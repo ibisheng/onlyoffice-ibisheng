@@ -1437,7 +1437,7 @@ cName.prototype.Calculate = function () {
 
 /** @constructor */
 function cStrucTable( val, wb, ws, cell ) {
-    this.constructor.call( this, val[0], cElementType.table );
+    this.constructor.call( this, val[0].replace("[]",""), cElementType.table );
     this.wb = wb;
     this.ws = ws;
     this.tableName = val['tableName'];
@@ -1520,7 +1520,7 @@ cStrucTable.prototype.toString = function () {
 		}
 		return tblStr.replace( "%1", data );
 	}
-	return tblStr.replace( "%1", "" );
+	return tblStr.replace( "%1", "" ).replace("[]","");
 };
 cStrucTable.prototype.toLocaleString = function () {
 	var tblStr, columns_1, columns_2;
@@ -1579,7 +1579,7 @@ cStrucTable.prototype.toLocaleString = function () {
 		}
 		return tblStr.replace( "%1", data );
 	}
-	return tblStr.replace( "%1", "" );
+	return tblStr.replace( "%1", "" ).replace("[]","");
 };
 cStrucTable.prototype.changeArea = function ( offset ) {
     return this.area;

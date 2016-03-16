@@ -317,7 +317,7 @@ var c_oAscAutoFilterTypes = {
 var c_oAscCoAuthoringMeBorderColor = new window["CColor"](22, 156, 0);
 var c_oAscCoAuthoringOtherBorderColor = new window["CColor"](238, 53, 37);
 var c_oAscCoAuthoringLockTablePropertiesBorderColor = new window["CColor"](255, 144, 0);
-var c_oAscCoAuthoringDottedWidth = 2;
+var c_oAscCoAuthoringDottedWidth = 4;
 var c_oAscCoAuthoringDottedDistance = 2;
 
 var c_oAscFormulaRangeBorderColor = [

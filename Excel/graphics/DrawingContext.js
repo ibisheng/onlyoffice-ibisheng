@@ -1032,9 +1032,9 @@
 		var _x2 = this._mct.transformPointX(x2, y);
 		var ctx = this.ctx;
 
-		_x1 = (_x1 >> 0) + 0.5;
+		_x1 = (_x1 >> 0);
 		_y  = (_y  >> 0) + 0.5;
-		_x2 = (_x2 >> 0) + 0.5;
+		_x2 = (_x2 >> 0);
 
 		for (; _x1 < _x2; _x1 += w_dist) {
 			ctx.moveTo(_x1, _y);
@@ -1053,9 +1053,9 @@
 		var _y2 = this._mct.transformPointY(x, y2);
 		var ctx = this.ctx;
 
-		_y1 = (_y1 >> 0) + 0.5;
+		_y1 = (_y1 >> 0);
 		_x  = (_x  >> 0) + 0.5;
-		_y2 = (_y2 >> 0) + 0.5;
+		_y2 = (_y2 >> 0);
 
 		for (; _y1 < _y2; _y1 += w_dist) {
 			ctx.moveTo(_x, _y1);

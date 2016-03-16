@@ -872,6 +872,7 @@
 						_s = _e - r.oper.value.length;
 						break;
 					}
+					case cElementType.table          :
 					case cElementType.name          :
 					{
 						var nameRef = r.oper.toRef();
@@ -879,7 +880,7 @@
 						switch ( nameRef.type ) {
 
 							case cElementType.cellsRange3D          :{
-								if ( !r.oper.isSingleSheet() ) {
+								if ( !nameRef.isSingleSheet() ) {
 									continue;
 								}
 							}
@@ -987,16 +988,16 @@
 						_s = _e - r.oper.value.length + 1;
 						break;
 					}
+					case cElementType.table          :
 					case cElementType.name          :
 					{
-//						continue;
 						var nameRef = r.oper.toRef();
 						if ( nameRef instanceof cError ) continue;
 						switch ( nameRef.type ) {
 
 							case cElementType.cellsRange3D          :
 							{
-								if ( !r.oper.isSingleSheet() ) {
+								if ( !nameRef.isSingleSheet() ) {
 									continue;
 								}
 							}

@@ -3494,12 +3494,31 @@
     /** */
 
     WorksheetView.prototype._drawSelectionElement = function ( visibleRange, offsetX, offsetY, args ) {
-        var range = args[0], isDashLine = args[1], lineWidth = args[2], strokeColor = args[3], fillColor = args[4], isAllRange = args[5];
-        var ctx = this.overlayCtx, c = this.cols, r = this.rows;
-        var oIntersection = range.intersectionSimple( visibleRange );
+        var range = args[0], isDashLine = args[1], lineWidth = args[2],
+			strokeColor = args[3], fillColor = args[4], isAllRange = args[5],
+			colorN = this.settings.activeCellBorderColor2,
+			ctx = this.overlayCtx, c = this.cols, r = this.rows,
+			oIntersection = range.intersectionSimple( visibleRange ),
+			ppiX = this._getPPIX(), ppiY = this._getPPIY();
+
         if ( !oIntersection ) {
             return;
         }
+
+		var width_1px = asc_calcnpt( 0, ppiX, 1/*px*/ ),
+			width_2px = asc_calcnpt( 0, ppiX, 2/*px*/ ),
+			width_3px = asc_calcnpt( 0, ppiX, 3/*px*/ ),
+			width_4px = asc_calcnpt( 0, ppiX, 4/*px*/ ),
+			width_5px = asc_calcnpt( 0, ppiX, 5/*px*/ ),
+			width_7px = asc_calcnpt( 0, ppiX, 7/*px*/ ),
+
+			height_1px = asc_calcnpt( 0, ppiY, 1/*px*/ ),
+			height_2px = asc_calcnpt( 0, ppiY, 2/*px*/ ),
+			height_3px = asc_calcnpt( 0, ppiY, 3/*px*/ ),
+			height_4px = asc_calcnpt( 0, ppiY, 4/*px*/ ),
+			height_5px = asc_calcnpt( 0, ppiY, 5/*px*/ ),
+			height_7px = asc_calcnpt( 0, ppiY, 7/*px*/ );
+
 
         var fHorLine, fVerLine;
         if ( isDashLine ) {
@@ -3524,42 +3543,75 @@
         var y1 = r[oIntersection.r1].top - offsetY;
         var y2 = r[oIntersection.r2].top + r[oIntersection.r2].height - offsetY;
 
-        ctx.setLineWidth( lineWidth ).setStrokeStyle( strokeColor );
+        ctx.setLineWidth( isDashLine ? lineWidth : 2 ).setStrokeStyle( strokeColor );/*2px для селекта ячеек в формулах*/
         if ( fillColor ) {
             ctx.setFillStyle( fillColor );
         }
-        ctx.beginPath();
 
-        if ( drawTopSide && !firstRow ) {
-            fHorLine.apply( ctx, [x1, y1, x2] );
-        }
-        if ( drawBottomSide ) {
-            fHorLine.apply( ctx, [x1, y2, x2] );
-        }
-        if ( drawLeftSide && !firstCol ) {
-            fVerLine.apply( ctx, [x1, y1, y2] );
-        }
-        if ( drawRightSide ) {
-            fVerLine.apply( ctx, [x2, y1, y2] );
-        }
+		ctx.beginPath();
+		if ( drawTopSide && !firstRow ) {
+			fHorLine.apply( ctx, [x1 - !isDashLine * width_2px, y1, x2 + !isDashLine * width_1px] );
+		}
+		if ( drawBottomSide ) {
+			fHorLine.apply( ctx, [x1, y2 + !isDashLine * height_1px, x2] );
+		}
+		if ( drawLeftSide && !firstCol ) {
+			fVerLine.apply( ctx, [x1, y1, y2 + !isDashLine * height_1px] );
+		}
+		if ( drawRightSide ) {
+			fVerLine.apply( ctx, [x2 + !isDashLine * width_1px, y1, y2 + !isDashLine * height_1px] );
+		}
+		ctx.closePath().stroke();
+
+		if ( !isDashLine ) {/*Отрисовка светлой полосы при выборе ячеек для формулы*/
+			ctx.setLineWidth( 1 );
+			ctx.setStrokeStyle( colorN );
+			ctx.beginPath();
+			if ( drawTopSide && !firstRow ) {
+				fHorLine.apply( ctx, [x1, y1 + height_1px, x2 - width_1px] );
+			}
+			if ( drawBottomSide ) {
+				fHorLine.apply( ctx, [x1, y2 - height_1px, x2 - width_1px] );
+			}
+			if ( drawLeftSide && !firstCol ) {
+				fVerLine.apply( ctx, [x1 + width_1px, y1, y2 - height_2px] );
+			}
+			if ( drawRightSide ) {
+				fVerLine.apply( ctx, [x2 - width_1px, y1, y2 - height_2px] );
+			}
+			ctx.closePath().stroke();
+		}
 
         // Отрисовка квадратов для move/resize
         if ( fillColor && !range.isName ) {
-            if ( drawLeftSide && drawTopSide ) {
-                ctx.fillRect( x1 - this.width_1px, y1 - this.height_1px, this.width_4px, this.height_4px );
-            }
-            if ( drawRightSide && drawTopSide ) {
-                ctx.fillRect( x2 - this.width_4px, y1 - this.height_1px, this.width_4px, this.height_4px );
-            }
-            if ( drawRightSide && drawBottomSide ) {
-                ctx.fillRect( x2 - this.width_4px, y2 - this.height_4px, this.width_4px, this.height_4px );
-            }
-            if ( drawLeftSide && drawBottomSide ) {
-                ctx.fillRect( x1 - this.width_1px, y2 - this.height_4px, this.width_4px, this.height_4px );
-            }
-        }
+			ctx.setFillStyle( colorN );
+			if ( drawLeftSide && drawTopSide ) {
+				ctx.fillRect( x1 - width_4px, y1 - height_4px, width_7px, height_7px );
+			}
+			if ( drawRightSide && drawTopSide ) {
+				ctx.fillRect( x2 - width_4px, y1 - height_4px, width_7px, height_7px );
+			}
+			if ( drawRightSide && drawBottomSide ) {
+				ctx.fillRect( x2 - width_4px, y2 - height_4px, width_7px, height_7px );
+			}
+			if ( drawLeftSide && drawBottomSide ) {
+				ctx.fillRect( x1 - width_4px, y2 - height_4px, width_7px, height_7px );
+			}
 
-        ctx.closePath().stroke();
+			ctx.setFillStyle( strokeColor );
+			if ( drawLeftSide && drawTopSide ) {
+				ctx.fillRect( x1 - width_3px, y1 - height_3px, width_5px, height_5px );
+			}
+			if ( drawRightSide && drawTopSide ) {
+				ctx.fillRect( x2 - width_3px, y1 - height_3px, width_5px, height_5px );
+			}
+			if ( drawRightSide && drawBottomSide ) {
+				ctx.fillRect( x2 - width_3px, y2 - height_3px, width_5px, height_5px );
+			}
+			if ( drawLeftSide && drawBottomSide ) {
+				ctx.fillRect( x1 - width_3px, y2 - height_3px, width_5px, height_5px );
+			}
+        }
     };
     /**Отрисовывает диапазон с заданными параметрами*/
     WorksheetView.prototype._drawElements = function ( thisArg, drawFunction ) {
@@ -3888,8 +3940,16 @@
                         ctx.setFillStyle( opt.activeCellBorderColor ).fillRect( this.fillHandleL, this.fillHandleT, this.fillHandleR - this.fillHandleL, this.fillHandleB - this.fillHandleT );
 
                         ctx.setStrokeStyle( opt.activeCellBorderColor2 ).setLineWidth( 1 ).beginPath();
-                        ctx.lineHorPrevPx( this.fillHandleL, this.fillHandleT, this.fillHandleR );
-                        ctx.lineVerPrevPx( this.fillHandleL, this.fillHandleT, this.fillHandleB );
+
+						/*TOP*/
+						ctx.lineHorPrevPx( this.fillHandleL, this.fillHandleT, this.fillHandleR + this.width_1px );
+						/*BOTTOM*/
+						ctx.lineHorPrevPx( this.fillHandleL - this.width_1px, this.fillHandleB + this.height_1px, this.fillHandleR + this.width_1px );
+						/*LEFT*/
+						ctx.lineVerPrevPx( this.fillHandleL, this.fillHandleT, this.fillHandleB );
+						/*RIGHT*/
+						ctx.lineVerPrevPx( this.fillHandleR + this.width_1px, this.fillHandleT, this.fillHandleB );
+
                         ctx.stroke();
                     }
                 }
@@ -4010,7 +4070,7 @@
         var strokeColor, fillColor, colorIndex, uniqueColorIndex = 0, tmpColors = [];
         for ( i = 0; i < arrRanges.length; ++i ) {
             var oFormulaRange = arrRanges[i].clone( true );
-			if(arrRanges[i].isName)oFormulaRange.isName=true;
+			if ( arrRanges[i].isName )oFormulaRange.isName = true;
             colorIndex = asc.getUniqueRangeColor( arrRanges, i, tmpColors );
             if ( null == colorIndex ) {
                 colorIndex = uniqueColorIndex++;
@@ -4211,10 +4271,10 @@
                 }
 
                 // Координаты для range формулы
-                var xF1 = this.cols[activeFormula.c1].left - offsetX - this.width_2px;
-                var xF2 = activeFormula.c2 > this.cols.length ? width : this.cols[activeFormula.c2].left + this.cols[activeFormula.c2].width - offsetX + this.width_1px;
-                var yF1 = this.rows[activeFormula.r1].top - offsetY - this.height_2px;
-                var yF2 = activeFormula.r2 > this.rows.length ? height : this.rows[activeFormula.r2].top + this.rows[activeFormula.r2].height - offsetY + this.height_1px;
+                var xF1 = this.cols[activeFormula.c1].left - offsetX - this.width_3px;
+                var xF2 = activeFormula.c2 > this.cols.length ? width : this.cols[activeFormula.c2].left + this.cols[activeFormula.c2].width - offsetX + this.width_3px;
+                var yF1 = this.rows[activeFormula.r1].top - offsetY - this.height_3px;
+                var yF2 = activeFormula.r2 > this.rows.length ? height : this.rows[activeFormula.r2].top + this.rows[activeFormula.r2].height - offsetY + this.height_3px;
 
                 // Выбираем наибольший range для очистки
                 x1 = Math.min( x1, xF1 );
@@ -6143,6 +6203,21 @@
         var cursor, oFormulaRange, oFormulaRangeIn, xFormula1, xFormula2, yFormula1, yFormula2;
         var col = -1, row = -1;
         var arrRanges = this.isFormulaEditMode ? this.arrActiveFormulaRanges : this.arrActiveChartsRanges, targetArr = this.isFormulaEditMode ? 0 : -1;
+		var ppiX = this._getPPIX(), ppiY = this._getPPIY();
+		var width_1px = asc_calcnpt( 0, ppiX, 1/*px*/ ),
+			width_2px = asc_calcnpt( 0, ppiX, 2/*px*/ ),
+			width_3px = asc_calcnpt( 0, ppiX, 3/*px*/ ),
+			width_4px = asc_calcnpt( 0, ppiX, 4/*px*/ ),
+			width_5px = asc_calcnpt( 0, ppiX, 5/*px*/ ),
+			width_7px = asc_calcnpt( 0, ppiX, 7/*px*/ ),
+
+			height_1px = asc_calcnpt( 0, ppiY, 1/*px*/ ),
+			height_2px = asc_calcnpt( 0, ppiY, 2/*px*/ ),
+			height_3px = asc_calcnpt( 0, ppiY, 3/*px*/ ),
+			height_4px = asc_calcnpt( 0, ppiY, 4/*px*/ ),
+			height_5px = asc_calcnpt( 0, ppiY, 5/*px*/ ),
+			height_7px = asc_calcnpt( 0, ppiY, 7/*px*/ );
+
         for ( i = 0, l = arrRanges.length; i < l; ++i ) {
             oFormulaRange = arrRanges[i].clone( true );
             oFormulaRange.isName = arrRanges[i].isName;
@@ -6153,29 +6228,32 @@
                 yFormula1 = this.rows[oFormulaRangeIn.r1].top - offsetY;
                 yFormula2 = this.rows[oFormulaRangeIn.r2].top + this.rows[oFormulaRangeIn.r2].height - offsetY;
 
-                if ( (x >= xFormula1 + 5 && x <= xFormula2 - 5) && ((y >= yFormula1 - this.height_2px && y <= yFormula1 + this.height_2px) || (y >= yFormula2 - this.height_2px && y <= yFormula2 + this.height_2px)) || (y >= yFormula1 + 5 && y <= yFormula2 - 5) && ((x >= xFormula1 - this.width_2px && x <= xFormula1 + this.width_2px) || (x >= xFormula2 - this.width_2px && x <= xFormula2 + this.width_2px)) ) {
+                if ( (x >= xFormula1 + width_3px && x <= xFormula2 - width_5px) &&
+					 ((y >= yFormula1 - height_2px && y <= yFormula1 + height_2px) || (y >= yFormula2 - height_2px && y <= yFormula2 + height_2px)) ||
+					 (y >= yFormula1 + height_3px && y <= yFormula2 - height_5px) &&
+					 ((x >= xFormula1 - width_2px && x <= xFormula1 + width_2px) || (x >= xFormula2 - width_2px && x <= xFormula2 + width_2px)) ) {
                     cursor = kCurMove;
                     break;
                 }
-                else if ( x >= xFormula1 && x < xFormula1 + 5 && y >= yFormula1 && y < yFormula1 + 5 ) {
+				else if ( x >= xFormula1 - width_3px && x < xFormula1 + width_2px && y >= yFormula1 - height_3px && y < yFormula1 + height_2px ) {/*TOP-LEFT*/
                     cursor = kCurSEResize;
                     col = oFormulaRange.c2;
                     row = oFormulaRange.r2;
                     break;
                 }
-                else if ( x > xFormula2 - 5 && x <= xFormula2 && y > yFormula2 - 5 && y <= yFormula2 ) {
+				else if ( x > xFormula2 - width_3px && x <= xFormula2 + width_2px && y >= yFormula1 - height_3px && y < yFormula1 + height_2px ) {/*TOP-RIGHT*/
+					cursor = kCurNEResize;
+					col = oFormulaRange.c1;
+					row = oFormulaRange.r2;
+					break;
+				}
+                else if ( x > xFormula2 - width_3px && x <= xFormula2 + width_2px && y > yFormula2 - height_3px && y <= yFormula2 + height_2px ) {/*BOTTOM-RIGHT*/
                     cursor = kCurSEResize;
                     col = oFormulaRange.c1;
                     row = oFormulaRange.r1;
                     break;
                 }
-                else if ( x > xFormula2 - 5 && x <= xFormula2 && y >= yFormula1 && y < yFormula1 + 5 ) {
-                    cursor = kCurNEResize;
-                    col = oFormulaRange.c1;
-                    row = oFormulaRange.r2;
-                    break;
-                }
-                else if ( x >= xFormula1 && x < xFormula1 + 5 && y > yFormula2 - 5 && y <= yFormula2 ) {
+                else if ( x >= xFormula1 - width_3px && x < xFormula1 + width_2px && y > yFormula2 - height_3px && y <= yFormula2 + height_2px ) {/*BOTTOM-LEFT*/
                     cursor = kCurNEResize;
                     col = oFormulaRange.c2;
                     row = oFormulaRange.r1;
