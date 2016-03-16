@@ -2085,6 +2085,8 @@
 			
 			ReadPresentationShapes: function(stream, worksheet)
 			{
+				History.TurnOff();
+				
 				var loader = new BinaryPPTYLoader();
 				loader.presentation = worksheet.model;
 				loader.Start_UseFullUrl();
@@ -2130,12 +2132,16 @@
 					arr_shapes[i] = worksheet.objectRender.createDrawingObject();
 					arr_shapes[i].graphicObject = drawing;
 				}
-
+				
+				History.TurnOn();
+				
 				return {arrShapes: arr_shapes, arrImages: loader.End_UseFullUrl(), arrTransforms: arr_transforms};
 			},
 			
 			ReadPresentationText: function(stream, worksheet)
 			{
+				History.TurnOff();
+				
 				var loader = new BinaryPPTYLoader();
 				loader.Start_UseFullUrl();
 				loader.stream = stream;
@@ -2153,6 +2159,9 @@
 					
 					elements.push(paragraph);
 				}
+				
+				History.TurnOn();
+				
 				return elements;
 			},
 			
