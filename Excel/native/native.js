@@ -2845,6 +2845,7 @@ function OfflineEditor () {
     this.cellPin = 0;
     this.col0 = 0;
     this.row0 = 0;
+    this.translate = null;
 
     // main
 
@@ -4293,6 +4294,21 @@ function OfflineEditor () {
             }
         };
 
+        if (this.translate) {
+            var t = JSON.parse(this.translate);
+            if (t) {
+                var translateChart = new Asc.asc_CChartTranslate();
+                if (t['diagrammtitle']) translateChart.asc_setTitle(t['diagrammtitle']);
+                if (t['xaxis']) translateChart.asc_setXAxis(t['xaxis']);
+                if (t['yaxis']) translateChart.asc_setYAxis(t['yaxis']);
+                if (t['series']) translateChart.asc_setSeries(t['series']);
+                _api.asc_setChartTranslate(translateChart);
+
+                var translateArt = new Asc.asc_TextArtTranslate();
+                if (t['art'])translateArt.asc_setDefaultText(t['art']);
+                _api.asc_setTextArtTranslate(translateArt);
+            }
+        }
     };
     this.offline_afteInit = function () {
         window.AscAlwaysSaveAspectOnResizeTrack = true;
@@ -4484,7 +4500,7 @@ function offline_mouse_up(x, y, isViewerMode, isRangeResize, isChartRange, index
 
         if (isRangeResize) {
             if (!isViewerMode) {
-               // var ct = ws.getCursorTypeFromXY(x, y, isViewerMode);
+                // var ct = ws.getCursorTypeFromXY(x, y, isViewerMode);
                 var target = {
                     //row: isChartRange ? ct.row : targetRow,
                     //col: isChartRange ? ct.col : targetCol,
@@ -5087,7 +5103,6 @@ function offline_calculate_range(x, y, w, h) {
         ws.cols[range.c2].left + ws.cols[range.c2].width,
         ws.rows[range.r2].top  + ws.rows[range.r1].height];
 }
-
 function offline_calculate_complete_range(x, y, w, h) {
 
     var ws = _api.wb.getWorksheet();
@@ -5117,6 +5132,10 @@ function offline_calculate_complete_range(x, y, w, h) {
         ws.rows[range.r1].top,
         ws.cols[range.c2].left + ws.cols[range.c2].width,
         ws.rows[range.r2].top  + ws.rows[range.r1].height];
+}
+
+function offline_set_translate(translate) {
+   _s.translate = translate;
 }
 
 function offline_apply_event(type,params) {
@@ -6062,9 +6081,6 @@ function offline_apply_event(type,params) {
 
             var ws = _api.wb.getWorksheet();
             ws.changeColumnWidth(toColumn, width, 0);
-
-            // _api.asc_setColumnWidth(params);
-
             break;
         }
 
@@ -6076,8 +6092,6 @@ function offline_apply_event(type,params) {
 
             var ws = _api.wb.getWorksheet();
             ws.changeRowHeight(toRow, height, 0);
-
-            // _api.asc_setRowHeight(params);
             break;
         }
 
