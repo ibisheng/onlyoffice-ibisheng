@@ -1305,24 +1305,12 @@
 
   WorkbookView.prototype._onAddColumn = function() {
     var res = this.getWorksheet().expandColsOnScroll(true);
-    if (res) {
-		if(res == 1)
-      		this.controller.reinitializeScroll(/*horizontal*/2);
-		else
-      		this.controller.reinitializeScroll(/*horizontal*/2,true);
-    }
+    this.controller.reinitializeScroll(/*horizontal*/2, !res);
   };
 
   WorkbookView.prototype._onAddRow = function() {
     var res = this.getWorksheet().expandRowsOnScroll(true);
-    if (res) {  // Добавлены строки
-      // после добавления controller.settings.wheelScrollLines
-      // ws.scrollVertical() здесь не нужен, scroll.js сам все разрулит
-		if(res == 1)
-      		this.controller.reinitializeScroll(/*vertical*/1);
-		else
-			this.controller.reinitializeScroll(/*vertical*/1,true);
-    }
+    this.controller.reinitializeScroll(/*vertical*/1, !res);
   };
 
   WorkbookView.prototype._onShowNextPrevWorksheet = function(direction) {

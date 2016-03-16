@@ -3466,11 +3466,11 @@
         this.visibleRange.c1 = col;
         this.visibleRange.r1 = row;
         if ( col >= this.nColsCount ) {
-            this.expandColsOnScroll( false, true, 0 );
-        } // Передаем 0, чтобы увеличить размеры
+            this.expandColsOnScroll(false, true);
+        }
         if ( row >= this.nRowsCount ) {
-            this.expandRowsOnScroll( false, true, 0 );
-        } // Передаем 0, чтобы увеличить размеры
+            this.expandRowsOnScroll(false, true);
+        }
 
         this.visibleRange.r2 = 0;
         this._calcVisibleRows();
@@ -9136,8 +9136,8 @@
             unLockDraw( t.model.workbook );
             return;
         }
-        t.expandColsOnScroll();
-        t.expandRowsOnScroll();
+        this.expandColsOnScroll(false, true);
+        this.expandRowsOnScroll(false, true);
 
         var arrFormula = selectData[1];
         for ( var i = 0; i < arrFormula.length; ++i ) {//!!!
@@ -10491,101 +10491,65 @@
         }
     };
 
-    WorksheetView.prototype.expandColsOnScroll = function ( isNotActive, updateColsCount, newColsCount ) {
-        var t = this;
-        var arn;
-        var bIsMaxCols = false;
+    WorksheetView.prototype.expandColsOnScroll = function(isNotActive, updateColsCount, newColsCount) {
         var obr = this.objectRender ? this.objectRender.getDrawingAreaMetrics() : {maxCol: 0, maxRow: 0};
-        var maxc = Math.max( this.model.getColsCount() + 1, this.cols.length, obr.maxCol );
-        if ( newColsCount ) {
-            maxc = Math.max( maxc, newColsCount );
+        var maxc = Math.max(this.model.getColsCount() + 1, this.cols.length, obr.maxCol);
+        if (newColsCount) {
+            maxc = Math.max(maxc, newColsCount);
         }
 
         // Сохраняем старое значение
         var nLastCols = this.nColsCount;
-        if ( isNotActive ) {
+        if (isNotActive) {
             this.nColsCount = maxc + 1;
-        }
-        else if ( updateColsCount ) {
+        } else if (updateColsCount) {
             this.nColsCount = maxc;
-            if ( this.cols.length < this.nColsCount ) {
+            if (this.cols.length < this.nColsCount) {
                 nLastCols = this.cols.length;
             }
         }
-        else {
-            arn = t.activeRange.clone( true );
-            if ( arn.c2 >= t.cols.length - 1 ) {
-                this.nColsCount = maxc;
-                if ( arn.c2 >= this.nColsCount - 1 ) {
-                    this.nColsCount = arn.c2 + 2;
-                }
-            }
-        }
         // Проверяем ограничения по столбцам
-        if ( gc_nMaxCol < this.nColsCount ) {
+        if (gc_nMaxCol < this.nColsCount) {
             this.nColsCount = gc_nMaxCol;
-            bIsMaxCols = true;
         }
 
-        t._calcWidthColumns( /*fullRecalc*/2 );
+        this._calcWidthColumns(/*fullRecalc*/2);
 
-        if ( this.objectRender && this.objectRender.drawingArea ) {
+        if (this.objectRender && this.objectRender.drawingArea) {
             this.objectRender.drawingArea.reinitRanges();
         }
 
-		if ( nLastCols !== this.nColsCount )
-			return 1;
-		if ( bIsMaxCols )
-			return 2;
-		return (nLastCols !== this.nColsCount || bIsMaxCols);
+        return nLastCols !== this.nColsCount;
     };
 
-    WorksheetView.prototype.expandRowsOnScroll = function ( isNotActive, updateRowsCount, newRowsCount ) {
-        var t = this;
-        var arn;
-        var bIsMaxRows = false;
+    WorksheetView.prototype.expandRowsOnScroll = function(isNotActive, updateRowsCount, newRowsCount) {
         var obr = this.objectRender ? this.objectRender.getDrawingAreaMetrics() : {maxCol: 0, maxRow: 0};
-        var maxr = Math.max( this.model.getRowsCount() + 1, this.rows.length, obr.maxRow );
-        if ( newRowsCount ) {
-            maxr = Math.max( maxr, newRowsCount );
+        var maxr = Math.max(this.model.getRowsCount() + 1, this.rows.length, obr.maxRow);
+        if (newRowsCount) {
+            maxr = Math.max(maxr, newRowsCount);
         }
 
         // Сохраняем старое значение
         var nLastRows = this.nRowsCount;
-        if ( isNotActive ) {
+        if (isNotActive) {
             this.nRowsCount = maxr + 1;
-        }
-        else if ( updateRowsCount ) {
+        } else if (updateRowsCount) {
             this.nRowsCount = maxr;
-            if ( this.rows.length < this.nRowsCount ) {
+            if (this.rows.length < this.nRowsCount) {
                 nLastRows = this.rows.length;
             }
         }
-        else {
-            arn = t.activeRange.clone( true );
-            if ( arn.r2 >= t.rows.length - 1 ) {
-                this.nRowsCount = maxr;
-                if ( arn.r2 >= this.nRowsCount - 1 ) {
-                    this.nRowsCount = arn.r2 + 2;
-                }
-            }
-        }
         // Проверяем ограничения по строкам
-        if ( gc_nMaxRow < this.nRowsCount ) {
+        if (gc_nMaxRow < this.nRowsCount) {
             this.nRowsCount = gc_nMaxRow;
-            bIsMaxRows = true;
         }
 
-        t._calcHeightRows( /*fullRecalc*/2 );
-        if ( this.objectRender && this.objectRender.drawingArea ) {
+        this._calcHeightRows(/*fullRecalc*/2);
+        if (this.objectRender && this.objectRender.drawingArea) {
             this.objectRender.drawingArea.reinitRanges();
         }
 
-		if ( nLastRows !== this.nRowsCount )
-			return 1;
-		if ( bIsMaxRows )
-			return 2;
-		return (nLastRows !== this.nRowsCount || bIsMaxRows);
+        return nLastRows !== this.nRowsCount;
     };
 
     WorksheetView.prototype.onChangeWidthCallback = function ( col, r1, r2, onlyIfMore ) {
