@@ -379,7 +379,8 @@ var c_oSerExtent = {
 var c_oSerPosHV = {
 	RelativeFrom: 0,
 	Align: 1,
-	PosOffset: 2
+	PosOffset: 2,
+	PctOffset: 3
 };
 var c_oSerSimplePos = {
 	X: 0,
@@ -3382,25 +3383,24 @@ Binary_tblPrWriter.prototype =
     },
     WriteW: function(WAfter)
     {
-		if(tblwidth_Pct != WAfter.Type)
+		//Type
+		if(null != WAfter.Type)
 		{
-			//Type
-			if(null != WAfter.Type)
-			{
-				this.memory.WriteByte(c_oSerWidthType.Type);
-				this.memory.WriteByte(c_oSerPropLenType.Byte);
-				this.memory.WriteByte(WAfter.Type);
-			}
-			//W
-			if(null != WAfter.W)
-			{
-				var nVal = WAfter.W;
-				if(tblwidth_Mm == WAfter.Type)
-					nVal = Math.round(g_dKoef_mm_to_twips * WAfter.W);
-				this.memory.WriteByte(c_oSerWidthType.WDocx);
-				this.memory.WriteByte(c_oSerPropLenType.Long);
-				this.memory.WriteLong(nVal);
-			}
+			this.memory.WriteByte(c_oSerWidthType.Type);
+			this.memory.WriteByte(c_oSerPropLenType.Byte);
+			this.memory.WriteByte(WAfter.Type);
+		}
+		//W
+		if(null != WAfter.W)
+		{
+			var nVal = WAfter.W;
+			if(tblwidth_Mm == WAfter.Type)
+				nVal = Math.round(g_dKoef_mm_to_twips * WAfter.W);
+			else if(tblwidth_Pct == WAfter.Type)
+				nVal = Math.round(100 * WAfter.W / 2);
+			this.memory.WriteByte(c_oSerWidthType.WDocx);
+			this.memory.WriteByte(c_oSerPropLenType.Long);
+			this.memory.WriteLong(nVal);
 		}
     },
     WriteCellPr: function(cellPr, vMerge, cell)
@@ -4359,7 +4359,11 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
 		}
 		else
 		{
-			this.memory.WriteByte(c_oSerPosHV.PosOffset);
+			if (true == PositionH.Percent) {
+				this.memory.WriteByte(c_oSerPosHV.PctOffset);
+			} else {
+				this.memory.WriteByte(c_oSerPosHV.PosOffset);
+			}
 			this.memory.WriteByte(c_oSerPropLenType.Double);
 			this.memory.WriteDouble(PositionH.Value);
 		}
@@ -7101,6 +7105,8 @@ Binary_tblPrReader.prototype =
 		{
 			if(tblwidth_Mm == input.Type)
 				output.W = g_dKoef_twips_to_mm * input.WDocx;
+			else if(tblwidth_Pct == input.Type)
+				output.W = 2 * input.WDocx / 100;
 			else
 				output.W = input.WDocx;
 		}
@@ -8749,6 +8755,11 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 		else if( c_oSerPosHV.PosOffset === type )
 		{
 			PositionH.Align = false;
+			PositionH.Value = this.bcr.ReadDouble();
+		}
+		else if( c_oSerPosHV.PctOffset === type )
+		{
+			PositionH.Percent = true;
 			PositionH.Value = this.bcr.ReadDouble();
 		}
 		else
