@@ -419,21 +419,25 @@
 				
 				var objectRender = worksheetView.objectRender;
 				var selectedImages = objectRender.getSelectedGraphicObjects();
-				
-				var drawingUrls = [];
-				if(selectedImages && selectedImages.length)
-				{
-					var url, correctUrl, graphicObj;
-					for(var i = 0; i < selectedImages.length; i++)
-					{
-						graphicObj = selectedImages[i];
-						if(graphicObj.isImage())
-						{
-							url = graphicObj;
-							drawingUrls[i] = graphicObj.getBase64Img();
-						}	
-					}
-				}
+
+                var drawingUrls = [];
+                if(selectedImages && selectedImages.length)
+                {
+                    var correctUrl, graphicObj;
+                    for(var i = 0; i < selectedImages.length; i++)
+                    {
+                        graphicObj = selectedImages[i];
+                        if(graphicObj.isImage())  {
+                            if(window["NativeCorrectImageUrlOnCopy"]) {
+                                correctUrl = window["NativeCorrectImageUrlOnCopy"](graphicObj.getImageUrl());
+                                drawingUrls[i] = correctUrl;
+                            }
+                            else {
+                                drawingUrls[i] = graphicObj.getBase64Img();
+                            }
+                        }
+                    }
+                }
 				
 				return {sBase64: sBase64, html: html, text: this.lStorageText, drawingUrls: drawingUrls};
 			},
@@ -1891,19 +1895,35 @@
 				if (pasteData) {
 					if(pasteData.Drawings && pasteData.Drawings.length)
 					{
-						if(!(window["Asc"]["editor"] && window["Asc"]["editor"].isChartEditor))
-						{
-							if(aPastedImages && aPastedImages.length)
-							{
-								t._loadImagesOnServer(aPastedImages, function() {
-									t._insertImagesFromBinary(worksheet, pasteData, isIntoShape);
-								});
-							}
-							else
-							{
-								t._insertImagesFromBinary(worksheet, pasteData, isIntoShape);
-							}
-						}
+                        if (window["NativeCorrectImageUrlOnPaste"]) {
+                            var url;
+                            for(var i = 0, length = aPastedImages.length; i < length; ++i)
+                            {
+                                url = window["NativeCorrectImageUrlOnPaste"](aPastedImages[i].Url);
+                                aPastedImages[i].Url = url;
+
+                                var imageElem = aPastedImages[i];
+                                if(null != imageElem)
+                                {
+                                    imageElem.SetUrl(url);
+                                }
+                            }
+
+                            t._insertImagesFromBinary(worksheet, pasteData, isIntoShape);
+                        }
+                        else if(!(window["Asc"]["editor"] && window["Asc"]["editor"].isChartEditor))
+                        {
+                            if(aPastedImages && aPastedImages.length)
+                            {
+                                t._loadImagesOnServer(aPastedImages, function() {
+                                    t._insertImagesFromBinary(worksheet, pasteData, isIntoShape);
+                                });
+                            }
+                            else
+                            {
+                                t._insertImagesFromBinary(worksheet, pasteData, isIntoShape);
+                            }
+                        }
 					}
 					else 
 					{	

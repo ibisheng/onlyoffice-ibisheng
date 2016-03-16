@@ -919,7 +919,9 @@ var editor;
    * asc_onEditorSelectionChanged	(asc_CFont)											- эвент на смену информации о выделении в редакторе ячейки
    * asc_onSelectionChanged		(asc_CCellInfo)										- эвент на смену информации о выделении
    * asc_onSelectionNameChanged	(sName)												- эвент на смену имени выделения (Id-ячейки, число выделенных столбцов/строк, имя диаграммы и др.)
-   * asc_onSelectionMathChanged	(asc_CSelectionMathInfo)							- эвент на смену математической информации о выделении
+   * asc_onSelection
+   *
+   * Changed	(asc_CSelectionMathInfo)							- эвент на смену математической информации о выделении
    * asc_onZoomChanged			(zoom)
    * asc_onSheetsChanged			()													- эвент на обновление списка листов
    * asc_onActiveSheetChanged		(indexActiveSheet)									- эвент на обновление активного листа
@@ -1429,10 +1431,13 @@ var editor;
 
   spreadsheet_api.prototype._sendWorkbookStyles = function() {
     if (this.wbModel) {
-      // Для нативной версии не генерируем стили
-      if (window["NATIVE_EDITOR_ENJINE"] && (!this.handlers.hasTrigger("asc_onInitTablePictures") || !this.handlers.hasTrigger("asc_onInitEditorStyles"))) {
-        return;
-      }
+
+        if (!window['IS_NATIVE_EDITOR']) {
+            // Для нативной версии не генерируем стили
+            if (window["NATIVE_EDITOR_ENJINE"] && (!this.handlers.hasTrigger("asc_onInitTablePictures") || !this.handlers.hasTrigger("asc_onInitEditorStyles"))) {
+                return;
+            }
+        }
 
       // Отправка стилей форматированных таблиц
       this.handlers.trigger("asc_onInitTablePictures", this.wb.getTablePictures());
@@ -2939,7 +2944,7 @@ var editor;
   };
   spreadsheet_api.prototype.asc_ApplyColorScheme = function(bRedraw) {
 
-    if (!window["NATIVE_EDITOR_ENJINE"]) {
+    if (window['IS_NATIVE_EDITOR'] || !window["NATIVE_EDITOR_ENJINE"]) {
       var wsViews = Asc["editor"].wb.wsViews;
       for (var i = 0; i < wsViews.length; ++i) {
         if (wsViews[i] && wsViews[i].objectRender && wsViews[i].objectRender.controller) {
