@@ -23135,64 +23135,13 @@ function Ins_FDEF(exc, args, args_pos)
 {
     var bIsSubpix = exc.face.driver.library.tt_hint_props.TT_CONFIG_OPTION_SUBPIXEL_HINTING;
 
-    /* some font programs are broken enough to redefine functions! */
-    /* We will then parse the current table.                       */
-    var defs = exc.FDefs;
-    var rec = 0;
-    var limit = exc.numFDefs;
-    var n = args[args_pos];
-
-    for ( ; rec < limit; rec++)
-    {
-        if (defs[rec].opc == n)
-            break;
-    }
-
-    if (rec == limit)
-    {
-        /* check that there is enough room for new functions */
-        if (exc.numFDefs >= exc.maxFDefs)
-        {
-            exc.error = 140;
-            return;
-        }
-        exc.numFDefs++;
-    }
-
-    /* Although FDEF takes unsigned 32-bit integer,  */
-    /* func # must be within unsigned 16-bit integer */
-    if (n > 0xFFFF)
-    {
-        exc.error = 140;
-        return;
-    }
-
-    defs[rec].range        = exc.curRange;
-    defs[rec].opc          = 0xFFFF & n;
-    defs[rec].start        = exc.IP + 1;
-    defs[rec].active       = true;
-    defs[rec].inline_delta = false;
-    defs[rec].sph_fdef_flags = 0x0000;
-
-    if (n > exc.maxFunc)
-        exc.maxFunc = 0xFFFF & n;
-
+    var opcode_pattern = null;
+    var opcode_patterns = null;
+    var opcode_pointer = null;
+    var opcode_size    = null;;
     if (bIsSubpix)
     {
-        /* We don't know for sure these are typeman functions, */
-        /* however they are only active when RS 22 is called   */
-        if (n >= 64 && n <= 66)
-            defs[rec].sph_fdef_flags |= 128;
-    }
-
-    /* Now skip the whole function definition. */
-    /* We don't allow nested IDEFS & FDEFs.    */
-
-    while (SkipCode(exc) == 0)
-    {
-        if (bIsSubpix)//#ifdef TT_CONFIG_OPTION_SUBPIXEL_HINTING
-        {
-            var opcode_pattern = [
+        opcode_pattern = [
             /* #0 inline delta function 1 */
             [
                 0x4B, /* PPEM    */
@@ -23283,11 +23232,69 @@ function Ins_FDEF(exc, args, args_pos)
                 0x06, /* SPVTL   */
                 0x7D, /* RDTG    */
             ]
-            ];
-            var opcode_patterns = opcode_pattern.length;
-            var opcode_pointer = [  0, 0, 0, 0, 0, 0, 0, 0, 0 ];
-            var opcode_size    = [ 12, 8, 8, 6, 7, 4, 5, 4, 2 ];
+        ];
+        opcode_patterns = opcode_pattern.length;
+        opcode_pointer = [  0, 0, 0, 0, 0, 0, 0, 0, 0 ];
+        opcode_size    = [ 12, 8, 8, 6, 7, 4, 5, 4, 2 ];
+    }
 
+    /* some font programs are broken enough to redefine functions! */
+    /* We will then parse the current table.                       */
+    var defs = exc.FDefs;
+    var rec = 0;
+    var limit = exc.numFDefs;
+    var n = args[args_pos];
+
+    for ( ; rec < limit; rec++)
+    {
+        if (defs[rec].opc == n)
+            break;
+    }
+
+    if (rec == limit)
+    {
+        /* check that there is enough room for new functions */
+        if (exc.numFDefs >= exc.maxFDefs)
+        {
+            exc.error = 140;
+            return;
+        }
+        exc.numFDefs++;
+    }
+
+    /* Although FDEF takes unsigned 32-bit integer,  */
+    /* func # must be within unsigned 16-bit integer */
+    if (n > 0xFFFF)
+    {
+        exc.error = 140;
+        return;
+    }
+
+    defs[rec].range        = exc.curRange;
+    defs[rec].opc          = 0xFFFF & n;
+    defs[rec].start        = exc.IP + 1;
+    defs[rec].active       = true;
+    defs[rec].inline_delta = false;
+    defs[rec].sph_fdef_flags = 0x0000;
+
+    if (n > exc.maxFunc)
+        exc.maxFunc = 0xFFFF & n;
+
+    if (bIsSubpix)
+    {
+        /* We don't know for sure these are typeman functions, */
+        /* however they are only active when RS 22 is called   */
+        if (n >= 64 && n <= 66)
+            defs[rec].sph_fdef_flags |= 128;
+    }
+
+    /* Now skip the whole function definition. */
+    /* We don't allow nested IDEFS & FDEFs.    */
+
+    while (SkipCode(exc) == 0)
+    {
+        if (bIsSubpix)//#ifdef TT_CONFIG_OPTION_SUBPIXEL_HINTING
+        {
             for (var i = 0; i < opcode_patterns; i++)
             {
                 if (opcode_pointer[i] < opcode_size[i] && exc.opcode == opcode_pattern[i][opcode_pointer[i]])
@@ -24436,7 +24443,7 @@ function Ins_RS(exc, args, args_pos)
             /* subpixel hinting - avoid Typeman Dstroke and */
             /* IStroke and Vacuform rounds                  */
 
-            if (exc.compatibility_mode &&
+            if (exc.ignore_x_mode &&
                 ((I == 24) && (exc.face.sph_found_func_flags & (32 | 64))) ||
                 ((I == 22) && (exc.sph_in_func_flags & 128)) ||
                 ((I == 8) && (exc.face.sph_found_func_flags & 8) && exc.iup_called))
