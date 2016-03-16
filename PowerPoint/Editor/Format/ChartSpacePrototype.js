@@ -567,7 +567,10 @@ CTable.prototype.Get_TableOffsetCorrection = function()
 {
     return 0;
 };
-
+CTable.prototype.Get_RightTableOffsetCorrection = function()
+{
+    return 0;
+};
 CTable.prototype.Selection_Draw_Page = function(CurPage)
 {
     if (false === this.Selection.Use)

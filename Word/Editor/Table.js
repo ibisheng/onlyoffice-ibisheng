@@ -2185,6 +2185,46 @@ CTable.prototype =
         return -X;
     },
 
+    Get_RightTableOffsetCorrection : function()
+    {
+        var X = 0;
+
+        if (true === this.Parent.Is_TableCellContent())
+            return 0;
+
+        var Row         = this.Content[0];
+        var Cell        = Row.Get_Cell(Row.Get_CellsCount() - 1);
+        var Margins     = Cell.Get_Margins();
+        var CellSpacing = Row.Get_CellSpacing();
+        if (null != CellSpacing)
+        {
+            var TableBorder_Right = this.Get_Borders().Right;
+            if (border_None != TableBorder_Right.Value)
+                X += TableBorder_Right.Size / 2;
+
+            X += CellSpacing;
+
+            var CellBorder_Right = Cell.Get_Borders().Right;
+            if (border_None != CellBorder_Right.Value)
+                X += CellBorder_Right.Size;
+
+            X += Margins.Right.W;
+        }
+        else
+        {
+            var TableBorder_Right = this.Get_Borders().Right;
+            var CellBorder_Right  = Cell.Get_Borders().Right;
+            var Result_Border     = this.Internal_CompareBorders(TableBorder_Right, CellBorder_Right, true, false);
+
+            if (border_None != Result_Border.Value)
+                X += Math.max(Result_Border.Size / 2, Margins.Right.W);
+            else
+                X += Margins.Right.W;
+        }
+
+        return X;
+    },
+
     // Получаем первый параграф первой ячейки. (Нужно для контроля ContextualSpacing)
     Get_FirstParagraph : function()
     {
