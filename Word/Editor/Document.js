@@ -2034,7 +2034,7 @@ CDocument.prototype =
                 if (null !== PrevElement && type_Paragraph === PrevElement.Get_Type() && true === PrevElement.Is_Empty() && undefined !== PrevElement.Get_SectionPr())
                     PrevElement = PrevElement.Get_DocumentPrev();
 
-                if (null !== PrevElement && type_Paragraph === PrevElement.Get_Type() && Index !== Page.Pos)
+                if (null !== PrevElement && type_Paragraph === PrevElement.Get_Type())
                 {
                     var bNeedPageBreak = true;
                     if (undefined !== PrevElement.Get_SectionPr())
@@ -2046,10 +2046,10 @@ CDocument.prototype =
                     }
 
                     var EndLine = PrevElement.Pages[PrevElement.Pages.length - 1].EndLine;
-                    if (true === bNeedPageBreak && -1 !== EndLine && PrevElement.Lines[EndLine].Info & paralineinfo_BreakRealPage)
+                    if (true === bNeedPageBreak && -1 !== EndLine && PrevElement.Lines[EndLine].Info & paralineinfo_BreakRealPage && Index !== Page.Pos)
                         isPageBreakOnPrevLine = true;
 
-                    if (-1 !== EndLine && !(PrevElement.Lines[EndLine].Info & paralineinfo_BreakRealPage) && PrevElement.Lines[EndLine].Info & paralineinfo_BreakPage)
+                    if (-1 !== EndLine && !(PrevElement.Lines[EndLine].Info & paralineinfo_BreakRealPage) && PrevElement.Lines[EndLine].Info & paralineinfo_BreakPage && Index !== PageColumn.Pos)
                         isColumnBreakOnPrevLine = true;
                 }
 

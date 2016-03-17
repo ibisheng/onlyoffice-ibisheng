@@ -2921,7 +2921,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                         if (break_Page === Item.BreakType)
                             PRS.BreakRealPageLine = true;
 
-                        if (true === Para.Check_BreakPageEnd(Item))
+                        if (break_Page === Item.BreakType && true === Para.Check_BreakPageEnd(Item))
                             continue;
 
                         Item.Flags.NewLine = true;
