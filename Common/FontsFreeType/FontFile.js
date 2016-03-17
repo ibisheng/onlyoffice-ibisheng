@@ -168,6 +168,7 @@ function CFontFile(fileName, faceIndex)
     this.m_bIsNeedUpdateMatrix12 = true;
     this.m_oFontManager = null;
     this.HintsSupport = true;
+    this.HintsSubpixelSupport = true;
 
     this.SetDefaultFont = function(pDefFont)
     {
@@ -579,7 +580,7 @@ function CFontFile(fileName, faceIndex)
                 oSizes.ushGID     = unGID;
                 oSizes.nCMapIndex = nCMapIndex.index;
 
-                var _LOAD_MODE = this.HintsSupport ? this.m_oFontManager.LOAD_MODE : 40970;
+                var _LOAD_MODE = this.GetCharLoadMode();
                 if (0 != FT_Load_Glyph(pFace, unGID, _LOAD_MODE))
                     return;
 
@@ -787,7 +788,7 @@ function CFontFile(fileName, faceIndex)
                     this.UpdateMatrix2();
                 }
 
-                var _LOAD_MODE = this.HintsSupport ? this.m_oFontManager.LOAD_MODE : 40970;
+                var _LOAD_MODE = this.GetCharLoadMode();
                 if (0 != FT_Load_Glyph(pFace, unGID, _LOAD_MODE))
                     return;
 
@@ -1060,7 +1061,7 @@ function CFontFile(fileName, faceIndex)
                 pCurGlyph.fY = (_m[5] + fX * _m[1] + fY * _m[3] - pString.m_fY);
             }
 
-            var _LOAD_MODE = this.HintsSupport ? this.m_oFontManager.LOAD_MODE : 40970;
+            var _LOAD_MODE = this.GetCharLoadMode();
             if (0 != FT_Load_Glyph(this.m_pFace, unGID, _LOAD_MODE))
                 return;
 
@@ -1385,7 +1386,7 @@ function CFontFile(fileName, faceIndex)
             oSizes.ushGID     = unGID;
             oSizes.nCMapIndex = nCMapIndex.index;
 
-            var _LOAD_MODE = this.HintsSupport ? this.m_oFontManager.LOAD_MODE : 40970;
+            var _LOAD_MODE = this.GetCharLoadMode();
             if (0 != FT_Load_Glyph(pFace, unGID, _LOAD_MODE))
                 return;
 
@@ -1632,9 +1633,20 @@ function CFontFile(fileName, faceIndex)
         }
 
         if (this.m_pFace.family_name == "MS Mincho" ||
-            this.m_pFace.family_name == "Castellar" ||
-            this.m_pFace.family_name == "Microsoft JhengHei UI Light")
+            this.m_pFace.family_name == "Castellar")
+        {
             this.HintsSupport = false;
+        }
+        else if (this.m_pFace.family_name == "Microsoft JhengHei UI Light" ||
+            this.m_pFace.family_name == "Kalinga")
+        {
+            this.HintsSubpixelSupport = false;
+        }
+    }
+
+    this.GetCharLoadMode = function()
+    {
+        return (this.HintsSupport && this.HintsSubpixelSupport) ? this.m_oFontManager.LOAD_MODE : 40970;
     }
 
     this.GetCharPath = function(lUnicode, worker, x, y)
@@ -1683,7 +1695,7 @@ function CFontFile(fileName, faceIndex)
             }
         }
 
-        var _LOAD_MODE = this.HintsSupport ? this.m_oFontManager.LOAD_MODE : 40970;
+        var _LOAD_MODE = this.GetCharLoadMode();
         if (0 != FT_Load_Glyph(pFace, unGID, _LOAD_MODE))
             return;
 
