@@ -3652,8 +3652,8 @@
             return;
         }
 
-        if ( !this.isSelectionDialogMode ) {
-            this._drawCollaborativeElements( /*bIsDrawObjects*/true );
+        if (!this.isSelectionDialogMode) {
+            this._drawCollaborativeElements();
         }
         if ((this.isSelectionDialogMode || this.isFormulaEditMode) && !this.handlers.trigger('isActive')) {
             if (this.isSelectionDialogMode) {
@@ -4083,14 +4083,14 @@
     };
 
     WorksheetView.prototype._drawSelectRange = function ( oSelectRange ) {
-        var lineWidth = 1, isDashLine = true, strokeColor = c_oAscCoAuthoringOtherBorderColor;
-        this._drawElements( this, this._drawSelectionElement, oSelectRange, isDashLine, lineWidth, strokeColor );
+        var lineWidth = 1, isDashLine = true;
+        this._drawElements( this, this._drawSelectionElement, oSelectRange, isDashLine, lineWidth, c_oAscCoAuthoringOtherBorderColor);
     };
 
-    WorksheetView.prototype._drawCollaborativeElements = function ( bIsDrawObjects ) {
+    WorksheetView.prototype._drawCollaborativeElements = function () {
         if ( this.collaborativeEditing.getCollaborativeEditing() ) {
-            this._drawCollaborativeElementsMeOther( c_oAscLockTypes.kLockTypeMine, bIsDrawObjects );
-            this._drawCollaborativeElementsMeOther( c_oAscLockTypes.kLockTypeOther, bIsDrawObjects );
+            this._drawCollaborativeElementsMeOther(c_oAscLockTypes.kLockTypeMine);
+            this._drawCollaborativeElementsMeOther(c_oAscLockTypes.kLockTypeOther);
             this._drawCollaborativeElementsAllLock();
         }
     };
@@ -4104,7 +4104,7 @@
         }
     };
 
-    WorksheetView.prototype._drawCollaborativeElementsMeOther = function ( type, bIsDrawObjects ) {
+    WorksheetView.prototype._drawCollaborativeElementsMeOther = function (type) {
         var currentSheetId = this.model.getId(), i, lineWidth = 1, isDashLine = true, strokeColor, arrayCells, oCellTmp;
         if ( c_oAscLockTypes.kLockTypeMine === type ) {
             strokeColor = c_oAscCoAuthoringMeBorderColor;
