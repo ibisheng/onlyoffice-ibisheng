@@ -642,7 +642,7 @@ function DrawingArea(ws) {
 		
 		_this.worksheet.overlayCtx.clear();
 		_this.worksheet.overlayGraphicCtx.clear();
-		_this.worksheet._drawCollaborativeElements(false);
+		_this.worksheet._drawCollaborativeElements();
 		
 		if ( !_this.worksheet.objectRender.controller.selectedObjects.length && !api.isStartAddShape )
 			_this.worksheet._drawSelection();
