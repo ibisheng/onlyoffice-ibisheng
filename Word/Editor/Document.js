@@ -15150,6 +15150,14 @@ CDocument.prototype.private_UpdateCursorXY = function(bUpdateX, bUpdateY)
         {
             NewCursorPos = this.HdrFtr.RecalculateCurPos();
         }
+
+        if (NewCursorPos && NewCursorPos.Transform)
+        {
+            var x = NewCursorPos.Transform.TransformPointX(NewCursorPos.X, NewCursorPos.Y);
+            var y = NewCursorPos.Transform.TransformPointY(NewCursorPos.X, NewCursorPos.Y);
+            NewCursorPos.X = x;
+            NewCursorPos.Y = y;
+        }
     }
     else
     {

@@ -628,11 +628,10 @@ Paragraph.prototype.private_RecalculatePageKeepNext    = function(CurLine, CurPa
             else
             {
                 var Prev = Curr.Get_DocumentPrev();
-                if (null === Prev || type_Paragraph != Prev.GetType() || undefined !== Prev.Get_SectionPr())
+                if (null === Prev || (type_Paragraph === Prev.GetType() && undefined !== Prev.Get_SectionPr()))
                     break;
 
-                var PrevKeepNext = Prev.Get_CompiledPr2(false).ParaPr.KeepNext;
-                if (false === PrevKeepNext)
+                if (type_Paragraph != Prev.GetType() || false === Prev.Get_CompiledPr2(false).ParaPr.KeepNext)
                 {
                     if (true === this.Parent.RecalcInfo.Can_RecalcObject())
                     {
@@ -644,7 +643,9 @@ Paragraph.prototype.private_RecalculatePageKeepNext    = function(CurLine, CurPa
                         break;
                 }
                 else
+                {
                     Curr = Prev;
+                }
             }
         }
     }

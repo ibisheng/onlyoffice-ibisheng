@@ -1048,13 +1048,15 @@ Paragraph.prototype =
     // Пересчитываем заданную позицию элемента или текущую позицию курсора.
     Internal_Recalculate_CurPos : function(Pos, UpdateCurPos, UpdateTarget, ReturnTarget)
     {
+        var Transform = this.Get_ParentTextTransform();
+
         if ( this.Lines.length <= 0 )
-            return { X : 0, Y : 0, Height : 0, PageNum : 0, Internal : { Line : 0, Page : 0, Range : 0 } };
+            return { X : 0, Y : 0, Height : 0, PageNum : 0, Internal : { Line : 0, Page : 0, Range : 0 }, Transform : Transform };
 
         var LinePos = this.Get_CurrentParaPos();
 
         if (-1 === LinePos.Line)
-            return { X : 0, Y : 0, Height : 0, PageNum : 0, Internal : { Line : 0, Page : 0, Range : 0 } };
+            return { X : 0, Y : 0, Height : 0, PageNum : 0, Internal : { Line : 0, Page : 0, Range : 0 }, Transform : Transform };
 
         var CurLine  = LinePos.Line;
         var CurRange = LinePos.Range;
@@ -1079,15 +1081,20 @@ Paragraph.prototype =
         for ( var CurPos = StartPos; CurPos <= EndPos; CurPos++ )
         {
             var Item = this.Content[CurPos];
-            var Res = Item.Recalculate_CurPos( X, Y, (CurPos === this.CurPos.ContentPos ? true : false), CurRange, CurLine, CurPage, UpdateCurPos, UpdateTarget, ReturnTarget );
+            var Res  = Item.Recalculate_CurPos(X, Y, (CurPos === this.CurPos.ContentPos ? true : false), CurRange, CurLine, CurPage, UpdateCurPos, UpdateTarget, ReturnTarget);
 
-            if ( CurPos === this.CurPos.ContentPos )
+            if (CurPos === this.CurPos.ContentPos)
+            {
+                Res.Transform = Transform;
                 return Res;
+            }
             else
+            {
                 X = Res.X;
+            }
         }
 
-        return { X : X, Y : Y, PageNum : CurPage + this.Get_StartPage_Absolute(), Internal : { Line : CurLine, Page : CurPage, Range : CurRange } };
+        return { X : X, Y : Y, PageNum : CurPage + this.Get_StartPage_Absolute(), Internal : { Line : CurLine, Page : CurPage, Range : CurRange }, Transform : Transform };
     },
 
     // Можно ли объединить границы двух параграфов с заданными настройками Pr1, Pr2
