@@ -3647,15 +3647,22 @@
      * Рисует выделение вокруг ячеек
      * @param {Asc.Range} [range]
      */
-    WorksheetView.prototype._drawSelection = function ( range ) {
-        if ( window['IS_NATIVE_EDITOR'] ) {
+    WorksheetView.prototype._drawSelection = function(range) {
+        if (window['IS_NATIVE_EDITOR']) {
             return;
         }
+
+        // set clipping rect to cells area
+        var ctx = this.overlayCtx;
+        ctx.save().beginPath()
+          .rect(this.cellsLeft, this.cellsTop, ctx.getWidth() - this.cellsLeft, ctx.getHeight() - this.cellsTop)
+          .clip();
 
         if (!this.isSelectionDialogMode) {
             this._drawCollaborativeElements();
         }
-        if ((this.isSelectionDialogMode || this.isFormulaEditMode) && !this.handlers.trigger('isActive')) {
+        var isOtherSelectionMode = this.isSelectionDialogMode || this.isFormulaEditMode;
+        if (isOtherSelectionMode && !this.handlers.trigger('isActive')) {
             if (this.isSelectionDialogMode) {
                 this._drawSelectRange(this.activeRange.clone(true));
             } else if (this.isFormulaEditMode) {
@@ -3663,6 +3670,13 @@
             }
         } else {
             this._drawSelectionRange(range);
+        }
+
+        // restore canvas' original clipping range
+        ctx.restore();
+
+        if (!isOtherSelectionMode) {
+            this._drawActiveHeaders();
         }
     };
 
@@ -3782,12 +3796,6 @@
         var drawRightFillHandle;
         var drawTopFillHandle;
         var drawBottomFillHandle;
-
-        // set clipping rect to cells area
-        ctx.save()
-            .beginPath()
-            .rect( this.cellsLeft, this.cellsTop, ctx.getWidth() - this.cellsLeft, ctx.getHeight() - this.cellsTop )
-            .clip();
 
         // draw frame around cells range
         l = drawLeftSide ? -this.width_1px : 0;
@@ -4050,13 +4058,6 @@
                 }
             }
             ctx.stroke();
-        }
-
-        // restore canvas' original clipping range
-        ctx.restore();
-
-        if ( !isFrozen ) {
-            this._drawActiveHeaders();
         }
     };
 
