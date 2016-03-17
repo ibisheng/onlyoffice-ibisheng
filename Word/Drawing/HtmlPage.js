@@ -4073,7 +4073,7 @@ function CEditorPage(api)
 
     this.TextBoxFocus = function()
     {
-        if (null == oThis.TextBoxInput || oThis.TextBoxInputFocus === true || oThis.TextBoxChangedValueEvent == false)
+        if (null == oThis.TextBoxInput || oThis.TextBoxInputFocus === true || oThis.TextBoxChangedValueEvent == false || null == oThis.m_oLogicDocument || oThis.m_oApi.isViewMode)
             return;
 
         oThis.TextBoxInputFocus = true;
@@ -4085,6 +4085,9 @@ function CEditorPage(api)
 
     this.OnTextBoxInput = function()
     {
+        if (null == oThis.m_oLogicDocument || oThis.m_oApi.isViewMode)
+            oThis.ReinitTB();
+
         oThis.TextBoxFocus();
         oThis.CheckTextBoxSize();
     }
