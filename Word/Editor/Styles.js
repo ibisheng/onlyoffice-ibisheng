@@ -3607,7 +3607,7 @@ CStyle.prototype =
 
     Write_ToBinary2 : function(Writer)
     {
-        Writer.WriteLong( historyitem_type_Style );
+        Writer.WriteLong(historyitem_type_Style);
 
         // String   : Id
         // Bool(und) -> Bool(null) -> String : Name
@@ -3638,99 +3638,19 @@ CStyle.prototype =
         // Variable(CTableStylePr) : TableBRCell
         // Variable(CTableStylePr) : TableWholeTable
 
-        Writer.WriteString2( this.Id );
+        Writer.WriteString2(this.Id);
 
-        if ( undefined === this.Name )
-            Writer.WriteBool( true );
-        else
-        {
-            Writer.WriteBool( false );
-            if ( null === this.Name )
-                Writer.WriteBool( true );
-            else
-                Writer.WriteString2( this.Name );
-        }
+        this.private_WriteUndefinedNullString(Writer, this.Name);
+        this.private_WriteUndefinedNullString(Writer, this.BasedOn);
+        this.private_WriteUndefinedNullString(Writer, this.Next);
 
+        Writer.WriteLong(this.Type);
 
-        if ( undefined === this.BasedOn )
-            Writer.WriteBool( true );
-        else
-        {
-            Writer.WriteBool( false );
-            if ( null === this.BasedOn )
-                Writer.WriteBool( true );
-            else
-                Writer.WriteString2( this.BasedOn );
-        }
-
-        if ( undefined === this.Next )
-            Writer.WriteBool( true );
-        else
-        {
-            Writer.WriteBool( false );
-            if ( null === this.Next )
-                Writer.WriteBool( true );
-            else
-                Writer.WriteString2( this.Next );
-        }
-
-        Writer.WriteLong( this.Type );
-
-        if ( undefined === this.uiPriority )
-            Writer.WriteBool( true );
-        else
-        {
-            Writer.WriteBool( false );
-            if ( null === this.uiPriority )
-                Writer.WriteBool( true );
-            else
-                Writer.WriteLong( this.uiPriority );
-        }
-
-        if ( undefined === this.qFormat )
-            Writer.WriteBool( true );
-        else
-        {
-            Writer.WriteBool( false );
-            if ( null === this.qFormat )
-                Writer.WriteBool( true );
-            else
-                Writer.WriteBool( this.qFormat );
-        }
-
-        if ( undefined === this.hidden )
-            Writer.WriteBool( true );
-        else
-        {
-            Writer.WriteBool( false );
-            if ( null === this.hidden )
-                Writer.WriteBool( true );
-            else
-                Writer.WriteBool( this.hidden );
-        }
-
-        if ( undefined === this.semiHidden )
-            Writer.WriteBool( true );
-        else
-        {
-            Writer.WriteBool( false );
-            if ( null === this.semiHidden )
-                Writer.WriteBool( true );
-            else
-                Writer.WriteBool( this.semiHidden );
-        }
-
-        if ( undefined === this.unhideWhenUsed )
-            Writer.WriteBool( true );
-        else
-        {
-            Writer.WriteBool( false );
-            if ( null === this.unhideWhenUsed )
-                Writer.WriteBool( true );
-            else
-                Writer.WriteBool( this.unhideWhenUsed );
-        }
-
+        this.private_WriterUndefinedNullLong(Writer, this.uiPriority);
+        this.private_WriterUndefinedNullBool(Writer, this.qFormat);
+        this.private_WriterUndefinedNullBool(Writer, this.hidden);
+        this.private_WriterUndefinedNullBool(Writer, this.semiHidden);
+        this.private_WriterUndefinedNullBool(Writer, this.unhideWhenUsed);
 
         this.TextPr.Write_ToBinary(Writer);
         this.ParaPr.Write_ToBinary(Writer);
@@ -3752,6 +3672,99 @@ CStyle.prototype =
         this.TableBLCell.Write_ToBinary(Writer);
         this.TableBRCell.Write_ToBinary(Writer);
         this.TableWholeTable.Write_ToBinary(Writer);
+    },
+
+    private_WriteUndefinedNullString : function(Writer, Value)
+    {
+        if (undefined === Value)
+        {
+            Writer.WriteBool(true);
+        }
+        else
+        {
+            Writer.WriteBool(false);
+            if (null === Value)
+            {
+                Writer.WriteBool(true);
+            }
+            else
+            {
+                Writer.WriteBool(false);
+                Writer.WriteString2(Value);
+            }
+        }
+    },
+
+    private_WriterUndefinedNullLong : function(Writer, Value)
+    {
+        if (undefined === Value)
+        {
+            Writer.WriteBool(true);
+        }
+        else
+        {
+            Writer.WriteBool(false);
+            if (null === Value)
+            {
+                Writer.WriteBool(true);
+            }
+            else
+            {
+                Writer.WriteBool(false);
+                Writer.WriteLong(Value);
+            }
+        }
+    },
+
+    private_WriterUndefinedNullBool : function(Writer, Value)
+    {
+        if (undefined === Value)
+        {
+            Writer.WriteBool(true);
+        }
+        else
+        {
+            Writer.WriteBool(false);
+            if (null === Value)
+            {
+                Writer.WriteBool(true);
+            }
+            else
+            {
+                Writer.WriteBool(false);
+                Writer.WriteBool(Value);
+            }
+        }
+    },
+
+    private_ReadUndefinedNullString : function(Reader)
+    {
+        if (true === Reader.GetBool())
+            return undefined;
+        else if (true === Reader.GetBool())
+            return null;
+        else
+            return Reader.GetString2();
+    },
+
+    private_ReadUndefinedNullLong : function(Reader)
+    {
+        if (true === Reader.GetBool())
+            return undefined;
+        else if (true === Reader.GetBool())
+            return null;
+        else
+            return Reader.GetLong();
+    },
+
+    private_ReadUndefinedNullBool : function(Reader)
+    {
+        if (true === Reader.GetBool())
+            return undefined;
+        else if (true === Reader.GetBool())
+            return null;
+        else
+            return Reader.GetBool();
     },
 
     Read_FromBinary2 : function(Reader)
@@ -3787,64 +3800,17 @@ CStyle.prototype =
 
         this.Id = Reader.GetString2();
 
-        if ( true === Reader.GetBool() )
-            this.Name = undefined;
-        else if ( true === Reader.GetBool() )
-            this.Name = null;
-        else
-            this.Name = Reader.GetString2();
-
-        if ( true === Reader.GetBool() )
-            this.BasedOn = undefined;
-        else if ( true === Reader.GetBool() )
-            this.BasedOn = null;
-        else
-            this.BasedOn = Reader.GetString2();
-
-
-        if ( true === Reader.GetBool() )
-            this.Next = undefined;
-        else if ( true === Reader.GetBool() )
-            this.Next = null;
-        else
-            this.Next = Reader.GetString2();
+        this.Name    = this.private_ReadUndefinedNullString(Reader);
+        this.BasedOn = this.private_ReadUndefinedNullString(Reader);
+        this.Next    = this.private_ReadUndefinedNullString(Reader);
 
         this.Type = Reader.GetLong();
 
-        if ( true === Reader.GetBool() )
-            this.uiPriority = undefined;
-        else if ( true === Reader.GetBool() )
-            this.uiPriority = null;
-        else
-            this.uiPriority = Reader.GetLong();
-
-        if ( true === Reader.GetBool() )
-            this.qFormat = undefined;
-        else if ( true === Reader.GetBool() )
-            this.qFormat = null;
-        else
-            this.qFormat = Reader.GetBool();
-
-        if ( true === Reader.GetBool() )
-            this.hidden = undefined;
-        else if ( true === Reader.GetBool() )
-            this.hidden = null;
-        else
-            this.hidden = Reader.GetBool();
-
-        if ( true === Reader.GetBool() )
-            this.semiHidden = undefined;
-        else if ( true === Reader.GetBool() )
-            this.semiHidden = null;
-        else
-            this.semiHidden = Reader.GetBool();
-
-        if ( true === Reader.GetBool() )
-            this.unhideWhenUsed = undefined;
-        else if ( true === Reader.GetBool() )
-            this.unhideWhenUsed = null;
-        else
-            this.unhideWhenUsed = Reader.GetBool();
+        this.uiPriority     = this.private_ReadUndefinedNullLong(Reader);
+        this.qFormat        = this.private_ReadUndefinedNullBool(Reader);
+        this.hidden         = this.private_ReadUndefinedNullBool(Reader);
+        this.semiHidden     = this.private_ReadUndefinedNullBool(Reader);
+        this.unhideWhenUsed = this.private_ReadUndefinedNullBool(Reader);
 
         this.TextPr.Read_FromBinary(Reader);
         this.ParaPr.Read_FromBinary(Reader);
