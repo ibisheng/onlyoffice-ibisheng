@@ -14480,7 +14480,7 @@ CDocument.prototype =
 //-----------------------------------------------------------------------------------
     TextBox_Put : function(sText, rFonts)
     {
-        if ( false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content) )
+        if (true !== this.Api.isViewMode && false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content))
         {
             this.Create_NewHistoryPoint(historydescription_Document_AddTextFromTextBox);
 
