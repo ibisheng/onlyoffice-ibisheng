@@ -821,7 +821,8 @@
 		this._formula = new parserFormula( s.substr( 1 ), this.options.cellName, ws );
 		this._formula.parse();
 
-		var r, offset, _e, _s, wsName = null, refStr, isName = false;
+		var r, offset, _e, _s, wsName = null, refStr, isName = false,
+			_sColorPos;
 
 		if ( this._formula.RefPos && this._formula.RefPos.length > 0 ) {
 			for ( var index = 0; index < this._formula.RefPos.length; index++ ) {
@@ -831,7 +832,7 @@
 
 				offset = r.end;
 				_e = r.end;
-				_s = r.start;
+				_sColorPos = _s = r.start;
 
 
 				switch ( r.oper.type ) {
@@ -849,6 +850,7 @@
 						ret = true;
 						wsName = r.oper.ws.getName();
 						_s = _e - r.oper.value.length;
+						_sColorPos = _e - r.oper.toString().length;
 						refStr = r.oper.value;
 						break;
 					}
@@ -870,6 +872,7 @@
 						refStr = r.oper.value;
 						wsName = r.oper.getWS().getName();
 						_s = _e - r.oper.value.length;
+						_sColorPos = _e - r.oper.toString().length;
 						break;
 					}
 					case cElementType.table          :
@@ -906,7 +909,9 @@
 					if(!range) return false;
 					range.cursorePos = offset - (_e - _s) + 1;
 					range.formulaRangeLength = _e - _s;
-					if(isName)range.isName = isName;
+					range.colorRangePos = offset - (_e - _sColorPos) + 1;
+					range.colorRangeLength = _e - _sColorPos;
+					if ( isName )range.isName = isName;
 					t.handlers.trigger( "newRange", range, wsName );
 				}
 			}
@@ -934,7 +939,7 @@
 		}
 
 		/*не нашли диапазонов под курсором, парсим формулу*/
-		var r, offset, _e, _s, wsName = null, ret = false, refStr, isName = false,
+		var r, offset, _e, _s, wsName = null, ret = false, refStr, isName = false, _sColorPos,
 			wsOPEN = this.handlers.trigger( "getCellFormulaEnterWSOpen" ),
 			ws = wsOPEN ? wsOPEN.model : this.handlers.trigger( "getActiveWS" );
 
@@ -948,7 +953,7 @@
 
 				offset = r.end;
 				_e = r.end;
-				_s = r.start;
+				_sColorPos = _s = r.start;
 
 				switch ( r.oper.type ) {
 					case cElementType.cell          :
@@ -966,6 +971,7 @@
 						ret = true;
 						wsName = r.oper.ws.getName();
 						_s = _e - r.oper.value.length + 1;
+						_sColorPos = _e - r.oper.toString().length;
 						break;
 					}
 					case cElementType.cellsRange    :
@@ -1090,7 +1096,7 @@
 					}
 					tmpColors.push( colorIndex );
 
-					this._extractFragments( val.cursorePos, val.formulaRangeLength, fragments );
+					this._extractFragments( val.colorRangePos, val.colorRangeLength, fragments );
 
 					first = this._findFragment( val.cursorePos, fragments );
 					last = this._findFragment( val.cursorePos + val.formulaRangeLength - 1, fragments );
