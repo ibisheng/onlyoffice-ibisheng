@@ -466,14 +466,12 @@ var maxIndividualValues = 10000;
 					
 					History.EndTransaction();
 				};
-				
 					
 				//не лочим в случае обыкновенного а/ф
 				if(isTurnOffHistory || !styleName)
 				addFilterCallBack(true);
 				else
-					ws._isLockedCells(filterRange, /*subType*/null, addFilterCallBack);
-								
+					ws._isLockedCells(filterRange, /*subType*/null, addFilterCallBack);				
 			},
 			
 			changeAutoFilterToTablePart: function(styleName, ar, addFormatTableOptionsObj)
