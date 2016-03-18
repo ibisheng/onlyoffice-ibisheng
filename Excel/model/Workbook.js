@@ -8773,7 +8773,11 @@ Range.prototype.promote=function(bCtrl, bVertical, nIndex){
 		}
 		History.SetSelectionRedo(oSelectionRedo);
 	}
+	gFormulaLocaleParse = false;
+	gFormulaLocaleDigetSep = false;
 	_promoteFromTo(oBBox, this.worksheet, oPromoteAscRange, this.worksheet, true, oCanPromote, bCtrl, bVertical, nIndex);
+	gFormulaLocaleParse = true;
+	gFormulaLocaleDigetSep = true;
 	return true;
 };
 function _promoteFromTo(from, wsFrom, to, wsTo, bIsPromote, oCanPromote, bCtrl, bVertical, nIndex) {
