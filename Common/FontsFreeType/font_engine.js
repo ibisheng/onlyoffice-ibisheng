@@ -26647,7 +26647,7 @@ function CSubpixHintingHacks()
 
     /* Skip IUP instructions if matched.                                     */
     this.SKIP_IUP_Rules = [
-        this._create_SPH_TweakRule("Arial", 13, "Regular", "a".charCodeAt(0)),
+        this._create_SPH_TweakRule("Arial", 13, "Regular", "a".charCodeAt(0))
     ];
 
     /* Skip MIAP Twilight hack if matched.                                   */
