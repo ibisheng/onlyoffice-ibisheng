@@ -1,10 +1,3 @@
-/**
- *    native.js
- *
- *    Created by Alexey Musinov on 14 April 2015
- *    Copyright (c) 2015 Ascensio System SIA. All rights reserved.
- *
- */
 
 var editor = undefined;
 var window = {};
@@ -2849,7 +2842,244 @@ function OfflineEditor () {
 
     // main
 
+    this.beforeOpen  = function() {
+        DrawingArea.prototype.drawSelection = function(drawingDocument) {
+
+            var canvas = this.worksheet.objectRender.getDrawingCanvas();
+            var shapeCtx = canvas.shapeCtx;
+            var shapeOverlayCtx = canvas.shapeOverlayCtx;
+            var autoShapeTrack = canvas.autoShapeTrack;
+            var trackOverlay = canvas.trackOverlay;
+
+            var ctx = trackOverlay.m_oContext;
+            trackOverlay.Clear();
+            drawingDocument.Overlay = trackOverlay;
+
+            this.worksheet.overlayCtx.clear();
+            this.worksheet.overlayGraphicCtx.clear();
+            this.worksheet._drawCollaborativeElements();
+
+            if ( !this.worksheet.objectRender.controller.selectedObjects.length && !this.api.isStartAddShape )
+                this.worksheet._drawSelection();
+
+            var chart;
+            var controller = this.worksheet.objectRender.controller;
+            var selected_objects = controller.selection.groupSelection ? controller.selection.groupSelection.selectedObjects : controller.selectedObjects;
+            if(selected_objects.length === 1 && selected_objects[0].getObjectType() === historyitem_type_ChartSpace)
+            {
+                chart = selected_objects[0];
+                this.worksheet.objectRender.selectDrawingObjectRange(chart);
+                //shapeOverlayCtx.ClearMode = true;
+                ////selected_objects[0].draw(shapeOverlayCtx);
+                //shapeOverlayCtx.ClearMode = false;
+            }
+            for ( var i = 0; i < this.frozenPlaces.length; i++ ) {
+
+                this.frozenPlaces[i].setTransform(shapeCtx, shapeOverlayCtx, autoShapeTrack);
+
+                // Clip
+                this.frozenPlaces[i].clip(shapeOverlayCtx);
+
+                if (null == drawingDocument.m_oDocumentRenderer) {
+                    if (drawingDocument.m_bIsSelection) {
+                        if (drawingDocument.m_bIsSelection) {
+                            trackOverlay.m_oControl.HtmlElement.style.display = "block";
+
+                            if (null == trackOverlay.m_oContext)
+                                trackOverlay.m_oContext = trackOverlay.m_oControl.HtmlElement.getContext('2d');
+                        }
+                        drawingDocument.private_StartDrawSelection(trackOverlay);
+                        this.worksheet.objectRender.controller.drawTextSelection();
+                        drawingDocument.private_EndDrawSelection();
+                    }
+
+                    ctx.globalAlpha = 1.0;
+
+                    this.worksheet.objectRender.controller.drawSelection(drawingDocument);
+
+                    if ( this.worksheet.objectRender.controller.needUpdateOverlay() ) {
+                        trackOverlay.Show();
+                        shapeOverlayCtx.put_GlobalAlpha(true, 0.5);
+                        this.worksheet.objectRender.controller.drawTracks(shapeOverlayCtx);
+                        shapeOverlayCtx.put_GlobalAlpha(true, 1);
+                    }
+                }
+                else {
+                    ctx.fillStyle = "rgba(51,102,204,255)";
+                    ctx.beginPath();
+
+                    for (var j = drawingDocument.m_lDrawingFirst; j <= drawingDocument.m_lDrawingEnd; j++) {
+                        var drawPage = drawingDocument.m_arrPages[j].drawingPage;
+                        drawingDocument.m_oDocumentRenderer.DrawSelection(j, trackOverlay, drawPage.left, drawPage.top, drawPage.right - drawPage.left, drawPage.bottom - drawPage.top);
+                    }
+
+                    ctx.globalAlpha = 0.2;
+                    ctx.fill();
+                    ctx.beginPath();
+                    ctx.globalAlpha = 1.0;
+                }
+
+                // Restore
+                this.frozenPlaces[i].restore(shapeOverlayCtx);
+            }
+		};
+		
+		DrawingObjectsController.prototype.onMouseDown = function(e, x, y) {
+			var ret = this.curState.onMouseDown(e, x, y, 0);
+			if(e.ClickCount < 2)
+			{
+				//this.updateOverlay();
+				//this.updateSelectionState();
+			}
+			return ret;
+		};
+   
+		Path.prototype.drawSmart = function(shape_drawer) {
+			
+        var _graphics   = shape_drawer.Graphics;
+        var _full_trans = _graphics.m_oFullTransform;
+
+        if (!_graphics || !_full_trans || undefined == _graphics.m_bIntegerGrid || true === shape_drawer.bIsNoSmartAttack)
+            return this.draw(shape_drawer);
+
+        var bIsTransformed = (_full_trans.shx == 0 && _full_trans.shy == 0) ? false : true;
+
+        if (bIsTransformed)
+            return this.draw(shape_drawer);
+
+        var isLine = this.isSmartLine();
+        var isRect = false;
+        if (!isLine)
+            isRect = this.isSmartRect();
+
+        //if (!isLine && !isRect)   // IOS убрать
+            return this.draw(shape_drawer);
+
+        var _old_int = _graphics.m_bIntegerGrid;
+
+        if (false == _old_int)
+            _graphics.SetIntegerGrid(true);
+
+        var dKoefMMToPx = Math.max(_graphics.m_oCoordTransform.sx, 0.001);
+
+        var _ctx = _graphics.m_oContext;
+        var bIsStroke = (shape_drawer.bIsNoStrokeAttack || (this.stroke !== true)) ? false : true;
+        var bIsEven = false;
+        if (bIsStroke)
+        {
+            var _lineWidth = Math.max((shape_drawer.StrokeWidth * dKoefMMToPx + 0.5) >> 0, 1);
+            _ctx.lineWidth = _lineWidth;
+
+            if (_lineWidth & 0x01 == 0x01)
+                bIsEven = true;
+        }
+
+        var bIsDrawLast = false;
+        var path = this.ArrPathCommand;
+        shape_drawer._s();
+
+        if (!isRect)
+        {
+            for(var j = 0, l = path.length; j < l; ++j)
+            {
+                var cmd=path[j];
+                switch(cmd.id)
+                {
+                    case moveTo:
+                    {
+                        bIsDrawLast = true;
+
+                        var _x = (_full_trans.TransformPointX(cmd.X, cmd.Y)) >> 0;
+                        var _y = (_full_trans.TransformPointY(cmd.X, cmd.Y)) >> 0;
+                        if (bIsEven)
+                        {
+                            _x -= 0.5;
+                            _y -= 0.5;
+                        }
+                        _ctx.moveTo(_x, _y);
+                        break;
+                    }
+                    case lineTo:
+                    {
+                        bIsDrawLast = true;
+
+                        var _x = (_full_trans.TransformPointX(cmd.X, cmd.Y)) >> 0;
+                        var _y = (_full_trans.TransformPointY(cmd.X, cmd.Y)) >> 0;
+                        if (bIsEven)
+                        {
+                            _x -= 0.5;
+                            _y -= 0.5;
+                        }
+                        _ctx.lineTo(_x, _y);
+                        break;
+                    }
+                    case close:
+                    {
+                        _ctx.closePath();
+                        break;
+                    }
+                }
+            }
+        }
+        else
+        {
+            var minX = 100000;
+            var minY = 100000;
+            var maxX = -100000;
+            var maxY = -100000;
+            bIsDrawLast = true;
+            for(var j = 0, l = path.length; j < l; ++j)
+            {
+                var cmd=path[j];
+                switch(cmd.id)
+                {
+                    case moveTo:
+                    case lineTo:
+                    {
+                        if (minX > cmd.X)
+                            minX = cmd.X;
+                        if (minY > cmd.Y)
+                            minY = cmd.Y;
+
+                        if (maxX < cmd.X)
+                            maxX = cmd.X;
+                        if (maxY < cmd.Y)
+                            maxY = cmd.Y;
+
+                        break;
+                    }
+                    default:
+                        break;
+                }
+            }
+
+            var _x1 = (_full_trans.TransformPointX(minX, minY)) >> 0;
+            var _y1 = (_full_trans.TransformPointY(minX, minY)) >> 0;
+            var _x2 = (_full_trans.TransformPointX(maxX, maxY)) >> 0;
+            var _y2 = (_full_trans.TransformPointY(maxX, maxY)) >> 0;
+
+            if (bIsEven)
+                _ctx.rect(_x1 + 0.5, _y1 + 0.5, _x2 - _x1, _y2 - _y1);
+            else
+                _ctx.rect(_x1, _y1, _x2 - _x1, _y2 - _y1);
+        }
+
+        if (bIsDrawLast)
+        {
+            shape_drawer.drawFillStroke(true, this.fill, bIsStroke);
+        }
+
+        shape_drawer._e();
+
+        if (false == _old_int)
+            _graphics.SetIntegerGrid(false);
+    };
+	};
+
     this.openFile = function (isViewer) {
+
+        this.beforeOpen();
+
         window["CreateMainTextMeasurerWrapper"]();
 
         deviceScale = window.native["GetDeviceScale"]();
@@ -4536,7 +4766,8 @@ function offline_get_selection(x, y, width, height, autocorrection) {
     return _s.getSelection(x, y, width, height, autocorrection);
 }
 function offline_get_charts_ranges() {
-    return _api.wb.getWorksheet().__chartsRanges();
+
+    return {'ranges': _api.wb.getWorksheet().__chartsRanges()};
 }
 function offline_get_worksheet_bounds() {
     return _s.getMaxBounds();
