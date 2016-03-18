@@ -6409,6 +6409,7 @@ function CTableCellPr()
     this.VAlign           = undefined;
     this.VMerge           = undefined;
     this.TextDirection    = undefined;
+    this.NoWrap           = undefined;
 }
 
 CTableCellPr.prototype =
@@ -6453,6 +6454,7 @@ CTableCellPr.prototype =
         CellPr.VAlign        = this.VAlign;
         CellPr.VMerge        = this.VMerge;
         CellPr.TextDirection = this.TextDirection;
+        CellPr.NoWrap        = this.NoWrap;
         return CellPr;
     },
 
@@ -6501,6 +6503,9 @@ CTableCellPr.prototype =
 
         if (undefined != CellPr.TextDirection)
             this.TextDirection = CellPr.TextDirection;
+
+        if (undefined !== CellPr.NoWrap)
+            this.NoWrap = CellPr.NoWrap;
     },
 
     Is_Equal : function(CellPr)
@@ -6528,7 +6533,8 @@ CTableCellPr.prototype =
             || true !== IsEqualStyleObjects(this.TableCellW, CellPr.TableCellW)
             || this.VAlign !== CellPr.VAlign
             || this.VMerge !== CellPr.VMerge
-            || this.TextDirection !== CellPr.TextDirection)
+            || this.TextDirection !== CellPr.TextDirection
+            || this.NoWrap !== CellPr.NoWrap)
             return false;
 
         return true;
@@ -6547,6 +6553,7 @@ CTableCellPr.prototype =
         this.VAlign                  = vertalignjc_Top;
         this.VMerge                  = vmerge_Restart;
         this.TextDirection           = textdirection_LRTB;
+        this.NoWrap                  = false;
     },
 
     Set_FromObject : function(CellPr)
@@ -6641,6 +6648,7 @@ CTableCellPr.prototype =
         this.VAlign = CellPr.VAlign;
         this.VMerge = CellPr.VMerge;
         this.TextDirection = CellPr.TextDirection;
+        this.NoWrap = CellPr.NoWrap;
     },
 
     Check_PresentationPr : function(Theme)
@@ -6769,6 +6777,12 @@ CTableCellPr.prototype =
             Flags |= 32768;
         }
 
+        if (undefined !== this.NoWrap)
+        {
+            Writer.WriteBool(this.NoWrap);
+            Flags |= 65536;
+        }
+
         var EndPos = Writer.GetCurPosition();
         Writer.Seek( StartPos );
         Writer.WriteLong( Flags );
@@ -6856,6 +6870,9 @@ CTableCellPr.prototype =
 
         if (32768 & Flags)
             this.TextDirection = Reader.GetLong();
+
+        if (65536 & Flags)
+            this.NoWrap = Reader.GetBool();
     }
 };
 

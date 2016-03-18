@@ -1085,6 +1085,7 @@ var historyitem_TableCell_VAlign        =  9; // Изменяем вертика
 var historyitem_TableCell_W             = 10; // Изменяем ширину ячейки
 var historyitem_TableCell_Pr            = 11; // Изменяем настройки целиком
 var historyitem_TableCell_TextDirection = 12; // Изменяем направление текста
+var historyitem_TableCell_NoWrap        = 13; // Изменяем настройку NoWrap
 
 // Типы изменений в классе CDocumentContent
 var historyitem_DocumentContent_AddItem     = 1; // Добавляем элемент в документ

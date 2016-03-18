@@ -1087,6 +1087,9 @@ CTableCell.prototype =
 
         // TextDirection
         this.Set_TextDirection(OtherPr.TextDirection);
+
+        // NoWrap
+        this.Set_NoWrap(OtherPr.NoWrap);
     },
 
     Get_W : function()
@@ -1358,6 +1361,21 @@ CTableCell.prototype =
         {
             History.Add( this, { Type : historyitem_TableCell_VAlign, Old : ( undefined === this.Pr.VAlign ? undefined : this.Pr.VAlign ), New : Value } );
             this.Pr.VAlign = Value;
+            this.Recalc_CompiledPr();
+        }
+    },
+
+    Get_NoWrap : function()
+    {
+        return this.Get_CompiledPr(false).NoWrap;
+    },
+
+    Set_NoWrap : function(Value)
+    {
+        if (this.Pr.NoWrap !== Value)
+        {
+            History.Add(this, {Type : historyitem_TableCell_NoWrap, Old : this.Pr.NoWrap, New : Value});
+            this.Pr.NoWrap = Value;
             this.Recalc_CompiledPr();
         }
     },
@@ -1757,6 +1775,13 @@ CTableCell.prototype =
                 this.Recalc_CompiledPr();
                 break;
             }
+
+            case historyitem_TableCell_NoWrap:
+            {
+                this.Pr.NoWrap = Data.Old;
+                this.Recalc_CompiledPr();
+                break;
+        }
         }
     },
 
@@ -1888,6 +1913,12 @@ CTableCell.prototype =
                 this.Recalc_CompiledPr();
                 break;
             }
+            case historyitem_TableCell_NoWrap:
+            {
+                this.Pr.NoWrap = Data.New;
+                this.Recalc_CompiledPr();
+                break;
+        }
         }
     },
 
@@ -1914,6 +1945,7 @@ CTableCell.prototype =
             case historyitem_TableCell_W:
             case historyitem_TableCell_Pr:
             case historyitem_TableCell_TextDirection:
+            case historyitem_TableCell_NoWrap:
             {
                 bNeedRecalc = true;
                 break;
@@ -2137,6 +2169,23 @@ CTableCell.prototype =
                     Writer.WriteBool(false);
                     Writer.WriteLong(Data.New);
                 }
+            }
+
+            case historyitem_TableCell_NoWrap:
+            {
+                // Bool : IsUndefined
+                // false - > Bool : NoWrap
+                if (undefined === Data.New)
+                {
+                    Writer.WriteBool(true);
+        }
+                else
+                {
+                    Writer.WriteBool(false);
+                    Writer.WriteBool(Data.New);
+                }
+
+                break;
             }
         }
 
@@ -2427,6 +2476,20 @@ CTableCell.prototype =
                 this.Recalc_CompiledPr();
                 break;
             }
+
+            case historyitem_TableCell_NoWrap:
+            {
+                // Bool : IsUndefined
+                // false - > Bool : NoWrap
+
+                if (true === Reader.GetBool())
+                    this.Pr.NoWrap = undefined;
+                else
+                    this.Pr.NoWrap = Reader.GetBool();
+
+                this.Recalc_CompiledPr();
+                break;
+        }
         }
     },
 

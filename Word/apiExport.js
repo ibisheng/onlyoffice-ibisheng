@@ -659,6 +659,9 @@ CTableProp.prototype['get_TableLayout'] = CTableProp.prototype.get_TableLayout;
 CTableProp.prototype['put_TableLayout'] = CTableProp.prototype.put_TableLayout;
 CTableProp.prototype['get_CellsTextDirection'] = CTableProp.prototype.get_CellsTextDirection;
 CTableProp.prototype['put_CellsTextDirection'] = CTableProp.prototype.put_CellsTextDirection;
+CTableProp.prototype['get_CellsNoWrap'] = CTableProp.prototype.get_CellsNoWrap;
+CTableProp.prototype['put_CellsNoWrap'] = CTableProp.prototype.put_CellsNoWrap;
+
 window['CBorders'] = CBorders;
 CBorders.prototype['get_Left'] = CBorders.prototype.get_Left;
 CBorders.prototype['put_Left'] = CBorders.prototype.put_Left;
