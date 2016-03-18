@@ -884,7 +884,12 @@ CTableCell.prototype =
         if (true === this.Is_VerticalText())
             isRotated = true === isRotated ? false : true;
 
-        return this.Content.Recalculate_MinMaxContentWidth(isRotated);
+        var Result = this.Content.Recalculate_MinMaxContentWidth(isRotated);
+
+        if (true !== isRotated && true === this.Get_NoWrap())
+            Result.Min = Math.max(Result.Min, Result.Max);
+
+        return Result;
     },
 
     private_GetTextDirectionTransform : function()
