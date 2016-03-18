@@ -236,14 +236,14 @@
 			if (isVert || isHoriz) {
 				this.handlers.trigger("reinitializeScroll", whichSB, function (vSize, hSize) {
 					if (isVert) {
-						vSize = self.vsb.offsetHeight + Math.max( (vSize + 1) * opt.vscrollStep, 1 );
+						vSize = self.vsb.offsetHeight + Math.max( vSize * opt.vscrollStep, 1 );
 //                        this.m_dScrollY_max = vSize;
     					self.vsbHSt.height = vSize + "px";
 						self.vsbApi.endByY = !!endScroll;
 						self.vsbApi.Reinit(opt, opt.vscrollStep * ws.getFirstVisibleRow(/*allowPane*/true));
 					}
 					if (isHoriz) {
-						hSize = self.hsb.offsetWidth + Math.max( (hSize + 1) * opt.hscrollStep, 1 );
+						hSize = self.hsb.offsetWidth + Math.max( hSize* opt.hscrollStep, 1 );
 //                        this.m_dScrollX_max = hSize ;
 						self.hsbApi.endByX = !!endScroll;
 						self.hsbHSt.width = hSize + "px";

@@ -3945,20 +3945,12 @@
                         this.fillHandleT = this.rows[cr.r1].top - offsetY + this.rows[cr.r1].height - this.height_1px - this.height_2px;
                         this.fillHandleB = this.fillHandleT + fillHandleHeight;
 
-                        ctx.setFillStyle( opt.activeCellBorderColor ).fillRect( this.fillHandleL, this.fillHandleT, this.fillHandleR - this.fillHandleL, this.fillHandleB - this.fillHandleT );
+                        ctx.setFillStyle( opt.activeCellBorderColor2 )
+							.fillRect( this.fillHandleL - this.width_1px, this.fillHandleT - this.height_1px, this.fillHandleR - this.fillHandleL + this.width_2px, this.fillHandleB - this.fillHandleT + this.height_2px);
 
-                        ctx.setStrokeStyle( opt.activeCellBorderColor2 ).setLineWidth( 1 ).beginPath();
+                        ctx.setFillStyle( opt.activeCellBorderColor )
+							.fillRect( this.fillHandleL, this.fillHandleT, this.fillHandleR - this.fillHandleL, this.fillHandleB - this.fillHandleT );
 
-						/*TOP*/
-						ctx.lineHorPrevPx( this.fillHandleL, this.fillHandleT, this.fillHandleR + this.width_1px );
-						/*BOTTOM*/
-						ctx.lineHorPrevPx( this.fillHandleL - this.width_1px, this.fillHandleB + this.height_1px, this.fillHandleR + this.width_1px );
-						/*LEFT*/
-						ctx.lineVerPrevPx( this.fillHandleL, this.fillHandleT, this.fillHandleB );
-						/*RIGHT*/
-						ctx.lineVerPrevPx( this.fillHandleR + this.width_1px, this.fillHandleT, this.fillHandleB );
-
-                        ctx.stroke();
                     }
                 }
             }
