@@ -654,10 +654,14 @@ WorksheetView.prototype.__changeSelectionTopLeft = function (x, y, isCoord, isSe
     return this._calcActiveRangeOffset(x,y);
 };
 
-WorksheetView.prototype.__chartsRanges = function() {
+WorksheetView.prototype.__chartsRanges = function(ranges) {
+
+    if (ranges) {
+        return this.__drawFormulaRanges(ranges, 0, 0, c_oAscSelectionType.RangeChart);
+    }
 
     if (asc["editor"].isStartAddShape || this.objectRender.selectedGraphicObjectsExists()) {
-        if (this.isChartAreaEditMode) {
+        if (this.isChartAreaEditMode && this.arrActiveChartsRanges.length) {
             return this.__drawFormulaRanges(this.arrActiveChartsRanges, 0, 0, c_oAscSelectionType.RangeChart);
         }
     }

@@ -2843,6 +2843,41 @@ function OfflineEditor () {
     // main
 
     this.beforeOpen  = function() {
+
+        function __selectDrawingObjectRange(drawing, worksheet) {
+
+            worksheet.cleanSelection();
+            worksheet.arrActiveChartsRanges = [];
+
+            if(!drawing.bbox || drawing.bbox.worksheet !== worksheet.model)
+                return;
+
+//            var stroke_color, fill_color;
+//            if (drawing.bbox.serBBox)
+//            {
+//                stroke_color = fill_color = new CColor(0, 128, 0);
+//                worksheet._drawElements(worksheet, worksheet._drawSelectionElement,
+//                    asc.Range(drawing.bbox.serBBox.c1, drawing.bbox.serBBox.r1, drawing.bbox.serBBox.c2, drawing.bbox.serBBox.r2, true),
+//                    false, 1,
+//                    stroke_color, fill_color);
+//            }
+
+//            if(drawing.bbox.catBBox)
+//            {
+//                stroke_color = fill_color = new CColor(153, 0, 204);
+//                worksheet._drawElements(worksheet, worksheet._drawSelectionElement,
+//                    asc.Range(drawing.bbox.catBBox.c1, drawing.bbox.catBBox.r1, drawing.bbox.catBBox.c2, drawing.bbox.catBBox.r2, true),
+//                    false, 1,
+//                    stroke_color, fill_color);
+//            }
+
+            var BB = drawing.bbox.seriesBBox;
+            var range = asc.Range(BB.c1, BB.r1, BB.c2, BB.r2, true);
+            worksheet.arrActiveChartsRanges.push(range);
+            worksheet.isChartAreaEditMode = true;
+            worksheet._drawSelection();
+        }
+
         DrawingArea.prototype.drawSelection = function(drawingDocument) {
 
             var canvas = this.worksheet.objectRender.getDrawingCanvas();
@@ -2859,7 +2894,7 @@ function OfflineEditor () {
             this.worksheet.overlayGraphicCtx.clear();
             this.worksheet._drawCollaborativeElements();
 
-            if ( !this.worksheet.objectRender.controller.selectedObjects.length && !this.api.isStartAddShape )
+            if (!this.worksheet.objectRender.controller.selectedObjects.length && !this.api.isStartAddShape)
                 this.worksheet._drawSelection();
 
             var chart;
@@ -2868,7 +2903,8 @@ function OfflineEditor () {
             if(selected_objects.length === 1 && selected_objects[0].getObjectType() === historyitem_type_ChartSpace)
             {
                 chart = selected_objects[0];
-                this.worksheet.objectRender.selectDrawingObjectRange(chart);
+                __selectDrawingObjectRange(chart, this.worksheet);  // <-
+              // this.worksheet.objectRender.selectDrawingObjectRange(chart);
                 //shapeOverlayCtx.ClearMode = true;
                 ////selected_objects[0].draw(shapeOverlayCtx);
                 //shapeOverlayCtx.ClearMode = false;
@@ -2882,12 +2918,12 @@ function OfflineEditor () {
 
                 if (null == drawingDocument.m_oDocumentRenderer) {
                     if (drawingDocument.m_bIsSelection) {
-                        if (drawingDocument.m_bIsSelection) {
-                            trackOverlay.m_oControl.HtmlElement.style.display = "block";
+                       // if (drawingDocument.m_bIsSelection) {
+                           // trackOverlay.m_oControl.HtmlElement.style.display = "block";
 
-                            if (null == trackOverlay.m_oContext)
-                                trackOverlay.m_oContext = trackOverlay.m_oControl.HtmlElement.getContext('2d');
-                        }
+                            //if (null == trackOverlay.m_oContext)
+                            //    trackOverlay.m_oContext = trackOverlay.m_oControl.HtmlElement.getContext('2d');
+                        //}
                         drawingDocument.private_StartDrawSelection(trackOverlay);
                         this.worksheet.objectRender.controller.drawTextSelection();
                         drawingDocument.private_EndDrawSelection();
@@ -2922,159 +2958,149 @@ function OfflineEditor () {
                 // Restore
                 this.frozenPlaces[i].restore(shapeOverlayCtx);
             }
-		};
-		
-		DrawingObjectsController.prototype.onMouseDown = function(e, x, y) {
-			var ret = this.curState.onMouseDown(e, x, y, 0);
-			if(e.ClickCount < 2)
-			{
-				//this.updateOverlay();
-				//this.updateSelectionState();
-			}
-			return ret;
-		};
-   
-		Path.prototype.drawSmart = function(shape_drawer) {
-			
-        var _graphics   = shape_drawer.Graphics;
-        var _full_trans = _graphics.m_oFullTransform;
+        };
 
-        if (!_graphics || !_full_trans || undefined == _graphics.m_bIntegerGrid || true === shape_drawer.bIsNoSmartAttack)
+        Path.prototype.drawSmart = function(shape_drawer) {
+
+            var _graphics   = shape_drawer.Graphics;
+            var _full_trans = _graphics.m_oFullTransform;
+
+            if (!_graphics || !_full_trans || undefined == _graphics.m_bIntegerGrid || true === shape_drawer.bIsNoSmartAttack)
+                return this.draw(shape_drawer);
+
+            var bIsTransformed = (_full_trans.shx == 0 && _full_trans.shy == 0) ? false : true;
+
+            if (bIsTransformed)
+                return this.draw(shape_drawer);
+
+            var isLine = this.isSmartLine();
+            var isRect = false;
+            if (!isLine)
+                isRect = this.isSmartRect();
+
+            //if (!isLine && !isRect)   // IOS убрать
             return this.draw(shape_drawer);
 
-        var bIsTransformed = (_full_trans.shx == 0 && _full_trans.shy == 0) ? false : true;
+            var _old_int = _graphics.m_bIntegerGrid;
 
-        if (bIsTransformed)
-            return this.draw(shape_drawer);
+            if (false == _old_int)
+                _graphics.SetIntegerGrid(true);
 
-        var isLine = this.isSmartLine();
-        var isRect = false;
-        if (!isLine)
-            isRect = this.isSmartRect();
+            var dKoefMMToPx = Math.max(_graphics.m_oCoordTransform.sx, 0.001);
 
-        //if (!isLine && !isRect)   // IOS убрать
-            return this.draw(shape_drawer);
-
-        var _old_int = _graphics.m_bIntegerGrid;
-
-        if (false == _old_int)
-            _graphics.SetIntegerGrid(true);
-
-        var dKoefMMToPx = Math.max(_graphics.m_oCoordTransform.sx, 0.001);
-
-        var _ctx = _graphics.m_oContext;
-        var bIsStroke = (shape_drawer.bIsNoStrokeAttack || (this.stroke !== true)) ? false : true;
-        var bIsEven = false;
-        if (bIsStroke)
-        {
-            var _lineWidth = Math.max((shape_drawer.StrokeWidth * dKoefMMToPx + 0.5) >> 0, 1);
-            _ctx.lineWidth = _lineWidth;
-
-            if (_lineWidth & 0x01 == 0x01)
-                bIsEven = true;
-        }
-
-        var bIsDrawLast = false;
-        var path = this.ArrPathCommand;
-        shape_drawer._s();
-
-        if (!isRect)
-        {
-            for(var j = 0, l = path.length; j < l; ++j)
+            var _ctx = _graphics.m_oContext;
+            var bIsStroke = (shape_drawer.bIsNoStrokeAttack || (this.stroke !== true)) ? false : true;
+            var bIsEven = false;
+            if (bIsStroke)
             {
-                var cmd=path[j];
-                switch(cmd.id)
+                var _lineWidth = Math.max((shape_drawer.StrokeWidth * dKoefMMToPx + 0.5) >> 0, 1);
+                _ctx.lineWidth = _lineWidth;
+
+                if (_lineWidth & 0x01 == 0x01)
+                    bIsEven = true;
+            }
+
+            var bIsDrawLast = false;
+            var path = this.ArrPathCommand;
+            shape_drawer._s();
+
+            if (!isRect)
+            {
+                for(var j = 0, l = path.length; j < l; ++j)
                 {
-                    case moveTo:
+                    var cmd=path[j];
+                    switch(cmd.id)
                     {
-                        bIsDrawLast = true;
-
-                        var _x = (_full_trans.TransformPointX(cmd.X, cmd.Y)) >> 0;
-                        var _y = (_full_trans.TransformPointY(cmd.X, cmd.Y)) >> 0;
-                        if (bIsEven)
+                        case moveTo:
                         {
-                            _x -= 0.5;
-                            _y -= 0.5;
-                        }
-                        _ctx.moveTo(_x, _y);
-                        break;
-                    }
-                    case lineTo:
-                    {
-                        bIsDrawLast = true;
+                            bIsDrawLast = true;
 
-                        var _x = (_full_trans.TransformPointX(cmd.X, cmd.Y)) >> 0;
-                        var _y = (_full_trans.TransformPointY(cmd.X, cmd.Y)) >> 0;
-                        if (bIsEven)
-                        {
-                            _x -= 0.5;
-                            _y -= 0.5;
+                            var _x = (_full_trans.TransformPointX(cmd.X, cmd.Y)) >> 0;
+                            var _y = (_full_trans.TransformPointY(cmd.X, cmd.Y)) >> 0;
+                            if (bIsEven)
+                            {
+                                _x -= 0.5;
+                                _y -= 0.5;
+                            }
+                            _ctx.moveTo(_x, _y);
+                            break;
                         }
-                        _ctx.lineTo(_x, _y);
-                        break;
-                    }
-                    case close:
-                    {
-                        _ctx.closePath();
-                        break;
+                        case lineTo:
+                        {
+                            bIsDrawLast = true;
+
+                            var _x = (_full_trans.TransformPointX(cmd.X, cmd.Y)) >> 0;
+                            var _y = (_full_trans.TransformPointY(cmd.X, cmd.Y)) >> 0;
+                            if (bIsEven)
+                            {
+                                _x -= 0.5;
+                                _y -= 0.5;
+                            }
+                            _ctx.lineTo(_x, _y);
+                            break;
+                        }
+                        case close:
+                        {
+                            _ctx.closePath();
+                            break;
+                        }
                     }
                 }
             }
-        }
-        else
-        {
-            var minX = 100000;
-            var minY = 100000;
-            var maxX = -100000;
-            var maxY = -100000;
-            bIsDrawLast = true;
-            for(var j = 0, l = path.length; j < l; ++j)
-            {
-                var cmd=path[j];
-                switch(cmd.id)
-                {
-                    case moveTo:
-                    case lineTo:
-                    {
-                        if (minX > cmd.X)
-                            minX = cmd.X;
-                        if (minY > cmd.Y)
-                            minY = cmd.Y;
-
-                        if (maxX < cmd.X)
-                            maxX = cmd.X;
-                        if (maxY < cmd.Y)
-                            maxY = cmd.Y;
-
-                        break;
-                    }
-                    default:
-                        break;
-                }
-            }
-
-            var _x1 = (_full_trans.TransformPointX(minX, minY)) >> 0;
-            var _y1 = (_full_trans.TransformPointY(minX, minY)) >> 0;
-            var _x2 = (_full_trans.TransformPointX(maxX, maxY)) >> 0;
-            var _y2 = (_full_trans.TransformPointY(maxX, maxY)) >> 0;
-
-            if (bIsEven)
-                _ctx.rect(_x1 + 0.5, _y1 + 0.5, _x2 - _x1, _y2 - _y1);
             else
-                _ctx.rect(_x1, _y1, _x2 - _x1, _y2 - _y1);
-        }
+            {
+                var minX = 100000;
+                var minY = 100000;
+                var maxX = -100000;
+                var maxY = -100000;
+                bIsDrawLast = true;
+                for(var j = 0, l = path.length; j < l; ++j)
+                {
+                    var cmd=path[j];
+                    switch(cmd.id)
+                    {
+                        case moveTo:
+                        case lineTo:
+                        {
+                            if (minX > cmd.X)
+                                minX = cmd.X;
+                            if (minY > cmd.Y)
+                                minY = cmd.Y;
 
-        if (bIsDrawLast)
-        {
-            shape_drawer.drawFillStroke(true, this.fill, bIsStroke);
-        }
+                            if (maxX < cmd.X)
+                                maxX = cmd.X;
+                            if (maxY < cmd.Y)
+                                maxY = cmd.Y;
 
-        shape_drawer._e();
+                            break;
+                        }
+                        default:
+                            break;
+                    }
+                }
 
-        if (false == _old_int)
-            _graphics.SetIntegerGrid(false);
+                var _x1 = (_full_trans.TransformPointX(minX, minY)) >> 0;
+                var _y1 = (_full_trans.TransformPointY(minX, minY)) >> 0;
+                var _x2 = (_full_trans.TransformPointX(maxX, maxY)) >> 0;
+                var _y2 = (_full_trans.TransformPointY(maxX, maxY)) >> 0;
+
+                if (bIsEven)
+                    _ctx.rect(_x1 + 0.5, _y1 + 0.5, _x2 - _x1, _y2 - _y1);
+                else
+                    _ctx.rect(_x1, _y1, _x2 - _x1, _y2 - _y1);
+            }
+
+            if (bIsDrawLast)
+            {
+                shape_drawer.drawFillStroke(true, this.fill, bIsStroke);
+            }
+
+            shape_drawer._e();
+
+            if (false == _old_int)
+                _graphics.SetIntegerGrid(false);
+        };
     };
-	};
 
     this.openFile = function (isViewer) {
 
@@ -4581,9 +4607,18 @@ function offline_mouse_down(x, y, pin, isViewerMode, isFormulaEditMode, isRangeR
             ws.isChartAreaEditMode = false;
         }
 
+        var ischart = false;
+        var controller = ws.objectRender.controller;
+        var selected_objects = controller.selection.groupSelection ? controller.selection.groupSelection.selectedObjects : controller.selectedObjects;
+        if (selected_objects.length === 1 && selected_objects[0].getObjectType() === historyitem_type_ChartSpace) {
+            ischart = true;
+
+           // console.log('CHART : ' + JSON.stringify(selected_objects[0].bbox.seriesBBox));
+        }
+
         return {
-            id:graphicsInfo.id//,
-            //ischart: graphicsInfo.object.graphicObject instanceof CChartSpace
+            id:graphicsInfo.id,
+            ischart: ischart
         };
     }
 
@@ -4748,6 +4783,9 @@ function offline_mouse_up(x, y, isViewerMode, isRangeResize, isChartRange, index
                 }
 
                 ws.applyMoveResizeRangeHandle(target);
+
+                var controller = ws.objectRender.controller;
+                controller.updateOverlay();
             }
         } else {
 
@@ -4766,8 +4804,25 @@ function offline_get_selection(x, y, width, height, autocorrection) {
     return _s.getSelection(x, y, width, height, autocorrection);
 }
 function offline_get_charts_ranges() {
+    var ws = _api.wb.getWorksheet();
 
-    return {'ranges': _api.wb.getWorksheet().__chartsRanges()};
+    var ranges = _api.wb.getWorksheet().__chartsRanges();
+    var cattbbox = null;
+    var serbbox = null;
+
+    var chart;
+    var controller = ws.objectRender.controller;
+    var selected_objects = controller.selection.groupSelection ? controller.selection.groupSelection.selectedObjects : controller.selectedObjects;
+    if (selected_objects.length === 1 && selected_objects[0].getObjectType() === historyitem_type_ChartSpace)
+    {
+        chart = selected_objects[0];
+
+        ranges   = ranges ? ranges : _api.wb.getWorksheet().__chartsRanges([chart.bbox.seriesBBox]);
+        cattbbox = chart.bbox.catBBox ? _api.wb.getWorksheet().__chartsRanges([chart.bbox.catBBox]) : null;
+        serbbox  = chart.bbox.serBBox ? _api.wb.getWorksheet().__chartsRanges([chart.bbox.serBBox]) : null;
+    }
+
+    return {'ranges':ranges, 'cattbbox':cattbbox, 'serbbox':serbbox};
 }
 function offline_get_worksheet_bounds() {
     return _s.getMaxBounds();
