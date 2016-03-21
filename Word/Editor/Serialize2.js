@@ -247,7 +247,10 @@ var c_oSerProp_cellPrType = {
     CellIns: 8,
     CellMerge: 9,
     tcPrChange: 10,
-    textDirection: 11
+    textDirection: 11,
+    hideMark: 12,
+    noWrap:13,
+    tcFitText: 14
 };
 var c_oSerProp_secPrType = {
     pgSz: 0,
@@ -3467,6 +3470,13 @@ Binary_tblPrWriter.prototype =
             this.memory.WriteByte(c_oSerPropLenType.Byte);
             this.memory.WriteByte(textDirection);
         }
+        var noWrap = cell ? cell.Get_NoWrap() : null;
+        if(null != noWrap)
+        {
+            this.memory.WriteByte(c_oSerProp_cellPrType.noWrap);
+            this.memory.WriteByte(c_oSerPropLenType.Byte);
+            this.memory.WriteBool(noWrap);
+    }
     }
 };
 function BinaryHeaderFooterTableWriter(memory, doc, oNumIdMap, oMapCommentId, saveParams)
@@ -7410,6 +7420,9 @@ Binary_tblPrReader.prototype =
         }
         else if( c_oSerProp_cellPrType.textDirection === type ){
             Pr.TextDirection = this.stream.GetUChar();
+        }
+        else if( c_oSerProp_cellPrType.noWrap === type ){
+            Pr.NoWrap = (this.stream.GetUChar() != 0);
         }
         else
             res = c_oSerConstants.ReadUnknown;
