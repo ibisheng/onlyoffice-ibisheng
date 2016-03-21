@@ -193,6 +193,13 @@ CChartsDrawer.prototype =
                 this.gridChart.draw(this);
 			}
 			
+			if(this.nDimensionCount === 3)
+			{
+				this.cShapeDrawer.bIsNoSmartAttack = true;
+				this.chart.draw(this);
+				this.cShapeDrawer.bIsNoSmartAttack = false;
+			}
+			
 			if(this.calcProp.type != "Pie" && this.calcProp.type != "DoughnutChart")
 			{
 				this.catAxisChart.draw(this);
@@ -200,9 +207,12 @@ CChartsDrawer.prototype =
 				this.serAxisChart.draw(this);
 			}
 			
+			if(this.nDimensionCount !== 3)
+			{
 			this.cShapeDrawer.bIsNoSmartAttack = true;
 			this.chart.draw(this);
 			this.cShapeDrawer.bIsNoSmartAttack = false;
+		}
 		}
 	},
 	
@@ -669,10 +679,12 @@ CChartsDrawer.prototype =
 		var valAx = chartSpace.chart.plotArea.valAx;
 		var catAx = chartSpace.chart.plotArea.catAx;
 		
+		var orientationValAx = valAx && valAx.scaling.orientation === ORIENTATION_MIN_MAX ? true : false;
+		var orientationCatAx = catAx && catAx.scaling.orientation === ORIENTATION_MIN_MAX ? true : false;
 
 		if(isHBar === 'HBar' && catAx && valAx && catAx.yPoints && valAx.xPoints)
 		{
-			if(catAx.scaling.orientation == ORIENTATION_MIN_MAX)
+			if(orientationCatAx)
 			{
 				if(valAx.crossBetween == CROSS_BETWEEN_BETWEEN)
 					leftDownPointY = catAx.yPoints[0].pos + Math.abs((catAx.interval) / 2);
@@ -688,14 +700,14 @@ CChartsDrawer.prototype =
 			}
 
 			
-			if(valAx.scaling.orientation == ORIENTATION_MIN_MAX)
+			if(orientationValAx)
 				leftDownPointX = valAx.xPoints[0].pos;
 			else
 				leftDownPointX = valAx.xPoints[valAx.xPoints.length - 1].pos;
 			
 			
 			
-			if(catAx.scaling.orientation == ORIENTATION_MIN_MAX)
+			if(orientationCatAx)
 			{
 				if(valAx.crossBetween == CROSS_BETWEEN_BETWEEN)
 					rightUpPointY = catAx.yPoints[catAx.yPoints.length - 1].pos - Math.abs((catAx.interval) / 2);
@@ -711,7 +723,7 @@ CChartsDrawer.prototype =
 			}
 
 			
-			if(valAx.scaling.orientation == ORIENTATION_MIN_MAX)
+			if(orientationValAx)
 				rightUpPointX = valAx.xPoints[valAx.xPoints.length - 1].pos;
 			else
 				rightUpPointX = valAx.xPoints[0].pos;
@@ -747,10 +759,10 @@ CChartsDrawer.prototype =
 		else if(isHBar === 'Scatter' && catAx && valAx && catAx.xPoints && valAx.yPoints)
 		{
 			leftDownPointX = catAx.xPoints[0].pos;
-			leftDownPointY = valAx.scaling.orientation == ORIENTATION_MIN_MAX ? valAx.yPoints[0].pos : valAx.yPoints[valAx.yPoints.length - 1].pos;
+			leftDownPointY = orientationValAx ? valAx.yPoints[0].pos : valAx.yPoints[valAx.yPoints.length - 1].pos;
 
 			rightUpPointX = catAx.xPoints[catAx.xPoints.length - 1].pos;
-			rightUpPointY = valAx.scaling.orientation == ORIENTATION_MIN_MAX ? valAx.yPoints[valAx.yPoints.length - 1].pos : valAx.yPoints[0].pos;
+			rightUpPointY = orientationValAx ? valAx.yPoints[valAx.yPoints.length - 1].pos : valAx.yPoints[0].pos;
 			
 			if(valAx.labels && !valAx.bDelete)
 			{
@@ -781,7 +793,7 @@ CChartsDrawer.prototype =
 		}
 		else if(isHBar !== undefined && valAx && catAx && catAx.xPoints && valAx.yPoints)
 		{
-			if(catAx.scaling.orientation != ORIENTATION_MIN_MAX)
+			if(!orientationCatAx)
 			{
 				leftDownPointX = catAx.xPoints[catAx.xPoints.length - 1].pos - Math.abs((catAx.interval) / 2);
 			}
@@ -793,13 +805,13 @@ CChartsDrawer.prototype =
 					leftDownPointX = catAx.xPoints[0].pos;
 			}
 			
-			if(valAx.scaling.orientation == ORIENTATION_MIN_MAX)
+			if(orientationValAx)
 				leftDownPointY = valAx.yPoints[0].pos;
 			else
 				leftDownPointY = valAx.yPoints[valAx.yPoints.length - 1].pos;
 			
 			
-			if(catAx.scaling.orientation != ORIENTATION_MIN_MAX)
+			if(!orientationCatAx)
 			{
 				rightUpPointX = catAx.xPoints[0].pos;
 			}
@@ -812,7 +824,7 @@ CChartsDrawer.prototype =
 			}
 
 
-			if(valAx.scaling.orientation == ORIENTATION_MIN_MAX)
+			if(orientationValAx)
 				rightUpPointY = valAx.yPoints[valAx.yPoints.length - 1].pos;
 			else
 				rightUpPointY = valAx.yPoints[0].pos;
@@ -2057,6 +2069,24 @@ CChartsDrawer.prototype =
 		return this.processor3D.convertAndTurnPoint(x, y, z);
 	},
 
+	//position of catAx labels(left or right) - returns false(left of axis)/true(right of axis) or null(standard position)
+	calculatePositionLabelsCatAxFromAngle: function(chartSpace)
+	{
+		var res = null;
+	
+		var angleOy = chartSpace.chart.view3D && chartSpace.chart.view3D.rotY ? (- chartSpace.chart.view3D.rotY / 360) * (Math.PI * 2) : 0;
+		if(chartSpace.chart.view3D && !chartSpace.chart.view3D.rAngAx && angleOy !== 0)
+		{
+			var angleOy = Math.abs(angleOy);
+	
+			if(angleOy >= Math.PI / 2 && angleOy < 3 * Math.PI / 2)
+				res = true;
+			else
+				res = false;
+		}
+		
+		return res;
+	},
 	
 	
 	//****accessory functions****
@@ -2501,7 +2531,7 @@ CChartsDrawer.prototype =
 		var chart = chartSpace && chartSpace.chart ? chartSpace.chart.plotArea.chart: null;
 		var typeChart = chart ? chart.getObjectType() : null;
 		
-		if(isTurnOn3DCharts && chartSpace && chartSpace.chart.view3D && chartSpace.chart.view3D.rAngAx && ((typeChart === historyitem_type_BarChart && chart && chart.barDir !== BAR_DIR_BAR) || (typeChart === historyitem_type_LineChart) || (typeChart === historyitem_type_BarChart && chart.barDir === BAR_DIR_BAR) /*|| (typeChart === historyitem_type_AreaChart)*/ || (typeChart === historyitem_type_PieChart)))
+		if(isTurnOn3DCharts && chartSpace && chartSpace.chart.view3D /*&& chartSpace.chart.view3D.rAngAx*/ && ((typeChart === historyitem_type_BarChart && chart && chart.barDir !== BAR_DIR_BAR) || (typeChart === historyitem_type_LineChart) || (typeChart === historyitem_type_BarChart && chart.barDir === BAR_DIR_BAR) /*|| (typeChart === historyitem_type_AreaChart)*/ || (typeChart === historyitem_type_PieChart)))
 		{
 			res = true;
 		}
@@ -2904,36 +2934,95 @@ drawBarChart.prototype =
 	_DrawBars3D: function()
 	{
 		var t = this;
-		var draw = function(onlyLessNull)
+		var processor3D = this.cChartDrawer.processor3D;
+		
+		var directionDraw = 
 		{
-			var brush, pen, options;
-			for (var i = 0; i < t.chartProp.ptCount; i++) 
+			onPoints: 0, 
+			reversePointsOnPoints: 1, 
+			reverseSeriesOnPoints: 2, 
+			reverseSeriesPointsOnPoints: 3, 
+			onSeries: 4, 
+			reversePointsOnSeries: 5, 
+			reverseSeriesOnSeries: 6, 
+			reversePointsSeriesOnSeries: 7
+		};
+		
+		var verges = 
 			{
-				if(!t.paths.series)
-					return;
+			front: 0,
+			down: 1,
+			left: 2,
+			right: 3,
+			up: 4,
+			unfront: 5
+		};
 				
-				for (var j = 0; j < t.paths.series.length; ++j) 
+		
+		var drawVerges = function(j, i, onlyLessNull, start, stop)
 				{
+			var brush, pen, options;
 					options = t._getOptionsForDrawing(j, i, onlyLessNull);
 					if(options !== null)
 					{
 						pen = options.pen;
 						brush = options.brush;
-					}
-					else
-						continue;
 					
-					for(var k = 0; k < t.paths.series[j][i].length; k++)
+				for(var k = start; k <= stop; k++)
 					{
 						t._drawBar3D(t.paths.series[j][i][k], pen, brush, k);
 					}
 				}
+		};
+		
+		
+		//рисуем по точкам
+		var onPoints = function(onlyLessNull)
+		{	
+			var drawNeedVerge = function(start, stop)
+			{
+				for (var i = 0; i < t.chartProp.ptCount; i++) 
+				{
+					if(!t.paths.series)
+						return;
+					
+					for (var j = 0; j < t.paths.series.length; ++j) 
+					{
+						drawVerges(j, i, onlyLessNull, start, stop);
+			}
+				}
+		};
+		
+			var angleOx = Math.abs(processor3D.angleOx);
+			var angleOy = Math.abs(processor3D.angleOy);
+			
+			if(angleOx === 0)//тестировал все повороты вокруг OY, без обратных осей
+		{
+				drawNeedVerge(verges.down, verges.up);
+				drawNeedVerge(verges.unfront, verges.unfront);
+				drawNeedVerge(verges.front, verges.front);
+			}
+			else if(angleOx !== 0 && angleOy === 0)
+			{
+				drawNeedVerge(verges.right, verges.right);
+				drawNeedVerge(verges.left, verges.left);
+				drawNeedVerge(verges.unfront, verges.unfront);
+				drawNeedVerge(verges.up, verges.up);
+				drawNeedVerge(verges.down, verges.down);
+				drawNeedVerge(verges.front, verges.front);
+			}
+			else
+			{
+				drawNeedVerge(verges.down, verges.up);
+				drawNeedVerge(verges.unfront, verges.unfront);
+				drawNeedVerge(verges.front, verges.front);
 			}
 		};
 		
-		var drawReverse = function(onlyLessNull)
+		var reverseSeriesOnPoints = function(onlyLessNull)
 		{
-			var brush, pen, options;
+			var drawNeedVerge = function(start, stop)
+			{
 			for (var i = 0; i < t.chartProp.ptCount; i++) 
 			{
 				if(!t.paths.series)
@@ -2941,72 +3030,315 @@ drawBarChart.prototype =
 				
 				for (var j = t.paths.series.length - 1; j >= 0; --j) 
 				{
-					options = t._getOptionsForDrawing(j, i, onlyLessNull);
-					if(options !== null)
+						drawVerges(j, i, onlyLessNull, start, stop);
+					}
+				}
+			};
+			
+			drawNeedVerge(verges.front, verges.unfront);
+		};
+		
+		var reverseSeriesPointsOnPoints = function(onlyLessNull)
 					{
-						pen = options.pen;
-						brush = options.brush;
+			var drawNeedVerge = function(start, stop)
+			{
+				for (var i = t.chartProp.ptCount - 1; i >= 0; --i) 
+				{
+					if(!t.paths.series)
+						return;
+					
+					for (var j = t.paths.series.length - 1; j >= 0; --j) 
+					{
+						drawVerges(j, i, onlyLessNull, start, stop);
+					}
+				}
+			};
+					
+			drawNeedVerge(verges.down, verges.unfront);
+			drawNeedVerge(verges.front, verges.front);
+		};
+		
+		var reversePointsOnPoints = function(onlyLessNull)
+					{
+			var drawNeedVerge = function(start, stop)
+			{
+				for (var i = t.chartProp.ptCount - 1; i >= 0; --i) 
+				{
+					if(!t.paths.series)
+						return;
+					
+					for (var j = 0; j < t.paths.series.length; j++) 
+					{
+						drawVerges(j, i, onlyLessNull, start, stop);
+					}
+				}
+			};
+			
+			drawNeedVerge(verges.front, verges.unfront);
+		};
+		
+		
+		//рисуем по сериям
+		var onSeries = function(onlyLessNull)
+		{
+			var drawNeedVerge = function(start, stop)
+			{
+				for (var j = 0; j < t.paths.series.length; j++)
+				{
+					if(!t.paths.series)
+						return;
+					
+					for (var i = 0; i < t.chartProp.ptCount; i++) 
+					{
+						drawVerges(j, i, onlyLessNull, start, stop);
+			}
+				}
+		};
+		
+			drawNeedVerge(verges.front, verges.unfront);
+		};
+		
+		var reversePointsOnSeries = function(onlyLessNull)
+		{
+			var drawNeedVerge = function(start, stop)
+			{
+				for (var j = 0; j < t.paths.series.length; j++) 
+				{
+					if(!t.paths.series)
+						return;
+			
+					for (var i = t.chartProp.ptCount - 1; i >= 0; i--) 
+					{
+						drawVerges(j, i, onlyLessNull, start, stop);
+					}
+				}
+			};
+			
+			drawNeedVerge(verges.front, verges.unfront);
+		};
+		
+		var reverseSeriesOnSeries = function(onlyLessNull)
+		{
+			var drawNeedVerge = function(start, stop)
+			{
+				for (var j = t.paths.series.length - 1; j >= 0; j--)
+				{
+					if(!t.paths.series)
+					return;
+			
+					for (var i = 0; i < t.chartProp.ptCount; i++) 
+					{
+						drawVerges(j, i, onlyLessNull, start, stop);
+					}
+				}
+			};
+					
+			drawNeedVerge(verges.front, verges.unfront);
+		};
+		
+		var reversePointsSeriesOnSeries = function(onlyLessNull)
+					{
+			var drawNeedVerge = function(start, stop)
+			{
+				for (var j = t.paths.series.length - 1; j >= 0; j--)
+				{
+					if(!t.paths.series)
+						return;
+					
+					for (var i = t.chartProp.ptCount - 1; i >= 0; i--) 
+					{
+						drawVerges(j, i, onlyLessNull, start, stop);
+					}
+				}
+			};
+					
+			drawNeedVerge(verges.front, verges.unfront);
+		};
+		
+		
+		var direction = this._calculateDirectionDraw3D(directionDraw);
+		
+		for(var n = 0; n < direction.length; n++)
+					{
+			switch (direction[n].res)
+			{
+				case directionDraw.onPoints:
+				{
+					onPoints(direction[n].isLess);
+					break;
+					}
+				case directionDraw.reversePointsOnPoints:
+				{
+					reversePointsOnPoints(direction[n].isLess);
+					break;
+				}
+				case directionDraw.reverseSeriesOnPoints:
+				{
+					reverseSeriesOnPoints(direction[n].isLess);
+					break;
+			}
+				case directionDraw.reverseSeriesPointsOnPoints:
+				{
+					reverseSeriesPointsOnPoints(direction[n].isLess);
+					break;
+		}
+				case directionDraw.onSeries:
+		{
+					onSeries(direction[n].isLess);
+					break;
+				}
+				case directionDraw.reversePointsOnSeries:
+			{
+					reversePointsOnSeries(direction[n].isLess);
+					break;
+				}
+				case directionDraw.reverseSeriesOnSeries:
+				{
+					reverseSeriesOnSeries(direction[n].isLess);
+					break;
+				}
+				case directionDraw.reversePointsSeriesOnSeries:
+				{
+					reversePointsSeriesOnSeries(direction[n].isLess);
+					break;
+				}
+			}
+		}
+				
+	},
+	
+	_calculateDirectionDraw3D: function(directionDraw)
+	{
+		var res = [];
+		var processor3D = this.cChartDrawer.processor3D;
+		var t = this;
+		
+		//NOT PERSPECTIVE
+		var calculateDirectionNoPerspective = function()
+		{
+			if(t.cChartSpace.chart.view3D.rAngAx)
+			{
+				if(t.chartProp.subType === "standard")
+				{
+					res.push({res: directionDraw.reversePointsSeriesOnSeries, isLess: false});
+			}
+				else if(t.chartProp.subType == "stacked" || t.chartProp.subType == "stackedPer")
+				{
+					if(t.cChartSpace.chart.plotArea.valAx.scaling.orientation === ORIENTATION_MIN_MAX)
+					{
+						res.push({res: directionDraw.reverseSeriesOnPoints, isLess: true});
+						res.push({res: directionDraw.onPoints, isLess: false});
+						
+					}
+			else
+			{
+						res.push({res: directionDraw.reverseSeriesOnPoints, isLess: false});
+						res.push({res: directionDraw.onPoints, isLess: true});
+			}
+				}
+				else
+				{
+					if(t.cChartSpace.chart.plotArea.catAx.scaling.orientation === ORIENTATION_MIN_MAX)
+					{
+						res.push({res: directionDraw.onPoints, isLess: false});
 					}
 					else
-						continue;
-					
-					for(var k = 0; k < t.paths.series[j][i].length; k++)
 					{
-						t._drawBar3D(t.paths.series[j][i][k], pen, brush, k);
+						res.push({res: directionDraw.reverseSeriesOnPoints, isLess: false});
 					}
 				}
 			}
 		};
-		
-		if(this.chartProp.subType === "standard")
+			
+		//PERSPECTIVE
+		var calculateDirectionPerspective = function()
 		{
-			//вторую половину с конца рисуем
-			var brush, pen, options;
-			
-			if(!this.paths.series)
-					return;
-			
-			for (var i = this.paths.series.length - 1; i >= 0; i--) {	
-				for (var j = this.chartProp.ptCount - 1; j >= 0; j--) {
-					
-					options = t._getOptionsForDrawing(i, j);
-					if(options !== null)
+			if(t.chartProp.subType === "standard")
+			{
+				var angle = Math.abs(processor3D.angleOy);
+				if(angle <= Math.PI / 2)
+				{
+					res.push({res: directionDraw.reverseSeriesOnSeries, isLess: true});
+					res.push({res: directionDraw.reverseSeriesOnSeries, isLess: false});
+		}
+				else if(angle <= Math.PI)
+				{
+					res.push({res: directionDraw.onSeries, isLess: true});
+					res.push({res: directionDraw.onSeries, isLess: false});
+				}
+				else if(angle <= (3/2) * Math.PI)
+				{
+					res.push({res: directionDraw.reversePointsOnSeries, isLess: true});
+					res.push({res: directionDraw.reversePointsOnSeries, isLess: false});
+				}
+		else
+		{
+					res.push({res: directionDraw.reversePointsSeriesOnSeries, isLess: true});
+					res.push({res: directionDraw.reversePointsSeriesOnSeries, isLess: false});
+				}
+			}
+			else if(t.chartProp.subType == "stacked" || t.chartProp.subType == "stackedPer")
+			{
+				if(Math.abs(processor3D.angleOy) > Math.PI)
+				{
+					if(t.cChartSpace.chart.plotArea.valAx.scaling.orientation === ORIENTATION_MIN_MAX)
+					{	
+						res.push({res: directionDraw.reversePointsOnPoints, isLess: false});	
+					}
+			else
 					{
-						pen = options.pen;
-						brush = options.brush;
+						res.push({res: directionDraw.reverseSeriesOnPoints, isLess: false});
+						res.push({res: directionDraw.onPoints, isLess: true});
+		}
+				}
+				else
+				{
+					if(t.cChartSpace.chart.plotArea.valAx.scaling.orientation === ORIENTATION_MIN_MAX)
+					{
+						res.push({res: directionDraw.reverseSeriesOnPoints, isLess: true});
+						res.push({res: directionDraw.onPoints, isLess: false});
 					}
 					else
-						continue;
-					
-					for(var k = 0; k < this.paths.series[i][j].length; k++)
 					{
-						this._drawBar3D(this.paths.series[i][j][k], pen, brush, k);
+						res.push({res: directionDraw.reverseSeriesOnPoints, isLess: false});
+						res.push({res: directionDraw.onPoints, isLess: true});
 					}
 				}
 			}
-		}
-		else if(this.chartProp.subType == "stacked" || this.chartProp.subType == "stackedPer")
-		{
-			if(this.cChartSpace.chart.plotArea.valAx.scaling.orientation === ORIENTATION_MIN_MAX)
-			{
-				drawReverse(true);
-				draw(false);
-				
-			}
 			else
 			{
-				drawReverse(false);
-				draw(true);
+				if(t.cChartSpace.chart.plotArea.catAx.scaling.orientation === ORIENTATION_MIN_MAX)
+				{
+					if(Math.abs(processor3D.angleOy) > Math.PI)
+					{
+						res.push({res: directionDraw.reverseSeriesPointsOnPoints, isLess: false});
+						res.push({res: directionDraw.reverseSeriesPointsOnPoints, isLess: true});
+					}
+					else
+					{
+						
+						res.push({res: directionDraw.onPoints, isLess: true});
+						res.push({res: directionDraw.onPoints, isLess: false});
+					}
+				}
+				else
+				{
+					res.push({res: directionDraw.reverseSeriesOnPoints, isLess: false});
+					res.push({res: directionDraw.reverseSeriesOnPoints, isLess: true});
+				}
 			}
-			
+		};
+		
+		if(t.cChartSpace.chart.view3D.rAngAx)
+		{
+			calculateDirectionNoPerspective();
 		}
 		else
 		{
-			if(this.cChartSpace.chart.plotArea.catAx.scaling.orientation === ORIENTATION_MIN_MAX)
-				draw();
-			else
-				drawReverse();
+			calculateDirectionPerspective();
 		}
+		
+		return res;	
 	},
 	
 	_getOptionsForDrawing: function(ser, point, onlyLessNull)
@@ -3523,27 +3855,80 @@ drawLineChart.prototype =
 	
 	_drawLines3D: function()
 	{
-		//вторую половину с конца рисуем
+		var t = this;
+		
+		var drawVerges = function(j, i, onlyLessNull)
+		{
 		var brush, pen, seria;
-		for (var i = this.paths.series.length - 1; i >= 0; i--) {
-			for (var j = 0; j < this.chartProp.ptCount; j++) {
-				seria = this.chartProp.series[i];
+			
+			seria = t.chartProp.series[j];
 				brush = seria.brush;
 				pen = seria.pen;
 				
-				if(!this.paths.series[i] || !this.paths.series[i][j] || !seria.val.numRef.numCache.pts[j])
-					continue;
+			if(!(!t.paths.series[j] || !t.paths.series[j][i] || !seria.val.numRef.numCache.pts[i]))
+			{
+				if(seria.val.numRef.numCache.pts[i].pen)
+					pen = seria.val.numRef.numCache.pts[i].pen;
+				if(seria.val.numRef.numCache.pts[i].brush)
+					brush = seria.val.numRef.numCache.pts[i].brush;
 				
-				if(seria.val.numRef.numCache.pts[j].pen)
-					pen = seria.val.numRef.numCache.pts[j].pen;
-				if(seria.val.numRef.numCache.pts[j].brush)
-					brush = seria.val.numRef.numCache.pts[j].brush;
-				
-				for(var k = 0; k < this.paths.series[i][j].length; k++)
+				for(var k = 0; k < t.paths.series[j][i].length; k++)
 				{
-					this._drawLine3D(this.paths.series[i][j][k], pen, brush, k);
+					t._drawLine3D(t.paths.series[j][i][k], pen, brush, k);
 				}
 			}
+		};
+				
+		
+		//рисуем по сериям
+		var onSeries = function(onlyLessNull)
+				{
+			var drawNeedVerge = function()
+			{
+				for (var j = 0; j < t.paths.series.length; j++)
+				{	
+					for (var i = 0; i < t.chartProp.ptCount; i++) 
+					{	
+						drawVerges(j, i, onlyLessNull);
+				}
+			}
+			};
+			
+			drawNeedVerge();
+		};
+		
+		
+		var reverseSeriesOnSeries = function(onlyLessNull)
+		{
+			var drawNeedVerge = function()
+			{
+				for (var j = t.paths.series.length - 1; j >= 0; j--)
+				{
+					if(!t.paths.series)
+						return;
+					
+					for (var i = 0; i < t.chartProp.ptCount; i++) 
+					{
+						drawVerges(j, i, onlyLessNull);
+		}
+				}
+			};
+			
+			drawNeedVerge();
+		};
+		
+		
+		if(!this.cChartDrawer.processor3D.view3D.rAngAx)
+		{
+			var angle = Math.abs(this.cChartDrawer.processor3D.angleOy);
+			if(angle > Math.PI / 2 && angle < 3 * Math.PI / 2)
+				onSeries();
+			else
+				reverseSeriesOnSeries();
+		}
+		else
+		{
+			reverseSeriesOnSeries();
 		}
 	},
 	
@@ -8980,6 +9365,9 @@ gridChart.prototype =
 				
 			}
 		}
+		//для того, чтобы отрисовывался один параллелепипед. необходимо верхний FOR закомментировать и раскомментировать то, что внизу. + убрать отрисовку самого chart'a
+		//this.paths.horisontalLines = [];
+		//this.paths.horisontalLines.push(this._calculate3DParallalepiped());
 	},
 	
 	_calculateVerticalLines: function()
@@ -9148,6 +9536,91 @@ gridChart.prototype =
 			path.lnTo(x3 / pxToMm * pathW, y3 / pxToMm * pathH);
 			path.lnTo(x / pxToMm * pathW, y / pxToMm * pathH);
 		}
+		path.recalculate(gdLst);
+		
+		return path;
+	},
+	
+	_calculate3DParallalepiped: function()
+	{
+		var path  = new Path();
+		
+		var pathH = this.chartProp.pathH;
+		var pathW = this.chartProp.pathW;
+		var gdLst = [];
+		
+		path.pathH = pathH;
+		path.pathW = pathW;
+		gdLst["w"] = 1;
+		gdLst["h"] = 1;
+		
+		
+		var perspectiveDepth = this.cChartDrawer.processor3D.depthPerspective;
+		var left = this.chartProp.chartGutter._left;
+		var right = this.chartProp.chartGutter._right;
+		var top = this.chartProp.chartGutter._top;
+		var bottom = this.chartProp.chartGutter._bottom;
+		var height = this.chartProp.heightCanvas - (top + bottom);
+		var width = this.chartProp.widthCanvas - (left + right);
+		
+		
+		var point0 = this.cChartDrawer._convertAndTurnPoint(left, top, perspectiveDepth);
+		var x0 = point0.x;
+		var y0 = point0.y;
+		
+		var point1 = this.cChartDrawer._convertAndTurnPoint(left, top + height, perspectiveDepth);
+		var x1 = point1.x;
+		var y1 = point1.y;
+		
+		var point2 = this.cChartDrawer._convertAndTurnPoint(left + width, top + height, perspectiveDepth);
+		var x2 = point2.x;
+		var y2 = point2.y;
+		
+		var point3 = this.cChartDrawer._convertAndTurnPoint(left + width, top, perspectiveDepth);
+		var x3 = point3.x;
+		var y3 = point3.y;
+		
+		var point4 = this.cChartDrawer._convertAndTurnPoint(left + width, top, 0);
+		var x4 = point4.x;
+		var y4 = point4.y;
+		
+		var point5 = this.cChartDrawer._convertAndTurnPoint(left + width, top + height, 0);
+		var x5 = point5.x;
+		var y5 = point5.y;
+		
+		var point6 = this.cChartDrawer._convertAndTurnPoint(left, top + height, 0);
+		var x6 = point6.x;
+		var y6 = point6.y;
+		
+		var point7 = this.cChartDrawer._convertAndTurnPoint(left, top, 0);
+		var x7 = point7.x;
+		var y7 = point7.y;
+		
+		
+		
+		
+		path.stroke = true;
+		var pxToMm = this.chartProp.pxToMM;
+		
+		path.moveTo(x0 / pxToMm * pathW, y0 / pxToMm * pathH);
+		path.lnTo(x1 / pxToMm * pathW, y1 / pxToMm * pathH);
+		path.lnTo(x2 / pxToMm * pathW, y2 / pxToMm * pathH);
+		path.lnTo(x3 / pxToMm * pathW, y3 / pxToMm * pathH);
+		path.lnTo(x4 / pxToMm * pathW, y4 / pxToMm * pathH);
+		path.lnTo(x5 / pxToMm * pathW, y5 / pxToMm * pathH);
+		path.lnTo(x6 / pxToMm * pathW, y6 / pxToMm * pathH);
+		path.lnTo(x7 / pxToMm * pathW, y7 / pxToMm * pathH);
+		path.lnTo(x0 / pxToMm * pathW, y0 / pxToMm * pathH);
+		path.lnTo(x1 / pxToMm * pathW, y1 / pxToMm * pathH);
+		path.lnTo(x6 / pxToMm * pathW, y6 / pxToMm * pathH);
+		path.lnTo(x5 / pxToMm * pathW, y5 / pxToMm * pathH);
+		path.lnTo(x2 / pxToMm * pathW, y2 / pxToMm * pathH);
+		path.lnTo(x3 / pxToMm * pathW, y3 / pxToMm * pathH);
+		path.lnTo(x0 / pxToMm * pathW, y0 / pxToMm * pathH);
+		path.lnTo(x7 / pxToMm * pathW, y7 / pxToMm * pathH);
+		path.lnTo(x4 / pxToMm * pathW, y4 / pxToMm * pathH);
+		
+		
 		path.recalculate(gdLst);
 		
 		return path;
