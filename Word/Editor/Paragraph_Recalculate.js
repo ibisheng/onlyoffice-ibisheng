@@ -2236,14 +2236,15 @@ CParaLineMetrics.prototype =
             }
             case linerule_AtLeast:
             {
-                var LineGap1 = ParaPr.Spacing.Line;
-                var LineGap2 = TextAscent + TextDescent;
+                var TargetLineGap = ParaPr.Spacing.Line;
+                var TextLineGap   = TextAscent + TextDescent;
+                var RealLineGap   = this.Ascent + this.Descent;
 
                 // Специальный случай, когда в строке нет никакого текста
-                if ( Math.abs( LineGap2 ) < 0.001 )
+                if (Math.abs(TextLineGap) < 0.001 || RealLineGap >= TargetLineGap)
                     LineGap = 0;
                 else
-                    LineGap = Math.max( LineGap1, LineGap2 ) - ( TextAscent + TextDescent );
+                    LineGap = TargetLineGap - RealLineGap;
 
                 break;
             }
