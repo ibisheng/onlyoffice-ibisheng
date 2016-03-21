@@ -9813,7 +9813,8 @@
 
                                 //formula
                                 if ( newVal.getFormula() && !isOneMerge ) {
-                                    var offset = range.getCells()[numFormula].getOffset2( value2[numFormula].sId ), assemb, _p_ = new parserFormula( value2[numFormula].sFormula, "", range.worksheet );
+                                    var offset = range.getCells()[numFormula].getOffset2( value2[numFormula].sId ), assemb,
+										_p_ = new parserFormula( value2[numFormula].sFormula, firstRange.getName() ? firstRange.getName() : "", range.worksheet );
 
                                     if ( _p_.parse() ) {
                                         assemb = _p_.changeOffset( offset ).assemble();
