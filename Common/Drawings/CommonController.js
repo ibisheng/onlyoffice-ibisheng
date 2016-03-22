@@ -1228,6 +1228,10 @@ DrawingObjectsController.prototype =
         else if(this.selection.chartSelection)
         {
             this.selection.chartSelection.applyTextFunction(docContentFunction, tableFunction, args);
+            if(this.document)
+            {
+                this.document.Recalculate();
+            }
         }
         else
         {

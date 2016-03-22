@@ -909,7 +909,7 @@ CGraphicObjects.prototype =
         for(i = 0; i < drawings.length; ++i)
         {
             var array_type = drawings[i].getDrawingArrayType();
-            if(!drawings[i].bNoNeedToAdd)
+            if(!drawings[i].bNoNeedToAdd && drawings[i].PageNum === pageIndex)
             {
                 var drawing_array = null;
                 switch(array_type)

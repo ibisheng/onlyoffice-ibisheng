@@ -874,13 +874,25 @@ CChartSpace.prototype =
                 this.selection.textSelection.paragraphAdd(paraItem, bRecalculate);
                 return;
             }
+            if(this.selection.title)
+            {
+                this.selection.title.checkDocContent();
+                CheckObjectTextPr(this.selection.title, _paraItem.Value, this.getDrawingDocument(), 18);
+                if(this.selection.title.tx && this.selection.title.tx.rich && this.selection.title.tx.rich.content)
+                {
+                    this.selection.title.tx.rich.content.Set_ApplyToAll(true);
+                    this.selection.title.tx.rich.content.Paragraph_Add(_paraItem);
+                    this.selection.title.tx.rich.content.Set_ApplyToAll(false);
+                }
+                return;
+            }
             this.applyLabelsFunction(CheckObjectTextPr, _paraItem.Value);
         }
     },
 
     applyTextFunction: function(docContentFunction, tableFunction, args)
     {
-        if(docContentFunction === CDocumentContent.prototype.Paragraph_Add)
+        if(docContentFunction === CDocumentContent.prototype.Paragraph_Add && !this.selection.textSelection)
         {
             this.paragraphAdd(args[0], args[1]);
             return;
