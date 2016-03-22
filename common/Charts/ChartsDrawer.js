@@ -2549,6 +2549,7 @@ function drawBarChart()
 	this.cChartDrawer = null;
 	this.cShapeDrawer = null;
 	this.paths = {};
+	this.sortZIndexPaths = [];
 	this.summBarVal = [];
 }
 
@@ -2721,6 +2722,9 @@ drawBarChart.prototype =
 				if(this.cChartDrawer.nDimensionCount === 3)
 				{
 					paths = this._calculateRect3D(startX, startY, individualBarWidth, height, val, isValMoreZero, isValLessZero, i);
+					
+					this.sortZIndexPaths.push({seria: i, point: idx, paths: paths.paths, x: paths.x, y: paths.y, zIndex: paths.zIndex});
+					paths = paths.paths;
 				}
 				else
 				{
@@ -2737,6 +2741,17 @@ drawBarChart.prototype =
 			
 			if(seria.length)
 				seriesCounter++;
+		}
+		
+		if(this.cChartDrawer.nDimensionCount === 3)
+		{
+			this.sortZIndexPaths.sort (function sortArr(a, b)
+			{
+				if(b.zIndex == a.zIndex)
+					return  b.y - a.y;
+				else
+					return  b.zIndex - a.zIndex;
+			});
 		}
     },
 	
@@ -2936,18 +2951,6 @@ drawBarChart.prototype =
 		var t = this;
 		var processor3D = this.cChartDrawer.processor3D;
 		
-		var directionDraw = 
-		{
-			onPoints: 0, 
-			reversePointsOnPoints: 1, 
-			reverseSeriesOnPoints: 2, 
-			reverseSeriesPointsOnPoints: 3, 
-			onSeries: 4, 
-			reversePointsOnSeries: 5, 
-			reverseSeriesOnSeries: 6, 
-			reversePointsSeriesOnSeries: 7
-		};
-		
 		var verges = 
 			{
 			front: 0,
@@ -2958,11 +2961,10 @@ drawBarChart.prototype =
 			unfront: 5
 		};
 				
-		
-		var drawVerges = function(j, i, onlyLessNull, start, stop)
+		var drawVerges = function(i, j, paths, onlyLessNull, start, stop)
 				{
 			var brush, pen, options;
-					options = t._getOptionsForDrawing(j, i, onlyLessNull);
+			options = t._getOptionsForDrawing(i, j, onlyLessNull);
 					if(options !== null)
 					{
 						pen = options.pen;
@@ -2970,375 +2972,35 @@ drawBarChart.prototype =
 					
 				for(var k = start; k <= stop; k++)
 					{
-						t._drawBar3D(t.paths.series[j][i][k], pen, brush, k);
+					t._drawBar3D(paths[k], pen, brush, k);
 					}
 				}
 		};
 		
-		
-		//рисуем по точкам
-		var onPoints = function(onlyLessNull)
+		var draw = function(onlyLessNull, start, stop)
 		{	
-			var drawNeedVerge = function(start, stop)
+			for(var i = 0; i < t.sortZIndexPaths.length; i++)
 			{
-				for (var i = 0; i < t.chartProp.ptCount; i++) 
-				{
-					if(!t.paths.series)
-						return;
-					
-					for (var j = 0; j < t.paths.series.length; ++j) 
-					{
-						drawVerges(j, i, onlyLessNull, start, stop);
+				drawVerges(t.sortZIndexPaths[i].seria, t.sortZIndexPaths[i].point, t.sortZIndexPaths[i].paths, onlyLessNull, start, stop);
 			}
-				}
 		};
 		
-			var angleOx = Math.abs(processor3D.angleOx);
-			var angleOy = Math.abs(processor3D.angleOy);
-			
-			if(angleOx === 0)//тестировал все повороты вокруг OY, без обратных осей
+		if(this.chartProp.subType === "standard")
 		{
-				drawNeedVerge(verges.down, verges.up);
-				drawNeedVerge(verges.unfront, verges.unfront);
-				drawNeedVerge(verges.front, verges.front);
-			}
-			else if(angleOx !== 0 && angleOy === 0)
-			{
-				drawNeedVerge(verges.right, verges.right);
-				drawNeedVerge(verges.left, verges.left);
-				drawNeedVerge(verges.unfront, verges.unfront);
-				drawNeedVerge(verges.up, verges.up);
-				drawNeedVerge(verges.down, verges.down);
-				drawNeedVerge(verges.front, verges.front);
+			draw(true, verges.front, verges.unfront);
+			draw(false, verges.front, verges.unfront);
 			}
 			else
 			{
-				drawNeedVerge(verges.down, verges.up);
-				drawNeedVerge(verges.unfront, verges.unfront);
-				drawNeedVerge(verges.front, verges.front);
-			}
-		};
+			draw(true, verges.down, verges.up);
+			draw(false, verges.down, verges.up);
 		
-		var reverseSeriesOnPoints = function(onlyLessNull)
-		{
-			var drawNeedVerge = function(start, stop)
-			{
-			for (var i = 0; i < t.chartProp.ptCount; i++) 
-			{
-				if(!t.paths.series)
-					return;
-				
-				for (var j = t.paths.series.length - 1; j >= 0; --j) 
-				{
-						drawVerges(j, i, onlyLessNull, start, stop);
-					}
-				}
-			};
+			draw(true, verges.unfront, verges.unfront);
+			draw(false, verges.unfront, verges.unfront);
 			
-			drawNeedVerge(verges.front, verges.unfront);
-		};
-		
-		var reverseSeriesPointsOnPoints = function(onlyLessNull)
-					{
-			var drawNeedVerge = function(start, stop)
-			{
-				for (var i = t.chartProp.ptCount - 1; i >= 0; --i) 
-				{
-					if(!t.paths.series)
-						return;
-					
-					for (var j = t.paths.series.length - 1; j >= 0; --j) 
-					{
-						drawVerges(j, i, onlyLessNull, start, stop);
+			draw(true, verges.front, verges.front);
+			draw(false, verges.front, verges.front);
 					}
-				}
-			};
-					
-			drawNeedVerge(verges.down, verges.unfront);
-			drawNeedVerge(verges.front, verges.front);
-		};
-		
-		var reversePointsOnPoints = function(onlyLessNull)
-					{
-			var drawNeedVerge = function(start, stop)
-			{
-				for (var i = t.chartProp.ptCount - 1; i >= 0; --i) 
-				{
-					if(!t.paths.series)
-						return;
-					
-					for (var j = 0; j < t.paths.series.length; j++) 
-					{
-						drawVerges(j, i, onlyLessNull, start, stop);
-					}
-				}
-			};
-			
-			drawNeedVerge(verges.front, verges.unfront);
-		};
-		
-		
-		//рисуем по сериям
-		var onSeries = function(onlyLessNull)
-		{
-			var drawNeedVerge = function(start, stop)
-			{
-				for (var j = 0; j < t.paths.series.length; j++)
-				{
-					if(!t.paths.series)
-						return;
-					
-					for (var i = 0; i < t.chartProp.ptCount; i++) 
-					{
-						drawVerges(j, i, onlyLessNull, start, stop);
-			}
-				}
-		};
-		
-			drawNeedVerge(verges.front, verges.unfront);
-		};
-		
-		var reversePointsOnSeries = function(onlyLessNull)
-		{
-			var drawNeedVerge = function(start, stop)
-			{
-				for (var j = 0; j < t.paths.series.length; j++) 
-				{
-					if(!t.paths.series)
-						return;
-			
-					for (var i = t.chartProp.ptCount - 1; i >= 0; i--) 
-					{
-						drawVerges(j, i, onlyLessNull, start, stop);
-					}
-				}
-			};
-			
-			drawNeedVerge(verges.front, verges.unfront);
-		};
-		
-		var reverseSeriesOnSeries = function(onlyLessNull)
-		{
-			var drawNeedVerge = function(start, stop)
-			{
-				for (var j = t.paths.series.length - 1; j >= 0; j--)
-				{
-					if(!t.paths.series)
-					return;
-			
-					for (var i = 0; i < t.chartProp.ptCount; i++) 
-					{
-						drawVerges(j, i, onlyLessNull, start, stop);
-					}
-				}
-			};
-					
-			drawNeedVerge(verges.front, verges.unfront);
-		};
-		
-		var reversePointsSeriesOnSeries = function(onlyLessNull)
-					{
-			var drawNeedVerge = function(start, stop)
-			{
-				for (var j = t.paths.series.length - 1; j >= 0; j--)
-				{
-					if(!t.paths.series)
-						return;
-					
-					for (var i = t.chartProp.ptCount - 1; i >= 0; i--) 
-					{
-						drawVerges(j, i, onlyLessNull, start, stop);
-					}
-				}
-			};
-					
-			drawNeedVerge(verges.front, verges.unfront);
-		};
-		
-		
-		var direction = this._calculateDirectionDraw3D(directionDraw);
-		
-		for(var n = 0; n < direction.length; n++)
-					{
-			switch (direction[n].res)
-			{
-				case directionDraw.onPoints:
-				{
-					onPoints(direction[n].isLess);
-					break;
-					}
-				case directionDraw.reversePointsOnPoints:
-				{
-					reversePointsOnPoints(direction[n].isLess);
-					break;
-				}
-				case directionDraw.reverseSeriesOnPoints:
-				{
-					reverseSeriesOnPoints(direction[n].isLess);
-					break;
-			}
-				case directionDraw.reverseSeriesPointsOnPoints:
-				{
-					reverseSeriesPointsOnPoints(direction[n].isLess);
-					break;
-		}
-				case directionDraw.onSeries:
-		{
-					onSeries(direction[n].isLess);
-					break;
-				}
-				case directionDraw.reversePointsOnSeries:
-			{
-					reversePointsOnSeries(direction[n].isLess);
-					break;
-				}
-				case directionDraw.reverseSeriesOnSeries:
-				{
-					reverseSeriesOnSeries(direction[n].isLess);
-					break;
-				}
-				case directionDraw.reversePointsSeriesOnSeries:
-				{
-					reversePointsSeriesOnSeries(direction[n].isLess);
-					break;
-				}
-			}
-		}
-				
-	},
-	
-	_calculateDirectionDraw3D: function(directionDraw)
-	{
-		var res = [];
-		var processor3D = this.cChartDrawer.processor3D;
-		var t = this;
-		
-		//NOT PERSPECTIVE
-		var calculateDirectionNoPerspective = function()
-		{
-			if(t.cChartSpace.chart.view3D.rAngAx)
-			{
-				if(t.chartProp.subType === "standard")
-				{
-					res.push({res: directionDraw.reversePointsSeriesOnSeries, isLess: false});
-			}
-				else if(t.chartProp.subType == "stacked" || t.chartProp.subType == "stackedPer")
-				{
-					if(t.cChartSpace.chart.plotArea.valAx.scaling.orientation === ORIENTATION_MIN_MAX)
-					{
-						res.push({res: directionDraw.reverseSeriesOnPoints, isLess: true});
-						res.push({res: directionDraw.onPoints, isLess: false});
-						
-					}
-			else
-			{
-						res.push({res: directionDraw.reverseSeriesOnPoints, isLess: false});
-						res.push({res: directionDraw.onPoints, isLess: true});
-			}
-				}
-				else
-				{
-					if(t.cChartSpace.chart.plotArea.catAx.scaling.orientation === ORIENTATION_MIN_MAX)
-					{
-						res.push({res: directionDraw.onPoints, isLess: false});
-					}
-					else
-					{
-						res.push({res: directionDraw.reverseSeriesOnPoints, isLess: false});
-					}
-				}
-			}
-		};
-			
-		//PERSPECTIVE
-		var calculateDirectionPerspective = function()
-		{
-			if(t.chartProp.subType === "standard")
-			{
-				var angle = Math.abs(processor3D.angleOy);
-				if(angle <= Math.PI / 2)
-				{
-					res.push({res: directionDraw.reverseSeriesOnSeries, isLess: true});
-					res.push({res: directionDraw.reverseSeriesOnSeries, isLess: false});
-		}
-				else if(angle <= Math.PI)
-				{
-					res.push({res: directionDraw.onSeries, isLess: true});
-					res.push({res: directionDraw.onSeries, isLess: false});
-				}
-				else if(angle <= (3/2) * Math.PI)
-				{
-					res.push({res: directionDraw.reversePointsOnSeries, isLess: true});
-					res.push({res: directionDraw.reversePointsOnSeries, isLess: false});
-				}
-		else
-		{
-					res.push({res: directionDraw.reversePointsSeriesOnSeries, isLess: true});
-					res.push({res: directionDraw.reversePointsSeriesOnSeries, isLess: false});
-				}
-			}
-			else if(t.chartProp.subType == "stacked" || t.chartProp.subType == "stackedPer")
-			{
-				if(Math.abs(processor3D.angleOy) > Math.PI)
-				{
-					if(t.cChartSpace.chart.plotArea.valAx.scaling.orientation === ORIENTATION_MIN_MAX)
-					{	
-						res.push({res: directionDraw.reversePointsOnPoints, isLess: false});	
-					}
-			else
-					{
-						res.push({res: directionDraw.reverseSeriesOnPoints, isLess: false});
-						res.push({res: directionDraw.onPoints, isLess: true});
-		}
-				}
-				else
-				{
-					if(t.cChartSpace.chart.plotArea.valAx.scaling.orientation === ORIENTATION_MIN_MAX)
-					{
-						res.push({res: directionDraw.reverseSeriesOnPoints, isLess: true});
-						res.push({res: directionDraw.onPoints, isLess: false});
-					}
-					else
-					{
-						res.push({res: directionDraw.reverseSeriesOnPoints, isLess: false});
-						res.push({res: directionDraw.onPoints, isLess: true});
-					}
-				}
-			}
-			else
-			{
-				if(t.cChartSpace.chart.plotArea.catAx.scaling.orientation === ORIENTATION_MIN_MAX)
-				{
-					if(Math.abs(processor3D.angleOy) > Math.PI)
-					{
-						res.push({res: directionDraw.reverseSeriesPointsOnPoints, isLess: false});
-						res.push({res: directionDraw.reverseSeriesPointsOnPoints, isLess: true});
-					}
-					else
-					{
-						
-						res.push({res: directionDraw.onPoints, isLess: true});
-						res.push({res: directionDraw.onPoints, isLess: false});
-					}
-				}
-				else
-				{
-					res.push({res: directionDraw.reverseSeriesOnPoints, isLess: false});
-					res.push({res: directionDraw.reverseSeriesOnPoints, isLess: true});
-				}
-			}
-		};
-		
-		if(t.cChartSpace.chart.view3D.rAngAx)
-		{
-			calculateDirectionNoPerspective();
-		}
-		else
-		{
-			calculateDirectionPerspective();
-		}
-		
-		return res;	
 	},
 	
 	_getOptionsForDrawing: function(ser, point, onlyLessNull)
@@ -3431,10 +3093,11 @@ drawBarChart.prototype =
 		
 		//down verge of minus values don't must draw(in stacked and stackedPer)
 		var isNotDrawDownVerge;
-		if((this.chartProp.subType == "stacked" || this.chartProp.subType == "stackedPer") && val < 0 && (isValMoreZero || (!isValMoreZero && isValLessZero !== 1)))
-			isNotDrawDownVerge = true;
+		/*if((this.chartProp.subType == "stacked" || this.chartProp.subType == "stackedPer") && val < 0 && (isValMoreZero || (!isValMoreZero && isValLessZero !== 1)))
+			isNotDrawDownVerge = true;*/
 		
-		return this.cChartDrawer.calculateRect3D(point1, point2, point3, point4, point5, point6, point7, point8, val, isNotDrawDownVerge);
+		var paths = this.cChartDrawer.calculateRect3D(point1, point2, point3, point4, point5, point6, point7, point8, val, isNotDrawDownVerge);
+		return {paths: paths, x: point1.x, y: point1.y, zIndex: point1.z};
 	}
 }
 
