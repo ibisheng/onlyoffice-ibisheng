@@ -375,7 +375,7 @@ function handleChart(drawing, drawingObjectsController, e, x, y, group, pageInde
                     selector.resetSelection();
                     selector.selectObject(drawing, pageIndex);
                     selector.selection.chartSelection = drawing;
-                    drawing.selection.axisLbls = oLabels;
+                    drawing.selection.axisLbls = oLabels.axis;
                     drawingObjectsController.updateSelectionState();
                     drawingObjectsController.updateOverlay();
                     return true;

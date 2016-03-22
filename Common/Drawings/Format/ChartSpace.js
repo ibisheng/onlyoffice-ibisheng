@@ -366,6 +366,31 @@ function CheckObjectTextPr(oElement, oTextPr, oDrawingDocument)
     }
 }
 
+function CheckIncDecFontSize(oElement, bIncrease, oDrawingDocument,nDefaultSize)
+{
+    if(oElement)
+    {
+        if(!oElement.txPr)
+        {
+            oElement.setTxPr(CreateTextBodyFromString("", oDrawingDocument, oElement));
+        }
+        var oParaPr = oElement.txPr.content.Content[0].Pr.Copy();
+        oElement.txPr.content.Content[0].Set_DocumentIndex(0);
+        var oCopyTextPr;
+        if(oParaPr.DefaultRunPr)
+        {
+            oCopyTextPr = oParaPr.DefaultRunPr.Copy();
+        }
+        else
+        {
+            oCopyTextPr = new CTextPr();
+        }
+        oCopyTextPr.FontSize = FontSize_IncreaseDecreaseValue( bIncrease, isRealNumber(oCopyTextPr.FontSize) ? oCopyTextPr.FontSize : nDefaultSize);
+        oParaPr.DefaultRunPr = oCopyTextPr;
+        oElement.txPr.content.Content[0].Set_Pr(oParaPr);
+    }
+}
+
 function CChartSpace()
 {
     this.chart = null;
@@ -495,7 +520,8 @@ CChartSpace.prototype =
             }
             else if(this.selection.axisLbls)
             {
-                drawingDocument.DrawTrack(TYPE_TRACK_SHAPE, this.transform, this.selection.axisLbls.x, this.selection.axisLbls.y, this.selection.axisLbls.extX, this.selection.axisLbls.extY, false, false);
+                var oLabels = this.selection.axisLbls.labels
+                drawingDocument.DrawTrack(TYPE_TRACK_SHAPE, this.transform, oLabels.x, oLabels.y, oLabels.extX, oLabels.extY, false, false);
             }
         }
     },
@@ -706,13 +732,10 @@ CChartSpace.prototype =
         {
             return this.selection.textSelection.txBody.content.Get_Paragraph_TextPr();
         }
-        else if(this.selection.axisLbls)
+        else if(this.selection.axisLbls && this.selection.axisLbls.labels)
         {
-            if(this.selection.axisLbls.axis)
-            {
-                return GetTextPrFormArrObjects(this.selection.axisLbls.arrLabels, true);
+            return GetTextPrFormArrObjects(this.selection.axisLbls.labels.arrLabels, true);
             }
-        }
         else if(isRealNumber(this.selection.dataLbls))
         {
             var ser = this.chart.plotArea.chart.series[this.selection.dataLbls];
@@ -740,33 +763,21 @@ CChartSpace.prototype =
         return new CTextPr();
     },
 
-    paragraphAdd: function(paraItem, bRecalculate)
+
+    applyLabelsFunction: function(fCallback, value)
     {
-        var content;
-        if(paraItem.Type === para_TextPr)
+        if(this.selection.title)
         {
-            var _paraItem;
-            if(paraItem.Value.Unifill && paraItem.Value.Unifill.checkWordMods())
-            {
-                _paraItem = paraItem.Copy();
-                _paraItem.Value.Unifill.convertToPPTXMods();
-            }
-            else
-            {
-                _paraItem = paraItem;
-            }
-            if(this.selection.title && !this.selection.textSelection)
-            {
-                CheckObjectTextPr(this.selection.title, _paraItem.Value, this.getDrawingDocument());
+            fCallback(this.selection.title, value, this.getDrawingDocument(), 18);
             }
             else if(this.selection.legend)
             {
                 if(!isRealNumber(this.selection.legendEntry))
                 {
-                    CheckObjectTextPr(this.selection.legend, paraItem.Value, this.getDrawingDocument());
+                fCallback(this.selection.legend, value, this.getDrawingDocument(), 10);
                     for(var i = 0; i < this.selection.legend.legendEntryes.length; ++i)
                     {
-                        CheckObjectTextPr(this.selection.legend.legendEntryes[i], paraItem.Value, this.getDrawingDocument());
+                    fCallback(this.selection.legend.legendEntryes[i], value, this.getDrawingDocument(), 10);
                     }
                 }
                 else
@@ -780,22 +791,14 @@ CChartSpace.prototype =
                     }
                     if(entry)
                     {
-                        CheckObjectTextPr(entry, paraItem.Value, this.getDrawingDocument());
+                    fCallback(entry, value, this.getDrawingDocument(), 10);
                     }
                 }
             }
-            else  if(this.selection.textSelection)
-            {
-                this.selection.textSelection.checkDocContent();
-                this.selection.textSelection.paragraphAdd(_paraItem, bRecalculate);
-            }
             else if(this.selection.axisLbls)
             {
-                if(this.selection.axisLbls.axis)
-                {
-                    CheckObjectTextPr(this.selection.axisLbls.axis, paraItem.Value, this.getDrawingDocument());
+            fCallback(this.selection.axisLbls, value, this.getDrawingDocument(), 10);
                 }
-            }
             else if(isRealNumber(this.selection.dataLbls))
             {
                 var ser = this.chart.plotArea.chart.series[this.selection.dataLbls];
@@ -817,14 +820,13 @@ CChartSpace.prototype =
                     }
                     if(!isRealNumber(this.selection.dataLbl))
                     {
-
-                        CheckObjectTextPr(ser.dLbls, paraItem.Value, this.getDrawingDocument());
+                    fCallback(ser.dLbls, value, this.getDrawingDocument(), 10);
                         for(var i = 0; i < pts.length; ++i)
                         {
                             var dLbl  = ser.dLbls.findDLblByIdx(pts[i].idx);
                             if(dLbl)
                             {
-                                CheckObjectTextPr(dLbl, paraItem.Value, this.getDrawingDocument());
+                            fCallback(dLbl, value, this.getDrawingDocument(), 10);
                             }
                         }
                     }
@@ -840,23 +842,39 @@ CChartSpace.prototype =
                                 dLbl.setIdx(pt.idx);
                                 ser.dLbls.addDLbl(dLbl);
                             }
-                            CheckObjectTextPr(dLbl, paraItem.Value, this.getDrawingDocument());
+                        fCallback(dLbl, value, this.getDrawingDocument(), 10);
                         }
                     }
                 }
             }
-            else
+    },
+
+    paragraphIncDecFontSize: function(bIncrease)
             {
-                //TODO: другие случаи будут обработаны в след. версиях
+        this.applyLabelsFunction(CheckIncDecFontSize, bIncrease);
+    },
+
+    paragraphAdd: function(paraItem, bRecalculate)
+    {
+        if(paraItem.Type === para_TextPr)
+        {
+            var _paraItem;
+            if(paraItem.Value.Unifill && paraItem.Value.Unifill.checkWordMods())
+            {
+                _paraItem = paraItem.Copy();
+                _paraItem.Value.Unifill.convertToPPTXMods();
             }
-        }
         else
         {
+                _paraItem = paraItem;
+            }
             if(this.selection.textSelection)
             {
                 this.selection.textSelection.checkDocContent();
                 this.selection.textSelection.paragraphAdd(paraItem, bRecalculate);
+                return;
             }
+            this.applyLabelsFunction(CheckObjectTextPr, _paraItem.Value);
         }
     },
 

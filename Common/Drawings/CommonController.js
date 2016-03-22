@@ -1019,7 +1019,7 @@ DrawingObjectsController.prototype =
                     }
                     if(f === CDocumentContent.prototype.Paragraph_IncDecFontSize)
                     {
-
+                        arr[i].paragraphIncDecFontSize(args[0]);
                     }
                 }
                 else if(arr[i].getDocContent)
@@ -1114,14 +1114,29 @@ DrawingObjectsController.prototype =
             }
             else if(this.selection.groupSelection.selection.chartSelection)
             {
-                applyToChartSelection(this.selection.groupSelection.selection.chartSelection);
+                if(f === CDocumentContent.prototype.Paragraph_IncDecFontSize)
+                {
+                    this.selection.groupSelection.selection.chartSelection.paragraphIncDecFontSize(args[0]);
+                }
+                else
+                {
+                    applyToChartSelection(this.selection.groupSelection.selection.chartSelection);
+                }
+
             }
             else
                 applyToArrayDrawings(this.selection.groupSelection.selectedObjects);
         }
         else if(this.selection.chartSelection)
         {
-            applyToChartSelection(this.selection.chartSelection);
+            if(f === CDocumentContent.prototype.Paragraph_IncDecFontSize)
+            {
+                this.selection.chartSelection.paragraphIncDecFontSize(args[0]);
+            }
+            else
+            {
+                applyToChartSelection(this.selection.chartSelection);
+            }
         }
         else
         {
