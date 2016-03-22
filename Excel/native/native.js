@@ -2824,6 +2824,19 @@ var PageType = {
     PageCornerType: 3
 };
 
+var kBeginOfLine = -1;
+var kBeginOfText = -2;
+var kEndOfLine = -3;
+var kEndOfText = -4;
+var kNextChar = -5;
+var kNextWord = -6;
+var kNextLine = -7;
+var kPrevChar = -8;
+var kPrevWord = -9;
+var kPrevLine = -10;
+var kPosition = -11;
+var kPositionLength = -12;
+
 var deviceScale = 1;
 
 //--------------------------------------------------------------------------------
@@ -2845,31 +2858,11 @@ function OfflineEditor () {
     this.beforeOpen  = function() {
 
         function __selectDrawingObjectRange(drawing, worksheet) {
-
             worksheet.cleanSelection();
             worksheet.arrActiveChartsRanges = [];
 
             if(!drawing.bbox || drawing.bbox.worksheet !== worksheet.model)
                 return;
-
-//            var stroke_color, fill_color;
-//            if (drawing.bbox.serBBox)
-//            {
-//                stroke_color = fill_color = new CColor(0, 128, 0);
-//                worksheet._drawElements(worksheet, worksheet._drawSelectionElement,
-//                    asc.Range(drawing.bbox.serBBox.c1, drawing.bbox.serBBox.r1, drawing.bbox.serBBox.c2, drawing.bbox.serBBox.r2, true),
-//                    false, 1,
-//                    stroke_color, fill_color);
-//            }
-
-//            if(drawing.bbox.catBBox)
-//            {
-//                stroke_color = fill_color = new CColor(153, 0, 204);
-//                worksheet._drawElements(worksheet, worksheet._drawSelectionElement,
-//                    asc.Range(drawing.bbox.catBBox.c1, drawing.bbox.catBBox.r1, drawing.bbox.catBBox.c2, drawing.bbox.catBBox.r2, true),
-//                    false, 1,
-//                    stroke_color, fill_color);
-//            }
 
             var BB = drawing.bbox.seriesBBox;
             var range = asc.Range(BB.c1, BB.r1, BB.c2, BB.r2, true);
@@ -2879,7 +2872,6 @@ function OfflineEditor () {
         }
 
         DrawingArea.prototype.drawSelection = function(drawingDocument) {
-
             var canvas = this.worksheet.objectRender.getDrawingCanvas();
             var shapeCtx = canvas.shapeCtx;
             var shapeOverlayCtx = canvas.shapeOverlayCtx;
@@ -2903,11 +2895,7 @@ function OfflineEditor () {
             if(selected_objects.length === 1 && selected_objects[0].getObjectType() === historyitem_type_ChartSpace)
             {
                 chart = selected_objects[0];
-                __selectDrawingObjectRange(chart, this.worksheet);  // <-
-              // this.worksheet.objectRender.selectDrawingObjectRange(chart);
-                //shapeOverlayCtx.ClearMode = true;
-                ////selected_objects[0].draw(shapeOverlayCtx);
-                //shapeOverlayCtx.ClearMode = false;
+                __selectDrawingObjectRange(chart, this.worksheet);
             }
             for ( var i = 0; i < this.frozenPlaces.length; i++ ) {
 
@@ -3102,7 +3090,7 @@ function OfflineEditor () {
         };
     };
 
-    this.openFile = function (isViewer) {
+    this.openFile = function () {
 
         this.beforeOpen();
 
@@ -3135,10 +3123,6 @@ function OfflineEditor () {
         _api.asc_SendThemeColorScheme();
         _api.asc_ApplyColorScheme(false);
 
-        //_api.asc_SendThemeColorScheme();
-
-        //this.offline_generateStyle();
-
         window["NativeSupportTimeouts"] = true;
 
         var ws = _api.wb.getWorksheet();
@@ -3151,18 +3135,8 @@ function OfflineEditor () {
             this.col0 = ws.topLeftFrozenCell.getCol0();
         }
 
-        // TODO: сделать закрепленные области
-
-//        ws.topLeftFrozenCel = null;
-//        ws.topLeftFrozenCell = ws.model.sheetViews[0].pane = null;
-//        ws.visibleRange.c1 = 0;
-//        ws.visibleRange.r1 = 0;
-//        ws.visibleRange.r2 = 0;
-//        ws.visibleRange.c2 = 0;
-//
-//        ws.objectRender.drawingArea.init();
-
-        // _api.asc_getTextArtPreviews();
+        // TODO: Implement frozen places
+        // TODO: Implement Text Art Styles
 
         this.offline_afteInit();
     };
@@ -3294,7 +3268,7 @@ function OfflineEditor () {
     };
     this.getNearCellCoord = function(x, y) {
 
-        //TODO: оптимизировать поиск ячейки по координатам ( bin2_search )
+        //TODO: optimize search ( bin2_search )
 
         var cell = [],
             worksheet = _api.wb.getWorksheet(),
@@ -3908,6 +3882,8 @@ function OfflineEditor () {
             objectId = objectRender.controller.selectedObjects[0].Id;
         }
 
+        ws.setSelectionShape(true);
+
         return objectId;
     };
 
@@ -4472,9 +4448,7 @@ function OfflineEditor () {
         };
 
         // chat styles
-        ChartPreviewManager.prototype.clearPreviews = function() {
-            window["native"]["ClearCacheChartStyles"]();
-        };
+        ChartPreviewManager.prototype.clearPreviews = function() {window["native"]["ClearCacheChartStyles"]();};
         ChartPreviewManager.prototype.createChartPreview = function(_graphics, type, styleIndex) {
             return ExecuteNoHistory(function(){
                 if(!this.chartsByTypes[type])
@@ -4525,7 +4499,6 @@ function OfflineEditor () {
 
         };
         ChartPreviewManager.prototype.getChartPreviews = function(chartType) {
-            // console.log('NATIVE getChartPreviews : ' + chartType);
 
             if (isRealNumber(chartType))
             {
@@ -4566,9 +4539,7 @@ function OfflineEditor () {
             }
         }
     };
-    this.offline_afteInit = function () {
-        window.AscAlwaysSaveAspectOnResizeTrack = true;
-    };
+    this.offline_afteInit = function () {window.AscAlwaysSaveAspectOnResizeTrack = true;};
 }
 var _s = new OfflineEditor();
 
@@ -4612,14 +4583,9 @@ function offline_mouse_down(x, y, pin, isViewerMode, isFormulaEditMode, isRangeR
         var selected_objects = controller.selection.groupSelection ? controller.selection.groupSelection.selectedObjects : controller.selectedObjects;
         if (selected_objects.length === 1 && selected_objects[0].getObjectType() === historyitem_type_ChartSpace) {
             ischart = true;
-
-           // console.log('CHART : ' + JSON.stringify(selected_objects[0].bbox.seriesBBox));
         }
 
-        return {
-            id:graphicsInfo.id,
-            ischart: ischart
-        };
+        return {id:graphicsInfo.id, ischart: ischart};
     }
 
     _s.cellPin = pin;
@@ -4765,10 +4731,7 @@ function offline_mouse_up(x, y, isViewerMode, isRangeResize, isChartRange, index
 
         if (isRangeResize) {
             if (!isViewerMode) {
-                // var ct = ws.getCursorTypeFromXY(x, y, isViewerMode);
                 var target = {
-                    //row: isChartRange ? ct.row : targetRow,
-                    //col: isChartRange ? ct.col : targetCol,
                     target: 5,
                     targetArr: isChartRange ? -1 : 0,
                     cursor: "se-resize",
@@ -4800,9 +4763,7 @@ function offline_mouse_up(x, y, isViewerMode, isRangeResize, isChartRange, index
     return ret;
 }
 
-function offline_get_selection(x, y, width, height, autocorrection) {
-    return _s.getSelection(x, y, width, height, autocorrection);
-}
+function offline_get_selection(x, y, width, height, autocorrection) {return _s.getSelection(x, y, width, height, autocorrection);}
 function offline_get_charts_ranges() {
     var ws = _api.wb.getWorksheet();
 
@@ -4813,23 +4774,17 @@ function offline_get_charts_ranges() {
     var chart;
     var controller = ws.objectRender.controller;
     var selected_objects = controller.selection.groupSelection ? controller.selection.groupSelection.selectedObjects : controller.selectedObjects;
-    if (selected_objects.length === 1 && selected_objects[0].getObjectType() === historyitem_type_ChartSpace)
-    {
+    if (selected_objects.length === 1 && selected_objects[0].getObjectType() === historyitem_type_ChartSpace) {
         chart = selected_objects[0];
-
-        ranges   = ranges ? ranges : _api.wb.getWorksheet().__chartsRanges([chart.bbox.seriesBBox]);
+        ranges = ranges ? ranges : _api.wb.getWorksheet().__chartsRanges([chart.bbox.seriesBBox]);
         cattbbox = chart.bbox.catBBox ? _api.wb.getWorksheet().__chartsRanges([chart.bbox.catBBox]) : null;
-        serbbox  = chart.bbox.serBBox ? _api.wb.getWorksheet().__chartsRanges([chart.bbox.serBBox]) : null;
+        serbbox = chart.bbox.serBBox ? _api.wb.getWorksheet().__chartsRanges([chart.bbox.serBBox]) : null;
     }
 
     return {'ranges':ranges, 'cattbbox':cattbbox, 'serbbox':serbbox};
 }
-function offline_get_worksheet_bounds() {
-    return _s.getMaxBounds();
-}
-function offline_complete_cell(x, y) {
-    return _s.getNearCellCoord(x, y);
-}
+function offline_get_worksheet_bounds() {return _s.getMaxBounds();}
+function offline_complete_cell(x, y) {return _s.getNearCellCoord(x, y);}
 function offline_keyboard_down(keys) {
     var wb = _api.wb;
     var ws = _api.wb.getWorksheet();
@@ -4881,12 +4836,9 @@ function offline_cell_editor_open(x, y, width, height, ratio, isSelectAll, isFor
     ws.visibleRange.r2 = r2;
 
     wb.cellEditor.isSelectAll = isSelectAll;
-    if (! isFormulaInsertMode) {
+    if (!isFormulaInsertMode) {
         wb._onEditCell(x, y, true, undefined, undefined, true, false);
-    } else {
-        // wb.cellEditor._draw();
     }
-
     ws.visibleRange = range;
 }
 
@@ -4923,9 +4875,9 @@ function offline_cell_editor_process_input_commands(commands, width, height, rat
             case 2: {
                 position = value;
                 if (position < 0) {
-                    cellEditor._moveCursor(position); // var kEndOfText = -4;
+                    cellEditor._moveCursor(position);
                 } else {
-                    cellEditor._moveCursor(-11, position);
+                    cellEditor._moveCursor(kPosition, position);
                 }
                 break;
             }
@@ -4953,8 +4905,8 @@ function offline_cell_editor_process_input_commands(commands, width, height, rat
 
             // SELECT_ALL
             case 6: {
-                cellEditor._moveCursor(-2);    // var kBeginOfText = -2;
-                cellEditor._selectChars(-4);   // var kEndOfText = -4;
+                cellEditor._moveCursor(kBeginOfText);
+                cellEditor._selectChars(kEndOfText);
                 break;
             }
 
@@ -4967,15 +4919,15 @@ function offline_cell_editor_process_input_commands(commands, width, height, rat
                 // Начало слова (ищем по окончанию, т.к. могли попасть в пробел)
                 var startWord = cellEditor.textRender.getPrevWord(endWord);
 
-                cellEditor._moveCursor(-11, startWord);  // var kPosition = -11;
-                cellEditor._selectChars(-11, endWord);
+                cellEditor._moveCursor(kPosition, startWord);
+                cellEditor._selectChars(kPosition, endWord);
 
                 break;
             }
 
             // DELETE_TEXT
             case 8: {
-                cellEditor._removeChars(-8);  // var kPrevChar = -8;
+                cellEditor._removeChars(kPrevChar);
                 break;
             }
         }
@@ -5084,20 +5036,10 @@ function offline_cell_editor_close(x, y, width, height, ratio) {
 
     return {'undo': length};
 }
-function offline_cell_editor_selection() {
-    return _api.wb.cellEditor._drawSelection();
-}
-function offline_cell_editor_move_select(position) {
-    var cellEditor =  _api.wb.cellEditor;
-
-    cellEditor._moveCursor(-11, Math.min(position,cellEditor.textRender.chars.length));
-
-//    cellEditor.cursorPos = position;
-//    cellEditor.selectionBegin = position;
-//    cellEditor.selectionEnd = position;
-}
+function offline_cell_editor_selection() {return _api.wb.cellEditor._drawSelection();}
+function offline_cell_editor_move_select(position) {_api.wb.cellEditor._moveCursor(kPosition, Math.min(position,cellEditor.textRender.chars.length));}
 function offline_cell_editor_select_range(from, to) {
-    var cellEditor =  _api.wb.cellEditor;
+    var cellEditor = _api.wb.cellEditor;
 
     cellEditor.cursorPos = from;
     cellEditor.selectionBegin = from;
@@ -5145,17 +5087,12 @@ function offline_get_graphics_object(x, y) {
 function offline_get_selected_object() {
     var ws = _api.wb.getWorksheet();
     var selectedImages = ws.objectRender.getSelectedGraphicObjects();
-    if(selectedImages && selectedImages.length)
-    {
+    if (selectedImages && selectedImages.length)
         return selectedImages[0].Get_Id();
-    }
 
     return null;
 }
-function offline_can_enter_cell_range() {
-    var wb = _api.wb;
-    return wb.cellEditor.canEnterCellRange();
-}
+function offline_can_enter_cell_range() {return _api.wb.cellEditor.canEnterCellRange();}
 function offline_insertFormula(functionName, autoComplete, isDefName) {
     var ws = _api.wb.getWorksheet();
     var wb = _api.wb;
@@ -5225,7 +5162,6 @@ function offline_insertFormula(functionName, autoComplete, isDefName) {
 }
 
 function offline_copy() {
-
     var worksheet = _api.wb.getWorksheet();
     var sBase64 = {};
 
@@ -5374,7 +5310,6 @@ function offline_delete() {
     return stream;
 }
 function offline_calculate_range(x, y, w, h) {
-
     var ws = _api.wb.getWorksheet();
     var range = _s._updateRegion(ws, x, y, w, h);
 
@@ -5390,7 +5325,6 @@ function offline_calculate_range(x, y, w, h) {
         ws.rows[range.r2].top  + ws.rows[range.r1].height];
 }
 function offline_calculate_complete_range(x, y, w, h) {
-
     var ws = _api.wb.getWorksheet();
     var range = _s._updateRegion(ws, x, y, w, h);
 
@@ -5420,9 +5354,7 @@ function offline_calculate_complete_range(x, y, w, h) {
         ws.rows[range.r2].top  + ws.rows[range.r1].height];
 }
 
-function offline_set_translate(translate) {
-   _s.translate = translate;
-}
+function offline_set_translate(translate) {_s.translate = translate;}
 
 function offline_apply_event(type,params) {
     var _stream = null;
