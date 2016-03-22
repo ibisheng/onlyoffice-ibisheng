@@ -2436,7 +2436,9 @@ CTable.prototype =
                 var Cell          = Row.Get_Cell(CurCell);
                 var CellPageIndex = CurPage - Cell.Content.Get_StartPage_Relative();
                 if (vmerge_Restart === Cell.Get_VMerge())
-                    Cell.Content.Shift(CellPageIndex, Dx, Dy);
+                {
+                    Cell.Content_Shift(CellPageIndex, Dx, Dy);
+                }
             }
 
             this.RowsInfo[CurRow].Y[CurPage] += Dy;

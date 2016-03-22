@@ -892,6 +892,28 @@ CTableCell.prototype =
         return Result;
     },
 
+    Content_Shift : function(CurPage, dX, dY)
+    {
+        if (true === this.Is_VerticalText())
+        {
+            this.Temp.X_start += dX;
+            this.Temp.Y_start += dY;
+            this.Temp.X_end   += dX;
+            this.Temp.Y_end   += dY;
+
+            this.Temp.X_cell_start += dX;
+            this.Temp.Y_cell_start += dY;
+            this.Temp.X_cell_end   += dX;
+            this.Temp.Y_cell_end   += dY;
+
+            this.Temp.Y += dY;
+        }
+        else
+        {
+            this.Content.Shift(CurPage, dX, dY);
+        }
+    },
+
     private_GetTextDirectionTransform : function()
     {
         var Transform = null;
