@@ -3128,6 +3128,8 @@ function Woorksheet(wb, _index, sId){
 	this.aConditionalFormatting = [];
 	this.sheetPr = null;
 	this.aFormulaExt = null;
+	
+	this.autoFilters = new asc.AutoFilters(this);
 
     this.oDrawingOjectsManager = new DrawingObjectsManager(this);
     this.contentChanges = new CContentChanges();
@@ -3657,6 +3659,8 @@ Woorksheet.prototype._removeRows=function(start, stop){
 
 
 	History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_RemoveRows, this.getId(), new Asc.Range(0, start, gc_nMaxCol0, gc_nMaxRow0), new UndoRedoData_FromToRowCol(true, start, stop));
+    this.autoFilters.insertRows( "delCell", new Asc.Range(0, start, gc_nMaxCol0, stop), c_oAscDeleteOptions.DeleteRows );
+
 	buildRecalc(this.workbook);
 	unLockDraw(this.workbook);
 		
@@ -3713,6 +3717,8 @@ Woorksheet.prototype._insertRowsBefore=function(index, count){
         }
         History.LocalChange = false;
     }
+
+    this.autoFilters.insertRows( "insCell", new Asc.Range(0, index, gc_nMaxCol0, index + count - 1), c_oAscInsertOptions.InsertColumns );
 
 	buildRecalc(this.workbook);
 	unLockDraw(this.workbook);
@@ -3797,6 +3803,8 @@ Woorksheet.prototype._removeCols=function(start, stop){
 
 
 	History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_RemoveCols, this.getId(), new Asc.Range(start, 0, gc_nMaxCol0, gc_nMaxRow0), new UndoRedoData_FromToRowCol(false, start, stop));
+	
+	this.autoFilters.insertColumn( "delCell",  new Asc.Range(start, 0, stop, gc_nMaxRow0), c_oAscInsertOptions.InsertColumns );
 	buildRecalc(this.workbook);
 	unLockDraw(this.workbook);
 
@@ -3837,7 +3845,8 @@ Woorksheet.prototype._insertColsBefore=function(index, count){
 		}
 	}
 	
-
+	this.autoFilters.insertColumn( "insCells",  new Asc.Range(index, 0, index + count - 1, gc_nMaxRow0), c_oAscInsertOptions.InsertColumns );
+	
 	buildRecalc(this.workbook);
 	unLockDraw(this.workbook);
 	
@@ -4626,6 +4635,9 @@ Woorksheet.prototype._moveRange=function(oBBoxFrom, oBBoxTo, copyRange){
         }
     }
 
+    if(false == this.workbook.bUndoChanges && false == this.workbook.bRedoChanges)
+        this.autoFilters._moveAutoFilters( oBBoxTo, oBBoxFrom, null, copyRange, true, oBBoxFrom );
+
 	if(false == this.workbook.bUndoChanges && (false == this.workbook.bRedoChanges || true == this.workbook.bCollaborativeChanges))
 	{
 	    History.LocalChange = true;
@@ -4734,6 +4746,7 @@ Woorksheet.prototype._shiftCellsLeft=function(oBBox){
 	}
 
 	History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_ShiftCellsLeft, this.getId(), new Asc.Range(nLeft, oBBox.r1, gc_nMaxCol0, oBBox.r2), new UndoRedoData_BBox(oBBox));
+    this.autoFilters.insertColumn( "delCell",  oBBox, c_oAscDeleteOptions.DeleteCellsAndShiftLeft );
 	//todo проверить не уменьшились ли границы таблицы
 };
 Woorksheet.prototype._shiftCellsUp=function(oBBox){
@@ -4776,6 +4789,7 @@ Woorksheet.prototype._shiftCellsUp=function(oBBox){
 	}
 
 	History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_ShiftCellsTop, this.getId(), new Asc.Range(oBBox.c1, oBBox.r1, oBBox.c2, gc_nMaxRow0), new UndoRedoData_BBox(oBBox));
+    this.autoFilters.insertRows( "delCell", oBBox, c_oAscDeleteOptions.DeleteCellsAndShiftTop );
 	//todo проверить не уменьшились ли границы таблицы
 };
 Woorksheet.prototype._shiftCellsRight=function(oBBox){
@@ -4813,6 +4827,7 @@ Woorksheet.prototype._shiftCellsRight=function(oBBox){
 	}
 
 	History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_ShiftCellsRight, this.getId(), new Asc.Range(oBBox.c1, oBBox.r1, gc_nMaxCol0, oBBox.r2), new UndoRedoData_BBox(oBBox));
+    this.autoFilters.insertColumn( "insCells",  oBBox, c_oAscInsertOptions.InsertCellsAndShiftRight );
 };
 Woorksheet.prototype._shiftCellsBottom=function(oBBox){
 	//до перемещения ячеек, перед функцией, в которой используются nodesSheetArea/nodesSheetCell move/shift нужно обязательно вызвать force buildRecalc
@@ -4847,6 +4862,7 @@ Woorksheet.prototype._shiftCellsBottom=function(oBBox){
 	}
 
 	History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_ShiftCellsBottom, this.getId(), new Asc.Range(oBBox.c1, oBBox.r1, oBBox.c2, gc_nMaxRow0), new UndoRedoData_BBox(oBBox));
+    this.autoFilters.insertRows( "insCell", oBBox, c_oAscInsertOptions.InsertCellsAndShiftDown );
 };
 Woorksheet.prototype._setIndex=function(ind){
 	this.index = ind;

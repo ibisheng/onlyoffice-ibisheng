@@ -3034,7 +3034,7 @@ UndoRedoCell.prototype = {
 			cell.setValueData(Val);
 			// ToDo Так делать неправильно, нужно поправить (перенести логику в model, а отрисовку отделить)
 			var worksheetView = this.wb.oApi.wb.getWorksheetById(nSheetId);
-			worksheetView.autoFilters.renameTableColumn(new Asc.Range(nCol, nRow, nCol, nRow), bUndo);
+			worksheetView.model.autoFilters.renameTableColumn(new Asc.Range(nCol, nRow, nCol, nRow), bUndo);
 		}
 		else if(historyitem_Cell_SetStyle == Type)
 		{
@@ -3195,7 +3195,7 @@ UndoRedoWoorksheet.prototype = {
 			if(bUndo)
 			{
 				var workSheetView = this.wb.oApi.wb.getWorksheetById(nSheetId);	
-				workSheetView.autoFilters.reDrawFilter(new Asc.Range(0, from, ws.nColsCount - 1, to));
+				workSheetView.model.autoFilters.reDrawFilter(new Asc.Range(0, from, ws.nColsCount - 1, to));
 			}
 		}
 		else if(historyitem_Worksheet_AddRows == Type || historyitem_Worksheet_RemoveRows == Type)
@@ -3232,8 +3232,6 @@ UndoRedoWoorksheet.prototype = {
 
 			// ToDo Так делать неправильно, нужно поправить (перенести логику в model, а отрисовку отделить)
 			worksheetView = this.wb.oApi.wb.getWorksheetById(nSheetId);
-			if(!bUndo)
-				worksheetView.autoFilters.insertRows(bInsert ? "insCell" : "delCell", range, operType);
 			worksheetView.cellCommentator.updateCommentsDependencies(bInsert, operType, range);
 		}
 		else if(historyitem_Worksheet_AddCols == Type || historyitem_Worksheet_RemoveCols == Type)
@@ -3271,8 +3269,6 @@ UndoRedoWoorksheet.prototype = {
 
 			// ToDo Так делать неправильно, нужно поправить (перенести логику в model, а отрисовку отделить)
 			worksheetView = this.wb.oApi.wb.getWorksheetById(nSheetId);
-			if(!bUndo)
-				worksheetView.autoFilters.insertColumn(bInsert ? "insCell" : "delCell", range, operType);
 			worksheetView.cellCommentator.updateCommentsDependencies(bInsert, operType, range);
 		}
 		else if(historyitem_Worksheet_ShiftCellsLeft == Type || historyitem_Worksheet_ShiftCellsRight == Type)
@@ -3310,10 +3306,6 @@ UndoRedoWoorksheet.prototype = {
 
 			// ToDo Так делать неправильно, нужно поправить (перенести логику в model, а отрисовку отделить)
 			worksheetView = this.wb.oApi.wb.getWorksheetById(nSheetId);
-			
-			var isCheckChangeAutoFilter = worksheetView.autoFilters.isActiveCellsCrossHalfFTable(range.bbox, operType, bInsert ? "insCell" : "delCell");
-			if(!bUndo && isCheckChangeAutoFilter === true)
-				worksheetView.autoFilters.insertColumn(bInsert ? "insCell" : "delCell", range.bbox, operType);
 			worksheetView.cellCommentator.updateCommentsDependencies(bInsert, operType, range.bbox);
 		}
 		else if(historyitem_Worksheet_ShiftCellsTop == Type || historyitem_Worksheet_ShiftCellsBottom == Type)
@@ -3351,8 +3343,6 @@ UndoRedoWoorksheet.prototype = {
 
 			// ToDo Так делать неправильно, нужно поправить (перенести логику в model, а отрисовку отделить)
 			worksheetView = this.wb.oApi.wb.getWorksheetById(nSheetId);
-			if(!bUndo)
-				worksheetView.autoFilters.insertRows(bInsert ? "insCell" : "delCell",range.bbox, operType);
 			worksheetView.cellCommentator.updateCommentsDependencies(bInsert, operType, range.bbox);
 		}
 		else if(historyitem_Worksheet_Sort == Type)
@@ -3416,11 +3406,11 @@ UndoRedoWoorksheet.prototype = {
 			worksheetView = this.wb.oApi.wb.getWorksheetById(nSheetId);
 			if(bUndo)//если на Undo перемещается диапазон из форматированной таблицы - стиль форматированной таблицы не должен цепляться
 			{
-				worksheetView.autoFilters._cleanStyleTable(to);
+				worksheetView.model.autoFilters._cleanStyleTable(to);
 			}
 
-			worksheetView.autoFilters.reDrawFilter(to);
-			worksheetView.autoFilters.reDrawFilter(from);
+			worksheetView.model.autoFilters.reDrawFilter(to);
+			worksheetView.model.autoFilters.reDrawFilter(from);
 		}
 		else if(historyitem_Worksheet_Merge == Type || historyitem_Worksheet_Unmerge == Type)
 		{
@@ -3791,7 +3781,7 @@ UndoRedoAutoFilters.prototype = {
 		
 		var ws = api.wb.getWorksheetById(nSheetId);
 		Data.worksheet = ws;
-		var autoFilters = ws.autoFilters;
+		var autoFilters = ws.model.autoFilters;
 		if (bUndo == true)
 		{
 			autoFilters.Undo(Type, Data);
