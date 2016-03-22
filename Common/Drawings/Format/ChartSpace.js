@@ -31,6 +31,33 @@ function ReadWBModel(oDrawing, oReader)
 }
 
 
+
+function GetTextPrFormArrObjects(aObjects, bFirstBreak, bLbl)
+{
+    var oResultTextPr;
+    for(var i = 0; i < aObjects.length; ++i)
+    {
+        var oContent = aObjects[i];
+        oContent = bLbl ? oContent.compiledDlb.txBody.content : oContent.txBody.content;
+        oContent.Set_ApplyToAll(true);
+        var oTextPr = oContent.Get_Paragraph_TextPr();
+        oContent.Set_ApplyToAll(false);
+        if(!oResultTextPr)
+        {
+            oResultTextPr = oTextPr;
+            if(bFirstBreak)
+            {
+                return oResultTextPr;
+            }
+        }
+        else
+        {
+            oResultTextPr.Compare(oTextPr);
+        }
+    }
+    return oResultTextPr;
+}
+
 function checkBlackUnifill(unifill, bLines)
 {
     if(unifill && unifill.fill && unifill.fill.color)
@@ -297,6 +324,48 @@ function checkPointInMap(map, worksheet, row, col)
 }*/
 
 
+function CheckObjectTextPr(oElement, oTextPr, oDrawingDocument)
+{
+    if(oElement)
+    {
+        if(!oElement.txPr)
+        {
+            oElement.setTxPr(CreateTextBodyFromString("", oDrawingDocument, oElement));
+        }
+
+        var oParaPr = oElement.txPr.content.Content[0].Pr.Copy();
+        oElement.txPr.content.Content[0].Set_DocumentIndex(0);
+        var oParaPr2 = new CParaPr();
+        var oCopyTextPr = oTextPr.Copy();
+        if(oCopyTextPr.FontFamily)
+        {
+            oCopyTextPr.RFonts.Set_FromObject(
+                {
+                    Ascii: {
+                        Name: oCopyTextPr.FontFamily.Name,
+                        Index: -1
+                    },
+                    EastAsia: {
+                        Name: oCopyTextPr.FontFamily.Name,
+                        Index: -1
+                    },
+                    HAnsi: {
+                        Name: oCopyTextPr.FontFamily.Name,
+                        Index: -1
+                    },
+                    CS: {
+                        Name: oCopyTextPr.FontFamily.Name,
+                        Index: -1
+                    }
+                }
+            );
+        }
+        oParaPr2.DefaultRunPr = oCopyTextPr;
+        oParaPr.Merge(oParaPr2);
+        oElement.txPr.content.Content[0].Set_Pr(oParaPr);
+    }
+}
+
 function CChartSpace()
 {
     this.chart = null;
@@ -334,8 +403,11 @@ function CChartSpace()
         axisLbls: null,
         dataLbls: null,
         dataLbl: null,
-        textSelection: null,
-        plotArea: null
+        plotArea:      null,
+        gridLines:     null,
+        series:        null,
+        datPoint:      null,
+        textSelection: null
     };
 
     this.bounds = {l: 0, t: 0, r: 0, b:0, w: 0, h:0, x: 0, y: 0};
@@ -364,6 +436,69 @@ CChartSpace.prototype =
     deleteBFromSerialize: CShape.prototype.deleteBFromSerialize,
     setBFromSerialize: CShape.prototype.setBFromSerialize,
 
+    drawSelect: function(drawingDocument, nPageIndex)
+    {
+        var i;
+        if(this.selectStartPage === nPageIndex)
+        {
+            drawingDocument.DrawTrack(TYPE_TRACK_SHAPE, this.getTransformMatrix(), 0, 0, this.extX, this.extY, false, this.canRotate());
+            if(this.selection.textSelection)
+            {
+                drawingDocument.DrawTrack(TYPE_TRACK_TEXT, this.selection.textSelection.transform, 0, 0, this.selection.textSelection.extX, this.selection.textSelection.extY, false, false, false);
+            }
+            else if(this.selection.title)
+            {
+                drawingDocument.DrawTrack(TYPE_TRACK_SHAPE, this.selection.title.transform, 0, 0, this.selection.title.extX, this.selection.title.extY, false, false, false);
+            }
+            else if(isRealNumber(this.selection.dataLbls))
+            {
+                var series = this.chart.plotArea.chart.series;
+                var ser = series[this.selection.dataLbls];
+                if(ser)
+                {
+                    var pts = getPtsFromSeries(ser);
+                    if(!isRealNumber(this.selection.dataLbl))
+                    {
+                        for(var i = 0; i < pts.length; ++i)
+                        {
+                            if(pts[i] && pts[i].compiledDlb)
+                            {
+                                drawingDocument.DrawTrack(TYPE_TRACK_SHAPE, pts[i].compiledDlb.transform, 0, 0, pts[i].compiledDlb.extX, pts[i].compiledDlb.extY, false, false);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if(pts[this.selection.dataLbl] && pts[this.selection.dataLbl].compiledDlb)
+                        {
+                            drawingDocument.DrawTrack(TYPE_TRACK_SHAPE, pts[this.selection.dataLbl].compiledDlb.transform, 0, 0, pts[this.selection.dataLbl].compiledDlb.extX, pts[this.selection.dataLbl].compiledDlb.extY, false, false);
+                        }
+                    }
+                }
+
+            }
+            else if(this.selection.dataLbl)
+            {
+                drawingDocument.DrawTrack(TYPE_TRACK_SHAPE, this.selection.dataLbl.transform, 0, 0, this.selection.dataLbl.extX, this.selection.dataLbl.extY, false, false);
+            }
+            else if(this.selection.legend)
+            {
+                if(isRealNumber(this.selection.legendEntry) && this.chart.legend.calcEntryes[this.selection.legendEntry])
+                {
+                    var oEntry = this.chart.legend.calcEntryes[this.selection.legendEntry];
+                    drawingDocument.DrawTrack(TYPE_TRACK_SHAPE, oEntry.transformText, 0, 0, oEntry.contentWidth, oEntry.contentHeight, false, false);
+                }
+                else
+                {
+                    drawingDocument.DrawTrack(TYPE_TRACK_SHAPE, this.selection.legend.transform, 0, 0, this.selection.legend.extX, this.selection.legend.extY, false, false);
+                }
+            }
+            else if(this.selection.axisLbls)
+            {
+                drawingDocument.DrawTrack(TYPE_TRACK_SHAPE, this.transform, this.selection.axisLbls.x, this.selection.axisLbls.y, this.selection.axisLbls.extX, this.selection.axisLbls.extY, false, false);
+            }
+        }
+    },
 
     recalculateTextPr: function()
     {
@@ -440,6 +575,10 @@ CChartSpace.prototype =
 
     resetInternalSelection: function(noResetContentSelect)
     {
+        if(this.selection.title)
+        {
+            this.selection.title.selected = false;
+        }
         if(this.selection.textSelection)
         {
             if(!(noResetContentSelect === true))
@@ -455,11 +594,6 @@ CChartSpace.prototype =
     getDocContent: function()
     {
         return null;
-        if(!this.txPr)
-        {
-            this.setTxPr(CreateTextBodyFromString("", this.getDrawingDocument(), this));
-        }
-        return this.txPr.content;
     },
 
     resetSelection: function(noResetContentSelect)
@@ -551,6 +685,61 @@ CChartSpace.prototype =
         }, this, []);
     },
 
+    getParagraphTextPr: function()
+    {
+        if(this.selection.title && !this.selection.textSelection)
+        {
+            return  GetTextPrFormArrObjects([this.selection.title]);
+        }
+        else if(this.selection.legend)
+        {
+            if(!isRealNumber(this.selection.legendEntry))
+            {
+                return GetTextPrFormArrObjects(this.chart.legend.calcEntryes);
+            }
+            else
+            {
+                return GetTextPrFormArrObjects([this.chart.legend.calcEntryes[this.selection.legendEntry]]);
+            }
+        }
+        else  if(this.selection.textSelection)
+        {
+            return this.selection.textSelection.txBody.content.Get_Paragraph_TextPr();
+        }
+        else if(this.selection.axisLbls)
+        {
+            if(this.selection.axisLbls.axis)
+            {
+                return GetTextPrFormArrObjects(this.selection.axisLbls.arrLabels, true);
+            }
+        }
+        else if(isRealNumber(this.selection.dataLbls))
+        {
+            var ser = this.chart.plotArea.chart.series[this.selection.dataLbls];
+            if(ser)
+            {
+                var pts = getPtsFromSeries(ser);
+                if(!isRealNumber(this.selection.dataLbl))
+                {
+                    return GetTextPrFormArrObjects(pts, undefined , true);
+                }
+                else
+                {
+                    var pt = pts[this.selection.dataLbl];
+                    if(pt)
+                    {
+                        return GetTextPrFormArrObjects([pt], undefined , true);
+                    }
+                }
+            }
+        }
+        if(this.txPr && this.txPr.content && this.txPr.content.Content[0] && this.txPr.content.Content[0].Pr.DefaultRunPr)
+        {
+            this.txPr.content.Content[0].Pr.DefaultRunPr.Copy();
+        }
+        return new CTextPr();
+    },
+
     paragraphAdd: function(paraItem, bRecalculate)
     {
         var content;
@@ -568,16 +757,93 @@ CChartSpace.prototype =
             }
             if(this.selection.title && !this.selection.textSelection)
             {
-                this.selection.title.checkDocContent();
-                content = this.selection.title.getDocContent();
-                content.Set_ApplyToAll(true);
-                content.Paragraph_Add(_paraItem, bRecalculate);
-                content.Set_ApplyToAll(false);
+                CheckObjectTextPr(this.selection.title, _paraItem.Value, this.getDrawingDocument());
+            }
+            else if(this.selection.legend)
+            {
+                if(!isRealNumber(this.selection.legendEntry))
+                {
+                    CheckObjectTextPr(this.selection.legend, paraItem.Value, this.getDrawingDocument());
+                    for(var i = 0; i < this.selection.legend.legendEntryes.length; ++i)
+                    {
+                        CheckObjectTextPr(this.selection.legend.legendEntryes[i], paraItem.Value, this.getDrawingDocument());
+                    }
+                }
+                else
+                {
+                    var entry = this.selection.legend.findLegendEntryByIndex(this.selection.legendEntry);
+                    if(!entry)
+                    {
+                        entry = new CLegendEntry();
+                        entry.setIdx(this.selection.legendEntry);
+                        this.selection.legend.addLegendEntry(entry);
+                    }
+                    if(entry)
+                    {
+                        CheckObjectTextPr(entry, paraItem.Value, this.getDrawingDocument());
+                    }
+                }
             }
             else  if(this.selection.textSelection)
             {
                 this.selection.textSelection.checkDocContent();
                 this.selection.textSelection.paragraphAdd(_paraItem, bRecalculate);
+            }
+            else if(this.selection.axisLbls)
+            {
+                if(this.selection.axisLbls.axis)
+                {
+                    CheckObjectTextPr(this.selection.axisLbls.axis, paraItem.Value, this.getDrawingDocument());
+                }
+            }
+            else if(isRealNumber(this.selection.dataLbls))
+            {
+                var ser = this.chart.plotArea.chart.series[this.selection.dataLbls];
+                if(ser)
+                {
+                    var pts = getPtsFromSeries(ser);
+                    if(!ser.dLbls)
+                    {
+                        var oDlbls;
+                        if(this.chart.plotArea.chart.dLbls)
+                        {
+                            oDlbls = this.chart.plotArea.chart.dLbls.createDuplicate();
+                        }
+            else
+            {
+                            oDlbls = new CDLbls();
+                        }
+                        ser.setDLbls(oDlbls);
+                    }
+                    if(!isRealNumber(this.selection.dataLbl))
+                    {
+
+                        CheckObjectTextPr(ser.dLbls, paraItem.Value, this.getDrawingDocument());
+                        for(var i = 0; i < pts.length; ++i)
+                        {
+                            var dLbl  = ser.dLbls.findDLblByIdx(pts[i].idx);
+                            if(dLbl)
+                            {
+                                CheckObjectTextPr(dLbl, paraItem.Value, this.getDrawingDocument());
+                            }
+                        }
+                    }
+                    else
+                    {
+                        var pt = pts[this.selection.dataLbl];
+                        if(pt)
+                        {
+                            var dLbl  = ser.dLbls.findDLblByIdx(pt.idx);
+                            if(!dLbl)
+                            {
+                                dLbl = new CDLbl();
+                                dLbl.setIdx(pt.idx);
+                                ser.dLbls.addDLbl(dLbl);
+                            }
+                            CheckObjectTextPr(dLbl, paraItem.Value, this.getDrawingDocument());
+                        }
+                    }
+                }
             }
             else
             {
@@ -638,6 +904,15 @@ CChartSpace.prototype =
         {
             this.selection.textSelection.updateSelectionState();
         }
+    },
+
+    getLegend: function()
+    {
+        if(this.chart)
+        {
+            return this.chart.legend;
+        }
+        return null;
     },
 
     getAllTitles: function()
@@ -1583,7 +1858,7 @@ CChartSpace.prototype =
             }
             if(chart.legend)
             {
-                checkTxBodyDefFonts(chart.legend.txPr);
+                checkTxBodyDefFonts(allFonts, chart.legend.txPr);
                 for(i = 0;  i < chart.legend.legendEntryes.length; ++i)
                 {
                     chart.legend.legendEntryes[i] && checkTxBodyDefFonts(allFonts, chart.legend.legendEntryes[i].txPr);
@@ -2744,7 +3019,7 @@ CChartSpace.prototype =
 
                     //расчитаем подписи для вертикальной оси найдем ширину максимальной и возьмем её удвоенную за ширину подписей верт оси
                     var left_align_labels = true;
-                    y_ax.labels = new CValAxisLabels(this);
+                    y_ax.labels = new CValAxisLabels(this, y_ax);
                     y_ax.yPoints = [];
                     var max_width = 0;
                     for(i = 0; i < arr_strings.length; ++i)
@@ -2793,7 +3068,7 @@ CChartSpace.prototype =
                         }
                     }
 
-                    x_ax.labels = new CValAxisLabels(this);
+                    x_ax.labels = new CValAxisLabels(this, x_ax);
                     var bottom_align_labels = true;
                     var max_height = 0;
                     for(i = 0; i < string_pts.length; ++i)
@@ -3412,7 +3687,7 @@ CChartSpace.prototype =
 
                     /*если у нас шкала логарифмическая то будем вместо полученных значений использовать логарифм*/
 
-                    val_ax.labels = new CValAxisLabels(this);
+                    val_ax.labels = new CValAxisLabels(this, val_ax);
                     var max_width = 0;
                     val_ax.yPoints = [];
 
@@ -3823,7 +4098,7 @@ CChartSpace.prototype =
                     //проверим умещаются ли подписи горизонтальной оси в point_interval
                     if(TICK_LABEL_POSITION_NONE !== cat_ax.tickLblPos && !(cat_ax.bDelete === true)) //будем корректировать вертикальные подписи только если есть горизонтальные
                     {
-                        cat_ax.labels = new CValAxisLabels(this);
+                        cat_ax.labels = new CValAxisLabels(this, cat_ax);
                         var tick_lbl_skip = isRealNumber(cat_ax.tickLblSkip) ? cat_ax.tickLblSkip :  (string_pts.length < SKIP_LBL_LIMIT ?  1 :  Math.floor(string_pts.length/SKIP_LBL_LIMIT));
                         var max_min_width = 0;
                         var max_max_width = 0;
@@ -4509,7 +4784,7 @@ CChartSpace.prototype =
 
 
                     //расчитаем подписи горизонтальной оси значений
-                    val_ax.labels = new CValAxisLabels(this);
+                    val_ax.labels = new CValAxisLabels(this, val_ax);
                     var max_height = 0;
                     val_ax.xPoints = [];
                     var max_val_ax_label_width = 0;
@@ -4934,7 +5209,7 @@ CChartSpace.prototype =
                     var max_cat_labels_block_width = rect.w/2;
                     if(TICK_LABEL_POSITION_NONE !== cat_ax.tickLblPos && !(cat_ax.bDelete === true)) //будем корректировать вертикальные подписи только если есть горизонтальные
                     {
-                        cat_ax.labels = new CValAxisLabels(this);
+                        cat_ax.labels = new CValAxisLabels(this, cat_ax);
                         var tick_lbl_skip = isRealNumber(cat_ax.tickLblSkip) ? cat_ax.tickLblSkip : (string_pts.length < SKIP_LBL_LIMIT ?  1 :  Math.floor(string_pts.length/SKIP_LBL_LIMIT));
                         var max_min_width = 0;
                         var max_max_width = 0;
@@ -5500,15 +5775,15 @@ CChartSpace.prototype =
                     arr_str_labels.push(ser.getSeriesName());
                     if(ser.isHiddenForLegend)
                         continue;
-                    calc_entry = new CalcLegendEntry(legend, this);
+                    calc_entry = new CalcLegendEntry(legend, this, i);
                     calc_entry.txBody = CreateTextBodyFromString(arr_str_labels[i], this.getDrawingDocument(), calc_entry);
                     entry = legend.findLegendEntryByIndex(i);
-                    if(entry)
-                        calc_entry.txPr = entry.txPr;
+                    //if(entry)
+                    //    calc_entry.txPr = entry.txPr;
 
                     if(calc_entryes[0])
                     {
-                        calc_entry.lastStyleObject = calc_entryes[0].lastStyleObject;
+                        //calc_entry.lastStyleObject = calc_entryes[0].lastStyleObject;
                     }
                     calc_entryes.push(calc_entry);
                     cur_width = calc_entry.txBody.getRectWidth(2000);
@@ -5587,14 +5862,14 @@ CChartSpace.prototype =
                     else
                         arr_str_labels.push((pt.idx + 1) + "");
 
-                    calc_entry = new CalcLegendEntry(legend, this);
+                    calc_entry = new CalcLegendEntry(legend, this, pt.idx);
                     calc_entry.txBody = CreateTextBodyFromString(arr_str_labels[i], this.getDrawingDocument(), calc_entry);
                     entry = legend.findLegendEntryByIndex(i);
-                    if(entry)
-                        calc_entry.txPr = entry.txPr;
+                    //if(entry)
+                    //    calc_entry.txPr = entry.txPr;
                     if(calc_entryes[0])
                     {
-                        calc_entry.lastStyleObject = calc_entryes[0].lastStyleObject;
+                       // calc_entry.lastStyleObject = calc_entryes[0].lastStyleObject;
                     }
                     calc_entryes.push(calc_entry);
 
@@ -6251,6 +6526,10 @@ CChartSpace.prototype =
             legend.recalcInfo = {recalculateLine: true, recalculateFill: true, recalculateTransparent: true};
             legend.recalculatePen();
             legend.recalculateBrush();
+            for(var i = 0; i < calc_entryes.length; ++i)
+            {
+                calc_entryes[i].checkWidhtContent();
+        }
         }
     },
 

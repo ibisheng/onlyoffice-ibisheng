@@ -4698,7 +4698,7 @@ CShape.prototype =
 
     hitInPath: function (x, y) {
         if(!this.checkHitToBounds(x, y))
-            return;
+            return false;
         var invert_transform = this.getInvertTransform();
         var x_t = invert_transform.TransformPointX(x, y);
         var y_t = invert_transform.TransformPointY(x, y);
@@ -4710,7 +4710,7 @@ CShape.prototype =
     },
 
     hitInInnerArea: function (x, y) {
-        if ((this.getObjectType && this.getObjectType() === historyitem_type_ChartSpace) || this.brush != null && this.brush.fill != null
+        if ((this.getObjectType && (this.getObjectType() === historyitem_type_ChartSpace || this.getObjectType() === historyitem_type_Title) ) || this.brush != null && this.brush.fill != null
             && this.brush.fill.type != FILL_TYPE_NOFILL && this.checkHitToBounds(x, y)) {
             var invert_transform = this.getInvertTransform();
             var x_t = invert_transform.TransformPointX(x, y);

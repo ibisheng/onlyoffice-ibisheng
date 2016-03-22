@@ -1,4 +1,4 @@
-﻿"use strict";
+"use strict";
 
 var historyitem_ChartFormatSetChart = 1001;
 var historyitem_AutoShapes_SetDrawingBaseCoors = 1000;
@@ -115,6 +115,7 @@ var historyitem_Legend_SetLegendPos = 2097;
 var historyitem_Legend_SetOverlay = 2098;
 var historyitem_Legend_SetSpPr = 2099;
 var historyitem_Legend_SetTxPr = 2100;
+var historyitem_Legend_RemoveLegendEntry = 2101;
 var historyitem_Layout_SetH = 2101;
 var historyitem_Layout_SetHMode = 2102;
 var historyitem_Layout_SetLayoutTarget = 2103;

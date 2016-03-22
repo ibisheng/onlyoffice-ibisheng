@@ -146,6 +146,8 @@ function CDLbl()
 
     this.compiledStyles = null;
 
+    this.parent = null;
+
     this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id);
 }
@@ -158,6 +160,7 @@ CDLbl.prototype =
     },
     Refresh_RecalcData: function()
     {},
+
 
     getObjectType: function()
     {
@@ -206,10 +209,10 @@ CDLbl.prototype =
         this.updatePosition(this.posX, this.posY);
         global_MatrixTransformer.MultiplyAppend(this.transform, transform);
         global_MatrixTransformer.MultiplyAppend(this.transformText, transform);
-        if(this instanceof CTitle)
+        if((this instanceof CTitle) || (this instanceof CDLbl))
         {
             this.invertTransform = global_MatrixTransformer.Invert(this.transform);
-            this.invertTransformText = global_MatrixTransformer.Invert(this.transform);
+            this.invertTransformText = global_MatrixTransformer.Invert(this.transformText);
         }
     },
 
@@ -282,6 +285,13 @@ CDLbl.prototype =
     recalculateBrush: CShape.prototype.recalculateBrush,
     recalculatePen: CShape.prototype.recalculatePen,
     check_bounds: CShape.prototype.check_bounds,
+
+    hit: function(x, y)
+    {
+        var tx = this.invertTransform.TransformPointX(x, y);
+        var ty = this.invertTransform.TransformPointY(x, y);
+        return tx>=0 && tx <= this.extX && ty >=0 && ty <=this.extY;
+    },
 
     getCompiledStyle: function()
     {
@@ -571,9 +581,23 @@ CDLbl.prototype =
             var style = new CStyle("dataLblStyle", null, null, null);
             var text_pr = new CTextPr();
             text_pr.FontSize = 10;
-            if(this.chart && isRealNumber(this.chart.style) && this.chart.style > 40)
+            if(this.chart && isRealNumber(this.chart.style) )
             {
+
+                if(this.chart.style > 40)
+                {
                 text_pr.Unifill = CreateUnfilFromRGB(255, 255, 255);
+            }
+            else
+            {
+                    var default_style = CHART_STYLE_MANAGER.getDefaultLineStyleByIndex(this.chart.style);
+                    var oUnifill = default_style.axisAndMajorGridLines.createDuplicate();
+                    if(oUnifill && oUnifill.fill && oUnifill.fill.color && oUnifill.fill.color.Mods)
+                    {
+                        oUnifill.fill.color.Mods.Mods.length = 0;
+                    }
+                    text_pr.Unifill = oUnifill;
+                }
             }
             else
             {
@@ -615,13 +639,13 @@ CDLbl.prototype =
                 && this.chart.txPr.content.Content[0]
                 && this.chart.txPr.content.Content[0].Pr)
             {
+                this.chart.txPr.content.Content[0].Set_DocumentIndex(0);
                 style.ParaPr.Merge(this.chart.txPr.content.Content[0].Pr);
                 if(this.chart.txPr.content.Content[0].Pr.DefaultRunPr)
                 {
                     chart_text_pr = this.chart.txPr.content.Content[0].Pr.DefaultRunPr;
                     style.TextPr.Merge(chart_text_pr);
                 }
-
             }
             if(this instanceof  CTitle || this.parent  instanceof  CTitle)
             {
@@ -635,15 +659,41 @@ CDLbl.prototype =
                 }
             }
             if(this instanceof  CalcLegendEntry
-                && this.legend
-                && this.legend.txPr
+                && this.legend)
+            {
+                if(this.legend.txPr
                 && this.legend.txPr.content
                 && this.legend.txPr.content.Content[0]
                 && this.legend.txPr.content.Content[0].Pr)
             {
+                    this.legend.txPr.content.Content[0].Set_DocumentIndex(0);
                 style.ParaPr.Merge(this.legend.txPr.content.Content[0].Pr);
                 if(this.legend.txPr.content.Content[0].Pr.DefaultRunPr)
                     style.TextPr.Merge(this.legend.txPr.content.Content[0].Pr.DefaultRunPr);
+            }
+
+                if(isRealNumber(this.idx))
+                {
+                    var aLegendEntries = this.legend.legendEntryes;
+                    for(var i = 0; i < aLegendEntries.length; ++i)
+                    {
+                        if(this.idx === aLegendEntries[i].idx)
+                        {
+                            var oLegendEntry = aLegendEntries[i];
+                            if(oLegendEntry.txPr
+                                && oLegendEntry.txPr.content
+                                && oLegendEntry.txPr.content.Content[0]
+                                && oLegendEntry.txPr.content.Content[0].Pr)
+                            {
+                                style.ParaPr.Merge(oLegendEntry.txPr.content.Content[0].Pr);
+                                if(oLegendEntry.txPr.content.Content[0].Pr.DefaultRunPr)
+                                    style.TextPr.Merge(oLegendEntry.txPr.content.Content[0].Pr.DefaultRunPr);
+                            }
+                            break;
+                        }
+                    }
+                }
+
             }
 
             if(!(this instanceof  CTitle) && this.parent && this.parent.txPr
@@ -651,6 +701,7 @@ CDLbl.prototype =
                 && this.parent.txPr.content.Content[0]
                 && this.parent.txPr.content.Content[0].Pr)
             {
+                this.parent.txPr.content.Content[0].Set_DocumentIndex(0);
                 style.ParaPr.Merge(this.parent.txPr.content.Content[0].Pr);
                 if(this.parent.txPr.content.Content[0].Pr.DefaultRunPr)
                     style.TextPr.Merge(this.parent.txPr.content.Content[0].Pr.DefaultRunPr);
@@ -661,6 +712,7 @@ CDLbl.prototype =
                 && this.txPr.content.Content[0]
                 && this.txPr.content.Content[0].Pr)
             {
+                this.txPr.content.Content[0].Set_DocumentIndex(0);
                 style.ParaPr.Merge(this.txPr.content.Content[0].Pr);
                 if(this.txPr.content.Content[0].Pr.DefaultRunPr)
                     style.TextPr.Merge(this.txPr.content.Content[0].Pr.DefaultRunPr);
@@ -1197,6 +1249,10 @@ CDLbl.prototype =
         this.transformText = this.localTransformText.CreateDublicate();
         global_MatrixTransformer.TranslateAppend(this.transformText, x, y);
 
+
+        this.invertTransform = global_MatrixTransformer.Invert(this.transform);
+        this.invertTransformText = global_MatrixTransformer.Invert(this.transformText);
+
     },
 
     setPositionRelative: function(x, y)
@@ -1291,6 +1347,19 @@ CDLbl.prototype =
     {
         History.Add(this, {Type: historyitem_DLbl_SetTxPr, oldPr: this.txPr  , newPr: pr});
         this.txPr = pr;
+        if(this.txPr)
+        {
+            this.txPr.setParent(this);
+        }
+    },
+
+
+    Refresh_RecalcData2: function(pageIndex, object)
+    {
+        if(this.parent && this.parent.Refresh_RecalcData2)
+        {
+            this.parent.Refresh_RecalcData2();
+        }
     },
 
     Undo: function(data)
@@ -2154,7 +2223,7 @@ CPlotArea.prototype =
             }
             case historyitem_PlotArea_AddAxis:
             {
-                for(var  i = this.axId.length; i > -1; --i)
+                for(var  i = this.axId.length - 1; i > -1; --i)
                 {
                     if(this.axId[i] === data.newPr)
                     {
@@ -2709,7 +2778,7 @@ CBarChart.prototype =
             }
             case historyitem_BarChart_AddAxId:
             {
-                for(var i = this.axId.length; i > -1; --i)
+                for(var i = this.axId.length - 1; i > -1; --i)
                 {
                     if(this.axId[i] === data.pr)
                     {
@@ -2758,7 +2827,7 @@ CBarChart.prototype =
             }
             case historyitem_BarChart_AddSer:
             {
-                for(var i = this.series.length; i > -1; --i)
+                for(var i = this.series.length - 1; i > -1; --i)
                 {
                     if(this.series[i] === data.pr)
                     {
@@ -3718,7 +3787,7 @@ CAreaSeries.prototype =
                 }
             }
         }
-        return idx + "";
+        return (idx + 1) + "";
     },
 
 
@@ -3832,6 +3901,10 @@ CAreaSeries.prototype =
     {
         History.Add(this, {Type: historyitem_AreaSeries_SetDLbls, oldPr: this.dLbls, newPr: pr});
         this.dLbls = pr;
+        if(this.dLbls)
+        {
+            this.dLbls.setParent(this);
+        }
     },
     addDPt: function(pr)
     {
@@ -3922,6 +3995,10 @@ CAreaSeries.prototype =
             case historyitem_AreaSeries_SetDLbls:
             {
                 this.dLbls = data.oldPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateDataLabels)
+                {
+                    this.parent.parent.parent.parent.handleUpdateDataLabels();
+                }
                 break;
             }
             case historyitem_AreaSeries_SetDPt:
@@ -3994,6 +4071,10 @@ CAreaSeries.prototype =
             case historyitem_AreaSeries_SetDLbls:
             {
                 this.dLbls = data.newPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateDataLabels)
+                {
+                    this.parent.parent.parent.parent.handleUpdateDataLabels();
+                }
                 break;
             }
             case historyitem_AreaSeries_SetDPt:
@@ -4099,6 +4180,10 @@ CAreaSeries.prototype =
             case historyitem_AreaSeries_SetDLbls:
             {
                 this.dLbls = readObject(r);
+                if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateDataLabels)
+                {
+                    this.parent.parent.parent.parent.handleUpdateDataLabels();
+                }
                 break;
             }
             case historyitem_AreaSeries_SetDPt:
@@ -9330,6 +9415,10 @@ CBarSeries.prototype =
     {
         History.Add(this, {Type: historyitem_BarSeries_SetDLbls, oldPr: this.dLbls, newPr: pr});
         this.dLbls = pr;
+        if(this.dLbls)
+        {
+            this.dLbls.setParent(this);
+        }
     },
     addDPt: function(pr)
     {
@@ -9419,6 +9508,10 @@ CBarSeries.prototype =
             case historyitem_BarSeries_SetDLbls:
             {
                 this.dLbls = data.oldPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateDataLabels)
+                {
+                    this.parent.parent.parent.parent.handleUpdateDataLabels();
+                }
                 break;
             }
             case historyitem_BarSeries_SetDPt:
@@ -9501,6 +9594,10 @@ CBarSeries.prototype =
             case historyitem_BarSeries_SetDLbls:
             {
                 this.dLbls = data.newPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateDataLabels)
+                {
+                    this.parent.parent.parent.parent.handleUpdateDataLabels();
+                }
                 break;
             }
             case historyitem_BarSeries_SetDPt:
@@ -9623,6 +9720,10 @@ CBarSeries.prototype =
             case historyitem_BarSeries_SetDLbls:
             {
                 this.dLbls = readObject(r);
+                if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateDataLabels)
+                {
+                    this.parent.parent.parent.parent.handleUpdateDataLabels();
+                }
                 break;
             }
             case historyitem_BarSeries_SetDPt:
@@ -10252,6 +10353,10 @@ CBubbleSeries.prototype =
             case historyitem_BubbleSeries_SetDLbls:
             {
                 this.dLbls = data.oldPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateDataLabels)
+                {
+                    this.parent.parent.parent.parent.handleUpdateDataLabels();
+                }
                 break;
             }
             case historyitem_BubbleSeries_SetDPt:
@@ -10334,6 +10439,10 @@ CBubbleSeries.prototype =
             case historyitem_BubbleSeries_SetDLbls:
             {
                 this.dLbls = data.newPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateDataLabels)
+                {
+                    this.parent.parent.parent.parent.handleUpdateDataLabels();
+                }
                 break;
             }
             case historyitem_BubbleSeries_SetDPt:
@@ -10464,6 +10573,10 @@ CBubbleSeries.prototype =
             case historyitem_BubbleSeries_SetDLbls:
             {
                 this.dLbls = readObject(r);
+                if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateDataLabels)
+                {
+                    this.parent.parent.parent.parent.handleUpdateDataLabels();
+                }
                 break;
             }
             case historyitem_BubbleSeries_SetDPt:
@@ -10533,6 +10646,10 @@ CBubbleSeries.prototype =
     {
         History.Add(this, {Type: historyitem_BubbleSeries_SetDLbls, oldPr: this.dLbls, newPr: pr});
         this.dLbls = pr;
+        if(this.dLbls)
+        {
+            this.dLbls.setParent(this);
+        }
     },
     addDPt: function(pr)
     {
@@ -11095,6 +11212,13 @@ CDLbls.prototype =
     },
     Refresh_RecalcData: function()
     {},
+    Refresh_RecalcData2: function()
+    {
+        if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.parent && this.parent.parent.parent.parent.parent.handleUpdateDataLabels)
+        {
+            this.parent.parent.parent.parent.parent.handleUpdateDataLabels();
+        }
+    },
 
 
     setParent: function(pr)
@@ -11207,6 +11331,10 @@ CDLbls.prototype =
     {
         History.Add(this, {Type: historyitem_DLbls_SetDLbl, newPr: pr});
         this.dLbl.push(pr);
+        if(pr)
+        {
+            pr.parent = this;
+        }
     },
     setDLblPos: function(pr)
     {
@@ -11304,6 +11432,10 @@ CDLbls.prototype =
     {
         History.Add(this, {Type: historyitem_DLbls_SetTxPr, oldPr: this.txPr, newPr: pr});
         this.txPr = pr;
+        if(pr)
+        {
+            pr.setParent(this);
+        }
         if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateDataLabels)
         {
             this.parent.parent.parent.parent.handleUpdateDataLabels();
@@ -11425,6 +11557,10 @@ CDLbls.prototype =
             case historyitem_DLbls_SetDLbl:
             {
                 this.dLbl.push(data.newPr);
+                if(data.newPr)
+                {
+                    data.parent = this;
+                }
                 break;
             }
             case historyitem_DLbls_SetDLblPos:
@@ -11564,6 +11700,7 @@ CDLbls.prototype =
                 if(d_lbl)
                 {
                     this.dLbl.push(d_lbl);
+                    d_lbl.parent = this;
                 }
                 break;
             }
@@ -13785,6 +13922,7 @@ function CLegend()
     this.parent = null;
 
     this.transform = new CMatrix();
+    this.invertTransform = new CMatrix();
 
     this.localTransform = new CMatrix();
 
@@ -13879,6 +14017,13 @@ CLegend.prototype =
         g.bDrawSmart = false;
     },
 
+    hit: function(x, y)
+    {
+        var t_x = this.invertTransform.TransformPointX(x, y);
+        var t_y = this.invertTransform.TransformPointY(x, y);
+        return t_x >= 0 && t_y >= 0 && t_x <= this.extX && t_y <=this.extY;
+    },
+
     setPosition: function(x, y)
     {
         this.x = x;
@@ -13888,6 +14033,7 @@ CLegend.prototype =
         //if(this.chart)
         //    global_MatrixTransformer.MultiplyAppend(this.localTransform, this.chart.localTransform);
         this.transform = this.localTransform.CreateDublicate();
+        this.invertTransform = global_MatrixTransformer.Invert(this.transform);
         var entry;
         for(var i = 0; i < this.calcEntryes.length; ++i)
         {
@@ -13897,14 +14043,15 @@ CLegend.prototype =
 
             global_MatrixTransformer.MultiplyAppend(entry.localTransformText, this.localTransform);
             entry.transformText = entry.localTransformText.CreateDublicate();
-
+            entry.invertTransformText = global_MatrixTransformer.Invert(entry.transformText);
             if(entry.calcMarkerUnion.marker)
             {
                 entry.calcMarkerUnion.marker.localTransform.Reset();
                 global_MatrixTransformer.TranslateAppend(entry.calcMarkerUnion.marker.localTransform, entry.calcMarkerUnion.marker.localX, entry.calcMarkerUnion.marker.localY);
 
                 global_MatrixTransformer.MultiplyAppend(entry.calcMarkerUnion.marker.localTransform, this.localTransform);
-                entry.calcMarkerUnion.marker.transform = entry.calcMarkerUnion.marker.localTransform.CreateDublicate()
+                entry.calcMarkerUnion.marker.transform = entry.calcMarkerUnion.marker.localTransform.CreateDublicate();
+                entry.calcMarkerUnion.marker.invertTransform = global_MatrixTransformer.Invert(entry.calcMarkerUnion.marker.transform);
             }
             if(entry.calcMarkerUnion.lineMarker)
             {
@@ -13913,6 +14060,7 @@ CLegend.prototype =
 
                 global_MatrixTransformer.MultiplyAppend(entry.calcMarkerUnion.lineMarker.localTransform, this.localTransform);
                 entry.calcMarkerUnion.lineMarker.transform = entry.calcMarkerUnion.lineMarker.localTransform.CreateDublicate();
+                entry.calcMarkerUnion.lineMarker.invertTransform = global_MatrixTransformer.Invert(entry.calcMarkerUnion.lineMarker.transform);
             }
         }
     },
@@ -13924,23 +14072,30 @@ CLegend.prototype =
         this.posY = y;
         this.transform = this.localTransform.CreateDublicate();
         global_MatrixTransformer.TranslateAppend(this.transform, x, y);
+        this.invertTransform = global_MatrixTransformer.Invert(this.transform);
         var entry;
         for(var i = 0; i < this.calcEntryes.length; ++i)
         {
             entry = this.calcEntryes[i];
             entry.transformText = entry.localTransformText.CreateDublicate();
             global_MatrixTransformer.TranslateAppend(entry.transformText, x, y);
+            entry.invertTransformText = global_MatrixTransformer.Invert(entry.transformText);
 
             if(entry.calcMarkerUnion.marker)
             {
                 entry.calcMarkerUnion.marker.transform = entry.calcMarkerUnion.marker.localTransform.CreateDublicate();
                 global_MatrixTransformer.TranslateAppend(entry.calcMarkerUnion.marker.transform, x, y);
+
+                entry.calcMarkerUnion.marker.invertTransform = global_MatrixTransformer.Invert(entry.calcMarkerUnion.marker.transform);
             }
 
             if(entry.calcMarkerUnion.lineMarker)
             {
                 entry.calcMarkerUnion.lineMarker.transform = entry.calcMarkerUnion.lineMarker.localTransform.CreateDublicate();
                 global_MatrixTransformer.TranslateAppend(entry.calcMarkerUnion.lineMarker.transform, x, y);
+
+                entry.calcMarkerUnion.lineMarker.invertTransform = global_MatrixTransformer.Invert(entry.calcMarkerUnion.lineMarker.transform);
+
             }
         }
     },
@@ -13950,8 +14105,8 @@ CLegend.prototype =
     {
         this.transform = this.localTransform.CreateDublicate();
         global_MatrixTransformer.TranslateAppend(this.transform, this.posX, this.posY);
-
         global_MatrixTransformer.MultiplyAppend(this.transform, t);
+        this.invertTransform = global_MatrixTransformer.Invert(this.transform);
         var entry;
         for(var i = 0; i < this.calcEntryes.length; ++i)
         {
@@ -13962,6 +14117,8 @@ CLegend.prototype =
 
             global_MatrixTransformer.MultiplyAppend(entry.transformText, t);
 
+            entry.invertTransformText = global_MatrixTransformer.Invert(entry.transformText);
+
 
             if(entry.calcMarkerUnion.marker)
             {
@@ -13969,6 +14126,8 @@ CLegend.prototype =
                 global_MatrixTransformer.TranslateAppend(entry.calcMarkerUnion.marker.transform, this.posX, this.posY);
 
                 global_MatrixTransformer.MultiplyAppend(entry.calcMarkerUnion.marker.transform, t);
+
+                entry.calcMarkerUnion.marker.invertTransform = global_MatrixTransformer.Invert(entry.calcMarkerUnion.marker.transform);
             }
 
             if(entry.calcMarkerUnion.lineMarker)
@@ -13976,6 +14135,8 @@ CLegend.prototype =
                 entry.calcMarkerUnion.lineMarker.transform = entry.calcMarkerUnion.lineMarker.localTransform.CreateDublicate();
                 global_MatrixTransformer.TranslateAppend(entry.calcMarkerUnion.lineMarker.transform, this.posX, this.posY);
                 global_MatrixTransformer.MultiplyAppend(entry.calcMarkerUnion.lineMarker.transform, t);
+
+                entry.calcMarkerUnion.lineMarker.invertTransform = global_MatrixTransformer.Invert(entry.calcMarkerUnion.lineMarker.transform);
             }
         }
     },
@@ -13994,6 +14155,15 @@ CLegend.prototype =
     {
         History.Add(this, {Type: historyitem_Legend_AddLegendEntry, entry: legendEntry});
         this.legendEntryes.push(legendEntry);
+        legendEntry.parent = this;
+    },
+    removeLegendEntry: function(idx)
+    {
+        if(this.legendEntryes[idx])
+        {
+            History.Add(this, {Type: historyitem_Legend_RemoveLegendEntry, entry: this.legendEntryes[idx], idx: idx});
+            this.legendEntryes.splice(idx, 1);
+        }
     },
     setLegendPos: function(legendPos)
     {
@@ -14022,6 +14192,18 @@ CLegend.prototype =
     {
         History.Add(this, {Type: historyitem_Legend_SetTxPr,oldPr: this.txPr, newPr: txPr});
         this.txPr = txPr;
+        if(txPr)
+        {
+            txPr.setParent(this);
+        }
+    },
+
+    Refresh_RecalcData2: function()
+    {
+        if(this.parent && this.parent.parent)
+        {
+            this.parent.parent.handleUpdateInternalChart();
+        }
     },
 
     findLegendEntryByIndex: function(idx)
@@ -14056,9 +14238,9 @@ CLegend.prototype =
             }
             case historyitem_Legend_AddLegendEntry:
             {
-                for(var i = this.legendEntryes.length; i > -1; --i)
+                for(var i = this.legendEntryes.length-1; i > -1; --i)
                 {
-                    if(this.legendEntryes[i].Get_Id() === data.entry)
+                    if(this.legendEntryes[i] === data.entry)
                     {
                         this.legendEntryes.splice(i, 1);
                         break;
@@ -14094,7 +14276,6 @@ CLegend.prototype =
                 this.txPr = data.oldPr;
                 break;
             }
-
         }
     },
 
@@ -14116,6 +14297,7 @@ CLegend.prototype =
             case historyitem_Legend_AddLegendEntry:
             {
                 this.legendEntryes.push(data.entry);
+                data.entry.parent = this;
                 break;
             }
             case historyitem_Legend_SetLegendPos:
@@ -14234,6 +14416,7 @@ CLegend.prototype =
                     if(isRealObject(entry))
                     {
                         this.legendEntryes.push(entry);
+                        entry.parent = this;
                     }
                 }
                 break;
@@ -14357,10 +14540,22 @@ CLegendEntry.prototype =
         this.idx = pr;
     },
 
+    Refresh_RecalcData2: function()
+    {
+        if(this.parent && this.parent.Refresh_RecalcData2)
+        {
+            this.parent.Refresh_RecalcData2();
+        }
+    },
+
     setTxPr: function(pr)
     {
         History.Add(this, {Type: historyitem_LegendEntry_SetTxPr, oldPr: this.txPr, newPr:pr});
         this.txPr = pr;
+        if(this.txPr)
+        {
+            this.txPr.setParent(this);
+        }
     },
 
     Undo: function(data)
@@ -15317,6 +15512,10 @@ CLineSeries.prototype =
     {
         History.Add(this, {Type: historyitem_LineSeries_SetDLbls, oldPr: this.dLbls, newPr: pr});
         this.dLbls = pr;
+        if(this.dLbls)
+        {
+            this.dLbls.setParent(this);
+        }
     },
     addDPt: function(pr)
     {
@@ -15415,6 +15614,10 @@ CLineSeries.prototype =
             case historyitem_LineSeries_SetDLbls:
             {
                 this.dLbls = data.oldPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateDataLabels)
+                {
+                    this.parent.parent.parent.parent.handleUpdateDataLabels();
+                }
                 break;
             }
             case historyitem_LineSeries_SetDPt:
@@ -15500,6 +15703,10 @@ CLineSeries.prototype =
             case historyitem_LineSeries_SetDLbls:
             {
                 this.dLbls = data.newPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateDataLabels)
+                {
+                    this.parent.parent.parent.parent.handleUpdateDataLabels();
+                }
                 break;
             }
             case historyitem_LineSeries_SetDPt:
@@ -15623,6 +15830,10 @@ CLineSeries.prototype =
             case historyitem_LineSeries_SetDLbls:
             {
                 this.dLbls = readObject(r);
+                if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateDataLabels)
+                {
+                    this.parent.parent.parent.parent.handleUpdateDataLabels();
+                }
                 break;
             }
             case historyitem_LineSeries_SetDPt:
@@ -18079,7 +18290,7 @@ CPieChart.prototype =
             }
             case historyitem_PieChart_AddSer:
             {
-                for(var i = this.series.length; i > -1; --i)
+                for(var i = this.series.length - 1; i > -1; --i)
                 {
                     if(this.series[i] === data.ser)
                     {
@@ -18423,6 +18634,10 @@ CPieSeries.prototype =
     {
         History.Add(this, {Type: historyitem_PieSeries_SetDLbls, oldPr: this.dLbls, newPr:pr});
         this.dLbls = pr;
+        if(this.dLbls)
+        {
+            this.dLbls.setParent(this);
+        }
     },
     addDPt: function(pr)
     {
@@ -18492,6 +18707,10 @@ CPieSeries.prototype =
             case historyitem_PieSeries_SetDLbls:
             {
                 this.dLbls = data.oldPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateDataLabels)
+                {
+                    this.parent.parent.parent.parent.handleUpdateDataLabels();
+                }
                 break;
             }
             case historyitem_PieSeries_SetDPt:
@@ -18554,6 +18773,10 @@ CPieSeries.prototype =
             case historyitem_PieSeries_SetDLbls:
             {
                 this.dLbls = data.newPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateDataLabels)
+                {
+                    this.parent.parent.parent.parent.handleUpdateDataLabels();
+                }
                 break;
             }
             case historyitem_PieSeries_SetDPt:
@@ -18656,6 +18879,10 @@ CPieSeries.prototype =
             case historyitem_PieSeries_SetDLbls:
             {
                 this.dLbls = readObject(r);
+                if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateDataLabels)
+                {
+                    this.parent.parent.parent.parent.handleUpdateDataLabels();
+                }
                 break;
             }
             case historyitem_PieSeries_SetDPt:
@@ -19173,7 +19400,7 @@ CRadarChart.prototype =
             }
             case historyitem_RadarChart_AddSer:
             {
-                for(var i = this.series.length; i >  -1; --i)
+                for(var i = this.series.length - 1; i >  -1; --i)
                 {
                     if(this.series[i] === data.ser)
                     {
@@ -19533,6 +19760,10 @@ CRadarSeries.prototype =
     {
         History.Add(this, {Type: historyitem_RadarSeries_SetCat, oldPr: this.dLbls, newPr: pr});
         this.dLbls = pr;
+        if(this.dLbls)
+        {
+            this.dLbls.setParent(this);
+        }
     },
     addDPt: function(pr)
     {
@@ -19603,6 +19834,10 @@ CRadarSeries.prototype =
             case historyitem_RadarSeries_SetDLbls:
             {
                 this.dLbls = data.oldPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateDataLabels)
+                {
+                    this.parent.parent.parent.parent.handleUpdateDataLabels();
+                }
                 break;
             }
             case historyitem_RadarSeries_SetDPt:
@@ -19665,6 +19900,10 @@ CRadarSeries.prototype =
             case historyitem_RadarSeries_SetDLbls:
             {
                 this.dLbls = data.newPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateDataLabels)
+                {
+                    this.parent.parent.parent.parent.handleUpdateDataLabels();
+                }
                 break;
             }
             case historyitem_RadarSeries_SetDPt:
@@ -19767,6 +20006,10 @@ CRadarSeries.prototype =
             case historyitem_RadarSeries_SetDLbls:
             {
                 this.dLbls = readObject(r);
+                if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateDataLabels)
+                {
+                    this.parent.parent.parent.parent.handleUpdateDataLabels();
+                }
                 break;
             }
             case historyitem_RadarSeries_SetDPt:
@@ -20307,7 +20550,7 @@ CScatterChart.prototype =
             }
             case historyitem_ScatterChart_AddAxId:
             {
-                for(var i = this.axId.length; i > -1; --i)
+                for(var i = this.axId.length - 1; i > -1; --i)
                 {
                     if(this.axId[i] === data.newPr)
                     {
@@ -20336,7 +20579,7 @@ CScatterChart.prototype =
             }
             case historyitem_ScatterChart_AddSer:
             {
-                for(var i = this.series.length; i >  -1; --i)
+                for(var i = this.series.length - 1; i >  -1; --i)
                 {
                     if(this.series[i] === data.newPr)
                     {
@@ -20709,6 +20952,10 @@ CScatterSeries.prototype =
     {
         History.Add(this, {Type: historyitem_ScatterSer_SetDLbls, oldPr: this.dLbls, newPr:pr});
         this.dLbls = pr;
+        if(this.dLbls)
+        {
+            this.dLbls.setParent(this);
+        }
     },
     addDPt: function(pr)
     {
@@ -20787,6 +21034,10 @@ CScatterSeries.prototype =
             case historyitem_ScatterSer_SetDLbls:
             {
                 this.dLbls = data.oldPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateDataLabels)
+                {
+                    this.parent.parent.parent.parent.handleUpdateDataLabels();
+                }
                 break;
             }
             case historyitem_ScatterSer_SetDPt:
@@ -20864,6 +21115,10 @@ CScatterSeries.prototype =
             case historyitem_ScatterSer_SetDLbls:
             {
                 this.dLbls = data.newPr;
+                if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateDataLabels)
+                {
+                    this.parent.parent.parent.parent.handleUpdateDataLabels();
+                }
                 break;
             }
             case historyitem_ScatterSer_SetDPt:
@@ -20997,6 +21252,10 @@ CScatterSeries.prototype =
                 else
                 {
                     this.dLbls = null;
+                }
+                if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateDataLabels)
+                {
+                    this.parent.parent.parent.parent.handleUpdateDataLabels();
                 }
                 break;
             }
@@ -24895,7 +25154,7 @@ CChart.prototype =
             }
             case historyitem_Chart_AddPivotFmt:
             {
-                for(var i = this.pivotFmts.length; i > -1; --i)
+                for(var i = this.pivotFmts.length - 1; i > -1; --i)
                 {
                     if(this.pivotFmts[i] === data.pivotFmt)
                     {
@@ -25627,7 +25886,7 @@ function AddToContentFromString(content, str)
     }
 }
 
-function CValAxisLabels(chart)
+function CValAxisLabels(chart, axis)
 {
     this.x = null;
     this.y = null;
@@ -25639,6 +25898,7 @@ function CValAxisLabels(chart)
     this.chart = chart;
     this.posX = null;
     this.posY = null;
+    this.axis = axis;
 }
 
 CValAxisLabels.prototype =
@@ -25654,6 +25914,18 @@ CValAxisLabels.prototype =
             }
         }
         this.extX = max_ext_x;
+    },
+
+    hit: function(x, y)
+    {
+        var tx, ty;
+        if(this.chart && this.chart.invertTransform)
+        {
+            tx = this.chart.invertTransform.TransformPointX(x, y);
+            ty = this.chart.invertTransform.TransformPointY(x, y);
+            return tx >= this.x && ty >= this.y && tx <= this.x + this.extX && ty <= this.y + this.extY;
+        }
+        return false;
     },
 
     getMinWidth: function()
@@ -25735,10 +26007,11 @@ CValAxisLabels.prototype =
 };
 
 
-function CalcLegendEntry(legend, chart)
+function CalcLegendEntry(legend, chart, idx)
 {
     this.chart = chart;
     this.legend = legend;
+    this.idx = idx;
     this.x = null;
     this.y = null;
     this.extX = null;
@@ -25749,6 +26022,9 @@ function CalcLegendEntry(legend, chart)
     this.spPr = new CSpPr();
     this.transform = new CMatrix();
     this.transformText = new CMatrix();
+
+    this.contentWidth = 0;
+    this.contentHeight = 0;
 
     this.localTransform = new CMatrix();
     this.localTransformText = new CMatrix();
@@ -25787,7 +26063,62 @@ CalcLegendEntry.prototype =
         return false;
     },
 
-    updatePosition: CShape.prototype.updatePosition
+    updatePosition: CShape.prototype.updatePosition,
+
+    checkWidhtContent: function()
+    {
+        var par = this.txBody.content.Content[0];
+        var max_width = 0;
+        for(var j = 0; j < par.Lines.length; ++j)
+        {
+            if(par.Lines[j].Ranges[0].W  > max_width)
+            {
+                max_width = par.Lines[j].Ranges[0].W;
+            }
+        }
+        this.contentWidth = max_width;
+        this.contentHeight = this.txBody.getSummaryHeight();
+    },
+
+    hit: function(x, y)
+    {
+        var tx, ty, oGeometry;
+        if(this.invertTransformText)
+        {
+            tx = this.invertTransformText.TransformPointX(x, y);
+            ty = this.invertTransformText.TransformPointY(x, y);
+            if(tx >= 0 && tx <= this.contentWidth && ty >= 0 && ty <= this.contentHeight)
+            {
+                return true;
+            }
+        }
+        if(this.chart)
+        {
+            var oCanvasHit = this.chart.getCanvasContext();
+            var calcMarkerUnion = this.calcMarkerUnion;
+            if(calcMarkerUnion.marker && calcMarkerUnion.marker.invertTransform)
+            {
+                tx = calcMarkerUnion.marker.invertTransform.TransformPointX(x, y);
+                ty = calcMarkerUnion.marker.invertTransform.TransformPointY(x, y);
+                oGeometry = calcMarkerUnion.marker.spPr.geometry;
+                if(oGeometry.hitInInnerArea(oCanvasHit, tx, ty) || oGeometry.hitInPath(oCanvasHit, tx, ty))
+                {
+                    return true;
+                }
+            }
+            if(calcMarkerUnion.lineMarker && calcMarkerUnion.lineMarker.invertTransform)
+            {
+                tx = calcMarkerUnion.lineMarker.invertTransform.TransformPointX(x, y);
+                ty = calcMarkerUnion.lineMarker.invertTransform.TransformPointY(x, y);
+                oGeometry = calcMarkerUnion.lineMarker.spPr.geometry;
+                if(oGeometry.hitInInnerArea(oCanvasHit, tx, ty) || oGeometry.hitInPath(oCanvasHit, tx, ty))
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 };
 
 
