@@ -1,4 +1,4 @@
-﻿"use strict";
+"use strict";
 
 /* CellEditorView.js
  *
@@ -794,7 +794,7 @@
 			wsOPEN = this.handlers.trigger( "getCellFormulaEnterWSOpen" ),
 			ws = wsOPEN ? wsOPEN.model : this.handlers.trigger( "getActiveWS" );
 
-		if ( s.length < 1 || s.charAt( 0 ) !== "=" || this.options.cellNumFormat == 2 ) {
+		if ( s.length < 1 || s.charAt( 0 ) !== "=" || this.options.cellNumFormat == c_oAscNumFormatType.Text ) {
 			return ret;
 		}
 
