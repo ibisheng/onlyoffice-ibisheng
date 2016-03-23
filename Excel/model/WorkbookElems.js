@@ -2887,6 +2887,9 @@ CCellValue.prototype =
 			for(var i = 0, length = this.textValueForEdit2.length; i < length; ++i)
 				this.textValueForEdit += this.textValueForEdit2[i].text;
 		}
+		if( CellValueType.Error == this.type ){
+			return this._getValueTypeError(this.textValueForEdit);
+		}
 		return this.textValueForEdit;
 	},
 	getValue2 : function(cell, dDigitsCount, fIsFitMeasurer)
@@ -2994,7 +2997,7 @@ CCellValue.prototype =
 			else if(CellValueType.Error == this.type)
 			{
 				if(null != this.text)
-					sText = this.text;
+					sText = this._getValueTypeError(this.text);
 			}
 			if(bNeedMeasure)
 			{
@@ -3192,6 +3195,40 @@ CCellValue.prototype =
 	setValue : function(cell, val)
 	{
 		this.clean();
+
+		function checkCellValueTypeError(sUpText){
+			switch (sUpText){
+				case cErrorLocal["nil"]:
+					return cErrorOrigin["nil"];
+					break;
+				case cErrorLocal["div"]:
+					return cErrorOrigin["div"];
+					break;
+				case cErrorLocal["value"]:
+					return cErrorOrigin["value"];
+					break;
+				case cErrorLocal["ref"]:
+					return cErrorOrigin["ref"];
+					break;
+				case cErrorLocal["name"]:
+					return cErrorOrigin["name"];
+					break;
+				case cErrorLocal["num"]:
+					return cErrorOrigin["num"];
+					break;
+				case cErrorLocal["na"]:
+					return cErrorOrigin["na"];
+					break;
+				case cErrorLocal["getdata"]:
+					return cErrorOrigin["getdata"];
+					break;
+				case cErrorLocal["uf"]:
+					return cErrorOrigin["uf"];
+					break;
+			}
+			return false;
+		}
+
 		if("" == val)
 			return;
 		var oNumFormat;
@@ -3220,11 +3257,12 @@ CCellValue.prototype =
 					this.type = CellValueType.Bool;
 					this.number = (cBoolLocal["t"].toUpperCase() == sUpText) ? 1 : 0;
 				}
-				else if("#NULL!" == sUpText || "#DIV/0!" == sUpText || "#NAME?" == sUpText || "#NUM!" == sUpText ||
-					"#N/A" == sUpText || "#REF!" == sUpText || "#VALUE!" == sUpText)
+//				else if( "#NULL!" == sUpText || "#DIV/0!" == sUpText || "#NAME?" == sUpText || "#NUM!" == sUpText ||
+//					"#N/A" == sUpText || "#REF!" == sUpText || "#VALUE!" == sUpText )
+				else if(checkCellValueTypeError(sUpText))
 				{
 					this.type = CellValueType.Error;
-					this.text = sUpText;
+					this.text = checkCellValueTypeError(sUpText);
 				}
 				else
 				{
@@ -3494,6 +3532,38 @@ CCellValue.prototype =
 			case this.Properties.number: this.number = value;break;
 			case this.Properties.type: this.type = value;break;
 		}
+	},
+	_getValueTypeError : function (text){
+		switch (text){
+			case cErrorOrigin["nil"]:
+				return cErrorLocal["nil"];
+				break;
+			case cErrorOrigin["div"]:
+				return cErrorLocal["div"];
+				break;
+			case cErrorOrigin["value"]:
+				return cErrorLocal["value"];
+				break;
+			case cErrorOrigin["ref"]:
+				return cErrorLocal["ref"];
+				break;
+			case cErrorOrigin["name"]:
+				return cErrorLocal["name"];
+				break;
+			case cErrorOrigin["num"]:
+				return cErrorLocal["num"];
+				break;
+			case cErrorOrigin["na"]:
+				return cErrorLocal["na"];
+				break;
+			case cErrorOrigin["getdata"]:
+				return cErrorLocal["getdata"];
+				break;
+			case cErrorOrigin["uf"]:
+				return cErrorLocal["uf"];
+				break;
+	}
+		return cErrorLocal["nil"];
 	}
 };
 
