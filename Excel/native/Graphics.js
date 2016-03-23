@@ -605,6 +605,7 @@ CGraphics.prototype =
             if (0 != this.m_oPen.LineWidth)
             {
                 this.Native["PD_p_width"](this.m_oPen.LineWidth);
+                this.m_oContext.lineWidth = this.m_oPen.LineWidth;
             }
             else
             {
@@ -615,6 +616,7 @@ CGraphics.prototype =
 
                 var _koef = Math.sqrt(((_x2 - _x1)*(_x2 - _x1) + (_y2 - _y1)*(_y2 - _y1)) / 2);
                 this.Native["PD_p_width"](1 / _koef);
+                this.m_oContext.lineWidth = 1 / _koef;
             }
         }
         else
@@ -627,10 +629,12 @@ CGraphics.prototype =
 
                 var koef = Math.sqrt((x * x + y * y) / 2);
                 this.Native["PD_p_width"](this.m_oPen.LineWidth * koef);
+                this.m_oContext.lineWidth = this.m_oPen.LineWidth * koef;
             }
             else
             {
                 this.Native["PD_p_width"](1);
+                this.m_oContext.lineWidth = 1;
             }
         }
     },

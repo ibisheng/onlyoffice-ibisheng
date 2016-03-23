@@ -4004,10 +4004,10 @@ function OfflineEditor () {
         var styleThumbnailWidth  = Math.floor(92.0 * pxToMM);
         var styleThumbnailHeight = Math.floor(48.0 * pxToMM);
 
-        asc.AutoFilters.prototype = Object.create (asc.AutoFilters.prototype);
-        asc.AutoFilters.prototype.constructor = asc.AutoFilters;
+        asc.WorkbookView.prototype = Object.create (asc.WorkbookView.prototype);
+        asc.WorkbookView.prototype.constructor = asc.WorkbookView;
 
-        asc.AutoFilters.prototype.getTablePictures =  function(wb, fmgrGraphics, oFont) {
+        asc.WorkbookView.prototype.af_getTablePictures =  function(wb, fmgrGraphics, oFont) {
 
             window['native'].SetStylesType(1);
 
@@ -4030,14 +4030,14 @@ function OfflineEditor () {
                     if(customStyles[i].table)
                     {
                         window['native'].BeginDrawDocumentStyle(customStyles[i].name, n);
-                        this._drawSmallIconTable(canvas, customStyles[i], fmgrGraphics, oFont);
+                        this.af_getSmallIconTable(canvas, customStyles[i], fmgrGraphics, oFont);
 
 //                        options =
 //                        {
 //                            name: i,
 //                            displayName: customStyles[i].displayName,
 //                            type: 'custom',
-//                            image: this._drawSmallIconTable(canvas, customStyles[i], fmgrGraphics, oFont)
+//                            image: this.af_getSmallIconTable(canvas, customStyles[i], fmgrGraphics, oFont)
 //                        };
 
                         // result[n] = new formatTablePictures(options);
@@ -4055,14 +4055,14 @@ function OfflineEditor () {
                     if(defaultStyles[i].table)
                     {
                         window['native'].BeginDrawDefaultStyle(defaultStyles[i].name, n);
-                        this._drawSmallIconTable(canvas, defaultStyles[i], fmgrGraphics, oFont);
+                        this.af_getSmallIconTable(canvas, defaultStyles[i], fmgrGraphics, oFont);
 
 //                        options =
 //                        {
 //                            name: i,
 //                            displayName: defaultStyles[i].displayName,
 //                            type: 'default',
-//                            image: this._drawSmallIconTable(canvas, defaultStyles[i], fmgrGraphics, oFont)
+//                            image: this.af_getSmallIconTable(canvas, defaultStyles[i], fmgrGraphics, oFont)
 //                        };
                         //result[n] = new formatTablePictures(options);
                         n++;
@@ -4073,7 +4073,7 @@ function OfflineEditor () {
             }
             return result;
         };
-        asc.AutoFilters.prototype._drawSmallIconTable = function(canvas, style, fmgrGraphics, oFont) {
+        asc.WorkbookView.prototype.af_getSmallIconTable = function(canvas, style, fmgrGraphics, oFont) {
 
             var ctx = new Asc.DrawingContext({canvas: canvas, units: 0/*pt*/, fmgrGraphics: fmgrGraphics, font: oFont});
             var styleOptions = style;
@@ -4578,11 +4578,19 @@ function offline_mouse_down(x, y, pin, isViewerMode, isFormulaEditMode, isRangeR
             ws.isChartAreaEditMode = false;
         }
 
+        window.AscAlwaysSaveAspectOnResizeTrack = true;
+
         var ischart = false;
         var controller = ws.objectRender.controller;
         var selected_objects = controller.selection.groupSelection ? controller.selection.groupSelection.selectedObjects : controller.selectedObjects;
         if (selected_objects.length === 1 && selected_objects[0].getObjectType() === historyitem_type_ChartSpace) {
             ischart = true;
+        }
+        else if (selected_objects.length === 1 && selected_objects[0].getObjectType() === historyitem_type_Shape) {
+            var shapeObj = selected_objects[0];
+            if (shapeObj.spPr && shapeObj.spPr.geometry && shapeObj.spPr.geometry.preset === "line") {
+                window.AscAlwaysSaveAspectOnResizeTrack = false;
+            }
         }
 
         return {id:graphicsInfo.id, ischart: ischart};
