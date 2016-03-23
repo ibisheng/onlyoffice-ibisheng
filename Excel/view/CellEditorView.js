@@ -794,7 +794,7 @@
 			wsOPEN = this.handlers.trigger( "getCellFormulaEnterWSOpen" ),
 			ws = wsOPEN ? wsOPEN.model : this.handlers.trigger( "getActiveWS" );
 
-		if ( s.length < 1 || s.charAt( 0 ) !== "=" ) {
+		if ( s.length < 1 || s.charAt( 0 ) !== "=" || this.options.cellNumFormat == 2 ) {
 			return ret;
 		}
 

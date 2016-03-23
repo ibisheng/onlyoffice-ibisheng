@@ -11357,6 +11357,7 @@
             autoComplete      : arrAutoComplete,
             autoCompleteLC    : arrAutoCompleteLC,
             cellName          : c.getName(),
+			cellNumFormat     : c.getNumFormatType(),
             saveValueCallback : function ( val, flags, skipNLCheck ) {
                 var oCellEdit = isMerged ? new asc_Range( mc.c1, mc.r1, mc.c1, mc.r1 ) : new asc_Range( col, row, col, row );
                 return t._saveCellValueAfterEdit( oCellEdit, c, val, flags, skipNLCheck, /*isNotHistory*/false, /*lockDraw*/false );
