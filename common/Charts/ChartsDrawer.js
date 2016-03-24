@@ -5943,7 +5943,24 @@ drawHBarChart.prototype =
 					
 					paths = this.cChartDrawer.calculateRect3D(point1, point2, point3, point4, point5, point6, point7, point8, val);
 					
-					this.sortZIndexPaths.push({seria: i, point: idx, paths: paths, x: point1.x, y: point1.y, zIndex: point1.z});
+					//расскомментируем, чтобы включить старую схему отрисовки(+ переименовать функции _DrawBars3D -> _DrawBars3D2)
+					//this.sortZIndexPaths.push({seria: i, point: idx, paths: paths, x: point1.x, y: point1.y, zIndex: point1.z});
+					
+					width = this.chartProp.widthCanvas - this.chartProp.chartGutter._left - this.chartProp.chartGutter._right;
+					var controlPoint1 = this.cChartDrawer._convertAndTurnPoint(x5 + width / 2, y5 - individualBarHeight / 2, z5);
+					var controlPoint2 = this.cChartDrawer._convertAndTurnPoint(x5 + width / 2, y5, z5 + perspectiveDepth / 2);
+					var controlPoint3 = this.cChartDrawer._convertAndTurnPoint(x5, y5 - individualBarHeight / 2, z5 + perspectiveDepth / 2);
+					var controlPoint4 = this.cChartDrawer._convertAndTurnPoint(x8, y8 - individualBarHeight / 2, z8 + perspectiveDepth / 2);
+					var controlPoint5 = this.cChartDrawer._convertAndTurnPoint(x1 + width / 2 , y1, z1 + perspectiveDepth / 2);
+					var controlPoint6 = this.cChartDrawer._convertAndTurnPoint(x6 + width / 2 , y6 - individualBarHeight / 2, z6);
+					
+					
+					var sortPaths = [controlPoint1, controlPoint2, controlPoint3, controlPoint4, controlPoint5, controlPoint6];
+					
+					for(var k = 0; k < paths.length; k++)
+					{
+						this.sortZIndexPaths.push({seria: i, point: idx, verge: k, paths: paths[k], x: sortPaths[k].x, y: sortPaths[k].y, zIndex: sortPaths[k].z});
+					}
 				}
 				else
 				{
@@ -6330,7 +6347,7 @@ drawHBarChart.prototype =
 	},
 	
 	
-	_DrawBars3D: function()
+	_DrawBars3D3: function()
 	{
 		var t = this;
 		var processor3D = this.cChartDrawer.processor3D;
@@ -6387,6 +6404,34 @@ drawHBarChart.prototype =
 		}
 	},
 	
+	_DrawBars3D: function()
+	{
+		var t = this;
+		var processor3D = this.cChartDrawer.processor3D;
+		
+		var drawVerges = function(i, j, paths, onlyLessNull, k)
+		{
+			var brush, pen, options;
+			options = t._getOptionsForDrawing(i, j, onlyLessNull);
+			if(paths !== null && options !== null)
+			{
+				pen = options.pen;
+				brush = options.brush;
+				
+				t._drawBar3D(paths, pen, brush, k);
+			}
+		};
+		
+		for(var i = 0; i < this.sortZIndexPaths.length; i++)
+		{
+			drawVerges(this.sortZIndexPaths[i].seria, this.sortZIndexPaths[i].point, this.sortZIndexPaths[i].paths, true, this.sortZIndexPaths[i].verge);
+		}
+		
+		for(var i = 0; i < this.sortZIndexPaths.length; i++)
+		{
+			drawVerges(this.sortZIndexPaths[i].seria, this.sortZIndexPaths[i].point, this.sortZIndexPaths[i].paths, false, this.sortZIndexPaths[i].verge);
+		}
+	},
 	
 	_drawBar3D: function(path, pen, brush, k)
 	{
