@@ -83,7 +83,7 @@ Processor3D.prototype._calculateAutoHPercent = function()
 	if(this.hPercent == null)
 	{
 		this.hPercent = this.view3D.hPercent === null ? (heightLine / widthLine) : this.view3D.hPercent / 100;
-		if(this.chartsDrawer.calcProp.type === "HBar" && this.view3D.hPercent === null)
+		if(this.chartsDrawer.calcProp.type === "HBar" && this.view3D.hPercent === null && this.view3D.rAngAx)
 			this.hPercent = 1 / this.hPercent;
 	}
 };
@@ -876,6 +876,10 @@ Processor3D.prototype._calculateDepthPerspective = function()
 	var depth = baseDepth * basePercent;
 	depth = depth + depth * gapDepth;
 	
+	if(this.chartsDrawer.calcProp.type === "HBar" && this.hPercent !== null)
+	{
+		depth = this.hPercent * depth;
+	}
 	
 	//TODO глубина в некоторых случаях отличается(тип Standard)
 	if(this.chartsDrawer.calcProp.subType === "standard" || this.chartsDrawer.calcProp.type === "Line")
