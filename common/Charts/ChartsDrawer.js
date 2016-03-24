@@ -5946,7 +5946,7 @@ drawHBarChart.prototype =
 					//расскомментируем, чтобы включить старую схему отрисовки(+ переименовать функции _DrawBars3D -> _DrawBars3D2)
 					//this.sortZIndexPaths.push({seria: i, point: idx, paths: paths, x: point1.x, y: point1.y, zIndex: point1.z});
 					
-					width = this.chartProp.widthCanvas - this.chartProp.chartGutter._left - this.chartProp.chartGutter._right;
+					//width = this.chartProp.widthCanvas - this.chartProp.chartGutter._left - this.chartProp.chartGutter._right;
 					var controlPoint1 = this.cChartDrawer._convertAndTurnPoint(x5 + width / 2, y5 - individualBarHeight / 2, z5);
 					var controlPoint2 = this.cChartDrawer._convertAndTurnPoint(x5 + width / 2, y5, z5 + perspectiveDepth / 2);
 					var controlPoint3 = this.cChartDrawer._convertAndTurnPoint(x5, y5 - individualBarHeight / 2, z5 + perspectiveDepth / 2);
@@ -5986,7 +5986,7 @@ drawHBarChart.prototype =
 			this.sortZIndexPaths.sort (function sortArr(a, b)
 			{
 				if(b.zIndex == a.zIndex)
-					return  b.y - a.y;
+					return  a.x - b.x;
 				else
 					return  b.zIndex - a.zIndex;
 			});
@@ -6424,12 +6424,7 @@ drawHBarChart.prototype =
 		
 		for(var i = 0; i < this.sortZIndexPaths.length; i++)
 		{
-			drawVerges(this.sortZIndexPaths[i].seria, this.sortZIndexPaths[i].point, this.sortZIndexPaths[i].paths, true, this.sortZIndexPaths[i].verge);
-		}
-		
-		for(var i = 0; i < this.sortZIndexPaths.length; i++)
-		{
-			drawVerges(this.sortZIndexPaths[i].seria, this.sortZIndexPaths[i].point, this.sortZIndexPaths[i].paths, false, this.sortZIndexPaths[i].verge);
+			drawVerges(this.sortZIndexPaths[i].seria, this.sortZIndexPaths[i].point, this.sortZIndexPaths[i].paths, null, this.sortZIndexPaths[i].verge);
 		}
 	},
 	
