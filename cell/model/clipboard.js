@@ -1477,7 +1477,7 @@
 						fs: '11',
 						b: false,
 						i: false,
-						u: false,
+						u: Asc.EUnderline.underlineNone,
 						s: false,
 						va: 'none'
 					},
