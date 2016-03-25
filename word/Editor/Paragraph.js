@@ -1094,7 +1094,7 @@ Paragraph.prototype =
             }
         }
 
-        return { X : X, Y : Y, PageNum : CurPage + this.Get_StartPage_Absolute(), Internal : { Line : CurLine, Page : CurPage, Range : CurRange }, Transform : Transform };
+        return { X : X, Y : Y, PageNum : this.Get_AbsolutePage(CurPage), Internal : { Line : CurLine, Page : CurPage, Range : CurRange }, Transform : Transform };
     },
 
     // Можно ли объединить границы двух параграфов с заданными настройками Pr1, Pr2
@@ -1424,7 +1424,7 @@ Paragraph.prototype =
         var _Page = this.Pages[CurPage];
 
         var DocumentComments = editor.WordControl.m_oLogicDocument.Comments;
-        var Page_abs = CurPage + this.Get_StartPage_Absolute();
+        var Page_abs = this.Get_AbsolutePage(CurPage);
 
         var DrawComm     = ( DocumentComments.Is_Use() && true != editor.isViewMode);
         var DrawFind     = editor.WordControl.m_oLogicDocument.SearchEngine.Selection;
@@ -2406,7 +2406,7 @@ Paragraph.prototype =
 
     ReDraw : function()
     {
-        this.Parent.OnContentReDraw( this.Get_StartPage_Absolute(), this.Get_StartPage_Absolute() + this.Pages.length - 1 );
+        this.Parent.OnContentReDraw(this.Get_AbsolutePage(0), this.Get_AbsolutePage(this.Pages.length - 1));
     },
 
     Shift : function(PageIndex, Dx, Dy)
@@ -3135,7 +3135,7 @@ Paragraph.prototype =
         {
             var ParaPr = this.Get_CompiledPr2(false).ParaPr;
 
-            var LD_PageFields = this.LogicDocument.Get_PageFields( this.Get_StartPage_Absolute() );
+            var LD_PageFields = this.LogicDocument.Get_PageFields(this.Get_AbsolutePage(0));
 
             if ( true != bShift )
             {
@@ -6487,12 +6487,10 @@ Paragraph.prototype =
 
     Get_SelectionBounds : function()
     {
-        var X0 = this.X, X1 = this.XLimit, Y = this.Y, Page = this.Get_StartPage_Absolute();
+        var X0 = this.X, X1 = this.XLimit, Y = this.Y;
 
         var BeginRect = null;
         var EndRect   = null;
-
-        var StartPage_abs = this.Get_StartPage_Absolute();
 
         var StartPage = 0, EndPage = 0;
         var _StartX = null, _StartY = null, _EndX = null, _EndY = null;
@@ -6579,7 +6577,7 @@ Paragraph.prototype =
                         X1 = StartX + W;
                         Y  = StartY;
 
-                        Page = CurPage + StartPage_abs;
+                        var Page = this.Get_AbsolutePage(CurPage);
 
                         if (null === BeginRect)
                             BeginRect = { X : StartX, Y : StartY, W : W, H : H, Page : Page };
@@ -6600,10 +6598,10 @@ Paragraph.prototype =
         }
 
         if (null === BeginRect)
-            BeginRect = {X : _StartX === null ? this.Pages[StartPage].X : _StartX, Y : _StartY === null ? this.Pages[StartPage].Y : _StartY, W : 0, H : 0, Page : StartPage_abs + StartPage};
+            BeginRect = {X : _StartX === null ? this.Pages[StartPage].X : _StartX, Y : _StartY === null ? this.Pages[StartPage].Y : _StartY, W : 0, H : 0, Page : this.Get_AbsolutePage(StartPage)};
 
         if (null === EndRect)
-            EndRect = {X : _EndX === null ? this.Pages[StartPage].X : _EndX, Y : _EndY === null ? this.Pages[StartPage].Y : _EndY, W : 0, H : 0, Page : StartPage_abs + EndPage};
+            EndRect = {X : _EndX === null ? this.Pages[StartPage].X : _EndX, Y : _EndY === null ? this.Pages[StartPage].Y : _EndY, W : 0, H : 0, Page : this.Get_AbsolutePage(EndPage)};
 
         return {Start : BeginRect, End : EndRect, Direction : this.Get_SelectionDirection()};
     },
@@ -6623,7 +6621,7 @@ Paragraph.prototype =
 
     Get_SelectionAnchorPos : function()
     {
-        var X0 = this.X, X1 = this.XLimit, Y = this.Y, Page = this.Get_StartPage_Absolute();
+        var X0 = this.X, X1 = this.XLimit, Y = this.Y, Page = this.Get_AbsolutePage(0);
         if ( true === this.ApplyToAll )
         {            
             // Ничего не делаем
@@ -6723,7 +6721,7 @@ Paragraph.prototype =
                         X1 = StartX + W;
                         Y  = StartY;
 
-                        Page = CurPage + this.Get_StartPage_Absolute();
+                        Page = this.Get_AbsolutePage(CurPage);
 
                         if ( null === Result )
                             Result = { X0 : X0, X1 : X1, Y : Y, Page : Page };
@@ -6747,7 +6745,7 @@ Paragraph.prototype =
             X0   = this.CurPos.X;
             X1   = this.CurPos.X;
             Y    = this.CurPos.Y;
-            Page = this.private_GetAbsolutePageIndex(this.CurPos.PagesPos);
+            Page = this.Get_AbsolutePage(this.CurPos.PagesPos);
         }
 
         return { X0 : X0, X1 : X1, Y : Y, Page : Page };
@@ -8951,7 +8949,7 @@ Paragraph.prototype =
                 }
 
                 var ParagraphTop = (true != Drawing.Use_TextWrap() ? this.Lines[Para.Pages[CurPage].StartLine].Top + this.Pages[CurPage].Y : this.Pages[CurPage].Y);
-                var Layout = new CParagraphLayout(DrawingLayout.X, DrawingLayout.Y , this.Get_StartPage_Absolute() + CurPage, DrawingLayout.LastW, ColumnStartX, ColumnEndX, X_Left_Margin, X_Right_Margin, Page_Width, Top_Margin, Bottom_Margin, Page_H, PageFields.X, PageFields.Y, this.Pages[CurPage].Y + this.Lines[CurLine].Y - this.Lines[CurLine].Metrics.Ascent, ParagraphTop);
+                var Layout = new CParagraphLayout(DrawingLayout.X, DrawingLayout.Y , this.Get_AbsolutePage(CurPage), DrawingLayout.LastW, ColumnStartX, ColumnEndX, X_Left_Margin, X_Right_Margin, Page_Width, Top_Margin, Bottom_Margin, Page_H, PageFields.X, PageFields.Y, this.Pages[CurPage].Y + this.Lines[CurLine].Y - this.Lines[CurLine].Metrics.Ascent, ParagraphTop);
                 return {ParagraphLayout : Layout, PageLimits : PageLimits};
             }
         }
@@ -9278,7 +9276,7 @@ Paragraph.prototype =
         }
         else
         {
-            var StartPage = this.Parent.Get_StartPage_Absolute();
+            var StartPage = this.Parent.Get_AbsolutePage(0);
             var Frame = this.CalculatedFrame;
             this.Parent.DrawingDocument.Set_RulerState_Paragraph( { L : Frame.L, T : Frame.T, R : Frame.L + Frame.W, B : Frame.T + Frame.H, PageIndex : StartPage + Frame.PageIndex, Frame : this }, false );
         }
@@ -9336,7 +9334,7 @@ Paragraph.prototype =
             {
                 var ContentPos = this.Get_ParaContentPos(this.Selection.Use, true);
                 var ParaPos    = this.Get_ParaPosByContentPos(ContentPos);
-                Page_abs   = this.Get_StartPage_Absolute() + ParaPos.Page;
+                Page_abs       = this.Get_AbsolutePage(ParaPos.Page);
                 _Y         = this.Pages[ParaPos.Page].Y + this.Lines[ParaPos.Line].Top;
                 TextTransform = this.Get_ParentTextTransform();
             }
@@ -13716,7 +13714,7 @@ Paragraph.prototype.Get_XYByContentPos = function(ContentPos)
         }
     }
 
-    return {X : X, Y : Y, PageNum : CurPage + this.Get_StartPage_Absolute(), Height : this.Lines[CurLine].Bottom - this.Lines[CurLine].Top};
+    return {X : X, Y : Y, PageNum : this.Get_AbsolutePage(CurPage), Height : this.Lines[CurLine].Bottom - this.Lines[CurLine].Top};
 };
 Paragraph.prototype.Get_Lock = function()
 {
