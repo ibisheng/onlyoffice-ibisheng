@@ -974,8 +974,8 @@ var str_namedRanges = "A-Za-z\u005F\u0080-\u0081\u0083\u0085-\u0087\u0089-\u008A
     rx_Comma = /^ *[,;] */,
     rx_arraySeparators = /^ *[,;] */,
 
-    rx_error = build_rx_error(null ),// /^(#NULL!|#DIV\/0!|#VALUE!|#REF!|#NAME\?|#NUM!|#UNSUPPORTED_FUNCTION!|#N\/A|#GETTING_DATA)/i,
-    rx_error_local = build_rx_error_local(null),// /^(#NULL!|#DIV\/0!|#VALUE!|#REF!|#NAME\?|#NUM!|#UNSUPPORTED_FUNCTION!|#N\/A|#GETTING_DATA)/i,
+    rx_error = build_rx_error(null ),
+    rx_error_local = build_rx_bool(null),
 
     rx_bool = build_rx_bool(null),
     rx_bool_local = build_rx_bool(null),
