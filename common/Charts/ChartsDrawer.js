@@ -295,8 +295,30 @@ CChartsDrawer.prototype =
 		
 		if(this.nDimensionCount === 3)
 		{
-			var convertResult = this._convertAndTurnPoint(x * this.calcProp.pxToMM, y * this.calcProp.pxToMM, 0);
-			y = convertResult.y / this.calcProp.pxToMM;
+			if(!this.processor3D.view3D.rAngAx && (this.calcProp.type === "Bar" || this.calcProp.type === "Line"))
+			{
+				var posX = chartSpace.chart.plotArea.valAx.posX;
+				var widthLabels = chartSpace.chart.plotArea.valAx.labels && chartSpace.chart.plotArea.valAx.labels.extX ? chartSpace.chart.plotArea.valAx.labels.extX : 0;
+				var widthTitle = chartSpace.chart.plotArea.valAx.title && chartSpace.chart.plotArea.valAx.title.extX ? chartSpace.chart.plotArea.valAx.title.extX : 0;
+				var yPoints = chartSpace.chart.plotArea.valAx.yPoints;
+				var upYPoint = yPoints && yPoints[0] ? yPoints[0].pos : 0;
+				var downYPoint = yPoints && yPoints[yPoints.length - 1] ? yPoints[yPoints.length - 1].pos : 0;
+				
+				var tempX = posX - widthLabels;
+				var convertResultX = this._convertAndTurnPoint(tempX * this.calcProp.pxToMM, y * this.calcProp.pxToMM, 0);
+				x = convertResultX.x / this.calcProp.pxToMM - widthTitle;
+				
+				var convertResultY1 = this._convertAndTurnPoint(posX * this.calcProp.pxToMM, upYPoint * this.calcProp.pxToMM, 0);
+				var convertResultY2 = this._convertAndTurnPoint(posX * this.calcProp.pxToMM, downYPoint * this.calcProp.pxToMM, 0);
+				var heightPerspectiveChart = convertResultY1.y - convertResultY2.y;
+				
+				var y = (convertResultY2.y + heightPerspectiveChart / 2) / this.calcProp.pxToMM - heightTitle / 2;
+			}
+			else
+			{
+				var convertResult = this._convertAndTurnPoint(x * this.calcProp.pxToMM, y * this.calcProp.pxToMM, 0);
+				y = convertResult.y / this.calcProp.pxToMM;
+			}
 		}
 		
 		return {x: x , y: y}
