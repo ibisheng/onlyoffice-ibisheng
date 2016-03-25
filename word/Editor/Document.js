@@ -3812,29 +3812,29 @@ CDocument.prototype =
             {
                 case type_Paragraph:
                 {
-                    // Если на текущй странице одна колонка, тогда мы добавляем таблицу по ширине этой колонке, а если
-                    // колонок больше одной, тогда добавляем таблицу минимальной ширины.
-
+                    // Ширину таблицы делаем по минимальной ширине колонки.
                     var Page = this.Pages[this.CurPage];
-                    var SectionIndex = this.private_GetPageSectionByContentPosition(this.CurPage, this.CurPos.ContentPos);
-                    var Section = Page.Sections[SectionIndex];
-
+                    var SectPr = this.SectionsInfo.Get_SectPr(this.CurPos.ContentPos).SectPr;
 
                     var PageFields = this.Get_PageFields( this.CurPage );
                     
                     // Создаем новую таблицу
-                    var W = ( PageFields.XLimit - PageFields.X  + 2 * 1.9);
+                    var W = (PageFields.XLimit - PageFields.X  + 2 * 1.9);
                     var Grid = [];
 
-                    if (Section.Columns.length > 1)
+                    if (SectPr.Get_ColumnsCount() > 1)
                     {
-                        if (Cols <= 3)
-                            W = 1124 / 20 * 25.4 / 72;
-                        else
-                            W = 360 / 20 * 25.4 / 72 * Cols;
+                        for (var CurCol = 0, ColsCount = SectPr.Get_ColumnsCount(); CurCol < ColsCount; ++CurCol)
+                        {
+                            var ColumnWidth = SectPr.Get_ColumnWidth(CurCol);
+                            if (W > ColumnWidth)
+                                W = ColumnWidth;
+                        }
+
+                        W += 2 * 1.9;
                     }
 
-                    W = Math.max( W, Cols * 2 * 1.9 );
+                    W = Math.max(W, Cols * 2 * 1.9);
 
                     for ( var Index = 0; Index < Cols; Index++ )
                         Grid[Index] = W / Cols;
