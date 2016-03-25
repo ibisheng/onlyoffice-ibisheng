@@ -1339,7 +1339,18 @@ CPresentation.prototype =
         var content = grFrame.graphicObject.Content, i;
         for(i = 0; i < content.length; ++i)
         {
-            content[i].Set_Height(content[i].Height, heightrule_AtLeast );
+            var ResultHeight;
+            ResultHeight = content[i].Height;
+            var FirstCell = content[i].Content[0];
+            if(FirstCell)
+            {
+                var oMargins = FirstCell.Get_Margins();
+                if(oMargins)
+                {
+                    ResultHeight -= (oMargins.Top + oMargins.Bottom);
+        }
+            }
+            content[i].Set_Height(ResultHeight, heightrule_AtLeast );
         }
     },
 
