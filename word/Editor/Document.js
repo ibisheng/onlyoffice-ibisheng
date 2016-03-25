@@ -1976,6 +1976,9 @@ CDocument.prototype =
         var StartIndex         = this.FullRecalc.StartIndex;
         var bResetStartElement = this.FullRecalc.ResetStartElement;
 
+        //console.log("Page " + PageIndex + " Section " + SectionIndex + " Column " + ColumnIndex + " Element " + StartIndex);
+        //console.log(this.RecalcInfo);
+
         var StartPos = this.Get_PageContentStartPos2(PageIndex, ColumnIndex, 0, StartIndex);
 
         var X      = StartPos.X;

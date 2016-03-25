@@ -1299,7 +1299,7 @@ Paragraph.prototype.private_RecalculateLineBottomBound = function(CurLine, CurPa
             && true === ParaPr.WidowControl
             && CurLine - this.Pages[CurPage].StartLine <= 1
             && CurLine >= 1 && true != PRS.BreakPageLine
-            && ( 0 === RealCurPage && null != this.Get_DocumentPrev() ) )
+            && ( 0 === CurPage && null != this.Get_DocumentPrev() ) )
         {
             // Вызываем данную функцию для удаления картинок с предыдущей страницы
             this.Recalculate_Drawing_AddPageBreak(0, 0, true);
