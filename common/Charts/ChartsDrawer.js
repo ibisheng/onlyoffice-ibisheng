@@ -2531,9 +2531,24 @@ CChartsDrawer.prototype =
 		var chart = chartSpace && chartSpace.chart ? chartSpace.chart.plotArea.chart: null;
 		var typeChart = chart ? chart.getObjectType() : null;
 		
-		if(isTurnOn3DCharts && chartSpace && chartSpace.chart.view3D /*&& chartSpace.chart.view3D.rAngAx*/ && ((typeChart === historyitem_type_BarChart && chart && chart.barDir !== BAR_DIR_BAR) || (typeChart === historyitem_type_LineChart) || (typeChart === historyitem_type_BarChart && chart.barDir === BAR_DIR_BAR) /*|| (typeChart === historyitem_type_AreaChart)*/ || (typeChart === historyitem_type_PieChart)))
+		if(isTurnOn3DCharts && chartSpace && chartSpace.chart.view3D)
 		{
-			res = true;
+			var isPerspective = !chartSpace.chart.view3D.rAngAx;
+			
+			var isBar = typeChart === historyitem_type_BarChart && chart && chart.barDir !== BAR_DIR_BAR;
+			var isHBar = typeChart === historyitem_type_BarChart && chart && chart.barDir === BAR_DIR_BAR;
+			var isLine = typeChart === historyitem_type_LineChart;
+			var isPie = typeChart === historyitem_type_PieChart;
+			var isArea = typeChart === historyitem_type_AreaChart;
+			
+			if(!isPerspective && (isBar || isLine || isHBar || isPie))
+			{
+				res = true;
+			}
+			else if(isPerspective && (isBar || isLine))
+			{
+				res = true;
+			}
 		}
 		
 		return res;
