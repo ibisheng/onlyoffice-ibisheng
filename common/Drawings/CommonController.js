@@ -2510,6 +2510,25 @@ DrawingObjectsController.prototype =
                         chart.setDefaultWalls();
                         new_chart_type.set3D(true);
                     }
+                    else
+                    {
+                        if(chart.view3D)
+                        {
+                            chart.setView3D(null);
+                        }
+                        if(chart.floor)
+                        {
+                            chart.setFloor(null);
+                        }
+                        if(chart.sideWall)
+                        {
+                            chart.setSideWall(null);
+                        }
+                        if(chart.backWall)
+                        {
+                            chart.setBackWall(null);
+                        }
+                    }
 
                     axis_by_types = new_chart_type.getAxisByTypes();
                     val_axis = axis_by_types.valAx;
@@ -2644,6 +2663,25 @@ DrawingObjectsController.prototype =
                         chart.setView3D(CreateView3d(15, 20, true, 100));
                         chart.setDefaultWalls();
                     }
+                    else
+                    {
+                        if(chart.view3D)
+                        {
+                            chart.setView3D(null);
+                        }
+                        if(chart.floor)
+                        {
+                            chart.setFloor(null);
+                        }
+                        if(chart.sideWall)
+                        {
+                            chart.setSideWall(null);
+                        }
+                        if(chart.backWall)
+                        {
+                            chart.setBackWall(null);
+                        }
+                    }
                     new_chart_type.setMarker(b_marker);
                     new_chart_type.setGrouping(need_groupping);
                 }
@@ -2661,6 +2699,25 @@ DrawingObjectsController.prototype =
                     {
                         chart.setView3D(CreateView3d(30, 0, true, 100));
                         chart.setDefaultWalls();
+                    }
+                    else
+                    {
+                        if(chart.view3D)
+                        {
+                            chart.setView3D(null);
+                }
+                        if(chart.floor)
+                        {
+                            chart.setFloor(null);
+                        }
+                        if(chart.sideWall)
+                        {
+                            chart.setSideWall(null);
+                        }
+                        if(chart.backWall)
+                        {
+                            chart.setBackWall(null);
+                        }
                     }
                 }
                 else
