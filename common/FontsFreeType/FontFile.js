@@ -607,7 +607,7 @@ function CFontFile(fileName, faceIndex)
                 oSizes.oBBox.fMinY = (yMin >> 6);
                 oSizes.oBBox.fMaxY = (yMax >> 6);
 
-                if (this.m_bNeedDoBold)
+                if (this.m_bNeedDoBold && this.m_oFontManager.IsAdvanceNeedBoldFonts)
                     oSizes.fAdvanceX += 1;
 
                 var dstM = oSizes.oMetrics;
@@ -686,7 +686,7 @@ function CFontFile(fileName, faceIndex)
                 pString.SetBBox( nIndex, charSymbolObj.oBBox.fMinX, charSymbolObj.oBBox.fMaxY, charSymbolObj.oBBox.fMaxX, charSymbolObj.oBBox.fMinY );
                 fPenX += charSymbolObj.fAdvanceX + this.m_fCharSpacing;
 
-                if (this.m_bNeedDoBold)
+                if (this.m_bNeedDoBold && this.m_oFontManager.IsAdvanceNeedBoldFonts)
                 {
                  // Когда текст делаем жирным сами, то мы увеличиваем расстояние на 1 пиксель в ширину (независимо от DPI и размера текста всегда 1 пиксель)
                     fPenX += 1;
@@ -958,7 +958,7 @@ function CFontFile(fileName, faceIndex)
                 pString.SetBBox (nIndex, charSymbolObj.oBBox.fMinX, charSymbolObj.oBBox.fMaxY, charSymbolObj.oBBox.fMaxX, charSymbolObj.oBBox.fMinY);
                 fPenX += charSymbolObj.fAdvanceX + this.m_fCharSpacing;
 
-                if (this.m_bNeedDoBold)
+                if (this.m_bNeedDoBold && this.m_oFontManager.IsAdvanceNeedBoldFonts)
                 {
                     // Когда текст делаем жирным сами, то мы увеличиваем расстояние на 1 пиксель в ширину (независимо от DPI и размера текста всегда 1 пиксель)
                     fPenX += 1;
@@ -1247,7 +1247,7 @@ function CFontFile(fileName, faceIndex)
         }
         
         fPenX += charSymbolObj.fAdvanceX + this.m_fCharSpacing;
-        if (this.m_bNeedDoBold)
+        if (this.m_bNeedDoBold && this.m_oFontManager.IsAdvanceNeedBoldFonts)
         {
             // Когда текст делаем жирным сами, то мы увеличиваем расстояние на 1 пиксель в ширину (независимо от DPI и размера текста всегда 1 пиксель)
             //fPenX += 1;
@@ -1413,7 +1413,7 @@ function CFontFile(fileName, faceIndex)
             oSizes.oBBox.fMinY = (yMin >> 6);
             oSizes.oBBox.fMaxY = (yMax >> 6);
 
-            if (this.m_bNeedDoBold)
+            if (this.m_bNeedDoBold && this.m_oFontManager.IsAdvanceNeedBoldFonts
                 oSizes.fAdvanceX += 1;
 
             var dstM = oSizes.oMetrics;
