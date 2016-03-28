@@ -409,7 +409,8 @@ function CEditorPage(api)
                 _text_bx_back.setAttribute("type", "password");
             }
 
-            _text_bx_back.willValidate = false;
+			// в некоторых браузерах - readonly
+            try {_text_bx_back.willValidate = false;}catch(err){}
             this.m_oMainView.HtmlElement.appendChild(_text_bx_back);
 
             this.TextBoxBackground = CreateControl("id_text_box_background");
