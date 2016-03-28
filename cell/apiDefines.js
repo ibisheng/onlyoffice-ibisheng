@@ -176,6 +176,13 @@ var c_oAscChangeFilterOptions = {
   style: 2
 };
 
+var c_oAscChangeSelectionFormatTable = {
+    all: 1,
+    data: 2,
+    row: 3,
+    column: 4
+};
+
 // Состояние редактора ячейки
 var c_oAscCellEditorState = {
   editEnd: 0,				// Окончание редактирования

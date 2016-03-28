@@ -12704,7 +12704,71 @@
 		
 		return true;
 	};
-			
+
+    WorksheetView.prototype.af_changeSelectionFormatTable = function(optionType, tableName)
+    {
+        var t = this;
+        var ws = this.model;
+
+        var tablePart = ws._getFilterByDisplayName(tableName);
+
+        if(!tablePart || !(tablePart && tablePart.Ref))
+        {
+            return false;
+        }
+
+        var refTablePart = tablePart.Ref;
+
+        var startCol = this.activeRange.c1;
+        var endCol = this.activeRange.c2;
+        var startRow = this.activeRange.r1;
+        var endRow = this.activeRange.r2;
+
+        var newActiveRange;
+        switch(optionType)
+        {
+            case c_oAscChangeSelectionFilter.all:
+            {
+                startCol = refTablePart.c1;
+                endCol = refTablePart.c2;
+                startRow = refTablePart.r1;
+                endRow = refTablePart.r2;
+
+                break;
+            }
+            case c_oAscChangeSelectionFilter.data:
+            {
+                //TODO проверить есть ли строка заголовков
+                startCol = refTablePart.c1;
+                endCol = refTablePart.c2;
+                startRow = refTablePart.r1 + 1;
+                endRow = refTablePart.r2;
+
+                break;
+            }
+            case c_oAscChangeSelectionFilter.row:
+            {
+                startCol = refTablePart.c1;
+                endCol = refTablePart.c2;
+                startRow = this.activeRange.r1 < refTablePart.r1 ? refTablePart.r1 : this.activeRange.r1;
+                endRow = this.activeRange.r2 > refTablePart.r2 ? refTablePart.r2 : this.activeRange.r2;
+
+                break;
+            }
+            case c_oAscChangeSelectionFilter.column:
+            {
+                startCol = this.activeRange.c1 < refTablePart.c1 ? refTablePart.c1 : this.activeRange.c1;
+                endCol = this.activeRange.c2 > refTablePart.r2 ? refTablePart.r2 : this.activeRange.r2;
+                startRow = refTablePart.r1;
+                endRow = refTablePart.r2;
+
+                break;
+            }
+        }
+
+        t.setSelection(new Asc.Range(startCol, startRow, endCol, endRow));
+    };
+    
     /*
      * Export
      * -----------------------------------------------------------------------------
