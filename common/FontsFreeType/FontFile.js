@@ -1413,7 +1413,7 @@ function CFontFile(fileName, faceIndex)
             oSizes.oBBox.fMinY = (yMin >> 6);
             oSizes.oBBox.fMaxY = (yMax >> 6);
 
-            if (this.m_bNeedDoBold && this.m_oFontManager.IsAdvanceNeedBoldFonts
+            if (this.m_bNeedDoBold && this.m_oFontManager.IsAdvanceNeedBoldFonts)
                 oSizes.fAdvanceX += 1;
 
             var dstM = oSizes.oMetrics;
