@@ -183,6 +183,13 @@ var c_oAscChangeSelectionFormatTable = {
     column: 4
 };
 
+var c_oAscChangeTableStyleInfo = {
+    showColumnStripes: 1,
+    showFirstColumn: 2,
+    showLastColumn: 3,
+    showRowStripes: 4
+};
+
 // Состояние редактора ячейки
 var c_oAscCellEditorState = {
   editEnd: 0,				// Окончание редактирования

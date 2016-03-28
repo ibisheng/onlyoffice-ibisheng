@@ -12705,14 +12705,14 @@
 		return true;
 	};
 
-    WorksheetView.prototype.af_changeSelectionFormatTable = function(optionType, tableName)
+    WorksheetView.prototype.af_changeSelectionFormatTable = function(tableName, optionType)
     {
         var t = this;
         var ws = this.model;
 
-        var tablePart = ws._getFilterByDisplayName(tableName);
+        var tablePart = ws.autoFilters._getFilterByDisplayName(tableName);
 
-        if(!tablePart || !(tablePart && tablePart.Ref))
+        if(!tablePart || (tablePart && !tablePart.Ref))
         {
             return false;
         }
@@ -12727,7 +12727,7 @@
         var newActiveRange;
         switch(optionType)
         {
-            case c_oAscChangeSelectionFilter.all:
+            case c_oAscChangeSelectionFormatTable.all:
             {
                 startCol = refTablePart.c1;
                 endCol = refTablePart.c2;
@@ -12736,7 +12736,7 @@
 
                 break;
             }
-            case c_oAscChangeSelectionFilter.data:
+            case c_oAscChangeSelectionFormatTable.data:
             {
                 //TODO проверить есть ли строка заголовков
                 startCol = refTablePart.c1;
@@ -12746,7 +12746,7 @@
 
                 break;
             }
-            case c_oAscChangeSelectionFilter.row:
+            case c_oAscChangeSelectionFormatTable.row:
             {
                 startCol = refTablePart.c1;
                 endCol = refTablePart.c2;
@@ -12755,7 +12755,7 @@
 
                 break;
             }
-            case c_oAscChangeSelectionFilter.column:
+            case c_oAscChangeSelectionFormatTable.column:
             {
                 startCol = this.activeRange.c1 < refTablePart.c1 ? refTablePart.c1 : this.activeRange.c1;
                 endCol = this.activeRange.c2 > refTablePart.r2 ? refTablePart.r2 : this.activeRange.r2;

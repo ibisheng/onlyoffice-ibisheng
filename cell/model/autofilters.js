@@ -1904,6 +1904,42 @@
 				return result;
 			},
 			
+			changeTableStyleInfo: function(tableName, optionType)
+			{
+				var tablePart = this._getFilterByDisplayName(tableName);
+				
+				if(!tablePart || (tablePart && !tablePart.TableStyleInfo))
+				{
+					return false;
+				}
+				
+				switch(optionType)
+				{
+					case c_oAscChangeTableStyleInfo.showColumnStripes:
+					{
+						tablePart.TableStyleInfo.ShowColumnStripes = !tablePart.TableStyleInfo.ShowColumnStripes;
+						break;
+					}
+					case c_oAscChangeTableStyleInfo.showFirstColumn:
+					{
+						tablePart.TableStyleInfo.ShowFirstColumn = !tablePart.TableStyleInfo.ShowFirstColumn;
+						break;
+					}
+					case c_oAscChangeTableStyleInfo.showLastColumn:
+					{
+						tablePart.TableStyleInfo.ShowLastColumn = !tablePart.TableStyleInfo.ShowLastColumn;
+						break;
+					}
+					case c_oAscChangeTableStyleInfo.showRowStripes:
+					{
+						tablePart.TableStyleInfo.ShowRowStripes = !tablePart.TableStyleInfo.ShowRowStripes;
+						break;
+					}
+				}
+				
+				//TODO add to history
+			};
+			
 			//TODO избавиться от split, передавать cellId и tableName
 			_getPressedFilter: function(activeRange, cellId)
 			{
