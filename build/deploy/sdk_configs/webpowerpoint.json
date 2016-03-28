@@ -174,56 +174,6 @@
             "url": "http://localhost:8080/sdkjs/slide"
         }
     },
-    "deploy": {
-        "copy": {
-            "api": {
-                "expand": true,
-                "cwd": "../../slide/",
-                "src": [
-                    "../common/apiBase.js",
-                    "api.js",
-                    "apiCommon.js",
-                    "apiDefines.js"
-                ],
-                "dest": "<%= pkg.menu_path %>/slide/"
-            },
-            "sdk": {
-                "expand": true,
-                "cwd": "../../slide/",
-                "src": [
-                    "sdk-all.js",
-                    "themes/theme*/**"
-                ],
-                "dest": "<%= pkg.menu_path %>/slide/"
-            },
-            "doc": {
-                "expand": true,
-                "cwd": "../../slide/",
-                "src": "document/**",
-                "dest": "<%= pkg.menu_path %>/slide/"
-            },
-            "log": {
-                "expand": true,
-                "cwd": "../../slide/",
-                "flatten": true,
-                "src": [
-                    "sdk-all.js.map",
-                    "Build/Log/property.map",
-                    "Build/Log/variable.map"
-                ],
-                "dest": "<%= pkg.menu_path %>/slide/"
-            },
-            "sample": {
-                "expand": true,
-                "cwd": "../../slide/",
-                "src": "index.html.deploy",
-                "dest": "<%= pkg.menu_path %>/slide/"
-            }
-        },
-        "store_log": {
-            "dst": "../../slide/Build/Log"
-        }
-    },
     "tasks": {
         "build": [
             "increment_build",

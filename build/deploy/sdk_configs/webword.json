@@ -178,59 +178,6 @@
             "url": "http://localhost:8080/sdkjs/word"
         }
     },
-    "deploy": {
-        "copy": {
-            "api": {
-                "expand": true,
-                "cwd": "../../word/",
-                "src": [
-                    "../common/apiBase.js",
-                    "api.js",
-                    "apiCommon.js",
-                    "apiDefines.js"
-                ],
-                "dest": "<%= pkg.menu_path %>/word/"
-            },
-            "sdk": {
-                "expand": true,
-                "cwd": "../../word/",
-                "src": "sdk-all.js",
-                "dest": "<%= pkg.menu_path %>/word/"
-            },
-            "doc": {
-                "expand": true,
-                "cwd": "../../word/",
-                "src": "document/**",
-                "dest": "<%= pkg.menu_path %>/word/"
-            },
-            "apisettings": {
-                "expand": true,
-                "cwd": "../../common/",
-                "src": [
-                    "spellcheckapisettings.js",
-                    "commonDefines.js",
-                    "apiCommon.js",
-                    "downloaderfiles.js",
-                    "Images/*.cur",
-                    "Native/jquery_native.js",
-                    "Native/native.js"
-                ],
-                "dest": "<%= pkg.menu_path %>/common/"
-            },
-            "log": {
-                "expand": true,
-                "cwd": "../../word/",
-                "src": [
-                    "Build/Log/property.map",
-                    "Build/Log/variable.map"
-                ],
-                "dest": "<%= pkg.menu_path %>/word/"
-            }
-        },
-        "store_log": {
-            "dst": "../../word/Build/Log"
-        }
-    },
     "tasks": {
         "build": [
             "increment_build",
