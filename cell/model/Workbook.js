@@ -8280,7 +8280,7 @@ Range.prototype.cleanHyperlinks=function(){
 		this.removeHyperlink(aHyperlinks.inner[i].data);
 	History.EndTransaction();
 };
-Range.prototype.sort=function(nOption, nStartCol){
+Range.prototype.sort=function(nOption, nStartCol, colorText, colorFill){
 	//todo горизонтальная сортировка
 	var aMerged = this.worksheet.mergeManager.get(this.bbox);
 	if(aMerged.outer.length > 0 || (aMerged.inner.length > 0 && null == _isSameSizeMerged(this.bbox, aMerged.inner)))
@@ -8336,6 +8336,23 @@ Range.prototype.sort=function(nOption, nStartCol){
 				if(nLastRow0 < nRow0)
 					nLastRow0 = nRow0;
 				var val = oCell.getValueWithoutFormat();
+				
+				//for sort color
+				var colorFillCell, colorsTextCell = null;
+				if(colorFill)
+				{
+					var styleCell = oCell.getStyle();
+					colorFillCell = styleCell !== null ? styleCell.fill : null;
+				}
+				else if(colorText)
+				{
+					var value2 = oCell.getValue2();
+					for(var n = 0; n < value2.length; n++)
+					{
+						colorsTextCell.push(value2[n].c);
+					}
+				}
+				
 				var nNumber = null;
 				var sText = null;
 				if("" != val)
@@ -8345,7 +8362,11 @@ Range.prototype.sort=function(nOption, nStartCol){
 						nNumber = nVal;
 					else
 						sText = val;
-					aSortElems.push({row: nRow0, num: nNumber, text: sText});
+					aSortElems.push({row: nRow0, num: nNumber, text: sText, colorFill: colorFillCell, colorsText: colorsTextCell});
+				}
+				else if(colorFill || colorText)
+				{
+					aSortElems.push({row: nRow0, num: nNumber, text: sText, colorFill: colorFillCell, colorsText: colorsTextCell});
 				}
 			}
 		}
@@ -8375,28 +8396,78 @@ Range.prototype.sort=function(nOption, nStartCol){
 	function strcmp ( str1, str2 ) {
 			return ( ( str1 == str2 ) ? 0 : ( ( str1 > str2 ) ? 1 : -1 ) );
 		}
-	aSortElems.sort(function(a, b){
-		var res = 0;
-		if(null != a.text)
+	
+	
+	//color sort
+	var colorFillCmp = function(color1, color2)
+	{
+		var res = false;
+		if(colorFill)
 		{
-			if(null != b.text)
-				res = strcmp(a.text.toUpperCase(), b.text.toUpperCase());
-			else
-				res = 1;
+			res = color1 !== null && color2 !== null && color1.isEqual(color2) === true ? true : false;
 		}
-		else if(null != a.num)
+		else if(colorText && color1 && color1.length)
 		{
-			if(null != b.num)
-				res = a.num - b.num;
-			else
-				res = -1;
+			for(var n = 0; n < color1.length; n++)
+			{
+				if(color1[n] && color1[n].isEqual(color2))
+				{
+					res = true;
+					break;
+				}
+			}
 		}
-		if(0 == res)
-			res = a.row - b.row;
-		else if(!bAscent)
-			res = -res;
+		
 		return res;
-	});
+	};
+	
+	if(colorText || colorFill)
+	{
+		var newArrayNeedColor = [];
+		var newArrayAnotherColor = [];
+		var sortColor = colorText ? colorText : colorFill;
+		
+		for(var i = 0; i < aSortElems.length; i++)
+		{
+			var color = colorFill ? aSortElems[i].colorFill : aSortElems[i].colorText;
+			if(colorFillCmp(color, sortColor))
+			{
+				newArrayNeedColor.push(aSortElems[i]);
+			}
+			else
+			{
+				newArrayAnotherColor.push(aSortElems[i]);
+			}
+		}
+		
+		aSortElems = newArrayAnotherColor.concat(newArrayNeedColor);
+	}
+	else
+	{
+		aSortElems.sort(function(a, b){
+			var res = 0;
+			if(null != a.text)
+			{
+				if(null != b.text)
+					res = strcmp(a.text.toUpperCase(), b.text.toUpperCase());
+				else
+					res = 1;
+			}
+			else if(null != a.num)
+			{
+				if(null != b.num)
+					res = a.num - b.num;
+				else
+					res = -1;
+			}
+			if(0 == res)
+				res = a.row - b.row;
+			else if(!bAscent)
+				res = -res;
+			return res;
+		});
+	}
+	
 	//проверяем что это не пустая операция
 	var aSortData = [];
 	var nHiddenCount = 0;
