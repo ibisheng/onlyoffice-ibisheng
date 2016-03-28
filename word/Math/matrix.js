@@ -1323,17 +1323,15 @@ CEqArray.prototype.getColsCount = function()
 };
 CEqArray.prototype.Resize = function(oMeasure, RPI)
 {
-    // на случай, чтобы не затереть массив
-    //var CurrAmperWPoints = RPI.AmperWPoints,
-    //    CurrEqArray     = RPI.bEqArray;
-
-    var NewRPI = RPI.Copy();
-    NewRPI.bEqArray = true;
+    var bEqArray = RPI.bEqArray;
+    RPI.bEqArray = true;
 
     for(var i = 0; i < this.nRow; i++)
-        this.elements[i][0].Resize(oMeasure, NewRPI);
+        this.elements[i][0].Resize(oMeasure, RPI);
 
     this.recalculateSize(oMeasure);
+
+    RPI.bEqArray = bEqArray;
 };
 CEqArray.prototype.getMetrics = function()
 {
@@ -1343,7 +1341,6 @@ CEqArray.prototype.getMetrics = function()
 
     // нумерация начинается с нуля, поэтому все четные точки идут с нечетными номерами в массиве
 
-    //var lngW = RPI.Widths.length; // this.nRow
     var EndWidths = 0;
 
     var even, // четная точка

@@ -12,7 +12,7 @@ function CMathPropertiesSettings()
     this.brkBin     = null;
 
     this.defJc      = null;
-    this.dispDef    = null;
+    this.dispDef    = null;  // свойство: применять/ не применять paragraph settings (в тч defJc)
 
     this.intLim     = null;
     this.naryLim    = null;
@@ -22,22 +22,41 @@ function CMathPropertiesSettings()
     this.wrapIndent = null;
     this.wrapRight  = null;
 
+    this.smallFrac  = null;
+
     //   не реализовано    //
+
+    // for minus operator
+    // when brkBin is set to repeat
     this.brkBinSub  = null;
 
-    this.interSp    = null;
-
-    this.intraSp    = null;
+    //***** WORD IGNORES followings parameters *****//
 
     // mathFont: в качестве font поддерживается только Cambria Math
     // остальные шрифты  возможно будут поддержаны MS Word в будущем
 
     this.mathFont   = null;
 
+    // Default font for math zones
+    // Gives a drop-down list of math fonts that can be used as the default math font to be used in the document.
+    // Currently only Cambria Math has thorough math support, but others such as the STIX fonts are coming soon.
+
+    // http://blogs.msdn.com/b/murrays/archive/2008/10/27/default-document-math-properties.aspx
+
+
+    // http://msdn.microsoft.com/en-us/library/ff529906(v=office.12).aspx
+    // Word ignores the interSp attribute and fails to write it back out.
+    this.interSp    = null;
+    // http://msdn.microsoft.com/en-us/library/ff529301(v=office.12).aspx
+    // Word does not implement this feature and does not write the intraSp element.
+    this.intraSp    = null;
+
+    // http://msdn.microsoft.com/en-us/library/ff533406(v=office.12).aspx
     this.postSp     = null;
     this.preSp      = null;
 
-    this.smallFrac  = null;
+    // RichEdit Hot Keys
+    // http://blogs.msdn.com/b/murrays/archive/2013/10/30/richedit-hot-keys.aspx
 
     //*********************//
 }
@@ -51,6 +70,7 @@ CMathPropertiesSettings.prototype.SetDefaultPr = function()
     this.lMargin    = 0;
     this.naryLim    = NARY_UndOvr;
     this.rMargin    = 0;
+    this.smallFrac  = false;
     this.wrapIndent = 25; // mm
     this.wrapRight  = false;
 };
@@ -85,6 +105,9 @@ CMathPropertiesSettings.prototype.Merge = function(Pr)
 
     if(Pr.wrapRight !== null && Pr.wrapRight !== undefined)
         this.wrapRight = Pr.wrapRight;
+
+    if(Pr.smallFrac !== null && Pr.smallFrac !== undefined)
+        this.smallFrac = Pr.smallFrac;
 };
 CMathPropertiesSettings.prototype.Copy = function()
 {
@@ -376,6 +399,11 @@ CMathSettings.prototype.Get_WrapRight = function()
     this.SetCompiledPr();
     return this.CompiledPr.wrapRight;
 };
+CMathSettings.prototype.Get_SmallFrac = function()
+{
+    this.SetCompiledPr();
+    return this.CompiledPr.smallFrac;
+};
 CMathSettings.prototype.Load_Settings = function()
 {
     var Settings = {};
@@ -605,6 +633,7 @@ function CMathMenuSettings(oMathPr)
         this.RightMargin    = oMathPr.rMargin/10;
         this.WrapIndent     = oMathPr.wrapIndent/10;
         this.WrapRight      = oMathPr.wrapRight;
+        this.SmallFraction  = oMathPr.smallFrac;
     }
     else
     {
@@ -617,6 +646,7 @@ function CMathMenuSettings(oMathPr)
         this.RightMargin     = undefined;
         this.WrapIndent      = undefined;
         this.WrapRight       = undefined;
+        this.SmallFraction   = undefined;
     }
 }
 CMathMenuSettings.prototype.get_BreakBin = function(){ return this.BrkBin;};
@@ -637,6 +667,8 @@ CMathMenuSettings.prototype.get_WrapIndent = function(){return this.WrapIndent;}
 CMathMenuSettings.prototype.put_WrapIndent = function(WrapIndent){this.WrapIndent = WrapIndent;};
 CMathMenuSettings.prototype.get_WrapRight = function(){ return this.WrapRight;};
 CMathMenuSettings.prototype.put_WrapRight = function(WrapRight){ this.WrapRight = WrapRight;};
+CMathMenuSettings.prototype.get_SmallFraction = function() {return this.SmallFraction;};
+CMathMenuSettings.prototype.put_SmallFraction = function(SmallFrac) {this.SmallFraction = SmallFrac;};
 
 window["CMathMenuSettings"]                         = CMathMenuSettings;
 CMathMenuSettings.prototype["get_BreakBin"]        = CMathMenuSettings.prototype.get_BreakBin;
@@ -657,6 +689,8 @@ CMathMenuSettings.prototype["get_WrapIndent"]      = CMathMenuSettings.prototype
 CMathMenuSettings.prototype["put_WrapIndent"]      = CMathMenuSettings.prototype.put_WrapIndent;
 CMathMenuSettings.prototype["get_WrapRight"]       = CMathMenuSettings.prototype.get_WrapRight;
 CMathMenuSettings.prototype["put_WrapRight"]       = CMathMenuSettings.prototype.put_WrapRight;
+CMathMenuSettings.prototype["get_SmallFraction"]   = CMathMenuSettings.prototype.get_SmallFraction;
+CMathMenuSettings.prototype["put_SmallFraction"]   = CMathMenuSettings.prototype.put_SmallFraction;
 
 
 function Get_WordDocumentDefaultMathSettings()
@@ -1213,6 +1247,7 @@ ParaMath.prototype.Add = function(Item)
             this.Get_ParaContentPos(false, false, ContentPos);
 
         var TextPr = this.Root.GetMathTextPrForMenu(ContentPos, 0);
+        var bPlh = oContent.IsPlaceholder();
 
         // Нам нужно разделить данный Run на 2 части
         var RightRun = Run.Split2(Run.State.ContentPos);
@@ -1227,18 +1262,16 @@ ParaMath.prototype.Add = function(Item)
         oContent.Correct_ContentCurPos();
 
         var lng2 = oContent.Content.length;
-        var Pos_ApplyTextPr =
-        {
-            StartPos:   StartPos + 1,
-            EndPos:     StartPos + lng2 - lng
-        };
 
         TextPr.RFonts.Set_All("Cambria Math", -1);
 
         if (true === TrackRevisions)
             LogicDocument.Set_TrackRevisions(false);
 
-        oContent.Apply_TextPr(TextPr, undefined, false, Pos_ApplyTextPr);
+        if(bPlh)
+            oContent.Apply_TextPr(TextPr, undefined, true);
+        else
+            oContent.Apply_TextPr(TextPr, undefined, false, StartPos + 1, StartPos + lng2 - lng);
 
         if (true === TrackRevisions)
             LogicDocument.Set_TrackRevisions(true);
@@ -2685,106 +2718,6 @@ ParaMath.prototype.GetPlh = function(oMeasure, font)
 
     return oMeasure.Measure2Code(0x2B1A).Height;
 };
-
-ParaMath.prototype.SetMathProperties = function(props)
-{
-    //*****  FOR FORMULA  *****//
-
-    // В документации везде, где нет примера использования свояства, означает, что Word не поддерживает это свойство !
-
-    if(props.naryLim == NARY_UndOvr || props.naryLim  == NARY_SubSup)
-        this.MathPr.naryLim = props.naryLim;
-
-    if(props.intLim == NARY_UndOvr || props.intLim  == NARY_SubSup)
-        this.MathPr.intLim = props.intLim;
-
-    if(props.brkBin == BREAK_BEFORE || props.brkBin == BREAK_AFTER || props.brkBin == BREAK_REPEAT)
-        this.MathPr.brkBin = props.brkBin;
-
-    // for minus operator
-    // when brkBin is set to repeat
-    if(props.brkSubBin == BREAK_MIN_MIN || props.brkSubBin == BREAK_PLUS_MIN || props.brkSubBin == BREAK_MIN_PLUS)
-        this.MathPr.brkSubBin = props.brkSubBin;
-
-    // в случае если smallFrac = true,
-    if(props.smallFrac == true || props.smallFrac == false)
-        this.MathPr.smallFrac = props.smallFrac;
-
-    if(props.wrapIndent + 0 == props.wrapIndent && isNaN(props.wrapIndent)) // проверка на число
-        this.MathPr.wrapIndent = props.wrapIndent/1440;
-
-    //********  check for element 0x1FFD - 0xA721  *******//
-    // This element specifies the right justification of the wrapped line of an instance of mathematical text
-    // Instance : Arrows 0x2190-0x21B3, 0x21B6, 0x21B7, 0x21BA-0x21E9, 0x21F4-0x21FF,
-    // 0x3D, 0x2234 - 0x2237, 0x2239, 0x223B - 0x228B, 0x228F - 0x2292, 0x22A2 - 0x22B9,
-    // 0x22C8-0x22CD, 0x22D0, 0x22D1, 0x22D5 - 0x22EE,0x22F0-0x22FF, 0x27F0 - 0x297F (arrows and fishes), 0x29CE - 0x29D5
-    // 0x2A66 - 0x2AF0 (equals), 0x2AF2-0x2AF3, 0x2AF7 - 0x2AFA
-
-
-    if(props.wrapRight == true || props.wrapRight == false)
-        this.MathPr.wrapRight = props.wrapRight;
-
-
-    //*****  FOR DOCUMENT  *****//
-
-    // defaultJc
-    // выравнивание формулы в документе
-
-    this.MathPr.defJc = props.defJc;
-
-    // dispDef
-    // свойство: применять/ не применять paragraph settings (в тч defaultJc)
-
-    this.MathPr.dispDef = props.dispDef;
-
-    // added to paragraph settings for margins
-    // rMargin
-    // lMargin
-
-    this.MathPr.lMargin = props.lMargin;
-    this.MathPr.rMargin = props.rMargin;
-
-    //*****  НЕПОДДЕРЖИВАЕМЫЕ Вордом свойства  *****//
-
-    // mathFont: в качестве font поддерживается только Cambria Math
-    // остальные шрифты  возможно будут поддержаны MS в будущем
-
-    this.MathPr.mathFont = props.mathFont;
-
-    // Default font for math zones
-    // Gives a drop-down list of math fonts that can be used as the default math font to be used in the document.
-    // Currently only Cambria Math has thorough math support, but others such as the STIX fonts are coming soon.
-
-    // http://blogs.msdn.com/b/murrays/archive/2008/10/27/default-document-math-properties.aspx
-
-
-    //*****  FOR FORMULA  *****//
-
-    // http://msdn.microsoft.com/en-us/library/ff529906(v=office.12).aspx
-    // Word ignores the interSp attribute and fails to write it back out.
-    this.MathPr.interSp = props.interSp;
-
-    // http://msdn.microsoft.com/en-us/library/ff529301(v=office.12).aspx
-    // Word does not implement this feature and does not write the intraSp element.
-    this.MathPr.intraSp = intraSp;
-
-    //*****  FOR DOCUMENT  *****//
-
-    // http://msdn.microsoft.com/en-us/library/ff533406(v=office.12).aspx
-    // Word ignores and discards postSp
-    this.MathPr.postSp = props.postSp;
-    this.MathPr.preSp = props.preSp;
-
-    // RichEdit Hot Keys
-    // http://blogs.msdn.com/b/murrays/archive/2013/10/30/richedit-hot-keys.aspx
-
-};
-
-ParaMath.prototype.GetMathPr = function()
-{
-    return this.MathPr;
-};
-
 ParaMath.prototype.Get_Default_TPrp = function()
 {
     return this.DefaultTextPr;

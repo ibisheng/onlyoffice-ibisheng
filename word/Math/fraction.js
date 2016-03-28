@@ -303,7 +303,12 @@ CFraction.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI, GapsInf
 
     var ArgSzNumDen = ArgSize.Copy();
 
-    if(RPI.bInline == true && (this.Pr.type === BAR_FRACTION || this.Pr.type == NO_BAR_FRACTION)) // уменьшае размер числителя и знаменателя
+    var oMathSettings = Get_WordDocumentDefaultMathSettings();
+
+    var bInlineBarFaction = RPI.bInline == true && (this.Pr.type === BAR_FRACTION || this.Pr.type == NO_BAR_FRACTION),
+        bReduceSize       = (RPI.bSmallFraction || RPI.bDecreasedComp == true) && true == oMathSettings.Get_SmallFrac();
+
+    if(bInlineBarFaction || bReduceSize) // уменьшае размер числителя и знаменателя
     {
         ArgSzNumDen.Decrease();        // для контентов числителя и знаменателя
         this.ArgSize.SetValue(-1);     // для CtrPrp
@@ -322,17 +327,24 @@ CFraction.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI, GapsInf
 
     this.ApplyProperties(RPI);
 
-    var NewRPI = RPI.Copy();
+    var bDecreasedComp = RPI.bDecreasedComp,
+        bSmallFraction = RPI.bSmallFraction;
+
     if(this.Pr.type !== LINEAR_FRACTION)
-        NewRPI.bDecreasedComp = true;
+        RPI.bDecreasedComp = true;
+
+    RPI.bSmallFraction = true;
 
     // setGaps обязательно после того как смержили CtrPrp (Set_CompiledCtrPrp)
 
     if(this.bInside == false)
         GapsInfo.setGaps(this, this.TextPrControlLetter.FontSize);
 
-    this.Numerator.PreRecalc(this, ParaMath, ArgSzNumDen, NewRPI);
-    this.Denominator.PreRecalc(this, ParaMath, ArgSzNumDen, NewRPI);
+    this.Numerator.PreRecalc(this, ParaMath, ArgSzNumDen, RPI);
+    this.Denominator.PreRecalc(this, ParaMath, ArgSzNumDen, RPI);
+
+    RPI.bDecreasedComp = bDecreasedComp;
+    RPI.bSmallFraction = bSmallFraction;
 };
 CFraction.prototype.recalculateSize = function(oMeasure)
 {

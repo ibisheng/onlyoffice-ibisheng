@@ -418,8 +418,15 @@ CRadical.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI, GapsInfo
     var ArgSzIter = new CMathArgSize();
     ArgSzIter.SetValue(-2);
 
-    this.Iterator.PreRecalc(this, ParaMath, ArgSzIter, RPI);
+
     this.RealBase.PreRecalc(this, ParaMath, ArgSize, RPI);
+
+    var bDecreasedComp = RPI.bDecreasedComp;
+    RPI.bDecreasedComp = true;
+
+    this.Iterator.PreRecalc(this, ParaMath, ArgSzIter, RPI);
+
+    RPI.bDecreasedComp = bDecreasedComp;
 
     if(this.bInside == false)
         GapsInfo.setGaps(this, this.TextPrControlLetter.FontSize);

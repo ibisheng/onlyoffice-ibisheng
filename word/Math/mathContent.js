@@ -10,22 +10,8 @@ function CRPI()
     this.bMathFunc                 = false;
     this.bRecalcCtrPrp             = false; // пересчет ctrPrp нужен, когда на Undo и тп изменился размер первого Run, а ctrPrp уже для мат объектов пересчитались
     this.bCorrect_ConvertFontSize  = false;
+    this.bSmallFraction            = false;
 }
-CRPI.prototype.Copy = function()
-{
-    var RPI = new CRPI();
-
-    RPI.bInline                   = this.bInline;
-    RPI.bDecreasedComp            = this.bDecreasedComp;
-    RPI.bChangeInline             = this.bChangeInline;
-    RPI.bNaryInline               = this.bNaryInline;
-    RPI.bEqArray                  = this.bEqArray;
-    RPI.bMathFunc                 = this.bMathFunc;
-    RPI.bRecalcCtrPrp             = this.bRecalcCtrPrp;
-    RPI.bCorrect_ConvertFontSize  = this.bCorrect_ConvertFontSize;
-
-    return RPI;
-};
 CRPI.prototype.MergeMathInfo = function(MathInfo)
 {
     this.bInline                   = MathInfo.bInline || (MathInfo.bInternalRanges == true && MathInfo.bStartRanges == false);
@@ -1307,10 +1293,9 @@ CMathContent.prototype.Correct_Content = function(bInnerCorrection)
             {
                 bEmptyContent = false;
             }
-
         }
 
-        if(bEmptyContent)
+        if(bEmptyContent == true && this.bRoot == false)
         {
             this.Content[0].fillPlaceholders();
             this.Content[0].Recalc_CompiledPr(true);
@@ -1473,7 +1458,7 @@ CMathContent.prototype.GetMathTextPrForMenu = function(ContentPos, Depth)
 
     return this.Content[pos].GetMathTextPrForMenu(ContentPos, Depth + 1);
 };
-CMathContent.prototype.Apply_TextPr = function(TextPr, IncFontSize, ApplyToAll, PosForMenu)
+CMathContent.prototype.Apply_TextPr = function(TextPr, IncFontSize, ApplyToAll, StartPos, EndPos)
 {
     if ( true === ApplyToAll )
     {
@@ -1484,10 +1469,10 @@ CMathContent.prototype.Apply_TextPr = function(TextPr, IncFontSize, ApplyToAll, 
     {
         var StartPos, EndPos, bMenu = false;
 
-        if(PosForMenu !== undefined)
+        if(StartPos !== undefined && EndPos !== undefined)
         {
-            StartPos = PosForMenu.StartPos;
-            EndPos   = PosForMenu.EndPos;
+            StartPos = StartPos;
+            EndPos   = EndPos;
 
             bMenu = true;
         }

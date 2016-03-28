@@ -23,7 +23,6 @@ function CMathBase(bInside)
     this.CtrPrp 			 = new CTextPr();
     this.CompiledCtrPrp 	 = new CTextPr(); 
     this.TextPrControlLetter = new CTextPr();
-	//this.CtrPr               = new CCtrPr();
 
     this.ArgSize             = new CMathArgSize();
 

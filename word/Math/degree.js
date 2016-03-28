@@ -85,12 +85,14 @@ CDegreeBase.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI, GapsI
     var ArgSzDegr = ArgSize.Copy();
     ArgSzDegr.Decrease();
 
-    var RPIDegr = RPI.Copy();
-    RPIDegr.bDecreasedComp = true;
-
     this.bNaryInline = RPI.bNaryInline;
 
-    this.iterContent.PreRecalc(this, ParaMath, ArgSzDegr, RPIDegr);
+    var bDecreasedComp = RPI.bDecreasedComp;
+    RPI.bDecreasedComp = true;
+
+    this.iterContent.PreRecalc(this, ParaMath, ArgSzDegr, RPI);
+
+    RPI.bDecreasedComp = bDecreasedComp;
 };
 CDegreeBase.prototype.Resize = function(oMeasure, RPI)
 {
@@ -536,11 +538,13 @@ CIterators.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI, GapsIn
 
     this.Set_CompiledCtrPrp(Parent, ParaMath, RPI);
 
-    var RPI_ITER = RPI.Copy();
-    RPI_ITER.bDecreasedComp = true;
+    var bDecreasedComp = RPI.bDecreasedComp;
+    RPI.bDecreasedComp = true;
 
-    this.iterUp.PreRecalc(this, ParaMath, ArgSzIters, RPI_ITER);
-    this.iterDn.PreRecalc(this, ParaMath, ArgSzIters, RPI_ITER);
+    this.iterUp.PreRecalc(this, ParaMath, ArgSzIters, RPI);
+    this.iterDn.PreRecalc(this, ParaMath, ArgSzIters, RPI);
+
+    RPI.bDecreasedComp = bDecreasedComp;
 };
 CIterators.prototype.recalculateSize = function(oMeasure, dH, ascent)
 {

@@ -87,10 +87,12 @@ CLimitPrimary.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI, Gap
     var ArgSzIter = ArgSize.Copy();
     ArgSzIter.Decrease();
 
-    var NewRPI = RPI.Copy();
-    NewRPI.bDecreasedComp = true;
+    var bDecreasedComp = RPI.bDecreasedComp;
+    RPI.bDecreasedComp = true;
 
-    this.Iterator.PreRecalc(this, ParaMath, ArgSzIter, NewRPI);
+    this.Iterator.PreRecalc(this, ParaMath, ArgSzIter, RPI);
+
+    RPI.bDecreasedComp = bDecreasedComp;
 };
 CLimitPrimary.prototype.Resize = function(oMeasure, RPI)
 {
@@ -343,10 +345,12 @@ CMathFunc.prototype.init = function(props)
 };
 CMathFunc.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI, GapsInfo)
 {
-    var NewRPI = RPI.Copy();
-    NewRPI.bMathFunc = true;
+    var bMathFunc = RPI.bMathFunc;
+    RPI.bMathFunc = true;
 
-    CMathFunc.superclass.PreRecalc.call(this, Parent, ParaMath, ArgSize, NewRPI, GapsInfo);
+    CMathFunc.superclass.PreRecalc.call(this, Parent, ParaMath, ArgSize, RPI, GapsInfo);
+
+    RPI.bMathFunc = bMathFunc;
 };
 CMathFunc.prototype.GetLastElement = function()
 {

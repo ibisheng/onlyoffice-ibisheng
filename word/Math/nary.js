@@ -305,12 +305,14 @@ CNary.prototype.private_GetLimLoc = function()
 };
 CNary.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI, GapsInfo)
 {
-    var NewRPI = RPI.Copy();
+    var bNaryInline = RPI.bNaryInline;
 
     if(RPI.bInline || RPI.bDecreasedComp)
-        NewRPI.bNaryInline = true;
+        RPI.bNaryInline = true;
 
-    CNary.superclass.PreRecalc.call(this, Parent, ParaMath, ArgSize, NewRPI, GapsInfo);
+    CNary.superclass.PreRecalc.call(this, Parent, ParaMath, ArgSize, RPI, GapsInfo);
+
+    RPI.bNaryInline = bNaryInline;
 };
 CNary.prototype.getSign = function(chrCode, chrType)
 {    
@@ -871,11 +873,14 @@ CNaryUnd.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI)
     var ArgSzUnd = ArgSize.Copy();
     ArgSzUnd.Decrease();
 
-    var RPIUnd = RPI.Copy();
-    RPIUnd.bDecreasedComp = true;
-
-    this.elements[0][0].PreRecalc(this, ParaMath, ArgSzUnd, RPIUnd);
     this.elements[1][0].PreRecalc(this, ParaMath, ArgSize,  RPI);
+
+    var bDecreasedComp = RPI.bDecreasedComp;
+    RPI.bDecreasedComp = true;
+
+    this.elements[0][0].PreRecalc(this, ParaMath, ArgSzUnd, RPI);
+
+    RPI.bDecreasedComp = bDecreasedComp;
 };
 CNaryUnd.prototype.setBase = function(base)
 {
@@ -909,11 +914,14 @@ CNaryOvr.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI)
     var ArgSzOvr = ArgSize.Copy();
     ArgSzOvr.Decrease();
 
-    var RPIOvr = RPI.Copy();
-    RPIOvr.bDecreasedComp = true;
-
     this.elements[0][0].PreRecalc(this, ParaMath, ArgSize,  RPI);
-    this.elements[1][0].PreRecalc(this, ParaMath, ArgSzOvr, RPIOvr);
+
+    var bDecreasedComp = RPI.bDecreasedComp;
+    RPI.bDecreasedComp = true;
+
+    this.elements[1][0].PreRecalc(this, ParaMath, ArgSzOvr, RPI);
+
+    RPI.bDecreasedComp = bDecreasedComp;
 };
 CNaryOvr.prototype.recalculateSize = function()
 {
@@ -976,13 +984,16 @@ CNaryUndOvr.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI)
     var ArgSzIter = ArgSize.Copy();
     ArgSzIter.Decrease();
 
-    var RPI_Iter = RPI.Copy();
-    RPI_Iter.bDecreasedComp = true;
-
-
-    this.elements[0][0].PreRecalc(this, ParaMath, ArgSzIter, RPI_Iter);
     this.elements[1][0].PreRecalc(this, ParaMath, ArgSize,  RPI);
-    this.elements[2][0].PreRecalc(this, ParaMath, ArgSzIter, RPI_Iter);
+
+    var bDecreasedComp = RPI.bDecreasedComp;
+    RPI.bDecreasedComp = true;
+
+    this.elements[0][0].PreRecalc(this, ParaMath, ArgSzIter, RPI);
+
+    this.elements[2][0].PreRecalc(this, ParaMath, ArgSzIter, RPI);
+
+    RPI.bDecreasedComp = bDecreasedComp;
 };
 CNaryUndOvr.prototype.recalculateSize = function()
 {
