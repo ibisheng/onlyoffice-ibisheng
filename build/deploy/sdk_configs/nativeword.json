@@ -169,7 +169,7 @@
             "dst": "../../word/sdk-all.js",
             "externs": [
                 "../../common/Native/jquery_native.js",
-                "../../common/3rdparty/XRegExp/xregexp-all-min.js"
+                "../../../web-apps/vendor/xregexp/xregexp-all-min.js"
             ],
             "map": "sdk-all.js.map",
             "log": "../../word/Build/Log"

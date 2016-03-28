@@ -1,4 +1,5 @@
 module.exports = function(grunt) {
+	require('google-closure-compiler').grunt(grunt);
     var revision="unknown", defaultConfig, packageFile, toolsConfig, toolsFile;
 	
 	var path = require('path');
@@ -7,7 +8,6 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-concat');
 	grunt.loadNpmTasks('grunt-contrib-copy');
     grunt.loadNpmTasks('grunt-exec');
-	grunt.loadNpmTasks('grunt-closure-tools');
 	grunt.loadNpmTasks('grunt-replace');
 	
 	grunt.registerTask('get_svn_info', 'Initialize svn information', function () {
@@ -205,32 +205,27 @@ module.exports = function(grunt) {
 					packageFile['compile']['defines']['dst'],
 					map_record_file_path ];
 		grunt.initConfig({
-			closureCompiler: {
+			pkg: grunt.file.readJSON(defaultConfig),
+			'closure-compiler': {
+				build: {
+					files: {
+						'<%= pkg.compile.sdk.dst %>': packageFile['compile']['sdk']['src']
+					},
 				options: {
-					compilerFile: compilerFile,
-					javaFlags: ['-Xms2048m']
-				},
-				sdk: {
-					TEMPcompilerOpts: {
 						compilation_level: compilation_level,
-						externs: packageFile['compile']['sdk']['externs'],
-						define: packageFile['compile']['sdk']['define'],
 						warning_level: 'QUIET',
+						externs: packageFile['compile']['sdk']['externs'],
 						variable_renaming_report: packageFile['compile']['sdk']['log'] + '/variable.map',
 						property_renaming_report: packageFile['compile']['sdk']['log'] + '/property.map'/*,
 						create_source_map: map_file_path,
 						source_map_format: "V3"*/
 					},
-					src: packageFile['compile']['sdk']['src'],
-					dest: packageFile['compile']['sdk']['dst']
-				},
 				defines: {
-					TEMPcompilerOpts: {
+						options: {
 						compilation_level: 'SIMPLE',
 						warning_level: 'QUIET'
-					},
-					src: packageFile['compile']['defines']['src'],
-					dest: packageFile['compile']['defines']['dst']
+				}
+					}
 				}
 			},
 			create_map_file: {},
@@ -239,7 +234,6 @@ module.exports = function(grunt) {
 				packageFile['compile']['defines']['dst'],
 				map_record_file_path
 			],
-			pkg: grunt.file.readJSON(defaultConfig),
 			replace: {
 				version: {
 					options: {
@@ -257,11 +251,11 @@ module.exports = function(grunt) {
 		});
 	});
 	
-	grunt.registerTask('compile_sdk', ['compile_sdk_init:ADVANCED', 'closureCompiler', 'concat', 'replace', 'clean']);
-	grunt.registerTask('compile_sdk_fast', ['compile_sdk_init:WHITESPACE_ONLY', 'closureCompiler', 'concat', 'replace', 'clean']);
+	grunt.registerTask('compile_sdk', ['compile_sdk_init:ADVANCED', 'closure-compiler', 'concat', 'replace', 'clean']);
+	grunt.registerTask('compile_sdk_fast', ['compile_sdk_init:WHITESPACE_ONLY', 'closure-compiler', 'concat', 'replace', 'clean']);
 		
-	grunt.registerTask('compile_sdk_native', ['compile_sdk_init:ADVANCED', 'closureCompiler:sdk', 'concat', 'replace', 'clean']);
-	grunt.registerTask('compile_sdk_native_fast', ['compile_sdk_init:WHITESPACE_ONLY', 'closureCompiler:sdk', 'concat', 'replace', 'clean']);
+	grunt.registerTask('compile_sdk_native', ['compile_sdk_init:ADVANCED', 'closure-compiler:sdk', 'concat', 'replace', 'clean']);
+	grunt.registerTask('compile_sdk_native_fast', ['compile_sdk_init:WHITESPACE_ONLY', 'closure-compiler:sdk', 'concat', 'replace', 'clean']);
 	
 	grunt.registerTask('deploy_sdk_init', function() {
         grunt.initConfig({
