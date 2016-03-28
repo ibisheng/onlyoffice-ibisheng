@@ -1,4 +1,4 @@
-"use strict";
+﻿"use strict";
 
 /* WorksheetView.js
  *
@@ -11943,7 +11943,7 @@
             if ( false === isSuccess ) {
                 return;
             }
-			var sortProps = t.model.autoFilters.getPropForSort(type, cellId, ar, displayName)
+			var sortProps = t.model.autoFilters.getPropForSort(type, cellId, ar, displayName);
 
 			var onSortAutoFilterCallBack = function()
 			{

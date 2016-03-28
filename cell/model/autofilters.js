@@ -1938,7 +1938,7 @@
 				}
 				
 				//TODO add to history
-			};
+			},
 			
 			//TODO избавиться от split, передавать cellId и tableName
 			_getPressedFilter: function(activeRange, cellId)
