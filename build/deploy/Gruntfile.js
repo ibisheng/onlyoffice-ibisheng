@@ -2,6 +2,7 @@ module.exports = function(grunt) {
 	require('google-closure-compiler').grunt(grunt);
     var revision="unknown", defaultConfig, packageFile;
 	var path = grunt.option('src') || './sdk_configs';
+	var level = grunt.option('level') || 'ADVANCED';
 	
 	grunt.loadNpmTasks('grunt-contrib-clean');
 	grunt.loadNpmTasks('grunt-contrib-concat');
@@ -192,11 +193,8 @@ module.exports = function(grunt) {
 		});
 	});
 	
-	grunt.registerTask('compile_sdk', ['compile_sdk_init:ADVANCED', 'closure-compiler', 'concat', 'replace', 'clean']);
-	grunt.registerTask('compile_sdk_fast', ['compile_sdk_init:WHITESPACE_ONLY', 'closure-compiler', 'concat', 'replace', 'clean']);
+	grunt.registerTask('compile_sdk', ['compile_sdk_init:' + level, 'closure-compiler', 'concat', 'replace', 'clean']);
+	grunt.registerTask('compile_sdk_native', ['compile_sdk_init:' + level, 'closure-compiler:sdk', 'concat', 'replace', 'clean']);
 		
-	grunt.registerTask('compile_sdk_native', ['compile_sdk_init:ADVANCED', 'closure-compiler:sdk', 'concat', 'replace', 'clean']);
-	grunt.registerTask('compile_sdk_native_fast', ['compile_sdk_init:WHITESPACE_ONLY', 'closure-compiler:sdk', 'concat', 'replace', 'clean']);
-		 
 	grunt.registerTask('default', ['get_svn_info', 'build_all']);
 };
