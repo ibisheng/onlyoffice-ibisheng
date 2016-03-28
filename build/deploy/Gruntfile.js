@@ -3,6 +3,8 @@ module.exports = function(grunt) {
     var revision="unknown", defaultConfig, packageFile;
 	var path = grunt.option('src') || './sdk_configs';
 	var level = grunt.option('level') || 'ADVANCED';
+	var formatting = grunt.option('formatting') || '';
+	var nomap = grunt.option('nomap') || '';
 	
 	grunt.loadNpmTasks('grunt-contrib-clean');
 	grunt.loadNpmTasks('grunt-contrib-concat');
@@ -143,6 +145,25 @@ module.exports = function(grunt) {
 					packageFile['compile']['sdk']['dst'],
 					packageFile['compile']['defines']['dst'],
 					map_record_file_path ];
+		var sdkOpt = {
+			compilation_level: compilation_level,
+			warning_level: 'QUIET',
+			externs: packageFile['compile']['sdk']['externs']/*,
+			create_source_map: map_file_path,
+			source_map_format: "V3"*/
+		};
+		var definesOpt = {
+			compilation_level: 'ADVANCED' === compilation_level ? 'SIMPLE' : compilation_level,
+			warning_level: 'QUIET'
+		};
+		if (formatting) {
+			definesOpt['formatting'] = sdkOpt['formatting'] = formatting;
+		}
+		if (!nomap) {
+			sdkOpt['variable_renaming_report'] = packageFile['compile']['sdk']['log'] + '/variable.map';
+			sdkOpt['property_renaming_report'] = packageFile['compile']['sdk']['log'] + '/property.map';
+		}
+
 		grunt.initConfig({
 			pkg: grunt.file.readJSON(defaultConfig),
 			'closure-compiler': {
@@ -150,24 +171,13 @@ module.exports = function(grunt) {
 					files: {
 						'<%= pkg.compile.sdk.dst %>': packageFile['compile']['sdk']['src']
 					},
-				options: {
-						compilation_level: compilation_level,
-						warning_level: 'QUIET',
-						externs: packageFile['compile']['sdk']['externs'],
-						variable_renaming_report: packageFile['compile']['sdk']['log'] + '/variable.map',
-						property_renaming_report: packageFile['compile']['sdk']['log'] + '/property.map'/*,
-						create_source_map: map_file_path,
-						source_map_format: "V3"*/
-					}
+					options: sdkOpt
 					},
 				defines: {
 					files: {
 						'<%= pkg.compile.defines.dst %>': packageFile['compile']['defines']['src']
 					},
-						options: {
-						compilation_level: 'SIMPLE',
-						warning_level: 'QUIET'
-					}
+					options: definesOpt
 					}
 			},
 			create_map_file: {},
