@@ -1,5 +1,8 @@
 .idea/
-Common/AllFonts.js
-Common/Images/fonts_thumbnail.png
-Common/Images/fonts_thumbnail@2x.png
+cell/sdk-all.js
+slide/sdk-all.js
+word/sdk-all.js
 **/node_modules
+common/AllFonts.js
+common/Images/fonts_thumbnail.png
+common/Images/fonts_thumbnail@2x.png
