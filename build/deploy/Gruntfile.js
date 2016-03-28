@@ -1,6 +1,7 @@
 module.exports = function(grunt) {
 	require('google-closure-compiler').grunt(grunt);
     var revision="unknown", defaultConfig, packageFile;
+	var path = grunt.option('src') || './sdk_configs';
 	
 	grunt.loadNpmTasks('grunt-contrib-clean');
 	grunt.loadNpmTasks('grunt-contrib-concat');
@@ -26,7 +27,7 @@ module.exports = function(grunt) {
 	});
 	
 	grunt.registerTask('build_webword_init', 'Initialize build WebWord SDK.', function(){
-        defaultConfig = './sdk_configs/webword.json';
+        defaultConfig = path + '/webword.json';
         packageFile = require(defaultConfig);
 
         if (packageFile)
@@ -36,7 +37,7 @@ module.exports = function(grunt) {
     });
 
 	grunt.registerTask('build_nativeword_init', 'Initialize build NativeWord SDK.', function(){
-        defaultConfig = './sdk_configs/nativeword.json';
+        defaultConfig = path + '/nativeword.json';
         packageFile = require(defaultConfig);
 
         if (packageFile)
@@ -46,7 +47,7 @@ module.exports = function(grunt) {
     });
 	
     grunt.registerTask('build_webexcel_init', 'Initialize build WebExcel SDK.', function(){
-        defaultConfig = './sdk_configs/webexcel.json';
+        defaultConfig = path + '/webexcel.json';
         packageFile = require(defaultConfig);
 
         if (packageFile)
@@ -56,7 +57,7 @@ module.exports = function(grunt) {
     });
 
     grunt.registerTask('build_webpowerpoint_init', 'Initialize build WebPowerPoint SDK.', function(){
-        defaultConfig = './sdk_configs/webpowerpoint.json';
+        defaultConfig = path + '/webpowerpoint.json';
         packageFile = require(defaultConfig);
 
         if (packageFile)

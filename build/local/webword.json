@@ -37,7 +37,7 @@
                 "../../word/Drawing/translations.js",
                 "../../common/Charts/charts.js",
                 "../../common/Charts/ChartsDrawer.js",
-				"../../common/Charts/3DTransformation.js",
+                "../../common/Charts/3DTransformation.js",
                 "../../common/Charts/DrawingArea.js",
                 "../../common/Charts/DrawingObjects.js",
                 "../../common/NumFormat.js",
@@ -94,10 +94,10 @@
                 "../../word/Editor/Common.js",
                 "../../word/Editor/DocumentContent.js",
                 "../../word/Editor/Table.js",
-				"../../word/Editor/Table/TableRecalculate.js",
-				"../../word/Editor/Table/TableDraw.js",				
-				"../../word/Editor/Table/TableRow.js",
-				"../../word/Editor/Table/TableCell.js",				
+                "../../word/Editor/Table/TableRecalculate.js",
+                "../../word/Editor/Table/TableDraw.js",
+                "../../word/Editor/Table/TableRow.js",
+                "../../word/Editor/Table/TableCell.js",
                 "../../word/Editor/Serialize2.js",
                 "../../word/Editor/Search.js",
                 "../../word/Editor/FontClassification.js",
@@ -107,7 +107,7 @@
                 "../../word/Drawing/HatchPattern.js",
                 "../../word/Drawing/ShapeDrawer.js",
                 "../../word/Drawing/Metafile.js",
-				"../../common/CollaborativeEditingBase.js",
+                "../../common/CollaborativeEditingBase.js",
                 "../../word/Drawing/DrawingDocument.js",
                 "../../word/Drawing/GraphicsEvents.js",
                 "../../common/Scrolls/iscroll.js",
@@ -121,9 +121,9 @@
                 "../../word/apiDefines.js",
                 "../../common/apiBase.js",
                 "../../word/api.js",
-				"../../common/Private/license.js",
-				"../../common/Private/versionHistory.js",
-				"../../word/Private/comments.js",
+                "../../common/Private/license.js",
+                "../../common/Private/versionHistory.js",
+                "../../word/Private/comments.js",
                 "../../word/Private/StyleManager.js",
                 "../../word/Private/MailMerge.js",
                 "../../word/Private/TrackRevisions.js",
@@ -151,19 +151,19 @@
                 "../../cell/model/CellInfo.js",
                 "../../common/AdvancedOptions.js",
                 "../../common/Private/Locks.js",
-				"../../common/Local/common.js",
-				"../../word/Local/api.js"
+                "../../common/Local/common.js",
+                "../../word/Local/api.js"
             ],
             "dst": "../../word/sdk-all.js",
             "externs": [
                 "../../common/Build/Externs.js",
-                "../../common/3rdparty/jquery/jquery.min.js",
-                "../../common/3rdparty/Underscore/underscore-min.js",
-                "../../common/3rdparty/Sockjs/sockjs.min.js",
-                "../../common/3rdparty/XRegExp/xregexp-all-min.js",
-                "../../common/3rdparty/jszip/jszip.min.js",
-                "../../common/3rdparty/jszip-utils/jszip-utils.min.js",
-                "../../common/3rdparty/jsrsasign/jsrsasign-latest-all-min.js"
+                "../../../web-apps/vendor/jquery/jquery.min.js",
+                "../../../web-apps/vendor/Underscore/underscore-min.js",
+                "../../../web-apps/vendor/Sockjs/sockjs.min.js",
+                "../../../web-apps/vendor/XRegExp/xregexp-all-min.js",
+                "../../../web-apps/vendor/jszip/jszip.min.js",
+                "../../../web-apps/vendor/jszip-utils/jszip-utils.min.js",
+                "../../../web-apps/vendor/jsrsasign/jsrsasign-latest-all-min.js"
             ],
             "map": "sdk-all.js.map",
             "log": "../../word/Build/Log"
@@ -178,59 +178,6 @@
         },
         "source_map": {
             "url": "http://localhost:8080/sdk/Word"
-        }
-    },
-    "deploy": {
-        "copy": {
-            "api": {
-                "expand": true,
-                "cwd": "../../word/",
-                "src": [
-                    "../common/apiBase.js",
-                    "api.js",
-                    "apiCommon.js",
-                    "apiDefines.js"
-                ],
-                "dest": "<%= pkg.menu_path %>/word/"
-            },
-            "sdk": {
-                "expand": true,
-                "cwd": "../../word/",
-                "src": "sdk-all.js",
-                "dest": "<%= pkg.menu_path %>/word/"
-            },
-            "doc": {
-                "expand": true,
-                "cwd": "../../word/",
-                "src": "document/**",
-                "dest": "<%= pkg.menu_path %>/word/"
-            },
-            "apisettings": {
-                "expand": true,
-                "cwd": "../../common/",
-                "src": [
-                    "spellcheckapisettings.js",
-                    "commonDefines.js",
-                    "apiCommon.js",
-                    "downloaderfiles.js",
-                    "Images/*.cur",
-                    "Native/jquery_native.js",
-                    "Native/native.js"
-                ],
-                "dest": "<%= pkg.menu_path %>/common/"
-            },
-            "log": {
-                "expand": true,
-                "cwd": "../../word/",
-                "src": [
-                    "Build/Log/property.map",
-                    "Build/Log/variable.map"
-                ],
-                "dest": "<%= pkg.menu_path %>/word/"
-            }
-        },
-        "store_log": {
-            "dst": "../../word/Build/Log"
         }
     },
     "tasks": {

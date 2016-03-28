@@ -23,7 +23,7 @@
                 "../../common/Charts/DrawingArea.js",
                 "../../common/Charts/DrawingObjects.js",
                 "../../common/Charts/ChartsDrawer.js",
-				"../../common/Charts/3DTransformation.js",
+                "../../common/Charts/3DTransformation.js",
                 "../../common/FontsFreeType/font_engine.js",
                 "../../common/FontsFreeType/FontFile.js",
                 "../../common/FontsFreeType/FontManager.js",
@@ -44,7 +44,7 @@
                 "../../cell/model/ConditionalFormatting.js",
                 "../../cell/model/FormulaObjects/parserFormula.js",
                 "../../cell/model/FormulaObjects/_xlfnFunctions.js",
-				"../../cell/model/FormulaObjects/dateandtimeFunctions.js",
+                "../../cell/model/FormulaObjects/dateandtimeFunctions.js",
                 "../../cell/model/FormulaObjects/engineeringFunctions.js",
                 "../../cell/model/FormulaObjects/cubeFunctions.js",
                 "../../cell/model/FormulaObjects/databaseFunctions.js",
@@ -133,10 +133,10 @@
                 "../../word/Editor/Document.js",
                 "../../word/Editor/DocumentContent.js",
                 "../../word/Editor/Table.js",
-				"../../word/Editor/Table/TableRecalculate.js",
-				"../../word/Editor/Table/TableDraw.js",				
-				"../../word/Editor/Table/TableRow.js",
-				"../../word/Editor/Table/TableCell.js",				
+                "../../word/Editor/Table/TableRecalculate.js",
+                "../../word/Editor/Table/TableDraw.js",
+                "../../word/Editor/Table/TableRow.js",
+                "../../word/Editor/Table/TableCell.js",
                 "../../word/Editor/Serialize2.js",
                 "../../word/Editor/FontClassification.js",
                 "../../word/Editor/Spelling.js",
@@ -155,29 +155,29 @@
                 "../../word/Math/operators.js",
                 "../../word/Math/accent.js",
                 "../../word/Math/borderBox.js",
-				"../../common/CollaborativeEditingBase.js",
+                "../../common/CollaborativeEditingBase.js",
                 "../../cell/model/DrawingObjects/GlobalCounters.js",
                 "../../word/apiCommon.js",
                 "../../cell/apiCommonExport.js",
                 "../../common/apiBase.js",
                 "../../cell/api.js",
-				"../../common/Private/license.js",
-				"../../cell/Private/comments.js",
-				"../../common/Local/common.js",
-				"../../cell/Local/api.js"
+                "../../common/Private/license.js",
+                "../../cell/Private/comments.js",
+                "../../common/Local/common.js",
+                "../../cell/Local/api.js"
             ],
             "dst": "../../cell/sdk-all.js",
             "externs": [
                 "../../common/Build/Externs.js",
-                "../../common/3rdparty/jquery/jquery.min.js",
-                "../../common/3rdparty/Underscore/underscore-min.js",
-                "../../common/3rdparty/Sockjs/sockjs.min.js",
-                "../../common/3rdparty/XRegExp/xregexp-all-min.js",
-                "../../common/3rdparty/jszip/jszip.min.js",
-                "../../common/3rdparty/jszip-utils/jszip-utils.min.js",
-				"../../common/3rdparty/jsrsasign/jsrsasign-latest-all-min.js",
-                "../../common/3rdparty/perfect-scrollbar/jquery.mousewheel.js",
-                "../../common/3rdparty/perfect-scrollbar/perfect-scrollbar.js"
+                "../../../web-apps/vendor/jquery/jquery.min.js",
+                "../../../web-apps/vendor/Underscore/underscore-min.js",
+                "../../../web-apps/vendor/Sockjs/sockjs.min.js",
+                "../../../web-apps/vendor/XRegExp/xregexp-all-min.js",
+                "../../../web-apps/vendor/jszip/jszip.min.js",
+                "../../../web-apps/vendor/jszip-utils/jszip-utils.min.js",
+                "../../../web-apps/vendor/jsrsasign/jsrsasign-latest-all-min.js",
+                "../../../web-apps/vendor/perfect-scrollbar/src/jquery.mousewheel.js",
+                "../../../web-apps/vendor/perfect-scrollbar/src/perfect-scrollbar.js"
             ],
             "map": "sdk-all.js.map",
             "log": "../../cell/Build/Log"
@@ -192,70 +192,6 @@
         },
         "source_map": {
             "url": "http://localhost:8080/sdk/Excel"
-        }
-    },
-    "deploy": {
-        "copy": {
-            "common": {
-                "expand": true,
-                "cwd": "../../common/Charts/",
-                "src": "DrawingObjects.js",
-                "dest": "<%= pkg.menu_path %>/cell/model/"
-            },
-            "api": {
-                "expand": true,
-                "cwd": "../../cell/",
-                "src": [
-                    "../common/apiBase.js",
-                    "api.js",
-                    "apiDefines.js",
-                    "view/EventsController.js",
-                    "view/HandlerList.js",
-                    "../common/AdvancedOptions.js",
-                    "model/CellInfo.js",
-                    "model/CellComment.js",
-                    "utils/utils.js",
-                    "css/*.css"
-                ],
-                "dest": "<%= pkg.menu_path %>/cell/"
-            },
-            "sdk": {
-                "expand": true,
-                "cwd": "../../cell/",
-                "src": "sdk-all.js",
-                "dest": "<%= pkg.menu_path %>/cell/"
-            },
-            "doc": {
-                "expand": true,
-                "cwd": "../../cell/",
-                "src": "document/**",
-                "dest": "<%= pkg.menu_path %>/cell/"
-            },
-            "log": {
-                "expand": true,
-                "cwd": "../../cell/",
-                "src": "sdk-all.js.map",
-                "dest": "<%= pkg.menu_path %>/cell/"
-            },
-            "samlpe": {
-                "expand": true,
-                "cwd": "../../cell/",
-                "src": "Spreadsheet.html.deploy",
-                "dest": "<%= pkg.menu_path %>/cell/"
-            },
-            "samlpe_files": {
-                "expand": true,
-                "cwd": "../../cell/",
-                "src": [
-                    "jquery/jquery-1.7.1.js",
-                    "css/nav-buttons.png",
-                    "css/gradient.png"
-                ],
-                "dest": "<%= pkg.menu_path %>/cell/"
-            }
-        },
-        "store_log": {
-            "dst": "../../cell/Build/Log"
         }
     },
     "tasks": {
