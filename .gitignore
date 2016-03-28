@@ -2,3 +2,4 @@
 Common/AllFonts.js
 Common/Images/fonts_thumbnail.png
 Common/Images/fonts_thumbnail@2x.png
+**/node_modules
