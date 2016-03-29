@@ -250,6 +250,7 @@
 			asc_getNumFormatType: function(){ return this.numFormatType; },
 			asc_getAngle: function () { return this.angle; },
 			asc_getAutoFilterInfo: function () { return this.autoFilterInfo; },
+            asc_getFormatTableInfo: function () { return this.formatTableInfo; },
 			asc_getIsFormatTable: function() {return null},//TODO DELETE
 			asc_getIsAutoFilter: function() {return null},//TODO DELETE
 			asc_getTableStyleName:  function() {return null},//TODO DELETE
@@ -277,6 +278,7 @@
 		prot["asc_getNumFormatType"]	= prot.asc_getNumFormatType;
 		prot["asc_getAngle"]			= prot.asc_getAngle;
 		prot["asc_getAutoFilterInfo"]	= prot.asc_getAutoFilterInfo;
+        prot["asc_getFormatTableInfo"]	= prot.asc_getFormatTableInfo;
 		prot["asc_getIsFormatTable"]	= prot.asc_getIsFormatTable;//TODO DELETE
 		prot["asc_getIsAutoFilter"]  	= prot.asc_getIsAutoFilter;//TODO DELETE
 		prot["asc_getTableStyleName"]  	= prot.asc_getTableStyleName;//TODO DELETE
