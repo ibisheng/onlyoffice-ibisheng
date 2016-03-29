@@ -12,23 +12,6 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-exec');
 	grunt.loadNpmTasks('grunt-replace');
 	
-	grunt.registerTask('get_svn_info', 'Initialize svn information', function () {
-		// Instruct this task to wait until we call the done() method to continue
-		var done = this.async();
-		
-		grunt.util.spawn({
-			cmd: 'svnversion',
-			args: ['../../'],
-			}, function (error, result, code) {
-				if (null === error) {
-					revision = result;
-				}
-				
-				// All done, continue to the next tasks
-				done();
-		});
-	});
-	
 	grunt.registerTask('build_webword_init', 'Initialize build WebWord SDK.', function(){
         defaultConfig = path + '/webword.json';
         packageFile = require(defaultConfig);
@@ -117,13 +100,7 @@ module.exports = function(grunt) {
 			packageFile['info']['build'] = parseInt(process.env['BUILD_NUMBER']);
 			pkg.info.build = packageFile['info']['build'];
 		}
-		if(undefined !== process.env['SVN_REVISION']){
-			packageFile['info']['rev'] = process.env['SVN_REVISION'];
-		}
-		else{
-			grunt.log.ok('Use revision number \"' + revision + '\" from svnversion!'.yellow);
-			packageFile['info']['rev'] = revision;
-		}
+		packageFile['info']['rev'] = process.env['SVN_REVISION'] || revision;
 		grunt.file.write(defaultConfig, JSON.stringify(pkg, null, 4));
     });
 	
@@ -229,5 +206,5 @@ module.exports = function(grunt) {
 	grunt.registerTask('compile_sdk', ['compile_sdk_init:' + level, 'closure-compiler', 'concat', 'replace', 'clean']);
 	grunt.registerTask('compile_sdk_native', ['compile_sdk_init:' + level, 'closure-compiler:sdk', 'concat', 'replace', 'clean']);
 		
-	grunt.registerTask('default', ['get_svn_info', 'build_all']);
+	grunt.registerTask('default', ['build_all']);
 };
