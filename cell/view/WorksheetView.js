@@ -7311,7 +7311,7 @@
 				cell_info.formatTableInfo.bandHor = tableStyleInfo.ShowRowStripes;
 			}
 			cell_info.formatTableInfo.lastRow = curTablePart.TotalsRowCount !== null ? true : false;
-			cell_info.formatTableInfo.firstRow = curTablePart.HeaderRowCount !== null ? true : false;
+			cell_info.formatTableInfo.firstRow = curTablePart.HeaderRowCount === null ? true : false;
 			
 			//cell_info.formatTableInfo.filterButton = curTablePart.HeaderRowCount !== null ? true : false;
 		}
@@ -12792,8 +12792,36 @@
 	
 	WorksheetView.prototype.af_changeFormatTableInfo = function(tableName, optionType)
     {
-		this.model.autoFilters.changeFormatTableInfo(tableName, optionType);
-		//TODO добавить перерисовку таблицы и перерисовку шаблонов
+		var tablePart = this.model.autoFilters._getFilterByDisplayName(tableName);
+		
+		if(!tablePart || (tablePart && !tablePart.TableStyleInfo))
+		{
+			return false;
+		}
+		
+		var isChangeTableInfo = this.af_checkChangeTableInfo(tablePart, optionType);
+		if(isChangeTableInfo !== false)
+		{
+			this.model.autoFilters.changeFormatTableInfo(tablePart, optionType);
+			
+			this._onUpdateFormatTable(isChangeTableInfo, false, true);
+			//TODO добавить перерисовку таблицы и перерисовку шаблонов
+		}
+	};
+	
+	WorksheetView.prototype.af_checkChangeTableInfo = function(tablePart, optionType)
+    {
+		var updateRange = tablePart.Ref;
+		if(optionType === c_oAscChangeTableStyleInfo.rowHeader && tablePart.HeaderRowCount !== null)//add header row
+		{
+			
+		}
+		else if(optionType === c_oAscChangeTableStyleInfo.rowTotal && tablePart.TotalsRowCount !== null)//add total row
+		{
+			
+		}
+		
+		return updateRange;
 	};
     
     /*
