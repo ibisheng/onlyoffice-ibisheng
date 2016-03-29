@@ -7286,8 +7286,6 @@
         var tableStyleInfo = curTablePart && curTablePart.TableStyleInfo ? curTablePart.TableStyleInfo : null;
 
         cell_info.autoFilterInfo = new asc_CAutoFilterInfo();
-        cell_info.autoFilterInfo.tableStyleName = tableStyleInfo !== null ? tableStyleInfo.Name : null;
-        cell_info.autoFilterInfo.tableName = curTablePart ? curTablePart.DisplayName : null;
         if ( -2 === tablePartsOptions ) {
             cell_info.autoFilterInfo.isAutoFilter = null;
             cell_info.autoFilterInfo.isApplyAutoFilter = false;
@@ -7301,15 +7299,21 @@
 		if(curTablePart !== null)
 		{
 			cell_info.formatTableInfo = new asc.asc_CFormatTableInfo();
+			cell_info.formatTableInfo.tableName = curTablePart.DisplayName;
+			
 			if (tableStyleInfo) {
-				cell_info.formatTableInfo.isShowColumnStripes = tableStyleInfo.ShowColumnStripes;
-				cell_info.formatTableInfo.isShowFirstColumn = tableStyleInfo.ShowFirstColumn;
-				cell_info.formatTableInfo.isShowLastColumn = tableStyleInfo.ShowLastColumn;
+				cell_info.formatTableInfo.tableStyleName = tableStyleInfo.Name;
+			
+				cell_info.formatTableInfo.bandVer = tableStyleInfo.ShowColumnStripes;
+				cell_info.formatTableInfo.firstCol = tableStyleInfo.ShowFirstColumn;
+				cell_info.formatTableInfo.lastCol = tableStyleInfo.ShowLastColumn;
 				
-				cell_info.formatTableInfo.isShowRowStripes = tableStyleInfo.ShowRowStripes;
+				cell_info.formatTableInfo.bandHor = tableStyleInfo.ShowRowStripes;
 			}
-			cell_info.formatTableInfo.isShowTotalRow = curTablePart.TotalsRowCount !== null ? true : false;
-			cell_info.formatTableInfo.isShowHeaderRow = curTablePart.HeaderRowCount !== null ? true : false;
+			cell_info.formatTableInfo.lastRow = curTablePart.TotalsRowCount !== null ? true : false;
+			cell_info.formatTableInfo.firstRow = curTablePart.HeaderRowCount !== null ? true : false;
+			
+			//cell_info.formatTableInfo.filterButton = curTablePart.HeaderRowCount !== null ? true : false;
 		}
        
 		

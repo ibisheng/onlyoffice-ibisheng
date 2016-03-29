@@ -149,8 +149,6 @@
 		
 		/** @constructor */
 		function asc_CAutoFilterInfo() {
-			this.tableStyleName = null;
-			this.tableName = null;
 			this.isApplyAutoFilter = false;   // Кнопка очистить фильтр: false - disable, true - pressed button
 			this.isAutoFilter = false;  // Кнопка автофильтр (также влияет на formatTable и Sort). Возможные состояния:
 										// - null - мы в пересечении с таблицой (но не полностью в ней)
@@ -158,8 +156,6 @@
 		}
 
 		asc_CAutoFilterInfo.prototype = {
-			asc_getTableStyleName: function () { return this.tableStyleName; },
-			asc_getTableName: function () { return this.tableName; },
 			asc_getIsAutoFilter: function () { return this.isAutoFilter; },
 			asc_getIsApplyAutoFilter: function () { return this.isApplyAutoFilter; }
 		};
@@ -167,14 +163,15 @@
 		window["Asc"].asc_CAutoFilterInfo = window["Asc"]["asc_CAutoFilterInfo"] = asc_CAutoFilterInfo;
 		prot = asc_CAutoFilterInfo.prototype;
 
-		prot["asc_getTableStyleName"] = prot.asc_getTableStyleName;
-		prot["asc_getTableName"]	  = prot.asc_getTableName;
 		prot["asc_getIsAutoFilter"]	  = prot.asc_getIsAutoFilter;
 		prot["asc_getIsApplyAutoFilter"] = prot.asc_getIsApplyAutoFilter;
 		
 		
 		/** @constructor */
         function asc_CFormatTableInfo() {
+			this.tableStyleName = null;
+			this.tableName = null;
+			
             this.isShowColumnStripes = null;
             this.isShowFirstColumn = null;
             this.isShowLastColumn = null;
@@ -184,23 +181,31 @@
         }
 
         asc_CFormatTableInfo.prototype = {
-            asc_getIsShowColumnStripes: function () { return this.isShowColumnStripes; },
-            asc_getIsShowFirstColumn: function () { return this.isShowFirstColumn; },
-            asc_getIsShowLastColumn: function () { return this.isShowLastColumn; },
-            asc_getIsShowRowStripes: function () { return this.isShowRowStripes; },
-			asc_getIsShowTotalRow: function () { return this.isShowTotalRow; },
-            asc_getIsShowHeaderRow: function () { return this.isShowHeaderRow; }
+			asc_getTableStyleName: function () { return this.tableStyleName; },
+			asc_getTableName: function () { return this.tableName; },
+			
+			asc_getFirstRow: function () { return this.firstRow; },
+			asc_getLastRow: function () { return this.lastRow; },
+			asc_getBandHor: function () { return this.bandHor; },
+			asc_getFirstCol: function () { return this.firstCol; },
+			asc_getLastCol: function () { return this.lastCol; },
+			asc_getBandVer: function () { return this.bandVer; },
+			asc_getFilterButton: function () { return this.filterButton; }
         };
 
         window["Asc"].asc_CFormatTableInfo = window["Asc"]["asc_CFormatTableInfo"] = asc_CFormatTableInfo;
         prot = asc_CFormatTableInfo.prototype;
-
-        prot["asc_getIsShowColumnStripes"] = prot.asc_getIsShowColumnStripes;
-        prot["asc_getIsShowFirstColumn"]   = prot.asc_getIsShowFirstColumn;
-        prot["asc_getIsShowLastColumn"]	   = prot.asc_getIsShowLastColumn;
-        prot["asc_getIsShowRowStripes"]    = prot.asc_getIsShowRowStripes;
-		prot["asc_getIsShowTotalRow"]	   = prot.asc_getIsShowTotalRow;
-        prot["asc_getIsShowHeaderRow"]     = prot.asc_getIsShowHeaderRow;
+		
+		prot["asc_getTableStyleName"]   = prot.asc_getTableStyleName;
+		prot["asc_getTableName"]	    = prot.asc_getTableName;
+		
+        prot["asc_getFirstRow"]         = prot.asc_getFirstRow;
+        prot["asc_getLastRow"]          = prot.asc_getLastRow;
+        prot["asc_getBandHor"]	        = prot.asc_getBandHor;
+        prot["asc_getFirstCol"]         = prot.asc_getFirstCol;
+		prot["asc_getLastCol"]	        = prot.asc_getLastCol;
+        prot["asc_getBandVer"]          = prot.asc_getBandVer;
+		prot["asc_getFilterButton"]     = prot.asc_getFilterButton;
 
 
 		/** @constructor */
