@@ -7283,9 +7283,10 @@
 
         var tablePartsOptions = this.model.autoFilters.searchRangeInTableParts( activeCell );
         var curTablePart = tablePartsOptions >= 0 ? this.model.TableParts[tablePartsOptions] : null;
+        var tableStyleInfo = curTablePart && curTablePart.TableStyleInfo ? curTablePart.TableStyleInfo : null;
 
         cell_info.autoFilterInfo = new asc_CAutoFilterInfo();
-        cell_info.autoFilterInfo.tableStyleName = curTablePart && curTablePart.TableStyleInfo ? curTablePart.TableStyleInfo.Name : null;
+        cell_info.autoFilterInfo.tableStyleName = tableStyleInfo !== null ? tableStyleInfo.Name : null;
         cell_info.autoFilterInfo.tableName = curTablePart ? curTablePart.DisplayName : null;
         if ( -2 === tablePartsOptions ) {
             cell_info.autoFilterInfo.isAutoFilter = null;
@@ -7296,6 +7297,22 @@
             cell_info.autoFilterInfo.isAutoFilter = checkApplyFilterOrSort.isAutoFilter;
             cell_info.autoFilterInfo.isApplyAutoFilter = checkApplyFilterOrSort.isFilterColumns;
         }
+		
+		if(curTablePart !== null)
+		{
+			cell_info.formatTableInfo = new asc.asc_CFormatTableInfo();
+			if (tableStyleInfo) {
+				cell_info.formatTableInfo.isShowColumnStripes = tableStyleInfo.ShowColumnStripes;
+				cell_info.formatTableInfo.isShowFirstColumn = tableStyleInfo.ShowFirstColumn;
+				cell_info.formatTableInfo.isShowLastColumn = tableStyleInfo.ShowLastColumn;
+				
+				cell_info.formatTableInfo.isShowRowStripes = tableStyleInfo.ShowRowStripes;
+			}
+			cell_info.formatTableInfo.isShowTotalRow = curTablePart.TotalsRowCount !== null ? true : false;
+			cell_info.formatTableInfo.isShowHeaderRow = curTablePart.HeaderRowCount !== null ? true : false;
+		}
+       
+		
 
         cell_info.styleName = c.getStyleName();
         cell_info.angle = c.getAngle();

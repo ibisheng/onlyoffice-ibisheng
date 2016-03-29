@@ -174,6 +174,36 @@
 		
 		
 		/** @constructor */
+        function asc_CFormatTableInfo() {
+            this.isShowColumnStripes = null;
+            this.isShowFirstColumn = null;
+            this.isShowLastColumn = null;
+            this.isShowRowStripes = null;
+			this.isShowTotalRow = null;
+			this.isShowHeaderRow = null;
+        }
+
+        asc_CFormatTableInfo.prototype = {
+            asc_getIsShowColumnStripes: function () { return this.isShowColumnStripes; },
+            asc_getIsShowFirstColumn: function () { return this.isShowFirstColumn; },
+            asc_getIsShowLastColumn: function () { return this.isShowLastColumn; },
+            asc_getIsShowRowStripes: function () { return this.isShowRowStripes; },
+			asc_getIsShowTotalRow: function () { return this.isShowTotalRow; },
+            asc_getIsShowHeaderRow: function () { return this.isShowHeaderRow; }
+        };
+
+        window["Asc"].asc_CFormatTableInfo = window["Asc"]["asc_CFormatTableInfo"] = asc_CFormatTableInfo;
+        prot = asc_CFormatTableInfo.prototype;
+
+        prot["asc_getIsShowColumnStripes"] = prot.asc_getIsShowColumnStripes;
+        prot["asc_getIsShowFirstColumn"]   = prot.asc_getIsShowFirstColumn;
+        prot["asc_getIsShowLastColumn"]	   = prot.asc_getIsShowLastColumn;
+        prot["asc_getIsShowRowStripes"]    = prot.asc_getIsShowRowStripes;
+		prot["asc_getIsShowTotalRow"]	   = prot.asc_getIsShowTotalRow;
+        prot["asc_getIsShowHeaderRow"]     = prot.asc_getIsShowHeaderRow;
+
+
+		/** @constructor */
 		function asc_CCellInfo() {
 			this.name = null;
 			this.formula = "";
@@ -193,6 +223,7 @@
 			this.numFormatType = null;
 			this.angle = null;
 			this.autoFilterInfo = null;
+            this.formatTableInfo = null;
 		}
 
 		asc_CCellInfo.prototype = {
