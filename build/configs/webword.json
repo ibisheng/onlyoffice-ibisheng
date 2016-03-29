@@ -145,18 +145,20 @@
                 "../cell/model/CellInfo.js",
                 "../common/AdvancedOptions.js"
             ],
-			"private": [
+            "private": [
                 "../common/Private/license.js",
                 "../common/Private/versionHistory.js",
                 "../word/Private/comments.js",
                 "../word/Private/StyleManager.js",
                 "../word/Private/MailMerge.js",
                 "../word/Private/TrackRevisions.js",
-				"../common/Private/Locks.js"
-			],
+                "../common/Private/Locks.js"
+            ],
             "desktop": [
                 "../common/Local/common.js",
                 "../word/Local/api.js"
+            ],
+            "exclude_mobile": [
             ],
             "dst": "../word/sdk-all.js",
             "externs": [

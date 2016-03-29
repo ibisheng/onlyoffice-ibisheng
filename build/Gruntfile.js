@@ -171,6 +171,12 @@ module.exports = function(grunt) {
 		if (grunt.option('desktop')) {
 			srcFiles.concat(packageFile['compile']['sdk']['desktop']);
 		}
+		if (grunt.option('exclude_mobile')) {
+			var excludeFiles = packageFile['compile']['sdk']['exclude_mobile']
+			srcFiles = srcFiles.filter(function(item) {
+				return -1 === excludeFiles.indexOf(item);
+			});
+		}
 		
 		var cc = require('google-closure-compiler').compiler;
 		cc.prototype.spawnOptions = {env: {'JAVA_OPTS': '-Xms2048m'}};

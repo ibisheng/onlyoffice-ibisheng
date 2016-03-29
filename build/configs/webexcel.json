@@ -162,14 +162,15 @@
                 "../common/apiBase.js",
                 "../cell/api.js"
             ],
-			"private": [
-				"../common/Private/license.js",
+            "private": [
+                "../common/Private/license.js",
                 "../cell/Private/comments.js"
-			],
+            ],
             "desktop": [
                 "../common/Local/common.js",
                 "../cell/Local/api.js"
             ],
+            "exclude_mobile": [],
             "dst": "../cell/sdk-all.js",
             "externs": [
                 "../common/Build/Externs.js",

@@ -144,15 +144,16 @@
                 "../cell/model/CellInfo.js",
                 "../common/AdvancedOptions.js"
             ],
-			"private": [
-				"../common/Private/license.js",
+            "private": [
+                "../common/Private/license.js",
                 "../slide/Private/comments.js",
-				"../common/Private/Locks.js"
-			],
-			"desktop": [
-				"../common/Local/common.js",
+                "../common/Private/Locks.js"
+            ],
+            "desktop": [
+                "../common/Local/common.js",
                 "../slide/Local/api.js"
-			],
+            ],
+            "exclude_mobile": [],
             "dst": "../slide/sdk-all.js",
             "externs": [
                 "../common/Build/Externs.js",
