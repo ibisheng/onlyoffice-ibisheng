@@ -2,6 +2,6 @@
 cd /D %~dp0
 
 @echo on
-call grunt.cmd
+call grunt
 
 pause
