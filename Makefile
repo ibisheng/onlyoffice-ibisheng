@@ -6,7 +6,7 @@ OUTPUT = $(OUTPUT_DIR)
 
 WEBAPPS_DIR = web-apps
 WEBAPPS = $(OUTPUT)/$(WEBAPPS_DIR)
-GRUNT_FILES = build/deploy/Gruntfile.js.out ../web-apps/build/Gruntfile.js.out
+GRUNT_FILES = build/Gruntfile.js.out ../web-apps/build/Gruntfile.js.out
 
 all: $(WEBAPPS)
 
