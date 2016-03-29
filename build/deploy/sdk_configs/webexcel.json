@@ -9,7 +9,7 @@
     },
     "compile": {
         "sdk": {
-            "src": [
+            "common": [
                 "../../common/Build/License.js",
                 "../../common/browser.js",
                 "../../common/docscoapicommon.js",
@@ -163,6 +163,10 @@
                 "../../cell/api.js",
                 "../../common/Private/license.js",
                 "../../cell/Private/comments.js"
+            ],
+            "desktop": [
+                "../../common/Local/common.js",
+                "../../cell/Local/api.js"
             ],
             "dst": "../../cell/sdk-all.js",
             "externs": [

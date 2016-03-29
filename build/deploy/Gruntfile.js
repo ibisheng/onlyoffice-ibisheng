@@ -145,6 +145,7 @@ module.exports = function(grunt) {
 					packageFile['compile']['sdk']['dst'],
 					packageFile['compile']['defines']['dst'],
 					map_record_file_path ];
+		var srcFiles = packageFile['compile']['sdk']['common'];
 		var sdkOpt = {
 			compilation_level: compilation_level,
 			warning_level: 'QUIET',
@@ -157,6 +158,7 @@ module.exports = function(grunt) {
 			warning_level: 'QUIET'
 		};
 		if (formatting) {
+			console.log('formatting');
 			definesOpt['formatting'] = sdkOpt['formatting'] = formatting;
 		}
 		if (!nomap) {
@@ -164,15 +166,20 @@ module.exports = function(grunt) {
 			sdkOpt['property_renaming_report'] = packageFile['compile']['sdk']['log'] + '/property.map';
 		}
 		
+		if (grunt.option('desktop')) {
+			console.log('desktop');
+			srcFiles.concat(packageFile['compile']['sdk']['desktop']);
+		}
+		
 		var cc = require('google-closure-compiler').compiler;
 		cc.prototype.spawnOptions = {env: {'JAVA_OPTS': '-Xms2048m'}};
 
 		grunt.initConfig({
-			pkg: grunt.file.readJSON(defaultConfig),
+			pkg: packageFile,
 			'closure-compiler': {
 				sdk: {
 					files: {
-						'<%= pkg.compile.sdk.dst %>': packageFile['compile']['sdk']['src']
+						'<%= pkg.compile.sdk.dst %>': srcFiles
 					},
 					options: sdkOpt
 					},

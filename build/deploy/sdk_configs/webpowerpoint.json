@@ -9,7 +9,7 @@
     },
     "compile": {
         "sdk": {
-            "src": [
+            "common": [
                 "../../common/Build/License.js",
                 "../../common/browser.js",
                 "../../common/FontsFreeType/font_engine.js",
@@ -147,6 +147,10 @@
                 "../../common/AdvancedOptions.js",
                 "../../common/Private/Locks.js"
             ],
+			"desktop": [
+				"../../common/Local/common.js",
+                "../../slide/Local/api.js"
+			],
             "dst": "../../slide/sdk-all.js",
             "externs": [
                 "../../common/Build/Externs.js",

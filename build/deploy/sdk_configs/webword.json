@@ -9,7 +9,7 @@
     },
     "compile": {
         "sdk": {
-            "src": [
+            "common": [
                 "../../common/Build/License.js",
                 "../../common/browser.js",
                 "../../common/docscoapicommon.js",
@@ -151,6 +151,10 @@
                 "../../cell/model/CellInfo.js",
                 "../../common/AdvancedOptions.js",
                 "../../common/Private/Locks.js"
+            ],
+            "desktop": [
+                "../../common/Local/common.js",
+                "../../word/Local/api.js"
             ],
             "dst": "../../word/sdk-all.js",
             "externs": [
