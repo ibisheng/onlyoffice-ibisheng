@@ -160,10 +160,12 @@
                 "../word/apiCommon.js",
                 "../cell/apiCommonExport.js",
                 "../common/apiBase.js",
-                "../cell/api.js",
-                "../common/Private/license.js",
-                "../cell/Private/comments.js"
+                "../cell/api.js"
             ],
+			"private": [
+				"../common/Private/license.js",
+                "../cell/Private/comments.js"
+			],
             "desktop": [
                 "../common/Local/common.js",
                 "../cell/Local/api.js"

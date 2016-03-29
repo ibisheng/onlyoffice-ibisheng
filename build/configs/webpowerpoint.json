@@ -134,8 +134,6 @@
                 "../slide/Editor/Format/GraphicFrame.js",
                 "../common/apiBase.js",
                 "../slide/api.js",
-                "../common/Private/license.js",
-                "../slide/Private/comments.js",
                 "../slide/apiCommon.js",
                 "../word/apiCommon.js",
                 "../slide/apiExport.js",
@@ -144,9 +142,13 @@
                 "../cell/model/WorkbookElems.js",
                 "../cell/model/Workbook.js",
                 "../cell/model/CellInfo.js",
-                "../common/AdvancedOptions.js",
-                "../common/Private/Locks.js"
+                "../common/AdvancedOptions.js"
             ],
+			"private": [
+				"../common/Private/license.js",
+                "../slide/Private/comments.js",
+				"../common/Private/Locks.js"
+			],
 			"desktop": [
 				"../common/Local/common.js",
                 "../slide/Local/api.js"

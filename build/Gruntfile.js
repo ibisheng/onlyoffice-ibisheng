@@ -158,7 +158,6 @@ module.exports = function(grunt) {
 			warning_level: 'QUIET'
 		};
 		if (formatting) {
-			console.log('formatting');
 			definesOpt['formatting'] = sdkOpt['formatting'] = formatting;
 		}
 		if (!nomap) {
@@ -166,8 +165,10 @@ module.exports = function(grunt) {
 			sdkOpt['property_renaming_report'] = packageFile['compile']['sdk']['log'] + '/property.map';
 		}
 		
+		if (grunt.option('private')) {
+			srcFiles.concat(packageFile['compile']['sdk']['private']);
+		}
 		if (grunt.option('desktop')) {
-			console.log('desktop');
 			srcFiles.concat(packageFile['compile']['sdk']['desktop']);
 		}
 		

@@ -121,12 +121,6 @@
                 "../word/apiDefines.js",
                 "../common/apiBase.js",
                 "../word/api.js",
-                "../common/Private/license.js",
-                "../common/Private/versionHistory.js",
-                "../word/Private/comments.js",
-                "../word/Private/StyleManager.js",
-                "../word/Private/MailMerge.js",
-                "../word/Private/TrackRevisions.js",
                 "../word/apiCommon.js",
                 "../word/apiExport.js",
                 "../word/document/empty.js",
@@ -149,9 +143,17 @@
                 "../cell/model/WorkbookElems.js",
                 "../cell/model/Workbook.js",
                 "../cell/model/CellInfo.js",
-                "../common/AdvancedOptions.js",
-                "../common/Private/Locks.js"
+                "../common/AdvancedOptions.js"
             ],
+			"private": [
+                "../common/Private/license.js",
+                "../common/Private/versionHistory.js",
+                "../word/Private/comments.js",
+                "../word/Private/StyleManager.js",
+                "../word/Private/MailMerge.js",
+                "../word/Private/TrackRevisions.js",
+				"../common/Private/Locks.js"
+			],
             "desktop": [
                 "../common/Local/common.js",
                 "../word/Local/api.js"
