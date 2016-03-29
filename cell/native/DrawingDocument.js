@@ -3162,18 +3162,18 @@ function CDrawingDocument(drawingObjects)
 
     this.SelectEnabled = function(bIsEnabled)
     {
-//        this.m_bIsSelection = bIsEnabled;
-//        if (false === this.m_bIsSelection)
-//        {
-//            this.SelectClear();
+        this.m_bIsSelection = bIsEnabled;
+        if (false === this.m_bIsSelection)
+        {
+            this.SelectClear();
 //            //this.m_oWordControl.CheckUnShowOverlay();
 //            //this.drawingObjects.OnUpdateOverlay();
 //            this.drawingObjects.getOverlay().m_oContext.globalAlpha = 1.0;
-//        }
+    }
     }
 	this.SelectClear = function()
     {
-
+        this.Native["DD_SelectClear"]();
     }
     this.SearchClear = function()
     {
