@@ -2099,54 +2099,58 @@ Paragraph.prototype =
                 Element = aUnderline.Get_Next();
             }
 
-            // Рисуем красный рект вокруг измененных ранов
-            var arrRunReviewRectsLine = [];
-            Element = aRunReview.Get_NextForward();
-            while (null !== Element)
-            {
-                if (null === RunPrReview || true !== RunPrReview.Is_Equal(Element.Additional.RunPr))
-                {
-                    if (arrRunReviewRectsLine.length > 0 && arrRunReviewRects)
-                    {
-                        arrRunReviewRects.push(arrRunReviewRectsLine);
-                        arrRunReviewRectsLine = [];
-            }
-                    RunPrReview = Element.Additional.RunPr;
-                    arrRunReviewRects = [];
-                    arrRunReviewAreas.push(arrRunReviewRects);
-                    arrRunReviewAreasColors.push(new CDocumentColor(Element.r, Element.g, Element.b));
-                }
+			if (pGraphics.RENDERER_PDF_FLAG !== true)
+			{
+				// Рисуем красный рект вокруг измененных ранов
+				var arrRunReviewRectsLine = [];
+				Element = aRunReview.Get_NextForward();
+				while (null !== Element)
+				{
+					if (null === RunPrReview || true !== RunPrReview.Is_Equal(Element.Additional.RunPr))
+					{
+						if (arrRunReviewRectsLine.length > 0 && arrRunReviewRects)
+						{
+							arrRunReviewRects.push(arrRunReviewRectsLine);
+							arrRunReviewRectsLine = [];
+						}
+						RunPrReview = Element.Additional.RunPr;
+						arrRunReviewRects = [];
+						arrRunReviewAreas.push(arrRunReviewRects);
+						arrRunReviewAreasColors.push(new CDocumentColor(Element.r, Element.g, Element.b));
+					}
 
-                arrRunReviewRectsLine.push({X : Element.x0, Y : Page.Y + Line.Y - Line.Metrics.TextAscent, W : Element.x1 - Element.x0, H : Line.Metrics.TextDescent + Line.Metrics.TextAscent + Line.Metrics.LineGap, Page : 0});
-                Element = aRunReview.Get_NextForward();
-            }
+					arrRunReviewRectsLine.push({X : Element.x0, Y : Page.Y + Line.Y - Line.Metrics.TextAscent, W : Element.x1 - Element.x0, H : Line.Metrics.TextDescent + Line.Metrics.TextAscent + Line.Metrics.LineGap, Page : 0});
+					Element = aRunReview.Get_NextForward();
+				}
 
-            if (arrRunReviewRectsLine.length > 0)
-                arrRunReviewRects.push(arrRunReviewRectsLine);
+				if (arrRunReviewRectsLine.length > 0)
+					arrRunReviewRects.push(arrRunReviewRectsLine);
 
-            if(this.bFromDocument)
-            {
-                // Рисуем рект вокруг измененных ранов (измененных другим пользователем)
-                Element = aCollChange.Get_Next();
-                while (null !== Element)
-                {
-                    pGraphics.p_color(Element.r, Element.g, Element.b, 255);
-                    pGraphics.AddSmartRect(Element.x0, Page.Y + Line.Top, Element.x1 - Element.x0, Line.Bottom - Line.Top, 0);
-                    Element = aCollChange.Get_Next();
-                }
-                // Рисуем подчеркивание орфографии
-                if(this.LogicDocument && true === this.LogicDocument.Spelling.Use)
-                {
-                    pGraphics.p_color( 255, 0, 0, 255 );
-                    var SpellingW = editor.WordControl.m_oDrawingDocument.GetMMPerDot(1);
-                    Element = aSpelling.Get_Next();
-                    while ( null != Element )
-                    {
-                        pGraphics.DrawSpellingLine(Element.y0, Element.x0, Element.x1, SpellingW);
-                        Element = aSpelling.Get_Next();
-                    }
-                }
-            }
+				if(this.bFromDocument)
+				{
+					// Рисуем рект вокруг измененных ранов (измененных другим пользователем)
+					Element = aCollChange.Get_Next();
+					while (null !== Element)
+					{
+						pGraphics.p_color(Element.r, Element.g, Element.b, 255);
+						pGraphics.AddSmartRect(Element.x0, Page.Y + Line.Top, Element.x1 - Element.x0, Line.Bottom - Line.Top, 0);
+						Element = aCollChange.Get_Next();
+					}
+					// Рисуем подчеркивание орфографии
+					if(this.LogicDocument && true === this.LogicDocument.Spelling.Use)
+					{
+						pGraphics.p_color( 255, 0, 0, 255 );
+						var SpellingW = editor.WordControl.m_oDrawingDocument.GetMMPerDot(1);
+						Element = aSpelling.Get_Next();
+						while ( null != Element )
+						{
+							pGraphics.DrawSpellingLine(Element.y0, Element.x0, Element.x1, SpellingW);
+							Element = aSpelling.Get_Next();
+						}
+					}
+				}			
+			}
+			
             if(pGraphics.End_Command)
             {
                 pGraphics.End_Command()
