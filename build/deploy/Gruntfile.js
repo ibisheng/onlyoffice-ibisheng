@@ -1,7 +1,7 @@
 module.exports = function(grunt) {
 	require('google-closure-compiler').grunt(grunt);
     var revision="unknown", defaultConfig, packageFile;
-	var path = grunt.option('src') || './sdk_configs';
+	var path = grunt.option('src') || './configs';
 	var level = grunt.option('level') || 'ADVANCED';
 	var formatting = grunt.option('formatting') || '';
 	var nomap = grunt.option('nomap') || '';
