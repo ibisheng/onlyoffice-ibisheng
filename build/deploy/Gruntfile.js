@@ -163,6 +163,9 @@ module.exports = function(grunt) {
 			sdkOpt['variable_renaming_report'] = packageFile['compile']['sdk']['log'] + '/variable.map';
 			sdkOpt['property_renaming_report'] = packageFile['compile']['sdk']['log'] + '/property.map';
 		}
+		
+		var cc = require('google-closure-compiler').compiler;
+		cc.prototype.spawnOptions = {env: {'JAVA_OPTS': '-Xms2048m'}};
 
 		grunt.initConfig({
 			pkg: grunt.file.readJSON(defaultConfig),
