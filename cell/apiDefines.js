@@ -184,10 +184,13 @@ var c_oAscChangeSelectionFormatTable = {
 };
 
 var c_oAscChangeTableStyleInfo = {
-    showColumnStripes: 1,
-    showFirstColumn: 2,
-    showLastColumn: 3,
-    showRowStripes: 4
+    columnFirst: 1,
+    columnLast: 2,
+    columnBanded: 3,
+    rowHeader: 4,
+    rowTotal: 5,
+    rowBanded: 6,
+	filterButton: 7
 };
 
 // Состояние редактора ячейки

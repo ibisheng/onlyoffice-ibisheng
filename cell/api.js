@@ -660,6 +660,11 @@ var editor;
     var ws = this.wb.getWorksheet();
     return ws.af_changeSelectionFormatTable(tableName, optionType);
   };
+  
+  spreadsheet_api.prototype.asc_changeFormatTableInfo = function(tableName, optionType) {
+    var ws = this.wb.getWorksheet();
+    return ws.af_changeFormatTableInfo(tableName, optionType);
+  };
 
   spreadsheet_api.prototype.asc_setMobileVersion = function(isMobile) {
     this.isMobileVersion = isMobile;
@@ -3361,6 +3366,7 @@ var editor;
   prot["asc_getAddFormatTableOptions"] = prot.asc_getAddFormatTableOptions;
   prot["asc_clearFilter"] = prot.asc_clearFilter;
   prot["asc_changeSelectionFormatTable"] = prot.asc_changeSelectionFormatTable;
+  prot["asc_changeFormatTableInfo"] = prot.asc_changeFormatTableInfo;
 
   // Drawing objects interface
 

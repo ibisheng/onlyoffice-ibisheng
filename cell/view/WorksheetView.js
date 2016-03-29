@@ -12789,6 +12789,12 @@
 
         t.setSelection(new Asc.Range(startCol, startRow, endCol, endRow));
     };
+	
+	WorksheetView.prototype.af_changeFormatTableInfo = function(tableName, optionType)
+    {
+		this.model.autoFilters.changeFormatTableInfo(tableName, optionType);
+		//TODO добавить перерисовку таблицы и перерисовку шаблонов
+	};
     
     /*
      * Export
