@@ -234,7 +234,16 @@ document.createComment = function() { return undefined; };
 document.documentElement = _null_object;
 document.body = _null_object;
 
-var native = CreateNativeEngine();
+var native;
+if(typeof NativeEngine === "undefined")
+{
+	native = CreateNativeEngine();
+}
+else
+{
+	native = NativeEngine;
+}
+
 window.native = native;
 window["native"] = native;
 

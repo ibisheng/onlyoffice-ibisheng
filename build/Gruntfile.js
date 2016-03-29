@@ -163,6 +163,17 @@ module.exports = function(grunt) {
 		if (!nomap) {
 			sdkOpt['variable_renaming_report'] = packageFile['compile']['sdk']['log'] + '/variable.map';
 			sdkOpt['property_renaming_report'] = packageFile['compile']['sdk']['log'] + '/property.map';
+		}		
+		
+		if (grunt.option('mobile')) {				
+			var excludeFiles = packageFile['compile']['sdk']['exclude_mobile']
+			srcFiles = srcFiles.filter(function(item) {
+				return -1 === excludeFiles.indexOf(item);
+			});		
+			var mobileFiles = packageFile['compile']['sdk']['mobile'];
+			if(mobileFiles){
+				srcFiles = mobileFiles.concat(srcFiles);
+			}
 		}
 		
 		if (grunt.option('private')) {
@@ -171,12 +182,7 @@ module.exports = function(grunt) {
 		if (grunt.option('desktop')) {
 			srcFiles.concat(packageFile['compile']['sdk']['desktop']);
 		}
-		if (grunt.option('exclude_mobile')) {
-			var excludeFiles = packageFile['compile']['sdk']['exclude_mobile']
-			srcFiles = srcFiles.filter(function(item) {
-				return -1 === excludeFiles.indexOf(item);
-			});
-		}
+	
 		
 		var cc = require('google-closure-compiler').compiler;
 		cc.prototype.spawnOptions = {env: {'JAVA_OPTS': '-Xms2048m'}};
