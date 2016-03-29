@@ -655,6 +655,11 @@ var editor;
     var ws = this.wb.getWorksheet();
     return ws.clearFilter();
   };
+  
+  spreadsheet_api.prototype.asc_changeSelectionFormatTable = function(tableName, optionType) {
+    var ws = this.wb.getWorksheet();
+    return ws.af_changeSelectionFormatTable(tableName, optionType);
+  };
 
   spreadsheet_api.prototype.asc_setMobileVersion = function(isMobile) {
     this.isMobileVersion = isMobile;
@@ -3348,13 +3353,14 @@ var editor;
   prot["asc_getDefaultDefinedName"] = prot.asc_getDefaultDefinedName;
   prot["asc_checkDefinedName"] = prot.asc_checkDefinedName;
 
-  // Auto filters interface
+  // Auto filters interface + format as table
   prot["asc_addAutoFilter"] = prot.asc_addAutoFilter;
   prot["asc_changeAutoFilter"] = prot.asc_changeAutoFilter;
   prot["asc_applyAutoFilter"] = prot.asc_applyAutoFilter;
   prot["asc_sortColFilter"] = prot.asc_sortColFilter;
   prot["asc_getAddFormatTableOptions"] = prot.asc_getAddFormatTableOptions;
   prot["asc_clearFilter"] = prot.asc_clearFilter;
+  prot["asc_changeSelectionFormatTable"] = prot.asc_changeSelectionFormatTable;
 
   // Drawing objects interface
 
