@@ -346,23 +346,61 @@ CFraction.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI, GapsInf
     RPI.bDecreasedComp = bDecreasedComp;
     RPI.bSmallFraction = bSmallFraction;
 };
-CFraction.prototype.recalculateSize = function(oMeasure)
+CFraction.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 {
+    var WordLen = PRS.WordLen; // запоминаем, чтобы внутр мат объекты не увеличили WordLen
+    var bContainCompareOper = PRS.bContainCompareOper;
+
+    var bOneLine = PRS.bMath_OneLine;
+
+    this.bOneLine = this.bCanBreak == false || PRS.bMath_OneLine == true;
+
+    this.BrGapLeft  = this.GapLeft;
+    this.BrGapRight = this.GapRight;
+
+    PRS.bMath_OneLine = this.bOneLine;
+
+    this.Numerator.Recalculate_Reset(PRS.Range, PRS.Line, PRS); // обновим StartLine и StartRange
+    this.Numerator.Recalculate_Range(PRS, ParaPr, Depth);
+
+    var bNumBarFraction = PRS.bSingleBarFraction;
+
+    this.Denominator.Recalculate_Reset(PRS.Range, PRS.Line, PRS);
+    this.Denominator.Recalculate_Range(PRS, ParaPr, Depth);
+
+    var bDenBarFraction = PRS.bSingleBarFraction;
+
     if(this.Pr.type == BAR_FRACTION || this.Pr.type == NO_BAR_FRACTION)
-        this.recalculateBarFraction(oMeasure);
+        this.recalculateBarFraction(g_oTextMeasurer, bNumBarFraction, bDenBarFraction);
     else if(this.Pr.type == SKEWED_FRACTION)
-        this.recalculateSkewed(oMeasure);
+        this.recalculateSkewed(g_oTextMeasurer);
     else if(this.Pr.type == LINEAR_FRACTION)
-        this.recalculateLinear(oMeasure);
+        this.recalculateLinear(g_oTextMeasurer);
+
+    this.UpdatePRS_OneLine(PRS, WordLen, PRS.MathFirstItem);
+    this.Bounds.SetWidth(0, 0, this.size.width);
+    this.Bounds.UpdateMetrics(0, 0, this.size);
+
+    PRS.bMath_OneLine       = bOneLine;
+    PRS.bContainCompareOper = bContainCompareOper;
 };
-CFraction.prototype.recalculateBarFraction = function(oMeasure)
+CFraction.prototype.recalculateBarFraction = function(oMeasure, bNumBarFraction, bDenBarFraction)
 {
+    var ctrPrp = this.Get_TxtPrControlLetter();
+
+    var Plh = new CMathText(true);
+    Plh.add(0x2B1A);
+    Plh.Measure(g_oTextMeasurer, ctrPrp);
+
     var num = this.elements[0][0].size,
         den = this.elements[1][0].size;
 
+    var NumWidth = bNumBarFraction ? num.width + 0.25*Plh.size.width : num.width;
+    var DenWidth = bDenBarFraction ? den.width + 0.25*Plh.size.width : den.width;
+
     var mgCtrPrp = this.Get_TxtPrControlLetter();
 
-    var width  = num.width > den.width ? num.width : den.width;
+    var width  = NumWidth > DenWidth ? NumWidth : DenWidth;
     var height = num.height + den.height;
     var ascent = num.height + this.ParaMath.GetShiftCenter(oMeasure, mgCtrPrp);
 
@@ -460,6 +498,24 @@ CFraction.prototype.setPosition = function(pos, PosInfo)
     {
         CFraction.superclass.setPosition.call(this, pos, PosInfo);
     }
+};
+CFraction.prototype.align = function(pos_x, pos_y)
+{
+    var PosAlign = new CMathPosition();
+
+    if(this.Pr.type == BAR_FRACTION || this.Pr.type == NO_BAR_FRACTION)
+    {
+        if(pos_x == 0)
+            PosAlign.x = (this.size.width - this.Numerator.size.width)*0.5;
+        else
+            PosAlign.x = (this.size.width - this.Denominator.size.width)*0.5;
+    }
+    else if(this.Pr.type == LINEAR_FRACTION)
+    {
+        PosAlign.y = this.size.ascent - this.elements[pos_x][pos_y].size.ascent;
+    }
+
+    return PosAlign;
 };
 CFraction.prototype.fillContent = function()
 {

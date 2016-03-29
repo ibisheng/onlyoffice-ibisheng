@@ -258,33 +258,29 @@ CMathBase.prototype.align = function(pos_x, pos_y)
     if(this.alignment.hgt[pos_x] == MCJC_CENTER)
     {
         var maxAsc = 0;
-        var _ascent;
 
         for(var j = 0; j < this.nCol; j++)
         {
-            _ascent = this.elements[pos_x][j].size.ascent;
+            var _ascent = this.elements[pos_x][j].size.ascent;
             maxAsc = ( maxAsc > _ascent ) ? maxAsc : _ascent;
         }
-        PosAlign.y = (maxAsc - this.elements[pos_x][pos_y].size.ascent);
+        PosAlign.y = maxAsc - this.elements[pos_x][pos_y].size.ascent;
     }
-    else
+    else if(this.alignment.hgt[pos_x] == MCJC_LEFT)
+    {
+        PosAlign.y = 0;
+    }
+    else // MCJC_RIGHT
     {
         var maxH = 0;
-        var _h;
 
         for(var j = 0; j < this.nCol; j++)
         {
-            _h = this.elements[pos_x][j].size.height;
+            var _h = this.elements[pos_x][j].size.height;
             maxH = ( maxH > _h ) ? maxH : _h;
         }
 
-        var coeffHgt;
-        if(this.alignment.hgt[pos_x] == MCJC_RIGHT)
-            coeffHgt = 1;
-        else
-            coeffHgt = 0;
-
-        PosAlign.y = (maxH - this.elements[pos_x][pos_y].size.height)*coeffHgt;
+        PosAlign.y = maxH - this.elements[pos_x][pos_y].size.height;
     }
 
     var maxW  = 0;
@@ -296,16 +292,10 @@ CMathBase.prototype.align = function(pos_x, pos_y)
 
     if(this.alignment.wdt[pos_y] == MCJC_CENTER)
         PosAlign.x = (maxW - this.elements[pos_x][pos_y].size.width)*0.5;
-    else
-    {
-        var coeffWdt;
-        if(this.alignment.wdt[pos_y] == MCJC_RIGHT)
-            coeffWdt = 1;
-        else
-            coeffWdt = 0;
-
-        PosAlign.x = (maxW - this.elements[pos_x][pos_y].size.width)*coeffWdt;
-    }
+    else if(this.alignment.hgt[pos_x] == MCJC_LEFT)
+        PosAlign.x = 0;
+    else // MCJC_RIGHT
+        PosAlign.x = maxW - this.elements[pos_x][pos_y].size.width;
 
     return PosAlign;
 };
@@ -1997,7 +1987,7 @@ CMathBase.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
     var bContainCompareOper = PRS.bContainCompareOper;
 
     var bOneLine = PRS.bMath_OneLine;
-    var MathFirstItem = PRS.MathFirstItem;
+
     this.bOneLine = this.bCanBreak == false || PRS.bMath_OneLine == true;
 
     if(this.kind !== MATH_DELIMITER)
@@ -2030,7 +2020,7 @@ CMathBase.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
         this.recalculateSize(g_oTextMeasurer);
 
-        this.UpdatePRS_OneLine(PRS, WordLen, MathFirstItem);
+        this.UpdatePRS_OneLine(PRS, WordLen, PRS.MathFirstItem);
         this.Bounds.SetWidth(0, 0, this.size.width);
         this.Bounds.UpdateMetrics(0, 0, this.size);
     }

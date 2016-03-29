@@ -4140,6 +4140,30 @@ CMathContent.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
         RangeEndPos = Pos - 1;
     }
 
+    var bSingleBarFraction = false;
+
+    for(var Pos = 0; Pos < ContentLen; Pos++)
+    {
+
+        if(this.Content[Pos].kind == MATH_FRACTION && this.Content[Pos].Pr.type == BAR_FRACTION)
+        {
+            if(bSingleBarFraction)
+            {
+                bSingleBarFraction = false;
+                break;
+            }
+
+            bSingleBarFraction = true;
+        }
+        else if( !(this.Content[Pos].Type == para_Math_Run && true == this.Content[Pos].Is_Empty()) ) // не пустой Run, другой мат объект
+        {
+            bSingleBarFraction = false;
+            break;
+        }
+    }
+
+    PRS.bSingleBarFraction = bSingleBarFraction;
+
     this.protected_FillRange(CurLine, CurRange, RangeStartPos, RangeEndPos);
 };
 CMathContent.prototype.private_ForceBreakBox = function(PRS, Box, _Depth, PrevLastPos, LastPos)
