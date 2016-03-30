@@ -65,7 +65,7 @@
                 "../common/Drawings/TrackObjects/MoveTracks.js",
                 "../word/Drawing/HatchPattern.js",
                 "../word/Drawing/Graphics.js",
-                "../word/Drawing/Overlay.js",
+                "../common/Overlay.js",
                 "../word/Drawing/ShapeDrawer.js",
                 "../slide/Drawing/Transitions.js",
                 "../slide/Drawing/DrawingDocument.js",
@@ -171,7 +171,7 @@
             "exclude_mobile": [
                 "../common/browser.js",
                 "../word/Drawing/ShapeDrawer.js",
-                "../word/Drawing/Overlay.js",
+                "../common/Overlay.js",
                 "../slide/Drawing/HtmlPage.js",
                 "../slide/Drawing/DrawingDocument.js"
             ],

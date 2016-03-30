@@ -107,7 +107,7 @@
                 "../common/wordcopypaste.js",
                 "../cell/view/DrawingObjectsController.js",
                 "../cell/model/DrawingObjects/Graphics.js",
-                "../cell/model/DrawingObjects/Overlay.js",
+                "../common/Overlay.js",
                 "../common/Controls.js",
                 "../cell/model/DrawingObjects/ShapeDrawer.js",
                 "../cell/model/DrawingObjects/DrawingDocument.js",

@@ -4867,3 +4867,25 @@ function CDrawingDocument(drawingObjects)
             this.m_oWordControl.MobileTouchManager.CheckSelectEnd(false);
     }
 }
+
+// заглушка
+function CHtmlPage()
+{
+    this.drawingPage = { top: 0, left: 0, right: 0, bottom: 0 };
+    this.width_mm = 0;
+    this.height_mm = 0;
+}
+
+CHtmlPage.prototype.init = function(x, y, w_pix, h_pix, w_mm, h_mm) {
+    this.drawingPage.top = y;
+    this.drawingPage.left = x;
+    this.drawingPage.right = w_pix;
+    this.drawingPage.bottom = h_pix;
+    this.width_mm = w_mm;
+    this.height_mm = h_mm;
+};
+
+CHtmlPage.prototype.GetDrawingPageInfo = function() {
+
+    return { drawingPage: this.drawingPage, width_mm: this.width_mm, height_mm: this.height_mm };
+};

@@ -103,7 +103,7 @@
                 "../word/Editor/FontClassification.js",
                 "../word/Editor/Spelling.js",
                 "../word/Drawing/Graphics.js",
-                "../word/Drawing/Overlay.js",
+                "../common/Overlay.js",
                 "../word/Drawing/HatchPattern.js",
                 "../word/Drawing/ShapeDrawer.js",
                 "../word/Drawing/Metafile.js",
@@ -158,8 +158,7 @@
                 "../common/Local/common.js",
                 "../word/Local/api.js"
             ],
-            "exclude_mobile": [
-            ],
+            "exclude_mobile": [],
             "dst": "../word/sdk-all.js",
             "externs": [
                 "../common/Build/Externs.js",

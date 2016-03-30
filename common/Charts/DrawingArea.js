@@ -1,4 +1,4 @@
-﻿"use strict";
+"use strict";
 
 //-----------------------------------------------------------------------------------
 // Drawing area manager
@@ -536,7 +536,7 @@ function FrozenPlace(ws, type) {
 		_this.restore(canvas.shapeCtx);
 	};
 	
-	_this.setTransform = function(shapeCtx, shapeOverlayCtx, autoShapeTrack) {
+	_this.setTransform = function(shapeCtx, shapeOverlayCtx, autoShapeTrack, trackOverlay) {
 		
 		if ( shapeCtx && shapeOverlayCtx && autoShapeTrack ) {
 			
@@ -556,6 +556,15 @@ function FrozenPlace(ws, type) {
 			autoShapeTrack.Graphics.CalculateFullTransform();
             _this.worksheet.objectRender.controller.recalculateCurPos();
 		}
+        if(trackOverlay && trackOverlay.m_oHtmlPage)
+        {
+            var width = trackOverlay.m_oHtmlPage.drawingPage.right -  trackOverlay.m_oHtmlPage.drawingPage.left;
+            var height = trackOverlay.m_oHtmlPage.drawingPage.bottom -  trackOverlay.m_oHtmlPage.drawingPage.top;
+            trackOverlay.m_oHtmlPage.drawingPage.left = x;
+            trackOverlay.m_oHtmlPage.drawingPage.top  = y;
+            trackOverlay.m_oHtmlPage.drawingPage.right = x + width;
+            trackOverlay.m_oHtmlPage.drawingPage.bottom  = y + height;
+        }
 	};
 	
 	// Range constructor	
@@ -658,7 +667,7 @@ DrawingArea.prototype.drawSelection = function(drawingDocument) {
     }
     for ( var i = 0; i < this.frozenPlaces.length; i++ ) {
 
-        this.frozenPlaces[i].setTransform(shapeCtx, shapeOverlayCtx, autoShapeTrack);
+        this.frozenPlaces[i].setTransform(shapeCtx, shapeOverlayCtx, autoShapeTrack, trackOverlay);
 
         // Clip
         this.frozenPlaces[i].clip(shapeOverlayCtx);

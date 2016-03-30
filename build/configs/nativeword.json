@@ -112,7 +112,7 @@
                 "../word/Editor/FontClassification.js",
                 "../word/Editor/Spelling.js",
                 "../word/Drawing/Graphics.js",
-                "../word/Drawing/Overlay.js",
+                "../common/Overlay.js",
                 "../word/Drawing/HatchPattern.js",
 
                 "../word/Drawing/Metafile.js",
