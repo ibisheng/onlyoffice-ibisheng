@@ -54,7 +54,8 @@ var c_oAscDeleteOptions = {
   DeleteCellsAndShiftLeft: 1,
   DeleteCellsAndShiftTop: 2,
   DeleteColumns: 3,
-  DeleteRows: 4
+  DeleteRows: 4,
+  DeleteTable: 5
 };
 
 var c_oAscBorderOptions = {
