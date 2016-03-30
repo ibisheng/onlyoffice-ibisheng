@@ -149,15 +149,15 @@ module.exports = function(grunt) {
 			});		
 			var mobileFiles = packageFile['compile']['sdk']['mobile'];
 			if(mobileFiles){
-				srcFiles = mobileFiles.concat(srcFiles);
+				srcFiles = srcFiles.concat(mobileFiles);
 			}
 		}
 		
 		if (grunt.option('private')) {
-			srcFiles.concat(packageFile['compile']['sdk']['private']);
+			srcFiles = srcFiles.concat(packageFile['compile']['sdk']['private']);
 		}
 		if (grunt.option('desktop')) {
-			srcFiles.concat(packageFile['compile']['sdk']['desktop']);
+			srcFiles = srcFiles.concat(packageFile['compile']['sdk']['desktop']);
 		}
 	
 		
@@ -192,7 +192,7 @@ module.exports = function(grunt) {
 						variables: {
 							Version: packageFile['info']['version'],
 							Build: packageFile['info']['build'].toString(),
-							Rev: packageFile['info']['rev'].toString()
+							Rev: (packageFile['info']['rev'] || 1).toString()
 						}
 					},
 					files: {
