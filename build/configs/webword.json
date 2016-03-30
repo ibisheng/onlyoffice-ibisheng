@@ -188,7 +188,6 @@
     },
     "tasks": {
         "build": [
-            "increment_build",
             "compile_sdk"
         ]
     }
