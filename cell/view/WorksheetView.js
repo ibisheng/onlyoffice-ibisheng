@@ -643,11 +643,6 @@
         this.updateZoom = false;
     };
 
-    WorksheetView.prototype.getCellTextMetrics = function ( col, row ) {
-        var ct = this._getCellTextCache( col, row );
-        return ct ? $.extend( {}, ct.metrics ) : undefined;
-    };
-
     WorksheetView.prototype.getSheetViewSettings = function () {
         return this.model.getSheetViewSettings();
     };
