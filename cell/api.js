@@ -833,6 +833,9 @@ var editor;
     oAdditionalData["vkey"] = this.documentVKey;
     oAdditionalData["outputformat"] = sFormat;
     oAdditionalData["title"] = changeFileExtention(this.documentTitle, getExtentionByFormat(sFormat));
+    if (DownloadType.Print === options.downloadType) {
+      oAdditionalData["inline"] = 1;
+    }
     if (c_oAscFileType.PDF === sFormat) {
       var printPagesData = this.wb.calcPagesPrint(this.adjustPrint);
       var pdf_writer = new CPdfPrinter();

@@ -4714,6 +4714,9 @@ function _downloadAs(editor, filetype, actionType, options)
 	oAdditionalData["outputformat"] = filetype;
 	oAdditionalData["title"] = changeFileExtention(editor.documentTitle, getExtentionByFormat(filetype));
 	oAdditionalData["savetype"] = c_oAscSaveTypes.CompleteAll;
+    if (DownloadType.Print === options.downloadType) {
+      oAdditionalData["inline"] = 1;
+    }
 	if(c_oAscFileType.PDF == filetype)
 	{
 		var dd = editor.WordControl.m_oDrawingDocument;

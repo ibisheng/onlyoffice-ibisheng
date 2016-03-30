@@ -6709,6 +6709,9 @@ function _downloadAs(editor, command, filetype, actionType, options, fCallbackRe
     oAdditionalData["outputformat"] = filetype;
     oAdditionalData["title"] = changeFileExtention(editor.documentTitle, getExtentionByFormat(filetype));
 	oAdditionalData["savetype"] = c_oAscSaveTypes.CompleteAll;
+    if (DownloadType.Print === options.downloadType) {
+      oAdditionalData["inline"] = 1;
+    }
 	if (options.isNoData) {
 		;//nothing
 	} else if (null == options.oDocumentMailMerge &&  c_oAscFileType.PDF === filetype) {
