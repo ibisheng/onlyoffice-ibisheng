@@ -43,7 +43,11 @@ var c_oAscInsertOptions = {
   InsertCellsAndShiftRight: 1,
   InsertCellsAndShiftDown: 2,
   InsertColumns: 3,
-  InsertRows: 4
+  InsertRows: 4,
+  InsertTableRowAbove: 5,
+  InsertTableRowBelow: 6,
+  InsertTableColLeft: 7,
+  InsertTableColRight: 8
 };
 
 var c_oAscDeleteOptions = {

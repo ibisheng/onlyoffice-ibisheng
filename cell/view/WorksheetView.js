@@ -12779,7 +12779,7 @@
             case c_oAscChangeSelectionFormatTable.column:
             {
                 startCol = this.activeRange.c1 < refTablePart.c1 ? refTablePart.c1 : this.activeRange.c1;
-                endCol = this.activeRange.c2 > refTablePart.r2 ? refTablePart.r2 : this.activeRange.r2;
+                endCol = this.activeRange.c2 > refTablePart.c2 ? refTablePart.c2 : this.activeRange.c2;
                 startRow = refTablePart.r1;
                 endRow = refTablePart.r2;
 
@@ -12824,6 +12824,97 @@
 		return updateRange;
 	};
     
+	WorksheetView.prototype.af_insertCellsInTable = function(tableName, optionType)
+    {
+		var t = this;
+        var ws = this.model;
+		var acitveRange = this.activeRange.clone();
+
+        var tablePart = ws.autoFilters._getFilterByDisplayName(tableName);
+
+        if(!tablePart || (tablePart && !tablePart.Ref))
+        {
+            return false;
+        }
+		
+		var startCol = this.activeRange.c1;
+        var endCol = this.activeRange.c2;
+        var startRow = this.activeRange.r1;
+        var endRow = this.activeRange.r2;
+		
+		var newActiveRange = null;
+		switch(optionType)
+		{
+			case c_oAscInsertOptions.InsertTableRowAbove:
+			{
+				newActiveRange = new Asc.Range(tablePart.Ref.c1, startRow, tablePart.Ref.c2, endRow);
+				break;
+			}
+			case c_oAscInsertOptions.InsertTableRowBelow:
+			{
+				newActiveRange = new Asc.Range(tablePart.Ref.c1, startRow - 1, tablePart.Ref.c2, endRow - 1);
+				break;
+			}
+			case c_oAscInsertOptions.InsertTableColLeft:
+			{
+				newActiveRange = new Asc.Range(startCol - 1, tablePart.Ref.r1, endCol - 1, tablePart.Ref.r2);
+				break;
+			}
+			case c_oAscInsertOptions.InsertTableColRight:
+			{
+				newActiveRange = new Asc.Range(startCol, tablePart.Ref.r1, endCol, tablePart.Ref.r2);
+				break;
+			}
+		}
+		
+		if(newActiveRange !== null)
+		{
+			t.activeRange = newActiveRange;
+			t.changeWorksheet("insCell");
+			t.activeRange = acitveRange;
+		}
+	};
+	
+	WorksheetView.prototype.af_deleteCellsInTable = function(tableName, optionType)
+    {
+		var t = this;
+        var ws = this.model;
+		var acitveRange = this.activeRange.clone();
+
+        var tablePart = ws.autoFilters._getFilterByDisplayName(tableName);
+
+        if(!tablePart || (tablePart && !tablePart.Ref))
+        {
+            return false;
+        }
+		
+		var startCol = this.activeRange.c1;
+        var endCol = this.activeRange.c2;
+        var startRow = this.activeRange.r1;
+        var endRow = this.activeRange.r2;
+		
+		var newActiveRange = null;
+		switch(optionType)
+		{
+			case c_oAscInsertOptions.DeleteColumns:
+			{
+				newActiveRange = new Asc.Range(startCol, tablePart.Ref.r1, endCol, tablePart.Ref.r2);
+				break;
+			}
+			case c_oAscInsertOptions.DeleteRows:
+			{
+				newActiveRange = new Asc.Range(tablePart.Ref.c1, startRow, tablePart.Ref.c2, endRow);
+				break;
+			}
+		}
+		
+		if(newActiveRange !== null)
+		{
+			t.activeRange = newActiveRange;
+			t.changeWorksheet("delCell");
+			t.activeRange = acitveRange;
+		}
+	};
     /*
      * Export
      * -----------------------------------------------------------------------------

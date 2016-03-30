@@ -665,6 +665,16 @@ var editor;
     var ws = this.wb.getWorksheet();
     return ws.af_changeFormatTableInfo(tableName, optionType);
   };
+  
+  spreadsheet_api.prototype.asc_insertCellsInTable = function(tableName, optionType) {
+    var ws = this.wb.getWorksheet();
+    return ws.af_insertCellsInTable(tableName, optionType);
+  };
+  
+  spreadsheet_api.prototype.asc_deleteCellsInTable = function(tableName, optionType) {
+    var ws = this.wb.getWorksheet();
+    return ws.asc_deleteCellsInTable(tableName, optionType);
+  };
 
   spreadsheet_api.prototype.asc_setMobileVersion = function(isMobile) {
     this.isMobileVersion = isMobile;
