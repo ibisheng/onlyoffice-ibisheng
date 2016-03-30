@@ -192,7 +192,7 @@
 			asc_getFirstCol: function () { return this.firstCol; },
 			asc_getLastCol: function () { return this.lastCol; },
 			asc_getBandVer: function () { return this.bandVer; },
-			asc_getFilterButton: function () { return this.filterButton; }
+			asc_getFilterButton: function () { return this.filterButton; },
 			asc_getTableRange: function () { return this.tableRange; }
         };
 
