@@ -673,7 +673,7 @@ var editor;
   
   spreadsheet_api.prototype.asc_deleteCellsInTable = function(tableName, optionType) {
     var ws = this.wb.getWorksheet();
-    return ws.asc_deleteCellsInTable(tableName, optionType);
+    return ws.af_deleteCellsInTable(tableName, optionType);
   };
 
   spreadsheet_api.prototype.asc_setMobileVersion = function(isMobile) {

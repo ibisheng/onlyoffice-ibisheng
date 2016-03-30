@@ -178,6 +178,8 @@
             this.isShowRowStripes = null;
 			this.isShowTotalRow = null;
 			this.isShowHeaderRow = null;
+			
+			this.tableRange = null;
         }
 
         asc_CFormatTableInfo.prototype = {
@@ -191,6 +193,7 @@
 			asc_getLastCol: function () { return this.lastCol; },
 			asc_getBandVer: function () { return this.bandVer; },
 			asc_getFilterButton: function () { return this.filterButton; }
+			asc_getTableRange: function () { return this.tableRange; }
         };
 
         window["Asc"].asc_CFormatTableInfo = window["Asc"]["asc_CFormatTableInfo"] = asc_CFormatTableInfo;
@@ -206,6 +209,8 @@
 		prot["asc_getLastCol"]	        = prot.asc_getLastCol;
         prot["asc_getBandVer"]          = prot.asc_getBandVer;
 		prot["asc_getFilterButton"]     = prot.asc_getFilterButton;
+		
+		prot["asc_getTableRange"]       = prot.asc_getTableRange;
 
 
 		/** @constructor */
