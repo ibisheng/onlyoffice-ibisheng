@@ -4439,9 +4439,34 @@ function sparklineGroup() {
 	this.colorHigh = null;
 	this.colorLow = null;
 	this.f = '??';
-
 	this.arrSparklines = [];
+    this.arrCachedSparklines = [];
 }
+
+sparklineGroup.prototype.clearCached = function()
+{
+    this.arrCachedSparklines.length = 0;
+};
+
+sparklineGroup.prototype.addView = function(oSparklineView)
+{
+    this.arrCachedSparklines.push(oSparklineView);
+};
+
+sparklineGroup.prototype.draw = function(oDrawingContext)
+{
+    var graphics = new CGraphics();
+    graphics.init(oDrawingContext.ctx, oDrawingContext.getWidth(0), oDrawingContext.getHeight(0), oDrawingContext.getWidth(3), oDrawingContext.getHeight(3));
+    graphics.m_oFontManager = g_fontManager;
+    for(var i = 0; i < this.arrCachedSparklines.length; ++i)
+    {
+        this.arrCachedSparklines[i].draw(graphics);
+    }
+};
+sparklineGroup.prototype.updateCache = function(wsView)
+{
+    wsView.objectRender.createSparklineViews(this);
+};
 function sparkline() {
 	this.sqref = '??'; // ToDo добавить значение по умолчанию
 	this.f = '??';
