@@ -7591,6 +7591,526 @@ DrawingObjectsController.prototype =
 };
 
 
+
+function CSlideBoundsChecker()
+{
+    this.map_bounds_shape = {};
+    this.map_bounds_shape["heart"] = true;
+
+    this.IsSlideBoundsCheckerType = true;
+
+    this.Bounds = new CBoundsController();
+
+    this.m_oCurFont     = null;
+    this.m_oTextPr      = null;
+
+    this.m_oCoordTransform  = new CMatrixL();
+    this.m_oTransform       = new CMatrixL();
+    this.m_oFullTransform   = new CMatrixL();
+
+    this.IsNoSupportTextDraw = true;
+
+    this.LineWidth = null;
+    this.AutoCheckLineWidth = false;
+}
+
+CSlideBoundsChecker.prototype =
+{
+    DrawLockParagraph: function()
+    {},
+
+    GetIntegerGrid: function()
+    {
+        return false;
+    },
+
+    AddSmartRect: function()
+    {},
+
+    drawCollaborativeChanges: function()
+    {},
+
+    drawSearchResult : function(x, y, w, h)
+    {},
+
+    IsShapeNeedBounds : function(preset)
+    {
+        if (preset === undefined || preset == null)
+            return true;
+        return (true === this.map_bounds_shape[preset]) ? false : true;
+    },
+
+    init : function(width_px, height_px, width_mm, height_mm)
+    {
+        this.m_lHeightPix   = height_px;
+        this.m_lWidthPix    = width_px;
+        this.m_dWidthMM     = width_mm;
+        this.m_dHeightMM    = height_mm;
+        this.m_dDpiX        = 25.4 * this.m_lWidthPix / this.m_dWidthMM;
+        this.m_dDpiY        = 25.4 * this.m_lHeightPix / this.m_dHeightMM;
+
+        this.m_oCoordTransform.sx   = this.m_dDpiX / 25.4;
+        this.m_oCoordTransform.sy   = this.m_dDpiY / 25.4;
+
+        this.Bounds.ClearNoAttack();
+    },
+
+    SetCurrentPage: function()
+    {},
+
+    EndDraw : function(){},
+    put_GlobalAlpha : function(enable, alpha)
+    {
+    },
+    Start_GlobalAlpha : function()
+    {
+    },
+    End_GlobalAlpha : function()
+    {
+    },
+    // pen methods
+    p_color : function(r,g,b,a)
+    {
+    },
+    p_width : function(w)
+    {
+    },
+    // brush methods
+    b_color1 : function(r,g,b,a)
+    {
+    },
+    b_color2 : function(r,g,b,a)
+    {
+    },
+
+    SetIntegerGrid : function()
+    {
+    },
+
+    transform : function(sx,shy,shx,sy,tx,ty)
+    {
+        this.m_oTransform.sx    = sx;
+        this.m_oTransform.shx   = shx;
+        this.m_oTransform.shy   = shy;
+        this.m_oTransform.sy    = sy;
+        this.m_oTransform.tx    = tx;
+        this.m_oTransform.ty    = ty;
+
+        this.CalculateFullTransform();
+    },
+    CalculateFullTransform : function()
+    {
+        this.m_oFullTransform.sx = this.m_oTransform.sx;
+        this.m_oFullTransform.shx = this.m_oTransform.shx;
+        this.m_oFullTransform.shy = this.m_oTransform.shy;
+        this.m_oFullTransform.sy = this.m_oTransform.sy;
+        this.m_oFullTransform.tx = this.m_oTransform.tx;
+        this.m_oFullTransform.ty = this.m_oTransform.ty;
+        global_MatrixTransformer.MultiplyAppend(this.m_oFullTransform, this.m_oCoordTransform);
+    },
+    // path commands
+    _s : function()
+    {
+    },
+    _e : function()
+    {
+    },
+    _z : function()
+    {
+    },
+    _m : function(x,y)
+    {
+        var _x = this.m_oFullTransform.TransformPointX(x,y);
+        var _y = this.m_oFullTransform.TransformPointY(x,y);
+
+        this.Bounds.CheckPoint(_x, _y);
+    },
+    _l : function(x,y)
+    {
+        var _x = this.m_oFullTransform.TransformPointX(x,y);
+        var _y = this.m_oFullTransform.TransformPointY(x,y);
+
+        this.Bounds.CheckPoint(_x, _y);
+    },
+    _c : function(x1,y1,x2,y2,x3,y3)
+    {
+        var _x1 = this.m_oFullTransform.TransformPointX(x1,y1);
+        var _y1 = this.m_oFullTransform.TransformPointY(x1,y1);
+
+        var _x2 = this.m_oFullTransform.TransformPointX(x2,y2);
+        var _y2 = this.m_oFullTransform.TransformPointY(x2,y2);
+
+        var _x3 = this.m_oFullTransform.TransformPointX(x3,y3);
+        var _y3 = this.m_oFullTransform.TransformPointY(x3,y3);
+
+        this.Bounds.CheckPoint(_x1, _y1);
+        this.Bounds.CheckPoint(_x2, _y2);
+        this.Bounds.CheckPoint(_x3, _y3);
+    },
+    _c2 : function(x1,y1,x2,y2)
+    {
+        var _x1 = this.m_oFullTransform.TransformPointX(x1,y1);
+        var _y1 = this.m_oFullTransform.TransformPointY(x1,y1);
+
+        var _x2 = this.m_oFullTransform.TransformPointX(x2,y2);
+        var _y2 = this.m_oFullTransform.TransformPointY(x2,y2);
+
+        this.Bounds.CheckPoint(_x1, _y1);
+        this.Bounds.CheckPoint(_x2, _y2);
+    },
+    ds : function()
+    {
+    },
+    df : function()
+    {
+    },
+
+    // canvas state
+    save : function()
+    {
+    },
+    restore : function()
+    {
+    },
+    clip : function()
+    {
+    },
+
+    reset : function()
+    {
+        this.m_oTransform.Reset();
+        this.CalculateFullTransform();
+    },
+
+    transform3 : function(m)
+    {
+        this.m_oTransform = m.CreateDublicate();
+        this.CalculateFullTransform();
+    },
+
+    transform00 : function(m)
+    {
+        this.m_oTransform = m.CreateDublicate();
+        this.m_oTransform.tx = 0;
+        this.m_oTransform.ty = 0;
+        this.CalculateFullTransform();
+    },
+
+    // images
+    drawImage2 : function(img,x,y,w,h)
+    {
+        var _x1 = this.m_oFullTransform.TransformPointX(x,y);
+        var _y1 = this.m_oFullTransform.TransformPointY(x,y);
+
+        var _x2 = this.m_oFullTransform.TransformPointX(x+w,y);
+        var _y2 = this.m_oFullTransform.TransformPointY(x+w,y);
+
+        var _x3 = this.m_oFullTransform.TransformPointX(x+w,y+h);
+        var _y3 = this.m_oFullTransform.TransformPointY(x+w,y+h);
+
+        var _x4 = this.m_oFullTransform.TransformPointX(x,y+h);
+        var _y4 = this.m_oFullTransform.TransformPointY(x,y+h);
+
+        this.Bounds.CheckPoint(_x1, _y1);
+        this.Bounds.CheckPoint(_x2, _y2);
+        this.Bounds.CheckPoint(_x3, _y3);
+        this.Bounds.CheckPoint(_x4, _y4);
+    },
+    drawImage : function(img,x,y,w,h)
+    {
+        return this.drawImage2(img, x, y, w, h);
+    },
+
+    // text
+    font : function(font_id,font_size)
+    {
+        this.m_oFontManager.LoadFontFromFile(font_id, font_size, this.m_dDpiX, this.m_dDpiY);
+    },
+    GetFont : function()
+    {
+        return this.m_oCurFont;
+    },
+    SetFont : function(font)
+    {
+        this.m_oCurFont = font;
+    },
+    SetTextPr : function(textPr)
+    {
+        this.m_oTextPr = textPr;
+    },
+    SetFontSlot : function(slot, fontSizeKoef)
+    {
+    },
+    GetTextPr : function()
+    {
+        return this.m_oTextPr;
+    },
+    FillText : function(x,y,text)
+    {
+        // убыстеренный вариант. здесь везде заточка на то, что приходит одна буква
+        if (this.m_bIsBreak)
+            return;
+
+        // TODO: нужен другой метод отрисовки!!!
+        var _x = this.m_oFullTransform.TransformPointX(x, y);
+        var _y = this.m_oFullTransform.TransformPointY(x, y);
+        this.Bounds.CheckRect(_x, _y, 1, 1);
+    },
+    FillTextCode : function(x, y, lUnicode)
+    {
+        // убыстеренный вариант. здесь везде заточка на то, что приходит одна буква
+        if (this.m_bIsBreak)
+            return;
+
+        // TODO: нужен другой метод отрисовки!!!
+        var _x = this.m_oFullTransform.TransformPointX(x, y);
+        var _y = this.m_oFullTransform.TransformPointY(x, y);
+        this.Bounds.CheckRect(_x, _y, 1, 1);
+    },
+    t : function(text,x,y)
+    {
+        if (this.m_bIsBreak)
+            return;
+
+        // TODO: нужен другой метод отрисовки!!!
+        var _x = this.m_oFullTransform.TransformPointX(x, y);
+        var _y = this.m_oFullTransform.TransformPointY(x, y);
+        this.Bounds.CheckRect(_x, _y, 1, 1);
+    },
+    FillText2 : function(x,y,text,cropX,cropW)
+    {
+        // убыстеренный вариант. здесь везде заточка на то, что приходит одна буква
+        if (this.m_bIsBreak)
+            return;
+
+        // TODO: нужен другой метод отрисовки!!!
+        var _x = this.m_oFullTransform.TransformPointX(x, y);
+        var _y = this.m_oFullTransform.TransformPointY(x, y);
+        this.Bounds.CheckRect(_x, _y, 1, 1);
+    },
+    t2 : function(text,x,y,cropX,cropW)
+    {
+        if (this.m_bIsBreak)
+            return;
+
+        // TODO: нужен другой метод отрисовки!!!
+        var _x = this.m_oFullTransform.TransformPointX(x, y);
+        var _y = this.m_oFullTransform.TransformPointY(x, y);
+        this.Bounds.CheckRect(_x, _y, 1, 1);
+    },
+    charspace : function(space)
+    {
+    },
+
+    // private methods
+    DrawHeaderEdit : function(yPos)
+    {
+    },
+    DrawFooterEdit : function(yPos)
+    {
+    },
+
+    DrawEmptyTableLine : function(x1,y1,x2,y2)
+    {
+    },
+
+    DrawSpellingLine : function(y0, x0, x1, w)
+    {
+    },
+
+    // smart methods for horizontal / vertical lines
+    drawHorLine : function(align, y, x, r, penW)
+    {
+        var _x1 = this.m_oFullTransform.TransformPointX(x,y-penW);
+        var _y1 = this.m_oFullTransform.TransformPointY(x,y-penW);
+
+        var _x2 = this.m_oFullTransform.TransformPointX(x,y+penW);
+        var _y2 = this.m_oFullTransform.TransformPointY(x,y+penW);
+
+        var _x3 = this.m_oFullTransform.TransformPointX(r,y-penW);
+        var _y3 = this.m_oFullTransform.TransformPointY(r,y-penW);
+
+        var _x4 = this.m_oFullTransform.TransformPointX(r,y+penW);
+        var _y4 = this.m_oFullTransform.TransformPointY(r,y+penW);
+
+        this.Bounds.CheckPoint(_x1, _y1);
+        this.Bounds.CheckPoint(_x2, _y2);
+        this.Bounds.CheckPoint(_x3, _y3);
+        this.Bounds.CheckPoint(_x4, _y4);
+    },
+    drawHorLine2 : function(align, y, x, r, penW)
+    {
+        return this.drawHorLine(align, y, x, r, penW);
+    },
+    drawVerLine : function(align, x, y, b, penW)
+    {
+        var _x1 = this.m_oFullTransform.TransformPointX(x-penW,y);
+        var _y1 = this.m_oFullTransform.TransformPointY(x-penW,y);
+
+        var _x2 = this.m_oFullTransform.TransformPointX(x+penW,y);
+        var _y2 = this.m_oFullTransform.TransformPointY(x+penW,y);
+
+        var _x3 = this.m_oFullTransform.TransformPointX(x-penW,b);
+        var _y3 = this.m_oFullTransform.TransformPointY(x-penW,b);
+
+        var _x4 = this.m_oFullTransform.TransformPointX(x+penW,b);
+        var _y4 = this.m_oFullTransform.TransformPointY(x+penW,b);
+
+        this.Bounds.CheckPoint(_x1, _y1);
+        this.Bounds.CheckPoint(_x2, _y2);
+        this.Bounds.CheckPoint(_x3, _y3);
+        this.Bounds.CheckPoint(_x4, _y4);
+    },
+
+    // мега крутые функции для таблиц
+    drawHorLineExt : function(align, y, x, r, penW, leftMW, rightMW)
+    {
+        this.drawHorLine(align, y, x + leftMW, r + rightMW);
+    },
+
+    rect : function(x,y,w,h)
+    {
+        var _x1 = this.m_oFullTransform.TransformPointX(x,y);
+        var _y1 = this.m_oFullTransform.TransformPointY(x,y);
+
+        var _x2 = this.m_oFullTransform.TransformPointX(x+w,y);
+        var _y2 = this.m_oFullTransform.TransformPointY(x+w,y);
+
+        var _x3 = this.m_oFullTransform.TransformPointX(x+w,y+h);
+        var _y3 = this.m_oFullTransform.TransformPointY(x+w,y+h);
+
+        var _x4 = this.m_oFullTransform.TransformPointX(x,y+h);
+        var _y4 = this.m_oFullTransform.TransformPointY(x,y+h);
+
+        this.Bounds.CheckPoint(_x1, _y1);
+        this.Bounds.CheckPoint(_x2, _y2);
+        this.Bounds.CheckPoint(_x3, _y3);
+        this.Bounds.CheckPoint(_x4, _y4);
+    },
+
+    rect2 : function(x,y,w,h)
+    {
+        var _x1 = this.m_oFullTransform.TransformPointX(x,y);
+        var _y1 = this.m_oFullTransform.TransformPointY(x,y);
+
+        var _x2 = this.m_oFullTransform.TransformPointX(x+w,y);
+        var _y2 = this.m_oFullTransform.TransformPointY(x+w,y);
+
+        var _x3 = this.m_oFullTransform.TransformPointX(x+w,y-h);
+        var _y3 = this.m_oFullTransform.TransformPointY(x+w,y-h);
+
+        var _x4 = this.m_oFullTransform.TransformPointX(x,y-h);
+        var _y4 = this.m_oFullTransform.TransformPointY(x,y-h);
+
+        this.Bounds.CheckPoint(_x1, _y1);
+        this.Bounds.CheckPoint(_x2, _y2);
+        this.Bounds.CheckPoint(_x3, _y3);
+        this.Bounds.CheckPoint(_x4, _y4);
+    },
+
+    TableRect : function(x,y,w,h)
+    {
+        this.rect(x, y, w, h);
+    },
+
+    // функции клиппирования
+    AddClipRect : function(x, y, w, h)
+    {
+    },
+    RemoveClipRect : function()
+    {
+    },
+
+    SetClip : function(r)
+    {
+    },
+    RemoveClip : function()
+    {
+    },
+
+    SavePen : function()
+    {
+    },
+    RestorePen : function()
+    {
+    },
+
+    SaveBrush : function()
+    {
+    },
+    RestoreBrush : function()
+    {
+    },
+
+    SavePenBrush : function()
+    {
+    },
+    RestorePenBrush : function()
+    {
+    },
+
+    SaveGrState : function()
+    {
+    },
+    RestoreGrState : function()
+    {
+    },
+
+    StartClipPath : function()
+    {
+    },
+
+    EndClipPath : function()
+    {
+    },
+
+    CorrectBounds : function()
+    {
+        if (this.LineWidth != null)
+        {
+            var _correct = this.LineWidth / 2.0;
+
+            this.Bounds.min_x -= _correct;
+            this.Bounds.min_y -= _correct;
+            this.Bounds.max_x += _correct;
+            this.Bounds.max_y += _correct;
+        }
+    },
+
+    CorrectBounds2 : function()
+    {
+        if (this.LineWidth != null)
+        {
+            var _correct = this.LineWidth * this.m_oCoordTransform.sx / 2;
+
+            this.Bounds.min_x -= _correct;
+            this.Bounds.min_y -= _correct;
+            this.Bounds.max_x += _correct;
+            this.Bounds.max_y += _correct;
+        }
+    },
+
+    CheckLineWidth : function(shape)
+    {
+        if (!shape)
+            return;
+        var _ln = shape.pen;
+        if (_ln != null && _ln.Fill != null && _ln.Fill.fill != null)
+        {
+            this.LineWidth = (_ln.w == null) ? 12700 : parseInt(_ln.w);
+            this.LineWidth /= 36000.0;
+        }
+    },
+
+    DrawLockObjectRect : function()
+    {
+    },
+
+    DrawPresentationComment : function(type, x, y, w, h)
+    {
+        this.rect(x, y, w, h);
+    }
+};
 //-----------------------------------------------------------------------------------
 // ASC Classes
 //-----------------------------------------------------------------------------------

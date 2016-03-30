@@ -3805,7 +3805,7 @@ CShape.prototype =
         {
             var clip_rect = this.clipRect;
             var oBodyPr = this.getBodyPr();
-            if(!oBodyPr || oBodyPr.upright)
+            if(!oBodyPr || !oBodyPr.upright)
             {
                 graphics.transform3(this.transform);
                 graphics.AddClipRect(clip_rect.x, clip_rect.y, clip_rect.w, clip_rect.h);
