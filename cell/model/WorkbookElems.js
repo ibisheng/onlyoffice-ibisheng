@@ -4406,6 +4406,46 @@ CellArea.prototype = {
 	}
 };
 
+function sparklineGroups() {
+	this.arrSparklineGroup = [];
+}
+function sparklineGroup() {
+	// attributes
+	this.manualMax = undefined;
+	this.manualMin = undefined;
+	this.lineWeight = 0.75;
+	this.type = Asc.ESparklineType.Line;
+	this.dateAxis = false;
+	this.displayEmptyCellsAs = Asc.EDispBlanksAs.Zero;
+	this.markers = false;
+	this.high = false;
+	this.low = false;
+	this.first = false;
+	this.last = false;
+	this.negative = false;
+	this.displayXAxis = false;
+	this.displayHidden = false;
+	this.minAxisType = Asc.SparklineAxisMinMax.Individual;
+	this.maxAxisType = Asc.SparklineAxisMinMax.Individual;
+	this.rightToLeft = false;
+
+	// elements
+	this.colorSeries = null; // ToDo добавить значения по умолчанию
+	this.colorNegative = null;
+	this.colorAxis = null;
+	this.colorMarkers = null;
+	this.colorFirst = null;
+	this.colorLast = null;
+	this.colorHigh = null;
+	this.colorLow = null;
+
+	this.arrSparklines = [];
+}
+function sparkline() {
+	this.sqref = '??'; // ToDo добавить значение по умолчанию
+	this.f = '??';
+}
+
 // For Auto Filters
 /** @constructor */
 function TablePart(handlers) {

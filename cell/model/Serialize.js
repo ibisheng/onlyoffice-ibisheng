@@ -921,6 +921,21 @@
         Percent: 4,
         Percentile: 5
     };
+      var ESparklineType = {
+          Line: 0,
+          Column: 1,
+          Stacked: 2
+      };
+      var EDispBlanksAs = {
+          Span: 0,
+          Gap: 1,
+          Zero: 2
+      };
+      var SparklineAxisMinMax = {
+          Individual: 0,
+          Group: 1,
+          Custom: 2
+      };
 
     var DocumentPageSize = new function() {
         this.oSizes = [
@@ -7823,6 +7838,9 @@
     window["Asc"].EFontScheme = EFontScheme;
     window["Asc"].EIconSetType = EIconSetType;
 	window["Asc"].ECfType = ECfType;
+      window["Asc"].ESparklineType = ESparklineType;
+      window["Asc"].EDispBlanksAs = EDispBlanksAs;
+      window["Asc"].SparklineAxisMinMax = SparklineAxisMinMax;
 
     window["Asc"].CTableStyles = CTableStyles;
     window["Asc"].CTableStyle = CTableStyle;
