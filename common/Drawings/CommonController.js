@@ -7592,6 +7592,116 @@ DrawingObjectsController.prototype =
 
 
 
+function CBoundsController()
+{
+    this.min_x = 0xFFFF;
+    this.min_y = 0xFFFF;
+    this.max_x = -0xFFFF;
+    this.max_y = -0xFFFF;
+
+    this.Rects = [];
+}
+
+CBoundsController.prototype =
+{
+    ClearNoAttack : function()
+    {
+        this.min_x = 0xFFFF;
+        this.min_y = 0xFFFF;
+        this.max_x = -0xFFFF;
+        this.max_y = -0xFFFF;
+
+        if (0 != this.Rects.length)
+            this.Rects.splice(0, this.Rects.length);
+    },
+
+    CheckPageRects : function(rects, ctx)
+    {
+        var _bIsUpdate = false;
+        if (rects.length != this.Rects.length)
+        {
+            _bIsUpdate = true;
+        }
+        else
+        {
+            for (var i = 0; i < rects.length; i++)
+            {
+                var _1 = this.Rects[i];
+                var _2 = rects[i];
+
+                if (_1.x != _2.x || _1.y != _2.y || _1.w != _2.w || _1.h != _2.h)
+                    _bIsUpdate = true;
+            }
+        }
+
+        if (!_bIsUpdate)
+            return;
+
+        this.Clear(ctx);
+
+        if (0 != this.Rects.length)
+            this.Rects.splice(0, this.Rects.length);
+
+        for (var i = 0; i < rects.length; i++)
+        {
+            var _r = rects[i];
+            this.CheckRect(_r.x, _r.y, _r.w, _r.h);
+            this.Rects.push(_r);
+        }
+    },
+
+    Clear : function(ctx)
+    {
+        if (this.max_x != -0xFFFF && this.max_y != -0xFFFF)
+        {
+            ctx.fillRect(this.min_x - 5, this.min_y - 5, this.max_x - this.min_x + 10, this.max_y - this.min_y + 10);
+        }
+        this.min_x = 0xFFFF;
+        this.min_y = 0xFFFF;
+        this.max_x = -0xFFFF;
+        this.max_y = -0xFFFF;
+    },
+
+    CheckPoint1 : function(x,y)
+    {
+        if (x < this.min_x)
+            this.min_x = x;
+        if (y < this.min_y)
+            this.min_y = y;
+    },
+    CheckPoint2 : function(x,y)
+    {
+        if (x > this.max_x)
+            this.max_x = x;
+        if (y > this.max_y)
+            this.max_y = y;
+    },
+    CheckPoint : function(x,y)
+    {
+        if (x < this.min_x)
+            this.min_x = x;
+        if (y < this.min_y)
+            this.min_y = y;
+        if (x > this.max_x)
+            this.max_x = x;
+        if (y > this.max_y)
+            this.max_y = y;
+    },
+    CheckRect : function(x,y,w,h)
+    {
+        this.CheckPoint1(x,y);
+        this.CheckPoint2(x + w,y + h);
+    },
+
+    fromBounds : function(_bounds)
+    {
+        this.min_x = _bounds.min_x;
+        this.min_y = _bounds.min_y;
+        this.max_x = _bounds.max_x;
+        this.max_y = _bounds.max_y;
+    }
+};
+
 function CSlideBoundsChecker()
 {
     this.map_bounds_shape = {};
