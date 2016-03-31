@@ -227,11 +227,6 @@ var c_oAscPrintType = {
   EntireWorkbook: 1,	// Всю книгу
   Selection: 2		// Выделенный фрагмент
 };
-// Тип печати
-var c_oAscLayoutPageType = {
-  FitToWidth: 0,	// На всю ширину
-  ActualSize: 1		// По реальным размерам
-};
 
 /** @enum */
 var c_oAscCustomAutoFilter = {

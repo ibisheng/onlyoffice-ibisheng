@@ -2328,7 +2328,8 @@ function asc_ReadAdjustPrint(s, p) {
             }
             case 1:
             {
-                adjustPrint.asc_setLayoutPageType(s[p.pos++]);
+                // ToDo что-то тут нужно поправить...Теперь нет asc_setLayoutPageType
+                //adjustPrint.asc_setLayoutPageType(s[p.pos++]);
                 break;
             }
             case 255:

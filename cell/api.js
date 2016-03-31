@@ -3160,11 +3160,14 @@ var editor;
     var _adjustPrint = window.AscDesktopEditor_PrintData ? window.AscDesktopEditor_PrintData : new asc_CAdjustPrint();
     window.AscDesktopEditor_PrintData = undefined;
 
-    if (1 == _param)
-    {
-      _adjustPrint.asc_setPrintType(c_oAscPrintType.EntireWorkbook);
-      _adjustPrint.asc_setFitToWidth(true);
-      _adjustPrint.asc_setFitToHeight(true);
+    if (1 == _param) {
+      var countWorksheets = _adjustPrint.asc_setPrintType(c_oAscPrintType.EntireWorkbook), printOptions;
+      this.wbModel.getWorksheetCount();
+      for (var j = 0; j < countWorksheets; ++j) {
+        printOptions = this.wbModel.getWorksheet(j).PagePrintOptions;
+        printOptions.asc_setFitToWidth(true);
+        printOptions.asc_setFitToHeight(true);
+    }
     }
 
     var _printPagesData = this.wb.calcPagesPrint(_adjustPrint);
