@@ -318,44 +318,45 @@ function CSparklineView()
 }
 CSparklineView.prototype.initFromSparkline = function(oSparkline, oSparklineGroup, worksheetView)
 {
-    this.ws = worksheetView;
-    var settings = new asc_ChartSettings();
-    switch(oSparklineGroup.type)
-    {
-        case Asc.ESparklineType.Column:
+    ExecuteNoHistory(function(){
+        this.ws = worksheetView;
+        var settings = new asc_ChartSettings();
+        switch(oSparklineGroup.type)
         {
-            settings.type = c_oAscChartTypeSettings.barNormal;
-            break;
+            case Asc.ESparklineType.Column:
+            {
+                settings.type = c_oAscChartTypeSettings.barNormal;
+                break;
+            }
+            case Asc.ESparklineType.Stacked:
+            {
+                settings.type = c_oAscChartTypeSettings.barStacked;
+                break;
+            }
+            default:
+            {
+                settings.type = c_oAscChartTypeSettings.lineNormal;
+                break;
+            }
         }
-        case Asc.ESparklineType.Stacked:
-        {
-            settings.type = c_oAscChartTypeSettings.barStacked;
-            break;
-        }
-        default:
-        {
-            settings.type = c_oAscChartTypeSettings.lineNormal;
-            break;
-        }
-    }
-
-    var ser = new asc_CChartSeria();
-    ser.Val.Formula = oSparkline.f;
-    var chartSeries = {series: [ser], parsedHeaders: {bLeft: false, bTop: false}};
-    var chart_space = DrawingObjectsController.prototype._getChartSpace(chartSeries, settings, true);
-    chart_space.setWorksheet(worksheetView.model);
-    this.chartSpace = chart_space;
-    var oBBox = worksheetView.model.getCell(oSparkline.sqref);
-    this.col = oBBox.c1;
-    this.row = oBBox.r1;
-    this.extX = worksheetView.getColumnWidth(oBBox.c1, 3);
-    this.extY = worksheetView.getRowHeight(oBBox.r1, 3);
-    CheckSpPrXfrm(this.chartSpace);
-    this.chartSpace.spPr.xfrm.setOffX(0);
-    this.chartSpace.spPr.xfrm.setOffY(0);
-    this.chartSpace.spPr.xfrm.setExtX(this.extX);
-    this.chartSpace.spPr.xfrm.setExtY(this.extY);
-    this.chartSpace.recalculate();
+        var ser = new asc_CChartSeria();
+        ser.Val.Formula = oSparkline.f;
+        var chartSeries = {series: [ser], parsedHeaders: {bLeft: false, bTop: false}};
+        var chart_space = DrawingObjectsController.prototype._getChartSpace(chartSeries, settings, true);
+        chart_space.setWorksheet(worksheetView.model);
+        this.chartSpace = chart_space;
+        var oBBox = worksheetView.model.getCell(oSparkline.sqref);
+        this.col = oBBox.c1;
+        this.row = oBBox.r1;
+        this.extX = worksheetView.getColumnWidth(oBBox.c1, 3);
+        this.extY = worksheetView.getRowHeight(oBBox.r1, 3);
+        CheckSpPrXfrm(this.chartSpace);
+        this.chartSpace.spPr.xfrm.setOffX(0);
+        this.chartSpace.spPr.xfrm.setOffY(0);
+        this.chartSpace.spPr.xfrm.setExtX(this.extX);
+        this.chartSpace.spPr.xfrm.setExtY(this.extY);
+        this.chartSpace.recalculate();
+    }, this, []);
 };
 
 CSparklineView.prototype.draw = function(graphics)
@@ -366,14 +367,17 @@ CSparklineView.prototype.draw = function(graphics)
     var extY = this.ws.getRowHeight(this.row, 3);
     if(Math.abs(this.extX - extX) > 0.01 || Math.abs(this.extY - extY) > 0.01)
     {
-        this.chartSpace.spPr.xfrm.setExtX(extX);
-        this.chartSpace.spPr.xfrm.setExtY(extY);
+        ExecuteNoHistory(function(){
+            this.chartSpace.spPr.xfrm.setExtX(extX);
+            this.chartSpace.spPr.xfrm.setExtY(extY);
+        }, this, []);
         this.extX = extX;
         this.extY = extY;
         this.chartSpace.recalculate();
     }
     graphics.m_oCoordTransform.tx = x;
     graphics.m_oCoordTransform.ty = y;
+    this.chartSpace.draw(graphics);
 };
 
 //-----------------------------------------------------------------------------------
