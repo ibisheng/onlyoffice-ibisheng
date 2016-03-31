@@ -4447,8 +4447,8 @@ function sparklineGroup() {
 sparklineGroup.prototype.clearCached = function() {
 	this.arrCachedSparklines.length = 0;
 };
-sparklineGroup.prototype.addView = function(oSparklineView) {
-	this.arrCachedSparklines.push(oSparklineView);
+sparklineGroup.prototype.addView = function(oSparklineView, index) {
+	this.arrCachedSparklines[index] = oSparklineView;
 };
 sparklineGroup.prototype.draw = function(oDrawingContext) {
 	var graphics = new CGraphics();
@@ -4471,6 +4471,9 @@ function sparkline() {
 	this.sqref = '??'; // ToDo добавить значение по умолчанию
 	this.f = '??';
 }
+sparkline.prototype.checkInRange = function(range) {
+	range.intersectionSimple(this.sqref);
+};
 
 // For Auto Filters
 /** @constructor */

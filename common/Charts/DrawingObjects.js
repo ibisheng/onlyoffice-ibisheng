@@ -1988,24 +1988,26 @@ function DrawingObjects() {
         }
     };
 
-
-    _this.createSparklineViews = function(oSparkLineGroup)
-    {
-        oSparkLineGroup.clearCached();
-        for(var i = 0; i < oSparkLineGroup.arrSparklines.length; ++i)
-        {
-            var oSparklineView = new CSparklineView();
-            oSparklineView.initFromSparkline(oSparkLineGroup.arrSparklines[i], oSparkLineGroup, worksheet);
-            oSparkLineGroup.addView(oSparklineView);
+    _this.clearSparklineGroups = function(range) {
+        for(var i = 0; i < oSparklineGroups.arrSparklineGroup.length; ++i) {
+            var oSparklineGroup = oSparklineGroups.arrSparklineGroup[i];
+            oSparklineGroup.updateCache(range);
         }
     };
-
-    _this.drawSparkLineGroups = function(oDrawingContext, oSparkLineGroups, range)
+    _this.drawSparklineGroups = function(oDrawingContext, oSparklineGroups, range)
     {
-        for(var i = 0; i < oSparkLineGroups.arrSparklineGroup.length; ++i) {
-            var oSparklineGroup = oSparkLineGroups.arrSparklineGroup[i];
-            oSparklineGroup.updateCache(range);
+        for(var i = 0; i < oSparklineGroups.arrSparklineGroup.length; ++i) {
+            var oSparklineGroup = oSparklineGroups.arrSparklineGroup[i];
             for(var j = 0; j < oSparklineGroup.arrSparklines.length; ++j) {
+                if (!oSparklineGroup.arrSparklines[i].checkInRange(range)) {
+                    continue;
+                }
+                if (!oSparklineGroup.arrCachedSparklines[j]) {
+                    var oSparklineView = new CSparklineView();
+                    oSparklineView.initFromSparkline(oSparklineGroup.arrSparklines[j], oSparklineGroup, worksheet);
+                    oSparklineGroup.addView(oSparklineView);
+                }
+                // draw
             }
         }
     };
