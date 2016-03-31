@@ -2840,7 +2840,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                     SpaceLen = 0;
                     WordLen = 0;
 
-                    var TabPos = Para.private_RecalculateGetTabPos(X, ParaPr, PRS.Page);
+                    var TabPos = Para.private_RecalculateGetTabPos(X, ParaPr, PRS.Page, false);
                     var NewX = TabPos.NewX;
                     var TabValue = TabPos.TabValue;
 

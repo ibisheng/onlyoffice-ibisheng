@@ -1861,7 +1861,7 @@ Paragraph.prototype.private_RecalculateRangeEndPos     = function(PRS, PRP, Dept
     this.Lines[CurLine].Set_RangeEndPos( CurRange, CurPos );
 };
 
-Paragraph.prototype.private_RecalculateGetTabPos = function(X, ParaPr, CurPage)
+Paragraph.prototype.private_RecalculateGetTabPos = function(X, ParaPr, CurPage, NumTab)
 {
     var PRS = this.m_oPRSW;
 
@@ -1882,10 +1882,9 @@ Paragraph.prototype.private_RecalculateGetTabPos = function(X, ParaPr, CurPage)
         var Tab = ParaPr.Tabs.Get(Index);
         var TabPos = Tab.Pos + PageStart.X;
 
-        // Здесь 0.001 убавляется из-за замечания ниже
-        if ( true === bCheckLeft && TabPos > PageStart.X + ParaPr.Ind.Left - 0.001 )
+        if ( true === bCheckLeft && TabPos > PageStart.X + ParaPr.Ind.Left )
         {
-            TabsPos.push( new CParaTab(tab_Left, ParaPr.Ind.Left - 0.001) );
+            TabsPos.push( new CParaTab(tab_Left, ParaPr.Ind.Left ) );
             bCheckLeft = false;
         }
 
@@ -1893,9 +1892,8 @@ Paragraph.prototype.private_RecalculateGetTabPos = function(X, ParaPr, CurPage)
             TabsPos.push( Tab );
     }
 
-    // Здесь 0.001 убавляется из-за замечания ниже
     if ( true === bCheckLeft )
-        TabsPos.push( new CParaTab(tab_Left, ParaPr.Ind.Left - 0.001) );
+        TabsPos.push( new CParaTab(tab_Left, ParaPr.Ind.Left ) );
 
     TabsCount = TabsPos.length;
 
@@ -1905,8 +1903,14 @@ Paragraph.prototype.private_RecalculateGetTabPos = function(X, ParaPr, CurPage)
         var TempTab = TabsPos[Index];
 
         // TODO: Пока здесь сделаем поправку на погрешность. Когда мы сделаем так, чтобы все наши значения хранились
-        //       в тех же единицах, что и в формате Docx, тогда и здесь можно будет вернуть строгое равенство (см. баг 22586)
-        if ( X < TempTab.Pos + PageStart.X + 0.001 )
+        //       в тех же единицах, что и в формате Docx, тогда и здесь можно будет вернуть обычное сравнение (см. баг 22586)
+        //       Разница с NumTab возникла из-за бага 22586, везде нестрогое оставлять нельзя из-за бага 32051.
+
+        var _X1 = (X * 72 * 20) | 0;
+        var _X2 = ((TempTab.Pos + PageStart.X) * 72 * 20) | 0;
+
+        //if (X < TempTab.Pos + PageStart.X)
+        if ((true === NumTab && _X1 <= _X2) || (true !== NumTab && _X1 < _X2))
         {
             Tab = TempTab;
             break;
@@ -1935,8 +1939,7 @@ Paragraph.prototype.private_RecalculateGetTabPos = function(X, ParaPr, CurPage)
     }
     else
     {
-        // Здесь 0.001 добавляется из-за замечания выше
-        NewX = Tab.Pos + PageStart.X + 0.001;
+        NewX = Tab.Pos + PageStart.X;
     }
 
     return { NewX : NewX, TabValue : ( null === Tab ? tab_Left : Tab.Value ), DefaultTab : (null === Tab ? true : false) };
@@ -2715,7 +2718,7 @@ CParagraphRecalculateStateWrap.prototype =
                     }
                     case numbering_suff_Tab:
                     {
-                        var NewX = Para.private_RecalculateGetTabPos(X, ParaPr, CurPage).NewX;
+                        var NewX = Para.private_RecalculateGetTabPos(X, ParaPr, CurPage, true).NewX;
 
                         NumberingItem.WidthSuff = NewX - X;
 
