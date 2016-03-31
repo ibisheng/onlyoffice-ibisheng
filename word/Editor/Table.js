@@ -263,7 +263,8 @@ CTable.prototype =
             var Border_insideH = null;
             var Border_insideV = null;
 
-            var CellShd = null;
+            var CellShd   = null;
+            var CellWidth = undefined;
 
             var Prev_row = -1;
             var bFirstRow = true;
@@ -276,10 +277,11 @@ CTable.prototype =
             {
                 var Pos = this.Selection.Data[Index];
                 var Row = this.Content[Pos.Row];
-                var Cell = Row.Get_Cell( Pos.Cell );
+                var Cell        = Row.Get_Cell( Pos.Cell );
                 var Cell_borders = Cell.Get_Borders();
                 var Cell_margins = Cell.Get_Margins();
-                var Cell_shd = Cell.Get_Shd();
+                var Cell_shd     = Cell.Get_Shd();
+                var Cell_w       = Cell.Get_W();
 
                 if ( 0 === Index )
                 {
@@ -307,6 +309,22 @@ CTable.prototype =
                 {
                     if ( null != CellShd && ( CellShd.Value != Cell_shd.Value || CellShd.Color.r != Cell_shd.Color.r || CellShd.Color.g != Cell_shd.Color.g || CellShd.Color.b != Cell_shd.Color.b ) )
                         CellShd = null;
+                }
+
+                if (0 === Index)
+                {
+                    if (tblwidth_Auto === Cell_w.Type)
+                        CellWidth = null;
+                    else if (tblwidth_Mm === Cell_w.Type)
+                        CellWidth = Cell_w.W;
+                    else// if (tblwidth_Pct === Cell_w.Type)
+                        CellWidth = -Cell_w.W;
+                }
+                else
+                {
+                    if ((tblwidth_Auto === Cell_w.Type && null !== CellWidth)
+                        || (undefined === CellWidth || null === CellWidth || Math.abs(CellWidth - Cell_w.W) > 0.001))
+                        CellWidth = undefined;
                 }
 
                 // Крайняя левая ли данная ячейка в выделении?
@@ -418,6 +436,7 @@ CTable.prototype =
             Pr.CellsVAlign = VAlign;
             Pr.CellsTextDirection = TextDirection;
             Pr.CellsNoWrap        = NoWrap;
+            Pr.CellsWidth         = CellWidth;
 
             Pr.CellBorders =
             {
@@ -465,6 +484,7 @@ CTable.prototype =
             var CellMargins = Cell.Get_Margins();
             var CellBorders = Cell.Get_Borders();
             var CellShd     = Cell.Get_Shd();
+            var CellW       = Cell.Get_W();
 
             if ( true === Cell.Is_TableMargins() )
             {
@@ -491,6 +511,12 @@ CTable.prototype =
 
             Pr.CellsBackground = CellShd.Copy();
 
+            if (tblwidth_Auto === CellW.Type)
+                Pr.CellsWidth = null;
+            else if (tblwidth_Mm === CellW.Type)
+                Pr.CellsWidth = CellW.W;
+            else// if (tblwidth_Pct === CellW.Type)
+                Pr.CellsWidth = -CellW.W;
 
             var Spacing = this.Content[0].Get_CellSpacing();
             if ( null === Spacing )
@@ -1908,6 +1934,36 @@ CTable.prototype =
             else
             {
                 this.CurCell.Set_NoWrap(Props.CellsNoWrap);
+            }
+        }
+
+        // CellsWidth
+        if (undefined !== Props.CellsWidth)
+        {
+            if (this.Selection.Use === true && table_Selection_Cell === this.Selection.Type)
+            {
+                var Count = this.Selection.Data.length;
+                for (var Index = 0; Index < Count; ++Index)
+                {
+                    var Pos  = this.Selection.Data[Index];
+                    var Cell = this.Content[Pos.Row].Get_Cell(Pos.Cell);
+
+                    if (null === Props.CellsWidth)
+                        Cell.Set_W(new CTableMeasurement(tblwidth_Auto, 0));
+                    else if (Props.CellsWidth > -0.001)
+                        Cell.Set_W(new CTableMeasurement(tblwidth_Mm, Props.CellsWidth));
+                    else
+                        Cell.Set_W(new CTableMeasurement(tblwidth_Pct, Math.abs(Props.CellsWidth)));
+                }
+            }
+            else
+            {
+                if (null === Props.CellsWidth)
+                    this.CurCell.Set_W(new CTableMeasurement(tblwidth_Auto, 0));
+                else if (Props.CellsWidth > -0.001)
+                    this.CurCell.Set_W(new CTableMeasurement(tblwidth_Mm, Props.CellsWidth));
+                else
+                    this.CurCell.Set_W(new CTableMeasurement(tblwidth_Pct, Math.abs(Props.CellsWidth)));
             }
         }
 
