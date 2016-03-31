@@ -1988,26 +1988,30 @@ function DrawingObjects() {
         }
     };
 
-    _this.clearSparklineGroups = function(range) {
+    _this.clearSparklineGroups = function(oSparklineGroups, range) {
         for(var i = 0; i < oSparklineGroups.arrSparklineGroup.length; ++i) {
             var oSparklineGroup = oSparklineGroups.arrSparklineGroup[i];
             oSparklineGroup.updateCache(range);
         }
     };
-    _this.drawSparklineGroups = function(oDrawingContext, oSparklineGroups, range)
+    _this.drawSparkLineGroups = function(oDrawingContext, oSparklineGroups, range)
     {
+        var graphics = new CGraphics();
+        graphics.init(oDrawingContext.ctx, oDrawingContext.getWidth(0), oDrawingContext.getHeight(0),
+            oDrawingContext.getWidth(3), oDrawingContext.getHeight(3));
+        graphics.m_oFontManager = g_fontManager;
         for(var i = 0; i < oSparklineGroups.arrSparklineGroup.length; ++i) {
             var oSparklineGroup = oSparklineGroups.arrSparklineGroup[i];
             for(var j = 0; j < oSparklineGroup.arrSparklines.length; ++j) {
-                if (!oSparklineGroup.arrSparklines[i].checkInRange(range)) {
-                    continue;
-                }
                 if (!oSparklineGroup.arrCachedSparklines[j]) {
                     var oSparklineView = new CSparklineView();
                     oSparklineView.initFromSparkline(oSparklineGroup.arrSparklines[j], oSparklineGroup, worksheet);
-                    oSparklineGroup.addView(oSparklineView);
+                    oSparklineGroup.addView(oSparklineView, j);
                 }
-                // draw
+                if (!oSparklineGroup.arrSparklines[j].checkInRange(range)) {
+                    continue;
+                }
+                oSparklineGroup.arrCachedSparklines[j].draw(graphics);
             }
         }
     };
