@@ -13,6 +13,18 @@ var DISTANCE_TO_TEXT_LEFTRIGHT = 3.2;
 
 function CheckShapeBodyAutoFitReset(oShape)
 {
+    var oParaDrawing = getParaDrawing(oShape);
+    if(oParaDrawing)
+    {
+        if(oParaDrawing.SizeRelH)
+        {
+            oParaDrawing.SetSizeRelH(undefined);
+        }
+        if(oParaDrawing.SizeRelV)
+        {
+            oParaDrawing.SetSizeRelV(undefined);
+        }
+    }
     if(oShape instanceof CShape)
     {
         var oPropsToSet = null;

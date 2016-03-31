@@ -2531,6 +2531,94 @@ CShape.prototype =
                         this.extY = this.parent.Extent.H;
                     }
                 }
+                else
+                {
+                        var oParaDrawing = getParaDrawing(this);
+                        if(oParaDrawing)
+                        {
+                            if(oParaDrawing.SizeRelH || oParaDrawing.SizeRelV)
+                            {
+                                this.m_oSectPr = null;
+                                var oParentParagraph = oParaDrawing.Get_ParentParagraph();
+                                if(oParentParagraph)
+                                {
+                                    var oSectPr = oParentParagraph.Get_SectPr();
+                                    if(oSectPr)
+                                    {
+                                        if(oParaDrawing.SizeRelH)
+                                        {
+                                            switch(oParaDrawing.SizeRelH.RelativeFrom)
+                                            {
+                                                case c_oAscRelativeFromH.Margin:
+                                                {
+                                                    this.extX = oSectPr.Get_PageWidth() - oSectPr.Get_PageMargin_Left() - oSectPr.Get_PageMargin_Right();
+                                                    break;
+                                                }
+                                                case c_oAscRelativeFromH.Page:
+                                                {
+                                                    this.extX = oSectPr.Get_PageWidth();
+                                                    break;
+                                                }
+                                                case c_oAscRelativeFromH.LeftMargin:
+                                                {
+                                                    this.extX = oSectPr.Get_PageMargin_Left();
+                                                    break;
+                                                }
+
+                                                case c_oAscRelativeFromH.RightMargin:
+                                                {
+                                                    this.extX = oSectPr.Get_PageMargin_Right();
+                                                    break;
+                                                }
+                                                default:
+                                                {
+                                                    this.extX = oSectPr.Get_PageMargin_Left();
+                                                    break;
+                                                }
+                                            }
+                                            this.extX *= oParaDrawing.SizeRelH.Percent;
+                                        }
+                                        if(oParaDrawing.SizeRelV)
+                                        {
+
+                                            switch(oParaDrawing.SizeRelV.RelativeFrom)
+                                            {
+                                                case c_oAscRelativeFromV.Margin:
+                                                {
+                                                    this.extY = oSectPr.Get_PageHeight() - oSectPr.Get_PageMargin_Top() - oSectPr.Get_PageMargin_Bottom();
+                                                    break;
+                                                }
+                                                case c_oAscRelativeFromV.Page:
+                                                {
+                                                    this.extY = oSectPr.Get_PageHeight();
+                                                    break;
+                                                }
+                                                case c_oAscRelativeFromV.TopMargin:
+                                                {
+                                                    this.extY = oSectPr.Get_PageMargin_Top();
+                                                    break;
+                                                }
+                                                case c_oAscRelativeFromV.BottomMargin:
+                                                {
+                                                    this.extY = oSectPr.Get_PageMargin_Bottom();
+                                                    break;
+                                                }
+                                                default:
+                                                {
+                                                    this.extY = oSectPr.Get_PageMargin_Top();
+                                                    break;
+                                                }
+                                            }
+                                            this.extY *= oParaDrawing.SizeRelV.Percent;
+                                        }
+                                        this.m_oSectPr = new CSectionPr();
+                                        this.m_oSectPr.Copy(oSectPr);
+                                    }
+                                }
+                            }
+                        }
+
+                }
             }
             else
             {
@@ -2918,7 +3006,9 @@ CShape.prototype =
     {
         var Width, Height, Width2, Height2;
         var bRet = false;
-        if(this.checkAutofit())
+        var oParaDrawing = getParaDrawing(this);
+        var bSizRel = (oParaDrawing && (oParaDrawing.SizeRelH || oParaDrawing.SizeRelV));
+        if(this.checkAutofit() || bSizRel )
         {
             if(oSectPr)
             {
@@ -2927,6 +3017,10 @@ CShape.prototype =
                     this.recalcBounds();
                     this.recalcText();
                     this.recalcGeometry();
+                    if(bSizRel)
+                    {
+                        this.recalcTransform();
+                    }
                     bRet = true;
                 }
                 else
@@ -2943,6 +3037,10 @@ CShape.prototype =
                         this.recalcBounds();
                         this.recalcText();
                         this.recalcGeometry();
+                        if(bSizRel)
+                        {
+                            this.recalcTransform();
+                        }
                     }
                     return bRet;
                 }

@@ -1,4 +1,4 @@
-"use strict";
+﻿"use strict";
 
 (	/**
 	 * @param {Window} window
@@ -1930,6 +1930,9 @@
             this.PositionH     = (undefined != obj.PositionH    ) ? new CImagePositionH(obj.PositionH) : undefined;
             this.PositionV     = (undefined != obj.PositionV    ) ? new CImagePositionV(obj.PositionV) : undefined;
 
+            this.SizeRelH       = (undefined != obj.SizeRelH) ? new CImagePositionH(obj.SizeRelH) : undefined;
+            this.SizeRelV       = (undefined != obj.SizeRelV) ? new CImagePositionH(obj.SizeRelV) : undefined;
+
             this.Internal_Position = (undefined != obj.Internal_Position) ? obj.Internal_Position : null;
 
             this.ImageUrl = (undefined != obj.ImageUrl) ? obj.ImageUrl : null;
@@ -1958,6 +1961,10 @@
             this.Position      = undefined;
             this.PositionH     = undefined;
             this.PositionV     = undefined;
+
+            this.SizeRelH       = undefined;
+            this.SizeRelV       = undefined;
+
             this.Internal_Position = null;
             this.ImageUrl = null;
             this.Locked   = false;
@@ -2003,6 +2010,27 @@
         asc_putPositionH: function(v) { this.PositionH = v; },
         asc_getPositionV: function()  { return this.PositionV; },
         asc_putPositionV: function(v) { this.PositionV = v; },
+
+        asc_getSizeRelH: function()
+        {
+            return this.SizeRelH;
+        },
+
+        asc_putSizeRelH: function(v)
+        {
+            this.SizeRelH = v;
+        },
+
+        asc_getSizeRelV: function()
+        {
+            return this.SizeRelV;
+        },
+
+        asc_putSizeRelV: function(v)
+        {
+            this.SizeRelV = v;
+        },
+
         asc_getValue_X: function(RelativeFrom) { if ( null != this.Internal_Position ) return this.Internal_Position.Calculate_X_Value(RelativeFrom);  return 0; },
         asc_getValue_Y: function(RelativeFrom) { if ( null != this.Internal_Position ) return this.Internal_Position.Calculate_Y_Value(RelativeFrom);  return 0; },
 
@@ -2110,6 +2138,13 @@
     prot["put_PositionH"] = prot["asc_putPositionH"] = prot.asc_putPositionH;
     prot["get_PositionV"] = prot["asc_getPositionV"] = prot.asc_getPositionV;
     prot["put_PositionV"] = prot["asc_putPositionV"] = prot.asc_putPositionV;
+
+
+    prot["get_SizeRelH"] = prot["asc_getSizeRelH"] = prot.asc_getSizeRelH;
+    prot["put_SizeRelH"] = prot["asc_putSizeRelH"] = prot.asc_putSizeRelH;
+    prot["get_SizeRelV"] = prot["asc_getSizeRelV"] = prot.asc_getSizeRelV;
+    prot["put_SizeRelV"] = prot["asc_putSizeRelV"] = prot.asc_putSizeRelV;
+
     prot["get_Value_X"] = prot["asc_getValue_X"] = prot.asc_getValue_X;
     prot["get_Value_Y"] = prot["asc_getValue_Y"] = prot.asc_getValue_Y;
     prot["get_ImageUrl"] = prot["asc_getImageUrl"] = prot.asc_getImageUrl;
