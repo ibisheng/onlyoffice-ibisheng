@@ -9,7 +9,6 @@ function CGlyphOperator()
     this.stretch = 0;
     this.bStretch = true;
 
-
     this.penW = 1; // px
 }
 CGlyphOperator.prototype.init = function(props)
@@ -77,7 +76,7 @@ CGlyphOperator.prototype.getCoordinateGlyph = function()
     var X = coord.XX, Y = coord.YY,
         W =  this.size.width, H =  this.size.height;
 
-    var bHor = this.loc == 0 || this.loc  == 1;
+    var bHor = this.loc == LOCATION_TOP || this.loc  == LOCATION_BOT;
     var glW = 0, glH = 0;
 
      if(bHor)
@@ -163,63 +162,6 @@ CGlyphOperator.prototype.getCoordinateGlyph = function()
         }
     }
 
-    /*if(this.loc == LOCATION_TOP)
-    {
-        a1 = 1; b1 = 0; c1 = 0;
-        a2 = 0; b2 = 1; c2 = 0;
-    }
-    else if(this.loc == LOCATION_BOT)
-    {
-        a1 = 1; b1 = 0; c1 = 0;
-
-        if(bLine)
-        {
-            a2 = 0; b2 = 1; c2 = (H - glH)/2;
-        }
-        else
-        {
-            a2 = 0; b2 = 1; c2 = H - glH;
-        }
-    }
-    else if(this.loc == LOCATION_LEFT)
-    {
-        a1 = 0; b1 = 1; c1 = 0;
-        a2 = 1; b2 = 0; c2 = 0;
-    }
-    else if(this.loc == LOCATION_RIGHT)
-    {
-        if(bLine)
-        {
-            a1 = 0; b1 = 1; c1 = (W - glW)/2;
-        }
-        else
-        {
-            a1 = 0; b1 = 1; c1 = W - glW;
-        }
-
-        a2 = 1; b2 = 0; c2 = 0;
-    }
-    else if(this.loc == LOCATION_SEP)
-    {
-        a1 = 0; b1 = 1; c1 = 0;
-        a2 = 1; b2 = 0; c2 = 0;
-    }*/
-
-
-    /*var shW = 0,
-        shH = 0;
-
-    if(bHor)
-    {
-        a1 = 1; b1 = 0; c1 = 0;
-        a2 = 0; b2 = 1; c2 = 0;
-    }
-    else
-    {
-        a1 = 0; b1 = 1; c1 = 0;
-        a2 = 1; b2 = 0; c2 = 0;
-    }*/
-
     if(this.turn == 1)
     {
         a1 *= -1; b1 *= -1; c1 += glW;
@@ -261,7 +203,7 @@ CGlyphOperator.prototype.draw = function(pGraphics, XX, YY, PDSE)
     pGraphics.p_width(this.penW*1000);
     pGraphics._s();
 
-    this.drawPath(pGraphics, XX,YY, PDSE);
+    this.drawPath(pGraphics, XX, YY, PDSE);
 
     pGraphics.df();
     pGraphics._s();
@@ -2970,7 +2912,6 @@ COperator.prototype.fixSize = function(oMeasure, stretch)
             Bold:       false //ctrPrp.Bold
         };
 
-
         oMeasure.SetFont(Font);
 
         var bLine = this.IsLineGlyph();
@@ -3004,19 +2945,25 @@ COperator.prototype.fixSize = function(oMeasure, stretch)
             }
         }
 
-        // Height
+        var mgCtrPrp = this.Parent.Get_TxtPrControlLetter();
+        var shCenter = this.ParaMath.GetShiftCenter(oMeasure, mgCtrPrp);
 
-        var letterOperator = new CMathText(true);
-        letterOperator.add(this.code);
-        letterOperator.Measure(oMeasure, ctrPrp);
+        // Height, Ascent
 
         if(this.type === OPER_ACCENT)
         {
+            var letterOperator = new CMathText(true);
+            letterOperator.add(this.code);
+            letterOperator.Measure(oMeasure, ctrPrp);
+
             var letterX = new CMathText(true);
             letterX.add(0x78);
             letterX.Measure(oMeasure, ctrPrp);
 
             height = letterOperator.size.ascent - letterX.size.ascent;
+
+            ascent = height/2 + shCenter;
+
         }
         else
         {
@@ -3029,17 +2976,16 @@ COperator.prototype.fixSize = function(oMeasure, stretch)
                 else
                     height = dims.Height;
             }
+
+            if(!bLine && this.operator.loc == LOCATION_TOP)
+                ascent = dims.Height;
+            else if(!bLine || this.operator.loc == LOCATION_BOT)
+                ascent = this.operator.size.height;
+            else
+                ascent = height/2 + shCenter;
         }
 
-        // Ascent
 
-        var mgCtrPrp = this.Parent.Get_TxtPrControlLetter();
-        var shCenter = this.ParaMath.GetShiftCenter(oMeasure, mgCtrPrp);
-
-        if(!bLine && (this.operator.loc == LOCATION_TOP || this.operator.loc == LOCATION_BOT))
-            ascent = dims.Height/2;
-        else
-            ascent = height/2 + shCenter;
 
         this.size.width  = width;
         this.size.height = height;
@@ -3054,7 +3000,7 @@ COperator.prototype.Resize = function(oMeasure)
 {
     if(this.typeOper !== OPERATOR_EMPTY)
     {
-        var bHor = this.operator.loc == 0 || this.operator.loc  == 1;
+        var bHor = this.operator.loc == LOCATION_TOP || this.operator.loc  == LOCATION_BOT;
 
         if(bHor)
             this.fixSize(oMeasure, this.size.width);
@@ -4111,7 +4057,7 @@ CCharacter.prototype.setCharacter = function(props, defaultProps)
 };
 CCharacter.prototype.recalculateSize = function(oMeasure)
 {
-    var Base = this.Content[0];
+    var Base = this.elements[0][0];
 
     this.operator.fixSize(oMeasure, Base.size.width);
 
@@ -4140,7 +4086,7 @@ CCharacter.prototype.setPosition = function(pos, PosInfo)
     var PosOper = new CMathPosition(),
         PosBase = new CMathPosition();
 
-    var Base = this.Content[0];
+    var Base = this.elements[0][0];
 
     if(this.Pr.pos === LOCATION_TOP)
     {
@@ -4150,14 +4096,14 @@ CCharacter.prototype.setPosition = function(pos, PosInfo)
         this.operator.setPosition(PosOper);
 
         PosBase.x = this.pos.x + this.GapLeft + alignCnt;
-        PosBase.y = this.pos.y + this.operator.size.height + Base.size.ascent;
+        PosBase.y = this.pos.y + this.operator.size.height;
 
         Base.setPosition(PosBase, PosInfo);
     }
     else if(this.Pr.pos === LOCATION_BOT)
     {
         PosBase.x = this.pos.x + this.GapLeft + alignCnt;
-        PosBase.y = this.pos.y + Base.size.ascent;
+        PosBase.y = this.pos.y;
 
         Base.setPosition(PosBase, PosInfo);
 
@@ -4389,22 +4335,17 @@ CGroupCharacter.prototype.getAscent = function(oMeasure)
 {
     var ascent;
 
-    //var shCent = DIV_CENT*this.getCtrPrp().FontSize;
-
     var ctrPrp = this.Get_TxtPrControlLetter();
     var shCent = this.ParaMath.GetShiftCenter(oMeasure, ctrPrp);
 
     if(this.Pr.vertJc === VJUST_TOP && this.Pr.pos === LOCATION_TOP)
-        ascent =  this.operator.size.ascent + shCent;
-        //ascent =  this.operator.size.ascent + 1.3*shCent;
+        ascent =  this.operator.size.ascent;
     else if(this.Pr.vertJc === VJUST_BOT && this.Pr.pos === LOCATION_TOP )
         ascent = this.operator.size.height + this.elements[0][0].size.ascent;
     else if(this.Pr.vertJc === VJUST_TOP && this.Pr.pos === LOCATION_BOT )
         ascent = this.elements[0][0].size.ascent;
     else if(this.Pr.vertJc === VJUST_BOT && this.Pr.pos === LOCATION_BOT )
-        ascent = this.elements[0][0].size.height + shCent + this.operator.size.height - this.operator.size.ascent;
-        //ascent = this.elements[0][0].size.height + 1.55*shCent + this.operator.size.height - this.operator.size.ascent;
-
+        ascent = this.elements[0][0].size.height + this.operator.size.height;
 
     return ascent;
 };
