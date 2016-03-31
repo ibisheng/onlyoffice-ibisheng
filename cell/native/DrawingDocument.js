@@ -2674,33 +2674,13 @@ function CDrawingDocument(drawingObjects)
 
     this.UpdateTarget = function(x, y, pageIndex)
     {
-        /*
-        if (this.UpdateTargetFromPaint === false)
-        {
-            this.UpdateTargetCheck = true;
-
-            if (this.NeedScrollToTargetFlag && this.m_dTargetX == x && this.m_dTargetY == y && this.m_lTargetPage == pageIndex)
-                this.NeedScrollToTarget = false;
-            else
-                this.NeedScrollToTarget = true;
-
-            return;
-        }
-        */
-
-        if (-1 != this.m_lTimerUpdateTargetID)
-        {
-            clearTimeout(this.m_lTimerUpdateTargetID);
-            this.m_lTimerUpdateTargetID = -1;
-        }
-
         this.m_dTargetX = x;
         this.m_dTargetY = y;
         this.m_lTargetPage = pageIndex;
 
         this.Native["DD_UpdateTarget"](x, y, pageIndex);
 
-       // this.CheckTargetDraw(x, y);
+        this.CheckTargetDraw(x, y);
     }
     this.UpdateTarget2 = function(x, y, pageIndex)
     {
@@ -2796,155 +2776,21 @@ function CDrawingDocument(drawingObjects)
 //        }
     }
 
-    this.UpdateTargetTimer = function()
-    {
-        //TODO:
-//        var x = oThis.m_tempX;
-//        var y = oThis.m_tempY;
-//        var pageIndex = oThis.m_tempPageIndex;
-//
-//        oThis.m_lTimerUpdateTargetID = -1;
-//        if (pageIndex >= oThis.m_arrPages.length)
-//            return;
-//
-//        var oWordControl = oThis.m_oWordControl;
-//
-//        var bIsPageChanged = false;
-//        if (oThis.m_lCurrentPage != pageIndex)
-//        {
-//            oThis.m_lCurrentPage = pageIndex;
-//            oWordControl.SetCurrentPage2();
-//            oWordControl.OnScroll();
-//            bIsPageChanged = true;
-//        }
-//
-//        oThis.m_dTargetX = x;
-//        oThis.m_dTargetY = y;
-//        oThis.m_lTargetPage = pageIndex;
-//
-//        var targetSize = Number(oThis.m_dTargetSize * oWordControl.m_nZoomValue * g_dKoef_mm_to_pix / 100);
-//        var pos = oThis.ConvertCoordsToCursor2(x, y, oThis.m_lCurrentPage);
-//        //pos.Y -= targetSize;
-//
-//        if (true === pos.Error && (false === bIsPageChanged))
-//            return;
-//
-//        // �������, ����� �� ������ �� ������
-//        var boxX = 0;
-//        var boxY = 0;
-//        var boxR = oWordControl.m_oEditor.HtmlElement.width - 2;
-//        var boxB = oWordControl.m_oEditor.HtmlElement.height - targetSize;
-//
-//        /*
-//        if (true === oWordControl.m_bIsRuler)
-//        {
-//            boxX += Number(5 * g_dKoef_mm_to_pix);
-//            boxY += Number(7 * g_dKoef_mm_to_pix);
-//            boxR += Number(5 * g_dKoef_mm_to_pix);
-//            boxB += Number(7 * g_dKoef_mm_to_pix);
-//        }
-//        */
-//
-//        var nValueScrollHor = 0;
-//        if (pos.X < boxX)
-//        {
-//            nValueScrollHor = boxX - pos.X;
-//        }
-//        if (pos.X > boxR)
-//        {
-//            nValueScrollHor = boxR - pos.X;
-//        }
-//
-//        var nValueScrollVer = 0;
-//        if (pos.Y < boxY)
-//        {
-//            nValueScrollVer = boxY - pos.Y;
-//        }
-//        if (pos.Y > boxB)
-//        {
-//            nValueScrollVer = boxB - pos.Y;
-//        }
-//
-//        var isNeedScroll = false;
-//        if (0 != nValueScrollHor)
-//        {
-//            isNeedScroll = true;
-//            oWordControl.m_bIsUpdateTargetNoAttack = true;
-//            oWordControl.m_oScrollHorApi.scrollByX(-nValueScrollHor, false);
-//        }
-//        if (0 != nValueScrollVer)
-//        {
-//            isNeedScroll = true;
-//            oWordControl.m_bIsUpdateTargetNoAttack = true;
-//            oWordControl.m_oScrollVerApi.scrollByY(-nValueScrollVer, false);
-//        }
-//
-//        if (true === isNeedScroll)
-//        {
-//            oWordControl.m_bIsUpdateTargetNoAttack = true;
-//            oWordControl.OnScroll();
-//            return;
-//        }
-//
-//        oThis.TargetHtmlElement.style.left = pos.X + "px";
-//        oThis.TargetHtmlElement.style.top  = pos.Y + "px";
-//
-//        this.m_oWordControl.CheckTextBoxInputPos();
-//
-//        if (this.m_bIsSearching && null != this.CurrentSearchNavi)
-//        {
-//            this.CurrentSearchNavi = null;
-//            this.drawingObjects.OnUpdateOverlay();
-//        }
-    }
+    this.UpdateTargetTimer = function() {}
 
     this.SetTargetSize = function(size)
     {
         this.m_dTargetSize = size;
         this.Native["DD_SetTargetSize"](size);
-
-        //this.TargetHtmlElement.style.height = Number(this.m_dTargetSize * this.m_oWordControl.m_nZoomValue * g_dKoef_mm_to_pix / 100) + "px";
-        //this.TargetHtmlElement.style.width = "2px";
-
     }
-    this.DrawTarget = function()
-    {
-        //TODO:
-//        if ( "block" != oThis.TargetHtmlElement.style.display && oThis.NeedTarget )
-//            oThis.TargetHtmlElement.style.display = "block";
-//        else
-//            oThis.TargetHtmlElement.style.display = "none";
-    }
+    this.DrawTarget = function() {}
 
     this.TargetShow = function()
     {
         this.TargetShowNeedFlag = true;
         this.Native["DD_TargetShow"]();
     }
-    this.CheckTargetShow = function()
-    {
-        //TODO:
-
-//        if (this.TargetShowFlag && this.TargetShowNeedFlag)
-//        {
-//            this.TargetHtmlElement.style.display = "block";
-//            this.TargetShowNeedFlag = false;
-//            return;
-//        }
-//
-//        if (!this.TargetShowNeedFlag)
-//            return;
-//
-//        this.TargetShowNeedFlag = false;
-//
-//        if ( -1 == this.m_lTimerTargetId )
-//            this.TargetStart();
-//
-//        if (oThis.NeedTarget)
-//            this.TargetHtmlElement.style.display = "block";
-//
-//        this.TargetShowFlag = true;
-    }
+    this.CheckTargetShow = function() {}
     this.StartTrackImage = function(obj, x, y, w, h, type, pagenum)
     {
     }
@@ -3383,9 +3229,9 @@ function CDrawingDocument(drawingObjects)
 
     this.private_StartDrawSelection = function(overlay)
     {
-        //TODO:
+        this.Native["DD_StartDrawSelection"]();
 
-//        this.Overlay = overlay;
+        //        this.Overlay = overlay;
 //        this.IsTextMatrixUse = ((null != this.TextMatrix) && !global_MatrixTransformer.IsIdentity(this.TextMatrix));
 //
 //        this.Overlay.m_oContext.fillStyle = "rgba(51,102,204,255)";
@@ -3396,6 +3242,8 @@ function CDrawingDocument(drawingObjects)
     }
     this.private_EndDrawSelection = function()
     {
+        this.Native["DD_EndDrawSelection"]();
+
         //TODO:
 //        var ctx = this.Overlay.m_oContext;
 //
@@ -3900,13 +3748,10 @@ function CDrawingDocument(drawingObjects)
 
     }
 
-
     this.DrawImageTextureFillTextArt = function(url)
     {
 
     }
-
-
 
     this.InitGuiCanvasShape = function(div_id)
     {
@@ -4060,6 +3905,6 @@ function CDrawingDocument(drawingObjects)
 
     this.OnSelectEnd = function()
     {
-
     }
+
 }
