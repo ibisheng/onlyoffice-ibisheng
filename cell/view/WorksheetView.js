@@ -10323,7 +10323,7 @@
                 range = t.model.getRange3( arn.r1, arn.c1, arn.r2, arn.c2 );
                 switch ( val ) {
                     case c_oAscInsertOptions.InsertCellsAndShiftRight:
-                        isCheckChangeAutoFilter = t.model.autoFilters.isActiveCellsCrossHalfFTable( arn, c_oAscInsertOptions.InsertCellsAndShiftRight, prop );
+                        isCheckChangeAutoFilter = t.af_checkInsDelCells( arn, c_oAscInsertOptions.InsertCellsAndShiftRight, prop );
                         if ( isCheckChangeAutoFilter === false ) {
                             return;
                         }
@@ -10344,7 +10344,7 @@
                         this._isLockedCells( oChangeData.changedRange, null, onChangeWorksheetCallback );
                         break;
                     case c_oAscInsertOptions.InsertCellsAndShiftDown:
-                        isCheckChangeAutoFilter = t.model.autoFilters.isActiveCellsCrossHalfFTable( arn, c_oAscInsertOptions.InsertCellsAndShiftDown, prop );
+                        isCheckChangeAutoFilter = t.af_checkInsDelCells( arn, c_oAscInsertOptions.InsertCellsAndShiftDown, prop );
                         if ( isCheckChangeAutoFilter === false ) {
                             return;
                         }
@@ -10403,7 +10403,7 @@
                 range = t.model.getRange3( checkRange.r1, checkRange.c1, checkRange.r2, checkRange.c2 );
                 switch ( val ) {
                     case c_oAscDeleteOptions.DeleteCellsAndShiftLeft:
-                        isCheckChangeAutoFilter = t.model.autoFilters.isActiveCellsCrossHalfFTable( arn, c_oAscDeleteOptions.DeleteCellsAndShiftLeft, prop );
+                        isCheckChangeAutoFilter = t.af_checkInsDelCells( arn, c_oAscDeleteOptions.DeleteCellsAndShiftLeft, prop );
                         if ( isCheckChangeAutoFilter === false ) {
                             return;
                         }
@@ -10428,7 +10428,7 @@
                         this._isLockedCells( oChangeData.changedRange, null, onChangeWorksheetCallback );
                         break;
                     case c_oAscDeleteOptions.DeleteCellsAndShiftTop:
-                        isCheckChangeAutoFilter = t.model.autoFilters.isActiveCellsCrossHalfFTable( arn, c_oAscDeleteOptions.DeleteCellsAndShiftTop, prop );
+                        isCheckChangeAutoFilter = t.af_checkInsDelCells( arn, c_oAscDeleteOptions.DeleteCellsAndShiftTop, prop );
                         if ( isCheckChangeAutoFilter === false ) {
                             return;
                         }
@@ -12829,7 +12829,7 @@
     {
 		var t = this;
         var ws = this.model;
-		var acitveRange = this.activeRange.clone();
+		var acitveRange = this.activeRange;
 
         var tablePart = ws.autoFilters._getFilterByDisplayName(tableName);
 
@@ -12843,37 +12843,51 @@
         var startRow = this.activeRange.r1;
         var endRow = this.activeRange.r2;
 		
-		var newActiveRange = null;
-		var val;
+		var newActiveRange = this.activeRange.clone();
+		var val = null;
 		switch(optionType)
 		{
 			case c_oAscInsertOptions.InsertTableRowAbove:
 			{
-				newActiveRange = new Asc.Range(tablePart.Ref.c1, startRow, tablePart.Ref.c2, endRow);
+				newActiveRange.c1 = tablePart.Ref.c1;
+				newActiveRange.c2 = tablePart.Ref.c2;
+				
 				val = c_oAscInsertOptions.InsertCellsAndShiftDown;
 				break;
 			}
 			case c_oAscInsertOptions.InsertTableRowBelow:
 			{
-				newActiveRange = new Asc.Range(tablePart.Ref.c1, startRow - 1, tablePart.Ref.c2, endRow - 1);
+				newActiveRange.c1 = tablePart.Ref.c1;
+				newActiveRange.c2 = tablePart.Ref.c2;
+				newActiveRange.r1 = startRow + (endRow - startRow) + 1;
+				newActiveRange.r2 = endRow + (endRow - startRow) + 1;
+				
 				val = c_oAscInsertOptions.InsertCellsAndShiftDown;
 				break;
 			}
 			case c_oAscInsertOptions.InsertTableColLeft:
 			{
-				newActiveRange = new Asc.Range(startCol - 1, tablePart.Ref.r1, endCol - 1, tablePart.Ref.r2);
+				newActiveRange.c1 = startCol - 1;
+				newActiveRange.c2 = endCol - 1;
+				newActiveRange.r1 = tablePart.Ref.r1;
+				newActiveRange.r2 = tablePart.Ref.r2;
+				
 				val = c_oAscInsertOptions.InsertCellsAndShiftRight;
 				break;
 			}
 			case c_oAscInsertOptions.InsertTableColRight:
 			{
 				newActiveRange = new Asc.Range(startCol, tablePart.Ref.r1, endCol, tablePart.Ref.r2);
+				
+				newActiveRange.r1 = tablePart.Ref.r1;
+				newActiveRange.r2 = tablePart.Ref.r2;
+				
 				val = c_oAscInsertOptions.InsertCellsAndShiftRight;
 				break;
 			}
 		}
 		
-		if(newActiveRange !== null)
+		if(val !== null)
 		{
 			t.activeRange = newActiveRange;
 			t.changeWorksheet("insCell", val);
@@ -12903,16 +12917,16 @@
 		var val;
 		switch(optionType)
 		{
-			case c_oAscInsertOptions.DeleteColumns:
+			case c_oAscDeleteOptions.DeleteColumns:
 			{
 				newActiveRange = new Asc.Range(startCol, tablePart.Ref.r1, endCol, tablePart.Ref.r2);
-				val = c_oAscInsertOptions.DeleteCellsAndShiftLeft;
+				val = c_oAscDeleteOptions.DeleteCellsAndShiftLeft;
 				break;
 			}
-			case c_oAscInsertOptions.DeleteRows:
+			case c_oAscDeleteOptions.DeleteRows:
 			{
 				newActiveRange = new Asc.Range(tablePart.Ref.c1, startRow, tablePart.Ref.c2, endRow);
-				val = c_oAscInsertOptions.DeleteCellsAndShiftTop;
+				val = c_oAscDeleteOptions.DeleteCellsAndShiftTop;
 				break;
 			}
 			case c_oAscInsertOptions.DeleteTable:
@@ -12945,6 +12959,103 @@
 		
 		//TODO тестовый вариант. нужно сделать методы и добавлять в историю
 		tablePart.DisplayName = newName;
+	};
+	
+	WorksheetView.prototype.af_checkInsDelCells = function(activeRange, val, prop)
+    {
+		var t = this;
+        var ws = this.model;
+		var res = true;
+		
+		var intersectionTableParts = ws.autoFilters.getTableIntersectionRange(activeRange);
+		var isPartTablePartsUnderRange = ws.autoFilters._isPartTablePartsUnderRange(activeRange);
+		var isPartTablePartsRightRange = ws.autoFilters.isPartTablePartsRightRange(activeRange);
+		var isOneTableIntersection = intersectionTableParts && intersectionTableParts.length === 1 ? intersectionTableParts[0] : null;
+		
+		var checkInsCells = function()
+		{
+			switch(val)
+			{
+				case c_oAscInsertOptions.InsertCellsAndShiftDown:
+				{
+					//если внизу находится часть форматированной таблицы или это часть форматированной таблицы
+					if(isPartTablePartsUnderRange)
+					{
+						res = false;
+					}
+					else if(isOneTableIntersection !== null && !(isOneTableIntersection.Ref.c1 === activeRange.c1 && isOneTableIntersection.Ref.c2 === activeRange.c2))
+					{
+						res = false;
+					}
+					
+					break;
+				}
+				case c_oAscInsertOptions.InsertCellsAndShiftRight:
+				{
+					//если справа находится часть форматированной таблицы или это часть форматированной таблицы
+					if(isPartTablePartsRightRange)
+					{
+						res = false;
+					}
+					
+					break;
+				}
+				case c_oAscInsertOptions.InsertColumns:
+				{
+					
+					break;
+				}
+				case c_oAscInsertOptions.InsertRows:
+				{
+					
+					break;
+				}
+			}
+		};
+		
+		var checkDelCells = function()
+		{
+			switch(val)
+			{
+				case c_oAscDeleteOptions.DeleteCellsAndShiftTop:
+				{
+					if(isPartTablePartsUnderRange)
+					{
+						res = false;
+					}
+					
+					break;
+				}
+				case c_oAscDeleteOptions.DeleteCellsAndShiftLeft:
+				{
+					if(isPartTablePartsUnderRange)
+					{
+						res = false;
+					}
+					
+					break;
+				}
+				case c_oAscDeleteOptions.DeleteColumns:
+				{
+					
+					break;
+				}
+				case c_oAscDeleteOptions.DeleteRows:
+				{
+					
+					break;
+				}
+			}
+		};
+		
+		prop === "insCell" ? checkInsCells() : checkDelCells();
+		
+		if(res === false)
+		{
+			ws.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterChangeFormatTableError, c_oAscError.Level.NoCritical);
+		}
+		
+		return res; 
 	};
     /*
      * Export
