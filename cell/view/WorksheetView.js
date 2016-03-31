@@ -2434,7 +2434,7 @@
 
     /** Рисует спарклайны */
     WorksheetView.prototype._drawSparklines = function(drawingCtx, range, offsetX, offsetY) {
-        this.objectRender.drawSparkLineGroup(this.model.sparklineGroups, drawingCtx);
+        this.objectRender.drawSparkLineGroups(drawingCtx, this.model.sparklineGroups, range);
     };
 
     /** Рисует ячейки таблицы */

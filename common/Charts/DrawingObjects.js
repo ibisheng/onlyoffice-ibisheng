@@ -2000,10 +2000,12 @@ function DrawingObjects() {
         }
     };
 
-    _this.drawSparkLineGroup = function(oSparkLineGroup, oDrawingContext)
+    _this.drawSparkLineGroups = function(oDrawingContext, oSparkLineGroups, range)
     {
+        for(var i = 0; i < oSparkLineGroups.arrSparklineGroup.length; ++i) {
 
-    },
+        }
+    };
 
     _this.rebuildChartGraphicObjects = function(data)
     {
