@@ -1,4 +1,4 @@
-﻿"use strict";
+"use strict";
 
 // Используем [] вместо new Array() для ускорения (http://jsperf.com/creation-array)
 // Используем {} вместо new Object() для ускорения (http://jsperf.com/creation-object)
