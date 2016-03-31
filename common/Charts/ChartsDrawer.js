@@ -1,4 +1,4 @@
-﻿"use strict";
+"use strict";
 
 var global3DPersperctive = 30;
 var globalBasePercent = 100;

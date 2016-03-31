@@ -1,4 +1,4 @@
-﻿"use strict";
+"use strict";
 
 var c_oAscZoomType = {
   Current: 0,

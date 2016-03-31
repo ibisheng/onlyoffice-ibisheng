@@ -1,4 +1,4 @@
-﻿"use strict";
+"use strict";
 
 function ChartPreviewManager() {
 	this.previewGroups = [];

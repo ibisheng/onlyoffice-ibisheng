@@ -1,4 +1,4 @@
-﻿"use strict";
+"use strict";
 
 asc_docs_api.prototype.asc_addComment = function(AscCommentData) {
   if (true === CollaborativeEditing.Get_GlobalLock()) {

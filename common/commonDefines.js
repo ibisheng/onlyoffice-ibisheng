@@ -1,4 +1,4 @@
-﻿"use strict";
+"use strict";
 
 var g_bDate1904 = false;
 var FONT_THUMBNAIL_HEIGHT = (7 * 96.0 / 25.4) >> 0;

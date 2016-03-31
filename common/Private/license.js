@@ -1,4 +1,4 @@
-﻿"use strict";
+"use strict";
 
 var g_oLicenseResult = {
   Error       : 1,

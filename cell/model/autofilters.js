@@ -1,4 +1,4 @@
-﻿"use strict";
+"use strict";
 var maxValCol = 20000;
 var maxValRow = 100000;
 
