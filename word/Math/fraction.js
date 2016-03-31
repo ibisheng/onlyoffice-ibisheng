@@ -386,11 +386,9 @@ CFraction.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 };
 CFraction.prototype.recalculateBarFraction = function(oMeasure, bNumBarFraction, bDenBarFraction)
 {
-    var ctrPrp = this.Get_TxtPrControlLetter();
-
     var Plh = new CMathText(true);
     Plh.add(0x2B1A);
-    Plh.Measure(g_oTextMeasurer, ctrPrp);
+    this.MeasureJustDraw(Plh);
 
     var num = this.elements[0][0].size,
         den = this.elements[1][0].size;

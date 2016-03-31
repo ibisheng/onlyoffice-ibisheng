@@ -171,7 +171,9 @@ CSignRadical.prototype.recalculateSize = function(oMeasure, sizeArg, bInline)
 
     var Symbol5 = new CMathText(true);
     Symbol5.add(0x35);
-    Symbol5.Measure(oMeasure, CtrPrp);
+
+    // измеряем функцией MeasureJustDraw, чтобы был выставлен Font
+    this.Parent.MeasureJustDraw(Symbol5);
 
     var measureH = Symbol5.size.height;
 
@@ -208,7 +210,9 @@ CSignRadical.prototype.recalculateSize = function(oMeasure, sizeArg, bInline)
 
     var letterG = new CMathText(true);
     letterG.add(0x67);
-    letterG.Measure(oMeasure, CtrPrp);
+
+    // измеряем функцией MeasureJustDraw, чтобы был выставлен Font
+    this.Parent.MeasureJustDraw(letterG);
 
     var Descent = letterG.size.height - letterG.size.ascent;
     var bDescentArg = sizeArg.height - sizeArg.ascent > 0.9*Descent;
