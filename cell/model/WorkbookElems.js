@@ -4442,29 +4442,29 @@ function sparklineGroup() {
 	this.colorLow = null;
 	this.f = '??';
 	this.arrSparklines = [];
-    this.arrCachedSparklines = [];
+	this.arrCachedSparklines = [];
 }
-sparklineGroup.prototype.clearCached = function()
-{
-    this.arrCachedSparklines.length = 0;
+sparklineGroup.prototype.clearCached = function() {
+	this.arrCachedSparklines.length = 0;
 };
-sparklineGroup.prototype.addView = function(oSparklineView)
-{
-    this.arrCachedSparklines.push(oSparklineView);
+sparklineGroup.prototype.addView = function(oSparklineView) {
+	this.arrCachedSparklines.push(oSparklineView);
 };
-sparklineGroup.prototype.draw = function(oDrawingContext)
-{
-    var graphics = new CGraphics();
-    graphics.init(oDrawingContext.ctx, oDrawingContext.getWidth(0), oDrawingContext.getHeight(0), oDrawingContext.getWidth(3), oDrawingContext.getHeight(3));
-    graphics.m_oFontManager = g_fontManager;
-    for(var i = 0; i < this.arrCachedSparklines.length; ++i)
-    {
-        this.arrCachedSparklines[i].draw(graphics);
-    }
+sparklineGroup.prototype.draw = function(oDrawingContext) {
+	var graphics = new CGraphics();
+	graphics.init(oDrawingContext.ctx, oDrawingContext.getWidth(0), oDrawingContext.getHeight(0),
+		oDrawingContext.getWidth(3), oDrawingContext.getHeight(3));
+	graphics.m_oFontManager = g_fontManager;
+	for (var i = 0; i < this.arrCachedSparklines.length; ++i) {
+		this.arrCachedSparklines[i].draw(graphics);
+	}
 };
-sparklineGroup.prototype.updateCache = function(wsView)
-{
-    wsView.objectRender.createSparklineViews(this);
+sparklineGroup.prototype.updateCache = function(range) {
+	for (var i = 0; i < this.arrSparklines.length; ++i) {
+		if (range.intersectionSimple(this.arrSparklines[i].f)) {
+			this.arrCachedSparklines[i] = null;
+		}
+	}
 };
 /** @constructor */
 function sparkline() {
