@@ -1063,6 +1063,18 @@
 			this.fitToWidth = false; //ToDo can be a number
 			this.fitToHeight = false; //ToDo can be a number
 
+			// ToDo
+			this.blackAndWhite = false;
+			this.cellComments = 0; // none ST_CellComments
+			this.copies = 1;
+			this.draft = false;
+			this.errors = 0; // displayed ST_PrintError
+			this.firstPageNumber = -1;
+			this.pageOrder = 0; // downThenOver ST_PageOrder
+			this.scale = 100;
+			this.useFirstPageNumber = false;
+			this.usePrinterDefaults = true;
+
 			return this;
 		}
 		asc_CPageSetup.prototype.asc_getOrientation = function () { return this.orientation; };
