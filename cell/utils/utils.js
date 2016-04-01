@@ -1110,7 +1110,6 @@
 
 			if (!this.pageSetup)
 				this.pageSetup = new asc_CPageSetup();
-			this.pageSetup.init();
 
 			if (null == this.gridLines)
 				this.gridLines = c_oAscPrintDefaultSettings.PageGridLines;
