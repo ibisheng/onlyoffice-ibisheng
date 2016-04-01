@@ -90,12 +90,10 @@ CFraction.prototype.drawBarFraction = function(PDSE)
 
     var numHeight = this.elements[0][0].size.height;
 
-    var width = this.size.width - this.GapLeft - this.GapRight;
-
     var PosLine = this.ParaMath.GetLinePosition(PDSE.Line, PDSE.Range);
 
     var x1 = this.pos.x + PosLine.x + this.GapLeft,
-        x2 = this.pos.x + PosLine.x + this.GapLeft + width,
+        x2 = this.pos.x + PosLine.x + this.size.width - this.GapRight,
         y1 = this.pos.y + PosLine.y + numHeight - penW;
 
     if(this.Pr.type == BAR_FRACTION)
@@ -503,10 +501,12 @@ CFraction.prototype.align = function(pos_x, pos_y)
 
     if(this.Pr.type == BAR_FRACTION || this.Pr.type == NO_BAR_FRACTION)
     {
+        var width = this.size.width - this.GapLeft - this.GapRight;
+
         if(pos_x == 0)
-            PosAlign.x = (this.size.width - this.Numerator.size.width)*0.5;
+            PosAlign.x = (width - this.Numerator.size.width)*0.5;
         else
-            PosAlign.x = (this.size.width - this.Denominator.size.width)*0.5;
+            PosAlign.x = (width - this.Denominator.size.width)*0.5;
     }
     else if(this.Pr.type == LINEAR_FRACTION)
     {
