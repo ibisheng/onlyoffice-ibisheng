@@ -367,7 +367,9 @@ var c_oSerImageType2 = {
 	Chart: 23,
 	ChartImg: 24,
 	Chart2: 25,
-	CachedImage: 26
+	CachedImage: 26,
+	SizeRelH: 27,
+	SizeRelV: 28
 };
 var c_oSerEffectExtent = {
 	Left: 0,
@@ -384,6 +386,10 @@ var c_oSerPosHV = {
 	Align: 1,
 	PosOffset: 2,
 	PctOffset: 3
+};
+var c_oSerSizeRelHV = {
+	RelativeFrom: 0,
+	Pct: 1
 };
 var c_oSerSimplePos = {
 	X: 0,
@@ -4264,6 +4270,18 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
 				this.memory.WriteByte(c_oSerPropLenType.Variable);
 				this.bs.WriteItemWithLength(function(){oThis.WriteSimplePos(img.SimplePos);});
 			}
+			// if(null != img.SizeRelH)
+			// {
+				// this.memory.WriteByte(c_oSerImageType2.SizeRelH);
+				// this.memory.WriteByte(c_oSerPropLenType.Variable);
+				// this.bs.WriteItemWithLength(function(){oThis.WriteSizeRelHV(img.SizeRelH);});
+			// }
+			// if(null != img.SizeRelV)
+			// {
+				// this.memory.WriteByte(c_oSerImageType2.SizeRelV);
+				// this.memory.WriteByte(c_oSerPropLenType.Variable);
+				// this.bs.WriteItemWithLength(function(){oThis.WriteSizeRelHV(img.SizeRelV);});
+			// }
 			switch(img.wrappingType)
 			{
 				case WRAPPING_TYPE_NONE:
@@ -4376,6 +4394,19 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
 			}
 			this.memory.WriteByte(c_oSerPropLenType.Double);
 			this.memory.WriteDouble(PositionH.Value);
+		}
+	}
+	this.WriteSizeRelHV = function(SizeRelHV)
+	{
+		if(null != SizeRelHV.RelativeFrom) {
+			this.memory.WriteByte(c_oSerSizeRelHV.RelativeFrom);
+			this.memory.WriteByte(c_oSerPropLenType.Byte);
+			this.memory.WriteByte(SizeRelHV.RelativeFrom);
+		}
+		if (null != SizeRelHV.Pct) {
+			this.memory.WriteByte(c_oSerSizeRelHV.Pct);
+			this.memory.WriteByte(c_oSerPropLenType.Double);
+			this.memory.WriteDouble(SizeRelHV.Pct);
 		}
 	}
 	this.WriteSimplePos = function(oSimplePos)
@@ -8687,6 +8718,22 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 		{
 			oParaDrawing.Set_WrappingType(WRAPPING_TYPE_NONE);
 		}
+        else if( c_oSerImageType2.SizeRelH === type )
+        {
+            var oNewSizeRel = {RelativeFrom: null, Pct: null};
+            res = this.bcr.Read2(length, function(t, l){
+                    return oThis.ReadSizeRelHV(t, l, oNewSizeRel);
+                });
+            //oParaDrawing.SizeRelH = oNewSizeRel;
+        }
+        else if( c_oSerImageType2.SizeRelV === type )
+        {
+            var oNewSizeRel = {RelativeFrom: null, Pct: null};
+            res = this.bcr.Read2(length, function(t, l){
+                    return oThis.ReadSizeRelHV(t, l, oNewSizeRel);
+                });
+            //oParaDrawing.SizeRelV = oNewSizeRel;
+        }
 		else if( c_oSerImageType2.WrapSquare === type )
 		{
 			oParaDrawing.Set_WrappingType(WRAPPING_TYPE_SQUARE);
@@ -8779,6 +8826,19 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
             res = c_oSerConstants.ReadUnknown;
         return res;
 	}
+    this.ReadSizeRelHV = function(type, length, SizeRel)
+    {
+        var res = c_oSerConstants.ReadOk;
+        var oThis = this;
+        if (c_oSerSizeRelHV.RelativeFrom === type) {
+            SizeRel.RelativeFrom = this.stream.GetUChar();
+        } else if (c_oSerSizeRelHV.Pct === type) {
+            SizeRel.Pct = this.bcr.ReadDouble();
+        }
+        else
+            res = c_oSerConstants.ReadUnknown;
+        return res;
+    }
 	this.ReadSimplePos = function(type, length, oSimplePos)
 	{
 		var res = c_oSerConstants.ReadOk;
