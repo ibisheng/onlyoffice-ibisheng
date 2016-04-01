@@ -711,6 +711,19 @@
 					case historyitem_AutoFilter_CleanFormat:
 						this.cleanFormat(data.activeCells, true);
 						break;
+					case historyitem_AutoFilter_Change:
+						if(data !== null && data.displayName)
+						{
+							if(data.type === true)
+							{
+								this.insertLastTableColumn(data.displayName, data.activeCells);
+							}	
+							else if(data.type === false)
+							{
+								this.insertLastTableRow(data.displayName, data.activeCells);
+							}
+						}
+						break;
 				}
 				History.TurnOn();
 			},
@@ -1052,7 +1065,7 @@
 				return false;
 			},
 			
-			insertColumn: function(type, activeRange, insertType)
+			insertColumn: function(type, activeRange, insertType, displayNameFormatTable)
 			{
 				var worksheet = this.worksheet;
 				var t  = this;
@@ -1198,6 +1211,10 @@
 				for(var i = 0; i < tableParts.length; i++)
 					changeFilter(tableParts[i], true);
 				
+				if(displayNameFormatTable && type == 'insCells')
+				{
+					this.insertLastTableColumn(displayNameFormatTable, activeRange);
+				}
 				
 				//set styles for tables
 				cleanStylesTables(redrawTablesArr);
@@ -1206,7 +1223,71 @@
 				History.EndTransaction();
 			},
 			
-			insertRows: function(type, activeRange, insertType)
+			insertLastTableColumn: function(displayNameFormatTable, activeRange)
+			{
+				var worksheet = this.worksheet;
+				var t  = this;
+				var bUndoChanges = worksheet.workbook.bUndoChanges;
+				var bRedoChanges = worksheet.workbook.bRedoChanges;
+				
+				var redrawTablesArr = [];
+				
+				History.StartTransaction();
+				History.Create_NewPoint();
+				
+				var cleanStylesTables = function(redrawTablesArr)
+				{
+					for(var i = 0; i < redrawTablesArr.length; i++)
+					{
+						t._cleanStyleTable(redrawTablesArr[i].oldfilterRef);
+					}
+				};
+				
+				var setStylesTables = function(redrawTablesArr)
+				{
+					for(var i = 0; i < redrawTablesArr.length; i++)
+					{
+						t._setColorStyleTable(redrawTablesArr[i].newFilter.Ref, redrawTablesArr[i].newFilter, null, true);
+					}
+				};
+				
+				var changeFilter = function(filter)
+				{
+					var oldFilter = filter.clone(null);
+					filter.addTableLastColumn(null, t);
+					filter.changeRef(1);
+						
+					//History
+					if(!bUndoChanges && !bRedoChanges /*&& !notAddToHistory*/ && oldFilter)
+					{
+						var changeElement = 
+						{
+							oldFilter: oldFilter,
+							newFilterRef: filter.Ref.clone()
+						};
+						t._addHistoryObj(changeElement, historyitem_AutoFilter_Change, {displayName: displayNameFormatTable, activeCells: activeRange, type: true}, false, oldFilter.Ref, null, activeRange);
+					}
+					
+					redrawTablesArr.push({oldfilterRef: oldFilter.Ref, newFilter: filter});
+				};
+				
+				var tablePart = t._getFilterByDisplayName(displayNameFormatTable);
+				
+				if(tablePart)
+				{
+					//change TableParts
+					changeFilter(tablePart);
+					
+					//set styles for tables
+					cleanStylesTables(redrawTablesArr);
+					setStylesTables(redrawTablesArr);
+				}
+				
+				
+				History.EndTransaction();
+			},
+			
+			insertRows: function(type, activeRange, insertType, displayNameFormatTable)
 			{
 				var worksheet = this.worksheet;
 				var t  = this;
@@ -1295,9 +1376,77 @@
 				for(var i = 0; i < tableParts.length; i++)
 					changeFilter(tableParts[i], true);
 				
+				if(displayNameFormatTable && type == 'insCell')
+				{
+					this.insertLastTableRow(displayNameFormatTable, activeRange);
+				}
+				
 				//set styles for tables
 				cleanStylesTables(redrawTablesArr);
 				setStylesTables(redrawTablesArr);
+				
+				History.EndTransaction();
+			},
+			
+			insertLastTableRow: function(displayNameFormatTable, activeRange)
+			{
+				var worksheet = this.worksheet;
+				var t  = this;
+				var bUndoChanges = worksheet.workbook.bUndoChanges;
+				var bRedoChanges = worksheet.workbook.bRedoChanges;
+				
+				var redrawTablesArr = [];
+				
+				History.StartTransaction();
+				History.Create_NewPoint();
+				
+				var cleanStylesTables = function(redrawTablesArr)
+				{
+					for(var i = 0; i < redrawTablesArr.length; i++)
+					{
+						t._cleanStyleTable(redrawTablesArr[i].oldfilterRef);
+					}
+				};
+				
+				var setStylesTables = function(redrawTablesArr)
+				{
+					for(var i = 0; i < redrawTablesArr.length; i++)
+					{
+						t._setColorStyleTable(redrawTablesArr[i].newFilter.Ref, redrawTablesArr[i].newFilter, null, true);
+					}
+				};
+				
+				var changeFilter = function(filter)
+				{
+					var oldFilter = filter.clone(null);
+					filter.changeRef(null, 1);
+						
+					//History
+					if(!bUndoChanges && !bRedoChanges /*&& !notAddToHistory*/ && oldFilter)
+					{
+						var changeElement = 
+						{
+							oldFilter: oldFilter,
+							newFilterRef: filter.Ref.clone()
+						};
+						t._addHistoryObj(changeElement, historyitem_AutoFilter_Change, {displayName: displayNameFormatTable, activeCells: activeRange, type: false}, false, oldFilter.Ref, null, activeRange);
+					}
+					
+					redrawTablesArr.push({oldfilterRef: oldFilter.Ref, newFilter: filter});
+				};
+				
+				var tablePart = t._getFilterByDisplayName(displayNameFormatTable);
+				
+				if(tablePart)
+				{
+					//change TableParts
+					changeFilter(tablePart);
+					
+					//set styles for tables
+					cleanStylesTables(redrawTablesArr);
+					setStylesTables(redrawTablesArr);
+				}
+				
 				
 				History.EndTransaction();
 			},
@@ -1953,26 +2102,21 @@
 						tablePart.TableStyleInfo.ShowRowStripes = !tablePart.TableStyleInfo.ShowRowStripes;
 						break;
 					}
-					case c_oAscChangeTableStyleInfo.rowHeader:
+					case c_oAscChangeTableStyleInfo.rowTotal:
 					{
-						tablePart.TableStyleInfo.ShowRowStripes = !tablePart.TableStyleInfo.ShowRowStripes;
-						break;
-					}
-					/*case c_oAscChangeTableStyleInfo.rowTotal:
-					{
-						tablePart.TableStyleInfo.ShowRowStripes = !tablePart.TableStyleInfo.ShowRowStripes;
+						tablePart.TotalsRowCount = tablePart.TotalsRowCount === null ? 1 : null;
 						break;
 					}
 					case c_oAscChangeTableStyleInfo.rowHeader:
 					{
-						tablePart.TableStyleInfo.ShowRowStripes = !tablePart.TableStyleInfo.ShowRowStripes;
+						tablePart.HeaderRowCount = tablePart.HeaderRowCount === null ? 0 : null;
 						break;
 					}
 					case c_oAscChangeTableStyleInfo.filterButton:
 					{
 						tablePart.TableStyleInfo.ShowRowStripes = !tablePart.TableStyleInfo.ShowRowStripes;
 						break;
-					}*/
+					}
 				}
 				
 				this._cleanStyleTable(tablePart.Ref);
@@ -4018,7 +4162,7 @@
 			isPartTablePartsRightRange: function(range)
 			{
 				var worksheet = this.worksheet;
-				var res = false;
+				var result = false;
 				
 				if(worksheet.TableParts && worksheet.TableParts.length)
 				{
@@ -4047,7 +4191,7 @@
 					}
 				}
 				
-				return res;
+				return result;
 			},
 			
 			_isPartAutoFilterUnderRange: function(range)

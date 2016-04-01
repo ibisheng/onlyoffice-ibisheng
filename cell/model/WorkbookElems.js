@@ -4611,7 +4611,7 @@ TablePart.prototype.deleteTableColumns = function(activeRange)
 		this.TableColumns.splice(startCol, diff);
 };
 
-TablePart.prototype.addTableColumns = function(activeRange, aF)
+TablePart.prototype.addTableColumns = function(activeRange, autoFilters)
 {
 	var newTableColumns = [], num = 0;
 
@@ -4634,8 +4634,17 @@ TablePart.prototype.addTableColumns = function(activeRange, aF)
 	for(var j = 0; j < newTableColumns.length; j++)
 	{
 		if(newTableColumns[j].Name === null)
-			newTableColumns[j].Name = aF._generateColumnName2(newTableColumns, newTableColumns[j - 1].Name);
+			newTableColumns[j].Name = autoFilters._generateColumnName2(newTableColumns, newTableColumns[j - 1].Name);
 	}
+	
+	this.TableColumns = newTableColumns;
+};
+
+TablePart.prototype.addTableLastColumn = function(activeRange, autoFilters, isAddLastColumn)
+{
+	var newTableColumns = this.TableColumns;
+	newTableColumns.push(new TableColumn());
+	newTableColumns[newTableColumns.length - 1].Name = autoFilters._generateColumnName2(newTableColumns, newTableColumns[newTableColumns.length - 2].Name);
 	
 	this.TableColumns = newTableColumns;
 };
