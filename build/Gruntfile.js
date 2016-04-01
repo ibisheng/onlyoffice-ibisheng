@@ -159,7 +159,7 @@ module.exports = function(grunt) {
 			}
 		}
 		
-		if (grunt.option('private')) {
+		if (!grunt.option('noprivate')) {
 			srcFiles = srcFiles.concat(packageFile['compile']['sdk']['private']);
 		}
 		if (grunt.option('desktop')) {
