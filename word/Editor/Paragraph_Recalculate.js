@@ -381,6 +381,7 @@ Paragraph.prototype.Prepare_RecalculateObject = function()
 Paragraph.prototype.Start_FromNewPage = function()
 {
     this.Pages.length = 1;
+    this.Pages[0] = new CParaPage(this.X, this.Y, this.XLimit, this.YLimit, 0);
 
     // Добавляем разрыв страницы
     this.Pages[0].Set_EndLine(-1);

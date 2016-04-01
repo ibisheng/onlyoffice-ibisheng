@@ -3262,6 +3262,8 @@ CTable.prototype =
         {
             if (true != this.Is_EmptyPage(CurPage))
                 break;
+
+            CurPage++;
         }
 
         this.private_StartTrackTable(CurPage);
