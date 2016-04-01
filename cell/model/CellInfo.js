@@ -180,6 +180,14 @@
 			this.isShowHeaderRow = null;
 			
 			this.tableRange = null;
+			
+			this.isInsertRowAbove = null;
+			this.isInsertRowBelow = null;
+			this.isInsertColumnLeft = null;
+			this.isInsertColumnRight = null;
+			this.isDeleteRow = null;
+			this.isDeleteColumn = null;
+			this.isDeleteTable = null;
         }
 
         asc_CFormatTableInfo.prototype = {
@@ -193,7 +201,15 @@
 			asc_getLastCol: function () { return this.lastCol; },
 			asc_getBandVer: function () { return this.bandVer; },
 			asc_getFilterButton: function () { return this.filterButton; },
-			asc_getTableRange: function () { return this.tableRange; }
+			asc_getTableRange: function () { return this.tableRange; },
+			
+			asc_getIsInsertRowAbove: function () { return this.isInsertRowAbove; },
+			asc_getIsInsertRowBelow: function () { return this.isInsertRowBelow; },
+			asc_getIsInsertColumnLeft: function () { return this.isInsertRowLeft; },
+			asc_getIsInsertColumnRight: function () { return this.isInsertColumnRight; },
+			asc_getIsDeleteRow: function () { return this.isDeleteRow; },
+			asc_getIsDeleteColumn: function () { return this.isDeleteColumn; },
+			asc_getIsDeleteTable: function () { return this.isDeleteTable; }
         };
 
         window["Asc"].asc_CFormatTableInfo = window["Asc"]["asc_CFormatTableInfo"] = asc_CFormatTableInfo;
@@ -211,6 +227,14 @@
 		prot["asc_getFilterButton"]     = prot.asc_getFilterButton;
 		
 		prot["asc_getTableRange"]       = prot.asc_getTableRange;
+		
+		prot["asc_getIsInsertRowAbove"] = prot.asc_getIsInsertRowAbove;
+        prot["asc_getIsInsertRowBelow"] = prot.asc_getIsInsertRowBelow;
+        prot["asc_getIsInsertColumnLeft"]  = prot.asc_getIsInsertColumnLeft;
+        prot["asc_getIsInsertColumnRight"] = prot.asc_getIsInsertColumnRight;
+		prot["asc_getIsDeleteRow"]	    = prot.asc_getIsDeleteRow;
+        prot["asc_getIsDeleteColumn"]   = prot.asc_getIsDeleteColumn;
+		prot["asc_getIsDeleteTable"]    = prot.asc_getIsDeleteTable;
 
 
 		/** @constructor */
