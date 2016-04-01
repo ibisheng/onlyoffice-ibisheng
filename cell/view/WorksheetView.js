@@ -1608,8 +1608,8 @@
         var maxRows = this.model.getRowsCount();
         var lastC = -1, lastR = -1;
         var activeRange = printOnlySelection ? this.activeRange : null;
-        var bFitToWidth = pageOptions.asc_getFitToWidth();
-        var bFitToHeight = pageOptions.asc_getFitToHeight();
+        var bFitToWidth = false;
+        var bFitToHeight = false;
 
         if (null === activeRange) {
             range = new asc_Range(0, 0, maxCols, maxRows);
@@ -1658,226 +1658,228 @@
         if (pageSetup instanceof asc_CPageSetup) {
             pageWidth = pageSetup.asc_getWidth();
             pageHeight = pageSetup.asc_getHeight();
-              pageOrientation = pageSetup.asc_getOrientation();
-          }
+            pageOrientation = pageSetup.asc_getOrientation();
+            bFitToWidth = pageSetup.asc_getFitToWidth();
+            bFitToHeight = pageSetup.asc_getFitToHeight();
+        }
 
-          var pageLeftField, pageRightField, pageTopField, pageBottomField;
-          if (pageMargins instanceof asc_CPageMargins) {
-              pageLeftField = pageMargins.asc_getLeft();
-              pageRightField = pageMargins.asc_getRight();
-              pageTopField = pageMargins.asc_getTop();
-              pageBottomField = pageMargins.asc_getBottom();
-          }
+        var pageLeftField, pageRightField, pageTopField, pageBottomField;
+        if (pageMargins instanceof asc_CPageMargins) {
+            pageLeftField = pageMargins.asc_getLeft();
+            pageRightField = pageMargins.asc_getRight();
+            pageTopField = pageMargins.asc_getTop();
+            pageBottomField = pageMargins.asc_getBottom();
+        }
 
-          if (null == pageGridLines) {
-              pageGridLines = c_oAscPrintDefaultSettings.PageGridLines;
-          }
-          if (null == pageHeadings) {
-              pageHeadings = c_oAscPrintDefaultSettings.PageHeadings;
-          }
+        if (null == pageGridLines) {
+            pageGridLines = c_oAscPrintDefaultSettings.PageGridLines;
+        }
+        if (null == pageHeadings) {
+            pageHeadings = c_oAscPrintDefaultSettings.PageHeadings;
+        }
 
-          if (null == pageWidth) {
-              pageWidth = c_oAscPrintDefaultSettings.PageWidth;
-          }
-          if (null == pageHeight) {
-              pageHeight = c_oAscPrintDefaultSettings.PageHeight;
-          }
-          if (null == pageOrientation) {
-              pageOrientation = c_oAscPrintDefaultSettings.PageOrientation;
-          }
+        if (null == pageWidth) {
+            pageWidth = c_oAscPrintDefaultSettings.PageWidth;
+        }
+        if (null == pageHeight) {
+            pageHeight = c_oAscPrintDefaultSettings.PageHeight;
+        }
+        if (null == pageOrientation) {
+            pageOrientation = c_oAscPrintDefaultSettings.PageOrientation;
+        }
 
-          if (null == pageLeftField) {
-              pageLeftField = c_oAscPrintDefaultSettings.PageLeftField;
-          }
-          if (null == pageRightField) {
-              pageRightField = c_oAscPrintDefaultSettings.PageRightField;
-          }
-          if (null == pageTopField) {
-              pageTopField = c_oAscPrintDefaultSettings.PageTopField;
-          }
-          if (null == pageBottomField) {
-              pageBottomField = c_oAscPrintDefaultSettings.PageBottomField;
-          }
+        if (null == pageLeftField) {
+            pageLeftField = c_oAscPrintDefaultSettings.PageLeftField;
+        }
+        if (null == pageRightField) {
+            pageRightField = c_oAscPrintDefaultSettings.PageRightField;
+        }
+        if (null == pageTopField) {
+            pageTopField = c_oAscPrintDefaultSettings.PageTopField;
+        }
+        if (null == pageBottomField) {
+            pageBottomField = c_oAscPrintDefaultSettings.PageBottomField;
+        }
 
-          if (c_oAscPageOrientation.PageLandscape === pageOrientation) {
-              var tmp = pageWidth;
-              pageWidth = pageHeight;
-              pageHeight = tmp;
-          }
+        if (c_oAscPageOrientation.PageLandscape === pageOrientation) {
+            var tmp = pageWidth;
+            pageWidth = pageHeight;
+            pageHeight = tmp;
+        }
 
-          var arrResult = [];
-          if (0 === maxCols || 0 === maxRows) {
-              // Ничего нет, возвращаем пустой массив
-              return null;
-          } else {
-              var pageWidthWithFields = pageWidth - pageLeftField - pageRightField;
-              var pageHeightWithFields = pageHeight - pageTopField - pageBottomField;
-              var leftFieldInPt = pageLeftField / vector_koef;
-              var topFieldInPt = pageTopField / vector_koef;
-              var rightFieldInPt = pageRightField / vector_koef;
-              var bottomFieldInPt = pageBottomField / vector_koef;
+        var arrResult = [];
+        if (0 === maxCols || 0 === maxRows) {
+            // Ничего нет, возвращаем пустой массив
+            return null;
+        } else {
+            var pageWidthWithFields = pageWidth - pageLeftField - pageRightField;
+            var pageHeightWithFields = pageHeight - pageTopField - pageBottomField;
+            var leftFieldInPt = pageLeftField / vector_koef;
+            var topFieldInPt = pageTopField / vector_koef;
+            var rightFieldInPt = pageRightField / vector_koef;
+            var bottomFieldInPt = pageBottomField / vector_koef;
 
-              if (pageHeadings) {
-                  // Рисуем заголовки, нужно чуть сдвинуться
-                  leftFieldInPt += this.cellsLeft;
-                  topFieldInPt += this.cellsTop;
-              }
+            if (pageHeadings) {
+                // Рисуем заголовки, нужно чуть сдвинуться
+                leftFieldInPt += this.cellsLeft;
+                topFieldInPt += this.cellsTop;
+            }
 
-              var pageWidthWithFieldsHeadings = (pageWidth - pageRightField) / vector_koef - leftFieldInPt;
-              var pageHeightWithFieldsHeadings = (pageHeight - pageBottomField) / vector_koef - topFieldInPt;
+            var pageWidthWithFieldsHeadings = (pageWidth - pageRightField) / vector_koef - leftFieldInPt;
+            var pageHeightWithFieldsHeadings = (pageHeight - pageBottomField) / vector_koef - topFieldInPt;
 
-              var currentColIndex = (null !== activeRange) ? activeRange.c1 : 0;
-              var currentWidth = 0;
-              var currentRowIndex = (null !== activeRange) ? activeRange.r1 : 0;
-              var currentHeight = 0;
-              var isCalcColumnsWidth = true;
+            var currentColIndex = (null !== activeRange) ? activeRange.c1 : 0;
+            var currentWidth = 0;
+            var currentRowIndex = (null !== activeRange) ? activeRange.r1 : 0;
+            var currentHeight = 0;
+            var isCalcColumnsWidth = true;
 
-              var bIsAddOffset = false;
-              var nCountOffset = 0;
+            var bIsAddOffset = false;
+            var nCountOffset = 0;
 
-              while (true) {
-                  if (currentColIndex === maxCols && currentRowIndex === maxRows) {
-                      break;
-                  }
+            while (true) {
+                if (currentColIndex === maxCols && currentRowIndex === maxRows) {
+                    break;
+                }
 
-                  var newPagePrint = new asc_CPagePrint();
+                var newPagePrint = new asc_CPagePrint();
 
-                  var colIndex = currentColIndex, rowIndex = currentRowIndex;
+                var colIndex = currentColIndex, rowIndex = currentRowIndex;
 
-                  newPagePrint.indexWorksheet = indexWorksheet;
+                newPagePrint.indexWorksheet = indexWorksheet;
 
-                  newPagePrint.pageWidth = pageWidth;
-                  newPagePrint.pageHeight = pageHeight;
-                  newPagePrint.pageClipRectLeft = pageLeftField / vector_koef;
-                  newPagePrint.pageClipRectTop = pageTopField / vector_koef;
-                  newPagePrint.pageClipRectWidth = pageWidthWithFields / vector_koef;
-                  newPagePrint.pageClipRectHeight = pageHeightWithFields / vector_koef;
+                newPagePrint.pageWidth = pageWidth;
+                newPagePrint.pageHeight = pageHeight;
+                newPagePrint.pageClipRectLeft = pageLeftField / vector_koef;
+                newPagePrint.pageClipRectTop = pageTopField / vector_koef;
+                newPagePrint.pageClipRectWidth = pageWidthWithFields / vector_koef;
+                newPagePrint.pageClipRectHeight = pageHeightWithFields / vector_koef;
 
-                  newPagePrint.leftFieldInPt = leftFieldInPt;
-                  newPagePrint.topFieldInPt = topFieldInPt;
-                  newPagePrint.rightFieldInPt = rightFieldInPt;
-                  newPagePrint.bottomFieldInPt = bottomFieldInPt;
+                newPagePrint.leftFieldInPt = leftFieldInPt;
+                newPagePrint.topFieldInPt = topFieldInPt;
+                newPagePrint.rightFieldInPt = rightFieldInPt;
+                newPagePrint.bottomFieldInPt = bottomFieldInPt;
 
-                  for (rowIndex = currentRowIndex; rowIndex < maxRows; ++rowIndex) {
-                      var currentRowHeight = this.rows[rowIndex].height;
-                      if (!bFitToHeight && currentHeight + currentRowHeight > pageHeightWithFieldsHeadings) {
-                          // Закончили рисовать страницу
-                          break;
-                      }
-                      if (isCalcColumnsWidth) {
-                          for (colIndex = currentColIndex; colIndex < maxCols; ++colIndex) {
-                              var currentColWidth = this.cols[colIndex].width;
-                              if (bIsAddOffset) {
-                                  newPagePrint.startOffset = ++nCountOffset;
-                                  newPagePrint.startOffsetPt = (pageWidthWithFieldsHeadings * newPagePrint.startOffset);
-                                  currentColWidth -= newPagePrint.startOffsetPt;
-                              }
+                for (rowIndex = currentRowIndex; rowIndex < maxRows; ++rowIndex) {
+                    var currentRowHeight = this.rows[rowIndex].height;
+                    if (!bFitToHeight && currentHeight + currentRowHeight > pageHeightWithFieldsHeadings) {
+                        // Закончили рисовать страницу
+                        break;
+                    }
+                    if (isCalcColumnsWidth) {
+                        for (colIndex = currentColIndex; colIndex < maxCols; ++colIndex) {
+                            var currentColWidth = this.cols[colIndex].width;
+                            if (bIsAddOffset) {
+                                newPagePrint.startOffset = ++nCountOffset;
+                                newPagePrint.startOffsetPt = (pageWidthWithFieldsHeadings * newPagePrint.startOffset);
+                                currentColWidth -= newPagePrint.startOffsetPt;
+                            }
 
-                              if (!bFitToWidth && currentWidth + currentColWidth > pageWidthWithFieldsHeadings &&
-                                colIndex !== currentColIndex) {
-                                  break;
-                              }
+                            if (!bFitToWidth && currentWidth + currentColWidth > pageWidthWithFieldsHeadings &&
+                              colIndex !== currentColIndex) {
+                                break;
+                            }
 
-                              currentWidth += currentColWidth;
+                            currentWidth += currentColWidth;
 
-                              if (!bFitToWidth && currentWidth > pageWidthWithFieldsHeadings &&
-                                colIndex === currentColIndex) {
-                                  // Смещаем в селедующий раз ячейку
-                                  bIsAddOffset = true;
-                                  ++colIndex;
-                                  break;
-                              } else {
-                                  bIsAddOffset = false;
-                              }
-                          }
-                          isCalcColumnsWidth = false;
-                          if (pageHeadings) {
-                              currentWidth += this.cellsLeft;
-                          }
+                            if (!bFitToWidth && currentWidth > pageWidthWithFieldsHeadings &&
+                              colIndex === currentColIndex) {
+                                // Смещаем в селедующий раз ячейку
+                                bIsAddOffset = true;
+                                ++colIndex;
+                                break;
+                            } else {
+                                bIsAddOffset = false;
+                            }
+                        }
+                        isCalcColumnsWidth = false;
+                        if (pageHeadings) {
+                            currentWidth += this.cellsLeft;
+                        }
 
-                          if (bFitToWidth) {
-                              newPagePrint.pageClipRectWidth = Math.max(currentWidth, newPagePrint.pageClipRectWidth);
-                              newPagePrint.pageWidth =
-                                newPagePrint.pageClipRectWidth * vector_koef + (pageLeftField + pageRightField);
-                          } else {
-                              newPagePrint.pageClipRectWidth = Math.min(currentWidth, newPagePrint.pageClipRectWidth);
-                          }
-                      }
+                        if (bFitToWidth) {
+                            newPagePrint.pageClipRectWidth = Math.max(currentWidth, newPagePrint.pageClipRectWidth);
+                            newPagePrint.pageWidth =
+                              newPagePrint.pageClipRectWidth * vector_koef + (pageLeftField + pageRightField);
+                        } else {
+                            newPagePrint.pageClipRectWidth = Math.min(currentWidth, newPagePrint.pageClipRectWidth);
+                        }
+                    }
 
-                      currentHeight += currentRowHeight;
-                      currentWidth = 0;
-                  }
+                    currentHeight += currentRowHeight;
+                    currentWidth = 0;
+                }
 
-                  if (bFitToHeight) {
-                      newPagePrint.pageClipRectHeight = Math.max(currentHeight, newPagePrint.pageClipRectHeight);
-                      newPagePrint.pageHeight =
-                        newPagePrint.pageClipRectHeight * vector_koef + (pageTopField + pageBottomField);
-                  }
+                if (bFitToHeight) {
+                    newPagePrint.pageClipRectHeight = Math.max(currentHeight, newPagePrint.pageClipRectHeight);
+                    newPagePrint.pageHeight =
+                      newPagePrint.pageClipRectHeight * vector_koef + (pageTopField + pageBottomField);
+                }
 
-                  // Нужно будет пересчитывать колонки
-                  isCalcColumnsWidth = true;
+                // Нужно будет пересчитывать колонки
+                isCalcColumnsWidth = true;
 
-                  // Рисуем сетку
-                  if (pageGridLines) {
-                      newPagePrint.pageGridLines = true;
-                  }
+                // Рисуем сетку
+                if (pageGridLines) {
+                    newPagePrint.pageGridLines = true;
+                }
 
-                  if (pageHeadings) {
-                      // Нужно отрисовать заголовки
-                      newPagePrint.pageHeadings = true;
-                  }
+                if (pageHeadings) {
+                    // Нужно отрисовать заголовки
+                    newPagePrint.pageHeadings = true;
+                }
 
-                  newPagePrint.pageRange = new asc_Range(currentColIndex, currentRowIndex, colIndex - 1, rowIndex - 1);
+                newPagePrint.pageRange = new asc_Range(currentColIndex, currentRowIndex, colIndex - 1, rowIndex - 1);
 
-                  if (bIsAddOffset) {
-                      // Мы еще не дорисовали колонку
-                      colIndex -= 1;
-                  } else {
-                      nCountOffset = 0;
-                  }
+                if (bIsAddOffset) {
+                    // Мы еще не дорисовали колонку
+                    colIndex -= 1;
+                } else {
+                    nCountOffset = 0;
+                }
 
-                  if (colIndex < maxCols) {
-                      // Мы еще не все колонки отрисовали
-                      currentColIndex = colIndex;
-                      currentHeight = 0;
-                  } else {
-                      // Мы дорисовали все колонки, нужна новая строка и стартовая колонка
-                      currentColIndex = (null !== activeRange) ? activeRange.c1 : 0;
-                      currentRowIndex = rowIndex;
-                      currentHeight = 0;
-                  }
+                if (colIndex < maxCols) {
+                    // Мы еще не все колонки отрисовали
+                    currentColIndex = colIndex;
+                    currentHeight = 0;
+                } else {
+                    // Мы дорисовали все колонки, нужна новая строка и стартовая колонка
+                    currentColIndex = (null !== activeRange) ? activeRange.c1 : 0;
+                    currentRowIndex = rowIndex;
+                    currentHeight = 0;
+                }
 
-                  if (rowIndex === maxRows) {
-                      // Мы вышли, т.к. дошли до конца отрисовки по строкам
-                      if (colIndex < maxCols) {
-                          currentColIndex = colIndex;
-                          currentHeight = 0;
-                      } else {
-                          // Мы дошли до конца отрисовки
-                          currentColIndex = colIndex;
-                          currentRowIndex = rowIndex;
-                      }
-                  }
+                if (rowIndex === maxRows) {
+                    // Мы вышли, т.к. дошли до конца отрисовки по строкам
+                    if (colIndex < maxCols) {
+                        currentColIndex = colIndex;
+                        currentHeight = 0;
+                    } else {
+                        // Мы дошли до конца отрисовки
+                        currentColIndex = colIndex;
+                        currentRowIndex = rowIndex;
+                    }
+                }
 
-                  arrResult.push(newPagePrint);
-              }
-          }
+                arrResult.push(newPagePrint);
+            }
+        }
 
-          return arrResult;
-      };
-    WorksheetView.prototype.drawForPrint = function ( drawingCtx, printPagesData ) {
+        return arrResult;
+    };
+    WorksheetView.prototype.drawForPrint = function(drawingCtx, printPagesData) {
         var isAppBridge = (undefined != window['appBridge']);
 
-        if ( null === printPagesData ) {
+        if (null === printPagesData) {
             // Напечатаем пустую страницу
-            drawingCtx.BeginPage( c_oAscPrintDefaultSettings.PageWidth, c_oAscPrintDefaultSettings.PageHeight );
+            drawingCtx.BeginPage(c_oAscPrintDefaultSettings.PageWidth, c_oAscPrintDefaultSettings.PageHeight);
             drawingCtx.EndPage();
-        }
-        else {
-            drawingCtx.BeginPage( printPagesData.pageWidth, printPagesData.pageHeight );
-            drawingCtx.AddClipRect( printPagesData.pageClipRectLeft, printPagesData.pageClipRectTop, printPagesData.pageClipRectWidth, printPagesData.pageClipRectHeight );
+        } else {
+            drawingCtx.BeginPage(printPagesData.pageWidth, printPagesData.pageHeight);
+            drawingCtx.AddClipRect(printPagesData.pageClipRectLeft, printPagesData.pageClipRectTop,
+              printPagesData.pageClipRectWidth, printPagesData.pageClipRectHeight);
 
-            if ( isAppBridge ) {
+            if (isAppBridge) {
                 window['appBridge']['dummyCommandUpdate']();
             }
 
@@ -1890,43 +1892,46 @@
             // Сменим visibleRange для прохождения проверок отрисовки
             this.visibleRange = range;
 
-            if ( isAppBridge ) {
+            if (isAppBridge) {
                 window['appBridge']['dummyCommandUpdate']();
             }
 
             // Нужно отрисовать заголовки
-            if ( printPagesData.pageHeadings ) {
-                this._drawColumnHeaders( drawingCtx, range.c1, range.c2, /*style*/ undefined, offsetX, printPagesData.topFieldInPt - this.cellsTop );
-                this._drawRowHeaders( drawingCtx, range.r1, range.r2, /*style*/ undefined, printPagesData.leftFieldInPt - this.cellsLeft, offsetY );
+            if (printPagesData.pageHeadings) {
+                this._drawColumnHeaders(drawingCtx, range.c1, range.c2, /*style*/ undefined, offsetX,
+                  printPagesData.topFieldInPt - this.cellsTop);
+                this._drawRowHeaders(drawingCtx, range.r1, range.r2, /*style*/ undefined,
+                  printPagesData.leftFieldInPt - this.cellsLeft, offsetY);
             }
 
-            if ( isAppBridge ) {
+            if (isAppBridge) {
                 window['appBridge']['dummyCommandUpdate']();
             }
 
             // Рисуем сетку
-            if ( printPagesData.pageGridLines ) {
-                this._drawGrid( drawingCtx, range, offsetX, offsetY, printPagesData.pageWidth / vector_koef, printPagesData.pageHeight / vector_koef );
+            if (printPagesData.pageGridLines) {
+                this._drawGrid(drawingCtx, range, offsetX, offsetY, printPagesData.pageWidth / vector_koef,
+                  printPagesData.pageHeight / vector_koef);
             }
 
-            if ( isAppBridge ) {
+            if (isAppBridge) {
                 window['appBridge']['dummyCommandUpdate']();
             }
 
             // Отрисовываем ячейки и бордеры
-            this._drawCellsAndBorders( drawingCtx, range, offsetX, offsetY );
+            this._drawCellsAndBorders(drawingCtx, range, offsetX, offsetY);
 
-            if ( isAppBridge ) {
+            if (isAppBridge) {
                 window['appBridge']['dummyCommandUpdate']();
             }
 
             var drawingPrintOptions = {
                 ctx: drawingCtx, printPagesData: printPagesData
             };
-            this.objectRender.showDrawingObjectsEx( false, null, drawingPrintOptions );
+            this.objectRender.showDrawingObjectsEx(false, null, drawingPrintOptions);
             this.visibleRange = tmpVisibleRange;
 
-            if ( isAppBridge ) {
+            if (isAppBridge) {
                 window['appBridge']['dummyCommandUpdate']();
             }
 
