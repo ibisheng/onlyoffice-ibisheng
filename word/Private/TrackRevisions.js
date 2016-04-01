@@ -70,6 +70,21 @@ asc_docs_api.prototype.asc_RejectAllChanges = function()
 {
     this.WordControl.m_oLogicDocument.Reject_AllRevisionChanges();
 };
+
+asc_docs_api.prototype['asc_SetTrackRevisions']               = asc_docs_api.prototype.asc_SetTrackRevisions;
+asc_docs_api.prototype['asc_IsTrackRevisions']                = asc_docs_api.prototype.asc_IsTrackRevisions;
+asc_docs_api.prototype['sync_BeginCatchRevisionsChanges']     = asc_docs_api.prototype.sync_BeginCatchRevisionsChanges;
+asc_docs_api.prototype['sync_EndCatchRevisionsChanges']       = asc_docs_api.prototype.sync_EndCatchRevisionsChanges;
+asc_docs_api.prototype['sync_AddRevisionsChange']             = asc_docs_api.prototype.sync_AddRevisionsChange;
+asc_docs_api.prototype['asc_AcceptChanges']                   = asc_docs_api.prototype.asc_AcceptChanges;
+asc_docs_api.prototype['asc_RejectChanges']                   = asc_docs_api.prototype.asc_RejectChanges;
+asc_docs_api.prototype['asc_HaveRevisionsChanges']            = asc_docs_api.prototype.asc_HaveRevisionsChanges;
+asc_docs_api.prototype['asc_HaveNewRevisionsChanges']         = asc_docs_api.prototype.asc_HaveNewRevisionsChanges;
+asc_docs_api.prototype['asc_GetNextRevisionsChange']          = asc_docs_api.prototype.asc_GetNextRevisionsChange;
+asc_docs_api.prototype['asc_GetPrevRevisionsChange']          = asc_docs_api.prototype.asc_GetPrevRevisionsChange;
+asc_docs_api.prototype['sync_UpdateRevisionsChangesPosition'] = asc_docs_api.prototype.sync_UpdateRevisionsChangesPosition;
+asc_docs_api.prototype['asc_AcceptAllChanges']                = asc_docs_api.prototype.asc_AcceptAllChanges;
+asc_docs_api.prototype['asc_RejectAllChanges']                = asc_docs_api.prototype.asc_RejectAllChanges;
 //----------------------------------------------------------------------------------------------------------------------
 // CDocument
 //----------------------------------------------------------------------------------------------------------------------

@@ -32,6 +32,13 @@ asc_docs_api.prototype.asc_IsDefaultStyleChanged = function(sName)
 {
     return this.WordControl.m_oLogicDocument.Is_DefaultStyleChanged(sName);
 };
+
+asc_docs_api.prototype['asc_GetStyleFromFormatting'] = asc_docs_api.prototype.asc_GetStyleFromFormatting;
+asc_docs_api.prototype['asc_AddNewStyle']            = asc_docs_api.prototype.asc_AddNewStyle;
+asc_docs_api.prototype['asc_RemoveStyle']            = asc_docs_api.prototype.asc_RemoveStyle;
+asc_docs_api.prototype['asc_RemoveAllCustomStyles']  = asc_docs_api.prototype.asc_RemoveAllCustomStyles;
+asc_docs_api.prototype['asc_IsStyleDefault']         = asc_docs_api.prototype.asc_IsStyleDefault;
+asc_docs_api.prototype['asc_IsDefaultStyleChanged']  = asc_docs_api.prototype.asc_IsDefaultStyleChanged;
 //----------------------------------------------------------------------------------------------------------------------
 //  CDocument
 //----------------------------------------------------------------------------------------------------------------------

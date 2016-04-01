@@ -157,6 +157,24 @@ asc_docs_api.prototype.asc_DownloadAsMailMerge = function(typeFile, StartIndex, 
     }
     return null != oDocumentMailMerge ? true : false;
 };
+
+asc_docs_api.prototype['asc_StartMailMerge']              = asc_docs_api.prototype.asc_StartMailMerge;
+asc_docs_api.prototype['asc_StartMailMergeByList']        = asc_docs_api.prototype.asc_StartMailMergeByList;
+asc_docs_api.prototype['asc_GetReceptionsCount']          = asc_docs_api.prototype.asc_GetReceptionsCount;
+asc_docs_api.prototype['asc_GetMailMergeFieldsNameList']  = asc_docs_api.prototype.asc_GetMailMergeFieldsNameList;
+asc_docs_api.prototype['asc_AddMailMergeField']           = asc_docs_api.prototype.asc_AddMailMergeField;
+asc_docs_api.prototype['asc_SetHighlightMailMergeFields'] = asc_docs_api.prototype.asc_SetHighlightMailMergeFields;
+asc_docs_api.prototype['asc_PreviewMailMergeResult']      = asc_docs_api.prototype.asc_PreviewMailMergeResult;
+asc_docs_api.prototype['asc_EndPreviewMailMergeResult']   = asc_docs_api.prototype.asc_EndPreviewMailMergeResult;
+asc_docs_api.prototype['sync_StartMailMerge']             = asc_docs_api.prototype.sync_StartMailMerge;
+asc_docs_api.prototype['sync_PreviewMailMergeResult']     = asc_docs_api.prototype.sync_PreviewMailMergeResult;
+asc_docs_api.prototype['sync_EndPreviewMailMergeResult']  = asc_docs_api.prototype.sync_EndPreviewMailMergeResult;
+asc_docs_api.prototype['sync_HighlightMailMergeFields']   = asc_docs_api.prototype.sync_HighlightMailMergeFields;
+asc_docs_api.prototype['asc_getMailMergeData']            = asc_docs_api.prototype.asc_getMailMergeData;
+asc_docs_api.prototype['asc_setMailMergeData']            = asc_docs_api.prototype.asc_setMailMergeData;
+asc_docs_api.prototype['asc_sendMailMergeData']           = asc_docs_api.prototype.asc_sendMailMergeData;
+asc_docs_api.prototype['asc_GetMailMergeFiledValue']      = asc_docs_api.prototype.asc_GetMailMergeFiledValue;
+asc_docs_api.prototype['asc_DownloadAsMailMerge']         = asc_docs_api.prototype.asc_DownloadAsMailMerge;
 //----------------------------------------------------------------------------------------------------------------------
 // Функции для работы с MailMerge
 //----------------------------------------------------------------------------------------------------------------------
