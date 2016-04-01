@@ -2979,7 +2979,7 @@ COperator.prototype.fixSize = function(oMeasure, stretch)
 
             if(!bLine && this.operator.loc == LOCATION_TOP)
                 ascent = dims.Height;
-            else if(!bLine || this.operator.loc == LOCATION_BOT)
+            else if(!bLine && this.operator.loc == LOCATION_BOT)
                 ascent = this.operator.size.height;
             else
                 ascent = height/2 + shCenter;
