@@ -1608,8 +1608,8 @@
         var maxRows = this.model.getRowsCount();
         var lastC = -1, lastR = -1;
         var activeRange = printOnlySelection ? this.activeRange : null;
-        var bFitToWidth = pageOptions.getFitToWidth();
-        var bFitToHeight = pageOptions.getFitToHeight();
+        var bFitToWidth = pageOptions.asc_getFitToWidth();
+        var bFitToHeight = pageOptions.asc_getFitToHeight();
 
         if (null === activeRange) {
             range = new asc_Range(0, 0, maxCols, maxRows);

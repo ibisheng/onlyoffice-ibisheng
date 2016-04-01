@@ -1083,8 +1083,8 @@
 		asc_CPageSetup.prototype.asc_setOrientation = function (val) { this.orientation = val; };
 		asc_CPageSetup.prototype.asc_setWidth = function (val) { this.width = val; };
 		asc_CPageSetup.prototype.asc_setHeight = function (val) { this.height = val; };
-		asc_CPageSetup.prototype.getFitToWidth = function () { return this.fitToWidth; };
-		asc_CPageSetup.prototype.getFitToHeight = function () { return this.fitToHeight; };
+		asc_CPageSetup.prototype.asc_getFitToWidth = function () { return this.fitToWidth; };
+		asc_CPageSetup.prototype.asc_getFitToHeight = function () { return this.fitToHeight; };
 		asc_CPageSetup.prototype.asc_setFitToWidth = function (val) { this.fitToWidth = val; };
 		asc_CPageSetup.prototype.asc_setFitToHeight = function (val) { this.fitToHeight = val; };
 
@@ -1652,6 +1652,8 @@
 		prot["asc_setOrientation"] = prot.asc_setOrientation;
 		prot["asc_setWidth"] = prot.asc_setWidth;
 		prot["asc_setHeight"] = prot.asc_setHeight;
+		prot["asc_getFitToWidth"] = prot.asc_getFitToWidth;
+		prot["asc_getFitToHeight"] = prot.asc_getFitToHeight;
 		prot["asc_setFitToWidth"] = prot.asc_setFitToWidth;
 		prot["asc_setFitToHeight"] = prot.asc_setFitToHeight;
 
