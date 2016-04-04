@@ -3792,6 +3792,15 @@ CAnchorPosition.prototype =
         return this.CalcY;
     },
 
+    Update_PositionYHeaderFooter : function(TopMarginY, BottomMarginY)
+    {
+        var TopY    = Math.max(this.Page_Y, Math.min(TopMarginY, this.Page_H));
+        var BottomY = Math.max(this.Page_Y, Math.min(BottomMarginY, this.Page_H));
+
+        this.Top_Margin    = TopY;
+        this.Bottom_Margin = this.Page_H - BottomY;
+    },
+
     Correct_Values : function(bInline, PageLimits, AllowOverlap, UseTextWrap, OtherFlowObjects)
     {
         if ( true != bInline )
@@ -4857,6 +4866,14 @@ ParaDrawing.prototype =
 
         this.updatePosition3( this.PageNum, this.X, this.Y, OldPageNum );
         this.useWrap = this.Use_TextWrap();
+    },
+
+    Update_PositionYHeaderFooter : function(TopMarginY, BottomMarginY)
+    {
+        this.Internal_Position.Update_PositionYHeaderFooter(TopMarginY, BottomMarginY);
+        this.Internal_Position.Calculate_Y(this.Is_Inline(), this.PositionV.RelativeFrom, this.PositionV.Align, this.PositionV.Value, this.PositionV.Percent);
+        this.Y = this.Internal_Position.CalcY;
+        this.updatePosition3(this.PageNum, this.X, this.Y, this.PageNum);
     },
 
     Reset_SavedPosition : function()

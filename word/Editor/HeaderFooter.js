@@ -1470,12 +1470,31 @@ CHeaderFooterController.prototype =
             FooterDrawings = Footer.Content.Get_AllDrawingObjects([]);
             FooterTables = Footer.Content.Get_AllFloatElements();
         }
+
+        // Подправляем позиции автофигур с учетом возможно изменившихся границ колонтитулов. Делаем это для всех автофигур,
+        // потому что колонтитулы рассчитываются первыми на странице и внутри них нет обтекания.
+        var PageLimits = this.LogicDocument.Get_PageContentStartPos(PageIndex);
+        this.private_UpdateDrawingVerticalPositions(HeaderDrawings, PageLimits.Y, PageLimits.YLimit);
+        this.private_UpdateDrawingVerticalPositions(FooterDrawings, PageLimits.Y, PageLimits.YLimit);
+
         this.LogicDocument.DrawingObjects.mergeDrawings(PageIndex, HeaderDrawings, HeaderTables, FooterDrawings, FooterTables);
         if ( true === bRecalcHeader || true === bRecalcFooter )
             return true;
         
         return false;
-    },    
+    },
+
+    private_UpdateDrawingVerticalPositions : function(Drawings, HeaderY, FooterY)
+    {
+        if (Drawings)
+        {
+            for (var Index = 0, Count = Drawings.length; Index < Count; ++Index)
+            {
+                var Drawing = Drawings[Index];
+                Drawing.Update_PositionYHeaderFooter(HeaderY, FooterY);
+            }
+        }
+    },
 
     // Отрисовка колонтитулов на данной странице
     Draw : function(nPageIndex, pGraphics)
