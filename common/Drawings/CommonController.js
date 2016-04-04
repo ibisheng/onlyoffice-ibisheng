@@ -347,7 +347,7 @@ DrawingObjectsController.prototype =
         var oSelector = this.selection.groupSelection ? this.selection.groupSelection : this;
         if(oSelector.selectedObjects.length === 1 && oSelector.selectedObjects[0].getObjectType() === historyitem_type_Shape)
         {
-            var oShape = this.selectedObjects[0];
+            var oShape = oSelector.selectedObjects[0];
             var oContent = oShape.getDocContent();
             if(oContent)
             {
