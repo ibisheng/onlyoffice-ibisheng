@@ -2178,7 +2178,7 @@
 							}
 							else
 							{
-								worksheet.getRange3(tablePart.Ref.r2, tablePart.Ref.c1, tablePart.Ref.r2, tablePart.Ref.c2).addCellsShiftBottom();
+								worksheet.getRange3(tablePart.Ref.r2 + 1, tablePart.Ref.c1, tablePart.Ref.r2 + 1, tablePart.Ref.c2).addCellsShiftBottom();
 								worksheet._moveRange(tablePart.Ref,  new Asc.Range(tablePart.Ref.c1, tablePart.Ref.r1 + 1, tablePart.Ref.c2, tablePart.Ref.r2 + 1));
 									
 								tablePart.changeRef(null, -1, true);
@@ -2203,7 +2203,7 @@
 				//History.TurnOn();
 				
 				this._addHistoryObj({oldFilter: oldFilter, newFilterRef: tablePart.Ref.clone()}, historyitem_AutoFilter_ChangeTableInfo,
-						{activeCells: null, type: optionType, val: val, displayName: tableName});
+						{activeCells: tablePart.Ref.clone(), type: optionType, val: val, displayName: tableName});
 				
 				this._cleanStyleTable(tablePart.Ref);
 				this._setColorStyleTable(tablePart.Ref, tablePart, null, isSetValue);
@@ -2348,7 +2348,7 @@
 
 				if(redoObject)
 				{
-					oHistoryObject.activeCells			= redoObject.activeCells ? redoObject.activeCells.clone() : null;	// ToDo Слишком много клонирования, это долгая операция
+					oHistoryObject.activeCells			= redoObject.activeCells.clone();	// ToDo Слишком много клонирования, это долгая операция
 					oHistoryObject.styleName			= redoObject.styleName;
 					oHistoryObject.type					= redoObject.type;
 					oHistoryObject.cellId				= redoObject.cellId;
