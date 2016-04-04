@@ -2542,6 +2542,7 @@ CShape.prototype =
                                 var oParentParagraph = oParaDrawing.Get_ParentParagraph();
                                 if(oParentParagraph)
                                 {
+
                                     var oSectPr = oParentParagraph.Get_SectPr();
                                     if(oSectPr)
                                     {
@@ -2549,23 +2550,23 @@ CShape.prototype =
                                         {
                                             switch(oParaDrawing.SizeRelH.RelativeFrom)
                                             {
-                                                case c_oAscRelativeFromH.Margin:
+                                                case c_oAscSizeRelFromH.sizerelfromhMargin:
                                                 {
                                                     this.extX = oSectPr.Get_PageWidth() - oSectPr.Get_PageMargin_Left() - oSectPr.Get_PageMargin_Right();
                                                     break;
                                                 }
-                                                case c_oAscRelativeFromH.Page:
+                                                case c_oAscSizeRelFromH.sizerelfromhPage:
                                                 {
                                                     this.extX = oSectPr.Get_PageWidth();
                                                     break;
                                                 }
-                                                case c_oAscRelativeFromH.LeftMargin:
+                                                case c_oAscSizeRelFromH.sizerelfromhLeftMargin:
                                                 {
                                                     this.extX = oSectPr.Get_PageMargin_Left();
                                                     break;
                                                 }
 
-                                                case c_oAscRelativeFromH.RightMargin:
+                                                case c_oAscSizeRelFromH.sizerelfromhRightMargin:
                                                 {
                                                     this.extX = oSectPr.Get_PageMargin_Right();
                                                     break;
@@ -2580,25 +2581,24 @@ CShape.prototype =
                                         }
                                         if(oParaDrawing.SizeRelV)
                                         {
-
                                             switch(oParaDrawing.SizeRelV.RelativeFrom)
                                             {
-                                                case c_oAscRelativeFromV.Margin:
+                                                case c_oAscSizeRelFromV.sizerelfromvMargin:
                                                 {
                                                     this.extY = oSectPr.Get_PageHeight() - oSectPr.Get_PageMargin_Top() - oSectPr.Get_PageMargin_Bottom();
                                                     break;
                                                 }
-                                                case c_oAscRelativeFromV.Page:
+                                                case c_oAscSizeRelFromV.sizerelfromvPage:
                                                 {
                                                     this.extY = oSectPr.Get_PageHeight();
                                                     break;
                                                 }
-                                                case c_oAscRelativeFromV.TopMargin:
+                                                case c_oAscSizeRelFromV.sizerelfromvTopMargin:
                                                 {
                                                     this.extY = oSectPr.Get_PageMargin_Top();
                                                     break;
                                                 }
-                                                case c_oAscRelativeFromV.BottomMargin:
+                                                case c_oAscSizeRelFromV.sizerelfromvBottomMargin:
                                                 {
                                                     this.extY = oSectPr.Get_PageMargin_Bottom();
                                                     break;

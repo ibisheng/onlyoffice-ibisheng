@@ -4270,18 +4270,18 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
 				this.memory.WriteByte(c_oSerPropLenType.Variable);
 				this.bs.WriteItemWithLength(function(){oThis.WriteSimplePos(img.SimplePos);});
 			}
-			// if(null != img.SizeRelH)
-			// {
-				// this.memory.WriteByte(c_oSerImageType2.SizeRelH);
-				// this.memory.WriteByte(c_oSerPropLenType.Variable);
-				// this.bs.WriteItemWithLength(function(){oThis.WriteSizeRelHV(img.SizeRelH);});
-			// }
-			// if(null != img.SizeRelV)
-			// {
-				// this.memory.WriteByte(c_oSerImageType2.SizeRelV);
-				// this.memory.WriteByte(c_oSerPropLenType.Variable);
-				// this.bs.WriteItemWithLength(function(){oThis.WriteSizeRelHV(img.SizeRelV);});
-			// }
+			if(null != img.SizeRelH)
+			{
+				 this.memory.WriteByte(c_oSerImageType2.SizeRelH);
+				 this.memory.WriteByte(c_oSerPropLenType.Variable);
+				 this.bs.WriteItemWithLength(function(){oThis.WriteSizeRelHV(img.SizeRelH);});
+			}
+			if(null != img.SizeRelV)
+			{
+				this.memory.WriteByte(c_oSerImageType2.SizeRelV);
+				this.memory.WriteByte(c_oSerPropLenType.Variable);
+				this.bs.WriteItemWithLength(function(){oThis.WriteSizeRelHV(img.SizeRelV);});
+			}
 			switch(img.wrappingType)
 			{
 				case WRAPPING_TYPE_NONE:
@@ -4403,10 +4403,10 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
 			this.memory.WriteByte(c_oSerPropLenType.Byte);
 			this.memory.WriteByte(SizeRelHV.RelativeFrom);
 		}
-		if (null != SizeRelHV.Pct) {
+		if (null != SizeRelHV.Percent) {
 			this.memory.WriteByte(c_oSerSizeRelHV.Pct);
 			this.memory.WriteByte(c_oSerPropLenType.Double);
-			this.memory.WriteDouble(SizeRelHV.Pct);
+			this.memory.WriteDouble((SizeRelHV.Percent*100) >> 0);
 		}
 	}
 	this.WriteSimplePos = function(oSimplePos)
@@ -8720,19 +8720,19 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 		}
         else if( c_oSerImageType2.SizeRelH === type )
         {
-            var oNewSizeRel = {RelativeFrom: null, Pct: null};
+            var oNewSizeRel = {RelativeFrom: null, Percent: null};
             res = this.bcr.Read2(length, function(t, l){
                     return oThis.ReadSizeRelHV(t, l, oNewSizeRel);
                 });
-            //oParaDrawing.SizeRelH = oNewSizeRel;
+            oParaDrawing.SetSizeRelH(oNewSizeRel);
         }
         else if( c_oSerImageType2.SizeRelV === type )
         {
-            var oNewSizeRel = {RelativeFrom: null, Pct: null};
+            var oNewSizeRel = {RelativeFrom: null, Percent: null};
             res = this.bcr.Read2(length, function(t, l){
                     return oThis.ReadSizeRelHV(t, l, oNewSizeRel);
                 });
-            //oParaDrawing.SizeRelV = oNewSizeRel;
+            oParaDrawing.SetSizeRelV(oNewSizeRel);
         }
 		else if( c_oSerImageType2.WrapSquare === type )
 		{
@@ -8833,7 +8833,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
         if (c_oSerSizeRelHV.RelativeFrom === type) {
             SizeRel.RelativeFrom = this.stream.GetUChar();
         } else if (c_oSerSizeRelHV.Pct === type) {
-            SizeRel.Pct = this.bcr.ReadDouble();
+            SizeRel.Percent = this.bcr.ReadDouble()/100.0;
         }
         else
             res = c_oSerConstants.ReadUnknown;

@@ -2348,8 +2348,8 @@ function CBinaryFileWriter()
                     oThis._WriteInt2(1, fill.tile.sy);
                     oThis._WriteInt2(2, fill.tile.tx);
                     oThis._WriteInt2(3, fill.tile.ty);
-                    oThis._WriteInt2(4, fill.tile.algn);
-                    oThis._WriteInt2(5, fill.tile.flip);
+                    oThis._WriteLimit2(4, fill.tile.algn);
+                    oThis._WriteLimit2(5, fill.tile.flip);
                     oThis.WriteUChar(g_nodeAttributeEnd);
                     oThis.EndRecord();
                 }

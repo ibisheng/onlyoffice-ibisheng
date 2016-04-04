@@ -411,6 +411,26 @@ var c_oAscRelativeFromH = {
     RightMargin: 0x07
 };
 
+var c_oAscSizeRelFromH =
+{
+    sizerelfromhMargin: 0,
+    sizerelfromhPage: 1,
+    sizerelfromhLeftMargin: 2,
+    sizerelfromhRightMargin: 3,
+    sizerelfromhInsideMargin: 4,
+    sizerelfromhOutsideMargin: 5
+};
+
+var c_oAscSizeRelFromV =
+{
+    sizerelfromvMargin: 0,
+    sizerelfromvPage: 1,
+    sizerelfromvTopMargin: 2,
+    sizerelfromvBottomMargin: 3,
+    sizerelfromvInsideMargin: 4,
+    sizerelfromvOutsideMargin: 5
+};
+
 var c_oAscRelativeFromV = {
     BottomMargin: 0x00,
     InsideMargin: 0x01,
