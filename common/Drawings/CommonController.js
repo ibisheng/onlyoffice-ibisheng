@@ -344,14 +344,15 @@ DrawingObjectsController.prototype =
     //for mobile spreadsheet editor
     startEditTextCurrentShape: function()
     {
-        if(this.selectedObjects.length === 1 && this.selectedObjects[0].getObjectType() === historyitem_type_Shape)
+        var oSelector = this.selection.groupSelection ? this.selection.groupSelection : this;
+        if(oSelector.selectedObjects.length === 1 && oSelector.selectedObjects[0].getObjectType() === historyitem_type_Shape)
         {
             var oShape = this.selectedObjects[0];
             var oContent = oShape.getDocContent();
             if(oContent)
             {
-                this.resetInternalSelection();
-                this.selection.textSelection = oShape;
+                oSelector.resetInternalSelection();
+                oSelector.selection.textSelection = oShape;
                 oContent.Cursor_MoveToEndPos(false);
                 this.updateSelectionState();
                 this.updateOverlay();
@@ -362,8 +363,8 @@ DrawingObjectsController.prototype =
                 this.checkSelectedObjectsAndCallback(function(){
                     oShape.createTextBody();
                     var oContent = oShape.getDocContent();
-                    oThis.resetInternalSelection();
-                    oThis.selection.textSelection = oShape;
+                    oSelector.resetInternalSelection();
+                    oSelector.selection.textSelection = oShape;
                     oContent.Cursor_MoveToEndPos(false);
                     oThis.updateSelectionState();
                 }, [], false, historydescription_Spreadsheet_AddNewParagraph);
