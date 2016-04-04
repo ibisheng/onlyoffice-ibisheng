@@ -7313,7 +7313,7 @@
 			cell_info.formatTableInfo.lastRow = curTablePart.TotalsRowCount !== null ? true : false;
 			cell_info.formatTableInfo.firstRow = curTablePart.HeaderRowCount === null ? true : false;
 			cell_info.formatTableInfo.tableRange = curTablePart.Ref.getAbsName();
-			//cell_info.formatTableInfo.filterButton = curTablePart.HeaderRowCount !== null ? true : false;
+			cell_info.formatTableInfo.filterButton = curTablePart.isShowButton();
 			
 			var checkDisableProps = this.af_checkDisableProps(curTablePart)
 			
@@ -12363,7 +12363,7 @@
 		{
 			for(var i = 0; i < aWs.TableParts.length; i++)
 			{
-				if(aWs.TableParts[i].AutoFilter)
+				if(aWs.TableParts[i].AutoFilter && aWs.TableParts[i].HeaderRowCount !== 0)
 					drawCurrentFilterButton(aWs.TableParts[i].AutoFilter, true);
 			}
 		}
@@ -12800,7 +12800,7 @@
         t.setSelection(new Asc.Range(startCol, startRow, endCol, endRow));
     };
 	
-	WorksheetView.prototype.af_changeFormatTableInfo = function(tableName, optionType)
+	WorksheetView.prototype.af_changeFormatTableInfo = function(tableName, optionType, val)
     {
 		var tablePart = this.model.autoFilters._getFilterByDisplayName(tableName);
 		
@@ -12812,7 +12812,7 @@
 		var isChangeTableInfo = this.af_checkChangeTableInfo(tablePart, optionType);
 		if(isChangeTableInfo !== false)
 		{
-			this.model.autoFilters.changeFormatTableInfo(tablePart, optionType);
+			this.model.autoFilters.changeFormatTableInfo(tableName, optionType, val);
 			
 			this._onUpdateFormatTable(isChangeTableInfo, false, true);
 			//TODO добавить перерисовку таблицы и перерисовку шаблонов
@@ -12821,17 +12821,31 @@
 	
 	WorksheetView.prototype.af_checkChangeTableInfo = function(tablePart, optionType)
     {
-		var updateRange = tablePart.Ref;
+		var res = tablePart.Ref;
+		var ws = this.model;
+		
 		if(optionType === c_oAscChangeTableStyleInfo.rowHeader && tablePart.HeaderRowCount !== null)//add header row
 		{
+			var rangeUpTable = new Asc.Range(tablePart.Ref.c1, tablePart.Ref.r1 - 1, tablePart.Ref.c2, tablePart.Ref.r1 - 1); 
 			
+			if(this.model.autoFilters._isEmptyCurrentRange(rangeUpTable) === false && this.model.autoFilters._isPartTablePartsUnderRange(tablePart.Ref) === true)
+			{
+				ws.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterMoveToHiddenRangeError, c_oAscError.Level.NoCritical);
+				res = false;
+			}
 		}
-		else if(optionType === c_oAscChangeTableStyleInfo.rowTotal && tablePart.TotalsRowCount !== null)//add total row
+		else if(optionType === c_oAscChangeTableStyleInfo.rowTotal && tablePart.TotalsRowCount === null)//add total row
 		{
+			var rangeUpTable = new Asc.Range(tablePart.Ref.c1, tablePart.Ref.r2 + 1, tablePart.Ref.c2, tablePart.Ref.r2 + 1); 
 			
+			if(this.model.autoFilters._isEmptyCurrentRange(rangeUpTable) === false && this.model.autoFilters._isPartTablePartsUnderRange(tablePart.Ref) === true)
+			{
+				ws.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterMoveToHiddenRangeError, c_oAscError.Level.NoCritical);
+				res = false;
+			}
 		}
 		
-		return updateRange;
+		return res;
 	};
     
 	WorksheetView.prototype.af_insertCellsInTable = function(tableName, optionType)
@@ -13103,8 +13117,7 @@
 		insertColumnLeft = !!(refTableContainsActiveRange || (acitveRange.c2 > refTable.c2 && acitveRange.r1 >= refTable.r1 && acitveRange.r2 <= refTable.r2 && acitveRange.c1 >= refTable.c1));
 		
 		//если внутри находится вся активная область(кроме строки заголовков) или если выходит активная область за границу снизу
-		insertRowAbove = !!(((acitveRange.r1 > refTable.c1 && tablePart.HeaderRowCount === null) || (acitveRange.r1 >= refTable.c1 && tablePart.HeaderRowCount !== null)) && (refTableContainsActiveRange || (acitveRange.r2 > refTable.r2 && acitveRange.c1 >= refTable.c1 && acitveRange.c2 <= refTable.c2 && acitveRange.r1 >= refTable.r1)));
-		
+		insertRowAbove = !!(((acitveRange.r1 > refTable.r1 && tablePart.HeaderRowCount === null) || (acitveRange.r1 >= refTable.r1 && tablePart.HeaderRowCount !== null)) && (refTableContainsActiveRange || (acitveRange.r2 > refTable.r2 && acitveRange.c1 >= refTable.c1 && acitveRange.c2 <= refTable.c2 && acitveRange.r1 >= refTable.r1)));
 		
 		
 		return {insertRowAbove: insertRowAbove, insertRowBelow: insertRowBelow, insertColumnLeft: insertColumnLeft, insertColumnRight: insertColumnRight, deleteRow: deleteRow, deleteColumn: deleteColumn, deleteTable: deleteTable};

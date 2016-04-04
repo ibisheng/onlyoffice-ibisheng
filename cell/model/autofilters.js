@@ -724,6 +724,9 @@
 							}
 						}
 						break;
+					case historyitem_AutoFilter_ChangeTableInfo:
+						this.changeFormatTableInfo(data.displayName, data.type, data.val);
+						break;
 				}
 				History.TurnOn();
 			},
@@ -765,7 +768,7 @@
 					else
 						worksheet.AutoFilter = cloneData;
 				}
-				else if(type === historyitem_AutoFilter_Change)//добавление/удаление строк/столбцов 
+				else if(type === historyitem_AutoFilter_Change || type === historyitem_AutoFilter_ChangeTableInfo)//добавление/удаление строк/столбцов 
 				{
 					if(worksheet.AutoFilter && cloneData.newFilterRef.isEqual(worksheet.AutoFilter.Ref))
 						worksheet.AutoFilter = cloneData.oldFilter.clone(null);
@@ -2078,8 +2081,24 @@
 				return res;
 			},
 			
-			changeFormatTableInfo: function(tablePart, optionType)
+			changeFormatTableInfo: function(tableName, optionType, val)
 			{	
+				var worksheet = this.worksheet;
+				var isSetValue = false;
+				
+				var tablePart = this._getFilterByDisplayName(tableName);
+				
+				if(!tablePart)
+				{
+					return false;
+				}
+				
+				History.Create_NewPoint();
+				History.StartTransaction();
+				
+				//History.TurnOff();
+				var oldFilter = tablePart.clone(null);
+				
 				switch(optionType)
 				{
 					case c_oAscChangeTableStyleInfo.columnBanded:
@@ -2103,26 +2122,118 @@
 						break;
 					}
 					case c_oAscChangeTableStyleInfo.rowTotal:
-					{
-						tablePart.TotalsRowCount = tablePart.TotalsRowCount === null ? 1 : null;
+					{	
+						if(val === false)//снимаем галку - удаляем строку итогов
+						{
+							var clearRange = new Range(worksheet, tablePart.Ref.r2, tablePart.Ref.c1, tablePart.Ref.r2, tablePart.Ref.c2);
+							this._clearRange(clearRange, true);
+							tablePart.changeRef(null, -1);
+							
+							tablePart.TotalsRowCount = tablePart.TotalsRowCount === null ? 1 : null;
+						}
+						else
+						{
+							//если сверху пустая строка, то просто увеличиваем диапазон и меняем флаг
+							var rangeUpTable = new Asc.Range(tablePart.Ref.c1, tablePart.Ref.r2 + 1, tablePart.Ref.c2, tablePart.Ref.r2 + 1); 
+							if(this._isEmptyCurrentRange(rangeUpTable) && this.searchRangeInTableParts(rangeUpTable) === -1)
+							{
+								tablePart.changeRef(null, 1);
+								isSetValue = true;
+								
+								tablePart.TotalsRowCount = tablePart.TotalsRowCount === null ? 1 : null;
+							}
+							else
+							{
+								worksheet.getRange3(tablePart.Ref.r2 + 1, tablePart.Ref.c1, tablePart.Ref.r2 + 1, tablePart.Ref.c2).addCellsShiftBottom();
+									
+								tablePart.changeRef(null, 1);
+								isSetValue = true;
+								
+								tablePart.TotalsRowCount = tablePart.TotalsRowCount === null ? 1 : null;
+							}
+						}
+						
 						break;
 					}
 					case c_oAscChangeTableStyleInfo.rowHeader:
 					{
-						tablePart.HeaderRowCount = tablePart.HeaderRowCount === null ? 0 : null;
+						if(val === false)//снимаем галку
+						{
+							var clearRange = new Range(worksheet, tablePart.Ref.r1, tablePart.Ref.c1, tablePart.Ref.r1, tablePart.Ref.c2);
+							this._clearRange(clearRange, true);
+							tablePart.changeRef(null, 1, true);
+							
+							tablePart.HeaderRowCount = tablePart.HeaderRowCount === null ? 0 : null;
+						}
+						else
+						{
+							//если сверху пустая строка, то просто увеличиваем диапазон и меняем флаг
+							var rangeUpTable = new Asc.Range(tablePart.Ref.c1, tablePart.Ref.r1 - 1, tablePart.Ref.c2, tablePart.Ref.r1 - 1); 
+							if(this._isEmptyCurrentRange(rangeUpTable) && this.searchRangeInTableParts(rangeUpTable) === -1)
+							{
+								tablePart.changeRef(null, -1, true);
+								isSetValue = true;
+								
+								tablePart.HeaderRowCount = tablePart.HeaderRowCount === null ? 0 : null;
+							}
+							else
+							{
+								worksheet.getRange3(tablePart.Ref.r2, tablePart.Ref.c1, tablePart.Ref.r2, tablePart.Ref.c2).addCellsShiftBottom();
+								worksheet._moveRange(tablePart.Ref,  new Asc.Range(tablePart.Ref.c1, tablePart.Ref.r1 + 1, tablePart.Ref.c2, tablePart.Ref.r2 + 1));
+									
+								tablePart.changeRef(null, -1, true);
+								isSetValue = true;
+								
+								
+								tablePart.HeaderRowCount = tablePart.HeaderRowCount === null ? 0 : null;
+							}
+						}
+						
+						
 						break;
 					}
 					case c_oAscChangeTableStyleInfo.filterButton:
 					{
-						tablePart.TableStyleInfo.ShowRowStripes = !tablePart.TableStyleInfo.ShowRowStripes;
+						tablePart.showButton(val);
+						
 						break;
 					}
 				}
 				
-				this._cleanStyleTable(tablePart.Ref);
-				this._setColorStyleTable(tablePart.Ref, tablePart);
+				//History.TurnOn();
 				
-				//TODO add to history
+				this._addHistoryObj({oldFilter: oldFilter, newFilterRef: tablePart.Ref.clone()}, historyitem_AutoFilter_ChangeTableInfo,
+						{activeCells: null, type: optionType, val: val, displayName: tableName});
+				
+				this._cleanStyleTable(tablePart.Ref);
+				this._setColorStyleTable(tablePart.Ref, tablePart, null, isSetValue);
+				History.EndTransaction();
+			},
+			
+			_clearRange: function(range, isClearText)
+			{
+				range.setTableStyle(null);
+				if(isClearText)
+				{
+					History.TurnOff();
+					range.cleanText();
+					History.TurnOn();
+				}
+			},
+			
+			_isEmptyCurrentRange: function(range)
+			{
+				var worksheet = this.worksheet;
+				for(var n = range.r1; n <= range.r2; n++)
+				{
+					for(var k = range.c1; k <= range.c2; k++)
+					{
+						var cell = worksheet.getCell3(n, k, n, k);
+						if(cell.getValueWithoutFormat() != '')
+							return false;
+					}
+				}
+				return true;
 			},
 			
 			//TODO избавиться от split, передавать cellId и tableName
@@ -2237,7 +2348,7 @@
 
 				if(redoObject)
 				{
-					oHistoryObject.activeCells			= redoObject.activeCells.clone();	// ToDo Слишком много клонирования, это долгая операция
+					oHistoryObject.activeCells			= redoObject.activeCells ? redoObject.activeCells.clone() : null;	// ToDo Слишком много клонирования, это долгая операция
 					oHistoryObject.styleName			= redoObject.styleName;
 					oHistoryObject.type					= redoObject.type;
 					oHistoryObject.cellId				= redoObject.cellId;
@@ -2247,6 +2358,7 @@
 					oHistoryObject.moveTo               = redoObject.arnTo;
 					oHistoryObject.bWithoutFilter       = bWithoutFilter ? bWithoutFilter : false;
 					oHistoryObject.displayName          = redoObject.displayName;
+					oHistoryObject.val                  = redoObject.val;
 				}
 				else
 				{

@@ -103,6 +103,7 @@ var historyitem_AutoFilter_Delete   = 8;
 var historyitem_AutoFilter_ChangeTableStyle = 9;
 var historyitem_AutoFilter_Change = 10;
 var historyitem_AutoFilter_CleanFormat  = 11;
+var historyitem_AutoFilter_ChangeTableInfo = 12;
 
 
 function CHistory(workbook)

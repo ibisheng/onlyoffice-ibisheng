@@ -205,7 +205,7 @@
 			
 			asc_getIsInsertRowAbove: function () { return this.isInsertRowAbove; },
 			asc_getIsInsertRowBelow: function () { return this.isInsertRowBelow; },
-			asc_getIsInsertColumnLeft: function () { return this.isInsertRowLeft; },
+			asc_getIsInsertColumnLeft: function () { return this.isInsertColumnLeft; },
 			asc_getIsInsertColumnRight: function () { return this.isInsertColumnRight; },
 			asc_getIsDeleteRow: function () { return this.isDeleteRow; },
 			asc_getIsDeleteColumn: function () { return this.isDeleteColumn; },

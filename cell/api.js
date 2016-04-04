@@ -661,9 +661,9 @@ var editor;
     return ws.af_changeSelectionFormatTable(tableName, optionType);
   };
   
-  spreadsheet_api.prototype.asc_changeFormatTableInfo = function(tableName, optionType) {
+  spreadsheet_api.prototype.asc_changeFormatTableInfo = function(tableName, optionType, val) {
     var ws = this.wb.getWorksheet();
-    return ws.af_changeFormatTableInfo(tableName, optionType);
+    return ws.af_changeFormatTableInfo(tableName, optionType, val);
   };
   
   spreadsheet_api.prototype.asc_insertCellsInTable = function(tableName, optionType) {

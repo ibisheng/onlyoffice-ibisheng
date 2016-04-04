@@ -4749,6 +4749,39 @@ TablePart.prototype.getTableNameColumnByIndex = function(index)
 	return res;
 };
 
+TablePart.prototype.showButton = function(val)
+{
+	if(val === false)
+	{
+		if(!this.AutoFilter)
+		{
+			this.AutoFilter = new AutoFilter();
+			this.AutoFilter.Ref = this.Ref;
+		}
+		
+		this.AutoFilter.showButton(val);
+	}
+	else
+	{
+		if(this.AutoFilter && this.AutoFilter.FilterColumns && this.AutoFilter.FilterColumns.length)
+		{
+			this.AutoFilter.showButton(val);
+		}
+	}
+};
+
+TablePart.prototype.isShowButton = function()
+{
+	var res = true;
+	
+	if(this.AutoFilter)
+	{
+		res = this.AutoFilter.isShowButton();
+	}
+	
+	return res;
+};
+
 /** @constructor */
 function AutoFilter() {
 	this.Ref = null;
@@ -4850,6 +4883,55 @@ AutoFilter.prototype.cleanFilters = function() {
 		}	
 	}
 };
+
+AutoFilter.prototype.showButton = function(val) {
+	
+	if(val === false)
+	{
+		if(this.FilterColumns === null)
+		{
+			this.FilterColumns = [];
+		}
+		
+		var columnsLength = this.Ref.c2 - this.Ref.c1 + 1;
+		for(var i = 0; i < columnsLength; i++)
+		{
+			this.FilterColumns[i] = new FilterColumn();
+			this.FilterColumns[i].ColId = i;
+			this.FilterColumns[i].ShowButton = false;
+		}
+	}
+	else
+	{
+		if(this.FilterColumns && this.FilterColumns.length)
+		{
+			for(var i = 0; i < this.FilterColumns.length; i++)
+			{
+				this.FilterColumns[i].ShowButton = true;
+			}
+		}
+	}
+};
+
+AutoFilter.prototype.isShowButton = function()
+{
+	var res = true;
+	
+	if(this.FilterColumns && this.FilterColumns.length)
+	{
+		for(var i = 0; i < this.FilterColumns.length; i++)
+		{
+			if(this.FilterColumns[i].ShowButton === false)
+			{
+				res = false;
+				break;
+			}
+		}
+	}
+	
+	return res;
+};
+
 
 function FilterColumns() {
 	this.ColId = null;
