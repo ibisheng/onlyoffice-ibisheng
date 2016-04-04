@@ -11069,7 +11069,7 @@ CDocument.prototype =
             }
             else // Ctrl + P - print
             {
-                this.DrawingDocument.m_oWordControl.m_oApi.asc_PrintKey();
+                this.DrawingDocument.m_oWordControl.m_oApi.onPrint();
                 bRetValue = keydownresult_PreventAll;
             }
         }

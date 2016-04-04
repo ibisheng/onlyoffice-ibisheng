@@ -5344,7 +5344,7 @@ function CThumbnailsManager()
             {
                 if(global_keyboardEvent.CtrlKey)
                 {
-                    this.m_oWordControl.m_oApi.asc_PrintKey();
+                    this.m_oWordControl.m_oApi.onPrint();
                 }
                 break;
             }

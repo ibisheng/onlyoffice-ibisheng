@@ -263,6 +263,9 @@ baseEditorsApi.prototype.IsNeedDefaultFonts = function() {
   }
   return res;
 };
+baseEditorsApi.prototype.onPrint = function() {
+  this.sendEvent("asc_onPrint");
+};
 // Open
 baseEditorsApi.prototype.asc_LoadDocument = function(isVersionHistory) {
   // Меняем тип состояния (на открытие)

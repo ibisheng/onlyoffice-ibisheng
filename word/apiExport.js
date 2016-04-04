@@ -173,7 +173,6 @@ asc_docs_api.prototype['sync_CanCopyCutCallback'] = asc_docs_api.prototype.sync_
 asc_docs_api.prototype['setStartPointHistory'] = asc_docs_api.prototype.setStartPointHistory;
 asc_docs_api.prototype['setEndPointHistory'] = asc_docs_api.prototype.setEndPointHistory;
 asc_docs_api.prototype['sync_CursorLockCallBack'] = asc_docs_api.prototype.sync_CursorLockCallBack;
-asc_docs_api.prototype['sync_PrintCallBack'] = asc_docs_api.prototype.sync_PrintCallBack;
 asc_docs_api.prototype['sync_UndoCallBack'] = asc_docs_api.prototype.sync_UndoCallBack;
 asc_docs_api.prototype['sync_RedoCallBack'] = asc_docs_api.prototype.sync_RedoCallBack;
 asc_docs_api.prototype['sync_CopyCallBack'] = asc_docs_api.prototype.sync_CopyCallBack;

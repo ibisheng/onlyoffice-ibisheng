@@ -78,7 +78,6 @@ asc_docs_api.prototype['sync_GetDocInfoEndCallback'] = asc_docs_api.prototype.sy
 asc_docs_api.prototype['sync_CanUndoCallback'] = asc_docs_api.prototype.sync_CanUndoCallback;
 asc_docs_api.prototype['sync_CanRedoCallback'] = asc_docs_api.prototype.sync_CanRedoCallback;
 asc_docs_api.prototype['sync_CursorLockCallBack'] = asc_docs_api.prototype.sync_CursorLockCallBack;
-asc_docs_api.prototype['sync_PrintCallBack'] = asc_docs_api.prototype.sync_PrintCallBack;
 asc_docs_api.prototype['sync_UndoCallBack'] = asc_docs_api.prototype.sync_UndoCallBack;
 asc_docs_api.prototype['sync_RedoCallBack'] = asc_docs_api.prototype.sync_RedoCallBack;
 asc_docs_api.prototype['sync_CopyCallBack'] = asc_docs_api.prototype.sync_CopyCallBack;
