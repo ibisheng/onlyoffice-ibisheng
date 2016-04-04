@@ -7932,13 +7932,8 @@ Paragraph.prototype =
     Internal_CalculateAutoSpacing : function(Value, UseAuto, Para)
     {
         var Result = Value;
-        if ( true === UseAuto )
-        {
-            if ( true === Para.Parent.Is_TableCellContent() )
-                Result = 0;
-            else
-                Result = 14 * g_dKoef_pt_to_mm;
-        }
+        if (true === UseAuto)
+            Result = 14 * g_dKoef_pt_to_mm;
 
         return Result;
     },
