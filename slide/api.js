@@ -1044,6 +1044,14 @@ asc_docs_api.prototype.asc_Print = function(bIsDownloadEvent){
     var options = {downloadType: bIsDownloadEvent ? DownloadType.Print: DownloadType.None};
 	_downloadAs(this, c_oAscFileType.PDF, c_oAscAsyncAction.Print, options);
 };
+asc_docs_api.prototype.asc_PrintKey = function(){
+    if (window["AscDesktopEditor"])
+    {
+        this.asc_Print();
+        return;
+    }
+    this.asc_fireCallback("asc_onPrint");
+};
 asc_docs_api.prototype.Undo = function(){
 	this.WordControl.m_oLogicDocument.Document_Undo();
 };

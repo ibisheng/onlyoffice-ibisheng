@@ -1737,6 +1737,15 @@ asc_docs_api.prototype.asc_Print = function(bIsDownloadEvent)
     }
     this._print(c_oAscAsyncAction.Print, bIsDownloadEvent ? DownloadType.Print: DownloadType.None);
 };
+asc_docs_api.prototype.asc_PrintKey = function(){
+    if (window["AscDesktopEditor"])
+    {
+        this.asc_Print();
+        return;
+    }
+    this.asc_fireCallback("asc_onPrint");
+};
+
 asc_docs_api.prototype._print = function(actionType, downloadType) {
   var command;
   var options = {isNoData: false, downloadType: downloadType};

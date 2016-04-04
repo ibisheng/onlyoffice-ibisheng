@@ -3171,7 +3171,7 @@ function CDocMeta()
         }
 		else if ( e.KeyCode == 80 && true === e.CtrlKey ) // Ctrl + P + ...
         {
-            editor.asc_Print();
+            editor.asc_PrintKey();
             bRetValue = true;
         }
         else if ( e.KeyCode == 83 && true === e.CtrlKey ) // Ctrl + S + ...
