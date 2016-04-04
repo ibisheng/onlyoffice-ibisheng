@@ -7352,20 +7352,24 @@ Paragraph.prototype =
             {
                 if ( undefined != OldNumPr && undefined != OldNumPr.NumId )
                 {
-                    var Lvl = this.Parent.Get_Numbering().Get_AbstractNum(OldNumPr.NumId).Lvl[OldNumPr.Lvl];
-                    if ( undefined != Lvl && undefined != Lvl.ParaPr.Ind && undefined != Lvl.ParaPr.Ind.Left )
+                    var Num = this.Parent.Get_Numbering().Get_AbstractNum(OldNumPr.NumId);
+                    if (Num)
                     {
-                        var CurParaPr = this.Get_CompiledPr2(false).ParaPr;
-                        var Left = CurParaPr.Ind.Left  + CurParaPr.Ind.FirstLine;
-                        var NumLeftCorrection = ( undefined != Lvl.ParaPr.Ind.FirstLine ?  Math.abs( Lvl.ParaPr.Ind.FirstLine ) : 0 );
+                        var Lvl = Num.Lvl[OldNumPr.Lvl];
+                        if ( undefined != Lvl && undefined != Lvl.ParaPr.Ind && undefined != Lvl.ParaPr.Ind.Left )
+                        {
+                            var CurParaPr = this.Get_CompiledPr2(false).ParaPr;
+                            var Left = CurParaPr.Ind.Left  + CurParaPr.Ind.FirstLine;
+                            var NumLeftCorrection = ( undefined != Lvl.ParaPr.Ind.FirstLine ?  Math.abs( Lvl.ParaPr.Ind.FirstLine ) : 0 );
 
-                        var NewFirstLine = 0;
-                        var NewLeft      = Left < 0 ? Left : Math.max(0, Left - NumLeftCorrection);
+                            var NewFirstLine = 0;
+                            var NewLeft      = Left < 0 ? Left : Math.max(0, Left - NumLeftCorrection);
 
-                        History.Add( this, { Type : historyitem_Paragraph_Ind_Left,  New : NewLeft,      Old : this.Pr.Ind.Left } );
-                        History.Add( this, { Type : historyitem_Paragraph_Ind_First, New : NewFirstLine, Old : this.Pr.Ind.FirstLine } );
-                        this.Pr.Ind.Left      = NewLeft;
-                        this.Pr.Ind.FirstLine = NewFirstLine;
+                            History.Add( this, { Type : historyitem_Paragraph_Ind_Left,  New : NewLeft,      Old : this.Pr.Ind.Left } );
+                            History.Add( this, { Type : historyitem_Paragraph_Ind_First, New : NewFirstLine, Old : this.Pr.Ind.FirstLine } );
+                            this.Pr.Ind.Left      = NewLeft;
+                            this.Pr.Ind.FirstLine = NewFirstLine;
+                        }
                     }
                 }
             }
