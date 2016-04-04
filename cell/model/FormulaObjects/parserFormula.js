@@ -17,8 +17,7 @@ var cElementType = {
 		cellsRange3D: 13,
 		table       : 14,
 		name3D       : 15
-	},
-/** @enum */
+  }, /** @enum */
 	cErrorType = {
 		unsupported_function: 0,
 		null_value          : 1,
@@ -29,39 +28,16 @@ var cElementType = {
 		not_numeric         : 6,
 		not_available       : 7,
 		getting_data        : 8
-	},
-	cExcelSignificantDigits = 15, //количество цифр в числе после запятой
-    cExcelMaxExponent = 308,
-    cExcelMinExponent = -308,
-    cExcelDateTimeDigits = 8, //количество цифр после запятой в числах отвечающих за время специализация $18.17.4.2
+  }, cExcelSignificantDigits = 15, //количество цифр в числе после запятой
+  cExcelMaxExponent = 308, cExcelMinExponent = -308, cExcelDateTimeDigits = 8, //количество цифр после запятой в числах отвечающих за время специализация $18.17.4.2
     c_Date1904Const = 24107, //разница в днях между 01.01.1970 и 01.01.1904 годами
     c_Date1900Const = 25568, //разница в днях между 01.01.1970 и 01.01.1900 годами
-    c_DateCorrectConst = c_Date1900Const,
-    c_sPerDay = 86400,
-    c_msPerDay = c_sPerDay * 1000,
-	cStrucTableReservedWords = {
-		all    : "#All",
-		data   : "#Data",
-		headers: "#Headers",
-		totals : "#Totals",
-		thisrow: "#This Row",
-		at     : "@"
-	},
-	cSubTotalFunctionType = {
+  c_DateCorrectConst = c_Date1900Const, c_sPerDay = 86400, c_msPerDay = c_sPerDay * 1000, cStrucTableReservedWords = {
+    all: "#All", data: "#Data", headers: "#Headers", totals: "#Totals", thisrow: "#This Row", at: "@"
+  }, cSubTotalFunctionType = {
 		includes: {
-			AVERAGE: 1,
-			COUNT  : 2,
-			COUNTA : 3,
-			MAX    : 4,
-			MIN    : 5,
-			PRODUCT: 6,
-			STDEV  : 7,
-			STDEVP : 8,
-			SUM    : 9,
-			VAR    : 10,
-			VARP   : 11
-		},
-		excludes: {
+      AVERAGE: 1, COUNT: 2, COUNTA: 3, MAX: 4, MIN: 5, PRODUCT: 6, STDEV: 7, STDEVP: 8, SUM: 9, VAR: 10, VARP: 11
+    }, excludes: {
 			AVERAGE: 101,
 			COUNT  : 102,
 			COUNTA : 103,
@@ -90,9 +66,7 @@ Date.prototype.isLeapYear = function () {
 
 Date.prototype.getDaysInMonth = function () {
 //    return arguments.callee[this.isLeapYear() ? 'L' : 'R'][this.getMonth()];
-    return this.isLeapYear() ?
-        this.getDaysInMonth.L[this.getUTCMonth()] :
-        this.getDaysInMonth.R[this.getUTCMonth()];
+  return this.isLeapYear() ? this.getDaysInMonth.L[this.getUTCMonth()] : this.getDaysInMonth.R[this.getUTCMonth()];
 };
 
 // durations of months for the regular year
@@ -113,12 +87,15 @@ Date.prototype.getExcelDateWithTime = function () {
 //    return Math.floor( ( this.getTime() / 1000 - this.getTimezoneOffset() * 60 ) / c_sPerDay + ( c_DateCorrectConst + (g_bDate1904 ? 0 : 1) ) );
     var year = this.getUTCFullYear(), month = this.getUTCMonth(), date = this.getUTCDate(), res;
 
-    if ( 1900 < year || (1900 == year && 1 < month) )
-        res = (Date.UTC( year, month, date, this.getUTCHours(), this.getUTCMinutes(), this.getUTCSeconds() ) - this.getExcelNullDate() ) / c_msPerDay;
-    else if ( 1900 == year && 1 == month && 29 == date )
+  if (1900 < year || (1900 == year && 1 < month)) {
+    res = (Date.UTC(year, month, date, this.getUTCHours(), this.getUTCMinutes(), this.getUTCSeconds()) -
+      this.getExcelNullDate() ) / c_msPerDay;
+  } else if (1900 == year && 1 == month && 29 == date) {
         res = 60;
-    else
-        res = (Date.UTC( year, month, date, this.getUTCHours(), this.getUTCMinutes(), this.getUTCSeconds() ) - this.getExcelNullDate() ) / c_msPerDay - 1;
+  } else {
+    res = (Date.UTC(year, month, date, this.getUTCHours(), this.getUTCMinutes(), this.getUTCSeconds()) -
+      this.getExcelNullDate() ) / c_msPerDay - 1;
+  }
 
     return res;
 };
@@ -129,15 +106,12 @@ Date.prototype.getDateFromExcel = function ( val ) {
 
     if ( g_bDate1904 ) {
         return new Date( val * c_msPerDay + this.getExcelNullDate() );
-    }
-    else {
+  } else {
         if ( val < 60 ) {
             return new Date( val * c_msPerDay + this.getExcelNullDate() );
-        }
-        else if ( val === 60 ) {
+    } else if (val === 60) {
             return new Date( Date.UTC( 1900, 1, 29 ) );
-        }
-        else {
+    } else {
             return new Date( val * c_msPerDay + this.getExcelNullDate() );
         }
     }
@@ -152,8 +126,7 @@ Date.prototype.addMonths = function ( counts ) {
         this.setUTCDate( 1 );
         this.setUTCMonth( this.getUTCMonth() + Math.floor( counts ) );
         this.setUTCDate( this.getDaysInMonth() );
-    }
-    else {
+  } else {
         this.setUTCMonth( this.getUTCMonth() + Math.floor( counts ) );
     }
 };
@@ -195,8 +168,7 @@ Math.fact = function ( n ) {
     n = this.floor( n );
     if ( n < 0 ) {
         return NaN;
-    }
-    else if ( n > 170 ) {
+  } else if (n > 170) {
         return Infinity;
     }
     while ( n !== 0 ) {
@@ -210,8 +182,7 @@ Math.doubleFact = function ( n ) {
     n = this.floor( n );
     if ( n < 0 ) {
         return NaN;
-    }
-    else if ( n > 170 ) {
+  } else if (n > 170) {
         return Infinity;
     }
 //    n = Math.floor((n+1)/2);
@@ -276,28 +247,22 @@ function cBaseType( val, type ) {
     this.value = val;
 }
 cBaseType.prototype = {
-    constructor   : cBaseType,
-    cloneTo       : function ( oRes ) {
+  constructor: cBaseType, cloneTo: function(oRes) {
         oRes.needRecalc = this.needRecalc;
         oRes.numFormat = this.numFormat;
         oRes.type = this.type;
         oRes.value = this.value;
         oRes.ca = this.ca;
         oRes.node = this.node;
-    },
-    tryConvert    : function () {
+  }, tryConvert: function() {
         return this;
-    },
-    getValue      : function () {
+  }, getValue: function() {
         return this.value;
-    },
-    toString      : function () {
+  }, toString: function() {
         return this.value.toString();
-    },
-    toLocaleString: function () {
+  }, toLocaleString: function() {
         return this.toString();
-    },
-    setNode       : function ( node ) {
+  }, setNode: function(node) {
         this.node = node;
     }
 };
@@ -310,11 +275,9 @@ function cNumber( val ) {
 
     if ( !isNaN( this.value ) && Math.abs( this.value ) !== Infinity ) {
         res = this;
-    }
-    else if ( val instanceof cError ) {
+  } else if (val instanceof cError) {
         res = val;
-    }
-    else {
+  } else {
         res = new cError( cErrorType.not_numeric );
     }
     return res;
@@ -332,10 +295,11 @@ cNumber.prototype.tocBool = function () {
 };
 cNumber.prototype.toLocaleString = function ( digitDelim ) {
     var res = this.value.toString();
-    if ( digitDelim )
+  if (digitDelim) {
         return res.replace( digitSeparatorDef, digitSeparator );
-    else
+  } else {
         return res;
+  }
 };
 
 /** @constructor */
@@ -362,15 +326,13 @@ cString.prototype.tocNumber = function () {
 
         if ( !parseNum( m ) ) {
             res = new cError( cErrorType.wrong_value_type );
-        }
-        else {
+    } else {
             var numberValue = g_oFormatParser.parseLocaleNumber( this.value );
             if ( !isNaN( numberValue ) ) {
                 res = new cNumber( numberValue );
             }
         }
-    }
-    else {
+  } else {
         res = new cError( cErrorType.wrong_value_type );
     }
 
@@ -380,8 +342,7 @@ cString.prototype.tocBool = function () {
     var res;
     if ( parserHelp.isBoolean( this.value, 0 ) ) {
         res = new cBool( parserHelp.operand_str.toUpperCase() === cBoolLocal["t"].toUpperCase() );
-    }
-    else {
+  } else {
         res = this;
     }
     return res;
@@ -393,8 +354,7 @@ cString.prototype.tryConvert = function () {
     var res = checkTypeCell( "" + this.value );
     if ( res instanceof cEmpty ) {
         return this;
-    }
-    else {
+  } else {
         return res;
     }
 };
@@ -404,7 +364,8 @@ function cBool( val ) {
 	var v = false;
 	switch(val.toString().toUpperCase()){
 		case "TRUE":
-		case cBoolLocal["t"].toUpperCase(): v = true;
+    case cBoolLocal["t"].toUpperCase():
+      v = true;
 	}
     this.constructor.call( this, v, cElementType.bool );
 }
@@ -517,7 +478,8 @@ function cError( val ) {
 }
 
 cError.prototype = Object.create( cBaseType.prototype );
-cError.prototype.tocNumber = cError.prototype.tocString = cError.prototype.tocBool = cError.prototype.tocEmpty = function () {
+cError.prototype.tocNumber =
+  cError.prototype.tocString = cError.prototype.tocBool = cError.prototype.tocEmpty = function() {
     return this;
 };
 cError.prototype.toLocaleString = function () {
@@ -624,13 +586,13 @@ cArea.prototype.getValue = function () {
     var val = [], r = this.getRange();
     if ( !r ) {
         val.push( new cError( cErrorType.bad_reference ) );
-    }
-    else {
+  } else {
         r._foreachNoEmpty( function ( cell ) {
             var cellType = cell.getType();
             switch ( cellType ) {
                 case CellValueType.Number:
-                    cell.getValueWithoutFormat() === "" ? val.push( new cEmpty() ) : val.push( new cNumber( cell.getValueWithoutFormat() ) );
+          cell.getValueWithoutFormat() === "" ? val.push(new cEmpty()) :
+            val.push(new cNumber(cell.getValueWithoutFormat()));
                     break;
 
                 case CellValueType.Bool:
@@ -648,8 +610,7 @@ cArea.prototype.getValue = function () {
                 default:
                     if ( cell.getValueWithoutFormat() && cell.getValueWithoutFormat() !== "" ) {
                         val.push( new cNumber( cell.getValueWithoutFormat() ) );
-                    }
-                    else {
+          } else {
                         val.push( checkTypeCell( "" + cell.getValueWithoutFormat() ) );
                     }
             }
@@ -676,8 +637,7 @@ cArea.prototype.tocNumber = function () {
     var v = this.getValue()[0];
     if ( !v ) {
         v = new cNumber( 0 );
-    }
-    else {
+  } else {
         v = v.tocNumber();
     }
     return v;
@@ -693,8 +653,7 @@ cArea.prototype.toString = function () {
 
     if ( this.getRange() ) {
         _c = this.getRange().getName();
-    }
-    else {
+  } else {
         _c = this._cells;
     }
     if ( _c.indexOf( ":" ) < 0 ) {
@@ -725,8 +684,7 @@ cArea.prototype.cross = function ( arg ) {
     if ( cross ) {
         if ( cross.r != undefined ) {
             return this.getValue2( cross.r - this.getBBox().r1, 0 );
-        }
-        else if ( cross.c != undefined ) {
+    } else if (cross.c != undefined) {
             return this.getValue2( 0, cross.c - this.getBBox().c1 );
         }
     }
@@ -737,8 +695,7 @@ cArea.prototype.isValid = function () {
     return !!r;
 };
 cArea.prototype.countCells = function () {
-    var r = this.getRange(), bbox = r.bbox,
-        count = (Math.abs( bbox.c1 - bbox.c2 ) + 1) * (Math.abs( bbox.r1 - bbox.r2 ) + 1);
+  var r = this.getRange(), bbox = r.bbox, count = (Math.abs(bbox.c1 - bbox.c2) + 1) * (Math.abs(bbox.r1 - bbox.r2) + 1);
     r._foreachNoEmpty( function () {
         count--;
     } );
@@ -757,21 +714,16 @@ cArea.prototype._parseCellValue = function ( cell ) {
         cellValue = cell.getValueWithoutFormat();
         if ( cellType === CellValueType.Number ) {
             result = cell.isEmptyTextString() ? new cEmpty() : new cNumber( cellValue );
-        }
-        else if ( cellType === CellValueType.Bool ) {
+    } else if (cellType === CellValueType.Bool) {
             result = new cBool( cellValue );
-        }
-        else if ( cellType === CellValueType.Error ) {
+    } else if (cellType === CellValueType.Error) {
             result = new cError( cellValue );
-        }
-        else if ( cellType === CellValueType.String ) {
+    } else if (cellType === CellValueType.String) {
             result = new cString( cellValue );
-        }
-        else {
+    } else {
             result = cell.isEmptyTextString() ? checkTypeCell( "" + cellValue ) : new cNumber( cellValue );
         }
-    }
-    else {
+  } else {
         result = new cEmpty();
     }
     return result;
@@ -787,8 +739,9 @@ cArea.prototype.foreach2 = function ( action ) {
 cArea.prototype.getMatrix = function () {
     var t = this, arr = [], r = this.getRange();
     r._foreach2( function ( cell, i, j, r1, c1 ) {
-        if ( !arr[i - r1] )
+    if (!arr[i - r1]) {
             arr[i - r1] = [];
+    }
         arr[i - r1][j - c1] = t._parseCellValue( cell );
     } );
     return arr;
@@ -796,12 +749,14 @@ cArea.prototype.getMatrix = function () {
 cArea.prototype.getRefMatrix = function () {
     var t = this, arr = [], r = this.getRange();
     r._foreach2( function ( cell, i, j, r1, c1 ) {
-        if ( !arr[i - r1] )
+    if (!arr[i - r1]) {
             arr[i - r1] = [];
-        if (cell)
+    }
+    if (cell) {
         arr[i - r1][j - c1] = new cRef( cell.getName(), t.ws );
-        else
+    } else {
             arr[i - r1][j - c1] = new cRef( t.ws._getCell( i, j ).getName(), t.ws );
+    }
     } );
     return arr;
 };
@@ -832,9 +787,8 @@ function cArea3D( val, wsFrom, wsTo, wb ) {/*Area3D means "Sheat1!A1:E5" for exa
 
 cArea3D.prototype = Object.create( cBaseType.prototype );
 cArea3D.prototype.clone = function () {
-    var wsFrom = this._wb.getWorksheetById( this.wsFrom ).getName(),
-        wsTo = this._wb.getWorksheetById( this.wsTo ).getName(),
-        oRes = new cArea3D( this._cells, wsFrom, wsTo, this._wb );
+  var wsFrom = this._wb.getWorksheetById(this.wsFrom).getName(), wsTo = this._wb.getWorksheetById(this.wsTo)
+    .getName(), oRes = new cArea3D(this._cells, wsFrom, wsTo, this._wb);
 //	cBaseType.prototype.cloneTo.call( this, oRes );
     this.constructor.prototype.cloneTo.call( this, oRes );
     oRes.isAbsolute = this.isAbsolute;
@@ -848,7 +802,8 @@ cArea3D.prototype.wsRange = function () {
     if ( !this.wsTo ) {
         this.wsTo = this.wsFrom;
     }
-    var wsF = this._wb.getWorksheetById( this.wsFrom ).getIndex(), wsL = this._wb.getWorksheetById( this.wsTo ).getIndex(), r = [];
+  var wsF = this._wb.getWorksheetById(this.wsFrom).getIndex(), wsL = this._wb.getWorksheetById(this.wsTo)
+    .getIndex(), r = [];
     for ( var i = wsF; i <= wsL; i++ ) {
         r.push( this._wb.getWorksheet( i ) );
     }
@@ -862,8 +817,7 @@ cArea3D.prototype.range = function ( wsRange ) {
     for ( var i = 0; i < wsRange.length; i++ ) {
         if ( !wsRange[i] ) {
             r.push( null );
-        }
-        else {
+    } else {
             r.push( wsRange[i].getRange2( this._cells ) );
         }
     }
@@ -896,7 +850,8 @@ cArea3D.prototype.getValue = function () {
             var cellType = _cell.getType();
             switch ( cellType ) {
                 case CellValueType.Number:
-                    _cell.getValueWithoutFormat() === "" ? _val.push( new cEmpty() ) : _val.push( new cNumber( _cell.getValueWithoutFormat() ) );
+          _cell.getValueWithoutFormat() === "" ? _val.push(new cEmpty()) :
+            _val.push(new cNumber(_cell.getValueWithoutFormat()));
                     break;
                 case CellValueType.Bool:
                     _val.push( new cBool( _cell.getValueWithoutFormat() ) );
@@ -911,8 +866,7 @@ cArea3D.prototype.getValue = function () {
                 {
                     if ( _cell.getValueWithoutFormat() && _cell.getValueWithoutFormat() !== "" ) {
                         _val.push( new cNumber( _cell.getValueWithoutFormat() ) );
-                    }
-                    else {
+          } else {
                         _val.push( checkTypeCell( "" + _cell.getValueWithoutFormat() ) );
                     }
                 }
@@ -946,7 +900,8 @@ cArea3D.prototype.getValue2 = function ( cell ) {
             switch ( cellType ) {
                 case CellValueType.Number:
                 {
-                    _cell.getValueWithoutFormat() === "" ? _val.push( new cEmpty() ) : _val.push( new cNumber( _cell.getValueWithoutFormat() ) );
+          _cell.getValueWithoutFormat() === "" ? _val.push(new cEmpty()) :
+            _val.push(new cNumber(_cell.getValueWithoutFormat()));
                     break;
                 }
                 case CellValueType.Bool:
@@ -968,8 +923,7 @@ cArea3D.prototype.getValue2 = function ( cell ) {
                 {
                     if ( _cell.getValueWithoutFormat() && _cell.getValueWithoutFormat() !== "" ) {
                         _val.push( new cNumber( _cell.getValueWithoutFormat() ) );
-                    }
-                    else {
+          } else {
                         _val.push( checkTypeCell( "" + _cell.getValueWithoutFormat() ) );
                     }
                 }
@@ -979,26 +933,23 @@ cArea3D.prototype.getValue2 = function ( cell ) {
 
     if ( _val[0] === undefined || _val[0] === null ) {
         return new cEmpty();
-    }
-    else {
+  } else {
         return _val[0];
     }
 };
 cArea3D.prototype.changeSheet = function ( lastName, newName ) {
-    if ( this.wsFrom === this._wb.getWorksheetByName( lastName ).getId() && this.wsTo === this._wb.getWorksheetByName( lastName ).getId() ) {
+  if (this.wsFrom === this._wb.getWorksheetByName(lastName).getId() &&
+    this.wsTo === this._wb.getWorksheetByName(lastName).getId()) {
         this.wsFrom = this.wsTo = this._wb.getWorksheetByName( newName ).getId();
-    }
-    else if ( this.wsFrom === this._wb.getWorksheetByName( lastName ).getId() ) {
+  } else if (this.wsFrom === this._wb.getWorksheetByName(lastName).getId()) {
         this.wsFrom = this._wb.getWorksheetByName( newName ).getId();
-    }
-    else if ( this.wsTo === this._wb.getWorksheetByName( lastName ).getId() ) {
+  } else if (this.wsTo === this._wb.getWorksheetByName(lastName).getId()) {
         this.wsTo = this._wb.getWorksheetByName( newName ).getId();
     }
 };
 cArea3D.prototype.toString = function () {
-    var wsFrom = this._wb.getWorksheetById( this.wsFrom ).getName(),
-        wsTo = this._wb.getWorksheetById( this.wsTo ).getName(),
-        name = Asc.g_oRangeCache.getActiveRange( this._cells );
+  var wsFrom = this._wb.getWorksheetById(this.wsFrom).getName(), wsTo = this._wb.getWorksheetById(this.wsTo)
+    .getName(), name = Asc.g_oRangeCache.getActiveRange(this._cells);
     name = name && name.getName ? name.getName() : this._cells;
 
     return parserHelp.get3DRef( wsFrom !== wsTo ? wsFrom + ':' + wsTo : wsFrom, name );
@@ -1037,15 +988,12 @@ cArea3D.prototype.cross = function ( arg, wsID ) {
     if ( cross ) {
         if ( cross.r != undefined ) {
             return this.getValue2( new CellAddress( cross.r, this.getBBox().c1 ) );
-        }
-        else if ( cross.c != undefined ) {
+    } else if (cross.c != undefined) {
             return this.getValue2( new CellAddress( this.getBBox().r1, cross.c ) );
-        }
-        else {
+    } else {
             return new cError( cErrorType.wrong_value_type );
         }
-    }
-    else {
+  } else {
         return new cError( cErrorType.wrong_value_type );
     }
 };
@@ -1078,9 +1026,8 @@ cArea3D.prototype.countCells = function () {
         }
 
     }
-    var _r = this.range( _wsA ),
-        bbox = _r[0].bbox,
-        count = (Math.abs( bbox.c1 - bbox.c2 ) + 1) * (Math.abs( bbox.r1 - bbox.r2 ) + 1);
+  var _r = this.range(_wsA), bbox = _r[0].bbox, count = (Math.abs(bbox.c1 - bbox.c2) + 1) *
+    (Math.abs(bbox.r1 - bbox.r2) + 1);
     count = _r.length * count;
     for ( var i = 0; i < _r.length; i++ ) {
         _r[i]._foreachNoEmpty( function ( _cell ) {
@@ -1096,8 +1043,7 @@ cArea3D.prototype.countCells = function () {
     return new cNumber( count );
 };
 cArea3D.prototype.getMatrix = function () {
-    var arr = [],
-        r = this.getRange(), res;
+  var arr = [], r = this.getRange(), res;
     for ( var k = 0; k < r.length; k++ ) {
         arr[k] = [];
         r[k]._foreach2( function ( cell, i, j, r1, c1 ) {
@@ -1108,26 +1054,20 @@ cArea3D.prototype.getMatrix = function () {
                 var cellType = cell.getType();
                 if ( cellType === CellValueType.Number ) {
                     res = cell.isEmptyTextString() ? new cEmpty() : new cNumber( cell.getValueWithoutFormat() );
-                }
-                else if ( cellType === CellValueType.Bool ) {
+        } else if (cellType === CellValueType.Bool) {
                     res = new cBool( cell.getValueWithoutFormat() );
-                }
-                else if ( cellType === CellValueType.Error ) {
+        } else if (cellType === CellValueType.Error) {
                     res = new cError( cell.getValueWithoutFormat() );
-                }
-                else if ( cellType === CellValueType.String ) {
+        } else if (cellType === CellValueType.String) {
                     res = new cString( cell.getValueWithoutFormat() );
-                }
-                else {
+        } else {
                     if ( cell.isEmptyTextString() ) {
                         res = new cNumber( cell.getValueWithoutFormat() );
-                    }
-                    else {
+          } else {
                         res = checkTypeCell( "" + cell.getValueWithoutFormat() );
                     }
                 }
-            }
-            else {
+      } else {
                 res = new cEmpty();
             }
 
@@ -1151,8 +1091,7 @@ cArea3D.prototype.foreach2 = function ( action ) {
                             {
                                 if ( _cell.getValueWithoutFormat() === "" ) {
                                     val = new cEmpty();
-                                }
-                                else {
+                } else {
                                     val = new cNumber( _cell.getValueWithoutFormat() );
                                 }
                                 break;
@@ -1176,15 +1115,13 @@ cArea3D.prototype.foreach2 = function ( action ) {
                             {
                                 if ( _cell.getValueWithoutFormat() && _cell.getValueWithoutFormat() !== "" ) {
                                     val = new cNumber( _cell.getValueWithoutFormat() );
-                                }
-                                else {
+                } else {
                                     val = checkTypeCell( "" + _cell.getValueWithoutFormat() );
                                 }
                                 break;
                             }
                         }
-                    }
-                    else {
+          } else {
                         val = new cEmpty();
                     }
                     action( val );
@@ -1193,7 +1130,9 @@ cArea3D.prototype.foreach2 = function ( action ) {
         }
     }
 };
-cArea3D.prototype.isSingleSheet = function(){return this.wsFrom == this.wsTo;};
+cArea3D.prototype.isSingleSheet = function() {
+  return this.wsFrom == this.wsTo;
+};
 
 /** @constructor */
 function cRef( val, ws ) {/*Ref means A1 for example*/
@@ -1210,8 +1149,7 @@ function cRef( val, ws ) {/*Ref means A1 for example*/
     this._valid = ca.isValid();
     if ( this._valid ) {
         this.range = this.ws.getRange3( ca.getRow0(), ca.getCol0(), ca.getRow0(), ca.getCol0() );
-    }
-    else {
+  } else {
         this.range = this.ws.getRange3( 0, 0, 0, 0 );
     }
 }
@@ -1239,21 +1177,16 @@ cRef.prototype.getValue = function () {
         v = this.range.getValueWithoutFormat();
         if ( v === "" ) {
             res = new cEmpty();
-        }
-        else {
+    } else {
             res = new cNumber( "" + v );
         }
-    }
-    else if ( cellType === CellValueType.Bool ) {
+  } else if (cellType === CellValueType.Bool) {
         res = new cBool( "" + this.range.getValueWithoutFormat() );
-    }
-    else if ( cellType === CellValueType.Error ) {
+  } else if (cellType === CellValueType.Error) {
         res = new cError( "" + this.range.getValueWithoutFormat() );
-    }
-    else if ( cellType === CellValueType.String ) {
+  } else if (cellType === CellValueType.String) {
         res = new cString( this.range.getValueWithoutFormat() );
-    }
-    else {
+  } else {
         res = checkTypeCell( "" + this.range.getValueWithoutFormat() );
     }
 
@@ -1285,9 +1218,7 @@ cRef.prototype.isValid = function () {
     return this._valid;
 };
 cRef.prototype.getMatrix = function () {
-    return [
-        [this.getValue()]
-    ];
+  return [[this.getValue()]];
 }
 cRef.prototype.getBBox0 = function () {
     return this.getRange().getBBox0();
@@ -1324,8 +1255,7 @@ cRef3D.prototype.getRange = function () {
             return this.range;
         }
         return this.range = this.ws.getRange2( this._cells );
-    }
-    else {
+  } else {
         return this.range = null;
     }
 };
@@ -1342,21 +1272,16 @@ cRef3D.prototype.getValue = function () {
         var v = _r.getValueWithoutFormat();
         if ( v === "" ) {
             return new cEmpty();
-        }
-        else {
+    } else {
             return new cNumber( "" + v );
         }
-    }
-    else if ( cellType === CellValueType.String ) {
+  } else if (cellType === CellValueType.String) {
         return new cString( "" + _r.getValueWithoutFormat() );
-    }
-    else if ( cellType === CellValueType.Bool ) {
+  } else if (cellType === CellValueType.Bool) {
         return new cBool( "" + _r.getValueWithoutFormat() );
-    }
-    else if ( cellType === CellValueType.Error ) {
+  } else if (cellType === CellValueType.Error) {
         return new cError( "" + _r.getValueWithoutFormat() );
-    }
-    else {
+  } else {
         return checkTypeCell( "" + _r.getValueWithoutFormat() );
     }
 };
@@ -1443,12 +1368,10 @@ cName.prototype.toRef = function () {
         if ( parserHelp.isArea( ref, ref.indexOf( "!" ) + 1 ) ) {
             if ( _wsFrom === _wsTo ) {
                 return new cArea( parserHelp.operand_str, this.wb.getWorksheetByName( _wsFrom ) );
-            }
-            else {
+      } else {
                 return new cArea3D( parserHelp.operand_str, _wsFrom, _wsTo, this.wb );
             }
-        }
-        else if ( parserHelp.isRef( ref, ref.indexOf( "!" ) + 1 ) ) {
+    } else if (parserHelp.isRef(ref, ref.indexOf("!") + 1)) {
             return new cRef3D( parserHelp.operand_str, _wsFrom, this.wb );
         }
     }
@@ -1457,8 +1380,7 @@ cName.prototype.toRef = function () {
 cName.prototype.toString = function () {
     if ( this.defName ) {
         return this.defName.Name;
-    }
-    else {
+  } else {
         return this.value;
     }
 };
@@ -1478,8 +1400,7 @@ cName.prototype.reParse = function () {
     if ( dN ) {
         this.defName.parsedRef = new parserFormula( dN.Ref, "", this.ws );
         this.defName.parsedRef.parse();
-    }
-    else {
+  } else {
         this.defName.parsedRef = null;
     }
 };
@@ -1555,7 +1476,8 @@ cStrucTable.prototype.toString = function () {
 		if(columns_2){
 			this.colEnd = columns_2.columnName
 		}
-		return tblStr.replace( "%1", "[" + this.colStart.replace(/#/g,"'#") + "]:[" + this.colEnd.replace(/#/g,"'#") + "]" );
+    return tblStr.replace("%1",
+      "[" + this.colStart.replace(/#/g, "'#") + "]:[" + this.colEnd.replace(/#/g, "'#") + "]");
 	}
 	if ( this.reservedColumn ) {
 		return tblStr.replace( "%1", this.buildLocalTableString(this.reservedColumnIndex,false) );
@@ -1614,7 +1536,8 @@ cStrucTable.prototype.toLocaleString = function () {
 		if(columns_2){
 			this.colEnd = columns_2.columnName
 		}
-		return tblStr.replace( "%1", "[" + this.colStart.replace(/#/g,"'#") + "]:[" + this.colEnd.replace(/#/g,"'#") + "]" );
+    return tblStr.replace("%1",
+      "[" + this.colStart.replace(/#/g, "'#") + "]:[" + this.colEnd.replace(/#/g, "'#") + "]");
 	}
 	if ( this.reservedColumn ) {
 		return tblStr.replace( "%1", this.buildLocalTableString(this.reservedColumnIndex,true) );
@@ -1697,16 +1620,16 @@ cStrucTable.prototype.createArea = function ( val, cell ) {
             this.columnRange = val['columnRange'];
             paramObj.startCol = this.colStart = val['colStart'].replace(/'#/g,"#");
             paramObj.endCol = this.colEnd = val['colEnd'].replace(/'#/g,"#");
-			if( !this.colEnd )
+      if (!this.colEnd) {
 				this.colEnd = this.colStart;
+      }
 
 			this.colStartIndex = this.wb.getTableIndexColumnByName( this.tableName, this.colStart );
 			this.colEndIndex = this.wb.getTableIndexColumnByName( this.tableName, this.colEnd );
 			if( !this.colStartIndex && !this.colEndIndex ){
 				return this.area =  new cError( cErrorType.bad_reference );
 			}
-        }
-        else {
+    } else {
             paramObj.startCol = this.oneColumn = val['oneColumn'].replace(/'#/g,"#");
 			this.oneColumnIndex = this.wb.getTableIndexColumnByName( this.tableName, this.oneColumn );
 			if( !this.oneColumnIndex ){
@@ -1721,11 +1644,12 @@ cStrucTable.prototype.createArea = function ( val, cell ) {
         }
 		if( this.tableData.range ){
 			this.area = this.tableData.range.isOneCell() ?
-				new cRef3D( this.tableData.range.getAbsName(), this.wb.getWorksheetById( this.tableData.wsID ).getName(), this.wb ):
-				new cArea3D( this.tableData.range.getAbsName(), this.wb.getWorksheetById( this.tableData.wsID ).getName(), this.wb.getWorksheetById( this.tableData.wsID ).getName(), this.wb );
+        new cRef3D(this.tableData.range.getAbsName(), this.wb.getWorksheetById(this.tableData.wsID)
+          .getName(), this.wb) :
+        new cArea3D(this.tableData.range.getAbsName(), this.wb.getWorksheetById(this.tableData.wsID)
+          .getName(), this.wb.getWorksheetById(this.tableData.wsID).getName(), this.wb);
 		}
-    }
-    else if ( val['reservedColumn'] || !val['columnName'] ) {
+  } else if (val['reservedColumn'] || !val['columnName']) {
 		this.reservedColumn = val['reservedColumn'] || "";
 		this.reservedColumnIndex = paramObj.param = getColumnType( this.reservedColumn );
 
@@ -1735,11 +1659,12 @@ cStrucTable.prototype.createArea = function ( val, cell ) {
         }
 		if( this.tableData.range ){
 			this.area = this.tableData.range.isOneCell() ?
-				new cRef3D( this.tableData.range.getAbsName(), this.wb.getWorksheetById( this.tableData.wsID ).getName(), this.wb ):
-				new cArea3D( this.tableData.range.getAbsName(), this.wb.getWorksheetById( this.tableData.wsID ).getName(), this.wb.getWorksheetById( this.tableData.wsID ).getName(), this.wb );
+        new cRef3D(this.tableData.range.getAbsName(), this.wb.getWorksheetById(this.tableData.wsID)
+          .getName(), this.wb) :
+        new cArea3D(this.tableData.range.getAbsName(), this.wb.getWorksheetById(this.tableData.wsID)
+          .getName(), this.wb.getWorksheetById(this.tableData.wsID).getName(), this.wb);
 		}
-    }
-    else if ( val['hdtcc'] ) {
+  } else if (val['hdtcc']) {
         this.hdt = val['hdt'];
 		this.hdtIndexes = [];
 		this.hdtcstart = val['hdtcstart'];
@@ -1756,8 +1681,7 @@ cStrucTable.prototype.createArea = function ( val, cell ) {
 
             if ( range ) {
                 range.union2( data.range );
-            }
-            else {
+      } else {
                 range = data.range;
             }
         }
@@ -1793,8 +1717,7 @@ cStrucTable.prototype.createArea = function ( val, cell ) {
 
             if ( range ) {
                 range = range.intersection( data.range );
-            }
-            else {
+      } else {
                 range = data.range;
             }
         }
@@ -1804,7 +1727,8 @@ cStrucTable.prototype.createArea = function ( val, cell ) {
 		if( range ){
 			this.area = range.isOneCell() ?
 				new cRef3D( range.getAbsName(), this.wb.getWorksheetById( this.tableData.wsID ).getName(), this.wb ):
-				new cArea3D( range.getAbsName(), this.wb.getWorksheetById( this.tableData.wsID ).getName(), this.wb.getWorksheetById( this.tableData.wsID ).getName(), this.wb );
+        new cArea3D(range.getAbsName(), this.wb.getWorksheetById(this.tableData.wsID)
+          .getName(), this.wb.getWorksheetById(this.tableData.wsID).getName(), this.wb);
 		}
     }
 
@@ -1814,33 +1738,43 @@ cStrucTable.prototype.createArea = function ( val, cell ) {
 cStrucTable.prototype.buildLocalTableString = function (reservedColumn,local) {
 
 	switch(reservedColumn){
-		case g_nFormulaTablePartInfo.all:{
-			if(local)
+    case g_nFormulaTablePartInfo.all:
+    {
+      if (local) {
 				return "#"+cStrucTableLocalColumns['a'];
+      }
 			return cStrucTableReservedWords.all;
 			break;
 		}
-		case g_nFormulaTablePartInfo.data:{
-			if(local)
+    case g_nFormulaTablePartInfo.data:
+    {
+      if (local) {
 				return "#"+cStrucTableLocalColumns['d'];
+      }
 			return cStrucTableReservedWords.data;
 			break;
 		}
-		case g_nFormulaTablePartInfo.headers:{
-			if(local)
+    case g_nFormulaTablePartInfo.headers:
+    {
+      if (local) {
 				return "#"+cStrucTableLocalColumns['h'];
+      }
 			return cStrucTableReservedWords.headers;
 			break;
 		}
-		case g_nFormulaTablePartInfo.totals:{
-			if(local)
+    case g_nFormulaTablePartInfo.totals:
+    {
+      if (local) {
 				return "#"+cStrucTableLocalColumns['t'];
+      }
 			return cStrucTableReservedWords.totals;
 			break;
 		}
-		case g_nFormulaTablePartInfo.thisRow:{
-			if(local)
+    case g_nFormulaTablePartInfo.thisRow:
+    {
+      if (local) {
 				return "#"+cStrucTableLocalColumns['tr'];
+      }
 			return cStrucTableReservedWords.thisrow;
 			break;
 		}
@@ -1857,8 +1791,7 @@ cName3D.prototype = Object.create( cName.prototype );
 cName3D.prototype.toString = function () {
 	if ( this.defName ) {
 		return parserHelp.getEscapeSheetName( this.ws.getName() ) + "!" + this.defName.Name;
-	}
-	else {
+  } else {
 		return parserHelp.getEscapeSheetName( this.wsFrom ) + "!" + this.value;
 	}
 };
@@ -1881,8 +1814,7 @@ cArray.prototype.addElement = function ( element ) {
     if ( this.array.length === 0 ) {
         this.addRow();
     }
-    var arr = this.array,
-        subArr = arr[this.rowCount - 1];
+  var arr = this.array, subArr = arr[this.rowCount - 1];
     subArr[subArr.length] = element;
     this.countElementInRow[this.rowCount - 1]++;
     this.countElement++;
@@ -1910,8 +1842,7 @@ cArray.prototype.getElement = function ( index ) {
     for ( var i = 0; i < this.rowCount; i++ ) {
         if ( index > this.countElementInRow[i].length ) {
             index -= this.countElementInRow[i].length;
-        }
-        else {
+    } else {
             return this.array[i][index];
         }
     }
@@ -1981,8 +1912,7 @@ cArray.prototype.toString = function () {
         for ( var ic = 0; ic < this.countElementInRow[ir]; ic++, ret += arrayColSeparatorDef ) {
             if ( this.array[ir][ic] instanceof cString ) {
                 ret += '"' + this.array[ir][ic].toString() + '"';
-            }
-            else {
+      } else {
                 ret += this.array[ir][ic].toString() + "";
             }
         }
@@ -1998,11 +1928,11 @@ cArray.prototype.toString = function () {
 cArray.prototype.toLocaleString = function ( digitDelim ) {
     var ret = "";
     for ( var ir = 0; ir < this.rowCount; ir++, ret += digitDelim ? arrayRowSeparator : arrayRowSeparatorDef ) {
-        for ( var ic = 0; ic < this.countElementInRow[ir]; ic++, ret += digitDelim ? arrayColSeparator : arrayColSeparatorDef ) {
+    for (var ic = 0; ic < this.countElementInRow[ir];
+         ic++, ret += digitDelim ? arrayColSeparator : arrayColSeparatorDef) {
             if ( this.array[ir][ic] instanceof cString ) {
                 ret += '"' + this.array[ir][ic].toLocaleString( digitDelim ) + '"';
-            }
-            else {
+      } else {
                 ret += this.array[ir][ic].toLocaleString( digitDelim ) + "";
             }
         }
@@ -2049,8 +1979,7 @@ cArray.prototype.getElementByCell = function ( cellAddress ) {
         if( this.rowCount == 1 ){
             this.getElementRowCol( 0, cellAddress.getCol0() );
         }
-    }
-    else{
+  } else {
         return this.getElement( 0 );
     }
 };
@@ -2065,20 +1994,15 @@ cUndefined.prototype = Object.create( cBaseType.prototype );
 function checkTypeCell( val ) {
     if ( val === "" ) {
         return new cEmpty();
-    }
-    else if ( parseNum( val ) ) {
+  } else if (parseNum(val)) {
         return new cNumber( val - 0 );
-    }
-    else if ( parserHelp.isString( val, 0 ) ) {
+  } else if (parserHelp.isString(val, 0)) {
         return new cString( parserHelp.operand_str );
-    }
-    else if ( parserHelp.isBoolean( val, 0 ) ) {
+  } else if (parserHelp.isBoolean(val, 0)) {
         return new cBool( parserHelp.operand_str );
-    }
-    else if ( parserHelp.isError( val, 0 ) ) {
+  } else if (parserHelp.isError(val, 0)) {
         return new cError( parserHelp.operand_str );
-    }
-    else {
+  } else {
         return new cString( val );
     }
 }
@@ -2089,22 +2013,19 @@ function checkTypeCell( val ) {
 function cBaseOperator( name, priority, argumentCount ) {
     if ( name ) {
         this.name = name;
-    }
-    else {
+  } else {
         this.name = "";
     }
     if ( priority !== undefined ) {
         this.priority = priority;
-    }
-    else {
+  } else {
         this.priority = 10;
     }
     this.type = cElementType.operator;
     this.isRightAssociative = false;
     if ( argumentCount !== undefined ) {
         this.argumentsCurrent = argumentCount;
-    }
-    else {
+  } else {
         this.argumentsCurrent = 2;
     }
     this.value = null;
@@ -2116,42 +2037,34 @@ function cBaseOperator( name, priority, argumentCount ) {
 }
 
 cBaseOperator.prototype = {
-    constructor    : cBaseOperator,
-    getArguments   : function () {
+  constructor: cBaseOperator, getArguments: function() {
         return this.argumentsCurrent;
-    },
-    toString       : function () {
+  }, toString: function() {
         return this.name;
-    },
-    Calculate      : function () {
+  }, Calculate: function() {
         return null;
-    },
-    Assemble       : function ( arg ) {
+  }, Assemble: function(arg) {
         var str = "";
         if ( this.argumentsCurrent === 2 ) {
             str = arg[0] + "" + this.name + "" + arg[1];
-        }
-        else {
+    } else {
             str = this.name + "" + arg[0];
         }
         return new cString( str );
-    },
-    Assemble2      : function ( arg, start, count ) {
+  }, Assemble2: function(arg, start, count) {
         var str = "";
         if ( this.argumentsCurrent === 2 ) {
             str += arg[start + count - 2] + this.name + arg[start + count - 1];
-        }
-        else {
+    } else {
             str += this.name + arg[start];
         }
         return new cString( str );
-    },
-    Assemble2Locale: function ( arg, start, count, locale, digitDelim ) {
+  }, Assemble2Locale: function(arg, start, count, locale, digitDelim) {
         var str = "";
         if ( this.argumentsCurrent === 2 ) {
-            str += arg[start + count - 2].toLocaleString( digitDelim ) + this.name + arg[start + count - 1].toLocaleString( digitDelim );
-        }
-        else {
+      str += arg[start + count - 2].toLocaleString(digitDelim) + this.name +
+        arg[start + count - 1].toLocaleString(digitDelim);
+    } else {
             str += this.name + arg[start];
         }
         return new cString( str );
@@ -2175,39 +2088,28 @@ function cBaseFunction( name, argMin, argMax ) {
 }
 
 cBaseFunction.prototype = {
-    constructor       : cBaseFunction,
-    Calculate         : function () {
+  constructor: cBaseFunction, Calculate: function() {
         this.value = new cError( cErrorType.wrong_name );
         return this.value;
-    },
-    setArgumentsMin   : function ( count ) {
+  }, setArgumentsMin: function(count) {
         this.argumentsMin = count;
-    },
-    setArgumentsMax   : function ( count ) {
+  }, setArgumentsMax: function(count) {
         this.argumentsMax = count;
-    },
-    DecrementArguments: function () {
+  }, DecrementArguments: function() {
         --this.argumentsCurrent;
-    },
-    IncrementArguments: function () {
+  }, IncrementArguments: function() {
         ++this.argumentsCurrent;
-    },
-    setName           : function ( name ) {
+  }, setName: function(name) {
         this.name = name;
-    },
-    setArgumentsCount : function ( count ) {
+  }, setArgumentsCount: function(count) {
         this.argumentsCurrent = count;
-    },
-    getArguments      : function () {
+  }, getArguments: function() {
         return this.argumentsCurrent;
-    },
-    getMaxArguments   : function () {
+  }, getMaxArguments: function() {
         return this.argumentsMax;
-    },
-    getMinArguments   : function () {
+  }, getMinArguments: function() {
         return this.argumentsMin;
-    },
-    Assemble          : function ( arg ) {
+  }, Assemble: function(arg) {
         var str = "";
         for ( var i = 0; i < arg.length; i++ ) {
             str += arg[i].toString();
@@ -2219,8 +2121,7 @@ cBaseFunction.prototype = {
             return new cString( "_xlfn." + this.name + "(" + str + ")" );
         }
         return new cString( this.toString() + "(" + str + ")" );
-    },
-    Assemble2         : function ( arg, start, count ) {
+  }, Assemble2: function(arg, start, count) {
 
         var str = "", c = start + count - 1;
         for ( var i = start; i <= c; i++ ) {
@@ -2233,12 +2134,9 @@ cBaseFunction.prototype = {
             return new cString( "_xlfn." + this.name + "(" + str + ")" );
         }
         return new cString( this.toString() + "(" + str + ")" );
-    },
-    Assemble2Locale   : function ( arg, start, count, locale, digitDelim ) {
+  }, Assemble2Locale: function(arg, start, count, locale, digitDelim) {
 
-        var name = this.toString(),
-            str = "", c = start + count - 1,
-            localeName = locale ? locale[name] : name;
+    var name = this.toString(), str = "", c = start + count - 1, localeName = locale ? locale[name] : name;
 
         localeName = localeName || this.toString();
         for ( var i = start; i <= c; i++ ) {
@@ -2248,11 +2146,9 @@ cBaseFunction.prototype = {
             }
         }
         return new cString( localeName + "(" + str + ")" );
-    },
-    toString          : function () {
+  }, toString: function() {
         return this.name.replace( rx_sFuncPref, "_xlfn." );
-    },
-    setCA             : function ( arg, ca, numFormat ) {
+  }, setCA: function(arg, ca, numFormat) {
         this.value = arg;
         if ( ca ) {
             this.value.ca = true;
@@ -2261,8 +2157,7 @@ cBaseFunction.prototype = {
             this.value.numFormat = numFormat;
         }
         return this.value;
-    },
-    setFormat         : function ( f ) {
+  }, setFormat: function(f) {
         this.numFormat = f;
     }
 };
@@ -2316,14 +2211,15 @@ function cRangeUnionOperator() {
 cRangeUnionOperator.prototype = Object.create( cBaseOperator.prototype );
 cRangeUnionOperator.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], arg1 = arg[1], wsId0, wsId1, wb, ws;
-    if ( ( arg0 instanceof cRef || arg0 instanceof cArea || arg0 instanceof cRef3D || arg0 instanceof cArea3D && (wsId0 = arg0.wsFrom) == arg0.wsTo ) &&
-        ( arg1 instanceof cRef || arg1 instanceof cArea || arg1 instanceof cRef3D || arg1 instanceof cArea3D && (wsId1 = arg1.wsFrom) == arg1.wsTo ) ) {
+  if (( arg0 instanceof cRef || arg0 instanceof cArea || arg0 instanceof cRef3D ||
+    arg0 instanceof cArea3D && (wsId0 = arg0.wsFrom) == arg0.wsTo ) &&
+    ( arg1 instanceof cRef || arg1 instanceof cArea || arg1 instanceof cRef3D ||
+    arg1 instanceof cArea3D && (wsId1 = arg1.wsFrom) == arg1.wsTo )) {
 
         if ( arg0 instanceof cArea3D ) {
             wsId0 = arg0.wsFrom;
             ws = arg0.getWS();
-        }
-        else {
+    } else {
             wsId0 = arg0.ws.getId();
             ws = arg0.getWS();
         }
@@ -2331,8 +2227,7 @@ cRangeUnionOperator.prototype.Calculate = function ( arg ) {
         if ( arg1 instanceof cArea3D ) {
             wsId1 = arg1.wsFrom;
             ws = arg1.getWS();
-        }
-        else {
+    } else {
             wsId1 = arg1.ws.getId();
             ws = arg1.getWS();
         }
@@ -2349,49 +2244,48 @@ cRangeUnionOperator.prototype.Calculate = function ( arg ) {
         arg0 = arg0.union( arg1 );
         arg0.normalize( true );
 
-		if( arg0.isOneCell() )
+    if (arg0.isOneCell()) {
 			this.value = new cRef( arg0.getName(), ws );
-		else
+    } else {
 			this.value = new cArea( arg0.getName(), ws );
+    }
 
         this.value = new cArea( arg0.getName(), ws );
 
-    }
-    else {
+  } else {
         return this.value = new cError( cErrorType.wrong_value_type );
     }
 
-    if ( this.value instanceof cArea || this.value instanceof cRef || this.value instanceof cRef3D || this.value instanceof cArea3D ) {
-        var r1 = arguments[1], r2 = arguments[2], wb = r1.worksheet.workbook, cellName = r1.getFirst().getID(), wsId = r1.worksheet.getId();
+  if (this.value instanceof cArea || this.value instanceof cRef || this.value instanceof cRef3D ||
+    this.value instanceof cArea3D) {
+    var r1 = arguments[1], r2 = arguments[2], wb = r1.worksheet.workbook, cellName = r1.getFirst()
+      .getID(), wsId = r1.worksheet.getId();
 
         if ( this.value instanceof cArea && this.value.isValid() ) {
             var nFrom, nTo;
 
             if ( r2 ) {
                 nFrom = r2.defName;
-            }
-            else {
+      } else {
                 nFrom = wb.dependencyFormulas.addNode( wsId, cellName );
             }
 
             nTo = wb.dependencyFormulas.addNode( this.value.getWsId(), this.value._cells.replace( /\$/g, "" ) );
             this.value.setNode( nTo );
             wb.dependencyFormulas.addEdge2( nFrom, nTo );
-        }
-        else if ( this.value instanceof cArea3D && this.value.isValid() ) {
-            var wsR = this.value.wsRange(),
-                nTo, nFrom, _cell = this.value._cells.replace( /\$/g, "" );
+    } else if (this.value instanceof cArea3D && this.value.isValid()) {
+      var wsR = this.value.wsRange(), nTo, nFrom, _cell = this.value._cells.replace(/\$/g, "");
 
             for ( var j = 0; j < wsR.length; j++ ) {
                 if ( r2 ) {
                     nTo = wb.dependencyFormulas.addNode( wsR[j].Id, _cell );
                     wb.dependencyFormulas.addEdge2( r2.defName, nTo );
-                }
-                else
+        } else {
                     wb.dependencyFormulas.addEdge( wsId, cellName.replace( /\$/g, "" ), wsR[j].Id, _cell );
             }
         }
     }
+  }
 
     return this.value;
 };
@@ -2404,14 +2298,15 @@ function cRangeIntersectionOperator() {
 cRangeIntersectionOperator.prototype = Object.create( cBaseOperator.prototype );
 cRangeIntersectionOperator.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], arg1 = arg[1], wsId0, wsId1, wb, ws;
-    if ( ( arg0 instanceof cRef || arg0 instanceof cArea || arg0 instanceof cRef3D || arg0 instanceof cArea3D && (wsId0 = arg0.wsFrom) == arg0.wsTo ) &&
-        ( arg1 instanceof cRef || arg1 instanceof cArea || arg1 instanceof cRef3D || arg1 instanceof cArea3D && (wsId1 = arg1.wsFrom) == arg1.wsTo ) ) {
+  if (( arg0 instanceof cRef || arg0 instanceof cArea || arg0 instanceof cRef3D ||
+    arg0 instanceof cArea3D && (wsId0 = arg0.wsFrom) == arg0.wsTo ) &&
+    ( arg1 instanceof cRef || arg1 instanceof cArea || arg1 instanceof cRef3D ||
+    arg1 instanceof cArea3D && (wsId1 = arg1.wsFrom) == arg1.wsTo )) {
 
         if ( arg0 instanceof cArea3D ) {
             wsId0 = arg0.wsFrom;
             ws = arg0.getWS();
-        }
-        else {
+    } else {
             wsId0 = arg0.ws.getId();
             ws = arg0.getWS();
         }
@@ -2419,8 +2314,7 @@ cRangeIntersectionOperator.prototype.Calculate = function ( arg ) {
         if ( arg1 instanceof cArea3D ) {
             wsId1 = arg1.wsFrom;
             ws = arg1.getWS();
-        }
-        else {
+    } else {
             wsId1 = arg1.ws.getId();
             ws = arg1.getWS();
         }
@@ -2437,50 +2331,49 @@ cRangeIntersectionOperator.prototype.Calculate = function ( arg ) {
         arg0 = arg0.intersection( arg1 );
 		if( arg0 ){
         	arg0.normalize( true );
-			if( arg0.isOneCell() )
+      if (arg0.isOneCell()) {
 				this.value = new cRef( arg0.getName(), ws );
-			else
+      } else {
 				this.value = new cArea( arg0.getName(), ws );
 		}
-		else
+    } else {
 			return this.value = new cError( cErrorType.null_value );
-
     }
-    else {
+
+  } else {
         return this.value = new cError( cErrorType.wrong_value_type );
     }
 
-    if ( this.value instanceof cArea || this.value instanceof cRef || this.value instanceof cRef3D || this.value instanceof cArea3D ) {
-        var r1 = arguments[1], r2 = arguments[2], wb = r1.worksheet.workbook, cellName = r1.getFirst().getID(), wsId = r1.worksheet.getId();
+  if (this.value instanceof cArea || this.value instanceof cRef || this.value instanceof cRef3D ||
+    this.value instanceof cArea3D) {
+    var r1 = arguments[1], r2 = arguments[2], wb = r1.worksheet.workbook, cellName = r1.getFirst()
+      .getID(), wsId = r1.worksheet.getId();
 
         if ( this.value instanceof cArea && this.value.isValid() ) {
             var nFrom, nTo;
 
             if ( r2 ) {
                 nFrom = r2.defName;
-            }
-            else {
+      } else {
                 nFrom = wb.dependencyFormulas.addNode( wsId, cellName );
             }
 
             nTo = wb.dependencyFormulas.addNode( this.value.getWsId(), this.value._cells.replace( /\$/g, "" ) );
             this.value.setNode( nTo );
             wb.dependencyFormulas.addEdge2( nFrom, nTo );
-        }
-        else if ( this.value instanceof cArea3D && this.value.isValid() ) {
-            var wsR = this.value.wsRange(),
-                nTo, nFrom, _cell = this.value._cells.replace( /\$/g, "" );
+    } else if (this.value instanceof cArea3D && this.value.isValid()) {
+      var wsR = this.value.wsRange(), nTo, nFrom, _cell = this.value._cells.replace(/\$/g, "");
 
             for ( var j = 0; j < wsR.length; j++ ) {
                 if ( r2 ) {
                     nTo = wb.dependencyFormulas.addNode( wsR[j].Id, _cell );
                     wb.dependencyFormulas.addEdge2( r2.defName, nTo );
-                }
-                else
+        } else {
                     wb.dependencyFormulas.addEdge( wsId, cellName.replace( /\$/g, "" ), wsR[j].Id, _cell );
             }
         }
     }
+  }
 
     return this.value;
 };
@@ -2497,17 +2390,13 @@ cUnarMinusOperator.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
     if ( arg0 instanceof cArea ) {
         arg0 = arg0.cross( arguments[1].first );
-    }
-    else if ( arg0 instanceof cArea3D){
+  } else if (arg0 instanceof cArea3D) {
         arg0 = arg0.cross( arguments[1].first, arguments[3] );
-    }
-    else if ( arg0 instanceof cArray ) {
-        arg0.foreach(
-            function ( arrElem, r, c ) {
+  } else if (arg0 instanceof cArray) {
+    arg0.foreach(function(arrElem, r, c) {
                 arrElem = arrElem.tocNumber();
                 arg0.array[r][c] = arrElem instanceof cError ? arrElem : new cNumber( -arrElem.getValue() );
-            }
-        );
+    });
         return this.value = arg0;
     }
     arg0 = arg0.tocNumber();
@@ -2537,8 +2426,7 @@ cUnarPlusOperator.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
     if ( arg0 instanceof cArea ) {
         arg0 = arg0.cross( arguments[1].first );
-    }
-    else if ( arg0 instanceof cArea3D){
+  } else if (arg0 instanceof cArea3D) {
         arg0 = arg0.cross( arguments[1].first, arguments[3] );
     }
     arg0 = arg0.tryConvert();
@@ -2569,14 +2457,12 @@ cAddOperator.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], arg1 = arg[1];
     if ( arg0 instanceof cArea ) {
         arg0 = arg0.cross( arguments[1].first );
-    }
-    else if ( arg0 instanceof cArea3D){
+  } else if (arg0 instanceof cArea3D) {
         arg0 = arg0.cross( arguments[1].first, arguments[3] );
     }
     if ( arg1 instanceof cArea ) {
         arg1 = arg1.cross( arguments[1].first );
-    }
-    else if ( arg1 instanceof cArea3D){
+  } else if (arg1 instanceof cArea3D) {
         arg1 = arg1.cross( arguments[1].first, arguments[3] );
     }
     arg0 = arg0.tocNumber(), arg1 = arg1.tocNumber();
@@ -2613,17 +2499,13 @@ cPercentOperator.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
     if ( arg0 instanceof cArea ) {
         arg0 = arg0.cross( arguments[1].first );
-    }
-    else if ( arg0 instanceof cArea3D){
+  } else if (arg0 instanceof cArea3D) {
         arg0 = arg0.cross( arguments[1].first, arguments[3] );
-    }
-    else if ( arg0 instanceof cArray ) {
-        arg0.foreach(
-            function ( arrElem, r, c ) {
+  } else if (arg0 instanceof cArray) {
+    arg0.foreach(function(arrElem, r, c) {
                 arrElem = arrElem.tocNumber();
                 arg0.array[r][c] = arrElem instanceof cError ? arrElem : new cNumber( arrElem.getValue() / 100 );
-            }
-        );
+    });
         return this.value = arg0;
     }
     arg0 = arg0.tocNumber();
@@ -2651,15 +2533,13 @@ cPowOperator.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], arg1 = arg[1];
     if ( arg0 instanceof cArea ) {
         arg0 = arg0.cross( arguments[1].first );
-    }
-    else if ( arg0 instanceof cArea3D){
+  } else if (arg0 instanceof cArea3D) {
         arg0 = arg0.cross( arguments[1].first, arguments[3] );
     }
     arg0 = arg0.tocNumber();
     if ( arg1 instanceof cArea ) {
         arg1 = arg1.cross( arguments[1].first );
-    }
-    else if ( arg1 instanceof cArea3D){
+  } else if (arg1 instanceof cArea3D) {
         arg1 = arg1.cross( arguments[1].first, arguments[3] );
     }
     arg1 = arg1.tocNumber();
@@ -2673,8 +2553,7 @@ cPowOperator.prototype.Calculate = function ( arg ) {
     var _v = Math.pow( arg0.getValue(), arg1.getValue() );
     if ( isNaN( _v ) ) {
         return this.value = new cError( cErrorType.not_numeric );
-    }
-    else if ( _v === Number.POSITIVE_INFINITY ) {
+  } else if (_v === Number.POSITIVE_INFINITY) {
         return this.value = new cError( cErrorType.division_by_zero );
     }
     return this.value = new cNumber( _v );
@@ -2691,14 +2570,12 @@ cMultOperator.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], arg1 = arg[1];
     if ( arg0 instanceof cArea ) {
         arg0 = arg0.cross( arguments[1].first );
-    }
-    else if ( arg0 instanceof cArea3D){
+  } else if (arg0 instanceof cArea3D) {
         arg0 = arg0.cross( arguments[1].first, arguments[3] );
     }
     if ( arg1 instanceof cArea ) {
         arg1 = arg1.cross( arguments[1].first );
-    }
-    else if ( arg1 instanceof cArea3D){
+  } else if (arg1 instanceof cArea3D) {
         arg1 = arg1.cross( arguments[1].first, arguments[3] );
     }
     arg0 = arg0.tocNumber(), arg1 = arg1.tocNumber();
@@ -2716,14 +2593,12 @@ cDivOperator.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], arg1 = arg[1];
     if ( arg0 instanceof cArea ) {
         arg0 = arg0.cross( arguments[1].first );
-    }
-    else if ( arg0 instanceof cArea3D){
+  } else if (arg0 instanceof cArea3D) {
         arg0 = arg0.cross( arguments[1].first, arguments[3] );
     }
     if ( arg1 instanceof cArea ) {
         arg1 = arg1.cross( arguments[1].first );
-    }
-    else if ( arg1 instanceof cArea3D){
+  } else if (arg1 instanceof cArea3D) {
         arg1 = arg1.cross( arguments[1].first, arguments[3] );
     }
     arg0 = arg0.tocNumber(), arg1 = arg1.tocNumber();
@@ -2740,22 +2615,19 @@ cConcatSTROperator.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], arg1 = arg[1];
     if ( arg0 instanceof cArea ) {
         arg0 = arg0.cross( arguments[1].first );
-    }
-    else if ( arg0 instanceof cArea3D){
+  } else if (arg0 instanceof cArea3D) {
         arg0 = arg0.cross( arguments[1].first, arguments[3] );
     }
     arg0 = arg0.tocString();
     if ( arg1 instanceof cArea ) {
         arg1 = arg1.cross( arguments[1].first );
-    }
-    else if ( arg1 instanceof cArea3D){
+  } else if (arg1 instanceof cArea3D) {
         arg1 = arg1.cross( arguments[1].first, arguments[3] );
     }
     arg1 = arg1.tocString();
 
     return this.value = arg0 instanceof cError ? arg0 :
-        arg1 instanceof cError ? arg1 :
-            new cString( arg0.toString().concat( arg1.toString() ) );
+    arg1 instanceof cError ? arg1 : new cString(arg0.toString().concat(arg1.toString()));
 };
 
 /** @constructor */
@@ -2769,14 +2641,12 @@ cEqualsOperator.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], arg1 = arg[1];
     if ( arg0 instanceof cArea ) {
         arg0 = arg0.cross( arguments[1].first );
-    }
-    else if ( arg0 instanceof cArea3D){
+  } else if (arg0 instanceof cArea3D) {
         arg0 = arg0.cross( arguments[1].first, arguments[3] );
     }
     if ( arg1 instanceof cArea ) {
         arg1 = arg1.cross( arguments[1].first );
-    }
-    else if ( arg1 instanceof cArea3D){
+  } else if (arg1 instanceof cArea3D) {
         arg1 = arg1.cross( arguments[1].first, arguments[3] );
     }
     arg0 = arg0.tryConvert(), arg1 = arg1.tryConvert();
@@ -2794,15 +2664,13 @@ cNotEqualsOperator.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], arg1 = arg[1];
     if ( arg0 instanceof cArea ) {
         arg0 = arg0.cross( arguments[1].first );
-    }
-    else if ( arg0 instanceof cArea3D ){
+  } else if (arg0 instanceof cArea3D) {
         arg0 = arg0.cross( arguments[1].first, arguments[3] );
     }
 
     if ( arg1.type == cElementType.cellsRange ) {
         arg1 = arg1.cross( arguments[1].first );
-    }
-    else if ( arg1 instanceof cArea3D ){
+  } else if (arg1 instanceof cArea3D) {
         arg1 = arg1.cross( arguments[1].first, arguments[3] );
     }
     arg0 = arg0.tryConvert(), arg1 = arg1.tryConvert();
@@ -2820,15 +2688,13 @@ cLessOperator.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], arg1 = arg[1];
     if ( arg0 instanceof cArea ) {
         arg0 = arg0.cross( arguments[1].first );
-    }
-    else if ( arg0 instanceof cArea3D ){
+  } else if (arg0 instanceof cArea3D) {
         arg0 = arg0.cross( arguments[1].first, arguments[3] );
     }
 
     if ( arg1 instanceof cArea ) {
         arg1 = arg1.cross( arguments[1].first );
-    }
-    else if ( arg1 instanceof cArea3D ){
+  } else if (arg1 instanceof cArea3D) {
         arg1 = arg1.cross( arguments[1].first, arguments[3] );
     }
     arg0 = arg0.tryConvert(), arg1 = arg1.tryConvert();
@@ -2846,14 +2712,12 @@ cLessOrEqualOperator.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], arg1 = arg[1];
     if ( arg0 instanceof cArea ) {
         arg0 = arg0.cross( arguments[1].first );
-    }
-    else if ( arg0 instanceof cArea3D ){
+  } else if (arg0 instanceof cArea3D) {
         arg0 = arg0.cross( arguments[1].first, arguments[3] );
     }
     if ( arg1 instanceof cArea ) {
         arg1 = arg1.cross( arguments[1].first );
-    }
-    else if ( arg1 instanceof cArea3D ){
+  } else if (arg1 instanceof cArea3D) {
         arg1 = arg1.cross( arguments[1].first, arguments[3] );
     }
     arg0 = arg0.tryConvert(), arg1 = arg1.tryConvert();
@@ -2871,14 +2735,12 @@ cGreaterOperator.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], arg1 = arg[1];
     if ( arg0 instanceof cArea ) {
         arg0 = arg0.cross( arguments[1].first );
-    }
-    else if ( arg0 instanceof cArea3D ){
+  } else if (arg0 instanceof cArea3D) {
         arg0 = arg0.cross( arguments[1].first, arguments[3] );
     }
     if ( arg1 instanceof cArea ) {
         arg1 = arg1.cross( arguments[1].first );
-    }
-    else if ( arg1 instanceof cArea3D ){
+  } else if (arg1 instanceof cArea3D) {
         arg1 = arg1.cross( arguments[1].first, arguments[3] );
     }
     arg0 = arg0.tryConvert(), arg1 = arg1.tryConvert();
@@ -2896,14 +2758,12 @@ cGreaterOrEqualOperator.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], arg1 = arg[1];
     if ( arg0 instanceof cArea ) {
         arg0 = arg0.cross( arguments[1].first );
-    }
-    else if ( arg0 instanceof cArea3D ){
+  } else if (arg0 instanceof cArea3D) {
         arg0 = arg0.cross( arguments[1].first, arguments[3] );
     }
     if ( arg1 instanceof cArea ) {
         arg1 = arg1.cross( arguments[1].first );
-    }
-    else if ( arg1 instanceof cArea3D ){
+  } else if (arg1 instanceof cArea3D) {
         arg1 = arg1.cross( arguments[1].first, arguments[3] );
     }
     arg0 = arg0.tryConvert(), arg1 = arg1.tryConvert();
@@ -2929,8 +2789,7 @@ var cFormulaOperators = {
             return this.name;
         };
         return r;
-    },
-    /* 50 is highest priority */
+  }, /* 50 is highest priority */
     ':'       : cRangeUnionOperator,
     ' '       : cRangeIntersectionOperator,
     'un_minus': cUnarMinusOperator,
@@ -3001,37 +2860,27 @@ _func[cElementType.cell] = [];
 _func[cElementType.number][cElementType.number] = function ( arg0, arg1, what ) {
     if ( what === ">" ) {
         return new cBool( arg0.getValue() > arg1.getValue() );
-    }
-    else if ( what === ">=" ) {
+  } else if (what === ">=") {
         return new cBool( arg0.getValue() >= arg1.getValue() );
-    }
-    else if ( what === "<" ) {
+  } else if (what === "<") {
         return new cBool( arg0.getValue() < arg1.getValue() );
-    }
-    else if ( what === "<=" ) {
+  } else if (what === "<=") {
         return new cBool( arg0.getValue() <= arg1.getValue() );
-    }
-    else if ( what === "=" ) {
+  } else if (what === "=") {
         return new cBool( arg0.getValue() === arg1.getValue() );
-    }
-    else if ( what === "<>" ) {
+  } else if (what === "<>") {
         return new cBool( arg0.getValue() !== arg1.getValue() );
-    }
-    else if ( what === "-" ) {
+  } else if (what === "-") {
         return new cNumber( arg0.getValue() - arg1.getValue() );
-    }
-    else if ( what === "+" ) {
+  } else if (what === "+") {
         return new cNumber( arg0.getValue() + arg1.getValue() );
-    }
-    else if ( what === "/" ) {
+  } else if (what === "/") {
         if ( arg1.getValue() !== 0 ) {
             return new cNumber( arg0.getValue() / arg1.getValue() );
-        }
-        else {
+    } else {
             return new cError( cErrorType.division_by_zero );
         }
-    }
-    else if ( what === "*" ) {
+  } else if (what === "*") {
         return new cNumber( arg0.getValue() * arg1.getValue() );
     }
     return new cError( cErrorType.wrong_value_type );
@@ -3040,17 +2889,13 @@ _func[cElementType.number][cElementType.number] = function ( arg0, arg1, what ) 
 _func[cElementType.number][cElementType.string] = function ( arg0, arg1, what ) {
     if ( what === ">" || what === ">=" ) {
         return new cBool( false );
-    }
-    else if ( what === "<" || what === "<=" ) {
+  } else if (what === "<" || what === "<=") {
         return new cBool( true );
-    }
-    else if ( what === "=" ) {
+  } else if (what === "=") {
         return new cBool( false );
-    }
-    else if ( what === "<>" ) {
+  } else if (what === "<>") {
         return new cBool( true );
-    }
-    else if ( what === "-" || what === "+" || what === "/" || what === "*" ) {
+  } else if (what === "-" || what === "+" || what === "/" || what === "*") {
         return new cError( cErrorType.wrong_value_type );
     }
     return new cError( cErrorType.wrong_value_type );
@@ -3060,43 +2905,35 @@ _func[cElementType.number][cElementType.bool] = function ( arg0, arg1, what ) {
     var _arg;
     if ( what === ">" || what === ">=" ) {
         return new cBool( false );
-    }
-    else if ( what === "<" || what === "<=" ) {
+  } else if (what === "<" || what === "<=") {
         return new cBool( true );
-    }
-    else if ( what === "=" ) {
+  } else if (what === "=") {
         return new cBool( false );
-    }
-    else if ( what === "<>" ) {
+  } else if (what === "<>") {
         return new cBool( true );
-    }
-    else if ( what === "-" ) {
+  } else if (what === "-") {
         _arg = arg1.tocNumber();
         if ( _arg instanceof cError ) {
             return _arg;
         }
         return new cNumber( arg0.getValue() - _arg.getValue() );
-    }
-    else if ( what === "+" ) {
+  } else if (what === "+") {
         _arg = arg1.tocNumber();
         if ( _arg instanceof cError ) {
             return _arg;
         }
         return new cNumber( arg0.getValue() + _arg.getValue() );
-    }
-    else if ( what === "/" ) {
+  } else if (what === "/") {
         _arg = arg1.tocNumber();
         if ( _arg instanceof cError ) {
             return _arg;
         }
         if ( _arg.getValue() !== 0 ) {
             return new cNumber( arg0.getValue() / _arg.getValue() );
-        }
-        else {
+    } else {
             return new cError( cErrorType.division_by_zero );
         }
-    }
-    else if ( what === "*" ) {
+  } else if (what === "*") {
         _arg = arg1.tocNumber();
         if ( _arg instanceof cError ) {
             return _arg;
@@ -3113,32 +2950,23 @@ _func[cElementType.number][cElementType.error] = function ( arg0, arg1 ) {
 _func[cElementType.number][cElementType.empty] = function ( arg0, arg1, what ) {
     if ( what === ">" ) {
         return new cBool( arg0.getValue() > 0 );
-    }
-    else if ( what === ">=" ) {
+  } else if (what === ">=") {
         return new cBool( arg0.getValue() >= 0 );
-    }
-    else if ( what === "<" ) {
+  } else if (what === "<") {
         return new cBool( arg0.getValue() < 0 );
-    }
-    else if ( what === "<=" ) {
+  } else if (what === "<=") {
         return new cBool( arg0.getValue() <= 0 );
-    }
-    else if ( what === "=" ) {
+  } else if (what === "=") {
         return new cBool( arg0.getValue() === 0 );
-    }
-    else if ( what === "<>" ) {
+  } else if (what === "<>") {
         return new cBool( arg0.getValue() !== 0 );
-    }
-    else if ( what === "-" ) {
+  } else if (what === "-") {
         return new cNumber( arg0.getValue() - 0 );
-    }
-    else if ( what === "+" ) {
+  } else if (what === "+") {
         return new cNumber( arg0.getValue() + 0 );
-    }
-    else if ( what === "/" ) {
+  } else if (what === "/") {
         return new cError( cErrorType.division_by_zero );
-    }
-    else if ( what === "*" ) {
+  } else if (what === "*") {
         return new cNumber( 0 );
     }
     return new cError( cErrorType.wrong_value_type );
@@ -3148,14 +2976,11 @@ _func[cElementType.number][cElementType.empty] = function ( arg0, arg1, what ) {
 _func[cElementType.string][cElementType.number] = function ( arg0, arg1, what ) {
     if ( what === ">" || what === ">=" ) {
         return new cBool( true );
-    }
-    else if ( what === "<" || what === "<=" || what === "=" ) {
+  } else if (what === "<" || what === "<=" || what === "=") {
         return new cBool( false );
-    }
-    else if ( what === "<>" ) {
+  } else if (what === "<>") {
         return new cBool( true );
-    }
-    else if ( what === "-" || what === "+" || what === "/" || what === "*" ) {
+  } else if (what === "-" || what === "+" || what === "/" || what === "*") {
         return new cError( cErrorType.wrong_value_type );
     }
     return new cError( cErrorType.wrong_value_type );
@@ -3165,23 +2990,17 @@ _func[cElementType.string][cElementType.string] = function ( arg0, arg1, what ) 
     var _arg0, _arg1;
     if ( what === ">" ) {
         return new cBool( arg0.getValue() > arg1.getValue() );
-    }
-    else if ( what === ">=" ) {
+  } else if (what === ">=") {
         return new cBool( arg0.getValue() >= arg1.getValue() );
-    }
-    else if ( what === "<" ) {
+  } else if (what === "<") {
         return new cBool( arg0.getValue() < arg1.getValue() );
-    }
-    else if ( what === "<=" ) {
+  } else if (what === "<=") {
         return new cBool( arg0.getValue() <= arg1.getValue() );
-    }
-    else if ( what === "=" ) {
+  } else if (what === "=") {
         return new cBool( arg0.getValue().toLowerCase() === arg1.getValue().toLowerCase() );
-    }
-    else if ( what === "<>" ) {
+  } else if (what === "<>") {
         return new cBool( arg0.getValue().toLowerCase() !== arg1.getValue().toLowerCase() );
-    }
-    else if ( what === "-" ) {
+  } else if (what === "-") {
         _arg0 = arg0.tocNumber();
         _arg1 = arg1.tocNumber();
         if ( _arg0 instanceof cError ) {
@@ -3191,8 +3010,7 @@ _func[cElementType.string][cElementType.string] = function ( arg0, arg1, what ) 
             return _arg1;
         }
         return new cNumber( _arg0.getValue() - _arg1.getValue() );
-    }
-    else if ( what === "+" ) {
+  } else if (what === "+") {
         _arg0 = arg0.tocNumber();
         _arg1 = arg1.tocNumber();
         if ( _arg0 instanceof cError ) {
@@ -3202,8 +3020,7 @@ _func[cElementType.string][cElementType.string] = function ( arg0, arg1, what ) 
             return _arg1;
         }
         return new cNumber( _arg0.getValue() + _arg1.getValue() );
-    }
-    else if ( what === "/" ) {
+  } else if (what === "/") {
         _arg0 = arg0.tocNumber();
         _arg1 = arg1.tocNumber();
         if ( _arg0 instanceof cError ) {
@@ -3216,8 +3033,7 @@ _func[cElementType.string][cElementType.string] = function ( arg0, arg1, what ) 
             return new cNumber( _arg0.getValue() / _arg1.getValue() );
         }
         return new cError( cErrorType.division_by_zero );
-    }
-    else if ( what === "*" ) {
+  } else if (what === "*") {
         _arg0 = arg0.tocNumber();
         _arg1 = arg1.tocNumber();
         if ( _arg0 instanceof cError ) {
@@ -3235,17 +3051,13 @@ _func[cElementType.string][cElementType.bool] = function ( arg0, arg1, what ) {
     var _arg0, _arg1;
     if ( what === ">" || what === ">=" ) {
         return new cBool( false );
-    }
-    else if ( what === "<" || what === "<=" ) {
+  } else if (what === "<" || what === "<=") {
         return new cBool( true );
-    }
-    else if ( what === "=" ) {
+  } else if (what === "=") {
         return new cBool( false );
-    }
-    else if ( what === "<>" ) {
+  } else if (what === "<>") {
         return new cBool( true );
-    }
-    else if ( what === "-" ) {
+  } else if (what === "-") {
         _arg0 = arg0.tocNumber();
         _arg1 = arg1.tocNumber();
         if ( _arg0 instanceof cError ) {
@@ -3255,8 +3067,7 @@ _func[cElementType.string][cElementType.bool] = function ( arg0, arg1, what ) {
             return _arg1;
         }
         return new cNumber( _arg0.getValue() - _arg1.getValue() );
-    }
-    else if ( what === "+" ) {
+  } else if (what === "+") {
         _arg0 = arg0.tocNumber();
         _arg1 = arg1.tocNumber();
         if ( _arg0 instanceof cError ) {
@@ -3266,8 +3077,7 @@ _func[cElementType.string][cElementType.bool] = function ( arg0, arg1, what ) {
             return _arg1;
         }
         return new cNumber( _arg0.getValue() + _arg1.getValue() );
-    }
-    else if ( what === "/" ) {
+  } else if (what === "/") {
         _arg0 = arg0.tocNumber();
         _arg1 = arg1.tocNumber();
         if ( _arg0 instanceof cError ) {
@@ -3280,8 +3090,7 @@ _func[cElementType.string][cElementType.bool] = function ( arg0, arg1, what ) {
             return new cNumber( _arg0.getValue() / _arg1.getValue() );
         }
         return new cError( cErrorType.division_by_zero );
-    }
-    else if ( what === "*" ) {
+  } else if (what === "*") {
         _arg0 = arg0.tocNumber();
         _arg1 = arg1.tocNumber();
         if ( _arg0 instanceof cError ) {
@@ -3302,23 +3111,17 @@ _func[cElementType.string][cElementType.error] = function ( arg0, arg1 ) {
 _func[cElementType.string][cElementType.empty] = function ( arg0, arg1, what ) {
     if ( what === ">" ) {
         return new cBool( arg0.getValue().length !== 0 );
-    }
-    else if ( what === ">=" ) {
+  } else if (what === ">=") {
         return new cBool( arg0.getValue().length >= 0 );
-    }
-    else if ( what === "<" ) {
+  } else if (what === "<") {
         return new cBool( false );
-    }
-    else if ( what === "<=" ) {
+  } else if (what === "<=") {
         return new cBool( arg0.getValue().length <= 0 );
-    }
-    else if ( what === "=" ) {
+  } else if (what === "=") {
         return new cBool( arg0.getValue().length === 0 );
-    }
-    else if ( what === "<>" ) {
+  } else if (what === "<>") {
         return new cBool( arg0.getValue().length !== 0 );
-    }
-    else if ( what === "-" || what === "+" || what === "/" || what === "*" ) {
+  } else if (what === "-" || what === "+" || what === "/" || what === "*") {
         return new cError( cErrorType.wrong_value_type );
     }
     return new cError( cErrorType.wrong_value_type );
@@ -3329,43 +3132,35 @@ _func[cElementType.bool][cElementType.number] = function ( arg0, arg1, what ) {
     var _arg;
     if ( what === ">" || what === ">=" ) {
         return new cBool( true );
-    }
-    else if ( what === "<" || what === "<=" ) {
+  } else if (what === "<" || what === "<=") {
         return new cBool( false );
-    }
-    else if ( what === "=" ) {
+  } else if (what === "=") {
         return new cBool( false );
-    }
-    else if ( what === "<>" ) {
+  } else if (what === "<>") {
         return new cBool( true );
-    }
-    else if ( what === "-" ) {
+  } else if (what === "-") {
         _arg = arg0.tocNumber();
         if ( _arg instanceof cError ) {
             return _arg;
         }
         return new cNumber( _arg.getValue() - arg1.getValue() );
-    }
-    else if ( what === "+" ) {
+  } else if (what === "+") {
         _arg = arg1.tocNumber();
         if ( _arg instanceof cError ) {
             return _arg;
         }
         return new cNumber( _arg.getValue() + arg1.getValue() );
-    }
-    else if ( what === "/" ) {
+  } else if (what === "/") {
         _arg = arg1.tocNumber();
         if ( _arg instanceof cError ) {
             return _arg;
         }
         if ( arg1.getValue() !== 0 ) {
             return new cNumber( _arg.getValue() / arg1.getValue() );
-        }
-        else {
+    } else {
             return new cError( cErrorType.division_by_zero );
         }
-    }
-    else if ( what === "*" ) {
+  } else if (what === "*") {
         _arg = arg1.tocNumber();
         if ( _arg instanceof cError ) {
             return _arg;
@@ -3379,33 +3174,27 @@ _func[cElementType.bool][cElementType.string] = function ( arg0, arg1, what ) {
     var _arg0, _arg1;
     if ( what === ">" || what === ">=" ) {
         return new cBool( true );
-    }
-    else if ( what === "<" || what === "<=" ) {
+  } else if (what === "<" || what === "<=") {
         return new cBool( false );
-    }
-    else if ( what === "=" ) {
+  } else if (what === "=") {
         return new cBool( false );
-    }
-    else if ( what === "<>" ) {
+  } else if (what === "<>") {
         return new cBool( true );
-    }
-    else if ( what === "-" ) {
+  } else if (what === "-") {
         _arg0 = arg0.tocNumber();
         _arg1 = arg1.tocNumber();
         if ( _arg1 instanceof cError ) {
             return _arg1;
         }
         return new cNumber( _arg0.getValue() - _arg1.getValue() );
-    }
-    else if ( what === "+" ) {
+  } else if (what === "+") {
         _arg0 = arg0.tocNumber();
         _arg1 = arg1.tocNumber();
         if ( _arg1 instanceof cError ) {
             return _arg1;
         }
         return new cNumber( _arg0.getValue() + _arg1.getValue() );
-    }
-    else if ( what === "/" ) {
+  } else if (what === "/") {
         _arg0 = arg0.tocNumber();
         _arg1 = arg1.tocNumber();
         if ( _arg1 instanceof cError ) {
@@ -3415,8 +3204,7 @@ _func[cElementType.bool][cElementType.string] = function ( arg0, arg1, what ) {
             return new cNumber( _arg0.getValue() / _arg1.getValue() );
         }
         return new cError( cErrorType.division_by_zero );
-    }
-    else if ( what === "*" ) {
+  } else if (what === "*") {
         _arg0 = arg0.tocNumber();
         _arg1 = arg1.tocNumber();
         if ( _arg1 instanceof cError ) {
@@ -3431,41 +3219,32 @@ _func[cElementType.bool][cElementType.bool] = function ( arg0, arg1, what ) {
     var _arg0, _arg1;
     if ( what === ">" ) {
         return    new cBool( arg0.value > arg1.value );
-    }
-    else if ( what === ">=" ) {
+  } else if (what === ">=") {
         return    new cBool( arg0.value >= arg1.value );
-    }
-    else if ( what === "<" ) {
+  } else if (what === "<") {
         return    new cBool( arg0.value < arg1.value );
-    }
-    else if ( what === "<=" ) {
+  } else if (what === "<=") {
         return    new cBool( arg0.value <= arg1.value );
-    }
-    else if ( what === "=" ) {
+  } else if (what === "=") {
         return    new cBool( arg0.value === arg1.value );
-    }
-    else if ( what === "<>" ) {
+  } else if (what === "<>") {
         return    new cBool( arg0.value !== arg1.value );
-    }
-    else if ( what === "-" ) {
+  } else if (what === "-") {
         _arg0 = arg0.tocNumber();
         _arg1 = arg1.tocNumber();
         return new cNumber( _arg0.getValue() - _arg1.getValue() );
-    }
-    else if ( what === "+" ) {
+  } else if (what === "+") {
         _arg0 = arg0.tocNumber();
         _arg1 = arg1.tocNumber();
         return new cNumber( _arg0.getValue() + _arg1.getValue() );
-    }
-    else if ( what === "/" ) {
+  } else if (what === "/") {
         if ( !arg1.value ) {
             return new cError( cErrorType.division_by_zero );
         }
         _arg0 = arg0.tocNumber();
         _arg1 = arg1.tocNumber();
         return new cNumber( _arg0.getValue() / _arg1.getValue() );
-    }
-    else if ( what === "*" ) {
+  } else if (what === "*") {
         _arg0 = arg0.tocNumber();
         _arg1 = arg1.tocNumber();
         return new cNumber( _arg0.getValue() * _arg1.getValue() );
@@ -3480,32 +3259,23 @@ _func[cElementType.bool][cElementType.error] = function ( arg0, arg1 ) {
 _func[cElementType.bool][cElementType.empty] = function ( arg0, arg1, what ) {
     if ( what === ">" ) {
         return new cBool( arg0.value > false );
-    }
-    else if ( what === ">=" ) {
+  } else if (what === ">=") {
         return new cBool( arg0.value >= false );
-    }
-    else if ( what === "<" ) {
+  } else if (what === "<") {
         return new cBool( arg0.value < false );
-    }
-    else if ( what === "<=" ) {
+  } else if (what === "<=") {
         return new cBool( arg0.value <= false );
-    }
-    else if ( what === "=" ) {
+  } else if (what === "=") {
         return new cBool( arg0.value === false );
-    }
-    else if ( what === "<>" ) {
+  } else if (what === "<>") {
         return new cBool( arg0.value !== false );
-    }
-    else if ( what === "-" ) {
+  } else if (what === "-") {
         return new cNumber( arg0.value ? 1 : 0 );
-    }
-    else if ( what === "+" ) {
+  } else if (what === "+") {
         return new cNumber( arg0.value ? 1 : 0 );
-    }
-    else if ( what === "/" ) {
+  } else if (what === "/") {
         return new cError( cErrorType.division_by_zero );
-    }
-    else if ( what === "*" ) {
+  } else if (what === "*") {
         return new cNumber( 0 );
     }
     return new cError( cErrorType.wrong_value_type );
@@ -3513,8 +3283,8 @@ _func[cElementType.bool][cElementType.empty] = function ( arg0, arg1, what ) {
 
 
 _func[cElementType.error][cElementType.number] = _func[cElementType.error][cElementType.string] =
-    _func[cElementType.error][cElementType.bool] = _func[cElementType.error][cElementType.error] =
-        _func[cElementType.error][cElementType.empty] = function ( arg0 ) {
+  _func[cElementType.error][cElementType.bool] =
+    _func[cElementType.error][cElementType.error] = _func[cElementType.error][cElementType.empty] = function(arg0) {
             return arg0;
         };
 
@@ -3522,35 +3292,26 @@ _func[cElementType.error][cElementType.number] = _func[cElementType.error][cElem
 _func[cElementType.empty][cElementType.number] = function ( arg0, arg1, what ) {
     if ( what === ">" ) {
         return new cBool( 0 > arg1.getValue() );
-    }
-    else if ( what === ">=" ) {
+  } else if (what === ">=") {
         return new cBool( 0 >= arg1.getValue() );
-    }
-    else if ( what === "<" ) {
+  } else if (what === "<") {
         return new cBool( 0 < arg1.getValue() );
-    }
-    else if ( what === "<=" ) {
+  } else if (what === "<=") {
         return new cBool( 0 <= arg1.getValue() );
-    }
-    else if ( what === "=" ) {
+  } else if (what === "=") {
         return new cBool( 0 === arg1.getValue() );
-    }
-    else if ( what === "<>" ) {
+  } else if (what === "<>") {
         return new cBool( 0 !== arg1.getValue() );
-    }
-    else if ( what === "-" ) {
+  } else if (what === "-") {
         return new cNumber( 0 - arg1.getValue() );
-    }
-    else if ( what === "+" ) {
+  } else if (what === "+") {
         return new cNumber( 0 + arg1.getValue() );
-    }
-    else if ( what === "/" ) {
+  } else if (what === "/") {
         if ( arg1.getValue() === 0 ) {
             return new cError( cErrorType.not_numeric );
         }
         return new cNumber( 0 );
-    }
-    else if ( what === "*" ) {
+  } else if (what === "*") {
         return new cNumber( 0 );
     }
     return new cError( cErrorType.wrong_value_type );
@@ -3559,23 +3320,17 @@ _func[cElementType.empty][cElementType.number] = function ( arg0, arg1, what ) {
 _func[cElementType.empty][cElementType.string] = function ( arg0, arg1, what ) {
     if ( what === ">" ) {
         return new cBool( 0 > arg1.getValue().length );
-    }
-    else if ( what === ">=" ) {
+  } else if (what === ">=") {
         return new cBool( 0 >= arg1.getValue().length );
-    }
-    else if ( what === "<" ) {
+  } else if (what === "<") {
         return new cBool( 0 < arg1.getValue().length );
-    }
-    else if ( what === "<=" ) {
+  } else if (what === "<=") {
         return new cBool( 0 <= arg1.getValue().length );
-    }
-    else if ( what === "=" ) {
+  } else if (what === "=") {
         return new cBool( 0 === arg1.getValue().length );
-    }
-    else if ( what === "<>" ) {
+  } else if (what === "<>") {
         return new cBool( 0 !== arg1.getValue().length );
-    }
-    else if ( what === "-" || what === "+" || what === "/" || what === "*" ) {
+  } else if (what === "-" || what === "+" || what === "/" || what === "*") {
         return new cError( cErrorType.wrong_value_type );
     }
     return new cError( cErrorType.wrong_value_type );
@@ -3584,35 +3339,26 @@ _func[cElementType.empty][cElementType.string] = function ( arg0, arg1, what ) {
 _func[cElementType.empty][cElementType.bool] = function ( arg0, arg1, what ) {
     if ( what === ">" ) {
         return new cBool( false > arg1.value );
-    }
-    else if ( what === ">=" ) {
+  } else if (what === ">=") {
         return new cBool( false >= arg1.value );
-    }
-    else if ( what === "<" ) {
+  } else if (what === "<") {
         return new cBool( false < arg1.value );
-    }
-    else if ( what === "<=" ) {
+  } else if (what === "<=") {
         return new cBool( false <= arg1.value );
-    }
-    else if ( what === "=" ) {
+  } else if (what === "=") {
         return new cBool( arg1.value === false );
-    }
-    else if ( what === "<>" ) {
+  } else if (what === "<>") {
         return new cBool( arg1.value !== false );
-    }
-    else if ( what === "-" ) {
+  } else if (what === "-") {
         return new cNumber( 0 - arg1.value ? 1.0 : 0.0 );
-    }
-    else if ( what === "+" ) {
+  } else if (what === "+") {
         return new cNumber( arg1.value ? 1.0 : 0.0 );
-    }
-    else if ( what === "/" ) {
+  } else if (what === "/") {
         if ( arg1.value ) {
             return new cNumber( 0 );
         }
         return new cError( cErrorType.not_numeric );
-    }
-    else if ( what === "*" ) {
+  } else if (what === "*") {
         return new cNumber( 0 );
     }
     return new cError( cErrorType.wrong_value_type );
@@ -3625,17 +3371,13 @@ _func[cElementType.empty][cElementType.error] = function ( arg0, arg1 ) {
 _func[cElementType.empty][cElementType.empty] = function ( arg0, arg1, what ) {
     if ( what === ">" || what === "<" || what === "<>" ) {
         return new cBool( false );
-    }
-    else if ( what === ">=" || what === "<=" || what === "=" ) {
+  } else if (what === ">=" || what === "<=" || what === "=") {
         return new cBool( true );
-    }
-    else if ( what === "-" || what === "+" ) {
+  } else if (what === "-" || what === "+") {
         return new cNumber( 0 );
-    }
-    else if ( what === "/" ) {
+  } else if (what === "/") {
         return new cError( cErrorType.not_numeric );
-    }
-    else if ( what === "*" ) {
+  } else if (what === "*") {
         return new cNumber( 0 );
     }
     return new cError( cErrorType.wrong_value_type );
@@ -3644,7 +3386,8 @@ _func[cElementType.empty][cElementType.empty] = function ( arg0, arg1, what ) {
 
 _func[cElementType.cellsRange][cElementType.number] = _func[cElementType.cellsRange][cElementType.string] =
     _func[cElementType.cellsRange][cElementType.bool] = _func[cElementType.cellsRange][cElementType.error] =
-        _func[cElementType.cellsRange][cElementType.array] = _func[cElementType.cellsRange][cElementType.empty] = function ( arg0, arg1, what, cellAddress ) {
+    _func[cElementType.cellsRange][cElementType.array] =
+      _func[cElementType.cellsRange][cElementType.empty] = function(arg0, arg1, what, cellAddress) {
             var cross = arg0.cross( cellAddress );
             return _func[cross.type][arg1.type]( cross, arg1, what );
         };
@@ -3652,15 +3395,15 @@ _func[cElementType.cellsRange][cElementType.number] = _func[cElementType.cellsRa
 
 _func[cElementType.number][cElementType.cellsRange] = _func[cElementType.string][cElementType.cellsRange] =
     _func[cElementType.bool][cElementType.cellsRange] = _func[cElementType.error][cElementType.cellsRange] =
-        _func[cElementType.array][cElementType.cellsRange] = _func[cElementType.empty][cElementType.cellsRange] = function ( arg0, arg1, what, cellAddress ) {
+    _func[cElementType.array][cElementType.cellsRange] =
+      _func[cElementType.empty][cElementType.cellsRange] = function(arg0, arg1, what, cellAddress) {
             var cross = arg1.cross( cellAddress );
             return _func[arg0.type][cross.type]( arg0, cross, what );
         };
 
 
 _func[cElementType.cellsRange][cElementType.cellsRange] = function ( arg0, arg1, what, cellAddress ) {
-    var cross1 = arg0.cross( cellAddress ),
-        cross2 = arg1.cross( cellAddress );
+  var cross1 = arg0.cross(cellAddress), cross2 = arg1.cross(cellAddress);
     return _func[cross1.type][cross2.type]( cross1, cross2, what );
 };
 
@@ -3723,8 +3466,7 @@ _func.binarySearch = function ( sElem, arrTagert, regExp ) {
         }
         if ( isString ) {
             arrTagertOneType[i] = new cString( arrTagert[i].toString().toLowerCase() );
-        }
-        else {
+    } else {
             arrTagertOneType[i] = arrTagert[i].tocNumber();
         }
     }
@@ -3732,11 +3474,9 @@ _func.binarySearch = function ( sElem, arrTagert, regExp ) {
     if ( arrTagert.length === 0 ) {
         return -1;
         /* массив пуст */
-    }
-    else if ( arrTagert[0].value > sElem.value ) {
+  } else if (arrTagert[0].value > sElem.value) {
         return -2;
-    }
-    else if ( arrTagert[arrTagert.length - 1].value < sElem.value ) {
+  } else if (arrTagert[arrTagert.length - 1].value < sElem.value) {
         return arrTagert.length - 1;
     }
 
@@ -3744,8 +3484,7 @@ _func.binarySearch = function ( sElem, arrTagert, regExp ) {
         mid = Math.floor( first + (last - first) / 2 );
         if ( sElem.value <= arrTagert[mid].value || ( regExp && regExp.test( arrTagert[mid].value ) ) ) {
             last = mid;
-        }
-        else {
+    } else {
             first = mid + 1;
         }
     }
@@ -3754,8 +3493,7 @@ _func.binarySearch = function ( sElem, arrTagert, regExp ) {
     if ( /* last<n &&*/ arrTagert[last].value === sElem.value ) {
         return last;
         /* Искомый элемент найден. last - искомый индекс */
-    }
-    else {
+  } else {
         return last - 1;
         /* Искомый элемент не найден. Но если вам вдруг надо его вставить со сдвигом, то его место - last.    */
     }
@@ -3801,8 +3539,7 @@ _func[cElementType.number][cElementType.cell] = function ( arg0, arg1, what, cel
         {
             if ( arg1.getValue() !== 0 ) {
                 return new cNumber( arg0.getValue() / ar1.getValue() );
-            }
-            else {
+      } else {
                 return new cError( cErrorType.division_by_zero );
             }
         }
@@ -3856,8 +3593,7 @@ _func[cElementType.cell][cElementType.number] = function ( arg0, arg1, what, cel
         {
             if ( arg1.getValue() !== 0 ) {
                 return new cNumber( ar0.getValue() / arg1.getValue() );
-            }
-            else {
+      } else {
                 return new cError( cErrorType.division_by_zero );
             }
         }
@@ -3910,8 +3646,7 @@ _func[cElementType.cell][cElementType.cell] = function ( arg0, arg1, what, cellA
         {
             if ( arg1.getValue() !== 0 ) {
                 return new cNumber( ar0.getValue() / arg1.getValue() );
-            }
-            else {
+      } else {
                 return new cError( cErrorType.division_by_zero );
             }
         }
@@ -3962,12 +3697,15 @@ parserFormula.prototype = {
     constructor: parserFormula,
 
     clone: function ( formula, cellId, ws ) {
-        if ( null == formula )
+    if (null == formula) {
             formula = this.Formula;
-        if ( null == cellId )
+    }
+    if (null == cellId) {
             cellId = this.cellId;
-        if ( null == ws )
+    }
+    if (null == ws) {
             ws = this.ws;
+    }
         var oRes = new parserFormula( formula, cellId, ws );
         oRes.is3D = this.is3D;
         oRes.value = this.value;
@@ -3975,11 +3713,12 @@ parserFormula.prototype = {
         oRes.elemArr = [];
         for ( var i = 0, length = this.outStack.length; i < length; i++ ) {
             var oCurElem = this.outStack[i];
-            if ( oCurElem.clone )
+      if (oCurElem.clone) {
                 oRes.outStack.push( oCurElem.clone() );
-            else
+      } else {
                 oRes.outStack.push( oCurElem );
         }
+    }
         oRes.RefPos = [];
         oRes.operand_str = this.operand_str;
         oRes.error = this.error.concat();
@@ -4022,8 +3761,7 @@ parserFormula.prototype = {
                 case 1:
                     if ( operand_str.indexOf( "$" ) > 0 ) {
                         found_operand.isAbsoluteRow1 = true;
-                    }
-                    else {
+          } else {
                         found_operand.isAbsoluteCol1 = true;
                     }
                     break;
@@ -4036,9 +3774,8 @@ parserFormula.prototype = {
         }
 
         function checkAbsArea( operand_str, found_operand ) {
-            var splitOpStr = operand_str.split( ":" ),
-                splitOpStr0 = splitOpStr[0].match( /\$/g ) || [],
-                splitOpStr1 = splitOpStr[1].match( /\$/g ) || [];
+      var splitOpStr = operand_str.split(":"), splitOpStr0 = splitOpStr[0].match(/\$/g) ||
+        [], splitOpStr1 = splitOpStr[1].match(/\$/g) || [];
 
             found_operand.isAbsolute = true;
 
@@ -4046,8 +3783,7 @@ parserFormula.prototype = {
                 case 1:
                     if ( splitOpStr[0].indexOf( "$" ) > 0 ) {
                         found_operand.isAbsoluteRow1 = true;
-                    }
-                    else {
+          } else {
                         found_operand.isAbsoluteCol1 = true;
                     }
                     break;
@@ -4061,8 +3797,7 @@ parserFormula.prototype = {
                 case 1:
                     if ( splitOpStr[1].indexOf( "$" ) > 0 ) {
                         found_operand.isAbsoluteRow2 = true;
-                    }
-                    else {
+          } else {
                         found_operand.isAbsoluteCol2 = true;
                     }
                     break;
@@ -4075,16 +3810,16 @@ parserFormula.prototype = {
 
         this.pCurrPos = 0;
 
-        if ( this.isParsed )
+    if (this.isParsed) {
             return this.isParsed;
+    }
         /*
          Парсер формулы реализует алгоритм перевода инфиксной формы записи выражения в постфиксную или Обратную Польскую Нотацию.
          Что упрощает вычисление результата формулы.
          При разборе формулы важен порядок проверки очередной части выражения на принадлежность тому или иному типу.
          */
         this.operand_expected = true;
-        var wasLeftParentheses = false, wasRigthParentheses = false,
-            found_operand = null, _3DRefTmp = null, _tableTMP = null;
+    var wasLeftParentheses = false, wasRigthParentheses = false, found_operand = null, _3DRefTmp = null, _tableTMP = null;
         var cFormulaList = (local && cFormulaFunctionLocalized) ? cFormulaFunctionLocalized : cFormulaFunction;
         while ( this.pCurrPos < this.Formula.length ) {
             this.operand_str = this.Formula[this.pCurrPos];
@@ -4094,7 +3829,8 @@ parserFormula.prototype = {
              }*/
 
             /* Operators*/
-            if (parserHelp.isOperator.call(this, this.Formula, this.pCurrPos) || parserHelp.isNextPtg.call(this, this.Formula, this.pCurrPos)) {
+      if (parserHelp.isOperator.call(this, this.Formula, this.pCurrPos) ||
+        parserHelp.isNextPtg.call(this, this.Formula, this.pCurrPos)) {
                 wasLeftParentheses = false;
                 wasRigthParentheses = false;
                 found_operator = null;
@@ -4103,47 +3839,37 @@ parserFormula.prototype = {
                     if ( this.operand_str == "-" ) {
                         this.operand_expected = true;
                         found_operator = new cFormulaOperators['un_minus']();
-                    }
-                    else if ( this.operand_str == "+" ) {
+          } else if (this.operand_str == "+") {
                         this.operand_expected = true;
                         found_operator = new cFormulaOperators['un_plus']();
-                    }
-					else if( this.operand_str == " " ){
+          } else if (this.operand_str == " ") {
 						continue;
-					}
-                    else {
+          } else {
                         this.error.push( c_oAscError.ID.FrmlWrongOperator );
                         this.outStack = [];
                         this.elemArr = [];
                         return false;
                     }
-                }
-                else if ( !this.operand_expected ) {
+        } else if (!this.operand_expected) {
                     if ( this.operand_str == "-" ) {
                         this.operand_expected = true;
                         found_operator = new cFormulaOperators['-']();
-                    }
-                    else if ( this.operand_str == "+" ) {
+          } else if (this.operand_str == "+") {
                         this.operand_expected = true;
                         found_operator = new cFormulaOperators['+']();
-                    }
-                    else if ( this.operand_str == ":" ) {
+          } else if (this.operand_str == ":") {
                         this.operand_expected = true;
                         found_operator = new cFormulaOperators[':']();
-                    }
-                    else if ( this.operand_str == "%" ) {
+          } else if (this.operand_str == "%") {
                         this.operand_expected = false;
                         found_operator = new cFormulaOperators['%']();
-                    }
-					else if ( this.operand_str == " " && this.pCurrPos == this.Formula.length) {
+          } else if (this.operand_str == " " && this.pCurrPos == this.Formula.length) {
 						continue;
-					}
-                    else {
+          } else {
                         if ( this.operand_str in cFormulaOperators ) {
                             found_operator = new cFormulaOperators[this.operand_str]();
                             this.operand_expected = true;
-                        }
-                        else {
+            } else {
                             this.error.push( c_oAscError.ID.FrmlWrongOperator );
                             this.outStack = [];
                             this.elemArr = [];
@@ -4156,8 +3882,7 @@ parserFormula.prototype = {
                     found_operator.isRightAssociative ?
                         ( found_operator.priority < this.elemArr[this.elemArr.length - 1].priority ) :
                         ( found_operator.priority <= this.elemArr[this.elemArr.length - 1].priority )
-                    )
-                    ) {
+        )) {
                     this.outStack.push( this.elemArr.pop() );
                 }
                 this.elemArr.push( found_operator );
@@ -4165,8 +3890,7 @@ parserFormula.prototype = {
                 found_operand = null;
             }
 
-            /* Left & Right Parentheses */
-            else if ( parserHelp.isLeftParentheses.call( this, this.Formula, this.pCurrPos ) ) {
+      /* Left & Right Parentheses */ else if (parserHelp.isLeftParentheses.call(this, this.Formula, this.pCurrPos)) {
                 if ( wasRigthParentheses || found_operand ) {
                     this.elemArr.push( new cMultOperator() );
                 }
@@ -4182,15 +3906,14 @@ parserFormula.prototype = {
                 this.f.push( new cFormulaOperators[this.operand_str]() );
                 wasRigthParentheses = true;
                 var top_elem = null;
-                if ( this.elemArr.length != 0 && ( (top_elem = this.elemArr[this.elemArr.length - 1]).name == "(" ) && this.operand_expected ) {
+        if (this.elemArr.length != 0 && ( (top_elem = this.elemArr[this.elemArr.length - 1]).name == "(" ) &&
+          this.operand_expected) {
                     if ( top_elem.getArguments() > 1 ) {
                         this.outStack.push( new cEmpty() );
-                    }
-                    else {
+          } else {
                         top_elem.DecrementArguments();
                     }
-                }
-                else {
+        } else {
                     while ( this.elemArr.length != 0 && !((top_elem = this.elemArr[this.elemArr.length - 1]).name == "(" ) ) {
                         if ( top_elem.name in cFormulaOperators && this.operand_expected ) {
                             this.error.push( c_oAscError.ID.FrmlOperandExpected );
@@ -4218,21 +3941,19 @@ parserFormula.prototype = {
                         this.elemArr = [];
                         this.error.push( c_oAscError.ID.FrmlWrongMaxArgument );
                         return false;
-                    }
-                    else {
+          } else {
                         if ( top_elem.getArguments() >= func.getMinArguments() ) {
                             func.setArgumentsCount( top_elem.getArguments() );
-                        }
-                        else {
+            } else {
                             this.outStack = [];
                             this.elemArr = [];
                             this.error.push( c_oAscError.ID.FrmlWrongCountArgument );
                             return false;
                         }
                     }
-                }
-                else {
-                    if ( wasLeftParentheses && (!this.elemArr[this.elemArr.length - 1] || this.elemArr[this.elemArr.length - 1].name == "(" ) ) {
+        } else {
+          if (wasLeftParentheses &&
+            (!this.elemArr[this.elemArr.length - 1] || this.elemArr[this.elemArr.length - 1].name == "(" )) {
                         this.outStack = [];
                         this.elemArr = [];
                         this.error.push( c_oAscError.ID.FrmlAnotherParsingError );
@@ -4248,8 +3969,7 @@ parserFormula.prototype = {
                 wasLeftParentheses = false;
             }
 
-            /*Comma & arguments union*/
-            else if ( parserHelp.isComma.call( this, this.Formula, this.pCurrPos ) ) {
+      /*Comma & arguments union*/ else if (parserHelp.isComma.call(this, this.Formula, this.pCurrPos)) {
                 wasLeftParentheses = false;
                 wasRigthParentheses = false;
                 var stackLength = this.elemArr.length, top_elem = null;
@@ -4259,15 +3979,13 @@ parserFormula.prototype = {
                     top_elem = this.elemArr[stackLength - 1];
                     wasLeftParentheses = true;
                     this.operand_expected = false;
-                }
-                else {
+        } else {
                     while ( stackLength != 0 ) {
                         top_elem = this.elemArr[stackLength - 1];
                         if ( top_elem.name == "(" ) {
                             wasLeftParentheses = true;
                             break;
-                        }
-                        else {
+            } else {
                             this.outStack.push( this.elemArr.pop() );
                             stackLength = this.elemArr.length;
                         }
@@ -4291,32 +4009,27 @@ parserFormula.prototype = {
                 this.operand_expected = true;
             }
 
-            /* Array */
-            else if ( parserHelp.isLeftBrace.call(this, this.Formula, this.pCurrPos) ) {
+      /* Array */ else if (parserHelp.isLeftBrace.call(this, this.Formula, this.pCurrPos)) {
                 wasLeftParentheses = false;
                 wasRigthParentheses = false;
                 var arr = new cArray(), operator = { isOperator: false, operatorName: ""};
-                while ( this.pCurrPos < this.Formula.length && !parserHelp.isRightBrace.call(this, this.Formula, this.pCurrPos) ) {
+        while (this.pCurrPos < this.Formula.length &&
+        !parserHelp.isRightBrace.call(this, this.Formula, this.pCurrPos)) {
                     if ( parserHelp.isArraySeparator.call( this, this.Formula, this.pCurrPos, digitDelim ) ) {
                         if ( this.operand_str == (digitDelim ? arrayRowSeparator : arrayRowSeparatorDef) ) {
                             arr.addRow();
                         }
-                    }
-                    else if ( parserHelp.isBoolean.call( this, this.Formula, this.pCurrPos, local ) ) {
+          } else if (parserHelp.isBoolean.call(this, this.Formula, this.pCurrPos, local)) {
                         arr.addElement( new cBool( this.operand_str ) );
-                    }
-                    else if ( parserHelp.isString.call( this, this.Formula, this.pCurrPos ) ) {
+          } else if (parserHelp.isString.call(this, this.Formula, this.pCurrPos)) {
                         arr.addElement( new cString( this.operand_str ) );
-                    }
-                    else if ( parserHelp.isError.call( this, this.Formula, this.pCurrPos ) ) {
+          } else if (parserHelp.isError.call(this, this.Formula, this.pCurrPos)) {
                         arr.addElement( new cError( this.operand_str ) );
-                    }
-                    else if ( parserHelp.isNumber.call( this, this.Formula, this.pCurrPos, digitDelim ) ) {
+          } else if (parserHelp.isNumber.call(this, this.Formula, this.pCurrPos, digitDelim)) {
                         if ( operator.isOperator ) {
                             if ( operator.operatorName == "+" || operator.operatorName == "-" ) {
 								this.operand_str = operator.operatorName + "" + this.operand_str
-                            }
-                            else {
+              } else {
                                 this.outStack = [];
                                 this.elemArr = [];
                                 this.error.push( c_oAscError.ID.FrmlAnotherParsingError );
@@ -4325,12 +4038,10 @@ parserFormula.prototype = {
                         }
                         arr.addElement( new cNumber( parseFloat( this.operand_str ) ) );
                         operator = { isOperator: false, operatorName: ""};
-                    }
-                    else if (parserHelp.isOperator.call(this, this.Formula, this.pCurrPos)) {
+          } else if (parserHelp.isOperator.call(this, this.Formula, this.pCurrPos)) {
                         operator.isOperator = true;
                         operator.operatorName = this.operand_str;
-                    }
-					else{
+          } else {
 						this.outStack = [];
 						this.elemArr = [];
 						/*в массиве используется недопустимый параметр*/
@@ -4349,8 +4060,7 @@ parserFormula.prototype = {
                 this.operand_expected = false;
             }
 
-            /* Operands*/
-            else {
+      /* Operands*/ else {
 
                 found_operand = null;
 
@@ -4370,25 +4080,23 @@ parserFormula.prototype = {
                     found_operand = new cBool( this.operand_str );
                 }
 
-                /* Strings */
-                else if ( parserHelp.isString.call( this, this.Formula, this.pCurrPos ) ) {
+        /* Strings */ else if (parserHelp.isString.call(this, this.Formula, this.pCurrPos)) {
                     found_operand = new cString( this.operand_str );
                 }
 
-                /* Errors */
-                else if ( parserHelp.isError.call( this, this.Formula, this.pCurrPos, local ) ) {
+        /* Errors */ else if (parserHelp.isError.call(this, this.Formula, this.pCurrPos, local)) {
                     found_operand = new cError( this.operand_str );
                 }
 
-                /* Referens to 3D area: Sheet1:Sheet3!A1:B3, Sheet1:Sheet3!B3, Sheet1!B3*/
-                else if ( (_3DRefTmp = parserHelp.is3DRef.call( this, this.Formula, this.pCurrPos ))[0] ) {
+        /* Referens to 3D area: Sheet1:Sheet3!A1:B3, Sheet1:Sheet3!B3, Sheet1!B3*/ else if ((_3DRefTmp =
+            parserHelp.is3DRef.call(this, this.Formula, this.pCurrPos))[0]) {
 
                     this.is3D = true;
-                    var _wsFrom = _3DRefTmp[1],
-                        _wsTo = ( (_3DRefTmp[2] !== null) && (_3DRefTmp[2] !== undefined) ) ? _3DRefTmp[2] : _wsFrom,
-                        wsF = this.wb.getWorksheetByName( _wsFrom ),
-                        wsT = this.wb.getWorksheetByName( _wsTo ),
-                        pos = {start: this.pCurrPos - this.operand_str.length - 1, end: this.pCurrPos, index: this.outStack.length};
+          var _wsFrom = _3DRefTmp[1], _wsTo = ( (_3DRefTmp[2] !== null) && (_3DRefTmp[2] !== undefined) ) ?
+            _3DRefTmp[2] : _wsFrom, wsF = this.wb.getWorksheetByName(_wsFrom), wsT = this.wb.getWorksheetByName(
+            _wsTo), pos = {
+            start: this.pCurrPos - this.operand_str.length - 1, end: this.pCurrPos, index: this.outStack.length
+          };
 
                     if ( !(wsF && wsT) ) {
                         this.error.push( c_oAscError.ID.FrmlWrongReferences );
@@ -4402,14 +4110,12 @@ parserFormula.prototype = {
                         pos.oper = found_operand;
                         this.RefPos.push( pos );
                         checkAbsArea( this.operand_str, found_operand );
-                    }
-                    else if ( parserHelp.isRef.call( this, this.Formula, this.pCurrPos ) ) {
+          } else if (parserHelp.isRef.call(this, this.Formula, this.pCurrPos)) {
                         pos.end = this.pCurrPos;
                         if ( _wsTo != _wsFrom ) {
                             found_operand = new cArea3D( this.operand_str.toUpperCase(), _wsFrom, _wsTo, this.wb );
                             pos.oper = found_operand;
-                        }
-                        else {
+            } else {
                             found_operand = new cRef3D( this.operand_str.toUpperCase(), _wsFrom, this.wb );
                             pos.oper = found_operand;
                         }
@@ -4417,26 +4123,33 @@ parserFormula.prototype = {
                         if ( this.operand_str.indexOf( "$" ) > -1 ) {
                             checkAbsRef( this.operand_str, found_operand );
                         }
-                    }
-                    else if ( parserHelp.isName.call( this, this.Formula, this.pCurrPos ) ) {
+          } else if (parserHelp.isName.call(this, this.Formula, this.pCurrPos)) {
                         found_operand = new cName3D( this.operand_str, _wsFrom, this.wb, wsF );
                     }
                     this.countRef++;
                 }
 
-                /* Referens to cells area A1:A10 */
-                else if ( parserHelp.isArea.call( this, this.Formula, this.pCurrPos ) ) {
+        /* Referens to cells area A1:A10 */ else if (parserHelp.isArea.call(this, this.Formula, this.pCurrPos)) {
                     found_operand = new cArea( this.operand_str.toUpperCase(), this.ws );
-                    this.RefPos.push( {start:this.pCurrPos - this.operand_str.length, end:this.pCurrPos, index:this.outStack.length, oper:found_operand } );
+          this.RefPos.push({
+            start: this.pCurrPos - this.operand_str.length,
+            end: this.pCurrPos,
+            index: this.outStack.length,
+            oper: found_operand
+          });
                     if ( this.operand_str.indexOf( "$" ) > -1 ) {
                         checkAbsArea( this.operand_str, found_operand );
                     }
                     this.countRef++;
                 }
-                /* Referens to cell A4 */
-                else if ( parserHelp.isRef.call( this, this.Formula, this.pCurrPos ) ) {
+        /* Referens to cell A4 */ else if (parserHelp.isRef.call(this, this.Formula, this.pCurrPos)) {
                     found_operand = new cRef( this.operand_str.toUpperCase(), this.ws );
-                    this.RefPos.push( {start:this.pCurrPos - this.operand_str.length, end:this.pCurrPos, index:this.outStack.length, oper:found_operand } );
+          this.RefPos.push({
+            start: this.pCurrPos - this.operand_str.length,
+            end: this.pCurrPos,
+            index: this.outStack.length,
+            oper: found_operand
+          });
                     if ( this.operand_str.indexOf( "$" ) > -1 ) {
                         checkAbsRef( this.operand_str, found_operand )
                     }
@@ -4447,7 +4160,13 @@ parserFormula.prototype = {
                     found_operand = new cStrucTable( _tableTMP, this.wb, this.ws, this.ws.getCell( this.cellAddress ) );
 
 					if(found_operand.type!=cElementType.error) {
-						this.RefPos.push( {start: this.pCurrPos - this.operand_str.length, end: this.pCurrPos, index: this.outStack.length, isName: true, oper:found_operand } );
+            this.RefPos.push({
+              start: this.pCurrPos - this.operand_str.length,
+              end: this.pCurrPos,
+              index: this.outStack.length,
+              isName: true,
+              oper: found_operand
+            });
 						this.countRef++;
 					}
 
@@ -4462,22 +4181,28 @@ parserFormula.prototype = {
 
                 }
 
-                /* Referens to DefinedNames */
-                else if ( parserHelp.isName.call( this, this.Formula, this.pCurrPos, this.wb, this.ws )[0] ) {
+        /* Referens to DefinedNames */ else if (parserHelp.isName.call(this, this.Formula, this.pCurrPos, this.wb,
+            this.ws)[0]) {
                     found_operand = new cName( this.operand_str, this.wb, this.ws );
                     if ( found_operand.defName && found_operand.defName.isTable ) {
-                        found_operand = new cStrucTable( parserHelp.isTable( this.operand_str + "[]", 0 ), this.wb, this.ws, this.ws.getCell( this.cellAddress ) );
+            found_operand =
+              new cStrucTable(parserHelp.isTable(this.operand_str + "[]", 0), this.wb, this.ws, this.ws.getCell(
+                this.cellAddress));
                     }
-					this.RefPos.push( {start:this.pCurrPos - this.operand_str.length, end:this.pCurrPos, index:this.outStack.length, isName: true, oper:found_operand } );
+          this.RefPos.push({
+            start: this.pCurrPos - this.operand_str.length,
+            end: this.pCurrPos,
+            index: this.outStack.length,
+            isName: true,
+            oper: found_operand
+          });
                     this.countRef++;
                 }
 
-                /* Numbers*/
-                else if ( parserHelp.isNumber.call( this, this.Formula, this.pCurrPos, digitDelim ) ) {
+        /* Numbers*/ else if (parserHelp.isNumber.call(this, this.Formula, this.pCurrPos, digitDelim)) {
                     if ( this.operand_str != "." ) {
                         found_operand = new cNumber( parseFloat( this.operand_str ) );
-                    }
-                    else {
+          } else {
                         this.error.push( c_oAscError.ID.FrmlAnotherParsingError );
                         this.outStack = [];
                         this.elemArr = [];
@@ -4485,20 +4210,18 @@ parserFormula.prototype = {
                     }
                 }
 
-                /* Function*/
-                else if ( parserHelp.isFunc.call( this, this.Formula, this.pCurrPos ) ) {
+        /* Function*/ else if (parserHelp.isFunc.call(this, this.Formula, this.pCurrPos)) {
 
                     if ( wasRigthParentheses && this.operand_expected ) {
                         this.elemArr.push( new cMultOperator() );
                     }
 
                     var found_operator = null, operandStr = this.operand_str.replace( rx_sFuncPref, "" ).toUpperCase();
-                    if ( operandStr in cFormulaList )
+          if (operandStr in cFormulaList) {
                         found_operator = new cFormulaList[operandStr]();
-                    else if ( operandStr in cAllFormulaFunction ) {
+          } else if (operandStr in cAllFormulaFunction) {
                         found_operator = new cAllFormulaFunction[operandStr]();
-                    }
-                    else {
+          } else {
                         found_operator = new cBaseFunction( operandStr );
                         found_operator.isXLFN = ( this.operand_str.indexOf( "_xlfn." ) === 0 );
                     }
@@ -4506,8 +4229,7 @@ parserFormula.prototype = {
                     if ( found_operator != null ) {
                         this.elemArr.push( found_operator );
                         this.f.push( found_operator );
-                    }
-                    else {
+          } else {
                         this.error.push( c_oAscError.ID.FrmlWrongFunctionName );
                         this.outStack = [];
                         this.elemArr = [];
@@ -4523,8 +4245,7 @@ parserFormula.prototype = {
                     this.f.push( found_operand );
                     this.operand_expected = false;
                     found_operand = null
-                }
-                else {
+        } else {
                     if ( this.operand_str == null || this.operand_str == "'" ) {
                         this.outStack.push( new cError( cErrorType.wrong_name ) );
                         this.error.push( c_oAscError.ID.FrmlAnotherParsingError );
@@ -4562,14 +4283,12 @@ parserFormula.prototype = {
             if ( operand.name == "(" && !this.parenthesesNotEnough ) {
                 this.Formula += ")";
                 parenthesesNotEnough = true;
-            }
-            else if ( operand.name == "(" || operand.name == ")" ) {
+      } else if (operand.name == "(" || operand.name == ")") {
                 this.outStack = [];
                 this.elemArr = [];
                 this.error.push( c_oAscError.ID.FrmlWrongCountParentheses );
                 return false;
-            }
-            else {
+      } else {
                 this.outStack.push( operand );
             }
         }
@@ -4581,8 +4300,7 @@ parserFormula.prototype = {
 
         if ( this.outStack.length != 0 ) {
             return this.isParsed = true;
-        }
-        else {
+    } else {
             return this.isParsed = false;
         }
     },
@@ -4601,29 +4319,25 @@ parserFormula.prototype = {
                 if ( elemArr.length < currentElement.getArguments() ) {
                     elemArr = [];
                     return this.value = new cError( cErrorType.unsupported_function );
-                }
-                else {
+        } else {
                     var arg = [];
                     for ( var ind = 0; ind < currentElement.getArguments(); ind++ ) {
                         arg.unshift( elemArr.pop() );
                     }
-                    _tmp = currentElement.Calculate( arg, this.ws.getCell( this.cellAddress ), isDefName, this.ws?this.ws.getId():undefined );
+          _tmp = currentElement.Calculate(arg, this.ws.getCell(this.cellAddress), isDefName,
+            this.ws ? this.ws.getId() : undefined);
                     if ( _tmp.numFormat !== undefined && _tmp.numFormat !== null ) {
                         numFormat = _tmp.numFormat; //> numFormat ? _tmp.numFormat : numFormat;
-                    }
-                    else if ( numFormat < 0 || currentElement.numFormat < currentElement.formatType.def ) {
+          } else if (numFormat < 0 || currentElement.numFormat < currentElement.formatType.def) {
                         numFormat = currentElement.numFormat;
                     }
                     elemArr.push( _tmp );
                 }
-            }
-            else if ( currentElement.type == cElementType.name || currentElement.type == cElementType.name3D ) {
+      } else if (currentElement.type == cElementType.name || currentElement.type == cElementType.name3D) {
                 elemArr.push( currentElement.Calculate() );
-            }
-            else if ( currentElement.type == cElementType.table ) {
+      } else if (currentElement.type == cElementType.table) {
                 elemArr.push( currentElement.toRef() );
-            }
-            else {
+      } else {
                 elemArr.push( currentElement );
             }
         }
@@ -4639,14 +4353,14 @@ parserFormula.prototype = {
             var ref = this.outStack[i];
             if ( ref instanceof cName || ref instanceof cName3D ) {
                 ref = ref.toRef( this.ws.getId() );
-                if ( ref instanceof cError )
+        if (ref instanceof cError) {
                     continue;
             }
+      }
 
             if ( ref instanceof cRef || ref instanceof cRef3D || ref instanceof cArea ) {
                 aOutRef.push( {wsId: ref.getWsId(), cell: ref._cells} );
-            }
-            else if ( ref instanceof cArea3D ) {
+      } else if (ref instanceof cArea3D) {
                 var wsR = ref.wsRange();
                 for ( var j = 0; j < wsR.length; j++ )
                     aOutRef.push( {wsId: wsR[j].Id, cell: ref._cells} );
@@ -4661,54 +4375,59 @@ parserFormula.prototype = {
             if ( this.outStack[i] instanceof cRef || this.outStack[i] instanceof cRef3D || this.outStack[i] instanceof cArea ) {
 
                 var r = this.outStack[i].getRange();
-                if ( !r ) break;
+        if (!r) {
+          break;
+        }
 
                 if ( this.outStack[i].isAbsolute ) {
                     this._changeOffsetHelper( this.outStack[i], offset );
-                }
-                else {
+        } else {
                     var a, b;
-                    if ( this.outStack[i] instanceof cArea && (r.isColumn() && offset.offsetRow != 0 || r.isRow() && offset.offsetCol != 0) ) {
+          if (this.outStack[i] instanceof cArea &&
+            (r.isColumn() && offset.offsetRow != 0 || r.isRow() && offset.offsetCol != 0)) {
                         continue;
                     }
                     r.setOffset( offset );
                     if ( r.isColumn() ) {
                         a = r.first.getColLetter();
                         b = r.last.getColLetter();
-                    }
-                    else if ( r.isRow() ) {
+          } else if (r.isRow()) {
                         a = r.first.getRow();
                         b = r.last.getRow();
-                    }
-                    else {
+          } else {
                         a = r.first.getID();
                         b = r.last.getID();
                     }
 
 
-                    if ( a != b || this.outStack[i] instanceof cArea )
+          if (a != b || this.outStack[i] instanceof cArea) {
                         this.outStack[i].value = this.outStack[i]._cells = a + ":" + b;
-                    else this.outStack[i].value = this.outStack[i]._cells = a;
+          } else {
+            this.outStack[i].value = this.outStack[i]._cells = a;
                 }
+        }
                 continue;
             }
             if ( this.outStack[i] instanceof cArea3D ) {
-                var r = this.outStack[i]._cells.indexOf( ":" ) > -1 ? (new cArea( this.outStack[i]._cells, this.ws )) : (new cRef( this.outStack[i]._cells, this.ws ));
+        var r = this.outStack[i]._cells.indexOf(":") > -1 ? (new cArea(this.outStack[i]._cells, this.ws)) :
+          (new cRef(this.outStack[i]._cells, this.ws));
                 var _r = r.getRange();
 
-                if ( !_r ) break;
+        if (!_r) {
+          break;
+        }
 
                 if ( this.outStack[i].isAbsolute ) {
                     this._changeOffsetHelper( r, offset );
-                }
-                else {
+        } else {
                     _r.setOffset( offset );
-                    var a = _r.first.getID(),
-                        b = _r.last.getID();
-                    if ( a != b )
+          var a = _r.first.getID(), b = _r.last.getID();
+          if (a != b) {
                         r.value = r._cells = a + ":" + b;
-                    else r.value = r._cells = a;
+          } else {
+            r.value = r._cells = a;
                 }
+        }
                 this.outStack[i]._cells = r._cells;
             }
         }
@@ -4720,16 +4439,16 @@ parserFormula.prototype = {
         for ( var i = 0; i < this.outStack.length; i++ ) {
             var elem = this.outStack[i];
             if ( elem instanceof cRef || elem instanceof cArea || elem instanceof cRef3D ) {
-                if ( node.sheetId == elem.ws.getId() && node.cellId == elem._cells )
+        if (node.sheetId == elem.ws.getId() && node.cellId == elem._cells) {
                     this.outStack[i] = new cError( cErrorType.bad_reference );
             }
-            else if ( elem instanceof cArea3D ) {
-                if ( elem.wsFrom == elem.wsTo && node.sheetId == elem.wsFrom && node.cellId == elem._cells )
+      } else if (elem instanceof cArea3D) {
+        if (elem.wsFrom == elem.wsTo && node.sheetId == elem.wsFrom && node.cellId == elem._cells) {
                     this.outStack[i] = new cError( cErrorType.bad_reference );
             }
         }
-    },
-    /*
+    }
+  }, /*
      Для изменения ссылок на конкретную ячейку.
      offset - на сколько сдвигаем ячейку (offset = {offsetCol:intNumber, offsetRow:intNumber})
      cellId - какую ячейку сдвигаем
@@ -4740,26 +4459,30 @@ parserFormula.prototype = {
         for ( var i = 0; i < this.outStack.length; i++ ) {
             elem = this.outStack[i];
             if ( elem instanceof cRef || elem instanceof cArea ) {
-                sFromName = from.getAbsName2( elem.isAbsoluteCol1, elem.isAbsoluteRow1, elem.isAbsoluteCol2, elem.isAbsoluteRow2 );
+        sFromName =
+          from.getAbsName2(elem.isAbsoluteCol1, elem.isAbsoluteRow1, elem.isAbsoluteCol2, elem.isAbsoluteRow2);
 
                 if ( node.sheetId == elem.ws.getId() && sFromName == elem._cells ) {
-                    elem.value = elem._cells = node.bbox.getAbsName2( elem.isAbsoluteCol1, elem.isAbsoluteRow1, elem.isAbsoluteCol2, elem.isAbsoluteRow2 );
+          elem.value = elem._cells =
+            node.bbox.getAbsName2(elem.isAbsoluteCol1, elem.isAbsoluteRow1, elem.isAbsoluteCol2, elem.isAbsoluteRow2);
                     elem.range = elem.ws.getRange3( to.r1, to.c1, to.r2, to.c2 );
                 }
-            }
-            else if ( elem instanceof cRef3D ) {
-                sFromName = from.getAbsName2( elem.isAbsoluteCol1, elem.isAbsoluteRow1, elem.isAbsoluteCol2, elem.isAbsoluteRow2 );
+      } else if (elem instanceof cRef3D) {
+        sFromName =
+          from.getAbsName2(elem.isAbsoluteCol1, elem.isAbsoluteRow1, elem.isAbsoluteCol2, elem.isAbsoluteRow2);
 
                 if ( node.sheetId == elem.ws.getId() && sFromName == elem._cells ) {
-                    elem.value = elem._cells = node.bbox.getAbsName2( elem.isAbsoluteCol1, elem.isAbsoluteRow1, elem.isAbsoluteCol2, elem.isAbsoluteRow2 );
+          elem.value = elem._cells =
+            node.bbox.getAbsName2(elem.isAbsoluteCol1, elem.isAbsoluteRow1, elem.isAbsoluteCol2, elem.isAbsoluteRow2);
                 }
-            }
-            else if ( elem instanceof cArea3D ) {
+      } else if (elem instanceof cArea3D) {
 
-                sFromName = from.getAbsName2( elem.isAbsoluteCol1, elem.isAbsoluteRow1, elem.isAbsoluteCol2, elem.isAbsoluteRow2 );
+        sFromName =
+          from.getAbsName2(elem.isAbsoluteCol1, elem.isAbsoluteRow1, elem.isAbsoluteCol2, elem.isAbsoluteRow2);
 
                 if ( elem.wsFrom == elem.wsTo && node.sheetId == elem.wsFrom && sFromName == elem._cells ) {
-                    elem.value = elem._cells = node.bbox.getAbsName2( elem.isAbsoluteCol1, elem.isAbsoluteRow1, elem.isAbsoluteCol2, elem.isAbsoluteRow2 );
+          elem.value = elem._cells =
+            node.bbox.getAbsName2(elem.isAbsoluteCol1, elem.isAbsoluteRow1, elem.isAbsoluteCol2, elem.isAbsoluteRow2);
                 }
             }
         }
@@ -4779,23 +4502,25 @@ parserFormula.prototype = {
 //                    elem.area.range = elem.area.ws.getRange3( to.r1, to.c1, to.r2, to.c2 );
                 }
 
-            }
-            else if ( elem.type == cElementType.cellsRange ) {
+      } else if (elem.type == cElementType.cellsRange) {
 
-                sFromName = from.getAbsName2( elem.isAbsoluteCol1, elem.isAbsoluteRow1, elem.isAbsoluteCol2, elem.isAbsoluteRow2 );
+        sFromName =
+          from.getAbsName2(elem.isAbsoluteCol1, elem.isAbsoluteRow1, elem.isAbsoluteCol2, elem.isAbsoluteRow2);
 
                 if ( node.sheetId == elem.ws.getId() && sFromName == elem._cells ) {
-                    elem.value = elem._cells = node.bbox.getAbsName2( elem.isAbsoluteCol1, elem.isAbsoluteRow1, elem.isAbsoluteCol2, elem.isAbsoluteRow2 );
+          elem.value = elem._cells =
+            node.bbox.getAbsName2(elem.isAbsoluteCol1, elem.isAbsoluteRow1, elem.isAbsoluteCol2, elem.isAbsoluteRow2);
                     elem.range = elem.ws.getRange3( to.r1, to.c1, to.r2, to.c2 );
                 }
-            }
-            else if ( elem.type == cElementType.cellsRange3D ) {
+      } else if (elem.type == cElementType.cellsRange3D) {
 
-                sFromName = from.getAbsName2( elem.isAbsoluteCol1, elem.isAbsoluteRow1, elem.isAbsoluteCol2, elem.isAbsoluteRow2 );
+        sFromName =
+          from.getAbsName2(elem.isAbsoluteCol1, elem.isAbsoluteRow1, elem.isAbsoluteCol2, elem.isAbsoluteRow2);
 
                 //node.cellId содержит уже сдвинутое значение
                 if ( elem.wsFrom == elem.wsTo && node.sheetId == elem.wsFrom && sFromName == elem._cells ) {
-                    elem.value = elem._cells = node.bbox.getAbsName2( elem.isAbsoluteCol1, elem.isAbsoluteRow1, elem.isAbsoluteCol2, elem.isAbsoluteRow2 );
+          elem.value = elem._cells =
+            node.bbox.getAbsName2(elem.isAbsoluteCol1, elem.isAbsoluteRow1, elem.isAbsoluteCol2, elem.isAbsoluteRow2);
                 }
             }
         }
@@ -4803,7 +4528,7 @@ parserFormula.prototype = {
 
     /* При переименовывании листа необходимо поменять название листа в соответствующих ссылках */
     changeSheet   : function ( lastName, newName ) {
-        if ( this.is3D )
+    if (this.is3D) {
             for ( var i = 0; i < this.outStack.length; i++ ) {
                 if ( this.outStack[i] instanceof cRef3D && this.outStack[i].ws.getName() == lastName ) {
                     this.outStack[i].changeSheet( lastName, newName );
@@ -4812,6 +4537,7 @@ parserFormula.prototype = {
                     this.outStack[i].changeSheet( lastName, newName );
                 }
             }
+    }
         return this;
     },
 
@@ -4820,10 +4546,7 @@ parserFormula.prototype = {
         if ( !rFormula && this.outStack.length == 1 && this.outStack[this.outStack.length - 1] instanceof cError ) {
             return this.Formula;
         }
-        var currentElement = null,
-            _count = this.outStack.length,
-            elemArr = new Array( _count ),
-            res = undefined, _count_arg;
+    var currentElement = null, _count = this.outStack.length, elemArr = new Array(_count), res = undefined, _count_arg;
         for ( var i = 0, j = 0; i < _count; i++, j++ ) {
             currentElement = this.outStack[i];
             if ( currentElement.type == cElementType.operator || currentElement.type == cElementType.func ) {
@@ -4831,8 +4554,7 @@ parserFormula.prototype = {
                 res = currentElement.Assemble2( elemArr, j - _count_arg, _count_arg );
                 j -= _count_arg;
                 elemArr[j] = res;
-            }
-            else {
+      } else {
                 if ( currentElement instanceof cString ) {
                     currentElement = new cString( "\"" + currentElement.toString() + "\"" );
                 }
@@ -4842,8 +4564,7 @@ parserFormula.prototype = {
         }
         if ( res != undefined && res != null ) {
             return res.toString();
-        }
-        else {
+    } else {
             return this.Formula;
         }
     },
@@ -4853,10 +4574,7 @@ parserFormula.prototype = {
 		if ( this.outStack.length == 1 && this.outStack[this.outStack.length - 1] instanceof cError ) {
 			return this.Formula;
 		}
-        var currentElement = null,
-            _count = this.outStack.length,
-            elemArr = new Array( _count ),
-            res = undefined, _count_arg;
+    var currentElement = null, _count = this.outStack.length, elemArr = new Array(_count), res = undefined, _count_arg;
         for ( var i = 0, j = 0; i < _count; i++, j++ ) {
             currentElement = this.outStack[i];
             if ( currentElement.type == cElementType.operator || currentElement.type == cElementType.func ) {
@@ -4864,8 +4582,7 @@ parserFormula.prototype = {
                 res = currentElement.Assemble2Locale( elemArr, j - _count_arg, _count_arg, locale, digitDelim );
                 j -= _count_arg;
                 elemArr[j] = res;
-            }
-            else {
+      } else {
                 if ( currentElement instanceof cString ) {
                     currentElement = new cString( "\"" + currentElement.toLocaleString( digitDelim ) + "\"" );
                 }
@@ -4875,119 +4592,118 @@ parserFormula.prototype = {
         }
         if ( res != undefined && res != null ) {
             return res.toLocaleString( digitDelim );
-        }
-        else {
+    } else {
             return this.Formula;
         }
     },
 
     _changeOffsetHelper: function ( ref, offset ) {
         var m = ref._cells.match( /\$/g );
-		if(!m){return;}
+    if (!m) {
+      return;
+    }
         if ( m.length == 1 ) {//для cRef, cRef3D, cArea. $A2, A$2, Sheet1!$A2, Sheet1!A$2, $A2:C4, A$2:C4, A2:$C4, A2:C$4.
             if ( !(ref instanceof cArea) ) {
                 if ( ref._cells.indexOf( "$" ) == 0 ) {
                     r = ref.getRange();
                     r.setOffset( {offsetCol: 0, offsetRow: offset.offsetRow} );
                     ref.value = ref._cells = "$" + r.first.getID();
-                }
-                else {
+        } else {
                     r = ref.getRange();
                     r.setOffset( {offsetCol: offset.offsetCol, offsetRow: 0} );
                     ref.value = ref._cells = r.first.getColLetter() + "$" + r.first.getRow();
                 }
-            }
-            else {
-                var r = ref.getRange(),
-                    c = ref._cells.split( ":" );// так как ссылка вида A1:A4, делим на первую и последнюю ячейку.
+      } else {
+        var r = ref.getRange(), c = ref._cells.split(":");// так как ссылка вида A1:A4, делим на первую и последнюю ячейку.
                 // проверяем в какой ячеейке находится абсолютная ссылка.
                 if ( c[0].indexOf( "$" ) > -1 ) {// если в первой ячейке
                     if ( c[0].indexOf( "$" ) == 0 ) {// абсолютна ли ссылка на столбец...
                         r.first.moveRow( offset.offsetRow );
                         r.last.moveCol( offset.offsetCol );
                         r.last.moveRow( offset.offsetRow );
-                        ref.setRange( "$" + r.first.getColLetter() + r.first.getRow() + ":" + r.last.getColLetter() + r.last.getRow() );
-                    }
-                    else {// ... или абсолютна ссылка на строку
+            ref.setRange(
+              "$" + r.first.getColLetter() + r.first.getRow() + ":" + r.last.getColLetter() + r.last.getRow());
+          } else {// ... или абсолютна ссылка на строку
                         r.first.moveCol( offset.offsetCol );
                         r.last.moveCol( offset.offsetCol );
                         r.last.moveRow( offset.offsetRow );
-                        ref.setRange( r.first.getColLetter() + "$" + r.first.getRow() + ":" + r.last.getColLetter() + r.last.getRow() );
+            ref.setRange(
+              r.first.getColLetter() + "$" + r.first.getRow() + ":" + r.last.getColLetter() + r.last.getRow());
                     }
-                }
-                else {// если в последней ячейке
+        } else {// если в последней ячейке
                     if ( c[1].indexOf( "$" ) == 0 ) {// абсолютна ли ссылка на столбец...
                         r.first.moveCol( offset.offsetCol );
                         r.first.moveRow( offset.offsetRow );
                         r.last.moveRow( offset.offsetRow );
-                        ref.setRange( r.first.getColLetter() + r.first.getRow() + ":" + "$" + r.last.getColLetter() + r.last.getRow() );
-                    }
-                    else {// ... или абсолютна ссылка на строку
+            ref.setRange(
+              r.first.getColLetter() + r.first.getRow() + ":" + "$" + r.last.getColLetter() + r.last.getRow());
+          } else {// ... или абсолютна ссылка на строку
                         r.first.moveCol( offset.offsetCol );
                         r.first.moveRow( offset.offsetRow );
                         r.last.moveCol( offset.offsetCol );
-                        ref.setRange( r.first.getColLetter() + r.first.getRow() + ":" + r.last.getColLetter() + "$" + r.last.getRow() );
+            ref.setRange(
+              r.first.getColLetter() + r.first.getRow() + ":" + r.last.getColLetter() + "$" + r.last.getRow());
                     }
                 }
             }
-        }
-        else if ( m.length == 2 ) {//для cArea. $A$2:C4, A2:$C$4, $A2:$C4, $A2:C$4, A$2:$C4, A$2:C$4.
+    } else if (m.length == 2) {//для cArea. $A$2:C4, A2:$C$4, $A2:$C4, $A2:C$4, A$2:$C4, A$2:C$4.
             if ( ref instanceof cArea ) {
                 var r = ref.getRange();
                 var c = ref._cells.split( ":" );
                 if ( c[1].indexOf( "$" ) < 0 ) {
                     r.last.moveCol( offset.offsetCol );
                     r.last.moveRow( offset.offsetRow );
-                    ref.setRange( "$" + r.first.getColLetter() + "$" + r.first.getRow() + ":" + r.last.getColLetter() + r.last.getRow() );
-                }
-                else if ( c[0].indexOf( "$" ) < 0 ) {
+          ref.setRange(
+            "$" + r.first.getColLetter() + "$" + r.first.getRow() + ":" + r.last.getColLetter() + r.last.getRow());
+        } else if (c[0].indexOf("$") < 0) {
                     r.first.moveCol( offset.offsetCol );
                     r.first.moveRow( offset.offsetRow );
-                    ref.setRange( r.first.getColLetter() + r.first.getRow() + ":" + "$" + r.last.getColLetter() + "$" + r.last.getRow() );
-                }
-                else {
+          ref.setRange(
+            r.first.getColLetter() + r.first.getRow() + ":" + "$" + r.last.getColLetter() + "$" + r.last.getRow());
+        } else {
                     if ( c[0].indexOf( "$" ) == 0 && c[1].indexOf( "$" ) == 0 ) {
                         r.first.moveRow( offset.offsetRow );
                         r.last.moveRow( offset.offsetRow );
-                        ref.setRange( "$" + r.first.getColLetter() + r.first.getRow() + ":" + "$" + r.last.getColLetter() + r.last.getRow() );
-                    }
-                    else if ( c[0].indexOf( "$" ) == 0 && c[1].indexOf( "$" ) > 0 ) {
+            ref.setRange(
+              "$" + r.first.getColLetter() + r.first.getRow() + ":" + "$" + r.last.getColLetter() + r.last.getRow());
+          } else if (c[0].indexOf("$") == 0 && c[1].indexOf("$") > 0) {
                         r.first.moveRow( offset.offsetRow );
                         r.last.moveCol( offset.offsetCol );
-                        ref.setRange( "$" + r.first.getColLetter() + r.first.getRow() + ":" + r.last.getColLetter() + "$" + r.last.getRow() );
-                    }
-                    else if ( c[0].indexOf( "$" ) > 0 && c[1].indexOf( "$" ) == 0 ) {
+            ref.setRange(
+              "$" + r.first.getColLetter() + r.first.getRow() + ":" + r.last.getColLetter() + "$" + r.last.getRow());
+          } else if (c[0].indexOf("$") > 0 && c[1].indexOf("$") == 0) {
                         r.first.moveCol( offset.offsetCol );
                         r.last.moveRow( offset.offsetRow );
-                        ref.setRange( r.first.getColLetter() + "$" + r.first.getRow() + ":" + "$" + r.last.getColLetter() + r.last.getRow() );
-                    }
-                    else {
+            ref.setRange(
+              r.first.getColLetter() + "$" + r.first.getRow() + ":" + "$" + r.last.getColLetter() + r.last.getRow());
+          } else {
                         r.first.moveCol( offset.offsetCol );
                         r.last.moveCol( offset.offsetCol );
-                        ref.setRange( r.first.getColLetter() + "$" + r.first.getRow() + ":" + r.last.getColLetter() + "$" + r.last.getRow() );
+            ref.setRange(
+              r.first.getColLetter() + "$" + r.first.getRow() + ":" + r.last.getColLetter() + "$" + r.last.getRow());
                     }
                 }
             }
-        }
-        else if ( m.length == 3 ) {//для cArea. $A$2:$C4, $A$2:C$4, $A2:$C$4, A$2:$C$4,
+    } else if (m.length == 3) {//для cArea. $A$2:$C4, $A$2:C$4, $A2:$C$4, A$2:$C$4,
             if ( ref instanceof cArea ) {
                 var r = ref.getRange();
                 var c = ref._cells.split( ":" );
                 if ( c[0].match( /\$/g ).length == 2 && c[1].indexOf( "$" ) == 0 ) {
                     r.last.moveRow( offset.offsetRow );
-                    ref.setRange( "$" + r.first.getColLetter() + "$" + r.first.getRow() + ":" + "$" + r.last.getColLetter() + r.last.getRow() );
-                }
-                else if ( c[0].match( /\$/g ).length == 2 && c[1].indexOf( "$" ) > 0 ) {
+          ref.setRange("$" + r.first.getColLetter() + "$" + r.first.getRow() + ":" + "$" + r.last.getColLetter() +
+            r.last.getRow());
+        } else if (c[0].match(/\$/g).length == 2 && c[1].indexOf("$") > 0) {
                     r.last.moveCol( offset.offsetCol );
-                    ref.setRange( "$" + r.first.getColLetter() + "$" + r.first.getRow() + ":" + r.last.getColLetter() + "$" + r.last.getRow() );
-                }
-                else if ( c[1].match( /\$/g ).length == 2 && c[0].indexOf( "$" ) == 0 ) {
+          ref.setRange("$" + r.first.getColLetter() + "$" + r.first.getRow() + ":" + r.last.getColLetter() + "$" +
+            r.last.getRow());
+        } else if (c[1].match(/\$/g).length == 2 && c[0].indexOf("$") == 0) {
                     r.first.moveRow( offset.offsetRow );
-                    ref.setRange( "$" + r.first.getColLetter() + r.first.getRow() + ":" + "$" + r.last.getColLetter() + "$" + r.last.getRow() );
-                }
-                else if ( c[1].match( /\$/g ).length == 2 && c[0].indexOf( "$" ) > 0 ) {
+          ref.setRange("$" + r.first.getColLetter() + r.first.getRow() + ":" + "$" + r.last.getColLetter() + "$" +
+            r.last.getRow());
+        } else if (c[1].match(/\$/g).length == 2 && c[0].indexOf("$") > 0) {
                     r.first.moveCol( offset.offsetCol );
-                    ref.setRange( r.first.getColLetter() + "$" + r.first.getRow() + ":" + "$" + r.last.getColLetter() + "$" + r.last.getRow() );
+          ref.setRange(r.first.getColLetter() + "$" + r.first.getRow() + ":" + "$" + r.last.getColLetter() + "$" +
+            r.last.getRow());
                 }
             }
         }
@@ -5002,10 +4718,11 @@ parserFormula.prototype = {
                 var wsToIndex = wsTo.getIndex();
                 var wsFrom = this.wb.getWorksheetById( elem.wsFrom );
                 var wsFromIndex = wsFrom.getIndex();
-                if ( wsFromIndex <= index && index <= wsToIndex )
+        if (wsFromIndex <= index && index <= wsToIndex) {
                     bRes = true;
             }
         }
+    }
         return bRes;
     },
 
@@ -5018,30 +4735,32 @@ parserFormula.prototype = {
                 var wsToIndex = wsTo.getIndex();
                 var wsFrom = this.wb.getWorksheetById( elem.wsFrom );
                 var wsFromIndex = wsFrom.getIndex();
-                if ( wsFromIndex <= tempW.wFI && tempW.wFI <= wsToIndex && 0 == nRes )
+        if (wsFromIndex <= tempW.wFI && tempW.wFI <= wsToIndex && 0 == nRes) {
                     nRes = 1;
+        }
                 if ( elem.wsFrom == tempW.wFId ) {
                     if ( tempW.wTI > wsToIndex ) {
                         nRes = 2;
                         var wsNext = this.wb.getWorksheet( wsFromIndex + 1 );
-                        if ( wsNext )
+            if (wsNext) {
                             this.outStack[i].changeSheet( tempW.wFN, wsNext.getName() );
-                        else
+            } else {
                             this.outStack[i] = new cError( cErrorType.bad_reference );
                     }
                 }
-                else if ( elem.wsTo == tempW.wFId ) {
+        } else if (elem.wsTo == tempW.wFId) {
                     if ( tempW.wTI <= wsFromIndex ) {
                         nRes = 2;
                         var wsPrev = this.wb.getWorksheet( wsToIndex - 1 );
-                        if ( wsPrev )
+            if (wsPrev) {
                             this.outStack[i].changeSheet( tempW.wFN, wsPrev.getName() );
-                        else
+            } else {
                             this.outStack[i] = new cError( cErrorType.bad_reference );
                     }
                 }
             }
         }
+    }
         return nRes;
     },
 
@@ -5051,27 +4770,28 @@ parserFormula.prototype = {
         if ( ws ) {
             var wsIndex = ws.getIndex();
             var wsPrev = null;
-            if ( wsIndex > 0 )
+      if (wsIndex > 0) {
                 wsPrev = this.wb.getWorksheet( wsIndex - 1 );
+      }
             var wsNext = null;
-            if ( wsIndex < this.wb.getWorksheetCount() - 1 )
+      if (wsIndex < this.wb.getWorksheetCount() - 1) {
                 wsNext = this.wb.getWorksheet( wsIndex + 1 );
+      }
             for ( var i = 0; i < this.outStack.length; i++ ) {
                 var elem = this.outStack[i];
                 if ( elem instanceof cArea3D ) {
                     if ( elem.wsFrom == sheetId ) {
                         bRes = true;
-                        if ( elem.wsTo != sheetId && null != wsNext )
+            if (elem.wsTo != sheetId && null != wsNext) {
                             this.outStack[i].changeSheet( ws.getName(), wsNext.getName() );
-                        else
+            } else {
                             this.outStack[i] = new cError( cErrorType.bad_reference );
                     }
-                    else if ( elem.wsTo == sheetId && null != wsPrev ) {
+          } else if (elem.wsTo == sheetId && null != wsPrev) {
                         this.outStack[i].changeSheet( ws.getName(), wsPrev.getName() );
                         bRes = true;
                     }
-                }
-                else if ( elem instanceof cRef3D ) {
+        } else if (elem instanceof cRef3D) {
                     if ( elem.ws.getId() == sheetId ) {
                         this.outStack[i] = new cError( cErrorType.bad_reference );
                         bRes = true;
@@ -5088,8 +4808,7 @@ parserFormula.prototype = {
 
         if ( !defName ) {
             node = this.wb.dependencyFormulas.addNode( this.ws.Id, this.cellId )
-        }
-        else {
+    } else {
             node = defName;
         }
 
@@ -5112,24 +4831,21 @@ parserFormula.prototype = {
             if ( ref.type == cElementType.name || ref.type == cElementType.name3D ) {
                 nTo = ref.addDefinedNameNode( /*nameReParse*/ );
                 this.wb.dependencyFormulas.addEdge2( node, nTo );
-            }
-            else if ( (ref instanceof cRef || ref instanceof cRef3D || ref instanceof cArea) && ref.isValid() ) {
+      } else if ((ref instanceof cRef || ref instanceof cRef3D || ref instanceof cArea) && ref.isValid()) {
                 nTo = this.wb.dependencyFormulas.addNode( ref.getWsId(), ref._cells.replace( this.regSpace, "" ) );
                 this.wb.dependencyFormulas.addEdge2( node, nTo );
-            }
-            else if ( ref instanceof cArea3D && ref.isValid() ) {
+      } else if (ref instanceof cArea3D && ref.isValid()) {
                 wsR = ref.wsRange();
                 for ( var j = 0; j < wsR.length; j++ ) {
-                    this.wb.dependencyFormulas.addEdge2( node, this.wb.dependencyFormulas.addNode( wsR[j].Id, ref._cells.replace( this.regSpace, "" ) ) );
+          this.wb.dependencyFormulas.addEdge2(node,
+            this.wb.dependencyFormulas.addNode(wsR[j].Id, ref._cells.replace(this.regSpace, "")));
                 }
             }
         }
     },
 
     parseDiagramRef: function () {
-        var res = [
-            []
-        ];
+    var res = [[]];
         while ( this.pCurrPos < this.Formula.length ) {
             if ( parserHelp.isComma.call( this, this.Formula, this.pCurrPos ) ) {
 
@@ -5137,20 +4853,18 @@ parserFormula.prototype = {
                     res.push( [] )
                 }
 
-            }
-            else {
+      } else {
                 var _3DRefTmp = null;
 
                 if ( (_3DRefTmp = parserHelp.is3DRef.call( this, this.Formula, this.pCurrPos ))[0] ) {
                     this.is3D = true;
-                    var _wsFrom = _3DRefTmp[1],
-                        _wsTo = ( (_3DRefTmp[2] !== null) && (_3DRefTmp[2] !== undefined) ) ? _3DRefTmp[2] : _wsFrom;
+          var _wsFrom = _3DRefTmp[1], _wsTo = ( (_3DRefTmp[2] !== null) && (_3DRefTmp[2] !== undefined) ) ?
+            _3DRefTmp[2] : _wsFrom;
 
                     if ( parserHelp.isArea.call( this, this.Formula, this.pCurrPos ) ) {
                         res[res.length - 1].push( {sheetNameFrom: _wsFrom, sheetNameTo: _wsTo, ref: this.operand_str.toUpperCase()} )
 
-                    }
-                    else if ( parserHelp.isRef.call( this, this.Formula, this.pCurrPos ) ) {
+          } else if (parserHelp.isRef.call(this, this.Formula, this.pCurrPos)) {
                         res[res.length - 1].push( {sheetNameFrom: _wsFrom, sheetNameTo: _wsTo, ref: this.operand_str.toUpperCase()} )
                     }
                 }
@@ -5164,7 +4878,9 @@ parserFormula.prototype = {
 
 function parseNum( str ) {
     if ( str.indexOf( "x" ) > -1 || str == "" || str.match( /\s+/ ) )//исключаем запись числа в 16-ричной форме из числа.
+  {
         return false;
+  }
     return !isNaN( str );
 }
 
@@ -5181,8 +4897,7 @@ function matching( x, y, oper ) {
                 res = rS;
                 break;
         }
-    }
-    else if ( typeof x === typeof y ) {
+  } else if (typeof x === typeof y) {
         switch ( oper ) {
             case "<>":
                 res = (x.value != y.value);
@@ -5210,9 +4925,7 @@ function matching( x, y, oper ) {
 
 function GetDiffDate360( nDay1, nMonth1, nYear1, nDay2, nMonth2, nYear2, bUSAMethod ) {
     var nDayDiff;
-    var startTime = new Date( nYear1, nMonth1 - 1, nDay1 ),
-        endTime = new Date( nYear2, nMonth2 - 1, nDay2 ),
-        nY, nM, nD;
+  var startTime = new Date(nYear1, nMonth1 - 1, nDay1), endTime = new Date(nYear2, nMonth2 - 1, nDay2), nY, nM, nD;
 
     if ( startTime > endTime ) {
         nY = nYear1;
@@ -5232,8 +4945,7 @@ function GetDiffDate360( nDay1, nMonth1, nYear1, nDay2, nMonth2, nYear2, bUSAMet
         }
         if ( nDay1 == 30 && nDay2 == 31 ) {
             nDay2--;
-        }
-        else {
+    } else {
             if ( nMonth1 == 2 && nDay1 == ( new Date( nYear1, 0, 1 ).isLeapYear() ? 29 : 28 ) ) {
                 nDay1 = 30;
                 if ( nMonth2 == 2 && nDay2 == ( new Date( nYear2, 0, 1 ).isLeapYear() ? 29 : 28 ) ) {
@@ -5242,8 +4954,7 @@ function GetDiffDate360( nDay1, nMonth1, nYear1, nDay2, nMonth2, nYear2, bUSAMet
             }
         }
 //        nDayDiff = ( nYear2 - nYear1 ) * 360 + ( nMonth2 - nMonth1 ) * 30 + ( nDay2 - nDay1 );
-    }
-    else {
+  } else {
         if ( nDay1 == 31 ) {
             nDay1--;
         }
@@ -5296,9 +5007,9 @@ function searchRegExp2( s, mask ) {
             nMaskIndex++;
             cCurMask = mask[nMaskIndex];
             t = true;
+    } else if ('*' == cCurMask) {
+      break;
         }
-        else if ( '*' == cCurMask )
-            break;
         if ( ( cCurMask != s[nSIndex] && '?' != cCurMask ) || ( cCurMask != s[nSIndex] && t) ) {
             bRes = false;
             break;
@@ -5314,8 +5025,7 @@ function searchRegExp2( s, mask ) {
                 }
                 bRes = nMaskIndex >= nMaskLength;
                 break;
-            }
-            else if ( '*' == cCurMask ) {
+      } else if ('*' == cCurMask) {
                 nMaskIndex++;
                 if ( nMaskIndex >= nMaskLength ) {
                     bRes = true;
@@ -5323,12 +5033,10 @@ function searchRegExp2( s, mask ) {
                 }
                 nSLastIndex = nSIndex + 1;
                 nMaskLastIndex = nMaskIndex;
-            }
-            else if ( cCurMask != s[nSIndex] && '?' != cCurMask ) {
+      } else if (cCurMask != s[nSIndex] && '?' != cCurMask) {
                 nMaskIndex = nMaskLastIndex;
                 nSIndex = nSLastIndex++;
-            }
-            else {
+      } else {
                 nSIndex++;
                 nMaskIndex++;
             }
@@ -5344,20 +5052,9 @@ function searchRegExp2( s, mask ) {
 var maxGammaArgument = 171.624376956302;
 
 function lcl_Erf0065( x ) {
-    var pn = [
-            1.12837916709551256,
-            1.35894887627277916E-1,
-            4.03259488531795274E-2,
-            1.20339380863079457E-3,
-            6.49254556481904354E-5
-        ],
-        qn = [
-            1.00000000000000000,
-            4.53767041780002545E-1,
-            8.69936222615385890E-2,
-            8.49717371168693357E-3,
-            3.64915280629351082E-4
-        ];
+  var pn = [1.12837916709551256, 1.35894887627277916E-1, 4.03259488531795274E-2, 1.20339380863079457E-3,
+    6.49254556481904354E-5], qn = [1.00000000000000000, 4.53767041780002545E-1, 8.69936222615385890E-2,
+    8.49717371168693357E-3, 3.64915280629351082E-4];
     var pSum = 0.0, qSum = 0.0, xPow = 1.0;
     for ( var i = 0; i <= 4; ++i ) {
         pSum += pn[i] * xPow;
@@ -5369,47 +5066,19 @@ function lcl_Erf0065( x ) {
 
 /** Approximation algorithm for erfc for 0.65 < x < 6.0. */
 function lcl_Erfc0600( x ) {
-    var pSum = 0,
-        qSum = 0,
-        xPow = 1, pn, qn;
+  var pSum = 0, qSum = 0, xPow = 1, pn, qn;
 
     if ( x < 2.2 ) {
-        pn = [
-            9.99999992049799098E-1,
-            1.33154163936765307,
-            8.78115804155881782E-1,
-            3.31899559578213215E-1,
-            7.14193832506776067E-2,
-            7.06940843763253131E-3
-        ];
-        qn = [
-            1.00000000000000000,
-            2.45992070144245533,
-            2.65383972869775752,
-            1.61876655543871376,
-            5.94651311286481502E-1,
-            1.26579413030177940E-1,
-            1.25304936549413393E-2
-        ];
-    }
-    else {
-        pn = [
-            9.99921140009714409E-1,
-            1.62356584489366647,
-            1.26739901455873222,
-            5.81528574177741135E-1,
-            1.57289620742838702E-1,
-            2.25716982919217555E-2
-        ];
-        qn = [
-            1.00000000000000000,
-            2.75143870676376208,
-            3.37367334657284535,
-            2.38574194785344389,
-            1.05074004614827206,
-            2.78788439273628983E-1,
-            4.00072964526861362E-2
-        ];
+    pn = [9.99999992049799098E-1, 1.33154163936765307, 8.78115804155881782E-1, 3.31899559578213215E-1,
+      7.14193832506776067E-2, 7.06940843763253131E-3];
+    qn = [1.00000000000000000, 2.45992070144245533, 2.65383972869775752, 1.61876655543871376, 5.94651311286481502E-1,
+      1.26579413030177940E-1, 1.25304936549413393E-2];
+  } else {
+    pn =
+      [9.99921140009714409E-1, 1.62356584489366647, 1.26739901455873222, 5.81528574177741135E-1, 1.57289620742838702E-1,
+        2.25716982919217555E-2];
+    qn = [1.00000000000000000, 2.75143870676376208, 3.37367334657284535, 2.38574194785344389, 1.05074004614827206,
+      2.78788439273628983E-1, 4.00072964526861362E-2];
     }
 
     for ( var i = 0; i < 6; ++i ) {
@@ -5423,20 +5092,9 @@ function lcl_Erfc0600( x ) {
 
 /** Approximation algorithm for erfc for 6.0 < x < 26.54 (but used for all x > 6.0). */
 function lcl_Erfc2654( x ) {
-    var pn = [
-            5.64189583547756078E-1,
-            8.80253746105525775,
-            3.84683103716117320E1,
-            4.77209965874436377E1,
-            8.08040729052301677
-        ],
-        qn = [
-            1.00000000000000000,
-            1.61020914205869003E1,
-            7.54843505665954743E1,
-            1.12123870801026015E2,
-            3.73997570145040850E1
-        ];
+  var pn = [5.64189583547756078E-1, 8.80253746105525775, 3.84683103716117320E1, 4.77209965874436377E1,
+    8.08040729052301677], qn = [1.00000000000000000, 1.61020914205869003E1, 7.54843505665954743E1,
+    1.12123870801026015E2, 3.73997570145040850E1];
 
     var pSum = 0, qSum = 0, xPow = 1;
 
@@ -5449,8 +5107,9 @@ function lcl_Erfc2654( x ) {
 }
 
 function rtl_math_erf( x ) {
-    if ( x == 0 )
+  if (x == 0) {
         return 0;
+  }
 
     var bNegative = false;
     if ( x < 0 ) {
@@ -5459,22 +5118,25 @@ function rtl_math_erf( x ) {
     }
 
     var res = 1;
-    if ( x < 1.0e-10 )
+  if (x < 1.0e-10) {
         res = parseFloat( x * 1.1283791670955125738961589031215452 );
-    else if ( x < 0.65 )
+  } else if (x < 0.65) {
         res = lcl_Erf0065( x );
-    else
+  } else {
         res = 1 - rtl_math_erfc( x );
+  }
 
-    if ( bNegative )
+  if (bNegative) {
         res *= -1;
+  }
 
     return res;
 }
 
 function rtl_math_erfc( x ) {
-    if ( x == 0 )
+  if (x == 0) {
         return 1;
+  }
 
     var bNegative = false;
     if ( x < 0 ) {
@@ -5484,16 +5146,18 @@ function rtl_math_erfc( x ) {
 
     var fErfc = 0;
     if ( x >= 0.65 ) {
-        if ( x < 6 )
+    if (x < 6) {
             fErfc = lcl_Erfc0600( x );
-        else
+    } else {
             fErfc = lcl_Erfc2654( x );
     }
-    else
+  } else {
         fErfc = 1 - rtl_math_erf( x );
+  }
 
-    if ( bNegative )
+  if (bNegative) {
         fErfc = 2 - fErfc;
+  }
 
     return fErfc;
 }
@@ -5515,44 +5179,33 @@ function taylor( pPolynom, nMax, x ) {
 }
 
 function gauss( x ) {
-    var t0 =
-            [ 0.39894228040143268, -0.06649038006690545, 0.00997355701003582,
-                -0.00118732821548045, 0.00011543468761616, -0.00000944465625950,
-                0.00000066596935163, -0.00000004122667415, 0.00000000227352982,
-                0.00000000011301172, 0.00000000000511243, -0.00000000000021218 ],
-        t2 =
-            [ 0.47724986805182079, 0.05399096651318805, -0.05399096651318805,
-                0.02699548325659403, -0.00449924720943234, -0.00224962360471617,
-                0.00134977416282970, -0.00011783742691370, -0.00011515930357476,
-                0.00003704737285544, 0.00000282690796889, -0.00000354513195524,
-                0.00000037669563126, 0.00000019202407921, -0.00000005226908590,
-                -0.00000000491799345, 0.00000000366377919, -0.00000000015981997,
-                -0.00000000017381238, 0.00000000002624031, 0.00000000000560919,
-                -0.00000000000172127, -0.00000000000008634, 0.00000000000007894 ],
-        t4 =
-            [ 0.49996832875816688, 0.00013383022576489, -0.00026766045152977,
-                0.00033457556441221, -0.00028996548915725, 0.00018178605666397,
-                -0.00008252863922168, 0.00002551802519049, -0.00000391665839292,
-                -0.00000074018205222, 0.00000064422023359, -0.00000017370155340,
-                0.00000000909595465, 0.00000000944943118, -0.00000000329957075,
-                0.00000000029492075, 0.00000000011874477, -0.00000000004420396,
-                0.00000000000361422, 0.00000000000143638, -0.00000000000045848 ];
-    var asympt = [ -1, 1, -3, 15, -105 ],
-        xabs = Math.abs( x ),
-        xshort = Math.floor( xabs ),
-        nval = 0;
-    if ( xshort == 0 )
+  var t0 = [0.39894228040143268, -0.06649038006690545, 0.00997355701003582, -0.00118732821548045, 0.00011543468761616,
+    -0.00000944465625950, 0.00000066596935163, -0.00000004122667415, 0.00000000227352982, 0.00000000011301172,
+    0.00000000000511243, -0.00000000000021218], t2 = [0.47724986805182079, 0.05399096651318805, -0.05399096651318805,
+    0.02699548325659403, -0.00449924720943234, -0.00224962360471617, 0.00134977416282970, -0.00011783742691370,
+    -0.00011515930357476, 0.00003704737285544, 0.00000282690796889, -0.00000354513195524, 0.00000037669563126,
+    0.00000019202407921, -0.00000005226908590, -0.00000000491799345, 0.00000000366377919, -0.00000000015981997,
+    -0.00000000017381238, 0.00000000002624031, 0.00000000000560919, -0.00000000000172127, -0.00000000000008634,
+    0.00000000000007894], t4 = [0.49996832875816688, 0.00013383022576489, -0.00026766045152977, 0.00033457556441221,
+    -0.00028996548915725, 0.00018178605666397, -0.00008252863922168, 0.00002551802519049, -0.00000391665839292,
+    -0.00000074018205222, 0.00000064422023359, -0.00000017370155340, 0.00000000909595465, 0.00000000944943118,
+    -0.00000000329957075, 0.00000000029492075, 0.00000000011874477, -0.00000000004420396, 0.00000000000361422,
+    0.00000000000143638, -0.00000000000045848];
+  var asympt = [-1, 1, -3, 15, -105], xabs = Math.abs(x), xshort = Math.floor(xabs), nval = 0;
+  if (xshort == 0) {
         nval = taylor( t0, 11, (xabs * xabs) ) * xabs;
-    else if ( (xshort >= 1) && (xshort <= 2) )
+  } else if ((xshort >= 1) && (xshort <= 2)) {
         nval = taylor( t2, 23, (xabs - 2) );
-    else if ( (xshort >= 3) && (xshort <= 4) )
+  } else if ((xshort >= 3) && (xshort <= 4)) {
         nval = taylor( t4, 20, (xabs - 4) );
-    else
+  } else {
         nval = 0.5 + phi( xabs ) * taylor( asympt, 4, 1 / (xabs * xabs) ) / xabs;
-    if ( x < 0 )
+  }
+  if (x < 0) {
         return -nval;
-    else
+  } else {
         return nval;
+}
 }
 
 function gaussinv( x ) {
@@ -5562,192 +5215,125 @@ function gaussinv( x ) {
 
     if ( Math.abs( q ) <= .425 ) {
         t = 0.180625 - q * q;
-        z =
-            q *
+    z = q * (
                 (
                     (
                         (
                             (
                                 (
                                     (
-                                        (
                                             t * 2509.0809287301226727 + 33430.575583588128105
-                                            )
-                                            * t + 67265.770927008700853
-                                        )
-                                        * t + 45921.953931549871457
-                                    )
-                                    * t + 13731.693765509461125
-                                )
-                                * t + 1971.5909503065514427
-                            )
-                            * t + 133.14166789178437745
-                        )
-                        * t + 3.387132872796366608
-                    )
-                /
+                  ) * t + 67265.770927008700853
+                ) * t + 45921.953931549871457
+              ) * t + 13731.693765509461125
+            ) * t + 1971.5909503065514427
+          ) * t + 133.14166789178437745
+        ) * t + 3.387132872796366608
+      ) / (
                 (
                     (
                         (
                             (
                                 (
                                     (
-                                        (
                                             t * 5226.495278852854561 + 28729.085735721942674
-                                            )
-                                            * t + 39307.89580009271061
-                                        )
-                                        * t + 21213.794301586595867
-                                    )
-                                    * t + 5394.1960214247511077
-                                )
-                                * t + 687.1870074920579083
-                            )
-                            * t + 42.313330701600911252
-                        )
-                        * t + 1
+                  ) * t + 39307.89580009271061
+                ) * t + 21213.794301586595867
+              ) * t + 5394.1960214247511077
+            ) * t + 687.1870074920579083
+          ) * t + 42.313330701600911252
+        ) * t + 1
                     );
-    }
-    else {
-        if ( q > 0 )
+  } else {
+    if (q > 0) {
             t = 1 - x;
-        else
+    } else {
             t = x;
+    }
 
         t = Math.sqrt( -Math.log( t ) );
 
         if ( t <= 5 ) {
             t += -1.6;
-            z =
+      z = (
                 (
                     (
                         (
                             (
                                 (
                                     (
-                                        (
                                             t * 7.7454501427834140764e-4 + 0.0227238449892691845833
-                                            )
-                                            * t + 0.24178072517745061177
-                                        )
-                                        * t + 1.27045825245236838258
-                                    )
-                                    * t + 3.64784832476320460504
-                                )
-                                * t + 5.7694972214606914055
-                            )
-                            * t + 4.6303378461565452959
-                        )
-                        * t + 1.42343711074968357734
-                    )
-                    /
+                    ) * t + 0.24178072517745061177
+                  ) * t + 1.27045825245236838258
+                ) * t + 3.64784832476320460504
+              ) * t + 5.7694972214606914055
+            ) * t + 4.6303378461565452959
+          ) * t + 1.42343711074968357734
+        ) / (
                     (
                         (
                             (
                                 (
                                     (
                                         (
-                                            (
                                                 t * 1.05075007164441684324e-9 + 5.475938084995344946e-4
-                                                )
-                                                * t + 0.0151986665636164571966
-                                            )
-                                            * t + 0.14810397642748007459
-                                        )
-                                        * t + 0.68976733498510000455
-                                    )
-                                    * t + 1.6763848301838038494
-                                )
-                                * t + 2.05319162663775882187
-                            )
-                            * t + 1
+                    ) * t + 0.0151986665636164571966
+                  ) * t + 0.14810397642748007459
+                ) * t + 0.68976733498510000455
+              ) * t + 1.6763848301838038494
+            ) * t + 2.05319162663775882187
+          ) * t + 1
                         );
-        }
-        else {
+    } else {
             t += -5;
-            z =
+      z = (
                 (
                     (
                         (
                             (
                                 (
                                     (
-                                        (
                                             t * 2.01033439929228813265e-7 + 2.71155556874348757815e-5
-                                            )
-                                            * t + 0.0012426609473880784386
-                                        )
-                                        * t + 0.026532189526576123093
-                                    )
-                                    * t + 0.29656057182850489123
-                                )
-                                * t + 1.7848265399172913358
-                            )
-                            * t + 5.4637849111641143699
-                        )
-                        * t + 6.6579046435011037772
-                    )
-                    /
+                    ) * t + 0.0012426609473880784386
+                  ) * t + 0.026532189526576123093
+                ) * t + 0.29656057182850489123
+              ) * t + 1.7848265399172913358
+            ) * t + 5.4637849111641143699
+          ) * t + 6.6579046435011037772
+        ) / (
                     (
                         (
                             (
                                 (
                                     (
                                         (
-                                            (
                                                 t * 2.04426310338993978564e-15 + 1.4215117583164458887e-7
-                                                )
-                                                * t + 1.8463183175100546818e-5
-                                            )
-                                            * t + 7.868691311456132591e-4
-                                        )
-                                        * t + 0.0148753612908506148525
-                                    )
-                                    * t + 0.13692988092273580531
-                                )
-                                * t + 0.59983220655588793769
-                            )
-                            * t + 1
+                    ) * t + 1.8463183175100546818e-5
+                  ) * t + 7.868691311456132591e-4
+                ) * t + 0.0148753612908506148525
+              ) * t + 0.13692988092273580531
+            ) * t + 0.59983220655588793769
+          ) * t + 1
                         );
         }
 
-        if ( q < 0 ) z = -z;
+    if (q < 0) {
+      z = -z;
     }
+  }
 
     return z;
 }
 
 function getLanczosSum( fZ ) {
-    var num = [
-            23531376880.41075968857200767445163675473,
-            42919803642.64909876895789904700198885093,
-            35711959237.35566804944018545154716670596,
-            17921034426.03720969991975575445893111267,
-            6039542586.35202800506429164430729792107,
-            1439720407.311721673663223072794912393972,
-            248874557.8620541565114603864132294232163,
-            31426415.58540019438061423162831820536287,
-            2876370.628935372441225409051620849613599,
-            186056.2653952234950402949897160456992822,
-            8071.672002365816210638002902272250613822,
-            210.8242777515793458725097339207133627117,
-            2.506628274631000270164908177133837338626
-        ],
-        denom = [
-            0,
-            39916800,
-            120543840,
-            150917976,
-            105258076,
-            45995730,
-            13339535,
-            2637558,
-            357423,
-            32670,
-            1925,
-            66,
-            1
-        ];
+  var num = [23531376880.41075968857200767445163675473, 42919803642.64909876895789904700198885093,
+    35711959237.35566804944018545154716670596, 17921034426.03720969991975575445893111267,
+    6039542586.35202800506429164430729792107, 1439720407.311721673663223072794912393972,
+    248874557.8620541565114603864132294232163, 31426415.58540019438061423162831820536287,
+    2876370.628935372441225409051620849613599, 186056.2653952234950402949897160456992822,
+    8071.672002365816210638002902272250613822, 210.8242777515793458725097339207133627117,
+    2.506628274631000270164908177133837338626], denom = [0, 39916800, 120543840, 150917976, 105258076, 45995730,
+    13339535, 2637558, 357423, 32670, 1925, 66, 1];
     // Horner scheme
     var sumNum, sumDenom, i, zInv;
     if ( fZ <= 1 ) {
@@ -5759,8 +5345,7 @@ function getLanczosSum( fZ ) {
             sumDenom *= fZ;
             sumDenom += denom[i];
         }
-    }
-    else
+  } else
     // Cancel down with fZ^12; Horner scheme with reverse coefficients
     {
         zInv = 1 / fZ;
@@ -5778,16 +5363,15 @@ function getLanczosSum( fZ ) {
 
 /** You must ensure fZ>0; fZ>171.624376956302 will overflow. */
 function getGammaHelper( fZ ) {
-    var gamma = getLanczosSum( fZ ),
-        fg = 6.024680040776729583740234375,
-        zgHelp = fZ + fg - 0.5;
+  var gamma = getLanczosSum(fZ), fg = 6.024680040776729583740234375, zgHelp = fZ + fg - 0.5;
     // avoid intermediate overflow
     var halfpower = Math.pow( zgHelp, fZ / 2 - 0.25 );
     gamma *= halfpower;
     gamma /= Math.exp( zgHelp );
     gamma *= halfpower;
-    if ( fZ <= 20 && fZ == Math.floor( fZ ) )
+  if (fZ <= 20 && fZ == Math.floor(fZ)) {
         gamma = Math.round( gamma );
+  }
     return gamma;
 }
 
@@ -5798,11 +5382,14 @@ function getLogGammaHelper( fZ ) {
 }
 
 function getLogGamma( fZ ) {
-    if ( fZ >= maxGammaArgument )
+  if (fZ >= maxGammaArgument) {
         return getLogGammaHelper( fZ );
-    if ( fZ >= 0 )
+  }
+  if (fZ >= 0) {
         return Math.log( getGammaHelper( fZ ) );
-    if ( fZ >= 0.5 )
+  }
+  if (fZ >= 0.5) {
         return Math.log( getGammaHelper( fZ + 1 ) / fZ );
+  }
     return getLogGammaHelper( fZ + 2 ) - Math.log( fZ + 1 ) - Math.log( fZ );
 }
