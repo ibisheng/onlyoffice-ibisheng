@@ -2278,6 +2278,373 @@ function asc_menu_WriteImagePr(_imagePr, _stream){
     _stream["WriteByte"](255);
 }
 
+function asc_menu_WriteParaInd(_type, _ind, _stream){
+    if (!_ind)
+        return;
+
+    _stream["WriteByte"](_type);
+
+    if (_ind.Left !== undefined && _ind.Left !== null)
+    {
+        _stream["WriteByte"](0);
+        _stream["WriteDouble2"](_ind.Left);
+    }
+    if (_ind.Right !== undefined && _ind.Right !== null)
+    {
+        _stream["WriteByte"](1);
+        _stream["WriteDouble2"](_ind.Right);
+    }
+    if (_ind.FirstLine !== undefined && _ind.FirstLine !== null)
+    {
+        _stream["WriteByte"](2);
+        _stream["WriteDouble2"](_ind.FirstLine);
+    }
+
+    _stream["WriteByte"](255);
+}
+function asc_menu_WriteParaSpacing(_type, _spacing, _stream){
+    if (!_spacing)
+        return;
+
+    _stream["WriteByte"](_type);
+
+    if (_spacing.Line !== undefined && _spacing.Line !== null)
+    {
+        _stream["WriteByte"](0);
+        _stream["WriteDouble2"](_spacing.Line);
+    }
+    if (_spacing.LineRule !== undefined && _spacing.LineRule !== null)
+    {
+        _stream["WriteByte"](1);
+        _stream["WriteLong"](_spacing.LineRule);
+    }
+    if (_spacing.Before !== undefined && _spacing.Before !== null)
+    {
+        _stream["WriteByte"](2);
+        _stream["WriteDouble2"](_spacing.Before);
+    }
+    if (_spacing.BeforeAutoSpacing !== undefined && _spacing.BeforeAutoSpacing !== null)
+    {
+        _stream["WriteByte"](3);
+        _stream["WriteBool"](_spacing.BeforeAutoSpacing);
+    }
+    if (_spacing.After !== undefined && _spacing.After !== null)
+    {
+        _stream["WriteByte"](4);
+        _stream["WriteDouble2"](_spacing.After);
+    }
+    if (_spacing.AfterAutoSpacing !== undefined && _spacing.AfterAutoSpacing !== null)
+    {
+        _stream["WriteByte"](5);
+        _stream["WriteBool"](_spacing.AfterAutoSpacing);
+    }
+
+    _stream["WriteByte"](255);
+}
+function asc_menu_WriteParaBorder(_type, _border, _stream){
+    if (!_border)
+        return;
+
+    _stream["WriteByte"](_type);
+
+    asc_menu_WriteColor(0, _border.Color, _stream);
+
+    if (_border.Size !== undefined && _border.Size !== null)
+    {
+        _stream["WriteByte"](1);
+        _stream["WriteDouble2"](_border.Size);
+    }
+    if (_border.Value !== undefined && _border.Value !== null)
+    {
+        _stream["WriteByte"](2);
+        _stream["WriteLong"](_border.Value);
+    }
+    if (_border.Space !== undefined && _border.Space !== null)
+    {
+        _stream["WriteByte"](3);
+        _stream["WriteDouble2"](_border.Space);
+    }
+
+    _stream["WriteByte"](255);
+}
+function asc_menu_WriteParaBorders(_type, _borders, _stream){
+    if (!_borders)
+        return;
+
+    _stream["WriteByte"](_type);
+
+    asc_menu_WriteParaBorder(0, _borders.Left, _stream);
+    asc_menu_WriteParaBorder(1, _borders.Top, _stream);
+    asc_menu_WriteParaBorder(2, _borders.Right, _stream);
+    asc_menu_WriteParaBorder(3, _borders.Bottom, _stream);
+    asc_menu_WriteParaBorder(4, _borders.Between, _stream);
+
+    _stream["WriteByte"](255);
+}
+function asc_menu_WriteParaShd(_type, _shd, _stream){
+    if (!_shd)
+        return;
+
+    _stream["WriteByte"](_type);
+
+    if (_shd.Value !== undefined && _shd.Value !== null)
+    {
+        _stream["WriteByte"](0);
+        _stream["WriteLong"](_shd.Value);
+    }
+
+    asc_menu_WriteColor(1, _shd.Color, _stream);
+
+    _stream["WriteByte"](255);
+}
+function asc_menu_WriteParaTabs(_type, _tabs, _stream){
+    if (!_tabs)
+        return;
+
+    _stream["WriteByte"](_type);
+
+    var _len = _tabs.Tabs.length;
+    _stream["WriteLong"](_len);
+
+    for (var i = 0; i < _len; i++)
+    {
+        if (_tabs.Tabs[i].Pos !== undefined && _tabs.Tabs[i].Pos !== null)
+        {
+            _stream["WriteByte"](0);
+            _stream["WriteDouble2"](_tabs.Tabs[i].Pos);
+        }
+        if (_tabs.Tabs[i].Value !== undefined && _tabs.Tabs[i].Value !== null)
+        {
+            _stream["WriteByte"](1);
+            _stream["WriteLong"](_tabs.Tabs[i].Value);
+        }
+        _stream["WriteByte"](255);
+    }
+}
+function asc_menu_WriteParaFrame(_type, _frame, _stream){
+    if (!_frame)
+        return;
+
+    _stream["WriteByte"](_type);
+
+    if (_frame.FromDropCapMenu !== undefined && _frame.FromDropCapMenu !== null)
+    {
+        _stream["WriteByte"](0);
+        _stream["WriteBool"](_frame.FromDropCapMenu);
+    }
+    if (_frame.DropCap !== undefined && _frame.DropCap !== null)
+    {
+        _stream["WriteByte"](1);
+        _stream["WriteLong"](_frame.DropCap);
+    }
+    if (_frame.W !== undefined && _frame.W !== null)
+    {
+        _stream["WriteByte"](2);
+        _stream["WriteDouble2"](_frame.W);
+    }
+    if (_frame.H !== undefined && _frame.H !== null)
+    {
+        _stream["WriteByte"](3);
+        _stream["WriteDouble2"](_frame.H);
+    }
+    if (_frame.HAlign !== undefined && _frame.HAlign !== null)
+    {
+        _stream["WriteByte"](4);
+        _stream["WriteLong"](_frame.HAlign);
+    }
+    if (_frame.HRule !== undefined && _frame.HRule !== null)
+    {
+        _stream["WriteByte"](5);
+        _stream["WriteLong"](_frame.HRule);
+    }
+    if (_frame.HSpace !== undefined && _frame.HSpace !== null)
+    {
+        _stream["WriteByte"](6);
+        _stream["WriteDouble2"](_frame.HSpace);
+    }
+    if (_frame.VAnchor !== undefined && _frame.VAnchor !== null)
+    {
+        _stream["WriteByte"](7);
+        _stream["WriteLong"](_frame.VAnchor);
+    }
+    if (_frame.VSpace !== undefined && _frame.VSpace !== null)
+    {
+        _stream["WriteByte"](8);
+        _stream["WriteDouble2"](_frame.VSpace);
+    }
+    if (_frame.X !== undefined && _frame.X !== null)
+    {
+        _stream["WriteByte"](9);
+        _stream["WriteDouble2"](_frame.X);
+    }
+    if (_frame.Y !== undefined && _frame.Y !== null)
+    {
+        _stream["WriteByte"](10);
+        _stream["WriteDouble2"](_frame.Y);
+    }
+    if (_frame.XAlign !== undefined && _frame.XAlign !== null)
+    {
+        _stream["WriteByte"](11);
+        _stream["WriteLong"](_frame.XAlign);
+    }
+    if (_frame.YAlign !== undefined && _frame.YAlign !== null)
+    {
+        _stream["WriteByte"](12);
+        _stream["WriteLong"](_frame.YAlign);
+    }
+    if (_frame.Lines !== undefined && _frame.Lines !== null)
+    {
+        _stream["WriteByte"](13);
+        _stream["WriteLong"](_frame.Lines);
+    }
+    if (_frame.Wrap !== undefined && _frame.Wrap !== null)
+    {
+        _stream["WriteByte"](14);
+        _stream["WriteLong"](_frame.Wrap);
+    }
+
+    asc_menu_WriteParaBorders(15, _frame.Brd, _stream);
+    asc_menu_WriteParaShd(16, _frame.Shd, _stream);
+    asc_menu_WriteFontFamily(17, _frame.FontFamily, _stream);
+
+    _stream["WriteByte"](255);
+}
+function asc_menu_WriteParaListType(_type, _list, _stream){
+    if (!_list)
+        return;
+
+    _stream["WriteByte"](_type);
+
+    if (_list.Type !== undefined && _list.Type !== null)
+    {
+        _stream["WriteByte"](0);
+        _stream["WriteLong"](_list.Type);
+    }
+    if (_list.SubType !== undefined && _list.SubType !== null)
+    {
+        _stream["WriteByte"](1);
+        _stream["WriteLong"](_list.SubType);
+    }
+
+    _stream["WriteByte"](255);
+}
+function asc_menu_WriteParagraphPr(_paraPr, _stream) {
+    if (_paraPr.ContextualSpacing !== undefined && _paraPr.ContextualSpacing !== null)
+    {
+        _stream["WriteByte"](0);
+        _stream["WriteBool"](_paraPr.ContextualSpacing);
+    }
+    asc_menu_WriteParaInd(1, _paraPr.Ind, _stream);
+
+    if (_paraPr.KeepLines !== undefined && _paraPr.KeepLines !== null)
+    {
+        _stream["WriteByte"](2);
+        _stream["WriteBool"](_paraPr.KeepLines);
+    }
+    if (_paraPr.KeepNext !== undefined && _paraPr.KeepNext !== null)
+    {
+        _stream["WriteByte"](3);
+        _stream["WriteBool"](_paraPr.KeepNext);
+    }
+    if (_paraPr.WidowControl !== undefined && _paraPr.WidowControl !== null)
+    {
+        _stream["WriteByte"](4);
+        _stream["WriteBool"](_paraPr.WidowControl);
+    }
+    if (_paraPr.PageBreakBefore !== undefined && _paraPr.PageBreakBefore !== null)
+    {
+        _stream["WriteByte"](5);
+        _stream["WriteBool"](_paraPr.PageBreakBefore);
+    }
+
+    asc_menu_WriteParaSpacing(6, _paraPr.Spacing, _stream);
+    asc_menu_WriteParaBorders(7, _paraPr.Brd, _stream);
+    asc_menu_WriteParaShd(8, _paraPr.Shd, _stream);
+
+    if (_paraPr.Locked !== undefined && _paraPr.Locked !== null)
+    {
+        _stream["WriteByte"](9);
+        _stream["WriteBool"](_paraPr.Locked);
+    }
+    if (_paraPr.CanAddTable !== undefined && _paraPr.CanAddTable !== null)
+    {
+        _stream["WriteByte"](10);
+        _stream["WriteBool"](_paraPr.CanAddTable);
+    }
+    if (_paraPr.CanAddDropCap !== undefined && _paraPr.CanAddDropCap !== null)
+    {
+        _stream["WriteByte"](11);
+        _stream["WriteBool"](_paraPr.CanAddDropCap);
+    }
+
+    if (_paraPr.DefaultTab !== undefined && _paraPr.DefaultTab !== null)
+    {
+        _stream["WriteByte"](12);
+        _stream["WriteDouble2"](_paraPr.DefaultTab);
+    }
+
+    asc_menu_WriteParaTabs(13, _paraPr.Tabs, _stream);
+    asc_menu_WriteParaFrame(14, _paraPr.FramePr, _stream);
+
+    if (_paraPr.Subscript !== undefined && _paraPr.Subscript !== null)
+    {
+        _stream["WriteByte"](15);
+        _stream["WriteBool"](_paraPr.Subscript);
+    }
+    if (_paraPr.Superscript !== undefined && _paraPr.Superscript !== null)
+    {
+        _stream["WriteByte"](16);
+        _stream["WriteBool"](_paraPr.Superscript);
+    }
+    if (_paraPr.SmallCaps !== undefined && _paraPr.SmallCaps !== null)
+    {
+        _stream["WriteByte"](17);
+        _stream["WriteBool"](_paraPr.SmallCaps);
+    }
+    if (_paraPr.AllCaps !== undefined && _paraPr.AllCaps !== null)
+    {
+        _stream["WriteByte"](18);
+        _stream["WriteBool"](_paraPr.AllCaps);
+    }
+    if (_paraPr.Strikeout !== undefined && _paraPr.Strikeout !== null)
+    {
+        _stream["WriteByte"](19);
+        _stream["WriteBool"](_paraPr.Strikeout);
+    }
+    if (_paraPr.DStrikeout !== undefined && _paraPr.DStrikeout !== null)
+    {
+        _stream["WriteByte"](20);
+        _stream["WriteBool"](_paraPr.DStrikeout);
+    }
+
+    if (_paraPr.TextSpacing !== undefined && _paraPr.TextSpacing !== null)
+    {
+        _stream["WriteByte"](21);
+        _stream["WriteDouble2"](_paraPr.TextSpacing);
+    }
+    if (_paraPr.Position !== undefined && _paraPr.Position !== null)
+    {
+        _stream["WriteByte"](22);
+        _stream["WriteDouble2"](_paraPr.Position);
+    }
+
+    asc_menu_WriteParaListType(23, _paraPr.ListType, _stream);
+
+    if (_paraPr.StyleName !== undefined && _paraPr.StyleName !== null)
+    {
+        _stream["WriteByte"](24);
+        _stream["WriteString2"](_paraPr.StyleName);
+    }
+
+    if (_paraPr.Jc !== undefined && _paraPr.Jc !== null)
+    {
+        _stream["WriteByte"](25);
+        _stream["WriteLong"](_paraPr.Jc);
+    }
+
+    _stream["WriteByte"](255);
+}
+
 function asc_ReadCBorder(s, p) {
     var color = null;
     var style = null;
@@ -4450,19 +4817,27 @@ function OfflineEditor () {
             {
                 switch (SelectedObjects[i].asc_getObjectType())
                 {
+                    case c_oAscTypeSelectElement.Paragraph:
+                    {
+                        stream["WriteLong"](c_oAscTypeSelectElement.Paragraph);
+                        asc_menu_WriteParagraphPr(SelectedObjects[i].Value, stream);
+                        //console.log('c_oAscTypeSelectElement.Paragraph');
+                        break;
+                    }
                     case c_oAscTypeSelectElement.Image:
                     {
                         stream["WriteLong"](c_oAscTypeSelectElement.Image);
                         asc_menu_WriteImagePr(SelectedObjects[i].Value, stream);
+                        //console.log('c_oAscTypeSelectElement.Image');
                         break;
                     }
                     case c_oAscTypeSelectElement.Hyperlink:
                     {
                         stream["WriteLong"](c_oAscTypeSelectElement.Hyperlink);
                         asc_menu_WriteHyperPr(SelectedObjects[i].Value, stream);
+                        //console.log('c_oAscTypeSelectElement.Hyperlink');
                         break;
                     }
-                    case c_oAscTypeSelectElement.SpellCheck:
                     default:
                     {
                         // none
@@ -5605,16 +5980,11 @@ function offline_shape_text_select() {
     var ws = _api.wb.getWorksheet();
 
     var controller = ws.objectRender.controller;
-    var selected_objects = controller.selection.groupSelection ? controller.selection.groupSelection.selectedObjects : controller.selectedObjects;
-    if (1 == selected_objects.length) {
-        var content =  this.controller.curState.drawingObjects.selectedObjects[0].getDocContent();
-        if (content) {
-            window.AscDisableTextSelection = false;
-            content.Cursor_MoveToEndPos();
 
-            _s.enableTextSelection = true;
-        }
-    }
+    window.AscDisableTextSelection = false;
+    controller.startEditTextCurrentShape();
+
+    _s.enableTextSelection = true;
 }
 
 function offline_get_selection(x, y, width, height, autocorrection) {return _s.getSelection(x, y, width, height, autocorrection);}
