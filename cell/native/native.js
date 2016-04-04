@@ -3288,10 +3288,12 @@ function OfflineEditor () {
             this._drawGrid(drawingCtx, range, leftFieldInPt, topFieldInPt, width, height);
         };
 
-        asc.WorksheetView.prototype.__drawCellsAndBorders = function (drawingCtx,  c1, r1, c2, r2, offsetXForDraw, offsetYForDraw) {
+        asc.WorksheetView.prototype.__drawCellsAndBorders = function (drawingCtx,  c1, r1, c2, r2, offsetXForDraw, offsetYForDraw, istoplayer) {
             var range = new asc_Range(c1, r1, c2, r2);
 
-            this._drawCellsAndBorders(drawingCtx, range, offsetXForDraw, offsetYForDraw);
+            if (false === istoplayer) {
+                this._drawCellsAndBorders(drawingCtx, range, offsetXForDraw, offsetYForDraw);
+            }
 
             var oldrange = this.visibleRange;
             this.visibleRange = range;
@@ -4203,7 +4205,7 @@ function OfflineEditor () {
 
     // render
 
-    this.drawSheet = function (x, y, width, height, ratio) {
+    this.drawSheet = function (x, y, width, height, ratio, istoplayer) {
         _null_object.width = width * ratio;
         _null_object.height = height * ratio;
 
@@ -4211,7 +4213,7 @@ function OfflineEditor () {
         var region = this._updateRegion(worksheet, x, y, width * ratio, height * ratio);
         var colRowHeaders = _api.asc_getSheetViewSettings();
 
-        if (colRowHeaders.asc_getShowGridLines()) {
+        if (colRowHeaders.asc_getShowGridLines() && false == istoplayer) {
             worksheet.__drawGrid(undefined,
                 region.columnBeg, region.rowBeg, region.columnEnd, region.rowEnd,
                 worksheet.cols[region.columnBeg].left + region.columnOff, worksheet.rows[region.rowBeg].top + region.rowOff,
@@ -4220,7 +4222,7 @@ function OfflineEditor () {
 
         worksheet.__drawCellsAndBorders(undefined,
             region.columnBeg, region.rowBeg, region.columnEnd, region.rowEnd,
-            worksheet.cols[region.columnBeg].left + region.columnOff, worksheet.rows[region.rowBeg].top + region.rowOff);
+            worksheet.cols[region.columnBeg].left + region.columnOff, worksheet.rows[region.rowBeg].top + region.rowOff, istoplayer);
     };
     this.drawHeader = function (x, y, width, height, type, ratio) {
 
@@ -5359,7 +5361,7 @@ var _s = new OfflineEditor();
 
 function offline_of() {_s.openFile();}
 function offline_stz(v) {_s.zoom = v; _api.asc_setZoom(v);}
-function offline_ds(x, y, width, height, ratio) {_s.drawSheet(x, y, width, height, ratio);}
+function offline_ds(x, y, width, height, ratio, istoplayer) {_s.drawSheet(x, y, width, height, ratio, istoplayer);}
 function offline_dh(x, y, width, height, type, ratio) {_s.drawHeader(x, y, width, height, type, ratio);}
 
 function offline_mouse_down(x, y, pin, isViewerMode, isFormulaEditMode, isRangeResize, isChartRange, indexRange, resizeRange, targetCol, targetRow) {
@@ -5370,7 +5372,7 @@ function offline_mouse_down(x, y, pin, isViewerMode, isFormulaEditMode, isRangeR
 
     _s._resizeWorkRegion(ws, x, y, true);
 
-    var range =  ws.visibleRange.clone();
+    var range = ws.visibleRange.clone();
     range.c1 = _s.col0;
     range.r1 = _s.row0;
     ws.visibleRange = range;
@@ -5378,9 +5380,11 @@ function offline_mouse_down(x, y, pin, isViewerMode, isFormulaEditMode, isRangeR
     ws.objectRender.drawingArea.reinitRanges();
     var graphicsInfo = wb._onGetGraphicsInfo(x, y);
     if (graphicsInfo) {
-        var e = {isLocked: true, Button: 0, ClickCount: 1, shiftKey: false, metaKey: false, ctrlKey: false};
+        var e = {isLocked:true, Button:0, ClickCount:1, shiftKey:false, metaKey:false, ctrlKey:false};
 
         ws.arrActiveChartsRanges = [];
+
+        window.AscDisableTextSelection = true;
 
         wb._onGraphicObjectMouseDown(e, x, y);
         wb._onUpdateSelectionShape(true);
@@ -5392,7 +5396,9 @@ function offline_mouse_down(x, y, pin, isViewerMode, isFormulaEditMode, isRangeR
             ws.isChartAreaEditMode = false;
         }
 
-        window.AscAlwaysSaveAspectOnResizeTrack = true;
+        if (!_s.enableTextSelection) {
+            window.AscAlwaysSaveAspectOnResizeTrack = true;
+        }
 
         var ischart = false;
         var controller = ws.objectRender.controller;
@@ -5407,7 +5413,10 @@ function offline_mouse_down(x, y, pin, isViewerMode, isFormulaEditMode, isRangeR
             }
         }
 
-        return {id:graphicsInfo.id, ischart: ischart, 'textselect': (null !== ws.objectRender.controller.selection.textSelection)};
+        //var content = ws.objectRender.controller.curState.majorObject.getDocContent();
+        //content.Cursor_MoveToEndPos();
+
+        return {id:graphicsInfo.id, ischart:ischart, 'textselect':(null !== ws.objectRender.controller.selection.textSelection)};
     }
 
     _s.cellPin = pin;
@@ -5584,8 +5593,27 @@ function offline_mouse_up(x, y, isViewerMode, isRangeResize, isChartRange, index
 
     return ret;
 }
-function offline_process_input_commands(comands) {
+function offline_mouse_double_tap(x, y) {
+    var ws = _api.wb.getWorksheet();
+    var e = {isLocked:true, Button:0, ClickCount:2, shiftKey:false, metaKey:false, ctrlKey:false};
 
+    ws.objectRender.graphicObjectMouseDown(e, x, y);
+    ws.objectRender.graphicObjectMouseUp(e, x, y);
+}
+function offline_shape_text_select() {
+    var ws = _api.wb.getWorksheet();
+
+    var controller = ws.objectRender.controller;
+    var selected_objects = controller.selection.groupSelection ? controller.selection.groupSelection.selectedObjects : controller.selectedObjects;
+    if (1 == selected_objects.length) {
+        var content =  this.controller.curState.drawingObjects.selectedObjects[0].getDocContent();
+        if (content) {
+            window.AscDisableTextSelection = false;
+            content.Cursor_MoveToEndPos();
+
+            _s.enableTextSelection = true;
+        }
+    }
 }
 
 function offline_get_selection(x, y, width, height, autocorrection) {return _s.getSelection(x, y, width, height, autocorrection);}
@@ -5618,17 +5646,30 @@ function offline_keyboard_down(keys) {
     ws.isFormulaEditMode = false;
 
     for (var i = 0; i < keys.length; ++i) {
-        if (37 === keys[i][2])          // LEFT
+
+        // TODO: commands for text in shape
+
+        var codeKey = keys[i][2];
+
+        if (100 == keys[i][1]) {
+            var event = {which:codeKey,keyCode:codeKey,metaKey:false,altKey:false,ctrlKey:false,shiftKey:false, preventDefault:function(){}};
+            if (32 === codeKey || 8 === codeKey || 13 === codeKey) {
+                ws.objectRender.graphicObjectKeyDown(event);
+            } else {
+                ws.objectRender.graphicObjectKeyPress(event);
+            }
+        }
+        else if (37 === codeKey)      // LEFT
             wb._onChangeSelection(true, -1, 0, false, false, undefined);
-        else if (39 === keys[i][2])     // RIGHT
+        else if (39 === codeKey)     // RIGHT
             wb._onChangeSelection(true, 1, 0, false, false, undefined);
-        if (38 === keys[i][2])          // UP
+        if (38 === codeKey)          // UP
             wb._onChangeSelection(true, 0, -1, false, false, undefined);
-        else if (40 === keys[i][2])     // DOWN
+        else if (40 === codeKey)     // DOWN
             wb._onChangeSelection(true, 0, 1, false, false, undefined);
-        else if (9 === keys[i][2])     // TAB
+        else if (9 === codeKey)     // TAB
             wb._onChangeSelection(true, -1, 0, false, false, undefined);
-        else if (13 === keys[i][2])     // ENTER
+        else if (13 === codeKey)     // ENTER
             wb._onChangeSelection(true, 0, 1, false, false, undefined);
     }
 
@@ -5666,7 +5707,6 @@ function offline_cell_editor_open(x, y, width, height, ratio, isSelectAll, isFor
     }
     ws.visibleRange = range;
 }
-
 function offline_cell_editor_process_input_commands(commands, width, height, ratio) {
     _null_object.width = width * ratio;
     _null_object.height = height * ratio;
