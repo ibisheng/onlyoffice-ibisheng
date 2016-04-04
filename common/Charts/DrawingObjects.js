@@ -345,7 +345,7 @@ CSparklineView.prototype.initFromSparkline = function(oSparkline, oSparklineGrou
         var chart_space = DrawingObjectsController.prototype._getChartSpace(chartSeries, settings, true);
         chart_space.setWorksheet(worksheetView.model);
         this.chartSpace = chart_space;
-        var oBBox = worksheetView.model.getCell2(oSparkline.sqref);
+        var oBBox = oSparkline.sqref;
         this.col = oBBox.c1;
         this.row = oBBox.r1;
         this.extX = worksheetView.getColumnWidth(oBBox.c1, 3);

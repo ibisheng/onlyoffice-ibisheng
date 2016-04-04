@@ -3581,13 +3581,13 @@
             var oThis = this;
             for(var i = 0, length = aReplies.length; i < length; ++i)
                 this.bs.WriteItem( c_oSer_CommentData.Reply, function(){oThis.WriteCommentData(aReplies[i]);});
-        }
+        };
 		this.WriteSparklineGroups = function(oSparklineGroups)
         {
             var oThis = this;
             for(var i = 0, length = oSparklineGroups.arrSparklineGroup.length; i < length; ++i)
                 this.bs.WriteItem( c_oSer_Sparkline.SparklineGroup, function(){oThis.WriteSparklineGroup(oSparklineGroups.arrSparklineGroup[i]);});
-        }
+        };
 		this.WriteSparklineGroup = function(oSparklineGroup)
         {
 			var oThis = this;
@@ -3673,23 +3673,22 @@
 			if (null != oSparklineGroup.arrSparklines) {
 				this.bs.WriteItem(c_oSer_Sparkline.Sparklines, function(){oThis.WriteSparklines(oSparklineGroup);});
 			}
-		}
+		};
 		this.WriteSparklines = function(oSparklineGroup)
         {
             var oThis = this;
             for(var i = 0, length = oSparklineGroup.arrSparklines.length; i < length; ++i)
                 this.bs.WriteItem( c_oSer_Sparkline.Sparkline, function(){oThis.WriteSparkline(oSparklineGroup.arrSparklines[i]);});
-        }
+        };
 		this.WriteSparkline = function(oSparkline)
         {
-			var oThis = this;
 			if (null != oSparkline.f) {
                 this.memory.WriteByte(c_oSer_Sparkline.SparklineRef);
                 this.memory.WriteString2(oSparkline.f);
 			}
 			if (null != oSparkline.sqref) {
 				this.memory.WriteByte(c_oSer_Sparkline.SparklineSqRef);
-                this.memory.WriteString2(oSparkline.sqref);
+                this.memory.WriteString2(oSparkline.sqref.getName());
 			}
 		}
     }
@@ -6604,12 +6603,11 @@
             return res;
         };
 		this.ReadSparkline = function (type, length, oSparkline) {
-            var oThis = this;
             var res = c_oSerConstants.ReadOk;
             if (c_oSer_Sparkline.SparklineRef === type) {
 				oSparkline.f = this.stream.GetString2LE(length);
 			} else if (c_oSer_Sparkline.SparklineSqRef === type) {
-				oSparkline.sqref = this.stream.GetString2LE(length);
+				oSparkline.setSqref(this.stream.GetString2LE(length));
 			} else
                 res = c_oSerConstants.ReadUnknown;
             return res;
