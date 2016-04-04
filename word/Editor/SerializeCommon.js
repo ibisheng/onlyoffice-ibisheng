@@ -725,6 +725,7 @@ function CPPTXContentLoader()
         this.stream.cur    = stream.cur;
 
         this.Reader.stream = this.stream;
+        this.Reader.ImageMapChecker = this.ImageMapChecker;
         return this.Reader.ReadTheme();
     }
 

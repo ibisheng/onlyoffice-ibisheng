@@ -1851,6 +1851,76 @@ CSrcRect.prototype =
     }
 };
 
+
+var TILE_FLIP_MODE_NONE = 0;
+var TILE_FLIP_MODE_X    = 1;
+var TILE_FLIP_MODE_Y    = 2;
+var TILE_FLIP_MODE_XY   = 3;
+
+var TILE_RECT_ALIGN_B    = 0;
+var TILE_RECT_ALIGN_BL   = 1;
+var TILE_RECT_ALIGN_BR   = 2;
+var TILE_RECT_ALIGN_CTR  = 3;
+var TILE_RECT_ALIGN_L    = 4;
+var TILE_RECT_ALIGN_R    = 5;
+var TILE_RECT_ALIGN_T    = 6;
+var TILE_RECT_ALIGN_TL   = 7;
+var TILE_RECT_ALIGN_TR   = 8;
+
+function CBlipFillTile()
+{
+    this.tx = null;
+    this.ty = null;
+    this.sx = null;
+    this.sy = null;
+    this.flip = null;
+    this.algn = null;
+}
+CBlipFillTile.prototype.Write_ToBinary = function(w)
+{
+    writeLong(w, this.tx);
+    writeLong(w, this.ty);
+    writeLong(w, this.sx);
+    writeLong(w, this.sy);
+    writeLong(w, this.flip);
+    writeLong(w, this.algn);
+};
+CBlipFillTile.prototype.Read_FromBinary = function(r)
+{
+    this.tx = readLong(r);
+    this.ty = readLong(r);
+    this.sx = readLong(r);
+    this.sy = readLong(r);
+    this.flip = readLong(r);
+    this.algn = readLong(r);
+};
+
+CBlipFillTile.prototype.createDuplicate = function()
+{
+    var ret = new CBlipFillTile();
+    ret.tx = this.tx;
+    ret.ty = this.ty;
+    ret.sx = this.sx;
+    ret.sy = this.sy;
+    ret.flip = this.flip;
+    ret.algn = this.algn;
+    return ret;
+};
+
+
+CBlipFillTile.prototype.IsIdentical = function(o)
+{
+    if(!o)
+    {
+        return false;
+    }
+    return (  o.tx == this.tx &&
+        o.ty == this.ty &&
+    o.sx == this.sx &&
+    o.sy == this.sy &&
+    o.flip == this.flip &&
+    o.algn == this.algn)
+};
 function CBlipFill()
 {
     this.type = FILL_TYPE_BLIP;
@@ -1893,7 +1963,15 @@ CBlipFill.prototype =
             writeBool(w, false);
         }
         writeBool(w, this.stretch);
-        writeBool(w, this.tile);
+        if(isRealObject(this.tile))
+        {
+            w.WriteBool(true);
+            this.tile.Write_ToBinary(w);
+        }
+        else
+        {
+            w.WriteBool(false);
+        }
         writeBool(w, this.rotWithShape);
     },
 
@@ -1925,7 +2003,15 @@ CBlipFill.prototype =
             this.srcRect = null;
         }
         this.stretch      = readBool(r);
-        this.tile         = readBool(r);
+        if(r.GetBool())
+        {
+            this.tile = new CBlipFillTile();
+            this.tile.Read_FromBinary(r);
+        }
+        else
+        {
+            this.tile = null;
+        }
         this.rotWithShape = readBool(r);
     },
 
@@ -1999,7 +2085,10 @@ CBlipFill.prototype =
         duplicate.VectorImageBin = this.VectorImageBin;
 
         duplicate.stretch = this.stretch;
-        duplicate.tile = this.tile;
+        if(isRealObject(this.tile))
+        {
+            duplicate.tile = this.tile.createDuplicate();
+        }
 
         if (null != this.srcRect)
             duplicate.srcRect = this.srcRect.createDublicate();
@@ -2034,11 +2123,20 @@ CBlipFill.prototype =
             return false;
         }
 
-        if(fill.tile !=  this.tile)
+        if(isRealObject(this.tile))
         {
+            if(!this.tile.IsIdentical(fill.tile))
+            {
             return false;
         }
-
+        }
+        else
+        {
+            if(fill.tile)
+            {
+                return false;
+            }
+        }
         /*
          if(fill.rotWithShape !=  this.rotWithShape)
          {
@@ -2064,9 +2162,16 @@ CBlipFill.prototype =
         {
             _ret.stretch = this.stretch;
         }
-        if(fill.tile == this.tile)
+        if(isRealObject(fill.tile))
         {
-            _ret.tile = this.tile;
+            if(fill.tile.IsIdentical(this.tile))
+            {
+                _ret.tile = this.tile.createDuplicate();
+        }
+            else
+            {
+                _ret.tile = new CBlipFillTile();
+            }
         }
         if(fill.rotWithShape === this.rotWithShape)
         {
@@ -3309,6 +3414,15 @@ function CompareUniFill(unifill_1, unifill_2)
 }
 
 
+function CompareBlipTiles(tile1, tile2)
+{
+    if(isRealObject(tile1))
+    {
+        return tile1.IsIdentical(tile2);
+    }
+    return tile1 === tile2;
+}
+
 function CompareUnifillBool(u1, u2)
 {
     if(!u1 && !u2)
@@ -3354,7 +3468,7 @@ function CompareUnifillBool(u1, u2)
                     return false;
             }
 
-            if(u1.fill.stretch !== u2.fill.stretch || u1.fill.tile !== u2.fill.tile || u1.fill.rotWithShape !== u2.fill.rotWithShape)
+            if(u1.fill.stretch !== u2.fill.stretch || !CompareBlipTiles(u1.fill.tile, u2.fill.tile) || u1.fill.rotWithShape !== u2.fill.rotWithShape)
                 return false;
             break;
         }
@@ -8262,9 +8376,9 @@ CTheme.prototype =
         }
         else if (idx >= 1001)
         {
-            if (this.themeElements.fmtScheme.bgFillStyleLst[idx-1])
+            if (this.themeElements.fmtScheme.bgFillStyleLst[idx-1001])
             {
-                ret = this.themeElements.fmtScheme.bgFillStyleLst[idx-1].createDuplicate();
+                ret = this.themeElements.fmtScheme.bgFillStyleLst[idx-1001].createDuplicate();
                 if(ret)
                 {
                     ret.checkPhColor(unicolor);

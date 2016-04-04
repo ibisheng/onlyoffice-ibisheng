@@ -4488,8 +4488,20 @@ CShape.prototype =
 
     getAllRasterImages: function(images)
     {
-        if(this.spPr && this.spPr.Fill && this.spPr.Fill.fill && typeof this.spPr.Fill.fill.RasterImageId === "string" && this.spPr.Fill.fill.RasterImageId.length > 0)
+        if(this.spPr && this.spPr.Fill && this.spPr.Fill.fill && typeof (this.spPr.Fill.fill.RasterImageId) === "string" && this.spPr.Fill.fill.RasterImageId.length > 0)
             images.push(this.spPr.Fill.fill.RasterImageId);
+
+
+        var compiled_style = this.getCompiledStyle();
+        var parents = this.getParentObjects();
+        if (isRealObject(parents.theme) && isRealObject(compiled_style) && isRealObject(compiled_style.fillRef))
+        {
+            var brush = parents.theme.getFillStyle(compiled_style.fillRef.idx, compiled_style.fillRef.Color);
+            if(brush && brush.fill && typeof (brush.fill.RasterImageId) === "string" && brush.fill.RasterImageId.length > 0)
+            {
+                images.push(brush.fill.RasterImageId);
+            }
+        }
         var oContent = this.getDocContent();
         if(oContent)
         {

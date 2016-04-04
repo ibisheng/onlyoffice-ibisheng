@@ -2196,8 +2196,62 @@ function BinaryPPTYLoader()
                             }
                             case 2:
                             {
-                                uni_fill.fill.setTile(true);
-                                s.SkipRecord();
+                                var oBlipTile = new CBlipFillTile();
+
+
+                                var s = this.stream;
+
+                                var _rec_start = s.cur;
+                                var _end_rec = _rec_start + s.GetLong() + 4;
+
+                                s.Skip2(1); // start attributes
+
+                                while (true)
+                                {
+                                    var _at = s.GetUChar();
+                                    if (_at == g_nodeAttributeEnd)
+                                break;
+
+                                    switch (_at)
+                                    {
+                                        case 0:
+                                        {
+                                            oBlipTile.sx = s.GetLong();
+                                            break;
+                            }
+                                        case 1:
+                                        {
+                                            oBlipTile.sy = s.GetLong();
+                                            break;
+                                        }
+                                        case 2:
+                                        {
+                                            oBlipTile.tx = s.GetLong();
+                                            break;
+                                        }
+                            case 3:
+                            {
+                                            oBlipTile.ty = s.GetLong();
+                                            break;
+                                        }
+                                        case 4:
+                                        {
+                                            oBlipTile.algn = s.GetUChar();
+                                            break;
+                                        }
+                                        case 5:
+                                        {
+                                            oBlipTile.flip = s.GetUChar();
+                                            break;
+                                        }
+                                        default:
+                                        {
+                                            break;
+                                        }
+                                    }
+                                }
+                                s.Seek2(_end_rec);
+                                uni_fill.fill.setTile(oBlipTile);
                                 break;
                             }
                             case 3:

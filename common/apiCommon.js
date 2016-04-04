@@ -3078,8 +3078,7 @@ function CorrectUniFill(asc_fill, unifill, editorId)
                 if (tile == c_oAscFillBlipType.STRETCH)
                     ret.fill.tile = null;
                 else if (tile == c_oAscFillBlipType.TILE)
-                    ret.fill.tile = true;
-
+                    ret.fill.tile = new CBlipFillTile();
                 break;
             }
             case c_oAscFill.FILL_TYPE_PATT:
