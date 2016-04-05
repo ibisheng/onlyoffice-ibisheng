@@ -2095,7 +2095,7 @@ CTableId.prototype.Load_Changes = function(Reader, Reader2)
                     var oParaDrawing = oLogicDocument.DrawingObjects.getTrialImage(sUrl);
                     var oFirstParagraph = oLogicDocument.Get_FirstParagraph();
                     ExecuteNoHistory(function(){
-                        var oRun = new CRun();
+                        var oRun = new ParaRun();
                         oRun.Content.splice(0, oParaDrawing);
                         oFirstParagraph.Content.splice(0, oRun);
                     }, this, []);
