@@ -118,6 +118,7 @@ function CHistory(workbook)
 	this.LastState = null;
 	this.LoadFonts = {};//собираем все загруженные шрифты между моментами сохранения
 	this.HasLoadFonts = false;
+	this.CanNotAddChanges = false;//флаг для отслеживания ошибок добавления изменений без точки:Create_NewPoint->Add->Save_Changes->Add
 
 	this.SavedIndex = null;			// Номер точки отката, на которой произошло последнее сохранение
   this.ForceSave  = false;       // Нужно сохранение, случается, когда у нас точка SavedIndex смещается из-за объединения точек, и мы делаем Undo
@@ -563,6 +564,8 @@ CHistory.prototype.Create_NewPoint = function()
 	if ( 0 !== this.TurnOffHistory || 0 !== this.Transaction )
 		return;
 
+	this.CanNotAddChanges = false;
+
 	if (null !== this.SavedIndex && this.Index < this.SavedIndex)
 		this.Set_SavedIndex(this.Index);
 
@@ -602,6 +605,8 @@ CHistory.prototype.Add = function(Class, Type, sheetid, range, Data, LocalChange
 {
 	if ( 0 !== this.TurnOffHistory || this.Index < 0 )
 		return;
+
+	this._CheckCanNotAddChanges();
 
 	var Item;
 	if ( this.RecIndex >= this.Index )
@@ -840,4 +845,15 @@ CHistory.prototype._addFonts = function (isCreateNew) {
 		this.HasLoadFonts = false;
 	}
 };
+CHistory.prototype._CheckCanNotAddChanges = function () {
+    try {
+        if (this.CanNotAddChanges) {
+            var tmpErr = new Error();
+            if (tmpErr.stack) {
+                this.workbook.oApi.CoAuthoringApi.sendChangesError(tmpErr.stack);
+            }
+        }
+    } catch (e) {
+    }
+}
 var History = null;

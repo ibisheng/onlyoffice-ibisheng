@@ -1341,6 +1341,7 @@ var editor;
       }
       if (0 < arrChanges.length || null !== deleteIndex || null !== excelAdditionalInfo) {
         this.CoAuthoringApi.saveChanges(arrChanges, deleteIndex, excelAdditionalInfo);
+        History.CanNotAddChanges = true;
       } else {
         this.CoAuthoringApi.unLockDocument(true);
       }

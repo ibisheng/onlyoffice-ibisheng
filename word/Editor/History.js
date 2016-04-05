@@ -16,6 +16,7 @@ function CHistory(Document)
     this.Document   = Document;
     this.Api                  = null;
     this.CollaborativeEditing = null;
+    this.CanNotAddChanges = false;//флаг для отслеживания ошибок добавления изменений без точки:Create_NewPoint->Add->Save_Changes->Add
 
     this.RecalculateData =
     {
@@ -279,6 +280,8 @@ CHistory.prototype =
 		if ( 0 !== this.TurnOffHistory )
 			return;
 
+        this.CanNotAddChanges = false;
+
         if (null !== this.SavedIndex && this.Index < this.SavedIndex)
             this.Set_SavedIndex(this.Index);
 
@@ -351,6 +354,8 @@ CHistory.prototype =
     {
 		if (0 !== this.TurnOffHistory || this.Index < 0)
             return;
+
+        this._CheckCanNotAddChanges();
 
         // Заглушка на случай, если у нас во время создания одной точки в истории, после нескольких изменений идет
         // пересчет, потом снова добавляются изменения и снова запускается пересчет и т.д.
@@ -971,6 +976,18 @@ CHistory.prototype =
         this.BinaryWriter.WriteLong(PosInfo.Position);
         var BinaryLen = this.BinaryWriter.GetCurPosition() - BinaryPos;
         return  (BinaryLen + ";" + this.BinaryWriter.GetBase64Memory2(BinaryPos, BinaryLen));
+    },
+
+    _CheckCanNotAddChanges : function() {
+        try {
+            if (this.CanNotAddChanges && this.Api) {
+                var tmpErr = new Error();
+                if (tmpErr.stack) {
+                    this.Api.CoAuthoringApi.sendChangesError(tmpErr.stack);
+                }
+            }
+        } catch (e) {
+        }
     }
 };
 

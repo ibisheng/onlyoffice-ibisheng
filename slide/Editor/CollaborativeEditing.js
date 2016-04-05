@@ -143,9 +143,10 @@ CCollaborativeEditing.prototype.Send_Changes = function(IsUserSave, AdditionalIn
     this.m_aNeedUnlock.length  = 0;
     this.m_aNeedUnlock2.length = 0;
 
-    if (0 < aChanges.length || null !== deleteIndex)
+    if (0 < aChanges.length || null !== deleteIndex) {
         editor.CoAuthoringApi.saveChanges(aChanges, deleteIndex, AdditionalInfo);
-    else
+        History.CanNotAddChanges = true;
+    } else
         editor.CoAuthoringApi.unLockDocument(true);
 
     if ( -1 === this.m_nUseType )

@@ -84,9 +84,10 @@ CWordCollaborativeEditing.prototype.Send_Changes = function(IsUserSave, Addition
     this.m_aNeedUnlock2.length = 0;
 
     var deleteIndex = ( null === History.SavedIndex ? null : SumIndex );
-    if (0 < aChanges.length || null !== deleteIndex)
+    if (0 < aChanges.length || null !== deleteIndex) {
         editor.CoAuthoringApi.saveChanges(aChanges, deleteIndex, AdditionalInfo);
-    else
+        History.CanNotAddChanges = true;
+    } else
         editor.CoAuthoringApi.unLockDocument(true);
 
     if (-1 === this.m_nUseType)
