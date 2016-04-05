@@ -2151,6 +2151,11 @@
 								
 								tablePart.TotalsRowCount = tablePart.TotalsRowCount === null ? 1 : null;
 							}
+							
+							if(val === true)
+							{
+								tablePart.generateTotalsRowLabel();
+							}
 						}
 						
 						break;
@@ -3764,20 +3769,39 @@
 				if(style && style.Name && worksheet.workbook.TableStyles && worksheet.workbook.TableStyles.AllStyles && (styleForCurTable = worksheet.workbook.TableStyles.AllStyles[style.Name]))
 				{
 					//заполняем названия столбцов
-					if(true != isOpenFilter && headerRowCount > 0 && options.TableColumns)
+					if(true != isOpenFilter && isSetVal && !bRedoChanges)
 					{
-						for(var ncol = bbox.c1; ncol <= bbox.c2; ncol++)
+						if((headerRowCount > 0 || totalsRowCount > 0)  && options.TableColumns)
 						{
-							var range = worksheet.getCell3(bbox.r1, ncol);
-							var num = ncol - bbox.c1;
-							var tableColumn = options.TableColumns[num];
-							if(null != tableColumn && null != tableColumn.Name && !bRedoChanges && isSetVal)
+							for(var ncol = bbox.c1; ncol <= bbox.c2; ncol++)
 							{
-								range.setValue(tableColumn.Name);
-								range.setType(CellValueType.String);
+								var range = worksheet.getCell3(bbox.r1, ncol);
+								var num = ncol - bbox.c1;
+								var tableColumn = options.TableColumns[num];
+								if(null != tableColumn && null != tableColumn.Name && headerRowCount > 0)
+								{
+									range.setValue(tableColumn.Name);
+									range.setType(CellValueType.String);
+								}
+								
+								if(tableColumn !== null && tableColumn.TotalsRowLabel !== null && totalsRowCount > 0)
+								{
+									range = worksheet.getCell3(bbox.r2, ncol);
+									range.setValue(tableColumn.TotalsRowLabel);
+									range.setType(CellValueType.String);
+									//TODO + далее необходимо добавлять формулу 
+								}
 							}
 						}
+						else if(totalsRowCount)
+						{
+							//var range = worksheet.getCell3(bbox.r2, bbox.c1);
+							//range.setValue(tableColumn.Name);
+							//range.setType(CellValueType.String);
+						}
+						
 					}
+					
 					//заполняем стили
 					var aNoHiddenCol = [];
 					for(var i = bbox.c1; i <= bbox.c2; i++)

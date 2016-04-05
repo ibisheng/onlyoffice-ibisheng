@@ -10206,7 +10206,7 @@
         return true;
     };
 
-    WorksheetView.prototype.changeWorksheet = function ( prop, val, displayNameFormatTable ) {
+    WorksheetView.prototype.changeWorksheet = function ( prop, val ) {
         // Проверка глобального лока
         if ( this.collaborativeEditing.getGlobalLock() ) {
             return;
@@ -10340,7 +10340,7 @@
                         functionModelAction = function () {
                             History.Create_NewPoint();
                             History.StartTransaction();
-                            if ( range.addCellsShiftRight(displayNameFormatTable) ) {
+                            if ( range.addCellsShiftRight() ) {
                                 fullRecalc = true;
                                 reinitRanges = true;
                                 t.cellCommentator.updateCommentsDependencies( true, val, arn );
@@ -10361,7 +10361,7 @@
                         functionModelAction = function () {
                             History.Create_NewPoint();
                             History.StartTransaction();
-                            if ( range.addCellsShiftBottom(displayNameFormatTable) ) {
+                            if ( range.addCellsShiftBottom() ) {
                                 fullRecalc = true;
                                 reinitRanges = true;
                                 t.cellCommentator.updateCommentsDependencies( true, val, arn );
@@ -12812,10 +12812,13 @@
 		var isChangeTableInfo = this.af_checkChangeTableInfo(tablePart, optionType);
 		if(isChangeTableInfo !== false)
 		{
+			History.Create_NewPoint();
+			History.StartTransaction();
 			this.model.autoFilters.changeFormatTableInfo(tableName, optionType, val);
 			
 			this._onUpdateFormatTable(isChangeTableInfo, false, true);
 			//TODO добавить перерисовку таблицы и перерисовку шаблонов
+			History.EndTransaction();
 		}
 	};
 	
@@ -13037,7 +13040,11 @@
         }
 		
 		//TODO тестовый вариант. нужно сделать методы и добавлять в историю
-		//ws.workbook.dependencyFormulas.changeDefName( tableName, newName );
+		
+		var oldNamedrange = this.model.workbook.dependencyFormulas.getDefNameNodeByName(tablePart.DisplayName);
+		var newNamedrange = oldNamedrange.clone();
+		newNamedrange.Name = newName;
+		oldNamedrange.changeDefName(newNamedrange);
 		tablePart.DisplayName = newName;
 	};
 	
