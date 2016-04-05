@@ -1915,7 +1915,7 @@ function angleInterfaceToFormat(val)
 	return nRes;
 }
 //-------------------------------------------------------------------------------------------------
-$(function(){
+(function(){
 	aStandartNumFormats = [];
 	aStandartNumFormats[0] = "General";
 	aStandartNumFormats[1] = "0";
@@ -1950,7 +1950,7 @@ $(function(){
 	{
 		aStandartNumFormatsId[aStandartNumFormats[i]] = i - 0;
 	}
-});
+})();
 //-------------------------------------------------------------------------------------------------
 /**
  * @constructor
