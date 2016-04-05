@@ -2118,7 +2118,9 @@ CTableId.prototype.Load_Changes = function(Reader, Reader2)
                 {
                     var objectRender = new DrawingObjects();
                     var oNewDrawing = objectRender.createDrawingObject(c_oAscCellAnchorType.cellanchorAbsolute);
-                    var oImage = DrawingObjectsController.prototype.createWatermarkImage();
+                    oNewDrawing.ext.cx = 101.6;
+                    oNewDrawing.ext.cy = 45.6;
+                    var oImage = DrawingObjectsController.prototype.createWatermarkImage(sUrl);
                     oNewDrawing.graphicObject = oImage;
                     oWsModel.Drawings.push(oNewDrawing);
                 }
