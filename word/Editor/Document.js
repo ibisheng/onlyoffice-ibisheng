@@ -13990,6 +13990,13 @@ CDocument.prototype =
 
         switch ( Type )
         {
+            case historyitem_Common_AddWatermark:
+            {
+                var sUrl = Reader.GetString2();
+                var oParaDrawing = this.DrawingObjects.getTrialImage(sUrl);
+
+                break;
+            }
             case  historyitem_Document_AddItem:
             {
                 // Long     : Количество элементов

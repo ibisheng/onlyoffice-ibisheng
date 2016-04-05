@@ -2865,6 +2865,18 @@ Workbook.prototype.DeserializeHistory = function(aChanges, fCallback){
 				for (var k = 0, length3 = item.oData.elem.length; k < length3; ++k)
 					oFontMap[item.oData.elem[k]] = 1;
 			}
+            if(g_oUndoRedoWorkbook == item.oClass && historyitem_Common_AddWatermark == item.nActionType)
+            {
+                var oWsModel = window["Asc"]["editor"].wbModel.aWorksheets[0];
+                if(oWsModel)
+                {
+                    var objectRender = new DrawingObjects();
+                    var oNewDrawing = objectRender.createDrawingObject(c_oAscCellAnchorType.cellanchorAbsolute);
+                    var oImage = DrawingObjectsController.prototype.createWatermarkImage();
+                    oNewDrawing.graphicObject = oImage;
+                    oWsModel.Drawings.push(oNewDrawing);
+                }
+            }
 			aUndoRedoElems.push(item);
 		}
 

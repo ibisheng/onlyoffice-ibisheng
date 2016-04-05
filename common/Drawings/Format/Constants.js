@@ -473,6 +473,8 @@ var historyitem_ClrScheme_AddClr      = 2462;
 var historyitem_ClrScheme_SetName     = 2463;
 var historyitem_ClrMap_SetClr         = 2464;
 
+var historyitem_Common_AddWatermark   = 100390;
+
 var historyitem_ExtraClrScheme_SetClrScheme  = 2465;
 var historyitem_ExtraClrScheme_SetClrMap     = 2466;
 

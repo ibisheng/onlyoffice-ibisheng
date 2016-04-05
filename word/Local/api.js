@@ -209,6 +209,15 @@ asc_docs_api.prototype.asc_isOffline = function()
 	return true;
 };
 
+//Получаем изменения добавления ватермарка для триальной версии
+asc_docs_api.prototype.asc_getTrialChanges = function()
+{
+	if (this.WordControl.m_oLogicDocument != null)
+	{
+		return this.WordControl.m_oLogicDocument.DrawingObjects.getTrialChanges();
+	}
+};
+
 asc_docs_api.prototype["asc_addImage"] = asc_docs_api.prototype.asc_addImage;
 asc_docs_api.prototype["AddImageUrl"] = asc_docs_api.prototype.AddImageUrl;
 asc_docs_api.prototype["AddImage"] = asc_docs_api.prototype.AddImage;
@@ -216,6 +225,7 @@ asc_docs_api.prototype["asc_Save"] = asc_docs_api.prototype.asc_Save;
 asc_docs_api.prototype["asc_DownloadAs"] = asc_docs_api.prototype.asc_DownloadAs;
 asc_docs_api.prototype["asc_isOffline"] = asc_docs_api.prototype.asc_isOffline;
 asc_docs_api.prototype["SetDocumentModified"] = asc_docs_api.prototype.SetDocumentModified;
+asc_docs_api.prototype["asc_getTrialChanges"] = asc_docs_api.prototype.asc_getTrialChanges;
 
 window["DesktopOfflineAppDocumentAddImageEnd"] = function(url)
 {

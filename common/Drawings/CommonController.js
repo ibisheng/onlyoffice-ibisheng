@@ -86,6 +86,33 @@ function CDistance(L, T, R, B)
     this.B = B;
 }
 
+
+function HistoryInterface()
+{
+    this.m_aChanges = [];
+    this.m_oBinaryWriter = new CMemory();
+}
+HistoryInterface.prototype.Add = function(Class, Data)
+{
+    var Binary_Pos = this.m_oBinaryWriter.GetCurPosition();
+    this.m_oBinaryWriter.WriteString2(Class.Get_Id());
+    Class.Save_Changes( Data, this.m_oBinaryWriter );
+    var Binary_Len = this.m_oBinaryWriter.GetCurPosition() - Binary_Pos;
+    this.m_aChanges.push(Binary_Len + ";" + this.m_oBinaryWriter.GetBase64Memory2(Binary_Pos, Binary_Len));
+};
+
+HistoryInterface.prototype.GetResultChanges = function()
+{
+    return this.m_aChanges;
+};
+HistoryInterface.prototype.Is_On = function()
+{
+    return true;
+};HistoryInterface.prototype.Is_On = function()
+{
+    return true;
+};
+
 function checkObjectInArray(aObjects, oObject)
 {
     var i;
@@ -776,6 +803,13 @@ DrawingObjectsController.prototype =
     getLeftTopSelectedObject: function(pageIndex)
     {
         return this.getLeftTopSelectedFromArray(this.getDrawingObjects(), pageIndex);
+    },
+	
+	createWatermarkImage: function(sImageUrl)
+	{
+        return ExecuteNoHistory(function(){
+            return this.createImage(sImageUrl, 0, 0, 45.6, 101.6);
+        }, this, []);
     },
 
     getFromTargetTextObjectContextMenuPosition: function(oTargetTextObject, pageIndex)

@@ -293,6 +293,48 @@ CGraphicObjects.prototype =
         return;
     },
 
+    createWatermarkImage: DrawingObjectsController.prototype.createWatermarkImage,
+
+
+
+    getTrialImage: function(sImageUrl)
+    {
+        return ExecuteNoHistory(function(){
+            var oParaDrawing = new ParaDrawing();
+            oParaDrawing.Set_RelativeHeight(251659264);
+            oParaDrawing.Set_PositionH(c_oAscRelativeFromH.Page, true, c_oAscAlignH.Center, undefined);
+            oParaDrawing.Set_PositionV(c_oAscRelativeFromV.Page, true, c_oAscAlignV.Center, undefined);
+            oParaDrawing.Set_WrappingType(WRAPPING_TYPE_NONE);
+            oParaDrawing.Set_BehindDoc( false );
+            oParaDrawing.Set_Distance( 3.2, 0, 3.2, 0 );
+            var oShape = this.createWatermarkImage(sImageUrl);
+            oShape.setParent(oParaDrawing);
+            oParaDrawing.Set_GraphicObject(oShape);
+            return oParaDrawing;
+        }, this, []);
+
+    },
+	getTrialChanges: function()
+	{
+		var oOldHistory = History;
+		var oInterfaceHistory = new HistoryInterface();
+        History = oInterfaceHistory;
+		var oParaDrawing = new ParaDrawing();
+		oParaDrawing.Set_RelativeHeight(251659264);
+        oParaDrawing.Set_PositionH(c_oAscRelativeFromH.Page, true, c_oAscAlignH.Center, undefined);
+        oParaDrawing.Set_PositionV(c_oAscRelativeFromV.Page, true, c_oAscAlignV.Center, undefined);
+        oParaDrawing.Set_WrappingType(WRAPPING_TYPE_NONE);
+        oParaDrawing.Set_BehindDoc( false );
+        oParaDrawing.Set_Distance( 3.2, 0, 3.2, 0 );
+        var oShape = this.createWatermarkImage();
+        oShape.setParent(oParaDrawing);
+        oParaDrawing.Set_GraphicObject(oShape);
+        this.document.Content[0].Add(oParaDrawing);
+        History = oOldHistory;
+        return oInterfaceHistory.GetResultChanges();
+	},
+	
+	
     recalculate_: function(data)
     {
         if(data.All)
