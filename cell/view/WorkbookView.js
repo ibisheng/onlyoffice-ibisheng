@@ -1,4 +1,4 @@
-"use strict";
+﻿"use strict";
 
 /* WorkbookView.js
  *
@@ -1396,8 +1396,8 @@
     }
   };
 
-  WorkbookView.prototype.getTablePictures = function() {
-      return this.af_getTablePictures(this.model, this.fmgrGraphics, this.m_oFont);
+  WorkbookView.prototype.getTablePictures = function(props) {
+      return this.af_getTablePictures(this.model, this.fmgrGraphics, this.m_oFont, props);
   };
 
   WorkbookView.prototype.getCellStyles = function() {
@@ -2576,7 +2576,7 @@
     this.defaults.worksheetView.cells.paddingPlusBorder = 2 * this.defaults.worksheetView.cells.padding + 1;
   };
 
-    WorkbookView.prototype.af_getTablePictures = function(wb, fmgrGraphics, oFont)
+    WorkbookView.prototype.af_getTablePictures = function(wb, fmgrGraphics, oFont, props)
     {
         var styleThumbnailWidth = 61;
         var styleThumbnailHeight = 46;
@@ -2603,7 +2603,7 @@
                         name: i,
                         displayName: customStyles[i].displayName,
                         type: 'custom',
-                        image: this.af_getSmallIconTable(canvas, customStyles[i], fmgrGraphics, oFont)
+                        image: this.af_getSmallIconTable(canvas, customStyles[i], fmgrGraphics, oFont, props)
                     };
                     result[n] = new Asc.formatTablePictures(options);
                     n++;
@@ -2622,7 +2622,7 @@
                         name: i,
                         displayName: defaultStyles[i].displayName,
                         type: 'default',
-                        image: this.af_getSmallIconTable(canvas, defaultStyles[i], fmgrGraphics, oFont)
+                        image: this.af_getSmallIconTable(canvas, defaultStyles[i], fmgrGraphics, oFont, props)
                     };
                     result[n] = new Asc.formatTablePictures(options);
                     n++;
@@ -2632,20 +2632,38 @@
         return result;
     };
 
-    WorkbookView.prototype.af_getSmallIconTable = function(canvas, style, fmgrGraphics, oFont)
+    WorkbookView.prototype.af_getSmallIconTable = function(canvas, style, fmgrGraphics, oFont, props)
     {
         var ctx = new Asc.DrawingContext({canvas: canvas, units: 1/*pt*/, fmgrGraphics: fmgrGraphics, font: oFont});
         var styleOptions = style;
 		
         //по умолчанию ставим строку заголовка и чередующиеся строки, позже нужно будет получать параметр
-		var styleInfo = 
+		var styleInfo;
+		if(props)
 		{
+			styleInfo = 
+			{
+				ShowColumnStripes: props.asc_getBandVer(),
+				ShowFirstColumn: props.asc_getFirstCol(),
+				ShowLastColumn: props.asc_getLastCol(),
+				ShowRowStripes: props.asc_getBandHor(),
+				HeaderRowCount: props.asc_getFirstRow(),
+				TotalsRowCount: props.asc_getLastRow()
+			};
+		}
+		else
+		{
+			styleInfo = 
+			{
 			ShowColumnStripes: false,
 			ShowFirstColumn: false,
 			ShowLastColumn: false,
 			ShowRowStripes: true,
+				HeaderRowCount: null,
 			TotalsRowCount: 0
 		};
+		}
+
 
         var pxToMM = 72 / 96;
         var ySize = 45 * pxToMM;
@@ -2783,7 +2801,7 @@
                 }
 
             }
-            if(styleOptions)//header row
+            if(styleInfo.HeaderRowCount)//header row
             {
                 if(styleOptions.headerRow && styleOptions.headerRow.dxf.fill && null != styleOptions.headerRow.dxf.fill.bg)
                 {
