@@ -541,6 +541,13 @@ CGraphics.prototype =
         this.TextureFillTransformScaleY = 1 / this.m_oCoordTransform.sy;
 
         this.LastFontOriginInfo = { Name : "", Replace : null };
+        this.m_oCurFont =
+        {
+            Name        : "",
+            FontSize    : 10,
+            Bold        : false,
+            Italic      : false
+        };
 
         /*
          if (this.IsThumbnail)

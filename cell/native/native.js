@@ -3666,6 +3666,8 @@ function OfflineEditor () {
             var oldrange = this.visibleRange;
             this.visibleRange = range;
 
+            //console.log('range:' + ' c1:' + c1 + ' r1:' + r1 + ' c2:' + c2 +' r2:' + r2);
+
             var cellsLeft_Local = this.cellsLeft;
             var cellsTop_Local  = this.cellsTop;
 
@@ -5789,9 +5791,6 @@ function offline_mouse_down(x, y, pin, isViewerMode, isFormulaEditMode, isRangeR
             }
         }
 
-        //var content = ws.objectRender.controller.curState.majorObject.getDocContent();
-        //content.Cursor_MoveToEndPos();
-
         return {id:graphicsInfo.id, ischart:ischart, 'textselect':(null !== ws.objectRender.controller.selection.textSelection)};
     }
 
@@ -6024,10 +6023,14 @@ function offline_keyboard_down(keys) {
 
         if (100 == keys[i][1]) {
             var event = {which:codeKey,keyCode:codeKey,metaKey:false,altKey:false,ctrlKey:false,shiftKey:false, preventDefault:function(){}};
-            if (32 === codeKey || 8 === codeKey || 13 === codeKey) {
+            if (32 === codeKey || 8 === codeKey || 13 === codeKey || 27 == codeKey) {
                 ws.objectRender.graphicObjectKeyDown(event);
             } else {
                 ws.objectRender.graphicObjectKeyPress(event);
+            }
+
+            if (27 == codeKey) {
+                window.AscDisableTextSelection = true;
             }
         }
         else if (37 === codeKey)      // LEFT
