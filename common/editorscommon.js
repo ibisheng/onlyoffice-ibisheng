@@ -2105,8 +2105,8 @@ CTableId.prototype.Load_Changes = function(Reader, Reader2)
                     if(oLogicDocument.Slides[0])
                     {
                         var oDrawing = oLogicDocument.Slides[0].graphicObjects.createWatermarkImage(sUrl);
-                        oDrawing.spPr.xfrm.offX = (oLogicDocument.Width - oDrawing.spPr.extX)/2;
-                        oDrawing.spPr.xfrm.offY = (oLogicDocument.Height - oDrawing.spPr.extY)/2;
+                        oDrawing.spPr.xfrm.offX = (oLogicDocument.Width - oDrawing.spPr.xfrm.extX)/2;
+                        oDrawing.spPr.xfrm.offY = (oLogicDocument.Height - oDrawing.spPr.xfrm.extY)/2;
                         oLogicDocument.Slides[0].cSld.spTree.push(oDrawing);
                     }
                 }
