@@ -13179,52 +13179,28 @@
 	
 	WorksheetView.prototype.af_changeTableRange = function(tableName, range)
     {
-		var tablePart = this.model.autoFilters._getFilterByDisplayName(tableName);
+		History.Create_NewPoint();
+		History.StartTransaction();
+		this.model.autoFilters.changeTableRange(tableName, range);
 		
-		if(!tablePart || (tablePart && !tablePart.TableStyleInfo))
-		{
-			return false;
-		}
-		
-		var isChangeRange = this.af_checkChangeRange(tablePart, range);
-		if(isChangeRange !== false)
-		{
-			History.Create_NewPoint();
-			History.StartTransaction();
-			this.model.autoFilters.changeTableRange(tablePart, range);
-			
-			this._onUpdateFormatTable(isChangeRange, false, true);
-			//TODO добавить перерисовку таблицы и перерисовку шаблонов
-			History.EndTransaction();
-		}
+		this._onUpdateFormatTable(isChangeRange, false, true);
+		//TODO добавить перерисовку таблицы и перерисовку шаблонов
+		History.EndTransaction();
 	};
 	
-	WorksheetView.prototype.af_checkChangeRange = function(tableName, range)
-    {
-		var tablePart = this.model.autoFilters._getFilterByDisplayName(tableName);
-		
-		if(!tablePart || (tablePart && !tablePart.TableStyleInfo))
-		{
-			return false;
-		}
-		
-		var res = true;
+	WorksheetView.prototype.af_checkChangeRange = function(range)
+    {	
+		var res = null;
 		var ws = this.model;
 		
-		
-		if(range.r1 !== tablePart.Ref.r1)
-		{	
-			ws.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterMoveToHiddenRangeError, c_oAscError.Level.NoCritical);
-			res = false;
-		}
-		else
+		var intersectionTables = this.model.autoFilters.getTableIntersectionRange(range);
+		if(!intersectionTables || (intersectionTables && intersectionTables.length !== 1))
 		{
-			var intersectionTables = this.model.autoFilters.getTableIntersectionRange(range);
-			if(intersectionTables && intersectionTables.length > 1)
-			{
-				ws.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterMoveToHiddenRangeError, c_oAscError.Level.NoCritical);
-				res = false;
-			}
+			res = c_oAscError.ID.AutoFilterMoveToHiddenRangeError;
+		}
+		else if(range.r1 !== tablePart.Ref.r1)
+		{
+			res = c_oAscError.ID.AutoFilterMoveToHiddenRangeError;
 		}
 		
 		return res;

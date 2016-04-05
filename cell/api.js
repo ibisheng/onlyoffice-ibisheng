@@ -3395,7 +3395,7 @@ var editor;
   prot["asc_insertCellsInTable"] = prot.asc_insertCellsInTable;
   prot["asc_deleteCellsInTable"] = prot.asc_deleteCellsInTable;
   prot["asc_changeDisplayNameTable"] = prot.asc_changeDisplayNameTable;
-  prot["af_changeTableRange"] = prot.af_changeTableRange;
+  prot["asc_changeTableRange"] = prot.asc_changeTableRange;
   prot["asc_getTablePictures"] = prot.asc_getTablePictures;
 
   // Drawing objects interface

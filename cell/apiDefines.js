@@ -102,7 +102,8 @@ var c_oAscSelectionDialogType = {
   None: 0,
   FormatTable: 1,
   Chart: 2,
-  DefinedName: 3
+  DefinedName: 3,
+  FormatTableChangeRange: 4
 };
 
 var c_oAscGraphicOption = {
