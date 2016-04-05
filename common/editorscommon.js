@@ -2064,12 +2064,6 @@ CTableId.prototype.Save_Changes = function(Data, Writer)
 
             break;
         }
-
-        case historyitem_Common_AddWatermark:
-        {
-            Writer.WriteString2("AVSUnregisteredVersion.emf");
-            break;
-        }
     }
 };
 CTableId.prototype.Save_Changes2 = function(Data, Writer)
