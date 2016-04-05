@@ -667,7 +667,6 @@ var c_oAscMathInterfaceSettingsAlign = {
 };
 
 
-
 var c_oAscRevisionsChangeType = {
   Unknown: 0x00,
   TextAdd: 0x01,
@@ -690,6 +689,32 @@ var c_oAscPageOrientation = {
   Portrait  : 0x00,
   Landscape : 0x01
 };
-
-
 window["flat_desine"] = false;
+
+//------------------------------------------------------------export---------------------------------------------------
+if (undefined === window['Asc']) {
+  window['Asc'] = {};
+}
+window['Asc']['c_oAscWrapStyle2'] = c_oAscWrapStyle2;
+window['Asc']['c_oAscError'] = c_oAscError;
+window['Asc']['c_oAscContextMenuTypes'] = c_oAscContextMenuTypes;
+window['Asc']['c_oAscCollaborativeMarksShowType'] = c_oAscCollaborativeMarksShowType;
+window['Asc']['c_oAscAlignH'] = c_oAscAlignH;
+window['Asc']['c_oAscAlignV'] = c_oAscAlignV;
+window['Asc']['c_oAscChangeLevel'] = c_oAscChangeLevel;
+window['Asc']['c_oAscVertAlignJc'] = c_oAscVertAlignJc;
+window['Asc']['c_oAscTableLayout'] = c_oAscTableLayout;
+window['Asc']['c_oAscAlignShapeType'] = c_oAscAlignShapeType;
+window['Asc']['c_oAscDropCap'] = c_oAscDropCap;
+window['Asc']['c_oAscSectionBreakType'] = c_oAscSectionBreakType;
+window['Asc']['c_oAscMathInterfaceType'] = c_oAscMathInterfaceType;
+window['Asc']['c_oAscMathInterfaceBarPos'] = c_oAscMathInterfaceBarPos;
+window['Asc']['c_oAscMathInterfaceScript'] = c_oAscMathInterfaceScript;
+window['Asc']['c_oAscMathInterfaceFraction'] = c_oAscMathInterfaceFraction;
+window['Asc']['c_oAscMathInterfaceLimitPos'] = c_oAscMathInterfaceLimitPos;
+window['Asc']['c_oAscMathInterfaceMatrixMatrixAlign'] = c_oAscMathInterfaceMatrixMatrixAlign;
+window['Asc']['c_oAscMathInterfaceMatrixColumnAlign'] = c_oAscMathInterfaceMatrixColumnAlign;
+window['Asc']['c_oAscMathInterfaceEqArrayAlign'] = c_oAscMathInterfaceEqArrayAlign;
+window['Asc']['c_oAscMathInterfaceNaryLimitLocation'] = c_oAscMathInterfaceNaryLimitLocation;
+window['Asc']['c_oAscMathInterfaceGroupCharPos'] = c_oAscMathInterfaceGroupCharPos;
+window['Asc']['c_oAscRevisionsChangeType'] = c_oAscRevisionsChangeType;

@@ -798,3 +798,55 @@ var c_oAscDocumentUnits = {
     Inch        : 1,
     Point       : 2
 };
+
+
+//------------------------------------------------------------export---------------------------------------------------
+if (undefined === window['Asc']) {
+  window['Asc'] = {};
+}
+window['Asc']['c_oAscMaxColumnWidth'] = c_oAscMaxColumnWidth;
+window['Asc']['c_oAscMaxRowHeight'] = c_oAscMaxRowHeight;
+window['Asc']['c_oAscFileType'] = c_oAscFileType;
+window['Asc']['c_oAscAsyncAction'] = c_oAscAsyncAction;
+window['Asc']['c_oAscAdvancedOptionsID'] = c_oAscAdvancedOptionsID;
+window['Asc']['c_oAscFontRenderingModeType'] = c_oAscFontRenderingModeType;
+window['Asc']['c_oAscAsyncActionType'] = c_oAscAsyncActionType;
+window['Asc']['c_oAscNumFormatType'] = c_oAscNumFormatType;
+window['Asc']['c_oAscDrawingLayerType'] = c_oAscDrawingLayerType;
+window['Asc']['c_oAscTypeSelectElement'] = c_oAscTypeSelectElement;
+window['Asc']['c_oAscChartTitleShowSettings'] = c_oAscChartTitleShowSettings;
+window['Asc']['c_oAscChartHorAxisLabelShowSettings'] = c_oAscChartHorAxisLabelShowSettings;
+window['Asc']['c_oAscChartVertAxisLabelShowSettings'] = c_oAscChartVertAxisLabelShowSettings;
+window['Asc']['c_oAscChartLegendShowSettings'] = c_oAscChartLegendShowSettings;
+window['Asc']['c_oAscChartDataLabelsPos'] = c_oAscChartDataLabelsPos;
+window['Asc']['c_oAscGridLinesSettings'] = c_oAscGridLinesSettings;
+window['Asc']['c_oAscChartTypeSettings'] = c_oAscChartTypeSettings;
+window['Asc']['c_oAscValAxisRule'] = c_oAscValAxisRule;
+window['Asc']['c_oAscValAxUnits'] = c_oAscValAxUnits;
+window['Asc']['c_oAscTickMark'] = c_oAscTickMark;
+window['Asc']['c_oAscTickLabelsPos'] = c_oAscTickLabelsPos;
+window['Asc']['c_oAscCrossesRule'] = c_oAscCrossesRule;
+window['Asc']['c_oAscBetweenLabelsRule'] = c_oAscBetweenLabelsRule;
+window['Asc']['c_oAscLabelsPosition'] = c_oAscLabelsPosition;
+window['Asc']['c_oAscAxisType'] = c_oAscAxisType;
+window['Asc']['c_oAscHAnchor'] = c_oAscHAnchor;
+window['Asc']['c_oAscXAlign'] = c_oAscXAlign;
+window['Asc']['c_oAscYAlign'] = c_oAscYAlign;
+window['Asc']['c_oAscVAnchor'] = c_oAscVAnchor;
+window['Asc']['c_oAscRelativeFromH'] = c_oAscRelativeFromH;
+window['Asc']['c_oAscRelativeFromV'] = c_oAscRelativeFromV;
+window['Asc']['c_oAscPageOrientation'] = c_oAscPageOrientation;
+window['Asc']['c_oAscColor'] = c_oAscColor;
+window['Asc']['c_oAscFill'] = c_oAscFill;
+window['Asc']['c_oAscFillGradType'] = c_oAscFillGradType;
+window['Asc']['c_oAscFillBlipType'] = c_oAscFillBlipType;
+window['Asc']['c_oAscStrokeType'] = c_oAscStrokeType;
+window['Asc']['c_oAscVerticalTextAlign'] = c_oAscVerticalTextAlign;
+window['Asc']['c_oAscLineJoinType'] = c_oAscLineJoinType;
+window['Asc']['c_oAscLineCapType'] = c_oAscLineCapType;
+window['Asc']['c_oAscLineBeginType'] = c_oAscLineBeginType;
+window['Asc']['c_oAscLineBeginSize'] = c_oAscLineBeginSize;
+window['Asc']['c_oAscVertDrawingText'] = c_oAscVertDrawingText;
+window['Asc']['c_oAscCellTextDirection'] = c_oAscCellTextDirection;
+window['Asc']['c_oAscMaxTooltipLength'] = c_oAscMaxTooltipLength;
+window['Asc']['c_oAscMaxCellOrCommentLength'] = c_oAscMaxCellOrCommentLength;

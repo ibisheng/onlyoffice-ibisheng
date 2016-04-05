@@ -349,3 +349,29 @@ var c_oAscPopUpSelectorType = {
   Range: 2,
   Table: 3
 };
+
+//------------------------------------------------------------export---------------------------------------------------
+if (undefined === window['Asc']) {
+  window['Asc'] = {};
+}
+window['Asc']['c_oAscError'] = c_oAscError;
+window['Asc']['c_oAscConfirm'] = c_oAscConfirm;
+window['Asc']['c_oAscMergeOptions'] = c_oAscMergeOptions;
+window['Asc']['c_oAscInsertOptions'] = c_oAscInsertOptions;
+window['Asc']['c_oAscDeleteOptions'] = c_oAscDeleteOptions;
+window['Asc']['c_oAscBorderOptions'] = c_oAscBorderOptions;
+window['Asc']['c_oAscCleanOptions'] = c_oAscCleanOptions;
+window['Asc']['c_oAscSelectionType'] = c_oAscSelectionType;
+window['Asc']['c_oAscSelectionDialogType'] = c_oAscSelectionDialogType;
+window['Asc']['c_oAscHyperlinkType'] = c_oAscHyperlinkType;
+window['Asc']['c_oAscMouseMoveType'] = c_oAscMouseMoveType;
+window['Asc']['c_oAscMouseMoveLockedObjectType'] = c_oAscMouseMoveLockedObjectType;
+window['Asc']['c_oAscPrintType'] = c_oAscPrintType;
+window['Asc']['c_oAscCustomAutoFilter'] = c_oAscCustomAutoFilter;
+window['Asc']['c_oAscChangeFilterOptions'] = c_oAscChangeFilterOptions;
+window['Asc']['c_oAscCellEditorState'] = c_oAscCellEditorState;
+window['Asc']['c_oAscAutoFilterTypes'] = c_oAscAutoFilterTypes;
+window['Asc']['c_oAscFindLookIn'] = c_oAscFindLookIn;
+window['Asc']['c_oAscGetDefinedNamesList'] = c_oAscGetDefinedNamesList;
+window['Asc']['c_oAscDefinedNameReason'] = c_oAscDefinedNameReason;
+window['Asc']['c_oAscPopUpSelectorType'] = c_oAscPopUpSelectorType;
