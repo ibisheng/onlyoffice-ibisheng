@@ -804,6 +804,7 @@ var c_oAscDocumentUnits = {
 if (undefined === window['Asc']) {
   window['Asc'] = {};
 }
+window['Asc']['FONT_THUMBNAIL_HEIGHT'] = FONT_THUMBNAIL_HEIGHT;
 window['Asc']['c_oAscMaxColumnWidth'] = c_oAscMaxColumnWidth;
 window['Asc']['c_oAscMaxRowHeight'] = c_oAscMaxRowHeight;
 window['Asc']['c_oAscFileType'] = c_oAscFileType;
@@ -814,6 +815,8 @@ window['Asc']['c_oAscAsyncActionType'] = c_oAscAsyncActionType;
 window['Asc']['c_oAscNumFormatType'] = c_oAscNumFormatType;
 window['Asc']['c_oAscDrawingLayerType'] = c_oAscDrawingLayerType;
 window['Asc']['c_oAscTypeSelectElement'] = c_oAscTypeSelectElement;
+window['Asc']['c_oAscShdClear'] = shd_Clear; //ToDo по идее должны совпадать переменные
+window['Asc']['c_oAscShdNil'] = shd_Nil;
 window['Asc']['c_oAscChartTitleShowSettings'] = c_oAscChartTitleShowSettings;
 window['Asc']['c_oAscChartHorAxisLabelShowSettings'] = c_oAscChartHorAxisLabelShowSettings;
 window['Asc']['c_oAscChartVertAxisLabelShowSettings'] = c_oAscChartVertAxisLabelShowSettings;
