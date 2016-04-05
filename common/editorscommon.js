@@ -2064,6 +2064,12 @@ CTableId.prototype.Save_Changes = function(Data, Writer)
 
             break;
         }
+
+        case historyitem_Common_AddWatermark:
+        {
+            Writer.WriteString2("AVSUnregisteredVersion.emf");
+            break;
+        }
     }
 };
 CTableId.prototype.Save_Changes2 = function(Data, Writer)
@@ -2084,6 +2090,47 @@ CTableId.prototype.Load_Changes = function(Reader, Reader2)
 
     switch ( Type )
     {
+        case historyitem_Common_AddWatermark:
+        {
+            var sUrl = Reader.GetString2();
+            if('undefined' != typeof editor && editor.WordControl && editor.WordControl.m_oLogicDocument)
+            {
+                var oLogicDocument = editor.WordControl.m_oLogicDocument;
+                if(oLogicDocument instanceof CDocument)
+                {
+                    var oParaDrawing = oLogicDocument.DrawingObjects.getTrialImage(sUrl);
+                    var oFirstParagraph = oLogicDocument.Get_FirstParagraph();
+                    ExecuteNoHistory(function(){
+                        var oRun = new CRun();
+                        oRun.Content.splice(0, oParaDrawing);
+                        oFirstParagraph.Content.splice(0, oRun);
+                    }, this, []);
+                }
+                else if(oLogicDocument instanceof CPresentation)
+                {
+                    if(oLogicDocument.Slides[0])
+                    {
+                        var oDrawing = oLogicDocument.Slides[0].graphicObjects.createWatermarkImage(sUrl);
+                        oDrawing.spPr.xfrm.offX = (oLogicDocument.Width - oDrawing.spPr.extX)/2;
+                        oDrawing.spPr.xfrm.offY = (oLogicDocument.Height - oDrawing.spPr.extY)/2;
+                        oLogicDocument.Slides[0].cSld.spTree.push(oDrawing);
+                    }
+                }
+            }
+            else
+            {
+                var oWsModel = window["Asc"]["editor"].wbModel.aWorksheets[0];
+                if(oWsModel)
+                {
+                    var objectRender = new DrawingObjects();
+                    var oNewDrawing = objectRender.createDrawingObject(c_oAscCellAnchorType.cellanchorAbsolute);
+                    var oImage = DrawingObjectsController.prototype.createWatermarkImage();
+                    oNewDrawing.graphicObject = oImage;
+                    oWsModel.Drawings.push(oNewDrawing);
+                }
+            }
+            break;
+        }
         case historyitem_TableId_Add:
         {
             // String   : Id элемента

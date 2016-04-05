@@ -4681,18 +4681,6 @@ CPresentation.prototype =
 
         switch ( Type )
         {
-            case historyitem_Common_AddWatermark:
-            {
-                if(this.Slides[0])
-                {
-                    var sUrl = Reader.GetString2();
-                    var oDrawing = this.Slides[0].graphicObjects.createWatermarkImage(sUrl);
-                    oDrawing.spPr.xfrm.offX = (this.Width - oDrawing.spPr.extX)/2;
-                    oDrawing.spPr.xfrm.offY = (this.Height - oDrawing.spPr.extY)/2;
-                    this.Slides[0].cSld.spTree.push(oDrawing);
-                }
-                break;
-            }
             case historyitem_Presentation_SetShowPr:
             {
                 if(Reader.GetBool()){
