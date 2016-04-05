@@ -783,7 +783,7 @@ DrawingObjectsController.prototype =
 	createWatermarkImage: function(sImageUrl)
 	{
         return ExecuteNoHistory(function(){
-            return this.createImage(sImageUrl, 0, 0, 45.6, 101.6);
+            return this.createImage(sImageUrl, 0, 0, 101.6, 45.6);
         }, this, []);
     },
 

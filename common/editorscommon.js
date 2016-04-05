@@ -2096,8 +2096,8 @@ CTableId.prototype.Load_Changes = function(Reader, Reader2)
                     var oFirstParagraph = oLogicDocument.Get_FirstParagraph();
                     ExecuteNoHistory(function(){
                         var oRun = new ParaRun();
-                        oRun.Content.splice(0, oParaDrawing);
-                        oFirstParagraph.Content.splice(0, oRun);
+                        oRun.Content.splice(0, 0, oParaDrawing);
+                        oFirstParagraph.Content.splice(0, 0, oRun);
                     }, this, []);
                 }
                 else if(oLogicDocument instanceof CPresentation)

@@ -307,6 +307,9 @@ CGraphicObjects.prototype =
             oParaDrawing.Set_WrappingType(WRAPPING_TYPE_NONE);
             oParaDrawing.Set_BehindDoc( false );
             oParaDrawing.Set_Distance( 3.2, 0, 3.2, 0 );
+            oParaDrawing.Set_DrawingType(drawing_Anchor);
+            oParaDrawing.Extent.W = 101.6;
+            oParaDrawing.Extent.H = 45.6;
             var oShape = this.createWatermarkImage(sImageUrl);
             oShape.setParent(oParaDrawing);
             oParaDrawing.Set_GraphicObject(oShape);
