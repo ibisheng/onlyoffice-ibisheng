@@ -13013,7 +13013,7 @@
 				val = c_oAscDeleteOptions.DeleteCellsAndShiftTop;
 				break;
 			}
-			case c_oAscInsertOptions.DeleteTable:
+			case c_oAscDeleteOptions.DeleteTable:
 			{
 				t.model.autoFilters.isEmptyAutoFilters(tablePart.Ref);
 				break;
@@ -13175,6 +13175,59 @@
 		
 		
 		return {insertRowAbove: insertRowAbove, insertRowBelow: insertRowBelow, insertColumnLeft: insertColumnLeft, insertColumnRight: insertColumnRight, deleteRow: deleteRow, deleteColumn: deleteColumn, deleteTable: deleteTable};
+	};
+	
+	WorksheetView.prototype.af_changeTableRange = function(tableName, range)
+    {
+		var tablePart = this.model.autoFilters._getFilterByDisplayName(tableName);
+		
+		if(!tablePart || (tablePart && !tablePart.TableStyleInfo))
+		{
+			return false;
+		}
+		
+		var isChangeRange = this.af_checkChangeRange(tablePart, range);
+		if(isChangeRange !== false)
+		{
+			History.Create_NewPoint();
+			History.StartTransaction();
+			this.model.autoFilters.changeTableRange(tablePart, range);
+			
+			this._onUpdateFormatTable(isChangeRange, false, true);
+			//TODO добавить перерисовку таблицы и перерисовку шаблонов
+			History.EndTransaction();
+		}
+	};
+	
+	WorksheetView.prototype.af_checkChangeRange = function(tableName, range)
+    {
+		var tablePart = this.model.autoFilters._getFilterByDisplayName(tableName);
+		
+		if(!tablePart || (tablePart && !tablePart.TableStyleInfo))
+		{
+			return false;
+		}
+		
+		var res = true;
+		var ws = this.model;
+		
+		
+		if(range.r1 !== tablePart.Ref.r1)
+		{	
+			ws.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterMoveToHiddenRangeError, c_oAscError.Level.NoCritical);
+			res = false;
+		}
+		else
+		{
+			var intersectionTables = this.model.autoFilters.getTableIntersectionRange(range);
+			if(intersectionTables && intersectionTables.length > 1)
+			{
+				ws.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterMoveToHiddenRangeError, c_oAscError.Level.NoCritical);
+				res = false;
+			}
+		}
+		
+		return res;
 	};
     /*
      * Export
