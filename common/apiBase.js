@@ -65,7 +65,7 @@ function baseEditorsApi(name) {
 
   // CoAuthoring and Chat
   this.User = undefined;
-  this.CoAuthoringApi = new window['CDocsCoApi']();
+  this.CoAuthoringApi = new Asc.CDocsCoApi();
   this.isCoAuthoringEnable = true;
   // Массив lock-ов, которые были на открытии документа
   this.arrPreOpenLocksObjects = [];

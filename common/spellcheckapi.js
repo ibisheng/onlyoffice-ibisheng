@@ -1,7 +1,9 @@
 "use strict";
 
-(function(global) {
+(function(window) {
   'use strict';
+
+  var asc = window["Asc"];
 
   // Класс надстройка, для online и offline работы
   var CSpellCheckApi = function(options) {
@@ -211,7 +213,7 @@
     this.sockjs_url = this._url + '/doc/' + docid + '/c';
     this.sockjs = initSocksJs(this.sockjs_url, this);
   };
-  global["CSpellCheckApi"] = CSpellCheckApi;
 
+  asc.CSpellCheckApi = CSpellCheckApi;
 })(window);
 

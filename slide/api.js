@@ -16,8 +16,6 @@ function asc_docs_api(name)
   asc_docs_api.superclass.constructor.call(this, name);
   this.editorId = c_oEditorId.Presentation;
 
-    var CSpellCheckApi  = window["CSpellCheckApi"];
-
     History    = new CHistory();
     g_oTableId = new CTableId();
 
