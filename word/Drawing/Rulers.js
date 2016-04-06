@@ -185,7 +185,7 @@ function CHorRuler()
 
     this.SimpleChanges = new RulerCheckSimpleChanges();
 
-    this.Units = c_oAscRulerUnits.Inch;
+    this.Units = c_oAscDocumentUnits.Millimeter;
 
     this.InitTablePict = function()
     {
@@ -354,7 +354,7 @@ function CHorRuler()
         return widthNew;
     }
 
-    this.CreateBackground = function(cachedPage)
+    this.CreateBackground = function(cachedPage, isattack)
     {
         if (window["NATIVE_EDITOR_ENJINE"])
             return;
@@ -380,7 +380,7 @@ function CHorRuler()
         if (this.CurrentObjectType == RULER_OBJECT_TYPE_COLUMNS)
             markup = this.m_oColumnMarkup;
 
-        if (this.CurrentObjectType == checker.Type && width == checker.Width)
+        if (isattack !== true && this.CurrentObjectType == checker.Type && width == checker.Width)
         {
             if (this.CurrentObjectType == RULER_OBJECT_TYPE_PARAGRAPH)
             {
@@ -586,7 +586,7 @@ function CHorRuler()
 
         context.font = "7pt Arial";
 
-        if (this.Units == c_oAscRulerUnits.Millimeter)
+        if (this.Units == c_oAscDocumentUnits.Millimeter)
         {
             var lCount1 = ((width - left_margin) / mm_1_4) >> 0;
             var lCount2 = (left_margin / mm_1_4) >> 0;
@@ -681,7 +681,7 @@ function CHorRuler()
             }
         }
         }
-        else if (this.Units == c_oAscRulerUnits.Inch)
+        else if (this.Units == c_oAscDocumentUnits.Inch)
         {
             var lCount1 = ((width - left_margin) / inch_1_8) >> 0;
             var lCount2 = (left_margin / inch_1_8) >> 0;
@@ -753,6 +753,71 @@ function CHorRuler()
                 else if (inch_1_8 > 8)
                 {
                     // 1/8
+                    context.beginPath();
+                    context.moveTo(lXPos, middleVert - part1);
+                    context.lineTo(lXPos, middleVert + part1);
+                    context.stroke();
+                }
+            }
+        }
+        else if (this.Units == c_oAscDocumentUnits.Point)
+        {
+            var point_1_12 = 25.4 * dKoef_mm_to_pix / 12;
+
+            var lCount1 = ((width - left_margin) / point_1_12) >> 0;
+            var lCount2 = (left_margin / point_1_12) >> 0;
+
+            var index = 0;
+            var num = 0;
+            for (var i = 1; i < lCount1; i++)
+            {
+                var lXPos = ((left_margin + i * point_1_12) >> 0) + 0.5;
+                index++;
+
+                if (index == 12)
+                    index = 0;
+
+                if (0 == index || 6 == index)
+                {
+                    num++;
+                    // number
+                    var strNum = "" + (num * 36);
+                    var lWidthText = context.measureText(strNum).width;
+                    lXPos -= (lWidthText / 2.0);
+                    context.fillText(strNum, lXPos, this.m_nBottom - 3);
+                }
+                else if (point_1_12 > 5)
+                {
+                    // 1/12
+                    context.beginPath();
+                    context.moveTo(lXPos, middleVert - part1);
+                    context.lineTo(lXPos, middleVert + part1);
+                    context.stroke();
+                }
+            }
+
+            index = 0;
+            num = 0;
+            for (var i = 1; i <= lCount2; i++)
+            {
+                var lXPos = ((left_margin - i * point_1_12) >> 0) + 0.5;
+                index++;
+
+                if (index == 12)
+                    index = 0;
+
+                if (0 == index || 6 == index)
+                {
+                    num++;
+                    // number
+                    var strNum = "" + (num * 36);
+                    var lWidthText = context.measureText(strNum).width;
+                    lXPos -= (lWidthText / 2.0);
+                    context.fillText(strNum, lXPos, this.m_nBottom - 3);
+                }
+                else if (point_1_12 > 5)
+                {
+                    // 1/12
                     context.beginPath();
                     context.moveTo(lXPos, middleVert - part1);
                     context.lineTo(lXPos, middleVert + part1);
@@ -2566,7 +2631,7 @@ function CVerRuler()
 
     this.SimpleChanges = new RulerCheckSimpleChanges();
 
-    this.Units = c_oAscRulerUnits.Inch;
+    this.Units = c_oAscDocumentUnits.Millimeter;
 
     this.CheckCanvas = function()
     {
@@ -2612,7 +2677,7 @@ function CVerRuler()
         return heightNew;
     }
 
-    this.CreateBackground = function(cachedPage)
+    this.CreateBackground = function(cachedPage, isattack)
     {
         if (window["NATIVE_EDITOR_ENJINE"])
             return;
@@ -2636,7 +2701,7 @@ function CVerRuler()
         var checker = this.RepaintChecker;
         var markup = this.m_oTableMarkup;
 
-        if (this.CurrentObjectType == checker.Type && height == checker.Height)
+        if (isattack !== true && this.CurrentObjectType == checker.Type && height == checker.Height)
         {
             if (this.CurrentObjectType == RULER_OBJECT_TYPE_PARAGRAPH)
             {
@@ -2787,7 +2852,7 @@ function CVerRuler()
 
         context.font = "7pt Arial";
 
-        if (this.Units == c_oAscRulerUnits.Millimeter)
+        if (this.Units == c_oAscDocumentUnits.Millimeter)
         {
             var lCount1 = ((height - top_margin) / mm_1_4) >> 0;
             var lCount2 = (top_margin / mm_1_4) >> 0;
@@ -2897,7 +2962,7 @@ function CVerRuler()
             }
         }
         }
-        else if (this.Units == c_oAscRulerUnits.Inch)
+        else if (this.Units == c_oAscDocumentUnits.Inch)
         {
             var lCount1 = ((height - top_margin) / inch_1_8) >> 0;
             var lCount2 = (top_margin / inch_1_8) >> 0;
@@ -2982,6 +3047,86 @@ function CVerRuler()
                     context.stroke();
                 }
                 else if (inch_1_8 > 8)
+                {
+                    // 1/8
+                    context.beginPath();
+                    context.moveTo(middleHor - part1, lYPos);
+                    context.lineTo(middleHor + part1, lYPos);
+                    context.stroke();
+                }
+            }
+        }
+        else if (this.Units == c_oAscDocumentUnits.Point)
+        {
+            var point_1_12 = 25.4 * dKoef_mm_to_pix / 12;
+
+            var lCount1 = ((height - top_margin) / point_1_12) >> 0;
+            var lCount2 = (top_margin / point_1_12) >> 0;
+
+            var index = 0;
+            var num = 0;
+            for (var i = 1; i < lCount1; i++)
+            {
+                var lYPos = ((top_margin + i * point_1_12) >> 0) + 0.5;
+                index++;
+
+                if (index == 12)
+                    index = 0;
+
+                if (0 == index || 6 == index)
+                {
+                    num++;
+                    // number
+
+                    var strNum = "" + (num * 36);
+                    var lWidthText = context.measureText(strNum).width;
+
+                    context.translate(middleHor, lYPos);
+                    context.rotate(-Math.PI / 2);
+                    context.fillText(strNum, -lWidthText / 2.0, 4);
+
+                    if (!this.IsRetina)
+                        context.setTransform(1, 0, 0, 1, 0, 5);
+                    else
+                        context.setTransform(2, 0, 0, 2, 0, 10);
+                }
+                else if (point_1_12 > 5)
+                {
+                    // 1/8
+                    context.beginPath();
+                    context.moveTo(middleHor - part1, lYPos);
+                    context.lineTo(middleHor + part1, lYPos);
+                    context.stroke();
+                }
+            }
+
+            index = 0;
+            num = 0;
+            for (var i = 1; i <= lCount2; i++)
+            {
+                var lYPos = ((top_margin - i * point_1_12) >> 0) + 0.5;
+                index++;
+
+                if (index == 12)
+                    index = 0;
+
+                if (0 == index || 6 == index)
+                {
+                    num++;
+                    // number
+                    var strNum = "" + (num * 36);
+                    var lWidthText = context.measureText(strNum).width;
+
+                    context.translate(middleHor, lYPos);
+                    context.rotate(-Math.PI / 2);
+                    context.fillText(strNum, -lWidthText / 2.0, 4);
+
+                    if (!this.IsRetina)
+                        context.setTransform(1, 0, 0, 1, 0, 5);
+                    else
+                        context.setTransform(2, 0, 0, 2, 0, 10);
+                }
+                else if (point_1_12 > 5)
                 {
                     // 1/8
                     context.beginPath();

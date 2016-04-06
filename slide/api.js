@@ -3794,6 +3794,8 @@ asc_docs_api.prototype.asc_SetDocumentUnits = function(_units)
     {
         this.WordControl.m_oHorRuler.Units = _units;
         this.WordControl.m_oVerRuler.Units = _units;
+        this.WordControl.UpdateHorRulerBack(true);
+        this.WordControl.UpdateVerRulerBack(true);
     }
 };
 

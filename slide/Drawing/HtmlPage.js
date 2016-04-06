@@ -3193,26 +3193,26 @@ function CEditorPage(api)
         this.m_oApi.sync_currentPageCallback(drDoc.m_lCurrentPage);
     }
 
-    this.UpdateHorRulerBack = function()
+    this.UpdateHorRulerBack = function(isattack)
     {
         var drDoc = this.m_oDrawingDocument;
         if (0 <= drDoc.SlideCurrent && drDoc.SlideCurrent < drDoc.SlidesCount)
         {
-            this.CreateBackgroundHorRuler();
+            this.CreateBackgroundHorRuler(undefined, isattack);
         }
         this.UpdateHorRuler();
     }
-    this.UpdateVerRulerBack = function()
+    this.UpdateVerRulerBack = function(isattack)
     {
         var drDoc = this.m_oDrawingDocument;
         if (0 <= drDoc.SlideCurrent && drDoc.SlideCurrent < drDoc.SlidesCount)
         {
-            this.CreateBackgroundVerRuler();
+            this.CreateBackgroundVerRuler(undefined, isattack);
         }
         this.UpdateVerRuler();
     }
 
-    this.CreateBackgroundHorRuler = function(margins)
+    this.CreateBackgroundHorRuler = function(margins, isattack)
     {
         var cachedPage = {};
         cachedPage.width_mm = this.m_oLogicDocument.Width;
@@ -3233,9 +3233,9 @@ function CEditorPage(api)
             cachedPage.margin_bottom  = this.m_oLogicDocument.Height;
         }
 
-        this.m_oHorRuler.CreateBackground(cachedPage);
+        this.m_oHorRuler.CreateBackground(cachedPage, isattack);
     }
-    this.CreateBackgroundVerRuler = function(margins)
+    this.CreateBackgroundVerRuler = function(margins, isattack)
     {
         var cachedPage = {};
         cachedPage.width_mm = this.m_oLogicDocument.Width;
@@ -3256,7 +3256,7 @@ function CEditorPage(api)
             cachedPage.margin_bottom  = this.m_oLogicDocument.Height;
         }
 
-        this.m_oVerRuler.CreateBackground(cachedPage);
+        this.m_oVerRuler.CreateBackground(cachedPage, isattack);
     }
 
     this.ThemeGenerateThumbnails = function(_master)
