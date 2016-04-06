@@ -13181,9 +13181,11 @@
     {
 		History.Create_NewPoint();
 		History.StartTransaction();
+		
+		range = Asc.g_oRangeCache.getAscRange(range);
 		this.model.autoFilters.changeTableRange(tableName, range);
 		
-		//this._onUpdateFormatTable(isChangeRange, false, true);
+		this._onUpdateFormatTable(range, false, true);
 		//TODO добавить перерисовку таблицы и перерисовку шаблонов
 		History.EndTransaction();
 	};

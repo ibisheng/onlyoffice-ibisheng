@@ -727,6 +727,9 @@
 					case historyitem_AutoFilter_ChangeTableInfo:
 						this.changeFormatTableInfo(data.displayName, data.type, data.val);
 						break;
+					case historyitem_AutoFilter_ChangeTableRef:
+						this.changeTableRange(data.displayName, data.moveTo);
+						break;
 				}
 				History.TurnOn();
 			},
@@ -768,7 +771,7 @@
 					else
 						worksheet.AutoFilter = cloneData;
 				}
-				else if(type === historyitem_AutoFilter_Change || type === historyitem_AutoFilter_ChangeTableInfo)//добавление/удаление строк/столбцов 
+				else if(type === historyitem_AutoFilter_Change || type === historyitem_AutoFilter_ChangeTableInfo || type === historyitem_AutoFilter_ChangeTableRef)
 				{
 					if(worksheet.AutoFilter && cloneData.newFilterRef.isEqual(worksheet.AutoFilter.Ref))
 						worksheet.AutoFilter = cloneData.oldFilter.clone(null);
@@ -2217,7 +2220,22 @@
 			
 			changeTableRange: function(tableName, range)
 			{
+				var tablePart = this._getFilterByDisplayName(tableName);
 				
+				if(!tablePart)
+				{
+					return false;
+				}
+				
+				var oldFilter = tablePart.clone(null);
+				
+				tablePart.changeRefOnRange(range, this, true);
+				
+				this._addHistoryObj({oldFilter: oldFilter, newFilterRef: tablePart.Ref.clone()}, historyitem_AutoFilter_ChangeTableRef,
+						{activeCells: tablePart.Ref.clone(), arnTo: range, displayName: tableName});
+				
+				this._cleanStyleTable(oldFilter.Ref);
+				this._setColorStyleTable(tablePart.Ref, tablePart, null, true);
 			},
 			
 			_clearRange: function(range, isClearText)
@@ -4380,10 +4398,9 @@
 				}
 			},
 			
-			_generateColumnName2: function(tableColumns, prevColumnName)
+			_generateColumnName2: function(tableColumns)
 			{
 				var columnName = "Column";
-				var name = prevColumnName.split(columnName);
 				var indexColumn = name[1];
 				var nextIndex;
 				

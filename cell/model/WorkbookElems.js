@@ -4563,6 +4563,47 @@ TablePart.prototype.changeRef = function(col, row, bIsFirst) {
 	if(this.AutoFilter)
 		this.AutoFilter.changeRef(col, row, bIsFirst);
 };
+TablePart.prototype.changeRefOnRange = function(range, autoFilters, generateNewTableColumns) {
+	if(!range)
+		return;
+	
+	//add table columns
+	if(generateNewTableColumns)
+	{
+		var newTableColumns = [];
+		var intersectionRanges = this.Ref.intersection(range);
+		for(var i = range.c1; i <= range.c2; i++)
+		{
+			var tableColumn;
+			if(i >= intersectionRanges.c1 && i <= intersectionRanges.c2)
+			{
+				var tableIndex = i - this.Ref.c1;
+				tableColumn = this.TableColumns[tableIndex];
+			}
+			else
+			{
+				tableColumn = new TableColumn();
+			}
+			
+			newTableColumns.push(tableColumn);
+		}
+		
+		for(var j = 0; j < newTableColumns.length; j++)
+		{
+			if(newTableColumns[j].Name === null)
+				newTableColumns[j].Name = autoFilters._generateColumnName2(newTableColumns);
+		}
+		
+		this.TableColumns = newTableColumns;
+	}
+	
+	this.Ref = Asc.Range(range.c1, range.r1, range.c2, range.r2);
+	//event
+	this.handlers.trigger("changeRefTablePart", this.DisplayName, this.Ref);
+	
+	if(this.AutoFilter)
+		this.AutoFilter.changeRefOnRange(range);
+};
 TablePart.prototype.isApplyAutoFilter = function() {
 	var res = false;
 	
@@ -4634,7 +4675,7 @@ TablePart.prototype.addTableColumns = function(activeRange, autoFilters)
 	for(var j = 0; j < newTableColumns.length; j++)
 	{
 		if(newTableColumns[j].Name === null)
-			newTableColumns[j].Name = autoFilters._generateColumnName2(newTableColumns, newTableColumns[j - 1].Name);
+			newTableColumns[j].Name = autoFilters._generateColumnName2(newTableColumns);
 	}
 	
 	this.TableColumns = newTableColumns;
@@ -4644,7 +4685,7 @@ TablePart.prototype.addTableLastColumn = function(activeRange, autoFilters, isAd
 {
 	var newTableColumns = this.TableColumns;
 	newTableColumns.push(new TableColumn());
-	newTableColumns[newTableColumns.length - 1].Name = autoFilters._generateColumnName2(newTableColumns, newTableColumns[newTableColumns.length - 2].Name);
+	newTableColumns[newTableColumns.length - 1].Name = autoFilters._generateColumnName2(newTableColumns);
 	
 	this.TableColumns = newTableColumns;
 };
@@ -4845,6 +4886,15 @@ AutoFilter.prototype.changeRef = function(col, row, bIsFirst) {
 		ref.setOffsetLast({offsetCol: col ? col : 0, offsetRow: row ? row : 0});
 	
 	this.Ref = ref;
+};
+AutoFilter.prototype.changeRefOnRange = function(range) {
+	if(!range)
+		return;
+		
+	this.Ref = Asc.Range(range.c1, range.r1, range.c2, range.r2);
+	
+	if(this.AutoFilter)
+		this.AutoFilter.changeRefOnRange(range);
 };
 AutoFilter.prototype.isApplyAutoFilter = function() {
 	var res = false;
