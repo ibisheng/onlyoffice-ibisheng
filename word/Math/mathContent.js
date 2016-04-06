@@ -3733,7 +3733,6 @@ CMathContent.prototype.Selection_DrawRange = function(_CurLine, _CurRange, Selec
     var StartPos = this.protected_GetRangeStartPos(CurLine, CurRange);
     var EndPos   = this.protected_GetRangeEndPos(CurLine, CurRange);
 
-
     if(this.bRoot == false)
     {
         var Bound = this.Get_LineBound(_CurLine, _CurRange);
@@ -4006,7 +4005,8 @@ CMathContent.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
             var PrevLastPos = PRS.PosEndRun.Get(_Depth-1),
                 LastPos     = PRS.PosEndRun.Get(_Depth);
 
-            var PrevWord = PRS.Word;
+            var PrevWord = PRS.Word,
+                MathFirstItem = PRS.MathFirstItem;
 
             PRS.bInsideOper = false;
 
@@ -4017,6 +4017,7 @@ CMathContent.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                 // перед мат объектом идет box break_operator и он не является первым элементом в строке
                 if(Item.kind == MATH_BOX)
                 {
+                    PRS.MathFirstItem = MathFirstItem;
                     if(true == Item.IsForcedBreak())
                     {
                         this.private_ForceBreakBox(PRS, Item, _Depth, PrevLastPos, LastPos); // _Depth, PrevLastPos, LastPos запоминаем до пересчета, поэтому передаем эти параметры в функцию
@@ -4049,7 +4050,6 @@ CMathContent.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                     }
 
                     PRS.MathFirstItem = false;
-
                 }
                 else
                 {
