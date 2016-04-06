@@ -73,10 +73,19 @@ function CVerRulerRepaintChecker()
     this.BlitTop = 0;
 }
 
-function RulerCorrectPosition(val, mm_1_8, mm_1_4, margin)
+function RulerCorrectPosition(_ruler, val, margin)
 {
     if (global_keyboardEvent.AltKey)
         return val;
+
+    var mm_1_4 = 10 / 4;
+
+    if (_ruler.Units == c_oAscDocumentUnits.Inch)
+        mm_1_4 = 25.4 / 16;
+    else if (_ruler.Units == c_oAscDocumentUnits.Point)
+        mm_1_4 = 25.4 / 12;
+
+    var mm_1_8 = mm_1_4 / 2;
 
     if (undefined === margin)
         return (((val + mm_1_8) / mm_1_4) >> 0) * mm_1_4;
@@ -1083,7 +1092,7 @@ function CHorRuler()
             }
             case 1:
             {
-                var newVal = RulerCorrectPosition(_x, mm_1_8, mm_1_4, _margin_left);
+                var newVal = RulerCorrectPosition(this, _x, _margin_left);
 
                 if (newVal < 0)
                     newVal = 0;
@@ -1109,7 +1118,7 @@ function CHorRuler()
             }
             case 2:
             {
-                var newVal = RulerCorrectPosition(_x, mm_1_8, mm_1_4, _margin_left);
+                var newVal = RulerCorrectPosition(this, _x, _margin_left);
 
                 var min = this.m_dMarginLeft;
                 if ((this.m_dMarginLeft + this.m_dIndentLeft) > min)
@@ -1137,7 +1146,7 @@ function CHorRuler()
             }
             case 3:
             {
-                var newVal = RulerCorrectPosition(_x, mm_1_8, mm_1_4, _margin_left);
+                var newVal = RulerCorrectPosition(this, _x, _margin_left);
 
                 var min = 0;
                 if (this.m_dIndentLeftFirst < this.m_dIndentLeft)
@@ -1178,7 +1187,7 @@ function CHorRuler()
             }
             case 4:
             {
-                var newVal = RulerCorrectPosition(_x, mm_1_8, mm_1_4, _margin_left);
+                var newVal = RulerCorrectPosition(this, _x, _margin_left);
 
                 if (newVal < 0)
                     newVal = 0;
@@ -1206,7 +1215,7 @@ function CHorRuler()
             }
             case 5:
             {
-                var newVal = RulerCorrectPosition(_x, mm_1_8, mm_1_4, _margin_left);
+                var newVal = RulerCorrectPosition(this, _x, _margin_left);
 
                 if (newVal < 0)
                     newVal = 0;
@@ -1234,7 +1243,7 @@ function CHorRuler()
             }
             case 6:
             {
-                var newVal = RulerCorrectPosition(_x, mm_1_8, mm_1_4, _margin_left);
+                var newVal = RulerCorrectPosition(this, _x, _margin_left);
 
                 if (newVal > (this.m_oPage.width_mm))
                     newVal = this.m_oPage.width_mm;
@@ -1266,7 +1275,7 @@ function CHorRuler()
             }
             case 7:
             {
-                var newVal = RulerCorrectPosition(_x, mm_1_8, mm_1_4, _margin_left);
+                var newVal = RulerCorrectPosition(this, _x, _margin_left);
 
                 this.m_dCurrentTabNewPosition = newVal - _margin_left;
 
@@ -1290,7 +1299,7 @@ function CHorRuler()
             }
             case 8:
             {
-                var newVal = RulerCorrectPosition(_x, mm_1_8, mm_1_4, this.TableMarginLeftTrackStart);
+                var newVal = RulerCorrectPosition(this, _x, this.TableMarginLeftTrackStart);
 
                 // сначала определим граничные условия
                 var _min = 0;
@@ -1335,7 +1344,7 @@ function CHorRuler()
             }
             case 9:
             {
-                var newVal = RulerCorrectPosition(_x, mm_1_8, mm_1_4, this.TableMarginLeftTrackStart);
+                var newVal = RulerCorrectPosition(this, _x, this.TableMarginLeftTrackStart);
 
                 // сначала определим граничные условия
                 var markup = this.m_oColumnMarkup;
@@ -1484,7 +1493,7 @@ function CHorRuler()
             }
             case 10:
             {
-                var newVal = RulerCorrectPosition(_x, mm_1_8, mm_1_4, this.TableMarginLeftTrackStart);
+                var newVal = RulerCorrectPosition(this, _x, this.TableMarginLeftTrackStart);
 
                 // сначала определим граничные условия
                 var markup = this.m_oColumnMarkup;
@@ -1940,7 +1949,7 @@ function CHorRuler()
                 var mm_1_4 = 10 / 4;
                 var mm_1_8 = mm_1_4 / 2;
 
-                var _new_tab_pos = RulerCorrectPosition(_x, mm_1_8, mm_1_4, _margin_left);
+                var _new_tab_pos = RulerCorrectPosition(this, _x, _margin_left);
                 _new_tab_pos -= _margin_left;
 
                 this.m_arrTabs[this.m_arrTabs.length] = new CTab(_new_tab_pos, word_control.m_nTabsType);
@@ -3222,7 +3231,7 @@ function CVerRuler()
             }
             case 1:
             {
-                var newVal = RulerCorrectPosition(_y, mm_1_8, mm_1_4, this.m_dMarginTop);
+                var newVal = RulerCorrectPosition(this, _y, this.m_dMarginTop);
 
                 if (newVal > (this.m_dMarginBottom - 30))
                     newVal = this.m_dMarginBottom - 30;
@@ -3241,7 +3250,7 @@ function CVerRuler()
             }
             case 2:
             {
-                var newVal = RulerCorrectPosition(_y, mm_1_8, mm_1_4, this.m_dMarginTop);
+                var newVal = RulerCorrectPosition(this, _y, this.m_dMarginTop);
 
                 if (newVal < (this.m_dMarginTop + 30))
                     newVal = this.m_dMarginTop + 30;
@@ -3260,7 +3269,7 @@ function CVerRuler()
             }
             case 3:
             {
-                var newVal = RulerCorrectPosition(_y, mm_1_8, mm_1_4, this.m_dMarginTop);
+                var newVal = RulerCorrectPosition(this, _y, this.m_dMarginTop);
 
                 if (newVal > this.header_bottom)
                     newVal = this.header_bottom;
@@ -3279,7 +3288,7 @@ function CVerRuler()
             }
             case 4:
             {
-                var newVal = RulerCorrectPosition(_y, mm_1_8, mm_1_4, this.m_dMarginTop);
+                var newVal = RulerCorrectPosition(this, _y, this.m_dMarginTop);
 
                 if (newVal < 0)
                     newVal = 0;
@@ -3311,7 +3320,7 @@ function CVerRuler()
                     _max = this.m_oTableMarkup.Rows[this.DragTablePos].Y + this.m_oTableMarkup.Rows[this.DragTablePos].H;
                 }
 
-                var newVal = RulerCorrectPosition(_y, mm_1_8, mm_1_4, this.m_dMarginTop);
+                var newVal = RulerCorrectPosition(this, _y, this.m_dMarginTop);
 
                 if (newVal < _min)
                     newVal = _min;

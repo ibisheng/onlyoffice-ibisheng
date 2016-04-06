@@ -301,6 +301,7 @@ asc_docs_api.prototype['asc_SetDocumentPlaceChangedEnabled'] = asc_docs_api.prot
 asc_docs_api.prototype['asc_SetViewRulers'] = asc_docs_api.prototype.asc_SetViewRulers;
 asc_docs_api.prototype['asc_SetViewRulersChange'] = asc_docs_api.prototype.asc_SetViewRulersChange;
 asc_docs_api.prototype['asc_GetViewRulers'] = asc_docs_api.prototype.asc_GetViewRulers;
+asc_docs_api.prototype['asc_SetDocumentUnits'] = asc_docs_api.prototype.asc_SetDocumentUnits;
 asc_docs_api.prototype['SetMobileVersion'] = asc_docs_api.prototype.SetMobileVersion;
 asc_docs_api.prototype['GoToHeader'] = asc_docs_api.prototype.GoToHeader;
 asc_docs_api.prototype['changeSlideSize'] = asc_docs_api.prototype.changeSlideSize;
