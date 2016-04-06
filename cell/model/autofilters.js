@@ -3798,13 +3798,6 @@
 								}
 							}
 						}
-						else if(totalsRowCount)
-						{
-							//var range = worksheet.getCell3(bbox.r2, bbox.c1);
-							//range.setValue(tableColumn.Name);
-							//range.setType(CellValueType.String);
-						}
-						
 					}
 					
 					//заполняем стили

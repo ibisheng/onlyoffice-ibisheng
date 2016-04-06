@@ -7284,23 +7284,6 @@
                     if(0 == (rowIndex - headerRowCount) % 2)
                     {
                         if(0 == colIndex % 2)
-                            res = styles.rightRowBand1ColBand1LC;
-                        else
-                            res = styles.rightRowBand1ColBand2LC;
-                    }
-                    else
-                    {
-                        if(0 == colIndex % 2)
-                            res = styles.rightRowBand2ColBand1LC;
-                        else
-                            res = styles.rightRowBand2ColBand2LC;
-                    }
-                }
-                else
-                {
-                    if(0 == (rowIndex - headerRowCount) % 2)
-                    {
-                        if(0 == colIndex % 2)
                             res = styles.rightBottomRowBand1ColBand1LC;
                         else
                             res = styles.rightBottomRowBand1ColBand2LC;
@@ -7311,6 +7294,23 @@
                             res = styles.rightBottomRowBand2ColBand1LC;
                         else
                             res = styles.rightBottomRowBand2ColBand2LC;
+                    }
+                }
+                else
+                {
+                    if(0 == (rowIndex - headerRowCount) % 2)
+                    {
+                        if(0 == colIndex % 2)
+                            res = styles.rightRowBand1ColBand1LC;
+                        else
+                            res = styles.rightRowBand1ColBand2LC;
+                    }
+                    else
+                    {
+                        if(0 == colIndex % 2)
+                            res = styles.rightRowBand2ColBand1LC;
+                        else
+                            res = styles.rightRowBand2ColBand2LC;
                     }
                 }
             }

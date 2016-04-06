@@ -13183,7 +13183,7 @@
 		History.StartTransaction();
 		this.model.autoFilters.changeTableRange(tableName, range);
 		
-		this._onUpdateFormatTable(isChangeRange, false, true);
+		//this._onUpdateFormatTable(isChangeRange, false, true);
 		//TODO добавить перерисовку таблицы и перерисовку шаблонов
 		History.EndTransaction();
 	};
@@ -13198,9 +13198,14 @@
 		{
 			res = c_oAscError.ID.AutoFilterMoveToHiddenRangeError;
 		}
-		else if(range.r1 !== tablePart.Ref.r1)
+		else
 		{
-			res = c_oAscError.ID.AutoFilterMoveToHiddenRangeError;
+			var tablePart = intersectionTables[0];
+			if(range.r1 !== tablePart.Ref.r1)
+			{
+				res = c_oAscError.ID.AutoFilterMoveToHiddenRangeError;
+			}
+			
 		}
 		
 		return res;

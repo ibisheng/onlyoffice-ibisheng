@@ -2687,19 +2687,19 @@
             if(styleOptions.wholeTable && styleOptions.wholeTable.dxf.fill && null != styleOptions.wholeTable.dxf.fill.bg)
             {
                 ctx.setFillStyle(styleOptions.wholeTable.dxf.fill.bg);
-                ctx.fillRect(0,0,xSize,ySize);
+                ctx.fillRect(0, 0, xSize, ySize);
             }
             else
             {
                 ctx.setFillStyle(whiteColor);
-                ctx.fillRect(0,0,xSize,ySize);
+                ctx.fillRect(0, 0, xSize, ySize);
             }
             if(styleInfo.ShowColumnStripes)//column stripes
             {
                 for(k = 0; k < 6; k++)
                 {
                     color = defaultColorBackground;
-                    if((k)%2 == 0)
+                    if(k % 2 == 0)
                     {
                         if(styleOptions.firstColumnStripe && styleOptions.firstColumnStripe.dxf.fill && null != styleOptions.firstColumnStripe.dxf.fill.bg)
                             color =  styleOptions.firstColumnStripe.dxf.fill.bg;
@@ -2714,79 +2714,73 @@
                             color =  styleOptions.wholeTable.dxf.fill.bg;
                     }
                     ctx.setFillStyle(color);
-                    ctx.fillRect(k*stepX,0,stepX,ySize);
+                    ctx.fillRect(k * stepX, 0, stepX, ySize);
                 }
             }
 
             if(styleInfo.ShowRowStripes)//row stripes
             {
-                for(k = 0; k < 6; k++)
+                for(var k = 0; k < 6; k++)
                 {
                     color = null;
-                    if(styleOptions)//styleOptions.headerRow
-                    {
-                        if(k ==0)
-                            k++;
-                        if((k)%2 != 0)
-                        {
-                            if(styleOptions.firstRowStripe && styleOptions.firstRowStripe.dxf.fill && null != styleOptions.firstRowStripe.dxf.fill.bg)
-                                color = styleOptions.firstRowStripe.dxf.fill.bg;
-                        }
-                        else
-                        {
-                            if(styleOptions.secondRowStripe && styleOptions.secondRowStripe.dxf.fill && null != styleOptions.secondRowStripe.dxf.fill.bg)
-                                color = styleOptions.secondRowStripe.dxf.fill.bg;
-                            else if(styleOptions.wholeTable && styleOptions.wholeTable.dxf.fill && null != styleOptions.wholeTable.dxf.fill.bg)
-                                color = styleOptions.wholeTable.dxf.fill.bg;
-
-                        }
-                        if(color != null)
-                        {
-                            ctx.setFillStyle(color);
-                            if(k == 1)
-                                ctx.fillRect(0, k*stepY, xSize, stepY);
-                            else if(k == 3)
-                                ctx.fillRect(0, k*stepY, xSize,stepY);
-                            else
-                                ctx.fillRect(0, k*stepY, xSize, stepY);
-                            //else
-                            //ctx.fillRect(0,k*stepY,xSize,stepY);
-                        }
-
-                    }
-                    else
-                    {
-                        color = null;
-                        if((k+1)%2 != 0)
-                        {
-                            if(styleOptions.firstRowStripe && styleOptions.firstRowStripe.dxf.fill && null != styleOptions.firstRowStripe.dxf.fill.bg)
-                                color =  styleOptions.firstRowStripe.dxf.fill.bg;
-                        }
-                        else
-                        {
-                            if(styleOptions.secondRowStripe && styleOptions.secondRowStripe.dxf.fill && null != styleOptions.secondRowStripe.dxf.fill.bg)
-                                color =  styleOptions.secondRowStripe.dxf.fill.bg;
-                            else if(styleOptions.wholeTable && styleOptions.wholeTable.dxf.fill && null != styleOptions.wholeTable.dxf.fill.bg)
-                                color =  styleOptions.wholeTable.dxf.fill.bg;
-                        }
-
-                        if(color != null)
-                        {
-                            ctx.setFillStyle(color);
-                            ctx.fillRect(0, k*stepY, xSize, stepY);
-                        }
-                    }
-
+					
+					if(k == 0 && styleInfo.HeaderRowCount)
+						continue;
+					
+					if(styleInfo.HeaderRowCount)
+					{
+						if(k % 2 != 0)
+						{
+							if(styleOptions.firstRowStripe && styleOptions.firstRowStripe.dxf.fill && null != styleOptions.firstRowStripe.dxf.fill.bg)
+							{
+								color = styleOptions.firstRowStripe.dxf.fill.bg;
+							}
+						}
+						else
+						{
+							if(styleOptions.secondRowStripe && styleOptions.secondRowStripe.dxf.fill && null != styleOptions.secondRowStripe.dxf.fill.bg)
+							{
+								color = styleOptions.secondRowStripe.dxf.fill.bg;
+							}
+						}
+					}
+					else
+					{
+						if(k % 2 != 0)
+						{
+							if(styleOptions.secondRowStripe && styleOptions.secondRowStripe.dxf.fill && null != styleOptions.secondRowStripe.dxf.fill.bg)
+							{
+								color = styleOptions.secondRowStripe.dxf.fill.bg;
+							}
+						}
+						else
+						{
+							if(styleOptions.firstRowStripe && styleOptions.firstRowStripe.dxf.fill && null != styleOptions.firstRowStripe.dxf.fill.bg)
+							{
+								color = styleOptions.firstRowStripe.dxf.fill.bg;
+							}
+						}
+					}
+					
+					if(color != null)
+					{
+						ctx.setFillStyle(color);
+						ctx.fillRect(0, k * stepY, xSize, stepY);
+					}
                 }
-
             }
+			
             if(styleInfo.ShowFirstColumn && styleOptions.firstColumn)//first column
             {
-                if(styleOptions.firstColumn && styleOptions.firstColumn.dxf.fill && null != styleOptions.firstColumn.dxf.fill.bg)
-                    ctx.setFillStyle(styleOptions.firstColumn.dxf.fill.bg);
-                else
-                    ctx.setFillStyle(defaultColorBackground);
-                ctx.fillRect(0,0,stepX,ySize);
+                color = null;
+				if(styleOptions.firstColumn && styleOptions.firstColumn.dxf.fill && null != styleOptions.firstColumn.dxf.fill.bg)
+                    color = styleOptions.firstColumn.dxf.fill.bg;
+				
+				if(color != null)
+                {
+					ctx.setFillStyle(color);
+					ctx.fillRect(0, 0, stepX, ySize);
+				}
             }
             if(styleInfo.ShowLastColumn)//last column
             {
@@ -2797,7 +2791,7 @@
                 if(color != null)
                 {
                     ctx.setFillStyle(color);
-                    ctx.fillRect(4*stepX,0,stepX,ySize);
+                    ctx.fillRect(4*stepX + 1, 0, stepX, ySize);
                 }
 
             }
@@ -2947,7 +2941,7 @@
                     ctx.lineVer(0, xSize, ySize);
                 }
             }
-            if(styleOptions.headerRow && styleOptions.headerRow.dxf.border)//header row
+            if(styleOptions.headerRow && styleOptions.headerRow.dxf.border && styleInfo.HeaderRowCount)//header row
             {
                 border = styleOptions.headerRow.dxf.border;
                 if(border.t.s !== c_oAscBorderStyles.None)
