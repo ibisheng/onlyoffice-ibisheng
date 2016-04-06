@@ -11752,7 +11752,7 @@ CDocument.prototype =
         return this.Content[ContentPos].Get_NearestPos(ElementPageIndex, X, Y, bAnchor, Drawing);
     },
 
-    Internal_Content_Add : function(Position, NewObject)
+    Internal_Content_Add : function(Position, NewObject, bDoNotCheckLastElement)
     {
         // Position = this.Content.length  допускается
         if ( Position < 0 || Position > this.Content.length )
@@ -11787,7 +11787,7 @@ CDocument.prototype =
         this.Check_SectionLastParagraph();
 
         // Проверим, что последний элемент не таблица
-        if ( type_Table == this.Content[this.Content.length - 1].GetType() )
+        if ( type_Table == this.Content[this.Content.length - 1].GetType() && true !== bDoNotCheckLastElement)
             this.Internal_Content_Add(this.Content.length, new Paragraph( this.DrawingDocument, this, 0, 0, 0, 0, 0 ) );
 
         // Запоминаем, что нам нужно произвести переиндексацию элементов
