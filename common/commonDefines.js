@@ -792,3 +792,8 @@ var contentchanges_Add    = 1;
 var contentchanges_Remove = 2;
 
 var offlineMode = '_offline_';
+
+var c_oAscRulerUnits = {
+    Millimeter  : 0,
+    Inch        : 1
+};

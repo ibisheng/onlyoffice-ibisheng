@@ -6327,6 +6327,15 @@ asc_docs_api.prototype.asc_GetViewRulers = function()
     return this.WordControl.m_bIsRuler;
 };
 
+asc_docs_api.prototype.asc_SetDocumentUnits = function(_units)
+{
+    if (this.WordControl && this.WordControl.m_oHorRuler && this.WordControl.m_oVerRuler)
+    {
+        this.WordControl.m_oHorRuler.Units = _units;
+        this.WordControl.m_oVerRuler.Units = _units;
+    }
+};
+
 asc_docs_api.prototype.SetMobileVersion = function(val)
 {
     this.isMobileVersion = val;
