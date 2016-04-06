@@ -404,90 +404,6 @@ CMathSettings.prototype.Get_SmallFrac = function()
     this.SetCompiledPr();
     return this.CompiledPr.smallFrac;
 };
-CMathSettings.prototype.Load_Settings = function()
-{
-    var Settings = {};
-
-    /*if(this.CompiledPr.brkBin !== BREAK_AFTER)
-        Settings.brkBin = BREAK_AFTER;
-    else if(this.CompiledPr.brkBin !== BREAK_BEFORE)
-        Settings.brkBin = BREAK_BEFORE;*/
-
-    /*if(this.CompiledPr.intLim !== NARY_SubSup)
-        Settings.intLim = NARY_SubSup;
-    else if(this.CompiledPr.intLim !== NARY_UndOvr)
-        Settings.intLim = NARY_UndOvr;
-
-    if(this.CompiledPr.naryLim !== NARY_SubSup)
-        Settings.naryLim = NARY_SubSup;
-    else if(this.CompiledPr.naryLim !== NARY_UndOvr)
-        Settings.naryLim = NARY_UndOvr;*/
-
-
-    /*if(this.CompiledPr.defJc == align_Justify)
-    {
-        Settings.defJc = align_Left;
-    }
-    else if(this.CompiledPr.defJc == align_Left)
-    {
-        Settings.defJc = align_Center;
-    }
-    else if(this.CompiledPr.defJc == align_Center)
-    {
-        Settings.defJc = align_Right;
-    }
-    else
-    {
-        Settings.defJc = align_Justify;
-    }*/
-
-    /*if(this.CompiledPr.wrapIndent >= 25 && this.CompiledPr.wrapIndent < 26)
-    {
-        Settings.wrapIndent = 26;
-    }
-
-    if(this.CompiledPr.wrapIndent >= 26 && this.CompiledPr.wrapIndent < 27)
-    {
-        Settings.wrapIndent = 27;
-    }
-
-    if(this.CompiledPr.wrapIndent >= 27 && this.CompiledPr.wrapIndent < 28)
-    {
-        Settings.wrapIndent = 28;
-    }
-
-    if(this.CompiledPr.wrapIndent >= 28 && this.CompiledPr.wrapIndent < 29)
-    {
-        Settings.wrapIndent = 29;
-    }
-
-    if(this.CompiledPr.wrapIndent >= 29 && this.CompiledPr.wrapIndent < 30)
-    {
-        Settings.wrapIndent = 30;
-    }*/
-
-    if(this.CompiledPr.rMargin < 15)
-    {
-        Settings.rMargin = 15;
-    }
-    else if(this.CompiledPr.rMargin < 20)
-    {
-        Settings.rMargin = 20;
-    }
-    else if(this.CompiledPr.rMargin < 26)
-    {
-        Settings.rMargin = 26;
-    }
-    else if(this.CompiledPr.rMargin < 31)
-    {
-        Settings.rMargin = 31;
-    }
-    else if(this.CompiledPr.rMargin < 37)
-    {
-        Settings.rMargin = 37;
-    }
-
-};
 CMathSettings.prototype.Get_MenuProps = function()
 {
     return new CMathMenuSettings(this.CompiledPr);
@@ -1855,7 +1771,7 @@ ParaMath.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
 
     // такая сиуация возможна, если разместили формулу под картинкой и нужно заново пересчитать формулу
-    // ддля этого меняем PRS.Y и ждем пока не произойдет private_RecalculateLineCheckRangeY
+    // для этого меняем PRS.Y и ждем пока не произойдет private_RecalculateLineCheckRangeY
     // т.к. в противном случае мы можем изменить Ranges на те, что находятся PRS.Y, который был до того как его изменили в данном блоке (возникает из-за того, что ф-ия private_RecalculateLineCheckRanges нах-ся выше ф-ии private_RecalculateLineCheckRangeY)
     if(this.ParaMathRPI.ShiftY - PRS.Y > 0 || PRS.bMathRangeY == true)
     {
