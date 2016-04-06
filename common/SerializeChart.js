@@ -2649,7 +2649,7 @@ BinaryChartWriter.prototype.WriteCT_DLbls = function (oVal) {
     if (null != oVal.dLbl) {
         for (var i = 0, length = oVal.dLbl.length; i < length; ++i) {
             var oCurVal = oVal.dLbl[i];
-            if (null != oCurVal) {
+            if (null != oCurVal && null != oCurVal.idx) {
                 this.bs.WriteItem(c_oserct_dlblsDLBL, function () {
                     oThis.WriteCT_DLbl(oCurVal);
                 });
@@ -5007,7 +5007,7 @@ BinaryChartWriter.prototype.WriteCT_PivotFmt = function (oVal) {
             oThis.WriteCT_Marker(oVal.marker);
         });
     }
-    if (null != oVal.dLbl) {
+    if (null != oVal.dLbl && null != oVal.dLbl.idx) {
         this.bs.WriteItem(c_oserct_pivotfmtDLBL, function () {
             oThis.WriteCT_DLbl(oVal.dLbl);
         });
