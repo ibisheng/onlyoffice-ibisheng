@@ -105,6 +105,7 @@ var historyitem_AutoFilter_Change = 10;
 var historyitem_AutoFilter_CleanFormat  = 11;
 var historyitem_AutoFilter_ChangeTableInfo = 12;
 var historyitem_AutoFilter_ChangeTableRef = 13;
+var historyitem_AutoFilter_ChangeTableName = 14;
 
 
 function CHistory(workbook)

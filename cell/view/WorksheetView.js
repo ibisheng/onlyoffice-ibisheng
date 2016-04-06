@@ -12803,6 +12803,7 @@
 	WorksheetView.prototype.af_changeFormatTableInfo = function(tableName, optionType, val)
     {
 		var tablePart = this.model.autoFilters._getFilterByDisplayName(tableName);
+		var t = this;
 		
 		if(!tablePart || (tablePart && !tablePart.TableStyleInfo))
 		{
@@ -12812,13 +12813,17 @@
 		var isChangeTableInfo = this.af_checkChangeTableInfo(tablePart, optionType);
 		if(isChangeTableInfo !== false)
 		{
-			History.Create_NewPoint();
-			History.StartTransaction();
-			this.model.autoFilters.changeFormatTableInfo(tableName, optionType, val);
+			var callback = function()
+			{
+				History.Create_NewPoint();
+				History.StartTransaction();
+				t.model.autoFilters.changeFormatTableInfo(tableName, optionType, val);
+				
+				t._onUpdateFormatTable(isChangeTableInfo, false, true);
+				History.EndTransaction();
+			};
 			
-			this._onUpdateFormatTable(isChangeTableInfo, false, true);
-			//TODO добавить перерисовку таблицы и перерисовку шаблонов
-			History.EndTransaction();
+			t._isLockedCells( tablePart.Ref, null, callback );
 		}
 	};
 	
@@ -13031,21 +13036,8 @@
 		var t = this;
         var ws = this.model;
 		var acitveRange = this.activeRange.clone();
-
-        var tablePart = ws.autoFilters._getFilterByDisplayName(tableName);
-
-        if(!tablePart)
-        {
-            return false;
-        }
 		
-		//TODO тестовый вариант. нужно сделать методы и добавлять в историю
-		
-		var oldNamedrange = this.model.workbook.dependencyFormulas.getDefNameNodeByName(tablePart.DisplayName);
-		var newNamedrange = oldNamedrange.clone();
-		newNamedrange.Name = newName;
-		oldNamedrange.changeDefName(newNamedrange);
-		tablePart.DisplayName = newName;
+		this.model.autoFilters.changeDisplayNameTable(tableName, newName);
 	};
 	
 	WorksheetView.prototype.af_checkInsDelCells = function(activeRange, val, prop)

@@ -4833,6 +4833,11 @@ TablePart.prototype.generateTotalsRowLabel = function()
 	this.TableColumns[0].generateTotalsRowLabel();
 };
 
+TablePart.prototype.changeDisplayName = function(newName)
+{
+	this.DisplayName = newName;
+}; 
+
 /** @constructor */
 function AutoFilter() {
 	this.Ref = null;
