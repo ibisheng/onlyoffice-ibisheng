@@ -2560,7 +2560,7 @@
 					if(divContent)
 						htmlInShape = divContent;	
 					
-					t.lStorageText = this._getTextFromHtml(htmlInShape);
+					t.lStorageText = this._getTextFromShape(isIntoShape);
 					
 					return htmlInShape;
 				}
@@ -2718,6 +2718,32 @@
 				};
 				
 				return text;
+			},
+			
+			_getTextFromShape: function(documentContent)
+			{
+				var res = "";
+				
+				if(documentContent && documentContent.Content && documentContent.Content.length)
+				{
+					for(var i = 0; i < documentContent.Content.length; i++)
+					{
+						if(documentContent.Content[i])
+						{
+							var paraText = documentContent.Content[i].Get_SelectedText();
+							if(paraText)
+							{
+								if(i !== 0)
+								{
+									res += '\n';
+								}
+								res += paraText;
+							}
+						}
+					}
+				}
+				
+				return res;
 			},
 			
 			_makeCellValuesHtml: function (node,isText) {
