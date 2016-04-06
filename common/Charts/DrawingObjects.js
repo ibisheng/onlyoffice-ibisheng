@@ -305,7 +305,7 @@ prot["asc_setFormatCode"] = prot.asc_setFormatCode;
 
 
 
-
+var nSparklineMultiplier = 3.5;
 
 function CSparklineView()
 {
@@ -343,7 +343,61 @@ CSparklineView.prototype.initFromSparkline = function(oSparkline, oSparklineGrou
         ser.Val.Formula = oSparkline.f;
         var chartSeries = {series: [ser], parsedHeaders: {bLeft: false, bTop: false}};
         var chart_space = DrawingObjectsController.prototype._getChartSpace(chartSeries, settings, true);
+        chart_space.setBDeleted(false);
         chart_space.setWorksheet(worksheetView.model);
+
+
+        settings.putTitle(c_oAscChartTitleShowSettings.none);
+        settings.putHorAxisLabel(c_oAscChartTitleShowSettings.none);
+        settings.putVertAxisLabel(c_oAscChartTitleShowSettings.none);
+        settings.putLegendPos(c_oAscChartLegendShowSettings.none);
+        settings.putHorGridLines(c_oAscGridLinesSettings.none);
+        settings.putVertGridLines(c_oAscGridLinesSettings.none);
+
+
+        var val_ax_props = new asc_ValAxisSettings();
+        val_ax_props.putMinValRule(c_oAscValAxisRule.auto);
+        val_ax_props.putMaxValRule(c_oAscValAxisRule.auto);
+        val_ax_props.putTickLabelsPos(c_oAscTickLabelsPos.TICK_LABEL_POSITION_NONE);
+        val_ax_props.putInvertValOrder(false);
+        val_ax_props.putDispUnitsRule(c_oAscValAxUnits.none);
+        val_ax_props.putMajorTickMark(c_oAscTickMark.TICK_MARK_NONE);
+        val_ax_props.putMinorTickMark(c_oAscTickMark.TICK_MARK_NONE);
+        val_ax_props.putCrossesRule(c_oAscCrossesRule.auto);
+
+
+        var cat_ax_props = new asc_CatAxisSettings();
+        cat_ax_props.putIntervalBetweenLabelsRule(c_oAscBetweenLabelsRule.auto);
+        cat_ax_props.putLabelsPosition(c_oAscLabelsPosition.betweenDivisions);
+        cat_ax_props.putTickLabelsPos(c_oAscTickLabelsPos.TICK_LABEL_POSITION_NONE);
+        cat_ax_props.putLabelsAxisDistance(100);
+        cat_ax_props.putMajorTickMark(c_oAscTickMark.TICK_MARK_NONE);
+        cat_ax_props.putMinorTickMark(c_oAscTickMark.TICK_MARK_NONE);
+        cat_ax_props.putIntervalBetweenTick(1);
+        cat_ax_props.putCrossesRule(c_oAscCrossesRule.auto);
+
+        settings.putVertAxisProps(val_ax_props);
+        settings.putHorAxisProps(cat_ax_props);
+
+        DrawingObjectsController.prototype.applyPropsToChartSpace(settings, chart_space);
+
+        if(!chart_space.spPr)
+            chart_space.setSpPr(new CSpPr());
+
+        var new_line = new CLn();
+        new_line.setFill(CreateNoFillUniFill());
+        chart_space.spPr.setLn(new_line);
+        chart_space.spPr.setFill(CreateNoFillUniFill());
+        if(!chart_space.chart.plotArea.spPr)
+        {
+            chart_space.chart.plotArea.setSpPr(new CSpPr());
+            chart_space.chart.plotArea.spPr.setFill(CreateNoFillUniFill());
+        }
+        for(var i = 0; i < chart_space.chart.plotArea.axId.length; ++i)
+		{
+			chart_space.chart.plotArea.axId[i].setDelete(true);
+		}
+
         this.chartSpace = chart_space;
         var oBBox = oSparkline.sqref;
         this.col = oBBox.c1;
@@ -353,23 +407,23 @@ CSparklineView.prototype.initFromSparkline = function(oSparkline, oSparklineGrou
         CheckSpPrXfrm(this.chartSpace);
         this.chartSpace.spPr.xfrm.setOffX(0);
         this.chartSpace.spPr.xfrm.setOffY(0);
-        this.chartSpace.spPr.xfrm.setExtX(this.extX);
-        this.chartSpace.spPr.xfrm.setExtY(this.extY);
+        this.chartSpace.spPr.xfrm.setExtX(this.extX*nSparklineMultiplier);
+        this.chartSpace.spPr.xfrm.setExtY(this.extY*nSparklineMultiplier);
         this.chartSpace.recalculate();
     }, this, []);
 };
 
 CSparklineView.prototype.draw = function(graphics)
 {
-    var x = this.ws.getCellLeft(this.col, 3);
-    var y = this.ws.getCellTop(this.row, 3);
+    var x = this.ws.getCellLeft(this.col, 0);
+    var y = this.ws.getCellTop(this.row, 0);
     var extX = this.ws.getColumnWidth(this.col, 3);
     var extY = this.ws.getRowHeight(this.row, 3);
     if(Math.abs(this.extX - extX) > 0.01 || Math.abs(this.extY - extY) > 0.01)
     {
         ExecuteNoHistory(function(){
-            this.chartSpace.spPr.xfrm.setExtX(extX);
-            this.chartSpace.spPr.xfrm.setExtY(extY);
+            this.chartSpace.spPr.xfrm.setExtX(extX*nSparklineMultiplier);
+            this.chartSpace.spPr.xfrm.setExtY(extY*nSparklineMultiplier);
         }, this, []);
         this.extX = extX;
         this.extY = extY;
@@ -377,7 +431,34 @@ CSparklineView.prototype.draw = function(graphics)
     }
     graphics.m_oCoordTransform.tx = x;
     graphics.m_oCoordTransform.ty = y;
+	
+	var _l = this.chartSpace.chartObj.calcProp.chartGutter._left;
+	var _t = this.chartSpace.chartObj.calcProp.chartGutter._top;
+	var _r = this.chartSpace.chartObj.calcProp.chartGutter._right;
+	var _b = this.chartSpace.chartObj.calcProp.chartGutter._bottom;
+	var _true_height = this.chartSpace.chartObj.calcProp.chartGutter.trueHeight;
+	var _true_width = this.chartSpace.chartObj.calcProp.chartGutter.trueWidht;
+	
+	
+	
+	this.chartSpace.chartObj.calcProp.trueWidht = this.chartSpace.extX * this.chartSpace.chartObj.calcProp.pxToMM;
+	this.chartSpace.chartObj.calcProp.trueHeight = this.chartSpace.extY * this.chartSpace.chartObj.calcProp.pxToMM;
+	
+	
+	this.chartSpace.chartObj.calcProp.chartGutter._left = 0;
+	this.chartSpace.chartObj.calcProp.chartGutter._top = 0;
+	this.chartSpace.chartObj.calcProp.chartGutter._right = 0;
+	this.chartSpace.chartObj.calcProp.chartGutter._bottom = 0;
+	
     this.chartSpace.draw(graphics);
+	
+	this.chartSpace.chartObj.calcProp.chartGutter._left = _l;
+	this.chartSpace.chartObj.calcProp.chartGutter._top = _t;
+	this.chartSpace.chartObj.calcProp.chartGutter._right = _r;
+	this.chartSpace.chartObj.calcProp.chartGutter._bottom = _b;
+	
+	this.chartSpace.chartObj.calcProp.trueWidht = _true_width;
+	this.chartSpace.chartObj.calcProp.trueHeight = _true_height;
 };
 
 //-----------------------------------------------------------------------------------
@@ -1998,7 +2079,7 @@ function DrawingObjects() {
     {
         var graphics = new CGraphics();
         graphics.init(oDrawingContext.ctx, oDrawingContext.getWidth(0), oDrawingContext.getHeight(0),
-            oDrawingContext.getWidth(3), oDrawingContext.getHeight(3));
+            oDrawingContext.getWidth(3)*nSparklineMultiplier, oDrawingContext.getHeight(3)*nSparklineMultiplier);
         graphics.m_oFontManager = g_fontManager;
         for(var i = 0; i < oSparklineGroups.arrSparklineGroup.length; ++i) {
             var oSparklineGroup = oSparklineGroups.arrSparklineGroup[i];
