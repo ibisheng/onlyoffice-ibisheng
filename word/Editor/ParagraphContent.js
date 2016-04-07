@@ -316,6 +316,14 @@ ParaText.prototype =
             this.Flags &= PARATEXT_FLAGS_NON_SPACEAFTER;
     },
 
+    Is_NoBreakHyphen : function()
+    {
+        if (false === this.Is_SpaceAfter() && (this.Value === 0x002D || this.Value === 0x2013))
+            return true;
+
+        return false;
+    },
+
     Write_ToBinary : function(Writer)
     {
         // Long : Type
