@@ -56,6 +56,7 @@
                 "../cell/model/FormulaObjects/informationFunctions.js",
                 "../cell/model/FormulaObjects/logicalFunctions.js",
                 "../cell/model/Serialize.js",
+				"../common/Shapes/EditorSettings.js",
                 "../cell/model/WorkbookElems.js",
                 "../cell/model/Workbook.js",
                 "../cell/model/CellInfo.js",
@@ -184,14 +185,6 @@
             ],
             "map": "sdk-all.js.map",
             "log": "../cell/Build/Log"
-        },
-        "defines": {
-            "src": [
-                "../common/Shapes/EditorSettings.js",
-                "../common/commonDefines.js",
-                "../cell/apiDefines.js"
-            ],
-            "dst": "apiDefines.min.js"
         },
         "source_map": {
             "url": "http://localhost:8080/sdkjs/cell"

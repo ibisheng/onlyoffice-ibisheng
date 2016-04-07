@@ -6,9 +6,7 @@ module.exports = function(grunt) {
 	var formatting = grunt.option('formatting') || '';
 	var nomap = grunt.option('nomap') || '';
 	
-	grunt.loadNpmTasks('grunt-contrib-clean');
 	grunt.loadNpmTasks('grunt-contrib-concat');
-	grunt.loadNpmTasks('grunt-contrib-copy');
     grunt.loadNpmTasks('grunt-exec');
 	grunt.loadNpmTasks('grunt-replace');
 	
@@ -110,39 +108,14 @@ module.exports = function(grunt) {
 		grunt.file.write(defaultConfig, JSON.stringify(pkg, null, 4));
     });
 	
-	grunt.registerTask('create_map_file', function() {
-		//Не нашел как передать параметры в таску, поэтому  продублировал код.	
-		var map_file_path = packageFile['compile']['sdk']['dst'] + '.map';	
-		var map_record = '//@ sourceMappingURL=' + packageFile['compile']['source_map']['url'] + '/' + map_file_path;
-
-		var map_record_file_path = map_file_path + '.tmp';
-		grunt.file.write(map_record_file_path, map_record);
-	});
-	
 	grunt.registerTask('compile_sdk_init', function(compilation_level) {
 		grunt.file.mkdir( packageFile['compile']['sdk']['log'] );
-		var map_file_path = packageFile['compile']['sdk']['dst'] + '.map';
-		var map_record_file_path = map_file_path + '.tmp';
-		var concat_res = {};
-		concat_res[packageFile['compile']['sdk']['dst']] = [
-					packageFile['compile']['sdk']['dst'],
-					packageFile['compile']['defines']['dst'],
-					map_record_file_path ];
 		var srcFiles = packageFile['compile']['sdk']['common'];
 		var sdkOpt = {
 			compilation_level: compilation_level,
 			warning_level: 'QUIET',
-			externs: packageFile['compile']['sdk']['externs']/*,
-			create_source_map: map_file_path,
-			source_map_format: "V3"*/
+			externs: packageFile['compile']['sdk']['externs']
 		};
-		var definesOpt = {
-			compilation_level: 'ADVANCED' === compilation_level ? 'SIMPLE' : compilation_level,
-			warning_level: 'QUIET'
-		};
-		if (formatting) {
-			definesOpt['formatting'] = sdkOpt['formatting'] = formatting;
-		}
 		if (!nomap) {
 			sdkOpt['variable_renaming_report'] = packageFile['compile']['sdk']['log'] + '/variable.map';
 			sdkOpt['property_renaming_report'] = packageFile['compile']['sdk']['log'] + '/property.map';
@@ -174,20 +147,18 @@ module.exports = function(grunt) {
 						'<%= pkg.compile.sdk.dst %>': srcFiles
 					},
 					options: sdkOpt
+				}
+			},
+			concat: {
+				options: {
+					banner: '(function(window, undefined) {',
+					footer: '})(window);'
 					},
-				defines: {
-					files: {
-						'<%= pkg.compile.defines.dst %>': packageFile['compile']['defines']['src']
-					},
-					options: definesOpt
+				dist: {
+					src: ['<%= pkg.compile.sdk.dst %>'],
+					dest: '<%= pkg.compile.sdk.dst %>'
 					}
 			},
-			create_map_file: {},
-			concat: concat_res,
-			clean: [ 
-				packageFile['compile']['defines']['dst'],
-				map_record_file_path
-			],
 			replace: {
 				version: {
 					options: {
@@ -205,8 +176,8 @@ module.exports = function(grunt) {
 		});
 	});
 	
-	grunt.registerTask('compile_sdk', ['compile_sdk_init:' + level, 'closure-compiler', 'concat', 'replace', 'clean']);
-	grunt.registerTask('compile_sdk_native', ['compile_sdk_init:' + level, 'closure-compiler:sdk', 'concat', 'replace', 'clean']);
+	grunt.registerTask('compile_sdk', ['compile_sdk_init:' + level, 'closure-compiler', 'concat', 'replace']);
+	grunt.registerTask('compile_sdk_native', ['compile_sdk_init:' + level, 'closure-compiler:sdk', 'concat', 'replace']);
 		
 	grunt.registerTask('default', ['build_all']);
 };
