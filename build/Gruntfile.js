@@ -1,6 +1,6 @@
 module.exports = function(grunt) {
 	require('google-closure-compiler').grunt(grunt, ['-Xms2048m']);
-    var revision="unknown", defaultConfig, packageFile;
+    var defaultConfig, packageFile;
 	var path = grunt.option('src') || './configs';
 	var level = grunt.option('level') || 'ADVANCED';
 	var formatting = grunt.option('formatting') || '';
@@ -8,7 +8,6 @@ module.exports = function(grunt) {
 	
 	grunt.loadNpmTasks('grunt-contrib-clean');
 	grunt.loadNpmTasks('grunt-contrib-concat');
-    grunt.loadNpmTasks('grunt-exec');
 	grunt.loadNpmTasks('grunt-replace');
 	
 	grunt.registerTask('build_webword_init', 'Initialize build WebWord SDK.', function(){
@@ -69,27 +68,6 @@ module.exports = function(grunt) {
 		
 	grunt.registerTask('build_all', ['build_webword_init', 'build_sdk', 'build_webexcel_init', 'build_sdk', 'build_webpowerpoint_init', 'build_sdk']);
 
-	grunt.registerTask('up_sdk_src_init', 'Update SDK source', function() {
-		grunt.initConfig({
-			exec: {
-				update_sources: {
-					command: 'svn.exe up -q --non-interactive -r ' + packageFile['update_src']['revision'] + ' ' + packageFile['update_src']['src'],
-					stdout: true
-				},				
-				update_logs: {
-					command: 'svn.exe up -q --non-interactive -r HEAD ' + packageFile['compile']['sdk']['log'],
-					stdout: true
-				}
-			}
-		});
-    });
-	
-	grunt.registerTask('update_sources_webword', ['build_webword_init', 'up_sdk_src_init', 'exec']);
-	grunt.registerTask('update_sources_webexcel', ['build_webexcel_init', 'up_sdk_src_init', 'exec']);
-	grunt.registerTask('update_sources_webpowerpoint', ['build_webpowerpoint_init', 'up_sdk_src_init', 'exec']);
-
-	grunt.registerTask('update_sources', ['update_sources_webword', 'update_sources_webexcel', 'update_sources_webpowerpoint']);
-		
   grunt.registerTask('add_build_number', function() {
 		var pkg = grunt.file.readJSON(defaultConfig);
 
@@ -97,7 +75,7 @@ module.exports = function(grunt) {
 			grunt.log.ok('Use Jenkins build number as sdk-all build number!'.yellow);
 			packageFile['info']['build'] = parseInt(process.env['BUILD_NUMBER']);
 			pkg.info.build = packageFile['info']['build'];
-      packageFile['info']['rev'] = process.env['GIT_COMMIT'] || revision;
+      packageFile['info']['rev'] = process.env['GIT_COMMIT'];
       grunt.file.write(defaultConfig, JSON.stringify(pkg, null, 4));    
 		}
   });
