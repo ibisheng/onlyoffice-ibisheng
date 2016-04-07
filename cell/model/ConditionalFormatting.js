@@ -6,11 +6,10 @@
  */
 
 (	/**
- * @param {jQuery} $
  * @param {Window} window
  * @param {undefined} undefined
  */
-	function ($, window, undefined) {
+	function (window, undefined) {
 	/*
 	 * Import
 	 * -----------------------------------------------------------------------------
@@ -250,4 +249,4 @@
 	asc.CIconSet = CIconSet;
 	asc.CConditionalFormatValueObject = CConditionalFormatValueObject;
 	asc.CGradient = CGradient;
-})(jQuery, window);
+})(window);
