@@ -13001,6 +13001,30 @@
 			t._isLockedCells( changedRange, null, callback );
 		};
 		
+		var deleteTableCallback = function(ref)
+		{
+			
+			var callback = function(isSuccess)
+			{
+				if ( false === isSuccess ) {
+					return;
+				}
+				
+				History.Create_NewPoint();
+				History.StartTransaction();
+				
+				t.model.autoFilters.isEmptyAutoFilters(ref);
+				var cleanRange = t.model.getRange3( ref.r1, ref.c1, ref.r2, ref.c2 );
+				cleanRange.cleanAll();
+				
+				t._onUpdateFormatTable(ref, false, true);
+				
+				History.EndTransaction();
+			}
+			
+			t._isLockedCells( ref, null, callback );
+		};
+		
 		var startCol = this.activeRange.c1;
         var endCol = this.activeRange.c2;
         var startRow = this.activeRange.r1;
@@ -13028,7 +13052,7 @@
 			}
 			case c_oAscDeleteOptions.DeleteTable:
 			{
-				t.model.autoFilters.isEmptyAutoFilters(tablePart.Ref);
+				deleteTableCallback(tablePart.Ref.clone());
 				break;
 			}
 		}
