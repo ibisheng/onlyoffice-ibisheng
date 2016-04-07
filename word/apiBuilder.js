@@ -7,7 +7,7 @@
 
 (function(window, builder)
 {
-    var Api           = window["asc_docs_api"];
+    var Api = window["asc_docs_api"];
 
     function ApiDocument(Document)
     {
@@ -35,24 +35,32 @@
     }
 
     //------------------------------------------------------------------------------------------------------------------
-    // Основное Апи
+    //
+    // Base Api
+    //
     //------------------------------------------------------------------------------------------------------------------
+
     /**
-     * Получаем ссылку на основной документ в виде класса ApiDocument
+     * Get main document
+     * @returns {ApiDocument}
      */
     Api.prototype["GetDocument"] = function()
     {
         return new ApiDocument(this.WordControl.m_oLogicDocument);
     };
     /**
-     * Создаем новый параграф
+     * Create new paragraph
+     * @returns {ApiParagraph}
      */
     Api.prototype["CreateParagraph"] = function()
     {
         return new ApiParagraph(new Paragraph(private_GetDrawingDocument(), private_GetLogicDocument()));
     };
     /**
-     * Создаем новую таблицу размерами nCols * nRows
+     * Create new table
+     * @param nCols
+     * @param nRows
+     * @returns {ApiTable}
      */
     Api.prototype["CreateTable"] = function(nCols, nRows)
     {
@@ -61,18 +69,23 @@
 
         return new ApiTable(new CTable(private_GetDrawingDocument(), private_GetLogicDocument(), true, 0, 0, 0, 0, 0, nRows, nCols, [], false));
     };
+
     //------------------------------------------------------------------------------------------------------------------
-    // Апи документа
+    //
+    // ApiDocument
+    //
     //------------------------------------------------------------------------------------------------------------------
+
     /**
-     * Получаем количество элементов в документе
+     * Get elements count
      */
     ApiDocument.prototype["GetElementsCount"] = function()
     {
         return this.Document.Content.length;
     };
     /**
-     * Получаем элемент по заданному номеру или null
+     * Get element by position
+     * @returns {ApiParagraph | ApiTable | null}
      */
     ApiDocument.prototype["GetElement"] = function(nPos)
     {
@@ -82,9 +95,9 @@
         return this.Document.Content[nPos];
     };
     /**
-     * Добавляем параграф или таблицу в документ
+     * Add paragraph or table by position
      * @param nPos
-     * @param oElement
+     * @param oElement (ApiParagraph or ApiTable)
      */
     ApiDocument.prototype["AddElement"] = function(nPos, oElement)
     {
@@ -97,8 +110,8 @@
         return false;
     };
     /**
-     * Добавляем параграф или таблицу в конец документа
-     * @param oElement
+     * Push paragraph or table
+     * @param oElement (ApiParagraph or ApiTable)
      */
     ApiDocument.prototype["Push"] = function(oElement)
     {
@@ -111,8 +124,9 @@
         return false;
     };
     /**
-     * Получаем стиль по заданному имени стиля, если стиля с таким именем нет, то возвращается null
+     * Get style by style name
      * @param sStyleName
+     * @returns {ApiStyle | null}
      */
     ApiDocument.prototype["GetStyle"] = function(sStyleName)
     {
@@ -120,13 +134,17 @@
         var oStyleId = oStyles.Get_StyleIdByName(sStyleName);
         return new ApiStyle(oStyles.Get(oStyleId));
     };
+
     //------------------------------------------------------------------------------------------------------------------
-    // Апи параграфа (Paragraph)
+    //
+    // ApiParagraph
+    //
     //------------------------------------------------------------------------------------------------------------------
+
     /**
-     * Добавляем текст к параграфу. Возвращается текстовый объект (Run), к которому можно применять различные
-     * текстовые настройки.
-     * @returns {ParaRun}
+     * Add text
+     * @param sText
+     * @returns {ApiRun}
      */
     ApiParagraph.prototype["AddText"] = function(sText)
     {
@@ -145,11 +163,11 @@
         }
 
         private_PushElementToParagraph(this.Paragraph, oRun);
-        return oRun;
+        return new ApiRun(oRun);
     };
     /**
-     * Добавляем разрыв страницы
-     * @returns {ParaRun}
+     * Add page beak
+     * @returns {ApiRun}
      */
     ApiParagraph.prototype["AddPageBreak"] = function()
     {
@@ -159,8 +177,8 @@
         return new ApiRun(oRun);
     };
     /**
-     * Добавляем разрыв строки
-     * @returns {ParaRun}
+     * Add line break
+     * @returns {ApiRun}
      */
     ApiParagraph.prototype["AddLineBreak"] = function()
     {
@@ -170,19 +188,20 @@
         return new ApiRun(oRun);
     };
     /**
-     * Добавляем разрыв колонки
-     * @returns {ParaRun}
+     * Add column break
+     * @returns {ApiRun}
      */
     ApiParagraph.prototype["AddColumnBreak"] = function()
     {
         var oRun = new ParaRun(this.Paragraph, false);
         oRun.Add_ToContent(0, new ParaNewLine(break_Column));
         private_PushElementToParagraph(this.Paragraph, oRun);
-        return oRun;
+        return new ApiRun(oRun);
     };
     /**
-     * Выставляем стиль
-     * @param oStyle
+     * Set paragraph style
+     * @param oStyle (ApiStyle)
+     * @returns {boolean}
      */
     ApiParagraph.prototype["SetStyle"] = function(oStyle)
     {
@@ -194,10 +213,13 @@
     };
 
     //------------------------------------------------------------------------------------------------------------------
-    // Апи текстового блока (Run)
+    //
+    // ApiRun
+    //
     //------------------------------------------------------------------------------------------------------------------
+
     /**
-     * Выставляем полужирный текст
+     * Set bold
      * @param isBold
      */
     ApiRun.prototype["SetBold"] = function(isBold)
@@ -205,28 +227,25 @@
         this.Run.Set_Bold(isBold);
     };
     /**
-     * Выставляем наклонный текст
+     * Set italic
      * @param isItalic
      */
     ApiRun.prototype["SetItalic"] = function(isItalic)
     {
         this.Run.Set_Italic(isItalic);
     };
+
     /**
-     * Выставляем подчеркнутый текст
+     * Set underline
      * @param isUnderline
      */
     ApiRun.prototype["SetUnderline"] = function(isUnderline)
     {
         this.Run.Set_Underline(isUnderline);
     };
-    //------------------------------------------------------------------------------------------------------------------
-    // Апи текстового блока (Run)
-    //------------------------------------------------------------------------------------------------------------------
-
 
     //------------------------------------------------------------------------------------------------------------------
-    // Приватный блок
+    // Private area
     //------------------------------------------------------------------------------------------------------------------
     function private_GetDrawingDocument()
     {
@@ -252,7 +271,6 @@
     {
         return this.Table;
     };
-
 
 }(window, null));
 
