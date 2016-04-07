@@ -6,6 +6,7 @@ module.exports = function(grunt) {
 	var formatting = grunt.option('formatting') || '';
 	var nomap = grunt.option('nomap') || '';
 	
+	grunt.loadNpmTasks('grunt-contrib-clean');
 	grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-exec');
 	grunt.loadNpmTasks('grunt-replace');
@@ -110,14 +111,24 @@ module.exports = function(grunt) {
 	
 	grunt.registerTask('compile_sdk_init', function(compilation_level) {
 		grunt.file.mkdir( packageFile['compile']['sdk']['log'] );
+		var map_file_path = packageFile['compile']['sdk']['dst'] + '.map';
+		var map_record_file_path = map_file_path + '.tmp';
+		var concat_src = [
+			packageFile['compile']['sdk']['dst'],
+			packageFile['compile']['defines']['dst'],
+			map_record_file_path ];
 		var srcFiles = packageFile['compile']['sdk']['common'];
 		var sdkOpt = {
 			compilation_level: compilation_level,
 			warning_level: 'QUIET',
 			externs: packageFile['compile']['sdk']['externs']
 		};
+		var definesOpt = {
+			compilation_level: 'ADVANCED' === compilation_level ? 'SIMPLE' : compilation_level,
+			warning_level: 'QUIET'
+		};
 		if (formatting) {
-			sdkOpt['formatting'] = formatting;
+			definesOpt['formatting'] = sdkOpt['formatting'] = formatting;
 		}
 		if (!nomap) {
 			sdkOpt['variable_renaming_report'] = packageFile['compile']['sdk']['log'] + '/variable.map';
@@ -150,6 +161,12 @@ module.exports = function(grunt) {
 						'<%= pkg.compile.sdk.dst %>': srcFiles
 					},
 					options: sdkOpt
+				},
+				defines: {
+					files: {
+						'<%= pkg.compile.defines.dst %>': packageFile['compile']['defines']['src']
+					},
+					options: definesOpt
 				}
 			},
 			concat: {
@@ -158,10 +175,14 @@ module.exports = function(grunt) {
 					footer: '})(window);'
 					},
 				dist: {
-					src: ['<%= pkg.compile.sdk.dst %>'],
+					src: concat_src,
 					dest: '<%= pkg.compile.sdk.dst %>'
 					}
 			},
+			clean: [ 
+				packageFile['compile']['defines']['dst'],
+				map_record_file_path
+			],
 			replace: {
 				version: {
 					options: {
@@ -179,8 +200,8 @@ module.exports = function(grunt) {
 		});
 	});
 	
-	grunt.registerTask('compile_sdk', ['compile_sdk_init:' + level, 'closure-compiler', 'concat', 'replace']);
-	grunt.registerTask('compile_sdk_native', ['compile_sdk_init:' + level, 'closure-compiler:sdk', 'concat', 'replace']);
+	grunt.registerTask('compile_sdk', ['compile_sdk_init:' + level, 'closure-compiler', 'concat', 'replace', 'clean']);
+	grunt.registerTask('compile_sdk_native', ['compile_sdk_init:' + level, 'closure-compiler:sdk', 'concat', 'replace', 'clean']);
 		
 	grunt.registerTask('default', ['build_all']);
 };

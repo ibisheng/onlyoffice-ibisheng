@@ -23,7 +23,6 @@
                 "../common/commonDefines.js",
                 "../common/editorscommon.js",
                 "../common/Shapes/Serialize.js",
-				"../common/Shapes/EditorSettings.js",
                 "../common/Shapes/SerializeWriter.js",
                 "../common/SerializeCommonWordExcel.js",
                 "../common/SerializeChart.js",
@@ -173,6 +172,14 @@
             ],
             "map": "sdk-all.js.map",
             "log": "../word/Build/Log"
+        },
+        "defines": {
+            "src": [
+                "../common/Shapes/EditorSettings.js",
+                "../common/commonDefines.js",
+                "../word/apiDefines.js"
+            ],
+            "dst": "apiDefines.min.js"
         },
         "source_map": {
             "url": "http://localhost:8080/sdkjs/word"

@@ -26,7 +26,6 @@
                 "../common/wordcopypaste.js",
                 "../common/editorscommon.js",
                 "../slide/Drawing/ThemeLoader.js",
-				"../common/Shapes/EditorSettings.js",
                 "../common/Charts/DrawingObjects.js",
                 "../common/SerializeCommonWordExcel.js",
                 "../common/SerializeChart.js",
@@ -73,7 +72,6 @@
                 "../slide/Drawing/HtmlPage.js",
                 "../slide/apiDefines.js",
                 "../common/Drawings/Format/Constants.js",
-				"../slide/themes/Themes.js",
                 "../common/Shapes/Serialize.js",
                 "../common/Shapes/SerializeWriter.js",
                 "../word/Editor/SerializeCommon.js",
@@ -190,6 +188,15 @@
             ],
             "map": "sdk-all.js.map",
             "log": "../slide/Build/Log"
+        },
+        "defines": {
+            "src": [
+                "../common/Shapes/EditorSettings.js",
+                "../slide/themes/Themes.js",
+                "../slide/apiDefines.js",
+                "../common/commonDefines.js"
+            ],
+            "dst": "apiDefines.min.js"
         },
         "source_map": {
             "url": "http://localhost:8080/sdkjs/slide"
