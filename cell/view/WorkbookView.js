@@ -2813,10 +2813,12 @@
                 color = null;
                 if(styleOptions.totalRow && styleOptions.totalRow.dxf.fill && null != styleOptions.totalRow.dxf.fill.bg)
                     color = styleOptions.totalRow.dxf.fill.bg;
-                else
-                    color = defaultColorBackground;
-                ctx.setFillStyle(color);
-                ctx.fillRect(0, stepY*4, xSize, stepY);
+                
+				if(color !== null)
+				{
+					ctx.setFillStyle(color);
+					ctx.fillRect(0, stepY * 4, xSize, stepY);
+				}
             }
 
 

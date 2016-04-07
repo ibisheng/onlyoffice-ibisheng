@@ -2269,10 +2269,7 @@
 				History.StartTransaction();
 				
 				//TODO добавлять в историю смену именного диапазона
-				var oldNamedrange = worksheet.workbook.dependencyFormulas.getDefNameNodeByName(tablePart.DisplayName);
-				var newNamedrange = oldNamedrange.clone();
-				newNamedrange.Name = newName;
-				oldNamedrange.changeDefName(newNamedrange);
+				worksheet.workbook.dependencyFormulas.changeTableRef(tableName, worksheet, newName);
 				
 				tablePart.changeDisplayName(newName);
 				

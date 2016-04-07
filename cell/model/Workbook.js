@@ -1153,6 +1153,34 @@ DependencyGraph.prototype = {
 		table.rebuild();
 //        table.Ref = parserHelp.getEscapeSheetName(ws.getName())+"!"+newRef.getAbsName();
     },
+	changeTableRef:function(tableName, ws, newName){
+        var table = this.getDefNameNodeByName( tableName, ws );
+        
+		var newTable = table.clone();
+		
+		if(table)
+		{
+			//изменяем имя именнованного диапазона
+			newTable.Name = newName;
+			newTable.cellId = newName.toLowerCase();
+			newTable.nodeId = table.sheetId + table.cellId;
+			
+			this.changeDefName(table, newTable);
+			
+			//изменяем все ссылки на данную таблицу
+			var nameRef = tableName + "[]";
+			for(var i in this.defNameList)
+			{
+				if(this.defNameList[i] && this.defNameList[i].Ref && this.defNameList[i].Ref === nameRef)
+				{
+					this.defNameList[i].Ref = newName + "[]";
+				}
+			}
+		}
+		
+		
+		table.rebuild();
+    },
     delTableName:function(name,ws){
         var table = this.getDefNameNodeByName( name, ws );
         table.Ref = null;

@@ -12813,8 +12813,12 @@
 		var isChangeTableInfo = this.af_checkChangeTableInfo(tablePart, optionType);
 		if(isChangeTableInfo !== false)
 		{
-			var callback = function()
+			var callback = function(isSuccess)
 			{
+				if ( false === isSuccess ) {
+					return;
+				}
+				
 				History.Create_NewPoint();
 				History.StartTransaction();
 				t.model.autoFilters.changeFormatTableInfo(tableName, optionType, val);
@@ -12971,7 +12975,11 @@
 				return;
 			}
 
-			var callback = function () {
+			var callback = function (isSuccess) {
+				if ( false === isSuccess ) {
+					return;
+				}
+				
 				History.Create_NewPoint();
 				History.StartTransaction();
 				
@@ -13171,15 +13179,25 @@
 	
 	WorksheetView.prototype.af_changeTableRange = function(tableName, range)
     {
-		History.Create_NewPoint();
-		History.StartTransaction();
-		
+		var t = this;
 		range = Asc.g_oRangeCache.getAscRange(range);
-		this.model.autoFilters.changeTableRange(tableName, range);
 		
-		this._onUpdateFormatTable(range, false, true);
-		//TODO добавить перерисовку таблицы и перерисовку шаблонов
-		History.EndTransaction();
+		var callback = function (isSuccess) {
+			if ( false === isSuccess ) {
+				return;
+			}
+			
+			History.Create_NewPoint();
+			History.StartTransaction();
+			
+			t.model.autoFilters.changeTableRange(tableName, range);
+			
+			t._onUpdateFormatTable(range, false, true);
+			//TODO добавить перерисовку таблицы и перерисовку шаблонов
+			History.EndTransaction();
+		};
+		
+		t._isLockedCells( range, null, callback );
 	};
 	
 	WorksheetView.prototype.af_checkChangeRange = function(range)
