@@ -116,6 +116,9 @@ module.exports = function(grunt) {
 			warning_level: 'QUIET',
 			externs: packageFile['compile']['sdk']['externs']
 		};
+		if (formatting) {
+			sdkOpt['formatting'] = formatting;
+		}
 		if (!nomap) {
 			sdkOpt['variable_renaming_report'] = packageFile['compile']['sdk']['log'] + '/variable.map';
 			sdkOpt['property_renaming_report'] = packageFile['compile']['sdk']['log'] + '/property.map';
