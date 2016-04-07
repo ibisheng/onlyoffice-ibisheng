@@ -2,11 +2,10 @@
 
 var editor;
 (/**
- * @param {jQuery} $
  * @param {Window} window
  * @param {undefined} undefined
  */
-  function($, window, undefined) {
+  function(window, undefined) {
 
   var asc = window["Asc"];
   var asc_applyFunction = asc.applyFunction;
@@ -3471,4 +3470,4 @@ var editor;
   
   prot['asc_isOffline'] = prot.asc_isOffline;
   prot['asc_getUrlType'] = prot.asc_getUrlType;
-})(jQuery, window);
+})(window);
