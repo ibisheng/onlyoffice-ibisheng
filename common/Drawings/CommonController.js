@@ -340,38 +340,49 @@ function DrawingObjectsController(drawingObjects)
     this.handleEventMode = HANDLE_EVENT_MODE_HANDLE;
 }
 
+function CanStartEditText(oController)
+{
+    var oSelector = oController.selection.groupSelection ? oController.selection.groupSelection : oController;
+    if(oSelector.selectedObjects.length === 1 && oSelector.selectedObjects[0].getObjectType() === historyitem_type_Shape)
+    {
+        return true;
+    }
+    return false;
+}
+
 DrawingObjectsController.prototype =
 {
+
 
     //for mobile spreadsheet editor
     startEditTextCurrentShape: function()
     {
-        var oSelector = this.selection.groupSelection ? this.selection.groupSelection : this;
-        if(oSelector.selectedObjects.length === 1 && oSelector.selectedObjects[0].getObjectType() === historyitem_type_Shape)
+        if(!CanStartEditText(this))
         {
-            var oShape = oSelector.selectedObjects[0];
-            var oContent = oShape.getDocContent();
-            if(oContent)
-            {
+            return;
+        }
+        var oSelector = this.selection.groupSelection ? this.selection.groupSelection : this;
+        var oShape = oSelector.selectedObjects[0];
+        var oContent = oShape.getDocContent();
+        if(oContent)
+        {
+            oSelector.resetInternalSelection();
+            oSelector.selection.textSelection = oShape;
+            oContent.Cursor_MoveToEndPos(false);
+            this.updateSelectionState();
+            this.updateOverlay();
+        }
+        else
+        {
+            var oThis = this;
+            this.checkSelectedObjectsAndCallback(function(){
+                oShape.createTextBody();
+                var oContent = oShape.getDocContent();
                 oSelector.resetInternalSelection();
                 oSelector.selection.textSelection = oShape;
                 oContent.Cursor_MoveToEndPos(false);
-                this.updateSelectionState();
-                this.updateOverlay();
-            }
-            else
-            {
-                var oThis = this;
-                this.checkSelectedObjectsAndCallback(function(){
-                    oShape.createTextBody();
-                    var oContent = oShape.getDocContent();
-                    oSelector.resetInternalSelection();
-                    oSelector.selection.textSelection = oShape;
-                    oContent.Cursor_MoveToEndPos(false);
-                    oThis.updateSelectionState();
-                }, [], false, historydescription_Spreadsheet_AddNewParagraph);
-            }
-
+                oThis.updateSelectionState();
+            }, [], false, historydescription_Spreadsheet_AddNewParagraph);
         }
     },
 
@@ -6572,7 +6583,7 @@ DrawingObjectsController.prototype =
         if (isRealObject(props.shapeProps))
         {
             shape_props = new asc_CImgProperty();
-            shape_props.fromGroup = props.shapeProps.fromGroup;
+            shape_props.fromGroup = CanStartEditText(this);
             shape_props.ShapeProperties = new asc_CShapeProperty();
             shape_props.ShapeProperties.type =  props.shapeProps.type;
             shape_props.ShapeProperties.fill = props.shapeProps.fill;
