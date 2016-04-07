@@ -1,4 +1,4 @@
-﻿function CAutoshapeTrack()
+function CAutoshapeTrack()
 {
     this.IsTrack            = true;
 
