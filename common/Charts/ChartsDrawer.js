@@ -209,7 +209,7 @@ CChartsDrawer.prototype =
 			
 			if(this.nDimensionCount !== 3)
 			{
-				if(this.calcProp.type === "Line" && this.calcProp.type === "Scatter")
+				if(this.calcProp.type === "Line" || this.calcProp.type === "Scatter")
 				{
 					this.cShapeDrawer.bIsNoSmartAttack = true;
 					this.chart.draw(this);
