@@ -2493,11 +2493,20 @@ CDocument.prototype =
 
         if (true === this.RecalcInfo.Can_RecalcObject())
         {
-            Element.Set_DocumentIndex(Index);
-            Element.Reset(X, Y, XLimit, YLimit, PageIndex, ColumnIndex, ColumnsCount);
+            var ElementPageIndex = 0;
+            if ((0 === Index && 0 === PageIndex) || Index != StartIndex || (Index === StartIndex && true === bResetStartElement))
+            {
+                Element.Set_DocumentIndex(Index);
+                Element.Reset(X, Y, XLimit, YLimit, PageIndex, ColumnIndex, ColumnsCount);
+                ElementPageIndex = 0;
+            }
+            else
+            {
+                ElementPageIndex = PageIndex - Element.PageNum;
+            }
 
-            var TempRecalcResult = Element.Recalculate_Page(0);
-            this.RecalcInfo.Set_FlowObject(Element, 0, TempRecalcResult, -1, {X : X, Y : Y, XLimit: XLimit, YLimit : YLimit});
+            var TempRecalcResult = Element.Recalculate_Page(ElementPageIndex);
+            this.RecalcInfo.Set_FlowObject(Element, ElementPageIndex, TempRecalcResult, -1, {X : X, Y : Y, XLimit: XLimit, YLimit : YLimit});
 
             if (((0 === Index && 0 === PageIndex) || Index != StartIndex) && true != Element.Is_ContentOnFirstPage() && true !== isColumns)
             {
