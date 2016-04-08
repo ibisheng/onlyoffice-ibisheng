@@ -209,10 +209,17 @@ CChartsDrawer.prototype =
 			
 			if(this.nDimensionCount !== 3)
 			{
-			this.cShapeDrawer.bIsNoSmartAttack = true;
-			this.chart.draw(this);
-			this.cShapeDrawer.bIsNoSmartAttack = false;
+				if(this.calcProp.type === "Line" && this.calcProp.type === "Scatter")
+				{
+					this.cShapeDrawer.bIsNoSmartAttack = true;
+					this.chart.draw(this);
+					this.cShapeDrawer.bIsNoSmartAttack = false;
+				}
+				else
+				{
+					this.chart.draw(this);
 		}
+			}
 		}
 	},
 	
