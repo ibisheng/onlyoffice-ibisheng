@@ -2710,8 +2710,10 @@ function CDrawingDocument()
 
         var page = this.m_arrPages[pageIndex];
 
-        var w = (this.m_oWordControl.m_nZoomValue * g_dKoef_mm_to_pix * page.width_mm / 100) >> 0;
-        var h = (this.m_oWordControl.m_nZoomValue * g_dKoef_mm_to_pix * page.height_mm / 100) >> 0;
+        var dKoef = (this.m_oWordControl.m_nZoomValue * g_dKoef_mm_to_pix / 100);
+
+        var w = (page.width_mm * dKoef + 0.5) >> 0;
+        var h = (page.height_mm * dKoef + 0.5) >> 0;
 
         if (this.m_oWordControl.bIsRetinaSupport)
         {

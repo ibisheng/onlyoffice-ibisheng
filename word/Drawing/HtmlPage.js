@@ -3267,8 +3267,8 @@ function CEditorPage(api)
         var lStart = 0;
         for (var i = 0; i < this.m_oDrawingDocument.m_lPagesCount; i++)
         {
-            var _pageWidth = parseInt(this.m_oDrawingDocument.m_arrPages[i].width_mm * dKoef);
-            var _pageHeight = parseInt(this.m_oDrawingDocument.m_arrPages[i].height_mm * dKoef);
+            var _pageWidth = (this.m_oDrawingDocument.m_arrPages[i].width_mm * dKoef + 0.5) >> 0;
+            var _pageHeight = (this.m_oDrawingDocument.m_arrPages[i].height_mm * dKoef + 0.5) >> 0;
 
             if (false === bIsFoundFirst)
             {
