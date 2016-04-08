@@ -39,6 +39,16 @@
         this.Section = Section;
     }
 
+    function ApiTableRow(Row)
+    {
+        this.Row = Row;
+    }
+
+    function ApiTableCell(Cell)
+    {
+        this.Cell = Cell;
+    }
+
     //------------------------------------------------------------------------------------------------------------------
     //
     // Base Api
@@ -82,7 +92,7 @@
     //------------------------------------------------------------------------------------------------------------------
 
     /**
-     * Get elements count
+     * Get the number of elements.
      */
     ApiDocument.prototype["GetElementsCount"] = function()
     {
@@ -97,7 +107,13 @@
         if (!this.Document.Content[nPos])
             return null;
 
-        return this.Document.Content[nPos];
+        var Type = this.Document.Content[nPos].Get_Type();
+        if (type_Paragraph === Type)
+            return new ApiParagraph(this.Document.Content[nPos]);
+        else if (type_Paragraph === Type)
+            return new ApiTable(this.Document.Content[nPos]);
+
+        return null;
     };
     /**
      * Add paragraph or table by position
@@ -313,6 +329,42 @@
     {
         this.Paragraph.Set_Ind(private_GetParaInd(undefined, undefined, nValue));
     };
+    /**
+     * This element specifies that when rendering this document in a paginated view, the contents of this paragraph
+     * are at least partly rendered on the same page as the following paragraph whenever possible.
+     * @param isKeepNext (true | false)
+     */
+    ApiParagraph.prototype["SetKeepNext"] = function(isKeepNext)
+    {
+        this.Paragraph.Set_KeepNext(isKeepNext);
+    };
+    /**
+     * This element specifies that when rendering this document in a page view, all lines of this paragraph are
+     * maintained on a single page whenever possible.
+     * @param isKeepLines (true | false)
+     */
+    ApiParagraph.prototype["SetKeepLines"] = function(isKeepLines)
+    {
+        this.Paragraph.Set_KeepLines(isKeepLines);
+    };
+    /**
+     * This element specifies that when rendering this document in a paginated view, the contents of this paragraph
+     * are rendered on the start of a new page in the document.
+     * @param isPageBreakBefore (true | false)
+     */
+    ApiParagraph.prototype["SetPageBreakBefore"] = function(isPageBreakBefore)
+    {
+        this.Paragraph.Set_PageBreakBefore(isPageBreakBefore);
+    };
+    /**
+     * This element specifies whether a consumer shall prevent a single line of this paragraph from being displayed on
+     * a separate page from the remaining content at display time by moving the line onto the following page.
+     * @param isWidowControl (true | false)
+     */
+    ApiParagraph.prototype["SetWidowControl"] = function(isWidowControl)
+    {
+        this.Paragraph.Set_WidowControl(isWidowControl);
+    };
     
     //------------------------------------------------------------------------------------------------------------------
     //
@@ -481,6 +533,217 @@
         this.Section.Set_PageMargins_Footer(private_Twips2MM(nDistance));
     };
 
+    //------------------------------------------------------------------------------------------------------------------
+    //
+    // ApiTable
+    //
+    //------------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Get the number of rows in the current table.
+     */
+    ApiTable.prototype["GetRowsCount"] = function()
+    {
+        return this.Table.Content.length;
+    };
+    /**
+     * Get table row by position.
+     * @param nPos
+     * @returns {ApiTableRow}
+     */
+    ApiTable.prototype["GetRow"] = function(nPos)
+    {
+        if (nPos < 0 || nPos >= this.Table.Content.length)
+            return null;
+
+        return new ApiTableRow(this.Table.Content[nPos]);
+    };
+    /**
+     * Set table style
+     * @param oStyle (ApiStyle)
+     * @return {boolean}
+     */
+    ApiTable.prototype["SetStyle"] = function(oStyle)
+    {
+        if (!oStyle || !(oStyle instanceof ApiStyle) || styletype_Table !== oStyle.Style.Get_Type())
+            return false;
+
+        this.Table.Set_Props({TableStyle : oStyle.Style.Get_Id()});
+        return true;
+    };
+    /**
+     * Set the preferred width for this table.
+     * @param sType ("auto" | "twips" | "percent" | "nil")
+     * @param nValue
+     */
+    ApiTable.prototype["SetWidth"] = function(sType, nValue)
+    {
+        if ("auto" === sType)
+            this.Table.Set_Props({TableWidth : null});
+        else if ("twips" === sType)
+            this.Table.Set_Props({TableWidth : private_Twips2MM(nValue)});
+        else if ("percent" === sType)
+            this.Table.Set_Props({TableWidth : -nValue});
+    };
+    /**
+     * Specify the components of the conditional formatting of the referenced table style (if one exists)
+     * which shall be applied to the set of table rows with the current table-level property exceptions. A table style can
+     * specify up to six different optional conditional formats [Example: Different formatting for first column. end
+     * example], which then can be applied or omitted from individual table rows in the parent table.
+     *
+     * The default setting is to apply the row and column banding formatting, but not the first row, last row, first
+     * column, or last column formatting.
+     * @param isFirstColumn (true | false) Specifies that the first column conditional formatting shall be applied to the table.
+     * @param isFirstRow (true | false) Specifies that the first row conditional formatting shall be applied to the table.
+     * @param isLastColumn (true | false) Specifies that the last column conditional formatting shall be applied to the table.
+     * @param isLastRow (true | false) Specifies that the last row conditional formatting shall be applied to the table.
+     * @param isHorBand (true | false) Specifies that the horizontal banding conditional formatting shall not be applied to the table.
+     * @param isVerBand (true | false) Specifies that the vertical banding conditional formatting shall not be applied to the table.
+     */
+    ApiTable.prototype["SetTableLook"] = function(isFirstColumn, isFirstRow, isLastColumn, isLastRow, isHorBand, isVerBand)
+    {
+        this.Table.Set_Props({TableLook :
+        {
+            FirstCol : isFirstColumn,
+            FirstRow : isFirstRow,
+            LastCol  : isLastColumn,
+            LastRow  : isLastRow,
+            BandHor  : isHorBand,
+            BandVer  : isVerBand
+        }});
+    };
+    /**
+     * Set the border which shall be displayed at the top of the current table.
+     * @param sType ("single" | "none")
+     * @param nSize (twips)
+     * @param nSpace (twips)
+     * @param r (0-255)
+     * @param g (0-255)
+     * @param b (0-255)
+     */
+    ApiTable.prototype["SetTableBorderTop"] = function(sType, nSize, nSpace, r, g, b)
+    {
+        this.Table.Set_Props({TableBorders : {Top : private_GetTableBorder(sType, nSize, nSpace, r, g, b)}});
+    };
+    /**
+     * Set the border which shall be displayed at the bottom of the current table.
+     * @param sType ("single" | "none")
+     * @param nSize (twips)
+     * @param nSpace (twips)
+     * @param r (0-255)
+     * @param g (0-255)
+     * @param b (0-255)
+     */
+    ApiTable.prototype["SetTableBorderBottom"] = function(sType, nSize, nSpace, r, g, b)
+    {
+        this.Table.Set_Props({TableBorders : {Bottom : private_GetTableBorder(sType, nSize, nSpace, r, g, b)}});
+    };
+    /**
+     * Set the border which shall be displayed on the left of the current table.
+     * @param sType ("single" | "none")
+     * @param nSize (twips)
+     * @param nSpace (twips)
+     * @param r (0-255)
+     * @param g (0-255)
+     * @param b (0-255)
+     */
+    ApiTable.prototype["SetTableBorderLeft"] = function(sType, nSize, nSpace, r, g, b)
+    {
+        this.Table.Set_Props({TableBorders : {Left : private_GetTableBorder(sType, nSize, nSpace, r, g, b)}});
+    };
+    /**
+     * Set the border which shall be displayed on the right of the current table.
+     * @param sType ("single" | "none")
+     * @param nSize (twips)
+     * @param nSpace (twips)
+     * @param r (0-255)
+     * @param g (0-255)
+     * @param b (0-255)
+     */
+    ApiTable.prototype["SetTableBorderRight"] = function(sType, nSize, nSpace, r, g, b)
+    {
+        this.Table.Set_Props({TableBorders : {Right : private_GetTableBorder(sType, nSize, nSpace, r, g, b)}});
+    };
+    /**
+     * Specify the border which shall be displayed on all horizontal table cell borders which are not on
+     * an outmost edge of the parent table (all horizontal borders which are not the topmost or bottommost border).
+     * @param sType ("single" | "none")
+     * @param nSize (twips)
+     * @param nSpace (twips)
+     * @param r (0-255)
+     * @param g (0-255)
+     * @param b (0-255)
+     */
+    ApiTable.prototype["SetTableBorderInsideH"] = function(sType, nSize, nSpace, r, g, b)
+    {
+        this.Table.Set_Props({TableBorders : {InsideH : private_GetTableBorder(sType, nSize, nSpace, r, g, b)}});
+    };
+    /**
+     * Specify the border which shall be displayed on all vertical table cell borders which are not on an
+     * outmost edge of the parent table (all horizontal borders which are not the leftmost or rightmost border).
+     * @param sType ("single" | "none")
+     * @param nSize (twips)
+     * @param nSpace (twips)
+     * @param r (0-255)
+     * @param g (0-255)
+     * @param b (0-255)
+     */
+    ApiTable.prototype["SetTableBorderInsideV"] = function(sType, nSize, nSpace, r, g, b)
+    {
+        this.Table.Set_Props({TableBorders : {InsideV : private_GetTableBorder(sType, nSize, nSpace, r, g, b)}});
+    };
+
+    //------------------------------------------------------------------------------------------------------------------
+    //
+    // ApiTableRow
+    //
+    //------------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Get the number of cells in the current row.
+     * @returns {number}
+     */
+    ApiTableRow.prototype["GetCellsCount"] = function()
+    {
+        return this.Row.Content.length;
+    };
+    /**
+     * Get cell by position.
+     * @param nPos
+     * @returns {ApiTableCell}
+     */
+    ApiTableRow.prototype["GetCell"] = function(nPos)
+    {
+        if (nPos < 0 || nPos >= this.Row.Content.length)
+            return null;
+
+        return new ApiTableCell(this.Row.Content[nPos]);
+    };
+    /**
+     * Set the height of the current table row within the current table.
+     * @param sHRule ("auto" | "atLeast") "auto" is default value
+     * @param nValue (twips)
+     */
+    ApiTableRow.prototype["SetHeight"] = function(sHRule, nValue)
+    {
+        var HRule = ("auto" === sHRule ? heightrule_Auto : heightrule_AtLeast);
+        this.Row.Set_Height(private_Twips2MM(nValue), HRule);
+    };
+
+    //------------------------------------------------------------------------------------------------------------------
+    //
+    // ApiTableCell
+    //
+    //------------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Get cell content
+     * @returns {ApiDocument}
+     */
+    ApiTableCell.prototype["GetContent"] = function()
+    {
+        return new ApiDocument(this.Cell.Content);
+    };
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Private area
@@ -585,6 +848,21 @@
         return undefined;
     }
 
+    function private_GetTableBorder(sType, nSize, nSpace, r, g, b)
+    {
+        var oBorder = new CDocumentBorder();
+
+        if ("single" === sType)
+            oBorder.Value = border_Single;
+        else if ("none" === sType)
+            oBorder.Value = border_None;
+
+        oBorder.Size = private_Twips2MM(nSize);
+        oBorder.Space = private_Twips2MM(nSpace);
+        oBorder.Color.Set(r, g, b);
+        return oBorder;
+    }
+
     ApiParagraph.prototype.private_GetImpl = function()
     {
         return this.Paragraph;
@@ -607,6 +885,7 @@ function TEST_BUILDER()
 
     var Api = editor;
 
+    var oRun;
     var oDocument     = Api.GetDocument();
     var oHeadingStyle = oDocument.GetStyle("Heading 1");
     var oNoSpacingStyle = oDocument.GetStyle("No Spacing");
@@ -717,6 +996,120 @@ function TEST_BUILDER()
     oSection1.SetPageMargins(1440, 1440, 1440, 1440);
     oSection1.SetHeaderDistance(720);
     oSection1.SetFooterDistance(576);
+
+
+    var oSubtitleStyle = oDocument.GetStyle("Subtitle");
+    oParagraph = Api.CreateParagraph();
+    oParagraph.SetStyle(oSubtitleStyle);
+    // TODO: Добавить автофигуру
+    oParagraph.AddText("Legal Issues");
+    oDocument.Push(oParagraph);
+
+
+    oParagraph = Api.CreateParagraph();
+    // TODO: Добавить автофигуру
+    oParagraph.AddText("To support the new product, the Legal Department will maintain a centralized repository for all patent investigations as well as marketing claims.  The release team will adhere to all of the standardized processes for releasing new products.   ");
+    oDocument.Push(oParagraph);
+
+
+    oParagraph = Api.CreateParagraph();
+    oParagraph.SetSpacingAfter(0);
+    oParagraph.AddText("As we approach release of the product, the Legal Department is prepared ");
+    oParagraph.AddText("to develop all licensing agreements and has streamlined coordination with the marketing and sales department on the license terms and addendums.   ");
+    oDocument.Push(oParagraph);
+
+
+    oParagraph = Api.CreateParagraph();
+    oDocument.Push(oParagraph);
+    oParagraph.SetStyle(oSubtitleStyle);
+    oParagraph.AddText("Statement on Timeline");
+
+
+    oParagraph = Api.CreateParagraph();
+    oDocument.Push(oParagraph);
+    oParagraph.SetSpacingAfter(0);
+    oParagraph.AddText("All timelines in this report are estimated and highly dependent upon each team meeting their individual objectives. There are many interdependencies that are detailed in the related project plan.  ");
+
+
+    oParagraph = Api.CreateParagraph();
+    oDocument.Push(oParagraph);
+    oParagraph.SetStyle(oSubtitleStyle);
+    oParagraph.AddText("Productivity Gains");
+
+
+    oParagraph = Api.CreateParagraph();
+    oDocument.Push(oParagraph);
+    oParagraph.AddText("To support the new product, the Legal Department will maintain a centralized repository for all patent investigations");
+    oParagraph.AddText(" as well as marketing claims.  ");
+
+
+    oParagraph = Api.CreateParagraph();
+    oDocument.Push(oParagraph);
+    oParagraph.SetStyle(oSubtitleStyle);
+    oParagraph.AddText("License Agreements");
+
+
+    oParagraph = Api.CreateParagraph();
+    oParagraph.SetSpacingAfter(0);
+    oParagraph.AddText("All timelines in this report are estimated and highly dependent upon each team meetin");
+    oParagraph.AddText("g their individual objectives.  I");
+    oParagraph.AddText("nterdependencies are detailed in the related project plan.  ");
+    oDocument.Push(oParagraph);
+
+
+    oParagraph = Api.CreateParagraph();
+    oDocument.Push(oParagraph);
+    oParagraph.SetStyle(oSubtitleStyle);
+    oParagraph.SetKeepNext(true);
+    oParagraph.SetKeepLines(true);
+    oParagraph.AddText("Revenue Forecasting");
+
+
+    oParagraph = Api.CreateParagraph();
+    oDocument.Push(oParagraph);
+    oParagraph.SetKeepNext(true);
+    oParagraph.SetKeepLines(true);
+    oParagraph.AddText("To support the new product, the Legal Department will maintain a centralized repository for all ");
+    oParagraph.AddText("patent investigations and");
+    oParagraph.AddText(" marketing claims.  The release team will adhere to all of the stand");
+    oParagraph.AddText("ardized processes for releasing ");
+    oParagraph.AddText("new products.   ");
+
+
+    var oTable = Api.CreateTable(2, 2);
+    oDocument.Push(oTable);
+    oTable.SetStyle(oDocument.GetStyle("TableGrid"));
+    oTable.SetWidth("twips", 4311);
+    oTable.SetTableLook(true, true, false, false, false, true);
+    oTable.SetTableBorderTop("single", 4, 0, 0xAF, 0xAD, 0x91);
+    oTable.SetTableBorderBottom("single", 4, 0, 0xAF, 0xAD, 0x91);
+    oTable.SetTableBorderLeft("single", 4, 0, 0xAF, 0xAD, 0x91);
+    oTable.SetTableBorderRight("single", 4, 0, 0xAF, 0xAD, 0x91);
+    oTable.SetTableBorderInsideH("single", 4, 0, 0xAF, 0xAD, 0x91);
+    oTable.SetTableBorderInsideV("single", 4, 0, 0xAF, 0xAD, 0x91);
+    var oRow1 = oTable.GetRow(0);
+    if (oRow1)
+    {
+        oRow1.SetHeight("atLeast", 201);
+        var oCell = oRow1.GetCell(0);
+        var oCellContent = oCell.GetContent();
+
+        oParagraph = oCellContent.GetElement(0);
+        oParagraph.SetJc("center");
+        oRun = oParagraph.AddText("2014");
+        oRun.SetBold(true);
+        oRun.SetColor(0, 0, 0, false);
+    }
+    var oRow2 = oTable.GetRow(1);
+    if (oRow2)
+    {
+        oRow2.SetHeight("atLeast", 1070);
+    }
+    // TODO: Добавить таблицу
+
+
+    oParagraph = Api.CreateParagraph();
+    oDocument.Push(oParagraph);
 
 
     //------------------------------------------------------------------------------------------------------------------
