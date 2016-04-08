@@ -2887,9 +2887,9 @@ CCellValue.prototype =
 			for(var i = 0, length = this.textValueForEdit2.length; i < length; ++i)
 				this.textValueForEdit += this.textValueForEdit2[i].text;
 		}
-		if( CellValueType.Error == this.type ){
-			return this._getValueTypeError(this.textValueForEdit);
-		}
+//		if( CellValueType.Error == this.type ){
+//			return this._getValueTypeError(this.textValueForEdit);
+//		}
 		return this.textValueForEdit;
 	},
 	getValue2 : function(cell, dDigitsCount, fIsFitMeasurer)
