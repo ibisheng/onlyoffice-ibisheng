@@ -473,6 +473,7 @@ CAscThemeInfo.prototype['get_Image'] = CAscThemeInfo.prototype.get_Image;
 CAscThemeInfo.prototype['get_Index'] = CAscThemeInfo.prototype.get_Index;
 CAscThemes.prototype['get_EditorThemes'] = CAscThemes.prototype.get_EditorThemes;
 CAscThemes.prototype['get_DocumentThemes'] = CAscThemes.prototype.get_DocumentThemes;
+window['Asc']['CPosition'] = CPosition;
 CPosition.prototype['get_X'] = CPosition.prototype.get_X;
 CPosition.prototype['put_X'] = CPosition.prototype.put_X;
 CPosition.prototype['get_Y'] = CPosition.prototype.get_Y;
