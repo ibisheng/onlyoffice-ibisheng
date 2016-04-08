@@ -34,6 +34,11 @@
         this.Style = Style;
     }
 
+    function ApiSection(Section)
+    {
+        this.Section = Section;
+    }
+
     //------------------------------------------------------------------------------------------------------------------
     //
     // Base Api
@@ -97,7 +102,7 @@
     /**
      * Add paragraph or table by position
      * @param nPos
-     * @param oElement (ApiParagraph or ApiTable)
+     * @param oElement (ApiParagraph | ApiTable)
      */
     ApiDocument.prototype["AddElement"] = function(nPos, oElement)
     {
@@ -111,7 +116,7 @@
     };
     /**
      * Push paragraph or table
-     * @param oElement (ApiParagraph or ApiTable)
+     * @param oElement (ApiParagraph | ApiTable)
      */
     ApiDocument.prototype["Push"] = function(oElement)
     {
@@ -133,6 +138,29 @@
         var oStyles = this.Document.Get_Styles();
         var oStyleId = oStyles.Get_StyleIdByName(sStyleName);
         return new ApiStyle(oStyles.Get(oStyleId));
+    };
+    /**
+     * Get document final section
+     * @return {ApiSection}
+     */
+    ApiDocument.prototype["GetFinalSection"] = function()
+    {
+        return new ApiSection(this.Document.SectPr);
+    };
+    /**
+     * Create a new section of the document, which ends at the specified paragraph.
+     * @param oParagraph (ApiParagraph)
+     * @returns {ApiSection}
+     * @constructor
+     */
+    ApiDocument.prototype["CreateSection"] = function(oParagraph)
+    {
+        if (!(oParagraph instanceof ApiParagraph))
+            return;
+
+        var oSectPr = new CSectionPr(this.Document);
+        oParagraph.private_GetImpl().Set_SectionPr(oSectPr);
+        return new ApiSection(oSectPr);
     };
 
     //------------------------------------------------------------------------------------------------------------------
@@ -221,53 +249,35 @@
         return true;
     };
     /**
-     * Set paragraph spacing line
-     * @param nLine (twips | undefined)
-     */
-    ApiParagraph.prototype["SetSpacingLine"] = function(nLine)
-    {
-        this.Paragraph.Set_Spacing(private_GetParaSpacing(nLine, undefined, undefined, undefined, undefined, undefined), false);
-    };
-    /**
-     * Set paragraph spacing line rule
+     * Set paragraph line spacing. If the value of the <sLineRule> parameter is either "atLeast" or "exact", then the
+     * value of <nLine> shall be interpreted as twentieths of a point. If the value of the <sLineRule> parameter is
+     * "auto", then the value of the <nLine> attribute shall be interpreted as 240ths of a line.
+     * @param nLine (twips | 1/240ths of a line)
      * @param sLineRule ("auto" | "atLeast" | "exact")
      */
-    ApiParagraph.prototype["SetSpacingLineRule"] = function(sLineRule)
+    ApiParagraph.prototype["SetSpacingLine"] = function(nLine, sLineRule)
     {
-        this.Paragraph.Set_Spacing(private_GetParaSpacing(undefined, sLineRule, undefined, undefined, undefined, undefined), false);
-    };
-
-    /**
-     * Set paragraph spacing before
-     * @param nBefore (twips | undefined)
-     */
-    ApiParagraph.prototype["SetSpacingBefore"] = function(nBefore)
-    {
-        this.Paragraph.Set_Spacing(private_GetParaSpacing(undefined, undefined, nBefore, undefined, undefined, undefined), false);
+        this.Paragraph.Set_Spacing(private_GetParaSpacing(nLine, sLineRule, undefined, undefined, undefined, undefined), false);
     };
     /**
-     * Set paragraph spacing after
-     * @param nAfter (twips | undefined)
+     * Set paragraph spacing before. If the value of the <isBeforeAuto> parameter is <true>, then any value of the
+     * <nBefore> is ignored. If <isBeforeAuto> parameter is not specified, then it will be interpreted as <false>.
+     * @param nBefore (twips)
+     * @param isBeforeAuto  (true | false)
      */
-    ApiParagraph.prototype["SetSpacingAfter"] = function(nAfter)
+    ApiParagraph.prototype["SetSpacingBefore"] = function(nBefore, isBeforeAuto)
     {
-        this.Paragraph.Set_Spacing(private_GetParaSpacing(undefined, undefined, undefined, nAfter, undefined, undefined), false);
+        this.Paragraph.Set_Spacing(private_GetParaSpacing(undefined, undefined, nBefore, undefined, isBeforeAuto === undefined ? false : isBeforeAuto, undefined), false);
     };
     /**
-     * Set paragraph before auto spacing
-     * @param isBeforeAuto  (true | false | undefined)
+     * Set paragraph spacing after. If the value of the <isAfterAuto> parameter is <true>, then any value of the
+     * <nAfter> is ignored. If <isAfterAuto> parameter is not specified, then it will be interpreted as <false>.
+     * @param nAfter (twips)
+     * @param isAfterAuto  (true | false)
      */
-    ApiParagraph.prototype["SetSpacingBeforeAuto"] = function(isBeforeAuto)
+    ApiParagraph.prototype["SetSpacingAfter"] = function(nAfter, isAfterAuto)
     {
-        this.Paragraph.Set_Spacing(private_GetParaSpacing(undefined, undefined, undefined, undefined, isBeforeAuto, undefined), false);
-    };
-    /**
-     * Set paragraph after auto spacing
-     * @param isAfterAuto  (true | false | undefined)
-     */
-    ApiParagraph.prototype["SetSpacingAfterAuto"] = function(isAfterAuto)
-    {
-        this.Paragraph.Set_Spacing(private_GetParaSpacing(undefined, undefined, undefined, undefined, undefined, isAfterAuto), false);
+        this.Paragraph.Set_Spacing(private_GetParaSpacing(undefined, undefined, undefined, nAfter, undefined, isAfterAuto === undefined ? false : isAfterAuto), false);
     };
     /**
      * Set paragraph justification
@@ -303,8 +313,7 @@
     {
         this.Paragraph.Set_Ind(private_GetParaInd(undefined, undefined, nValue));
     };
-
-
+    
     //------------------------------------------------------------------------------------------------------------------
     //
     // ApiRun
@@ -349,7 +358,7 @@
      * @param r (0-255)
      * @param g (0-255)
      * @param b (0-255)
-     * @oaram isAuto (true | false) false is default
+     * @param isAuto (true | false) false is default
      */
     ApiRun.prototype["SetColor"] = function(r, g, b, isAuto)
     {
@@ -365,8 +374,117 @@
     };
 
     //------------------------------------------------------------------------------------------------------------------
-    // Private area
+    //
+    // ApiSection
+    //
     //------------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Specify the section type of the current section. The section type specifies how the contents of the current
+     * section shall be placed relative to the previous section.
+     * WordprocessingML supports five distinct types of section breaks:
+     *   <b>Next page</b> section breaks (the default if type is not specified), which begin the new section on the
+     *   following page.
+     *   <b>Odd</b> page section breaks, which begin the new section on the next odd-numbered page.
+     *   <b>Even</b> page section breaks, which begin the new section on the next even-numbered page.
+     *   <b>Continuous</b> section breaks, which begin the new section on the following paragraph. This means that
+     *   continuous section breaks might not specify certain page-level section properties, since they shall be
+     *   inherited from the following section. These breaks, however, can specify other section properties, such
+     *   as line numbering and footnote/endnote settings.
+     *   <b>Column</b> section breaks, which begin the new section on the next column on the page.
+     * @param sType ("nextPage" | "oddPage" | "evenPage" | "continuous" | "nextColumn")
+     */
+    ApiSection.prototype["SetType"] = function(sType)
+    {
+        if ("oddPage" === sType)
+            this.Section.Set_Type(section_type_OddPage);
+        else if ("evenPage" === sType)
+            this.Section.Set_Type(section_type_EvenPage);
+        else if ("continuous" === sType)
+            this.Section.Set_Type(section_type_Continuous);
+        else if ("nextColumn" === sType)
+            this.Section.Set_Type(section_type_Column);
+        else if ("nextPage" === sType)
+            this.Section.Set_Type(section_type_NextPage);
+    };
+    /**
+     * Specify all text columns in the current section are of equal width.
+     * @param nCount
+     * @param nSpace (twips)
+     */
+    ApiSection.prototype["SetEqualColumns"] = function(nCount, nSpace)
+    {
+        this.Section.Set_Columns_EqualWidth(true);
+        this.Section.Set_Columns_Num(nCount);
+        this.Section.Set_Columns_Space(private_Twips2MM(nSpace));
+    };
+    /**
+     * Set all columns of this section are of different widths. Count of columns are equal length of <aWidth> array.
+     * The length of <aSpaces> array MUST BE (<aWidth>.length - 1).
+     * @param aWidths (array of twips)
+     * @param aSpaces (array of twips)
+     */
+    ApiSection.prototype["SetNotEqualColumns"] = function(aWidths, aSpaces)
+    {
+        if (!aWidths || !aWidths.length || aWidths.length <= 1 || aSpaces.length !== aWidths.length - 1)
+            return false;
+
+        this.Section.Set_Columns_EqualWidth(false);
+        var aCols = [];
+        for (var nPos = 0, nCount = aWidths.length; nPos < nCount; ++nPos)
+        {
+            var SectionColumn = new CSectionColumn();
+            SectionColumn.W     = private_Twips2MM(aWidths[nPos]);
+            SectionColumn.Space = private_Twips2MM(nPos !== nCount - 1 ? aSpaces[nPos] : 0);
+            aCols.push(SectionColumn);
+        }
+
+        this.Section.Set_Columns_Cols(aCols);
+        this.Section.Set_Columns_Num(aCols.length);
+    };
+    /**
+     * Specify the properties (size and orientation) for all pages in the current section.
+     * @param nWidth (twips)
+     * @param nHeight (twips)
+     * @param isPortrait (true | false) Specifies the orientation of all pages in this section. Default value is true.
+     */
+    ApiSection.prototype["SetPageSize"] = function(nWidth, nHeight, isPortrait)
+    {
+        this.Section.Set_PageSize(private_Twips2MM(nWidth), private_Twips2MM(nHeight));
+        this.Section.Set_Orientation(false === isPortrait ? orientation_Landscape : orientation_Portrait, false);
+    };
+    /**
+     * Specify the page margins for all pages in this section.
+     * @param nLeft (twips)
+     * @param nTop (twips)
+     * @param nRight (twips)
+     * @param nBottom (twips)
+     */
+    ApiSection.prototype["SetPageMargins"] = function(nLeft, nTop, nRight, nBottom)
+    {
+        this.Section.Set_PageMargins(private_Twips2MM(nLeft), private_Twips2MM(nTop), private_Twips2MM(nRight), private_Twips2MM(nBottom));
+    };
+    /**
+     * Specifies the distance (in twentieths of a point) from the top edge of the page to the top edge of the header.
+     * @param nDistance (twips)
+     */
+    ApiSection.prototype["SetHeaderDistance"] = function(nDistance)
+    {
+        this.Section.Set_PageMargins_Header(private_Twips2MM(nDistance));
+    };
+    /**
+     * Specifies the distance (in twentieths of a point) from the bottom edge of the page to the bottom edge of the footer.
+     * @param nDistance (twips)
+     */
+    ApiSection.prototype["SetFooterDistance"] = function(nDistance)
+    {
+        this.Section.Set_PageMargins_Footer(private_Twips2MM(nDistance));
+    };
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Private area
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     function private_GetDrawingDocument()
     {
         return editor.WordControl.m_oLogicDocument.DrawingDocument;
@@ -402,17 +520,24 @@
     {
         var oSp = new CParaSpacing();
 
-        if (undefined !== nLine)
-            oSp.Line = private_Twips2MM(nLine);
-
-        if (undefined !== sLineRule)
+        if (undefined !== nLine && undefined !== sLineRule)
         {
             if ("auto" === sLineRule)
+            {
                 oSp.LineRule = linerule_Auto;
+                oSp.Line = nLine / 240.0;
+            }
             else if ("atLeast" === sLineRule)
+            {
                 oSp.LineRule = linerule_AtLeast;
+                oSp.Line = private_Twips2MM(nLine);
+
+            }
             else if ("exact" === sLineRule)
+            {
                 oSp.LineRule = linerule_Exact;
+                oSp.Line = private_Twips2MM(nLine);
+            }
         }
 
         if (undefined !== nBefore)
@@ -485,10 +610,16 @@ function TEST_BUILDER()
     var oDocument     = Api.GetDocument();
     var oHeadingStyle = oDocument.GetStyle("Heading 1");
     var oNoSpacingStyle = oDocument.GetStyle("No Spacing");
+    var oFinalSection   = oDocument.GetFinalSection();
+    oFinalSection.SetEqualColumns(2, 720);
+    oFinalSection.SetPageSize(12240, 15840);
+    oFinalSection.SetPageMargins(1440, 1440, 1440, 1440);
+    oFinalSection.SetHeaderDistance(720);
+    oFinalSection.SetFooterDistance(720);
+    oFinalSection.SetType("continuous");
 
     var oParagraph = Api.CreateParagraph();
-    oParagraph.SetSpacingLine(276);
-    oParagraph.SetSpacingLineRule("auto");
+    oParagraph.SetSpacingLine(276, "auto");
     oParagraph.SetJc("left");
     var oEndRun = oParagraph.GetParagraphMark();
     oEndRun.SetFontSize(52);
@@ -521,35 +652,33 @@ function TEST_BUILDER()
 
     oParagraph = Api.CreateParagraph();
     oParagraph.SetStyle(oHeadingStyle);
-    oParagraph.SetSpacingAfter(100);
-    oParagraph.SetSpacingAfterAuto(true);
-    oParagraph.SetSpacingBefore(100);
-    oParagraph.SetSpacingBeforeAuto(true);
+    oParagraph.SetSpacingAfter(100, true);
+    oParagraph.SetSpacingBefore(100, true);
     // TODO: Добавить aвтофигуру
     oParagraph.AddText("Summary");
     oDocument.Push(oParagraph);
 
+
     oParagraph = Api.CreateParagraph();
-    oParagraph.SetSpacingAfter(100);
-    oParagraph.SetSpacingAfterAuto(true);
-    oParagraph.SetSpacingBefore(100);
-    oParagraph.SetSpacingBeforeAuto(true);
+    oParagraph.SetSpacingAfter(100, true);
+    oParagraph.SetSpacingBefore(100, true);
     // TODO: Добавить автофигуру
     oParagraph.AddText("After years of market research and focused creative effort we are in a position to take our “Innovate 1” to market. We have a three phase approach in place to complete the product and take the product to market.  The first step of this initiative is to test the market.  Once we have identified the market, then we will make any final product product to drive that effectively keeps down costs while meeting sales goals. ");
     oDocument.Push(oParagraph);
 
+
     oParagraph = Api.CreateParagraph();
     oDocument.Push(oParagraph);
 
+
     oParagraph = Api.CreateParagraph();
     oParagraph.SetStyle(oHeadingStyle);
-    oParagraph.SetSpacingAfter(100);
-    oParagraph.SetSpacingAfterAuto(true);
-    oParagraph.SetSpacingBefore(100);
-    oParagraph.SetSpacingBeforeAuto(true);
+    oParagraph.SetSpacingAfter(100, true);
+    oParagraph.SetSpacingBefore(100, true);
     // TODO: Добавить автофигуру
     oParagraph.AddText("Financial Overview");
     oDocument.Push(oParagraph);
+
 
     oParagraph = Api.CreateParagraph();
     oParagraph.SetIndRight(5040);
@@ -558,30 +687,37 @@ function TEST_BUILDER()
     oParagraph.AddText(" we expect to be profitable.");
     oDocument.Push(oParagraph);
 
+
     oParagraph = Api.CreateParagraph();
     oParagraph.SetIndRight(5040);
     oDocument.Push(oParagraph);
 
+
     oParagraph = Api.CreateParagraph();
     oParagraph.SetStyle(oHeadingStyle);
-    oParagraph.SetSpacingAfter(100);
-    oParagraph.SetSpacingAfterAuto(true);
-    oParagraph.SetSpacingBefore(100);
-    oParagraph.SetSpacingBeforeAuto(true);
+    oParagraph.SetSpacingAfter(100, true);
+    oParagraph.SetSpacingBefore(100, true);
     oParagraph.AddText("Details");
     oDocument.Push(oParagraph);
+
 
     oParagraph = Api.CreateParagraph();
     oParagraph.SetSpacingAfter(240);
     oParagraph.AddText("Out of the $250,000 allocated for this effort, we would like to spend about $50,000 towards the identification of the market.  For this we are allowed to engage with a marketing consulting organization.  Let us start with creating an RFP for this and start inviting the bids.   We would like to get the selection process completed by no later than end of first quarter.");
     oDocument.Push(oParagraph);
 
+
     oParagraph = Api.CreateParagraph();
-    oParagraph.SetSpacingBefore(100);
-    oParagraph.SetSpacingBeforeAuto(true);
+    oParagraph.SetSpacingBefore(100, true);
     oParagraph.SetSpacingAfter(360);
-    // TODO: Вставить разрыв секции
     oDocument.Push(oParagraph);
+    var oSection1 = oDocument.CreateSection(oParagraph);
+    oSection1.SetEqualColumns(1, 720);
+    oSection1.SetPageSize(12240, 15840);
+    oSection1.SetPageMargins(1440, 1440, 1440, 1440);
+    oSection1.SetHeaderDistance(720);
+    oSection1.SetFooterDistance(576);
+
 
     //------------------------------------------------------------------------------------------------------------------
     oLD.Recalculate_FromStart(true);
