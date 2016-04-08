@@ -292,7 +292,7 @@ CMathBase.prototype.align = function(pos_x, pos_y)
 
     if(this.alignment.wdt[pos_y] == MCJC_CENTER)
         PosAlign.x = (maxW - this.elements[pos_x][pos_y].size.width)*0.5;
-    else if(this.alignment.hgt[pos_x] == MCJC_LEFT)
+    else if(this.alignment.wdt[pos_y] == MCJC_LEFT)
         PosAlign.x = 0;
     else // MCJC_RIGHT
         PosAlign.x = maxW - this.elements[pos_x][pos_y].size.width;
