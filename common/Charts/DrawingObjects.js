@@ -305,7 +305,7 @@ prot["asc_setFormatCode"] = prot.asc_setFormatCode;
 
 
 
-var nSparklineMultiplier = 3.5;
+var nSparklineMultiplier = 3.75;
 
 function CSparklineView()
 {
@@ -398,6 +398,47 @@ CSparklineView.prototype.initFromSparkline = function(oSparkline, oSparklineGrou
 			chart_space.chart.plotArea.axId[i].setDelete(true);
 		}
 
+
+        var oSerie = chart_space.chart.plotArea.charts[0].series[0];
+        if(!oSerie.spPr)
+        {
+            oSerie.setSpPr(new CSpPr());
+        }
+        if(oSparklineGroup.type === Asc.ESparklineType.Line)
+        {
+            var oLn = new CLn();
+            oLn.setW(36000*nSparklineMultiplier*25.4*(oSparklineGroup.lineWidth != null ? oSparklineGroup.lineWidth : 0.75)/72);
+            oSerie.spPr.setLn(oLn);
+        }
+        else
+        {
+            chart_space.chart.plotArea.charts[0].setGapWidth(30);
+            chart_space.chart.plotArea.charts[0].setOverlap(50);
+        }
+        if(oSparklineGroup.colorSeries)
+        {
+            var oUnifill;
+            if(oSparklineGroup.colorSeries instanceof ThemeColor)
+            {
+
+                oUnifill = CreateUniFillSchemeColorWidthTint(map_themeExcel_to_themePresentation[oSparklineGroup.colorSeries.theme], oSparklineGroup.colorSeries.tint != null ? oSparklineGroup.colorSeries.tint : 0);
+            }
+            else
+            {
+                oUnifill = CreateUnfilFromRGB(oSparklineGroup.colorSeries.getR(), oSparklineGroup.colorSeries.getG(),oSparklineGroup.colorSeries.getB())
+            }
+            var oSerie = chart_space.chart.plotArea.charts[0].series[0];
+            if(oSparklineGroup.type === Asc.ESparklineType.Line)
+            {
+                var oLn = oSerie.spPr.ln;
+                oLn.setFill(oUnifill);
+                oSerie.spPr.setLn(oLn);
+            }
+            else
+            {
+                oSerie.spPr.setFill(oUnifill);
+            }
+        }
         this.chartSpace = chart_space;
         var oBBox = oSparkline.sqref;
         this.col = oBBox.c1;
@@ -432,10 +473,10 @@ CSparklineView.prototype.draw = function(graphics)
     graphics.m_oCoordTransform.tx = x;
     graphics.m_oCoordTransform.ty = y;
 	
-	var _l = this.chartSpace.chartObj.calcProp.chartGutter._left;
+	/*var _l = this.chartSpace.chartObj.calcProp.chartGutter._left;
 	var _t = this.chartSpace.chartObj.calcProp.chartGutter._top;
 	var _r = this.chartSpace.chartObj.calcProp.chartGutter._right;
-	var _b = this.chartSpace.chartObj.calcProp.chartGutter._bottom;
+	var _b = this.chartSpace.chartObj.calcProp.chartGutter._bottom;*/
 	var _true_height = this.chartSpace.chartObj.calcProp.chartGutter.trueHeight;
 	var _true_width = this.chartSpace.chartObj.calcProp.chartGutter.trueWidht;
 	
@@ -445,17 +486,17 @@ CSparklineView.prototype.draw = function(graphics)
 	this.chartSpace.chartObj.calcProp.trueHeight = this.chartSpace.extY * this.chartSpace.chartObj.calcProp.pxToMM;
 	
 	
-	this.chartSpace.chartObj.calcProp.chartGutter._left = 0;
+	/*this.chartSpace.chartObj.calcProp.chartGutter._left = 0;
 	this.chartSpace.chartObj.calcProp.chartGutter._top = 0;
 	this.chartSpace.chartObj.calcProp.chartGutter._right = 0;
-	this.chartSpace.chartObj.calcProp.chartGutter._bottom = 0;
+	this.chartSpace.chartObj.calcProp.chartGutter._bottom = 0;*/
 	
     this.chartSpace.draw(graphics);
 	
-	this.chartSpace.chartObj.calcProp.chartGutter._left = _l;
+	/*this.chartSpace.chartObj.calcProp.chartGutter._left = _l;
 	this.chartSpace.chartObj.calcProp.chartGutter._top = _t;
 	this.chartSpace.chartObj.calcProp.chartGutter._right = _r;
-	this.chartSpace.chartObj.calcProp.chartGutter._bottom = _b;
+	this.chartSpace.chartObj.calcProp.chartGutter._bottom = _b;*/
 	
 	this.chartSpace.chartObj.calcProp.trueWidht = _true_width;
 	this.chartSpace.chartObj.calcProp.trueHeight = _true_height;
