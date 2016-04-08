@@ -4093,25 +4093,29 @@ CCharacter.prototype.setPosition = function(pos, PosInfo)
         PosOper.x = this.pos.x + this.GapLeft + alignOp;
         PosOper.y = this.pos.y;
 
-        this.operator.setPosition(PosOper);
-
         PosBase.x = this.pos.x + this.GapLeft + alignCnt;
         PosBase.y = this.pos.y + this.operator.size.height;
 
-        Base.setPosition(PosBase, PosInfo);
     }
     else if(this.Pr.pos === LOCATION_BOT)
     {
         PosBase.x = this.pos.x + this.GapLeft + alignCnt;
         PosBase.y = this.pos.y;
 
-        Base.setPosition(PosBase, PosInfo);
+        //Base.setPosition(PosBase, PosInfo);
 
         PosOper.x = this.pos.x + this.GapLeft + alignOp;
         PosOper.y = this.pos.y + Base.size.height;
 
-        this.operator.setPosition(PosOper);
+        //this.operator.setPosition(PosOper);
     }
+
+    this.operator.setPosition(PosOper);
+
+    if(Base.Type == para_Math_Content)
+        PosBase.y += Base.size.ascent;
+
+    Base.setPosition(PosBase, PosInfo);
 
     pos.x += this.size.width;
 };
