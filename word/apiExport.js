@@ -517,7 +517,6 @@ asc_docs_api.prototype['asc_AcceptAllChanges'] = asc_docs_api.prototype.asc_Acce
 asc_docs_api.prototype['asc_RejectAllChanges'] = asc_docs_api.prototype.asc_RejectAllChanges;
 asc_docs_api.prototype['asc_stopSaving'] = asc_docs_api.prototype.asc_stopSaving;
 asc_docs_api.prototype['asc_continueSaving'] = asc_docs_api.prototype.asc_continueSaving;
-asc_docs_api.prototype['asc_showRevision'] = asc_docs_api.prototype.asc_showRevision;
 asc_docs_api.prototype['asc_undoAllChanges'] = asc_docs_api.prototype.asc_undoAllChanges;
 asc_docs_api.prototype['asc_CloseFile'] = asc_docs_api.prototype.asc_CloseFile;
 asc_docs_api.prototype['asc_addComment'] = asc_docs_api.prototype.asc_addComment;

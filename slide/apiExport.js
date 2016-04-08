@@ -391,7 +391,6 @@ asc_docs_api.prototype['asc_getTextArtPreviews'] = asc_docs_api.prototype.asc_ge
 asc_docs_api.prototype['sync_closeChartEditor'] = asc_docs_api.prototype.sync_closeChartEditor;
 asc_docs_api.prototype['asc_stopSaving'] = asc_docs_api.prototype.asc_stopSaving;
 asc_docs_api.prototype['asc_continueSaving'] = asc_docs_api.prototype.asc_continueSaving;
-asc_docs_api.prototype['asc_showRevision'] = asc_docs_api.prototype.asc_showRevision;
 asc_docs_api.prototype['asc_undoAllChanges'] = asc_docs_api.prototype.asc_undoAllChanges;
 asc_docs_api.prototype['sync_ContextMenuCallback'] = asc_docs_api.prototype.sync_ContextMenuCallback;
 asc_docs_api.prototype['asc_addComment'] = asc_docs_api.prototype.asc_addComment;

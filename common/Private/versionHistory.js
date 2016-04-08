@@ -96,3 +96,4 @@ baseEditorsApi.prototype.asc_showRevision = function(newObj) {
     CollaborativeEditing.Apply_Changes();
   }
 };
+baseEditorsApi.prototype['asc_showRevision'] = baseEditorsApi.prototype.asc_showRevision;
