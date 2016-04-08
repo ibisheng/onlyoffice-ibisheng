@@ -6017,20 +6017,43 @@ function offline_keyboard_down(keys) {
 
     for (var i = 0; i < keys.length; ++i) {
 
+        var operationCode = keys[i][0];
+
         // TODO: commands for text in shape
 
         var codeKey = keys[i][2];
 
         if (100 == keys[i][1]) {
-            var event = {which:codeKey,keyCode:codeKey,metaKey:false,altKey:false,ctrlKey:false,shiftKey:false, preventDefault:function(){}};
-            if (32 === codeKey || 8 === codeKey || 13 === codeKey || 27 == codeKey) {
-                ws.objectRender.graphicObjectKeyDown(event);
-            } else {
-                ws.objectRender.graphicObjectKeyPress(event);
-            }
 
-            if (27 == codeKey) {
-                window.AscDisableTextSelection = true;
+            var event = {which:codeKey,keyCode:codeKey,metaKey:false,altKey:false,ctrlKey:false,shiftKey:false, preventDefault:function(){}};
+
+            if (6 === operationCode) {    // SELECT_ALL
+
+                event.keyCode = 65;
+                event.ctrlKey = true;
+                ws.objectRender.graphicObjectKeyDown(event);
+
+            } else if (3 === operationCode) {    // SELECT
+
+                var content = ws.objectRender.controller.getTargetDocContent();
+
+                content.Cursor_MoveLeft(false, true);
+                content.Cursor_MoveRight(true, true);
+
+                ws.objectRender.controller.updateSelectionState();
+                ws.objectRender.controller.drawingObjects.sendGraphicObjectProps();
+
+            } else {
+
+                if (32 === codeKey || 8 === codeKey || 13 === codeKey || 27 == codeKey) {
+                    ws.objectRender.graphicObjectKeyDown(event);
+                } else {
+                    ws.objectRender.graphicObjectKeyPress(event);
+                }
+
+                if (27 == codeKey) {
+                    window.AscDisableTextSelection = true;
+                }
             }
         }
         else if (37 === codeKey)      // LEFT
