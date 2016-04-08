@@ -13230,18 +13230,17 @@
 		var ws = this.model;
 		
 		var intersectionTables = this.model.autoFilters.getTableIntersectionRange(range);
-		if(!intersectionTables || (intersectionTables && intersectionTables.length !== 1))
+		var tablePart = intersectionTables[0];
+		if(tablePart)
 		{
-			res = c_oAscError.ID.AutoFilterMoveToHiddenRangeError;
-		}
-		else
-		{
-			var tablePart = intersectionTables[0];
-			if(range.r1 !== tablePart.Ref.r1)
+			if(range.r1 !== tablePart.Ref.r1)//первая строка таблицы не равно первой строке выделенного диапазона
 			{
-				res = c_oAscError.ID.AutoFilterMoveToHiddenRangeError;
+				res = c_oAscError.ID.FTChangeTableRangeError;
 			}
-			
+			else if(intersectionTables.length !== 1)//выделено несколько таблиц
+			{
+				res = c_oAscError.ID.FTRangeIncludedOtherTables;
+			}
 		}
 		
 		return res;
