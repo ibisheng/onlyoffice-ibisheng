@@ -2163,6 +2163,33 @@
 			{
 				//TODO сделать вставку текста всегда через эту функцию
 				this.activeRange = worksheet.activeRange.clone(true);
+				
+				//если находимся внутри шейпа
+				var isIntoShape = worksheet.objectRender.controller.getTargetDocContent();
+				if(isIntoShape)
+				{
+					var callback = function(isSuccess)
+					{
+						if(isSuccess === false)
+						{
+							return false;
+						}
+						
+						var Count = text.length;
+						for ( var Index = 0; Index < Count; Index++ )
+						{
+							var _char = text.charAt(Index);
+							if (" " == _char)
+								isIntoShape.Paragraph_Add(new ParaSpace());
+							else
+								isIntoShape.Paragraph_Add(new ParaText(_char));
+						}
+					};
+					
+					worksheet.objectRender.controller.checkSelectedObjectsAndCallback2(callback);
+					return;
+				}
+				
 				var aResult = [];
 				aResult[this.activeRange.r1] = [];
 				
