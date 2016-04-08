@@ -7964,23 +7964,17 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
             //для случая гиперссылок на несколько строк в конце параграфа завершаем начатые, а начале - продолжаем незавершенные
             if (this.aFields.length > 0) {
                 for (var i = 0; i < this.aFields.length; ++i) {
-                    var elem = this.aFields[i];
-					elem.commitElem = false;
-					var oField = elem.field;
-					if(null != oField){
-						if(para_Hyperlink == oField.Get_Type()){
-							var oHyperlink = new ParaHyperlink();
-							oHyperlink.Set_Paragraph(paragraph);
-							oHyperlink.Set_Value(oField.Get_Value());
-							oHyperlink.Set_ToolTip(oField.Get_ToolTip());
-							oParStruct.addElem(oHyperlink);
-							elem.commitElem = true;
-						}
-						else if(para_PageNum == oField.Get_Type()){
-							oParStruct.addElem(null);
-							elem.commitElem = true;
-						}
-					}
+					var oField = this.aFields[i];
+					if (null != oField && para_Hyperlink == oField.Get_Type()) {
+						var oHyperlink = new ParaHyperlink();
+						oHyperlink.Set_Paragraph(paragraph);
+						oHyperlink.Set_Value(oField.Get_Value());
+						oHyperlink.Set_ToolTip(oField.Get_ToolTip());
+						oParStruct.addElem(oHyperlink);
+					} else {
+                        //зануляем, чтобы когда придет fldend ничего не делать
+                        this.aFields[i] = null;
+                    }
                 }
             }
             res = this.bcr.Read1(length, function(t, l){
@@ -8100,18 +8094,9 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 		        return oThis.ReadFldSimple(t, l, oFldSimpleObj, oParStruct);
 		    });
 			if(null != oFldSimpleObj.ParaField){
-				var oField = oFldSimpleObj.ParaField;
-				var nFieldType = oField.Get_Type();
-				if(para_PageNum == nFieldType)
-				{
-					var oNewRun = new ParaRun(oParStruct.paragraph);
-					oNewRun.Add_ToContent(0, oField);
-					oParStruct.addToContent(oNewRun);
-				}
-				else
-					oParStruct.addToContent(oField);
-				if (para_Field == nFieldType && editor)
-					editor.WordControl.m_oLogicDocument.Register_Field(oField);
+                //чтобы не писать здесь логику для pagenum
+                oParStruct.addElem(oFldSimpleObj.ParaField);
+                oParStruct.commitElem();
 			}
 		} else if (c_oSerParType.Del == type) {
             var reviewInfo = new CReviewInfo();
@@ -8152,19 +8137,13 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 			oFldSimpleObj.ParaField = this.parseField(Instr, oParStruct.paragraph);
         }
         else if (c_oSer_FldSimpleType.Content === type) {
-			if(null != oFldSimpleObj.ParaField){
-				if(para_PageNum != oFldSimpleObj.ParaField.Get_Type())
-				{
-					var oFldStruct = new OpenParStruct(oFldSimpleObj.ParaField, oParStruct.Content, oParStruct.paragraph);
-					res = this.bcr.Read1(length, function (t, l) {
-						return oThis.ReadParagraphContent(t, l, oFldStruct);
-					});
-					oFldStruct.commitAll();
-				}
-				else
-					res = c_oSerConstants.ReadUnknown;
-			}
-			else{
+			if(null != oFldSimpleObj.ParaField) {
+				var oFldStruct = new OpenParStruct(oFldSimpleObj.ParaField, oParStruct.Content, oParStruct.paragraph);
+				res = this.bcr.Read1(length, function (t, l) {
+					return oThis.ReadParagraphContent(t, l, oFldStruct);
+				});
+				oFldStruct.commitAll();
+			} else {
 				res = this.bcr.Read1(length, function (t, l) {
 					return oThis.ReadParagraphContent(t, l, oParStruct);
 				});
@@ -8374,27 +8353,18 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
             oRes.bRes = false;
 			var sField = this.stream.GetString2LE(length);
 			var oField = this.parseField(sField, oParStruct.paragraph);
-			var commitElem = false;
-			if(null != oField)
-			{
-				if(para_PageNum == oField.Get_Type()){
-					oNewElem = oField;
-					//досрочно добавляем oPos.run потому что после oParStruct.addElem(null); он никуда не добавится
-					oParStruct.addToContent(oPos.run);
-					oParStruct.addElem(null);
-				}
-				else
-					oParStruct.addElem(oField);
-				commitElem = true;
+			if (null != oField) {
+				oParStruct.addElem(oField);
 			}
-            this.aFields.push({field: oField, commitElem: commitElem});
+            this.aFields.push(oField);
         }
         else if(c_oSerRunType.fldend === type)
         {
             oRes.bRes = false;
 			var elem = this.aFields.pop();
-			if(elem.commitElem)
-				oParStruct.commitElem();
+			if (elem) {
+                oParStruct.commitElem();
+            }
         }
         else if (c_oSerRunType._LastRun === type)
             this.oReadResult.bLastRun = true;
@@ -8572,10 +8542,12 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 			}
 		}
 		else if("PAGE" == sFieldType){
-			oRes = new ParaPageNum();
+            oRes = new ParaField(fieldtype_PAGENUM, aArguments, aSwitches);
 		}
 		else if("MERGEFIELD" == sFieldType){
 			oRes = new ParaField(fieldtype_MERGEFIELD, aArguments, aSwitches);
+            if (editor)
+               editor.WordControl.m_oLogicDocument.Register_Field(oRes);
 		}
 		return oRes;
 	}
@@ -12393,7 +12365,18 @@ CFontsCharMap.prototype =
             this.CurrentFontInfo.CharArray[_find] = true;
     }
 }
-
+function getStyleFirstRun(oField){
+    var res = null;
+    //берем первый с непустым Content, потому что в случае fldstart первым будет run fldstart
+    for (var i = 0 ; i < oField.Content.length; ++i) {
+        var run = oField.Content[i];
+        if (run.Content.length > 0) {
+            res = run.Get_FirstTextPr();
+            break;
+        }
+    }
+    return res;
+}
 function OpenParStruct(oContainer, Content, paragraph) {
     this.DocContent = Content;
     this.paragraph = paragraph;
@@ -12450,8 +12433,20 @@ OpenParStruct.prototype = {
         if (this.stack.length > 1) {
             var oPrevElem = this.stack.pop();
             this.cur = this.stack[this.stack.length - 1];
-            if (null != oPrevElem.elem && oPrevElem.elem.Content && oPrevElem.elem.Content.length > 0)
-                this.addToContent(oPrevElem.elem);
+            var elem = oPrevElem.elem;
+            if (null != elem && elem.Content && elem.Content.length > 0) {
+                if (para_Field == elem.Get_Type() && fieldtype_PAGENUM == elem.Get_FieldType()) {
+                    var oNewRun = new ParaRun(this.paragraph);
+                    var rPr = getStyleFirstRun(elem);
+                    if (rPr) {
+                        oNewRun.Set_Pr(rPr);
+                    }
+                    oNewRun.Add_ToContent(0, new ParaPageNum());
+                    this.addToContent(oNewRun);
+                } else {
+                    this.addToContent(elem);
+                }
+            }
             bRes = true;
         }
         return bRes;
