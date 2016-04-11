@@ -1,4 +1,4 @@
-﻿function CPointer()
+function CPointer()
 {
     this.obj    = null;
     this.data   = null;
