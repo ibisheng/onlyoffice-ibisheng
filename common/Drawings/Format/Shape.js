@@ -2711,6 +2711,8 @@ CShape.prototype =
                     xfrm.extY = 5;
                 }
             }
+
+
             var scale_scale_coefficients = this.group.getResultScaleCoefficients();
             this.x = scale_scale_coefficients.cx * (xfrm.offX - this.group.spPr.xfrm.chOffX);
             this.y = scale_scale_coefficients.cy * (xfrm.offY - this.group.spPr.xfrm.chOffY);
@@ -2997,6 +2999,16 @@ CShape.prototype =
         global_MatrixTransformer.TranslateAppend(transform, this.x + hc, this.y + vc);
         if (isRealObject(this.group)) {
             global_MatrixTransformer.MultiplyAppend(transform, this.group.getLocalTransform());
+        }
+        var oParaDrawing = getParaDrawing(this);
+        if(oParaDrawing) {
+            this.m_oSectPr = null;
+            var oParentParagraph = oParaDrawing.Get_ParentParagraph();
+            if (oParentParagraph) {
+                var oSectPr = oParentParagraph.Get_SectPr();
+                this.m_oSectPr = new CSectionPr();
+                this.m_oSectPr.Copy(oSectPr);
+            }
         }
         this.localTransform = transform;
         this.transform = transform;
