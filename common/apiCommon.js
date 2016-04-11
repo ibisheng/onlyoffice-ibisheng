@@ -1931,7 +1931,7 @@
             this.PositionV     = (undefined != obj.PositionV    ) ? new CImagePositionV(obj.PositionV) : undefined;
 
             this.SizeRelH       = (undefined != obj.SizeRelH) ? new CImagePositionH(obj.SizeRelH) : undefined;
-            this.SizeRelV       = (undefined != obj.SizeRelV) ? new CImagePositionH(obj.SizeRelV) : undefined;
+            this.SizeRelV       = (undefined != obj.SizeRelV) ? new CImagePositionV(obj.SizeRelV) : undefined;
 
             this.Internal_Position = (undefined != obj.Internal_Position) ? obj.Internal_Position : null;
 
