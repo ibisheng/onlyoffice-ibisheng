@@ -6,6 +6,12 @@
  * To change this template use File | Settings | File Templates.
  */
 "use strict";
+(
+/**
+ * @param {Window} window
+ * @param {undefined} undefined
+ */
+function (window, undefined) {
 function CMobileTouchManager()
 {
     this.AnimateScroll  = false;
@@ -73,16 +79,15 @@ function CMobileTouchManager()
     this.canZoom = true;
     this.wasMove = false;
 }
-CMobileTouchManager.prototype = {
-    Init : function(ctrl)
+CMobileTouchManager.prototype.Init = function(ctrl)
     {
         this.ctrl = ctrl;
         this.iScroll = new window.CTouchScroll(ctrl,{hScrollbar:true,vScrollbar:true,momentum:false}/*, { onAnimationEnd : function(param) {
             param.api.MobileTouchManager.OnScrollAnimationEnd();
         } }*/);
-    },
+};
 
-    MoveCursorToPoint : function(e)
+CMobileTouchManager.prototype.MoveCursorToPoint = function(e)
     {
         check_MouseMoveEvent(e);
         var pos = this.DrawingDocument.ConvertCoordsFromCursor2(global_mouseEvent.X, global_mouseEvent.Y);
@@ -98,9 +103,9 @@ CMobileTouchManager.prototype = {
         this.DrawingDocument.NeedScrollToTargetFlag = false;
 
         global_mouseEvent.ClickCount = old_click_count;
-    },
+};
 
-    onTouchStart : function(e)
+CMobileTouchManager.prototype.onTouchStart = function(e)
     {
         this.longTapFlag = true;
         this.wasMove = false;
@@ -577,8 +582,8 @@ CMobileTouchManager.prototype = {
                 e.returnValue = false;
             return false;
         }*/
-    },
-    onTouchMove : function(e)
+};
+CMobileTouchManager.prototype.onTouchMove = function(e)
     {
         this.longTapFlag = false;
         this.wasMove = true;
@@ -779,8 +784,8 @@ CMobileTouchManager.prototype = {
             default:
                 break;
         }*/
-    },
-    onTouchEnd : function(e)
+};
+CMobileTouchManager.prototype.onTouchEnd = function(e)
     {
         this.longTapFlag = false;
 //        clearInterval(this.longTapTimer);
@@ -999,9 +1004,9 @@ CMobileTouchManager.prototype = {
 
         // если есть селект - то показать меню
         this.CheckSelectEnd(true);*/
-    },
+};
 
-    onTouchStart_renderer : function(e)
+CMobileTouchManager.prototype.onTouchStart_renderer = function(e)
     {
         check_MouseDownEvent(e.touches ? e.touches[0] : e, true);
         global_mouseEvent.LockMouse();
@@ -1062,8 +1067,8 @@ CMobileTouchManager.prototype = {
             e.preventDefault();
         else
             e.returnValue = false;
-    },
-    onTouchMove_renderer : function(e)
+};
+CMobileTouchManager.prototype.onTouchMove_renderer = function(e)
     {
         check_MouseMoveEvent(e.touches ? e.touches[0] : e);
 
@@ -1126,8 +1131,8 @@ CMobileTouchManager.prototype = {
             e.preventDefault();
         else
             e.returnValue = false;
-    },
-    onTouchEnd_renderer : function(e)
+};
+CMobileTouchManager.prototype.onTouchEnd_renderer = function(e)
     {
         check_MouseUpEvent(e.changedTouches ? e.changedTouches[0] : e);
 
@@ -1168,9 +1173,9 @@ CMobileTouchManager.prototype = {
             e.preventDefault();
         else
             e.returnValue = false;
-    },
+};
 
-    CheckSelectEnd : function(bIsAttack)
+CMobileTouchManager.prototype.CheckSelectEnd = function(bIsAttack)
     {
         var _bIsRet = false;
         if (!bIsAttack)
@@ -1209,9 +1214,9 @@ CMobileTouchManager.prototype = {
             if (!this.iScroll.animating)
                 this.SendShowMenu(_x, _y);
         }
-    },
+};
 
-    CheckZoomCriticalValues : function(zoomMin)
+CMobileTouchManager.prototype.CheckZoomCriticalValues = function(zoomMin)
     {
         if (zoomMin !== undefined)
         {
@@ -1247,15 +1252,15 @@ CMobileTouchManager.prototype = {
             this.ZoomValue = this.ZoomValueMin;
             this.HtmlPage.m_oApi.zoom(this.ZoomValue);
         }
-    },
+};
 
-    Resize : function()
+CMobileTouchManager.prototype.Resize = function()
     {
         if (this.iScroll != null)
             this.iScroll.refresh(true);
-    },
+};
 
-    SendShowMenu : function(x, y)
+CMobileTouchManager.prototype.SendShowMenu = function(x, y)
     {
         if (-1 != this.ShowMenuTimerId)
         {
@@ -1263,9 +1268,9 @@ CMobileTouchManager.prototype = {
         }
         var that = this;
         that.ShowMenuTimerId = setTimeout(function(){ that.HtmlPage.m_oApi.asc_fireCallback("asc_onShowPopMenu", x, y); }, 500);
-    },
+};
 
-    OnScrollAnimationEnd : function()
+CMobileTouchManager.prototype.OnScrollAnimationEnd = function()
     {
         if (this.HtmlPage.m_oApi.isViewMode)
             return;
@@ -1298,9 +1303,9 @@ CMobileTouchManager.prototype = {
 
             this.SendShowMenu(_x, _y);
         }
-    },
+};
 
-    CheckSelect : function(overlay)
+CMobileTouchManager.prototype.CheckSelect = function(overlay)
     {
         if (null == this.RectSelect1 || null == this.RectSelect2)
             return;
@@ -1409,9 +1414,9 @@ CMobileTouchManager.prototype = {
             overlay.AddEllipse(pos4.X, pos4.Y + 5, 5);
             ctx.fill();
         }
-    },
+};
 
-    CheckSelect2 : function(overlay)
+CMobileTouchManager.prototype.CheckSelect2 = function(overlay)
     {
         if (null == this.RectSelect1 || null == this.RectSelect2)
             return;
@@ -1523,9 +1528,9 @@ CMobileTouchManager.prototype = {
             overlay.CheckRect(_x1, _y1, _w, _h);
             overlay.CheckRect(_x2, _y2, _w, _h);
         }
-    },
+};
 
-    CheckTableRules : function(overlay)
+CMobileTouchManager.prototype.CheckTableRules = function(overlay)
     {
         if (this.HtmlPage.m_oApi.isViewMode)
             return;
@@ -1770,9 +1775,9 @@ CMobileTouchManager.prototype = {
                 }
             }
         }
-    },
+};
 
-    CheckTableRules2 : function(overlay)
+CMobileTouchManager.prototype.CheckTableRules2 = function(overlay)
     {
         if (this.HtmlPage.m_oApi.isViewMode)
             return;
@@ -2061,5 +2066,8 @@ CMobileTouchManager.prototype = {
                 }
             }
         }
-    }
 };
+//------------------------------------------------------------export---------------------------------------------------
+window['AscCommonExcel'] = window['AscCommonExcel'] || {};
+window['AscCommonExcel'].CMobileTouchManager = CMobileTouchManager;
+})(window);
