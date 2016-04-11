@@ -661,18 +661,25 @@ CTableCell.prototype =
     {
         var TextDirection = this.Get_TextDirection();
         var bNeedRestore = false;
+        var _transform = undefined;
         if (textdirection_BTLR === TextDirection || textdirection_TBRL === TextDirection)
         {
             bNeedRestore = true;
             pGraphics.SaveGrState();
             pGraphics.AddClipRect(this.Temp.X_cell_start, this.Temp.Y_cell_start, this.Temp.X_cell_end - this.Temp.X_cell_start, this.Temp.Y_cell_end - this.Temp.Y_cell_start);
-            pGraphics.transform3(this.Get_ParentTextTransform());
+
+            _transform = this.Get_ParentTextTransform();
+            if (pGraphics.CheckUseFonts2 !== undefined)
+                pGraphics.CheckUseFonts2(_transform);
+            pGraphics.transform3(_transform);
         }
 
         this.Content.Draw(PageIndex, pGraphics);
         if (bNeedRestore)
         {
             pGraphics.RestoreGrState();
+            if (pGraphics.UncheckUseFonts2 !== undefined && _transform)
+                pGraphics.UncheckUseFonts2(_transform);
         }
     },
 
