@@ -184,22 +184,7 @@ var c_oAscMouseMoveLockedObjectType = {
   Sheet: 2
 };
 
-// Print default options (in mm)
-var c_oAscPrintDefaultSettings = {
-  // Размеры страницы при печати
-  PageWidth: 210,
-  PageHeight: 297,
-  PageOrientation: c_oAscPageOrientation.PagePortrait,
 
-  // Поля для страницы при печати
-  PageLeftField: 17.8,
-  PageRightField: 17.8,
-  PageTopField: 19.1,
-  PageBottomField: 19.1,
-
-  PageGridLines: 0,
-  PageHeadings: 0
-};
 
 var c_oAscLockTypeElem = {
   Range: 1,
