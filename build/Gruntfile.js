@@ -68,18 +68,6 @@ module.exports = function(grunt) {
 		
 	grunt.registerTask('build_all', ['build_webword_init', 'build_sdk', 'build_webexcel_init', 'build_sdk', 'build_webpowerpoint_init', 'build_sdk']);
 
-  grunt.registerTask('add_build_number', function() {
-		var pkg = grunt.file.readJSON(defaultConfig);
-
-		if(undefined !== process.env['BUILD_NUMBER']) {
-			grunt.log.ok('Use Jenkins build number as sdk-all build number!'.yellow);
-			packageFile['info']['build'] = parseInt(process.env['BUILD_NUMBER']);
-			pkg.info.build = packageFile['info']['build'];
-      packageFile['info']['rev'] = process.env['GIT_COMMIT'];
-      grunt.file.write(defaultConfig, JSON.stringify(pkg, null, 4));    
-		}
-  });
-    
 	grunt.registerTask('compile_sdk_init', function(compilation_level) {
 		grunt.file.mkdir( packageFile['compile']['sdk']['log'] );
 		var map_file_path = packageFile['compile']['sdk']['dst'] + '.map';
@@ -158,9 +146,8 @@ module.exports = function(grunt) {
 				version: {
 					options: {
 						variables: {
-							Version: packageFile['info']['version'],
-							Build: packageFile['info']['build'].toString(),
-							Rev: (packageFile['info']['rev'] || 1).toString()
+							Version: process.env['PRODUCT_VERSION'],
+							Build: process.env['BUILD_NUMBER']
 						}
 					},
 					files: {

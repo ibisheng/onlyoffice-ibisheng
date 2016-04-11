@@ -1,12 +1,4 @@
 {
-    "info": {
-        "version": "3.8.0",
-        "build": 167
-    },
-    "update_src": {
-        "revision": "HEAD",
-        "src": "../common ../word"
-    },
     "compile": {
         "sdk": {
             "common": [
@@ -187,7 +179,6 @@
     },
     "tasks": {
         "build": [
-            "add_build_number",
             "compile_sdk"
         ]
     }

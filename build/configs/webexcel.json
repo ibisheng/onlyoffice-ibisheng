@@ -1,12 +1,4 @@
 {
-    "info": {
-        "version": "3.8.0",
-        "build": 148
-    },
-    "update_src": {
-        "revision": "HEAD",
-        "src": "../common ../word ../cell ../slide"
-    },
     "compile": {
         "sdk": {
             "common": [
@@ -199,7 +191,6 @@
     },
     "tasks": {
         "build": [
-            "add_build_number",
             "compile_sdk"
         ]
     }
