@@ -1486,11 +1486,10 @@
       }
 
       if (this.cellEditor && this.cellFormulaEnterWSOpen ) {
-          if( ws.model.getId() == this.cellFormulaEnterWSOpen.model.getId() ){
+          if (ws === this.cellFormulaEnterWSOpen){
               this.cellFormulaEnterWSOpen.setFormulaEditMode( true );
               this.cellEditor._showCanvas();
-          }
-          else if (this.cellFormulaEnterWSOpen.getCellEditMode() && this.cellEditor.isFormula() ) {
+          } else if (this.cellFormulaEnterWSOpen.getCellEditMode() && this.cellEditor.isFormula() ) {
               this.cellFormulaEnterWSOpen.setFormulaEditMode( false );
               /*скрываем cellEditor, в редактор добавляем %selected sheet name%+"!" */
               this.cellEditor._hideCanvas();
