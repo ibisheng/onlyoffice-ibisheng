@@ -3006,8 +3006,11 @@ CShape.prototype =
             var oParentParagraph = oParaDrawing.Get_ParentParagraph();
             if (oParentParagraph) {
                 var oSectPr = oParentParagraph.Get_SectPr();
-                this.m_oSectPr = new CSectionPr();
-                this.m_oSectPr.Copy(oSectPr);
+                if(oSectPr)
+                {
+                    this.m_oSectPr = new CSectionPr();
+                    this.m_oSectPr.Copy(oSectPr);
+                }
             }
         }
         this.localTransform = transform;
