@@ -2904,8 +2904,7 @@ DrawingObjectsController.prototype =
                 if(chart_type.getObjectType() !== historyitem_type_ScatterChart)
                 {
                     new_chart_type = new CScatterChart();
-                    plot_area.addChart(new_chart_type, 0);
-                    new_chart_type.setFromOtherChart(chart_type);
+                    replaceChart(plot_area, chart_type, new_chart_type);
                     for(var j = 0; j < new_chart_type.series.length; ++j)
                     {
                         new_chart_type.series[j].setMarker(null);
