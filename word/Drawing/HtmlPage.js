@@ -3719,7 +3719,7 @@ function CEditorPage(api)
             this.onTimerScroll2();
     }
 
-    this.onTimerScroll2 = function()
+    this.onTimerScroll2_internal = function()
     {
         var oWordControl = oThis;
 
@@ -3789,6 +3789,16 @@ function CEditorPage(api)
 
         this.m_nPaintTimerId = setTimeout(oWordControl.onTimerScroll2, oWordControl.m_nTimerScrollInterval);
         //window.requestAnimationFrame(oWordControl.onTimerScroll2);
+    }
+	this.onTimerScroll2 = function()
+    {
+        try
+		{
+			oThis.onTimerScroll2_internal();
+		}
+		catch (err)
+		{			
+		}			
     }
 
     this.onTimerScroll2_sync = function()

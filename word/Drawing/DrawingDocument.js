@@ -2765,7 +2765,14 @@ function CDrawingDocument()
     this.IsFreezePage = function(pageIndex)
     {
         if (pageIndex >= 0 && (pageIndex < Math.min(this.m_lCountCalculatePages, this.m_lPagesCount)))
+		{
+			if (this.m_oLogicDocument)
+			{
+				if (pageIndex >= this.m_oLogicDocument.Pages.length)
+					return true;
+			}
             return false;
+		}
         return true;
     }
 
