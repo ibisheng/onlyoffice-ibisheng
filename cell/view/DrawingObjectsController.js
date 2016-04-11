@@ -1,4 +1,10 @@
 "use strict";
+(
+/**
+ * @param {Window} window
+ * @param {undefined} undefined
+ */
+function (window, undefined) {
 
 if(window.editor === "undefined" && window["Asc"]["editor"])
 {
@@ -474,3 +480,7 @@ DrawingObjectsController.prototype.onKeyPress = function(e)
     //    this.updateSelectionState();
     return bRetValue;
 };
+//------------------------------------------------------------export---------------------------------------------------
+window['AscCommonExcel'] = window['AscCommonExcel'] || {};
+window['AscCommonExcel'].CheckIdSatetShapeAdd = CheckIdSatetShapeAdd;
+})(window);
