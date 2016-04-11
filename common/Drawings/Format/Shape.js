@@ -2546,7 +2546,7 @@ CShape.prototype =
                                     var oSectPr = oParentParagraph.Get_SectPr();
                                     if(oSectPr)
                                     {
-                                        if(oParaDrawing.SizeRelH)
+                                        if(oParaDrawing.SizeRelH && oParaDrawing.SizeRelH.Percent > 0)
                                         {
                                             switch(oParaDrawing.SizeRelH.RelativeFrom)
                                             {
@@ -2579,7 +2579,7 @@ CShape.prototype =
                                             }
                                             this.extX *= oParaDrawing.SizeRelH.Percent;
                                         }
-                                        if(oParaDrawing.SizeRelV)
+                                        if(oParaDrawing.SizeRelV && oParaDrawing.SizeRelV.Percent > 0)
                                         {
                                             switch(oParaDrawing.SizeRelV.RelativeFrom)
                                             {
