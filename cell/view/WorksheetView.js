@@ -8697,7 +8697,7 @@
             this.handlers.trigger( "onErrorEvent", c_oAscError.ID.CannotMoveRange, c_oAscError.Level.NoCritical );
             this._cleanSelectionMoveRange();
         }
-        else if ( resmove === -1 && this.model.autoFilters.checkMoveRangeIntoApplyAutoFilter( arnTo ) ) {
+        else if (resmove === -1) {
             var t = this;
             this.model.workbook.handlers.trigger( "asc_onConfirmAction", c_oAscConfirm.ConfirmReplaceRange, function ( can ) {
                 if ( can ) {
