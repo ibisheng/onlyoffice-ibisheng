@@ -483,11 +483,13 @@
             self.getWorksheet(self.model.getWorksheetIndexByName(ws)).addFormulaRange(range);
           }
         }, "existedRange": function(range, ws) {
-              if (!ws) {
-                  self.getWorksheet().activeFormulaRange(range);
-              } else {
-                  self.getWorksheet(self.model.getWorksheetIndexByName(ws)).activeFormulaRange(range);
-              }
+          var editRangeSheet = ws ? self.model.getWorksheetIndexByName(ws) : self.copyActiveSheet;
+          if (-1 === editRangeSheet || editRangeSheet === self.wsActive) {
+            self.getWorksheet().activeFormulaRange(range);
+          } else {
+            self.getWorksheet(editRangeSheet).removeFormulaRange(range);
+            self.getWorksheet().addFormulaRange(range);
+          }
         }, "updateUndoRedoChanged": function(bCanUndo, bCanRedo) {
           self.handlers.trigger("asc_onCanUndoChanged", bCanUndo);
           self.handlers.trigger("asc_onCanRedoChanged", bCanRedo);

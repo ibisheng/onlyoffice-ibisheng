@@ -4859,6 +4859,17 @@ parserFormula.prototype.parseDiagramRef = function() {
   return res;
 };
 
+parserFormula.prototype.getElementByPos = function(pos) {
+  var curPos = 0;
+  for (var i = 0; i < this.f.length; ++i) {
+    curPos += this.f[i].toString().length;
+    if (curPos >= pos) {
+      return this.f[i];
+    }
+  }
+  return null;
+};
+
 function parseNum( str ) {
     if ( str.indexOf( "x" ) > -1 || str == "" || str.match( /\s+/ ) )//исключаем запись числа в 16-ричной форме из числа.
   {

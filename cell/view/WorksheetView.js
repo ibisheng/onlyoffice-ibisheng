@@ -11688,6 +11688,15 @@
             }
         }
     };
+  WorksheetView.prototype.removeFormulaRange = function(range) {
+    this.arrActiveFormulaRangesPosition = -1;
+    for (var i = 0; i < this.arrActiveFormulaRanges.length; ++i) {
+      if (this.arrActiveFormulaRanges[i].isEqual(range)) {
+        this.arrActiveFormulaRanges.splice(i, 1);
+        return;
+      }
+    }
+  };
 
     WorksheetView.prototype.cleanFormulaRanges = function () {
         // Очищаем массив ячеек для текущей формулы

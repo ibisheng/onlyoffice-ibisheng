@@ -686,11 +686,10 @@
 	};
 
 	CellEditor.prototype.formulaIsOperator = function () {
+		var elem;
 		return this.isFormula() &&
-			this._formula &&
-			( this._formula.f.length > 0 && this._formula.f[this._formula.f.length - 1].type == cElementType.operator ||
-				this._formula.f.length == 0 ||
-				this._formula.operand_expected );
+			(null !== (elem = this._formula.getElementByPos(this.cursorPos - 1)) && elem.type === cElementType.operator ||
+			null === elem || this._formula.operand_expected);
 	};
 
 	CellEditor.prototype.insertFormula = function ( functionName, isDefName ) {
