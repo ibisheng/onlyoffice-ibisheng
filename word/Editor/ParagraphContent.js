@@ -4279,21 +4279,21 @@ ParaDrawing.prototype =
 
 
 
-        if(this.SizeRelH)
+        if(this.SizeRelH && this.SizeRelH.Percent > 0)
         {
             Props.SizeRelH =
             {
-                RelativeFrom: this.SizeRelH.RelativeFrom,
-                Percent: this.SizeRelH.Percent
+                RelativeFrom: ConvertRelSizeHToRelPosition(this.SizeRelH.RelativeFrom),
+                Value: (this.SizeRelH.Percent*100) >> 0
             };
         }
 
-        if(this.SizeRelV)
+        if(this.SizeRelV && this.SizeRelV.Percent > 0)
         {
             Props.SizeRelV =
             {
-                RelativeFrom: this.SizeRelV.RelativeFrom,
-                Percent: this.SizeRelV.Percent
+                RelativeFrom: ConvertRelSizeVToRelPosition(this.SizeRelV.RelativeFrom),
+                Value: (this.SizeRelV.Percent*100) >> 0
             };
         }
 
@@ -4455,34 +4455,28 @@ ParaDrawing.prototype =
         }
     },
 
-    Set_Props : function(Props)
-    {
+    Set_Props : function(Props) {
         var bCheckWrapPolygon = false;
-        if ( undefined != Props.WrappingStyle )
-        {
-            if ( drawing_Inline === this.DrawingType && c_oAscWrapStyle2.Inline != Props.WrappingStyle && undefined === Props.Paddings )
-            {
-                this.Set_Distance( 3.2,  0,  3.2, 0 );
+        if (undefined != Props.WrappingStyle) {
+            if (drawing_Inline === this.DrawingType && c_oAscWrapStyle2.Inline != Props.WrappingStyle && undefined === Props.Paddings) {
+                this.Set_Distance(3.2, 0, 3.2, 0);
             }
 
-            this.Set_DrawingType( c_oAscWrapStyle2.Inline === Props.WrappingStyle ? drawing_Inline : drawing_Anchor );
-            if(c_oAscWrapStyle2.Inline === Props.WrappingStyle)
-            {
-                if(isRealObject(this.GraphicObj.bounds) && isRealNumber(this.GraphicObj.bounds.w) && isRealNumber(this.GraphicObj.bounds.h))
-                {
+            this.Set_DrawingType(c_oAscWrapStyle2.Inline === Props.WrappingStyle ? drawing_Inline : drawing_Anchor);
+            if (c_oAscWrapStyle2.Inline === Props.WrappingStyle) {
+                if (isRealObject(this.GraphicObj.bounds) && isRealNumber(this.GraphicObj.bounds.w) && isRealNumber(this.GraphicObj.bounds.h)) {
                     this.setExtent(this.GraphicObj.bounds.w, this.GraphicObj.bounds.h);
                 }
             }
-            if ( c_oAscWrapStyle2.Behind === Props.WrappingStyle || c_oAscWrapStyle2.InFront === Props.WrappingStyle )
-            {
-                this.Set_WrappingType( WRAPPING_TYPE_NONE );
-                this.Set_BehindDoc( c_oAscWrapStyle2.Behind === Props.WrappingStyle ? true : false );
+            if (c_oAscWrapStyle2.Behind === Props.WrappingStyle || c_oAscWrapStyle2.InFront === Props.WrappingStyle) {
+                this.Set_WrappingType(WRAPPING_TYPE_NONE);
+                this.Set_BehindDoc(c_oAscWrapStyle2.Behind === Props.WrappingStyle ? true : false);
             }
-            else
-            {
-                switch ( Props.WrappingStyle )
-                {
-                    case c_oAscWrapStyle2.Square      : this.Set_WrappingType(WRAPPING_TYPE_SQUARE);         break;
+            else {
+                switch (Props.WrappingStyle) {
+                    case c_oAscWrapStyle2.Square      :
+                        this.Set_WrappingType(WRAPPING_TYPE_SQUARE);
+                        break;
                     case c_oAscWrapStyle2.Tight       :
                     {
                         bCheckWrapPolygon = true;
@@ -4495,54 +4489,67 @@ ParaDrawing.prototype =
                         bCheckWrapPolygon = true;
                         break;
                     }
-                    case c_oAscWrapStyle2.TopAndBottom: this.Set_WrappingType(WRAPPING_TYPE_TOP_AND_BOTTOM); break;
-                    default                           : this.Set_WrappingType(WRAPPING_TYPE_SQUARE);         break;
+                    case c_oAscWrapStyle2.TopAndBottom:
+                        this.Set_WrappingType(WRAPPING_TYPE_TOP_AND_BOTTOM);
+                        break;
+                    default                           :
+                        this.Set_WrappingType(WRAPPING_TYPE_SQUARE);
+                        break;
                 }
 
-                this.Set_BehindDoc( false );
+                this.Set_BehindDoc(false);
             }
         }
 
-        if ( undefined != Props.Paddings )
-            this.Set_Distance( Props.Paddings.Left,  Props.Paddings.Top,  Props.Paddings.Right,  Props.Paddings.Bottom );
+        if (undefined != Props.Paddings)
+            this.Set_Distance(Props.Paddings.Left, Props.Paddings.Top, Props.Paddings.Right, Props.Paddings.Bottom);
 
-        if ( undefined != Props.AllowOverlap )
-            this.Set_AllowOverlap( Props.AllowOverlap );
+        if (undefined != Props.AllowOverlap)
+            this.Set_AllowOverlap(Props.AllowOverlap);
 
         var bNeedUpdateWH = false, newW = this.Extent.W, newH = this.Extent.H;
-        if ( undefined != Props.PositionH )
-        {
-            this.Set_PositionH( Props.PositionH.RelativeFrom, Props.PositionH.UseAlign, ( true === Props.PositionH.UseAlign ? Props.PositionH.Align : Props.PositionH.Value ), Props.PositionH.Percent);
-            if(Props.PositionH.UseAlign)
-            {
+        if (undefined != Props.PositionH) {
+            this.Set_PositionH(Props.PositionH.RelativeFrom, Props.PositionH.UseAlign, ( true === Props.PositionH.UseAlign ? Props.PositionH.Align : Props.PositionH.Value ), Props.PositionH.Percent);
+            if (Props.PositionH.UseAlign) {
                 bNeedUpdateWH = true;
-                if(isRealObject(this.GraphicObj.bounds) && isRealNumber(this.GraphicObj.bounds.w))
-                {
+                if (isRealObject(this.GraphicObj.bounds) && isRealNumber(this.GraphicObj.bounds.w)) {
                     newW = this.GraphicObj.bounds.w;
                 }
             }
         }
-        if ( undefined != Props.PositionV )
-        {
-            this.Set_PositionV( Props.PositionV.RelativeFrom, Props.PositionV.UseAlign, ( true === Props.PositionV.UseAlign ? Props.PositionV.Align : Props.PositionV.Value ), Props.PositionV.Percent);
-            if(this.PositionV.UseAlign)
-            {
+        if (undefined != Props.PositionV) {
+            this.Set_PositionV(Props.PositionV.RelativeFrom, Props.PositionV.UseAlign, ( true === Props.PositionV.UseAlign ? Props.PositionV.Align : Props.PositionV.Value ), Props.PositionV.Percent);
+            if (this.PositionV.UseAlign) {
                 bNeedUpdateWH = true;
-                if(isRealObject(this.GraphicObj.bounds) && isRealNumber(this.GraphicObj.bounds.h))
-                {
+                if (isRealObject(this.GraphicObj.bounds) && isRealNumber(this.GraphicObj.bounds.h)) {
                     newH = this.GraphicObj.bounds.h;
                 }
             }
         }
-        if(undefined != Props.SizeRelH)
-        {
-            this.SetSizeRelH({RelativeFrom: Props.SizeRelH.RelativeFrom, Percent: Props.SizeRelH.Percent});
+        if (undefined != Props.SizeRelH) {
+            this.SetSizeRelH({
+                RelativeFrom: ConvertRelPositionHToRelSize(Props.SizeRelH.RelativeFrom),
+                Percent: Props.SizeRelH.Value / 100.0
+            });
         }
 
-        if(undefined != Props.SizeRelV)
-        {
-            this.SetSizeRelV({RelativeFrom: Props.SizeRelV.RelativeFrom, Percent: Props.SizeRelV.Percent});
+        if (undefined != Props.SizeRelV) {
+            this.SetSizeRelV({
+                RelativeFrom: ConvertRelPositionVToRelSize(Props.SizeRelV.RelativeFrom),
+                Percent: Props.SizeRelV.Value / 100.0
+            });
         }
+
+        if (this.SizeRelH && !this.SizeRelV)
+        {
+            this.SetSizeRelV({RelativeFrom: c_oAscSizeRelFromV.sizerelfromvPage, Percent: 0});
+        }
+
+        if (this.SizeRelV && !this.SizeRelH)
+        {
+            this.SetSizeRelH({RelativeFrom: c_oAscSizeRelFromH.sizerelfromhPage, Percent: 0})
+        }
+
         if(bNeedUpdateWH)
         {
             this.setExtent(newW, newH);

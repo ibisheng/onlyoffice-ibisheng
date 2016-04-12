@@ -11,10 +11,10 @@ var HANDLE_EVENT_MODE_CURSOR = 1;
 
 var DISTANCE_TO_TEXT_LEFTRIGHT = 3.2;
 
-function CheckShapeBodyAutoFitReset(oShape)
+function CheckShapeBodyAutoFitReset(oShape, bNoResetRelSize)
 {
     var oParaDrawing = getParaDrawing(oShape);
-    if(oParaDrawing)
+    if(oParaDrawing && !(bNoResetRelSize === true))
     {
         if(oParaDrawing.SizeRelH)
         {
@@ -87,6 +87,146 @@ function CDistance(L, T, R, B)
 }
 
 
+function ConvertRelPositionHToRelSize(nRelPosition)
+{
+    switch(nRelPosition)
+    {
+        case c_oAscRelativeFromH.InsideMargin:
+        {
+            return c_oAscSizeRelFromH.sizerelfromhInsideMargin;
+        }
+        case c_oAscRelativeFromH.LeftMargin:
+        {
+            return c_oAscSizeRelFromH.sizerelfromhLeftMargin;
+        }
+        case c_oAscRelativeFromH.Margin:
+        {
+            return c_oAscSizeRelFromH.sizerelfromhMargin;
+        }
+        case c_oAscRelativeFromH.OutsideMargin:
+        {
+            return c_oAscSizeRelFromH.sizerelfromhOutsideMargin;
+        }
+        case c_oAscRelativeFromH.Page:
+        {
+            return c_oAscSizeRelFromH.sizerelfromhPage;
+        }
+        case c_oAscRelativeFromH.RightMargin:
+        {
+            return c_oAscSizeRelFromH.sizerelfromhRightMargin;
+        }
+        default:
+        {
+            return c_oAscSizeRelFromH.sizerelfromhPage;
+        }
+    }
+}
+
+function ConvertRelPositionVToRelSize(nRelPosition)
+{
+    switch(nRelPosition)
+    {
+        case c_oAscRelativeFromV.BottomMargin:
+        {
+            return c_oAscSizeRelFromV.sizerelfromvBottomMargin;
+        }
+        case c_oAscRelativeFromV.InsideMargin:
+        {
+            return c_oAscSizeRelFromV.sizerelfromvInsideMargin;
+        }
+        case c_oAscRelativeFromV.Margin:
+        {
+            return c_oAscSizeRelFromV.sizerelfromvMargin;
+        }
+        case c_oAscRelativeFromV.OutsideMargin:
+        {
+            return c_oAscSizeRelFromV.sizerelfromvOutsideMargin;
+        }
+        case c_oAscRelativeFromV.Page:
+        {
+            return c_oAscSizeRelFromV.sizerelfromvPage;
+        }
+        case c_oAscRelativeFromV.TopMargin:
+        {
+            return c_oAscSizeRelFromV.sizerelfromvTopMargin;
+        }
+        default:
+        {
+            return c_oAscSizeRelFromV.sizerelfromvMargin;
+        }
+    }
+}
+
+function ConvertRelSizeHToRelPosition(nRelSize)
+{
+    switch(nRelSize)
+    {
+        case c_oAscSizeRelFromH.sizerelfromhMargin:
+        {
+            return c_oAscRelativeFromH.Margin;
+        }
+        case c_oAscSizeRelFromH.sizerelfromhPage:
+        {
+            return c_oAscRelativeFromH.Page;
+        }
+        case c_oAscSizeRelFromH.sizerelfromhLeftMargin:
+        {
+            return c_oAscRelativeFromH.LeftMargin;
+        }
+        case c_oAscSizeRelFromH.sizerelfromhRightMargin:
+        {
+            return c_oAscRelativeFromH.RightMargin;
+        }
+        case c_oAscSizeRelFromH.sizerelfromhInsideMargin:
+        {
+            return c_oAscRelativeFromH.InsideMargin;
+        }
+        case c_oAscSizeRelFromH.sizerelfromhOutsideMargin:
+        {
+            return c_oAscRelativeFromH.OutsideMargin;
+        }
+        default:
+        {
+            return c_oAscRelativeFromH.Margin;
+        }
+    }
+}
+
+
+function ConvertRelSizeVToRelPosition(nRelSize)
+{
+    switch(nRelSize)
+    {
+        case c_oAscSizeRelFromV.sizerelfromvMargin:
+        {
+            return c_oAscRelativeFromV.Margin;
+        }
+        case c_oAscSizeRelFromV.sizerelfromvPage:
+        {
+            return c_oAscRelativeFromV.Page;
+        }
+        case c_oAscSizeRelFromV.sizerelfromvTopMargin:
+        {
+            return c_oAscRelativeFromV.TopMargin;
+        }
+        case c_oAscSizeRelFromV.sizerelfromvBottomMargin:
+        {
+            return c_oAscRelativeFromV.BottomMargin;
+        }
+        case c_oAscSizeRelFromV.sizerelfromvInsideMargin:
+        {
+            return c_oAscRelativeFromV.InsideMargin;
+        }
+        case c_oAscSizeRelFromV.sizerelfromvOutsideMargin:
+        {
+            return c_oAscRelativeFromV.OutsideMargin;
+        }
+        default:
+        {
+            return c_oAscRelativeFromV.Margin;
+        }
+    }
+}
 
 function checkObjectInArray(aObjects, oObject)
 {
@@ -2015,36 +2155,65 @@ DrawingObjectsController.prototype =
             for(i = 0; i < objects_by_type.shapes.length; ++i)
             {
                 CheckSpPrXfrm(objects_by_type.shapes[i]);
-                objects_by_type.shapes[i].spPr.xfrm.setExtX(props.Width);
-                objects_by_type.shapes[i].spPr.xfrm.setExtY(props.Height);
-                CheckShapeBodyAutoFitReset(objects_by_type.shapes[i]);
+                if(!props.SizeRelH)
+                {
+                    objects_by_type.shapes[i].spPr.xfrm.setExtX(props.Width);
+                    if(objects_by_type.shapes[i].parent instanceof ParaDrawing)
+                    {
+                        objects_by_type.shapes[i].parent.SetSizeRelH({RelativeFrom: c_oAscSizeRelFromH.sizerelfromhPage, Percent: 0})
+                    }
+                }
+                if(!props.SizeRelV)
+                {
+                    objects_by_type.shapes[i].spPr.xfrm.setExtY(props.Height);
+                    if(objects_by_type.shapes[i].parent instanceof ParaDrawing)
+                    {
+                        objects_by_type.shapes[i].parent.SetSizeRelV({RelativeFrom: c_oAscSizeRelFromV.sizerelfromvPage, Percent: 0});
+                    }
+                }
+                if(objects_by_type.shapes[i].parent instanceof ParaDrawing)
+                {
+                    var oDrawing =  objects_by_type.shapes[i].parent;
+                    if (oDrawing.SizeRelH && !oDrawing.SizeRelV)
+                    {
+                        oDrawing.SetSizeRelV({RelativeFrom: c_oAscSizeRelFromV.sizerelfromvPage, Percent: 0});
+                    }
+                    if (oDrawing.SizeRelV && !oDrawing.SizeRelH)
+                    {
+                        oDrawing.SetSizeRelH({RelativeFrom: c_oAscSizeRelFromH.sizerelfromhPage, Percent: 0})
+                    }
+                }
+                CheckShapeBodyAutoFitReset(objects_by_type.shapes[i], true);
                 if(objects_by_type.shapes[i].group)
                 {
                     checkObjectInArray(aGroups, objects_by_type.shapes[i].group.getMainGroup());
                 }
                 objects_by_type.shapes[i].checkDrawingBaseCoords();
             }
-            for(i = 0; i < objects_by_type.images.length; ++i)
+            if(!props.SizeRelH && !props.SizeRelV)
             {
-                CheckSpPrXfrm(objects_by_type.images[i]);
-                objects_by_type.images[i].spPr.xfrm.setExtX(props.Width);
-                objects_by_type.images[i].spPr.xfrm.setExtY(props.Height);
-                if(objects_by_type.images[i].group)
+                for(i = 0; i < objects_by_type.images.length; ++i)
                 {
-                    checkObjectInArray(aGroups, objects_by_type.images[i].group.getMainGroup());
+                    CheckSpPrXfrm(objects_by_type.images[i]);
+                    objects_by_type.images[i].spPr.xfrm.setExtX(props.Width);
+                    objects_by_type.images[i].spPr.xfrm.setExtY(props.Height);
+                    if(objects_by_type.images[i].group)
+                    {
+                        checkObjectInArray(aGroups, objects_by_type.images[i].group.getMainGroup());
+                    }
+                    objects_by_type.images[i].checkDrawingBaseCoords();
                 }
-                objects_by_type.images[i].checkDrawingBaseCoords();
-            }
-            for(i = 0; i < objects_by_type.charts.length; ++i)
-            {
-                CheckSpPrXfrm(objects_by_type.charts[i]);
-                objects_by_type.charts[i].spPr.xfrm.setExtX(props.Width);
-                objects_by_type.charts[i].spPr.xfrm.setExtY(props.Height);
-                if(objects_by_type.charts[i].group)
+                for(i = 0; i < objects_by_type.charts.length; ++i)
                 {
-                    checkObjectInArray(aGroups, objects_by_type.charts[i].group.getMainGroup());
+                    CheckSpPrXfrm(objects_by_type.charts[i]);
+                    objects_by_type.charts[i].spPr.xfrm.setExtX(props.Width);
+                    objects_by_type.charts[i].spPr.xfrm.setExtY(props.Height);
+                    if(objects_by_type.charts[i].group)
+                    {
+                        checkObjectInArray(aGroups, objects_by_type.charts[i].group.getMainGroup());
+                    }
+                    objects_by_type.charts[i].checkDrawingBaseCoords();
                 }
-                objects_by_type.charts[i].checkDrawingBaseCoords();
             }
         }
 
