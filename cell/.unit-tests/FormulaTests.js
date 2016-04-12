@@ -3864,7 +3864,7 @@ $( function () {
             if( settlement >= maturity || pr <= 0 || redemption <= 0 || basis < 0 || basis > 4 )
                 return "#NUM!"
 
-            return ( 1.0 - pr / redemption ) / yearFrac( settlement, maturity, basis );
+            return ( 1.0 - pr / redemption ) / AscCommonExcel.yearFrac( settlement, maturity, basis );
 
         }
 
@@ -3943,7 +3943,7 @@ $( function () {
             if( settlement >= maturity || investment <= 0 || discount <= 0 || basis < 0 || basis > 4 )
                 return "#NUM!"
 
-            return investment / ( 1 - ( discount * yearFrac( settlement, maturity, basis) ) )
+            return investment / ( 1 - ( discount * AscCommonExcel.yearFrac( settlement, maturity, basis) ) )
 
         }
 
@@ -4060,7 +4060,7 @@ $( function () {
             if( settlement >= maturity || investment <= 0 || redemption <= 0 || basis < 0 || basis > 4 )
                 return "#NUM!"
 
-            return ( ( redemption / investment ) - 1 ) / yearFrac( settlement, maturity, basis )
+            return ( ( redemption / investment ) - 1 ) / AscCommonExcel.yearFrac( settlement, maturity, basis )
 
         }
 
@@ -4104,7 +4104,7 @@ $( function () {
             var d1 = settlement
             var d2 = maturity
 
-            var fFraction = yearFrac(d1, d2, 0);
+            var fFraction = AscCommonExcel.yearFrac(d1, d2, 0);
 
             if( fFraction - Math.floor( fFraction ) == 0 )
                 return "#NUM!"

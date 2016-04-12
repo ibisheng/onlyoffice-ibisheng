@@ -1,5 +1,10 @@
 "use strict";
-
+(
+/**
+* @param {Window} window
+* @param {undefined} undefined
+*/
+function (window, undefined) {
 var DayCountBasis = {
     // US 30/360
     UsPsa30_360:0,
@@ -1886,3 +1891,12 @@ cYEARFRAC.prototype.getInfo = function () {
         args:"(  start-date , end-date [ , basis ] )"
     };
 }
+
+//----------------------------------------------------------export----------------------------------------------------
+window['AscCommonExcel'] = window['AscCommonExcel'] || {};
+window['AscCommonExcel'].DayCountBasis = DayCountBasis;
+window['AscCommonExcel'].yearFrac = yearFrac;
+window['AscCommonExcel'].diffDate = diffDate;
+window['AscCommonExcel'].days360 = days360;
+window['AscCommonExcel'].daysInYear = daysInYear;
+})(window);
