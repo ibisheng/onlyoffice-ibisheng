@@ -696,7 +696,7 @@ if (undefined === window['Asc']) {
   window['Asc'] = {};
 }
 window['Asc']['c_oAscWrapStyle2'] = c_oAscWrapStyle2;
-window['Asc']['c_oAscError'] = c_oAscError;
+window['Asc']['c_oAscError'] = window['Asc'].c_oAscError = c_oAscError;
 window['Asc']['c_oAscContextMenuTypes'] = c_oAscContextMenuTypes;
 window['Asc']['c_oAscCollaborativeMarksShowType'] = c_oAscCollaborativeMarksShowType;
 window['Asc']['c_oAscAlignH'] = c_oAscAlignH;
