@@ -62,6 +62,9 @@ CSectionPr.prototype =
 
     Copy : function(Other, CopyHdrFtr)
     {
+        if (!Other)
+            return;
+
         // Тип
         this.Set_Type( Other.Type );
 

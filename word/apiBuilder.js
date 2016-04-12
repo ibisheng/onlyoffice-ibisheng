@@ -82,7 +82,9 @@
         if (!nRows || nRows <= 0 || !nCols || nCols <= 0)
             return null;
 
-        return new ApiTable(new CTable(private_GetDrawingDocument(), private_GetLogicDocument(), true, 0, 0, 0, 0, 0, nRows, nCols, [], false));
+        var oTable = new CTable(private_GetDrawingDocument(), private_GetLogicDocument(), true, 0, 0, 0, 0, 0, nRows, nCols, [], false);
+        oTable.private_RecalculateGridOpen();
+        return new ApiTable(oTable);
     };
 
     //------------------------------------------------------------------------------------------------------------------
@@ -138,11 +140,18 @@
     {
         if (oElement instanceof ApiParagraph || oElement instanceof ApiTable)
         {
-            this.Document.Internal_Content_Add(this.Document.Content.length, oElement.private_GetImpl(), true);
+            this.Document.Internal_Content_Add(this.Document.Content.length, oElement.private_GetImpl(), false);
             return true;
         }
 
         return false;
+    };
+    /**
+     * Remove all elements from the current document.
+     */
+    ApiDocument.prototype["RemoveAllElements"] = function()
+    {
+        this.Document.Content = [];
     };
     /**
      * Get style by style name
@@ -559,6 +568,59 @@
         return new ApiTableRow(this.Table.Content[nPos]);
     };
     /**
+     * Merge array of cells. If merge was done successfully it will reuturn merged cell, otherwise "null".
+     * <b>Warning</b>: The number of cells in any row and the numbers of rows in the current table may be changed.
+     * @param aCells
+     * @returns {ApiTableCell | null}
+     */
+    ApiTable.prototype["MergeCells"] = function(aCells)
+    {
+        var oTable = this.Table;
+        oTable.Selection.Use  = true;
+        oTable.Selection.Type = table_Selection_Cell;
+        oTable.Selection.Data = [];
+
+        for (var nPos = 0, nCount = aCells.length; nPos < nCount; ++nPos)
+        {
+            var oCell = aCells[nPos].Cell;
+            var oPos = {Cell : oCell.Index, Row : oCell.Row.Index};
+
+            var nResultPos    = 0;
+            var nResultLength = oTable.Selection.Data.length;
+            for (nResultPos = 0; nResultPos < nResultLength; ++nResultPos)
+            {
+                var oCurPos = oTable.Selection.Data[nResultPos];
+                if (oCurPos.Row < oPos.Row)
+                {
+                    continue;
+                }
+                else if (oCurPos.Row > oPos.Row)
+                {
+                    break;
+                }
+                else
+                {
+                    if (oCurPos.Cell < oPos.Cell)
+                        continue;
+                    else
+                        break;
+                }
+            }
+
+            oTable.Selection.Data.splice(nResultPos, 0, oPos);
+        }
+
+        this.Table.private_UpdateCellsGrid();
+
+        var isMerged = this.Table.Cell_Merge(true);
+        oTable.Selection_Remove();
+
+        if (true === isMerged)
+            return new ApiTableCell(this.Table.CurCell);
+
+        return null;
+    };
+    /**
      * Set table style
      * @param oStyle (ApiStyle)
      * @return {boolean}
@@ -744,6 +806,63 @@
     {
         return new ApiDocument(this.Cell.Content);
     };
+    /**
+     * Set the preferred width for this cell.
+     * @param sType ("auto" | "twips" | "percent" | "nil")
+     * @param nValue
+     */
+    ApiTableCell.prototype["SetWidth"] = function(sType, nValue)
+    {
+        var CellW = null;
+        if ("auto" === sType)
+            CellW = new CTableMeasurement(tblwidth_Auto, 0);
+        else if ("twips" === sType)
+            CellW = new CTableMeasurement(tblwidth_Mm, private_Twips2MM(nValue));
+        else if ("percent" === sType)
+            CellW = new CTableMeasurement(tblwidth_Pct, nValue);
+
+        if (CellW)
+            this.Cell.Set_W(CellW);
+    };
+    /**
+     * Specify the vertical alignment for text within the current table cell.
+     * @param sType ("top" | "center" | "bottom")
+     */
+    ApiTableCell.prototype["SetVerticalAlign"] = function(sType)
+    {
+        if ("top" === sType)
+            this.Cell.Set_VAlign(vertalignjc_Top);
+        else if ("bottom" === sType)
+            this.Cell.Set_VAlign(vertalignjc_Bottom);
+        else if ("center" === sType)
+            this.Cell.Set_VAlign(vertalignjc_Center);
+    };
+    /**
+     * Specify the shading which shall be applied to the extents of the current table cell.
+     * @param sType ("nil" | "clear")
+     * @param r (0-255)
+     * @param g (0-255)
+     * @param b (0-255)
+     * @param isAuto (true | false)
+     * @constructor
+     */
+    ApiTableCell.prototype["SetShd"] = function(sType, r, g, b, isAuto)
+    {
+        this.Cell.Set_Shd(private_GetShd(sType, r, g, b, isAuto));
+    };
+    /**
+     * Specify the direction of the text flow for this table cell.
+     * @param sType ("lrtb" || "tbrl" || "btlr") default value is "lrtb" (left-right-top-bottom)
+     */
+    ApiTableCell.prototype["SetTextDirection"] = function(sType)
+    {
+        if ("lrtb" === sType)
+            this.Cell.Set_TextDirection(textdirection_LRTB);
+        else if ("tbrl" === sType)
+            this.Cell.Set_TextDirection(textdirection_TBRL);
+        else if ("btlr" === sType)
+            this.Cell.Set_TextDirection(textdirection_BTLR);
+    };
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Private area
@@ -861,6 +980,19 @@
         oBorder.Space = private_Twips2MM(nSpace);
         oBorder.Color.Set(r, g, b);
         return oBorder;
+    }
+
+    function private_GetShd(sType, r, g, b, isAuto)
+    {
+        var oShd = new CDocumentShd();
+
+        if ("nil" === sType)
+            oShd.Value = shd_Nil;
+        else if ("clear" === sType)
+            oShd.Value = shd_Clear;
+
+        oShd.Color.Set(r, g, b, isAuto);
+        return oShd;
     }
 
     ApiParagraph.prototype.private_GetImpl = function()
@@ -1076,36 +1208,169 @@ function TEST_BUILDER()
     oParagraph.AddText("new products.   ");
 
 
+    var oTableGridStyle = oDocument.GetStyle("TableGrid");
     var oTable = Api.CreateTable(2, 2);
     oDocument.Push(oTable);
-    oTable.SetStyle(oDocument.GetStyle("TableGrid"));
+    oTable.SetStyle(oTableGridStyle);
     oTable.SetWidth("twips", 4311);
-    oTable.SetTableLook(true, true, false, false, false, true);
+    oTable.SetTableLook(true, true, false, false, true, false);
     oTable.SetTableBorderTop("single", 4, 0, 0xAF, 0xAD, 0x91);
     oTable.SetTableBorderBottom("single", 4, 0, 0xAF, 0xAD, 0x91);
     oTable.SetTableBorderLeft("single", 4, 0, 0xAF, 0xAD, 0x91);
     oTable.SetTableBorderRight("single", 4, 0, 0xAF, 0xAD, 0x91);
     oTable.SetTableBorderInsideH("single", 4, 0, 0xAF, 0xAD, 0x91);
     oTable.SetTableBorderInsideV("single", 4, 0, 0xAF, 0xAD, 0x91);
-    var oRow1 = oTable.GetRow(0);
-    if (oRow1)
+    var oRow = oTable.GetRow(0), oCell, oCellContent;
+    if (oRow)
     {
-        oRow1.SetHeight("atLeast", 201);
-        var oCell = oRow1.GetCell(0);
-        var oCellContent = oCell.GetContent();
-
+        oRow.SetHeight("atLeast", 201);
+        oCell = oRow.GetCell(0);
+        oCell.SetWidth("twips", 1637);
+        oCell.SetShd("clear", 0xff, 0x68, 0x00, false);
+        oCell.SetVerticalAlign("center");
+        oCellContent = oCell.GetContent();
         oParagraph = oCellContent.GetElement(0);
         oParagraph.SetJc("center");
         oRun = oParagraph.AddText("2014");
         oRun.SetBold(true);
         oRun.SetColor(0, 0, 0, false);
+
+        oCell = oRow.GetCell(1);
+        oCell.SetWidth("twips", 2674);
+        oCell.SetShd("clear", 0xff, 0x68, 0x00, false);
+        oCell.SetVerticalAlign("center");
+        oCellContent = oCell.GetContent();
+        oParagraph = oCellContent.GetElement(0);
+        oParagraph.SetJc("center");
+        oRun = oParagraph.AddText("2015");
+        oRun.SetBold(true);
+        oRun.SetColor(0, 0, 0, false);
     }
-    var oRow2 = oTable.GetRow(1);
-    if (oRow2)
+    oRow = oTable.GetRow(1);
+    if (oRow)
     {
-        oRow2.SetHeight("atLeast", 1070);
+        oRow.SetHeight("atLeast", 1070);
+        oCell = oRow.GetCell(0);
+        oCell.SetWidth("twips", 1637);
+        oCell.SetVerticalAlign("center");
+        oCellContent = oCell.GetContent();
+        oParagraph = oCellContent.GetElement(0);
+        oParagraph.SetJc("center");
+        oParagraph.AddText("All Projects");
+        oParagraph.AddLineBreak();
+        oParagraph.AddText("Pending");
+
+
+        oCell = oRow.GetCell(1);
+        oCell.SetWidth("twips", 2674);
+        oCell.SetShd("clear", 0, 0, 0, true);
+        oCell.SetVerticalAlign("center");
+        oCellContent = oCell.GetContent();
+        oCellContent.RemoveAllElements();
+        var oInnerTable = Api.CreateTable(3, 3);
+        oCellContent.Push(oInnerTable);
+        oInnerTable.SetStyle(oTableGridStyle);
+        oInnerTable.SetWidth("twips", 2448);
+        oInnerTable.SetTableLook(true, true, false, false, true, false);
+        var oMergeCells = [];
+        oRow = oInnerTable.GetRow(0);
+        if(oRow)
+        {
+            oRow.SetHeight("atLeast", 201);
+            oCell = oRow.GetCell(0);
+            if (oCell)
+            {
+                oMergeCells.push(oCell);
+            }
+            oCell = oRow.GetCell(1);
+            if (oCell)
+            {
+                oCell.SetWidth("twips", 865);
+                oCell.SetShd("clear", 0xFF, 0xc2, 0x99, false);
+                oCellContent = oCell.GetContent();
+                oParagraph = oCellContent.GetElement(0);
+                oParagraph.AddText("West");
+            }
+            oCell = oRow.GetCell(2);
+            if (oCell)
+            {
+                oCell.SetWidth("twips", 1092);
+                oCell.SetShd("clear", 0xff, 0xe0, 0xcc, false);
+                oCellContent = oCell.GetContent();
+                oParagraph = oCellContent.GetElement(0);
+                oParagraph.AddText("Approved");
+            }
+        }
+        oRow = oInnerTable.GetRow(1);
+        if (oRow)
+        {
+            oRow.SetHeight("atLeast", 196);
+            oCell = oRow.GetCell(0);
+            if (oCell)
+            {
+                oMergeCells.push(oCell);
+            }
+
+            oCell = oRow.GetCell(1);
+            if (oCell)
+            {
+                oCell.SetWidth("twips", 865);
+                oCell.SetShd("clear", 0xFF, 0xc2, 0x99, false);
+                oCellContent = oCell.GetContent();
+                oParagraph = oCellContent.GetElement(0);
+                oParagraph.AddText("Central");
+            }
+            oCell = oRow.GetCell(2);
+            if (oCell)
+            {
+                oCell.SetWidth("twips", 1092);
+                oCell.SetShd("clear", 0xff, 0xe0, 0xcc, false);
+                oCellContent = oCell.GetContent();
+                oParagraph = oCellContent.GetElement(0);
+                oParagraph.AddText("Pending");
+            }
+        }
+        oRow = oInnerTable.GetRow(2);
+        if (oRow)
+        {
+            oRow.SetHeight("atLeast", 196);
+            oCell = oRow.GetCell(0);
+            if (oCell)
+            {
+                oMergeCells.push(oCell);
+            }
+            oCell = oRow.GetCell(1);
+            if (oCell)
+            {
+                oCell.SetWidth("twips", 865);
+                oCell.SetShd("clear", 0xFF, 0xc2, 0x99, false);
+                oCellContent = oCell.GetContent();
+                oParagraph = oCellContent.GetElement(0);
+                oParagraph.AddText("East");
+            }
+            oCell = oRow.GetCell(2);
+            if (oCell)
+            {
+                oCell.SetWidth("twips", 1092);
+                oCell.SetShd("clear", 0xff, 0xe0, 0xcc, false);
+                oCellContent = oCell.GetContent();
+                oParagraph = oCellContent.GetElement(0);
+                oParagraph.AddText("Approved");
+            }
+        }
+        var oMergedCell = oInnerTable.MergeCells(oMergeCells);
+        oMergedCell.SetVerticalAlign("center");
+        oMergedCell.SetTextDirection("btlr");
+        oMergedCell.SetWidth("twips", 491);
+        oMergedCell.SetShd("clear", 0xff, 0xa4, 0x66, false);
+        oCellContent = oMergedCell.GetContent();
+        oParagraph = oCellContent.GetElement(0);
+        oParagraph.SetIndLeft(113);
+        oParagraph.SetIndRight(113);
+        oParagraph.SetJc("center");
+        oRun = oParagraph.AddText("USA");
+        oRun.SetBold(true);
     }
-    // TODO: Добавить таблицу
 
 
     oParagraph = Api.CreateParagraph();

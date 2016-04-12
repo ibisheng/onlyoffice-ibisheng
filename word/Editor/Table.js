@@ -9746,18 +9746,21 @@ CTable.prototype =
         return { Grid_start : Grid_start, Grid_end : Grid_end, RowsInfo : RowsInfo, bCanMerge : bCanMerge };
     },
 
-    // Объединяем заселекченные ячейки
-    Cell_Merge : function()
+    /**
+     * Объединяем выделенные ячейки таблицы.
+     * @param isClearMerge - используем или нет рассчетные данные (true - не используем, false - default value)
+     */
+    Cell_Merge : function(isClearMerge)
     {
         var bApplyToInnerTable = false;
         if ( false === this.Selection.Use || ( true === this.Selection.Use && table_Selection_Text === this.Selection.Type ) )
             bApplyToInnerTable = this.CurCell.Content.Table_MergeCells();
 
         if ( true === bApplyToInnerTable )
-            return;
+            return false;
 
         if ( true != this.Selection.Use || table_Selection_Cell != this.Selection.Type || this.Selection.Data.length <= 1 )
-            return;
+            return false;
 
         // В массиве this.Selection.Data идет список ячеек по строкам (без разрывов)
         // Перед объединением мы должны проверить совпадают ли начальная и конечная колонки
@@ -9769,7 +9772,7 @@ CTable.prototype =
         var RowsInfo   = Temp.RowsInfo;
 
         if ( false === bCanMerge )
-            return;
+            return false;
 
         // Объединяем содержимое всех ячеек в левую верхнюю ячейку. (Все выделенные
         // ячейки идут у нас последовательно, начиная с левой верхней), и объединяем
@@ -9792,13 +9795,16 @@ CTable.prototype =
             }
         }
 
-        // Выставим ширину результируещей ячейки
-        var SumW = 0;
-        for (var CurGridCol = Grid_start; CurGridCol <= Grid_end; CurGridCol++)
+        if (true !== isClearMerge)
         {
-            SumW += this.TableGridCalc[CurGridCol];
+            // Выставим ширину результируещей ячейки
+            var SumW = 0;
+            for (var CurGridCol = Grid_start; CurGridCol <= Grid_end; CurGridCol++)
+            {
+                SumW += this.TableGridCalc[CurGridCol];
+            }
+            Cell_tl.Set_W(new CTableMeasurement(tblwidth_Mm, SumW));
         }
-        Cell_tl.Set_W(new CTableMeasurement(tblwidth_Mm, SumW));
 
         // Теперь нам надо удалить лишние ячейки и добавить ячейки с
         // вертикальным объединением.
@@ -9832,16 +9838,9 @@ CTable.prototype =
             }
         }
 
-        // У ряда, который содержит полученную ячейку мы выставляем минимальную высоту
-        // сумму высот объединенных строк.
-        //var Summary_VMerge = this.Internal_GetVertMergeCount( Pos_tl.Row, Grid_start, Grid_end - Grid_start + 1 );
-        //var Summary_Height = this.RowsInfo[Pos_tl.Row + Summary_VMerge - 1].H + this.RowsInfo[Pos_tl.Row + Summary_VMerge - 1].Y - this.RowsInfo[Pos_tl.Row].Y;
-
         // Удаляем лишние строки
-        this.Internal_Check_TableRows(true);
-
-        var PageNum = 0;
-        for ( PageNum = 0; PageNum < this.Pages.length - 1; PageNum++ )
+        this.Internal_Check_TableRows(true !== isClearMerge ? true : false);
+        for (var PageNum = 0; PageNum < this.Pages.length - 1; PageNum++ )
         {
             if ( Pos_tl.Row <= this.Pages[PageNum + 1].FirstRow )
                 break;
@@ -9855,9 +9854,14 @@ CTable.prototype =
         this.Selection.Data = [ Pos_tl ];
 
         this.CurCell = Cell_tl;
-        
-        // Запускаем пересчет
-        this.Internal_Recalculate_1();
+
+        if (true !== isClearMerge)
+        {
+            // Запускаем пересчет
+            this.Internal_Recalculate_1();
+        }
+
+        return true;
     },
 
     // Разделяем текущую ячейку
@@ -13291,6 +13295,24 @@ CTable.prototype.Is_TableFirstRowOnNewPage = function(CurRow)
     }
 
     return false;
+};
+CTable.prototype.private_UpdateCellsGrid = function()
+{
+    for (var nCurRow = 0, nRowsCount = this.Content.length; nCurRow < nRowsCount; ++nCurRow)
+    {
+        var Row        = this.Content[nCurRow];
+        var BeforeInfo = Row.Get_Before();
+        var CurGridCol = BeforeInfo.GridBefore;
+
+        for (var nCurCell = 0, nCellsCount = Row.Get_CellsCount(); nCurCell < nCellsCount; ++nCurCell)
+        {
+            var Cell = Row.Get_Cell(nCurCell);
+            var GridSpan = Cell.Get_GridSpan();
+            Cell.Set_Metrics(CurGridCol, 0, 0, 0, 0, 0, 0);
+            Row.Update_CellInfo(nCurCell);
+            CurGridCol += GridSpan;
+        }
+    }
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Класс  CTableLook
