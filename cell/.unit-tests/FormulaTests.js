@@ -241,9 +241,9 @@ $( function () {
 
     function _getprice( nSettle, nMat, fRate, fYield, fRedemp, nFreq, nBase ){
 
-        var fdays = getcoupdays( new Date(nSettle), new Date(nMat), nFreq, nBase ),
-            fdaybs = getcoupdaybs( new Date(nSettle), new Date(nMat), nFreq, nBase ),
-            fnum = getcoupnum( new Date(nSettle), (nMat), nFreq, nBase ),
+        var fdays = AscCommonExcel.getcoupdays( new Date(nSettle), new Date(nMat), nFreq, nBase ),
+            fdaybs = AscCommonExcel.getcoupdaybs( new Date(nSettle), new Date(nMat), nFreq, nBase ),
+            fnum = AscCommonExcel.getcoupnum( new Date(nSettle), (nMat), nFreq, nBase ),
             fdaysnc = ( fdays - fdaybs ) / fdays,
             fT1 = 100 * fRate / nFreq,
             fT2 = 1 + fYield / nFreq,
@@ -347,9 +347,9 @@ $( function () {
     }
 
     function _duration( settlement, maturity, coupon, yld, frequency, basis ){
-        var dbc = getcoupdaybs(new Date( settlement ),new Date( maturity ),frequency,basis),
-            coupD = getcoupdays(new Date( settlement ),new Date( maturity ),frequency,basis),
-            numCoup = getcoupnum(new Date( settlement ),new Date( maturity ),frequency);
+        var dbc = AscCommonExcel.getcoupdaybs(new Date( settlement ),new Date( maturity ),frequency,basis),
+            coupD = AscCommonExcel.getcoupdays(new Date( settlement ),new Date( maturity ),frequency,basis),
+            numCoup = AscCommonExcel.getcoupnum(new Date( settlement ),new Date( maturity ),frequency);
 
         if ( settlement >= maturity || basis < 0 || basis > 4 || ( frequency != 1 && frequency != 2 && frequency != 4 ) || yld < 0 || coupon < 0 ){
             return "#NUM!";
@@ -4509,8 +4509,8 @@ $( function () {
             if( fv == undefined ) fv = 0;
             if( type == undefined ) type = 0;
 
-            var res = getPMT(rate, nper, pv, fv, type);
-            res = getIPMT(rate, per, pv, type, res);
+            var res = AscCommonExcel.getPMT(rate, nper, pv, fv, type);
+            res = AscCommonExcel.getIPMT(rate, per, pv, type, res);
 
             return res;
 
