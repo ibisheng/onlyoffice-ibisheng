@@ -904,7 +904,7 @@
 									{
 										if (0 === window.GlobalPasteFlagCounter)
 										{
-											SafariIntervalFocus2();
+											AscCommonExcel.SafariIntervalFocus2();
 											window.GlobalPasteFlag = true;
 											t.handlers.trigger("paste");
 										}
