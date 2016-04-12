@@ -1,10 +1,3 @@
-/**
- * Created with JetBrains WebStorm.
- * User: Dmitry.Shahtanov
- * Date: 03.02.14
- * Time: 14:26
- * To change this template use File | Settings | File Templates.
- */
 "use strict";
 (
 /**
