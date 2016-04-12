@@ -1,5 +1,11 @@
 "use strict";
 
+(
+/**
+* @param {Window} window
+* @param {undefined} undefined
+*/
+function (window, undefined) {
 cFormulaFunctionGroup['Logical'] = cFormulaFunctionGroup['Logical'] || [];
 cFormulaFunctionGroup['Logical'].push(
     cAND,
@@ -417,3 +423,4 @@ cTRUE.prototype.getInfo = function () {
         args:"()"
     };
 };
+})(window);
