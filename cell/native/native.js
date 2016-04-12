@@ -5742,7 +5742,7 @@ function offline_stz(v) {_s.zoom = v; _api.asc_setZoom(v);}
 function offline_ds(x, y, width, height, ratio, istoplayer) {_s.drawSheet(x, y, width, height, ratio, istoplayer);}
 function offline_dh(x, y, width, height, type, ratio) {_s.drawHeader(x, y, width, height, type, ratio);}
 
-function offline_mouse_down(x, y, pin, isViewerMode, isFormulaEditMode, isRangeResize, isChartRange, indexRange, resizeRange, targetCol, targetRow) {
+function offline_mouse_down(x, y, pin, isViewerMode, isFormulaEditMode, isRangeResize, isChartRange, indexRange, resizeRange, targetCol, targetRow, select) {
     _s.isShapeAction = false;
 
     var ws = _api.wb.getWorksheet();
@@ -5758,11 +5758,26 @@ function offline_mouse_down(x, y, pin, isViewerMode, isFormulaEditMode, isRangeR
     ws.objectRender.drawingArea.reinitRanges();
     var graphicsInfo = wb._onGetGraphicsInfo(x, y);
     if (graphicsInfo) {
+        ws.arrActiveChartsRanges = [];
+        window.AscDisableTextSelection = true;
+
         var e = {isLocked:true, Button:0, ClickCount:1, shiftKey:false, metaKey:false, ctrlKey:false};
 
-        ws.arrActiveChartsRanges = [];
+        var content = null;
 
-        window.AscDisableTextSelection = true;
+        if (1 === select.pin) {
+            content = ws.objectRender.controller.getTargetDocContent();
+            wb._onGraphicObjectMouseDown(e, select.beginX, select.beginY);
+            wb._onGraphicObjectMouseUp(e, select.endX, select.endY);
+            e.shiftKey = true;
+        }
+
+        if (-1 === select.pin) {
+            content = ws.objectRender.controller.getTargetDocContent();
+            wb._onGraphicObjectMouseDown(e, select.endX, select.endY);
+            wb._onGraphicObjectMouseUp(e, select.beginX, select.beginY);
+            e.shiftKey = true;
+        }
 
         wb._onGraphicObjectMouseDown(e, x, y);
         wb._onUpdateSelectionShape(true);
@@ -5779,6 +5794,7 @@ function offline_mouse_down(x, y, pin, isViewerMode, isFormulaEditMode, isRangeR
         }
 
         var ischart = false;
+        var isimage = false;
         var controller = ws.objectRender.controller;
         var selected_objects = controller.selection.groupSelection ? controller.selection.groupSelection.selectedObjects : controller.selectedObjects;
         if (selected_objects.length === 1 && selected_objects[0].getObjectType() === historyitem_type_ChartSpace) {
@@ -5790,8 +5806,14 @@ function offline_mouse_down(x, y, pin, isViewerMode, isFormulaEditMode, isRangeR
                 window.AscAlwaysSaveAspectOnResizeTrack = false;
             }
         }
+        else if (selected_objects.length === 1 && selected_objects[0].getObjectType() === historyitem_type_ImageShape) {
+            isimage = true;
+        }
 
-        return {id:graphicsInfo.id, ischart:ischart, 'textselect':(null !== ws.objectRender.controller.selection.textSelection)};
+        return {id:graphicsInfo.id, ischart:ischart, isimage:isimage,
+            'textselect':(null !== ws.objectRender.controller.selection.textSelection),
+            'chartselect':(null !== ws.objectRender.controller.selection.chartSelection)
+        };
     }
 
     _s.cellPin = pin;
@@ -5851,7 +5873,7 @@ function offline_mouse_down(x, y, pin, isViewerMode, isFormulaEditMode, isRangeR
 
     return null;
 }
-function offline_mouse_move(x, y, isViewerMode, isRangeResize, isChartRange, indexRange, resizeRange, targetCol, targetRow) {
+function offline_mouse_move(x, y, isViewerMode, isRangeResize, isChartRange, indexRange, resizeRange, targetCol, targetRow, textPin) {
     var ws = _api.wb.getWorksheet();
     var wb = _api.wb;
 
@@ -5880,7 +5902,6 @@ function offline_mouse_move(x, y, isViewerMode, isRangeResize, isChartRange, ind
 
         if (_s.isShapeAction) {
             if (!isViewerMode) {
-
                 var e = {isLocked: true, Button: 0, ClickCount: 1, shiftKey: false, metaKey: false, ctrlKey: false};
                 ws.objectRender.graphicObjectMouseMove(e, x, y);
             }
@@ -6486,7 +6507,7 @@ function offline_paste(params) {
     }
     else if (2 == type)
     {
-        _api.wb.clipboard._pasteFromBinaryExcel(worksheet, params[1]);
+        _api.wb.clipboard._pasteFromBinaryExcel(worksheet, params[1], null, true);
     }
 }
 function offline_cut() {
