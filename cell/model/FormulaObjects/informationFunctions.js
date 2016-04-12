@@ -1,5 +1,11 @@
 "use strict";
 
+(
+/**
+* @param {Window} window
+* @param {undefined} undefined
+*/
+function (window, undefined) {
 cFormulaFunctionGroup['Information'] = cFormulaFunctionGroup['Information'] || [];
 cFormulaFunctionGroup['Information'].push(
     cERROR_TYPE,
@@ -710,3 +716,4 @@ cTYPE.prototype.getInfo = function () {
         args:"(value)"
     };
 };
+})(window);
