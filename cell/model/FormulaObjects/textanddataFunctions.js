@@ -1,5 +1,11 @@
 "use strict";
 
+(
+/**
+* @param {Window} window
+* @param {undefined} undefined
+*/
+function (window, undefined) {
 cFormulaFunctionGroup['TextAndData'] = cFormulaFunctionGroup['TextAndData'] || [];
 cFormulaFunctionGroup['TextAndData'].push(
     cASC,
@@ -1824,3 +1830,4 @@ cVALUE.prototype.getInfo = function () {
         args:"( string )"
     };
 };
+})(window);
