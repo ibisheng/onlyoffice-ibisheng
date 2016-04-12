@@ -11192,12 +11192,12 @@ CDocument.prototype =
             bUpdateSelection = false;
             bRetValue = keydownresult_PreventAll;
         }
-        else if (e.KeyCode === 113)
-        {
-            // Для теста
-            TEST_BUILDER();
-            bRetValue = keydownresult_PreventAll;
-        }
+        //else if (e.KeyCode === 113)
+        //{
+        //    // Для теста
+        //    TEST_BUILDER();
+        //    bRetValue = keydownresult_PreventAll;
+        //}
         else if ( e.KeyCode == 121 && true === e.ShiftKey ) // Shift + F10 - контекстное меню
         {
             var X_abs, Y_abs, oPosition, ConvertedPos;

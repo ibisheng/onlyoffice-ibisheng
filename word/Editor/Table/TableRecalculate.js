@@ -686,7 +686,15 @@ CTable.prototype.private_RecalculateGrid = function()
             // максимальным значениям.
             if (tblwidth_Mm === TablePr.TableW.Type || tblwidth_Pct === TablePr.TableW.Type)
             {
-                if (SumMin >= TableW)
+                if (SumMin < 0.001 && SumMax < 0.001)
+                {
+                    // Распределяем ширину по количеству колонок
+                    for (var CurCol = 0; CurCol < GridCount; ++CurCol)
+                    {
+                        this.TableGridCalc[CurCol] = TableW / GridCount;
+                    }
+                }
+                else if (SumMin >= TableW)
                 {
                     // Выставляем минимальные значения
                     for (var CurCol = 0; CurCol < GridCount; ++CurCol)
