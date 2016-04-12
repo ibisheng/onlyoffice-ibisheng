@@ -4730,6 +4730,14 @@ ParaDrawing.prototype =
         }
         c.Set_BehindDoc(this.behindDoc);
         c.Set_RelativeHeight(this.RelativeHeight);
+        if(this.SizeRelH)
+        {
+            c.SetSizeRelH({RelativeFrom: this.SizeRelH.RelativeFrom, Percent: this.SizeRelH.Percent});
+        }
+        if(this.SizeRelV)
+        {
+            c.SetSizeRelV({RelativeFrom: this.SizeRelV.RelativeFrom, Percent: this.SizeRelV.Percent});
+        }
         if(isRealNumber(this.Extent.W) && isRealNumber(this.Extent.H))
         {
             c.setExtent(this.Extent.W, this.Extent.H);

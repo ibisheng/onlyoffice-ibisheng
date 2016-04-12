@@ -512,7 +512,7 @@ CGraphicObjects.prototype =
         {
             this.selectedObjects[i].parent.Set_Props(oProps);
         }
-        if(isRealNumber(oProps.Width) && isRealNumber(oProps.Height))
+        if(isRealNumber(oProps.Width) || isRealNumber(oProps.Height))
         {
             oApplyProps = oProps;
         }
@@ -521,7 +521,7 @@ CGraphicObjects.prototype =
             oApplyProps = oProps.ShapeProperties ? oProps.ShapeProperties : oProps;
         }
         this.applyDrawingProps(oApplyProps);
-        if(isRealNumber(oApplyProps.Width) && isRealNumber(oApplyProps.Height))
+        if(isRealNumber(oApplyProps.Width) || isRealNumber(oApplyProps.Height))
         {
             /*в случае если в насторойках ParaDrawing стоит UseAlign - пересчитываем drawing, т. к. ширина и высото ParaDrawing рассчитывается по bounds*/
             var aSelectedObjects = this.selectedObjects;
