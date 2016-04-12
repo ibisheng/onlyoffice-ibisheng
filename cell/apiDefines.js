@@ -1,5 +1,11 @@
 "use strict";
 
+(
+/**
+* @param {Window} window
+* @param {undefined} undefined
+*/
+function (window, undefined) {
 // Используем [] вместо new Array() для ускорения (http://jsperf.com/creation-array)
 // Используем {} вместо new Object() для ускорения (http://jsperf.com/creation-object)
 var c_oAscError = {
@@ -301,7 +307,7 @@ var c_oAscCoAuthoringDottedWidth = 4;
 var c_oAscCoAuthoringDottedDistance = 2;
 
 var c_oAscFormulaRangeBorderColor = [
-  new window["CColor"](95, 140, 237), 
+  new window["CColor"](95, 140, 237),
   new window["CColor"](235, 94, 96),
   new window["CColor"](141, 97, 194),
   new window["CColor"](45, 150, 57),
@@ -334,29 +340,48 @@ var c_oAscPopUpSelectorType = {
   Range: 2,
   Table: 3
 };
+  //----------------------------------------------------------export----------------------------------------------------
+  window['AscCommonExcel'] = window['AscCommonExcel'] || {};
+  window['AscCommonExcel'].c_oAscAlignType = c_oAscAlignType;
+  window['AscCommonExcel'].c_oAscSortOptions = c_oAscSortOptions;
+  window['AscCommonExcel'].c_oAscDrawDepOptions = c_oAscDrawDepOptions;
+  window['AscCommonExcel'].c_oAscGraphicOption = c_oAscGraphicOption;
+  window['AscCommonExcel'].c_oAscLockTypeElem = c_oAscLockTypeElem;
+  window['AscCommonExcel'].c_oAscLockTypeElemSubType = c_oAscLockTypeElemSubType;
+  window['AscCommonExcel'].c_oAscRecalcIndexTypes = c_oAscRecalcIndexTypes;
+  window['AscCommonExcel'].c_oAscCellEditorSelectState = c_oAscCellEditorSelectState;
+  window['AscCommonExcel'].c_oAscCanChangeColWidth = c_oAscCanChangeColWidth;
+  window['AscCommonExcel'].c_oAscPaneState = c_oAscPaneState;
+  window['AscCommonExcel'].c_oTargetType = c_oTargetType;
+  window['AscCommonExcel'].c_oAscCoAuthoringMeBorderColor = c_oAscCoAuthoringMeBorderColor;
+  window['AscCommonExcel'].c_oAscCoAuthoringOtherBorderColor = c_oAscCoAuthoringOtherBorderColor;
+  window['AscCommonExcel'].c_oAscCoAuthoringLockTablePropertiesBorderColor = c_oAscCoAuthoringLockTablePropertiesBorderColor;
+  window['AscCommonExcel'].c_oAscCoAuthoringDottedWidth = c_oAscCoAuthoringDottedWidth;
+  window['AscCommonExcel'].c_oAscCoAuthoringDottedDistance = c_oAscCoAuthoringDottedDistance;
+  window['AscCommonExcel'].c_oAscFormulaRangeBorderColor = c_oAscFormulaRangeBorderColor;
+  window['AscCommonExcel'].c_oAscLockNameFrozenPane = c_oAscLockNameFrozenPane;
+  window['AscCommonExcel'].c_oAscLockNameTabColor = c_oAscLockNameTabColor;
 
-//------------------------------------------------------------export---------------------------------------------------
-if (undefined === window['Asc']) {
-  window['Asc'] = {};
-}
-window['Asc']['c_oAscError'] = c_oAscError;
-window['Asc']['c_oAscConfirm'] = c_oAscConfirm;
-window['Asc']['c_oAscMergeOptions'] = c_oAscMergeOptions;
-window['Asc']['c_oAscInsertOptions'] = c_oAscInsertOptions;
-window['Asc']['c_oAscDeleteOptions'] = c_oAscDeleteOptions;
-window['Asc']['c_oAscBorderOptions'] = c_oAscBorderOptions;
-window['Asc']['c_oAscCleanOptions'] = c_oAscCleanOptions;
-window['Asc']['c_oAscSelectionType'] = c_oAscSelectionType;
-window['Asc']['c_oAscSelectionDialogType'] = c_oAscSelectionDialogType;
-window['Asc']['c_oAscHyperlinkType'] = c_oAscHyperlinkType;
-window['Asc']['c_oAscMouseMoveType'] = c_oAscMouseMoveType;
-window['Asc']['c_oAscMouseMoveLockedObjectType'] = c_oAscMouseMoveLockedObjectType;
-window['Asc']['c_oAscPrintType'] = c_oAscPrintType;
-window['Asc']['c_oAscCustomAutoFilter'] = c_oAscCustomAutoFilter;
-window['Asc']['c_oAscChangeFilterOptions'] = c_oAscChangeFilterOptions;
-window['Asc']['c_oAscCellEditorState'] = c_oAscCellEditorState;
-window['Asc']['c_oAscAutoFilterTypes'] = c_oAscAutoFilterTypes;
-window['Asc']['c_oAscFindLookIn'] = c_oAscFindLookIn;
-window['Asc']['c_oAscGetDefinedNamesList'] = c_oAscGetDefinedNamesList;
-window['Asc']['c_oAscDefinedNameReason'] = c_oAscDefinedNameReason;
-window['Asc']['c_oAscPopUpSelectorType'] = c_oAscPopUpSelectorType;
+  window['Asc'] = window['Asc'] || {};
+  window['Asc']['c_oAscError'] = c_oAscError;
+  window['Asc']['c_oAscConfirm'] = c_oAscConfirm;
+  window['Asc']['c_oAscMergeOptions'] = c_oAscMergeOptions;
+  window['Asc']['c_oAscInsertOptions'] = c_oAscInsertOptions;
+  window['Asc']['c_oAscDeleteOptions'] = c_oAscDeleteOptions;
+  window['Asc']['c_oAscBorderOptions'] = c_oAscBorderOptions;
+  window['Asc']['c_oAscCleanOptions'] = c_oAscCleanOptions;
+  window['Asc']['c_oAscSelectionType'] = c_oAscSelectionType;
+  window['Asc']['c_oAscSelectionDialogType'] = c_oAscSelectionDialogType;
+  window['Asc']['c_oAscHyperlinkType'] = c_oAscHyperlinkType;
+  window['Asc']['c_oAscMouseMoveType'] = c_oAscMouseMoveType;
+  window['Asc']['c_oAscMouseMoveLockedObjectType'] = c_oAscMouseMoveLockedObjectType;
+  window['Asc']['c_oAscPrintType'] = c_oAscPrintType;
+  window['Asc']['c_oAscCustomAutoFilter'] = c_oAscCustomAutoFilter;
+  window['Asc']['c_oAscChangeFilterOptions'] = c_oAscChangeFilterOptions;
+  window['Asc']['c_oAscCellEditorState'] = c_oAscCellEditorState;
+  window['Asc']['c_oAscAutoFilterTypes'] = c_oAscAutoFilterTypes;
+  window['Asc']['c_oAscFindLookIn'] = c_oAscFindLookIn;
+  window['Asc']['c_oAscGetDefinedNamesList'] = c_oAscGetDefinedNamesList;
+  window['Asc']['c_oAscDefinedNameReason'] = c_oAscDefinedNameReason;
+  window['Asc']['c_oAscPopUpSelectorType'] = c_oAscPopUpSelectorType;
+})(window);

@@ -3714,12 +3714,12 @@ function OfflineEditor () {
                 return;
             }
 
-            if (c_oAscSelectionType.RangeMax === this.activeRange.type) {
+            if (Asc.c_oAscSelectionType.RangeMax === this.activeRange.type) {
                 this.activeRange.c2 = this.cols.length - 1;
                 this.activeRange.r2 = this.rows.length - 1;
-            } else if (c_oAscSelectionType.RangeCol === this.activeRange.type) {
+            } else if (Asc.c_oAscSelectionType.RangeCol === this.activeRange.type) {
                 this.activeRange.r2 = this.rows.length - 1;
-            } else if (c_oAscSelectionType.RangeRow === this.activeRange.type) {
+            } else if (Asc.c_oAscSelectionType.RangeRow === this.activeRange.type) {
                 this.activeRange.c2 = this.cols.length - 1;
             }
 
@@ -4137,12 +4137,12 @@ function OfflineEditor () {
         asc.WorksheetView.prototype.__chartsRanges = function(ranges) {
 
             if (ranges) {
-                return this.__drawFormulaRanges(ranges, 0, 0, c_oAscSelectionType.RangeChart);
+                return this.__drawFormulaRanges(ranges, 0, 0, Asc.c_oAscSelectionType.RangeChart);
             }
 
             if (asc["editor"].isStartAddShape || this.objectRender.selectedGraphicObjectsExists()) {
                 if (this.isChartAreaEditMode && this.arrActiveChartsRanges.length) {
-                    return this.__drawFormulaRanges(this.arrActiveChartsRanges, 0, 0, c_oAscSelectionType.RangeChart);
+                    return this.__drawFormulaRanges(this.arrActiveChartsRanges, 0, 0, Asc.c_oAscSelectionType.RangeChart);
                 }
             }
 
@@ -4783,7 +4783,7 @@ function OfflineEditor () {
         };
         if (_api.isHidden) {
             var sheetId = _api.wbModel.getWorksheet(index).getId();
-            var lockInfo = _api.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Sheet, /*subType*/null, sheetId, sheetId);
+            var lockInfo = _api.collaborativeEditing.getLockInfo(AscCommonExcel.c_oAscLockTypeElem.Sheet, /*subType*/null, sheetId, sheetId);
             _api._getIsLockObjectSheet(lockInfo, showWorksheetCallback);
         }
         else
@@ -4804,9 +4804,9 @@ function OfflineEditor () {
         stream["ClearNoAttack"]();
 
         var SelectedObjects = [], selectType = info.asc_getFlags().asc_getSelectionType();
-        if (selectType == c_oAscSelectionType.RangeImage || selectType == c_oAscSelectionType.RangeShape ||
-            selectType == c_oAscSelectionType.RangeChart || selectType == c_oAscSelectionType.RangeChartText ||
-            selectType == c_oAscSelectionType.RangeShapeText)
+        if (selectType == Asc.c_oAscSelectionType.RangeImage || selectType == Asc.c_oAscSelectionType.RangeShape ||
+            selectType == Asc.c_oAscSelectionType.RangeChart || selectType == Asc.c_oAscSelectionType.RangeChartText ||
+            selectType == Asc.c_oAscSelectionType.RangeShapeText)
         {
             SelectedObjects = _api.asc_getGraphicObjectProps();
 
@@ -4928,7 +4928,7 @@ function OfflineEditor () {
             var addImageObject = function (_image) {
 
                 //if (!_image.Image) {
-                //    worksheet.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.UplImageUrl, c_oAscError.Level.NoCritical);
+                //    worksheet.model.workbook.handlers.trigger("asc_onError", Asc.c_oAscError.ID.UplImageUrl, Asc.c_oAscError.Level.NoCritical);
                 //} else {
 
                 var drawingObject = _this.createDrawingObject();
@@ -6196,7 +6196,7 @@ function offline_cell_editor_process_input_commands(commands, width, height, rat
             // SELECT_WORD
             case 7: {
 
-                cellEditor.isSelectMode = c_oAscCellEditorSelectState.word;
+                cellEditor.isSelectMode = AscCommonExcel.c_oAscCellEditorSelectState.word;
                 // Окончание слова
                 var endWord = cellEditor.textRender.getNextWord(cellEditor.cursorPos);
                 // Начало слова (ищем по окончанию, т.к. могли попасть в пробел)
@@ -6413,13 +6413,13 @@ function offline_insertFormula(functionName, autoComplete, isDefName) {
             // t.controller.setCellEditMode(true);
             ws.setCellEditMode(true);
 
-            ws.handlers.trigger("asc_onEditCell", c_oAscCellEditorState.editStart);
+            ws.handlers.trigger("asc_onEditCell", Asc.c_oAscCellEditorState.editStart);
             if (isDefName)
                 ws.skipHelpSelector = true;
             // Открываем, с выставлением позиции курсора
             if (!ws.openCellEditorWithText(wb.cellEditor, functionName, cursorPos, /*isFocus*/false,
                 /*activeRange*/arn)) {
-                ws.handlers.trigger("asc_onEditCell", c_oAscCellEditorState.editEnd);
+                ws.handlers.trigger("asc_onEditCell", Asc.c_oAscCellEditorState.editEnd);
                 // t.controller.setCellEditMode(false);
                 // t.controller.setStrictClose(false);
                 // t.controller.setFormulaEditMode(false);
@@ -6526,7 +6526,7 @@ function offline_cut() {
     }
     else {
         sBase64 =  _api.wb.clipboard.getSelectedBinary(true);
-        worksheet.emptySelection(c_oAscCleanOptions.All);
+        worksheet.emptySelection(Asc.c_oAscCleanOptions.All);
     }
 
     var _stream = global_memory_stream_menu;
@@ -6588,7 +6588,7 @@ function offline_delete() {
     stream["WriteString"](0);
 
     var worksheet = _api.wb.getWorksheet();
-    worksheet.emptySelection(c_oAscCleanOptions.Text);
+    worksheet.emptySelection(Asc.c_oAscCleanOptions.Text);
 
     return stream;
 }
@@ -7478,7 +7478,7 @@ function offline_apply_event(type,params) {
 
             var curIndex = _api.asc_getActiveWorksheetIndex();
 
-            if (c_oTargetType.Hyperlink === ct.target) {
+            if (AscCommonExcel.c_oTargetType.Hyperlink === ct.target) {
                 _api._asc_setWorksheetRange(ct.hyperlink);
             }
 
@@ -7493,55 +7493,55 @@ function offline_apply_event(type,params) {
 
         case 6000: // ASC_SPREADSHEETS_EVENT_TYPE_CONTEXTMENU_CLEAR_ALL:
         {
-            _api.asc_emptyCells(c_oAscCleanOptions.All);
+            _api.asc_emptyCells(Asc.c_oAscCleanOptions.All);
             break;
         }
 
         case 6010: // ASC_SPREADSHEETS_EVENT_TYPE_CONTEXTMENU_CLEAR_TEXT
         {
-            _api.asc_emptyCells(c_oAscCleanOptions.Text);
+            _api.asc_emptyCells(Asc.c_oAscCleanOptions.Text);
             break;
         }
 
         case 6020: // ASC_SPREADSHEETS_EVENT_TYPE_CONTEXTMENU_CLEAR_FORMAT
         {
-            _api.asc_emptyCells(c_oAscCleanOptions.Format);
+            _api.asc_emptyCells(Asc.c_oAscCleanOptions.Format);
             break;
         }
 
         case 6030: // ASC_SPREADSHEETS_EVENT_TYPE_CONTEXTMENU_CLEAR_COMMENTS
         {
-            _api.asc_emptyCells(c_oAscCleanOptions.Comments);
+            _api.asc_emptyCells(Asc.c_oAscCleanOptions.Comments);
             break;
         }
 
         case 6040: // ASC_SPREADSHEETS_EVENT_TYPE_CONTEXTMENU_CLEAR_HYPERLINKS
         {
-            _api.asc_emptyCells(c_oAscCleanOptions.Hyperlinks);
+            _api.asc_emptyCells(Asc.c_oAscCleanOptions.Hyperlinks);
             break;
         }
 
         case 6050: // ASC_SPREADSHEETS_EVENT_TYPE_CONTEXTMENU_INSERT_LEFT
         {
-            _api.asc_insertCells(c_oAscInsertOptions.InsertColumns);
+            _api.asc_insertCells(Asc.c_oAscInsertOptions.InsertColumns);
             break;
         }
 
         case 6060: // ASC_SPREADSHEETS_EVENT_TYPE_CONTEXTMENU_INSERT_TOP
         {
-            _api.asc_insertCells(c_oAscInsertOptions.InsertRows);
+            _api.asc_insertCells(Asc.c_oAscInsertOptions.InsertRows);
             break;
         }
 
         case 6070: // ASC_SPREADSHEETS_EVENT_TYPE_CONTEXTMENU_DELETE_COLUMNES
         {
-            _api.asc_deleteCells(c_oAscDeleteOptions.DeleteColumns);
+            _api.asc_deleteCells(Asc.c_oAscDeleteOptions.DeleteColumns);
             break;
         }
 
         case 6080: // ASC_SPREADSHEETS_EVENT_TYPE_CONTEXTMENU_DELETE_ROWS
         {
-            _api.asc_deleteCells(c_oAscDeleteOptions.DeleteRows);
+            _api.asc_deleteCells(Asc.c_oAscDeleteOptions.DeleteRows);
             break;
         }
 
@@ -7565,7 +7565,7 @@ function offline_apply_event(type,params) {
 
         case 7000: // ASC_SPREADSHEETS_EVENT_TYPE_CHECK_DATA_RANGE
         {
-            var isValid = _api.asc_checkDataRange(c_oAscSelectionDialogType.Chart, params, false);
+            var isValid = _api.asc_checkDataRange(Asc.c_oAscSelectionDialogType.Chart, params, false);
 
             _stream = global_memory_stream_menu;
             _stream["ClearNoAttack"]();

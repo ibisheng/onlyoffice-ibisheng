@@ -128,12 +128,12 @@ asc_docs_api.prototype.asc_sendMailMergeData = function(oData)
             }
             else
             {
-                t.asc_fireCallback("asc_onError", g_fMapAscServerErrorToAscError(parseInt(input["data"])), c_oAscError.Level.NoCritical);
+                t.asc_fireCallback("asc_onError", g_fMapAscServerErrorToAscError(parseInt(input["data"])), Asc.c_oAscError.Level.NoCritical);
             }
         }
         else
         {
-            t.asc_fireCallback("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
+            t.asc_fireCallback("asc_onError", Asc.c_oAscError.ID.Unknown, Asc.c_oAscError.Level.NoCritical);
         }
         t.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, actionType);
     });
@@ -148,7 +148,7 @@ asc_docs_api.prototype.asc_DownloadAsMailMerge = function(typeFile, StartIndex, 
     if (null != oDocumentMailMerge)
     {
         var actionType = null;
-        var options = {oDocumentMailMerge: oDocumentMailMerge, downloadType: DownloadType.MailMerge, errorDirect: c_oAscError.ID.MailMergeSaveFile};
+        var options = {oDocumentMailMerge: oDocumentMailMerge, downloadType: DownloadType.MailMerge, errorDirect: Asc.c_oAscError.ID.MailMergeSaveFile};
         if (bIsDownload) {
             actionType = c_oAscAsyncAction.DownloadMerge;
             options.downloadType = DownloadType.None;

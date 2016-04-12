@@ -436,11 +436,11 @@
 
 			getAllRange: function () {
 				var result;
-				if (c_oAscSelectionType.RangeMax === this.type)
+				if (Asc.c_oAscSelectionType.RangeMax === this.type)
 					result = new Range(0, 0, gc_nMaxCol0, gc_nMaxRow0);
-				else if (c_oAscSelectionType.RangeCol === this.type)
+				else if (Asc.c_oAscSelectionType.RangeCol === this.type)
 					result = new Range(this.c1, 0, this.c2, gc_nMaxRow0);
-				else if (c_oAscSelectionType.RangeRow === this.type)
+				else if (Asc.c_oAscSelectionType.RangeRow === this.type)
 					result = new Range(0, this.r1, gc_nMaxCol0, this.r2);
 				else
 					result = this.clone();
@@ -469,7 +469,7 @@
 				ActiveRange.superclass.constructor.apply(this, arguments);
 			else
 				ActiveRange.superclass.constructor.call(this, 0, 0, 0, 0);
-			this.type = c_oAscSelectionType.RangeCells;
+			this.type = Asc.c_oAscSelectionType.RangeCells;
 			this.startCol = 0; // Активная ячейка в выделении
 			this.startRow = 0; // Активная ячейка в выделении
 			this._updateAdditionalData();
@@ -567,17 +567,17 @@
 				this.startRow = this.r1;
 			}
 			//не меняем тип выделения, если это не выделение ячееек
-			// if(this.type == c_oAscSelectionType.RangeCells || this.type == c_oAscSelectionType.RangeCol ||
-				// this.type == c_oAscSelectionType.RangeRow || this.type == c_oAscSelectionType.RangeMax)
+			// if(this.type == Asc.c_oAscSelectionType.RangeCells || this.type == Asc.c_oAscSelectionType.RangeCol ||
+				// this.type == Asc.c_oAscSelectionType.RangeRow || this.type == Asc.c_oAscSelectionType.RangeMax)
 			// {
 				// if(0 == this.r1 && 0 == this.c1 && gc_nMaxRow0 == this.r2 && gc_nMaxCol0 == this.c2)
-					// this.type = c_oAscSelectionType.RangeMax;
+					// this.type = Asc.c_oAscSelectionType.RangeMax;
 				// else if(0 == this.r1 && gc_nMaxRow0 == this.r2)
-					// this.type = c_oAscSelectionType.RangeCol;
+					// this.type = Asc.c_oAscSelectionType.RangeCol;
 				// else if(0 == this.c1 && gc_nMaxCol0 == this.c2)
-					// this.type = c_oAscSelectionType.RangeRow;
+					// this.type = Asc.c_oAscSelectionType.RangeRow;
 				// else
-					// this.type = c_oAscSelectionType.RangeCells;
+					// this.type = Asc.c_oAscSelectionType.RangeCells;
 			// }
 		};
 
@@ -764,13 +764,13 @@
 				            var bCol = 0 == r1 && gc_nMaxRow0 == r2;
 				            var bRow = 0 == c1 && gc_nMaxCol0 == c2;
 				            if (bCol && bRow)
-				                oActiveRange.type = c_oAscSelectionType.RangeMax;
+				                oActiveRange.type = Asc.c_oAscSelectionType.RangeMax;
 				            else if (bCol)
-				                oActiveRange.type = c_oAscSelectionType.RangeCol;
+				                oActiveRange.type = Asc.c_oAscSelectionType.RangeCol;
 				            else if (bRow)
-				                oActiveRange.type = c_oAscSelectionType.RangeRow;
+				                oActiveRange.type = Asc.c_oAscSelectionType.RangeRow;
 				            else
-				                oActiveRange.type = c_oAscSelectionType.RangeCells;
+				                oActiveRange.type = Asc.c_oAscSelectionType.RangeCells;
 				            oActiveRange.startCol = oActiveRange.c1;
 				            oActiveRange.startRow = oActiveRange.r1;
 				            oCacheVal.activeRange = oActiveRange;
@@ -1004,10 +1004,10 @@
 			asc_setType: function (val) {
 				// В принципе эта функция избыточна
 				switch (val) {
-					case c_oAscHyperlinkType.WebLink:
+					case Asc.c_oAscHyperlinkType.WebLink:
 						this.hyperlinkModel.setLocation(null);
 						break;
-					case c_oAscHyperlinkType.RangeLink:
+					case Asc.c_oAscHyperlinkType.RangeLink:
 						this.hyperlinkModel.Hyperlink = null;
 						break;
 				}
@@ -1166,7 +1166,7 @@
 		/** @constructor */
 		function asc_CAdjustPrint () {
 			// Вид печати
-			this.printType = c_oAscPrintType.ActiveSheets;
+			this.printType = Asc.c_oAscPrintType.ActiveSheets;
 			// ToDo сюда же start и end page index
 
 			return this;
@@ -1287,7 +1287,7 @@
 		};
 		asc_CPane.prototype.init = function() {
 			// ToDo Обрабатываем пока только frozen и frozenSplit
-			if ((c_oAscPaneState.Frozen === this.state || c_oAscPaneState.FrozenSplit === this.state) &&
+			if ((AscCommonExcel.c_oAscPaneState.Frozen === this.state || AscCommonExcel.c_oAscPaneState.FrozenSplit === this.state) &&
 				(0 < this.xSplit || 0 < this.ySplit)) {
 				this.topLeftFrozenCell = new CellAddress(this.ySplit, this.xSplit, 0);
 				if (!this.topLeftFrozenCell.isValid())
@@ -1499,7 +1499,7 @@
 			this.isMatchCase = false;					// учитывать регистр
 			this.isWholeCell = false;					// ячейка целиком
 			this.scanOnOnlySheet = true;				// искать только на листе/в книге
-			this.lookIn = c_oAscFindLookIn.Formulas;	// искать в формулах/значениях/примечаниях
+			this.lookIn = Asc.c_oAscFindLookIn.Formulas;	// искать в формулах/значениях/примечаниях
 
 			this.replaceWith = "";						// текст, на который заменяем (если у нас замена)
 			this.isReplaceAll = false;					// заменить все (если у нас замена)

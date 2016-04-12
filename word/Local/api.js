@@ -17,7 +17,7 @@ asc_docs_api.prototype._OfflineAppDocumentEndLoad = function(_url, _data)
 	g_oIdCounter.m_sUserId = window["AscDesktopEditor"]["CheckUserId"]();
 	if (_data == "")
 	{
-		this.sendEvent("asc_onError", c_oAscError.ID.ConvertationError, c_oAscError.Level.Critical);
+		this.sendEvent("asc_onError", Asc.c_oAscError.ID.ConvertationError, Asc.c_oAscError.Level.Critical);
 		return;
 	}
     if (c_oSerFormat.Signature !== _data.substring(0, c_oSerFormat.Signature.length))
@@ -184,7 +184,7 @@ window["DesktopOfflineAppDocumentEndSave"] = function(error)
 	editor.LastUserSavedIndex = undefined;
 	
 	if (2 == error)
-		editor.sendEvent("asc_onError", c_oAscError.ID.ConvertationError, c_oAscError.Level.NoCritical);
+		editor.sendEvent("asc_onError", Asc.c_oAscError.ID.ConvertationError, Asc.c_oAscError.Level.NoCritical);
 };
 asc_docs_api.prototype.asc_DownloadAs = function(typeFile, bIsDownloadEvent) 
 {

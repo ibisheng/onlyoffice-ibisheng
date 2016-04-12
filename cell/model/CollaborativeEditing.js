@@ -361,7 +361,7 @@
 			var oUnlockElement = null, rangeTmp1, rangeTmp2;
 			for (var i = 0; i < arrayElements.length; ++i) {
 				oUnlockElement = arrayElements[i].Element;
-				if (c_oAscLockTypeElem.Sheet === element["type"] && element["type"] === oUnlockElement["type"]) {
+				if (AscCommonExcel.c_oAscLockTypeElem.Sheet === element["type"] && element["type"] === oUnlockElement["type"]) {
 					// Проверка только на удаление листа (если проверка для себя, то выходим не сразу, т.к. нужно проверить lock от других элементов)
 					if ((c_oAscLockTypes.kLockTypeMine !== type && false === bCheckOnlyLockAll) ||
 						element["sheetId"] === oUnlockElement["sheetId"]) {
@@ -377,17 +377,17 @@
 
 				// Не учитываем lock от ChangeProperties (только если это не lock листа)
 				if (true === bCheckOnlyLockAll ||
-					(c_oAscLockTypeElemSubType.ChangeProperties === oUnlockElement["subType"]
-						&& c_oAscLockTypeElem.Sheet !== element["type"]))
+					(AscCommonExcel.c_oAscLockTypeElemSubType.ChangeProperties === oUnlockElement["subType"]
+						&& AscCommonExcel.c_oAscLockTypeElem.Sheet !== element["type"]))
 					continue;
 
 				if (element["type"] === oUnlockElement["type"]) {
-					if (element["type"] === c_oAscLockTypeElem.Object) {
+					if (element["type"] === AscCommonExcel.c_oAscLockTypeElem.Object) {
 						if (element["rangeOrObjectId"] === oUnlockElement["rangeOrObjectId"])
 							return arrayElements[i];
-					} else if (element["type"] === c_oAscLockTypeElem.Range) {
+					} else if (element["type"] === AscCommonExcel.c_oAscLockTypeElem.Range) {
 						// Не учитываем lock от Insert
-						if (c_oAscLockTypeElemSubType.InsertRows === oUnlockElement["subType"] || c_oAscLockTypeElemSubType.InsertColumns === oUnlockElement["subType"])
+						if (AscCommonExcel.c_oAscLockTypeElemSubType.InsertRows === oUnlockElement["subType"] || AscCommonExcel.c_oAscLockTypeElemSubType.InsertColumns === oUnlockElement["subType"])
 							continue;
 						rangeTmp1 = oUnlockElement["rangeOrObjectId"];
 						rangeTmp2 = element["rangeOrObjectId"];
@@ -395,8 +395,8 @@
 							continue;
 						return arrayElements[i];
 					}
-				} else if (oUnlockElement["type"] === c_oAscLockTypeElem.Sheet ||
-					(element["type"] === c_oAscLockTypeElem.Sheet && c_oAscLockTypes.kLockTypeMine !== type)) {
+				} else if (oUnlockElement["type"] === AscCommonExcel.c_oAscLockTypeElem.Sheet ||
+					(element["type"] === AscCommonExcel.c_oAscLockTypeElem.Sheet && c_oAscLockTypes.kLockTypeMine !== type)) {
 					// Если кто-то уже залочил лист или мы пытаемся сами залочить и проверяем на чужие lock
 					return arrayElements[i];
 				}
@@ -424,26 +424,26 @@
 					continue;
 
 				// Отображать залоченность удаленных текущим пользователем строк/столбцов не нужно (уже нечего отображать)
-				if (c_oAscLockTypes.kLockTypeMine === type && c_oAscLockTypeElem.Range === typeElem &&
-					(c_oAscLockTypeElemSubType.DeleteColumns === element["subType"] ||
-						c_oAscLockTypeElemSubType.DeleteRows === element["subType"]))
+				if (c_oAscLockTypes.kLockTypeMine === type && AscCommonExcel.c_oAscLockTypeElem.Range === typeElem &&
+					(AscCommonExcel.c_oAscLockTypeElemSubType.DeleteColumns === element["subType"] ||
+						AscCommonExcel.c_oAscLockTypeElemSubType.DeleteRows === element["subType"]))
 					continue;
 				// Отображать залоченность добавленных другим пользователем строк/столбцов не нужно (еще нечего отображать)
-				if (c_oAscLockTypeElem.Range === typeElem &&
-					(c_oAscLockTypeElemSubType.InsertColumns === element["subType"] ||
-						c_oAscLockTypeElemSubType.InsertRows === element["subType"]))
+				if (AscCommonExcel.c_oAscLockTypeElem.Range === typeElem &&
+					(AscCommonExcel.c_oAscLockTypeElemSubType.InsertColumns === element["subType"] ||
+						AscCommonExcel.c_oAscLockTypeElemSubType.InsertRows === element["subType"]))
 					continue;
 				// Отображать lock-диапазон для lockAll(всего листа) не нужно
-				if (c_oAscLockTypeElemSubType.ChangeProperties === element["subType"])
+				if (AscCommonExcel.c_oAscLockTypeElemSubType.ChangeProperties === element["subType"])
 					continue;
 
 				oRangeOrObjectId = element["rangeOrObjectId"];
 				// Для диапазона нужно сделать пересчет с учетом удаленных или добавленных строк/столбцов
-				if (c_oAscLockTypeElem.Range === typeElem) {
+				if (AscCommonExcel.c_oAscLockTypeElem.Range === typeElem) {
 					// Пересчитывать для удаленных строк/столбцов у другого пользователя не нужно
-					if (c_oAscLockTypes.kLockTypeMine !== type && c_oAscLockTypeElem.Range === typeElem &&
-						(c_oAscLockTypeElemSubType.DeleteColumns === element["subType"] ||
-							c_oAscLockTypeElemSubType.DeleteRows === element["subType"])) {
+					if (c_oAscLockTypes.kLockTypeMine !== type && AscCommonExcel.c_oAscLockTypeElem.Range === typeElem &&
+						(AscCommonExcel.c_oAscLockTypeElemSubType.DeleteColumns === element["subType"] ||
+							AscCommonExcel.c_oAscLockTypeElemSubType.DeleteRows === element["subType"])) {
 						c1 = oRangeOrObjectId["c1"];
 						c2 = oRangeOrObjectId["c2"];
 						r1 = oRangeOrObjectId["r1"];
@@ -467,36 +467,36 @@
 		};
 
 		CCollaborativeEditing.prototype.getLockCellsMe = function (sheetId) {
-			return this.getLockElem(c_oAscLockTypeElem.Range, c_oAscLockTypes.kLockTypeMine, sheetId);
+			return this.getLockElem(AscCommonExcel.c_oAscLockTypeElem.Range, c_oAscLockTypes.kLockTypeMine, sheetId);
 		};
 		CCollaborativeEditing.prototype.getLockCellsOther = function (sheetId) {
-			return this.getLockElem(c_oAscLockTypeElem.Range, c_oAscLockTypes.kLockTypeOther, sheetId);
+			return this.getLockElem(AscCommonExcel.c_oAscLockTypeElem.Range, c_oAscLockTypes.kLockTypeOther, sheetId);
 		};
 		CCollaborativeEditing.prototype.getLockObjectsMe = function (sheetId) {
-			return this.getLockElem(c_oAscLockTypeElem.Object, c_oAscLockTypes.kLockTypeMine, sheetId);
+			return this.getLockElem(AscCommonExcel.c_oAscLockTypeElem.Object, c_oAscLockTypes.kLockTypeMine, sheetId);
 		};
 		CCollaborativeEditing.prototype.getLockObjectsOther = function (sheetId) {
-			return this.getLockElem(c_oAscLockTypeElem.Object, c_oAscLockTypes.kLockTypeOther, sheetId);
+			return this.getLockElem(AscCommonExcel.c_oAscLockTypeElem.Object, c_oAscLockTypes.kLockTypeOther, sheetId);
 		};
 		/**
 		 * Проверка lock для всего листа
 		 * @param {Number} sheetId  элемент для проверки lock
-		 * @return {c_oAscMouseMoveLockedObjectType} oLockedObjectType
+		 * @return {Asc.c_oAscMouseMoveLockedObjectType} oLockedObjectType
 		 */
 		CCollaborativeEditing.prototype.isLockAllOther = function (sheetId) {
 			var arrayElements = this.m_arrNeedUnlock;
 			var count = arrayElements.length;
 			var element = null;
-			var oLockedObjectType = c_oAscMouseMoveLockedObjectType.None;
+			var oLockedObjectType = Asc.c_oAscMouseMoveLockedObjectType.None;
 
 			for (var i = 0; i < count; ++i) {
 				element = arrayElements[i].Element;
 				if (element["sheetId"] === sheetId) {
-					if (element["type"] === c_oAscLockTypeElem.Sheet) {
-						oLockedObjectType = c_oAscMouseMoveLockedObjectType.Sheet;
+					if (element["type"] === AscCommonExcel.c_oAscLockTypeElem.Sheet) {
+						oLockedObjectType = Asc.c_oAscMouseMoveLockedObjectType.Sheet;
 						break;
-					} else if (element["type"] === c_oAscLockTypeElem.Range && null !== element["subType"])
-						oLockedObjectType = c_oAscMouseMoveLockedObjectType.TableProperties;
+					} else if (element["type"] === AscCommonExcel.c_oAscLockTypeElem.Range && null !== element["subType"])
+						oLockedObjectType = Asc.c_oAscMouseMoveLockedObjectType.TableProperties;
 				}
 			}
 			return oLockedObjectType;
@@ -512,11 +512,11 @@
 			for (i = 0; i < count; ++i) {
 				element = arrayElements[i].Element;
 				// Для удаления пересчитывать индексы не нужно
-				if (c_oAscLockTypeElem.Range !== element["type"] ||
-					c_oAscLockTypeElemSubType.InsertColumns === element["subType"] ||
-					c_oAscLockTypeElemSubType.InsertRows === element["subType"] ||
-					c_oAscLockTypeElemSubType.DeleteColumns === element["subType"] ||
-					c_oAscLockTypeElemSubType.DeleteRows === element["subType"])
+				if (AscCommonExcel.c_oAscLockTypeElem.Range !== element["type"] ||
+					AscCommonExcel.c_oAscLockTypeElemSubType.InsertColumns === element["subType"] ||
+					AscCommonExcel.c_oAscLockTypeElemSubType.InsertRows === element["subType"] ||
+					AscCommonExcel.c_oAscLockTypeElemSubType.DeleteColumns === element["subType"] ||
+					AscCommonExcel.c_oAscLockTypeElemSubType.DeleteRows === element["subType"])
 					continue;
 				sheetId = element["sheetId"];
 
@@ -545,9 +545,9 @@
 
 			for (i = 0; i < count; ++i) {
 				element = arrayElements[i].Element;
-				if (c_oAscLockTypeElem.Range !== element["type"] ||
-					c_oAscLockTypeElemSubType.InsertColumns === element["subType"] ||
-					c_oAscLockTypeElemSubType.InsertRows === element["subType"])
+				if (AscCommonExcel.c_oAscLockTypeElem.Range !== element["type"] ||
+					AscCommonExcel.c_oAscLockTypeElemSubType.InsertColumns === element["subType"] ||
+					AscCommonExcel.c_oAscLockTypeElemSubType.InsertRows === element["subType"])
 					continue;
 				sheetId = element["sheetId"];
 
@@ -570,7 +570,7 @@
 			if (null == oRecalcIndex)
 				return null;
 			var nIndex = 0;
-			var nRecalcType = c_oAscRecalcIndexTypes.RecalcIndexAdd;
+			var nRecalcType = AscCommonExcel.c_oAscRecalcIndexTypes.RecalcIndexAdd;
 			var oRecalcIndexElement = null;
 			var oRecalcIndexResult = {};
 
@@ -587,8 +587,8 @@
 						oRecalcIndexElement = oRecalcIndex[sheetId]["_arrElements"][nIndex];
 						if (true === oRecalcIndexElement["m_bIsSaveIndex"])
 							continue;
-						nRecalcType = (c_oAscRecalcIndexTypes.RecalcIndexAdd === oRecalcIndexElement["_recalcType"]) ?
-							c_oAscRecalcIndexTypes.RecalcIndexRemove : c_oAscRecalcIndexTypes.RecalcIndexAdd;
+						nRecalcType = (AscCommonExcel.c_oAscRecalcIndexTypes.RecalcIndexAdd === oRecalcIndexElement["_recalcType"]) ?
+							AscCommonExcel.c_oAscRecalcIndexTypes.RecalcIndexRemove : AscCommonExcel.c_oAscRecalcIndexTypes.RecalcIndexAdd;
 						oRecalcIndexTmp[sheetId].add(nRecalcType, oRecalcIndexElement["_position"],
 							oRecalcIndexElement["_count"], /*bIsSaveIndex*/true);
 						// Дублируем для возврата результата (нам нужно пересчитать только по последнему индексу
@@ -618,28 +618,28 @@
       if (!this.m_oRecalcIndexColumns.hasOwnProperty(sheetId)) {
         this.m_oRecalcIndexColumns[sheetId] = new CRecalcIndex();
       }
-      this.m_oRecalcIndexColumns[sheetId].add(c_oAscRecalcIndexTypes.RecalcIndexRemove, position,
+      this.m_oRecalcIndexColumns[sheetId].add(AscCommonExcel.c_oAscRecalcIndexTypes.RecalcIndexRemove, position,
         count, /*bIsSaveIndex*/false);
 		};
 		CCollaborativeEditing.prototype.addCols = function (sheetId, position, count) {
       if (!this.m_oRecalcIndexColumns.hasOwnProperty(sheetId)) {
         this.m_oRecalcIndexColumns[sheetId] = new CRecalcIndex();
       }
-      this.m_oRecalcIndexColumns[sheetId].add(c_oAscRecalcIndexTypes.RecalcIndexAdd, position,
+      this.m_oRecalcIndexColumns[sheetId].add(AscCommonExcel.c_oAscRecalcIndexTypes.RecalcIndexAdd, position,
         count, /*bIsSaveIndex*/false);
 		};
 		CCollaborativeEditing.prototype.removeRows = function (sheetId, position, count) {
       if (!this.m_oRecalcIndexRows.hasOwnProperty(sheetId)) {
         this.m_oRecalcIndexRows[sheetId] = new CRecalcIndex();
       }
-      this.m_oRecalcIndexRows[sheetId].add(c_oAscRecalcIndexTypes.RecalcIndexRemove, position,
+      this.m_oRecalcIndexRows[sheetId].add(AscCommonExcel.c_oAscRecalcIndexTypes.RecalcIndexRemove, position,
         count, /*bIsSaveIndex*/false);
 		};
 		CCollaborativeEditing.prototype.addRows = function (sheetId, position, count) {
       if (!this.m_oRecalcIndexRows.hasOwnProperty(sheetId)) {
         this.m_oRecalcIndexRows[sheetId] = new CRecalcIndex();
       }
-      this.m_oRecalcIndexRows[sheetId].add(c_oAscRecalcIndexTypes.RecalcIndexAdd, position,
+      this.m_oRecalcIndexRows[sheetId].add(AscCommonExcel.c_oAscRecalcIndexTypes.RecalcIndexAdd, position,
         count, /*bIsSaveIndex*/false);
 		};
 		CCollaborativeEditing.prototype.addColsRange = function (sheetId, range) {
@@ -869,15 +869,15 @@
 
 		// Пересчет для других
 		CRecalcIndexElement.prototype.getLockOther = function (position, type) {
-			var inc = (c_oAscRecalcIndexTypes.RecalcIndexAdd === this._recalcType) ? +1 : -1;
-			if (position === this._position && c_oAscRecalcIndexTypes.RecalcIndexRemove === this._recalcType &&
+			var inc = (AscCommonExcel.c_oAscRecalcIndexTypes.RecalcIndexAdd === this._recalcType) ? +1 : -1;
+			if (position === this._position && AscCommonExcel.c_oAscRecalcIndexTypes.RecalcIndexRemove === this._recalcType &&
 				true === this.m_bIsSaveIndex) {
 				// Мы еще не применили чужие изменения (поэтому для insert не нужно отрисовывать)
 				// RecalcIndexRemove (потому что перевертываем для правильной отработки, от другого пользователя
 				// пришло RecalcIndexAdd
 				return null;
 			} else if (position === this._position &&
-				c_oAscRecalcIndexTypes.RecalcIndexRemove === this._recalcType &&
+				AscCommonExcel.c_oAscRecalcIndexTypes.RecalcIndexRemove === this._recalcType &&
 				c_oAscLockTypes.kLockTypeMine === type && false === this.m_bIsSaveIndex) {
 				// Для пользователя, который удалил столбец, рисовать залоченные ранее в данном столбце ячейки
 				// не нужно
@@ -892,15 +892,15 @@
 			if (this.m_bIsSaveIndex)
 				return position;
 
-			var inc = (c_oAscRecalcIndexTypes.RecalcIndexAdd === this._recalcType) ? +1 : -1;
-			if (position === this._position && c_oAscRecalcIndexTypes.RecalcIndexRemove === this._recalcType &&
+			var inc = (AscCommonExcel.c_oAscRecalcIndexTypes.RecalcIndexAdd === this._recalcType) ? +1 : -1;
+			if (position === this._position && AscCommonExcel.c_oAscRecalcIndexTypes.RecalcIndexRemove === this._recalcType &&
 				true === this.m_bIsSaveIndex) {
 				// Мы еще не применили чужие изменения (поэтому для insert не нужно отрисовывать)
 				// RecalcIndexRemove (потому что перевертываем для правильной отработки, от другого пользователя
 				// пришло RecalcIndexAdd
 				return null;
 			} else if (position === this._position &&
-				c_oAscRecalcIndexTypes.RecalcIndexRemove === this._recalcType &&
+				AscCommonExcel.c_oAscRecalcIndexTypes.RecalcIndexRemove === this._recalcType &&
 				c_oAscLockTypes.kLockTypeMine === type && false === this.m_bIsSaveIndex) {
 				// Для пользователя, который удалил столбец, рисовать залоченные ранее в данном столбце ячейки
 				// не нужно
@@ -912,7 +912,7 @@
 		};
 		// Пересчет для себя
 		CRecalcIndexElement.prototype.getLockMe = function (position) {
-			var inc = (c_oAscRecalcIndexTypes.RecalcIndexAdd === this._recalcType) ? -1 : +1;
+			var inc = (AscCommonExcel.c_oAscRecalcIndexTypes.RecalcIndexAdd === this._recalcType) ? -1 : +1;
 			if (position < this._position)
 				return position;
 			else
@@ -920,7 +920,7 @@
 		};
 		// Только когда от других пользователей изменения (для пересчета)
 		CRecalcIndexElement.prototype.getLockMe2 = function (position) {
-			var inc = (c_oAscRecalcIndexTypes.RecalcIndexAdd === this._recalcType) ? -1 : +1;
+			var inc = (AscCommonExcel.c_oAscRecalcIndexTypes.RecalcIndexAdd === this._recalcType) ? -1 : +1;
 			if (true !== this.m_bIsSaveIndex || position < this._position)
 				return position;
 			else

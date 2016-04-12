@@ -1817,7 +1817,7 @@
 				if(cMax > gc_nMaxCol0 || rMax > gc_nMaxRow0)
 				{
 					if(isWriteError)
-						worksheet.handlers.trigger ("onErrorEvent", c_oAscError.ID.PasteMaxRangeError, c_oAscError.Level.NoCritical);
+						worksheet.handlers.trigger ("onErrorEvent", Asc.c_oAscError.ID.PasteMaxRangeError, Asc.c_oAscError.Level.NoCritical);
 					return false;
 				}
 				return true;
@@ -5184,7 +5184,7 @@ function Editor_Copy_Event_Excel(e, ElemToSelect, isCut, isAlreadyReadyHtml)
 		
 
 	if(isCut)
-		ws.emptySelection(c_oAscCleanOptions.All);
+		ws.emptySelection(Asc.c_oAscCleanOptions.All);
 	
 	if(sBase64)
 		e.clipboardData.setData("text/x-custom", sBase64);

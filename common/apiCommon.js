@@ -2563,7 +2563,7 @@
                 {
                     this.UserId           = ( undefined != obj.UserId ) ? obj.UserId : "";
                     this.HaveChanges      = ( undefined != obj.HaveChanges ) ? obj.HaveChanges : false;
-                    this.LockedObjectType = ( undefined != obj.LockedObjectType ) ? obj.LockedObjectType : c_oAscMouseMoveLockedObjectType.Common;
+                    this.LockedObjectType = ( undefined != obj.LockedObjectType ) ? obj.LockedObjectType : Asc.c_oAscMouseMoveLockedObjectType.Common;
                     break;
                 }
             }

@@ -2584,7 +2584,7 @@
         this.WriteSheetViewPane = function (oPane) {
             var oThis = this;
             // Всегда пишем Frozen
-            this.bs.WriteItem(c_oSer_Pane.State, function(){oThis.memory.WriteString3(c_oAscPaneState.Frozen);});
+            this.bs.WriteItem(c_oSer_Pane.State, function(){oThis.memory.WriteString3(AscCommonExcel.c_oAscPaneState.Frozen);});
             this.bs.WriteItem(c_oSer_Pane.TopLeftCell, function(){oThis.memory.WriteString3(oPane.topLeftFrozenCell.getID());});
 
             var col = oPane.topLeftFrozenCell.getCol0();

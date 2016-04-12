@@ -1,4 +1,4 @@
-﻿$(function () {
+$(function () {
 	var  IsVisibleMenu = false, elem, contextGrad, gradient, gradSelectPosTop = 1, colorSelecterClick, newColorSelected={r:255,g:0,b:0},lastColorSelected={r:255,g:0,b:0};
 	var autoFilterObj;
 	var g_sheetViewSettings = null;
@@ -93,37 +93,37 @@
 	function onError(id,level){
 		consolelog("id "+ id + " level " + level);
 		switch(arguments[0]){
-			case c_oAscError.ID.FrmlWrongCountParentheses:
+			case Asc.c_oAscError.ID.FrmlWrongCountParentheses:
 				// alert("неверное количество скобок");
 				if(console&&console.error)
 					console.error("!!! "+"неверное количество скобок");
 				break;
-			case c_oAscError.ID.FrmlWrongOperator:
+			case Asc.c_oAscError.ID.FrmlWrongOperator:
 				// alert("неверный оператор");
 				if(console&&console.error)
 					console.error("!!! "+"неверный оператор");
 				break;
-			case c_oAscError.ID.FrmlWrongMaxArgument:
+			case Asc.c_oAscError.ID.FrmlWrongMaxArgument:
 				// alert("превышено максимальное число аргументов");
 				if(console&&console.error)
 					console.error("!!! "+"превышено максимальное число аргументов");
 				break;
-			case c_oAscError.ID.FrmlWrongCountArgument:
+			case Asc.c_oAscError.ID.FrmlWrongCountArgument:
 				// alert("неверное количество аргументов");
 				if(console&&console.error)
 					console.error("!!! "+"неверное количество аргументов");
 				break;
-			case c_oAscError.ID.FrmlWrongFunctionName:
+			case Asc.c_oAscError.ID.FrmlWrongFunctionName:
 				// alert("неверное название функции");
 				if(console&&console.error)
 					console.error("!!! "+"неверное название функции");
 				break;
-			case c_oAscError.ID.FrmlAnotherParsingError:
+			case Asc.c_oAscError.ID.FrmlAnotherParsingError:
 				// alert("прочие ошибки анализа");
 				if(console&&console.error)
 					console.error("!!! "+"прочие ошибки анализа");
 				break;
-			case c_oAscError.ID.FrmlWrongArgumentRange:
+			case Asc.c_oAscError.ID.FrmlWrongArgumentRange:
 				// alert("неверный диапазон");
 				if(console&&console.error)
 					console.error("!!! "+"неверный диапазон");
@@ -630,15 +630,15 @@
 				break;
 			}
 			case "mnuShowMasterDep":{
-				api.asc_drawDepCells(c_oAscDrawDepOptions.Master);
+				api.asc_drawDepCells(AscCommonExcel.c_oAscDrawDepOptions.Master);
 				break;
 			}
 			case "mnuShowSlaveDep":{
-				api.asc_drawDepCells(c_oAscDrawDepOptions.Slave);
+				api.asc_drawDepCells(AscCommonExcel.c_oAscDrawDepOptions.Slave);
 				break;
 			}
 			case "mnuClearDep":{
-				api.asc_drawDepCells(c_oAscDrawDepOptions.Clear);
+				api.asc_drawDepCells(AscCommonExcel.c_oAscDrawDepOptions.Clear);
 				break;
 			}
 			
@@ -841,24 +841,24 @@
 			case "td_mergeCells":{
 				if ($(this).hasClass("iconPressed")){
 					$(this).removeClass("iconPressed");
-					api.asc_mergeCells(c_oAscMergeOptions.Unmerge);
+					api.asc_mergeCells(Asc.c_oAscMergeOptions.Unmerge);
 				}
 				else{
 					$(this).addClass("iconPressed");
-					api.asc_mergeCells(c_oAscMergeOptions.Merge);
+					api.asc_mergeCells(Asc.c_oAscMergeOptions.Merge);
 				}
 
 				break;
 			}
 			case "td_recalc":{
-				api.asc_drawDepCells(c_oAscDrawDepOptions.Master);
+				api.asc_drawDepCells(AscCommonExcel.c_oAscDrawDepOptions.Master);
 				break;
 			}
 			case "td_sort_asc":{
-				api.asc_sortCells(c_oAscSortOptions.Ascending);
+				api.asc_sortCells(AscCommonExcel.c_oAscSortOptions.Ascending);
 				break;
 			}case "td_sort_desc":{
-				api.asc_sortCells(c_oAscSortOptions.Descending);
+				api.asc_sortCells(AscCommonExcel.c_oAscSortOptions.Descending);
 				break;
 			}
 			case "td_insert_chart":{
@@ -903,11 +903,11 @@
 				} else {
 					oHyperText.val(oTmpHyperlinkObj.asc_getText());
 					switch (oTmpHyperlinkObj.asc_getType()) {
-						case c_oAscHyperlinkType.WebLink:
+						case Asc.c_oAscHyperlinkType.WebLink:
 							toggleHyperlinkDialog(true);
 							$("#addHyperlink_url").val(oTmpHyperlinkObj.asc_getHyperlinkUrl());
 							break;
-						case c_oAscHyperlinkType.RangeLink:
+						case Asc.c_oAscHyperlinkType.RangeLink:
 							toggleHyperlinkDialog(false);
 							oSelect.val(oTmpHyperlinkObj.asc_getSheet());
 							$("#addHyperlink_ran").val(oTmpHyperlinkObj.asc_getRange());
@@ -970,15 +970,15 @@
 	$("#td_va").click(function() {
 		switch( $("#td_va").attr("al") ){
 			case "top":{
-				api.asc_setCellVertAlign(c_oAscAlignType.TOP);
+				api.asc_setCellVertAlign(AscCommonExcel.c_oAscAlignType.TOP);
 				break;
 			}
 			case "middle":{
-				api.asc_setCellVertAlign(c_oAscAlignType.MIDDLE);
+				api.asc_setCellVertAlign(AscCommonExcel.c_oAscAlignType.MIDDLE);
 				break;
 			}
 			case "bottom":{
-				api.asc_setCellVertAlign(c_oAscAlignType.BOTTOM);
+				api.asc_setCellVertAlign(AscCommonExcel.c_oAscAlignType.BOTTOM);
 				break;
 			}
 		}
@@ -1854,7 +1854,7 @@
 
 		for (; nIndex < mouseMoveObjects.length; ++nIndex) {
 			mouseMoveObject = mouseMoveObjects[nIndex];
-			if ( mouseMoveObject.type == c_oAscMouseMoveType.Comment ) {
+			if ( mouseMoveObject.type == Asc.c_oAscMouseMoveType.Comment ) {
 
 				var indexes = mouseMoveObject.asc_getCommentIndexes();
 
@@ -2090,10 +2090,10 @@
 		
 		addFilterDialog.dialog({ autoOpen: false, closeOnEscape: false, dialogClass: 'dialogClass',
 			open: function() { 
-				api.asc_setSelectionDialogMode(c_oAscSelectionDialogType.FormatTable, null);
+				api.asc_setSelectionDialogMode(Asc.c_oAscSelectionDialogType.FormatTable, null);
 				aDialogNames.push("addFilterDialog"); 
 			},
-			close: function() { aDialogNames.pop(); api.asc_setSelectionDialogMode(c_oAscSelectionDialogType.None, null);},
+			close: function() { aDialogNames.pop(); api.asc_setSelectionDialogMode(Asc.c_oAscSelectionDialogType.None, null);},
 			resizable: false, modal: false, width: '350px',
 			buttons: [
 				{
@@ -2141,7 +2141,7 @@
 	//	function setAxisXFont() { showChartFontDialog(chart.asc_getXAxis().asc_getTitleFont()) }
 	//	function setAxisYFont() { showChartFontDialog(chart.asc_getYAxis().asc_getTitleFont()) }
     //
-		api.asc_setSelectionDialogMode(c_oAscSelectionDialogType.Chart, null);
+		api.asc_setSelectionDialogMode(Asc.c_oAscSelectionDialogType.Chart, null);
 
 		chartForm.css("visibility", "visible");
 		chartForm.dialog({ autoOpen: false, closeOnEscape: true, height: 'auto', width: 400,
@@ -2215,7 +2215,7 @@
 					],
 					close: function() {
 						if (!bIsReopenDialog)
-							api.asc_setSelectionDialogMode(c_oAscSelectionDialogType.None, null);
+							api.asc_setSelectionDialogMode(Asc.c_oAscSelectionDialogType.None, null);
 						api.asc_enableKeyEvents(true);
 						
 						// chart font unbinding
@@ -2270,7 +2270,7 @@
 					],
 					close: function() {
 						if (!bIsReopenDialog)
-							api.asc_setSelectionDialogMode(c_oAscSelectionDialogType.None, null);
+							api.asc_setSelectionDialogMode(Asc.c_oAscSelectionDialogType.None, null);
 						api.asc_enableKeyEvents(true);
 					},
 					create: function() {

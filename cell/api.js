@@ -743,7 +743,7 @@ var editor;
     if (data) {
       g_fLoadFileContent(data, function(result) {
         if (null === result) {
-          t.handlers.trigger("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.Critical);
+          t.handlers.trigger("asc_onError", Asc.c_oAscError.ID.Unknown, Asc.c_oAscError.Level.Critical);
           return;
         }
         var cp = JSON.parse(result);
@@ -751,14 +751,14 @@ var editor;
         t.handlers.trigger("asc_onAdvancedOptions", new asc.asc_CAdvancedOptions(c_oAscAdvancedOptionsID.CSV, cp), t.advancedOptionsAction);
       });
     } else {
-      t.handlers.trigger("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
+      t.handlers.trigger("asc_onError", Asc.c_oAscError.ID.Unknown, Asc.c_oAscError.Level.NoCritical);
     }
   };
   spreadsheet_api.prototype._onOpenCommand = function(data) {
     var t = this;
     g_fOpenFileCommand(data, this.documentUrlChanges, Asc.c_oSerFormat.Signature, function(error, result) {
       if (error || !result.bSerFormat) {
-        var oError = {returnCode: c_oAscError.Level.Critical, val: c_oAscError.ID.Unknown};
+        var oError = {returnCode: Asc.c_oAscError.Level.Critical, val: Asc.c_oAscError.ID.Unknown};
         t.handlers.trigger("asc_onError", oError.val, oError.returnCode);
         return;
       }
@@ -797,13 +797,13 @@ var editor;
           if (url) {
             t.processSavedFile(url, false);
           } else {
-            t.handlers.trigger("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
+            t.handlers.trigger("asc_onError", Asc.c_oAscError.ID.Unknown, Asc.c_oAscError.Level.NoCritical);
           }
         } else {
-          t.handlers.trigger("asc_onError", g_fMapAscServerErrorToAscError(parseInt(input["data"])), c_oAscError.Level.NoCritical);
+          t.handlers.trigger("asc_onError", g_fMapAscServerErrorToAscError(parseInt(input["data"])), Asc.c_oAscError.Level.NoCritical);
         }
       } else {
-        t.handlers.trigger("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
+        t.handlers.trigger("asc_onError", Asc.c_oAscError.ID.Unknown, Asc.c_oAscError.Level.NoCritical);
       }
     };
     g_fSaveWithParts(function(fCallback1, oAdditionalData1, dataContainer1) {
@@ -862,20 +862,20 @@ var editor;
       dataContainer.data = oBinaryFileWriter.Write();
     }
     var fCallback = function(input) {
-      var error = c_oAscError.ID.Unknown;
+      var error = Asc.c_oAscError.ID.Unknown;
       if (null != input && command == input["type"]) {
         if ('ok' == input["status"]) {
           var url = input["data"];
           if (url) {
-            error = c_oAscError.ID.No;
+            error = Asc.c_oAscError.ID.No;
             t.processSavedFile(url, options.downloadType);
           }
         } else {
           error = g_fMapAscServerErrorToAscError(parseInt(input["data"]));
         }
       }
-      if (c_oAscError.ID.No != error) {
-        t.handlers.trigger("asc_onError", error, c_oAscError.Level.NoCritical);
+      if (Asc.c_oAscError.ID.No != error) {
+        t.handlers.trigger("asc_onError", error, Asc.c_oAscError.Level.NoCritical);
       }
       // Меняем тип состояния (на никакое)
       t.advancedOptionsAction = c_oAscAdvancedOptionsAction.None;
@@ -916,8 +916,8 @@ var editor;
    * asc_onInitEditorStyles		(gui_styles)
    * asc_onOpenDocumentProgress	(COpenProgress)
    * asc_onAdvancedOptions		(asc_CAdvancedOptions, ascAdvancedOptionsAction)	- эвент на получение дополнительных опций (открытие/сохранение CSV)
-   * asc_onError					(c_oAscError.ID, c_oAscError.Level)					- эвент об ошибке
-   * asc_onEditCell				(c_oAscCellEditorState)								- эвент на редактирование ячейки с состоянием (переходами из формулы и обратно)
+   * asc_onError					(Asc.c_oAscError.ID, Asc.c_oAscError.Level)					- эвент об ошибке
+   * asc_onEditCell				(Asc.c_oAscCellEditorState)								- эвент на редактирование ячейки с состоянием (переходами из формулы и обратно)
    * asc_onEditorSelectionChanged	(asc_CFont)											- эвент на смену информации о выделении в редакторе ячейки
    * asc_onSelectionChanged		(asc_CCellInfo)										- эвент на смену информации о выделении
    * asc_onSelectionNameChanged	(sName)												- эвент на смену имени выделения (Id-ячейки, число выделенных столбцов/строк, имя диаграммы и др.)
@@ -1174,7 +1174,7 @@ var editor;
         // Выставляем ID пользователя, залочившего данный элемент
         lockElem.setUserId(e["user"]);
 
-        if (lockType === c_oAscLockTypeElem.Object) {
+        if (lockType === AscCommonExcel.c_oAscLockTypeElem.Object) {
           drawing = g_oTableId.Get_ById(lockElem.Element["rangeOrObjectId"]);
           if (drawing) {
             drawing.lockType = lockElem.Type;
@@ -1193,7 +1193,7 @@ var editor;
           var ws = t.wb.getWorksheet();
           var lockSheetId = lockElem.Element["sheetId"];
           if (lockSheetId === ws.model.getId()) {
-            if (lockType === c_oAscLockTypeElem.Object) {
+            if (lockType === AscCommonExcel.c_oAscLockTypeElem.Object) {
               // Нужно ли обновлять закрепление областей
               if (t._onUpdateFrozenPane(lockElem)) {
                 ws.draw();
@@ -1202,7 +1202,7 @@ var editor;
                   ws.objectRender.showDrawingObjects(true);
                 }
               }
-            } else if (lockType === c_oAscLockTypeElem.Range || lockType === c_oAscLockTypeElem.Sheet) {
+            } else if (lockType === AscCommonExcel.c_oAscLockTypeElem.Range || lockType === AscCommonExcel.c_oAscLockTypeElem.Sheet) {
               ws.updateSelection();
             }
           } else if (-1 !== lockSheetId && 0 === lockSheetId.indexOf(CCellCommentator.sStartCommentId)) {
@@ -1249,7 +1249,7 @@ var editor;
           // Удаляем из lock-ов, тот, кто правил ушел и не сохранил
           t.collaborativeEditing.removeUnlock(lockElem);
           if (!t._onCheckCommentRemoveLock(lockElem.Element)) {
-            if (lockElem.Element["type"] === c_oAscLockTypeElem.Object) {
+            if (lockElem.Element["type"] === AscCommonExcel.c_oAscLockTypeElem.Object) {
               drawing = g_oTableId.Get_ById(lockElem.Element["rangeOrObjectId"]);
               if (drawing) {
                 drawing.lockType = c_oAscLockTypes.kLockTypeNone;
@@ -1261,7 +1261,7 @@ var editor;
           // Шлем update для листов
           t._onUpdateSheetsLock(lockElem);
           /*снимаем лок для DefName*/
-          t.handlers.trigger("asc_onLockDefNameManager",c_oAscDefinedNameReason.OK);
+          t.handlers.trigger("asc_onLockDefNameManager",Asc.c_oAscDefinedNameReason.OK);
         }
       }
     };
@@ -1417,7 +1417,7 @@ var editor;
   spreadsheet_api.prototype._onUpdateSheetsLock = function(lockElem) {
     var t = this;
     // Шлем update для листов, т.к. нужно залочить лист
-    if (c_oAscLockTypeElem.Sheet === lockElem.Element["type"]) {
+    if (AscCommonExcel.c_oAscLockTypeElem.Sheet === lockElem.Element["type"]) {
       t.handlers.trigger("asc_onWorkbookLocked", t.asc_isWorkbookLocked());
     }
     // Шлем update для листа
@@ -1429,7 +1429,7 @@ var editor;
   };
 
   spreadsheet_api.prototype._onUpdateFrozenPane = function(lockElem) {
-    return (c_oAscLockTypeElem.Object === lockElem.Element["type"] && lockElem.Element["rangeOrObjectId"] === c_oAscLockNameFrozenPane);
+    return (AscCommonExcel.c_oAscLockTypeElem.Object === lockElem.Element["type"] && lockElem.Element["rangeOrObjectId"] === AscCommonExcel.c_oAscLockNameFrozenPane);
   };
 
   spreadsheet_api.prototype._sendWorkbookStyles = function() {
@@ -1487,7 +1487,7 @@ var editor;
 
     // Были ошибки при открытии, посылаем предупреждение
     if (0 < this.wbModel.openErrors.length) {
-      this.sendEvent('asc_onError', c_oAscError.ID.OpenWarning, c_oAscError.Level.NoCritical);
+      this.sendEvent('asc_onError', Asc.c_oAscError.ID.OpenWarning, Asc.c_oAscError.Level.NoCritical);
     }
 
     //this.asc_Resize(); // Убрал, т.к. сверху приходит resize (http://bugzserver/show_bug.cgi?id=14680)
@@ -1611,7 +1611,7 @@ var editor;
   // Залочена ли панель для закрепления
   spreadsheet_api.prototype._isLockedTabColor = function(index, callback) {
     var sheetId = this.wbModel.getWorksheet(index).getId();
-    var lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Object, null, sheetId, c_oAscLockNameTabColor);
+    var lockInfo = this.collaborativeEditing.getLockInfo(AscCommonExcel.c_oAscLockTypeElem.Object, null, sheetId, AscCommonExcel.c_oAscLockNameTabColor);
 
     if (false === this.collaborativeEditing.getCollaborativeEditing()) {
       // Пользователь редактирует один: не ждем ответа, а сразу продолжаем редактирование
@@ -1721,14 +1721,14 @@ var editor;
   };
 
   spreadsheet_api.prototype._onUpdateDefinedNames = function(lockElem) {
-//      if( lockElem.Element["subType"] == c_oAscLockTypeElemSubType.DefinedNames ){
+//      if( lockElem.Element["subType"] == AscCommonExcel.c_oAscLockTypeElemSubType.DefinedNames ){
       if( lockElem.Element["sheetId"] == -1 && lockElem.Element["rangeOrObjectId"] != -1 && !this.collaborativeEditing.getFast() ){
           var dN = this.wbModel.dependencyFormulas.defNameList[lockElem.Element["rangeOrObjectId"]];
           if (dN) {
               dN.isLock = lockElem.UserId;
               this.handlers.trigger("asc_onRefreshDefNameList",dN.getAscCDefName());
           }
-          this.handlers.trigger("asc_onLockDefNameManager",c_oAscDefinedNameReason.LockDefNameManager);
+          this.handlers.trigger("asc_onLockDefNameManager",Asc.c_oAscDefinedNameReason.LockDefNameManager);
       }
   }
 
@@ -1750,14 +1750,14 @@ var editor;
       sheetId = ws.getId();
     }
 
-    var lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Sheet, /*subType*/null, sheetId, sheetId);
+    var lockInfo = this.collaborativeEditing.getLockInfo(AscCommonExcel.c_oAscLockTypeElem.Sheet, /*subType*/null, sheetId, sheetId);
     // Проверим, редактирует ли кто-то лист
     return (false !== this.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeOther, /*bCheckOnlyLockAll*/false));
   };
 
   // Залочена ли работа с листами
   spreadsheet_api.prototype.asc_isWorkbookLocked = function() {
-    var lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Sheet, /*subType*/null, null, null);
+    var lockInfo = this.collaborativeEditing.getLockInfo(AscCommonExcel.c_oAscLockTypeElem.Sheet, /*subType*/null, null, null);
     // Проверим, редактирует ли кто-то лист
     return (false !== this.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeOther, /*bCheckOnlyLockAll*/false));
   };
@@ -1793,7 +1793,7 @@ var editor;
       };
       if (isHidden) {
         var sheetId = this.wbModel.getWorksheet(index).getId();
-        var lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Sheet, /*subType*/null, sheetId, sheetId);
+        var lockInfo = this.collaborativeEditing.getLockInfo(AscCommonExcel.c_oAscLockTypeElem.Sheet, /*subType*/null, sheetId, sheetId);
         this._getIsLockObjectSheet(lockInfo, showWorksheetCallback);
       } else {
         showWorksheetCallback(true);
@@ -1821,7 +1821,7 @@ var editor;
     // Активный лист
     var activeWorksheet = model.getActive();
     var sheetId = this.wbModel.getWorksheet(activeWorksheet).getId();
-    var lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Sheet, /*subType*/null, sheetId, sheetId);
+    var lockInfo = this.collaborativeEditing.getLockInfo(AscCommonExcel.c_oAscLockTypeElem.Sheet, /*subType*/null, sheetId, sheetId);
 
     var hideWorksheetCallback = function(res) {
       if (res) {
@@ -1841,7 +1841,7 @@ var editor;
 
     var i = this.wbModel.getActive();
     var sheetId = this.wbModel.getWorksheet(i).getId();
-    var lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Sheet, /*subType*/null, sheetId, sheetId);
+    var lockInfo = this.collaborativeEditing.getLockInfo(AscCommonExcel.c_oAscLockTypeElem.Sheet, /*subType*/null, sheetId, sheetId);
 
     var t = this;
     var renameCallback = function(res) {
@@ -1849,7 +1849,7 @@ var editor;
         t.wbModel.getWorksheet(i).setName(name);
         t.sheetsChanged();
       } else {
-        t.handlers.trigger("asc_onError", c_oAscError.ID.LockedWorksheetRename, c_oAscError.Level.NoCritical);
+        t.handlers.trigger("asc_onError", Asc.c_oAscError.ID.LockedWorksheetRename, Asc.c_oAscError.Level.NoCritical);
       }
     };
 
@@ -1878,7 +1878,7 @@ var editor;
     var activeSheet = this.wbModel.getWorksheet(i);
     var activeName = activeSheet.sName;
     var sheetId = activeSheet.getId();
-    var lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Sheet, /*subType*/null, sheetId, sheetId);
+    var lockInfo = this.collaborativeEditing.getLockInfo(AscCommonExcel.c_oAscLockTypeElem.Sheet, /*subType*/null, sheetId, sheetId);
 
     var t = this;
     var deleteCallback = function(res) {
@@ -1940,7 +1940,7 @@ var editor;
 
     // ToDo уйти от lock для листа при копировании
     var sheetId = this.wbModel.getWorksheet(i).getId();
-    var lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Sheet, /*subType*/null, sheetId, sheetId);
+    var lockInfo = this.collaborativeEditing.getLockInfo(AscCommonExcel.c_oAscLockTypeElem.Sheet, /*subType*/null, sheetId, sheetId);
     var t = this;
     var copyWorksheet = function(res) {
       if (res) {
@@ -2015,7 +2015,7 @@ var editor;
   };
 
   spreadsheet_api.prototype.asc_replaceText = function(options) {
-    options.lookIn = c_oAscFindLookIn.Formulas; // При замене поиск только в формулах
+    options.lookIn = Asc.c_oAscFindLookIn.Formulas; // При замене поиск только в формулах
     this.wb.replaceCellText(options);
   };
 
@@ -2033,7 +2033,7 @@ var editor;
     var d = this.wb.findCell(reference);
 
     if (!d) {
-      this.handlers.trigger("asc_onError", c_oAscError.ID.InvalidReferenceOrName, c_oAscError.Level.NoCritical);
+      this.handlers.trigger("asc_onError", Asc.c_oAscError.ID.InvalidReferenceOrName, Asc.c_oAscError.Level.NoCritical);
       return;
     }
 
@@ -2063,7 +2063,7 @@ var editor;
         this.controller.scrollVertical(d.deltaY);
       }
     } else {
-      this.handlers.trigger("asc_onError", c_oAscError.ID.InvalidReferenceOrName, c_oAscError.Level.NoCritical);
+      this.handlers.trigger("asc_onError", Asc.c_oAscError.ID.InvalidReferenceOrName, Asc.c_oAscError.Level.NoCritical);
     }
   };
 
@@ -2130,7 +2130,7 @@ var editor;
 
   spreadsheet_api.prototype.asc_drawDepCells = function(se) {
     /* ToDo
-     if( se != c_oAscDrawDepOptions.Clear )
+     if( se != AscCommonExcel.c_oAscDrawDepOptions.Clear )
      this.wb.getWorksheet().prepareDepCells(se);
      else
      this.wb.getWorksheet().cleanDepCells();*/
@@ -2207,13 +2207,13 @@ var editor;
             var ws = t.wb.getWorksheet();
             ws.objectRender.addImageDrawingObject(firstUrl, null);
           } else {
-            t.handlers.trigger("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
+            t.handlers.trigger("asc_onError", Asc.c_oAscError.ID.Unknown, Asc.c_oAscError.Level.NoCritical);
           }
         } else {
-          t.handlers.trigger("asc_onError", g_fMapAscServerErrorToAscError(parseInt(input["data"])), c_oAscError.Level.NoCritical);
+          t.handlers.trigger("asc_onError", g_fMapAscServerErrorToAscError(parseInt(input["data"])), Asc.c_oAscError.Level.NoCritical);
         }
       } else {
-        t.handlers.trigger("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
+        t.handlers.trigger("asc_onError", Asc.c_oAscError.ID.Unknown, Asc.c_oAscError.Level.NoCritical);
       }
       t.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
     };
@@ -2461,13 +2461,13 @@ var editor;
               fReplaceCallback(firstUrl);
               ws.objectRender.setGraphicObjectProps(props);
             } else {
-              t.handlers.trigger("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
+              t.handlers.trigger("asc_onError", Asc.c_oAscError.ID.Unknown, Asc.c_oAscError.Level.NoCritical);
             }
           } else {
-            t.handlers.trigger("asc_onError", g_fMapAscServerErrorToAscError(parseInt(input["data"])), c_oAscError.Level.NoCritical);
+            t.handlers.trigger("asc_onError", g_fMapAscServerErrorToAscError(parseInt(input["data"])), Asc.c_oAscError.Level.NoCritical);
           }
         } else {
-          t.handlers.trigger("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
+          t.handlers.trigger("asc_onError", Asc.c_oAscError.ID.Unknown, Asc.c_oAscError.Level.NoCritical);
         }
         t.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
       };
@@ -2544,7 +2544,7 @@ var editor;
       var drawing_area = worksheet.objectRender.drawingArea;
       if (drawing_area) {
         for (var i = 0; i < drawing_area.frozenPlaces.length; ++i) {
-          worksheet.objectRender.showDrawingObjects(false, new GraphicOption(worksheet, c_oAscGraphicOption.ScrollVertical, drawing_area.frozenPlaces[i].range, {offsetX: 0, offsetY: 0}));
+          worksheet.objectRender.showDrawingObjects(false, new GraphicOption(worksheet, AscCommonExcel.c_oAscGraphicOption.ScrollVertical, drawing_area.frozenPlaces[i].range, {offsetX: 0, offsetY: 0}));
             worksheet.objectRender.controller && worksheet.objectRender.controller.getGraphicObjectProps();
         }
       }
@@ -2843,11 +2843,11 @@ var editor;
 
   /**
    * Режим выбора диапазона
-   * @param {c_oAscSelectionDialogType} selectionDialogType
+   * @param {Asc.c_oAscSelectionDialogType} selectionDialogType
    * @param selectRange
    */
   spreadsheet_api.prototype.asc_setSelectionDialogMode = function(selectionDialogType, selectRange) {
-    this.controller.setSelectionDialogMode(c_oAscSelectionDialogType.None !== selectionDialogType);
+    this.controller.setSelectionDialogMode(Asc.c_oAscSelectionDialogType.None !== selectionDialogType);
     if (this.wb) {
       this.wb._onStopFormatPainter();
       this.wb.setSelectionDialogMode(selectionDialogType, selectRange);
@@ -2937,7 +2937,7 @@ var editor;
     };
     // ToDo поправить заглушку, сделать новый тип lock element-а
     var sheetId = -1; // Делаем не существующий лист и не существующий объект
-    var lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Object, /*subType*/null, sheetId, sheetId);
+    var lockInfo = this.collaborativeEditing.getLockInfo(AscCommonExcel.c_oAscLockTypeElem.Object, /*subType*/null, sheetId, sheetId);
     this._getIsLockObjectSheet(lockInfo, onChangeColorScheme);
   };
   spreadsheet_api.prototype.asc_AfterChangeColorScheme = function() {
@@ -3161,7 +3161,7 @@ var editor;
     window.AscDesktopEditor_PrintData = undefined;
 
     if (1 == _param) {
-      var countWorksheets = _adjustPrint.asc_setPrintType(c_oAscPrintType.EntireWorkbook), printOptions;
+      var countWorksheets = _adjustPrint.asc_setPrintType(Asc.c_oAscPrintType.EntireWorkbook), printOptions;
       this.wbModel.getWorksheetCount();
       for (var j = 0; j < countWorksheets; ++j) {
         printOptions = this.wbModel.getWorksheet(j).PagePrintOptions;

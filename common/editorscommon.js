@@ -295,24 +295,24 @@ function sendCommand2(editor, fCallback, rdata, dataContainer) {
 }
 
 function g_fMapAscServerErrorToAscError (nServerError) {
-	var nRes = c_oAscError.ID.Unknown;
+	var nRes = Asc.c_oAscError.ID.Unknown;
 	switch (nServerError) {
-		case c_oAscServerError.NoError : nRes = c_oAscError.ID.No; break;
+		case c_oAscServerError.NoError : nRes = Asc.c_oAscError.ID.No; break;
 		case c_oAscServerError.TaskQueue :
-		case c_oAscServerError.TaskResult : nRes = c_oAscError.ID.Database; break;
-		case c_oAscServerError.ConvertDownload : nRes = c_oAscError.ID.DownloadError; break;
-		case c_oAscServerError.ConvertTimeout : nRes = c_oAscError.ID.ConvertationTimeout; break;
-		case c_oAscServerError.ConvertMS_OFFCRYPTO : nRes = c_oAscError.ID.ConvertationPassword; break;
+		case c_oAscServerError.TaskResult : nRes = Asc.c_oAscError.ID.Database; break;
+		case c_oAscServerError.ConvertDownload : nRes = Asc.c_oAscError.ID.DownloadError; break;
+		case c_oAscServerError.ConvertTimeout : nRes = Asc.c_oAscError.ID.ConvertationTimeout; break;
+		case c_oAscServerError.ConvertMS_OFFCRYPTO : nRes = Asc.c_oAscError.ID.ConvertationPassword; break;
 		case c_oAscServerError.ConvertUnknownFormat :
 		case c_oAscServerError.ConvertReadFile :
-		case c_oAscServerError.Convert : nRes = c_oAscError.ID.ConvertationError; break;
-		case c_oAscServerError.UploadContentLength : nRes = c_oAscError.ID.UplImageSize; break;
-		case c_oAscServerError.UploadExtension : nRes = c_oAscError.ID.UplImageExt; break;
-		case c_oAscServerError.UploadCountFiles : nRes = c_oAscError.ID.UplImageFileCount; break;
-		case c_oAscServerError.VKey : nRes = c_oAscError.ID.FileVKey; break;
-		case c_oAscServerError.VKeyEncrypt : nRes = c_oAscError.ID.VKeyEncrypt; break;
-		case c_oAscServerError.VKeyKeyExpire : nRes = c_oAscError.ID.KeyExpire; break;
-		case c_oAscServerError.VKeyUserCountExceed : nRes = c_oAscError.ID.UserCountExceed; break;
+		case c_oAscServerError.Convert : nRes = Asc.c_oAscError.ID.ConvertationError; break;
+		case c_oAscServerError.UploadContentLength : nRes = Asc.c_oAscError.ID.UplImageSize; break;
+		case c_oAscServerError.UploadExtension : nRes = Asc.c_oAscError.ID.UplImageExt; break;
+		case c_oAscServerError.UploadCountFiles : nRes = Asc.c_oAscError.ID.UplImageFileCount; break;
+		case c_oAscServerError.VKey : nRes = Asc.c_oAscError.ID.FileVKey; break;
+		case c_oAscServerError.VKeyEncrypt : nRes = Asc.c_oAscError.ID.VKeyEncrypt; break;
+		case c_oAscServerError.VKeyKeyExpire : nRes = Asc.c_oAscError.ID.KeyExpire; break;
+		case c_oAscServerError.VKeyUserCountExceed : nRes = Asc.c_oAscError.ID.UserCountExceed; break;
 		case c_oAscServerError.Storage :
 		case c_oAscServerError.StorageFileNoFound :
 		case c_oAscServerError.StorageRead :
@@ -322,7 +322,7 @@ function g_fMapAscServerErrorToAscError (nServerError) {
 		case c_oAscServerError.StorageGetInfo :
 		case c_oAscServerError.Upload :
 		case c_oAscServerError.ReadRequestStream :
-		case c_oAscServerError.Unknown : nRes = c_oAscError.ID.Unknown; break;
+		case c_oAscServerError.Unknown : nRes = Asc.c_oAscError.ID.Unknown; break;
 	}
 	return nRes;
 }
@@ -757,7 +757,7 @@ function InitOnMessage (callback) {
 										break;
 									}
 								}
-								callback(c_oAscError.ID.No, firstUrl);
+								callback(Asc.c_oAscError.ID.No, firstUrl);
 							}
 
 						} else
@@ -777,7 +777,7 @@ function ShowImageFileDialog (documentId, documentUserId, callback, callbackOld)
 				var nError = ValidateUploadImage(e.target.files);
 				callback(g_fMapAscServerErrorToAscError(nError), e.target.files);
 			} else {
-				callback(c_oAscError.ID.Unknown);
+				callback(Asc.c_oAscError.ID.Unknown);
 			}
 		});
 	} else {
@@ -798,7 +798,7 @@ function ShowImageFileDialog (documentId, documentUserId, callback, callbackOld)
 					return;
 				}
 			}
-			callbackOld(c_oAscError.ID.No);
+			callbackOld(Asc.c_oAscError.ID.No);
 			fileSubmit.click();
 		};
 	}
@@ -842,14 +842,14 @@ function UploadImageFiles (files, documentId, documentUserId, callback) {
 							break;
 						}
 					}
-					callback(c_oAscError.ID.No, firstUrl);
+					callback(Asc.c_oAscError.ID.No, firstUrl);
 				} else
-					callback(c_oAscError.ID.Unknown);
+					callback(Asc.c_oAscError.ID.Unknown);
 			}
 		};
 		xhr.send(file);
 	} else {
-		callback(c_oAscError.ID.Unknown);
+		callback(Asc.c_oAscError.ID.Unknown);
 	}
 }
 function ValidateUploadImage( files ) {
@@ -873,7 +873,7 @@ function ValidateUploadImage( files ) {
 				if (false == bSupported)
 					nRes = c_oAscServerError.UploadExtension;
 			}
-			if (c_oAscError.ID.No == nRes) {
+			if (Asc.c_oAscError.ID.No == nRes) {
 				var nSize = file.fileSize || file.size;
 				if (nSize && c_oAscImageUploadProp.MaxFileSize < nSize)
 					nRes = c_oAscServerError.UploadContentLength;
@@ -1503,7 +1503,7 @@ parserHelper.prototype.getEscapeSheetName = function (sheet) {
  * Проверяем ссылку на валидность для диаграммы или автофильтра
  * @param {Workbook} model
  * @param {WorkbookView} wb
- * @param {c_oAscSelectionDialogType} dialogType
+ * @param {Asc.c_oAscSelectionDialogType} dialogType
  * @param {string} dataRange
  * @param {boolean} fullCheck
  * @param {boolean} isRows
@@ -1512,23 +1512,23 @@ parserHelper.prototype.getEscapeSheetName = function (sheet) {
  */
 parserHelper.prototype.checkDataRange = function (model, wb, dialogType, dataRange, fullCheck, isRows, chartType) {
     var sDataRange = dataRange, sheetModel;
-	if (c_oAscSelectionDialogType.Chart === dialogType) {
+	if (Asc.c_oAscSelectionDialogType.Chart === dialogType) {
 		dataRange = parserHelp.parse3DRef(dataRange);
         if(dataRange)
         {
             sheetModel =  model.getWorksheetByName(dataRange.sheet);
         }
 		if (null === dataRange || !sheetModel)
-			return c_oAscError.ID.DataRangeError;
+			return Asc.c_oAscError.ID.DataRangeError;
 		dataRange = Asc.g_oRangeCache.getAscRange(dataRange.range);
 	} else
 		dataRange = Asc.g_oRangeCache.getAscRange(dataRange);
 
 	if (null === dataRange)
-		return c_oAscError.ID.DataRangeError;
+		return Asc.c_oAscError.ID.DataRangeError;
 
 	if (fullCheck) {
-		if (c_oAscSelectionDialogType.Chart === dialogType) {
+		if (Asc.c_oAscSelectionDialogType.Chart === dialogType) {
 			// Проверка максимального дипазона
 			var maxSeries = 255;
 			var minStockVal = 4;
@@ -1549,16 +1549,16 @@ parserHelper.prototype.checkDataRange = function (model, wb, dialogType, dataRan
                 chartSettings.putInColumns(!isRows);
                 var chartSeries = getChartSeries (sheetModel, chartSettings).series;
 				if (minStockVal !== chartSeries.length || !chartSeries[0].Val || !chartSeries[0].Val.NumCache || chartSeries[0].Val.NumCache.length < minStockVal)
-					return c_oAscError.ID.StockChartError;
+					return Asc.c_oAscError.ID.StockChartError;
 			} else if (intervalSeries > maxSeries)
-				return c_oAscError.ID.MaxDataSeriesError;
-		} else if (c_oAscSelectionDialogType.FormatTable === dialogType) {
+				return Asc.c_oAscError.ID.MaxDataSeriesError;
+		} else if (Asc.c_oAscSelectionDialogType.FormatTable === dialogType) {
 			// ToDo убрать эту проверку, заменить на более грамотную после правки функции _searchFilters
 			if (true === wb.getWorksheet().model.autoFilters.isRangeIntersectionTableOrFilter(dataRange))
-				return c_oAscError.ID.AutoFilterDataRangeError;
+				return Asc.c_oAscError.ID.AutoFilterDataRangeError;
 		}
 	}
-	return c_oAscError.ID.No;
+	return Asc.c_oAscError.ID.No;
 };
 parserHelper.prototype.setDigitSeparator = function( sep ){
     if( sep != digitSeparatorDef ){

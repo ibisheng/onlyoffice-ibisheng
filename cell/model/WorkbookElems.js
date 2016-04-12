@@ -2093,7 +2093,7 @@ Hyperlink.prototype = {
 		return this.bVisited;
 	},
 	getHyperlinkType : function () {
-		return null !== this.Hyperlink ? c_oAscHyperlinkType.WebLink : c_oAscHyperlinkType.RangeLink;
+		return null !== this.Hyperlink ? Asc.c_oAscHyperlinkType.WebLink : Asc.c_oAscHyperlinkType.RangeLink;
 	},
 	getType : function () {
 		return UndoRedoDataTypes.Hyperlink;
@@ -4954,24 +4954,24 @@ FilterColumn.prototype.createFilter = function(obj) {
 	
 	switch (obj.filter.type)
 	{
-		case c_oAscAutoFilterTypes.ColorFilter:
+		case Asc.c_oAscAutoFilterTypes.ColorFilter:
 		{
 			break;
 		}
-		case c_oAscAutoFilterTypes.CustomFilters:
+		case Asc.c_oAscAutoFilterTypes.CustomFilters:
 		{
 			this.CustomFiltersObj = obj.filter.filter.clone();
 			break;
 		}	
-		case c_oAscAutoFilterTypes.DynamicFilter:
+		case Asc.c_oAscAutoFilterTypes.DynamicFilter:
 		{
 			break;
 		}
-		case c_oAscAutoFilterTypes.Top10:
+		case Asc.c_oAscAutoFilterTypes.Top10:
 		{
 			break;
 		}	
-		case c_oAscAutoFilterTypes.Filters:
+		case Asc.c_oAscAutoFilterTypes.Filters:
 		{
 			newFilter = new Filters();
 			this.Filters = newFilter;
@@ -5315,58 +5315,58 @@ CustomFilter.prototype.isHideValue = function(val) {
 		result = checkComplexSymbols;
 	else
 	{
-		if(this.Operator == c_oAscCustomAutoFilter.equals || this.Operator == c_oAscCustomAutoFilter.doesNotEqual)//общие для числа и текста
+		if(this.Operator == Asc.c_oAscCustomAutoFilter.equals || this.Operator == Asc.c_oAscCustomAutoFilter.doesNotEqual)//общие для числа и текста
 		{
 			filterVal = isNaN(this.Val) ? this.Val.toLowerCase() : this.Val;
-			if (this.Operator == c_oAscCustomAutoFilter.equals)//equals
+			if (this.Operator == Asc.c_oAscCustomAutoFilter.equals)//equals
 			{
 				if(val == filterVal)
 					result = true;
 			}
-			else if (this.Operator == c_oAscCustomAutoFilter.doesNotEqual)//doesNotEqual
+			else if (this.Operator == Asc.c_oAscCustomAutoFilter.doesNotEqual)//doesNotEqual
 			{
 				if(val != filterVal)
 					result = true;
 			}
 		}
-		else if((this.Operator == c_oAscCustomAutoFilter.isGreaterThan ||this.Operator == c_oAscCustomAutoFilter.isGreaterThanOrEqualTo || this.Operator == c_oAscCustomAutoFilter.isLessThan || this.Operator == c_oAscCustomAutoFilter.isLessThanOrEqualTo) && !isNaN(this.Val))//только для чисел
+		else if((this.Operator == Asc.c_oAscCustomAutoFilter.isGreaterThan ||this.Operator == Asc.c_oAscCustomAutoFilter.isGreaterThanOrEqualTo || this.Operator == Asc.c_oAscCustomAutoFilter.isLessThan || this.Operator == Asc.c_oAscCustomAutoFilter.isLessThanOrEqualTo) && !isNaN(this.Val))//только для чисел
 		{
 			filterVal =  parseFloat(this.Val);
 			val = parseFloat(val);
 			
 			switch (this.Operator)
 			{
-				case c_oAscCustomAutoFilter.isGreaterThan:
+				case Asc.c_oAscCustomAutoFilter.isGreaterThan:
 					if(val > filterVal)//isGreaterThan
 						result = true;
 					break;
-				case c_oAscCustomAutoFilter.isGreaterThanOrEqualTo:
+				case Asc.c_oAscCustomAutoFilter.isGreaterThanOrEqualTo:
 					if(val >= filterVal)//isGreaterThanOrEqualTo
 						result = true;
 					break;
-				case c_oAscCustomAutoFilter.isLessThan:
+				case Asc.c_oAscCustomAutoFilter.isLessThan:
 					if(val < filterVal)//isLessThan
 						result = true;
 					break;
-				case c_oAscCustomAutoFilter.isLessThanOrEqualTo:
+				case Asc.c_oAscCustomAutoFilter.isLessThanOrEqualTo:
 					if(val <= filterVal)//isLessThanOrEqualTo
 						result = true;
 					break;
 			}
 		}
-		else if(this.Operator == c_oAscCustomAutoFilter.beginsWith || this.Operator == c_oAscCustomAutoFilter.doesNotBeginWith || this.Operator == c_oAscCustomAutoFilter.endsWith || this.Operator == c_oAscCustomAutoFilter.doesNotEndWith || this.Operator == c_oAscCustomAutoFilter.contains || this.Operator == c_oAscCustomAutoFilter.doesNotContain)//только для текста
+		else if(this.Operator == Asc.c_oAscCustomAutoFilter.beginsWith || this.Operator == Asc.c_oAscCustomAutoFilter.doesNotBeginWith || this.Operator == Asc.c_oAscCustomAutoFilter.endsWith || this.Operator == Asc.c_oAscCustomAutoFilter.doesNotEndWith || this.Operator == Asc.c_oAscCustomAutoFilter.contains || this.Operator == Asc.c_oAscCustomAutoFilter.doesNotContain)//только для текста
 		{
 			filterVal = isNaN(this.Val) ? this.Val.toLowerCase() : this.Val;
 			switch (this.Operator)
 			{
-				case c_oAscCustomAutoFilter.beginsWith:
+				case Asc.c_oAscCustomAutoFilter.beginsWith:
 					if(!isDigitValue)
 					{
 						if(val.startsWith(filterVal))//beginsWith
 							result = true;
 					}
 					break;
-				case c_oAscCustomAutoFilter.doesNotBeginWith: 
+				case Asc.c_oAscCustomAutoFilter.doesNotBeginWith: 
 					if(!isDigitValue)
 					{
 						if(!val.startsWith(filterVal))//doesNotBeginWith
@@ -5375,14 +5375,14 @@ CustomFilter.prototype.isHideValue = function(val) {
 					else
 						result = true;
 					break;
-				case c_oAscCustomAutoFilter.endsWith: 
+				case Asc.c_oAscCustomAutoFilter.endsWith: 
 					if(!isDigitValue)
 					{
 						if(val.endsWith(filterVal))//endsWith
 							result = true;
 					}
 					break;
-				case c_oAscCustomAutoFilter.doesNotEndWith: 
+				case Asc.c_oAscCustomAutoFilter.doesNotEndWith: 
 					if(!isDigitValue)
 					{
 						if(!val.endsWith(filterVal))//doesNotEndWith
@@ -5391,14 +5391,14 @@ CustomFilter.prototype.isHideValue = function(val) {
 					else
 						result = true;
 					break;
-				case c_oAscCustomAutoFilter.contains: 
+				case Asc.c_oAscCustomAutoFilter.contains: 
 					if(!isDigitValue)
 					{
 						if(val.indexOf(filterVal) != -1)//contains
 							result = true;
 					}
 					break;
-				case c_oAscCustomAutoFilter.doesNotContain: 
+				case Asc.c_oAscCustomAutoFilter.doesNotContain: 
 					if(!isDigitValue)
 					{
 						if(val.indexOf(filterVal) == -1)//doesNotContain

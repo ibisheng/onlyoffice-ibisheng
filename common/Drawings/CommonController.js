@@ -263,7 +263,7 @@ function CheckStockChart(oDrawingObjects, oApi)
         {
             if(chartSpace.chart.plotArea.charts[0].series.length !== 4)
             {
-                oApi.asc_fireCallback("asc_onError", c_oAscError.ID.StockChartError, c_oAscError.Level.NoCritical);
+                oApi.asc_fireCallback("asc_onError", Asc.c_oAscError.ID.StockChartError, Asc.c_oAscError.Level.NoCritical);
                 oApi.WordControl.m_oLogicDocument.Document_UpdateInterfaceState();
                 return false;
             }
@@ -7162,11 +7162,11 @@ DrawingObjectsController.prototype =
             if(props && props.ChartProperties && typeof props.ChartProperties.range === "string")
             {
                 var editor = window["Asc"]["editor"];
-                var check = parserHelp.checkDataRange(editor.wbModel, editor.wb, c_oAscSelectionDialogType.Chart, props.ChartProperties.range, true, !props.ChartProperties.inColumns, props.ChartProperties.type);
-                if(check === c_oAscError.ID.StockChartError || check === c_oAscError.ID.DataRangeError
-                    || check === c_oAscError.ID.MaxDataSeriesError)
+                var check = parserHelp.checkDataRange(editor.wbModel, editor.wb, Asc.c_oAscSelectionDialogType.Chart, props.ChartProperties.range, true, !props.ChartProperties.inColumns, props.ChartProperties.type);
+                if(check === Asc.c_oAscError.ID.StockChartError || check === Asc.c_oAscError.ID.DataRangeError
+                    || check === Asc.c_oAscError.ID.MaxDataSeriesError)
                 {
-                    editor.wbModel.handlers.trigger("asc_onError", check, c_oAscError.Level.NoCritical);
+                    editor.wbModel.handlers.trigger("asc_onError", check, Asc.c_oAscError.Level.NoCritical);
                     this.drawingObjects.sendGraphicObjectProps();
                     return;
                 }
@@ -8502,7 +8502,7 @@ function CreateImageDrawingObject(imageUrl, options, drawingObjects) {
         var addImageObject = function (_image) {
 
             if ( !_image.Image ) {
-                worksheet.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.UplImageUrl, c_oAscError.Level.NoCritical);
+                worksheet.model.workbook.handlers.trigger("asc_onError", Asc.c_oAscError.ID.UplImageUrl, Asc.c_oAscError.Level.NoCritical);
             }
             else {
 

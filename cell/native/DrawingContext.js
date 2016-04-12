@@ -1109,7 +1109,7 @@
     };
 
     DrawingContext.prototype.dashLineCleverHor = function (x1, y, x2) {
-        var w_dot = c_oAscCoAuthoringDottedWidth, w_dist = c_oAscCoAuthoringDottedDistance;
+        var w_dot = AscCommonExcel.c_oAscCoAuthoringDottedWidth, w_dist = AscCommonExcel.c_oAscCoAuthoringDottedDistance;
         var _x1 = this._mct.transformPointX(x1, y);
         var _y  = this._mct.transformPointY(x1, y) - 1;
         var _x2 = this._mct.transformPointX(x2, y);
@@ -1130,7 +1130,7 @@
         }
     };
     DrawingContext.prototype.dashLineCleverVer = function (x, y1, y2) {
-        var w_dot = c_oAscCoAuthoringDottedWidth, w_dist = c_oAscCoAuthoringDottedDistance;
+        var w_dot = AscCommonExcel.c_oAscCoAuthoringDottedWidth, w_dist = AscCommonExcel.c_oAscCoAuthoringDottedDistance;
         var _y1 = this._mct.transformPointY(x, y1);
         var _x  = this._mct.transformPointX(x, y1) - 1;
         var _y2 = this._mct.transformPointY(x, y2);
