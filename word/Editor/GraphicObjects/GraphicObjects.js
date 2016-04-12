@@ -301,7 +301,6 @@ CGraphicObjects.prototype =
     {
         return ExecuteNoHistory(function(){
             var oParaDrawing = new ParaDrawing();
-            oParaDrawing.Set_RelativeHeight(251659264);
             oParaDrawing.Set_PositionH(c_oAscRelativeFromH.Page, true, c_oAscAlignH.Center, undefined);
             oParaDrawing.Set_PositionV(c_oAscRelativeFromV.Page, true, c_oAscAlignV.Center, undefined);
             oParaDrawing.Set_WrappingType(WRAPPING_TYPE_NONE);
