@@ -19,6 +19,12 @@ window.document = document;
 
 var History = {};
 
+window["Asc"] = {};
+var Asc = window["Asc"];
+
+window["AscCommonExcel"] = {};
+var AscCommonExcel = window["AscCommonExcel"];
+
 //-------------------------------------------------------------------------------------------------
 aStandartNumFormats = [];
 aStandartNumFormats[0] = "General";
@@ -190,8 +196,6 @@ native_canvas.prototype =
     }
 };
 
-window["Asc"] = {};
-
 var _null_object = {};
 _null_object.length = 0;
 _null_object.nodeType = 1;
@@ -272,7 +276,7 @@ function GetNativeEngine() {
 
 var native_renderer = null;
 var _api = null;
-var Asc = window["Asc"];
+
 
 function NativeOpenFileData(data, version) {
     window.NATIVE_DOCUMENT_TYPE = window.native.GetEditorType();
