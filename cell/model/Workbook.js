@@ -1828,8 +1828,8 @@ function sortDependency( wb, setCellFormat ) {
         for (i in oCleanCellCacheArea)
             wb.handlers.trigger("cleanCellCache", i, oCleanCellCacheArea[i], AscCommonExcel.c_oAscCanChangeColWidth.numbers);
 
-		g_oVLOOKUPCache.clean();
-        g_oHLOOKUPCache.clean();
+    AscCommonExcel.g_oVLOOKUPCache.clean();
+    AscCommonExcel.g_oHLOOKUPCache.clean();
     }
 	wb.needRecalc = {nodes: {}, length:0};
 }
@@ -5162,8 +5162,8 @@ Woorksheet.prototype._RecalculatedFunctions=function(cell,bad,setCellFormat){
 				__cell.oValue.type = CellValueType.String;
 				__cell.oValue.text = res.getValue().toString();
 		}
-		g_oVLOOKUPCache.remove(__cell);
-		g_oHLOOKUPCache.remove(__cell);
+    AscCommonExcel.g_oVLOOKUPCache.remove(__cell);
+    AscCommonExcel.g_oHLOOKUPCache.remove(__cell);
 		__cell.setFormulaCA(res.ca);
         if(setCellFormat){
             if( res.numFormat !== undefined && res.numFormat >= 0){

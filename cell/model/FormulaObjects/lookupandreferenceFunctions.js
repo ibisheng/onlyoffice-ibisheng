@@ -1,5 +1,11 @@
 "use strict";
 
+(
+/**
+* @param {Window} window
+* @param {undefined} undefined
+*/
+function (window, undefined) {
 function _getRowTitle( row ) {
     return "" + (row + 1);
 }
@@ -292,8 +298,6 @@ function cGETPIVOTDATA() {
 }
 
 cGETPIVOTDATA.prototype = Object.create( cBaseFunction.prototype );
-
-var g_oHLOOKUPCache = new VHLOOKUPCache( true );
 
 function cHLOOKUP() {
 //    cBaseFunction.call( this, "HLOOKUP" );
@@ -1371,7 +1375,6 @@ VHLOOKUPCache.prototype.clean = function () {
     this.cacheId = {};
     this.cacheRanges = {};
 };
-var g_oVLOOKUPCache = new VHLOOKUPCache( false );
 
 function cVLOOKUP() {
 //    cBaseFunction.call( this, "VLOOKUP" );
@@ -1611,3 +1614,12 @@ cVLOOKUP.prototype.getInfo = function () {
         args:"( lookup-value  ,  table-array  ,  col-index-num  [  ,  [  range-lookup-flag  ] ] )"
     };
 };
+
+var g_oVLOOKUPCache = new VHLOOKUPCache( false );
+var g_oHLOOKUPCache = new VHLOOKUPCache( true );
+
+//----------------------------------------------------------export----------------------------------------------------
+window['AscCommonExcel'] = window['AscCommonExcel'] || {};
+window['AscCommonExcel'].g_oVLOOKUPCache = g_oVLOOKUPCache;
+window['AscCommonExcel'].g_oHLOOKUPCache = g_oHLOOKUPCache;
+})(window);
