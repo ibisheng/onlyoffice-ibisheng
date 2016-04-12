@@ -1,13 +1,7 @@
 "use strict";
 
-/**
- * Created with JetBrains WebStorm.
- * User: Dmitry.Shahtanov
- * Date: 27.06.13
- * Time: 15:20
- * To change this template use File | Settings | File Templates.
- */
-cFormulaFunctionGroup['Mathematic'] = [
+cFormulaFunctionGroup['Mathematic'] = cFormulaFunctionGroup['Mathematic'] || [];
+cFormulaFunctionGroup['Mathematic'].push(
     cABS,
     cACOS,
     cACOSH,
@@ -69,28 +63,8 @@ cFormulaFunctionGroup['Mathematic'] = [
     cSUMXMY2,
     cTAN,
     cTANH,
-    cTRUNC,
-
-    /*new funcions with _xlnf-prefix*/
-    cACOT,
-    cACOTH,
-    cAGGREGATE,
-    cARABIC,
-    cBASE,
-    cCEILING_MATH,
-    cCEILING_PRECISE,
-    cCOMBINA,
-    cCOT,
-    cCOTH,
-    cCSC,
-    cCSCH,
-    cDECIMAL,
-    cFLOOR_MATH,
-    cFLOOR_PRECISE,
-    cMUNIT,
-    cSEC,
-    cSECH
-];
+    cTRUNC
+);
 
 function cABS() {
 //    cBaseFunction.call( this, "ABS" );

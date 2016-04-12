@@ -1,11 +1,10 @@
-/**
- * Created with JetBrains WebStorm.
- * User: Dmitry.Shahtanov
- * Date: 02.11.15
- * Time: 14:59
- * To change this template use File | Settings | File Templates.
- */
 
+(
+/**
+* @param {Window} window
+* @param {undefined} undefined
+ */
+function (window, undefined) {
 /*cFormulaFunctionGroup['_xlfn'] = [
 
     cFILTERXML,//web not support in MS Office Online
@@ -13,6 +12,146 @@
 
     cQUERYSTRING
 ];*/
+
+    /*new funcions with _xlnf-prefix*/
+    cFormulaFunctionGroup['DateAndTime'] = cFormulaFunctionGroup['DateAndTime'] || [];
+    cFormulaFunctionGroup['DateAndTime'].push(
+      cDAYS,
+      cISOWEEKNUM
+    );
+    cFormulaFunctionGroup['Engineering'] = cFormulaFunctionGroup['Engineering'] || [];
+    cFormulaFunctionGroup['Engineering'].push(
+      cBITAND,
+      cBITLSHIFT,
+      cBITOR,
+      cBITRSHIFT,
+      cBITXOR,
+      cERF_PRECISE,
+      cERFC_PRECISE,
+      cIMCOSH,
+      cIMCOT,
+      cIMCSC,
+      cIMCSCH,
+      cIMSEC,
+      cIMSECH,
+      cIMSINH,
+      cIMTAN
+    );
+    cFormulaFunctionGroup['TextAndData'] = cFormulaFunctionGroup['TextAndData'] || [];
+    cFormulaFunctionGroup['TextAndData'].push(
+      cDBCS,
+      cNUMBERVALUE,
+      cUNICHAR,
+      cUNICODE
+    );
+    cFormulaFunctionGroup['Statistical'] = cFormulaFunctionGroup['Statistical'] || [];
+    cFormulaFunctionGroup['Statistical'].push(
+      cBETA_DIST,
+      cBETA_INV,
+      cBINOM_DIST,
+      cBINOM_DIST_RANGE,
+      cBINOM_INV,
+      cCHISQ_DIST,
+      cCHISQ_DIST_RT,
+      cCHISQ_INV,
+      cCHISQ_INV_RT,
+      cCHISQ_TEST,
+      cCONFIDENCE_NORM,
+      cCONFIDENCE_T,
+      cCOVARIANCE_P,
+      cCOVARIANCE_S,
+      cEXPON_DIST,
+      cF_DIST,
+      cF_DIST_RT,
+      cF_INV,
+      cF_INV_RT,
+      cF_TEST,
+      cFORECAST_ETS,
+      cFORECAST_ETS_CONFINT,
+      cFORECAST_ETS_SEASONALITY,
+      cFORECAST_ETS_STAT,
+      cFORECAST_LINEAR,
+      cGAMMA,
+      cGAMMA_DIST,
+      cGAMMA_INV,
+      cGAMMALN_PRECISE,
+      cGAUSS,
+      cHYPGEOM_DIST,
+      cLOGNORM_DIST,
+      cLOGNORM_INV,
+      cMODE_MULT,
+      cMODE_SNGL,
+      cNEGBINOM_DIST,
+      cNORM_DIST,
+      cNORM_INV,
+      cNORM_S_DIST,
+      cNORM_S_INV,
+      cPERCENTILE_EXC,
+      cPERCENTILE_INC,
+      cPERCENTRANK_EXC,
+      cPERCENTRANK_INC,
+      cPERMUTATIONA,
+      cPHI,
+      cPOISSON_DIST,
+      cQUARTILE_EXC,
+      cQUARTILE_INC,
+      cRANK_AVG,
+      cRANK_EQ,
+      cSKEW_P,
+      cSTDEV_P,
+      cSTDEV_S,
+      cT_DIST,
+      cT_DIST_2T,
+      cT_DIST_RT,
+      cT_INV,
+      cT_INV_2T,
+      cT_TEST,
+      cVAR_P,
+      cVAR_S,
+      cWEIBULL_DIST,
+      cZ_TEST
+    );
+    cFormulaFunctionGroup['Financial'] = cFormulaFunctionGroup['Financial'] || [];
+    cFormulaFunctionGroup['Financial'].push(
+      cPDURATION,
+      cRRI
+    );
+    cFormulaFunctionGroup['Mathematic'] = cFormulaFunctionGroup['Mathematic'] || [];
+    cFormulaFunctionGroup['Mathematic'].push(
+      cACOT,
+      cACOTH,
+      cAGGREGATE,
+      cARABIC,
+      cBASE,
+      cCEILING_MATH,
+      cCEILING_PRECISE,
+      cCOMBINA,
+      cCOT,
+      cCOTH,
+      cCSC,
+      cCSCH,
+      cDECIMAL,
+      cFLOOR_MATH,
+      cFLOOR_PRECISE,
+      cMUNIT,
+      cSEC,
+      cSECH
+    );
+    cFormulaFunctionGroup['LookupAndReference'] = cFormulaFunctionGroup['LookupAndReference'] || [];
+    cFormulaFunctionGroup['LookupAndReference'].push(
+      cFORMULATEXT
+    );
+    cFormulaFunctionGroup['Information'] = cFormulaFunctionGroup['Information'] || [];
+    cFormulaFunctionGroup['Information'].push(
+      cISFORMULA,
+      cSHEET,
+      cSHEETS
+    );
+    cFormulaFunctionGroup['Logical'] = cFormulaFunctionGroup['Logical'] || [];
+    cFormulaFunctionGroup['Logical'].push(
+      cIFNA,
+      cXOR
+    );
 
 function cACOT() {
     cBaseFunction.call( this, "ACOT" );
@@ -697,3 +836,4 @@ function cZ_TEST() {
     this.isXLFN = true;
 }
 cZ_TEST.prototype = Object.create( cBaseFunction.prototype );
+})(window);

@@ -444,14 +444,8 @@ function oddFPrice( settl, matur, iss, firstCoup, rate, yld, redemption, frequen
     return res;
 }
 
-/**
- * Created with JetBrains WebStorm.
- * User: Dmitry.Shahtanov
- * Date: 27.06.13
- * Time: 15:19
- * To change this template use File | Settings | File Templates.
- */
-cFormulaFunctionGroup['Financial'] = [
+cFormulaFunctionGroup['Financial'] = cFormulaFunctionGroup['Financial'] || [];
+cFormulaFunctionGroup['Financial'].push(
     cACCRINT,
     cACCRINTM,
     cAMORDEGRC,
@@ -504,12 +498,8 @@ cFormulaFunctionGroup['Financial'] = [
     cXNPV,
     cYIELD,
     cYIELDDISC,
-    cYIELDMAT,
-
-    /*new funcions with _xlnf-prefix*/
-    cPDURATION,
-    cRRI
-];
+    cYIELDMAT
+);
 
 function cACCRINT() {
 //    cBaseFunction.call( this, "ACCRINT" );

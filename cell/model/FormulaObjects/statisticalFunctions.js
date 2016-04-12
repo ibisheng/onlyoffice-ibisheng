@@ -1,14 +1,7 @@
 "use strict";
 
-/**
- * Created with JetBrains WebStorm.
- * User: Dmitry.Shahtanov
- * Date: 27.06.13
- * Time: 15:18
- * To change this template use File | Settings | File Templates.
- */
-
-cFormulaFunctionGroup['Statistical'] = [
+cFormulaFunctionGroup['Statistical'] = cFormulaFunctionGroup['Statistical'] || [];
+cFormulaFunctionGroup['Statistical'].push(
     cAVEDEV,
     cAVERAGE,
     cAVERAGEA,
@@ -91,73 +84,8 @@ cFormulaFunctionGroup['Statistical'] = [
     cVARP,
     cVARPA,
     cWEIBULL,
-    cZTEST,
-    /*new funcions with _xlnf-prefix*/
-    cBETA_DIST,
-    cBETA_INV,
-    cBINOM_DIST,
-    cBINOM_DIST_RANGE,
-    cBINOM_INV,
-    cCHISQ_DIST,
-    cCHISQ_DIST_RT,
-    cCHISQ_INV,
-    cCHISQ_INV_RT,
-    cCHISQ_TEST,
-    cCONFIDENCE_NORM,
-    cCONFIDENCE_T,
-    cCOVARIANCE_P,
-    cCOVARIANCE_S,
-    cEXPON_DIST,
-    cF_DIST,
-    cF_DIST_RT,
-    cF_INV,
-    cF_INV_RT,
-    cF_TEST,
-    cFORECAST_ETS,
-    cFORECAST_ETS_CONFINT,
-    cFORECAST_ETS_SEASONALITY,
-    cFORECAST_ETS_STAT,
-    cFORECAST_LINEAR,
-    cGAMMA,
-    cGAMMA_DIST,
-    cGAMMA_INV,
-    cGAMMALN_PRECISE,
-    cGAUSS,
-    cHYPGEOM_DIST,
-    cLOGNORM_DIST,
-    cLOGNORM_INV,
-    cMODE_MULT,
-    cMODE_SNGL,
-    cNEGBINOM_DIST,
-    cNORM_DIST,
-    cNORM_INV,
-    cNORM_S_DIST,
-    cNORM_S_INV,
-    cPERCENTILE_EXC,
-    cPERCENTILE_INC,
-    cPERCENTRANK_EXC,
-    cPERCENTRANK_INC,
-    cPERMUTATIONA,
-    cPHI,
-    cPOISSON_DIST,
-    cQUARTILE_EXC,
-    cQUARTILE_INC,
-    cRANK_AVG,
-    cRANK_EQ,
-    cSKEW_P,
-    cSTDEV_P,
-    cSTDEV_S,
-    cT_DIST,
-    cT_DIST_2T,
-    cT_DIST_RT,
-    cT_INV,
-    cT_INV_2T,
-    cT_TEST,
-    cVAR_P,
-    cVAR_S,
-    cWEIBULL_DIST,
-    cZ_TEST
-];
+    cZTEST
+);
 function cAVEDEV() {
 //    cBaseFunction.call( this, "AVEDEV" );
 //    this.setArgumentsMin( 1 );

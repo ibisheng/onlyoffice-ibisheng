@@ -1,18 +1,11 @@
 "use strict";
 
-/**
- * Created with JetBrains WebStorm.
- * User: Dmitry.Shahtanov
- * Date: 27.06.13
- * Time: 15:21
- * To change this template use File | Settings | File Templates.
- */
-
 function _getRowTitle( row ) {
     return "" + (row + 1);
 }
 
-cFormulaFunctionGroup['LookupAndReference'] = [
+cFormulaFunctionGroup['LookupAndReference'] = cFormulaFunctionGroup['LookupAndReference'] || [];
+cFormulaFunctionGroup['LookupAndReference'].push(
     cADDRESS,
     cAREAS,
     cCHOOSE,
@@ -30,11 +23,8 @@ cFormulaFunctionGroup['LookupAndReference'] = [
     cROWS,
     cRTD,
     cTRANSPOSE,
-    cVLOOKUP,
-
-    /*new funcions with _xlnf-prefix*/
-    cFORMULATEXT
-];
+    cVLOOKUP
+);
 
 function cADDRESS() {
 //    cBaseFunction.call( this, "ADDRESS" );

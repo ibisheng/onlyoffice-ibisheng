@@ -1,14 +1,7 @@
 "use strict";
 
-/**
- * Created with JetBrains WebStorm.
- * User: Dmitry.Shahtanov
- * Date: 27.06.13
- * Time: 15:17
- * To change this template use File | Settings | File Templates.
- */
-
-cFormulaFunctionGroup['TextAndData'] = [
+cFormulaFunctionGroup['TextAndData'] = cFormulaFunctionGroup['TextAndData'] || [];
+cFormulaFunctionGroup['TextAndData'].push(
     cASC,
     cBAHTTEXT,
     cCHAR,
@@ -42,14 +35,8 @@ cFormulaFunctionGroup['TextAndData'] = [
     cTEXT,
     cTRIM,
     cUPPER,
-    cVALUE,
-
-    /*new funcions with _xlnf-prefix*/
-    cDBCS,
-    cNUMBERVALUE,
-    cUNICHAR,
-    cUNICODE
-];
+    cVALUE
+);
 
 function cASC() {
     cBaseFunction.call( this, "ASC" );

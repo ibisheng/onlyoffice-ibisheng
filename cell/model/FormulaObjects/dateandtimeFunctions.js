@@ -1,13 +1,5 @@
 "use strict";
 
-/**
- * Created with JetBrains WebStorm.
- * User: Dmitry.Shahtanov
- * Date: 27.06.13
- * Time: 13:24
- * To change this template use File | Settings | File Templates.
- */
-
 var DayCountBasis = {
     // US 30/360
     UsPsa30_360:0,
@@ -247,7 +239,8 @@ function daysInYear( date, basis ){
     }
 }
 
-cFormulaFunctionGroup['DateAndTime'] = [
+cFormulaFunctionGroup['DateAndTime'] = cFormulaFunctionGroup['DateAndTime'] || [];
+cFormulaFunctionGroup['DateAndTime'].push(
     cDATE,
     cDATEDIF,
     cDATEVALUE,
@@ -270,12 +263,8 @@ cFormulaFunctionGroup['DateAndTime'] = [
     cWORKDAY,
     cWORKDAY_INTL,
     cYEAR,
-    cYEARFRAC,
-
-    /*new funcions with _xlnf-prefix*/
-    cDAYS,
-    cISOWEEKNUM
-];
+    cYEARFRAC
+);
 
 function cDATE() {
 //    cBaseFunction.call( this, "DATE", 3, 3 );
