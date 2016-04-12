@@ -666,7 +666,7 @@
       self.defNameAllowCreate = !(reason == Asc.c_oAscDefinedNameReason.LockDefNameManager);
     });
 
-    this.cellCommentator = new CCellCommentator({
+    this.cellCommentator = new AscCommonExcel.CCellCommentator({
       model: new WorkbookCommentsModel(this.handlers),
       collaborativeEditing: this.collaborativeEditing,
       draw: function() {

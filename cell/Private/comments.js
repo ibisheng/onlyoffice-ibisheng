@@ -6,11 +6,10 @@
  * Date:   Apr 23, 2015
  */
 (/**
- * @param {jQuery} $
  * @param {Window} window
  * @param {undefined} undefined
  */
-  function($, window, undefined) {
+  function(window, undefined) {
 
   var asc = window["Asc"];
   var prot;
@@ -22,9 +21,8 @@
 
   prot = asc['spreadsheet_api'].prototype;
   prot['asc_addComment'] = prot.asc_addComment;
-})(jQuery, window);
 
-CCellCommentator.prototype.addComment = function(comment, bIsNotUpdate) {
+  AscCommonExcel.CCellCommentator.prototype.addComment = function(comment, bIsNotUpdate) {
   var t = this;
   var oComment = comment;
   var bChange = false;
@@ -55,4 +53,5 @@ CCellCommentator.prototype.addComment = function(comment, bIsNotUpdate) {
     t._addComment(oComment, bChange, bIsNotUpdate);
   };
   this.isLockedComment(oComment, onAddCommentCallback);
-};
+  };
+})(window);
