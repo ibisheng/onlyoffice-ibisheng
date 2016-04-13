@@ -34,6 +34,18 @@
         this.Style = Style;
     }
 
+    function ApiTextPr(Parent, TextPr)
+    {
+        this.Parent = Parent;
+        this.TextPr = TextPr;
+    }
+
+    function ApiParaPr(Parent, ParaPr)
+    {
+        this.Parent = Parent;
+        this.ParaPr = ParaPr;
+    }
+
     function ApiSection(Section)
     {
         this.Section = Section;
@@ -165,6 +177,61 @@
         return new ApiStyle(oStyles.Get(oStyleId));
     };
     /**
+     * Create a new style with the specified type and name. If there is a style with the same name it will be replaced
+     * with a new one.
+     * @param sStyleName
+     * @param sType ("paragraph" || "table" || "run" || "numbering") default value is "paragraph"
+     * @returns {ApiStyle}
+     */
+    ApiDocument.prototype["CreateStyle"] = function(sStyleName, sType)
+    {
+        var nStyleType = styletype_Paragraph;
+        if ("paragraph" === sType)
+            nStyleType = styletype_Paragraph;
+        else if ("table" === sType)
+            nStyleType = styletype_Table;
+        else if ("run" === sType)
+            nStyleType = styletype_Character;
+        else if ("numbering" === sType)
+            nStyleType = styletype_Numbering;
+
+        var oStyle = new CStyle(sStyleName, null, null, nStyleType, (styletype_Table !== nStyleType? false : true));
+        var oStyles = this.Document.Get_Styles();
+
+        // Если у нас есть стиль с данным именем, тогда мы старый стиль удаляем, а новый добавляем со старым Id,
+        // чтобы если были ссылки на старый стиль - теперь они стали на новый.
+        var sOldId    = oStyles.Get_StyleIdByName(sStyleName, false);
+        var oOldStyle = oStyles.Get(sOldId);
+        if (null != sOldId && oOldStyle)
+        {
+            oStyles.Remove(sOldId);
+            oStyle.Set_Id(sOldId);
+        }
+
+        oStyles.Add(oStyle);
+        return new ApiStyle(oStyle);
+    };
+    /**
+     * Get the default style for the specified style type.
+     * @param sStyleType ("paragraph" || "table" || "run" || "numbering")
+     * @returns {ApiStyle || null}
+     */
+    ApiDocument.prototype["GetDefaultStyle"] = function(sStyleType)
+    {
+        var oStyles = this.Document.Get_Styles();
+
+        if ("paragraph" === sStyleType)
+            return new ApiStyle(oStyles.Get(oStyles.Get_Default_Paragraph()));
+        else if ("table" === sStyleType)
+            return new ApiStyle(oStyles.Get(oStyles.Get_Default_Table()));
+        else if ("run" === sStyleType)
+            return new ApiStyle(oStyles.Get(oStyles.Get_Default_Character()));
+        else if ("numbering" === sStyleType)
+            return new ApiStyle(oStyles.Get(oStyles.Get_Default_Numbering()));
+
+        return null;
+    };
+    /**
      * Get document final section
      * @return {ApiSection}
      */
@@ -272,6 +339,14 @@
 
         this.Paragraph.Style_Add(oStyle.Style.Get_Id(), true);
         return true;
+    };
+    /**
+     * Get paragraph properties.
+     * @returns {ApiParaPr}
+     */
+    ApiParagraph.prototype["GetParaPr"] = function()
+    {
+        return new ApiParaPr(this, this.Paragraph.Pr.Copy());
     };
     /**
      * Set paragraph line spacing. If the value of the <sLineRule> parameter is either "atLeast" or "exact", then the
@@ -864,6 +939,247 @@
             this.Cell.Set_TextDirection(textdirection_BTLR);
     };
 
+    //------------------------------------------------------------------------------------------------------------------
+    //
+    // ApiStyle
+    //
+    //------------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Get the name of the current style.
+     * @returns {string}
+     */
+    ApiStyle.prototype["GetName"] = function()
+    {
+        return this.Style.Get_Name();
+    };
+    /**
+     * Set the name of the current style.
+     * @param sStyleName
+     */
+    ApiStyle.prototype["SetName"] = function(sStyleName)
+    {
+        this.Style.Set_Name(sStyleName);
+    };
+    /**
+     * Get the type of the current style.
+     * @returns {"paragraph" || "table" || "run" || "numbering"}
+     */
+    ApiStyle.prototype["GetType"] = function()
+    {
+        var nStyleType = this.Style.Get_Type();
+
+        if (styletype_Paragraph === nStyleType)
+            return "paragraph";
+        else if (styletype_Table === nStyleType)
+            return "table";
+        else if (styletype_Character === nStyleType)
+            return "run";
+        else if (styletype_Numbering === nStyleType)
+            return "numbering";
+
+        return "paragraph";
+    };
+    /**
+     * Get the text properties of the current style.
+     * @returns {ApiTextPr}
+     */
+    ApiStyle.prototype["GetTextPr"] = function()
+    {
+        return new ApiTextPr(this, this.Style.TextPr.Copy());
+    };
+    /**
+     * Get the paragraph properties of the current style.
+     * @returns {ApiParaPr}
+     */
+    ApiStyle.prototype["GetParaPr"] = function()
+    {
+        return new ApiParaPr(this, this.Style.ParaPr.Copy());
+    };
+
+    //------------------------------------------------------------------------------------------------------------------
+    //
+    // ApiTextPr
+    //
+    //------------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Set text color in rgb
+     * @param r (0-255)
+     * @param g (0-255)
+     * @param b (0-255)
+     * @param isAuto (true | false) false is default
+     */
+    ApiTextPr.prototype["SetColor"] = function(r, g, b, isAuto)
+    {
+        this.TextPr.Color = private_GetColor(r, g, b, isAuto);
+        this.private_OnChange();
+    };
+    /**
+     * Set font size
+     * @param nSize (half-points)
+     */
+    ApiTextPr.prototype["SetFontSize"] = function(nSize)
+    {
+        this.TextPr.FontSize = private_GetHps(nSize);
+        this.private_OnChange();
+    };
+    /**
+     * Set all 4 font slots with the specified font family.
+     * @param sFontFamily
+     */
+    ApiTextPr.prototype["SetFontFamily"] = function(sFontFamily)
+    {
+        this.TextPr.RFonts.Set_All(sFontFamily, -1);
+        this.private_OnChange();
+    };
+
+    //------------------------------------------------------------------------------------------------------------------
+    //
+    // ApiParaPr
+    //
+    //------------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Set paragraph line spacing. If the value of the <sLineRule> parameter is either "atLeast" or "exact", then the
+     * value of <nLine> shall be interpreted as twentieths of a point. If the value of the <sLineRule> parameter is
+     * "auto", then the value of the <nLine> attribute shall be interpreted as 240ths of a line.
+     * @param nLine (twips | 1/240ths of a line)
+     * @param sLineRule ("auto" | "atLeast" | "exact")
+     */
+    ApiParaPr.prototype["SetSpacingLine"] = function(nLine, sLineRule)
+    {
+        if (undefined !== nLine && undefined !== sLineRule)
+        {
+            if ("auto" === sLineRule)
+            {
+                this.ParaPr.Spacing.LineRule = linerule_Auto;
+                this.ParaPr.Spacing.Line = nLine / 240.0;
+            }
+            else if ("atLeast" === sLineRule)
+            {
+                this.ParaPr.Spacing.LineRule = linerule_AtLeast;
+                this.ParaPr.Spacing.Line = private_Twips2MM(nLine);
+
+            }
+            else if ("exact" === sLineRule)
+            {
+                this.ParaPr.Spacing.LineRule = linerule_Exact;
+                this.ParaPr.Spacing.Line = private_Twips2MM(nLine);
+            }
+        }
+
+        this.private_OnChange();
+    };
+    /**
+     * Set paragraph spacing before. If the value of the <isBeforeAuto> parameter is <true>, then any value of the
+     * <nBefore> is ignored. If <isBeforeAuto> parameter is not specified, then it will be interpreted as <false>.
+     * @param nBefore (twips)
+     * @param isBeforeAuto  (true | false)
+     */
+    ApiParaPr.prototype["SetSpacingBefore"] = function(nBefore, isBeforeAuto)
+    {
+        if (undefined !== nBefore)
+            this.ParaPr.Spacing.Before = private_Twips2MM(nBefore);
+
+        if (undefined !== isBeforeAuto)
+            this.ParaPr.Spacing.BeforeAutoSpacing = isBeforeAuto;
+
+        this.private_OnChange();
+    };
+    /**
+     * Set paragraph spacing after. If the value of the <isAfterAuto> parameter is <true>, then any value of the
+     * <nAfter> is ignored. If <isAfterAuto> parameter is not specified, then it will be interpreted as <false>.
+     * @param nAfter (twips)
+     * @param isAfterAuto  (true | false)
+     */
+    ApiParaPr.prototype["SetSpacingAfter"] = function(nAfter, isAfterAuto)
+    {
+        if (undefined !== nAfter)
+            this.ParaPr.Spacing.After = private_Twips2MM(nAfter);
+
+        if (undefined !== isAfterAuto)
+            this.ParaPr.Spacing.AfterAutoSpacing = isAfterAuto;
+
+        this.private_OnChange();
+    };
+    /**
+     * Set paragraph justification
+     * @param sJc ("left" | "right" | "both" | "center")
+     */
+    ApiParaPr.prototype["SetJc"] = function(sJc)
+    {
+        this.ParaPr.Jc = private_GetParaAlign(sJc);
+        this.private_OnChange();
+    };
+    /**
+     * Set left indentation
+     * @param nValue (twips)
+     */
+    ApiParaPr.prototype["SetIndLeft"] = function(nValue)
+    {
+        this.ParaPr.Ind.Left = private_Twips2MM(nValue);
+        this.private_OnChange();
+    };
+    /**
+     * Set right indentation
+     * @param nValue (twips)
+     */
+    ApiParaPr.prototype["SetIndRight"] = function(nValue)
+    {
+        this.ParaPr.Ind.Right = private_Twips2MM(nValue);
+        this.private_OnChange();
+    };
+    /**
+     * Set first line indentation
+     * @param nValue (twips)
+     */
+    ApiParaPr.prototype["SetIndFirstLine"] = function(nValue)
+    {
+        this.ParaPr.Ind.FirstLine = private_Twips2MM(nValue);
+        this.private_OnChange();
+    };
+    /**
+     * This element specifies that when rendering this document in a paginated view, the contents of this paragraph
+     * are at least partly rendered on the same page as the following paragraph whenever possible.
+     * @param isKeepNext (true | false)
+     */
+    ApiParaPr.prototype["SetKeepNext"] = function(isKeepNext)
+    {
+        this.ParaPr.KeepNext = isKeepNext;
+        this.private_OnChange();
+    };
+    /**
+     * This element specifies that when rendering this document in a page view, all lines of this paragraph are
+     * maintained on a single page whenever possible.
+     * @param isKeepLines (true | false)
+     */
+    ApiParaPr.prototype["SetKeepLines"] = function(isKeepLines)
+    {
+        this.ParaPr.KeepLines = isKeepLines;
+        this.private_OnChange();
+    };
+    /**
+     * This element specifies that when rendering this document in a paginated view, the contents of this paragraph
+     * are rendered on the start of a new page in the document.
+     * @param isPageBreakBefore (true | false)
+     */
+    ApiParaPr.prototype["SetPageBreakBefore"] = function(isPageBreakBefore)
+    {
+        this.ParaPr.PageBreakBefore = isPageBreakBefore;
+        this.private_OnChange();
+    };
+    /**
+     * This element specifies whether a consumer shall prevent a single line of this paragraph from being displayed on
+     * a separate page from the remaining content at display time by moving the line onto the following page.
+     * @param isWidowControl (true | false)
+     */
+    ApiParaPr.prototype["SetWidowControl"] = function(isWidowControl)
+    {
+        this.ParaPr.WidowControl = isWidowControl;
+        this.private_OnChange();
+    };
+
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Private area
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -890,7 +1206,7 @@
 
     function private_GetHps(hps)
     {
-        return 2 * Math.ceil(hps);
+        return Math.ceil(hps) / 2.0;
     }
 
     function private_GetColor(r, g, b, Auto)
@@ -999,9 +1315,32 @@
     {
         return this.Paragraph;
     };
+    ApiParagraph.prototype.OnChangeParaPr = function(oApiParaPr)
+    {
+        this.Paragraph.Set_Pr(oApiParaPr.ParaPr);
+        oApiParaPr.ParaPr = this.Paragraph.Pr.Copy();
+    };
     ApiTable.prototype.private_GetImpl = function()
     {
         return this.Table;
+    };
+    ApiStyle.prototype.OnChangeTextPr = function(oApiTextPr)
+    {
+        this.Style.Set_TextPr(oApiTextPr.TextPr);
+        oApiTextPr.TextPr = this.Style.TextPr.Copy();
+    };
+    ApiStyle.prototype.OnChangeParaPr = function(oApiParaPr)
+    {
+        this.Style.Set_ParaPr(oApiParaPr.ParaPr);
+        oApiParaPr.ParaPr = this.Style.ParaPr.Copy();
+    };
+    ApiTextPr.prototype.private_OnChange = function()
+    {
+        this.Parent.OnChangeTextPr(this);
+    };
+    ApiParaPr.prototype.private_OnChange = function()
+    {
+        this.Parent.OnChangeParaPr(this);
     };
 
 }(window, null));
@@ -1019,7 +1358,6 @@ function TEST_BUILDER()
 
     var oRun;
     var oDocument     = Api.GetDocument();
-    var oHeadingStyle = oDocument.GetStyle("Heading 1");
     var oNoSpacingStyle = oDocument.GetStyle("No Spacing");
     var oFinalSection   = oDocument.GetFinalSection();
     oFinalSection.SetEqualColumns(2, 720);
@@ -1029,9 +1367,40 @@ function TEST_BUILDER()
     oFinalSection.SetFooterDistance(720);
     oFinalSection.SetType("continuous");
 
+    // Генерим стили, которые будем использовать в документе
+    var oTextPr, oParaPr;
+    var oNormalStyle = oDocument.GetDefaultStyle("paragraph");
+    oParaPr = oNormalStyle.GetParaPr();
+    oParaPr.SetSpacingLine(240, "auto");
+    oParaPr.SetJc("both");
+    oTextPr = oNormalStyle.GetTextPr();
+    oTextPr.SetColor(0x26, 0x26, 0x26, false);
+    oTextPr.SetFontFamily("Calibri");
+
+    var oHeading1Style = oDocument.CreateStyle("Heading 1", "paragraph");
+    oParaPr = oHeading1Style.GetParaPr();
+    oParaPr.SetKeepNext(true);
+    oParaPr.SetKeepLines(true);
+    oParaPr.SetSpacingAfter(240);
+    oTextPr = oHeading1Style.GetTextPr();
+    oTextPr.SetColor(0xff, 0x68, 0x00, false);
+    oTextPr.SetFontSize(40);
+    oTextPr.SetFontFamily("Calibri Light");
+
+    var oSubtitleStyle = oDocument.CreateStyle("Subtitle");
+    oParaPr = oSubtitleStyle.GetParaPr();
+    oParaPr.SetSpacingAfter(0);
+    oParaPr.SetSpacingBefore(240);
+    oTextPr = oSubtitleStyle.GetTextPr();
+    oTextPr.SetColor(0xff, 0x68, 0x00, false);
+    oTextPr.SetFontSize(32);
+    oTextPr.SetFontFamily("Calibri Light");
+
+
     var oParagraph = Api.CreateParagraph();
     oParagraph.SetSpacingLine(276, "auto");
     oParagraph.SetJc("left");
+
     var oEndRun = oParagraph.GetParagraphMark();
     oEndRun.SetFontSize(52);
     oEndRun.SetColor(0x14, 0x14, 0x14);
@@ -1048,7 +1417,7 @@ function TEST_BUILDER()
 
 
     oParagraph = Api.CreateParagraph();
-    oParagraph.SetStyle(oHeadingStyle);
+    oParagraph.SetStyle(oHeading1Style);
     // TODO: Добавить aвтофигуру
     oParagraph.AddText("Overview");
     oDocument.Push(oParagraph);
@@ -1062,7 +1431,7 @@ function TEST_BUILDER()
     oDocument.Push(oParagraph);
 
     oParagraph = Api.CreateParagraph();
-    oParagraph.SetStyle(oHeadingStyle);
+    oParagraph.SetStyle(oHeading1Style);
     oParagraph.SetSpacingAfter(100, true);
     oParagraph.SetSpacingBefore(100, true);
     // TODO: Добавить aвтофигуру
@@ -1083,7 +1452,7 @@ function TEST_BUILDER()
 
 
     oParagraph = Api.CreateParagraph();
-    oParagraph.SetStyle(oHeadingStyle);
+    oParagraph.SetStyle(oHeading1Style);
     oParagraph.SetSpacingAfter(100, true);
     oParagraph.SetSpacingBefore(100, true);
     // TODO: Добавить автофигуру
@@ -1105,7 +1474,7 @@ function TEST_BUILDER()
 
 
     oParagraph = Api.CreateParagraph();
-    oParagraph.SetStyle(oHeadingStyle);
+    oParagraph.SetStyle(oHeading1Style);
     oParagraph.SetSpacingAfter(100, true);
     oParagraph.SetSpacingBefore(100, true);
     oParagraph.AddText("Details");
@@ -1130,7 +1499,6 @@ function TEST_BUILDER()
     oSection1.SetFooterDistance(576);
 
 
-    var oSubtitleStyle = oDocument.GetStyle("Subtitle");
     oParagraph = Api.CreateParagraph();
     oParagraph.SetStyle(oSubtitleStyle);
     // TODO: Добавить автофигуру
