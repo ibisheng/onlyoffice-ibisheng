@@ -2098,6 +2098,7 @@ CTableId.prototype.Load_Changes = function(Reader, Reader2)
                         var oRun = new ParaRun();
                         oRun.Content.splice(0, 0, oParaDrawing);
                         oFirstParagraph.Content.splice(0, 0, oRun);
+						oLogicDocument.DrawingObjects.addGraphicObject(oParaDrawing);
                     }, this, []);
                 }
                 else if(oLogicDocument instanceof CPresentation)
@@ -2107,6 +2108,7 @@ CTableId.prototype.Load_Changes = function(Reader, Reader2)
                         var oDrawing = oLogicDocument.Slides[0].graphicObjects.createWatermarkImage(sUrl);
                         oDrawing.spPr.xfrm.offX = (oLogicDocument.Width - oDrawing.spPr.xfrm.extX)/2;
                         oDrawing.spPr.xfrm.offY = (oLogicDocument.Height - oDrawing.spPr.xfrm.extY)/2;
+						oDrawing.parent = oLogicDocument.Slides[0];
                         oLogicDocument.Slides[0].cSld.spTree.push(oDrawing);
                     }
                 }
