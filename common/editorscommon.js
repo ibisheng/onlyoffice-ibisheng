@@ -2446,6 +2446,9 @@ CContentChangesElement.prototype.Make_ArrayOfSimpleActions = function(Type, Pos,
 var g_oUserColorById = {}, g_oUserNextColorIndex = 0;
 function getUserColorById(userId, userName, isDark, isNumericValue)
 {
+    if ((!userId || "" === userId) && (!userName || "" === userName))
+        return new CColor(0, 0, 0, 255);
+
     var res;
     if (g_oUserColorById.hasOwnProperty(userId))
     {
