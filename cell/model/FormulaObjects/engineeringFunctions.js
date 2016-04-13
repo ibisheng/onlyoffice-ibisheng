@@ -7,6 +7,19 @@
 * @param {undefined} undefined
 */
 function (window, undefined) {
+    var cErrorType = AscCommonExcel.cErrorType;
+    var cNumber = AscCommonExcel.cNumber;
+    var cString = AscCommonExcel.cString;
+    var cError = AscCommonExcel.cError;
+    var cArea = AscCommonExcel.cArea;
+    var cArea3D = AscCommonExcel.cArea3D;
+    var cArray = AscCommonExcel.cArray;
+    var cUndefined = AscCommonExcel.cUndefined;
+    var cBaseFunction = AscCommonExcel.cBaseFunction;
+    var cFormulaFunctionGroup = AscCommonExcel.cFormulaFunctionGroup;
+
+    var rtl_math_erf = AscCommonExcel.rtl_math_erf;
+
 var NumberBase = {
     BIN:2,
     OCT:8,
@@ -1208,7 +1221,7 @@ cCOMPLEX.prototype.Calculate = function ( arg ) {
 
     var real = arg[0],
         img = arg[1],
-        suf = !arg[2] || arg[2] instanceof cEmpty ? new cString( "i" ) : arg[2];
+        suf = !arg[2] || arg[2] instanceof AscCommonExcel.cEmpty ? new cString( "i" ) : arg[2];
     if ( real instanceof cArea || img instanceof cArea3D ) {
         real = real.cross( arguments[1].first );
     }
@@ -1557,7 +1570,7 @@ cERFC.prototype.Calculate = function ( arg ) {
 
     a = a.getValue();
 
-    this.value = new cNumber( rtl_math_erfc( a ) );
+    this.value = new cNumber( AscCommonExcel.rtl_math_erfc( a ) );
 
     return this.value;
 

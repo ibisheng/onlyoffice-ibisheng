@@ -6,43 +6,57 @@
 * @param {undefined} undefined
 */
 function (window, undefined) {
-cFormulaFunctionGroup['TextAndData'] = cFormulaFunctionGroup['TextAndData'] || [];
-cFormulaFunctionGroup['TextAndData'].push(
-    cASC,
-    cBAHTTEXT,
-    cCHAR,
-    cCLEAN,
-    cCODE,
-    cCONCATENATE,
-    cDOLLAR,
-    cEXACT,
-    cFIND,
-    cFINDB,
-    cFIXED,
-    cJIS,
-    cLEFT,
-    cLEFTB,
-    cLEN,
-    cLENB,
-    cLOWER,
-    cMID,
-    cMIDB,
-    cPHONETIC,
-    cPROPER,
-    cREPLACE,
-    cREPLACEB,
-    cREPT,
-    cRIGHT,
-    cRIGHTB,
-    cSEARCH,
-    cSEARCHB,
-    cSUBSTITUTE,
-    cT,
-    cTEXT,
-    cTRIM,
-    cUPPER,
-    cVALUE
-);
+    var cElementType = AscCommonExcel.cElementType;
+    var cErrorType = AscCommonExcel.cErrorType;
+    var cNumber = AscCommonExcel.cNumber;
+    var cString = AscCommonExcel.cString;
+    var cBool = AscCommonExcel.cBool;
+    var cError = AscCommonExcel.cError;
+    var cArea = AscCommonExcel.cArea;
+    var cArea3D = AscCommonExcel.cArea3D;
+    var cRef = AscCommonExcel.cRef;
+    var cRef3D = AscCommonExcel.cRef3D;
+    var cArray = AscCommonExcel.cArray;
+    var cBaseFunction = AscCommonExcel.cBaseFunction;
+    var cFormulaFunctionGroup = AscCommonExcel.cFormulaFunctionGroup;
+
+    cFormulaFunctionGroup['TextAndData'] = cFormulaFunctionGroup['TextAndData'] || [];
+    cFormulaFunctionGroup['TextAndData'].push(
+        cASC,
+        cBAHTTEXT,
+        cCHAR,
+        cCLEAN,
+        cCODE,
+        cCONCATENATE,
+        cDOLLAR,
+        cEXACT,
+        cFIND,
+        cFINDB,
+        cFIXED,
+        cJIS,
+        cLEFT,
+        cLEFTB,
+        cLEN,
+        cLENB,
+        cLOWER,
+        cMID,
+        cMIDB,
+        cPHONETIC,
+        cPROPER,
+        cREPLACE,
+        cREPLACEB,
+        cREPT,
+        cRIGHT,
+        cRIGHTB,
+        cSEARCH,
+        cSEARCHB,
+        cSUBSTITUTE,
+        cT,
+        cTEXT,
+        cTRIM,
+        cUPPER,
+        cVALUE
+    );
 
 function cASC() {
     cBaseFunction.call( this, "ASC" );
@@ -314,19 +328,19 @@ cDOLLAR.prototype.Calculate = function ( arg ) {
         if ( quotient == 0 ) {
             return 0;
         }
-        var nolpiat = 5 * sign( quotient ) * Math.pow( 10, Math.floor( Math.log10( Math.abs( quotient ) ) ) - cExcelSignificantDigits );
+        var nolpiat = 5 * sign( quotient ) * Math.pow( 10, Math.floor( Math.log10( Math.abs( quotient ) ) ) - AscCommonExcel.cExcelSignificantDigits );
         return truncate( quotient + nolpiat ) * significance;
     }
 
     function roundHelper( number, num_digits ) {
-        if ( num_digits > cExcelMaxExponent ) {
+        if ( num_digits > AscCommonExcel.cExcelMaxExponent ) {
             if ( Math.abs( number ) < 1 || num_digits < 1e10 ) // The values are obtained experimentally
             {
                 return new cNumber( number );
             }
             return new cNumber( 0 );
         }
-        else if ( num_digits < cExcelMinExponent ) {
+        else if ( num_digits < AscCommonExcel.cExcelMinExponent ) {
             if ( Math.abs( number ) < 0.01 ) // The values are obtained experimentally
             {
                 return new cNumber( number );
@@ -661,19 +675,19 @@ cFIXED.prototype.Calculate = function ( arg ) {
         if ( quotient == 0 ) {
             return 0;
         }
-        var nolpiat = 5 * sign( quotient ) * Math.pow( 10, Math.floor( Math.log10( Math.abs( quotient ) ) ) - cExcelSignificantDigits );
+        var nolpiat = 5 * sign( quotient ) * Math.pow( 10, Math.floor( Math.log10( Math.abs( quotient ) ) ) - AscCommonExcel.cExcelSignificantDigits );
         return truncate( quotient + nolpiat ) * significance;
     }
 
     function roundHelper( number, num_digits ) {
-        if ( num_digits > cExcelMaxExponent ) {
+        if ( num_digits > AscCommonExcel.cExcelMaxExponent ) {
             if ( Math.abs( number ) < 1 || num_digits < 1e10 ) // The values are obtained experimentally
             {
                 return new cNumber( number );
             }
             return new cNumber( 0 );
         }
-        else if ( num_digits < cExcelMinExponent ) {
+        else if ( num_digits < AscCommonExcel.cExcelMinExponent ) {
             if ( Math.abs( number ) < 0.01 ) // The values are obtained experimentally
             {
                 return new cNumber( number );
@@ -1604,7 +1618,7 @@ cT.prototype.Calculate = function ( arg ) {
     if ( arg0 instanceof cString || arg0 instanceof cError )
         return this.value = arg[0];
     else
-        return this.value = new cEmpty();
+        return this.value = new AscCommonExcel.cEmpty();
 };
 cT.prototype.getInfo = function () {
     return {

@@ -6,31 +6,73 @@
 * @param {undefined} undefined
 */
 function (window, undefined) {
-function _getRowTitle( row ) {
-    return "" + (row + 1);
-}
+    function _getRowTitle( row ) {
+        return "" + (row + 1);
+    }
 
-cFormulaFunctionGroup['LookupAndReference'] = cFormulaFunctionGroup['LookupAndReference'] || [];
-cFormulaFunctionGroup['LookupAndReference'].push(
-    cADDRESS,
-    cAREAS,
-    cCHOOSE,
-    cCOLUMN,
-    cCOLUMNS,
-    cGETPIVOTDATA,
-    cHLOOKUP,
-    cHYPERLINK,
-    cINDEX,
-    cINDIRECT,
-    cLOOKUP,
-    cMATCH,
-    cOFFSET,
-    cROW,
-    cROWS,
-    cRTD,
-    cTRANSPOSE,
-    cVLOOKUP
-);
+    var cElementType = AscCommonExcel.cElementType;
+    var cErrorType = AscCommonExcel.cErrorType;
+    var cNumber = AscCommonExcel.cNumber;
+    var cString = AscCommonExcel.cString;
+    var cBool = AscCommonExcel.cBool;
+    var cError = AscCommonExcel.cError;
+    var cArea = AscCommonExcel.cArea;
+    var cArea3D = AscCommonExcel.cArea3D;
+    var cRef = AscCommonExcel.cRef;
+    var cRef3D = AscCommonExcel.cRef3D;
+    var cEmpty = AscCommonExcel.cEmpty;
+    var cArray = AscCommonExcel.cArray;
+    var cBaseFunction = AscCommonExcel.cBaseFunction;
+
+    var checkTypeCell = AscCommonExcel.checkTypeCell;
+    var cFormulaFunctionGroup = AscCommonExcel.cFormulaFunctionGroup;
+
+    var _func = AscCommonExcel._func;
+
+    cFormulaFunctionGroup['LookupAndReference'] = cFormulaFunctionGroup['LookupAndReference'] || [];
+    cFormulaFunctionGroup['LookupAndReference'].push(
+        cADDRESS,
+        cAREAS,
+        cCHOOSE,
+        cCOLUMN,
+        cCOLUMNS,
+        cGETPIVOTDATA,
+        cHLOOKUP,
+        cHYPERLINK,
+        cINDEX,
+        cINDIRECT,
+        cLOOKUP,
+        cMATCH,
+        cOFFSET,
+        cROW,
+        cROWS,
+        cRTD,
+        cTRANSPOSE,
+        cVLOOKUP
+    );
+
+    function searchRegExp(str, flags) {
+        var vFS = str
+          .replace(/(\\)/g, "\\")
+          .replace(/(\^)/g, "\\^")
+          .replace(/(\()/g, "\\(")
+          .replace(/(\))/g, "\\)")
+          .replace(/(\+)/g, "\\+")
+          .replace(/(\[)/g, "\\[")
+          .replace(/(\])/g, "\\]")
+          .replace(/(\{)/g, "\\{")
+          .replace(/(\})/g, "\\}")
+          .replace(/(\$)/g, "\\$")
+          .replace(/(~)?\*/g, function($0, $1) {
+              return $1 ? $0 : '(.*)';
+          })
+          .replace(/(~)?\?/g, function($0, $1) {
+              return $1 ? $0 : '.{1}';
+          })
+          .replace(/(~\*)/g, "\\*").replace(/(~\?)/g, "\\?");
+
+        return new RegExp(vFS + "$", flags ? flags : "i");
+    }
 
 function cADDRESS() {
 //    cBaseFunction.call( this, "ADDRESS" );
@@ -605,7 +647,7 @@ cINDIRECT.prototype.Calculate = function ( arg ) {
                 found_operand.isAbsolute = true;
         }
         else if ( parserHelp.isName.call( o, o.Formula, o.pCurrPos, wb )[0] ) {
-            found_operand = new cName( o.operand_str, wb, r1.worksheet );
+            found_operand = new AscCommonExcel.cName( o.operand_str, wb, r1.worksheet );
         }
     }
 
@@ -626,7 +668,7 @@ cINDIRECT.prototype.Calculate = function ( arg ) {
     }
 
     if ( found_operand ) {
-        if ( found_operand instanceof cName ) {
+        if ( found_operand instanceof AscCommonExcel.cName ) {
             found_operand = found_operand.toRef();
         }
 
@@ -894,7 +936,7 @@ cMATCH.prototype.Calculate = function ( arg ) {
         else if ( a2Value == 0 ) {
             if ( a0 instanceof cString ) {
                 for ( var i = 0; i < arr.length; i++ ) {
-                    if ( searchRegExp2( arr[i].toString(), a0Value ) ) {
+                    if ( AscCommonExcel.searchRegExp2( arr[i].toString(), a0Value ) ) {
                         index = i;
                         break;
                     }

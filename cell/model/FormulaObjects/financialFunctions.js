@@ -6,6 +6,18 @@
 * @param {undefined} undefined
 */
 function (window, undefined) {
+    var cElementType = AscCommonExcel.cElementType;
+    var cErrorType = AscCommonExcel.cErrorType;
+    var cNumber = AscCommonExcel.cNumber;
+    var cBool = AscCommonExcel.cBool;
+    var cError = AscCommonExcel.cError;
+    var cArea = AscCommonExcel.cArea;
+    var cArea3D = AscCommonExcel.cArea3D;
+    var cEmpty = AscCommonExcel.cEmpty;
+    var cArray = AscCommonExcel.cArray;
+    var cBaseFunction = AscCommonExcel.cBaseFunction;
+    var cFormulaFunctionGroup = AscCommonExcel.cFormulaFunctionGroup;
+
 var startRangeCurrentDateSystem = 1;
 
 function getPMT( rate, nper, pv, fv, flag ) {
@@ -5272,7 +5284,7 @@ cTBILLEQ.prototype.Calculate = function ( arg ) {
     var date1 = d1.getUTCDate(), month1 = d1.getUTCMonth(), year1 = d1.getUTCFullYear(),
         date2 = d2.getUTCDate(), month2 = d2.getUTCMonth(), year2 = d2.getUTCFullYear();
 
-    var nDiff = GetDiffDate360( date1, month1, year1, date2, month2, year2, true );
+    var nDiff = AscCommonExcel.GetDiffDate360( date1, month1, year1, date2, month2, year2, true );
 
     if ( nDiff > 360 ){
         return this.value = new cError( cErrorType.not_numeric );
@@ -5442,7 +5454,7 @@ cTBILLYIELD.prototype.Calculate = function ( arg ) {
         date1 = d1.getUTCDate(), month1 = d1.getUTCMonth(), year1 = d1.getUTCFullYear(),
         date2 = d2.getUTCDate(), month2 = d2.getUTCMonth(), year2 = d2.getUTCFullYear();
 
-    var nDiff = GetDiffDate360( date1, month1, year1, date2, month2, year2, true );
+    var nDiff = AscCommonExcel.GetDiffDate360( date1, month1, year1, date2, month2, year2, true );
     nDiff++;
 
     if ( nDiff > 360 ){
@@ -5887,7 +5899,7 @@ cXIRR.prototype.Calculate = function ( arg ) {
         }
     }
 
-    if ( arg2 instanceof cRef || arg2 instanceof cRef3D ) {
+    if ( arg2 instanceof AscCommonExcel.cRef || arg2 instanceof AscCommonExcel.cRef3D ) {
         arg2 = arg2.getValue();
         if ( !(arg2 instanceof cNumber) ) {
             return this.value = new cError( cErrorType.wrong_value_type );

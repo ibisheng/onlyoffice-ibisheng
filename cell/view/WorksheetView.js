@@ -9447,7 +9447,7 @@
                                 var nameFormat = false;
                                 //}
                                 if ( currentObj[0].cellFrom ) {
-                                    var offset = range.getCells()[0].getOffset2( currentObj[0].cellFrom ), assemb, _p_ = new parserFormula( currentObj[0].text.substring( 1 ), "", range.worksheet );
+                                    var offset = range.getCells()[0].getOffset2( currentObj[0].cellFrom ), assemb, _p_ = new AscCommonExcel.parserFormula( currentObj[0].text.substring( 1 ), "", range.worksheet );
 
                                     if ( _p_.parse() ) {
                                         assemb = _p_.changeOffset( offset ).assemble();
@@ -9821,7 +9821,7 @@
                                 //formula
                                 if ( newVal.getFormula() && !isOneMerge ) {
                                     var offset = range.getCells()[numFormula].getOffset2( value2[numFormula].sId ), assemb,
-										_p_ = new parserFormula( value2[numFormula].sFormula, firstRange.getName() ? firstRange.getName() : "", range.worksheet );
+										_p_ = new AscCommonExcel.parserFormula( value2[numFormula].sFormula, firstRange.getName() ? firstRange.getName() : "", range.worksheet );
 
                                     if ( _p_.parse() ) {
                                         assemb = _p_.changeOffset( offset ).assemble();
@@ -11006,11 +11006,11 @@
                 }
                 else if ( _C2H50H_.parsedRef.RefPos.length == 1 && _C2H50H_.parsedRef.outStack.length == 1 ) {
                     ref = _C2H50H_.parsedRef.outStack[0];
-                    if ( ref.type == cElementType.cell3D ) {
+                    if ( ref.type == AscCommonExcel.cElementType.cell3D ) {
                         range = ref.range.getBBox0().clone( true );
                         sheetName = ref.getWS();
                     }
-                    else if ( ref.type == cElementType.cellsRange3D && ref.wsFrom == ref.wsTo ) {
+                    else if ( ref.type == AscCommonExcel.cElementType.cellsRange3D && ref.wsFrom == ref.wsTo ) {
                         range = ref.getRange()[0].getBBox0().clone( true );
                         sheetName = this.model.workbook.getWorksheetById( ref.wsFrom );
                     }

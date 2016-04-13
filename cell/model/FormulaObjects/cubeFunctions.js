@@ -6,16 +6,20 @@
 * @param {undefined} undefined
  */
 function (window, undefined) {
-cFormulaFunctionGroup['Cube'] = cFormulaFunctionGroup['Cube'] || [];
-cFormulaFunctionGroup['Cube'].push(
-    cCUBEKPIMEMBER,
-    cCUBEMEMBER,
-    cCUBEMEMBERPROPERTY,
-    cCUBERANKEDMEMBER,
-    cCUBESET,
-    cCUBESETCOUNT,
-    cCUBEVALUE
-);
+    var cElementType = AscCommonExcel.cElementType;
+    var cBaseFunction = AscCommonExcel.cBaseFunction;
+    var cFormulaFunctionGroup = AscCommonExcel.cFormulaFunctionGroup;
+
+    cFormulaFunctionGroup['Cube'] = cFormulaFunctionGroup['Cube'] || [];
+    cFormulaFunctionGroup['Cube'].push(
+        cCUBEKPIMEMBER,
+        cCUBEMEMBER,
+        cCUBEMEMBERPROPERTY,
+        cCUBERANKEDMEMBER,
+        cCUBESET,
+        cCUBESETCOUNT,
+        cCUBEVALUE
+    );
 
 function cCUBEKPIMEMBER() {
 //    cBaseFunction.call( this, "CUBEKPIMEMBER" );

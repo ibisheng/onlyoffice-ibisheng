@@ -6,92 +6,338 @@
 * @param {undefined} undefined
 */
 function (window, undefined) {
-cFormulaFunctionGroup['Statistical'] = cFormulaFunctionGroup['Statistical'] || [];
-cFormulaFunctionGroup['Statistical'].push(
-    cAVEDEV,
-    cAVERAGE,
-    cAVERAGEA,
-    cAVERAGEIF,
-    cAVERAGEIFS,
-    cBETADIST,
-    cBETAINV,
-    cBINOMDIST,
-    cCHIDIST,
-    cCHIINV,
-    cCHITEST,
-    cCONFIDENCE,
-    cCORREL,
-    cCOUNT,
-    cCOUNTA,
-    cCOUNTBLANK,
-    cCOUNTIF,
-    cCOUNTIFS,
-    cCOVAR,
-    cCRITBINOM,
-    cDEVSQ,
-    cEXPONDIST,
-    cFDIST,
-    cFINV,
-    cFISHER,
-    cFISHERINV,
-    cFORECAST,
-    cFREQUENCY,
-    cFTEST,
-    cGAMMADIST,
-    cGAMMAINV,
-    cGAMMALN,
-    cGEOMEAN,
-    cGROWTH,
-    cHARMEAN,
-    cHYPGEOMDIST,
-    cINTERCEPT,
-    cKURT,
-    cLARGE,
-    cLINEST,
-    cLOGEST,
-    cLOGINV,
-    cLOGNORMDIST,
-    cMAX,
-    cMAXA,
-    cMEDIAN,
-    cMIN,
-    cMINA,
-    cMODE,
-    cNEGBINOMDIST,
-    cNORMDIST,
-    cNORMINV,
-    cNORMSDIST,
-    cNORMSINV,
-    cPEARSON,
-    cPERCENTILE,
-    cPERCENTRANK,
-    cPERMUT,
-    cPOISSON,
-    cPROB,
-    cQUARTILE,
-    cRANK,
-    cRSQ,
-    cSKEW,
-    cSLOPE,
-    cSMALL,
-    cSTANDARDIZE,
-    cSTDEV,
-    cSTDEVA,
-    cSTDEVP,
-    cSTDEVPA,
-    cSTEYX,
-    cTDIST,
-    cTINV,
-    cTREND,
-    cTRIMMEAN,
-    cTTEST,
-    cVAR,
-    cVARA,
-    cVARP,
-    cVARPA,
-    cWEIBULL,
-    cZTEST
-);
+    var cElementType = AscCommonExcel.cElementType;
+    var cErrorType = AscCommonExcel.cErrorType;
+    var cNumber = AscCommonExcel.cNumber;
+    var cString = AscCommonExcel.cString;
+    var cBool = AscCommonExcel.cBool;
+    var cError = AscCommonExcel.cError;
+    var cArea = AscCommonExcel.cArea;
+    var cArea3D = AscCommonExcel.cArea3D;
+    var cRef = AscCommonExcel.cRef;
+    var cRef3D = AscCommonExcel.cRef3D;
+    var cEmpty = AscCommonExcel.cEmpty;
+    var cArray = AscCommonExcel.cArray;
+    var cBaseFunction = AscCommonExcel.cBaseFunction;
+    var cFormulaFunctionGroup = AscCommonExcel.cFormulaFunctionGroup;
+
+    var _func = AscCommonExcel._func;
+    var parseNum = AscCommonExcel.parseNum;
+    var matching = AscCommonExcel.matching;
+
+    var maxGammaArgument = 171.624376956302;
+
+    cFormulaFunctionGroup['Statistical'] = cFormulaFunctionGroup['Statistical'] || [];
+    cFormulaFunctionGroup['Statistical'].push(
+        cAVEDEV,
+        cAVERAGE,
+        cAVERAGEA,
+        cAVERAGEIF,
+        cAVERAGEIFS,
+        cBETADIST,
+        cBETAINV,
+        cBINOMDIST,
+        cCHIDIST,
+        cCHIINV,
+        cCHITEST,
+        cCONFIDENCE,
+        cCORREL,
+        cCOUNT,
+        cCOUNTA,
+        cCOUNTBLANK,
+        cCOUNTIF,
+        cCOUNTIFS,
+        cCOVAR,
+        cCRITBINOM,
+        cDEVSQ,
+        cEXPONDIST,
+        cFDIST,
+        cFINV,
+        cFISHER,
+        cFISHERINV,
+        cFORECAST,
+        cFREQUENCY,
+        cFTEST,
+        cGAMMADIST,
+        cGAMMAINV,
+        cGAMMALN,
+        cGEOMEAN,
+        cGROWTH,
+        cHARMEAN,
+        cHYPGEOMDIST,
+        cINTERCEPT,
+        cKURT,
+        cLARGE,
+        cLINEST,
+        cLOGEST,
+        cLOGINV,
+        cLOGNORMDIST,
+        cMAX,
+        cMAXA,
+        cMEDIAN,
+        cMIN,
+        cMINA,
+        cMODE,
+        cNEGBINOMDIST,
+        cNORMDIST,
+        cNORMINV,
+        cNORMSDIST,
+        cNORMSINV,
+        cPEARSON,
+        cPERCENTILE,
+        cPERCENTRANK,
+        cPERMUT,
+        cPOISSON,
+        cPROB,
+        cQUARTILE,
+        cRANK,
+        cRSQ,
+        cSKEW,
+        cSLOPE,
+        cSMALL,
+        cSTANDARDIZE,
+        cSTDEV,
+        cSTDEVA,
+        cSTDEVP,
+        cSTDEVPA,
+        cSTEYX,
+        cTDIST,
+        cTINV,
+        cTREND,
+        cTRIMMEAN,
+        cTTEST,
+        cVAR,
+        cVARA,
+        cVARP,
+        cVARPA,
+        cWEIBULL,
+        cZTEST
+    );
+
+    function integralPhi(x) { // Using gauss(x)+0.5 has severe cancellation errors for x<-4
+        return 0.5 * AscCommonExcel.rtl_math_erfc(-x * 0.7071067811865475); // * 1/sqrt(2)
+    }
+    function phi(x) {
+        return 0.39894228040143268 * Math.exp(-(x * x) / 2);
+    }
+    function gauss(x) {
+        var t0 = [0.39894228040143268, -0.06649038006690545, 0.00997355701003582, -0.00118732821548045, 0.00011543468761616,
+            -0.00000944465625950, 0.00000066596935163, -0.00000004122667415, 0.00000000227352982, 0.00000000011301172,
+            0.00000000000511243, -0.00000000000021218], t2 = [0.47724986805182079, 0.05399096651318805, -0.05399096651318805,
+            0.02699548325659403, -0.00449924720943234, -0.00224962360471617, 0.00134977416282970, -0.00011783742691370,
+            -0.00011515930357476, 0.00003704737285544, 0.00000282690796889, -0.00000354513195524, 0.00000037669563126,
+            0.00000019202407921, -0.00000005226908590, -0.00000000491799345, 0.00000000366377919, -0.00000000015981997,
+            -0.00000000017381238, 0.00000000002624031, 0.00000000000560919, -0.00000000000172127, -0.00000000000008634,
+            0.00000000000007894], t4 = [0.49996832875816688, 0.00013383022576489, -0.00026766045152977, 0.00033457556441221,
+            -0.00028996548915725, 0.00018178605666397, -0.00008252863922168, 0.00002551802519049, -0.00000391665839292,
+            -0.00000074018205222, 0.00000064422023359, -0.00000017370155340, 0.00000000909595465, 0.00000000944943118,
+            -0.00000000329957075, 0.00000000029492075, 0.00000000011874477, -0.00000000004420396, 0.00000000000361422,
+            0.00000000000143638, -0.00000000000045848];
+        var asympt = [-1, 1, -3, 15, -105], xabs = Math.abs(x), xshort = Math.floor(xabs), nval = 0;
+        if (xshort == 0) {
+            nval = taylor(t0, 11, (xabs * xabs)) * xabs;
+        } else if ((xshort >= 1) && (xshort <= 2)) {
+            nval = taylor(t2, 23, (xabs - 2));
+        } else if ((xshort >= 3) && (xshort <= 4)) {
+            nval = taylor(t4, 20, (xabs - 4));
+        } else {
+            nval = 0.5 + phi(xabs) * taylor(asympt, 4, 1 / (xabs * xabs)) / xabs;
+        }
+        if (x < 0) {
+            return -nval;
+        } else {
+            return nval;
+        }
+    }
+    function taylor(pPolynom, nMax, x) {
+        var nVal = pPolynom[nMax];
+        for (var i = nMax - 1; i >= 0; i--) {
+            nVal = pPolynom[i] + (nVal * x);
+        }
+        return nVal;
+    }
+    function gaussinv(x) {
+        var q, t, z;
+
+        q = x - 0.5;
+
+        if (Math.abs(q) <= .425) {
+            t = 0.180625 - q * q;
+            z = q * (
+                (
+                  (
+                    (
+                      (
+                        (
+                          (
+                            t * 2509.0809287301226727 + 33430.575583588128105
+                          ) * t + 67265.770927008700853
+                        ) * t + 45921.953931549871457
+                      ) * t + 13731.693765509461125
+                    ) * t + 1971.5909503065514427
+                  ) * t + 133.14166789178437745
+                ) * t + 3.387132872796366608
+              ) / (
+                (
+                  (
+                    (
+                      (
+                        (
+                          (
+                            t * 5226.495278852854561 + 28729.085735721942674
+                          ) * t + 39307.89580009271061
+                        ) * t + 21213.794301586595867
+                      ) * t + 5394.1960214247511077
+                    ) * t + 687.1870074920579083
+                  ) * t + 42.313330701600911252
+                ) * t + 1
+              );
+        } else {
+            if (q > 0) {
+                t = 1 - x;
+            } else {
+                t = x;
+            }
+
+            t = Math.sqrt(-Math.log(t));
+
+            if (t <= 5) {
+                t += -1.6;
+                z = (
+                    (
+                      (
+                        (
+                          (
+                            (
+                              (
+                                t * 7.7454501427834140764e-4 + 0.0227238449892691845833
+                              ) * t + 0.24178072517745061177
+                            ) * t + 1.27045825245236838258
+                          ) * t + 3.64784832476320460504
+                        ) * t + 5.7694972214606914055
+                      ) * t + 4.6303378461565452959
+                    ) * t + 1.42343711074968357734
+                  ) / (
+                    (
+                      (
+                        (
+                          (
+                            (
+                              (
+                                t * 1.05075007164441684324e-9 + 5.475938084995344946e-4
+                              ) * t + 0.0151986665636164571966
+                            ) * t + 0.14810397642748007459
+                          ) * t + 0.68976733498510000455
+                        ) * t + 1.6763848301838038494
+                      ) * t + 2.05319162663775882187
+                    ) * t + 1
+                  );
+            } else {
+                t += -5;
+                z = (
+                    (
+                      (
+                        (
+                          (
+                            (
+                              (
+                                t * 2.01033439929228813265e-7 + 2.71155556874348757815e-5
+                              ) * t + 0.0012426609473880784386
+                            ) * t + 0.026532189526576123093
+                          ) * t + 0.29656057182850489123
+                        ) * t + 1.7848265399172913358
+                      ) * t + 5.4637849111641143699
+                    ) * t + 6.6579046435011037772
+                  ) / (
+                    (
+                      (
+                        (
+                          (
+                            (
+                              (
+                                t * 2.04426310338993978564e-15 + 1.4215117583164458887e-7
+                              ) * t + 1.8463183175100546818e-5
+                            ) * t + 7.868691311456132591e-4
+                          ) * t + 0.0148753612908506148525
+                        ) * t + 0.13692988092273580531
+                      ) * t + 0.59983220655588793769
+                    ) * t + 1
+                  );
+            }
+
+            if (q < 0) {
+                z = -z;
+            }
+        }
+
+        return z;
+    }
+    function getLanczosSum(fZ) {
+        var num = [23531376880.41075968857200767445163675473, 42919803642.64909876895789904700198885093,
+            35711959237.35566804944018545154716670596, 17921034426.03720969991975575445893111267,
+            6039542586.35202800506429164430729792107, 1439720407.311721673663223072794912393972,
+            248874557.8620541565114603864132294232163, 31426415.58540019438061423162831820536287,
+            2876370.628935372441225409051620849613599, 186056.2653952234950402949897160456992822,
+            8071.672002365816210638002902272250613822, 210.8242777515793458725097339207133627117,
+            2.506628274631000270164908177133837338626], denom = [0, 39916800, 120543840, 150917976, 105258076, 45995730,
+            13339535, 2637558, 357423, 32670, 1925, 66, 1];
+        // Horner scheme
+        var sumNum, sumDenom, i, zInv;
+        if (fZ <= 1) {
+            sumNum = num[12];
+            sumDenom = denom[12];
+            for (i = 11; i >= 0; --i) {
+                sumNum *= fZ;
+                sumNum += num[i];
+                sumDenom *= fZ;
+                sumDenom += denom[i];
+            }
+        } else
+        // Cancel down with fZ^12; Horner scheme with reverse coefficients
+        {
+            zInv = 1 / fZ;
+            sumNum = num[0];
+            sumDenom = denom[0];
+            for (i = 1; i <= 12; ++i) {
+                sumNum *= zInv;
+                sumNum += num[i];
+                sumDenom *= zInv;
+                sumDenom += denom[i];
+            }
+        }
+        return sumNum / sumDenom;
+    }
+    /** You must ensure fZ>0; fZ>171.624376956302 will overflow. */
+    function getGammaHelper(fZ) {
+        var gamma = getLanczosSum(fZ), fg = 6.024680040776729583740234375, zgHelp = fZ + fg - 0.5;
+        // avoid intermediate overflow
+        var halfpower = Math.pow(zgHelp, fZ / 2 - 0.25);
+        gamma *= halfpower;
+        gamma /= Math.exp(zgHelp);
+        gamma *= halfpower;
+        if (fZ <= 20 && fZ == Math.floor(fZ)) {
+            gamma = Math.round(gamma);
+        }
+        return gamma;
+    }
+    /** You must ensure fZ>0 */
+    function getLogGammaHelper(fZ) {
+        var _fg = 6.024680040776729583740234375, zgHelp = fZ + _fg - 0.5;
+        return Math.log(getLanczosSum(fZ)) + (fZ - 0.5) * Math.log(zgHelp) - zgHelp;
+    }
+    function getLogGamma(fZ) {
+        if (fZ >= maxGammaArgument) {
+            return getLogGammaHelper(fZ);
+        }
+        if (fZ >= 0) {
+            return Math.log(getGammaHelper(fZ));
+        }
+        if (fZ >= 0.5) {
+            return Math.log(getGammaHelper(fZ + 1) / fZ);
+        }
+        return getLogGammaHelper(fZ + 2) - Math.log(fZ + 1) - Math.log(fZ);
+    }
+
 function cAVEDEV() {
 //    cBaseFunction.call( this, "AVEDEV" );
 //    this.setArgumentsMin( 1 );
@@ -5418,4 +5664,10 @@ function cZTEST() {
 }
 
 cZTEST.prototype = Object.create( cBaseFunction.prototype );
+
+    //----------------------------------------------------------export----------------------------------------------------
+    window['AscCommonExcel'] = window['AscCommonExcel'] || {};
+    window['AscCommonExcel'].phi = phi;
+    window['AscCommonExcel'].gauss = gauss;
+    window['AscCommonExcel'].gaussinv = gaussinv;
 })(window);

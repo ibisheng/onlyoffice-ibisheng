@@ -5267,7 +5267,7 @@
             {
                 WorkbookPr.Date1904 = this.stream.GetBool();
                 g_bDate1904 = WorkbookPr.Date1904;
-                c_DateCorrectConst = g_bDate1904?c_Date1904Const:c_Date1900Const;
+                AscCommonExcel.c_DateCorrectConst = g_bDate1904?AscCommonExcel.c_Date1904Const:AscCommonExcel.c_Date1900Const;
             }
             else if ( c_oSerWorkbookPrTypes.DateCompatibility == type )
                 WorkbookPr.DateCompatibility = this.stream.GetBool();

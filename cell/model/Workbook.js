@@ -1,5 +1,11 @@
 "use strict";
 
+var cElementType = AscCommonExcel.cElementType;
+var cArea3D = AscCommonExcel.cArea3D;
+var cRef3D = AscCommonExcel.cRef3D;
+
+var parserFormula = AscCommonExcel.parserFormula;
+
 var g_nHSLMaxValue = 255;
 var g_nVerticalTextAngle = 255;
 var gc_dDefaultColWidthCharsAttribute;//определяется в WorksheetView.js
@@ -2534,7 +2540,7 @@ Workbook.prototype.getDefinedNamesWB = function (defNameListId) {
             name = listDN[id]
 
             if ( name.Ref && !name.Hidden && name.Name.indexOf("_xlnm") < 0 ) {
-                if( name.isTable || name.parsedRef && name.parsedRef.isParsed && name.parsedRef.countRef == 1 && name.parsedRef.outStack.length == 1 && name.parsedRef.calculate().errorType !== cErrorType.bad_reference ){
+                if( name.isTable || name.parsedRef && name.parsedRef.isParsed && name.parsedRef.countRef == 1 && name.parsedRef.outStack.length == 1 && name.parsedRef.calculate().errorType !== AscCommonExcel.cErrorType.bad_reference ){
                     arr.push( name.getAscCDefName() );
                 }
             }
@@ -4927,9 +4933,9 @@ Woorksheet.prototype._BuildDependencies=function(cellRange){
 									oNewElem = new cArea3D(ref, wsFrom, wsTo, elem._wb);
 								}
 								else if(-1 != ref.indexOf(":"))//случай "A1:A1"
-									oNewElem = new cArea(ref, elem.ws);
+									oNewElem = new AscCommonExcel.cArea(ref, elem.ws);
 								else
-									oNewElem = new cRef(ref, elem.ws);
+									oNewElem = new AscCommonExcel.cRef(ref, elem.ws);
 							}
 							else
 							{
@@ -4942,7 +4948,7 @@ Woorksheet.prototype._BuildDependencies=function(cellRange){
 									oNewElem = new cArea3D(ref, wsFrom, wsTo, elem._wb);
 								}
 								else
-									oNewElem = new cArea(ref, elem.ws);
+									oNewElem = new AscCommonExcel.cArea(ref, elem.ws);
 							}
 							if ( ref.indexOf( "$" ) > -1 )
 								oNewElem.isAbsolute = true; // ToDo - пересмотреть этот параметр (есть в Range информация о абсолютной ссылке)
@@ -5088,7 +5094,7 @@ Woorksheet.prototype._RecalculatedFunctions=function(cell,bad,setCellFormat){
         if ( c.formulaParsed && c.formulaParsed.outStack ) {
             for ( var i = 0, length = c.formulaParsed.outStack.length; i < length; i++ ) {
                 elem = c.formulaParsed.outStack[i];
-                if ( elem instanceof cRef || elem instanceof cRef3D || elem instanceof cArea || elem instanceof cArea3D ) {
+                if ( elem instanceof AscCommonExcel.cRef || elem instanceof cRef3D || elem instanceof AscCommonExcel.cArea || elem instanceof cArea3D ) {
                     var r = elem.getRange();
                     if ( elem instanceof cArea3D && r.length > 0 )
                         r = r[0];
@@ -5121,7 +5127,7 @@ Woorksheet.prototype._RecalculatedFunctions=function(cell,bad,setCellFormat){
 		res = __cell.formulaParsed.calculate();
 	}
 	else {
-		res = new cError( cErrorType.bad_reference )
+		res = new AscCommonExcel.cError( AscCommonExcel.cErrorType.bad_reference )
 	}
 	if(res){
 		if( res.type == cElementType.cell){

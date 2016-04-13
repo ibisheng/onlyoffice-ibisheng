@@ -6,71 +6,107 @@
 * @param {undefined} undefined
 */
 function (window, undefined) {
-cFormulaFunctionGroup['Mathematic'] = cFormulaFunctionGroup['Mathematic'] || [];
-cFormulaFunctionGroup['Mathematic'].push(
-    cABS,
-    cACOS,
-    cACOSH,
-    cASIN,
-    cASINH,
-    cATAN,
-    cATAN2,
-    cATANH,
-    cCEILING,
-    cCOMBIN,
-    cCOS,
-    cCOSH,
-    cDEGREES,
-    cECMA_CEILING,
-    cEVEN,
-    cEXP,
-    cFACT,
-    cFACTDOUBLE,
-    cFLOOR,
-    cGCD,
-    cINT,
-    cISO_CEILING,
-    cLCM,
-    cLN,
-    cLOG,
-    cLOG10,
-    cMDETERM,
-    cMINVERSE,
-    cMMULT,
-    cMOD,
-    cMROUND,
-    cMULTINOMIAL,
-    cODD,
-    cPI,
-    cPOWER,
-    cPRODUCT,
-    cQUOTIENT,
-    cRADIANS,
-    cRAND,
-    cRANDBETWEEN,
-    cROMAN,
-    cROUND,
-    cROUNDDOWN,
-    cROUNDUP,
-    cSERIESSUM,
-    cSIGN,
-    cSIN,
-    cSINH,
-    cSQRT,
-    cSQRTPI,
-    cSUBTOTAL,
-    cSUM,
-    cSUMIF,
-    cSUMIFS,
-    cSUMPRODUCT,
-    cSUMSQ,
-    cSUMX2MY2,
-    cSUMX2PY2,
-    cSUMXMY2,
-    cTAN,
-    cTANH,
-    cTRUNC
-);
+    var cElementType = AscCommonExcel.cElementType;
+    var cErrorType = AscCommonExcel.cErrorType;
+    var cExcelSignificantDigits = AscCommonExcel.cExcelSignificantDigits;
+    var cNumber = AscCommonExcel.cNumber;
+    var cString = AscCommonExcel.cString;
+    var cBool = AscCommonExcel.cBool;
+    var cError = AscCommonExcel.cError;
+    var cArea = AscCommonExcel.cArea;
+    var cArea3D = AscCommonExcel.cArea3D;
+    var cRef = AscCommonExcel.cRef;
+    var cRef3D = AscCommonExcel.cRef3D;
+    var cEmpty = AscCommonExcel.cEmpty;
+    var cArray = AscCommonExcel.cArray;
+    var cBaseFunction = AscCommonExcel.cBaseFunction;
+    var cFormulaFunctionGroup = AscCommonExcel.cFormulaFunctionGroup;
+
+    var _func = AscCommonExcel._func;
+    
+    cFormulaFunctionGroup['Mathematic'] = cFormulaFunctionGroup['Mathematic'] || [];
+    cFormulaFunctionGroup['Mathematic'].push(
+        cABS,
+        cACOS,
+        cACOSH,
+        cASIN,
+        cASINH,
+        cATAN,
+        cATAN2,
+        cATANH,
+        cCEILING,
+        cCOMBIN,
+        cCOS,
+        cCOSH,
+        cDEGREES,
+        cECMA_CEILING,
+        cEVEN,
+        cEXP,
+        cFACT,
+        cFACTDOUBLE,
+        cFLOOR,
+        cGCD,
+        cINT,
+        cISO_CEILING,
+        cLCM,
+        cLN,
+        cLOG,
+        cLOG10,
+        cMDETERM,
+        cMINVERSE,
+        cMMULT,
+        cMOD,
+        cMROUND,
+        cMULTINOMIAL,
+        cODD,
+        cPI,
+        cPOWER,
+        cPRODUCT,
+        cQUOTIENT,
+        cRADIANS,
+        cRAND,
+        cRANDBETWEEN,
+        cROMAN,
+        cROUND,
+        cROUNDDOWN,
+        cROUNDUP,
+        cSERIESSUM,
+        cSIGN,
+        cSIN,
+        cSINH,
+        cSQRT,
+        cSQRTPI,
+        cSUBTOTAL,
+        cSUM,
+        cSUMIF,
+        cSUMIFS,
+        cSUMPRODUCT,
+        cSUMSQ,
+        cSUMX2MY2,
+        cSUMX2PY2,
+        cSUMXMY2,
+        cTAN,
+        cTANH,
+        cTRUNC
+    );
+
+var cSubTotalFunctionType = {
+    includes: {
+        AVERAGE: 1, COUNT: 2, COUNTA: 3, MAX: 4, MIN: 5, PRODUCT: 6, STDEV: 7, STDEVP: 8, SUM: 9, VAR: 10, VARP: 11
+    }, excludes: {
+        AVERAGE: 101,
+        COUNT: 102,
+        COUNTA: 103,
+        MAX: 104,
+        MIN: 105,
+        PRODUCT: 106,
+        STDEV: 107,
+        STDEVP: 108,
+        SUM: 109,
+        VAR: 110,
+        VARP: 111
+    }
+};
 
 function cABS() {
 //    cBaseFunction.call( this, "ABS" );
@@ -3053,14 +3089,14 @@ cROUND.prototype.Calculate = function ( arg ) {
     }
 
     function roundHelper( number, num_digits ) {
-        if ( num_digits > cExcelMaxExponent ) {
+        if ( num_digits > AscCommonExcel.cExcelMaxExponent ) {
             if ( Math.abs( number ) < 1 || num_digits < 1e10 ) // The values are obtained experimentally
             {
                 return new cNumber( number );
             }
             return new cNumber( 0 );
         }
-        else if ( num_digits < cExcelMinExponent ) {
+        else if ( num_digits < AscCommonExcel.cExcelMinExponent ) {
             if ( Math.abs( number ) < 0.01 ) // The values are obtained experimentally
             {
                 return new cNumber( number );
@@ -3183,13 +3219,13 @@ function cROUNDDOWN() {
 cROUNDDOWN.prototype = Object.create( cBaseFunction.prototype )
 cROUNDDOWN.prototype.Calculate = function ( arg ) {
     function rounddownHelper( number, num_digits ) {
-        if ( num_digits > cExcelMaxExponent ) {
+        if ( num_digits > AscCommonExcel.cExcelMaxExponent ) {
             if ( Math.abs( number ) >= 1e-100 || num_digits <= 98303 ) { // The values are obtained experimentally
                 return new cNumber( number );
             }
             return new cNumber( 0 );
         }
-        else if ( num_digits < cExcelMinExponent ) {
+        else if ( num_digits < AscCommonExcel.cExcelMinExponent ) {
             if ( Math.abs( number ) >= 1e100 ) { // The values are obtained experimentally
                 return new cNumber( number );
             }
@@ -3308,13 +3344,13 @@ function cROUNDUP() {
 cROUNDUP.prototype = Object.create( cBaseFunction.prototype )
 cROUNDUP.prototype.Calculate = function ( arg ) {
     function roundupHelper( number, num_digits ) {
-        if ( num_digits > cExcelMaxExponent ) {
+        if ( num_digits > AscCommonExcel.cExcelMaxExponent ) {
             if ( Math.abs( number ) >= 1e-100 || num_digits <= 98303 ) { // The values are obtained experimentally
                 return new cNumber( number );
             }
             return new cNumber( 0 );
         }
-        else if ( num_digits < cExcelMinExponent ) {
+        else if ( num_digits < AscCommonExcel.cExcelMinExponent ) {
             if ( Math.abs( number ) >= 1e100 ) { // The values are obtained experimentally
                 return new cNumber( number );
             }
@@ -3992,14 +4028,14 @@ cSUMIF.prototype.Calculate = function ( arg ) {
     else {
         search = arg1;
     }
-    valueForSearching = parseNum( search ) ? new cNumber( search ) : new cString( search );
+    valueForSearching = AscCommonExcel.parseNum( search ) ? new cNumber( search ) : new cString( search );
     if ( arg0 instanceof cArea ) {
         var arg0Matrix = arg0.getMatrix(), arg2Matrix = arg2.getMatrix(), valMatrix0, valMatrix2;
         for ( var i = 0; i < arg0Matrix.length; i++ ) {
             for ( var j = 0; j < arg0Matrix[i].length; j++ ) {
                 valMatrix0 = arg0Matrix[i][j];
                 valMatrix2 = arg2Matrix[i]? (arg2Matrix[i][j] ? arg2Matrix[i][j] : new cEmpty()) : new cEmpty();
-                if ( matching( valMatrix0, valueForSearching, oper ) ) {
+                if ( AscCommonExcel.matching( valMatrix0, valueForSearching, oper ) ) {
                     if ( valMatrix2 instanceof cNumber ) {
                         _sum += valMatrix2.getValue();
                     }
@@ -4009,7 +4045,7 @@ cSUMIF.prototype.Calculate = function ( arg ) {
     }
     else {
         val = arg0.getValue();
-        if ( matching( val, valueForSearching, oper ) ) {
+        if ( AscCommonExcel.matching( val, valueForSearching, oper ) ) {
             var r = arg0.getRange(), ws = arg0.getWS(),
                 r1 = r.first.getRow0() + 0, c1 = arg2.getRange().first.getCol0();
             r = new cRef( ws.getRange3( r1, c1, r1, c1 ).getName(), ws );

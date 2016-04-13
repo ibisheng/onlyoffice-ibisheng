@@ -3035,7 +3035,7 @@ CCellValue.prototype =
 			var oValueArray = null;
 			var xfs = cell.getCompiledStyle();
 			if(cell.sFormula)
-				oValueText = "="+cell.formulaParsed.assembleLocale(cFormulaFunctionToLocale,true);	// ToDo если будет притормаживать, то завести переменную и не рассчитывать каждый раз!
+				oValueText = "="+cell.formulaParsed.assembleLocale(AscCommonExcel.cFormulaFunctionToLocale,true);	// ToDo если будет притормаживать, то завести переменную и не рассчитывать каждый раз!
 			else
 			{
 				if(null != this.text || null != this.number)

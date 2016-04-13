@@ -6,16 +6,29 @@
 * @param {undefined} undefined
 */
 function (window, undefined) {
-cFormulaFunctionGroup['Logical'] = cFormulaFunctionGroup['Logical'] || [];
-cFormulaFunctionGroup['Logical'].push(
-    cAND,
-    cFALSE,
-    cIF,
-    cIFERROR,
-    cNOT,
-    cOR,
-    cTRUE
-);
+    var cElementType = AscCommonExcel.cElementType;
+    var cErrorType = AscCommonExcel.cErrorType;
+    var cNumber = AscCommonExcel.cNumber;
+    var cString = AscCommonExcel.cString;
+    var cBool = AscCommonExcel.cBool;
+    var cError = AscCommonExcel.cError;
+    var cArea = AscCommonExcel.cArea;
+    var cArea3D = AscCommonExcel.cArea3D;
+    var cEmpty = AscCommonExcel.cEmpty;
+    var cArray = AscCommonExcel.cArray;
+    var cBaseFunction = AscCommonExcel.cBaseFunction;
+    var cFormulaFunctionGroup = AscCommonExcel.cFormulaFunctionGroup;
+
+    cFormulaFunctionGroup['Logical'] = cFormulaFunctionGroup['Logical'] || [];
+    cFormulaFunctionGroup['Logical'].push(
+        cAND,
+        cFALSE,
+        cIF,
+        cIFERROR,
+        cNOT,
+        cOR,
+        cTRUE
+    );
 
 function cAND() {
 //    cBaseFunction.call( this, "AND" );
@@ -231,7 +244,7 @@ cIFERROR.prototype.Calculate = function ( arg ) {
     if ( arg0 instanceof cArray ) {
         arg0 = arg0.getElement( 0 );
     }
-    if ( arg0 instanceof cRef || arg0 instanceof cRef3D ) {
+    if ( arg0 instanceof AscCommonExcel.cRef || arg0 instanceof AscCommonExcel.cRef3D ) {
         arg0 = arg0.getValue();
     }
     if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {

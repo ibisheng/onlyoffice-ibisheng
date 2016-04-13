@@ -6,24 +6,38 @@
 * @param {undefined} undefined
 */
 function (window, undefined) {
-cFormulaFunctionGroup['Information'] = cFormulaFunctionGroup['Information'] || [];
-cFormulaFunctionGroup['Information'].push(
-    cERROR_TYPE,
-    cISBLANK,
-    cISERR,
-    cISERROR,
-    cISEVEN,
-    cISLOGICAL,
-    cISNA,
-    cISNONTEXT,
-    cISNUMBER,
-    cISODD,
-    cISREF,
-    cISTEXT,
-    cN,
-    cNA,
-    cTYPE
-);
+    var cElementType = AscCommonExcel.cElementType;
+    var cErrorType = AscCommonExcel.cErrorType;
+    var cNumber = AscCommonExcel.cNumber;
+    var cString = AscCommonExcel.cString;
+    var cBool = AscCommonExcel.cBool;
+    var cError = AscCommonExcel.cError;
+    var cArea = AscCommonExcel.cArea;
+    var cArea3D = AscCommonExcel.cArea3D;
+    var cRef = AscCommonExcel.cRef;
+    var cRef3D = AscCommonExcel.cRef3D;
+    var cArray = AscCommonExcel.cArray;
+    var cBaseFunction = AscCommonExcel.cBaseFunction;
+    var cFormulaFunctionGroup = AscCommonExcel.cFormulaFunctionGroup;
+    
+    cFormulaFunctionGroup['Information'] = cFormulaFunctionGroup['Information'] || [];
+    cFormulaFunctionGroup['Information'].push(
+        cERROR_TYPE,
+        cISBLANK,
+        cISERR,
+        cISERROR,
+        cISEVEN,
+        cISLOGICAL,
+        cISNA,
+        cISNONTEXT,
+        cISNUMBER,
+        cISODD,
+        cISREF,
+        cISTEXT,
+        cN,
+        cNA,
+        cTYPE
+    );
 /*
  здесь вынесены функции, которы по назначению не могут быть использованы в веб редакторах документах.
  либо они будут реализованы с усеченным функционалом позже.
@@ -137,7 +151,7 @@ cISBLANK.prototype.Calculate = function ( arg ) {
     else if ( arg0 instanceof cRef || arg0 instanceof cRef3D ) {
         arg0 = arg0.getValue();
     }
-    if ( arg0 instanceof cEmpty )
+    if ( arg0 instanceof AscCommonExcel.cEmpty )
         return this.value = new cBool( true );
     else
         return this.value = new cBool( false );

@@ -2491,7 +2491,8 @@
 
   WorkbookView.prototype.initFormulasList = function() {
     this.formulasList = [];
-    var oFormulaList = cFormulaFunctionLocalized ? cFormulaFunctionLocalized : cFormulaFunction;
+    var oFormulaList = AscCommonExcel.cFormulaFunctionLocalized ? AscCommonExcel.cFormulaFunctionLocalized :
+      AscCommonExcel.cFormulaFunction;
     for (var f in oFormulaList) {
       this.formulasList.push(f);
     }

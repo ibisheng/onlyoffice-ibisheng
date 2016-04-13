@@ -93,7 +93,7 @@ var editor;
 
   spreadsheet_api.prototype._init = function() {
     this.topLineEditorElement = document.getElementById(this.topLineEditorName);
-    this.formulasList = getFormulasInfo();
+    this.formulasList = AscCommonExcel.getFormulasInfo();
     // ToDo нужно ли это
     asc['editor'] = ( asc['editor'] || this );
     AscBrowser.checkZoom();
@@ -2825,7 +2825,7 @@ var editor;
     return this.formulasList;
   };
   spreadsheet_api.prototype.asc_getFormulaLocaleName = function(name) {
-    return cFormulaFunctionToLocale ? cFormulaFunctionToLocale[name] : name;
+    return AscCommonExcel.cFormulaFunctionToLocale ? AscCommonExcel.cFormulaFunctionToLocale[name] : name;
   };
 
   spreadsheet_api.prototype.asc_recalc = function(isRecalcWB) {
@@ -3039,17 +3039,17 @@ var editor;
   // Выставление локали
   spreadsheet_api.prototype.asc_setLocalization = function(oLocalizedData) {
     if (null == oLocalizedData) {
-      cFormulaFunctionLocalized = null;
-      cFormulaFunctionToLocale = null;
+      AscCommonExcel.cFormulaFunctionLocalized = null;
+      AscCommonExcel.cFormulaFunctionToLocale = null;
     } else {
-      cFormulaFunctionLocalized = {};
-      cFormulaFunctionToLocale = {};
+      AscCommonExcel.cFormulaFunctionLocalized = {};
+      AscCommonExcel.cFormulaFunctionToLocale = {};
       var localName;
-      for (var i in cFormulaFunction) {
+      for (var i in AscCommonExcel.cFormulaFunction) {
         localName = oLocalizedData[i] ? oLocalizedData[i]['n'] : null;
         localName = localName ? localName : i;
-        cFormulaFunctionLocalized[localName] = cFormulaFunction[i];
-        cFormulaFunctionToLocale[i] = localName;
+        AscCommonExcel.cFormulaFunctionLocalized[localName] = AscCommonExcel.cFormulaFunction[i];
+        AscCommonExcel.cFormulaFunctionToLocale[i] = localName;
       }
     }
 	  build_local_rx(oLocalizedData?oLocalizedData["LocalFormulaOperands"]:null);

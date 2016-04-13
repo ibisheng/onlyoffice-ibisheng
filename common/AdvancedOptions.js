@@ -1,4 +1,4 @@
-﻿"use strict";
+"use strict";
 
 (
 	/**
@@ -183,7 +183,7 @@
 			this.arg = o.args;
 		}
 		asc_CFormula.prototype.asc_getName = function () {
-			return cFormulaFunctionToLocale ? cFormulaFunctionToLocale[this.name] : this.name;
+			return AscCommonExcel.cFormulaFunctionToLocale ? AscCommonExcel.cFormulaFunctionToLocale[this.name] : this.name;
 		};
 		asc_CFormula.prototype.asc_getArguments = function () {
 			return this.arg;

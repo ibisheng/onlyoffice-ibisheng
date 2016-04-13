@@ -13,6 +13,9 @@ function (window, undefined) {
     cQUERYSTRING
 ];*/
 
+    var cBaseFunction = AscCommonExcel.cBaseFunction;
+    var cFormulaFunctionGroup = AscCommonExcel.cFormulaFunctionGroup;
+
     /*new funcions with _xlnf-prefix*/
     cFormulaFunctionGroup['DateAndTime'] = cFormulaFunctionGroup['DateAndTime'] || [];
     cFormulaFunctionGroup['DateAndTime'].push(

@@ -6,21 +6,24 @@
 * @param {undefined} undefined
 */
 function (window, undefined) {
-cFormulaFunctionGroup['Database'] = cFormulaFunctionGroup['Database'] || [];
-cFormulaFunctionGroup['Database'].push(
-    cDAVERAGE,
-    cDCOUNT,
-    cDCOUNTA,
-    cDGET,
-    cDMAX,
-    cDMIN,
-    cDPRODUCT,
-    cDSTDEV,
-    cDSTDEVP,
-    cDSUM,
-    cDVAR,
-    cDVARP
-);
+    var cBaseFunction = AscCommonExcel.cBaseFunction;
+    var cFormulaFunctionGroup = AscCommonExcel.cFormulaFunctionGroup;
+
+    cFormulaFunctionGroup['Database'] = cFormulaFunctionGroup['Database'] || [];
+    cFormulaFunctionGroup['Database'].push(
+        cDAVERAGE,
+        cDCOUNT,
+        cDCOUNTA,
+        cDGET,
+        cDMAX,
+        cDMIN,
+        cDPRODUCT,
+        cDSTDEV,
+        cDSTDEVP,
+        cDSUM,
+        cDVAR,
+        cDVARP
+    );
 
 function cDAVERAGE() {
     cBaseFunction.call( this, "DAVERAGE" );

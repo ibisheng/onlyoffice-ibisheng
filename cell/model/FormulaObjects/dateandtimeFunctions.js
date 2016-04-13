@@ -5,6 +5,28 @@
 * @param {undefined} undefined
 */
 function (window, undefined) {
+    var cElementType = AscCommonExcel.cElementType;
+    var cErrorType = AscCommonExcel.cErrorType;
+    var c_DateCorrectConst = AscCommonExcel.c_DateCorrectConst;
+    var c_sPerDay = AscCommonExcel.c_sPerDay;
+    var c_msPerDay = AscCommonExcel.c_msPerDay;
+    var cNumber = AscCommonExcel.cNumber;
+    var cString = AscCommonExcel.cString;
+    var cBool = AscCommonExcel.cBool;
+    var cError = AscCommonExcel.cError;
+    var cArea = AscCommonExcel.cArea;
+    var cArea3D = AscCommonExcel.cArea3D;
+    var cRef = AscCommonExcel.cRef;
+    var cRef3D = AscCommonExcel.cRef3D;
+    var cEmpty = AscCommonExcel.cEmpty;
+    var cArray = AscCommonExcel.cArray;
+    var cBaseFunction = AscCommonExcel.cBaseFunction;
+    var cFormulaFunctionGroup = AscCommonExcel.cFormulaFunctionGroup;
+
+    var GetDiffDate360 = AscCommonExcel.GetDiffDate360;
+
+    var cExcelDateTimeDigits = 8; //количество цифр после запятой в числах отвечающих за время специализация $18.17.4.2
+
 var DayCountBasis = {
     // US 30/360
     UsPsa30_360:0,
