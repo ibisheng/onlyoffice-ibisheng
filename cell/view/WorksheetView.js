@@ -18,6 +18,7 @@
      * -----------------------------------------------------------------------------
      */
     var asc = window["Asc"];
+    var borderOptions = asc.c_oAscBorderOptions;
     var asc_applyFunction = asc.applyFunction;
     var asc_calcnpt = asc.calcNearestPt;
     var asc_getcvt = asc.getCvtRatio;
@@ -8929,17 +8930,17 @@
                     }
                     res = new Border();
                     // Diagonal
-                    res.d = makeBorder( val[c_oAscBorderOptions.DiagD] || val[c_oAscBorderOptions.DiagU] );
-                    res.dd = val[c_oAscBorderOptions.DiagD] ? true : false;
-                    res.du = val[c_oAscBorderOptions.DiagU] ? true : false;
+                    res.d = makeBorder( val[borderOptions.DiagD] || val[borderOptions.DiagU] );
+                    res.dd = val[borderOptions.DiagD] ? true : false;
+                    res.du = val[borderOptions.DiagU] ? true : false;
                     // Vertical
-                    res.l = makeBorder( val[c_oAscBorderOptions.Left] );
-                    res.iv = makeBorder( val[c_oAscBorderOptions.InnerV] );
-                    res.r = makeBorder( val[c_oAscBorderOptions.Right] );
+                    res.l = makeBorder( val[borderOptions.Left] );
+                    res.iv = makeBorder( val[borderOptions.InnerV] );
+                    res.r = makeBorder( val[borderOptions.Right] );
                     // Horizontal
-                    res.t = makeBorder( val[c_oAscBorderOptions.Top] );
-                    res.ih = makeBorder( val[c_oAscBorderOptions.InnerH] );
-                    res.b = makeBorder( val[c_oAscBorderOptions.Bottom] );
+                    res.t = makeBorder( val[borderOptions.Top] );
+                    res.ih = makeBorder( val[borderOptions.InnerH] );
+                    res.b = makeBorder( val[borderOptions.Bottom] );
                     // Change border
                     range.setBorder( res );
                     break;
