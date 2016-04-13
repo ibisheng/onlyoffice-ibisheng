@@ -15,6 +15,10 @@ var maxIndividualValues = 10000;
 		 * Import
 		 * -----------------------------------------------------------------------------
 		 */
+		var c_oAscError = Asc.c_oAscError;
+		var c_oAscInsertOptions = Asc.c_oAscInsertOptions;
+		var c_oAscDeleteOptions = Asc.c_oAscDeleteOptions;
+
 		var prot;
 
 		var g_oAutoFiltersOptionsElementsProperties = {
@@ -913,8 +917,8 @@ var maxIndividualValues = 10000;
 				var activeCells = ar.clone();
 				var t = this;
 				
-				var DeleteColumns = insertType && (insertType == Asc.c_oAscDeleteOptions.DeleteColumns || insertType == Asc.c_oAscInsertOptions.InsertColumns) ? true : false;
-				var DeleteRows = insertType && (insertType == Asc.c_oAscDeleteOptions.DeleteRows || insertType == Asc.c_oAscInsertOptions.InsertRows) ? true : false;
+				var DeleteColumns = insertType && (insertType == c_oAscDeleteOptions.DeleteColumns || insertType == c_oAscInsertOptions.InsertColumns) ? true : false;
+				var DeleteRows = insertType && (insertType == c_oAscDeleteOptions.DeleteRows || insertType == c_oAscInsertOptions.InsertRows) ? true : false;
 
 				if(DeleteColumns)//в случае, если удаляем столбцы, тогда расширяем активную область область по всем строкам
 				{
@@ -1051,7 +1055,7 @@ var maxIndividualValues = 10000;
 				var t  = this;
 				var bUndoChanges = worksheet.workbook.bUndoChanges;
 				var bRedoChanges = worksheet.workbook.bRedoChanges;
-				var DeleteColumns = ((insertType == Asc.c_oAscDeleteOptions.DeleteColumns && type == 'delCell') || insertType == Asc.c_oAscInsertOptions.InsertColumns) ? true : false;
+				var DeleteColumns = ((insertType == c_oAscDeleteOptions.DeleteColumns && type == 'delCell') || insertType == c_oAscInsertOptions.InsertColumns) ? true : false;
 				activeRange = activeRange.clone();
 				var diff = activeRange.c2 - activeRange.c1 + 1;
 				var redrawTablesArr = [];
@@ -1205,7 +1209,7 @@ var maxIndividualValues = 10000;
 				var t  = this;
 				var bUndoChanges = worksheet.workbook.bUndoChanges;
 				var bRedoChanges = worksheet.workbook.bRedoChanges;
-				var DeleteRows = ((insertType == Asc.c_oAscDeleteOptions.DeleteRows && type == 'delCell') || insertType == Asc.c_oAscInsertOptions.InsertRows) ? true : false;
+				var DeleteRows = ((insertType == c_oAscDeleteOptions.DeleteRows && type == 'delCell') || insertType == c_oAscInsertOptions.InsertRows) ? true : false;
 				activeRange = activeRange.clone();
 				var diff = activeRange.r2 - activeRange.r1 + 1;
 				var redrawTablesArr = [];
@@ -1668,13 +1672,13 @@ var maxIndividualValues = 10000;
 			//if active range intersect even a part tablePart(for insert(delete) cells)
 			isActiveCellsCrossHalfFTable: function(activeCells, val, prop)
 			{
-				var InsertCellsAndShiftDown = val == Asc.c_oAscInsertOptions.InsertCellsAndShiftDown && prop == 'insCell';
-				var InsertCellsAndShiftRight = val == Asc.c_oAscInsertOptions.InsertCellsAndShiftRight && prop == 'insCell';
-				var DeleteCellsAndShiftLeft = val == Asc.c_oAscDeleteOptions.DeleteCellsAndShiftLeft && prop == 'delCell';
-				var DeleteCellsAndShiftTop = val == Asc.c_oAscDeleteOptions.DeleteCellsAndShiftTop && prop == 'delCell';
+				var InsertCellsAndShiftDown = val == c_oAscInsertOptions.InsertCellsAndShiftDown && prop == 'insCell';
+				var InsertCellsAndShiftRight = val == c_oAscInsertOptions.InsertCellsAndShiftRight && prop == 'insCell';
+				var DeleteCellsAndShiftLeft = val == c_oAscDeleteOptions.DeleteCellsAndShiftLeft && prop == 'delCell';
+				var DeleteCellsAndShiftTop = val == c_oAscDeleteOptions.DeleteCellsAndShiftTop && prop == 'delCell';
 				
-				var DeleteColumns = val == Asc.c_oAscDeleteOptions.DeleteColumns && prop == 'delCell';
-				var DeleteRows = val == Asc.c_oAscDeleteOptions.DeleteRows && prop == 'delCell';
+				var DeleteColumns = val == c_oAscDeleteOptions.DeleteColumns && prop == 'delCell';
+				var DeleteRows = val == c_oAscDeleteOptions.DeleteRows && prop == 'delCell';
 				
 				var worksheet = this.worksheet;
 				var tableParts = worksheet.TableParts;
@@ -1708,7 +1712,7 @@ var maxIndividualValues = 10000;
 							{
 								if(isExp && isPart)//часть + целая
 								{
-									worksheet.workbook.handlers.trigger("asc_onError", Asc.c_oAscError.ID.AutoFilterChangeFormatTableError, Asc.c_oAscError.Level.NoCritical);
+									worksheet.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterChangeFormatTableError, c_oAscError.Level.NoCritical);
 									return false;
 								}	
 								if(newActiveRange.c1 <= tableRange.c1 && newActiveRange.c2 >= tableRange.c2 && newActiveRange.r1 <= tableRange.r1 && newActiveRange.r2 >= tableRange.r2)
@@ -1716,36 +1720,36 @@ var maxIndividualValues = 10000;
 									isExp = true;
 									if(isPart)
 									{
-										worksheet.workbook.handlers.trigger("asc_onError", Asc.c_oAscError.ID.AutoFilterChangeFormatTableError, Asc.c_oAscError.Level.NoCritical);
+										worksheet.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterChangeFormatTableError, c_oAscError.Level.NoCritical);
 										return false;
 									}
 								}
 								else if(isExp)
 								{
-									worksheet.workbook.handlers.trigger("asc_onError", Asc.c_oAscError.ID.AutoFilterChangeFormatTableError, Asc.c_oAscError.Level.NoCritical);
+									worksheet.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterChangeFormatTableError, c_oAscError.Level.NoCritical);
 									return false;
 								}
 								else if(isPart)//уже часть захвачена + ещё одна часть
 								{
-									worksheet.workbook.handlers.trigger("asc_onError", Asc.c_oAscError.ID.AutoFilterChangeFormatTableError, Asc.c_oAscError.Level.NoCritical);
+									worksheet.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterChangeFormatTableError, c_oAscError.Level.NoCritical);
 									return false;
 								}
 								else if(DeleteRows)
 								{
 									if(!this.checkRemoveTableParts(newActiveRange, tableRange))
 									{
-										worksheet.workbook.handlers.trigger("asc_onError", Asc.c_oAscError.ID.AutoFilterChangeFormatTableError, Asc.c_oAscError.Level.NoCritical);
+										worksheet.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterChangeFormatTableError, c_oAscError.Level.NoCritical);
 										return false;
 									}
 									else if(activeCells.r1 < tableRange.r1 && activeCells.r2 >= tableRange.r1 && activeCells.r2 < tableRange.r2)//TODO заглушка!!!
 									{
-										worksheet.workbook.handlers.trigger("asc_onError", Asc.c_oAscError.ID.AutoFilterChangeFormatTableError, Asc.c_oAscError.Level.NoCritical);
+										worksheet.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterChangeFormatTableError, c_oAscError.Level.NoCritical);
 										return false;
 									}
 								}
 								else if(DeleteColumns && activeCells.c1 < tableRange.c1 && activeCells.c2 >= tableRange.c1 && activeCells.c2 < tableRange.c2)//TODO заглушка!!!
 								{
-									worksheet.workbook.handlers.trigger("asc_onError", Asc.c_oAscError.ID.AutoFilterChangeFormatTableError, Asc.c_oAscError.Level.NoCritical);
+									worksheet.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterChangeFormatTableError, c_oAscError.Level.NoCritical);
 									return false;
 								}
 								else	
@@ -1786,7 +1790,7 @@ var maxIndividualValues = 10000;
 								if(!isExp)
 								{
 
-									worksheet.workbook.handlers.trigger("asc_onError", Asc.c_oAscError.ID.AutoFilterChangeFormatTableError, Asc.c_oAscError.Level.NoCritical);
+									worksheet.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterChangeFormatTableError, c_oAscError.Level.NoCritical);
 									return false;
 								}
 							}
@@ -1800,7 +1804,7 @@ var maxIndividualValues = 10000;
 								if(tableRange.c1 > activeCells.c1 && (((tableRange.r1 <= activeCells.r1 && tableRange.r2 >= activeCells.r1) || (tableRange.r1 <= activeCells.r2  && tableRange.r2 >= activeCells.r2))  && !(tableRange.r1 == activeCells.r1 && tableRange.r2 == activeCells.r2)))
 								{
 
-									worksheet.workbook.handlers.trigger("asc_onError", Asc.c_oAscError.ID.AutoFilterChangeFormatTableError, Asc.c_oAscError.Level.NoCritical);
+									worksheet.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterChangeFormatTableError, c_oAscError.Level.NoCritical);
 									return false;
 								}
 							}
@@ -1810,7 +1814,7 @@ var maxIndividualValues = 10000;
 								if(tableRange.r1 > activeCells.r1 && (((tableRange.c1 <= activeCells.c1 && tableRange.c2 >= activeCells.c1) || (tableRange.c1 <= activeCells.c2  && tableRange.c2 >= activeCells.c2))  && !(tableRange.c1 == activeCells.c1 && tableRange.c2 == activeCells.c2)))
 								{
 
-									worksheet.workbook.handlers.trigger("asc_onError", Asc.c_oAscError.ID.AutoFilterChangeFormatTableError, Asc.c_oAscError.Level.NoCritical);
+									worksheet.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterChangeFormatTableError, c_oAscError.Level.NoCritical);
 									return false;
 								}
 								
@@ -1821,7 +1825,7 @@ var maxIndividualValues = 10000;
 								if(tableRange.c1 > activeCells.c1 && (((tableRange.r1 <= activeCells.r1 && tableRange.r2 >= activeCells.r1) || (tableRange.r1 <= activeCells.r2  && tableRange.r2 >= activeCells.r2)) && !(tableRange.r1 == activeCells.r1 && tableRange.r2 == activeCells.r2)))
 								{
 
-									worksheet.workbook.handlers.trigger("asc_onError", Asc.c_oAscError.ID.AutoFilterChangeFormatTableError, Asc.c_oAscError.Level.NoCritical);
+									worksheet.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterChangeFormatTableError, c_oAscError.Level.NoCritical);
 									return false;
 								}
 							}
@@ -1831,7 +1835,7 @@ var maxIndividualValues = 10000;
 								if(tableRange.r1 > activeCells.r1 && (((tableRange.c1 <= activeCells.c1 && tableRange.c2 >= activeCells.c1) || (tableRange.c1 <= activeCells.c2  && tableRange.c2 >= activeCells.c2))  && !(tableRange.c1 >= activeCells.c1 && tableRange.c2 <= activeCells.c2)))
 								{
 
-									worksheet.workbook.handlers.trigger("asc_onError", Asc.c_oAscError.ID.AutoFilterChangeFormatTableError, Asc.c_oAscError.Level.NoCritical);
+									worksheet.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterChangeFormatTableError, c_oAscError.Level.NoCritical);
 									return false;
 								}
 							}
@@ -1879,12 +1883,12 @@ var maxIndividualValues = 10000;
 					if((InsertCellsAndShiftDown || DeleteCellsAndShiftTop) && tableRange.r1 > activeCells.r1 && (((tableRange.c1 <= activeCells.c1 && tableRange.c2 >= activeCells.c1) || (tableRange.c1 <= activeCells.c2  && tableRange.c2 >= activeCells.c2))  && !(tableRange.c1 >= activeCells.c1 && tableRange.c2 <= activeCells.c2)))
 					{
 
-						worksheet.workbook.handlers.trigger("asc_onError", Asc.c_oAscError.ID.AutoFilterChangeFormatTableError, Asc.c_oAscError.Level.NoCritical);
+						worksheet.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterChangeFormatTableError, c_oAscError.Level.NoCritical);
 						return false;
 					}
 					else if(InsertCellsAndShiftRight && activeCells.c1 <= tableRange.c1 && ((activeCells.r1 >= tableRange.r1 && activeCells.r1 <= tableRange.r2) || (activeCells.r2 >= tableRange.r1 && activeCells.r2 <= tableRange.r2)) && !(activeCells.r1 <= tableRange.r1 && activeCells.r2 >= tableRange.r2))//если часть а/ф находится справа
 					{
-						worksheet.workbook.handlers.trigger("asc_onError", Asc.c_oAscError.ID.AutoFilterChangeFormatTableError, Asc.c_oAscError.Level.NoCritical);
+						worksheet.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterChangeFormatTableError, c_oAscError.Level.NoCritical);
 						return false;
 					}
 					

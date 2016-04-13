@@ -12,8 +12,11 @@
 	 */
 	function (window, undefined) {
 
+		// Import
 		var asc = window["Asc"] ? window["Asc"] : (window["Asc"] = {});
 		var prot;
+
+		var c_oAscSelectionType = asc.c_oAscSelectionType;
 
 
 		/** @const */
@@ -436,11 +439,11 @@
 
 			getAllRange: function () {
 				var result;
-				if (Asc.c_oAscSelectionType.RangeMax === this.type)
+				if (c_oAscSelectionType.RangeMax === this.type)
 					result = new Range(0, 0, gc_nMaxCol0, gc_nMaxRow0);
-				else if (Asc.c_oAscSelectionType.RangeCol === this.type)
+				else if (c_oAscSelectionType.RangeCol === this.type)
 					result = new Range(this.c1, 0, this.c2, gc_nMaxRow0);
-				else if (Asc.c_oAscSelectionType.RangeRow === this.type)
+				else if (c_oAscSelectionType.RangeRow === this.type)
 					result = new Range(0, this.r1, gc_nMaxCol0, this.r2);
 				else
 					result = this.clone();
@@ -469,7 +472,7 @@
 				ActiveRange.superclass.constructor.apply(this, arguments);
 			else
 				ActiveRange.superclass.constructor.call(this, 0, 0, 0, 0);
-			this.type = Asc.c_oAscSelectionType.RangeCells;
+			this.type = c_oAscSelectionType.RangeCells;
 			this.startCol = 0; // Активная ячейка в выделении
 			this.startRow = 0; // Активная ячейка в выделении
 			this._updateAdditionalData();
@@ -567,17 +570,17 @@
 				this.startRow = this.r1;
 			}
 			//не меняем тип выделения, если это не выделение ячееек
-			// if(this.type == Asc.c_oAscSelectionType.RangeCells || this.type == Asc.c_oAscSelectionType.RangeCol ||
-				// this.type == Asc.c_oAscSelectionType.RangeRow || this.type == Asc.c_oAscSelectionType.RangeMax)
+			// if(this.type == c_oAscSelectionType.RangeCells || this.type == c_oAscSelectionType.RangeCol ||
+				// this.type == c_oAscSelectionType.RangeRow || this.type == c_oAscSelectionType.RangeMax)
 			// {
 				// if(0 == this.r1 && 0 == this.c1 && gc_nMaxRow0 == this.r2 && gc_nMaxCol0 == this.c2)
-					// this.type = Asc.c_oAscSelectionType.RangeMax;
+					// this.type = c_oAscSelectionType.RangeMax;
 				// else if(0 == this.r1 && gc_nMaxRow0 == this.r2)
-					// this.type = Asc.c_oAscSelectionType.RangeCol;
+					// this.type = c_oAscSelectionType.RangeCol;
 				// else if(0 == this.c1 && gc_nMaxCol0 == this.c2)
-					// this.type = Asc.c_oAscSelectionType.RangeRow;
+					// this.type = c_oAscSelectionType.RangeRow;
 				// else
-					// this.type = Asc.c_oAscSelectionType.RangeCells;
+					// this.type = c_oAscSelectionType.RangeCells;
 			// }
 		};
 
@@ -764,13 +767,13 @@
 				            var bCol = 0 == r1 && gc_nMaxRow0 == r2;
 				            var bRow = 0 == c1 && gc_nMaxCol0 == c2;
 				            if (bCol && bRow)
-				                oActiveRange.type = Asc.c_oAscSelectionType.RangeMax;
+				                oActiveRange.type = c_oAscSelectionType.RangeMax;
 				            else if (bCol)
-				                oActiveRange.type = Asc.c_oAscSelectionType.RangeCol;
+				                oActiveRange.type = c_oAscSelectionType.RangeCol;
 				            else if (bRow)
-				                oActiveRange.type = Asc.c_oAscSelectionType.RangeRow;
+				                oActiveRange.type = c_oAscSelectionType.RangeRow;
 				            else
-				                oActiveRange.type = Asc.c_oAscSelectionType.RangeCells;
+				                oActiveRange.type = c_oAscSelectionType.RangeCells;
 				            oActiveRange.startCol = oActiveRange.c1;
 				            oActiveRange.startRow = oActiveRange.r1;
 				            oCacheVal.activeRange = oActiveRange;

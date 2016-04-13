@@ -1,5 +1,8 @@
 "use strict";
 
+// Import
+var c_oAscError = Asc.c_oAscError;
+
 /////////////////////////////////////////////////////////
 //////////////        OPEN       ////////////////////////
 /////////////////////////////////////////////////////////
@@ -28,7 +31,7 @@
 		g_oIdCounter.m_sUserId = window["AscDesktopEditor"]["CheckUserId"]();
 		if (_data == "")
 		{
-			this.sendEvent("asc_onError", Asc.c_oAscError.ID.ConvertationError, Asc.c_oAscError.Level.Critical);
+			this.sendEvent("asc_onError", c_oAscError.ID.ConvertationError, c_oAscError.Level.Critical);
 			return;
 		}
 	
@@ -218,7 +221,7 @@ window["DesktopOfflineAppDocumentEndSave"] = function(error)
 	window["Asc"]["editor"].LastUserSavedIndex = undefined;
 	
 	if (2 == error)
-		window["Asc"]["editor"].sendEvent("asc_onError", Asc.c_oAscError.ID.ConvertationError, Asc.c_oAscError.Level.NoCritical);
+		window["Asc"]["editor"].sendEvent("asc_onError", c_oAscError.ID.ConvertationError, c_oAscError.Level.NoCritical);
 };
 
 window["Asc"]['spreadsheet_api'].prototype["asc_addImageDrawingObject"] = window["Asc"]['spreadsheet_api'].prototype.asc_addImageDrawingObject;

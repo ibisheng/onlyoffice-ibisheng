@@ -6,6 +6,10 @@
 * @param {undefined} undefined
 */
 function (window, undefined) {
+	// Import
+	var c_oAscInsertOptions = Asc.c_oAscInsertOptions;
+	var c_oAscDeleteOptions = Asc.c_oAscDeleteOptions;
+	
 /** @constructor */
 function asc_CCommentCoords(obj) {
 
@@ -602,7 +606,7 @@ CCellCommentator.prototype.updateCommentsDependencies = function(bInsert, operTy
 	var i, comment;
 	if (bInsert) {
 		switch (operType) {
-			case Asc.c_oAscInsertOptions.InsertCellsAndShiftDown:
+			case c_oAscInsertOptions.InsertCellsAndShiftDown:
 				for (i = 0; i < this.aComments.length; i++) {
 					comment = new asc_CCommentData(this.aComments[i]);
 					if ((comment.nRow >= updateRange.r1) && (comment.nCol >= updateRange.c1) && (comment.nCol <= updateRange.c2)) {
@@ -612,7 +616,7 @@ CCellCommentator.prototype.updateCommentsDependencies = function(bInsert, operTy
 				}
 				break;
 
-			case Asc.c_oAscInsertOptions.InsertCellsAndShiftRight:
+			case c_oAscInsertOptions.InsertCellsAndShiftRight:
 				for (i = 0; i < this.aComments.length; i++) {
 					comment = new asc_CCommentData(this.aComments[i]);
 					if ((comment.nCol >= updateRange.c1) && (comment.nRow >= updateRange.r1) && (comment.nRow <= updateRange.r2)) {
@@ -622,7 +626,7 @@ CCellCommentator.prototype.updateCommentsDependencies = function(bInsert, operTy
 				}
 				break;
 
-			case Asc.c_oAscInsertOptions.InsertColumns:
+			case c_oAscInsertOptions.InsertColumns:
 				for (i = 0; i < this.aComments.length; i++) {
 					comment = new asc_CCommentData(this.aComments[i]);
 					if (comment.nCol >= updateRange.c1) {
@@ -632,7 +636,7 @@ CCellCommentator.prototype.updateCommentsDependencies = function(bInsert, operTy
 				}
 				break;
 
-			case Asc.c_oAscInsertOptions.InsertRows:
+			case c_oAscInsertOptions.InsertRows:
 				for (i = 0; i < this.aComments.length; i++) {
 					comment = new asc_CCommentData(this.aComments[i]);
 					if (comment.nRow >= updateRange.r1) {
@@ -644,7 +648,7 @@ CCellCommentator.prototype.updateCommentsDependencies = function(bInsert, operTy
 		}
 	} else {
 		switch (operType) {
-			case Asc.c_oAscDeleteOptions.DeleteCellsAndShiftTop:
+			case c_oAscDeleteOptions.DeleteCellsAndShiftTop:
 				for (i = 0; i < this.aComments.length; i++) {
 					comment = new asc_CCommentData(this.aComments[i]);
 					if ((comment.nRow > updateRange.r1) && (comment.nCol >= updateRange.c1) && (comment.nCol <= updateRange.c2)) {
@@ -656,7 +660,7 @@ CCellCommentator.prototype.updateCommentsDependencies = function(bInsert, operTy
 				}
 				break;
 
-			case Asc.c_oAscDeleteOptions.DeleteCellsAndShiftLeft:
+			case c_oAscDeleteOptions.DeleteCellsAndShiftLeft:
 				for (i = 0; i < this.aComments.length; i++) {
 					comment = new asc_CCommentData(this.aComments[i]);
 					if ((comment.nCol > updateRange.c2) && (comment.nRow >= updateRange.r1) && (comment.nRow <= updateRange.r2)) {
@@ -668,7 +672,7 @@ CCellCommentator.prototype.updateCommentsDependencies = function(bInsert, operTy
 				}
 				break;
 
-			case Asc.c_oAscDeleteOptions.DeleteColumns:
+			case c_oAscDeleteOptions.DeleteColumns:
 				for (i = 0; i < this.aComments.length; i++) {
 					comment = new asc_CCommentData(this.aComments[i]);
 					if (comment.nCol > updateRange.c2) {
@@ -680,7 +684,7 @@ CCellCommentator.prototype.updateCommentsDependencies = function(bInsert, operTy
 				}
 				break;
 
-			case Asc.c_oAscDeleteOptions.DeleteRows:
+			case c_oAscDeleteOptions.DeleteRows:
 				for (i = 0; i < this.aComments.length; i++) {
 					comment = new asc_CCommentData(this.aComments[i]);
 					if (comment.nRow > updateRange.r2) {

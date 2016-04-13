@@ -1,5 +1,10 @@
 "use strict";
 
+// Import
+var c_oAscLockTypeElem = AscCommonExcel.c_oAscLockTypeElem;
+var c_oAscInsertOptions = Asc.c_oAscInsertOptions;
+var c_oAscDeleteOptions = Asc.c_oAscDeleteOptions;
+
 var c_oUndoRedoSerializeType =
 {
     Null:0,
@@ -2976,7 +2981,7 @@ UndoRedoCell.prototype = {
 			nCol = collaborativeEditing.getLockOtherColumn2(nSheetId, nCol);
 			var oLockInfo = new Asc.asc_CLockInfo();
 			oLockInfo["sheetId"] = nSheetId;
-			oLockInfo["type"] = AscCommonExcel.c_oAscLockTypeElem.Range;
+			oLockInfo["type"] = c_oAscLockTypeElem.Range;
 			oLockInfo["rangeOrObjectId"] = new Asc.Range(nCol, nRow, nCol, nRow);
 			this.wb.aCollaborativeChangeElements.push(oLockInfo);
 		}
@@ -3094,7 +3099,7 @@ UndoRedoWoorksheet.prototype = {
 				nCol = collaborativeEditing.getLockOtherColumn2(nSheetId, nCol);
 				oLockInfo = new Asc.asc_CLockInfo();
 				oLockInfo["sheetId"] = nSheetId;
-				oLockInfo["type"] = AscCommonExcel.c_oAscLockTypeElem.Range;
+				oLockInfo["type"] = c_oAscLockTypeElem.Range;
 				oLockInfo["rangeOrObjectId"] = new Asc.Range(nCol, nRow, nCol, nRow);
 				this.wb.aCollaborativeChangeElements.push(oLockInfo);
 			}
@@ -3137,7 +3142,7 @@ UndoRedoWoorksheet.prototype = {
 			    }
 			    oLockInfo = new Asc.asc_CLockInfo();
 			    oLockInfo["sheetId"] = nSheetId;
-			    oLockInfo["type"] = AscCommonExcel.c_oAscLockTypeElem.Range;
+			    oLockInfo["type"] = c_oAscLockTypeElem.Range;
 			    oLockInfo["rangeOrObjectId"] = range;
 			    this.wb.aCollaborativeChangeElements.push(oLockInfo);
 			}
@@ -3155,7 +3160,7 @@ UndoRedoWoorksheet.prototype = {
 				index = collaborativeEditing.getLockOtherRow2(nSheetId, index);
 				oLockInfo = new Asc.asc_CLockInfo();
 				oLockInfo["sheetId"] = nSheetId;
-				oLockInfo["type"] = AscCommonExcel.c_oAscLockTypeElem.Range;
+				oLockInfo["type"] = c_oAscLockTypeElem.Range;
 				oLockInfo["rangeOrObjectId"] = new Asc.Range(0, index, gc_nMaxCol0, index);
 				this.wb.aCollaborativeChangeElements.push(oLockInfo);
 			}
@@ -3182,7 +3187,7 @@ UndoRedoWoorksheet.prototype = {
 				
 				oLockInfo = new Asc.asc_CLockInfo();
 				oLockInfo["sheetId"] = nSheetId;
-				oLockInfo["type"] = AscCommonExcel.c_oAscLockTypeElem.Range;
+				oLockInfo["type"] = c_oAscLockTypeElem.Range;
 				oLockInfo["rangeOrObjectId"] = new Asc.Range(0, from, gc_nMaxCol0, to);
 				this.wb.aCollaborativeChangeElements.push(oLockInfo);
 			}
@@ -3210,7 +3215,7 @@ UndoRedoWoorksheet.prototype = {
 				{
 					oLockInfo = new Asc.asc_CLockInfo();
 					oLockInfo["sheetId"] = nSheetId;
-					oLockInfo["type"] = AscCommonExcel.c_oAscLockTypeElem.Range;
+					oLockInfo["type"] = c_oAscLockTypeElem.Range;
 					oLockInfo["rangeOrObjectId"] = new Asc.Range(0, from, gc_nMaxCol0, to);
 					this.wb.aCollaborativeChangeElements.push(oLockInfo);
 				}
@@ -3219,11 +3224,11 @@ UndoRedoWoorksheet.prototype = {
 			if((true == bUndo && historyitem_Worksheet_AddRows == Type) || (false == bUndo && historyitem_Worksheet_RemoveRows == Type)) {
 				ws.removeRows(from, to);
 				bInsert = false;
-				operType = Asc.c_oAscDeleteOptions.DeleteRows;
+				operType = c_oAscDeleteOptions.DeleteRows;
 			} else {
 				ws.insertRowsBefore(from, to - from + 1);
 				bInsert = true;
-				operType = Asc.c_oAscInsertOptions.InsertRows;
+				operType = c_oAscInsertOptions.InsertRows;
 			}
 
 			// Нужно поменять пересчетные индексы для совместного редактирования (lock-элементы), но только если это не изменения от другого пользователя
@@ -3246,7 +3251,7 @@ UndoRedoWoorksheet.prototype = {
 				{
 					oLockInfo = new Asc.asc_CLockInfo();
 					oLockInfo["sheetId"] = nSheetId;
-					oLockInfo["type"] = AscCommonExcel.c_oAscLockTypeElem.Range;
+					oLockInfo["type"] = c_oAscLockTypeElem.Range;
 					oLockInfo["rangeOrObjectId"] = new Asc.Range(from, 0, to, gc_nMaxRow0);
 					this.wb.aCollaborativeChangeElements.push(oLockInfo);
 				}
@@ -3256,11 +3261,11 @@ UndoRedoWoorksheet.prototype = {
 			if((true == bUndo && historyitem_Worksheet_AddCols == Type) || (false == bUndo && historyitem_Worksheet_RemoveCols == Type)) {
 				ws.removeCols(from, to);
 				bInsert = false;
-				operType = Asc.c_oAscDeleteOptions.DeleteColumns;
+				operType = c_oAscDeleteOptions.DeleteColumns;
 			} else {
 				ws.insertColsBefore(from, to - from + 1);
 				bInsert = true;
-				operType = Asc.c_oAscInsertOptions.InsertColumns;
+				operType = c_oAscInsertOptions.InsertColumns;
 			}
 
 			// Нужно поменять пересчетные индексы для совместного редактирования (lock-элементы), но только если это не изменения от другого пользователя
@@ -3287,7 +3292,7 @@ UndoRedoWoorksheet.prototype = {
 				{
 					oLockInfo = new Asc.asc_CLockInfo();
 					oLockInfo["sheetId"] = nSheetId;
-					oLockInfo["type"] = AscCommonExcel.c_oAscLockTypeElem.Range;
+					oLockInfo["type"] = c_oAscLockTypeElem.Range;
 					oLockInfo["rangeOrObjectId"] = new Asc.Range(c1, r1, c2, r2);
 					this.wb.aCollaborativeChangeElements.push(oLockInfo);
 				}
@@ -3297,11 +3302,11 @@ UndoRedoWoorksheet.prototype = {
 			if((true == bUndo && historyitem_Worksheet_ShiftCellsLeft == Type) || (false == bUndo && historyitem_Worksheet_ShiftCellsRight == Type)) {
 				range.addCellsShiftRight();
 				bInsert = true;
-				operType = Asc.c_oAscInsertOptions.InsertCellsAndShiftRight;
+				operType = c_oAscInsertOptions.InsertCellsAndShiftRight;
 			}  else {
 				range.deleteCellsShiftLeft();
 				bInsert = false;
-				operType = Asc.c_oAscDeleteOptions.DeleteCellsAndShiftLeft;
+				operType = c_oAscDeleteOptions.DeleteCellsAndShiftLeft;
 			}
 
 			// ToDo Так делать неправильно, нужно поправить (перенести логику в model, а отрисовку отделить)
@@ -3324,7 +3329,7 @@ UndoRedoWoorksheet.prototype = {
 				{
 					oLockInfo = new Asc.asc_CLockInfo();
 					oLockInfo["sheetId"] = nSheetId;
-					oLockInfo["type"] = AscCommonExcel.c_oAscLockTypeElem.Range;
+					oLockInfo["type"] = c_oAscLockTypeElem.Range;
 					oLockInfo["rangeOrObjectId"] = new Asc.Range(c1, r1, c2, r2);
 					this.wb.aCollaborativeChangeElements.push(oLockInfo);
 				}
@@ -3334,11 +3339,11 @@ UndoRedoWoorksheet.prototype = {
 			if((true == bUndo && historyitem_Worksheet_ShiftCellsTop == Type) || (false == bUndo && historyitem_Worksheet_ShiftCellsBottom == Type)) {
 				range.addCellsShiftBottom();
 				bInsert = true;
-				operType = Asc.c_oAscInsertOptions.InsertCellsAndShiftDown;
+				operType = c_oAscInsertOptions.InsertCellsAndShiftDown;
 			} else {
 				range.deleteCellsShiftUp();
 				bInsert = false;
-				operType = Asc.c_oAscDeleteOptions.DeleteCellsAndShiftTop;
+				operType = c_oAscDeleteOptions.DeleteCellsAndShiftTop;
 			}
 
 			// ToDo Так делать неправильно, нужно поправить (перенести логику в model, а отрисовку отделить)
@@ -3362,7 +3367,7 @@ UndoRedoWoorksheet.prototype = {
 					place.to = collaborativeEditing.getLockOtherRow2(nSheetId, place.to);
 					oLockInfo = new Asc.asc_CLockInfo();
 					oLockInfo["sheetId"] = nSheetId;
-					oLockInfo["type"] = AscCommonExcel.c_oAscLockTypeElem.Range;
+					oLockInfo["type"] = c_oAscLockTypeElem.Range;
 					oLockInfo["rangeOrObjectId"] = new Asc.Range(bbox.c1, place.from, bbox.c2, place.from);
 					this.wb.aCollaborativeChangeElements.push(oLockInfo);
 				}
@@ -3625,7 +3630,7 @@ UndoRedoRowCol.prototype = {
 			var collaborativeEditing = this.wb.oApi.collaborativeEditing;
 			var oLockInfo = new Asc.asc_CLockInfo();
 			oLockInfo["sheetId"] = nSheetId;
-			oLockInfo["type"] = AscCommonExcel.c_oAscLockTypeElem.Range;
+			oLockInfo["type"] = c_oAscLockTypeElem.Range;
 			if(this.bRow)
 			{
 				nIndex = collaborativeEditing.getLockOtherRow2(nSheetId, nIndex);

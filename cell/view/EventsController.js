@@ -14,6 +14,7 @@
 
 		var asc = window["Asc"] ? window["Asc"] : (window["Asc"] = {});
 		var asc_applyFunction = asc.applyFunction;
+		var c_oTargetType = AscCommonExcel.c_oTargetType;
 
 		/**
 		 * Desktop event controller for WorkbookView
@@ -301,9 +302,9 @@
 			// Для формулы не нужно выходить из редактирования ячейки
 			if (t.settings.isViewerMode || t.isFormulaEditMode || t.isSelectionDialogMode) {return true;}
 
-			if(this.targetInfo && (this.targetInfo.target == AscCommonExcel.c_oTargetType.MoveResizeRange ||
-				this.targetInfo.target == AscCommonExcel.c_oTargetType.MoveRange ||
-				this.targetInfo.target == AscCommonExcel.c_oTargetType.FillHandle))
+			if(this.targetInfo && (this.targetInfo.target == c_oTargetType.MoveResizeRange ||
+				this.targetInfo.target == c_oTargetType.MoveRange ||
+				this.targetInfo.target == c_oTargetType.FillHandle))
 				return true;
 
 			if (t.handlers.trigger("getCellEditMode")) {if (!t.handlers.trigger("stopCellEditing")) {return true;}}
@@ -1234,31 +1235,31 @@
 					return;
 				}
 				if (t.targetInfo){
-					if (t.targetInfo.target === AscCommonExcel.c_oTargetType.ColumnResize || t.targetInfo.target === AscCommonExcel.c_oTargetType.RowResize) {
+					if (t.targetInfo.target === c_oTargetType.ColumnResize || t.targetInfo.target === c_oTargetType.RowResize) {
 						t.isResizeMode = true;
 						t._resizeElement(event);
 						return;
-					} else if (t.targetInfo && t.targetInfo.target === AscCommonExcel.c_oTargetType.FillHandle && false === this.settings.isViewerMode) {
+					} else if (t.targetInfo && t.targetInfo.target === c_oTargetType.FillHandle && false === this.settings.isViewerMode) {
 						// В режиме автозаполнения
 						this.isFillHandleMode = true;
 						t._changeFillHandle(event);
 						return;
-					} else if (t.targetInfo && t.targetInfo.target === AscCommonExcel.c_oTargetType.MoveRange && false === this.settings.isViewerMode) {
+					} else if (t.targetInfo && t.targetInfo.target === c_oTargetType.MoveRange && false === this.settings.isViewerMode) {
 						// В режиме перемещения диапазона
 						this.isMoveRangeMode = true;
 						t._moveRangeHandle(event);
 						return;
-					} else if (t.targetInfo && t.targetInfo.target === AscCommonExcel.c_oTargetType.FilterObject) {
+					} else if (t.targetInfo && t.targetInfo.target === c_oTargetType.FilterObject) {
 						  t._autoFiltersClick(t.targetInfo.idFilter);
 						  return;
 					} else if (t.targetInfo && undefined !== t.targetInfo.commentIndexes && false === this.settings.isViewerMode) {
 						t._commentCellClick(event);
-					} else if ( t.targetInfo && t.targetInfo.target === AscCommonExcel.c_oTargetType.MoveResizeRange && false === this.settings.isViewerMode ){
+					} else if ( t.targetInfo && t.targetInfo.target === c_oTargetType.MoveResizeRange && false === this.settings.isViewerMode ){
 						this.isMoveResizeRange = true;
 						t._moveResizeRangeHandle(event, t.targetInfo);
 						return;
-					} else if (t.targetInfo && (t.targetInfo.target === AscCommonExcel.c_oTargetType.FrozenAnchorV ||
-						t.targetInfo.target === AscCommonExcel.c_oTargetType.FrozenAnchorH) && false === this.settings.isViewerMode) {
+					} else if (t.targetInfo && (t.targetInfo.target === c_oTargetType.FrozenAnchorV ||
+						t.targetInfo.target === c_oTargetType.FrozenAnchorH) && false === this.settings.isViewerMode) {
 						// Режим установки закреплённых областей
 						this.frozenAnchorMode = t.targetInfo.target;
 						t._moveFrozenAnchorHandle(event, this.frozenAnchorMode);
@@ -1276,7 +1277,7 @@
 					} else {
 						if (t.isFormulaEditMode) {
 							// !!! в зависимости от цели делаем разные действия - либо селектим область либо мувим существующий диапазон
-							if ( t.targetInfo && t.targetInfo.target === AscCommonExcel.c_oTargetType.MoveResizeRange && false === this.settings.isViewerMode ){
+							if ( t.targetInfo && t.targetInfo.target === c_oTargetType.MoveResizeRange && false === this.settings.isViewerMode ){
 								this.isMoveResizeRange = true;
 								t._moveResizeRangeHandle(event, t.targetInfo);
 								return;
@@ -1306,7 +1307,7 @@
 			if (2 === event.button) {
 				t.handlers.trigger("changeSelectionRightClick", coord.x, coord.y);
 			} else {
-				if (t.targetInfo && t.targetInfo.target === AscCommonExcel.c_oTargetType.FillHandle  && false === this.settings.isViewerMode){
+				if (t.targetInfo && t.targetInfo.target === c_oTargetType.FillHandle  && false === this.settings.isViewerMode){
 					// В режиме автозаполнения
 					t.isFillHandleMode = true;
 					t._changeFillHandle(event);
