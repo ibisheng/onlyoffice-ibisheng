@@ -2403,6 +2403,21 @@ function BinaryPPTYLoader()
                             // ms office не открывает такие файлы.
                             uni_fill.fill.setPath(null);
                         }
+
+                        if(uni_fill.fill.colors.length < 2)
+                        {
+                            if(uni_fill.fill.colors.length === 1)
+                            {
+                                var oUniColor = uni_fill.fill.colors[0].color;
+                                uni_fill.fill = new CSolidFill();
+                                uni_fill.fill.color = oUniColor;
+                            }
+                            else
+                            {
+                                uni_fill.fill = new CSolidFill();
+                                uni_fill.fill.color =  CreateUniColorRGB(0, 0, 0);
+                            }
+                        }
                     }
 
                     break;
