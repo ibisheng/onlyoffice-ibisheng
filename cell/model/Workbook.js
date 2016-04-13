@@ -1,6 +1,18 @@
 "use strict";
 
 // Import
+var UndoRedoItemSerializable = AscCommonExcel.UndoRedoItemSerializable;
+var UndoRedoData_CellSimpleData = AscCommonExcel.UndoRedoData_CellSimpleData;
+var UndoRedoData_CellValueData = AscCommonExcel.UndoRedoData_CellValueData;
+var UndoRedoData_FromToRowCol = AscCommonExcel.UndoRedoData_FromToRowCol;
+var UndoRedoData_FromTo = AscCommonExcel.UndoRedoData_FromTo;
+var UndoRedoData_IndexSimpleProp = AscCommonExcel.UndoRedoData_IndexSimpleProp;
+var UndoRedoData_BBox = AscCommonExcel.UndoRedoData_BBox;
+var UndoRedoData_SheetAdd = AscCommonExcel.UndoRedoData_SheetAdd;
+var UndoRedoData_SheetPositions = AscCommonExcel.UndoRedoData_SheetPositions;
+var UndoRedoData_DefinedNames = AscCommonExcel.UndoRedoData_DefinedNames;
+var UndoRedoData_DefinedNamesChange = AscCommonExcel.UndoRedoData_DefinedNamesChange;
+
 var cElementType = AscCommonExcel.cElementType;
 var cArea3D = AscCommonExcel.cArea3D;
 var cRef3D = AscCommonExcel.cRef3D;
@@ -947,7 +959,7 @@ DependencyGraph.prototype = {
             if ( defN.isTable && defN.Ref ){
                 var a = defN.Ref.split("!")[0];
                 if( a.localeCompare(parserHelp.getEscapeSheetName(wsName)) == 0 ){
-                    History.Add( g_oUndoRedoWorkbook, historyitem_Workbook_DefinedNamesDelete, null, null, new UndoRedoData_DefinedNames( defN.Name, defN.Ref, undefined, defN.isTable ) );
+                    History.Add( AscCommonExcel.g_oUndoRedoWorkbook, historyitem_Workbook_DefinedNamesDelete, null, null, new UndoRedoData_DefinedNames( defN.Name, defN.Ref, undefined, defN.isTable ) );
                     defN.Ref = null;
                 }
                 continue;
@@ -962,7 +974,7 @@ DependencyGraph.prototype = {
 
                 wsIndex = this.wb.getWorksheetById( defN.sheetId );
 
-                History.Add( g_oUndoRedoWorkbook, historyitem_Workbook_DefinedNamesDelete, null, null,
+                History.Add( AscCommonExcel.g_oUndoRedoWorkbook, historyitem_Workbook_DefinedNamesDelete, null, null,
                     new UndoRedoData_DefinedNames( defN.Name, defN.Ref, wsIndex ? wsIndex.getIndex() : undefined, defN.isTable, seUndoRedo ) );
 
                 if ( defN.sheetId == sheetId ) {
@@ -1700,13 +1712,13 @@ DefNameVertex.prototype = {
             var aPointActions = this.wb.aCollaborativeActions[i];
             for (var j = 0, length2 = aPointActions.length; j < length2; ++j) {
                 var action = aPointActions[j];
-                if (g_oUndoRedoWorkbook == action.oClass) {
+                if (AscCommonExcel.g_oUndoRedoWorkbook == action.oClass) {
                     if (historyitem_Workbook_DefinedNamesAdd == action.nActionType) {
                         if (lastname == action.oData.newName.Name)
                             action.oData.newName.Name = name;
                     }
                 }
-                else if (g_oUndoRedoCell == action.oClass) {
+                else if (AscCommonExcel.g_oUndoRedoCell == action.oClass) {
                     if (action.oData instanceof UndoRedoData_CellSimpleData) {
                         if (action.oData.oNewVal instanceof UndoRedoData_CellValueData) {
                             var oNewVal = action.oData.oNewVal;
@@ -2108,7 +2120,7 @@ Workbook.prototype.createWorksheet=function(indexBefore, sName, sId){
 	this._updateWorksheetIndexes(wsActive);
 	History.TurnOn();
 	this._insertWorksheetFormula(oNewWorksheet.index);
-	History.Add(g_oUndoRedoWorkbook, historyitem_Workbook_SheetAdd, null, null, new UndoRedoData_SheetAdd(indexBefore, oNewWorksheet.getName(), null, oNewWorksheet.getId()));
+	History.Add(AscCommonExcel.g_oUndoRedoWorkbook, historyitem_Workbook_SheetAdd, null, null, new UndoRedoData_SheetAdd(indexBefore, oNewWorksheet.getName(), null, oNewWorksheet.getId()));
 	History.SetSheetUndo(wsActive.getId());
 	History.SetSheetRedo(oNewWorksheet.getId());
 	return oNewWorksheet.index;
@@ -2150,7 +2162,7 @@ Workbook.prototype.copyWorksheet=function(index, insertBefore, sName, sId, bFrom
 			}
 			newSheet._BuildDependencies(cwf.cells);
 		}
-		History.Add(g_oUndoRedoWorkbook, historyitem_Workbook_SheetAdd, null, null, new UndoRedoData_SheetAdd(insertBefore, newSheet.getName(), wsFrom.getId(), newSheet.getId()));
+		History.Add(AscCommonExcel.g_oUndoRedoWorkbook, historyitem_Workbook_SheetAdd, null, null, new UndoRedoData_SheetAdd(insertBefore, newSheet.getName(), wsFrom.getId(), newSheet.getId()));
 		History.SetSheetUndo(wsActive.getId());
 		History.SetSheetRedo(newSheet.getId());
         if(!(bFromRedo === true))
@@ -2253,7 +2265,7 @@ Workbook.prototype.replaceWorksheet=function(indexFrom, indexTo){
 		
 		this._insertWorksheetFormula(tempW.wTI);
 		
-		History.Add(g_oUndoRedoWorkbook, historyitem_Workbook_SheetMove, null, null, new UndoRedoData_FromTo(indexFrom, indexTo), true);
+		History.Add(AscCommonExcel.g_oUndoRedoWorkbook, historyitem_Workbook_SheetMove, null, null, new UndoRedoData_FromTo(indexFrom, indexTo), true);
 		buildRecalc(this);
 		unLockDraw(this);
 	}
@@ -2367,7 +2379,7 @@ Workbook.prototype.removeWorksheet=function(nIndex, outputParams){
 		        wsActive = oVisibleWs;
 		}
 
-		History.Add(g_oUndoRedoWorkbook, historyitem_Workbook_SheetRemove, null, null, new UndoRedoData_SheetRemove(nIndex, removedSheetId, removedSheet, _cwf));
+		History.Add(AscCommonExcel.g_oUndoRedoWorkbook, historyitem_Workbook_SheetRemove, null, null, new AscCommonExcel.UndoRedoData_SheetRemove(nIndex, removedSheetId, removedSheet, _cwf));
 		if (null != oVisibleWs) {
 		    History.SetSheetUndo(removedSheetId);
 		    History.SetSheetRedo(wsActive.getId());
@@ -2621,7 +2633,7 @@ Workbook.prototype.delDefinesNames = function ( defName, bUndo ) {
         if(!bUndo)
             buildRecalc( this );
 
-        History.Add( g_oUndoRedoWorkbook, historyitem_Workbook_DefinedNamesDelete, null, null, new UndoRedoData_DefinedNames( defName.Name, defName.Ref, defName.LocalSheetId, defName.isTable, seUndoRedo ) );
+        History.Add( AscCommonExcel.g_oUndoRedoWorkbook, historyitem_Workbook_DefinedNamesDelete, null, null, new UndoRedoData_DefinedNames( defName.Name, defName.Ref, defName.LocalSheetId, defName.isTable, seUndoRedo ) );
     }
 
     return retRes;
@@ -2677,10 +2689,10 @@ Workbook.prototype.editDefinesNames = function ( oldName, newName, bUndo ) {
         }
 
 		if ( rename ) {
-			History.Add( g_oUndoRedoWorkbook, historyitem_Workbook_DefinedNamesChange, null, null, new UndoRedoData_DefinedNamesChange( oldName, newName ) );
+			History.Add( AscCommonExcel.g_oUndoRedoWorkbook, historyitem_Workbook_DefinedNamesChange, null, null, new UndoRedoData_DefinedNamesChange( oldName, newName ) );
 		}
 		else {
-			History.Add( g_oUndoRedoWorkbook, historyitem_Workbook_DefinedNamesAdd, null, null, new UndoRedoData_DefinedNamesChange( oldName, newName ) );
+			History.Add( AscCommonExcel.g_oUndoRedoWorkbook, historyitem_Workbook_DefinedNamesAdd, null, null, new UndoRedoData_DefinedNamesChange( oldName, newName ) );
 		}
         /*if(retRes){
             retRes = retRes.getAscCDefName();
@@ -2815,11 +2827,11 @@ Workbook.prototype.SerializeHistory = function(){
 		    bChangeSheetPlace = false;
 		    for (j = 0, length2 = aPointChanges.length; j < length2; ++j) {
 		        var item = aPointChanges[j];
-		        if (g_oUndoRedoWorkbook == item.oClass) {
+		        if (AscCommonExcel.g_oUndoRedoWorkbook == item.oClass) {
 		            if (historyitem_Workbook_SheetAdd == item.nActionType || historyitem_Workbook_SheetRemove == item.nActionType || historyitem_Workbook_SheetMove == item.nActionType)
 		                bChangeSheetPlace = true;
 		        }
-		        else if (g_oUndoRedoWorksheet === item.oClass && historyitem_Worksheet_Hide === item.nActionType) {
+		        else if (AscCommonExcel.g_oUndoRedoWorksheet === item.oClass && historyitem_Worksheet_Hide === item.nActionType) {
 		            bChangeSheetPlace = true;
 		        }
 		        this._SerializeHistoryBase64(oMemory, item, aRes);
@@ -2835,7 +2847,7 @@ Workbook.prototype.SerializeHistory = function(){
 		    }
 			else
 				oUndoRedoData_SheetPositions = new UndoRedoData_SheetPositions();
-			this._SerializeHistoryBase64(oMemory, new UndoRedoItemSerializable(g_oUndoRedoWorkbook, historyitem_Workbook_SheetPositions, null, null, oUndoRedoData_SheetPositions), aRes);
+			this._SerializeHistoryBase64(oMemory, new UndoRedoItemSerializable(AscCommonExcel.g_oUndoRedoWorkbook, historyitem_Workbook_SheetPositions, null, null, oUndoRedoData_SheetPositions), aRes);
 		}
 		this.aCollaborativeActions = [];
 	}
@@ -2874,7 +2886,7 @@ Workbook.prototype.DeserializeHistory = function(aChanges, fCallback){
 			nCurOffset = oBinaryFileReader.getbase64DecodedData2(sChange, aIndexes[i], stream, nCurOffset);
 			var item = new UndoRedoItemSerializable();
 			item.Deserialize(stream);
-			if (g_oUndoRedoWorkbook == item.oClass && historyitem_Workbook_AddFont == item.nActionType) {
+			if (AscCommonExcel.g_oUndoRedoWorkbook == item.oClass && historyitem_Workbook_AddFont == item.nActionType) {
 				for (var k = 0, length3 = item.oData.elem.length; k < length3; ++k)
 					oFontMap[item.oData.elem[k]] = 1;
 			}
@@ -3098,8 +3110,7 @@ function Woorksheet(wb, _index, sId){
       var oHistoryRange = from;
       if (null == oHistoryRange)
         oHistoryRange = to;
-      History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_ChangeMerge, oThis.getId(), oHistoryRange,
-        new UndoRedoData_FromTo(new UndoRedoData_BBox(from), new UndoRedoData_BBox(to)));
+			History.Add(AscCommonExcel.g_oUndoRedoWorksheet, historyitem_Worksheet_ChangeMerge, oThis.getId(), oHistoryRange, new UndoRedoData_FromTo(new UndoRedoData_BBox(from), new UndoRedoData_BBox(to)));
     }
     //расширяем границы
     if (null != to) {
@@ -3121,8 +3132,7 @@ function Woorksheet(wb, _index, sId){
       var oHistoryData = null;
       if (null == from || null == to)
         oHistoryData = data.clone();
-      History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_ChangeHyperlink, oThis.getId(), oHistoryRange,
-        new UndoRedoData_FromToHyperlink(from, to, oHistoryData));
+			History.Add(AscCommonExcel.g_oUndoRedoWorksheet, historyitem_Worksheet_ChangeHyperlink, oThis.getId(), oHistoryRange, new AscCommonExcel.UndoRedoData_FromToHyperlink(from, to, oHistoryData));
     }
     if (null != to)
       data.Ref = oThis.getRange3(to.r1, to.c1, to.r2, to.c2); else if (oChangeParam && oChangeParam.removeStyle &&
@@ -3480,7 +3490,7 @@ Woorksheet.prototype.setName=function(name, bFromUndoRedo){
 		var lastName = this.sName;
 		this.sName = name;
 		History.Create_NewPoint();
-		History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_Rename, this.getId(), null, new UndoRedoData_FromTo(lastName, name));
+		History.Add(AscCommonExcel.g_oUndoRedoWorksheet, historyitem_Worksheet_Rename, this.getId(), null, new UndoRedoData_FromTo(lastName, name));
 
 		//перестраиваем формулы, если у них были ссылки на лист со старым именем.
 		for(var id in this.workbook.cwf) {
@@ -3511,7 +3521,7 @@ Woorksheet.prototype.setTabColor=function(color){
 		this.sheetPr = new Asc.asc_CSheetPr();
 
 	History.Create_NewPoint();
-	History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_SetTabColor, this.getId(), null,
+	History.Add(AscCommonExcel.g_oUndoRedoWorksheet, historyitem_Worksheet_SetTabColor, this.getId(), null,
 		new UndoRedoData_FromTo(this.sheetPr.TabColor ? this.sheetPr.TabColor.clone() : null, color ? color.clone() : null));
 
 	this.sheetPr.TabColor = color;
@@ -3533,19 +3543,19 @@ Woorksheet.prototype.renameWsToCollaborate=function(name){
 	    var aPointActions = this.workbook.aCollaborativeActions[i];
 	    for (var j = 0, length2 = aPointActions.length; j < length2; ++j) {
 	        var action = aPointActions[j];
-	        if (g_oUndoRedoWorkbook == action.oClass) {
+	        if (AscCommonExcel.g_oUndoRedoWorkbook == action.oClass) {
 	            if (historyitem_Workbook_SheetAdd == action.nActionType) {
 	                if (lastname == action.oData.name)
 	                    action.oData.name = name;
 	            }
 	        }
-	        else if (g_oUndoRedoWorksheet == action.oClass) {
+	        else if (AscCommonExcel.g_oUndoRedoWorksheet == action.oClass) {
 	            if (historyitem_Worksheet_Rename == action.nActionType) {
 	                if (lastname == action.oData.to)
 	                    action.oData.to = name;
 	            }
 	        }
-	        else if (g_oUndoRedoCell == action.oClass) {
+	        else if (AscCommonExcel.g_oUndoRedoCell == action.oClass) {
 	            if (action.oData instanceof UndoRedoData_CellSimpleData) {
 	                if (action.oData.oNewVal instanceof UndoRedoData_CellValueData) {
 	                    var oNewVal = action.oData.oNewVal;
@@ -3588,7 +3598,7 @@ Woorksheet.prototype.setHidden = function (hidden) {
 	}
 	if (bOldHidden != hidden) {
 	    History.Create_NewPoint();
-	    History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_Hide, this.getId(), null, new UndoRedoData_FromTo(bOldHidden, hidden));
+	    History.Add(AscCommonExcel.g_oUndoRedoWorksheet, historyitem_Worksheet_Hide, this.getId(), null, new UndoRedoData_FromTo(bOldHidden, hidden));
 	    if (null != oVisibleWs) {
 	        History.SetSheetUndo(wsActive.getId());
 	        History.SetSheetRedo(oVisibleWs.getId());
@@ -3604,7 +3614,7 @@ Woorksheet.prototype.setSheetViewSettings = function (options) {
 		return;
 
 	History.Create_NewPoint();
-	History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_SetViewSettings, this.getId(), null, new UndoRedoData_FromTo(current, options.clone()));
+	History.Add(AscCommonExcel.g_oUndoRedoWorksheet, historyitem_Worksheet_SetViewSettings, this.getId(), null, new UndoRedoData_FromTo(current, options.clone()));
 
 	this.sheetViews[0].setSettings(options);
 	if (!this.workbook.bUndoChanges && !this.workbook.bRedoChanges)
@@ -3641,7 +3651,7 @@ Woorksheet.prototype._removeRows=function(start, stop){
 	}
 	//По возрастанию
 	aIndexes.sort(fSortAscending);
-	var oDefRowPr = new UndoRedoData_RowProp();
+	var oDefRowPr = new AscCommonExcel.UndoRedoData_RowProp();
 	for(i = 0, length = aIndexes.length; i < length; ++i)
 	{
 		nIndex = aIndexes[i];
@@ -3660,7 +3670,7 @@ Woorksheet.prototype._removeRows=function(start, stop){
 		{
 			var oOldProps = row.getHeightProp();
 			if (false === oOldProps.isEqual(oDefRowPr))
-			    History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_RowProp, this.getId(), row._getUpdateRange(), new UndoRedoData_IndexSimpleProp(nIndex, true, oOldProps, oDefRowPr));
+			    History.Add(AscCommonExcel.g_oUndoRedoWorksheet, historyitem_Worksheet_RowProp, this.getId(), row._getUpdateRange(), new UndoRedoData_IndexSimpleProp(nIndex, true, oOldProps, oDefRowPr));
 			row.setStyle(null);
 			for(j in row.c)
 			{
@@ -3673,7 +3683,7 @@ Woorksheet.prototype._removeRows=function(start, stop){
 	}
 
 
-	History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_RemoveRows, this.getId(), new Asc.Range(0, start, gc_nMaxCol0, gc_nMaxRow0), new UndoRedoData_FromToRowCol(true, start, stop));
+	History.Add(AscCommonExcel.g_oUndoRedoWorksheet, historyitem_Worksheet_RemoveRows, this.getId(), new Asc.Range(0, start, gc_nMaxCol0, gc_nMaxRow0), new UndoRedoData_FromToRowCol(true, start, stop));
     this.autoFilters.insertRows( "delCell", new Asc.Range(0, start, gc_nMaxCol0, stop), c_oAscDeleteOptions.DeleteRows );
 
 	buildRecalc(this.workbook);
@@ -3694,7 +3704,7 @@ Woorksheet.prototype._insertRowsBefore=function(index, count){
 	var oActualRange = {r1: index, c1: 0, r2: index + count - 1, c2: gc_nMaxCol0};
 	History.Create_NewPoint();
     this.renameDependencyNodes({offsetRow:count,offsetCol:0},oActualRange);
-	History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_AddRows, this.getId(), new Asc.Range(0, index, gc_nMaxCol0, gc_nMaxRow0), new UndoRedoData_FromToRowCol(true, index, index + count - 1));
+	History.Add(AscCommonExcel.g_oUndoRedoWorksheet, historyitem_Worksheet_AddRows, this.getId(), new Asc.Range(0, index, gc_nMaxCol0, gc_nMaxRow0), new UndoRedoData_FromToRowCol(true, index, index + count - 1));
 	//index 0 based
 	var aIndexes = [];
 	for(var i in this.aGCells)
@@ -3796,7 +3806,7 @@ Woorksheet.prototype._removeCols=function(start, stop){
 		}
 	}
 	
-	var oDefColPr = new UndoRedoData_ColProp();
+	var oDefColPr = new AscCommonExcel.UndoRedoData_ColProp();
 	for(i = start; i <= stop; ++i)
 	{
 		var col = this.aCols[i];
@@ -3804,7 +3814,7 @@ Woorksheet.prototype._removeCols=function(start, stop){
 		{
 			var oOldProps = col.getWidthProp();
 			if(false === oOldProps.isEqual(oDefColPr))
-				History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_ColProp, this.getId(), new Asc.Range(i, 0, i, gc_nMaxRow0), new UndoRedoData_IndexSimpleProp(i, false, oOldProps, oDefColPr));
+				History.Add(AscCommonExcel.g_oUndoRedoWorksheet, historyitem_Worksheet_ColProp, this.getId(), new Asc.Range(i, 0, i, gc_nMaxRow0), new UndoRedoData_IndexSimpleProp(i, false, oOldProps, oDefColPr));
 			col.setStyle(null);
 		}
 	}
@@ -3817,7 +3827,7 @@ Woorksheet.prototype._removeCols=function(start, stop){
 	}
 
 
-	History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_RemoveCols, this.getId(), new Asc.Range(start, 0, gc_nMaxCol0, gc_nMaxRow0), new UndoRedoData_FromToRowCol(false, start, stop));
+	History.Add(AscCommonExcel.g_oUndoRedoWorksheet, historyitem_Worksheet_RemoveCols, this.getId(), new Asc.Range(start, 0, gc_nMaxCol0, gc_nMaxRow0), new UndoRedoData_FromToRowCol(false, start, stop));
 	
 	this.autoFilters.insertColumn( "delCell",  new Asc.Range(start, 0, stop, gc_nMaxRow0), c_oAscInsertOptions.InsertColumns );
 	buildRecalc(this.workbook);
@@ -3838,7 +3848,7 @@ Woorksheet.prototype._insertColsBefore=function(index, count){
 	var oActualRange = {r1: 0, c1: index, r2: gc_nMaxRow0, c2: index + count - 1};
 	History.Create_NewPoint();
     this.renameDependencyNodes({offsetRow:0,offsetCol:count},oActualRange);
-    History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_AddCols, this.getId(), new Asc.Range(index, 0, gc_nMaxCol0, gc_nMaxRow0), new UndoRedoData_FromToRowCol(false, index, index + count - 1));
+    History.Add(AscCommonExcel.g_oUndoRedoWorksheet, historyitem_Worksheet_AddCols, this.getId(), new Asc.Range(index, 0, gc_nMaxCol0, gc_nMaxRow0), new UndoRedoData_FromToRowCol(false, index, index + count - 1));
 	//index 0 based
 	for(var i in this.aGCells)
 	{
@@ -3948,7 +3958,7 @@ Woorksheet.prototype.setColWidth=function(width, start, stop){
 			col.hd = null;
 			var oNewProps = col.getWidthProp();
 			if(false == oOldProps.isEqual(oNewProps))
-				History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_ColProp, oThis.getId(),
+				History.Add(AscCommonExcel.g_oUndoRedoWorksheet, historyitem_Worksheet_ColProp, oThis.getId(),
 					col._getUpdateRange(),
 					new UndoRedoData_IndexSimpleProp(col.index, false, oOldProps, oNewProps));
 		}
@@ -4003,7 +4013,7 @@ Woorksheet.prototype.setColHidden=function(bHidden, start, stop){
 			}
 			var oNewProps = col.getWidthProp();
 			if(false == oOldProps.isEqual(oNewProps))
-				History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_ColProp, oThis.getId(),
+				History.Add(AscCommonExcel.g_oUndoRedoWorksheet, historyitem_Worksheet_ColProp, oThis.getId(),
 					col._getUpdateRange(),
 					new UndoRedoData_IndexSimpleProp(col.index, false, oOldProps, oNewProps));
 		}
@@ -4056,7 +4066,7 @@ Woorksheet.prototype.setColBestFit=function(bBestFit, width, start, stop){
 		col.width = width;
 		var oNewProps = col.getWidthProp();
 		if(false == oOldProps.isEqual(oNewProps))
-			History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_ColProp, oThis.getId(),
+			History.Add(AscCommonExcel.g_oUndoRedoWorksheet, historyitem_Worksheet_ColProp, oThis.getId(),
 				col._getUpdateRange(),
 				new UndoRedoData_IndexSimpleProp(col.index, false, oOldProps, oNewProps));
 	};
@@ -4140,7 +4150,7 @@ Woorksheet.prototype.setRowHeight=function(height, start, stop, isCustom){
 			row.flags &= ~g_nRowFlag_hd;
 			var oNewProps = row.getHeightProp();
 			if(false === oOldProps.isEqual(oNewProps))
-			    History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_RowProp, oThis.getId(), row._getUpdateRange(), new UndoRedoData_IndexSimpleProp(row.index, true, oOldProps, oNewProps));
+			    History.Add(AscCommonExcel.g_oUndoRedoWorksheet, historyitem_Worksheet_RowProp, oThis.getId(), row._getUpdateRange(), new UndoRedoData_IndexSimpleProp(row.index, true, oOldProps, oNewProps));
 		}
 	};
 	if(0 == start && gc_nMaxRow0 == stop)
@@ -4187,7 +4197,7 @@ Woorksheet.prototype.setRowHidden=function(bHidden, start, stop){
 				if(startIndex !== null)
 				{
 					updateRange = new Asc.Range(0, startIndex, gc_nMaxCol0, endIndex);
-					History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_RowHide, oThis.getId(), updateRange, new UndoRedoData_FromToRowCol(bHidden, startIndex, endIndex));
+					History.Add(AscCommonExcel.g_oUndoRedoWorksheet, historyitem_Worksheet_RowHide, oThis.getId(), updateRange, new UndoRedoData_FromToRowCol(bHidden, startIndex, endIndex));
 				}	
 				
 				startIndex = row.index;
@@ -4207,7 +4217,7 @@ Woorksheet.prototype.setRowHidden=function(bHidden, start, stop){
 		if(startIndex !== null)//заносим последние строки
 		{
 			updateRange = new Asc.Range(0, startIndex, gc_nMaxCol0, endIndex);
-			History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_RowHide, oThis.getId(),updateRange, new UndoRedoData_FromToRowCol(bHidden, startIndex, endIndex));
+			History.Add(AscCommonExcel.g_oUndoRedoWorksheet, historyitem_Worksheet_RowHide, oThis.getId(),updateRange, new UndoRedoData_FromToRowCol(bHidden, startIndex, endIndex));
 		}
 	}
 };
@@ -4231,7 +4241,7 @@ Woorksheet.prototype.setRowBestFit=function(bBestFit, height, start, stop){
 			row.h = height;
 			var oNewProps = row.getHeightProp();
 			if(false == oOldProps.isEqual(oNewProps))
-			    History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_RowProp, oThis.getId(), row._getUpdateRange(), new UndoRedoData_IndexSimpleProp(row.index, true, oOldProps, oNewProps));
+			    History.Add(AscCommonExcel.g_oUndoRedoWorksheet, historyitem_Worksheet_RowProp, oThis.getId(), row._getUpdateRange(), new UndoRedoData_IndexSimpleProp(row.index, true, oOldProps, oNewProps));
 		}
 	};
 	if(0 == start && gc_nMaxRow0 == stop)
@@ -4314,10 +4324,10 @@ Woorksheet.prototype._removeCell=function(nRow, nCol, cell){
 			}
 			else {
 			    if (false == cell.isEmpty()) {
-			        var oUndoRedoData_CellData = new UndoRedoData_CellData(cell.getValueData(), null);
+			        var oUndoRedoData_CellData = new AscCommonExcel.UndoRedoData_CellData(cell.getValueData(), null);
 			        if (null != cell.xfs)
 			            oUndoRedoData_CellData.style = cell.xfs.clone();
-			        History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_RemoveCell, sheetId, new Asc.Range(nCol, nRow, nCol, nRow), new UndoRedoData_CellSimpleData(nRow, nCol, oUndoRedoData_CellData, null));
+			        History.Add(AscCommonExcel.g_oUndoRedoWorksheet, historyitem_Worksheet_RemoveCell, sheetId, new Asc.Range(nCol, nRow, nCol, nRow), new UndoRedoData_CellSimpleData(nRow, nCol, oUndoRedoData_CellData, null));
 			    }
 			    delete row.c[nCol];
 			    if (row.isEmpty())
@@ -4345,7 +4355,7 @@ Woorksheet.prototype._getCell=function(row, col){
 			this.nRowsCount = row + 1;
 		if(col >= this.nColsCount)
 			this.nColsCount = col + 1;
-		//History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_CreateCell, this.getId(), null, new UndoRedoData_CellSimpleData(row, col, null, null));
+		//History.Add(AscCommonExcel.g_oUndoRedoWorksheet, historyitem_Worksheet_CreateCell, this.getId(), null, new UndoRedoData_CellSimpleData(row, col, null, null));
 	}
 	return oCurCell;
 };
@@ -4400,7 +4410,7 @@ Woorksheet.prototype._getRow=function(row){
             oCurRow.create(row + 1);
             this.aGCells[row] = oCurRow;
             this.nRowsCount = row >= this.nRowsCount ? row + 1 : this.nRowsCount;
-            //History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_CreateRow, this.getId(), null, new UndoRedoData_SingleProperty(row));
+            //History.Add(AscCommonExcel.g_oUndoRedoWorksheet, historyitem_Worksheet_CreateRow, this.getId(), null, new UndoRedoData_SingleProperty(row));
         }
     }
 	return oCurRow;
@@ -4427,7 +4437,7 @@ Woorksheet.prototype._getCol=function(index){
 				oCurCol = new Col(this, index);
 			this.aCols[index] = oCurCol;
 			this.nColsCount = index >= this.nColsCount ? index + 1 : this.nColsCount;
-			//History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_CreateCol, this.getId(), null, new UndoRedoData_SingleProperty(index));
+			//History.Add(AscCommonExcel.g_oUndoRedoWorksheet, historyitem_Worksheet_CreateCol, this.getId(), null, new UndoRedoData_SingleProperty(index));
 		}
 	}
 	return oCurCol;
@@ -4718,7 +4728,7 @@ Woorksheet.prototype._moveRange=function(oBBoxFrom, oBBoxTo, copyRange){
         sortDependency(this.workbook);
 	}
 	// ToDo возможно нужно уменьшить диапазон обновления
-    History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_MoveRange,
+    History.Add(AscCommonExcel.g_oUndoRedoWorksheet, historyitem_Worksheet_MoveRange,
 				this.getId(), new Asc.Range(0, 0, gc_nMaxCol0, gc_nMaxRow0),
 				new UndoRedoData_FromTo(new UndoRedoData_BBox(oBBoxFrom), new UndoRedoData_BBox(oBBoxTo), copyRange));
 	History.EndTransaction();
@@ -4760,7 +4770,7 @@ Woorksheet.prototype._shiftCellsLeft=function(oBBox){
 		}
 	}
 
-	History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_ShiftCellsLeft, this.getId(), new Asc.Range(nLeft, oBBox.r1, gc_nMaxCol0, oBBox.r2), new UndoRedoData_BBox(oBBox));
+	History.Add(AscCommonExcel.g_oUndoRedoWorksheet, historyitem_Worksheet_ShiftCellsLeft, this.getId(), new Asc.Range(nLeft, oBBox.r1, gc_nMaxCol0, oBBox.r2), new UndoRedoData_BBox(oBBox));
     this.autoFilters.insertColumn( "delCell",  oBBox, c_oAscDeleteOptions.DeleteCellsAndShiftLeft );
 	//todo проверить не уменьшились ли границы таблицы
 };
@@ -4803,7 +4813,7 @@ Woorksheet.prototype._shiftCellsUp=function(oBBox){
 		}
 	}
 
-	History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_ShiftCellsTop, this.getId(), new Asc.Range(oBBox.c1, oBBox.r1, oBBox.c2, gc_nMaxRow0), new UndoRedoData_BBox(oBBox));
+	History.Add(AscCommonExcel.g_oUndoRedoWorksheet, historyitem_Worksheet_ShiftCellsTop, this.getId(), new Asc.Range(oBBox.c1, oBBox.r1, oBBox.c2, gc_nMaxRow0), new UndoRedoData_BBox(oBBox));
     this.autoFilters.insertRows( "delCell", oBBox, c_oAscDeleteOptions.DeleteCellsAndShiftTop );
 	//todo проверить не уменьшились ли границы таблицы
 };
@@ -4841,7 +4851,7 @@ Woorksheet.prototype._shiftCellsRight=function(oBBox){
 		}
 	}
 
-	History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_ShiftCellsRight, this.getId(), new Asc.Range(oBBox.c1, oBBox.r1, gc_nMaxCol0, oBBox.r2), new UndoRedoData_BBox(oBBox));
+	History.Add(AscCommonExcel.g_oUndoRedoWorksheet, historyitem_Worksheet_ShiftCellsRight, this.getId(), new Asc.Range(oBBox.c1, oBBox.r1, gc_nMaxCol0, oBBox.r2), new UndoRedoData_BBox(oBBox));
     this.autoFilters.insertColumn( "insCells",  oBBox, c_oAscInsertOptions.InsertCellsAndShiftRight );
 };
 Woorksheet.prototype._shiftCellsBottom=function(oBBox){
@@ -4876,7 +4886,7 @@ Woorksheet.prototype._shiftCellsBottom=function(oBBox){
 		}
 	}
 
-	History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_ShiftCellsBottom, this.getId(), new Asc.Range(oBBox.c1, oBBox.r1, oBBox.c2, gc_nMaxRow0), new UndoRedoData_BBox(oBBox));
+	History.Add(AscCommonExcel.g_oUndoRedoWorksheet, historyitem_Worksheet_ShiftCellsBottom, this.getId(), new Asc.Range(oBBox.c1, oBBox.r1, oBBox.c2, gc_nMaxRow0), new UndoRedoData_BBox(oBBox));
     this.autoFilters.insertRows( "insCell", oBBox, c_oAscInsertOptions.InsertCellsAndShiftDown );
 };
 Woorksheet.prototype._setIndex=function(ind){
@@ -5374,7 +5384,7 @@ Cell.prototype.cleanCache=function(){
 Cell.prototype.setFormula=function(val, bAddToHistory){
 	if(bAddToHistory)
 	{
-		History.Add( g_oUndoRedoWorksheet, historyitem_Worksheet_RemoveCellFormula, this.ws.getId(), new Asc.Range( this.nCol, this.nRow, this.nCol, this.nRow ), new UndoRedoData_CellSimpleData( this.nRow, this.nCol, null, null, this.sFormula ));
+		History.Add( AscCommonExcel.g_oUndoRedoWorksheet, historyitem_Worksheet_RemoveCellFormula, this.ws.getId(), new Asc.Range( this.nCol, this.nRow, this.nCol, this.nRow ), new UndoRedoData_CellSimpleData( this.nRow, this.nCol, null, null, this.sFormula ));
 	}
 	this.sFormula = val;
 	this.oValue.cleanCache();
@@ -5463,7 +5473,7 @@ Cell.prototype.setValue=function(val,callback, isCopyPaste){
 	if(History.Is_On())
 		DataNew = this.getValueData();
 	if(History.Is_On() && false == DataOld.isEqual(DataNew))
-	    History.Add(g_oUndoRedoCell, historyitem_Cell_ChangeValue, this.ws.getId(), new Asc.Range(this.nCol, this.nRow, this.nCol, this.nRow), new UndoRedoData_CellSimpleData(this.nRow, this.nCol, DataOld, DataNew));
+	    History.Add(AscCommonExcel.g_oUndoRedoCell, historyitem_Cell_ChangeValue, this.ws.getId(), new Asc.Range(this.nCol, this.nRow, this.nCol, this.nRow), new UndoRedoData_CellSimpleData(this.nRow, this.nCol, DataOld, DataNew));
     if ( this.ws.workbook.isNeedCacheClean ){
 		/*
 			Если необходим пересчет, то по списку пересчитываемых ячеек сортируем граф зависимостей и пересчиываем в получившемся порядке. Плохим ячейкам с цикличискими ссылками выставляем ошибку "#REF!".
@@ -5492,7 +5502,7 @@ Cell.prototype.setValue2=function(array){
 	if(History.Is_On())
 		DataNew = this.getValueData();
 	if(History.Is_On() && false == DataOld.isEqual(DataNew))
-		History.Add(g_oUndoRedoCell, historyitem_Cell_ChangeValue, this.ws.getId(), new Asc.Range(this.nCol, this.nRow, this.nCol, this.nRow), new UndoRedoData_CellSimpleData(this.nRow, this.nCol, DataOld, DataNew));
+		History.Add(AscCommonExcel.g_oUndoRedoCell, historyitem_Cell_ChangeValue, this.ws.getId(), new Asc.Range(this.nCol, this.nRow, this.nCol, this.nRow), new UndoRedoData_CellSimpleData(this.nRow, this.nCol, DataOld, DataNew));
 	//todo не должны удаляться ссылки, если сделать merge ее части.
 	if(this.isEmptyTextString())
 	{
@@ -5521,7 +5531,7 @@ Cell.prototype.setType=function(type){
 		var DataOld = this.getValueData();
 		this.oValue.setValueType(type);
 		var DataNew = this.getValueData();
-		History.Add(g_oUndoRedoCell, historyitem_Cell_ChangeValue, this.ws.getId(), new Asc.Range(this.nCol, this.nRow, this.nCol, this.nRow), new UndoRedoData_CellSimpleData(this.nRow, this.nCol, DataOld, DataNew));
+		History.Add(AscCommonExcel.g_oUndoRedoCell, historyitem_Cell_ChangeValue, this.ws.getId(), new Asc.Range(this.nCol, this.nRow, this.nCol, this.nRow), new UndoRedoData_CellSimpleData(this.nRow, this.nCol, DataOld, DataNew));
 	}
 	return this.oValue.type;
 };
@@ -5533,7 +5543,7 @@ Cell.prototype.setCellStyle=function(val){
 	var oRes = this.ws.workbook.oStyleManager.setCellStyle(this, newVal);
 	if(History.Is_On()) {
 		var oldStyleName = this.ws.workbook.CellStyles.getStyleNameByXfId(oRes.oldVal);
-		History.Add(g_oUndoRedoCell, historyitem_Cell_Style, this.ws.getId(), new Asc.Range(this.nCol, this.nRow, this.nCol, this.nRow), new UndoRedoData_CellSimpleData(this.nRow, this.nCol, oldStyleName, val));
+		History.Add(AscCommonExcel.g_oUndoRedoCell, historyitem_Cell_Style, this.ws.getId(), new Asc.Range(this.nCol, this.nRow, this.nCol, this.nRow), new UndoRedoData_CellSimpleData(this.nRow, this.nCol, oldStyleName, val));
 
 		// Выставляем стиль
 		var oStyle = this.ws.workbook.CellStyles.getStyleByXfId(oRes.newVal);
@@ -5558,7 +5568,7 @@ Cell.prototype.setNumFormat=function(val){
     else*/
         oRes = this.ws.workbook.oStyleManager.setNumFormat(this, val);
     if(History.Is_On() && oRes.oldVal != oRes.newVal)
-        History.Add(g_oUndoRedoCell, historyitem_Cell_Numformat, this.ws.getId(), new Asc.Range(this.nCol, this.nRow, this.nCol, this.nRow), new UndoRedoData_CellSimpleData(this.nRow, this.nCol, oRes.oldVal, oRes.newVal));
+        History.Add(AscCommonExcel.g_oUndoRedoCell, historyitem_Cell_Numformat, this.ws.getId(), new Asc.Range(this.nCol, this.nRow, this.nCol, this.nRow), new UndoRedoData_CellSimpleData(this.nRow, this.nCol, oRes.oldVal, oRes.newVal));
 	this.compiledXfs = null;
 	this.oValue.cleanCache();
 };
@@ -5613,7 +5623,7 @@ Cell.prototype.setFont=function(val, bModifyValue){
 			if(History.Is_On())
 			{
 				var newVal = this.getValueData();
-				History.Add(g_oUndoRedoCell, historyitem_Cell_ChangeValue, this.ws.getId(), new Asc.Range(this.nCol, this.nRow, this.nCol, this.nRow), new UndoRedoData_CellSimpleData(this.nRow, this.nCol, oldVal, newVal));
+				History.Add(AscCommonExcel.g_oUndoRedoCell, historyitem_Cell_ChangeValue, this.ws.getId(), new Asc.Range(this.nCol, this.nRow, this.nCol, this.nRow), new UndoRedoData_CellSimpleData(this.nRow, this.nCol, oldVal, newVal));
 			}
 		}
 	}
@@ -5626,7 +5636,7 @@ Cell.prototype.setFont=function(val, bModifyValue){
 		var newVal = null;
 		if(null != oRes.newVal)
 			newVal = oRes.newVal.clone();
-        History.Add(g_oUndoRedoCell, historyitem_Cell_SetFont, this.ws.getId(), new Asc.Range(this.nCol, this.nRow, this.nCol, this.nRow), new UndoRedoData_CellSimpleData(this.nRow, this.nCol, oldVal, newVal));
+        History.Add(AscCommonExcel.g_oUndoRedoCell, historyitem_Cell_SetFont, this.ws.getId(), new Asc.Range(this.nCol, this.nRow, this.nCol, this.nRow), new UndoRedoData_CellSimpleData(this.nRow, this.nCol, oldVal, newVal));
 	}
 	this.compiledXfs = null;
 	this.oValue.cleanCache();
@@ -5635,7 +5645,7 @@ Cell.prototype.setFontname=function(val){
     var oRes = this.ws.workbook.oStyleManager.setFontname(this, val);
 	this.oValue.setFontname(this, val);
 	if(History.Is_On() && oRes.oldVal != oRes.newVal)
-		History.Add(g_oUndoRedoCell, historyitem_Cell_Fontname, this.ws.getId(), new Asc.Range(this.nCol, this.nRow, this.nCol, this.nRow), new UndoRedoData_CellSimpleData(this.nRow, this.nCol, oRes.oldVal, oRes.newVal));
+		History.Add(AscCommonExcel.g_oUndoRedoCell, historyitem_Cell_Fontname, this.ws.getId(), new Asc.Range(this.nCol, this.nRow, this.nCol, this.nRow), new UndoRedoData_CellSimpleData(this.nRow, this.nCol, oRes.oldVal, oRes.newVal));
 	this.compiledXfs = null;
 	this.oValue.cleanCache();
 };
@@ -5643,7 +5653,7 @@ Cell.prototype.setFontsize=function(val){
     var oRes = this.ws.workbook.oStyleManager.setFontsize(this, val);
 	this.oValue.setFontsize(this, val);
     if(History.Is_On() && oRes.oldVal != oRes.newVal)
-        History.Add(g_oUndoRedoCell, historyitem_Cell_Fontsize, this.ws.getId(), new Asc.Range(this.nCol, this.nRow, this.nCol, this.nRow), new UndoRedoData_CellSimpleData(this.nRow, this.nCol, oRes.oldVal, oRes.newVal));
+        History.Add(AscCommonExcel.g_oUndoRedoCell, historyitem_Cell_Fontsize, this.ws.getId(), new Asc.Range(this.nCol, this.nRow, this.nCol, this.nRow), new UndoRedoData_CellSimpleData(this.nRow, this.nCol, oRes.oldVal, oRes.newVal));
 	this.compiledXfs = null;
 	this.oValue.cleanCache();
 };
@@ -5651,7 +5661,7 @@ Cell.prototype.setFontcolor=function(val){
     var oRes = this.ws.workbook.oStyleManager.setFontcolor(this, val);
 	this.oValue.setFontcolor(this, val);
     if(History.Is_On() && oRes.oldVal != oRes.newVal)
-        History.Add(g_oUndoRedoCell, historyitem_Cell_Fontcolor, this.ws.getId(), new Asc.Range(this.nCol, this.nRow, this.nCol, this.nRow), new UndoRedoData_CellSimpleData(this.nRow, this.nCol, oRes.oldVal, oRes.newVal));
+        History.Add(AscCommonExcel.g_oUndoRedoCell, historyitem_Cell_Fontcolor, this.ws.getId(), new Asc.Range(this.nCol, this.nRow, this.nCol, this.nRow), new UndoRedoData_CellSimpleData(this.nRow, this.nCol, oRes.oldVal, oRes.newVal));
 	this.compiledXfs = null;
 	this.oValue.cleanCache();
 };
@@ -5659,7 +5669,7 @@ Cell.prototype.setBold=function(val){
     var oRes = this.ws.workbook.oStyleManager.setBold(this, val);
 	this.oValue.setBold(this, val);
     if(History.Is_On() && oRes.oldVal != oRes.newVal)
-        History.Add(g_oUndoRedoCell, historyitem_Cell_Bold, this.ws.getId(), new Asc.Range(this.nCol, this.nRow, this.nCol, this.nRow), new UndoRedoData_CellSimpleData(this.nRow, this.nCol, oRes.oldVal, oRes.newVal));
+        History.Add(AscCommonExcel.g_oUndoRedoCell, historyitem_Cell_Bold, this.ws.getId(), new Asc.Range(this.nCol, this.nRow, this.nCol, this.nRow), new UndoRedoData_CellSimpleData(this.nRow, this.nCol, oRes.oldVal, oRes.newVal));
 	this.compiledXfs = null;
 	this.oValue.cleanCache();
 };
@@ -5667,7 +5677,7 @@ Cell.prototype.setItalic=function(val){
     var oRes = this.ws.workbook.oStyleManager.setItalic(this, val);
 	this.oValue.setItalic(this, val);
     if(History.Is_On() && oRes.oldVal != oRes.newVal)
-        History.Add(g_oUndoRedoCell, historyitem_Cell_Italic, this.ws.getId(), new Asc.Range(this.nCol, this.nRow, this.nCol, this.nRow), new UndoRedoData_CellSimpleData(this.nRow, this.nCol, oRes.oldVal, oRes.newVal));
+        History.Add(AscCommonExcel.g_oUndoRedoCell, historyitem_Cell_Italic, this.ws.getId(), new Asc.Range(this.nCol, this.nRow, this.nCol, this.nRow), new UndoRedoData_CellSimpleData(this.nRow, this.nCol, oRes.oldVal, oRes.newVal));
 	this.compiledXfs = null;
 	this.oValue.cleanCache();
 };
@@ -5675,7 +5685,7 @@ Cell.prototype.setUnderline=function(val){
     var oRes = this.ws.workbook.oStyleManager.setUnderline(this, val);
 	this.oValue.setUnderline(this, val);
     if(History.Is_On() && oRes.oldVal != oRes.newVal)
-        History.Add(g_oUndoRedoCell, historyitem_Cell_Underline, this.ws.getId(), new Asc.Range(this.nCol, this.nRow, this.nCol, this.nRow), new UndoRedoData_CellSimpleData(this.nRow, this.nCol, oRes.oldVal, oRes.newVal));
+        History.Add(AscCommonExcel.g_oUndoRedoCell, historyitem_Cell_Underline, this.ws.getId(), new Asc.Range(this.nCol, this.nRow, this.nCol, this.nRow), new UndoRedoData_CellSimpleData(this.nRow, this.nCol, oRes.oldVal, oRes.newVal));
 	this.compiledXfs = null;
 	this.oValue.cleanCache();
 };
@@ -5683,7 +5693,7 @@ Cell.prototype.setStrikeout=function(val){
     var oRes = this.ws.workbook.oStyleManager.setStrikeout(this, val);
 	this.oValue.setStrikeout(this, val);
     if(History.Is_On() && oRes.oldVal != oRes.newVal)
-        History.Add(g_oUndoRedoCell, historyitem_Cell_Strikeout, this.ws.getId(), new Asc.Range(this.nCol, this.nRow, this.nCol, this.nRow), new UndoRedoData_CellSimpleData(this.nRow, this.nCol, oRes.oldVal, oRes.newVal));
+        History.Add(AscCommonExcel.g_oUndoRedoCell, historyitem_Cell_Strikeout, this.ws.getId(), new Asc.Range(this.nCol, this.nRow, this.nCol, this.nRow), new UndoRedoData_CellSimpleData(this.nRow, this.nCol, oRes.oldVal, oRes.newVal));
 	this.compiledXfs = null;
 	this.oValue.cleanCache();
 };
@@ -5691,26 +5701,26 @@ Cell.prototype.setFontAlign=function(val){
     var oRes = this.ws.workbook.oStyleManager.setFontAlign(this, val);
 	this.oValue.setFontAlign(this, val);
     if(History.Is_On() && oRes.oldVal != oRes.newVal)
-        History.Add(g_oUndoRedoCell, historyitem_Cell_FontAlign, this.ws.getId(), new Asc.Range(this.nCol, this.nRow, this.nCol, this.nRow), new UndoRedoData_CellSimpleData(this.nRow, this.nCol, oRes.oldVal, oRes.newVal));
+        History.Add(AscCommonExcel.g_oUndoRedoCell, historyitem_Cell_FontAlign, this.ws.getId(), new Asc.Range(this.nCol, this.nRow, this.nCol, this.nRow), new UndoRedoData_CellSimpleData(this.nRow, this.nCol, oRes.oldVal, oRes.newVal));
 	this.compiledXfs = null;
 	this.oValue.cleanCache();
 };
 Cell.prototype.setAlignVertical=function(val){
 	var oRes = this.ws.workbook.oStyleManager.setAlignVertical(this, val);
     if(History.Is_On() && oRes.oldVal != oRes.newVal)
-        History.Add(g_oUndoRedoCell, historyitem_Cell_AlignVertical, this.ws.getId(), new Asc.Range(this.nCol, this.nRow, this.nCol, this.nRow), new UndoRedoData_CellSimpleData(this.nRow, this.nCol, oRes.oldVal, oRes.newVal));
+        History.Add(AscCommonExcel.g_oUndoRedoCell, historyitem_Cell_AlignVertical, this.ws.getId(), new Asc.Range(this.nCol, this.nRow, this.nCol, this.nRow), new UndoRedoData_CellSimpleData(this.nRow, this.nCol, oRes.oldVal, oRes.newVal));
 	this.compiledXfs = null;
 };
 Cell.prototype.setAlignHorizontal=function(val){
 	var oRes = this.ws.workbook.oStyleManager.setAlignHorizontal(this, val);
     if(History.Is_On() && oRes.oldVal != oRes.newVal)
-        History.Add(g_oUndoRedoCell, historyitem_Cell_AlignHorizontal, this.ws.getId(), new Asc.Range(this.nCol, this.nRow, this.nCol, this.nRow), new UndoRedoData_CellSimpleData(this.nRow, this.nCol, oRes.oldVal, oRes.newVal));
+        History.Add(AscCommonExcel.g_oUndoRedoCell, historyitem_Cell_AlignHorizontal, this.ws.getId(), new Asc.Range(this.nCol, this.nRow, this.nCol, this.nRow), new UndoRedoData_CellSimpleData(this.nRow, this.nCol, oRes.oldVal, oRes.newVal));
 	this.compiledXfs = null;
 };
 Cell.prototype.setFill=function(val){
 	var oRes = this.ws.workbook.oStyleManager.setFill(this, val);
     if(History.Is_On() && oRes.oldVal != oRes.newVal)
-        History.Add(g_oUndoRedoCell, historyitem_Cell_Fill, this.ws.getId(), new Asc.Range(this.nCol, this.nRow, this.nCol, this.nRow), new UndoRedoData_CellSimpleData(this.nRow, this.nCol, oRes.oldVal, oRes.newVal));
+        History.Add(AscCommonExcel.g_oUndoRedoCell, historyitem_Cell_Fill, this.ws.getId(), new Asc.Range(this.nCol, this.nRow, this.nCol, this.nRow), new UndoRedoData_CellSimpleData(this.nRow, this.nCol, oRes.oldVal, oRes.newVal));
 	this.compiledXfs = null;
 };
 Cell.prototype.setBorder=function(val){
@@ -5722,38 +5732,38 @@ Cell.prototype.setBorder=function(val){
 		var newVal = null;
 		if(null != oRes.newVal)
 			newVal = oRes.newVal.clone();
-        History.Add(g_oUndoRedoCell, historyitem_Cell_Border, this.ws.getId(), new Asc.Range(this.nCol, this.nRow, this.nCol, this.nRow), new UndoRedoData_CellSimpleData(this.nRow, this.nCol, oldVal, newVal));
+        History.Add(AscCommonExcel.g_oUndoRedoCell, historyitem_Cell_Border, this.ws.getId(), new Asc.Range(this.nCol, this.nRow, this.nCol, this.nRow), new UndoRedoData_CellSimpleData(this.nRow, this.nCol, oldVal, newVal));
 	}
 	this.compiledXfs = null;
 };
 Cell.prototype.setShrinkToFit=function(val){
 	var oRes = this.ws.workbook.oStyleManager.setShrinkToFit(this, val);
     if(History.Is_On() && oRes.oldVal != oRes.newVal)
-        History.Add(g_oUndoRedoCell, historyitem_Cell_ShrinkToFit, this.ws.getId(), new Asc.Range(this.nCol, this.nRow, this.nCol, this.nRow), new UndoRedoData_CellSimpleData(this.nRow, this.nCol, oRes.oldVal, oRes.newVal));
+        History.Add(AscCommonExcel.g_oUndoRedoCell, historyitem_Cell_ShrinkToFit, this.ws.getId(), new Asc.Range(this.nCol, this.nRow, this.nCol, this.nRow), new UndoRedoData_CellSimpleData(this.nRow, this.nCol, oRes.oldVal, oRes.newVal));
 	this.compiledXfs = null;
 };
 Cell.prototype.setWrap=function(val){
 	var oRes = this.ws.workbook.oStyleManager.setWrap(this, val);
     if(History.Is_On() && oRes.oldVal != oRes.newVal)
-        History.Add(g_oUndoRedoCell, historyitem_Cell_Wrap, this.ws.getId(), new Asc.Range(this.nCol, this.nRow, this.nCol, this.nRow), new UndoRedoData_CellSimpleData(this.nRow, this.nCol, oRes.oldVal, oRes.newVal));
+        History.Add(AscCommonExcel.g_oUndoRedoCell, historyitem_Cell_Wrap, this.ws.getId(), new Asc.Range(this.nCol, this.nRow, this.nCol, this.nRow), new UndoRedoData_CellSimpleData(this.nRow, this.nCol, oRes.oldVal, oRes.newVal));
 	this.compiledXfs = null;
 };
 Cell.prototype.setAngle=function(val){
     var oRes = this.ws.workbook.oStyleManager.setAngle(this, val);
     if(History.Is_On() && oRes.oldVal != oRes.newVal)
-        History.Add(g_oUndoRedoCell, historyitem_Cell_Angle, this.ws.getId(), new Asc.Range(this.nCol, this.nRow, this.nCol, this.nRow), new UndoRedoData_CellSimpleData(this.nRow, this.nCol, oRes.oldVal, oRes.newVal));
+        History.Add(AscCommonExcel.g_oUndoRedoCell, historyitem_Cell_Angle, this.ws.getId(), new Asc.Range(this.nCol, this.nRow, this.nCol, this.nRow), new UndoRedoData_CellSimpleData(this.nRow, this.nCol, oRes.oldVal, oRes.newVal));
     this.compiledXfs = null;
 };
 Cell.prototype.setVerticalText=function(val){
     var oRes = this.ws.workbook.oStyleManager.setVerticalText(this, val);
     if(History.Is_On() && oRes.oldVal != oRes.newVal)
-        History.Add(g_oUndoRedoCell, historyitem_Cell_Angle, this.ws.getId(), new Asc.Range(this.nCol, this.nRow, this.nCol, this.nRow), new UndoRedoData_CellSimpleData(this.nRow, this.nCol, oRes.oldVal, oRes.newVal));
+        History.Add(AscCommonExcel.g_oUndoRedoCell, historyitem_Cell_Angle, this.ws.getId(), new Asc.Range(this.nCol, this.nRow, this.nCol, this.nRow), new UndoRedoData_CellSimpleData(this.nRow, this.nCol, oRes.oldVal, oRes.newVal));
     this.compiledXfs = null;
 };
 Cell.prototype.setQuotePrefix=function(val){
 	var oRes = this.ws.workbook.oStyleManager.setQuotePrefix(this, val);
     if(History.Is_On() && oRes.oldVal != oRes.newVal)
-        History.Add(g_oUndoRedoCell, historyitem_Cell_SetQuotePrefix, this.ws.getId(), new Asc.Range(this.nCol, this.nRow, this.nCol, this.nRow), new UndoRedoData_CellSimpleData(this.nRow, this.nCol, oRes.oldVal, oRes.newVal));
+        History.Add(AscCommonExcel.g_oUndoRedoCell, historyitem_Cell_SetQuotePrefix, this.ws.getId(), new Asc.Range(this.nCol, this.nRow, this.nCol, this.nRow), new UndoRedoData_CellSimpleData(this.nRow, this.nCol, oRes.oldVal, oRes.newVal));
 	this.oValue.cleanCache();
 };
 Cell.prototype.setConditionalFormattingStyle=function(xfs){
@@ -5789,7 +5799,7 @@ Cell.prototype.setStyle=function(xfs){
 			oldVal = oldVal.clone();
 		if(null != newVal)
 			newVal = newVal.clone();
-		History.Add(g_oUndoRedoCell, historyitem_Cell_SetStyle, this.ws.getId(), new Asc.Range(this.nCol, this.nRow, this.nCol, this.nRow), new UndoRedoData_CellSimpleData(this.nRow, this.nCol, oldVal, newVal));
+		History.Add(AscCommonExcel.g_oUndoRedoCell, historyitem_Cell_SetStyle, this.ws.getId(), new Asc.Range(this.nCol, this.nRow, this.nCol, this.nRow), new UndoRedoData_CellSimpleData(this.nRow, this.nCol, oldVal, newVal));
 	}
 	// if(this.isEmpty())
 		// this.Remove();
@@ -5866,7 +5876,7 @@ Cell.prototype.setValueData = function(Val){
 	    if (History.Is_On()) {
 	        DataNew = this.getValueData();
 	        if (false == DataOld.isEqual(DataNew))
-	            History.Add(g_oUndoRedoCell, historyitem_Cell_ChangeValue, this.ws.getId(), new Asc.Range(this.nCol, this.nRow, this.nCol, this.nRow), new UndoRedoData_CellSimpleData(this.nRow, this.nCol, DataOld, DataNew));
+	            History.Add(AscCommonExcel.g_oUndoRedoCell, historyitem_Cell_ChangeValue, this.ws.getId(), new Asc.Range(this.nCol, this.nRow, this.nCol, this.nRow), new UndoRedoData_CellSimpleData(this.nRow, this.nCol, DataOld, DataNew));
 	    }
     }
 	else
@@ -8441,8 +8451,8 @@ Range.prototype.sort=function(nOption, nStartCol){
 			History.SetSelectionRedo(oSelection);
 		}
 		var oUndoRedoBBox = new UndoRedoData_BBox({r1:nRowFirst0, c1:nColFirst0, r2:nLastRow0, c2:nLastCol0});
-		oRes = new UndoRedoData_SortData(oUndoRedoBBox, aSortData);
-		History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_Sort, this.worksheet.getId(), new Asc.Range(0, nRowFirst0, gc_nMaxCol0, nLastRow0), oRes);
+		oRes = new AscCommonExcel.UndoRedoData_SortData(oUndoRedoBBox, aSortData);
+		History.Add(AscCommonExcel.g_oUndoRedoWorksheet, historyitem_Worksheet_Sort, this.worksheet.getId(), new Asc.Range(0, nRowFirst0, gc_nMaxCol0, nLastRow0), oRes);
 		this._sortByArray(oUndoRedoBBox, aSortData);
 	}
     buildRecalc(this.worksheet.workbook);
@@ -8852,7 +8862,7 @@ function _promoteFromTo(from, wsFrom, to, wsTo, bIsPromote, oCanPromote, bCtrl, 
 		                    var oOldProps = row.getHeightProp();
 		                    if (false === oOldProps.isEqual(oNewProps)) {
 		                        row.setHeightProp(oNewProps);
-		                        History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_RowProp, wsTo.getId(), row._getUpdateRange(), new UndoRedoData_IndexSimpleProp(nCurIndex, true, oOldProps, oNewProps));
+		                        History.Add(AscCommonExcel.g_oUndoRedoWorksheet, historyitem_Worksheet_RowProp, wsTo.getId(), row._getUpdateRange(), new UndoRedoData_IndexSimpleProp(nCurIndex, true, oOldProps, oNewProps));
 		                    }
 		                }
 		            }
@@ -8896,7 +8906,7 @@ function _promoteFromTo(from, wsFrom, to, wsTo, bIsPromote, oCanPromote, bCtrl, 
 		                    var oOldProps = col.getWidthProp();
 		                    if (false == oOldProps.isEqual(oNewProps)) {
 		                        col.setWidthProp(oNewProps);
-		                        History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_ColProp, wsTo.getId(), new Asc.Range(nCurIndex, 0, nCurIndex, gc_nMaxRow0), new UndoRedoData_IndexSimpleProp(nCurIndex, false, oOldProps, oNewProps));
+		                        History.Add(AscCommonExcel.g_oUndoRedoWorksheet, historyitem_Worksheet_ColProp, wsTo.getId(), new Asc.Range(nCurIndex, 0, nCurIndex, gc_nMaxRow0), new UndoRedoData_IndexSimpleProp(nCurIndex, false, oOldProps, oNewProps));
 		                    }
 		                }
 		            }
@@ -9069,7 +9079,7 @@ function _promoteFromTo(from, wsFrom, to, wsTo, bIsPromote, oCanPromote, bCtrl, 
 								oCopyCell.oValue = oFromCell.oValue.clone();
 								var DataNew = oCopyCell.getValueData();
 								if(false == DataOld.isEqual(DataNew))
-									History.Add(g_oUndoRedoCell, historyitem_Cell_ChangeValue, wsTo.getId(), new Asc.Range(oCopyCell.nCol, oCopyCell.nRow, oCopyCell.nCol, oCopyCell.nRow), new UndoRedoData_CellSimpleData(oCopyCell.nRow, oCopyCell.nCol, DataOld, DataNew));
+									History.Add(AscCommonExcel.g_oUndoRedoCell, historyitem_Cell_ChangeValue, wsTo.getId(), new Asc.Range(oCopyCell.nCol, oCopyCell.nRow, oCopyCell.nCol, oCopyCell.nRow), new UndoRedoData_CellSimpleData(oCopyCell.nRow, oCopyCell.nCol, DataOld, DataNew));
 								//todo
 								// if(oCopyCell.isEmptyTextString())
 									// wsTo._getHyperlink().remove({r1: oCopyCell.nRow, c1: oCopyCell.nCol, r2: oCopyCell.nRow, c2: oCopyCell.nCol});

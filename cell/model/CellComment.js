@@ -271,7 +271,7 @@ asc_CCommentData.prototype = {
 
 	//	For collaborative editing
 	getType: function() {
-		return UndoRedoDataTypes.CommentData;
+		return AscCommonExcel.UndoRedoDataTypes.CommentData;
 	},
 
 	getProperties: function() {
@@ -337,7 +337,7 @@ function CompositeCommentData() {
 CompositeCommentData.prototype = {
 	//	For collaborative editing
 	getType: function() {
-		return UndoRedoDataTypes.CompositeCommentData;
+		return AscCommonExcel.UndoRedoDataTypes.CompositeCommentData;
 	},
 
 	getProperties: function() {
@@ -450,7 +450,7 @@ CCellCommentator.prototype.moveRangeComments = function(rangeFrom, rangeTo) {
 				compositeComment.commentAfter = commentAfter;
 
 				History.Create_NewPoint();
-				History.Add(g_oUndoRedoComment, historyitem_Comment_Change, this.worksheet.model.getId(), null, compositeComment);
+				History.Add(AscCommonExcel.g_oUndoRedoComment, historyitem_Comment_Change, this.worksheet.model.getId(), null, compositeComment);
 			}
 		}
 	}
@@ -1124,7 +1124,7 @@ CCellCommentator.prototype.changeComment = function(id, oComment, bChangeCoords,
 			compositeComment.commentAfter = commentAfter;
 
 			History.Create_NewPoint();
-			History.Add(g_oUndoRedoComment, historyitem_Comment_Change, t.worksheet.model.getId(), null, compositeComment);
+			History.Add(AscCommonExcel.g_oUndoRedoComment, historyitem_Comment_Change, t.worksheet.model.getId(), null, compositeComment);
 		}
 
 		if (!bNoDraw)
@@ -1231,7 +1231,7 @@ CCellCommentator.prototype._addComment = function (oComment, bChange, bIsNotUpda
 	// Add new comment
 	if (!bChange) {
 		History.Create_NewPoint();
-		History.Add(g_oUndoRedoComment, historyitem_Comment_Add, this.worksheet.model.getId(), null, new asc_CCommentData(oComment));
+		History.Add(AscCommonExcel.g_oUndoRedoComment, historyitem_Comment_Add, this.worksheet.model.getId(), null, new asc_CCommentData(oComment));
 
 		this.aComments.push(oComment);
 
@@ -1252,7 +1252,7 @@ CCellCommentator.prototype._removeComment = function (comment, bNoEvent, isDraw)
 
 				if (this.bSaveHistory) {
 					History.Create_NewPoint();
-					History.Add(g_oUndoRedoComment, historyitem_Comment_Remove, this.worksheet.model.getId(), null, new asc_CCommentData(comment.oParent.aReplies[i]));
+					History.Add(AscCommonExcel.g_oUndoRedoComment, historyitem_Comment_Remove, this.worksheet.model.getId(), null, new asc_CCommentData(comment.oParent.aReplies[i]));
 				}
 
 				comment.oParent.aReplies.splice(i, 1);
@@ -1265,7 +1265,7 @@ CCellCommentator.prototype._removeComment = function (comment, bNoEvent, isDraw)
 
 				if (this.bSaveHistory) {
 					History.Create_NewPoint();
-					History.Add(g_oUndoRedoComment, historyitem_Comment_Remove, this.worksheet.model.getId(), null, new asc_CCommentData(this.aComments[i]));
+					History.Add(AscCommonExcel.g_oUndoRedoComment, historyitem_Comment_Remove, this.worksheet.model.getId(), null, new asc_CCommentData(this.aComments[i]));
 				}
 
 				this.aComments.splice(i, 1);

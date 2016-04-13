@@ -460,13 +460,13 @@ var editor;
     History = new CHistory(wbModel);
 
     g_oTableId = new CTableId();
-    g_oUndoRedoCell = new UndoRedoCell(wbModel);
-    g_oUndoRedoWorksheet = new UndoRedoWoorksheet(wbModel);
-    g_oUndoRedoWorkbook = new UndoRedoWorkbook(wbModel);
-    g_oUndoRedoCol = new UndoRedoRowCol(wbModel, false);
-    g_oUndoRedoRow = new UndoRedoRowCol(wbModel, true);
-    g_oUndoRedoComment = new UndoRedoComment(wbModel);
-    g_oUndoRedoAutoFilters = new UndoRedoAutoFilters(wbModel);
+    AscCommonExcel.g_oUndoRedoCell = new AscCommonExcel.UndoRedoCell(wbModel);
+    AscCommonExcel.g_oUndoRedoWorksheet = new AscCommonExcel.UndoRedoWoorksheet(wbModel);
+    AscCommonExcel.g_oUndoRedoWorkbook = new AscCommonExcel.UndoRedoWorkbook(wbModel);
+    AscCommonExcel.g_oUndoRedoCol = new AscCommonExcel.UndoRedoRowCol(wbModel, false);
+    AscCommonExcel.g_oUndoRedoRow = new AscCommonExcel.UndoRedoRowCol(wbModel, true);
+    AscCommonExcel.g_oUndoRedoComment = new AscCommonExcel.UndoRedoComment(wbModel);
+    AscCommonExcel.g_oUndoRedoAutoFilters = new AscCommonExcel.UndoRedoAutoFilters(wbModel);
   };
 
   spreadsheet_api.prototype.asc_DownloadAs = function(typeFile, bIsDownloadEvent) {//передаем число соответствующее своему формату. например  c_oAscFileType.XLSX
@@ -2934,7 +2934,7 @@ var editor;
         }
         History.Create_NewPoint();
         //не делаем Duplicate потому что предполагаем что схема не будет менять частями, а только обьектом целиком.
-        History.Add(g_oUndoRedoWorkbook, historyitem_Workbook_ChangeColorScheme, null, null, new UndoRedoData_ClrScheme(oldClrScheme, theme.themeElements.clrScheme));
+        History.Add(AscCommonExcel.g_oUndoRedoWorkbook, historyitem_Workbook_ChangeColorScheme, null, null, new AscCommonExcel.UndoRedoData_ClrScheme(oldClrScheme, theme.themeElements.clrScheme));
         t.asc_AfterChangeColorScheme();
       }
     };

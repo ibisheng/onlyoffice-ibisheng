@@ -397,13 +397,13 @@ $( function () {
         if ( this.User )
             g_oIdCounter.Set_UserId(this.User.asc_getId());
 
-        g_oUndoRedoCell = new UndoRedoCell(wb);
-        g_oUndoRedoWorksheet = new UndoRedoWoorksheet(wb);
-        g_oUndoRedoWorkbook = new UndoRedoWorkbook(wb);
-        g_oUndoRedoCol = new UndoRedoRowCol(wb, false);
-        g_oUndoRedoRow = new UndoRedoRowCol(wb, true);
-        g_oUndoRedoComment = new UndoRedoComment(wb);
-        g_oUndoRedoAutoFilters = new UndoRedoAutoFilters(wb);
+        AscCommonExcel.g_oUndoRedoCell = new AscCommonExcel.UndoRedoCell(wb);
+        AscCommonExcel.g_oUndoRedoWorksheet = new AscCommonExcel.UndoRedoWoorksheet(wb);
+        AscCommonExcel.g_oUndoRedoWorkbook = new AscCommonExcel.UndoRedoWorkbook(wb);
+        AscCommonExcel.g_oUndoRedoCol = new AscCommonExcel.UndoRedoRowCol(wb, false);
+        AscCommonExcel.g_oUndoRedoRow = new AscCommonExcel.UndoRedoRowCol(wb, true);
+        AscCommonExcel.g_oUndoRedoComment = new AscCommonExcel.UndoRedoComment(wb);
+        AscCommonExcel.g_oUndoRedoAutoFilters = new AscCommonExcel.UndoRedoAutoFilters(wb);
 //        g_oUndoRedoGraphicObjects = new UndoRedoGraphicObjects(wb);
         g_oIdCounter.Set_Load(false);
 
