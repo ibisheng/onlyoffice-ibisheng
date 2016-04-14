@@ -403,14 +403,36 @@ CSparklineView.prototype.initFromSparkline = function(oSparkline, oSparklineGrou
 
 
         var val_ax_props = new asc_ValAxisSettings();
-        val_ax_props.putMinValRule(c_oAscValAxisRule.auto);
-        val_ax_props.putMaxValRule(c_oAscValAxisRule.auto);
+        if(settings.type !== c_oAscChartTypeSettings.barStackedPer)
+        {
+            val_ax_props.putMinValRule(c_oAscValAxisRule.auto);
+            val_ax_props.putMaxValRule(c_oAscValAxisRule.auto);
+        }
+        else
+        {
+            val_ax_props.putMinValRule(c_oAscValAxisRule.fixed);
+            val_ax_props.putMinVal(-1);
+
+            val_ax_props.putMaxValRule(c_oAscValAxisRule.fixed);
+            val_ax_props.putMaxVal(1);
+        }
+
+
+
         val_ax_props.putTickLabelsPos(c_oAscTickLabelsPos.TICK_LABEL_POSITION_NONE);
-        val_ax_props.putInvertValOrder(false);
+        if(oSparklineGroup.rightToLeft)
+        {
+            val_ax_props.putInvertValOrder(true);
+        }
+        else
+        {
+            val_ax_props.putInvertValOrder(false);
+        }
         val_ax_props.putDispUnitsRule(c_oAscValAxUnits.none);
         val_ax_props.putMajorTickMark(c_oAscTickMark.TICK_MARK_NONE);
         val_ax_props.putMinorTickMark(c_oAscTickMark.TICK_MARK_NONE);
         val_ax_props.putCrossesRule(c_oAscCrossesRule.auto);
+
 
 
         var cat_ax_props = new asc_CatAxisSettings();
@@ -2267,16 +2289,36 @@ function DrawingObjects() {
             oSparklineGroup.updateCache(range);
         }
     };
+
+    _this.checkSparklineGroupMinMaxVal = function(oSparklineGroup)
+    {
+        var maxVal = null, minVal = null;
+        if(oSparklineGroup.type !== Asc.ESparklineType.Stacked &&
+            (Asc.SparklineAxisMinMax.Group === oSparklineGroup.minAxisType || Asc.SparklineAxisMinMax.Group === oSparklineGroup.maxAxisType))
+        {
+            for(var i = 0; i < oSparklineGroup.arrSparklines.length; ++i)
+            {
+                if (!oSparklineGroup.arrCachedSparklines[j]) {
+                    var oSparklineView = new CSparklineView();
+                    oSparklineView.initFromSparkline(oSparklineGroup.arrSparklines[j], oSparklineGroup, worksheet);
+                    oSparklineGroup.addView(oSparklineView, j);
+                }
+                var aPoints = getPtsFromSeries(oSparklineView.chartSpace.chart.plotArea.charts[0].series[0]);
+            }
+        }
+    };
+
     _this.drawSparkLineGroups = function(oDrawingContext, oSparklineGroups, range)
     {
-        oDrawingContext.save();
+
         var graphics = new CGraphics();
         graphics.init(oDrawingContext.ctx, oDrawingContext.getWidth(0), oDrawingContext.getHeight(0),
             oDrawingContext.getWidth(3)*nSparklineMultiplier, oDrawingContext.getHeight(3)*nSparklineMultiplier);
         graphics.m_oFontManager = g_fontManager;
-
+        graphics.SaveGrState();
         for(var i = 0; i < oSparklineGroups.arrSparklineGroup.length; ++i) {
             var oSparklineGroup = oSparklineGroups.arrSparklineGroup[i];
+
             for(var j = 0; j < oSparklineGroup.arrSparklines.length; ++j) {
                 if (!oSparklineGroup.arrCachedSparklines[j]) {
                     var oSparklineView = new CSparklineView();
@@ -2288,8 +2330,9 @@ function DrawingObjects() {
                 }
                 oSparklineGroup.arrCachedSparklines[j].draw(graphics);
             }
+
         }
-        oDrawingContext.restore();
+        graphics.RestoreGrState();
     };
 
     _this.rebuildChartGraphicObjects = function(data)

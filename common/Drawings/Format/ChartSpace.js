@@ -2598,6 +2598,117 @@ CChartSpace.prototype =
 
     },
 
+    checkValByNumRef: function(workbook, ser, val, bVertical)
+    {
+        if(val && val.numRef && typeof val.numRef.f === "string"/*(!val.numRef.numCache || val.numRef.numCache.pts.length === 0)*/)
+        {
+            var first_slice = 0, last_slice = 0;
+            if(val.numRef.f[0] === "(")
+            {
+                first_slice = 1;
+            }
+            if(val.numRef.f[val.numRef.f.length - 1] === ")")
+            {
+                last_slice = -1;
+            }
+            else
+            {
+                last_slice = val.numRef.f.length;
+            }
+            var f1 = val.numRef.f.slice(first_slice, last_slice);
+            var arr_f = f1.split(",");
+
+            var num_cache;
+            if(!val.numRef.numCache )
+            {
+                num_cache = new CNumLit();
+                num_cache.setFormatCode("General");
+            }
+            else
+            {
+                num_cache = val.numRef.numCache;
+                removePtsFromLit(num_cache);
+            }
+            var lit_format_code = typeof num_cache.formatCode === "string" && num_cache.formatCode.length > 0 ? num_cache.formatCode : "General";
+            var pt_index = 0, i, j, cell, pt, worksheet_id, hidden = true, row_hidden, col_hidden, nPtCount;
+            for(i = 0; i < arr_f.length; ++i)
+            {
+                var parsed_ref = parserHelp.parse3DRef(arr_f[i]);
+                if(parsed_ref)
+                {
+                    var source_worksheet = workbook.getWorksheetByName(parsed_ref.sheet);
+                    if(source_worksheet)
+                    {
+                        worksheet_id = source_worksheet.getId() + "";
+                        var range1 = source_worksheet.getRange2(parsed_ref.range);
+                        if(range1)
+                        {
+                            var range = range1.bbox;
+
+                            if(range.r1 === range.r2 || bVertical === true)
+                            {
+                                row_hidden = source_worksheet.getRowHidden(range.r1);
+                                for(j = range.c1;  j <= range.c2; ++j)
+                                {
+                                    if(!row_hidden && !source_worksheet.getColHidden(j))
+                                    {
+                                        cell = source_worksheet.getCell3(range.r1, j);
+                                        if(typeof cell.getValueWithFormat() === "string" && cell.getValueWithFormat().length > 0)
+                                        {
+                                            hidden = false;
+                                            pt = new CNumericPoint();
+                                            pt.setIdx(pt_index);
+                                            pt.setVal(parseFloat(cell.getValue()));
+                                            if(cell.getNumFormatStr() !== lit_format_code)
+                                            {
+                                                pt.setFormatCode(cell.getNumFormatStr())
+                                            }
+                                            num_cache.addPt(pt);
+                                           
+                                        }
+                                    }
+                                    pt_index++;
+                                }
+                            }
+                            else
+                            {
+                                col_hidden = source_worksheet.getColHidden(range.c1);
+                                for(j = range.r1; j <= range.r2; ++j)
+                                {
+                                    if(!col_hidden && !source_worksheet.getRowHidden(j))
+                                    {
+                                        cell = source_worksheet.getCell3(j, range.c1);
+                                        if(typeof cell.getValueWithFormat() === "string" && cell.getValueWithFormat().length > 0)
+                                        {
+                                            hidden = false;
+                                            pt = new CNumericPoint();
+                                            pt.setIdx(pt_index);
+                                            pt.setVal(parseFloat(cell.getValue()));
+                                            if(cell.getNumFormatStr() !== lit_format_code)
+                                            {
+                                                pt.setFormatCode(cell.getNumFormatStr())
+                                            }
+                                            num_cache.addPt(pt);
+                                            
+                                        }
+                                    }
+                                    pt_index++;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            num_cache.setPtCount(pt_index);
+            val.numRef.setNumCache(num_cache);
+            if(!(val instanceof CCat))
+            {
+                ser.isHidden = hidden;
+                ser.isHiddenForLegend = hidden;
+            }
+        }
+    },
+
     recalculateReferences: function()
     {
         var worksheet = this.worksheet;
@@ -2610,116 +2721,7 @@ CChartSpace.prototype =
             this.recalculateBBox();
             this.recalcInfo.recalculateBBox = false;
         }
-        var checkValByNumRef = function(oThis, ser, val, bVertical)
-        {
-            if(val && val.numRef && typeof val.numRef.f === "string"/*(!val.numRef.numCache || val.numRef.numCache.pts.length === 0)*/)
-            {
-                var first_slice = 0, last_slice = 0;
-                if(val.numRef.f[0] === "(")
-                {
-                    first_slice = 1;
-                }
-                if(val.numRef.f[val.numRef.f.length - 1] === ")")
-                {
-                    last_slice = -1;
-                }
-                else
-                {
-                    last_slice = val.numRef.f.length;
-                }
-                var f1 = val.numRef.f.slice(first_slice, last_slice);
-                var arr_f = f1.split(",");
-
-                var num_cache;
-                if(!val.numRef.numCache )
-                {
-                    num_cache = new CNumLit();
-                    num_cache.setFormatCode("General");
-                }
-                else
-                {
-                    num_cache = val.numRef.numCache;
-                    removePtsFromLit(num_cache);
-                }
-                var lit_format_code = typeof num_cache.formatCode === "string" && num_cache.formatCode.length > 0 ? num_cache.formatCode : "General";
-                var pt_index = 0, i, j, cell, pt, worksheet_id, hidden = true, row_hidden, col_hidden, nPtCount;
-                for(i = 0; i < arr_f.length; ++i)
-                {
-                    var parsed_ref = parserHelp.parse3DRef(arr_f[i]);
-                    if(parsed_ref)
-                    {
-                        var source_worksheet = oThis.worksheet.workbook.getWorksheetByName(parsed_ref.sheet);
-                        if(source_worksheet)
-                        {
-                            worksheet_id = source_worksheet.getId() + "";
-                            var range1 = source_worksheet.getRange2(parsed_ref.range);
-                            if(range1)
-                            {
-                                var range = range1.bbox;
-
-                                if(range.r1 === range.r2 || bVertical === true)
-                                {
-                                    row_hidden = source_worksheet.getRowHidden(range.r1);
-                                    for(j = range.c1;  j <= range.c2; ++j)
-                                    {
-                                        if(!row_hidden && !source_worksheet.getColHidden(j))
-                                        {
-                                            cell = source_worksheet.getCell3(range.r1, j);
-                                            if(typeof cell.getValueWithFormat() === "string" && cell.getValueWithFormat().length > 0)
-                                            {
-                                                hidden = false;
-                                                pt = new CNumericPoint();
-                                                pt.setIdx(pt_index);
-                                                pt.setVal(parseFloat(cell.getValue()));
-                                                if(cell.getNumFormatStr() !== lit_format_code)
-                                                {
-                                                    pt.setFormatCode(cell.getNumFormatStr())
-                                                }
-                                                num_cache.addPt(pt);
-                                                //addPointToMap(oThis.pointsMap, source_worksheet, range.r1, j, pt);
-                                            }
-                                        }
-                                        pt_index++;
-                                    }
-                                }
-                                else
-                                {
-                                    col_hidden = source_worksheet.getColHidden(range.c1);
-                                    for(j = range.r1; j <= range.r2; ++j)
-                                    {
-                                        if(!col_hidden && !source_worksheet.getRowHidden(j))
-                                        {
-                                            cell = source_worksheet.getCell3(j, range.c1);
-                                            if(typeof cell.getValueWithFormat() === "string" && cell.getValueWithFormat().length > 0)
-                                            {
-                                                hidden = false;
-                                                pt = new CNumericPoint();
-                                                pt.setIdx(pt_index);
-                                                pt.setVal(parseFloat(cell.getValue()));
-                                                if(cell.getNumFormatStr() !== lit_format_code)
-                                                {
-                                                    pt.setFormatCode(cell.getNumFormatStr())
-                                                }
-                                                num_cache.addPt(pt);
-                                                //addPointToMap(oThis.pointsMap, source_worksheet, j, range.c1, pt);
-                                            }
-                                        }
-                                        pt_index++;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                num_cache.setPtCount(pt_index);
-                val.numRef.setNumCache(num_cache);
-                if(!(val instanceof CCat))
-                {
-                    ser.isHidden = hidden;
-                    ser.isHiddenForLegend = hidden;
-                }
-            }
-        };
+       
 
         var checkCatByNumRef = function(oThis, ser, cat, bVertical)
         {
@@ -2824,9 +2826,9 @@ CChartSpace.prototype =
                 {
                     ser = series[j];
                     //val
-                    checkValByNumRef(this, ser, ser.val);
+                    this.checkValByNumRef(this.worksheet.workbook, ser, ser.val);
                     //cat
-                    checkValByNumRef(this, ser, ser.cat, bVert);
+                    this.checkValByNumRef(this.worksheet.workbook, ser, ser.cat, bVert);
                     checkCatByNumRef(this, ser, ser.cat, bVert);
                     //tx
                     checkCatByNumRef(this, ser, ser.tx, isRealBool(bVert) ? !bVert : undefined);
@@ -2847,8 +2849,8 @@ CChartSpace.prototype =
                 for(j = 0; j < series.length; ++j)
                 {
                     ser = series[j];
-                    checkValByNumRef(this, ser, ser.xVal, bVert);
-                    checkValByNumRef(this, ser, ser.yVal);
+                    this.checkValByNumRef(this.worksheet.workbook, ser, ser.xVal, bVert);
+                    this.checkValByNumRef(this.worksheet.workbook, ser, ser.yVal);
                     checkCatByNumRef(this, ser, ser.tx, isRealBool(bVert) ? !bVert : undefined);
 
                     if(ser.isHidden)
