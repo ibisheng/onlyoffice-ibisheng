@@ -630,6 +630,28 @@
         this.GetTextPr().SetColor(r, g, b, isAuto);
     };
     /**
+     * Specifies the alignment which shall be applied to the contents of this run in relation to the default
+     * appearance of the run's text.
+     * @see {@link ApiRun#GetTextPr} and {@link ApiTextPr#SetVertAlign}
+     * @param {("baseline" | "subscript" | "superscript")} sType
+     */
+    ApiRun.prototype.SetVertAlign = function(sType)
+    {
+        this.GetTextPr().SetVertAlign(sType);
+    };
+    /**
+     * Specify a highlighting color which is applied as a background behind the contents of this run.
+     * @see {@link ApiRun#GetTextPr} and {@link ApiTextPr#SetHighlight}
+     * @param {byte} r
+     * @param {byte} g
+     * @param {byte} b
+     * @param {boolean} [isNone=false] If this parameter is true, then parameters r,g,b will be ignored.
+     */
+    ApiRun.prototype.SetHighlight = function(r, g, b, isNone)
+    {
+        this.GetTextPr().SetHighlight(r, g, b, isNone);
+    };
+    /**
      * Set the text spacing.
      * @see {@link ApiRun#GetTextPr} and {@link ApiTextPr#SetSpacing}.
      * @param {twips} nSpacing
@@ -638,6 +660,69 @@
     {
         this.GetTextPr().SetSpacing(nSpacing);
     };
+    /**
+     * Specify that the contents of this run shall be displayed with two horizontal lines through each character
+     * displayed on the line.
+     * @see {@link ApiRun#GetTextPr} and {@link ApiTextPr#SetDoubleStrikeout}.
+     * @param {boolean} isDoubleStrikeout
+     */
+    ApiRun.prototype.SetDoubleStrikeout = function(isDoubleStrikeout)
+    {
+        this.GetTextPr().SetDoubleStrikeout(isDoubleStrikeout);
+    };
+    /**
+     * Specify that any lowercase characters in this text run shall be formatted for display only as their capital
+     * letter character equivalents.
+     * @see {@link ApiRun#GetTextPr} and {@link ApiTextPr#SetCaps}.
+     * @param {boolean} isCaps
+     */
+    ApiRun.prototype.SetCaps = function(isCaps)
+    {
+        this.GetTextPr().SetCaps(isCaps);
+    };
+    /**
+     * Specify that all small letter characters in this text run shall be formatted for display only as their capital
+     * letter character equivalents in a font size two points smaller than the actual font size specified for this text.
+     * @see {@link ApiRun#GetTextPr} and {@link ApiTextPr#SetSmallCaps}.
+     * @param {boolean} isSmallCaps
+     */
+    ApiRun.prototype.SetSmallCaps = function(isSmallCaps)
+    {
+        this.GetTextPr().SetSmallCaps(isSmallCaps);
+    };
+    /**
+     * Specify the amount by which text shall be raised or lowered for this run in relation to the default baseline of
+     * the surrounding non-positioned text.
+     * @see {@link ApiRun#GetTextPr} and {@link ApiTextPr#SetPosition}.
+     * @param {hps} nPosition - Specifies a positive or negative measurement in half-points (1/144 of an inch).
+     */
+    ApiRun.prototype.SetPosition = function(nPosition)
+    {
+        this.GetTextPr().SetPosition(nPosition);
+    };
+    /**
+     * Specifies the languages which shall be used to check spelling and grammar (if requested) when processing the
+     * contents of this run.
+     * @see {@link ApiRun#GetTextPr} and {@link ApiTextPr#SetLanguage}.
+     * @param {string} sLangId - The possible values for this parameter is a language identifier as defined by RFC 4646/BCP 47. Example: "en-CA".
+     */
+    ApiRun.prototype.SetLanguage = function(sLangId)
+    {
+        this.GetTextPr().SetLanguage(sLangId);
+    };
+    /**
+     * Specifies the shading applied to the contents of the run.
+     * @see {@link ApiRun#GetTextPr} and {@link ApiTextPr#SetShd}.
+     * @param {ShdType} sType
+     * @param {byte} r
+     * @param {byte} g
+     * @param {byte} b
+     */
+    ApiRun.prototype.SetShd = function(sType, r, g, b)
+    {
+        this.GetTextPr().SetShd(sType, r, g, b);
+    };
+
 
     //------------------------------------------------------------------------------------------------------------------
     //
@@ -1201,6 +1286,41 @@
         this.private_OnChange();
     };
     /**
+     * Specifies the alignment which shall be applied to the contents of this run in relation to the default
+     * appearance of the run's text.
+     * @param {("baseline" | "subscript" | "superscript")} sType
+     */
+    ApiTextPr.prototype.SetVertAlign = function(sType)
+    {
+        if ("baseline" === sType)
+            this.TextPr.VertAlign = vertalign_Baseline;
+        else if ("subscript" === sType)
+            this.TextPr.VertAlign = vertalign_SubScript;
+        else if ("superscript" === sType)
+            this.TextPr.VertAlign = vertalign_SuperScript;
+
+        this.private_OnChange();
+    };
+    /**
+     * Specify a highlighting color which is applied as a background behind the contents of this run.
+     * @param {byte} r
+     * @param {byte} g
+     * @param {byte} b
+     * @param {boolean} [isNone=false] If this parameter is true, then parameters r,g,b will be ignored.
+     */
+    ApiTextPr.prototype.SetHighlight = function(r, g, b, isNone)
+    {
+        if (undefined === isNone)
+            isNone = false;
+
+        if (true === isNone)
+            this.TextPr.HighLight = highlight_None;
+        else
+            this.TextPr.HighLight = new CDocumentColor(r, g, b, false);
+
+        this.private_OnChange();
+    };
+    /**
      * Set text spacing.
      * @param {twips} nSpacing
      */
@@ -1209,6 +1329,73 @@
         this.TextPr.Spacing = private_Twips2MM(nSpacing);
         this.private_OnChange();
     };
+    /**
+     * Specify that the contents of this run shall be displayed with two horizontal lines through each character
+     * displayed on the line.
+     * @param {boolean} isDoubleStrikeout
+     */
+    ApiTextPr.prototype.SetDoubleStrikeout = function(isDoubleStrikeout)
+    {
+        this.TextPr.DStrikeout = isDoubleStrikeout;
+        this.private_OnChange();
+    };
+    /**
+     * Specify that any lowercase characters in this text run shall be formatted for display only as their capital
+     * letter character equivalents.
+     * @param {boolean} isCaps
+     */
+    ApiTextPr.prototype.SetCaps = function(isCaps)
+    {
+        this.TextPr.Caps = isCaps;
+        this.private_OnChange();
+    };
+    /**
+     * Specify that all small letter characters in this text run shall be formatted for display only as their capital
+     * letter character equivalents in a font size two points smaller than the actual font size specified for this text.
+     * @param {boolean} isSmallCaps
+     */
+    ApiTextPr.prototype.SetSmallCaps = function(isSmallCaps)
+    {
+        this.TextPr.SmallCaps = isSmallCaps;
+        this.private_OnChange();
+    };
+    /**
+     * Specify the amount by which text shall be raised or lowered for this run in relation to the default baseline of
+     * the surrounding non-positioned text.
+     * @param {hps} nPosition - Specifies a positive or negative measurement in half-points (1/144 of an inch).
+     */
+    ApiTextPr.prototype.SetPosition = function(nPosition)
+    {
+        this.TextPr.Position =private_GetHps(nPosition);
+        this.private_OnChange();
+    };
+    /**
+     * Specifies the languages which shall be used to check spelling and grammar (if requested) when processing the
+     * contents of this run.
+     * @param {string} sLangId - The possible values for this parameter is a language identifier as defined by RFC 4646/BCP 47. Example: "en-CA".
+     */
+    ApiTextPr.prototype.SetLanguage = function(sLangId)
+    {
+        var nLcid = g_oLcidNameToIdMap[sLangId];
+        if (undefined !== nLcid)
+        {
+            this.TextPr.Lang.Val = nLcid;
+            this.private_OnChange();
+        }
+    };
+    /**
+     * Specifies the shading applied to the contents of the run.
+     * @param {ShdType} sType
+     * @param {byte} r
+     * @param {byte} g
+     * @param {byte} b
+     */
+    ApiTextPr.prototype.SetShd = function(sType, r, g, b)
+    {
+        this.TextPr.Shd = private_GetShd(sType, r, g, b, false);
+        this.private_OnChange();
+    };
+
 
     //------------------------------------------------------------------------------------------------------------------
     //
@@ -1404,7 +1591,15 @@
     ApiRun.prototype["SetFontFamily"]                = ApiRun.prototype.SetFontFamily;
     ApiRun.prototype["SetFontSize"]                  = ApiRun.prototype.SetFontSize;
     ApiRun.prototype["SetColor"]                     = ApiRun.prototype.SetColor;
+    ApiRun.prototype["SetVertAlign"]                 = ApiRun.prototype.SetVertAlign;
+    ApiRun.prototype["SetHighlight"]                 = ApiRun.prototype.SetHighlight;
     ApiRun.prototype["SetSpacing"]                   = ApiRun.prototype.SetSpacing;
+    ApiRun.prototype["SetDoubleStrikeout"]           = ApiRun.prototype.SetDoubleStrikeout;
+    ApiRun.prototype["SetCaps"]                      = ApiRun.prototype.SetCaps;
+    ApiRun.prototype["SetSmallCaps"]                 = ApiRun.prototype.SetSmallCaps;
+    ApiRun.prototype["SetPosition"]                  = ApiRun.prototype.SetPosition;
+    ApiRun.prototype["SetLanguage"]                  = ApiRun.prototype.SetLanguage;
+    ApiRun.prototype["SetShd"]                       = ApiRun.prototype.SetShd;
 
     ApiSection.prototype["SetType"]                  = ApiSection.prototype.SetType;
     ApiSection.prototype["SetEqualColumns"]          = ApiSection.prototype.SetEqualColumns;
@@ -1450,7 +1645,15 @@
     ApiTextPr.prototype["SetFontFamily"]             = ApiTextPr.prototype.SetFontFamily;
     ApiTextPr.prototype["SetFontSize"]               = ApiTextPr.prototype.SetFontSize;
     ApiTextPr.prototype["SetColor"]                  = ApiTextPr.prototype.SetColor;
+    ApiTextPr.prototype["SetVertAlign"]              = ApiTextPr.prototype.SetVertAlign;
+    ApiTextPr.prototype["SetHighlight"]              = ApiTextPr.prototype.SetHighlight;
     ApiTextPr.prototype["SetSpacing"]                = ApiTextPr.prototype.SetSpacing;
+    ApiTextPr.prototype["SetDoubleStrikeout"]        = ApiTextPr.prototype.SetDoubleStrikeout;
+    ApiTextPr.prototype["SetCaps"]                   = ApiTextPr.prototype.SetCaps;
+    ApiTextPr.prototype["SetSmallCaps"]              = ApiTextPr.prototype.SetSmallCaps;
+    ApiTextPr.prototype["SetPosition"]               = ApiTextPr.prototype.SetPosition;
+    ApiTextPr.prototype["SetLanguage"]               = ApiTextPr.prototype.SetLanguage;
+    ApiTextPr.prototype["SetShd"]                    = ApiTextPr.prototype.SetShd;
 
     ApiParaPr.prototype["SetSpacingLine"]            = ApiParaPr.prototype.SetSpacingLine;
     ApiParaPr.prototype["SetSpacingBefore"]          = ApiParaPr.prototype.SetSpacingBefore;
@@ -1462,7 +1665,7 @@
     ApiParaPr.prototype["SetKeepNext"]               = ApiParaPr.prototype.SetKeepNext;
     ApiParaPr.prototype["SetKeepLines"]              = ApiParaPr.prototype.SetKeepLines;
     ApiParaPr.prototype["SetPageBreakBefore"]        = ApiParaPr.prototype.SetPageBreakBefore;
-    ApiParaPr.prototype.SetWidowControl              = ApiParaPr.prototype.SetWidowControl;
+    ApiParaPr.prototype["SetWidowControl"]           = ApiParaPr.prototype.SetWidowControl;
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Private area
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -2059,22 +2262,19 @@ function TEST_BUILDER2()
     oParagraph.AddText("Calibri").SetFontFamily("Calibri");
     oParagraph.AddText("FontSize40").SetFontSize(40);
     oParagraph.AddText("ColorGreen").SetColor(0, 255, 0);
-
-
-    //this.VertAlign  = undefined;
-    //this.HighLight  = undefined; // highlight_None/Color
-    //this.RStyle     = undefined;
-    //this.Spacing    = undefined; // Дополнительное расстояние между символвами
-    //this.DStrikeout = undefined; // Двойное зачеркивание
-    //this.Caps       = undefined;
-    //this.SmallCaps  = undefined;
-    //this.Position   = undefined; // Смещение по Y
-    //
-    //this.RFonts     = new CRFonts();
-
-    //this.Lang       = new CLang();
-    //
-    //this.Shd        = undefined;
+    oParagraph.AddText("Superscript").SetVertAlign("superscript");
+    oParagraph.AddText("Subscript").SetVertAlign("subscript");
+    oParagraph.AddText("HighlightBlue").SetHighlight(0, 0, 255);
+    oParagraph.AddText("Spacing 1pt").SetSpacing(20);
+    oParagraph.AddText("Spacing -1pt").SetSpacing(-20);
+    oParagraph.AddText("DoubleStrikeout").SetDoubleStrikeout(true);
+    oParagraph.AddText("Capitals").SetCaps(true);
+    oParagraph.AddText("SmallCapitals").SetSmallCaps(true);
+    oParagraph.AddText("Position +10pt").SetPosition(20);
+    oParagraph.AddText("Position -10pt").SetPosition(-20);
+    oParagraph.AddText("Language English(Canada)").SetLanguage("en-CA");
+    oParagraph.AddText("Language Russia").SetLanguage("ru-RU");
+    oParagraph.AddText("ShadeRed").SetShd("clear", 255, 0, 0);
 
     //------------------------------------------------------------------------------------------------------------------
     oLD.Recalculate_FromStart();
