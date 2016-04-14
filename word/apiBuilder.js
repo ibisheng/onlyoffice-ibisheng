@@ -105,6 +105,15 @@
     }
 
     /**
+     * Class representing a numbering properties.
+     * @constructor
+     */
+    function ApiNumPr(Num)
+    {
+        this.Num = Num;
+    }
+
+    /**
      * Twentieths of a point (equivalent to 1/1440th of an inch).
      * @typedef {number} twips
      */
@@ -142,6 +151,10 @@
      * @typedef {("nil" | "clear")} ShdType
      */
 
+    /**
+     * Types of custom tab
+     * @typedef {("clear" | "left" | "right" | "center")} TabJc
+     */
 
     //------------------------------------------------------------------------------------------------------------------
     //
@@ -433,119 +446,235 @@
         return new ApiParaPr(this, this.Paragraph.Pr.Copy());
     };
     /**
+     * Specifies that any space specified before or after this paragraph, specified using the spacing element
+     * {@link ApiParaPr#SetSpacingBefore}{@link ApiParaPr#SetSpacingAfter}, should not be applied when the preceding and
+     * following paragraphs are of the same paragraph style, affecting the top and bottom spacing respectively.
+     * @see {@link ApiParagraph#GetParaPr} and {@link ApiParaPr#SetContextualSpacing}
+     * @param {boolean} isContextualSpacing
+     */
+    ApiParagraph.prototype.SetContextualSpacing = function(isContextualSpacing)
+    {
+        this.GetParaPr().SetContextualSpacing(isContextualSpacing);
+    };
+    /**
+     * Set left indentation.
+     * @see {@link ApiParagraph#GetParaPr} and {@link ApiParaPr#SetIndLeft}
+     * @param {twips} nValue
+     */
+    ApiParagraph.prototype.SetIndLeft = function(nValue)
+    {
+        this.GetParaPr().SetIndLeft(nValue);
+    };
+    /**
+     * Set right indentation.
+     * @see {@link ApiParagraph#GetParaPr} and {@link ApiParaPr#SetIndRight}
+     * @param {twips} nValue
+     */
+    ApiParagraph.prototype.SetIndRight = function(nValue)
+    {
+        this.GetParaPr().SetIndRight(nValue);
+    };
+    /**
+     * Set first line indentation.
+     * @see {@link ApiParagraph#GetParaPr} and {@link ApiParaPr#SetIndFirstLine}
+     * @param {twips} nValue
+     */
+    ApiParagraph.prototype.SetIndFirstLine = function(nValue)
+    {
+        this.GetParaPr().SetIndFirstLine(nValue);
+    };
+    /**
+     * Set paragraph justification
+     * @see {@link ApiParagraph#GetParaPr} and {@link ApiParaPr#SetJc}
+     * @param {("left" | "right" | "both" | "center")} sJc
+     */
+    ApiParagraph.prototype.SetJc = function(sJc)
+    {
+        this.GetParaPr().SetJc(sJc);
+    };
+    /**
+     * This element specifies that when rendering this document in a page view, all lines of this paragraph are
+     * maintained on a single page whenever possible.
+     * @see {@link ApiParagraph#GetParaPr} and {@link ApiParaPr#SetKeepLines}
+     * @param {boolean} isKeepLines
+     */
+    ApiParagraph.prototype.SetKeepLines = function(isKeepLines)
+    {
+        this.GetParaPr().SetKeepLines(isKeepLines);
+    };
+    /**
+     * This element specifies that when rendering this document in a paginated view, the contents of this paragraph
+     * are at least partly rendered on the same page as the following paragraph whenever possible.
+     * @see {@link ApiParagraph#GetParaPr} and {@link ApiParaPr#SetKeepNext}
+     * @param {boolean} isKeepNext
+     */
+    ApiParagraph.prototype.SetKeepNext = function(isKeepNext)
+    {
+        this.GetParaPr().SetKeepNext(isKeepNext);
+    };
+    /**
+     * This element specifies that when rendering this document in a paginated view, the contents of this paragraph
+     * are rendered on the start of a new page in the document.
+     * @see {@link ApiParagraph#GetParaPr} and {@link ApiParaPr#SetPageBreakBefore}
+     * @param {boolean} isPageBreakBefore
+     */
+    ApiParagraph.prototype.SetPageBreakBefore = function(isPageBreakBefore)
+    {
+        this.GetParaPr().SetPageBreakBefore(isPageBreakBefore);
+    };
+    /**
      * Set paragraph line spacing. If the value of the <code>sLineRule</code> parameter is either <code>"atLeast"</code>
      * or <code>"exact"</code>, then the value of <code>nLine</code> shall be interpreted as twentieths of a point. If
      * the value of the <code>sLineRule</code> parameter is <code>"auto"</code>, then the value of the <code>nLine</code>
      * attribute shall be interpreted as 240ths of a line.
-	 * @see {@link ApiParagraph#GetParaPr} and {@link ApiParaPr#SetSpacingLine}.
+     * @see {@link ApiParagraph#GetParaPr} and {@link ApiParaPr#SetSpacingLine}
      * @param {(twips | line240)} nLine
      * @param {("auto" | "atLeast" | "exact")} sLineRule
      */
     ApiParagraph.prototype.SetSpacingLine = function(nLine, sLineRule)
     {
-        this.Paragraph.Set_Spacing(private_GetParaSpacing(nLine, sLineRule, undefined, undefined, undefined, undefined), false);
+        this.GetParaPr().SetSpacingLine(nLine, sLineRule);
     };
     /**
-     * Set paragraph spacing before. If the value of the <code>isBeforeAuto</code> parameter is <code>true</code>, then 
-     * any value of the <code>nBefore</code> is ignored. If <code>isBeforeAuto</code> parameter is not specified, then it 
+     * Set paragraph spacing before. If the value of the <code>isBeforeAuto</code> parameter is <code>true</code>, then
+     * any value of the <code>nBefore</code> is ignored. If <code>isBeforeAuto</code> parameter is not specified, then it
      * will be interpreted as <code>false</code>.
-	 * @see {@link ApiParagraph#GetParaPr} and {@link ApiParaPr#SetSpacingBefore}.
+     * @see {@link ApiParagraph#GetParaPr} and {@link ApiParaPr#SetSpacingBefore}
      * @param {twips} nBefore
      * @param {boolean} [isBeforeAuto=false]
      */
     ApiParagraph.prototype.SetSpacingBefore = function(nBefore, isBeforeAuto)
     {
-        this.Paragraph.Set_Spacing(private_GetParaSpacing(undefined, undefined, nBefore, undefined, isBeforeAuto === undefined ? false : isBeforeAuto, undefined), false);
+        this.GetParaPr().SetSpacingBefore(nBefore, isBeforeAuto);
     };
     /**
      * Set paragraph spacing after. If the value of the <code>isAfterAuto</code> parameter is <code>true</code>, then
      * any value of the <code>nAfter</code> is ignored. If <code>isAfterAuto</code> parameter is not specified, then it
      * will be interpreted as <code>false</code>.
-	 * @see {@link ApiParagraph#GetParaPr} and {@link ApiParaPr#SetSpacingAfter}.
+     * @see {@link ApiParagraph#GetParaPr} and {@link ApiParaPr#SetSpacingAfter}
      * @param {twips} nAfter
      * @param {boolean} [isAfterAuto=false]
      */
     ApiParagraph.prototype.SetSpacingAfter = function(nAfter, isAfterAuto)
     {
-        this.Paragraph.Set_Spacing(private_GetParaSpacing(undefined, undefined, undefined, nAfter, undefined, isAfterAuto === undefined ? false : isAfterAuto), false);
+        this.GetParaPr().SetSpacingAfter(nAfter, isAfterAuto);
     };
     /**
-     * Set paragraph justification
-	 * @see {@link ApiParagraph#GetParaPr} and {@link ApiParaPr#SetJc}.
-     * @param {("left" | "right" | "both" | "center")} sJc
+     * Specifies the shading applied to the contents of the paragraph.
+     * @see {@link ApiParagraph#GetParaPr} and {@link ApiParaPr#SetShd}
+     * @param {ShdType} sType
+     * @param {byte} r
+     * @param {byte} g
+     * @param {byte} b
+     * @param {boolean} [isAuto=false]
      */
-    ApiParagraph.prototype.SetJc = function(sJc)
+    ApiParagraph.prototype.SetShd = function(sType, r, g, b, isAuto)
     {
-        var nAlign = private_GetParaAlign(sJc);
-        if (undefined !== nAlign)
-            this.Paragraph.Set_Align(nAlign);
+        this.GetParaPr().SetShd(sType, r, g, b, isAuto);
     };
     /**
-     * Set left indentation.
-	 * @see {@link ApiParagraph#GetParaPr} and {@link ApiParaPr#SetIndLeft}.
-     * @param {twips} nValue
+     * Specifies the border which shall be displayed below a set of paragraphs which have the same paragraph border settings.
+     * @see {@link ApiParagraph#GetParaPr} and {@link ApiParaPr#SetBottomBorder}
+     * @param {BorderType} sType - The style of border.
+     * @param {twips} nSize - The width of the current border.
+     * @param {twips} nSpace - The spacing offset that shall be used to place this border.
+     * @param {byte} r
+     * @param {byte} g
+     * @param {byte} b
      */
-    ApiParagraph.prototype.SetIndLeft = function(nValue)
+    ApiParagraph.prototype.SetBottomBorder = function(sType, nSize, nSpace, r, g, b)
     {
-        this.Paragraph.Set_Ind(private_GetParaInd(nValue, undefined, undefined));
+        this.GetParaPr().SetBottomBorder(sType, nSize, nSpace, r, g, b);
     };
     /**
-     * Set right indentation
-	 * @see {@link ApiParagraph#GetParaPr} and {@link ApiParaPr#SetIndRight}.
-     * @param {twips} nValue
+     * Specifies the border which shall be displayed on the left side of the page around the specified paragraph.
+     * @see {@link ApiParagraph#GetParaPr} and {@link ApiParaPr#SetLeftBorder}
+     * @param {BorderType} sType - The style of border.
+     * @param {twips} nSize - The width of the current border.
+     * @param {twips} nSpace - The spacing offset that shall be used to place this border.
+     * @param {byte} r
+     * @param {byte} g
+     * @param {byte} b
      */
-    ApiParagraph.prototype.SetIndRight = function(nValue)
+    ApiParagraph.prototype.SetLeftBorder = function(sType, nSize, nSpace, r, g, b)
     {
-        this.Paragraph.Set_Ind(private_GetParaInd(undefined, nValue, undefined));
+        this.GetParaPr().SetLeftBorder(sType, nSize, nSpace, r, g, b);
     };
     /**
-     * Set first line indentation
-	 * @see {@link ApiParagraph#GetParaPr} and {@link ApiParaPr#SetIndFirstLine}.
-     * @param {twips} nValue
+     * Specifies the border which shall be displayed on the right side of the page around the specified paragraph.
+     * @see {@link ApiParagraph#GetParaPr} and {@link ApiParaPr#SetRightBorder}
+     * @param {BorderType} sType - The style of border.
+     * @param {twips} nSize - The width of the current border.
+     * @param {twips} nSpace - The spacing offset that shall be used to place this border.
+     * @param {byte} r
+     * @param {byte} g
+     * @param {byte} b
      */
-    ApiParagraph.prototype.SetIndFirstLine = function(nValue)
+    ApiParagraph.prototype.SetRightBorder = function(sType, nSize, nSpace, r, g, b)
     {
-        this.Paragraph.Set_Ind(private_GetParaInd(undefined, undefined, nValue));
+        this.GetParaPr().SetRightBorder(sType, nSize, nSpace, r, g, b);
     };
     /**
-     * This element specifies that when rendering this document in a paginated view, the contents of this paragraph
-     * are at least partly rendered on the same page as the following paragraph whenever possible.
-	 * @see {@link ApiParagraph#GetParaPr} and {@link ApiParaPr#SetKeepNext}.
-     * @param {boolean} isKeepNext
+     * Specifies the border which shall be displayed above a set of paragraphs which have the same set of paragraph
+     * border settings.
+     * @see {@link ApiParagraph#GetParaPr} and {@link ApiParaPr#SetTopBorder}
+     * @param {BorderType} sType - The style of border.
+     * @param {twips} nSize - The width of the current border.
+     * @param {twips} nSpace - The spacing offset that shall be used to place this border.
+     * @param {byte} r
+     * @param {byte} g
+     * @param {byte} b
      */
-    ApiParagraph.prototype.SetKeepNext = function(isKeepNext)
+    ApiParagraph.prototype.SetTopBorder = function(sType, nSize, nSpace, r, g, b)
     {
-        this.Paragraph.Set_KeepNext(isKeepNext);
+        this.GetParaPr().SetTopBorder(sType, nSize, nSpace, r, g, b);
     };
     /**
-     * This element specifies that when rendering this document in a page view, all lines of this paragraph are
-     * maintained on a single page whenever possible.
-	 * @see {@link ApiParagraph#GetParaPr} and {@link ApiParaPr#SetKeepLines}.
-     * @param {boolean} isKeepLines
+     * Specifies the border which shall be displayed between each paragraph in a set of paragraphs which have the same
+     * set of paragraph border settings.
+     * @see {@link ApiParagraph#GetParaPr} and {@link ApiParaPr#SetBetweenBorder}
+     * @param {BorderType} sType - The style of border.
+     * @param {twips} nSize - The width of the current border.
+     * @param {twips} nSpace - The spacing offset that shall be used to place this border.
+     * @param {byte} r
+     * @param {byte} g
+     * @param {byte} b
      */
-    ApiParagraph.prototype.SetKeepLines = function(isKeepLines)
+    ApiParagraph.prototype.SetBetweenBorder = function(sType, nSize, nSpace, r, g, b)
     {
-        this.Paragraph.Set_KeepLines(isKeepLines);
-    };
-    /**
-     * This element specifies that when rendering this document in a paginated view, the contents of this paragraph
-     * are rendered on the start of a new page in the document.
-	 * @see {@link ApiParagraph#GetParaPr} and {@link ApiParaPr#SetPageBreakBefore}.
-     * @param {boolean} isPageBreakBefore
-     */
-    ApiParagraph.prototype.SetPageBreakBefore = function(isPageBreakBefore)
-    {
-        this.Paragraph.Set_PageBreakBefore(isPageBreakBefore);
+        this.GetParaPr().SetBetweenBorder(sType, nSize, nSpace, r, g, b);
     };
     /**
      * This element specifies whether a consumer shall prevent a single line of this paragraph from being displayed on
      * a separate page from the remaining content at display time by moving the line onto the following page.
-	 * @see {@link ApiParagraph#GetParaPr} and {@link ApiParaPr#SetWidowControl}.
+     * @see {@link ApiParagraph#GetParaPr} and {@link ApiParaPr#SetWidowControl}
      * @param {boolean} isWidowControl
      */
     ApiParagraph.prototype.SetWidowControl = function(isWidowControl)
     {
-        this.Paragraph.Set_WidowControl(isWidowControl);
+        this.GetParaPr().SetWidowControl(isWidowControl);
+    };
+    /**
+     * Specifies a sequence of custom tab stops which shall be used for any tab characters in the current paragraph.
+     * <b>Warning</b>: The lengths of aPos array and aVal array <b>MUST BE</b> equal.
+     * @see {@link ApiParagraph#GetParaPr} and {@link ApiParaPr#SetTabs}
+     * @param {twips[]} aPos - An array of the positions of custom tab stops with respect to the current page margins.
+     * @param {TabJc[]} aVal - An array of the styles of custom tab stops, which determines the behavior of the tab stop and
+     * the alignment which shall be applied to text entered at the current custom tab stop.
+     */
+    ApiParagraph.prototype.SetTabs = function(aPos, aVal)
+    {
+        this.GetParaPr().SetTabs(aPos, aVal);
+    };
+    /**
+     * Specifies that the current paragraph references a numbering definition instance in the current document.
+     * @see {@link ApiParagraph#GetParaPr} and {@link SetNumPr#SetTabs}
+     * @param {ApiNumPr} oNumPr - Specifies a numbering definition.
+     * @param {number} nLvl - Specifies a numbering level reference.
+     */
+    ApiParagraph.prototype.SetNumPr = function(oNumPr, nLvl)
+    {
+        this.GetParaPr().SetTabs(oNumPr, nLvl);
     };
     
     //------------------------------------------------------------------------------------------------------------------
@@ -1366,7 +1495,7 @@
      */
     ApiTextPr.prototype.SetPosition = function(nPosition)
     {
-        this.TextPr.Position =private_GetHps(nPosition);
+        this.TextPr.Position = private_GetHps(nPosition);
         this.private_OnChange();
     };
     /**
@@ -1403,6 +1532,84 @@
     //
     //------------------------------------------------------------------------------------------------------------------
 
+
+    /**
+     * Specifies that any space specified before or after this paragraph, specified using the spacing element
+     * {@link ApiParaPr#SetSpacingBefore}{@link ApiParaPr#SetSpacingAfter}, should not be applied when the preceding and
+     * following paragraphs are of the same paragraph style, affecting the top and bottom spacing respectively.
+     * @param {boolean} isContextualSpacing
+     */
+    ApiParaPr.prototype.SetContextualSpacing = function(isContextualSpacing)
+    {
+        this.ParaPr.ContextualSpacing = private_GetBoolean(isContextualSpacing);
+        this.private_OnChange();
+    };
+    /**
+     * Set left indentation.
+     * @param {twips} nValue
+     */
+    ApiParaPr.prototype.SetIndLeft = function(nValue)
+    {
+        this.ParaPr.Ind.Left = private_Twips2MM(nValue);
+        this.private_OnChange();
+    };
+    /**
+     * Set right indentation.
+     * @param {twips} nValue
+     */
+    ApiParaPr.prototype.SetIndRight = function(nValue)
+    {
+        this.ParaPr.Ind.Right = private_Twips2MM(nValue);
+        this.private_OnChange();
+    };
+    /**
+     * Set first line indentation.
+     * @param {twips} nValue
+     */
+    ApiParaPr.prototype.SetIndFirstLine = function(nValue)
+    {
+        this.ParaPr.Ind.FirstLine = private_Twips2MM(nValue);
+        this.private_OnChange();
+    };
+    /**
+     * Set paragraph justification
+     * @param {("left" | "right" | "both" | "center")} sJc
+     */
+    ApiParaPr.prototype.SetJc = function(sJc)
+    {
+        this.ParaPr.Jc = private_GetParaAlign(sJc);
+        this.private_OnChange();
+    };
+    /**
+     * This element specifies that when rendering this document in a page view, all lines of this paragraph are
+     * maintained on a single page whenever possible.
+     * @param {boolean} isKeepLines
+     */
+    ApiParaPr.prototype.SetKeepLines = function(isKeepLines)
+    {
+        this.ParaPr.KeepLines = isKeepLines;
+        this.private_OnChange();
+    };
+    /**
+     * This element specifies that when rendering this document in a paginated view, the contents of this paragraph
+     * are at least partly rendered on the same page as the following paragraph whenever possible.
+     * @param {boolean} isKeepNext
+     */
+    ApiParaPr.prototype.SetKeepNext = function(isKeepNext)
+    {
+        this.ParaPr.KeepNext = isKeepNext;
+        this.private_OnChange();
+    };
+    /**
+     * This element specifies that when rendering this document in a paginated view, the contents of this paragraph
+     * are rendered on the start of a new page in the document.
+     * @param {boolean} isPageBreakBefore
+     */
+    ApiParaPr.prototype.SetPageBreakBefore = function(isPageBreakBefore)
+    {
+        this.ParaPr.PageBreakBefore = isPageBreakBefore;
+        this.private_OnChange();
+    };
     /**
      * Set paragraph line spacing. If the value of the <code>sLineRule</code> parameter is either <code>"atLeast"</code>
      * or <code>"exact"</code>, then the value of <code>nLine</code> shall be interpreted as twentieths of a point. If
@@ -1470,69 +1677,88 @@
         this.private_OnChange();
     };
     /**
-     * Set paragraph justification
-     * @param {("left" | "right" | "both" | "center")} sJc
+     * Specifies the shading applied to the contents of the paragraph.
+     * @param {ShdType} sType
+     * @param {byte} r
+     * @param {byte} g
+     * @param {byte} b
+     * @param {boolean} [isAuto=false]
      */
-    ApiParaPr.prototype.SetJc = function(sJc)
+    ApiParaPr.prototype.SetShd = function(sType, r, g, b, isAuto)
     {
-        this.ParaPr.Jc = private_GetParaAlign(sJc);
+        this.ParaPr.Shd = private_GetShd(sType, r, b, b, isAuto);
         this.private_OnChange();
     };
     /**
-     * Set left indentation.
-     * @param {twips} nValue
+     * Specifies the border which shall be displayed below a set of paragraphs which have the same paragraph border settings.
+     * @param {BorderType} sType - The style of border.
+     * @param {twips} nSize - The width of the current border.
+     * @param {twips} nSpace - The spacing offset that shall be used to place this border.
+     * @param {byte} r
+     * @param {byte} g
+     * @param {byte} b
      */
-    ApiParaPr.prototype.SetIndLeft = function(nValue)
+    ApiParaPr.prototype.SetBottomBorder = function(sType, nSize, nSpace, r, g, b)
     {
-        this.ParaPr.Ind.Left = private_Twips2MM(nValue);
+        this.ParaPr.Brd.Bottom = private_GetTableBorder(sType, nSize, nSpace, r, g, b);
         this.private_OnChange();
     };
     /**
-     * Set right indentation.
-     * @param {twips} nValue
+     * Specifies the border which shall be displayed on the left side of the page around the specified paragraph.
+     * @param {BorderType} sType - The style of border.
+     * @param {twips} nSize - The width of the current border.
+     * @param {twips} nSpace - The spacing offset that shall be used to place this border.
+     * @param {byte} r
+     * @param {byte} g
+     * @param {byte} b
      */
-    ApiParaPr.prototype.SetIndRight = function(nValue)
+    ApiParaPr.prototype.SetLeftBorder = function(sType, nSize, nSpace, r, g, b)
     {
-        this.ParaPr.Ind.Right = private_Twips2MM(nValue);
+        this.ParaPr.Brd.Left = private_GetTableBorder(sType, nSize, nSpace, r, g, b);
         this.private_OnChange();
     };
     /**
-     * Set first line indentation.
-     * @param {twips} nValue
+     * Specifies the border which shall be displayed on the right side of the page around the specified paragraph.
+     * @param {BorderType} sType - The style of border.
+     * @param {twips} nSize - The width of the current border.
+     * @param {twips} nSpace - The spacing offset that shall be used to place this border.
+     * @param {byte} r
+     * @param {byte} g
+     * @param {byte} b
      */
-    ApiParaPr.prototype.SetIndFirstLine = function(nValue)
+    ApiParaPr.prototype.SetRightBorder = function(sType, nSize, nSpace, r, g, b)
     {
-        this.ParaPr.Ind.FirstLine = private_Twips2MM(nValue);
+        this.ParaPr.Brd.Right = private_GetTableBorder(sType, nSize, nSpace, r, g, b);
         this.private_OnChange();
     };
     /**
-     * This element specifies that when rendering this document in a paginated view, the contents of this paragraph
-     * are at least partly rendered on the same page as the following paragraph whenever possible.
-     * @param {boolean} isKeepNext
+     * Specifies the border which shall be displayed above a set of paragraphs which have the same set of paragraph
+     * border settings.
+     * @param {BorderType} sType - The style of border.
+     * @param {twips} nSize - The width of the current border.
+     * @param {twips} nSpace - The spacing offset that shall be used to place this border.
+     * @param {byte} r
+     * @param {byte} g
+     * @param {byte} b
      */
-    ApiParaPr.prototype.SetKeepNext = function(isKeepNext)
+    ApiParaPr.prototype.SetTopBorder = function(sType, nSize, nSpace, r, g, b)
     {
-        this.ParaPr.KeepNext = isKeepNext;
+        this.ParaPr.Brd.Top = private_GetTableBorder(sType, nSize, nSpace, r, g, b);
         this.private_OnChange();
     };
     /**
-     * This element specifies that when rendering this document in a page view, all lines of this paragraph are
-     * maintained on a single page whenever possible.
-     * @param {boolean} isKeepLines
+     * Specifies the border which shall be displayed between each paragraph in a set of paragraphs which have the same
+     * set of paragraph border settings.
+     * @param {BorderType} sType - The style of border.
+     * @param {twips} nSize - The width of the current border.
+     * @param {twips} nSpace - The spacing offset that shall be used to place this border.
+     * @param {byte} r
+     * @param {byte} g
+     * @param {byte} b
      */
-    ApiParaPr.prototype.SetKeepLines = function(isKeepLines)
+    ApiParaPr.prototype.SetBetweenBorder = function(sType, nSize, nSpace, r, g, b)
     {
-        this.ParaPr.KeepLines = isKeepLines;
-        this.private_OnChange();
-    };
-    /**
-     * This element specifies that when rendering this document in a paginated view, the contents of this paragraph
-     * are rendered on the start of a new page in the document.
-     * @param {boolean} isPageBreakBefore
-     */
-    ApiParaPr.prototype.SetPageBreakBefore = function(isPageBreakBefore)
-    {
-        this.ParaPr.PageBreakBefore = isPageBreakBefore;
+        this.ParaPr.Brd.Between = private_GetTableBorder(sType, nSize, nSpace, r, g, b);
         this.private_OnChange();
     };
     /**
@@ -1545,6 +1771,55 @@
         this.ParaPr.WidowControl = isWidowControl;
         this.private_OnChange();
     };
+    /**
+     * Specifies a sequence of custom tab stops which shall be used for any tab characters in the current paragraph.
+     * <b>Warning</b>: The lengths of aPos array and aVal array <b>MUST BE</b> equal.
+     * @param {twips[]} aPos - An array of the positions of custom tab stops with respect to the current page margins.
+     * @param {TabJc[]} aVal - An array of the styles of custom tab stops, which determines the behavior of the tab stop and
+     * the alignment which shall be applied to text entered at the current custom tab stop.
+     */
+    ApiParaPr.prototype.SetTabs = function(aPos, aVal)
+    {
+        if (!(aPos instanceof Array) || !(aVal instanceof Array) || aPos.length !== aVal.length)
+            return;
+
+        var oTabs = new CParaTabs();
+        for (var nIndex = 0, nCount = aPos.length; nIndex < nPos; ++nIndex)
+        {
+            oTabs.push(private_GetTabStop(aPos[nIndex], aVal[nIndex]));
+        }
+        this.ParaPr.Tabs = oTabs;
+        this.private_OnChange();
+    };
+    /**
+     * Specifies that the current paragraph references a numbering definition instance in the current document.
+     * @param {ApiNumPr} oNumPr - Specifies a numbering definition.
+     * @param {number} [nLvl=0] - Specifies a numbering level reference. If the current instance of the class ApiParaPr is
+     * direct formatting of a paragraph, then this parameter <b>MUST BE</b> specified. Otherwise if the current instance
+     * of the class ApiParaPr is the part of ApiStyle properties, then this parameter will be ignored.
+     */
+    ApiParaPr.prototype.SetNumPr = function(oNumPr, nLvl)
+    {
+        if (!(oNumPr instanceof ApiNumPr))
+            return;
+
+        this.ParaPr.NumPr = new CNumPr();
+        this.ParaPr.NumPr.NumId = oNumPr.Num.Get_Id();
+        this.ParaPr.NumPr.Lvl   = undefined;
+
+        if (this.Parent instanceof ApiParagraph)
+        {
+            this.ParaPr.NumPr.Lvl = Math.min(8, Math.max(0, (nLvl ? nLvl : 0)));
+        }
+        this.private_OnChange();
+    };
+
+    //------------------------------------------------------------------------------------------------------------------
+    //
+    // ApiNumPr
+    //
+    //------------------------------------------------------------------------------------------------------------------
+
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Export
@@ -1571,17 +1846,27 @@
     ApiParagraph.prototype["GetParagraphMarkTextPr"] = ApiParagraph.prototype.GetParagraphMarkTextPr;
     ApiParagraph.prototype["SetStyle"]               = ApiParagraph.prototype.SetStyle;
     ApiParagraph.prototype["GetParaPr"]              = ApiParagraph.prototype.GetParaPr;
-    ApiParagraph.prototype["SetSpacingLine"]         = ApiParagraph.prototype.SetSpacingLine;
-    ApiParagraph.prototype["SetSpacingBefore"]       = ApiParagraph.prototype.SetSpacingBefore;
-    ApiParagraph.prototype["SetSpacingAfter"]        = ApiParagraph.prototype.SetSpacingAfter;
-    ApiParagraph.prototype["SetJc"]                  = ApiParagraph.prototype.SetJc;
+    ApiParagraph.prototype["SetContextualSpacing"]   = ApiParagraph.prototype.SetContextualSpacing;
     ApiParagraph.prototype["SetIndLeft"]             = ApiParagraph.prototype.SetIndLeft;
     ApiParagraph.prototype["SetIndRight"]            = ApiParagraph.prototype.SetIndRight;
     ApiParagraph.prototype["SetIndFirstLine"]        = ApiParagraph.prototype.SetIndFirstLine;
-    ApiParagraph.prototype["SetKeepNext"]            = ApiParagraph.prototype.SetKeepNext;
+    ApiParagraph.prototype["SetJc"]                  = ApiParagraph.prototype.SetJc;
     ApiParagraph.prototype["SetKeepLines"]           = ApiParagraph.prototype.SetKeepLines;
+    ApiParagraph.prototype["SetKeepNext"]            = ApiParagraph.prototype.SetKeepNext;
     ApiParagraph.prototype["SetPageBreakBefore"]     = ApiParagraph.prototype.SetPageBreakBefore;
+    ApiParagraph.prototype["SetSpacingLine"]         = ApiParagraph.prototype.SetSpacingLine;
+    ApiParagraph.prototype["SetSpacingBefore"]       = ApiParagraph.prototype.SetSpacingBefore;
+    ApiParagraph.prototype["SetSpacingAfter"]        = ApiParagraph.prototype.SetSpacingAfter;
+    ApiParagraph.prototype["SetShd"]                 = ApiParagraph.prototype.SetShd;
+    ApiParagraph.prototype["SetBottomBorder"]        = ApiParagraph.prototype.SetBottomBorder;
+    ApiParagraph.prototype["SetLeftBorder"]          = ApiParagraph.prototype.SetLeftBorder;
+    ApiParagraph.prototype["SetRightBorder"]         = ApiParagraph.prototype.SetRightBorder;
+    ApiParagraph.prototype["SetTopBorder"]           = ApiParagraph.prototype.SetTopBorder;
+    ApiParagraph.prototype["SetBetweenBorder"]       = ApiParagraph.prototype.SetBetweenBorder;
     ApiParagraph.prototype["SetWidowControl"]        = ApiParagraph.prototype.SetWidowControl;
+    ApiParagraph.prototype["SetTabs"]                = ApiParagraph.prototype.SetTabs;
+    ApiParagraph.prototype["SetNumPr"]               = ApiParagraph.prototype.SetNumPr;
+
 
     ApiRun.prototype["GetTextPr"]                    = ApiRun.prototype.GetTextPr;
     ApiRun.prototype["SetBold"]                      = ApiRun.prototype.SetBold;
@@ -1655,17 +1940,27 @@
     ApiTextPr.prototype["SetLanguage"]               = ApiTextPr.prototype.SetLanguage;
     ApiTextPr.prototype["SetShd"]                    = ApiTextPr.prototype.SetShd;
 
-    ApiParaPr.prototype["SetSpacingLine"]            = ApiParaPr.prototype.SetSpacingLine;
-    ApiParaPr.prototype["SetSpacingBefore"]          = ApiParaPr.prototype.SetSpacingBefore;
-    ApiParaPr.prototype["SetSpacingAfter"]           = ApiParaPr.prototype.SetSpacingAfter;
-    ApiParaPr.prototype["SetJc"]                     = ApiParaPr.prototype.SetJc;
+    ApiParaPr.prototype["SetContextualSpacing"]      = ApiParaPr.prototype.SetContextualSpacing;
     ApiParaPr.prototype["SetIndLeft"]                = ApiParaPr.prototype.SetIndLeft;
     ApiParaPr.prototype["SetIndRight"]               = ApiParaPr.prototype.SetIndRight;
     ApiParaPr.prototype["SetIndFirstLine"]           = ApiParaPr.prototype.SetIndFirstLine;
-    ApiParaPr.prototype["SetKeepNext"]               = ApiParaPr.prototype.SetKeepNext;
+    ApiParaPr.prototype["SetJc"]                     = ApiParaPr.prototype.SetJc;
     ApiParaPr.prototype["SetKeepLines"]              = ApiParaPr.prototype.SetKeepLines;
+    ApiParaPr.prototype["SetKeepNext"]               = ApiParaPr.prototype.SetKeepNext;
     ApiParaPr.prototype["SetPageBreakBefore"]        = ApiParaPr.prototype.SetPageBreakBefore;
+    ApiParaPr.prototype["SetSpacingLine"]            = ApiParaPr.prototype.SetSpacingLine;
+    ApiParaPr.prototype["SetSpacingBefore"]          = ApiParaPr.prototype.SetSpacingBefore;
+    ApiParaPr.prototype["SetSpacingAfter"]           = ApiParaPr.prototype.SetSpacingAfter;
+    ApiParaPr.prototype["SetShd"]                    = ApiParaPr.prototype.SetShd;
+    ApiParaPr.prototype["SetBottomBorder"]           = ApiParaPr.prototype.SetBottomBorder;
+    ApiParaPr.prototype["SetLeftBorder"]             = ApiParaPr.prototype.SetLeftBorder;
+    ApiParaPr.prototype["SetRightBorder"]            = ApiParaPr.prototype.SetRightBorder;
+    ApiParaPr.prototype["SetTopBorder"]              = ApiParaPr.prototype.SetTopBorder;
+    ApiParaPr.prototype["SetBetweenBorder"]          = ApiParaPr.prototype.SetBetweenBorder;
     ApiParaPr.prototype["SetWidowControl"]           = ApiParaPr.prototype.SetWidowControl;
+    ApiParaPr.prototype["SetTabs"]                   = ApiParaPr.prototype.SetTabs;
+    ApiParaPr.prototype["SetNumPr"]                  = ApiParaPr.prototype.SetNumPr;
+
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Private area
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1698,6 +1993,21 @@
     function private_GetColor(r, g, b, Auto)
     {
         return new CDocumentColor(r, g, b, Auto ? Auto : false);
+    }
+
+    function private_GetTabStop(nPos, sValue)
+    {
+        var nType = tab_Left;
+        if ("left" === sValue)
+            nType = tab_Left;
+        else if ("right" === sValue)
+            nType = tab_Right;
+        else if ("clear" === sValue)
+            nType = tab_Clear;
+        else if ("center" === sValue)
+            nType = tab_Center;
+
+        return new CParaTab(nType, nPos);
     }
 
     function private_GetParaSpacing(nLine, sLineRule, nBefore, nAfter, isBeforeAuto, isAfterAuto)
@@ -1795,6 +2105,16 @@
 
         oShd.Color.Set(r, g, b, isAuto);
         return oShd;
+    }
+
+    function private_GetBoolean(bValue, bDefValue)
+    {
+        if (true === bValue)
+            return true;
+        else if (false === bValue)
+            return false;
+        else
+            return (undefined !== bDefValue ? bDefValue : false);
     }
 
     ApiParagraph.prototype.private_GetImpl = function()
