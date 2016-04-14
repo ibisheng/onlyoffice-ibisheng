@@ -7,12 +7,14 @@
 
 (function(window, builder)
 {
+    /**
+     * @global
+     */
     var Api = window["asc_docs_api"];
 
     /**
      * Class representing a document.
-     * @class
-     * @global
+     * @constructor
      */
     function ApiDocument(Document)
     {
@@ -21,7 +23,7 @@
 
     /**
      * Class representing a paragraph.
-     * @class
+     * @constructor
      */
     function ApiParagraph(Paragraph)
     {
@@ -30,7 +32,7 @@
 
     /**
      * Class representing a table.
-     * @class
+     * @constructor
      */
     function ApiTable(Table)
     {
@@ -39,7 +41,7 @@
 
     /**
      * Class representing a small text block calling 'run'.
-     * @class
+     * @constructor
      */
     function ApiRun(Run)
     {
@@ -48,7 +50,7 @@
 
     /**
      * Class representing a style.
-     * @class
+     * @constructor
      */
     function ApiStyle(Style)
     {
@@ -57,7 +59,7 @@
 
     /**
      * Class representing a text properties.
-     * @class
+     * @constructor
      */
     function ApiTextPr(Parent, TextPr)
     {
@@ -67,7 +69,7 @@
 
     /**
      * Class representing a paragraph properties.
-     * @class
+     * @constructor
      */
     function ApiParaPr(Parent, ParaPr)
     {
@@ -77,7 +79,7 @@
 
     /**
      * Class representing a document section.
-     * @class
+     * @constructor
      */
     function ApiSection(Section)
     {
@@ -86,7 +88,7 @@
 
     /**
      * Class representing a table row.
-     * @class
+     * @constructor
      */
     function ApiTableRow(Row)
     {
@@ -95,7 +97,7 @@
 
     /**
      * Class representing a table cell.
-     * @class
+     * @constructor
      */
     function ApiTableCell(Cell)
     {
@@ -149,27 +151,30 @@
 
     /**
      * Get main document
+     * @method
      * @returns {ApiDocument}
      */
-    Api.prototype["GetDocument"] = function()
+    Api.prototype.GetDocument = function()
     {
         return new ApiDocument(this.WordControl.m_oLogicDocument);
     };
     /**
      * Create new paragraph
+     * @method
      * @returns {ApiParagraph}
      */
-    Api.prototype["CreateParagraph"] = function()
+    Api.prototype.CreateParagraph = function()
     {
         return new ApiParagraph(new Paragraph(private_GetDrawingDocument(), private_GetLogicDocument()));
     };
     /**
      * Create new table
+     * @method
      * @param {number} [nCols]
      * @param {number} [nRows]
      * @returns {ApiTable}
      */
-    Api.prototype["CreateTable"] = function(nCols, nRows)
+    Api.prototype.CreateTable = function(nCols, nRows)
     {
         if (!nRows || nRows <= 0 || !nCols || nCols <= 0)
             return null;
@@ -189,7 +194,7 @@
      * Get the number of elements.
      * @returns {number}
      */
-    ApiDocument.prototype["GetElementsCount"] = function()
+    ApiDocument.prototype.GetElementsCount = function()
     {
         return this.Document.Content.length;
     };
@@ -197,7 +202,7 @@
      * Get element by position
      * @returns {?DocumentElement}
      */
-    ApiDocument.prototype["GetElement"] = function(nPos)
+    ApiDocument.prototype.GetElement = function(nPos)
     {
         if (!this.Document.Content[nPos])
             return null;
@@ -215,7 +220,7 @@
      * @param {number} nPos
      * @param {DocumentElement} oElement
      */
-    ApiDocument.prototype["AddElement"] = function(nPos, oElement)
+    ApiDocument.prototype.AddElement = function(nPos, oElement)
     {
         if (oElement instanceof ApiParagraph || oElement instanceof ApiTable)
         {
@@ -229,7 +234,7 @@
      * Push paragraph or table
      * @param {DocumentElement} oElement
      */
-    ApiDocument.prototype["Push"] = function(oElement)
+    ApiDocument.prototype.Push = function(oElement)
     {
         if (oElement instanceof ApiParagraph || oElement instanceof ApiTable)
         {
@@ -242,7 +247,7 @@
     /**
      * Remove all elements from the current document.
      */
-    ApiDocument.prototype["RemoveAllElements"] = function()
+    ApiDocument.prototype.RemoveAllElements = function()
     {
         this.Document.Content = [];
     };
@@ -251,7 +256,7 @@
      * @param {string} sStyleName
      * @returns {?ApiStyle}
      */
-    ApiDocument.prototype["GetStyle"] = function(sStyleName)
+    ApiDocument.prototype.GetStyle = function(sStyleName)
     {
         var oStyles = this.Document.Get_Styles();
         var oStyleId = oStyles.Get_StyleIdByName(sStyleName);
@@ -264,7 +269,7 @@
      * @param {StyleType} [sType="paragraph"]
      * @returns {ApiStyle}
      */
-    ApiDocument.prototype["CreateStyle"] = function(sStyleName, sType)
+    ApiDocument.prototype.CreateStyle = function(sStyleName, sType)
     {
         var nStyleType = styletype_Paragraph;
         if ("paragraph" === sType)
@@ -297,7 +302,7 @@
      * @param {StyleType} sStyleType
      * @returns {?ApiStyle}
      */
-    ApiDocument.prototype["GetDefaultStyle"] = function(sStyleType)
+    ApiDocument.prototype.GetDefaultStyle = function(sStyleType)
     {
         var oStyles = this.Document.Get_Styles();
 
@@ -316,7 +321,7 @@
      * Get document final section
      * @return {ApiSection}
      */
-    ApiDocument.prototype["GetFinalSection"] = function()
+    ApiDocument.prototype.GetFinalSection = function()
     {
         return new ApiSection(this.Document.SectPr);
     };
@@ -324,9 +329,8 @@
      * Create a new section of the document, which ends at the specified paragraph.
      * @param {ApiParagraph} oParagraph
      * @returns {ApiSection}
-     * @constructor
      */
-    ApiDocument.prototype["CreateSection"] = function(oParagraph)
+    ApiDocument.prototype.CreateSection = function(oParagraph)
     {
         if (!(oParagraph instanceof ApiParagraph))
             return;
@@ -347,7 +351,7 @@
      * @param {string} [sText=""]
      * @returns {ApiRun}
      */
-    ApiParagraph.prototype["AddText"] = function(sText)
+    ApiParagraph.prototype.AddText = function(sText)
     {
         var oRun = new ParaRun(this.Paragraph, false);
 
@@ -370,7 +374,7 @@
      * Add page break
      * @returns {ApiRun}
      */
-    ApiParagraph.prototype["AddPageBreak"] = function()
+    ApiParagraph.prototype.AddPageBreak = function()
     {
         var oRun = new ParaRun(this.Paragraph, false);
         oRun.Add_ToContent(0, new ParaNewLine(break_Page));
@@ -381,7 +385,7 @@
      * Add line break
      * @returns {ApiRun}
      */
-    ApiParagraph.prototype["AddLineBreak"] = function()
+    ApiParagraph.prototype.AddLineBreak = function()
     {
         var oRun = new ParaRun(this.Paragraph, false);
         oRun.Add_ToContent(0, new ParaNewLine(break_Line));
@@ -392,7 +396,7 @@
      * Add column break
      * @returns {ApiRun}
      */
-    ApiParagraph.prototype["AddColumnBreak"] = function()
+    ApiParagraph.prototype.AddColumnBreak = function()
     {
         var oRun = new ParaRun(this.Paragraph, false);
         oRun.Add_ToContent(0, new ParaNewLine(break_Column));
@@ -403,7 +407,7 @@
      * Get text properties of the paragraph mark.
      * @returns {ApiTextPr}
      */
-    ApiParagraph.prototype["GetParagraphMarkTextPr"] = function()
+    ApiParagraph.prototype.GetParagraphMarkTextPr = function()
     {
         return new ApiTextPr(this, this.Paragraph.TextPr.Value.Copy());
     };
@@ -412,7 +416,7 @@
      * @param {ApiStyle} oStyle
      * @returns {boolean}
      */
-    ApiParagraph.prototype["SetStyle"] = function(oStyle)
+    ApiParagraph.prototype.SetStyle = function(oStyle)
     {
         if (!oStyle || !(oStyle instanceof ApiStyle))
             return false;
@@ -424,7 +428,7 @@
      * Get paragraph properties.
      * @returns {ApiParaPr}
      */
-    ApiParagraph.prototype["GetParaPr"] = function()
+    ApiParagraph.prototype.GetParaPr = function()
     {
         return new ApiParaPr(this, this.Paragraph.Pr.Copy());
     };
@@ -433,11 +437,11 @@
      * or <code>"exact"</code>, then the value of <code>nLine</code> shall be interpreted as twentieths of a point. If
      * the value of the <code>sLineRule</code> parameter is <code>"auto"</code>, then the value of the <code>nLine</code>
      * attribute shall be interpreted as 240ths of a line.
-	 * See also {@link ApiParagraph#GetParaPr} and {@link ApiParaPr#SetSpacingLine}.
+	 * @see {@link ApiParagraph#GetParaPr} and {@link ApiParaPr#SetSpacingLine}.
      * @param {(twips | line240)} nLine
      * @param {("auto" | "atLeast" | "exact")} sLineRule
      */
-    ApiParagraph.prototype["SetSpacingLine"] = function(nLine, sLineRule)
+    ApiParagraph.prototype.SetSpacingLine = function(nLine, sLineRule)
     {
         this.Paragraph.Set_Spacing(private_GetParaSpacing(nLine, sLineRule, undefined, undefined, undefined, undefined), false);
     };
@@ -445,11 +449,11 @@
      * Set paragraph spacing before. If the value of the <code>isBeforeAuto</code> parameter is <code>true</code>, then 
      * any value of the <code>nBefore</code> is ignored. If <code>isBeforeAuto</code> parameter is not specified, then it 
      * will be interpreted as <code>false</code>.
-	 * See also {@link ApiParagraph#GetParaPr} and {@link ApiParaPr#SetSpacingBefore}.
+	 * @see {@link ApiParagraph#GetParaPr} and {@link ApiParaPr#SetSpacingBefore}.
      * @param {twips} nBefore
      * @param {boolean} [isBeforeAuto=false]
      */
-    ApiParagraph.prototype["SetSpacingBefore"] = function(nBefore, isBeforeAuto)
+    ApiParagraph.prototype.SetSpacingBefore = function(nBefore, isBeforeAuto)
     {
         this.Paragraph.Set_Spacing(private_GetParaSpacing(undefined, undefined, nBefore, undefined, isBeforeAuto === undefined ? false : isBeforeAuto, undefined), false);
     };
@@ -457,20 +461,20 @@
      * Set paragraph spacing after. If the value of the <code>isAfterAuto</code> parameter is <code>true</code>, then
      * any value of the <code>nAfter</code> is ignored. If <code>isAfterAuto</code> parameter is not specified, then it
      * will be interpreted as <code>false</code>.
-	 * See also {@link ApiParagraph#GetParaPr} and {@link ApiParaPr#SetSpacingAfter}.
+	 * @see {@link ApiParagraph#GetParaPr} and {@link ApiParaPr#SetSpacingAfter}.
      * @param {twips} nAfter
      * @param {boolean} [isAfterAuto=false]
      */
-    ApiParagraph.prototype["SetSpacingAfter"] = function(nAfter, isAfterAuto)
+    ApiParagraph.prototype.SetSpacingAfter = function(nAfter, isAfterAuto)
     {
         this.Paragraph.Set_Spacing(private_GetParaSpacing(undefined, undefined, undefined, nAfter, undefined, isAfterAuto === undefined ? false : isAfterAuto), false);
     };
     /**
      * Set paragraph justification
-	 * See also {@link ApiParagraph#GetParaPr} and {@link ApiParaPr#SetJc}.
+	 * @see {@link ApiParagraph#GetParaPr} and {@link ApiParaPr#SetJc}.
      * @param {("left" | "right" | "both" | "center")} sJc
      */
-    ApiParagraph.prototype["SetJc"] = function(sJc)
+    ApiParagraph.prototype.SetJc = function(sJc)
     {
         var nAlign = private_GetParaAlign(sJc);
         if (undefined !== nAlign)
@@ -478,68 +482,68 @@
     };
     /**
      * Set left indentation.
-	 * See also {@link ApiParagraph#GetParaPr} and {@link ApiParaPr#SetIndLeft}.
+	 * @see {@link ApiParagraph#GetParaPr} and {@link ApiParaPr#SetIndLeft}.
      * @param {twips} nValue
      */
-    ApiParagraph.prototype["SetIndLeft"] = function(nValue)
+    ApiParagraph.prototype.SetIndLeft = function(nValue)
     {
         this.Paragraph.Set_Ind(private_GetParaInd(nValue, undefined, undefined));
     };
     /**
      * Set right indentation
-	 * See also {@link ApiParagraph#GetParaPr} and {@link ApiParaPr#SetIndRight}.
+	 * @see {@link ApiParagraph#GetParaPr} and {@link ApiParaPr#SetIndRight}.
      * @param {twips} nValue
      */
-    ApiParagraph.prototype["SetIndRight"] = function(nValue)
+    ApiParagraph.prototype.SetIndRight = function(nValue)
     {
         this.Paragraph.Set_Ind(private_GetParaInd(undefined, nValue, undefined));
     };
     /**
      * Set first line indentation
-	 * See also {@link ApiParagraph#GetParaPr} and {@link ApiParaPr#SetIndFirstLine}.
+	 * @see {@link ApiParagraph#GetParaPr} and {@link ApiParaPr#SetIndFirstLine}.
      * @param {twips} nValue
      */
-    ApiParagraph.prototype["SetIndFirstLine"] = function(nValue)
+    ApiParagraph.prototype.SetIndFirstLine = function(nValue)
     {
         this.Paragraph.Set_Ind(private_GetParaInd(undefined, undefined, nValue));
     };
     /**
      * This element specifies that when rendering this document in a paginated view, the contents of this paragraph
      * are at least partly rendered on the same page as the following paragraph whenever possible.
-	 * See also {@link ApiParagraph#GetParaPr} and {@link ApiParaPr#SetKeepNext}.
+	 * @see {@link ApiParagraph#GetParaPr} and {@link ApiParaPr#SetKeepNext}.
      * @param {boolean} isKeepNext
      */
-    ApiParagraph.prototype["SetKeepNext"] = function(isKeepNext)
+    ApiParagraph.prototype.SetKeepNext = function(isKeepNext)
     {
         this.Paragraph.Set_KeepNext(isKeepNext);
     };
     /**
      * This element specifies that when rendering this document in a page view, all lines of this paragraph are
      * maintained on a single page whenever possible.
-	 * See also {@link ApiParagraph#GetParaPr} and {@link ApiParaPr#SetKeepLines}.
+	 * @see {@link ApiParagraph#GetParaPr} and {@link ApiParaPr#SetKeepLines}.
      * @param {boolean} isKeepLines
      */
-    ApiParagraph.prototype["SetKeepLines"] = function(isKeepLines)
+    ApiParagraph.prototype.SetKeepLines = function(isKeepLines)
     {
         this.Paragraph.Set_KeepLines(isKeepLines);
     };
     /**
      * This element specifies that when rendering this document in a paginated view, the contents of this paragraph
      * are rendered on the start of a new page in the document.
-	 * See also {@link ApiParagraph#GetParaPr} and {@link ApiParaPr#SetPageBreakBefore}.
+	 * @see {@link ApiParagraph#GetParaPr} and {@link ApiParaPr#SetPageBreakBefore}.
      * @param {boolean} isPageBreakBefore
      */
-    ApiParagraph.prototype["SetPageBreakBefore"] = function(isPageBreakBefore)
+    ApiParagraph.prototype.SetPageBreakBefore = function(isPageBreakBefore)
     {
         this.Paragraph.Set_PageBreakBefore(isPageBreakBefore);
     };
     /**
      * This element specifies whether a consumer shall prevent a single line of this paragraph from being displayed on
      * a separate page from the remaining content at display time by moving the line onto the following page.
-	 * See also {@link ApiParagraph#GetParaPr} and {@link ApiParaPr#SetWidowControl}.
+	 * @see {@link ApiParagraph#GetParaPr} and {@link ApiParaPr#SetWidowControl}.
      * @param {boolean} isWidowControl
      */
-    ApiParagraph.prototype["SetWidowControl"] = function(isWidowControl)
+    ApiParagraph.prototype.SetWidowControl = function(isWidowControl)
     {
         this.Paragraph.Set_WidowControl(isWidowControl);
     };
@@ -554,27 +558,27 @@
      * Get the text properties of the current run.
      * @returns {ApiTextPr}
      */
-    ApiRun.prototype["GetTextPr"] = function()
+    ApiRun.prototype.GetTextPr = function()
     {
-        return this.private_GetTextPr();
+        return new ApiTextPr(this, this.Run.Pr.Copy());
     };
     /**
      * Set the bold property.
-     * See also {@link ApiRun#GetTextPr} and {@link ApiTextPr#SetBold}.
+     * @see {@link ApiRun#GetTextPr} and {@link ApiTextPr#SetBold}.
      * @param {boolean} isBold
      */
-    ApiRun.prototype["SetBold"] = function(isBold)
+    ApiRun.prototype.SetBold = function(isBold)
     {
-        this.private_GetTextPr().SetBold(isBold);
+        this.GetTextPr().SetBold(isBold);
     };
     /**
      * Set the italic property.
-     * See also {@link ApiRun#GetTextPr} and {@link ApiTextPr#SetItalic}.
+     * @see {@link ApiRun#GetTextPr} and {@link ApiTextPr#SetItalic}.
      * @param {boolean} isItalic
      */
-    ApiRun.prototype["SetItalic"] = function(isItalic)
+    ApiRun.prototype.SetItalic = function(isItalic)
     {
-        this.private_GetTextPr().SetItalic(isItalic);
+        this.GetTextPr().SetItalic(isItalic);
     };
     /**
      * Specify that the contents of this run shall be displayed with a single horizontal line through the center of
@@ -582,48 +586,57 @@
       See also {@link ApiRun#GetTextPr} and {@link ApiTextPr#SetStrikeout}.
      * @param {boolean} isStrikeout
      */
-    ApiRun.prototype["SetStrikeout"] = function(isStrikeout)
+    ApiRun.prototype.SetStrikeout = function(isStrikeout)
     {
-        this.private_GetTextPr().SetStrikeout(isStrikeout);
+        this.GetTextPr().SetStrikeout(isStrikeout);
     };
     /**
      * Set the underline property.
-     * See also {@link ApiRun#GetTextPr} and {@link ApiTextPr#SetUnderline}.
+     * @see {@link ApiRun#GetTextPr} and {@link ApiTextPr#SetUnderline}.
      * @param {boolean} isUnderline
      */
-    ApiRun.prototype["SetUnderline"] = function(isUnderline)
+    ApiRun.prototype.SetUnderline = function(isUnderline)
     {
-        this.private_GetTextPr().SetUnderline(isUnderline);
+        this.GetTextPr().SetUnderline(isUnderline);
+    };
+    /**
+     * Set all 4 font slots with the specified font family.
+     * @see {@link ApiRun#GetTextPr} and {@link ApiTextPr#SetFontFamily}
+     * @param {string} sFontFamily
+     */
+    ApiRun.prototype.SetFontFamily = function(sFontFamily)
+    {
+        this.GetTextPr().SetFontFamily(sFontFamily);
     };
     /**
      * Set the font size.
-     * See also {@link ApiRun#GetTextPr} and {@link ApiTextPr#SetFontSize}.
+     * @see {@link ApiRun#GetTextPr} and {@link ApiTextPr#SetFontSize}.
      * @param {hps} nSize
      */
-    ApiRun.prototype["SetFontSize"] = function(nSize)
+    ApiRun.prototype.SetFontSize = function(nSize)
     {
-        this.private_GetTextPr().SetFontSize(nSize);
+        this.GetTextPr().SetFontSize(nSize);
     };
     /**
      * Set text color in the rgb format.
-     * See also {@link ApiRun#GetTextPr} and {@link ApiTextPr#SetColor}.
+     * @see {@link ApiRun#GetTextPr} and {@link ApiTextPr#SetColor}.
      * @param {byte} r
      * @param {byte} g
      * @param {byte} b
      * @param {boolean} [isAuto=false]
      */
-    ApiRun.prototype["SetColor"] = function(r, g, b, isAuto)
+    ApiRun.prototype.SetColor = function(r, g, b, isAuto)
     {
-        this.private_GetTextPr().SetColor(r, g, b, isAuto);
+        this.GetTextPr().SetColor(r, g, b, isAuto);
     };
     /**
      * Set the text spacing.
-     * See also {@link ApiRun#GetTextPr} and {@link ApiTextPr#SetSpacing}.
+     * @see {@link ApiRun#GetTextPr} and {@link ApiTextPr#SetSpacing}.
      * @param {twips} nSpacing
      */
-    ApiRun.prototype["SetSpacing"] = function(nSpacing)
+    ApiRun.prototype.SetSpacing = function(nSpacing)
     {
-        this.private_GetTextPr().SetSpacing(nSpacing);
+        this.GetTextPr().SetSpacing(nSpacing);
     };
 
     //------------------------------------------------------------------------------------------------------------------
@@ -635,19 +648,19 @@
     /**
      * Specify the section type of the current section. The section type specifies how the contents of the current
      * section shall be placed relative to the previous section.
-     * WordprocessingML supports five distinct types of section breaks:
+     * WordprocessingML supports five distinct types of section breaks:<br/>
      *   <b>Next page</b> section breaks (the default if type is not specified), which begin the new section on the
-     *   following page.
-     *   <b>Odd</b> page section breaks, which begin the new section on the next odd-numbered page.
-     *   <b>Even</b> page section breaks, which begin the new section on the next even-numbered page.
+     *   following page.<br/>
+     *   <b>Odd</b> page section breaks, which begin the new section on the next odd-numbered page.<br/>
+     *   <b>Even</b> page section breaks, which begin the new section on the next even-numbered page.<br/>
      *   <b>Continuous</b> section breaks, which begin the new section on the following paragraph. This means that
      *   continuous section breaks might not specify certain page-level section properties, since they shall be
      *   inherited from the following section. These breaks, however, can specify other section properties, such
-     *   as line numbering and footnote/endnote settings.
+     *   as line numbering and footnote/endnote settings.<br/>
      *   <b>Column</b> section breaks, which begin the new section on the next column on the page.
      * @param {("nextPage" | "oddPage" | "evenPage" | "continuous" | "nextColumn")} sType - Type of the section break
      */
-    ApiSection.prototype["SetType"] = function(sType)
+    ApiSection.prototype.SetType = function(sType)
     {
         if ("oddPage" === sType)
             this.Section.Set_Type(section_type_OddPage);
@@ -665,7 +678,7 @@
      * @param {number} nCount - Number of columns
      * @param {twips} nSpace - Distance between columns
      */
-    ApiSection.prototype["SetEqualColumns"] = function(nCount, nSpace)
+    ApiSection.prototype.SetEqualColumns = function(nCount, nSpace)
     {
         this.Section.Set_Columns_EqualWidth(true);
         this.Section.Set_Columns_Num(nCount);
@@ -677,7 +690,7 @@
      * @param {twips[]} aWidths - An array of column width
      * @param {twips[]} aSpaces - An array of distances between the columns
      */
-    ApiSection.prototype["SetNotEqualColumns"] = function(aWidths, aSpaces)
+    ApiSection.prototype.SetNotEqualColumns = function(aWidths, aSpaces)
     {
         if (!aWidths || !aWidths.length || aWidths.length <= 1 || aSpaces.length !== aWidths.length - 1)
             return false;
@@ -701,7 +714,7 @@
      * @param {twips} nHeight - height
      * @param {boolean} [isPortrait=false] - Specifies the orientation of all pages in this section.
      */
-    ApiSection.prototype["SetPageSize"] = function(nWidth, nHeight, isPortrait)
+    ApiSection.prototype.SetPageSize = function(nWidth, nHeight, isPortrait)
     {
         this.Section.Set_PageSize(private_Twips2MM(nWidth), private_Twips2MM(nHeight));
         this.Section.Set_Orientation(false === isPortrait ? orientation_Landscape : orientation_Portrait, false);
@@ -713,7 +726,7 @@
      * @param {twips} nRight - Right margin
      * @param {twips} nBottom - Bottom margin
      */
-    ApiSection.prototype["SetPageMargins"] = function(nLeft, nTop, nRight, nBottom)
+    ApiSection.prototype.SetPageMargins = function(nLeft, nTop, nRight, nBottom)
     {
         this.Section.Set_PageMargins(private_Twips2MM(nLeft), private_Twips2MM(nTop), private_Twips2MM(nRight), private_Twips2MM(nBottom));
     };
@@ -721,7 +734,7 @@
      * Specifies the distance (in twentieths of a point) from the top edge of the page to the top edge of the header.
      * @param {twips} nDistance
      */
-    ApiSection.prototype["SetHeaderDistance"] = function(nDistance)
+    ApiSection.prototype.SetHeaderDistance = function(nDistance)
     {
         this.Section.Set_PageMargins_Header(private_Twips2MM(nDistance));
     };
@@ -729,7 +742,7 @@
      * Specifies the distance (in twentieths of a point) from the bottom edge of the page to the bottom edge of the footer.
      * @param {twips} nDistance
      */
-    ApiSection.prototype["SetFooterDistance"] = function(nDistance)
+    ApiSection.prototype.SetFooterDistance = function(nDistance)
     {
         this.Section.Set_PageMargins_Footer(private_Twips2MM(nDistance));
     };
@@ -743,7 +756,7 @@
     /**
      * Get the number of rows in the current table.
      */
-    ApiTable.prototype["GetRowsCount"] = function()
+    ApiTable.prototype.GetRowsCount = function()
     {
         return this.Table.Content.length;
     };
@@ -752,7 +765,7 @@
      * @param {number} nPos
      * @returns {ApiTableRow}
      */
-    ApiTable.prototype["GetRow"] = function(nPos)
+    ApiTable.prototype.GetRow = function(nPos)
     {
         if (nPos < 0 || nPos >= this.Table.Content.length)
             return null;
@@ -765,7 +778,7 @@
      * @param {ApiTableCell[]} aCells
      * @returns {?ApiTableCell}
      */
-    ApiTable.prototype["MergeCells"] = function(aCells)
+    ApiTable.prototype.MergeCells = function(aCells)
     {
         var oTable = this.Table;
         oTable.Selection.Use  = true;
@@ -817,7 +830,7 @@
      * @param {ApiStyle} oStyle
      * @return {boolean}
      */
-    ApiTable.prototype["SetStyle"] = function(oStyle)
+    ApiTable.prototype.SetStyle = function(oStyle)
     {
         if (!oStyle || !(oStyle instanceof ApiStyle) || styletype_Table !== oStyle.Style.Get_Type())
             return false;
@@ -830,7 +843,7 @@
      * @param {("auto" | "twips" | "percent" | "nil")} sType - Type of the width value
      * @param {number} nValue
      */
-    ApiTable.prototype["SetWidth"] = function(sType, nValue)
+    ApiTable.prototype.SetWidth = function(sType, nValue)
     {
         if ("auto" === sType)
             this.Table.Set_Props({TableWidth : null});
@@ -854,7 +867,7 @@
      * @param {boolean} isHorBand - Specifies that the horizontal banding conditional formatting shall not be applied to the table.
      * @param {boolean} isVerBand - Specifies that the vertical banding conditional formatting shall not be applied to the table.
      */
-    ApiTable.prototype["SetTableLook"] = function(isFirstColumn, isFirstRow, isLastColumn, isLastRow, isHorBand, isVerBand)
+    ApiTable.prototype.SetTableLook = function(isFirstColumn, isFirstRow, isLastColumn, isLastRow, isHorBand, isVerBand)
     {
         this.Table.Set_Props({TableLook :
         {
@@ -875,7 +888,7 @@
      * @param {byte} g
      * @param {byte} b
      */
-    ApiTable.prototype["SetTableBorderTop"] = function(sType, nSize, nSpace, r, g, b)
+    ApiTable.prototype.SetTableBorderTop = function(sType, nSize, nSpace, r, g, b)
     {
         this.Table.Set_Props({TableBorders : {Top : private_GetTableBorder(sType, nSize, nSpace, r, g, b)}});
     };
@@ -888,7 +901,7 @@
      * @param {byte} g
      * @param {byte} b
      */
-    ApiTable.prototype["SetTableBorderBottom"] = function(sType, nSize, nSpace, r, g, b)
+    ApiTable.prototype.SetTableBorderBottom = function(sType, nSize, nSpace, r, g, b)
     {
         this.Table.Set_Props({TableBorders : {Bottom : private_GetTableBorder(sType, nSize, nSpace, r, g, b)}});
     };
@@ -901,7 +914,7 @@
      * @param {byte} g
      * @param {byte} b
      */
-    ApiTable.prototype["SetTableBorderLeft"] = function(sType, nSize, nSpace, r, g, b)
+    ApiTable.prototype.SetTableBorderLeft = function(sType, nSize, nSpace, r, g, b)
     {
         this.Table.Set_Props({TableBorders : {Left : private_GetTableBorder(sType, nSize, nSpace, r, g, b)}});
     };
@@ -914,7 +927,7 @@
      * @param {byte} g
      * @param {byte} b
      */
-    ApiTable.prototype["SetTableBorderRight"] = function(sType, nSize, nSpace, r, g, b)
+    ApiTable.prototype.SetTableBorderRight = function(sType, nSize, nSpace, r, g, b)
     {
         this.Table.Set_Props({TableBorders : {Right : private_GetTableBorder(sType, nSize, nSpace, r, g, b)}});
     };
@@ -928,7 +941,7 @@
      * @param {byte} g
      * @param {byte} b
      */
-    ApiTable.prototype["SetTableBorderInsideH"] = function(sType, nSize, nSpace, r, g, b)
+    ApiTable.prototype.SetTableBorderInsideH = function(sType, nSize, nSpace, r, g, b)
     {
         this.Table.Set_Props({TableBorders : {InsideH : private_GetTableBorder(sType, nSize, nSpace, r, g, b)}});
     };
@@ -942,7 +955,7 @@
      * @param {byte} g
      * @param {byte} b
      */
-    ApiTable.prototype["SetTableBorderInsideV"] = function(sType, nSize, nSpace, r, g, b)
+    ApiTable.prototype.SetTableBorderInsideV = function(sType, nSize, nSpace, r, g, b)
     {
         this.Table.Set_Props({TableBorders : {InsideV : private_GetTableBorder(sType, nSize, nSpace, r, g, b)}});
     };
@@ -957,7 +970,7 @@
      * Get the number of cells in the current row.
      * @returns {number}
      */
-    ApiTableRow.prototype["GetCellsCount"] = function()
+    ApiTableRow.prototype.GetCellsCount = function()
     {
         return this.Row.Content.length;
     };
@@ -966,7 +979,7 @@
      * @param {number} nPos
      * @returns {ApiTableCell}
      */
-    ApiTableRow.prototype["GetCell"] = function(nPos)
+    ApiTableRow.prototype.GetCell = function(nPos)
     {
         if (nPos < 0 || nPos >= this.Row.Content.length)
             return null;
@@ -978,7 +991,7 @@
      * @param {("auto" | "atLeast")} sHRule - Specifies the meaning of the height specified for this table row.
      * @param {twips} nValue
      */
-    ApiTableRow.prototype["SetHeight"] = function(sHRule, nValue)
+    ApiTableRow.prototype.SetHeight = function(sHRule, nValue)
     {
         var HRule = ("auto" === sHRule ? heightrule_Auto : heightrule_AtLeast);
         this.Row.Set_Height(private_Twips2MM(nValue), HRule);
@@ -994,7 +1007,7 @@
      * Get cell content.
      * @returns {ApiDocument}
      */
-    ApiTableCell.prototype["GetContent"] = function()
+    ApiTableCell.prototype.GetContent = function()
     {
         return new ApiDocument(this.Cell.Content);
     };
@@ -1003,7 +1016,7 @@
      * @param {("auto" | "twips" | "percent" | "nil")} sType - Specifies the meaning of the width value.
      * @param {number} [nValue]
      */
-    ApiTableCell.prototype["SetWidth"] = function(sType, nValue)
+    ApiTableCell.prototype.SetWidth = function(sType, nValue)
     {
         var CellW = null;
         if ("auto" === sType)
@@ -1020,7 +1033,7 @@
      * Specify the vertical alignment for text within the current table cell.
      * @param {("top" | "center" | "bottom")} sType
      */
-    ApiTableCell.prototype["SetVerticalAlign"] = function(sType)
+    ApiTableCell.prototype.SetVerticalAlign = function(sType)
     {
         if ("top" === sType)
             this.Cell.Set_VAlign(vertalignjc_Top);
@@ -1036,9 +1049,8 @@
      * @param {byte} g
      * @param {byte} b
      * @param {boolean} [isAuto=false]
-     * @constructor
      */
-    ApiTableCell.prototype["SetShd"] = function(sType, r, g, b, isAuto)
+    ApiTableCell.prototype.SetShd = function(sType, r, g, b, isAuto)
     {
         this.Cell.Set_Shd(private_GetShd(sType, r, g, b, isAuto));
     };
@@ -1046,7 +1058,7 @@
      * Specify the direction of the text flow for this table cell.
      * @param {("lrtb" | "tbrl" | "btlr")} sType
      */
-    ApiTableCell.prototype["SetTextDirection"] = function(sType)
+    ApiTableCell.prototype.SetTextDirection = function(sType)
     {
         if ("lrtb" === sType)
             this.Cell.Set_TextDirection(textdirection_LRTB);
@@ -1066,7 +1078,7 @@
      * Get the name of the current style.
      * @returns {string}
      */
-    ApiStyle.prototype["GetName"] = function()
+    ApiStyle.prototype.GetName = function()
     {
         return this.Style.Get_Name();
     };
@@ -1074,7 +1086,7 @@
      * Set the name of the current style.
      * @param {string} sStyleName
      */
-    ApiStyle.prototype["SetName"] = function(sStyleName)
+    ApiStyle.prototype.SetName = function(sStyleName)
     {
         this.Style.Set_Name(sStyleName);
     };
@@ -1082,7 +1094,7 @@
      * Get the type of the current style.
      * @returns {StyleType}
      */
-    ApiStyle.prototype["GetType"] = function()
+    ApiStyle.prototype.GetType = function()
     {
         var nStyleType = this.Style.Get_Type();
 
@@ -1101,7 +1113,7 @@
      * Get the text properties of the current style.
      * @returns {ApiTextPr}
      */
-    ApiStyle.prototype["GetTextPr"] = function()
+    ApiStyle.prototype.GetTextPr = function()
     {
         return new ApiTextPr(this, this.Style.TextPr.Copy());
     };
@@ -1109,7 +1121,7 @@
      * Get the paragraph properties of the current style.
      * @returns {ApiParaPr}
      */
-    ApiStyle.prototype["GetParaPr"] = function()
+    ApiStyle.prototype.GetParaPr = function()
     {
         return new ApiParaPr(this, this.Style.ParaPr.Copy());
     };
@@ -1124,7 +1136,7 @@
      * Set the bold property.
      * @param {boolean} isBold
      */
-    ApiTextPr.prototype["SetBold"] = function(isBold)
+    ApiTextPr.prototype.SetBold = function(isBold)
     {
         this.TextPr.Bold = isBold;
         this.private_OnChange();
@@ -1133,7 +1145,7 @@
      * Set the italic property.
      * @param {boolean} isItalic
      */
-    ApiTextPr.prototype["SetItalic"] = function(isItalic)
+    ApiTextPr.prototype.SetItalic = function(isItalic)
     {
         this.TextPr.Italic = isItalic;
         this.private_OnChange();
@@ -1143,7 +1155,7 @@
      * the line.
      * @param {boolean} isStrikeout
      */
-    ApiTextPr.prototype["SetStrikeout"] = function(isStrikeout)
+    ApiTextPr.prototype.SetStrikeout = function(isStrikeout)
     {
         this.TextPr.Strikeout = isStrikeout;
         this.private_OnChange();
@@ -1153,9 +1165,27 @@
      * character height (less all spacing above and below the characters on the line).
      * @param {boolean} isUnderline
      */
-    ApiTextPr.prototype["SetUnderline"] = function(isUnderline)
+    ApiTextPr.prototype.SetUnderline = function(isUnderline)
     {
         this.TextPr.Underline = isUnderline;
+        this.private_OnChange();
+    };
+    /**
+     * Set all 4 font slots with the specified font family.
+     * @param {string} sFontFamily
+     */
+    ApiTextPr.prototype.SetFontFamily = function(sFontFamily)
+    {
+        this.TextPr.RFonts.Set_All(sFontFamily, -1);
+        this.private_OnChange();
+    };
+    /**
+     * Set the font size.
+     * @param {hps} nSize
+     */
+    ApiTextPr.prototype.SetFontSize = function(nSize)
+    {
+        this.TextPr.FontSize = private_GetHps(nSize);
         this.private_OnChange();
     };
     /**
@@ -1165,34 +1195,16 @@
      * @param {byte} b
      * @param {boolean} [isAuto=false]
      */
-    ApiTextPr.prototype["SetColor"] = function(r, g, b, isAuto)
+    ApiTextPr.prototype.SetColor = function(r, g, b, isAuto)
     {
         this.TextPr.Color = private_GetColor(r, g, b, isAuto);
-        this.private_OnChange();
-    };
-    /**
-     * Set the font size.
-     * @param {hps} nSize
-     */
-    ApiTextPr.prototype["SetFontSize"] = function(nSize)
-    {
-        this.TextPr.FontSize = private_GetHps(nSize);
-        this.private_OnChange();
-    };
-    /**
-     * Set all 4 font slots with the specified font family.
-     * @param {string} sFontFamily
-     */
-    ApiTextPr.prototype["SetFontFamily"] = function(sFontFamily)
-    {
-        this.TextPr.RFonts.Set_All(sFontFamily, -1);
         this.private_OnChange();
     };
     /**
      * Set text spacing.
      * @param {twips} nSpacing
      */
-    ApiTextPr.prototype["SetSpacing"] = function(nSpacing)
+    ApiTextPr.prototype.SetSpacing = function(nSpacing)
     {
         this.TextPr.Spacing = private_Twips2MM(nSpacing);
         this.private_OnChange();
@@ -1212,7 +1224,7 @@
      * @param {(twips | line240)} nLine
      * @param {("auto" | "atLeast" | "exact")} sLineRule
      */
-    ApiParaPr.prototype["SetSpacingLine"] = function(nLine, sLineRule)
+    ApiParaPr.prototype.SetSpacingLine = function(nLine, sLineRule)
     {
         if (undefined !== nLine && undefined !== sLineRule)
         {
@@ -1243,7 +1255,7 @@
      * @param {twips} nBefore
      * @param {boolean} [isBeforeAuto=false]
      */
-    ApiParaPr.prototype["SetSpacingBefore"] = function(nBefore, isBeforeAuto)
+    ApiParaPr.prototype.SetSpacingBefore = function(nBefore, isBeforeAuto)
     {
         if (undefined !== nBefore)
             this.ParaPr.Spacing.Before = private_Twips2MM(nBefore);
@@ -1260,7 +1272,7 @@
      * @param {twips} nAfter
      * @param {boolean} [isAfterAuto=false]
      */
-    ApiParaPr.prototype["SetSpacingAfter"] = function(nAfter, isAfterAuto)
+    ApiParaPr.prototype.SetSpacingAfter = function(nAfter, isAfterAuto)
     {
         if (undefined !== nAfter)
             this.ParaPr.Spacing.After = private_Twips2MM(nAfter);
@@ -1274,7 +1286,7 @@
      * Set paragraph justification
      * @param {("left" | "right" | "both" | "center")} sJc
      */
-    ApiParaPr.prototype["SetJc"] = function(sJc)
+    ApiParaPr.prototype.SetJc = function(sJc)
     {
         this.ParaPr.Jc = private_GetParaAlign(sJc);
         this.private_OnChange();
@@ -1283,7 +1295,7 @@
      * Set left indentation.
      * @param {twips} nValue
      */
-    ApiParaPr.prototype["SetIndLeft"] = function(nValue)
+    ApiParaPr.prototype.SetIndLeft = function(nValue)
     {
         this.ParaPr.Ind.Left = private_Twips2MM(nValue);
         this.private_OnChange();
@@ -1292,7 +1304,7 @@
      * Set right indentation.
      * @param {twips} nValue
      */
-    ApiParaPr.prototype["SetIndRight"] = function(nValue)
+    ApiParaPr.prototype.SetIndRight = function(nValue)
     {
         this.ParaPr.Ind.Right = private_Twips2MM(nValue);
         this.private_OnChange();
@@ -1301,7 +1313,7 @@
      * Set first line indentation.
      * @param {twips} nValue
      */
-    ApiParaPr.prototype["SetIndFirstLine"] = function(nValue)
+    ApiParaPr.prototype.SetIndFirstLine = function(nValue)
     {
         this.ParaPr.Ind.FirstLine = private_Twips2MM(nValue);
         this.private_OnChange();
@@ -1311,7 +1323,7 @@
      * are at least partly rendered on the same page as the following paragraph whenever possible.
      * @param {boolean} isKeepNext
      */
-    ApiParaPr.prototype["SetKeepNext"] = function(isKeepNext)
+    ApiParaPr.prototype.SetKeepNext = function(isKeepNext)
     {
         this.ParaPr.KeepNext = isKeepNext;
         this.private_OnChange();
@@ -1321,7 +1333,7 @@
      * maintained on a single page whenever possible.
      * @param {boolean} isKeepLines
      */
-    ApiParaPr.prototype["SetKeepLines"] = function(isKeepLines)
+    ApiParaPr.prototype.SetKeepLines = function(isKeepLines)
     {
         this.ParaPr.KeepLines = isKeepLines;
         this.private_OnChange();
@@ -1331,7 +1343,7 @@
      * are rendered on the start of a new page in the document.
      * @param {boolean} isPageBreakBefore
      */
-    ApiParaPr.prototype["SetPageBreakBefore"] = function(isPageBreakBefore)
+    ApiParaPr.prototype.SetPageBreakBefore = function(isPageBreakBefore)
     {
         this.ParaPr.PageBreakBefore = isPageBreakBefore;
         this.private_OnChange();
@@ -1341,12 +1353,116 @@
      * a separate page from the remaining content at display time by moving the line onto the following page.
      * @param {boolean} isWidowControl
      */
-    ApiParaPr.prototype["SetWidowControl"] = function(isWidowControl)
+    ApiParaPr.prototype.SetWidowControl = function(isWidowControl)
     {
         this.ParaPr.WidowControl = isWidowControl;
         this.private_OnChange();
     };
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Export
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    Api.prototype["GetDocument"]                     = Api.prototype.GetDocument;
+    Api.prototype["CreateParagraph"]                 = Api.prototype.CreateParagraph;
+    Api.prototype["CreateTable"]                     = Api.prototype.CreateTable;
+
+    ApiDocument.prototype["GetElementsCount"]        = ApiDocument.prototype.GetElementsCount;
+    ApiDocument.prototype["GetElement"]              = ApiDocument.prototype.GetElement;
+    ApiDocument.prototype["AddElement"]              = ApiDocument.prototype.AddElement;
+    ApiDocument.prototype["Push"]                    = ApiDocument.prototype.Push;
+    ApiDocument.prototype["RemoveAllElements"]       = ApiDocument.prototype.RemoveAllElements;
+    ApiDocument.prototype["GetStyle"]                = ApiDocument.prototype.GetStyle;
+    ApiDocument.prototype["CreateStyle"]             = ApiDocument.prototype.CreateStyle;
+    ApiDocument.prototype["GetDefaultStyle"]         = ApiDocument.prototype.GetDefaultStyle;
+    ApiDocument.prototype["GetFinalSection"]         = ApiDocument.prototype.GetFinalSection;
+    ApiDocument.prototype["CreateSection"]           = ApiDocument.prototype.CreateSection;
+
+    ApiParagraph.prototype["AddText"]                = ApiParagraph.prototype.AddText;
+    ApiParagraph.prototype["AddPageBreak"]           = ApiParagraph.prototype.AddPageBreak;
+    ApiParagraph.prototype["AddLineBreak"]           = ApiParagraph.prototype.AddLineBreak;
+    ApiParagraph.prototype["AddColumnBreak"]         = ApiParagraph.prototype.AddColumnBreak;
+    ApiParagraph.prototype["GetParagraphMarkTextPr"] = ApiParagraph.prototype.GetParagraphMarkTextPr;
+    ApiParagraph.prototype["SetStyle"]               = ApiParagraph.prototype.SetStyle;
+    ApiParagraph.prototype["GetParaPr"]              = ApiParagraph.prototype.GetParaPr;
+    ApiParagraph.prototype["SetSpacingLine"]         = ApiParagraph.prototype.SetSpacingLine;
+    ApiParagraph.prototype["SetSpacingBefore"]       = ApiParagraph.prototype.SetSpacingBefore;
+    ApiParagraph.prototype["SetSpacingAfter"]        = ApiParagraph.prototype.SetSpacingAfter;
+    ApiParagraph.prototype["SetJc"]                  = ApiParagraph.prototype.SetJc;
+    ApiParagraph.prototype["SetIndLeft"]             = ApiParagraph.prototype.SetIndLeft;
+    ApiParagraph.prototype["SetIndRight"]            = ApiParagraph.prototype.SetIndRight;
+    ApiParagraph.prototype["SetIndFirstLine"]        = ApiParagraph.prototype.SetIndFirstLine;
+    ApiParagraph.prototype["SetKeepNext"]            = ApiParagraph.prototype.SetKeepNext;
+    ApiParagraph.prototype["SetKeepLines"]           = ApiParagraph.prototype.SetKeepLines;
+    ApiParagraph.prototype["SetPageBreakBefore"]     = ApiParagraph.prototype.SetPageBreakBefore;
+    ApiParagraph.prototype["SetWidowControl"]        = ApiParagraph.prototype.SetWidowControl;
+
+    ApiRun.prototype["GetTextPr"]                    = ApiRun.prototype.GetTextPr;
+    ApiRun.prototype["SetBold"]                      = ApiRun.prototype.SetBold;
+    ApiRun.prototype["SetItalic"]                    = ApiRun.prototype.SetItalic;
+    ApiRun.prototype["SetStrikeout"]                 = ApiRun.prototype.SetStrikeout;
+    ApiRun.prototype["SetUnderline"]                 = ApiRun.prototype.SetUnderline;
+    ApiRun.prototype["SetFontFamily"]                = ApiRun.prototype.SetFontFamily;
+    ApiRun.prototype["SetFontSize"]                  = ApiRun.prototype.SetFontSize;
+    ApiRun.prototype["SetColor"]                     = ApiRun.prototype.SetColor;
+    ApiRun.prototype["SetSpacing"]                   = ApiRun.prototype.SetSpacing;
+
+    ApiSection.prototype["SetType"]                  = ApiSection.prototype.SetType;
+    ApiSection.prototype["SetEqualColumns"]          = ApiSection.prototype.SetEqualColumns;
+    ApiSection.prototype["SetNotEqualColumns"]       = ApiSection.prototype.SetNotEqualColumns;
+    ApiSection.prototype["SetPageSize"]              = ApiSection.prototype.SetPageSize;
+    ApiSection.prototype["SetPageMargins"]           = ApiSection.prototype.SetPageMargins;
+    ApiSection.prototype["SetHeaderDistance"]        = ApiSection.prototype.SetHeaderDistance;
+    ApiSection.prototype["SetFooterDistance"]        = ApiSection.prototype.SetFooterDistance;
+
+    ApiTable.prototype["GetRowsCount"]               = ApiTable.prototype.GetRowsCount;
+    ApiTable.prototype["GetRow"]                     = ApiTable.prototype.GetRow;
+    ApiTable.prototype["MergeCells"]                 = ApiTable.prototype.MergeCells;
+    ApiTable.prototype["SetStyle"]                   = ApiTable.prototype.SetStyle;
+    ApiTable.prototype["SetWidth"]                   = ApiTable.prototype.SetWidth;
+    ApiTable.prototype["SetTableLook"]               = ApiTable.prototype.SetTableLook;
+    ApiTable.prototype["SetTableBorderTop"]          = ApiTable.prototype.SetTableBorderTop;
+    ApiTable.prototype["SetTableBorderBottom"]       = ApiTable.prototype.SetTableBorderBottom;
+    ApiTable.prototype["SetTableBorderLeft"]         = ApiTable.prototype.SetTableBorderLeft;
+    ApiTable.prototype["SetTableBorderRight"]        = ApiTable.prototype.SetTableBorderRight;
+    ApiTable.prototype["SetTableBorderInsideH"]      = ApiTable.prototype.SetTableBorderInsideH;
+    ApiTable.prototype["SetTableBorderInsideV"]      = ApiTable.prototype.SetTableBorderInsideV;
+
+    ApiTableRow.prototype["GetCellsCount"]           = ApiTableRow.prototype.GetCellsCount;
+    ApiTableRow.prototype["GetCell"]                 = ApiTableRow.prototype.GetCell;
+    ApiTableRow.prototype["SetHeight"]               = ApiTableRow.prototype.SetHeight;
+
+    ApiTableCell.prototype["GetContent"]             = ApiTableCell.prototype.GetContent;
+    ApiTableCell.prototype["SetWidth"]               = ApiTableCell.prototype.SetWidth;
+    ApiTableCell.prototype["SetVerticalAlign"]       = ApiTableCell.prototype.SetVerticalAlign;
+    ApiTableCell.prototype["SetShd"]                 = ApiTableCell.prototype.SetShd;
+    ApiTableCell.prototype["SetTextDirection"]       = ApiTableCell.prototype.SetTextDirection;
+
+    ApiStyle.prototype["GetName"]                    = ApiStyle.prototype.GetName;
+    ApiStyle.prototype["SetName"]                    = ApiStyle.prototype.SetName;
+    ApiStyle.prototype["GetType"]                    = ApiStyle.prototype.GetType;
+    ApiStyle.prototype["GetTextPr"]                  = ApiStyle.prototype.GetTextPr;
+    ApiStyle.prototype["GetParaPr"]                  = ApiStyle.prototype.GetParaPr;
+
+    ApiTextPr.prototype["SetBold"]                   = ApiTextPr.prototype.SetBold;
+    ApiTextPr.prototype["SetItalic"]                 = ApiTextPr.prototype.SetItalic;
+    ApiTextPr.prototype["SetStrikeout"]              = ApiTextPr.prototype.SetStrikeout;
+    ApiTextPr.prototype["SetUnderline"]              = ApiTextPr.prototype.SetUnderline;
+    ApiTextPr.prototype["SetFontFamily"]             = ApiTextPr.prototype.SetFontFamily;
+    ApiTextPr.prototype["SetFontSize"]               = ApiTextPr.prototype.SetFontSize;
+    ApiTextPr.prototype["SetColor"]                  = ApiTextPr.prototype.SetColor;
+    ApiTextPr.prototype["SetSpacing"]                = ApiTextPr.prototype.SetSpacing;
+
+    ApiParaPr.prototype["SetSpacingLine"]            = ApiParaPr.prototype.SetSpacingLine;
+    ApiParaPr.prototype["SetSpacingBefore"]          = ApiParaPr.prototype.SetSpacingBefore;
+    ApiParaPr.prototype["SetSpacingAfter"]           = ApiParaPr.prototype.SetSpacingAfter;
+    ApiParaPr.prototype["SetJc"]                     = ApiParaPr.prototype.SetJc;
+    ApiParaPr.prototype["SetIndLeft"]                = ApiParaPr.prototype.SetIndLeft;
+    ApiParaPr.prototype["SetIndRight"]               = ApiParaPr.prototype.SetIndRight;
+    ApiParaPr.prototype["SetIndFirstLine"]           = ApiParaPr.prototype.SetIndFirstLine;
+    ApiParaPr.prototype["SetKeepNext"]               = ApiParaPr.prototype.SetKeepNext;
+    ApiParaPr.prototype["SetKeepLines"]              = ApiParaPr.prototype.SetKeepLines;
+    ApiParaPr.prototype["SetPageBreakBefore"]        = ApiParaPr.prototype.SetPageBreakBefore;
+    ApiParaPr.prototype.SetWidowControl              = ApiParaPr.prototype.SetWidowControl;
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Private area
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1496,10 +1612,6 @@
     {
         this.Run.Set_Pr(oApiTextPr.TextPr);
         oApiTextPr.TextPr = this.Run.Pr.Copy();
-    };
-    ApiRun.prototype.private_GetTextPr = function()
-    {
-        return new ApiTextPr(this, this.Run.Pr.Copy());
     };
     ApiTable.prototype.private_GetImpl = function()
     {
@@ -1944,11 +2056,11 @@ function TEST_BUILDER2()
     oParagraph.AddText("Italic").SetItalic(true);
     oParagraph.AddText("Strikeout").SetStrikeout(true);
     oParagraph.AddText("Underline").SetUnderline(true);
+    oParagraph.AddText("Calibri").SetFontFamily("Calibri");
+    oParagraph.AddText("FontSize40").SetFontSize(40);
+    oParagraph.AddText("ColorGreen").SetColor(0, 255, 0);
 
 
-    //this.FontFamily = undefined;
-    //this.FontSize   = undefined;
-    //this.Color      = undefined;
     //this.VertAlign  = undefined;
     //this.HighLight  = undefined; // highlight_None/Color
     //this.RStyle     = undefined;
@@ -1959,20 +2071,10 @@ function TEST_BUILDER2()
     //this.Position   = undefined; // Смещение по Y
     //
     //this.RFonts     = new CRFonts();
-    //this.BoldCS     = undefined;
-    //this.ItalicCS   = undefined;
-    //this.FontSizeCS = undefined;
-    //this.CS         = undefined;
-    //this.RTL        = undefined;
+
     //this.Lang       = new CLang();
-    //this.Unifill    = undefined;
-    //this.FontRef    = undefined;
     //
     //this.Shd        = undefined;
-    //this.Vanish     = undefined;
-    //
-    //this.TextOutline = undefined;
-    //this.TextFill    = undefined;
 
     //------------------------------------------------------------------------------------------------------------------
     oLD.Recalculate_FromStart();
