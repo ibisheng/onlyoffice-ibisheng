@@ -972,9 +972,9 @@ Processor3D.prototype._calculateCameraDiff = function (/*isSkip*/)
 		//this._calculateCameraDiffZ(points, faces);
 	
 		//быстрая функция поиска сдвигов камеры
-		console.time("sdf");
+		//console.time("sdf");
 		this._calculateCameraDiffZX(points, faces);
-		console.timeEnd("sdf");
+		//console.timeEnd("sdf");
 	}
 	
 	//***Calculate cameraDiffX***
