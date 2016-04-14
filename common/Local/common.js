@@ -167,11 +167,11 @@ function DesktopOfflineUpdateLocalName(_api)
 	window["AscDesktopEditor"]["SetDocumentName"](_name);
 }
 
-Asc.CDocsCoApi.prototype.askSaveChanges = function(callback)
+AscCommon.CDocsCoApi.prototype.askSaveChanges = function(callback)
 {
     callback({"saveLock": false});
 };
-Asc.CDocsCoApi.prototype.saveChanges = function(arrayChanges, deleteIndex, excelAdditionalInfo)
+AscCommon.CDocsCoApi.prototype.saveChanges = function(arrayChanges, deleteIndex, excelAdditionalInfo)
 {
 	window["AscDesktopEditor"]["LocalFileSaveChanges"](arrayChanges.join("\",\""), deleteIndex, arrayChanges.length);
 	//this.onUnSaveLock();

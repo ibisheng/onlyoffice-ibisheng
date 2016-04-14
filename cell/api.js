@@ -1568,7 +1568,7 @@ var editor;
       this.collaborativeEditing.sendChanges(this.IsUserSave);
     } else {
       nState = t.CoAuthoringApi.get_state();
-      if (ConnectionState.Close === nState) {
+      if (AscCommon.ConnectionState.Close === nState) {
         // Отключаемся от сохранения, соединение потеряно
         if (this.IsUserSave) {
           this.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
@@ -3079,7 +3079,7 @@ var editor;
 
     this.SpellCheckUrl = '';
 
-    this.User = new asc.asc_CUser();
+    this.User = new AscCommon.asc_CUser();
     this.User.setId("TM");
     this.User.setUserName("native");
 

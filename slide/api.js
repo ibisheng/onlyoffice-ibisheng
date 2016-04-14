@@ -1171,7 +1171,7 @@ function OnSave_Callback(e) {
     CollaborativeEditing.Send_Changes(editor.IsUserSave, {UserId: editor.CoAuthoringApi.getUserConnectionId(), UserShortId : editor.DocInfo.get_UserId(), CursorInfo: CursorInfo});
   } else {
     var nState = editor.CoAuthoringApi.get_state();
-    if (ConnectionState.Close === nState) {
+    if (AscCommon.ConnectionState.Close === nState) {
       // Отключаемся от сохранения, соединение потеряно
       editor.canSave = true;
       editor.IsUserSave = false;
@@ -4771,7 +4771,7 @@ window["asc_docs_api"].prototype["asc_nativeOpenFile"] = function(base64File, ve
 {
 	this.SpellCheckUrl = '';
 
-	this.User = new Asc.asc_CUser();
+	this.User = new AscCommon.asc_CUser();
 	this.User.setId("TM");
 	this.User.setUserName("native");
 	

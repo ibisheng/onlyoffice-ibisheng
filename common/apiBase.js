@@ -68,7 +68,7 @@ function baseEditorsApi(name) {
 
   // CoAuthoring and Chat
   this.User = undefined;
-  this.CoAuthoringApi = new Asc.CDocsCoApi();
+  this.CoAuthoringApi = new AscCommon.CDocsCoApi();
   this.isCoAuthoringEnable = true;
   // Массив lock-ов, которые были на открытии документа
   this.arrPreOpenLocksObjects = [];
@@ -166,7 +166,7 @@ baseEditorsApi.prototype.asc_setDocInfo = function(oDocInfo) {
 
     this.documentOpenOptions = this.DocInfo.asc_getOptions();
 
-    this.User = new Asc.asc_CUser();
+    this.User = new AscCommon.asc_CUser();
     this.User.setId(this.DocInfo.get_UserId());
     this.User.setUserName(this.DocInfo.get_UserName());
   }
@@ -371,7 +371,7 @@ baseEditorsApi.prototype._coAuthoringInit = function() {
   var t = this;
   //Если User не задан, отключаем коавторинг.
   if (null == this.User || null == this.User.asc_getId()) {
-    this.User = new Asc.asc_CUser();
+    this.User = new AscCommon.asc_CUser();
     this.User.setId("Unknown");
     this.User.setUserName("Unknown");
   }
@@ -419,7 +419,7 @@ baseEditorsApi.prototype._coAuthoringInit = function() {
    * @param {Bool} isCloseCoAuthoring
    */
   this.CoAuthoringApi.onDisconnect = function(e, isDisconnectAtAll, isCloseCoAuthoring) {
-    if (ConnectionState.None === t.CoAuthoringApi.get_state()) {
+    if (AscCommon.ConnectionState.None === t.CoAuthoringApi.get_state()) {
       t.asyncServerIdEndLoaded();
     }
     if (isDisconnectAtAll) {

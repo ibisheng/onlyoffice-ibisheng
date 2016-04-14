@@ -22,11 +22,14 @@ var History = {};
 window["Asc"] = {};
 var Asc = window["Asc"];
 
-window["AscCommonExcel"] = {};
-var AscCommonExcel = window["AscCommonExcel"];
-
 window["AscBrowser"] = {};
 var AscBrowser = window["AscBrowser"];
+
+window["AscCommon"] = {};
+var AscCommon = window["AscCommon"];
+
+window["AscCommonExcel"] = {};
+var AscCommonExcel = window["AscCommonExcel"];
 
 //-------------------------------------------------------------------------------------------------
 aStandartNumFormats = [];

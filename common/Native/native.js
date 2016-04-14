@@ -162,8 +162,9 @@ native_canvas.prototype =
 };
 
 window["Asc"] = {};
-window["AscCommonExcel"] = {};
 window["AscBrowser"] = {};
+window["AscCommon"] = {};
+window["AscCommonExcel"] = {};
 
 var _null_object = {};
 _null_object.length = 0;
@@ -257,8 +258,9 @@ function GetNativeEngine()
 var native_renderer = null;
 var _api = null;
 var Asc = window["Asc"];
-var AscCommonExcel = window["AscCommonExcel"];
 var AscBrowser = window["AscBrowser"];
+var AscCommon = window["AscCommon"];
+var AscCommonExcel = window["AscCommonExcel"];
 
 function NativeOpenFileData(data, version)
 {
