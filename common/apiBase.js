@@ -336,7 +336,7 @@ baseEditorsApi.prototype.processSavedFile = function(url, downloadType) {
     this.sendEvent(downloadType, url, function(hasError) {
     });
   } else {
-    getFile(url);
+    AscCommon.getFile(url);
   }
 };
 // Выставление интервала автосохранения (0 - означает, что автосохранения нет)
