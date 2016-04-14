@@ -1786,6 +1786,15 @@ asc_docs_api.prototype.ShapeApply = function(prop)
           fApplyCallback();
         }
         else{
+
+          if (window["AscDesktopEditor"])
+          {
+              image_url = window["AscDesktopEditor"]["LocalFileGetImageUrl"](sImageUrl);
+			  image_url = g_oDocumentUrls.getImageUrl(image_url);
+              fApplyCallback();
+              return;
+          }
+
           this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
           this.fCurCallback = function(input) {
             if(null != input && "imgurl" == input["type"]){

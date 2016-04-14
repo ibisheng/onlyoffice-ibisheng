@@ -4849,6 +4849,16 @@ asc_docs_api.prototype.ImgApply = function(obj)
             };
 
             if(sImageUrl){
+
+                if (window["AscDesktopEditor"])
+                {
+                    var _url = window["AscDesktopEditor"]["LocalFileGetImageUrl"](sImageToDownLoad);
+					_url = g_oDocumentUrls.getImageUrl(_url);
+                    fReplaceCallback(_url);
+                    fApplyCallback();
+                    return;
+                }
+
                 var rData = {
                     "id": this.documentId,
                     "userid": this.documentUserId,

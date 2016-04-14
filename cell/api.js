@@ -2434,6 +2434,16 @@ var editor;
       }
     }
     if(fReplaceCallback){
+
+      if (window["AscDesktopEditor"])
+      {
+        var firstUrl = window["AscDesktopEditor"]["LocalFileGetImageUrl"](sImageUrl);
+		firstUrl = g_oDocumentUrls.getImageUrl(firstUrl);
+        fReplaceCallback(firstUrl);
+        ws.objectRender.setGraphicObjectProps(props);
+        return;
+      }
+
       var rData = {
         "id": this.documentId,
         "userid": this.documentUserId,
