@@ -488,7 +488,9 @@ window.clearInterval = clearInterval;
 window.setInterval = setInterval;
 
 var console = {
-    log : function(param) { window.native.consoleLog(param); }
+    log : function(param) { window.native.consoleLog(param); },
+    time : function (param) {},
+    timeEnd : function (param) {}
 };
 
 window["NativeCorrectImageUrlOnPaste"] = function(url) {
@@ -3244,6 +3246,17 @@ function OfflineEditor () {
         }
 
         DrawingArea.prototype.drawSelection = function(drawingDocument) {
+
+            g_oTextMeasurer.m_oFont = null;
+            g_oTextMeasurer.m_oTextPr = null;
+            g_oTextMeasurer.m_oGrFonts = new CGrRFonts();
+            g_oTextMeasurer.m_oLastFont = new CFontSetup();
+            g_oTextMeasurer.LastFontOriginInfo = { Name : "", Replace : null };
+            g_oTextMeasurer.Ascender  = 0;
+            g_oTextMeasurer.Descender = 0;
+            g_oTextMeasurer.Height = 0;
+            g_oTextMeasurer.UnitsPerEm = 0;
+
             var canvas = this.worksheet.objectRender.getDrawingCanvas();
             var shapeCtx = canvas.shapeCtx;
             var shapeOverlayCtx = canvas.shapeOverlayCtx;
@@ -5767,17 +5780,13 @@ function offline_mouse_down(x, y, pin, isViewerMode, isFormulaEditMode, isRangeR
 
         var e = {isLocked:true, Button:0, ClickCount:1, shiftKey:false, metaKey:false, ctrlKey:false};
 
-        var content = null;
-
         if (1 === select.pin) {
-            content = ws.objectRender.controller.getTargetDocContent();
             wb._onGraphicObjectMouseDown(e, select.beginX, select.beginY);
             wb._onGraphicObjectMouseUp(e, select.endX, select.endY);
             e.shiftKey = true;
         }
 
         if (-1 === select.pin) {
-            content = ws.objectRender.controller.getTargetDocContent();
             wb._onGraphicObjectMouseDown(e, select.endX, select.endY);
             wb._onGraphicObjectMouseUp(e, select.beginX, select.beginY);
             e.shiftKey = true;
@@ -5906,8 +5915,15 @@ function offline_mouse_move(x, y, isViewerMode, isRangeResize, isChartRange, ind
 
         if (_s.isShapeAction) {
             if (!isViewerMode) {
+
                 var e = {isLocked: true, Button: 0, ClickCount: 1, shiftKey: false, metaKey: false, ctrlKey: false};
-                ws.objectRender.graphicObjectMouseMove(e, x, y);
+
+                if (textPin && 0 == textPin.pin) {
+                    wb._onGraphicObjectMouseDown(e, x, y);
+                    wb._onGraphicObjectMouseUp(e, x, y);
+                } else {
+                    ws.objectRender.graphicObjectMouseMove(e, x, y);
+                }
             }
         } else {
             if (_s.isFormulaEditMode) {
