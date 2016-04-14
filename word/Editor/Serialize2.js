@@ -4078,11 +4078,15 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
             if (null != elem.pageNum) {
 				var Instr = "PAGE \\* MERGEFORMAT";
 				this.bs.WriteItem(c_oSerParType.FldSimple, function(){oThis.WriteFldSimple(Instr, function(){
-					if(null != elem.pageNum.String && "string" == typeof(elem.pageNum.String)){
-						oThis.WriteRun2(function () {
-							oThis.WriteText(elem.pageNum.String, delText);
-						}, oRun);
-					}
+                    oThis.WriteRun2(function () {
+                        //всегда что-то пишем, потому что если ничего нет в w:t, то и не применяются настройки
+                        //todo не писать через fldsimple
+                        var numText = '1';
+                        if (null != elem.pageNum.String && "string" == typeof(elem.pageNum.String)) {
+                            numText = elem.pageNum.String;
+                        }
+                        oThis.WriteText(numText, delText);
+                    }, oRun);
 				});});
             }
         }
@@ -12434,7 +12438,7 @@ OpenParStruct.prototype = {
             var oPrevElem = this.stack.pop();
             this.cur = this.stack[this.stack.length - 1];
             var elem = oPrevElem.elem;
-            if (null != elem && elem.Content && elem.Content.length > 0) {
+            if (null != elem && elem.Content) {
                 if (para_Field == elem.Get_Type() && fieldtype_PAGENUM == elem.Get_FieldType()) {
                     var oNewRun = new ParaRun(this.paragraph);
                     var rPr = getStyleFirstRun(elem);
@@ -12443,7 +12447,7 @@ OpenParStruct.prototype = {
                     }
                     oNewRun.Add_ToContent(0, new ParaPageNum());
                     this.addToContent(oNewRun);
-                } else {
+                } else if(elem.Content.length > 0) {
                     this.addToContent(elem);
                 }
             }
