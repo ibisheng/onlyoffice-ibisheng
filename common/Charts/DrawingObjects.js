@@ -334,7 +334,27 @@ function CreateUniFillFromExcelColor(oExcelColor)
     if(oExcelColor instanceof ThemeColor)
     {
 
-        oUnifill = CreateUniFillSchemeColorWidthTint(map_themeExcel_to_themePresentation[oExcelColor.theme], oExcelColor.tint != null ? oExcelColor.tint : 0);
+        oUnifill = CreateUnifillSolidFillSchemeColorByIndex(map_themeExcel_to_themePresentation[oExcelColor.theme]);
+        if(oExcelColor.tint != null)
+        {
+            var unicolor = oUnifill.fill.color;
+            if(!unicolor.Mods)
+                unicolor.setMods(new CColorModifiers());
+            var mod = new CColorMod();
+            if(oExcelColor.tint > 0)
+            {
+                mod.setName("wordTint");
+                mod.setVal(Math.round(oExcelColor.tint*255));
+            }
+            else
+            {
+                mod.setName("wordShade");
+                mod.setVal(Math.round(255 + oExcelColor.tint*255));
+            }
+            unicolor.Mods.addMod(mod);
+        }
+
+        //oUnifill = CreateUniFillSchemeColorWidthTint(map_themeExcel_to_themePresentation[oExcelColor.theme], oExcelColor.tint != null ? oExcelColor.tint : 0);
     }
     else
     {
@@ -2249,11 +2269,12 @@ function DrawingObjects() {
     };
     _this.drawSparkLineGroups = function(oDrawingContext, oSparklineGroups, range)
     {
+        oDrawingContext.save();
         var graphics = new CGraphics();
         graphics.init(oDrawingContext.ctx, oDrawingContext.getWidth(0), oDrawingContext.getHeight(0),
             oDrawingContext.getWidth(3)*nSparklineMultiplier, oDrawingContext.getHeight(3)*nSparklineMultiplier);
         graphics.m_oFontManager = g_fontManager;
-        graphics.SaveGrState();
+
         for(var i = 0; i < oSparklineGroups.arrSparklineGroup.length; ++i) {
             var oSparklineGroup = oSparklineGroups.arrSparklineGroup[i];
             for(var j = 0; j < oSparklineGroup.arrSparklines.length; ++j) {
@@ -2268,7 +2289,7 @@ function DrawingObjects() {
                 oSparklineGroup.arrCachedSparklines[j].draw(graphics);
             }
         }
-        graphics.RestoreGrState();
+        oDrawingContext.restore();
     };
 
     _this.rebuildChartGraphicObjects = function(data)
