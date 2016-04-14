@@ -163,6 +163,7 @@ native_canvas.prototype =
 
 window["Asc"] = {};
 window["AscCommonExcel"] = {};
+window["AscBrowser"] = {};
 
 var _null_object = {};
 _null_object.length = 0;
@@ -257,6 +258,7 @@ var native_renderer = null;
 var _api = null;
 var Asc = window["Asc"];
 var AscCommonExcel = window["AscCommonExcel"];
+var AscBrowser = window["AscBrowser"];
 
 function NativeOpenFileData(data, version)
 {

@@ -25,6 +25,9 @@ var Asc = window["Asc"];
 window["AscCommonExcel"] = {};
 var AscCommonExcel = window["AscCommonExcel"];
 
+window["AscBrowser"] = {};
+var AscBrowser = window["AscBrowser"];
+
 //-------------------------------------------------------------------------------------------------
 aStandartNumFormats = [];
 aStandartNumFormats[0] = "General";
