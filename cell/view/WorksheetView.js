@@ -57,7 +57,7 @@
     var c_oAscCleanOptions = asc.c_oAscCleanOptions;
     var c_oAscSelectionType = asc.c_oAscSelectionType;
     var c_oAscSelectionDialogType = asc.c_oAscSelectionDialogType;
-    var c_oAscCustomAutoFilter = asc.c_oAscAutoFilterTypes;
+    var c_oAscAutoFilterTypes = asc.c_oAscAutoFilterTypes;
 
     /*
      * Constants

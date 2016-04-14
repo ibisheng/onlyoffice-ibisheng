@@ -6,7 +6,7 @@ var UndoRedoData_CellSimpleData = AscCommonExcel.UndoRedoData_CellSimpleData;
 var UndoRedoData_IndexSimpleProp = AscCommonExcel.UndoRedoData_IndexSimpleProp;
 
 var c_oAscCustomAutoFilter = Asc.c_oAscCustomAutoFilter;
-var c_oAscCustomAutoFilter = Asc.c_oAscAutoFilterTypes;
+var c_oAscAutoFilterTypes = Asc.c_oAscAutoFilterTypes;
 
 var g_oColorManager = null;
 var g_nNumsMaxId = 160;
