@@ -1129,10 +1129,13 @@ CTable.prototype =
         // TableWidth (ширина таблицы)
         if (undefined !== Props.TableWidth)
         {
-            if (null === Props.TableWidth && tblwidth_Auto != TablePr.TableW.Type)
+            if (null === Props.TableWidth)
             {
-                this.Set_TableW(tblwidth_Auto, 0);
-                bRecalc_All = true;
+                if (tblwidth_Auto != TablePr.TableW.Type)
+                {
+                    this.Set_TableW(tblwidth_Auto, 0);
+                    bRecalc_All = true;
+                }
             }
             else if (Props.TableWidth > -0.001)
             {
@@ -1183,7 +1186,7 @@ CTable.prototype =
         // TableAlignment (прилегание таблицы)
         if ( "undefined" != typeof(Props.TableAlignment) && true === this.Is_Inline() )
         {
-            var NewJc = ( 0 === Props.TableAlignment ? align_Left : ( 1 === Props.TableAlignment ? AscCommon.align_Center : AscCommon.align_Right ) );
+            var NewJc = ( 0 === Props.TableAlignment ? AscCommon.align_Left : ( 1 === Props.TableAlignment ? AscCommon.align_Center : AscCommon.align_Right ) );
             if ( TablePr.Jc != NewJc )
             {
                 _Jc = NewJc;
@@ -1193,7 +1196,7 @@ CTable.prototype =
         }
 
         // TableIndent (отступ слева)
-        if ( "undefined" != typeof(Props.TableIndent) && true === this.Is_Inline() && align_Left === _Jc )
+        if ( "undefined" != typeof(Props.TableIndent) && true === this.Is_Inline() && AscCommon.align_Left === _Jc )
         {
             if ( Props.TableIndent != TablePr.TableInd )
             {

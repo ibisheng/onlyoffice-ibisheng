@@ -198,8 +198,8 @@
     /**
      * Create new table
      * @method
-     * @param {number} [nCols]
-     * @param {number} [nRows]
+     * @param {number} nCols
+     * @param {number} nRows
      * @returns {ApiTable}
      */
     Api.prototype.CreateTable = function(nCols, nRows)
@@ -252,7 +252,7 @@
     {
         if (oElement instanceof ApiParagraph || oElement instanceof ApiTable)
         {
-            this.Document.Internal_Content_Add(nPos, oElement.private_GetImpl());
+            this.Document.Internal_Content_Add(nPos, oElement.private_GetImpl(), false);
             return true;
         }
 
@@ -384,6 +384,15 @@
         var oSectPr = new CSectionPr(this.Document);
         oParagraph.private_GetImpl().Set_SectionPr(oSectPr);
         return new ApiSection(oSectPr);
+    };
+    /**
+     * Specifies whether sections in this document shall have different headers and footers for even and odd pages
+     * (an odd page header/footer and an even page header/footer).
+     * @param {boolean} isEvenAndOdd
+     */
+    ApiDocument.prototype.SetEvenAndOddHdrFtr = function(isEvenAndOdd)
+    {
+        this.Document.Set_DocumentEvenAndOddHeaders(isEvenAndOdd);
     };
 
     //------------------------------------------------------------------------------------------------------------------
@@ -995,7 +1004,7 @@
     };
     /**
      * Get the content for the specified type of header.
-     * @param {HdrFtrType} sType - Type of the header.
+     * @param {HdrFtrType} sType - Type of header.
      * @param {boolean} [isCreate=false] - Create a header or not if there is no header with specified type in the current section.
      * @returns {?ApiDocument}
      */
@@ -1027,8 +1036,23 @@
         return new ApiDocument(oHeader.Get_DocumentContent());
     };
     /**
+     * Remove a header of the specified type from the current section. After removing the header will be inherited from
+     * the previous section or, if this is the first section in the document, there won't be no header of the specified
+     * type.
+     * @param {HdrFtrType} sType - Type of header.
+     */
+    ApiSection.prototype.RemoveHeader = function(sType)
+    {
+        if ("title" === sType)
+            this.Section.Set_Header_First(null);
+        else if ("even" === sType)
+            this.Section.Set_Header_Even(null);
+        else if ("default" === sType)
+            this.Section.Set_Header_Default(null);
+    };
+    /**
      * Get the content for the specified type of footer.
-     * @param {HdrFtrType} sType - Type of the footer.
+     * @param {HdrFtrType} sType - Type of footer.
      * @param {boolean} [isCreate=false] - Create a footer or not if there is no footer with specified type in the current section.
      * @returns {?ApiDocument}
      */
@@ -1045,7 +1069,7 @@
         else
             return null;
 
-        if (null === oHeader && true === isCreate)
+        if (null === oFooter && true === isCreate)
         {
             var oLogicDocument = private_GetLogicDocument();
             oFooter = new CHeaderFooter(oLogicDocument.Get_HdrFtr(), oLogicDocument, oLogicDocument.Get_DrawingDocument(), hdrftr_Footer);
@@ -1058,6 +1082,30 @@
         }
 
         return new ApiDocument(oFooter.Get_DocumentContent());
+    };
+    /**
+     * Remove a footer of the specified type from the current section. After removing the footer will be inherited from
+     * the previous section or, if this is the first section in the document, there won't be no footer of the specified
+     * type.
+     * @param {HdrFtrType} sType - Type of footer.
+     */
+    ApiSection.prototype.RemoveFooter = function(sType)
+    {
+        if ("title" === sType)
+            this.Section.Set_Footer_First(null);
+        else if ("even" === sType)
+            this.Section.Set_Footer_Even(null);
+        else if ("default" === sType)
+            this.Section.Set_Footer_Default(null);
+    };
+    /**
+     * Specifies whether the current section in this document shall have a different header and footer for its first
+     * page.
+     * @param {boolean} isTitlePage
+     */
+    ApiSection.prototype.SetTitlePage = function(isTitlePage)
+    {
+        this.Section.Set_TitlePage(private_GetBoolean(isTitlePage));
     };
 
     //------------------------------------------------------------------------------------------------------------------
@@ -1154,7 +1202,7 @@
     /**
      * Set the preferred width for this table.
      * @param {("auto" | "twips" | "percent" | "nil")} sType - Type of the width value
-     * @param {number} nValue
+     * @param {number} [nValue]
      */
     ApiTable.prototype.SetWidth = function(sType, nValue)
     {
@@ -1164,6 +1212,19 @@
             this.Table.Set_Props({TableWidth : private_Twips2MM(nValue)});
         else if ("percent" === sType)
             this.Table.Set_Props({TableWidth : -nValue});
+    };
+    /**
+     * Set the alignment of the current table with respect to the text margins in the current section.
+     * @param {("left" | "right" | "center")} sJcType
+     */
+    ApiTable.prototype.SetJc = function(sJcType)
+    {
+        if ("left" === sJcType)
+            this.Table.Set_Props({TableAlignment : 0});
+        else if ("right" === sJcType)
+            this.Table.Set_Props({TableAlignment : 2});
+        else if ("center" === sJcType)
+            this.Table.Set_Props({TableAlignment : 1});
     };
     /**
      * Specify the components of the conditional formatting of the referenced table style (if one exists)
@@ -1937,6 +1998,7 @@
     ApiDocument.prototype["GetDefaultStyle"]         = ApiDocument.prototype.GetDefaultStyle;
     ApiDocument.prototype["GetFinalSection"]         = ApiDocument.prototype.GetFinalSection;
     ApiDocument.prototype["CreateSection"]           = ApiDocument.prototype.CreateSection;
+    ApiDocument.prototype["SetEvenAndOddHdrFtr"]     = ApiDocument.prototype.SetEvenAndOddHdrFtr;
 
     ApiParagraph.prototype["AddText"]                = ApiParagraph.prototype.AddText;
     ApiParagraph.prototype["AddPageBreak"]           = ApiParagraph.prototype.AddPageBreak;
@@ -1992,6 +2054,11 @@
     ApiSection.prototype["SetPageMargins"]           = ApiSection.prototype.SetPageMargins;
     ApiSection.prototype["SetHeaderDistance"]        = ApiSection.prototype.SetHeaderDistance;
     ApiSection.prototype["SetFooterDistance"]        = ApiSection.prototype.SetFooterDistance;
+    ApiSection.prototype["GetHeader"]                = ApiSection.prototype.GetHeader;
+    ApiSection.prototype["RemoveHeader"]             = ApiSection.prototype.RemoveHeader;
+    ApiSection.prototype["GetFooter"]                = ApiSection.prototype.GetFooter;
+    ApiSection.prototype["RemoveFooter"]             = ApiSection.prototype.RemoveFooter;
+    ApiSection.prototype["SetTitlePage"]             = ApiSection.prototype.SetTitlePage;
 
     ApiTable.prototype["GetRowsCount"]               = ApiTable.prototype.GetRowsCount;
     ApiTable.prototype["GetRow"]                     = ApiTable.prototype.GetRow;
@@ -2633,7 +2700,91 @@ function TEST_BUILDER()
 
     oParagraph = Api.CreateParagraph();
     oDocument.Push(oParagraph);
+    oTextPr = oParagraph.GetParagraphMarkTextPr();
+    oTextPr.SetColor(0xff, 0x00, 0x00);
+    oTextPr.SetFontFamily("Segoe UI");
 
+    // Filling ups header and footer
+    oSection1.SetTitlePage(true);
+    var oDocContent = oSection1.GetHeader("default", true);
+    oDocContent.RemoveAllElements();
+    oTable = Api.CreateTable(2, 1);
+    oDocContent.Push(oTable);
+    oTable.SetWidth("auto");
+    oTable.SetJc("right");
+    oTable.SetTableLook(true, true, false, false, true, false);
+    oRow = oTable.GetRow(0);
+    if (oRow)
+    {
+        oRow.SetHeight("atLeast", 792);
+        oCell = oRow.GetCell(0);
+        if (oCell)
+        {
+            oCell.SetWidth("twips", 3337);
+            oCell.SetVerticalAlign("bottom");
+            oCellContent = oCell.GetContent();
+            oParagraph = oCellContent.GetElement(0);
+            oParagraph.SetStyle("Header");
+            oParagraph.SetJc("right");
+            oTextPr = oParagraph.GetParagraphMarkTextPr();
+            oTextPr.SetFontFamily("Calibri Light");
+            oTextPr.SetFontSize(28);
+            oRun = oParagraph.AddText("HAYDEN MANAGEMENT");
+            oRun.SetSmallCaps(true);
+            oRun.SetFontSize(32);
+            oRun.SetFontFamily("Calibri Light");
+        }
+        oCell = oRow.GetCell(1);
+        if (oCell)
+        {
+            oCell.SetWidth("twips", 792);
+            oCell.SetShd("clear", 0xff, 0xa4, 0x65);
+            oCell.SetVerticalAlign("center");
+            oCellContent = oCell.GetContent();
+            oParagraph = oCellContent.GetElement(0);
+            oParagraph.SetStyle("Header");
+            oParagraph.SetJc("center");
+            oParagraph.GetParagraphMarkTextPr().SetColor(0xff, 0xff, 0xff);
+            oRun = oParagraph.AddText("1");
+            oRun.SetColor(0xff, 0xff, 0xff);
+        }
+    }
+
+    oParagraph = Api.CreateParagraph();
+    oDocContent.Push(oParagraph);
+
+    oDocContent = oSection1.GetFooter("default", true);
+    oDocContent.RemoveAllElements();
+    oTable = Api.CreateTable(2, 1);
+    oDocContent.Push(oTable);
+    oTable.SetWidth("auto");
+    oTable.SetJc("right");
+    oTable.SetTableLook(true, true, false, false, true, false);
+    oRow = oTable.GetRow(0);
+    if (oRow)
+    {
+        oCell = oRow.GetCell(0);
+        if (oCell)
+        {
+            oCell.SetWidth("auto");
+            oCellContent = oCell.GetContent();
+            oParagraph = oCellContent.GetElement(0);
+            oParagraph.SetStyle("Footer");
+            oParagraph.SetJc("right");
+            oParagraph.AddText("Hayden Management");
+            oParagraph.AddText(" | Confidential");
+        }
+        oCell = oRow.GetCell(1);
+        if (oCell)
+        {
+            oCell.SetWidth("auto");
+            oCellContent = oCell.GetContent();
+            oParagraph = oCellContent.GetElement(0);
+            oParagraph.SetStyle("Footer");
+            oParagraph.SetJc("right");
+            // TODO: Добавить автофигуру
+        }
+    }
 
     //------------------------------------------------------------------------------------------------------------------
     oLD.Recalculate_FromStart(true);
