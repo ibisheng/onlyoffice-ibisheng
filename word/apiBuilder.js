@@ -156,6 +156,16 @@
      * @typedef {("clear" | "left" | "right" | "center")} TabJc
      */
 
+    /**
+     * Eighths of a point (24 eighths of a point = 3 points)
+     * @typedef {number} pt_8
+     */
+
+    /**
+     * point
+     * @typedef {number} pt
+     */
+
     //------------------------------------------------------------------------------------------------------------------
     //
     // Base Api
@@ -576,8 +586,8 @@
      * Specifies the border which shall be displayed below a set of paragraphs which have the same paragraph border settings.
      * @see {@link ApiParagraph#GetParaPr} and {@link ApiParaPr#SetBottomBorder}
      * @param {BorderType} sType - The style of border.
-     * @param {twips} nSize - The width of the current border.
-     * @param {twips} nSpace - The spacing offset that shall be used to place this border.
+     * @param {pt_8} nSize - The width of the current border.
+     * @param {pt} nSpace - The spacing offset that shall be used to place this border.
      * @param {byte} r
      * @param {byte} g
      * @param {byte} b
@@ -590,8 +600,8 @@
      * Specifies the border which shall be displayed on the left side of the page around the specified paragraph.
      * @see {@link ApiParagraph#GetParaPr} and {@link ApiParaPr#SetLeftBorder}
      * @param {BorderType} sType - The style of border.
-     * @param {twips} nSize - The width of the current border.
-     * @param {twips} nSpace - The spacing offset that shall be used to place this border.
+     * @param {pt_8} nSize - The width of the current border.
+     * @param {pt} nSpace - The spacing offset that shall be used to place this border.
      * @param {byte} r
      * @param {byte} g
      * @param {byte} b
@@ -604,8 +614,8 @@
      * Specifies the border which shall be displayed on the right side of the page around the specified paragraph.
      * @see {@link ApiParagraph#GetParaPr} and {@link ApiParaPr#SetRightBorder}
      * @param {BorderType} sType - The style of border.
-     * @param {twips} nSize - The width of the current border.
-     * @param {twips} nSpace - The spacing offset that shall be used to place this border.
+     * @param {pt_8} nSize - The width of the current border.
+     * @param {pt} nSpace - The spacing offset that shall be used to place this border.
      * @param {byte} r
      * @param {byte} g
      * @param {byte} b
@@ -619,8 +629,8 @@
      * border settings.
      * @see {@link ApiParagraph#GetParaPr} and {@link ApiParaPr#SetTopBorder}
      * @param {BorderType} sType - The style of border.
-     * @param {twips} nSize - The width of the current border.
-     * @param {twips} nSpace - The spacing offset that shall be used to place this border.
+     * @param {pt_8} nSize - The width of the current border.
+     * @param {pt} nSpace - The spacing offset that shall be used to place this border.
      * @param {byte} r
      * @param {byte} g
      * @param {byte} b
@@ -634,8 +644,8 @@
      * set of paragraph border settings.
      * @see {@link ApiParagraph#GetParaPr} and {@link ApiParaPr#SetBetweenBorder}
      * @param {BorderType} sType - The style of border.
-     * @param {twips} nSize - The width of the current border.
-     * @param {twips} nSpace - The spacing offset that shall be used to place this border.
+     * @param {pt_8} nSize - The width of the current border.
+     * @param {pt} nSpace - The spacing offset that shall be used to place this border.
      * @param {byte} r
      * @param {byte} g
      * @param {byte} b
@@ -1096,8 +1106,8 @@
     /**
      * Set the border which shall be displayed at the top of the current table.
      * @param {BorderType} sType - The style of border.
-     * @param {twips} nSize - The width of the current border.
-     * @param {twips} nSpace - The spacing offset that shall be used to place this border.
+     * @param {pt_8} nSize - The width of the current border.
+     * @param {pt} nSpace - The spacing offset that shall be used to place this border.
      * @param {byte} r
      * @param {byte} g
      * @param {byte} b
@@ -1109,8 +1119,8 @@
     /**
      * Set the border which shall be displayed at the bottom of the current table.
      * @param {BorderType} sType - The style of border.
-     * @param {twips} nSize - The width of the current border.
-     * @param {twips} nSpace - The spacing offset that shall be used to place this border.
+     * @param {pt_8} nSize - The width of the current border.
+     * @param {pt} nSpace - The spacing offset that shall be used to place this border.
      * @param {byte} r
      * @param {byte} g
      * @param {byte} b
@@ -1122,8 +1132,8 @@
     /**
      * Set the border which shall be displayed on the left of the current table.
      * @param {BorderType} sType - The style of border.
-     * @param {twips} nSize - The width of the current border.
-     * @param {twips} nSpace - The spacing offset that shall be used to place this border.
+     * @param {pt_8} nSize - The width of the current border.
+     * @param {pt} nSpace - The spacing offset that shall be used to place this border.
      * @param {byte} r
      * @param {byte} g
      * @param {byte} b
@@ -1135,8 +1145,8 @@
     /**
      * Set the border which shall be displayed on the right of the current table.
      * @param {BorderType} sType - The style of border.
-     * @param {twips} nSize - The width of the current border.
-     * @param {twips} nSpace - The spacing offset that shall be used to place this border.
+     * @param {pt_8} nSize - The width of the current border.
+     * @param {pt} nSpace - The spacing offset that shall be used to place this border.
      * @param {byte} r
      * @param {byte} g
      * @param {byte} b
@@ -1149,8 +1159,8 @@
      * Specify the border which shall be displayed on all horizontal table cell borders which are not on
      * an outmost edge of the parent table (all horizontal borders which are not the topmost or bottommost border).
      * @param {BorderType} sType - The style of border.
-     * @param {twips} nSize - The width of the current border.
-     * @param {twips} nSpace - The spacing offset that shall be used to place this border.
+     * @param {pt_8} nSize - The width of the current border.
+     * @param {pt} nSpace - The spacing offset that shall be used to place this border.
      * @param {byte} r
      * @param {byte} g
      * @param {byte} b
@@ -1163,8 +1173,8 @@
      * Specify the border which shall be displayed on all vertical table cell borders which are not on an
      * outmost edge of the parent table (all horizontal borders which are not the leftmost or rightmost border).
      * @param {BorderType} sType - The style of border.
-     * @param {twips} nSize - The width of the current border.
-     * @param {twips} nSpace - The spacing offset that shall be used to place this border.
+     * @param {pt_8} nSize - The width of the current border.
+     * @param {pt} nSpace - The spacing offset that shall be used to place this border.
      * @param {byte} r
      * @param {byte} g
      * @param {byte} b
@@ -1495,7 +1505,7 @@
      */
     ApiTextPr.prototype.SetPosition = function(nPosition)
     {
-        this.TextPr.Position = private_GetHps(nPosition);
+        this.TextPr.Position = private_PtToMM(private_GetHps(nPosition));
         this.private_OnChange();
     };
     /**
@@ -1686,14 +1696,14 @@
      */
     ApiParaPr.prototype.SetShd = function(sType, r, g, b, isAuto)
     {
-        this.ParaPr.Shd = private_GetShd(sType, r, b, b, isAuto);
+        this.ParaPr.Shd = private_GetShd(sType, r, g, b, isAuto);
         this.private_OnChange();
     };
     /**
      * Specifies the border which shall be displayed below a set of paragraphs which have the same paragraph border settings.
      * @param {BorderType} sType - The style of border.
-     * @param {twips} nSize - The width of the current border.
-     * @param {twips} nSpace - The spacing offset that shall be used to place this border.
+     * @param {pt_8} nSize - The width of the current border.
+     * @param {pt} nSpace - The spacing offset that shall be used to place this border.
      * @param {byte} r
      * @param {byte} g
      * @param {byte} b
@@ -1706,8 +1716,8 @@
     /**
      * Specifies the border which shall be displayed on the left side of the page around the specified paragraph.
      * @param {BorderType} sType - The style of border.
-     * @param {twips} nSize - The width of the current border.
-     * @param {twips} nSpace - The spacing offset that shall be used to place this border.
+     * @param {pt_8} nSize - The width of the current border.
+     * @param {pt} nSpace - The spacing offset that shall be used to place this border.
      * @param {byte} r
      * @param {byte} g
      * @param {byte} b
@@ -1720,8 +1730,8 @@
     /**
      * Specifies the border which shall be displayed on the right side of the page around the specified paragraph.
      * @param {BorderType} sType - The style of border.
-     * @param {twips} nSize - The width of the current border.
-     * @param {twips} nSpace - The spacing offset that shall be used to place this border.
+     * @param {pt_8} nSize - The width of the current border.
+     * @param {pt} nSpace - The spacing offset that shall be used to place this border.
      * @param {byte} r
      * @param {byte} g
      * @param {byte} b
@@ -1735,8 +1745,8 @@
      * Specifies the border which shall be displayed above a set of paragraphs which have the same set of paragraph
      * border settings.
      * @param {BorderType} sType - The style of border.
-     * @param {twips} nSize - The width of the current border.
-     * @param {twips} nSpace - The spacing offset that shall be used to place this border.
+     * @param {pt_8} nSize - The width of the current border.
+     * @param {pt} nSpace - The spacing offset that shall be used to place this border.
      * @param {byte} r
      * @param {byte} g
      * @param {byte} b
@@ -1750,8 +1760,8 @@
      * Specifies the border which shall be displayed between each paragraph in a set of paragraphs which have the same
      * set of paragraph border settings.
      * @param {BorderType} sType - The style of border.
-     * @param {twips} nSize - The width of the current border.
-     * @param {twips} nSpace - The spacing offset that shall be used to place this border.
+     * @param {pt_8} nSize - The width of the current border.
+     * @param {pt} nSpace - The spacing offset that shall be used to place this border.
      * @param {byte} r
      * @param {byte} g
      * @param {byte} b
@@ -1784,9 +1794,9 @@
             return;
 
         var oTabs = new CParaTabs();
-        for (var nIndex = 0, nCount = aPos.length; nIndex < nPos; ++nIndex)
+        for (var nIndex = 0, nCount = aPos.length; nIndex < nCount; ++nIndex)
         {
-            oTabs.push(private_GetTabStop(aPos[nIndex], aVal[nIndex]));
+            oTabs.Add(private_GetTabStop(aPos[nIndex], aVal[nIndex]));
         }
         this.ParaPr.Tabs = oTabs;
         this.private_OnChange();
@@ -2007,62 +2017,7 @@
         else if ("center" === sValue)
             nType = tab_Center;
 
-        return new CParaTab(nType, nPos);
-    }
-
-    function private_GetParaSpacing(nLine, sLineRule, nBefore, nAfter, isBeforeAuto, isAfterAuto)
-    {
-        var oSp = new CParaSpacing();
-
-        if (undefined !== nLine && undefined !== sLineRule)
-        {
-            if ("auto" === sLineRule)
-            {
-                oSp.LineRule = linerule_Auto;
-                oSp.Line = nLine / 240.0;
-            }
-            else if ("atLeast" === sLineRule)
-            {
-                oSp.LineRule = linerule_AtLeast;
-                oSp.Line = private_Twips2MM(nLine);
-
-            }
-            else if ("exact" === sLineRule)
-            {
-                oSp.LineRule = linerule_Exact;
-                oSp.Line = private_Twips2MM(nLine);
-            }
-        }
-
-        if (undefined !== nBefore)
-            oSp.Before = private_Twips2MM(nBefore);
-
-        if (undefined !== nAfter)
-            oSp.After = private_Twips2MM(nAfter);
-
-        if (undefined !== isAfterAuto)
-            oSp.AfterAutoSpacing = isAfterAuto;
-
-        if (undefined !== isBeforeAuto)
-            oSp.BeforeAutoSpacing = isBeforeAuto;
-
-        return oSp;
-    }
-
-    function private_GetParaInd(nLeft, nRight, nFirstLine)
-    {
-        var oInd = new CParaInd();
-
-        if (undefined !== nLeft)
-            oInd.Left = private_Twips2MM(nLeft);
-
-        if (undefined !== nRight)
-            oInd.Right = private_Twips2MM(nRight);
-
-        if (undefined !== nFirstLine)
-            oInd.FirstLine = private_Twips2MM(nFirstLine);
-
-        return oInd;
+        return new CParaTab(nType, private_Twips2MM(nPos));
     }
 
     function private_GetParaAlign(sJc)
@@ -2088,8 +2043,8 @@
         else if ("none" === sType)
             oBorder.Value = border_None;
 
-        oBorder.Size = private_Twips2MM(nSize);
-        oBorder.Space = private_Twips2MM(nSpace);
+        oBorder.Size  = private_Pt_8ToMM(nSize);
+        oBorder.Space = private_PtToMM(nSpace);
         oBorder.Color.Set(r, g, b);
         return oBorder;
     }
@@ -2116,6 +2071,18 @@
         else
             return (undefined !== bDefValue ? bDefValue : false);
     }
+
+    function private_PtToMM(pt)
+    {
+        return 25.4 / 72.0 * pt;
+    }
+
+    function private_Pt_8ToMM(pt)
+    {
+        return 25.4 / 72.0 / 8 * pt;
+    }
+
+
 
     ApiParagraph.prototype.private_GetImpl = function()
     {
@@ -2595,6 +2562,127 @@ function TEST_BUILDER2()
     oParagraph.AddText("Language English(Canada)").SetLanguage("en-CA");
     oParagraph.AddText("Language Russia").SetLanguage("ru-RU");
     oParagraph.AddText("ShadeRed").SetShd("clear", 255, 0, 0);
+
+    oParagraph = Api.CreateParagraph();
+    oParagraph.AddText("Normal paragraph");
+    oDocument.Push(oParagraph);
+
+    oParagraph = Api.CreateParagraph();
+    oParagraph.SetContextualSpacing(true);
+    oParagraph.AddText("ContextualSpacing is true");
+    oDocument.Push(oParagraph);
+
+    oParagraph = Api.CreateParagraph();
+    oParagraph.SetIndLeft(300);
+    oParagraph.AddText("Left indent is 15pt");
+    oDocument.Push(oParagraph);
+
+    oParagraph = Api.CreateParagraph();
+    oParagraph.SetIndRight(600);
+    oParagraph.AddText("Right indent is 30pt");
+    oDocument.Push(oParagraph);
+
+    oParagraph = Api.CreateParagraph();
+    oParagraph.SetIndFirstLine(100);
+    oParagraph.AddText("First line indent is 5pt");
+    oDocument.Push(oParagraph);
+
+    oParagraph = Api.CreateParagraph();
+    oParagraph.SetIndFirstLine(-100);
+    oParagraph.AddText("First line indent is -5pt");
+    oDocument.Push(oParagraph);
+
+    oParagraph = Api.CreateParagraph();
+    oParagraph.SetJc("left");
+    oParagraph.AddText("Paragraph align: left");
+    oDocument.Push(oParagraph);
+
+    oParagraph = Api.CreateParagraph();
+    oParagraph.SetJc("right");
+    oParagraph.AddText("Paragraph align: right");
+    oDocument.Push(oParagraph);
+
+    oParagraph = Api.CreateParagraph();
+    oParagraph.SetJc("center");
+    oParagraph.AddText("Paragraph align: center");
+    oDocument.Push(oParagraph);
+
+    oParagraph = Api.CreateParagraph();
+    oParagraph.SetJc("both");
+    oParagraph.AddText("Paragraph align: both both both both both both both both both both both both both both both both both both both both both both both both both both both both both both both both both both both both both both both both both both both both both both both both both both ");
+    oDocument.Push(oParagraph);
+
+    oParagraph = Api.CreateParagraph();
+    oParagraph.SetKeepLines(true);
+    oParagraph.AddText("KeepLines");
+    oDocument.Push(oParagraph);
+
+    oParagraph = Api.CreateParagraph();
+    oParagraph.SetKeepNext(true);
+    oParagraph.AddText("KeepNext");
+    oDocument.Push(oParagraph);
+
+    oParagraph = Api.CreateParagraph();
+    oParagraph.SetPageBreakBefore(true);
+    oParagraph.AddText("PageBreakBefore");
+    oDocument.Push(oParagraph);
+
+    oParagraph = Api.CreateParagraph();
+    oParagraph.SetSpacingLine(3 * 240, "auto");
+    oParagraph.AddText("Spacing: multiply 3");
+    oDocument.Push(oParagraph);
+
+    oParagraph = Api.CreateParagraph();
+    oParagraph.SetSpacingLine(200, "exact");
+    oParagraph.AddText("Spacing: exact 10pt");
+    oDocument.Push(oParagraph);
+
+    oParagraph = Api.CreateParagraph();
+    oParagraph.SetSpacingLine(400, "atLeast");
+    oParagraph.AddText("Spacing: atLeast 20pt");
+    oDocument.Push(oParagraph);
+
+    oParagraph = Api.CreateParagraph();
+    oParagraph.SetSpacingBefore(200);
+    oParagraph.SetSpacingAfter(0);
+    oParagraph.AddText("Spacing: before 10pt after 0");
+    oDocument.Push(oParagraph);
+
+    oParagraph = Api.CreateParagraph();
+    oParagraph.SetSpacingBefore(0, true);
+    oParagraph.SetSpacingAfter(0, true);
+    oParagraph.AddText("Spacing: before auto after auto");
+    oDocument.Push(oParagraph);
+
+    oParagraph = Api.CreateParagraph();
+    oParagraph.SetShd("clear", 0, 255, 0, false);
+    oParagraph.AddText("Shading: green");
+    oDocument.Push(oParagraph);
+
+    for (var nIndex = 0; nIndex < 3; ++nIndex)
+    {
+        oParagraph = Api.CreateParagraph();
+        oDocument.Push(oParagraph);
+        oParagraph.AddText("Borders");
+
+        oParagraph.SetTopBorder("single", 24, 0, 255, 0, 0);
+        oParagraph.SetBottomBorder("single", 24, 0, 0, 255, 0);
+        oParagraph.SetLeftBorder("single", 48, 0, 0, 0, 255);
+        oParagraph.SetRightBorder("single", 48, 0, 255, 255, 0);
+        oParagraph.SetBetweenBorder("single", 36, 0, 255, 0, 255);
+    }
+
+    oParagraph = Api.CreateParagraph();
+    oParagraph.SetWidowControl(false);
+    oParagraph.AddText("Widow control is off");
+    oDocument.Push(oParagraph);
+
+    oParagraph = Api.CreateParagraph();
+    oParagraph.SetTabs([1000, 1500, 3000], ["center", "left", "right"]);
+    oParagraph.AddText("Custom tabs (center, left, right)");
+    oDocument.Push(oParagraph);
+
+    //TODO: Сделать примеры параграфов с нумерацей
 
     //------------------------------------------------------------------------------------------------------------------
     oLD.Recalculate_FromStart();
