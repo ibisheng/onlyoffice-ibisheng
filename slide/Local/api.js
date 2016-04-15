@@ -146,7 +146,7 @@ window["DesktopOfflineAppDocumentStartSave"] = function(isSaveAs)
 	var _param = "";
 	if (isSaveAs === true)
 		_param += "saveas=true;";
-	if (AscBrowser.isRetina)
+	if (AscCommon.AscBrowser.isRetina)
 		_param += "retina=true;";
 	
 	window["AscDesktopEditor"]["LocalFileSave"](_param);

@@ -4011,9 +4011,9 @@ function CThumbnailsManager()
             if (!oThis.IsMouseDownTrackSimple)
             {
                 var cursor_dragged = "default";
-                if (AscBrowser.isWebkit)
+                if (AscCommon.AscBrowser.isWebkit)
                     cursor_dragged = "-webkit-grabbing";
-                else if (AscBrowser.isMozilla)
+                else if (AscCommon.AscBrowser.isMozilla)
                     cursor_dragged = "-moz-grabbing";
 
                 oThis.m_oWordControl.m_oThumbnails.HtmlElement.style.cursor = cursor_dragged;

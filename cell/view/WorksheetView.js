@@ -23,6 +23,7 @@
     var c_oAscLockTypes = AscCommon.c_oAscLockTypes;
     var c_oAscFormatPainterState = AscCommon.c_oAscFormatPainterState;
     var c_oAscPrintDefaultSettings = AscCommon.c_oAscPrintDefaultSettings;
+    var AscBrowser = AscCommon.AscBrowser;
 
     var asc = window["Asc"];
     var asc_applyFunction = asc.applyFunction;

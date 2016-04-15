@@ -8,7 +8,7 @@ function (window, undefined) {
 function FileHandler() {
 
     this.get = function ( file ) {
-        if ( AscBrowser.isAppleDevices ) {
+        if ( AscCommon.AscBrowser.isAppleDevices ) {
             var downloadWindow = window.open( file, "_parent", "", false );
             downloadWindow.document.title = "Downloading...";
             window.focus();

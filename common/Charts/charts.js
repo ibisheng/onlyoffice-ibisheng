@@ -419,7 +419,7 @@ ChartPreviewManager.prototype.createChartPreview = function(type, styleIndex) {
             this._canvas_charts.width = this.CHART_PREVIEW_WIDTH_PIX;
             this._canvas_charts.height = this.CHART_PREVIEW_HEIGHT_PIX;
 
-            if (AscBrowser.isRetina) {
+            if (AscCommon.AscBrowser.isRetina) {
                 this._canvas_charts.width <<= 1;
                 this._canvas_charts.height <<= 1;
             }
@@ -666,7 +666,7 @@ TextArtPreviewManager.prototype.getCanvas = function()
 		this.canvas.width = this.canvasWidth;
 		this.canvas.height = this.canvasHeight;
 
-		if (AscBrowser.isRetina) {
+		if (AscCommon.AscBrowser.isRetina) {
 			this.canvas.width <<= 1;
 			this.canvas.height <<= 1;
 		}

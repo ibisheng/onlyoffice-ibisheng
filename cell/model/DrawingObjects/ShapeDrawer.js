@@ -843,7 +843,7 @@ CShapeDrawer.prototype =
             }
 
 			var bIsUnusePattern = false;
-			if (AscBrowser.isIE)
+			if (AscCommon.AscBrowser.isIE)
 			{
 				// ie падает иначе !!!
 				if (this.UniFill.fill.RasterImageId)

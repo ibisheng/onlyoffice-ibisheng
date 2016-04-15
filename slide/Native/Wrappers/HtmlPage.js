@@ -6,7 +6,7 @@ var g_dDpiY = 96.0;
 var g_dKoef_mm_to_pix = g_dDpiX / 25.4;
 var g_dKoef_pix_to_mm = 25.4 / g_dDpiX;
 
-var g_bIsMobile = AscBrowser.isMobile;
+var g_bIsMobile = AscCommon.AscBrowser.isMobile;
 var g_bIsMouseUpLockedSend = false;
 
 var Page_Width     = 297;

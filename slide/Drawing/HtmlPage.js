@@ -6,7 +6,7 @@ var g_dDpiY = 96.0;
 var g_dKoef_mm_to_pix = g_dDpiX / 25.4;
 var g_dKoef_pix_to_mm = 25.4 / g_dDpiX;
 
-var g_bIsMobile = AscBrowser.isMobile;
+var g_bIsMobile = AscCommon.AscBrowser.isMobile;
 var g_bIsMouseUpLockedSend = false;
 
 var Page_Width     = 297;
@@ -210,7 +210,7 @@ function CEditorPage(api)
 
     this.ZoomFreePageNum = -1;
 
-    this.m_bIsIE = AscBrowser.isIE;
+    this.m_bIsIE = AscCommon.AscBrowser.isIE;
 
     // сплиттеры (для табнейлов и для заметок)
     this.Splitter1Pos = 0;
@@ -512,7 +512,7 @@ function CEditorPage(api)
         var old = this.bIsRetinaSupport;
         if (!this.bIsRetinaNoSupportAttack)
         {
-			this.bIsRetinaSupport = AscBrowser.isRetina;
+			this.bIsRetinaSupport = AscCommon.AscBrowser.isRetina;
             this.m_oOverlayApi.IsRetina = this.bIsRetinaSupport;
         }
         else
@@ -2370,7 +2370,7 @@ function CEditorPage(api)
 
     this.OnResize = function(isAttack)
     {
-        AscBrowser.checkZoom();
+        AscCommon.AscBrowser.checkZoom();
 
         var isNewSize = this.checkBodySize();
         if (!isNewSize && false === isAttack)

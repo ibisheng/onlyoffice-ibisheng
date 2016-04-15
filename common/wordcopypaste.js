@@ -1,6 +1,7 @@
 "use strict";
 
 // Import
+var AscBrowser = AscCommon.AscBrowser;
 var align_Right = AscCommon.align_Right;
 var align_Left = AscCommon.align_Left;
 var align_Center = AscCommon.align_Center;

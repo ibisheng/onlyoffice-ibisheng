@@ -19,9 +19,6 @@ window.document = document;
 window["Asc"] = {};
 var Asc = window["Asc"];
 
-window["AscBrowser"] = {};
-var AscBrowser = window["AscBrowser"];
-
 window["AscCommon"] = {};
 var AscCommon = window["AscCommon"];
 

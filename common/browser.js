@@ -93,5 +93,6 @@ AscBrowser.checkZoom();
 AscBrowser.isRetina = (Math.abs(2 - (window.devicePixelRatio / AscBrowser.zoom)) < 0.01);
 
     //--------------------------------------------------------export----------------------------------------------------
-    window['AscBrowser'] = window.AscBrowser = AscBrowser; // ToDo убрать window['AscBrowser']
+    window['AscCommon'] = window['AscCommon'] || {};
+    window['AscCommon'].AscBrowser = AscBrowser; // ToDo убрать window['AscBrowser']
 })(window);

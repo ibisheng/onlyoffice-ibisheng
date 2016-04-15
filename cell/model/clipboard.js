@@ -12,8 +12,8 @@
 		 * -----------------------------------------------------------------------------
 		 */
 		var c_oAscBorderStyles = AscCommon.c_oAscBorderStyles;
-
 		var c_oAscMaxCellOrCommentLength = AscCommon.c_oAscMaxCellOrCommentLength;
+		var AscBrowser = AscCommon.AscBrowser;
 
 		var doc = window.document;
 		

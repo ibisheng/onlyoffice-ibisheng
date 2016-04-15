@@ -106,10 +106,10 @@ function CBrush()
 var MATRIX_ORDER_PREPEND    = 0;
 var MATRIX_ORDER_APPEND     = 1;
 
-var bIsChrome   = AscBrowser.isChrome;
-var bIsSafari   = AscBrowser.isSafari;
-var bIsIE       = AscBrowser.isIE;
-var bIsAndroid  = AscBrowser.isAndroid;
+var bIsChrome   = AscCommon.AscBrowser.isChrome;
+var bIsSafari   = AscCommon.AscBrowser.isSafari;
+var bIsIE       = AscCommon.AscBrowser.isIE;
+var bIsAndroid  = AscCommon.AscBrowser.isAndroid;
 
 function deg2rad(deg){
     return deg * Math.PI / 180.0;

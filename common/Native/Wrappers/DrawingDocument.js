@@ -1,4 +1,4 @@
-﻿function CTableMarkup(Table)
+function CTableMarkup(Table)
 {
     this.Internal =
     {
@@ -2232,7 +2232,7 @@ CDrawingDocument.prototype =
             var _w_px = TABLE_STYLE_WIDTH_PIX;
             var _h_px = TABLE_STYLE_HEIGHT_PIX;
 
-            if (AscBrowser.isRetina)
+            if (AscCommon.AscBrowser.isRetina)
             {
                 _w_px *= 2;
                 _h_px *= 2;

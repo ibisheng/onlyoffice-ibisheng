@@ -19,6 +19,7 @@
    */
   var c_oAscBorderStyles = AscCommon.c_oAscBorderStyles;
   var c_oAscFormatPainterState = AscCommon.c_oAscFormatPainterState;
+  var AscBrowser = AscCommon.AscBrowser;
 
   var asc = window["Asc"];
   var asc_applyFunction = asc.applyFunction;

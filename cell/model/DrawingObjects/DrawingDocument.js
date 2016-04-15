@@ -2665,7 +2665,7 @@ function CDrawingDocument(drawingObjects)
             _offY = this.AutoShapesTrack.Graphics.m_oCoordTransform.ty;
         }
 
-        var _factor = AscBrowser.isRetina ? 1 : 0;
+        var _factor = AscCommon.AscBrowser.isRetina ? 1 : 0;
 
         if (null != this.TextMatrix && !global_MatrixTransformer.IsIdentity2(this.TextMatrix))
         {

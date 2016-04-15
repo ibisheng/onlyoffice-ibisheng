@@ -420,7 +420,7 @@ function CFontFileLoader(id)
                 g_fonts_streams[__font_data_idx] = new FT_Stream(_uintData, _uintData.length);
                 oThis.SetStreamIndex(__font_data_idx);
             }
-            else if (AscBrowser.isIE)
+            else if (AscCommon.AscBrowser.isIE)
             {
                 var _response = new VBArray(this["responseBody"]).toArray();
 

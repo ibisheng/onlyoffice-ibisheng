@@ -18,6 +18,8 @@
 	 * -----------------------------------------------------------------------------
 	 */
 	var asc = window["Asc"];
+
+	var AscBrowser = AscCommon.AscBrowser;
 	
 	var cElementType = AscCommonExcel.cElementType;
 	var c_oAscCellEditorSelectState = AscCommonExcel.c_oAscCellEditorSelectState;

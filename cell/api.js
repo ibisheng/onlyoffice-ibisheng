@@ -108,7 +108,7 @@ var editor;
     this.formulasList = AscCommonExcel.getFormulasInfo();
     // ToDo нужно ли это
     asc['editor'] = ( asc['editor'] || this );
-    AscBrowser.checkZoom();
+    AscCommon.AscBrowser.checkZoom();
   };
 
   spreadsheet_api.prototype.asc_CheckGuiControlColors = function() {
@@ -657,7 +657,7 @@ var editor;
 
   spreadsheet_api.prototype.asc_setMobileVersion = function(isMobile) {
     this.isMobileVersion = isMobile;
-    AscBrowser.isMobileVersion = isMobile;
+    AscCommon.AscBrowser.isMobileVersion = isMobile;
   };
 
   spreadsheet_api.prototype.getViewMode = function() {
