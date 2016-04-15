@@ -6325,7 +6325,7 @@ CChartSpace.prototype =
                             union_marker.lineMarker = CreateMarkerGeometryByType(SYMBOL_DASH, null);
                             union_marker.lineMarker.pen = pt.pen;
                         }
-                        if(!b_scatter_no_line && this.chart.view3D)
+                        if(!b_scatter_no_line && !this.chart.view3D)
                             b_line_series = true;
                     }
                     else
