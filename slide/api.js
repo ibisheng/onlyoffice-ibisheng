@@ -1189,7 +1189,7 @@ function OnSave_Callback(e) {
     CollaborativeEditing.Send_Changes(editor.IsUserSave, {UserId: editor.CoAuthoringApi.getUserConnectionId(), UserShortId : editor.DocInfo.get_UserId(), CursorInfo: CursorInfo});
   } else {
     var nState = editor.CoAuthoringApi.get_state();
-    if (AscCommon.ConnectionState.Close === nState) {
+    if (AscCommon.ConnectionState.ClosedCoAuth === nState || AscCommon.ConnectionState.ClosedAll === nState) {
       // Отключаемся от сохранения, соединение потеряно
       editor.canSave = true;
       editor.IsUserSave = false;

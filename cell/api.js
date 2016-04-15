@@ -1577,7 +1577,7 @@ var editor;
       this.collaborativeEditing.sendChanges(this.IsUserSave);
     } else {
       nState = t.CoAuthoringApi.get_state();
-      if (AscCommon.ConnectionState.Close === nState) {
+      if (AscCommon.ConnectionState.ClosedCoAuth === nState || AscCommon.ConnectionState.ClosedAll === nState) {
         // Отключаемся от сохранения, соединение потеряно
         if (this.IsUserSave) {
           this.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
