@@ -622,7 +622,7 @@ CSparklineView.prototype.initFromSparkline = function(oSparkline, oSparklineGrou
                 else
                 {
 
-                    aSeriesPoints.sort(function(a, b){return b.val - a.val;});
+                    aSeriesPoints.sort(function(a, b){return a.val - b.val;});
                     bSorted = true;
                     dMinVal = aSeriesPoints[0].val;
                 }
@@ -642,7 +642,7 @@ CSparklineView.prototype.initFromSparkline = function(oSparkline, oSparklineGrou
                 {
                     if(!bSorted)
                     {
-                        aSeriesPoints.sort(function(a, b){return b.val - a.val;});
+                        aSeriesPoints.sort(function(a, b){return a.val - b.val;});
                         bSorted = true;
                     }
                     dMaxVal = aSeriesPoints[aSeriesPoints.length - 1].val;
@@ -770,7 +770,7 @@ CSparklineView.prototype.setMinMaxValAx = function(minVal, maxVal, oSparklineGro
                 var dMinVal, dMaxVal, bSorted = false;
                 if(minVal == null)
                 {
-                    aSeriesPoints.sort(function(a, b){return b.val - a.val;});
+                    aSeriesPoints.sort(function(a, b){return a.val - b.val;});
                     bSorted = true;
                     dMinVal = aSeriesPoints[0].val;
                 }
@@ -783,7 +783,7 @@ CSparklineView.prototype.setMinMaxValAx = function(minVal, maxVal, oSparklineGro
                 {
                     if(!bSorted)
                     {
-                        aSeriesPoints.sort(function(a, b){return b.val - a.val;});
+                        aSeriesPoints.sort(function(a, b){return a.val - b.val;});
                         bSorted = true;
                     }
                     dMaxVal = aSeriesPoints[aSeriesPoints.length - 1].val;
