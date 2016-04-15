@@ -16,6 +16,18 @@ window.NATIVE_EDITOR_ENJINE_SYNC_RECALC = true;
 var document = {};
 window.document = document;
 
+window["Asc"] = {};
+var Asc = window["Asc"];
+
+window["AscBrowser"] = {};
+var AscBrowser = window["AscBrowser"];
+
+window["AscCommon"] = {};
+var AscCommon = window["AscCommon"];
+
+window["AscCommonExcel"] = {};
+var AscCommonExcel = window["AscCommonExcel"];
+
 function ConvertJSC_Array(_array)
 {
     var _len = _array.length;
@@ -162,11 +174,6 @@ native_canvas.prototype =
     } 
 };
 
-window["Asc"] = {};
-window["AscBrowser"] = {};
-window["AscCommon"] = {};
-window["AscCommonExcel"] = {};
-
 var _null_object = {};
 _null_object.length = 0;
 _null_object.nodeType = 1;
@@ -258,10 +265,6 @@ function GetNativeEngine()
 
 var native_renderer = null;
 var _api = null;
-var Asc = window["Asc"];
-var AscBrowser = window["AscBrowser"];
-var AscCommon = window["AscCommon"];
-var AscCommonExcel = window["AscCommonExcel"];
 
 function NativeOpenFileData(data, version)
 {
