@@ -2630,7 +2630,7 @@ CChartSpace.prototype =
                 removePtsFromLit(num_cache);
             }
             var lit_format_code = typeof num_cache.formatCode === "string" && num_cache.formatCode.length > 0 ? num_cache.formatCode : "General";
-            var pt_index = 0, i, j, cell, pt, worksheet_id, hidden = true, row_hidden, col_hidden, nPtCount;
+            var pt_index = 0, i, j, cell, pt, worksheet_id, hidden = true, row_hidden, col_hidden, nPtCount, t;
             for(i = 0; i < arr_f.length; ++i)
             {
                 var parsed_ref = parserHelp.parse3DRef(arr_f[i]);
@@ -2645,6 +2645,7 @@ CChartSpace.prototype =
                         {
                             var range = range1.bbox;
 
+                            var nLastNoEmptyIndex = null, dLastNoEmptyVal = null, aSpanPoints = [];
                             if(range.r1 === range.r2 || bVertical === true)
                             {
                                 row_hidden = source_worksheet.getRowHidden(range.r1);
@@ -2664,26 +2665,40 @@ CChartSpace.prototype =
                                                 pt.setFormatCode(cell.getNumFormatStr())
                                             }
                                             num_cache.addPt(pt);
-                                           
+
+                                            if(aSpanPoints.length > 0 )
+                                            {
+                                                if(isRealNumber(nLastNoEmptyIndex))
+                                                {
+                                                    var oStartPoint = num_cache.getPtByIndex(nLastNoEmptyIndex);
+                                                    for(t = 0; t < aSpanPoints.length; ++i)
+                                                    {
+
+                                                    }
+                                                }
+                                                aSpanPoints.length = 0;
+                                            }
+                                            nLastNoEmptyIndex = pt_index;
+                                            dLastNoEmptyVal = pt.val;
                                         }
                                         else
                                         {
-                                            if(isRealNumber(this.displayEmptyCellsAs))
+                                            if(isRealNumber(this.displayEmptyCellsAs) && this.displayEmptyCellsAs !== 1)
                                             {
-                                                switch (this.displayEmptyCellsAs)
+                                                if(this.displayEmptyCellsAs === 2)
                                                 {
-                                                    case 0:
-                                                    {
-                                                        break;
-                                                    }
-                                                    case 1:
-                                                    {
-                                                        break;
-                                                    }
-                                                    case 2:
-                                                    {
-                                                        break;
-                                                    }
+                                                    pt = new CNumericPoint();
+                                                    pt.setIdx(pt_index);
+                                                    pt.setVal(0);
+                                                    num_cache.addPt(pt);
+                                                }
+                                                if(this.displayEmptyCellsAs === 0)
+                                                {
+                                                    pt = new CNumericPoint();
+                                                    pt.setIdx(pt_index);
+                                                    pt.setVal(0);
+                                                    num_cache.addPt(pt);
+                                                    aSpanPoints.push(pt);
                                                 }
                                             }
                                         }
