@@ -71,10 +71,6 @@ var c_oAscError = {
   }
 };
 
-
-var hdrftr_Header = 0x01;
-var hdrftr_Footer = 0x02;
-
 var c_oAscTableSelectionType = {
   Cell: 0,
   Row: 1,
@@ -685,10 +681,6 @@ var c_oAscRevisionsObjectType =
   MathEquation : 3
 };
 
-var c_oAscPageOrientation = {
-  Portrait  : 0x00,
-  Landscape : 0x01
-};
 window["flat_desine"] = false;
 
 //------------------------------------------------------------export---------------------------------------------------

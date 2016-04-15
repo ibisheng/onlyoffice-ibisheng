@@ -6,6 +6,13 @@
  * Time: 14:46
  */
 
+// Import
+var align_Left = AscCommon.align_Left;
+
+var linerule_Auto = Asc.linerule_Auto;
+var c_oAscShdClear = Asc.c_oAscShdClear;
+var c_oAscShdNil = Asc.c_oAscShdNil;
+
 var EvenAndOddHeaders = false;
 
 var Default_Tab_Stop = 12.5;
@@ -1364,7 +1371,7 @@ CStyle.prototype =
 
             Shd :
             {
-                Value : shd_Clear,
+                Value : c_oAscShdClear,
                 Color :
                 {
                     r : 0xD9,
@@ -1599,7 +1606,7 @@ CStyle.prototype =
 
                 Shd :
                 {
-                    Value : shd_Clear,
+                    Value : c_oAscShdClear,
                     Color :
                     {
                         r : 0x4F,
@@ -1655,7 +1662,7 @@ CStyle.prototype =
 
                 Shd :
                 {
-                    Value : shd_Clear,
+                    Value : c_oAscShdClear,
                     Color :
                     {
                         r : 0xFF,
@@ -1720,7 +1727,7 @@ CStyle.prototype =
 
                 Shd :
                 {
-                    Value : shd_Clear,
+                    Value : c_oAscShdClear,
                     Color :
                     {
                         r : 0x4F,
@@ -1762,7 +1769,7 @@ CStyle.prototype =
 
                 Shd :
                 {
-                    Value : shd_Clear,
+                    Value : c_oAscShdClear,
                     Color :
                     {
                         r : 0x4F,
@@ -1792,7 +1799,7 @@ CStyle.prototype =
 
                 Shd :
                 {
-                    Value : shd_Clear,
+                    Value : c_oAscShdClear,
                     Color :
                     {
                         r : 0xD8,
@@ -1809,7 +1816,7 @@ CStyle.prototype =
             {
                 Shd :
                 {
-                    Value : shd_Clear,
+                    Value : c_oAscShdClear,
                     Color :
                     {
                         r : 0xD8,
@@ -1855,7 +1862,7 @@ CStyle.prototype =
 
                 Shd :
                 {
-                    Value : shd_Clear,
+                    Value : c_oAscShdClear,
                     Color :
                     {
                         r : 0,
@@ -1911,7 +1918,7 @@ CStyle.prototype =
 
                 Shd :
                 {
-                    Value : shd_Clear,
+                    Value : c_oAscShdClear,
                     Color :
                     {
                         r : 255,
@@ -1994,7 +2001,7 @@ CStyle.prototype =
         {
             Shd :
             {
-                Value : shd_Clear,
+                Value : c_oAscShdClear,
                 Color : { r : 0xFE, g : 0xF4, b : 0xEC }
             }
         };
@@ -2022,7 +2029,7 @@ CStyle.prototype =
 
                 Shd :
                 {
-                    Value : shd_Clear,
+                    Value : c_oAscShdClear,
                     Color : { r : 0x34, g : 0x8D, b : 0xA5 }
                 }
             }
@@ -2051,7 +2058,7 @@ CStyle.prototype =
 
                 Shd :
                 {
-                    Value : shd_Clear,
+                    Value : c_oAscShdClear,
                     Color : { r : 0xFF, g : 0xFF, b : 0xFF }
                 }
             }
@@ -2089,7 +2096,7 @@ CStyle.prototype =
 
                 Shd :
                 {
-                    Value : shd_Clear,
+                    Value : c_oAscShdClear,
                     Color : { r : 0xFD, g : 0xE4, b : 0xD0 }
                 }
             }
@@ -2101,7 +2108,7 @@ CStyle.prototype =
             {
                 Shd :
                 {
-                    Value : shd_Clear,
+                    Value : c_oAscShdClear,
                     Color : { r : 0xFD, g : 0xE9, b : 0xD9 }
                 }
             }
@@ -2127,7 +2134,7 @@ CStyle.prototype =
         var TextSize1  = 11;
 
         var CellShd1   = new CDocumentShd();
-        CellShd1.Value = shd_Clear;
+        CellShd1.Value = c_oAscShdClear;
         CellShd1.Color = new CDocumentColor(Color1.r, Color1.g, Color1.b);
 
         var TableStylePrBoundary =
@@ -2241,7 +2248,7 @@ CStyle.prototype =
             {
                 Shd :
                 {
-                    Value : shd_Clear,
+                    Value : c_oAscShdClear,
                     Color : { r : Color2.r, g : Color2.g, b : Color2.b}
                 }
             }
@@ -2468,7 +2475,7 @@ CStyle.prototype =
         {
             Shd :
             {
-                Value : shd_Clear,
+                Value : c_oAscShdClear,
                 Color : { r : TableShdColorBoundary.r, g : TableShdColorBoundary.g, b : TableShdColorBoundary.b}
             }
         };
@@ -2477,7 +2484,7 @@ CStyle.prototype =
         {
             Shd :
             {
-                Value : shd_Clear,
+                Value : c_oAscShdClear,
                 Color : { r : TableShdColorVertBand.r, g : TableShdColorVertBand.g, b : TableShdColorVertBand.b}
             }
         };
@@ -2486,7 +2493,7 @@ CStyle.prototype =
         {
             Shd :
             {
-                Value : shd_Clear,
+                Value : c_oAscShdClear,
                 Color : { r : TableShdColorHorzBand.r, g : TableShdColorHorzBand.g, b : TableShdColorHorzBand.b}
             }
         };
@@ -5159,7 +5166,7 @@ CDocumentColor.prototype =
 
 function CDocumentShd()
 {
-    this.Value = shd_Nil;
+    this.Value = c_oAscShdNil;
     this.Color = new CDocumentColor(255, 255, 255);
     this.Unifill = undefined;
     this.FillRef = undefined;
@@ -5193,10 +5200,10 @@ CDocumentShd.prototype =
         {
             switch ( this.Value )
             {
-                case shd_Nil:
+                case c_oAscShdNil:
                     return true;
 
-                case shd_Clear:
+                case c_oAscShdClear:
                 {
                     return this.Color.Compare( Shd.Color ) && CompareUnifillBool(this.Unifill, Shd.Unifill);
                 }
@@ -5255,7 +5262,7 @@ CDocumentShd.prototype =
     
     Init_Default : function()
     {
-        this.Value = shd_Nil;
+        this.Value = c_oAscShdNil;
         this.Color.Set( 0, 0, 0, false );
         this.Unifill = undefined;
         this.FillRef = undefined;
@@ -5265,12 +5272,12 @@ CDocumentShd.prototype =
     {
         if ( undefined === Shd )
         {
-            this.Value = shd_Nil;
+            this.Value = c_oAscShdNil;
             return;
         }
         
         this.Value = Shd.Value;
-        if ( shd_Nil != Shd.Value )
+        if ( c_oAscShdNil != Shd.Value )
         {
             if( undefined != Shd.Color )
                 this.Color.Set( Shd.Color.r, Shd.Color.g, Shd.Color.b, Shd.Color.Auto );
@@ -5300,11 +5307,11 @@ CDocumentShd.prototype =
     {
         // Byte : Value
         //
-        // Если shd_Clear
+        // Если c_oAscShdClear
         // Variable : Color
 
         Writer.WriteByte( this.Value );
-        if ( shd_Clear === this.Value )
+        if ( c_oAscShdClear === this.Value )
         {
             this.Color.Write_ToBinary(Writer);
             if(this.Unifill)
@@ -5332,12 +5339,12 @@ CDocumentShd.prototype =
     {
         // Byte : Value
         //
-        // Если shd_Clear
+        // Если c_oAscShdClear
         // Variable : Color
 
         this.Value = Reader.GetByte();
 
-        if ( shd_Clear === this.Value )
+        if ( c_oAscShdClear === this.Value )
         {
             this.Color.Read_FromBinary(Reader);
             if(Reader.GetBool())
@@ -7605,7 +7612,7 @@ CTextPr.prototype =
         };
         this.FontSize   = 11;
         this.Color      = new CDocumentColor(0, 0, 0, true);
-        this.VertAlign  = vertalign_Baseline;
+        this.VertAlign  = AscCommon.vertalign_Baseline;
         this.HighLight  = highlight_None;
         this.RStyle     = undefined;
         this.Spacing    = 0;
@@ -8311,13 +8318,13 @@ CTextPr.prototype =
 
         switch ( this.VertAlign )
         {
-            case vertalign_Baseline:
+            case AscCommon.vertalign_Baseline:
             {
                 dFontKoef = 1;
                 break;
             }
-            case vertalign_SubScript:
-            case vertalign_SuperScript:
+            case AscCommon.vertalign_SubScript:
+            case AscCommon.vertalign_SuperScript:
             {
                 dFontKoef = vertalign_Koef_Size;
                 break;
@@ -9614,8 +9621,8 @@ CFramePr.prototype =
         this.DropCap = ( true === bInside ? dropcap_Drop : dropcap_Margin );
         this.Lines   = 3;
         this.Wrap    = wrap_Around;
-        this.VAnchor = c_oAscVAnchor.Text;
-        this.HAnchor = ( true === bInside ? c_oAscHAnchor.Text : c_oAscHAnchor.Page );
+        this.VAnchor = Asc.c_oAscVAnchor.Text;
+        this.HAnchor = ( true === bInside ? Asc.c_oAscHAnchor.Text : Asc.c_oAscHAnchor.Page );
 
         this.X       = undefined;
         this.XAlign  = undefined;

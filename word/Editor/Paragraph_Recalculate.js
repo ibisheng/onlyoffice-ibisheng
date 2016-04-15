@@ -1653,22 +1653,22 @@ Paragraph.prototype.private_RecalculateLineAlign       = function(CurLine, CurPa
                 // RangeWidth - ширина всего пространства в данном отрезке, а Range.W - ширина занимаемого пространства
                 switch (ParaPr.Jc)
                 {
-                    case align_Left :
+                    case AscCommon.align_Left :
                     {
                         X = Range.X;
                         break;
                     }
-                    case align_Right:
+                    case AscCommon.align_Right:
                     {
                         X = Math.max(Range.X + RangeWidth - Range.W, Range.X);
                         break;
                     }
-                    case align_Center:
+                    case AscCommon.align_Center:
                     {
                         X = Math.max(Range.X + (RangeWidth - Range.W) / 2, Range.X);
                         break;
                     }
-                    case align_Justify:
+                    case AscCommon.align_Justify:
                     {
                         X = Range.X;
 
@@ -2157,7 +2157,7 @@ CParaLineMetrics.prototype =
 
         this.LineGap = this.Recalculate_LineGap( ParaPr, this.TextAscent, this.TextDescent );
 
-        if (linerule_AtLeast === ParaPr.Spacing.LineRule && (this.Ascent + this.Descent + this.LineGap) > (this.TextAscent + this.TextDescent))
+        if (Asc.linerule_AtLeast === ParaPr.Spacing.LineRule && (this.Ascent + this.Descent + this.LineGap) > (this.TextAscent + this.TextDescent))
         {
             // В такой ситуации Word располагает текст внизу строки
             this.Ascent  = this.Ascent + this.LineGap;
@@ -2170,12 +2170,12 @@ CParaLineMetrics.prototype =
         var LineGap = 0;
         switch ( ParaPr.Spacing.LineRule )
         {
-            case linerule_Auto:
+            case Asc.linerule_Auto:
             {
                 LineGap = ( TextAscent + TextDescent ) * ( ParaPr.Spacing.Line - 1 );
                 break;
             }
-            case linerule_Exact:
+            case Asc.linerule_Exact:
             {
                 var ExactValue = Math.max( 25.4 / 72, ParaPr.Spacing.Line );
                 LineGap = ExactValue - ( TextAscent + TextDescent );
@@ -2238,7 +2238,7 @@ CParaLineMetrics.prototype =
 
                 break;
             }
-            case linerule_AtLeast:
+            case Asc.linerule_AtLeast:
             {
                 var TargetLineGap = ParaPr.Spacing.Line;
                 var TextLineGap   = TextAscent + TextDescent;
@@ -2677,17 +2677,17 @@ CParagraphRecalculateStateWrap.prototype =
 
                 switch ( NumJc )
                 {
-                    case align_Right:
+                    case AscCommon.align_Right:
                     {
                         NumberingItem.WidthVisible = 0;
                         break;
                     }
-                    case align_Center:
+                    case AscCommon.align_Center:
                     {
                         NumberingItem.WidthVisible = NumberingItem.WidthNum / 2;
                         break;
                     }
-                    case align_Left:
+                    case AscCommon.align_Left:
                     default:
                     {
                         NumberingItem.WidthVisible = NumberingItem.WidthNum;

@@ -38,7 +38,7 @@ CImageShape.prototype.setRecalculateInfo = function()
         recalculateTransparent:    true
     };
     this.bounds = {l: 0, t: 0, r: 0, b:0, w: 0, h:0};
-    this.lockType = c_oAscLockTypes.kLockTypeNone;
+    this.lockType = AscCommon.c_oAscLockTypes.kLockTypeNone;
 };
 
 CImageShape.prototype.recalcBrush = function()

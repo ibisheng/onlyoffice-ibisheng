@@ -17,6 +17,13 @@
      * Import
      * -----------------------------------------------------------------------------
      */
+    var CellValueType = AscCommon.CellValueType;
+    var c_oAscBorderStyles = AscCommon.c_oAscBorderStyles;
+    var c_oAscBorderType = AscCommon.c_oAscBorderType;
+    var c_oAscLockTypes = AscCommon.c_oAscLockTypes;
+    var c_oAscFormatPainterState = AscCommon.c_oAscFormatPainterState;
+    var c_oAscPrintDefaultSettings = AscCommon.c_oAscPrintDefaultSettings;
+
     var asc = window["Asc"];
     var asc_applyFunction = asc.applyFunction;
     var asc_calcnpt = asc.calcNearestPt;
@@ -707,7 +714,7 @@
         if ( w === t.cols[col].width ) {
             return;
         }
-        var cc = Math.min( t._colWidthToCharCount( w ), c_oAscMaxColumnWidth );
+        var cc = Math.min( t._colWidthToCharCount( w ), Asc.c_oAscMaxColumnWidth );
         var cw = t._charCountToModelColWidth( cc );
 
         var onChangeWidthCallback = function ( isSuccess ) {
@@ -1172,7 +1179,7 @@
         var tm = this._roundTextMetrics( this.stringRender.measureString( "A" ) );
         this.headersHeightByFont = tm.height;
 
-        this.maxRowHeight = asc_calcnpt( c_oAscMaxRowHeight, this._getPPIY() );
+        this.maxRowHeight = asc_calcnpt(Asc.c_oAscMaxRowHeight, this._getPPIY());
         this.defaultRowDescender = this._calcRowDescender( defaultFontSize );
         gc_dDefaultRowHeightAttribute = this.defaultRowHeight = this.model.getDefaultHeight() || Math.max( asc_calcnpt( defaultFontSize * this.vspRatio, this._getPPIY() ) + this.height_1px, this.headersHeightByFont );
 
@@ -1716,7 +1723,7 @@
             pageBottomField = c_oAscPrintDefaultSettings.PageBottomField;
         }
 
-        if (c_oAscPageOrientation.PageLandscape === pageOrientation) {
+        if (Asc.c_oAscPageOrientation.PageLandscape === pageOrientation) {
             var tmp = pageWidth;
             pageWidth = pageHeight;
             pageHeight = tmp;
@@ -4628,7 +4635,7 @@
     };
 
     WorksheetView.prototype._changeColWidth = function ( col, width, pad ) {
-        var cc = Math.min( this._colWidthToCharCount( width + pad ), c_oAscMaxColumnWidth );
+        var cc = Math.min( this._colWidthToCharCount( width + pad ), Asc.c_oAscMaxColumnWidth );
         var modelw = this._charCountToModelColWidth( cc );
         var colw = this._calcColWidth( modelw );
 
@@ -7181,7 +7188,7 @@
         if ( 1 < oSelectionMathInfo.countNumbers ) {
             // Мы должны отдавать в формате активной ячейки
             var numFormat = range.getNumFormat();
-            if ( c_oAscNumFormatType.Time === numFormat.getType() ) {
+            if ( Asc.c_oAscNumFormatType.Time === numFormat.getType() ) {
                 // Для времени нужно отдавать в формате [h]:mm:ss (http://bugzserver/show_bug.cgi?id=26271)
                 numFormat = oNumFormatCache.get( '[h]:mm:ss' );
             }
@@ -7389,16 +7396,16 @@
 
             var horAlign = "center";
             switch ( paraPr.Jc ) {
-                case align_Left    :
+                case AscCommon.align_Left    :
                     horAlign = "left";
                     break;
-                case align_Right  :
+                case AscCommon.align_Right  :
                     horAlign = "right";
                     break;
-                case align_Center  :
+                case AscCommon.align_Center  :
                     horAlign = "center";
                     break;
-                case align_Justify  :
+                case AscCommon.align_Justify  :
                     horAlign = "justify";
                     break;
             }
@@ -7445,8 +7452,8 @@
             objectInfo.font.italic = textPr.Italic;
             objectInfo.font.underline = textPr.Underline;
             objectInfo.font.strikeout = textPr.Strikeout;
-            objectInfo.font.subscript = textPr.VertAlign == vertalign_SubScript;
-            objectInfo.font.superscript = textPr.VertAlign == vertalign_SuperScript;
+            objectInfo.font.subscript = textPr.VertAlign == AscCommon.vertalign_SubScript;
+            objectInfo.font.superscript = textPr.VertAlign == AscCommon.vertalign_SuperScript;
             if ( textPr.Color ) {
                 objectInfo.font.color = CreateAscColorCustom( textPr.Color.r, textPr.Color.g, textPr.Color.b );
             }
@@ -10623,7 +10630,7 @@
         var pad, cc, cw;
         if ( width > 0 ) {
             pad = this.width_padding * 2 + this.width_1px;
-            cc = Math.min( this._colWidthToCharCount( width + pad ), c_oAscMaxColumnWidth );
+            cc = Math.min( this._colWidthToCharCount( width + pad ), Asc.c_oAscMaxColumnWidth );
             cw = this._charCountToModelColWidth( cc );
         }
         else {
@@ -11378,7 +11385,7 @@
             isClearCell       : isClearCell,
             isHideCursor      : isHideCursor,
             isQuickInput      : isQuickInput,
-            isAddPersentFormat: isQuickInput && c_oAscNumFormatType.Percent === c.getNumFormat().getType(),
+            isAddPersentFormat: isQuickInput && Asc.c_oAscNumFormatType.Percent === c.getNumFormat().getType(),
             autoComplete      : arrAutoComplete,
             autoCompleteLC    : arrAutoCompleteLC,
             cellName          : c.getName(),

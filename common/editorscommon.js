@@ -1,5 +1,15 @@
 ﻿"use strict";
 
+// Import
+var locktype_None = AscCommon.locktype_None;
+var locktype_Mine = AscCommon.locktype_Mine;
+var locktype_Other = AscCommon.locktype_Other;
+var locktype_Other2 = AscCommon.locktype_Other2;
+var locktype_Other3 = AscCommon.locktype_Other3;
+var contentchanges_Add = AscCommon.contentchanges_Add;
+
+var c_oAscFileType = Asc.c_oAscFileType;
+
 if (typeof String.prototype.startsWith != 'function') {
 	String.prototype.startsWith = function (str){
 		return this.indexOf(str) === 0;
@@ -75,8 +85,8 @@ var g_cCharDelimiter = String.fromCharCode(5);
 
 function getEncodingParams() {
 	var res = [];
-	for(var i = 0; i < c_oAscEncodings.length; ++i) {
-		var encoding = c_oAscEncodings[i];
+	for(var i = 0; i < AscCommon.c_oAscEncodings.length; ++i) {
+		var encoding = AscCommon.c_oAscEncodings[i];
 		var newElem = {'codepage': encoding[0], 'name': encoding[3]};
 		res.push(newElem);
 	}
@@ -154,16 +164,16 @@ function OpenFileResult () {
 function g_fSaveWithParts(fSendCommand, fCallback, fCallbackRequest, oAdditionalData, dataContainer) {
 	var index = dataContainer.index;
 	if(null == dataContainer.part && (!dataContainer.data || dataContainer.data.length <= g_nMaxRequestLength)){
-		oAdditionalData["savetype"] = c_oAscSaveTypes.CompleteAll;
+		oAdditionalData["savetype"] = AscCommon.c_oAscSaveTypes.CompleteAll;
 	}
 	else{
 		if(0 == index){
-			oAdditionalData["savetype"] = c_oAscSaveTypes.PartStart;
+			oAdditionalData["savetype"] = AscCommon.c_oAscSaveTypes.PartStart;
 			dataContainer.count = Math.ceil(dataContainer.data.length / g_nMaxRequestLength);
 		} else if(index != dataContainer.count - 1){
-			oAdditionalData["savetype"] = c_oAscSaveTypes.Part;
+			oAdditionalData["savetype"] = AscCommon.c_oAscSaveTypes.Part;
 		} else {
-			oAdditionalData["savetype"] = c_oAscSaveTypes.Complete;
+			oAdditionalData["savetype"] = AscCommon.c_oAscSaveTypes.Complete;
 		}
 		dataContainer.part = dataContainer.data.substring(index * g_nMaxRequestLength, (index + 1) * g_nMaxRequestLength);
 	}
@@ -1044,11 +1054,11 @@ function getUrlType(url) {
   isEmail = checkvalue.strongMatch(emailRe);
   !isvalid && (isvalid = isEmail);
 
-  return isvalid ? (isEmail ? c_oAscUrlType.Email : c_oAscUrlType.Http) : c_oAscUrlType.Invalid;
+  return isvalid ? (isEmail ? AscCommon.c_oAscUrlType.Email : AscCommon.c_oAscUrlType.Http) : AscCommon.c_oAscUrlType.Invalid;
 }
 function prepareUrl(url, type) {
   if (!/(((^https?)|(^ftp)):\/\/)|(^mailto:)/i.test(url)) {
-    url = ( (c_oAscUrlType.Email == type) ? 'mailto:' : 'http://' ) + url;
+    url = ( (AscCommon.c_oAscUrlType.Email == type) ? 'mailto:' : 'http://' ) + url;
   }
 
   return url.replace(new RegExp("%20", 'g'), " ");
@@ -1522,7 +1532,7 @@ parserHelper.prototype.getEscapeSheetName = function (sheet) {
  * @param {string} dataRange
  * @param {boolean} fullCheck
  * @param {boolean} isRows
- * @param {c_oAscChartTypeSettings} chartType
+ * @param {Asc.c_oAscChartTypeSettings} chartType
  * @returns {*}
  */
 parserHelper.prototype.checkDataRange = function (model, wb, dialogType, dataRange, fullCheck, isRows, chartType) {
@@ -1557,9 +1567,9 @@ parserHelper.prototype.checkDataRange = function (model, wb, dialogType, dataRan
 				intervalValues = dataRange.r2 - dataRange.r1 + 1;
 			}
 
-			if (c_oAscChartTypeSettings.stock === chartType) {
+			if (Asc.c_oAscChartTypeSettings.stock === chartType) {
                 var chartSettings = new asc_ChartSettings();
-                chartSettings.putType(c_oAscChartTypeSettings.stock);
+                chartSettings.putType(Asc.c_oAscChartTypeSettings.stock);
                 chartSettings.putRange(sDataRange);
                 chartSettings.putInColumns(!isRows);
                 var chartSeries = getChartSeries (sheetModel, chartSettings).series;
@@ -2134,7 +2144,7 @@ CTableId.prototype.Load_Changes = function(Reader, Reader2)
                 if(oWsModel)
                 {
                     var objectRender = new DrawingObjects();
-                    var oNewDrawing = objectRender.createDrawingObject(c_oAscCellAnchorType.cellanchorAbsolute);
+                    var oNewDrawing = objectRender.createDrawingObject(AscCommon.c_oAscCellAnchorType.cellanchorAbsolute);
                     var oImage = DrawingObjectsController.prototype.createWatermarkImage(sUrl);
                     oNewDrawing.ext.cx = oImage.spPr.xfrm.extX;
                     oNewDrawing.ext.cy = oImage.spPr.xfrm.extY;
@@ -2424,7 +2434,7 @@ CContentChangesElement.prototype.Check_Changes = function(Type, Pos)
 				}
 				else //if ( CurPos === this.m_aPositions[Index] )
 				{
-					if ( contentchanges_Remove === this.m_nType )
+					if ( AscCommon.contentchanges_Remove === this.m_nType )
 					{
 						// Отмечаем, что действия совпали
 						this.m_aPositions[Index] = false;

@@ -418,7 +418,7 @@ CHistory.prototype =
                 ( Class instanceof CDocumentContent && historyitem_DocumentContent_RemoveItem === Data.Type ) )
                 Count = Data.Items.length;
 
-            var ContentChanges = new CContentChangesElement( ( bAdd == true ? contentchanges_Add : contentchanges_Remove ), Data.Pos, Count, Item );
+            var ContentChanges = new CContentChangesElement( ( bAdd == true ? AscCommon.contentchanges_Add : AscCommon.contentchanges_Remove ), Data.Pos, Count, Item );
             Class.Add_ContentChanges( ContentChanges );
             this.CollaborativeEditing.Add_NewDC( Class );
 

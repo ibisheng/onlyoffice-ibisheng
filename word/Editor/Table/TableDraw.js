@@ -5,6 +5,9 @@
  * Time: 12:22
  */
 
+// Import
+var c_oAscLineDrawingRule = AscCommon.c_oAscLineDrawingRule;
+
 CTable.prototype.ReDraw = function()
 {
     this.Parent.OnContentReDraw( this.Get_StartPage_Absolute(), this.Get_StartPage_Absolute() + this.Pages.length - 1 );
@@ -82,7 +85,7 @@ CTable.prototype.private_DrawTableBackgroundAndOuterBorder = function(pGraphics,
     var Y_bottom = this.Pages[PNum].Bounds.Top;
 
     var LockType = this.Lock.Get_Type();
-    if ( locktype_None != LockType )
+    if ( AscCommon.locktype_None != LockType )
     {
         pGraphics.DrawLockObjectRect(this.Lock.Get_Type(), this.Pages[PNum].Bounds.Left, this.Pages[PNum].Bounds.Top, this.Pages[PNum].Bounds.Right - this.Pages[PNum].Bounds.Left, this.Pages[PNum].Bounds.Bottom - this.Pages[PNum].Bounds.Top );
     }
@@ -173,7 +176,7 @@ CTable.prototype.private_DrawRowBackgroundAndOuterBorder = function(pGraphics, T
     var ColorMap = this.Get_ColorMap();
     var RGBA;
     // Рисуем рамку и заливку самой таблицы
-    if ( shd_Nil != TableShd.Value )
+    if ( Asc.c_oAscShdNil != TableShd.Value )
     {
         if(!this.bPresentation)
         {
@@ -477,7 +480,7 @@ CTable.prototype.private_DrawCellsBackround = function(pGraphics, PNum, Row_star
 
             // Заливаем ячейку
             var CellShd = Cell.Get_Shd();
-            if ( shd_Nil != CellShd.Value )
+            if ( Asc.c_oAscShdNil != CellShd.Value )
             {
                 if(!this.bPresentation)
                 {

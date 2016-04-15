@@ -383,6 +383,7 @@ $( function () {
     var c_msPerDay = AscCommonExcel.c_msPerDay;
     var parserFormula = AscCommonExcel.parserFormula;
     var GetDiffDate360 = AscCommonExcel.GetDiffDate360;
+    var bDate1904 = AscCommon.bDate1904;
 
     var oParser, wb, ws, dif = 1e-9,
         data = getTestWorkbook(),
@@ -700,7 +701,7 @@ $( function () {
     test( "Test: YEAR", function () {
         oParser = new parserFormula( "YEAR(2013)", "A1", ws );
         ok( oParser.parse() );
-        if ( g_bDate1904 )
+        if ( bDate1904 )
             strictEqual( oParser.calculate().getValue(), 1909 );
         else
             strictEqual( oParser.calculate().getValue(), 1905 );
@@ -709,7 +710,7 @@ $( function () {
     test( "Test: DAY", function () {
         oParser = new parserFormula( "DAY(2013)", "A1", ws );
         ok( oParser.parse() );
-        if ( g_bDate1904 )
+        if ( bDate1904 )
             strictEqual( oParser.calculate().getValue(), 6 );
         else
             strictEqual( oParser.calculate().getValue(), 5 );
@@ -1020,7 +1021,7 @@ $( function () {
         oParser = new parserFormula( "VALUE(\"03-26-2006\")", "A2", ws );
         ok( oParser.parse() );
 
-        if ( g_bDate1904 )
+        if ( bDate1904 )
             strictEqual( oParser.calculate().getValue(), 37340 );
         else
             strictEqual( oParser.calculate().getValue(), 38802 );
@@ -1060,7 +1061,7 @@ $( function () {
         oParser = new parserFormula( "DATEVALUE(\"03-26-2006\")", "A2", ws );
         ok( oParser.parse() );
 
-        if ( g_bDate1904 )
+        if ( bDate1904 )
             strictEqual( oParser.calculate().getValue(), 37340 );
         else
             strictEqual( oParser.calculate().getValue(), 38802 );
@@ -1068,7 +1069,7 @@ $( function () {
 
     test( "Test: \"EDATE\"", function () {
 
-        if ( !g_bDate1904 ) {
+        if ( !bDate1904 ) {
             oParser = new parserFormula( "EDATE(DATE(2006,1,31),5)", "A2", ws );
             ok( oParser.parse() );
             strictEqual( oParser.calculate().getValue(), 38898 );
@@ -1108,7 +1109,7 @@ $( function () {
 
     test( "Test: \"EOMONTH\"", function () {
 
-        if ( !g_bDate1904 ) {
+        if ( !bDate1904 ) {
             oParser = new parserFormula( "EOMONTH(DATE(2006,1,31),5)", "A2", ws );
             ok( oParser.parse() );
             strictEqual( oParser.calculate().getValue(), 38898 );

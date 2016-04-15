@@ -1,5 +1,11 @@
 "use strict";
 
+// Import
+var align_Left = AscCommon.align_Left;
+var align_Justify = AscCommon.align_Justify;
+var vertalign_Baseline = AscCommon.vertalign_Baseline;
+var changestype_Drawing_Props = AscCommon.changestype_Drawing_Props;
+
 var History = null;
 var recalcSlideInterval = 30;
 
@@ -1361,7 +1367,7 @@ CPresentation.prototype =
 
         History.Create_NewPoint(historydescription_Presentation_AddFlowTable);
         var graphic_frame = this.Create_TableGraphicFrame(Cols, Rows, this.Slides[this.CurPage], this.DefaultTableStyleId);
-        if(this.Document_Is_SelectionLocked(changestype_AddShape, graphic_frame) === false)
+        if(this.Document_Is_SelectionLocked(AscCommon.changestype_AddShape, graphic_frame) === false)
         {
             //this.Slides[this.CurPage].graphicObjects.resetSelection();
             //this.Slides[this.CurPage].graphicObjects.selectObject(graphic_frame, 0);
@@ -1433,8 +1439,8 @@ CPresentation.prototype =
         var table = new CTable(this.DrawingDocument, graphic_frame, Inline, 0, X, Y, W, 100000, Rows, Cols, Grid, true);
         if(!Inline)
         {
-            table.Set_PositionH(c_oAscHAnchor.Page, false, 0);
-            table.Set_PositionV(c_oAscVAnchor.Page, false, 0);
+            table.Set_PositionH(Asc.c_oAscHAnchor.Page, false, 0);
+            table.Set_PositionV(Asc.c_oAscVAnchor.Page, false, 0);
         }
         table.Set_TableLayout(tbllayout_Fixed);
         if(typeof StyleId === "string")
@@ -2461,7 +2467,7 @@ CPresentation.prototype =
                 if ( null != ParaPr )
                 {
                     this.Create_NewHistoryPoint(historydescription_Document_SetParagraphAlignHotKey);
-                    this.Set_ParagraphAlign( ParaPr.Jc === align_Center ? align_Left : align_Center );
+                    this.Set_ParagraphAlign( ParaPr.Jc === AscCommon.align_Center ? align_Left : AscCommon.align_Center );
                     this.Document_UpdateInterfaceState();
                 }
                 bRetValue = keydownresult_PreventAll;
@@ -2504,7 +2510,7 @@ CPresentation.prototype =
             var ParaPr = this.Get_Paragraph_ParaPr();
             if ( null != ParaPr )
             {
-                if ( false === this.Document_Is_SelectionLocked(changestype_Paragraph_Properties) )
+                if ( false === this.Document_Is_SelectionLocked(AscCommon.changestype_Paragraph_Properties) )
                 {
                     this.Create_NewHistoryPoint(historydescription_Document_SetParagraphAlignHotKey);
                     this.Set_ParagraphAlign( ParaPr.Jc === align_Justify ? align_Left : align_Justify );
@@ -2537,7 +2543,7 @@ CPresentation.prototype =
                 var ParaPr = this.Get_Paragraph_ParaPr();
                 if ( null != ParaPr )
                 {
-                    if ( false === this.Document_Is_SelectionLocked(changestype_Paragraph_Properties) )
+                    if ( false === this.Document_Is_SelectionLocked(AscCommon.changestype_Paragraph_Properties) )
                     {
                         this.Create_NewHistoryPoint(historydescription_Document_SetParagraphNumberingHotKey);
                         this.Set_ParagraphAlign( ParaPr.Jc === align_Left ? align_Justify : align_Left );
@@ -2585,10 +2591,10 @@ CPresentation.prototype =
             var ParaPr = this.Get_Paragraph_ParaPr();
             if ( null != ParaPr )
             {
-                if ( false === this.Document_Is_SelectionLocked(changestype_Paragraph_Properties) )
+                if ( false === this.Document_Is_SelectionLocked(AscCommon.changestype_Paragraph_Properties) )
                 {
                     this.Create_NewHistoryPoint(historydescription_Document_SetParagraphAlignHotKey4);
-                    this.Set_ParagraphAlign( ParaPr.Jc === align_Right ? align_Left : align_Right );
+                    this.Set_ParagraphAlign( ParaPr.Jc === AscCommon.align_Right ? align_Left : AscCommon.align_Right );
                     this.Document_UpdateInterfaceState();
                 }
                 bRetValue = keydownresult_PreventAll;
@@ -2721,9 +2727,9 @@ CPresentation.prototype =
                 if(CollaborativeEditing.Is_Fast() || editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false) {
                     History.Create_NewPoint(historydescription_Presentation_ParagraphAdd);
                     if (true === e.ShiftKey)
-                        this.Paragraph_Add(new ParaTextPr({VertAlign: TextPr.VertAlign === vertalign_SuperScript ? vertalign_Baseline : vertalign_SuperScript}));
+                        this.Paragraph_Add(new ParaTextPr({VertAlign: TextPr.VertAlign === AscCommon.vertalign_SuperScript ? vertalign_Baseline : AscCommon.vertalign_SuperScript}));
                     else
-                        this.Paragraph_Add(new ParaTextPr({VertAlign: TextPr.VertAlign === vertalign_SubScript ? vertalign_Baseline : vertalign_SubScript}));
+                        this.Paragraph_Add(new ParaTextPr({VertAlign: TextPr.VertAlign === AscCommon.vertalign_SubScript ? vertalign_Baseline : AscCommon.vertalign_SubScript}));
                 }
                 bRetValue = keydownresult_PreventAll;
             }
@@ -2735,7 +2741,7 @@ CPresentation.prototype =
             {
                 if(CollaborativeEditing.Is_Fast() || editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false) {
                     History.Create_NewPoint(historydescription_Presentation_ParagraphAdd);
-                    this.Paragraph_Add(new ParaTextPr({VertAlign: TextPr.VertAlign === vertalign_SuperScript ? vertalign_Baseline : vertalign_SuperScript}));
+                    this.Paragraph_Add(new ParaTextPr({VertAlign: TextPr.VertAlign === AscCommon.vertalign_SuperScript ? vertalign_Baseline : AscCommon.vertalign_SuperScript}));
                 }
                 bRetValue = keydownresult_PreventAll;
             }
@@ -2769,7 +2775,7 @@ CPresentation.prototype =
             {
                 if(CollaborativeEditing.Is_Fast() || editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false) {
                     History.Create_NewPoint(historydescription_Presentation_ParagraphAdd);
-                    this.Paragraph_Add(new ParaTextPr({VertAlign: TextPr.VertAlign === vertalign_SubScript ? vertalign_Baseline : vertalign_SubScript}));
+                    this.Paragraph_Add(new ParaTextPr({VertAlign: TextPr.VertAlign === AscCommon.vertalign_SubScript ? vertalign_Baseline : AscCommon.vertalign_SubScript}));
                 }
                 bRetValue = keydownresult_PreventAll;
             }
@@ -3337,7 +3343,7 @@ CPresentation.prototype =
 
     changeBackground: function(bg, arr_ind, bNoCreatePoint)
     {
-        if(bNoCreatePoint === true || this.Document_Is_SelectionLocked(changestype_SlideBg) === false)
+        if(bNoCreatePoint === true || this.Document_Is_SelectionLocked(AscCommon.changestype_SlideBg) === false)
         {
             if(!(bNoCreatePoint === true ))
             {
@@ -4309,7 +4315,7 @@ CPresentation.prototype =
 
     deleteSlides: function(array)
     {
-        if(array.length > 0 && (CollaborativeEditing.Is_Fast() || this.Document_Is_SelectionLocked(changestype_RemoveSlide, null) === false))
+        if(array.length > 0 && (CollaborativeEditing.Is_Fast() || this.Document_Is_SelectionLocked(AscCommon.changestype_RemoveSlide, null) === false))
         {
             History.Create_NewPoint(historydescription_Presentation_DeleteSlides);
             var oldLen = this.Slides.length;
@@ -4339,7 +4345,7 @@ CPresentation.prototype =
 
     changeLayout: function(_array, MasterLayouts, layout_index)
     {
-        if(this.Document_Is_SelectionLocked(changestype_Layout) === false)
+        if(this.Document_Is_SelectionLocked(AscCommon.changestype_Layout) === false)
         {
             History.Create_NewPoint(historydescription_Presentation_ChangeLayout);
             if(this.Slides[this.CurPage])
@@ -4506,7 +4512,7 @@ CPresentation.prototype =
 
     changeSlideSize: function(width, height)
     {
-        if(this.Document_Is_SelectionLocked(changestype_SlideSize) === false)
+        if(this.Document_Is_SelectionLocked(AscCommon.changestype_SlideSize) === false)
         {
             History.Create_NewPoint(historydescription_Presentation_ChangeSlideSize);
             History.Add(this, {Type: historyitem_Presentation_SlideSize, oldW: this.Width, newW: width, oldH: this.Height, newH:  height});
@@ -4525,7 +4531,7 @@ CPresentation.prototype =
             return;
         }
 
-        if(!(this.Document_Is_SelectionLocked(changestype_Theme) === false))
+        if(!(this.Document_Is_SelectionLocked(AscCommon.changestype_Theme) === false))
             return;
 
         if(!(colorScheme instanceof ClrScheme))
@@ -4694,7 +4700,7 @@ CPresentation.prototype =
             }
             case historyitem_Presentation_AddSlide:
             {
-                var pos = this.m_oContentChanges.Check( contentchanges_Add, Reader.GetLong());
+                var pos = this.m_oContentChanges.Check( AscCommon.contentchanges_Add, Reader.GetLong());
                 var Id = Reader.GetString2();
                 var oSlide = g_oTableId.Get_ById(Id);
                 if(oSlide)
@@ -4709,7 +4715,7 @@ CPresentation.prototype =
                 var pos = Reader.GetLong();
                 Reader.GetString2();
 
-                var ChangesPos = this.m_oContentChanges.Check( contentchanges_Remove, pos);
+                var ChangesPos = this.m_oContentChanges.Check( AscCommon.contentchanges_Remove, pos);
 
                 // действие совпало, не делаем его
                 if ( false === ChangesPos )
@@ -4816,7 +4822,7 @@ CPresentation.prototype =
             this.Slides[this.CurPage].commentX += W;
             this.Slides[this.CurPage].commentY += H;
 
-            if(this.Document_Is_SelectionLocked(changestype_AddComment, Comment) === false)
+            if(this.Document_Is_SelectionLocked(AscCommon.changestype_AddComment, Comment) === false)
             {
                 for(var i = this.Slides[this.CurPage].slideComments.comments.length - 1; i > -1; --i)
                 {
@@ -4843,7 +4849,7 @@ CPresentation.prototype =
 
     Change_Comment : function(Id, CommentData)
     {
-        if(this.Document_Is_SelectionLocked(changestype_MoveComment, Id) === false)
+        if(this.Document_Is_SelectionLocked(AscCommon.changestype_MoveComment, Id) === false)
         {
             History.Create_NewPoint(historydescription_Presentation_ChangeComment);
             var comment = g_oTableId.Get_ById(Id);

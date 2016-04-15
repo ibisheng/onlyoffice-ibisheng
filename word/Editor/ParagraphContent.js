@@ -19,6 +19,10 @@
 //       нового элемента не надо было бы просматривать каждый раз все функции класса
 //       CParagraph.
 
+// Import
+var c_oAscRelativeFromH = Asc.c_oAscRelativeFromH;
+var c_oAscRelativeFromV = Asc.c_oAscRelativeFromV;
+
 var para_Unknown                   =     -1; //
 var para_Empty                     = 0x0000; // Пустой элемент (таким элементом должен заканчиваться каждый параграф)
 var para_Text                      = 0x0001; // Текст
@@ -184,7 +188,7 @@ ParaText.prototype =
             bCapitals = false;
         }
 
-        if (TextPr.VertAlign !== vertalign_Baseline)
+        if (TextPr.VertAlign !== AscCommon.vertalign_Baseline)
             this.Flags |= PARATEXT_FLAGS_FONTKOEF_SCRIPT;
         else
             this.Flags &= PARATEXT_FLAGS_NON_FONTKOEF_SCRIPT;
@@ -367,7 +371,7 @@ ParaSpace.prototype =
 
     Measure : function(Context, TextPr)
     {
-        this.Set_FontKoef_Script( TextPr.VertAlign !== vertalign_Baseline ? true : false );
+        this.Set_FontKoef_Script( TextPr.VertAlign !== AscCommon.vertalign_Baseline ? true : false );
         this.Set_FontKoef_SmallCaps( true != TextPr.Caps && true === TextPr.SmallCaps ? true : false );
 
         // Разрешенные размеры шрифта только либо целое, либо целое/2. Даже после применения FontKoef, поэтому
@@ -4542,12 +4546,12 @@ ParaDrawing.prototype =
 
         if (this.SizeRelH && !this.SizeRelV)
         {
-            this.SetSizeRelV({RelativeFrom: c_oAscSizeRelFromV.sizerelfromvPage, Percent: 0});
+            this.SetSizeRelV({RelativeFrom: AscCommon.c_oAscSizeRelFromV.sizerelfromvPage, Percent: 0});
         }
 
         if (this.SizeRelV && !this.SizeRelH)
         {
-            this.SetSizeRelH({RelativeFrom: c_oAscSizeRelFromH.sizerelfromhPage, Percent: 0})
+            this.SetSizeRelH({RelativeFrom: AscCommon.c_oAscSizeRelFromH.sizerelfromhPage, Percent: 0})
         }
 
         if(bNeedUpdateWH)
@@ -7119,7 +7123,7 @@ ParaDrawing.prototype =
             return;
 
         var LogicDocument = editor.WordControl.m_oLogicDocument;
-        if (false === LogicDocument.Document_Is_SelectionLocked(changestype_None, {Type : changestype_2_Element_and_Type, Element : Para, CheckType : changestype_Paragraph_Content}))
+        if (false === LogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_None, {Type : AscCommon.changestype_2_Element_and_Type, Element : Para, CheckType : AscCommon.changestype_Paragraph_Content}))
         {
             LogicDocument.Create_NewHistoryPoint(historydescription_Document_ConvertOldEquation);
 

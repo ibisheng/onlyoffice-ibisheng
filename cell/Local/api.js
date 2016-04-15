@@ -50,7 +50,7 @@ var c_oAscError = Asc.c_oAscError;
 	{
 		var cp = JSON.parse("{\"codepage\":46,\"delimiter\":1}");
 		cp['encodings'] = getEncodingParams();
-		this.handlers.trigger("asc_onAdvancedOptions", new asc.asc_CAdvancedOptions(c_oAscAdvancedOptionsID.CSV, cp), c_oAscAdvancedOptionsAction.Open);
+		this.handlers.trigger("asc_onAdvancedOptions", new asc.asc_CAdvancedOptions(Asc.c_oAscAdvancedOptionsID.CSV, cp), AscCommon.c_oAscAdvancedOptionsAction.Open);
 	};
 	
 	asc['spreadsheet_api'].prototype.asc_addImageDrawingObject = function(url)
@@ -162,7 +162,7 @@ window["Asc"]['spreadsheet_api'].prototype.onUpdateDocumentModified = function(b
   
 window["Asc"]['spreadsheet_api'].prototype.asc_Save = function (isNoUserSave, isSaveAs)
 {
-	if (this.isChartEditor || c_oAscAdvancedOptionsAction.None !== this.advancedOptionsAction)
+	if (this.isChartEditor || AscCommon.c_oAscAdvancedOptionsAction.None !== this.advancedOptionsAction)
 		return;
     	
 	var t = this;
@@ -199,7 +199,7 @@ window["Asc"]['spreadsheet_api'].prototype.asc_isOffline = function()
 
 window["DesktopOfflineAppDocumentStartSave"] = function(isSaveAs)
 {
-	window["Asc"]["editor"].sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Save);
+	window["Asc"]["editor"].sync_StartAction(Asc.c_oAscAsyncActionType.BlockInteraction, Asc.c_oAscAsyncAction.Save);
 	
 	var _param = "";
 	if (isSaveAs === true)
@@ -211,7 +211,7 @@ window["DesktopOfflineAppDocumentStartSave"] = function(isSaveAs)
 };
 window["DesktopOfflineAppDocumentEndSave"] = function(error)
 {
-	window["Asc"]["editor"].sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Save);
+	window["Asc"]["editor"].sync_EndAction(Asc.c_oAscAsyncActionType.BlockInteraction, Asc.c_oAscAsyncAction.Save);
 	if (0 == error)
 		DesktopOfflineUpdateLocalName(window["Asc"]["editor"]);
 	else

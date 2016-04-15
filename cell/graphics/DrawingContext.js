@@ -53,7 +53,7 @@
 				oRes.g = g;
 				oRes.b = b;
 				oRes.a = 255;
-				oRes.type = c_oAscColor.COLOR_TYPE_SCHEME;
+				oRes.type = Asc.c_oAscColor.COLOR_TYPE_SCHEME;
 				oRes.value = themePresentation;
 			}
 		}

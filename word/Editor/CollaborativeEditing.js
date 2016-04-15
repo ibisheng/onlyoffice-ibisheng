@@ -76,7 +76,7 @@ CWordCollaborativeEditing.prototype.Send_Changes = function(IsUserSave, Addition
     for (var Index = 0; Index < UnlockCount2; Index++)
     {
         var Class = this.m_aNeedUnlock2[Index];
-        Class.Lock.Set_Type(locktype_None, false);
+        Class.Lock.Set_Type(AscCommon.locktype_None, false);
         editor.CoAuthoringApi.releaseLocks(Class.Get_Id());
     }
 
@@ -129,9 +129,9 @@ CWordCollaborativeEditing.prototype.Release_Locks = function()
     for (var Index = 0; Index < UnlockCount; Index++)
     {
         var CurLockType = this.m_aNeedUnlock[Index].Lock.Get_Type();
-        if (locktype_Other3 != CurLockType && locktype_Other != CurLockType)
+        if (AscCommon.locktype_Other3 != CurLockType && AscCommon.locktype_Other != CurLockType)
         {
-            this.m_aNeedUnlock[Index].Lock.Set_Type(locktype_None, false);
+            this.m_aNeedUnlock[Index].Lock.Set_Type(AscCommon.locktype_None, false);
 
             if (this.m_aNeedUnlock[Index] instanceof CHeaderFooterController)
                 editor.sync_UnLockHeaderFooters();
@@ -142,9 +142,9 @@ CWordCollaborativeEditing.prototype.Release_Locks = function()
             else if (this.m_aNeedUnlock[Index] instanceof CGraphicObjects)
                 editor.sync_UnLockDocumentSchema();
         }
-        else if (locktype_Other3 === CurLockType)
+        else if (AscCommon.locktype_Other3 === CurLockType)
         {
-            this.m_aNeedUnlock[Index].Lock.Set_Type(locktype_Other, false);
+            this.m_aNeedUnlock[Index].Lock.Set_Type(AscCommon.locktype_Other, false);
         }
     }
 };
@@ -176,7 +176,7 @@ CWordCollaborativeEditing.prototype.OnEnd_Load_Objects = function()
     LogicDocument.Document_UpdateSelectionState();
     LogicDocument.Document_UpdateInterfaceState();
 
-    editor.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.ApplyChanges);
+    editor.sync_EndAction(Asc.c_oAscAsyncActionType.BlockInteraction, Asc.c_oAscAsyncAction.ApplyChanges);
 };
 CWordCollaborativeEditing.prototype.Check_MergeData = function()
 {
@@ -230,7 +230,7 @@ CWordCollaborativeEditing.prototype.OnEnd_CheckLock = function(DontLockInFastMod
                     var Class = g_oTableId.Get_ById(oItem);
                     if (null != Class)
                     {
-                        Class.Lock.Set_Type(locktype_Mine, false);
+                        Class.Lock.Set_Type(AscCommon.locktype_Mine, false);
                         this.Add_Unlock2(Class);
                     }
                 }
@@ -271,7 +271,7 @@ CWordCollaborativeEditing.prototype.OnCallback_AskLock = function(result)
                     var Class = g_oTableId.Get_ById(oItem);
                     if (null != Class)
                     {
-                        Class.Lock.Set_Type(locktype_Mine);
+                        Class.Lock.Set_Type(AscCommon.locktype_Mine);
                         oThis.Add_Unlock2(Class);
                     }
                 }

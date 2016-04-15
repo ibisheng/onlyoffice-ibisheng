@@ -127,7 +127,7 @@ asc_docs_api.prototype["Call_HR_Tabs"] = function(arrT, arrP)
     }
 
     var _logic = this.WordControl.m_oLogicDocument;
-    if ( false === _logic.Document_Is_SelectionLocked(changestype_Paragraph_Properties) )
+    if ( false === _logic.Document_Is_SelectionLocked(AscCommon.changestype_Paragraph_Properties) )
     {
         _logic.Create_NewHistoryPoint();
         _logic.Set_ParagraphTabs(_arr);
@@ -136,7 +136,7 @@ asc_docs_api.prototype["Call_HR_Tabs"] = function(arrT, arrP)
 asc_docs_api.prototype["Call_HR_Pr"] = function(_indent_left, _indent_right, _indent_first)
 {
     var _logic = this.WordControl.m_oLogicDocument;
-    if ( false === _logic.Document_Is_SelectionLocked(changestype_Paragraph_Properties) )
+    if ( false === _logic.Document_Is_SelectionLocked(AscCommon.changestype_Paragraph_Properties) )
     {
         _logic.Create_NewHistoryPoint();
         _logic.Set_ParagraphIndent( { Left : _indent_left, Right : _indent_right, FirstLine: _indent_first } );
@@ -146,7 +146,7 @@ asc_docs_api.prototype["Call_HR_Pr"] = function(_indent_left, _indent_right, _in
 asc_docs_api.prototype["Call_HR_Margins"] = function(_margin_left, _margin_right)
 {
     var _logic = this.WordControl.m_oLogicDocument;
-    if ( false === _logic.Document_Is_SelectionLocked(changestype_Document_SectPr) )
+    if ( false === _logic.Document_Is_SelectionLocked(AscCommon.changestype_Document_SectPr) )
     {
         _logic.Create_NewHistoryPoint();
         _logic.Set_DocumentMargin( { Left : _margin_left, Right : _margin_right });
@@ -155,7 +155,7 @@ asc_docs_api.prototype["Call_HR_Margins"] = function(_margin_left, _margin_right
 asc_docs_api.prototype["Call_HR_Table"] = function(_params, _cols, _margins, _rows)
 {
     var _logic = this.WordControl.m_oLogicDocument;
-    if ( false === _logic.Document_Is_SelectionLocked(changestype_Table_Properties) )
+    if ( false === _logic.Document_Is_SelectionLocked(AscCommon.changestype_Table_Properties) )
     {
         _logic.Create_NewHistoryPoint();
 
@@ -171,7 +171,7 @@ asc_docs_api.prototype["Call_HR_Table"] = function(_params, _cols, _margins, _ro
 asc_docs_api.prototype["Call_VR_Margins"] = function(_top, _bottom)
 {
     var _logic = this.WordControl.m_oLogicDocument;
-    if ( false === _logic.Document_Is_SelectionLocked(changestype_Document_SectPr) )
+    if ( false === _logic.Document_Is_SelectionLocked(AscCommon.changestype_Document_SectPr) )
     {
         _logic.Create_NewHistoryPoint();
         _logic.Set_DocumentMargin( { Top : _top, Bottom : _bottom });
@@ -180,7 +180,7 @@ asc_docs_api.prototype["Call_VR_Margins"] = function(_top, _bottom)
 asc_docs_api.prototype["Call_VR_Header"] = function(_header_top, _header_bottom)
 {
     var _logic = this.WordControl.m_oLogicDocument;
-    if ( false === _logic.Document_Is_SelectionLocked(changestype_HdrFtr) )
+    if ( false === _logic.Document_Is_SelectionLocked(AscCommon.changestype_HdrFtr) )
     {
         _logic.Create_NewHistoryPoint();
         _logic.Document_SetHdrFtrBounds(_header_top, _header_bottom);
@@ -189,7 +189,7 @@ asc_docs_api.prototype["Call_VR_Header"] = function(_header_top, _header_bottom)
 asc_docs_api.prototype["Call_VR_Table"] = function(_params, _cols, _margins, _rows)
 {
     var _logic = this.WordControl.m_oLogicDocument;
-    if ( false === _logic.Document_Is_SelectionLocked(changestype_Table_Properties) )
+    if ( false === _logic.Document_Is_SelectionLocked(AscCommon.changestype_Table_Properties) )
     {
         _logic.Create_NewHistoryPoint();
 
@@ -1260,9 +1260,9 @@ asc_docs_api.prototype["Call_Menu_Event"] = function(type, _params)
                         if (_textPr === undefined)
                             _textPr = new CTextPr();
                         if (true == _params[_current.pos++])
-                            _textPr.VertAlign = vertalign_SubScript;
+                            _textPr.VertAlign = AscCommon.vertalign_SubScript;
                         else
-                            _textPr.VertAlign = vertalign_Baseline;
+                            _textPr.VertAlign = AscCommon.vertalign_Baseline;
                         break;
                     }
                     case 16:
@@ -1270,9 +1270,9 @@ asc_docs_api.prototype["Call_Menu_Event"] = function(type, _params)
                         if (_textPr === undefined)
                             _textPr = new CTextPr();
                         if (true == _params[_current.pos++])
-                            _textPr.VertAlign = vertalign_SuperScript;
+                            _textPr.VertAlign = AscCommon.vertalign_SuperScript;
                         else
-                            _textPr.VertAlign = vertalign_Baseline;
+                            _textPr.VertAlign = AscCommon.vertalign_Baseline;
                         break;
                     }
                     case 17:
@@ -1366,7 +1366,7 @@ asc_docs_api.prototype["Call_Menu_Event"] = function(type, _params)
         }
         case 7: // ASC_MENU_EVENT_TYPE_HEADERFOOTER
         {
-            var bIsApply = (this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_HdrFtr) === false) ? true : false;
+            var bIsApply = (this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_HdrFtr) === false) ? true : false;
 
             if (bIsApply)
                 this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
@@ -1824,7 +1824,7 @@ asc_docs_api.prototype["Call_Menu_Event"] = function(type, _params)
                 }
             }
 
-            if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Document_Content_Add) )
+            if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Document_Content_Add) )
             {
                 this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
                 this.WordControl.m_oLogicDocument.Add_InlineTable(_rows, _cols);
@@ -1867,7 +1867,7 @@ asc_docs_api.prototype["Call_Menu_Event"] = function(type, _params)
         case 52: // ASC_MENU_EVENT_TYPE_INSERT_HYPERLINK
         {
             var _props = asc_menu_ReadHyperPr(_params, _current);
-            if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content) )
+            if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Paragraph_Content) )
             {
                 this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
                 this.WordControl.m_oLogicDocument.Hyperlink_Add( _props );
@@ -1877,7 +1877,7 @@ asc_docs_api.prototype["Call_Menu_Event"] = function(type, _params)
         case 8: // ASC_MENU_EVENT_TYPE_HYPERLINK
         {
             var _props = asc_menu_ReadHyperPr(_params, _current);
-            if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content) )
+            if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Paragraph_Content) )
             {
                 this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
                 this.WordControl.m_oLogicDocument.Hyperlink_Modify( _props );
@@ -1886,7 +1886,7 @@ asc_docs_api.prototype["Call_Menu_Event"] = function(type, _params)
         }
         case 59: // ASC_MENU_EVENT_TYPE_REMOVE_HYPERLINK
         {
-            if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content) )
+            if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Paragraph_Content) )
             {
                 this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
                 this.WordControl.m_oLogicDocument.Hyperlink_Remove();
@@ -2105,7 +2105,7 @@ asc_docs_api.prototype["Call_Menu_Event"] = function(type, _params)
 
             if (1 == _type)
             {
-                if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Table_Properties) )
+                if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Table_Properties) )
                 {
                     this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(historydescription_Document_TableAddColumnLeft);
                     if (_is_add)
@@ -2116,7 +2116,7 @@ asc_docs_api.prototype["Call_Menu_Event"] = function(type, _params)
             }
             else if (2 == _type)
             {
-                if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Table_Properties) )
+                if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Table_Properties) )
                 {
                     this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(historydescription_Document_TableAddColumnLeft);
                     if (_is_add)
@@ -3680,22 +3680,22 @@ function asc_menu_ReadAscFill(_params, _cursor)
             {
                 switch (_fill.type)
                 {
-                    case c_oAscFill.FILL_TYPE_SOLID:
+                    case Asc.c_oAscFill.FILL_TYPE_SOLID:
                     {
                         _fill.fill = asc_menu_ReadAscFill_solid(_params, _cursor);
                         break;
                     }
-                    case c_oAscFill.FILL_TYPE_PATT:
+                    case Asc.c_oAscFill.FILL_TYPE_PATT:
                     {
                         _fill.fill = asc_menu_ReadAscFill_patt(_params, _cursor);
                         break;
                     }
-                    case c_oAscFill.FILL_TYPE_GRAD:
+                    case Asc.c_oAscFill.FILL_TYPE_GRAD:
                     {
                         _fill.fill = asc_menu_ReadAscFill_grad(_params, _cursor);
                         break;
                     }
-                    case c_oAscFill.FILL_TYPE_BLIP:
+                    case Asc.c_oAscFill.FILL_TYPE_BLIP:
                     {
                         _fill.fill = asc_menu_ReadAscFill_blip(_params, _cursor);
                         break;
@@ -3739,22 +3739,22 @@ function asc_menu_WriteAscFill(_type, _fill, _stream)
     {
         switch (_fill.type)
         {
-            case c_oAscFill.FILL_TYPE_SOLID:
+            case Asc.c_oAscFill.FILL_TYPE_SOLID:
             {
                 _fill.fill = asc_menu_WriteAscFill_solid(1, _fill.fill, _stream);
                 break;
             }
-            case c_oAscFill.FILL_TYPE_PATT:
+            case Asc.c_oAscFill.FILL_TYPE_PATT:
             {
                 _fill.fill = asc_menu_ReadAscFill_patt(1, _fill.fill, _stream);
                 break;
             }
-            case c_oAscFill.FILL_TYPE_GRAD:
+            case Asc.c_oAscFill.FILL_TYPE_GRAD:
             {
                 _fill.fill = asc_menu_ReadAscFill_grad(1, _fill.fill, _stream);
                 break;
             }
-            case c_oAscFill.FILL_TYPE_BLIP:
+            case Asc.c_oAscFill.FILL_TYPE_BLIP:
             {
                 _fill.fill = asc_menu_ReadAscFill_blip(1, _fill.fill, _stream);
                 break;
@@ -4248,8 +4248,8 @@ asc_docs_api.prototype.UpdateParagraphProp = function(ParaPr)
 {
     // TODO: как только разъединят настройки параграфа и текста переделать тут
     var TextPr = this.WordControl.m_oLogicDocument.Get_Paragraph_TextPr();
-    ParaPr.Subscript   = ( TextPr.VertAlign === vertalign_SubScript   ? true : false );
-    ParaPr.Superscript = ( TextPr.VertAlign === vertalign_SuperScript ? true : false );
+    ParaPr.Subscript   = ( TextPr.VertAlign === AscCommon.vertalign_SubScript   ? true : false );
+    ParaPr.Superscript = ( TextPr.VertAlign === AscCommon.vertalign_SuperScript ? true : false );
     ParaPr.Strikeout   = TextPr.Strikeout;
     ParaPr.DStrikeout  = TextPr.DStrikeout;
     ParaPr.AllCaps     = TextPr.Caps;
@@ -4362,21 +4362,21 @@ asc_docs_api.prototype.UpdateParagraphProp = function(ParaPr)
     var _len = this.SelectedObjectsStack.length;
     if (_len > 0)
     {
-        if (this.SelectedObjectsStack[_len - 1].Type == c_oAscTypeSelectElement.Paragraph)
+        if (this.SelectedObjectsStack[_len - 1].Type == Asc.c_oAscTypeSelectElement.Paragraph)
         {
             this.SelectedObjectsStack[_len - 1].Value = ParaPr;
             return;
         }
     }
 
-    this.SelectedObjectsStack[this.SelectedObjectsStack.length] = new asc_CSelectedObject ( c_oAscTypeSelectElement.Paragraph, ParaPr );
+    this.SelectedObjectsStack[this.SelectedObjectsStack.length] = new asc_CSelectedObject ( Asc.c_oAscTypeSelectElement.Paragraph, ParaPr );
 };
 
 asc_docs_api.prototype.put_PageNum = function(where,align)
 {
     if ( where >= 0 )
     {
-        if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_None, { Type : changestype_2_HdrFtr }) )
+        if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_None, { Type : AscCommon.changestype_2_HdrFtr }) )
         {
             this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
             this.WordControl.m_oLogicDocument.Document_AddPageNum( where, align );
@@ -4384,7 +4384,7 @@ asc_docs_api.prototype.put_PageNum = function(where,align)
     }
     else
     {
-        if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content) )
+        if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Paragraph_Content) )
         {
             this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
             this.WordControl.m_oLogicDocument.Document_AddPageNum( where, align );
@@ -4394,7 +4394,7 @@ asc_docs_api.prototype.put_PageNum = function(where,align)
 
 asc_docs_api.prototype.put_AddPageBreak = function()
 {
-    if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content) )
+    if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Paragraph_Content) )
     {
         var Document = this.WordControl.m_oLogicDocument;
 
@@ -4418,7 +4418,7 @@ asc_docs_api.prototype.add_SectionBreak = function(_Type)
         case c_oAscSectionBreakType.Column     : Type = section_type_Column; break;
     }
 
-    if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content) )
+    if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Paragraph_Content) )
     {
         this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
         this.WordControl.m_oLogicDocument.Add_SectionBreak(Type);
@@ -4427,7 +4427,7 @@ asc_docs_api.prototype.add_SectionBreak = function(_Type)
 
 asc_docs_api.prototype.put_AddLineBreak = function()
 {
-    if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content) )
+    if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Paragraph_Content) )
     {
         var Document = this.WordControl.m_oLogicDocument;
 
@@ -4447,7 +4447,7 @@ asc_docs_api.prototype.ImgApply = function(obj)
     // Если у нас меняется с Float->Inline мы также должны залочить соответствующий параграф
     var AdditionalData = null;
     var LogicDocument = this.WordControl.m_oLogicDocument;
-    if(obj && obj.ChartProperties && obj.ChartProperties.type === c_oAscChartTypeSettings.stock)
+    if(obj && obj.ChartProperties && obj.ChartProperties.type === Asc.c_oAscChartTypeSettings.stock)
     {
         var selectedObjectsByType = LogicDocument.DrawingObjects.getSelectedObjectsByTypes();
         if(selectedObjectsByType.charts[0])
@@ -4478,7 +4478,7 @@ asc_docs_api.prototype.ImgApply = function(obj)
      }
      */
 
-    if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Image_Properties, AdditionalData) )
+    if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Image_Properties, AdditionalData) )
     {
 
         if (ImagePr.ShapeProperties)
@@ -4531,7 +4531,7 @@ asc_docs_api.prototype.ImgApply = function(obj)
 
 asc_docs_api.prototype.IncreaseIndent = function()
 {
-    if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Properties) )
+    if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Paragraph_Properties) )
     {
         this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
         this.WordControl.m_oLogicDocument.Paragraph_IncDecIndent( true );
@@ -4539,7 +4539,7 @@ asc_docs_api.prototype.IncreaseIndent = function()
 };
 asc_docs_api.prototype.DecreaseIndent = function()
 {
-    if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Properties) )
+    if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Paragraph_Properties) )
     {
         this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
         this.WordControl.m_oLogicDocument.Paragraph_IncDecIndent( false );
@@ -4548,7 +4548,7 @@ asc_docs_api.prototype.DecreaseIndent = function()
 
 asc_docs_api.prototype.MergeCells = function()
 {
-    if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Table_Properties) )
+    if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Table_Properties) )
     {
         this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
         this.WordControl.m_oLogicDocument.Table_MergeCells();
@@ -4556,7 +4556,7 @@ asc_docs_api.prototype.MergeCells = function()
 }
 asc_docs_api.prototype.SplitCell = function(Cols, Rows)
 {
-    if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Table_Properties) )
+    if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Table_Properties) )
     {
         this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
         this.WordControl.m_oLogicDocument.Table_SplitCell(Cols, Rows);
@@ -4648,11 +4648,11 @@ asc_docs_api.prototype.sync_EndCatchSelectedElements = function()
     {
         switch (this.SelectedObjectsStack[i].Type)
         {
-            case c_oAscTypeSelectElement.Paragraph:
-            case c_oAscTypeSelectElement.Header:
-            case c_oAscTypeSelectElement.Table:
-            case c_oAscTypeSelectElement.Image:
-            case c_oAscTypeSelectElement.Hyperlink:
+            case Asc.c_oAscTypeSelectElement.Paragraph:
+            case Asc.c_oAscTypeSelectElement.Header:
+            case Asc.c_oAscTypeSelectElement.Table:
+            case Asc.c_oAscTypeSelectElement.Image:
+            case Asc.c_oAscTypeSelectElement.Hyperlink:
             {
                 ++_naturalCount;
                 break;
@@ -4669,37 +4669,37 @@ asc_docs_api.prototype.sync_EndCatchSelectedElements = function()
         switch (this.SelectedObjectsStack[i].Type)
         {
             //console.log(JSON.stringify(this.SelectedObjectsStack[i].Value));
-            case c_oAscTypeSelectElement.Paragraph:
+            case Asc.c_oAscTypeSelectElement.Paragraph:
             {
-                _stream["WriteLong"](c_oAscTypeSelectElement.Paragraph);
+                _stream["WriteLong"](Asc.c_oAscTypeSelectElement.Paragraph);
                 asc_menu_WriteParagraphPr(this.SelectedObjectsStack[i].Value, _stream);
                 break;
             }
-            case c_oAscTypeSelectElement.Header:
+            case Asc.c_oAscTypeSelectElement.Header:
             {
-                _stream["WriteLong"](c_oAscTypeSelectElement.Header);
+                _stream["WriteLong"](Asc.c_oAscTypeSelectElement.Header);
                 asc_menu_WriteHeaderFooterPr(this.SelectedObjectsStack[i].Value, _stream);
                 break;
             }
-            case c_oAscTypeSelectElement.Table:
+            case Asc.c_oAscTypeSelectElement.Table:
             {
-                _stream["WriteLong"](c_oAscTypeSelectElement.Table);
+                _stream["WriteLong"](Asc.c_oAscTypeSelectElement.Table);
                 asc_menu_WriteTablePr(this.SelectedObjectsStack[i].Value, _stream);
                 break;
             }
-            case c_oAscTypeSelectElement.Image:
+            case Asc.c_oAscTypeSelectElement.Image:
             {
-                _stream["WriteLong"](c_oAscTypeSelectElement.Image);
+                _stream["WriteLong"](Asc.c_oAscTypeSelectElement.Image);
                 asc_menu_WriteImagePr(this.SelectedObjectsStack[i].Value, _stream);
                 break;
             }
-            case c_oAscTypeSelectElement.Hyperlink:
+            case Asc.c_oAscTypeSelectElement.Hyperlink:
             {
-                _stream["WriteLong"](c_oAscTypeSelectElement.Hyperlink);
+                _stream["WriteLong"](Asc.c_oAscTypeSelectElement.Hyperlink);
                 asc_menu_WriteHyperPr(this.SelectedObjectsStack[i].Value, _stream);
                 break;
             }
-            case c_oAscTypeSelectElement.SpellCheck:
+            case Asc.c_oAscTypeSelectElement.SpellCheck:
             default:
             {
                 // none
@@ -4879,7 +4879,7 @@ asc_docs_api.prototype.asc_isSelectSearchingResults = function()
 // sectionPr --------------------------------------------------------------------------------------------
 asc_docs_api.prototype.change_PageOrient = function(isPortrait)
 {
-    if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Document_SectPr) )
+    if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Document_SectPr) )
     {
         this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
         if (isPortrait)
@@ -4897,7 +4897,7 @@ asc_docs_api.prototype.change_PageOrient = function(isPortrait)
 };
 asc_docs_api.prototype.change_DocSize = function(width,height)
 {
-    if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Document_SectPr) )
+    if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Document_SectPr) )
     {
         this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
         if (this.DocumentOrientation)
@@ -5169,7 +5169,7 @@ CStylesPainter.prototype =
         var oldDefTabStop = Default_Tab_Stop;
         Default_Tab_Stop = 1;
 
-        var hdr = new CHeaderFooter(_api.WordControl.m_oLogicDocument.HdrFtr, _api.WordControl.m_oLogicDocument, _api.WordControl.m_oDrawingDocument, hdrftr_Header);
+        var hdr = new CHeaderFooter(_api.WordControl.m_oLogicDocument.HdrFtr, _api.WordControl.m_oLogicDocument, _api.WordControl.m_oDrawingDocument, AscCommon.hdrftr_Header);
         var _dc = hdr.Content;//new CDocumentContent(editor.WordControl.m_oLogicDocument, editor.WordControl.m_oDrawingDocument, 0, 0, 0, 0, false, true, false);
 
         var par = new Paragraph(_api.WordControl.m_oDrawingDocument, _dc, 0, 0, 0, 0, false);
@@ -5183,7 +5183,7 @@ CStylesPainter.prototype =
         _dc.Internal_Content_Add(0, par, false);
         par.Add_ToContent(0, run);
         par.Style_Add(style.Id, false);
-        par.Set_Align(align_Left);
+        par.Set_Align(AscCommon.align_Left);
         par.Set_Tabs(new CParaTabs());
 
         var _brdL = style.ParaPr.Brd.Left;
@@ -5230,7 +5230,7 @@ CStylesPainter.prototype =
 
         var _sp = new CParaSpacing();
         _sp.Line              = 1;
-        _sp.LineRule          = linerule_Auto;
+        _sp.LineRule          = Asc.linerule_Auto;
         _sp.Before            = 0;
         _sp.BeforeAutoSpacing = false;
         _sp.After             = 0;
@@ -5462,7 +5462,7 @@ asc_docs_api.prototype.Call_Menu_Context_Paste = function(type, param)
 };
 asc_docs_api.prototype.Call_Menu_Context_Delete = function()
 {
-    if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Delete) )
+    if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Delete) )
     {
         this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
         this.WordControl.m_oLogicDocument.Remove( 1, true );

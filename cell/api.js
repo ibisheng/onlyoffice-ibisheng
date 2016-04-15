@@ -13,8 +13,17 @@ var editor;
   var asc_CAdjustPrint = asc.asc_CAdjustPrint;
   var prot;
 
+  var c_oAscAdvancedOptionsAction = AscCommon.c_oAscAdvancedOptionsAction;
+  var DownloadType = AscCommon.DownloadType;
+  var c_oAscLockTypes = AscCommon.c_oAscLockTypes;
+
   var c_oAscLockTypeElem = AscCommonExcel.c_oAscLockTypeElem;
+
   var c_oAscError = asc.c_oAscError;
+  var c_oAscFileType = asc.c_oAscFileType;
+  var c_oAscAsyncAction = asc.c_oAscAsyncAction;
+  var c_oAscAdvancedOptionsID = asc.c_oAscAdvancedOptionsID;
+  var c_oAscAsyncActionType = asc.c_oAscAsyncActionType;
 
 
   /**
@@ -40,7 +49,7 @@ var editor;
     // Вид печати
     this.adjustPrint = null;
 
-    this.fontRenderingMode = c_oAscFontRenderingModeType.hintingAndSubpixeling;
+    this.fontRenderingMode = Asc.c_oAscFontRenderingModeType.hintingAndSubpixeling;
     this.wb = null;
     this.wbModel = null;
 
@@ -737,7 +746,7 @@ var editor;
     var t = this;
     // Проверяем, возможно нам пришли опции для CSV
     if (this.documentOpenOptions) {
-      var codePageCsv = c_oAscEncodingsMap[this.documentOpenOptions["codePage"]] || c_oAscCodePageUtf8, delimiterCsv = this.documentOpenOptions["delimiter"];
+      var codePageCsv = AscCommon.c_oAscEncodingsMap[this.documentOpenOptions["codePage"]] || AscCommon.c_oAscCodePageUtf8, delimiterCsv = this.documentOpenOptions["delimiter"];
       if (null != codePageCsv && null != delimiterCsv) {
         this.asc_setAdvancedOptions(c_oAscAdvancedOptionsID.CSV, new asc.asc_CCSVAdvancedOptions(codePageCsv, delimiterCsv));
         return;
@@ -791,7 +800,7 @@ var editor;
     oAdditionalData["outputformat"] = filetype;
     oAdditionalData["title"] = changeFileExtention(this.documentTitle, getExtentionByFormat(filetype));
     this.wb._initCommentsToSave();
-    oAdditionalData["savetype"] = c_oAscSaveTypes.CompleteAll;
+    oAdditionalData["savetype"] = AscCommon.c_oAscSaveTypes.CompleteAll;
     var t = this;
     t.fCurCallback = function(incomeObject) {
       if (null != input && "save" == input["type"]) {
@@ -849,7 +858,7 @@ var editor;
       if (actionType) {
         this.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, actionType);
       }
-      var cp = {'delimiter': c_oAscCsvDelimiter.Comma, 'codepage': c_oAscCodePageUtf8, 'encodings': getEncodingParams()};
+      var cp = {'delimiter': AscCommon.c_oAscCsvDelimiter.Comma, 'codepage': AscCommon.c_oAscCodePageUtf8, 'encodings': getEncodingParams()};
       this.downloadType = options.downloadType;
       this.handlers.trigger("asc_onAdvancedOptions", new asc.asc_CAdvancedOptions(c_oAscAdvancedOptionsID.CSV, cp), this.advancedOptionsAction);
       return;

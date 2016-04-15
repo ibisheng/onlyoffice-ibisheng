@@ -165,7 +165,7 @@ asc_docs_api.prototype.asc_Save = function (isNoUserSave, isSaveAs)
 };
 window["DesktopOfflineAppDocumentStartSave"] = function(isSaveAs)
 {
-    editor.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Save);
+    editor.sync_StartAction(Asc.c_oAscAsyncActionType.BlockInteraction, Asc.c_oAscAsyncAction.Save);
 	
 	var _param = "";
 	if (isSaveAs === true)
@@ -177,7 +177,7 @@ window["DesktopOfflineAppDocumentStartSave"] = function(isSaveAs)
 };
 window["DesktopOfflineAppDocumentEndSave"] = function(error)
 {
-	editor.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Save);
+	editor.sync_EndAction(Asc.c_oAscAsyncActionType.BlockInteraction, Asc.c_oAscAsyncAction.Save);
 	if (error == 0)
 		DesktopOfflineUpdateLocalName(editor);
 	else

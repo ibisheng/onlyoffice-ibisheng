@@ -6,6 +6,9 @@
 * @param {undefined} undefined
 */
 function (window, undefined) {
+    // Import
+    var CellValueType = AscCommon.CellValueType;
+
     var cElementType = AscCommonExcel.cElementType;
     var cErrorType = AscCommonExcel.cErrorType;
     var cNumber = AscCommonExcel.cNumber;

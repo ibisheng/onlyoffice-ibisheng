@@ -17,6 +17,9 @@
    * Import
    * -----------------------------------------------------------------------------
    */
+  var c_oAscBorderStyles = AscCommon.c_oAscBorderStyles;
+  var c_oAscFormatPainterState = AscCommon.c_oAscFormatPainterState;
+
   var asc = window["Asc"];
   var asc_applyFunction = asc.applyFunction;
   var asc_round = asc.round;
@@ -32,6 +35,9 @@
   var c_oAscMouseMoveType = asc.c_oAscMouseMoveType;
   var c_oAscCellEditorState = asc.c_oAscCellEditorState;
   var c_oAscPopUpSelectorType = asc.c_oAscPopUpSelectorType;
+  var c_oAscAsyncAction = asc.c_oAscAsyncAction;
+  var c_oAscFontRenderingModeType = asc.c_oAscFontRenderingModeType;
+  var c_oAscAsyncActionType = asc.c_oAscAsyncActionType;
   
 
   function WorkbookCommentsModel(handlers) {

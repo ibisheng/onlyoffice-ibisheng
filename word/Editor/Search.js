@@ -265,7 +265,7 @@ CDocument.prototype.Search_Replace = function(NewStr, bAll, Id)
 
     var AllCount = this.SearchEngine.Count;
 
-    if ( false === this.Document_Is_SelectionLocked( changestype_None, { Type : changestype_2_ElementsArray_and_Type, Elements : CheckParagraphs, CheckType : changestype_Paragraph_Content } ) )
+    if ( false === this.Document_Is_SelectionLocked( AscCommon.changestype_None, { Type : AscCommon.changestype_2_ElementsArray_and_Type, Elements : CheckParagraphs, CheckType : AscCommon.changestype_Paragraph_Content } ) )
     {
         History.Create_NewPoint(bAll ? historydescription_Document_ReplaceAll : historydescription_Document_ReplaceSingle);
 

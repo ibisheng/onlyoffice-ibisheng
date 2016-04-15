@@ -11,6 +11,10 @@
 		 * Import
 		 * -----------------------------------------------------------------------------
 		 */
+		var c_oAscBorderStyles = AscCommon.c_oAscBorderStyles;
+
+		var c_oAscMaxCellOrCommentLength = AscCommon.c_oAscMaxCellOrCommentLength;
+
 		var doc = window.document;
 		
 		var isTruePaste = false;
@@ -4422,10 +4426,10 @@
 					if(Def_pPr.Jc != Item_pPr.Jc){
 						switch(Item_pPr.Jc)
 						{
-							case align_Left: apPr.push("text-align:left");break;
-							case align_Center: apPr.push("text-align:center");break;
-							case align_Right: apPr.push("text-align:right");break;
-							case align_Justify: apPr.push("text-align:justify");break;
+							case AscCommon.align_Left: apPr.push("text-align:left");break;
+							case AscCommon.align_Center: apPr.push("text-align:center");break;
+							case AscCommon.align_Right: apPr.push("text-align:right");break;
+							case AscCommon.align_Justify: apPr.push("text-align:justify");break;
 						}
 					}
 					//KeepLines , WidowControl
@@ -4447,9 +4451,9 @@
 					//Spacing
 					if(Def_pPr.Spacing.Line != Item_pPr.Spacing.Line)
 					{
-						if(linerule_AtLeast == Item_pPr.Spacing.LineRule)
+						if(Asc.linerule_AtLeast == Item_pPr.Spacing.LineRule)
 							apPr.push("line-height:"+(Item_pPr.Spacing.Line * g_dKoef_mm_to_pt)+"pt");
-						else if( linerule_Auto == Item_pPr.Spacing.LineRule)
+						else if( Asc.linerule_Auto == Item_pPr.Spacing.LineRule)
 						{
 							if(1 == Item_pPr.Spacing.Line)
 								apPr.push("line-height:normal");
@@ -4459,7 +4463,7 @@
 					}
 					if(Def_pPr.Spacing.LineRule != Item_pPr.Spacing.LineRule)
 					{
-						if(linerule_Exact == Item_pPr.Spacing.LineRule)
+						if(Asc.linerule_Exact == Item_pPr.Spacing.LineRule)
 							apPr.push("mso-line-height-rule:exactly");
 					}
 					//��� ������� � word ����� ����� ��� �������� ������������ ������
@@ -4562,9 +4566,9 @@
 					aProp.push("mso-style-textfill-fill-color:" + color);
 				}
 				if (null != Value.VertAlign) {
-					if(vertalign_SuperScript == Value.VertAlign)
+					if(AscCommon.vertalign_SuperScript == Value.VertAlign)
 						aProp.push("vertical-align:super");
-					else if(vertalign_SubScript == Value.VertAlign)
+					else if(AscCommon.vertalign_SubScript == Value.VertAlign)
 						aProp.push("vertical-align:sub");
 				}
 

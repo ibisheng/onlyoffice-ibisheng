@@ -1,6 +1,13 @@
 "use strict";
 (function(window, undefined) {
 
+      // Import
+      var CellValueType = AscCommon.CellValueType;
+      var c_oAscCellAnchorType = AscCommon.c_oAscCellAnchorType;
+      var c_oAscBorderStyles = AscCommon.c_oAscBorderStyles;
+
+      var c_oAscPageOrientation = Asc.c_oAscPageOrientation;
+
     /** @enum */
     var c_oSerFormat = {
         Version		: 2, //1.0.0.2
@@ -5266,8 +5273,8 @@
             if ( c_oSerWorkbookPrTypes.Date1904 == type )
             {
                 WorkbookPr.Date1904 = this.stream.GetBool();
-                g_bDate1904 = WorkbookPr.Date1904;
-                AscCommonExcel.c_DateCorrectConst = g_bDate1904?AscCommonExcel.c_Date1904Const:AscCommonExcel.c_Date1900Const;
+                AscCommon.bDate1904 = WorkbookPr.Date1904;
+                AscCommonExcel.c_DateCorrectConst = AscCommon.bDate1904?AscCommonExcel.c_Date1904Const:AscCommonExcel.c_Date1900Const;
             }
             else if ( c_oSerWorkbookPrTypes.DateCompatibility == type )
                 WorkbookPr.DateCompatibility = this.stream.GetBool();

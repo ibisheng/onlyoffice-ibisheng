@@ -1,5 +1,9 @@
 "use strict";
 
+// Import
+var c_oAscSizeRelFromH = AscCommon.c_oAscSizeRelFromH;
+var c_oAscSizeRelFromV = AscCommon.c_oAscSizeRelFromV;
+
 function CGroupShape()
 {
 
@@ -390,7 +394,7 @@ CGroupShape.prototype =
             {
                 oLock = this.Lock;
             }
-            if(oLock && locktype_None != oLock.Get_Type())
+            if(oLock && AscCommon.locktype_None != oLock.Get_Type())
             {
                 graphics.transform3(this.transform);
                 graphics.DrawLockObjectRect(oLock.Get_Type(), 0, 0, this.extX, this.extY);
@@ -2078,7 +2082,7 @@ CGroupShape.prototype =
                 var pos = readLong(r);
                 if(this.worksheet)
                 {
-                    pos = this.worksheet.contentChanges.Check(contentchanges_Add, pos);
+                    pos = this.worksheet.contentChanges.Check(AscCommon.contentchanges_Add, pos);
                 }
                 addToDrawings(this.worksheet, this, pos);
                 break;

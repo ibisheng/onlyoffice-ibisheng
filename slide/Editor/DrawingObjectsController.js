@@ -48,13 +48,13 @@ DrawingObjectsController.prototype.getColorMap = function()
 
 DrawingObjectsController.prototype.checkSelectedObjectsAndCallback = function(callback, args, bNoSendProps, nHistoryPointType)
 {
-    var check_type = changestype_Drawing_Props, comment;
+    var check_type = AscCommon.changestype_Drawing_Props, comment;
     if(this.drawingObjects.slideComments)
     {
         comment = this.drawingObjects.slideComments.getSelectedComment();
         if(comment)
         {
-            check_type = changestype_MoveComment;
+            check_type = AscCommon.changestype_MoveComment;
             comment = comment.Get_Id();
         }
     }
@@ -148,13 +148,13 @@ DrawingObjectsController.prototype.resetSelect = function()
 
 DrawingObjectsController.prototype.checkSelectedObjectsAndFireCallback = function(callback, args)
 {
-    var check_type = changestype_Drawing_Props, comment;
+    var check_type = AscCommon.changestype_Drawing_Props, comment;
     if(this.drawingObjects.slideComments)
     {
         comment = this.drawingObjects.slideComments.getSelectedComment();
         if(comment)
         {
-            check_type = changestype_MoveComment;
+            check_type = AscCommon.changestype_MoveComment;
             comment = comment.Get_Id();
         }
     }
@@ -365,7 +365,7 @@ MoveCommentState.prototype =
 
     onMouseUp: function(e, x, y, pageIndex)
     {
-        if(!this.drawingObjects.isViewMode() && editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_MoveComment, this.comment.Get_Id()) === false)
+        if(!this.drawingObjects.isViewMode() && editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_MoveComment, this.comment.Get_Id()) === false)
         {
             History.Create_NewPoint(historydescription_Presentation_MoveComments);
             var tracks = this.drawingObjects.arrTrackObjects;

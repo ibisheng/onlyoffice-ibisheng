@@ -7,6 +7,8 @@
 */
 function (window, undefined) {
   // Import
+  var CellValueType = AscCommon.CellValueType;
+
   var c_oAscError = Asc.c_oAscError;
   
 /** @enum */
@@ -56,7 +58,7 @@ Date.prototype.excelNullDate1900 = Date.UTC( 1899, 11, 30, 0, 0, 0 );
 Date.prototype.excelNullDate1904 = Date.UTC( 1904, 0, 1, 0, 0, 0 );
 
 Date.prototype.getExcelNullDate = function () {
-    return g_bDate1904 ? Date.prototype.excelNullDate1904 : Date.prototype.excelNullDate1900;
+  return AscCommon.bDate1904 ? Date.prototype.excelNullDate1904 : Date.prototype.excelNullDate1900;
 };
 
 Date.prototype.isLeapYear = function () {
@@ -84,7 +86,7 @@ Date.prototype.getExcelDate = function () {
 };
 
 Date.prototype.getExcelDateWithTime = function () {
-//    return Math.floor( ( this.getTime() / 1000 - this.getTimezoneOffset() * 60 ) / c_sPerDay + ( c_DateCorrectConst + (g_bDate1904 ? 0 : 1) ) );
+//    return Math.floor( ( this.getTime() / 1000 - this.getTimezoneOffset() * 60 ) / c_sPerDay + ( c_DateCorrectConst + (bDate1904 ? 0 : 1) ) );
     var year = this.getUTCFullYear(), month = this.getUTCMonth(), date = this.getUTCDate(), res;
 
   if (1900 < year || (1900 == year && 1 < month)) {
@@ -104,7 +106,7 @@ Date.prototype.getDateFromExcel = function ( val ) {
 
     val = Math.floor( val );
 
-    if ( g_bDate1904 ) {
+  if (AscCommon.bDate1904) {
         return new Date( val * c_msPerDay + this.getExcelNullDate() );
   } else {
         if ( val < 60 ) {

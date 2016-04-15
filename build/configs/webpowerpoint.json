@@ -4,9 +4,11 @@
             "common": [
                 "../common/Build/License.js",
                 "../common/browser.js",
+				"../common/commonDefines.js",
+				"../common/downloaderfiles.js",
 				"../common/docscoapicommon.js",
                 "../common/docscoapi.js",
-				"../common/downloaderfiles.js",
+				
 				"../common/apiCommon.js",
 				"../slide/apiDefines.js",
 				"../common/editorscommon.js",
@@ -17,7 +19,6 @@
                 "../common/FontsFreeType/font_map.js",
                 "../word/Drawing/Externals.js",
                 "../common/GlobalLoaders.js",
-                "../common/commonDefines.js",
                 "../slide/Drawing/ThemeLoader.js",
                 "../common/Charts/DrawingObjects.js",
                 "../common/SerializeCommonWordExcel.js",

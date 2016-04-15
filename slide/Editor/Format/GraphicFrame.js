@@ -359,8 +359,8 @@ CGraphicFrame.prototype =
             {
                 if(this.graphicObject)
                 {
-                    this.graphicObject.Set_PositionH(c_oAscHAnchor.Page, false, 0, false);
-                    this.graphicObject.Set_PositionV(c_oAscVAnchor.Page, false, 0, false);
+                    this.graphicObject.Set_PositionH(Asc.c_oAscHAnchor.Page, false, 0, false);
+                    this.graphicObject.Set_PositionV(Asc.c_oAscVAnchor.Page, false, 0, false);
                     this.graphicObject.Parent = this;
                     this.graphicObject.Reset(0, 0, this.spPr.xfrm.extX, 10000, 0);
                     this.graphicObject.Recalculate_Page(0);
@@ -670,7 +670,7 @@ CGraphicFrame.prototype =
             {
                 if(this.graphicObject.Is_TableBorder( tx, ty, 0))
                 {
-                    if(!editor.isViewMode && editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
+                    if(!editor.isViewMode && editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Drawing_Props) === false)
                     {
                         History.Create_NewPoint(historydescription_Presentation_TableBorder);
                     }
@@ -790,7 +790,7 @@ CGraphicFrame.prototype =
             graphics.transform3(this.transform);
             graphics.SetIntegerGrid(true);
             this.graphicObject.Draw(0, graphics);
-            if(locktype_None != this.Lock.Get_Type() && !this.group)
+            if(AscCommon.locktype_None != this.Lock.Get_Type() && !this.group)
                 graphics.DrawLockObjectRect(this.Lock.Get_Type() , 0, 0, this.extX, this.extY);
             graphics.reset();
             graphics.SetIntegerGrid(true);

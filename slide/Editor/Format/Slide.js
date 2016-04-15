@@ -690,14 +690,14 @@ Slide.prototype =
             {
                 var Pos = readLong(r);
                 var Item = readObject(r);
-                var ChangesPos = this.m_oContentChanges.Check( contentchanges_Add, Pos );
+                var ChangesPos = this.m_oContentChanges.Check( AscCommon.contentchanges_Add, Pos );
                 this.cSld.spTree.splice(ChangesPos, 0, Item);
                 break;
             }
             case historyitem_SlideRemoveFromSpTree:
             {
                 var Pos = readLong(r);
-                var ChangesPos = this.m_oContentChanges.Check( contentchanges_Remove, Pos );
+                var ChangesPos = this.m_oContentChanges.Check( AscCommon.contentchanges_Remove, Pos );
                 if(!(ChangesPos === false))
                 {
                     this.cSld.spTree.splice(ChangesPos, 1);
@@ -1232,7 +1232,7 @@ Slide.prototype =
       //  var sp_tree = this.cSld.spTree;
       //  for(var i = 0; i < sp_tree.length; ++i)
       //  {
-      //      if(sp_tree[i].Lock.Type !== locktype_Mine && sp_tree[i].Lock.Type !== locktype_None)
+      //      if(sp_tree[i].Lock.Type !== locktype_Mine && sp_tree[i].Lock.Type !== AscCommon.locktype_None)
       //          return true;
       //  }
         return false;
@@ -1668,7 +1668,7 @@ SlideComments.prototype =
             {
                 var pos = r.GetLong();
                 var id = r.GetString2();
-                var pos2 = this.m_oContentChanges.Check( contentchanges_Add, pos);
+                var pos2 = this.m_oContentChanges.Check( AscCommon.contentchanges_Add, pos);
                 this.comments.splice(pos2, 0,  g_oTableId.Get_ById(id));
                 this.comments[pos2].slideComments = this;
                 editor.sync_AddComment( id, this.comments[pos2].Data);
@@ -1677,7 +1677,7 @@ SlideComments.prototype =
             case historyitem_SlideCommentsRemoveComment:
             {
                 var pos = r.GetLong();
-                var pos2 = this.m_oContentChanges.Check( contentchanges_Remove, pos);
+                var pos2 = this.m_oContentChanges.Check( AscCommon.contentchanges_Remove, pos);
 
                 var comment = this.comments.splice(pos2, 1)[0];
                 editor.sync_RemoveComment(comment.Id);

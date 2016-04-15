@@ -227,7 +227,7 @@ asc_CCommentData.prototype = {
 	asc_putParent: function(obj) { this.oParent = obj; },
 	asc_getParent: function() { return this.oParent; },
 
-	asc_putText: function(val) { this.sText = val ? val.slice(0, c_oAscMaxCellOrCommentLength) : val; },
+	asc_putText: function(val) { this.sText = val ? val.slice(0, Asc.c_oAscMaxCellOrCommentLength) : val; },
 	asc_getText: function() { return this.sText; },
 
 	asc_putTime: function(val) { this.sTime = val; },
@@ -406,12 +406,12 @@ CCellCommentator.prototype.isLockedComment = function(oComment, callbackFunc) {
 			callbackFunc = undefined;
 		}
 		if (false !== this.worksheet.collaborativeEditing.getLockIntersection(lockInfo,
-			c_oAscLockTypes.kLockTypeMine, /*bCheckOnlyLockAll*/false)) {
+				AscCommon.c_oAscLockTypes.kLockTypeMine, /*bCheckOnlyLockAll*/false)) {
 			// Редактируем сами
 			Asc.applyFunction(callbackFunc, true);
 			return;
 		} else if (false !== this.worksheet.collaborativeEditing.getLockIntersection(lockInfo,
-			c_oAscLockTypes.kLockTypeOther, /*bCheckOnlyLockAll*/false)) {
+				AscCommon.c_oAscLockTypes.kLockTypeOther, /*bCheckOnlyLockAll*/false)) {
 			// Уже ячейку кто-то редактирует
 			Asc.applyFunction(callbackFunc, false);
 			return;

@@ -460,7 +460,7 @@ CTextBody.prototype =
                                 new_spacing.LineRule = spacing2.LineRule;
                                 if(isRealNumber(spc))
                                 {
-                                    if(spacing2.LineRule === linerule_Auto)
+                                    if(spacing2.LineRule === Asc.linerule_Auto)
                                     {
                                         new_spacing.Line = spacing2.Line - spacing_scale;
                                     }
@@ -753,7 +753,7 @@ CTextBody.prototype =
     {
         var max_content = this.content.Recalculate_MinMaxContentWidth().Max;
         this.content.Set_ApplyToAll(true);
-        this.content.Set_ParagraphAlign(align_Center);
+        this.content.Set_ParagraphAlign(AscCommon.align_Center);
         this.content.Set_ApplyToAll(false);
         this.content.Reset(0, 0,max_content, 20000);
         this.content.Recalculate_Page(0, true);
@@ -789,7 +789,7 @@ CTextBody.prototype =
         if(bLeft)
         {
             this.content.Set_ApplyToAll(true);
-            this.content.Set_ParagraphAlign(align_Left);
+            this.content.Set_ParagraphAlign(AscCommon.align_Left);
             this.content.Set_ApplyToAll(false);
         }
         this.content.Recalculate_Page(0, true);

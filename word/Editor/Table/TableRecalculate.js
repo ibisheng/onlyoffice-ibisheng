@@ -1581,12 +1581,12 @@ CTable.prototype.private_RecalculatePositionX = function(CurPage)
 
         switch (TablePr.Jc)
         {
-            case align_Left :
+            case AscCommon.align_Left :
             {
                 Page.X = Page.X_origin + this.Get_TableOffsetCorrection() + TablePr.TableInd;
                 break;
             }
-            case align_Right :
+            case AscCommon.align_Right :
             {
                 var TableWidth = this.TableSumGrid[this.TableSumGrid.length - 1];
 
@@ -1596,7 +1596,7 @@ CTable.prototype.private_RecalculatePositionX = function(CurPage)
                     Page.X = Page.XLimit - TableWidth;
                 break;
             }
-            case align_Center :
+            case AscCommon.align_Center :
             {
                 var TableWidth = this.TableSumGrid[this.TableSumGrid.length - 1];
                 var RangeWidth = Page.XLimit - Page.X_origin;

@@ -5,6 +5,9 @@ if ( !window["Asc"] ) {		// Для вставки диаграмм в Word
 }
 
 // Import
+var c_oAscCellAnchorType = AscCommon.c_oAscCellAnchorType;
+var c_oAscLockTypes = AscCommon.c_oAscLockTypes;
+
 var c_oAscError = Asc.c_oAscError;
 var c_oAscInsertOptions = Asc.c_oAscInsertOptions;
 var c_oAscDeleteOptions = Asc.c_oAscDeleteOptions;
@@ -2107,7 +2110,7 @@ function DrawingObjects() {
                         var shapeProp = new asc_CShapeProperty();
                         imgProps.ShapeProperties = shapeProp;
                         shapeProp.fill = new asc_CShapeFill();
-                        shapeProp.fill.type = c_oAscFill.FILL_TYPE_BLIP;
+                        shapeProp.fill.type = Asc.c_oAscFill.FILL_TYPE_BLIP;
                         shapeProp.fill.fill = new asc_CFillBlip();
                         shapeProp.fill.fill.asc_putUrl(_image.src);
                         _this.setGraphicObjectProps(imgProps);
@@ -2120,7 +2123,7 @@ function DrawingObjects() {
                         var AscShapeProp = new asc_CShapeProperty();
                         imgProps.ShapeProperties = AscShapeProp;
                         var oFill = new asc_CShapeFill();
-                        oFill.type = c_oAscFill.FILL_TYPE_BLIP;
+                        oFill.type = Asc.c_oAscFill.FILL_TYPE_BLIP;
                         oFill.fill = new asc_CFillBlip();
                         oFill.fill.asc_putUrl(imageUrl);
                         AscShapeProp.textArtProperties = new asc_TextArtProperties();
@@ -3475,24 +3478,24 @@ function DrawingObjects() {
             }
             settings.putRange(worksheet.getSelectionRangeValue());
             settings.putStyle(2);
-            settings.putType(c_oAscChartTypeSettings.lineNormal);
-            settings.putTitle(c_oAscChartTitleShowSettings.noOverlay);
+            settings.putType(Asc.c_oAscChartTypeSettings.lineNormal);
+            settings.putTitle(Asc.c_oAscChartTitleShowSettings.noOverlay);
             settings.putShowHorAxis(true);
             settings.putShowVerAxis(true);
             var series = getChartSeries(worksheet.model, settings);
             if(series && series.series.length > 1)
             {
-                settings.putLegendPos(c_oAscChartLegendShowSettings.right);
+                settings.putLegendPos(Asc.c_oAscChartLegendShowSettings.right);
             }
             else
             {
-                settings.putLegendPos(c_oAscChartLegendShowSettings.none);
+                settings.putLegendPos(Asc.c_oAscChartLegendShowSettings.none);
             }
-            settings.putHorAxisLabel(c_oAscChartHorAxisLabelShowSettings.none);
-            settings.putVertAxisLabel(c_oAscChartVertAxisLabelShowSettings.none);
-            settings.putDataLabelsPos(c_oAscChartDataLabelsPos.none);
-            settings.putHorGridLines(c_oAscGridLinesSettings.major);
-            settings.putVertGridLines(c_oAscGridLinesSettings.none);
+            settings.putHorAxisLabel(Asc.c_oAscChartHorAxisLabelShowSettings.none);
+            settings.putVertAxisLabel(Asc.c_oAscChartVertAxisLabelShowSettings.none);
+            settings.putDataLabelsPos(Asc.c_oAscChartDataLabelsPos.none);
+            settings.putHorGridLines(Asc.c_oAscGridLinesSettings.major);
+            settings.putVertGridLines(Asc.c_oAscGridLinesSettings.none);
             //settings.putInColumns(false);
             settings.putSeparator(",");
             settings.putLine(true);

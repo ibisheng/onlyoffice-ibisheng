@@ -2474,7 +2474,7 @@ function CDrawingDocument()
     {
         if ("" == this.m_sLockedCursorType)
         {
-            if ( c_oAscFormatPainterState.kOff !== this.m_oWordControl.m_oApi.isPaintFormat && "default" == sType)
+            if ( AscCommon.c_oAscFormatPainterState.kOff !== this.m_oWordControl.m_oApi.isPaintFormat && "default" == sType)
                 this.m_oWordControl.m_oMainContent.HtmlElement.style.cursor = kCurFormatPainterWord;
             else if (this.m_oWordControl.m_oApi.isMarkerFormat && "default" == sType)
                 this.m_oWordControl.m_oMainContent.HtmlElement.style.cursor = this.cursorMarkerFormat;
@@ -6184,11 +6184,11 @@ function CDrawingDocument()
         _textPr.Strikeout  = this.GuiLastTextProps.Strikeout;
 
         if (true === this.GuiLastTextProps.Subscript)
-            _textPr.VertAlign  = vertalign_SubScript;
+            _textPr.VertAlign  = AscCommon.vertalign_SubScript;
         else if (true === this.GuiLastTextProps.Superscript)
-            _textPr.VertAlign  = vertalign_SuperScript;
+            _textPr.VertAlign  = AscCommon.vertalign_SuperScript;
         else
-            _textPr.VertAlign = vertalign_Baseline;
+            _textPr.VertAlign = AscCommon.vertalign_Baseline;
 
         _textPr.DStrikeout = this.GuiLastTextProps.DStrikeout;
         _textPr.Caps       = this.GuiLastTextProps.AllCaps;
@@ -7202,7 +7202,7 @@ CStylesPainter.prototype =
       var style = styles[i];
       if (true == style.qFormat && null === DocumentStyles.Get_StyleIdByName(style.Name, false)) {
         this.drawStyle(graphics, style);
-        this.defaultStyles.push(new CStyleImage(style.Name, c_oAscStyleImage.Default, _canvas.toDataURL("image/png"), style.uiPriority));
+        this.defaultStyles.push(new CStyleImage(style.Name, AscCommon.c_oAscStyleImage.Default, _canvas.toDataURL("image/png"), style.uiPriority));
       }
     }
   },
@@ -7254,7 +7254,7 @@ CStylesPainter.prototype =
         _dr_style.Id = i;
 
         this.drawStyle(graphics, _dr_style);
-        this.docStyles[cur_index] = new CStyleImage(style.Name, c_oAscStyleImage.Document, _canvas.toDataURL("image/png"), style.uiPriority);
+        this.docStyles[cur_index] = new CStyleImage(style.Name, AscCommon.c_oAscStyleImage.Document, _canvas.toDataURL("image/png"), style.uiPriority);
 
         // алгоритм смены имени
         if (style.Default) {
@@ -7363,7 +7363,7 @@ CStylesPainter.prototype =
       var oldDefTabStop = Default_Tab_Stop;
       Default_Tab_Stop = 1;
 
-      var hdr = new CHeaderFooter(editor.WordControl.m_oLogicDocument.HdrFtr, editor.WordControl.m_oLogicDocument, editor.WordControl.m_oDrawingDocument, hdrftr_Header);
+      var hdr = new CHeaderFooter(editor.WordControl.m_oLogicDocument.HdrFtr, editor.WordControl.m_oLogicDocument, editor.WordControl.m_oDrawingDocument, AscCommon.hdrftr_Header);
       var _dc = hdr.Content;//new CDocumentContent(editor.WordControl.m_oLogicDocument, editor.WordControl.m_oDrawingDocument, 0, 0, 0, 0, false, true, false);
 
       var par = new Paragraph(editor.WordControl.m_oDrawingDocument, _dc, 0, 0, 0, 0, false);
@@ -7377,7 +7377,7 @@ CStylesPainter.prototype =
       _dc.Internal_Content_Add(0, par, false);
       par.Add_ToContent(0, run);
       par.Style_Add(style.Id, false);
-      par.Set_Align(align_Left);
+      par.Set_Align(AscCommon.align_Left);
       par.Set_Tabs(new CParaTabs());
 
       var _brdL = style.ParaPr.Brd.Left;
@@ -7424,7 +7424,7 @@ CStylesPainter.prototype =
 
       var _sp = new CParaSpacing();
       _sp.Line              = 1;
-      _sp.LineRule          = linerule_Auto;
+      _sp.LineRule          = Asc.linerule_Auto;
       _sp.Before            = 0;
       _sp.BeforeAutoSpacing = false;
       _sp.After             = 0;

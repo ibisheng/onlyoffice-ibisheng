@@ -1,12 +1,17 @@
 ﻿"use strict";
 
 // Import
+var CellValueType = AscCommon.CellValueType;
+var c_oAscBorderWidth = AscCommon.c_oAscBorderWidth;
+var c_oAscBorderStyles = AscCommon.c_oAscBorderStyles;
+
 var UndoRedoDataTypes = AscCommonExcel.UndoRedoDataTypes;
 var UndoRedoData_CellSimpleData = AscCommonExcel.UndoRedoData_CellSimpleData;
 var UndoRedoData_IndexSimpleProp = AscCommonExcel.UndoRedoData_IndexSimpleProp;
 
 var c_oAscCustomAutoFilter = Asc.c_oAscCustomAutoFilter;
 var c_oAscAutoFilterTypes = Asc.c_oAscAutoFilterTypes;
+var c_oAscNumFormatType = Asc.c_oAscNumFormatType;
 
 var g_oColorManager = null;
 var g_nNumsMaxId = 160;
@@ -309,7 +314,7 @@ function CorrectAscColor(asc_color)
 	var _type = asc_color.asc_getType();
 	switch (_type)
 	{
-		case c_oAscColor.COLOR_TYPE_SCHEME:
+		case Asc.c_oAscColor.COLOR_TYPE_SCHEME:
 		{
 			// тут выставляется ТОЛЬКО из меню. поэтому:
 			var _index = asc_color.asc_getValue() >> 0;
@@ -3306,7 +3311,7 @@ CCellValue.prototype =
       // Удаляем концевые пробелы и переводы строки перед проверкой гиперссылок
       val = val.replace(/\s+$/, '');
       var typeHyp = getUrlType(val);
-      if (c_oAscUrlType.Invalid != typeHyp) {
+      if (AscCommon.c_oAscUrlType.Invalid != typeHyp) {
         val = prepareUrl(val, typeHyp);
 
         var oNewHyperlink = new Hyperlink();

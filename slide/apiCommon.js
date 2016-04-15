@@ -625,19 +625,19 @@ function CTablePositionH(obj)
 {
     if ( obj )
     {
-        this.RelativeFrom = ( undefined === obj.RelativeFrom ) ? c_oAscHAnchor.Margin : obj.RelativeFrom;
+        this.RelativeFrom = ( undefined === obj.RelativeFrom ) ? Asc.c_oAscHAnchor.Margin : obj.RelativeFrom;
         this.UseAlign     = ( true === obj.Align ) ? true : false;
         this.Align        = undefined;
         this.Value        = undefined;
 
         if ( true === this.UseAlign )
-            this.Align    = ( undefined === obj.Value ) ? c_oAscXAlign.Left : obj.Value;
+            this.Align    = ( undefined === obj.Value ) ? Asc.c_oAscXAlign.Left : obj.Value;
         else
             this.Value    = ( undefined === obj.Value ) ? 0 : obj.Value;
     }
     else
     {
-        this.RelativeFrom = c_oAscHAnchor.Column;
+        this.RelativeFrom = Asc.c_oAscHAnchor.Column;
         this.UseAlign     = false;
         this.Align        = undefined;
         this.Value        = 0;
@@ -657,19 +657,19 @@ function CTablePositionV(obj)
 {
     if ( obj )
     {
-        this.RelativeFrom = ( undefined === obj.RelativeFrom ) ? c_oAscVAnchor.Text : obj.RelativeFrom;
+        this.RelativeFrom = ( undefined === obj.RelativeFrom ) ? Asc.c_oAscVAnchor.Text : obj.RelativeFrom;
         this.UseAlign     = ( true === obj.Align ) ? true : false;
         this.Align        = undefined;
         this.Value        = undefined;
 
         if ( true === this.UseAlign )
-            this.Align    = ( undefined === obj.Value ) ? c_oAscYAlign.Top : obj.Value;
+            this.Align    = ( undefined === obj.Value ) ? Asc.c_oAscYAlign.Top : obj.Value;
         else
             this.Value    = ( undefined === obj.Value ) ? 0 : obj.Value;
     }
     else
     {
-        this.RelativeFrom = c_oAscVAnchor.Text;
+        this.RelativeFrom = Asc.c_oAscVAnchor.Text;
         this.UseAlign     = false;
         this.Align        = undefined;
         this.Value        = 0;
@@ -1006,7 +1006,7 @@ function CParagraphPropEx (obj)
         //    PageBreakBefore : false,              // начинать параграф с новой страницы
         this.ContextualSpacing = false;
         this.Ind = new asc_CParagraphInd();
-        this.Jc = align_Left;
+        this.Jc = AscCommon.align_Left;
         this.KeepLines = false;
         this.KeepNext = false;
         this.PageBreakBefore = false;
@@ -1122,7 +1122,7 @@ function CTextProp (obj)
         this.FontFamily = new CFontFamily ();
         this.FontSize = 12;
         this.Color = new CColor ();
-        this.VertAlign = vertalign_Baseline;
+        this.VertAlign = AscCommon.vertalign_Baseline;
         this.HighLight =highlight_None;
     }
 }

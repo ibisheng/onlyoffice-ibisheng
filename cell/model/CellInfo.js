@@ -6,6 +6,8 @@
 	 * @param {undefined} undefined
 	 */
 	function ( window, undefined) {
+		// Import
+		var c_oAscBorderStyles = AscCommon.c_oAscBorderStyles;
 
 
 		if (!window["Asc"]) {window["Asc"] = {};}

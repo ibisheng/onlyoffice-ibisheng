@@ -1,5 +1,9 @@
 "use strict";
 
+// Import
+var c_oAscShdClear = Asc.c_oAscShdClear;
+var c_oAscColor = Asc.c_oAscColor;
+
 var c_dScalePPTXSizes = 36000;
 function IsHiddenObj(object)
 {
@@ -1263,7 +1267,7 @@ function BinaryPPTYLoader()
                                                 if (undefined === _style.TablePr.Shd || null == _style.TablePr.Shd)
                                                 {
                                                     _style.TablePr.Shd = new CDocumentShd();
-                                                    _style.TablePr.Shd.Value = shd_Clear;
+                                                    _style.TablePr.Shd.Value = c_oAscShdClear;
                                                 }
                                                 _style.TablePr.Shd.Unifill = _unifill;
                                             }
@@ -1279,7 +1283,7 @@ function BinaryPPTYLoader()
                                 if (undefined === _style.TablePr.Shd || null == _style.TablePr.Shd)
                                 {
                                     _style.TablePr.Shd = new CDocumentShd();
-                                    _style.TablePr.Shd.Value = shd_Clear;
+                                    _style.TablePr.Shd.Value = c_oAscShdClear;
                                 }
                                 _style.TablePr.Shd.FillRef = this.ReadStyleRef();
                                 break;
@@ -1508,7 +1512,7 @@ function BinaryPPTYLoader()
                                 if (undefined === _part.TableCellPr.Shd || null == _part.TableCellPr.Shd)
                                 {
                                     _part.TableCellPr.Shd = new CDocumentShd();
-                                    _part.TableCellPr.Shd.Value = shd_Clear;
+                                    _part.TableCellPr.Shd.Value = c_oAscShdClear;
                                 }
                                 _part.TableCellPr.Shd.FillRef = this.ReadStyleRef();
                                 break;
@@ -1529,7 +1533,7 @@ function BinaryPPTYLoader()
                                                 if (undefined === _part.TableCellPr.Shd || null == _part.TableCellPr.Shd)
                                                 {
                                                     _part.TableCellPr.Shd = new CDocumentShd();
-                                                    _part.TableCellPr.Shd.Value = shd_Clear;
+                                                    _part.TableCellPr.Shd.Value = c_oAscShdClear;
                                                 }
                                                 _part.TableCellPr.Shd.Unifill = _unifill;
                                             }
@@ -6001,7 +6005,7 @@ function BinaryPPTYLoader()
                     if (_unifill.fill !== undefined && _unifill.fill != null)
                     {
                         props.Shd = new CDocumentShd();
-                        props.Shd.Value = shd_Clear;
+                        props.Shd.Value = c_oAscShdClear;
                         props.Shd.Unifill = _unifill;
                     }
                     break;
@@ -6116,7 +6120,7 @@ function BinaryPPTYLoader()
                     if (_unifill.fill !== undefined && _unifill.fill != null)
                     {
                         obj.props.Shd = new CDocumentShd();
-                        obj.props.Shd.Value = shd_Clear;
+                        obj.props.Shd.Value = c_oAscShdClear;
                         obj.props.Shd.Unifill = _unifill;
                     }
                     break;
@@ -6275,9 +6279,9 @@ function BinaryPPTYLoader()
                     var baseline = s.GetLong();
 
                     if (baseline < 0)
-                        rPr.VertAlign = vertalign_SubScript;
+                        rPr.VertAlign = AscCommon.vertalign_SubScript;
                     else if (baseline > 0)
-                        rPr.VertAlign = vertalign_SuperScript;
+                        rPr.VertAlign = AscCommon.vertalign_SuperScript;
 
                     break;
                 }
@@ -6824,15 +6828,15 @@ function BinaryPPTYLoader()
                     var _align = s.GetUChar();
                     switch (_align)
                     {
-                        case 0: { para_pr.Jc = align_Center; break; }
-                        case 1: { para_pr.Jc = align_Justify; break; }
-                        case 2: { para_pr.Jc = align_Justify; break; }
-                        case 3: { para_pr.Jc = align_Justify; break; }
-                        case 4: { para_pr.Jc = align_Left; break; }
-                        case 5: { para_pr.Jc = align_Right; break; }
-                        case 6: { para_pr.Jc = align_Justify; break; }
+                        case 0: { para_pr.Jc = AscCommon.align_Center; break; }
+                        case 1: { para_pr.Jc = AscCommon.align_Justify; break; }
+                        case 2: { para_pr.Jc = AscCommon.align_Justify; break; }
+                        case 3: { para_pr.Jc = AscCommon.align_Justify; break; }
+                        case 4: { para_pr.Jc = AscCommon.align_Left; break; }
+                        case 5: { para_pr.Jc = AscCommon.align_Right; break; }
+                        case 6: { para_pr.Jc = AscCommon.align_Justify; break; }
                         default:
-                            para_pr.Jc = align_Center;
+                            para_pr.Jc = AscCommon.align_Center;
                             break;
                     }
                     break;
@@ -6918,14 +6922,14 @@ function BinaryPPTYLoader()
                             {
                                 Pct = s.GetLong();
                                 para_pr.Spacing.Line = Pct/100000;
-                                para_pr.Spacing.LineRule = linerule_Auto;
+                                para_pr.Spacing.LineRule = Asc.linerule_Auto;
                                 break;
                             }
                             case 1:
                             {
                                 Pts = s.GetLong();
                                 para_pr.Spacing.Line = Pts*0.00352777778;
-                                para_pr.Spacing.LineRule = linerule_Exact;
+                                para_pr.Spacing.LineRule = Asc.linerule_Exact;
                                 break;
                             }
                             default:

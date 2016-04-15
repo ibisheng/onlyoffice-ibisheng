@@ -1598,11 +1598,11 @@ function CDrawingDocument()
         _textPr.Strikeout  = this.GuiLastTextProps.Strikeout;
 
         if (true === this.GuiLastTextProps.Subscript)
-            _textPr.VertAlign  = vertalign_SubScript;
+            _textPr.VertAlign  = AscCommon.vertalign_SubScript;
         else if (true === this.GuiLastTextProps.Superscript)
-            _textPr.VertAlign  = vertalign_SuperScript;
+            _textPr.VertAlign  = AscCommon.vertalign_SuperScript;
         else
-            _textPr.VertAlign = vertalign_Baseline;
+            _textPr.VertAlign = AscCommon.vertalign_Baseline;
 
         _textPr.DStrikeout = this.GuiLastTextProps.DStrikeout;
         _textPr.Caps       = this.GuiLastTextProps.AllCaps;
@@ -5166,7 +5166,7 @@ function CThumbnailsManager()
                 if(global_keyboardEvent.CtrlKey)
                 {
                     var doc = editor.WordControl.m_oLogicDocument;
-                    if(this.m_oWordControl.m_oLogicDocument.viewMode === true || doc.Document_Is_SelectionLocked(changestype_RemoveSlide) === false)
+                    if(this.m_oWordControl.m_oLogicDocument.viewMode === true || doc.Document_Is_SelectionLocked(AscCommon.changestype_RemoveSlide) === false)
                     {
                         Editor_Copy(editor, this.m_oWordControl.m_oLogicDocument.viewMode === false);
                         return undefined;

@@ -1,5 +1,12 @@
 "use strict";
 
+// Import
+var c_oAscColor = Asc.c_oAscColor;
+var c_oAscFill = Asc.c_oAscFill;
+var c_oAscFillGradType = Asc.c_oAscFillGradType;
+var c_oAscFillBlipType = Asc.c_oAscFillBlipType;
+var c_oAscStrokeType = Asc.c_oAscStrokeType;
+
 (	/**
 	 * @param {Window} window
 	 * @param {undefined} undefined
@@ -11,6 +18,9 @@
 		 */
 		var asc = window["Asc"] ? window["Asc"] : (window["Asc"] = {});
 		var prot;
+      var c_oAscChartTypeSettings = Asc.c_oAscChartTypeSettings;
+      var c_oAscTickMark = Asc.c_oAscTickMark;
+      var c_oAscAxisType = Asc.c_oAscAxisType;
 
 		/**
 		 * Класс asc_CAscEditorPermissions для прав редакторов
@@ -20,8 +30,6 @@
 		 * @memberOf Asc
 		 */
 		function asc_CAscEditorPermissions (settings) {
-			this.canEdit = true;
-			this.canDownload = true;
 			this.canCoAuthoring = true;
 			this.canReaderMode = true;
 			this.canBranding = false;
@@ -35,8 +43,6 @@
 			constructor: asc_CAscEditorPermissions,
 			asc_getCanLicense: function(){ return this.canLicense; },
 
-			asc_getCanEdit: function(){ return this.canEdit; }, //ToDo убрать
-			asc_getCanDownload: function(){ return this.canDownload; }, //ToDo убрать
 			asc_getCanCoAuthoring: function(){ return this.canCoAuthoring; },
 			asc_getCanReaderMode: function(){ return this.canReaderMode; },
 			asc_getCanBranding: function(){ return this.canBranding; },
@@ -47,25 +53,22 @@
 			asc_setCanLicense: function(v){ this.canLicense = v; },
       asc_setCanBranding: function(v){ this.canBranding = v; }
 		};
-		
-		/*
-		 * Export
-		 * -----------------------------------------------------------------------------
-		 */
-		window["Asc"]["asc_CAscEditorPermissions"] = 
-		window["Asc"].asc_CAscEditorPermissions = asc_CAscEditorPermissions;
-		
-		prot = asc_CAscEditorPermissions.prototype;
-		prot["asc_getCanLicense"]			= prot.asc_getCanLicense;
 
-		prot["asc_getCanEdit"]				= prot.asc_getCanEdit;
-		prot["asc_getCanDownload"]			= prot.asc_getCanDownload;
-		prot["asc_getCanCoAuthoring"]		= prot.asc_getCanCoAuthoring;
-		prot["asc_getCanReaderMode"]		= prot.asc_getCanReaderMode;
-		prot["asc_getCanBranding"]			= prot.asc_getCanBranding;
-		prot["asc_getIsAutosaveEnable"]		= prot.asc_getIsAutosaveEnable;
-		prot["asc_getAutosaveMinInterval"]	= prot.asc_getAutosaveMinInterval;
-		prot["asc_getIsAnalyticsEnable"]	= prot.asc_getIsAnalyticsEnable;
+      /*
+       * Export
+       * -----------------------------------------------------------------------------
+       */
+      window['AscCommon'] = window['AscCommon'] || {};
+
+      window["AscCommon"].asc_CAscEditorPermissions = asc_CAscEditorPermissions;
+      prot = asc_CAscEditorPermissions.prototype;
+      prot["asc_getCanLicense"]			= prot.asc_getCanLicense;
+      prot["asc_getCanCoAuthoring"]		= prot.asc_getCanCoAuthoring;
+      prot["asc_getCanReaderMode"]		= prot.asc_getCanReaderMode;
+      prot["asc_getCanBranding"]			= prot.asc_getCanBranding;
+      prot["asc_getIsAutosaveEnable"]		= prot.asc_getIsAutosaveEnable;
+      prot["asc_getAutosaveMinInterval"]	= prot.asc_getAutosaveMinInterval;
+      prot["asc_getIsAnalyticsEnable"]	= prot.asc_getIsAnalyticsEnable;
 
 		/**
 		 * Класс CColor для работы с цветами
@@ -791,14 +794,14 @@
             },
             setDefault: function()
             {
-                this.putMinValRule(c_oAscValAxisRule.auto);
-                this.putMaxValRule(c_oAscValAxisRule.auto);
-                this.putTickLabelsPos(c_oAscTickLabelsPos.TICK_LABEL_POSITION_NEXT_TO);
+                this.putMinValRule(Asc.c_oAscValAxisRule.auto);
+                this.putMaxValRule(Asc.c_oAscValAxisRule.auto);
+                this.putTickLabelsPos(Asc.c_oAscTickLabelsPos.TICK_LABEL_POSITION_NEXT_TO);
                 this.putInvertValOrder(false);
-                this.putDispUnitsRule(c_oAscValAxUnits.none);
+                this.putDispUnitsRule(Asc.c_oAscValAxUnits.none);
                 this.putMajorTickMark(c_oAscTickMark.TICK_MARK_OUT);
                 this.putMinorTickMark(c_oAscTickMark.TICK_MARK_NONE);
-                this.putCrossesRule(c_oAscCrossesRule.auto);
+                this.putCrossesRule(Asc.c_oAscCrossesRule.auto);
             }
         };
 
@@ -991,14 +994,14 @@
 
         setDefault: function()
         {
-            this.putIntervalBetweenLabelsRule(c_oAscBetweenLabelsRule.auto);
-            this.putLabelsPosition(c_oAscLabelsPosition.betweenDivisions);
-            this.putTickLabelsPos(c_oAscTickLabelsPos.TICK_LABEL_POSITION_NEXT_TO);
+            this.putIntervalBetweenLabelsRule(Asc.c_oAscBetweenLabelsRule.auto);
+            this.putLabelsPosition(Asc.c_oAscLabelsPosition.betweenDivisions);
+            this.putTickLabelsPos(Asc.c_oAscTickLabelsPos.TICK_LABEL_POSITION_NEXT_TO);
             this.putLabelsAxisDistance(100);
             this.putMajorTickMark(c_oAscTickMark.TICK_MARK_OUT);
             this.putMinorTickMark(c_oAscTickMark.TICK_MARK_NONE);
             this.putIntervalBetweenTick(1);
-            this.putCrossesRule(c_oAscCrossesRule.auto);
+            this.putCrossesRule(Asc.c_oAscCrossesRule.auto);
         }
     };
 
@@ -1269,7 +1272,7 @@
             }
         }
         else {
-            this.Value = shd_Nil;
+            this.Value = Asc.c_oAscShdNil;
             this.Color = CreateAscColorCustom(255, 255, 255);
         }
     }
@@ -1305,7 +1308,7 @@
             this.DropCap = ( dropcap_None === obj.DropCap ? c_oAscDropCap.None : ( dropcap_Drop === obj.DropCap ? c_oAscDropCap.Drop : ( dropcap_Margin === obj.DropCap ? c_oAscDropCap.Margin : undefined ) ) );
             this.H       = obj.H;
             this.HAnchor = obj.HAnchor;
-            this.HRule   = ( heightrule_AtLeast ===  obj.HRule ? linerule_AtLeast : ( heightrule_Auto === obj.HRule  ? linerule_Auto : ( heightrule_Exact === obj.HRule ? linerule_Exact : undefined ) ) );
+            this.HRule   = ( heightrule_AtLeast ===  obj.HRule ? Asc.linerule_AtLeast : ( heightrule_Auto === obj.HRule  ? Asc.linerule_Auto : ( heightrule_Exact === obj.HRule ? Asc.linerule_Exact : undefined ) ) );
             this.HSpace  = obj.HSpace;
             this.Lines   = obj.Lines;
             this.VAnchor = obj.VAnchor;
@@ -2744,7 +2747,7 @@
 
   // ToDo продолжаем делать плохие вещи...Нужно с этим что-то делать!
   function COpenProgress() {
-    this.Type = c_oAscAsyncAction.Open;
+    this.Type = Asc.c_oAscAsyncAction.Open;
 
     this.FontsCount = 0;
     this.CurrentFont = 0;

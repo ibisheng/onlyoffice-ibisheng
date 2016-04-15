@@ -82,7 +82,7 @@ baseEditorsApi.prototype._onCheckLicenseEnd = function(err, res) {
 };
 baseEditorsApi.prototype._onEndPermissions = function() {
   if (this.isOnFirstConnectEnd && this.isOnLoadLicense) {
-    var oResult = new window['Asc'].asc_CAscEditorPermissions();
+    var oResult = new AscCommon.asc_CAscEditorPermissions();
     if (null !== this.licenseResult) {
       oResult.asc_setCanLicense(g_oLicenseResult.Success === this.licenseResult);
       oResult.asc_setCanBranding(g_oLicenseResult.Error !== this.licenseResult); // Для тех, у кого есть лицензия, branding доступен

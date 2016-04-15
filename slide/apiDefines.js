@@ -28,12 +28,6 @@ var c_oAscAlignType = {
   BOTTOM: 6
 };
 
-// image wrap style
-var c_oAscWrapStyle = {
-  Inline: 0,
-  Flow: 1
-};
-
 /*Error level & ID*/
 var c_oAscError = {
   Level: {
@@ -82,10 +76,6 @@ var THEME_THUMBNAIL_WIDTH = 180;
 var THEME_THUMBNAIL_HEIGHT = 135;
 var LAYOUT_THUMBNAIL_WIDTH = 180;
 var LAYOUT_THUMBNAIL_HEIGHT = 135;
-
-
-var hdrftr_Header = 0x01;
-var hdrftr_Footer = 0x02;
 
 var c_oAscTableSelectionType = {
   Cell: 0,

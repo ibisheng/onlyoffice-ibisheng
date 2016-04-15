@@ -1726,7 +1726,7 @@ CMathBase.prototype.Draw_HighLights = function(PDSH, bAll)
 {
     var ComplCtrPrp = this.Get_CompiledCtrPrp();
     var oShd = ComplCtrPrp.Shd;
-    var bDrawShd  = ( oShd === undefined || shd_Nil === oShd.Value ? false : true );
+    var bDrawShd  = ( oShd === undefined || Asc.c_oAscShdNil === oShd.Value ? false : true );
     var ShdColor  = ( true === bDrawShd ? oShd.Get_Color( PDSH.Paragraph ) : null );
 
     var X = PDSH.X,
@@ -1793,7 +1793,7 @@ CMathBase.prototype.Draw_Lines = function(PDSL)
     var Para       = PDSL.Paragraph;
 
     var BgColor = PDSL.BgColor;
-    if ( undefined !== CtrPrp.Shd && shd_Nil !== CtrPrp.Shd.Value )
+    if ( undefined !== CtrPrp.Shd && Asc.c_oAscShdNil !== CtrPrp.Shd.Value )
         BgColor = CtrPrp.Shd.Get_Color( Para );
     var AutoColor = ( undefined != BgColor && false === BgColor.Check_BlackAutoColor() ? new CDocumentColor( 255, 255, 255, false ) : new CDocumentColor( 0, 0, 0, false ) );
     var CurColor, RGBA, Theme = this.Paragraph.Get_Theme(), ColorMap = this.Paragraph.Get_ColorMap();
@@ -1860,7 +1860,7 @@ CMathBase.prototype.Make_ShdColor = function(PDSE, CurTextPr)
     var pGraphics = PDSE.Graphics;
     var BgColor   = PDSE.BgColor;
 
-    if ( undefined !== CurTextPr.Shd && shd_Nil !== CurTextPr.Shd.Value )
+    if ( undefined !== CurTextPr.Shd && Asc.c_oAscShdNil !== CurTextPr.Shd.Value )
         BgColor = CurTextPr.Shd.Get_Color( Para );
 
     var AutoColor = ( undefined != BgColor && false === BgColor.Check_BlackAutoColor() ? new CDocumentColor( 255, 255, 255, false ) : new CDocumentColor( 0, 0, 0, false ) );
@@ -2384,7 +2384,7 @@ CMathBase.prototype.UpdateOperators = function(_CurLine, _CurRange, bEmptyGapLef
 CMathBase.prototype.IsShade = function()
 {
     var oShd = this.Get_CompiledCtrPrp().Shd;
-    return !(oShd === undefined || shd_Nil === oShd.Value);
+    return !(oShd === undefined || Asc.c_oAscShdNil === oShd.Value);
 };
 CMathBase.prototype.Get_Range_VisibleWidth = function(RangeW, _CurLine, _CurRange)
 {

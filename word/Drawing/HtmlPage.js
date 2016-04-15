@@ -744,7 +744,7 @@ function CEditorPage(api)
                 };
 
                 this.TextBoxBackground.HtmlElement["onpaste"] = function(e){
-                    if ( false === oThis.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content) )
+                    if ( false === oThis.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Paragraph_Content) )
                     {
                         oThis.m_oLogicDocument.Create_NewHistoryPoint();
                         Editor_Paste(oThis.m_oApi, true);
@@ -4241,7 +4241,7 @@ function CEditorPage(api)
                 }
                 else
                 {
-                    oThis.m_oApi.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadFont);
+                    oThis.m_oApi.sync_StartAction(Asc.c_oAscAsyncActionType.BlockInteraction, Asc.c_oAscAsyncAction.LoadFont);
                     _check_obj.text = oThis.TextBoxInput.value;
                     _fontSelections.CurrentLoadedObj = _check_obj;
                 }

@@ -4,12 +4,13 @@
             "common": [
                 "../common/Build/License.js",
                 "../common/browser.js",
+				"../common/commonDefines.js",
+				"../common/downloaderfiles.js",
                 "../common/docscoapicommon.js",
                 "../common/docscoapi.js",
-                "../common/downloaderfiles.js",
+				
                 "../common/apiCommon.js",
 				"../cell/apiDefines.js",
-                "../common/commonDefines.js",
                 "../common/editorscommon.js",
                 "../common/NumFormat.js",
                 "../common/Charts/charts.js",

@@ -289,8 +289,8 @@ DrawingObjectsController.prototype.addChartDrawingObject = function(options)
         }
         else
         {
-            w = this.drawingObjects.convertMetric(c_oAscChartDefines.defaultChartWidth, 0, 3);
-            h = this.drawingObjects.convertMetric(c_oAscChartDefines.defaultChartHeight, 0, 3);
+            w = this.drawingObjects.convertMetric(AscCommon.c_oAscChartDefines.defaultChartWidth, 0, 3);
+            h = this.drawingObjects.convertMetric(AscCommon.c_oAscChartDefines.defaultChartHeight, 0, 3);
         }
 
         var chartLeft, chartTop;

@@ -22,7 +22,14 @@
 //       в ячейке зависит от следующей и предыдущей ячеек, надо включать их в пересчет
 
 // Import
+var align_Left = AscCommon.align_Left;
+
 var c_oAscError = Asc.c_oAscError;
+var c_oAscHAnchor = Asc.c_oAscHAnchor;
+var c_oAscXAlign = Asc.c_oAscXAlign;
+var c_oAscYAlign = Asc.c_oAscYAlign;
+var c_oAscVAnchor = Asc.c_oAscVAnchor;
+var c_oAscCellTextDirection = Asc.c_oAscCellTextDirection;
     
 
 var table_Selection_Cell = 0x00; // Селектим целыми ячейками
@@ -54,7 +61,7 @@ function CTable(DrawingDocument, Parent, Inline, PageNum, X, Y, XLimit, YLimit, 
     // TODO: Когда у g_oIdCounter будет тоже проверка на TurnOff заменить здесь
     if (false === g_oIdCounter.m_bLoad && true === History.Is_On())
     {
-        this.Lock.Set_Type(locktype_Mine, false);
+        this.Lock.Set_Type(AscCommon.locktype_Mine, false);
         if (CollaborativeEditing)
             CollaborativeEditing.Add_Unlock2(this);
     }
@@ -680,9 +687,9 @@ CTable.prototype =
 
         if ( true === this.Is_Inline() )
         {
-            Pr.TableAlignment     = ( align_Left === TablePr.Jc ? 0 : ( align_Center === TablePr.Jc ? 1 : 2 ) );
+            Pr.TableAlignment     = ( align_Left === TablePr.Jc ? 0 : ( AscCommon.align_Center === TablePr.Jc ? 1 : 2 ) );
             Pr.TableIndent        = TablePr.TableInd;
-            Pr.TableWrappingStyle = c_oAscWrapStyle.Inline;
+            Pr.TableWrappingStyle = AscCommon.c_oAscWrapStyle.Inline;
 
             Pr.Position =
             {
@@ -704,7 +711,7 @@ CTable.prototype =
             
             Pr.TableAlignment     = 0; // align_Left
             Pr.TableIndent        = this.X_origin - LD_PageFields.X;
-            Pr.TableWrappingStyle = c_oAscWrapStyle.Flow;
+            Pr.TableWrappingStyle = AscCommon.c_oAscWrapStyle.Flow;
 
             Pr.PositionH = {};
             Pr.PositionH.RelativeFrom = this.PositionH.RelativeFrom;
@@ -1176,7 +1183,7 @@ CTable.prototype =
         // TableAlignment (прилегание таблицы)
         if ( "undefined" != typeof(Props.TableAlignment) && true === this.Is_Inline() )
         {
-            var NewJc = ( 0 === Props.TableAlignment ? align_Left : ( 1 === Props.TableAlignment ? align_Center : align_Right ) );
+            var NewJc = ( 0 === Props.TableAlignment ? align_Left : ( 1 === Props.TableAlignment ? AscCommon.align_Center : AscCommon.align_Right ) );
             if ( TablePr.Jc != NewJc )
             {
                 _Jc = NewJc;
@@ -1778,7 +1785,7 @@ CTable.prototype =
                     for ( var  CurCell = 0; CurCell < Row.Get_CellsCount(); CurCell++ )
                     {
                         var Cell = Row.Get_Cell( CurCell );
-                        Cell.Set_Shd( { Value : shd_Nil, Color : { r : 0, g : 0, b : 0 } } );
+                        Cell.Set_Shd( { Value : Asc.c_oAscShdNil, Color : { r : 0, g : 0, b : 0 } } );
                     }
                 }
             }
@@ -1983,7 +1990,7 @@ CTable.prototype =
         // Сначала проверим заливку данной таблицы, если ее нет, тогда спрашиваем у родительского класса
         var Shd = this.Get_Shd();
 
-        if ( shd_Nil !== Shd.Value )
+        if ( Asc.c_oAscShdNil !== Shd.Value )
             return Shd.Get_Color2(this.Get_Theme(), this.Get_ColorMap());
 
         return this.Parent.Get_TextBackGroundColor();
@@ -2539,7 +2546,7 @@ CTable.prototype =
 
         if ( true != this.Is_Inline() )
         {
-            if ( false === oLogicDocument.Document_Is_SelectionLocked(changestype_Table_Properties) )
+            if ( false === oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Table_Properties) )
             {
                 oLogicDocument.Create_NewHistoryPoint(historydescription_Document_MoveInlineTable);
 
@@ -2644,7 +2651,7 @@ CTable.prototype =
         else
         {
             // Проверяем, можно ли двигать данную таблицу
-            if ( false === oLogicDocument.Document_Is_SelectionLocked(changestype_Table_Properties, { Type : changestype_2_InlineObjectMove, PageNum : PageNum, X : X, Y : Y }) )
+            if ( false === oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Table_Properties, { Type : AscCommon.changestype_2_InlineObjectMove, PageNum : PageNum, X : X, Y : Y }) )
             {
                 oLogicDocument.Create_NewHistoryPoint(historydescription_Document_MoveFlowTable);
 
@@ -5107,7 +5114,7 @@ CTable.prototype =
 
                 for ( var Index = 0; Index < Count; Index++ )
                 {
-                    var Pos     = this.m_oContentChanges.Check(contentchanges_Add, Reader.GetLong());
+                    var Pos     = this.m_oContentChanges.Check(AscCommon.contentchanges_Add, Reader.GetLong());
                     var Element = g_oTableId.Get_ById(Reader.GetString2());
 
                     if (null != Element)
@@ -5132,7 +5139,7 @@ CTable.prototype =
 
                 for ( var Index = 0; Index < Count; Index++ )
                 {
-                    var Pos = this.m_oContentChanges.Check(contentchanges_Remove, Reader.GetLong());
+                    var Pos = this.m_oContentChanges.Check(AscCommon.contentchanges_Remove, Reader.GetLong());
 
                     // действие совпало, не делаем его
                     if (false === Pos)
@@ -6035,10 +6042,10 @@ CTable.prototype =
                 }
 
                 var LogicDocument = (editor && true !== editor.isViewMode ? editor.WordControl.m_oLogicDocument : null);
-                if (LogicDocument && false === LogicDocument.Document_Is_SelectionLocked(changestype_None, {
-                        Type      : changestype_2_Element_and_Type,
+                if (LogicDocument && false === LogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_None, {
+                        Type      : AscCommon.changestype_2_Element_and_Type,
                         Element   : this,
-                        CheckType : changestype_Table_Properties
+                        CheckType : AscCommon.changestype_Table_Properties
                     }))
                 {
                     History.Create_NewPoint(historydescription_Document_MoveTableBorder);
@@ -7818,7 +7825,7 @@ CTable.prototype =
                     CurCell = TempCell;
                 else
                 {
-                    if ( false == editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_None, { Type : changestype_2_Element_and_Type, Element : this, CheckType : changestype_Table_Properties }) )
+                    if ( false == editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_None, { Type : AscCommon.changestype_2_Element_and_Type, Element : this, CheckType : AscCommon.changestype_Table_Properties }) )
                     {
                         History.Create_NewPoint(historydescription_Document_TableAddNewRowByTab);
                         this.Row_Add(false);

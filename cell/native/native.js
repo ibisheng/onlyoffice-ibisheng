@@ -1265,22 +1265,22 @@ function asc_menu_ReadAscFill(_params, _cursor){
             {
                 switch (_fill.type)
                 {
-                    case c_oAscFill.FILL_TYPE_SOLID:
+                    case Asc.c_oAscFill.FILL_TYPE_SOLID:
                     {
                         _fill.fill = asc_menu_ReadAscFill_solid(_params, _cursor);
                         break;
                     }
-                    case c_oAscFill.FILL_TYPE_PATT:
+                    case Asc.c_oAscFill.FILL_TYPE_PATT:
                     {
                         _fill.fill = asc_menu_ReadAscFill_patt(_params, _cursor);
                         break;
                     }
-                    case c_oAscFill.FILL_TYPE_GRAD:
+                    case Asc.c_oAscFill.FILL_TYPE_GRAD:
                     {
                         _fill.fill = asc_menu_ReadAscFill_grad(_params, _cursor);
                         break;
                     }
-                    case c_oAscFill.FILL_TYPE_BLIP:
+                    case Asc.c_oAscFill.FILL_TYPE_BLIP:
                     {
                         _fill.fill = asc_menu_ReadAscFill_blip(_params, _cursor);
                         break;
@@ -1323,22 +1323,22 @@ function asc_menu_WriteAscFill(_type, _fill, _stream){
     {
         switch (_fill.type)
         {
-            case c_oAscFill.FILL_TYPE_SOLID:
+            case Asc.c_oAscFill.FILL_TYPE_SOLID:
             {
                 _fill.fill = asc_menu_WriteAscFill_solid(1, _fill.fill, _stream);
                 break;
             }
-            case c_oAscFill.FILL_TYPE_PATT:
+            case Asc.c_oAscFill.FILL_TYPE_PATT:
             {
                 _fill.fill = asc_menu_ReadAscFill_patt(1, _fill.fill, _stream);
                 break;
             }
-            case c_oAscFill.FILL_TYPE_GRAD:
+            case Asc.c_oAscFill.FILL_TYPE_GRAD:
             {
                 _fill.fill = asc_menu_ReadAscFill_grad(1, _fill.fill, _stream);
                 break;
             }
-            case c_oAscFill.FILL_TYPE_BLIP:
+            case Asc.c_oAscFill.FILL_TYPE_BLIP:
             {
                 _fill.fill = asc_menu_ReadAscFill_blip(1, _fill.fill, _stream);
                 break;
@@ -4843,23 +4843,23 @@ function OfflineEditor () {
             {
                 switch (SelectedObjects[i].asc_getObjectType())
                 {
-                    case c_oAscTypeSelectElement.Paragraph:
+                    case Asc.c_oAscTypeSelectElement.Paragraph:
                     {
-                        stream["WriteLong"](c_oAscTypeSelectElement.Paragraph);
+                        stream["WriteLong"](Asc.c_oAscTypeSelectElement.Paragraph);
                         asc_menu_WriteParagraphPr(SelectedObjects[i].Value, stream);
                         //console.log('c_oAscTypeSelectElement.Paragraph');
                         break;
                     }
-                    case c_oAscTypeSelectElement.Image:
+                    case Asc.c_oAscTypeSelectElement.Image:
                     {
-                        stream["WriteLong"](c_oAscTypeSelectElement.Image);
+                        stream["WriteLong"](Asc.c_oAscTypeSelectElement.Image);
                         asc_menu_WriteImagePr(SelectedObjects[i].Value, stream);
                         //console.log('c_oAscTypeSelectElement.Image');
                         break;
                     }
-                    case c_oAscTypeSelectElement.Hyperlink:
+                    case Asc.c_oAscTypeSelectElement.Hyperlink:
                     {
-                        stream["WriteLong"](c_oAscTypeSelectElement.Hyperlink);
+                        stream["WriteLong"](Asc.c_oAscTypeSelectElement.Hyperlink);
                         asc_menu_WriteHyperPr(SelectedObjects[i].Value, stream);
                         //console.log('c_oAscTypeSelectElement.Hyperlink');
                         break;
@@ -5069,11 +5069,11 @@ function OfflineEditor () {
         var series = getChartSeries(ws.model, settings);
         if(series && series.series.length > 1)
         {
-            settings.putLegendPos(c_oAscChartLegendShowSettings.right);
+            settings.putLegendPos(Asc.c_oAscChartLegendShowSettings.right);
         }
         else
         {
-            settings.putLegendPos(c_oAscChartLegendShowSettings.none);
+            settings.putLegendPos(Asc.c_oAscChartLegendShowSettings.none);
         }
         // settings.putHorAxisLabel(c_oAscChartHorAxisLabelShowSettings.none);
         // settings.putVertAxisLabel(c_oAscChartVertAxisLabelShowSettings.none);
@@ -5181,7 +5181,7 @@ function OfflineEditor () {
             }
 
             var drawBorder = function (b, x1, y1, x2, y2) {
-                if (null != b && c_oAscBorderStyles.None !== b.s) {
+                if (null != b && AscCommon.c_oAscBorderStyles.None !== b.s) {
                     oGraphics.setStrokeStyle(b.c);
                     oGraphics.setLineWidth(b.w).beginPath();
 
@@ -5523,12 +5523,12 @@ function OfflineEditor () {
                 if(styleOptions.wholeTable && styleOptions.wholeTable.dxf.border)
                 {
                     var borders = styleOptions.wholeTable.dxf.border;
-                    if(borders.t.s !== c_oAscBorderStyles.None)
+                    if(borders.t.s !== AscCommon.c_oAscBorderStyles.None)
                     {
                         ctx.setStrokeStyle(borders.t.c);
                         ctx.lineHor(0, 0, xSize);
                     }
-                    if(borders.b.s !== c_oAscBorderStyles.None)
+                    if(borders.b.s !== AscCommon.c_oAscBorderStyles.None)
                     {
                         ctx.setStrokeStyle(borders.b.c);
                         // ctx.lineHor(0, ySize-0.5, xSize);
@@ -5536,12 +5536,12 @@ function OfflineEditor () {
                         nativeRender["PD_PathMoveTo"](0, ySize-0.5);
                         nativeRender["PD_PathLineTo"](xSize, ySize-0.5);
                     }
-                    if(borders.l.s !== c_oAscBorderStyles.None)
+                    if(borders.l.s !== AscCommon.c_oAscBorderStyles.None)
                     {
                         ctx.setStrokeStyle(borders.l.c);
                         ctx.lineVer(0, 0, ySize);
                     }
-                    if(borders.r.s !== c_oAscBorderStyles.None)
+                    if(borders.r.s !== AscCommon.c_oAscBorderStyles.None)
                     {
                         ctx.setStrokeStyle(borders.r.c);
                         //ctx.lineVer(xSize-0.5, 0, ySize);
@@ -5549,7 +5549,7 @@ function OfflineEditor () {
                         nativeRender["PD_PathMoveTo"](xSize-0.5, 0);
                         nativeRender["PD_PathLineTo"](xSize-0.5, ySize);
                     }
-                    if(borders.ih.s !== c_oAscBorderStyles.None)
+                    if(borders.ih.s !== AscCommon.c_oAscBorderStyles.None)
                     {
                         ctx.setStrokeStyle(borders.ih.c);
                         for(var n = 1; n < 5; n++)
@@ -5558,7 +5558,7 @@ function OfflineEditor () {
                         }
                         ctx.stroke();
                     }
-                    if(borders.iv.s !== c_oAscBorderStyles.None)
+                    if(borders.iv.s !== AscCommon.c_oAscBorderStyles.None)
                     {
                         ctx.setStrokeStyle(borders.iv.c);
                         for(var n = 1; n < 5; n++)
@@ -5590,7 +5590,7 @@ function OfflineEditor () {
                 if(styleOptions.totalRow && styleInfo.TotalsRowCount && styleOptions.totalRow.dxf.border)
                 {
                     border = styleOptions.totalRow.dxf.border;
-                    if(border.t.s !== c_oAscBorderStyles.None)
+                    if(border.t.s !== AscCommon.c_oAscBorderStyles.None)
                     {
                         ctx.setStrokeStyle(border.t.c);
                         ctx.lineVer(0, xSize, ySize);
@@ -5599,12 +5599,12 @@ function OfflineEditor () {
                 if(styleOptions.headerRow && styleOptions.headerRow.dxf.border)//header row
                 {
                     border = styleOptions.headerRow.dxf.border;
-                    if(border.t.s !== c_oAscBorderStyles.None)
+                    if(border.t.s !== AscCommon.c_oAscBorderStyles.None)
                     {
                         ctx.setStrokeStyle(border.t.c);
                         ctx.lineHor(0, 0, xSize);
                     }
-                    if(border.b.s !== c_oAscBorderStyles.None)
+                    if(border.b.s !== AscCommon.c_oAscBorderStyles.None)
                     {
                         ctx.setStrokeStyle(border.b.c);
                         ctx.lineHor(0, stepY, xSize);

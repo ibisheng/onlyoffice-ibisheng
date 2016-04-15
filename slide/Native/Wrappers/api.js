@@ -241,7 +241,7 @@ CStylesPainter.prototype =
         var oldDefTabStop = Default_Tab_Stop;
         Default_Tab_Stop = 1;
 
-        var hdr = new CHeaderFooter(_api.WordControl.m_oLogicDocument.HdrFtr, _api.WordControl.m_oLogicDocument, _api.WordControl.m_oDrawingDocument, hdrftr_Header);
+        var hdr = new CHeaderFooter(_api.WordControl.m_oLogicDocument.HdrFtr, _api.WordControl.m_oLogicDocument, _api.WordControl.m_oDrawingDocument, AscCommon.hdrftr_Header);
         var _dc = hdr.Content;//new CDocumentContent(editor.WordControl.m_oLogicDocument, editor.WordControl.m_oDrawingDocument, 0, 0, 0, 0, false, true, false);
 
         var par = new Paragraph(_api.WordControl.m_oDrawingDocument, _dc, 0, 0, 0, 0, false);
@@ -255,7 +255,7 @@ CStylesPainter.prototype =
         _dc.Internal_Content_Add(0, par, false);
         par.Add_ToContent(0, run);
         par.Style_Add(style.Id, false);
-        par.Set_Align(align_Left);
+        par.Set_Align(AscCommon.align_Left);
         par.Set_Tabs(new CParaTabs());
 
         var _brdL = style.ParaPr.Brd.Left;
@@ -302,7 +302,7 @@ CStylesPainter.prototype =
 
         var _sp = new CParaSpacing();
         _sp.Line              = 1;
-        _sp.LineRule          = linerule_Auto;
+        _sp.LineRule          = Asc.linerule_Auto;
         _sp.Before            = 0;
         _sp.BeforeAutoSpacing = false;
         _sp.After             = 0;

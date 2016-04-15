@@ -1,7 +1,11 @@
 "use strict";
 
 // Import
+var offlineMode = AscCommon.offlineMode;
+
 var c_oAscError = Asc.c_oAscError;
+var c_oAscAsyncAction = Asc.c_oAscAsyncAction;
+var c_oAscAsyncActionType = Asc.c_oAscAsyncActionType;
 
 var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 
@@ -33,14 +37,14 @@ function baseEditorsApi(name) {
   this.documentCallbackUrl = undefined;		// Ссылка для отправления информации о документе
   this.documentFormat = "null";
   this.documentTitle = "null";
-  this.documentFormatSave = c_oAscFileType.UNKNOWN;
+  this.documentFormatSave = Asc.c_oAscFileType.UNKNOWN;
 
   this.documentOpenOptions = undefined;		// Опции при открытии (пока только опции для CSV)
 
   // Тип состояния на данный момент (сохранение, открытие или никакое)
-  this.advancedOptionsAction = c_oAscAdvancedOptionsAction.None;
+  this.advancedOptionsAction = AscCommon.c_oAscAdvancedOptionsAction.None;
   // Тип скачивания файлы(download или event).нужен для txt, csv. запоминаем на asc_DownloadAs используем asc_setAdvancedOptions
-  this.downloadType = DownloadType.None;
+  this.downloadType = AscCommon.DownloadType.None;
   this.OpenDocumentProgress = new COpenProgress();
   var sProtocol = window.location.protocol;
   this.documentOrigin = ((sProtocol && '' !== sProtocol) ? sProtocol + '//' : '') + window.location.host; // for presentation theme url
@@ -272,7 +276,7 @@ baseEditorsApi.prototype.onPrint = function() {
 // Open
 baseEditorsApi.prototype.asc_LoadDocument = function(isVersionHistory) {
   // Меняем тип состояния (на открытие)
-  this.advancedOptionsAction = c_oAscAdvancedOptionsAction.Open;
+  this.advancedOptionsAction = AscCommon.c_oAscAdvancedOptionsAction.Open;
   this.CoAuthoringApi.auth(this.getViewMode());
 
   this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Open);
@@ -332,7 +336,7 @@ baseEditorsApi.prototype.asyncImagesDocumentStartLoaded = function() {
 };
 // Save
 baseEditorsApi.prototype.processSavedFile = function(url, downloadType) {
-  if (DownloadType.None !== downloadType) {
+  if (AscCommon.DownloadType.None !== downloadType) {
     this.sendEvent(downloadType, url, function(hasError) {
     });
   } else {
@@ -363,7 +367,7 @@ baseEditorsApi.prototype.asc_getEditorPermissions = function() {
 };
 baseEditorsApi.prototype._onEndPermissions = function() {
   if (this.isOnFirstConnectEnd && this.isOnLoadLicense) {
-    this.sendEvent('asc_onGetEditorPermissions', new window['Asc'].asc_CAscEditorPermissions());
+    this.sendEvent('asc_onGetEditorPermissions', new AscCommon.asc_CAscEditorPermissions());
   }
 };
 // CoAuthoring

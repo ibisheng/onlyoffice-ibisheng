@@ -583,7 +583,7 @@ CImageShape.prototype =
             {
                 oLock = this.Lock;
             }
-            if(oLock && locktype_None != oLock.Get_Type())
+            if(oLock && AscCommon.locktype_None != oLock.Get_Type())
             {
                 graphics.transform3(_transform);
                 graphics.DrawLockObjectRect(oLock.Get_Type(), 0, 0, this.extX, this.extY);
@@ -947,7 +947,7 @@ CImageShape.prototype =
                 var pos = readLong(r);
                 if(this.worksheet)
                 {
-                    pos = this.worksheet.contentChanges.Check(contentchanges_Add, pos);
+                    pos = this.worksheet.contentChanges.Check(AscCommon.contentchanges_Add, pos);
                 }
                 addToDrawings(this.worksheet, this, pos);
                 break;

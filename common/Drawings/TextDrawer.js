@@ -970,7 +970,7 @@ CTextDrawer.prototype =
     {
         if(oShd)
         {
-            if (oShd.Value !== shd_Nil)
+            if (oShd.Value !== Asc.c_oAscShdNil)
             {
                 if(oShd.Unifill)
                 {

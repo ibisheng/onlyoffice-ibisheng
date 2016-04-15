@@ -24,6 +24,7 @@ function (window, undefined) {
     var cFormulaFunctionGroup = AscCommonExcel.cFormulaFunctionGroup;
 
     var GetDiffDate360 = AscCommonExcel.GetDiffDate360;
+    var bDate1904 = AscCommon.bDate1904;
 
     var cExcelDateTimeDigits = 8; //количество цифр после запятой в числах отвечающих за время специализация $18.17.4.2
 
@@ -582,7 +583,7 @@ cDAY.prototype.Calculate = function ( arg ) {
                 return this.setCA( new cError( cErrorType.wrong_value_type ), true );
             }
             else
-                val = Math.floor( ( d.getTime() / 1000 - d.getTimezoneOffset() * 60 ) / c_sPerDay + ( c_DateCorrectConst + (g_bDate1904 ? 0 : 1) ) );
+                val = Math.floor( ( d.getTime() / 1000 - d.getTimezoneOffset() * 60 ) / c_sPerDay + ( c_DateCorrectConst + (bDate1904 ? 0 : 1) ) );
         }
         else {
             val = arg0.tocNumber().getValue();
@@ -590,7 +591,7 @@ cDAY.prototype.Calculate = function ( arg ) {
     }
     if ( val < 0 )
         return this.setCA( new cError( cErrorType.not_numeric ), true );
-    else if ( !g_bDate1904 ) {
+    else if ( !bDate1904 ) {
         if ( val < 60 )
             return this.setCA( new cNumber( ( new Date( (val - c_DateCorrectConst) * c_msPerDay ) ).getUTCDate() ), true, 0 );
         else if ( val == 60 )
@@ -720,7 +721,7 @@ cEDATE.prototype.Calculate = function ( arg ) {
 
     if ( val < 0 )
         return this.setCA( new cError( cErrorType.not_numeric ), true );
-    else if ( !g_bDate1904 ) {
+    else if ( !bDate1904 ) {
         if ( val < 60 )
             val = new Date( (val - c_DateCorrectConst) * c_msPerDay );
         else if ( val == 60 )
@@ -800,7 +801,7 @@ cEOMONTH.prototype.Calculate = function ( arg ) {
 
     if ( val < 0 )
         return this.setCA( new cError( cErrorType.not_numeric ), true );
-    else if ( !g_bDate1904 ) {
+    else if ( !bDate1904 ) {
         if ( val < 60 )
             val = new Date( (val - c_DateCorrectConst) * c_msPerDay );
         else if ( val == 60 )
@@ -878,7 +879,7 @@ cHOUR.prototype.Calculate = function ( arg ) {
                 val = d.value;
             }
             else
-                val = ( d.getTime() / 1000 - d.getTimezoneOffset() * 60 ) / c_sPerDay + ( c_DateCorrectConst + (g_bDate1904 ? 0 : 1) );
+                val = ( d.getTime() / 1000 - d.getTimezoneOffset() * 60 ) / c_sPerDay + ( c_DateCorrectConst + (bDate1904 ? 0 : 1) );
         }
         else {
             val = arg0.tocNumber().getValue();
@@ -950,7 +951,7 @@ cMINUTE.prototype.Calculate = function ( arg ) {
                 val = d.value;
             }
             else
-                val = ( d.getTime() / 1000 - d.getTimezoneOffset() * 60 ) / c_sPerDay + ( c_DateCorrectConst + (g_bDate1904 ? 0 : 1) );
+                val = ( d.getTime() / 1000 - d.getTimezoneOffset() * 60 ) / c_sPerDay + ( c_DateCorrectConst + (bDate1904 ? 0 : 1) );
         }
         else {
             val = arg0.tocNumber().getValue();
@@ -1020,7 +1021,7 @@ cMONTH.prototype.Calculate = function ( arg ) {
                 return this.setCA( new cError( cErrorType.wrong_value_type ), true );
             }
             else
-                val = Math.floor( ( d.getTime() / 1000 - d.getTimezoneOffset() * 60 ) / c_sPerDay + ( c_DateCorrectConst + (g_bDate1904 ? 0 : 1) ) );
+                val = Math.floor( ( d.getTime() / 1000 - d.getTimezoneOffset() * 60 ) / c_sPerDay + ( c_DateCorrectConst + (bDate1904 ? 0 : 1) ) );
         }
         else {
             val = arg0.tocNumber().getValue();
@@ -1028,7 +1029,7 @@ cMONTH.prototype.Calculate = function ( arg ) {
     }
     if ( val < 0 )
         return this.setCA( new cError( cErrorType.not_numeric ), true );
-    if ( !g_bDate1904 ) {
+    if ( !bDate1904 ) {
         if ( val == 60 )
             return this.setCA( new cNumber( 2 ), true, 0 );
         else
@@ -1090,7 +1091,7 @@ cNETWORKDAYS.prototype.Calculate = function ( arg ) {
 
     if ( val0 < 0 )
         return this.setCA( new cError( cErrorType.not_numeric ), true );
-    else if ( !g_bDate1904 ) {
+    else if ( !bDate1904 ) {
         if ( val0 < 60 )
             val0 = new Date( (val0 - c_DateCorrectConst) * c_msPerDay );
         else if ( val0 == 60 )
@@ -1103,7 +1104,7 @@ cNETWORKDAYS.prototype.Calculate = function ( arg ) {
 
     if ( val1 < 0 )
         return this.setCA( new cError( cErrorType.not_numeric ), true );
-    else if ( !g_bDate1904 ) {
+    else if ( !bDate1904 ) {
         if ( val1 < 60 )
             val1 = new Date( (val1 - c_DateCorrectConst) * c_msPerDay );
         else if ( val1 == 60 )
@@ -1265,7 +1266,7 @@ cSECOND.prototype.Calculate = function ( arg ) {
                 val = d.value;
             }
             else
-                val = ( d.getTime() / 1000 - d.getTimezoneOffset() * 60 ) / c_sPerDay + ( c_DateCorrectConst + (g_bDate1904 ? 0 : 1) );
+                val = ( d.getTime() / 1000 - d.getTimezoneOffset() * 60 ) / c_sPerDay + ( c_DateCorrectConst + (bDate1904 ? 0 : 1) );
         }
         else {
             val = arg0.tocNumber().getValue();
@@ -1688,7 +1689,7 @@ cWORKDAY.prototype.Calculate = function ( arg ) {
 
     if ( val0 < 0 )
         return this.setCA( new cError( cErrorType.not_numeric ), true );
-    else if ( !g_bDate1904 ) {
+    else if ( !bDate1904 ) {
         if ( val0 < 60 )
             val0 = new Date( (val0 - c_DateCorrectConst) * c_msPerDay );
         else if ( val0 == 60 )
@@ -1723,7 +1724,7 @@ cWORKDAY.prototype.Calculate = function ( arg ) {
     }
 
     for ( var i = 0; i < holidays.length; i++ ) {
-        if ( !g_bDate1904 ) {
+        if ( !bDate1904 ) {
             if ( holidays[i].getValue() < 60 )
                 holidays[i] = new Date( (holidays[i].getValue() - c_DateCorrectConst) * c_msPerDay );
             else if ( holidays[i] == 60 )
@@ -1827,7 +1828,7 @@ cYEAR.prototype.Calculate = function ( arg ) {
                 return this.setCA( new cError( cErrorType.wrong_value_type ), true );
             }
             else
-                val = Math.floor( ( d.getTime() / 1000 - d.getTimezoneOffset() * 60 ) / c_sPerDay + ( c_DateCorrectConst + (g_bDate1904 ? 0 : 1) ) );
+                val = Math.floor( ( d.getTime() / 1000 - d.getTimezoneOffset() * 60 ) / c_sPerDay + ( c_DateCorrectConst + (bDate1904 ? 0 : 1) ) );
         }
         else {
             val = arg0.tocNumber().getValue();

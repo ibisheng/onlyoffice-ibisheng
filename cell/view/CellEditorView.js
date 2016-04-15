@@ -797,7 +797,7 @@
 			wsOPEN = this.handlers.trigger( "getCellFormulaEnterWSOpen" ),
 			ws = wsOPEN ? wsOPEN.model : this.handlers.trigger( "getActiveWS" );
 
-		if ( s.length < 1 || s.charAt( 0 ) !== "=" || this.options.cellNumFormat == c_oAscNumFormatType.Text ) {
+		if ( s.length < 1 || s.charAt( 0 ) !== "=" || this.options.cellNumFormat == Asc.c_oAscNumFormatType.Text ) {
 			return ret;
 		}
 
@@ -2161,14 +2161,14 @@
 	CellEditor.prototype._checkMaxCellLength = function ( length ) {
 		var newLength = this._getFragmentsLength( this.options.fragments ) + length;
 		// Ограничение на ввод
-		if ( newLength > c_oAscMaxCellOrCommentLength ) {
+		if ( newLength > Asc.c_oAscMaxCellOrCommentLength ) {
 			if ( this.selectionBegin === this.selectionEnd ) {
 				return false;
 			}
 
 			var b = Math.min( this.selectionBegin, this.selectionEnd );
 			var e = Math.max( this.selectionBegin, this.selectionEnd );
-			if ( newLength - this._getFragmentsLength( this._getFragments( b, e - b ) ) > c_oAscMaxCellOrCommentLength ) {
+			if ( newLength - this._getFragmentsLength( this._getFragments( b, e - b ) ) > Asc.c_oAscMaxCellOrCommentLength ) {
 				return false;
 			}
 		}

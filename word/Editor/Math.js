@@ -4,6 +4,12 @@
  * Created by Ilja.Kirillov on 18.03.14.
  */
 
+// Import
+var align_Right = AscCommon.align_Right;
+var align_Left = AscCommon.align_Left;
+var align_Center = AscCommon.align_Center;
+var align_Justify = AscCommon.align_Justify;
+
 var g_dMathArgSizeKoeff_1 = 0.76;
 var g_dMathArgSizeKoeff_2 = 0.6498; // 0.76 * 0.855
 
@@ -2491,7 +2497,7 @@ ParaMath.prototype.MathToImageConverter = function(bCopy, _canvasInput, _widthPx
     var oldDefTabStop = Default_Tab_Stop;
     Default_Tab_Stop = 1;
 
-    var hdr = new CHeaderFooter(editor.WordControl.m_oLogicDocument.HdrFtr, editor.WordControl.m_oLogicDocument, editor.WordControl.m_oDrawingDocument, hdrftr_Header);
+    var hdr = new CHeaderFooter(editor.WordControl.m_oLogicDocument.HdrFtr, editor.WordControl.m_oLogicDocument, editor.WordControl.m_oDrawingDocument, AscCommon.hdrftr_Header);
     var _dc = hdr.Content;
 
     var par = new Paragraph(editor.WordControl.m_oDrawingDocument, _dc, 0, 0, 0, 0, false);
@@ -2514,7 +2520,7 @@ ParaMath.prototype.MathToImageConverter = function(bCopy, _canvasInput, _widthPx
 
     var _sp = new CParaSpacing();
     _sp.Line              = 1;
-    _sp.LineRule          = linerule_Auto;
+    _sp.LineRule          = Asc.linerule_Auto;
     _sp.Before            = 0;
     _sp.BeforeAutoSpacing = false;
     _sp.After             = 0;
@@ -2717,7 +2723,7 @@ ParaMath.prototype.Draw_Lines = function(PDSL)
 
 
         var BgColor = PDSL.BgColor;
-        if ( undefined !== FirstRPrp.Shd && shd_Nil !== FirstRPrp.Shd.Value )
+        if ( undefined !== FirstRPrp.Shd && Asc.c_oAscShdNil !== FirstRPrp.Shd.Value )
             BgColor = FirstRPrp.Shd.Get_Color( Para );
         var AutoColor = ( undefined != BgColor && false === BgColor.Check_BlackAutoColor() ? new CDocumentColor( 255, 255, 255, false ) : new CDocumentColor( 0, 0, 0, false ) );
         var CurColor, RGBA, Theme = this.Paragraph.Get_Theme(), ColorMap = this.Paragraph.Get_ColorMap();

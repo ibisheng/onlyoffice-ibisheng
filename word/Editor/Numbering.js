@@ -6,6 +6,10 @@
  * Time: 14:49
  */
 
+// Import
+var align_Right = AscCommon.align_Right;
+var align_Left = AscCommon.align_Left;
+
 var numbering_numfmt_None        = 0x0000;
 var numbering_numfmt_Bullet      = 0x1001;
 var numbering_numfmt_Decimal     = 0x2002;
@@ -195,7 +199,7 @@ function CAbstractNum(Type)
     this.Lock = new CLock();
     if ( false === g_oIdCounter.m_bLoad )
     {
-        this.Lock.Set_Type(locktype_Mine, false);
+        this.Lock.Set_Type(AscCommon.locktype_Mine, false);
         if (typeof CollaborativeEditing !== "undefined")
             CollaborativeEditing.Add_Unlock2( this );
     }

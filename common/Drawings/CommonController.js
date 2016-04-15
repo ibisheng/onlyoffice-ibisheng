@@ -3,10 +3,20 @@
 var asc = window["Asc"] ? window["Asc"] : (window["Asc"] = {});
 
 // Import
-var c_oAscError = Asc.c_oAscError;
+var c_oAscSizeRelFromH = AscCommon.c_oAscSizeRelFromH;
+var c_oAscSizeRelFromV = AscCommon.c_oAscSizeRelFromV;
+var c_oAscLockTypes = AscCommon.c_oAscLockTypes;
 
-var contentchanges_Add    = 1;
-var contentchanges_Remove = 2;
+var c_oAscError = Asc.c_oAscError;
+var c_oAscChartTitleShowSettings = Asc.c_oAscChartTitleShowSettings;
+var c_oAscChartHorAxisLabelShowSettings = Asc.c_oAscChartHorAxisLabelShowSettings;
+var c_oAscChartVertAxisLabelShowSettings = Asc.c_oAscChartVertAxisLabelShowSettings;
+var c_oAscChartLegendShowSettings = Asc.c_oAscChartLegendShowSettings;
+var c_oAscChartDataLabelsPos = Asc.c_oAscChartDataLabelsPos;
+var c_oAscGridLinesSettings = Asc.c_oAscGridLinesSettings;
+var c_oAscChartTypeSettings = Asc.c_oAscChartTypeSettings;
+var c_oAscRelativeFromH = Asc.c_oAscRelativeFromH;
+var c_oAscRelativeFromV = Asc.c_oAscRelativeFromV;
 
 
 var HANDLE_EVENT_MODE_HANDLE = 0;
@@ -1584,7 +1594,7 @@ DrawingObjectsController.prototype =
         var oThis = this;
         var callBack = function()
         {
-            oThis.paragraphAdd(new ParaTextPr({ VertAlign : isSubscript ? vertalign_SubScript : vertalign_Baseline}));
+            oThis.paragraphAdd(new ParaTextPr({ VertAlign : isSubscript ? AscCommon.vertalign_SubScript : AscCommon.vertalign_Baseline}));
         };
         this.checkSelectedObjectsAndCallback(callBack, [], false, historydescription_Spreadsheet_SetCellSubscript);
     },
@@ -1593,7 +1603,7 @@ DrawingObjectsController.prototype =
         var oThis = this;
         var callBack = function()
         {
-            oThis.paragraphAdd(new ParaTextPr({ VertAlign : isSuperscript ? vertalign_SubScript : vertalign_Baseline}));
+            oThis.paragraphAdd(new ParaTextPr({ VertAlign : isSuperscript ? AscCommon.vertalign_SubScript : AscCommon.vertalign_Baseline}));
         };
         this.checkSelectedObjectsAndCallback(callBack, [], false, historydescription_Spreadsheet_SetCellSuperscript);
     },
@@ -1604,22 +1614,22 @@ DrawingObjectsController.prototype =
         {
             case "left":
             {
-                align_ = align_Left;
+                align_ = AscCommon.align_Left;
                 break;
             }
             case "right":
             {
-                align_ = align_Right;
+                align_ = AscCommon.align_Right;
                 break;
             }
             case "center":
             {
-                align_ = align_Center;
+                align_ = AscCommon.align_Center;
                 break;
             }
             case "justify":
             {
-                align_ = align_Justify;
+                align_ = AscCommon.align_Justify;
             }
         }
         this.checkSelectedObjectsAndCallback(this.setParagraphAlign, [align_], false, historydescription_Spreadsheet_SetCellAlign);
@@ -1685,13 +1695,13 @@ DrawingObjectsController.prototype =
         var fill = new asc_CShapeFill();
         if(color)
         {
-            fill.type = c_oAscFill.FILL_TYPE_SOLID;
+            fill.type = Asc.c_oAscFill.FILL_TYPE_SOLID;
             fill.fill = new asc_CFillSolid();
             fill.fill.color = color;
         }
         else
         {
-            fill.type = c_oAscFill.FILL_TYPE_NOFILL;
+            fill.type = Asc.c_oAscFill.FILL_TYPE_NOFILL;
         }
 
         this.checkSelectedObjectsAndCallback(this.applyDrawingProps, [{fill: fill}], false, historydescription_Spreadsheet_SetCellBackgroundColor);
@@ -3722,7 +3732,7 @@ DrawingObjectsController.prototype =
             {
                 if(ret.horAxisProps)
                 {
-                    ret.horAxisProps.putLabelsPosition(c_oAscLabelsPosition.byDivisions);
+                    ret.horAxisProps.putLabelsPosition(Asc.c_oAscLabelsPosition.byDivisions);
                 }
             }
         }
@@ -5198,7 +5208,7 @@ DrawingObjectsController.prototype =
             var ParaPr = drawingObjectsController.getParagraphParaPr();
             if ( isRealObject(ParaPr))
             {
-                this.setCellAlign(ParaPr.Jc === align_Center ? "left" : "center" );
+                this.setCellAlign(ParaPr.Jc === AscCommon.align_Center ? "left" : "center" );
                 bRetValue = true;
             }
         }
@@ -5216,7 +5226,7 @@ DrawingObjectsController.prototype =
             var ParaPr = drawingObjectsController.getParagraphParaPr();
             if ( isRealObject(ParaPr))
             {
-                drawingObjectsController.setCellAlign(ParaPr.Jc === align_Justify ? "left" : "justify" );
+                drawingObjectsController.setCellAlign(ParaPr.Jc === AscCommon.align_Justify ? "left" : "justify" );
                 bRetValue = true;
             }
         }
@@ -5231,7 +5241,7 @@ DrawingObjectsController.prototype =
             var ParaPr = drawingObjectsController.getParagraphParaPr();
             if ( isRealObject(ParaPr))
             {
-                drawingObjectsController.setCellAlign(ParaPr.Jc === align_Left ? "justify" : "left");
+                drawingObjectsController.setCellAlign(ParaPr.Jc === AscCommon.align_Left ? "justify" : "left");
                 bRetValue = true;
             }
 
@@ -5251,7 +5261,7 @@ DrawingObjectsController.prototype =
             var ParaPr = drawingObjectsController.getParagraphParaPr();
             if ( isRealObject(ParaPr))
             {
-                drawingObjectsController.setCellAlign(ParaPr.Jc === align_Right ? "left" : "right");
+                drawingObjectsController.setCellAlign(ParaPr.Jc === AscCommon.align_Right ? "left" : "right");
                 bRetValue = true;
             }
         }
@@ -5301,9 +5311,9 @@ DrawingObjectsController.prototype =
             if ( isRealObject(TextPr))
             {
                 if ( true === e.shiftKey )
-                    drawingObjectsController.setCellSuperscript(TextPr.VertAlign === vertalign_SuperScript ? false : true );
+                    drawingObjectsController.setCellSuperscript(TextPr.VertAlign === AscCommon.vertalign_SuperScript ? false : true );
                 else
-                    drawingObjectsController.setCellSubscript(TextPr.VertAlign === vertalign_SubScript ? false : true );
+                    drawingObjectsController.setCellSubscript(TextPr.VertAlign === AscCommon.vertalign_SubScript ? false : true );
                 bRetValue = true;
             }
         }
@@ -5312,7 +5322,7 @@ DrawingObjectsController.prototype =
             var TextPr = drawingObjectsController.getParagraphTextPr();
             if ( isRealObject(TextPr))
             {
-                drawingObjectsController.setCellSuperscript(TextPr.VertAlign === vertalign_SuperScript ? false : true );
+                drawingObjectsController.setCellSuperscript(TextPr.VertAlign === AscCommon.vertalign_SuperScript ? false : true );
                 bRetValue = true;
             }
         }
@@ -5349,7 +5359,7 @@ DrawingObjectsController.prototype =
             var TextPr = drawingObjectsController.getParagraphTextPr();
             if ( isRealObject(TextPr))
             {
-                drawingObjectsController.setCellSubscript(TextPr.VertAlign === vertalign_SubScript ? false : true );
+                drawingObjectsController.setCellSubscript(TextPr.VertAlign === AscCommon.vertalign_SubScript ? false : true );
                 bRetValue = true;
             }
         }
@@ -6498,12 +6508,12 @@ DrawingObjectsController.prototype =
                                 new_table_props.CellsBackground.Unifill.check(drawing.Get_Theme(), drawing.Get_ColorMap());
                                 var RGBA = new_table_props.CellsBackground.Unifill.getRGBAColor();
                                 new_table_props.CellsBackground.Color = new CDocumentColor(RGBA.R, RGBA.G, RGBA.B, false);
-                                new_table_props.CellsBackground.Value = shd_Clear;
+                                new_table_props.CellsBackground.Value = Asc.c_oAscShdClear;
                             }
                             else
                             {
                                 new_table_props.CellsBackground.Color = new CDocumentColor(0, 0, 0, false);
-                                new_table_props.CellsBackground.Value = shd_Nil;
+                                new_table_props.CellsBackground.Value = Asc.c_oAscShdNil;
                             }
                         }
                         if(new_table_props.CellBorders)
@@ -6842,7 +6852,7 @@ DrawingObjectsController.prototype =
         }
         for (i = 0; i < ret.length; i++)
         {
-            ascSelectedObjects.push(new asc_CSelectedObject ( c_oAscTypeSelectElement.Image, new asc_CImgProperty(ret[i]) ));
+            ascSelectedObjects.push(new asc_CSelectedObject ( Asc.c_oAscTypeSelectElement.Image, new asc_CImgProperty(ret[i]) ));
         }
 
         // Текстовые свойства объекта
@@ -6884,8 +6894,8 @@ DrawingObjectsController.prototype =
         var _this = this;
         var trigger = this.drawingObjects.callTrigger;
 
-        ParaPr.Subscript   = ( TextPr.VertAlign === vertalign_SubScript   ? true : false );
-        ParaPr.Superscript = ( TextPr.VertAlign === vertalign_SuperScript ? true : false );
+        ParaPr.Subscript   = ( TextPr.VertAlign === AscCommon.vertalign_SubScript   ? true : false );
+        ParaPr.Superscript = ( TextPr.VertAlign === AscCommon.vertalign_SuperScript ? true : false );
         ParaPr.Strikeout   = TextPr.Strikeout;
         ParaPr.DStrikeout  = TextPr.DStrikeout;
         ParaPr.AllCaps     = TextPr.Caps;
@@ -6926,7 +6936,7 @@ DrawingObjectsController.prototype =
         // ParaPr.Jc
         trigger("asc_onPrAlign", ParaPr.Jc);
 
-        ascSelectedObjects.push(new asc_CSelectedObject ( c_oAscTypeSelectElement.Paragraph, new asc_CParagraphProperty( ParaPr ) ));
+        ascSelectedObjects.push(new asc_CSelectedObject ( Asc.c_oAscTypeSelectElement.Paragraph, new asc_CParagraphProperty( ParaPr ) ));
     },
 
     createImage: function(rasterImageId, x, y, extX, extY)
@@ -7068,7 +7078,7 @@ DrawingObjectsController.prototype =
         }
         oContent.Set_ApplyToAll(true);
         oContent.Paragraph_Add(new ParaTextPr(oTextPr));
-        oContent.Set_ParagraphAlign(align_Center);
+        oContent.Set_ParagraphAlign(AscCommon.align_Center);
         oContent.Set_ApplyToAll(false);
         var oBodyPr = oShape.getBodyPr().createDuplicate();
         oBodyPr.rot = 0;
@@ -7361,11 +7371,11 @@ DrawingObjectsController.prototype =
             var TextPr = new CTextPr();
 
             if ( true === Props.Subscript )
-                TextPr.VertAlign = vertalign_SubScript;
+                TextPr.VertAlign = AscCommon.vertalign_SubScript;
             else if ( true === Props.Superscript )
-                TextPr.VertAlign = vertalign_SuperScript;
+                TextPr.VertAlign = AscCommon.vertalign_SuperScript;
             else if ( false === Props.Superscript || false === Props.Subscript )
-                TextPr.VertAlign = vertalign_Baseline;
+                TextPr.VertAlign = AscCommon.vertalign_Baseline;
 
             if ( undefined != Props.Strikeout )
             {
