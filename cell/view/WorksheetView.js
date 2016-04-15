@@ -9725,7 +9725,7 @@
                                 for ( var i = 0; i < val.aComments.length; i++ ) {
                                     comment = val.aComments[i];
                                     if ( comment.nCol == pasteCol && comment.nRow == pasteRow ) {
-                                        var commentData = new asc_CCommentData( comment );
+                                        var commentData = new Asc.asc_CCommentData( comment );
                                         //change nRow, nCol
                                         commentData.asc_putCol( c + autoC * plCol );
                                         commentData.asc_putRow( r + autoR * plRow );
