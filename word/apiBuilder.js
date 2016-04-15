@@ -341,6 +341,24 @@
         return null;
     };
     /**
+     * A set of default run properties for the current document.
+     * @returns {ApiTextPr}
+     */
+    ApiDocument.prototype.GetDefaultTextPr = function()
+    {
+        var oStyles = this.Document.Get_Styles();
+        return new ApiTextPr(this, oStyles.Get_DefaultTextPr().Copy());
+    };
+    /**
+     * A set of default paragraph properties for the current document.
+     * @returns {ApiParaPr}
+     */
+    ApiDocument.prototype.GetDefaultParaPr = function()
+    {
+        var oStyles = this.Document.Get_Styles();
+        return new ApiParaPr(this, oStyles.Get_DefaultParaPr().Copy());
+    };
+    /**
      * Get document final section
      * @return {ApiSection}
      */
@@ -2082,8 +2100,18 @@
         return 25.4 / 72.0 / 8 * pt;
     }
 
-
-
+    ApiDocument.prototype.OnChangeParaPr = function(oApiParaPr)
+    {
+        var oStyles = this.Document.Get_Styles();
+        oStyles.Set_DefaultParaPr(oApiParaPr.ParaPr);
+        oApiParaPr.ParaPr = oStyles.Get_DefaultParaPr().Copy();
+    };
+    ApiDocument.prototype.OnChangeTextPr = function(oApiTextPr)
+    {
+        var oStyles = this.Document.Get_Styles();
+        oStyles.Set_DefaultTextPr(oApiTextPr.TextPr);
+        oApiTextPr.TextPr = oStyles.Get_DefaultTextPr().Copy();
+    };
     ApiParagraph.prototype.private_GetImpl = function()
     {
         return this.Paragraph;
@@ -2152,13 +2180,22 @@ function TEST_BUILDER()
 
     // Генерим стили, которые будем использовать в документе
     var oTextPr, oParaPr;
+
+    oTextPr = oDocument.GetDefaultTextPr();
+    oTextPr.SetFontSize(22);
+    oTextPr.SetLanguage("en-US");
+    oTextPr.SetFontFamily("Calibri");
+
+    oParaPr = oDocument.GetDefaultParaPr();
+    oParaPr.SetSpacingLine(276, "auto");
+    oParaPr.SetSpacingAfter(200);
+
     var oNormalStyle = oDocument.GetDefaultStyle("paragraph");
     oParaPr = oNormalStyle.GetParaPr();
     oParaPr.SetSpacingLine(240, "auto");
     oParaPr.SetJc("both");
     oTextPr = oNormalStyle.GetTextPr();
     oTextPr.SetColor(0x26, 0x26, 0x26, false);
-    oTextPr.SetFontFamily("Calibri");
 
     var oHeading1Style = oDocument.CreateStyle("Heading 1", "paragraph");
     oParaPr = oHeading1Style.GetParaPr();

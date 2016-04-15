@@ -4234,6 +4234,34 @@ CStyles.prototype =
 
         return Styles;
     },
+
+    Get_DefaultParaPr : function()
+    {
+        return this.Default.ParaPr;
+    },
+
+    Set_DefaultParaPr : function(ParaPr)
+    {
+        History.Add(this, {Type : historyitem_Styles_ChangeDefaultParaPr, Old : this.Default.ParaPr, New : ParaPr});
+        this.Default.ParaPr = ParaPr;
+
+        // TODO: Пока данная функция используется только в билдере, как только будет использоваться в самом редакторе,
+        //       надо будет сделать, чтобы происходил пересчет всех стилей.
+    },
+
+    Get_DefaultTextPr : function()
+    {
+        return this.Default.TextPr;
+    },
+
+    Set_DefaultTextPr : function(TextPr)
+    {
+        History.Add(this, {Type : historyitem_Styles_ChangeDefaultTextPr, Old : this.Default.TextPr, New : TextPr});
+        this.Default.TextPr = TextPr;
+
+        // TODO: Пока данная функция используется только в билдере, как только будет использоваться в самом редакторе,
+        //       надо будет сделать, чтобы происходил пересчет всех стилей.
+    },
 //-----------------------------------------------------------------------------------
 //
 //-----------------------------------------------------------------------------------
@@ -4803,6 +4831,18 @@ CStyles.prototype =
                 this.Update_Interface(Data.Id);
                 break;
             }
+
+            case historyitem_Styles_ChangeDefaultParaPr:
+            {
+                this.Default.ParaPr = Data.Old;
+                break;
+            }
+
+            case historyitem_Styles_ChangeDefaultTextPr:
+            {
+                this.Default.TextPr = Data.Old;
+                break;
+            }
         }
     },
 
@@ -4823,6 +4863,18 @@ CStyles.prototype =
             {
                 delete this.Style[Data.Id];
                 this.Update_Interface(Data.Id);
+                break;
+            }
+
+            case historyitem_Styles_ChangeDefaultParaPr:
+            {
+                this.Default.ParaPr = Data.New;
+                break;
+            }
+
+            case historyitem_Styles_ChangeDefaultTextPr:
+            {
+                this.Default.TextPr = Data.New;
                 break;
             }
         }
@@ -4918,6 +4970,14 @@ CStyles.prototype =
 
                 break;
             }
+
+            case historyitem_Styles_ChangeDefaultParaPr:
+            case historyitem_Styles_ChangeDefaultTextPr:
+            {
+                // Variable : ParaPr | TextPr
+                Data.New.Write_ToBinary(Writer);
+                break;
+            }
         }
 
         return Writer;
@@ -4957,6 +5017,22 @@ CStyles.prototype =
                 delete this.Style[Id];
                 this.Update_Interface(Id);
                 CollaborativeEditing.Add_LinkData(this, {UpdateStyleId : Id});
+                break;
+            }
+            case historyitem_Styles_ChangeDefaultParaPr:
+            {
+                // Variable : ParaPr
+                var oParaPr = new CParaPr();
+                oParaPr.Read_FromBinary(Reader);
+                this.Default.ParaPr = oParaPr;
+                break;
+            }
+            case historyitem_Styles_ChangeDefaultTextPr:
+            {
+                // Variable : TextPr
+                var oTextPr = new CTextPr();
+                oTextPr.Read_FromBinary(Reader);
+                this.Default.TextPr = oTextPr;
                 break;
             }
         }
