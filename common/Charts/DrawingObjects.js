@@ -393,6 +393,33 @@ CSparklineView.prototype.initFromSparkline = function(oSparkline, oSparklineGrou
         chart_space.setBDeleted(false);
         chart_space.setWorksheet(worksheetView.model);
 
+        chart_space.displayHidden = oSparklineGroup.displayHidden;
+        chart_space.displayEmptyCellsAs = oSparklineGroup.displayEmptyCellsAs;
+
+
+        if(isRealNumber(oSparklineGroup.displayEmptyCellsAs))
+        {
+            switch(oSparklineGroup.displayEmptyCellsAs)
+            {
+                case Asc.EDispBlanksAs.Span:
+                {
+                    chart_space.displayEmptyCellsAs = 0;
+                    break;
+                }
+                case Asc.EDispBlanksAs.Gap:
+                {
+                    chart_space.displayEmptyCellsAs = 1;
+                    break;
+                }
+                case Asc.EDispBlanksAs.Zero:
+                {
+                    chart_space.displayEmptyCellsAs = 2;
+                    break;
+                }
+            }
+            chart_space.displayHidden = oSparklineGroup.displayHidden;
+        }
+
 
         settings.putTitle(c_oAscChartTitleShowSettings.none);
         settings.putHorAxisLabel(c_oAscChartTitleShowSettings.none);

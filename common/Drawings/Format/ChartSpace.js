@@ -2650,7 +2650,7 @@ CChartSpace.prototype =
                                 row_hidden = source_worksheet.getRowHidden(range.r1);
                                 for(j = range.c1;  j <= range.c2; ++j)
                                 {
-                                    if(!row_hidden && !source_worksheet.getColHidden(j))
+                                    if(!row_hidden && !source_worksheet.getColHidden(j) || (this.displayHidden === true))
                                     {
                                         cell = source_worksheet.getCell3(range.r1, j);
                                         if(typeof cell.getValueWithFormat() === "string" && cell.getValueWithFormat().length > 0)
@@ -2666,6 +2666,27 @@ CChartSpace.prototype =
                                             num_cache.addPt(pt);
                                            
                                         }
+                                        else
+                                        {
+                                            if(isRealNumber(this.displayEmptyCellsAs))
+                                            {
+                                                switch (this.displayEmptyCellsAs)
+                                                {
+                                                    case 0:
+                                                    {
+                                                        break;
+                                                    }
+                                                    case 1:
+                                                    {
+                                                        break;
+                                                    }
+                                                    case 2:
+                                                    {
+                                                        break;
+                                                    }
+                                                }
+                                            }
+                                        }
                                     }
                                     pt_index++;
                                 }
@@ -2675,7 +2696,7 @@ CChartSpace.prototype =
                                 col_hidden = source_worksheet.getColHidden(range.c1);
                                 for(j = range.r1; j <= range.r2; ++j)
                                 {
-                                    if(!col_hidden && !source_worksheet.getRowHidden(j))
+                                    if(!col_hidden && !source_worksheet.getRowHidden(j) || (this.displayHidden === true))
                                     {
                                         cell = source_worksheet.getCell3(j, range.c1);
                                         if(typeof cell.getValueWithFormat() === "string" && cell.getValueWithFormat().length > 0)
