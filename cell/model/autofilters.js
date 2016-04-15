@@ -1456,14 +1456,13 @@
 						}
 					}
 				}
-				
-				if(worksheet.AutoFilter && (worksheet.AutoFilter.isApplyAutoFilter() || worksheet.AutoFilter.isApplySortConditions()))
-				{
-					if(clean)
-					{
-						this._cleanFilterColumnsAndSortState(worksheet.AutoFilter, activeCell);
+
+				if (worksheet.AutoFilter &&
+					(worksheet.AutoFilter.isApplyAutoFilter() || worksheet.AutoFilter.isApplySortConditions())) {
+					if (clean) {
+						return this._cleanFilterColumnsAndSortState(worksheet.AutoFilter, activeCell);
 					}
-					}
+				}
 				
 				return false;
 			},
