@@ -166,6 +166,11 @@
      * @typedef {number} pt
      */
 
+    /**
+     * Header and footer types
+     * @typedef {("default" | "title" | "even")} HdrFtrType
+     */
+
     //------------------------------------------------------------------------------------------------------------------
     //
     // Base Api
@@ -987,6 +992,72 @@
     ApiSection.prototype.SetFooterDistance = function(nDistance)
     {
         this.Section.Set_PageMargins_Footer(private_Twips2MM(nDistance));
+    };
+    /**
+     * Get the content for the specified type of header.
+     * @param {HdrFtrType} sType - Type of the header.
+     * @param {boolean} [isCreate=false] - Create a header or not if there is no header with specified type in the current section.
+     * @returns {?ApiDocument}
+     */
+    ApiSection.prototype.GetHeader = function(sType, isCreate)
+    {
+        var oHeader = null;
+
+        if ("title" === sType)
+            oHeader = this.Section.Get_Header_First();
+        else if ("even" === sType)
+            oHeader = this.Section.Get_Header_Even();
+        else if ("default" === sType)
+            oHeader = this.Section.Get_Header_Default();
+        else
+            return null;
+
+        if (null === oHeader && true === isCreate)
+        {
+            var oLogicDocument = private_GetLogicDocument();
+            oHeader = new CHeaderFooter(oLogicDocument.Get_HdrFtr(), oLogicDocument, oLogicDocument.Get_DrawingDocument(), hdrftr_Header);
+            if ("title" === sType)
+                this.Section.Set_Header_First(oHeader);
+            else if ("even" === sType)
+                this.Section.Set_Header_Even(oHeader);
+            else if ("default" === sType)
+                this.Section.Set_Header_Default(oHeader);
+        }
+
+        return new ApiDocument(oHeader.Get_DocumentContent());
+    };
+    /**
+     * Get the content for the specified type of footer.
+     * @param {HdrFtrType} sType - Type of the footer.
+     * @param {boolean} [isCreate=false] - Create a footer or not if there is no footer with specified type in the current section.
+     * @returns {?ApiDocument}
+     */
+    ApiSection.prototype.GetFooter = function(sType, isCreate)
+    {
+        var oFooter = null;
+
+        if ("title" === sType)
+            oFooter = this.Section.Get_Footer_First();
+        else if ("even" === sType)
+            oFooter = this.Section.Get_Footer_Even();
+        else if ("default" === sType)
+            oFooter = this.Section.Get_Footer_Default();
+        else
+            return null;
+
+        if (null === oHeader && true === isCreate)
+        {
+            var oLogicDocument = private_GetLogicDocument();
+            oFooter = new CHeaderFooter(oLogicDocument.Get_HdrFtr(), oLogicDocument, oLogicDocument.Get_DrawingDocument(), hdrftr_Footer);
+            if ("title" === sType)
+                this.Section.Set_Footer_First(oFooter);
+            else if ("even" === sType)
+                this.Section.Set_Footer_Even(oFooter);
+            else if ("default" === sType)
+                this.Section.Set_Footer_Default(oFooter);
+        }
+
+        return new ApiDocument(oFooter.Get_DocumentContent());
     };
 
     //------------------------------------------------------------------------------------------------------------------
@@ -2720,6 +2791,12 @@ function TEST_BUILDER2()
     oDocument.Push(oParagraph);
 
     //TODO: Сделать примеры параграфов с нумерацей
+
+    var oSection = oDocument.GetFinalSection();
+    var oHeader = oSection.GetHeader("default", true);
+
+    oParagraph = oHeader.GetElement(0);
+    oParagraph.AddText("I'm in default header");
 
     //------------------------------------------------------------------------------------------------------------------
     oLD.Recalculate_FromStart();
