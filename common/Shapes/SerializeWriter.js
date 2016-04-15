@@ -89,7 +89,7 @@ function CBinaryFileWriter()
 
     this.Start_UseDocumentOrigin = function(origin)
     {
-        this.PresentationThemesOrigin = origin + "/presentationthemes/";
+        this.PresentationThemesOrigin = origin;
     };
 
     this.End_UseFullUrl = function()

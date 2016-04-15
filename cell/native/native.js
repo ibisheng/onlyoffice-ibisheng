@@ -9,6 +9,7 @@ window.location = {};
 window.location.protocol = "";
 window.location.host = "";
 window.location.href = "";
+window.location.pathname = "";
 
 window.NATIVE_EDITOR_ENJINE = true;
 window.NATIVE_EDITOR_ENJINE_SYNC_RECALC = true;

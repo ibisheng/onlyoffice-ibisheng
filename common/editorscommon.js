@@ -131,8 +131,8 @@ DocumentUrls.prototype = {
 	getLocal : function(url){
 		if(this.urlsReverse){
 			var res = this.urlsReverse[url];
-			if (!res && typeof editor !== 'undefined' && editor.ThemeLoader && 0 == url.indexOf(editor.ThemeLoader.ThemesUrl)) {
-				res = url.substring(editor.ThemeLoader.ThemesUrl.length);
+			if (!res && typeof editor !== 'undefined' && editor.ThemeLoader && 0 == url.indexOf(editor.ThemeLoader.ThemesUrlAbs)) {
+				res = url.substring(editor.ThemeLoader.ThemesUrlAbs.length);
 			}
 			return res;
 		}
@@ -327,14 +327,29 @@ function g_fMapAscServerErrorToAscError (nServerError) {
 	return nRes;
 }
 
+function joinUrls(base, relative) {
+    //http://stackoverflow.com/questions/14780350/convert-relative-path-to-absolute-using-javascript
+    var stack = base.split("/"),
+        parts = relative.split("/");
+    stack.pop(); // remove current file name (or empty string)
+                 // (omit if "base" is the current folder without trailing slash)
+    for (var i=0; i<parts.length; i++) {
+        if (parts[i] == ".")
+            continue;
+        if (parts[i] == "..")
+            stack.pop();
+        else
+            stack.push(parts[i]);
+    }
+    return stack.join("/");
+}
 function getFullImageSrc2 (src) {
 	if (window["NATIVE_EDITOR_ENJINE"])
 		return src;
 
 	var start = src.slice(0, 6);
-	if (0 === start.indexOf('theme')){
-		var themesUrl = editor.ThemeLoader ? editor.ThemeLoader.ThemesUrl : undefined;
-		return themesUrl + src;
+	if (0 === start.indexOf('theme') && editor.ThemeLoader){
+		return  editor.ThemeLoader.ThemesUrlAbs + src;
 	}
 
 	if (0 !== start.indexOf('http:') && 0 !== start.indexOf('data:') && 0 !== start.indexOf('https:') &&

@@ -582,7 +582,9 @@ function CopyProcessor(api, onlyBinaryCopy)
 	this.oBinaryFileWriter = new BinaryFileWriter(this.oDocument);
 	this.oPresentationWriter = new CBinaryFileWriter();
     this.oPresentationWriter.Start_UseFullUrl();
-    this.oPresentationWriter.Start_UseDocumentOrigin(this.api.documentOrigin);
+    if (this.api.ThemeLoader) {
+        this.oPresentationWriter.Start_UseDocumentOrigin(this.api.ThemeLoader.ThemesUrlAbs);
+    }
 	
 	this.oRoot = new CopyElement("root");
 }

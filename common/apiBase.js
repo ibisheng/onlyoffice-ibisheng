@@ -42,7 +42,9 @@ function baseEditorsApi(name) {
   // Тип скачивания файлы(download или event).нужен для txt, csv. запоминаем на asc_DownloadAs используем asc_setAdvancedOptions
   this.downloadType = DownloadType.None;
   this.OpenDocumentProgress = new COpenProgress();
-  this.documentOrigin = ''; // ToDo скорее всего лишняя переменная и можно обойтись и без нее
+  var sProtocol = window.location.protocol;
+  this.documentOrigin = ((sProtocol && '' !== sProtocol) ? sProtocol + '//' : '') + window.location.host; // for presentation theme url
+  this.documentPathname = window.location.pathname; // for presentation theme url
 
   // Переменная отвечает, получили ли мы ответ с сервера совместного редактирования
   this.ServerIdWaitComplete = false;
@@ -161,8 +163,6 @@ baseEditorsApi.prototype.asc_setDocInfo = function(oDocInfo) {
     this.documentFormat = this.DocInfo.get_Format();
     this.documentCallbackUrl = this.DocInfo.get_CallbackUrl();
     this.documentVKey = this.DocInfo.get_VKey();
-    var sProtocol = window.location.protocol;
-    this.documentOrigin = ((sProtocol && '' !== sProtocol) ? sProtocol + '//' : '') + window.location.host;
 
     this.documentOpenOptions = this.DocInfo.asc_getOptions();
 

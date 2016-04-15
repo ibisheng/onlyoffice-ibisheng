@@ -1210,13 +1210,7 @@ CMetafile.prototype =
 		var srcLocal = g_oDocumentUrls.getLocal(_src);
         if (srcLocal){
             _src = srcLocal;
-		} else {
-            if (window.editor.ThemeLoader !== undefined && window.editor.ThemeLoader != null)
-            {
-                if (0 == _src.indexOf(window.editor.ThemeLoader.ThemesUrl))
-                    _src = _src.substring(window.editor.ThemeLoader.ThemesUrl.length);
-            }
-        }
+		}
 
         this.Memory.WriteByte(CommandType.ctDrawImageFromFile);
         this.Memory.WriteString2(_src);

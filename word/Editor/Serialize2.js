@@ -993,7 +993,10 @@ function BinaryFileWriter(doc, bMailMergeDocx, bMailMergeHtml)
     {
 		var api = this.Document.DrawingDocument.m_oWordControl.m_oApi;
 		window.global_pptx_content_writer.Start_UseFullUrl();
-        window.global_pptx_content_writer.Start_UseDocumentOrigin(api.documentOrigin);
+        if (api.ThemeLoader) {
+            window.global_pptx_content_writer.Start_UseDocumentOrigin(api.ThemeLoader.ThemesUrlAbs);
+        }
+
         window.global_pptx_content_writer._Start();
 		this.copyParams.bLockCopyElems = 0;
 		this.copyParams.itemCount = 0;

@@ -528,6 +528,11 @@ asc_docs_api.prototype.asc_setLocale = function(val) {
 asc_docs_api.prototype.SetThemesPath = function(path)
 {
     this.ThemeLoader.ThemesUrl = path;
+    if (this.documentOrigin) {
+        this.ThemeLoader.ThemesUrlAbs = joinUrls(this.documentOrigin + this.documentPathname, path);
+    } else {
+        this.ThemeLoader.ThemesUrlAbs = path;
+    }
 };
 
 asc_docs_api.prototype.CreateCSS = function()
