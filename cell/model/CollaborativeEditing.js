@@ -19,7 +19,7 @@
 		var asc_applyFunction	= asc.applyFunction;
 		var asc_Range			= asc.Range;
 
-		var c_oAscCellEditorSelectState = AscCommonExcel.c_oAscRecalcIndexTypes;
+		var c_oAscRecalcIndexTypes = AscCommonExcel.c_oAscRecalcIndexTypes;
 		var c_oAscLockTypeElemSubType = AscCommonExcel.c_oAscLockTypeElemSubType;
 		var c_oAscLockTypeElem = AscCommonExcel.c_oAscLockTypeElem;
 
