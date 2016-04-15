@@ -3498,11 +3498,14 @@ drawLineChart.prototype =
 			
 			//draw point
 			for(var k = 0; k < this.paths.points[i].length; k++)
-			{	
-				if(numCache.pts[k])
+			{
+
+				var numPoint = numCache.getPtByIndex(k);
+				if(numPoint)
 				{
-					markerBrush = numCache.pts[k].compiledMarker ? numCache.pts[k].compiledMarker.brush : null;
-					markerPen = numCache.pts[k].compiledMarker ? numCache.pts[k].compiledMarker.pen : null;
+
+					markerBrush = numPoint.compiledMarker ? numPoint.compiledMarker.brush : null;
+					markerPen = numPoint.compiledMarker ? numPoint.compiledMarker.pen : null;
 				}
 				
 				//frame of point
