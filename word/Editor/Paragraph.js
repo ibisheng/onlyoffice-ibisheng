@@ -1349,7 +1349,7 @@ Paragraph.prototype =
 
     Internal_Draw_1 : function(CurPage, pGraphics, Pr)
     {
-        if(this.bFromDocument)
+        if(this.bFromDocument && (pGraphics.RENDERER_PDF_FLAG !== true))
         {
             // Если данный параграф зажат другим пользователем, рисуем соответствующий знак
             if ( AscCommon.locktype_None != this.Lock.Get_Type() )
