@@ -592,7 +592,7 @@
     }
 
     // Проверим состояние, если мы не подсоединились, то сразу отправим ошибку
-    if (ConnectionState.Reconnect === this._state) {
+    if (ConnectionState.Authorized !== this._state) {
       this.saveLockCallbackErrorTimeOutId = window.setTimeout(function() {
         if (callback && _.isFunction(callback)) {
           // Фиктивные вызовы
