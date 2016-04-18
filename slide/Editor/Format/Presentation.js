@@ -3258,6 +3258,7 @@ CPresentation.prototype =
             {
                 drawing_props.imageProps.Width = drawing_props.imageProps.w;
                 drawing_props.imageProps.Height = drawing_props.imageProps.h;
+                drawing_props.imageProps.Position = {X: drawing_props.imageProps.x, Y: drawing_props.imageProps.y};
                 editor.sync_ImgPropCallback(drawing_props.imageProps);
             }
 
