@@ -1,9 +1,10 @@
 "use strict";
 
 // Import
+var c_oAscChartType = AscCommon.c_oAscChartType;
+var c_oAscChartSubType = AscCommon.c_oAscChartSubType;
+
 var c_oAscNumFormatType = Asc.c_oAscNumFormatType;
-var c_oAscChartType = Asc.c_oAscChartType;
-var c_oAscChartSubType = Asc.c_oAscChartSubType;
 
 var EFFECT_NONE = 0;
 var EFFECT_SUBTLE = 1;
