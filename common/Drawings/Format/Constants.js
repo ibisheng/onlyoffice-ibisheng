@@ -1191,8 +1191,10 @@ var historyitem_Style_UnhideWhenUsed  = 109; // Изменяем UnhideWhenUsed
 var historyitem_Style_Link            = 110; // Изменяем Link
 
 // Типы изменений в классе CStyles
-var historyitem_Styles_Add    = 1; // Добавляем стиль
-var historyitem_Styles_Remove = 2; // Удаляем стиль
+var historyitem_Styles_Add                 = 1; // Добавляем стиль
+var historyitem_Styles_Remove              = 2; // Удаляем стиль
+var historyitem_Styles_ChangeDefaultTextPr = 3; // Изменяем настройки текста по умолчанию
+var historyitem_Styles_ChangeDefaultParaPr = 4; // Изменяем настройки параграфа по умолчанию
 
 // Тип изменений в классе CSectionPr
 var historyitem_Section_PageSize_Orient    = 1; // Меняем ориентацию страницы

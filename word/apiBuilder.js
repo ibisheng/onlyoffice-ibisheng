@@ -9,6 +9,8 @@
 {
     /**
      * @global
+     * @class
+     * @name Api
      */
     var Api = window["asc_docs_api"];
 
@@ -114,6 +116,16 @@
     }
 
     /**
+     * Class representing a reference to a specified level of the numbering.
+     * @constructor
+     */
+    function ApiNumPrLvl(NumPr, Lvl)
+    {
+        this.Num = NumPr;
+        this.Lvl = Math.max(0, Math.min(8, Lvl));
+    }
+
+    /**
      * Twentieths of a point (equivalent to 1/1440th of an inch).
      * @typedef {number} twips
      */
@@ -179,7 +191,7 @@
 
     /**
      * Get main document
-     * @method
+     * @memberof Api
      * @returns {ApiDocument}
      */
     Api.prototype.GetDocument = function()
@@ -188,7 +200,7 @@
     };
     /**
      * Create new paragraph
-     * @method
+     * @memberof Api
      * @returns {ApiParagraph}
      */
     Api.prototype.CreateParagraph = function()
@@ -197,7 +209,7 @@
     };
     /**
      * Create new table
-     * @method
+     * @memberof Api
      * @param {number} nCols
      * @param {number} nRows
      * @returns {ApiTable}
@@ -723,9 +735,27 @@
      */
     ApiParagraph.prototype.SetNumPr = function(oNumPr, nLvl)
     {
-        this.GetParaPr().SetTabs(oNumPr, nLvl);
+        this.GetParaPr().SetNumPr(oNumPr, nLvl);
     };
-    
+    /**
+     * Get a numbering defenition and numbering level.
+     * @returns {?ApiNumPrLvl}
+     */
+    ApiParagraph.prototype.GetNumPr = function()
+    {
+        var oNumPr = this.Paragraph.Numbering_Get();
+        if (!oNumPr)
+            return null;
+
+        var oLogicDocument = private_GetLogicDocument();
+        var oGlobalNumbering = oLogicDocument.Get_Numbering();
+        var oNumbering = oGlobalNumbering.Get_AbstractNum(oNumPr.NumId);
+        if (!oNumbering)
+            return null;
+
+        return new ApiNumPrLvl(oNumbering, oNumPr.Lvl);
+    };
+
     //------------------------------------------------------------------------------------------------------------------
     //
     // ApiRun
@@ -1987,6 +2017,37 @@
     //
     //------------------------------------------------------------------------------------------------------------------
 
+    //------------------------------------------------------------------------------------------------------------------
+    //
+    // ApiNumPr
+    //
+    //------------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Get a numbering defenition.
+     * @returns {ApiNumPr}
+     */
+    ApiNumPrLvl.prototype.GetNumbering = function()
+    {
+        return new ApiNumPr(this.Num);
+    };
+    /**
+     * Get level index.
+     * @returns {number}
+     */
+    ApiNumPrLvl.prototype.GetLevel = function()
+    {
+        return this.Lvl;
+    };
+    /**
+     * Set level index.
+     * @param {number} nLevel - Index of the level in the current numbering. This value MUST BE from 0 to 8.
+     */
+    ApiNumPrLvl.prototype.SetLevel = function(nLevel)
+    {
+        this.Lvl = Math.max(0, Math.min(8, nLevel));
+    };
+
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Export
@@ -2037,6 +2098,7 @@
     ApiParagraph.prototype["SetWidowControl"]        = ApiParagraph.prototype.SetWidowControl;
     ApiParagraph.prototype["SetTabs"]                = ApiParagraph.prototype.SetTabs;
     ApiParagraph.prototype["SetNumPr"]               = ApiParagraph.prototype.SetNumPr;
+    ApiParagraph.prototype["GetNumPr"]               = ApiParagraph.prototype.GetNumPr;
 
 
     ApiRun.prototype["GetTextPr"]                    = ApiRun.prototype.GetTextPr;
@@ -2076,6 +2138,7 @@
     ApiTable.prototype["MergeCells"]                 = ApiTable.prototype.MergeCells;
     ApiTable.prototype["SetStyle"]                   = ApiTable.prototype.SetStyle;
     ApiTable.prototype["SetWidth"]                   = ApiTable.prototype.SetWidth;
+    ApiTable.prototype["SetJc"]                      = ApiTable.prototype.SetJc;
     ApiTable.prototype["SetTableLook"]               = ApiTable.prototype.SetTableLook;
     ApiTable.prototype["SetTableBorderTop"]          = ApiTable.prototype.SetTableBorderTop;
     ApiTable.prototype["SetTableBorderBottom"]       = ApiTable.prototype.SetTableBorderBottom;
@@ -2137,6 +2200,10 @@
     ApiParaPr.prototype["SetWidowControl"]           = ApiParaPr.prototype.SetWidowControl;
     ApiParaPr.prototype["SetTabs"]                   = ApiParaPr.prototype.SetTabs;
     ApiParaPr.prototype["SetNumPr"]                  = ApiParaPr.prototype.SetNumPr;
+
+    ApiNumPrLvl.prototype["GetNumbering"]            = ApiNumPrLvl.prototype.GetNumbering;
+    ApiNumPrLvl.prototype["GetLevel"]                = ApiNumPrLvl.prototype.GetLevel;
+    ApiNumPrLvl.prototype["SetLevel"]                = ApiNumPrLvl.prototype.SetLevel;
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Private area
