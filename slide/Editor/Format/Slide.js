@@ -670,7 +670,7 @@ Slide.prototype =
                 }
                 if(typeof CollaborativeEditing !== "undefined")
                 {
-                    if(Fill && Fill.fill && Fill.fill.type === FILL_TYPE_BLIP && typeof Fill.fill.RasterImageId === "string" && Fill.fill.RasterImageId.length > 0)
+                    if(Fill && Fill.fill && Fill.fill.type === Asc.c_oAscFill.FILL_TYPE_BLIP && typeof Fill.fill.RasterImageId === "string" && Fill.fill.RasterImageId.length > 0)
                     {
 						CollaborativeEditing.Add_NewImage(getFullImageSrc2(Fill.fill.RasterImageId));
                     }

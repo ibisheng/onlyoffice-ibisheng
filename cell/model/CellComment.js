@@ -368,8 +368,8 @@ function CCellCommentator(currentSheet) {
 
 	// Drawing settings
 	this.bShow = true;
-	this.commentIconColor = new CColor(255, 144, 0);
-	this.commentFillColor = new CColor(255, 255, 0);
+	this.commentIconColor = new AscCommon.CColor(255, 144, 0);
+	this.commentFillColor = new AscCommon.CColor(255, 255, 0);
 	this.commentPadding = 4; 	// px
 	this.minAreaWidth = 160; 	// px
 	this.minAreaHeight = 80; 	// px

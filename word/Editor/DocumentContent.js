@@ -820,11 +820,11 @@ CDocumentContent.prototype =
                     else if ( -1 === FrameW )
                         FrameW = Frame_XLimit;
 
-                    var FrameHRule = ( undefined === FramePr.HRule ? heightrule_Auto : FramePr.HRule );
+                    var FrameHRule = ( undefined === FramePr.HRule ? Asc.linerule_Auto : FramePr.HRule );
                     switch ( FrameHRule )
                     {
-                        case heightrule_Auto : break;
-                        case heightrule_AtLeast :
+                        case Asc.linerule_Auto : break;
+                        case Asc.linerule_AtLeast :
                         {
                             if ( FrameH < FramePr.H )
                                 FrameH = FramePr.H;
@@ -832,7 +832,7 @@ CDocumentContent.prototype =
                             break;
                         }
 
-                        case heightrule_Exact:
+                        case Asc.linerule_Exact:
                         {
                             FrameH = FramePr.H;
                             break;
@@ -2056,7 +2056,7 @@ CDocumentContent.prototype =
     Update_CursorType : function(X, Y, CurPage)
     {
         if (CurPage < 0 || CurPage >= this.Pages.length)
-            return this.DrawingDocument.SetCursorType("default", new CMouseMoveData());
+            return this.DrawingDocument.SetCursorType("default", new AscCommon.CMouseMoveData());
 
         var bInText      = (null === this.Is_InText(X, Y, CurPage)      ? false : true);
         var bTableBorder = (null === this.Is_TableBorder(X, Y, CurPage) ? false : true);

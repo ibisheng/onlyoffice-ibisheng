@@ -1,7 +1,15 @@
 "use strict";
 
 // Import
+var CreateAscColor = AscCommon.CreateAscColor;
+
 var c_oAscColor = Asc.c_oAscColor;
+var c_oAscFill = Asc.c_oAscFill;
+var asc_CShapeFill = Asc.asc_CShapeFill;
+var c_oAscFillGradType = Asc.c_oAscFillGradType;
+var c_oAscFillBlipType = Asc.c_oAscFillBlipType;
+var c_oAscStrokeType = Asc.c_oAscStrokeType;
+var asc_CShapeProperty = Asc.asc_CShapeProperty;
 
 // COLOR -----------------------
 /*
@@ -1787,15 +1795,6 @@ function CreateSolidFillRGBA(r, g, b, a)
 
 // -----------------------------
 
-// FILL ------------------------
-
-var FILL_TYPE_NONE      = 0;
-var FILL_TYPE_BLIP      = 1;
-var FILL_TYPE_NOFILL	= 2;
-var FILL_TYPE_SOLID		= 3;
-var FILL_TYPE_GRAD		= 4;
-var FILL_TYPE_PATT		= 5;
-
 function CSrcRect()
 {
     this.l = null;
@@ -1926,7 +1925,7 @@ CBlipFillTile.prototype.IsIdentical = function(o)
 };
 function CBlipFill()
 {
-    this.type = FILL_TYPE_BLIP;
+    this.type = c_oAscFill.FILL_TYPE_BLIP;
 
     this.RasterImageId = "";
     this.VectorImageBin = null;
@@ -2106,7 +2105,7 @@ CBlipFill.prototype =
         {
             return false;
         }
-        if(fill.type !=  FILL_TYPE_BLIP)
+        if(fill.type !=  c_oAscFill.FILL_TYPE_BLIP)
         {
             return false;
         }
@@ -2152,7 +2151,7 @@ CBlipFill.prototype =
 
     compare : function(fill)
     {
-        if(fill == null || fill.type !== FILL_TYPE_BLIP)
+        if(fill == null || fill.type !== c_oAscFill.FILL_TYPE_BLIP)
         {
             return null;
         }
@@ -2186,7 +2185,7 @@ CBlipFill.prototype =
 
 function CSolidFill()
 {
-    this.type = FILL_TYPE_SOLID;
+    this.type = c_oAscFill.FILL_TYPE_SOLID;
     this.color = null;
 }
 
@@ -2221,7 +2220,7 @@ CSolidFill.prototype =
 
     Write_ToBinary: function(w)
     {
-        w.WriteLong(FILL_TYPE_SOLID);
+        w.WriteLong(c_oAscFill.FILL_TYPE_SOLID);
         if(this.color)
         {
             w.WriteBool(true);
@@ -2269,7 +2268,7 @@ CSolidFill.prototype =
         {
             return false;
         }
-        if(fill.type !=  FILL_TYPE_SOLID)
+        if(fill.type !=  c_oAscFill.FILL_TYPE_SOLID)
         {
             return false;
         }
@@ -2290,7 +2289,7 @@ CSolidFill.prototype =
 
     compare : function(fill)
     {
-        if(fill == null || fill.type !== FILL_TYPE_SOLID)
+        if(fill == null || fill.type !== c_oAscFill.FILL_TYPE_SOLID)
         {
             return null;
         }
@@ -2536,7 +2535,7 @@ GradPath.prototype =
 
 function CGradFill()
 {
-    this.type = FILL_TYPE_GRAD;
+    this.type = c_oAscFill.FILL_TYPE_GRAD;
     // пока просто front color
     this.colors = [];
 
@@ -2681,7 +2680,7 @@ CGradFill.prototype =
         {
             return false;
         }
-        if(fill.type !=  FILL_TYPE_GRAD)
+        if(fill.type !=  c_oAscFill.FILL_TYPE_GRAD)
         {
             return false;
         }
@@ -2725,7 +2724,7 @@ CGradFill.prototype =
 
     compare : function(fill)
     {
-        if(fill == null || fill.type !== FILL_TYPE_GRAD)
+        if(fill == null || fill.type !== c_oAscFill.FILL_TYPE_GRAD)
         {
             return null;
         }
@@ -2765,7 +2764,7 @@ CGradFill.prototype =
 
 function CPattFill()
 {
-    this.type = FILL_TYPE_PATT;
+    this.type = c_oAscFill.FILL_TYPE_PATT;
     this.ftype = 0;
     this.fgClr = null;//new CUniColor();
     this.bgClr = null;//new CUniColor();
@@ -2880,7 +2879,7 @@ CPattFill.prototype =
         {
             return false;
         }
-        if(fill.type !=  FILL_TYPE_PATT && this.ftype!=fill.ftype)
+        if(fill.type !=  c_oAscFill.FILL_TYPE_PATT && this.ftype!=fill.ftype)
         {
             return false;
         }
@@ -2908,7 +2907,7 @@ CPattFill.prototype =
         {
             return null;
         }
-        if(fill.type !== FILL_TYPE_PATT)
+        if(fill.type !== c_oAscFill.FILL_TYPE_PATT)
         {
             return null;
         }
@@ -2925,7 +2924,7 @@ CPattFill.prototype =
 
 function CNoFill()
 {
-    this.type = FILL_TYPE_NOFILL;
+    this.type = c_oAscFill.FILL_TYPE_NOFILL;
 }
 
 CNoFill.prototype =
@@ -2950,7 +2949,7 @@ CNoFill.prototype =
 
     Write_ToBinary: function(w)
     {
-        w.WriteLong(FILL_TYPE_NOFILL);
+        w.WriteLong(c_oAscFill.FILL_TYPE_NOFILL);
     },
 
     Read_FromBinary: function(r)
@@ -2988,7 +2987,7 @@ CNoFill.prototype =
         {
             return false;
         }
-        return fill.type ===  FILL_TYPE_NOFILL;
+        return fill.type ===  c_oAscFill.FILL_TYPE_NOFILL;
     },
     compare : function(nofill)
     {
@@ -3053,19 +3052,13 @@ CUniFill.prototype =
         {
             switch(this.fill.type)
             {
-                case FILL_TYPE_NONE:
+                case c_oAscFill.FILL_TYPE_NONE:
+                case c_oAscFill.FILL_TYPE_BLIP:
+                case c_oAscFill.FILL_TYPE_NOFILL:
                 {
                     break;
                 }
-                case FILL_TYPE_BLIP:
-                {
-                    break;
-                }
-                case FILL_TYPE_NOFILL:
-                {
-                    break;
-                }
-                case FILL_TYPE_SOLID:
+                case c_oAscFill.FILL_TYPE_SOLID:
                 {
                     if(this.fill.color && this.fill.color)
                     {
@@ -3073,7 +3066,7 @@ CUniFill.prototype =
                     }
                     break;
                 }
-                case FILL_TYPE_GRAD:
+                case c_oAscFill.FILL_TYPE_GRAD:
                 {
                     for(var i = 0; i < this.fill.colors.length; ++i)
                     {
@@ -3084,7 +3077,7 @@ CUniFill.prototype =
                     }
                     break;
                 }
-                case FILL_TYPE_PATT:
+                case c_oAscFill.FILL_TYPE_PATT:
                 {
                     if(this.fill.bgClr)
                     {
@@ -3106,19 +3099,13 @@ CUniFill.prototype =
         {
             switch(this.fill.type)
             {
-                case FILL_TYPE_NONE:
+                case c_oAscFill.FILL_TYPE_NONE:
+                case c_oAscFill.FILL_TYPE_BLIP:
+                case c_oAscFill.FILL_TYPE_NOFILL:
                 {
                     break;
                 }
-                case FILL_TYPE_BLIP:
-                {
-                    break;
-                }
-                case FILL_TYPE_NOFILL:
-                {
-                    break;
-                }
-                case FILL_TYPE_SOLID:
+                case c_oAscFill.FILL_TYPE_SOLID:
                 {
                     if(this.fill.color && this.fill.color)
                     {
@@ -3126,7 +3113,7 @@ CUniFill.prototype =
                     }
                     break;
                 }
-                case FILL_TYPE_GRAD:
+                case c_oAscFill.FILL_TYPE_GRAD:
                 {
                     for(var i = 0; i < this.fill.colors.length; ++i)
                     {
@@ -3137,7 +3124,7 @@ CUniFill.prototype =
                     }
                     break;
                 }
-                case FILL_TYPE_PATT:
+                case c_oAscFill.FILL_TYPE_PATT:
                 {
                     if(this.fill.bgClr)
                     {
@@ -3211,35 +3198,35 @@ CUniFill.prototype =
             var type = r.GetLong();
             switch(type)
             {
-                case FILL_TYPE_NONE:
+                case c_oAscFill.FILL_TYPE_NONE:
                 {
                     break;
                 }
-                case FILL_TYPE_BLIP:
+                case c_oAscFill.FILL_TYPE_BLIP:
                 {
                     this.fill = new CBlipFill();
                     this.fill.Read_FromBinary(r);
                     break;
                 }
-                case FILL_TYPE_NOFILL:
+                case c_oAscFill.FILL_TYPE_NOFILL:
                 {
                     this.fill = new CNoFill();
                     this.fill.Read_FromBinary(r);
                     break;
                 }
-                case FILL_TYPE_SOLID:
+                case c_oAscFill.FILL_TYPE_SOLID:
                 {
                     this.fill = new CSolidFill();
                     this.fill.Read_FromBinary(r);
                     break;
                 }
-                case FILL_TYPE_GRAD:
+                case c_oAscFill.FILL_TYPE_GRAD:
                 {
                     this.fill = new CGradFill();
                     this.fill.Read_FromBinary(r);
                     break;
                 }
-                case FILL_TYPE_PATT:
+                case c_oAscFill.FILL_TYPE_PATT:
                 {
                     this.fill = new CPattFill();
                     this.fill.Read_FromBinary(r);
@@ -3277,11 +3264,11 @@ CUniFill.prototype =
     {
         if (this.fill)
         {
-            if (this.fill.type == FILL_TYPE_SOLID)
+            if (this.fill.type == c_oAscFill.FILL_TYPE_SOLID)
             {
                 return this.fill.color.RGBA;
             }
-            if (this.fill.type == FILL_TYPE_GRAD)
+            if (this.fill.type == c_oAscFill.FILL_TYPE_GRAD)
             {
                 var RGBA = new FormatRGBAColor();
                 var _colors = this.fill.colors;
@@ -3303,11 +3290,11 @@ CUniFill.prototype =
 
                 return RGBA;
             }
-            if (this.fill.type == FILL_TYPE_PATT)
+            if (this.fill.type == c_oAscFill.FILL_TYPE_PATT)
             {
                 return this.fill.fgClr.RGBA;
             }
-            if(this.fill.type == FILL_TYPE_NOFILL)
+            if(this.fill.type == c_oAscFill.FILL_TYPE_NOFILL)
             {
                 return {R: 0, G: 0, B: 0};
             }
@@ -3447,7 +3434,7 @@ function CompareUnifillBool(u1, u2)
         return false
     switch(u1.fill.type)
     {
-        case FILL_TYPE_BLIP:
+        case c_oAscFill.FILL_TYPE_BLIP:
         {
             if(u1.fill.RasterImageId && !u2.fill.RasterImageId || u2.fill.RasterImageId && !u1.fill.RasterImageId)
                 return false;
@@ -3475,7 +3462,7 @@ function CompareUnifillBool(u1, u2)
                 return false;
             break;
         }
-        case FILL_TYPE_SOLID:
+        case c_oAscFill.FILL_TYPE_SOLID:
         {
             if(u1.fill.color && u2.fill.color)
             {
@@ -3483,7 +3470,7 @@ function CompareUnifillBool(u1, u2)
             }
             break;
         }
-        case FILL_TYPE_GRAD:
+        case c_oAscFill.FILL_TYPE_GRAD:
         {
             if(u1.fill.colors.length !== u2.fill.colors.length)
                 return false;
@@ -3506,7 +3493,7 @@ function CompareUnifillBool(u1, u2)
             }
             break;
         }
-        case FILL_TYPE_PATT:
+        case c_oAscFill.FILL_TYPE_PATT:
         {
             if(u1.fill.ftype !== u2.fill.ftype
                 || !CompareUniColor(u1.fill.fgClr, u2.fill.fgClr)
@@ -3645,7 +3632,7 @@ function CompareShapeProperties(shapeProp1, shapeProp2)
     _result_shape_prop.IsLocked = shapeProp1.IsLocked === true || shapeProp2.IsLocked === true;
     if(isRealObject(shapeProp1.paddings) && isRealObject(shapeProp2.paddings))
     {
-        _result_shape_prop.paddings = new asc_CPaddings();
+        _result_shape_prop.paddings = new Asc.asc_CPaddings();
         _result_shape_prop.paddings.Left = isRealNumber(shapeProp1.paddings.Left) ? (shapeProp1.paddings.Left === shapeProp2.paddings.Left ? shapeProp1.paddings.Left : undefined) : undefined;
         _result_shape_prop.paddings.Top = isRealNumber(shapeProp1.paddings.Top) ? (shapeProp1.paddings.Top === shapeProp2.paddings.Top ? shapeProp1.paddings.Top : undefined) : undefined;
         _result_shape_prop.paddings.Right = isRealNumber(shapeProp1.paddings.Right) ? (shapeProp1.paddings.Right === shapeProp2.paddings.Right ? shapeProp1.paddings.Right : undefined) : undefined;
@@ -7017,7 +7004,7 @@ CSpPr.prototype =
 
                     if(typeof CollaborativeEditing !== "undefined")
                     {
-                        if(this.Fill.fill && this.Fill.fill.type === FILL_TYPE_BLIP && typeof this.Fill.fill.RasterImageId === "string" && this.Fill.fill.RasterImageId.length > 0)
+                        if(this.Fill.fill && this.Fill.fill.type === c_oAscFill.FILL_TYPE_BLIP && typeof this.Fill.fill.RasterImageId === "string" && this.Fill.fill.RasterImageId.length > 0)
                         {
 							CollaborativeEditing.Add_NewImage(getFullImageSrc2(this.Fill.fill.RasterImageId));
                         }
@@ -11140,3 +11127,734 @@ function GenerateDefaultColorMap()
 
 }
 var DEFAULT_COLOR_MAP = GenerateDefaultColorMap();
+
+
+function CreateAscFill(unifill)
+{
+    if (null == unifill || null == unifill.fill)
+        return new asc_CShapeFill();
+
+    var ret = new asc_CShapeFill();
+
+    var _fill = unifill.fill;
+    switch (_fill.type)
+    {
+        case c_oAscFill.FILL_TYPE_SOLID:
+        {
+            ret.type = c_oAscFill.FILL_TYPE_SOLID;
+            ret.fill = new Asc.asc_CFillSolid();
+            ret.fill.color = CreateAscColor(_fill.color);
+            break;
+        }
+        case c_oAscFill.FILL_TYPE_PATT:
+        {
+            ret.type = c_oAscFill.FILL_TYPE_PATT;
+            ret.fill = new Asc.asc_CFillHatch();
+            ret.fill.PatternType = _fill.ftype;
+            ret.fill.fgClr = CreateAscColor(_fill.fgClr);
+            ret.fill.bgClr = CreateAscColor(_fill.bgClr);
+            break;
+        }
+        case c_oAscFill.FILL_TYPE_GRAD:
+        {
+            ret.type = c_oAscFill.FILL_TYPE_GRAD;
+            ret.fill = new Asc.asc_CFillGrad();
+            var bCheckTransparent = true, nLastTransparent = null, nLastTempTransparent, j, aMods;
+            for (var i = 0; i < _fill.colors.length; i++)
+            {
+                if (0 == i)
+                {
+                    ret.fill.Colors = [];
+                    ret.fill.Positions = [];
+                }
+                if(bCheckTransparent)
+                {
+                    if(_fill.colors[i].color.Mods)
+                    {
+                        aMods = _fill.colors[i].color.Mods.Mods;
+                        nLastTempTransparent = null;
+                        for(j = 0; j < aMods.length; ++j)
+                        {
+                            if(aMods[j].name === "alpha")
+                            {
+                                if(nLastTempTransparent === null)
+                                {
+                                    nLastTempTransparent = aMods[j].val;
+                                    if(nLastTransparent === null)
+                                    {
+                                        nLastTransparent = nLastTempTransparent;
+                                    }
+                                    else
+                                    {
+                                        if(nLastTransparent !== nLastTempTransparent)
+                                        {
+                                            bCheckTransparent = false;
+                                            break;
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    bCheckTransparent = false;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        bCheckTransparent = false;
+                    }
+                }
+                ret.fill.Colors.push(CreateAscColor(_fill.colors[i].color));
+                ret.fill.Positions.push(_fill.colors[i].pos);
+            }
+            if(bCheckTransparent && nLastTransparent !== null)
+            {
+                ret.transparent = (nLastTransparent/100000)*255;
+            }
+
+            if (_fill.lin)
+            {
+                ret.fill.GradType = c_oAscFillGradType.GRAD_LINEAR;
+                ret.fill.LinearAngle = _fill.lin.angle;
+                ret.fill.LinearScale = _fill.lin.scale;
+            }
+            else if(_fill.path)
+            {
+                ret.fill.GradType = c_oAscFillGradType.GRAD_PATH;
+                ret.fill.PathType = 0;
+            }
+
+            break;
+        }
+        case c_oAscFill.FILL_TYPE_BLIP:
+        {
+            ret.type = c_oAscFill.FILL_TYPE_BLIP;
+            ret.fill = new Asc.asc_CFillBlip();
+
+            ret.fill.url = _fill.RasterImageId;
+            ret.fill.type = (_fill.tile == null) ? c_oAscFillBlipType.STRETCH : c_oAscFillBlipType.TILE;
+            break;
+        }
+        case c_oAscFill.FILL_TYPE_NOFILL:
+        case c_oAscFill.FILL_TYPE_NONE:
+        {
+            ret.type = c_oAscFill.FILL_TYPE_NOFILL;
+            break;
+        }
+        default:
+            break;
+    }
+
+    if(isRealNumber(unifill.transparent))
+    {
+        ret.transparent = unifill.transparent;
+    }
+    return ret;
+}
+function CorrectUniFill(asc_fill, unifill, editorId)
+{
+    if (null == asc_fill)
+        return unifill;
+
+    var ret = unifill;
+    if (null == ret)
+        ret = new CUniFill();
+
+    var _fill = asc_fill.fill;
+    var _type = asc_fill.type;
+
+    if (null != _type)
+    {
+        switch (_type)
+        {
+            case c_oAscFill.FILL_TYPE_NOFILL:
+            {
+                ret.fill = new CNoFill();
+                break;
+            }
+            case c_oAscFill.FILL_TYPE_BLIP:
+            {
+
+                var _url = _fill.url;
+                var _tx_id = _fill.texture_id;
+                if (null != _tx_id && (0 <= _tx_id) && (_tx_id < g_oUserTexturePresets.length))
+                {
+                    _url = g_oUserTexturePresets[_tx_id];
+                }
+
+
+                if (ret.fill == null)
+                {
+                    ret.fill = new CBlipFill();
+                }
+
+                if(ret.fill.type != c_oAscFill.FILL_TYPE_BLIP)
+                {
+                    if(!(typeof (_url) === "string" && _url.length > 0) || !isRealNumber(_fill.type))
+                    {
+                        break;
+                    }
+                    ret.fill = new CBlipFill();
+                }
+
+                if (_url != null && _url !== undefined && _url != "")
+                    ret.fill.setRasterImageId(_url);
+
+                if (ret.fill.RasterImageId == null)
+                    ret.fill.RasterImageId = "";
+
+                var tile = _fill.type;
+                if (tile == c_oAscFillBlipType.STRETCH)
+                    ret.fill.tile = null;
+                else if (tile == c_oAscFillBlipType.TILE)
+                    ret.fill.tile = new CBlipFillTile();
+                break;
+            }
+            case c_oAscFill.FILL_TYPE_PATT:
+            {
+                if (ret.fill == null)
+                {
+                    ret.fill = new CPattFill();
+                }
+
+                if(ret.fill.type != c_oAscFill.FILL_TYPE_PATT)
+                {
+                    if(undefined != _fill.PatternType && undefined != _fill.fgClr && undefined != _fill.bgClr)
+                    {
+                        ret.fill = new CPattFill();
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+
+                if (undefined != _fill.PatternType)
+                {
+                    ret.fill.ftype = _fill.PatternType;
+                }
+                if (undefined != _fill.fgClr)
+                {
+                    ret.fill.fgClr = CorrectUniColor(_fill.fgClr, ret.fill.fgClr, editorId);
+                }
+                if(!ret.fill.fgClr)
+                {
+                    ret.fill.fgClr = CreateUniColorRGB(0, 0, 0);
+                }
+                if (undefined != _fill.bgClr)
+                {
+                    ret.fill.bgClr = CorrectUniColor(_fill.bgClr, ret.fill.bgClr, editorId);
+                }
+                if(!ret.fill.bgClr)
+                {
+                    ret.fill.bgClr = CreateUniColorRGB(0, 0, 0);
+                }
+
+                break;
+            }
+            case c_oAscFill.FILL_TYPE_GRAD:
+            {
+                if (ret.fill == null)
+                {
+                    ret.fill = new CGradFill();
+                }
+
+                var _colors     = _fill.Colors;
+                var _positions  = _fill.Positions;
+
+                if(ret.fill.type != c_oAscFill.FILL_TYPE_GRAD )
+                {
+                    if(undefined != _colors && undefined != _positions)
+                    {
+                        ret.fill = new CGradFill();
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+
+                if (undefined != _colors && undefined != _positions)
+                {
+                    if (_colors.length == _positions.length)
+                    {
+                        if(ret.fill.colors.length === _colors.length){
+                            for (var i = 0; i < _colors.length; i++){
+                                var _gs = ret.fill.colors[i] ? ret.fill.colors[i] : new CGs();
+                                _gs.color = CorrectUniColor(_colors[i], _gs.color, editorId);
+                                _gs.pos = _positions[i];
+                                ret.fill.colors[i] = _gs;
+                            }
+                        }
+                        else{
+                            for (var i = 0; i < _colors.length; i++){
+                                var _gs = new CGs();
+                                _gs.color = CorrectUniColor(_colors[i], _gs.color, editorId);
+                                _gs.pos = _positions[i];
+
+                                ret.fill.colors.push(_gs);
+                            }
+                        }
+                    }
+                }
+                else if (undefined != _colors)
+                {
+                    if (_colors.length == ret.fill.colors.length)
+                    {
+                        for (var i = 0; i < _colors.length; i++)
+                        {
+                            ret.fill.colors[i].color = CorrectUniColor(_colors[i], ret.fill.colors[i].color, editorId);
+                        }
+                    }
+                }
+                else if (undefined != _positions)
+                {
+                    if (_positions.length <= ret.fill.colors.length)
+                    {
+                        if(_positions.length < ret.fill.colors.length)
+                        {
+                            ret.fill.colors.splice(_positions.length, ret.fill.colors.length - _positions.length);
+                        }
+                        for (var i = 0; i < _positions.length; i++)
+                        {
+                            ret.fill.colors[i].pos = _positions[i];
+                        }
+                    }
+                }
+
+                var _grad_type = _fill.GradType;
+
+                if (c_oAscFillGradType.GRAD_LINEAR == _grad_type)
+                {
+                    var _angle = _fill.LinearAngle;
+                    var _scale = _fill.LinearScale;
+
+                    if (!ret.fill.lin)
+                        ret.fill.lin = new GradLin();
+
+                    if (undefined != _angle)
+                        ret.fill.lin.angle = _angle;
+                    if (undefined != _scale)
+                        ret.fill.lin.scale = _scale;
+                    ret.fill.path = null;
+                }
+                else if (c_oAscFillGradType.GRAD_PATH == _grad_type)
+                {
+                    ret.fill.lin = null;
+                    ret.fill.path = new GradPath();
+                }
+                break;
+            }
+            default:
+            {
+                if (ret.fill == null || ret.fill.type != c_oAscFill.FILL_TYPE_SOLID)
+                {
+                    ret.fill = new CSolidFill();
+                }
+                ret.fill.color = CorrectUniColor(_fill.color, ret.fill.color, editorId);
+            }
+        }
+    }
+
+    var _alpha = asc_fill.transparent;
+    if (null != _alpha)
+        ret.transparent = _alpha;
+
+    return ret;
+}
+// эта функция ДОЛЖНА минимизироваться
+function CreateAscStroke(ln, _canChangeArrows)
+{
+    if (null == ln || null == ln.Fill || ln.Fill.fill == null)
+        return new Asc.asc_CStroke();
+
+    var ret = new Asc.asc_CStroke();
+
+    var _fill = ln.Fill.fill;
+    if(_fill != null)
+    {
+        switch (_fill.type)
+        {
+            case c_oAscFill.FILL_TYPE_BLIP:
+            {
+                break;
+            }
+            case c_oAscFill.FILL_TYPE_SOLID:
+            {
+                ret.color = CreateAscColor(_fill.color);
+                ret.type = c_oAscStrokeType.STROKE_COLOR;
+                break;
+            }
+            case c_oAscFill.FILL_TYPE_GRAD:
+            {
+                var _c = _fill.colors;
+                if (_c != 0)
+                {
+                    ret.color = CreateAscColor(_fill.colors[0].color);
+                    ret.type = c_oAscStrokeType.STROKE_COLOR;
+                }
+
+                break;
+            }
+            case c_oAscFill.FILL_TYPE_PATT:
+            {
+                ret.color = CreateAscColor(_fill.fgClr);
+                ret.type = c_oAscStrokeType.STROKE_COLOR;
+                break;
+            }
+            case c_oAscFill.FILL_TYPE_NOFILL:
+            {
+                ret.color = null;
+                ret.type = c_oAscStrokeType.STROKE_NONE;
+                break;
+            }
+            default:
+            {
+                break;
+            }
+        }
+    }
+
+
+    ret.width = (ln.w == null) ? 12700 : (ln.w >> 0);
+    ret.width /= 36000.0;
+
+    if (ln.cap != null)
+        ret.asc_putLinecap(ln.cap);
+
+    if (ln.Join != null)
+        ret.asc_putLinejoin(ln.Join.type);
+
+    if (ln.headEnd != null)
+    {
+        ret.asc_putLinebeginstyle((ln.headEnd.type == null) ? LineEndType.None : ln.headEnd.type);
+
+        var _len = (null == ln.headEnd.len) ? 1 : (2 - ln.headEnd.len);
+        var _w = (null == ln.headEnd.w) ? 1 : (2 - ln.headEnd.w);
+
+        ret.asc_putLinebeginsize(_w * 3 + _len);
+    }
+    else
+    {
+        ret.asc_putLinebeginstyle(LineEndType.None);
+    }
+
+    if (ln.tailEnd != null)
+    {
+        ret.asc_putLineendstyle((ln.tailEnd.type == null) ? LineEndType.None : ln.tailEnd.type);
+
+        var _len = (null == ln.tailEnd.len) ? 1 : (2 - ln.tailEnd.len);
+        var _w = (null == ln.tailEnd.w) ? 1 : (2 - ln.tailEnd.w);
+
+        ret.asc_putLineendsize(_w * 3 + _len);
+    }
+    else
+    {
+        ret.asc_putLineendstyle(LineEndType.None);
+    }
+
+    if (true === _canChangeArrows)
+        ret.canChangeArrows = true;
+
+    return ret;
+}
+
+function CorrectUniStroke(asc_stroke, unistroke, flag)
+{
+    if (null == asc_stroke)
+        return unistroke;
+
+    var ret = unistroke;
+    if (null == ret)
+        ret = new CLn();
+
+    var _type = asc_stroke.type;
+    var _w = asc_stroke.width;
+
+    if (_w != null && _w !== undefined)
+        ret.w = _w * 36000.0;
+
+    var _color = asc_stroke.color;
+    if (_type == c_oAscStrokeType.STROKE_NONE)
+    {
+        ret.Fill = new CUniFill();
+        ret.Fill.fill = new CNoFill();
+    }
+    else if (_type != null)
+    {
+        if (null != _color && undefined !== _color)
+        {
+            ret.Fill = new CUniFill();
+            ret.Fill.type = c_oAscFill.FILL_TYPE_SOLID;
+            ret.Fill.fill = new CSolidFill();
+            ret.Fill.fill.color = CorrectUniColor(_color, ret.Fill.fill.color, flag);
+        }
+    }
+
+    var _join = asc_stroke.LineJoin;
+    if (null != _join)
+    {
+        ret.Join = new LineJoin();
+        ret.Join.type = _join;
+    }
+
+    var _cap = asc_stroke.LineCap;
+    if (null != _cap)
+    {
+        ret.cap = _cap;
+    }
+
+    var _begin_style = asc_stroke.LineBeginStyle;
+    if (null != _begin_style)
+    {
+        if (ret.headEnd == null)
+            ret.headEnd = new EndArrow();
+
+        ret.headEnd.type = _begin_style;
+    }
+
+    var _end_style = asc_stroke.LineEndStyle;
+    if (null != _end_style)
+    {
+        if (ret.tailEnd == null)
+            ret.tailEnd = new EndArrow();
+
+        ret.tailEnd.type = _end_style;
+    }
+
+    var _begin_size = asc_stroke.LineBeginSize;
+    if (null != _begin_size)
+    {
+        if (ret.headEnd == null)
+            ret.headEnd = new EndArrow();
+
+        ret.headEnd.w = 2 - ((_begin_size/3) >> 0);
+        ret.headEnd.len = 2 - (_begin_size % 3);
+    }
+
+    var _end_size = asc_stroke.LineEndSize;
+    if (null != _end_size)
+    {
+        if (ret.tailEnd == null)
+            ret.tailEnd = new EndArrow();
+
+        ret.tailEnd.w = 2 - ((_end_size/3) >> 0);
+        ret.tailEnd.len = 2 - (_end_size % 3);
+    }
+
+    return ret;
+}
+
+// эта функция ДОЛЖНА минимизироваться
+function CreateAscShapeProp(shape)
+{
+    if (null == shape)
+        return new asc_CShapeProperty();
+
+    var ret = new asc_CShapeProperty();
+    ret.fill = CreateAscFill(shape.brush);
+    ret.stroke = CreateAscStroke(shape.pen);
+    var paddings = null;
+    if(shape.textBoxContent)
+    {
+        var body_pr = shape.bodyPr;
+        paddings = new asc_CPaddings();
+        if(typeof body_pr.lIns === "number")
+            paddings.Left = body_pr.lIns;
+        else
+            paddings.Left = 2.54;
+
+        if(typeof body_pr.tIns === "number")
+            paddings.Top = body_pr.tIns;
+        else
+            paddings.Top = 1.27;
+
+        if(typeof body_pr.rIns === "number")
+            paddings.Right = body_pr.rIns;
+        else
+            paddings.Right = 2.54;
+
+        if(typeof body_pr.bIns === "number")
+            paddings.Bottom = body_pr.bIns;
+        else
+            paddings.Bottom = 1.27;
+    }
+    return ret;
+}
+
+function CreateAscShapePropFromProp(shapeProp)
+{
+    var obj = new asc_CShapeProperty();
+    if(!isRealObject(shapeProp))
+        return obj;
+    if(isRealBool(shapeProp.locked))
+    {
+        obj.Locked = shapeProp.locked;
+    }
+
+    if(typeof shapeProp.type === "string")
+        obj.type = shapeProp.type;
+    if(isRealObject(shapeProp.fill))
+        obj.fill = CreateAscFill(shapeProp.fill);
+    if(isRealObject(shapeProp.stroke))
+        obj.stroke = CreateAscStroke(shapeProp.stroke, shapeProp.canChangeArrows);
+    if(isRealObject(shapeProp.paddings))
+        obj.paddings = shapeProp.paddings;
+    if(shapeProp.canFill === true || shapeProp.canFill === false)
+    {
+        obj.canFill = shapeProp.canFill;
+    }
+    obj.bFromChart = shapeProp.bFromChart;
+    obj.w = shapeProp.w;
+    obj.h = shapeProp.h;
+    obj.vert = shapeProp.vert;
+    obj.verticalTextAlign = shapeProp.verticalTextAlign;
+    if(shapeProp.textArtProperties)
+    {
+        obj.textArtProperties = CreateAscTextArtProps(shapeProp.textArtProperties);
+    }
+    return obj;
+}
+
+function CorrectShapeProp(asc_shape_prop, shape)
+{
+    if (null == shape || null == asc_shape_prop)
+        return;
+
+    shape.spPr.Fill = CorrectUniFill(asc_shape_prop.asc_getFill(), shape.spPr.Fill);
+    shape.spPr.ln = CorrectUniFill(asc_shape_prop.asc_getStroke(), shape.spPr.ln);
+}
+
+
+function CreateAscTextArtProps(oTextArtProps)
+{
+    if(!oTextArtProps)
+    {
+        return undefined;
+    }
+    var oRet = new Asc.asc_TextArtProperties();
+    if(oTextArtProps.Fill)
+    {
+        oRet.asc_putFill(CreateAscFill(oTextArtProps.Fill));
+    }
+    if(oTextArtProps.Line)
+    {
+        oRet.asc_putLine(CreateAscStroke(oTextArtProps.Line, false));
+    }
+    oRet.asc_putForm(oTextArtProps.Form);
+    return oRet;
+}
+
+function CreateUnifillFromAscColor(asc_color)
+{
+    var Unifill = new CUniFill();
+    Unifill.fill = new CSolidFill();
+    Unifill.fill.color = CorrectUniColor(asc_color, Unifill.fill.color);
+    return Unifill;
+}
+
+function CorrectUniColor(asc_color, unicolor, flag)
+{
+    if (null == asc_color)
+        return unicolor;
+
+    var ret = unicolor;
+    if (null == ret)
+        ret = new CUniColor();
+
+    var _type = asc_color.asc_getType();
+    switch (_type)
+    {
+        case c_oAscColor.COLOR_TYPE_PRST:
+        {
+            if (ret.color == null || ret.color.type != c_oAscColor.COLOR_TYPE_PRST)
+            {
+                ret.color = new CPrstColor();
+            }
+            ret.color.id = asc_color.value;
+
+            if (ret.Mods.Mods.length != 0)
+                ret.Mods.Mods.splice(0, ret.Mods.Mods.length);
+            break;
+        }
+        case c_oAscColor.COLOR_TYPE_SCHEME:
+        {
+            if (ret.color == null || ret.color.type != c_oAscColor.COLOR_TYPE_SCHEME)
+            {
+                ret.color = new CSchemeColor();
+            }
+
+            // тут выставляется ТОЛЬКО из меню. поэтому:
+            var _index = parseInt(asc_color.value);
+            if(isNaN(_index))
+                break;
+            var _id = (_index / 6) >> 0;
+            var _pos = _index - _id * 6;
+
+            var array_colors_types = [6, 15, 7, 16, 0, 1, 2, 3, 4, 5];
+            ret.color.id = array_colors_types[_id];
+            if(!ret.Mods)
+            {
+                ret.setMods(new CColorModifiers());
+            }
+
+            if (ret.Mods.Mods.length != 0)
+                ret.Mods.Mods.splice(0, ret.Mods.Mods.length);
+
+            var __mods = null;
+
+            var _flag;
+            if (editor && editor.WordControl && editor.WordControl.m_oDrawingDocument && editor.WordControl.m_oDrawingDocument.GuiControlColorsMap)
+            {
+                var _map = editor.WordControl.m_oDrawingDocument.GuiControlColorsMap;
+                _flag = isRealNumber(flag) ? flag : 1;
+                __mods = GetDefaultMods(_map[_id].r, _map[_id].g, _map[_id].b, _pos, _flag);
+            }
+            else
+            {
+                var _editor = window["Asc"] && window["Asc"]["editor"];
+                if (_editor && _editor.wbModel)
+                {
+                    var _theme = _editor.wbModel.theme;
+                    var _clrMap = _editor.wbModel.clrSchemeMap;
+
+                    if (_theme && _clrMap)
+                    {
+                        var _schemeClr = new CSchemeColor();
+                        _schemeClr.id = array_colors_types[_id];
+
+                        var _rgba = {R:0, G:0, B:0, A:255};
+                        _schemeClr.Calculate(_theme, _clrMap.color_map, _rgba);
+                        _flag = isRealNumber(flag) ? flag : 0;
+                        __mods = GetDefaultMods(_schemeClr.RGBA.R, _schemeClr.RGBA.G, _schemeClr.RGBA.B, _pos, _flag);
+                    }
+                }
+            }
+
+            if (null != __mods)
+            {
+                for (var modInd = 0; modInd < __mods.length; modInd++)
+                    ret.Mods.Mods[modInd] = _create_mod(__mods[modInd]);
+            }
+
+            break;
+        }
+        default:
+        {
+            if (ret.color == null || ret.color.type != c_oAscColor.COLOR_TYPE_SRGB)
+            {
+                ret.color = new CRGBColor();
+            }
+            ret.color.RGBA.R = asc_color.r;
+            ret.color.RGBA.G = asc_color.g;
+            ret.color.RGBA.B = asc_color.b;
+            ret.color.RGBA.A = asc_color.a;
+
+            if (ret.Mods && ret.Mods.Mods.length != 0)
+                ret.Mods.Mods.splice(0, ret.Mods.Mods.length);
+        }
+    }
+    return ret;
+}

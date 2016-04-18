@@ -1,5 +1,9 @@
 "use strict";
 
+// Import
+var CColor = AscCommon.CColor;
+var CAscMathCategory = AscCommon.CAscMathCategory;
+
 var g_fontManager = new CFontManager();
 g_fontManager.Initialize(true);
 
@@ -2485,7 +2489,7 @@ function CDrawingDocument()
             this.m_oWordControl.m_oMainContent.HtmlElement.style.cursor = this.m_sLockedCursorType;
 
         if ( "undefined" === typeof(Data) || null === Data )
-            Data = new CMouseMoveData();
+            Data = new AscCommon.CMouseMoveData();
 
         editor.sync_MouseMoveCallback( Data );
     }
@@ -5845,7 +5849,7 @@ function CDrawingDocument()
         for (var i = 0; i < _count_defaults; ++i)
         {
             var _obj = g_oUserColorScheme[i];
-            infos[_index] = new CAscColorScheme();
+            infos[_index] = new AscCommon.CAscColorScheme();
             infos[_index].Name = _obj["name"];
 
             _c = _obj["dk1"];
@@ -5896,7 +5900,7 @@ function CDrawingDocument()
         {
             var _scheme = _extra[i].clrScheme;
 
-            infos[_index] = new CAscColorScheme();
+            infos[_index] = new AscCommon.CAscColorScheme();
             infos[_index].Name = _scheme.name;
 
             _scheme.colors[8].Calculate(_theme, null, null, null, _rgba);
@@ -6104,7 +6108,7 @@ function CDrawingDocument()
         {
             bIsChange = true;
 
-            this.GuiLastTextProps = new asc_CParagraphProperty();
+            this.GuiLastTextProps = new Asc.asc_CParagraphProperty();
 
             this.GuiLastTextProps.Subscript     = props.Subscript;
             this.GuiLastTextProps.Superscript   = props.Superscript;
@@ -6418,7 +6422,7 @@ function CDrawingDocument()
                 _table_styles.Set_Props({TableStyle : i, TableLook : tableLook, TableLayout : c_oAscTableLayout.Fixed});
 
                 for (var j = 0; j < Rows; j++)
-                    _table_styles.Content[j].Set_Height(H / Rows, heightrule_AtLeast);
+                    _table_styles.Content[j].Set_Height(H / Rows, Asc.linerule_AtLeast);
             }
             else
             {
@@ -6426,7 +6430,7 @@ function CDrawingDocument()
                 _table_styles.Recalc_CompiledPr2();
 
                 for (var j = 0; j < Rows; j++)
-                    _table_styles.Content[j].Set_Height(H / Rows, heightrule_AtLeast);
+                    _table_styles.Content[j].Set_Height(H / Rows, Asc.linerule_AtLeast);
             }
 
 
@@ -7202,7 +7206,7 @@ CStylesPainter.prototype =
       var style = styles[i];
       if (true == style.qFormat && null === DocumentStyles.Get_StyleIdByName(style.Name, false)) {
         this.drawStyle(graphics, style);
-        this.defaultStyles.push(new CStyleImage(style.Name, AscCommon.c_oAscStyleImage.Default, _canvas.toDataURL("image/png"), style.uiPriority));
+        this.defaultStyles.push(new AscCommon.CStyleImage(style.Name, AscCommon.c_oAscStyleImage.Default, _canvas.toDataURL("image/png"), style.uiPriority));
       }
     }
   },
@@ -7254,7 +7258,7 @@ CStylesPainter.prototype =
         _dr_style.Id = i;
 
         this.drawStyle(graphics, _dr_style);
-        this.docStyles[cur_index] = new CStyleImage(style.Name, AscCommon.c_oAscStyleImage.Document, _canvas.toDataURL("image/png"), style.uiPriority);
+        this.docStyles[cur_index] = new AscCommon.CStyleImage(style.Name, AscCommon.c_oAscStyleImage.Document, _canvas.toDataURL("image/png"), style.uiPriority);
 
         // алгоритм смены имени
         if (style.Default) {
@@ -7580,7 +7584,7 @@ function CMathPainter(_api)
                 _math.Data[_category1].Data[_category2].H = _sizes[_category1].h;
             }
 
-            var _menuType = new CAscMathType();
+            var _menuType = new AscCommon.CAscMathType();
             _menuType.Id = _types[t];
 
             var _paraMath = new ParaMath();
@@ -7652,7 +7656,7 @@ function CMathPainter(_api)
                 for (var i3 = 0; i3 < _len3; i3++)
                 {
                     var _typeJS = _catJS2["Data"][i3];
-                    var _type = new CAscMathType();
+                    var _type = new AscCommon.CAscMathType();
 
                     _type.Id = _typeJS["Id"];
                     _type.X = _typeJS["X"];

@@ -23,7 +23,9 @@
 
 // Import
 var align_Left = AscCommon.align_Left;
+var CMouseMoveData = AscCommon.CMouseMoveData;
 
+var linerule_AtLeast = Asc.linerule_AtLeast;
 var c_oAscError = Asc.c_oAscError;
 var c_oAscHAnchor = Asc.c_oAscHAnchor;
 var c_oAscXAlign = Asc.c_oAscXAlign;
@@ -1133,9 +1135,9 @@ CTable.prototype =
             {
                 if (tblwidth_Auto != TablePr.TableW.Type)
                 {
-                    this.Set_TableW(tblwidth_Auto, 0);
-                    bRecalc_All = true;
-                }
+                this.Set_TableW(tblwidth_Auto, 0);
+                bRecalc_All = true;
+            }
             }
             else if (Props.TableWidth > -0.001)
             {
@@ -1186,7 +1188,7 @@ CTable.prototype =
         // TableAlignment (прилегание таблицы)
         if ( "undefined" != typeof(Props.TableAlignment) && true === this.Is_Inline() )
         {
-            var NewJc = ( 0 === Props.TableAlignment ? AscCommon.align_Left : ( 1 === Props.TableAlignment ? AscCommon.align_Center : AscCommon.align_Right ) );
+            var NewJc = ( 0 === Props.TableAlignment ? align_Left : ( 1 === Props.TableAlignment ? AscCommon.align_Center : AscCommon.align_Right ) );
             if ( TablePr.Jc != NewJc )
             {
                 _Jc = NewJc;
@@ -1196,7 +1198,7 @@ CTable.prototype =
         }
 
         // TableIndent (отступ слева)
-        if ( "undefined" != typeof(Props.TableIndent) && true === this.Is_Inline() && AscCommon.align_Left === _Jc )
+        if ( "undefined" != typeof(Props.TableIndent) && true === this.Is_Inline() && align_Left === _Jc )
         {
             if ( Props.TableIndent != TablePr.TableInd )
             {
@@ -2818,10 +2820,10 @@ CTable.prototype =
                 }
 
                 var RowH = Row.Get_Height();
-                if (heightrule_Exact === RowH.HRule || (heightrule_AtLeast === RowH.HRule && MinContent[CurRow] < RowH.Value))
+                if (Asc.linerule_Exact === RowH.HRule || (linerule_AtLeast === RowH.HRule && MinContent[CurRow] < RowH.Value))
                     MinContent[CurRow] = RowH.Value;
 
-                if (heightrule_Exact === RowH.HRule || (heightrule_AtLeast === RowH.HRule && MaxContent[CurRow] < RowH.Value))
+                if (Asc.linerule_Exact === RowH.HRule || (linerule_AtLeast === RowH.HRule && MaxContent[CurRow] < RowH.Value))
                     MaxContent[CurRow] = RowH.Value;
             }
 
@@ -3198,7 +3200,7 @@ CTable.prototype =
             var Coords = this.DrawingDocument.ConvertCoordsToCursorWR(_X, _Y, this.Get_AbsolutePage(CurPage));
             MMData.X_abs            = Coords.X - 5;
             MMData.Y_abs            = Coords.Y - 5;
-            MMData.Type             = c_oAscMouseMoveDataTypes.LockedObject;
+            MMData.Type             = AscCommon.c_oAscMouseMoveDataTypes.LockedObject;
             MMData.UserId           = this.Lock.Get_UserId();
             MMData.HaveChanges      = this.Lock.Have_Changes();
             MMData.LockedObjectType = c_oAscMouseMoveLockedObjectType.Common;
@@ -6395,7 +6397,7 @@ CTable.prototype =
                                 this.Internal_UpdateFlowPosition(Page.X, Page.Y);
 
                                 //var NewH = this.Markup.Rows[0].H + Dy;
-                                //this.Content[0].Set_Height( NewH, heightrule_AtLeast );
+                                //this.Content[0].Set_Height( NewH, Asc.linerule_AtLeast );
                             }
                         }
                         else
@@ -6409,7 +6411,7 @@ CTable.prototype =
                                 var _Y_old = this.Markup.Rows[this.Selection.Data2.Index - 1].Y + this.Markup.Rows[this.Selection.Data2.Index - 1].H;
                                 var Dy     = _Y - _Y_old;
                                 var NewH   = this.Markup.Rows[this.Selection.Data2.Index - 1].H + Dy;
-                                this.Content[RowIndex - 1].Set_Height(NewH, heightrule_AtLeast);
+                                this.Content[RowIndex - 1].Set_Height(NewH, linerule_AtLeast);
                             }
                         }
                     }
@@ -9927,7 +9929,7 @@ CTable.prototype =
             if ( Rows > VMerge_count )
             {
                 // Сообщение об ошибке : "Value Rows must be between 1 and " + VMerge_count
-                var ErrData = new CErrorData();
+                var ErrData = new AscCommon.CErrorData();
                 ErrData.put_Value( VMerge_count );
                 editor.asc_fireCallback("asc_onError",c_oAscError.ID.SplitCellMaxRows,c_oAscError.Level.NoCritical, ErrData );
                 return false;
@@ -9935,7 +9937,7 @@ CTable.prototype =
             else if ( 0 != VMerge_count % Rows )
             {
                 // Сообщение об ошибке : "Value must be a divisor of the number " + VMerge_count
-                var ErrData = new CErrorData();
+                var ErrData = new AscCommon.CErrorData();
                 ErrData.put_Value( VMerge_count );
                 editor.asc_fireCallback("asc_onError",c_oAscError.ID.SplitCellRowsDivider,c_oAscError.Level.NoCritical, ErrData );
                 return false;
@@ -9961,7 +9963,7 @@ CTable.prototype =
                 var MaxCols = Math.floor( Span_width / MinW );
 
                 // Сообщение об ошибке : "Value Cols must be a between 1 and " + MaxCols
-                var ErrData = new CErrorData();
+                var ErrData = new AscCommon.CErrorData();
                 ErrData.put_Value( MaxCols );
                 editor.asc_fireCallback("asc_onError",c_oAscError.ID.SplitCellMaxCols,c_oAscError.Level.NoCritical, ErrData );
                 return false;
@@ -11183,7 +11185,7 @@ CTable.prototype =
                     Page.Y -= Dy;
                     this.Internal_UpdateFlowPosition(Page.X, Page.Y);
                     var NewH = NewMarkup.Rows[0].H;
-                    this.Content[0].Set_Height( NewH, heightrule_AtLeast );
+                    this.Content[0].Set_Height( NewH, linerule_AtLeast );
                 }
             }
             else
@@ -11195,7 +11197,7 @@ CTable.prototype =
                 else
                 {
                     var NewH = NewMarkup.Rows[Index - 1].H;
-                    this.Content[RowIndex - 1].Set_Height( NewH, heightrule_AtLeast );
+                    this.Content[RowIndex - 1].Set_Height( NewH, linerule_AtLeast );
                 }
             }
         }
@@ -11515,8 +11517,8 @@ CTable.prototype =
 
             var OldHeight = this.Content[RowIndex].Get_Height();
 
-            if ( undefined === OldHeight || heightrule_Auto == OldHeight.HRule || ( MinHeight > OldHeight.Value ) )
-                this.Content[RowIndex].Set_Height( MinHeight, heightrule_AtLeast );
+            if ( undefined === OldHeight || Asc.linerule_Auto == OldHeight.HRule || ( MinHeight > OldHeight.Value ) )
+                this.Content[RowIndex].Set_Height( MinHeight, linerule_AtLeast );
         }
 
         if ( Rows_to_Delete.length <= 0 )
@@ -11528,7 +11530,7 @@ CTable.prototype =
             for ( var Index = 0; Index < Rows_to_CalcH.length; Index++ )
             {
                 var RowIndex = Rows_to_CalcH[Index];
-                this.Content[RowIndex].Set_Height( this.RowsInfo[RowIndex].H, heightrule_AtLeast );
+                this.Content[RowIndex].Set_Height( this.RowsInfo[RowIndex].H, linerule_AtLeast );
             }
 
             // Рассчитаем высоты строк, так чтобы после удаления, общий вид таблицы не менялся
@@ -11544,7 +11546,7 @@ CTable.prototype =
                 {
                     var StartPage = this.RowsInfo[StartRow - 1 + CurRowSpan].StartPage;
                     var Summary_Height = this.RowsInfo[StartRow - 1 + CurRowSpan].H[StartPage] + this.RowsInfo[StartRow - 1 + CurRowSpan].Y[StartPage] - this.RowsInfo[StartRow - 1].Y[StartPage];
-                    this.Content[StartRow - 1].Set_Height( Summary_Height, heightrule_AtLeast );
+                    this.Content[StartRow - 1].Set_Height( Summary_Height, linerule_AtLeast );
                 }
 
                 Counter += CurRowSpan;

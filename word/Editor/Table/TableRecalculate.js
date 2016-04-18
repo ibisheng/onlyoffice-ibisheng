@@ -1960,7 +1960,7 @@ CTable.prototype.private_RecalculatePage = function(CurPage)
             var CellHeight = HeaderPage.RowsInfo[CurRow].TableRowsBottom - Y;
 
             // TODO: улучшить проверку на высоту строки (для строк разбитых на страницы)
-            if (false === bHeaderNextPage && heightrule_AtLeast === RowH.HRule && CellHeight < RowH.Value - MaxTopBorder[CurRow])
+            if (false === bHeaderNextPage && Asc.linerule_AtLeast === RowH.HRule && CellHeight < RowH.Value - MaxTopBorder[CurRow])
             {
                 CellHeight = RowH.Value - MaxTopBorder[CurRow];
                 HeaderPage.RowsInfo[CurRow].TableRowsBottom = Y + CellHeight;
@@ -2369,7 +2369,7 @@ CTable.prototype.private_RecalculatePage = function(CurPage)
         if (null === CellSpacing)
             RowHValue -= this.MaxTopBorder[CurRow];
 
-        if ((heightrule_AtLeast === RowH.HRule || heightrule_Exact == RowH.HRule) && Y + RowHValue > Y_content_end && ((0 === CurRow && 0 === CurPage && (null !== this.Get_DocumentPrev() || true === this.Parent.Is_TableCellContent())) || CurRow != FirstRow))
+        if ((Asc.linerule_AtLeast === RowH.HRule || Asc.linerule_Exact == RowH.HRule) && Y + RowHValue > Y_content_end && ((0 === CurRow && 0 === CurPage && (null !== this.Get_DocumentPrev() || true === this.Parent.Is_TableCellContent())) || CurRow != FirstRow))
         {
             bNextPage = true;
 
@@ -2599,7 +2599,7 @@ CTable.prototype.private_RecalculatePage = function(CurPage)
         var CellHeight = this.TableRowsBottom[CurRow][CurPage] - Y;
 
         // TODO: улучшить проверку на высоту строки (для строк разбитых на страницы)
-        if ( false === bNextPage && heightrule_AtLeast === RowH.HRule && CellHeight < RowHValue )
+        if ( false === bNextPage && Asc.linerule_AtLeast === RowH.HRule && CellHeight < RowHValue )
         {
             CellHeight = RowHValue;
             this.TableRowsBottom[CurRow][CurPage] = Y + CellHeight;

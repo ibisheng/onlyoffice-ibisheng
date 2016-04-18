@@ -1,5 +1,7 @@
 "use strict";
 
+// Import
+var c_oAscFill = Asc.c_oAscFill;
 
 
 function OverlayObject(geometry, extX, extY, brush, pen, transform )
@@ -12,8 +14,8 @@ function OverlayObject(geometry, extX, extY, brush, pen, transform )
     this.extY = extY;
 
     var _brush, _pen;
-    if((!brush || !brush.fill || brush.fill.type === FILL_TYPE_NOFILL) &&
-        (!pen || !pen.Fill || !pen.Fill || !pen.Fill.fill || pen.Fill.fill.type === FILL_TYPE_NOFILL || pen.w === 0))
+    if((!brush || !brush.fill || brush.fill.type === c_oAscFill.FILL_TYPE_NOFILL) &&
+        (!pen || !pen.Fill || !pen.Fill || !pen.Fill.fill || pen.Fill.fill.type === c_oAscFill.FILL_TYPE_NOFILL || pen.w === 0))
     {
         var penBrush = CreatePenBrushForChartTrack();
         _brush = penBrush.brush;
@@ -123,9 +125,9 @@ function OverlayObject(geometry, extX, extY, brush, pen, transform )
     {
         return this.geometry &&
             ( (this.pen && this.pen.Fill && this.pen.Fill.fill
-                && this.pen.Fill.fill.type != FILL_TYPE_NOFILL && this.pen.Fill.fill.type != FILL_TYPE_NONE)
+                && this.pen.Fill.fill.type != c_oAscFill.FILL_TYPE_NOFILL && this.pen.Fill.fill.type != c_oAscFill.FILL_TYPE_NONE)
                 || (this.brush && this.brush.fill && this.brush.fill
-                && this.brush.fill.type != FILL_TYPE_NOFILL && this.brush.fill.type != FILL_TYPE_NONE) )
+                && this.brush.fill.type != c_oAscFill.FILL_TYPE_NOFILL && this.brush.fill.type != c_oAscFill.FILL_TYPE_NONE) )
     }
 
 

@@ -24,6 +24,7 @@
     var c_oAscFormatPainterState = AscCommon.c_oAscFormatPainterState;
     var c_oAscPrintDefaultSettings = AscCommon.c_oAscPrintDefaultSettings;
     var AscBrowser = AscCommon.AscBrowser;
+    var CColor = AscCommon.CColor;
 
     var asc = window["Asc"];
     var asc_applyFunction = asc.applyFunction;
@@ -7316,7 +7317,7 @@
         cell_info.font.strikeout = c.getStrikeout();
         cell_info.font.subscript = fa === "subscript";
         cell_info.font.superscript = fa === "superscript";
-        cell_info.font.color = (fc ? asc_obj2Color( fc ) : new asc_CColor( c_opt.defaultState.color ));
+        cell_info.font.color = (fc ? asc_obj2Color( fc ) : new Asc.asc_CColor( c_opt.defaultState.color ));
 
         cell_info.fill = new asc_CFill( (null != bg) ? asc_obj2Color( bg ) : bg );
 
@@ -7456,7 +7457,7 @@
             objectInfo.font.subscript = textPr.VertAlign == AscCommon.vertalign_SubScript;
             objectInfo.font.superscript = textPr.VertAlign == AscCommon.vertalign_SuperScript;
             if ( textPr.Color ) {
-                objectInfo.font.color = CreateAscColorCustom( textPr.Color.r, textPr.Color.g, textPr.Color.b );
+                objectInfo.font.color = AscCommon.CreateAscColorCustom( textPr.Color.r, textPr.Color.g, textPr.Color.b );
             }
 
             var shapeHyperlink = this.objectRender.controller.getHyperlinkInfo();
@@ -7538,7 +7539,7 @@
             height >>= 1;
         }
 
-        return new asc_CRect( xL, yL, width, height );
+        return new AscCommon.asc_CRect( xL, yL, width, height );
     };
 
     WorksheetView.prototype._checkSelectionShape = function () {
@@ -8874,7 +8875,7 @@
                         border.setStyle( b.style );
                     }
                     if ( b.color !== null && b.color !== undefined ) {
-                        if ( b.color instanceof asc_CColor ) {
+                        if ( b.color instanceof Asc.asc_CColor ) {
                             border.c = CorrectAscColor( b.color );
                         }
                     }

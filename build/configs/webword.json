@@ -8,8 +8,8 @@
 				"../common/downloaderfiles.js",
                 "../common/docscoapicommon.js",
                 "../common/docscoapi.js",
-				
                 "../common/apiCommon.js",
+				
 				"../word/apiDefines.js",
                 "../common/spellcheckapi.js",
                 "../common/wordcopypaste.js",

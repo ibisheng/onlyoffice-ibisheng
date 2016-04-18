@@ -18,7 +18,7 @@
 	 * -----------------------------------------------------------------------------
 	 */
 	var asc = window["Asc"];
-
+	
 	var AscBrowser = AscCommon.AscBrowser;
 	
 	var cElementType = AscCommonExcel.cElementType;
@@ -149,7 +149,7 @@
 		this.reFormula = new XRegExp( "^([\\p{L}][\\p{L}0-9_]*)", "i" );
 
 		this.defaults = {
-			padding: -1, selectColor: new CColor( 190, 190, 255, 0.5 ),
+			padding: -1, selectColor: new AscCommon.CColor( 190, 190, 255, 0.5 ),
 
 			canvasZIndex: 500, blinkInterval: 500, cursorShape: "text"
 		};
@@ -2155,7 +2155,7 @@
 		result.strikeout = tmp.s;
 		result.subscript = tmp.va === "subscript";
 		result.superscript = tmp.va === "superscript";
-		result.color = (tmp.c ? asc.colorObjToAscColor( tmp.c ) : new asc_CColor( this.options.textColor ));
+		result.color = (tmp.c ? asc.colorObjToAscColor( tmp.c ) : new Asc.asc_CColor( this.options.textColor ));
 
 		this.handlers.trigger( "updateEditorSelectionInfo", result );
 	};

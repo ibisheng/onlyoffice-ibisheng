@@ -8,8 +8,8 @@
 				"../common/downloaderfiles.js",
                 "../common/docscoapicommon.js",
                 "../common/docscoapi.js",
-				
                 "../common/apiCommon.js",
+				
 				"../cell/apiDefines.js",
                 "../common/editorscommon.js",
                 "../common/NumFormat.js",

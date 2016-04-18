@@ -99,12 +99,6 @@ var c_oAscTableLayout = {
   Fixed: 0x01
 };
 
-var c_oAscMouseMoveDataTypes = {
-  Common: 0,
-  Hyperlink: 1,
-  LockedObject: 2
-};
-
 var c_oAscSlideTransitionTypes = {
   None: 0,
   Fade: 1,

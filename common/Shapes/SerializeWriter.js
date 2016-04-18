@@ -2,6 +2,7 @@
 
 // Import
 var c_oAscColor = Asc.c_oAscColor;
+var c_oAscFill = Asc.c_oAscFill;
 
 var c_oMainTables = {
     Main			: 255,
@@ -2184,15 +2185,15 @@ function CBinaryFileWriter()
 
         switch (fill.type)
         {
-            case FILL_TYPE_NOFILL:
+            case c_oAscFill.FILL_TYPE_NOFILL:
             {
-                oThis.StartRecord(FILL_TYPE_NOFILL);
+                oThis.StartRecord(c_oAscFill.FILL_TYPE_NOFILL);
                 oThis.EndRecord();
                 break;
             }
-            case FILL_TYPE_GRAD:
+            case c_oAscFill.FILL_TYPE_GRAD:
             {
-                oThis.StartRecord(FILL_TYPE_GRAD);
+                oThis.StartRecord(c_oAscFill.FILL_TYPE_GRAD);
 
                 oThis.WriteUChar(g_nodeAttributeStart);
                 oThis.WriteUChar(g_nodeAttributeEnd);
@@ -2240,9 +2241,9 @@ function CBinaryFileWriter()
                 oThis.EndRecord();
                 break;
             }
-            case FILL_TYPE_PATT:
+            case c_oAscFill.FILL_TYPE_PATT:
             {
-                oThis.StartRecord(FILL_TYPE_PATT);
+                oThis.StartRecord(c_oAscFill.FILL_TYPE_PATT);
 
                 oThis.WriteUChar(g_nodeAttributeStart);
                 oThis._WriteLimit2(0, fill.ftype);
@@ -2257,9 +2258,9 @@ function CBinaryFileWriter()
                 oThis.EndRecord();
                 break;
             }
-            case FILL_TYPE_BLIP:
+            case c_oAscFill.FILL_TYPE_BLIP:
             {
-                oThis.StartRecord(FILL_TYPE_BLIP);
+                oThis.StartRecord(c_oAscFill.FILL_TYPE_BLIP);
 
                 oThis.WriteUChar(g_nodeAttributeStart);
                 oThis.WriteUChar(g_nodeAttributeEnd);
@@ -2395,9 +2396,9 @@ function CBinaryFileWriter()
                 oThis.EndRecord();
                 break;
             }
-            case FILL_TYPE_SOLID:
+            case c_oAscFill.FILL_TYPE_SOLID:
             {
-                oThis.StartRecord(FILL_TYPE_SOLID);
+                oThis.StartRecord(c_oAscFill.FILL_TYPE_SOLID);
 
                 oThis.CorrectUniColorAlpha(fill.color, trans);
                 oThis.WriteRecord1(0, fill.color, oThis.WriteUniColor);
@@ -3832,7 +3833,7 @@ function CBinaryFileWriter()
 
             oThis.WriteRecord2(0, _part.TextPr.FontRef, oThis.WriteFontRef);
 
-            if (bIsFill && _part.TextPr.Unifill.fill !== undefined && _part.TextPr.Unifill.fill != null && _part.TextPr.Unifill.fill.type == FILL_TYPE_SOLID)
+            if (bIsFill && _part.TextPr.Unifill.fill !== undefined && _part.TextPr.Unifill.fill != null && _part.TextPr.Unifill.fill.type == c_oAscFill.FILL_TYPE_SOLID)
                 oThis.WriteRecord2(1, _part.TextPr.Unifill.fill.color, oThis.WriteUniColor);
 
             oThis.EndRecord();
@@ -3896,7 +3897,7 @@ function CBinaryFileWriter()
 
             oThis.WriteRecord2(0, _part.TextPr.FontRef, oThis.WriteFontRef);
 
-            if (bIsFill && _part.TextPr.Unifill.fill !== undefined && _part.TextPr.Unifill.fill != null && _part.TextPr.Unifill.fill.type == FILL_TYPE_SOLID)
+            if (bIsFill && _part.TextPr.Unifill.fill !== undefined && _part.TextPr.Unifill.fill != null && _part.TextPr.Unifill.fill.type == c_oAscFill.FILL_TYPE_SOLID)
                 oThis.WriteRecord2(1, _part.TextPr.Unifill.fill.color, oThis.WriteUniColor);
 
             oThis.EndRecord();

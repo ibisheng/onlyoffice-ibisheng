@@ -647,22 +647,6 @@ function CPoint2() {
     this.fRight = 0;
     this.fBottom = 0;
 }
-function CPosition( obj ) {
-    if (obj)
-    {
-        this.X = (undefined == obj.X) ? null : obj.X;
-        this.Y = (undefined == obj.Y) ? null : obj.Y;
-    }
-    else
-    {
-        this.X = null;
-        this.Y = null;
-    }
-}
-CPosition.prototype.get_X = function() { return this.X; };
-CPosition.prototype.put_X = function(v) { this.X = v; };
-CPosition.prototype.get_Y = function() { return this.Y; };
-CPosition.prototype.put_Y = function(v) { this.Y = v; };
 function CFontManager() {
     this.m_oLibrary = {};
     this.Initialize = function(){};
@@ -781,7 +765,7 @@ var FT_Common = new _FT_Common();
 var global_memory_stream_menu = CreateNativeMemoryStream();
 
 function asc_menu_ReadColor(_params, _cursor) {
-    var _color = new asc_CColor();
+    var _color = new Asc.asc_CColor();
     var _continue = true;
     while (_continue)
     {
@@ -960,7 +944,7 @@ function asc_menu_WriteFontFamily(_type, _family, _stream) {
     _stream["WriteByte"](255);
 }
 function asc_menu_ReadAscFill_solid(_params, _cursor){
-    var _fill = new asc_CFillSolid();
+    var _fill = new Asc.asc_CFillSolid();
 
     var _continue = true;
     while (_continue)
@@ -995,7 +979,7 @@ function asc_menu_WriteAscFill_solid(_type, _fill, _stream){
     _stream["WriteByte"](255);
 }
 function asc_menu_ReadAscFill_patt(_params, _cursor){
-    var _fill = new asc_CFillHatch();
+    var _fill = new Asc.asc_CFillHatch();
 
     var _continue = true;
     while (_continue)
@@ -1047,7 +1031,7 @@ function asc_menu_WriteAscFill_patt(_type, _fill, _stream){
     _stream["WriteByte"](255);
 }
 function asc_menu_ReadAscFill_grad(_params, _cursor){
-    var _fill = new asc_CFillGrad();
+    var _fill = new Asc.asc_CFillGrad();
 
     var _continue = true;
     while (_continue)
@@ -1183,7 +1167,7 @@ function asc_menu_WriteAscFill_grad(_type, _fill, _stream){
     _stream["WriteByte"](255);
 }
 function asc_menu_ReadAscFill_blip(_params, _cursor){
-    var _fill = new asc_CFillBlip();
+    var _fill = new Asc.asc_CFillBlip();
 
     var _continue = true;
     while (_continue)
@@ -1244,7 +1228,7 @@ function asc_menu_WriteAscFill_blip(_type, _fill, _stream){
     _stream["WriteByte"](255);
 }
 function asc_menu_ReadAscFill(_params, _cursor){
-    var _fill = new asc_CShapeFill();
+    var _fill = new Asc.asc_CShapeFill();
 
     //_fill.type = c_oAscFill.FILL_TYPE_NOFILL;
     var _continue = true;
@@ -1354,7 +1338,7 @@ function asc_menu_WriteAscFill(_type, _fill, _stream){
     _stream["WriteByte"](255);
 }
 function asc_menu_ReadAscStroke(_params, _cursor){
-    var _stroke = new asc_CStroke();
+    var _stroke = new Asc.asc_CStroke();
 
     var _continue = true;
     while (_continue)
@@ -1483,7 +1467,7 @@ function asc_menu_WriteAscStroke(_type, _stroke, _stream){
 
 }
 function asc_menu_ReadPaddings(_params, _cursor){
-    var _paddings = new asc_CPaddings();
+    var _paddings = new Asc.asc_CPaddings();
     var _continue = true;
     while (_continue)
     {
@@ -1664,7 +1648,7 @@ function asc_menu_WriteImagePosition(_type, _position, _stream){
     _stream["WriteByte"](255);
 }
 function asc_menu_ReadAscValAxisSettings(_params, _cursor){
-    var _settings = new asc_ValAxisSettings();
+    var _settings = new AscCommon.asc_ValAxisSettings();
 
     var _continue = true;
     while (_continue)
@@ -1853,7 +1837,7 @@ function asc_menu_WriteAscValAxisSettings(_type, _settings, _stream){
     _stream["WriteByte"](255);
 }
 function asc_menu_ReadChartPr(_params, _cursor){
-    var _settings = new asc_ChartSettings();
+    var _settings = new AscCommon.asc_ChartSettings();
 
     var _continue = true;
     while (_continue)
@@ -2109,7 +2093,7 @@ function asc_menu_WriteChartPr(_type, _chartPr, _stream){
     _stream["WriteByte"](255);
 }
 function asc_menu_ReadShapePr(_params, _cursor){
-    var _settings = new asc_CShapeProperty();
+    var _settings = new Asc.asc_CShapeProperty();
 
     var _continue = true;
     while (_continue)
@@ -4043,7 +4027,7 @@ function OfflineEditor () {
             //	this._drawFormatPainterRange();
             //}
             //if (null !== this.activeMoveRange) {
-            //	ctx.setStrokeStyle(new CColor(0, 0, 0))
+            //	ctx.setStrokeStyle(new AscCommon.CColor(0, 0, 0))
             //		.setLineWidth(1)
             //		.beginPath();
             //	var aActiveMoveRangeIntersection = this.activeMoveRange.intersection(tmpRange !== undefined ? tmpRange : this.visibleRange);
@@ -5064,11 +5048,11 @@ function OfflineEditor () {
         // settings.putHorGridLines(c_oAscGridLinesSettings.major);
         // settings.putVertGridLines(c_oAscGridLinesSettings.none);
 
-        var vert_axis_settings = new asc_ValAxisSettings();
+        var vert_axis_settings = new AscCommon.asc_ValAxisSettings();
         settings.putVertAxisProps(vert_axis_settings);
         vert_axis_settings.setDefault();
 
-        var hor_axis_settings = new asc_CatAxisSettings();
+        var hor_axis_settings = new AscCommon.asc_CatAxisSettings();
         settings.putHorAxisProps(hor_axis_settings);
         hor_axis_settings.setDefault();
 
@@ -5183,7 +5167,7 @@ function OfflineEditor () {
 
             // Draw text
             var fc = oStyle.getFontColor();
-            var oFontColor = fc !== null ? fc : new CColor(0, 0, 0);
+            var oFontColor = fc !== null ? fc : new AscCommon.CColor(0, 0, 0);
             var format = oStyle.getFont();
             // Для размера шрифта делаем ограничение для превью в 16pt (у Excel 18pt, но и высота превью больше 22px)
             var oFont = new asc.FontProperties(format.fn, (16 < format.fs) ? 16 : format.fs, format.b, format.i, format.u, format.s);
@@ -5299,8 +5283,8 @@ function OfflineEditor () {
 
             var stepY = (ySize)/5;
             var stepX = (styleThumbnailWidth * pxToMM)/5;   //(60 * pxToMM)/5;
-            var whiteColor = new CColor(255, 255, 255);
-            var blackColor = new CColor(0, 0, 0);
+            var whiteColor = new AscCommon.CColor(255, 255, 255);
+            var blackColor = new AscCommon.CColor(0, 0, 0);
 
             //**draw background**
             var defaultColorBackground;
@@ -6696,7 +6680,7 @@ function offline_apply_event(type,params) {
             if (ws && ws.objectRender && ws.objectRender.controller) {
                 var selectedImageProp =  ws.objectRender.controller.getGraphicObjectProps();
 
-                var _imagePr =  new asc_CImgProperty();
+                var _imagePr =  new Asc.asc_CImgProperty();
                 while (_continue)
                 {
                     _attr = params[_current.pos++];

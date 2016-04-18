@@ -73,7 +73,7 @@ function GenerateTableStyles(drawingDoc, logicDoc, tableLook)
         table.Set_Props({TableStyle : i});
 
         for (var j = 0; j < Rows; j++)
-            table.Content[j].Set_Height(H / Rows, heightrule_AtLeast);
+            table.Content[j].Set_Height(H / Rows, Asc.linerule_AtLeast);
 
         ctx.fillStyle = "#FFFFFF";
         ctx.fillRect(0, 0, _canvas.width, _canvas.height);

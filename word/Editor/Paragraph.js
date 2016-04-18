@@ -24,7 +24,7 @@ var type_Paragraph = 0x0001;
 
 var UnknownValue  = null;
 
-var REVIEW_COLOR = new CColor(255, 0, 0, 255);
+var REVIEW_COLOR = new AscCommon.CColor(255, 0, 0, 255);
 
 // Класс Paragraph
 function Paragraph(DrawingDocument, Parent, PageNum, X, Y, XLimit, YLimit, bFromPresentation)
@@ -9133,7 +9133,7 @@ Paragraph.prototype =
     {
         CurPage = Math.max(0, Math.min(CurPage, this.Pages.length - 1));
         var text_transform = this.Get_ParentTextTransform();
-        var MMData = new CMouseMoveData();
+        var MMData = new AscCommon.CMouseMoveData();
         var Coords = this.DrawingDocument.ConvertCoordsToCursorWR( X, Y, this.Get_AbsolutePage(CurPage), text_transform );
         MMData.X_abs = Coords.X;
         MMData.Y_abs = Coords.Y;
@@ -9142,11 +9142,11 @@ Paragraph.prototype =
 
         if (null != Hyperlink && (Y <= this.Pages[CurPage].Bounds.Bottom && Y >= this.Pages[CurPage].Bounds.Top))
         {
-            MMData.Type      = c_oAscMouseMoveDataTypes.Hyperlink;
+            MMData.Type      = AscCommon.c_oAscMouseMoveDataTypes.Hyperlink;
             MMData.Hyperlink = new CHyperlinkProperty( Hyperlink );
         }
         else
-            MMData.Type      = c_oAscMouseMoveDataTypes.Common;
+            MMData.Type      = AscCommon.c_oAscMouseMoveDataTypes.Common;
 
         if ( null != Hyperlink && true === global_keyboardEvent.CtrlKey )
             this.DrawingDocument.SetCursorType( "pointer", MMData );
@@ -9159,11 +9159,11 @@ Paragraph.prototype =
             var _X = this.Pages[CurPage].X;
             var _Y = this.Pages[CurPage].Y;
 
-            var MMData = new CMouseMoveData();
+            var MMData = new AscCommon.CMouseMoveData();
             var Coords = this.DrawingDocument.ConvertCoordsToCursorWR( _X, _Y, this.Get_AbsolutePage(CurPage), text_transform );
             MMData.X_abs            = Coords.X - 5;
             MMData.Y_abs            = Coords.Y;
-            MMData.Type             = c_oAscMouseMoveDataTypes.LockedObject;
+            MMData.Type             = AscCommon.c_oAscMouseMoveDataTypes.LockedObject;
             MMData.UserId           = this.Lock.Get_UserId();
             MMData.HaveChanges      = this.Lock.Have_Changes();
             MMData.LockedObjectType = c_oAscMouseMoveLockedObjectType.Common;
@@ -9484,7 +9484,7 @@ Paragraph.prototype =
 
         var FrameParas = this.Internal_Get_FrameParagraphs();
 
-        // Тут FramePr- объект класса из api.js CParagraphFrame
+        // Тут FramePr- объект класса из api.js asc_CParagraphFrame
         if ( true === FramePr.FromDropCapMenu && 1 === FrameParas.length )
         {
             // Здесь мы смотрим только на количество строк, шрифт, тип и горизонтальный отступ от текста
@@ -9493,7 +9493,7 @@ Paragraph.prototype =
             if ( undefined != FramePr.DropCap )
             {
                 var OldLines = NewFramePr.Lines;
-                NewFramePr.Init_Default_DropCap( FramePr.DropCap === c_oAscDropCap.Drop ? true : false );
+                NewFramePr.Init_Default_DropCap( FramePr.DropCap === Asc.c_oAscDropCap.Drop ? true : false );
                 NewFramePr.Lines = OldLines;
             }
 
@@ -9674,7 +9674,7 @@ Paragraph.prototype =
         if ( undefined != BottomBorder && border_None != BottomBorder.Value )
             _Y1 += BottomBorder.Size + BottomBorder.Space;
 
-        if ( _Y1 > Y1 && ( heightrule_Auto === FramePr.HRule || ( heightrule_AtLeast === FramePr.HRule && FrameH >= FramePr.H ) ) )
+        if ( _Y1 > Y1 && ( Asc.linerule_Auto === FramePr.HRule || ( Asc.linerule_AtLeast === FramePr.HRule && FrameH >= FramePr.H ) ) )
             Y1 = _Y1;
 
         return { X : X0, Y : Y0, W : X1 - X0, H : Y1 - Y0 };
@@ -9798,7 +9798,7 @@ Paragraph.prototype =
 
             if ( Math.abs( H - this.CalculatedFrame.H ) > 0.001 )
             {
-                if ( undefined != FramePr.DropCap && dropcap_None != FramePr.DropCap && 1 === FrameParas.length )
+                if ( undefined != FramePr.DropCap && Asc.c_oAscDropCap.None != FramePr.DropCap && 1 === FrameParas.length )
                 {
                     var PageH = this.LogicDocument.Get_PageLimits( PageIndex).YLimit;
                     var _H = Math.min( H, PageH );
@@ -9832,7 +9832,7 @@ Paragraph.prototype =
 
     Supplement_FramePr : function(FramePr)
     {
-        if ( undefined != FramePr.DropCap && dropcap_None != FramePr.DropCap )
+        if ( undefined != FramePr.DropCap && Asc.c_oAscDropCap.None != FramePr.DropCap )
         {
             var _FramePr = this.Get_FramePr();
             var FirstFramePara = this;

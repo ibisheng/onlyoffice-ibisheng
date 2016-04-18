@@ -2100,18 +2100,18 @@ function DrawingObjects() {
                 }
                 else {
                     if ( api.isImageChangeUrl ) {
-                        var imageProp = new asc_CImgProperty();
+                        var imageProp = new Asc.asc_CImgProperty();
                         imageProp.ImageUrl = _image.src;
                         _this.setGraphicObjectProps(imageProp);
                         api.isImageChangeUrl = false;
                     }
                     else if ( api.isShapeImageChangeUrl ) {
-                        var imgProps = new asc_CImgProperty();
-                        var shapeProp = new asc_CShapeProperty();
+                        var imgProps = new Asc.asc_CImgProperty();
+                        var shapeProp = new Asc.asc_CShapeProperty();
                         imgProps.ShapeProperties = shapeProp;
-                        shapeProp.fill = new asc_CShapeFill();
+                        shapeProp.fill = new Asc.asc_CShapeFill();
                         shapeProp.fill.type = Asc.c_oAscFill.FILL_TYPE_BLIP;
-                        shapeProp.fill.fill = new asc_CFillBlip();
+                        shapeProp.fill.fill = new Asc.asc_CFillBlip();
                         shapeProp.fill.fill.asc_putUrl(_image.src);
                         _this.setGraphicObjectProps(imgProps);
                         api.isShapeImageChangeUrl = false;
@@ -2119,14 +2119,14 @@ function DrawingObjects() {
                     else if(api.isTextArtChangeUrl)
                     {
 
-                        var imgProps = new asc_CImgProperty();
-                        var AscShapeProp = new asc_CShapeProperty();
+                        var imgProps = new Asc.asc_CImgProperty();
+                        var AscShapeProp = new Asc.asc_CShapeProperty();
                         imgProps.ShapeProperties = AscShapeProp;
-                        var oFill = new asc_CShapeFill();
+                        var oFill = new Asc.asc_CShapeFill();
                         oFill.type = Asc.c_oAscFill.FILL_TYPE_BLIP;
-                        oFill.fill = new asc_CFillBlip();
+                        oFill.fill = new Asc.asc_CFillBlip();
                         oFill.fill.asc_putUrl(imageUrl);
-                        AscShapeProp.textArtProperties = new asc_TextArtProperties();
+                        AscShapeProp.textArtProperties = new Asc.asc_TextArtProperties();
                         AscShapeProp.textArtProperties.asc_putFill(oFill);
                         _this.setGraphicObjectProps(imgProps);
                         api.isTextArtChangeUrl = false;
@@ -2155,7 +2155,7 @@ function DrawingObjects() {
 
         worksheet.setSelectionShape(true);
 
-        if ( chart instanceof asc_ChartSettings )
+        if ( chart instanceof AscCommon.asc_ChartSettings )
         {
             if(api.isChartEditor)
             {
@@ -2903,7 +2903,7 @@ function DrawingObjects() {
             {
                 var editChart = function (drawingObject)
                 {
-					var options = new asc_ChartSettings();
+					var options = new AscCommon.asc_ChartSettings();
 					var catHeadersBBox, serHeadersBBox;
                     var final_bbox = oBBoxTo.clone();
                     if(chart.bbox.seriesBBox.bVert)
@@ -3268,10 +3268,10 @@ function DrawingObjects() {
                     _h = Math.max( pxToMm(_image.Image.height), 1 );
                 }
 
-                return new asc_CImageSize( _w, _h, bIsCorrect);
+                return new AscCommon.asc_CImageSize( _w, _h, bIsCorrect);
             }
         }
-        return new asc_CImageSize( 50, 50, false );
+        return new AscCommon.asc_CImageSize( 50, 50, false );
     };
 
     _this.sendGraphicObjectProps = function() {
@@ -3469,7 +3469,7 @@ function DrawingObjects() {
         settings = _this.controller.getChartProps();
         if ( !settings )
         {
-            settings = new asc_ChartSettings();
+            settings = new AscCommon.asc_ChartSettings();
             var selectedRange = worksheet.getSelectedRange();
             if (selectedRange)
             {
@@ -3501,11 +3501,11 @@ function DrawingObjects() {
             settings.putLine(true);
             settings.putShowMarker(false);
 
-            var vert_axis_settings = new asc_ValAxisSettings();
+            var vert_axis_settings = new AscCommon.asc_ValAxisSettings();
             settings.putVertAxisProps(vert_axis_settings);
             vert_axis_settings.setDefault();
 
-            var hor_axis_settings = new asc_CatAxisSettings();
+            var hor_axis_settings = new AscCommon.asc_CatAxisSettings();
             settings.putHorAxisProps(hor_axis_settings);
             hor_axis_settings.setDefault();
         }
@@ -3530,7 +3530,7 @@ function DrawingObjects() {
         var stroke_color, fill_color;
         if(drawing.bbox.serBBox)
         {
-            stroke_color = fill_color = new CColor(0, 128, 0);
+            stroke_color = fill_color = new AscCommon.CColor(0, 128, 0);
             worksheet._drawElements(worksheet, worksheet._drawSelectionElement,
                 asc.Range(drawing.bbox.serBBox.c1, drawing.bbox.serBBox.r1, drawing.bbox.serBBox.c2, drawing.bbox.serBBox.r2, true),
                 false, 1,
@@ -3538,7 +3538,7 @@ function DrawingObjects() {
         }
         if(drawing.bbox.catBBox)
         {
-            stroke_color = fill_color = new CColor(153, 0, 204);
+            stroke_color = fill_color = new AscCommon.CColor(153, 0, 204);
             worksheet._drawElements(worksheet, worksheet._drawSelectionElement,
                 asc.Range(drawing.bbox.catBBox.c1, drawing.bbox.catBBox.r1, drawing.bbox.catBBox.c2, drawing.bbox.catBBox.r2, true),
                 false, 1,

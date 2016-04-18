@@ -12458,7 +12458,7 @@ function getChartSeries (worksheet, options, catHeadersBBox, serHeadersBBox) {
 
 function checkSpPrRasterImages(spPr)
 {
-    if(spPr && spPr.Fill && spPr.Fill && spPr.Fill.fill && spPr.Fill.fill.type === FILL_TYPE_BLIP)
+    if(spPr && spPr.Fill && spPr.Fill && spPr.Fill.fill && spPr.Fill.fill.type === Asc.c_oAscFill.FILL_TYPE_BLIP)
     {
         var copyBlipFill = spPr.Fill.createDuplicate();
         copyBlipFill.fill.setRasterImageId(spPr.Fill.fill.RasterImageId);

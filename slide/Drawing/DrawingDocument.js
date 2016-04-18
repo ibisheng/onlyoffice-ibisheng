@@ -1,5 +1,8 @@
 "use strict";
 
+// Import
+var CColor = AscCommon.CColor;
+
 var g_fontManager = new CFontManager();
 g_fontManager.Initialize(true);
 
@@ -1276,7 +1279,7 @@ function CDrawingDocument()
         else
             this.m_oWordControl.m_oMainContent.HtmlElement.style.cursor = this.m_sLockedCursorType;
         if ( "undefined" === typeof(Data) || null === Data )
-            Data = new CMouseMoveData();
+            Data = new AscCommon.CMouseMoveData();
 
         editor.sync_MouseMoveCallback( Data );
     }
@@ -1518,7 +1521,7 @@ function CDrawingDocument()
         {
             bIsChange = true;
 
-            this.GuiLastTextProps = new asc_CParagraphProperty();
+            this.GuiLastTextProps = new Asc.asc_CParagraphProperty();
 
             this.GuiLastTextProps.Subscript     = props.Subscript;
             this.GuiLastTextProps.Superscript   = props.Superscript;
@@ -2910,7 +2913,7 @@ function CDrawingDocument()
         for (var i = 0; i < _count_defaults; ++i)
         {
             var _obj = g_oUserColorScheme[i];
-            infos[_index] = new CAscColorScheme();
+            infos[_index] = new AscCommon.CAscColorScheme();
             infos[_index].Name = _obj["name"];
 
             _c = _obj["dk1"];
@@ -2961,7 +2964,7 @@ function CDrawingDocument()
         {
             var _scheme = _extra[i].clrScheme;
 
-            infos[_index] = new CAscColorScheme();
+            infos[_index] = new AscCommon.CAscColorScheme();
             infos[_index].Name = _scheme.name;
 
             _scheme.colors[8].Calculate(_theme, null, null, null, _rgba);

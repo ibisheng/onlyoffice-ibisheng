@@ -1453,8 +1453,8 @@ CTableCell.prototype =
                 var Row  = this.Row;
                 var RowH = this.Row.Get_Height();
 
-                if (heightrule_Auto === RowH.HRule)
-                    Row.Set_Height(20, heightrule_AtLeast);
+                if (Asc.linerule_Auto === RowH.HRule)
+                    Row.Set_Height(20, Asc.linerule_AtLeast);
                 else if (RowH.Value < 20)
                     Row.Set_Height(20, RowH.HRule);
             }

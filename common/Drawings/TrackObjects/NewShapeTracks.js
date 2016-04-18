@@ -51,7 +51,7 @@ function NewShapeTrack(presetGeom, startX, startY, theme, master, layout, slide,
         var RGBA = style.fillRef.Color.RGBA;
         if (style.fillRef.Color.color)
         {
-            if (brush.fill && (brush.fill.type === FILL_TYPE_SOLID))
+            if (brush.fill && (brush.fill.type === Asc.c_oAscFill.FILL_TYPE_SOLID))
             {
                 brush.fill.color = style.fillRef.Color.createDuplicate();
             }

@@ -2298,7 +2298,7 @@ ParaTextPr.prototype =
 
                     if(typeof CollaborativeEditing !== "undefined")
                     {
-                        if(unifill.fill && unifill.fill.type === FILL_TYPE_BLIP && typeof unifill.fill.RasterImageId === "string" && unifill.fill.RasterImageId.length > 0)
+                        if(unifill.fill && unifill.fill.type === Asc.c_oAscFill.FILL_TYPE_BLIP && typeof unifill.fill.RasterImageId === "string" && unifill.fill.RasterImageId.length > 0)
                         {
                             CollaborativeEditing.Add_NewImage(getFullImageSrc2(unifill.fill.RasterImageId));
                         }
@@ -5298,7 +5298,7 @@ ParaDrawing.prototype =
 
     Update_CursorType : function(X, Y, PageIndex)
     {
-        this.DrawingDocument.SetCursorType( "move", new CMouseMoveData() );
+        this.DrawingDocument.SetCursorType( "move", new AscCommon.CMouseMoveData() );
 
         if ( null != this.Parent )
         {
@@ -5309,11 +5309,11 @@ ParaDrawing.prototype =
                 var _X = this.Parent.Pages[PNum].X;
                 var _Y = this.Parent.Pages[PNum].Y;
 
-                var MMData = new CMouseMoveData();
+                var MMData = new AscCommon.CMouseMoveData();
                 var Coords = this.DrawingDocument.ConvertCoordsToCursorWR( _X, _Y, this.Parent.Get_StartPage_Absolute() + ( PageIndex - this.Parent.PageNum ) );
                 MMData.X_abs            = Coords.X - 5;
                 MMData.Y_abs            = Coords.Y;
-                MMData.Type             = c_oAscMouseMoveDataTypes.LockedObject;
+                MMData.Type             = AscCommon.c_oAscMouseMoveDataTypes.LockedObject;
                 MMData.UserId           = Lock.Get_UserId();
                 MMData.HaveChanges      = Lock.Have_Changes();
                 MMData.LockedObjectType = c_oAscMouseMoveLockedObjectType.Common;

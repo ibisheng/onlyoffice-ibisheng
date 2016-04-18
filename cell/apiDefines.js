@@ -8,6 +8,10 @@
 function (window, undefined) {
 // Используем [] вместо new Array() для ускорения (http://jsperf.com/creation-array)
 // Используем {} вместо new Object() для ускорения (http://jsperf.com/creation-object)
+
+  // Import
+  var CColor = AscCommon.CColor;
+
 var c_oAscError = {
   Level: {
     Critical: -1,
@@ -300,20 +304,20 @@ var c_oAscAutoFilterTypes = {
   Filters: 4
 };
 
-var c_oAscCoAuthoringMeBorderColor = new window["CColor"](22, 156, 0);
-var c_oAscCoAuthoringOtherBorderColor = new window["CColor"](238, 53, 37);
-var c_oAscCoAuthoringLockTablePropertiesBorderColor = new window["CColor"](255, 144, 0);
+var c_oAscCoAuthoringMeBorderColor = new CColor(22, 156, 0);
+var c_oAscCoAuthoringOtherBorderColor = new CColor(238, 53, 37);
+var c_oAscCoAuthoringLockTablePropertiesBorderColor = new CColor(255, 144, 0);
 var c_oAscCoAuthoringDottedWidth = 4;
 var c_oAscCoAuthoringDottedDistance = 2;
 
 var c_oAscFormulaRangeBorderColor = [
-  new window["CColor"](95, 140, 237),
-  new window["CColor"](235, 94, 96),
-  new window["CColor"](141, 97, 194),
-  new window["CColor"](45, 150, 57),
-  new window["CColor"](191, 76, 145),
-  new window["CColor"](227, 130, 34),
-  new window["CColor"](55, 127, 158)
+  new CColor(95, 140, 237),
+  new CColor(235, 94, 96),
+  new CColor(141, 97, 194),
+  new CColor(45, 150, 57),
+  new CColor(191, 76, 145),
+  new CColor(227, 130, 34),
+  new CColor(55, 127, 158)
 ];
 
 var c_oAscLockNameFrozenPane = "frozenPane";

@@ -508,7 +508,7 @@ DependencyGraph.prototype = {
         if ( rc.length == 0 )
             return;
 
-        var color = new CColor( 0, 0, 255 );
+        var color = new AscCommon.CColor( 0, 0, 255 );
 
         function draw_arrow( context, fromx, fromy, tox, toy ) {
             var headlen = 9;

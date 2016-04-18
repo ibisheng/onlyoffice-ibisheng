@@ -16,6 +16,7 @@ var editor;
   var c_oAscAdvancedOptionsAction = AscCommon.c_oAscAdvancedOptionsAction;
   var DownloadType = AscCommon.DownloadType;
   var c_oAscLockTypes = AscCommon.c_oAscLockTypes;
+  var CColor = AscCommon.CColor;
 
   var c_oAscLockTypeElem = AscCommonExcel.c_oAscLockTypeElem;
 
@@ -189,7 +190,7 @@ var editor;
     var _count_defaults = g_oUserColorScheme.length;
     for (var i = 0; i < _count_defaults; ++i) {
       var _obj = g_oUserColorScheme[i];
-      infos[_index] = new CAscColorScheme();
+      infos[_index] = new AscCommon.CAscColorScheme();
       infos[_index].Name = _obj["name"];
 
       _c = _obj["dk1"];
@@ -239,7 +240,7 @@ var editor;
     for (var i = 0; i < _count; ++i) {
       var _scheme = _extra[i].clrScheme;
 
-      infos[_index] = new CAscColorScheme();
+      infos[_index] = new AscCommon.CAscColorScheme();
       infos[_index].Name = _scheme.name;
 
       _scheme.colors[8].Calculate(_theme, null, null, null, _rgba);
@@ -926,7 +927,7 @@ var editor;
    * asc_onEndAction				(type, id)
    * asc_onInitEditorFonts		(gui_fonts)
    * asc_onInitEditorStyles		(gui_styles)
-   * asc_onOpenDocumentProgress	(COpenProgress)
+   * asc_onOpenDocumentProgress	(AscCommon.COpenProgress)
    * asc_onAdvancedOptions		(asc_CAdvancedOptions, ascAdvancedOptionsAction)	- эвент на получение дополнительных опций (открытие/сохранение CSV)
    * asc_onError					(c_oAscError.ID, c_oAscError.Level)					- эвент об ошибке
    * asc_onEditCell				(Asc.c_oAscCellEditorState)								- эвент на редактирование ячейки с состоянием (переходами из формулы и обратно)
@@ -982,7 +983,7 @@ var editor;
       var _count = g_oUserTexturePresets.length;
       var arr = new Array(_count);
       for (var i = 0; i < _count; ++i) {
-        arr[i] = new asc_CTexture();
+        arr[i] = new AscCommon.asc_CTexture();
         arr[i].Id = i;
         arr[i].Image = g_oUserTexturePresets[i];
         this.ImageLoader.LoadImage(g_oUserTexturePresets[i], 1);
@@ -2410,7 +2411,7 @@ var editor;
   };
 
   spreadsheet_api.prototype.asc_changeShapeType = function(value) {
-    this.asc_setGraphicObjectProps(new asc_CImgProperty({ShapeProperties: {type: value}}));
+    this.asc_setGraphicObjectProps(new Asc.asc_CImgProperty({ShapeProperties: {type: value}}));
   };
 
   spreadsheet_api.prototype.asc_getGraphicObjectProps = function() {
@@ -2731,7 +2732,7 @@ var editor;
     if (ws.objectRender.selectedGraphicObjectsExists() && ws.objectRender.controller.setCellTextColor) {
       ws.objectRender.controller.setCellTextColor(color);
     } else {
-      if (color instanceof asc_CColor) {
+      if (color instanceof Asc.asc_CColor) {
         color = CorrectAscColor(color);
         this.wb.setFontAttributes("c", color);
         this.wb.restoreFocus();
@@ -2745,7 +2746,7 @@ var editor;
     if (ws.objectRender.selectedGraphicObjectsExists() && ws.objectRender.controller.setCellBackgroundColor) {
       ws.objectRender.controller.setCellBackgroundColor(color);
     } else {
-      if (color instanceof asc_CColor || null == color) {
+      if (color instanceof Asc.asc_CColor || null == color) {
         if (null != color) {
           color = CorrectAscColor(color);
         }

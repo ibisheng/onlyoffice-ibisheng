@@ -3390,7 +3390,7 @@ Binary_tblPrWriter.prototype =
             this.memory.WriteDouble(rowPr.TableCellSpacing);
         }
         //Height
-        if(null != rowPr.Height && heightrule_Auto != rowPr.Height.HRule)
+        if(null != rowPr.Height && Asc.linerule_Auto != rowPr.Height.HRule)
         {
             this.memory.WriteByte(c_oSerProp_rowPrType.Height);
             this.memory.WriteByte(c_oSerPropLenType.Variable);
@@ -7369,7 +7369,7 @@ Binary_tblPrReader.prototype =
         else if( c_oSerProp_rowPrType.Height === type )
         {
             if(null == Pr.Height)
-                Pr.Height = new CTableRowHeight(0,heightrule_Auto);
+                Pr.Height = new CTableRowHeight(0,Asc.linerule_Auto);
             res = this.bcr.Read2(length, function(t, l){
                 return oThis.ReadHeight(t, l, Pr.Height);
             });

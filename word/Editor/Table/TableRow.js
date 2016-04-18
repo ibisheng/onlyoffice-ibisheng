@@ -1257,7 +1257,7 @@ CTableRow.prototype =
                     this.Pr.Height = undefined;
                 else
                 {
-                    this.Pr.Height = new CTableRowHeight(0, heightrule_Auto);
+                    this.Pr.Height = new CTableRowHeight(0, Asc.linerule_Auto);
                     this.Pr.Height.Read_FromBinary( Reader );
                 }
 

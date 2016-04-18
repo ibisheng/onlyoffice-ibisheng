@@ -4,6 +4,8 @@
 var changestype_Drawing_Props = AscCommon.changestype_Drawing_Props;
 var changestype_2_ElementsArray_and_Type = AscCommon.changestype_2_ElementsArray_and_Type;
 
+var asc_CImgProperty = Asc.asc_CImgProperty;
+
 function CBoundsRectForMath(oDrawing)
 {
     this.L = 0;
@@ -475,7 +477,7 @@ CGraphicObjects.prototype =
         if(props_by_types.shapeProps)
         {
             var pr = props_by_types.shapeProps;
-            if (pr.fill != null && pr.fill.fill != null && pr.fill.fill.type == FILL_TYPE_BLIP)
+            if (pr.fill != null && pr.fill.fill != null && pr.fill.fill.type == Asc.c_oAscFill.FILL_TYPE_BLIP)
             {
                 this.drawingDocument.DrawImageTextureFillShape(pr.fill.fill.RasterImageId);
             }

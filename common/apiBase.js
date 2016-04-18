@@ -45,7 +45,7 @@ function baseEditorsApi(name) {
   this.advancedOptionsAction = AscCommon.c_oAscAdvancedOptionsAction.None;
   // Тип скачивания файлы(download или event).нужен для txt, csv. запоминаем на asc_DownloadAs используем asc_setAdvancedOptions
   this.downloadType = AscCommon.DownloadType.None;
-  this.OpenDocumentProgress = new COpenProgress();
+  this.OpenDocumentProgress = new AscCommon.COpenProgress();
   var sProtocol = window.location.protocol;
   this.documentOrigin = ((sProtocol && '' !== sProtocol) ? sProtocol + '//' : '') + window.location.host; // for presentation theme url
   this.documentPathname = window.location.pathname; // for presentation theme url
@@ -65,7 +65,7 @@ function baseEditorsApi(name) {
 
   // Chart
   this.chartTranslate = new asc_CChartTranslate();
-  this.textArtTranslate = new asc_TextArtTranslate();
+  this.textArtTranslate = new Asc.asc_TextArtTranslate();
   this.chartPreviewManager = new ChartPreviewManager();
   this.textArtPreviewManager = new TextArtPreviewManager();
   // Режим вставки диаграмм в редакторе документов

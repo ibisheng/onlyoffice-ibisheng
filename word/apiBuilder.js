@@ -1374,7 +1374,7 @@
      */
     ApiTableRow.prototype.SetHeight = function(sHRule, nValue)
     {
-        var HRule = ("auto" === sHRule ? heightrule_Auto : heightrule_AtLeast);
+        var HRule = ("auto" === sHRule ? Asc.linerule_Auto : Asc.linerule_AtLeast);
         this.Row.Set_Height(private_Twips2MM(nValue), HRule);
     };
 

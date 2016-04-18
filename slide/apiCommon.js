@@ -217,27 +217,6 @@ CAscThemes.prototype.get_DocumentThemes = function(){ return this.DocumentThemes
 
 // ---------------------------------------------------------------
 
-
-
-function CPosition( obj )
-{
-    if (obj)
-    {
-        this.X = (undefined == obj.X) ? null : obj.X;
-        this.Y = (undefined == obj.Y) ? null : obj.Y;
-    }
-    else
-    {
-        this.X = null;
-        this.Y = null;
-    }
-}
-CPosition.prototype.get_X = function() { return this.X; }
-CPosition.prototype.put_X = function(v) { this.X = v; }
-CPosition.prototype.get_Y = function() { return this.Y; }
-CPosition.prototype.put_Y = function(v) { this.Y = v; }
-
-
 function CAscChartProp( obj )
 {
     if( obj )
@@ -245,7 +224,7 @@ function CAscChartProp( obj )
 
         this.Width         = (undefined != obj.w) ? obj.w : undefined;
         this.Height        = (undefined != obj.h) ? obj.h : undefined;
-        this.Position      = new CPosition({X: obj.x, Y: obj.y});
+        this.Position      = new Asc.CPosition({X: obj.x, Y: obj.y});
 
         this.Locked        = (undefined != obj.locked) ? obj.locked : false;
 
@@ -262,7 +241,7 @@ function CAscChartProp( obj )
         this.Position      = undefined;
         this.Locked   = false;
 
-        this.ChartProperties = new asc_ChartSettings();
+        this.ChartProperties = new AscCommon.asc_ChartSettings();
 
         this.severalCharts = false;
         this.severalChartTypes = undefined;
@@ -279,9 +258,9 @@ CAscChartProp.prototype.get_Height = function() { return this.Height; }
 CAscChartProp.prototype.put_Height = function(v) { this.Height = v; }
 CAscChartProp.prototype.get_WrappingStyle = function() { return this.WrappingStyle; }
 CAscChartProp.prototype.put_WrappingStyle = function(v) { this.WrappingStyle = v; }
-// Возвращается объект класса asc_CPaddings
+// Возвращается объект класса Asc.asc_CPaddings
 CAscChartProp.prototype.get_Paddings = function() { return this.Paddings; }
-// Аргумент объект класса asc_CPaddings
+// Аргумент объект класса Asc.asc_CPaddings
 CAscChartProp.prototype.put_Paddings = function(v) { this.Paddings = v; }
 CAscChartProp.prototype.get_AllowOverlap = function() {return this.AllowOverlap;}
 CAscChartProp.prototype.put_AllowOverlap = function(v) {this.AllowOverlap = v;}
@@ -607,12 +586,12 @@ function CBackground (obj)
 {
     if (obj)
     {
-        this.Color = (undefined != obj.Color && null != obj.Color) ? CreateAscColorCustom(obj.Color.r, obj.Color.g, obj.Color.b) : null;
+        this.Color = (undefined != obj.Color && null != obj.Color) ? AscCommon.CreateAscColorCustom(obj.Color.r, obj.Color.g, obj.Color.b) : null;
         this.Value = (undefined != obj.Value) ? obj.Value : null;
     }
     else
     {
-        this.Color = CreateAscColorCustom(0, 0, 0);
+        this.Color = AscCommon.CreateAscColorCustom(0, 0, 0);
         this.Value = 1;
     }
 }
@@ -728,7 +707,7 @@ function CTableProp (tblProp)
         this.CellSelect = (undefined != tblProp.CellSelect) ? tblProp.CellSelect : false;
         this.TableWidth = (undefined != tblProp.TableWidth) ? tblProp.TableWidth : null;
         this.TableSpacing = (undefined != tblProp.TableSpacing) ? tblProp.TableSpacing : null;
-        this.TableDefaultMargins = (undefined != tblProp.TableDefaultMargins && null != tblProp.TableDefaultMargins) ? new asc_CPaddings (tblProp.TableDefaultMargins) : null;
+        this.TableDefaultMargins = (undefined != tblProp.TableDefaultMargins && null != tblProp.TableDefaultMargins) ? new Asc.asc_CPaddings (tblProp.TableDefaultMargins) : null;
 
         this.CellMargins = (undefined != tblProp.CellMargins && null != tblProp.CellMargins) ? new CMargins (tblProp.CellMargins) : null;
 
@@ -736,13 +715,13 @@ function CTableProp (tblProp)
         this.TableIndent = (undefined != tblProp.TableIndent) ? tblProp.TableIndent : null;
         this.TableWrappingStyle = (undefined != tblProp.TableWrappingStyle) ? tblProp.TableWrappingStyle : null;
 
-        this.TablePaddings = (undefined != tblProp.TablePaddings && null != tblProp.TablePaddings) ? new asc_CPaddings (tblProp.TablePaddings) : null;
+        this.TablePaddings = (undefined != tblProp.TablePaddings && null != tblProp.TablePaddings) ? new Asc.asc_CPaddings (tblProp.TablePaddings) : null;
 
         this.TableBorders = (undefined != tblProp.TableBorders && null != tblProp.TableBorders) ? new CBorders (tblProp.TableBorders) : null;
         this.CellBorders = (undefined != tblProp.CellBorders && null != tblProp.CellBorders) ? new CBorders (tblProp.CellBorders) : null;
         this.TableBackground = (undefined != tblProp.TableBackground && null != tblProp.TableBackground) ? new CBackground (tblProp.TableBackground) : null;
         this.CellsBackground = (undefined != tblProp.CellsBackground && null != tblProp.CellsBackground) ? new CBackground (tblProp.CellsBackground) : null;
-        this.Position = (undefined != tblProp.Position && null != tblProp.Position) ? new CPosition (tblProp.Position) : null;
+        this.Position = (undefined != tblProp.Position && null != tblProp.Position) ? new Asc.CPosition (tblProp.Position) : null;
         this.PositionH = ( undefined != tblProp.PositionH && null != tblProp.PositionH ) ? new CTablePositionH(tblProp.PositionH) : undefined;
         this.PositionV = ( undefined != tblProp.PositionV && null != tblProp.PositionV ) ? new CTablePositionV(tblProp.PositionV) : undefined;
         this.Internal_Position = ( undefined != tblProp.Internal_Position ) ? tblProp.Internal_Position : undefined;
@@ -761,7 +740,7 @@ function CTableProp (tblProp)
         this.CellSelect = false; //обязательное свойство
         /*this.TableWidth = null;
          this.TableSpacing = null;
-         this.TableDefaultMargins = new asc_CPaddings ();
+         this.TableDefaultMargins = new Asc.asc_CPaddings ();
 
          this.CellMargins = new CMargins ();
 
@@ -769,7 +748,7 @@ function CTableProp (tblProp)
          this.TableIndent = 0;
          this.TableWrappingStyle = c_oAscWrapStyle.Inline;
 
-         this.TablePaddings = new asc_CPaddings ();
+         this.TablePaddings = new Asc.asc_CPaddings ();
 
          this.TableBorders = new CBorders ();
          this.CellBorders = new CBorders ();
@@ -833,12 +812,12 @@ function CBorders (obj)
 {
     if (obj)
     {
-        this.Left = (undefined != obj.Left && null != obj.Left) ? new asc_CTextBorder (obj.Left) : null;
-        this.Top = (undefined != obj.Top && null != obj.Top) ? new asc_CTextBorder (obj.Top) : null;
-        this.Right = (undefined != obj.Right && null != obj.Right) ? new asc_CTextBorder (obj.Right) : null;
-        this.Bottom = (undefined != obj.Bottom && null != obj.Bottom) ? new asc_CTextBorder (obj.Bottom) : null;
-        this.InsideH = (undefined != obj.InsideH && null != obj.InsideH) ? new asc_CTextBorder (obj.InsideH) : null;
-        this.InsideV = (undefined != obj.InsideV && null != obj.InsideV) ? new asc_CTextBorder (obj.InsideV) : null;
+        this.Left = (undefined != obj.Left && null != obj.Left) ? new Asc.asc_CTextBorder (obj.Left) : null;
+        this.Top = (undefined != obj.Top && null != obj.Top) ? new Asc.asc_CTextBorder (obj.Top) : null;
+        this.Right = (undefined != obj.Right && null != obj.Right) ? new Asc.asc_CTextBorder (obj.Right) : null;
+        this.Bottom = (undefined != obj.Bottom && null != obj.Bottom) ? new Asc.asc_CTextBorder (obj.Bottom) : null;
+        this.InsideH = (undefined != obj.InsideH && null != obj.InsideH) ? new Asc.asc_CTextBorder (obj.InsideH) : null;
+        this.InsideV = (undefined != obj.InsideV && null != obj.InsideV) ? new Asc.asc_CTextBorder (obj.InsideV) : null;
     }
     //Все свойства класса CBorders должны быть undefined если они не изменялись
     /*else
@@ -852,17 +831,17 @@ function CBorders (obj)
      }*/
 }
 CBorders.prototype.get_Left = function(){return this.Left; }
-CBorders.prototype.put_Left = function(v){this.Left = (v) ? new asc_CTextBorder (v) : null;}
+CBorders.prototype.put_Left = function(v){this.Left = (v) ? new Asc.asc_CTextBorder (v) : null;}
 CBorders.prototype.get_Top = function(){return this.Top; }
-CBorders.prototype.put_Top = function(v){this.Top = (v) ? new asc_CTextBorder (v) : null;}
+CBorders.prototype.put_Top = function(v){this.Top = (v) ? new Asc.asc_CTextBorder (v) : null;}
 CBorders.prototype.get_Right = function(){return this.Right; }
-CBorders.prototype.put_Right = function(v){this.Right = (v) ? new asc_CTextBorder (v) : null;}
+CBorders.prototype.put_Right = function(v){this.Right = (v) ? new Asc.asc_CTextBorder (v) : null;}
 CBorders.prototype.get_Bottom = function(){return this.Bottom; }
-CBorders.prototype.put_Bottom = function(v){this.Bottom = (v) ? new asc_CTextBorder (v) : null;}
+CBorders.prototype.put_Bottom = function(v){this.Bottom = (v) ? new Asc.asc_CTextBorder (v) : null;}
 CBorders.prototype.get_InsideH = function(){return this.InsideH; }
-CBorders.prototype.put_InsideH = function(v){this.InsideH = (v) ? new asc_CTextBorder (v) : null;}
+CBorders.prototype.put_InsideH = function(v){this.InsideH = (v) ? new Asc.asc_CTextBorder (v) : null;}
 CBorders.prototype.get_InsideV = function(){return this.InsideV; }
-CBorders.prototype.put_InsideV = function(v){this.InsideV = (v) ? new asc_CTextBorder (v) : null;}
+CBorders.prototype.put_InsideV = function(v){this.InsideV = (v) ? new Asc.asc_CTextBorder (v) : null;}
 
 
 
@@ -976,13 +955,13 @@ function CParagraphPropEx (obj)
     if (obj)
     {
         this.ContextualSpacing = (undefined != obj.ContextualSpacing) ? obj.ContextualSpacing : null;
-        this.Ind = (undefined != obj.Ind && null != obj.Ind) ? new asc_CParagraphInd(obj.Ind) : null;
+        this.Ind = (undefined != obj.Ind && null != obj.Ind) ? new Asc.asc_CParagraphInd(obj.Ind) : null;
         this.Jc = (undefined != obj.Jc) ? obj.Jc : null;
         this.KeepLines = (undefined != obj.KeepLines) ? obj.KeepLines : null;
         this.KeepNext = (undefined != obj.KeepNext) ? obj.KeepNext : null;
         this.PageBreakBefore = (undefined != obj.PageBreakBefore) ? obj.PageBreakBefore : null;
-        this.Spacing = (undefined != obj.Spacing && null != obj.Spacing) ? new asc_CParagraphSpacing(obj.Spacing) : null;
-        this.Shd = (undefined != obj.Shd && null != obj.Shd) ? new asc_CParagraphShd(obj.Shd) : null;
+        this.Spacing = (undefined != obj.Spacing && null != obj.Spacing) ? new AscCommon.asc_CParagraphSpacing(obj.Spacing) : null;
+        this.Shd = (undefined != obj.Shd && null != obj.Shd) ? new Asc.asc_CParagraphShd(obj.Shd) : null;
         this.WidowControl = (undefined != obj.WidowControl) ? obj.WidowControl : null;                  // Запрет висячих строк
         this.Tabs = obj.Tabs;
     }
@@ -1005,13 +984,13 @@ function CParagraphPropEx (obj)
         //
         //    PageBreakBefore : false,              // начинать параграф с новой страницы
         this.ContextualSpacing = false;
-        this.Ind = new asc_CParagraphInd();
+        this.Ind = new Asc.asc_CParagraphInd();
         this.Jc = AscCommon.align_Left;
         this.KeepLines = false;
         this.KeepNext = false;
         this.PageBreakBefore = false;
-        this.Spacing = new asc_CParagraphSpacing();
-        this.Shd = new asc_CParagraphShd();
+        this.Spacing = new AscCommon.asc_CParagraphSpacing();
+        this.Shd = new Asc.asc_CParagraphShd();
         this.WidowControl = true;                  // Запрет висячих строк
         this.Tabs = null;
     }
@@ -1089,11 +1068,11 @@ function CTextProp (obj)
         this.Italic = (undefined != obj.Italic) ? obj.Italic : null;
         this.Underline = (undefined != obj.Underline) ? obj.Underline : null;
         this.Strikeout = (undefined != obj.Strikeout) ? obj.Strikeout : null;
-        this.FontFamily = (undefined != obj.FontFamily && null != obj.FontFamily) ? new asc_CTextFontFamily (obj.FontFamily) : null;
+        this.FontFamily = (undefined != obj.FontFamily && null != obj.FontFamily) ? new AscCommon.asc_CTextFontFamily (obj.FontFamily) : null;
         this.FontSize = (undefined != obj.FontSize) ? obj.FontSize : null;
-        this.Color = (undefined != obj.Color && null != obj.Color) ? new CColor (obj.Color.r, obj.Color.g, obj.Color.b) : null;
+        this.Color = (undefined != obj.Color && null != obj.Color) ? new AscCommon.CColor (obj.Color.r, obj.Color.g, obj.Color.b) : null;
         this.VertAlign = (undefined != obj.VertAlign) ? obj.VertAlign : null;
-        this.HighLight = (undefined != obj.HighLight) ? obj.HighLight == highlight_None ? obj.HighLight : new CColor (obj.HighLight.r, obj.HighLight.g, obj.HighLight.b) : null;
+        this.HighLight = (undefined != obj.HighLight) ? obj.HighLight == highlight_None ? obj.HighLight : new AscCommon.CColor (obj.HighLight.r, obj.HighLight.g, obj.HighLight.b) : null;
     }
     else
     {
@@ -1121,7 +1100,7 @@ function CTextProp (obj)
         this.Strikeout = false;
         this.FontFamily = new CFontFamily ();
         this.FontSize = 12;
-        this.Color = new CColor ();
+        this.Color = new AscCommon.CColor ();
         this.VertAlign = AscCommon.vertalign_Baseline;
         this.HighLight =highlight_None;
     }

@@ -12,6 +12,7 @@ var align_Left = AscCommon.align_Left;
 var linerule_Auto = Asc.linerule_Auto;
 var c_oAscShdClear = Asc.c_oAscShdClear;
 var c_oAscShdNil = Asc.c_oAscShdNil;
+var c_oAscDropCap = Asc.c_oAscDropCap;
 
 var EvenAndOddHeaders = false;
 
@@ -47,10 +48,6 @@ var tbllayout_AutoFit = 0x01;
 
 var border_None   = 0x0000;
 var border_Single = 0x0001;
-
-var heightrule_AtLeast = 0x00;
-var heightrule_Auto    = 0x01;
-var heightrule_Exact   = 0x02;
 
 var vertalignjc_Top    = 0x00;
 var vertalignjc_Center = 0x01;
@@ -5490,7 +5487,7 @@ CDocumentBorder.prototype =
             this.LineRef = undefined;
             this.Size = isRealNumber(pen.w) ? pen.w / 36000 : 12700 /36000;
         }
-        if(!this.Unifill || !this.Unifill.fill || this.Unifill.fill.type === FILL_TYPE_NOFILL)
+        if(!this.Unifill || !this.Unifill.fill || this.Unifill.fill.type === Asc.c_oAscFill.FILL_TYPE_NOFILL)
         {
             this.Value = border_None;
         }
@@ -6324,7 +6321,7 @@ CTableRowPr.prototype =
         this.GridBefore       = 0;
         this.Jc               = align_Left;
         this.TableCellSpacing = null;
-        this.Height           = new CTableRowHeight(0, heightrule_Auto);
+        this.Height           = new CTableRowHeight(0, Asc.linerule_Auto);
         this.WAfter           = new CTableMeasurement(tblwidth_Auto, 0);
         this.WBefore          = new CTableMeasurement(tblwidth_Auto, 0);
         this.TableHeader      = false;
@@ -6455,7 +6452,7 @@ CTableRowPr.prototype =
 
         if ( 32 & Flags )
         {
-            this.Height = new CTableRowHeight(0, heightrule_Auto);
+            this.Height = new CTableRowHeight(0, Asc.linerule_Auto);
             this.Height.Read_FromBinary(Reader);
         }
 
@@ -9385,10 +9382,6 @@ CNumPr.prototype =
     }
 };
 
-var dropcap_None   = 0x00;
-var dropcap_Drop   = 0x01;
-var dropcap_Margin = 0x02;
-
 var wrap_Around    = 0x01;
 var wrap_Auto      = 0x02;
 var wrap_None      = 0x03;
@@ -9618,7 +9611,7 @@ CFramePr.prototype =
 
     Init_Default_DropCap : function(bInside)
     {
-        this.DropCap = ( true === bInside ? dropcap_Drop : dropcap_Margin );
+        this.DropCap = ( true === bInside ? c_oAscDropCap.Drop : c_oAscDropCap.Margin );
         this.Lines   = 3;
         this.Wrap    = wrap_Around;
         this.VAnchor = Asc.c_oAscVAnchor.Text;
@@ -9646,7 +9639,7 @@ CFramePr.prototype =
 
     Is_DropCap : function()
     {
-        if ( dropcap_Margin === this.DropCap || dropcap_Drop === this.DropCap )
+        if ( c_oAscDropCap.Margin === this.DropCap || c_oAscDropCap.Drop === this.DropCap )
             return true;
 
         return false;

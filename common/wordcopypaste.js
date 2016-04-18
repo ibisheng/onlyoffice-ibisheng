@@ -1210,7 +1210,7 @@ CopyProcessor.prototype =
 				elems.gridEnd -= rowPr.GridAfter;
 			}
             //height
-            if(null != rowPr.Height && heightrule_Auto != rowPr.Height.HRule && null != rowPr.Height.Value)
+            if(null != rowPr.Height && Asc.linerule_Auto != rowPr.Height.HRule && null != rowPr.Height.Value)
             {
                 trStyle += "height:"+(rowPr.Height.Value * g_dKoef_mm_to_pt)+"pt;";
             }
@@ -6113,7 +6113,7 @@ PasteProcessor.prototype =
         {
             var height = node.style.height;
             if(!("auto" == height || "inherit" == height || -1 != height.indexOf("%")) && null != (height = this._ValueToMm(height)))
-                row.Set_Height(height, heightrule_AtLeast);
+                row.Set_Height(height, Asc.linerule_AtLeast);
         }
 		var bBefore = false;
 		var bAfter = false;
@@ -6479,7 +6479,7 @@ PasteProcessor.prototype =
                     if((!window["Asc"] || (window["Asc"] && window["Asc"]["editor"] === undefined)) && (isNaN(nWidth) || isNaN(nHeight) || !(typeof nWidth === "number") || !(typeof nHeight === "number")//первое условие - мы не в редакторе таблиц, тогда выполняем
                         ||  nWidth === 0 ||  nHeight === 0))
                     {
-                        var img_prop = new asc_CImgProperty();
+                        var img_prop = new Asc.asc_CImgProperty();
                         img_prop.asc_putImageUrl(sSrc);
                         var or_sz = img_prop.asc_getOriginSize(editor);
                         nWidth = or_sz.Width / g_dKoef_pix_to_mm;
@@ -6865,7 +6865,7 @@ PasteProcessor.prototype =
                 if(isNaN(nWidth) || isNaN(nHeight) || !(typeof nWidth === "number") || !(typeof nHeight === "number")
                     ||  nWidth === 0 ||  nHeight === 0)
                 {
-                    var img_prop = new asc_CImgProperty();
+                    var img_prop = new Asc.asc_CImgProperty();
                     img_prop.asc_putImageUrl(sSrc);
                     var or_sz = img_prop.asc_getOriginSize(editor);
                     nWidth = or_sz.Width / g_dKoef_pix_to_mm;
@@ -7364,7 +7364,7 @@ PasteProcessor.prototype =
         {
             var height = node.style.height;
             if(!("auto" == height || "inherit" == height || -1 != height.indexOf("%")) && null != (height = this._ValueToMm(height)))
-                row.Set_Height(height, heightrule_AtLeast);
+                row.Set_Height(height, Asc.linerule_AtLeast);
         }
         var bBefore = false;
         var bAfter = false;

@@ -4,6 +4,8 @@
 var c_oAscSizeRelFromH = AscCommon.c_oAscSizeRelFromH;
 var c_oAscSizeRelFromV = AscCommon.c_oAscSizeRelFromV;
 
+var c_oAscFill = Asc.c_oAscFill;
+
 var BOUNDS_DELTA = 3;
 function CheckObjectLine(obj)
 {
@@ -14,7 +16,7 @@ function CheckObjectLine(obj)
 function CheckWordArtTextPr(oRun)
 {
     var oTextPr = oRun.Get_CompiledPr()
-    if(oTextPr.TextFill || oTextPr.TextOutline || (oTextPr.Unifill && oTextPr.Unifill.fill && (oTextPr.Unifill.fill.type !== FILL_TYPE_SOLID || oTextPr.Unifill.transparent != null && oTextPr.Unifill.transparent < 254.5)))
+    if(oTextPr.TextFill || oTextPr.TextOutline || (oTextPr.Unifill && oTextPr.Unifill.fill && (oTextPr.Unifill.fill.type !== c_oAscFill.FILL_TYPE_SOLID || oTextPr.Unifill.transparent != null && oTextPr.Unifill.transparent < 254.5)))
         return true;
     return false;
 }
@@ -359,7 +361,7 @@ function CheckWordRunPr(Pr)
     {
         switch(Pr.Unifill.fill.type)
         {
-            case FILL_TYPE_SOLID:
+            case c_oAscFill.FILL_TYPE_SOLID:
             {
                 if(Pr.Unifill.fill.color && Pr.Unifill.fill.color.color)
                 {
@@ -402,8 +404,8 @@ function CheckWordRunPr(Pr)
                 }
                 break;
             }
-            case FILL_TYPE_PATT:
-            case FILL_TYPE_BLIP:
+            case c_oAscFill.FILL_TYPE_PATT:
+            case c_oAscFill.FILL_TYPE_BLIP:
             {
                 NewRPr = Pr.Copy();
                 NewRPr.TextFill = CreateUnfilFromRGB(0, 0, 0);
@@ -1109,7 +1111,7 @@ CShape.prototype =
             body_pr = shape.bodyPr;
         }
         if (body_pr) {
-            paddings = new asc_CPaddings();
+            paddings = new Asc.asc_CPaddings();
             if (typeof body_pr.lIns === "number")
                 paddings.Left = body_pr.lIns;
             else
@@ -4534,7 +4536,7 @@ CShape.prototype =
             }
             var fCallback = function(oTextPr)
             {
-                if( (oTextPr.Unifill && oTextPr.Unifill.fill && oTextPr.Unifill.fill.type == FILL_TYPE_BLIP))
+                if( (oTextPr.Unifill && oTextPr.Unifill.fill && oTextPr.Unifill.fill.type == c_oAscFill.FILL_TYPE_BLIP))
                 {
                     images.push(oTextPr.Unifill.fill.RasterImageId);
                 }
@@ -4840,7 +4842,7 @@ CShape.prototype =
 
     hitInInnerArea: function (x, y) {
         if ((this.getObjectType && (this.getObjectType() === historyitem_type_ChartSpace || this.getObjectType() === historyitem_type_Title) ) || this.brush != null && this.brush.fill != null
-            && this.brush.fill.type != FILL_TYPE_NOFILL && this.checkHitToBounds(x, y)) {
+            && this.brush.fill.type != c_oAscFill.FILL_TYPE_NOFILL && this.checkHitToBounds(x, y)) {
             var invert_transform = this.getInvertTransform();
             var x_t = invert_transform.TransformPointX(x, y);
             var y_t = invert_transform.TransformPointY(x, y);

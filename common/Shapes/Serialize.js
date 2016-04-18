@@ -3,6 +3,7 @@
 // Import
 var c_oAscShdClear = Asc.c_oAscShdClear;
 var c_oAscColor = Asc.c_oAscColor;
+var c_oAscFill = Asc.c_oAscFill;
 
 var c_dScalePPTXSizes = 36000;
 function IsHiddenObj(object)
@@ -216,13 +217,13 @@ CBuilderImages.prototype =
             if(!this.Ln && this.SpPr && this.SpPr.Fill)
             {
                 oCopyFill = this.SpPr.Fill.createDuplicate();
-                if(oCopyFill.fill && oCopyFill.fill.type === FILL_TYPE_BLIP)
+                if(oCopyFill.fill && oCopyFill.fill.type === c_oAscFill.FILL_TYPE_BLIP)
                 {
                     oCopyFill.fill.setRasterImageId(url);
                     this.SpPr.setFill(oCopyFill);
                 }
             }
-            if(this.Ln && this.SpPr && this.SpPr === this.Ln && this.Ln.Fill && this.Ln.Fill.fill && this.Ln.Fill.fill.type === FILL_TYPE_BLIP)
+            if(this.Ln && this.SpPr && this.SpPr === this.Ln && this.Ln.Fill && this.Ln.Fill.fill && this.Ln.Fill.fill.type === c_oAscFill.FILL_TYPE_BLIP)
             {
                 oCopyLn = this.Ln.createDuplicate();
                 oCopyLn.Fill.fill.setRasterImageId(url);
@@ -239,7 +240,7 @@ CBuilderImages.prototype =
                 if(this.Paragraph)
                 {
                     var oPr = this.Paragraph.Pr;
-                    if(oPr.DefaultRunPr && oPr.DefaultRunPr.Unifill && oPr.DefaultRunPr.Unifill.fill && oPr.DefaultRunPr.Unifill.fill.type === FILL_TYPE_BLIP)
+                    if(oPr.DefaultRunPr && oPr.DefaultRunPr.Unifill && oPr.DefaultRunPr.Unifill.fill && oPr.DefaultRunPr.Unifill.fill.type === c_oAscFill.FILL_TYPE_BLIP)
                     {
                         var Pr = this.Paragraph.Pr.Copy();
                         Pr.DefaultRunPr.Unifill.fill.setRasterImageId(url);
@@ -248,13 +249,13 @@ CBuilderImages.prototype =
                 }
                 else if(this.ParaTextPr || this.Run)
                 {
-                    if(this.ParaTextPr && this.ParaTextPr.Value && this.ParaTextPr.Value.Unifill && this.ParaTextPr.Value.Unifill.fill && this.ParaTextPr.Value.Unifill.fill.type === FILL_TYPE_BLIP)
+                    if(this.ParaTextPr && this.ParaTextPr.Value && this.ParaTextPr.Value.Unifill && this.ParaTextPr.Value.Unifill.fill && this.ParaTextPr.Value.Unifill.fill.type === c_oAscFill.FILL_TYPE_BLIP)
                     {
                         oCopyFill = this.ParaTextPr.Value.Unifill.createDuplicate();
                         oCopyFill.fill.setRasterImageId(url);
                         this.ParaTextPr.Set_Unifill(oCopyFill);
                     }
-                    if(this.Run && this.Run.Pr && this.Run.Pr.Unifill && this.Run.Pr.Unifill.fill && this.Run.Pr.Unifill.fill.type === FILL_TYPE_BLIP)
+                    if(this.Run && this.Run.Pr && this.Run.Pr.Unifill && this.Run.Pr.Unifill.fill && this.Run.Pr.Unifill.fill.type === c_oAscFill.FILL_TYPE_BLIP)
                     {
                         oCopyFill = this.Run.Pr.Unifill.createDuplicate();
                         oCopyFill.fill.setRasterImageId(url);
@@ -2036,7 +2037,7 @@ function BinaryPPTYLoader()
 
             switch (_type)
             {
-                case FILL_TYPE_BLIP:
+                case c_oAscFill.FILL_TYPE_BLIP:
                 {
                     s.Skip2(1);
 
@@ -2311,7 +2312,7 @@ function BinaryPPTYLoader()
 
                     break;
                 }
-                case FILL_TYPE_GRAD:
+                case c_oAscFill.FILL_TYPE_GRAD:
                 {
                     s.Skip2(1);
 
@@ -2426,7 +2427,7 @@ function BinaryPPTYLoader()
 
                     break;
                 }
-                case FILL_TYPE_PATT:
+                case c_oAscFill.FILL_TYPE_PATT:
                 {
                     uni_fill.setFill(new CPattFill());
 
@@ -2475,7 +2476,7 @@ function BinaryPPTYLoader()
 
                     break;
                 }
-                case FILL_TYPE_SOLID:
+                case c_oAscFill.FILL_TYPE_SOLID:
                 {
                     s.Skip2(1); // type + len
 
@@ -2506,7 +2507,7 @@ function BinaryPPTYLoader()
                     }
                     break;
                 }
-                case FILL_TYPE_NOFILL:
+                case c_oAscFill.FILL_TYPE_NOFILL:
                 {
                     uni_fill.setFill(new CNoFill());
                     break;
@@ -5675,7 +5676,7 @@ function BinaryPPTYLoader()
             {
                 case 0:
                 {
-                    row.Set_Height(s.GetULong() / 36000, heightrule_AtLeast);
+                    row.Set_Height(s.GetULong() / 36000, Asc.linerule_AtLeast);
                     break;
                 }
                 default:

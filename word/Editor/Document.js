@@ -2673,8 +2673,8 @@ CDocument.prototype =
                 FrameW = Frame_XLimit;
             }
 
-            var FrameHRule = ( undefined === FramePr.HRule ? heightrule_Auto : FramePr.HRule );
-            if ((heightrule_AtLeast === FrameHRule && FrameH < FramePr.H) || heightrule_Exact === FrameHRule)
+            var FrameHRule = ( undefined === FramePr.HRule ? Asc.linerule_Auto : FramePr.HRule );
+            if ((Asc.linerule_AtLeast === FrameHRule && FrameH < FramePr.H) || Asc.linerule_Exact === FrameHRule)
             {
                 FrameH = FramePr.H;
             }
@@ -10241,7 +10241,7 @@ CDocument.prototype =
         // Ничего не делаем
         if ( true === this.DrawingDocument.IsCursorInTableCur( X, Y, PageIndex ) )
         {
-            this.DrawingDocument.SetCursorType( "default", new CMouseMoveData() );
+            this.DrawingDocument.SetCursorType( "default", new AscCommon.CMouseMoveData() );
             editor.sync_MouseMoveEndCallback();
             return;
         }
@@ -11646,7 +11646,7 @@ CDocument.prototype =
 
                 // Вызываем стандартное событие mouseMove, чтобы сбросить различные подсказки, если они были
                 editor.sync_MouseMoveStartCallback();
-                editor.sync_MouseMoveCallback(new CMouseMoveData());
+                editor.sync_MouseMoveCallback(new AscCommon.CMouseMoveData());
                 editor.sync_MouseMoveEndCallback();
 
                 this.DrawingDocument.StartTrackText();                

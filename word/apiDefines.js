@@ -84,12 +84,6 @@ var c_oAscContextMenuTypes = {
   ChangeHdrFtr: 1  // Специальное контестное меню для попадания в колонтитул
 };
 
-var c_oAscMouseMoveDataTypes = {
-  Common: 0,
-  Hyperlink: 1,
-  LockedObject: 2
-};
-
 var c_oAscMouseMoveLockedObjectType = {
   Common: 0,
   Header: 1,
@@ -147,12 +141,6 @@ var c_oAscAlignShapeType = {
 
 var TABLE_STYLE_WIDTH_PIX = 70;
 var TABLE_STYLE_HEIGHT_PIX = 50;
-
-var c_oAscDropCap = {
-  None: 0,
-  Drop: 1,
-  Margin: 2
-};
 
 var c_oAscSectionBreakType = {
   NextPage: 0x00,
@@ -697,7 +685,6 @@ window['Asc']['c_oAscChangeLevel'] = c_oAscChangeLevel;
 window['Asc']['c_oAscVertAlignJc'] = c_oAscVertAlignJc;
 window['Asc']['c_oAscTableLayout'] = c_oAscTableLayout;
 window['Asc']['c_oAscAlignShapeType'] = c_oAscAlignShapeType;
-window['Asc']['c_oAscDropCap'] = c_oAscDropCap;
 window['Asc']['c_oAscSectionBreakType'] = c_oAscSectionBreakType;
 window['Asc']['c_oAscMathInterfaceType'] = c_oAscMathInterfaceType;
 window['Asc']['c_oAscMathInterfaceBarPos'] = c_oAscMathInterfaceBarPos;

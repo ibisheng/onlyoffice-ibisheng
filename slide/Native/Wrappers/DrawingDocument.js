@@ -206,7 +206,7 @@ function CDrawingDocument()
         else
             sResultCursorType = this.m_sLockedCursorType;
         if ( "undefined" === typeof(Data) || null === Data )
-            Data = new CMouseMoveData();
+            Data = new AscCommon.CMouseMoveData();
         this.Native["DD_SetCursorType"](sResultCursorType, Data);
     }
     this.LockCursorType = function(sType)

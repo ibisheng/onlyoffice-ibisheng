@@ -253,7 +253,7 @@ ChartPreviewManager.prototype.getChartByType = function(type)
 {
 	return ExecuteNoHistory(function()
 	{
-		var settings = new asc_ChartSettings();
+		var settings = new AscCommon.asc_ChartSettings();
 		settings.type = type;
 		var chartSeries = {series: this.getAscChartSeriesDefault(type), parsedHeaders: {bLeft: true, bTop: true}};
 		var chart_space = DrawingObjectsController.prototype._getChartSpace(chartSeries, settings, true);
@@ -283,7 +283,7 @@ ChartPreviewManager.prototype.getChartByType = function(type)
 		settings.putVertGridLines(Asc.c_oAscGridLinesSettings.none);
 
 
-		var val_ax_props = new asc_ValAxisSettings();
+		var val_ax_props = new AscCommon.asc_ValAxisSettings();
 		val_ax_props.putMinValRule(Asc.c_oAscValAxisRule.auto);
 		val_ax_props.putMaxValRule(Asc.c_oAscValAxisRule.auto);
 		val_ax_props.putTickLabelsPos(Asc.c_oAscTickLabelsPos.TICK_LABEL_POSITION_NONE);
@@ -294,7 +294,7 @@ ChartPreviewManager.prototype.getChartByType = function(type)
 		val_ax_props.putCrossesRule(Asc.c_oAscCrossesRule.auto);
 
 
-		var cat_ax_props = new asc_CatAxisSettings();
+		var cat_ax_props = new AscCommon.asc_CatAxisSettings();
 		cat_ax_props.putIntervalBetweenLabelsRule(Asc.c_oAscBetweenLabelsRule.auto);
 		cat_ax_props.putLabelsPosition(Asc.c_oAscLabelsPosition.betweenDivisions);
 		cat_ax_props.putTickLabelsPos(Asc.c_oAscTickLabelsPos.TICK_LABEL_POSITION_NONE);
@@ -476,7 +476,7 @@ function arrReverse(arr) {
 
 function CreateAscColorByIndex(nIndex)
 {
-	var oColor = new asc_CColor();
+	var oColor = new Asc.asc_CColor();
 	oColor.type = Asc.c_oAscColor.COLOR_TYPE_SCHEME;
 	oColor.value = nIndex;
 	return oColor;
@@ -484,18 +484,18 @@ function CreateAscColorByIndex(nIndex)
 
 function CreateAscFillByIndex(nIndex)
 {
-	var oAscFill = new CAscFill();
+	var oAscFill = new Asc.asc_CShapeFill();
 	oAscFill.type = Asc.c_oAscFill.FILL_TYPE_SOLID;
-	oAscFill.fill = new asc_CFillSolid();
+	oAscFill.fill = new Asc.asc_CFillSolid();
 	oAscFill.fill.color = CreateAscColorByIndex(nIndex);
 	return oAscFill;
 }
 
 function CreateAscGradFillByIndex(nIndex1, nIndex2, nAngle)
 {
-	var oAscFill = new CAscFill();
+	var oAscFill = new Asc.asc_CShapeFill();
 	oAscFill.type = Asc.c_oAscFill.FILL_TYPE_GRAD;
-	oAscFill.fill = new asc_CFillGrad();
+	oAscFill.fill = new Asc.asc_CFillGrad();
 	oAscFill.fill.GradType = Asc.c_oAscFillGradType.GRAD_LINEAR;
 	oAscFill.fill.LinearAngle = nAngle;
 	oAscFill.fill.LinearScale = true;

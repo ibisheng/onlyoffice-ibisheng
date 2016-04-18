@@ -271,7 +271,7 @@
 			this.worksheet = currentSheet;
 			this.changeFilters = null;
 
-			this.m_oColor = new CColor(120, 120, 120);
+			this.m_oColor = new AscCommon.CColor(120, 120, 120);
 			return this;
 		}
 

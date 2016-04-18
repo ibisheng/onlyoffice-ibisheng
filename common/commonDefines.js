@@ -166,9 +166,9 @@ var align_Center  = 2;
 var align_Justify = 3;
 
 
-var linerule_AtLeast = 0;
-var linerule_Auto    = 1;
-var linerule_Exact   = 2;
+var linerule_AtLeast = 0x00;
+var linerule_Auto    = 0x01;
+var linerule_Exact   = 0x02;
 
 var c_oAscShdClear = 0;
 var c_oAscShdNil   = 1;
@@ -178,6 +178,12 @@ var vertalign_SuperScript = 1;
 var vertalign_SubScript   = 2;
 var hdrftr_Header = 0x01;
 var hdrftr_Footer = 0x02;
+
+var c_oAscDropCap = {
+  None: 0x00,
+  Drop: 0x01,
+  Margin: 0x02
+};
 
 
 var c_oAscChartTitleShowSettings =
@@ -521,11 +527,13 @@ var c_oAscColor = {
 };
 
 var c_oAscFill = {
+  FILL_TYPE_NONE   : 0,
 	FILL_TYPE_BLIP   : 1,
 	FILL_TYPE_NOFILL : 2,
 	FILL_TYPE_SOLID	 : 3,
-	FILL_TYPE_PATT   : 4,
-	FILL_TYPE_GRAD   : 5
+  FILL_TYPE_GRAD   : 4,
+	FILL_TYPE_PATT   : 5
+
 };
 
 // Chart defines
@@ -625,6 +633,12 @@ var c_oAscDocumentUnits = {
   Millimeter  : 0,
   Inch        : 1,
   Point       : 2
+};
+
+var c_oAscMouseMoveDataTypes = {
+  Common: 0,
+  Hyperlink: 1,
+  LockedObject: 2
 };
 
 
@@ -791,6 +805,7 @@ window['Asc']['linerule_Auto'] = window['Asc'].linerule_Auto = linerule_Auto;
 window['Asc']['linerule_Exact'] = window['Asc'].linerule_Exact = linerule_Exact;
 window['Asc']['c_oAscShdClear'] = window['Asc'].c_oAscShdClear = c_oAscShdClear;
 window['Asc']['c_oAscShdNil'] = window['Asc'].c_oAscShdNil = c_oAscShdNil;
+window['Asc']['c_oAscDropCap'] = window['Asc'].c_oAscDropCap = c_oAscDropCap;
 window['Asc']['c_oAscChartTitleShowSettings'] = window['Asc'].c_oAscChartTitleShowSettings = c_oAscChartTitleShowSettings;
 window['Asc']['c_oAscChartHorAxisLabelShowSettings'] = window['Asc'].c_oAscChartHorAxisLabelShowSettings = c_oAscChartHorAxisLabelShowSettings;
 window['Asc']['c_oAscChartVertAxisLabelShowSettings'] = window['Asc'].c_oAscChartVertAxisLabelShowSettings = c_oAscChartVertAxisLabelShowSettings;
@@ -860,6 +875,7 @@ window['Asc']['c_oAscMaxCellOrCommentLength'] = window['Asc'].c_oAscMaxCellOrCom
   window["AscCommon"].c_oAscChartSubType = c_oAscChartSubType;
   window["AscCommon"].c_oAscCsvDelimiter = c_oAscCsvDelimiter;
   window["AscCommon"].c_oAscUrlType = c_oAscUrlType;
+  window["AscCommon"].c_oAscMouseMoveDataTypes = c_oAscMouseMoveDataTypes;
   window["AscCommon"].c_oAscPrintDefaultSettings = c_oAscPrintDefaultSettings;
   window["AscCommon"].c_oAscEncodings = c_oAscEncodings;
   window["AscCommon"].c_oAscEncodingsMap = c_oAscEncodingsMap;
