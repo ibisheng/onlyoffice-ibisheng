@@ -2620,7 +2620,7 @@
       prot["asc_getStyle"] = prot.asc_getStyle;
 
       window["Asc"]["asc_TextArtTranslate"] = window["Asc"].asc_TextArtTranslate = asc_TextArtTranslate;
-      prot = asc_TextArtProperties.prototype;
+      prot = asc_TextArtTranslate.prototype;
       prot["asc_setDefaultText"] = prot.asc_setDefaultText;
 
       window['Asc']['CImagePositionH'] = window["Asc"].CImagePositionH = CImagePositionH;
