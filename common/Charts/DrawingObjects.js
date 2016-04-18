@@ -702,11 +702,13 @@ CSparklineView.prototype.initFromSparkline = function(oSparkline, oSparklineGrou
         var oBBox = oSparkline.sqref;
         this.col = oBBox.c1;
         this.row = oBBox.r1;
+        this.x = worksheetView.getCellLeft(oBBox.c1, 3);
+        this.y = worksheetView.getCellTop(oBBox.r1, 3);
         this.extX = worksheetView.getColumnWidth(oBBox.c1, 3);
         this.extY = worksheetView.getRowHeight(oBBox.r1, 3);
         CheckSpPrXfrm(this.chartSpace);
-        this.chartSpace.spPr.xfrm.setOffX(0);
-        this.chartSpace.spPr.xfrm.setOffY(0);
+        this.chartSpace.spPr.xfrm.setOffX(this.x*nSparklineMultiplier);
+        this.chartSpace.spPr.xfrm.setOffY(this.y*nSparklineMultiplier);
         this.chartSpace.spPr.xfrm.setExtX(this.extX*nSparklineMultiplier);
         this.chartSpace.spPr.xfrm.setExtY(this.extY*nSparklineMultiplier);
         this.chartSpace.recalculate();
@@ -715,22 +717,27 @@ CSparklineView.prototype.initFromSparkline = function(oSparkline, oSparklineGrou
 
 CSparklineView.prototype.draw = function(graphics)
 {
-    var x = this.ws.getCellLeft(this.col, 0);
-    var y = this.ws.getCellTop(this.row, 0);
+    var x = this.ws.getCellLeft(this.col, 3);
+    var y = this.ws.getCellTop(this.row, 3);
     var extX = this.ws.getColumnWidth(this.col, 3);
     var extY = this.ws.getRowHeight(this.row, 3);
-    if(Math.abs(this.extX - extX) > 0.01 || Math.abs(this.extY - extY) > 0.01)
+    if(Math.abs(this.extX - extX) > 0.01 || Math.abs(this.extY - extY) > 0.01
+        || Math.abs(this.x - x) > 0.01 || Math.abs(this.y - y))
     {
         ExecuteNoHistory(function(){
+            this.chartSpace.spPr.xfrm.setOffX(x*nSparklineMultiplier);
+            this.chartSpace.spPr.xfrm.setOffY(y*nSparklineMultiplier);
             this.chartSpace.spPr.xfrm.setExtX(extX*nSparklineMultiplier);
             this.chartSpace.spPr.xfrm.setExtY(extY*nSparklineMultiplier);
         }, this, []);
+        this.x = x;
+        this.y = y;
         this.extX = extX;
         this.extY = extY;
         this.chartSpace.recalculate();
     }
-    graphics.m_oCoordTransform.tx = x;
-    graphics.m_oCoordTransform.ty = y;
+    //graphics.m_oCoordTransform.tx = x;
+    //graphics.m_oCoordTransform.ty = y;
 	
 	/*var _l = this.chartSpace.chartObj.calcProp.chartGutter._left;
 	var _t = this.chartSpace.chartObj.calcProp.chartGutter._top;
@@ -2507,11 +2514,20 @@ function DrawingObjects() {
     _this.drawSparkLineGroups = function(oDrawingContext, oSparklineGroups, range)
     {
 
-        var graphics = new CGraphics(), i, j;
-        graphics.init(oDrawingContext.ctx, oDrawingContext.getWidth(0), oDrawingContext.getHeight(0),
-            oDrawingContext.getWidth(3)*nSparklineMultiplier, oDrawingContext.getHeight(3)*nSparklineMultiplier);
-        graphics.m_oFontManager = g_fontManager;
+        var graphics, i, j;
+        if(oDrawingContext instanceof CPdfPrinter)
+        {
+            graphics = oDrawingContext;
+        }
+        else
+        {
+            graphics = new CGraphics();
+            graphics.init(oDrawingContext.ctx, oDrawingContext.getWidth(0), oDrawingContext.getHeight(0),
+                oDrawingContext.getWidth(3)*nSparklineMultiplier, oDrawingContext.getHeight(3)*nSparklineMultiplier);
+            graphics.m_oFontManager = g_fontManager;
+        }
         graphics.SaveGrState();
+
         for(i = 0; i < oSparklineGroups.arrSparklineGroup.length; ++i) {
             var oSparklineGroup = oSparklineGroups.arrSparklineGroup[i];
 
