@@ -9,6 +9,8 @@ var cBoolLocal = AscCommon.cBoolLocal;
 var cErrorOrigin = AscCommon.cErrorOrigin;
 var cErrorLocal = AscCommon.cErrorLocal;
 var parserHelp = AscCommon.parserHelp;
+var oNumFormatCache = AscCommon.oNumFormatCache;
+var gc_nMaxDigCountView = AscCommon.gc_nMaxDigCountView;
 
 var UndoRedoDataTypes = AscCommonExcel.UndoRedoDataTypes;
 var UndoRedoData_CellSimpleData = AscCommonExcel.UndoRedoData_CellSimpleData;
@@ -2960,7 +2962,7 @@ CCellValue.prototype =
 					while(nTempDigCount >= 1)
 					{
 						//Строим подходящий general format
-						var sGeneral = DecodeGeneralFormat(sOriginText, this.type, nTempDigCount);
+						var sGeneral = AscCommon.DecodeGeneralFormat(sOriginText, this.type, nTempDigCount);
 						if(null != sGeneral)
 							oNumFormat = oNumFormatCache.get(sGeneral);
 
@@ -2989,7 +2991,7 @@ CCellValue.prototype =
 						aRes = null;
 						sText = null;
 						if (dDigitsCount > 1){
-						    var oNumFormatFont = new NumFormatFont();
+						    var oNumFormatFont = new AscCommon.NumFormatFont();
 						    oNumFormatFont.repeat = true;
 						    aText = [{ text: "#", format: oNumFormatFont }];
 						}
@@ -3016,7 +3018,7 @@ CCellValue.prototype =
 				{
 					aRes = null;
 					sText = null;
-					var oNumFormatFont = new NumFormatFont();
+					var oNumFormatFont = new AscCommon.NumFormatFont();
 					oNumFormatFont.repeat = true;
 					aText = [{ text: "#", format: oNumFormatFont }];
 				}
@@ -3035,7 +3037,7 @@ CCellValue.prototype =
 	getValueForEdit2: function (cell, cultureInfo)
 	{
 	    if (null == cultureInfo)
-	        cultureInfo = g_oDefaultCultureInfo;
+	        cultureInfo = AscCommon.g_oDefaultCultureInfo;
 		if(null == this.textValueForEdit2)
 		{
 			//todo проблема точности. в excel у чисел только 15 значащих цифр у нас больше.
@@ -3071,7 +3073,7 @@ CCellValue.prototype =
 									if(1 == oTargetFormat.nPercent)
 									{
 										//prercent
-										oValueText = oGeneralEditFormatCache.format(nValue * 100) + "%";
+										oValueText = AscCommon.oGeneralEditFormatCache.format(nValue * 100) + "%";
 									}
 									else if(oTargetFormat.bDateTime)
 									{
@@ -3109,16 +3111,16 @@ CCellValue.prototype =
 											else
 											    oNumFormat = oNumFormatCache.get(sDateFormat);
 											
-											var aFormatedValue = oNumFormat.format(nValue, CellValueType.Number, gc_nMaxDigCount);
+											var aFormatedValue = oNumFormat.format(nValue, CellValueType.Number, AscCommon.gc_nMaxDigCount);
 											oValueText = "";
 											for(var i = 0, length = aFormatedValue.length; i < length; ++i)
 												oValueText += aFormatedValue[i].text;
 										}
 										else
-											oValueText = oGeneralEditFormatCache.format(nValue);
+											oValueText = AscCommon.oGeneralEditFormatCache.format(nValue);
 									}
 									else
-										oValueText = oGeneralEditFormatCache.format(nValue);
+										oValueText = AscCommon.oGeneralEditFormatCache.format(nValue);
 								}
 							}
 						}
@@ -3253,10 +3255,10 @@ CCellValue.prototype =
 		}
 		else
 		{
-		    if (g_oFormatParser.isLocaleNumber(val))
+		    if (AscCommon.g_oFormatParser.isLocaleNumber(val))
 			{
 				this.type = CellValueType.Number;
-				this.number = g_oFormatParser.parseLocaleNumber(val);
+				this.number = AscCommon.g_oFormatParser.parseLocaleNumber(val);
 			}
 			else
 			{
@@ -3276,7 +3278,7 @@ CCellValue.prototype =
 				else
 				{
 					//распознаем формат
-					var res = g_oFormatParser.parse(val);
+					var res = AscCommon.g_oFormatParser.parse(val);
 					if(null != res)
 					{
 						//Сравниваем с текущим форматом, если типы совпадают - меняем только значение ячейки
@@ -5304,7 +5306,7 @@ DateGroupItem.prototype.clone = function() {
 	return res;
 };
 DateGroupItem.prototype.convertRangeToDateGroupItem = function(range) {
-	var startUtcDate = NumFormat.prototype.parseDate(range.start);
+	var startUtcDate = AscCommon.NumFormat.prototype.parseDate(range.start);
 	var year = startUtcDate.year;
 	var month = startUtcDate.month + 1;
 	var day = startUtcDate.d;

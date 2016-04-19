@@ -27,6 +27,7 @@
     var CColor = AscCommon.CColor;
     var fSortAscending = AscCommon.fSortAscending;
     var parserHelp = AscCommon.parserHelp;
+    var gc_nMaxDigCountView = AscCommon.gc_nMaxDigCountView;
 
     var asc = window["Asc"];
     var asc_applyFunction = asc.applyFunction;
@@ -7196,7 +7197,7 @@
             var numFormat = range.getNumFormat();
             if ( Asc.c_oAscNumFormatType.Time === numFormat.getType() ) {
                 // Для времени нужно отдавать в формате [h]:mm:ss (http://bugzserver/show_bug.cgi?id=26271)
-                numFormat = oNumFormatCache.get( '[h]:mm:ss' );
+                numFormat = AscCommon.oNumFormatCache.get( '[h]:mm:ss' );
             }
 
             oSelectionMathInfo.sum = numFormat.formatToMathInfo( sum, CellValueType.Number, this.settings.mathMaxDigCount );

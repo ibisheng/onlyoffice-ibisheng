@@ -1,4 +1,4 @@
-﻿$(function(){
+$(function(){
 	var fGetFormatedText = function(aFormated)
 	{
 		var res = "";
@@ -7,7 +7,7 @@
 			res += aFormated[i].text;
 		}
 		return res;
-	}
+	};
     module("Formats");
 	test("General", function test_date(){
 		var form = new CellFormat("General");

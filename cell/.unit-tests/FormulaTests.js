@@ -1030,7 +1030,7 @@ $( function () {
 
         oParser = new parserFormula( "VALUE(\"16:48:00\")-VALUE(\"12:17:12\")", "A2", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), g_oFormatParser.parse( "16:48:00" ).value - g_oFormatParser.parse( "12:17:12" ).value );
+        strictEqual( oParser.calculate().getValue(), AscCommon.g_oFormatParser.parse( "16:48:00" ).value - AscCommon.g_oFormatParser.parse( "12:17:12" ).value );
 
     } )
 

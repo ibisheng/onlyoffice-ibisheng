@@ -5,6 +5,9 @@
 * @param {undefined} undefined
 */
 function (window, undefined) {
+    var bDate1904 = AscCommon.bDate1904;
+    var g_oFormatParser = AscCommon.g_oFormatParser;
+    
     var cElementType = AscCommonExcel.cElementType;
     var cErrorType = AscCommonExcel.cErrorType;
     var c_DateCorrectConst = AscCommonExcel.c_DateCorrectConst;
@@ -24,7 +27,6 @@ function (window, undefined) {
     var cFormulaFunctionGroup = AscCommonExcel.cFormulaFunctionGroup;
 
     var GetDiffDate360 = AscCommonExcel.GetDiffDate360;
-    var bDate1904 = AscCommon.bDate1904;
 
     var cExcelDateTimeDigits = 8; //количество цифр после запятой в числах отвечающих за время специализация $18.17.4.2
 

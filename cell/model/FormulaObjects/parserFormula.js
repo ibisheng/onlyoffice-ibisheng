@@ -13,6 +13,7 @@ function (window, undefined) {
   var cErrorLocal = AscCommon.cErrorLocal;
   var FormulaSeparators = AscCommon.FormulaSeparators;
   var parserHelp = AscCommon.parserHelp;
+  var g_oFormatParser = AscCommon.g_oFormatParser;
 
   var c_oAscError = Asc.c_oAscError;
   
@@ -240,7 +241,7 @@ RegExp.escape = function ( text ) {
     return text.replace( /[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&" );
 };
 
-parserHelp.setDigitSeparator( g_oDefaultCultureInfo.NumberDecimalSeparator );
+parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSeparator);
 
 /** @constructor */
 function cBaseType( val, type ) {
@@ -328,9 +329,9 @@ cString.prototype.tocNumber = function () {
      }*/
 
     if ( g_oFormatParser.isLocaleNumber( this.value ) ) {
-        if ( "." != g_oDefaultCultureInfo.NumberDecimalSeparator ) {
+    if ("." != AscCommon.g_oDefaultCultureInfo.NumberDecimalSeparator) {
             m = this.value.replace( ".", "q" );//заменяем на символ с которым не распознается, как в Excel
-            m = m.replace( g_oDefaultCultureInfo.NumberDecimalSeparator, "." );
+      m = m.replace(AscCommon.g_oDefaultCultureInfo.NumberDecimalSeparator, ".");
         }
 
         if ( !parseNum( m ) ) {

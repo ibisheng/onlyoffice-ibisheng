@@ -23,6 +23,8 @@ var editor;
   var parserHelp = AscCommon.parserHelp;
   var g_oIdCounter = AscCommon.g_oIdCounter;
   var g_oTableId = AscCommon.g_oTableId;
+  var oNumFormatCache = AscCommon.oNumFormatCache;
+  var g_aCultureInfos = AscCommon.g_aCultureInfos;
 
   var c_oAscLockTypeElem = AscCommonExcel.c_oAscLockTypeElem;
 
@@ -439,10 +441,10 @@ var editor;
     return positiveFormat + ';' + negativeFormat + ';' + nullFormat + ';' + textFormat;
   };
   spreadsheet_api.prototype.asc_setLocale = function(val) {
-    g_oDefaultCultureInfo = g_aCultureInfos[val];
-    parserHelp.setDigitSeparator( g_oDefaultCultureInfo.NumberDecimalSeparator );
+    AscCommon.setCurrentCultureInfo(val);
+    parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSeparator);
 	  if (this.wbModel) {
-      oGeneralEditFormatCache.cleanCache();
+      AscCommon.oGeneralEditFormatCache.cleanCache();
       oNumFormatCache.cleanCache();
       this.wbModel.rebuildColors();
       if (this.IsSendDocumentLoadCompleate) {

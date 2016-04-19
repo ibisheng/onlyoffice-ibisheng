@@ -10,6 +10,7 @@
                 "../common/docscoapi.js",
                 "../common/apiCommon.js",
 				"../common/editorscommon.js",
+				"../common/NumFormat.js",
 				
 				"../word/apiDefines.js",
                 "../common/spellcheckapi.js",
@@ -34,7 +35,6 @@
                 "../common/Charts/3DTransformation.js",
                 "../common/Charts/DrawingArea.js",
                 "../common/Charts/DrawingObjects.js",
-                "../common/NumFormat.js",
                 "../common/Drawings/TrackObjects/AdjustmentTracks.js",
                 "../common/Drawings/TrackObjects/MoveTracks.js",
                 "../common/Drawings/TrackObjects/NewShapeTracks.js",

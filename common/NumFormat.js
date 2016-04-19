@@ -1,5 +1,10 @@
 "use strict";
 
+(/**
+* @param {Window} window
+* @param {undefined} undefined
+*/
+function(window, undefined) {
 // Import
 var bDate1904 = AscCommon.bDate1904;
 var CellValueType = AscCommon.CellValueType;
@@ -35,9 +40,6 @@ var numFormat_DecimalPointText = 22;
 //Вспомогательные типы, которые заменятюся в _prepareFormat
 var numFormat_MonthMinute = 101;
 var numFormat_Percent = 102;
-
-//кеш структур по строке формата
-var oNumFormatCache;
 
 var FormatStates = {Decimal: 1, Frac: 2, Scientific: 3, Slash: 4};
 var SignType = {Positive: 1, Negative: 2, Null:3};
@@ -1990,7 +1992,8 @@ NumFormatCache.prototype =
         this.oNumFormats[format] = res;
     }
 };
-oNumFormatCache = new NumFormatCache();
+//кеш структур по строке формата
+var oNumFormatCache = new NumFormatCache();
 
 function CellFormat(format)
 {
@@ -3539,6 +3542,9 @@ var g_oFormatParser = new FormatParser();
 function escapeRegExp(string) {
     return string.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
 }
+function setCurrentCultureInfo(val) {
+    AscCommon.g_oDefaultCultureInfo = g_oDefaultCultureInfo = g_aCultureInfos[val];
+}
 var g_aCultureInfos = {
     1: { LCID: 1, Name: "ar", CurrencyPositivePattern: 2, CurrencyNegativePattern: 3, CurrencySymbol: "ر.س.‏", NumberDecimalSeparator: ".", NumberGroupSeparator: ",", NumberGroupSizes: [3], DayNames: ["الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"], AbbreviatedDayNames: ["الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"], MonthNames: ["محرم", "صفر", "ربيع الأول", "ربيع الثاني", "جمادى الأولى", "جمادى الثانية", "رجب", "شعبان", "رمضان", "شوال", "ذو القعدة", "ذو الحجة", ""], AbbreviatedMonthNames: ["محرم", "صفر", "ربيع الأول", "ربيع الثاني", "جمادى الأولى", "جمادى الثانية", "رجب", "شعبان", "رمضان", "شوال", "ذو القعدة", "ذو الحجة", ""], MonthGenitiveNames: [], AbbreviatedMonthGenitiveNames: [], AMDesignator: "ص", PMDesignator: "م", DateSeparator: "/", TimeSeparator: ":", ShortDatePattern: "012" },
     2: { LCID: 2, Name: "bg", CurrencyPositivePattern: 3, CurrencyNegativePattern: 8, CurrencySymbol: "лв.", NumberDecimalSeparator: ",", NumberGroupSeparator: " ", NumberGroupSizes: [3], DayNames: ["неделя", "понеделник", "вторник", "сряда", "четвъртък", "петък", "събота"], AbbreviatedDayNames: ["нед", "пон", "вт", "ср", "четв", "пет", "съб"], MonthNames: ["януари", "февруари", "март", "април", "май", "юни", "юли", "август", "септември", "октомври", "ноември", "декември", ""], AbbreviatedMonthNames: ["ян", "февр", "март", "апр", "май", "юни", "юли", "авг", "септ", "окт", "ноември", "дек", ""], MonthGenitiveNames: [], AbbreviatedMonthGenitiveNames: [], AMDesignator: "", PMDesignator: "", DateSeparator: ".", TimeSeparator: ":", ShortDatePattern: "012" },
@@ -3894,3 +3900,20 @@ var g_aCultureInfos = {
     31848: { LCID: 31848, Name: "ha-Latn", CurrencyPositivePattern: 2, CurrencyNegativePattern: 2, CurrencySymbol: "N", NumberDecimalSeparator: ".", NumberGroupSeparator: ",", NumberGroupSizes: [3], DayNames: ["Lahadi", "Litinin", "Talata", "Laraba", "Alhamis", "Juma'a", "Asabar"], AbbreviatedDayNames: ["Lah", "Lit", "Tal", "Lar", "Alh", "Jum", "Asa"], MonthNames: ["Januwaru", "Febreru", "Maris", "Afrilu", "Mayu", "Yuni", "Yuli", "Agusta", "Satumba", "Oktocba", "Nuwamba", "Disamba", ""], AbbreviatedMonthNames: ["Jan", "Feb", "Mar", "Afr", "May", "Yun", "Yul", "Agu", "Sat", "Okt", "Nuw", "Dis", ""], MonthGenitiveNames: [], AbbreviatedMonthGenitiveNames: [], AMDesignator: "Safe", PMDesignator: "Yamma", DateSeparator: "/", TimeSeparator: ":", ShortDatePattern: "012" }
 };
 var g_oDefaultCultureInfo = g_aCultureInfos[1033];//en-US//1033//fr-FR//1036//basq//1069//ru-Ru//1049//hindi//1081
+
+    //---------------------------------------------------------export---------------------------------------------------
+    window['AscCommon'] = window['AscCommon'] || {};
+    window["AscCommon"].NumFormatFont = NumFormatFont;
+    window["AscCommon"].NumFormat = NumFormat;
+    window["AscCommon"].CellFormat = CellFormat;
+    window["AscCommon"].DecodeGeneralFormat = DecodeGeneralFormat;
+    window["AscCommon"].setCurrentCultureInfo = setCurrentCultureInfo;
+
+    window["AscCommon"].gc_nMaxDigCount = gc_nMaxDigCount;
+    window["AscCommon"].gc_nMaxDigCountView = gc_nMaxDigCountView;
+    window["AscCommon"].oNumFormatCache = oNumFormatCache;
+    window["AscCommon"].oGeneralEditFormatCache = oGeneralEditFormatCache;
+    window["AscCommon"].g_oFormatParser = g_oFormatParser;
+    window["AscCommon"].g_aCultureInfos = g_aCultureInfos;
+    window["AscCommon"].g_oDefaultCultureInfo = g_oDefaultCultureInfo;
+})(window);

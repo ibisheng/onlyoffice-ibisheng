@@ -1,4 +1,4 @@
-﻿$(function () {
+$(function () {
 
 	var ver = 2;
 
@@ -51,7 +51,7 @@
 				break;
 
 			case 2:
-				expr = new CellFormat(fmtStr);
+				expr = new AscCommon.CellFormat(fmtStr);
 				for (i = 0; i < nArr.length; ++i) {
 					var aFormated = expr.format(nArr[i]);
 					var text = "";

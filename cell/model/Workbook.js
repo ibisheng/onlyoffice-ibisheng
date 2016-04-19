@@ -6,6 +6,7 @@ var c_oAscBorderStyles = AscCommon.c_oAscBorderStyles;
 var fSortAscending = AscCommon.fSortAscending;
 var fSortDescending = AscCommon.fSortDescending;
 var parserHelp = AscCommon.parserHelp;
+var oNumFormatCache = AscCommon.oNumFormatCache;
 
 var UndoRedoItemSerializable = AscCommonExcel.UndoRedoItemSerializable;
 var UndoRedoData_CellSimpleData = AscCommonExcel.UndoRedoData_CellSimpleData;
@@ -5632,7 +5633,7 @@ Cell.prototype.shiftNumFormat=function(nShift, dDigitsCount){
 	{
 		if(CellValueType.Number == this.oValue.type)
 		{
-			var sGeneral = DecodeGeneralFormat(this.oValue.number, this.oValue.type, dDigitsCount);
+			var sGeneral = AscCommon.DecodeGeneralFormat(this.oValue.number, this.oValue.type, dDigitsCount);
 			var oGeneral = oNumFormatCache.get(sGeneral);
 			if(null != oGeneral && false == oGeneral.isGeneralFormat())
 			{
@@ -5862,7 +5863,7 @@ Cell.prototype.getValue2=function(dDigitsCount, fIsFitMeasurer){
 	if(null == fIsFitMeasurer)
 		fIsFitMeasurer = function(aText){return true;};
 	if(null == dDigitsCount)
-		dDigitsCount = gc_nMaxDigCountView;
+		dDigitsCount = AscCommon.gc_nMaxDigCountView;
 	return this.oValue.getValue2(this, dDigitsCount, fIsFitMeasurer);
 };
 Cell.prototype.getNumFormatStr=function(){
@@ -9176,7 +9177,7 @@ function _promoteFromTo(from, wsFrom, to, wsTo, bIsPromote, oCanPromote, bCtrl, 
 							if(null != data.sPrefix)
 								sVal += data.sPrefix;
 							//change javascript NumberDecimalSeparator '.' , to cultural NumberDecimalSeparator
-							sVal += data.nCurValue.toString().replace(/\./g, g_oDefaultCultureInfo.NumberDecimalSeparator);
+							sVal += data.nCurValue.toString().replace(/\./g, AscCommon.g_oDefaultCultureInfo.NumberDecimalSeparator);
 							oCopyCell.setValue(sVal);
 						}
 						else if(null != oFromCell)
