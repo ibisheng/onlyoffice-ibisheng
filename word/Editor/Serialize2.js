@@ -7462,17 +7462,27 @@ Binary_tblPrReader.prototype =
         {
             if(null == Pr.Shd)
                 Pr.Shd = new CDocumentShd();
+            var oNewShd = {Value: undefined, Color: undefined, Unifill: undefined};
 			var themeColor = {Auto: null, Color: null, Tint: null, Shade: null};
             res = this.bcr.Read2(length, function(t, l){
-                return oThis.bcr.ReadShd(t, l, Pr.Shd, themeColor);
+                return oThis.bcr.ReadShd(t, l, oNewShd, themeColor);
             });
-			if(true == themeColor.Auto && null != Pr.Shd.Color)
-				Pr.Shd.Color.Auto = true;//todo менять полностью цвет
-			var unifill = CreateThemeUnifill(themeColor.Color, themeColor.Tint, themeColor.Shade);
+            var unifill = CreateThemeUnifill(themeColor.Color, themeColor.Tint, themeColor.Shade);
+            if (true == themeColor.Auto) {
+                if (!oNewShd.Color) {
+                    oNewShd.Color = new CDocumentColor(255, 255, 255);
+                }
+                oNewShd.Color.Auto = true;
+            }
 			if(null != unifill)
-				Pr.Shd.Unifill = unifill;
-			else if (null != Pr.Shd.Color && !Pr.Shd.Color.Auto)
-			    Pr.Shd.Unifill = CreteSolidFillRGB(Pr.Shd.Color.r, Pr.Shd.Color.g, Pr.Shd.Color.b);
+				oNewShd.Unifill = unifill;
+			else if (null != oNewShd.Color && !oNewShd.Color.Auto)
+			    oNewShd.Unifill = CreteSolidFillRGB(oNewShd.Color.r, oNewShd.Color.g, oNewShd.Color.b);
+            //если есть themeColor или Color, то Value по умолчанию ShdClear(Тарифы_на_комплексное_обслуживание_клиен.docx)
+            if (undefined == oNewShd.Value && oNewShd.Unifill) {
+                oNewShd.Value = Asc.c_oAscShdClear;
+            }
+            Pr.Shd.Set_FromObject(oNewShd);
         }
         else if( c_oSerProp_cellPrType.TableCellBorders === type )
         {
