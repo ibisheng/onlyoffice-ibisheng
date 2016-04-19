@@ -110,7 +110,7 @@
      * Class representing a numbering properties.
      * @constructor
      */
-    function ApiNumPr(Num)
+    function ApiNumbering(Num)
     {
         this.Num = Num;
     }
@@ -119,10 +119,11 @@
      * Class representing a reference to a specified level of the numbering.
      * @constructor
      */
-    function ApiNumPrLvl(NumPr, Lvl)
+    function ApiNumberingLevel(Num, Lvl)
     {
-        this.Num = NumPr;
-        this.Lvl = Math.max(0, Math.min(8, Lvl));
+        this.Num    = Num;
+        this.Lvl    = Math.max(0, Math.min(8, Lvl));
+        this.NumLvl = this.Num.Lvl[this.Lvl];
     }
 
     /**
@@ -412,6 +413,24 @@
     ApiDocument.prototype.SetEvenAndOddHdrFtr = function(isEvenAndOdd)
     {
         this.Document.Set_DocumentEvenAndOddHeaders(isEvenAndOdd);
+    };
+    /**
+     * Creating an abstract multilevel numbering with specified type.
+     * @param {("bullet" | "numbered")} [sType="bullet"]
+     * @returns {ApiNumbering}
+     */
+    ApiDocument.prototype.CreateNumbering = function(sType)
+    {
+        var oGlobalNumbering = this.Document.Get_Numbering();
+        var oNumberingId = oGlobalNumbering.Create_AbstractNum();
+        var oNumbering = oGlobalNumbering.Get_AbstractNum(oNumberingId);
+
+        if ("numbered" === sType)
+            oNumbering.Create_Default_Numbered();
+        else
+            oNumbering.Create_Default_Bullet();
+
+        return new ApiNumbering(oNumbering);
     };
 
     //------------------------------------------------------------------------------------------------------------------
@@ -730,7 +749,7 @@
     /**
      * Specifies that the current paragraph references a numbering definition instance in the current document.
      * @see {@link ApiParagraph#GetParaPr} and {@link SetNumPr#SetTabs}
-     * @param {ApiNumPr} oNumPr - Specifies a numbering definition.
+     * @param {ApiNumbering} oNumPr - Specifies a numbering definition.
      * @param {number} nLvl - Specifies a numbering level reference.
      */
     ApiParagraph.prototype.SetNumPr = function(oNumPr, nLvl)
@@ -739,7 +758,7 @@
     };
     /**
      * Get a numbering defenition and numbering level.
-     * @returns {?ApiNumPrLvl}
+     * @returns {?ApiNumberingLevel}
      */
     ApiParagraph.prototype.GetNumPr = function()
     {
@@ -753,7 +772,19 @@
         if (!oNumbering)
             return null;
 
-        return new ApiNumPrLvl(oNumbering, oNumPr.Lvl);
+        return new ApiNumberingLevel(oNumbering, oNumPr.Lvl);
+    };
+    /**
+     * Specifies that the current paragraph references a numbering definition instance in the current document.
+     * @see Same as {@link ApiParagraph#SetNumPr}
+     * @param oNumberingLevel
+     */
+    ApiParagraph.prototype.SetNumbering = function(oNumberingLevel)
+    {
+        if (!(oNumberingLevel instanceof ApiNumberingLevel))
+            return;
+
+        this.SetNumPr(oNumberingLevel.GetNumbering(), oNumberingLevel.GetLevelIndex());
     };
 
     //------------------------------------------------------------------------------------------------------------------
@@ -1990,14 +2021,14 @@
     };
     /**
      * Specifies that the current paragraph references a numbering definition instance in the current document.
-     * @param {ApiNumPr} oNumPr - Specifies a numbering definition.
+     * @param {ApiNumbering} oNumPr - Specifies a numbering definition.
      * @param {number} [nLvl=0] - Specifies a numbering level reference. If the current instance of the class ApiParaPr is
      * direct formatting of a paragraph, then this parameter <b>MUST BE</b> specified. Otherwise if the current instance
      * of the class ApiParaPr is the part of ApiStyle properties, then this parameter will be ignored.
      */
     ApiParaPr.prototype.SetNumPr = function(oNumPr, nLvl)
     {
-        if (!(oNumPr instanceof ApiNumPr))
+        if (!(oNumPr instanceof ApiNumbering))
             return;
 
         this.ParaPr.NumPr = new CNumPr();
@@ -2013,41 +2044,151 @@
 
     //------------------------------------------------------------------------------------------------------------------
     //
-    // ApiNumPr
+    // ApiNumbering
     //
     //------------------------------------------------------------------------------------------------------------------
 
+    /**
+     * Get the specified level of the current numbering.
+     * @param {number} nLevel - Index of the numbering level. This value MUST BE from 0 to 8.
+     * @returns {ApiNumberingLevel}
+     */
+    ApiNumbering.prototype.GetLevel = function(nLevel)
+    {
+        return new ApiNumberingLevel(this.Num, nLevel);
+    };
+
     //------------------------------------------------------------------------------------------------------------------
     //
-    // ApiNumPr
+    // ApiNumberingLevel
     //
     //------------------------------------------------------------------------------------------------------------------
 
     /**
      * Get a numbering defenition.
-     * @returns {ApiNumPr}
+     * @returns {ApiNumbering}
      */
-    ApiNumPrLvl.prototype.GetNumbering = function()
+    ApiNumberingLevel.prototype.GetNumbering = function()
     {
-        return new ApiNumPr(this.Num);
+        return new ApiNumbering(this.Num);
     };
     /**
      * Get level index.
      * @returns {number}
      */
-    ApiNumPrLvl.prototype.GetLevel = function()
+    ApiNumberingLevel.prototype.GetLevelIndex = function()
     {
         return this.Lvl;
     };
     /**
-     * Set level index.
-     * @param {number} nLevel - Index of the level in the current numbering. This value MUST BE from 0 to 8.
+     * Specifies the run properties which shall be applied to the numbering level's text.
+     * @returns {ApiTextPr}
      */
-    ApiNumPrLvl.prototype.SetLevel = function(nLevel)
+    ApiNumberingLevel.prototype.GetTextPr = function()
     {
-        this.Lvl = Math.max(0, Math.min(8, nLevel));
+        return new ApiTextPr(this.NumLvl.TextPr.Copy());
     };
+    /**
+     * This paragraph properties are applied to any numbered paragraph that references the given numbering definition
+     * and numbering level.
+     * @returns {ApiParaPr}
+     */
+    ApiNumberingLevel.prototype.GetParaPr = function()
+    {
+        return new ApiParaPr(this.NumPr.ParaPr.Copy());
+    };
+    /**
+     * Set one of the predefined numbering templates.
+     * @param {("none" | "bullet" | "1)" | "1." | "I." | "A." | "a)" | "a." | "i." )} sType - Type of the numbering
+     * @param {string} [sSymbol=""] - This parameter have a meaning only if <code>sType="bullet"</code>
+     */
+    ApiNumberingLevel.prototype.SetTemplateType = function(sType, sSymbol)
+    {
+        switch (sType)
+        {
+            case "none"  : this.Num.Set_Lvl_None(this.Lvl); break;
+            case "bullet": this.Num.Set_Lvl_Bullet(this.Lvl, sSymbol, new CTextPr()); break;
+            case "1)"    : this.Num.Set_Lvl_Numbered_1(this.Lvl); break;
+            case "1."    : this.Num.Set_Lvl_Numbered_2(this.Lvl); break;
+            case "I."    : this.Num.Set_Lvl_Numbered_5(this.Lvl); break;
+            case "A."    : this.Num.Set_Lvl_Numbered_6(this.Lvl); break;
+            case "a)"    : this.Num.Set_Lvl_Numbered_7(this.Lvl); break;
+            case "a."    : this.Num.Set_Lvl_Numbered_8(this.Lvl); break;
+            case "i."    : this.Num.Set_Lvl_Numbered_9(this.Lvl); break;
+        }
+    };
+    /**
+     * Set the custom type of the numbering.
+     * @param {("none" | "bullet" | "decimal" | "lowerRoman" | "upperRoman" | "lowerLetter" | "upperLetter" | "decimalZero")} sType
+     * @param {string} sTextFormatString - All text in this parameter shall be taken as literal text to be repeated in
+     * each instance of this numbering level, except for any use of the percent symbol (%) followed by a number,
+     * which shall be used to indicate the one-based index of the number to be used at this level. Any number of a level
+     * higher than this level shall be ignored.
+     * @param {("left" | "right" | "center")} sAlign - Type of justification used on a numbering level's text.
+     */
+    ApiNumberingLevel.prototype.SetCustomType = function(sType, sTextFormatString, sAlign)
+    {
+        var nType = numbering_numfmt_None;
+        if ("none" === sType)
+            nType = numbering_numfmt_None;
+        else if ("bullet" === sType)
+            nType = numbering_numfmt_Bullet;
+        else if ("decimal" === sType)
+            nType = numbering_numfmt_Decimal;
+        else if ("lowerRoman" === sType)
+            nType = numbering_numfmt_LowerRoman;
+        else if ("upperRoman" === sType)
+            nType = numbering_numfmt_UpperRoman;
+        else if ("lowerLetter" === sType)
+            nType = numbering_numfmt_LowerLetter;
+        else if ("upperLetter" === sType)
+            nType = numbering_numfmt_UpperLetter;
+        else if ("decimalZero" === sType)
+            nType = numbering_numfmt_DecimalZero;
 
+        var nAlign = AscCommon.align_Left;
+        if ("left" === sAlign)
+            nAlign = AscCommon.align_Left;
+        else if ("right" === sAlign)
+            nAlign = AscCommon.align_Right;
+        else if ("center" === sAlign)
+            nAlign = AscCommon.align_Center;
+
+        this.Num.Set_Lvl_ByFormat(this.Lvl, nType, sTextFormatString, nAlign);
+    };
+    /**
+     * This element specifies a one-based index which determines when a numbering level should restart to its start 
+     * value. A numbering level restarts when an instance of the specified numbering level, which shall be
+     * higher (earlier than the this level) is used in the given document's contents. By default this value is true.
+     * @param {boolean} isRestart
+     */
+    ApiNumberingLevel.prototype.SetRestart = function(isRestart)
+    {
+        this.Num.Set_Lvl_Restart(this.Lvl, private_GetBoolean(isRestart, true));
+    };
+    /**
+     * This element specifies the starting value for the numbering used by the parent numbering level within a given
+     * numbering level definition. By default this value is 1.
+     * @param {number} nStart
+     */
+    ApiNumberingLevel.prototype.SetStart = function(nStart)
+    {
+        this.Num.Set_Lvl_Start(this.Lvl, private_GetInt(nStart));
+    };
+    /**
+     * Specifies the content which shall be added between a given numbering level's text and the text of every numbered
+     * paragraph which references that numbering level. By default this value is "tab".
+     * @param {("space" | "tab" | "none")} sType
+     */
+    ApiNumberingLevel.prototype.SetSuff = function(sType)
+    {
+        if ("space" === sType)
+            this.Num.Set_Lvl_Suff(this.Lvl, numbering_suff_Space);
+        else if ("tab" === sType)
+            this.Num.Set_Lvl_Suff(this.Lvl, numbering_suff_Tab);
+        else if ("none" === sType)
+            this.Num.Set_Lvl_Suff(this.Lvl, numbering_suff_Nothing);
+    };
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Export
@@ -2070,6 +2211,7 @@
     ApiDocument.prototype["GetFinalSection"]         = ApiDocument.prototype.GetFinalSection;
     ApiDocument.prototype["CreateSection"]           = ApiDocument.prototype.CreateSection;
     ApiDocument.prototype["SetEvenAndOddHdrFtr"]     = ApiDocument.prototype.SetEvenAndOddHdrFtr;
+    ApiDocument.prototype["CreateNumbering"]         = ApiDocument.prototype.CreateNumbering;
 
     ApiParagraph.prototype["AddText"]                = ApiParagraph.prototype.AddText;
     ApiParagraph.prototype["AddPageBreak"]           = ApiParagraph.prototype.AddPageBreak;
@@ -2201,9 +2343,18 @@
     ApiParaPr.prototype["SetTabs"]                   = ApiParaPr.prototype.SetTabs;
     ApiParaPr.prototype["SetNumPr"]                  = ApiParaPr.prototype.SetNumPr;
 
-    ApiNumPrLvl.prototype["GetNumbering"]            = ApiNumPrLvl.prototype.GetNumbering;
-    ApiNumPrLvl.prototype["GetLevel"]                = ApiNumPrLvl.prototype.GetLevel;
-    ApiNumPrLvl.prototype["SetLevel"]                = ApiNumPrLvl.prototype.SetLevel;
+    ApiNumbering.prototype["GetLevel"]               = ApiNumbering.prototype.GetLevel;
+    
+    ApiNumberingLevel.prototype["GetNumbering"]      = ApiNumberingLevel.prototype.GetNumbering;
+    ApiNumberingLevel.prototype["GetLevelIndex"]     = ApiNumberingLevel.prototype.GetLevelIndex;
+    ApiNumberingLevel.prototype["GetTextPr"]         = ApiNumberingLevel.prototype.GetTextPr;
+    ApiNumberingLevel.prototype["GetParaPr"]         = ApiNumberingLevel.prototype.GetParaPr;
+    ApiNumberingLevel.prototype["SetTemplateType"]   = ApiNumberingLevel.prototype.SetTemplateType;
+    ApiNumberingLevel.prototype["SetCustomType"]     = ApiNumberingLevel.prototype.SetCustomType;
+    ApiNumberingLevel.prototype["SetRestart"]        = ApiNumberingLevel.prototype.SetRestart;
+    ApiNumberingLevel.prototype["SetStart"]          = ApiNumberingLevel.prototype.SetStart;
+    ApiNumberingLevel.prototype["SetSuff"]           = ApiNumberingLevel.prototype.SetSuff;
+
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Private area
@@ -2272,14 +2423,23 @@
     {
         var oBorder = new CDocumentBorder();
 
-        if ("single" === sType)
-            oBorder.Value = border_Single;
-        else if ("none" === sType)
+        if ("none" === sType)
+        {
             oBorder.Value = border_None;
+            oBorder.Size  = 0;
+            oBorder.Space = 0;
+            oBorder.Color.Set(0, 0, 0, true);
+        }
+        else
+        {
+            if ("single" === sType)
+                oBorder.Value = border_Single;
 
-        oBorder.Size  = private_Pt_8ToMM(nSize);
-        oBorder.Space = private_PtToMM(nSpace);
-        oBorder.Color.Set(r, g, b);
+            oBorder.Size  = private_Pt_8ToMM(nSize);
+            oBorder.Space = private_PtToMM(nSpace);
+            oBorder.Color.Set(r, g, b);
+        }
+
         return oBorder;
     }
 
@@ -2304,6 +2464,11 @@
             return false;
         else
             return (undefined !== bDefValue ? bDefValue : false);
+    }
+
+    function private_GetInt(nValue)
+    {
+        return nValue | 0;
     }
 
     function private_PtToMM(pt)
@@ -2360,6 +2525,16 @@
     {
         this.Style.Set_ParaPr(oApiParaPr.ParaPr);
         oApiParaPr.ParaPr = this.Style.ParaPr.Copy();
+    };
+    ApiNumberingLevel.prototype.OnChangeTextPr = function(oApiTextPr)
+    {
+        this.Num.Set_TextPr(this.Lvl, oApiTextPr.TextPr);
+        oApiTextPr.TextPr = this.Num.Lvl[this.Lvl].TextPr.Copy();
+    };
+    ApiNumberingLevel.prototype.OnChangeParaPr = function(oApiParaPr)
+    {
+        this.Num.Set_ParaPr(this.Lvl, oApiParaPr.ParaPr);
+        oApiParaPr.ParaPr = this.Num.Lvl[this.Lvl].ParaPr.Copy();
     };
     ApiTextPr.prototype.private_OnChange = function()
     {
@@ -2791,6 +2966,14 @@ function TEST_BUILDER()
     oTable.SetWidth("auto");
     oTable.SetJc("right");
     oTable.SetTableLook(true, true, false, false, true, false);
+
+    oTable.SetTableBorderLeft("none");
+    oTable.SetTableBorderRight("none");
+    oTable.SetTableBorderTop("none");
+    oTable.SetTableBorderBottom("none");
+    oTable.SetTableBorderInsideV("none");
+
+
     oRow = oTable.GetRow(0);
     if (oRow)
     {
@@ -3019,7 +3202,77 @@ function TEST_BUILDER2()
     oParagraph.AddText("Custom tabs (center, left, right)");
     oDocument.Push(oParagraph);
 
-    //TODO: Сделать примеры параграфов с нумерацей
+
+    var oNumbering = oDocument.CreateNumbering("bullet");
+    var oNumLvl;
+    for (var nLvl = 0; nLvl < 8; ++nLvl)
+    {
+        oNumLvl = oNumbering.GetLevel(nLvl);
+        oParagraph = Api.CreateParagraph();
+        oParagraph.AddText("Default bullet lvl " + (nLvl + 1));
+        oParagraph.SetNumbering(oNumLvl);
+        oParagraph.SetContextualSpacing(true);
+        oDocument.Push(oParagraph);
+    }
+
+    oNumbering = oDocument.CreateNumbering("numbered");
+    for (var nLvl = 0; nLvl < 8; ++nLvl)
+    {
+        oNumLvl = oNumbering.GetLevel(nLvl);
+        oParagraph = Api.CreateParagraph();
+        oParagraph.AddText("Default numbered lvl " + (nLvl + 1));
+        oParagraph.SetNumbering(oNumLvl);
+        oParagraph.SetContextualSpacing(true);
+        oDocument.Push(oParagraph);
+    }
+
+    oNumbering = oDocument.CreateNumbering("numbered");
+    for (var nLvl = 0; nLvl < 8; ++nLvl)
+    {
+        oNumLvl = oNumbering.GetLevel(nLvl);
+
+        var sFormatString = "";
+        for (var nTempLvl = 0; nTempLvl <= nLvl; ++nTempLvl)
+            sFormatString += "%" + nTempLvl + ".";
+
+        oNumLvl.SetCustomType("lowerRoman", sFormatString, "left");
+        oNumLvl.SetStart(nLvl + 1);
+        oNumLvl.SetSuff("space");
+
+        oParagraph = Api.CreateParagraph();
+        oParagraph.AddText("Custom numbered lvl " + (nLvl + 1));
+        oParagraph.SetNumbering(oNumLvl);
+        oParagraph.SetContextualSpacing(true);
+        oDocument.Push(oParagraph);
+
+        oParagraph = Api.CreateParagraph();
+        oParagraph.AddText("Custom numbered lvl " + (nLvl + 1));
+        oParagraph.SetNumbering(oNumLvl);
+        oParagraph.SetContextualSpacing(true);
+        oDocument.Push(oParagraph);
+    }
+
+    oNumbering = oDocument.CreateNumbering("bullet");
+    for (var nLvl = 0; nLvl < 8; ++nLvl)
+    {
+        oNumLvl = oNumbering.GetLevel(nLvl);
+
+        var sSymbolCharCode = 'a'.charCodeAt(0) + nLvl;
+        oNumLvl.SetTemplateType("bullet", String.fromCharCode(sSymbolCharCode));
+        oNumLvl.SetSuff("none");
+
+        oParagraph = Api.CreateParagraph();
+        oParagraph.AddText("Template bullet lvl " + (nLvl + 1));
+        oParagraph.SetNumbering(oNumLvl);
+        oParagraph.SetContextualSpacing(true);
+        oDocument.Push(oParagraph);
+
+        oParagraph = Api.CreateParagraph();
+        oParagraph.AddText("Template bullet  lvl " + (nLvl + 1));
+        oParagraph.SetNumbering(oNumLvl);
+        oParagraph.SetContextualSpacing(true);
+        oDocument.Push(oParagraph);
+    }
 
     var oSection = oDocument.GetFinalSection();
     var oHeader = oSection.GetHeader("default", true);

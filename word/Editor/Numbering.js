@@ -258,7 +258,7 @@ CAbstractNum.prototype =
 {
     Set_Id : function(newId)
     {
-        AscCommon.g_oTableId.Reset_Id( this, newId, this.Id );
+        AscCommon.g_oTableId.Reset_Id(this, newId, this.Id);
         this.Id = newId;
     },
 
@@ -274,11 +274,11 @@ CAbstractNum.prototype =
         this.StyleLink    = AbstractNum.StyleLink;
         this.NumStyleLink = AbstractNum.NumStyleLink;
 
-        for ( var Index = 0; Index < 9; Index++ )
+        for (var Index = 0; Index < 9; Index++)
         {
-            var Lvl_new = this.Internal_CopyLvl( AbstractNum.Lvl[Index] );
+            var Lvl_new = this.Internal_CopyLvl(AbstractNum.Lvl[Index]);
             var Lvl_old = this.Lvl[Index];
-            History.Add( this, { Type : historyitem_AbstractNum_LvlChange, Index : Index, Old : Lvl_old, New : Lvl_new } );
+            History.Add(this, {Type : historyitem_AbstractNum_LvlChange, Index : Index, Old : Lvl_old, New : Lvl_new});
 
             this.Lvl[Index] = Lvl_new;
         }
@@ -288,35 +288,35 @@ CAbstractNum.prototype =
     Change_LeftInd : function(NewLeft)
     {
         var OldLeft = this.Lvl[0].ParaPr.Ind.Left;
-        for ( var Index = 0; Index < 9; Index++ )
+        for (var Index = 0; Index < 9; Index++)
         {
-            var Lvl_new = this.Internal_CopyLvl( this.Lvl[Index] );
-            var Lvl_old = this.Internal_CopyLvl( this.Lvl[Index] );
+            var Lvl_new             = this.Internal_CopyLvl(this.Lvl[Index]);
+            var Lvl_old             = this.Internal_CopyLvl(this.Lvl[Index]);
             Lvl_new.ParaPr.Ind.Left = Lvl_old.ParaPr.Ind.Left - OldLeft + NewLeft;
 
-            this.Internal_SetLvl( Index, Lvl_new );
+            this.Internal_SetLvl(Index, Lvl_new);
 
-            History.Add( this, { Type : historyitem_AbstractNum_LvlChange, Index : Index, Old : Lvl_old, New : Lvl_new } );
+            History.Add(this, {Type : historyitem_AbstractNum_LvlChange, Index : Index, Old : Lvl_old, New : Lvl_new});
         }
 
         var LogicDocument = editor.WordControl.m_oLogicDocument;
-        var AllParagraphs = LogicDocument.Get_AllParagraphsByNumbering( { NumId : this.Id, Lvl : undefined } );
+        var AllParagraphs = LogicDocument.Get_AllParagraphsByNumbering({NumId : this.Id, Lvl : undefined});
 
         var Count = AllParagraphs.length;
-        for ( var Index = 0; Index < Count; Index++ )
+        for (var Index = 0; Index < Count; Index++)
         {
-            var Para = AllParagraphs[Index];
+            var Para                   = AllParagraphs[Index];
             Para.CompiledPr.NeedRecalc = true;
         }
     },
 
     Get_LvlByStyle : function(StyleId)
     {
-        for ( var Index = 0; Index < 9; Index++ )
+        for (var Index = 0; Index < 9; Index++)
         {
             var Lvl = this.Lvl[Index];
 
-            if ( StyleId === Lvl.PStyle )
+            if (StyleId === Lvl.PStyle)
                 return Index;
         }
 
@@ -325,45 +325,45 @@ CAbstractNum.prototype =
 
     Get_Lvl : function(Lvl)
     {
-        if ( undefined === this.Lvl[Lvl] )
+        if (undefined === this.Lvl[Lvl])
             return this.Lvl[0];
 
         return this.Lvl[Lvl];
     },
-	
+
     Set_Lvl : function(iLvl, Lvl_new)
     {
-        if ( "number" != typeof(iLvl) || iLvl < 0 || iLvl >= 9 )
+        if ("number" != typeof(iLvl) || iLvl < 0 || iLvl >= 9)
             return;
 
-        var Lvl_old = this.Lvl[iLvl];
+        var Lvl_old    = this.Lvl[iLvl];
         this.Lvl[iLvl] = Lvl_new;
-        History.Add( this, { Type : historyitem_AbstractNum_LvlChange, Index : iLvl, Old : Lvl_old, New : Lvl_new } );
+        History.Add(this, {Type : historyitem_AbstractNum_LvlChange, Index : iLvl, Old : Lvl_old, New : Lvl_new});
     },
-	
+
     // Определяем многоуровненый список по умолчанию
     Create_Default_Numbered : function()
     {
-        for ( var Index = 0; Index < 9; Index++ )
+        for (var Index = 0; Index < 9; Index++)
         {
-            var Lvl_old = this.Internal_CopyLvl( this.Lvl[Index] );
+            var Lvl_old = this.Internal_CopyLvl(this.Lvl[Index]);
 
             this.Lvl[Index] = {};
-            var Lvl = this.Lvl[Index];
+            var Lvl         = this.Lvl[Index];
 
             Lvl.Start   = 1;
             Lvl.Restart = -1;        // -1 - делаем нумерацию сначала всегда, 0 - никогда не начинаем нумерацию заново
             Lvl.Suff    = numbering_suff_Tab;
 
-            var Left      =  36 * (Index + 1) * g_dKoef_pt_to_mm;
+            var Left      = 36 * (Index + 1) * g_dKoef_pt_to_mm;
             var FirstLine = -18 * g_dKoef_pt_to_mm;
 
-            if ( 0 == Index % 3 )
+            if (0 == Index % 3)
             {
                 Lvl.Jc     = align_Left;
                 Lvl.Format = numbering_numfmt_Decimal;
             }
-            else if ( 1 == Index % 3 )
+            else if (1 == Index % 3)
             {
                 Lvl.Jc     = align_Left;
                 Lvl.Format = numbering_numfmt_LowerLetter;
@@ -376,43 +376,43 @@ CAbstractNum.prototype =
             }
 
             Lvl.LvlText = [];
-            Lvl.LvlText.push( new CLvlText_Num( Index ) );
-            Lvl.LvlText.push( new CLvlText_Text( "." ) );
+            Lvl.LvlText.push(new CLvlText_Num(Index));
+            Lvl.LvlText.push(new CLvlText_Text("."));
 
-            Lvl.ParaPr = new CParaPr();
+            Lvl.ParaPr               = new CParaPr();
             Lvl.ParaPr.Ind.Left      = Left;
             Lvl.ParaPr.Ind.FirstLine = FirstLine;
 
             Lvl.TextPr = new CTextPr();
 
-            var Lvl_new = this.Internal_CopyLvl( Lvl );
-            History.Add( this, { Type : historyitem_AbstractNum_LvlChange, Index : Index, Old : Lvl_old, New : Lvl_new } );
+            var Lvl_new = this.Internal_CopyLvl(Lvl);
+            History.Add(this, {Type : historyitem_AbstractNum_LvlChange, Index : Index, Old : Lvl_old, New : Lvl_new});
         }
     },
 
     Create_Default_Multilevel_1 : function()
     {
-        for ( var Index = 0; Index < 9; Index++ )
+        for (var Index = 0; Index < 9; Index++)
         {
-            var Lvl_old = this.Internal_CopyLvl( this.Lvl[Index] );
+            var Lvl_old = this.Internal_CopyLvl(this.Lvl[Index]);
 
             this.Lvl[Index] = {};
-            var Lvl = this.Lvl[Index];
+            var Lvl         = this.Lvl[Index];
 
             Lvl.Start   = 1;
             Lvl.Restart = -1;
             Lvl.Suff    = numbering_suff_Tab;
 
-            var Left      =  18 * (Index + 1) * g_dKoef_pt_to_mm;
+            var Left      = 18 * (Index + 1) * g_dKoef_pt_to_mm;
             var FirstLine = -18 * g_dKoef_pt_to_mm;
 
-            Lvl.Jc     = align_Left;
+            Lvl.Jc = align_Left;
 
-            if ( 0 == Index % 3 )
+            if (0 == Index % 3)
             {
                 Lvl.Format = numbering_numfmt_Decimal;
             }
-            else if ( 1 == Index % 3 )
+            else if (1 == Index % 3)
             {
                 Lvl.Format = numbering_numfmt_LowerLetter;
             }
@@ -422,74 +422,74 @@ CAbstractNum.prototype =
             }
 
             Lvl.LvlText = [];
-            Lvl.LvlText.push( new CLvlText_Num( Index ) );
-            Lvl.LvlText.push( new CLvlText_Text( ")" ) );
+            Lvl.LvlText.push(new CLvlText_Num(Index));
+            Lvl.LvlText.push(new CLvlText_Text(")"));
 
-            Lvl.ParaPr = new CParaPr();
+            Lvl.ParaPr               = new CParaPr();
             Lvl.ParaPr.Ind.Left      = Left;
             Lvl.ParaPr.Ind.FirstLine = FirstLine;
 
             var TextPr = new CTextPr();
             Lvl.TextPr = TextPr;
 
-            var Lvl_new = this.Internal_CopyLvl( Lvl );
-            History.Add( this, { Type : historyitem_AbstractNum_LvlChange, Index : Index, Old : Lvl_old, New : Lvl_new } );
+            var Lvl_new = this.Internal_CopyLvl(Lvl);
+            History.Add(this, {Type : historyitem_AbstractNum_LvlChange, Index : Index, Old : Lvl_old, New : Lvl_new});
         }
     },
 
     Create_Default_Multilevel_2 : function()
     {
-        for ( var Index = 0; Index < 9; Index++ )
+        for (var Index = 0; Index < 9; Index++)
         {
-            var Lvl_old = this.Internal_CopyLvl( this.Lvl[Index] );
+            var Lvl_old = this.Internal_CopyLvl(this.Lvl[Index]);
 
             this.Lvl[Index] = {};
-            var Lvl = this.Lvl[Index];
+            var Lvl         = this.Lvl[Index];
 
             Lvl.Start   = 1;
             Lvl.Restart = -1;        // -1 - делаем нумерацию сначала всегда, 0 - никогда не начинаем нумерацию заново
             Lvl.Suff    = numbering_suff_Tab;
 
-            var Left      =  0;
-            var FirstLine =  0;
+            var Left      = 0;
+            var FirstLine = 0;
 
-            switch ( Index )
+            switch (Index)
             {
                 case 0 :
-                    Left      =  18 * g_dKoef_pt_to_mm;
+                    Left      = 18 * g_dKoef_pt_to_mm;
                     FirstLine = -18 * g_dKoef_pt_to_mm;
                     break;
                 case 1 :
-                    Left      =  39.6 * g_dKoef_pt_to_mm;
+                    Left      = 39.6 * g_dKoef_pt_to_mm;
                     FirstLine = -21.6 * g_dKoef_pt_to_mm;
                     break;
                 case 2 :
-                    Left      =  61.2 * g_dKoef_pt_to_mm;
+                    Left      = 61.2 * g_dKoef_pt_to_mm;
                     FirstLine = -25.2 * g_dKoef_pt_to_mm;
                     break;
                 case 3 :
-                    Left      =  86.4 * g_dKoef_pt_to_mm;
+                    Left      = 86.4 * g_dKoef_pt_to_mm;
                     FirstLine = -32.4 * g_dKoef_pt_to_mm;
                     break;
                 case 4 :
-                    Left      =  111.6 * g_dKoef_pt_to_mm;
-                    FirstLine = -39.6  * g_dKoef_pt_to_mm;
+                    Left      = 111.6 * g_dKoef_pt_to_mm;
+                    FirstLine = -39.6 * g_dKoef_pt_to_mm;
                     break;
                 case 5 :
-                    Left      =  136.8 * g_dKoef_pt_to_mm;
-                    FirstLine = -46.8  * g_dKoef_pt_to_mm;
+                    Left      = 136.8 * g_dKoef_pt_to_mm;
+                    FirstLine = -46.8 * g_dKoef_pt_to_mm;
                     break;
                 case 6 :
-                    Left      =  162 * g_dKoef_pt_to_mm;
-                    FirstLine = -54  * g_dKoef_pt_to_mm;
+                    Left      = 162 * g_dKoef_pt_to_mm;
+                    FirstLine = -54 * g_dKoef_pt_to_mm;
                     break;
                 case 7 :
-                    Left      =  187.2 * g_dKoef_pt_to_mm;
-                    FirstLine =  -61.2 * g_dKoef_pt_to_mm;
+                    Left      = 187.2 * g_dKoef_pt_to_mm;
+                    FirstLine = -61.2 * g_dKoef_pt_to_mm;
                     break;
                 case 8 :
-                    Left      =  216 * g_dKoef_pt_to_mm;
-                    FirstLine = -72  * g_dKoef_pt_to_mm;
+                    Left      = 216 * g_dKoef_pt_to_mm;
+                    FirstLine = -72 * g_dKoef_pt_to_mm;
                     break;
             }
 
@@ -497,105 +497,105 @@ CAbstractNum.prototype =
             Lvl.Format = numbering_numfmt_Decimal;
 
             Lvl.LvlText = [];
-            for ( var Index2 = 0; Index2 <= Index; Index2++ )
+            for (var Index2 = 0; Index2 <= Index; Index2++)
             {
-                Lvl.LvlText.push( new CLvlText_Num( Index2 ) );
-                Lvl.LvlText.push( new CLvlText_Text( "." ) );
+                Lvl.LvlText.push(new CLvlText_Num(Index2));
+                Lvl.LvlText.push(new CLvlText_Text("."));
             }
 
-            Lvl.ParaPr = new CParaPr();
+            Lvl.ParaPr               = new CParaPr();
             Lvl.ParaPr.Ind.Left      = Left;
             Lvl.ParaPr.Ind.FirstLine = FirstLine;
 
             var TextPr = new CTextPr();
             Lvl.TextPr = TextPr;
 
-            var Lvl_new = this.Internal_CopyLvl( Lvl );
-            History.Add( this, { Type : historyitem_AbstractNum_LvlChange, Index : Index, Old : Lvl_old, New : Lvl_new } );
+            var Lvl_new = this.Internal_CopyLvl(Lvl);
+            History.Add(this, {Type : historyitem_AbstractNum_LvlChange, Index : Index, Old : Lvl_old, New : Lvl_new});
         }
     },
 
     Create_Default_Multilevel_3 : function()
     {
-        for ( var Index = 0; Index < 9; Index++ )
+        for (var Index = 0; Index < 9; Index++)
         {
-            var Lvl_old = this.Internal_CopyLvl( this.Lvl[Index] );
+            var Lvl_old = this.Internal_CopyLvl(this.Lvl[Index]);
 
             this.Lvl[Index] = {};
-            var Lvl = this.Lvl[Index];
+            var Lvl         = this.Lvl[Index];
 
             Lvl.Start   = 1;
             Lvl.Restart = -1;        // -1 - делаем нумерацию сначала всегда, 0 - никогда не начинаем нумерацию заново
             Lvl.Suff    = numbering_suff_Tab;
 
-            var Left      =  18 * (Index + 1) * g_dKoef_pt_to_mm;
+            var Left      = 18 * (Index + 1) * g_dKoef_pt_to_mm;
             var FirstLine = -18 * g_dKoef_pt_to_mm;
-            Lvl.Format = numbering_numfmt_Bullet;
-            Lvl.Jc     = align_Left;
+            Lvl.Format    = numbering_numfmt_Bullet;
+            Lvl.Jc        = align_Left;
 
             Lvl.LvlText = [];
-            switch( Index )
+            switch (Index)
             {
                 case 0:
-                    Lvl.LvlText.push( new CLvlText_Text( String.fromCharCode( 0x0076 ) ) );
+                    Lvl.LvlText.push(new CLvlText_Text(String.fromCharCode(0x0076)));
                     break;
                 case 1:
-                    Lvl.LvlText.push( new CLvlText_Text( String.fromCharCode( 0x00D8 ) ) );
+                    Lvl.LvlText.push(new CLvlText_Text(String.fromCharCode(0x00D8)));
                     break;
                 case 2:
-                    Lvl.LvlText.push( new CLvlText_Text( String.fromCharCode( 0x00A7 ) ) );
+                    Lvl.LvlText.push(new CLvlText_Text(String.fromCharCode(0x00A7)));
                     break;
                 case 3:
-                    Lvl.LvlText.push( new CLvlText_Text( String.fromCharCode( 0x00B7 ) ) );
+                    Lvl.LvlText.push(new CLvlText_Text(String.fromCharCode(0x00B7)));
                     break;
                 case 4:
-                    Lvl.LvlText.push( new CLvlText_Text( String.fromCharCode( 0x00A8 ) ) );
+                    Lvl.LvlText.push(new CLvlText_Text(String.fromCharCode(0x00A8)));
                     break;
                 case 5:
-                    Lvl.LvlText.push( new CLvlText_Text( String.fromCharCode( 0x00D8 ) ) );
+                    Lvl.LvlText.push(new CLvlText_Text(String.fromCharCode(0x00D8)));
                     break;
                 case 6:
-                    Lvl.LvlText.push( new CLvlText_Text( String.fromCharCode( 0x00A7 ) ) );
+                    Lvl.LvlText.push(new CLvlText_Text(String.fromCharCode(0x00A7)));
                     break;
                 case 7:
-                    Lvl.LvlText.push( new CLvlText_Text( String.fromCharCode( 0x00B7 ) ) );
+                    Lvl.LvlText.push(new CLvlText_Text(String.fromCharCode(0x00B7)));
                     break;
                 case 8:
-                    Lvl.LvlText.push( new CLvlText_Text( String.fromCharCode( 0x00A8 ) ) );
+                    Lvl.LvlText.push(new CLvlText_Text(String.fromCharCode(0x00A8)));
                     break;
             }
 
-            Lvl.ParaPr = new CParaPr();
+            Lvl.ParaPr               = new CParaPr();
             Lvl.ParaPr.Ind.Left      = Left;
             Lvl.ParaPr.Ind.FirstLine = FirstLine;
 
             var TextPr = new CTextPr();
-            if ( 3 === Index || 4 === Index || 7 === Index || 8 === Index )
-                TextPr.RFonts.Set_All( "Symbol", -1 );
+            if (3 === Index || 4 === Index || 7 === Index || 8 === Index)
+                TextPr.RFonts.Set_All("Symbol", -1);
             else
-                TextPr.RFonts.Set_All( "Wingdings", -1 );
+                TextPr.RFonts.Set_All("Wingdings", -1);
 
             Lvl.TextPr = TextPr;
 
-            var Lvl_new = this.Internal_CopyLvl( Lvl );
-            History.Add( this, { Type : historyitem_AbstractNum_LvlChange, Index : Index, Old : Lvl_old, New : Lvl_new } );
+            var Lvl_new = this.Internal_CopyLvl(Lvl);
+            History.Add(this, {Type : historyitem_AbstractNum_LvlChange, Index : Index, Old : Lvl_old, New : Lvl_new});
         }
     },
 
     Create_Default_Bullet : function()
     {
-        for ( var Index = 0; Index < 9; Index++ )
+        for (var Index = 0; Index < 9; Index++)
         {
-            var Lvl_old = this.Internal_CopyLvl( this.Lvl[Index] );
+            var Lvl_old = this.Internal_CopyLvl(this.Lvl[Index]);
 
             this.Lvl[Index] = {};
-            var Lvl = this.Lvl[Index];
+            var Lvl         = this.Lvl[Index];
 
             Lvl.Start   = 1;
             Lvl.Restart = -1;        // -1 - делаем нумерацию сначала всегда, 0 - никогда не начинаем нумерацию заново
             Lvl.Suff    = numbering_suff_Tab;
 
-            var Left      =  36 * (Index + 1) * g_dKoef_pt_to_mm;
+            var Left      = 36 * (Index + 1) * g_dKoef_pt_to_mm;
             var FirstLine = -18 * g_dKoef_pt_to_mm;
 
             Lvl.Jc     = align_Left;
@@ -603,239 +603,330 @@ CAbstractNum.prototype =
 
             Lvl.LvlText = [];
 
-            Lvl.ParaPr = new CParaPr();
+            Lvl.ParaPr               = new CParaPr();
             Lvl.ParaPr.Ind.Left      = Left;
             Lvl.ParaPr.Ind.FirstLine = FirstLine;
 
             var TextPr = new CTextPr();
-            if ( 0 == Index % 3 )
+            if (0 == Index % 3)
             {
-                TextPr.RFonts.Set_All( "Symbol", -1 );
-                Lvl.LvlText.push( new CLvlText_Text( String.fromCharCode( 0x00B7 ) ) );
+                TextPr.RFonts.Set_All("Symbol", -1);
+                Lvl.LvlText.push(new CLvlText_Text(String.fromCharCode(0x00B7)));
             }
-            else if ( 1 == Index % 3 )
+            else if (1 == Index % 3)
             {
-                TextPr.RFonts.Set_All( "Courier New", -1 );
-                Lvl.LvlText.push( new CLvlText_Text( "o" ) );
+                TextPr.RFonts.Set_All("Courier New", -1);
+                Lvl.LvlText.push(new CLvlText_Text("o"));
             }
             else
             {
-                TextPr.RFonts.Set_All( "Wingdings", -1 );
-                Lvl.LvlText.push( new CLvlText_Text( String.fromCharCode( 0x00A7 ) ) );
+                TextPr.RFonts.Set_All("Wingdings", -1);
+                Lvl.LvlText.push(new CLvlText_Text(String.fromCharCode(0x00A7)));
             }
 
             Lvl.TextPr = TextPr;
 
-            var Lvl_new = this.Internal_CopyLvl( Lvl );
-            History.Add( this, { Type : historyitem_AbstractNum_LvlChange, Index : Index, Old : Lvl_old, New : Lvl_new } );
+            var Lvl_new = this.Internal_CopyLvl(Lvl);
+            History.Add(this, {Type : historyitem_AbstractNum_LvlChange, Index : Index, Old : Lvl_old, New : Lvl_new});
         }
+    },
+
+    Set_Lvl_None : function(iLvl)
+    {
+        if ("number" != typeof(iLvl) || iLvl < 0 || iLvl >= 9)
+            return;
+
+        var Lvl     = this.Lvl[iLvl];
+        var Lvl_old = this.Internal_CopyLvl(Lvl);
+
+        Lvl.Format  = numbering_numfmt_None;
+        Lvl.LvlText = [];
+        Lvl.TextPr  = new CTextPr();
+        var Lvl_new = this.Internal_CopyLvl(Lvl);
+        History.Add(this, {Type : historyitem_AbstractNum_LvlChange, Index : iLvl, Old : Lvl_old, New : Lvl_new});
     },
 
     Set_Lvl_Bullet : function(iLvl, LvlText, TextPr)
     {
-        if ( "number" != typeof(iLvl) || iLvl < 0 || iLvl >= 9 )
+        if ("number" != typeof(iLvl) || iLvl < 0 || iLvl >= 9)
             return;
 
         var Lvl = this.Lvl[iLvl];
 
-        var Lvl_old = this.Internal_CopyLvl( Lvl );
+        var Lvl_old = this.Internal_CopyLvl(Lvl);
 
-        Lvl.Format = numbering_numfmt_Bullet;
+        Lvl.Format  = numbering_numfmt_Bullet;
         Lvl.LvlText = [];
-        Lvl.LvlText.push( new CLvlText_Text( LvlText ) );
+        Lvl.LvlText.push(new CLvlText_Text(LvlText));
         Lvl.TextPr = TextPr;
 
-        var Lvl_new = this.Internal_CopyLvl( Lvl );
-        History.Add( this, { Type : historyitem_AbstractNum_LvlChange, Index : iLvl, Old : Lvl_old, New : Lvl_new } );
+        var Lvl_new = this.Internal_CopyLvl(Lvl);
+        History.Add(this, {Type : historyitem_AbstractNum_LvlChange, Index : iLvl, Old : Lvl_old, New : Lvl_new});
     },
 
     // 1) right
     Set_Lvl_Numbered_1 : function(iLvl)
     {
-        if ( "number" != typeof(iLvl) || iLvl < 0 || iLvl >= 9 )
+        if ("number" != typeof(iLvl) || iLvl < 0 || iLvl >= 9)
             return;
 
         var Lvl = this.Lvl[iLvl];
 
-        var Lvl_old = this.Internal_CopyLvl( Lvl );
+        var Lvl_old = this.Internal_CopyLvl(Lvl);
 
-        Lvl.Jc = align_Right;
-        Lvl.Format = numbering_numfmt_Decimal;
+        Lvl.Jc      = align_Right;
+        Lvl.Format  = numbering_numfmt_Decimal;
         Lvl.LvlText = [];
-        Lvl.LvlText.push( new CLvlText_Num( iLvl ) );
-        Lvl.LvlText.push( new CLvlText_Text( ")" ) );
+        Lvl.LvlText.push(new CLvlText_Num(iLvl));
+        Lvl.LvlText.push(new CLvlText_Text(")"));
         Lvl.TextPr = new CTextPr();
 
-        var Lvl_new = this.Internal_CopyLvl( Lvl );
-        History.Add( this, { Type : historyitem_AbstractNum_LvlChange, Index : iLvl, Old : Lvl_old, New : Lvl_new } );
+        var Lvl_new = this.Internal_CopyLvl(Lvl);
+        History.Add(this, {Type : historyitem_AbstractNum_LvlChange, Index : iLvl, Old : Lvl_old, New : Lvl_new});
     },
 
     // 1. right
     Set_Lvl_Numbered_2 : function(iLvl)
     {
-        if ( "number" != typeof(iLvl) || iLvl < 0 || iLvl >= 9 )
+        if ("number" != typeof(iLvl) || iLvl < 0 || iLvl >= 9)
             return;
 
         var Lvl = this.Lvl[iLvl];
 
-        var Lvl_old = this.Internal_CopyLvl( Lvl );
+        var Lvl_old = this.Internal_CopyLvl(Lvl);
 
-        Lvl.Jc = align_Right;
-        Lvl.Format = numbering_numfmt_Decimal;
+        Lvl.Jc      = align_Right;
+        Lvl.Format  = numbering_numfmt_Decimal;
         Lvl.LvlText = [];
-        Lvl.LvlText.push( new CLvlText_Num( iLvl ) );
-        Lvl.LvlText.push( new CLvlText_Text( "." ) );
+        Lvl.LvlText.push(new CLvlText_Num(iLvl));
+        Lvl.LvlText.push(new CLvlText_Text("."));
         Lvl.TextPr = new CTextPr();
 
-        var Lvl_new = this.Internal_CopyLvl( Lvl );
-        History.Add( this, { Type : historyitem_AbstractNum_LvlChange, Index : iLvl, Old : Lvl_old, New : Lvl_new } );
+        var Lvl_new = this.Internal_CopyLvl(Lvl);
+        History.Add(this, {Type : historyitem_AbstractNum_LvlChange, Index : iLvl, Old : Lvl_old, New : Lvl_new});
     },
 
     // 1. left
     Set_Lvl_Numbered_3 : function(iLvl)
     {
-        if ( "number" != typeof(iLvl) || iLvl < 0 || iLvl >= 9 )
+        if ("number" != typeof(iLvl) || iLvl < 0 || iLvl >= 9)
             return;
 
         var Lvl = this.Lvl[iLvl];
 
-        var Lvl_old = this.Internal_CopyLvl( Lvl );
+        var Lvl_old = this.Internal_CopyLvl(Lvl);
 
-        Lvl.Jc = align_Left;
-        Lvl.Format = numbering_numfmt_Decimal;
+        Lvl.Jc      = align_Left;
+        Lvl.Format  = numbering_numfmt_Decimal;
         Lvl.LvlText = [];
-        Lvl.LvlText.push( new CLvlText_Num( iLvl ) );
-        Lvl.LvlText.push( new CLvlText_Text( "." ) );
+        Lvl.LvlText.push(new CLvlText_Num(iLvl));
+        Lvl.LvlText.push(new CLvlText_Text("."));
         Lvl.TextPr = new CTextPr();
 
-        var Lvl_new = this.Internal_CopyLvl( Lvl );
-        History.Add( this, { Type : historyitem_AbstractNum_LvlChange, Index : iLvl, Old : Lvl_old, New : Lvl_new } );
+        var Lvl_new = this.Internal_CopyLvl(Lvl);
+        History.Add(this, {Type : historyitem_AbstractNum_LvlChange, Index : iLvl, Old : Lvl_old, New : Lvl_new});
     },
 
     // 1) left
     Set_Lvl_Numbered_4 : function(iLvl)
     {
-        if ( "number" != typeof(iLvl) || iLvl < 0 || iLvl >= 9 )
+        if ("number" != typeof(iLvl) || iLvl < 0 || iLvl >= 9)
             return;
 
         var Lvl = this.Lvl[iLvl];
 
-        var Lvl_old = this.Internal_CopyLvl( Lvl );
+        var Lvl_old = this.Internal_CopyLvl(Lvl);
 
-        Lvl.Jc = align_Left;
-        Lvl.Format = numbering_numfmt_Decimal;
+        Lvl.Jc      = align_Left;
+        Lvl.Format  = numbering_numfmt_Decimal;
         Lvl.LvlText = [];
-        Lvl.LvlText.push( new CLvlText_Num( iLvl ) );
-        Lvl.LvlText.push( new CLvlText_Text( ")" ) );
+        Lvl.LvlText.push(new CLvlText_Num(iLvl));
+        Lvl.LvlText.push(new CLvlText_Text(")"));
         Lvl.TextPr = new CTextPr();
 
-        var Lvl_new = this.Internal_CopyLvl( Lvl );
-        History.Add( this, { Type : historyitem_AbstractNum_LvlChange, Index : iLvl, Old : Lvl_old, New : Lvl_new } );
+        var Lvl_new = this.Internal_CopyLvl(Lvl);
+        History.Add(this, {Type : historyitem_AbstractNum_LvlChange, Index : iLvl, Old : Lvl_old, New : Lvl_new});
     },
 
     // I. right
     Set_Lvl_Numbered_5 : function(iLvl)
     {
-        if ( "number" != typeof(iLvl) || iLvl < 0 || iLvl >= 9 )
+        if ("number" != typeof(iLvl) || iLvl < 0 || iLvl >= 9)
             return;
 
         var Lvl = this.Lvl[iLvl];
 
-        var Lvl_old = this.Internal_CopyLvl( Lvl );
+        var Lvl_old = this.Internal_CopyLvl(Lvl);
 
-        Lvl.Jc = align_Right;
-        Lvl.Format = numbering_numfmt_UpperRoman;
+        Lvl.Jc      = align_Right;
+        Lvl.Format  = numbering_numfmt_UpperRoman;
         Lvl.LvlText = [];
-        Lvl.LvlText.push( new CLvlText_Num( iLvl ) );
-        Lvl.LvlText.push( new CLvlText_Text( "." ) );
+        Lvl.LvlText.push(new CLvlText_Num(iLvl));
+        Lvl.LvlText.push(new CLvlText_Text("."));
         Lvl.TextPr = new CTextPr();
 
-        var Lvl_new = this.Internal_CopyLvl( Lvl );
-        History.Add( this, { Type : historyitem_AbstractNum_LvlChange, Index : iLvl, Old : Lvl_old, New : Lvl_new } );
+        var Lvl_new = this.Internal_CopyLvl(Lvl);
+        History.Add(this, {Type : historyitem_AbstractNum_LvlChange, Index : iLvl, Old : Lvl_old, New : Lvl_new});
     },
 
     // A. left
     Set_Lvl_Numbered_6 : function(iLvl)
     {
-        if ( "number" != typeof(iLvl) || iLvl < 0 || iLvl >= 9 )
+        if ("number" != typeof(iLvl) || iLvl < 0 || iLvl >= 9)
             return;
 
         var Lvl = this.Lvl[iLvl];
 
-        var Lvl_old = this.Internal_CopyLvl( Lvl );
+        var Lvl_old = this.Internal_CopyLvl(Lvl);
 
-        Lvl.Jc = align_Left;
-        Lvl.Format = numbering_numfmt_UpperLetter;
+        Lvl.Jc      = align_Left;
+        Lvl.Format  = numbering_numfmt_UpperLetter;
         Lvl.LvlText = [];
-        Lvl.LvlText.push( new CLvlText_Num( iLvl ) );
-        Lvl.LvlText.push( new CLvlText_Text( "." ) );
+        Lvl.LvlText.push(new CLvlText_Num(iLvl));
+        Lvl.LvlText.push(new CLvlText_Text("."));
         Lvl.TextPr = new CTextPr();
 
-        var Lvl_new = this.Internal_CopyLvl( Lvl );
-        History.Add( this, { Type : historyitem_AbstractNum_LvlChange, Index : iLvl, Old : Lvl_old, New : Lvl_new } );
+        var Lvl_new = this.Internal_CopyLvl(Lvl);
+        History.Add(this, {Type : historyitem_AbstractNum_LvlChange, Index : iLvl, Old : Lvl_old, New : Lvl_new});
     },
 
     // a) left
     Set_Lvl_Numbered_7 : function(iLvl)
     {
-        if ( "number" != typeof(iLvl) || iLvl < 0 || iLvl >= 9 )
+        if ("number" != typeof(iLvl) || iLvl < 0 || iLvl >= 9)
             return;
 
         var Lvl = this.Lvl[iLvl];
 
-        var Lvl_old = this.Internal_CopyLvl( Lvl );
+        var Lvl_old = this.Internal_CopyLvl(Lvl);
 
-        Lvl.Jc = align_Left;
-        Lvl.Format = numbering_numfmt_LowerLetter;
+        Lvl.Jc      = align_Left;
+        Lvl.Format  = numbering_numfmt_LowerLetter;
         Lvl.LvlText = [];
-        Lvl.LvlText.push( new CLvlText_Num( iLvl ) );
-        Lvl.LvlText.push( new CLvlText_Text( ")" ) );
+        Lvl.LvlText.push(new CLvlText_Num(iLvl));
+        Lvl.LvlText.push(new CLvlText_Text(")"));
         Lvl.TextPr = new CTextPr();
 
-        var Lvl_new = this.Internal_CopyLvl( Lvl );
-        History.Add( this, { Type : historyitem_AbstractNum_LvlChange, Index : iLvl, Old : Lvl_old, New : Lvl_new } );
+        var Lvl_new = this.Internal_CopyLvl(Lvl);
+        History.Add(this, {Type : historyitem_AbstractNum_LvlChange, Index : iLvl, Old : Lvl_old, New : Lvl_new});
     },
 
     // a. left
     Set_Lvl_Numbered_8 : function(iLvl)
     {
-        if ( "number" != typeof(iLvl) || iLvl < 0 || iLvl >= 9 )
+        if ("number" != typeof(iLvl) || iLvl < 0 || iLvl >= 9)
             return;
 
         var Lvl = this.Lvl[iLvl];
 
-        var Lvl_old = this.Internal_CopyLvl( Lvl );
+        var Lvl_old = this.Internal_CopyLvl(Lvl);
 
-        Lvl.Jc = align_Left;
-        Lvl.Format = numbering_numfmt_LowerLetter;
+        Lvl.Jc      = align_Left;
+        Lvl.Format  = numbering_numfmt_LowerLetter;
         Lvl.LvlText = [];
-        Lvl.LvlText.push( new CLvlText_Num( iLvl ) );
-        Lvl.LvlText.push( new CLvlText_Text( "." ) );
+        Lvl.LvlText.push(new CLvlText_Num(iLvl));
+        Lvl.LvlText.push(new CLvlText_Text("."));
         Lvl.TextPr = new CTextPr();
 
-        var Lvl_new = this.Internal_CopyLvl( Lvl );
-        History.Add( this, { Type : historyitem_AbstractNum_LvlChange, Index : iLvl, Old : Lvl_old, New : Lvl_new } );
+        var Lvl_new = this.Internal_CopyLvl(Lvl);
+        History.Add(this, {Type : historyitem_AbstractNum_LvlChange, Index : iLvl, Old : Lvl_old, New : Lvl_new});
     },
 
     // i. left
     Set_Lvl_Numbered_9 : function(iLvl)
     {
-        if ( "number" != typeof(iLvl) || iLvl < 0 || iLvl >= 9 )
+        if ("number" != typeof(iLvl) || iLvl < 0 || iLvl >= 9)
             return;
 
         var Lvl = this.Lvl[iLvl];
 
-        var Lvl_old = this.Internal_CopyLvl( Lvl );
+        var Lvl_old = this.Internal_CopyLvl(Lvl);
 
-        Lvl.Jc = align_Right;
-        Lvl.Format = numbering_numfmt_LowerRoman;
+        Lvl.Jc      = align_Right;
+        Lvl.Format  = numbering_numfmt_LowerRoman;
         Lvl.LvlText = [];
-        Lvl.LvlText.push( new CLvlText_Num( iLvl ) );
-        Lvl.LvlText.push( new CLvlText_Text( "." ) );
+        Lvl.LvlText.push(new CLvlText_Num(iLvl));
+        Lvl.LvlText.push(new CLvlText_Text("."));
         Lvl.TextPr = new CTextPr();
 
-        var Lvl_new = this.Internal_CopyLvl( Lvl );
-        History.Add( this, { Type : historyitem_AbstractNum_LvlChange, Index : iLvl, Old : Lvl_old, New : Lvl_new } );
+        var Lvl_new = this.Internal_CopyLvl(Lvl);
+        History.Add(this, {Type : historyitem_AbstractNum_LvlChange, Index : iLvl, Old : Lvl_old, New : Lvl_new});
+    },
+
+    Set_Lvl_ByFormat : function(iLvl, nType, sFormatText, nAlign)
+    {
+        if ("number" != typeof(iLvl) || iLvl < 0 || iLvl >= 9)
+            return;
+
+        var Lvl     = this.Lvl[iLvl];
+        var Lvl_old = this.Internal_CopyLvl(Lvl);
+
+        Lvl.Jc      = nAlign;
+        Lvl.Format  = nType;
+        Lvl.LvlText = [];
+
+        var nLastPos = 0;
+        var nPos     = 0;
+        while (-1 !== (nPos = sFormatText.indexOf("%", nPos)) && nPos < sFormatText.length)
+        {
+            if (nPos < sFormatText.length - 1 && sFormatText.charCodeAt(nPos + 1) >= 48 && sFormatText.charCodeAt(nPos + 1) <= 48 + iLvl)
+            {
+                if (nPos > nLastPos)
+                    Lvl.LvlText.push(new CLvlText_Text(sFormatText.substring(nLastPos, nPos)));
+
+                Lvl.LvlText.push(new CLvlText_Num(sFormatText.charCodeAt(nPos + 1) - 48));
+                nPos += 2;
+                nLastPos = nPos;
+            }
+            else
+            {
+                nPos++;
+            }
+        }
+        nPos = sFormatText.length;
+        if (nPos > nLastPos)
+            Lvl.LvlText.push(new CLvlText_Text(sFormatText.substring(nLastPos, nPos)));
+
+        Lvl.TextPr = new CTextPr();
+
+        var Lvl_new = this.Internal_CopyLvl(Lvl);
+        History.Add(this, {Type : historyitem_AbstractNum_LvlChange, Index : iLvl, Old : Lvl_old, New : Lvl_new});
+    },
+
+    Set_Lvl_Restart : function(iLvl, isRestart)
+    {
+        if ("number" != typeof(iLvl) || iLvl < 0 || iLvl >= 9)
+            return;
+
+        var Lvl     = this.Lvl[iLvl];
+        var Lvl_old = this.Internal_CopyLvl(Lvl);
+        Lvl.Restart = (isRestart ? -1 : 0);
+        var Lvl_new = this.Internal_CopyLvl(Lvl);
+        History.Add(this, {Type : historyitem_AbstractNum_LvlChange, Index : iLvl, Old : Lvl_old, New : Lvl_new});
+    },
+
+    Set_Lvl_Start : function(iLvl, nStart)
+    {
+        if ("number" != typeof(iLvl) || iLvl < 0 || iLvl >= 9)
+            return;
+
+        var Lvl     = this.Lvl[iLvl];
+        var Lvl_old = this.Internal_CopyLvl(Lvl);
+        Lvl.Start = nStart;
+        var Lvl_new = this.Internal_CopyLvl(Lvl);
+        History.Add(this, {Type : historyitem_AbstractNum_LvlChange, Index : iLvl, Old : Lvl_old, New : Lvl_new});
+    },
+
+    Set_Lvl_Suff : function(iLvl, nSuff)
+    {
+        if ("number" != typeof(iLvl) || iLvl < 0 || iLvl >= 9)
+            return;
+
+        var Lvl     = this.Lvl[iLvl];
+        var Lvl_old = this.Internal_CopyLvl(Lvl);
+        Lvl.Suff = nSuff;
+        var Lvl_new = this.Internal_CopyLvl(Lvl);
+        History.Add(this, {Type : historyitem_AbstractNum_LvlChange, Index : iLvl, Old : Lvl_old, New : Lvl_new});
     },
 
     // X, Y, Context - параметры для рисование
@@ -1374,6 +1465,17 @@ CAbstractNum.prototype =
         History.Add( this, { Type : historyitem_AbstractNum_TextPrChange, Index : Lvl, Old : TextPr_old, New : TextPr_new } );
     },
 
+    Set_TextPr : function(Lvl, TextPr)
+    {
+        History.Add(this, {Type : historyitem_AbstractNum_TextPrChange, Index : Lvl, Old : this.Lvl[Lvl].TextPr, New : TextPr});
+        this.Lvl[Lvl].TextPr = TextPr;
+    },
+    
+    Set_ParaPr : function(Lvl, ParaPr)
+    {
+        History.Add(this, {Type : historyitem_AbstractNum_ParaPrChange, Index : Lvl, Old : this.Lvl[Lvl].ParaPr, New : ParaPr});
+        this.Lvl[Lvl].ParaPr = ParaPr;
+    },
 //-----------------------------------------------------------------------------------
 // Undo/Redo функции
 //-----------------------------------------------------------------------------------
@@ -1495,6 +1597,16 @@ CAbstractNum.prototype =
                 this.Recalc_CompiledPr(Data.Index);
                 break;
             }
+
+
+            case historyitem_AbstractNum_ParaPrChange:
+            {
+                this.Lvl[Data.Index].ParaPr = Data.Old;
+
+                // Пересчитываем стили у все параграфов с данной нумерацией
+                this.Recalc_CompiledPr(Data.Index);
+                break;
+            }
         }
     },
 
@@ -1516,6 +1628,15 @@ CAbstractNum.prototype =
             case historyitem_AbstractNum_TextPrChange:
             {
                 this.Lvl[Data.Index].TextPr = Data.New;
+
+                // Пересчитываем стили у все параграфов с данной нумерацией
+                this.Recalc_CompiledPr(Data.Index);
+                break;
+            }
+
+            case historyitem_AbstractNum_ParaPrChange:
+            {
+                this.Lvl[Data.Index].ParaPr = Data.New;
 
                 // Пересчитываем стили у все параграфов с данной нумерацией
                 this.Recalc_CompiledPr(Data.Index);
@@ -1579,6 +1700,17 @@ CAbstractNum.prototype =
 
                 break;
             }
+
+            case historyitem_AbstractNum_ParaPrChange:
+            {
+                // Long     : iLvl
+                // Vairable : ParaPr
+
+                Writer.WriteLong(Data.Index);
+                Data.New.Write_ToBinary(Writer);
+
+                break;
+            }
         }
         
         
@@ -1625,6 +1757,18 @@ CAbstractNum.prototype =
                 iLvl = Reader.GetLong();
                 this.Lvl[iLvl].TextPr = new CTextPr();
                 this.Lvl[iLvl].TextPr.Read_FromBinary(Reader);
+
+                break;
+            }
+
+            case historyitem_AbstractNum_ParaPrChange:
+            {
+                // Long     : iLvl
+                // Vairable : ParaPr
+
+                iLvl = Reader.GetLong();
+                this.Lvl[iLvl].ParaPr = new CParaPr();
+                this.Lvl[iLvl].ParaPr.Read_FromBinary(Reader);
 
                 break;
             }
