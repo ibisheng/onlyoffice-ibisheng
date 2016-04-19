@@ -24,13 +24,26 @@
     }
 
     /**
+     * Class representing a paragraph properties.
+     * @constructor
+     */
+    function ApiParaPr(Parent, ParaPr)
+    {
+        this.Parent = Parent;
+        this.ParaPr = ParaPr;
+    }
+
+    /**
      * Class representing a paragraph.
      * @constructor
+     * @extends {ApiParaPr}
      */
     function ApiParagraph(Paragraph)
     {
+        ApiParagraph.superclass.constructor.call(this, this, Paragraph.Pr.Copy());
         this.Paragraph = Paragraph;
     }
+    AscCommon.extendClass(ApiParagraph, ApiParaPr);
 
     /**
      * Class representing a table.
@@ -39,24 +52,6 @@
     function ApiTable(Table)
     {
         this.Table = Table;
-    }
-
-    /**
-     * Class representing a small text block calling 'run'.
-     * @constructor
-     */
-    function ApiRun(Run)
-    {
-        this.Run = Run;
-    }
-
-    /**
-     * Class representing a style.
-     * @constructor
-     */
-    function ApiStyle(Style)
-    {
-        this.Style = Style;
     }
 
     /**
@@ -70,13 +65,24 @@
     }
 
     /**
-     * Class representing a paragraph properties.
+     * Class representing a small text block calling 'run'.
+     * @constructor
+     * @extends {ApiTextPr}
+     */
+    function ApiRun(Run)
+    {
+        ApiRun.superclass.constructor.call(this, this, Run.Pr.Copy());
+        this.Run = Run;
+    }
+    AscCommon.extendClass(ApiRun, ApiTextPr);
+
+    /**
+     * Class representing a style.
      * @constructor
      */
-    function ApiParaPr(Parent, ParaPr)
+    function ApiStyle(Style)
     {
-        this.Parent = Parent;
-        this.ParaPr = ParaPr;
+        this.Style = Style;
     }
 
     /**
@@ -329,6 +335,8 @@
             nStyleType = styletype_Numbering;
 
         var oStyle = new CStyle(sStyleName, null, null, nStyleType, (styletype_Table !== nStyleType? false : true));
+        oStyle.qFormat = true;
+        oStyle.uiPriority = 1;
         var oStyles = this.Document.Get_Styles();
 
         // Если у нас есть стиль с данным именем, тогда мы старый стиль удаляем, а новый добавляем со старым Id,
@@ -504,19 +512,6 @@
         return new ApiTextPr(this, this.Paragraph.TextPr.Value.Copy());
     };
     /**
-     * Set paragraph style
-     * @param {ApiStyle} oStyle
-     * @returns {boolean}
-     */
-    ApiParagraph.prototype.SetStyle = function(oStyle)
-    {
-        if (!oStyle || !(oStyle instanceof ApiStyle))
-            return false;
-
-        this.Paragraph.Style_Add(oStyle.Style.Get_Id(), true);
-        return true;
-    };
-    /**
      * Get paragraph properties.
      * @returns {ApiParaPr}
      */
@@ -525,241 +520,10 @@
         return new ApiParaPr(this, this.Paragraph.Pr.Copy());
     };
     /**
-     * Specifies that any space specified before or after this paragraph, specified using the spacing element
-     * {@link ApiParaPr#SetSpacingBefore}{@link ApiParaPr#SetSpacingAfter}, should not be applied when the preceding and
-     * following paragraphs are of the same paragraph style, affecting the top and bottom spacing respectively.
-     * @see {@link ApiParagraph#GetParaPr} and {@link ApiParaPr#SetContextualSpacing}
-     * @param {boolean} isContextualSpacing
-     */
-    ApiParagraph.prototype.SetContextualSpacing = function(isContextualSpacing)
-    {
-        this.GetParaPr().SetContextualSpacing(isContextualSpacing);
-    };
-    /**
-     * Set left indentation.
-     * @see {@link ApiParagraph#GetParaPr} and {@link ApiParaPr#SetIndLeft}
-     * @param {twips} nValue
-     */
-    ApiParagraph.prototype.SetIndLeft = function(nValue)
-    {
-        this.GetParaPr().SetIndLeft(nValue);
-    };
-    /**
-     * Set right indentation.
-     * @see {@link ApiParagraph#GetParaPr} and {@link ApiParaPr#SetIndRight}
-     * @param {twips} nValue
-     */
-    ApiParagraph.prototype.SetIndRight = function(nValue)
-    {
-        this.GetParaPr().SetIndRight(nValue);
-    };
-    /**
-     * Set first line indentation.
-     * @see {@link ApiParagraph#GetParaPr} and {@link ApiParaPr#SetIndFirstLine}
-     * @param {twips} nValue
-     */
-    ApiParagraph.prototype.SetIndFirstLine = function(nValue)
-    {
-        this.GetParaPr().SetIndFirstLine(nValue);
-    };
-    /**
-     * Set paragraph justification
-     * @see {@link ApiParagraph#GetParaPr} and {@link ApiParaPr#SetJc}
-     * @param {("left" | "right" | "both" | "center")} sJc
-     */
-    ApiParagraph.prototype.SetJc = function(sJc)
-    {
-        this.GetParaPr().SetJc(sJc);
-    };
-    /**
-     * This element specifies that when rendering this document in a page view, all lines of this paragraph are
-     * maintained on a single page whenever possible.
-     * @see {@link ApiParagraph#GetParaPr} and {@link ApiParaPr#SetKeepLines}
-     * @param {boolean} isKeepLines
-     */
-    ApiParagraph.prototype.SetKeepLines = function(isKeepLines)
-    {
-        this.GetParaPr().SetKeepLines(isKeepLines);
-    };
-    /**
-     * This element specifies that when rendering this document in a paginated view, the contents of this paragraph
-     * are at least partly rendered on the same page as the following paragraph whenever possible.
-     * @see {@link ApiParagraph#GetParaPr} and {@link ApiParaPr#SetKeepNext}
-     * @param {boolean} isKeepNext
-     */
-    ApiParagraph.prototype.SetKeepNext = function(isKeepNext)
-    {
-        this.GetParaPr().SetKeepNext(isKeepNext);
-    };
-    /**
-     * This element specifies that when rendering this document in a paginated view, the contents of this paragraph
-     * are rendered on the start of a new page in the document.
-     * @see {@link ApiParagraph#GetParaPr} and {@link ApiParaPr#SetPageBreakBefore}
-     * @param {boolean} isPageBreakBefore
-     */
-    ApiParagraph.prototype.SetPageBreakBefore = function(isPageBreakBefore)
-    {
-        this.GetParaPr().SetPageBreakBefore(isPageBreakBefore);
-    };
-    /**
-     * Set paragraph line spacing. If the value of the <code>sLineRule</code> parameter is either <code>"atLeast"</code>
-     * or <code>"exact"</code>, then the value of <code>nLine</code> shall be interpreted as twentieths of a point. If
-     * the value of the <code>sLineRule</code> parameter is <code>"auto"</code>, then the value of the <code>nLine</code>
-     * attribute shall be interpreted as 240ths of a line.
-     * @see {@link ApiParagraph#GetParaPr} and {@link ApiParaPr#SetSpacingLine}
-     * @param {(twips | line240)} nLine
-     * @param {("auto" | "atLeast" | "exact")} sLineRule
-     */
-    ApiParagraph.prototype.SetSpacingLine = function(nLine, sLineRule)
-    {
-        this.GetParaPr().SetSpacingLine(nLine, sLineRule);
-    };
-    /**
-     * Set paragraph spacing before. If the value of the <code>isBeforeAuto</code> parameter is <code>true</code>, then
-     * any value of the <code>nBefore</code> is ignored. If <code>isBeforeAuto</code> parameter is not specified, then it
-     * will be interpreted as <code>false</code>.
-     * @see {@link ApiParagraph#GetParaPr} and {@link ApiParaPr#SetSpacingBefore}
-     * @param {twips} nBefore
-     * @param {boolean} [isBeforeAuto=false]
-     */
-    ApiParagraph.prototype.SetSpacingBefore = function(nBefore, isBeforeAuto)
-    {
-        this.GetParaPr().SetSpacingBefore(nBefore, isBeforeAuto);
-    };
-    /**
-     * Set paragraph spacing after. If the value of the <code>isAfterAuto</code> parameter is <code>true</code>, then
-     * any value of the <code>nAfter</code> is ignored. If <code>isAfterAuto</code> parameter is not specified, then it
-     * will be interpreted as <code>false</code>.
-     * @see {@link ApiParagraph#GetParaPr} and {@link ApiParaPr#SetSpacingAfter}
-     * @param {twips} nAfter
-     * @param {boolean} [isAfterAuto=false]
-     */
-    ApiParagraph.prototype.SetSpacingAfter = function(nAfter, isAfterAuto)
-    {
-        this.GetParaPr().SetSpacingAfter(nAfter, isAfterAuto);
-    };
-    /**
-     * Specifies the shading applied to the contents of the paragraph.
-     * @see {@link ApiParagraph#GetParaPr} and {@link ApiParaPr#SetShd}
-     * @param {ShdType} sType
-     * @param {byte} r
-     * @param {byte} g
-     * @param {byte} b
-     * @param {boolean} [isAuto=false]
-     */
-    ApiParagraph.prototype.SetShd = function(sType, r, g, b, isAuto)
-    {
-        this.GetParaPr().SetShd(sType, r, g, b, isAuto);
-    };
-    /**
-     * Specifies the border which shall be displayed below a set of paragraphs which have the same paragraph border settings.
-     * @see {@link ApiParagraph#GetParaPr} and {@link ApiParaPr#SetBottomBorder}
-     * @param {BorderType} sType - The style of border.
-     * @param {pt_8} nSize - The width of the current border.
-     * @param {pt} nSpace - The spacing offset that shall be used to place this border.
-     * @param {byte} r
-     * @param {byte} g
-     * @param {byte} b
-     */
-    ApiParagraph.prototype.SetBottomBorder = function(sType, nSize, nSpace, r, g, b)
-    {
-        this.GetParaPr().SetBottomBorder(sType, nSize, nSpace, r, g, b);
-    };
-    /**
-     * Specifies the border which shall be displayed on the left side of the page around the specified paragraph.
-     * @see {@link ApiParagraph#GetParaPr} and {@link ApiParaPr#SetLeftBorder}
-     * @param {BorderType} sType - The style of border.
-     * @param {pt_8} nSize - The width of the current border.
-     * @param {pt} nSpace - The spacing offset that shall be used to place this border.
-     * @param {byte} r
-     * @param {byte} g
-     * @param {byte} b
-     */
-    ApiParagraph.prototype.SetLeftBorder = function(sType, nSize, nSpace, r, g, b)
-    {
-        this.GetParaPr().SetLeftBorder(sType, nSize, nSpace, r, g, b);
-    };
-    /**
-     * Specifies the border which shall be displayed on the right side of the page around the specified paragraph.
-     * @see {@link ApiParagraph#GetParaPr} and {@link ApiParaPr#SetRightBorder}
-     * @param {BorderType} sType - The style of border.
-     * @param {pt_8} nSize - The width of the current border.
-     * @param {pt} nSpace - The spacing offset that shall be used to place this border.
-     * @param {byte} r
-     * @param {byte} g
-     * @param {byte} b
-     */
-    ApiParagraph.prototype.SetRightBorder = function(sType, nSize, nSpace, r, g, b)
-    {
-        this.GetParaPr().SetRightBorder(sType, nSize, nSpace, r, g, b);
-    };
-    /**
-     * Specifies the border which shall be displayed above a set of paragraphs which have the same set of paragraph
-     * border settings.
-     * @see {@link ApiParagraph#GetParaPr} and {@link ApiParaPr#SetTopBorder}
-     * @param {BorderType} sType - The style of border.
-     * @param {pt_8} nSize - The width of the current border.
-     * @param {pt} nSpace - The spacing offset that shall be used to place this border.
-     * @param {byte} r
-     * @param {byte} g
-     * @param {byte} b
-     */
-    ApiParagraph.prototype.SetTopBorder = function(sType, nSize, nSpace, r, g, b)
-    {
-        this.GetParaPr().SetTopBorder(sType, nSize, nSpace, r, g, b);
-    };
-    /**
-     * Specifies the border which shall be displayed between each paragraph in a set of paragraphs which have the same
-     * set of paragraph border settings.
-     * @see {@link ApiParagraph#GetParaPr} and {@link ApiParaPr#SetBetweenBorder}
-     * @param {BorderType} sType - The style of border.
-     * @param {pt_8} nSize - The width of the current border.
-     * @param {pt} nSpace - The spacing offset that shall be used to place this border.
-     * @param {byte} r
-     * @param {byte} g
-     * @param {byte} b
-     */
-    ApiParagraph.prototype.SetBetweenBorder = function(sType, nSize, nSpace, r, g, b)
-    {
-        this.GetParaPr().SetBetweenBorder(sType, nSize, nSpace, r, g, b);
-    };
-    /**
-     * This element specifies whether a consumer shall prevent a single line of this paragraph from being displayed on
-     * a separate page from the remaining content at display time by moving the line onto the following page.
-     * @see {@link ApiParagraph#GetParaPr} and {@link ApiParaPr#SetWidowControl}
-     * @param {boolean} isWidowControl
-     */
-    ApiParagraph.prototype.SetWidowControl = function(isWidowControl)
-    {
-        this.GetParaPr().SetWidowControl(isWidowControl);
-    };
-    /**
-     * Specifies a sequence of custom tab stops which shall be used for any tab characters in the current paragraph.
-     * <b>Warning</b>: The lengths of aPos array and aVal array <b>MUST BE</b> equal.
-     * @see {@link ApiParagraph#GetParaPr} and {@link ApiParaPr#SetTabs}
-     * @param {twips[]} aPos - An array of the positions of custom tab stops with respect to the current page margins.
-     * @param {TabJc[]} aVal - An array of the styles of custom tab stops, which determines the behavior of the tab stop and
-     * the alignment which shall be applied to text entered at the current custom tab stop.
-     */
-    ApiParagraph.prototype.SetTabs = function(aPos, aVal)
-    {
-        this.GetParaPr().SetTabs(aPos, aVal);
-    };
-    /**
-     * Specifies that the current paragraph references a numbering definition instance in the current document.
-     * @see {@link ApiParagraph#GetParaPr} and {@link SetNumPr#SetTabs}
-     * @param {ApiNumbering} oNumPr - Specifies a numbering definition.
-     * @param {number} nLvl - Specifies a numbering level reference.
-     */
-    ApiParagraph.prototype.SetNumPr = function(oNumPr, nLvl)
-    {
-        this.GetParaPr().SetNumPr(oNumPr, nLvl);
-    };
-    /**
-     * Get a numbering defenition and numbering level.
+     * Get a numbering definition and numbering level.
      * @returns {?ApiNumberingLevel}
      */
-    ApiParagraph.prototype.GetNumPr = function()
+    ApiParagraph.prototype.GetNumbering = function()
     {
         var oNumPr = this.Paragraph.Numbering_Get();
         if (!oNumPr)
@@ -776,7 +540,7 @@
     /**
      * Specifies that the current paragraph references a numbering definition instance in the current document.
      * @see Same as {@link ApiParagraph#SetNumPr}
-     * @param oNumberingLevel
+     * @param {ApiNumberingLevel} oNumberingLevel
      */
     ApiParagraph.prototype.SetNumbering = function(oNumberingLevel)
     {
@@ -800,167 +564,6 @@
     {
         return new ApiTextPr(this, this.Run.Pr.Copy());
     };
-    /**
-     * Set the bold property.
-     * @see {@link ApiRun#GetTextPr} and {@link ApiTextPr#SetBold}.
-     * @param {boolean} isBold
-     */
-    ApiRun.prototype.SetBold = function(isBold)
-    {
-        this.GetTextPr().SetBold(isBold);
-    };
-    /**
-     * Set the italic property.
-     * @see {@link ApiRun#GetTextPr} and {@link ApiTextPr#SetItalic}.
-     * @param {boolean} isItalic
-     */
-    ApiRun.prototype.SetItalic = function(isItalic)
-    {
-        this.GetTextPr().SetItalic(isItalic);
-    };
-    /**
-     * Specify that the contents of this run shall be displayed with a single horizontal line through the center of
-     * the line.
-      See also {@link ApiRun#GetTextPr} and {@link ApiTextPr#SetStrikeout}.
-     * @param {boolean} isStrikeout
-     */
-    ApiRun.prototype.SetStrikeout = function(isStrikeout)
-    {
-        this.GetTextPr().SetStrikeout(isStrikeout);
-    };
-    /**
-     * Set the underline property.
-     * @see {@link ApiRun#GetTextPr} and {@link ApiTextPr#SetUnderline}.
-     * @param {boolean} isUnderline
-     */
-    ApiRun.prototype.SetUnderline = function(isUnderline)
-    {
-        this.GetTextPr().SetUnderline(isUnderline);
-    };
-    /**
-     * Set all 4 font slots with the specified font family.
-     * @see {@link ApiRun#GetTextPr} and {@link ApiTextPr#SetFontFamily}
-     * @param {string} sFontFamily
-     */
-    ApiRun.prototype.SetFontFamily = function(sFontFamily)
-    {
-        this.GetTextPr().SetFontFamily(sFontFamily);
-    };
-    /**
-     * Set the font size.
-     * @see {@link ApiRun#GetTextPr} and {@link ApiTextPr#SetFontSize}.
-     * @param {hps} nSize
-     */
-    ApiRun.prototype.SetFontSize = function(nSize)
-    {
-        this.GetTextPr().SetFontSize(nSize);
-    };
-    /**
-     * Set text color in the rgb format.
-     * @see {@link ApiRun#GetTextPr} and {@link ApiTextPr#SetColor}.
-     * @param {byte} r
-     * @param {byte} g
-     * @param {byte} b
-     * @param {boolean} [isAuto=false]
-     */
-    ApiRun.prototype.SetColor = function(r, g, b, isAuto)
-    {
-        this.GetTextPr().SetColor(r, g, b, isAuto);
-    };
-    /**
-     * Specifies the alignment which shall be applied to the contents of this run in relation to the default
-     * appearance of the run's text.
-     * @see {@link ApiRun#GetTextPr} and {@link ApiTextPr#SetVertAlign}
-     * @param {("baseline" | "subscript" | "superscript")} sType
-     */
-    ApiRun.prototype.SetVertAlign = function(sType)
-    {
-        this.GetTextPr().SetVertAlign(sType);
-    };
-    /**
-     * Specify a highlighting color which is applied as a background behind the contents of this run.
-     * @see {@link ApiRun#GetTextPr} and {@link ApiTextPr#SetHighlight}
-     * @param {byte} r
-     * @param {byte} g
-     * @param {byte} b
-     * @param {boolean} [isNone=false] If this parameter is true, then parameters r,g,b will be ignored.
-     */
-    ApiRun.prototype.SetHighlight = function(r, g, b, isNone)
-    {
-        this.GetTextPr().SetHighlight(r, g, b, isNone);
-    };
-    /**
-     * Set the text spacing.
-     * @see {@link ApiRun#GetTextPr} and {@link ApiTextPr#SetSpacing}.
-     * @param {twips} nSpacing
-     */
-    ApiRun.prototype.SetSpacing = function(nSpacing)
-    {
-        this.GetTextPr().SetSpacing(nSpacing);
-    };
-    /**
-     * Specify that the contents of this run shall be displayed with two horizontal lines through each character
-     * displayed on the line.
-     * @see {@link ApiRun#GetTextPr} and {@link ApiTextPr#SetDoubleStrikeout}.
-     * @param {boolean} isDoubleStrikeout
-     */
-    ApiRun.prototype.SetDoubleStrikeout = function(isDoubleStrikeout)
-    {
-        this.GetTextPr().SetDoubleStrikeout(isDoubleStrikeout);
-    };
-    /**
-     * Specify that any lowercase characters in this text run shall be formatted for display only as their capital
-     * letter character equivalents.
-     * @see {@link ApiRun#GetTextPr} and {@link ApiTextPr#SetCaps}.
-     * @param {boolean} isCaps
-     */
-    ApiRun.prototype.SetCaps = function(isCaps)
-    {
-        this.GetTextPr().SetCaps(isCaps);
-    };
-    /**
-     * Specify that all small letter characters in this text run shall be formatted for display only as their capital
-     * letter character equivalents in a font size two points smaller than the actual font size specified for this text.
-     * @see {@link ApiRun#GetTextPr} and {@link ApiTextPr#SetSmallCaps}.
-     * @param {boolean} isSmallCaps
-     */
-    ApiRun.prototype.SetSmallCaps = function(isSmallCaps)
-    {
-        this.GetTextPr().SetSmallCaps(isSmallCaps);
-    };
-    /**
-     * Specify the amount by which text shall be raised or lowered for this run in relation to the default baseline of
-     * the surrounding non-positioned text.
-     * @see {@link ApiRun#GetTextPr} and {@link ApiTextPr#SetPosition}.
-     * @param {hps} nPosition - Specifies a positive or negative measurement in half-points (1/144 of an inch).
-     */
-    ApiRun.prototype.SetPosition = function(nPosition)
-    {
-        this.GetTextPr().SetPosition(nPosition);
-    };
-    /**
-     * Specifies the languages which shall be used to check spelling and grammar (if requested) when processing the
-     * contents of this run.
-     * @see {@link ApiRun#GetTextPr} and {@link ApiTextPr#SetLanguage}.
-     * @param {string} sLangId - The possible values for this parameter is a language identifier as defined by RFC 4646/BCP 47. Example: "en-CA".
-     */
-    ApiRun.prototype.SetLanguage = function(sLangId)
-    {
-        this.GetTextPr().SetLanguage(sLangId);
-    };
-    /**
-     * Specifies the shading applied to the contents of the run.
-     * @see {@link ApiRun#GetTextPr} and {@link ApiTextPr#SetShd}.
-     * @param {ShdType} sType
-     * @param {byte} r
-     * @param {byte} g
-     * @param {byte} b
-     */
-    ApiRun.prototype.SetShd = function(sType, r, g, b)
-    {
-        this.GetTextPr().SetShd(sType, r, g, b);
-    };
-
 
     //------------------------------------------------------------------------------------------------------------------
     //
@@ -1574,6 +1177,18 @@
     //------------------------------------------------------------------------------------------------------------------
 
     /**
+     * Specifies the character style.
+     * @param {ApiStyle} oStyle
+     */
+    ApiTextPr.prototype.SetStyle = function(oStyle)
+    {
+        if (!(oStyle instanceof ApiStyle))
+            return;
+
+        this.TextPr.RStyle = oStyle.Style.Get_Id();
+        this.private_OnChange();
+    };
+    /**
      * Set the bold property.
      * @param {boolean} isBold
      */
@@ -1759,7 +1374,18 @@
     //
     //------------------------------------------------------------------------------------------------------------------
 
+    /**
+     * Set paragraph style.
+     * @param {ApiStyle} oStyle
+     */
+    ApiParaPr.prototype.SetStyle = function(oStyle)
+    {
+        if (!oStyle || !(oStyle instanceof ApiStyle))
+            return;
 
+        this.ParaPr.PStyle = oStyle.Style.Get_Id();
+        this.private_OnChange();
+    };
     /**
      * Specifies that any space specified before or after this paragraph, specified using the spacing element
      * {@link ApiParaPr#SetSpacingBefore}{@link ApiParaPr#SetSpacingAfter}, should not be applied when the preceding and
@@ -2217,48 +1843,13 @@
     ApiParagraph.prototype["AddLineBreak"]           = ApiParagraph.prototype.AddLineBreak;
     ApiParagraph.prototype["AddColumnBreak"]         = ApiParagraph.prototype.AddColumnBreak;
     ApiParagraph.prototype["GetParagraphMarkTextPr"] = ApiParagraph.prototype.GetParagraphMarkTextPr;
-    ApiParagraph.prototype["SetStyle"]               = ApiParagraph.prototype.SetStyle;
     ApiParagraph.prototype["GetParaPr"]              = ApiParagraph.prototype.GetParaPr;
-    ApiParagraph.prototype["SetContextualSpacing"]   = ApiParagraph.prototype.SetContextualSpacing;
-    ApiParagraph.prototype["SetIndLeft"]             = ApiParagraph.prototype.SetIndLeft;
-    ApiParagraph.prototype["SetIndRight"]            = ApiParagraph.prototype.SetIndRight;
-    ApiParagraph.prototype["SetIndFirstLine"]        = ApiParagraph.prototype.SetIndFirstLine;
-    ApiParagraph.prototype["SetJc"]                  = ApiParagraph.prototype.SetJc;
-    ApiParagraph.prototype["SetKeepLines"]           = ApiParagraph.prototype.SetKeepLines;
-    ApiParagraph.prototype["SetKeepNext"]            = ApiParagraph.prototype.SetKeepNext;
-    ApiParagraph.prototype["SetPageBreakBefore"]     = ApiParagraph.prototype.SetPageBreakBefore;
-    ApiParagraph.prototype["SetSpacingLine"]         = ApiParagraph.prototype.SetSpacingLine;
-    ApiParagraph.prototype["SetSpacingBefore"]       = ApiParagraph.prototype.SetSpacingBefore;
-    ApiParagraph.prototype["SetSpacingAfter"]        = ApiParagraph.prototype.SetSpacingAfter;
-    ApiParagraph.prototype["SetShd"]                 = ApiParagraph.prototype.SetShd;
-    ApiParagraph.prototype["SetBottomBorder"]        = ApiParagraph.prototype.SetBottomBorder;
-    ApiParagraph.prototype["SetLeftBorder"]          = ApiParagraph.prototype.SetLeftBorder;
-    ApiParagraph.prototype["SetRightBorder"]         = ApiParagraph.prototype.SetRightBorder;
-    ApiParagraph.prototype["SetTopBorder"]           = ApiParagraph.prototype.SetTopBorder;
-    ApiParagraph.prototype["SetBetweenBorder"]       = ApiParagraph.prototype.SetBetweenBorder;
-    ApiParagraph.prototype["SetWidowControl"]        = ApiParagraph.prototype.SetWidowControl;
-    ApiParagraph.prototype["SetTabs"]                = ApiParagraph.prototype.SetTabs;
-    ApiParagraph.prototype["SetNumPr"]               = ApiParagraph.prototype.SetNumPr;
-    ApiParagraph.prototype["GetNumPr"]               = ApiParagraph.prototype.GetNumPr;
+    ApiParagraph.prototype["GetNumbering"]           = ApiParagraph.prototype.GetNumbering;
+    ApiParagraph.prototype["SetNumbering"]           = ApiParagraph.prototype.SetNumbering;
 
 
     ApiRun.prototype["GetTextPr"]                    = ApiRun.prototype.GetTextPr;
-    ApiRun.prototype["SetBold"]                      = ApiRun.prototype.SetBold;
-    ApiRun.prototype["SetItalic"]                    = ApiRun.prototype.SetItalic;
-    ApiRun.prototype["SetStrikeout"]                 = ApiRun.prototype.SetStrikeout;
-    ApiRun.prototype["SetUnderline"]                 = ApiRun.prototype.SetUnderline;
-    ApiRun.prototype["SetFontFamily"]                = ApiRun.prototype.SetFontFamily;
-    ApiRun.prototype["SetFontSize"]                  = ApiRun.prototype.SetFontSize;
-    ApiRun.prototype["SetColor"]                     = ApiRun.prototype.SetColor;
-    ApiRun.prototype["SetVertAlign"]                 = ApiRun.prototype.SetVertAlign;
-    ApiRun.prototype["SetHighlight"]                 = ApiRun.prototype.SetHighlight;
-    ApiRun.prototype["SetSpacing"]                   = ApiRun.prototype.SetSpacing;
-    ApiRun.prototype["SetDoubleStrikeout"]           = ApiRun.prototype.SetDoubleStrikeout;
-    ApiRun.prototype["SetCaps"]                      = ApiRun.prototype.SetCaps;
-    ApiRun.prototype["SetSmallCaps"]                 = ApiRun.prototype.SetSmallCaps;
-    ApiRun.prototype["SetPosition"]                  = ApiRun.prototype.SetPosition;
-    ApiRun.prototype["SetLanguage"]                  = ApiRun.prototype.SetLanguage;
-    ApiRun.prototype["SetShd"]                       = ApiRun.prototype.SetShd;
+
 
     ApiSection.prototype["SetType"]                  = ApiSection.prototype.SetType;
     ApiSection.prototype["SetEqualColumns"]          = ApiSection.prototype.SetEqualColumns;
@@ -2304,6 +1895,7 @@
     ApiStyle.prototype["GetTextPr"]                  = ApiStyle.prototype.GetTextPr;
     ApiStyle.prototype["GetParaPr"]                  = ApiStyle.prototype.GetParaPr;
 
+    ApiTextPr.prototype["SetStyle"]                  = ApiTextPr.prototype.SetStyle;
     ApiTextPr.prototype["SetBold"]                   = ApiTextPr.prototype.SetBold;
     ApiTextPr.prototype["SetItalic"]                 = ApiTextPr.prototype.SetItalic;
     ApiTextPr.prototype["SetStrikeout"]              = ApiTextPr.prototype.SetStrikeout;
@@ -2321,6 +1913,7 @@
     ApiTextPr.prototype["SetLanguage"]               = ApiTextPr.prototype.SetLanguage;
     ApiTextPr.prototype["SetShd"]                    = ApiTextPr.prototype.SetShd;
 
+    ApiParaPr.prototype["SetStyle"]                  = ApiParaPr.prototype.SetStyle;
     ApiParaPr.prototype["SetContextualSpacing"]      = ApiParaPr.prototype.SetContextualSpacing;
     ApiParaPr.prototype["SetIndLeft"]                = ApiParaPr.prototype.SetIndLeft;
     ApiParaPr.prototype["SetIndRight"]               = ApiParaPr.prototype.SetIndRight;
