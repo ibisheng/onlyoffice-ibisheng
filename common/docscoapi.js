@@ -126,7 +126,7 @@
       this._CoAuthoringApi.auth(isViewer);
     } else {
       // Фиктивные вызовы
-      this.callback_OnSpellCheckInit(window['g_cAscSpellCheckUrl'] ? window['g_cAscSpellCheckUrl'] : '');
+      this.callback_OnSpellCheckInit('');
       this.callback_OnSetIndexUser('123');
       this.onFirstLoadChangesEnd();
     }
