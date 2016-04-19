@@ -7958,24 +7958,26 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
             res = this.bcr.Read1(length, function(t, l){
                 return oThis.ReadDocTable(t, l, oNewTable);
             });
-            oNewTable.ReIndexing(0);
-            oNewTable.Correct_BadTable();
-			if(2 == g_nCurFileVersion && false == oNewTable.Inline)
-			{
-				//делаем смещение левой границы
-				if(false == oNewTable.PositionH.Align)
-				{
-					var dx = Get_TableOffsetCorrection(oNewTable);
-					oNewTable.PositionH.Value += dx;
-				}
-			}
-			if(null != this.lastPar)
-            {
-                oNewTable.Set_DocumentPrev(this.lastPar);
-                this.lastPar.Set_DocumentNext(oNewTable);
+            if (oNewTable.Content.length > 0) {
+              oNewTable.ReIndexing(0);
+              oNewTable.Correct_BadTable();
+              if(2 == g_nCurFileVersion && false == oNewTable.Inline)
+              {
+                  //делаем смещение левой границы
+                  if(false == oNewTable.PositionH.Align)
+                  {
+                      var dx = Get_TableOffsetCorrection(oNewTable);
+                      oNewTable.PositionH.Value += dx;
+                  }
+              }
+              if(null != this.lastPar)
+              {
+                  oNewTable.Set_DocumentPrev(this.lastPar);
+                  this.lastPar.Set_DocumentNext(oNewTable);
+              }
+              this.lastPar = oNewTable;
+              Content.push(oNewTable);
             }
-            this.lastPar = oNewTable;
-            Content.push(oNewTable);
         }
         else if ( c_oSerParType.sectPr === type )
 		{
@@ -8397,24 +8399,26 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
             res = this.bcr.Read1(length, function(t, l){
                 return oThis.ReadDocTable(t, l, oNewTable);
             });
-            oNewTable.ReIndexing(0);
-            oNewTable.Correct_BadTable();
-            if(2 == g_nCurFileVersion && false == oNewTable.Inline)
-            {
-                //делаем смещение левой границы
-                if(false == oNewTable.PositionH.Align)
-                {
-                    var dx = Get_TableOffsetCorrection(oNewTable);
-                    oNewTable.PositionH.Value += dx;
-                }
+            if (oNewTable.Content.length > 0) {
+              oNewTable.ReIndexing(0);
+              oNewTable.Correct_BadTable();
+              if(2 == g_nCurFileVersion && false == oNewTable.Inline)
+              {
+                  //делаем смещение левой границы
+                  if(false == oNewTable.PositionH.Align)
+                  {
+                      var dx = Get_TableOffsetCorrection(oNewTable);
+                      oNewTable.PositionH.Value += dx;
+                  }
+              }
+              if(null != this.lastPar)
+              {
+                  oNewTable.Set_DocumentPrev(this.lastPar);
+                  this.lastPar.Set_DocumentNext(oNewTable);
+              }
+              this.lastPar = oNewTable;
+              oParStruct.DocContent.push(oNewTable);
             }
-            if(null != this.lastPar)
-            {
-                oNewTable.Set_DocumentPrev(this.lastPar);
-                this.lastPar.Set_DocumentNext(oNewTable);
-            }
-            this.lastPar = oNewTable;
-            oParStruct.DocContent.push(oNewTable);
         }
         else if(c_oSerRunType.fldstart === type)
         {
