@@ -3733,7 +3733,7 @@ function CEditorPage(api)
         if (!oWordControl.m_oApi.bInit_word_control)
             return;
 
-        if (oWordControl.IsFocus && oWordControl.TextBoxInputMode && oWordControl.TextBoxInput && !window.USER_AGENT_SAFARI_MACOS)
+        if (oWordControl.IsFocus && oWordControl.TextBoxInputMode && oWordControl.TextBoxInput && !AscCommon.AscBrowser.isSafariMacOs)
         {
             if (!oWordControl.m_oApi.isLongAction() && !window.GlobalCopyFlag)
                 oWordControl.TextBoxInput.focus();

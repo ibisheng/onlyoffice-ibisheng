@@ -5185,7 +5185,7 @@ function CThumbnailsManager()
                     {
 						if(this.m_oWordControl.m_oLogicDocument.viewMode === false)
 						{							
-							if (!window.USER_AGENT_SAFARI_MACOS)
+							if (!AscCommon.AscBrowser.isSafariMacOs)
 							{
 								this.m_oWordControl.m_oLogicDocument.Create_NewHistoryPoint(historydescription_Presentation_PasteOnThumbnails);
 
@@ -5213,7 +5213,7 @@ function CThumbnailsManager()
                     }
                     else
                     {
-                        if (window.USER_AGENT_SAFARI_MACOS)
+                        if (AscCommon.AscBrowser.isSafariMacOs)
                             return undefined;
                     }
                 }

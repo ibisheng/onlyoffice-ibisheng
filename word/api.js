@@ -693,12 +693,12 @@ asc_docs_api.prototype.OpenDocument2 = function(url, gObject)
 
     if (this.isMobileVersion)
     {
-        window.USER_AGENT_SAFARI_MACOS = false;
+      AscCommon.AscBrowser.isSafariMacOs = false;
         PASTE_ELEMENT_ID = "wrd_pastebin";
         ELEMENT_DISPAY_STYLE = "none";
     }
 
-    if (window.USER_AGENT_SAFARI_MACOS)
+    if (AscCommon.AscBrowser.isSafariMacOs)
         setInterval(SafariIntervalFocus, 10);
 };
 // Callbacks
@@ -1757,7 +1757,7 @@ asc_docs_api.prototype.Paste = function()
     {
         if (!window.GlobalPasteFlag)
         {
-            if (!window.USER_AGENT_SAFARI_MACOS)
+            if (!AscCommon.AscBrowser.isSafariMacOs)
             {
                 window.GlobalPasteFlag = true;
                 return Editor_Paste_Button(this);
@@ -6141,7 +6141,7 @@ asc_docs_api.prototype.pre_Paste = function(_fonts, _images, callback)
 
             var pastebin = Editor_Paste_GetElem(this, true);
 
-            if (!window.USER_AGENT_SAFARI_MACOS)
+            if (!AscCommon.AscBrowser.isSafariMacOs)
                 pastebin.onpaste = null;
 
             pastebin.style.display  = ELEMENT_DISPAY_STYLE;

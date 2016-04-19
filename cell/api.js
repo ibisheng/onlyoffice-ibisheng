@@ -1106,12 +1106,12 @@ var editor;
 
     // Какая-то непонятная заглушка, чтобы не падало в ipad
     if (this.isMobileVersion) {
-      window.USER_AGENT_SAFARI_MACOS = false;
+      AscCommon.AscBrowser.isSafariMacOs = false;
       PASTE_ELEMENT_ID = "wrd_pastebin";
       ELEMENT_DISPAY_STYLE = "none";
     }
 
-    if (window.USER_AGENT_SAFARI_MACOS) {
+    if (AscCommon.AscBrowser.isSafariMacOs) {
       setInterval(AscCommonExcel.SafariIntervalFocus2, 10);
     }
   };

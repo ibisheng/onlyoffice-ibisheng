@@ -10886,7 +10886,7 @@ CDocument.prototype =
                 {
                     if (!window.GlobalPasteFlag)
                     {
-                        if (!window.USER_AGENT_SAFARI_MACOS)
+                        if (!AscCommon.AscBrowser.isSafariMacOs)
                         {
                             this.Create_NewHistoryPoint(historydescription_Document_ShiftInsert);
 
@@ -11140,7 +11140,7 @@ CDocument.prototype =
                 {
                     if (!window.GlobalPasteFlag)
                     {
-                        if (!window.USER_AGENT_SAFARI_MACOS)
+                        if (!AscCommon.AscBrowser.isSafariMacOs)
                         {
                             this.Create_NewHistoryPoint(historydescription_Document_PasteHotKey);
 
@@ -11165,7 +11165,7 @@ CDocument.prototype =
                     }
                     else
                     {
-                        if (!window.USER_AGENT_SAFARI_MACOS)
+                        if (!AscCommon.AscBrowser.isSafariMacOs)
                             bRetValue = keydownresult_PreventAll;
                     }
                 }

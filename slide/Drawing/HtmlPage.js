@@ -3053,7 +3053,7 @@ function CEditorPage(api)
         var oWordControl = oThis;
         oWordControl.m_nTimeDrawingLast = new Date().getTime();
 		
-		if (oWordControl.IsFocus && oWordControl.TextBoxInputMode && oWordControl.TextBoxInput && !window.USER_AGENT_SAFARI_MACOS)
+		if (oWordControl.IsFocus && oWordControl.TextBoxInputMode && oWordControl.TextBoxInput && !AscCommon.AscBrowser.isSafariMacOs)
         {
             if (!oWordControl.m_oApi.isLongAction() && !window.GlobalCopyFlag)
                 oWordControl.TextBoxInput.focus();
