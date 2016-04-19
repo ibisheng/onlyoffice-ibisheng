@@ -91,6 +91,8 @@ var c_oAscFileType = {
       AutoFilterMoveToHiddenRangeError: -53,
       LockedAllError: -54,
       LockedWorksheetRename: -55,
+      FTChangeTableRangeError: -56,
+      FTRangeIncludedOtherTables: -57,
 
       PasteMaxRangeError: -64,
       PastInMergeAreaError: -65,
