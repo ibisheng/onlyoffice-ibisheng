@@ -27,50 +27,6 @@ var c_oAscWrapStyle2 = {
   InFront: 6
 };
 
-/*Error level & ID*/
-var c_oAscError = {
-  Level: {
-    Critical: -1,
-    NoCritical: 0
-  },
-  ID: {
-    ServerSaveComplete: 3,
-    ConvertationProgress: 2,
-    DownloadProgress: 1,
-    No: 0,
-    Unknown: -1,
-    ConvertationTimeout: -2,
-    ConvertationError: -3,
-    DownloadError: -4,
-    UnexpectedGuid: -5,
-    Database: -6,
-    FileRequest: -7,
-    FileVKey: -8,
-    UplImageSize: -9,
-    UplImageExt: -10,
-    UplImageFileCount: -11,
-    NoSupportClipdoard: -12,
-    SplitCellMaxRows: -13,
-    SplitCellMaxCols: -14,
-    SplitCellRowsDivider: -15,
-    StockChartError: -16,
-
-    CoAuthoringDisconnect: -18,
-    ConvertationPassword: -19,
-
-    VKeyEncrypt: -20,
-    KeyExpire: -21,
-    UserCountExceed: -22,
-    MobileUnexpectedCharCount: -23,
-
-    MailMergeLoadFile: -24,
-    MailMergeSaveFile: -25,
-
-    UserDrop: -100,
-    Warning: -101
-  }
-};
-
 var c_oAscTableSelectionType = {
   Cell: 0,
   Row: 1,
@@ -672,11 +628,8 @@ var c_oAscRevisionsObjectType =
 window["flat_desine"] = false;
 
 //------------------------------------------------------------export---------------------------------------------------
-if (undefined === window['Asc']) {
-  window['Asc'] = {};
-}
+window['Asc'] = window['Asc'] || {};
 window['Asc']['c_oAscWrapStyle2'] = c_oAscWrapStyle2;
-window['Asc']['c_oAscError'] = window['Asc'].c_oAscError = c_oAscError;
 window['Asc']['c_oAscContextMenuTypes'] = c_oAscContextMenuTypes;
 window['Asc']['c_oAscCollaborativeMarksShowType'] = c_oAscCollaborativeMarksShowType;
 window['Asc']['c_oAscAlignH'] = c_oAscAlignH;

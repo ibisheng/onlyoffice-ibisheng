@@ -42,6 +42,86 @@ var c_oAscFileType = {
 	ODP		: 0x0083
 };
 
+  var c_oAscError = {
+    Level: {
+      Critical: -1,
+      NoCritical: 0
+    },
+    ID: {
+      ServerSaveComplete: 3,
+      ConvertationProgress: 2,
+      DownloadProgress: 1,
+      No: 0,
+      Unknown: -1,
+      ConvertationTimeout: -2,
+      ConvertationError: -3,
+      DownloadError: -4,
+      UnexpectedGuid: -5,
+      Database: -6,
+      FileRequest: -7,
+      FileVKey: -8,
+      UplImageSize: -9,
+      UplImageExt: -10,
+      UplImageFileCount: -11,
+      NoSupportClipdoard: -12,
+      UplImageUrl: -13,
+
+      StockChartError: -17,
+      CoAuthoringDisconnect: -18,
+      ConvertationPassword: -19,
+      VKeyEncrypt: -20,
+      KeyExpire: -21,
+      UserCountExceed: -22,
+
+      SplitCellMaxRows: -30,
+      SplitCellMaxCols: -31,
+      SplitCellRowsDivider: -32,
+
+      MobileUnexpectedCharCount: -35,
+
+      // Mail Merge
+      MailMergeLoadFile: -40,
+      MailMergeSaveFile: -41,
+
+      // for AutoFilter
+      AutoFilterDataRangeError: -50,
+      AutoFilterChangeFormatTableError: -51,
+      AutoFilterChangeError: -52,
+      AutoFilterMoveToHiddenRangeError: -53,
+      LockedAllError: -54,
+      LockedWorksheetRename: -55,
+
+      PasteMaxRangeError: -64,
+      PastInMergeAreaError: -65,
+
+      DataRangeError: -72,
+      CannotMoveRange: -71,
+
+      MaxDataSeriesError: -80,
+      CannotFillRange: -81,
+
+      UserDrop: -100,
+      Warning: -101,
+
+      /* для формул */
+      FrmlWrongCountParentheses: -300,
+      FrmlWrongOperator: -301,
+      FrmlWrongMaxArgument: -302,
+      FrmlWrongCountArgument: -303,
+      FrmlWrongFunctionName: -304,
+      FrmlAnotherParsingError: -305,
+      FrmlWrongArgumentRange: -306,
+      FrmlOperandExpected: -307,
+      FrmlParenthesesCorrectCount: -308,
+      FrmlWrongReferences: -309,
+
+      InvalidReferenceOrName: -310,
+      LockCreateDefName: -311,
+
+      OpenWarning: 500
+    }
+  };
+
 var c_oAscAsyncAction = {
 	Open				: 0,  // открытие документа
 	Save				: 1,  // сохранение
@@ -793,6 +873,7 @@ window['Asc']['FONT_THUMBNAIL_HEIGHT'] = FONT_THUMBNAIL_HEIGHT;
 window['Asc']['c_oAscMaxColumnWidth'] = window['Asc'].c_oAscMaxColumnWidth = c_oAscMaxColumnWidth;
 window['Asc']['c_oAscMaxRowHeight'] = window['Asc'].c_oAscMaxRowHeight = c_oAscMaxRowHeight;
 window['Asc']['c_oAscFileType'] = window['Asc'].c_oAscFileType = c_oAscFileType;
+window['Asc']['c_oAscError'] = window['Asc'].c_oAscError = c_oAscError;
 window['Asc']['c_oAscAsyncAction'] = window['Asc'].c_oAscAsyncAction = c_oAscAsyncAction;
 window['Asc']['c_oAscAdvancedOptionsID'] = window['Asc'].c_oAscAdvancedOptionsID = c_oAscAdvancedOptionsID;
 window['Asc']['c_oAscFontRenderingModeType'] = window['Asc'].c_oAscFontRenderingModeType = c_oAscFontRenderingModeType;

@@ -12,74 +12,6 @@ function (window, undefined) {
   // Import
   var CColor = AscCommon.CColor;
 
-var c_oAscError = {
-  Level: {
-    Critical: -1,
-    NoCritical: 0
-  },
-  ID: {
-    ServerSaveComplete: 3,
-    ConvertationProgress: 2,
-    DownloadProgress: 1,
-    No: 0,
-    Unknown: -1,
-    ConvertationTimeout: -2,
-    ConvertationError: -3,
-    DownloadError: -4,
-    UnexpectedGuid: -5,
-    Database: -6,
-    FileRequest: -7,
-    FileVKey: -8,
-    UplImageSize: -9,
-    UplImageExt: -10,
-    UplImageFileCount: -11,
-    NoSupportClipdoard: -12,
-    PastInMergeAreaError: -13,
-    StockChartError: -14,
-    DataRangeError: -15,
-    CannotMoveRange: -16,
-    UplImageUrl: -17,
-    CoAuthoringDisconnect: -18,
-    ConvertationPassword: -19,
-
-    VKeyEncrypt: -20,
-    KeyExpire: -21,
-    UserCountExceed: -22,
-
-    /* для формул */
-    FrmlWrongCountParentheses: -300,
-    FrmlWrongOperator: -301,
-    FrmlWrongMaxArgument: -302,
-    FrmlWrongCountArgument: -303,
-    FrmlWrongFunctionName: -304,
-    FrmlAnotherParsingError: -305,
-    FrmlWrongArgumentRange: -306,
-    FrmlOperandExpected: -307,
-    FrmlParenthesesCorrectCount: -308,
-    FrmlWrongReferences: -309,
-
-    InvalidReferenceOrName: -310,
-    LockCreateDefName: -311,
-
-
-    AutoFilterDataRangeError: -50,
-    AutoFilterChangeFormatTableError: -51,
-    AutoFilterChangeError: -52,
-    AutoFilterMoveToHiddenRangeError: -53,
-    LockedAllError: -54,
-    LockedWorksheetRename: -55,
-
-    PasteMaxRangeError: -65,
-
-    MaxDataSeriesError: -80,
-    CannotFillRange: -81,
-
-    UserDrop: -100,
-    Warning: -101,
-
-    OpenWarning: 500
-  }
-};
 var c_oAscConfirm = {
   ConfirmReplaceRange: 0
 };
@@ -367,7 +299,6 @@ var c_oAscPopUpSelectorType = {
   window['AscCommonExcel'].c_oAscLockNameTabColor = c_oAscLockNameTabColor;
 
   window['Asc'] = window['Asc'] || {};
-  window['Asc']['c_oAscError'] = window['Asc'].c_oAscError = c_oAscError;
   window['Asc']['c_oAscConfirm'] = window['Asc'].c_oAscConfirm = c_oAscConfirm;
   window['Asc']['c_oAscMergeOptions'] = window['Asc'].c_oAscMergeOptions = c_oAscMergeOptions;
   window['Asc']['c_oAscInsertOptions'] = window['Asc'].c_oAscInsertOptions = c_oAscInsertOptions;
