@@ -715,14 +715,14 @@ CSparklineView.prototype.initFromSparkline = function(oSparkline, oSparklineGrou
     }, this, []);
 };
 
-CSparklineView.prototype.draw = function(graphics)
+CSparklineView.prototype.draw = function(graphics, offX, offY)
 {
-    var x = this.ws.getCellLeft(this.col, 3);
-    var y = this.ws.getCellTop(this.row, 3);
+    var x = this.ws.getCellLeft(this.col, 3) - offX;
+    var y = this.ws.getCellTop(this.row, 3) - offY;
     var extX = this.ws.getColumnWidth(this.col, 3);
     var extY = this.ws.getRowHeight(this.row, 3);
     if(Math.abs(this.extX - extX) > 0.01 || Math.abs(this.extY - extY) > 0.01
-        || Math.abs(this.x - x) > 0.01 || Math.abs(this.y - y))
+        || Math.abs(this.x - x) > 0.01 || Math.abs(this.y - y) > 0.01)
     {
         ExecuteNoHistory(function(){
             this.chartSpace.spPr.xfrm.setOffX(x*nSparklineMultiplier);
@@ -734,7 +734,8 @@ CSparklineView.prototype.draw = function(graphics)
         this.y = y;
         this.extX = extX;
         this.extY = extY;
-        this.chartSpace.recalculate();
+        this.chartSpace.transform.tx = x*nSparklineMultiplier;
+        this.chartSpace.transform.ty = y*nSparklineMultiplier;
     }
     //graphics.m_oCoordTransform.tx = x;
     //graphics.m_oCoordTransform.ty = y;
@@ -2511,7 +2512,7 @@ function DrawingObjects() {
         }
     };
 
-    _this.drawSparkLineGroups = function(oDrawingContext, oSparklineGroups, range)
+    _this.drawSparkLineGroups = function(oDrawingContext, oSparklineGroups, range, offsetX, offsetY)
     {
 
         var graphics, i, j;
@@ -2526,8 +2527,9 @@ function DrawingObjects() {
                 oDrawingContext.getWidth(3)*nSparklineMultiplier, oDrawingContext.getHeight(3)*nSparklineMultiplier);
             graphics.m_oFontManager = g_fontManager;
         }
-        graphics.SaveGrState();
 
+        var _offX = offsetX* Asc.getCvtRatio(1, 3, oDrawingContext.getPPIX());
+        var _offY = offsetY* Asc.getCvtRatio(1, 3, oDrawingContext.getPPIY());
         for(i = 0; i < oSparklineGroups.arrSparklineGroup.length; ++i) {
             var oSparklineGroup = oSparklineGroups.arrSparklineGroup[i];
 
@@ -2545,10 +2547,10 @@ function DrawingObjects() {
                 if (!oSparklineGroup.arrSparklines[j].checkInRange(range)) {
                     continue;
                 }
-                oSparklineGroup.arrCachedSparklines[j].draw(graphics);
+                oSparklineGroup.arrCachedSparklines[j].draw(graphics, _offX, _offY);
             }
         }
-        graphics.RestoreGrState();
+        oDrawingContext.restore();
     };
 
     _this.rebuildChartGraphicObjects = function(data)
