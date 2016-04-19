@@ -1,10 +1,10 @@
 "use strict";
 
-/* spellCheckLanguages.js
- *
- * Author: Alexander.Trofimov
- * Date: 24.06.13
+(	/**
+ * @param {Window} window
+ * @param {undefined} undefined
  */
+  function (window, undefined) {
 var g_spellCheckLanguages = [];
 //{ "ar", 0x0001 },
 //{ "bg", 0x0002 },
@@ -123,48 +123,48 @@ var g_spellCheckLanguages = [];
 //{ "gd", 0x0091 },
 //{ "ar-SA", 0x0401 },
 //{ "bg-BG", 0x0402 },
-g_spellCheckLanguages.push(window["Asc"].asc_CLanguage("ca-ES", 0x0403));
+g_spellCheckLanguages.push(AscCommon.asc_CLanguage("ca-ES", 0x0403));
 //{ "zh-TW", 0x0404 },
-g_spellCheckLanguages.push(window["Asc"].asc_CLanguage("cs-CZ", 0x0405));
-g_spellCheckLanguages.push(window["Asc"].asc_CLanguage("da-DK", 0x0406));
-g_spellCheckLanguages.push(window["Asc"].asc_CLanguage("de-DE", 0x0407));
-g_spellCheckLanguages.push(window["Asc"].asc_CLanguage("el-GR", 0x0408));
-g_spellCheckLanguages.push(window["Asc"].asc_CLanguage("en-US", 0x0409));
+g_spellCheckLanguages.push(AscCommon.asc_CLanguage("cs-CZ", 0x0405));
+g_spellCheckLanguages.push(AscCommon.asc_CLanguage("da-DK", 0x0406));
+g_spellCheckLanguages.push(AscCommon.asc_CLanguage("de-DE", 0x0407));
+g_spellCheckLanguages.push(AscCommon.asc_CLanguage("el-GR", 0x0408));
+g_spellCheckLanguages.push(AscCommon.asc_CLanguage("en-US", 0x0409));
 //{ "es-ES_tradnl", 0x040a },
 //{ "fi-FI", 0x040b },
-g_spellCheckLanguages.push(window["Asc"].asc_CLanguage("fr-FR", 0x040c));
+g_spellCheckLanguages.push(AscCommon.asc_CLanguage("fr-FR", 0x040c));
 //{ "he-IL", 0x040d },
-g_spellCheckLanguages.push(window["Asc"].asc_CLanguage("hu-HU", 0x040e));
+g_spellCheckLanguages.push(AscCommon.asc_CLanguage("hu-HU", 0x040e));
 //{ "is-IS", 0x040f },
-g_spellCheckLanguages.push(window["Asc"].asc_CLanguage("it-IT", 0x0410));
+g_spellCheckLanguages.push(AscCommon.asc_CLanguage("it-IT", 0x0410));
 //{ "ja-JP", 0x0411 },
-g_spellCheckLanguages.push(window["Asc"].asc_CLanguage("ko-KR", 0x0412));
-g_spellCheckLanguages.push(window["Asc"].asc_CLanguage("nl-NL", 0x0413));
-g_spellCheckLanguages.push(window["Asc"].asc_CLanguage("nb-NO", 0x0414));
-g_spellCheckLanguages.push(window["Asc"].asc_CLanguage("pl-PL", 0x0415));
-g_spellCheckLanguages.push(window["Asc"].asc_CLanguage("pt-BR", 0x0416));
+g_spellCheckLanguages.push(AscCommon.asc_CLanguage("ko-KR", 0x0412));
+g_spellCheckLanguages.push(AscCommon.asc_CLanguage("nl-NL", 0x0413));
+g_spellCheckLanguages.push(AscCommon.asc_CLanguage("nb-NO", 0x0414));
+g_spellCheckLanguages.push(AscCommon.asc_CLanguage("pl-PL", 0x0415));
+g_spellCheckLanguages.push(AscCommon.asc_CLanguage("pt-BR", 0x0416));
 //{ "rm-CH", 0x0417 },
-g_spellCheckLanguages.push(window["Asc"].asc_CLanguage("ro-RO", 0x0418));
-g_spellCheckLanguages.push(window["Asc"].asc_CLanguage("ru-RU", 0x0419));
+g_spellCheckLanguages.push(AscCommon.asc_CLanguage("ro-RO", 0x0418));
+g_spellCheckLanguages.push(AscCommon.asc_CLanguage("ru-RU", 0x0419));
 //{ "hr-HR", 0x041a },
-g_spellCheckLanguages.push(window["Asc"].asc_CLanguage("sk-SK", 0x041b));
+g_spellCheckLanguages.push(AscCommon.asc_CLanguage("sk-SK", 0x041b));
 //{ "sq-AL", 0x041c },
-g_spellCheckLanguages.push(window["Asc"].asc_CLanguage("sv-SE", 0x041d));
+g_spellCheckLanguages.push(AscCommon.asc_CLanguage("sv-SE", 0x041d));
 //{ "th-TH", 0x041e },
-g_spellCheckLanguages.push(window["Asc"].asc_CLanguage("tr-TR", 0x041f));
+g_spellCheckLanguages.push(AscCommon.asc_CLanguage("tr-TR", 0x041f));
 //{ "ur-PK", 0x0420 },
 //{ "id-ID", 0x0421 },
-g_spellCheckLanguages.push(window["Asc"].asc_CLanguage("uk-UA", 0x0422));
+g_spellCheckLanguages.push(AscCommon.asc_CLanguage("uk-UA", 0x0422));
 //{ "be-BY", 0x0423 },
 //{ "sl-SI", 0x0424 },
 //{ "et-EE", 0x0425 },
-g_spellCheckLanguages.push(window["Asc"].asc_CLanguage("lv-LV", 0x0426));
-g_spellCheckLanguages.push(window["Asc"].asc_CLanguage("lt-LT", 0x0427));
+g_spellCheckLanguages.push(AscCommon.asc_CLanguage("lv-LV", 0x0426));
+g_spellCheckLanguages.push(AscCommon.asc_CLanguage("lt-LT", 0x0427));
 //{ "tg-Cyrl-TJ", 0x0428 },
 //{ "fa-IR", 0x0429 },
-g_spellCheckLanguages.push(window["Asc"].asc_CLanguage("vi-VN", 0x042a));
+g_spellCheckLanguages.push(AscCommon.asc_CLanguage("vi-VN", 0x042a));
 //{ "hy-AM", 0x042b },
-g_spellCheckLanguages.push(window["Asc"].asc_CLanguage("az-Latn-AZ", 0x042c));
+g_spellCheckLanguages.push(AscCommon.asc_CLanguage("az-Latn-AZ", 0x042c));
 //{ "eu-ES", 0x042d },
 //{ "wen-DE", 0x042e },
 //{ "mk-MK", 0x042f },
@@ -255,14 +255,14 @@ g_spellCheckLanguages.push(window["Asc"].asc_CLanguage("az-Latn-AZ", 0x042c));
 //{ "gd-GB", 0x0491 },
 //{ "ar-IQ", 0x0801 },
 //{ "zh-CN", 0x0804 },
-g_spellCheckLanguages.push(window["Asc"].asc_CLanguage("de-CH", 0x0807));
-g_spellCheckLanguages.push(window["Asc"].asc_CLanguage("en-GB", 0x0809));
+g_spellCheckLanguages.push(AscCommon.asc_CLanguage("de-CH", 0x0807));
+g_spellCheckLanguages.push(AscCommon.asc_CLanguage("en-GB", 0x0809));
 //{ "es-MX", 0x080a },
 //{ "fr-BE", 0x080c },
 //{ "it-CH", 0x0810 },
 //{ "nl-BE", 0x0813 },
-g_spellCheckLanguages.push(window["Asc"].asc_CLanguage("nn-NO", 0x0814));
-g_spellCheckLanguages.push(window["Asc"].asc_CLanguage("pt-PT", 0x0816));
+g_spellCheckLanguages.push(AscCommon.asc_CLanguage("nn-NO", 0x0814));
+g_spellCheckLanguages.push(AscCommon.asc_CLanguage("pt-PT", 0x0816));
 //{ "ro-MO", 0x0818 },
 //{ "ru-MO", 0x0819 },
 //{ "sr-Latn-CS", 0x081a },
@@ -286,9 +286,9 @@ g_spellCheckLanguages.push(window["Asc"].asc_CLanguage("pt-PT", 0x0816));
 //{ "ti-ET", 0x0873 },
 //{ "ar-EG", 0x0c01 },
 //{ "zh-HK", 0x0c04 },
-g_spellCheckLanguages.push(window["Asc"].asc_CLanguage("de-AT", 0x0c07));
-g_spellCheckLanguages.push(window["Asc"].asc_CLanguage("en-AU", 0x0c09));
-g_spellCheckLanguages.push(window["Asc"].asc_CLanguage("es-ES", 0x0c0a));
+g_spellCheckLanguages.push(AscCommon.asc_CLanguage("de-AT", 0x0c07));
+g_spellCheckLanguages.push(AscCommon.asc_CLanguage("en-AU", 0x0c09));
+g_spellCheckLanguages.push(AscCommon.asc_CLanguage("es-ES", 0x0c0a));
 //{ "fr-CA", 0x0c0c },
 //{ "sr-Cyrl-CS", 0x0c1a },
 //{ "se-FI", 0x0c3b },
@@ -397,3 +397,8 @@ g_spellCheckLanguages.push(window["Asc"].asc_CLanguage("es-ES", 0x0c0a));
 //{ "iu-Latn", 0x7c5d },
 //{ "tzm-Latn", 0x7c5f },
 //{ "ha-Latn", 0x7c68 },
+
+  //-----------------------------------------------------------export---------------------------------------------------
+  window['AscCommon'] = window['AscCommon'] || {};
+  window["AscCommon"].g_spellCheckLanguages = g_spellCheckLanguages;
+})(window);

@@ -252,7 +252,7 @@ function asc_docs_api(name)
   this.isCoMarksDraw = false;
 
 	// Spell Checking
-	this.SpellCheckApi = (window["AscDesktopEditor"] === undefined) ? new Asc.CSpellCheckApi() : new CSpellCheckApi_desktop();
+	this.SpellCheckApi = (window["AscDesktopEditor"] === undefined) ? new AscCommon.CSpellCheckApi() : new CSpellCheckApi_desktop();
 	this.isSpellCheckEnable = true;
 
     // это чтобы сразу показать ридер, без возможности вернуться в редактор/вьюер
@@ -1031,7 +1031,7 @@ asc_docs_api.prototype._coSpellCheckInit = function() {
 };
 
 asc_docs_api.prototype.asc_getSpellCheckLanguages = function() {
-	return g_spellCheckLanguages;
+	return AscCommon.g_spellCheckLanguages;
 };
 asc_docs_api.prototype.asc_SpellCheckDisconnect = function() {
 	if (!this.SpellCheckApi)
