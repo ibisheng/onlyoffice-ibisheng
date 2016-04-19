@@ -69,6 +69,8 @@
     var c_oAscSelectionType = asc.c_oAscSelectionType;
     var c_oAscSelectionDialogType = asc.c_oAscSelectionDialogType;
     var c_oAscAutoFilterTypes = asc.c_oAscAutoFilterTypes;
+    var c_oAscChangeTableStyleInfo = asc.c_oAscChangeTableStyleInfo;
+    var c_oAscChangeSelectionFormatTable = asc.c_oAscChangeSelectionFormatTable;
 
     /*
      * Constants

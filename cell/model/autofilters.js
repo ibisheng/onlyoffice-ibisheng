@@ -11,12 +11,14 @@
 		 * Import
 		 * -----------------------------------------------------------------------------
 		 */
+		var CellValueType = AscCommon.CellValueType;
+		
 		var UndoRedoDataTypes = AscCommonExcel.UndoRedoDataTypes;
 
 		var c_oAscError = Asc.c_oAscError;
 		var c_oAscInsertOptions = Asc.c_oAscInsertOptions;
 		var c_oAscDeleteOptions = Asc.c_oAscDeleteOptions;
-		var CellValueType = AscCommon.CellValueType;
+		var c_oAscChangeTableStyleInfo = Asc.c_oAscChangeTableStyleInfo;
 
 		var prot;
 
