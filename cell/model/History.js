@@ -445,7 +445,7 @@ CHistory.prototype._addRedoObjectParam = function (oRedoObjectParam, Point) {
 		oRedoObjectParam.oOnUpdateSheetViewSettings[Point.SheetId] = Point.SheetId;
 	else if (AscCommonExcel.g_oUndoRedoWorksheet === Point.Class && (historyitem_Worksheet_RemoveRows === Point.Type || historyitem_Worksheet_RemoveCols === Point.Type || historyitem_Worksheet_AddRows === Point.Type || historyitem_Worksheet_AddCols === Point.Type))
 		oRedoObjectParam.bAddRemoveRowCol = true;
-	else if(g_oUndoRedoAutoFilters === Point.Class && historyitem_AutoFilter_ChangeTableInfo === Point.Type)
+	else if(AscCommonExcel.g_oUndoRedoAutoFilters === Point.Class && historyitem_AutoFilter_ChangeTableInfo === Point.Type)
 		oRedoObjectParam.oChangeWorksheetUpdate[Point.SheetId] = Point.SheetId;
 		
 };
