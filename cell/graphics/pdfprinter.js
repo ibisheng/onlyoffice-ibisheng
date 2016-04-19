@@ -358,7 +358,7 @@ CPdfPrinter.prototype =
     {
         if (this.bIsSimpleCommands)
             return this.DocumentRenderer.drawImage(_src, sx, sy, sw, sh, dx, dy);
-        var srcLocal = g_oDocumentUrls.getLocal(_src);
+        var srcLocal = AscCommon.g_oDocumentUrls.getLocal(_src);
         if (srcLocal){
             _src = srcLocal;
         }

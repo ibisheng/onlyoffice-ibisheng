@@ -13,7 +13,7 @@ function ParaHyperlink()
 {
     ParaHyperlink.superclass.constructor.call(this);
 
-    this.Id = g_oIdCounter.Get_NewId();
+    this.Id = AscCommon.g_oIdCounter.Get_NewId();
 
     this.Type    = para_Hyperlink;
     this.Value   = "";
@@ -21,10 +21,10 @@ function ParaHyperlink()
     this.ToolTip = "";
 
     // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
-    g_oTableId.Add( this, this.Id );
+    AscCommon.g_oTableId.Add( this, this.Id );
 }
 
-Asc.extendClass(ParaHyperlink, CParagraphContentWithParagraphLikeContent);
+AscCommon.extendClass(ParaHyperlink, CParagraphContentWithParagraphLikeContent);
 
 ParaHyperlink.prototype.Get_Id = function()
 {
@@ -498,7 +498,7 @@ ParaHyperlink.prototype.Load_Changes = function(Reader)
             for ( var Index = 0; Index < Count; Index++ )
             {
                 var Pos     = this.m_oContentChanges.Check( AscCommon.contentchanges_Add, Reader.GetLong() );
-                var Element = g_oTableId.Get_ById( Reader.GetString2() );
+                var Element = AscCommon.g_oTableId.Get_ById( Reader.GetString2() );
 
                 if ( null != Element )
                 {
@@ -597,7 +597,7 @@ ParaHyperlink.prototype.Read_FromBinary2 = function(Reader)
 
     for ( var Index = 0; Index < Count; Index++ )
     {
-        var Element = g_oTableId.Get_ById( Reader.GetString2() );
+        var Element = AscCommon.g_oTableId.Get_ById( Reader.GetString2() );
         if ( null !== Element )
             this.Content.push( Element );
     }

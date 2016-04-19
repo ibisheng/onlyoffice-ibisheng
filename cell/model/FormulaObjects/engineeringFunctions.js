@@ -20,6 +20,14 @@ function (window, undefined) {
 
     var rtl_math_erf = AscCommonExcel.rtl_math_erf;
 
+    var rg_validBINNumber = /^[01]{1,10}$/,
+      rg_validDEC2BINNumber = /^-?[0-9]{1,3}$/,
+      rg_validDEC2OCTNumber = /^-?[0-9]{1,9}$/,
+      rg_validDEC2HEXNumber = /^-?[0-9]{1,12}$/,
+      rg_validHEXNumber = /^[0-9A-F]{1,10}$/i,
+      rg_validOCTNumber = /^[0-7]{1,10}$/,
+      rg_complex_number = new XRegExp( "^(?<real>[-+]?(?:\\d*(?:\\.\\d+)?(?:[Ee][+-]?\\d+)?))?(?<img>([-+]?(\\d*(?:\\.\\d+)?(?:[Ee][+-]?\\d+)?)?[ij])?)", "g" );
+
 var NumberBase = {
     BIN:2,
     OCT:8,

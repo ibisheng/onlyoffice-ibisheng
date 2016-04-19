@@ -186,7 +186,7 @@ function CBorderBox(props)
 {
     CBorderBox.superclass.constructor.call(this);
 
-	this.Id = g_oIdCounter.Get_NewId();
+	this.Id = AscCommon.g_oIdCounter.Get_NewId();
 
     this.gapBrd = 0;
 
@@ -195,9 +195,9 @@ function CBorderBox(props)
     if(props !== null && typeof(props) !== "undefined")
         this.init(props);
 
-	g_oTableId.Add(this, this.Id);
+    AscCommon.g_oTableId.Add(this, this.Id);
 }
-Asc.extendClass(CBorderBox, CMathBase);
+AscCommon.extendClass(CBorderBox, CMathBase);
 CBorderBox.prototype.ClassType = historyitem_type_borderBox;
 CBorderBox.prototype.kind      = MATH_BORDER_BOX;
 CBorderBox.prototype.init = function(props)
@@ -554,7 +554,7 @@ function CMathMenuBorderBox(BorderBox)
         this.HideTopRTL = undefined;
     }
 }
-Asc.extendClass(CMathMenuBorderBox, CMathMenuBase);
+AscCommon.extendClass(CMathMenuBorderBox, CMathMenuBase);
 CMathMenuBorderBox.prototype.get_HideTop = function(){return this.HideTop;};
 CMathMenuBorderBox.prototype.put_HideTop = function(bHideTop){this.HideTop = bHideTop;};
 CMathMenuBorderBox.prototype.get_HideBottom = function(){return this.HideBottom;};
@@ -739,7 +739,7 @@ function CBox(props)
 {
     CBox.superclass.constructor.call(this);
 
-	this.Id = g_oIdCounter.Get_NewId();
+	this.Id = AscCommon.g_oIdCounter.Get_NewId();
 
     this.Pr = new CMathBoxPr();
 
@@ -748,9 +748,9 @@ function CBox(props)
     if(props !== null && typeof(props) !== "undefined")
         this.init(props);
 
-	g_oTableId.Add( this, this.Id );
+    AscCommon.g_oTableId.Add( this, this.Id );
 }
-Asc.extendClass(CBox, CMathBase);
+AscCommon.extendClass(CBox, CMathBase);
 CBox.prototype.ClassType = historyitem_type_box;
 CBox.prototype.kind      = MATH_BOX;
 CBox.prototype.init = function(props)
@@ -916,7 +916,7 @@ function CMathMenuBox(Box)
 
     this.Type = c_oAscMathInterfaceType.Box;
 }
-Asc.extendClass(CMathMenuBox, CMathMenuBase);
+AscCommon.extendClass(CMathMenuBox, CMathMenuBase);
 window["CMathMenuBox"] = CMathMenuBox;
 
 function CMathBarPr()
@@ -955,7 +955,7 @@ function CBar(props)
 {
     CBar.superclass.constructor.call(this);
 
-	this.Id = g_oIdCounter.Get_NewId();
+	this.Id = AscCommon.g_oIdCounter.Get_NewId();
 
     this.Pr = new CMathBarPr();
 
@@ -964,9 +964,9 @@ function CBar(props)
     if(props !== null && typeof(props) !== "undefined")
         this.init(props);
 
-	g_oTableId.Add( this, this.Id );
+    AscCommon.g_oTableId.Add( this, this.Id );
 }
-Asc.extendClass(CBar, CCharacter);
+AscCommon.extendClass(CBar, CCharacter);
 CBar.prototype.ClassType = historyitem_type_bar;
 CBar.prototype.kind      = MATH_BAR;
 CBar.prototype.init = function(props)
@@ -1060,7 +1060,7 @@ function CMathMenuBar(Bar)
         this.Pos = undefined;
     }
 }
-Asc.extendClass(CMathMenuBar, CMathMenuBase);
+AscCommon.extendClass(CMathMenuBar, CMathMenuBase);
 
 CMathMenuBar.prototype.get_Pos = function(){return this.Pos};
 CMathMenuBar.prototype.put_Pos = function(Pos){this.Pos = Pos;};
@@ -1155,16 +1155,16 @@ function CPhantom(props)
 {
     CPhantom.superclass.constructor.call(this);
 
-	this.Id = g_oIdCounter.Get_NewId();
+	this.Id = AscCommon.g_oIdCounter.Get_NewId();
 
     this.Pr = new CMathPhantomPr();
 
     if(props !== null && typeof(props) !== "undefined")
         this.init(props);
 
-	g_oTableId.Add( this, this.Id );
+    AscCommon.g_oTableId.Add( this, this.Id );
 }
-Asc.extendClass(CPhantom, CMathBase);
+AscCommon.extendClass(CPhantom, CMathBase);
 CPhantom.prototype.ClassType = historyitem_type_phant;
 CPhantom.prototype.kind      = MATH_PHANTOM;
 CPhantom.prototype.init = function(props)

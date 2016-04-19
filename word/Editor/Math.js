@@ -9,6 +9,7 @@ var align_Right = AscCommon.align_Right;
 var align_Left = AscCommon.align_Left;
 var align_Center = AscCommon.align_Center;
 var align_Justify = AscCommon.align_Justify;
+var g_oTableId = AscCommon.g_oTableId;
 
 var g_dMathArgSizeKoeff_1 = 0.76;
 var g_dMathArgSizeKoeff_2 = 0.6498; // 0.76 * 0.855
@@ -983,7 +984,7 @@ function ParaMath()
 {
     ParaMath.superclass.constructor.call(this);
 
-    this.Id                 = g_oIdCounter.Get_NewId();
+    this.Id                 = AscCommon.g_oIdCounter.Get_NewId();
     this.Type               = para_Math;
 
     this.Jc                 = undefined;
@@ -1023,7 +1024,7 @@ function ParaMath()
 	g_oTableId.Add( this, this.Id );
 }
 
-Asc.extendClass(ParaMath, CParagraphContentWithContentBase);
+AscCommon.extendClass(ParaMath, CParagraphContentWithContentBase);
 ParaMath.prototype.Get_Type = function()
 {
     return this.Type;

@@ -30,7 +30,7 @@ function CWrapPolygon(wordGraphicObject)
 
     this.wordGraphicObject = wordGraphicObject;
 
-    g_oTableId.Add( this, g_oIdCounter.Get_NewId());
+    AscCommon.g_oTableId.Add( this, AscCommon.g_oIdCounter.Get_NewId());
 }
 
 CWrapPolygon.prototype =

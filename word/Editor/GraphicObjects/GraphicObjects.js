@@ -3,6 +3,7 @@
 // Import
 var changestype_Drawing_Props = AscCommon.changestype_Drawing_Props;
 var changestype_2_ElementsArray_and_Type = AscCommon.changestype_2_ElementsArray_and_Type;
+var g_oTableId = AscCommon.g_oTableId;
 
 var asc_CImgProperty = Asc.asc_CImgProperty;
 
@@ -145,8 +146,8 @@ function CGraphicObjects(document, drawingDocument, api)
     this.nullState = new NullState(this);
     this.bNoCheckChartTextSelection = false;
 
-    this.Id = g_oIdCounter.Get_NewId();
-    this.Lock = new CLock();
+    this.Id = AscCommon.g_oIdCounter.Get_NewId();
+    this.Lock = new AscCommon.CLock();
     g_oTableId.Add( this, this.Id );
 }
 

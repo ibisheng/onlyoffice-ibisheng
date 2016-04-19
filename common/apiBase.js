@@ -2,6 +2,7 @@
 
 // Import
 var offlineMode = AscCommon.offlineMode;
+var c_oEditorId = AscCommon.c_oEditorId;
 
 var c_oAscError = Asc.c_oAscError;
 var c_oAscAsyncAction = Asc.c_oAscAsyncAction;
@@ -117,7 +118,7 @@ baseEditorsApi.prototype._baseInit = function() {
   this.HtmlElement = document.getElementById(this.HtmlElementName);
 
   // init OnMessage
-  InitOnMessage(function(error, url) {
+  AscCommon.InitOnMessage(function(error, url) {
     if (c_oAscError.ID.No !== error) {
       t.sendEvent("asc_onError", error, c_oAscError.Level.NoCritical);
     } else {
@@ -127,7 +128,7 @@ baseEditorsApi.prototype._baseInit = function() {
     t.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
   });
   // init drag&drop
-  InitDragAndDrop(this.HtmlElement, function(error, files) {
+  AscCommon.InitDragAndDrop(this.HtmlElement, function(error, files) {
     t._uploadCallback(error, files);
   });
 
@@ -303,7 +304,7 @@ baseEditorsApi.prototype.asc_LoadDocument = function(isVersionHistory) {
       //чтобы результат пришел только этому соединению, а не всем кто в документе
       rData["userconnectionid"] = this.CoAuthoringApi.getUserConnectionId();
     }
-    sendCommand2(this, null, rData);
+    AscCommon.sendCommand(this, null, rData);
   }
 };
 baseEditorsApi.prototype._OfflineAppDocumentStartLoad = function() {
@@ -399,7 +400,7 @@ baseEditorsApi.prototype._coAuthoringInit = function() {
     t._coSpellCheckInit();
   };
   this.CoAuthoringApi.onSetIndexUser = function(e) {
-    g_oIdCounter.Set_UserId('' + e);
+    AscCommon.g_oIdCounter.Set_UserId('' + e);
   };
   this.CoAuthoringApi.onFirstLoadChangesEnd = function() {
     t.asyncServerIdEndLoaded();
@@ -444,7 +445,7 @@ baseEditorsApi.prototype._coAuthoringInit = function() {
             case "updateversion":
             case "ok":
               var urls = input["data"];
-              g_oDocumentUrls.init(urls);
+              AscCommon.g_oDocumentUrls.init(urls);
               if (null != urls['Editor.bin']) {
                 if ('ok' === input["status"] || t.getViewMode()) {
                   t._onOpenCommand(urls['Editor.bin']);
@@ -464,7 +465,7 @@ baseEditorsApi.prototype._coAuthoringInit = function() {
               t._onNeedParams(input["data"]);
               break;
             case "err":
-              t.sendEvent("asc_onError", g_fMapAscServerErrorToAscError(parseInt(input["data"])), c_oAscError.Level.Critical);
+              t.sendEvent("asc_onError", AscCommon.mapAscServerErrorToAscError(parseInt(input["data"])), c_oAscError.Level.Critical);
               break;
           }
           break;
@@ -526,7 +527,7 @@ baseEditorsApi.prototype._addImageUrl = function() {
 };
 baseEditorsApi.prototype.asc_addImage = function() {
   var t = this;
-  ShowImageFileDialog(this.documentId, this.documentUserId, function(error, files) {
+  AscCommon.ShowImageFileDialog(this.documentId, this.documentUserId, function(error, files) {
     t._uploadCallback(error, files);
   }, function(error) {
     if (c_oAscError.ID.No !== error) {
@@ -541,7 +542,7 @@ baseEditorsApi.prototype._uploadCallback = function(error, files) {
     this.sendEvent("asc_onError", error, c_oAscError.Level.NoCritical);
   } else {
     this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
-    UploadImageFiles(files, this.documentId, this.documentUserId, function(error, url) {
+    AscCommon.UploadImageFiles(files, this.documentId, this.documentUserId, function(error, url) {
       if (c_oAscError.ID.No !== error) {
         t.sendEvent("asc_onError", error, c_oAscError.Level.NoCritical);
       } else {
@@ -567,5 +568,5 @@ baseEditorsApi.prototype.asc_isOffline = function() {
 	return false;
 };
 baseEditorsApi.prototype.asc_getUrlType = function(url) {
-	return getUrlType(url);
+	return AscCommon.getUrlType(url);
 };

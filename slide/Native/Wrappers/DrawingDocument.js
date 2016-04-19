@@ -199,7 +199,7 @@ function CDrawingDocument()
         if ("" == this.m_sLockedCursorType)
         {
             if (this.m_oWordControl.m_oApi.isPaintFormat && (("default" == sType) || ("text" == sType)))
-                sResultCursorType = kCurFormatPainterWord;
+                sResultCursorType = AscCommon.kCurFormatPainterWord;
             else
                 sResultCursorType = sType;
         }

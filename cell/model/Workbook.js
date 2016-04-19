@@ -3,6 +3,9 @@
 // Import
 var CellValueType = AscCommon.CellValueType;
 var c_oAscBorderStyles = AscCommon.c_oAscBorderStyles;
+var fSortAscending = AscCommon.fSortAscending;
+var fSortDescending = AscCommon.fSortDescending;
+var parserHelp = AscCommon.parserHelp;
 
 var UndoRedoItemSerializable = AscCommonExcel.UndoRedoItemSerializable;
 var UndoRedoData_CellSimpleData = AscCommonExcel.UndoRedoData_CellSimpleData;
@@ -856,7 +859,7 @@ DependencyGraph.prototype = {
             nodeId,
             oRes = false;
 
-        if ( !rx_defName.test( name ) ) {
+        if ( !AscCommon.rx_defName.test( name ) ) {
             return oRes ;
         }
 
@@ -1785,10 +1788,10 @@ DefNameVertex.prototype = {
 };
 
 function getVertexId(sheetId, cellId){
-	return sheetId + g_cCharDelimiter + cellId;
+	return sheetId + AscCommon.g_cCharDelimiter + cellId;
 }
 function getDefNameVertexId(scope, name){
-	return ( scope === null || scope === undefined ? "WB" : scope ) + g_cCharDelimiter + name.toLowerCase();
+	return ( scope === null || scope === undefined ? "WB" : scope ) + AscCommon.g_cCharDelimiter + name.toLowerCase();
 }
 function lockDraw(wb){
     lc++;
@@ -2538,7 +2541,7 @@ Workbook.prototype.recalcWB = function(isRecalcWB){
 };
 Workbook.prototype.checkDefName = function ( checkName, scope ) {
 
-    var rxTest = rx_defName.test( checkName ), res = new Asc.asc_CCheckDefName();
+    var rxTest = AscCommon.rx_defName.test( checkName ), res = new Asc.asc_CCheckDefName();
     if ( !rxTest ) {
         res.status = false;
         res.reason = c_oAscDefinedNameReason.WrongName;
@@ -2674,7 +2677,7 @@ Workbook.prototype.editDefinesNames = function ( oldName, newName, bUndo ) {
 
     var newN = newName.Name.toLowerCase(), retRes = null, rename = false, nSE, se;
 
-    if ( !rx_defName.test( newN ) || !newName.Ref || newName.Ref.length == 0  ) {
+    if ( !AscCommon.rx_defName.test( newN ) || !newName.Ref || newName.Ref.length == 0  ) {
         return retRes;
     }
 
@@ -3119,7 +3122,7 @@ function Woorksheet(wb, _index, sId){
 	this.bHidden = false;
 	this.oSheetFormatPr = new SheetFormatPr();
 	this.index = _index;
-	this.Id = null != sId ? sId : g_oIdCounter.Get_NewId();
+	this.Id = null != sId ? sId : AscCommon.g_oIdCounter.Get_NewId();
 	this.nRowsCount = 0;
 	this.nColsCount = 0;
 	this.aGCells = {};// 0 based
@@ -3188,7 +3191,7 @@ function Woorksheet(wb, _index, sId){
   this.sparklineGroups = new sparklineGroups();
 
   this.oDrawingOjectsManager = new DrawingObjectsManager(this);
-  this.contentChanges = new CContentChanges();
+    this.contentChanges = new AscCommon.CContentChanges();
 
     this.sparklineGroups = new sparklineGroups();
 

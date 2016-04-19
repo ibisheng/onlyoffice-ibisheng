@@ -10,6 +10,9 @@ function (window, undefined) {
         return "" + (row + 1);
     }
 
+    var g_cCharDelimiter = AscCommon.g_cCharDelimiter;
+    var parserHelp = AscCommon.parserHelp;
+    
     var cElementType = AscCommonExcel.cElementType;
     var cErrorType = AscCommonExcel.cErrorType;
     var cNumber = AscCommonExcel.cNumber;

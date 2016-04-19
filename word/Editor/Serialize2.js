@@ -2197,7 +2197,7 @@ function Binary_oMathWriter(memory, oMathPara, saveParams)
 				}		
 			case para_Math_Text:
 			case para_Math_BreakOperator:
-				this.bs.WriteItem(c_oSer_OMathContentType.MText, function(){ oThis.memory.WriteString2(convertUnicodeToUTF16([item.value]));}); //m:t
+				this.bs.WriteItem(c_oSer_OMathContentType.MText, function(){ oThis.memory.WriteString2(AscCommon.convertUnicodeToUTF16([item.value]));}); //m:t
 				break;
 			case para_Math_Run:
 				this.bs.WriteItem(c_oSer_OMathContentType.MRun, function(){oThis.WriteMRun(item);});
@@ -2252,7 +2252,7 @@ function Binary_oMathWriter(memory, oMathPara, saveParams)
             {	
 				case para_Math_Ampersand :		oText += "&"; break;
 				case para_Math_BreakOperator:
-				case para_Math_Text :			oText += convertUnicodeToUTF16([Item.value]); break;
+				case para_Math_Text :			oText += AscCommon.convertUnicodeToUTF16([Item.value]); break;
             	case para_Space:
             	case para_Tab : 				oText += " "; break;
             }
@@ -2432,7 +2432,7 @@ function Binary_oMathWriter(memory, oMathPara, saveParams)
         if (OPERATOR_EMPTY === Chr)
             this.memory.WriteString2("");
         else
-		    this.memory.WriteString2(convertUnicodeToUTF16([Chr]));
+		    this.memory.WriteString2(AscCommon.convertUnicodeToUTF16([Chr]));
 	}
 	this.WriteCount = function(Count)
 	{
@@ -4182,7 +4182,7 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
                         oThis.memory.WriteByte(c_oSerRunType.nonBreakHyphen);
                         oThis.memory.WriteLong(c_oSerPropLenType.Null);
                     } else {
-                        sCurText += encodeSurrogateChar(item.Value);
+                        sCurText += AscCommon.encodeSurrogateChar(item.Value);
                     }
                     break;
                 case para_Space:
@@ -8309,13 +8309,13 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 			{
 			    var nUnicode = null;
 			    var nCharCode = text.charCodeAt(i);
-			    if (isLeadingSurrogateChar(nCharCode))
+			    if (AscCommon.isLeadingSurrogateChar(nCharCode))
 			    {
 			        if(i + 1 < text.length)
 			        {
 			            i++;
 			            var nTrailingChar = text.charCodeAt(i);
-			            nUnicode = decodeSurrogateChar(nCharCode, nTrailingChar);
+			            nUnicode = AscCommon.decodeSurrogateChar(nCharCode, nTrailingChar);
 			        }
 			    }
 			    else
@@ -9221,13 +9221,13 @@ function Binary_oMathReader(stream, oReadResult)
 			{
 			    var nUnicode = null;
 			    var nCharCode = text.charCodeAt(i);
-			    if (isLeadingSurrogateChar(nCharCode))
+			    if (AscCommon.isLeadingSurrogateChar(nCharCode))
 			    {
 			        if(i + 1 < text.length)
 			        {
 			            i++;
 			            var nTrailingChar = text.charCodeAt(i);
-			            nUnicode = decodeSurrogateChar(nCharCode, nTrailingChar);
+			            nUnicode = AscCommon.decodeSurrogateChar(nCharCode, nTrailingChar);
 			        }
 			    }
 			    else
@@ -9884,7 +9884,7 @@ function Binary_oMathReader(stream, oReadResult)
 		if (c_oSer_OMathBottomNodesValType.Val === type)
         {
 			var text = this.stream.GetString2LE(length);
-            var aUnicode = convertUTF16toUnicode(text);
+            var aUnicode = AscCommon.convertUTF16toUnicode(text);
 
             var chr = (aUnicode.length <= 0 ? OPERATOR_EMPTY : aUnicode[0]);
 
@@ -10698,7 +10698,7 @@ function Binary_oMathReader(stream, oReadResult)
         {
 			var aUnicodes = [];
             if (length > 0)
-                aUnicodes = convertUTF16toUnicode(this.stream.GetString2LE(length));
+                aUnicodes = AscCommon.convertUTF16toUnicode(this.stream.GetString2LE(length));
 
 			for (var nPos = 0, nCount = aUnicodes.length; nPos < nCount; ++nPos)
             {
@@ -11745,7 +11745,7 @@ function Binary_OtherTableReader(doc, oReadResult, stream)
 			if(true == api.isUseEmbeddedCutFonts)
 			{
 				var font_cuts = api.FontLoader.embedded_cut_manager;
-				font_cuts.Url = g_oDocumentUrls.getUrl('fonts/fonts.js');
+				font_cuts.Url = AscCommon.g_oDocumentUrls.getUrl('fonts/fonts.js');
 				font_cuts.init_cut_fonts(_embedded_fonts);
 				font_cuts.bIsCutFontsUse = true;
 			}

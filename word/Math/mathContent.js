@@ -726,7 +726,7 @@ function CMathContent()
 {
     CMathContent.superclass.constructor.call(this);
 
-	this.Id = g_oIdCounter.Get_NewId();		
+	this.Id = AscCommon.g_oIdCounter.Get_NewId();		
 
     this.Content = []; // array of mathElem
 
@@ -772,9 +772,9 @@ function CMathContent()
     this.size = new CMathSize();
 	
 	// Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
-	g_oTableId.Add( this, this.Id );
+    AscCommon.g_oTableId.Add( this, this.Id );
 }
-Asc.extendClass(CMathContent, CParagraphContentWithParagraphLikeContent);
+AscCommon.extendClass(CMathContent, CParagraphContentWithParagraphLikeContent);
 CMathContent.prototype.init = function()
 {
 
@@ -2076,7 +2076,7 @@ CMathContent.prototype.Load_Changes = function(Reader)
             for ( var Index = 0; Index < Count; Index++ )
             {
                 var Pos     = Reader.GetLong();
-                var Element = g_oTableId.Get_ById( Reader.GetString2() );
+                var Element = AscCommon.g_oTableId.Get_ById( Reader.GetString2() );
 
                 if ( null != Element )
                 {

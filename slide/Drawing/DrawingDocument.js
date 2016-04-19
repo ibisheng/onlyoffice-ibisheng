@@ -1005,7 +1005,7 @@ CDrawingCollaborativeTarget.prototype =
             this.HtmlElement.width = 1;
             this.HtmlElement.height = 1;
 
-            this.Color = getUserColorById(this.ShortId, null, true);
+            this.Color = AscCommon.getUserColorById(this.ShortId, null, true);
             this.Style ="rgb(" + this.Color.r + "," + this.Color.g + "," + this.Color.b + ")";
         }
 
@@ -1272,7 +1272,7 @@ function CDrawingDocument()
         if ("" == this.m_sLockedCursorType)
         {
             if (this.m_oWordControl.m_oApi.isPaintFormat && (("default" == sType) || ("text" == sType)))
-                this.m_oWordControl.m_oMainContent.HtmlElement.style.cursor = kCurFormatPainterWord;
+                this.m_oWordControl.m_oMainContent.HtmlElement.style.cursor = AscCommon.kCurFormatPainterWord;
             else
                 this.m_oWordControl.m_oMainContent.HtmlElement.style.cursor = sType;
         }
@@ -3040,7 +3040,7 @@ function CDrawingDocument()
         if (null == this.LastDrawingUrl)
             return;
 
-        var _img = this.m_oWordControl.m_oApi.ImageLoader.map_image_index[getFullImageSrc2(this.LastDrawingUrl)];
+        var _img = this.m_oWordControl.m_oApi.ImageLoader.map_image_index[AscCommon.getFullImageSrc2(this.LastDrawingUrl)];
         if (_img != undefined && _img.Image != null && _img.Status != ImageLoadStatus.Loading)
         {
             var _x = 0;
@@ -3110,7 +3110,7 @@ function CDrawingDocument()
         if (null == this.LastDrawingUrlSlide)
             return;
 
-        var _img = this.m_oWordControl.m_oApi.ImageLoader.map_image_index[getFullImageSrc2(this.LastDrawingUrlSlide)];
+        var _img = this.m_oWordControl.m_oApi.ImageLoader.map_image_index[AscCommon.getFullImageSrc2(this.LastDrawingUrlSlide)];
         if (_img != undefined && _img.Image != null && _img.Status != ImageLoadStatus.Loading)
         {
             var _x = 0;
@@ -3182,7 +3182,7 @@ function CDrawingDocument()
         if (null == this.LastDrawingUrlTextArt)
             return;
 
-        var _img = this.m_oWordControl.m_oApi.ImageLoader.map_image_index[getFullImageSrc2(this.LastDrawingUrlTextArt)];
+        var _img = this.m_oWordControl.m_oApi.ImageLoader.map_image_index[AscCommon.getFullImageSrc2(this.LastDrawingUrlTextArt)];
         if (_img != undefined && _img.Image != null && _img.Status != ImageLoadStatus.Loading)
         {
             var _x = 0;

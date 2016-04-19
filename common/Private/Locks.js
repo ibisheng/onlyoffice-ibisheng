@@ -588,7 +588,7 @@ if(typeof CPresentation !== "undefined")
 
         if(CheckType === AscCommon.changestype_MoveComment)
         {
-            var comment = g_oTableId.Get_ById(AdditionalData);
+            var comment = AscCommon.g_oTableId.Get_ById(AdditionalData);
             if(isRealObject(comment))
             {
                 var slides = this.Slides;

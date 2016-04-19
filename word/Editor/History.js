@@ -81,7 +81,7 @@ CHistory.prototype =
         {
             // Проверяем первое изменение. Если оно уже нужного типа, тогда мы его удаляем. Добавляем специфическое
             // первое изменение с описанием.
-            var Class = g_oTableId;
+            var Class = AscCommon.g_oTableId;
 
             if (Point.Items.length > 0)
             {
@@ -332,7 +332,7 @@ CHistory.prototype =
 
         for(var Key in RecalcData.Drawings.Map)
         {
-            if(null != g_oTableId.Get_ById(Key))
+            if(null != AscCommon.g_oTableId.Get_ById(Key))
             {
                 return true;
             }
@@ -418,7 +418,7 @@ CHistory.prototype =
                 ( Class instanceof CDocumentContent && historyitem_DocumentContent_RemoveItem === Data.Type ) )
                 Count = Data.Items.length;
 
-            var ContentChanges = new CContentChangesElement( ( bAdd == true ? AscCommon.contentchanges_Add : AscCommon.contentchanges_Remove ), Data.Pos, Count, Item );
+            var ContentChanges = new AscCommon.CContentChangesElement( ( bAdd == true ? AscCommon.contentchanges_Add : AscCommon.contentchanges_Remove ), Data.Pos, Count, Item );
             Class.Add_ContentChanges( ContentChanges );
             this.CollaborativeEditing.Add_NewDC( Class );
 
@@ -581,7 +581,7 @@ CHistory.prototype =
         // Пересчитываем таблицы
         for (var TableId in this.RecalculateData.Tables)
         {
-            var Table = g_oTableId.Get_ById(TableId);
+            var Table = AscCommon.g_oTableId.Get_ById(TableId);
             if (null !== Table)
             {
                 if (true === Table.Check_ChangedTableGrid())

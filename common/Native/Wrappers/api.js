@@ -5163,7 +5163,7 @@ CStylesPainter.prototype =
 
         _api.WordControl.m_oDrawingDocument.Native["DD_StartNativeDraw"](_w_px, _h_px, _w_px * dKoefToMM, _h_px * dKoefToMM);
 
-        g_oTableId.m_bTurnOff = true;
+        AscCommon.g_oTableId.m_bTurnOff = true;
         History.TurnOff();
 
         var oldDefTabStop = Default_Tab_Stop;
@@ -5268,7 +5268,7 @@ CStylesPainter.prototype =
 
         Default_Tab_Stop = oldDefTabStop;
 
-        g_oTableId.m_bTurnOff = false;
+        AscCommon.g_oTableId.m_bTurnOff = false;
         History.TurnOn();
 
         var _stream = global_memory_stream_menu;

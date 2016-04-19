@@ -191,13 +191,13 @@ CLvlText_Num.prototype =
 
 function CAbstractNum(Type)
 {
-    this.Id = g_oIdCounter.Get_NewId();
+    this.Id = AscCommon.g_oIdCounter.Get_NewId();
 
     if ( "undefined" == typeof(Type) )
         Type = numbering_numfmt_Bullet;
 
-    this.Lock = new CLock();
-    if ( false === g_oIdCounter.m_bLoad )
+    this.Lock = new AscCommon.CLock();
+    if ( false === AscCommon.g_oIdCounter.m_bLoad )
     {
         this.Lock.Set_Type(AscCommon.locktype_Mine, false);
         if (typeof CollaborativeEditing !== "undefined")
@@ -251,14 +251,14 @@ function CAbstractNum(Type)
     }
 
     // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
-    g_oTableId.Add( this, this.Id );
+    AscCommon.g_oTableId.Add( this, this.Id );
 }
 
 CAbstractNum.prototype =
 {
     Set_Id : function(newId)
     {
-        g_oTableId.Reset_Id( this, newId, this.Id );
+        AscCommon.g_oTableId.Reset_Id( this, newId, this.Id );
         this.Id = newId;
     },
 

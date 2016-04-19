@@ -1744,9 +1744,9 @@ cTRIM.prototype.Calculate = function ( arg ) {
     if ( arg0 instanceof cError )
         return this.value = arg0;
 
-    return this.value = new cString( arg0.getValue().replace( rx_space_g,function ( $0, $1, $2 ) {
+    return this.value = new cString( arg0.getValue().replace( AscCommon.rx_space_g,function ( $0, $1, $2 ) {
         var res;
-        rx_space.test( $2[$1 + 1] ) ? res = "" : res = $2[$1];
+        AscCommon.rx_space.test( $2[$1 + 1] ) ? res = "" : res = $2[$1];
         return res;
     } ).replace( /^\s|\s$/g, "" ) )
 };

@@ -253,7 +253,7 @@ UndoRedoItemSerializable.prototype = {
         else
         {
             var changedObjectId = oBinaryReader.GetString2();
-            var changedObject = g_oTableId.Get_ById(changedObjectId);
+            var changedObject = AscCommon.g_oTableId.Get_ById(changedObjectId);
             this.nActionType = 1;
             this.oClass = changedObject;
             this.oData = new DrawingCollaborativeData();

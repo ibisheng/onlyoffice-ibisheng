@@ -8,6 +8,11 @@
 function (window, undefined) {
   // Import
   var CellValueType = AscCommon.CellValueType;
+  var cBoolLocal = AscCommon.cBoolLocal;
+  var cErrorOrigin = AscCommon.cErrorOrigin;
+  var cErrorLocal = AscCommon.cErrorLocal;
+  var FormulaSeparators = AscCommon.FormulaSeparators;
+  var parserHelp = AscCommon.parserHelp;
 
   var c_oAscError = Asc.c_oAscError;
   
@@ -50,9 +55,7 @@ var c_Date1900Const = 25568; //разница в днях между 01.01.1970 
 var c_DateCorrectConst = c_Date1900Const;
 var c_sPerDay = 86400;
 var c_msPerDay = c_sPerDay * 1000;
-var cStrucTableReservedWords = {
-    all: "#All", data: "#Data", headers: "#Headers", totals: "#Totals", thisrow: "#This Row", at: "@"
-	};
+  var rx_sFuncPref = /_xlfn\./i;
 
 Date.prototype.excelNullDate1900 = Date.UTC( 1899, 11, 30, 0, 0, 0 );
 Date.prototype.excelNullDate1904 = Date.UTC( 1904, 0, 1, 0, 0, 0 );
@@ -235,7 +238,7 @@ Math.sign = function ( x ) {
 
 RegExp.escape = function ( text ) {
     return text.replace( /[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&" );
-}
+};
 
 parserHelp.setDigitSeparator( g_oDefaultCultureInfo.NumberDecimalSeparator );
 
@@ -291,7 +294,7 @@ function cNumber( val ) {
 
 cNumber.prototype = Object.create( cBaseType.prototype );
 cNumber.prototype.tocString = function () {
-    return new cString( ("" + this.value).replace( digitSeparatorDef, digitSeparator ) );
+  return new cString(("" + this.value).replace(FormulaSeparators.digitSeparatorDef, FormulaSeparators.digitSeparator));
 };
 cNumber.prototype.tocNumber = function () {
     return this;
@@ -302,7 +305,7 @@ cNumber.prototype.tocBool = function () {
 cNumber.prototype.toLocaleString = function ( digitDelim ) {
     var res = this.value.toString();
   if (digitDelim) {
-        return res.replace( digitSeparatorDef, digitSeparator );
+    return res.replace(FormulaSeparators.digitSeparatorDef, FormulaSeparators.digitSeparator);
   } else {
         return res;
   }
@@ -1150,7 +1153,7 @@ function cRef( val, ws ) {/*Ref means A1 for example*/
     this.isAbsolute = false;
     this.isAbsoluteCol1 = false;
     this.isAbsoluteRow1 = false;
-    var ca = g_oCellAddressUtils.getCellAddress( val.replace( rx_space_g, "" ) );
+  var ca = g_oCellAddressUtils.getCellAddress(val.replace(AscCommon.rx_space_g, ""));
     this.range = null;
     this._valid = ca.isValid();
     if ( this._valid ) {
@@ -1492,7 +1495,7 @@ cStrucTable.prototype.toString = function () {
 		var re = /\[(.*?)\]/ig, m, data = "",i=0;
 		while ( null !== (m = re.exec( this.hdt )) ) {
 
-			data += "[" + this.buildLocalTableString(this.hdtIndexes[i],false) + "]" + functionArgumentSeparatorDef;
+      data += "[" + this.buildLocalTableString(this.hdtIndexes[i], false) + "]" + FormulaSeparators.functionArgumentSeparatorDef;
 		}
 		data = data.substr( 0, data.length - 1 );
 		if ( this.hdtcstart ) {
@@ -1502,7 +1505,7 @@ cStrucTable.prototype.toString = function () {
 				this.hdtcstart = columns_1.columnName;
 			}
 
-			data += functionArgumentSeparatorDef + "[" + this.hdtcstart.replace(/#/g,"'#") + "]"
+      data += FormulaSeparators.functionArgumentSeparatorDef + "[" + this.hdtcstart.replace(/#/g, "'#") + "]"
 		}
 		if ( this.hdtcend ) {
 
@@ -1552,7 +1555,7 @@ cStrucTable.prototype.toLocaleString = function () {
 		var re = /\[(.*?)\]/ig, m, data = "",i=0;
 		while ( null !== (m = re.exec( this.hdt )) ) {
 
-			data += "[" + this.buildLocalTableString(this.hdtIndexes[i],true) + "]" + functionArgumentSeparatorDef;
+      data += "[" + this.buildLocalTableString(this.hdtIndexes[i], true) + "]" + FormulaSeparators.functionArgumentSeparatorDef;
 		}
 		data = data.substr( 0, data.length - 1 );
 		if ( this.hdtcstart ) {
@@ -1562,7 +1565,7 @@ cStrucTable.prototype.toLocaleString = function () {
 				this.hdtcstart = columns_1.columnName;
 			}
 
-			data += functionArgumentSeparatorDef + "[" + this.hdtcstart.replace(/#/g,"'#") + "]"
+      data += FormulaSeparators.functionArgumentSeparatorDef + "[" + this.hdtcstart.replace(/#/g, "'#") + "]"
 		}
 		if ( this.hdtcend ) {
 
@@ -1585,43 +1588,12 @@ cStrucTable.prototype.createArea = function ( val, cell ) {
 
     var paramObj = {param: null, startCol: null, endCol: null, cell: cell.bbox, includeColumnHeader:false};
 
-    function getColumnType( value ) {
-        var res;
-        switch ( value.toLowerCase() ) {
-            case "#"+cStrucTableLocalColumns['a'].toLocaleLowerCase():
-            case cStrucTableReservedWords.all.toLocaleLowerCase():
-                res = g_nFormulaTablePartInfo.all;
-                break;
-			case "#"+cStrucTableLocalColumns['d'].toLocaleLowerCase():
-            case cStrucTableReservedWords.data.toLocaleLowerCase():
-                res = g_nFormulaTablePartInfo.data;
-                break;
-			case "#"+cStrucTableLocalColumns['h'].toLocaleLowerCase():
-            case cStrucTableReservedWords.headers.toLocaleLowerCase():
-                res = g_nFormulaTablePartInfo.headers;
-                break;
-			case "#"+cStrucTableLocalColumns['t'].toLocaleLowerCase():
-            case cStrucTableReservedWords.totals.toLocaleLowerCase():
-                res = g_nFormulaTablePartInfo.totals;
-                break;
-			case "#"+cStrucTableLocalColumns['tr'].toLocaleLowerCase():
-            case cStrucTableReservedWords.at.toLocaleLowerCase():
-            case cStrucTableReservedWords.thisrow.toLocaleLowerCase():
-                res = g_nFormulaTablePartInfo.thisRow;
-                break;
-            default:
-                res = g_nFormulaTablePartInfo.data;
-                break;
-        }
-        return res;
-    }
-
     if ( val['oneColumn'] || val['columnRange'] ) {
 
         this.oneColumn = val['oneColumn'];
         this.columnRange = val['columnRange'];
 
-        paramObj.param = g_nFormulaTablePartInfo.columns;
+    paramObj.param = AscCommon.FormulaTablePartInfo.columns;
         if ( val['columnRange'] ) {
             this.columnRange = val['columnRange'];
             paramObj.startCol = this.colStart = val['colStart'].replace(/'#/g,"#");
@@ -1657,7 +1629,7 @@ cStrucTable.prototype.createArea = function ( val, cell ) {
 		}
   } else if (val['reservedColumn'] || !val['columnName']) {
 		this.reservedColumn = val['reservedColumn'] || "";
-		this.reservedColumnIndex = paramObj.param = getColumnType( this.reservedColumn );
+    this.reservedColumnIndex = paramObj.param = parserHelp.getColumnTypeByName(this.reservedColumn);
 
         this.tableData = this.wb.getTableRangeForFormula( this.tableName, paramObj );
         if ( !this.tableData ) {
@@ -1677,7 +1649,7 @@ cStrucTable.prototype.createArea = function ( val, cell ) {
         this.hdtcend = val['hdtcend'];
         var re = /\[(.*?)\]/ig, m, data, range;
         while ( null !== (m = re.exec( this.hdt )) ) {
-            paramObj.param = getColumnType( m[1] );
+      paramObj.param = parserHelp.getColumnTypeByName(m[1]);
 			this.hdtIndexes.push(paramObj.param);
             data = this.wb.getTableRangeForFormula( this.tableName, paramObj );
 
@@ -1694,7 +1666,7 @@ cStrucTable.prototype.createArea = function ( val, cell ) {
 
         if ( this.hdtcstart ) {
 			this.hdtcstart = this.hdtcstart.replace(/'#/g,"#");
-			paramObj.param = g_nFormulaTablePartInfo.columns;
+      paramObj.param = AscCommon.FormulaTablePartInfo.columns;
             paramObj.startCol = this.hdtcstart;
             paramObj.endCol = null;
 			this.hdtcstartIndex = this.wb.getTableIndexColumnByName( this.tableName, this.hdtcstart );
@@ -1742,50 +1714,8 @@ cStrucTable.prototype.createArea = function ( val, cell ) {
 	return this.area;
 };
 cStrucTable.prototype.buildLocalTableString = function (reservedColumn,local) {
-
-	switch(reservedColumn){
-    case g_nFormulaTablePartInfo.all:
-    {
-      if (local) {
-				return "#"+cStrucTableLocalColumns['a'];
-      }
-			return cStrucTableReservedWords.all;
-			break;
-		}
-    case g_nFormulaTablePartInfo.data:
-    {
-      if (local) {
-				return "#"+cStrucTableLocalColumns['d'];
-      }
-			return cStrucTableReservedWords.data;
-			break;
-		}
-    case g_nFormulaTablePartInfo.headers:
-    {
-      if (local) {
-				return "#"+cStrucTableLocalColumns['h'];
-      }
-			return cStrucTableReservedWords.headers;
-			break;
-		}
-    case g_nFormulaTablePartInfo.totals:
-    {
-      if (local) {
-				return "#"+cStrucTableLocalColumns['t'];
-      }
-			return cStrucTableReservedWords.totals;
-			break;
-		}
-    case g_nFormulaTablePartInfo.thisRow:
-    {
-      if (local) {
-				return "#"+cStrucTableLocalColumns['tr'];
-      }
-			return cStrucTableReservedWords.thisrow;
-			break;
-		}
-	}
-}
+  return parserHelp.getColumnNameByType();
+};
 
 /** @constructor */
 function cName3D( val, wsFrom, wb, ws ) {
@@ -1914,39 +1844,39 @@ cArray.prototype.tocBool = function () {
 };
 cArray.prototype.toString = function () {
     var ret = "";
-    for ( var ir = 0; ir < this.rowCount; ir++, ret += arrayRowSeparatorDef ) {
-        for ( var ic = 0; ic < this.countElementInRow[ir]; ic++, ret += arrayColSeparatorDef ) {
+  for (var ir = 0; ir < this.rowCount; ir++, ret += FormulaSeparators.arrayRowSeparatorDef) {
+    for (var ic = 0; ic < this.countElementInRow[ir]; ic++, ret += FormulaSeparators.arrayColSeparatorDef) {
             if ( this.array[ir][ic] instanceof cString ) {
                 ret += '"' + this.array[ir][ic].toString() + '"';
       } else {
                 ret += this.array[ir][ic].toString() + "";
             }
         }
-        if ( ret[ret.length - 1] === arrayColSeparatorDef ) {
+    if (ret[ret.length - 1] === FormulaSeparators.arrayColSeparatorDef) {
             ret = ret.substring( 0, ret.length - 1 );
         }
     }
-    if ( ret[ret.length - 1] === arrayRowSeparatorDef ) {
+  if (ret[ret.length - 1] === FormulaSeparators.arrayRowSeparatorDef) {
         ret = ret.substring( 0, ret.length - 1 );
     }
     return "{" + ret + "}";
 };
 cArray.prototype.toLocaleString = function ( digitDelim ) {
     var ret = "";
-    for ( var ir = 0; ir < this.rowCount; ir++, ret += digitDelim ? arrayRowSeparator : arrayRowSeparatorDef ) {
+  for (var ir = 0; ir < this.rowCount; ir++, ret += digitDelim ? FormulaSeparators.arrayRowSeparator : FormulaSeparators.arrayRowSeparatorDef) {
     for (var ic = 0; ic < this.countElementInRow[ir];
-         ic++, ret += digitDelim ? arrayColSeparator : arrayColSeparatorDef) {
+         ic++, ret += digitDelim ? FormulaSeparators.arrayColSeparator : FormulaSeparators.arrayColSeparatorDef) {
             if ( this.array[ir][ic] instanceof cString ) {
                 ret += '"' + this.array[ir][ic].toLocaleString( digitDelim ) + '"';
       } else {
                 ret += this.array[ir][ic].toLocaleString( digitDelim ) + "";
             }
         }
-        if ( ret[ret.length - 1] === digitDelim ? arrayColSeparator : arrayColSeparatorDef ) {
+    if (ret[ret.length - 1] === digitDelim ? FormulaSeparators.arrayColSeparator : FormulaSeparators.arrayColSeparatorDef) {
             ret = ret.substring( 0, ret.length - 1 );
         }
     }
-    if ( ret[ret.length - 1] === digitDelim ? arrayRowSeparator : arrayRowSeparatorDef ) {
+  if (ret[ret.length - 1] === digitDelim ? FormulaSeparators.arrayRowSeparator : FormulaSeparators.arrayRowSeparatorDef) {
         ret = ret.substring( 0, ret.length - 1 );
     }
     return "{" + ret + "}";
@@ -2148,7 +2078,7 @@ cBaseFunction.prototype = {
         for ( var i = start; i <= c; i++ ) {
             str += arg[i].toLocaleString( digitDelim );
             if ( i !== c ) {
-                str += functionArgumentSeparator;
+        str += FormulaSeparators.functionArgumentSeparator;
             }
         }
         return new cString( localeName + "(" + str + ")" );
@@ -4014,7 +3944,7 @@ parserFormula.prototype.parse = function(local, digitDelim) {
       var arr = new cArray(), operator = {isOperator: false, operatorName: ""};
       while (this.pCurrPos < this.Formula.length && !parserHelp.isRightBrace.call(this, this.Formula, this.pCurrPos)) {
         if (parserHelp.isArraySeparator.call(this, this.Formula, this.pCurrPos, digitDelim)) {
-          if (this.operand_str == (digitDelim ? arrayRowSeparator : arrayRowSeparatorDef)) {
+          if (this.operand_str == (digitDelim ? FormulaSeparators.arrayRowSeparator : FormulaSeparators.arrayRowSeparatorDef)) {
             arr.addRow();
           }
         } else if (parserHelp.isBoolean.call(this, this.Formula, this.pCurrPos, local)) {

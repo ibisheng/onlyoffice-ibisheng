@@ -185,7 +185,7 @@ function CMathText(bJDraw)
     };*/
 
 }
-Asc.extendClass(CMathText, CMathBaseText);
+AscCommon.extendClass(CMathText, CMathBaseText);
 CMathText.prototype.add = function(code)
 {
     this.value = code;
@@ -996,7 +996,7 @@ function CMathAmp()
     this.AmpText = new CMathText(false);
     this.AmpText.add(this.value);
 }
-Asc.extendClass(CMathAmp, CMathBaseText);
+AscCommon.extendClass(CMathAmp, CMathBaseText);
 CMathAmp.prototype.Measure = function(oMeasure, TextPr, InfoMathText)
 {
     this.bAlignPoint = InfoMathText.bEqArray == true && InfoMathText.bNormalText == false;

@@ -1811,7 +1811,7 @@
                       _page_height = _section_select.H;
               }
 
-              var _image = api.ImageLoader.map_image_index[getFullImageSrc2(this.ImageUrl)];
+              var _image = api.ImageLoader.map_image_index[AscCommon.getFullImageSrc2(this.ImageUrl)];
               if (_image != undefined && _image.Image != null && _image.Status == ImageLoadStatus.Complete)
               {
                   var _w = Math.max(1, _page_width - (_page_x_left_margin + _page_x_right_margin));

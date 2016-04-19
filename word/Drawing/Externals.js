@@ -543,7 +543,7 @@ CFontFileLoader.prototype.LoadFontAsync = function(basePath, _callback, isEmbed)
 	else
 		src = basePath + this.Id + ".js";
 	if(isEmbed)
-		src = g_oDocumentUrls.getUrl(src);
+		src = AscCommon.g_oDocumentUrls.getUrl(src);
 	scriptElem.setAttribute('src', src);
 	scriptElem.setAttribute('type','text/javascript');
 	document.getElementsByTagName('head')[0].appendChild(scriptElem);

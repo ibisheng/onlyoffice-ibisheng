@@ -3,6 +3,9 @@
 // Import
 var c_oAscChartType = AscCommon.c_oAscChartType;
 var c_oAscChartSubType = AscCommon.c_oAscChartSubType;
+var parserHelp = AscCommon.parserHelp;
+var g_oIdCounter = AscCommon.g_oIdCounter;
+var g_oTableId = AscCommon.g_oTableId;
 
 var c_oAscNumFormatType = Asc.c_oAscNumFormatType;
 
@@ -447,7 +450,7 @@ function CChartSpace()
 
     this.setRecalculateInfo();
 
-    this.Lock = new CLock();
+    this.Lock = new AscCommon.CLock();
     this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id);
 }

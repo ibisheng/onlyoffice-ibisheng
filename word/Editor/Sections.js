@@ -7,6 +7,9 @@
 //                      Top, Left, Right, Bottom, Header, Footer
 //
 
+// Import
+var g_oTableId = AscCommon.g_oTableId;
+
 var section_type_NextPage   = 0x00;
 var section_type_OddPage    = 0x01;
 var section_type_EvenPage   = 0x02;
@@ -25,7 +28,7 @@ var section_borders_ZOrderFront = 0x01;
 
 function CSectionPr(LogicDocument)
 {
-    this.Id = g_oIdCounter.Get_NewId();
+    this.Id = AscCommon.g_oIdCounter.Get_NewId();
 
     this.Type          = section_type_NextPage;
     this.PageSize      = new CSectionPageSize();

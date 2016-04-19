@@ -479,7 +479,7 @@
 			this.startRow = 0; // Активная ячейка в выделении
 			this._updateAdditionalData();
 		}
-		asc.extendClass(ActiveRange, Range);
+		AscCommon.extendClass(ActiveRange, Range);
 		
 		ActiveRange.prototype.assign = function () {
 			ActiveRange.superclass.assign.apply(this, arguments);
@@ -606,7 +606,7 @@
 			this.r2Abs = false;
 			this.c2Abs = false;
 		}
-		asc.extendClass(FormulaRange, Range);
+		AscCommon.extendClass(FormulaRange, Range);
 		FormulaRange.prototype.clone = function(){
 			var oRes = new FormulaRange(FormulaRange.superclass.clone.apply(this, arguments));
 			oRes.r1Abs = this.r1Abs;

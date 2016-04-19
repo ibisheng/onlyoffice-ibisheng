@@ -16,9 +16,9 @@ function CGraphicFrame()
     this.snapArrayX = [];
     this.snapArrayY = [];
     this.Pages      = [];
-    this.Lock = new CLock();
-    this.Id = g_oIdCounter.Get_NewId();
-    g_oTableId.Add(this, this.Id);
+    this.Lock = new AscCommon.CLock();
+    this.Id = AscCommon.g_oIdCounter.Get_NewId();
+    AscCommon.g_oTableId.Add(this, this.Id);
     this.compiledStyles = [];
     this.recalcInfo =
     {

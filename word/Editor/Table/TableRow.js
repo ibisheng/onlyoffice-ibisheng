@@ -10,7 +10,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 function CTableRow(Table, Cols, TableGrid)
 {
-    this.Id = g_oIdCounter.Get_NewId();
+    this.Id = AscCommon.g_oIdCounter.Get_NewId();
 
     this.Table = Table; // Родительский класс таблицы
 
@@ -55,19 +55,19 @@ function CTableRow(Table, Cols, TableGrid)
     // Добавляем данный класс в список DocumentContent'ов
     if (typeof CollaborativeEditing !== "undefined")
         CollaborativeEditing.Add_NewDC(this);
-    this.m_oContentChanges = new CContentChanges(); // список изменений(добавление/удаление элементов)
+    this.m_oContentChanges = new AscCommon.CContentChanges(); // список изменений(добавление/удаление элементов)
 
     this.Index = 0;
 
     // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
-    g_oTableId.Add( this, this.Id );
+    AscCommon.g_oTableId.Add( this, this.Id );
 }
 
 CTableRow.prototype =
 {
     Set_Id : function(newId)
     {
-        g_oTableId.Reset_Id( this, newId, this.Id );
+        AscCommon.g_oTableId.Reset_Id( this, newId, this.Id );
         this.Id = newId;
     },
 
@@ -206,7 +206,7 @@ CTableRow.prototype =
     {
         if ( true === this.CompiledPr.NeedRecalc )
         {
-            if (true === g_oIdCounter.m_bLoad || true === g_oIdCounter.m_bRead)
+            if (true === AscCommon.g_oIdCounter.m_bLoad || true === AscCommon.g_oIdCounter.m_bRead)
             {
                 this.CompiledPr.Pr         = g_oDocumentDefaultTableRowPr;
                 this.CompiledPr.NeedRecalc = true;
@@ -1279,7 +1279,7 @@ CTableRow.prototype =
                 for ( var Index = 0; Index < Count; Index++ )
                 {
                     var Pos     = this.m_oContentChanges.Check(AscCommon.contentchanges_Add, Reader.GetLong());
-                    var Element = g_oTableId.Get_ById(Reader.GetString2());
+                    var Element = AscCommon.g_oTableId.Get_ById(Reader.GetString2());
 
                     if (null != Element)
                     {
@@ -1380,7 +1380,7 @@ CTableRow.prototype =
         this.Content = [];
         for ( var Index = 0; Index < Count; Index++ )
         {
-            var Cell = g_oTableId.Get_ById( Reader.GetString2() );
+            var Cell = AscCommon.g_oTableId.Get_ById( Reader.GetString2() );
             this.Content.push(Cell);
         }
 

@@ -6,6 +6,8 @@
 * @param {undefined} undefined
 */
 function (window, undefined) {
+    var fSortAscending = AscCommon.fSortAscending;
+    
     var cElementType = AscCommonExcel.cElementType;
     var cErrorType = AscCommonExcel.cErrorType;
     var cNumber = AscCommonExcel.cNumber;
@@ -2457,7 +2459,7 @@ cLARGE.prototype.Calculate = function ( arg ) {
             }
         }
 
-        tA.sort(fSortDescending);
+        tA.sort(AscCommon.fSortDescending);
 
         if ( k.getValue() > tA.length || k.getValue() <= 0 )
             return new cError( cErrorType.not_available );
@@ -3125,7 +3127,7 @@ cMODE.prototype.Calculate = function ( arg ) {
             }
         }
 
-        medArr.sort(fSortDescending);
+        medArr.sort(AscCommon.fSortDescending);
 
         if ( medArr.length < 1 )
             return new cError( cErrorType.wrong_value_type );

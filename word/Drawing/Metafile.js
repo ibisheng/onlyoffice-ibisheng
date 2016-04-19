@@ -953,7 +953,7 @@ CMetafile.prototype =
 
         var _src = src;
 
-        var srcLocal = g_oDocumentUrls.getLocal(_src);
+        var srcLocal = AscCommon.g_oDocumentUrls.getLocal(_src);
 		if (srcLocal){
 			_src = srcLocal;
 		}
@@ -1179,7 +1179,7 @@ CMetafile.prototype =
             // excel
             this.Memory.WriteByte(CommandType.ctDrawImageFromFile);
 
-			var imgLocal = g_oDocumentUrls.getLocal(img);
+			var imgLocal = AscCommon.g_oDocumentUrls.getLocal(img);
             if (imgLocal){
                 this.Memory.WriteString2(imgLocal);
             } else {
@@ -1207,7 +1207,7 @@ CMetafile.prototype =
             _src = img;
         }
 		
-		var srcLocal = g_oDocumentUrls.getLocal(_src);
+		var srcLocal = AscCommon.g_oDocumentUrls.getLocal(_src);
         if (srcLocal){
             _src = srcLocal;
 		}

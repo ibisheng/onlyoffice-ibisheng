@@ -24,7 +24,7 @@ function CAccentCircumflex()
 {
     CGlyphOperator.call(this);
 }
-Asc.extendClass(CAccentCircumflex, CGlyphOperator);
+AscCommon.extendClass(CAccentCircumflex, CGlyphOperator);
 CAccentCircumflex.prototype.calcSize = function(stretch)
 {
     var alpha = this.Parent.Get_TxtPrControlLetter().FontSize/36;
@@ -133,7 +133,7 @@ function CAccentLine()
 {
     CGlyphOperator.call(this);
 }
-Asc.extendClass(CAccentLine, CGlyphOperator);
+AscCommon.extendClass(CAccentLine, CGlyphOperator);
 CAccentLine.prototype.calcSize = function(stretch)
 {
     var alpha = this.Parent.Get_TxtPrControlLetter().FontSize/36;
@@ -165,7 +165,7 @@ function CAccentDoubleLine()
 {
     CGlyphOperator.call(this);
 }
-Asc.extendClass(CAccentDoubleLine, CGlyphOperator);
+AscCommon.extendClass(CAccentDoubleLine, CGlyphOperator);
 CAccentDoubleLine.prototype.calcSize = function(stretch)
 {
     var alpha = this.Parent.Get_TxtPrControlLetter().FontSize/36;
@@ -212,7 +212,7 @@ function CAccentTilde()
 {
     CGlyphOperator.call(this);
 }
-Asc.extendClass(CAccentTilde, CGlyphOperator);
+AscCommon.extendClass(CAccentTilde, CGlyphOperator);
 CAccentTilde.prototype.calcSize = function(stretch)
 {
     var betta = this.Parent.Get_TxtPrControlLetter().FontSize/36;
@@ -316,7 +316,7 @@ function CAccentBreve()
 {
     CGlyphOperator.call(this);
 }
-Asc.extendClass(CAccentBreve, CGlyphOperator);
+AscCommon.extendClass(CAccentBreve, CGlyphOperator);
 CAccentBreve.prototype.calcSize = function(stretch)
 {
     var betta = this.Parent.Get_TxtPrControlLetter().FontSize/36;
@@ -447,7 +447,7 @@ function CAccent(props)
 {
     CAccent.superclass.constructor.call(this);
 
-    this.Id = g_oIdCounter.Get_NewId();
+    this.Id = AscCommon.g_oIdCounter.Get_NewId();
 
     //// Properties
     this.Pr = new CMathAccentPr();
@@ -461,9 +461,9 @@ function CAccent(props)
     if(props !== null && typeof(props) !== "undefined")
         this.init(props);
 
-	g_oTableId.Add( this, this.Id );	
+    AscCommon.g_oTableId.Add( this, this.Id );	
 }
-Asc.extendClass(CAccent, CMathBase);
+AscCommon.extendClass(CAccent, CMathBase);
 
 CAccent.prototype.ClassType = historyitem_type_acc;
 CAccent.prototype.kind      = MATH_ACCENT;
@@ -663,6 +663,6 @@ function CMathMenuAccent(Accent)
 
     this.Type   = c_oAscMathInterfaceType.Accent;
 }
-Asc.extendClass(CMathMenuAccent, CMathMenuBase);
+AscCommon.extendClass(CMathMenuAccent, CMathMenuBase);
 window["CMathMenuAccent"] = CMathMenuAccent;
 

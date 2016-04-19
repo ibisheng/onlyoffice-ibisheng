@@ -240,7 +240,7 @@ CHistory.prototype.RedoAdd = function(oRedoObjectParam, Class, Type, sheetid, ra
 			Data.oBinaryReader.Seek2(Data.nPos);
 			if(!Class)
 			{
-				Class = g_oTableId.Get_ById(Data.sChangedObjectId);
+				Class = AscCommon.g_oTableId.Get_ById(Data.sChangedObjectId);
 				if(Class)
 					this.Add(Class, Type, sheetid, range, Data, LocalChange);
 			}

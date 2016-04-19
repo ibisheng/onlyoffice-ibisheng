@@ -4950,7 +4950,7 @@ function OfflineEditor () {
 
                 // CImage
                 _this.objectLocker.reset();
-                _this.objectLocker.addObjectId(g_oIdCounter.Get_NewId());
+                _this.objectLocker.addObjectId(AscCommon.g_oIdCounter.Get_NewId());
                 _this.objectLocker.checkObjects(function (bLock) {
                     if (bLock !== true)
                         return;

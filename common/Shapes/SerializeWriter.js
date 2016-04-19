@@ -591,7 +591,7 @@ function CBinaryFileWriter()
         {
             if(this.tableStylesGuides.hasOwnProperty(key))
             {
-                this.WriteTableStyle(key, g_oTableId.m_aPairs[key]);
+                this.WriteTableStyle(key, AscCommon.g_oTableId.m_aPairs[key]);
             }
         }
         this.EndRecord();
@@ -2266,7 +2266,7 @@ function CBinaryFileWriter()
                 oThis.WriteUChar(g_nodeAttributeEnd);
 				
                 var _src = fill.RasterImageId;
-				var imageLocal = g_oDocumentUrls.getImageLocal(_src);
+				var imageLocal = AscCommon.g_oDocumentUrls.getImageLocal(_src);
                 if(imageLocal)
                     _src = imageLocal;
                 else
@@ -2281,7 +2281,7 @@ function CBinaryFileWriter()
                         _src = oThis.PresentationThemesOrigin + _src;
                     }
                     else if (0 != _src.indexOf("http:") && 0 != _src.indexOf("data:") && 0 != _src.indexOf("https:") && 0 != _src.indexOf("ftp:") && 0 != _src.indexOf("file:")){
-                        var imageUrl = g_oDocumentUrls.getImageUrl(_src);
+                        var imageUrl = AscCommon.g_oDocumentUrls.getImageUrl(_src);
 						if(imageUrl){
 							_src = imageUrl;
 						}
@@ -2368,18 +2368,18 @@ function CBinaryFileWriter()
                   if (0 != displayN) {
                     var additionalSrc = [];
                     if (0 != (displayN & 1)) {
-                      additionalSrc.push(changeFileExtention(imageLocal, "wmf"));
+                      additionalSrc.push(AscCommon.changeFileExtention(imageLocal, "wmf"));
                     }
                     if (0 != (displayN & 2)) {
-                      additionalSrc.push(changeFileExtention(imageLocal, "emf"));
+                      additionalSrc.push(AscCommon.changeFileExtention(imageLocal, "emf"));
                     }
                     if (0 != (displayN & 4)) {
-                      additionalSrc.push(changeFileExtention(imageLocal, "bin"));
-                      additionalSrc.push(changeFileExtention(imageLocal, "txt"));
+                      additionalSrc.push(AscCommon.changeFileExtention(imageLocal, "bin"));
+                      additionalSrc.push(AscCommon.changeFileExtention(imageLocal, "txt"));
                     }
                     var additionalUrl = [];
                     for (var i = 0; i < additionalSrc.length; ++i) {
-                      var imageUrl = g_oDocumentUrls.getImageUrl(additionalSrc[i]);
+                      var imageUrl = AscCommon.g_oDocumentUrls.getImageUrl(additionalSrc[i]);
                       if (imageUrl) {
                         additionalUrl.push(imageUrl);
                       }

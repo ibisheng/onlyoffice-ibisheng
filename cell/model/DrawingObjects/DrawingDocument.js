@@ -1843,7 +1843,7 @@ function CDrawingDocument(drawingObjects)
         if ("" == this.m_sLockedCursorType)
         {
             if (this.m_oWordControl.m_oApi.isPaintFormat && "default" == sType)
-                this.m_oWordControl.m_oMainContent.HtmlElement.style.cursor = kCurFormatPainterWord;
+                this.m_oWordControl.m_oMainContent.HtmlElement.style.cursor = AscCommon.kCurFormatPainterWord;
             else if (this.m_oWordControl.m_oApi.isMarkerFormat && "default" == sType)
                 this.m_oWordControl.m_oMainContent.HtmlElement.style.cursor = this.cursorMarkerFormat;
             else
@@ -2236,7 +2236,7 @@ function CDrawingDocument(drawingObjects)
             var _len = _imgs.length;
             for (var j = 0; j < _len; j++)
             {
-                if (getFullImageSrc2(_imgs[j]) == src)
+                if (AscCommon.getFullImageSrc2(_imgs[j]) == src)
                 {
                     this.StopRenderingPage(i);
                     bIsRaster = true;
@@ -4299,7 +4299,7 @@ function CDrawingDocument(drawingObjects)
             return;
 
 		var api = window["Asc"]["editor"];
-        var _img = api.ImageLoader.map_image_index[getFullImageSrc2(this.LastDrawingUrl)];
+        var _img = api.ImageLoader.map_image_index[AscCommon.getFullImageSrc2(this.LastDrawingUrl)];
         if (_img != undefined && _img.Image != null && _img.Status != ImageLoadStatus.Loading)
         {
             var _x = 0;
@@ -4371,7 +4371,7 @@ function CDrawingDocument(drawingObjects)
             return;
 
         var api = window["Asc"]["editor"];
-        var _img = api.ImageLoader.map_image_index[getFullImageSrc2(this.LastDrawingUrlTextArt)];
+        var _img = api.ImageLoader.map_image_index[AscCommon.getFullImageSrc2(this.LastDrawingUrlTextArt)];
         if (_img != undefined && _img.Image != null && _img.Status != ImageLoadStatus.Loading)
         {
             var _x = 0;

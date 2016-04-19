@@ -7,6 +7,7 @@ if ( !window["Asc"] ) {		// Для вставки диаграмм в Word
 // Import
 var c_oAscCellAnchorType = AscCommon.c_oAscCellAnchorType;
 var c_oAscLockTypes = AscCommon.c_oAscLockTypes;
+var parserHelp = AscCommon.parserHelp;
 
 var c_oAscError = Asc.c_oAscError;
 var c_oAscInsertOptions = Asc.c_oAscInsertOptions;
@@ -155,7 +156,7 @@ function asc_CChartBinary(chart) {
             pptx_writer.WriteRecord1(1, chart.colorMapOverride, pptx_writer.WriteClrMap);
             this["colorMapBinary"] = pptx_writer.pos + ";" + pptx_writer.GetBase64Memory();
         }
-        this["urls"] = JSON.stringify(g_oDocumentUrls.getUrls());
+        this["urls"] = JSON.stringify(AscCommon.g_oDocumentUrls.getUrls());
     }
 }
 
@@ -1474,9 +1475,9 @@ function DrawingObjects() {
         {
 			var localUrl = aImagesSync[i];
 			if(api.DocInfo && api.DocInfo.asc_getOfflineApp()) {
-				g_oDocumentUrls.addImageUrl(localUrl, api.FontLoader.fontFilesPath + "../Excel/document/media/" + localUrl);
+          AscCommon.g_oDocumentUrls.addImageUrl(localUrl, api.FontLoader.fontFilesPath + "../Excel/document/media/" + localUrl);
 			}
-            aImagesSync[i] = getFullImageSrc2(localUrl);
+            aImagesSync[i] = AscCommon.getFullImageSrc2(localUrl);
         }
 
         // Загружаем все картинки листа
@@ -2042,7 +2043,7 @@ function DrawingObjects() {
 
                     // CImage
                     _this.objectLocker.reset();
-                    _this.objectLocker.addObjectId(g_oIdCounter.Get_NewId());
+                    _this.objectLocker.addObjectId(AscCommon.g_oIdCounter.Get_NewId());
                     _this.objectLocker.checkObjects(function (bLock) {
                         if (bLock !== true)
                             return;
@@ -2072,7 +2073,7 @@ function DrawingObjects() {
             var oVisibleRange = worksheet.getVisibleRange();
 
             _this.objectLocker.reset();
-            _this.objectLocker.addObjectId(g_oIdCounter.Get_NewId());
+            _this.objectLocker.addObjectId(AscCommon.g_oIdCounter.Get_NewId());
             _this.objectLocker.checkObjects(function (bLock) {
                 if (bLock !== true)
                     return;
@@ -2165,7 +2166,7 @@ function DrawingObjects() {
             }
 
             _this.objectLocker.reset();
-            _this.objectLocker.addObjectId(g_oIdCounter.Get_NewId());
+            _this.objectLocker.addObjectId(AscCommon.g_oIdCounter.Get_NewId());
             _this.objectLocker.checkObjects(function(bLock){
                 if(bLock)
                 {
@@ -2208,7 +2209,7 @@ function DrawingObjects() {
             }
 
             if(typeof chart["urls"] === "string") {
-                g_oDocumentUrls.addUrls(JSON.parse(chart["urls"]));
+                AscCommon.g_oDocumentUrls.addUrls(JSON.parse(chart["urls"]));
             }
             var font_map = {};
             oNewChartSpace.documentGetAllFontNames(font_map);
@@ -3256,7 +3257,7 @@ function DrawingObjects() {
 
             var imageUrl = selectedObjects[0].getImageUrl();
 
-            var _image = api.ImageLoader.map_image_index[getFullImageSrc2(imageUrl)];
+            var _image = api.ImageLoader.map_image_index[AscCommon.getFullImageSrc2(imageUrl)];
             if (_image != undefined && _image.Image != null && _image.Status == ImageLoadStatus.Complete) {
 
                 var _w = 1, _h = 1;

@@ -20,6 +20,8 @@
 //       CParagraph.
 
 // Import
+var g_oTableId = AscCommon.g_oTableId;
+
 var c_oAscRelativeFromH = Asc.c_oAscRelativeFromH;
 var c_oAscRelativeFromV = Asc.c_oAscRelativeFromV;
 
@@ -571,7 +573,7 @@ ParaSym.prototype =
 // Класс ParaTextPr
 function ParaTextPr(Props)
 {
-    this.Id = g_oIdCounter.Get_NewId();
+    this.Id = AscCommon.g_oIdCounter.Get_NewId();
 
     this.Type   = para_TextPr;
     this.Value  = new CTextPr();
@@ -2300,7 +2302,7 @@ ParaTextPr.prototype =
                     {
                         if(unifill.fill && unifill.fill.type === Asc.c_oAscFill.FILL_TYPE_BLIP && typeof unifill.fill.RasterImageId === "string" && unifill.fill.RasterImageId.length > 0)
                         {
-                            CollaborativeEditing.Add_NewImage(getFullImageSrc2(unifill.fill.RasterImageId));
+                            CollaborativeEditing.Add_NewImage(AscCommon.getFullImageSrc2(unifill.fill.RasterImageId));
                         }
                     }
                 }
@@ -4027,7 +4029,7 @@ var WRAP_HIT_TYPE_SECTION = 0x01;
 // Класс ParaDrawing
 function ParaDrawing(W, H, GraphicObj, DrawingDocument, DocumentContent, Parent)
 {
-    this.Id = g_oIdCounter.Get_NewId();
+    this.Id = AscCommon.g_oIdCounter.Get_NewId();
     this.DrawingType = drawing_Inline;
     this.GraphicObj  = GraphicObj;
 
@@ -4139,7 +4141,7 @@ function ParaDrawing(W, H, GraphicObj, DrawingDocument, DocumentContent, Parent)
     this.bNoNeedToAdd = false;
 
     this.pageIndex = -1;
-    this.Lock = new CLock();
+    this.Lock = new AscCommon.CLock();
 //------------------------------------------------------------
     g_oTableId.Add( this, this.Id );
 

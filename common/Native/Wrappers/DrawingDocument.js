@@ -2193,7 +2193,7 @@ CDrawingDocument.prototype =
         var Rows = 5;
 
         History.TurnOff();
-        g_oTableId.m_bTurnOff = true;
+        AscCommon.g_oTableId.m_bTurnOff = true;
         for (var i1 = 0; i1 < _styles_len; i1++)
         {
             var i = _styles[i1];
@@ -2255,7 +2255,7 @@ CDrawingDocument.prototype =
             this.Native["DD_EndNativeDraw"](_stream);
             _graphics.ClearParams();
         }
-        g_oTableId.m_bTurnOff = false;
+        AscCommon.g_oTableId.m_bTurnOff = false;
         History.TurnOn();
 
         _stream["ClearNoAttack"]();

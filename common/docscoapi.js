@@ -5,6 +5,7 @@
 
   var asc_coAuthV = '3.0.9';
   var ConnectionState = AscCommon.ConnectionState;
+  var c_oEditorId = AscCommon.c_oEditorId;
 
   // Класс надстройка, для online и offline работы
   function CDocsCoApi(options) {

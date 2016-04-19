@@ -233,7 +233,7 @@ function COperatorBracket()
 {
     CGlyphOperator.call(this);
 }
-Asc.extendClass(COperatorBracket, CGlyphOperator);
+AscCommon.extendClass(COperatorBracket, CGlyphOperator);
 COperatorBracket.prototype.calcSize = function( stretch )
 {
     var betta = this.getCtrPrp().FontSize/36;
@@ -771,7 +771,7 @@ function COperatorParenthesis()
 {
     CGlyphOperator.call(this);
 }
-Asc.extendClass(COperatorParenthesis, CGlyphOperator);
+AscCommon.extendClass(COperatorParenthesis, CGlyphOperator);
 COperatorParenthesis.prototype.calcSize = function(stretch)
 {
     var betta = this.getCtrPrp().FontSize/36;
@@ -922,7 +922,7 @@ function COperatorAngleBracket()
 {
     CGlyphOperator.call(this);
 }
-Asc.extendClass(COperatorAngleBracket, CGlyphOperator);
+AscCommon.extendClass(COperatorAngleBracket, CGlyphOperator);
 COperatorAngleBracket.prototype.calcSize = function(stretch)
 {
     //скобка перевернутая
@@ -1038,7 +1038,7 @@ function CSquareBracket()
 {
     CGlyphOperator.call(this);
 }
-Asc.extendClass(CSquareBracket, CGlyphOperator);
+AscCommon.extendClass(CSquareBracket, CGlyphOperator);
 CSquareBracket.prototype.calcCoord = function(stretch)
 {
     var X = [],
@@ -1114,7 +1114,7 @@ function CHalfSquareBracket()
 {
     CGlyphOperator.call(this);
 }
-Asc.extendClass(CHalfSquareBracket, CGlyphOperator);
+AscCommon.extendClass(CHalfSquareBracket, CGlyphOperator);
 CHalfSquareBracket.prototype.calcCoord = function(stretch)
 {
     var X = [],
@@ -1186,7 +1186,7 @@ function COperatorLine()
 {
     CGlyphOperator.call(this);
 }
-Asc.extendClass(COperatorLine, CGlyphOperator);
+AscCommon.extendClass(COperatorLine, CGlyphOperator);
 COperatorLine.prototype.calcSize = function()
 {
     var betta = this.getCtrPrp().FontSize/36;
@@ -1254,7 +1254,7 @@ function CWhiteSquareBracket()
 {
     CGlyphOperator.call(this);
 }
-Asc.extendClass(CWhiteSquareBracket, CGlyphOperator);
+AscCommon.extendClass(CWhiteSquareBracket, CGlyphOperator);
 CWhiteSquareBracket.prototype.calcSize = function()
 {
     var betta = this.getCtrPrp().FontSize/36;
@@ -1360,7 +1360,7 @@ function COperatorDoubleLine()
 {
     CGlyphOperator.call(this);
 }
-Asc.extendClass(COperatorDoubleLine, CGlyphOperator);
+AscCommon.extendClass(COperatorDoubleLine, CGlyphOperator);
 COperatorDoubleLine.prototype.calcSize = function()
 {
     var betta = this.getCtrPrp().FontSize/36;
@@ -1441,7 +1441,7 @@ function CSingleArrow()
 {
     CGlyphOperator.call(this);
 }
-Asc.extendClass(CSingleArrow, CGlyphOperator);
+AscCommon.extendClass(CSingleArrow, CGlyphOperator);
 CSingleArrow.prototype.calcSize = function()
 {
     var betta = this.getCtrPrp().FontSize/36;
@@ -1518,7 +1518,7 @@ function CLeftRightArrow()
 {
     CGlyphOperator.call(this);
 }
-Asc.extendClass(CLeftRightArrow, CGlyphOperator);
+AscCommon.extendClass(CLeftRightArrow, CGlyphOperator);
 CLeftRightArrow.prototype.calcSize = function()
 {
     var betta = this.getCtrPrp().FontSize/36;
@@ -1608,7 +1608,7 @@ function CDoubleArrow()
 {
     CGlyphOperator.call(this);
 }
-Asc.extendClass(CDoubleArrow, CGlyphOperator);
+AscCommon.extendClass(CDoubleArrow, CGlyphOperator);
 CDoubleArrow.prototype.calcSize = function()
 {
     var betta = this.getCtrPrp().FontSize/36;
@@ -1708,7 +1708,7 @@ function CLR_DoubleArrow()
 {
     CGlyphOperator.call(this);
 }
-Asc.extendClass(CLR_DoubleArrow, CGlyphOperator);
+AscCommon.extendClass(CLR_DoubleArrow, CGlyphOperator);
 CLR_DoubleArrow.prototype.calcSize = function()
 {
     var betta = this.getCtrPrp().FontSize/36;
@@ -1821,7 +1821,7 @@ function CCombiningArrow()
 {
     CGlyphOperator.call(this);
 }
-Asc.extendClass(CCombiningArrow, CGlyphOperator);
+AscCommon.extendClass(CCombiningArrow, CGlyphOperator);
 CCombiningArrow.prototype.calcSize = function()
 {
     var betta = this.getCtrPrp().FontSize/36;
@@ -1896,7 +1896,7 @@ function CCombiningHalfArrow()
 {
     CGlyphOperator.call(this);
 }
-Asc.extendClass(CCombiningHalfArrow, CGlyphOperator);
+AscCommon.extendClass(CCombiningHalfArrow, CGlyphOperator);
 CCombiningHalfArrow.prototype.calcSize = function()
 {
     var betta = this.getCtrPrp().FontSize/36;
@@ -1967,7 +1967,7 @@ function CCombining_LR_Arrow()
 {
     CGlyphOperator.call(this);
 }
-Asc.extendClass(CCombining_LR_Arrow, CGlyphOperator);
+AscCommon.extendClass(CCombining_LR_Arrow, CGlyphOperator);
 CCombining_LR_Arrow.prototype.calcSize = function()
 {
     var betta = this.getCtrPrp().FontSize/36;
@@ -3233,7 +3233,7 @@ function CDelimiter(props)
 {
     CDelimiter.superclass.constructor.call(this);
 
-	this.Id = g_oIdCounter.Get_NewId();
+	this.Id = AscCommon.g_oIdCounter.Get_NewId();
 
     this.GeneralMetrics = new CMathSize();
 
@@ -3247,9 +3247,9 @@ function CDelimiter(props)
     if(props !== null && props !== undefined)
         this.init(props);
 
-	g_oTableId.Add( this, this.Id );
+    AscCommon.g_oTableId.Add( this, this.Id );
 }
-Asc.extendClass(CDelimiter, CMathBase);
+AscCommon.extendClass(CDelimiter, CMathBase);
 
 CDelimiter.prototype.ClassType = historyitem_type_delimiter;
 CDelimiter.prototype.kind      = MATH_DELIMITER;
@@ -4016,7 +4016,7 @@ function CMathMenuDelimiter(Delimiter)
         this.bSingleArgument    = true;
     }
 }
-Asc.extendClass(CMathMenuDelimiter, CMathMenuBase);
+AscCommon.extendClass(CMathMenuDelimiter, CMathMenuBase);
 CMathMenuDelimiter.prototype.get_HideOpeningBracket = function(){return this.HideBegOper;};
 CMathMenuDelimiter.prototype.put_HideOpeningBracket = function(Hide){this.HideBegOper = Hide;};
 CMathMenuDelimiter.prototype.get_HideClosingBracket = function(){return this.HideEndOper;};
@@ -4050,7 +4050,7 @@ function CCharacter()
     this.operator = new COperator(OPER_GROUP_CHAR);
     CMathBase.call(this);
 }
-Asc.extendClass(CCharacter, CMathBase);
+AscCommon.extendClass(CCharacter, CMathBase);
 CCharacter.prototype.setCharacter = function(props, defaultProps)
 {
     this.operator.mergeProperties(props, defaultProps);
@@ -4256,7 +4256,7 @@ function CGroupCharacter(props)
 {
     CGroupCharacter.superclass.constructor.call(this);
 
-	this.Id   = g_oIdCounter.Get_NewId();
+	this.Id   = AscCommon.g_oIdCounter.Get_NewId();
 
     this.Pr = new CMathGroupChrPr();
 
@@ -4264,9 +4264,9 @@ function CGroupCharacter(props)
         this.init(props);
 
     /// вызов этой функции обязательно в конце
-    g_oTableId.Add( this, this.Id );
+    AscCommon.g_oTableId.Add( this, this.Id );
 }
-Asc.extendClass(CGroupCharacter, CCharacter);
+AscCommon.extendClass(CGroupCharacter, CCharacter);
 CGroupCharacter.prototype.ClassType = historyitem_type_groupChr;
 CGroupCharacter.prototype.kind      = MATH_GROUP_CHARACTER;
 CGroupCharacter.prototype.init = function(props)
@@ -4458,7 +4458,7 @@ function CMathMenuGroupCharacter(GroupChr)
         this.bCanChangePos = undefined;
     }
 }
-Asc.extendClass(CMathMenuGroupCharacter, CMathMenuBase);
+AscCommon.extendClass(CMathMenuGroupCharacter, CMathMenuBase);
 CMathMenuGroupCharacter.prototype.get_Pos         = function(){return this.Pos;};
 CMathMenuGroupCharacter.prototype.put_Pos         = function(Pos){this.Pos = Pos;};
 CMathMenuGroupCharacter.prototype.can_ChangePos   = function(){return this.bCanChangePos;};

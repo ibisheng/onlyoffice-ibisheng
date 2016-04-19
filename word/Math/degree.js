@@ -56,7 +56,7 @@ function CDegreeBase(props, bInside)
     if(props !== null && typeof(props) !== "undefined")
         this.init(props);
 }
-Asc.extendClass(CDegreeBase, CMathBase);
+AscCommon.extendClass(CDegreeBase, CMathBase);
 CDegreeBase.prototype.init = function(props)
 {
     this.setProperties(props);
@@ -407,14 +407,14 @@ function CDegree(props, bInside)
 {
     CDegree.superclass.constructor.call(this, props, bInside);
 
-    this.Id = g_oIdCounter.Get_NewId();
+    this.Id = AscCommon.g_oIdCounter.Get_NewId();
 
     if(props !== null && typeof(props) !== "undefined")
         this.init(props);
 
-    g_oTableId.Add( this, this.Id );
+    AscCommon.g_oTableId.Add( this, this.Id );
 }
-Asc.extendClass(CDegree, CDegreeBase);
+AscCommon.extendClass(CDegree, CDegreeBase);
 CDegree.prototype.ClassType = historyitem_type_deg;
 CDegree.prototype.kind      = MATH_DEGREE;
 CDegree.prototype.init = function(props)
@@ -519,7 +519,7 @@ function CIterators(iterUp, iterDn)
     this.iterUp = iterUp;
     this.iterDn = iterDn;
 }
-Asc.extendClass(CIterators, CMathBase);
+AscCommon.extendClass(CIterators, CMathBase);
 CIterators.prototype.init = function()
 {
     this.setDimension(2, 1);
@@ -670,7 +670,7 @@ function CDegreeSubSupBase(props, bInside)
     if(props !== null && typeof(props) !== "undefined")
         this.init(props);
 }
-Asc.extendClass(CDegreeSubSupBase, CMathBase);
+AscCommon.extendClass(CDegreeSubSupBase, CMathBase);
 CDegreeSubSupBase.prototype.init = function(props)
 {
     this.setProperties(props);
@@ -863,14 +863,14 @@ function CDegreeSubSup(props, bInside)
 {
     CDegreeSubSup.superclass.constructor.call(this, props, bInside);
 
-    this.Id = g_oIdCounter.Get_NewId();
+    this.Id = AscCommon.g_oIdCounter.Get_NewId();
 
     if(props !== null && typeof(props) !== "undefined")
         this.init(props);
 
-    g_oTableId.Add( this, this.Id );
+    AscCommon.g_oTableId.Add( this, this.Id );
 }
-Asc.extendClass(CDegreeSubSup, CDegreeSubSupBase);
+AscCommon.extendClass(CDegreeSubSup, CDegreeSubSupBase);
 CDegreeSubSup.prototype.ClassType = historyitem_type_deg_subsup;
 CDegreeSubSup.prototype.kind      = MATH_DEGREESubSup;
 CDegreeSubSup.prototype.init = function(props)
@@ -1173,7 +1173,7 @@ function CMathMenuScript(Script, Type)
     else
         this.ScriptType = undefined;
 }
-Asc.extendClass(CMathMenuScript, CMathMenuBase);
+AscCommon.extendClass(CMathMenuScript, CMathMenuBase);
 
 CMathMenuScript.prototype.get_ScriptType = function(){return this.ScriptType;};
 CMathMenuScript.prototype.put_ScriptType = function(Type){this.ScriptType = Type;};

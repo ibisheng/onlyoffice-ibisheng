@@ -9,6 +9,11 @@ var locktype_Other2 = AscCommon.locktype_Other2;
 var locktype_Other3 = AscCommon.locktype_Other3;
 var changestype_Drawing_Props = AscCommon.changestype_Drawing_Props;
 var asc_CSelectedObject = AscCommon.asc_CSelectedObject;
+var g_oDocumentUrls = AscCommon.g_oDocumentUrls;
+var sendCommand = AscCommon.sendCommand;
+var mapAscServerErrorToAscError = AscCommon.mapAscServerErrorToAscError;
+var g_oIdCounter = AscCommon.g_oIdCounter;
+var g_oTableId = AscCommon.g_oTableId;
 
 var c_oAscError = Asc.c_oAscError;
 var c_oAscFileType = Asc.c_oAscFileType;
@@ -33,10 +38,10 @@ var c_oSerFormat = {
 function asc_docs_api(name)
 {
   asc_docs_api.superclass.constructor.call(this, name);
-  this.editorId = c_oEditorId.Presentation;
+  this.editorId = AscCommon.c_oEditorId.Presentation;
 
     History    = new CHistory();
-    g_oTableId = new CTableId();
+    g_oTableId.init();
 
 	/************ private!!! **************/
     this.WordControl = new CEditorPage(this);
@@ -116,7 +121,7 @@ function asc_docs_api(name)
             editor = window.editor;
     }
 }
-asc.extendClass(asc_docs_api, baseEditorsApi);
+AscCommon.extendClass(asc_docs_api, baseEditorsApi);
 
 asc_docs_api.prototype.sendEvent = function() {
   this.asc_fireCallback.apply(this, arguments);
@@ -545,7 +550,7 @@ asc_docs_api.prototype.SetThemesPath = function(path)
 {
     this.ThemeLoader.ThemesUrl = path;
     if (this.documentOrigin) {
-        this.ThemeLoader.ThemesUrlAbs = joinUrls(this.documentOrigin + this.documentPathname, path);
+        this.ThemeLoader.ThemesUrlAbs = AscCommon.joinUrls(this.documentOrigin + this.documentPathname, path);
     } else {
         this.ThemeLoader.ThemesUrlAbs = path;
     }
@@ -1840,7 +1845,7 @@ asc_docs_api.prototype.ShapeApply = function(prop)
                   oApi.asc_fireCallback("asc_onError",c_oAscError.ID.Unknown,c_oAscError.Level.NoCritical);
                 }
               } else {
-                oApi.asc_fireCallback("asc_onError", g_fMapAscServerErrorToAscError(parseInt(input["data"])), c_oAscError.Level.NoCritical);
+                oApi.asc_fireCallback("asc_onError", mapAscServerErrorToAscError(parseInt(input["data"])), c_oAscError.Level.NoCritical);
               }
             } else {
               oApi.asc_fireCallback("asc_onError",c_oAscError.ID.Unknown,c_oAscError.Level.NoCritical);
@@ -1854,7 +1859,7 @@ asc_docs_api.prototype.ShapeApply = function(prop)
             "c":"imgurl",
             "saveindex": g_oDocumentUrls.getMaxIndex(),
             "data": sImageUrl};
-          sendCommand2(this, null, rData );
+          sendCommand(this, null, rData );
         }
     }
     else
@@ -2758,14 +2763,14 @@ asc_docs_api.prototype.AddImageUrl = function(url){
 						t.asc_fireCallback("asc_onError",c_oAscError.ID.Unknown,c_oAscError.Level.NoCritical);
 					}
 				} else {
-					t.asc_fireCallback("asc_onError", g_fMapAscServerErrorToAscError(parseInt(input["data"])), c_oAscError.Level.NoCritical);
+					t.asc_fireCallback("asc_onError", mapAscServerErrorToAscError(parseInt(input["data"])), c_oAscError.Level.NoCritical);
 				}
 			} else {
 				t.asc_fireCallback("asc_onError",c_oAscError.ID.Unknown,c_oAscError.Level.NoCritical);
 			}
 			t.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
 		};
-		sendCommand2(this, null, rData );
+		sendCommand(this, null, rData );
 	}
 };
 
@@ -2935,7 +2940,7 @@ asc_docs_api.prototype.ImgApply = function(obj){
                 oApi.asc_fireCallback("asc_onError",c_oAscError.ID.Unknown,c_oAscError.Level.NoCritical);
               }
             } else {
-              oApi.asc_fireCallback("asc_onError", g_fMapAscServerErrorToAscError(parseInt(input["data"])), c_oAscError.Level.NoCritical);
+              oApi.asc_fireCallback("asc_onError", mapAscServerErrorToAscError(parseInt(input["data"])), c_oAscError.Level.NoCritical);
             }
           } else {
             oApi.asc_fireCallback("asc_onError",c_oAscError.ID.Unknown,c_oAscError.Level.NoCritical);
@@ -2950,7 +2955,7 @@ asc_docs_api.prototype.ImgApply = function(obj){
           "c":"imgurl",
           "saveindex": g_oDocumentUrls.getMaxIndex(),
           "data": sImageUrl};
-        sendCommand2(this, null, rData );
+        sendCommand(this, null, rData );
       }
 	}
 	else
@@ -4721,7 +4726,7 @@ asc_docs_api.prototype.sync_ContextMenuCallback = function(Data)
 
 asc_docs_api.prototype._onOpenCommand = function(data) {
   var t = this;
-	g_fOpenFileCommand(data, this.documentUrlChanges, c_oSerFormat.Signature, function (error, result) {
+  AscCommon.openFileCommand(data, this.documentUrlChanges, c_oSerFormat.Signature, function (error, result) {
 		if (error || !result.bSerFormat) {
 			t.asc_fireCallback("asc_onError",c_oAscError.ID.Unknown,c_oAscError.Level.Critical);
 			return;
@@ -4750,7 +4755,7 @@ function _downloadAs(editor, filetype, actionType, options)
 	oAdditionalData["userid"] = editor.documentUserId;
 	oAdditionalData["vkey"] = editor.documentVKey;
 	oAdditionalData["outputformat"] = filetype;
-	oAdditionalData["title"] = changeFileExtention(editor.documentTitle, getExtentionByFormat(filetype));
+	oAdditionalData["title"] = AscCommon.changeFileExtention(editor.documentTitle, AscCommon.getExtentionByFormat(filetype));
 	oAdditionalData["savetype"] = AscCommon.c_oAscSaveTypes.CompleteAll;
     if (DownloadType.Print === options.downloadType) {
       oAdditionalData["inline"] = 1;
@@ -4772,7 +4777,7 @@ function _downloadAs(editor, filetype, actionType, options)
             editor.processSavedFile(url, options.downloadType);
           }
         } else {
-          error = g_fMapAscServerErrorToAscError(parseInt(input["data"]));
+          error = mapAscServerErrorToAscError(parseInt(input["data"]));
         }
       }
       if (c_oAscError.ID.No != error) {
@@ -4783,7 +4788,7 @@ function _downloadAs(editor, filetype, actionType, options)
       }
     };
 	editor.fCurCallback = fCallback;
-	g_fSaveWithParts(function(fCallback1, oAdditionalData1, dataContainer1){sendCommand2(editor, fCallback1, oAdditionalData1, dataContainer1);}, fCallback, null, oAdditionalData, dataContainer);
+  AscCommon.saveWithParts(function(fCallback1, oAdditionalData1, dataContainer1){sendCommand(editor, fCallback1, oAdditionalData1, dataContainer1);}, fCallback, null, oAdditionalData, dataContainer);
 }
 
 //test

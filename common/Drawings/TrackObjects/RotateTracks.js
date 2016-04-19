@@ -255,10 +255,10 @@ ObjectToDraw.prototype =
     {
         if(this.Comment)
         {
-            var oComment = g_oTableId.Get_ById(this.Comment.Additional.CommentId);
+            var oComment = AscCommon.g_oTableId.Get_ById(this.Comment.Additional.CommentId);
             if(oComment)
             {
-                var Para = g_oTableId.Get_ById( oComment.StartId );
+                var Para = AscCommon.g_oTableId.Get_ById( oComment.StartId );
                 if( editor && editor.WordControl && editor.WordControl.m_oLogicDocument && editor.WordControl.m_oLogicDocument.Comments &&
                     (graphics instanceof CGraphics) && ( editor.WordControl.m_oLogicDocument.Comments.Is_Use() && true != editor.isViewMode))
                 {

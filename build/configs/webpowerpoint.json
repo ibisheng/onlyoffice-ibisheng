@@ -9,9 +9,9 @@
 				"../common/docscoapicommon.js",
                 "../common/docscoapi.js",
 				"../common/apiCommon.js",
+				"../common/editorscommon.js",
 				
 				"../slide/apiDefines.js",
-				"../common/editorscommon.js",
 				"../common/wordcopypaste.js",
                 "../common/FontsFreeType/font_engine.js",
                 "../common/FontsFreeType/FontFile.js",

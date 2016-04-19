@@ -17,6 +17,12 @@ var editor;
   var DownloadType = AscCommon.DownloadType;
   var c_oAscLockTypes = AscCommon.c_oAscLockTypes;
   var CColor = AscCommon.CColor;
+  var g_oDocumentUrls = AscCommon.g_oDocumentUrls;
+  var sendCommand = AscCommon.sendCommand;
+  var mapAscServerErrorToAscError = AscCommon.mapAscServerErrorToAscError;
+  var parserHelp = AscCommon.parserHelp;
+  var g_oIdCounter = AscCommon.g_oIdCounter;
+  var g_oTableId = AscCommon.g_oTableId;
 
   var c_oAscLockTypeElem = AscCommonExcel.c_oAscLockTypeElem;
 
@@ -38,7 +44,7 @@ var editor;
    */
   function spreadsheet_api(name, inputName, eventsHandlers) {
     spreadsheet_api.superclass.constructor.call(this, name);
-    this.editorId = c_oEditorId.Spreadsheet;
+    this.editorId = AscCommon.c_oEditorId.Spreadsheet;
 
     /************ private!!! **************/
     this.topLineEditorName = inputName;
@@ -98,7 +104,7 @@ var editor;
     this._init();
     return this;
   }
-  asc.extendClass(spreadsheet_api, baseEditorsApi);
+  AscCommon.extendClass(spreadsheet_api, baseEditorsApi);
 
   spreadsheet_api.prototype.sendEvent = function() {
     this.handlers.trigger.apply(this.handlers, arguments);
@@ -469,7 +475,7 @@ var editor;
     // History & global counters
     History = new CHistory(wbModel);
 
-    g_oTableId = new CTableId();
+    g_oTableId.init();
     AscCommonExcel.g_oUndoRedoCell = new AscCommonExcel.UndoRedoCell(wbModel);
     AscCommonExcel.g_oUndoRedoWorksheet = new AscCommonExcel.UndoRedoWoorksheet(wbModel);
     AscCommonExcel.g_oUndoRedoWorkbook = new AscCommonExcel.UndoRedoWorkbook(wbModel);
@@ -758,7 +764,7 @@ var editor;
             "delimiter": option.asc_getDelimiter(),
             "codepage": option.asc_getCodePage()};
 
-          sendCommand2(this, null, v);
+          sendCommand(this, null, v);
         } else if (this.advancedOptionsAction === c_oAscAdvancedOptionsAction.Save) {
           var options = {CSVOptions: option, downloadType: this.downloadType};
           this.downloadType = DownloadType.None;
@@ -789,13 +795,13 @@ var editor;
       }
     }
     if (data) {
-      g_fLoadFileContent(data, function(result) {
+      AscCommon.loadFileContent(data, function(result) {
         if (null === result) {
           t.handlers.trigger("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.Critical);
           return;
         }
         var cp = JSON.parse(result);
-        cp['encodings'] = getEncodingParams();
+        cp['encodings'] = AscCommon.getEncodingParams();
         t.handlers.trigger("asc_onAdvancedOptions", new asc.asc_CAdvancedOptions(c_oAscAdvancedOptionsID.CSV, cp), t.advancedOptionsAction);
       });
     } else {
@@ -804,7 +810,7 @@ var editor;
   };
   spreadsheet_api.prototype._onOpenCommand = function(data) {
     var t = this;
-    g_fOpenFileCommand(data, this.documentUrlChanges, Asc.c_oSerFormat.Signature, function(error, result) {
+    AscCommon.openFileCommand(data, this.documentUrlChanges, Asc.c_oSerFormat.Signature, function(error, result) {
       if (error || !result.bSerFormat) {
         var oError = {returnCode: c_oAscError.Level.Critical, val: c_oAscError.ID.Unknown};
         t.handlers.trigger("asc_onError", oError.val, oError.returnCode);
@@ -834,7 +840,7 @@ var editor;
     oAdditionalData["userid"] = this.documentUserId;
     oAdditionalData["vkey"] = this.documentVKey;
     oAdditionalData["outputformat"] = filetype;
-    oAdditionalData["title"] = changeFileExtention(this.documentTitle, getExtentionByFormat(filetype));
+    oAdditionalData["title"] = AscCommon.changeFileExtention(this.documentTitle, AscCommon.getExtentionByFormat(filetype));
     this.wb._initCommentsToSave();
     oAdditionalData["savetype"] = AscCommon.c_oAscSaveTypes.CompleteAll;
     var t = this;
@@ -848,14 +854,14 @@ var editor;
             t.handlers.trigger("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
           }
         } else {
-          t.handlers.trigger("asc_onError", g_fMapAscServerErrorToAscError(parseInt(input["data"])), c_oAscError.Level.NoCritical);
+          t.handlers.trigger("asc_onError", mapAscServerErrorToAscError(parseInt(input["data"])), c_oAscError.Level.NoCritical);
         }
       } else {
         t.handlers.trigger("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
       }
     };
-    g_fSaveWithParts(function(fCallback1, oAdditionalData1, dataContainer1) {
-      sendCommand2(t, fCallback1, oAdditionalData1, dataContainer1);
+    AscCommon.saveWithParts(function(fCallback1, oAdditionalData1, dataContainer1) {
+      sendCommand(t, fCallback1, oAdditionalData1, dataContainer1);
     }, t.fCurCallback, null, oAdditionalData, dataContainer);
   };
 
@@ -879,7 +885,7 @@ var editor;
     oAdditionalData["userid"] = this.documentUserId;
     oAdditionalData["vkey"] = this.documentVKey;
     oAdditionalData["outputformat"] = sFormat;
-    oAdditionalData["title"] = changeFileExtention(this.documentTitle, getExtentionByFormat(sFormat));
+    oAdditionalData["title"] = AscCommon.changeFileExtention(this.documentTitle, AscCommon.getExtentionByFormat(sFormat));
     if (DownloadType.Print === options.downloadType) {
       oAdditionalData["inline"] = 1;
     }
@@ -894,7 +900,7 @@ var editor;
       if (actionType) {
         this.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, actionType);
       }
-      var cp = {'delimiter': AscCommon.c_oAscCsvDelimiter.Comma, 'codepage': AscCommon.c_oAscCodePageUtf8, 'encodings': getEncodingParams()};
+      var cp = {'delimiter': AscCommon.c_oAscCsvDelimiter.Comma, 'codepage': AscCommon.c_oAscCodePageUtf8, 'encodings': AscCommon.getEncodingParams()};
       this.downloadType = options.downloadType;
       this.handlers.trigger("asc_onAdvancedOptions", new asc.asc_CAdvancedOptions(c_oAscAdvancedOptionsID.CSV, cp), this.advancedOptionsAction);
       return;
@@ -919,7 +925,7 @@ var editor;
             t.processSavedFile(url, options.downloadType);
           }
         } else {
-          error = g_fMapAscServerErrorToAscError(parseInt(input["data"]));
+          error = mapAscServerErrorToAscError(parseInt(input["data"]));
         }
       }
       if (c_oAscError.ID.No != error) {
@@ -932,8 +938,8 @@ var editor;
       }
     };
     t.fCurCallback = fCallback;
-    g_fSaveWithParts(function(fCallback1, oAdditionalData1, dataContainer1) {
-      sendCommand2(t, fCallback1, oAdditionalData1, dataContainer1);
+    AscCommon.saveWithParts(function(fCallback1, oAdditionalData1, dataContainer1) {
+      sendCommand(t, fCallback1, oAdditionalData1, dataContainer1);
     }, fCallback, null, oAdditionalData, dataContainer);
   };
 
@@ -1207,7 +1213,7 @@ var editor;
         var elementValue = e["blockValue"];
         var lockElem = t.collaborativeEditing.getLockByElem(elementValue, c_oAscLockTypes.kLockTypeOther);
         if (null === lockElem) {
-          lockElem = new asc.CLock(elementValue);
+          lockElem = new AscCommonExcel.CLock(elementValue);
           t.collaborativeEditing.addUnlock(lockElem);
         }
 
@@ -2258,14 +2264,14 @@ var editor;
             t.handlers.trigger("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
           }
         } else {
-          t.handlers.trigger("asc_onError", g_fMapAscServerErrorToAscError(parseInt(input["data"])), c_oAscError.Level.NoCritical);
+          t.handlers.trigger("asc_onError", mapAscServerErrorToAscError(parseInt(input["data"])), c_oAscError.Level.NoCritical);
         }
       } else {
         t.handlers.trigger("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
       }
       t.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
     };
-    sendCommand2(this, null, rData);
+    sendCommand(this, null, rData);
   };
 
   spreadsheet_api.prototype.asc_showImageFileDialog = function() {
@@ -2522,14 +2528,14 @@ var editor;
               t.handlers.trigger("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
             }
           } else {
-            t.handlers.trigger("asc_onError", g_fMapAscServerErrorToAscError(parseInt(input["data"])), c_oAscError.Level.NoCritical);
+            t.handlers.trigger("asc_onError", mapAscServerErrorToAscError(parseInt(input["data"])), c_oAscError.Level.NoCritical);
           }
         } else {
           t.handlers.trigger("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
         }
         t.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
       };
-      sendCommand2(this, null, rData);
+      sendCommand(this, null, rData);
     }
     else{
       ws.objectRender.setGraphicObjectProps(props);
@@ -3110,7 +3116,7 @@ var editor;
         AscCommonExcel.cFormulaFunctionToLocale[i] = localName;
       }
     }
-	  build_local_rx(oLocalizedData?oLocalizedData["LocalFormulaOperands"]:null);
+    AscCommon.build_local_rx(oLocalizedData?oLocalizedData["LocalFormulaOperands"]:null);
     if (this.wb) {
       this.wb.initFormulasList();
     }

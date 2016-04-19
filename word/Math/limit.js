@@ -49,7 +49,7 @@ function CLimitPrimary(bInside, Type, FName, Iterator)
 
     this.init(FName, Iterator);
 }
-Asc.extendClass(CLimitPrimary, CMathBase);
+AscCommon.extendClass(CLimitPrimary, CMathBase);
 CLimitPrimary.prototype.kind      = MATH_PRIMARY_LIMIT;
 CLimitPrimary.prototype.init = function(FName, Iterator)
 {
@@ -175,16 +175,16 @@ function CLimit(props)
 {
     CLimit.superclass.constructor.call(this);
 
-	this.Id = g_oIdCounter.Get_NewId();
+	this.Id = AscCommon.g_oIdCounter.Get_NewId();
 
     this.Pr = new CMathLimitPr();
 
     if(props !== null && typeof(props) !== "undefined")
         this.init(props);
 
-	g_oTableId.Add( this, this.Id );
+    AscCommon.g_oTableId.Add( this, this.Id );
 }
-Asc.extendClass(CLimit, CMathBase);
+AscCommon.extendClass(CLimit, CMathBase);
 
 CLimit.prototype.ClassType = historyitem_type_lim;
 CLimit.prototype.kind      = MATH_LIMIT;
@@ -303,7 +303,7 @@ function CMathMenuLimit(Limit)
         this.Pos = undefined;
     }
 }
-Asc.extendClass(CMathMenuLimit, CMathMenuBase);
+AscCommon.extendClass(CMathMenuLimit, CMathMenuBase);
 
 CMathMenuLimit.prototype.get_Pos = function(){return this.Pos;};
 CMathMenuLimit.prototype.put_Pos = function(Pos){this.Pos = Pos;};
@@ -322,16 +322,16 @@ function CMathFunc(props)
 {
     CMathFunc.superclass.constructor.call(this);
 
-	this.Id = g_oIdCounter.Get_NewId();
+	this.Id = AscCommon.g_oIdCounter.Get_NewId();
 
     this.Pr = new CMathBasePr();
 
     if(props !== null && typeof(props) !== "undefined")
         this.init(props);
 
-	g_oTableId.Add( this, this.Id );
+    AscCommon.g_oTableId.Add( this, this.Id );
 }
-Asc.extendClass(CMathFunc, CMathBase);
+AscCommon.extendClass(CMathFunc, CMathBase);
 
 CMathFunc.prototype.ClassType = historyitem_type_mathFunc;
 CMathFunc.prototype.kind      = MATH_FUNCTION;

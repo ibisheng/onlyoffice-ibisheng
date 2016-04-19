@@ -16,6 +16,7 @@ var c_oAscLineDrawingRule = AscCommon.c_oAscLineDrawingRule;
 var align_Right = AscCommon.align_Right;
 var align_Left = AscCommon.align_Left;
 var align_Center = AscCommon.align_Center;
+var g_oTableId = AscCommon.g_oTableId;
 
 var linerule_Exact = Asc.linerule_Exact;
 var c_oAscRelativeFromV = Asc.c_oAscRelativeFromV;
@@ -29,7 +30,7 @@ var REVIEW_COLOR = new AscCommon.CColor(255, 0, 0, 255);
 // Класс Paragraph
 function Paragraph(DrawingDocument, Parent, PageNum, X, Y, XLimit, YLimit, bFromPresentation)
 {
-    this.Id = g_oIdCounter.Get_NewId();
+    this.Id = AscCommon.g_oIdCounter.Get_NewId();
 
     this.Prev = null;
     this.Next = null;
@@ -126,9 +127,9 @@ function Paragraph(DrawingDocument, Parent, PageNum, X, Y, XLimit, YLimit, bFrom
     this.ApplyToAll = false; // Специальный параметр, используемый в ячейках таблицы.
     // True, если ячейка попадает в выделение по ячейкам.
 
-    this.Lock = new CLock(); // Зажат ли данный параграф другим пользователем
+    this.Lock = new AscCommon.CLock(); // Зажат ли данный параграф другим пользователем
     // TODO: Когда у g_oIdCounter будет тоже проверка на TurnOff заменить здесь
-    if (false === g_oIdCounter.m_bLoad && true === History.Is_On())
+    if (false === AscCommon.g_oIdCounter.m_bLoad && true === History.Is_On())
     {
         this.Lock.Set_Type(AscCommon.locktype_Mine, false);
         if (CollaborativeEditing)
@@ -137,7 +138,7 @@ function Paragraph(DrawingDocument, Parent, PageNum, X, Y, XLimit, YLimit, bFrom
 
     this.DeleteCommentOnRemove    = true; // Удаляем ли комменты в функциях Internal_Content_Remove
 
-    this.m_oContentChanges = new CContentChanges(); // список изменений(добавление/удаление элементов)
+    this.m_oContentChanges = new AscCommon.CContentChanges(); // список изменений(добавление/удаление элементов)
 
     // Свойства необходимые для презентаций
     this.PresentationPr =
@@ -7776,7 +7777,7 @@ Paragraph.prototype =
     {
         if ( true === this.CompiledPr.NeedRecalc )
         {
-            if (undefined !== this.Parent && null !== this.Parent && true !== g_oIdCounter.m_bLoad && true !== g_oIdCounter.m_bRead)
+            if (undefined !== this.Parent && null !== this.Parent && true !== AscCommon.g_oIdCounter.m_bLoad && true !== AscCommon.g_oIdCounter.m_bRead)
             {
                 this.CompiledPr.Pr = this.Internal_CompileParaPr2();
                 if(!this.bFromDocument)

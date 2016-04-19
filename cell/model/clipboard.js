@@ -2151,7 +2151,7 @@
 							var sFrom = aImagesToDownload[i];
 							if (null != elem.url) 
 							{
-								var name = g_oDocumentUrls.imagePath2Local(elem.path);
+								var name = AscCommon.g_oDocumentUrls.imagePath2Local(elem.path);
 								t.oImages[sFrom] = name;
 							} 
 							else 
@@ -2263,7 +2263,7 @@
 			ReadFromBinaryWord : function(sBase64, worksheet)
 			{
 			    History.TurnOff();
-                g_oIdCounter.m_bRead = true;
+				AscCommon.g_oIdCounter.m_bRead = true;
 				//передавать CDrawingDocument текущего worksheet
 				var oTempDrawingDocument = worksheet.model.DrawingDocument;
 				
@@ -2287,7 +2287,7 @@
 				
 				window.global_pptx_content_loader.End_UseFullUrl();
 				History.TurnOn();
-                g_oIdCounter.m_bRead = false;
+				AscCommon.g_oIdCounter.m_bRead = false;
 			    editor = oOldEditor;
 
 			    return oRes;
@@ -2632,7 +2632,7 @@
 							if(isImage)
 								imageUrl = cloneImg.graphicObject.getImageUrl();
 							if(isImage && imageUrl)
-								url = getFullImageSrc2(imageUrl);
+								url = AscCommon.getFullImageSrc2(imageUrl);
 							else
 								url = cloneImg.graphicObject.getBase64Img();
 							curImage.alt = altAttr;
@@ -4952,7 +4952,7 @@
 												tempAr[k] = s_arr[k].y;
 											}
 										}
-										tempAr.sort(fSortAscending);
+										tempAr.sort(AscCommon.fSortAscending);
 										newArr = [];
 										for(var k = 0; k < tempAr.length; k++)
 										{

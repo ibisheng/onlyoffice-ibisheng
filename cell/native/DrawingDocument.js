@@ -2120,7 +2120,7 @@ function CDrawingDocument(drawingObjects)
             var _len = _imgs.length;
             for (var j = 0; j < _len; j++)
             {
-                if (getFullImageSrc2(_imgs[j]) == src)
+                if (AscCommon.getFullImageSrc2(_imgs[j]) == src)
                 {
                     this.StopRenderingPage(i);
                     bIsRaster = true;

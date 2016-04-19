@@ -17,7 +17,7 @@ asc_docs_api.prototype._OfflineAppDocumentStartLoad = function()
 };
 asc_docs_api.prototype._OfflineAppDocumentEndLoad = function(_url, _data)
 {
-	g_oIdCounter.m_sUserId = window["AscDesktopEditor"]["CheckUserId"]();
+	AscCommon.g_oIdCounter.m_sUserId = window["AscDesktopEditor"]["CheckUserId"]();
 	if (_data == "")
 	{
 		this.sendEvent("asc_onError", c_oAscError.ID.ConvertationError, c_oAscError.Level.Critical);
@@ -31,12 +31,12 @@ asc_docs_api.prototype._OfflineAppDocumentEndLoad = function(_url, _data)
 };
 window["DesktopOfflineAppDocumentEndLoad"] = function(_url, _data)
 {
-    g_oDocumentUrls.documentUrl = _url;
-	if (g_oDocumentUrls.documentUrl.indexOf("file:") != 0)
+	AscCommon.g_oDocumentUrls.documentUrl = _url;
+	if (AscCommon.g_oDocumentUrls.documentUrl.indexOf("file:") != 0)
 	{
-		if (g_oDocumentUrls.documentUrl.indexOf("/") != 0)
-			g_oDocumentUrls.documentUrl = "/" + g_oDocumentUrls.documentUrl;
-		g_oDocumentUrls.documentUrl = "file://" + g_oDocumentUrls.documentUrl;
+		if (AscCommon.g_oDocumentUrls.documentUrl.indexOf("/") != 0)
+			AscCommon.g_oDocumentUrls.documentUrl = "/" + AscCommon.g_oDocumentUrls.documentUrl;
+		AscCommon.g_oDocumentUrls.documentUrl = "file://" + AscCommon.g_oDocumentUrls.documentUrl;
 	}
 	
     editor._OfflineAppDocumentEndLoad(_url, _data);
@@ -173,7 +173,7 @@ asc_docs_api.prototype.asc_DownloadAs = function(typeFile, bIsDownloadEvent)
 asc_docs_api.prototype.AddImageUrl = function(url, imgProp)
 {
 	var _url = window["AscDesktopEditor"]["LocalFileGetImageUrl"](url);
-	this.AddImageUrlAction(g_oDocumentUrls.getImageUrl(_url), imgProp);
+	this.AddImageUrlAction(AscCommon.g_oDocumentUrls.getImageUrl(_url), imgProp);
 };
 asc_docs_api.prototype.AddImage = function()
 {
@@ -201,7 +201,7 @@ window["DesktopOfflineAppDocumentAddImageEnd"] = function(url)
 	if (url == "")
 		return;
 	var _url = window["AscDesktopEditor"]["LocalFileGetImageUrl"](url);
-	editor.AddImageUrlAction(g_oDocumentUrls.getImageUrl(_url));
+	editor.AddImageUrlAction(AscCommon.g_oDocumentUrls.getImageUrl(_url));
 };
 
 window["on_editor_native_message"] = function(sCommand, sParam)

@@ -373,7 +373,7 @@ function CRadical(props)
 {
     CRadical.superclass.constructor.call(this);
 
-	this.Id = g_oIdCounter.Get_NewId();
+	this.Id = AscCommon.g_oIdCounter.Get_NewId();
 
     this.Iterator = null;
     this.Base     = null;
@@ -391,9 +391,9 @@ function CRadical(props)
     if(props !== null && props !== undefined)
         this.init(props);
 
-	g_oTableId.Add( this, this.Id );
+    AscCommon.g_oTableId.Add( this, this.Id );
 }
-Asc.extendClass(CRadical, CMathBase);
+AscCommon.extendClass(CRadical, CMathBase);
 
 CRadical.prototype.ClassType = historyitem_type_rad;
 CRadical.prototype.kind      = MATH_RADICAL;
@@ -752,7 +752,7 @@ function CMathMenuRadical(Radical)
         this.HideDegree = undefined;
     }
 }
-Asc.extendClass(CMathMenuRadical, CMathMenuBase);
+AscCommon.extendClass(CMathMenuRadical, CMathMenuBase);
 CMathMenuRadical.prototype.get_HideDegree = function(){return this.HideDegree;};
 CMathMenuRadical.prototype.put_HideDegree = function(Hide){this.HideDegree = Hide;};
 

@@ -98,8 +98,8 @@ function CTextBody()
     };
     this.textPropsForRecalc = [];
     this.bRecalculateNumbering = true;
-    this.Id = g_oIdCounter.Get_NewId();
-    g_oTableId.Add(this, this.Id);
+    this.Id = AscCommon.g_oIdCounter.Get_NewId();
+    AscCommon.g_oTableId.Add(this, this.Id);
 }
 
 CTextBody.prototype =
@@ -474,15 +474,15 @@ CTextBody.prototype =
                             if(isRealNumber(font_scale))
                             {
                                 var bReset = false;
-                                if(g_oIdCounter.m_bLoad)
+                                if(AscCommon.g_oIdCounter.m_bLoad)
                                 {
                                     bReset = true;
-                                    g_oIdCounter.m_bLoad = false;
+                                    AscCommon.g_oIdCounter.m_bLoad = false;
                                 }
                                  var redFontSize = Math.round(parg.Get_CompiledPr(false).TextPr.FontSize*font_scale);
                                 if(bReset)
                                 {
-                                    g_oIdCounter.m_bLoad = true;
+                                    AscCommon.g_oIdCounter.m_bLoad = true;
                                 }
                                 this.checkParagraphContent(parg, font_scale, true, redFontSize);
                             }

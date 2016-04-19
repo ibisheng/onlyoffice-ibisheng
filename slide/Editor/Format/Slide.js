@@ -1,5 +1,8 @@
 "use strict";
 
+// Import
+var g_oTableId = AscCommon.g_oTableId;
+
 function Slide(presentation, slideLayout, slideNum)
 {
     this.kind = SLIDE_KIND;
@@ -35,7 +38,7 @@ function Slide(presentation, slideLayout, slideNum)
     this.writecomments = [];
     this.maxId = 1000;
 
-    this.m_oContentChanges = new CContentChanges(); // список изменений(добавление/удаление элементов)
+    this.m_oContentChanges = new AscCommon.CContentChanges(); // список изменений(добавление/удаление элементов)
 
     this.commentX = 0;
     this.commentY = 0;
@@ -47,8 +50,8 @@ function Slide(presentation, slideLayout, slideNum)
     this.transitionLock = null;
     this.layoutLock     = null;
 
-    this.Lock = new CLock();
-    this.Id = g_oIdCounter.Get_NewId();
+    this.Lock = new AscCommon.CLock();
+    this.Id = AscCommon.g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id);
 
     if(presentation)
@@ -672,7 +675,7 @@ Slide.prototype =
                 {
                     if(Fill && Fill.fill && Fill.fill.type === Asc.c_oAscFill.FILL_TYPE_BLIP && typeof Fill.fill.RasterImageId === "string" && Fill.fill.RasterImageId.length > 0)
                     {
-						CollaborativeEditing.Add_NewImage(getFullImageSrc2(Fill.fill.RasterImageId));
+						CollaborativeEditing.Add_NewImage(AscCommon.getFullImageSrc2(Fill.fill.RasterImageId));
                     }
                 }
                 break;
@@ -903,7 +906,7 @@ Slide.prototype =
     {
         if(this.cSld.Bg && this.cSld.Bg.bgPr && this.cSld.Bg.bgPr.Fill && this.cSld.Bg.bgPr.Fill.fill instanceof  CBlipFill && typeof this.cSld.Bg.bgPr.Fill.fill.RasterImageId === "string" )
         {
-            images[getFullImageSrc2(this.cSld.Bg.bgPr.Fill.fill.RasterImageId)] = true;
+            images[AscCommon.getFullImageSrc2(this.cSld.Bg.bgPr.Fill.fill.RasterImageId)] = true;
         }
         for(var i = 0; i < this.cSld.spTree.length; ++i)
         {
@@ -1386,8 +1389,8 @@ Slide.prototype =
 function PropLocker(objectId)
 {
     this.objectId = null;
-    this.Lock = new CLock();
-    this.Id = g_oIdCounter.Get_NewId();
+    this.Lock = new AscCommon.CLock();
+    this.Id = AscCommon.g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id);
 
     if(typeof  objectId === "string")
@@ -1517,9 +1520,9 @@ CTextBody.prototype.checkCurrentPlaceholder = function()
 function SlideComments(slide)
 {
     this.comments = [];
-    this.m_oContentChanges = new CContentChanges(); // список изменений(добавление/удаление элементов)
+    this.m_oContentChanges = new AscCommon.CContentChanges(); // список изменений(добавление/удаление элементов)
     this.slide = slide;
-    this.Id = g_oIdCounter.Get_NewId();
+    this.Id = AscCommon.g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id);
 }
 

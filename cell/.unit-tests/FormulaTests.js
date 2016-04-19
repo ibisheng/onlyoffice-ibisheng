@@ -384,6 +384,8 @@ $( function () {
     var parserFormula = AscCommonExcel.parserFormula;
     var GetDiffDate360 = AscCommonExcel.GetDiffDate360;
     var bDate1904 = AscCommon.bDate1904;
+    var fSortAscending = AscCommon.fSortAscending;
+    var g_oIdCounter = AscCommon.g_oIdCounter;
 
     var oParser, wb, ws, dif = 1e-9,
         data = getTestWorkbook(),
@@ -394,7 +396,7 @@ $( function () {
 
         History = new CHistory(wb);
 
-        g_oTableId = new CTableId();
+        AscCommon.g_oTableId.init();
         if ( this.User )
             g_oIdCounter.Set_UserId(this.User.asc_getId());
 
@@ -2442,7 +2444,7 @@ $( function () {
 
         function mode( x ) {
 
-            x.sort(fSortDescending);
+            x.sort(AscCommon.fSortDescending);
 
             if ( x.length < 1 )
                 return "#VALUE!";

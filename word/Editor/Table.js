@@ -24,6 +24,7 @@
 // Import
 var align_Left = AscCommon.align_Left;
 var CMouseMoveData = AscCommon.CMouseMoveData;
+var g_oTableId = AscCommon.g_oTableId;
 
 var linerule_AtLeast = Asc.linerule_AtLeast;
 var c_oAscError = Asc.c_oAscError;
@@ -49,7 +50,7 @@ var type_Table = 0x0002;
 //----------------------------------------------------------------------------------------------------------------------
 function CTable(DrawingDocument, Parent, Inline, PageNum, X, Y, XLimit, YLimit, Rows, Cols, TableGrid, bPresentation)
 {
-    this.Id = g_oIdCounter.Get_NewId();
+    this.Id = AscCommon.g_oIdCounter.Get_NewId();
 
     this.Markup = new CTableMarkup(this);
 
@@ -59,9 +60,9 @@ function CTable(DrawingDocument, Parent, Inline, PageNum, X, Y, XLimit, YLimit, 
     this.Index  = -1; // перед тем как пользоваться этим параметром нужно у родительского класса вызывать this.Parent.Update_ContentIndexing();
     this.Inline = Inline;
 
-    this.Lock = new CLock();
+    this.Lock = new AscCommon.CLock();
     // TODO: Когда у g_oIdCounter будет тоже проверка на TurnOff заменить здесь
-    if (false === g_oIdCounter.m_bLoad && true === History.Is_On())
+    if (false === AscCommon.g_oIdCounter.m_bLoad && true === History.Is_On())
     {
         this.Lock.Set_Type(AscCommon.locktype_Mine, false);
         if (CollaborativeEditing)
@@ -214,7 +215,7 @@ function CTable(DrawingDocument, Parent, Inline, PageNum, X, Y, XLimit, YLimit, 
     this.ApplyToAll = false; // Специальный параметр, используемый в ячейках таблицы.
                              // True, если ячейка попадает в выделение по ячейкам.
 
-    this.m_oContentChanges = new CContentChanges(); // список изменений(добавление/удаление элементов)
+    this.m_oContentChanges = new AscCommon.CContentChanges(); // список изменений(добавление/удаление элементов)
     // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
     g_oTableId.Add( this, this.Id );
 }
@@ -8945,7 +8946,7 @@ CTable.prototype =
     {
         if ( true === this.CompiledPr.NeedRecalc )
         {
-            if (true === g_oIdCounter.m_bLoad && true === g_oIdCounter.m_bRead)
+            if (true === AscCommon.g_oIdCounter.m_bLoad && true === AscCommon.g_oIdCounter.m_bRead)
             {
                 this.CompiledPr.Pr = {
                     TextPr          : g_oDocumentDefaultTextPr,

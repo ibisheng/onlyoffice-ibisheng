@@ -533,7 +533,7 @@
 
             for (var id in _images)
             {
-                this.images_loading[this.images_loading.length] = getFullImageSrc2(_images[id]);
+                this.images_loading[this.images_loading.length] = AscCommon.getFullImageSrc2(_images[id]);
             }
 
             if (!this.bIsAsyncLoadDocumentImages)

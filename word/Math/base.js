@@ -85,7 +85,7 @@ function CMathBase(bInside)
 
     return this;
 }
-Asc.extendClass(CMathBase, CParagraphContentWithParagraphLikeContent);
+AscCommon.extendClass(CMathBase, CParagraphContentWithParagraphLikeContent);
 CMathBase.prototype.setContent = function()
 {
     for(var i=0; i < this.nRow; i++)
@@ -1414,7 +1414,7 @@ CMathBase.prototype.Read_FromBinary2 = function( Reader )
     this.Content = [];
     for (var nIndex = 0; nIndex < nCount; nIndex++)
     {
-        this.Content[nIndex] = g_oTableId.Get_ById(Reader.GetString2());
+        this.Content[nIndex] = AscCommon.g_oTableId.Get_ById(Reader.GetString2());
         this.Content[nIndex].ParentElement = this;
         this.Content[nIndex].Parent        = this;
     }

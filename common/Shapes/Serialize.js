@@ -770,7 +770,7 @@ function BinaryPPTYLoader()
             }
 
             var font_cuts = this.Api.FontLoader.embedded_cut_manager;
-            font_cuts.Url = g_oDocumentUrls.getUrl("fonts/fonts.js");
+            font_cuts.Url = AscCommon.g_oDocumentUrls.getUrl("fonts/fonts.js");
             font_cuts.init_cut_fonts(_embedded_fonts);
             font_cuts.bIsCutFontsUse = true;
         }

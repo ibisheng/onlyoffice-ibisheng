@@ -30,10 +30,10 @@ function CImageShape()
     this.snapArrayY = [];
 
     this.setRecalculateInfo();
-    this.Lock = new CLock();
+    this.Lock = new AscCommon.CLock();
 
-    this.Id = g_oIdCounter.Get_NewId();
-    g_oTableId.Add( this, this.Id );
+    this.Id = AscCommon.g_oIdCounter.Get_NewId();
+    AscCommon.g_oTableId.Add( this, this.Id );
 }
 
 CImageShape.prototype =
@@ -666,7 +666,7 @@ CImageShape.prototype =
     {
         if(this.blipFill instanceof  CBlipFill && typeof this.blipFill.RasterImageId === "string")
         {
-            images[getFullImageSrc2(this.blipFill.RasterImageId)] = true;
+            images[AscCommon.getFullImageSrc2(this.blipFill.RasterImageId)] = true;
         }
     },
 
@@ -984,7 +984,7 @@ CImageShape.prototype =
                     {
                         if(typeof this.blipFill.RasterImageId === "string" && this.blipFill.RasterImageId.length > 0)
                         {
-							CollaborativeEditing.Add_NewImage(getFullImageSrc2(this.blipFill.RasterImageId));
+							CollaborativeEditing.Add_NewImage(AscCommon.getFullImageSrc2(this.blipFill.RasterImageId));
                         }
                     }
                 }

@@ -193,7 +193,7 @@ CShape.prototype.addToDrawingObjects =  function(pos)
     var position = addToDrawings(this.worksheet, this, pos, /*lockByDefault*/undefined, undefined);
     var data = {Type: historyitem_AutoShapes_AddToDrawingObjects, Pos: position};
     History.Add(this, data);
-    this.worksheet.addContentChanges(new CContentChangesElement(AscCommon.contentchanges_Add, data.Pos, 1, data));
+    this.worksheet.addContentChanges(new AscCommon.CContentChangesElement(AscCommon.contentchanges_Add, data.Pos, 1, data));
 };
 
 
@@ -204,7 +204,7 @@ CShape.prototype.deleteDrawingBase = function()
     {
         var data = {Type: historyitem_AutoShapes_RemoveFromDrawingObjects, Pos: position};
         History.Add(this, data);
-        this.worksheet.addContentChanges(new CContentChangesElement(AscCommon.contentchanges_Remove, data.Pos, 1, data));
+        this.worksheet.addContentChanges(new AscCommon.CContentChangesElement(AscCommon.contentchanges_Remove, data.Pos, 1, data));
     }
     return position;
 };

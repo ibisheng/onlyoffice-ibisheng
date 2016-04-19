@@ -6,6 +6,7 @@ var align_Right = AscCommon.align_Right;
 var align_Left = AscCommon.align_Left;
 var align_Center = AscCommon.align_Center;
 var align_Justify = AscCommon.align_Justify;
+var g_oDocumentUrls = AscCommon.g_oDocumentUrls;
 
 var c_oAscError = Asc.c_oAscError;
 var c_oAscShdClear = Asc.c_oAscShdClear;
@@ -786,7 +787,7 @@ CopyProcessor.prototype =
         {
             case para_Text:
                 //���������� �����������
-                var sValue = encodeSurrogateChar(ParaItem.Value);
+                var sValue = AscCommon.encodeSurrogateChar(ParaItem.Value);
                 if(sValue)
 					oTarget.addChild(new CopyElement(CopyPasteCorrectString(sValue), true));
                 break;
@@ -2523,7 +2524,7 @@ function sendImgUrls(api, images, callback, bExcel) {
         }
         g_oDocumentUrls.addUrls(urls);
       } else {
-        nError = g_fMapAscServerErrorToAscError(parseInt(input["data"]));
+        nError = AscCommon.mapAscServerErrorToAscError(parseInt(input["data"]));
       }
     } else {
       nError = c_oAscError.ID.Unknown;
@@ -2543,7 +2544,7 @@ function sendImgUrls(api, images, callback, bExcel) {
     }
     callback(data);
   };
-  sendCommand2(api, null, rData);
+  AscCommon.sendCommand(api, null, rData);
 }
 function PasteProcessor(api, bUploadImage, bUploadFonts, bNested, pasteInExcel)
 {
@@ -3554,7 +3555,7 @@ PasteProcessor.prototype =
                                 var b_read_layouts = false;
                                 for(var i = 0; i < arr_layouts_id.length; ++i)
                                 {
-                                    var tempLayout = g_oTableId.Get_ById(arr_layouts_id[i]);
+                                    var tempLayout = AscCommon.g_oTableId.Get_ById(arr_layouts_id[i]);
 									if(!tempLayout || !tempLayout.Master)
                                     {
                                         b_read_layouts = true;
@@ -3598,12 +3599,12 @@ PasteProcessor.prototype =
                                     var addedLayouts = [];
                                     for(var i = 0; i < slide_count; ++i)
                                     {
-                                        var tempLayout = g_oTableId.Get_ById(arr_layouts_id[i]);
+                                        var tempLayout = AscCommon.g_oTableId.Get_ById(arr_layouts_id[i]);
 										if(tempLayout && tempLayout.Master)
                                         {
                                             arr_slides[i].changeSize(presentation.Width, presentation.Height);
                                             arr_slides[i].setSlideSize(presentation.Width, presentation.Height);
-                                            arr_slides[i].setLayout(g_oTableId.Get_ById(arr_layouts_id[i]));
+                                            arr_slides[i].setLayout(AscCommon.g_oTableId.Get_ById(arr_layouts_id[i]));
                                         }
                                         else
                                         {
@@ -3622,7 +3623,7 @@ PasteProcessor.prototype =
                                     {
                                         arr_slides[i].changeSize(presentation.Width, presentation.Height);
                                         arr_slides[i].setSlideSize(presentation.Width, presentation.Height);
-                                        arr_slides[i].setLayout(g_oTableId.Get_ById(arr_layouts_id[i]));
+                                        arr_slides[i].setLayout(AscCommon.g_oTableId.Get_ById(arr_layouts_id[i]));
 										//arr_slides[i].Layout.setMaster(master);
                                         arr_slides[i].Width = presentation.Width;
                                         arr_slides[i].Height = presentation.Height;
@@ -3736,9 +3737,9 @@ PasteProcessor.prototype =
 					//создаём темповый CDocument
 					this.oDocument = ExecuteNoHistory(tempCDocument , this, []);
 
-                    g_oIdCounter.m_bRead = true;
+          AscCommon.g_oIdCounter.m_bRead = true;
 					var aContent = ExecuteNoHistory(this.ReadFromBinary, this, [base64FromWord]);
-                    g_oIdCounter.m_bRead = false;
+          AscCommon.g_oIdCounter.m_bRead = false;
 					//возврщаем обратно переменные и историю, документ которой заменяется при создании CDocument
 					this.oDocument = trueDocument;
 					History.Document = trueDocument;
@@ -4323,11 +4324,11 @@ PasteProcessor.prototype =
 					{
 						var nUnicode = null;
 						var nCharCode = value.charCodeAt(k);
-						if (isLeadingSurrogateChar(nCharCode)) {
+						if (AscCommon.isLeadingSurrogateChar(nCharCode)) {
 							if (k + 1 < length) {
 								k++;
 								var nTrailingChar = value.charCodeAt(k);
-								nUnicode = decodeSurrogateChar(nCharCode, nTrailingChar);
+								nUnicode = AscCommon.decodeSurrogateChar(nCharCode, nTrailingChar);
 							}
 						}
 						else
@@ -6363,11 +6364,11 @@ PasteProcessor.prototype =
                         {
                             var nUnicode = null;
                             var nCharCode = value.charCodeAt(i);
-                            if (isLeadingSurrogateChar(nCharCode)) {
+                            if (AscCommon.isLeadingSurrogateChar(nCharCode)) {
                                 if (i + 1 < length) {
                                     i++;
                                     var nTrailingChar = value.charCodeAt(i);
-                                    nUnicode = decodeSurrogateChar(nCharCode, nTrailingChar);
+                                    nUnicode = AscCommon.decodeSurrogateChar(nCharCode, nTrailingChar);
                                 }
                             }
                             else
@@ -6776,11 +6777,11 @@ PasteProcessor.prototype =
                         {
                             var nUnicode = null;
                             var nCharCode = value.charCodeAt(i);
-                            if (isLeadingSurrogateChar(nCharCode)) {
+                            if (AscCommon.isLeadingSurrogateChar(nCharCode)) {
                                 if (i + 1 < length) {
                                     i++;
                                     var nTrailingChar = value.charCodeAt(i);
-                                    nUnicode = decodeSurrogateChar(nCharCode, nTrailingChar);
+                                    nUnicode = AscCommon.decodeSurrogateChar(nCharCode, nTrailingChar);
                                 }
                             }
                             else

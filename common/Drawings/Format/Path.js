@@ -26,8 +26,8 @@ function Path()
     this.ArrPathCommand = [];
 
 
-    this.Id = g_oIdCounter.Get_NewId();
-    g_oTableId.Add(this, this.Id);
+    this.Id = AscCommon.g_oIdCounter.Get_NewId();
+    AscCommon.g_oTableId.Add(this, this.Id);
 }
 
 Path.prototype = {

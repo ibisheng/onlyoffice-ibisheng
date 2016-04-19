@@ -13,7 +13,7 @@ if(window.editor === "undefined" && window["Asc"]["editor"])
 }
 
 // ToDo убрать это отсюда!!!
-CContentChangesElement.prototype.Refresh_BinaryData = function()
+AscCommon.CContentChangesElement.prototype.Refresh_BinaryData = function()
 {
 	this.m_pData.Pos = this.m_aPositions[0];
 

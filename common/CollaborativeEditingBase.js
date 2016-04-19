@@ -44,7 +44,7 @@ CCollaborativeChanges.prototype.Apply_Data = function()
     if (historyitem_type_HdrFtr === Type)
         Class = editor.WordControl.m_oLogicDocument.HdrFtr;
     else
-        Class = g_oTableId.Get_ById(ClassId);
+        Class = AscCommon.g_oTableId.Get_ById(ClassId);
 
     LoadData.Reader.Seek2(ReaderPos);
 
@@ -388,7 +388,7 @@ CCollaborativeEditingBase.prototype.Apply_Changes = function()
 CCollaborativeEditingBase.prototype.Apply_OtherChanges = function()
 {
     // Чтобы заново созданные параграфы не отображались залоченными
-    g_oIdCounter.Set_Load( true );
+    AscCommon.g_oIdCounter.Set_Load( true );
 
     // Применяем изменения, пока они есть
     var _count = this.m_aChanges.length;
@@ -416,7 +416,7 @@ CCollaborativeEditingBase.prototype.Apply_OtherChanges = function()
 
     this.OnEnd_ReadForeignChanges();
 
-    g_oIdCounter.Set_Load( false );
+    AscCommon.g_oIdCounter.Set_Load( false );
 };
 CCollaborativeEditingBase.prototype.getOwnLocksLength = function()
 {
@@ -506,7 +506,7 @@ CCollaborativeEditingBase.prototype.Lock_NeedLock = function()
 {
     for ( var Id in this.m_aNeedLock )
     {
-        var Class = g_oTableId.Get_ById( Id );
+        var Class = AscCommon.g_oTableId.Get_ById( Id );
 
         if ( null != Class )
         {

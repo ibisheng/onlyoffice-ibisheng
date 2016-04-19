@@ -33,7 +33,7 @@ function CParagraphContentWithContentBase()
     this.StartRange  = -1;
 }
 
-Asc.extendClass(CParagraphContentWithContentBase, CParagraphContentBase);
+AscCommon.extendClass(CParagraphContentWithContentBase, CParagraphContentBase);
 
 CParagraphContentWithContentBase.prototype.Recalculate_Reset = function(StartRange, StartLine)
 {
@@ -181,7 +181,7 @@ function CParagraphContentWithParagraphLikeContent()
 
     this.Type              = undefined;
     this.Paragraph         = null;                  // Ссылка на родительский класс параграф.
-    this.m_oContentChanges = new CContentChanges(); // Список изменений(добавление/удаление элементов)
+    this.m_oContentChanges = new AscCommon.CContentChanges(); // Список изменений(добавление/удаление элементов)
     this.Content           = [];                    // Содержимое данного элемента.
 
     this.State             = new CParaRunState();   // Состояние курсора/селекта.
@@ -191,7 +191,7 @@ function CParagraphContentWithParagraphLikeContent()
     this.SearchMarks       = [];
 }
 
-Asc.extendClass(CParagraphContentWithParagraphLikeContent, CParagraphContentWithContentBase);
+AscCommon.extendClass(CParagraphContentWithParagraphLikeContent, CParagraphContentWithContentBase);
 
 CParagraphContentWithParagraphLikeContent.prototype.Get_Type = function()
 {

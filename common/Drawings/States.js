@@ -59,7 +59,7 @@ StartAddNewShape.prototype =
             if(this.drawingObjects.drawingObjects.objectLocker)
             {
                 this.drawingObjects.drawingObjects.objectLocker.reset();
-                this.drawingObjects.drawingObjects.objectLocker.addObjectId(g_oIdCounter.Get_NewId());
+                this.drawingObjects.drawingObjects.objectLocker.addObjectId(AscCommon.g_oIdCounter.Get_NewId());
             }
             var oThis = this;
             var track =  oThis.drawingObjects.arrTrackObjects[0];

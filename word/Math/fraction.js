@@ -36,7 +36,7 @@ function CFraction(props)
 {
     CFraction.superclass.constructor.call(this);
 
-	this.Id = g_oIdCounter.Get_NewId();
+	this.Id = AscCommon.g_oIdCounter.Get_NewId();
 
     this.Numerator   = null;
     this.Denominator = null;
@@ -46,9 +46,9 @@ function CFraction(props)
     if(props !== null && typeof(props) !== "undefined")
         this.init(props);
 
-	g_oTableId.Add( this, this.Id );
+    AscCommon.g_oTableId.Add( this, this.Id );
 }
-Asc.extendClass(CFraction, CMathBase);
+AscCommon.extendClass(CFraction, CMathBase);
 
 CFraction.prototype.ClassType = historyitem_type_frac;
 CFraction.prototype.kind      = MATH_FRACTION;
@@ -616,7 +616,7 @@ function CMathMenuFraction(Fraction)
         this.FractionType = undefined;
     }
 }
-Asc.extendClass(CMathMenuFraction, CMathMenuBase);
+AscCommon.extendClass(CMathMenuFraction, CMathMenuBase);
 
 CMathMenuFraction.prototype.get_FractionType = function(){return this.FractionType;};
 CMathMenuFraction.prototype.put_FractionType = function(Type){this.FractionType = Type;};
@@ -638,7 +638,7 @@ function CFractionBase(bInside, MathContent)
     this.gap = 0;
     this.init(MathContent);
 }
-Asc.extendClass(CFractionBase, CMathBase);
+AscCommon.extendClass(CFractionBase, CMathBase);
 CFractionBase.prototype.init = function(MathContent)
 {
     this.setDimension(1, 1);
@@ -671,7 +671,7 @@ function CNumerator(MathContent)
 {
     CNumerator.superclass.constructor.call(this, true, MathContent);
 }
-Asc.extendClass(CNumerator, CFractionBase);
+AscCommon.extendClass(CNumerator, CFractionBase);
 CNumerator.prototype.recalculateSize = function()
 {
     var arg = this.elements[0][0].size;
@@ -727,7 +727,7 @@ function CDenominator(MathContent)
 {
     CDenominator.superclass.constructor.call(this, true, MathContent);
 }
-Asc.extendClass(CDenominator, CFractionBase);
+AscCommon.extendClass(CDenominator, CFractionBase);
 CDenominator.prototype.recalculateSize = function()
 {
     var arg = this.elements[0][0].size;

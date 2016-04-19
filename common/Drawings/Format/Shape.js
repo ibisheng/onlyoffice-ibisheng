@@ -622,9 +622,9 @@ function CShape()
 
     this.setRecalculateInfo();
 
-    this.Lock = new CLock();
-    this.Id = g_oIdCounter.Get_NewId();
-    g_oTableId.Add( this, this.Id );
+    this.Lock = new AscCommon.CLock();
+    this.Id = AscCommon.g_oIdCounter.Get_NewId();
+    AscCommon.g_oTableId.Add( this, this.Id );
 }
 
 CShape.prototype =
@@ -1033,7 +1033,7 @@ CShape.prototype =
 
     getAllImages: function (images) {
         if (this.spPr && this.spPr.Fill && this.spPr.Fill.fill instanceof CBlipFill && typeof this.spPr.Fill.fill.RasterImageId === "string") {
-            images[getFullImageSrc2(this.spPr.Fill.fill.RasterImageId)] = true;
+            images[AscCommon.getFullImageSrc2(this.spPr.Fill.fill.RasterImageId)] = true;
         }
     },
 

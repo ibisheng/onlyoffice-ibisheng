@@ -9,9 +9,9 @@
                 "../common/docscoapicommon.js",
                 "../common/docscoapi.js",
                 "../common/apiCommon.js",
+				"../common/editorscommon.js",
 				
 				"../cell/apiDefines.js",
-                "../common/editorscommon.js",
                 "../common/NumFormat.js",
                 "../common/Charts/charts.js",
                 "../common/Charts/DrawingArea.js",

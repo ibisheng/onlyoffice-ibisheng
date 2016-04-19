@@ -306,7 +306,7 @@ function CMatrixBase()
 
     this.Set_DefaultSpace();
 }
-Asc.extendClass(CMatrixBase, CMathBase);
+AscCommon.extendClass(CMatrixBase, CMathBase);
 CMatrixBase.prototype.recalculateSize = function(oMeasure, RPI)
 {
     if(this.RecalcInfo.bProps)
@@ -610,7 +610,7 @@ function CMathMatrix(props)
 {
     CMathMatrix.superclass.constructor.call(this);
 
-	this.Id             = g_oIdCounter.Get_NewId();
+	this.Id             = AscCommon.g_oIdCounter.Get_NewId();
     this.Pr             = new CMathMatrixPr();
 
     this.column         = 0;
@@ -618,9 +618,9 @@ function CMathMatrix(props)
     if(props !== null && props !== undefined)
         this.init(props);
 
-	g_oTableId.Add( this, this.Id );
+    AscCommon.g_oTableId.Add( this, this.Id );
 }
-Asc.extendClass(CMathMatrix, CMatrixBase);
+AscCommon.extendClass(CMathMatrix, CMatrixBase);
 
 CMathMatrix.prototype.ClassType = historyitem_type_matrix;
 CMathMatrix.prototype.kind      = MATH_MATRIX;
@@ -1145,7 +1145,7 @@ function CMathMenuMatrix(MathMatrix)
         this.bHidePlh       = undefined;
     }
 }
-Asc.extendClass(CMathMenuMatrix, CMathMenuBase);
+AscCommon.extendClass(CMathMenuMatrix, CMathMenuBase);
 CMathMenuMatrix.prototype.get_MatrixAlign     = function(){return this.BaseJc;};
 CMathMenuMatrix.prototype.put_MatrixAlign     = function(Align){this.BaseJc = Align;};
 CMathMenuMatrix.prototype.get_ColumnAlign     = function(){return this.ColumnJc;};
@@ -1281,7 +1281,7 @@ function CEqArray(props)
 {
     CEqArray.superclass.constructor.call(this);
 
-	this.Id = g_oIdCounter.Get_NewId();
+	this.Id = AscCommon.g_oIdCounter.Get_NewId();
     this.Pr = new CMathEqArrPr();
 
     // for ampersand in Run
@@ -1293,9 +1293,9 @@ function CEqArray(props)
     if(props !== null && props !== undefined)
         this.init(props);
 
-	g_oTableId.Add( this, this.Id );
+    AscCommon.g_oTableId.Add( this, this.Id );
 }
-Asc.extendClass(CEqArray, CMatrixBase);
+AscCommon.extendClass(CEqArray, CMatrixBase);
 
 CEqArray.prototype.ClassType = historyitem_type_eqArr;
 CEqArray.prototype.kind      = MATH_EQ_ARRAY;
@@ -1657,7 +1657,7 @@ function CMathMenuEqArray(EqArray)
         this.RowGap  = undefined;
     }
 }
-Asc.extendClass(CMathMenuEqArray, CMathMenuBase);
+AscCommon.extendClass(CMathMenuEqArray, CMathMenuBase);
 CMathMenuEqArray.prototype.get_Align    = function(){return this.BaseJc;};
 CMathMenuEqArray.prototype.put_Align    = function(Align){this.BaseJc = Align;};
 CMathMenuEqArray.prototype.get_LineRule = function(){return this.RowRule;};

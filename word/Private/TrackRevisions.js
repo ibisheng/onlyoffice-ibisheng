@@ -319,7 +319,7 @@ CDocument.prototype.Accept_AllRevisionChanges = function()
         var LogicDocuments = this.TrackRevisionsManager.Get_AllChangesLogicDocuments();
         for (var LogicDocId in LogicDocuments)
         {
-            var LogicDoc = g_oTableId.Get_ById(LogicDocId);
+            var LogicDoc = AscCommon.g_oTableId.Get_ById(LogicDocId);
             if (LogicDoc)
             {
                 LogicDoc.Accept_RevisionChanges(undefined, true);
@@ -348,7 +348,7 @@ CDocument.prototype.Reject_AllRevisionChanges = function()
         var LogicDocuments = this.TrackRevisionsManager.Get_AllChangesLogicDocuments();
         for (var LogicDocId in LogicDocuments)
         {
-            var LogicDoc = g_oTableId.Get_ById(LogicDocId);
+            var LogicDoc = AscCommon.g_oTableId.Get_ById(LogicDocId);
             if (LogicDoc)
             {
                 LogicDoc.Reject_RevisionChanges(undefined, true);

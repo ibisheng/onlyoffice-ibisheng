@@ -6,6 +6,7 @@ var asc = window["Asc"] ? window["Asc"] : (window["Asc"] = {});
 var c_oAscSizeRelFromH = AscCommon.c_oAscSizeRelFromH;
 var c_oAscSizeRelFromV = AscCommon.c_oAscSizeRelFromV;
 var c_oAscLockTypes = AscCommon.c_oAscLockTypes;
+var parserHelp = AscCommon.parserHelp;
 
 var c_oAscError = Asc.c_oAscError;
 var c_oAscChartTitleShowSettings = Asc.c_oAscChartTitleShowSettings;
