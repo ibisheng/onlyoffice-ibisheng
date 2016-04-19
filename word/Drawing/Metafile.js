@@ -1490,10 +1490,16 @@ function CDocumentRenderer()
     this.m_oTransform = null;
 
     this._restoreDumpedVectors = null;
+
+    this.m_oBaseTransform = null;
 }
 
 CDocumentRenderer.prototype =
 {
+    SetBaseTransform : function(_matrix)
+    {
+        this.m_oBaseTransform = _matrix;
+    },
     BeginPage : function(width,height)
     {
         this.m_arrayPages[this.m_arrayPages.length] = new CMetafile(width,height);
@@ -1543,7 +1549,22 @@ CDocumentRenderer.prototype =
     transform : function(sx,shy,shx,sy,tx,ty)
     {
         if (0 != this.m_lPagesCount)
+        {
+            if (null == this.m_oBaseTransform)
             this.m_arrayPages[this.m_lPagesCount - 1].transform(sx,shy,shx,sy,tx,ty);
+            else
+            {
+                var _transform = new CMatrix();
+                _transform.sx = sx;
+                _transform.shy = shy;
+                _transform.shx = shx;
+                _transform.sy = sy;
+                _transform.tx = tx;
+                _transform.ty = ty;
+                global_MatrixTransformer.MultiplyAppend(_transform, this.m_oBaseTransform);
+                this.m_arrayPages[this.m_lPagesCount - 1].transform(_transform.sx,_transform.shy,_transform.shx,_transform.sy,_transform.tx,_transform.ty);
+            }
+        }
     },
     transform3 : function(m)
     {
@@ -2106,7 +2127,10 @@ CDocumentRenderer.prototype =
     },
     RestoreGrState : function()
     {
+        var _t = this.m_oBaseTransform;
+        this.m_oBaseTransform = null;
         this.GrState.RestoreGrState();
+        this.m_oBaseTransform = _t;
     },
 
     StartClipPath : function()

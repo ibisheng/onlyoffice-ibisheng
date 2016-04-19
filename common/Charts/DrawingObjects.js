@@ -755,36 +755,22 @@ CSparklineView.prototype.draw = function(graphics, offX, offY)
             this.chartSpace.transform.ty = this.chartSpace.y;
         }
     }
-    //graphics.m_oCoordTransform.tx = x;
-    //graphics.m_oCoordTransform.ty = y;
-	
-	/*var _l = this.chartSpace.chartObj.calcProp.chartGutter._left;
-	var _t = this.chartSpace.chartObj.calcProp.chartGutter._top;
-	var _r = this.chartSpace.chartObj.calcProp.chartGutter._right;
-	var _b = this.chartSpace.chartObj.calcProp.chartGutter._bottom;*/
-	var _true_height = this.chartSpace.chartObj.calcProp.chartGutter.trueHeight;
-	var _true_width = this.chartSpace.chartObj.calcProp.chartGutter.trueWidht;
-	
-	
-	
+
+    var tx, ty, sx, sy, oldExtX, oldExtY;
+
+    var _true_height = this.chartSpace.chartObj.calcProp.chartGutter.trueHeight;
+    var _true_width = this.chartSpace.chartObj.calcProp.chartGutter.trueWidht;
+
+
 	this.chartSpace.chartObj.calcProp.trueWidht = this.chartSpace.extX * this.chartSpace.chartObj.calcProp.pxToMM;
 	this.chartSpace.chartObj.calcProp.trueHeight = this.chartSpace.extY * this.chartSpace.chartObj.calcProp.pxToMM;
-	
-	
-	/*this.chartSpace.chartObj.calcProp.chartGutter._left = 0;
-	this.chartSpace.chartObj.calcProp.chartGutter._top = 0;
-	this.chartSpace.chartObj.calcProp.chartGutter._right = 0;
-	this.chartSpace.chartObj.calcProp.chartGutter._bottom = 0;*/
-	
+
     this.chartSpace.draw(graphics);
-	
-	/*this.chartSpace.chartObj.calcProp.chartGutter._left = _l;
-	this.chartSpace.chartObj.calcProp.chartGutter._top = _t;
-	this.chartSpace.chartObj.calcProp.chartGutter._right = _r;
-	this.chartSpace.chartObj.calcProp.chartGutter._bottom = _b;*/
-	
+
 	this.chartSpace.chartObj.calcProp.trueWidht = _true_width;
 	this.chartSpace.chartObj.calcProp.trueHeight = _true_height;
+
+
 };
 
 
@@ -2536,7 +2522,7 @@ function DrawingObjects() {
         var graphics, i, j;
         if(oDrawingContext instanceof CPdfPrinter)
         {
-            graphics = oDrawingContext;
+            graphics = oDrawingContext.DocumentRenderer;
         }
         else
         {
@@ -2565,10 +2551,33 @@ function DrawingObjects() {
                 if (!oSparklineGroup.arrSparklines[j].checkInRange(range)) {
                     continue;
                 }
+
+                if(oDrawingContext instanceof CPdfPrinter)
+                {
+                    graphics.SaveGrState();
+                    var _baseTransform = new CMatrix();
+                    _baseTransform.sx /= nSparklineMultiplier;
+                    _baseTransform.sy /= nSparklineMultiplier;
+
+                    graphics.SetBaseTransform(_baseTransform);
+                }
+
                 oSparklineGroup.arrCachedSparklines[j].draw(graphics, _offX, _offY);
+
+                if(oDrawingContext instanceof CPdfPrinter)
+                {
+                    graphics.SetBaseTransform(null);
+                    graphics.RestoreGrState();
+                }
             }
         }
-        oDrawingContext.restore();
+        if(oDrawingContext instanceof CPdfPrinter)
+        {
+        }
+        else
+        {
+            oDrawingContext.restore();
+        }
     };
 
     _this.rebuildChartGraphicObjects = function(data)
