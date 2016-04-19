@@ -721,21 +721,39 @@ CSparklineView.prototype.draw = function(graphics, offX, offY)
     var y = this.ws.getCellTop(this.row, 3) - offY;
     var extX = this.ws.getColumnWidth(this.col, 3);
     var extY = this.ws.getRowHeight(this.row, 3);
-    if(Math.abs(this.extX - extX) > 0.01 || Math.abs(this.extY - extY) > 0.01
-        || Math.abs(this.x - x) > 0.01 || Math.abs(this.y - y) > 0.01)
+
+    var bExtent = Math.abs(this.extX - extX) > 0.01 || Math.abs(this.extY - extY) > 0.01;
+    var bPosition = Math.abs(this.x - x) > 0.01 || Math.abs(this.y - y) > 0.01;
+    if(bExtent || bPosition)
     {
         ExecuteNoHistory(function(){
-            this.chartSpace.spPr.xfrm.setOffX(x*nSparklineMultiplier);
-            this.chartSpace.spPr.xfrm.setOffY(y*nSparklineMultiplier);
-            this.chartSpace.spPr.xfrm.setExtX(extX*nSparklineMultiplier);
-            this.chartSpace.spPr.xfrm.setExtY(extY*nSparklineMultiplier);
+            if(bPosition)
+            {
+                this.chartSpace.spPr.xfrm.setOffX(x*nSparklineMultiplier);
+                this.chartSpace.spPr.xfrm.setOffY(y*nSparklineMultiplier);
+            }
+            if(bExtent)
+            {
+                this.chartSpace.spPr.xfrm.setExtX(extX*nSparklineMultiplier);
+                this.chartSpace.spPr.xfrm.setExtY(extY*nSparklineMultiplier);
+            }
         }, this, []);
         this.x = x;
         this.y = y;
         this.extX = extX;
         this.extY = extY;
-        this.chartSpace.transform.tx = x*nSparklineMultiplier;
-        this.chartSpace.transform.ty = y*nSparklineMultiplier;
+        if(bExtent)
+        {
+            this.chartSpace.handleUpdateExtents();
+            this.chartSpace.recalculate();
+        }
+        else
+        {
+            this.chartSpace.x = x*nSparklineMultiplier;
+            this.chartSpace.y = y*nSparklineMultiplier;
+            this.chartSpace.transform.tx = this.chartSpace.x;
+            this.chartSpace.transform.ty = this.chartSpace.y;
+        }
     }
     //graphics.m_oCoordTransform.tx = x;
     //graphics.m_oCoordTransform.ty = y;
