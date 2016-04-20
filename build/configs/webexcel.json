@@ -13,8 +13,10 @@
 				"../common/NumFormat.js",
 				"../common/wordcopypaste.js",
 				
+				"../common/Charts/charts.js",
+				
 				"../cell/apiDefines.js",
-                "../common/Charts/charts.js",
+                
                 "../common/Charts/DrawingArea.js",
                 "../common/Charts/DrawingObjects.js",
                 "../common/Charts/ChartsDrawer.js",

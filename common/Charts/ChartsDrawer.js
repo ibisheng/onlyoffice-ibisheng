@@ -6,6 +6,19 @@ var globalGapDepth = 150;
 var isTurnOn3DCharts = true;
 var standartMarginForCharts = 13;
 
+function arrReverse(arr) {
+	if(!arr || !arr.length)
+		return;
+	var newarr = [];
+	for (var i = 0; i < arr[0].length; ++i) {
+		newarr[i] = [];
+		for (var j = 0; j < arr.length; ++j) {
+			newarr[i][j] = arr[j][i];
+		}
+	}
+	return newarr;
+}
+
 //*****MAIN*****
 function CChartsDrawer()
 {

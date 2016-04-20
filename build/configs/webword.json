@@ -16,6 +16,8 @@
 				"../common/NumFormat.js",
 				"../common/wordcopypaste.js",
 				
+				"../common/Charts/charts.js",
+				
 				"../word/apiDefines.js",
                 
                 "../common/Shapes/Serialize.js",
@@ -31,7 +33,7 @@
                 "../word/Drawing/Externals.js",
                 "../common/GlobalLoaders.js",
                 "../word/Drawing/translations.js",
-                "../common/Charts/charts.js",
+                
                 "../common/Charts/ChartsDrawer.js",
                 "../common/Charts/3DTransformation.js",
                 "../common/Charts/DrawingArea.js",

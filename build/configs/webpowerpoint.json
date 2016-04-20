@@ -13,6 +13,8 @@
 				"../common/NumFormat.js",
 				"../common/wordcopypaste.js",
 				
+				"../common/Charts/charts.js",
+				
 				"../slide/apiDefines.js",
 				
                 "../common/FontsFreeType/font_engine.js",
@@ -25,7 +27,7 @@
                 "../common/Charts/DrawingObjects.js",
                 "../common/SerializeCommonWordExcel.js",
                 "../common/SerializeChart.js",
-                "../common/Charts/charts.js",
+                
                 "../common/Charts/ChartsDrawer.js",
                 "../common/Charts/3DTransformation.js",
                 "../common/Charts/DrawingArea.js",

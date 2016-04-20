@@ -67,8 +67,8 @@ function baseEditorsApi(name) {
   // Chart
   this.chartTranslate = new asc_CChartTranslate();
   this.textArtTranslate = new Asc.asc_TextArtTranslate();
-  this.chartPreviewManager = new ChartPreviewManager();
-  this.textArtPreviewManager = new TextArtPreviewManager();
+  this.chartPreviewManager = new AscCommon.ChartPreviewManager();
+  this.textArtPreviewManager = new AscCommon.TextArtPreviewManager();
   // Режим вставки диаграмм в редакторе документов
   this.isChartEditor = false;
   this.isOpenedChartFrame = false;

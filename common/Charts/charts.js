@@ -1,5 +1,11 @@
 "use strict";
 
+(
+/**
+* @param {Window} window
+* @param {undefined} undefined
+*/
+function (window, undefined) {
 // Import
 var c_oAscChartTypeSettings = Asc.c_oAscChartTypeSettings;
 var c_oAscTickMark = Asc.c_oAscTickMark;
@@ -461,19 +467,6 @@ ChartPreviewManager.prototype.getChartPreviews = function(chartType) {
 		return null;
 };
 
-function arrReverse(arr) {
-	if(!arr || !arr.length)
-		return;
-	var newarr = [];
-	for (var i = 0; i < arr[0].length; ++i) {
-		newarr[i] = [];
-		for (var j = 0; j < arr.length; ++j) {
-			newarr[i][j] = arr[j][i];
-		}
-	}
-	return newarr;
-}
-
 function CreateAscColorByIndex(nIndex)
 {
 	var oColor = new Asc.asc_CColor();
@@ -633,7 +626,7 @@ TextArtPreviewManager.prototype.initStyles = function()
 	oTextPr.TextOutline = CreateNoFillLine();
 	this.aStylesByIndex[11] = oTextPr;
 	this.aStylesByIndexToApply[11] = oTextPr;
-}
+};
 
 TextArtPreviewManager.prototype.getStylesToApply = function()
 {
@@ -1020,3 +1013,8 @@ function GenerateWordArtPrewiewCode()
 	return oRetString;
 }
 
+	//----------------------------------------------------------export----------------------------------------------------
+	window['AscCommon'] = window['AscCommon'] || {};
+	window['AscCommon'].ChartPreviewManager = ChartPreviewManager;
+	window['AscCommon'].TextArtPreviewManager = TextArtPreviewManager;
+})(window);

@@ -5633,8 +5633,8 @@ function OfflineEditor () {
         };
 
         // chat styles
-        ChartPreviewManager.prototype.clearPreviews = function() {window["native"]["ClearCacheChartStyles"]();};
-        ChartPreviewManager.prototype.createChartPreview = function(_graphics, type, styleIndex) {
+        AscCommon.ChartPreviewManager.prototype.clearPreviews = function() {window["native"]["ClearCacheChartStyles"]();};
+        AscCommon.ChartPreviewManager.prototype.createChartPreview = function(_graphics, type, styleIndex) {
             return ExecuteNoHistory(function(){
                 if(!this.chartsByTypes[type])
                     this.chartsByTypes[type] = this.getChartByType(type);
@@ -5683,7 +5683,7 @@ function OfflineEditor () {
             }, this, []);
 
         };
-        ChartPreviewManager.prototype.getChartPreviews = function(chartType) {
+        AscCommon.ChartPreviewManager.prototype.getChartPreviews = function(chartType) {
 
             if (isRealNumber(chartType))
             {
