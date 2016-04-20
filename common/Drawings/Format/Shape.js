@@ -646,6 +646,15 @@ CShape.prototype =
         this.Id = r.GetString2();
     },
 
+    Get_AllDrawingObjects: function(DrawingObjects)
+    {
+        var oContent = this.getDocContent();
+        if(oContent)
+        {
+            oContent.Get_AllDrawingObjects(DrawingObjects);
+        }
+    },
+
     convertToWord: function (document) {
         this.setBDeleted(true);
         var c = new CShape();

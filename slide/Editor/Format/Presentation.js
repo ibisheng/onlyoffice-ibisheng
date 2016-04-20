@@ -3719,6 +3719,32 @@ CPresentation.prototype =
         }, this, []);
     },
 
+
+    CreateAndAddShapeFromSelectedContent : function(oDocContent)
+    {
+        var track_object = new NewShapeTrack("textRect", 0, 0, this.Slides[this.CurPage].Layout.Master.Theme, this.Slides[this.CurPage].Layout.Master, this.Slides[this.CurPage].Layout, this.Slides[this.CurPage], this.CurPage);
+        track_object.track({}, 0, 0);
+        var shape = track_object.getShape(false, this.DrawingDocument, this.Slides[this.CurPage]);
+        shape.setParent(this.Slides[this.CurPage]);
+        var paragraph = shape.txBody.content.Content[0];
+        var NearPos = { Paragraph: paragraph, ContentPos: paragraph.Get_ParaContentPos(false, false) };
+        paragraph.Check_NearestPos(NearPos);
+        var old_val = oDocContent.MoveDrawing;
+        oDocContent.MoveDrawing = true;
+        shape.txBody.content.Insert_Content(oDocContent, NearPos);
+        oDocContent.MoveDrawing = old_val;
+        var body_pr = shape.getBodyPr();
+        var w = shape.txBody.getMaxContentWidth(this.Width/2, true) + body_pr.lIns + body_pr.rIns;
+        var h = shape.txBody.content.Get_SummaryHeight() + body_pr.tIns + body_pr.bIns;
+        shape.spPr.xfrm.setExtX(w);
+        shape.spPr.xfrm.setExtY(h);
+        shape.spPr.xfrm.setOffX((this.Width - w) / 2);
+        shape.spPr.xfrm.setOffY((this.Height - h) / 2);
+        shape.setParent(this.Slides[this.CurPage]);
+        shape.addToDrawingObjects();
+        return shape;
+    },
+
     Insert_Content : function(Content)
     {
         var selected_slides = editor.WordControl.Thumbnails.GetSelectedArray(), i;
@@ -3764,6 +3790,11 @@ CPresentation.prototype =
                     Content.Drawings[i].Drawing.checkExtentsByDocContent && Content.Drawings[i].Drawing.checkExtentsByDocContent();
                     this.Slides[this.CurPage].graphicObjects.selectObject(Content.Drawings[i].Drawing, 0);
                 }
+                if(Content.DocContent)
+                {
+                    var shape = this.CreateAndAddShapeFromSelectedContent(Content.DocContent);
+                    this.Slides[this.CurPage].graphicObjects.selectObject(shape, 0);
+                }
             }
             else if(Content.DocContent)
             {
@@ -3786,26 +3817,7 @@ CPresentation.prototype =
                 }
                 else
                 {
-                    var track_object = new NewShapeTrack("textRect", 0, 0, this.Slides[this.CurPage].Layout.Master.Theme, this.Slides[this.CurPage].Layout.Master, this.Slides[this.CurPage].Layout, this.Slides[this.CurPage], this.CurPage);
-                    track_object.track({}, 0, 0);
-                    var shape = track_object.getShape(false, this.DrawingDocument, this.Slides[this.CurPage]);
-                    shape.setParent(this.Slides[this.CurPage]);
-                    paragraph = shape.txBody.content.Content[0];
-                    NearPos = { Paragraph: paragraph, ContentPos: paragraph.Get_ParaContentPos(false, false) };
-                    paragraph.Check_NearestPos(NearPos);
-                    var old_val = Content.DocContent.MoveDrawing;
-                    Content.DocContent.MoveDrawing = true;
-                    shape.txBody.content.Insert_Content(Content.DocContent, NearPos);
-                    Content.DocContent.MoveDrawing = old_val;
-                    var body_pr = shape.getBodyPr();
-                    var w = shape.txBody.getMaxContentWidth(this.Width/2, true) + body_pr.lIns + body_pr.rIns;
-                    var h = shape.txBody.content.Get_SummaryHeight() + body_pr.tIns + body_pr.bIns;
-                    shape.spPr.xfrm.setExtX(w);
-                    shape.spPr.xfrm.setExtY(h);
-                    shape.spPr.xfrm.setOffX((this.Width - w) / 2);
-                    shape.spPr.xfrm.setOffY((this.Height - h) / 2);
-                    shape.setParent(this.Slides[this.CurPage]);
-                    shape.addToDrawingObjects();
+                    var shape = this.CreateAndAddShapeFromSelectedContent(Content.DocContent);
                     this.Slides[this.CurPage].graphicObjects.resetSelection();
                     this.Slides[this.CurPage].graphicObjects.selectObject(shape, 0);
                 }

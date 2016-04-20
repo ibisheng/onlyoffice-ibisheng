@@ -4194,6 +4194,18 @@ ParaDrawing.prototype =
         return null;
     },
 
+    Get_AllDrawingObjects: function(DrawingObjects)
+    {
+        if(null == DrawingObjects)
+        {
+            DrawingObjects = [];
+        }
+        if(this.GraphicObj.Get_AllDrawingObjects)
+        {
+            this.GraphicObj.Get_AllDrawingObjects(DrawingObjects);
+        }
+    },
+
     canRotate: function()
     {
         return isRealObject(this.GraphicObj) && typeof this.GraphicObj.canRotate == "function" && this.GraphicObj.canRotate();

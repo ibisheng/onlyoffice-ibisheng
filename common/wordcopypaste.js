@@ -3742,25 +3742,15 @@ PasteProcessor.prototype =
 					var presentationSelectedContent = new PresentationSelectedContent();
 					presentationSelectedContent.DocContent = new CSelectedContent();
 					
-					var elements = [], selectedElement, element, drawings, pDrawings = [], drawingCopyObject;
+					var elements = [], selectedElement, element, drawings = [], pDrawings = [], drawingCopyObject;
 					var defaultTableStyleId = presentation.DefaultTableStyleId;
 					for(var i = 0; i < aContent.content.length; ++i)
 					{
 						selectedElement = new CSelectedElement();
 						element = aContent.content[i];
-						
 						//drawings
-						drawings = element.Get_AllDrawingObjects();
-						if(drawings && drawings.length)
-						{
-							for(var j = 0; j < drawings.length; j++)
-							{
-								drawingCopyObject = new DrawingCopyObject();
-								drawingCopyObject.Drawing = drawings[j].GraphicObj;
-								pDrawings.push(drawingCopyObject);
-							}
-						}
-						else if(type_Paragraph == element.GetType())//paragraph
+                        element.Get_AllDrawingObjects(drawings);
+						if(type_Paragraph == element.GetType())//paragraph
 						{
 							selectedElement.Element = ConvertParagraphToPPTX(element);
 							elements.push(selectedElement);
@@ -3791,7 +3781,16 @@ PasteProcessor.prototype =
 							
 						}							
 					}
-					
+
+                    if(drawings && drawings.length)
+                    {
+                        for(var j = 0; j < drawings.length; j++)
+                        {
+                            drawingCopyObject = new DrawingCopyObject();
+                            drawingCopyObject.Drawing = drawings[j].GraphicObj;
+                            pDrawings.push(drawingCopyObject);
+                        }
+                    }
 					presentationSelectedContent.DocContent.Elements = elements;
 					presentationSelectedContent.Drawings = pDrawings;
 

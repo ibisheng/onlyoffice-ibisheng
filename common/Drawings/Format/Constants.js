@@ -1,4 +1,4 @@
-"use strict";
+﻿"use strict";
 
 var historyitem_ChartFormatSetChart = 1001;
 var historyitem_AutoShapes_SetDrawingBaseCoors = 1000;

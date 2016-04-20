@@ -63,6 +63,17 @@ CGroupShape.prototype =
         return this.Id;
     },
 
+    Get_AllDrawingObjects: function(DrawingObjects)
+    {
+        for(var i = 0; i < this.spTree.length; ++i)
+        {
+            if(this.spTree[i].Get_AllDrawingObjects)
+            {
+                this.spTree[i].Get_AllDrawingObjects(DrawingObjects);
+            }
+        }
+    },
+
     documentGetAllFontNames: function(allFonts)
     {
         for(var i = 0; i < this.spTree.length; ++i)
