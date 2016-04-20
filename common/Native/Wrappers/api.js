@@ -5378,7 +5378,7 @@ asc_docs_api.prototype["Native_Editor_Initialize_Settings"] = function(_params)
 /***************************** COPY|PASTE *******************************/
 asc_docs_api.prototype.Call_Menu_Context_Copy = function()
 {
-    var oCopyProcessor = new CopyProcessor(this, true);
+    var oCopyProcessor = new AscCommon.CopyProcessor(this, true);
     var _binary_data = oCopyProcessor.getSelectedBinary();
 
     var _stream = global_memory_stream_menu;
@@ -5410,7 +5410,7 @@ asc_docs_api.prototype.Call_Menu_Context_Copy = function()
 };
 asc_docs_api.prototype.Call_Menu_Context_Cut = function()
 {
-    var oCopyProcessor = new CopyProcessor(this, true);
+    var oCopyProcessor = new AscCommon.CopyProcessor(this, true);
     var _binary_data = oCopyProcessor.getSelectedBinary();
 
     this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
@@ -5456,7 +5456,7 @@ asc_docs_api.prototype.Call_Menu_Context_Paste = function(type, param)
     }
     else if (2 == type)
     {
-        var oPasteProcessor = new PasteProcessor(this, true, true, false);
+        var oPasteProcessor = new AscCommon.PasteProcessor(this, true, true, false);
         oPasteProcessor.Start(null, null, false, param);
     }
 };

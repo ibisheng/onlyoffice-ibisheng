@@ -3166,7 +3166,7 @@ function CDocMeta()
         }
         else if ( e.KeyCode == 67 && true === e.CtrlKey ) // Ctrl + C + ...
         {
-            Editor_Copy(editor);
+            AscCommon.Editor_Copy(editor);
             //íå âîçâðàùàåì true ÷òîáû íå áûëî preventDefault
         }
 		else if ( e.KeyCode == 80 && true === e.CtrlKey ) // Ctrl + P + ...

@@ -120,7 +120,7 @@ prot.getLocal = function(url){
 	return this.getImageLocal(url);
 };
 
-function sendImgUrls(api, images, callback)
+AscCommon.sendImgUrls = function(api, images, callback)
 {
 	var _data = [];
 	for (var i = 0; i < images.length; i++)
@@ -128,8 +128,8 @@ function sendImgUrls(api, images, callback)
 		var _url = window["AscDesktopEditor"]["LocalFileGetImageUrl"](images[i]);
 		_data[i] = { url: images[i], path : AscCommon.g_oDocumentUrls.getImageUrl(_url) };
 	}
-	callback(_data);  
-}
+	callback(_data);
+};
 
 /////////////////////////////////////////////////////////
 ////////////////        SAVE       //////////////////////

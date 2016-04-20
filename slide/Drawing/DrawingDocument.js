@@ -5171,7 +5171,7 @@ function CThumbnailsManager()
                     var doc = editor.WordControl.m_oLogicDocument;
                     if(this.m_oWordControl.m_oLogicDocument.viewMode === true || doc.Document_Is_SelectionLocked(AscCommon.changestype_RemoveSlide) === false)
                     {
-                        Editor_Copy(editor, this.m_oWordControl.m_oLogicDocument.viewMode === false);
+                        AscCommon.Editor_Copy(editor, this.m_oWordControl.m_oLogicDocument.viewMode === false);
                         return undefined;
                     }
                 }
@@ -5191,7 +5191,7 @@ function CThumbnailsManager()
 
 								window.GlobalPasteFlag = true;
                                 editor.incrementCounterLongAction();
-								Editor_Paste(this.m_oWordControl.m_oApi, true);
+                  AscCommon.Editor_Paste(this.m_oWordControl.m_oApi, true);
 								return undefined;
 								//не возвращаем true чтобы не было preventDefault
 							}
@@ -5201,10 +5201,10 @@ function CThumbnailsManager()
 								{
 									this.m_oWordControl.m_oLogicDocument.Create_NewHistoryPoint(historydescription_Presentation_PasteOnThumbnailsSafari);
 
-									SafariIntervalFocus();
+                    AscCommon.SafariIntervalFocus();
 									window.GlobalPasteFlag = true;
                                     editor.incrementCounterLongAction();
-									Editor_Paste(this.m_oWordControl.m_oApi, true);
+                    AscCommon.Editor_Paste(this.m_oWordControl.m_oApi, true);
 									return undefined;
 									//не возвращаем true чтобы не было preventDefault
 								}
@@ -5225,7 +5225,7 @@ function CThumbnailsManager()
             {
                 if(global_keyboardEvent.CtrlKey)
                 {
-                    Editor_Copy(editor);
+                    AscCommon.Editor_Copy(editor);
                     return undefined;
                 }
                 break;

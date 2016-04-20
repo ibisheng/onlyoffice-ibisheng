@@ -11,9 +11,10 @@
 				"../common/apiCommon.js",
 				"../common/editorscommon.js",
 				"../common/NumFormat.js",
+				"../common/wordcopypaste.js",
 				
 				"../slide/apiDefines.js",
-				"../common/wordcopypaste.js",
+				
                 "../common/FontsFreeType/font_engine.js",
                 "../common/FontsFreeType/FontFile.js",
                 "../common/FontsFreeType/FontManager.js",

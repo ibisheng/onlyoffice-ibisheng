@@ -11,6 +11,7 @@
                 "../common/apiCommon.js",
 				"../common/editorscommon.js",
 				"../common/NumFormat.js",
+				"../common/wordcopypaste.js",
 				
 				"../cell/apiDefines.js",
                 "../common/Charts/charts.js",
@@ -97,7 +98,6 @@
                 "../common/Drawings/Format/ChartFormat.js",
                 "../common/Drawings/Format/TextBody.js",
                 "../common/Drawings/TextDrawer.js",
-                "../common/wordcopypaste.js",
                 "../cell/view/DrawingObjectsController.js",
                 "../cell/model/DrawingObjects/Graphics.js",
                 "../common/Overlay.js",

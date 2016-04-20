@@ -25,6 +25,7 @@ var editor;
   var g_oTableId = AscCommon.g_oTableId;
   var oNumFormatCache = AscCommon.oNumFormatCache;
   var g_aCultureInfos = AscCommon.g_aCultureInfos;
+  var PasteElementsId = AscCommon.PasteElementsId;
 
   var c_oAscLockTypeElem = AscCommonExcel.c_oAscLockTypeElem;
 
@@ -1107,8 +1108,8 @@ var editor;
     // Какая-то непонятная заглушка, чтобы не падало в ipad
     if (this.isMobileVersion) {
       AscCommon.AscBrowser.isSafariMacOs = false;
-      PASTE_ELEMENT_ID = "wrd_pastebin";
-      ELEMENT_DISPAY_STYLE = "none";
+      PasteElementsId.PASTE_ELEMENT_ID = "wrd_pastebin";
+      PasteElementsId.ELEMENT_DISPAY_STYLE = "none";
     }
 
     if (AscCommon.AscBrowser.isSafariMacOs) {

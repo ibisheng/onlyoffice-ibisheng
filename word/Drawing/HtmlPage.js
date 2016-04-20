@@ -2130,7 +2130,7 @@ function CEditorPage(api)
         {
             if ( false === e.ShiftKey )
             {
-                Editor_Copy(oThis.m_oApi);
+                AscCommon.Editor_Copy(oThis.m_oApi);
                 //не возвращаем true чтобы не было preventDefault
             }
         }

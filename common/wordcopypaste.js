@@ -1,5 +1,11 @@
 "use strict";
 
+(/**
+* @param {Window} window
+* @param {undefined} undefined
+*/
+function(window, undefined) {
+
 // Import
 var AscBrowser = AscCommon.AscBrowser;
 var align_Right = AscCommon.align_Right;
@@ -106,31 +112,35 @@ window.GlobalCopyFlag = false; window.GlobalCopyFlag;
 
 window.PasteEndTimerId = -1; window.PasteEndTimerId;
 
-var COPY_ELEMENT_ID = "SelectId";
-var PASTE_ELEMENT_ID = "wrd_pastebin";
-var ELEMENT_DISPAY_STYLE = "none";
-var COPYPASTE_ELEMENT_CLASS = "sdk-element";
-var copyPasteUseBinary = true;
+var PasteElementsId = {
+  COPY_ELEMENT_ID : 'SelectId',
+  PASTE_ELEMENT_ID : 'wrd_pastebin',
+  ELEMENT_DISPAY_STYLE : 'none',
+  COPYPASTE_ELEMENT_CLASS : 'sdk-element',
+  copyPasteUseBinary : true,
+  g_bIsDocumentCopyPaste : true
+};
 
 if (AscBrowser.isSafariMacOs)
 {
-    PASTE_ELEMENT_ID = COPY_ELEMENT_ID;
-    ELEMENT_DISPAY_STYLE = "block";
+  PasteElementsId.PASTE_ELEMENT_ID = PasteElementsId.COPY_ELEMENT_ID;
+  PasteElementsId.ELEMENT_DISPAY_STYLE = "block";
 }
 
-var PASTE_EMPTY_COUNTER_MAX = 10;
-var PASTE_EMPTY_COUNTER     = 0;
-var PASTE_EMPTY_USE         = AscBrowser.isMozilla;
+var PASTE_EMPTY = {
+  PASTE_EMPTY_COUNTER_MAX : 10,
+  PASTE_EMPTY_COUNTER     : 0,
+  PASTE_EMPTY_USE         : AscBrowser.isMozilla
+};
 
-var g_bIsDocumentCopyPaste = true;
 function Editor_Copy_GetElem(api)
 {
-    var ElemToSelect = document.getElementById( COPY_ELEMENT_ID );
+    var ElemToSelect = document.getElementById( PasteElementsId.COPY_ELEMENT_ID );
     if ( !ElemToSelect )
     {
         ElemToSelect = document.createElement("div");
-        ElemToSelect.id = COPY_ELEMENT_ID;
-        ElemToSelect.className = COPYPASTE_ELEMENT_CLASS;
+        ElemToSelect.id = PasteElementsId.COPY_ELEMENT_ID;
+        ElemToSelect.className = PasteElementsId.COPYPASTE_ELEMENT_CLASS;
         ElemToSelect.style.position = "absolute";
         //���� ������� width ���������, �� �������� ����� ��������� ������������ �� span
         //� �������� � ����� ������ ��������� ������ <span>1</span><span> </span><span>2</span>
@@ -399,7 +409,7 @@ function Editor_Copy(api, bCut)
     {
         window.GlobalCopyFlag = false;
         //�������� ����������� ���������
-        ElemToSelect.style.display  = ELEMENT_DISPAY_STYLE;
+        ElemToSelect.style.display  = PasteElementsId.ELEMENT_DISPAY_STYLE;
         document.body.style.MozUserSelect = "none";
         document.body.style["-khtml-user-select"] = "none";
         document.body.style["-o-user-select"] = "none";
@@ -515,7 +525,7 @@ function Editor_Copy_Event(e, ElemToSelect)
 	var sBase64 = oCopyProcessor.Start();
 	ElemToSelect.innerHTML = oCopyProcessor.getInnerHtml();
 	
-	if(sBase64 !== false || g_bIsDocumentCopyPaste)
+	if(sBase64 !== false || PasteElementsId.g_bIsDocumentCopyPaste)
 	{
 		e.clipboardData.setData("text/x-custom", sBase64);
 		e.clipboardData.setData("text/html", ElemToSelect.innerHTML);
@@ -927,7 +937,7 @@ CopyProcessor.prototype =
 
         var oNumPr;
         var bIsNullNumPr = false;
-        if(g_bIsDocumentCopyPaste)
+        if(PasteElementsId.g_bIsDocumentCopyPaste)
         {
             oNumPr = Item.Numbering_Get();
             bIsNullNumPr = (null == oNumPr || 0 == oNumPr.NumId);
@@ -941,7 +951,7 @@ CopyProcessor.prototype =
         var sListStyle = "";
         if(!bIsNullNumPr)
         {
-            if(g_bIsDocumentCopyPaste)
+            if(PasteElementsId.g_bIsDocumentCopyPaste)
             {
 				var aNum = this.oDocument.Numbering.Get_AbstractNum( oNumPr.NumId );
 				if(null != aNum)
@@ -1135,7 +1145,7 @@ CopyProcessor.prototype =
         var cellPr = null;
 		
 		var tablePr = null;
-        if(!g_bIsDocumentCopyPaste && editor.WordControl.m_oLogicDocument && null != cell.CompiledPr && null != cell.CompiledPr.Pr)
+        if(!PasteElementsId.g_bIsDocumentCopyPaste && editor.WordControl.m_oLogicDocument && null != cell.CompiledPr && null != cell.CompiledPr.Pr)
 		{
 			var presentation = editor.WordControl.m_oLogicDocument;
 			var curSlide = presentation.Slides[presentation.CurPage];
@@ -1395,7 +1405,7 @@ CopyProcessor.prototype =
 	
 	CopyDocument2 : function(oDomTarget, oDocument, elementsContent, bFromPresentation)
     {	
-        if(g_bIsDocumentCopyPaste)
+        if(PasteElementsId.g_bIsDocumentCopyPaste)
 		{
 			if(!elementsContent && oDocument && oDocument.Content)
 				elementsContent = oDocument.Content;
@@ -1604,7 +1614,7 @@ CopyProcessor.prototype =
 	{
 		var oDocument = this.oDocument;
 		
-		if(g_bIsDocumentCopyPaste)
+		if(PasteElementsId.g_bIsDocumentCopyPaste)
 		{
 			var selectedContent = oDocument.Get_SelectedContent();
 				
@@ -1655,7 +1665,7 @@ CopyProcessor.prototype =
 		var oDocument = this.oDocument;
 		var bFromPresentation;
 		
-		if(g_bIsDocumentCopyPaste)
+		if(PasteElementsId.g_bIsDocumentCopyPaste)
 		{
 			var selectedContent = oDocument.Get_SelectedContent();
 			
@@ -1707,7 +1717,7 @@ CopyProcessor.prototype =
 				this.oRoot.aChildren[0].oAttributes["class"] = "pptData;" + sBase64;
         }
 		
-		if(g_bIsDocumentCopyPaste && copyPasteUseBinary && this.oBinaryFileWriter.copyParams.itemCount > 0 && !bFromPresentation)
+		if(PasteElementsId.g_bIsDocumentCopyPaste && PasteElementsId.copyPasteUseBinary && this.oBinaryFileWriter.copyParams.itemCount > 0 && !bFromPresentation)
 		{
 			var sBase64 = this.oBinaryFileWriter.GetResult();
 			if(this.oRoot.aChildren && this.oRoot.aChildren.length == 1 && AscBrowser.isSafariMacOs)
@@ -2025,11 +2035,11 @@ CopyProcessor.prototype =
 function Editor_Paste_GetElem(api, bClean)
 {
     var oWordControl = api.WordControl;
-    var pastebin = document.getElementById(PASTE_ELEMENT_ID);
+    var pastebin = document.getElementById(PasteElementsId.PASTE_ELEMENT_ID);
     if(!pastebin){
         pastebin = document.createElement("div");
-        pastebin.setAttribute( 'id', PASTE_ELEMENT_ID );
-        pastebin.className = COPYPASTE_ELEMENT_CLASS;
+        pastebin.setAttribute( 'id', PasteElementsId.PASTE_ELEMENT_ID );
+        pastebin.className = PasteElementsId.COPYPASTE_ELEMENT_CLASS;
 
         if (AscBrowser.isIE)
             pastebin.style.position = 'fixed';
@@ -2044,7 +2054,7 @@ function Editor_Paste_GetElem(api, bClean)
         pastebin.style.zIndex = -1000;
         //��������� ������ ������������, ����� �������� �������� ����� pastebin �������� span � ������� ��� �������� ������ � computedStyle ���������� ����������� ��������� ��������� �� ���������
         var Def_rPr;
-		if(g_bIsDocumentCopyPaste)
+		if(PasteElementsId.g_bIsDocumentCopyPaste)
 			Def_rPr = oWordControl.m_oLogicDocument.Styles.Default.TextPr;
 		else	
 			Def_rPr = oWordControl.m_oLogicDocument.globalTableStyles.Default.TextPr;
@@ -2116,7 +2126,7 @@ function Editor_Paste_Button(api)
         if (!AscBrowser.isSafariMacOs)
             pastebin.blur();
 
-        pastebin.style.display  = ELEMENT_DISPAY_STYLE;
+        pastebin.style.display  = PasteElementsId.ELEMENT_DISPAY_STYLE;
 
         document.body.style.MozUserSelect = "none";
         document.body.style["-khtml-user-select"] = "none";
@@ -2131,7 +2141,7 @@ function Editor_Paste_Button(api)
     }
 	else
 	{
-		var ElemToSelect = document.getElementById( COPY_ELEMENT_ID );
+		var ElemToSelect = document.getElementById( PasteElementsId.COPY_ELEMENT_ID );
 		if(ElemToSelect && ElemToSelect.innerHTML !== "&nbsp;" && ElemToSelect.innerHTML !== "")
 		{
 			History.Create_NewPoint(historydescription_PasteButtonNotIE);
@@ -2153,7 +2163,7 @@ function CanPaste(oDocument)
     //����� ������ paste ����� Select � ���������
     //�� ����� ������ paste ����� select �� ������� �������, ��������, ������
     var oTargetDoc = oDocument;
-    if(g_bIsDocumentCopyPaste)
+    if(PasteElementsId.g_bIsDocumentCopyPaste)
     {
         if ( docpostype_HdrFtr === oTargetDoc.CurPos.Type )
         {
@@ -2236,7 +2246,7 @@ function Editor_Paste(api, bClean)
     //���� ���������� paste
     var func_timeout = function() {
 
-        if (PASTE_EMPTY_USE && !oWordControl.bIsEventPaste)
+        if (PASTE_EMPTY.PASTE_EMPTY_USE && !oWordControl.bIsEventPaste)
         {
             // не править. это сделано для фаерфокса. ну не успевает он вставить
             // в дивку контент. и получалось, что мы через раз вставляем пробел.
@@ -2244,8 +2254,8 @@ function Editor_Paste(api, bClean)
             // но может с задержкой 1-2 секунды.
             if (pastebin.innerHTML == "&nbsp;")
             {
-                PASTE_EMPTY_COUNTER++;
-                if (PASTE_EMPTY_COUNTER < PASTE_EMPTY_COUNTER_MAX)
+              PASTE_EMPTY.PASTE_EMPTY_COUNTER++;
+                if (PASTE_EMPTY.PASTE_EMPTY_COUNTER < PASTE_EMPTY.PASTE_EMPTY_COUNTER_MAX)
                 {
                     window.PasteEndTimerId = window.setTimeout( func_timeout, 100 );
                     return;
@@ -2278,7 +2288,7 @@ function Editor_Paste(api, bClean)
             Editor_Paste_Exec(api, pastebin);
         }
         else
-            pastebin.style.display  = ELEMENT_DISPAY_STYLE;
+            pastebin.style.display  = PasteElementsId.ELEMENT_DISPAY_STYLE;
 
         window.PasteEndTimerId = -1;
     };
@@ -2288,7 +2298,7 @@ function Editor_Paste(api, bClean)
     if (-1 != window.PasteEndTimerId)
         clearTimeout(window.PasteEndTimerId);
 
-    PASTE_EMPTY_COUNTER = 0;
+  PASTE_EMPTY.PASTE_EMPTY_COUNTER = 0;
     window.PasteEndTimerId = window.setTimeout( func_timeout, _interval_time );
 }
 function CopyPasteCorrectString(str)
@@ -2596,7 +2606,7 @@ PasteProcessor.prototype =
 {
     _GetTargetDocument : function(oDocument)
     {
-        if(g_bIsDocumentCopyPaste)
+        if(PasteElementsId.g_bIsDocumentCopyPaste)
         {
             if(docpostype_HdrFtr === oDocument.CurPos.Type)
             {
@@ -2679,7 +2689,7 @@ PasteProcessor.prototype =
         if(nInsertLength > 0)
         {
             this.InsertInPlace(oDocument, this.aContent);
-            if(false == g_bIsDocumentCopyPaste)
+            if(false == PasteElementsId.g_bIsDocumentCopyPaste)
             {
                 oDocument.Recalculate();
                 if(oDocument.Parent != null && oDocument.Parent.txBody != null)
@@ -2707,7 +2717,7 @@ PasteProcessor.prototype =
     },
     InsertInPlace : function(oDoc, aNewContent)
     {
-        if(!g_bIsDocumentCopyPaste)
+        if(!PasteElementsId.g_bIsDocumentCopyPaste)
             return;
         var paragraph = oDoc.Content[oDoc.CurPos.ContentPos];
         if (null != paragraph && type_Paragraph == paragraph.GetType()) {
@@ -2933,7 +2943,7 @@ PasteProcessor.prototype =
 		//PASTE
 		if(null == nodeDisplay)
 			nodeDisplay = node;
-		if(g_bIsDocumentCopyPaste)//document
+		if(PasteElementsId.g_bIsDocumentCopyPaste)//document
         {
             var oThis = this;
 			//удаляем в начале, иначе может получиться что будем вставлять в элементы, которое потом удалим.
@@ -2947,7 +2957,7 @@ PasteProcessor.prototype =
             // {
             // oThis.InsertInDocument();
             // node.blur();
-            // node.style.display  = ELEMENT_DISPAY_STYLE;
+            // node.style.display  = PasteElementsId.ELEMENT_DISPAY_STYLE;
             // }
             // });
             // return;
@@ -2958,7 +2968,7 @@ PasteProcessor.prototype =
                     bTurnOffTrackRevisions = true;
                 }
             }
-            if(copyPasteUseBinary)
+            if(PasteElementsId.copyPasteUseBinary)
             {
                 if(onlyBinary)
 				{
@@ -3031,12 +3041,12 @@ PasteProcessor.prototype =
 							if(nodeDisplay)
 							{
 								nodeDisplay.blur();
-								nodeDisplay.style.display  = ELEMENT_DISPAY_STYLE;
+								nodeDisplay.style.display  = PasteElementsId.ELEMENT_DISPAY_STYLE;
 							}
                             if(oThis.aContent.bAddNewStyles)
                                 oThis.api.GenerateStyles();
                         }
-                    }
+                    };
 					
 					History.TurnOff();
 					aContentExcel = this._readFromBinaryExcel(base64FromExcel);
@@ -3046,7 +3056,7 @@ PasteProcessor.prototype =
 					if(aContentExcel.arrImages && aContentExcel.arrImages.length)
 					{
                         var oObjectsForDownload = GetObjectsForImageDownload(aContentExcel.arrImages);
-                        sendImgUrls(oThis.api, oObjectsForDownload.aUrls, function (data) {
+            AscCommon.sendImgUrls(oThis.api, oObjectsForDownload.aUrls, function (data) {
                             var oImageMap = {};
                             ResetNewUrls(data, oObjectsForDownload.aUrls, oObjectsForDownload.aBuilderImagesByUrl, oImageMap);
                             var aContent = oThis._convertExcelBinary(aContentExcel);
@@ -3074,7 +3084,7 @@ PasteProcessor.prototype =
 							if(nodeDisplay)
 							{
 								nodeDisplay.blur();
-								nodeDisplay.style.display  = ELEMENT_DISPAY_STYLE;
+								nodeDisplay.style.display  = PasteElementsId.ELEMENT_DISPAY_STYLE;
 							}
                             if(aContent.bAddNewStyles)
                                 oThis.api.GenerateStyles();
@@ -3105,7 +3115,7 @@ PasteProcessor.prototype =
 						}
 						else
 						{
-                            sendImgUrls(oThis.api, oObjectsForDownload.aUrls, function (data)
+              AscCommon.sendImgUrls(oThis.api, oObjectsForDownload.aUrls, function (data)
                             {
                                 ResetNewUrls(data, oObjectsForDownload.aUrls, oObjectsForDownload.aBuilderImagesByUrl, aContent.images);
                                 oThis.api.pre_Paste(aContent.fonts, aContent.images, fPrepasteCallback);
@@ -3131,7 +3141,7 @@ PasteProcessor.prototype =
 							if(nodeDisplay)
 							{
 								nodeDisplay.blur();
-								nodeDisplay.style.display  = ELEMENT_DISPAY_STYLE;
+								nodeDisplay.style.display  = PasteElementsId.ELEMENT_DISPAY_STYLE;
 							}
                             if(aContent.bAddNewStyles)
                                 oThis.api.GenerateStyles();
@@ -3216,7 +3226,7 @@ PasteProcessor.prototype =
 									}
 								}
 							}
-                            sendImgUrls(oThis.api, aImagesToDownload, function (data) {
+                          AscCommon.sendImgUrls(oThis.api, aImagesToDownload, function (data) {
                             var image_map = {};
                             for (var i = 0, length = Math.min(data.length, objects.arrImages.length); i < length; ++i) {
                               var elem = data[i];
@@ -3300,7 +3310,7 @@ PasteProcessor.prototype =
                     {
                         oThis.InsertInDocument();
 						nodeDisplay.blur();
-						nodeDisplay.style.display  = ELEMENT_DISPAY_STYLE;
+						nodeDisplay.style.display  = PasteElementsId.ELEMENT_DISPAY_STYLE;
                     }
                     if(bTurnOffTrackRevisions){
                         oThis.api.WordControl.m_oLogicDocument.TrackRevisions = true;
@@ -3314,7 +3324,7 @@ PasteProcessor.prototype =
         {
             var oThis = this;
             var presentation = editor.WordControl.m_oLogicDocument;
-            if(copyPasteUseBinary)
+            if(PasteElementsId.copyPasteUseBinary)
             {
                 var base64 = null, base64FromWord = null, base64FromExcel = null;
                 var classNode;
@@ -3390,7 +3400,7 @@ PasteProcessor.prototype =
                                     presentation.Document_UpdateInterfaceState();
 
                                     nodeDisplay.blur();
-                                    nodeDisplay.style.display  = ELEMENT_DISPAY_STYLE;
+                                    nodeDisplay.style.display  = PasteElementsId.ELEMENT_DISPAY_STYLE;
                                 }
                             };
 
@@ -3430,7 +3440,7 @@ PasteProcessor.prototype =
                                     presentation.Document_UpdateInterfaceState();
 
                                     nodeDisplay.blur();
-                                    nodeDisplay.style.display  = ELEMENT_DISPAY_STYLE;
+                                    nodeDisplay.style.display  = PasteElementsId.ELEMENT_DISPAY_STYLE;
                                 }
                             };
 
@@ -3441,7 +3451,7 @@ PasteProcessor.prototype =
                             var oObjectsForDownload = GetObjectsForImageDownload(objects.arrImages);
                             if(oObjectsForDownload.aUrls.length > 0)
                             {
-                              sendImgUrls(oThis.api, oObjectsForDownload.aUrls, function (data) {
+                              AscCommon.sendImgUrls(oThis.api, oObjectsForDownload.aUrls, function (data) {
                                 var oImageMap = {};
                                 ResetNewUrls(data, oObjectsForDownload.aUrls, oObjectsForDownload.aBuilderImagesByUrl, oImageMap);
                                 oThis.api.pre_Paste(fonts, oImageMap, paste_callback);
@@ -3691,7 +3701,7 @@ PasteProcessor.prototype =
                                     }
                                     presentation.Recalculate();
                                     nodeDisplay.blur();
-                                    nodeDisplay.style.display  = ELEMENT_DISPAY_STYLE;
+                                    nodeDisplay.style.display  = PasteElementsId.ELEMENT_DISPAY_STYLE;
                                 }*/
                             };
 
@@ -3702,7 +3712,7 @@ PasteProcessor.prototype =
                             var oObjectsForDownload = GetObjectsForImageDownload(objects.arrImages);
                             if(oObjectsForDownload.aUrls.length > 0)
                             {
-                                sendImgUrls(oThis.api, oObjectsForDownload.aUrls, function (data) {
+                              AscCommon.sendImgUrls(oThis.api, oObjectsForDownload.aUrls, function (data) {
                                     var oImageMap = {};
                                     ResetNewUrls(data, oObjectsForDownload.aUrls, oObjectsForDownload.aBuilderImagesByUrl, oImageMap);
                                     oThis.api.pre_Paste(fonts, oImageMap, paste_callback);
@@ -3810,7 +3820,7 @@ PasteProcessor.prototype =
 							presentation.Document_UpdateInterfaceState();
 
 							nodeDisplay.blur();
-							nodeDisplay.style.display  = ELEMENT_DISPAY_STYLE;
+							nodeDisplay.style.display  = PasteElementsId.ELEMENT_DISPAY_STYLE;
 						}
 					}
 					
@@ -3827,7 +3837,7 @@ PasteProcessor.prototype =
                     var oObjectsForDownload = GetObjectsForImageDownload(aContent.aPastedImages);
 					if(oObjectsForDownload.aUrls.length > 0)
 					{
-                        sendImgUrls(oThis.api, oObjectsForDownload.aUrls, function (data){
+            AscCommon.sendImgUrls(oThis.api, oObjectsForDownload.aUrls, function (data){
                             var oImageMap = {};
                             ResetNewUrls(data, oObjectsForDownload.aUrls, oObjectsForDownload.aBuilderImagesByUrl, oImageMap);
                             //ковертим изображения в презентационный формат
@@ -3919,7 +3929,7 @@ PasteProcessor.prototype =
 								presentation.Document_UpdateInterfaceState();
 
 								nodeDisplay.blur();
-								nodeDisplay.style.display  = ELEMENT_DISPAY_STYLE;
+								nodeDisplay.style.display  = PasteElementsId.ELEMENT_DISPAY_STYLE;
 							}
 						}
 
@@ -3935,7 +3945,7 @@ PasteProcessor.prototype =
                         var oObjectsForDownload = GetObjectsForImageDownload(arrImages);
 						if(oObjectsForDownload.aUrls.length > 0)
 						{
-                            sendImgUrls(oThis.api, oObjectsForDownload.aUrls, function (data) {
+              AscCommon.sendImgUrls(oThis.api, oObjectsForDownload.aUrls, function (data) {
                                 var oImageMap = {};
 								
 								History.TurnOff();
@@ -4060,7 +4070,7 @@ PasteProcessor.prototype =
                         presentation.Document_UpdateInterfaceState();
                     }
 					nodeDisplay.blur();
-					nodeDisplay.style.display  = ELEMENT_DISPAY_STYLE;	
+					nodeDisplay.style.display  = PasteElementsId.ELEMENT_DISPAY_STYLE;
             });
         }
     },
@@ -4615,7 +4625,7 @@ PasteProcessor.prototype =
                 if(loader.stream.GetBool())
                 {
 					//в случае если вставляем в презентации, пропускаем
-					if(!g_bIsDocumentCopyPaste)
+					if(!PasteElementsId.g_bIsDocumentCopyPaste)
 					{
 						loader.stream.Skip2(1);
 						loader.stream.SkipRecord();
@@ -4653,7 +4663,7 @@ PasteProcessor.prototype =
 			
 			if(style_index != null && arr_shapes[i].Drawing.graphicObject && arr_shapes[i].Drawing.graphicObject.Set_TableStyle)
 			{
-				if(!g_bIsDocumentCopyPaste)
+				if(!PasteElementsId.g_bIsDocumentCopyPaste)
 					arr_shapes[i].Drawing.graphicObject.Set_TableStyle(style_index, true);
 				else if(cStyle)
 				{
@@ -4747,7 +4757,7 @@ PasteProcessor.prototype =
 			}
 			if(aImagesToDownload.length > 0)
 			{
-        sendImgUrls(oThis.api, aImagesToDownload, function (data) {
+        AscCommon.sendImgUrls(oThis.api, aImagesToDownload, function (data) {
           var image_map = {};
           for (var i = 0, length = Math.min(data.length, aImagesToDownload.length); i < length; ++i) {
             var elem = data[i];
@@ -5158,7 +5168,7 @@ PasteProcessor.prototype =
                 if(this.oRootNode == oTempNode || "body" == oTempNode.nodeName.toLowerCase() || true == this._IsBlockElem(oTempNode.nodeName.toLowerCase()))
                     break;
             }
-            if(g_bIsDocumentCopyPaste)
+            if(PasteElementsId.g_bIsDocumentCopyPaste)
             {
                 if(background_color)
                 {
@@ -5222,7 +5232,7 @@ PasteProcessor.prototype =
         }
 
         //num
-        if(g_bIsDocumentCopyPaste)
+        if(PasteElementsId.g_bIsDocumentCopyPaste)
         {
             if(true == pNoHtmlPr.bNum)
             {
@@ -5438,7 +5448,7 @@ PasteProcessor.prototype =
     {
         var oDocument = this.oDocument;
         var rPr = new CTextPr();
-        if(false == g_bIsDocumentCopyPaste)
+        if(false == PasteElementsId.g_bIsDocumentCopyPaste)
         {
             rPr.Set_FromObject({
                 Bold       : false,
@@ -5578,7 +5588,7 @@ PasteProcessor.prototype =
                 if(this.oRootNode == oTempNode || "body" == oTempNode.nodeName.toLowerCase()  || true == this._IsBlockElem(oTempNode.nodeName.toLowerCase()))
                     break;
             }
-            if(g_bIsDocumentCopyPaste)
+            if(PasteElementsId.g_bIsDocumentCopyPaste)
             {
                 if(background_color)
                     rPr.HighLight = background_color;
@@ -6385,7 +6395,7 @@ PasteProcessor.prototype =
             var sNodeName = node.nodeName.toLowerCase();
             if("table" == sNodeName && this.pasteInExcel !== true && this.pasteInPresentationShape !== true)
             {
-                if(g_bIsDocumentCopyPaste)
+                if(PasteElementsId.g_bIsDocumentCopyPaste)
                 {
                     this._StartExecuteTable(node, pPr);
                     return bAddParagraph;
@@ -6415,7 +6425,7 @@ PasteProcessor.prototype =
             if("ul" == sNodeName || "ol" == sNodeName || "li" == sNodeName)
             {
                 pPr.bNum = true;
-                if(g_bIsDocumentCopyPaste)
+                if(PasteElementsId.g_bIsDocumentCopyPaste)
                 {
                     if("ul" == sNodeName)
                         pPr.numType = numbering_numfmt_Bullet;
@@ -6433,7 +6443,7 @@ PasteProcessor.prototype =
 
             if("img" == sNodeName && this.pasteInExcel !== true)
             {
-                if(g_bIsDocumentCopyPaste)
+                if(PasteElementsId.g_bIsDocumentCopyPaste)
                 {
                     bAddParagraph = this._Decide_AddParagraph(node, pPr, bAddParagraph);
                     
@@ -6824,7 +6834,7 @@ PasteProcessor.prototype =
             if("ul" == sNodeName || "ol" == sNodeName || "li" == sNodeName)
             {
                 pPr.bNum = true;
-                if(g_bIsDocumentCopyPaste)
+                if(PasteElementsId.g_bIsDocumentCopyPaste)
                 {
                     if("ul" == sNodeName)
                         pPr.numType = numbering_numfmt_Bullet;
@@ -7563,9 +7573,9 @@ PasteProcessor.prototype =
 
 function SafariIntervalFocus()
 {
-    if (window.editor && window.editor.WordControl && window.editor.WordControl.IsFocus && (!g_bIsDocumentCopyPaste || (g_bIsDocumentCopyPaste && !window.editor.WordControl.TextBoxInputFocus)))
+    if (window.editor && window.editor.WordControl && window.editor.WordControl.IsFocus && (!PasteElementsId.g_bIsDocumentCopyPaste || (PasteElementsId.g_bIsDocumentCopyPaste && !window.editor.WordControl.TextBoxInputFocus)))
     {
-        var pastebin = document.getElementById(COPY_ELEMENT_ID);
+        var pastebin = document.getElementById(PasteElementsId.COPY_ELEMENT_ID);
         if (pastebin)
             pastebin.focus();
         else
@@ -7579,8 +7589,8 @@ function SafariIntervalFocus()
 function Editor_CopyPaste_Create(api)
 {
     var ElemToSelect = document.createElement("div");
-    ElemToSelect.id = COPY_ELEMENT_ID;
-    ElemToSelect.className = COPYPASTE_ELEMENT_CLASS;
+    ElemToSelect.id = PasteElementsId.COPY_ELEMENT_ID;
+    ElemToSelect.className = PasteElementsId.COPYPASTE_ELEMENT_CLASS;
     ElemToSelect.style.position = "absolute";
 
     ElemToSelect.style.left = '0px';
@@ -7597,7 +7607,7 @@ function Editor_CopyPaste_Create(api)
     ElemToSelect.setAttribute("contentEditable", true);
 
 	var Def_rPr;
-	if(g_bIsDocumentCopyPaste)
+	if(PasteElementsId.g_bIsDocumentCopyPaste)
 		Def_rPr = api.WordControl.m_oLogicDocument.Styles.Default.TextPr;
 	else	
 		Def_rPr = api.WordControl.m_oLogicDocument.globalTableStyles.Default.TextPr;
@@ -7724,3 +7734,24 @@ function CreateImageFromBinary(bin, nW, nH)
     para_drawing.Set_GraphicObject(word_image);
     return para_drawing;
 }
+
+  //---------------------------------------------------------export---------------------------------------------------
+  window['AscCommon'] = window['AscCommon'] || {};
+  window["AscCommon"].CDocumentReaderMode = CDocumentReaderMode;
+  window["AscCommon"].GetObjectsForImageDownload = GetObjectsForImageDownload;
+  window["AscCommon"].ResetNewUrls = ResetNewUrls;
+  window["AscCommon"].Editor_Copy_Button = Editor_Copy_Button;
+  window["AscCommon"].Editor_Copy = Editor_Copy;
+  window["AscCommon"].CopyProcessor = CopyProcessor;
+  window["AscCommon"].Editor_Paste_GetElem = Editor_Paste_GetElem;
+  window["AscCommon"].Editor_Paste_Button = Editor_Paste_Button;
+  window["AscCommon"].Editor_Paste = Editor_Paste;
+  window["AscCommon"].CopyPasteCorrectString = CopyPasteCorrectString;
+  window["AscCommon"].Editor_Paste_Exec = Editor_Paste_Exec;
+  window["AscCommon"].sendImgUrls = sendImgUrls;
+  window["AscCommon"].PasteProcessor = PasteProcessor;
+  window["AscCommon"].SafariIntervalFocus = SafariIntervalFocus;
+
+  window["AscCommon"].PasteElementsId = PasteElementsId;
+  window["AscCommon"].PASTE_EMPTY = PASTE_EMPTY;
+})(window);

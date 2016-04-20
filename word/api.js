@@ -22,6 +22,7 @@ var sendCommand = AscCommon.sendCommand;
 var mapAscServerErrorToAscError = AscCommon.mapAscServerErrorToAscError;
 var g_oIdCounter = AscCommon.g_oIdCounter;
 var g_oTableId = AscCommon.g_oTableId;
+var PasteElementsId = AscCommon.PasteElementsId;
 
 var c_oAscError = Asc.c_oAscError;
 var c_oAscFileType = Asc.c_oAscFileType;
@@ -302,7 +303,7 @@ function asc_docs_api(name)
     //window["USE_FONTS_WIN_PARAMS"] = true;
 
     //выставляем тип copypaste
-    g_bIsDocumentCopyPaste = true;
+  PasteElementsId.g_bIsDocumentCopyPaste = true;
     this.DocumentReaderMode = null;
 
     this.ParcedDocument = false;
@@ -599,13 +600,13 @@ asc_docs_api.prototype.GetCopyPasteDivId = function()
 
 asc_docs_api.prototype.ContentToHTML = function(bIsRet)
 {
-    this.DocumentReaderMode = new CDocumentReaderMode();
-    var _old = copyPasteUseBinary;
-    copyPasteUseBinary = false;
+    this.DocumentReaderMode = new AscCommon.CDocumentReaderMode();
+    var _old = PasteElementsId.copyPasteUseBinary;
+  PasteElementsId.copyPasteUseBinary = false;
     this.WordControl.m_oLogicDocument.Select_All();
-    Editor_Copy(this);
+  AscCommon.Editor_Copy(this);
     this.WordControl.m_oLogicDocument.Selection_Remove();
-    copyPasteUseBinary = _old;
+  PasteElementsId.copyPasteUseBinary = _old;
     this.DocumentReaderMode = null;
     return document.getElementById("SelectId").innerHTML;
 };
@@ -694,12 +695,12 @@ asc_docs_api.prototype.OpenDocument2 = function(url, gObject)
     if (this.isMobileVersion)
     {
       AscCommon.AscBrowser.isSafariMacOs = false;
-        PASTE_ELEMENT_ID = "wrd_pastebin";
-        ELEMENT_DISPAY_STYLE = "none";
+      PasteElementsId.PASTE_ELEMENT_ID = "wrd_pastebin";
+      PasteElementsId.ELEMENT_DISPAY_STYLE = "none";
     }
 
     if (AscCommon.AscBrowser.isSafariMacOs)
-        setInterval(SafariIntervalFocus, 10);
+        setInterval(AscCommon.SafariIntervalFocus, 10);
 };
 // Callbacks
 /* все имена callback'оф начинаются с On. Пока сделаны:
@@ -1717,7 +1718,7 @@ asc_docs_api.prototype.Copy = function()
 
         return;
     }
-	return Editor_Copy_Button(this);
+	return AscCommon.Editor_Copy_Button(this);
 };
 asc_docs_api.prototype.Update_ParaTab = function(Default_Tab, ParaTabs){
     this.WordControl.m_oDrawingDocument.Update_ParaTab(Default_Tab, ParaTabs);
@@ -1736,7 +1737,7 @@ asc_docs_api.prototype.Cut = function()
 
         return;
     }
-	return Editor_Copy_Button(this, true);
+	return AscCommon.Editor_Copy_Button(this, true);
 };
 asc_docs_api.prototype.Paste = function()
 {
@@ -1760,15 +1761,15 @@ asc_docs_api.prototype.Paste = function()
             if (!AscCommon.AscBrowser.isSafariMacOs)
             {
                 window.GlobalPasteFlag = true;
-                return Editor_Paste_Button(this);
+                return AscCommon.Editor_Paste_Button(this);
             }
             else
             {
                 if (0 === window.GlobalPasteFlagCounter)
                 {
-                    SafariIntervalFocus();
+                  AscCommon.SafariIntervalFocus();
                     window.GlobalPasteFlag = true;
-                    return Editor_Paste_Button(this);
+                    return AscCommon.Editor_Paste_Button(this);
                 }
             }
         }
@@ -1810,7 +1811,7 @@ asc_docs_api.prototype.asc_CheckCopy = function(_clipboard /* CClipboardData */,
     //HTML
     if(c_oAscClipboardDataFormat.Html & _formats)
     {
-        var oCopyProcessor = new CopyProcessor(this);
+        var oCopyProcessor = new AscCommon.CopyProcessor(this);
         sBase64 = oCopyProcessor.Start();
         _data = oCopyProcessor.getInnerHtml();
 
@@ -1821,7 +1822,7 @@ asc_docs_api.prototype.asc_CheckCopy = function(_clipboard /* CClipboardData */,
     {
         if(sBase64 === null)
         {
-            var oCopyProcessor = new CopyProcessor(this);
+            var oCopyProcessor = new AscCommon.CopyProcessor(this);
             sBase64 = oCopyProcessor.Start();
         }
 
@@ -1850,10 +1851,10 @@ asc_docs_api.prototype.asc_PasteData = function(_format, data1, data2)
     switch (_format)
     {
         case c_oAscClipboardDataFormat.HtmlElement:
-            Editor_Paste_Exec(this, data1, data2);
+          AscCommon.Editor_Paste_Exec(this, data1, data2);
             break;
         case c_oAscClipboardDataFormat.Internal:
-            Editor_Paste_Exec(this, null, null, data1);
+          AscCommon.Editor_Paste_Exec(this, null, null, data1);
             break;
         default:
             break;
@@ -6139,12 +6140,12 @@ asc_docs_api.prototype.pre_Paste = function(_fonts, _images, callback)
             document.body.style["user-select"] = "none";
             document.body.style["-webkit-user-select"] = "none";
 
-            var pastebin = Editor_Paste_GetElem(this, true);
+            var pastebin = AscCommon.Editor_Paste_GetElem(this, true);
 
             if (!AscCommon.AscBrowser.isSafariMacOs)
                 pastebin.onpaste = null;
 
-            pastebin.style.display  = ELEMENT_DISPAY_STYLE;
+            pastebin.style.display  = PasteElementsId.ELEMENT_DISPAY_STYLE;
         }
 		
 		return;
@@ -7301,14 +7302,14 @@ window["asc_docs_api"].prototype["asc_nativeGetFileData"] = function()
 
 window["asc_docs_api"].prototype["asc_nativeGetHtml"] = function()
 {
-    var _old = copyPasteUseBinary;
-    copyPasteUseBinary = false;
+    var _old = PasteElementsId.copyPasteUseBinary;
+  PasteElementsId.copyPasteUseBinary = false;
     this.WordControl.m_oLogicDocument.Select_All();
-    var oCopyProcessor = new CopyProcessor(this);
+    var oCopyProcessor = new AscCommon.CopyProcessor(this);
     oCopyProcessor.Start();
     var _ret = "<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" /></head><body>" + oCopyProcessor.getInnerHtml() + "</body></html>";
     this.WordControl.m_oLogicDocument.Selection_Remove();
-    copyPasteUseBinary = _old;
+  PasteElementsId.copyPasteUseBinary = _old;
     return _ret;
 };
 
@@ -7323,7 +7324,7 @@ window["asc_docs_api"].prototype["asc_AddHtml"] = function(_iframeId)
         {
             ifr.style.display  = "block";
             this.WordControl.m_oLogicDocument.TurnOffHistory();
-            Editor_Paste_Exec(this, frameWindow.document.body, ifr);
+          AscCommon.Editor_Paste_Exec(this, frameWindow.document.body, ifr);
             this.WordControl.m_oLogicDocument.TurnOnHistory();
         }
     }

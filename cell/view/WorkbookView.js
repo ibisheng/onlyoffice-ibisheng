@@ -129,7 +129,7 @@
     this.wsViewHandlers = null;
     this.element = elem;
     this.input = inputElem;
-    this.clipboard = new asc.Clipboard();
+    this.clipboard = new AscCommonExcel.Clipboard();
     this.Api = Api;
     this.collaborativeEditing = collaborativeEditing;
     this.lastSendInfoRange = null;

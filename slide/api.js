@@ -14,6 +14,7 @@ var sendCommand = AscCommon.sendCommand;
 var mapAscServerErrorToAscError = AscCommon.mapAscServerErrorToAscError;
 var g_oIdCounter = AscCommon.g_oIdCounter;
 var g_oTableId = AscCommon.g_oTableId;
+var PasteElementsId = AscCommon.PasteElementsId;
 
 var c_oAscError = Asc.c_oAscError;
 var c_oAscFileType = Asc.c_oAscFileType;
@@ -108,7 +109,7 @@ function asc_docs_api(name)
     this._gui_editor_themes = null;
     this._gui_document_themes = null;
     //выставляем тип copypaste
-    g_bIsDocumentCopyPaste = false;
+  PasteElementsId.g_bIsDocumentCopyPaste = false;
 
 
     if (window.editor == undefined)
@@ -721,12 +722,12 @@ asc_docs_api.prototype.OpenDocument2 = function(url, gObject)
     if (this.isMobileVersion)
     {
       AscCommon.AscBrowser.isSafariMacOs = false;
-        PASTE_ELEMENT_ID = "wrd_pastebin";
-        ELEMENT_DISPAY_STYLE = "none";
+      PasteElementsId.PASTE_ELEMENT_ID = "wrd_pastebin";
+      PasteElementsId.ELEMENT_DISPAY_STYLE = "none";
     }
 
     if (AscCommon.AscBrowser.isSafariMacOs)
-        setInterval(SafariIntervalFocus, 10);
+        setInterval(AscCommon.SafariIntervalFocus, 10);
 };
 
 asc_docs_api.prototype._OfflineAppDocumentEndLoad = function() {
@@ -1091,7 +1092,7 @@ asc_docs_api.prototype.Copy = function()
 
         return;
     }
-	return Editor_Copy_Button(this);
+	return AscCommon.Editor_Copy_Button(this);
 };
 asc_docs_api.prototype.Update_ParaTab = function(Default_Tab, ParaTabs){
     this.WordControl.m_oDrawingDocument.Update_ParaTab(Default_Tab, ParaTabs);
@@ -1110,7 +1111,7 @@ asc_docs_api.prototype.Cut = function()
 
         return;
     }
-	return Editor_Copy_Button(this, true);
+	return AscCommon.Editor_Copy_Button(this, true);
 };
 asc_docs_api.prototype.Paste = function()
 {
@@ -1133,15 +1134,15 @@ asc_docs_api.prototype.Paste = function()
             if (!AscCommon.AscBrowser.isSafariMacOs)
             {
                 window.GlobalPasteFlag = true;
-                return Editor_Paste_Button(this);
+                return AscCommon.Editor_Paste_Button(this);
             }
             else
             {
                 if (0 === window.GlobalPasteFlagCounter)
                 {
-                    SafariIntervalFocus();
+                  AscCommon.SafariIntervalFocus();
                     window.GlobalPasteFlag = true;
-                    return Editor_Paste_Button(this);
+                    return AscCommon.Editor_Paste_Button(this);
                 }
             }
         }

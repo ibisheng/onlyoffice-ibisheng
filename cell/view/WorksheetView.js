@@ -9318,7 +9318,7 @@
                 isEndTransaction = true;
             }
             else if ( val.addImagesFromWord && val.addImagesFromWord.length != 0 && !(window["Asc"]["editor"] && window["Asc"]["editor"].isChartEditor) ) {
-                var oObjectsForDownload = GetObjectsForImageDownload( val._aPastedImages );
+                var oObjectsForDownload = AscCommon.GetObjectsForImageDownload( val._aPastedImages );
 
                 //if already load images on server
                 if ( api.wb.clipboard.alreadyLoadImagesOnServer === true ) {
@@ -9352,9 +9352,9 @@
                     isEndTransaction = true;
                 }
                 else {
-                    sendImgUrls( api, oObjectsForDownload.aUrls, function ( data ) {
+                    AscCommon.sendImgUrls( api, oObjectsForDownload.aUrls, function ( data ) {
                         var oImageMap = {};
-                        ResetNewUrls( data, oObjectsForDownload.aUrls, oObjectsForDownload.aBuilderImagesByUrl, oImageMap );
+                        AscCommon.ResetNewUrls( data, oObjectsForDownload.aUrls, oObjectsForDownload.aBuilderImagesByUrl, oImageMap );
 
                         if ( val.onlyImages !== true ) {
                             t._pasteFromLocalBuff( isLargeRange, isLocal, val, bIsUpdate, canChangeColWidth );
