@@ -183,8 +183,7 @@
 		"defines": {
             "src": [
                 "../common/Shapes/EditorSettings.js",
-                "../common/commonDefines.js",
-                "../cell/apiDefines.js"
+                "../common/commonDefines.js"
             ],
             "dst": "apiDefines.min.js"
         },
