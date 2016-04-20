@@ -189,8 +189,7 @@
             "src": [
                 "../common/Shapes/EditorSettings.js",
                 "../slide/themes/Themes.js",
-                "../slide/apiDefines.js",
-                "../common/commonDefines.js"
+                "../slide/apiDefines.js"
             ],
             "dst": "apiDefines.min.js"
         },
