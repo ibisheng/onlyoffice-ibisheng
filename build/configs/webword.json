@@ -171,8 +171,7 @@
         },
         "defines": {
             "src": [
-                "../common/Shapes/EditorSettings.js",
-                "../word/apiDefines.js"
+                "../common/Shapes/EditorSettings.js"
             ],
             "dst": "apiDefines.min.js"
         },
