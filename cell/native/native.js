@@ -3045,7 +3045,6 @@ function asc_WriteCBorders(i, c, s) {
     s['WriteByte'](255);
 }
 function asc_WriteAutoFilterInfo(i, c, s) {
-    if (!c) return;
 
     if (i !== -1) s['WriteByte'](i);
 
@@ -3065,7 +3064,7 @@ function asc_WriteAutoFilterInfo(i, c, s) {
 
     if (null !== c.asc_getIsApplyAutoFilter()) {
         s['WriteByte'](3);
-        s['WriteString2'](c.asc_getIsApplyAutoFilter());
+        s['WriteBool'](c.asc_getIsApplyAutoFilter());
     }
 
     s['WriteByte'](255);
@@ -3140,7 +3139,7 @@ function asc_WriteCCelInfo(c, s) {
         s['WriteDouble2'](c.asc_getAngle());
     }
 
-    asc_WriteAutoFilterInfo(30, c.asc_getAutoFilterInfo(), s);
+    if (c.asc_getAutoFilterInfo()) { asc_WriteAutoFilterInfo(30, c.asc_getAutoFilterInfo(), s); }
 
     s['WriteByte'](255);
 }
