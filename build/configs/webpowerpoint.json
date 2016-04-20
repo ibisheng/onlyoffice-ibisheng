@@ -188,8 +188,7 @@
         "defines": {
             "src": [
                 "../common/Shapes/EditorSettings.js",
-                "../slide/themes/Themes.js",
-                "../slide/apiDefines.js"
+                "../slide/themes/Themes.js"
             ],
             "dst": "apiDefines.min.js"
         },
