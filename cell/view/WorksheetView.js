@@ -12589,7 +12589,7 @@
         var colId = filterProp.colId;
         var openAndClosedValues = ws.autoFilters._getOpenAndClosedValues(autoFilter, colId);
         var values = openAndClosedValues.values;
-        var automaticRowCount = openAndClosedValues.automaticRowCount
+        var automaticRowCount = openAndClosedValues.automaticRowCount;
         var filters = ws.autoFilters._getFilterColumn(autoFilter, colId);
 
         var rangeButton = Asc.Range(autoFilter.Ref.c1 + colId, autoFilter.Ref.r1, autoFilter.Ref.c1 + colId, autoFilter.Ref.r1);
