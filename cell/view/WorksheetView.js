@@ -7429,6 +7429,10 @@
         }
 
         var paraPr = this.objectRender.controller.getParagraphParaPr();
+        if(!paraPr && textPr)
+        {
+            paraPr = new CParaPr();
+        }
         if ( textPr && paraPr ) {
             objectInfo.text = this.objectRender.controller.Get_SelectedText( true );
 

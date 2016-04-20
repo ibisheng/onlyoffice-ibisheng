@@ -284,9 +284,9 @@ function handleGroup(drawing, drawingObjectsController, e, x, y, group, pageInde
     return false;
 }
 
-function handleChart(drawing, drawingObjectsController, e, x, y, group, pageIndex, bWord)
+function handleInternalChart(drawing, drawingObjectsController, e, x, y, group, pageIndex, bWord)
 {
-    var ret, i, title;
+    var ret = false, i, title;
     if(drawing.hit(x, y))
     {
 
@@ -495,7 +495,16 @@ function handleChart(drawing, drawingObjectsController, e, x, y, group, pageInde
         }
 
     }
+    return ret;
+}
 
+function handleChart(drawing, drawingObjectsController, e, x, y, group, pageIndex, bWord)
+{
+    var ret = handleInternalChart(drawing, drawingObjectsController, e, x, y, group, pageIndex, bWord);
+    if(ret)
+    {
+        return ret;
+    }
     ret = handleShapeImage(drawing, drawingObjectsController, e, x, y, group, pageIndex, bWord);
     if(ret)
         return ret;
@@ -532,69 +541,10 @@ function handleInlineShapeImage(drawing, drawingObjectsController, e, x, y, page
 
 function handleInlineChart(drawing, drawingObjectsController, e, x, y, pageIndex)
 {
-    if(drawing.hit(x, y))
+    var ret = handleInternalChart(drawing, drawingObjectsController, e, x, y, null, pageIndex, true);
+    if(ret)
     {
-        var ret, i, title;
-        var chart_titles = drawing.getAllTitles();
-        for(i = 0; i < chart_titles.length; ++i)
-        {
-            title = chart_titles[i];
-            var hit_in_inner_area = title.hitInInnerArea(x, y);
-            var hit_in_path = title.hitInPath(x, y);
-            var hit_in_text_rect = title.hitInTextRect(x, y);
-            if(hit_in_inner_area && !hit_in_text_rect || hit_in_path)
-            {
-                if(drawingObjectsController.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
-                {
-                    var is_selected =  drawing.selected;
-                    drawingObjectsController.checkChartTextSelection();
-                    drawingObjectsController.resetSelection();
-                    drawingObjectsController.selectObject(drawing, pageIndex);
-                    drawingObjectsController.selection.chartSelection = drawing;
-                    drawing.selectTitle(title, pageIndex);
-                    drawingObjectsController.updateSelectionState();
-                    return true;
-                }
-                else
-                {
-                    return {objectId: drawing.Get_Id(), cursorType: "move", bMarker: false};
-                }
-            }
-            else if(hit_in_text_rect)
-            {
-                if(drawingObjectsController.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
-                {
-                    drawingObjectsController.checkChartTextSelection();
-                    drawingObjectsController.resetSelection();
-                    drawingObjectsController.selectObject(drawing, pageIndex);
-                    drawingObjectsController.selection.chartSelection = drawing;
-                    drawing.selectTitle(title, pageIndex);
-                    drawing.selection.textSelection = title;
-                    title.selectionSetStart(e, x, y, pageIndex);
-                    drawingObjectsController.changeCurrentState(new TextAddState(drawingObjectsController, title, x, y));
-                    if(e.ClickCount <= 1)
-                    {
-                        drawingObjectsController.updateSelectionState();
-                    }
-                    return true;
-                }
-                else
-                {
-                    if(drawingObjectsController.document)
-                    {
-                        var content = title.getDocContent();
-                        var invert_transform_text = title.invertTransformText, tx, ty;
-                        if(content && invert_transform_text)
-                        {
-                            tx = invert_transform_text.TransformPointX(x, y);
-                            ty = invert_transform_text.TransformPointY(x, y);
-                            content.Update_CursorType(tx, ty, 0);
-                        }
-                    }
-                    return {objectId: drawing.Get_Id(), cursorType: "text", title: title};
-                }
-            }
-        }
+        return ret;
     }
     return handleInlineShapeImage(drawing, drawingObjectsController, e, x, y, pageIndex);
 }

@@ -4836,7 +4836,8 @@ CShape.prototype =
         return this.hitInInnerArea(x, y) || this.hitInPath(x, y) || this.hitInTextRect(x, y);
     },
 
-    hitInPath: function (x, y) {
+    hitInPath: function (x, y)
+    {
         if(!this.checkHitToBounds(x, y))
             return false;
         var invert_transform = this.getInvertTransform();
@@ -4846,12 +4847,14 @@ CShape.prototype =
             return this.spPr.geometry.hitInPath(this.getCanvasContext(), x_t, y_t);
         else
             return this.hitInBoundingRect(x, y);
-        return false;
     },
 
     hitInInnerArea: function (x, y) {
-        if ((this.getObjectType && (this.getObjectType() === historyitem_type_ChartSpace || this.getObjectType() === historyitem_type_Title) ) || this.brush != null && this.brush.fill != null
-            && this.brush.fill.type != c_oAscFill.FILL_TYPE_NOFILL && this.checkHitToBounds(x, y)) {
+        if ((this.getObjectType &&
+            (this.getObjectType() === historyitem_type_ChartSpace || this.getObjectType() === historyitem_type_Title) ) ||
+            this.brush != null && this.brush.fill != null &&
+            this.brush.fill.type != c_oAscFill.FILL_TYPE_NOFILL && this.checkHitToBounds(x, y))
+        {
             var invert_transform = this.getInvertTransform();
             var x_t = invert_transform.TransformPointX(x, y);
             var y_t = invert_transform.TransformPointY(x, y);

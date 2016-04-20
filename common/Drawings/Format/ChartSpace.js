@@ -530,7 +530,7 @@ CChartSpace.prototype =
             }
             else if(this.selection.axisLbls)
             {
-                var oLabels = this.selection.axisLbls.labels
+                var oLabels = this.selection.axisLbls.labels;
                 drawingDocument.DrawTrack(TYPE_TRACK_SHAPE, this.transform, oLabels.x, oLabels.y, oLabels.extX, oLabels.extY, false, false);
             }
         }
@@ -5966,6 +5966,7 @@ CChartSpace.prototype =
             var oAxisByTypes = this.chart.plotArea.chart.getAxisByTypes();
             var oCatAx = oAxisByTypes.catAx[0], oValAx = oAxisByTypes.valAx[0], deltaX, deltaY, i, oAxisLabels, oLabel, oNewPos;
             var oProcessor3D = this.chartObj && this.chartObj.processor3D;
+            var aXPoints = [], aYPoints = [];
             if(oCatAx && oValAx && oProcessor3D)
             {
                 if(( (oCatAx.axPos === AX_POS_B || oCatAx.axPos === AX_POS_T) && oCatAx.xPoints) &&
@@ -5973,6 +5974,7 @@ CChartSpace.prototype =
                 {
                     oAxisLabels = oCatAx.labels;
 					
+
 					if(oAxisLabels)
 					{
                         var dZPositionCatAxis = oProcessor3D.calculateZPositionCatAxis();
@@ -6070,6 +6072,22 @@ CChartSpace.prototype =
                                 }
                             }
                         }
+                        oNewPos = oProcessor3D.convertAndTurnPoint(oAxisLabels.x*this.chartObj.calcProp.pxToMM, oAxisLabels.y*this.chartObj.calcProp.pxToMM, dZPositionCatAxis);
+                        aXPoints.push(oNewPos.x/this.chartObj.calcProp.pxToMM);
+                        aYPoints.push(oNewPos.y/this.chartObj.calcProp.pxToMM);
+                        oNewPos = oProcessor3D.convertAndTurnPoint((oAxisLabels.x + oAxisLabels.extX)*this.chartObj.calcProp.pxToMM, oAxisLabels.y*this.chartObj.calcProp.pxToMM, dZPositionCatAxis);
+                        aXPoints.push(oNewPos.x/this.chartObj.calcProp.pxToMM);
+                        aYPoints.push(oNewPos.y/this.chartObj.calcProp.pxToMM);
+                        oNewPos = oProcessor3D.convertAndTurnPoint((oAxisLabels.x + oAxisLabels.extX)*this.chartObj.calcProp.pxToMM, (oAxisLabels.y + oAxisLabels.extY)*this.chartObj.calcProp.pxToMM, dZPositionCatAxis);
+                        aXPoints.push(oNewPos.x/this.chartObj.calcProp.pxToMM);
+                        aYPoints.push(oNewPos.y/this.chartObj.calcProp.pxToMM);
+                        oNewPos = oProcessor3D.convertAndTurnPoint((oAxisLabels.x)*this.chartObj.calcProp.pxToMM, (oAxisLabels.y + oAxisLabels.extY)*this.chartObj.calcProp.pxToMM, dZPositionCatAxis);
+                        aXPoints.push(oNewPos.x/this.chartObj.calcProp.pxToMM);
+                        aYPoints.push(oNewPos.y/this.chartObj.calcProp.pxToMM);
+                        oAxisLabels.x = Math.min.apply(Math, aXPoints);
+                        oAxisLabels.y = Math.min.apply(Math, aYPoints);
+                        oAxisLabels.extX = Math.max.apply(Math, aXPoints) - oAxisLabels.x;
+                        oAxisLabels.extY = Math.max.apply(Math, aYPoints) - oAxisLabels.y;
 					}
                     oAxisLabels = oValAx.labels;
 					if(oAxisLabels)
@@ -6087,6 +6105,8 @@ CChartSpace.prototype =
                             dPosX2 = oAxisLabels.x + oAxisLabels.extX;
                             dPosX = (oAxisLabels.x + oAxisLabels.extX)*this.chartObj.calcProp.pxToMM;
                         }
+                        aXPoints.length = 0;
+                        aYPoints.length = 0;
 						for(i = 0; i < oAxisLabels.arrLabels.length; ++i)
 						{
 							oLabel = oAxisLabels.arrLabels[i];
@@ -6094,9 +6114,20 @@ CChartSpace.prototype =
                             {
                                 oNewPos =  oProcessor3D.convertAndTurnPoint(dPosX, oLabel.localTransformText.ty*this.chartObj.calcProp.pxToMM, dZPositionCatAxis);
                                 oLabel.setPosition2(oLabel.localTransformText.tx - dPosX2 + oNewPos.x/this.chartObj.calcProp.pxToMM, oNewPos.y/this.chartObj.calcProp.pxToMM);
+                                aXPoints.push(oLabel.x);
+                                aYPoints.push(oLabel.y);
+                                aXPoints.push(oLabel.x + oLabel.txBody.content.XLimit);
+                                aYPoints.push(oLabel.y + oLabel.txBody.content.Get_SummaryHeight());
                             }
 						}
+                        if(aXPoints.length > 0 && aYPoints.length > 0)
+                        {
+                            oAxisLabels.x = Math.min.apply(Math, aXPoints);
+                            oAxisLabels.y = Math.min.apply(Math, aYPoints);
+                            oAxisLabels.extX = Math.max.apply(Math, aXPoints) - oAxisLabels.x;
+                            oAxisLabels.extY = Math.max.apply(Math, aYPoints) - oAxisLabels.y;
 					}
+                }
                 }
                 else if(((oCatAx.axPos === AX_POS_L || oCatAx.axPos === AX_POS_R) && oCatAx.yPoints) &&
                     ((oValAx.axPos === AX_POS_T || oValAx.axPos === AX_POS_B) && oValAx.xPoints))
@@ -6135,11 +6166,30 @@ CChartSpace.prototype =
                                //oLabel.setPosition2(oNewPos.x/this.chartObj.calcProp.pxToMM, oNewPos.y/this.chartObj.calcProp.pxToMM);
                             }
                         }
+
+                        oNewPos = oProcessor3D.convertAndTurnPoint(oAxisLabels.x*this.chartObj.calcProp.pxToMM, oAxisLabels.y*this.chartObj.calcProp.pxToMM, dZPositionValAxis);
+                        aXPoints.push(oNewPos.x/this.chartObj.calcProp.pxToMM);
+                        aYPoints.push(oNewPos.y/this.chartObj.calcProp.pxToMM);
+                        oNewPos = oProcessor3D.convertAndTurnPoint((oAxisLabels.x + oAxisLabels.extX)*this.chartObj.calcProp.pxToMM, oAxisLabels.y*this.chartObj.calcProp.pxToMM, dZPositionValAxis);
+                        aXPoints.push(oNewPos.x/this.chartObj.calcProp.pxToMM);
+                        aYPoints.push(oNewPos.y/this.chartObj.calcProp.pxToMM);
+                        oNewPos = oProcessor3D.convertAndTurnPoint((oAxisLabels.x + oAxisLabels.extX)*this.chartObj.calcProp.pxToMM, (oAxisLabels.y + oAxisLabels.extY)*this.chartObj.calcProp.pxToMM, dZPositionValAxis);
+                        aXPoints.push(oNewPos.x/this.chartObj.calcProp.pxToMM);
+                        aYPoints.push(oNewPos.y/this.chartObj.calcProp.pxToMM);
+                        oNewPos = oProcessor3D.convertAndTurnPoint((oAxisLabels.x)*this.chartObj.calcProp.pxToMM, (oAxisLabels.y + oAxisLabels.extY)*this.chartObj.calcProp.pxToMM, dZPositionValAxis);
+                        aXPoints.push(oNewPos.x/this.chartObj.calcProp.pxToMM);
+                        aYPoints.push(oNewPos.y/this.chartObj.calcProp.pxToMM);
+                        oAxisLabels.x = Math.min.apply(Math, aXPoints);
+                        oAxisLabels.y = Math.min.apply(Math, aYPoints);
+                        oAxisLabels.extX = Math.max.apply(Math, aXPoints) - oAxisLabels.x;
+                        oAxisLabels.extY = Math.max.apply(Math, aYPoints) - oAxisLabels.y;
                     }
 
 
                     oAxisLabels = oCatAx.labels;
 
+                    aXPoints.length = 0;
+                    aYPoints.length = 0;
                     if(oAxisLabels)
                     {
                         var dZPositionCatAxis = oProcessor3D.calculateZPositionCatAxis();
@@ -6161,14 +6211,24 @@ CChartSpace.prototype =
 
                             if(oLabel)
                             {
-
                                     oNewPos =  oProcessor3D.convertAndTurnPoint(dPosX, oLabel.localTransformText.ty*this.chartObj.calcProp.pxToMM, dZPositionCatAxis);
                                     oLabel.setPosition2(oLabel.localTransformText.tx - dPosX2 + oNewPos.x/this.chartObj.calcProp.pxToMM, oNewPos.y/this.chartObj.calcProp.pxToMM);
+                                aXPoints.push(oLabel.x);
+                                aYPoints.push(oLabel.y);
+                                aXPoints.push(oLabel.x + oLabel.txBody.content.XLimit);
+                                aYPoints.push(oLabel.y + oLabel.txBody.content.Get_SummaryHeight());
                             }
                         }
+                        if(aXPoints.length > 0 && aYPoints.length > 0)
+                        {
+                            oAxisLabels.x = Math.min.apply(Math, aXPoints);
+                            oAxisLabels.y = Math.min.apply(Math, aYPoints);
+                            oAxisLabels.extX = Math.max.apply(Math, aXPoints) - oAxisLabels.x;
+                            oAxisLabels.extY = Math.max.apply(Math, aYPoints) - oAxisLabels.y;
                     }
                 }
             }
+        }
         }
     },
 
