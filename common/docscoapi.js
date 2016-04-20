@@ -121,9 +121,9 @@
     return undefined;
   };
 
-  CDocsCoApi.prototype.auth = function(isViewer) {
+  CDocsCoApi.prototype.auth = function(isViewer, opt_openCmd) {
     if (this._CoAuthoringApi && this._onlineWork) {
-      this._CoAuthoringApi.auth(isViewer);
+      this._CoAuthoringApi.auth(isViewer, opt_openCmd);
     } else {
       // Фиктивные вызовы
       this.callback_OnSpellCheckInit('');
@@ -1161,7 +1161,7 @@
     return this._docid;
   };
   // Авторизация (ее нужно делать после выставления состояния редактора view-mode)
-  DocsCoApi.prototype.auth = function(isViewer) {
+  DocsCoApi.prototype.auth = function(isViewer, opt_openCmd) {
     this.isAuthInit = true;
     this._isViewer = isViewer;
     if (this._locks) {
@@ -1193,6 +1193,7 @@
       'documentFormatSave': this._documentFormatSave,
       'view': this._isViewer,
       'isCloseCoAuthoring': this.isCloseCoAuthoring,
+      'openCmd': opt_openCmd,
       'version': asc_coAuthV
     });
   };

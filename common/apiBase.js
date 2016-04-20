@@ -278,23 +278,14 @@ baseEditorsApi.prototype.onPrint = function() {
 baseEditorsApi.prototype.asc_LoadDocument = function(isVersionHistory) {
   // Меняем тип состояния (на открытие)
   this.advancedOptionsAction = AscCommon.c_oAscAdvancedOptionsAction.Open;
-  this.CoAuthoringApi.auth(this.getViewMode());
-
-  this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Open);
-
-  if (offlineMode === this.documentUrl) {
-    // ToDo убрать зависимость от this.FontLoader.fontFilesPath
-    this.documentUrl = this.FontLoader.fontFilesPath + '../' + this._editorNameById() + '/document/';
-    this.DocInfo.asc_putOfflineApp(true);
-    this._OfflineAppDocumentStartLoad();
-  } else {
-    var rData = {
+  var rData = null;
+  if (offlineMode !== this.documentUrl) {
+	  var rData = {
       "c": 'open',
       "id": this.documentId,
       "userid": this.documentUserId,
       "format": this.documentFormat,
       "vkey": this.documentVKey,
-      "editorid": this.editorId,
       "url": this.documentUrl,
       "title": this.documentTitle,
       "embeddedfonts": this.isUseEmbeddedCutFonts,
@@ -304,7 +295,16 @@ baseEditorsApi.prototype.asc_LoadDocument = function(isVersionHistory) {
       //чтобы результат пришел только этому соединению, а не всем кто в документе
       rData["userconnectionid"] = this.CoAuthoringApi.getUserConnectionId();
     }
-    AscCommon.sendCommand(this, null, rData);
+  }
+  this.CoAuthoringApi.auth(this.getViewMode(), rData);
+
+  this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Open);
+
+  if (offlineMode === this.documentUrl) {
+    // ToDo убрать зависимость от this.FontLoader.fontFilesPath
+    this.documentUrl = this.FontLoader.fontFilesPath + '../' + this._editorNameById() + '/document/';
+    this.DocInfo.asc_putOfflineApp(true);
+    this._OfflineAppDocumentStartLoad();
   }
 };
 baseEditorsApi.prototype._OfflineAppDocumentStartLoad = function() {
