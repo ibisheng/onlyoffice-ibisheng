@@ -450,7 +450,7 @@ CCellCommentator.prototype.moveRangeComments = function(rangeFrom, rangeTo) {
 				compositeComment.commentAfter = commentAfter;
 
 				History.Create_NewPoint();
-				History.Add(AscCommonExcel.g_oUndoRedoComment, historyitem_Comment_Change, this.worksheet.model.getId(), null, compositeComment);
+				History.Add(AscCommonExcel.g_oUndoRedoComment, AscCH.historyitem_Comment_Change, this.worksheet.model.getId(), null, compositeComment);
 			}
 		}
 	}
@@ -1124,7 +1124,7 @@ CCellCommentator.prototype.changeComment = function(id, oComment, bChangeCoords,
 			compositeComment.commentAfter = commentAfter;
 
 			History.Create_NewPoint();
-			History.Add(AscCommonExcel.g_oUndoRedoComment, historyitem_Comment_Change, t.worksheet.model.getId(), null, compositeComment);
+			History.Add(AscCommonExcel.g_oUndoRedoComment, AscCH.historyitem_Comment_Change, t.worksheet.model.getId(), null, compositeComment);
 		}
 
 		if (!bNoDraw)
@@ -1231,7 +1231,7 @@ CCellCommentator.prototype._addComment = function (oComment, bChange, bIsNotUpda
 	// Add new comment
 	if (!bChange) {
 		History.Create_NewPoint();
-		History.Add(AscCommonExcel.g_oUndoRedoComment, historyitem_Comment_Add, this.worksheet.model.getId(), null, new asc_CCommentData(oComment));
+		History.Add(AscCommonExcel.g_oUndoRedoComment, AscCH.historyitem_Comment_Add, this.worksheet.model.getId(), null, new asc_CCommentData(oComment));
 
 		this.aComments.push(oComment);
 
@@ -1252,7 +1252,7 @@ CCellCommentator.prototype._removeComment = function (comment, bNoEvent, isDraw)
 
 				if (this.bSaveHistory) {
 					History.Create_NewPoint();
-					History.Add(AscCommonExcel.g_oUndoRedoComment, historyitem_Comment_Remove, this.worksheet.model.getId(), null, new asc_CCommentData(comment.oParent.aReplies[i]));
+					History.Add(AscCommonExcel.g_oUndoRedoComment, AscCH.historyitem_Comment_Remove, this.worksheet.model.getId(), null, new asc_CCommentData(comment.oParent.aReplies[i]));
 				}
 
 				comment.oParent.aReplies.splice(i, 1);
@@ -1265,7 +1265,7 @@ CCellCommentator.prototype._removeComment = function (comment, bNoEvent, isDraw)
 
 				if (this.bSaveHistory) {
 					History.Create_NewPoint();
-					History.Add(AscCommonExcel.g_oUndoRedoComment, historyitem_Comment_Remove, this.worksheet.model.getId(), null, new asc_CCommentData(this.aComments[i]));
+					History.Add(AscCommonExcel.g_oUndoRedoComment, AscCH.historyitem_Comment_Remove, this.worksheet.model.getId(), null, new asc_CCommentData(this.aComments[i]));
 				}
 
 				this.aComments.splice(i, 1);
@@ -1334,7 +1334,7 @@ CCellCommentator.prototype.Undo = function(type, data) {
 	var i, parentComment;
 	switch (type) {
 
-		case historyitem_Comment_Add:
+		case AscCH.historyitem_Comment_Add:
 			if (data.oParent) {
 				parentComment = this.findComment(data.oParent.asc_getId());
 				for (i = 0; i < parentComment.aReplies.length; i++) {
@@ -1354,7 +1354,7 @@ CCellCommentator.prototype.Undo = function(type, data) {
 			}
 			break;
 
-		case historyitem_Comment_Remove:
+		case AscCH.historyitem_Comment_Remove:
 			if (data.oParent) {
 				parentComment = this.findComment(data.oParent.asc_getId());
 				parentComment.aReplies.push(data);
@@ -1364,7 +1364,7 @@ CCellCommentator.prototype.Undo = function(type, data) {
 			}
 			break;
 
-		case historyitem_Comment_Change:
+		case AscCH.historyitem_Comment_Change:
 			if (data.commentAfter.oParent) {
 				parentComment = this.findComment(data.commentAfter.oParent.asc_getId());
 				for (i = 0; i < parentComment.aReplies.length; i++) {
@@ -1393,7 +1393,7 @@ CCellCommentator.prototype.Redo = function(type, data) {
 	var parentComment, i;
 	switch (type) {
 
-		case historyitem_Comment_Add:
+		case AscCH.historyitem_Comment_Add:
 			if (data.oParent) {
 				parentComment = this.findComment(data.oParent.asc_getId());
 				parentComment.aReplies.push(data);
@@ -1403,7 +1403,7 @@ CCellCommentator.prototype.Redo = function(type, data) {
 			}
 			break;
 
-		case historyitem_Comment_Remove:
+		case AscCH.historyitem_Comment_Remove:
 			if (data.oParent) {
 				parentComment = this.findComment(data.oParent.asc_getId());
 				for (i = 0; i < parentComment.aReplies.length; i++) {
@@ -1423,7 +1423,7 @@ CCellCommentator.prototype.Redo = function(type, data) {
 			}
 			break;
 
-		case historyitem_Comment_Change:
+		case AscCH.historyitem_Comment_Change:
 			if (data.commentBefore.oParent) {
 				parentComment = this.findComment(data.commentBefore.oParent.asc_getId());
 				for (i = 0; i < parentComment.aReplies.length; i++) {

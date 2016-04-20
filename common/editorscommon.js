@@ -2338,7 +2338,7 @@ CTableId.prototype.Load_Changes = function(Reader, Reader2)
             //                console.log("----------------------------");
             //                console.log("FileCheckSum " + FileCheckSum);
             //                console.log("FileSize     " + FileSize);
-            //                console.log("Description  " + Description + " " + Get_HistoryPointStringDescription(Description));
+            //                console.log("Description  " + Description + " " + AscDFH.Get_HistoryPointStringDescription(Description));
             //                console.log("PointIndex   " + PointIndex);
             //                console.log("StartPoint   " + StartPoint);
             //                console.log("LastPoint    " + LastPoint);

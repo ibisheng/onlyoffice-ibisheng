@@ -3485,7 +3485,7 @@
         }
         History.Create_NewPoint();
         var oData = new AscCommonExcel.UndoRedoData_FromTo( new AscCommonExcel.UndoRedoData_BBox( new asc_Range( lastCol, lastRow, lastCol, lastRow ) ), new AscCommonExcel.UndoRedoData_BBox( new asc_Range( col, row, col, row ) ), null );
-        History.Add( AscCommonExcel.g_oUndoRedoWorksheet, historyitem_Worksheet_ChangeFrozenCell, this.model.getId(), null, oData );
+        History.Add( AscCommonExcel.g_oUndoRedoWorksheet, AscCH.historyitem_Worksheet_ChangeFrozenCell, this.model.getId(), null, oData );
 
         var isUpdate = false;
         if ( 0 === col && 0 === row ) { // Очистка

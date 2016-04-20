@@ -1,111 +1,120 @@
 "use strict";
 
-var historyitem_Unknown = 0;
+(
+/**
+* @param {Window} window
+* @param {undefined} undefined
+*/
+function (window, undefined) {
+	//------------------------------------------------------------export--------------------------------------------------
+	window['AscCH'] = window['AscCH'] || {};
+	window['AscCH'].historyitem_Unknown = 0;
 
-var historyitem_Workbook_SheetAdd = 1;
-var historyitem_Workbook_SheetRemove = 2;
-var historyitem_Workbook_SheetMove = 3;
-var historyitem_Workbook_SheetPositions = 4;
-var historyitem_Workbook_ChangeColorScheme = 5;
-var historyitem_Workbook_AddFont = 6;
-var historyitem_Workbook_DefinedNamesAdd = 7;
-var historyitem_Workbook_DefinedNamesChange = 8;
-var historyitem_Workbook_DefinedNamesDelete = 9;
+	window['AscCH'].historyitem_Workbook_SheetAdd = 1;
+	window['AscCH'].historyitem_Workbook_SheetRemove = 2;
+	window['AscCH'].historyitem_Workbook_SheetMove = 3;
+	window['AscCH'].historyitem_Workbook_SheetPositions = 4;
+	window['AscCH'].historyitem_Workbook_ChangeColorScheme = 5;
+	window['AscCH'].historyitem_Workbook_AddFont = 6;
+	window['AscCH'].historyitem_Workbook_DefinedNamesAdd = 7;
+	window['AscCH'].historyitem_Workbook_DefinedNamesChange = 8;
+	window['AscCH'].historyitem_Workbook_DefinedNamesDelete = 9;
 
-var historyitem_Worksheet_RemoveCell = 1;
-var historyitem_Worksheet_RemoveRows = 2;
-var historyitem_Worksheet_RemoveCols = 3;
-var historyitem_Worksheet_AddRows = 4;
-var historyitem_Worksheet_AddCols = 5;
-var historyitem_Worksheet_ShiftCellsLeft = 6;
-var historyitem_Worksheet_ShiftCellsTop = 7;
-var historyitem_Worksheet_ShiftCellsRight = 8;
-var historyitem_Worksheet_ShiftCellsBottom = 9;
-var historyitem_Worksheet_ColProp = 10;
-var historyitem_Worksheet_RowProp = 11;
-var historyitem_Worksheet_Sort = 12;
-var historyitem_Worksheet_MoveRange = 13;
-var historyitem_Worksheet_Merge = 14;
-var historyitem_Worksheet_Unmerge = 15;
-var historyitem_Worksheet_SetHyperlink = 16;
-var historyitem_Worksheet_RemoveHyperlink = 17;
-var historyitem_Worksheet_Rename = 18;
-var historyitem_Worksheet_Hide = 19;
+	window['AscCH'].historyitem_Worksheet_RemoveCell = 1;
+	window['AscCH'].historyitem_Worksheet_RemoveRows = 2;
+	window['AscCH'].historyitem_Worksheet_RemoveCols = 3;
+	window['AscCH'].historyitem_Worksheet_AddRows = 4;
+	window['AscCH'].historyitem_Worksheet_AddCols = 5;
+	window['AscCH'].historyitem_Worksheet_ShiftCellsLeft = 6;
+	window['AscCH'].historyitem_Worksheet_ShiftCellsTop = 7;
+	window['AscCH'].historyitem_Worksheet_ShiftCellsRight = 8;
+	window['AscCH'].historyitem_Worksheet_ShiftCellsBottom = 9;
+	window['AscCH'].historyitem_Worksheet_ColProp = 10;
+	window['AscCH'].historyitem_Worksheet_RowProp = 11;
+	window['AscCH'].historyitem_Worksheet_Sort = 12;
+	window['AscCH'].historyitem_Worksheet_MoveRange = 13;
+	window['AscCH'].historyitem_Worksheet_Merge = 14;
+	window['AscCH'].historyitem_Worksheet_Unmerge = 15;
+	window['AscCH'].historyitem_Worksheet_SetHyperlink = 16;
+	window['AscCH'].historyitem_Worksheet_RemoveHyperlink = 17;
+	window['AscCH'].historyitem_Worksheet_Rename = 18;
+	window['AscCH'].historyitem_Worksheet_Hide = 19;
 //не добавляем в историю события historyitem_Worksheet_CreateRow, CreateCol, CreateCell - потому что появляется много ошибок(например удаление строк, если снизу были данные и undo)
 //они решают только одну проблему, что когда есть стиль колонки, а мы создаем ячейку, при полном undo не отменится стиль ячейки.
-var historyitem_Worksheet_CreateRow = 20;
-var historyitem_Worksheet_CreateCol = 21;
-var historyitem_Worksheet_CreateCell = 22;
-var historyitem_Worksheet_SetViewSettings = 23;
-var historyitem_Worksheet_RemoveCellFormula = 24;
-var historyitem_Worksheet_ChangeMerge = 25;
-var historyitem_Worksheet_ChangeHyperlink = 26;
-var historyitem_Worksheet_SetTabColor = 27;
-var historyitem_Worksheet_RowHide = 28;
+	window['AscCH'].historyitem_Worksheet_CreateRow = 20;
+	window['AscCH'].historyitem_Worksheet_CreateCol = 21;
+	window['AscCH'].historyitem_Worksheet_CreateCell = 22;
+	window['AscCH'].historyitem_Worksheet_SetViewSettings = 23;
+	window['AscCH'].historyitem_Worksheet_RemoveCellFormula = 24;
+	window['AscCH'].historyitem_Worksheet_ChangeMerge = 25;
+	window['AscCH'].historyitem_Worksheet_ChangeHyperlink = 26;
+	window['AscCH'].historyitem_Worksheet_SetTabColor = 27;
+	window['AscCH'].historyitem_Worksheet_RowHide = 28;
 // Frozen cell
-var historyitem_Worksheet_ChangeFrozenCell = 30;
+	window['AscCH'].historyitem_Worksheet_ChangeFrozenCell = 30;
 
-var historyitem_RowCol_Fontname = 1;
-var historyitem_RowCol_Fontsize = 2;
-var historyitem_RowCol_Fontcolor = 3;
-var historyitem_RowCol_Bold = 4;
-var historyitem_RowCol_Italic = 5;
-var historyitem_RowCol_Underline = 6;
-var historyitem_RowCol_Strikeout = 7;
-var historyitem_RowCol_FontAlign = 8;
-var historyitem_RowCol_AlignVertical = 9;
-var historyitem_RowCol_AlignHorizontal = 10;
-var historyitem_RowCol_Fill = 11;
-var historyitem_RowCol_Border = 12;
-var historyitem_RowCol_ShrinkToFit = 13;
-var historyitem_RowCol_Wrap = 14;
-var historyitem_RowCol_NumFormat = 15;
-var historyitem_RowCol_SetFont = 16;
-var historyitem_RowCol_Angle = 17;
-var historyitem_RowCol_SetStyle = 18;
-var historyitem_RowCol_SetCellStyle = 19;
+	window['AscCH'].historyitem_RowCol_Fontname = 1;
+	window['AscCH'].historyitem_RowCol_Fontsize = 2;
+	window['AscCH'].historyitem_RowCol_Fontcolor = 3;
+	window['AscCH'].historyitem_RowCol_Bold = 4;
+	window['AscCH'].historyitem_RowCol_Italic = 5;
+	window['AscCH'].historyitem_RowCol_Underline = 6;
+	window['AscCH'].historyitem_RowCol_Strikeout = 7;
+	window['AscCH'].historyitem_RowCol_FontAlign = 8;
+	window['AscCH'].historyitem_RowCol_AlignVertical = 9;
+	window['AscCH'].historyitem_RowCol_AlignHorizontal = 10;
+	window['AscCH'].historyitem_RowCol_Fill = 11;
+	window['AscCH'].historyitem_RowCol_Border = 12;
+	window['AscCH'].historyitem_RowCol_ShrinkToFit = 13;
+	window['AscCH'].historyitem_RowCol_Wrap = 14;
+	window['AscCH'].historyitem_RowCol_NumFormat = 15;
+	window['AscCH'].historyitem_RowCol_SetFont = 16;
+	window['AscCH'].historyitem_RowCol_Angle = 17;
+	window['AscCH'].historyitem_RowCol_SetStyle = 18;
+	window['AscCH'].historyitem_RowCol_SetCellStyle = 19;
 
-var historyitem_Cell_Fontname = 1;
-var historyitem_Cell_Fontsize = 2;
-var historyitem_Cell_Fontcolor = 3;
-var historyitem_Cell_Bold = 4;
-var historyitem_Cell_Italic = 5;
-var historyitem_Cell_Underline = 6;
-var historyitem_Cell_Strikeout = 7;
-var historyitem_Cell_FontAlign = 8;
-var historyitem_Cell_AlignVertical = 9;
-var historyitem_Cell_AlignHorizontal = 10;
-var historyitem_Cell_Fill = 11;
-var historyitem_Cell_Border = 12;
-var historyitem_Cell_ShrinkToFit = 13;
-var historyitem_Cell_Wrap = 14;
-var historyitem_Cell_Numformat = 15;
-var historyitem_Cell_ChangeValue = 16;
-var historyitem_Cell_ChangeArrayValueFormat = 17;
-var historyitem_Cell_SetStyle = 18;
-var historyitem_Cell_SetFont = 19;
-var historyitem_Cell_SetQuotePrefix = 20;
-var historyitem_Cell_Angle = 21;
-var historyitem_Cell_Style = 22;
+	window['AscCH'].historyitem_Cell_Fontname = 1;
+	window['AscCH'].historyitem_Cell_Fontsize = 2;
+	window['AscCH'].historyitem_Cell_Fontcolor = 3;
+	window['AscCH'].historyitem_Cell_Bold = 4;
+	window['AscCH'].historyitem_Cell_Italic = 5;
+	window['AscCH'].historyitem_Cell_Underline = 6;
+	window['AscCH'].historyitem_Cell_Strikeout = 7;
+	window['AscCH'].historyitem_Cell_FontAlign = 8;
+	window['AscCH'].historyitem_Cell_AlignVertical = 9;
+	window['AscCH'].historyitem_Cell_AlignHorizontal = 10;
+	window['AscCH'].historyitem_Cell_Fill = 11;
+	window['AscCH'].historyitem_Cell_Border = 12;
+	window['AscCH'].historyitem_Cell_ShrinkToFit = 13;
+	window['AscCH'].historyitem_Cell_Wrap = 14;
+	window['AscCH'].historyitem_Cell_Numformat = 15;
+	window['AscCH'].historyitem_Cell_ChangeValue = 16;
+	window['AscCH'].historyitem_Cell_ChangeArrayValueFormat = 17;
+	window['AscCH'].historyitem_Cell_SetStyle = 18;
+	window['AscCH'].historyitem_Cell_SetFont = 19;
+	window['AscCH'].historyitem_Cell_SetQuotePrefix = 20;
+	window['AscCH'].historyitem_Cell_Angle = 21;
+	window['AscCH'].historyitem_Cell_Style = 22;
 
-var historyitem_Comment_Add = 1;
-var historyitem_Comment_Remove = 2;
-var historyitem_Comment_Change = 3;
+	window['AscCH'].historyitem_Comment_Add = 1;
+	window['AscCH'].historyitem_Comment_Remove = 2;
+	window['AscCH'].historyitem_Comment_Change = 3;
 
-var historyitem_AutoFilter_Add		= 1;
-var historyitem_AutoFilter_Sort		= 2;
-var historyitem_AutoFilter_Empty	= 3;
-var historyitem_AutoFilter_ApplyDF	= 4;
-var historyitem_AutoFilter_ApplyMF	= 5;
-var historyitem_AutoFilter_Move     = 6;
-var historyitem_AutoFilter_CleanAutoFilter  = 7;
-var historyitem_AutoFilter_Delete   = 8;
-var historyitem_AutoFilter_ChangeTableStyle = 9;
-var historyitem_AutoFilter_Change = 10;
-var historyitem_AutoFilter_CleanFormat  = 11;
-var historyitem_AutoFilter_ChangeTableInfo = 12;
-var historyitem_AutoFilter_ChangeTableRef = 13;
-var historyitem_AutoFilter_ChangeTableName = 14;
+	window['AscCH'].historyitem_AutoFilter_Add		= 1;
+	window['AscCH'].historyitem_AutoFilter_Sort		= 2;
+	window['AscCH'].historyitem_AutoFilter_Empty	= 3;
+	window['AscCH'].historyitem_AutoFilter_ApplyDF	= 4;
+	window['AscCH'].historyitem_AutoFilter_ApplyMF	= 5;
+	window['AscCH'].historyitem_AutoFilter_Move     = 6;
+	window['AscCH'].historyitem_AutoFilter_CleanAutoFilter  = 7;
+	window['AscCH'].historyitem_AutoFilter_Delete   = 8;
+	window['AscCH'].historyitem_AutoFilter_ChangeTableStyle = 9;
+	window['AscCH'].historyitem_AutoFilter_Change = 10;
+	window['AscCH'].historyitem_AutoFilter_CleanFormat  = 11;
+	window['AscCH'].historyitem_AutoFilter_ChangeTableInfo = 12;
+	window['AscCH'].historyitem_AutoFilter_ChangeTableRef = 13;
+	window['AscCH'].historyitem_AutoFilter_ChangeTableName = 14;
+})(window);
 
 
 function CHistory(workbook)
@@ -427,25 +436,25 @@ CHistory.prototype.Redo = function()
 	this.UndoRedoEnd(Point, oRedoObjectParam, false);
 };
 CHistory.prototype._addRedoObjectParam = function (oRedoObjectParam, Point) {
-	if (AscCommonExcel.g_oUndoRedoWorksheet === Point.Class && historyitem_Worksheet_SetViewSettings === Point.Type) {
+	if (AscCommonExcel.g_oUndoRedoWorksheet === Point.Class && AscCH.historyitem_Worksheet_SetViewSettings === Point.Type) {
 		oRedoObjectParam.bIsReInit = true;
 		oRedoObjectParam.oOnUpdateSheetViewSettings[Point.SheetId] = Point.SheetId;
 	}
-	else if (AscCommonExcel.g_oUndoRedoWorksheet === Point.Class && (historyitem_Worksheet_RowProp == Point.Type || historyitem_Worksheet_ColProp == Point.Type || historyitem_Worksheet_RowHide == Point.Type))
+	else if (AscCommonExcel.g_oUndoRedoWorksheet === Point.Class && (AscCH.historyitem_Worksheet_RowProp == Point.Type || AscCH.historyitem_Worksheet_ColProp == Point.Type || AscCH.historyitem_Worksheet_RowHide == Point.Type))
 		oRedoObjectParam.oChangeWorksheetUpdate[Point.SheetId] = Point.SheetId;
-	else if (AscCommonExcel.g_oUndoRedoWorkbook === Point.Class && (historyitem_Workbook_SheetAdd === Point.Type || historyitem_Workbook_SheetRemove === Point.Type || historyitem_Workbook_SheetMove === Point.Type || historyitem_Workbook_SheetPositions === Point.Type)) {
+	else if (AscCommonExcel.g_oUndoRedoWorkbook === Point.Class && (AscCH.historyitem_Workbook_SheetAdd === Point.Type || AscCH.historyitem_Workbook_SheetRemove === Point.Type || AscCH.historyitem_Workbook_SheetMove === Point.Type || AscCH.historyitem_Workbook_SheetPositions === Point.Type)) {
 		oRedoObjectParam.bUpdateWorksheetByModel = true;
 		oRedoObjectParam.bOnSheetsChanged = true;
 	}
-	else if (AscCommonExcel.g_oUndoRedoWorksheet === Point.Class && (historyitem_Worksheet_Rename === Point.Type || historyitem_Worksheet_Hide === Point.Type))
+	else if (AscCommonExcel.g_oUndoRedoWorksheet === Point.Class && (AscCH.historyitem_Worksheet_Rename === Point.Type || AscCH.historyitem_Worksheet_Hide === Point.Type))
 		oRedoObjectParam.bOnSheetsChanged = true;
-	else if (AscCommonExcel.g_oUndoRedoWorksheet === Point.Class && historyitem_Worksheet_SetTabColor === Point.Type)
+	else if (AscCommonExcel.g_oUndoRedoWorksheet === Point.Class && AscCH.historyitem_Worksheet_SetTabColor === Point.Type)
 		oRedoObjectParam.oOnUpdateTabColor[Point.SheetId] = Point.SheetId;
-	else if (AscCommonExcel.g_oUndoRedoWorksheet === Point.Class && historyitem_Worksheet_ChangeFrozenCell === Point.Type)
+	else if (AscCommonExcel.g_oUndoRedoWorksheet === Point.Class && AscCH.historyitem_Worksheet_ChangeFrozenCell === Point.Type)
 		oRedoObjectParam.oOnUpdateSheetViewSettings[Point.SheetId] = Point.SheetId;
-	else if (AscCommonExcel.g_oUndoRedoWorksheet === Point.Class && (historyitem_Worksheet_RemoveRows === Point.Type || historyitem_Worksheet_RemoveCols === Point.Type || historyitem_Worksheet_AddRows === Point.Type || historyitem_Worksheet_AddCols === Point.Type))
+	else if (AscCommonExcel.g_oUndoRedoWorksheet === Point.Class && (AscCH.historyitem_Worksheet_RemoveRows === Point.Type || AscCH.historyitem_Worksheet_RemoveCols === Point.Type || AscCH.historyitem_Worksheet_AddRows === Point.Type || AscCH.historyitem_Worksheet_AddCols === Point.Type))
 		oRedoObjectParam.bAddRemoveRowCol = true;
-	else if(AscCommonExcel.g_oUndoRedoAutoFilters === Point.Class && historyitem_AutoFilter_ChangeTableInfo === Point.Type)
+	else if(AscCommonExcel.g_oUndoRedoAutoFilters === Point.Class && AscCH.historyitem_AutoFilter_ChangeTableInfo === Point.Type)
 		oRedoObjectParam.oChangeWorksheetUpdate[Point.SheetId] = Point.SheetId;
 		
 };
@@ -474,7 +483,7 @@ CHistory.prototype.Get_RecalcData = function(Point2)
 
 					if ( /*true === Item.NeedRecalc*/ Item.Class && Item.Class.Refresh_RecalcData )
 						Item.Class.Refresh_RecalcData( Item.Data );
-					if(Item.Type === historyitem_Workbook_ChangeColorScheme && Item.Class === AscCommonExcel.g_oUndoRedoWorkbook)
+					if(Item.Type === AscCH.historyitem_Workbook_ChangeColorScheme && Item.Class === AscCommonExcel.g_oUndoRedoWorkbook)
 					{
 						var wsViews = Asc["editor"].wb.wsViews;
 						for(var i = 0; i < wsViews.length; ++i)
@@ -845,7 +854,7 @@ CHistory.prototype._addFonts = function (isCreateNew) {
 		var arrFonts = [];
 		for (var i in this.LoadFonts)
 			arrFonts.push(i);
-		this.Add(AscCommonExcel.g_oUndoRedoWorkbook, historyitem_Workbook_AddFont, null, null, new AscCommonExcel.UndoRedoData_SingleProperty(arrFonts));
+		this.Add(AscCommonExcel.g_oUndoRedoWorkbook, AscCH.historyitem_Workbook_AddFont, null, null, new AscCommonExcel.UndoRedoData_SingleProperty(arrFonts));
 
 		this.LoadFonts = {};
 		this.HasLoadFonts = false;

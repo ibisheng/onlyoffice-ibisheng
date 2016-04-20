@@ -2727,7 +2727,7 @@ UndoRedoWorkbook.prototype = {
 	UndoRedo : function(Type, Data, nSheetId, bUndo)
 	{
 		var bNeedTrigger = true;
-		if(historyitem_Workbook_SheetAdd == Type)
+		if(AscCH.historyitem_Workbook_SheetAdd == Type)
 		{
 			if(null == Data.insertBefore)
 				Data.insertBefore = 0;
@@ -2773,7 +2773,7 @@ UndoRedoWorkbook.prototype = {
 			}
 			this.wb.handlers.trigger("updateWorksheetByModel");
 		}
-		else if(historyitem_Workbook_SheetRemove == Type)
+		else if(AscCH.historyitem_Workbook_SheetRemove == Type)
 		{
 			if(bUndo)
 			{
@@ -2795,7 +2795,7 @@ UndoRedoWorkbook.prototype = {
 			}
 			this.wb.handlers.trigger("updateWorksheetByModel");
 		}
-		else if(historyitem_Workbook_SheetMove == Type)
+		else if(AscCH.historyitem_Workbook_SheetMove == Type)
 		{
 			if(bUndo)
 			{
@@ -2807,7 +2807,7 @@ UndoRedoWorkbook.prototype = {
 			}
 			this.wb.handlers.trigger("updateWorksheetByModel");
 		}
-		else if(historyitem_Workbook_SheetPositions == Type)
+		else if(AscCH.historyitem_Workbook_SheetPositions == Type)
 		{
 			if(Data.positions){
 				var wsActive = this.wb.getActiveWs();
@@ -2873,7 +2873,7 @@ UndoRedoWorkbook.prototype = {
 				this.wb.handlers.trigger("updateWorksheetByModel");
 			}
 		}
-		else if(historyitem_Workbook_ChangeColorScheme == Type)
+		else if(AscCH.historyitem_Workbook_ChangeColorScheme == Type)
 		{
 			bNeedTrigger = false;
 			if(bUndo)
@@ -2882,7 +2882,7 @@ UndoRedoWorkbook.prototype = {
 				this.wb.theme.themeElements.clrScheme = Data.newVal;
 			this.wb.oApi.asc_AfterChangeColorScheme();
 		}
-        else if(historyitem_Workbook_DefinedNamesAdd === Type ){
+        else if(AscCH.historyitem_Workbook_DefinedNamesAdd === Type ){
             if(bUndo){
                 this.wb.delDefinesNames( Data.newName, true );
                 this.wb.handlers.trigger("asc_onDelDefName")
@@ -2907,7 +2907,7 @@ UndoRedoWorkbook.prototype = {
             * граф зависимостей.
             * */
         }
-        else if(historyitem_Workbook_DefinedNamesChange === Type ){
+        else if(AscCH.historyitem_Workbook_DefinedNamesChange === Type ){
             var oldName, newName;
             if(bUndo){
                 oldName = Data.newName;
@@ -2930,7 +2930,7 @@ UndoRedoWorkbook.prototype = {
             this.wb.editDefinesNames( oldName, newName, true );
             this.wb.handlers.trigger("asc_onEditDefName", oldName, newName);
         }
-        else if(historyitem_Workbook_DefinedNamesDelete === Type ){
+        else if(AscCH.historyitem_Workbook_DefinedNamesDelete === Type ){
             if(bUndo){
                 this.wb.editDefinesNames( null, Data, true );
                 if( Data.slaveEdge ){
@@ -2999,72 +2999,72 @@ UndoRedoCell.prototype = {
 			Val = Data.oOldVal;
 		else
 			Val = Data.oNewVal;
-		if(historyitem_Cell_Fontname == Type)
+		if(AscCH.historyitem_Cell_Fontname == Type)
 			cell.setFontname(Val);
-		else if(historyitem_Cell_Fontsize == Type)
+		else if(AscCH.historyitem_Cell_Fontsize == Type)
 			cell.setFontsize(Val);
-		else if(historyitem_Cell_Fontcolor == Type)
+		else if(AscCH.historyitem_Cell_Fontcolor == Type)
 			cell.setFontcolor(Val);
-		else if(historyitem_Cell_Bold == Type)
+		else if(AscCH.historyitem_Cell_Bold == Type)
 			cell.setBold(Val);
-		else if(historyitem_Cell_Italic == Type)
+		else if(AscCH.historyitem_Cell_Italic == Type)
 			cell.setItalic(Val);
-		else if(historyitem_Cell_Underline == Type)
+		else if(AscCH.historyitem_Cell_Underline == Type)
 			cell.setUnderline(Val);
-		else if(historyitem_Cell_Strikeout == Type)
+		else if(AscCH.historyitem_Cell_Strikeout == Type)
 			cell.setStrikeout(Val);
-		else if(historyitem_Cell_FontAlign == Type)
+		else if(AscCH.historyitem_Cell_FontAlign == Type)
 			cell.setFontAlign(Val);
-		else if(historyitem_Cell_AlignVertical == Type)
+		else if(AscCH.historyitem_Cell_AlignVertical == Type)
 			cell.setAlignVertical(Val);
-		else if(historyitem_Cell_AlignHorizontal == Type)
+		else if(AscCH.historyitem_Cell_AlignHorizontal == Type)
 			cell.setAlignHorizontal(Val);
-		else if(historyitem_Cell_Fill == Type)
+		else if(AscCH.historyitem_Cell_Fill == Type)
 			cell.setFill(Val);
-		else if(historyitem_Cell_Border == Type)
+		else if(AscCH.historyitem_Cell_Border == Type)
 		{
 			if(null != Val)
 				cell.setBorder(Val.clone());
 			else
 				cell.setBorder(null);
 		}
-		else if(historyitem_Cell_ShrinkToFit == Type)
+		else if(AscCH.historyitem_Cell_ShrinkToFit == Type)
 			cell.setFill(Val);
-		else if(historyitem_Cell_Wrap == Type)
+		else if(AscCH.historyitem_Cell_Wrap == Type)
 			cell.setWrap(Val);
-		else if(historyitem_Cell_Numformat == Type)
+		else if(AscCH.historyitem_Cell_Numformat == Type)
 			cell.setNumFormat(Val);
-        else if(historyitem_Cell_Angle == Type)
+        else if(AscCH.historyitem_Cell_Angle == Type)
             cell.setAngle(Val);
-        else if(historyitem_Cell_ChangeArrayValueFormat == Type)
+        else if(AscCH.historyitem_Cell_ChangeArrayValueFormat == Type)
 		{
 			cell.oValue.multiText = [];
 			for(var i = 0, length = Val.length; i < length; ++i)
 				cell.oValue.multiText.push(Val[i].clone());
 		}
-		else if(historyitem_Cell_ChangeValue == Type)
+		else if(AscCH.historyitem_Cell_ChangeValue == Type)
 		{
 			cell.setValueData(Val);
 			// ToDo Так делать неправильно, нужно поправить (перенести логику в model, а отрисовку отделить)
 			var worksheetView = this.wb.oApi.wb.getWorksheetById(nSheetId);
 			worksheetView.model.autoFilters.renameTableColumn(new Asc.Range(nCol, nRow, nCol, nRow), bUndo);
 		}
-		else if(historyitem_Cell_SetStyle == Type)
+		else if(AscCH.historyitem_Cell_SetStyle == Type)
 		{
             if(null != Val)
                 cell.setStyle(Val);
 			else
 				cell.setStyle(null);
 		}
-		else if(historyitem_Cell_SetFont == Type)
+		else if(AscCH.historyitem_Cell_SetFont == Type)
 		{
 			cell.setFont(Val);
 		}
-		else if(historyitem_Cell_SetQuotePrefix == Type)
+		else if(AscCH.historyitem_Cell_SetQuotePrefix == Type)
 		{
 			cell.setQuotePrefix(Val);
 		}
-		else if (historyitem_Cell_Style == Type)
+		else if (AscCH.historyitem_Cell_Style == Type)
 		{
 			cell.setCellStyle(Val);
 		}
@@ -3096,7 +3096,7 @@ UndoRedoWoorksheet.prototype = {
 		if(null == ws)
 			return;
 		var collaborativeEditing = this.wb.oApi.collaborativeEditing;
-		if(historyitem_Worksheet_RemoveCell == Type)
+		if(AscCH.historyitem_Worksheet_RemoveCell == Type)
 		{
 			nRow = Data.nRow;
 			nCol = Data.nCol;
@@ -3124,7 +3124,7 @@ UndoRedoWoorksheet.prototype = {
 			else
 				ws._removeCell(nRow, nCol);
 		}
-        else if(historyitem_Worksheet_RemoveCellFormula == Type){
+        else if(AscCH.historyitem_Worksheet_RemoveCellFormula == Type){
             nRow = Data.nRow;
             nCol = Data.nCol;
             if(bUndo)
@@ -3135,7 +3135,7 @@ UndoRedoWoorksheet.prototype = {
                     node.setFormula(Data.sFormula, false, true);
             }
         }
-		else if(historyitem_Worksheet_ColProp == Type)
+		else if(AscCH.historyitem_Worksheet_ColProp == Type)
 		{
 			index = Data.index;
 			if(false != this.wb.bCollaborativeChanges)
@@ -3159,7 +3159,7 @@ UndoRedoWoorksheet.prototype = {
 			else
 				col.setWidthProp(Data.oNewVal);
 		}
-		else if(historyitem_Worksheet_RowProp == Type)
+		else if(AscCH.historyitem_Worksheet_RowProp == Type)
 		{
 			index = Data.index;
 			if(false != this.wb.bCollaborativeChanges)
@@ -3181,7 +3181,7 @@ UndoRedoWoorksheet.prototype = {
 			//var workSheetView = this.wb.oApi.wb.getWorksheetById(nSheetId);	
 			//workSheetView.autoFilters.reDrawFilter(null, index);
 		}
-		else if(historyitem_Worksheet_RowHide == Type)
+		else if(AscCH.historyitem_Worksheet_RowHide == Type)
 		{
 			from = Data.from;
 			to = Data.to;
@@ -3210,7 +3210,7 @@ UndoRedoWoorksheet.prototype = {
 				workSheetView.model.autoFilters.reDrawFilter(new Asc.Range(0, from, ws.nColsCount - 1, to));
 			}
 		}
-		else if(historyitem_Worksheet_AddRows == Type || historyitem_Worksheet_RemoveRows == Type)
+		else if(AscCH.historyitem_Worksheet_AddRows == Type || AscCH.historyitem_Worksheet_RemoveRows == Type)
 		{
 			from = Data.from;
 			to = Data.to;
@@ -3218,7 +3218,7 @@ UndoRedoWoorksheet.prototype = {
 			{
 				from = collaborativeEditing.getLockOtherRow2(nSheetId, from);
 				to = collaborativeEditing.getLockOtherRow2(nSheetId, to);
-				if(false == ((true == bUndo && historyitem_Worksheet_AddRows == Type) || (false == bUndo && historyitem_Worksheet_RemoveRows == Type)))
+				if(false == ((true == bUndo && AscCH.historyitem_Worksheet_AddRows == Type) || (false == bUndo && AscCH.historyitem_Worksheet_RemoveRows == Type)))
 				{
 					oLockInfo = new Asc.asc_CLockInfo();
 					oLockInfo["sheetId"] = nSheetId;
@@ -3228,7 +3228,7 @@ UndoRedoWoorksheet.prototype = {
 				}
 			}
 			range = Asc.Range(0, from, gc_nMaxCol0, to);
-			if((true == bUndo && historyitem_Worksheet_AddRows == Type) || (false == bUndo && historyitem_Worksheet_RemoveRows == Type)) {
+			if((true == bUndo && AscCH.historyitem_Worksheet_AddRows == Type) || (false == bUndo && AscCH.historyitem_Worksheet_RemoveRows == Type)) {
 				ws.removeRows(from, to);
 				bInsert = false;
 				operType = c_oAscDeleteOptions.DeleteRows;
@@ -3246,7 +3246,7 @@ UndoRedoWoorksheet.prototype = {
 			worksheetView = this.wb.oApi.wb.getWorksheetById(nSheetId);
 			worksheetView.cellCommentator.updateCommentsDependencies(bInsert, operType, range);
 		}
-		else if(historyitem_Worksheet_AddCols == Type || historyitem_Worksheet_RemoveCols == Type)
+		else if(AscCH.historyitem_Worksheet_AddCols == Type || AscCH.historyitem_Worksheet_RemoveCols == Type)
 		{
 			from = Data.from;
 			to = Data.to;
@@ -3254,7 +3254,7 @@ UndoRedoWoorksheet.prototype = {
 			{
 				from = collaborativeEditing.getLockOtherColumn2(nSheetId, from);
 				to = collaborativeEditing.getLockOtherColumn2(nSheetId, to);
-				if(false == ((true == bUndo && historyitem_Worksheet_AddCols == Type) || (false == bUndo && historyitem_Worksheet_RemoveCols == Type)))
+				if(false == ((true == bUndo && AscCH.historyitem_Worksheet_AddCols == Type) || (false == bUndo && AscCH.historyitem_Worksheet_RemoveCols == Type)))
 				{
 					oLockInfo = new Asc.asc_CLockInfo();
 					oLockInfo["sheetId"] = nSheetId;
@@ -3265,7 +3265,7 @@ UndoRedoWoorksheet.prototype = {
 			}
 
 			range = Asc.Range(from, 0, to, gc_nMaxRow0);
-			if((true == bUndo && historyitem_Worksheet_AddCols == Type) || (false == bUndo && historyitem_Worksheet_RemoveCols == Type)) {
+			if((true == bUndo && AscCH.historyitem_Worksheet_AddCols == Type) || (false == bUndo && AscCH.historyitem_Worksheet_RemoveCols == Type)) {
 				ws.removeCols(from, to);
 				bInsert = false;
 				operType = c_oAscDeleteOptions.DeleteColumns;
@@ -3283,7 +3283,7 @@ UndoRedoWoorksheet.prototype = {
 			worksheetView = this.wb.oApi.wb.getWorksheetById(nSheetId);
 			worksheetView.cellCommentator.updateCommentsDependencies(bInsert, operType, range);
 		}
-		else if(historyitem_Worksheet_ShiftCellsLeft == Type || historyitem_Worksheet_ShiftCellsRight == Type)
+		else if(AscCH.historyitem_Worksheet_ShiftCellsLeft == Type || AscCH.historyitem_Worksheet_ShiftCellsRight == Type)
 		{
 			r1 = Data.r1;
 			c1 = Data.c1;
@@ -3295,7 +3295,7 @@ UndoRedoWoorksheet.prototype = {
 				c1 = collaborativeEditing.getLockOtherColumn2(nSheetId, c1);
 				r2 = collaborativeEditing.getLockOtherRow2(nSheetId, r2);
 				c2 = collaborativeEditing.getLockOtherColumn2(nSheetId, c2);
-				if(false == ((true == bUndo && historyitem_Worksheet_ShiftCellsLeft == Type) || (false == bUndo && historyitem_Worksheet_ShiftCellsRight == Type)))
+				if(false == ((true == bUndo && AscCH.historyitem_Worksheet_ShiftCellsLeft == Type) || (false == bUndo && AscCH.historyitem_Worksheet_ShiftCellsRight == Type)))
 				{
 					oLockInfo = new Asc.asc_CLockInfo();
 					oLockInfo["sheetId"] = nSheetId;
@@ -3306,7 +3306,7 @@ UndoRedoWoorksheet.prototype = {
 			}
 
 			range = ws.getRange3(r1, c1, r2, c2);
-			if((true == bUndo && historyitem_Worksheet_ShiftCellsLeft == Type) || (false == bUndo && historyitem_Worksheet_ShiftCellsRight == Type)) {
+			if((true == bUndo && AscCH.historyitem_Worksheet_ShiftCellsLeft == Type) || (false == bUndo && AscCH.historyitem_Worksheet_ShiftCellsRight == Type)) {
 				range.addCellsShiftRight();
 				bInsert = true;
 				operType = c_oAscInsertOptions.InsertCellsAndShiftRight;
@@ -3320,7 +3320,7 @@ UndoRedoWoorksheet.prototype = {
 			worksheetView = this.wb.oApi.wb.getWorksheetById(nSheetId);
 			worksheetView.cellCommentator.updateCommentsDependencies(bInsert, operType, range.bbox);
 		}
-		else if(historyitem_Worksheet_ShiftCellsTop == Type || historyitem_Worksheet_ShiftCellsBottom == Type)
+		else if(AscCH.historyitem_Worksheet_ShiftCellsTop == Type || AscCH.historyitem_Worksheet_ShiftCellsBottom == Type)
 		{
 			r1 = Data.r1;
 			c1 = Data.c1;
@@ -3332,7 +3332,7 @@ UndoRedoWoorksheet.prototype = {
 				c1 = collaborativeEditing.getLockOtherColumn2(nSheetId, c1);
 				r2 = collaborativeEditing.getLockOtherRow2(nSheetId, r2);
 				c2 = collaborativeEditing.getLockOtherColumn2(nSheetId, c2);
-				if(false == ((true == bUndo && historyitem_Worksheet_ShiftCellsTop == Type) || (false == bUndo && historyitem_Worksheet_ShiftCellsBottom == Type)))
+				if(false == ((true == bUndo && AscCH.historyitem_Worksheet_ShiftCellsTop == Type) || (false == bUndo && AscCH.historyitem_Worksheet_ShiftCellsBottom == Type)))
 				{
 					oLockInfo = new Asc.asc_CLockInfo();
 					oLockInfo["sheetId"] = nSheetId;
@@ -3343,7 +3343,7 @@ UndoRedoWoorksheet.prototype = {
 			}
 
 			range = ws.getRange3(r1, c1, r2, c2);
-			if((true == bUndo && historyitem_Worksheet_ShiftCellsTop == Type) || (false == bUndo && historyitem_Worksheet_ShiftCellsBottom == Type)) {
+			if((true == bUndo && AscCH.historyitem_Worksheet_ShiftCellsTop == Type) || (false == bUndo && AscCH.historyitem_Worksheet_ShiftCellsBottom == Type)) {
 				range.addCellsShiftBottom();
 				bInsert = true;
 				operType = c_oAscInsertOptions.InsertCellsAndShiftDown;
@@ -3357,7 +3357,7 @@ UndoRedoWoorksheet.prototype = {
 			worksheetView = this.wb.oApi.wb.getWorksheetById(nSheetId);
 			worksheetView.cellCommentator.updateCommentsDependencies(bInsert, operType, range.bbox);
 		}
-		else if(historyitem_Worksheet_Sort == Type)
+		else if(AscCH.historyitem_Worksheet_Sort == Type)
 		{
 			var bbox = Data.bbox;
 			var places = Data.places;
@@ -3382,7 +3382,7 @@ UndoRedoWoorksheet.prototype = {
 			range = ws.getRange3(bbox.r1, bbox.c1, bbox.r2, bbox.c2);
 			range._sortByArray(bbox, places);
 		}
-		else if(historyitem_Worksheet_MoveRange == Type)
+		else if(AscCH.historyitem_Worksheet_MoveRange == Type)
 		{
 			//todo worksheetView.autoFilters._moveAutoFilters(worksheetView ,null, null, g_oUndoRedoAutoFiltersMoveData);
 			from = Asc.Range(Data.from.c1, Data.from.r1, Data.from.c2, Data.from.r2);
@@ -3424,9 +3424,9 @@ UndoRedoWoorksheet.prototype = {
 			worksheetView.model.autoFilters.reDrawFilter(to);
 			worksheetView.model.autoFilters.reDrawFilter(from);
 		}
-		else if(historyitem_Worksheet_Merge == Type || historyitem_Worksheet_Unmerge == Type)
+		else if(AscCH.historyitem_Worksheet_Merge == Type || AscCH.historyitem_Worksheet_Unmerge == Type)
 		{
-			if(historyitem_Worksheet_Unmerge == Type)
+			if(AscCH.historyitem_Worksheet_Unmerge == Type)
 				bUndo = !bUndo;
 			r1 = Data.r1;
 			c1 = Data.c1;
@@ -3445,9 +3445,9 @@ UndoRedoWoorksheet.prototype = {
 			else
 				range.merge();
 		}
-		else if(historyitem_Worksheet_SetHyperlink == Type || historyitem_Worksheet_RemoveHyperlink == Type)
+		else if(AscCH.historyitem_Worksheet_SetHyperlink == Type || AscCH.historyitem_Worksheet_RemoveHyperlink == Type)
 		{
-			if(historyitem_Worksheet_RemoveHyperlink == Type)
+			if(AscCH.historyitem_Worksheet_RemoveHyperlink == Type)
 				bUndo = !bUndo;
 			var Ref = Data.Ref;
 			if(false != this.wb.bCollaborativeChanges)
@@ -3465,7 +3465,7 @@ UndoRedoWoorksheet.prototype = {
 			else
 				Ref.setHyperlink(Data, true);
 		}
-		else if(historyitem_Worksheet_Rename == Type)
+		else if(AscCH.historyitem_Worksheet_Rename == Type)
 		{
 			if(bUndo)
 				ws.setName(Data.from, true);
@@ -3493,38 +3493,38 @@ UndoRedoWoorksheet.prototype = {
 				ws.setName(name, true);
 			}
 		}
-		else if(historyitem_Worksheet_Hide == Type)
+		else if(AscCH.historyitem_Worksheet_Hide == Type)
 		{
 			if(bUndo)
 				ws.setHidden(Data.from);
 			else
 				ws.setHidden(Data.to);
 		}
-		else if(historyitem_Worksheet_CreateRow == Type)
+		else if(AscCH.historyitem_Worksheet_CreateRow == Type)
 		{
 			if(bUndo)
 				ws._removeRow(Data.elem);
 			else
 				ws._getRow(Data.elem);
 		}
-		else if(historyitem_Worksheet_CreateCol == Type)
+		else if(AscCH.historyitem_Worksheet_CreateCol == Type)
 		{
 			if(bUndo)
 				ws._removeCol(Data.elem);
 			else
 				ws._getCol(Data.elem);
 		}
-		else if(historyitem_Worksheet_CreateCell == Type)
+		else if(AscCH.historyitem_Worksheet_CreateCell == Type)
 		{
 			if(bUndo)
 				ws._removeCell(Data.nRow, Data.nCol);
 			else
 				ws._getCell(Data.nRow, Data.nCol);
 		}
-        else if (historyitem_Worksheet_SetViewSettings === Type) {
+        else if (AscCH.historyitem_Worksheet_SetViewSettings === Type) {
 			ws.setSheetViewSettings(bUndo ? Data.from : Data.to);
 		}
-		else if(historyitem_Worksheet_ChangeMerge === Type){
+		else if(AscCH.historyitem_Worksheet_ChangeMerge === Type){
 			from = null;
 			if(null != Data.from)
 				from = new Asc.Range(Data.from.c1, Data.from.r1, Data.from.c2, Data.from.r2);
@@ -3554,7 +3554,7 @@ UndoRedoWoorksheet.prototype = {
 			if(null != to && null != to.r1 && null != to.c1 && null != to.r2 && null != to.c2)
 				ws.mergeManager.add(to, data);
 		}
-		else if(historyitem_Worksheet_ChangeHyperlink === Type){
+		else if(AscCH.historyitem_Worksheet_ChangeHyperlink === Type){
 			from = null;
 			if(null != Data.from)
 				from = new Asc.Range(Data.from.c1, Data.from.r1, Data.from.c2, Data.from.r2);
@@ -3591,12 +3591,12 @@ UndoRedoWoorksheet.prototype = {
 				ws.hyperlinkManager.add(to, data);
 			}
 		}
-        else if (historyitem_Worksheet_ChangeFrozenCell === Type) {
+        else if (AscCH.historyitem_Worksheet_ChangeFrozenCell === Type) {
 			worksheetView = this.wb.oApi.wb.getWorksheetById(nSheetId);
 			var updateData = bUndo ? Data.from : Data.to;
 			worksheetView._updateFreezePane(updateData.c1, updateData.r1, /*lockDraw*/true);
 		}
-        else if (historyitem_Worksheet_SetTabColor === Type) {
+        else if (AscCH.historyitem_Worksheet_SetTabColor === Type) {
 			ws.setTabColor(bUndo ? Data.from : Data.to);
 		}
 	}
@@ -3663,48 +3663,48 @@ UndoRedoRowCol.prototype = {
 			row = ws._getRow(nIndex);
 		else
 			row = ws._getCol(nIndex);
-		if(historyitem_RowCol_SetFont == Type)
+		if(AscCH.historyitem_RowCol_SetFont == Type)
 			row.setFont(Val);
-		else if(historyitem_RowCol_Fontname == Type)
+		else if(AscCH.historyitem_RowCol_Fontname == Type)
 			row.setFontname(Val);
-		else if(historyitem_RowCol_Fontsize == Type)
+		else if(AscCH.historyitem_RowCol_Fontsize == Type)
 			row.setFontsize(Val);
-		else if(historyitem_RowCol_Fontcolor == Type)
+		else if(AscCH.historyitem_RowCol_Fontcolor == Type)
 			row.setFontcolor(Val);
-		else if(historyitem_RowCol_Bold == Type)
+		else if(AscCH.historyitem_RowCol_Bold == Type)
 			row.setBold(Val);
-		else if(historyitem_RowCol_Italic == Type)
+		else if(AscCH.historyitem_RowCol_Italic == Type)
 			row.setItalic(Val);
-		else if(historyitem_RowCol_Underline == Type)
+		else if(AscCH.historyitem_RowCol_Underline == Type)
 			row.setUnderline(Val);
-		else if(historyitem_RowCol_Strikeout == Type)
+		else if(AscCH.historyitem_RowCol_Strikeout == Type)
 			row.setStrikeout(Val);
-		else if(historyitem_RowCol_FontAlign == Type)
+		else if(AscCH.historyitem_RowCol_FontAlign == Type)
 			row.setFontAlign(Val);
-		else if(historyitem_RowCol_AlignVertical == Type)
+		else if(AscCH.historyitem_RowCol_AlignVertical == Type)
 			row.setAlignVertical(Val);
-		else if(historyitem_RowCol_AlignHorizontal == Type)
+		else if(AscCH.historyitem_RowCol_AlignHorizontal == Type)
 			row.setAlignHorizontal(Val);
-		else if(historyitem_RowCol_Fill == Type)
+		else if(AscCH.historyitem_RowCol_Fill == Type)
 			row.setFill(Val);
-		else if(historyitem_RowCol_Border == Type)
+		else if(AscCH.historyitem_RowCol_Border == Type)
 		{
 			if(null != Val)
 				row.setBorder(Val.clone());
 			else
 				row.setBorder(null);
 		}
-		else if(historyitem_RowCol_ShrinkToFit == Type)
+		else if(AscCH.historyitem_RowCol_ShrinkToFit == Type)
 			row.setShrinkToFit(Val);
-		else if(historyitem_RowCol_Wrap == Type)
+		else if(AscCH.historyitem_RowCol_Wrap == Type)
 			row.setWrap(Val);
-		else if(historyitem_RowCol_NumFormat == Type)
+		else if(AscCH.historyitem_RowCol_NumFormat == Type)
 			row.setNumFormat(Val);
-        else if(historyitem_RowCol_Angle == Type)
+        else if(AscCH.historyitem_RowCol_Angle == Type)
             row.setAngle(Val);
-		else if(historyitem_RowCol_SetStyle == Type)
+		else if(AscCH.historyitem_RowCol_SetStyle == Type)
             row.setStyle(Val);
-		else if (historyitem_RowCol_SetCellStyle == Type)
+		else if (AscCH.historyitem_RowCol_SetCellStyle == Type)
 			row.setCellStyle(Val);
 	}
 };

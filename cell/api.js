@@ -2998,7 +2998,7 @@ var editor;
         }
         History.Create_NewPoint();
         //не делаем Duplicate потому что предполагаем что схема не будет менять частями, а только обьектом целиком.
-        History.Add(AscCommonExcel.g_oUndoRedoWorkbook, historyitem_Workbook_ChangeColorScheme, null, null, new AscCommonExcel.UndoRedoData_ClrScheme(oldClrScheme, theme.themeElements.clrScheme));
+        History.Add(AscCommonExcel.g_oUndoRedoWorkbook, AscCH.historyitem_Workbook_ChangeColorScheme, null, null, new AscCommonExcel.UndoRedoData_ClrScheme(oldClrScheme, theme.themeElements.clrScheme));
         t.asc_AfterChangeColorScheme();
       }
     };

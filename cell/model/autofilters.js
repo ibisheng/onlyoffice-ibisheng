@@ -308,7 +308,7 @@
 						tablePartsContainsRange.AutoFilter.Ref = tablePartsContainsRange.Ref.clone();
 
 						//history
-						t._addHistoryObj(cloneFilter, historyitem_AutoFilter_Add,
+						t._addHistoryObj(cloneFilter, AscCH.historyitem_AutoFilter_Add,
 							{activeCells: activeRange, styleName: styleName}, null, cloneFilter.Ref);
 					}
 					else
@@ -339,7 +339,7 @@
 							t._setColorStyleTable(worksheet.TableParts[worksheet.TableParts.length - 1].Ref, worksheet.TableParts[worksheet.TableParts.length - 1], null, true);
 
 						//history
-						t._addHistoryObj({Ref: filterRange}, historyitem_AutoFilter_Add,
+						t._addHistoryObj({Ref: filterRange}, AscCH.historyitem_AutoFilter_Add,
 							{activeCells: filterRange, styleName: styleName, addFormatTableOptionsObj: addFormatTableOptionsObj, displayName: newDisplayName}, null, filterRange, bWithoutFilter);
 						History.SetSelectionRedo(filterRange);
 					}
@@ -390,7 +390,7 @@
 					}
 					
 					//history
-					t._addHistoryObj(cloneFilter, historyitem_AutoFilter_Delete,
+					t._addHistoryObj(cloneFilter, AscCH.historyitem_AutoFilter_Delete,
 						{activeCells: activeRange}, null, cloneFilter.Ref);
 
 					t._setStyleTablePartsAfterOpenRows(filterRange);
@@ -427,7 +427,7 @@
 					t._setColorStyleTable(isTablePartsContainsRange.Ref, isTablePartsContainsRange);
 					
 					//history
-					t._addHistoryObj(cloneFilter, historyitem_AutoFilter_ChangeTableStyle,
+					t._addHistoryObj(cloneFilter, AscCH.historyitem_AutoFilter_ChangeTableStyle,
 						{activeCells: activeRange, styleName: styleName}, null, filterRange);
 					
 					History.EndTransaction();
@@ -566,7 +566,7 @@
 				}
 				
 				//history
-				this._addHistoryObj(oldFilter, historyitem_AutoFilter_ApplyMF,
+				this._addHistoryObj(oldFilter, AscCH.historyitem_AutoFilter_ApplyMF,
 					{activeCells: ar, autoFiltersObject: autoFiltersObject});
 				History.EndTransaction();
 
@@ -686,34 +686,34 @@
 			Redo: function (type, data) {
 				History.TurnOff();
 				switch (type) {
-					case historyitem_AutoFilter_Add:
+					case AscCH.historyitem_AutoFilter_Add:
 						this.addAutoFilter(data.styleName, data.activeCells, data.addFormatTableOptionsObj, null, data.bWithoutFilter, data.displayName);
 						break;
-					case historyitem_AutoFilter_Delete:
+					case AscCH.historyitem_AutoFilter_Delete:
 						this.deleteAutoFilter(data.activeCells);
 						break;
-					case historyitem_AutoFilter_ChangeTableStyle:
+					case AscCH.historyitem_AutoFilter_ChangeTableStyle:
 						this.changeTableStyleInfo(data.styleName, data.activeCells);
 						break;
-					case historyitem_AutoFilter_Sort:
+					case AscCH.historyitem_AutoFilter_Sort:
 						this.sortColFilter(data.type, data.cellId, data.activeCells);
 						break;
-					case historyitem_AutoFilter_Empty:
+					case AscCH.historyitem_AutoFilter_Empty:
 						this.isEmptyAutoFilters(data.activeCells);
 						break;
-					case historyitem_AutoFilter_ApplyMF:
+					case AscCH.historyitem_AutoFilter_ApplyMF:
 						this.applyAutoFilter(data.autoFiltersObject, data.activeCells);
 						break;
-					case historyitem_AutoFilter_Move:
+					case AscCH.historyitem_AutoFilter_Move:
 						this._moveAutoFilters(data.moveTo, data.moveFrom);
 						break;
-					case historyitem_AutoFilter_CleanAutoFilter:
+					case AscCH.historyitem_AutoFilter_CleanAutoFilter:
 						this.isApplyAutoFilterInCell(data.activeCells, true);
 						break;
-					case historyitem_AutoFilter_CleanFormat:
+					case AscCH.historyitem_AutoFilter_CleanFormat:
 						this.cleanFormat(data.activeCells, true);
 						break;
-					case historyitem_AutoFilter_Change:
+					case AscCH.historyitem_AutoFilter_Change:
 						if(data !== null && data.displayName)
 						{
 							if(data.type === true)
@@ -726,13 +726,13 @@
 							}
 						}
 						break;
-					case historyitem_AutoFilter_ChangeTableInfo:
+					case AscCH.historyitem_AutoFilter_ChangeTableInfo:
 						this.changeFormatTableInfo(data.displayName, data.type, data.val);
 						break;
-					case historyitem_AutoFilter_ChangeTableRef:
+					case AscCH.historyitem_AutoFilter_ChangeTableRef:
 						this.changeTableRange(data.displayName, data.moveTo);
 						break;
-					case historyitem_AutoFilter_ChangeTableName:
+					case AscCH.historyitem_AutoFilter_ChangeTableName:
 						this.changeDisplayNameTable(data.displayName, data.val);
 						break;
 				}
@@ -759,11 +759,11 @@
 					delete cloneData.insCells;
 
 				//TODO переделать undo, по типам
-				if(type === historyitem_AutoFilter_Move)//перемещение
+				if(type === AscCH.historyitem_AutoFilter_Move)//перемещение
 				{
 					this._moveAutoFilters(null, null, data);
 				}
-				else if(type === historyitem_AutoFilter_Empty)//было удаление, на undo добавляем
+				else if(type === AscCH.historyitem_AutoFilter_Empty)//было удаление, на undo добавляем
 				{
 					if(cloneData.TableStyleInfo)
 					{
@@ -776,7 +776,7 @@
 					else
 						worksheet.AutoFilter = cloneData;
 				}
-				else if(type === historyitem_AutoFilter_Change || type === historyitem_AutoFilter_ChangeTableInfo || type === historyitem_AutoFilter_ChangeTableRef)
+				else if(type === AscCH.historyitem_AutoFilter_Change || type === AscCH.historyitem_AutoFilter_ChangeTableInfo || type === AscCH.historyitem_AutoFilter_ChangeTableRef)
 				{
 					if(worksheet.AutoFilter && cloneData.newFilterRef.isEqual(worksheet.AutoFilter.Ref))
 						worksheet.AutoFilter = cloneData.oldFilter.clone(null);
@@ -805,7 +805,7 @@
 						}
 					}
 				}
-				else if(type === historyitem_AutoFilter_ChangeTableName)
+				else if(type === AscCH.historyitem_AutoFilter_ChangeTableName)
 				{
 					var oldName = cloneData.newDisplayName;
 					
@@ -818,7 +818,7 @@
 						}
 					}
 				}
-				else if(type === historyitem_AutoFilter_Sort && cloneData.oldFilter)//сортировка
+				else if(type === AscCH.historyitem_AutoFilter_Sort && cloneData.oldFilter)//сортировка
 				{
 					if(worksheet.AutoFilter && cloneData.oldFilter.getType() === g_nFiltersType.autoFilter)
 						worksheet.AutoFilter = cloneData.oldFilter.clone(null);
@@ -834,7 +834,7 @@
 						}
 					}
 				}
-				else if(type === historyitem_AutoFilter_CleanFormat)
+				else if(type === AscCH.historyitem_AutoFilter_CleanFormat)
 				{
 					if(worksheet.TableParts && cloneData && cloneData.Ref)
 					{
@@ -993,10 +993,10 @@
 
 						//заносим в историю
 						if(isTablePart){
-							t._addHistoryObj(oldFilter, historyitem_AutoFilter_Empty, {activeCells: activeCells}, null, bbox);
+							t._addHistoryObj(oldFilter, AscCH.historyitem_AutoFilter_Empty, {activeCells: activeCells}, null, bbox);
                         }
 						else
-							t._addHistoryObj(oldFilter, historyitem_AutoFilter_Empty, {activeCells: activeCells}, null, oldFilter.Ref);
+							t._addHistoryObj(oldFilter, AscCH.historyitem_AutoFilter_Empty, {activeCells: activeCells}, null, oldFilter.Ref);
 						
 						if(isTablePart)
 							worksheet.workbook.dependencyFormulas.delTableName(oldFilter.DisplayName, worksheet.getName())
@@ -1051,7 +1051,7 @@
 
 							t._cleanStyleTable(selectedTableParts[i].Ref);
 							
-							t._addHistoryObj(cloneFilter, historyitem_AutoFilter_CleanFormat, {activeCells: range});
+							t._addHistoryObj(cloneFilter, AscCH.historyitem_AutoFilter_CleanFormat, {activeCells: range});
 						}
 						
 						History.EndTransaction();
@@ -1066,7 +1066,7 @@
 						History.Create_NewPoint();
 						History.StartTransaction();
 						this._cleanStyleTable(range);
-						t._addHistoryObj(null, historyitem_AutoFilter_CleanFormat, {activeCells: range});
+						t._addHistoryObj(null, AscCH.historyitem_AutoFilter_CleanFormat, {activeCells: range});
 						History.EndTransaction();
 					}
 				}
@@ -1216,7 +1216,7 @@
 								oldFilter: oldFilter,
 								newFilterRef: filter.Ref.clone()
 							};
-							t._addHistoryObj(changeElement, historyitem_AutoFilter_Change, null, true, oldFilter.Ref, null, activeRange);
+							t._addHistoryObj(changeElement, AscCH.historyitem_AutoFilter_Change, null, true, oldFilter.Ref, null, activeRange);
 						}
 						
 						//set style
@@ -1289,7 +1289,7 @@
 							oldFilter: oldFilter,
 							newFilterRef: filter.Ref.clone()
 						};
-						t._addHistoryObj(changeElement, historyitem_AutoFilter_Change, {displayName: displayNameFormatTable, activeCells: activeRange, type: true}, false, oldFilter.Ref, null, activeRange);
+						t._addHistoryObj(changeElement, AscCH.historyitem_AutoFilter_Change, {displayName: displayNameFormatTable, activeCells: activeRange, type: true}, false, oldFilter.Ref, null, activeRange);
 					}
 					
 					redrawTablesArr.push({oldfilterRef: oldFilter.Ref, newFilter: filter});
@@ -1383,7 +1383,7 @@
 							oldFilter: oldFilter,
 							newFilterRef: filter.Ref.clone()
 						};
-						t._addHistoryObj(changeElement, historyitem_AutoFilter_Change, null, true, oldFilter.Ref, null, activeRange);
+						t._addHistoryObj(changeElement, AscCH.historyitem_AutoFilter_Change, null, true, oldFilter.Ref, null, activeRange);
 					}
 					
 					//set style
@@ -1453,7 +1453,7 @@
 							oldFilter: oldFilter,
 							newFilterRef: filter.Ref.clone()
 						};
-						t._addHistoryObj(changeElement, historyitem_AutoFilter_Change, {displayName: displayNameFormatTable, activeCells: activeRange, type: false}, false, oldFilter.Ref, null, activeRange);
+						t._addHistoryObj(changeElement, AscCH.historyitem_AutoFilter_Change, {displayName: displayNameFormatTable, activeCells: activeRange, type: false}, false, oldFilter.Ref, null, activeRange);
 					}
 					
 					redrawTablesArr.push({oldfilterRef: oldFilter.Ref, newFilter: filter});
@@ -1510,7 +1510,7 @@
 
 					if(curFilter.TableStyleInfo)
 						t._setColorStyleTable(curFilter.Ref, curFilter);
-					t._addHistoryObj({oldFilter: oldFilter}, historyitem_AutoFilter_Sort,
+					t._addHistoryObj({oldFilter: oldFilter}, AscCH.historyitem_AutoFilter_Sort,
 						{activeCells: cellIdRange, type: type, cellId: cellId}, null, curFilter.Ref);
 					History.EndTransaction();
 				};
@@ -1818,11 +1818,11 @@
                             {
 							if(!addRedo && !data)
 							{
-                                    this._addHistoryObj(oCurFilter, historyitem_AutoFilter_Move, {arnTo: arnTo, arnFrom: arnFrom, activeCells: activeRange});
+                                    this._addHistoryObj(oCurFilter, AscCH.historyitem_AutoFilter_Move, {arnTo: arnTo, arnFrom: arnFrom, activeCells: activeRange});
 								addRedo = true;
 							}
 							else if(!data && addRedo)
-                                    this._addHistoryObj(oCurFilter, historyitem_AutoFilter_Move, null, null, null, null, activeRange);
+                                    this._addHistoryObj(oCurFilter, AscCH.historyitem_AutoFilter_Move, null, null, null, null, activeRange);
 						}
 					}
 				}
@@ -2223,7 +2223,7 @@
 				
 				//History.TurnOn();
 				
-				this._addHistoryObj({oldFilter: oldFilter, newFilterRef: tablePart.Ref.clone()}, historyitem_AutoFilter_ChangeTableInfo,
+				this._addHistoryObj({oldFilter: oldFilter, newFilterRef: tablePart.Ref.clone()}, AscCH.historyitem_AutoFilter_ChangeTableInfo,
 						{activeCells: tablePart.Ref.clone(), type: optionType, val: val, displayName: tableName});
 				
 				this._cleanStyleTable(tablePart.Ref);
@@ -2244,7 +2244,7 @@
 				
 				tablePart.changeRefOnRange(range, this, true);
 				
-				this._addHistoryObj({oldFilter: oldFilter, newFilterRef: tablePart.Ref.clone()}, historyitem_AutoFilter_ChangeTableRef,
+				this._addHistoryObj({oldFilter: oldFilter, newFilterRef: tablePart.Ref.clone()}, AscCH.historyitem_AutoFilter_ChangeTableRef,
 						{activeCells: tablePart.Ref.clone(), arnTo: range, displayName: tableName});
 				
 				this._cleanStyleTable(oldFilter.Ref);
@@ -2270,7 +2270,7 @@
 				
 				tablePart.changeDisplayName(newName);
 				
-				this._addHistoryObj({oldFilter: oldFilter, newFilterRef: tablePart.Ref.clone(), newDisplayName: newName}, historyitem_AutoFilter_ChangeTableName,
+				this._addHistoryObj({oldFilter: oldFilter, newFilterRef: tablePart.Ref.clone(), newDisplayName: newName}, AscCH.historyitem_AutoFilter_ChangeTableName,
 						{activeCells: tablePart.Ref.clone(), val: newName, displayName: tableName});
 				
 				History.EndTransaction();
@@ -2429,7 +2429,7 @@
 				else
 				{
 					oHistoryObject.activeCells			= activeRange ? activeRange.clone() : null;
-					if(type !== historyitem_AutoFilter_Change)
+					if(type !== AscCH.historyitem_AutoFilter_Change)
 						type = null;
 				}
 				
@@ -4184,7 +4184,7 @@
 					autoFilterElement.FilterColumns = null;
 				}
 				
-				this._addHistoryObj(oldFilter, historyitem_AutoFilter_CleanAutoFilter, {activeCells: activeCells}, null, activeCells);
+				this._addHistoryObj(oldFilter, AscCH.historyitem_AutoFilter_CleanAutoFilter, {activeCells: activeCells}, null, activeCells);
 
 				this._resetTablePartStyle();
 				

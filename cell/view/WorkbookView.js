@@ -644,30 +644,30 @@
     });
     this.model.handlers.add("undoRedoAddRemoveRowCols", function(sheetId, type, range, bUndo) {
       if (true === bUndo) {
-        if (historyitem_Worksheet_AddRows === type) {
+        if (AscCH.historyitem_Worksheet_AddRows === type) {
           self.collaborativeEditing.removeRowsRange(sheetId, range.clone(true));
           self.collaborativeEditing.undoRows(sheetId, range.r2 - range.r1 + 1);
-        } else if (historyitem_Worksheet_RemoveRows === type) {
+        } else if (AscCH.historyitem_Worksheet_RemoveRows === type) {
           self.collaborativeEditing.addRowsRange(sheetId, range.clone(true));
           self.collaborativeEditing.undoRows(sheetId, range.r2 - range.r1 + 1);
-        } else if (historyitem_Worksheet_AddCols === type) {
+        } else if (AscCH.historyitem_Worksheet_AddCols === type) {
           self.collaborativeEditing.removeColsRange(sheetId, range.clone(true));
           self.collaborativeEditing.undoCols(sheetId, range.c2 - range.c1 + 1);
-        } else if (historyitem_Worksheet_RemoveCols === type) {
+        } else if (AscCH.historyitem_Worksheet_RemoveCols === type) {
           self.collaborativeEditing.addColsRange(sheetId, range.clone(true));
           self.collaborativeEditing.undoCols(sheetId, range.c2 - range.c1 + 1);
         }
       } else {
-        if (historyitem_Worksheet_AddRows === type) {
+        if (AscCH.historyitem_Worksheet_AddRows === type) {
           self.collaborativeEditing.addRowsRange(sheetId, range.clone(true));
           self.collaborativeEditing.addRows(sheetId, range.r1, range.r2 - range.r1 + 1);
-        } else if (historyitem_Worksheet_RemoveRows === type) {
+        } else if (AscCH.historyitem_Worksheet_RemoveRows === type) {
           self.collaborativeEditing.removeRowsRange(sheetId, range.clone(true));
           self.collaborativeEditing.removeRows(sheetId, range.r1, range.r2 - range.r1 + 1);
-        } else if (historyitem_Worksheet_AddCols === type) {
+        } else if (AscCH.historyitem_Worksheet_AddCols === type) {
           self.collaborativeEditing.addColsRange(sheetId, range.clone(true));
           self.collaborativeEditing.addCols(sheetId, range.c1, range.c2 - range.c1 + 1);
-        } else if (historyitem_Worksheet_RemoveCols === type) {
+        } else if (AscCH.historyitem_Worksheet_RemoveCols === type) {
           self.collaborativeEditing.removeColsRange(sheetId, range.clone(true));
           self.collaborativeEditing.removeCols(sheetId, range.c1, range.c2 - range.c1 + 1);
         }
