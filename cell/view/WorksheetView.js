@@ -2495,11 +2495,11 @@
 
     /** Рисует фон ячеек в строке */
     WorksheetView.prototype._drawRowBG = function ( drawingCtx, row, colStart, colEnd, offsetX, offsetY, oMergedCell ) {
+        var mergedCells = [];
         if ( this.rows[row].height < this.height_1px && null === oMergedCell ) {
-            return {};
+            return mergedCells;
         }
 
-        var mergedCells = [];
         var ctx = (undefined === drawingCtx) ? this.drawingCtx : drawingCtx;
         for ( var col = colStart; col <= colEnd; ++col ) {
             if ( this.cols[col].width < this.width_1px && null === oMergedCell ) {
@@ -2575,11 +2575,12 @@
 
     /** Рисует текст ячеек в строке */
     WorksheetView.prototype._drawRowText = function ( drawingCtx, row, colStart, colEnd, offsetX, offsetY ) {
+        var mergedCells = [];
         if ( this.rows[row].height < this.height_1px ) {
-            return {};
+            return mergedCells;
         }
 
-        var dependentCells = {}, mergedCells = [], i, mc, col;
+        var dependentCells = {}, i, mc, col;
         // draw cells' text
         for ( col = colStart; col <= colEnd; ++col ) {
             if ( this.cols[col].width < this.width_1px ) {
