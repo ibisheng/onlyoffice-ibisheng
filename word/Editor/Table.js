@@ -95,6 +95,7 @@ function CTable(DrawingDocument, Parent, Inline, PageNum, X, Y, XLimit, YLimit, 
     this.TableGridNeedRecalc = true;
     this.bPresentation = bPresentation === true;
 
+    // TODO: TableLook и TableStyle нужно перемесить в TablePr
     this.TableStyle = (undefined !== this.DrawingDocument && null !== this.DrawingDocument && this.DrawingDocument.m_oLogicDocument && this.DrawingDocument.m_oLogicDocument.Styles ? this.DrawingDocument.m_oLogicDocument.Styles.Get_Default_TableGrid() : null);
     this.TableLook  = new CTableLook(true, true, false, false, true, false);
 
@@ -9115,6 +9116,7 @@ CTable.prototype =
     {
         History.Add( this, { Type : historyitem_Table_Pr, Old : this.Pr, New : TablePr } );
         this.Pr = TablePr;
+        this.Recalc_CompiledPr2();
     },
 
     Set_TableStyle : function(StyleId, bNoClearFormatting)
@@ -9130,7 +9132,7 @@ CTable.prototype =
         {
             this.Clear_DirectFormatting(false);
         }
-        this.Recalc_CompiledPr();
+        this.Recalc_CompiledPr2();
     },
 
     Set_TableStyle2 : function(StyleId)
@@ -9153,7 +9155,7 @@ CTable.prototype =
     {
         History.Add( this, { Type : historyitem_Table_TableLook, Old : this.TableLook, New : TableLook } );
         this.TableLook = TableLook;
-        this.Recalc_CompiledPr();
+        this.Recalc_CompiledPr2();
     },
 
     Get_TableLook : function()
@@ -9289,14 +9291,14 @@ CTable.prototype =
         }
         else if ( undefined === this.Pr.TableW )
         {
-            var TableW = new CTableMeasurement(Type, W)
+            var TableW = new CTableMeasurement(Type, W);
             History.Add( this, { Type : historyitem_Table_TableW, Old : undefined, New : TableW } );
             this.Pr.TableW = TableW;
             this.Recalc_CompiledPr();
         }
         else if ( Type != this.Pr.TableW.Type || Math.abs( this.Pr.TableW.W - W ) > 0.001 )
         {
-            var TableW = new CTableMeasurement(Type, W)
+            var TableW = new CTableMeasurement(Type, W);
             History.Add( this, { Type : historyitem_Table_TableW, Old : this.Pr.TableW, New : TableW } );
             this.Pr.TableW = TableW;
             this.Recalc_CompiledPr();

@@ -43,7 +43,18 @@
         ApiParagraph.superclass.constructor.call(this, this, Paragraph.Pr.Copy());
         this.Paragraph = Paragraph;
     }
+
     AscCommon.extendClass(ApiParagraph, ApiParaPr);
+
+    /**
+     * Class representing a table properties.
+     * @constructor
+     */
+    function ApiTablePr(Parent, TablePr)
+    {
+        this.Parent  = Parent;
+        this.TablePr = TablePr;
+    }
 
     /**
      * Class representing a table.
@@ -51,8 +62,10 @@
      */
     function ApiTable(Table)
     {
+        ApiTable.superclass.constructor.call(this, this, Table.Pr.Copy());
         this.Table = Table;
     }
+    AscCommon.extendClass(ApiTable, ApiTablePr);
 
     /**
      * Class representing a text properties.
@@ -74,6 +87,7 @@
         ApiRun.superclass.constructor.call(this, this, Run.Pr.Copy());
         this.Run = Run;
     }
+
     AscCommon.extendClass(ApiRun, ApiTextPr);
 
     /**
@@ -189,6 +203,11 @@
      * @typedef {("default" | "title" | "even")} HdrFtrType
      */
 
+    /**
+     * The possible values for the units of the width property being defined by a specific table width property.
+     * @typedef {("auto" | "twips" | "nul" | "percent")} TableWidth
+     */
+
     //------------------------------------------------------------------------------------------------------------------
     //
     // Base Api
@@ -236,10 +255,10 @@
     //
     //------------------------------------------------------------------------------------------------------------------
 
-	/**
+    /**
      * Create new history point
      */
-	ApiDocument.prototype.Create_NewHistoryPoint = function()
+    ApiDocument.prototype.Create_NewHistoryPoint = function()
     {
         this.Document.Create_NewHistoryPoint();
     };
@@ -311,7 +330,7 @@
      */
     ApiDocument.prototype.GetStyle = function(sStyleName)
     {
-        var oStyles = this.Document.Get_Styles();
+        var oStyles  = this.Document.Get_Styles();
         var oStyleId = oStyles.Get_StyleIdByName(sStyleName);
         return new ApiStyle(oStyles.Get(oStyleId));
     };
@@ -334,10 +353,10 @@
         else if ("numbering" === sType)
             nStyleType = styletype_Numbering;
 
-        var oStyle = new CStyle(sStyleName, null, null, nStyleType, (styletype_Table !== nStyleType? false : true));
-        oStyle.qFormat = true;
+        var oStyle        = new CStyle(sStyleName, null, null, nStyleType, (styletype_Table !== nStyleType ? false : true));
+        oStyle.qFormat    = true;
         oStyle.uiPriority = 1;
-        var oStyles = this.Document.Get_Styles();
+        var oStyles       = this.Document.Get_Styles();
 
         // Если у нас есть стиль с данным именем, тогда мы старый стиль удаляем, а новый добавляем со старым Id,
         // чтобы если были ссылки на старый стиль - теперь они стали на новый.
@@ -429,8 +448,8 @@
     ApiDocument.prototype.CreateNumbering = function(sType)
     {
         var oGlobalNumbering = this.Document.Get_Numbering();
-        var oNumberingId = oGlobalNumbering.Create_AbstractNum();
-        var oNumbering = oGlobalNumbering.Get_AbstractNum(oNumberingId);
+        var oNumberingId     = oGlobalNumbering.Create_AbstractNum();
+        var oNumbering       = oGlobalNumbering.Get_AbstractNum(oNumberingId);
 
         if ("numbered" === sType)
             oNumbering.Create_Default_Numbered();
@@ -529,9 +548,9 @@
         if (!oNumPr)
             return null;
 
-        var oLogicDocument = private_GetLogicDocument();
+        var oLogicDocument   = private_GetLogicDocument();
         var oGlobalNumbering = oLogicDocument.Get_Numbering();
-        var oNumbering = oGlobalNumbering.Get_AbstractNum(oNumPr.NumId);
+        var oNumbering       = oGlobalNumbering.Get_AbstractNum(oNumPr.NumId);
         if (!oNumbering)
             return null;
 
@@ -619,13 +638,13 @@
     ApiSection.prototype.SetNotEqualColumns = function(aWidths, aSpaces)
     {
         if (!aWidths || !aWidths.length || aWidths.length <= 1 || aSpaces.length !== aWidths.length - 1)
-            return false;
+            return;
 
         this.Section.Set_Columns_EqualWidth(false);
         var aCols = [];
         for (var nPos = 0, nCount = aWidths.length; nPos < nCount; ++nPos)
         {
-            var SectionColumn = new CSectionColumn();
+            var SectionColumn   = new CSectionColumn();
             SectionColumn.W     = private_Twips2MM(aWidths[nPos]);
             SectionColumn.Space = private_Twips2MM(nPos !== nCount - 1 ? aSpaces[nPos] : 0);
             aCols.push(SectionColumn);
@@ -694,7 +713,7 @@
         if (null === oHeader && true === isCreate)
         {
             var oLogicDocument = private_GetLogicDocument();
-            oHeader = new CHeaderFooter(oLogicDocument.Get_HdrFtr(), oLogicDocument, oLogicDocument.Get_DrawingDocument(), hdrftr_Header);
+            oHeader            = new CHeaderFooter(oLogicDocument.Get_HdrFtr(), oLogicDocument, oLogicDocument.Get_DrawingDocument(), hdrftr_Header);
             if ("title" === sType)
                 this.Section.Set_Header_First(oHeader);
             else if ("even" === sType)
@@ -742,7 +761,7 @@
         if (null === oFooter && true === isCreate)
         {
             var oLogicDocument = private_GetLogicDocument();
-            oFooter = new CHeaderFooter(oLogicDocument.Get_HdrFtr(), oLogicDocument, oLogicDocument.Get_DrawingDocument(), hdrftr_Footer);
+            oFooter            = new CHeaderFooter(oLogicDocument.Get_HdrFtr(), oLogicDocument, oLogicDocument.Get_DrawingDocument(), hdrftr_Footer);
             if ("title" === sType)
                 this.Section.Set_Footer_First(oFooter);
             else if ("even" === sType)
@@ -811,7 +830,7 @@
      */
     ApiTable.prototype.MergeCells = function(aCells)
     {
-        var oTable = this.Table;
+        var oTable            = this.Table;
         oTable.Selection.Use  = true;
         oTable.Selection.Type = table_Selection_Cell;
         oTable.Selection.Data = [];
@@ -819,7 +838,7 @@
         for (var nPos = 0, nCount = aCells.length; nPos < nCount; ++nPos)
         {
             var oCell = aCells[nPos].Cell;
-            var oPos = {Cell : oCell.Index, Row : oCell.Row.Index};
+            var oPos  = {Cell : oCell.Index, Row : oCell.Row.Index};
 
             var nResultPos    = 0;
             var nResultLength = oTable.Selection.Data.length;
@@ -857,44 +876,15 @@
         return null;
     };
     /**
-     * Set table style
+     * Set table style.
      * @param {ApiStyle} oStyle
-     * @return {boolean}
      */
     ApiTable.prototype.SetStyle = function(oStyle)
     {
         if (!oStyle || !(oStyle instanceof ApiStyle) || styletype_Table !== oStyle.Style.Get_Type())
-            return false;
+            return;
 
-        this.Table.Set_Props({TableStyle : oStyle.Style.Get_Id()});
-        return true;
-    };
-    /**
-     * Set the preferred width for this table.
-     * @param {("auto" | "twips" | "percent" | "nil")} sType - Type of the width value
-     * @param {number} [nValue]
-     */
-    ApiTable.prototype.SetWidth = function(sType, nValue)
-    {
-        if ("auto" === sType)
-            this.Table.Set_Props({TableWidth : null});
-        else if ("twips" === sType)
-            this.Table.Set_Props({TableWidth : private_Twips2MM(nValue)});
-        else if ("percent" === sType)
-            this.Table.Set_Props({TableWidth : -nValue});
-    };
-    /**
-     * Set the alignment of the current table with respect to the text margins in the current section.
-     * @param {("left" | "right" | "center")} sJcType
-     */
-    ApiTable.prototype.SetJc = function(sJcType)
-    {
-        if ("left" === sJcType)
-            this.Table.Set_Props({TableAlignment : 0});
-        else if ("right" === sJcType)
-            this.Table.Set_Props({TableAlignment : 2});
-        else if ("center" === sJcType)
-            this.Table.Set_Props({TableAlignment : 1});
+        this.Table.Set_TableStyle(oStyle.Style.Get_Id(), true);
     };
     /**
      * Specify the components of the conditional formatting of the referenced table style (if one exists)
@@ -913,95 +903,13 @@
      */
     ApiTable.prototype.SetTableLook = function(isFirstColumn, isFirstRow, isLastColumn, isLastRow, isHorBand, isVerBand)
     {
-        this.Table.Set_Props({TableLook :
-        {
-            FirstCol : isFirstColumn,
-            FirstRow : isFirstRow,
-            LastCol  : isLastColumn,
-            LastRow  : isLastRow,
-            BandHor  : isHorBand,
-            BandVer  : isVerBand
-        }});
-    };
-    /**
-     * Set the border which shall be displayed at the top of the current table.
-     * @param {BorderType} sType - The style of border.
-     * @param {pt_8} nSize - The width of the current border.
-     * @param {pt} nSpace - The spacing offset that shall be used to place this border.
-     * @param {byte} r
-     * @param {byte} g
-     * @param {byte} b
-     */
-    ApiTable.prototype.SetTableBorderTop = function(sType, nSize, nSpace, r, g, b)
-    {
-        this.Table.Set_Props({TableBorders : {Top : private_GetTableBorder(sType, nSize, nSpace, r, g, b)}});
-    };
-    /**
-     * Set the border which shall be displayed at the bottom of the current table.
-     * @param {BorderType} sType - The style of border.
-     * @param {pt_8} nSize - The width of the current border.
-     * @param {pt} nSpace - The spacing offset that shall be used to place this border.
-     * @param {byte} r
-     * @param {byte} g
-     * @param {byte} b
-     */
-    ApiTable.prototype.SetTableBorderBottom = function(sType, nSize, nSpace, r, g, b)
-    {
-        this.Table.Set_Props({TableBorders : {Bottom : private_GetTableBorder(sType, nSize, nSpace, r, g, b)}});
-    };
-    /**
-     * Set the border which shall be displayed on the left of the current table.
-     * @param {BorderType} sType - The style of border.
-     * @param {pt_8} nSize - The width of the current border.
-     * @param {pt} nSpace - The spacing offset that shall be used to place this border.
-     * @param {byte} r
-     * @param {byte} g
-     * @param {byte} b
-     */
-    ApiTable.prototype.SetTableBorderLeft = function(sType, nSize, nSpace, r, g, b)
-    {
-        this.Table.Set_Props({TableBorders : {Left : private_GetTableBorder(sType, nSize, nSpace, r, g, b)}});
-    };
-    /**
-     * Set the border which shall be displayed on the right of the current table.
-     * @param {BorderType} sType - The style of border.
-     * @param {pt_8} nSize - The width of the current border.
-     * @param {pt} nSpace - The spacing offset that shall be used to place this border.
-     * @param {byte} r
-     * @param {byte} g
-     * @param {byte} b
-     */
-    ApiTable.prototype.SetTableBorderRight = function(sType, nSize, nSpace, r, g, b)
-    {
-        this.Table.Set_Props({TableBorders : {Right : private_GetTableBorder(sType, nSize, nSpace, r, g, b)}});
-    };
-    /**
-     * Specify the border which shall be displayed on all horizontal table cell borders which are not on
-     * an outmost edge of the parent table (all horizontal borders which are not the topmost or bottommost border).
-     * @param {BorderType} sType - The style of border.
-     * @param {pt_8} nSize - The width of the current border.
-     * @param {pt} nSpace - The spacing offset that shall be used to place this border.
-     * @param {byte} r
-     * @param {byte} g
-     * @param {byte} b
-     */
-    ApiTable.prototype.SetTableBorderInsideH = function(sType, nSize, nSpace, r, g, b)
-    {
-        this.Table.Set_Props({TableBorders : {InsideH : private_GetTableBorder(sType, nSize, nSpace, r, g, b)}});
-    };
-    /**
-     * Specify the border which shall be displayed on all vertical table cell borders which are not on an
-     * outmost edge of the parent table (all horizontal borders which are not the leftmost or rightmost border).
-     * @param {BorderType} sType - The style of border.
-     * @param {pt_8} nSize - The width of the current border.
-     * @param {pt} nSpace - The spacing offset that shall be used to place this border.
-     * @param {byte} r
-     * @param {byte} g
-     * @param {byte} b
-     */
-    ApiTable.prototype.SetTableBorderInsideV = function(sType, nSize, nSpace, r, g, b)
-    {
-        this.Table.Set_Props({TableBorders : {InsideV : private_GetTableBorder(sType, nSize, nSpace, r, g, b)}});
+        var oTableLook = new CTableLook(private_GetBoolean(isFirstColumn),
+            private_GetBoolean(isFirstRow),
+            private_GetBoolean(isLastColumn),
+            private_GetBoolean(isLastRow),
+            private_GetBoolean(isHorBand),
+            private_GetBoolean(isVerBand));
+        this.Table.Set_TableLook(oTableLook);
     };
 
     //------------------------------------------------------------------------------------------------------------------
@@ -1478,18 +1386,18 @@
             if ("auto" === sLineRule)
             {
                 this.ParaPr.Spacing.LineRule = Asc.linerule_Auto;
-                this.ParaPr.Spacing.Line = nLine / 240.0;
+                this.ParaPr.Spacing.Line     = nLine / 240.0;
             }
             else if ("atLeast" === sLineRule)
             {
                 this.ParaPr.Spacing.LineRule = Asc.linerule_AtLeast;
-                this.ParaPr.Spacing.Line = private_Twips2MM(nLine);
+                this.ParaPr.Spacing.Line     = private_Twips2MM(nLine);
 
             }
             else if ("exact" === sLineRule)
             {
                 this.ParaPr.Spacing.LineRule = Asc.linerule_Exact;
-                this.ParaPr.Spacing.Line = private_Twips2MM(nLine);
+                this.ParaPr.Spacing.Line     = private_Twips2MM(nLine);
             }
         }
 
@@ -1656,7 +1564,7 @@
         if (!(oNumPr instanceof ApiNumbering))
             return;
 
-        this.ParaPr.NumPr = new CNumPr();
+        this.ParaPr.NumPr       = new CNumPr();
         this.ParaPr.NumPr.NumId = oNumPr.Num.Get_Id();
         this.ParaPr.NumPr.Lvl   = undefined;
 
@@ -1731,15 +1639,33 @@
     {
         switch (sType)
         {
-            case "none"  : this.Num.Set_Lvl_None(this.Lvl); break;
-            case "bullet": this.Num.Set_Lvl_Bullet(this.Lvl, sSymbol, new CTextPr()); break;
-            case "1)"    : this.Num.Set_Lvl_Numbered_1(this.Lvl); break;
-            case "1."    : this.Num.Set_Lvl_Numbered_2(this.Lvl); break;
-            case "I."    : this.Num.Set_Lvl_Numbered_5(this.Lvl); break;
-            case "A."    : this.Num.Set_Lvl_Numbered_6(this.Lvl); break;
-            case "a)"    : this.Num.Set_Lvl_Numbered_7(this.Lvl); break;
-            case "a."    : this.Num.Set_Lvl_Numbered_8(this.Lvl); break;
-            case "i."    : this.Num.Set_Lvl_Numbered_9(this.Lvl); break;
+            case "none"  :
+                this.Num.Set_Lvl_None(this.Lvl);
+                break;
+            case "bullet":
+                this.Num.Set_Lvl_Bullet(this.Lvl, sSymbol, new CTextPr());
+                break;
+            case "1)"    :
+                this.Num.Set_Lvl_Numbered_1(this.Lvl);
+                break;
+            case "1."    :
+                this.Num.Set_Lvl_Numbered_2(this.Lvl);
+                break;
+            case "I."    :
+                this.Num.Set_Lvl_Numbered_5(this.Lvl);
+                break;
+            case "A."    :
+                this.Num.Set_Lvl_Numbered_6(this.Lvl);
+                break;
+            case "a)"    :
+                this.Num.Set_Lvl_Numbered_7(this.Lvl);
+                break;
+            case "a."    :
+                this.Num.Set_Lvl_Numbered_8(this.Lvl);
+                break;
+            case "i."    :
+                this.Num.Set_Lvl_Numbered_9(this.Lvl);
+                break;
         }
     };
     /**
@@ -1782,7 +1708,7 @@
         this.Num.Set_Lvl_ByFormat(this.Lvl, nType, sTextFormatString, nAlign);
     };
     /**
-     * This element specifies a one-based index which determines when a numbering level should restart to its start 
+     * This element specifies a one-based index which determines when a numbering level should restart to its start
      * value. A numbering level restarts when an instance of the specified numbering level, which shall be
      * higher (earlier than the this level) is used in the given document's contents. By default this value is true.
      * @param {boolean} isRestart
@@ -1813,6 +1739,230 @@
             this.Num.Set_Lvl_Suff(this.Lvl, numbering_suff_Tab);
         else if ("none" === sType)
             this.Num.Set_Lvl_Suff(this.Lvl, numbering_suff_Nothing);
+    };
+
+    //------------------------------------------------------------------------------------------------------------------
+    //
+    // ApiTablePr
+    //
+    //------------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Specifies the number of columns which shall comprise each a table style column band for this table style.
+     * @param {number} nCount
+     */
+    ApiTablePr.prototype.SetStyleColBandSize = function(nCount)
+    {
+        this.TablePr.TableStyleColBandSize = private_GetInt(nCount, 1, null);
+        this.private_OnChange();
+    };
+    /**
+     * Specifies the number of rows which shall comprise each a table style row band for this table style.
+     * @param {number} nCount
+     */
+    ApiTablePr.prototype.SetStyleRowBandSize = function(nCount)
+    {
+        this.TablePr.TableStyleRowBandSize = private_GetInt(nCount, 1, null);
+        this.private_OnChange();
+    };
+    /**
+     * Specifies the alignment of the current table with respect to the text margins in the current section.
+     * @param {("left" | "right" | "center")} sJcType
+     */
+    ApiTablePr.prototype.SetJc = function(sJcType)
+    {
+        if ("left" === sJcType)
+            this.TablePr.Jc = AscCommon.align_Left;
+        else if ("right" === sJcType)
+            this.TablePr.Jc = AscCommon.align_Right;
+        else if ("center" === sJcType)
+            this.TablePr.Jc = AscCommon.align_Center;
+        this.private_OnChange();
+    };
+    /**
+     * Specify the shading which shall be applied to the extents of the current table.
+     * @param {ShdType} sType
+     * @param {byte} r
+     * @param {byte} g
+     * @param {byte} b
+     * @param {boolean} [isAuto=false]
+     */
+    ApiTablePr.prototype.SetShd = function(sType, r, g, b, isAuto)
+    {
+        this.TablePr.Shd = private_GetShd(sType, r, g, b, isAuto);
+        this.private_OnChange();
+    };
+    /**
+     * Set the border which shall be displayed at the top of the current table.
+     * @param {BorderType} sType - The style of border.
+     * @param {pt_8} nSize - The width of the current border.
+     * @param {pt} nSpace - The spacing offset that shall be used to place this border.
+     * @param {byte} r
+     * @param {byte} g
+     * @param {byte} b
+     */
+    ApiTablePr.prototype.SetTableBorderTop = function(sType, nSize, nSpace, r, g, b)
+    {
+        this.TablePr.TableBorders.Top = private_GetTableBorder(sType, nSize, nSpace, r, g, b);
+        this.private_OnChange();
+    };
+    /**
+     * Set the border which shall be displayed at the bottom of the current table.
+     * @param {BorderType} sType - The style of border.
+     * @param {pt_8} nSize - The width of the current border.
+     * @param {pt} nSpace - The spacing offset that shall be used to place this border.
+     * @param {byte} r
+     * @param {byte} g
+     * @param {byte} b
+     */
+    ApiTablePr.prototype.SetTableBorderBottom = function(sType, nSize, nSpace, r, g, b)
+    {
+        this.TablePr.TableBorders.Bottom = private_GetTableBorder(sType, nSize, nSpace, r, g, b);
+        this.private_OnChange();
+    };
+    /**
+     * Set the border which shall be displayed on the left of the current table.
+     * @param {BorderType} sType - The style of border.
+     * @param {pt_8} nSize - The width of the current border.
+     * @param {pt} nSpace - The spacing offset that shall be used to place this border.
+     * @param {byte} r
+     * @param {byte} g
+     * @param {byte} b
+     */
+    ApiTablePr.prototype.SetTableBorderLeft = function(sType, nSize, nSpace, r, g, b)
+    {
+        this.TablePr.TableBorders.Left = private_GetTableBorder(sType, nSize, nSpace, r, g, b);
+        this.private_OnChange();
+    };
+    /**
+     * Set the border which shall be displayed on the right of the current table.
+     * @param {BorderType} sType - The style of border.
+     * @param {pt_8} nSize - The width of the current border.
+     * @param {pt} nSpace - The spacing offset that shall be used to place this border.
+     * @param {byte} r
+     * @param {byte} g
+     * @param {byte} b
+     */
+    ApiTablePr.prototype.SetTableBorderRight = function(sType, nSize, nSpace, r, g, b)
+    {
+        this.TablePr.TableBorders.Right = private_GetTableBorder(sType, nSize, nSpace, r, g, b);
+        this.private_OnChange();
+    };
+    /**
+     * Specify the border which shall be displayed on all horizontal table cell borders which are not on
+     * an outmost edge of the parent table (all horizontal borders which are not the topmost or bottommost border).
+     * @param {BorderType} sType - The style of border.
+     * @param {pt_8} nSize - The width of the current border.
+     * @param {pt} nSpace - The spacing offset that shall be used to place this border.
+     * @param {byte} r
+     * @param {byte} g
+     * @param {byte} b
+     */
+    ApiTablePr.prototype.SetTableBorderInsideH = function(sType, nSize, nSpace, r, g, b)
+    {
+        this.TablePr.TableBorders.InsideH = private_GetTableBorder(sType, nSize, nSpace, r, g, b);
+        this.private_OnChange();
+    };
+    /**
+     * Specify the border which shall be displayed on all vertical table cell borders which are not on an
+     * outmost edge of the parent table (all horizontal borders which are not the leftmost or rightmost border).
+     * @param {BorderType} sType - The style of border.
+     * @param {pt_8} nSize - The width of the current border.
+     * @param {pt} nSpace - The spacing offset that shall be used to place this border.
+     * @param {byte} r
+     * @param {byte} g
+     * @param {byte} b
+     */
+    ApiTablePr.prototype.SetTableBorderInsideV = function(sType, nSize, nSpace, r, g, b)
+    {
+        this.TablePr.TableBorders.InsideV = private_GetTableBorder(sType, nSize, nSpace, r, g, b);
+        this.private_OnChange();
+    };
+
+    /**
+     * Specifies the amount of space which shall be left between the bottom extent of the cell contents and the border
+     * of all table cells within the parent table (or table row).
+     * @param {twips} nValue
+     */
+    ApiTablePr.prototype.SetTableCellMarginBottom = function(nValue)
+    {
+        this.TablePr.TableCellMar.Bottom = private_GetTableMeasure("twips", nValue);
+        this.private_OnChange();
+    };
+    /**
+     * Specifies the amount of space which shall be present between the left extent of the cell contents and the left
+     * border of all table cells within the parent table (or table row) .
+     * @param {twips} nValue
+     */
+    ApiTablePr.prototype.SetTableCellMarginLeft = function(nValue)
+    {
+        this.TablePr.TableCellMar.Left = private_GetTableMeasure("twips", nValue);
+        this.private_OnChange();
+    };
+    /**
+     * Specifies the amount of space which shall be present between the right extent of the cell contents and the right
+     * border of all table cells within the parent table (or table row) .
+     * @param {twips} nValue
+     */
+    ApiTablePr.prototype.SetTableCellMarginRight = function(nValue)
+    {
+        this.TablePr.TableCellMar.Right = private_GetTableMeasure("twips", nValue);
+        this.private_OnChange();
+    };
+    /**
+     * Specifies the amount of space which shall be present between the top extent of the cell contents and the top
+     * border of all table cells within the parent table (or table row) .
+     * @param {twips} nValue
+     */
+    ApiTablePr.prototype.SetTableCellMarginTop = function(nValue)
+    {
+        this.TablePr.TableCellMar.Top = private_GetTableMeasure("twips", nValue);
+        this.private_OnChange();
+    };
+    /**
+     * Specifies the default table cell spacing (the spacing between adjacent cells and the edges of the table).
+     * @param {?twips} nValue - Value of the spacing. Null mean no spacing.
+     */
+    ApiTablePr.prototype.SetCellSpacing = function(nValue)
+    {
+        if (null === nValue)
+            this.TablePr.TableCellSpacing = null;
+        else
+            this.TablePr.TableCellSpacing = private_Twips2MM(nValue);
+        this.private_OnChange();
+    };
+    /**
+     * Specifies the indentation which shall be added before the leading edge of the current table in the document (the
+     * left edge in a left-to-right table, and the right edge in a right-to-left table).
+     * @param {twips} nValue
+     */
+    ApiTablePr.prototype.SetTableInd = function(nValue)
+    {
+        this.TablePr.TableInd = private_Twips2MM(nValue);
+        this.private_OnChange();
+    };
+    /**
+     * Set the preferred width for this table.
+     * @param {TableWidth} sType - Type of the width value
+     * @param {number} [nValue]
+     */
+    ApiTablePr.prototype.SetWidth = function(sType, nValue)
+    {
+        this.TablePr.TableW = private_GetTableMeasure(sType, nValue);
+        this.private_OnChange();
+    };
+    /**
+     * Specifies the algorithm which shall be used to lay out the contents of this table within the document.
+     * @param {("autofit" | "fixed")} sType
+     */
+    ApiTablePr.prototype.SetTableLayout = function(sType)
+    {
+        if ("autofit" === sType)
+            this.TablePr.TableLayout = tbllayout_AutoFit;
+        else if ("fixed" === sType)
+            this.TablePr.TableLayout = tbllayout_Fixed;
+
+        this.private_OnChange();
     };
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1847,9 +1997,7 @@
     ApiParagraph.prototype["GetNumbering"]           = ApiParagraph.prototype.GetNumbering;
     ApiParagraph.prototype["SetNumbering"]           = ApiParagraph.prototype.SetNumbering;
 
-
     ApiRun.prototype["GetTextPr"]                    = ApiRun.prototype.GetTextPr;
-
 
     ApiSection.prototype["SetType"]                  = ApiSection.prototype.SetType;
     ApiSection.prototype["SetEqualColumns"]          = ApiSection.prototype.SetEqualColumns;
@@ -1869,15 +2017,7 @@
     ApiTable.prototype["GetRow"]                     = ApiTable.prototype.GetRow;
     ApiTable.prototype["MergeCells"]                 = ApiTable.prototype.MergeCells;
     ApiTable.prototype["SetStyle"]                   = ApiTable.prototype.SetStyle;
-    ApiTable.prototype["SetWidth"]                   = ApiTable.prototype.SetWidth;
-    ApiTable.prototype["SetJc"]                      = ApiTable.prototype.SetJc;
     ApiTable.prototype["SetTableLook"]               = ApiTable.prototype.SetTableLook;
-    ApiTable.prototype["SetTableBorderTop"]          = ApiTable.prototype.SetTableBorderTop;
-    ApiTable.prototype["SetTableBorderBottom"]       = ApiTable.prototype.SetTableBorderBottom;
-    ApiTable.prototype["SetTableBorderLeft"]         = ApiTable.prototype.SetTableBorderLeft;
-    ApiTable.prototype["SetTableBorderRight"]        = ApiTable.prototype.SetTableBorderRight;
-    ApiTable.prototype["SetTableBorderInsideH"]      = ApiTable.prototype.SetTableBorderInsideH;
-    ApiTable.prototype["SetTableBorderInsideV"]      = ApiTable.prototype.SetTableBorderInsideV;
 
     ApiTableRow.prototype["GetCellsCount"]           = ApiTableRow.prototype.GetCellsCount;
     ApiTableRow.prototype["GetCell"]                 = ApiTableRow.prototype.GetCell;
@@ -1946,6 +2086,25 @@
     ApiNumberingLevel.prototype["SetRestart"]        = ApiNumberingLevel.prototype.SetRestart;
     ApiNumberingLevel.prototype["SetStart"]          = ApiNumberingLevel.prototype.SetStart;
     ApiNumberingLevel.prototype["SetSuff"]           = ApiNumberingLevel.prototype.SetSuff;
+
+    ApiTablePr.prototype["SetStyleColBandSize"]      = ApiTablePr.prototype.SetStyleColBandSize;
+    ApiTablePr.prototype["SetStyleRowBandSize"]      = ApiTablePr.prototype.SetStyleRowBandSize;
+    ApiTablePr.prototype["SetJc"]                    = ApiTablePr.prototype.SetJc;
+    ApiTablePr.prototype["SetShd"]                   = ApiTablePr.prototype.SetShd;
+    ApiTablePr.prototype["SetTableBorderTop"]        = ApiTablePr.prototype.SetTableBorderTop;
+    ApiTablePr.prototype["SetTableBorderBottom"]     = ApiTablePr.prototype.SetTableBorderBottom;
+    ApiTablePr.prototype["SetTableBorderLeft"]       = ApiTablePr.prototype.SetTableBorderLeft;
+    ApiTablePr.prototype["SetTableBorderRight"]      = ApiTablePr.prototype.SetTableBorderRight;
+    ApiTablePr.prototype["SetTableBorderInsideH"]    = ApiTablePr.prototype.SetTableBorderInsideH;
+    ApiTablePr.prototype["SetTableBorderInsideV"]    = ApiTablePr.prototype.SetTableBorderInsideV;
+    ApiTablePr.prototype["SetTableCellMarginBottom"] = ApiTablePr.prototype.SetTableCellMarginBottom;
+    ApiTablePr.prototype["SetTableCellMarginLeft"]   = ApiTablePr.prototype.SetTableCellMarginLeft;
+    ApiTablePr.prototype["SetTableCellMarginRight"]  = ApiTablePr.prototype.SetTableCellMarginRight;
+    ApiTablePr.prototype["SetTableCellMarginTop"]    = ApiTablePr.prototype.SetTableCellMarginTop;
+    ApiTablePr.prototype["SetCellSpacing"]           = ApiTablePr.prototype.SetCellSpacing;
+    ApiTablePr.prototype["SetTableInd"]              = ApiTablePr.prototype.SetTableInd;
+    ApiTablePr.prototype["SetWidth"]                 = ApiTablePr.prototype.SetWidth;
+    ApiTablePr.prototype["SetTableLayout"]           = ApiTablePr.prototype.SetTableLayout;
 
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -2035,6 +2194,34 @@
         return oBorder;
     }
 
+    function private_GetTableMeasure(sType, nValue)
+    {
+        var nType = tblwidth_Auto;
+        var nW    = 0;
+        if ("auto" === sType)
+        {
+            nType = tblwidth_Auto;
+            nW    = 0;
+        }
+        else if ("nil" === sType)
+        {
+            nType = tblwidth_Nil;
+            nW    = 0;
+        }
+        else if ("percent" === sType)
+        {
+            nType = tblwidth_Pct;
+            nW    = private_GetInt(nValue, null, null);
+        }
+        else if ("twips" === sType)
+        {
+            nType = tblwidth_Mm;
+            nW    = private_Twips2MM(nValue);
+        }
+
+        return new CTableMeasurement(nType, nW);
+    }
+
     function private_GetShd(sType, r, g, b, isAuto)
     {
         var oShd = new CDocumentShd();
@@ -2058,9 +2245,17 @@
             return (undefined !== bDefValue ? bDefValue : false);
     }
 
-    function private_GetInt(nValue)
+    function private_GetInt(nValue, nMin, nMax)
     {
-        return nValue | 0;
+        var nResult = nValue | 0;
+
+        if (undefined !== nMin && null !== nMin)
+            nResult = Math.max(nMin, nResult);
+
+        if (undefined !== nMax && null !== nMax)
+            nResult = Math.min(nMax, nResult);
+
+        return nResult;
     }
 
     function private_PtToMM(pt)
@@ -2108,6 +2303,11 @@
     {
         return this.Table;
     };
+    ApiTable.prototype.OnChangeTablePr = function(oApiTablePr)
+    {
+        this.Table.Set_Pr(oApiTablePr.TablePr);
+        oApiTablePr.TablePr = this.Table.Pr.Copy();
+    };
     ApiStyle.prototype.OnChangeTextPr = function(oApiTextPr)
     {
         this.Style.Set_TextPr(oApiTextPr.TextPr);
@@ -2135,6 +2335,10 @@
     ApiParaPr.prototype.private_OnChange = function()
     {
         this.Parent.OnChangeParaPr(this);
+    };
+    ApiTablePr.prototype.private_OnChange = function()
+    {
+        this.Parent.OnChangeTablePr(this);
     };
 
 }(window, null));
@@ -2874,6 +3078,71 @@ function TEST_BUILDER2()
 
     oParagraph = oHeader.GetElement(0);
     oParagraph.AddText("I'm in default header");
+
+    var oTable = Api.CreateTable(3, 3);
+    oDocument.Push(oTable);
+    oTable.SetJc("left");
+
+    oTable = Api.CreateTable(3, 3);
+    oDocument.Push(oTable);
+    oTable.SetJc("center");
+
+    oTable = Api.CreateTable(3, 3);
+    oDocument.Push(oTable);
+    oTable.SetJc("right");
+
+    var oTableStyle = oDocument.GetStyle("Bordered & Lined - Accent 3");
+    oTable = Api.CreateTable(10, 10);
+    oDocument.Push(oTable);
+    oTable.SetStyle(oTableStyle);
+
+    oTable = Api.CreateTable(10, 10);
+    oDocument.Push(oTable);
+    oTable.SetStyle(oTableStyle);
+    oTable.SetTableLook(false, false, true, true, false, true);
+
+    oTable = Api.CreateTable(10, 10);
+    oDocument.Push(oTable);
+    oTable.SetTableLook(true, true, true, true, true, true);
+    oTable.SetStyle(oTableStyle);
+    oTable.SetStyleColBandSize(2);
+    oTable.SetStyleRowBandSize(3);
+
+    oTable = Api.CreateTable(3, 3);
+    oDocument.Push(oTable);
+    oTable.SetShd("clear", 255, 0, 0);
+    oTable.SetTableBorderTop("single", 32, 0, 0, 255, 0);
+    oTable.SetTableBorderBottom("single", 64, 0, 0, 255, 0);
+    oTable.SetTableBorderLeft("single", 32, 0, 0, 0, 255);
+    oTable.SetTableBorderRight("single", 16, 0, 0, 0, 255);
+    oTable.SetTableBorderInsideV("single", 32, 0, 0, 0, 0);
+    oTable.SetTableBorderInsideH("single", 32, 0, 0, 0, 0);
+
+    oTable = Api.CreateTable(3, 3);
+    oDocument.Push(oTable);
+    oTable.SetTableInd(1000);
+    oTable.SetTableCellMarginBottom(200);
+    oTable.SetTableCellMarginTop(100);
+    oTable.SetTableCellMarginLeft(400);
+    oTable.SetTableCellMarginRight(200);
+    oTable.SetCellSpacing(200);
+
+    oTable = Api.CreateTable(3, 3);
+    oDocument.Push(oTable);
+    oTable.SetWidth("auto");
+
+    oTable = Api.CreateTable(3, 3);
+    oDocument.Push(oTable);
+    oTable.SetWidth("twips", 3000);
+
+    oTable = Api.CreateTable(3, 3);
+    oDocument.Push(oTable);
+    oTable.SetWidth("percent", 100);
+
+    oTable = Api.CreateTable(3, 3);
+    oDocument.Push(oTable);
+    oTable.SetTableLayout("fixed");
+
 
     //------------------------------------------------------------------------------------------------------------------
     oLD.Recalculate_FromStart();
