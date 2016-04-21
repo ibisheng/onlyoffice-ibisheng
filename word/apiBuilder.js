@@ -280,11 +280,11 @@
     //------------------------------------------------------------------------------------------------------------------
 
     /**
-     * Create new history point
+     * Create new history point.
      */
-    ApiDocument.prototype.Create_NewHistoryPoint = function()
+    ApiDocument.prototype.CreateNewHistoryPoint = function()
     {
-        this.Document.Create_NewHistoryPoint();
+        this.Document.Create_NewHistoryPoint(AscDFH.historydescription_Document_ApiBuilder);
     };
     /**
      * Get the number of elements.
@@ -1035,6 +1035,40 @@
     {
         return new ApiParaPr(this, this.Style.ParaPr.Copy());
     };
+    /**
+     * Get the table properties of the current style.
+     * @returns {?ApiTablePr} If the type of this style is not a <code>"table"</code> then it will return <code>null</code>.
+     */
+    ApiStyle.prototype.GetTablePr = function()
+    {
+        if (styletype_Table !== this.Style.Get_Type())
+            return null;
+
+        return new ApiTablePr(this, this.Style.TablePr.Copy());
+    };
+    /**
+     * Get the table row properties of the current style.
+     * @returns {?ApiTableRowPr} If the type of this style is not a <code>"table"</code> then it will return <code>null</code>.
+     */
+    ApiStyle.prototype.GetTableRowPr = function()
+    {
+        if (styletype_Table !== this.Style.Get_Type())
+            return null;
+
+        return new ApiTableRowPr(this, this.Style.TableRowPr.Copy());
+    };
+    /**
+     * Get the table cell properties of the current style.
+     * @returns {?ApiTableCellPr}
+     */
+    ApiStyle.prototype.GetTableCellPr = function()
+    {
+        if (styletype_Table !== this.Style.Get_Type())
+            return null;
+
+        return new ApiTableCellPr(this, this.Style.TableCellPr.Copy());
+    };
+
 
     //------------------------------------------------------------------------------------------------------------------
     //
@@ -2246,6 +2280,10 @@
     ApiStyle.prototype["GetType"]                    = ApiStyle.prototype.GetType;
     ApiStyle.prototype["GetTextPr"]                  = ApiStyle.prototype.GetTextPr;
     ApiStyle.prototype["GetParaPr"]                  = ApiStyle.prototype.GetParaPr;
+    ApiStyle.prototype["GetTablePr"]                 = ApiStyle.prototype.GetTablePr;
+    ApiStyle.prototype["GetTableRowPr"]              = ApiStyle.prototype.GetTableRowPr;
+    ApiStyle.prototype["GetTableCellPr"]             = ApiStyle.prototype.GetTableCellPr;
+
 
     ApiNumbering.prototype["GetLevel"]               = ApiNumbering.prototype.GetLevel;
 
@@ -2545,6 +2583,21 @@
     {
         this.Style.Set_ParaPr(oApiParaPr.ParaPr);
         oApiParaPr.ParaPr = this.Style.ParaPr.Copy();
+    };
+    ApiStyle.prototype.OnChangeTablePr = function(oApiTablePr)
+    {
+        this.Style.Set_TablePr(oApiTablePr.TablePr);
+        oApiTablePr.TablePr = this.Style.TablePr.Copy();
+    };
+    ApiStyle.prototype.OnChangeTableRowPr = function(oApiTableRowPr)
+    {
+        this.Style.Set_TableRowPr(oApiTableRowPr.RowPr);
+        oApiTableRowPr.RowPr = this.Style.TableRowPr.Copy();
+    };
+    ApiStyle.prototype.OnChangeTableCellPr = function(oApiTableCellPr)
+    {
+        this.Style.Set_TableCellPr(oApiTableCellPr.CellPr);
+        oApiTableCellPr.CellPr = this.Style.TableCellPr.Copy();
     };
     ApiNumberingLevel.prototype.OnChangeTextPr = function(oApiTextPr)
     {
