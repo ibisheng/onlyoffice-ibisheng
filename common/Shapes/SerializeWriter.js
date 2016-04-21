@@ -3666,7 +3666,7 @@ function CBinaryFileWriter()
 
                     switch(cmd.id)
                     {
-                        case moveTo:
+                        case AscFormat.moveTo:
                         {
                             this.StartRecord(1);
                             this.WriteUChar(g_nodeAttributeStart);
@@ -3676,7 +3676,7 @@ function CBinaryFileWriter()
                             this.EndRecord();
                             break;
                         }
-                        case lineTo:
+                        case AscFormat.lineTo:
                         {
                             this.StartRecord(2);
                             this.WriteUChar(g_nodeAttributeStart);
@@ -3686,7 +3686,7 @@ function CBinaryFileWriter()
                             this.EndRecord();
                             break;
                         }
-                        case bezier3:
+                        case AscFormat.bezier3:
                         {
                             this.StartRecord(6);
                             this.WriteUChar(g_nodeAttributeStart);
@@ -3698,7 +3698,7 @@ function CBinaryFileWriter()
                             this.EndRecord();
                             break;
                         }
-                        case bezier4:
+                        case AscFormat.bezier4:
                         {
                             this.StartRecord(4);
                             this.WriteUChar(g_nodeAttributeStart);
@@ -3712,7 +3712,7 @@ function CBinaryFileWriter()
                             this.EndRecord();
                             break;
                         }
-                        case arcTo:
+                        case AscFormat.arcTo:
                         {
                             this.StartRecord(5);
                             this.WriteUChar(g_nodeAttributeStart);
@@ -3724,7 +3724,7 @@ function CBinaryFileWriter()
                             this.EndRecord();
                             break;
                         }
-                        case close:
+                        case AscFormat.close:
                         {
                             this.StartRecord(3);
                             this.EndRecord();

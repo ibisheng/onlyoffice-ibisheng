@@ -573,7 +573,7 @@ Geometry.prototype=
         {
             case 0:
             {                              /* extrusionOk, fill, stroke, w, h*/
-                var path = new Path();
+                var path = new AscFormat.Path();
                 path.setExtrusionOk(x1 || false);
                 path.setFill(y1 || "norm");
                 path.setStroke(x2 != undefined ? x2 : true);
@@ -1237,9 +1237,9 @@ Geometry.prototype=
                 var cur_command = arr_cur_path_commands[command_index];
                 switch(cur_command.id)
                 {
-                    case moveTo:
+                    case AscFormat.moveTo:
                     {
-                        if(last_command === null || last_command.id === close)
+                        if(last_command === null || last_command.id === AscFormat.close)
                         {
                             cur_polygon.push({x: cur_command.X, y: cur_command.Y});
                             last_command = cur_command;
@@ -1250,7 +1250,7 @@ Geometry.prototype=
                         }
                         break;
                     }
-                    case lineTo:
+                    case AscFormat.lineTo:
                     {
                         cur_polygon.push({x: cur_command.X, y: cur_command.Y});
                         last_command = cur_command;
@@ -1258,9 +1258,9 @@ Geometry.prototype=
                         last_point_y = cur_command.Y;
                         break;
                     }
-                    case bezier3:
+                    case AscFormat.bezier3:
                     {
-                        bezier_polygon = partition_bezier3(last_point_x, last_point_y, cur_command.X0, cur_command.Y0, cur_command.X1, cur_command.Y1, used_epsilon);
+                        bezier_polygon = AscFormat.partition_bezier3(last_point_x, last_point_y, cur_command.X0, cur_command.Y0, cur_command.X1, cur_command.Y1, used_epsilon);
                         for(var point_index = 1; point_index < bezier_polygon.length; ++point_index)
                         {
                             cur_polygon.push(bezier_polygon[point_index]);
@@ -1270,9 +1270,9 @@ Geometry.prototype=
                         last_point_y = cur_command.Y1;
                         break;
                     }
-                    case bezier4:
+                    case AscFormat.bezier4:
                     {
-                        bezier_polygon = partition_bezier4(last_point_x, last_point_y, cur_command.X0, cur_command.Y0, cur_command.X1, cur_command.Y1, cur_command.X2, cur_command.Y2, used_epsilon);
+                        bezier_polygon = AscFormat.partition_bezier4(last_point_x, last_point_y, cur_command.X0, cur_command.Y0, cur_command.X1, cur_command.Y1, cur_command.X2, cur_command.Y2, used_epsilon);
                         for(point_index = 1; point_index < bezier_polygon.length; ++point_index)
                         {
                             cur_polygon.push(bezier_polygon[point_index]);
@@ -1283,7 +1283,7 @@ Geometry.prototype=
                         break;
                     }
 
-                    case arcTo:
+                    case AscFormat.arcTo:
                     {
                         var path_accumulator = new PathAccumulator();
                         ArcToCurvers(path_accumulator, cur_command.stX, cur_command.stY, cur_command.wR, cur_command.hR, cur_command.stAng, cur_command.swAng);
@@ -1293,7 +1293,7 @@ Geometry.prototype=
                             var cur_arc_to_command = arc_to_path_commands[arc_to_path_index];
                             switch (cur_arc_to_command.id)
                             {
-                                case moveTo:
+                                case AscFormat.moveTo:
                                 {
                                     cur_polygon.push({x: cur_arc_to_command.X, y: cur_arc_to_command.Y});
                                     last_command = cur_arc_to_command;
@@ -1301,9 +1301,9 @@ Geometry.prototype=
                                     last_point_y = cur_arc_to_command.Y;
                                     break;
                                 }
-                                case bezier4:
+                                case AscFormat.bezier4:
                                 {
-                                    bezier_polygon = partition_bezier4(last_point_x, last_point_y, cur_arc_to_command.X0, cur_arc_to_command.Y0, cur_arc_to_command.X1, cur_arc_to_command.Y1, cur_arc_to_command.X2, cur_arc_to_command.Y2, used_epsilon);
+                                    bezier_polygon = AscFormat.partition_bezier4(last_point_x, last_point_y, cur_arc_to_command.X0, cur_arc_to_command.Y0, cur_arc_to_command.X1, cur_arc_to_command.Y1, cur_arc_to_command.X2, cur_arc_to_command.Y2, used_epsilon);
                                     for(point_index = 0; point_index < bezier_polygon.length; ++point_index)
                                     {
                                         cur_polygon.push(bezier_polygon[point_index]);
@@ -1318,10 +1318,10 @@ Geometry.prototype=
                         break;
                     }
 
-                    case close:
+                    case AscFormat.close:
                     {
 
-                        if(last_command.id !== moveTo)
+                        if(last_command.id !== AscFormat.moveTo)
                         {
                             if(cur_polygon.length >= 2)
                             {
@@ -1422,12 +1422,12 @@ PathAccumulator.prototype =
 {
     _m: function(x, y)
     {
-        this.pathCommand.push({id: moveTo, X: x, Y: y});
+        this.pathCommand.push({id: AscFormat.moveTo, X: x, Y: y});
     },
 
     _c: function(x0, y0, x1, y1, x2, y2)
     {
-        this.pathCommand.push({id: bezier4, X0: x0, Y0: y0, X1: x1, Y1: y1, X2: x2, Y2: y2});
+        this.pathCommand.push({id: AscFormat.bezier4, X0: x0, Y0: y0, X1: x1, Y1: y1, X2: x2, Y2: y2});
     }
 };
 

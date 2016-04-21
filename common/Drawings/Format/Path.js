@@ -1,5 +1,11 @@
 "use strict";
 
+(
+/**
+* @param {Window} window
+* @param {undefined} undefined
+*/
+function (window, undefined) {
 var moveTo=0,
     lineTo=1,
     arcTo=2,
@@ -7,10 +13,9 @@ var moveTo=0,
     bezier4=4,
     close=5;
 
-var PATH_COMMAND_START = 0x101;
-var PATH_COMMAND_END = 0x102;
-
+// Import
 var cToRad = AscFormat.cToRad;
+
 var cToRad2 = (Math.PI/60000)/180;
 
 function Path()
@@ -1210,5 +1215,16 @@ function partition_bezier4(x0, y0, x1, y1, x2, y2, x3, y3, epsilon)
     return partition_bezier4(x0, y0, x01, y01, x012, y012, x0123, y0123, epsilon).concat(partition_bezier4(x0123, y0123, x123, y123, x23, y23, x3, y3, epsilon));
 }
 
-
-
+    //--------------------------------------------------------export----------------------------------------------------
+    window['AscFormat'] = window['AscFormat'] || {};
+    window['AscFormat'].moveTo = moveTo;
+    window['AscFormat'].lineTo = lineTo;
+    window['AscFormat'].arcTo = arcTo;
+    window['AscFormat'].bezier3 = bezier3;
+    window['AscFormat'].bezier4 = bezier4;
+    window['AscFormat'].close = close;
+    window['AscFormat'].cToRad2 = cToRad2;
+    window['AscFormat'].Path = Path;
+    window['AscFormat'].partition_bezier3 = partition_bezier3;
+    window['AscFormat'].partition_bezier4 = partition_bezier4;
+})(window);

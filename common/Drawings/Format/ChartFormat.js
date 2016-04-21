@@ -990,7 +990,7 @@ CDLbl.prototype =
                 }
                 default:
                 {
-                    var _rot = AscFormat.isRealNumber(bodyPr.rot) ? bodyPr.rot*cToRad2 : 0;
+                    var _rot = AscFormat.isRealNumber(bodyPr.rot) ? bodyPr.rot*AscFormat.cToRad2 : 0;
                     var t = new CMatrix();
                     global_MatrixTransformer.RotateRadAppend(t, -_rot);
                     var w, h, x0, y0, x1, y1, x2, y2, x3, y3;

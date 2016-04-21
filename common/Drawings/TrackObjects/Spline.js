@@ -177,7 +177,7 @@ function Spline(drawingObjects, theme, master, layout, slide, pageIndex)
             }
             else
             {
-                var bezier_polygon = partition_bezier4(last_x, last_y, path_command.x1, path_command.y1, path_command.x2, path_command.y2, path_command.x3, path_command.y3, AscFormat.APPROXIMATE_EPSILON);
+                var bezier_polygon = AscFormat.partition_bezier4(last_x, last_y, path_command.x1, path_command.y1, path_command.x2, path_command.y2, path_command.x3, path_command.y3, AscFormat.APPROXIMATE_EPSILON);
                 for(var point_index = 1; point_index < bezier_polygon.length; ++point_index)
                 {
                     var cur_point = bezier_polygon[point_index];
