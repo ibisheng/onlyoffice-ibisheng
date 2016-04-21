@@ -24,12 +24,12 @@ function ReadWBModel(oDrawing, oReader)
 {
     if(isRealObject(window["Asc"]) && isRealObject(window["Asc"]["editor"]))
     {
-        if(readBool(oReader))
+        if(AscFormat.readBool(oReader))
         {
             var api = window["Asc"]["editor"];
             if (api.wbModel )
             {
-                var id = readString(oReader);
+                var id = AscFormat.readString(oReader);
                 oDrawing.worksheet = api.wbModel.getWorksheetById(id);
             }
         }
@@ -118,10 +118,10 @@ BBoxInfo.prototype =
 
 function CreateUnifillSolidFillSchemeColorByIndex(index)
 {
-    var ret =  new CUniFill();
-    ret.setFill(new CSolidFill());
-    ret.fill.setColor(new CUniColor());
-    ret.fill.color.setColor(new CSchemeColor());
+    var ret =  new AscFormat.CUniFill();
+    ret.setFill(new AscFormat.CSolidFill());
+    ret.fill.setColor(new AscFormat.CUniColor());
+    ret.fill.color.setColor(new AscFormat.CSchemeColor());
     ret.fill.color.color.setId(index);
     return ret;
 }
@@ -129,7 +129,7 @@ function CreateUnifillSolidFillSchemeColorByIndex(index)
 function CChartStyleManager()
 {
     this.styles = [];
-    ExecuteNoHistory(
+    AscFormat.ExecuteNoHistory(
         function()
         {
             var DefaultDataPointPerDataPoint =
@@ -232,7 +232,7 @@ CChartStyleManager.prototype =
 {
     getStyleByIndex: function(index)
     {
-        if(isRealNumber(index))
+        if(AscFormat.isRealNumber(index))
         {
             return this.styles[(index - 1) % 48];
         }
@@ -241,7 +241,7 @@ CChartStyleManager.prototype =
 
     getDefaultLineStyleByIndex: function(index)
     {
-        if(isRealNumber(index))
+        if(AscFormat.isRealNumber(index))
         {
             return this.defaultLineStyles[(index - 1) % 48];
         }
@@ -276,7 +276,7 @@ function CChartStyle(effect, fill1, fill2, fill3, line1, line2, line3, line4, ma
 
 function CreateUniFillSchemeColorWidthTint(schemeColorId, tintVal)
 {
-    return ExecuteNoHistory(
+    return AscFormat.ExecuteNoHistory(
         function(schemeColorId, tintVal)
         {
             return CreateUniFillSolidFillWidthTintOrShade(CreateUnifillSolidFillSchemeColorByIndex(schemeColorId), tintVal);
@@ -287,7 +287,7 @@ function CreateUniFillSchemeColorWidthTint(schemeColorId, tintVal)
 
 function checkFiniteNumber(num)
 {
-    if(isRealNumber(num) && isFinite(num))
+    if(AscFormat.isRealNumber(num) && isFinite(num))
     {
         return num;
     }
@@ -295,8 +295,8 @@ function checkFiniteNumber(num)
 }
 
 var G_O_VISITED_HLINK_COLOR = CreateUniFillSolidFillWidthTintOrShade(CreateUnifillSolidFillSchemeColorByIndex(10), 0);
-var G_O_NO_ACTIVE_COMMENT_BRUSH = CreateUniFillByUniColor(CreateUniColorRGB(248, 231, 195));
-var G_O_ACTIVE_COMMENT_BRUSH = CreateUniFillByUniColor(CreateUniColorRGB(240, 200, 120));
+var G_O_NO_ACTIVE_COMMENT_BRUSH = CreateUniFillByUniColor(AscFormat.CreateUniColorRGB(248, 231, 195));
+var G_O_ACTIVE_COMMENT_BRUSH = CreateUniFillByUniColor(AscFormat.CreateUniColorRGB(240, 200, 120));
 /*function addPointToMap(map, worksheet, row, col, pt)
 {
     if(!Array.isArray(map[worksheet.getId()+""]))
@@ -647,7 +647,7 @@ CChartSpace.prototype =
 
     getStyles: function()
     {
-        return ExecuteNoHistory(function(){
+        return AscFormat.ExecuteNoHistory(function(){
 
             //todo: доработать
             var styles = new CStyles();
@@ -999,7 +999,7 @@ CChartSpace.prototype =
         {
             this.recalculatePenBrush();
         }
-        var unifill2 = CorrectUniFill(unifill, this.brush);
+        var unifill2 = AscFormat.CorrectUniFill(unifill, this.brush);
         unifill2.convertToPPTXMods();
         this.spPr.setFill(unifill2);
     },
@@ -1014,7 +1014,7 @@ CChartSpace.prototype =
         {
             this.recalculatePenBrush();
         }
-        var stroke = CorrectUniStroke(line, this.pen);
+        var stroke = AscFormat.CorrectUniStroke(line, this.pen);
         if(stroke.Fill)
         {
             stroke.Fill.convertToPPTXMods();
@@ -1282,7 +1282,7 @@ CChartSpace.prototype =
     {
         if( this.checkIntersectionChangedRange(data))
         {
-            ExecuteNoHistory(function(){
+            AscFormat.ExecuteNoHistory(function(){
                 this.checkRemoveCache();
                 this.recalculateReferences();
                 // this.recalculate();
@@ -1345,7 +1345,7 @@ CChartSpace.prototype =
                 }
             }
 
-            if(isRealNumber(this.chart.plotArea.chart.grouping))
+            if(AscFormat.isRealNumber(this.chart.plotArea.chart.grouping))
             {
                 if(!this.chart.plotArea.chart.getObjectType() === AscDFH.historyitem_type_BarChart)
                 {
@@ -2239,7 +2239,7 @@ CChartSpace.prototype =
                                         series_f = null;
                                     if(series_f && series_f.length > 0)
                                     {
-                                        if(!isRealBool(b_vert))
+                                        if(!AscFormat.isRealBool(b_vert))
                                         {
                                             if(series_f[0].c1 === cur_bbox.c1 && series_f[0].c2 === cur_bbox.c2)
                                             {
@@ -2323,7 +2323,7 @@ CChartSpace.prototype =
                                     series_title_f = null;
                                     continue;
                                 }
-                                if(!isRealBool(b_titles_vert))
+                                if(!AscFormat.isRealBool(b_titles_vert))
                                 {
                                     if(series_title_f.length > 0)
                                     {
@@ -2425,7 +2425,7 @@ CChartSpace.prototype =
                         b_vert = false;
                     }
 
-                    if(!isRealBool(b_vert) && Array.isArray(series_title_f) )
+                    if(!AscFormat.isRealBool(b_vert) && Array.isArray(series_title_f) )
                     {
                         if(series_f[0].r1 === series_f[0].r2 && series_title_f[0].r1 === series_f[0].r1)
                         {
@@ -2436,7 +2436,7 @@ CChartSpace.prototype =
                             b_vert = false;
                         }
                     }
-                    if(!isRealBool(b_vert))
+                    if(!AscFormat.isRealBool(b_vert))
                     {
                         if(cat_title_f)
                         {
@@ -2449,7 +2449,7 @@ CChartSpace.prototype =
                                 b_vert = false;
                             }
                         }
-                        if(!isRealBool(b_vert))
+                        if(!AscFormat.isRealBool(b_vert))
                         {
                             b_vert = true;
                         }
@@ -2544,7 +2544,7 @@ CChartSpace.prototype =
             this.recalcInfo.recalculateBBox = false;
         }
         var oRet = null;
-        if(this.bbox && this.bbox.seriesBBox && isRealBool(this.bbox.seriesBBox.bVert))
+        if(this.bbox && this.bbox.seriesBBox && AscFormat.isRealBool(this.bbox.seriesBBox.bVert))
         {
             oRet = {r1: this.bbox.seriesBBox.r1, r2: this.bbox.seriesBBox.r2, c1: this.bbox.seriesBBox.c1, c2: this.bbox.seriesBBox.c2};
             if(this.bbox.seriesBBox.bVert)
@@ -2678,7 +2678,7 @@ CChartSpace.prototype =
 
                                             if(aSpanPoints.length > 0 )
                                             {
-                                                if(isRealNumber(nLastNoEmptyIndex))
+                                                if(AscFormat.isRealNumber(nLastNoEmptyIndex))
                                                 {
                                                     var oStartPoint = num_cache.getPtByIndex(nLastNoEmptyIndex);
                                                     for(t = 0; t < aSpanPoints.length; ++t)
@@ -2695,7 +2695,7 @@ CChartSpace.prototype =
                                         }
                                         else
                                         {
-                                            if(isRealNumber(this.displayEmptyCellsAs) && this.displayEmptyCellsAs !== 1)
+                                            if(AscFormat.isRealNumber(this.displayEmptyCellsAs) && this.displayEmptyCellsAs !== 1)
                                             {
                                                 if(this.displayEmptyCellsAs === 2)
                                                 {
@@ -2859,7 +2859,7 @@ CChartSpace.prototype =
         var charts, series, i, j, ser;
         charts = this.chart.plotArea.charts;
         var bVert = undefined;
-        if(this.bbox && this.bbox.seriesBBox && isRealBool(this.bbox.seriesBBox.bVert))
+        if(this.bbox && this.bbox.seriesBBox && AscFormat.isRealBool(this.bbox.seriesBBox.bVert))
         {
             bVert = this.bbox.seriesBBox.bVert;
         }
@@ -2878,7 +2878,7 @@ CChartSpace.prototype =
                     this.checkValByNumRef(this.worksheet.workbook, ser, ser.cat, bVert);
                     checkCatByNumRef(this, ser, ser.cat, bVert);
                     //tx
-                    checkCatByNumRef(this, ser, ser.tx, isRealBool(bVert) ? !bVert : undefined);
+                    checkCatByNumRef(this, ser, ser.tx, AscFormat.isRealBool(bVert) ? !bVert : undefined);
 
                     if(ser.isHidden)
                     {
@@ -2898,7 +2898,7 @@ CChartSpace.prototype =
                     ser = series[j];
                     this.checkValByNumRef(this.worksheet.workbook, ser, ser.xVal, bVert);
                     this.checkValByNumRef(this.worksheet.workbook, ser, ser.yVal);
-                    checkCatByNumRef(this, ser, ser.tx, isRealBool(bVert) ? !bVert : undefined);
+                    checkCatByNumRef(this, ser, ser.tx, AscFormat.isRealBool(bVert) ? !bVert : undefined);
 
                     if(ser.isHidden)
                     {
@@ -3184,7 +3184,7 @@ CChartSpace.prototype =
 
 
                     /*расчитаем позицию блока с подпиясями вертикальной оси*/
-                    var x_ax_orientation = isRealObject(x_ax.scaling) && isRealNumber(x_ax.scaling.orientation) ? x_ax.scaling.orientation : ORIENTATION_MIN_MAX;
+                    var x_ax_orientation = isRealObject(x_ax.scaling) && AscFormat.isRealNumber(x_ax.scaling.orientation) ? x_ax.scaling.orientation : ORIENTATION_MIN_MAX;
                     var crosses;//точка на горизонтальной оси где её пересекает вертикальная
                     if(y_ax.crosses === CROSSES_AUTO_ZERO)
                     {
@@ -3199,7 +3199,7 @@ CChartSpace.prototype =
                         crosses =  arr_x_val[arr_x_val.length-1];
                     else if(y_ax.crosses === CROSSES_MIN)
                         crosses = arr_x_val[0];
-                    else if(isRealNumber(y_ax.crossesAt) && arr_val[0] <= y_ax.crossesAt && arr_val[arr_val.length-1] >= y_ax.crossesAt)
+                    else if(AscFormat.isRealNumber(y_ax.crossesAt) && arr_val[0] <= y_ax.crossesAt && arr_val[arr_val.length-1] >= y_ax.crossesAt)
                     {
                         crosses = y_ax.crossesAt;
                     }
@@ -3414,7 +3414,7 @@ CChartSpace.prototype =
                     x_ax.interval = hor_interval_width;
 
                     /*рассчитаем позицию блока с подписями горизонтальной оси*/
-                    var y_ax_orientation = isRealObject(y_ax.scaling) && isRealNumber(y_ax.scaling.orientation) ? y_ax.scaling.orientation : ORIENTATION_MIN_MAX;
+                    var y_ax_orientation = isRealObject(y_ax.scaling) && AscFormat.isRealNumber(y_ax.scaling.orientation) ? y_ax.scaling.orientation : ORIENTATION_MIN_MAX;
                     var crosses_x;
                     if(x_ax.crosses === CROSSES_AUTO_ZERO)
                     {
@@ -3435,7 +3435,7 @@ CChartSpace.prototype =
                     {
                         crosses_x = arr_val[0];
                     }
-                    else if(isRealNumber(x_ax.crossesAt) && arr_val[0] <= x_ax.crossesAt && arr_val[arr_val.length-1] >= x_ax.crossesAt)
+                    else if(AscFormat.isRealNumber(x_ax.crossesAt) && arr_val[0] <= x_ax.crossesAt && arr_val[arr_val.length-1] >= x_ax.crossesAt)
                     {
                         crosses_x = x_ax.crossesAt;
                     }
@@ -3980,7 +3980,7 @@ CChartSpace.prototype =
                         crosses = 1;
                     else if(val_ax.crosses === CROSSES_MAX)
                         crosses = string_pts.length;
-                    else if(isRealNumber(val_ax.crossesAt))
+                    else if(AscFormat.isRealNumber(val_ax.crossesAt))
                     {
                         if(val_ax.crossesAt <= string_pts.length + 1 && val_ax.crossesAt > 0)
                             crosses = val_ax.crossesAt;
@@ -3994,14 +3994,14 @@ CChartSpace.prototype =
 
                     cat_ax.maxCatVal = string_pts.length;
 
-                    var cat_ax_orientation = cat_ax.scaling && isRealNumber(cat_ax.scaling.orientation) ?  cat_ax.scaling.orientation : ORIENTATION_MIN_MAX;
+                    var cat_ax_orientation = cat_ax.scaling && AscFormat.isRealNumber(cat_ax.scaling.orientation) ?  cat_ax.scaling.orientation : ORIENTATION_MIN_MAX;
                     var point_width = rect.w/string_pts.length;
                     var labels_pos = val_ax.tickLblPos;
                     if(val_ax.bDelete)
                     {
                         labels_pos = TICK_LABEL_POSITION_NONE;
                     }
-                    var cross_between = isRealNumber(val_ax.crossBetween) ? val_ax.crossBetween :  (chart_type === AscDFH.historyitem_type_AreaChart ? CROSS_BETWEEN_MID_CAT : CROSS_BETWEEN_BETWEEN) ;
+                    var cross_between = AscFormat.isRealNumber(val_ax.crossBetween) ? val_ax.crossBetween :  (chart_type === AscDFH.historyitem_type_AreaChart ? CROSS_BETWEEN_MID_CAT : CROSS_BETWEEN_BETWEEN) ;
 
                     var left_val_ax_labels_align = true;//приленгание подписей оси значений к левому краю.
 
@@ -4017,7 +4017,7 @@ CChartSpace.prototype =
                     var arr_cat_labels_points = [];//массив середин подписей горизонтальной оси; i-й элемент - x-координата центра подписи категории с номером i;
                     if(cat_ax_orientation === ORIENTATION_MIN_MAX)
                     {
-                        if(labels_pos === TICK_LABEL_POSITION_NEXT_TO || !isRealNumber(labels_pos)) //подписи рядом с осью
+                        if(labels_pos === TICK_LABEL_POSITION_NEXT_TO || !AscFormat.isRealNumber(labels_pos)) //подписи рядом с осью
                         {
                             if(val_ax.crosses === CROSSES_MAX)
                             {
@@ -4164,7 +4164,7 @@ CChartSpace.prototype =
                     }
                     else
                     {//то же самое, только зеркально отраженное
-                        if(labels_pos === TICK_LABEL_POSITION_NEXT_TO || !isRealNumber(labels_pos)) //подписи рядом с осью
+                        if(labels_pos === TICK_LABEL_POSITION_NEXT_TO || !AscFormat.isRealNumber(labels_pos)) //подписи рядом с осью
                         {
                             if(val_ax.crosses === CROSSES_MAX)
                             {
@@ -4321,7 +4321,7 @@ CChartSpace.prototype =
                     if(TICK_LABEL_POSITION_NONE !== cat_ax.tickLblPos && !(cat_ax.bDelete === true)) //будем корректировать вертикальные подписи только если есть горизонтальные
                     {
                         cat_ax.labels = new CValAxisLabels(this, cat_ax);
-                        var tick_lbl_skip = isRealNumber(cat_ax.tickLblSkip) ? cat_ax.tickLblSkip :  (string_pts.length < SKIP_LBL_LIMIT ?  1 :  Math.floor(string_pts.length/SKIP_LBL_LIMIT));
+                        var tick_lbl_skip = AscFormat.isRealNumber(cat_ax.tickLblSkip) ? cat_ax.tickLblSkip :  (string_pts.length < SKIP_LBL_LIMIT ?  1 :  Math.floor(string_pts.length/SKIP_LBL_LIMIT));
                         var max_min_width = 0;
                         var max_max_width = 0;
                         var arr_max_contents = [];
@@ -4357,7 +4357,7 @@ CChartSpace.prototype =
                             }
                             cat_ax.labels.arrLabels.push(dlbl);
                         }
-                        var stake_offset = isRealNumber(cat_ax.lblOffset) ? cat_ax.lblOffset/100 : 1;
+                        var stake_offset = AscFormat.isRealNumber(cat_ax.lblOffset) ? cat_ax.lblOffset/100 : 1;
                         var labels_offset = cat_ax.labels.arrLabels[0].tx.rich.content.Content[0].CompiledPr.Pr.TextPr.FontSize*(25.4/72)*stake_offset;
                         if(max_min_width < max_cat_label_width)//значит текст каждой из точек умещается в point_width
                         {
@@ -4598,7 +4598,7 @@ CChartSpace.prototype =
                     {
                         crosses_val_ax = arr_val[arr_val.length - 1];
                     }
-                    else if(isRealNumber(cat_ax.crossesAt) && cat_ax.crossesAt >= arr_val[0] && cat_ax.crossesAt <= arr_val[arr_val.length - 1])
+                    else if(AscFormat.isRealNumber(cat_ax.crossesAt) && cat_ax.crossesAt >= arr_val[0] && cat_ax.crossesAt <= arr_val[arr_val.length - 1])
                     {
                         //сделаем провеку на попадание в интервал
                         if(cat_ax.crossesAt >= arr_val[0] && cat_ax.crossesAt <= arr_val[arr_val.length - 1])
@@ -4613,7 +4613,7 @@ CChartSpace.prototype =
                         else
                             crosses_val_ax = arr_val[0];
                     }
-                    var val_ax_orientation = val_ax.scaling && isRealNumber(val_ax.scaling.orientation) ? val_ax.scaling.orientation : ORIENTATION_MIN_MAX;
+                    var val_ax_orientation = val_ax.scaling && AscFormat.isRealNumber(val_ax.scaling.orientation) ? val_ax.scaling.orientation : ORIENTATION_MIN_MAX;
                     var hor_labels_pos = cat_ax.tickLblPos;
 
                     var arr_val_labels_points = [];//массив середин подписей вертикальной оси; i-й элемент - y-координата центра подписи i-огто значения;
@@ -4626,7 +4626,7 @@ CChartSpace.prototype =
                     var cat_ax_ext_y = cat_ax.labels ? cat_ax.labels.extY : 0;
                     if(val_ax_orientation === ORIENTATION_MIN_MAX)
                     {
-                        if(hor_labels_pos === TICK_LABEL_POSITION_NEXT_TO || !isRealNumber(hor_labels_pos))
+                        if(hor_labels_pos === TICK_LABEL_POSITION_NEXT_TO || !AscFormat.isRealNumber(hor_labels_pos))
                         {
                             if(cat_ax.crosses === CROSSES_MAX)
                             {
@@ -4684,7 +4684,7 @@ CChartSpace.prototype =
                     }
                     else
                     {//зеркально отражаем
-                        if(hor_labels_pos === TICK_LABEL_POSITION_NEXT_TO || !isRealNumber(hor_labels_pos))
+                        if(hor_labels_pos === TICK_LABEL_POSITION_NEXT_TO || !AscFormat.isRealNumber(hor_labels_pos))
                         {
                             if(cat_ax.crosses === CROSSES_MAX)
                             {
@@ -4888,7 +4888,7 @@ CChartSpace.prototype =
                                         global_MatrixTransformer.RotateRadAppend(label_text_transform, Math.PI/4);//TODO
                                         global_MatrixTransformer.TranslateAppend(label_text_transform, xc, yc);
                                         global_MatrixTransformer.MultiplyAppend(label_text_transform,this.transform);
-                                        if(!isRealNumber(left_x))
+                                        if(!AscFormat.isRealNumber(left_x))
                                         {
                                             left_x = xc - w2/2;
                                             right_x = xc + w2/2;
@@ -4934,7 +4934,7 @@ CChartSpace.prototype =
                                         global_MatrixTransformer.TranslateAppend(label_text_transform, xc, yc);
                                         global_MatrixTransformer.MultiplyAppend(label_text_transform,this.transform);
 
-                                        if(!isRealNumber(left_x))
+                                        if(!AscFormat.isRealNumber(left_x))
                                         {
                                             left_x = xc - w2/2;
                                             right_x = xc + w2/2;
@@ -5164,7 +5164,7 @@ CChartSpace.prototype =
                         crosses = 1;
                     else if(val_ax.crosses === CROSSES_MAX)
                         crosses = string_pts.length;
-                    else if(isRealNumber(val_ax.crossesAt))
+                    else if(AscFormat.isRealNumber(val_ax.crossesAt))
                     {
                         if(val_ax.crossesAt <= string_pts.length + 1 && val_ax.crossesAt > 0)
                             crosses = val_ax.crossesAt;
@@ -5179,9 +5179,9 @@ CChartSpace.prototype =
 
                     cat_ax.maxCatVal = string_pts.length;
 
-                    var cat_ax_orientation = cat_ax.scaling && isRealNumber(cat_ax.scaling.orientation) ?  cat_ax.scaling.orientation : ORIENTATION_MIN_MAX;
+                    var cat_ax_orientation = cat_ax.scaling && AscFormat.isRealNumber(cat_ax.scaling.orientation) ?  cat_ax.scaling.orientation : ORIENTATION_MIN_MAX;
                     var labels_pos = val_ax.tickLblPos;
-                    var cross_between = isRealNumber(val_ax.crossBetween) ? val_ax.crossBetween : CROSS_BETWEEN_BETWEEN;
+                    var cross_between = AscFormat.isRealNumber(val_ax.crossBetween) ? val_ax.crossBetween : CROSS_BETWEEN_BETWEEN;
 
                     var bottom_val_ax_labels_align = true;//приленгание подписей оси значений к левому краю.
 
@@ -5208,7 +5208,7 @@ CChartSpace.prototype =
                             }
                             val_ax.posY = rect.y + rect.h - point_interval*(crosses-1);
                         }
-                        else if(labels_pos === TICK_LABEL_POSITION_NEXT_TO || !isRealNumber(labels_pos)) //подписи рядом с осью
+                        else if(labels_pos === TICK_LABEL_POSITION_NEXT_TO || !AscFormat.isRealNumber(labels_pos)) //подписи рядом с осью
                         {
                             if(val_ax.crosses === CROSSES_MAX)
                             {
@@ -5332,7 +5332,7 @@ CChartSpace.prototype =
                             }
                             val_ax.posY = rect.y + point_interval*(crosses-1);
                         }
-                        else if(labels_pos === TICK_LABEL_POSITION_NEXT_TO || !isRealNumber(labels_pos)) //подписи рядом с осью
+                        else if(labels_pos === TICK_LABEL_POSITION_NEXT_TO || !AscFormat.isRealNumber(labels_pos)) //подписи рядом с осью
                         {
                             if(val_ax.crosses === CROSSES_MAX)
                             {
@@ -5449,7 +5449,7 @@ CChartSpace.prototype =
                     if(TICK_LABEL_POSITION_NONE !== cat_ax.tickLblPos && !(cat_ax.bDelete === true)) //будем корректировать вертикальные подписи только если есть горизонтальные
                     {
                         cat_ax.labels = new CValAxisLabels(this, cat_ax);
-                        var tick_lbl_skip = isRealNumber(cat_ax.tickLblSkip) ? cat_ax.tickLblSkip : (string_pts.length < SKIP_LBL_LIMIT ?  1 :  Math.floor(string_pts.length/SKIP_LBL_LIMIT));
+                        var tick_lbl_skip = AscFormat.isRealNumber(cat_ax.tickLblSkip) ? cat_ax.tickLblSkip : (string_pts.length < SKIP_LBL_LIMIT ?  1 :  Math.floor(string_pts.length/SKIP_LBL_LIMIT));
                         var max_min_width = 0;
                         var max_max_width = 0;
                         var max_content_width = 0;
@@ -5493,7 +5493,7 @@ CChartSpace.prototype =
                             }
                             cat_ax.labels.arrLabels.push(dlbl);
                         }
-                        var stake_offset = isRealNumber(cat_ax.lblOffset) ? cat_ax.lblOffset/100 : 1;
+                        var stake_offset = AscFormat.isRealNumber(cat_ax.lblOffset) ? cat_ax.lblOffset/100 : 1;
                         var labels_offset = cat_ax.labels.arrLabels[0].tx.rich.content.Content[0].CompiledPr.Pr.TextPr.FontSize*(25.4/72)*stake_offset;
                         //сначала посмотрим убираются ли в максимальную допустимую ширину подписей подписи расчитанные в одну строку
 
@@ -5534,7 +5534,7 @@ CChartSpace.prototype =
                     {
                         crosses_val_ax = arr_val[arr_val.length - 1];
                     }
-                    else if(isRealNumber(cat_ax.crossesAt) && cat_ax.crossesAt >= arr_val[0] && cat_ax.crossesAt <= arr_val[arr_val.length - 1])
+                    else if(AscFormat.isRealNumber(cat_ax.crossesAt) && cat_ax.crossesAt >= arr_val[0] && cat_ax.crossesAt <= arr_val[arr_val.length - 1])
                     {
                         //сделаем провеку на попадание в интервал
                         if(cat_ax.crossesAt >= arr_val[0] && cat_ax.crossesAt <= arr_val[arr_val.length - 1])
@@ -5549,7 +5549,7 @@ CChartSpace.prototype =
                         else
                             crosses_val_ax = arr_val[0];
                     }
-                    var val_ax_orientation = val_ax.scaling && isRealNumber(val_ax.scaling.orientation) ? val_ax.scaling.orientation : ORIENTATION_MIN_MAX;
+                    var val_ax_orientation = val_ax.scaling && AscFormat.isRealNumber(val_ax.scaling.orientation) ? val_ax.scaling.orientation : ORIENTATION_MIN_MAX;
                     var hor_labels_pos = cat_ax.tickLblPos;
 
 
@@ -5563,7 +5563,7 @@ CChartSpace.prototype =
                     var cat_ax_ext_x = cat_ax.labels ? cat_ax.labels.extX : 0;
                     if(val_ax_orientation === ORIENTATION_MIN_MAX)
                     {
-                        if(hor_labels_pos === TICK_LABEL_POSITION_NEXT_TO || !isRealNumber(hor_labels_pos))
+                        if(hor_labels_pos === TICK_LABEL_POSITION_NEXT_TO || !AscFormat.isRealNumber(hor_labels_pos))
                         {
                             if(cat_ax.crosses === CROSSES_MAX)
                             {
@@ -5646,7 +5646,7 @@ CChartSpace.prototype =
                     }
                     else
                     {//зеркально отражаем
-                        if(hor_labels_pos === TICK_LABEL_POSITION_NEXT_TO || !isRealNumber(hor_labels_pos))
+                        if(hor_labels_pos === TICK_LABEL_POSITION_NEXT_TO || !AscFormat.isRealNumber(hor_labels_pos))
                         {
                             if(cat_ax.crosses === CROSSES_MAX)
                             {
@@ -6017,7 +6017,7 @@ CChartSpace.prototype =
                         {
                             if(oAxisLabels.align)
                             {
-                                var stake_offset = isRealNumber(oCatAx.lblOffset) ? oCatAx.lblOffset/100 : 1;
+                                var stake_offset = AscFormat.isRealNumber(oCatAx.lblOffset) ? oCatAx.lblOffset/100 : 1;
                                 var labels_offset = oCatAx.labels.arrLabels[0].tx.rich.content.Content[0].CompiledPr.Pr.TextPr.FontSize*(25.4/72)*stake_offset;
                                 for(i = 0; i < oAxisLabels.arrLabels.length; ++i)
                                 {
@@ -6045,7 +6045,7 @@ CChartSpace.prototype =
                             }
                             else
                             {
-                                var stake_offset = isRealNumber(oCatAx.lblOffset) ? oCatAx.lblOffset/100 : 1;
+                                var stake_offset = AscFormat.isRealNumber(oCatAx.lblOffset) ? oCatAx.lblOffset/100 : 1;
                                 var labels_offset = oCatAx.labels.arrLabels[0].tx.rich.content.Content[0].CompiledPr.Pr.TextPr.FontSize*(25.4/72)*stake_offset;
                                 for(i = 0; i < oAxisLabels.arrLabels.length; ++i)
                                 {
@@ -6422,11 +6422,11 @@ CChartSpace.prototype =
                         calc_entry.calcMarkerUnion.lineMarker.spPr.geometry.Recalculate(line_marker_width, 1);
                         /*Excel не дает сделать толщину линии для маркера легенды больше определенной. Считаем, что это толщина равна 133000emu*/
                         if(calc_entry.calcMarkerUnion.lineMarker.pen
-                            && isRealNumber(calc_entry.calcMarkerUnion.lineMarker.pen.w) && calc_entry.calcMarkerUnion.lineMarker.pen.w > 133000)
+                            && AscFormat.isRealNumber(calc_entry.calcMarkerUnion.lineMarker.pen.w) && calc_entry.calcMarkerUnion.lineMarker.pen.w > 133000)
                         {
                             calc_entry.calcMarkerUnion.lineMarker.pen.w = 133000;
                         }
-                        calc_entry.calcMarkerUnion.lineMarker.penWidth = calc_entry.calcMarkerUnion.lineMarker.pen && isRealNumber(calc_entry.calcMarkerUnion.lineMarker.pen.w) ? calc_entry.calcMarkerUnion.lineMarker.pen.w/36000 : 0;
+                        calc_entry.calcMarkerUnion.lineMarker.penWidth = calc_entry.calcMarkerUnion.lineMarker.pen && AscFormat.isRealNumber(calc_entry.calcMarkerUnion.lineMarker.pen.w) ? calc_entry.calcMarkerUnion.lineMarker.pen.w/36000 : 0;
                     }
                     if(calc_entryes[i].calcMarkerUnion.marker)
                     {
@@ -6448,7 +6448,7 @@ CChartSpace.prototype =
             }
             var left_inset = marker_size + 3*distance_to_text;
             var legend_pos;
-            if(isRealNumber(legend.legendPos))
+            if(AscFormat.isRealNumber(legend.legendPos))
             {
                 legend_pos = legend.legendPos;
             }
@@ -6457,12 +6457,12 @@ CChartSpace.prototype =
                 legend_pos = LEGEND_POS_L;
             }
             var legend_width, legend_height;
-            if(isRealNumber(legend_pos)
+            if(AscFormat.isRealNumber(legend_pos)
                 && (!legend.layout || !legend.layout.manualLayout
-                || !isRealNumber(legend.layout.manualLayout.w) || !isRealNumber(legend.layout.manualLayout.h)
-                || !isRealNumber(legend.layout.manualLayout.x) || !isRealNumber(legend.layout.manualLayout.y)
-                || !isRealNumber(legend.layout.manualLayout.wMode) || !isRealNumber(legend.layout.manualLayout.hMode)
-                || !isRealNumber(legend.layout.manualLayout.xMode) || !isRealNumber(legend.layout.manualLayout.yMode)))
+                || !AscFormat.isRealNumber(legend.layout.manualLayout.w) || !AscFormat.isRealNumber(legend.layout.manualLayout.h)
+                || !AscFormat.isRealNumber(legend.layout.manualLayout.x) || !AscFormat.isRealNumber(legend.layout.manualLayout.y)
+                || !AscFormat.isRealNumber(legend.layout.manualLayout.wMode) || !AscFormat.isRealNumber(legend.layout.manualLayout.hMode)
+                || !AscFormat.isRealNumber(legend.layout.manualLayout.xMode) || !AscFormat.isRealNumber(legend.layout.manualLayout.yMode)))
             {
                 var max_legend_width, max_legend_height;
                 var cut_index;
@@ -6510,7 +6510,7 @@ CChartSpace.prototype =
                                 break;
                             }
                         }
-                        if(isRealNumber(cut_index))
+                        if(AscFormat.isRealNumber(cut_index))
                         {
                             if(cut_index > 0)
                             {
@@ -6593,7 +6593,7 @@ CChartSpace.prototype =
                         }
 
 
-                        if(isRealNumber(cut_index))
+                        if(AscFormat.isRealNumber(cut_index))
                         {
                             if(cut_index > 0)
                             {
@@ -6628,7 +6628,7 @@ CChartSpace.prototype =
                             }
                         }
                         if(chart_object && chart_object.getObjectType() === AscDFH.historyitem_type_BarChart && chart_object.barDir === BAR_DIR_BAR &&
-                            (cat_ax && cat_ax.scaling && isRealNumber(cat_ax.scaling.orientation) ?  cat_ax.scaling.orientation : ORIENTATION_MIN_MAX) === ORIENTATION_MIN_MAX)
+                            (cat_ax && cat_ax.scaling && AscFormat.isRealNumber(cat_ax.scaling.orientation) ?  cat_ax.scaling.orientation : ORIENTATION_MIN_MAX) === ORIENTATION_MIN_MAX)
                         {
                             b_reverse_order = true;
                         }
@@ -6812,7 +6812,7 @@ CChartSpace.prototype =
                                     break;
                                 }
                             }
-                            if(isRealNumber(cut_index))
+                            if(AscFormat.isRealNumber(cut_index))
                             {
                                 if(cut_index > 0)
                                 {
@@ -6976,7 +6976,7 @@ CChartSpace.prototype =
                                     break;
                                 }
                             }
-                            if(isRealNumber(cut_index))
+                            if(AscFormat.isRealNumber(cut_index))
                             {
                                 if(cut_index > 0)
                                 {
@@ -7070,7 +7070,7 @@ CChartSpace.prototype =
                 oSide.brush = oSide.spPr.Fill.createDuplicate();
                 if(nSideType === 0 || nSideType === 2)
                 {
-                    var cColorMod = new CColorMod;
+                    var cColorMod = new AscFormat.CColorMod;
                     if(nSideType === 2)
                         cColorMod.val = 45000;
                     else
@@ -7110,7 +7110,7 @@ CChartSpace.prototype =
 
             if(nSideType === 0 || nSideType === 2)
             {
-                var cColorMod = new CColorMod;
+                var cColorMod = new AscFormat.CColorMod;
                 if(nSideType === 0)
                     cColorMod.val = 45000;
                 else
@@ -7155,7 +7155,7 @@ CChartSpace.prototype =
             bars.downBarsPen = null;
             if(up_bars || down_bars)
             {
-                var default_bar_line = new CLn();
+                var default_bar_line = new AscFormat.CLn();
                 if(parents.theme  && parents.theme.themeElements
                     && parents.theme.themeElements.fmtScheme
                     && parents.theme.themeElements.fmtScheme.lnStyleLst)
@@ -7583,7 +7583,7 @@ CChartSpace.prototype =
     recalculateChartPen: function()
     {
         var parent_objects = this.getParentObjects();
-        var default_line = new CLn();
+        var default_line = new AscFormat.CLn();
         if(parent_objects.theme  && parent_objects.theme.themeElements
             && parent_objects.theme.themeElements.fmtScheme
             && parent_objects.theme.themeElements.fmtScheme.lnStyleLst)
@@ -7640,7 +7640,7 @@ CChartSpace.prototype =
             {
                 function calcGridLine(defaultStyle, spPr, subtleLine, parents)
                 {
-                    var compiled_grid_lines = new CLn();
+                    var compiled_grid_lines = new AscFormat.CLn();
                     compiled_grid_lines.merge(subtleLine);
                     // if(compiled_grid_lines.Fill && compiled_grid_lines.Fill.fill && compiled_grid_lines.Fill.fill.color && compiled_grid_lines.Fill.fill.color.Mods)
                     // {
@@ -7648,7 +7648,7 @@ CChartSpace.prototype =
                     // }
                     if(!compiled_grid_lines.Fill)
                     {
-                        compiled_grid_lines.setFill(new CUniFill());
+                        compiled_grid_lines.setFill(new AscFormat.CUniFill());
                     }
                     //if(compiled_grid_lines.Fill && compiled_grid_lines.Fill.fill && compiled_grid_lines.Fill.fill.color && compiled_grid_lines.Fill.fill.color.Mods)
                     //{
@@ -7674,7 +7674,7 @@ CChartSpace.prototype =
                 }
                 axis.compiledLn = calcGridLine(defaultStyle.axisAndMajorGridLines, axis.spPr, subtleLine, parents);
                 axis.compiledTickMarkLn = axis.compiledLn.createDuplicate();
-                if(isRealNumber(axis.compiledTickMarkLn.w))
+                if(AscFormat.isRealNumber(axis.compiledTickMarkLn.w))
                     axis.compiledTickMarkLn.w/=2;
                 axis.compiledTickMarkLn.calculate(parents.theme, parents.slide, parents.layout, parents.master, {R: 0, G: 0, B: 0, A: 255})
             };
@@ -7815,7 +7815,7 @@ CChartSpace.prototype =
                         var base_fills = getArrayFillsFromBase(style.fill2, getMaxIdx(pts));
                         for(var i = 0; i < pts.length; ++i)
                         {
-                            var compiled_brush = new CUniFill();
+                            var compiled_brush = new AscFormat.CUniFill();
                             compiled_brush.merge(base_fills[pts[i].idx]);
                             if(ser.spPr && ser.spPr.Fill)
                             {
@@ -7839,7 +7839,7 @@ CChartSpace.prototype =
                             pts[i].brush.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
                         }
 
-                        default_line =  new CLn();
+                        default_line =  new AscFormat.CLn();
                         if(style.line1 === EFFECT_NONE)
                         {
                             default_line.w = 0;
@@ -7861,9 +7861,9 @@ CChartSpace.prototype =
                             base_line_fills = getArrayFillsFromBase(style.line2, getMaxIdx(pts));
                         for(i = 0; i < pts.length; ++i)
                         {
-                            var compiled_line = new CLn();
+                            var compiled_line = new AscFormat.CLn();
                             compiled_line.merge(default_line);
-                            compiled_line.Fill = new CUniFill();
+                            compiled_line.Fill = new AscFormat.CUniFill();
                             if(this.style !== 34)
                             {
                                 compiled_line.Fill.merge(style.line2[0]);
@@ -7897,9 +7897,9 @@ CChartSpace.prototype =
                         var default_line;
                         if(this.chart.plotArea.chart.getObjectType() === AscDFH.historyitem_type_ScatterChart && this.chart.plotArea.chart.scatterStyle === SCATTER_STYLE_MARKER || this.chart.plotArea.chart.scatterStyle === SCATTER_STYLE_NONE)
                         {
-                            default_line = new CLn();
-                            default_line.setFill(new CUniFill());
-                            default_line.Fill.setFill(new CNoFill());
+                            default_line = new AscFormat.CLn();
+                            default_line.setFill(new AscFormat.CUniFill());
+                            default_line.Fill.setFill(new AscFormat.CNoFill());
                         }
                         else
                         {
@@ -7908,7 +7908,7 @@ CChartSpace.prototype =
                         var base_line_fills = getArrayFillsFromBase(style.line4, getMaxIdx(pts));
                         for(var i = 0; i < pts.length; ++i)
                         {
-                            var compiled_line = new CLn();
+                            var compiled_line = new AscFormat.CLn();
                             compiled_line.merge(default_line);
                             if(!(this.chart.plotArea.chart.getObjectType() === AscDFH.historyitem_type_ScatterChart && this.chart.plotArea.chart.scatterStyle === SCATTER_STYLE_MARKER || this.chart.plotArea.chart.scatterStyle === SCATTER_STYLE_NONE))
                                 compiled_line.Fill.merge(base_line_fills[pts[i].idx]);
@@ -7963,7 +7963,7 @@ CChartSpace.prototype =
                                 var default_line = parents.theme.themeElements.fmtScheme.lnStyleLst[0];
                                 var ser = series[i];
                                 var pts = getPtsFromSeries(ser);
-                                var compiled_line = new CLn();
+                                var compiled_line = new AscFormat.CLn();
                                 compiled_line.merge(default_line);
                                 compiled_line.Fill.merge(base_line_fills[ser.idx]);
                                 compiled_line.w *= style.line3;
@@ -7972,7 +7972,7 @@ CChartSpace.prototype =
                                 ser.compiledSeriesPen = compiled_line.createDuplicate();
                                 for(var j = 0; j < pts.length; ++j)
                                 {
-                                    var compiled_line = new CLn();
+                                    var compiled_line = new AscFormat.CLn();
                                     compiled_line.merge(default_line);
                                     compiled_line.Fill.merge(base_line_fills[ser.idx]);
                                     compiled_line.w *= style.line3;
@@ -8014,7 +8014,7 @@ CChartSpace.prototype =
                             for(var i = 0; i < series.length; ++i)
                             {
                                 var ser = series[i];
-                                var compiled_brush = new CUniFill();
+                                var compiled_brush = new AscFormat.CUniFill();
                                 compiled_brush.merge(base_fills[ser.idx]);
                                 if(ser.spPr && ser.spPr.Fill)
                                 {
@@ -8024,7 +8024,7 @@ CChartSpace.prototype =
                                 var pts = getPtsFromSeries(ser);
                                 for(var j = 0; j < pts.length; ++j)
                                 {
-                                    var compiled_brush = new CUniFill();
+                                    var compiled_brush = new AscFormat.CUniFill();
                                     compiled_brush.merge(base_fills[ser.idx]);
                                     if(ser.spPr && ser.spPr.Fill)
                                     {
@@ -8051,7 +8051,7 @@ CChartSpace.prototype =
 
                                 //
                                 {
-                                    default_line =  new CLn();
+                                    default_line =  new AscFormat.CLn();
                                     if(style.line1 === EFFECT_NONE)
                                     {
                                         default_line.w = 0;
@@ -8073,9 +8073,9 @@ CChartSpace.prototype =
                                         base_line_fills = getArrayFillsFromBase(style.line2, getMaxIdx(pts));
 
 
-                                    var compiled_line = new CLn();
+                                    var compiled_line = new AscFormat.CLn();
                                     compiled_line.merge(default_line);
-                                    compiled_line.Fill = new CUniFill();
+                                    compiled_line.Fill = new AscFormat.CUniFill();
                                     if(this.style !== 34)
                                         compiled_line.Fill.merge(style.line2[0]);
                                     else
@@ -8087,9 +8087,9 @@ CChartSpace.prototype =
                                     ser.compiledSeriesPen = compiled_line.createDuplicate();
                                     for(var j = 0; j < pts.length; ++j)
                                     {
-                                        var compiled_line = new CLn();
+                                        var compiled_line = new AscFormat.CLn();
                                         compiled_line.merge(default_line);
-                                        compiled_line.Fill = new CUniFill();
+                                        compiled_line.Fill = new AscFormat.CUniFill();
                                         if(this.style !== 34)
                                             compiled_line.Fill.merge(style.line2[0]);
                                         else
@@ -8135,19 +8135,19 @@ CChartSpace.prototype =
                             var pts = getPtsFromSeries(ser);
                             if(this.chart.plotArea.chart.scatterStyle === SCATTER_STYLE_SMOOTH || this.chart.plotArea.chart.scatterStyle === SCATTER_STYLE_SMOOTH_MARKER)
                             {
-                                if(!isRealBool(ser.smooth))
+                                if(!AscFormat.isRealBool(ser.smooth))
                                 {
                                     ser.smooth = true;
                                 }
                             }
                             if(this.chart.plotArea.chart.scatterStyle === SCATTER_STYLE_MARKER || this.chart.plotArea.chart.scatterStyle === SCATTER_STYLE_NONE)
                             {
-                                default_line = new CLn();
-                                default_line.setFill(new CUniFill());
-                                default_line.Fill.setFill(new CNoFill());
+                                default_line = new AscFormat.CLn();
+                                default_line.setFill(new AscFormat.CUniFill());
+                                default_line.Fill.setFill(new AscFormat.CNoFill());
                             }
 
-                            var compiled_line = new CLn();
+                            var compiled_line = new AscFormat.CLn();
                             compiled_line.merge(default_line);
                             if(!(this.chart.plotArea.chart.scatterStyle === SCATTER_STYLE_MARKER || this.chart.plotArea.chart.scatterStyle === SCATTER_STYLE_NONE))
                                 compiled_line.Fill.merge(base_line_fills[ser.idx]);
@@ -8157,7 +8157,7 @@ CChartSpace.prototype =
                             ser.compiledSeriesPen = compiled_line.createDuplicate();
                             for(var j = 0; j < pts.length; ++j)
                             {
-                                var compiled_line = new CLn();
+                                var compiled_line = new AscFormat.CLn();
                                 compiled_line.merge(default_line);
                                 if(!(this.chart.plotArea.chart.scatterStyle === SCATTER_STYLE_MARKER || this.chart.plotArea.chart.scatterStyle === SCATTER_STYLE_NONE))
                                     compiled_line.Fill.merge(base_line_fills[ser.idx]);
@@ -8201,7 +8201,7 @@ CChartSpace.prototype =
                         for(var i = 0; i < series.length; ++i)
                         {
                             var ser = series[i];
-                            var compiled_brush = new CUniFill();
+                            var compiled_brush = new AscFormat.CUniFill();
                             compiled_brush.merge(base_fills[ser.idx]);
                             if(ser.spPr && ser.spPr.Fill)
                             {
@@ -8211,7 +8211,7 @@ CChartSpace.prototype =
                             var pts = getPtsFromSeries(ser);
                             for(var j = 0; j < pts.length; ++j)
                             {
-                                var compiled_brush = new CUniFill();
+                                var compiled_brush = new AscFormat.CUniFill();
                                 compiled_brush.merge(base_fills[ser.idx]);
                                 if(ser.spPr && ser.spPr.Fill)
                                 {
@@ -8238,7 +8238,7 @@ CChartSpace.prototype =
 
                             //
                             {
-                                default_line =  new CLn();
+                                default_line =  new AscFormat.CLn();
                                 if(style.line1 === EFFECT_NONE)
                                 {
                                     default_line.w = 0;
@@ -8260,9 +8260,9 @@ CChartSpace.prototype =
                                     base_line_fills = getArrayFillsFromBase(style.line2, getMaxIdx(pts));
 
 
-                                var compiled_line = new CLn();
+                                var compiled_line = new AscFormat.CLn();
                                 compiled_line.merge(default_line);
-                                compiled_line.Fill = new CUniFill();
+                                compiled_line.Fill = new AscFormat.CUniFill();
                                 if(this.style !== 34)
                                     compiled_line.Fill.merge(style.line2[0]);
                                 else
@@ -8274,9 +8274,9 @@ CChartSpace.prototype =
                                 ser.compiledSeriesPen = compiled_line.createDuplicate();
                                 for(var j = 0; j < pts.length; ++j)
                                 {
-                                    var compiled_line = new CLn();
+                                    var compiled_line = new AscFormat.CLn();
                                     compiled_line.merge(default_line);
-                                    compiled_line.Fill = new CUniFill();
+                                    compiled_line.Fill = new AscFormat.CUniFill();
                                     if(this.style !== 34)
                                         compiled_line.Fill.merge(style.line2[0]);
                                     else
@@ -8377,8 +8377,8 @@ CChartSpace.prototype =
                     && parent_objects.theme.themeElements.fmtScheme
                     && parent_objects.theme.themeElements.fmtScheme.lnStyleLst)
                 {
-                    default_marker.setSpPr(new CSpPr());
-                    default_marker.spPr.setLn(new CLn());
+                    default_marker.setSpPr(new AscFormat.CSpPr());
+                    default_marker.spPr.setLn(new AscFormat.CLn());
                     default_marker.spPr.ln.merge(parent_objects.theme.themeElements.fmtScheme.lnStyleLst[0]);
                 }
                 var RGBA = {R:0, G:0, B:0, A: 255};
@@ -8399,12 +8399,12 @@ CChartSpace.prototype =
                         compiled_marker.merge(default_marker);
                         if(!compiled_marker.spPr)
                         {
-                            compiled_marker.setSpPr(new CSpPr());
+                            compiled_marker.setSpPr(new AscFormat.CSpPr());
                         }
                         compiled_marker.spPr.setFill(brushes[pts[i].idx]);
                         compiled_marker.spPr.Fill.merge(pts[i].brush);
                         if(!compiled_marker.spPr.ln)
-                            compiled_marker.spPr.setLn(new CLn());
+                            compiled_marker.spPr.setLn(new AscFormat.CLn());
                         compiled_marker.spPr.ln.merge(pts[i].pen);
                         compiled_marker.setSymbol(GetTypeMarkerByIndex(i));
                         compiled_marker.merge(ser.marker);
@@ -8421,7 +8421,7 @@ CChartSpace.prototype =
                                     {
                                         if(!compiled_marker.spPr)
                                         {
-                                            compiled_marker.setSpPr(new CSpPr());
+                                            compiled_marker.setSpPr(new AscFormat.CSpPr());
                                         }
                                         if(d_pt.spPr.Fill)
                                         {
@@ -8431,7 +8431,7 @@ CChartSpace.prototype =
                                         {
                                             if(!compiled_marker.spPr.ln)
                                             {
-                                                compiled_marker.spPr.setLn(new CLn());
+                                                compiled_marker.spPr.setLn(new AscFormat.CLn());
                                             }
                                             compiled_marker.spPr.ln.merge(d_pt.spPr.ln);
                                         }
@@ -8466,11 +8466,11 @@ CChartSpace.prototype =
                             compiled_marker.merge(default_marker);
                             if(!compiled_marker.spPr)
                             {
-                                compiled_marker.setSpPr(new CSpPr());
+                                compiled_marker.setSpPr(new AscFormat.CSpPr());
                             }
                             compiled_marker.spPr.setFill(brushes[series[i].idx]);
                             if(!compiled_marker.spPr.ln)
-                                compiled_marker.spPr.setLn(new CLn());
+                                compiled_marker.spPr.setLn(new AscFormat.CLn());
                             compiled_marker.spPr.ln.setFill(pens_fills[series[i].idx]);
                             compiled_marker.setSymbol(GetTypeMarkerByIndex(series[i].idx));
                             compiled_marker.merge(ser.marker);
@@ -8528,7 +8528,7 @@ CChartSpace.prototype =
     {
         if(spPr)
         {
-            var compiled_grid_lines = new CLn();
+            var compiled_grid_lines = new AscFormat.CLn();
             compiled_grid_lines.merge(subtleLine);
             // if(compiled_grid_lines.Fill && compiled_grid_lines.Fill.fill && compiled_grid_lines.Fill.fill.color && compiled_grid_lines.Fill.fill.color.Mods)
             // {
@@ -8536,7 +8536,7 @@ CChartSpace.prototype =
             // }
             if(!compiled_grid_lines.Fill)
             {
-                compiled_grid_lines.setFill(new CUniFill());
+                compiled_grid_lines.setFill(new AscFormat.CUniFill());
             }
             //if(compiled_grid_lines.Fill && compiled_grid_lines.Fill.fill && compiled_grid_lines.Fill.fill.color && compiled_grid_lines.Fill.fill.color.Mods)
             //{
@@ -8737,7 +8737,7 @@ CChartSpace.prototype =
         graphics.transform3(this.transform, false);
 
         var ln_width;
-        if(this.pen && isRealNumber(this.pen.w))
+        if(this.pen && AscFormat.isRealNumber(this.pen.w))
         {
             ln_width = this.pen.w/36000;
         }
@@ -9101,26 +9101,26 @@ CChartSpace.prototype =
         {
             case AscDFH.historyitem_AutoShapes_SetBFromSerialize:
             {
-                writeBool(w, data.newPr);
+                AscFormat.writeBool(w, data.newPr);
                 break;
             }
             case AscDFH.historyitem_AutoShapes_SetDrawingBaseCoors:
             {
-                writeDouble(w, data.fromCol   );
-                writeDouble(w, data.fromColOff);
-                writeDouble(w, data.fromRow   );
-                writeDouble(w, data.fromRowOff);
-                writeDouble(w, data.toCol);
-                writeDouble(w, data.toColOff);
-                writeDouble(w, data.toRow   );
-                writeDouble(w, data.toRowOff);
+                AscFormat.writeDouble(w, data.fromCol   );
+                AscFormat.writeDouble(w, data.fromColOff);
+                AscFormat.writeDouble(w, data.fromRow   );
+                AscFormat.writeDouble(w, data.fromRowOff);
+                AscFormat.writeDouble(w, data.toCol);
+                AscFormat.writeDouble(w, data.toColOff);
+                AscFormat.writeDouble(w, data.toRow   );
+                AscFormat.writeDouble(w, data.toRowOff);
 
 
 
-                writeDouble(w, data.posX);
-                writeDouble(w, data.posY);
-                writeDouble(w, data.cx);
-                writeDouble(w, data.cy);
+                AscFormat.writeDouble(w, data.posX);
+                AscFormat.writeDouble(w, data.posY);
+                AscFormat.writeDouble(w, data.cx);
+                AscFormat.writeDouble(w, data.cy);
                 break;
             }
             case AscDFH.historyitem_AutoShapes_RemoveFromDrawingObjects:
@@ -9130,104 +9130,104 @@ CChartSpace.prototype =
             case AscDFH.historyitem_AutoShapes_AddToDrawingObjects:
             {
                 var Pos = data.UseArray ? data.PosArray[0] : data.Pos;
-                writeLong(w, Pos);
+                AscFormat.writeLong(w, Pos);
                 break;
             }
             case AscDFH.historyitem_AutoShapes_SetWorksheet:
             {
-                writeBool(w, isRealObject(data.newPr));
+                AscFormat.writeBool(w, isRealObject(data.newPr));
                 if(isRealObject(data.newPr))
                 {
-                    writeString(w, data.newPr.getId());
+                    AscFormat.writeString(w, data.newPr.getId());
                 }
                 break;
             }
 
             case AscDFH.historyitem_ChartSpace_SetParent:
             {
-                writeObject(w, data.newPr);
+                AscFormat.writeObject(w, data.newPr);
                 break;
             }
             case AscDFH.historyitem_ShapeSetBDeleted:
             {
-                writeBool(w, data.newPr);
+                AscFormat.writeBool(w, data.newPr);
                 break;
             }
             case AscDFH.historyitem_ChartSpace_SetChart:
             {
-                writeObject(w,data.newChart);
+                AscFormat.writeObject(w,data.newChart);
                 break;
             }
             case AscDFH.historyitem_ChartSpace_SetClrMapOvr:
             {
-                writeObject(w,data.newClrMapOvr);
+                AscFormat.writeObject(w,data.newClrMapOvr);
                 break;
             }
             case AscDFH.historyitem_ChartSpace_SetDate1904:
             {
-                writeBool(w,data.newDate1904);
+                AscFormat.writeBool(w,data.newDate1904);
                 break;
             }
             case AscDFH.historyitem_ChartSpace_SetExternalData:
             {
-                writeObject(w,data.newExternalData);
+                AscFormat.writeObject(w,data.newExternalData);
                 break;
             }
             case AscDFH.historyitem_ChartSpace_SetLang:
             {
-                writeString(w, data.newLang);
+                AscFormat.writeString(w, data.newLang);
                 break;
             }
             case AscDFH.historyitem_ChartSpace_SetPivotSource:
             {
-                writeObject(w, data.newPivotSource);
+                AscFormat.writeObject(w, data.newPivotSource);
                 break;
             }
             case AscDFH.historyitem_ChartSpace_SetPrintSettings:
             {
-                writeObject(w, data.newPrintSettings);
+                AscFormat.writeObject(w, data.newPrintSettings);
                 break;
             }
             case AscDFH.historyitem_ChartSpace_SetProtection:
             {
-                writeObject(w, data.newProtection);
+                AscFormat.writeObject(w, data.newProtection);
                 break;
             }
             case AscDFH.historyitem_ChartSpace_SetRoundedCorners:
             {
-                writeBool(w, data.newRoundedCorners);
+                AscFormat.writeBool(w, data.newRoundedCorners);
                 break;
             }
             case AscDFH.historyitem_ChartSpace_SetSpPr:
             {
-                writeObject(w, data.newSpPr);
+                AscFormat.writeObject(w, data.newSpPr);
                 break;
             }
             case AscDFH.historyitem_ChartSpace_SetStyle:
             {
-                writeLong(w, data.newStyle);
+                AscFormat.writeLong(w, data.newStyle);
                 break;
             }
             case AscDFH.historyitem_ChartSpace_SetTxPr:
             {
-                writeObject(w, data.newTxPr);
+                AscFormat.writeObject(w, data.newTxPr);
                 break;
             }
             case AscDFH.historyitem_ChartSpace_SetUserShapes:
             {
-                writeString(w, data.newUserShapes);
+                AscFormat.writeString(w, data.newUserShapes);
                 break;
             }
 
             case AscDFH.historyitem_ChartSpace_SetThemeOverride:
             {
-                writeObject(w, data.oldPr);
+                AscFormat.writeObject(w, data.oldPr);
                 break;
             }
 
             case AscDFH.historyitem_ChartSpace_SetGroup:
             {
-                writeObject(w, data.newPr);
+                AscFormat.writeObject(w, data.newPr);
                 break;
             }
         }
@@ -9240,27 +9240,27 @@ CChartSpace.prototype =
         {
             case AscDFH.historyitem_AutoShapes_SetBFromSerialize:
             {
-                this.fromSerialize = readBool(r);
+                this.fromSerialize = AscFormat.readBool(r);
                 break;
             }
             case AscDFH.historyitem_AutoShapes_SetDrawingBaseCoors:
             {
                 if(this.drawingBase)
                 {
-                    this.drawingBase.from.col    = readDouble(r);
-                    this.drawingBase.from.colOff = readDouble(r);
-                    this.drawingBase.from.row    = readDouble(r);
-                    this.drawingBase.from.rowOff = readDouble(r);
-                    this.drawingBase.to.col      = readDouble(r);
-                    this.drawingBase.to.colOff   = readDouble(r);
-                    this.drawingBase.to.row      = readDouble(r);
-                    this.drawingBase.to.rowOff   = readDouble(r);
+                    this.drawingBase.from.col    = AscFormat.readDouble(r);
+                    this.drawingBase.from.colOff = AscFormat.readDouble(r);
+                    this.drawingBase.from.row    = AscFormat.readDouble(r);
+                    this.drawingBase.from.rowOff = AscFormat.readDouble(r);
+                    this.drawingBase.to.col      = AscFormat.readDouble(r);
+                    this.drawingBase.to.colOff   = AscFormat.readDouble(r);
+                    this.drawingBase.to.row      = AscFormat.readDouble(r);
+                    this.drawingBase.to.rowOff   = AscFormat.readDouble(r);
 
 
-                    this.drawingBase.Pos.X = readDouble(r);
-                    this.drawingBase.Pos.Y = readDouble(r);
-                    this.drawingBase.ext.cx = readDouble(r);
-                    this.drawingBase.ext.cy = readDouble(r);
+                    this.drawingBase.Pos.X = AscFormat.readDouble(r);
+                    this.drawingBase.Pos.Y = AscFormat.readDouble(r);
+                    this.drawingBase.ext.cx = AscFormat.readDouble(r);
+                    this.drawingBase.ext.cy = AscFormat.readDouble(r);
                 }
                 break;
             }
@@ -9271,7 +9271,7 @@ CChartSpace.prototype =
             }
             case AscDFH.historyitem_AutoShapes_AddToDrawingObjects:
             {
-                var pos = readLong(r);
+                var pos = AscFormat.readLong(r);
                 if(this.worksheet)
                 {
                     pos = this.worksheet.contentChanges.Check(AscCommon.contentchanges_Add, pos);
@@ -9286,88 +9286,88 @@ CChartSpace.prototype =
             }
             case AscDFH.historyitem_ChartSpace_SetParent:
             {
-                this.parent = readObject(r);
+                this.parent = AscFormat.readObject(r);
                 break;
             }
             case AscDFH.historyitem_ShapeSetBDeleted:
             {
-                this.bDeleted = readBool(r);
+                this.bDeleted = AscFormat.readBool(r);
                 break;
             }
             case AscDFH.historyitem_ChartSpace_SetChart:
             {
-                this.chart = readObject(r);
+                this.chart = AscFormat.readObject(r);
                 break;
             }
             case AscDFH.historyitem_ChartSpace_SetClrMapOvr:
             {
-                this.clrMapOvr = readObject(r);
+                this.clrMapOvr = AscFormat.readObject(r);
                 break;
             }
             case AscDFH.historyitem_ChartSpace_SetDate1904:
             {
-                this.date1904 = readBool(r);
+                this.date1904 = AscFormat.readBool(r);
                 break;
             }
             case AscDFH.historyitem_ChartSpace_SetExternalData:
             {
-                this.externalData = readObject(r);
+                this.externalData = AscFormat.readObject(r);
                 break;
             }
             case AscDFH.historyitem_ChartSpace_SetLang:
             {
-                this.lang = readString(r);
+                this.lang = AscFormat.readString(r);
                 break;
             }
             case AscDFH.historyitem_ChartSpace_SetPivotSource:
             {
-                this.pivotSource = readObject(r);
+                this.pivotSource = AscFormat.readObject(r);
                 break;
             }
             case AscDFH.historyitem_ChartSpace_SetPrintSettings:
             {
-                this.printSettings = readObject(r);
+                this.printSettings = AscFormat.readObject(r);
                 break;
             }
             case AscDFH.historyitem_ChartSpace_SetProtection:
             {
-                this.protection = readObject(r);
+                this.protection = AscFormat.readObject(r);
                 break;
             }
             case AscDFH.historyitem_ChartSpace_SetRoundedCorners:
             {
-                this.roundedCorners = readBool(r);
+                this.roundedCorners = AscFormat.readBool(r);
                 break;
             }
             case AscDFH.historyitem_ChartSpace_SetSpPr:
             {
-                this.spPr = readObject(r);
+                this.spPr = AscFormat.readObject(r);
                 break;
             }
             case AscDFH.historyitem_ChartSpace_SetStyle:
             {
-                this.style = readLong(r);
+                this.style = AscFormat.readLong(r);
                 this.handleUpdateStyle();
                 break;
             }
             case AscDFH.historyitem_ChartSpace_SetTxPr:
             {
-                this.txPr = readObject(r);
+                this.txPr = AscFormat.readObject(r);
                 break;
             }
             case AscDFH.historyitem_ChartSpace_SetUserShapes:
             {
-                this.userShapes = readString(r);
+                this.userShapes = AscFormat.readString(r);
                 break;
             }
             case AscDFH.historyitem_ChartSpace_SetThemeOverride:
             {
-                this.themeOverride = readObject(r);
+                this.themeOverride = AscFormat.readObject(r);
                 break;
             }
             case AscDFH.historyitem_ChartSpace_SetGroup:
             {
-                this.group = readObject(r);
+                this.group = AscFormat.readObject(r);
                 break;
             }                
         }
@@ -9553,10 +9553,10 @@ function GetTypeMarkerByIndex(index)
 
 function CreateUnfilFromRGB(r, g, b)
 {
-    var ret =  new CUniFill();
-    ret.setFill(new CSolidFill());
-    ret.fill.setColor(new CUniColor());
-    ret.fill.color.setColor(new CRGBColor());
+    var ret =  new AscFormat.CUniFill();
+    ret.setFill(new AscFormat.CSolidFill());
+    ret.fill.setColor(new AscFormat.CUniColor());
+    ret.fill.color.setColor(new AscFormat.CRGBColor());
     ret.fill.color.color.setColor(r, g, b);
     return ret;
 }
@@ -9602,8 +9602,8 @@ function CreateUniFillSolidFillWidthTintOrShade(unifill, effectVal)
     {
         effectVal*=100000.0;
         if(!unicolor.Mods)
-            unicolor.setMods(new CColorModifiers());
-        var mod = new CColorMod();
+            unicolor.setMods(new AscFormat.CColorModifiers());
+        var mod = new AscFormat.CColorMod();
         if(effectVal > 0)
         {
             mod.setName("tint");
@@ -9623,25 +9623,25 @@ function CreateUniFillSolidFillWidthTintOrShade(unifill, effectVal)
 
 function CreateUnifillSolidFillSchemeColor(colorId, tintOrShade)
 {
-    var unifill = new CUniFill();
-    unifill.setFill(new CSolidFill());
-    unifill.fill.setColor(new CUniColor());
-    unifill.fill.color.setColor(new CSchemeColor());
+    var unifill = new AscFormat.CUniFill();
+    unifill.setFill(new AscFormat.CSolidFill());
+    unifill.fill.setColor(new AscFormat.CUniColor());
+    unifill.fill.color.setColor(new AscFormat.CSchemeColor());
     unifill.fill.color.color.setId(colorId);
     return CreateUniFillSolidFillWidthTintOrShade(unifill, tintOrShade);
 }
 
 function CreateNoFillLine()
 {
-    var ret = new CLn();
+    var ret = new AscFormat.CLn();
     ret.setFill(CreateNoFillUniFill());
     return ret;
 }
 
 function CreateNoFillUniFill()
 {
-    var ret = new CUniFill();
-    ret.setFill(new CNoFill());
+    var ret = new AscFormat.CUniFill();
+    ret.setFill(new AscFormat.CNoFill());
     return ret;
 }
 
@@ -9732,12 +9732,12 @@ CExternalData.prototype =
         {
             case AscDFH.historyitem_ExternalData_SetAutoUpdate:
             {
-                writeBool(data.newPr);
+                AscFormat.writeBool(data.newPr);
                 break;
             }
             case AscDFH.historyitem_ExternalData_SetId:
             {
-                writeString(data.newPr);
+                AscFormat.writeString(data.newPr);
                 break;
             }
         }
@@ -9750,12 +9750,12 @@ CExternalData.prototype =
         {
             case AscDFH.historyitem_ExternalData_SetAutoUpdate:
             {
-                this.autoUpdate = readBool(r);
+                this.autoUpdate = AscFormat.readBool(r);
                 break;
             }
             case AscDFH.historyitem_ExternalData_SetId:
             {
-                this.id = readString(r);
+                this.id = AscFormat.readString(r);
                 break;
             }
         }
@@ -9845,7 +9845,7 @@ CPivotSource.prototype =
     createDuplicate: function()
     {
         var copy = new CPivotSource();
-        if(isRealNumber(this.fmtId))
+        if(AscFormat.isRealNumber(this.fmtId))
         {
             copy.setFmtId(this.fmtId);
         }
@@ -9863,12 +9863,12 @@ CPivotSource.prototype =
         {
             case AscDFH.historyitem_PivotSource_SetFmtId:
             {
-                writeLong(w, data.newPr);
+                AscFormat.writeLong(w, data.newPr);
                 break;
             }
             case AscDFH.historyitem_PivotSource_SetName:
             {
-                writeString(w, data.newPr);
+                AscFormat.writeString(w, data.newPr);
                 break;
             }
         }
@@ -9881,12 +9881,12 @@ CPivotSource.prototype =
         {
             case AscDFH.historyitem_PivotSource_SetFmtId:
             {
-                this.fmtId = readLong(r);
+                this.fmtId = AscFormat.readLong(r);
                 break;
             }
             case AscDFH.historyitem_PivotSource_SetName:
             {
-                this.name = readString(r);
+                this.name = AscFormat.readString(r);
                 break;
             }
         }
@@ -10050,7 +10050,7 @@ CProtection.prototype =
             case AscDFH.historyitem_Protection_SetSelection:
             case AscDFH.historyitem_Protection_SetUserInterface:
             {
-                writeBool(w, data.newPr);
+                AscFormat.writeBool(w, data.newPr);
                 break;
             }
         }
@@ -10063,27 +10063,27 @@ CProtection.prototype =
         {
             case AscDFH.historyitem_Protection_SetChartObject:
             {
-                this.chartObject = readBool(r);
+                this.chartObject = AscFormat.readBool(r);
                 break;
             }
             case AscDFH.historyitem_Protection_SetData:
             {
-                this.data = readBool(r);
+                this.data = AscFormat.readBool(r);
                 break;
             }
             case AscDFH.historyitem_Protection_SetFormatting:
             {
-                this.formatting = readBool(r);
+                this.formatting = AscFormat.readBool(r);
                 break;
             }
             case AscDFH.historyitem_Protection_SetSelection:
             {
-                this.selection = readBool(r);
+                this.selection = AscFormat.readBool(r);
                 break;
             }
             case AscDFH.historyitem_Protection_SetUserInterface:
             {
-                this.userInterface = readBool(r);
+                this.userInterface = AscFormat.readBool(r);
                 break;
             }
         }
@@ -10212,7 +10212,7 @@ CPrintSettings.prototype =
             case AscDFH.historyitem_PrintSettingsSetPageMargins:
             case AscDFH.historyitem_PrintSettingsSetPageSetup:
             {
-                writeObject(w, data.newPr);
+                AscFormat.writeObject(w, data.newPr);
                 break;
             }
         }
@@ -10225,17 +10225,17 @@ CPrintSettings.prototype =
         {
             case AscDFH.historyitem_PrintSettingsSetHeaderFooter:
             {
-                this.headerFooter = readObject(r);
+                this.headerFooter = AscFormat.readObject(r);
                 break;
             }
             case AscDFH.historyitem_PrintSettingsSetPageMargins:
             {
-                this.pageMargins = readObject(r);
+                this.pageMargins = AscFormat.readObject(r);
                 break;
             }
             case AscDFH.historyitem_PrintSettingsSetPageSetup:
             {
-                this.pageSetup = readObject(r);
+                this.pageSetup = AscFormat.readObject(r);
                 break;
             }
         }
@@ -10479,7 +10479,7 @@ CHeaderFooterChart.prototype =
             case AscDFH.historyitem_HeaderFooterChartSetDifferentFirst:
             case AscDFH.historyitem_HeaderFooterChartSetDifferentOddEven:
             {
-                writeBool(w, data.newPr);
+                AscFormat.writeBool(w, data.newPr);
                 break;
             }
             case AscDFH.historyitem_HeaderFooterChartSetEvenFooter:
@@ -10489,7 +10489,7 @@ CHeaderFooterChart.prototype =
             case AscDFH.historyitem_HeaderFooterChartSetOddFooter:
             case AscDFH.historyitem_HeaderFooterChartSetOddHeader:
             {
-                writeString(w, data.newPr);
+                AscFormat.writeString(w, data.newPr);
                 break;
             }
         }
@@ -10502,47 +10502,47 @@ CHeaderFooterChart.prototype =
         {
             case AscDFH.historyitem_HeaderFooterChartSetAlignWithMargins:
             {
-                this.alignWithMargins = readBool(r);
+                this.alignWithMargins = AscFormat.readBool(r);
                 break;
             }
             case AscDFH.historyitem_HeaderFooterChartSetDifferentFirst:
             {
-                this.differentFirst = readBool(r);
+                this.differentFirst = AscFormat.readBool(r);
                 break;
             }
             case AscDFH.historyitem_HeaderFooterChartSetDifferentOddEven:
             {
-                this.differentOddEven = readBool(r);
+                this.differentOddEven = AscFormat.readBool(r);
                 break;
             }
             case AscDFH.historyitem_HeaderFooterChartSetEvenFooter:
             {
-                this.evenFooter = readString(r);
+                this.evenFooter = AscFormat.readString(r);
                 break;
             }
             case AscDFH.historyitem_HeaderFooterChartSetEvenHeader:
             {
-                this.evenHeader = readString(r);
+                this.evenHeader = AscFormat.readString(r);
                 break;
             }
             case AscDFH.historyitem_HeaderFooterChartSetFirstFooter:
             {
-                this.firstFooter = readString(r);
+                this.firstFooter = AscFormat.readString(r);
                 break;
             }
             case AscDFH.historyitem_HeaderFooterChartSetFirstHeader:
             {
-                this.firstHeader = readString(r);
+                this.firstHeader = AscFormat.readString(r);
                 break;
             }
             case AscDFH.historyitem_HeaderFooterChartSetOddFooter:
             {
-                this.oddFooter = readString(r);
+                this.oddFooter = AscFormat.readString(r);
                 break;
             }
             case AscDFH.historyitem_HeaderFooterChartSetOddHeader:
             {
-                this.oddHeader = readString(r);
+                this.oddHeader = AscFormat.readString(r);
                 break;
             }
         }
@@ -10725,7 +10725,7 @@ CPageMarginsChart.prototype =
             case AscDFH.historyitem_PageMarginsSetR:
             case AscDFH.historyitem_PageMarginsSetT:
             {
-                writeDouble(w, data.newPr);
+                AscFormat.writeDouble(w, data.newPr);
                 break;
             }
         }
@@ -10738,32 +10738,32 @@ CPageMarginsChart.prototype =
         {
             case AscDFH.historyitem_PageMarginsSetB:
             {
-                this.b = readDouble(r);
+                this.b = AscFormat.readDouble(r);
                 break;
             }
             case AscDFH.historyitem_PageMarginsSetFooter:
             {
-                this.footer = readDouble(r);
+                this.footer = AscFormat.readDouble(r);
                 break;
             }
             case AscDFH.historyitem_PageMarginsSetHeader:
             {
-                this.header = readDouble(r);
+                this.header = AscFormat.readDouble(r);
                 break;
             }
             case AscDFH.historyitem_PageMarginsSetL:
             {
-                this.l = readDouble(r);
+                this.l = AscFormat.readDouble(r);
                 break;
             }
             case AscDFH.historyitem_PageMarginsSetR:
             {
-                this.r = readDouble(r);
+                this.r = AscFormat.readDouble(r);
                 break;
             }
             case AscDFH.historyitem_PageMarginsSetT:
             {
-                this.t = readDouble(r);
+                this.t = AscFormat.readDouble(r);
                 break;
             }
         }
@@ -11036,7 +11036,7 @@ CPageSetup.prototype =
             case AscDFH.historyitem_PageSetupSetDraft:
             case AscDFH.historyitem_PageSetupSetUseFirstPageNumb:
             {
-                writeBool(w, data.newPr);
+                AscFormat.writeBool(w, data.newPr);
                 break;
             }
             case AscDFH.historyitem_PageSetupSetCopies:
@@ -11046,13 +11046,13 @@ CPageSetup.prototype =
             case AscDFH.historyitem_PageSetupSetPaperSize:
             case AscDFH.historyitem_PageSetupSetVerticalDpi:
             {
-                writeLong(w, data.newPr);
+                AscFormat.writeLong(w, data.newPr);
                 break;
             }
             case AscDFH.historyitem_PageSetupSetPaperHeight:
             case AscDFH.historyitem_PageSetupSetPaperWidth:
             {
-                writeDouble(w, data.newPr);
+                AscFormat.writeDouble(w, data.newPr);
                 break;
             }
         }
@@ -11065,57 +11065,57 @@ CPageSetup.prototype =
         {
             case AscDFH.historyitem_PageSetupSetBlackAndWhite:
             {
-                this.blackAndWhite = readBool(r);
+                this.blackAndWhite = AscFormat.readBool(r);
                 break;
             }
             case AscDFH.historyitem_PageSetupSetCopies:
             {
-                this.copies = readLong(r);
+                this.copies = AscFormat.readLong(r);
                 break;
             }
             case AscDFH.historyitem_PageSetupSetDraft:
             {
-                this.draft = readBool(r);
+                this.draft = AscFormat.readBool(r);
                 break;
             }
             case AscDFH.historyitem_PageSetupSetFirstPageNumber:
             {
-                this.firstPageNumber = readLong(r);
+                this.firstPageNumber = AscFormat.readLong(r);
                 break;
             }
             case AscDFH.historyitem_PageSetupSetHorizontalDpi:
             {
-                this.horizontalDpi = readLong(r);
+                this.horizontalDpi = AscFormat.readLong(r);
                 break;
             }
             case AscDFH.historyitem_PageSetupSetOrientation:
             {
-                this.orientation = readLong(r);
+                this.orientation = AscFormat.readLong(r);
                 break;
             }
             case AscDFH.historyitem_PageSetupSetPaperHeight:
             {
-                this.paperHeight = readDouble(r);
+                this.paperHeight = AscFormat.readDouble(r);
                 break;
             }
             case AscDFH.historyitem_PageSetupSetPaperSize:
             {
-                this.paperSize = readLong(r);
+                this.paperSize = AscFormat.readLong(r);
                 break;
             }
             case AscDFH.historyitem_PageSetupSetPaperWidth:
             {
-                this.paperWidth = readDouble(r);
+                this.paperWidth = AscFormat.readDouble(r);
                 break;
             }
             case AscDFH.historyitem_PageSetupSetUseFirstPageNumb:
             {
-                this.useFirstPageNumb = readBool(r);
+                this.useFirstPageNumb = AscFormat.readBool(r);
                 break;
             }
             case AscDFH.historyitem_PageSetupSetVerticalDpi:
             {
-                this.verticalDpi = readLong(r);
+                this.verticalDpi = AscFormat.readLong(r);
                 break;
             }
         }
@@ -11128,10 +11128,10 @@ CPageSetup.prototype =
 function CreateView3d(nRotX, nRotY, bRAngAx, nDepthPercent)
 {
     var oView3d = new CView3d();
-    isRealNumber(nRotX) && oView3d.setRotX(nRotX);
-    isRealNumber(nRotY) && oView3d.setRotY(nRotY);
-    isRealBool(bRAngAx) && oView3d.setRAngAx(bRAngAx);
-    isRealNumber(nDepthPercent) && oView3d.setDepthPercent(nDepthPercent);
+    AscFormat.isRealNumber(nRotX) && oView3d.setRotX(nRotX);
+    AscFormat.isRealNumber(nRotY) && oView3d.setRotY(nRotY);
+    AscFormat.isRealBool(bRAngAx) && oView3d.setRAngAx(bRAngAx);
+    AscFormat.isRealNumber(nDepthPercent) && oView3d.setDepthPercent(nDepthPercent);
     return oView3d;
 }
 
@@ -11235,7 +11235,7 @@ function CreateLineChart(chartSeries, type, bUseCache, oOptions, b3D)
     val_ax.setScaling(new CScaling());
     val_ax.setDelete(false);
     val_ax.setAxPos(AX_POS_L);
-    val_ax.setMajorGridlines(new CSpPr());
+    val_ax.setMajorGridlines(new AscFormat.CSpPr());
     val_ax.setNumFmt(new CNumFmt());
     val_ax.setMajorTickMark(TICK_MARK_OUT);
     val_ax.setMinorTickMark(TICK_MARK_NONE);
@@ -11381,7 +11381,7 @@ function CreateBarChart(chartSeries, type, bUseCache, oOptions, b3D, bDepth)
     val_ax.setScaling(new CScaling());
     val_ax.setDelete(false);
     val_ax.setAxPos(AX_POS_L);
-    val_ax.setMajorGridlines(new CSpPr());
+    val_ax.setMajorGridlines(new AscFormat.CSpPr());
     val_ax.setNumFmt(new CNumFmt());
     var num_fmt = val_ax.numFmt;
     var format_code;
@@ -11525,7 +11525,7 @@ function CreateHBarChart(chartSeries, type, bUseCache, oOptions, b3D)
     val_ax.setScaling(new CScaling());
     val_ax.setDelete(false);
     val_ax.setAxPos(AX_POS_B);
-    val_ax.setMajorGridlines(new CSpPr());
+    val_ax.setMajorGridlines(new AscFormat.CSpPr());
     val_ax.setNumFmt(new CNumFmt());
     val_ax.setMajorTickMark(TICK_MARK_OUT);
     val_ax.setMinorTickMark(TICK_MARK_NONE);
@@ -11654,7 +11654,7 @@ function CreateAreaChart(chartSeries, type, bUseCache, oOptions)
     val_ax.setScaling(new CScaling());
     val_ax.setDelete(false);
     val_ax.setAxPos(AX_POS_L);
-    val_ax.setMajorGridlines(new CSpPr());
+    val_ax.setMajorGridlines(new AscFormat.CSpPr());
     val_ax.setNumFmt(new CNumFmt());
     val_ax.setMajorTickMark(TICK_MARK_OUT);
     val_ax.setMinorTickMark(TICK_MARK_NONE);
@@ -11938,7 +11938,7 @@ function CreateScatterChart(chartSeries, bUseCache, oOptions)
     val_ax.setScaling(new CScaling());
     val_ax.setDelete(false);
     val_ax.setAxPos(AX_POS_L);
-    val_ax.setMajorGridlines(new CSpPr());
+    val_ax.setMajorGridlines(new AscFormat.CSpPr());
     val_ax.setNumFmt(new CNumFmt());
     val_ax.setMajorTickMark(TICK_MARK_OUT);
     val_ax.setMinorTickMark(TICK_MARK_NONE);
@@ -12020,11 +12020,11 @@ function CreateStockChart(chartSeries, bUseCache, oOptions)
     var line_chart = plot_area.charts[0];
     line_chart.addAxId(cat_ax);
     line_chart.addAxId(val_ax);
-    line_chart.setHiLowLines(new CSpPr());
+    line_chart.setHiLowLines(new AscFormat.CSpPr());
     line_chart.setUpDownBars(new CUpDownBars());
     line_chart.upDownBars.setGapWidth(150);
-    line_chart.upDownBars.setUpBars(new CSpPr());
-    line_chart.upDownBars.setDownBars(new CSpPr());
+    line_chart.upDownBars.setUpBars(new AscFormat.CSpPr());
+    line_chart.upDownBars.setDownBars(new AscFormat.CSpPr());
     var parsedHeaders = chartSeries.parsedHeaders;
     for(var i = 0; i < asc_series.length; ++i)
     {
@@ -12032,8 +12032,8 @@ function CreateStockChart(chartSeries, bUseCache, oOptions)
         series.setIdx(i);
         series.setOrder(i);
         series.setMarker(new CMarker());
-        series.setSpPr(new CSpPr());
-        series.spPr.setLn(new CLn());
+        series.setSpPr(new AscFormat.CSpPr());
+        series.spPr.setLn(new AscFormat.CLn());
         series.spPr.ln.setW(28575);
         series.spPr.ln.setFill(CreateNoFillUniFill());
         series.marker.setSymbol(SYMBOL_NONE);
@@ -12099,7 +12099,7 @@ function CreateStockChart(chartSeries, bUseCache, oOptions)
     val_ax.setScaling(new CScaling());
     val_ax.setDelete(false);
     val_ax.setAxPos(AX_POS_L);
-    val_ax.setMajorGridlines(new CSpPr());
+    val_ax.setMajorGridlines(new AscFormat.CSpPr());
     val_ax.setNumFmt(new CNumFmt());
     val_ax.setMajorTickMark(TICK_MARK_OUT);
     val_ax.setMinorTickMark(TICK_MARK_NONE);
@@ -12157,7 +12157,7 @@ function CreateDefaultAxises(valFormatCode)
     val_ax.setScaling(new CScaling());
     val_ax.setDelete(false);
     val_ax.setAxPos(AX_POS_L);
-    val_ax.setMajorGridlines(new CSpPr());
+    val_ax.setMajorGridlines(new AscFormat.CSpPr());
     val_ax.setNumFmt(new CNumFmt());
     var num_fmt = val_ax.numFmt;
     num_fmt.setFormatCode(valFormatCode);
@@ -12175,8 +12175,8 @@ function CreateDefaultAxises(valFormatCode)
     //val_ax.setTitle(new CTitle());
    // var title = val_ax.title;
    // title.setTxPr(new CTextBody());
-   // title.txPr.setBodyPr(new CBodyPr());
-   // title.txPr.bodyPr.setVert(nVertTTvert);
+   // title.txPr.setBodyPr(new AscFormat.CBodyPr());
+   // title.txPr.bodyPr.setVert(AscFormat.nVertTTvert);
     return {valAx: val_ax, catAx: cat_ax};
 }
 
@@ -12201,7 +12201,7 @@ function CreateScatterAxis()
     val_ax.setScaling(new CScaling());
     val_ax.setDelete(false);
     val_ax.setAxPos(AX_POS_L);
-    val_ax.setMajorGridlines(new CSpPr());
+    val_ax.setMajorGridlines(new AscFormat.CSpPr());
     val_ax.setNumFmt(new CNumFmt());
     val_ax.setMajorTickMark(TICK_MARK_OUT);
     val_ax.setMinorTickMark(TICK_MARK_NONE);

@@ -1111,8 +1111,8 @@ CComment.prototype =
             }
             case AscDFH.historyitem_Comment_Position:
             {
-                Writer.WriteBool(isRealNumber(Data.newOffsetX) && isRealNumber(Data.newOffsetY));
-                if(isRealNumber(Data.newOffsetX) && isRealNumber(Data.newOffsetY))
+                Writer.WriteBool(AscFormat.isRealNumber(Data.newOffsetX) && AscFormat.isRealNumber(Data.newOffsetY));
+                if(AscFormat.isRealNumber(Data.newOffsetX) && AscFormat.isRealNumber(Data.newOffsetY))
                 {
                     Writer.WriteDouble(Data.newOffsetX);
                     Writer.WriteDouble(Data.newOffsetY);

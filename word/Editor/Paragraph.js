@@ -3392,7 +3392,7 @@ Paragraph.prototype =
 
     Can_IncreaseLevel : function(bIncrease)
     {
-        var CurLevel = isRealNumber(this.Pr.Lvl) ? this.Pr.Lvl : 0, NewPr, OldPr = this.Get_CompiledPr2(false).TextPr, DeltaFontSize, i, j, RunPr;
+        var CurLevel = AscFormat.isRealNumber(this.Pr.Lvl) ? this.Pr.Lvl : 0, NewPr, OldPr = this.Get_CompiledPr2(false).TextPr, DeltaFontSize, i, j, RunPr;
         if(bIncrease)
         {
             if(CurLevel >= 8)
@@ -3410,14 +3410,14 @@ Paragraph.prototype =
             NewPr = this.Internal_CompiledParaPrPresentation(CurLevel - 1).TextPr;
         }
         DeltaFontSize = NewPr.FontSize - OldPr.FontSize;
-        if(this.Pr.DefaultRunPr && isRealNumber(this.Pr.DefaultRunPr.FontSize))
+        if(this.Pr.DefaultRunPr && AscFormat.isRealNumber(this.Pr.DefaultRunPr.FontSize))
         {
             if(this.Pr.DefaultRunPr.FontSize + DeltaFontSize < 1)
             {
                 return false;
             }
         }
-        if(isRealNumber(this.TextPr.FontSize))
+        if(AscFormat.isRealNumber(this.TextPr.FontSize))
         {
             if(this.TextPr.FontSize + DeltaFontSize < 1)
             {
@@ -3451,7 +3451,7 @@ Paragraph.prototype =
 
     Increase_Level : function(bIncrease)
     {
-        var CurLevel = isRealNumber(this.Pr.Lvl) ? this.Pr.Lvl : 0, NewPr, OldPr = this.Get_CompiledPr2(false).TextPr, DeltaFontSize, i, j, RunPr;
+        var CurLevel = AscFormat.isRealNumber(this.Pr.Lvl) ? this.Pr.Lvl : 0, NewPr, OldPr = this.Get_CompiledPr2(false).TextPr, DeltaFontSize, i, j, RunPr;
         if(bIncrease)
         {
             NewPr = this.Internal_CompiledParaPrPresentation(CurLevel + 1).TextPr;
@@ -3473,13 +3473,13 @@ Paragraph.prototype =
         DeltaFontSize = NewPr.FontSize - OldPr.FontSize;
         if(DeltaFontSize !== 0)
         {
-            if(this.Pr.DefaultRunPr && isRealNumber(this.Pr.DefaultRunPr.FontSize))
+            if(this.Pr.DefaultRunPr && AscFormat.isRealNumber(this.Pr.DefaultRunPr.FontSize))
             {
                 var NewParaPr = this.Pr.Copy();
                 NewParaPr.DefaultRunPr.FontSize += DeltaFontSize;
                 this.Set_Pr(NewParaPr);//Todo: сделать отдельный метод для выставления DefaultRunPr
             }
-            if(isRealNumber(this.TextPr.FontSize))
+            if(AscFormat.isRealNumber(this.TextPr.FontSize))
             {
                 this.TextPr.Set_FontSize(this.TextPr.FontSize + DeltaFontSize);
             }
@@ -3487,7 +3487,7 @@ Paragraph.prototype =
             {
                 if(this.Content[i].Type === para_Run)
                 {
-                    if(isRealNumber(this.Content[i].Pr.FontSize))
+                    if(AscFormat.isRealNumber(this.Content[i].Pr.FontSize))
                     {
                         this.Content[i].Set_FontSize(this.Content[i].Pr.FontSize + DeltaFontSize);
                     }
@@ -3496,7 +3496,7 @@ Paragraph.prototype =
                 {
                     for(j = 0; j < this.Content[i].Content.length; ++j)
                     {
-                        if(isRealNumber(this.Content[i].Content[j].Pr.FontSize))
+                        if(AscFormat.isRealNumber(this.Content[i].Content[j].Pr.FontSize))
                         {
                             this.Content[i].Content[j].Set_FontSize(this.Content[i].Content[j].Pr.FontSize + DeltaFontSize);
                         }
@@ -5345,15 +5345,15 @@ Paragraph.prototype =
                         EndTextPr.Merge( this.TextPr.Value );
                         if(TextPr.AscFill)
                         {
-                            this.TextPr.Set_TextFill(CorrectUniFill(TextPr.AscFill, EndTextPr.TextFill, 0));
+                            this.TextPr.Set_TextFill(AscFormat.CorrectUniFill(TextPr.AscFill, EndTextPr.TextFill, 0));
                         }
                         if(TextPr.AscUnifill)
                         {
-                            this.TextPr.Set_Unifill(CorrectUniFill(TextPr.AscUnifill, EndTextPr.Unifill, 0));
+                            this.TextPr.Set_Unifill(AscFormat.CorrectUniFill(TextPr.AscUnifill, EndTextPr.Unifill, 0));
                         }
                         if(TextPr.AscLine)
                         {
-                            this.TextPr.Set_TextOutline(CorrectUniStroke(TextPr.AscLine, EndTextPr.TextOutline, 0));
+                            this.TextPr.Set_TextOutline(AscFormat.CorrectUniStroke(TextPr.AscLine, EndTextPr.TextOutline, 0));
                         }
                     }
                 }
@@ -7438,9 +7438,9 @@ Paragraph.prototype =
         }
         else
         {
-            oBullet2 = new CBullet();
-            oBullet2.bulletType = new CBulletType();
-            oBullet2.bulletType.type = BULLET_TYPE_BULLET_NONE;
+            oBullet2 = new AscFormat.CBullet();
+            oBullet2.bulletType = new AscFormat.CBulletType();
+            oBullet2.bulletType.type = AscFormat.BULLET_TYPE_BULLET_NONE;
         }
         var oUndefParaPr = this.Get_CompiledPr2(false).ParaPr;
         var NewType = oBullet2.getBulletType();
@@ -7524,9 +7524,9 @@ Paragraph.prototype =
     // Удаляем нумерацию
     Remove_PresentationNumbering : function()
     {
-        var Bullet = new CBullet();
-        Bullet.bulletType = new CBulletType();
-        Bullet.bulletType.type = BULLET_TYPE_BULLET_NONE;
+        var Bullet = new AscFormat.CBullet();
+        Bullet.bulletType = new AscFormat.CBulletType();
+        Bullet.bulletType.type = AscFormat.BULLET_TYPE_BULLET_NONE;
         this.Add_PresentationNumbering(Bullet);
     },
 
@@ -7782,7 +7782,7 @@ Paragraph.prototype =
                 this.CompiledPr.Pr = this.Internal_CompileParaPr2();
                 if(!this.bFromDocument)
                 {
-                    this.PresentationPr.Level = isRealNumber(this.Pr.Lvl) ? this.Pr.Lvl : 0;
+                    this.PresentationPr.Level = AscFormat.isRealNumber(this.Pr.Lvl) ? this.Pr.Lvl : 0;
                     this.PresentationPr.Bullet =  this.CompiledPr.Pr.ParaPr.Get_PresentationBullet();
                     this.Numbering.Bullet = this.PresentationPr.Bullet;
                 }
@@ -7903,7 +7903,7 @@ Paragraph.prototype =
 
     Internal_CompiledParaPrPresentation: function(Lvl)
     {
-        var _Lvl = isRealNumber(Lvl) ? Lvl : (isRealNumber(this.Pr.Lvl) ? this.Pr.Lvl : 0);
+        var _Lvl = AscFormat.isRealNumber(Lvl) ? Lvl : (AscFormat.isRealNumber(this.Pr.Lvl) ? this.Pr.Lvl : 0);
         var styleObject = this.Parent.Get_Styles(_Lvl);
         var Styles     = styleObject.styles;
 
@@ -12103,7 +12103,7 @@ Paragraph.prototype =
                     if ( undefined === this.Pr.Shd )
                         this.Pr.Shd = new CDocumentShd();
 
-                    this.Pr.Shd.Unifill = new CUniFill();
+                    this.Pr.Shd.Unifill = new AscFormat.CUniFill();
                     this.Pr.Shd.Unifill.Read_FromBinary(Reader);
                 }
                 else if ( undefined != this.Pr.Shd )
@@ -12339,7 +12339,7 @@ Paragraph.prototype =
                 // Variable : Bullet
                 if(Reader.GetBool())
                 {
-                    this.Pr.Bullet = new CBullet();
+                    this.Pr.Bullet = new AscFormat.CBullet();
                     this.Pr.Bullet.Read_FromBinary(Reader);
                 }
                 else

@@ -409,7 +409,7 @@ CTable.prototype.private_DrawCellsBackround = function(pGraphics, PNum, Row_star
                         //if(CellShd.Unifill.fill.type === FILL_TYPE_SOLID)
                         //{
                         //    var Alpha, RGBA = CellShd.Get_Color3(Theme, ColorMap);
-                        //    if(isRealNumber(CellShd.Unifill.transparent))
+                        //    if(AscFormat.isRealNumber(CellShd.Unifill.transparent))
                         //    {
                         //        Alpha = CellShd.Unifill.transparent;
                         //    }
@@ -503,7 +503,7 @@ CTable.prototype.private_DrawCellsBackround = function(pGraphics, PNum, Row_star
                         //if(CellShd.Unifill.fill.type === FILL_TYPE_SOLID)
                         //{
                         //    var Alpha, RGBA = CellShd.Get_Color3(Theme, ColorMap);
-                        //    if(isRealNumber(CellShd.Unifill.transparent))
+                        //    if(AscFormat.isRealNumber(CellShd.Unifill.transparent))
                         //    {
                         //        Alpha = CellShd.Unifill.transparent;
                         //    }

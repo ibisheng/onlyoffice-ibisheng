@@ -890,15 +890,15 @@ CMathBase.prototype.Apply_TextPrToCtrPr = function(TextPr, IncFontSize, ApplyToA
             var oCompiledPr = this.Get_CompiledCtrPrp();
             if(TextPr.AscFill)
             {
-                this.Set_TextFill(CorrectUniFill(TextPr.AscFill, oCompiledPr.TextFill, 0));
+                this.Set_TextFill(AscFormat.CorrectUniFill(TextPr.AscFill, oCompiledPr.TextFill, 0));
             }
             if(TextPr.AscUnifill)
             {
-                this.Set_Unifill(CorrectUniFill(TextPr.AscUnifill, oCompiledPr.Unifill, 0));
+                this.Set_Unifill(AscFormat.CorrectUniFill(TextPr.AscUnifill, oCompiledPr.Unifill, 0));
             }
             if(TextPr.AscLine)
             {
-                this.Set_TextOutline(CorrectUniStroke(TextPr.AscLine, oCompiledPr.TextOutline, 0));
+                this.Set_TextOutline(AscFormat.CorrectUniStroke(TextPr.AscLine, oCompiledPr.TextOutline, 0));
             }
             return;
         }
@@ -995,7 +995,7 @@ CMathBase.prototype.Set_Color = function(Value)
 };
 CMathBase.prototype.Set_Unifill = function(Value)
 {
-    if ( ( undefined === Value && undefined !== this.CtrPrp.Unifill ) || ( Value instanceof CUniFill && ( undefined === this.CtrPrp.Unifill || false === CompareUnifillBool(this.CtrPrp.Unifill, Value) ) ) )
+    if ( ( undefined === Value && undefined !== this.CtrPrp.Unifill ) || ( Value instanceof AscFormat.CUniFill && ( undefined === this.CtrPrp.Unifill || false === AscFormat.CompareUnifillBool(this.CtrPrp.Unifill, Value) ) ) )
     {
         History.Add(this, new CChangesMathUnifill(Value, this.CtrPrp.Unifill));
         this.raw_SetUnifill(Value);
@@ -1003,7 +1003,7 @@ CMathBase.prototype.Set_Unifill = function(Value)
 };
 CMathBase.prototype.Set_TextFill = function(Value)
 {
-    if ( ( undefined === Value && undefined !== this.CtrPrp.TextFill ) || ( Value instanceof CUniFill && ( undefined === this.CtrPrp.TextFill || false === CompareUnifillBool(this.CtrPrp.TextFill, Value) ) ) )
+    if ( ( undefined === Value && undefined !== this.CtrPrp.TextFill ) || ( Value instanceof AscFormat.CUniFill && ( undefined === this.CtrPrp.TextFill || false === AscFormat.CompareUnifillBool(this.CtrPrp.TextFill, Value) ) ) )
     {
         History.Add(this, new CChangesMathTextFill(Value, this.CtrPrp.TextFill));
         this.raw_SetTextFill(Value);
@@ -1011,7 +1011,7 @@ CMathBase.prototype.Set_TextFill = function(Value)
 };
 CMathBase.prototype.Set_TextOutline = function(Value)
 {
-    if ( ( undefined === Value && undefined !== this.CtrPrp.TextOutline ) || ( Value instanceof CLn && ( undefined === this.CtrPrp.TextOutline || false === Value.IsIdentical(this.CtrPrp.TextOutline) ) ) )
+    if ( ( undefined === Value && undefined !== this.CtrPrp.TextOutline ) || ( Value instanceof AscFormat.CLn && ( undefined === this.CtrPrp.TextOutline || false === Value.IsIdentical(this.CtrPrp.TextOutline) ) ) )
     {
         History.Add(this, new CChangesMathTextOutline(Value, this.CtrPrp.TextOutline));
         this.raw_SetTextOutline(Value);

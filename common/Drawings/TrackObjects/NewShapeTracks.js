@@ -16,7 +16,7 @@ function NewShapeTrack(presetGeom, startX, startY, theme, master, layout, slide,
     this.pageIndex = pageIndex;
     this.theme = theme;
 
-    ExecuteNoHistory(function(){
+    AscFormat.ExecuteNoHistory(function(){
         var style;
 
         if(presetGeom.indexOf("WithArrow") > -1)
@@ -41,11 +41,11 @@ function NewShapeTrack(presetGeom, startX, startY, theme, master, layout, slide,
             }
             else
             {
-                style = CreateDefaultShapeStyle(this.presetGeom);
+                style = AscFormat.CreateDefaultShapeStyle(this.presetGeom);
             }
         }
         else
-            style = CreateDefaultTextRectStyle();
+            style = AscFormat.CreateDefaultTextRectStyle();
         var brush = theme.getFillStyle(style.fillRef.idx);
         style.fillRef.Color.Calculate(theme, slide, layout, master, {R:0, G: 0, B:0, A:255});
         var RGBA = style.fillRef.Color.RGBA;
@@ -63,18 +63,18 @@ function NewShapeTrack(presetGeom, startX, startY, theme, master, layout, slide,
         if(presetGeom === "textRect")
         {
             var ln, fill;
-            ln = new CLn();
+            ln = new AscFormat.CLn();
             ln.w = 6350;
-            ln.Fill = new CUniFill();
-            ln.Fill.fill = new CSolidFill();
-            ln.Fill.fill.color = new CUniColor();
-            ln.Fill.fill.color.color  = new CPrstColor();
+            ln.Fill = new AscFormat.CUniFill();
+            ln.Fill.fill = new AscFormat.CSolidFill();
+            ln.Fill.fill.color = new AscFormat.CUniColor();
+            ln.Fill.fill.color.color  = new AscFormat.CPrstColor();
             ln.Fill.fill.color.color.id = "black";
 
-            fill = new CUniFill();
-            fill.fill = new CSolidFill();
-            fill.fill.color = new CUniColor();
-            fill.fill.color.color  = new CSchemeColor();
+            fill = new AscFormat.CUniFill();
+            fill.fill = new AscFormat.CSolidFill();
+            fill.fill.color = new AscFormat.CUniColor();
+            fill.fill.color.color  = new AscFormat.CSchemeColor();
             fill.fill.color.color.id = 12;
             pen.merge(ln);
             brush.merge(fill);
@@ -87,14 +87,14 @@ function NewShapeTrack(presetGeom, startX, startY, theme, master, layout, slide,
 
         if(this.arrowsCount > 0)
         {
-            pen.setTailEnd(new EndArrow());
-            pen.tailEnd.setType(LineEndType.Arrow);
-            pen.tailEnd.setLen(LineEndSize.Mid);
+            pen.setTailEnd(new AscFormat.EndArrow());
+            pen.tailEnd.setType(AscFormat.LineEndType.Arrow);
+            pen.tailEnd.setLen(AscFormat.LineEndSize.Mid);
             if(this.arrowsCount === 2)
             {
-                pen.setHeadEnd(new EndArrow());
-                pen.headEnd.setType(LineEndType.Arrow);
-                pen.headEnd.setLen(LineEndSize.Mid);
+                pen.setHeadEnd(new AscFormat.EndArrow());
+                pen.headEnd.setType(AscFormat.LineEndType.Arrow);
+                pen.headEnd.setLen(AscFormat.LineEndSize.Mid);
             }
         }
         if(presetGeom !== "textRect")
@@ -345,7 +345,7 @@ function NewShapeTrack(presetGeom, startX, startY, theme, master, layout, slide,
 
     this.draw = function(overlay)
     {
-        if(isRealNumber(this.pageIndex) && overlay.SetCurrentPage)
+        if(AscFormat.isRealNumber(this.pageIndex) && overlay.SetCurrentPage)
         {
             overlay.SetCurrentPage(this.pageIndex);
         }
@@ -359,9 +359,9 @@ function NewShapeTrack(presetGeom, startX, startY, theme, master, layout, slide,
         {
             shape.setDrawingObjects(drawingObjects);
         }
-        shape.setSpPr(new CSpPr());
+        shape.setSpPr(new AscFormat.CSpPr());
         shape.spPr.setParent(shape);
-        shape.spPr.setXfrm(new CXfrm());
+        shape.spPr.setXfrm(new AscFormat.CXfrm());
         if(bFromWord)
         {
             shape.setWordShape(true);
@@ -394,34 +394,34 @@ function NewShapeTrack(presetGeom, startX, startY, theme, master, layout, slide,
             var fill, ln;
             if(!drawingObjects || !drawingObjects.cSld)
             {
-                shape.setStyle(CreateDefaultTextRectStyle());
+                shape.setStyle(AscFormat.CreateDefaultTextRectStyle());
 
-                fill = new CUniFill();
-                fill.setFill(new CSolidFill());
-                fill.fill.setColor(new CUniColor());
-                fill.fill.color.setColor(new CSchemeColor());
+                fill = new AscFormat.CUniFill();
+                fill.setFill(new AscFormat.CSolidFill());
+                fill.fill.setColor(new AscFormat.CUniColor());
+                fill.fill.color.setColor(new AscFormat.CSchemeColor());
                 fill.fill.color.color.setId(12);
                 shape.spPr.setFill(fill);
 
-                ln = new CLn();
+                ln = new AscFormat.CLn();
                 ln.setW(6350);
-                ln.setFill(new CUniFill());
-                ln.Fill.setFill(new CSolidFill());
-                ln.Fill.fill.setColor(new CUniColor());
-                ln.Fill.fill.color.setColor(new CPrstColor());
+                ln.setFill(new AscFormat.CUniFill());
+                ln.Fill.setFill(new AscFormat.CSolidFill());
+                ln.Fill.fill.setColor(new AscFormat.CUniColor());
+                ln.Fill.fill.color.setColor(new AscFormat.CPrstColor());
                 ln.Fill.fill.color.color.setId("black");
                 shape.spPr.setLn(ln);
             }
             else
             {
-                fill = new CUniFill();
-                fill.setFill(new CNoFill());
+                fill = new AscFormat.CUniFill();
+                fill.setFill(new AscFormat.CNoFill());
                 shape.spPr.setFill(fill);
             }
             if(bFromWord)
             {
                 shape.setTextBoxContent(new CDocumentContent(shape, DrawingDocument, 0, 0, 0, 0, false, false, false));
-                var body_pr = new CBodyPr();
+                var body_pr = new AscFormat.CBodyPr();
                 body_pr.setDefault();
                 shape.setBodyPr(body_pr);
             }
@@ -431,7 +431,7 @@ function NewShapeTrack(presetGeom, startX, startY, theme, master, layout, slide,
                 var content = new CDocumentContent(shape.txBody, DrawingDocument, 0, 0, 0, 0, false, false, true);
                 shape.txBody.setParent(shape);
                 shape.txBody.setContent(content);
-                var body_pr = new CBodyPr();
+                var body_pr = new AscFormat.CBodyPr();
                 body_pr.setDefault();
                 shape.txBody.setBodyPr(body_pr);
             }
@@ -440,18 +440,18 @@ function NewShapeTrack(presetGeom, startX, startY, theme, master, layout, slide,
         {
             shape.spPr.setGeometry(CreateGeometry(this.presetGeom));
             shape.spPr.geometry.setParent(shape.spPr);
-            shape.setStyle(CreateDefaultShapeStyle(this.presetGeom));
+            shape.setStyle(AscFormat.CreateDefaultShapeStyle(this.presetGeom));
             if(this.arrowsCount > 0)
             {
-                var ln = new CLn();
-                ln.setTailEnd(new EndArrow());
-                ln.tailEnd.setType(LineEndType.Arrow);
-                ln.tailEnd.setLen(LineEndSize.Mid);
+                var ln = new AscFormat.CLn();
+                ln.setTailEnd(new AscFormat.EndArrow());
+                ln.tailEnd.setType(AscFormat.LineEndType.Arrow);
+                ln.tailEnd.setLen(AscFormat.LineEndSize.Mid);
                 if(this.arrowsCount === 2)
                 {
-                    ln.setHeadEnd(new EndArrow());
-                    ln.headEnd.setType(LineEndType.Arrow);
-                    ln.headEnd.setLen(LineEndSize.Mid);
+                    ln.setHeadEnd(new AscFormat.EndArrow());
+                    ln.headEnd.setType(AscFormat.LineEndType.Arrow);
+                    ln.headEnd.setLen(AscFormat.LineEndSize.Mid);
                 }
                 shape.spPr.setLn(ln);
             }

@@ -2701,9 +2701,9 @@ asc_docs_api.prototype.paraApply = function(Props)
 
         if ( "undefined" != typeof(Props.Shd) && null != Props.Shd )
         {
-            var Unifill = new CUniFill();
-            Unifill.fill = new CSolidFill();
-            Unifill.fill.color = CorrectUniColor(Props.Shd.Color, Unifill.fill.color, 1);
+            var Unifill = new AscFormat.CUniFill();
+            Unifill.fill = new AscFormat.CSolidFill();
+            Unifill.fill.color = AscFormat.CorrectUniColor(Props.Shd.Color, Unifill.fill.color, 1);
             this.WordControl.m_oLogicDocument.Set_ParagraphShd(
                 {
                     Value : Props.Shd.Value,
@@ -2720,27 +2720,27 @@ asc_docs_api.prototype.paraApply = function(Props)
         {
             if(Props.Brd.Left && Props.Brd.Left.Color)
             {
-                Props.Brd.Left.Unifill = CreateUnifillFromAscColor(Props.Brd.Left.Color);
+                Props.Brd.Left.Unifill = AscFormat.CreateUnifillFromAscColor(Props.Brd.Left.Color);
             }
             if(Props.Brd.Top && Props.Brd.Top.Color)
             {
-                Props.Brd.Top.Unifill = CreateUnifillFromAscColor(Props.Brd.Top.Color);
+                Props.Brd.Top.Unifill = AscFormat.CreateUnifillFromAscColor(Props.Brd.Top.Color);
             }
             if(Props.Brd.Right && Props.Brd.Right.Color)
             {
-                Props.Brd.Right.Unifill = CreateUnifillFromAscColor(Props.Brd.Right.Color);
+                Props.Brd.Right.Unifill = AscFormat.CreateUnifillFromAscColor(Props.Brd.Right.Color);
             }
             if(Props.Brd.Bottom && Props.Brd.Bottom.Color)
             {
-                Props.Brd.Bottom.Unifill = CreateUnifillFromAscColor(Props.Brd.Bottom.Color);
+                Props.Brd.Bottom.Unifill = AscFormat.CreateUnifillFromAscColor(Props.Brd.Bottom.Color);
             }
             if(Props.Brd.InsideH && Props.Brd.InsideH.Color)
             {
-                Props.Brd.InsideH.Unifill = CreateUnifillFromAscColor(Props.Brd.InsideH.Color);
+                Props.Brd.InsideH.Unifill = AscFormat.CreateUnifillFromAscColor(Props.Brd.InsideH.Color);
             }
             if(Props.Brd.InsideV && Props.Brd.InsideV.Color)
             {
-                Props.Brd.InsideV.Unifill = CreateUnifillFromAscColor(Props.Brd.InsideV.Color);
+                Props.Brd.InsideV.Unifill = AscFormat.CreateUnifillFromAscColor(Props.Brd.InsideV.Color);
             }
 
             this.WordControl.m_oLogicDocument.Set_ParagraphBorders( Props.Brd );
@@ -3048,9 +3048,9 @@ asc_docs_api.prototype.put_TextColor = function(color)
         }
         else
         {
-            var Unifill = new CUniFill();
-            Unifill.fill = new CSolidFill();
-            Unifill.fill.color = CorrectUniColor(color, Unifill.fill.color, 1);
+            var Unifill = new AscFormat.CUniFill();
+            Unifill.fill = new AscFormat.CSolidFill();
+            Unifill.fill.color = AscFormat.CorrectUniColor(color, Unifill.fill.color, 1);
             this.WordControl.m_oLogicDocument.Paragraph_Add( new ParaTextPr( { Unifill : Unifill} ) );
         }
 
@@ -3071,9 +3071,9 @@ asc_docs_api.prototype.put_ParagraphShade = function(is_flag, color, isOnlyPara)
             this.WordControl.m_oLogicDocument.Set_ParagraphShd( { Value : Asc.c_oAscShdNil  }  );
         else
         {
-            var Unifill = new CUniFill();
-            Unifill.fill = new CSolidFill();
-            Unifill.fill.color = CorrectUniColor(color, Unifill.fill.color, 1);
+            var Unifill = new AscFormat.CUniFill();
+            Unifill.fill = new AscFormat.CSolidFill();
+            Unifill.fill.color = AscFormat.CorrectUniColor(color, Unifill.fill.color, 1);
             this.WordControl.m_oLogicDocument.Set_ParagraphShd( { Value : Asc.c_oAscShdClear, Color : { r : color.asc_getR(), g : color.asc_getG(), b : color.asc_getB() }, Unifill: Unifill } );
         }
 
@@ -4382,32 +4382,32 @@ asc_docs_api.prototype.tblApply = function(obj)
         {
             if(obj.CellBorders.Left && obj.CellBorders.Left.Color)
             {
-                obj.CellBorders.Left.Unifill = CreateUnifillFromAscColor(obj.CellBorders.Left.Color);
+                obj.CellBorders.Left.Unifill = AscFormat.CreateUnifillFromAscColor(obj.CellBorders.Left.Color);
             }
             if(obj.CellBorders.Top && obj.CellBorders.Top.Color)
             {
-                obj.CellBorders.Top.Unifill = CreateUnifillFromAscColor(obj.CellBorders.Top.Color);
+                obj.CellBorders.Top.Unifill = AscFormat.CreateUnifillFromAscColor(obj.CellBorders.Top.Color);
             }
             if(obj.CellBorders.Right && obj.CellBorders.Right.Color)
             {
-                obj.CellBorders.Right.Unifill = CreateUnifillFromAscColor(obj.CellBorders.Right.Color);
+                obj.CellBorders.Right.Unifill = AscFormat.CreateUnifillFromAscColor(obj.CellBorders.Right.Color);
             }
             if(obj.CellBorders.Bottom && obj.CellBorders.Bottom.Color)
             {
-                obj.CellBorders.Bottom.Unifill = CreateUnifillFromAscColor(obj.CellBorders.Bottom.Color);
+                obj.CellBorders.Bottom.Unifill = AscFormat.CreateUnifillFromAscColor(obj.CellBorders.Bottom.Color);
             }
             if(obj.CellBorders.InsideH && obj.CellBorders.InsideH.Color)
             {
-                obj.CellBorders.InsideH.Unifill = CreateUnifillFromAscColor(obj.CellBorders.InsideH.Color);
+                obj.CellBorders.InsideH.Unifill = AscFormat.CreateUnifillFromAscColor(obj.CellBorders.InsideH.Color);
             }
             if(obj.CellBorders.InsideV && obj.CellBorders.InsideV.Color)
             {
-                obj.CellBorders.InsideV.Unifill = CreateUnifillFromAscColor(obj.CellBorders.InsideV.Color);
+                obj.CellBorders.InsideV.Unifill = AscFormat.CreateUnifillFromAscColor(obj.CellBorders.InsideV.Color);
             }
         }
         if(obj.CellsBackground && obj.CellsBackground.Color)
         {
-            obj.CellsBackground.Unifill = CreateUnifillFromAscColor(obj.CellsBackground.Color);
+            obj.CellsBackground.Unifill = AscFormat.CreateUnifillFromAscColor(obj.CellsBackground.Color);
         }
 
         this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_ApplyTablePr);
@@ -4688,7 +4688,7 @@ asc_docs_api.prototype.ImgApply = function(obj)
     }
 
     /*изменение z-индекса*/
-    if(isRealNumber(ImagePr.ChangeLevel))
+    if(AscFormat.isRealNumber(ImagePr.ChangeLevel))
     {
         switch(ImagePr.ChangeLevel)
         {
@@ -5763,45 +5763,45 @@ asc_docs_api.prototype.ChangeColorScheme = function(index_scheme)
         if (index_scheme < _count_defaults)
         {
             var _obj = g_oUserColorScheme[index_scheme];
-            var scheme = new ClrScheme();
+            var scheme = new AscFormat.ClrScheme();
 			scheme.name = _obj["name"];
             var _c = null;
 
             _c = _obj["dk1"];
-            scheme.colors[8] = CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
+            scheme.colors[8] = AscFormat.CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
 
             _c = _obj["lt1"];
-            scheme.colors[12] = CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
+            scheme.colors[12] = AscFormat.CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
 
             _c = _obj["dk2"];
-            scheme.colors[9] = CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
+            scheme.colors[9] = AscFormat.CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
 
             _c = _obj["lt2"];
-            scheme.colors[13] = CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
+            scheme.colors[13] = AscFormat.CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
 
             _c = _obj["accent1"];
-            scheme.colors[0] = CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
+            scheme.colors[0] = AscFormat.CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
 
             _c = _obj["accent2"];
-            scheme.colors[1] = CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
+            scheme.colors[1] = AscFormat.CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
 
             _c = _obj["accent3"];
-            scheme.colors[2] = CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
+            scheme.colors[2] = AscFormat.CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
 
             _c = _obj["accent4"];
-            scheme.colors[3] = CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
+            scheme.colors[3] = AscFormat.CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
 
             _c = _obj["accent5"];
-            scheme.colors[4] = CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
+            scheme.colors[4] = AscFormat.CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
 
             _c = _obj["accent6"];
-            scheme.colors[5] = CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
+            scheme.colors[5] = AscFormat.CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
 
             _c = _obj["hlink"];
-            scheme.colors[11] = CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
+            scheme.colors[11] = AscFormat.CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
 
             _c = _obj["folHlink"];
-            scheme.colors[10] = CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
+            scheme.colors[10] = AscFormat.CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
 
             theme.themeElements.clrScheme = scheme;
             /*_changer.calculateAfterChangeTheme();
@@ -6801,7 +6801,7 @@ function  _asc_scrollTo (x,y)
 asc_docs_api.prototype.asc_getChartObject = function(type)
 {	
 	this.isChartEditor = true;		// Для совместного редактирования
-    if(!isRealNumber(type))
+    if(!AscFormat.isRealNumber(type))
     {
         this.asc_onOpenChartFrame();
         this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Drawing_Props);

@@ -3627,7 +3627,7 @@ CChangesMathUnifill.prototype.Load_Changes = function(Reader, Class)
 
     if ( Reader.GetBool() == false)
     {
-        this.New = new CUniFill();
+        this.New = new AscFormat.CUniFill();
         this.New.Read_FromBinary(Reader);
     }
     else
@@ -3671,7 +3671,7 @@ CChangesMathTextFill.prototype.Load_Changes = function(Reader, Class)
 
     if ( Reader.GetBool() == false)
     {
-        this.New = new CUniFill();
+        this.New = new AscFormat.CUniFill();
         this.New.Read_FromBinary(Reader);
     }
     else
@@ -3714,7 +3714,7 @@ CChangesMathTextOutline.prototype.Load_Changes = function(Reader, Class)
 
     if ( Reader.GetBool() == false)
     {
-        this.New = new CLn();
+        this.New = new AscFormat.CLn();
         this.New.Read_FromBinary(Reader);
     }
     else

@@ -265,7 +265,7 @@ CShape.prototype.recalculate = function ()
 {
     if(this.bDeleted || !this.bWordShape)
         return;
-    ExecuteNoHistory(function()
+    AscFormat.ExecuteNoHistory(function()
     {
         if (this.recalcInfo.recalculateBrush) {
             this.recalculateBrush();
@@ -304,7 +304,7 @@ CShape.prototype.recalculateText = function()
 {
     if(!this.bWordShape)
         return;
-    ExecuteNoHistory(function()
+    AscFormat.ExecuteNoHistory(function()
     {
         if(this.bWordShape)
         {
@@ -508,13 +508,13 @@ CShape.prototype.recalculateShapeStyleForParagraph = function()
         {
             shape_text_pr.Unifill = CreateUniFillByUniColorCopy(this.style.fontRef.Color);
         }
-        if(this.style.fontRef.idx === fntStyleInd_major)
+        if(this.style.fontRef.idx === AscFormat.fntStyleInd_major)
         {
             shape_text_pr.RFonts.Ascii = { Name: "+mj-lt", Index : -1 };
             shape_text_pr.RFonts.EastAsia = { Name: "+mj-ea", Index : -1 };
             shape_text_pr.RFonts.CS = { Name: "+mj-cs", Index : -1 };
         }
-        else if( this.style.fontRef.idx === fntStyleInd_minor)
+        else if( this.style.fontRef.idx === AscFormat.fntStyleInd_minor)
         {
             shape_text_pr.RFonts.Ascii = { Name: "+mn-lt", Index : -1 };
             shape_text_pr.RFonts.EastAsia = { Name: "+mn-ea", Index : -1 };
@@ -795,7 +795,7 @@ CShape.prototype.documentStatistics = function(stats)
 
 CShape.prototype.checkPosTransformText = function()
 {
-    if(isRealNumber(this.posX) && isRealNumber(this.posY))
+    if(AscFormat.isRealNumber(this.posX) && AscFormat.isRealNumber(this.posY))
     {
         this.transformText = this.localTransformText.CreateDublicate();
         global_MatrixTransformer.TranslateAppend(this.transformText, this.posX, this.posY);
@@ -844,7 +844,7 @@ CShape.prototype.cursorMoveAt = function( X, Y, AddToSelect )
     {
         var t_x = this.invertTransformText.TransformPointX(X, Y);
         var t_y = this.invertTransformText.TransformPointY(X, Y);
-        content.Cursor_MoveAt(t_x, t_y, AddToSelect, undefined, isRealNumber(this.selectStartPage) ? this.selectStartPage : 0);
+        content.Cursor_MoveAt(t_x, t_y, AddToSelect, undefined, AscFormat.isRealNumber(this.selectStartPage) ? this.selectStartPage : 0);
     }
 };
 

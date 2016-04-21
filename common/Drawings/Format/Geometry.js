@@ -473,7 +473,7 @@ Geometry.prototype=
         var dVal = parseInt(x);
         if(isNaN(dVal))
         {
-            if(isRealNumber(oGdLst[x]))
+            if(AscFormat.isRealNumber(oGdLst[x]))
             {
                 dVal = oGdLst[x];
             }
@@ -817,72 +817,72 @@ Geometry.prototype=
         {
             case AscDFH.historyitem_GeometrySetParent:
             {
-                writeObject(w, data.newPr);
+                AscFormat.writeObject(w, data.newPr);
                 break;
             }
             case AscDFH.historyitem_GeometryAddAdj:
             {
-                writeString(w, data.name);
-                writeString(w, data.newVal);
-                writeBool(w, data.oldAvVal);
+                AscFormat.writeString(w, data.name);
+                AscFormat.writeString(w, data.newVal);
+                AscFormat.writeBool(w, data.oldAvVal);
                 break;
             }
             case AscDFH.historyitem_GeometryAddGuide:
             {
-                writeString(w, data.name);
-                writeLong(w, data.formula);
-                writeString(w, data.x);
-                writeString(w, data.y);
-                writeString(w, data.z);
+                AscFormat.writeString(w, data.name);
+                AscFormat.writeLong(w, data.formula);
+                AscFormat.writeString(w, data.x);
+                AscFormat.writeString(w, data.y);
+                AscFormat.writeString(w, data.z);
                 break;
             }
             case AscDFH.historyitem_GeometryAddCnx:
             {
-                writeString(w, data.ang);
-                writeString(w, data.x);
-                writeString(w, data.y);
+                AscFormat.writeString(w, data.ang);
+                AscFormat.writeString(w, data.x);
+                AscFormat.writeString(w, data.y);
                 break;
             }
             case AscDFH.historyitem_GeometryAddHandleXY:
             {
-                writeString(w, data.gdRefX);
-                writeString(w, data.minX);
-                writeString(w, data.maxX);
-                writeString(w, data.gdRefY);
-                writeString(w, data.minY);
-                writeString(w, data.maxY);
-                writeString(w, data.posX);
-                writeString(w, data.posY);
+                AscFormat.writeString(w, data.gdRefX);
+                AscFormat.writeString(w, data.minX);
+                AscFormat.writeString(w, data.maxX);
+                AscFormat.writeString(w, data.gdRefY);
+                AscFormat.writeString(w, data.minY);
+                AscFormat.writeString(w, data.maxY);
+                AscFormat.writeString(w, data.posX);
+                AscFormat.writeString(w, data.posY);
                 break;
             }
             case AscDFH.historyitem_GeometryAddHandlePolar:
             {
-                writeString(w, data.gdRefAng);
-                writeString(w, data.minAng);
-                writeString(w, data.maxAng);
-                writeString(w, data.gdRefR);
-                writeString(w, data.minR);
-                writeString(w, data.maxR);
-                writeString(w, data.posX);
-                writeString(w, data.posY);
+                AscFormat.writeString(w, data.gdRefAng);
+                AscFormat.writeString(w, data.minAng);
+                AscFormat.writeString(w, data.maxAng);
+                AscFormat.writeString(w, data.gdRefR);
+                AscFormat.writeString(w, data.minR);
+                AscFormat.writeString(w, data.maxR);
+                AscFormat.writeString(w, data.posX);
+                AscFormat.writeString(w, data.posY);
                 break;
             }
             case AscDFH.historyitem_GeometryAddPath:
             {
-                writeObject(w, data.newPr);
+                AscFormat.writeObject(w, data.newPr);
                 break;
             }
             case AscDFH.historyitem_GeometryAddRect:
             {
-                writeString(w, data.l);
-                writeString(w, data.t);
-                writeString(w, data.r);
-                writeString(w, data.b);
+                AscFormat.writeString(w, data.l);
+                AscFormat.writeString(w, data.t);
+                AscFormat.writeString(w, data.r);
+                AscFormat.writeString(w, data.b);
                 break;
             }
             case AscDFH.historyitem_GeometrySetPreset:
             {
-                writeString(w, data.newPr);
+                AscFormat.writeString(w, data.newPr);
                 break;
             }
         }
@@ -895,14 +895,14 @@ Geometry.prototype=
         {
             case AscDFH.historyitem_GeometrySetParent:
             {
-                this.parent = readObject(r);
+                this.parent = AscFormat.readObject(r);
                 break;
             }
             case AscDFH.historyitem_GeometryAddAdj:
             {
-                var name = readString(r);
-                var val = readString(r);
-                var oldAvVal = readBool(r);
+                var name = AscFormat.readString(r);
+                var val = AscFormat.readString(r);
+                var oldAvVal = AscFormat.readBool(r);
                 if(typeof name === "string" && typeof val === "string")
                 {
                     this.gdLst[name] = parseInt(val);
@@ -919,45 +919,45 @@ Geometry.prototype=
             }
             case AscDFH.historyitem_GeometryAddGuide:
             {
-                var name = readString(r);
-                var formula = readLong(r);
-                var x = readString(r);
-                var y = readString(r);
-                var z = readString(r);
+                var name = AscFormat.readString(r);
+                var formula = AscFormat.readLong(r);
+                var x = AscFormat.readString(r);
+                var y = AscFormat.readString(r);
+                var z = AscFormat.readString(r);
                 this.gdLstInfo.push({name: name, formula:formula, x: x, y: y, z: z});
                 break;
             }
             case AscDFH.historyitem_GeometryAddCnx:
             {
-                var ang = readString(r);
-                var x = readString(r);
-                var y = readString(r);
+                var ang = AscFormat.readString(r);
+                var x = AscFormat.readString(r);
+                var y = AscFormat.readString(r);
                 this.cnxLstInfo.push({ang: ang, x: x, y: y});
                 break;
             }
             case AscDFH.historyitem_GeometryAddHandleXY:
             {
-                var gdRefX = readString(r);
-                var minX = readString(r);
-                var maxX = readString(r);
-                var gdRefY = readString(r);
-                var minY = readString(r);
-                var maxY = readString(r);
-                var posX = readString(r);
-                var posY = readString(r);
+                var gdRefX = AscFormat.readString(r);
+                var minX = AscFormat.readString(r);
+                var maxX = AscFormat.readString(r);
+                var gdRefY = AscFormat.readString(r);
+                var minY = AscFormat.readString(r);
+                var maxY = AscFormat.readString(r);
+                var posX = AscFormat.readString(r);
+                var posY = AscFormat.readString(r);
                 this.ahXYLstInfo.push({gdRefX: gdRefX, minX: minX, maxX: maxX, gdRefY: gdRefY, minY: minY, maxY: maxY, posX:posX,posY: posY});
                 break;
             }
             case AscDFH.historyitem_GeometryAddHandlePolar:
             {
-                var gdRefAng = readString(r);
-                var minAng = readString(r);
-                var maxAng = readString(r);
-                var gdRefR = readString(r);
-                var minR = readString(r);
-                var maxR = readString(r);
-                var posX = readString(r);
-                var posY = readString(r);
+                var gdRefAng = AscFormat.readString(r);
+                var minAng = AscFormat.readString(r);
+                var maxAng = AscFormat.readString(r);
+                var gdRefR = AscFormat.readString(r);
+                var minR = AscFormat.readString(r);
+                var maxR = AscFormat.readString(r);
+                var posX = AscFormat.readString(r);
+                var posY = AscFormat.readString(r);
                 this.ahPolarLstInfo.push(
                     {
                         gdRefAng: gdRefAng,
@@ -973,21 +973,21 @@ Geometry.prototype=
             }
             case AscDFH.historyitem_GeometryAddPath:
             {
-                this.pathLst.push(readObject(r));
+                this.pathLst.push(AscFormat.readObject(r));
                 break;
             }
             case AscDFH.historyitem_GeometryAddRect:
             {
                 this.rectS = {};
-                this.rectS.l = readString(r);
-                this.rectS.t = readString(r);
-                this.rectS.r = readString(r);
-                this.rectS.b = readString(r);
+                this.rectS.l = AscFormat.readString(r);
+                this.rectS.t = AscFormat.readString(r);
+                this.rectS.r = AscFormat.readString(r);
+                this.rectS.b = AscFormat.readString(r);
                 break;
             }
             case AscDFH.historyitem_GeometrySetPreset:
             {
-                this.preset = readString(r);
+                this.preset = AscFormat.readString(r);
                 break;
             }
         }
@@ -1361,9 +1361,9 @@ Geometry.prototype=
     {
         var dDelta = 0;
         var dWi = dTextWidth, dHi = dTextHeight, dWNext, dHNext;
-        var oGeometry = ExecuteNoHistory(function(){return this.createDuplicate()}, this, []);
+        var oGeometry = AscFormat.ExecuteNoHistory(function(){return this.createDuplicate()}, this, []);
         var iter_Count = 0;
-        if(!isRealNumber(dGeometryWidth) && !isRealNumber(dGeometryHeight))
+        if(!AscFormat.isRealNumber(dGeometryWidth) && !AscFormat.isRealNumber(dGeometryHeight))
         {
             do
             {
@@ -1378,7 +1378,7 @@ Geometry.prototype=
             while(dDelta > EPSILON_TEXT_AUTOFIT && iter_Count < MAX_ITER_COUNT);
             return {W: dWi, H: dHi, bError: dDelta > EPSILON_TEXT_AUTOFIT};
         }
-        else if(isRealNumber(dGeometryWidth))
+        else if(AscFormat.isRealNumber(dGeometryWidth))
         {
             do
             {

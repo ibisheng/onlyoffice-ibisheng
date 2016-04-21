@@ -281,7 +281,7 @@ ThemeColor.prototype =
 			}
 			if(null != this.tint && 0 != this.tint)
 			{
-				var oCColorModifiers = new CColorModifiers();
+				var oCColorModifiers = new AscFormat.CColorModifiers();
 				var HSL = {H: 0, S: 0, L: 0};
 				oCColorModifiers.RGB2HSL(r, g, b, HSL);
 				if (this.tint < 0)

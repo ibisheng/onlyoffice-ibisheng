@@ -1150,7 +1150,7 @@ CopyProcessor.prototype =
 			var presentation = editor.WordControl.m_oLogicDocument;
 			var curSlide = presentation.Slides[presentation.CurPage];
 			if(presentation && curSlide && curSlide.Layout && curSlide.Layout.Master && curSlide.Layout.Master.Theme)
-				checkTableCellPr(cell.CompiledPr.Pr, curSlide, curSlide.Layout, curSlide.Layout.Master, curSlide.Layout.Master.Theme);	
+        AscFormat.checkTableCellPr(cell.CompiledPr.Pr, curSlide, curSlide.Layout, curSlide.Layout.Master, curSlide.Layout.Master.Theme);	
 		}
 		
 		if(null != cell.CompiledPr && null != cell.CompiledPr.Pr)
@@ -1923,7 +1923,7 @@ CopyProcessor.prototype =
         graphic_frame.setGraphicObject(table);
         graphic_frame.setXfrm(0, 0, 20, 30, 0, false, false);
         var  b_style_index = false;
-        if(isRealNumber(graphic_frame.graphicObject.styleIndex) && graphic_frame.graphicObject.styleIndex > -1)
+        if(AscFormat.isRealNumber(graphic_frame.graphicObject.styleIndex) && graphic_frame.graphicObject.styleIndex > -1)
         {
             b_style_index = true;
         }
@@ -3586,7 +3586,7 @@ PasteProcessor.prototype =
                                 {
                                     var layouts_count = stream.GetULong();
 									
-                                    ExecuteNoHistory(function(){
+                                    AscFormat.ExecuteNoHistory(function(){
                                         for(var i = 0; i < layouts_count; ++i)
                                         {
                                             arr_layouts[i] = loader.ReadSlideLayout();
@@ -3740,10 +3740,10 @@ PasteProcessor.prototype =
 						return new CDocument( this.oDocument.DrawingDocument, false);
 					}
 					//создаём темповый CDocument
-					this.oDocument = ExecuteNoHistory(tempCDocument , this, []);
+					this.oDocument = AscFormat.ExecuteNoHistory(tempCDocument , this, []);
 
           AscCommon.g_oIdCounter.m_bRead = true;
-					var aContent = ExecuteNoHistory(this.ReadFromBinary, this, [base64FromWord]);
+					var aContent = AscFormat.ExecuteNoHistory(this.ReadFromBinary, this, [base64FromWord]);
           AscCommon.g_oIdCounter.m_bRead = false;
 					//возврщаем обратно переменные и историю, документ которой заменяется при создании CDocument
 					this.oDocument = trueDocument;
@@ -3771,15 +3771,15 @@ PasteProcessor.prototype =
 							var W = 100;
 							var Rows = 3;
 							var graphic_frame = new CGraphicFrame();
-							graphic_frame.setSpPr(new CSpPr());
+							graphic_frame.setSpPr(new AscFormat.CSpPr());
 							graphic_frame.spPr.setParent(graphic_frame);
-							graphic_frame.spPr.setXfrm(new CXfrm());
+							graphic_frame.spPr.setXfrm(new AscFormat.CXfrm());
 							graphic_frame.spPr.xfrm.setParent(graphic_frame.spPr);
 							graphic_frame.spPr.xfrm.setOffX((this.oDocument.Width - W)/2);
 							graphic_frame.spPr.xfrm.setOffY(this.oDocument.Height/5);
 							graphic_frame.spPr.xfrm.setExtX(W);
 							graphic_frame.spPr.xfrm.setExtY(7.478268771701388 * Rows);
-							graphic_frame.setNvSpPr(new UniNvPr());
+							graphic_frame.setNvSpPr(new AscFormat.UniNvPr());
 							
 							element = this._convertTableToPPTX(element);
 							graphic_frame.setGraphicObject(element.Copy(graphic_frame));
@@ -7212,7 +7212,7 @@ PasteProcessor.prototype =
             table.Set_TableStyle(0);
             var dd = editor.WordControl.m_oDrawingDocument;
             graphicFrame.setGraphicObject(table);
-            graphicFrame.setNvSpPr(new UniNvPr());
+            graphicFrame.setNvSpPr(new AscFormat.UniNvPr());
             arrTables.push(graphicFrame);
 			
 			//TODO пересмотреть!!!

@@ -251,7 +251,7 @@ function CPPTXContentLoader()
 			oNewSpPr = this.Reader.ReadUniFill();
 		}
 		else{
-			oNewSpPr = new CSpPr();
+			oNewSpPr = new AscFormat.CSpPr();
 			this.Reader.ReadSpPr(oNewSpPr);
 		}
 
@@ -260,7 +260,7 @@ function CPPTXContentLoader()
 
         this.LogicDocument = oLogicDocument;
         return oNewSpPr;
-    }
+    };
 
     this.ReadShape = function()
     {
@@ -305,7 +305,7 @@ function CPPTXContentLoader()
                 }
                 case 1:
                 {
-                    var spPr = new CSpPr();
+                    var spPr = new AscFormat.CSpPr();
                     this.ReadSpPr(spPr);
                     shape.setSpPr(spPr);
                     shape.spPr.setParent(shape);
@@ -355,7 +355,7 @@ function CPPTXContentLoader()
                 }
                 case 5:
                 {
-                    var bodyPr = new CBodyPr();
+                    var bodyPr = new AscFormat.CBodyPr();
                     this.Reader.CorrectBodyPr(bodyPr);
                     shape.setBodyPr(bodyPr);
                 }
@@ -412,7 +412,7 @@ function CPPTXContentLoader()
                 }
                 case 1:
                 {
-                    var spPr = new CSpPr();
+                    var spPr = new AscFormat.CSpPr();
                     this.ReadSpPr(spPr);
                     shape.setSpPr(spPr);
                     break;
@@ -458,7 +458,7 @@ function CPPTXContentLoader()
                     var unifill = this.Reader.ReadUniFill(null, pic, null);
                     pic.setBlipFill(unifill.fill);//this.Reader.ReadUniFill();
 
-                    //pic.spPr.Fill = new CUniFill();
+                    //pic.spPr.Fill = new AscFormat.CUniFill();
                     //pic.spPr.Fill.fill = pic.blipFill;
                     //pic.brush = pic.spPr.Fill;
 
@@ -466,7 +466,7 @@ function CPPTXContentLoader()
                 }
                 case 2:
                 {
-                    var spPr = new CSpPr();
+                    var spPr = new AscFormat.CSpPr();
                     this.ReadSpPr(spPr);
                     pic.setSpPr(spPr);
                     pic.spPr.setParent(pic);
@@ -515,7 +515,7 @@ function CPPTXContentLoader()
                 }
                 case 1:
                 {
-                    var spPr = new CSpPr();
+                    var spPr = new AscFormat.CSpPr();
                     this.ReadSpPr(spPr);
                     shape.setSpPr(spPr);
                     shape.spPr.setParent(shape);
@@ -1003,13 +1003,13 @@ function CPPTXContentWriter()
         }
 
         var _unifill = null;
-        if (image.blipFill instanceof CUniFill)
+        if (image.blipFill instanceof AscFormat.CUniFill)
         {
             _unifill = image.blipFill;
         }
         else
         {
-            _unifill = new CUniFill();
+            _unifill = new AscFormat.CUniFill();
             _unifill.fill = image.blipFill;
         }
 
@@ -1035,8 +1035,8 @@ function CPPTXContentWriter()
         _writer.StartRecord(2);
         //_writer.WriteRecord1(0, image.nvPicPr, _writer.WriteUniNvPr);
 
-        var spPr = new CSpPr();
-        spPr.WriteXfrm = new CXfrm();
+        var spPr = new AscFormat.CSpPr();
+        spPr.WriteXfrm = new AscFormat.CXfrm();
         spPr.WriteXfrm.offX = 0;
         spPr.WriteXfrm.offY = 0;
         spPr.WriteXfrm.extX = w;
@@ -1044,8 +1044,8 @@ function CPPTXContentWriter()
 
         spPr.Geometry = CreateGeometry("rect");
 
-        var _unifill = new CUniFill();
-        _unifill.fill = new CBlipFill();
+        var _unifill = new AscFormat.CUniFill();
+        _unifill.fill = new AscFormat.CBlipFill();
         _unifill.fill.RasterImageId = src;
 
         _writer.WriteRecord1(1, _unifill, _writer.WriteUniFill);

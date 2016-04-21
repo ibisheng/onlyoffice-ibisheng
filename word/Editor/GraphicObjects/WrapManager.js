@@ -89,13 +89,13 @@ CWrapPolygon.prototype =
     {
         writer.WriteLong(AscDFH.historyitem_type_WrapPolygon);
         writer.WriteString2(this.Get_Id());
-        writeObject(writer, this.wordGraphicObject);
+        AscFormat.writeObject(writer, this.wordGraphicObject);
     },
 
     Read_FromBinary2: function(reader)
     {
         this.Id = reader.GetString2();
-        this.wordGraphicObject = readObject(reader);
+        this.wordGraphicObject = AscFormat.readObject(reader);
     },
 
     Load_LinkData: function(data)
@@ -801,7 +801,7 @@ CWrapPolygon.prototype =
         {
             case AscDFH.historyitem_WrapPolygonSetEdited:
             {
-                writeBool(writer, data.newPr);
+                AscFormat.writeBool(writer, data.newPr);
                 break;
             }
             case AscDFH.historyitem_WrapPolygonSetRelPoints:
@@ -817,7 +817,7 @@ CWrapPolygon.prototype =
 
             case AscDFH.historyitem_WrapPolygonSetWrapSide:
             {
-                writeLong(writer, data.newPr);
+                AscFormat.writeLong(writer, data.newPr);
                 break;
             }
         }
@@ -831,7 +831,7 @@ CWrapPolygon.prototype =
         {
             case AscDFH.historyitem_WrapPolygonSetEdited:
             {
-                this.edited = readBool(reader);
+                this.edited = AscFormat.readBool(reader);
                 break;
             }
             case AscDFH.historyitem_WrapPolygonSetRelPoints:
@@ -850,7 +850,7 @@ CWrapPolygon.prototype =
 
             case AscDFH.historyitem_WrapPolygonSetWrapSide:
             {
-                this.wrapSide = readLong(reader);
+                this.wrapSide = AscFormat.readLong(reader);
                 break;
             }
         }

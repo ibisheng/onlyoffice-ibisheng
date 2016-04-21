@@ -1474,12 +1474,12 @@ function CBinaryFileWriter()
 
         oThis.StartRecord(4);
 
-        var uniPr = ExecuteNoHistory(function(){return new UniNvPr();}, this, []);
+        var uniPr = AscFormat.ExecuteNoHistory(function(){return new AscFormat.UniNvPr();}, this, []);
         uniPr.cNvPr.id = 1;
         uniPr.cNvPr.name = "";
 
-        var spPr = ExecuteNoHistory(function(){return new CSpPr();}, this, []);
-        spPr.xfrm = ExecuteNoHistory(function(){return new CXfrm();}, this, []);
+        var spPr = AscFormat.ExecuteNoHistory(function(){return new AscFormat.CSpPr();}, this, []);
+        spPr.xfrm = AscFormat.ExecuteNoHistory(function(){return new AscFormat.CXfrm();}, this, []);
         spPr.xfrm.offX = 0;
         spPr.xfrm.offY = 0;
         spPr.xfrm.extX = 0;
@@ -1602,7 +1602,7 @@ function CBinaryFileWriter()
         {
             if(_levels[i])
             {
-                _props_to_write = new CTextParagraphPr();
+                _props_to_write = new AscFormat.CTextParagraphPr();
                 _props_to_write.bullet = _levels[i].Bullet;
                 _props_to_write.lvl = _levels[i].Lvl;
                 _props_to_write.pPr = _levels[i];
@@ -1711,40 +1711,40 @@ function CBinaryFileWriter()
 
         if (undefined !== bullet && null != bullet)
         {
-            if (bullet.bulletColor != null && bullet.bulletColor.type != BULLET_TYPE_COLOR_NONE)
+            if (bullet.bulletColor != null && bullet.bulletColor.type != AscFormat.BULLET_TYPE_COLOR_NONE)
             {
                 oThis.StartRecord(3);
 
-                if (bullet.bulletColor.type == BULLET_TYPE_COLOR_CLR)
+                if (bullet.bulletColor.type == AscFormat.BULLET_TYPE_COLOR_CLR)
                 {
-                    oThis.StartRecord(BULLET_TYPE_COLOR_CLR);
+                    oThis.StartRecord(AscFormat.BULLET_TYPE_COLOR_CLR);
                     oThis.WriteRecord2(0, bullet.bulletColor.UniColor, oThis.WriteUniColor);
                     oThis.EndRecord();
                 }
                 else
                 {
-                    oThis.StartRecord(BULLET_TYPE_COLOR_CLRTX);
+                    oThis.StartRecord(AscFormat.BULLET_TYPE_COLOR_CLRTX);
                     oThis.EndRecord();
                 }
 
                 oThis.EndRecord();
             }
 
-            if (bullet.bulletSize != null && bullet.bulletSize.type != BULLET_TYPE_SIZE_NONE)
+            if (bullet.bulletSize != null && bullet.bulletSize.type != AscFormat.BULLET_TYPE_SIZE_NONE)
             {
                 oThis.StartRecord(4);
 
-                if (bullet.bulletSize.type == BULLET_TYPE_SIZE_PTS)
+                if (bullet.bulletSize.type == AscFormat.BULLET_TYPE_SIZE_PTS)
                 {
-                    oThis.StartRecord(BULLET_TYPE_SIZE_PTS);
+                    oThis.StartRecord(AscFormat.BULLET_TYPE_SIZE_PTS);
                     oThis.WriteUChar(g_nodeAttributeStart);
                     oThis._WriteInt1(0, bullet.bulletSize.val);
                     oThis.WriteUChar(g_nodeAttributeEnd);
                     oThis.EndRecord();
                 }
-                else if (bullet.bulletSize.type == BULLET_TYPE_SIZE_PCT)
+                else if (bullet.bulletSize.type == AscFormat.BULLET_TYPE_SIZE_PCT)
                 {
-                    oThis.StartRecord(BULLET_TYPE_SIZE_PCT);
+                    oThis.StartRecord(AscFormat.BULLET_TYPE_SIZE_PCT);
                     oThis.WriteUChar(g_nodeAttributeStart);
                     oThis._WriteInt1(0, bullet.bulletSize.val);
                     oThis.WriteUChar(g_nodeAttributeEnd);
@@ -1752,24 +1752,24 @@ function CBinaryFileWriter()
                 }
                 else
                 {
-                    oThis.StartRecord(BULLET_TYPE_SIZE_TX);
+                    oThis.StartRecord(AscFormat.BULLET_TYPE_SIZE_TX);
                     oThis.EndRecord();
                 }
 
                 oThis.EndRecord();
             }
 
-            if (bullet.bulletTypeface != null && bullet.bulletTypeface.type != null && bullet.bulletTypeface.type != BULLET_TYPE_TYPEFACE_NONE)
+            if (bullet.bulletTypeface != null && bullet.bulletTypeface.type != null && bullet.bulletTypeface.type != AscFormat.BULLET_TYPE_TYPEFACE_NONE)
             {
                 oThis.StartRecord(5);
 
-                if (bullet.bulletTypeface.type == BULLET_TYPE_TYPEFACE_BUFONT)
+                if (bullet.bulletTypeface.type == AscFormat.BULLET_TYPE_TYPEFACE_BUFONT)
                 {
-                    oThis.WriteRecord2(BULLET_TYPE_TYPEFACE_BUFONT, { Name: bullet.bulletTypeface.typeface, Index : -1}, oThis.WriteTextFontTypeface);
+                    oThis.WriteRecord2(AscFormat.BULLET_TYPE_TYPEFACE_BUFONT, { Name: bullet.bulletTypeface.typeface, Index : -1}, oThis.WriteTextFontTypeface);
                 }
                 else
                 {
-                    oThis.StartRecord(BULLET_TYPE_TYPEFACE_TX);
+                    oThis.StartRecord(AscFormat.BULLET_TYPE_TYPEFACE_TX);
                     oThis.EndRecord();
                 }
 
@@ -1782,28 +1782,28 @@ function CBinaryFileWriter()
 
                 switch (bullet.bulletType.type)
                 {
-                    case BULLET_TYPE_BULLET_CHAR:
+                    case AscFormat.BULLET_TYPE_BULLET_CHAR:
                     {
-                        oThis.StartRecord(BULLET_TYPE_BULLET_CHAR);
+                        oThis.StartRecord(AscFormat.BULLET_TYPE_BULLET_CHAR);
                         oThis.WriteUChar(g_nodeAttributeStart);
                         oThis._WriteString1(0, bullet.bulletType.Char);
                         oThis.WriteUChar(g_nodeAttributeEnd);
                         oThis.EndRecord();
                         break;
                     }
-                    case BULLET_TYPE_BULLET_BLIP:
+                    case AscFormat.BULLET_TYPE_BULLET_BLIP:
                     {
                         // not support. char (*)
-                        oThis.StartRecord(BULLET_TYPE_BULLET_CHAR);
+                        oThis.StartRecord(AscFormat.BULLET_TYPE_BULLET_CHAR);
                         oThis.WriteUChar(g_nodeAttributeStart);
                         oThis._WriteString1(0, "*");
                         oThis.WriteUChar(g_nodeAttributeEnd);
                         oThis.EndRecord();
                         break;
                     }
-                    case BULLET_TYPE_BULLET_AUTONUM:
+                    case AscFormat.BULLET_TYPE_BULLET_AUTONUM:
                     {
-                        oThis.StartRecord(BULLET_TYPE_BULLET_AUTONUM);
+                        oThis.StartRecord(AscFormat.BULLET_TYPE_BULLET_AUTONUM);
                         oThis.WriteUChar(g_nodeAttributeStart);
                         oThis._WriteLimit1(0, bullet.bulletType.AutoNumType);
                         oThis._WriteInt2(1, bullet.bulletType.startAt);
@@ -1811,9 +1811,9 @@ function CBinaryFileWriter()
                         oThis.EndRecord();
                         break;
                     }
-                    case BULLET_TYPE_BULLET_NONE:
+                    case AscFormat.BULLET_TYPE_BULLET_NONE:
                     {
-                        oThis.StartRecord(BULLET_TYPE_BULLET_NONE);
+                        oThis.StartRecord(AscFormat.BULLET_TYPE_BULLET_NONE);
                         oThis.EndRecord();
                         break;
                     }
@@ -2145,7 +2145,7 @@ function CBinaryFileWriter()
         // делаем прозрачность
         if(!color.Mods)
         {
-            color.setMods(new CColorModifiers());
+            color.setMods(new AscFormat.CColorModifiers());
         }
         var mods = color.Mods.Mods;
         var _len = mods.length;
@@ -2167,7 +2167,7 @@ function CBinaryFileWriter()
                 mods.splice(nIndex, 1);
             }
 
-            mods[_len] = new CColorMod();
+            mods[_len] = new AscFormat.CColorMod();
             mods[_len].name = "alpha";
             mods[_len].val = (trans * 100000 / 255) >> 0;
         }
@@ -2490,7 +2490,7 @@ function CBinaryFileWriter()
 
     this.WriteParagraph = function(paragraph, startPos, endPos)
     {
-        var tPr = new CTextParagraphPr();
+        var tPr = new AscFormat.CTextParagraphPr();
         tPr.bullet = paragraph.Pr.Bullet;
         tPr.lvl = paragraph.Pr.Lvl;
         tPr.pPr = paragraph.Pr;
@@ -2667,7 +2667,7 @@ function CBinaryFileWriter()
 
     this.WriteParagraphField = function (id, type, text)
     {
-        oThis.StartRecord(PARRUN_TYPE_FLD);
+        oThis.StartRecord(AscFormat.PARRUN_TYPE_FLD);
 
         oThis.WriteUChar(g_nodeAttributeStart);
         oThis._WriteString1(0, id);
@@ -2682,7 +2682,7 @@ function CBinaryFileWriter()
 
     this.WriteTextRun = function(runPr, text, hlinkObj)
     {
-        oThis.StartRecord(PARRUN_TYPE_RUN);
+        oThis.StartRecord(AscFormat.PARRUN_TYPE_RUN);
 
         oThis.WriteUChar(g_nodeAttributeStart);
         oThis._WriteString2(0, text);
@@ -2699,7 +2699,7 @@ function CBinaryFileWriter()
     };
     this.WriteLineBreak = function(runPr, hlinkObj)
     {
-        oThis.StartRecord(PARRUN_TYPE_BR);
+        oThis.StartRecord(AscFormat.PARRUN_TYPE_BR);
 
         if (runPr !== undefined && runPr != null)
         {
@@ -2812,7 +2812,7 @@ function CBinaryFileWriter()
             image.spPr.geometry = CreateGeometry("rect");
         }
 
-        var unifill = new CUniFill();
+        var unifill = new AscFormat.CUniFill();
         unifill.fill = image.blipFill
         oThis.WriteRecord1(1, unifill, oThis.WriteUniFill);
         oThis.WriteRecord1(2, image.spPr, oThis.WriteSpPr);
@@ -3087,43 +3087,43 @@ function CBinaryFileWriter()
         var _marg = cell.Pr.TableCellMar;
         var tableMar = cell.Row.Table.Pr.TableCellMar;
 
-        if(_marg && _marg.Left && isRealNumber(_marg.Left.W))
+        if(_marg && _marg.Left && AscFormat.isRealNumber(_marg.Left.W))
         {
             oThis._WriteInt1(0, (_marg.Left.W * 36000) >> 0);
         }
-        else if(tableMar && tableMar.Left && isRealNumber(tableMar.Left.W))
+        else if(tableMar && tableMar.Left && AscFormat.isRealNumber(tableMar.Left.W))
         {
             oThis._WriteInt1(0, (tableMar.Left.W * 36000) >> 0);
         }
 
-        if(_marg && _marg.Top && isRealNumber(_marg.Top.W))
+        if(_marg && _marg.Top && AscFormat.isRealNumber(_marg.Top.W))
         {
             oThis._WriteInt1(1, (_marg.Top.W * 36000) >> 0);
         }
-        else if(tableMar && tableMar.Top && isRealNumber(tableMar.Top.W))
+        else if(tableMar && tableMar.Top && AscFormat.isRealNumber(tableMar.Top.W))
         {
             oThis._WriteInt1(1, (tableMar.Top.W * 36000) >> 0);
         }
 
-        if(_marg && _marg.Right && isRealNumber(_marg.Right.W))
+        if(_marg && _marg.Right && AscFormat.isRealNumber(_marg.Right.W))
         {
             oThis._WriteInt1(2, (_marg.Right.W * 36000) >> 0);
         }
-        else if(tableMar && tableMar.Right && isRealNumber(tableMar.Right.W))
+        else if(tableMar && tableMar.Right && AscFormat.isRealNumber(tableMar.Right.W))
         {
             oThis._WriteInt1(2, (tableMar.Right.W * 36000) >> 0);
         }
 
-        if(_marg && _marg.Bottom && isRealNumber(_marg.Bottom.W))
+        if(_marg && _marg.Bottom && AscFormat.isRealNumber(_marg.Bottom.W))
         {
             oThis._WriteInt1(3, (_marg.Bottom.W * 36000) >> 0);
         }
-        else if(tableMar && tableMar.Bottom && isRealNumber(tableMar.Bottom.W))
+        else if(tableMar && tableMar.Bottom && AscFormat.isRealNumber(tableMar.Bottom.W))
         {
             oThis._WriteInt1(3, (tableMar.Bottom.W * 36000) >> 0);
         }
 
-        if(isRealNumber(cell.Pr.VAlign))
+        if(AscFormat.isRealNumber(cell.Pr.VAlign))
         {
             switch(cell.Pr.VAlign)
             {
@@ -3821,11 +3821,11 @@ function CBinaryFileWriter()
         {
             oThis.StartRecord(0);
             oThis.WriteUChar(g_nodeAttributeStart);
-            if(isRealBool(_part.TextPr.Italic))
+            if(AscFormat.isRealBool(_part.TextPr.Italic))
             {
                 oThis._WriteLimit1(0, _part.TextPr.Italic === true ? 0 : 1);
             }
-            if(isRealBool(_part.TextPr.Bold))
+            if(AscFormat.isRealBool(_part.TextPr.Bold))
             {
                 oThis._WriteLimit1(1, _part.TextPr.Bold === true ? 0 : 1);
             }
@@ -3982,8 +3982,8 @@ function CBinaryFileWriter()
             oThis.WriteUChar(g_nodeAttributeStart);
             oThis.WriteUChar(g_nodeAttributeEnd);
 
-            var _unifill = new CUniFill();
-            _unifill.fill = new CNoFill();
+            var _unifill = new AscFormat.CUniFill();
+            _unifill.fill = new AscFormat.CNoFill();
             oThis.WriteRecord2(0, _unifill, oThis.WriteUniFill);
 
             oThis.EndRecord();
@@ -4014,8 +4014,8 @@ function CBinaryFileWriter()
             // TODO: потом переделать по-нормальному
             //if (!_border.Unifill && _border.Color instanceof CDocumentColor)
             //{
-            //    var _unifill = new CUniFill();
-            //    _unifill.fill = new CSolidFill();
+            //    var _unifill = new AscFormat.CUniFill();
+            //    _unifill.fill = new AscFormat.CSolidFill();
             //    _unifill.fill.color.color = new CRGBColor();
 //
             //    _unifill.fill.color.color.RGBA.R = _border.Color.r;
@@ -4041,8 +4041,8 @@ function CBinaryFileWriter()
             oThis.WriteUChar(g_nodeAttributeStart);
             oThis.WriteUChar(g_nodeAttributeEnd);
 
-            var _unifill = new CUniFill();
-            _unifill.fill = new CNoFill();
+            var _unifill = new AscFormat.CUniFill();
+            _unifill.fill = new AscFormat.CNoFill();
             oThis.WriteRecord2(0, _unifill, oThis.WriteUniFill);
 
             oThis.EndRecord();
@@ -4064,8 +4064,8 @@ function CBinaryFileWriter()
             oThis.WriteUChar(g_nodeAttributeStart);
             oThis.WriteUChar(g_nodeAttributeEnd);
 
-            var _unifill = new CUniFill();
-            _unifill.fill = new CNoFill();
+            var _unifill = new AscFormat.CUniFill();
+            _unifill.fill = new AscFormat.CNoFill();
             oThis.WriteRecord2(0, _unifill, oThis.WriteUniFill);
 
             oThis.EndRecord();
@@ -4097,8 +4097,8 @@ function CBinaryFileWriter()
             // TODO: потом переделать по-нормальному
             //if (!_border.Unifill && _border.Color instanceof CDocumentColor)
             //{
-            //    var _unifill = new CUniFill();
-            //    _unifill.fill = new CSolidFill();
+            //    var _unifill = new AscFormat.CUniFill();
+            //    _unifill.fill = new AscFormat.CSolidFill();
             //    _unifill.fill.color.color = new CRGBColor();
 //
             //    _unifill.fill.color.color.RGBA.R = _border.Color.r;

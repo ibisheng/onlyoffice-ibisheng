@@ -26,6 +26,9 @@ var Asc = window["Asc"];
 window["AscCommon"] = {};
 var AscCommon = window["AscCommon"];
 
+window["AscFormat"] = {};
+var AscFormat = window["AscFormat"];
+
 window["AscDFH"] = {};
 var AscDFH = window["AscDFH"];
 
@@ -823,7 +826,7 @@ function asc_menu_ReadColor(_params, _cursor) {
                 var _count = _params[_cursor.pos++];
                 for (var i = 0; i < _count; i++)
                 {
-                    var _mod = new CColorMod();
+                    var _mod = new AscFormat.CColorMod();
                     _mod.name = _params[_cursor.pos++];
                     _mod.val = _params[_cursor.pos++];
                     _color.Mods.push(_mod);
@@ -5640,7 +5643,7 @@ function OfflineEditor () {
         // chat styles
         AscCommon.ChartPreviewManager.prototype.clearPreviews = function() {window["native"]["ClearCacheChartStyles"]();};
         AscCommon.ChartPreviewManager.prototype.createChartPreview = function(_graphics, type, styleIndex) {
-            return ExecuteNoHistory(function(){
+            return AscFormat.ExecuteNoHistory(function(){
                 if(!this.chartsByTypes[type])
                     this.chartsByTypes[type] = this.getChartByType(type);
                 var chart_space = this.chartsByTypes[type];
@@ -5690,7 +5693,7 @@ function OfflineEditor () {
         };
         AscCommon.ChartPreviewManager.prototype.getChartPreviews = function(chartType) {
 
-            if (isRealNumber(chartType))
+            if (AscFormat.isRealNumber(chartType))
             {
                 var bIsCached = window["native"]["IsCachedChartStyles"](chartType);
                 if (!bIsCached)

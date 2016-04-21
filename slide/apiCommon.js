@@ -97,29 +97,29 @@ CAscSlideTiming.prototype.setDefaultParams = function()
 
 CAscSlideTiming.prototype.Write_ToBinary = function(w)
 {
-    w.WriteBool(isRealNumber(this.TransitionType));
-    if(isRealNumber(this.TransitionType))
+    w.WriteBool(AscFormat.isRealNumber(this.TransitionType));
+    if(AscFormat.isRealNumber(this.TransitionType))
         w.WriteLong(this.TransitionType);
 
-    w.WriteBool(isRealNumber(this.TransitionOption));
-    if(isRealNumber(this.TransitionOption))
+    w.WriteBool(AscFormat.isRealNumber(this.TransitionOption));
+    if(AscFormat.isRealNumber(this.TransitionOption))
         w.WriteLong(this.TransitionOption);
 
-    w.WriteBool(isRealNumber(this.TransitionDuration));
-    if(isRealNumber(this.TransitionDuration))
+    w.WriteBool(AscFormat.isRealNumber(this.TransitionDuration));
+    if(AscFormat.isRealNumber(this.TransitionDuration))
         w.WriteLong(this.TransitionDuration);
 
 
-    w.WriteBool(isRealBool(this.SlideAdvanceOnMouseClick));
-    if(isRealBool(this.SlideAdvanceOnMouseClick))
+    w.WriteBool(AscFormat.isRealBool(this.SlideAdvanceOnMouseClick));
+    if(AscFormat.isRealBool(this.SlideAdvanceOnMouseClick))
         w.WriteBool(this.SlideAdvanceOnMouseClick);
 
-    w.WriteBool(isRealBool(this.SlideAdvanceAfter));
-    if(isRealBool(this.SlideAdvanceAfter))
+    w.WriteBool(AscFormat.isRealBool(this.SlideAdvanceAfter));
+    if(AscFormat.isRealBool(this.SlideAdvanceAfter))
         w.WriteBool(this.SlideAdvanceAfter);
 
-    w.WriteBool(isRealNumber(this.SlideAdvanceDuration));
-    if(isRealNumber(this.SlideAdvanceDuration))
+    w.WriteBool(AscFormat.isRealNumber(this.SlideAdvanceDuration));
+    if(AscFormat.isRealNumber(this.SlideAdvanceDuration))
         w.WriteLong(this.SlideAdvanceDuration);
 };
 

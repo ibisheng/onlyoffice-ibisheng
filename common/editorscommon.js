@@ -1995,13 +1995,13 @@ CTableId.prototype.Read_Class_FromBinary = function(Reader)
         case AscDFH.historyitem_type_Section                  : Element = new CSectionPr(); break;
         case AscDFH.historyitem_type_Field                    : Element = new ParaField(); break;
 
-        case AscDFH.historyitem_type_DefaultShapeDefinition   : Element = new DefaultShapeDefinition(); break;
-        case AscDFH.historyitem_type_CNvPr                    : Element = new CNvPr(); break;
-        case AscDFH.historyitem_type_NvPr                     : Element = new NvPr(); break;
-        case AscDFH.historyitem_type_Ph                       : Element = new Ph(); break;
-        case AscDFH.historyitem_type_UniNvPr                  : Element = new UniNvPr(); break;
-        case AscDFH.historyitem_type_StyleRef                 : Element = new StyleRef(); break;
-        case AscDFH.historyitem_type_FontRef                  : Element = new FontRef(); break;
+        case AscDFH.historyitem_type_DefaultShapeDefinition   : Element = new AscFormat.DefaultShapeDefinition(); break;
+        case AscDFH.historyitem_type_CNvPr                    : Element = new AscFormat.CNvPr(); break;
+        case AscDFH.historyitem_type_NvPr                     : Element = new AscFormat.NvPr(); break;
+        case AscDFH.historyitem_type_Ph                       : Element = new AscFormat.Ph(); break;
+        case AscDFH.historyitem_type_UniNvPr                  : Element = new AscFormat.UniNvPr(); break;
+        case AscDFH.historyitem_type_StyleRef                 : Element = new AscFormat.StyleRef(); break;
+        case AscDFH.historyitem_type_FontRef                  : Element = new AscFormat.FontRef(); break;
         case AscDFH.historyitem_type_Chart                    : Element = new CChart(); break;
         case AscDFH.historyitem_type_ChartSpace               : Element = new CChartSpace(); break;
         case AscDFH.historyitem_type_Legend                   : Element = new CLegend(); break;
@@ -2060,19 +2060,19 @@ CTableId.prototype.Read_Class_FromBinary = function(Reader)
         case AscDFH.historyitem_type_ChartWall                : Element = new CChartWall(); break;
         case AscDFH.historyitem_type_View3d                   : Element = new CView3d(); break;
         case AscDFH.historyitem_type_ChartText                : Element = new CChartText(); break;
-        case AscDFH.historyitem_type_ShapeStyle               : Element = new CShapeStyle(); break;
-        case AscDFH.historyitem_type_Xfrm                     : Element = new CXfrm(); break;
-        case AscDFH.historyitem_type_SpPr                     : Element = new CSpPr(); break;
-        case AscDFH.historyitem_type_ClrScheme                : Element = new ClrScheme(); break;
-        case AscDFH.historyitem_type_ClrMap                   : Element = new ClrMap(); break;
-        case AscDFH.historyitem_type_ExtraClrScheme           : Element = new ExtraClrScheme(); break;
-        case AscDFH.historyitem_type_FontCollection           : Element = new FontCollection(); break;
-        case AscDFH.historyitem_type_FontScheme               : Element = new FontScheme(); break;
-        case AscDFH.historyitem_type_FormatScheme             : Element = new FmtScheme(); break;
-        case AscDFH.historyitem_type_ThemeElements            : Element = new ThemeElements(); break;
-        case AscDFH.historyitem_type_HF                       : Element = new HF(); break;
-        case AscDFH.historyitem_type_BgPr                     : Element = new CBgPr(); break;
-        case AscDFH.historyitem_type_Bg                       : Element = new CBg(); break;
+        case AscDFH.historyitem_type_ShapeStyle               : Element = new AscFormat.CShapeStyle(); break;
+        case AscDFH.historyitem_type_Xfrm                     : Element = new AscFormat.CXfrm(); break;
+        case AscDFH.historyitem_type_SpPr                     : Element = new AscFormat.CSpPr(); break;
+        case AscDFH.historyitem_type_ClrScheme                : Element = new AscFormat.ClrScheme(); break;
+        case AscDFH.historyitem_type_ClrMap                   : Element = new AscFormat.ClrMap(); break;
+        case AscDFH.historyitem_type_ExtraClrScheme           : Element = new AscFormat.ExtraClrScheme(); break;
+        case AscDFH.historyitem_type_FontCollection           : Element = new AscFormat.FontCollection(); break;
+        case AscDFH.historyitem_type_FontScheme               : Element = new AscFormat.FontScheme(); break;
+        case AscDFH.historyitem_type_FormatScheme             : Element = new AscFormat.FmtScheme(); break;
+        case AscDFH.historyitem_type_ThemeElements            : Element = new AscFormat.ThemeElements(); break;
+        case AscDFH.historyitem_type_HF                       : Element = new AscFormat.HF(); break;
+        case AscDFH.historyitem_type_BgPr                     : Element = new AscFormat.CBgPr(); break;
+        case AscDFH.historyitem_type_Bg                       : Element = new AscFormat.CBg(); break;
         case AscDFH.historyitem_type_PrintSettings            : Element = new CPrintSettings(); break;
         case AscDFH.historyitem_type_HeaderFooterChart        : Element = new CHeaderFooterChart(); break;
         case AscDFH.historyitem_type_PageMarginsChart         : Element = new CPageMarginsChart(); break;
@@ -2114,7 +2114,7 @@ CTableId.prototype.Read_Class_FromBinary = function(Reader)
         case  AscDFH.historyitem_type_SlideMaster              : Element = new MasterSlide(); break;
         case  AscDFH.historyitem_type_SlideComments            : Element = new SlideComments(); break;
         case  AscDFH.historyitem_type_PropLocker               : Element = new PropLocker(); break;
-        case  AscDFH.historyitem_type_Theme                    : Element = new CTheme(); break;
+        case  AscDFH.historyitem_type_Theme                    : Element = new AscFormat.CTheme(); break;
         case  AscDFH.historyitem_type_GraphicFrame             : Element = new CGraphicFrame(); break;
     }
 
@@ -2218,7 +2218,7 @@ CTableId.prototype.Load_Changes = function(Reader, Reader2)
                 {
                     var oParaDrawing = oLogicDocument.DrawingObjects.getTrialImage(sUrl);
                     var oFirstParagraph = oLogicDocument.Get_FirstParagraph();
-                    ExecuteNoHistory(function(){
+                    AscFormat.ExecuteNoHistory(function(){
                         var oRun = new ParaRun();
                         oRun.Content.splice(0, 0, oParaDrawing);
                         oFirstParagraph.Content.splice(0, 0, oRun);

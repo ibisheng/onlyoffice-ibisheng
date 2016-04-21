@@ -2945,45 +2945,45 @@ var editor;
         var _count_defaults = g_oUserColorScheme.length;
         if (index_scheme < _count_defaults) {
           var _obj = g_oUserColorScheme[index_scheme];
-          var scheme = new ClrScheme();
+          var scheme = new AscFormat.ClrScheme();
           scheme.name = _obj["name"];
           var _c;
 
           _c = _obj["dk1"];
-          scheme.colors[8] = CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
+          scheme.colors[8] = AscFormat.CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
 
           _c = _obj["lt1"];
-          scheme.colors[12] = CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
+          scheme.colors[12] = AscFormat.CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
 
           _c = _obj["dk2"];
-          scheme.colors[9] = CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
+          scheme.colors[9] = AscFormat.CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
 
           _c = _obj["lt2"];
-          scheme.colors[13] = CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
+          scheme.colors[13] = AscFormat.CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
 
           _c = _obj["accent1"];
-          scheme.colors[0] = CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
+          scheme.colors[0] = AscFormat.CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
 
           _c = _obj["accent2"];
-          scheme.colors[1] = CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
+          scheme.colors[1] = AscFormat.CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
 
           _c = _obj["accent3"];
-          scheme.colors[2] = CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
+          scheme.colors[2] = AscFormat.CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
 
           _c = _obj["accent4"];
-          scheme.colors[3] = CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
+          scheme.colors[3] = AscFormat.CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
 
           _c = _obj["accent5"];
-          scheme.colors[4] = CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
+          scheme.colors[4] = AscFormat.CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
 
           _c = _obj["accent6"];
-          scheme.colors[5] = CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
+          scheme.colors[5] = AscFormat.CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
 
           _c = _obj["hlink"];
-          scheme.colors[11] = CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
+          scheme.colors[11] = AscFormat.CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
 
           _c = _obj["folHlink"];
-          scheme.colors[10] = CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
+          scheme.colors[10] = AscFormat.CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
 
           theme.themeElements.clrScheme = scheme;
         } else {

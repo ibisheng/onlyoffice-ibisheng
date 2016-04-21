@@ -14,10 +14,11 @@
         "../common/apiCommon.js",
         "../common/editorscommon.js",
         "../common/NumFormat.js",
-        "../common/wordcopypaste.js",
 
         "../common/Drawings/Format/Constants.js",
         "../common/Charts/charts.js",
+
+        "../common/wordcopypaste.js",
 
         "../word/apiDefines.js",
         "../common/Shapes/Serialize.js",

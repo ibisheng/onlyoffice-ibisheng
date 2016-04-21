@@ -314,7 +314,7 @@ function asc_menu_ReadColor(_params, _cursor)
                 var _count = _params[_cursor.pos++];
                 for (var i = 0; i < _count; i++)
                 {
-                    var _mod = new CColorMod();
+                    var _mod = new AscFormat.CColorMod();
                     _mod.name = _params[_cursor.pos++];
                     _mod.val = _params[_cursor.pos++];
                     _color.Mods.push(_mod);
@@ -1093,10 +1093,10 @@ asc_docs_api.prototype["Call_Menu_Event"] = function(type, _params)
                     }
                     case 6:
                     {
-                        var Unifill = new CUniFill();
-                        Unifill.fill = new CSolidFill();
+                        var Unifill = new AscFormat.CUniFill();
+                        Unifill.fill = new AscFormat.CSolidFill();
                         var color = asc_menu_ReadColor(_params, _current);
-                        Unifill.fill.color = CorrectUniColor(color, Unifill.fill.color, 1);
+                        Unifill.fill.color = AscFormat.CorrectUniColor(color, Unifill.fill.color, 1);
                         _textPr.Unifill = Unifill;
                         break;
                     }
@@ -1205,19 +1205,19 @@ asc_docs_api.prototype["Call_Menu_Event"] = function(type, _params)
 
                         if (_brds.Left && _brds.Left.Color)
                         {
-                            _brds.Left.Unifill = CreateUnifillFromAscColor(_brds.Left.Color);
+                            _brds.Left.Unifill = AscFormat.CreateUnifillFromAscColor(_brds.Left.Color);
                         }
                         if (_brds.Top && _brds.Top.Color)
                         {
-                            _brds.Top.Unifill = CreateUnifillFromAscColor(_brds.Top.Color);
+                            _brds.Top.Unifill = AscFormat.CreateUnifillFromAscColor(_brds.Top.Color);
                         }
                         if (_brds.Right && _brds.Right.Color)
                         {
-                            _brds.Right.Unifill = CreateUnifillFromAscColor(_brds.Right.Color);
+                            _brds.Right.Unifill = AscFormat.CreateUnifillFromAscColor(_brds.Right.Color);
                         }
                         if (_brds.Bottom && _brds.Bottom.Color)
                         {
-                            _brds.Bottom.Unifill = CreateUnifillFromAscColor(_brds.Bottom.Color);
+                            _brds.Bottom.Unifill = AscFormat.CreateUnifillFromAscColor(_brds.Bottom.Color);
                         }
 
                         this.WordControl.m_oLogicDocument.Set_ParagraphBorders( _brds );
@@ -4519,7 +4519,7 @@ asc_docs_api.prototype.ImgApply = function(obj)
             }
             else
             {
-                ExecuteNoHistory(function(){
+                AscFormat.ExecuteNoHistory(function(){
                     this.WordControl.m_oLogicDocument.Set_ImageProps( ImagePr );
                 }, this, []);
             }
@@ -5501,7 +5501,7 @@ AscCommon.ChartPreviewManager.prototype.clearPreviews = function()
 };
 AscCommon.ChartPreviewManager.prototype.createChartPreview = function(_graphics, type, styleIndex)
 {
-    return ExecuteNoHistory(function(){
+    return AscFormat.ExecuteNoHistory(function(){
         if(!this.chartsByTypes[type])
             this.chartsByTypes[type] = this.getChartByType(type);
         var chart_space = this.chartsByTypes[type];
@@ -5548,7 +5548,7 @@ AscCommon.ChartPreviewManager.prototype.createChartPreview = function(_graphics,
 
 AscCommon.ChartPreviewManager.prototype.getChartPreviews = function(chartType)
 {
-    if (isRealNumber(chartType))
+    if (AscFormat.isRealNumber(chartType))
     {
         var bIsCached = window["native"]["DD_IsCachedChartStyles"](chartType);
         if (!bIsCached)

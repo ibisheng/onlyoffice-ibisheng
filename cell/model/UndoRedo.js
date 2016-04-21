@@ -1692,7 +1692,7 @@ UndoRedoData_ClrScheme.prototype = {
 	},
 	Read_FromBinary2 : function(reader)
 	{
-		this.newVal = new ClrScheme();
+		this.newVal = new AscFormat.ClrScheme();
 		this.newVal.Read_FromBinary(reader);
 	}
 };

@@ -6005,15 +6005,15 @@ ParaRun.prototype.Apply_TextPr = function(TextPr, IncFontSize, ApplyToAll)
                     EndTextPr.Merge( this.Paragraph.TextPr.Value );
                     if(TextPr.AscFill)
                     {
-                        this.Paragraph.TextPr.Set_TextFill(CorrectUniFill(TextPr.AscFill, EndTextPr.TextFill, 0));
+                        this.Paragraph.TextPr.Set_TextFill(AscFormat.CorrectUniFill(TextPr.AscFill, EndTextPr.TextFill, 0));
                     }
                     if(TextPr.AscUnifill)
                     {
-                        this.Paragraph.TextPr.Set_Unifill(CorrectUniFill(TextPr.AscUnifill, EndTextPr.Unifill, 0));
+                        this.Paragraph.TextPr.Set_Unifill(AscFormat.CorrectUniFill(TextPr.AscUnifill, EndTextPr.Unifill, 0));
                     }
                     if(TextPr.AscLine)
                     {
-                        this.Paragraph.TextPr.Set_TextOutline(CorrectUniStroke(TextPr.AscLine, EndTextPr.TextOutline, 0));
+                        this.Paragraph.TextPr.Set_TextOutline(AscFormat.CorrectUniStroke(TextPr.AscLine, EndTextPr.TextOutline, 0));
                     }
                 }
             }
@@ -6122,15 +6122,15 @@ ParaRun.prototype.Apply_TextPr = function(TextPr, IncFontSize, ApplyToAll)
                         EndTextPr.Merge( this.Paragraph.TextPr.Value );
                         if(TextPr.AscFill)
                         {
-                            this.Paragraph.TextPr.Set_TextFill(CorrectUniFill(TextPr.AscFill, EndTextPr.TextFill, 0));
+                            this.Paragraph.TextPr.Set_TextFill(AscFormat.CorrectUniFill(TextPr.AscFill, EndTextPr.TextFill, 0));
                         }
                         if(TextPr.AscUnifill)
                         {
-                            this.Paragraph.TextPr.Set_Unifill(CorrectUniFill(TextPr.AscUnifill, EndTextPr.Unifill, 0));
+                            this.Paragraph.TextPr.Set_Unifill(AscFormat.CorrectUniFill(TextPr.AscUnifill, EndTextPr.Unifill, 0));
                         }
                         if(TextPr.AscLine)
                         {
-                            this.Paragraph.TextPr.Set_TextOutline(CorrectUniStroke(TextPr.AscLine, EndTextPr.TextOutline, 0));
+                            this.Paragraph.TextPr.Set_TextOutline(AscFormat.CorrectUniStroke(TextPr.AscLine, EndTextPr.TextOutline, 0));
                         }
                     }
                 }
@@ -6391,7 +6391,7 @@ ParaRun.prototype.Apply_Pr = function(TextPr)
         if(!this.Paragraph.bFromDocument)
         {
             var oCompiledPr = this.Get_CompiledPr(true);
-            this.Set_Unifill(CorrectUniFill(TextPr.AscUnifill, oCompiledPr.Unifill, 0), isRealObject(TextPr.AscUnifill) && TextPr.AscUnifill.asc_CheckForseSet() );
+            this.Set_Unifill(AscFormat.CorrectUniFill(TextPr.AscUnifill, oCompiledPr.Unifill, 0), isRealObject(TextPr.AscUnifill) && TextPr.AscUnifill.asc_CheckForseSet() );
             this.Set_Color(undefined);
             this.Set_TextFill(undefined);
         }
@@ -6424,7 +6424,7 @@ ParaRun.prototype.Apply_Pr = function(TextPr)
             }
             this.Set_Unifill(undefined);
             this.Set_Color(undefined);
-            this.Set_TextFill(CorrectUniFill(TextPr.AscFill, oMergeUnifill, 0), isRealObject(TextPr.AscFill) && TextPr.AscFill.asc_CheckForseSet());
+            this.Set_TextFill(AscFormat.CorrectUniFill(TextPr.AscFill, oMergeUnifill, 0), isRealObject(TextPr.AscFill) && TextPr.AscFill.asc_CheckForseSet());
         }
     }
 
@@ -6435,7 +6435,7 @@ ParaRun.prototype.Apply_Pr = function(TextPr)
     else if(undefined !== TextPr.AscLine && this.Paragraph)
     {
 		var oCompiledPr = this.Get_CompiledPr(true);
-		this.Set_TextOutline(CorrectUniStroke(TextPr.AscLine, oCompiledPr.TextOutline, 0));
+		this.Set_TextOutline(AscFormat.CorrectUniStroke(TextPr.AscLine, oCompiledPr.TextOutline, 0));
     }
 
     if ( undefined != TextPr.VertAlign )
@@ -6658,7 +6658,7 @@ ParaRun.prototype.Set_Color = function(Value)
 
 ParaRun.prototype.Set_Unifill = function(Value, bForce)
 {
-    if ( ( undefined === Value && undefined !== this.Pr.Unifill ) || ( Value instanceof CUniFill && ( undefined === this.Pr.Unifill || false === CompareUnifillBool(this.Pr.Unifill, Value) ) ) || bForce )
+    if ( ( undefined === Value && undefined !== this.Pr.Unifill ) || ( Value instanceof AscFormat.CUniFill && ( undefined === this.Pr.Unifill || false === AscFormat.CompareUnifillBool(this.Pr.Unifill, Value) ) ) || bForce )
     {
         var OldValue = this.Pr.Unifill;
         this.Pr.Unifill = Value;
@@ -6671,7 +6671,7 @@ ParaRun.prototype.Set_Unifill = function(Value, bForce)
 };
 ParaRun.prototype.Set_TextFill = function(Value, bForce)
 {
-    if ( ( undefined === Value && undefined !== this.Pr.TextFill ) || ( Value instanceof CUniFill && ( undefined === this.Pr.TextFill || false === CompareUnifillBool(this.Pr.TextFill.IsIdentical, Value) ) ) || bForce )
+    if ( ( undefined === Value && undefined !== this.Pr.TextFill ) || ( Value instanceof AscFormat.CUniFill && ( undefined === this.Pr.TextFill || false === AscFormat.CompareUnifillBool(this.Pr.TextFill.IsIdentical, Value) ) ) || bForce )
     {
         var OldValue = this.Pr.TextFill;
         this.Pr.TextFill = Value;
@@ -6685,7 +6685,7 @@ ParaRun.prototype.Set_TextFill = function(Value, bForce)
 
 ParaRun.prototype.Set_TextOutline = function(Value)
 {
-    if ( ( undefined === Value && undefined !== this.Pr.TextOutline ) || ( Value instanceof CLn && ( undefined === this.Pr.TextOutline || false === this.Pr.TextOutline.IsIdentical(Value) ) ) )
+    if ( ( undefined === Value && undefined !== this.Pr.TextOutline ) || ( Value instanceof AscFormat.CLn && ( undefined === this.Pr.TextOutline || false === this.Pr.TextOutline.IsIdentical(Value) ) ) )
     {
         var OldValue = this.Pr.TextOutline;
         this.Pr.TextOutline = Value;
@@ -8772,7 +8772,7 @@ ParaRun.prototype.Load_Changes = function(Reader, Reader2, Color)
             bColorPrChange = Reader.GetBool();
             if ( true != Reader.GetBool() )
             {
-                var unifill = new CUniFill();
+                var unifill = new AscFormat.CUniFill();
                 unifill.Read_FromBinary(Reader);
                 this.Pr.Unifill = unifill;
                 if(typeof CollaborativeEditing !== "undefined")
@@ -8798,7 +8798,7 @@ ParaRun.prototype.Load_Changes = function(Reader, Reader2, Color)
             bColorPrChange = Reader.GetBool();
             if ( true != Reader.GetBool() )
             {
-                var unifill = new CUniFill();
+                var unifill = new AscFormat.CUniFill();
                 unifill.Read_FromBinary(Reader);
                 this.Pr.TextFill = unifill;
             }
@@ -8814,7 +8814,7 @@ ParaRun.prototype.Load_Changes = function(Reader, Reader2, Color)
             bColorPrChange = Reader.GetBool();
             if ( true != Reader.GetBool() )
             {
-                var ln = new CLn();
+                var ln = new AscFormat.CLn();
                 ln.Read_FromBinary(Reader);
                 this.Pr.TextOutline = ln;
             }

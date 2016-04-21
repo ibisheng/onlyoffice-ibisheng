@@ -3226,7 +3226,7 @@ Woorksheet.prototype.generateFontMap=function(oFontMap){
 			drawing.getAllFonts(oFontMap);
 	}
 	if(null != this.workbook.theme)
-		checkThemeFonts(oFontMap, this.workbook.theme.themeElements.fontScheme);
+    AscFormat.checkThemeFonts(oFontMap, this.workbook.theme.themeElements.fontScheme);
 	//пробегаемся по колонкам
 	for(var i in this.aCols)
 	{
@@ -9684,7 +9684,7 @@ function DrawingObjectsManager(worksheet)
 
 DrawingObjectsManager.prototype.updateChartReferences = function(oldWorksheet, newWorksheet)
 {
-    ExecuteNoHistory(function(){
+    AscFormat.ExecuteNoHistory(function(){
         this.updateChartReferencesWidthHistory(oldWorksheet, newWorksheet);
     }, this, []);
 };

@@ -100,7 +100,7 @@ CChartSpace.prototype.setRecalculateInfo = function()
     this.localTransform = new CMatrix();
     this.snapArrayX = [];
     this.snapArrayY = [];
-    this.rectGeometry = ExecuteNoHistory(function(){return  CreateGeometry("rect");},  this, []);
+    this.rectGeometry = AscFormat.ExecuteNoHistory(function(){return  CreateGeometry("rect");},  this, []);
     this.bNeedUpdatePosition = true;
 };
 CChartSpace.prototype.recalcTransform = function()
@@ -251,7 +251,7 @@ CChartSpace.prototype.recalculate = function()
 {
     if(this.bDeleted)
         return;
-    ExecuteNoHistory(function()
+    AscFormat.ExecuteNoHistory(function()
     {
         var bOldTrackRevision =  editor.WordControl.m_oLogicDocument.TrackRevisions;
         if(bOldTrackRevision){
@@ -458,7 +458,7 @@ CChartSpace.prototype.recalculate = function()
         }
         this.recalcInfo.axisLabels.length = 0;
         this.bNeedUpdatePosition = true;
-        if(isRealNumber(this.posX) && isRealNumber(this.posY))
+        if(AscFormat.isRealNumber(this.posX) && AscFormat.isRealNumber(this.posY))
         {
             this.updatePosition(this.posX, this.posY);
         }
@@ -582,24 +582,24 @@ CChartSpace.prototype.Is_UseInDocument = CShape.prototype.Is_UseInDocument;
 
 function CreateUnifillSolidFillSchemeColor(colorId, tintOrShade)
 {
-    var unifill = new CUniFill();
-    unifill.setFill(new CSolidFill());
-    unifill.fill.setColor(new CUniColor());
-    unifill.fill.color.setColor(new CSchemeColor());
+    var unifill = new AscFormat.CUniFill();
+    unifill.setFill(new AscFormat.CSolidFill());
+    unifill.fill.setColor(new AscFormat.CUniColor());
+    unifill.fill.color.setColor(new AscFormat.CSchemeColor());
     unifill.fill.color.color.setId(colorId);
     return CreateUniFillSolidFillWidthTintOrShade(unifill, tintOrShade);
 }
 
 function CreateNoFillLine()
 {
-    var ret = new CLn();
+    var ret = new AscFormat.CLn();
     ret.setFill(CreateNoFillUniFill());
     return ret;
 }
 
 function CreateNoFillUniFill()
 {
-    var ret = new CUniFill();
-    ret.setFill(new CNoFill());
+    var ret = new AscFormat.CUniFill();
+    ret.setFill(new AscFormat.CNoFill());
     return ret;
 }

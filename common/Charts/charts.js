@@ -257,7 +257,7 @@ ChartPreviewManager.prototype.getAscChartSeriesDefault = function(type) {
 
 ChartPreviewManager.prototype.getChartByType = function(type)
 {
-	return ExecuteNoHistory(function()
+	return AscFormat.ExecuteNoHistory(function()
 	{
 		var settings = new AscCommon.asc_ChartSettings();
 		settings.type = type;
@@ -383,11 +383,11 @@ ChartPreviewManager.prototype.getChartByType = function(type)
 			}
 		}
 		if(!chart_space.spPr)
-			chart_space.setSpPr(new CSpPr());
+			chart_space.setSpPr(new AscFormat.CSpPr());
 
-		var new_line = new CLn();
-		new_line.setFill(new CUniFill());
-		new_line.Fill.setFill(new CNoFill());
+		var new_line = new AscFormat.CLn();
+		new_line.setFill(new AscFormat.CUniFill());
+		new_line.Fill.setFill(new AscFormat.CNoFill());
 		chart_space.spPr.setLn(new_line);
         chart_space.recalcInfo.recalculateReferences = false;
 		chart_space.recalculate();
@@ -401,7 +401,7 @@ ChartPreviewManager.prototype.clearPreviews = function()
 	this.previewGroups.length = 0;
 };
 ChartPreviewManager.prototype.createChartPreview = function(type, styleIndex) {
-    return ExecuteNoHistory(function(){
+    return AscFormat.ExecuteNoHistory(function(){
         if(!this.chartsByTypes[type])
             this.chartsByTypes[type] = this.getChartByType(type);
         var chart_space = this.chartsByTypes[type];
@@ -444,7 +444,7 @@ ChartPreviewManager.prototype.createChartPreview = function(type, styleIndex) {
 };
 
 ChartPreviewManager.prototype.getChartPreviews = function(chartType) {
-	if (isRealNumber(chartType)) {
+	if (AscFormat.isRealNumber(chartType)) {
 		if (!this.previewGroups.hasOwnProperty(chartType)) {
 			this.previewGroups[chartType] = [];
 			var arr = this.previewGroups[chartType];
@@ -521,21 +521,21 @@ TextArtPreviewManager.prototype.initStyles = function()
 
 	var oTextPr = new CTextPr();
 	oTextPr.Bold = true;
-	oTextPr.TextFill = CorrectUniFill(CreateAscFillByIndex(24), new CUniFill(), 0);
+	oTextPr.TextFill = AscFormat.CorrectUniFill(CreateAscFillByIndex(24), new AscFormat.CUniFill(), 0);
 	oTextPr.TextOutline = CreateNoFillLine();
 	this.aStylesByIndex[0] = oTextPr;
 	this.aStylesByIndexToApply[0] = oTextPr;
 
 	oTextPr = new CTextPr();
 	oTextPr.Bold = true;
-	oTextPr.TextFill = CorrectUniFill(CreateAscGradFillByIndex(52, 24, 5400000), new CUniFill(), 0);
+	oTextPr.TextFill = AscFormat.CorrectUniFill(CreateAscGradFillByIndex(52, 24, 5400000), new AscFormat.CUniFill(), 0);
 	oTextPr.TextOutline = CreateNoFillLine();
 	this.aStylesByIndex[4] = oTextPr;
 	this.aStylesByIndexToApply[4] = oTextPr;
 
 	oTextPr = new CTextPr();
 	oTextPr.Bold = true;
-	oTextPr.TextFill = CorrectUniFill(CreateAscGradFillByIndex(44, 42, 5400000), new CUniFill(), 0);
+	oTextPr.TextFill = AscFormat.CorrectUniFill(CreateAscGradFillByIndex(44, 42, 5400000), new AscFormat.CUniFill(), 0);
 	oTextPr.TextOutline = CreateNoFillLine();
 	this.aStylesByIndex[8] = oTextPr;
 	this.aStylesByIndexToApply[8] = oTextPr;
@@ -543,86 +543,86 @@ TextArtPreviewManager.prototype.initStyles = function()
 	oTextPr = new CTextPr();
 	oTextPr.Bold = true;
 	oTextPr.TextFill = CreateNoFillUniFill();
-	oTextPr.TextOutline = CreatePenFromParams(CorrectUniFill(CreateAscFillByIndex(34), new CUniFill(), 0), undefined, undefined, undefined, undefined, (15773/36000)*this.dKoeff);
+	oTextPr.TextOutline = CreatePenFromParams(AscFormat.CorrectUniFill(CreateAscFillByIndex(34), new AscFormat.CUniFill(), 0), undefined, undefined, undefined, undefined, (15773/36000)*this.dKoeff);
 	this.aStylesByIndex[1] = oTextPr;
 	oTextPr = new CTextPr();
 	oTextPr.Bold = true;
 	oTextPr.TextFill = CreateNoFillUniFill();
-	oTextPr.TextOutline = CreatePenFromParams(CorrectUniFill(CreateAscFillByIndex(34), new CUniFill(), 0), undefined, undefined, undefined, undefined, (15773/36000));
+	oTextPr.TextOutline = CreatePenFromParams(AscFormat.CorrectUniFill(CreateAscFillByIndex(34), new AscFormat.CUniFill(), 0), undefined, undefined, undefined, undefined, (15773/36000));
 	this.aStylesByIndexToApply[1] = oTextPr;
 
 	oTextPr = new CTextPr();
 	oTextPr.Bold = true;
 	oTextPr.TextFill = CreateNoFillUniFill();
-	oTextPr.TextOutline = CreatePenFromParams(CorrectUniFill(CreateAscFillByIndex(59), new CUniFill(), 0), undefined, undefined, undefined, undefined, (15773/36000)*this.dKoeff);
+	oTextPr.TextOutline = CreatePenFromParams(AscFormat.CorrectUniFill(CreateAscFillByIndex(59), new AscFormat.CUniFill(), 0), undefined, undefined, undefined, undefined, (15773/36000)*this.dKoeff);
 	this.aStylesByIndex[5] = oTextPr;
 	oTextPr = new CTextPr();
 	oTextPr.Bold = true;
 	oTextPr.TextFill = CreateNoFillUniFill();
-	oTextPr.TextOutline = CreatePenFromParams(CorrectUniFill(CreateAscFillByIndex(59), new CUniFill(), 0), undefined, undefined, undefined, undefined, (15773/36000));
+	oTextPr.TextOutline = CreatePenFromParams(AscFormat.CorrectUniFill(CreateAscFillByIndex(59), new AscFormat.CUniFill(), 0), undefined, undefined, undefined, undefined, (15773/36000));
 	this.aStylesByIndexToApply[5] = oTextPr;
 
 	oTextPr = new CTextPr();
 	oTextPr.Bold = true;
 	oTextPr.TextFill = CreateNoFillUniFill();
-	oTextPr.TextOutline = CreatePenFromParams(CorrectUniFill(CreateAscFillByIndex(52), new CUniFill(), 0), undefined, undefined, undefined, undefined, (15773/36000)*this.dKoeff);
+	oTextPr.TextOutline = CreatePenFromParams(AscFormat.CorrectUniFill(CreateAscFillByIndex(52), new AscFormat.CUniFill(), 0), undefined, undefined, undefined, undefined, (15773/36000)*this.dKoeff);
 	this.aStylesByIndex[9] = oTextPr;
 	oTextPr = new CTextPr();
 	oTextPr.Bold = true;
 	oTextPr.TextFill = CreateNoFillUniFill();
-	oTextPr.TextOutline = CreatePenFromParams(CorrectUniFill(CreateAscFillByIndex(52), new CUniFill(), 0), undefined, undefined, undefined, undefined, (15773/36000));
+	oTextPr.TextOutline = CreatePenFromParams(AscFormat.CorrectUniFill(CreateAscFillByIndex(52), new AscFormat.CUniFill(), 0), undefined, undefined, undefined, undefined, (15773/36000));
 	this.aStylesByIndexToApply[9] = oTextPr;
 
 	oTextPr = new CTextPr();
 	oTextPr.Bold = true;
-	oTextPr.TextFill = CorrectUniFill(CreateAscFillByIndex(27), new CUniFill(), 0);
-	oTextPr.TextOutline = CreatePenFromParams(CorrectUniFill(CreateAscFillByIndex(52), new CUniFill(), 0), undefined, undefined, undefined, undefined, (12700/36000)*this.dKoeff);
+	oTextPr.TextFill = AscFormat.CorrectUniFill(CreateAscFillByIndex(27), new AscFormat.CUniFill(), 0);
+	oTextPr.TextOutline = CreatePenFromParams(AscFormat.CorrectUniFill(CreateAscFillByIndex(52), new AscFormat.CUniFill(), 0), undefined, undefined, undefined, undefined, (12700/36000)*this.dKoeff);
 	this.aStylesByIndex[2] = oTextPr;
 	oTextPr = new CTextPr();
 	oTextPr.Bold = true;
-	oTextPr.TextFill = CorrectUniFill(CreateAscFillByIndex(27), new CUniFill(), 0);
-	oTextPr.TextOutline = CreatePenFromParams(CorrectUniFill(CreateAscFillByIndex(52), new CUniFill(), 0), undefined, undefined, undefined, undefined, (12700/36000));
+	oTextPr.TextFill = AscFormat.CorrectUniFill(CreateAscFillByIndex(27), new AscFormat.CUniFill(), 0);
+	oTextPr.TextOutline = CreatePenFromParams(AscFormat.CorrectUniFill(CreateAscFillByIndex(52), new AscFormat.CUniFill(), 0), undefined, undefined, undefined, undefined, (12700/36000));
 	this.aStylesByIndexToApply[2] = oTextPr;
 
 	oTextPr = new CTextPr();
 	oTextPr.Bold = true;
-	oTextPr.TextFill = CorrectUniFill(CreateAscFillByIndex(42), new CUniFill(), 0);
-	oTextPr.TextOutline = CreatePenFromParams(CorrectUniFill(CreateAscFillByIndex(46), new CUniFill(), 0), undefined, undefined, undefined, undefined, (12700/36000)*this.dKoeff);
+	oTextPr.TextFill = AscFormat.CorrectUniFill(CreateAscFillByIndex(42), new AscFormat.CUniFill(), 0);
+	oTextPr.TextOutline = CreatePenFromParams(AscFormat.CorrectUniFill(CreateAscFillByIndex(46), new AscFormat.CUniFill(), 0), undefined, undefined, undefined, undefined, (12700/36000)*this.dKoeff);
 	this.aStylesByIndex[6] = oTextPr;
 	oTextPr = new CTextPr();
 	oTextPr.Bold = true;
-	oTextPr.TextFill = CorrectUniFill(CreateAscFillByIndex(42), new CUniFill(), 0);
-	oTextPr.TextOutline = CreatePenFromParams(CorrectUniFill(CreateAscFillByIndex(46), new CUniFill(), 0), undefined, undefined, undefined, undefined, (12700/36000));
+	oTextPr.TextFill = AscFormat.CorrectUniFill(CreateAscFillByIndex(42), new AscFormat.CUniFill(), 0);
+	oTextPr.TextOutline = CreatePenFromParams(AscFormat.CorrectUniFill(CreateAscFillByIndex(46), new AscFormat.CUniFill(), 0), undefined, undefined, undefined, undefined, (12700/36000));
 	this.aStylesByIndexToApply[6] = oTextPr;
 
 	oTextPr = new CTextPr();
 	oTextPr.Bold = true;
-	oTextPr.TextFill = CorrectUniFill(CreateAscFillByIndex(57), new CUniFill(), 0);
-	oTextPr.TextOutline = CreatePenFromParams(CorrectUniFill(CreateAscFillByIndex(54), new CUniFill(), 0), undefined, undefined, undefined, undefined, (12700/36000)*this.dKoeff);
+	oTextPr.TextFill = AscFormat.CorrectUniFill(CreateAscFillByIndex(57), new AscFormat.CUniFill(), 0);
+	oTextPr.TextOutline = CreatePenFromParams(AscFormat.CorrectUniFill(CreateAscFillByIndex(54), new AscFormat.CUniFill(), 0), undefined, undefined, undefined, undefined, (12700/36000)*this.dKoeff);
 	this.aStylesByIndex[10] = oTextPr;
 	oTextPr = new CTextPr();
 	oTextPr.Bold = true;
-	oTextPr.TextFill = CorrectUniFill(CreateAscFillByIndex(57), new CUniFill(), 0);
-	oTextPr.TextOutline = CreatePenFromParams(CorrectUniFill(CreateAscFillByIndex(54), new CUniFill(), 0), undefined, undefined, undefined, undefined, (12700/36000));
+	oTextPr.TextFill = AscFormat.CorrectUniFill(CreateAscFillByIndex(57), new AscFormat.CUniFill(), 0);
+	oTextPr.TextOutline = CreatePenFromParams(AscFormat.CorrectUniFill(CreateAscFillByIndex(54), new AscFormat.CUniFill(), 0), undefined, undefined, undefined, undefined, (12700/36000));
 	this.aStylesByIndexToApply[10] = oTextPr;
 
 	oTextPr = new CTextPr();
 	oTextPr.Bold = true;
-	oTextPr.TextFill = CorrectUniFill(CreateAscGradFillByIndex(45, 57, 0), new CUniFill(), 0);
+	oTextPr.TextFill = AscFormat.CorrectUniFill(CreateAscGradFillByIndex(45, 57, 0), new AscFormat.CUniFill(), 0);
 	oTextPr.TextOutline = CreateNoFillLine();
 	this.aStylesByIndex[3] = oTextPr;
 	this.aStylesByIndexToApply[3] = oTextPr;
 
 	oTextPr = new CTextPr();
 	oTextPr.Bold = true;
-	oTextPr.TextFill = CorrectUniFill(CreateAscGradFillByIndex(52, 33, 0), new CUniFill(), 0);
+	oTextPr.TextFill = AscFormat.CorrectUniFill(CreateAscGradFillByIndex(52, 33, 0), new AscFormat.CUniFill(), 0);
 	oTextPr.TextOutline = CreateNoFillLine();
 	this.aStylesByIndex[7] = oTextPr;
 	this.aStylesByIndexToApply[7] = oTextPr;
 
 	oTextPr = new CTextPr();
 	oTextPr.Bold = true;
-	oTextPr.TextFill = CorrectUniFill(CreateAscGradFillByIndex(27, 45, 5400000), new CUniFill(), 0);
+	oTextPr.TextFill = AscFormat.CorrectUniFill(CreateAscGradFillByIndex(27, 45, 5400000), new AscFormat.CUniFill(), 0);
 	oTextPr.TextOutline = CreateNoFillLine();
 	this.aStylesByIndex[11] = oTextPr;
 	this.aStylesByIndexToApply[11] = oTextPr;
@@ -801,7 +801,7 @@ TextArtPreviewManager.prototype.getShapeByPrst = function(prst)
 	oContent.Set_ApplyToAll(false);
 
 	var oBodypr = oShape.getBodyPr().createDuplicate();
-	oBodypr.prstTxWarp = ExecuteNoHistory(
+	oBodypr.prstTxWarp = AscFormat.ExecuteNoHistory(
 		function()
 		{
 			return  CreatePrstTxWarpGeometry(prst)
@@ -939,7 +939,7 @@ TextArtPreviewManager.prototype.getWordArtPreview = function(prst)
 
 TextArtPreviewManager.prototype.generateTextArtStyles = function()
 {
-    ExecuteNoHistory(function(){
+    AscFormat.ExecuteNoHistory(function(){
 
         if(this.aStylesByIndex.length === 0)
         {

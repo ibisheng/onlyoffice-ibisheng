@@ -530,7 +530,7 @@ RotateState.prototype =
                     this.drawingObjects.selectObject(copy, 0);
                     if(!(this.drawingObjects.drawingObjects && this.drawingObjects.drawingObjects.cSld))
                     {
-                        ExecuteNoHistory(function(){drawingObjects.checkSelectedObjectsAndCallback(function(){}, []);}, this, []);
+                        AscFormat.ExecuteNoHistory(function(){drawingObjects.checkSelectedObjectsAndCallback(function(){}, []);}, this, []);
                     }
                     else
                     {
@@ -580,7 +580,7 @@ RotateState.prototype =
                             for(i = 0; i < oThis.drawingObjects.selectedObjects.length; ++i)
                             {
                                 drawing = oThis.drawingObjects.selectedObjects[i];
-                                var rot = isRealNumber(drawing.spPr.xfrm.rot) ? drawing.spPr.xfrm.rot : 0;
+                                var rot = AscFormat.isRealNumber(drawing.spPr.xfrm.rot) ? drawing.spPr.xfrm.rot : 0;
                                 rot = normalizeRotate(rot);
                                 arr_x2.push(drawing.spPr.xfrm.offX);
                                 arr_y2.push(drawing.spPr.xfrm.offY);
@@ -969,7 +969,7 @@ MoveState.prototype =
             min_dx = 0;
         else
         {
-            if(isRealNumber(snap_x) && this.drawingObjects.drawingObjects.cSld)
+            if(AscFormat.isRealNumber(snap_x) && this.drawingObjects.drawingObjects.cSld)
             {
                 this.drawingObjects.getDrawingDocument().DrawVerAnchor(pageIndex, snap_x);
             }
@@ -979,7 +979,7 @@ MoveState.prototype =
             min_dy = 0;
         else
         {
-            if(isRealNumber(snap_y) && this.drawingObjects.drawingObjects.cSld)
+            if(AscFormat.isRealNumber(snap_y) && this.drawingObjects.drawingObjects.cSld)
             {
                 this.drawingObjects.getDrawingDocument().DrawHorAnchor(pageIndex, snap_y);
             }
@@ -1254,7 +1254,7 @@ TextAddState.prototype =
             this.onMouseUp(e, x, y, pageIndex);
             return;
         }
-        if(isRealNumber(this.startX) && isRealNumber(this.startY))
+        if(AscFormat.isRealNumber(this.startX) && AscFormat.isRealNumber(this.startY))
         {
             if(Math.abs(this.startX - x) < 0.001 && Math.abs(this.startY - y) < 0.001)
             {

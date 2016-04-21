@@ -306,7 +306,7 @@ CGraphicObjects.prototype =
 
     getTrialImage: function(sImageUrl)
     {
-        return ExecuteNoHistory(function(){
+        return AscFormat.ExecuteNoHistory(function(){
             var oParaDrawing = new ParaDrawing();
             oParaDrawing.Set_PositionH(Asc.c_oAscRelativeFromH.Page, true, c_oAscAlignH.Center, undefined);
             oParaDrawing.Set_PositionV(Asc.c_oAscRelativeFromV.Page, true, c_oAscAlignV.Center, undefined);
@@ -452,7 +452,7 @@ CGraphicObjects.prototype =
             if(props_by_types.shapeProps)
             {
                 shape_props = new asc_CImgProperty(para_drawing_props);
-                shape_props.ShapeProperties = CreateAscShapePropFromProp(props_by_types.shapeProps);
+                shape_props.ShapeProperties = AscFormat.CreateAscShapePropFromProp(props_by_types.shapeProps);
                 shape_props.verticalTextAlign = props_by_types.shapeProps.verticalTextAlign;
                 shape_props.vert = props_by_types.shapeProps.vert;
                 shape_props.Width = props_by_types.shapeProps.w;
@@ -518,7 +518,7 @@ CGraphicObjects.prototype =
         {
             this.selectedObjects[i].parent.Set_Props(oProps);
         }
-        if(isRealNumber(oProps.Width) || isRealNumber(oProps.Height))
+        if(AscFormat.isRealNumber(oProps.Width) || AscFormat.isRealNumber(oProps.Height))
         {
             oApplyProps = oProps;
         }
@@ -527,7 +527,7 @@ CGraphicObjects.prototype =
             oApplyProps = oProps.ShapeProperties ? oProps.ShapeProperties : oProps;
         }
         this.applyDrawingProps(oApplyProps);
-        if(isRealNumber(oApplyProps.Width) || isRealNumber(oApplyProps.Height))
+        if(AscFormat.isRealNumber(oApplyProps.Width) || AscFormat.isRealNumber(oApplyProps.Height))
         {
             /*в случае если в насторойках ParaDrawing стоит UseAlign - пересчитываем drawing, т. к. ширина и высото ParaDrawing рассчитывается по bounds*/
             var aSelectedObjects = this.selectedObjects;
@@ -541,7 +541,7 @@ CGraphicObjects.prototype =
         {
             this.document.Document_UpdateSelectionState();
         }
-        oApplyProps && (isRealNumber(oApplyProps.verticalTextAlign) || isRealNumber(oApplyProps.vert)) && this.document.Document_UpdateSelectionState();
+        oApplyProps && (AscFormat.isRealNumber(oApplyProps.verticalTextAlign) || AscFormat.isRealNumber(oApplyProps.vert)) && this.document.Document_UpdateSelectionState();
     },
 
     applyDrawingProps: DrawingObjectsController.prototype.applyDrawingProps,
@@ -1109,7 +1109,7 @@ CGraphicObjects.prototype =
 
             this.changeCurrentState(new StartAddNewShape(this, sPreset));
             this.OnMouseDown({}, dX, dY, nPageIndex);
-            if(isRealNumber(dExtX) && isRealNumber(dExtY))
+            if(AscFormat.isRealNumber(dExtX) && AscFormat.isRealNumber(dExtY))
             {
                 this.OnMouseMove({IsLocked: true}, dX + dExtX, dY + dExtY, nPageIndex)
             }
@@ -1317,7 +1317,7 @@ CGraphicObjects.prototype =
                     drawing = new ParaDrawing(0, 0, selectedObjects[i].copy(), this.document.DrawingDocument, this.document, null);
                     drawing.Set_DrawingType(groupParaDrawing.DrawingType);
                     drawing.GraphicObj.setParent(drawing);
-                    if(drawing.GraphicObj.spPr && drawing.GraphicObj.spPr.xfrm && isRealNumber(drawing.GraphicObj.spPr.xfrm.offX) && isRealNumber(drawing.GraphicObj.spPr.xfrm.offY))
+                    if(drawing.GraphicObj.spPr && drawing.GraphicObj.spPr.xfrm && AscFormat.isRealNumber(drawing.GraphicObj.spPr.xfrm.offX) && AscFormat.isRealNumber(drawing.GraphicObj.spPr.xfrm.offY))
                     {
                         drawing.GraphicObj.spPr.xfrm.setOffX(0);
                         drawing.GraphicObj.spPr.xfrm.setOffY(0);
@@ -2295,7 +2295,7 @@ CGraphicObjects.prototype =
         var x_arr_max = [], y_arr_max = [];
         for(var i = 0; i < arrDrawings.length; ++i)
         {
-            var rot = normalizeRotate(isRealNumber(arrDrawings[i].rot) ? arrDrawings[i].rot : 0);
+            var rot = normalizeRotate(AscFormat.isRealNumber(arrDrawings[i].rot) ? arrDrawings[i].rot : 0);
             if (checkNormalRotate(rot))
             {
                 l = arrDrawings[i].posX;
@@ -3239,7 +3239,7 @@ CGraphicObjects.prototype =
         {
             case AscDFH.historyitem_ChangeColorScheme:
             {
-                var clr_scheme = new ClrScheme();
+                var clr_scheme = new AscFormat.ClrScheme();
                 clr_scheme.Read_FromBinary(r);
                 this.document.theme.themeElements.clrScheme = clr_scheme;
                 this.drawingDocument.CheckGuiControlColors();
@@ -3285,7 +3285,7 @@ function ComparisonByZIndexSimpleParent(obj1, obj2)
 
 function ComparisonByZIndexSimple(obj1, obj2)
 {
-    if(isRealNumber(obj1.RelativeHeight) && isRealNumber(obj2.RelativeHeight))
+    if(AscFormat.isRealNumber(obj1.RelativeHeight) && AscFormat.isRealNumber(obj2.RelativeHeight))
     {
         if(obj1.RelativeHeight === obj2.RelativeHeight)
         {
@@ -3296,9 +3296,9 @@ function ComparisonByZIndexSimple(obj1, obj2)
         }
         return obj1.RelativeHeight - obj2.RelativeHeight;
     }
-    if(!isRealNumber(obj1.RelativeHeight) && isRealNumber(obj2.RelativeHeight))
+    if(!AscFormat.isRealNumber(obj1.RelativeHeight) && AscFormat.isRealNumber(obj2.RelativeHeight))
         return -1;
-    if(isRealNumber(obj1.RelativeHeight) && !isRealNumber(obj2.RelativeHeight))
+    if(AscFormat.isRealNumber(obj1.RelativeHeight) && !AscFormat.isRealNumber(obj2.RelativeHeight))
         return 1;
     return 0;
 }

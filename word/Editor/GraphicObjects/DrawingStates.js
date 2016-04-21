@@ -582,7 +582,7 @@ RotateState.prototype =
                     aDrawings[i] = this.drawingObjects.arrTrackObjects[i].originalObject.parent;
                     bounds = this.drawingObjects.arrTrackObjects[i].getBounds();
                     aBounds.push(bounds);
-                    page_index = isRealNumber(this.drawingObjects.arrTrackObjects[i].pageIndex) ? this.drawingObjects.arrTrackObjects[i].pageIndex : this.drawingObjects.arrTrackObjects[i].originalObject.parent.pageIndex;
+                    page_index = AscFormat.isRealNumber(this.drawingObjects.arrTrackObjects[i].pageIndex) ? this.drawingObjects.arrTrackObjects[i].pageIndex : this.drawingObjects.arrTrackObjects[i].originalObject.parent.pageIndex;
                     nearest_pos = this.drawingObjects.document.Get_NearestPos(page_index, bounds.min_x, bounds.min_y, true, this.drawingObjects.arrTrackObjects[i].originalObject.parent);
                     aNearestPos.push(nearest_pos);
                     aParentParagraphs.push(aDrawings[i].Get_ParentParagraph());
@@ -1019,7 +1019,7 @@ MoveState.prototype =
             min_dx = 0;
         else
         {
-            if(isRealNumber(snap_x))
+            if(AscFormat.isRealNumber(snap_x))
             {
                 this.drawingObjects.drawingDocument.DrawVerAnchor(pageIndex, snap_x);
             }
@@ -1029,7 +1029,7 @@ MoveState.prototype =
             min_dy = 0;
         else
         {
-            if(isRealNumber(snap_y))
+            if(AscFormat.isRealNumber(snap_y))
             {
                 this.drawingObjects.drawingDocument.DrawHorAnchor(pageIndex, snap_y);
             }

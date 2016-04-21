@@ -857,22 +857,22 @@ function CreateThemeUnifill(color, tint, shade){
 			case EThemeColor.themecolorText1: id = 15;break;
 			case EThemeColor.themecolorText2: id = 16;break;
 		}
-		ret = new CUniFill();
-		ret.setFill(new CSolidFill());
-		ret.fill.setColor(new CUniColor());
-		ret.fill.color.setColor(new CSchemeColor());
+		ret = new AscFormat.CUniFill();
+		ret.setFill(new AscFormat.CSolidFill());
+		ret.fill.setColor(new AscFormat.CUniColor());
+		ret.fill.color.setColor(new AscFormat.CSchemeColor());
 		ret.fill.color.color.setId(id);
 		if(null != tint || null != shade){
-			ret.fill.color.setMods(new CColorModifiers());
+			ret.fill.color.setMods(new AscFormat.CColorModifiers());
 			var mod;
 			if(null != tint){
-				mod = new CColorMod();
+				mod = new AscFormat.CColorMod();
 				mod.setName("wordTint");
 				mod.setVal(tint /** 100000.0 / 0xff*/);
 				ret.fill.color.Mods.addMod(mod);
 			}
 			if(null != shade){
-				mod = new CColorMod();
+				mod = new AscFormat.CColorMod();
 				mod.setName("wordShade");
 				mod.setVal(shade /** 100000.0 / 0xff*/);
 				ret.fill.color.Mods.addMod(mod);
@@ -4216,7 +4216,7 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
                     //}
                     if(this.copyParams)
                     {
-                        ExecuteNoHistory(function(){
+                        AscFormat.ExecuteNoHistory(function(){
                             CheckSpPrXfrm2(item.GraphicObj);
                         }, this, []);
                     }
@@ -5835,8 +5835,8 @@ function BinaryFileReader(doc, openParams)
 			fontScheme = m_oLogicDocument.slideMasters[0].Theme.themeElements.fontScheme;
 		else
 			fontScheme = oDocument.theme.themeElements.fontScheme;
-		
-		checkThemeFonts(AllFonts, fontScheme);
+
+      AscFormat.checkThemeFonts(AllFonts, fontScheme);
 		
         for (var i in AllFonts)
             aPrepeareFonts.push(new CFont(i, 0, "", 0));
@@ -6264,7 +6264,7 @@ function Binary_pPrReader(doc, oReadResult, stream)
 				if(null != unifill)
 					pPr.Shd.Unifill = unifill;
 				else if (null != pPr.Shd.Color && !pPr.Shd.Color.Auto)
-				    pPr.Shd.Unifill = CreteSolidFillRGB(pPr.Shd.Color.r, pPr.Shd.Color.g, pPr.Shd.Color.b);
+				    pPr.Shd.Unifill = AscFormat.CreteSolidFillRGB(pPr.Shd.Color.r, pPr.Shd.Color.g, pPr.Shd.Color.b);
                 break;
             case c_oSerProp_pPrType.WidowControl:
 				pPr.WidowControl = this.stream.GetBool();
@@ -6390,7 +6390,7 @@ function Binary_pPrReader(doc, oReadResult, stream)
 			if(null != unifill)
 				Border.Unifill = unifill;
 			else if (null != Border.Color && !Border.Color.Auto)
-			    Border.Unifill = CreteSolidFillRGB(Border.Color.r, Border.Color.g, Border.Color.b);
+			    Border.Unifill = AscFormat.CreteSolidFillRGB(Border.Color.r, Border.Color.g, Border.Color.b);
         }
         else
             res = c_oSerConstants.ReadUnknown;
@@ -6979,7 +6979,7 @@ function Binary_rPrReader(doc, oReadResult, stream)
 				if(null != unifill)
 					rPr.Unifill = unifill;
 				else if (null != rPr.Color && !rPr.Color.Auto)
-				    rPr.Unifill = CreteSolidFillRGB(rPr.Color.r, rPr.Color.g, rPr.Color.b);
+				    rPr.Unifill = AscFormat.CreteSolidFillRGB(rPr.Color.r, rPr.Color.g, rPr.Color.b);
 				break;
             case c_oSerProp_rPrType.Shd:
                 rPr.Shd = new CDocumentShd();
@@ -6993,7 +6993,7 @@ function Binary_rPrReader(doc, oReadResult, stream)
                 if (null != unifill)
                     rPr.Shd.Unifill = unifill;
                 else if (null != rPr.Shd.Color && !rPr.Shd.Color.Auto)
-                    rPr.Shd.Unifill = CreteSolidFillRGB(rPr.Shd.Color.r, rPr.Shd.Color.g, rPr.Shd.Color.b);
+                    rPr.Shd.Unifill = AscFormat.CreteSolidFillRGB(rPr.Shd.Color.r, rPr.Shd.Color.g, rPr.Shd.Color.b);
                 break;
 			case c_oSerProp_rPrType.Vanish:
                 rPr.Vanish = this.stream.GetBool();
@@ -7116,7 +7116,7 @@ Binary_tblPrReader.prototype =
 			if(null != unifill)
 				Pr.Shd.Unifill = unifill;
 			else if (null != Pr.Shd.Color && !Pr.Shd.Color.Auto)
-			    Pr.Shd.Unifill = CreteSolidFillRGB(Pr.Shd.Color.r, Pr.Shd.Color.g, Pr.Shd.Color.b);
+			    Pr.Shd.Unifill = AscFormat.CreteSolidFillRGB(Pr.Shd.Color.r, Pr.Shd.Color.g, Pr.Shd.Color.b);
         }
 		else if( c_oSerProp_tblPrType.Layout === type )
 		{
@@ -7477,7 +7477,7 @@ Binary_tblPrReader.prototype =
 			if(null != unifill)
 				oNewShd.Unifill = unifill;
 			else if (null != oNewShd.Color && !oNewShd.Color.Auto)
-			    oNewShd.Unifill = CreteSolidFillRGB(oNewShd.Color.r, oNewShd.Color.g, oNewShd.Color.b);
+			    oNewShd.Unifill = AscFormat.CreteSolidFillRGB(oNewShd.Color.r, oNewShd.Color.g, oNewShd.Color.b);
             //если есть themeColor или Color, то Value по умолчанию ShdClear(Тарифы_на_комплексное_обслуживание_клиен.docx)
             if (undefined == oNewShd.Value && oNewShd.Unifill) {
                 oNewShd.Value = Asc.c_oAscShdClear;

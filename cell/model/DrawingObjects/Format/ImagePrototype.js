@@ -127,7 +127,7 @@ CImageShape.prototype.recalculate = function ()
 {
     if(this.bDeleted)
         return;
-    ExecuteNoHistory(function(){
+    AscFormat.ExecuteNoHistory(function(){
     if (this.recalcInfo.recalculateBrush) {
         this.recalculateBrush();
         this.recalcInfo.recalculateBrush = false;

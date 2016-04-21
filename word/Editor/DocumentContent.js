@@ -9068,7 +9068,7 @@ CDocumentContent.prototype =
         Writer.WriteString2( this.Parent.Get_Id() );
         Writer.WriteBool(this.TurnOffInnerWrap);
         Writer.WriteBool(this.Split);
-        writeBool(Writer, this.bPresentation);
+        AscFormat.writeBool(Writer, this.bPresentation);
 
 
         var ContentToWrite;
@@ -9123,7 +9123,7 @@ CDocumentContent.prototype =
         LinkData.Parent         = Reader.GetString2();
         this.TurnOffInnerWrap   = Reader.GetBool();
         this.Split              = Reader.GetBool();
-        this.bPresentation      = readBool(Reader);
+        this.bPresentation      = AscFormat.readBool(Reader);
 
         var Count = Reader.GetLong();
         this.Content = [];

@@ -80,9 +80,9 @@ function OverlayObject(geometry, extX, extY, brush, pen, transform )
 				_shape.extX = this.ext.cx;
 				_shape.extY = this.ext.cy;
 				
-				_shape.brush = CreateSolidFillRGBA(255, 255, 255, 128);
-				_shape.pen = new CLn();
-				_shape.pen.Fill = CreateSolidFillRGBA(0, 0, 0, 160);
+				_shape.brush = AscFormat.CreateSolidFillRGBA(255, 255, 255, 128);
+				_shape.pen = new AscFormat.CLn();
+				_shape.pen.Fill = AscFormat.CreateSolidFillRGBA(0, 0, 0, 160);
 				_shape.pen.w = 18000;
 				
 				overlay.SaveGrState();
@@ -191,7 +191,7 @@ ObjectToDraw.prototype =
         this.brush = brush;
         this.pen = pen;
 
-        if(isRealNumber(x) && isRealNumber(y))
+        if(AscFormat.isRealNumber(x) && AscFormat.isRealNumber(y))
         {
             this.x = x;
             this.y = y;
@@ -200,7 +200,7 @@ ObjectToDraw.prototype =
 
     Recalculate: function(oTheme, oColorMap, dWidth, dHeight, oShape)
     {
-       // if(isRealNumber(this.x) && isRealNumber(this.y))
+       // if(AscFormat.isRealNumber(this.x) && AscFormat.isRealNumber(this.y))
        // {
        //     if(Math.abs(dWidth - this.extX) > MOVE_DELTA || Math.abs(dHeight - this.extY))
        //     {
@@ -321,7 +321,7 @@ function RotateTrackShapeImage(originalObject)
     this.signum = !full_flip_h && !full_flip_v || full_flip_h && full_flip_v ? 1 : -1;
     this.draw = function(overlay, transform)
     {
-        if(isRealNumber(this.originalObject.selectStartPage) && overlay.SetCurrentPage)
+        if(AscFormat.isRealNumber(this.originalObject.selectStartPage) && overlay.SetCurrentPage)
         {
             overlay.SetCurrentPage(this.originalObject.selectStartPage);
         }
@@ -455,7 +455,7 @@ function RotateTrackGroup(originalObject)
 
     this.draw = function(overlay)
     {
-        if(isRealNumber(this.originalObject.selectStartPage) && overlay.SetCurrentPage)
+        if(AscFormat.isRealNumber(this.originalObject.selectStartPage) && overlay.SetCurrentPage)
         {
             overlay.SetCurrentPage(this.originalObject.selectStartPage);
         }

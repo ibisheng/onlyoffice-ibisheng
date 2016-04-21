@@ -2958,11 +2958,11 @@
 					{
 						offX = 0;
 						offY = 0;
-						rot = isRealNumber(xfrm.rot) ? xfrm.rot : 0;
+						rot = AscFormat.isRealNumber(xfrm.rot) ? xfrm.rot : 0;
 						rot = normalizeRotate(rot);
 						if (checkNormalRotate(rot))
 						{
-							if(isRealNumber(xfrm.offX) && isRealNumber(xfrm.offY))
+							if(AscFormat.isRealNumber(xfrm.offX) && AscFormat.isRealNumber(xfrm.offY))
 							{
 								offX = xfrm.offX;
 								offY = xfrm.offY;
@@ -2970,8 +2970,8 @@
 						}
 						else
 						{
-							if(isRealNumber(xfrm.offX) && isRealNumber(xfrm.offY)
-							&& isRealNumber(xfrm.extX) && isRealNumber(xfrm.extY))
+							if(AscFormat.isRealNumber(xfrm.offX) && AscFormat.isRealNumber(xfrm.offY)
+							&& AscFormat.isRealNumber(xfrm.extX) && AscFormat.isRealNumber(xfrm.extY))
 							{
 								offX = xfrm.offX + xfrm.extX/2 - xfrm.extY/2;
 								offY = xfrm.offY + xfrm.extY/2 - xfrm.extX/2;
@@ -3242,11 +3242,11 @@
 						xfrm = drawingObject.graphicObject.spPr.xfrm;
 						offX = 0;
 						offY = 0;
-						rot = isRealNumber(xfrm.rot) ? xfrm.rot : 0;
+						rot = AscFormat.isRealNumber(xfrm.rot) ? xfrm.rot : 0;
 						rot = normalizeRotate(rot);
 						if (checkNormalRotate(rot))
 						{
-							if(isRealNumber(xfrm.offX) && isRealNumber(xfrm.offY))
+							if(AscFormat.isRealNumber(xfrm.offX) && AscFormat.isRealNumber(xfrm.offY))
 							{
 								offX = xfrm.offX;
 								offY = xfrm.offY;
@@ -3254,8 +3254,8 @@
 						}
 						else
 						{
-							if(isRealNumber(xfrm.offX) && isRealNumber(xfrm.offY)
-								&& isRealNumber(xfrm.extX) && isRealNumber(xfrm.extY))
+							if(AscFormat.isRealNumber(xfrm.offX) && AscFormat.isRealNumber(xfrm.offY)
+								&& AscFormat.isRealNumber(xfrm.extX) && AscFormat.isRealNumber(xfrm.extY))
 							{
 								offX = xfrm.offX + xfrm.extX/2 - xfrm.extY/2;
 								offY = xfrm.offY + xfrm.extY/2 - xfrm.extX/2;

@@ -5,12 +5,12 @@ var g_oTableId = AscCommon.g_oTableId;
 
 function Slide(presentation, slideLayout, slideNum)
 {
-    this.kind = SLIDE_KIND;
+    this.kind = AscFormat.TYPE_KIND.SLIDE;
 
     this.presentation = editor && editor.WordControl && editor.WordControl.m_oLogicDocument;
     this.graphicObjects = new DrawingObjectsController(this);
     this.maxId = 0;
-    this.cSld = new CSld();
+    this.cSld = new AscFormat.CSld();
     this.clrMap = null; // override ClrMap
 
     this.show = true;
@@ -105,15 +105,15 @@ Slide.prototype =
         {
             copy.setClMapOverride(this.clrMap.createDuplicate());
         }
-        if(isRealBool(this.show))
+        if(AscFormat.isRealBool(this.show))
         {
             copy.setShow(this.show);
         }
-        if(isRealBool(this.showMasterPhAnim))
+        if(AscFormat.isRealBool(this.showMasterPhAnim))
         {
             copy.setShowPhAnim(this.showMasterPhAnim);
         }
-        if(isRealBool(this.showMasterSp))
+        if(AscFormat.isRealBool(this.showMasterSp))
         {
             copy.setShowMasterSp(this.showMasterSp);
         }
@@ -180,13 +180,13 @@ Slide.prototype =
         var _input_reduced_type;
         if(type == null)
         {
-            _input_reduced_type = phType_body;
+            _input_reduced_type = AscFormat.phType_body;
         }
         else
         {
-            if(type == phType_ctrTitle)
+            if(type == AscFormat.phType_ctrTitle)
             {
-                _input_reduced_type = phType_title;
+                _input_reduced_type = AscFormat.phType_title;
             }
             else
             {
@@ -233,13 +233,13 @@ Slide.prototype =
                 }
                 if(_type == null)
                 {
-                    _final_type = phType_body;
+                    _final_type = AscFormat.phType_body;
                 }
                 else
                 {
-                    if(_type == phType_ctrTitle)
+                    if(_type == AscFormat.phType_ctrTitle)
                     {
-                        _final_type = phType_title;
+                        _final_type = AscFormat.phType_title;
                     }
                     else
                     {
@@ -260,11 +260,11 @@ Slide.prototype =
                 {
                     return _glyph;
                 }
-                if(_input_reduced_type == phType_title && _input_reduced_type == _final_type)
+                if(_input_reduced_type == AscFormat.phType_title && _input_reduced_type == _final_type)
                 {
                     return _glyph;
                 }
-                if(phType_body === _type)
+                if(AscFormat.phType_body === _type)
                 {
                     ++body_count;
                     last_body = _glyph;
@@ -273,7 +273,7 @@ Slide.prototype =
         }
 
 
-        if(_input_reduced_type == phType_sldNum || _input_reduced_type == phType_dt || _input_reduced_type == phType_ftr || _input_reduced_type == phType_hdr)
+        if(_input_reduced_type == AscFormat.phType_sldNum || _input_reduced_type == AscFormat.phType_dt || _input_reduced_type == AscFormat.phType_ftr || _input_reduced_type == AscFormat.phType_hdr)
         {
             for(_shape_index = 0; _shape_index < _sp_tree.length; ++_shape_index)
             {
@@ -301,7 +301,7 @@ Slide.prototype =
             }
         }
 
-        if(body_count === 1 && type === phType_body && bSingleBody)
+        if(body_count === 1 && type === AscFormat.phType_body && bSingleBody)
         {
             return last_body;
         }
@@ -557,19 +557,19 @@ Slide.prototype =
             case AscDFH.historyitem_SlideSetLayout:
             case AscDFH.historyitem_SlideSetClrMapOverride:
             {
-                writeObject(w, data.newPr);
+                AscFormat.writeObject(w, data.newPr);
                 break;
             }
             case AscDFH.historyitem_SlideSetShow:
             case AscDFH.historyitem_SlideSetShowPhAnim:
             case AscDFH.historyitem_SlideSetShowMasterSp:
             {
-                writeBool(w, data.newPr);
+                AscFormat.writeBool(w, data.newPr);
                 break;
             }
             case AscDFH.historyitem_SlideSetNum:
             {
-                writeLong(w, data.newPr);
+                AscFormat.writeLong(w, data.newPr);
                 break;
             }
             case AscDFH.historyitem_SlideSetTiming:
@@ -580,35 +580,35 @@ Slide.prototype =
             }
             case AscDFH.historyitem_SlideSetSize:
             {
-                writeDouble(w, data.newW);
-                writeDouble(w, data.newH);
+                AscFormat.writeDouble(w, data.newW);
+                AscFormat.writeDouble(w, data.newH);
                 break;
             }
             case AscDFH.historyitem_SlideSetLocks:
             {
-                writeObject(w, data.deleteLock    );
-                writeObject(w, data.backgroundLock);
-                writeObject(w, data.timingLock    );
-                writeObject(w, data.transitionLock);
-                writeObject(w, data.layoutLock    );
+                AscFormat.writeObject(w, data.deleteLock    );
+                AscFormat.writeObject(w, data.backgroundLock);
+                AscFormat.writeObject(w, data.timingLock    );
+                AscFormat.writeObject(w, data.transitionLock);
+                AscFormat.writeObject(w, data.layoutLock    );
                 break;
             }
             case AscDFH.historyitem_SlideAddToSpTree:
             {
                 var Pos = data.UseArray ? data.PosArray[0] : data.Pos;
-                writeLong(w, Pos);
-                writeObject(w, data.Item);
+                AscFormat.writeLong(w, Pos);
+                AscFormat.writeObject(w, data.Item);
                 break;
             }
             case AscDFH.historyitem_SlideRemoveFromSpTree:
             {
                 var Pos = data.UseArray ? data.PosArray[0] : data.Pos;
-                writeLong(w, data.Pos);
+                AscFormat.writeLong(w, data.Pos);
                 break;
             }
             case AscDFH.historyitem_SlideSetCSldName:
             {
-                writeString(w, data.newPr);
+                AscFormat.writeString(w, data.newPr);
                 break;
             }
         }
@@ -621,32 +621,32 @@ Slide.prototype =
         {
             case AscDFH.historyitem_SlideSetComments:
             {
-                this.slideComments = readObject(r);
+                this.slideComments = AscFormat.readObject(r);
                 break;
             }
             case AscDFH.historyitem_SlideSetShow:
             {
-                this.show = readBool(r);
+                this.show = AscFormat.readBool(r);
                 break;
             }
             case AscDFH.historyitem_SlideSetShowPhAnim:
             {
-                this.showMasterPhAnim = readBool(r);
+                this.showMasterPhAnim = AscFormat.readBool(r);
                 break;
             }
             case AscDFH.historyitem_SlideSetShowMasterSp:
             {
-                this.showMasterSp = readBool(r);
+                this.showMasterSp = AscFormat.readBool(r);
                 break;
             }
             case AscDFH.historyitem_SlideSetLayout:
             {
-                this.Layout = readObject(r);
+                this.Layout = AscFormat.readObject(r);
                 break;
             }
             case AscDFH.historyitem_SlideSetNum:
             {
-                this.num = readLong(r);
+                this.num = AscFormat.readLong(r);
                 break;
             }
             case AscDFH.historyitem_SlideSetTiming:
@@ -657,13 +657,13 @@ Slide.prototype =
             }
             case AscDFH.historyitem_SlideSetSize:
             {
-                this.Width  = readDouble(r);
-                this.Height = readDouble(r);
+                this.Width  = AscFormat.readDouble(r);
+                this.Height = AscFormat.readDouble(r);
                 break;
             }
             case AscDFH.historyitem_SlideSetBg:
             {
-                this.cSld.Bg = new CBg();
+                this.cSld.Bg = new AscFormat.CBg();
                 this.cSld.Bg.Read_FromBinary(r);
                 this.recalcInfo.recalculateBackground = true;
                 var Fill;
@@ -682,24 +682,24 @@ Slide.prototype =
             }
             case AscDFH.historyitem_SlideSetLocks:
             {
-                this.deleteLock     = readObject(r);
-                this.backgroundLock = readObject(r);
-                this.timingLock     = readObject(r);
-                this.transitionLock = readObject(r);
-                this.layoutLock     = readObject(r);
+                this.deleteLock     = AscFormat.readObject(r);
+                this.backgroundLock = AscFormat.readObject(r);
+                this.timingLock     = AscFormat.readObject(r);
+                this.transitionLock = AscFormat.readObject(r);
+                this.layoutLock     = AscFormat.readObject(r);
                 break;
             }
             case AscDFH.historyitem_SlideAddToSpTree:
             {
-                var Pos = readLong(r);
-                var Item = readObject(r);
+                var Pos = AscFormat.readLong(r);
+                var Item = AscFormat.readObject(r);
                 var ChangesPos = this.m_oContentChanges.Check( AscCommon.contentchanges_Add, Pos );
                 this.cSld.spTree.splice(ChangesPos, 0, Item);
                 break;
             }
             case AscDFH.historyitem_SlideRemoveFromSpTree:
             {
-                var Pos = readLong(r);
+                var Pos = AscFormat.readLong(r);
                 var ChangesPos = this.m_oContentChanges.Check( AscCommon.contentchanges_Remove, Pos );
                 if(!(ChangesPos === false))
                 {
@@ -709,12 +709,12 @@ Slide.prototype =
             }
             case AscDFH.historyitem_SlideSetCSldName:
             {
-                this.cSld.name = readString(r);
+                this.cSld.name = AscFormat.readString(r);
                 break;
             }
             case AscDFH.historyitem_SlideSetClrMapOverride:
             {
-                this.clrMap = readObject(r);
+                this.clrMap = AscFormat.readObject(r);
                 this.recalcInfo.recalculateBackground = true;
                 this.recalcInfo.recalculateSpTree = true;
                 break;
@@ -793,7 +793,7 @@ Slide.prototype =
     shapeAdd: function(pos, item)
     {
         this.checkDrawingUniNvPr(item);
-        var _pos = isRealNumber(pos) ? pos : this.cSld.spTree.length;
+        var _pos = AscFormat.isRealNumber(pos) ? pos : this.cSld.spTree.length;
         History.Add(this, {Type: AscDFH.historyitem_SlideAddToSpTree, Pos: _pos, Item: item});
         this.cSld.spTree.splice(_pos, 0, item);
     },
@@ -813,7 +813,7 @@ Slide.prototype =
                 {
                     if(!drawing.nvGrpSpPr)
                     {
-                        nv_sp_pr = new UniNvPr();
+                        nv_sp_pr = new AscFormat.UniNvPr();
                         nv_sp_pr.cNvPr.setId(++this.maxId);
                         drawing.setNvSpPr(nv_sp_pr);
                     }
@@ -827,7 +827,7 @@ Slide.prototype =
                 {
                     if(!drawing.nvPicPr)
                     {
-                        nv_sp_pr = new UniNvPr();
+                        nv_sp_pr = new AscFormat.UniNvPr();
                         nv_sp_pr.cNvPr.setId(++this.maxId);
                         drawing.setNvSpPr(nv_sp_pr);
                     }
@@ -837,7 +837,7 @@ Slide.prototype =
                 {
                     if(!drawing.nvSpPr)
                     {
-                        nv_sp_pr = new UniNvPr();
+                        nv_sp_pr = new AscFormat.UniNvPr();
                         nv_sp_pr.cNvPr.setId(++this.maxId);
                         drawing.setNvSpPr(nv_sp_pr);
                     }
@@ -904,7 +904,7 @@ Slide.prototype =
 
     getAllImages: function(images)
     {
-        if(this.cSld.Bg && this.cSld.Bg.bgPr && this.cSld.Bg.bgPr.Fill && this.cSld.Bg.bgPr.Fill.fill instanceof  CBlipFill && typeof this.cSld.Bg.bgPr.Fill.fill.RasterImageId === "string" )
+        if(this.cSld.Bg && this.cSld.Bg.bgPr && this.cSld.Bg.bgPr.Fill && this.cSld.Bg.bgPr.Fill.fill instanceof  AscFormat.CBlipFill && typeof this.cSld.Bg.bgPr.Fill.fill.RasterImageId === "string" )
         {
             images[AscCommon.getFullImageSrc2(this.cSld.Bg.bgPr.Fill.fill.RasterImageId)] = true;
         }
@@ -981,7 +981,7 @@ Slide.prototype =
 
     recalculate: function()
     {
-        if(!this.Layout || !isRealNumber(this.num))
+        if(!this.Layout || !AscFormat.isRealNumber(this.num))
         {
             return;
         }
@@ -1047,10 +1047,10 @@ Slide.prototype =
                     }
                     else
                     {
-                        _back_fill = new CUniFill();
-                        _back_fill.fill = new CSolidFill();
-                        _back_fill.fill.color =  new CUniColor();
-                        _back_fill.fill.color.color = new CRGBColor();
+                        _back_fill = new AscFormat.CUniFill();
+                        _back_fill.fill = new AscFormat.CSolidFill();
+                        _back_fill.fill.color =  new AscFormat.CUniColor();
+                        _back_fill.fill.color.color = new AscFormat.CRGBColor();
                         _back_fill.fill.color.color.RGBA = {R:255, G:255, B:255, A:255};
                     }
                 }
@@ -1457,7 +1457,7 @@ PropLocker.prototype = {
         {
             case AscDFH.historyitem_PropLockerSetId:
             {
-                writeString(w, data.newId);
+                AscFormat.writeString(w, data.newId);
                 break;
             }
         }
@@ -1470,7 +1470,7 @@ PropLocker.prototype = {
         {
             case AscDFH.historyitem_PropLockerSetId:
             {
-                this.objectId = readString(r);
+                this.objectId = AscFormat.readString(r);
                 break;
             }
         }
@@ -1626,13 +1626,13 @@ SlideComments.prototype =
     {
         w.WriteLong(AscDFH.historyitem_type_SlideComments);
         w.WriteString2(this.Id);
-        writeObject(w, this.slide);
+        AscFormat.writeObject(w, this.slide);
     },
 
     Read_FromBinary2: function(r)
     {
         this.Id = r.GetString2();
-        this.slide = readObject(r);
+        this.slide = AscFormat.readObject(r);
     },
 
     Refresh_RecalcData: function()

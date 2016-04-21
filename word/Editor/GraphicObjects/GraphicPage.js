@@ -327,7 +327,7 @@ CGraphicPage.prototype =
                 _extensions = {extX: 0, extY: 0};
 
 
-            this.drawingDocument.DrawTrack(TYPE_TRACK_SHAPE , _transform, 0, 0, _extensions.extX, _extensions.extY, /*shape.geometry ? shape.geometry.preset == "line"  : false*/false);
+            this.drawingDocument.DrawTrack(AscFormat.TYPE_TRACK.SHAPE , _transform, 0, 0, _extensions.extX, _extensions.extY, /*shape.geometry ? shape.geometry.preset == "line"  : false*/false);
         }
     },
 

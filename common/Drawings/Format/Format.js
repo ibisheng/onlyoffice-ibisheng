@@ -1,5 +1,12 @@
 "use strict";
 
+(
+/**
+* @param {Window} window
+* @param {undefined} undefined
+*/
+function (window, undefined) {
+
 // Import
 var CreateAscColor = AscCommon.CreateAscColor;
 var g_oIdCounter = AscCommon.g_oIdCounter;
@@ -334,17 +341,18 @@ function checkTableCellPr(cellPr, slide, layout, master, theme)
     return cellPr;
 }
 
-
-var TYPE_TRACK_SHAPE = 0;
-var TYPE_TRACK_GROUP = TYPE_TRACK_SHAPE;
-var TYPE_TRACK_GROUP_PASSIVE = 1;
-var TYPE_TRACK_TEXT = 2;
-var TYPE_TRACK_EMPTY_PH = 3;
-var TYPE_TRACK_CHART = 4;
-
-var SLIDE_KIND = 0;
-var LAYOUT_KIND = 1;
-var MASTER_KIND = 2;
+var TYPE_TRACK = {
+    SHAPE : 0,
+    GROUP : 0,
+    GROUP_PASSIVE : 1,
+    TEXT : 2,
+    EMPTY_PH : 3
+};
+var TYPE_KIND = {
+    SLIDE : 0,
+    LAYOUT : 1,
+    MASTER : 2
+};
 
 var map_prst_color = {};
 
@@ -538,14 +546,6 @@ map_prst_color["white"] = 			0xFFFFFF;
 map_prst_color["whiteSmoke"] = 		0xF5F5F5;
 map_prst_color["yellow"] = 			0xFFFF00;
 map_prst_color["yellowGreen"] = 	0x9ACD32;
-
-
-
-
-
-
-
-
 
 function CColorMod()
 {
@@ -1392,7 +1392,7 @@ CSchemeColor.prototype =
                 }
                 else
                 {
-                    clrMap = DEFAULT_COLOR_MAP.color_map;
+                    clrMap = AscFormat.DEFAULT_COLOR_MAP.color_map;
                 }
                 if (clrMap[this.id]!=null && theme.themeElements.clrScheme.colors[clrMap[this.id]] != null)
                     this.RGBA = theme.themeElements.clrScheme.colors[clrMap[this.id]].color.RGBA;
@@ -1856,22 +1856,6 @@ CSrcRect.prototype =
     }
 };
 
-
-var TILE_FLIP_MODE_NONE = 0;
-var TILE_FLIP_MODE_X    = 1;
-var TILE_FLIP_MODE_Y    = 2;
-var TILE_FLIP_MODE_XY   = 3;
-
-var TILE_RECT_ALIGN_B    = 0;
-var TILE_RECT_ALIGN_BL   = 1;
-var TILE_RECT_ALIGN_BR   = 2;
-var TILE_RECT_ALIGN_CTR  = 3;
-var TILE_RECT_ALIGN_L    = 4;
-var TILE_RECT_ALIGN_R    = 5;
-var TILE_RECT_ALIGN_T    = 6;
-var TILE_RECT_ALIGN_TL   = 7;
-var TILE_RECT_ALIGN_TR   = 8;
-
 function CBlipFillTile()
 {
     this.tx = null;
@@ -1899,7 +1883,6 @@ CBlipFillTile.prototype.Read_FromBinary = function(r)
     this.flip = readLong(r);
     this.algn = readLong(r);
 };
-
 CBlipFillTile.prototype.createDuplicate = function()
 {
     var ret = new CBlipFillTile();
@@ -1911,8 +1894,6 @@ CBlipFillTile.prototype.createDuplicate = function()
     ret.algn = this.algn;
     return ret;
 };
-
-
 CBlipFillTile.prototype.IsIdentical = function(o)
 {
     if(!o)
@@ -4793,24 +4774,6 @@ NvPr.prototype =
     }
 };
 
-//типы плейсхолдеров
-var phType_body     = 0,
-    phType_chart    = 1,
-    phType_clipArt  = 2, //(Clip Art)
-    phType_ctrTitle = 3, //(Centered Title)
-    phType_dgm      = 4, //(Diagram)
-    phType_dt       = 5, //(Date and Time)
-    phType_ftr      = 6, //(Footer)
-    phType_hdr      = 7, //(Header)
-    phType_media    = 8, //(Media)
-    phType_obj      = 9, //(Object)
-    phType_pic      = 10, //(Picture)
-    phType_sldImg   = 11, //(Slide Image)
-    phType_sldNum   = 12, //(Slide Number)
-    phType_subTitle = 13, //(Subtitle)
-    phType_tbl      = 14, //(Table)
-    phType_title    = 15; //(Title)
-
 var szPh_full    = 0,
     szPh_half    = 1,
     szPh_quarter = 2;
@@ -5485,13 +5448,9 @@ StyleRef.prototype =
     }
 };
 
-var fntStyleInd_none = 2;
-var fntStyleInd_major = 0;
-var fntStyleInd_minor = 1;
-
 function FontRef()
 {
-    this.idx = fntStyleInd_none;
+    this.idx = AscFormat.fntStyleInd_none;
     this.Color = null;//new CUniColor();
 
 
@@ -5958,7 +5917,7 @@ function CreateDefaultShapeStyle(preset)
     unicolor = new CUniColor();
     unicolor.setColor(new CSchemeColor());
     unicolor.color.setId(tx_color ? 15 : 12);
-    fontRef.setIdx(fntStyleInd_minor);
+    fontRef.setIdx(AscFormat.fntStyleInd_minor);
     fontRef.setColor(unicolor);
     style.setFontRef(fontRef);
     return style;
@@ -9160,9 +9119,7 @@ var nSldLtTVertTitleAndTx          = 33; //Vertical Title and Text)
 var nSldLtTVertTitleAndTxOverChart = 34; //Vertical Title and Text Over Chart)
 var nSldLtTVertTx                  = 35; //Vertical Text)
 
-
-
-
+var _ph_multiplier = 4;
 
 var _weight_body = 9;
 var _weight_chart = 5;
@@ -9175,8 +9132,6 @@ var _weight_pic = 7;
 var _weight_subTitle = 10;
 var _weight_tbl = 6;
 var _weight_title = 11;
-
-var _ph_multiplier = 4;
 
 var _ph_summ_blank = 0;
 var _ph_summ_chart = Math.pow(_ph_multiplier, _weight_title) + Math.pow(_ph_multiplier, _weight_chart);
@@ -9405,15 +9360,6 @@ CTextFit.prototype =
     {}
 };
 
-// ----------------------------------
-
-
-var VERTICAL_ANCHOR_TYPE_BOTTOM = 0;
-var VERTICAL_ANCHOR_TYPE_CENTER = 1;
-var VERTICAL_ANCHOR_TYPE_DISTRIBUTED = 2;
-var VERTICAL_ANCHOR_TYPE_JUSTIFIED = 3;
-var VERTICAL_ANCHOR_TYPE_TOP = 4;
-
 //Overflow Types
 var nOTClip     = 0;
 var nOTEllipsis = 1;
@@ -9426,23 +9372,6 @@ var nTextATCtr = 1;// (Text Anchor Enum ( Center ))
 var nTextATDist = 2;// (Text Anchor Enum ( Distributed ))
 var nTextATJust = 3;// (Text Anchor Enum ( Justified ))
 var nTextATT = 4;// Top
-
-//Vertical Text Types
-var nVertTTeaVert          = 0; //( ( East Asian Vertical ))
-var nVertTThorz            = 1; //( ( Horizontal ))
-var nVertTTmongolianVert   = 2; //( ( Mongolian Vertical ))
-var nVertTTvert            = 3; //( ( Vertical ))
-var nVertTTvert270         = 4;//( ( Vertical 270 ))
-var nVertTTwordArtVert     = 5;//( ( WordArt Vertical ))
-var nVertTTwordArtVertRtl  = 6;//(Vertical WordArt Right to Left)
-//-------------------------------------------------------------------
-//Text Wrapping Types
-var nTWTNone   = 0;
-var nTWTSquare = 1;
-
-var text_fit_No         = 0;
-var text_fit_Auto       = 1;
-var text_fit_NormAuto   = 2;
 
 function CBodyPr()
 {
@@ -9918,9 +9847,9 @@ CBodyPr.prototype =
         this.spcFirstLastPara = null;
         this.tIns           = 45720/36000;
         this.upright        = false;
-        this.vert           = nVertTThorz;
+        this.vert           = AscFormat.nVertTThorz;
         this.vertOverflow   = nOTOwerflow;
-        this.wrap           = nTWTSquare;
+        this.wrap           = AscFormat.nTWTSquare;
         this.prstTxWarp     = null;
     },
 
@@ -10589,13 +10518,9 @@ CBullet.prototype =
 
 };
 
-var BULLET_TYPE_COLOR_NONE	= 0;
-var BULLET_TYPE_COLOR_CLRTX	= 1;
-var BULLET_TYPE_COLOR_CLR	= 2;
-
 function CBulletColor()
 {
-    this.type = BULLET_TYPE_COLOR_NONE;
+    this.type = AscFormat.BULLET_TYPE_COLOR_NONE;
     this.UniColor = null;
 
 }
@@ -10659,14 +10584,9 @@ CBulletColor.prototype =
     }
 };
 
-var BULLET_TYPE_SIZE_NONE	= 0;
-var BULLET_TYPE_SIZE_TX		= 1;
-var BULLET_TYPE_SIZE_PCT	= 2;
-var BULLET_TYPE_SIZE_PTS	= 3;
-
 function CBulletSize()
 {
-    this.type = BULLET_TYPE_SIZE_NONE;
+    this.type = AscFormat.BULLET_TYPE_SIZE_NONE;
     this.val = 0;
 
 }
@@ -10718,16 +10638,10 @@ CBulletSize.prototype =
     }
 };
 
-var BULLET_TYPE_TYPEFACE_NONE	= 0;
-var BULLET_TYPE_TYPEFACE_TX		= 1;
-var BULLET_TYPE_TYPEFACE_BUFONT	= 2;
-
 function CBulletTypeface()
 {
-    this.type = BULLET_TYPE_TYPEFACE_NONE;
+    this.type = AscFormat.BULLET_TYPE_TYPEFACE_NONE;
     this.typeface = "";
-
-
 }
 
 CBulletTypeface.prototype =
@@ -10922,13 +10836,6 @@ TextListStyle.prototype =
     }
 };
 
-var PARRUN_TYPE_NONE      = 0;
-var PARRUN_TYPE_RUN		  = 1;
-var PARRUN_TYPE_FLD		  = 2;
-var PARRUN_TYPE_BR		  = 3;
-var PARRUN_TYPE_TEXT_MATH = 4;
-
-
 // DEFAULT OBJECTS
 function GenerateDefaultTheme(presentation)
 {
@@ -11099,15 +11006,13 @@ function CreateDefaultTextRectStyle()
     unicolor.color.setId(g_clr_accent1);
 
     style.setFontRef(new FontRef());
-    style.fontRef.setIdx(fntStyleInd_minor);
+    style.fontRef.setIdx(AscFormat.fntStyleInd_minor);
     unicolor = new CUniColor();
     unicolor.setColor(new CSchemeColor());
     unicolor.color.setId(8);
     style.fontRef.setColor(unicolor);
     return style;
 }
-
-
 
 function GenerateDefaultColorMap()
 {
@@ -11129,8 +11034,6 @@ function GenerateDefaultColorMap()
     return clrMap;
 
 }
-var DEFAULT_COLOR_MAP = GenerateDefaultColorMap();
-
 
 function CreateAscFill(unifill)
 {
@@ -11861,3 +11764,208 @@ function CorrectUniColor(asc_color, unicolor, flag)
     }
     return ret;
 }
+
+    //----------------------------------------------------------export----------------------------------------------------
+    window['AscFormat'] = window['AscFormat'] || {};
+    window['AscFormat'].CreateFontRef = CreateFontRef;
+    window['AscFormat'].CreatePresetColor = CreatePresetColor;
+    window['AscFormat'].isRealNumber = isRealNumber;
+    window['AscFormat'].isRealBool = isRealBool;
+    window['AscFormat'].writeLong = writeLong;
+    window['AscFormat'].readLong = readLong;
+    window['AscFormat'].writeDouble = writeDouble;
+    window['AscFormat'].readDouble = readDouble;
+    window['AscFormat'].writeBool = writeBool;
+    window['AscFormat'].readBool = readBool;
+    window['AscFormat'].writeString = writeString;
+    window['AscFormat'].readString = readString;
+    window['AscFormat'].writeObject = writeObject;
+    window['AscFormat'].readObject = readObject;
+    window['AscFormat'].checkThemeFonts = checkThemeFonts;
+    window['AscFormat'].ExecuteNoHistory = ExecuteNoHistory;
+    window['AscFormat'].checkTableCellPr = checkTableCellPr;
+    window['AscFormat'].CColorMod = CColorMod;
+    window['AscFormat']._create_mods = _create_mods;
+    window['AscFormat'].CColorModifiers = CColorModifiers;
+    window['AscFormat'].CSysColor = CSysColor;
+    window['AscFormat'].CPrstColor = CPrstColor;
+    window['AscFormat'].CRGBColor = CRGBColor;
+    window['AscFormat'].CSchemeColor = CSchemeColor;
+    window['AscFormat'].CUniColor = CUniColor;
+    window['AscFormat'].CreateUniColorRGB = CreateUniColorRGB;
+    window['AscFormat'].CreteSolidFillRGB = CreteSolidFillRGB;
+    window['AscFormat'].CreateSolidFillRGBA = CreateSolidFillRGBA;
+    window['AscFormat'].CSrcRect = CSrcRect;
+    window['AscFormat'].CBlipFillTile = CBlipFillTile;
+    window['AscFormat'].CBlipFill = CBlipFill;
+    window['AscFormat'].CSolidFill = CSolidFill;
+    window['AscFormat'].CGs = CGs;
+    window['AscFormat'].GradLin = GradLin;
+    window['AscFormat'].GradPath = GradPath;
+    window['AscFormat'].CGradFill = CGradFill;
+    window['AscFormat'].CPattFill = CPattFill;
+    window['AscFormat'].CNoFill = CNoFill;
+    window['AscFormat'].CUniFill = CUniFill;
+    window['AscFormat'].CompareUniFill = CompareUniFill;
+    window['AscFormat'].CompareUnifillBool = CompareUnifillBool;
+    window['AscFormat'].CompareShapeProperties = CompareShapeProperties;
+    window['AscFormat'].EndArrow = EndArrow;
+    window['AscFormat'].ConvertJoinAggType = ConvertJoinAggType;
+    window['AscFormat'].LineJoin = LineJoin;
+    window['AscFormat'].CLn = CLn;
+    window['AscFormat'].DefaultShapeDefinition = DefaultShapeDefinition;
+    window['AscFormat'].CNvPr = CNvPr;
+    window['AscFormat'].NvPr = NvPr;
+    window['AscFormat'].Ph = Ph;
+    window['AscFormat'].UniNvPr = UniNvPr;
+    window['AscFormat'].StyleRef = StyleRef;
+    window['AscFormat'].FontRef = FontRef;
+    window['AscFormat'].CShapeStyle = CShapeStyle;
+    window['AscFormat'].CreateDefaultShapeStyle = CreateDefaultShapeStyle;
+    window['AscFormat'].CXfrm = CXfrm;
+    window['AscFormat'].CSpPr = CSpPr;
+    window['AscFormat'].ClrScheme = ClrScheme;
+    window['AscFormat'].ClrMap = ClrMap;
+    window['AscFormat'].ExtraClrScheme = ExtraClrScheme;
+    window['AscFormat'].FontCollection = FontCollection;
+    window['AscFormat'].FontScheme = FontScheme;
+    window['AscFormat'].FmtScheme = FmtScheme;
+    window['AscFormat'].ThemeElements = ThemeElements;
+    window['AscFormat'].CTheme = CTheme;
+    window['AscFormat'].HF = HF;
+    window['AscFormat'].CBgPr = CBgPr;
+    window['AscFormat'].CBg = CBg;
+    window['AscFormat'].CSld = CSld;
+    window['AscFormat'].CTextStyles = CTextStyles;
+    window['AscFormat'].redrawSlide = redrawSlide;
+    window['AscFormat'].CTextFit = CTextFit;
+    window['AscFormat'].CBodyPr = CBodyPr;
+    window['AscFormat'].CHyperlink = CHyperlink;
+    window['AscFormat'].CTextParagraphPr = CTextParagraphPr;
+    window['AscFormat'].CompareBullets = CompareBullets;
+    window['AscFormat'].CBullet = CBullet;
+    window['AscFormat'].CBulletColor = CBulletColor;
+    window['AscFormat'].CBulletSize = CBulletSize;
+    window['AscFormat'].CBulletTypeface = CBulletTypeface;
+    window['AscFormat'].CBulletType = CBulletType;
+    window['AscFormat'].TextListStyle = TextListStyle;
+    window['AscFormat'].GenerateDefaultTheme = GenerateDefaultTheme;
+    window['AscFormat'].GenerateDefaultMasterSlide = GenerateDefaultMasterSlide;
+    window['AscFormat'].GenerateDefaultSlide = GenerateDefaultSlide;
+    window['AscFormat'].CreateDefaultTextRectStyle = CreateDefaultTextRectStyle;
+    window['AscFormat'].GenerateDefaultColorMap = GenerateDefaultColorMap;
+    window['AscFormat'].CreateAscFill = CreateAscFill;
+    window['AscFormat'].CorrectUniFill = CorrectUniFill;
+    window['AscFormat'].CreateAscStroke = CreateAscStroke;
+    window['AscFormat'].CorrectUniStroke = CorrectUniStroke;
+    window['AscFormat'].CreateAscShapePropFromProp = CreateAscShapePropFromProp;
+    window['AscFormat'].CreateAscTextArtProps = CreateAscTextArtProps;
+    window['AscFormat'].CreateUnifillFromAscColor = CreateUnifillFromAscColor;
+    window['AscFormat'].CorrectUniColor = CorrectUniColor;
+
+    window['AscFormat'].TYPE_TRACK = TYPE_TRACK;
+    window['AscFormat'].TYPE_KIND = TYPE_KIND;
+    window['AscFormat'].ar_arrow = ar_arrow;
+    window['AscFormat'].ar_diamond = ar_diamond;
+    window['AscFormat'].ar_none = ar_none;
+    window['AscFormat'].ar_oval = ar_oval;
+    window['AscFormat'].ar_stealth = ar_stealth;
+    window['AscFormat'].ar_triangle = ar_triangle;
+    window['AscFormat'].LineEndType = LineEndType;
+    window['AscFormat'].LineEndSize = LineEndSize;
+    window['AscFormat'].LineJoinType = LineJoinType;
+
+    //типы плейсхолдеров
+    window['AscFormat'].phType_body     = 0;
+    window['AscFormat'].phType_chart    = 1;
+    window['AscFormat'].phType_clipArt  = 2; //(Clip Art)
+    window['AscFormat'].phType_ctrTitle = 3; //(Centered Title)
+    window['AscFormat'].phType_dgm      = 4; //(Diagram)
+    window['AscFormat'].phType_dt       = 5; //(Date and Time)
+    window['AscFormat'].phType_ftr      = 6; //(Footer)
+    window['AscFormat'].phType_hdr      = 7; //(Header)
+    window['AscFormat'].phType_media    = 8; //(Media)
+    window['AscFormat'].phType_obj      = 9; //(Object)
+    window['AscFormat'].phType_pic      = 10; //(Picture)
+    window['AscFormat'].phType_sldImg   = 11; //(Slide Image)
+    window['AscFormat'].phType_sldNum   = 12; //(Slide Number)
+    window['AscFormat'].phType_subTitle = 13; //(Subtitle)
+    window['AscFormat'].phType_tbl      = 14; //(Table)
+    window['AscFormat'].phType_title    = 15; //(Title)
+
+    window['AscFormat'].fntStyleInd_none = 2;
+    window['AscFormat'].fntStyleInd_major = 0;
+    window['AscFormat'].fntStyleInd_minor = 1;
+
+    window['AscFormat'].VERTICAL_ANCHOR_TYPE_BOTTOM = 0;
+    window['AscFormat'].VERTICAL_ANCHOR_TYPE_CENTER = 1;
+    window['AscFormat'].VERTICAL_ANCHOR_TYPE_DISTRIBUTED = 2;
+    window['AscFormat'].VERTICAL_ANCHOR_TYPE_JUSTIFIED = 3;
+    window['AscFormat'].VERTICAL_ANCHOR_TYPE_TOP = 4;
+
+    //Vertical Text Types
+    window['AscFormat'].nVertTTeaVert          = 0; //( ( East Asian Vertical ))
+    window['AscFormat'].nVertTThorz            = 1; //( ( Horizontal ))
+    window['AscFormat'].nVertTTmongolianVert   = 2; //( ( Mongolian Vertical ))
+    window['AscFormat'].nVertTTvert            = 3; //( ( Vertical ))
+    window['AscFormat'].nVertTTvert270         = 4;//( ( Vertical 270 ))
+    window['AscFormat'].nVertTTwordArtVert     = 5;//( ( WordArt Vertical ))
+    window['AscFormat'].nVertTTwordArtVertRtl  = 6;//(Vertical WordArt Right to Left)
+
+    //Text Wrapping Types
+    window['AscFormat'].nTWTNone   = 0;
+    window['AscFormat'].nTWTSquare = 1;
+
+    window['AscFormat'].text_fit_No         = 0;
+    window['AscFormat'].text_fit_Auto       = 1;
+    window['AscFormat'].text_fit_NormAuto   = 2;
+
+    window['AscFormat'].BULLET_TYPE_COLOR_NONE	= 0;
+    window['AscFormat'].BULLET_TYPE_COLOR_CLRTX	= 1;
+    window['AscFormat'].BULLET_TYPE_COLOR_CLR	= 2;
+
+    window['AscFormat'].BULLET_TYPE_SIZE_NONE	= 0;
+    window['AscFormat'].BULLET_TYPE_SIZE_TX		= 1;
+    window['AscFormat'].BULLET_TYPE_SIZE_PCT	= 2;
+    window['AscFormat'].BULLET_TYPE_SIZE_PTS	= 3;
+
+    window['AscFormat'].BULLET_TYPE_TYPEFACE_NONE	= 0;
+    window['AscFormat'].BULLET_TYPE_TYPEFACE_TX		= 1;
+    window['AscFormat'].BULLET_TYPE_TYPEFACE_BUFONT	= 2;
+
+    window['AscFormat'].PARRUN_TYPE_NONE      = 0;
+    window['AscFormat'].PARRUN_TYPE_RUN		  = 1;
+    window['AscFormat'].PARRUN_TYPE_FLD		  = 2;
+    window['AscFormat'].PARRUN_TYPE_BR		  = 3;
+    window['AscFormat'].PARRUN_TYPE_TEXT_MATH = 4;
+
+    window['AscFormat']._weight_body = _weight_body;
+    window['AscFormat']._weight_chart = _weight_chart;
+    window['AscFormat']._weight_clipArt = _weight_clipArt;
+    window['AscFormat']._weight_ctrTitle = _weight_ctrTitle;
+    window['AscFormat']._weight_dgm = _weight_dgm;
+    window['AscFormat']._weight_media = _weight_media;
+    window['AscFormat']._weight_obj = _weight_obj;
+    window['AscFormat']._weight_pic = _weight_pic;
+    window['AscFormat']._weight_subTitle = _weight_subTitle;
+    window['AscFormat']._weight_tbl = _weight_tbl;
+    window['AscFormat']._weight_title = _weight_title;
+
+    window['AscFormat']._ph_multiplier = _ph_multiplier;
+
+    window['AscFormat'].nSldLtTTitle = nSldLtTTitle;
+    window['AscFormat'].nSldLtTObj = nSldLtTObj;
+    window['AscFormat'].nSldLtTTx = nSldLtTTx;
+
+    window['AscFormat']._arr_lt_types_weight = _arr_lt_types_weight;
+    window['AscFormat']._global_layout_summs_array = _global_layout_summs_array;
+
+    window['AscFormat'].nOTOwerflow = nOTOwerflow;
+
+    window['AscFormat'].BULLET_TYPE_BULLET_NONE = BULLET_TYPE_BULLET_NONE;
+    window['AscFormat'].BULLET_TYPE_BULLET_CHAR = BULLET_TYPE_BULLET_CHAR;
+    window['AscFormat'].BULLET_TYPE_BULLET_AUTONUM = BULLET_TYPE_BULLET_AUTONUM;
+    window['AscFormat'].BULLET_TYPE_BULLET_BLIP = BULLET_TYPE_BULLET_BLIP;
+
+    window['AscFormat'].DEFAULT_COLOR_MAP = GenerateDefaultColorMap();
+})(window);

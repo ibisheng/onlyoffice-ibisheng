@@ -39,7 +39,7 @@ function hitToHandles(x, y, object)
     t_y = invert_transform.TransformPointY(x, y);
     var radius = object.convertPixToMM(TRACK_CIRCLE_RADIUS);
 
-    if(typeof global_mouseEvent !== "undefined" && isRealObject(global_mouseEvent) && isRealNumber(global_mouseEvent.KoefPixToMM))
+    if(typeof global_mouseEvent !== "undefined" && isRealObject(global_mouseEvent) && AscFormat.isRealNumber(global_mouseEvent.KoefPixToMM))
     {
         radius *= global_mouseEvent.KoefPixToMM;
     }
@@ -195,7 +195,7 @@ function getRotateAngle(x, y, object)
 function getBoundsInGroup(shape)
 {
     var r = shape.rot;
-    if (!isRealNumber(r) || checkNormalRotate(r)) {
+    if (!AscFormat.isRealNumber(r) || checkNormalRotate(r)) {
         return { minX: shape.x, minY: shape.y, maxX: shape.x + shape.extX, maxY: shape.y + shape.extY };
     }
     else {
@@ -209,16 +209,16 @@ function getBoundsInGroup(shape)
 
 function CreateUniFillByUniColorCopy(uniColor)
 {
-    var ret = new CUniFill();
-    ret.setFill(new CSolidFill());
+    var ret = new AscFormat.CUniFill();
+    ret.setFill(new AscFormat.CSolidFill());
     ret.fill.setColor(uniColor.createDuplicate());
     return ret;
 }
 
 function CreateUniFillByUniColor(uniColor)
 {
-    var ret = new CUniFill();
-    ret.setFill(new CSolidFill());
+    var ret = new AscFormat.CUniFill();
+    ret.setFill(new AscFormat.CSolidFill());
     ret.fill.setColor(uniColor.createDuplicate());
     return ret;
 }
@@ -497,7 +497,7 @@ function RecalculateDocContentByMaxLine(oDocContent, dMaxWidth, bNeedRecalcAllDr
 
 function CheckExcelDrawingXfrm(xfrm)
 {
-    var rot = isRealNumber(xfrm.rot) ? xfrm.rot : 0;
+    var rot = AscFormat.isRealNumber(xfrm.rot) ? xfrm.rot : 0;
 
     if (checkNormalRotate(rot))
     {
@@ -529,7 +529,7 @@ function CheckExcelDrawingXfrm(xfrm)
 function SetXfrmFromMetrics(oDrawing, metrics)
 {
     CheckSpPrXfrm(oDrawing);
-    var rot = isRealNumber(oDrawing.spPr.xfrm.rot) ? normalizeRotate(oDrawing.spPr.xfrm.rot) : 0;
+    var rot = AscFormat.isRealNumber(oDrawing.spPr.xfrm.rot) ? normalizeRotate(oDrawing.spPr.xfrm.rot) : 0;
 
     var metricExtX, metricExtY;
     if(!(oDrawing instanceof CGroupShape))
@@ -549,7 +549,7 @@ function SetXfrmFromMetrics(oDrawing, metrics)
     }
     else
     {
-        if(isRealNumber(oDrawing.spPr.xfrm.extX) && isRealNumber(oDrawing.spPr.xfrm.extY))
+        if(AscFormat.isRealNumber(oDrawing.spPr.xfrm.extX) && AscFormat.isRealNumber(oDrawing.spPr.xfrm.extY))
         {
             metricExtX = oDrawing.spPr.xfrm.extX;
             metricExtY = oDrawing.spPr.xfrm.extY;
@@ -684,19 +684,19 @@ CShape.prototype =
                     var new_paragraph = ConvertParagraphToWord(cur_par, new_content);
                     new_content.Internal_Content_Add(i, new_paragraph, false);
                     /*var bullet = cur_par.Pr.Bullet;
-                     if(bullet && bullet.bulletType && bullet.bulletType.type !== BULLET_TYPE_BULLET_NONE)
+                     if(bullet && bullet.bulletType && bullet.bulletType.type !== AscFormat.BULLET_TYPE_BULLET_NONE)
                      {
                      switch(bullet.bulletType.type)
                      {
-                     case BULLET_TYPE_BULLET_CHAR:
-                     case BULLET_TYPE_BULLET_BLIP :
+                     case AscFormat.BULLET_TYPE_BULLET_CHAR:
+                     case AscFormat.BULLET_TYPE_BULLET_BLIP :
                      {
                      _bullet.m_nType = numbering_presentationnumfrmt_Char;
                      _bullet.m_sChar = _final_bullet.bulletType.Char[0];
                      _cur_paragraph.Add_PresentationNumbering(_bullet, true);
                      break;
                      }
-                     case BULLET_TYPE_BULLET_AUTONUM :
+                     case AscFormat.BULLET_TYPE_BULLET_AUTONUM :
                      {
                      _bullet.m_nType = g_NumberingArr[_final_bullet.bulletType.AutoNumType];
                      _bullet.m_nStartAt = _final_bullet.bulletType.startAt;
@@ -820,13 +820,13 @@ CShape.prototype =
         var tx_body = new CTextBody();
         tx_body.setParent(this);
         tx_body.setContent(new CDocumentContent(tx_body, this.getDrawingDocument(), 0, 0, 0, 20000, false, false, true));
-        tx_body.setBodyPr(new CBodyPr());
+        tx_body.setBodyPr(new AscFormat.CBodyPr());
         tx_body.content.Content[0].Set_DocumentIndex(0);
         this.setTxBody(tx_body);
     },
 
     createTextBoxContent: function () {
-        var body_pr = new CBodyPr();
+        var body_pr = new AscFormat.CBodyPr();
         body_pr.setAnchor(1);
         this.setBodyPr(body_pr);
         this.setTextBoxContent(new CDocumentContent(this, this.getDrawingDocument(), 0, 0, 0, 20000, false, false));
@@ -917,10 +917,10 @@ CShape.prototype =
     },
 
     getBodyPr: function () {
-        return ExecuteNoHistory(function () {
+        return AscFormat.ExecuteNoHistory(function () {
 
             if (this.bWordShape) {
-                var ret = new CBodyPr();
+                var ret = new AscFormat.CBodyPr();
                 ret.setDefault();
                 if (this.bodyPr)
                     ret.merge(this.bodyPr);
@@ -929,7 +929,7 @@ CShape.prototype =
             else {
                 if (this.txBody && this.txBody.bodyPr)
                     return this.txBody.getCompiledBodyPr();
-                var ret = new CBodyPr();
+                var ret = new AscFormat.CBodyPr();
                 ret.setDefault();
                 return ret;
             }
@@ -1027,7 +1027,7 @@ CShape.prototype =
         var vc = (b - t) * 0.5;
 
         this.getDrawingDocument().Set_RulerState_Paragraph({L: xc - hc, T: yc - vc, R: xc + hc, B: yc + vc});
-        content.Document_UpdateRulersState(isRealNumber(this.selectStartPage) ? this.selectStartPage : 0);
+        content.Document_UpdateRulersState(AscFormat.isRealNumber(this.selectStartPage) ? this.selectStartPage : 0);
     },
 
     setParent: function (parent) {
@@ -1041,7 +1041,7 @@ CShape.prototype =
     },
 
     getAllImages: function (images) {
-        if (this.spPr && this.spPr.Fill && this.spPr.Fill.fill instanceof CBlipFill && typeof this.spPr.Fill.fill.RasterImageId === "string") {
+        if (this.spPr && this.spPr.Fill && this.spPr.Fill.fill instanceof AscFormat.CBlipFill && typeof this.spPr.Fill.fill.RasterImageId === "string") {
             images[AscCommon.getFullImageSrc2(this.spPr.Fill.fill.RasterImageId)] = true;
         }
     },
@@ -1090,14 +1090,14 @@ CShape.prototype =
                 var ph_type = this.getPlaceholderType();
                 var ph_index = this.getPlaceholderIndex();
                 switch (this.parent.kind) {
-                    case SLIDE_KIND:
+                    case AscFormat.TYPE_KIND.SLIDE:
                     {
                         hierarchy.push(this.parent.Layout.getMatchingShape(ph_type, ph_index));
                         hierarchy.push(this.parent.Layout.Master.getMatchingShape(ph_type, ph_index));
                         break;
                     }
 
-                    case LAYOUT_KIND:
+                    case AscFormat.TYPE_KIND.LAYOUT:
                     {
                         hierarchy.push(this.parent.Master.getMatchingShape(ph_type, ph_index));
                         break;
@@ -1148,13 +1148,13 @@ CShape.prototype =
         if (this.recalcInfo.recalculateFill) {
             this.compiledFill = null;
             if (isRealObject(this.spPr) && isRealObject(this.spPr.Fill) && isRealObject(this.spPr.Fill.fill)) {
-                if (this.spPr.Fill.fill instanceof CGradFill && this.spPr.Fill.fill.colors.length === 0) {
+                if (this.spPr.Fill.fill instanceof AscFormat.CGradFill && this.spPr.Fill.fill.colors.length === 0) {
                     var parent_objects = this.getParentObjects();
                     var theme = parent_objects.theme;
                     var fmt_scheme = theme.themeElements.fmtScheme;
                     var fill_style_lst = fmt_scheme.fillStyleLst;
                     for (var i = fill_style_lst.length - 1; i > -1; --i) {
-                        if (fill_style_lst[i] && fill_style_lst[i].fill instanceof CGradFill) {
+                        if (fill_style_lst[i] && fill_style_lst[i].fill instanceof AscFormat.CGradFill) {
                             this.spPr.Fill = fill_style_lst[i].createDuplicate();
                             break;
                         }
@@ -1243,17 +1243,17 @@ CShape.prototype =
     getCompiledTransparent: function () {
         if (this.recalcInfo.recalculateTransparent) {
             this.compiledTransparent = null;
-            if (isRealObject(this.spPr) && isRealObject(this.spPr.Fill) && isRealNumber(this.spPr.Fill.transparent))
+            if (isRealObject(this.spPr) && isRealObject(this.spPr.Fill) && AscFormat.isRealNumber(this.spPr.Fill.transparent))
                 this.compiledTransparent = this.spPr.Fill.transparent;
             else if (isRealObject(this.group)) {
                 var group_transparent = this.group.getCompiledTransparent();
-                if (isRealNumber(group_transparent)) {
+                if (AscFormat.isRealNumber(group_transparent)) {
                     this.compiledTransparent = group_transparent;
                 }
                 else {
                     var hierarchy = this.getHierarchy();
                     for (var i = 0; i < hierarchy.length; ++i) {
-                        if (isRealObject(hierarchy[i]) && isRealObject(hierarchy[i].spPr) && isRealObject(hierarchy[i].spPr.Fill) && isRealNumber(hierarchy[i].spPr.Fill.transparent)) {
+                        if (isRealObject(hierarchy[i]) && isRealObject(hierarchy[i].spPr) && isRealObject(hierarchy[i].spPr.Fill) && AscFormat.isRealNumber(hierarchy[i].spPr.Fill.transparent)) {
                             this.compiledTransparent = hierarchy[i].spPr.Fill.transparent;
                             break;
                         }
@@ -1264,7 +1264,7 @@ CShape.prototype =
             else {
                 var hierarchy = this.getHierarchy();
                 for (var i = 0; i < hierarchy.length; ++i) {
-                    if (isRealObject(hierarchy[i]) && isRealObject(hierarchy[i].spPr) && isRealObject(hierarchy[i].spPr.Fill) && isRealNumber(hierarchy[i].spPr.Fill.transparent)) {
+                    if (isRealObject(hierarchy[i]) && isRealObject(hierarchy[i].spPr) && isRealObject(hierarchy[i].spPr.Fill) && AscFormat.isRealNumber(hierarchy[i].spPr.Fill.transparent)) {
                         this.compiledTransparent = hierarchy[i].spPr.Fill.transparent;
                         break;
                     }
@@ -1334,18 +1334,18 @@ CShape.prototype =
             var new_body_pr = this.getBodyPr();
             if (new_body_pr) {
                 new_body_pr = new_body_pr.createDuplicate();
-                if (isRealNumber(paddings.Left)) {
+                if (AscFormat.isRealNumber(paddings.Left)) {
                     new_body_pr.lIns = paddings.Left;
                 }
 
-                if (isRealNumber(paddings.Top)) {
+                if (AscFormat.isRealNumber(paddings.Top)) {
                     new_body_pr.tIns = paddings.Top;
                 }
 
-                if (isRealNumber(paddings.Right)) {
+                if (AscFormat.isRealNumber(paddings.Right)) {
                     new_body_pr.rIns = paddings.Right;
                 }
-                if (isRealNumber(paddings.Bottom)) {
+                if (AscFormat.isRealNumber(paddings.Bottom)) {
                     new_body_pr.bIns = paddings.Bottom;
                 }
 
@@ -1494,7 +1494,7 @@ CShape.prototype =
         var _text_rect_height = _b - _t;
         var _text_rect_width = _r - _l;
         if (!_body_pr.upright) {
-            if (!(_body_pr.vert === nVertTTvert || _body_pr.vert === nVertTTvert270)) {
+            if (!(_body_pr.vert === AscFormat.nVertTTvert || _body_pr.vert === AscFormat.nVertTTvert270)) {
                 if (/*_content_height < _text_rect_height*/true) {
                     switch (_body_pr.anchor) {
                         case 0: //b
@@ -1594,7 +1594,7 @@ CShape.prototype =
                 global_MatrixTransformer.TranslateAppend(_text_transform, 0, _vertical_shift);
                 var _alpha;
                 _alpha = Math.atan2(_dy_t, _dx_t);
-                if (_body_pr.vert === nVertTTvert) {
+                if (_body_pr.vert === AscFormat.nVertTTvert) {
                     if (_dx_lt_rb * _dy_t - _dy_lt_rb * _dx_t <= 0) {
                         global_MatrixTransformer.RotateRadAppend(_text_transform, -_alpha - Math.PI * 0.5);
                         global_MatrixTransformer.TranslateAppend(_text_transform, _t_x_rt, _t_y_rt);
@@ -1635,7 +1635,7 @@ CShape.prototype =
 
             var _content_width, content_height2;
             if (checkNormalRotate(_full_rotate)) {
-                if (!(_body_pr.vert === nVertTTvert || _body_pr.vert === nVertTTvert270)) {
+                if (!(_body_pr.vert === AscFormat.nVertTTvert || _body_pr.vert === AscFormat.nVertTTvert270)) {
                     _content_width = _r - _l;
                     content_height2 = _b - _t;
                 }
@@ -1645,7 +1645,7 @@ CShape.prototype =
                 }
             }
             else {
-                if (!(_body_pr.vert === nVertTTvert || _body_pr.vert === nVertTTvert270)) {
+                if (!(_body_pr.vert === AscFormat.nVertTTvert || _body_pr.vert === AscFormat.nVertTTvert270)) {
                     _content_width = _b - _t;
                     content_height2 = _r - _l;
 
@@ -1719,13 +1719,13 @@ CShape.prototype =
             }
 
             global_MatrixTransformer.TranslateAppend(_text_transform, 0, _vertical_shift);
-            if (_body_pr.vert === nVertTTvert) {
+            if (_body_pr.vert === AscFormat.nVertTTvert) {
                 global_MatrixTransformer.TranslateAppend(_text_transform, -_content_width * 0.5, -content_height2 * 0.5);
                 global_MatrixTransformer.RotateRadAppend(_text_transform, -Math.PI * 0.5);
                 global_MatrixTransformer.TranslateAppend(_text_transform, _content_width * 0.5, content_height2 * 0.5);
 
             }
-            if (_body_pr.vert === nVertTTvert270) {
+            if (_body_pr.vert === AscFormat.nVertTTvert270) {
                 global_MatrixTransformer.TranslateAppend(_text_transform, -_content_width * 0.5, -content_height2 * 0.5);
                 global_MatrixTransformer.RotateRadAppend(_text_transform, -Math.PI * 1.5);
                 global_MatrixTransformer.TranslateAppend(_text_transform, _content_width * 0.5, content_height2 * 0.5);
@@ -1763,10 +1763,10 @@ CShape.prototype =
         var _l, _t, _r, _b;
         var _t_x_lt, _t_y_lt, _t_x_rt, _t_y_rt, _t_x_lb, _t_y_lb, _t_x_rb, _t_y_rb;
         var oRect = this.getTextRect();
-        var l_ins = bIgnoreInsets ? 0 : (isRealNumber(oBodyPr.lIns) ? oBodyPr.lIns : 2.54);
-        var t_ins = bIgnoreInsets ? 0 : (isRealNumber(oBodyPr.tIns) ? oBodyPr.tIns : 1.27);
-        var r_ins = bIgnoreInsets ? 0 : (isRealNumber(oBodyPr.rIns) ? oBodyPr.rIns : 2.54);
-        var b_ins = bIgnoreInsets ? 0 : (isRealNumber(oBodyPr.bIns) ? oBodyPr.bIns : 1.27);
+        var l_ins = bIgnoreInsets ? 0 : (AscFormat.isRealNumber(oBodyPr.lIns) ? oBodyPr.lIns : 2.54);
+        var t_ins = bIgnoreInsets ? 0 : (AscFormat.isRealNumber(oBodyPr.tIns) ? oBodyPr.tIns : 1.27);
+        var r_ins = bIgnoreInsets ? 0 : (AscFormat.isRealNumber(oBodyPr.rIns) ? oBodyPr.rIns : 2.54);
+        var b_ins = bIgnoreInsets ? 0 : (AscFormat.isRealNumber(oBodyPr.bIns) ? oBodyPr.bIns : 1.27);
         _l = oRect.l + l_ins;
         _t = oRect.t + t_ins;
         _r = oRect.r - r_ins;
@@ -1808,7 +1808,7 @@ CShape.prototype =
         var _text_rect_width = _r - _l;
         var oClipRect;
         if (!oBodyPr.upright) {
-            if (!(oBodyPr.vert === nVertTTvert || oBodyPr.vert === nVertTTvert270)) {
+            if (!(oBodyPr.vert === AscFormat.nVertTTvert || oBodyPr.vert === AscFormat.nVertTTvert270)) {
                 if (bWordArtTransform) {
                     _vertical_shift = 0;
                 }
@@ -1910,7 +1910,7 @@ CShape.prototype =
                 global_MatrixTransformer.TranslateAppend(oMatrix, 0, _vertical_shift);
                 var _alpha;
                 _alpha = Math.atan2(_dy_t, _dx_t);
-                if (oBodyPr.vert === nVertTTvert) {
+                if (oBodyPr.vert === AscFormat.nVertTTvert) {
                     if (_dx_lt_rb * _dy_t - _dy_lt_rb * _dx_t <= 0) {
                         global_MatrixTransformer.RotateRadAppend(oMatrix, -_alpha - Math.PI * 0.5);
                         global_MatrixTransformer.TranslateAppend(oMatrix, _t_x_rt, _t_y_rt);
@@ -1962,7 +1962,7 @@ CShape.prototype =
 
             var _content_width, content_height2;
             if (checkNormalRotate(_full_rotate)) {
-                if (!(oBodyPr.vert === nVertTTvert || oBodyPr.vert === nVertTTvert270)) {
+                if (!(oBodyPr.vert === AscFormat.nVertTTvert || oBodyPr.vert === AscFormat.nVertTTvert270)) {
                     _content_width = _r - _l;
                     content_height2 = _b - _t;
                 }
@@ -1972,7 +1972,7 @@ CShape.prototype =
                 }
             }
             else {
-                if (!(oBodyPr.vert === nVertTTvert || oBodyPr.vert === nVertTTvert270)) {
+                if (!(oBodyPr.vert === AscFormat.nVertTTvert || oBodyPr.vert === AscFormat.nVertTTvert270)) {
                     _content_width = _b - _t;
                     content_height2 = _r - _l;
 
@@ -2049,13 +2049,13 @@ CShape.prototype =
             }
 
             global_MatrixTransformer.TranslateAppend(oMatrix, 0, _vertical_shift);
-            if (oBodyPr.vert === nVertTTvert) {
+            if (oBodyPr.vert === AscFormat.nVertTTvert) {
                 global_MatrixTransformer.TranslateAppend(oMatrix, -_content_width * 0.5, -content_height2 * 0.5);
                 global_MatrixTransformer.RotateRadAppend(oMatrix, -Math.PI * 0.5);
                 global_MatrixTransformer.TranslateAppend(oMatrix, _content_width * 0.5, content_height2 * 0.5);
 
             }
-            if (oBodyPr.vert === nVertTTvert270) {
+            if (oBodyPr.vert === AscFormat.nVertTTvert270) {
                 global_MatrixTransformer.TranslateAppend(oMatrix, -_content_width * 0.5, -content_height2 * 0.5);
                 global_MatrixTransformer.RotateRadAppend(oMatrix, -Math.PI * 1.5);
                 global_MatrixTransformer.TranslateAppend(oMatrix, _content_width * 0.5, content_height2 * 0.5);
@@ -2134,7 +2134,7 @@ CShape.prototype =
 
     Get_Styles: function (level) {
 
-        var _level = isRealNumber(level) ? level : 0;
+        var _level = AscFormat.isRealNumber(level) ? level : 0;
         if (this.recalcInfo.recalculateTextStyles[_level]) {
             this.recalculateTextStyles(_level);
             this.recalcInfo.recalculateTextStyles[_level] = false;
@@ -2148,7 +2148,7 @@ CShape.prototype =
 
 
     recalculateTextStyles: function (level) {
-        return ExecuteNoHistory(function () {
+        return AscFormat.ExecuteNoHistory(function () {
             var parent_objects = this.getParentObjects();
             var default_style = new CStyle("defaultStyle", null, null, null, true);
             default_style.ParaPr.Spacing.LineRule = Asc.linerule_Auto;
@@ -2176,15 +2176,15 @@ CShape.prototype =
                 master_style = new CStyle("masterStyle", null, null, null, true);
                 if (this.isPlaceholder()) {
                     switch (this.getPlaceholderType()) {
-                        case phType_ctrTitle:
-                        case phType_title:
+                        case AscFormat.phType_ctrTitle:
+                        case AscFormat.phType_title:
                         {
                             master_ppt_styles = parent_objects.master.txStyles.titleStyle;
                             break;
                         }
-                        case phType_body:
-                        case phType_subTitle:
-                        case phType_obj:
+                        case AscFormat.phType_body:
+                        case AscFormat.phType_subTitle:
+                        case AscFormat.phType_obj:
                         case null:
                         {
                             master_ppt_styles = parent_objects.master.txStyles.bodyStyle;
@@ -2243,7 +2243,7 @@ CShape.prototype =
             if (isRealObject(this.style) && isRealObject(this.style.fontRef)) {
                 shape_text_style = new CStyle("shapeTextStyle", null, null, null, true);
                 var first_name;
-                if (this.style.fontRef.idx === fntStyleInd_major)
+                if (this.style.fontRef.idx === AscFormat.fntStyleInd_major)
                     first_name = "+mj-";
                 else
                     first_name = "+mn-";
@@ -2254,8 +2254,8 @@ CShape.prototype =
                 shape_text_style.TextPr.RFonts.HAnsi = {Name: first_name + "lt", Index: -1};
 
                 if (this.style.fontRef.Color != null && this.style.fontRef.Color.color != null) {
-                    var unifill = new CUniFill();
-                    unifill.fill = new CSolidFill();
+                    var unifill = new AscFormat.CUniFill();
+                    unifill.fill = new AscFormat.CSolidFill();
                     unifill.fill.color = this.style.fontRef.Color;
                     shape_text_style.TextPr.Unifill = unifill;
                 }
@@ -2342,11 +2342,11 @@ CShape.prototype =
             //}
             //else
             //{
-            //    this.brush = new CUniFill();
+            //    this.brush = new AscFormat.CUniFill();
             //}
         }
         else {
-            this.brush = new CUniFill();
+            this.brush = new AscFormat.CUniFill();
         }
 
         this.brush.merge(this.getCompiledFill());
@@ -2373,11 +2373,11 @@ CShape.prototype =
             //}
             //else
             //{
-            //    this.pen = new CLn();
+            //    this.pen = new AscFormat.CLn();
             //}
         }
         else {
-            this.pen = new CLn();
+            this.pen = new AscFormat.CLn();
         }
 
         this.pen.merge(this.getCompiledLine());
@@ -2391,16 +2391,16 @@ CShape.prototype =
 
     isEmptyPlaceholder: function () {
         if (this.isPlaceholder()) {
-            if (this.nvSpPr.nvPr.ph.type == phType_title
-                || this.nvSpPr.nvPr.ph.type == phType_ctrTitle
-                || this.nvSpPr.nvPr.ph.type == phType_body
-                || this.nvSpPr.nvPr.ph.type == phType_subTitle
+            if (this.nvSpPr.nvPr.ph.type == AscFormat.phType_title
+                || this.nvSpPr.nvPr.ph.type == AscFormat.phType_ctrTitle
+                || this.nvSpPr.nvPr.ph.type == AscFormat.phType_body
+                || this.nvSpPr.nvPr.ph.type == AscFormat.phType_subTitle
                 || this.nvSpPr.nvPr.ph.type == null
-                || this.nvSpPr.nvPr.ph.type == phType_dt
-                || this.nvSpPr.nvPr.ph.type == phType_ftr
-                || this.nvSpPr.nvPr.ph.type == phType_hdr
-                || this.nvSpPr.nvPr.ph.type == phType_sldNum
-                || this.nvSpPr.nvPr.ph.type == phType_sldImg) {
+                || this.nvSpPr.nvPr.ph.type == AscFormat.phType_dt
+                || this.nvSpPr.nvPr.ph.type == AscFormat.phType_ftr
+                || this.nvSpPr.nvPr.ph.type == AscFormat.phType_hdr
+                || this.nvSpPr.nvPr.ph.type == AscFormat.phType_sldNum
+                || this.nvSpPr.nvPr.ph.type == AscFormat.phType_sldImg) {
                 if (this.txBody) {
                     if (this.txBody.content) {
                         return this.txBody.content.Is_Empty();
@@ -2409,11 +2409,11 @@ CShape.prototype =
                 }
                 return true;
             }
-            if (this.nvSpPr.nvPr.ph.type == phType_chart
-                || this.nvSpPr.nvPr.ph.type == phType_media) {
+            if (this.nvSpPr.nvPr.ph.type == AscFormat.phType_chart
+                || this.nvSpPr.nvPr.ph.type == AscFormat.phType_media) {
                 return true;
             }
-            if (this.nvSpPr.nvPr.ph.type == phType_pic) {
+            if (this.nvSpPr.nvPr.ph.type == AscFormat.phType_pic) {
                 var _b_empty_text = true;
                 if (this.txBody) {
                     if (this.txBody.content) {
@@ -2453,7 +2453,7 @@ CShape.prototype =
             var content = this.getDocContent();
             if (content) {
                 var oBodyPr = this.getBodyPr();
-                if (oBodyPr.textFit && oBodyPr.textFit.type === text_fit_Auto || oBodyPr.wrap === nTWTNone) {
+                if (oBodyPr.textFit && oBodyPr.textFit.type === AscFormat.text_fit_Auto || oBodyPr.wrap === AscFormat.nTWTNone) {
                     return true;
                 }
             }
@@ -2482,7 +2482,7 @@ CShape.prototype =
                 this.y = metrics.y;
                 extX = metrics.extX;
                 extY = metrics.extY;
-                var rot = this.spPr && this.spPr.xfrm && isRealNumber(this.spPr.xfrm.rot) ? normalizeRotate(this.spPr.xfrm.rot) : 0;
+                var rot = this.spPr && this.spPr.xfrm && AscFormat.isRealNumber(this.spPr.xfrm.rot) ? normalizeRotate(this.spPr.xfrm.rot) : 0;
                 this.rot = rot;
                 var metricExtX, metricExtY;
                 if(!(this instanceof CGroupShape))
@@ -2502,7 +2502,7 @@ CShape.prototype =
                 }
                 else
                 {
-                    if(this.spPr && this.spPr.xfrm && isRealNumber(this.spPr.xfrm.extX) && isRealNumber(this.spPr.xfrm.extY))
+                    if(this.spPr && this.spPr.xfrm && AscFormat.isRealNumber(this.spPr.xfrm.extX) && AscFormat.isRealNumber(this.spPr.xfrm.extY))
                     {
                         this.extX = this.spPr.xfrm.extX;
                         this.extY = this.spPr.xfrm.extY;
@@ -2533,12 +2533,12 @@ CShape.prototype =
                 this.y = xfrm.offY;
                 this.extX = xfrm.extX;
                 this.extY = xfrm.extY;
-                this.rot = isRealNumber(xfrm.rot) ? xfrm.rot : 0;
+                this.rot = AscFormat.isRealNumber(xfrm.rot) ? xfrm.rot : 0;
                 this.flipH = xfrm.flipH === true;
                 this.flipV = xfrm.flipV === true;
                 if(this.extX < 0.01 && this.extY < 0.01)
                 {
-                    if(this.parent && this.parent.Extent && isRealNumber(this.parent.Extent.W) && isRealNumber(this.parent.Extent.H))
+                    if(this.parent && this.parent.Extent && AscFormat.isRealNumber(this.parent.Extent.W) && AscFormat.isRealNumber(this.parent.Extent.H))
                     {
                         this.x = 0;
                         this.y = 0;
@@ -2650,7 +2650,7 @@ CShape.prototype =
                             this.y = xfrm.offY;
                             this.extX = xfrm.extX;
                             this.extY = xfrm.extY;
-                            this.rot = isRealNumber(xfrm.rot) ? xfrm.rot : 0;
+                            this.rot = AscFormat.isRealNumber(xfrm.rot) ? xfrm.rot : 0;
                             this.flipH = xfrm.flipH === true;
                             this.flipV = xfrm.flipV === true;
                             break;
@@ -2711,7 +2711,7 @@ CShape.prototype =
                         }
                     }
                     if (i === hierarchy.length) {
-                        xfrm = new CXfrm();
+                        xfrm = new AscFormat.CXfrm();
                         xfrm.offX = 0;
                         xfrm.offX = 0;
                         xfrm.extX = 5;
@@ -2719,7 +2719,7 @@ CShape.prototype =
                     }
                 }
                 else {
-                    xfrm = new CXfrm();
+                    xfrm = new AscFormat.CXfrm();
                     xfrm.offX = 0;
                     xfrm.offY = 0;
                     xfrm.extX = 5;
@@ -2733,7 +2733,7 @@ CShape.prototype =
             this.y = scale_scale_coefficients.cy * (xfrm.offY - this.group.spPr.xfrm.chOffY);
             this.extX = scale_scale_coefficients.cx * xfrm.extX;
             this.extY = scale_scale_coefficients.cy * xfrm.extY;
-            this.rot = isRealNumber(xfrm.rot) ? xfrm.rot : 0;
+            this.rot = AscFormat.isRealNumber(xfrm.rot) ? xfrm.rot : 0;
             this.flipH = xfrm.flipH === true;
             this.flipV = xfrm.flipV === true;
         }
@@ -2763,10 +2763,10 @@ CShape.prototype =
 
             var l_ins, t_ins, r_ins, b_ins;
             if (oBodyPr) {
-                l_ins = isRealNumber(oBodyPr.lIns) ? oBodyPr.lIns : 2.54;
-                r_ins = isRealNumber(oBodyPr.rIns) ? oBodyPr.rIns : 2.54;
-                t_ins = isRealNumber(oBodyPr.tIns) ? oBodyPr.tIns : 1.27;
-                b_ins = isRealNumber(oBodyPr.bIns) ? oBodyPr.bIns : 1.27;
+                l_ins = AscFormat.isRealNumber(oBodyPr.lIns) ? oBodyPr.lIns : 2.54;
+                r_ins = AscFormat.isRealNumber(oBodyPr.rIns) ? oBodyPr.rIns : 2.54;
+                t_ins = AscFormat.isRealNumber(oBodyPr.tIns) ? oBodyPr.tIns : 1.27;
+                b_ins = AscFormat.isRealNumber(oBodyPr.bIns) ? oBodyPr.bIns : 1.27;
             }
             else {
                 l_ins = 2.54;
@@ -2778,9 +2778,9 @@ CShape.prototype =
             var dOldExtX = this.extX, dOldExtY = this.extY, dDeltaX = 0, dDeltaY = 0;
 
 
-            if (oBodyPr.wrap === nTWTNone) {
+            if (oBodyPr.wrap === AscFormat.nTWTNone) {
                 if (!oBodyPr.upright) {
-                    if (!(oBodyPr.vert === nVertTTvert || oBodyPr.vert === nVertTTvert270)) {
+                    if (!(oBodyPr.vert === AscFormat.nVertTTvert || oBodyPr.vert === AscFormat.nVertTTvert270)) {
                         if (oGeometry) {
                             oWH = oGeometry.getNewWHByTextRect(oContentMetrics.w + l_ins + r_ins, oContentMetrics.contentH + t_ins + b_ins);
                             if(!oWH.bError)
@@ -2813,7 +2813,7 @@ CShape.prototype =
                 else {
                     var _full_rotate = this.getFullRotate();
                     if (checkNormalRotate(_full_rotate)) {
-                        if (!(oBodyPr.vert === nVertTTvert || oBodyPr.vert === nVertTTvert270)) {
+                        if (!(oBodyPr.vert === AscFormat.nVertTTvert || oBodyPr.vert === AscFormat.nVertTTvert270)) {
 
                             if (oGeometry) {
                                 oWH = oGeometry.getNewWHByTextRect(oContentMetrics.w + l_ins + r_ins, oContentMetrics.contentH + t_ins + b_ins);
@@ -2843,7 +2843,7 @@ CShape.prototype =
                         }
                     }
                     else {
-                        if (!(oBodyPr.vert === nVertTTvert || oBodyPr.vert === nVertTTvert270)) {
+                        if (!(oBodyPr.vert === AscFormat.nVertTTvert || oBodyPr.vert === AscFormat.nVertTTvert270)) {
                             if (oGeometry) {
                                 oWH = oGeometry.getNewWHByTextRect(oContentMetrics.w + l_ins + r_ins, oContentMetrics.contentH + t_ins + b_ins);
                                 if(!oWH.bError) {
@@ -2874,7 +2874,7 @@ CShape.prototype =
             }
             else {
                 if (!oBodyPr.upright) {
-                    if (!(oBodyPr.vert === nVertTTvert || oBodyPr.vert === nVertTTvert270)) {
+                    if (!(oBodyPr.vert === AscFormat.nVertTTvert || oBodyPr.vert === AscFormat.nVertTTvert270)) {
                         if (oGeometry) {
                             oWH = oGeometry.getNewWHByTextRect(undefined, oContentMetrics.contentH + t_ins + b_ins, this.extX, undefined);
                             if(!oWH.bError) {
@@ -2900,7 +2900,7 @@ CShape.prototype =
                 else {
                     var _full_rotate = this.getFullRotate();
                     if (checkNormalRotate(_full_rotate)) {
-                        if (!(oBodyPr.vert === nVertTTvert || oBodyPr.vert === nVertTTvert270)) {
+                        if (!(oBodyPr.vert === AscFormat.nVertTTvert || oBodyPr.vert === AscFormat.nVertTTvert270)) {
                             if (oGeometry) {
                                 oWH = oGeometry.getNewWHByTextRect(undefined, oContentMetrics.contentH + t_ins + b_ins, this.extX, undefined);
                                 if(!oWH.bError) {
@@ -2924,7 +2924,7 @@ CShape.prototype =
                         }
                     }
                     else {
-                        if (!(oBodyPr.vert === nVertTTvert || oBodyPr.vert === nVertTTvert270)) {
+                        if (!(oBodyPr.vert === AscFormat.nVertTTvert || oBodyPr.vert === AscFormat.nVertTTvert270)) {
                             if (oGeometry) {
                                 oWH = oGeometry.getNewWHByTextRect(oContentMetrics.contentH + l_ins + r_ins, undefined, undefined, this.extY);
                                 if(!oWH.bError) {
@@ -3096,10 +3096,10 @@ CShape.prototype =
         var l_ins, t_ins, r_ins, b_ins;
         if(oBodyPr)
         {
-            l_ins = isRealNumber(oBodyPr.lIns) ? oBodyPr.lIns : 2.54;
-            r_ins = isRealNumber(oBodyPr.rIns) ? oBodyPr.rIns : 2.54;
-            t_ins = isRealNumber(oBodyPr.tIns) ? oBodyPr.tIns : 1.27;
-            b_ins = isRealNumber(oBodyPr.bIns) ? oBodyPr.bIns : 1.27;
+            l_ins = AscFormat.isRealNumber(oBodyPr.lIns) ? oBodyPr.lIns : 2.54;
+            r_ins = AscFormat.isRealNumber(oBodyPr.rIns) ? oBodyPr.rIns : 2.54;
+            t_ins = AscFormat.isRealNumber(oBodyPr.tIns) ? oBodyPr.tIns : 1.27;
+            b_ins = AscFormat.isRealNumber(oBodyPr.bIns) ? oBodyPr.bIns : 1.27;
         }
         else
         {
@@ -3112,7 +3112,7 @@ CShape.prototype =
         var w, h;
         w = oRect.r - oRect.l - (l_ins + r_ins);
         h = oRect.b - oRect.t - (t_ins + b_ins);
-        if(oBodyPr.wrap === nTWTNone)
+        if(oBodyPr.wrap === AscFormat.nTWTNone)
         {
             var dMaxWidth = 100000;
             if(this.bWordShape)
@@ -3127,7 +3127,7 @@ CShape.prototype =
                         var oSectPr = oParentParagraph.Get_SectPr();
                         if(oSectPr)
                         {
-                            if(!(oBodyPr.vert === nVertTTvert || oBodyPr.vert === nVertTTvert270))
+                            if(!(oBodyPr.vert === AscFormat.nVertTTvert || oBodyPr.vert === AscFormat.nVertTTvert270))
                             {
                                 dMaxWidth = oSectPr.Get_PageWidth() - oSectPr.Get_PageMargin_Left() - oSectPr.Get_PageMargin_Right() - l_ins - r_ins;
                             }
@@ -3142,7 +3142,7 @@ CShape.prototype =
                 }
             }
             var dMaxWidthRec = RecalculateDocContentByMaxLine(oDocContent, dMaxWidth, this.bWordShape);
-            if(!(oBodyPr.vert === nVertTTvert || oBodyPr.vert === nVertTTvert270))
+            if(!(oBodyPr.vert === AscFormat.nVertTTvert || oBodyPr.vert === AscFormat.nVertTTvert270))
             {
                 if(dMaxWidthRec < w && (!this.bWordShape && !this.bCheckAutoFitFlag))
                 {
@@ -3193,12 +3193,12 @@ CShape.prototype =
                 oRet.textRectH = w;
             }
         }
-        else//nTWTSquare
+        else//AscFormat.nTWTSquare
         {
 
             if(!oBodyPr.upright)
             {
-                if(!(oBodyPr.vert === nVertTTvert || oBodyPr.vert === nVertTTvert270))
+                if(!(oBodyPr.vert === AscFormat.nVertTTvert || oBodyPr.vert === AscFormat.nVertTTvert270))
                 {
                     oRet.w = w + 0.001;
                     oRet.h = h + 0.001;
@@ -3218,7 +3218,7 @@ CShape.prototype =
                 var _full_rotate = this.getFullRotate();
                 if(checkNormalRotate(_full_rotate))
                 {
-                    if(!(oBodyPr.vert === nVertTTvert || oBodyPr.vert === nVertTTvert270))
+                    if(!(oBodyPr.vert === AscFormat.nVertTTvert || oBodyPr.vert === AscFormat.nVertTTvert270))
                     {
                         oRet.w = w + 0.001;
                         oRet.h = h + 0.001;
@@ -3235,7 +3235,7 @@ CShape.prototype =
                 }
                 else
                 {
-                    if(!(oBodyPr.vert === nVertTTvert || oBodyPr.vert === nVertTTvert270))
+                    if(!(oBodyPr.vert === AscFormat.nVertTTvert || oBodyPr.vert === AscFormat.nVertTTvert270))
                     {
                         oRet.w = h + 0.001;
                         oRet.h = w + 0.001;
@@ -3642,7 +3642,7 @@ CShape.prototype =
             return true;
         }
         var _x, _y;
-        if(isRealNumber(this.posX) && isRealNumber(this.posY))
+        if(AscFormat.isRealNumber(this.posX) && AscFormat.isRealNumber(this.posY))
         {
             _x = x - this.posX - this.bounds.x;
             _y = y - this.posY - this.bounds.y;
@@ -3652,7 +3652,7 @@ CShape.prototype =
             _x = x - this.bounds.x;
             _y = y - this.bounds.y;
         }
-        var delta = BOUNDS_DELTA + (this.pen && isRealNumber(this.pen.w) ? this.pen.w/36000 : 0);
+        var delta = BOUNDS_DELTA + (this.pen && AscFormat.isRealNumber(this.pen.w) ? this.pen.w/36000 : 0);
         return _x >= -delta && _x <= this.bounds.w + delta && _y >= -delta && _y <= this.bounds.h + delta;
 
     },
@@ -3670,8 +3670,8 @@ CShape.prototype =
             var w, h, x_, y_;
 
             if(this.spPr && this.spPr.geometry && this.spPr.geometry.rect
-                && isRealNumber(this.spPr.geometry.rect.l) && isRealNumber(this.spPr.geometry.rect.t)
-                && isRealNumber(this.spPr.geometry.rect.r) && isRealNumber(this.spPr.geometry.rect.r))
+                && AscFormat.isRealNumber(this.spPr.geometry.rect.l) && AscFormat.isRealNumber(this.spPr.geometry.rect.t)
+                && AscFormat.isRealNumber(this.spPr.geometry.rect.r) && AscFormat.isRealNumber(this.spPr.geometry.rect.r))
             {
                 x_ = this.spPr.geometry.rect.l;
                 y_ = this.spPr.geometry.rect.t;
@@ -3883,7 +3883,7 @@ CShape.prototype =
         {
             return this.cachedImage;
         }
-        if(!isRealNumber(this.x) || !isRealNumber(this.y) || !isRealNumber(this.extX) || !isRealNumber(this.extY))
+        if(!AscFormat.isRealNumber(this.x) || !AscFormat.isRealNumber(this.y) || !AscFormat.isRealNumber(this.extX) || !AscFormat.isRealNumber(this.extY))
             return "";
         var img_object = ShapeToImageConverter(this, this.pageIndex);
         if(img_object)
@@ -4137,7 +4137,7 @@ CShape.prototype =
                 graphics.SaveGrState();
                 graphics.SetIntegerGrid(false);
                 this.clipTextRect(graphics);
-                var result_page_index = isRealNumber(graphics.shapePageIndex) ? graphics.shapePageIndex : old_start_page;
+                var result_page_index = AscFormat.isRealNumber(graphics.shapePageIndex) ? graphics.shapePageIndex : old_start_page;
 
                 if (graphics.CheckUseFonts2 !== undefined)
                     graphics.CheckUseFonts2(this.transformText);
@@ -4181,7 +4181,7 @@ CShape.prototype =
             {
 
                 var oContent = this.getDocContent();
-                var result_page_index = isRealNumber(graphics.shapePageIndex) ? graphics.shapePageIndex : (oContent ? oContent.Get_StartPage_Relative() : 0);
+                var result_page_index = AscFormat.isRealNumber(graphics.shapePageIndex) ? graphics.shapePageIndex : (oContent ? oContent.Get_StartPage_Relative() : 0);
                 graphics.PageNum = result_page_index;
                 var bNeedRestoreState = false;
                 var bEditTextArt = isRealObject(oController) && (getTargetTextObject(oController) === this);
@@ -4480,7 +4480,7 @@ CShape.prototype =
     applyTextArtForm: function(sPreset)
     {
         var oBodyPr = this.getBodyPr().createDuplicate();
-        oBodyPr.prstTxWarp = ExecuteNoHistory(function(){return CreatePrstTxWarpGeometry(sPreset)}, this, []);
+        oBodyPr.prstTxWarp = AscFormat.ExecuteNoHistory(function(){return CreatePrstTxWarpGeometry(sPreset)}, this, []);
         if(this.bWordShape)
         {
             this.setBodyPr(oBodyPr);
@@ -4562,20 +4562,20 @@ CShape.prototype =
         {
             this.spPr.setGeometry(CreateGeometry("rect"));
             this.spPr.geometry.setParent(this.spPr);
-            this.setStyle(CreateDefaultTextRectStyle());
-            var fill = new CUniFill();
-            fill.setFill(new CSolidFill());
-            fill.fill.setColor(new CUniColor());
-            fill.fill.color.setColor(new CSchemeColor());
+            this.setStyle(AscFormat.CreateDefaultTextRectStyle());
+            var fill = new AscFormat.CUniFill();
+            fill.setFill(new AscFormat.CSolidFill());
+            fill.fill.setColor(new AscFormat.CUniColor());
+            fill.fill.color.setColor(new AscFormat.CSchemeColor());
             fill.fill.color.color.setId(12);
             this.spPr.setFill(fill);
 
-            var ln = new CLn();
+            var ln = new AscFormat.CLn();
             ln.setW(6350);
-            ln.setFill(new CUniFill());
-            ln.Fill.setFill(new CSolidFill());
-            ln.Fill.fill.setColor(new CUniColor());
-            ln.Fill.fill.color.setColor(new CPrstColor());
+            ln.setFill(new AscFormat.CUniFill());
+            ln.Fill.setFill(new AscFormat.CSolidFill());
+            ln.Fill.fill.setColor(new AscFormat.CUniColor());
+            ln.Fill.fill.color.setColor(new AscFormat.CPrstColor());
             ln.Fill.fill.color.color.setId("black");
             this.spPr.setLn(ln);
             if(this.bWordShape)
@@ -4583,7 +4583,7 @@ CShape.prototype =
                 if(!this.textBoxContent)
                 {
                     this.setTextBoxContent(new CDocumentContent(this, this.getDrawingDocument(), 0, 0, 0, 0, false, false, false));
-                    var body_pr = new CBodyPr();
+                    var body_pr = new AscFormat.CBodyPr();
                     body_pr.setDefault();
                     this.setBodyPr(body_pr);
                 }
@@ -4596,7 +4596,7 @@ CShape.prototype =
                     var content = new CDocumentContent(this.txBody, this.getDrawingDocument(), 0, 0, 0, 0, false, false, true);
                     this.txBody.setParent(this);
                     this.txBody.setContent(content);
-                    var body_pr = new CBodyPr();
+                    var body_pr = new AscFormat.CBodyPr();
                     body_pr.setDefault();
                     this.txBody.setBodyPr(body_pr);
                 }
@@ -4619,115 +4619,115 @@ CShape.prototype =
             {
                 _final_preset = "line";
                 if (_old_line == null) {
-                    _new_line = new CLn();
+                    _new_line = new AscFormat.CLn();
                 }
                 else {
                     _new_line = this.spPr.ln.createDuplicate();
                 }
-                _new_line.tailEnd = new EndArrow();
-                _new_line.tailEnd.type = LineEndType.Arrow;
-                _new_line.tailEnd.len = LineEndSize.Mid;
-                _new_line.tailEnd.w = LineEndSize.Mid;
+                _new_line.tailEnd = new AscFormat.EndArrow();
+                _new_line.tailEnd.type = AscFormat.LineEndType.Arrow;
+                _new_line.tailEnd.len = AscFormat.LineEndSize.Mid;
+                _new_line.tailEnd.w = AscFormat.LineEndSize.Mid;
                 break;
             }
             case "lineWithTwoArrows":
             {
                 _final_preset = "line";
                 if (_old_line == null) {
-                    _new_line = new CLn();
+                    _new_line = new AscFormat.CLn();
 
                 }
                 else {
                     _new_line = this.spPr.ln.createDuplicate();
                 }
-                _new_line.tailEnd = new EndArrow();
-                _new_line.tailEnd.type = LineEndType.Arrow;
-                _new_line.tailEnd.len = LineEndSize.Mid;
-                _new_line.tailEnd.w = LineEndSize.Mid;
+                _new_line.tailEnd = new AscFormat.EndArrow();
+                _new_line.tailEnd.type = AscFormat.LineEndType.Arrow;
+                _new_line.tailEnd.len = AscFormat.LineEndSize.Mid;
+                _new_line.tailEnd.w = AscFormat.LineEndSize.Mid;
 
-                _new_line.headEnd = new EndArrow();
-                _new_line.headEnd.type = LineEndType.Arrow;
-                _new_line.headEnd.len = LineEndSize.Mid;
-                _new_line.headEnd.w = LineEndSize.Mid;
+                _new_line.headEnd = new AscFormat.EndArrow();
+                _new_line.headEnd.type = AscFormat.LineEndType.Arrow;
+                _new_line.headEnd.len = AscFormat.LineEndSize.Mid;
+                _new_line.headEnd.w = AscFormat.LineEndSize.Mid;
                 break;
             }
             case "bentConnector5WithArrow":
             {
                 _final_preset = "bentConnector5";
                 if (_old_line == null) {
-                    _new_line = new CLn();
+                    _new_line = new AscFormat.CLn();
 
                 }
                 else {
                     _new_line = this.spPr.ln.createDuplicate();
                 }
-                _new_line.tailEnd = new EndArrow();
-                _new_line.tailEnd.type = LineEndType.Arrow;
-                _new_line.tailEnd.len = LineEndSize.Mid;
-                _new_line.tailEnd.w = LineEndSize.Mid;
+                _new_line.tailEnd = new AscFormat.EndArrow();
+                _new_line.tailEnd.type = AscFormat.LineEndType.Arrow;
+                _new_line.tailEnd.len = AscFormat.LineEndSize.Mid;
+                _new_line.tailEnd.w = AscFormat.LineEndSize.Mid;
                 break;
             }
             case "bentConnector5WithTwoArrows":
             {
                 _final_preset = "bentConnector5";
                 if (_old_line == null) {
-                    _new_line = new CLn();
+                    _new_line = new AscFormat.CLn();
                 }
                 else {
                     _new_line = this.spPr.ln.createDuplicate();
                 }
-                _new_line.tailEnd = new EndArrow();
-                _new_line.tailEnd.type = LineEndType.Arrow;
-                _new_line.tailEnd.len = LineEndSize.Mid;
-                _new_line.tailEnd.w = LineEndSize.Mid;
+                _new_line.tailEnd = new AscFormat.EndArrow();
+                _new_line.tailEnd.type = AscFormat.LineEndType.Arrow;
+                _new_line.tailEnd.len = AscFormat.LineEndSize.Mid;
+                _new_line.tailEnd.w = AscFormat.LineEndSize.Mid;
 
-                _new_line.headEnd = new EndArrow();
-                _new_line.headEnd.type = LineEndType.Arrow;
-                _new_line.headEnd.len = LineEndSize.Mid;
-                _new_line.headEnd.w = LineEndSize.Mid;
+                _new_line.headEnd = new AscFormat.EndArrow();
+                _new_line.headEnd.type = AscFormat.LineEndType.Arrow;
+                _new_line.headEnd.len = AscFormat.LineEndSize.Mid;
+                _new_line.headEnd.w = AscFormat.LineEndSize.Mid;
                 break;
             }
             case "curvedConnector3WithArrow":
             {
                 _final_preset = "curvedConnector3";
                 if (_old_line == null) {
-                    _new_line = new CLn();
+                    _new_line = new AscFormat.CLn();
                 }
                 else {
                     _new_line = this.spPr.ln.createDuplicate();
                 }
-                _new_line.tailEnd = new EndArrow();
-                _new_line.tailEnd.type = LineEndType.Arrow;
-                _new_line.tailEnd.len = LineEndSize.Mid;
-                _new_line.tailEnd.w = LineEndSize.Mid;
+                _new_line.tailEnd = new AscFormat.EndArrow();
+                _new_line.tailEnd.type = AscFormat.LineEndType.Arrow;
+                _new_line.tailEnd.len = AscFormat.LineEndSize.Mid;
+                _new_line.tailEnd.w = AscFormat.LineEndSize.Mid;
                 break;
             }
             case "curvedConnector3WithTwoArrows":
             {
                 _final_preset = "curvedConnector3";
                 if (_old_line == null) {
-                    _new_line = new CLn();
+                    _new_line = new AscFormat.CLn();
 
                 }
                 else {
                     _new_line = this.spPr.ln.createDuplicate();
                 }
-                _new_line.tailEnd = new EndArrow();
-                _new_line.tailEnd.type = LineEndType.Arrow;
-                _new_line.tailEnd.len = LineEndSize.Mid;
-                _new_line.tailEnd.w = LineEndSize.Mid;
+                _new_line.tailEnd = new AscFormat.EndArrow();
+                _new_line.tailEnd.type = AscFormat.LineEndType.Arrow;
+                _new_line.tailEnd.len = AscFormat.LineEndSize.Mid;
+                _new_line.tailEnd.w = AscFormat.LineEndSize.Mid;
 
-                _new_line.headEnd = new EndArrow();
-                _new_line.headEnd.type = LineEndType.Arrow;
-                _new_line.headEnd.len = LineEndSize.Mid;
-                _new_line.headEnd.w = LineEndSize.Mid;
+                _new_line.headEnd = new AscFormat.EndArrow();
+                _new_line.headEnd.type = AscFormat.LineEndType.Arrow;
+                _new_line.headEnd.len = AscFormat.LineEndSize.Mid;
+                _new_line.headEnd.w = AscFormat.LineEndSize.Mid;
                 break;
             }
             default:
             {
                 _final_preset = sPreset;
                 if (_old_line == null) {
-                    _new_line = new CLn();
+                    _new_line = new AscFormat.CLn();
                 }
                 else {
                     _new_line = this.spPr.ln.createDuplicate();
@@ -4753,11 +4753,11 @@ CShape.prototype =
             this.checkExtentsByDocContent();
         }
         if ((!this.brush || !this.brush.fill) && (!this.pen || !this.pen.Fill || !this.pen.Fill.fill)) {
-            var new_line2 = new CLn();
-            new_line2.Fill = new CUniFill();
-            new_line2.Fill.fill = new CSolidFill();
-            new_line2.Fill.fill.color = new CUniColor();
-            new_line2.Fill.fill.color.color = new CSchemeColor();
+            var new_line2 = new AscFormat.CLn();
+            new_line2.Fill = new AscFormat.CUniFill();
+            new_line2.Fill.fill = new AscFormat.CSolidFill();
+            new_line2.Fill.fill.color = new AscFormat.CUniColor();
+            new_line2.Fill.fill.color.color = new AscFormat.CSchemeColor();
             new_line2.Fill.fill.color.color.id = 0;
             if (isRealObject(_new_line)) {
                 new_line2.merge(_new_line);
@@ -4774,7 +4774,7 @@ CShape.prototype =
         {
             this.recalculateBrush();
         }
-        var unifill2 = CorrectUniFill(unifill, this.brush);
+        var unifill2 = AscFormat.CorrectUniFill(unifill, this.brush);
         unifill2.convertToPPTXMods();
         this.spPr.setFill(unifill2);
     },
@@ -4789,7 +4789,7 @@ CShape.prototype =
         {
             this.recalculatePen();
         }
-        var stroke = CorrectUniStroke(line, this.pen);
+        var stroke = AscFormat.CorrectUniStroke(line, this.pen);
         if(stroke.Fill)
         {
             stroke.Fill.convertToPPTXMods();
@@ -5231,24 +5231,24 @@ CShape.prototype =
         {
             case AscDFH.historyitem_AutoShapes_SetBFromSerialize:
             {
-                writeBool(w, data.newPr);
+                AscFormat.writeBool(w, data.newPr);
                 break;
             }
             case AscDFH.historyitem_AutoShapes_SetDrawingBaseCoors:
             {
-                writeDouble(w, data.fromCol   );
-                writeDouble(w, data.fromColOff);
-                writeDouble(w, data.fromRow   );
-                writeDouble(w, data.fromRowOff);
-                writeDouble(w, data.toCol);
-                writeDouble(w, data.toColOff);
-                writeDouble(w, data.toRow   );
-                writeDouble(w, data.toRowOff);
+                AscFormat.writeDouble(w, data.fromCol   );
+                AscFormat.writeDouble(w, data.fromColOff);
+                AscFormat.writeDouble(w, data.fromRow   );
+                AscFormat.writeDouble(w, data.fromRowOff);
+                AscFormat.writeDouble(w, data.toCol);
+                AscFormat.writeDouble(w, data.toColOff);
+                AscFormat.writeDouble(w, data.toRow   );
+                AscFormat.writeDouble(w, data.toRowOff);
 
-                writeDouble(w, data.posX);
-                writeDouble(w, data.posY);
-                writeDouble(w, data.cx);
-                writeDouble(w, data.cy);
+                AscFormat.writeDouble(w, data.posX);
+                AscFormat.writeDouble(w, data.posY);
+                AscFormat.writeDouble(w, data.cx);
+                AscFormat.writeDouble(w, data.cy);
 
                 break;
             }
@@ -5259,15 +5259,15 @@ CShape.prototype =
             case AscDFH.historyitem_AutoShapes_AddToDrawingObjects:
             {
                 var Pos = data.UseArray ? data.PosArray[0] : data.Pos;
-                writeLong(w, Pos);
+                AscFormat.writeLong(w, Pos);
                 break;
             }
             case AscDFH.historyitem_AutoShapes_SetWorksheet:
             {
-                writeBool(w, isRealObject(data.newPr));
+                AscFormat.writeBool(w, isRealObject(data.newPr));
                 if(isRealObject(data.newPr))
                 {
-                    writeString(w, data.newPr.getId());
+                    AscFormat.writeString(w, data.newPr.getId());
                 }
                 break;
             }
@@ -5279,7 +5279,7 @@ CShape.prototype =
             case AscDFH.historyitem_ShapeSetParent:
             case AscDFH.historyitem_ShapeSetGroup:
             {
-                writeObject(w, data.newPr);
+                AscFormat.writeObject(w, data.newPr);
                 break;
             }
             case AscDFH.historyitem_ShapeSetBodyPr:
@@ -5295,7 +5295,7 @@ CShape.prototype =
 
             case AscDFH.historyitem_ShapeSetBDeleted:
             {
-                writeBool(w, data.newPr);
+                AscFormat.writeBool(w, data.newPr);
                 break;
             }
         }
@@ -5310,26 +5310,26 @@ CShape.prototype =
             {
                 case AscDFH.historyitem_AutoShapes_SetBFromSerialize:
                 {
-                    this.fromSerialize = readBool(r);
+                    this.fromSerialize = AscFormat.readBool(r);
                     break;
                 }
                 case AscDFH.historyitem_AutoShapes_SetDrawingBaseCoors:
                 {
                     if(this.drawingBase)
                     {
-                        this.drawingBase.from.col    = readDouble(r);
-                        this.drawingBase.from.colOff = readDouble(r);
-                        this.drawingBase.from.row    = readDouble(r);
-                        this.drawingBase.from.rowOff = readDouble(r);
-                        this.drawingBase.to.col      = readDouble(r);
-                        this.drawingBase.to.colOff   = readDouble(r);
-                        this.drawingBase.to.row      = readDouble(r);
-                        this.drawingBase.to.rowOff   = readDouble(r);
+                        this.drawingBase.from.col    = AscFormat.readDouble(r);
+                        this.drawingBase.from.colOff = AscFormat.readDouble(r);
+                        this.drawingBase.from.row    = AscFormat.readDouble(r);
+                        this.drawingBase.from.rowOff = AscFormat.readDouble(r);
+                        this.drawingBase.to.col      = AscFormat.readDouble(r);
+                        this.drawingBase.to.colOff   = AscFormat.readDouble(r);
+                        this.drawingBase.to.row      = AscFormat.readDouble(r);
+                        this.drawingBase.to.rowOff   = AscFormat.readDouble(r);
 
-                        this.drawingBase.Pos.X = readDouble(r);
-                        this.drawingBase.Pos.Y = readDouble(r);
-                        this.drawingBase.ext.cx = readDouble(r);
-                        this.drawingBase.ext.cy = readDouble(r);
+                        this.drawingBase.Pos.X = AscFormat.readDouble(r);
+                        this.drawingBase.Pos.Y = AscFormat.readDouble(r);
+                        this.drawingBase.ext.cx = AscFormat.readDouble(r);
+                        this.drawingBase.ext.cy = AscFormat.readDouble(r);
 
                     }
                     break;
@@ -5341,7 +5341,7 @@ CShape.prototype =
                 }
                 case AscDFH.historyitem_AutoShapes_AddToDrawingObjects:
                 {
-                    var pos = readLong(r);
+                    var pos = AscFormat.readLong(r);
                     if(this.worksheet)
                     {
                         pos = this.worksheet.contentChanges.Check(AscCommon.contentchanges_Add, pos);
@@ -5356,22 +5356,22 @@ CShape.prototype =
                 }
                 case AscDFH.historyitem_ShapeSetBDeleted:
                 {
-                    this.bDeleted = readBool(r);
+                    this.bDeleted = AscFormat.readBool(r);
                     break;
                 }
                 case AscDFH.historyitem_ShapeSetNvSpPr:
                 {
-                    this.nvSpPr = readObject(r);
+                    this.nvSpPr = AscFormat.readObject(r);
                     break;
                 }
                 case AscDFH.historyitem_ShapeSetSpPr:
                 {
-                    this.spPr = readObject(r);
+                    this.spPr = AscFormat.readObject(r);
                     break;
                 }
                 case AscDFH.historyitem_ShapeSetStyle:
                 {
-                    this.style = readObject(r);
+                    this.style = AscFormat.readObject(r);
                     var content = this.getDocContent();
 
                     this.recalcInfo.recalculateShapeStyleForParagraph = true;
@@ -5385,29 +5385,29 @@ CShape.prototype =
                 }
                 case AscDFH.historyitem_ShapeSetTxBody:
                 {
-                    this.txBody = readObject(r);
+                    this.txBody = AscFormat.readObject(r);
                     break;
                 }
                 case AscDFH.historyitem_ShapeSetTextBoxContent:
                 {
-                    this.textBoxContent = readObject(r);
+                    this.textBoxContent = AscFormat.readObject(r);
                     break;
                 }
                 case AscDFH.historyitem_ShapeSetParent:
                 {
-                    this.parent = readObject(r);
+                    this.parent = AscFormat.readObject(r);
                     break;
                 }
                 case AscDFH.historyitem_ShapeSetGroup:
                 {
-                    this.group = readObject(r);
+                    this.group = AscFormat.readObject(r);
                     break;
                 }
                 case AscDFH.historyitem_ShapeSetBodyPr:
                 {
                     if(r.GetBool())
                     {
-                        this.bodyPr = new CBodyPr();
+                        this.bodyPr = new AscFormat.CBodyPr();
                         this.bodyPr.Read_FromBinary(r);
                     }
                     else
@@ -5418,7 +5418,7 @@ CShape.prototype =
                 }
                 case AscDFH.historyitem_ShapeSetWordShape:
                 {
-                    this.bWordShape = readBool(r);
+                    this.bWordShape = AscFormat.readBool(r);
                     break;
                 }
             }

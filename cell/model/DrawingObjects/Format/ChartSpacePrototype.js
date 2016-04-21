@@ -83,7 +83,7 @@ CChartSpace.prototype.setRecalculateInfo = function()
     this.baseColors = [];
     this.bounds = {l: 0, t: 0, r: 0, b:0, w: 0, h:0};
     this.chartObj = null;
-    this.rectGeometry = ExecuteNoHistory(function(){return  CreateGeometry("rect");},  this, []);
+    this.rectGeometry = AscFormat.ExecuteNoHistory(function(){return  CreateGeometry("rect");},  this, []);
     this.lockType = AscCommon.c_oAscLockTypes.kLockTypeNone;
 };
 CChartSpace.prototype.recalcTransform = function()
@@ -242,7 +242,7 @@ CChartSpace.prototype.recalculate = function()
 {
     if(this.bDeleted)
         return;
-    ExecuteNoHistory(function()
+    AscFormat.ExecuteNoHistory(function()
     {
         this.updateLinks();
 

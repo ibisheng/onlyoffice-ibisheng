@@ -60,7 +60,7 @@ DrawingObjectsController.prototype.checkSelectedObjectsAndCallback = function(ca
     }
     if(editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(check_type, comment) === false)
     {
-        var nPointType = isRealNumber(nHistoryPointType) ? nHistoryPointType : AscDFH.historydescription_CommonControllerCheckSelected;
+        var nPointType = AscFormat.isRealNumber(nHistoryPointType) ? nHistoryPointType : AscDFH.historydescription_CommonControllerCheckSelected;
         History.Create_NewPoint(nPointType);
         callback.apply(this, args);
         this.startRecalculate();

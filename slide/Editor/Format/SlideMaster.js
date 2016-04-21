@@ -10,10 +10,10 @@
 
 function MasterSlide(presentation, theme)
 {
-    this.cSld = new CSld();
-    this.clrMap = new ClrMap();
+    this.cSld = new AscFormat.CSld();
+    this.clrMap = new AscFormat.ClrMap();
 
-    this.hf = new HF();
+    this.hf = new AscFormat.HF();
 
     this.sldLayoutLst = [];
 
@@ -42,7 +42,7 @@ function MasterSlide(presentation, theme)
     this.presentation = editor.WordControl.m_oLogicDocument;
     this.theme = theme;
 
-    this.kind = MASTER_KIND;
+    this.kind = AscFormat.TYPE_KIND.MASTER;
     this.recalcInfo =
     {
         recalculateBackground: true,
@@ -182,13 +182,13 @@ MasterSlide.prototype =
     {
         w.WriteLong(AscDFH.historyitem_type_SlideMaster);
         w.WriteString2(this.Id);
-        writeObject(w, this.theme);
+        AscFormat.writeObject(w, this.theme);
     },
 
     Read_FromBinary2: function(r)
     {
         this.Id = r.GetString2();
-        this.theme = readObject(r);
+        this.theme = AscFormat.readObject(r);
     },
 
     Save_Changes: function(data, w)
@@ -198,15 +198,15 @@ MasterSlide.prototype =
         {
             case AscDFH.historyitem_SlideMasterSetSize:
             {
-                writeDouble(w, data.newW);
-                writeDouble(w, data.newH);
+                AscFormat.writeDouble(w, data.newW);
+                AscFormat.writeDouble(w, data.newH);
                 break;
             }
             case AscDFH.historyitem_SlideMasterAddToSpTree:
             case AscDFH.historyitem_SlideMasterAddLayout           :
             {
-                writeLong(w, data.Pos);
-                writeObject(w, data.Item);
+                AscFormat.writeLong(w, data.Pos);
+                AscFormat.writeObject(w, data.Item);
                 break;
             }
             case AscDFH.historyitem_SlideMasterSetBg :
@@ -217,19 +217,19 @@ MasterSlide.prototype =
             }
             case AscDFH.historyitem_SlideMasterSetCSldName         :
             {
-                writeString(w, data.newPr);
+                AscFormat.writeString(w, data.newPr);
                 break;
             }
 
             case AscDFH.historyitem_SlideMasterSetTheme :
             case AscDFH.historyitem_SlideMasterSetClrMapOverride   :
             {
-                writeObject(w, data.newPr);
+                AscFormat.writeObject(w, data.newPr);
                 break;
             }
             case AscDFH.historyitem_SlideMasterSetThemeIndex:
             {
-                writeLong(w, data.newPr);
+                AscFormat.writeLong(w, data.newPr);
                 break;
             }
         }
@@ -242,25 +242,25 @@ MasterSlide.prototype =
         {
             case AscDFH.historyitem_SlideMasterSetSize:
             {
-                this.Width  = readDouble(r);
-                this.Height = readDouble(r);
+                this.Width  = AscFormat.readDouble(r);
+                this.Height = AscFormat.readDouble(r);
                 break;
             }
             case AscDFH.historyitem_SlideMasterAddToSpTree:
             {
-                var Pos = readLong(r);
-                var Item = readObject(r);
+                var Pos = AscFormat.readLong(r);
+                var Item = AscFormat.readObject(r);
                 this.cSld.spTree.splice(Pos, 0, Item);
                 break;
             }
             case AscDFH.historyitem_SlideMasterSetTheme :
             {
-                this.Theme = readObject(r);
+                this.Theme = AscFormat.readObject(r);
                 break;
             }
             case AscDFH.historyitem_SlideMasterSetBg               :
             {
-                this.cSld.Bg = new CBg();
+                this.cSld.Bg = new AscFormat.CBg();
                 this.cSld.Bg.Read_FromBinary(r);
                 var Fill;
                 if(this.cSld.Bg.bgPr && this.cSld.Bg.bgPr.Fill)
@@ -278,31 +278,31 @@ MasterSlide.prototype =
             }
             case AscDFH.historyitem_SlideMasterSetTxStyles         :
             {
-                this.txStyles = new CTextStyles();
+                this.txStyles = new AscFormat.CTextStyles();
                 this.txStyles.Read_FromBinary(r);
                 break;
             }
             case AscDFH.historyitem_SlideMasterSetCSldName         :
             {
-                this.cSld.name = readString(r);
+                this.cSld.name = AscFormat.readString(r);
                 break;
             }
             case AscDFH.historyitem_SlideMasterSetClrMapOverride   :
             {
-                this.clrMap = readObject(r);
+                this.clrMap = AscFormat.readObject(r);
                 break;
             }
             case AscDFH.historyitem_SlideMasterAddLayout           :
             {
-                var Pos = readLong(r);
-                var Item = readObject(r);
+                var Pos = AscFormat.readLong(r);
+                var Item = AscFormat.readObject(r);
                 this.sldLayoutLst.splice(Pos, 0, Item);
                 break;
             }
             case AscDFH.historyitem_SlideMasterSetThemeIndex:
             {
-                this.ThemeIndex = readLong(r);
-                if (isRealNumber(this.ThemeIndex) && editor && editor.ThemeLoader)
+                this.ThemeIndex = AscFormat.readLong(r);
+                if (AscFormat.isRealNumber(this.ThemeIndex) && editor && editor.ThemeLoader)
                 {
                     var theme_loader = editor.ThemeLoader;
 
@@ -338,9 +338,9 @@ MasterSlide.prototype =
 
         var _layoutName = null, _layout_index, _layout;
 
-        if(type === nSldLtTTitle && !(themeFlag === true))
+        if(type === AscFormat.nSldLtTTitle && !(themeFlag === true))
         {
-            layoutType = nSldLtTObj;
+            layoutType = AscFormat.nSldLtTObj;
         }
         if(layoutType != null)
         {
@@ -353,9 +353,9 @@ MasterSlide.prototype =
             }
         }
 
-        if(type === nSldLtTTitle && !(themeFlag === true))
+        if(type === AscFormat.nSldLtTTitle && !(themeFlag === true))
         {
-            layoutType = nSldLtTTx;
+            layoutType = AscFormat.nSldLtTTx;
             for(i = 0; i < this.sldLayoutLst.length; ++i)
             {
                 if(this.sldLayoutLst[i].type == layoutType)
@@ -407,7 +407,7 @@ MasterSlide.prototype =
             _layout = this.sldLayoutLst[_layout_index];
             _layout_name = null;
 
-            if(_layout.type != nSldLtTTitle)
+            if(_layout.type != AscFormat.nSldLtTTitle)
             {
                 return _layout;
             }
@@ -423,13 +423,13 @@ MasterSlide.prototype =
         var _input_reduced_type;
         if(type == null)
         {
-            _input_reduced_type = phType_body;
+            _input_reduced_type = AscFormat.phType_body;
         }
         else
         {
-            if(type == phType_ctrTitle)
+            if(type == AscFormat.phType_ctrTitle)
             {
-                _input_reduced_type = phType_title;
+                _input_reduced_type = AscFormat.phType_title;
             }
             else
             {
@@ -477,13 +477,13 @@ MasterSlide.prototype =
                 }
                 if(_type == null)
                 {
-                    _final_type = phType_body;
+                    _final_type = AscFormat.phType_body;
                 }
                 else
                 {
-                    if(_type == phType_ctrTitle)
+                    if(_type == AscFormat.phType_ctrTitle)
                     {
-                        _final_type = phType_title;
+                        _final_type = AscFormat.phType_title;
                     }
                     else
                     {
@@ -504,11 +504,11 @@ MasterSlide.prototype =
                 {
                     return _glyph;
                 }
-                if(_input_reduced_type == phType_title && _input_reduced_type == _final_type)
+                if(_input_reduced_type == AscFormat.phType_title && _input_reduced_type == _final_type)
                 {
                     return _glyph;
                 }
-                if(phType_body === _type)
+                if(AscFormat.phType_body === _type)
                 {
                     ++body_count;
                     last_body = _glyph;
@@ -517,7 +517,7 @@ MasterSlide.prototype =
         }
 
 
-        if(_input_reduced_type == phType_sldNum || _input_reduced_type == phType_dt || _input_reduced_type == phType_ftr || _input_reduced_type == phType_hdr)
+        if(_input_reduced_type == AscFormat.phType_sldNum || _input_reduced_type == AscFormat.phType_dt || _input_reduced_type == AscFormat.phType_ftr || _input_reduced_type == AscFormat.phType_hdr)
         {
             for(_shape_index = 0; _shape_index < _sp_tree.length; ++_shape_index)
             {
@@ -545,7 +545,7 @@ MasterSlide.prototype =
             }
         }
 
-        if(body_count === 1 && type === phType_body  && bSingleBody)
+        if(body_count === 1 && type === AscFormat.phType_body  && bSingleBody)
         {
             return last_body;
         }
@@ -635,7 +635,7 @@ MasterSlide.prototype =
 
     getAllImages: function(images)
     {
-        if(this.cSld.Bg && this.cSld.Bg.bgPr && this.cSld.Bg.bgPr.Fill && this.cSld.Bg.bgPr.Fill.fill instanceof  CBlipFill && typeof this.cSld.Bg.bgPr.Fill.fill.RasterImageId === "string" )
+        if(this.cSld.Bg && this.cSld.Bg.bgPr && this.cSld.Bg.bgPr.Fill && this.cSld.Bg.bgPr.Fill.fill instanceof  AscFormat.CBlipFill && typeof this.cSld.Bg.bgPr.Fill.fill.RasterImageId === "string" )
         {
             images[AscCommon.getFullImageSrc2(this.cSld.Bg.bgPr.Fill.fill.RasterImageId)] = true;
         }
@@ -720,7 +720,7 @@ function CMasterThumbnailDrawer()
         var _layout = null;
         for (var i = 0; i < _master.sldLayoutLst.length; i++)
         {
-            if (_master.sldLayoutLst[i].type == nSldLtTTitle)
+            if (_master.sldLayoutLst[i].type == AscFormat.nSldLtTTitle)
             {
                 _layout = _master.sldLayoutLst[i];
                 break;
@@ -755,10 +755,10 @@ function CMasterThumbnailDrawer()
             }
             else
             {
-                _back_fill = new CUniFill();
-                _back_fill.fill = new CSolidFill();
-                _back_fill.fill.color = new CUniColor();
-                _back_fill.fill.color.color = new CRGBColor();
+                _back_fill = new AscFormat.CUniFill();
+                _back_fill.fill = new AscFormat.CSolidFill();
+                _back_fill.fill.color = new AscFormat.CUniColor();
+                _back_fill.fill.color.color = new AscFormat.CRGBColor();
                 _back_fill.fill.color.color.RGBA = {R:255, G:255, B:255, A:255};
             }
         }
@@ -805,7 +805,7 @@ function CMasterThumbnailDrawer()
         _ctx.fillRect(_color_x - _color_delta, _color_y - _color_delta, _color_w * 6 + 7 * _color_delta, 5);
         _ctx.beginPath();
 
-        var _color = new CSchemeColor();
+        var _color = new AscFormat.CSchemeColor();
         for (var i = 0; i < 6; i++)
         {
             _ctx.beginPath();

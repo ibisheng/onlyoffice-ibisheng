@@ -3,7 +3,7 @@
 function CImageShape()
 {
     this.nvPicPr  = null;
-    this.spPr     = new CSpPr();
+    this.spPr     = new AscFormat.CSpPr();
     this.blipFill = null;
     this.style    = null;
 
@@ -337,7 +337,7 @@ CImageShape.prototype =
 
     recalculateBrush: function()
     {
-        this.brush = new CUniFill();
+        this.brush = new AscFormat.CUniFill();
         this.brush.setFill(this.blipFill);
     },
 
@@ -364,14 +364,14 @@ CImageShape.prototype =
                 var b_is_single_body = this.getIsSingleBody();
                 switch (this.parent.kind)
                 {
-                    case SLIDE_KIND:
+                    case AscFormat.TYPE_KIND.SLIDE:
                     {
                         hierarchy.push(this.parent.Layout.getMatchingShape(ph_type, ph_index, b_is_single_body));
                         hierarchy.push(this.parent.Layout.Master.getMatchingShape(ph_type, ph_index, b_is_single_body));
                         break;
                     }
 
-                    case LAYOUT_KIND:
+                    case AscFormat.TYPE_KIND.LAYOUT:
                     {
                         hierarchy.push(this.parent.Master.getMatchingShape(ph_type, ph_index, b_is_single_body));
                         break;
@@ -394,7 +394,7 @@ CImageShape.prototype =
                 this.y = xfrm.offY;
                 this.extX = xfrm.extX;
                 this.extY = xfrm.extY;
-                this.rot = isRealNumber(xfrm.rot) ? xfrm.rot : 0;
+                this.rot = AscFormat.isRealNumber(xfrm.rot) ? xfrm.rot : 0;
                 this.flipH = xfrm.flipH === true;
                 this.flipV = xfrm.flipV === true;
             }
@@ -413,7 +413,7 @@ CImageShape.prototype =
                             this.y = xfrm.offY;
                             this.extX = xfrm.extX;
                             this.extY = xfrm.extY;
-                            this.rot = isRealNumber(xfrm.rot) ? xfrm.rot : 0;
+                            this.rot = AscFormat.isRealNumber(xfrm.rot) ? xfrm.rot : 0;
                             this.flipH = xfrm.flipH === true;
                             this.flipV = xfrm.flipV === true;
                             break;
@@ -465,7 +465,7 @@ CImageShape.prototype =
                     }
                     if(i === hierarchy.length)
                     {
-                        xfrm = new CXfrm();
+                        xfrm = new AscFormat.CXfrm();
                         xfrm.offX = 0;
                         xfrm.offX = 0;
                         xfrm.extX = 5;
@@ -474,7 +474,7 @@ CImageShape.prototype =
                 }
                 else
                 {
-                    xfrm = new CXfrm();
+                    xfrm = new AscFormat.CXfrm();
                     xfrm.offX = 0;
                     xfrm.offY = 0;
                     xfrm.extX = 5;
@@ -486,7 +486,7 @@ CImageShape.prototype =
             this.y = scale_scale_coefficients.cy*(xfrm.offY - this.group.spPr.xfrm.chOffY);
             this.extX = scale_scale_coefficients.cx*xfrm.extX;
             this.extY = scale_scale_coefficients.cy*xfrm.extY;
-            this.rot = isRealNumber(xfrm.rot) ? xfrm.rot : 0;
+            this.rot = AscFormat.isRealNumber(xfrm.rot) ? xfrm.rot : 0;
             this.flipH = xfrm.flipH === true;
             this.flipV = xfrm.flipV === true;
         }
@@ -664,7 +664,7 @@ CImageShape.prototype =
 
     getAllImages: function(images)
     {
-        if(this.blipFill instanceof  CBlipFill && typeof this.blipFill.RasterImageId === "string")
+        if(this.blipFill instanceof  AscFormat.CBlipFill && typeof this.blipFill.RasterImageId === "string")
         {
             images[AscCommon.getFullImageSrc2(this.blipFill.RasterImageId)] = true;
         }
@@ -839,25 +839,25 @@ CImageShape.prototype =
         {
             case AscDFH.historyitem_AutoShapes_SetBFromSerialize:
             {
-                writeBool(w, data.newPr);
+                AscFormat.writeBool(w, data.newPr);
                 break;
             }
             case AscDFH.historyitem_AutoShapes_SetDrawingBaseCoors:
             {
-                writeDouble(w, data.fromCol   );
-                writeDouble(w, data.fromColOff);
-                writeDouble(w, data.fromRow   );
-                writeDouble(w, data.fromRowOff);
-                writeDouble(w, data.toCol);
-                writeDouble(w, data.toColOff);
-                writeDouble(w, data.toRow   );
-                writeDouble(w, data.toRowOff);
+                AscFormat.writeDouble(w, data.fromCol   );
+                AscFormat.writeDouble(w, data.fromColOff);
+                AscFormat.writeDouble(w, data.fromRow   );
+                AscFormat.writeDouble(w, data.fromRowOff);
+                AscFormat.writeDouble(w, data.toCol);
+                AscFormat.writeDouble(w, data.toColOff);
+                AscFormat.writeDouble(w, data.toRow   );
+                AscFormat.writeDouble(w, data.toRowOff);
 
 
-                writeDouble(w, data.posX);
-                writeDouble(w, data.posY);
-                writeDouble(w, data.cx);
-                writeDouble(w, data.cy);
+                AscFormat.writeDouble(w, data.posX);
+                AscFormat.writeDouble(w, data.posY);
+                AscFormat.writeDouble(w, data.cx);
+                AscFormat.writeDouble(w, data.cy);
                 break;
             }
             case AscDFH.historyitem_AutoShapes_RemoveFromDrawingObjects:
@@ -867,15 +867,15 @@ CImageShape.prototype =
             case AscDFH.historyitem_AutoShapes_AddToDrawingObjects:
             {
                 var Pos = data.UseArray ? data.PosArray[0] : data.Pos;
-                writeLong(w, Pos);
+                AscFormat.writeLong(w, Pos);
                 break;
             }
             case AscDFH.historyitem_AutoShapes_SetWorksheet:
             {
-                writeBool(w,isRealObject(data.newPr));
+                AscFormat.writeBool(w,isRealObject(data.newPr));
                 if(isRealObject(data.newPr))
                 {
-                    writeString(w,data.newPr.getId());
+                    AscFormat.writeString(w,data.newPr.getId());
                 }
                 break;
             }
@@ -885,12 +885,12 @@ CImageShape.prototype =
             case AscDFH.historyitem_ImageShapeSetGroup:
             case AscDFH.historyitem_ImageShapeSetStyle:
             {
-                writeObject(w, data.newPr);
+                AscFormat.writeObject(w, data.newPr);
                 break;
             }
             case AscDFH.historyitem_ShapeSetBDeleted:
             {
-                writeBool(w, data.newPr);
+                AscFormat.writeBool(w, data.newPr);
                 break;
             }
 
@@ -913,27 +913,27 @@ CImageShape.prototype =
         {
             case AscDFH.historyitem_AutoShapes_SetBFromSerialize:
             {
-                this.fromSerialize = readBool(r);
+                this.fromSerialize = AscFormat.readBool(r);
                 break;
             }
             case AscDFH.historyitem_AutoShapes_SetDrawingBaseCoors:
             {
                 if(this.drawingBase)
                 {
-                    this.drawingBase.from.col    = readDouble(r);
-                    this.drawingBase.from.colOff = readDouble(r);
-                    this.drawingBase.from.row    = readDouble(r);
-                    this.drawingBase.from.rowOff = readDouble(r);
-                    this.drawingBase.to.col      = readDouble(r);
-                    this.drawingBase.to.colOff   = readDouble(r);
-                    this.drawingBase.to.row      = readDouble(r);
-                    this.drawingBase.to.rowOff   = readDouble(r);
+                    this.drawingBase.from.col    = AscFormat.readDouble(r);
+                    this.drawingBase.from.colOff = AscFormat.readDouble(r);
+                    this.drawingBase.from.row    = AscFormat.readDouble(r);
+                    this.drawingBase.from.rowOff = AscFormat.readDouble(r);
+                    this.drawingBase.to.col      = AscFormat.readDouble(r);
+                    this.drawingBase.to.colOff   = AscFormat.readDouble(r);
+                    this.drawingBase.to.row      = AscFormat.readDouble(r);
+                    this.drawingBase.to.rowOff   = AscFormat.readDouble(r);
 
 
-                    this.drawingBase.Pos.X = readDouble(r);
-                    this.drawingBase.Pos.Y = readDouble(r);
-                    this.drawingBase.ext.cx = readDouble(r);
-                    this.drawingBase.ext.cy = readDouble(r);
+                    this.drawingBase.Pos.X = AscFormat.readDouble(r);
+                    this.drawingBase.Pos.Y = AscFormat.readDouble(r);
+                    this.drawingBase.ext.cx = AscFormat.readDouble(r);
+                    this.drawingBase.ext.cy = AscFormat.readDouble(r);
                 }
                 break;
             }
@@ -944,7 +944,7 @@ CImageShape.prototype =
             }
             case AscDFH.historyitem_AutoShapes_AddToDrawingObjects:
             {
-                var pos = readLong(r);
+                var pos = AscFormat.readLong(r);
                 if(this.worksheet)
                 {
                     pos = this.worksheet.contentChanges.Check(AscCommon.contentchanges_Add, pos);
@@ -959,17 +959,17 @@ CImageShape.prototype =
             }
             case AscDFH.historyitem_ShapeSetBDeleted:
             {
-                this.bDeleted = readBool(r);
+                this.bDeleted = AscFormat.readBool(r);
                 break;
             }
             case AscDFH.historyitem_ImageShapeSetNvPicPr:
             {
-                this.nvPicPr = readObject(r);
+                this.nvPicPr = AscFormat.readObject(r);
                 break;
             }
             case AscDFH.historyitem_ImageShapeSetSpPr:
             {
-                this.spPr = readObject(r);
+                this.spPr = AscFormat.readObject(r);
                 break;
             }
 
@@ -977,7 +977,7 @@ CImageShape.prototype =
             {
                 if(r.GetBool())
                 {
-                    this.blipFill = new CBlipFill();
+                    this.blipFill = new AscFormat.CBlipFill();
                     r.GetLong();
                     this.blipFill.Read_FromBinary(r);
                     if(typeof CollaborativeEditing !== "undefined")
@@ -997,17 +997,17 @@ CImageShape.prototype =
             }
             case AscDFH.historyitem_ImageShapeSetParent:
             {
-                this.parent = readObject(r);
+                this.parent = AscFormat.readObject(r);
                 break;
             }
             case AscDFH.historyitem_ImageShapeSetGroup:
             {
-                this.group = readObject(r);
+                this.group = AscFormat.readObject(r);
                 break;
             }
             case AscDFH.historyitem_ImageShapeSetStyle:
             {
-                this.style = readObject(r);
+                this.style = AscFormat.readObject(r);
                 break;
             }
         }

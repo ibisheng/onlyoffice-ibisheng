@@ -7457,24 +7457,24 @@
             var angle = null;
             if ( shape_props ) {
                 switch ( shape_props.verticalTextAlign ) {
-                    case VERTICAL_ANCHOR_TYPE_BOTTOM:
+                    case AscFormat.VERTICAL_ANCHOR_TYPE_BOTTOM:
                         vertAlign = "bottom";
                         break;
-                    case VERTICAL_ANCHOR_TYPE_CENTER:
+                    case AscFormat.VERTICAL_ANCHOR_TYPE_CENTER:
                         vertAlign = "center";
                         break;
 
-                    case VERTICAL_ANCHOR_TYPE_TOP:
-                    case VERTICAL_ANCHOR_TYPE_DISTRIBUTED:
-                    case VERTICAL_ANCHOR_TYPE_JUSTIFIED:
+                    case AscFormat.VERTICAL_ANCHOR_TYPE_TOP:
+                    case AscFormat.VERTICAL_ANCHOR_TYPE_DISTRIBUTED:
+                    case AscFormat.VERTICAL_ANCHOR_TYPE_JUSTIFIED:
                         vertAlign = "top";
                         break;
                 }
                 switch ( shape_props.vert ) {
-                    case nVertTTvert:
+                    case AscFormat.nVertTTvert:
                         angle = 90;
                         break;
-                    case nVertTTvert270:
+                    case AscFormat.nVertTTvert270:
                         angle = 270;
                         break;
                     default:

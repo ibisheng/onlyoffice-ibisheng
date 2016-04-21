@@ -29,22 +29,22 @@ var  field_type_datetime13 = 14;
 
 var pHText = [];
 pHText[0] = [];//rus         ""                                                          ;
-pHText[0][phType_body]  =    "Slide text";             //"Текст слайда" ;                              ;
-pHText[0][phType_chart]    = "Chart";         // "Диаграмма" ;                                     ;
-pHText[0][phType_clipArt]  = "ClipArt";// "Текст слайда" ; //(Clip Art)                   ;
-pHText[0][phType_ctrTitle] = "Slide title";// "Заголовок слайда" ; //(Centered Title)     ;
-pHText[0][phType_dgm]      = "Diagram";// "Диаграмма";// (Diagram)                        ;
-pHText[0][phType_dt]       = "Date and time";// "Дата и время";// (Date and Time)         ;
-pHText[0][phType_ftr]      = "Footer";// "Нижний колонтитул";// (Footer)                  ;
-pHText[0][phType_hdr]      = "Header";// "Верхний колонтитул"; //(Header)                 ;
-pHText[0][phType_media]    = "Media";// "Текст слайда"; //(Media)                         ;
-pHText[0][phType_obj]      = "Slide text";// "Текст слайда"; //(Object)                   ;
-pHText[0][phType_pic]      = "Picture";// "Вставка рисунка"; //(Picture)                  ;
-pHText[0][phType_sldImg]   = "Image";// "Вставка рисунка"; //(Slide Image)                ;
-pHText[0][phType_sldNum]   = "Slide number";// "Номер слайда"; //(Slide Number)           ;
-pHText[0][phType_subTitle] = "Slide subtitle";// "Подзаголовок слайда"; //(Subtitle)      ;
-pHText[0][phType_tbl]      = "Table";// "Таблица"; //(Table)                              ;
-pHText[0][phType_title]    = "Slide title";// "Заголовок слайда" ;  //(Title)             ;
+pHText[0][AscFormat.phType_body]  =    "Slide text";             //"Текст слайда" ;                              ;
+pHText[0][AscFormat.phType_chart]    = "Chart";         // "Диаграмма" ;                                     ;
+pHText[0][AscFormat.phType_clipArt]  = "ClipArt";// "Текст слайда" ; //(Clip Art)                   ;
+pHText[0][AscFormat.phType_ctrTitle] = "Slide title";// "Заголовок слайда" ; //(Centered Title)     ;
+pHText[0][AscFormat.phType_dgm]      = "Diagram";// "Диаграмма";// (Diagram)                        ;
+pHText[0][AscFormat.phType_dt]       = "Date and time";// "Дата и время";// (Date and Time)         ;
+pHText[0][AscFormat.phType_ftr]      = "Footer";// "Нижний колонтитул";// (Footer)                  ;
+pHText[0][AscFormat.phType_hdr]      = "Header";// "Верхний колонтитул"; //(Header)                 ;
+pHText[0][AscFormat.phType_media]    = "Media";// "Текст слайда"; //(Media)                         ;
+pHText[0][AscFormat.phType_obj]      = "Slide text";// "Текст слайда"; //(Object)                   ;
+pHText[0][AscFormat.phType_pic]      = "Picture";// "Вставка рисунка"; //(Picture)                  ;
+pHText[0][AscFormat.phType_sldImg]   = "Image";// "Вставка рисунка"; //(Slide Image)                ;
+pHText[0][AscFormat.phType_sldNum]   = "Slide number";// "Номер слайда"; //(Slide Number)           ;
+pHText[0][AscFormat.phType_subTitle] = "Slide subtitle";// "Подзаголовок слайда"; //(Subtitle)      ;
+pHText[0][AscFormat.phType_tbl]      = "Table";// "Таблица"; //(Table)                              ;
+pHText[0][AscFormat.phType_title]    = "Slide title";// "Заголовок слайда" ;  //(Title)             ;
 
 
 var field_months = [];
@@ -62,24 +62,7 @@ field_months[0][9]  = "октября";
 field_months[0][10] = "ноября";
 field_months[0][11] = "декабря";
 
-
-
-
-
-//Overflow Types
-var nOTClip     = 0;
-var nOTEllipsis = 1;
-var nOTOwerflow = 2;
 //-----------------------------
-
-//Text Anchoring Types
-var nTextATB = 0;// (Text Anchor Enum ( Bottom ))
-var nTextATCtr = 1;// (Text Anchor Enum ( Center ))
-var nTextATDist = 2;// (Text Anchor Enum ( Distributed ))
-var nTextATJust = 3;// (Text Anchor Enum ( Justified ))
-var nTextATT = 4;// Top
-
-
 
 function CTextBody()
 {
@@ -287,7 +270,7 @@ CTextBody.prototype =
             case AscDFH.historyitem_TextBodySetParent:
             case AscDFH.historyitem_TextBodySetContent:
             {
-                writeObject(w, data.newPr);
+                AscFormat.writeObject(w, data.newPr);
                 break;
             }
             case AscDFH.historyitem_TextBodySetBodyPr:
@@ -312,7 +295,7 @@ CTextBody.prototype =
             {
                 case AscDFH.historyitem_TextBodySetParent:
                 {
-                    this.parent = readObject(r);
+                    this.parent = AscFormat.readObject(r);
                     break;
                 }
 
@@ -320,7 +303,7 @@ CTextBody.prototype =
                 {
                     if(r.GetBool())
                     {
-                        this.bodyPr = new CBodyPr();
+                        this.bodyPr = new AscFormat.CBodyPr();
                         this.bodyPr.Read_FromBinary(r);
                     }
                     else
@@ -336,14 +319,14 @@ CTextBody.prototype =
                 }
                 case AscDFH.historyitem_TextBodySetContent:
                 {
-                    this.content = readObject(r);
+                    this.content = AscFormat.readObject(r);
                     break;
                 }
                 case AscDFH.historyitem_TextBodySetLstStyle:
                 {
                     if(r.GetBool())
                     {
-                        this.lstStyle = new TextListStyle();
+                        this.lstStyle = new AscFormat.TextListStyle();
                         this.lstStyle.Read_FromBinary(r);
                     }
                     else
@@ -382,7 +365,7 @@ CTextBody.prototype =
             var _ph_type = this.parent.getPlaceholderType();
             switch (_ph_type)
             {
-                case phType_dt :
+                case AscFormat.phType_dt :
                 {
                     var _cur_date = new Date();
                     var _cur_year = _cur_date.getFullYear();
@@ -394,9 +377,9 @@ CTextBody.prototype =
                                 + "." + _cur_year;
                     break;
                 }
-                case phType_sldNum :
+                case AscFormat.phType_sldNum :
                 {
-                    var _firstSlideNum = isRealNumber(firstSlideNum) ? firstSlideNum : 1;
+                    var _firstSlideNum = AscFormat.isRealNumber(firstSlideNum) ? firstSlideNum : 1;
                     if(slide instanceof Slide)
                     {
                         ret += "" + (slide.num+_firstSlideNum);
@@ -410,10 +393,10 @@ CTextBody.prototype =
 
     recalculateBodyPr: function()
     {
-        ExecuteNoHistory(function()
+        AscFormat.ExecuteNoHistory(function()
         {
             if(!this.compiledBodyPr)
-                this.compiledBodyPr = new CBodyPr();
+                this.compiledBodyPr = new AscFormat.CBodyPr();
             this.compiledBodyPr.setDefault();
             if(this.parent && this.parent.isPlaceholder && this.parent.isPlaceholder())
             {
@@ -437,28 +420,28 @@ CTextBody.prototype =
         {
             if(isRealObject(this.bodyPr.textFit))
             {
-                if(this.bodyPr.textFit.type === text_fit_NormAuto)
+                if(this.bodyPr.textFit.type === AscFormat.text_fit_NormAuto)
                 {
                     var text_fit = this.bodyPr.textFit;
                     var font_scale, spacing_scale;
-                    if(isRealNumber(text_fit.fontScale))
+                    if(AscFormat.isRealNumber(text_fit.fontScale))
                         font_scale = text_fit.fontScale/100000;
-                    if(isRealNumber(text_fit.lnSpcReduction))
+                    if(AscFormat.isRealNumber(text_fit.lnSpcReduction))
                         spacing_scale = text_fit.lnSpcReduction/100000;
 
-                    if(isRealNumber(font_scale)|| isRealNumber(spacing_scale))
+                    if(AscFormat.isRealNumber(font_scale)|| AscFormat.isRealNumber(spacing_scale))
                     {
                         var pars = this.content.Content;
                         for(var index = 0; index < pars.length; ++index)
                         {
                             var parg = pars[index];
-                            if(isRealNumber(spacing_scale))
+                            if(AscFormat.isRealNumber(spacing_scale))
                             {
                                 var spacing2 = parg.Get_CompiledPr(false).ParaPr.Spacing;
                                 var new_spacing = {};
                                 var spc = spacing2.Line*spacing_scale;
                                 new_spacing.LineRule = spacing2.LineRule;
-                                if(isRealNumber(spc))
+                                if(AscFormat.isRealNumber(spc))
                                 {
                                     if(spacing2.LineRule === Asc.linerule_Auto)
                                     {
@@ -471,7 +454,7 @@ CTextBody.prototype =
                                 }
                                 parg.Set_Spacing(new_spacing);
                             }
-                            if(isRealNumber(font_scale))
+                            if(AscFormat.isRealNumber(font_scale))
                             {
                                 var bReset = false;
                                 if(AscCommon.g_oIdCounter.m_bLoad)
@@ -503,7 +486,7 @@ CTextBody.prototype =
             {
                 case para_Run:
                 {
-                    if(isRealNumber(item.Pr.FontSize))
+                    if(AscFormat.isRealNumber(item.Pr.FontSize))
                     {
                         item.Set_FontSize(Math.round(item.Pr.FontSize*fontScale));
                     }
@@ -677,7 +660,7 @@ CTextBody.prototype =
         {
             return this.parent.getStyles(level);
         }
-        return ExecuteNoHistory(function(){
+        return AscFormat.ExecuteNoHistory(function(){
             var oStyles = new CStyles(false);
             var Style_Para_Def = new CStyle( "Normal", null, null, styletype_Paragraph );
             Style_Para_Def.Create_Default_Paragraph();

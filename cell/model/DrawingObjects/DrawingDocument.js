@@ -4069,8 +4069,8 @@ function CDrawingDocument(drawingObjects)
         var array_colors_types = [6, 15, 7, 16, 0, 1, 2, 3, 4, 5];
         var _count = array_colors_types.length;
 
-        var color = new CUniColor();
-        color.color = new CSchemeColor();
+        var color = new AscFormat.CUniColor();
+        color.color = new AscFormat.CSchemeColor();
         for (var i = 0; i < _count; ++i)
         {
             color.color.id = array_colors_types[i];
@@ -4145,8 +4145,8 @@ function CDrawingDocument(drawingObjects)
 			var _count_mods = 5;
             for (var j = 0; j < _count_mods; ++j)
             {
-                var dst_mods = new CColorModifiers();
-                dst_mods.Mods = _create_mods(GetDefaultMods(_color_src.r, _color_src.g, _color_src.b, j + 1, 2));
+                var dst_mods = new AscFormat.CColorModifiers();
+                dst_mods.Mods = AscFormat._create_mods(GetDefaultMods(_color_src.r, _color_src.g, _color_src.b, j + 1, 2));
 				
                 var _rgba = {R:_color_src.r, G: _color_src.g, B:_color_src.b, A: 255};
                 dst_mods.Apply(_rgba);
@@ -4626,7 +4626,7 @@ function CDrawingDocument(drawingObjects)
         if (!bIsChange)
             return;
 
-        ExecuteNoHistory(function()
+        AscFormat.ExecuteNoHistory(function()
         {
             var shape = new CShape();
             shape.setTxBody(CreateTextBodyFromString("", this, shape));

@@ -100,7 +100,7 @@ CCollaborativeEditing.prototype.Send_Changes = function(IsUserSave, AdditionalIn
                 || Class.getObjectType() === AscDFH.historyitem_type_GraphicFrame
                 || Class.getObjectType() === AscDFH.historyitem_type_ChartSpace) && isRealObject(Class.parent))
             {
-                if(Class.parent && isRealNumber(Class.parent.num))
+                if(Class.parent && AscFormat.isRealNumber(Class.parent.num))
                 {
                     map[Class.parent.num] = true;
                 }
@@ -245,7 +245,7 @@ CCollaborativeEditing.prototype.Release_Locks = function()
             if(this.m_aNeedUnlock[Index] instanceof Slide)
                 editor.WordControl.m_oLogicDocument.DrawingDocument.LockSlide(this.m_aNeedUnlock[Index].num);
         }
-        if(this.m_aNeedUnlock[Index].parent && isRealNumber(this.m_aNeedUnlock[Index].parent.num))
+        if(this.m_aNeedUnlock[Index].parent && AscFormat.isRealNumber(this.m_aNeedUnlock[Index].parent.num))
         {
             map_redraw[this.m_aNeedUnlock[Index].parent.num] = true;
         }

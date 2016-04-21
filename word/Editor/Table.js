@@ -1836,7 +1836,7 @@ CTable.prototype =
                     var Cell = this.Content[Pos.Row].Get_Cell( Pos.Cell );
                     var Cell_shd = Cell.Get_Shd();
 
-                    if ( Props.CellsBackground.Value != Cell_shd.Value || Props.CellsBackground.Color.r != Cell_shd.Color.r || Props.CellsBackground.Color.g != Cell_shd.Color.g || Props.CellsBackground.Color.b != Cell_shd.Color.b || !CompareUnifillBool(Props.CellsBackground.Unifill, Cell_shd.Unifill) )
+                    if ( Props.CellsBackground.Value != Cell_shd.Value || Props.CellsBackground.Color.r != Cell_shd.Color.r || Props.CellsBackground.Color.g != Cell_shd.Color.g || Props.CellsBackground.Color.b != Cell_shd.Color.b || !AscFormat.CompareUnifillBool(Props.CellsBackground.Unifill, Cell_shd.Unifill) )
                     {
                         var NewShd =
                         {
@@ -1862,7 +1862,7 @@ CTable.prototype =
                 var Cell = this.CurCell;
                 var Cell_shd = Cell.Get_Shd();
 
-                if ( Props.CellsBackground.Value != Cell_shd.Value || Props.CellsBackground.Color.r != Cell_shd.Color.r || Props.CellsBackground.Color.g != Cell_shd.Color.g || Props.CellsBackground.Color.b != Cell_shd.Color.b || !CompareUnifillBool(Props.CellsBackground.Unifill, Cell_shd.Unifill)  )
+                if ( Props.CellsBackground.Value != Cell_shd.Value || Props.CellsBackground.Color.r != Cell_shd.Color.r || Props.CellsBackground.Color.g != Cell_shd.Color.g || Props.CellsBackground.Color.b != Cell_shd.Color.b || !AscFormat.CompareUnifillBool(Props.CellsBackground.Unifill, Cell_shd.Unifill)  )
                 {
                     var NewShd =
                     {

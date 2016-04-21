@@ -220,19 +220,19 @@ var MIN_ANGLE = 0.07;
 
 function CreatePenBrushForChartTrack()
 {
-    return ExecuteNoHistory(function()
+    return AscFormat.ExecuteNoHistory(function()
         {
-            var brush = new CUniFill();
-            brush.setFill(new CSolidFill());
-            brush.fill.setColor(new CUniColor());
+            var brush = new AscFormat.CUniFill();
+            brush.setFill(new AscFormat.CSolidFill());
+            brush.fill.setColor(new AscFormat.CUniColor());
             brush.fill.color.RGBA = {R:255, G:255, B:255, A:255};
-            brush.fill.color.setColor(new CRGBColor());
+            brush.fill.color.setColor(new AscFormat.CRGBColor());
             brush.fill.color.color.RGBA = {R:255, G:255, B:255, A:255};
-            var pen = new CLn();
-            pen.setFill(new CUniFill());
-            pen.Fill.setFill(new CSolidFill());
-            pen.Fill.fill.setColor(new CUniColor());
-            pen.Fill.fill.color.setColor(new CRGBColor());
+            var pen = new AscFormat.CLn();
+            pen.setFill(new AscFormat.CUniFill());
+            pen.Fill.setFill(new AscFormat.CSolidFill());
+            pen.Fill.fill.setColor(new AscFormat.CUniColor());
+            pen.Fill.fill.color.setColor(new AscFormat.CRGBColor());
             return {brush: brush, pen: pen};
         },
         this, []);
@@ -240,7 +240,7 @@ function CreatePenBrushForChartTrack()
 
 function ResizeTrackShapeImage(originalObject, cardDirection)
 {
-    ExecuteNoHistory(function()
+    AscFormat.ExecuteNoHistory(function()
     {
         this.originalObject = originalObject;
         this.numberHandle = originalObject.getNumByCardDirection(cardDirection);
@@ -837,7 +837,7 @@ function ResizeTrackShapeImage(originalObject, cardDirection)
 
         this.draw = function(overlay, transform)
         {
-            if(isRealNumber(this.originalObject.selectStartPage) && overlay.SetCurrentPage)
+            if(AscFormat.isRealNumber(this.originalObject.selectStartPage) && overlay.SetCurrentPage)
             {
                 overlay.SetCurrentPage(this.originalObject.selectStartPage);
             }
@@ -929,14 +929,14 @@ function ResizeTrackShapeImage(originalObject, cardDirection)
 
 function ResizeTrackGroup(originalObject, cardDirection, parentTrack)
 {
-    ExecuteNoHistory(function()
+    AscFormat.ExecuteNoHistory(function()
     {
         this.original = originalObject;
 
         this.originalObject = originalObject;
         this.parentTrack = parentTrack;
         var numberHandle;
-        if(isRealNumber(cardDirection))
+        if(AscFormat.isRealNumber(cardDirection))
         {
             this.numberHandle = originalObject.getNumByCardDirection(cardDirection);
             numberHandle =  this.numberHandle;
@@ -1508,7 +1508,7 @@ function ResizeTrackGroup(originalObject, cardDirection, parentTrack)
 
         this.draw = function(graphics)
         {
-            if( isRealNumber(this.originalObject.selectStartPage) && graphics.SetCurrentPage)
+            if( AscFormat.isRealNumber(this.originalObject.selectStartPage) && graphics.SetCurrentPage)
             {
                 graphics.SetCurrentPage(this.originalObject.selectStartPage);
             }
@@ -1564,11 +1564,11 @@ function ResizeTrackGroup(originalObject, cardDirection, parentTrack)
 
             if(!this.original.spPr)
             {
-                this.original.setSpPr(new CSpPr());
+                this.original.setSpPr(new AscFormat.CSpPr());
             }
             if(!this.original.spPr.xfrm)
             {
-                this.original.spPr.setXfrm(new CXfrm());
+                this.original.spPr.setXfrm(new AscFormat.CXfrm());
                 this.original.spPr.xfrm.setParent(this.original.spPr);
             }
             var xfrm = this.original.spPr.xfrm;
@@ -1603,7 +1603,7 @@ function ResizeTrackGroup(originalObject, cardDirection, parentTrack)
 
 function ShapeForResizeInGroup(originalObject, parentTrack)
 {
-    ExecuteNoHistory(function()
+    AscFormat.ExecuteNoHistory(function()
     {
         this.originalObject = originalObject;
         this.parentTrack = parentTrack;
@@ -1684,7 +1684,7 @@ function ShapeForResizeInGroup(originalObject, parentTrack)
 
             if(!this.originalObject.spPr.xfrm)
             {
-                this.originalObject.spPr.setXfrm(new CXfrm());
+                this.originalObject.spPr.setXfrm(new AscFormat.CXfrm());
                 this.originalObject.spPr.xfrm.setParent(this.originalObject.spPr);
             }
             var xfrm = this.originalObject.spPr.xfrm;

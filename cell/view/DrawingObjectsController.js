@@ -282,7 +282,7 @@ DrawingObjectsController.prototype.addChartDrawingObject = function(options)
         chart.setBDeleted(false);
         this.resetSelection();
         var w, h;
-        if(isRealObject(options) && isRealNumber(options.width) && isRealNumber(options.height))
+        if(isRealObject(options) && AscFormat.isRealNumber(options.width) && AscFormat.isRealNumber(options.height))
         {
             w = this.drawingObjects.convertMetric(options.width, 0, 3);
             h = this.drawingObjects.convertMetric(options.height, 0, 3);
@@ -294,7 +294,7 @@ DrawingObjectsController.prototype.addChartDrawingObject = function(options)
         }
 
         var chartLeft, chartTop;
-        if(options && isRealNumber(options.left) && options.left >= 0 && isRealNumber(options.top) && options.top >= 0)
+        if(options && AscFormat.isRealNumber(options.left) && options.left >= 0 && AscFormat.isRealNumber(options.top) && options.top >= 0)
         {
             chartLeft = this.drawingObjects.convertMetric(options.left, 0, 3);
             chartTop = this.drawingObjects.convertMetric(options.top, 0, 3);
@@ -314,9 +314,9 @@ DrawingObjectsController.prototype.addChartDrawingObject = function(options)
         }
 
 
-        chart.setSpPr(new CSpPr());
+        chart.setSpPr(new AscFormat.CSpPr());
         chart.spPr.setParent(chart);
-        chart.spPr.setXfrm(new CXfrm());
+        chart.spPr.setXfrm(new AscFormat.CXfrm());
         chart.spPr.xfrm.setParent(chart.spPr);
         chart.spPr.xfrm.setOffX(chartLeft);
         chart.spPr.xfrm.setOffY(chartTop);
@@ -418,7 +418,7 @@ DrawingObjectsController.prototype.setParagraphNumbering = function(Bullet)
 
 DrawingObjectsController.prototype.setParagraphIndent = function(Indent)
 {
-    if(isRealObject(Indent) && isRealNumber(Indent.Left) && Indent.Left < 0)
+    if(isRealObject(Indent) && AscFormat.isRealNumber(Indent.Left) && Indent.Left < 0)
     {
         Indent.Left = 0;
     }
@@ -437,7 +437,7 @@ DrawingObjectsController.prototype.canIncreaseParagraphLevel = function(bIncreas
     {
         var target_text_object = getTargetTextObject(this);
         if(target_text_object && target_text_object.getObjectType() === AscDFH.historyitem_type_Shape
-            && (!target_text_object.isPlaceholder() || !target_text_object.getPhType() !== phType_title && target_text_object.getPhType() !== phType_ctrTitle))
+            && (!target_text_object.isPlaceholder() || !target_text_object.getPhType() !== AscFormat.phType_title && target_text_object.getPhType() !== AscFormat.phType_ctrTitle))
         {
             return content.Can_IncreaseParagraphLevel(bIncrease);
         }

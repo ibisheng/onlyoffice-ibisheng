@@ -94,7 +94,7 @@ CChartSpace.prototype.recalculateChartBrush = function()
 CChartSpace.prototype.recalculateChartPen = function()
 {
     var parent_objects = this.getParentObjects();
-    var default_line = new CLn();
+    var default_line = new AscFormat.CLn();
     if(parent_objects.theme  && parent_objects.theme.themeElements
         && parent_objects.theme.themeElements.fmtScheme
         && parent_objects.theme.themeElements.fmtScheme.lnStyleLst)
@@ -191,7 +191,7 @@ CChartSpace.prototype.setRecalculateInfo = function()
     this.baseColors = [];
     this.bounds = {l: 0, t: 0, r: 0, b:0, w: 0, h:0};
     this.chartObj = null;
-    this.rectGeometry = ExecuteNoHistory(function(){return  CreateGeometry("rect");},  this, []);
+    this.rectGeometry = AscFormat.ExecuteNoHistory(function(){return  CreateGeometry("rect");},  this, []);
     this.lockType = AscCommon.c_oAscLockTypes.kLockTypeNone;
 };
 CChartSpace.prototype.recalcTransform = function()
@@ -334,7 +334,7 @@ CChartSpace.prototype.recalculate = function()
 {
     if(this.bDeleted || !this.parent)
         return;
-    ExecuteNoHistory(function()
+    AscFormat.ExecuteNoHistory(function()
     {
         this.updateLinks();
 

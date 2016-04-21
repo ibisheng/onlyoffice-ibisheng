@@ -135,7 +135,7 @@ CDocContentStructure.prototype.checkByWarpStruct = function(oWarpStruct, dWidth,
             {
                 var oWarpedObject = aWarpedObjects[t];
                 var bArcDown = "textArchDown" !== oWarpStruct.preset && i < 1;
-                if(!isRealNumber(oWarpedObject.x) || !isRealNumber(oWarpedObject.y) )
+                if(!AscFormat.isRealNumber(oWarpedObject.x) || !AscFormat.isRealNumber(oWarpedObject.y) )
                 {
                     CheckGeometryByPolygon(oWarpedObject, oPolygon, bArcDown, XLimit*dKoeff, dContentHeight, dKoeff, nDivCount > 1 ? oBoundsChecker.Bounds : null);
                 }
@@ -195,7 +195,7 @@ CDocContentStructure.prototype.checkContentReduct = function(oWarpStruct, dWidth
             for(t = 0; t < aWarpedObjects.length; ++t)
             {
                 var oWarpedObject = aWarpedObjects[t];
-                if(isRealNumber(oWarpedObject.x) && isRealNumber(oWarpedObject.y) )
+                if(AscFormat.isRealNumber(oWarpedObject.x) && AscFormat.isRealNumber(oWarpedObject.y) )
                 {
                     oMatrix = new CMatrix();
                     oBoundsChecker.Bounds.ClearNoAttack();
@@ -434,7 +434,7 @@ CDocContentStructure.prototype.checkTransformByOddPath = function(oMatrix, oWarp
         dX = -dX;
         dY = -dY;
     }
-    if(oObjectToDrawNext && isRealNumber(oObjectToDrawNext.x) && isRealNumber(oObjectToDrawNext.y) && oObjectToDrawNext.x > oWarpedObject.x)
+    if(oObjectToDrawNext && AscFormat.isRealNumber(oObjectToDrawNext.x) && AscFormat.isRealNumber(oObjectToDrawNext.y) && oObjectToDrawNext.x > oWarpedObject.x)
     {
         cX2 = (oObjectToDrawNext.x)/XLimit;
         oRet = oPolygon.getPointOnPolygon(cX2, true);
@@ -798,7 +798,7 @@ function GetConstDescription(nConst)
 
 function CreatePenFromParams(oUnifill, nStyle, nLineCap, nLineJoin, dLineWidth, dSize)
 {
-    var oLine = new CLn();
+    var oLine = new AscFormat.CLn();
     oLine.setW(dSize * 36000 >> 0);
     oLine.setFill(oUnifill);
 
@@ -936,7 +936,7 @@ CTextDrawer.prototype =
 
     set_fillColor: function(R, G, B)
     {
-        this.m_oFill = CreateUniFillByUniColor(CreateUniColorRGB(R, G, B));
+        this.m_oFill = CreateUniFillByUniColor(AscFormat.CreateUniColorRGB(R, G, B));
         this.Get_PathToDraw(false, true);
     },
 
@@ -2059,11 +2059,11 @@ CTextDrawer.prototype =
             if(this.m_oBrush.Color1.R !== -1)
             {
                 var Color = this.m_oBrush.Color1;
-                return CreateUniFillByUniColor(CreateUniColorRGB(Color.R, Color.G, Color.B));
+                return CreateUniFillByUniColor(AscFormat.CreateUniColorRGB(Color.R, Color.G, Color.B));
             }
             else
             {
-                return CreateUniFillByUniColor(CreateUniColorRGB(0, 0, 0));
+                return CreateUniFillByUniColor(AscFormat.CreateUniColorRGB(0, 0, 0));
             }
         }
     },
@@ -2457,7 +2457,7 @@ function ComparePens(oPen1, oPen2)
 
 function GetRectContentWidth(oContent, dMaxWidth)
 {
-    var _maxWidth = isRealNumber(dMaxWidth) ? dMaxWidth : 100000;
+    var _maxWidth = AscFormat.isRealNumber(dMaxWidth) ? dMaxWidth : 100000;
 
     oContent.Reset(0, 0, _maxWidth, 100000);
     oContent.Recalculate_Page(0, true);

@@ -2294,7 +2294,7 @@ ParaTextPr.prototype =
             {
                 if ( true != Reader.GetBool() )
                 {
-                    var unifill = new CUniFill();
+                    var unifill = new AscFormat.CUniFill();
                     unifill.Read_FromBinary(Reader);
                     this.Value.Unifill = unifill;
 
@@ -2314,7 +2314,7 @@ ParaTextPr.prototype =
             {
                 if ( true != Reader.GetBool() )
                 {
-                    var unifill = new CUniFill();
+                    var unifill = new AscFormat.CUniFill();
                     unifill.Read_FromBinary(Reader);
                     this.Value.TextFill = unifill;
                 }
@@ -2326,7 +2326,7 @@ ParaTextPr.prototype =
             {
                 if ( true != Reader.GetBool() )
                 {
-                    var line = new CLn();
+                    var line = new AscFormat.CLn();
                     line.Read_FromBinary(Reader);
                     this.Value.TextOutline = line;
                 }
@@ -4446,7 +4446,7 @@ ParaDrawing.prototype =
     {
         if(isRealObject(this.GraphicObj) && isRealObject(this.GraphicObj.spPr) && isRealObject(this.GraphicObj.spPr.xfrm))
             return this.GraphicObj.spPr.xfrm.extX;
-        if(isRealNumber(this.Extent.W))
+        if(AscFormat.isRealNumber(this.Extent.W))
             return this.Extent.W;
         return 0;
     },
@@ -4455,7 +4455,7 @@ ParaDrawing.prototype =
     {
         if(isRealObject(this.GraphicObj) && isRealObject(this.GraphicObj.spPr) && isRealObject(this.GraphicObj.spPr.xfrm))
             return this.GraphicObj.spPr.xfrm.extY;
-        if(isRealNumber(this.Extent.H))
+        if(AscFormat.isRealNumber(this.Extent.H))
             return this.Extent.H;
         return 0;
     },
@@ -4482,7 +4482,7 @@ ParaDrawing.prototype =
 
             this.Set_DrawingType(c_oAscWrapStyle2.Inline === Props.WrappingStyle ? drawing_Inline : drawing_Anchor);
             if (c_oAscWrapStyle2.Inline === Props.WrappingStyle) {
-                if (isRealObject(this.GraphicObj.bounds) && isRealNumber(this.GraphicObj.bounds.w) && isRealNumber(this.GraphicObj.bounds.h)) {
+                if (isRealObject(this.GraphicObj.bounds) && AscFormat.isRealNumber(this.GraphicObj.bounds.w) && AscFormat.isRealNumber(this.GraphicObj.bounds.h)) {
                     this.setExtent(this.GraphicObj.bounds.w, this.GraphicObj.bounds.h);
                 }
             }
@@ -4530,7 +4530,7 @@ ParaDrawing.prototype =
             this.Set_PositionH(Props.PositionH.RelativeFrom, Props.PositionH.UseAlign, ( true === Props.PositionH.UseAlign ? Props.PositionH.Align : Props.PositionH.Value ), Props.PositionH.Percent);
             if (Props.PositionH.UseAlign) {
                 bNeedUpdateWH = true;
-                if (isRealObject(this.GraphicObj.bounds) && isRealNumber(this.GraphicObj.bounds.w)) {
+                if (isRealObject(this.GraphicObj.bounds) && AscFormat.isRealNumber(this.GraphicObj.bounds.w)) {
                     newW = this.GraphicObj.bounds.w;
                 }
             }
@@ -4539,7 +4539,7 @@ ParaDrawing.prototype =
             this.Set_PositionV(Props.PositionV.RelativeFrom, Props.PositionV.UseAlign, ( true === Props.PositionV.UseAlign ? Props.PositionV.Align : Props.PositionV.Value ), Props.PositionV.Percent);
             if (this.PositionV.UseAlign) {
                 bNeedUpdateWH = true;
-                if (isRealObject(this.GraphicObj.bounds) && isRealNumber(this.GraphicObj.bounds.h)) {
+                if (isRealObject(this.GraphicObj.bounds) && AscFormat.isRealNumber(this.GraphicObj.bounds.h)) {
                     newH = this.GraphicObj.bounds.h;
                 }
             }
@@ -4643,7 +4643,7 @@ ParaDrawing.prototype =
             this.Height = 0;
             return;
         }
-        if(isRealNumber(this.Extent.W) && isRealNumber(this.Extent.H) && (!this.GraphicObj.checkAutofit || !this.GraphicObj.checkAutofit()) && !this.SizeRelH && !this.SizeRelV)
+        if(AscFormat.isRealNumber(this.Extent.W) && AscFormat.isRealNumber(this.Extent.H) && (!this.GraphicObj.checkAutofit || !this.GraphicObj.checkAutofit()) && !this.SizeRelH && !this.SizeRelV)
         {
             this.Width        = this.Extent.W;
             this.Height       = this.Extent.H;
@@ -4756,7 +4756,7 @@ ParaDrawing.prototype =
         {
             c.SetSizeRelV({RelativeFrom: this.SizeRelV.RelativeFrom, Percent: this.SizeRelV.Percent});
         }
-        if(isRealNumber(this.Extent.W) && isRealNumber(this.Extent.H))
+        if(AscFormat.isRealNumber(this.Extent.W) && AscFormat.isRealNumber(this.Extent.H))
         {
             c.setExtent(this.Extent.W, this.Extent.H);
         }
@@ -4939,7 +4939,7 @@ ParaDrawing.prototype =
     updatePosition3: function(pageIndex, x, y, oldPageNum)
     {
         this.graphicObjects.removeById(pageIndex, this.Get_Id());
-        if(isRealNumber(oldPageNum))
+        if(AscFormat.isRealNumber(oldPageNum))
         {
             this.graphicObjects.removeById(oldPageNum, this.Get_Id());
         }
@@ -4967,10 +4967,10 @@ ParaDrawing.prototype =
         this.selectY = y;
 
 
-        if( this.GraphicObj.bNeedUpdatePosition || !(isRealNumber(this.GraphicObj.posX) && isRealNumber(this.GraphicObj.posY)) ||
+        if( this.GraphicObj.bNeedUpdatePosition || !(AscFormat.isRealNumber(this.GraphicObj.posX) && AscFormat.isRealNumber(this.GraphicObj.posY)) ||
             !(Math.abs(this.GraphicObj.posX-_x) < MOVE_DELTA && Math.abs(this.GraphicObj.posY-_y) < MOVE_DELTA))
             this.GraphicObj.updatePosition(_x, _y);
-        if( this.GraphicObj.bNeedUpdatePosition || !(isRealNumber(this.wrappingPolygon.posX) && isRealNumber(this.wrappingPolygon.posY)) ||
+        if( this.GraphicObj.bNeedUpdatePosition || !(AscFormat.isRealNumber(this.wrappingPolygon.posX) && AscFormat.isRealNumber(this.wrappingPolygon.posY)) ||
             !(Math.abs(this.wrappingPolygon.posX -_x) < MOVE_DELTA && Math.abs(this.wrappingPolygon.posY-_y) < MOVE_DELTA))
             this.wrappingPolygon.updatePosition(_x, _y);
         this.calculateSnapArrays();
@@ -5030,19 +5030,19 @@ ParaDrawing.prototype =
     Set_Distance : function(L, T, R, B)
     {
         var oDistance = this.Get_Distance();
-        if (!isRealNumber(L))
+        if (!AscFormat.isRealNumber(L))
         {
             L = oDistance.L;
         }
-        if (!isRealNumber(T))
+        if (!AscFormat.isRealNumber(T))
         {
             T = oDistance.T;
         }
-        if(!isRealNumber(R))
+        if(!AscFormat.isRealNumber(R))
         {
             R = oDistance.R;
         }
-        if (!isRealNumber(B))
+        if (!AscFormat.isRealNumber(B))
         {
             B = oDistance.B;
         }
@@ -5113,7 +5113,7 @@ ParaDrawing.prototype =
     Set_RelativeHeight2 : function(nRelativeHeight)
     {
         this.RelativeHeight = nRelativeHeight;
-        if(this.graphicObjects && isRealNumber(nRelativeHeight) && nRelativeHeight > this.graphicObjects.maximalGraphicObjectZIndex)
+        if(this.graphicObjects && AscFormat.isRealNumber(nRelativeHeight) && nRelativeHeight > this.graphicObjects.maximalGraphicObjectZIndex)
         {
             this.graphicObjects.maximalGraphicObjectZIndex = nRelativeHeight;
         }
@@ -5956,15 +5956,15 @@ ParaDrawing.prototype =
             }
             case AscDFH.historyitem_Drawing_SetEffectExtent:
             {
-                writeDouble(Writer, Data.NewEE.L);
-                writeDouble(Writer, Data.NewEE.T);
-                writeDouble(Writer, Data.NewEE.R);
-                writeDouble(Writer, Data.NewEE.B);
+                AscFormat.writeDouble(Writer, Data.NewEE.L);
+                AscFormat.writeDouble(Writer, Data.NewEE.T);
+                AscFormat.writeDouble(Writer, Data.NewEE.R);
+                AscFormat.writeDouble(Writer, Data.NewEE.B);
                 break;
             }
             case AscDFH.historyitem_Drawing_SetRelativeHeight:
             {
-                writeLong(Writer, Data.NewPr);
+                AscFormat.writeLong(Writer, Data.NewPr);
                 break;
             }
             case AscDFH.historyitem_Drawing_DrawingType:
@@ -6078,7 +6078,7 @@ ParaDrawing.prototype =
             }
             case AscDFH.historyitem_SetWrapPolygon:
             {
-                writeObject(Writer, Data.newW);
+                AscFormat.writeObject(Writer, Data.newW);
                // Writer.WriteBool(Data.newW !== null && typeof Data.newW === "object");
                // if(Data.newW !== null && typeof Data.newW === "object")
                // {
@@ -6088,13 +6088,13 @@ ParaDrawing.prototype =
             }
             case AscDFH.historyitem_Drawing_SetLocked:
             {
-                writeBool(Writer, Data.NewPr);
+                AscFormat.writeBool(Writer, Data.NewPr);
                 break;
             }
 
             case AscDFH.historyitem_Drawing_SetParent:
             {
-                writeObject(Writer, Data.newPr);
+                AscFormat.writeObject(Writer, Data.newPr);
                 break;
             }
             case AscDFH.historyitem_Drawing_SetParaMath:
@@ -6163,15 +6163,15 @@ ParaDrawing.prototype =
             }
             case AscDFH.historyitem_Drawing_SetEffectExtent:
             {
-                this.EffectExtent.L = readDouble(Reader);
-                this.EffectExtent.T = readDouble(Reader);
-                this.EffectExtent.R = readDouble(Reader);
-                this.EffectExtent.B = readDouble(Reader);
+                this.EffectExtent.L = AscFormat.readDouble(Reader);
+                this.EffectExtent.T = AscFormat.readDouble(Reader);
+                this.EffectExtent.R = AscFormat.readDouble(Reader);
+                this.EffectExtent.B = AscFormat.readDouble(Reader);
                 break;
             }
             case AscDFH.historyitem_Drawing_SetRelativeHeight:
             {
-                this.Set_RelativeHeight2(readLong(Reader));
+                this.Set_RelativeHeight2(AscFormat.readLong(Reader));
                 break;
             }
             case AscDFH.historyitem_Drawing_DrawingType:
@@ -6318,18 +6318,18 @@ ParaDrawing.prototype =
             }
             case AscDFH.historyitem_SetWrapPolygon:
             {
-                this.wrappingPolygon = readObject(Reader);
+                this.wrappingPolygon = AscFormat.readObject(Reader);
                 break;
             }
             case AscDFH.historyitem_Drawing_SetLocked:
             {
-                this.Locked = readBool(Reader);
+                this.Locked = AscFormat.readBool(Reader);
                 break;
             }
 
             case AscDFH.historyitem_Drawing_SetParent:
             {
-                this.Parent = readObject(Reader);
+                this.Parent = AscFormat.readObject(Reader);
                 break;
             }
             case AscDFH.historyitem_Drawing_SetParaMath:
@@ -6366,13 +6366,13 @@ ParaDrawing.prototype =
     {
         Writer.WriteLong( AscDFH.historyitem_type_Drawing );
         Writer.WriteString2(this.Id);
-        writeDouble(Writer, this.Extent.W);
-        writeDouble(Writer, this.Extent.H);
-        writeObject(Writer, this.GraphicObj);
-        writeObject(Writer, this.DocumentContent);
-        writeObject(Writer, this.Parent);
-        writeObject(Writer, this.wrappingPolygon);
-        writeLong(Writer, this.RelativeHeight);
+        AscFormat.writeDouble(Writer, this.Extent.W);
+        AscFormat.writeDouble(Writer, this.Extent.H);
+        AscFormat.writeObject(Writer, this.GraphicObj);
+        AscFormat.writeObject(Writer, this.DocumentContent);
+        AscFormat.writeObject(Writer, this.Parent);
+        AscFormat.writeObject(Writer, this.wrappingPolygon);
+        AscFormat.writeLong(Writer, this.RelativeHeight);
 
     },
 
@@ -6382,13 +6382,13 @@ ParaDrawing.prototype =
         this.DrawingDocument = editor.WordControl.m_oLogicDocument.DrawingDocument;
         this.LogicDocument   = this.DrawingDocument ? this.DrawingDocument.m_oLogicDocument : null;
 
-        this.Extent.W = readDouble(Reader);
-        this.Extent.H = readDouble(Reader);
-        this.GraphicObj      = readObject(Reader);
-        this.DocumentContent = readObject(Reader);
-        this.Parent          = readObject(Reader);
-        this.wrappingPolygon = readObject(Reader);
-        this.RelativeHeight  = readLong(Reader);
+        this.Extent.W = AscFormat.readDouble(Reader);
+        this.Extent.H = AscFormat.readDouble(Reader);
+        this.GraphicObj      = AscFormat.readObject(Reader);
+        this.DocumentContent = AscFormat.readObject(Reader);
+        this.Parent          = AscFormat.readObject(Reader);
+        this.wrappingPolygon = AscFormat.readObject(Reader);
+        this.RelativeHeight  = AscFormat.readLong(Reader);
         if(this.wrappingPolygon)
         {
             this.wrappingPolygon.wordGraphicObject = this;

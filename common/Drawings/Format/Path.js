@@ -263,18 +263,18 @@ Path.prototype = {
             case AscDFH.historyitem_PathSetStroke:
             case AscDFH.historyitem_PathSetExtrusionOk:
             {
-                writeBool(w, data.newPr);
+                AscFormat.writeBool(w, data.newPr);
                 break;
             }
             case AscDFH.historyitem_PathSetFill:
             {
-                writeString(w, data.newPr);
+                AscFormat.writeString(w, data.newPr);
                 break;
             }
             case AscDFH.historyitem_PathSetPathH:
             case AscDFH.historyitem_PathSetPathW:
             {
-                writeLong(w, data.newPr);
+                AscFormat.writeLong(w, data.newPr);
                 break;
             }
             case AscDFH.historyitem_PathAddPathCommand:
@@ -285,47 +285,47 @@ Path.prototype = {
                     case lineTo:
                     {
                         w.WriteBool(true);
-                        writeLong(w, data.newPr.id);
-                        writeString(w, data.newPr.X);
-                        writeString(w, data.newPr.Y);
+                        AscFormat.writeLong(w, data.newPr.id);
+                        AscFormat.writeString(w, data.newPr.X);
+                        AscFormat.writeString(w, data.newPr.Y);
                         break;
                     }
                     case bezier3:
                     {
                         w.WriteBool(true);
-                        writeLong(w, data.newPr.id);
-                        writeString(w, data.newPr.X0);
-                        writeString(w, data.newPr.Y0);
-                        writeString(w, data.newPr.X1);
-                        writeString(w, data.newPr.Y1);
+                        AscFormat.writeLong(w, data.newPr.id);
+                        AscFormat.writeString(w, data.newPr.X0);
+                        AscFormat.writeString(w, data.newPr.Y0);
+                        AscFormat.writeString(w, data.newPr.X1);
+                        AscFormat.writeString(w, data.newPr.Y1);
                         break;
                     }
                     case bezier4:
                     {
                         w.WriteBool(true);
-                        writeLong(w, data.newPr.id);
-                        writeString(w, data.newPr.X0);
-                        writeString(w, data.newPr.Y0);
-                        writeString(w, data.newPr.X1);
-                        writeString(w, data.newPr.Y1);
-                        writeString(w, data.newPr.X2);
-                        writeString(w, data.newPr.Y2);
+                        AscFormat.writeLong(w, data.newPr.id);
+                        AscFormat.writeString(w, data.newPr.X0);
+                        AscFormat.writeString(w, data.newPr.Y0);
+                        AscFormat.writeString(w, data.newPr.X1);
+                        AscFormat.writeString(w, data.newPr.Y1);
+                        AscFormat.writeString(w, data.newPr.X2);
+                        AscFormat.writeString(w, data.newPr.Y2);
                         break;
                     }
                     case arcTo:
                     {
                         w.WriteBool(true);
-                        writeLong(w, data.newPr.id);
-                        writeString(w, data.newPr.hR);
-                        writeString(w, data.newPr.wR);
-                        writeString(w, data.newPr.stAng);
-                        writeString(w, data.newPr.swAng);
+                        AscFormat.writeLong(w, data.newPr.id);
+                        AscFormat.writeString(w, data.newPr.hR);
+                        AscFormat.writeString(w, data.newPr.wR);
+                        AscFormat.writeString(w, data.newPr.stAng);
+                        AscFormat.writeString(w, data.newPr.swAng);
                         break;
                     }
                     case close:
                     {
                         w.WriteBool(true);
-                        writeLong(w, data.newPr.id);
+                        AscFormat.writeLong(w, data.newPr.id);
                         break;
                     }
                 }
@@ -341,70 +341,70 @@ Path.prototype = {
         {
             case AscDFH.historyitem_PathSetStroke:
             {
-                this.stroke = readBool(r);
+                this.stroke = AscFormat.readBool(r);
                 break;
             }
             case AscDFH.historyitem_PathSetExtrusionOk:
             {
-                this.extrusionOk = readBool(r);
+                this.extrusionOk = AscFormat.readBool(r);
                 break;
             }
             case AscDFH.historyitem_PathSetFill:
             {
-                this.fill = readString(r);
+                this.fill = AscFormat.readString(r);
                 break;
             }
             case AscDFH.historyitem_PathSetPathH:
             {
-                this.pathH = readLong(r);
+                this.pathH = AscFormat.readLong(r);
                 break;
             }
             case AscDFH.historyitem_PathSetPathW:
             {
-                this.pathW = readLong(r);
+                this.pathW = AscFormat.readLong(r);
                 break;
             }
             case AscDFH.historyitem_PathAddPathCommand:
             {
                 if(r.GetBool())
                 {
-                    var command_id = readLong(r);
+                    var command_id = AscFormat.readLong(r);
                     switch (command_id)
                     {
                         case moveTo:
                         case lineTo:
                         {
-                            var x = readString(r);
-                            var y = readString(r);
+                            var x = AscFormat.readString(r);
+                            var y = AscFormat.readString(r);
                             this.ArrPathCommandInfo.push({id: command_id, X: x, Y: y});
                             break;
                         }
                         case bezier3:
                         {
-                            var X0 = readString(r);
-                            var Y0 = readString(r);
-                            var X1 = readString(r);
-                            var Y1 = readString(r);
+                            var X0 = AscFormat.readString(r);
+                            var Y0 = AscFormat.readString(r);
+                            var X1 = AscFormat.readString(r);
+                            var Y1 = AscFormat.readString(r);
                             this.ArrPathCommandInfo.push({id: bezier3, X0: X0, Y0: Y0, X1: X1, Y1: Y1});
                             break;
                         }
                         case bezier4:
                         {
-                            var X0 = readString(r);
-                            var Y0 = readString(r);
-                            var X1 = readString(r);
-                            var Y1 = readString(r);
-                            var X2 = readString(r);
-                            var Y2 = readString(r);
+                            var X0 = AscFormat.readString(r);
+                            var Y0 = AscFormat.readString(r);
+                            var X1 = AscFormat.readString(r);
+                            var Y1 = AscFormat.readString(r);
+                            var X2 = AscFormat.readString(r);
+                            var Y2 = AscFormat.readString(r);
                             this.ArrPathCommandInfo.push({id: bezier4, X0: X0, Y0: Y0, X1: X1, Y1: Y1, X2: X2, Y2: Y2});
                             break;
                         }
                         case arcTo:
                         {
-                            var hR    = readString(r);
-                            var wR    = readString(r);
-                            var stAng = readString(r);
-                            var swAng = readString(r);
+                            var hR    = AscFormat.readString(r);
+                            var wR    = AscFormat.readString(r);
+                            var stAng = AscFormat.readString(r);
+                            var swAng = AscFormat.readString(r);
                             this.ArrPathCommandInfo.push({id: arcTo, hR: hR, wR: wR, stAng: stAng, swAng: swAng});
                             break;
                         }

@@ -1,6 +1,6 @@
 "use strict";
 
-var G_O_DEFAULT_COLOR_MAP = GenerateDefaultColorMap();
+var G_O_DEFAULT_COLOR_MAP = AscFormat.GenerateDefaultColorMap();
 
 CShape.prototype.setDrawingObjects = function(drawingObjects)
 {
@@ -134,7 +134,7 @@ function addToDrawings(worksheet, graphic, position, lockByDefault, anchor)
     if(!worksheet)
         return;
     var ret, aObjects = worksheet.Drawings;
-    if (isRealNumber(position)) {
+    if (AscFormat.isRealNumber(position)) {
         aObjects.splice(position, 0, drawingObject);
         ret = position;
     }
@@ -200,7 +200,7 @@ CShape.prototype.addToDrawingObjects =  function(pos)
 CShape.prototype.deleteDrawingBase = function()
 {
     var position = deleteDrawingBase(this.worksheet.Drawings, this.Get_Id());
-    if(isRealNumber(position))
+    if(AscFormat.isRealNumber(position))
     {
         var data = {Type: AscDFH.historyitem_AutoShapes_RemoveFromDrawingObjects, Pos: position};
         History.Add(this, data);
@@ -396,7 +396,7 @@ CShape.prototype.recalculate = function ()
 {
     if(this.bDeleted)
         return;
-    ExecuteNoHistory(function(){
+    AscFormat.ExecuteNoHistory(function(){
         if (this.recalcInfo.recalculateBrush) {
             this.recalculateBrush();
             this.recalcInfo.recalculateBrush = false;

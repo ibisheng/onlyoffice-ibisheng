@@ -979,7 +979,7 @@ asc_docs_api.prototype.UpdateParagraphProp = function(ParaPr, bParaPr){
         {
             switch (ParaPr.Bullet.bulletType.type)
             {
-                case BULLET_TYPE_BULLET_CHAR:
+                case AscFormat.BULLET_TYPE_BULLET_CHAR:
                 {
                     ListType.Type = 0;
                     ListType.SubType = undefined;
@@ -1023,17 +1023,17 @@ asc_docs_api.prototype.UpdateParagraphProp = function(ParaPr, bParaPr){
                     }
                     break;
                 }
-                case BULLET_TYPE_BULLET_BLIP:
+                case AscFormat.BULLET_TYPE_BULLET_BLIP:
                 {
                     ListType.Type = 0;
                     ListType.SubType = undefined;
                     break;
                 }
-                case BULLET_TYPE_BULLET_AUTONUM:
+                case AscFormat.BULLET_TYPE_BULLET_AUTONUM:
                 {
                     ListType.Type = 1;
                     ListType.SubType = undefined;
-                    if(isRealNumber(ParaPr.Bullet.bulletType.AutoNumType))
+                    if(AscFormat.isRealNumber(ParaPr.Bullet.bulletType.AutoNumType))
                     {
                         var AutoNumType = g_NumberingArr[ParaPr.Bullet.bulletType.AutoNumType] - 99;
                         if(AutoNumType > 0 && AutoNumType < 9)
@@ -1956,9 +1956,9 @@ asc_docs_api.prototype.SetSlideProps = function(prop)
     {
         if (_back_fill.asc_getType() == c_oAscFill.FILL_TYPE_NOFILL)
         {
-            var bg = new CBg();
-            bg.bgPr = new CBgPr();
-            bg.bgPr.Fill = CorrectUniFill(_back_fill, null);
+            var bg = new AscFormat.CBg();
+            bg.bgPr = new AscFormat.CBgPr();
+            bg.bgPr.Fill = AscFormat.CorrectUniFill(_back_fill, null);
 
             this.WordControl.m_oLogicDocument.changeBackground(bg, arr_ind);
             return;
@@ -1967,9 +1967,9 @@ asc_docs_api.prototype.SetSlideProps = function(prop)
         var _old_fill = this.WordControl.m_oLogicDocument.Slides[this.WordControl.m_oLogicDocument.CurPage].backgroundFill;
         if (isRealObject(_old_fill))
             _old_fill = _old_fill.createDuplicate();
-        var bg = new CBg();
-        bg.bgPr = new CBgPr();
-        bg.bgPr.Fill = CorrectUniFill(_back_fill, _old_fill);
+        var bg = new AscFormat.CBg();
+        bg.bgPr = new AscFormat.CBgPr();
+        bg.bgPr.Fill = AscFormat.CorrectUniFill(_back_fill, _old_fill);
         var image_url = "";
         if (_back_fill.asc_getType() == c_oAscFill.FILL_TYPE_BLIP && _back_fill.fill && typeof _back_fill.fill.url === "string" && _back_fill.fill.url.length > 0)
         {
@@ -2039,7 +2039,7 @@ asc_docs_api.prototype.SetSlideProps = function(prop)
             {
                 if(this.WordControl.m_oLogicDocument.Slides[this.WordControl.m_oLogicDocument.CurPage])
                 {
-                    ExecuteNoHistory(function(){
+                    AscFormat.ExecuteNoHistory(function(){
 
                         this.WordControl.m_oLogicDocument.changeBackground(bg, arr_ind, true);
                         for(var i = 0; i <arr_ind.length; ++i)
@@ -2104,9 +2104,9 @@ asc_docs_api.prototype.put_TextColor = function(color)
 {
     if(editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false) {
         History.Create_NewPoint(AscDFH.historydescription_Presentation_ParagraphAdd);
-        var _unifill = new CUniFill();
-        _unifill.fill = new CSolidFill();
-        _unifill.fill.color = CorrectUniColor(color, _unifill.fill.color, 0);
+        var _unifill = new AscFormat.CUniFill();
+        _unifill.fill = new AscFormat.CSolidFill();
+        _unifill.fill.color = AscFormat.CorrectUniColor(color, _unifill.fill.color, 0);
         this.WordControl.m_oLogicDocument.Paragraph_Add(new ParaTextPr({Unifill: _unifill}));
     }
 };
@@ -2620,32 +2620,32 @@ asc_docs_api.prototype.tblApply = function(obj)
         {
             if(obj.CellBorders.Left && obj.CellBorders.Left.Color)
             {
-                obj.CellBorders.Left.Unifill = CreateUnifillFromAscColor(obj.CellBorders.Left.Color);
+                obj.CellBorders.Left.Unifill = AscFormat.CreateUnifillFromAscColor(obj.CellBorders.Left.Color);
             }
             if(obj.CellBorders.Top && obj.CellBorders.Top.Color)
             {
-                obj.CellBorders.Top.Unifill = CreateUnifillFromAscColor(obj.CellBorders.Top.Color);
+                obj.CellBorders.Top.Unifill = AscFormat.CreateUnifillFromAscColor(obj.CellBorders.Top.Color);
             }
             if(obj.CellBorders.Right && obj.CellBorders.Right.Color)
             {
-                obj.CellBorders.Right.Unifill = CreateUnifillFromAscColor(obj.CellBorders.Right.Color);
+                obj.CellBorders.Right.Unifill = AscFormat.CreateUnifillFromAscColor(obj.CellBorders.Right.Color);
             }
             if(obj.CellBorders.Bottom && obj.CellBorders.Bottom.Color)
             {
-                obj.CellBorders.Bottom.Unifill = CreateUnifillFromAscColor(obj.CellBorders.Bottom.Color);
+                obj.CellBorders.Bottom.Unifill = AscFormat.CreateUnifillFromAscColor(obj.CellBorders.Bottom.Color);
             }
             if(obj.CellBorders.InsideH && obj.CellBorders.InsideH.Color)
             {
-                obj.CellBorders.InsideH.Unifill = CreateUnifillFromAscColor(obj.CellBorders.InsideH.Color);
+                obj.CellBorders.InsideH.Unifill = AscFormat.CreateUnifillFromAscColor(obj.CellBorders.InsideH.Color);
             }
             if(obj.CellBorders.InsideV && obj.CellBorders.InsideV.Color)
             {
-                obj.CellBorders.InsideV.Unifill = CreateUnifillFromAscColor(obj.CellBorders.InsideV.Color);
+                obj.CellBorders.InsideV.Unifill = AscFormat.CreateUnifillFromAscColor(obj.CellBorders.InsideV.Color);
             }
         }
         if(obj.CellsBackground && obj.CellsBackground.Color)
         {
-            obj.CellsBackground.Unifill = CreateUnifillFromAscColor(obj.CellsBackground.Color);
+            obj.CellsBackground.Unifill = AscFormat.CreateUnifillFromAscColor(obj.CellsBackground.Color);
         }
         this.WordControl.m_oLogicDocument.Set_TableProps(obj);
     }
@@ -3116,45 +3116,45 @@ asc_docs_api.prototype.ChangeColorScheme = function(index_scheme)
     if (index_scheme < _count_defaults)
     {
         var _obj = g_oUserColorScheme[index_scheme];
-        var scheme = new ClrScheme();
+        var scheme = new AscFormat.ClrScheme();
 		scheme.name = _obj["name"];
         var _c = null;
 
         _c = _obj["dk1"];
-        scheme.colors[8] = CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
+        scheme.colors[8] = AscFormat.CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
 
         _c = _obj["lt1"];
-        scheme.colors[12] = CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
+        scheme.colors[12] = AscFormat.CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
 
         _c = _obj["dk2"];
-        scheme.colors[9] = CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
+        scheme.colors[9] = AscFormat.CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
 
         _c = _obj["lt2"];
-        scheme.colors[13] = CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
+        scheme.colors[13] = AscFormat.CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
 
         _c = _obj["accent1"];
-        scheme.colors[0] = CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
+        scheme.colors[0] = AscFormat.CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
 
         _c = _obj["accent2"];
-        scheme.colors[1] = CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
+        scheme.colors[1] = AscFormat.CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
 
         _c = _obj["accent3"];
-        scheme.colors[2] = CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
+        scheme.colors[2] = AscFormat.CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
 
         _c = _obj["accent4"];
-        scheme.colors[3] = CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
+        scheme.colors[3] = AscFormat.CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
 
         _c = _obj["accent5"];
-        scheme.colors[4] = CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
+        scheme.colors[4] = AscFormat.CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
 
         _c = _obj["accent6"];
-        scheme.colors[5] = CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
+        scheme.colors[5] = AscFormat.CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
 
         _c = _obj["hlink"];
-        scheme.colors[11] = CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
+        scheme.colors[11] = AscFormat.CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
 
         _c = _obj["folHlink"];
-        scheme.colors[10] = CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
+        scheme.colors[10] = AscFormat.CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
 
         this.WordControl.m_oLogicDocument.changeColorScheme(scheme);
     }
@@ -4122,7 +4122,7 @@ asc_docs_api.prototype.GoToFooter = function(pageNumber)
 };
 asc_docs_api.prototype.sync_shapePropCallback = function(pr)
 {
-    var obj = CreateAscShapePropFromProp(pr);
+    var obj = AscFormat.CreateAscShapePropFromProp(pr);
     if (pr.fill != null && pr.fill.fill != null && pr.fill.fill.type == c_oAscFill.FILL_TYPE_BLIP)
     {
         this.WordControl.m_oDrawingDocument.DrawImageTextureFillShape(pr.fill.fill.RasterImageId);
@@ -4177,7 +4177,7 @@ asc_docs_api.prototype.sync_slidePropCallback = function(slide)
     }
     else
     {
-        obj.Background = CreateAscFill(bgFill);
+        obj.Background = AscFormat.CreateAscFill(bgFill);
 
         if (bgFill != null && bgFill.fill != null && bgFill.fill.type == c_oAscFill.FILL_TYPE_BLIP)
         {

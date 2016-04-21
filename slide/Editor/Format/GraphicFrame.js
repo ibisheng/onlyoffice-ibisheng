@@ -354,7 +354,7 @@ CGraphicFrame.prototype =
     {
         if(this.bDeleted  || !this.parent)
             return;
-        ExecuteNoHistory(function(){
+        AscFormat.ExecuteNoHistory(function(){
             if(this.recalcInfo.recalculateTable)
             {
                 if(this.graphicObject)
@@ -1013,7 +1013,7 @@ CGraphicFrame.prototype =
 
     Get_Styles: function(level)
     {
-        if(isRealNumber(level))
+        if(AscFormat.isRealNumber(level))
         {
             if(!this.compiledStyles[level])
             {
@@ -1166,12 +1166,12 @@ CGraphicFrame.prototype =
             case AscDFH.historyitem_GraphicFrameSetSetParent     :
             case AscDFH.historyitem_GraphicFrameSetSetGroup      :
             {
-                writeObject(w, data.newPr);
+                AscFormat.writeObject(w, data.newPr);
                 break;
             }
             case AscDFH.historyitem_ShapeSetBDeleted:
             {
-                writeBool(w, data.newPr);
+                AscFormat.writeBool(w, data.newPr);
                 break;
             }
         }
@@ -1184,17 +1184,17 @@ CGraphicFrame.prototype =
         {
             case AscDFH.historyitem_ShapeSetBDeleted:
             {
-                this.bDeleted = readBool(r);
+                this.bDeleted = AscFormat.readBool(r);
                 break;
             }
             case AscDFH.historyitem_GraphicFrameSetSpPr         :
             {
-                this.spPr = readObject(r);
+                this.spPr = AscFormat.readObject(r);
                 break;
             }
             case AscDFH.historyitem_GraphicFrameSetGraphicObject:
             {
-                this.graphicObject = readObject(r);
+                this.graphicObject = AscFormat.readObject(r);
                 if(this.graphicObject)
                 {
                     this.graphicObject.Index = 0;
@@ -1203,17 +1203,17 @@ CGraphicFrame.prototype =
             }
             case AscDFH.historyitem_GraphicFrameSetSetNvSpPr    :
             {
-                this.nvGraphicFramePr = readObject(r);
+                this.nvGraphicFramePr = AscFormat.readObject(r);
                 break;
             }
             case AscDFH.historyitem_GraphicFrameSetSetParent    :
             {
-                this.parent = readObject(r);
+                this.parent = AscFormat.readObject(r);
                 break;
             }
             case AscDFH.historyitem_GraphicFrameSetSetGroup     :
             {
-                this.group = readObject(r);
+                this.group = AscFormat.readObject(r);
                 break;
             }
         }

@@ -2842,7 +2842,7 @@
                         }
                         else
                         {
-                            var oCurDrawingToWrite = ExecuteNoHistory(function()
+                            var oCurDrawingToWrite = AscFormat.ExecuteNoHistory(function()
                             {
                                 var oRet = oDrawing.graphicObject.copy();
                                 var oMetrics = oDrawing.getGraphicObjectMetrics();
@@ -5988,12 +5988,12 @@
                     }
                     if(!oNewDrawing.graphicObject.spPr)
                     {
-                        oNewDrawing.graphicObject.setSpPr(new CSpPr());
+                        oNewDrawing.graphicObject.setSpPr(new AscFormat.CSpPr());
                         oNewDrawing.graphicObject.spPr.setParent(oNewDrawing.graphicObject);
                     }
                     if(!oNewDrawing.graphicObject.spPr.xfrm)
                     {
-                        oNewDrawing.graphicObject.spPr.setXfrm(new CXfrm());
+                        oNewDrawing.graphicObject.spPr.setXfrm(new AscFormat.CXfrm());
                         oNewDrawing.graphicObject.spPr.xfrm.setParent(oNewDrawing.graphicObject.spPr);
                         oNewDrawing.graphicObject.spPr.xfrm.setOffX(0);
                         oNewDrawing.graphicObject.spPr.xfrm.setOffY(0);
@@ -6726,9 +6726,9 @@
             var oRes = this.bcr.ReadTable(function(t, l){
                 return oThis.ReadOtherContent(t,l);
             });
-            this.wb.clrSchemeMap = GenerateDefaultColorMap();
+            this.wb.clrSchemeMap = AscFormat.GenerateDefaultColorMap();
             if(null == this.wb.theme)
-                this.wb.theme = GenerateDefaultTheme(this.wb);
+                this.wb.theme = AscFormat.GenerateDefaultTheme(this.wb);
 
             Asc.getBinaryOtherTableGVar(this.wb);
 

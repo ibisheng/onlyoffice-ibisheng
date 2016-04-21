@@ -1,6 +1,6 @@
 "use strict";
 
-var G_O_DEFAULT_COLOR_MAP = GenerateDefaultColorMap();
+var G_O_DEFAULT_COLOR_MAP = AscFormat.GenerateDefaultColorMap();
 
 CRFonts.prototype.Merge = function(RFonts)
 {
@@ -113,7 +113,7 @@ function addToDrawings(worksheet, graphic, position, lockByDefault)
     if(!worksheet)
         return;
     var ret, aObjects = worksheet.Drawings;
-    if (isRealNumber(position)) {
+    if (AscFormat.isRealNumber(position)) {
         aObjects.splice(position, 0, drawingObject);
         ret = position;
     }
@@ -283,7 +283,7 @@ CShape.prototype.addToRecalculate = function()
 };
 CShape.prototype.getSlideIndex = function()
 {
-    if(this.parent && isRealNumber(this.parent.num))
+    if(this.parent && AscFormat.isRealNumber(this.parent.num))
     {
         return this.parent.num;
     }
@@ -447,7 +447,7 @@ CShape.prototype.recalculate = function ()
     if(this.bDeleted || !this.parent)
         return;
     var check_slide_placeholder = !this.isPlaceholder() || (this.parent && this.parent.getObjectType() === AscDFH.historyitem_type_Slide);
-    ExecuteNoHistory(function(){
+    AscFormat.ExecuteNoHistory(function(){
 
 
         if (this.recalcInfo.recalculateBrush) {
@@ -556,7 +556,7 @@ CShape.prototype.recalculateContent2 = function()
             {
                 return;
             }
-            var text = typeof pHText[0][this.nvSpPr.nvPr.ph.type] === "string" && pHText[0][this.nvSpPr.nvPr.ph.type].length > 0 ?  pHText[0][this.nvSpPr.nvPr.ph.type] : pHText[0][phType_body];
+            var text = typeof pHText[0][this.nvSpPr.nvPr.ph.type] === "string" && pHText[0][this.nvSpPr.nvPr.ph.type].length > 0 ?  pHText[0][this.nvSpPr.nvPr.ph.type] : pHText[0][AscFormat.phType_body];
             if (!this.txBody.content2)
                 this.txBody.content2 = CreateDocContentFromString(text, this.getDrawingDocument(), this.txBody);
             else
@@ -572,10 +572,10 @@ CShape.prototype.recalculateContent2 = function()
                 var body_pr = this.getBodyPr();
                 if(body_pr)
                 {
-                    l_ins = isRealNumber(body_pr.lIns) ? body_pr.lIns : 2.54;
-                    r_ins = isRealNumber(body_pr.rIns) ? body_pr.rIns : 2.54;
-                    t_ins = isRealNumber(body_pr.tIns) ? body_pr.tIns : 1.27;
-                    b_ins = isRealNumber(body_pr.bIns) ? body_pr.bIns : 1.27;
+                    l_ins = AscFormat.isRealNumber(body_pr.lIns) ? body_pr.lIns : 2.54;
+                    r_ins = AscFormat.isRealNumber(body_pr.rIns) ? body_pr.rIns : 2.54;
+                    t_ins = AscFormat.isRealNumber(body_pr.tIns) ? body_pr.tIns : 1.27;
+                    b_ins = AscFormat.isRealNumber(body_pr.bIns) ? body_pr.bIns : 1.27;
                 }
                 else
                 {
@@ -585,8 +585,8 @@ CShape.prototype.recalculateContent2 = function()
                     b_ins = 1.27;
                 }
                 if(this.spPr.geometry && this.spPr.geometry.rect
-                    && isRealNumber(this.spPr.geometry.rect.l) && isRealNumber(this.spPr.geometry.rect.t)
-                    && isRealNumber(this.spPr.geometry.rect.r) && isRealNumber(this.spPr.geometry.rect.r))
+                    && AscFormat.isRealNumber(this.spPr.geometry.rect.l) && AscFormat.isRealNumber(this.spPr.geometry.rect.t)
+                    && AscFormat.isRealNumber(this.spPr.geometry.rect.r) && AscFormat.isRealNumber(this.spPr.geometry.rect.r))
                 {
                     w = this.spPr.geometry.rect.r - this.spPr.geometry.rect.l - (l_ins + r_ins);
                     h = this.spPr.geometry.rect.b - this.spPr.geometry.rect.t - (t_ins + b_ins);
@@ -599,7 +599,7 @@ CShape.prototype.recalculateContent2 = function()
 
                 if(!body_pr.upright)
                 {
-                    if(!(body_pr.vert === nVertTTvert || body_pr.vert === nVertTTvert270))
+                    if(!(body_pr.vert === AscFormat.nVertTTvert || body_pr.vert === AscFormat.nVertTTvert270))
                     {
                         this.txBody.contentWidth2 = w;
                         this.txBody.contentHeight2 = h;
@@ -616,7 +616,7 @@ CShape.prototype.recalculateContent2 = function()
                     var _full_rotate = this.getFullRotate();
                     if(checkNormalRotate(_full_rotate))
                     {
-                        if(!(body_pr.vert === nVertTTvert || body_pr.vert === nVertTTvert270))
+                        if(!(body_pr.vert === AscFormat.nVertTTvert || body_pr.vert === AscFormat.nVertTTvert270))
                         {
 
                             this.txBody.contentWidth2 = w;
@@ -630,7 +630,7 @@ CShape.prototype.recalculateContent2 = function()
                     }
                     else
                     {
-                        if(!(body_pr.vert === nVertTTvert || body_pr.vert === nVertTTvert270))
+                        if(!(body_pr.vert === AscFormat.nVertTTvert || body_pr.vert === AscFormat.nVertTTvert270))
                         {
 
                             this.txBody.contentWidth2 = h;
@@ -724,14 +724,14 @@ CShape.prototype.getIsSingleBody = function(x, y)
 {
     if(!this.isPlaceholder())
         return false;
-    if(this.getPlaceholderType() !== phType_body)
+    if(this.getPlaceholderType() !== AscFormat.phType_body)
         return false;
     if(this.parent && this.parent.cSld && Array.isArray(this.parent.cSld.spTree))
     {
         var sp_tree = this.parent.cSld.spTree;
         for(var i = 0; i < sp_tree.length; ++i)
         {
-            if(sp_tree[i] !== this && sp_tree[i].getPlaceholderType && sp_tree[i].getPlaceholderType() === phType_body)
+            if(sp_tree[i] !== this && sp_tree[i].getPlaceholderType && sp_tree[i].getPlaceholderType() === AscFormat.phType_body)
                 return false;
         }
     }

@@ -193,7 +193,7 @@ CGroupShape.prototype =
 
     addToSpTree: function(pos, item)
     {
-        if(!isRealNumber(pos))
+        if(!AscFormat.isRealNumber(pos))
             pos = this.spTree.length;
         History.Add(this, {Type: AscDFH.historyitem_GroupShapeAddToSpTree, pos: pos, item: item});
         this.handleUpdateSpTree();
@@ -745,7 +745,7 @@ CGroupShape.prototype =
             {
                 this.selection.textSelection = this.selectedObjects[0];
                 this.selection.textSelection.paragraphAdd(paraItem, bRecalculate);
-                if(isRealNumber(this.selection.textSelection.selectStartPage))
+                if(AscFormat.isRealNumber(this.selection.textSelection.selectStartPage))
                     this.selection.textSelection.select(this, this.selection.textSelection.selectStartPage);
             }
             else if(this.selectedObjects.length > 0)
@@ -862,7 +862,7 @@ CGroupShape.prototype =
             xfrm = this.spPr.xfrm;
         else
         {
-            xfrm = new CXfrm();
+            xfrm = new AscFormat.CXfrm();
             xfrm.offX = 0;
             xfrm.offY = 0;
             xfrm.extX = 5;
@@ -879,7 +879,7 @@ CGroupShape.prototype =
             this.y = xfrm.offY;
             this.extX = xfrm.extX;
             this.extY = xfrm.extY;
-            this.rot = isRealNumber(xfrm.rot) ? xfrm.rot : 0;
+            this.rot = AscFormat.isRealNumber(xfrm.rot) ? xfrm.rot : 0;
             this.flipH = this.flipH === true;
             this.flipV = this.flipV === true;
         }
@@ -890,7 +890,7 @@ CGroupShape.prototype =
             this.y = scale_scale_coefficients.cy*(xfrm.offY - this.group.spPr.xfrm.chOffY);
             this.extX = scale_scale_coefficients.cx*xfrm.extX;
             this.extY = scale_scale_coefficients.cy*xfrm.extY;
-            this.rot = isRealNumber(xfrm.rot) ? xfrm.rot : 0;
+            this.rot = AscFormat.isRealNumber(xfrm.rot) ? xfrm.rot : 0;
             this.flipH = xfrm.flipH === true;
             this.flipV = xfrm.flipV === true;
         }
@@ -1988,25 +1988,25 @@ CGroupShape.prototype =
 
             case AscDFH.historyitem_AutoShapes_SetBFromSerialize:
             {
-                writeBool(w, data.newPr);
+                AscFormat.writeBool(w, data.newPr);
                 break;
             }
             case AscDFH.historyitem_AutoShapes_SetDrawingBaseCoors:
             {
-                writeDouble(w, data.fromCol   );
-                writeDouble(w, data.fromColOff);
-                writeDouble(w, data.fromRow   );
-                writeDouble(w, data.fromRowOff);
-                writeDouble(w, data.toCol);
-                writeDouble(w, data.toColOff);
-                writeDouble(w, data.toRow   );
-                writeDouble(w, data.toRowOff);
+                AscFormat.writeDouble(w, data.fromCol   );
+                AscFormat.writeDouble(w, data.fromColOff);
+                AscFormat.writeDouble(w, data.fromRow   );
+                AscFormat.writeDouble(w, data.fromRowOff);
+                AscFormat.writeDouble(w, data.toCol);
+                AscFormat.writeDouble(w, data.toColOff);
+                AscFormat.writeDouble(w, data.toRow   );
+                AscFormat.writeDouble(w, data.toRowOff);
 
 
-                writeDouble(w, data.posX);
-                writeDouble(w, data.posY);
-                writeDouble(w, data.cx);
-                writeDouble(w, data.cy);
+                AscFormat.writeDouble(w, data.posX);
+                AscFormat.writeDouble(w, data.posY);
+                AscFormat.writeDouble(w, data.cx);
+                AscFormat.writeDouble(w, data.cy);
                 break;
             }
             case AscDFH.historyitem_AutoShapes_RemoveFromDrawingObjects:
@@ -2016,23 +2016,23 @@ CGroupShape.prototype =
             case AscDFH.historyitem_AutoShapes_AddToDrawingObjects:
             {
                 var Pos = data.UseArray ? data.PosArray[0] : data.Pos;
-                writeLong(w, Pos);
+                AscFormat.writeLong(w, Pos);
                 break;
             }
             case AscDFH.historyitem_AutoShapes_SetWorksheet:
             {
-                writeBool(w,isRealObject(data.newPr));
+                AscFormat.writeBool(w,isRealObject(data.newPr));
                 if(isRealObject(data.newPr))
                 {
-                    writeString(w,data.newPr.getId());
+                    AscFormat.writeString(w,data.newPr.getId());
                 }
                 break;
             }
             case AscDFH.historyitem_GroupShapeAddToSpTree:
             case AscDFH.historyitem_GroupShapeRemoveFromSpTree:
             {
-                writeLong(w, data.pos);
-                writeObject(w, data.item);
+                AscFormat.writeLong(w, data.pos);
+                AscFormat.writeObject(w, data.item);
                 break;
             }
             case AscDFH.historyitem_GroupShapeSetGroup:
@@ -2040,13 +2040,13 @@ CGroupShape.prototype =
             case AscDFH.historyitem_GroupShapeSetParent:
             case AscDFH.historyitem_GroupShapeSetSpPr:
             {
-                writeObject(w, data.newPr);
+                AscFormat.writeObject(w, data.newPr);
                 break;
             }
 
             case AscDFH.historyitem_ShapeSetBDeleted:
             {
-                writeBool(w, data.newPr);
+                AscFormat.writeBool(w, data.newPr);
                 break;
             }
         }
@@ -2059,27 +2059,27 @@ CGroupShape.prototype =
         {
             case AscDFH.historyitem_AutoShapes_SetBFromSerialize:
             {
-                this.fromSerialize = readBool(r);
+                this.fromSerialize = AscFormat.readBool(r);
                 break;
             }
             case AscDFH.historyitem_AutoShapes_SetDrawingBaseCoors:
             {
                 if(this.drawingBase)
                 {
-                    this.drawingBase.from.col    = readDouble(r);
-                    this.drawingBase.from.colOff = readDouble(r);
-                    this.drawingBase.from.row    = readDouble(r);
-                    this.drawingBase.from.rowOff = readDouble(r);
-                    this.drawingBase.to.col      = readDouble(r);
-                    this.drawingBase.to.colOff   = readDouble(r);
-                    this.drawingBase.to.row      = readDouble(r);
-                    this.drawingBase.to.rowOff   = readDouble(r);
+                    this.drawingBase.from.col    = AscFormat.readDouble(r);
+                    this.drawingBase.from.colOff = AscFormat.readDouble(r);
+                    this.drawingBase.from.row    = AscFormat.readDouble(r);
+                    this.drawingBase.from.rowOff = AscFormat.readDouble(r);
+                    this.drawingBase.to.col      = AscFormat.readDouble(r);
+                    this.drawingBase.to.colOff   = AscFormat.readDouble(r);
+                    this.drawingBase.to.row      = AscFormat.readDouble(r);
+                    this.drawingBase.to.rowOff   = AscFormat.readDouble(r);
 
 
-                    this.drawingBase.Pos.X = readDouble(r);
-                    this.drawingBase.Pos.Y = readDouble(r);
-                    this.drawingBase.ext.cx = readDouble(r);
-                    this.drawingBase.ext.cy = readDouble(r);
+                    this.drawingBase.Pos.X = AscFormat.readDouble(r);
+                    this.drawingBase.Pos.Y = AscFormat.readDouble(r);
+                    this.drawingBase.ext.cx = AscFormat.readDouble(r);
+                    this.drawingBase.ext.cy = AscFormat.readDouble(r);
                 }
                 break;
             }
@@ -2090,7 +2090,7 @@ CGroupShape.prototype =
             }
             case AscDFH.historyitem_AutoShapes_AddToDrawingObjects:
             {
-                var pos = readLong(r);
+                var pos = AscFormat.readLong(r);
                 if(this.worksheet)
                 {
                     pos = this.worksheet.contentChanges.Check(AscCommon.contentchanges_Add, pos);
@@ -2105,14 +2105,14 @@ CGroupShape.prototype =
             }
             case AscDFH.historyitem_ShapeSetBDeleted:
             {
-                this.bDeleted = readBool(r);
+                this.bDeleted = AscFormat.readBool(r);
                 break;
             }
             case AscDFH.historyitem_GroupShapeAddToSpTree:
             {
-                var pos = readLong(r);
-                var item = readObject(r);
-                if(isRealObject(item) && isRealNumber(pos))
+                var pos = AscFormat.readLong(r);
+                var item = AscFormat.readObject(r);
+                if(isRealObject(item) && AscFormat.isRealNumber(pos))
                 {
                     this.spTree.splice(pos, 0, item);
                 }
@@ -2121,24 +2121,24 @@ CGroupShape.prototype =
             }
             case AscDFH.historyitem_GroupShapeSetGroup:
             {
-                this.group = readObject(r);
+                this.group = AscFormat.readObject(r);
                 break;
             }
             case AscDFH.historyitem_GroupShapeSetNvGrpSpPr:
             {
-                this.nvGrpSpPr = readObject(r);
+                this.nvGrpSpPr = AscFormat.readObject(r);
                 break;
             }
             case AscDFH.historyitem_GroupShapeSetParent:
             {
-                this.parent = readObject(r);
+                this.parent = AscFormat.readObject(r);
                 break;
             }
             case AscDFH.historyitem_GroupShapeRemoveFromSpTree:
             {
-                var pos = readLong(r);
-                var item = readObject(r);
-                if(isRealNumber(pos) && isRealObject(item))
+                var pos = AscFormat.readLong(r);
+                var item = AscFormat.readObject(r);
+                if(AscFormat.isRealNumber(pos) && isRealObject(item))
                 {
                     if(this.spTree[pos] === item)
                     {
@@ -2151,7 +2151,7 @@ CGroupShape.prototype =
 
             case AscDFH.historyitem_GroupShapeSetSpPr:
             {
-                this.spPr = readObject(r);
+                this.spPr = AscFormat.readObject(r);
                 break;
             }
         }
@@ -2161,7 +2161,7 @@ CGroupShape.prototype =
 function normalizeRotate(rot)
 {
     var new_rot = rot;
-    if(isRealNumber(new_rot))
+    if(AscFormat.isRealNumber(new_rot))
     {
         while(new_rot >= 2*Math.PI)
             new_rot -= 2*Math.PI;

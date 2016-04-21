@@ -2320,7 +2320,7 @@ CClosedPathIntegral.prototype.drawGlyph = function(parameters)
         // делаем заливку уже обводки
 
         var WidthLine;
-        if(pGraphics.m_oTextPr.TextOutline && isRealNumber(pGraphics.m_oTextPr.TextOutline.w))
+        if(pGraphics.m_oTextPr.TextOutline && AscFormat.isRealNumber(pGraphics.m_oTextPr.TextOutline.w))
         {
             WidthLine = (pGraphics.m_oTextPr.TextOutline.w/36000) *0.6; // сместим заливку на половину толщины линии , чтобы не было зазоров м/ду обводкой и заливкой
         }

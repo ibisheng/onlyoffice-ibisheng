@@ -105,7 +105,7 @@ function CreatePresentationTableStyles(Styles, IdMap)
             {
                 TextPr:
                 {
-                    FontRef: CreateFontRef(fntStyleInd_minor, CreatePresetColor("black")),
+                    FontRef: AscFormat.CreateFontRef(AscFormat.fntStyleInd_minor, AscFormat.CreatePresetColor("black")),
                     Unifill:  CreateUnifillSolidFillSchemeColor(8, 0)
                 },
                 TableCellPr:
@@ -133,7 +133,7 @@ function CreatePresentationTableStyles(Styles, IdMap)
             TextPr:
             {
                 Bold: true,
-                FontRef: CreateFontRef(fntStyleInd_minor, CreatePresetColor("black")),
+                FontRef: AscFormat.CreateFontRef(AscFormat.fntStyleInd_minor, AscFormat.CreatePresetColor("black")),
                 Unifill:  CreateUnifillSolidFillSchemeColor(8, 0)
             },
             TableCellPr:
@@ -173,7 +173,7 @@ function CreatePresentationTableStyles(Styles, IdMap)
         styleObject.TextPr =
         {
             Bold: true,
-            FontRef: CreateFontRef(fntStyleInd_minor, CreatePresetColor("black")),
+            FontRef: AscFormat.CreateFontRef(AscFormat.fntStyleInd_minor, AscFormat.CreatePresetColor("black")),
             Unifill:  CreateUnifillSolidFillSchemeColor(12, 0)
         };
         style.TableFirstRow.Set_FromObject(styleObject);
@@ -215,13 +215,13 @@ CShowPr.prototype.Write_ToBinary = function(w){
     var nStartPos = w.GetCurPosition();
     w.Skip(4);
     var Flags = 0;
-    if(isRealBool(this.browse)){
+    if(AscFormat.isRealBool(this.browse)){
         Flags |= 1;
         w.WriteBool(this.browse);
     }
     if(isRealObject(this.kiosk)){
         Flags |= 2;
-        if(isRealNumber(this.kiosk.restart)){
+        if(AscFormat.isRealNumber(this.kiosk.restart)){
             Flags |= 4;
             w.WriteLong(this.kiosk.restart);
         }
@@ -240,25 +240,25 @@ CShowPr.prototype.Write_ToBinary = function(w){
                w.WriteLong(this.range.start);
                w.WriteLong(this.range.end);
            }
-           else if(isRealNumber(this.show.custShow)){
+           else if(AscFormat.isRealNumber(this.show.custShow)){
                Flags |= 64;
                w.WriteLong(this.show.custShow);
            }
         }
     }
-    if(isRealBool(this.loop)){
+    if(AscFormat.isRealBool(this.loop)){
         Flags |= 128;
         w.WriteBool(this.loop);
     }
-    if(isRealBool(this.showAnimation)){
+    if(AscFormat.isRealBool(this.showAnimation)){
         Flags |= 256;
         w.WriteBool(this.showAnimation);
     }
-    if(isRealBool(this.showNarration)){
+    if(AscFormat.isRealBool(this.showNarration)){
         Flags |= 512;
         w.WriteBool(this.showNarration);
     }
-    if(isRealBool(this.useTimings)){
+    if(AscFormat.isRealBool(this.useTimings)){
         Flags |= 1024;
         w.WriteBool(this.useTimings);
     }
@@ -280,7 +280,7 @@ CShowPr.prototype.Read_FromBinary = function(r){
         }
     }
     if(Flags & 8){
-        this.penClr = new CUniColor();
+        this.penClr = new AscFormat.CUniColor();
         this.penClr.Read_FromBinary(r);
     }
     this.present = r.Read_FromBinary(r);
@@ -315,7 +315,7 @@ CShowPr.prototype.Copy = function(){
     oCopy.browse = this.browse;
     if(isRealObject(this.kiosk)){
         oCopy.kiosk = {};
-        if(isRealBool(this.kiosk.restart)){
+        if(AscFormat.isRealBool(this.kiosk.restart)){
             oCopy.kiosk.restart = this.kiosk.restart;
         }
     }
@@ -329,7 +329,7 @@ CShowPr.prototype.Copy = function(){
         if(isRealObject(this.show.range)){
             oCopy.show.range = {start: this.show.range.start, end: this.show.range.end};
         }
-        else if(isRealNumber(this.show.custShow)){
+        else if(AscFormat.isRealNumber(this.show.custShow)){
             oCopy.show.custShow = this.show.custShow;
         }
     }
@@ -504,7 +504,7 @@ CPresentation.prototype =
 
     createDefaultTableStyles: function()
     {
-        //ExecuteNoHistory(function(){
+        //AscFormat.ExecuteNoHistory(function(){
             this.globalTableStyles = new CStyles();
             this.DefaultTableStyleId = CreatePresentationTableStyles(this.globalTableStyles, this.TableStylesIdMap);
         //}, this, []);
@@ -722,7 +722,7 @@ CPresentation.prototype =
                 var oThis = this;
                 bSync = false;
                 aToRedrawSlides = [].concat(_RecalcData.Drawings.ThemeInfo.ArrInd);
-                redrawSlide(oThis.Slides[_RecalcData.Drawings.ThemeInfo.ArrInd[startRecalcIndex]], oThis, aToRedrawSlides, startRecalcIndex,  0, oThis.Slides);
+                AscFormat.redrawSlide(oThis.Slides[_RecalcData.Drawings.ThemeInfo.ArrInd[startRecalcIndex]], oThis, aToRedrawSlides, startRecalcIndex,  0, oThis.Slides);
             }
             else
             {
@@ -1392,7 +1392,7 @@ CPresentation.prototype =
     Create_TableGraphicFrame : function(Cols, Rows, Parent, StyleId, Width, Height, PosX, PosY, bInline)
     {
         var W;
-        if(isRealNumber(Width))
+        if(AscFormat.isRealNumber(Width))
         {
             W = Width;
         }
@@ -1401,7 +1401,7 @@ CPresentation.prototype =
             W = this.Width*2/3;
         }
         var X, Y;
-        if(isRealNumber(PosX) && isRealNumber(PosY))
+        if(AscFormat.isRealNumber(PosX) && AscFormat.isRealNumber(PosY))
         {
             X = PosX;
             Y = PosY;
@@ -1412,7 +1412,7 @@ CPresentation.prototype =
             Y = 0;
         }
         var Inline = false;
-        if(isRealBool(bInline))
+        if(AscFormat.isRealBool(bInline))
         {
             Inline = bInline;
         }
@@ -1422,22 +1422,22 @@ CPresentation.prototype =
             Grid[Index] = W / Cols;
 
         var RowHeight;
-        if(isRealNumber(Height))
+        if(AscFormat.isRealNumber(Height))
         {
             RowHeight = Height / Rows;
         }
 
         var graphic_frame = new CGraphicFrame();
         graphic_frame.setParent(Parent);
-        graphic_frame.setSpPr(new CSpPr());
+        graphic_frame.setSpPr(new AscFormat.CSpPr());
         graphic_frame.spPr.setParent(graphic_frame);
-        graphic_frame.spPr.setXfrm(new CXfrm());
+        graphic_frame.spPr.setXfrm(new AscFormat.CXfrm());
         graphic_frame.spPr.xfrm.setParent(graphic_frame.spPr);
         graphic_frame.spPr.xfrm.setOffX((this.Width - W)/2);
         graphic_frame.spPr.xfrm.setOffY(this.Height/5);
         graphic_frame.spPr.xfrm.setExtX(W);
         graphic_frame.spPr.xfrm.setExtY(7.478268771701388 * Rows);
-        graphic_frame.setNvSpPr(new UniNvPr());
+        graphic_frame.setNvSpPr(new AscFormat.UniNvPr());
 
         var table = new CTable(this.DrawingDocument, graphic_frame, Inline, 0, X, Y, W, 100000, Rows, Cols, Grid, true);
         if(!Inline)
@@ -1454,7 +1454,7 @@ CPresentation.prototype =
         for(var i = 0; i < table.Content.length; ++i)
         {
             var Row = table.Content[i];
-            if(isRealNumber(RowHeight))
+            if(AscFormat.isRealNumber(RowHeight))
             {
                 Row.Set_Height(RowHeight, Asc.linerule_AtLeast);
             }
@@ -1589,11 +1589,11 @@ CPresentation.prototype =
 
     Get_PresentationBulletByNumInfo : function(NumInfo)
     {
-        var bullet = new CBullet();
+        var bullet = new AscFormat.CBullet();
         if(NumInfo.SubType < 0)
         {
-            bullet.bulletType = new CBulletType();
-            bullet.bulletType.type = BULLET_TYPE_BULLET_NONE;
+            bullet.bulletType = new AscFormat.CBulletType();
+            bullet.bulletType.type = AscFormat.BULLET_TYPE_BULLET_NONE;
         }
         else
         {
@@ -1607,48 +1607,48 @@ CPresentation.prototype =
                         case 1:
                         {
                             var bulletText = "•";
-                            bullet.bulletTypeface = new CBulletTypeface();
-                            bullet.bulletTypeface.type = BULLET_TYPE_TYPEFACE_BUFONT;
+                            bullet.bulletTypeface = new AscFormat.CBulletTypeface();
+                            bullet.bulletTypeface.type = AscFormat.BULLET_TYPE_TYPEFACE_BUFONT;
                             bullet.bulletTypeface.typeface = "Arial";
                             break;
                         }
                         case 2:
                         {
                             bulletText = "o";
-                            bullet.bulletTypeface = new CBulletTypeface();
-                            bullet.bulletTypeface.type = BULLET_TYPE_TYPEFACE_BUFONT;
+                            bullet.bulletTypeface = new AscFormat.CBulletTypeface();
+                            bullet.bulletTypeface.type = AscFormat.BULLET_TYPE_TYPEFACE_BUFONT;
                             bullet.bulletTypeface.typeface = "Courier New";
                             break;
                         }
                         case 3:
                         {
                             bulletText = "§";
-                            bullet.bulletTypeface = new CBulletTypeface();
-                            bullet.bulletTypeface.type = BULLET_TYPE_TYPEFACE_BUFONT;
+                            bullet.bulletTypeface = new AscFormat.CBulletTypeface();
+                            bullet.bulletTypeface.type = AscFormat.BULLET_TYPE_TYPEFACE_BUFONT;
                             bullet.bulletTypeface.typeface = "Wingdings";
                             break;
                         }
                         case 4:
                         {
                             bulletText = String.fromCharCode( 0x0076 );
-                            bullet.bulletTypeface = new CBulletTypeface();
-                            bullet.bulletTypeface.type = BULLET_TYPE_TYPEFACE_BUFONT;
+                            bullet.bulletTypeface = new AscFormat.CBulletTypeface();
+                            bullet.bulletTypeface.type = AscFormat.BULLET_TYPE_TYPEFACE_BUFONT;
                             bullet.bulletTypeface.typeface = "Wingdings";
                             break;
                         }
                         case 5:
                         {
                             bulletText = String.fromCharCode( 0x00D8 );
-                            bullet.bulletTypeface = new CBulletTypeface();
-                            bullet.bulletTypeface.type = BULLET_TYPE_TYPEFACE_BUFONT;
+                            bullet.bulletTypeface = new AscFormat.CBulletTypeface();
+                            bullet.bulletTypeface.type = AscFormat.BULLET_TYPE_TYPEFACE_BUFONT;
                             bullet.bulletTypeface.typeface = "Wingdings";
                             break;
                         }
                         case 6:
                         {
                             bulletText = String.fromCharCode( 0x00FC );
-                            bullet.bulletTypeface = new CBulletTypeface();
-                            bullet.bulletTypeface.type = BULLET_TYPE_TYPEFACE_BUFONT;
+                            bullet.bulletTypeface = new AscFormat.CBulletTypeface();
+                            bullet.bulletTypeface.type = AscFormat.BULLET_TYPE_TYPEFACE_BUFONT;
                             bullet.bulletTypeface.typeface = "Wingdings";
                             break;
                         }
@@ -1656,14 +1656,14 @@ CPresentation.prototype =
                         {
 
                             bulletText = String.fromCharCode(119);
-                            bullet.bulletTypeface = new CBulletTypeface();
-                            bullet.bulletTypeface.type = BULLET_TYPE_TYPEFACE_BUFONT;
+                            bullet.bulletTypeface = new AscFormat.CBulletTypeface();
+                            bullet.bulletTypeface.type = AscFormat.BULLET_TYPE_TYPEFACE_BUFONT;
                             bullet.bulletTypeface.typeface = "Wingdings";
                             break;
                         }
                     }
-                    bullet.bulletType = new CBulletType();
-                    bullet.bulletType.type = BULLET_TYPE_BULLET_CHAR;
+                    bullet.bulletType = new AscFormat.CBulletType();
+                    bullet.bulletType.type = AscFormat.BULLET_TYPE_BULLET_CHAR;
                     bullet.bulletType.Char = bulletText;
                     break;
                 }
@@ -1708,8 +1708,8 @@ CPresentation.prototype =
                             break;
                         }
                     }
-                    bullet.bulletType = new CBulletType();
-                    bullet.bulletType.type = BULLET_TYPE_BULLET_AUTONUM;
+                    bullet.bulletType = new AscFormat.CBulletType();
+                    bullet.bulletType.type = AscFormat.BULLET_TYPE_BULLET_AUTONUM;
                     bullet.bulletType.AutoNumType = numberingType;
                     break;
                 }
@@ -3011,7 +3011,7 @@ CPresentation.prototype =
         if(this.Slides[this.CurPage])
         {
             var args;
-            if(isRealNumber(Rows) && isRealNumber(Cols))
+            if(AscFormat.isRealNumber(Rows) && AscFormat.isRealNumber(Cols))
             {
                 args = [Rows, Cols];
             }
@@ -3291,15 +3291,15 @@ CPresentation.prototype =
                 {
                     if(drawing_props.tableProps.CellsVAlign === vertalignjc_Bottom)
                     {
-                        editor.sync_VerticalTextAlign(VERTICAL_ANCHOR_TYPE_BOTTOM);
+                        editor.sync_VerticalTextAlign(AscFormat.VERTICAL_ANCHOR_TYPE_BOTTOM);
                     }
                     else if(drawing_props.tableProps.CellsVAlign === vertalignjc_Center)
                     {
-                        editor.sync_VerticalTextAlign(VERTICAL_ANCHOR_TYPE_CENTER);
+                        editor.sync_VerticalTextAlign(AscFormat.VERTICAL_ANCHOR_TYPE_CENTER);
                     }
                     else
                     {
-                        editor.sync_VerticalTextAlign(VERTICAL_ANCHOR_TYPE_TOP);
+                        editor.sync_VerticalTextAlign(AscFormat.VERTICAL_ANCHOR_TYPE_TOP);
                     }
                 }
             }
@@ -3387,7 +3387,7 @@ CPresentation.prototype =
             var W = (_pageW - _x_mar - _r_mar);
             var H = (_pageH - _y_mar - _b_mar);
             var index = 0;
-            ExecuteNoHistory(function(){
+            AscFormat.ExecuteNoHistory(function(){
             for(var key in this.TableStylesIdMap)
             {
                 if(this.TableStylesIdMap[key])
@@ -3422,7 +3422,7 @@ CPresentation.prototype =
             this.LastTableLook = TableLook;
             var need_set_recalc = true, i;
 
-            ExecuteNoHistory(function(){
+            AscFormat.ExecuteNoHistory(function(){
                 if(!only_redraw)
                 {
                     var TableLook2;
@@ -3645,7 +3645,7 @@ CPresentation.prototype =
 
     Get_SelectedContent : function()
     {
-        return ExecuteNoHistory(function()
+        return AscFormat.ExecuteNoHistory(function()
         {
             var ret = new PresentationSelectedContent(), i;
             if(this.Slides.length > 0)
@@ -4214,14 +4214,14 @@ CPresentation.prototype =
         {
             var cur_slide = this.Slides[this.CurPage];
 
-            layout = isRealNumber(layoutIndex) ? (cur_slide.Layout.Master.sldLayoutLst[layoutIndex] ?  cur_slide.Layout.Master.sldLayoutLst[layoutIndex]:  cur_slide.Layout) : cur_slide.Layout.Master.getMatchingLayout(cur_slide.Layout.type, cur_slide.Layout.matchingName, cur_slide.Layout.cSld.name);
+            layout = AscFormat.isRealNumber(layoutIndex) ? (cur_slide.Layout.Master.sldLayoutLst[layoutIndex] ?  cur_slide.Layout.Master.sldLayoutLst[layoutIndex]:  cur_slide.Layout) : cur_slide.Layout.Master.getMatchingLayout(cur_slide.Layout.type, cur_slide.Layout.matchingName, cur_slide.Layout.cSld.name);
             new_slide = new Slide(this, layout, this.CurPage + 1);
             for(i = 0; i < layout.cSld.spTree.length; ++i)
             {
                 if(layout.cSld.spTree[i].isPlaceholder())
                 {
                     _ph_type = layout.cSld.spTree[i].getPhType();
-                    if(_ph_type != phType_dt && _ph_type != phType_ftr && _ph_type != phType_hdr && _ph_type != phType_sldNum)
+                    if(_ph_type != AscFormat.phType_dt && _ph_type != AscFormat.phType_ftr && _ph_type != AscFormat.phType_hdr && _ph_type != AscFormat.phType_sldNum)
                     {
                         sp = layout.cSld.spTree[i].copy();
                         sp.setParent(new_slide);
@@ -4244,7 +4244,7 @@ CPresentation.prototype =
         {
             var master = this.slideMasters[0];
 
-            layout = isRealNumber(layoutIndex) ? (master.sldLayoutLst[layoutIndex] ?  master.sldLayoutLst[layoutIndex]:  master.sldLayoutLst[0]) : master.sldLayoutLst[0];
+            layout = AscFormat.isRealNumber(layoutIndex) ? (master.sldLayoutLst[layoutIndex] ?  master.sldLayoutLst[layoutIndex]:  master.sldLayoutLst[0]) : master.sldLayoutLst[0];
 
 
             new_slide = new Slide(this, layout, this.CurPage + 1);
@@ -4253,7 +4253,7 @@ CPresentation.prototype =
                 if(layout.cSld.spTree[i].isPlaceholder())
                 {
                     _ph_type = layout.cSld.spTree[i].getPhType();
-                    if(_ph_type != phType_dt && _ph_type != phType_ftr && _ph_type != phType_hdr && _ph_type != phType_sldNum)
+                    if(_ph_type != AscFormat.phType_dt && _ph_type != AscFormat.phType_ftr && _ph_type != AscFormat.phType_hdr && _ph_type != AscFormat.phType_sldNum)
                     {
                         sp = layout.cSld.spTree[i].copy();
                         sp.setParent(new_slide);
@@ -4404,7 +4404,7 @@ CPresentation.prototype =
                     if(layout.cSld.spTree[j].isPlaceholder())
                     {
                         var _ph_type = layout.cSld.spTree[j].getPhType();
-                        if(_ph_type != phType_dt && _ph_type != phType_ftr && _ph_type != phType_hdr && _ph_type != phType_sldNum)
+                        if(_ph_type != AscFormat.phType_dt && _ph_type != AscFormat.phType_ftr && _ph_type != AscFormat.phType_hdr && _ph_type != AscFormat.phType_sldNum)
                         {
                             var matching_shape =  slide.getMatchingShape(layout.cSld.spTree[j].getPlaceholderType(), layout.cSld.spTree[j].getPlaceholderIndex(), layout.cSld.spTree[j].getIsSingleBody ? layout.cSld.spTree[j].getIsSingleBody() : false);
                             if(matching_shape == null && layout.cSld.spTree[j])
@@ -4508,7 +4508,7 @@ CPresentation.prototype =
 
     changeSlideSizeFunction: function(width, height)
     {
-        ExecuteNoHistory(function()
+        AscFormat.ExecuteNoHistory(function()
         {
             for(var i = 0; i < this.slideMasters.length; ++i)
             {
@@ -4550,7 +4550,7 @@ CPresentation.prototype =
         if(!(this.Document_Is_SelectionLocked(AscCommon.changestype_Theme) === false))
             return;
 
-        if(!(colorScheme instanceof ClrScheme))
+        if(!(colorScheme instanceof AscFormat.ClrScheme))
         {
             return;
         }
@@ -4573,7 +4573,7 @@ CPresentation.prototype =
 
     removeSlide: function(pos)
     {
-        if(isRealNumber(pos) && pos > -1 && pos < this.Slides.length)
+        if(AscFormat.isRealNumber(pos) && pos > -1 && pos < this.Slides.length)
         {
             History.Add(this, {Type: AscDFH.historyitem_Presentation_RemoveSlide, Pos: pos, Id: this.Slides[pos].Get_Id()});
             this.Slides[pos].removeAllCommentsToInterface();
