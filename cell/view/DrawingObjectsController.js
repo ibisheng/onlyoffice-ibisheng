@@ -5,6 +5,9 @@
  * @param {undefined} undefined
  */
 function (window, undefined) {
+    
+    // Import
+    var DrawingObjectsController = AscFormat.DrawingObjectsController;
 
 if(window.editor === "undefined" && window["Asc"]["editor"])
 {
@@ -59,7 +62,7 @@ DrawingObjectsController.prototype.setTableProps = function(props)
     var by_type = this.getSelectedObjectsByTypes();
     if(by_type.tables.length === 1)
     {
-        var target_text_object = getTargetTextObject(this);
+        var target_text_object = AscFormat.getTargetTextObject(this);
         if(target_text_object === by_type.tables[0])
         {
             by_type.tables[0].graphicObject.Set_Props(props);
@@ -344,9 +347,9 @@ DrawingObjectsController.prototype.addChartDrawingObject = function(options)
 
 DrawingObjectsController.prototype.isPointInDrawingObjects = function(x, y, e)
 {
-    this.handleEventMode = HANDLE_EVENT_MODE_CURSOR;
+    this.handleEventMode = AscFormat.HANDLE_EVENT_MODE_CURSOR;
     var ret = this.curState.onMouseDown(e || {}, x, y, 0);
-    this.handleEventMode = HANDLE_EVENT_MODE_HANDLE;
+    this.handleEventMode = AscFormat.HANDLE_EVENT_MODE_HANDLE;
     return ret;
 };
 
@@ -435,7 +438,7 @@ DrawingObjectsController.prototype.canIncreaseParagraphLevel = function(bIncreas
     var content = this.getTargetDocContent();
     if(content)
     {
-        var target_text_object = getTargetTextObject(this);
+        var target_text_object = AscFormat.getTargetTextObject(this);
         if(target_text_object && target_text_object.getObjectType() === AscDFH.historyitem_type_Shape
             && (!target_text_object.isPlaceholder() || !target_text_object.getPhType() !== AscFormat.phType_title && target_text_object.getPhType() !== AscFormat.phType_ctrTitle))
         {

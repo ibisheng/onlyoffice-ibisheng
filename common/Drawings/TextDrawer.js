@@ -89,7 +89,7 @@ CDocContentStructure.prototype.checkByWarpStruct = function(oWarpStruct, dWidth,
     var nDivCount = bOddPaths ? oWarpStruct.pathLst.length : oWarpStruct.pathLst.length >> 1, oNextPointOnPolygon, oObjectToDrawNext, oMatrix = new CMatrix();
     aByPaths = oWarpStruct.getArrayPolygonsByPaths(PATH_DIV_EPSILON);
     var nLastIndex = 0, dTmp, oBoundsChecker, oTemp, nIndex, aWarpedObjects2 = [];
-    oBoundsChecker = new CSlideBoundsChecker();
+    oBoundsChecker = new AscFormat.CSlideBoundsChecker();
     oBoundsChecker.init(100, 100, 100, 100);
     var dMinX, dMaxX;
     for(j = 0; j < this.m_aByLines.length; ++j)
@@ -164,7 +164,7 @@ CDocContentStructure.prototype.checkContentReduct = function(oWarpStruct, dWidth
     var nDivCount = bOddPaths ? oWarpStruct.pathLst.length : oWarpStruct.pathLst.length >> 1, oNextPointOnPolygon, oObjectToDrawNext, oMatrix;
     aByPaths = oWarpStruct.getArrayPolygonsByPaths(PATH_DIV_EPSILON);
     var nLastIndex = 0, dTmp, oBoundsChecker, oTemp, nIndex, aWarpedObjects2 = [];
-    oBoundsChecker = new CSlideBoundsChecker();
+    oBoundsChecker = new AscFormat.CSlideBoundsChecker();
     oBoundsChecker.init(100, 100, 100, 100);
     for(j = 0; j < this.m_aByLines.length; ++j)
     {
@@ -206,7 +206,7 @@ CDocContentStructure.prototype.checkContentReduct = function(oWarpStruct, dWidth
                     oNextPointOnPolygon = this.checkTransformByOddPath(oMatrix, oWarpedObject, aWarpedObjects[t+1], oNextPointOnPolygon, dContentHeight, dKoeff, bArcDown, oPolygon, XLimit);
                     oWarpedObject.draw(oBoundsChecker);
 
-                    var oBounds = new CBoundsController();
+                    var oBounds = new AscFormat.CBoundsController();
 //                    oBounds.fromBounds(oBoundsChecker.Bounds);
                     for(var k = 0; k < aBounds.length; ++k)
                     {

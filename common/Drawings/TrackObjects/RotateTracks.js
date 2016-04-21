@@ -380,13 +380,13 @@ function RotateTrackShapeImage(originalObject)
 
     this.trackEnd = function()
     {
-        CheckSpPrXfrm(this.originalObject);
+        AscFormat.CheckSpPrXfrm(this.originalObject);
         this.originalObject.spPr.xfrm.setRot(this.angle);
     };
 
     this.getBounds = function()
     {
-        var boundsChecker = new  CSlideBoundsChecker();
+        var boundsChecker = new  AscFormat.CSlideBoundsChecker();
         var tr = null;
         if(this.originalObject && this.originalObject.parent)
         {
@@ -467,7 +467,7 @@ function RotateTrackGroup(originalObject)
 
     this.getBounds = function()
     {
-        var boundsChecker = new  CSlideBoundsChecker();
+        var boundsChecker = new  AscFormat.CSlideBoundsChecker();
         this.draw(boundsChecker);
         var tr = this.transform;
         var arr_p_x = [];
@@ -542,7 +542,7 @@ function RotateTrackGroup(originalObject)
 
     this.trackEnd = function()
     {
-        CheckSpPrXfrm(this.originalObject);
+        AscFormat.CheckSpPrXfrm(this.originalObject);
         this.originalObject.spPr.xfrm.setRot(this.angle);
     }
 }

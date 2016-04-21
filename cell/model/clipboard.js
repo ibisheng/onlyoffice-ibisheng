@@ -1927,7 +1927,7 @@
 					
 					if(count !== 1 && typeof CGraphicFrame !== "undefined" && drawing instanceof CGraphicFrame)
 					{
-						drawing = DrawingObjectsController.prototype.createImage(base64, x, y, extX, extY);
+						drawing = AscFormat.DrawingObjectsController.prototype.createImage(base64, x, y, extX, extY);
 					}
 					
 					arr_shapes[i] = worksheet.objectRender.createDrawingObject();
@@ -2007,7 +2007,7 @@
 					
 				worksheet._loadFonts(newFonts, function () {
 					oPasteProcessor.InsertInPlace(targetContent , oPasteProcessor.aContent);
-                    var oTargetTextObject = getTargetTextObject(worksheet.objectRender.controller);
+                    var oTargetTextObject = AscFormat.getTargetTextObject(worksheet.objectRender.controller);
                     oTargetTextObject && oTargetTextObject.checkExtentsByDocContent && oTargetTextObject.checkExtentsByDocContent();
 					worksheet.objectRender.controller.startRecalculate();
                     worksheet.objectRender.controller.cursorMoveRight(false, false);
@@ -2960,7 +2960,7 @@
 						offY = 0;
 						rot = AscFormat.isRealNumber(xfrm.rot) ? xfrm.rot : 0;
 						rot = AscFormat.normalizeRotate(rot);
-						if (checkNormalRotate(rot))
+						if (AscFormat.checkNormalRotate(rot))
 						{
 							if(AscFormat.isRealNumber(xfrm.offX) && AscFormat.isRealNumber(xfrm.offY))
 							{
@@ -3049,7 +3049,7 @@
                     {
                         drawingObject.graphicObject.setBFromSerialize(false);
                     }
-					CheckSpPrXfrm(drawingObject.graphicObject);
+					AscFormat.CheckSpPrXfrm(drawingObject.graphicObject);
 					xfrm = drawingObject.graphicObject.spPr.xfrm;
 					
 					activeRow = activeRange.r1;
@@ -3124,7 +3124,7 @@
 
 					if(src) 
 					{
-						var drawing = DrawingObjectsController.prototype.createImage(src, x, y, extX, extY);
+						var drawing = AscFormat.DrawingObjectsController.prototype.createImage(src, x, y, extX, extY);
 						var drawingBase = ws.objectRender.createDrawingObject();
 						drawingBase.graphicObject = drawing;
 						
@@ -3162,7 +3162,7 @@
 						return;
 					}
 
-					CheckSpPrXfrm(drawingObject.graphicObject);
+					AscFormat.CheckSpPrXfrm(drawingObject.graphicObject);
 					xfrm = drawingObject.graphicObject.spPr.xfrm;
 
 					drawingObject = ws.objectRender.cloneDrawingObject(drawingObject);
@@ -3244,7 +3244,7 @@
 						offY = 0;
 						rot = AscFormat.isRealNumber(xfrm.rot) ? xfrm.rot : 0;
 						rot = AscFormat.normalizeRotate(rot);
-						if (checkNormalRotate(rot))
+						if (AscFormat.checkNormalRotate(rot))
 						{
 							if(AscFormat.isRealNumber(xfrm.offX) && AscFormat.isRealNumber(xfrm.offY))
 							{
@@ -3300,7 +3300,7 @@
 					}
 
 
-					CheckSpPrXfrm(drawingObject.graphicObject);
+					AscFormat.CheckSpPrXfrm(drawingObject.graphicObject);
 					xfrm = drawingObject.graphicObject.spPr.xfrm;
 
 					curCol = xfrm.offX - startCol + ws.objectRender.convertMetric(ws.cols[addImagesFromWord[i].col].left - ws.getCellLeft(0, 1), 1, 3);

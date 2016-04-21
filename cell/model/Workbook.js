@@ -2056,7 +2056,7 @@ Workbook.prototype.init=function(bNoBuildDep){
 	
 	var self = this;
 
-	this.wsHandlers = new asc.asc_CHandlersList( /*handlers*/{
+	this.wsHandlers = new Asc.asc_CHandlersList( /*handlers*/{
 		"changeRefTablePart"   : function ( displayName, ref ) {
 			self.dependencyFormulas.changeTableName( displayName, null, ref );
 		},
@@ -3188,7 +3188,7 @@ function Woorksheet(wb, _index, sId){
   this.sheetPr = null;
   this.aFormulaExt = null;
 
-  this.autoFilters = asc.AutoFilters !== undefined ? new asc.AutoFilters(this) : null;
+	this.autoFilters = Asc.AutoFilters !== undefined ? new Asc.AutoFilters(this) : null;
   this.sparklineGroups = new sparklineGroups();
 
   this.oDrawingOjectsManager = new DrawingObjectsManager(this);
@@ -3420,7 +3420,7 @@ Woorksheet.prototype.initPostOpen = function(handlers){
 	// Sheet Views
 	if (0 === this.sheetViews.length) {
 		// Даже если не было, создадим
-		this.sheetViews.push(new asc.asc_CSheetViewSettings());
+		this.sheetViews.push(new Asc.asc_CSheetViewSettings());
 	}
 
     if (window['IS_NATIVE_EDITOR']) {

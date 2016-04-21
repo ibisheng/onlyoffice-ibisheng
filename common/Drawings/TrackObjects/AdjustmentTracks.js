@@ -227,7 +227,7 @@ function XYAdjustmentTrack(originalShape, adjIndex, bTextWarp)
 
 XYAdjustmentTrack.prototype.getBounds = function()
 {
-    var bounds_checker = new  CSlideBoundsChecker();
+    var bounds_checker = new  AscFormat.CSlideBoundsChecker();
     bounds_checker.init(Page_Width, Page_Height, Page_Width, Page_Height);
     this.draw(bounds_checker);
     var tr = this.originalShape.transform;

@@ -8,7 +8,7 @@ function Slide(presentation, slideLayout, slideNum)
     this.kind = AscFormat.TYPE_KIND.SLIDE;
 
     this.presentation = editor && editor.WordControl && editor.WordControl.m_oLogicDocument;
-    this.graphicObjects = new DrawingObjectsController(this);
+    this.graphicObjects = new AscFormat.DrawingObjectsController(this);
     this.maxId = 0;
     this.cSld = new AscFormat.CSld();
     this.clrMap = null; // override ClrMap
@@ -1274,7 +1274,7 @@ Slide.prototype =
                     }
                     if(j === hierarchy.length)
                     {
-                        CheckSpPrXfrm(sp, true);
+                        AscFormat.CheckSpPrXfrm(sp, true);
                     }
                 }
             }

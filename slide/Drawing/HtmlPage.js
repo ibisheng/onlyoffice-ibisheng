@@ -144,7 +144,7 @@ function CEditorPage(api)
     this.zoom_values = [50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200];
     this.m_nZoomType = 2; // 0 - custom, 1 - fitToWodth, 2 - fitToPage
 
-    this.m_oBoundsController = new CBoundsController();
+    this.m_oBoundsController = new AscFormat.CBoundsController();
     this.m_nTabsType        = 0;
 
     this.m_dScrollY         = 0;
@@ -200,7 +200,7 @@ function CEditorPage(api)
 
     this.Thumbnails = new CThumbnailsManager();
     this.SlideDrawer = new CSlideDrawer();
-    this.SlideBoundsOnCalculateSize = new CBoundsController();
+    this.SlideBoundsOnCalculateSize = new AscFormat.CBoundsController();
     this.MainScrollsEnabledFlag = 0;
 
     this.bIsUseKeyPress = true;

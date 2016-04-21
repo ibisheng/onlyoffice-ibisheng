@@ -393,7 +393,7 @@ CSparklineView.prototype.initFromSparkline = function(oSparkline, oSparklineGrou
         var ser = new asc_CChartSeria();
         ser.Val.Formula = oSparkline.f;
         var chartSeries = {series: [ser], parsedHeaders: {bLeft: false, bTop: false}};
-        var chart_space = DrawingObjectsController.prototype._getChartSpace(chartSeries, settings, true);
+        var chart_space = AscFormat.DrawingObjectsController.prototype._getChartSpace(chartSeries, settings, true);
         chart_space.setBDeleted(false);
         chart_space.setWorksheet(worksheetView.model);
 
@@ -488,7 +488,7 @@ CSparklineView.prototype.initFromSparkline = function(oSparkline, oSparklineGrou
         settings.putVertAxisProps(val_ax_props);
         settings.putHorAxisProps(cat_ax_props);
 
-        DrawingObjectsController.prototype.applyPropsToChartSpace(settings, chart_space);
+        AscFormat.DrawingObjectsController.prototype.applyPropsToChartSpace(settings, chart_space);
         var i;
         if(!chart_space.spPr)
             chart_space.setSpPr(new AscFormat.CSpPr());
@@ -710,7 +710,7 @@ CSparklineView.prototype.initFromSparkline = function(oSparkline, oSparklineGrou
         this.y = worksheetView.getCellTop(oBBox.r1, 3);
         this.extX = worksheetView.getColumnWidth(oBBox.c1, 3);
         this.extY = worksheetView.getRowHeight(oBBox.r1, 3);
-        CheckSpPrXfrm(this.chartSpace);
+        AscFormat.CheckSpPrXfrm(this.chartSpace);
         this.chartSpace.spPr.xfrm.setOffX(this.x*nSparklineMultiplier);
         this.chartSpace.spPr.xfrm.setOffY(this.y*nSparklineMultiplier);
         this.chartSpace.spPr.xfrm.setExtX(this.extX*nSparklineMultiplier);
@@ -1094,7 +1094,7 @@ function DrawingObjects() {
             rot = AscFormat.normalizeRotate(rot);
 
             var fromX, fromY, toX, toY;
-            if (checkNormalRotate(rot))
+            if (AscFormat.checkNormalRotate(rot))
             {
                 fromX =  mmToPt(_t.graphicObject.x);
                 fromY =  mmToPt(_t.graphicObject.y);
@@ -1436,7 +1436,7 @@ function DrawingObjects() {
         _this.drawingDocument.AutoShapesTrack = autoShapeTrack;
         _this.drawingDocument.TargetHtmlElement = document.getElementById('id_target_cursor');
         _this.drawingDocument.InitGuiCanvasShape(api.shapeElementId);
-        _this.controller = new DrawingObjectsController(_this);
+        _this.controller = new AscFormat.DrawingObjectsController(_this);
 
         _this.isViewerMode = function() { return worksheet.handlers.trigger("getViewerMode"); };
 
@@ -2407,7 +2407,7 @@ function DrawingObjects() {
                     oNewChartSpace.setWorksheet(worksheet.model);
                     oNewChartSpace.addToDrawingObjects();
                     oNewChartSpace.recalculate();
-                    CheckSpPrXfrm(oNewChartSpace);
+                    AscFormat.CheckSpPrXfrm(oNewChartSpace);
 
                     var canvas_height = worksheet.drawingCtx.getHeight(3);
                     var pos_y = (canvas_height - oNewChartSpace.spPr.xfrm.extY)/2;
@@ -2868,7 +2868,7 @@ function DrawingObjects() {
 
                         var rot = AscFormat.isRealNumber(obj.graphicObject.spPr.xfrm.rot) ? obj.graphicObject.spPr.xfrm.rot : 0;
                         rot = AscFormat.normalizeRotate(rot);
-                        if (checkNormalRotate(rot))
+                        if (AscFormat.checkNormalRotate(rot))
                         {
                             obj.graphicObject.spPr.xfrm.setOffX(pxToMm(coords.x));
                             obj.graphicObject.spPr.xfrm.setOffY(pxToMm(coords.y));
@@ -3652,11 +3652,11 @@ function DrawingObjects() {
 
                 if (drawingObject.from.row >= target.row) {
                     coords = _this.coordsManager.calculateCoords(drawingObject.from);
-                    CheckSpPrXfrm(drawingObject.graphicObject);
+                    AscFormat.CheckSpPrXfrm(drawingObject.graphicObject);
 
                     var rot = AscFormat.isRealNumber(drawingObject.graphicObject.spPr.xfrm.rot) ? drawingObject.graphicObject.spPr.xfrm.rot : 0;
                     rot = AscFormat.normalizeRotate(rot);
-                    if (checkNormalRotate(rot)) {
+                    if (AscFormat.checkNormalRotate(rot)) {
                         drawingObject.graphicObject.spPr.xfrm.setOffX(pxToMm(coords.x));
                         drawingObject.graphicObject.spPr.xfrm.setOffY(pxToMm(coords.y));
                     } else {
@@ -3673,11 +3673,11 @@ function DrawingObjects() {
 
                 if (drawingObject.from.col >= target.col) {
                     coords = _this.coordsManager.calculateCoords(drawingObject.from);
-                    CheckSpPrXfrm(drawingObject.graphicObject);
+                    AscFormat.CheckSpPrXfrm(drawingObject.graphicObject);
 
                     var rot = AscFormat.isRealNumber(drawingObject.graphicObject.spPr.xfrm.rot) ? drawingObject.graphicObject.spPr.xfrm.rot : 0;
                     rot = AscFormat.normalizeRotate(rot);
-                    if (checkNormalRotate(rot)) {
+                    if (AscFormat.checkNormalRotate(rot)) {
                         drawingObject.graphicObject.spPr.xfrm.setOffX(pxToMm(coords.x));
                         drawingObject.graphicObject.spPr.xfrm.setOffY(pxToMm(coords.y));
                     } else {

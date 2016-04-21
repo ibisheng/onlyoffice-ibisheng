@@ -1,6 +1,11 @@
 "use strict";
 
-var asc = window["Asc"] ? window["Asc"] : (window["Asc"] = {});
+(
+/**
+* @param {Window} window
+* @param {undefined} undefined
+*/
+function (window, undefined) {
 
 // Import
 var c_oAscSizeRelFromH = AscCommon.c_oAscSizeRelFromH;
@@ -4409,9 +4414,8 @@ DrawingObjectsController.prototype =
 
     remove: function(dir, bOnlyText, bRemoveOnlySelection)
     {
-        var asc = window["Asc"] ? window["Asc"] : (window["Asc"] = {});
         var content = this.getTargetDocContent();
-        if(asc["editor"] && asc["editor"].isChartEditor && !content)
+        if(Asc["editor"] && Asc["editor"].isChartEditor && !content)
         {
             return;
         }
@@ -5470,9 +5474,9 @@ DrawingObjectsController.prototype =
                 this.clearTrackObjects();
                 this.updateOverlay();
             }
-            if(asc["editor"])
+            if(Asc["editor"])
             {
-                asc["editor"].asc_endAddShape();
+                Asc["editor"].asc_endAddShape();
             }
             return true;
         }
@@ -5495,8 +5499,7 @@ DrawingObjectsController.prototype =
         this.clearTrackObjects();
         this.changeCurrentState(new NullState(this, this.drawingObjects));
         this.updateSelectionState();
-        var asc = window["Asc"] ? window["Asc"] : (window["Asc"] = {});
-        asc["editor"] && asc["editor"].asc_endAddShape();
+        Asc["editor"] && Asc["editor"].asc_endAddShape();
     },
 
     resetSelectionState2: function()
@@ -8540,92 +8543,6 @@ CSlideBoundsChecker.prototype =
 // ASC Classes
 //-----------------------------------------------------------------------------------
 
-function CreateImageDrawingObject(imageUrl, options, drawingObjects) {
-
-    var _this = drawingObjects;
-    var  worksheet = drawingObjects.getWorksheet();
-    if ( imageUrl && !_this.isViewerMode() ) {
-
-        var _image =  asc["editor"].ImageLoader.LoadImage(imageUrl, 1);
-        var isOption = options && options.cell;
-
-        var calculateObjectMetrics = function (object, width, height) {
-            // Обработка картинок большого разрешения
-            var metricCoeff = 1;
-
-            var coordsFrom = _this.coordsManager.calculateCoords(object.from);
-            var realTopOffset = coordsFrom.y;
-            var realLeftOffset = coordsFrom.x;
-
-            var areaWidth = worksheet.getCellLeft(worksheet.getLastVisibleCol(), 0) - worksheet.getCellLeft(worksheet.getFirstVisibleCol(), 0); 	// по ширине
-            if (areaWidth < width) {
-                metricCoeff = width / areaWidth;
-
-                width = areaWidth;
-                height /= metricCoeff;
-            }
-
-            var areaHeight = worksheet.getCellTop(worksheet.getLastVisibleRow(), 0) - worksheet.getCellTop(worksheet.getFirstVisibleRow(), 0); 	// по высоте
-            if (areaHeight < height) {
-                metricCoeff = height / areaHeight;
-
-                height = areaHeight;
-                width /= metricCoeff;
-            }
-
-            var cellTo = _this.coordsManager.calculateCell(realLeftOffset + width, realTopOffset + height);
-            object.to.col = cellTo.col;
-            object.to.colOff = cellTo.colOff;
-            object.to.row = cellTo.row;
-            object.to.rowOff = cellTo.rowOff;
-
-            worksheet.handlers.trigger("reinitializeScroll");
-        }
-
-        var addImageObject = function (_image) {
-
-            if ( !_image.Image ) {
-                worksheet.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.UplImageUrl, c_oAscError.Level.NoCritical);
-            }
-            else {
-
-                var drawingObject = _this.createDrawingObject();
-                drawingObject.worksheet = worksheet;
-
-                drawingObject.from.col = isOption ? options.cell.col : worksheet.getSelectedColumnIndex();
-                drawingObject.from.row = isOption ? options.cell.row : worksheet.getSelectedRowIndex();
-
-                // Проверяем начальные координаты при вставке
-                while ( !worksheet.cols[drawingObject.from.col] ) {
-                    worksheet.expandColsOnScroll(true);
-                }
-                worksheet.expandColsOnScroll(true); 	// для colOff
-
-                while ( !worksheet.rows[drawingObject.from.row] ) {
-                    worksheet.expandRowsOnScroll(true);
-                }
-                worksheet.expandRowsOnScroll(true); 	// для rowOff
-
-                calculateObjectMetrics(drawingObject, isOption ? options.width : _image.Image.width, isOption ? options.height : _image.Image.height);
-
-                var coordsFrom = _this.coordsManager.calculateCoords(drawingObject.from);
-                var coordsTo = _this.coordsManager.calculateCoords(drawingObject.to);
-                drawingObject.graphicObject = _this.controller.createImage(_image.src, drawingObjects.convertMetric(coordsFrom.x, 0, 3), drawingObjects.convertMetric(coordsFrom.y, 0, 3), drawingObjects.convertMetric(coordsTo.x - coordsFrom.x, 0, 3), drawingObjects.convertMetric(coordsTo.y - coordsFrom.y, 0, 3));
-                drawingObject.graphicObject.setWorksheet(worksheet.model);
-                // drawingObject.graphicObject.select(_this.controller);
-                //drawingObject.graphicObject.setDrawingObjects(_this);
-                //drawingObject.graphicObject.addToDrawingObjects();
-                return drawingObject;
-            }
-        }
-        if (null != _image)
-        {
-            return addImageObject(_image);
-        }
-    }
-    return null;
-}
-
 function GetMinSnapDistanceXObject(pointX, arrGrObjects)
 {
     var min_dx = null;
@@ -8788,3 +8705,33 @@ function getAbsoluteRectBoundsArr(aDrawings)
     }
     return {arrBounds: arrBounds, minX: minX, maxX: maxX, minY: minY, maxY: maxY};
 }
+
+    //--------------------------------------------------------export----------------------------------------------------
+    window['AscFormat'] = window['AscFormat'] || {};
+    window['AscFormat'].HANDLE_EVENT_MODE_HANDLE = HANDLE_EVENT_MODE_HANDLE;
+    window['AscFormat'].HANDLE_EVENT_MODE_CURSOR = HANDLE_EVENT_MODE_CURSOR;
+    window['AscFormat'].DISTANCE_TO_TEXT_LEFTRIGHT = DISTANCE_TO_TEXT_LEFTRIGHT;
+    window['AscFormat'].CheckShapeBodyAutoFitReset = CheckShapeBodyAutoFitReset;
+    window['AscFormat'].CDistance = CDistance;
+    window['AscFormat'].ConvertRelPositionHToRelSize = ConvertRelPositionHToRelSize;
+    window['AscFormat'].ConvertRelPositionVToRelSize = ConvertRelPositionVToRelSize;
+    window['AscFormat'].ConvertRelSizeHToRelPosition = ConvertRelSizeHToRelPosition;
+    window['AscFormat'].ConvertRelSizeVToRelPosition = ConvertRelSizeVToRelPosition;
+    window['AscFormat'].checkObjectInArray = checkObjectInArray;
+    window['AscFormat'].getValOrDefault = getValOrDefault;
+    window['AscFormat'].CheckStockChart = CheckStockChart;
+    window['AscFormat'].CheckLinePreset = CheckLinePreset;
+    window['AscFormat'].CompareGroups = CompareGroups;
+    window['AscFormat'].CheckSpPrXfrm = CheckSpPrXfrm;
+    window['AscFormat'].CheckSpPrXfrm2 = CheckSpPrXfrm2;
+    window['AscFormat'].checkNormalRotate = checkNormalRotate;
+    window['AscFormat'].getObjectsByTypesFromArr = getObjectsByTypesFromArr;
+    window['AscFormat'].getTargetTextObject = getTargetTextObject;
+    window['AscFormat'].DrawingObjectsController = DrawingObjectsController;
+    window['AscFormat'].CBoundsController = CBoundsController;
+    window['AscFormat'].CSlideBoundsChecker = CSlideBoundsChecker;
+    window['AscFormat'].GetMinSnapDistanceXObject = GetMinSnapDistanceXObject;
+    window['AscFormat'].GetMinSnapDistanceYObject = GetMinSnapDistanceYObject;
+    window['AscFormat'].GetMinSnapDistanceXObjectByArrays = GetMinSnapDistanceXObjectByArrays;
+    window['AscFormat'].GetMinSnapDistanceYObjectByArrays = GetMinSnapDistanceYObjectByArrays;
+})(window);

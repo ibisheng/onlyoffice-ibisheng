@@ -115,7 +115,7 @@ function CEditorPage(api)
     this.m_bDocumentPlaceChangedEnabled = false;
 
     this.m_nZoomValue       = 100;
-    this.m_oBoundsController = new CBoundsController();
+    this.m_oBoundsController = new AscFormat.CBoundsController();
     this.m_nTabsType        = 0;
 
     this.m_dScrollY         = 0;

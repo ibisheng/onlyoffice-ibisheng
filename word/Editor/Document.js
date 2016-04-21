@@ -12860,7 +12860,7 @@ CDocument.prototype =
         else if ( docpostype_DrawingObjects === this.CurPos.Type )
         {
             var drawin_objects = this.DrawingObjects;
-            var oTargetTextObject = getTargetTextObject(this.DrawingObjects);
+            var oTargetTextObject = AscFormat.getTargetTextObject(this.DrawingObjects);
             if(oTargetTextObject)
             {
                 this.Interface_Update_DrawingPr();

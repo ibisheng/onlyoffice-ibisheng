@@ -11,6 +11,8 @@ function (window, undefined) {
 var c_oAscSizeRelFromH = AscCommon.c_oAscSizeRelFromH;
 var c_oAscSizeRelFromV = AscCommon.c_oAscSizeRelFromV;
 
+    var checkNormalRotate = AscFormat.checkNormalRotate;
+
 var c_oAscFill = Asc.c_oAscFill;
 
 var BOUNDS_DELTA = 3;
@@ -482,7 +484,7 @@ function CheckExcelDrawingXfrm(xfrm)
 
 function SetXfrmFromMetrics(oDrawing, metrics)
 {
-    CheckSpPrXfrm(oDrawing);
+    AscFormat.CheckSpPrXfrm(oDrawing);
     var rot = AscFormat.isRealNumber(oDrawing.spPr.xfrm.rot) ? normalizeRotate(oDrawing.spPr.xfrm.rot) : 0;
 
     var metricExtX, metricExtY;
@@ -3257,7 +3259,7 @@ CShape.prototype =
             this.bCheckAutoFitFlag = false;
             this.recalcInfo.recalcTitle =  oOldRecalcTitle;
             this.recalcInfo.bRecalculatedTitle =  bOldRecalcTitle;
-            CheckSpPrXfrm(this, true);
+            AscFormat.CheckSpPrXfrm(this, true);
             this.spPr.xfrm.setExtX(this.extX + 0.001);
             this.spPr.xfrm.setExtY(this.extY + 0.001);
             if(!this.bWordShape || this.group)
@@ -3649,7 +3651,7 @@ CShape.prototype =
         var oController = this.getDrawingObjectsController && this.getDrawingObjectsController();
         if(!this.txWarpStruct || !this.recalcInfo.warpGeometry ||
             this.recalcInfo.warpGeometry.preset === "textNoShape" ||
-            oController && (getTargetTextObject(oController) === this || (oController.curState.startTargetTextObject === this)))
+            oController && (AscFormat.getTargetTextObject(oController) === this || (oController.curState.startTargetTextObject === this)))
         {
             var content = this.getDocContent && this.getDocContent();
             if ( content && this.invertTransformText)
@@ -3985,7 +3987,7 @@ CShape.prototype =
         if (this.isEmptyPlaceholder() && graphics.IsNoDrawingEmptyPlaceholder !== true)
         {
             var drawingObjects = this.getDrawingObjectsController();
-            if (graphics.m_oContext !== undefined && graphics.IsTrack === undefined && (!drawingObjects || getTargetTextObject(drawingObjects) !== this ))
+            if (graphics.m_oContext !== undefined && graphics.IsTrack === undefined && (!drawingObjects || AscFormat.getTargetTextObject(drawingObjects) !== this ))
             {
                 if (global_MatrixTransformer.IsIdentity2(_transform))
                 {
@@ -4052,7 +4054,7 @@ CShape.prototype =
         }
 
         var oController = this.getDrawingObjectsController && this.getDrawingObjectsController();
-        if(!this.txWarpStruct && !this.txWarpStructParamarksNoTransform || (!this.txWarpStructParamarksNoTransform && oController && (getTargetTextObject(oController) === this)) /*|| this.haveSelectedDrawingInContent()*/)
+        if(!this.txWarpStruct && !this.txWarpStructParamarksNoTransform || (!this.txWarpStructParamarksNoTransform && oController && (AscFormat.getTargetTextObject(oController) === this)) /*|| this.haveSelectedDrawingInContent()*/)
         {
             if (this.txBody)
             {
@@ -4068,7 +4070,7 @@ CShape.prototype =
                     transform_text = _transform_text;
                 }
 
-                if(this.worksheet && (this instanceof CShape) && !(oController && (getTargetTextObject(oController) === this)))
+                if(this.worksheet && (this instanceof CShape) && !(oController && (AscFormat.getTargetTextObject(oController) === this)))
                 {
                     this.clipTextRect(graphics);
                 }
@@ -4138,7 +4140,7 @@ CShape.prototype =
                 var result_page_index = AscFormat.isRealNumber(graphics.shapePageIndex) ? graphics.shapePageIndex : (oContent ? oContent.Get_StartPage_Relative() : 0);
                 graphics.PageNum = result_page_index;
                 var bNeedRestoreState = false;
-                var bEditTextArt = isRealObject(oController) && (getTargetTextObject(oController) === this);
+                var bEditTextArt = isRealObject(oController) && (AscFormat.getTargetTextObject(oController) === this);
                 if(this.bWordShape && this.clipRect /*&& (!this.bodyPr.prstTxWarp || this.bodyPr.prstTxWarp.preset === "textNoShape" || bEditTextArt)*/)
                 {
                     bNeedRestoreState = true;
@@ -4968,7 +4970,7 @@ CShape.prototype =
         this.recalcTransformText();
         this.addToRecalculate();
         var oController = this.getDrawingObjectsController();
-        if(oController && getTargetTextObject(oController) === this)
+        if(oController && AscFormat.getTargetTextObject(oController) === this)
         {
             this.recalcInfo.recalcTitle = this.getDocContent();
             this.recalcInfo.bRecalculatedTitle = true;
@@ -5415,7 +5417,7 @@ CShape.prototype =
 
     recalculateBounds: function()
     {
-        var boundsChecker = new  CSlideBoundsChecker();
+        var boundsChecker = new  AscFormat.CSlideBoundsChecker();
         this.draw(boundsChecker, this.localTransform, this.localTransformText);
         if(!this.group)
         {

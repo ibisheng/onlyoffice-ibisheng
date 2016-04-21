@@ -1,5 +1,9 @@
 "use strict";
 
+// Import
+var HANDLE_EVENT_MODE_HANDLE = AscFormat.HANDLE_EVENT_MODE_HANDLE;
+var HANDLE_EVENT_MODE_CURSOR = AscFormat.HANDLE_EVENT_MODE_CURSOR;
+
 var MOVE_DELTA = 1/100000;
 var SNAP_DISTANCE = 1.27;
 
@@ -174,7 +178,7 @@ NullState.prototype =
         if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
         {
             start_target_doc_content = checkEmptyPlaceholderContent(this.drawingObjects.getTargetDocContent());
-            this.startTargetTextObject = getTargetTextObject(this.drawingObjects);
+            this.startTargetTextObject = AscFormat.getTargetTextObject(this.drawingObjects);
         }
         var ret;
         ret = this.drawingObjects.handleSlideComments(e, x, y, pageIndex);
@@ -586,7 +590,7 @@ RotateState.prototype =
                                 arr_y2.push(drawing.spPr.xfrm.offY);
                                 arr_x2.push(drawing.spPr.xfrm.offX + drawing.spPr.xfrm.extX);
                                 arr_y2.push(drawing.spPr.xfrm.offY + drawing.spPr.xfrm.extY);
-                                if (checkNormalRotate(rot))
+                                if (AscFormat.checkNormalRotate(rot))
                                 {
                                     min_x = drawing.spPr.xfrm.offX;
                                     min_y = drawing.spPr.xfrm.offY;
@@ -843,7 +847,7 @@ MoveState.prototype =
 
                 for(snap_index = 0; snap_index < trackSnapArrayX.length; ++snap_index)
                 {
-                    var snap_obj = GetMinSnapDistanceXObjectByArrays(trackSnapArrayX[snap_index] + curDX, snapHorArray);
+                    var snap_obj = AscFormat.GetMinSnapDistanceXObjectByArrays(trackSnapArrayX[snap_index] + curDX, snapHorArray);
                     if(isRealObject(snap_obj))
                     {
                         dx = snap_obj.dist;
@@ -870,7 +874,7 @@ MoveState.prototype =
                 {
                     for(var snap_index = 0; snap_index < trackSnapArrayX.length; ++snap_index)
                     {
-                        var snap_obj = GetMinSnapDistanceXObject(trackSnapArrayX[snap_index] + curDX, start_arr);
+                        var snap_obj = AscFormat.GetMinSnapDistanceXObject(trackSnapArrayX[snap_index] + curDX, start_arr);
                         if(isRealObject(snap_obj))
                         {
                             dx = snap_obj.dist;
@@ -911,7 +915,7 @@ MoveState.prototype =
 
                 for(snap_index = 0; snap_index < trackSnapArrayY.length; ++snap_index)
                 {
-                    var snap_obj = GetMinSnapDistanceYObjectByArrays(trackSnapArrayY[snap_index] + curDY, snapVerArray);
+                    var snap_obj = AscFormat.GetMinSnapDistanceYObjectByArrays(trackSnapArrayY[snap_index] + curDY, snapVerArray);
                     if(isRealObject(snap_obj))
                     {
                         dy = snap_obj.dist;
@@ -938,7 +942,7 @@ MoveState.prototype =
                 {
                     for(snap_index = 0; snap_index < trackSnapArrayY.length; ++snap_index)
                     {
-                        var snap_obj = GetMinSnapDistanceYObject(trackSnapArrayY[snap_index] + curDY, start_arr);
+                        var snap_obj = AscFormat.GetMinSnapDistanceYObject(trackSnapArrayY[snap_index] + curDY, start_arr);
                         if(isRealObject(snap_obj))
                         {
                             dy = snap_obj.dist;

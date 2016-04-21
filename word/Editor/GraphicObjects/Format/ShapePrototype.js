@@ -549,7 +549,7 @@ CShape.prototype.Refresh_RecalcData2 = function()
 {
 
     var oController = this.getDrawingObjectsController();
-    if(oController && getTargetTextObject(oController) === this)
+    if(oController && AscFormat.getTargetTextObject(oController) === this)
     {
         this.recalcInfo.recalcTitle = this.getDocContent();
         this.recalcInfo.bRecalculatedTitle = true;

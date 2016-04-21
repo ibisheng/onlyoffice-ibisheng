@@ -262,7 +262,7 @@ ChartPreviewManager.prototype.getChartByType = function(type)
 		var settings = new AscCommon.asc_ChartSettings();
 		settings.type = type;
 		var chartSeries = {series: this.getAscChartSeriesDefault(type), parsedHeaders: {bLeft: true, bTop: true}};
-		var chart_space = DrawingObjectsController.prototype._getChartSpace(chartSeries, settings, true);
+		var chart_space = AscFormat.DrawingObjectsController.prototype._getChartSpace(chartSeries, settings, true);
         chart_space.bPreview = true;
 		if(window["Asc"]["editor"])
 		{
@@ -276,7 +276,7 @@ ChartPreviewManager.prototype.getChartByType = function(type)
                 chart_space.setParent(editor.WordControl.m_oLogicDocument.Slides[editor.WordControl.m_oLogicDocument.CurPage]);
             }
         }
-		CheckSpPrXfrm(chart_space);
+		AscFormat.CheckSpPrXfrm(chart_space);
 		chart_space.spPr.xfrm.setOffX(0);
 		chart_space.spPr.xfrm.setOffY(0);
 		chart_space.spPr.xfrm.setExtX(50);
@@ -357,7 +357,7 @@ ChartPreviewManager.prototype.getChartByType = function(type)
 		settings.putVertAxisProps(vert_axis_settings);
 		settings.putHorAxisProps(hor_axis_settings);
 
-		DrawingObjectsController.prototype.applyPropsToChartSpace(settings, chart_space);
+		AscFormat.DrawingObjectsController.prototype.applyPropsToChartSpace(settings, chart_space);
 		chart_space.setBDeleted(false);
 		chart_space.updateLinks();
 		if(!(isScatter || type === c_oAscChartTypeSettings.stock))

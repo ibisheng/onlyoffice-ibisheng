@@ -5,6 +5,10 @@ var changestype_Drawing_Props = AscCommon.changestype_Drawing_Props;
 var changestype_2_ElementsArray_and_Type = AscCommon.changestype_2_ElementsArray_and_Type;
 var g_oTableId = AscCommon.g_oTableId;
 
+var DrawingObjectsController = AscFormat.DrawingObjectsController;
+var HANDLE_EVENT_MODE_HANDLE = AscFormat.HANDLE_EVENT_MODE_HANDLE;
+var HANDLE_EVENT_MODE_CURSOR = AscFormat.HANDLE_EVENT_MODE_CURSOR;
+
 var asc_CImgProperty = Asc.asc_CImgProperty;
 
 function CBoundsRectForMath(oDrawing)
@@ -87,7 +91,7 @@ function CBoundsRectForMath(oDrawing)
     else
     {
         this.WrapType = WRAPPING_TYPE_NONE;
-        this.Distance = new CDistance(0, 0, 0, 0);
+        this.Distance = new AscFormat.CDistance(0, 0, 0, 0);
     }
 }
 
@@ -833,7 +837,7 @@ CGraphicObjects.prototype =
 
 
         var by_types;
-        by_types = getObjectsByTypesFromArr(this.selectedObjects, true);
+        by_types = AscFormat.getObjectsByTypesFromArr(this.selectedObjects, true);
 
         var aSelectedCharts = [];
         for(i = 0; i < by_types.charts.length; ++i)
@@ -1966,7 +1970,7 @@ CGraphicObjects.prototype =
 
     selectionCheck: function( X, Y, Page_Abs, NearPos )
     {
-        var text_object = getTargetTextObject(this);
+        var text_object = AscFormat.getTargetTextObject(this);
         if(text_object)
             return text_object.selectionCheck( X, Y, Page_Abs, NearPos );
         return false;
@@ -1974,7 +1978,7 @@ CGraphicObjects.prototype =
 
     checkTextObject: function(x, y, pageIndex)
     {
-        var text_object = getTargetTextObject(this);
+        var text_object = AscFormat.getTargetTextObject(this);
         if(text_object && text_object.hitInTextRect)
         {
             if(text_object.selectStartPage === pageIndex)
@@ -2296,7 +2300,7 @@ CGraphicObjects.prototype =
         for(var i = 0; i < arrDrawings.length; ++i)
         {
             var rot = AscFormat.normalizeRotate(AscFormat.isRealNumber(arrDrawings[i].rot) ? arrDrawings[i].rot : 0);
-            if (checkNormalRotate(rot))
+            if (AscFormat.checkNormalRotate(rot))
             {
                 l = arrDrawings[i].posX;
                 r = arrDrawings[i].extX + arrDrawings[i].posX;
@@ -2557,7 +2561,7 @@ CGraphicObjects.prototype =
         if(content)
         {
             content.Remove(Count, bOnlyText, bRemoveOnlySelection, bOnTextAdd);
-            var oTargetTextObject = getTargetTextObject(this);
+            var oTargetTextObject = AscFormat.getTargetTextObject(this);
             oTargetTextObject && oTargetTextObject.checkExtentsByDocContent && oTargetTextObject.checkExtentsByDocContent();
             this.document.Recalculate();
         }
@@ -2591,7 +2595,7 @@ CGraphicObjects.prototype =
                         if(group_map.hasOwnProperty(key))
                             group_arr.push(group_map[key]);
                     }
-                    group_arr.sort(CompareGroups);
+                    group_arr.sort(AscFormat.CompareGroups);
                     for(i = 0; i < group_arr.length; ++i)
                     {
                         cur_group = group_arr[i];

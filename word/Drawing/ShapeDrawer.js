@@ -1803,7 +1803,7 @@ CShapeDrawer.prototype =
 function ShapeToImageConverter(shape, pageIndex)
 {
 	window.IsShapeToImageConverter = true;
-    var _bounds_cheker = new CSlideBoundsChecker();
+    var _bounds_cheker = new AscFormat.CSlideBoundsChecker();
 
     var dKoef = g_dKoef_mm_to_pix;
     var w_mm = 210;

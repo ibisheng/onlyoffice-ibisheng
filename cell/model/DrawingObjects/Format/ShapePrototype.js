@@ -89,7 +89,7 @@ CShape.prototype.getDrawingObjectsController = function()
 CShape.prototype.hitInTextRect = function (x, y)
 {
     var oController = this.getDrawingObjectsController && this.getDrawingObjectsController();
-    if(oController && (getTargetTextObject(oController) === this || (oController.curState.startTargetTextObject === this)))
+    if(oController && (AscFormat.getTargetTextObject(oController) === this || (oController.curState.startTargetTextObject === this)))
     {
         var content = this.getDocContent && this.getDocContent();
         if ( content && this.invertTransformText)
@@ -440,7 +440,7 @@ CShape.prototype.recalculate = function ()
 };
 CShape.prototype.recalculateBounds = function()
 {
-    var boundsChecker = new  CSlideBoundsChecker();
+    var boundsChecker = new  AscFormat.CSlideBoundsChecker();
     this.draw(boundsChecker);
     boundsChecker.CorrectBounds();
 

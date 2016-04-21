@@ -107,7 +107,7 @@ CFlowTable.prototype =
     Get_Distance : function()
     {
         var oDist = this.Distance;
-        return new CDistance(getValOrDefault(oDist.L, DISTANCE_TO_TEXT_LEFTRIGHT), getValOrDefault(oDist.T, 0), getValOrDefault(oDist.R, DISTANCE_TO_TEXT_LEFTRIGHT), getValOrDefault(oDist.B, 0));
+        return new AscFormat.CDistance(AscFormat.getValOrDefault(oDist.L, AscFormat.DISTANCE_TO_TEXT_LEFTRIGHT), AscFormat.getValOrDefault(oDist.T, 0), AscFormat.getValOrDefault(oDist.R, AscFormat.DISTANCE_TO_TEXT_LEFTRIGHT), AscFormat.getValOrDefault(oDist.B, 0));
 
     },
 
@@ -118,8 +118,8 @@ CFlowTable.prototype =
             y0 = Y0Sp;
             y1 = Y1Sp;
         }
-        var top = this.Y - getValOrDefault(this.Distance.T, 0);
-        var bottom = this.Y + this.H + getValOrDefault(this.Distance.B, 0);
+        var top = this.Y - AscFormat.getValOrDefault(this.Distance.T, 0);
+        var bottom = this.Y + this.H + AscFormat.getValOrDefault(this.Distance.B, 0);
         if(y1 < top || y0 > bottom)
             return ret;
 
@@ -134,16 +134,16 @@ CFlowTable.prototype =
             case WRAPPING_TYPE_THROUGH:
             case WRAPPING_TYPE_TIGHT:
             {
-                X0 = this.X - getValOrDefault(this.Distance.L, DISTANCE_TO_TEXT_LEFTRIGHT);
-                X1 = this.X + this.W + getValOrDefault(this.Distance.R, DISTANCE_TO_TEXT_LEFTRIGHT);
+                X0 = this.X - AscFormat.getValOrDefault(this.Distance.L, AscFormat.DISTANCE_TO_TEXT_LEFTRIGHT);
+                X1 = this.X + this.W + AscFormat.getValOrDefault(this.Distance.R, AscFormat.DISTANCE_TO_TEXT_LEFTRIGHT);
                 Y1 = bottom;
                 b_check = true;
                 break;
             }
             case WRAPPING_TYPE_TOP_AND_BOTTOM:
             {
-                var L = this.X - getValOrDefault(this.Distance.L, DISTANCE_TO_TEXT_LEFTRIGHT);
-                var R = this.X + this.W + getValOrDefault(this.Distance.R, DISTANCE_TO_TEXT_LEFTRIGHT);
+                var L = this.X - AscFormat.getValOrDefault(this.Distance.L, AscFormat.DISTANCE_TO_TEXT_LEFTRIGHT);
+                var R = this.X + this.W + AscFormat.getValOrDefault(this.Distance.R, AscFormat.DISTANCE_TO_TEXT_LEFTRIGHT);
 
                 if (R < LeftField || L > RightField)
                     return ret;
@@ -236,7 +236,7 @@ CFlowParagraph.prototype =
     Get_Distance : function()
     {
         var oDist = this.Distance;
-        return new CDistance(getValOrDefault(oDist.L, DISTANCE_TO_TEXT_LEFTRIGHT), getValOrDefault(oDist.T, 0), getValOrDefault(oDist.R, DISTANCE_TO_TEXT_LEFTRIGHT), getValOrDefault(oDist.B, 0));
+        return new AscFormat.CDistance(AscFormat.getValOrDefault(oDist.L, AscFormat.DISTANCE_TO_TEXT_LEFTRIGHT), AscFormat.getValOrDefault(oDist.T, 0), AscFormat.getValOrDefault(oDist.R, AscFormat.DISTANCE_TO_TEXT_LEFTRIGHT), AscFormat.getValOrDefault(oDist.B, 0));
 
     },
 

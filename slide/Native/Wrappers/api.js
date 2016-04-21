@@ -450,7 +450,7 @@ asc_docs_api.prototype["Native_Editor_Initialize_Settings"] = function(_params)
 
 
 asc_docs_api.prototype["CheckSlideBounds"] = function(nSlideIndex){
-    var oBoundsChecker = new CSlideBoundsChecker();
+    var oBoundsChecker = new AscFormat.CSlideBoundsChecker();
     this.WordControl.m_oLogicDocument.Draw(nSlideIndex, oBoundsChecker);
     var oBounds = oBoundsChecker.Bounds;
     return [

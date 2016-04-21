@@ -4251,8 +4251,8 @@ ParaDrawing.prototype =
         {
             Props.Paddings =
             {
-                Left   : DISTANCE_TO_TEXT_LEFTRIGHT,
-                Right  : DISTANCE_TO_TEXT_LEFTRIGHT,
+                Left   : AscFormat.DISTANCE_TO_TEXT_LEFTRIGHT,
+                Right  : AscFormat.DISTANCE_TO_TEXT_LEFTRIGHT,
                 Top    : 0,
                 Bottom : 0
             };
@@ -4301,7 +4301,7 @@ ParaDrawing.prototype =
         {
             Props.SizeRelH =
             {
-                RelativeFrom: ConvertRelSizeHToRelPosition(this.SizeRelH.RelativeFrom),
+                RelativeFrom: AscFormat.ConvertRelSizeHToRelPosition(this.SizeRelH.RelativeFrom),
                 Value: (this.SizeRelH.Percent*100) >> 0
             };
         }
@@ -4310,7 +4310,7 @@ ParaDrawing.prototype =
         {
             Props.SizeRelV =
             {
-                RelativeFrom: ConvertRelSizeVToRelPosition(this.SizeRelV.RelativeFrom),
+                RelativeFrom: AscFormat.ConvertRelSizeVToRelPosition(this.SizeRelV.RelativeFrom),
                 Value: (this.SizeRelV.Percent*100) >> 0
             };
         }
@@ -4546,14 +4546,14 @@ ParaDrawing.prototype =
         }
         if (undefined != Props.SizeRelH) {
             this.SetSizeRelH({
-                RelativeFrom: ConvertRelPositionHToRelSize(Props.SizeRelH.RelativeFrom),
+                RelativeFrom: AscFormat.ConvertRelPositionHToRelSize(Props.SizeRelH.RelativeFrom),
                 Percent: Props.SizeRelH.Value / 100.0
             });
         }
 
         if (undefined != Props.SizeRelV) {
             this.SetSizeRelV({
-                RelativeFrom: ConvertRelPositionVToRelSize(Props.SizeRelV.RelativeFrom),
+                RelativeFrom: AscFormat.ConvertRelPositionVToRelSize(Props.SizeRelV.RelativeFrom),
                 Percent: Props.SizeRelV.Value / 100.0
             });
         }
@@ -5071,7 +5071,7 @@ ParaDrawing.prototype =
     Get_Distance : function()
     {
         var oDist = this.Distance;
-        return new CDistance(getValOrDefault(oDist.L, DISTANCE_TO_TEXT_LEFTRIGHT), getValOrDefault(oDist.T, 0), getValOrDefault(oDist.R, DISTANCE_TO_TEXT_LEFTRIGHT), getValOrDefault(oDist.B, 0));
+        return new AscFormat.CDistance(AscFormat.getValOrDefault(oDist.L, AscFormat.DISTANCE_TO_TEXT_LEFTRIGHT), AscFormat.getValOrDefault(oDist.T, 0), AscFormat.getValOrDefault(oDist.R, AscFormat.DISTANCE_TO_TEXT_LEFTRIGHT), AscFormat.getValOrDefault(oDist.B, 0));
     },
 
     Set_AllowOverlap : function(AllowOverlap)

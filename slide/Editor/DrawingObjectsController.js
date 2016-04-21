@@ -1,5 +1,9 @@
 "use strict";
 
+// Import
+var DrawingObjectsController = AscFormat.DrawingObjectsController;
+var HANDLE_EVENT_MODE_HANDLE = AscFormat.HANDLE_EVENT_MODE_HANDLE;
+
 
 DrawingObjectsController.prototype.getTheme = function()
 {
@@ -181,7 +185,7 @@ DrawingObjectsController.prototype.editChart = function(binary)
     var chart_space = this.getChartSpace2(bin_object, null);
     chart_space.setParent(this.drawingObjects);
     var by_types, i;
-    by_types = getObjectsByTypesFromArr(this.selectedObjects, true);
+    by_types = AscFormat.getObjectsByTypesFromArr(this.selectedObjects, true);
     var aSelectedCharts = [];
     for(i = 0; i < by_types.charts.length; ++i)
     {

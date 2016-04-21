@@ -44,7 +44,7 @@ CGroupShape.prototype.Get_ColorMap = CShape.prototype.Get_ColorMap;
 CGroupShape.prototype.Is_UseInDocument = CShape.prototype.Is_UseInDocument;
 
 
-CGroupShape.prototype.getTargetDocContent = DrawingObjectsController.prototype.getTargetDocContent;
+CGroupShape.prototype.getTargetDocContent = AscFormat.DrawingObjectsController.prototype.getTargetDocContent;
 CGroupShape.prototype.documentUpdateInterfaceState = function()
 {
     if(this.selection.textSelection)
@@ -57,8 +57,8 @@ CGroupShape.prototype.documentUpdateInterfaceState = function()
     }
     else
     {
-        var para_pr = DrawingObjectsController.prototype.getParagraphParaPr.call(this);
-        var text_pr = DrawingObjectsController.prototype.getParagraphTextPr.call(this);
+        var para_pr = AscFormat.DrawingObjectsController.prototype.getParagraphParaPr.call(this);
+        var text_pr = AscFormat.DrawingObjectsController.prototype.getParagraphTextPr.call(this);
         if(!para_pr)
         {
             para_pr = new CParaPr();

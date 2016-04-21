@@ -61,7 +61,7 @@ function PolyLine (drawingObjects, theme, master, layout, slide, pageIndex)
 
     this.getBounds = function()
     {
-        var boundsChecker = new  CSlideBoundsChecker();
+        var boundsChecker = new  AscFormat.CSlideBoundsChecker();
         this.draw(boundsChecker);
         boundsChecker.Bounds.posX = boundsChecker.Bounds.min_x;
         boundsChecker.Bounds.posY = boundsChecker.Bounds.min_y;

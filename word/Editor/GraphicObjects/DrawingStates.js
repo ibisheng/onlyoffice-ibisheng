@@ -3,6 +3,9 @@
 var changestype_Drawing_Props = AscCommon.changestype_Drawing_Props;
 var changestype_2_ElementsArray_and_Type = AscCommon.changestype_2_ElementsArray_and_Type;
 
+var HANDLE_EVENT_MODE_HANDLE = AscFormat.HANDLE_EVENT_MODE_HANDLE;
+var HANDLE_EVENT_MODE_CURSOR = AscFormat.HANDLE_EVENT_MODE_CURSOR;
+
 var MOVE_DELTA = 1/100000;
 var SNAP_DISTANCE = 1.27;
 
@@ -148,7 +151,7 @@ NullState.prototype =
         var selection = this.drawingObjects.selection;
         var b_no_handle_selected = false;
 
-        this.startTargetTextObject = getTargetTextObject(this.drawingObjects);
+        this.startTargetTextObject = AscFormat.getTargetTextObject(this.drawingObjects);
         var start_target_doc_content, end_target_doc_content;
         if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
         {
@@ -363,7 +366,7 @@ NullState.prototype =
 
     onMouseMove: function(e, x, y, pageIndex)
     {
-        var text_object = getTargetTextObject(this.drawingObjects);
+        var text_object = AscFormat.getTargetTextObject(this.drawingObjects);
         if(text_object && e.IsLocked)
         {
             text_object.selectionSetEnd(e, x, y, pageIndex);
@@ -592,9 +595,9 @@ RotateState.prototype =
                     for(i = 0; i < aNearestPos.length; ++i)
                     {
                         if(aDrawings[i].Locked !== true)
-                            checkObjectInArray(aCheckParagraphs, aNearestPos[i].Paragraph);
+                            AscFormat.checkObjectInArray(aCheckParagraphs, aNearestPos[i].Paragraph);
                         else
-                            checkObjectInArray(aCheckParagraphs, aParentParagraphs[i]);
+                            AscFormat.checkObjectInArray(aCheckParagraphs, aParentParagraphs[i]);
                     }
                     if(false === editor.isViewMode && false === this.drawingObjects.document.Document_Is_SelectionLocked(changestype_Drawing_Props, {Type : changestype_2_ElementsArray_and_Type , Elements : aCheckParagraphs, CheckType : AscCommon.changestype_Paragraph_Content}))
                     {
@@ -629,8 +632,8 @@ RotateState.prototype =
                         {
                             if(aNearestPos[i].Paragraph !== aParentParagraphs[i] && aDrawings[i].Locked !== true)
                             {
-                                checkObjectInArray(aCheckParagraphs, aNearestPos[i].Paragraph);
-                                checkObjectInArray(aCheckParagraphs, aParentParagraphs[i]);
+                                AscFormat.checkObjectInArray(aCheckParagraphs, aNearestPos[i].Paragraph);
+                                AscFormat.checkObjectInArray(aCheckParagraphs, aParentParagraphs[i]);
                             }
                         }
                     }
@@ -892,7 +895,7 @@ MoveState.prototype =
 
                 for(snap_index = 0; snap_index < trackSnapArrayX.length; ++snap_index)
                 {
-                    var snap_obj = GetMinSnapDistanceXObjectByArrays(trackSnapArrayX[snap_index] + curDX, snapHorArray);
+                    var snap_obj = AscFormat.GetMinSnapDistanceXObjectByArrays(trackSnapArrayX[snap_index] + curDX, snapHorArray);
                     if(isRealObject(snap_obj))
                     {
                         dx = snap_obj.dist;
@@ -919,7 +922,7 @@ MoveState.prototype =
                 {
                     for(var snap_index = 0; snap_index < trackSnapArrayX.length; ++snap_index)
                     {
-                        var snap_obj = GetMinSnapDistanceXObject(trackSnapArrayX[snap_index] + curDX, start_arr);
+                        var snap_obj = AscFormat.GetMinSnapDistanceXObject(trackSnapArrayX[snap_index] + curDX, start_arr);
                         if(isRealObject(snap_obj))
                         {
                             dx = snap_obj.dist;
@@ -960,7 +963,7 @@ MoveState.prototype =
 
                 for(snap_index = 0; snap_index < trackSnapArrayY.length; ++snap_index)
                 {
-                    var snap_obj = GetMinSnapDistanceYObjectByArrays(trackSnapArrayY[snap_index] + curDY, snapVerArray);
+                    var snap_obj = AscFormat.GetMinSnapDistanceYObjectByArrays(trackSnapArrayY[snap_index] + curDY, snapVerArray);
                     if(isRealObject(snap_obj))
                     {
                         dy = snap_obj.dist;
@@ -987,7 +990,7 @@ MoveState.prototype =
                 {
                     for(snap_index = 0; snap_index < trackSnapArrayY.length; ++snap_index)
                     {
-                        var snap_obj = GetMinSnapDistanceYObject(trackSnapArrayY[snap_index] + curDY, start_arr);
+                        var snap_obj = AscFormat.GetMinSnapDistanceYObject(trackSnapArrayY[snap_index] + curDY, start_arr);
                         if(isRealObject(snap_obj))
                         {
                             dy = snap_obj.dist;

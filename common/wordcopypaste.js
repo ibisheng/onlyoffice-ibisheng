@@ -1745,7 +1745,7 @@ CopyProcessor.prototype =
         var sSrc = slide.getBase64Img();
         //if(sSrc.length > 0)
         {
-            var _bounds_cheker = new CSlideBoundsChecker();
+            var _bounds_cheker = new AscFormat.CSlideBoundsChecker();
             slide.draw(_bounds_cheker, 0);
 			var oImg = new CopyElement("img");
 			oImg.oAttributes["width"] = Math.round((_bounds_cheker.Bounds.max_x - _bounds_cheker.Bounds.min_x + 1) * g_dKoef_mm_to_pix);
@@ -1988,7 +1988,7 @@ CopyProcessor.prototype =
         var sSrc = oGraphicObj.getBase64Img();
         if(sSrc.length > 0)
         {
-            var _bounds_cheker = new CSlideBoundsChecker();
+            var _bounds_cheker = new AscFormat.CSlideBoundsChecker();
             oGraphicObj.draw(_bounds_cheker, 0);
 			
 			var width, height;
@@ -2754,7 +2754,7 @@ PasteProcessor.prototype =
             oDoc.Insert_Content(oSelectedContent, NearPos);
             if(this.oLogicDocument && this.oLogicDocument.DrawingObjects)
             {
-                var oTargetTextObject = getTargetTextObject(this.oLogicDocument.DrawingObjects);
+                var oTargetTextObject = AscFormat.getTargetTextObject(this.oLogicDocument.DrawingObjects);
                 oTargetTextObject && oTargetTextObject.checkExtentsByDocContent && oTargetTextObject.checkExtentsByDocContent();
             }
 
@@ -4011,7 +4011,7 @@ PasteProcessor.prototype =
 						
                         var w =  shape.txBody.getRectWidth(presentation.Width*2/3);
                         var h = shape.txBody.content.Get_SummaryHeight();
-                        CheckSpPrXfrm(shape);
+                      AscFormat.CheckSpPrXfrm(shape);
                         shape.spPr.xfrm.setExtX(w);
                         shape.spPr.xfrm.setExtY(h);
                         shape.spPr.xfrm.setOffX(0);
@@ -4029,7 +4029,7 @@ PasteProcessor.prototype =
                         //var h = shape.txBody.content.Get_SummaryHeight();
 						var w = 100;
 						var h = 100;
-                        CheckSpPrXfrm(shape);
+                      AscFormat.CheckSpPrXfrm(shape);
                         shape.spPr.xfrm.setExtX(w);
                         shape.spPr.xfrm.setExtY(h);
                         shape.spPr.xfrm.setOffX(0);
@@ -4041,8 +4041,8 @@ PasteProcessor.prototype =
 					for(var i = 0; i < arrImages.length; ++i)
                     {
                         shape = arrImages[i];
-                       
-                        CheckSpPrXfrm(shape);
+
+                      AscFormat.CheckSpPrXfrm(shape);
                         //shape.spPr.xfrm.setExtX(w);
                         //shape.spPr.xfrm.setExtY(h);
                         shape.spPr.xfrm.setOffX(0);
@@ -4106,7 +4106,7 @@ PasteProcessor.prototype =
 					extY = drawings[i].ExtY;
 					imageUrl = drawings[i].base64;
 					
-					graphicObj = DrawingObjectsController.prototype.createImage(imageUrl, 0, 0, extX, extY);	
+					graphicObj = AscFormat.DrawingObjectsController.prototype.createImage(imageUrl, 0, 0, extX, extY);	
 					
 					tempParaRun = new ParaRun();
 					tempParaRun.Paragraph = null;
@@ -6888,7 +6888,7 @@ PasteProcessor.prototype =
                     var sSrc = this.oImages[sSrc];
                     if(sSrc)
                     {
-						var image = DrawingObjectsController.prototype.createImage(sSrc, 0, 0, nWidth, nHeight);	
+						var image = AscFormat.DrawingObjectsController.prototype.createImage(sSrc, 0, 0, nWidth, nHeight);	
                         arrImages.push(image);
                     }
                 }
@@ -7730,7 +7730,7 @@ function CreateImageFromBinary(bin, nW, nH)
         h = nH;
     }
     var para_drawing = new ParaDrawing(w, h, null, editor.WordControl.m_oLogicDocument.DrawingDocument, editor.WordControl.m_oLogicDocument, null);
-    var word_image = DrawingObjectsController.prototype.createImage(bin, 0, 0, w, h);
+    var word_image = AscFormat.DrawingObjectsController.prototype.createImage(bin, 0, 0, w, h);
     para_drawing.Set_GraphicObject(word_image);
     word_image.setParent(para_drawing);
     para_drawing.Set_GraphicObject(word_image);

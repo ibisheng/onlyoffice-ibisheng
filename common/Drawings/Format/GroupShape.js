@@ -741,11 +741,11 @@ CGroupShape.prototype =
             var i;
             if(paraItem.Type === para_TextPr)
             {
-                DrawingObjectsController.prototype.applyDocContentFunction.call(this, CDocumentContent.prototype.Paragraph_Add, [paraItem, bRecalculate], CTable.prototype.Paragraph_Add);
+                AscFormat.DrawingObjectsController.prototype.applyDocContentFunction.call(this, CDocumentContent.prototype.Paragraph_Add, [paraItem, bRecalculate], CTable.prototype.Paragraph_Add);
             }
             else if(this.selectedObjects.length === 1
                 && this.selectedObjects[0].getObjectType() === AscDFH.historyitem_type_Shape
-                &&  !CheckLinePreset(this.selectedObjects[0].getPresetGeom()))
+                &&  !AscFormat.CheckLinePreset(this.selectedObjects[0].getPresetGeom()))
             {
                 this.selection.textSelection = this.selectedObjects[0];
                 this.selection.textSelection.paragraphAdd(paraItem, bRecalculate);
@@ -763,8 +763,8 @@ CGroupShape.prototype =
         }
     },
 
-    applyTextFunction: DrawingObjectsController.prototype.applyTextFunction,
-    applyDocContentFunction: DrawingObjectsController.prototype.applyDocContentFunction,
+    applyTextFunction: AscFormat.DrawingObjectsController.prototype.applyTextFunction,
+    applyDocContentFunction: AscFormat.DrawingObjectsController.prototype.applyDocContentFunction,
 
     applyAllAlign: function(val)
     {
@@ -1412,7 +1412,7 @@ CGroupShape.prototype =
         var xfrm  = sp.spPr.xfrm;
         var rot = xfrm.rot == null ? 0 : xfrm.rot;
         var xc, yc;
-        if(checkNormalRotate(rot))
+        if(AscFormat.checkNormalRotate(rot))
         {
             min_x = xfrm.offX;
             min_y = xfrm.offY;
@@ -1435,7 +1435,7 @@ CGroupShape.prototype =
             xfrm  = sp.spPr.xfrm;
             rot = xfrm.rot == null ? 0 : xfrm.rot;
 
-            if(checkNormalRotate(rot))
+            if(AscFormat.checkNormalRotate(rot))
             {
                 cur_min_x = xfrm.offX;
                 cur_min_y = xfrm.offY;
@@ -1676,9 +1676,9 @@ CGroupShape.prototype =
         }
     },
 
-    resetInternalSelection: DrawingObjectsController.prototype.resetInternalSelection,
-    recalculateCurPos: DrawingObjectsController.prototype.recalculateCurPos,
-    loadDocumentStateAfterLoadChanges: DrawingObjectsController.prototype.loadDocumentStateAfterLoadChanges,
+    resetInternalSelection: AscFormat.DrawingObjectsController.prototype.resetInternalSelection,
+    recalculateCurPos: AscFormat.DrawingObjectsController.prototype.recalculateCurPos,
+    loadDocumentStateAfterLoadChanges: AscFormat.DrawingObjectsController.prototype.loadDocumentStateAfterLoadChanges,
     checkHitToBounds: CShape.prototype.checkHitToBounds,
     checkDrawingBaseCoords: CShape.prototype.checkDrawingBaseCoords,
     setDrawingBaseCoords: CShape.prototype.setDrawingBaseCoords,
