@@ -57,7 +57,7 @@ CShape.prototype.Is_UseInDocument = function(drawingObjects)
 };
 CShape.prototype.setWorksheet = function(worksheet)
 {
-    History.Add(this, {Type: historyitem_AutoShapes_SetWorksheet, oldPr: this.worksheet, newPr: worksheet});
+    History.Add(this, {Type: AscDFH.historyitem_AutoShapes_SetWorksheet, oldPr: this.worksheet, newPr: worksheet});
     this.worksheet = worksheet;
     if(this.spTree)
     {
@@ -81,7 +81,7 @@ CShape.prototype.setDrawingBase = function(drawingBase)
 
 CShape.prototype.getDrawingObjectsController = function()
 {
-    if(this.parent && this.parent.getObjectType() === historyitem_type_Slide)
+    if(this.parent && this.parent.getObjectType() === AscDFH.historyitem_type_Slide)
     {
         return this.parent.graphicObjects;
     }
@@ -279,7 +279,7 @@ CShape.prototype.recalcTextStyles = function()
 };
 CShape.prototype.addToRecalculate = function()
 {
-    History.RecalcData_Add({Type: historyrecalctype_Drawing, Object: this});
+    History.RecalcData_Add({Type: AscDFH.historyitem_recalctype_Drawing, Object: this});
 };
 CShape.prototype.getSlideIndex = function()
 {
@@ -312,7 +312,7 @@ CShape.prototype.handleUpdateTheme = function()
 
     if(this.isPlaceholder()
         && !( this.spPr && this.spPr.xfrm &&
-        (this.getObjectType() === historyitem_type_GroupShape && this.spPr.xfrm.isNotNullForGroup() || this.getObjectType() !== historyitem_type_GroupShape && this.spPr.xfrm.isNotNull() ) ))
+        (this.getObjectType() === AscDFH.historyitem_type_GroupShape && this.spPr.xfrm.isNotNullForGroup() || this.getObjectType() !== AscDFH.historyitem_type_GroupShape && this.spPr.xfrm.isNotNull() ) ))
     {
         this.recalcTransform();
         this.recalcGeometry()
@@ -400,7 +400,7 @@ CShape.prototype.getParentObjects = function ()
     {
         switch(this.parent.getObjectType())
         {
-            case historyitem_type_Slide:
+            case AscDFH.historyitem_type_Slide:
             {
                 return {
                     presentation: editor.WordControl.m_oLogicDocument,
@@ -410,7 +410,7 @@ CShape.prototype.getParentObjects = function ()
                     theme: this.themeOverride ? this.themeOverride : (this.parent.Layout && this.parent.Layout.Master ? this.parent.Layout.Master.Theme : null)
                 };
             }
-            case historyitem_type_SlideLayout:
+            case AscDFH.historyitem_type_SlideLayout:
             {
                 return {
                     presentation: editor.WordControl.m_oLogicDocument,
@@ -420,7 +420,7 @@ CShape.prototype.getParentObjects = function ()
                     theme: this.themeOverride ? this.themeOverride : (this.parent.Master ? this.parent.Master.Theme : null)
                 };
             }
-            case historyitem_type_SlideMaster:
+            case AscDFH.historyitem_type_SlideMaster:
             {
                 return {
                     presentation: editor.WordControl.m_oLogicDocument,
@@ -446,7 +446,7 @@ CShape.prototype.recalculate = function ()
 {
     if(this.bDeleted || !this.parent)
         return;
-    var check_slide_placeholder = !this.isPlaceholder() || (this.parent && this.parent.getObjectType() === historyitem_type_Slide);
+    var check_slide_placeholder = !this.isPlaceholder() || (this.parent && this.parent.getObjectType() === AscDFH.historyitem_type_Slide);
     ExecuteNoHistory(function(){
 
 

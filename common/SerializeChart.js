@@ -10798,9 +10798,9 @@ BinaryChartReader.prototype.ReadCT_Chart = function (type, length, val) {
             var oCurChartWithAxis = aChartWithAxis[nChartIndex];
             var axis = oIdToAxisMap[oCurChartWithAxis.axisId];
             oCurChartWithAxis.chart.addAxId(axis);
-            if(axis && axis.getObjectType() === historyitem_type_ValAx && !isRealNumber(axis.crossBetween))
+            if(axis && axis.getObjectType() === AscDFH.historyitem_type_ValAx && !isRealNumber(axis.crossBetween))
             {
-                if(oCurChartWithAxis.chart.getObjectType() === historyitem_type_AreaChart)
+                if(oCurChartWithAxis.chart.getObjectType() === AscDFH.historyitem_type_AreaChart)
                 {
                     axis.setCrossBetween(CROSS_BETWEEN_MID_CAT);
                 }

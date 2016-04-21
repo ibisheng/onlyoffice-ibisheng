@@ -78,14 +78,14 @@ CCollaborativeEditing.prototype.Send_Changes = function(IsUserSave, AdditionalIn
     {
         var Class = this.m_aNeedUnlock2[Index];
         Class.Lock.Set_Type( AscCommon.locktype_None, false);
-        if(Class.getObjectType && Class.getObjectType() === historyitem_type_Slide)
+        if(Class.getObjectType && Class.getObjectType() === AscDFH.historyitem_type_Slide)
         {
             editor.WordControl.m_oLogicDocument.DrawingDocument.UnLockSlide(Class.num);
         }
         if(Class instanceof PropLocker)
         {
             var Class2 = AscCommon.g_oTableId.Get_ById(Class.objectId);
-            if(Class2 && Class2.getObjectType && Class2.getObjectType() === historyitem_type_Slide && Class2.deleteLock === Class)
+            if(Class2 && Class2.getObjectType && Class2.getObjectType() === AscDFH.historyitem_type_Slide && Class2.deleteLock === Class)
             {
                 editor.WordControl.m_oLogicDocument.DrawingDocument.UnLockSlide(Class2.num);
             }
@@ -94,11 +94,11 @@ CCollaborativeEditing.prototype.Send_Changes = function(IsUserSave, AdditionalIn
         var check_obj = null;
         if(Class.getObjectType)
         {
-            if( (Class.getObjectType() === historyitem_type_Shape
-                || Class.getObjectType() === historyitem_type_ImageShape
-                || Class.getObjectType() === historyitem_type_GroupShape
-                || Class.getObjectType() === historyitem_type_GraphicFrame
-                || Class.getObjectType() === historyitem_type_ChartSpace) && isRealObject(Class.parent))
+            if( (Class.getObjectType() === AscDFH.historyitem_type_Shape
+                || Class.getObjectType() === AscDFH.historyitem_type_ImageShape
+                || Class.getObjectType() === AscDFH.historyitem_type_GroupShape
+                || Class.getObjectType() === AscDFH.historyitem_type_GraphicFrame
+                || Class.getObjectType() === AscDFH.historyitem_type_ChartSpace) && isRealObject(Class.parent))
             {
                 if(Class.parent && isRealNumber(Class.parent.num))
                 {
@@ -113,7 +113,7 @@ CCollaborativeEditing.prototype.Send_Changes = function(IsUserSave, AdditionalIn
                     "guid": Class.Get_Id()
                 };
             }
-            else if(Class.getObjectType() === historyitem_type_Slide)
+            else if(Class.getObjectType() === AscDFH.historyitem_type_Slide)
             {
                 check_obj =
                 {
@@ -229,7 +229,7 @@ CCollaborativeEditing.prototype.Release_Locks = function()
                         editor.asc_fireCallback("asc_onUnLockDocumentProps");
                     }
                 }
-                if(object.getObjectType && object.getObjectType() === historyitem_type_Slide && object.deleteLock === Class)
+                if(object.getObjectType && object.getObjectType() === AscDFH.historyitem_type_Slide && object.deleteLock === Class)
                 {
                     editor.WordControl.m_oLogicDocument.DrawingDocument.UnLockSlide(object.num);
                 }

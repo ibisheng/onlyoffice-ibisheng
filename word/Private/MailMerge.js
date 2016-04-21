@@ -215,7 +215,7 @@ CDocument.prototype.Add_MailMergeField = function(Name)
 {
     if (false === this.Document_Is_SelectionLocked(AscCommon.changestype_Paragraph_Content))
     {
-        this.Create_NewHistoryPoint(historydescription_Document_AddMailMergeField);
+        this.Create_NewHistoryPoint(AscDFH.historydescription_Document_AddMailMergeField);
 
         var oField = new ParaField(fieldtype_MERGEFIELD, [Name], []);
         var oRun = new ParaRun();

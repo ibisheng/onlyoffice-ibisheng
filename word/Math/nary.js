@@ -153,7 +153,7 @@ function CNary(props)
 }
 AscCommon.extendClass(CNary, CMathBase);
 
-CNary.prototype.ClassType = historyitem_type_nary;
+CNary.prototype.ClassType = AscDFH.historyitem_type_nary;
 CNary.prototype.kind      = MATH_NARY;
   
 CNary.prototype.init = function(props)

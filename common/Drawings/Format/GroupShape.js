@@ -55,7 +55,7 @@ CGroupShape.prototype =
 {
     getObjectType: function()
     {
-        return historyitem_type_GroupShape;
+        return AscDFH.historyitem_type_GroupShape;
     },
 
     Get_Id: function()
@@ -94,7 +94,7 @@ CGroupShape.prototype =
 
     setBDeleted: function(pr)
     {
-        History.Add(this, {Type: historyitem_ShapeSetBDeleted, oldPr: this.bDeleted, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_ShapeSetBDeleted, oldPr: this.bDeleted, newPr: pr});
         this.bDeleted = pr;
     },
 
@@ -170,7 +170,7 @@ CGroupShape.prototype =
 
     Write_ToBinary2: function(w)
     {
-        w.WriteLong(historyitem_type_GroupShape);
+        w.WriteLong(AscDFH.historyitem_type_GroupShape);
         w.WriteString2(this.Id);
     },
 
@@ -181,13 +181,13 @@ CGroupShape.prototype =
 
     setNvGrpSpPr: function(pr)
     {
-        History.Add(this, {Type:historyitem_GroupShapeSetNvGrpSpPr, oldPr: this.nvGrpSpPr, newPr: pr});
+        History.Add(this, {Type:AscDFH.historyitem_GroupShapeSetNvGrpSpPr, oldPr: this.nvGrpSpPr, newPr: pr});
         this.nvGrpSpPr = pr;
     },
 
     setSpPr: function(pr)
     {
-        History.Add(this, {Type:historyitem_GroupShapeSetSpPr, oldPr: this.spPr, newPr: pr});
+        History.Add(this, {Type:AscDFH.historyitem_GroupShapeSetSpPr, oldPr: this.spPr, newPr: pr});
         this.spPr = pr;
     },
 
@@ -195,20 +195,20 @@ CGroupShape.prototype =
     {
         if(!isRealNumber(pos))
             pos = this.spTree.length;
-        History.Add(this, {Type: historyitem_GroupShapeAddToSpTree, pos: pos, item: item});
+        History.Add(this, {Type: AscDFH.historyitem_GroupShapeAddToSpTree, pos: pos, item: item});
         this.handleUpdateSpTree();
         this.spTree.splice(pos, 0, item);
     },
 
     setParent: function(pr)
     {
-        History.Add(this, {Type: historyitem_GroupShapeSetParent, oldPr: this.parent, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_GroupShapeSetParent, oldPr: this.parent, newPr: pr});
         this.parent = pr;
     },
 
     setGroup: function(group)
     {
-        History.Add(this, {Type: historyitem_GroupShapeSetGroup, oldPr: this.group, newPr: group});
+        History.Add(this, {Type: AscDFH.historyitem_GroupShapeSetGroup, oldPr: this.group, newPr: group});
         this.group = group;
     },
 
@@ -219,7 +219,7 @@ CGroupShape.prototype =
             if(this.spTree[i].Get_Id() === id)
             {
                 this.handleUpdateSpTree();
-                History.Add(this,{Type:historyitem_GroupShapeRemoveFromSpTree, pos: i, item:this.spTree[i]});
+                History.Add(this,{Type:AscDFH.historyitem_GroupShapeRemoveFromSpTree, pos: i, item:this.spTree[i]});
                 return this.spTree.splice(i, 1)[0];
             }
         }
@@ -228,7 +228,7 @@ CGroupShape.prototype =
 
     removeFromSpTreeByPos: function(pos)
     {
-        History.Add(this,{Type:historyitem_GroupShapeRemoveFromSpTree, pos: pos, item:this.spTree[pos]});
+        History.Add(this,{Type:AscDFH.historyitem_GroupShapeRemoveFromSpTree, pos: pos, item:this.spTree[pos]});
         this.handleUpdateSpTree();
         return this.spTree.splice(pos, 1)[0];
     },
@@ -740,7 +740,7 @@ CGroupShape.prototype =
                 DrawingObjectsController.prototype.applyDocContentFunction.call(this, CDocumentContent.prototype.Paragraph_Add, [paraItem, bRecalculate], CTable.prototype.Paragraph_Add);
             }
             else if(this.selectedObjects.length === 1
-                && this.selectedObjects[0].getObjectType() === historyitem_type_Shape
+                && this.selectedObjects[0].getObjectType() === AscDFH.historyitem_type_Shape
                 &&  !CheckLinePreset(this.selectedObjects[0].getPresetGeom()))
             {
                 this.selection.textSelection = this.selectedObjects[0];
@@ -1704,7 +1704,7 @@ CGroupShape.prototype =
 
     setNvSpPr: function(pr)
     {
-        History.Add(this, {Type: historyitem_GroupShapeSetNvGrpSpPr, oldPr: this.nvGrpSpPr, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_GroupShapeSetNvGrpSpPr, oldPr: this.nvGrpSpPr, newPr: pr});
         this.nvGrpSpPr = pr;
     },
 
@@ -1725,7 +1725,7 @@ CGroupShape.prototype =
         var arrDrawings = [];
         for(i = this.spTree.length - 1;  i > -1; --i)
         {
-            if(this.spTree[i].getObjectType() === historyitem_type_GroupShape)
+            if(this.spTree[i].getObjectType() === AscDFH.historyitem_type_GroupShape)
             {
                 this.spTree[i].bringToFront();
             }
@@ -1745,7 +1745,7 @@ CGroupShape.prototype =
         var i;
         for(i = this.spTree.length-1; i > -1; --i)
         {
-            if(this.spTree[i].getObjectType() === historyitem_type_GroupShape)
+            if(this.spTree[i].getObjectType() === AscDFH.historyitem_type_GroupShape)
             {
                 this.spTree[i].bringForward();
             }
@@ -1762,7 +1762,7 @@ CGroupShape.prototype =
         var i, arrDrawings = [];
         for(i = this.spTree.length-1; i > -1; --i)
         {
-            if(this.spTree[i].getObjectType() === historyitem_type_GroupShape)
+            if(this.spTree[i].getObjectType() === AscDFH.historyitem_type_GroupShape)
             {
                 this.spTree[i].sendToBack();
             }
@@ -1783,7 +1783,7 @@ CGroupShape.prototype =
         var i;
         for(i = 0; i < this.spTree.length; ++i)
         {
-            if(this.spTree[i].getObjectType() === historyitem_type_GroupShape)
+            if(this.spTree[i].getObjectType() === AscDFH.historyitem_type_GroupShape)
             {
                 this.spTree[i].bringBackward();
             }
@@ -1798,12 +1798,12 @@ CGroupShape.prototype =
     {
         switch(data.Type)
         {
-            case historyitem_AutoShapes_SetBFromSerialize:
+            case AscDFH.historyitem_AutoShapes_SetBFromSerialize:
             {
                 this.fromSerialize = data.oldPr;
                 break;
             }
-            case historyitem_AutoShapes_SetDrawingBaseCoors:
+            case AscDFH.historyitem_AutoShapes_SetDrawingBaseCoors:
             {
                 if(this.drawingBase)
                 {
@@ -1822,34 +1822,34 @@ CGroupShape.prototype =
                 }
                 break;
             }
-            case historyitem_AutoShapes_RemoveFromDrawingObjects:
+            case AscDFH.historyitem_AutoShapes_RemoveFromDrawingObjects:
             {
                 addToDrawings(this.worksheet, this, data.Pos);
                 break;
             }
-            case historyitem_AutoShapes_AddToDrawingObjects:
+            case AscDFH.historyitem_AutoShapes_AddToDrawingObjects:
             {
                 deleteDrawingBase(this.worksheet.Drawings, this.Get_Id());
                 break;
             }
-            case historyitem_AutoShapes_SetWorksheet:
+            case AscDFH.historyitem_AutoShapes_SetWorksheet:
             {
                 this.worksheet = data.oldPr;
                 break;
             }
-            case historyitem_ShapeSetBDeleted:
+            case AscDFH.historyitem_ShapeSetBDeleted:
             {
                 this.bDeleted = data.oldPr;
                 break;
             }
 
-            case historyitem_GroupShapeSetSpPr:
+            case AscDFH.historyitem_GroupShapeSetSpPr:
             {
                 this.spPr = data.oldPr;
                 break;
             }
 
-            case historyitem_GroupShapeAddToSpTree:
+            case AscDFH.historyitem_GroupShapeAddToSpTree:
             {
                 for(var i = this.spTree.length - 1; i > -1; --i)
                 {
@@ -1862,22 +1862,22 @@ CGroupShape.prototype =
                 this.handleUpdateSpTree();
                 break;
             }
-            case historyitem_GroupShapeSetGroup:
+            case AscDFH.historyitem_GroupShapeSetGroup:
             {
                 this.group = data.oldPr;
                 break;
             }
-            case historyitem_GroupShapeSetNvGrpSpPr:
+            case AscDFH.historyitem_GroupShapeSetNvGrpSpPr:
             {
                 this.nvGrpSpPr = data.oldPr;
                 break;
             }
-            case historyitem_GroupShapeSetParent:
+            case AscDFH.historyitem_GroupShapeSetParent:
             {
                 this.parent = data.oldPr;
                 break;
             }
-            case historyitem_GroupShapeRemoveFromSpTree:
+            case AscDFH.historyitem_GroupShapeRemoveFromSpTree:
             {
                 this.spTree.splice(data.pos, 0, data.item);
                 this.handleUpdateSpTree();
@@ -1890,12 +1890,12 @@ CGroupShape.prototype =
     {
         switch(data.Type)
         {
-            case historyitem_AutoShapes_SetBFromSerialize:
+            case AscDFH.historyitem_AutoShapes_SetBFromSerialize:
             {
                 this.fromSerialize = data.newPr;
                 break;
             }
-            case historyitem_AutoShapes_SetDrawingBaseCoors:
+            case AscDFH.historyitem_AutoShapes_SetDrawingBaseCoors:
             {
                 if(this.drawingBase)
                 {
@@ -1914,54 +1914,54 @@ CGroupShape.prototype =
                 }
                 break;
             }
-            case historyitem_AutoShapes_RemoveFromDrawingObjects:
+            case AscDFH.historyitem_AutoShapes_RemoveFromDrawingObjects:
             {
                 deleteDrawingBase(this.worksheet.Drawings, this.Get_Id());
                 break;
             }
-            case historyitem_AutoShapes_AddToDrawingObjects:
+            case AscDFH.historyitem_AutoShapes_AddToDrawingObjects:
             {
                 addToDrawings(this.worksheet, this, data.Pos);
                 break;
             }
-            case historyitem_AutoShapes_SetWorksheet:
+            case AscDFH.historyitem_AutoShapes_SetWorksheet:
             {
                 this.worksheet = data.newPr;
                 break;
             }
-            case historyitem_ShapeSetBDeleted:
+            case AscDFH.historyitem_ShapeSetBDeleted:
             {
                 this.bDeleted = data.newPr;
                 break;
             }
 
-            case historyitem_GroupShapeSetSpPr:
+            case AscDFH.historyitem_GroupShapeSetSpPr:
             {
                 this.spPr = data.newPr;
                 break;
             }
-            case historyitem_GroupShapeAddToSpTree:
+            case AscDFH.historyitem_GroupShapeAddToSpTree:
             {
                 this.spTree.splice(data.pos, 0, data.item);
                 this.handleUpdateSpTree();
                 break;
             }
-            case historyitem_GroupShapeSetGroup:
+            case AscDFH.historyitem_GroupShapeSetGroup:
             {
                 this.group = data.newPr;
                 break;
             }
-            case historyitem_GroupShapeSetNvGrpSpPr:
+            case AscDFH.historyitem_GroupShapeSetNvGrpSpPr:
             {
                 this.nvGrpSpPr = data.newPr;
                 break;
             }
-            case historyitem_GroupShapeSetParent:
+            case AscDFH.historyitem_GroupShapeSetParent:
             {
                 this.parent = data.newPr;
                 break;
             }
-            case historyitem_GroupShapeRemoveFromSpTree:
+            case AscDFH.historyitem_GroupShapeRemoveFromSpTree:
             {
                 for(var i = this.spTree.length; i > -1; --i)
                 {
@@ -1986,12 +1986,12 @@ CGroupShape.prototype =
         switch(data.Type)
         {
 
-            case historyitem_AutoShapes_SetBFromSerialize:
+            case AscDFH.historyitem_AutoShapes_SetBFromSerialize:
             {
                 writeBool(w, data.newPr);
                 break;
             }
-            case historyitem_AutoShapes_SetDrawingBaseCoors:
+            case AscDFH.historyitem_AutoShapes_SetDrawingBaseCoors:
             {
                 writeDouble(w, data.fromCol   );
                 writeDouble(w, data.fromColOff);
@@ -2009,17 +2009,17 @@ CGroupShape.prototype =
                 writeDouble(w, data.cy);
                 break;
             }
-            case historyitem_AutoShapes_RemoveFromDrawingObjects:
+            case AscDFH.historyitem_AutoShapes_RemoveFromDrawingObjects:
             {
                 break;
             }
-            case historyitem_AutoShapes_AddToDrawingObjects:
+            case AscDFH.historyitem_AutoShapes_AddToDrawingObjects:
             {
                 var Pos = data.UseArray ? data.PosArray[0] : data.Pos;
                 writeLong(w, Pos);
                 break;
             }
-            case historyitem_AutoShapes_SetWorksheet:
+            case AscDFH.historyitem_AutoShapes_SetWorksheet:
             {
                 writeBool(w,isRealObject(data.newPr));
                 if(isRealObject(data.newPr))
@@ -2028,23 +2028,23 @@ CGroupShape.prototype =
                 }
                 break;
             }
-            case historyitem_GroupShapeAddToSpTree:
-            case historyitem_GroupShapeRemoveFromSpTree:
+            case AscDFH.historyitem_GroupShapeAddToSpTree:
+            case AscDFH.historyitem_GroupShapeRemoveFromSpTree:
             {
                 writeLong(w, data.pos);
                 writeObject(w, data.item);
                 break;
             }
-            case historyitem_GroupShapeSetGroup:
-            case historyitem_GroupShapeSetNvGrpSpPr:
-            case historyitem_GroupShapeSetParent:
-            case historyitem_GroupShapeSetSpPr:
+            case AscDFH.historyitem_GroupShapeSetGroup:
+            case AscDFH.historyitem_GroupShapeSetNvGrpSpPr:
+            case AscDFH.historyitem_GroupShapeSetParent:
+            case AscDFH.historyitem_GroupShapeSetSpPr:
             {
                 writeObject(w, data.newPr);
                 break;
             }
 
-            case historyitem_ShapeSetBDeleted:
+            case AscDFH.historyitem_ShapeSetBDeleted:
             {
                 writeBool(w, data.newPr);
                 break;
@@ -2057,12 +2057,12 @@ CGroupShape.prototype =
         var type  = r.GetLong();
         switch (type)
         {
-            case historyitem_AutoShapes_SetBFromSerialize:
+            case AscDFH.historyitem_AutoShapes_SetBFromSerialize:
             {
                 this.fromSerialize = readBool(r);
                 break;
             }
-            case historyitem_AutoShapes_SetDrawingBaseCoors:
+            case AscDFH.historyitem_AutoShapes_SetDrawingBaseCoors:
             {
                 if(this.drawingBase)
                 {
@@ -2083,12 +2083,12 @@ CGroupShape.prototype =
                 }
                 break;
             }
-            case historyitem_AutoShapes_RemoveFromDrawingObjects:
+            case AscDFH.historyitem_AutoShapes_RemoveFromDrawingObjects:
             {
                 deleteDrawingBase(this.worksheet.Drawings, this.Get_Id());
                 break;
             }
-            case historyitem_AutoShapes_AddToDrawingObjects:
+            case AscDFH.historyitem_AutoShapes_AddToDrawingObjects:
             {
                 var pos = readLong(r);
                 if(this.worksheet)
@@ -2098,17 +2098,17 @@ CGroupShape.prototype =
                 addToDrawings(this.worksheet, this, pos);
                 break;
             }
-            case historyitem_AutoShapes_SetWorksheet:
+            case AscDFH.historyitem_AutoShapes_SetWorksheet:
             {
                 ReadWBModel(this, r);
                 break;
             }
-            case historyitem_ShapeSetBDeleted:
+            case AscDFH.historyitem_ShapeSetBDeleted:
             {
                 this.bDeleted = readBool(r);
                 break;
             }
-            case historyitem_GroupShapeAddToSpTree:
+            case AscDFH.historyitem_GroupShapeAddToSpTree:
             {
                 var pos = readLong(r);
                 var item = readObject(r);
@@ -2119,22 +2119,22 @@ CGroupShape.prototype =
                 this.handleUpdateSpTree();
                 break;
             }
-            case historyitem_GroupShapeSetGroup:
+            case AscDFH.historyitem_GroupShapeSetGroup:
             {
                 this.group = readObject(r);
                 break;
             }
-            case historyitem_GroupShapeSetNvGrpSpPr:
+            case AscDFH.historyitem_GroupShapeSetNvGrpSpPr:
             {
                 this.nvGrpSpPr = readObject(r);
                 break;
             }
-            case historyitem_GroupShapeSetParent:
+            case AscDFH.historyitem_GroupShapeSetParent:
             {
                 this.parent = readObject(r);
                 break;
             }
-            case historyitem_GroupShapeRemoveFromSpTree:
+            case AscDFH.historyitem_GroupShapeRemoveFromSpTree:
             {
                 var pos = readLong(r);
                 var item = readObject(r);
@@ -2149,7 +2149,7 @@ CGroupShape.prototype =
                 break;
             }
 
-            case historyitem_GroupShapeSetSpPr:
+            case AscDFH.historyitem_GroupShapeSetSpPr:
             {
                 this.spPr = readObject(r);
                 break;

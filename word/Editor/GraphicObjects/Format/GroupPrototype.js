@@ -291,8 +291,8 @@ CGroupShape.prototype.Refresh_RecalcData = function(data)
 {
     switch (data.Type)
     {
-        case historyitem_GroupShapeAddToSpTree:
-        case historyitem_GroupShapeRemoveFromSpTree:
+        case AscDFH.historyitem_GroupShapeAddToSpTree:
+        case AscDFH.historyitem_GroupShapeRemoveFromSpTree:
         {
             if(!this.group)
             {

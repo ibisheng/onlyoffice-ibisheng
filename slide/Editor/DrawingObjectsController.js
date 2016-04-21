@@ -60,7 +60,7 @@ DrawingObjectsController.prototype.checkSelectedObjectsAndCallback = function(ca
     }
     if(editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(check_type, comment) === false)
     {
-        var nPointType = isRealNumber(nHistoryPointType) ? nHistoryPointType : historydescription_CommonControllerCheckSelected;
+        var nPointType = isRealNumber(nHistoryPointType) ? nHistoryPointType : AscDFH.historydescription_CommonControllerCheckSelected;
         History.Create_NewPoint(nPointType);
         callback.apply(this, args);
         this.startRecalculate();
@@ -83,7 +83,7 @@ DrawingObjectsController.prototype.paragraphFormatPaste = function( CopyTextPr, 
     this.checkSelectedObjectsAndCallback(function()
     {
         this.applyTextFunction(CDocumentContent.prototype.Paragraph_Format_Paste, CTable.prototype.Paragraph_Format_Paste, [CopyTextPr, CopyParaPr, Bool]);
-    }, [CopyTextPr, CopyParaPr, Bool], false, historydescription_Presentation_ParaFormatPaste);
+    }, [CopyTextPr, CopyParaPr, Bool], false, AscDFH.historydescription_Presentation_ParaFormatPaste);
 };
 
 
@@ -367,7 +367,7 @@ MoveCommentState.prototype =
     {
         if(!this.drawingObjects.isViewMode() && editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_MoveComment, this.comment.Get_Id()) === false)
         {
-            History.Create_NewPoint(historydescription_Presentation_MoveComments);
+            History.Create_NewPoint(AscDFH.historydescription_Presentation_MoveComments);
             var tracks = this.drawingObjects.arrTrackObjects;
             for(var i = 0; i < tracks.length; ++i)
             {

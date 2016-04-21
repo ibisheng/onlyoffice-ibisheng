@@ -186,7 +186,7 @@ function CLimit(props)
 }
 AscCommon.extendClass(CLimit, CMathBase);
 
-CLimit.prototype.ClassType = historyitem_type_lim;
+CLimit.prototype.ClassType = AscDFH.historyitem_type_lim;
 CLimit.prototype.kind      = MATH_LIMIT;
 
 CLimit.prototype.init = function(props)
@@ -333,7 +333,7 @@ function CMathFunc(props)
 }
 AscCommon.extendClass(CMathFunc, CMathBase);
 
-CMathFunc.prototype.ClassType = historyitem_type_mathFunc;
+CMathFunc.prototype.ClassType = AscDFH.historyitem_type_mathFunc;
 CMathFunc.prototype.kind      = MATH_FUNCTION;
 
 CMathFunc.prototype.init = function(props)

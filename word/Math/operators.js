@@ -3251,7 +3251,7 @@ function CDelimiter(props)
 }
 AscCommon.extendClass(CDelimiter, CMathBase);
 
-CDelimiter.prototype.ClassType = historyitem_type_delimiter;
+CDelimiter.prototype.ClassType = AscDFH.historyitem_type_delimiter;
 CDelimiter.prototype.kind      = MATH_DELIMITER;
 
 CDelimiter.prototype.init = function(props)
@@ -4267,7 +4267,7 @@ function CGroupCharacter(props)
     AscCommon.g_oTableId.Add( this, this.Id );
 }
 AscCommon.extendClass(CGroupCharacter, CCharacter);
-CGroupCharacter.prototype.ClassType = historyitem_type_groupChr;
+CGroupCharacter.prototype.ClassType = AscDFH.historyitem_type_groupChr;
 CGroupCharacter.prototype.kind      = MATH_GROUP_CHARACTER;
 CGroupCharacter.prototype.init = function(props)
 {

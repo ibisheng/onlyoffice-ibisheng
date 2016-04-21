@@ -93,7 +93,7 @@ StartAddNewShape.prototype =
                 }
                 this.onMouseMove({IsLocked: true}, this.startX + ext_x, this.startY + ext_y, this.pageIndex);
             }
-            History.Create_NewPoint(historydescription_Document_AddNewShape);
+            History.Create_NewPoint(AscDFH.historydescription_Document_AddNewShape);
             var bounds = this.drawingObjects.arrTrackObjects[0].getBounds();
             var shape = this.drawingObjects.arrTrackObjects[0].getShape(true, this.drawingObjects.drawingDocument);
             var drawing = new ParaDrawing(shape.spPr.xfrm.extX, shape.spPr.xfrm.extY, shape, this.drawingObjects.drawingDocument, this.drawingObjects.document, null);
@@ -181,7 +181,7 @@ NullState.prototype =
                             {
                                 if(false === editor.isViewMode && false === this.drawingObjects.document.Document_Is_SelectionLocked(changestype_Drawing_Props, {Type : AscCommon.changestype_2_Element_and_Type , Element : selection.wrapPolygonSelection.parent.Get_ParentParagraph(), CheckType : AscCommon.changestype_Paragraph_Content}))
                                 {
-                                    History.Create_NewPoint(historydescription_Document_EditWrapPolygon);
+                                    History.Create_NewPoint(AscDFH.historydescription_Document_EditWrapPolygon);
                                     var new_rel_array = [].concat(wrap_polygon.relativeArrPoints);
                                     new_rel_array.splice(hit_to_wrap_polygon.pointNum, 1);
                                     wrap_polygon.setEdited(true);
@@ -479,7 +479,7 @@ MoveInlineObject.prototype =
                 check_paragraphs.push(new_check_paragraph);
             if(false === editor.isViewMode &&  false === this.drawingObjects.document.Document_Is_SelectionLocked(changestype_Drawing_Props, {Type : changestype_2_ElementsArray_and_Type , Elements : check_paragraphs, CheckType : AscCommon.changestype_Paragraph_Content}))
             {
-                History.Create_NewPoint(historydescription_Document_MoveInlineObject);
+                History.Create_NewPoint(AscDFH.historydescription_Document_MoveInlineObject);
                 this.majorObject.parent.OnEnd_MoveInline(this.InlinePos);
             }
         }
@@ -488,7 +488,7 @@ MoveInlineObject.prototype =
             check_paragraphs.push(this.majorObject.parent.checkShapeChildAndGetTopParagraph(this.InlinePos.Paragraph));
             if(false === editor.isViewMode && false === this.drawingObjects.document.Document_Is_SelectionLocked(changestype_Drawing_Props, {Type : changestype_2_ElementsArray_and_Type , Elements : check_paragraphs, CheckType : AscCommon.changestype_Paragraph_Content}))
             {
-                History.Create_NewPoint(historydescription_Document_CopyAndMoveInlineObject);
+                History.Create_NewPoint(AscDFH.historydescription_Document_CopyAndMoveInlineObject);
                 var new_para_drawing = new ParaDrawing(this.majorObject.parent.Extent.W, this.majorObject.parent.Extent.H, null, this.drawingObjects.drawingDocument, null, null);
                 var drawing = this.majorObject.copy();
                 drawing.setParent(new_para_drawing);
@@ -567,7 +567,7 @@ RotateState.prototype =
             {
                 if(this.drawingObjects.document.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
                 {
-                    History.Create_NewPoint(historydescription_Document_RotateInlineDrawing);
+                    History.Create_NewPoint(AscDFH.historydescription_Document_RotateInlineDrawing);
                     this.drawingObjects.arrTrackObjects[0].trackEnd(true);
                     this.majorObject.parent.CheckWH();
                     this.drawingObjects.document.Recalculate();
@@ -599,7 +599,7 @@ RotateState.prototype =
                     if(false === editor.isViewMode && false === this.drawingObjects.document.Document_Is_SelectionLocked(changestype_Drawing_Props, {Type : changestype_2_ElementsArray_and_Type , Elements : aCheckParagraphs, CheckType : AscCommon.changestype_Paragraph_Content}))
                     {
                         this.drawingObjects.resetSelection();
-                        History.Create_NewPoint(historydescription_Document_RotateFlowDrawingCtrl);
+                        History.Create_NewPoint(AscDFH.historydescription_Document_RotateFlowDrawingCtrl);
                         for(i = 0; i < this.drawingObjects.arrTrackObjects.length; ++i)
                         {
                             bounds = aBounds[i];
@@ -636,7 +636,7 @@ RotateState.prototype =
                     }
                     if(false === editor.isViewMode && false === this.drawingObjects.document.Document_Is_SelectionLocked(changestype_Drawing_Props, {Type : changestype_2_ElementsArray_and_Type , Elements : aCheckParagraphs, CheckType : AscCommon.changestype_Paragraph_Content}))
                     {
-                        History.Create_NewPoint(historydescription_Document_RotateFlowDrawingNoCtrl);
+                        History.Create_NewPoint(AscDFH.historydescription_Document_RotateFlowDrawingNoCtrl);
                         for(i = 0; i < aDrawings.length; ++i)
                         {
                             bounds = aBounds[i];
@@ -1102,7 +1102,7 @@ MoveInGroupState.prototype =
 
     onMouseUp: function(e, x, y, pageIndex)
     {
-        History.Create_NewPoint(historydescription_Document_MoveInGroup);
+        History.Create_NewPoint(AscDFH.historydescription_Document_MoveInGroup);
         var old_x = this.group.bounds.x;
         var old_y = this.group.bounds.y;
         var i;
@@ -1404,7 +1404,7 @@ ChangeWrapContour.prototype.onMouseUp = function(e, x, y, pageIndex)
 {
     if(false === editor.isViewMode && false === this.drawingObjects.document.Document_Is_SelectionLocked(changestype_Drawing_Props))
     {
-        History.Create_NewPoint(historydescription_Document_ChangeWrapContour);
+        History.Create_NewPoint(AscDFH.historydescription_Document_ChangeWrapContour);
         var calc_points = [], calc_points2 = [], i;
         for(i = 0; i < this.majorObject.parent.wrappingPolygon.calculatedPoints.length; ++i)
         {
@@ -1489,7 +1489,7 @@ ChangeWrapContourAddPoint.prototype.onMouseUp = function(e, x, y, pageIndex)
 {
     if(false === editor.isViewMode && false === this.drawingObjects.document.Document_Is_SelectionLocked(changestype_Drawing_Props))
     {
-        History.Create_NewPoint(historydescription_Document_ChangeWrapContourAddPoint);
+        History.Create_NewPoint(AscDFH.historydescription_Document_ChangeWrapContourAddPoint);
         var calc_points = [], calc_points2 = [], i;
         for(i = 0; i < this.drawingObjects.arrTrackObjects[0].arrPoints.length; ++i)
         {

@@ -1184,7 +1184,7 @@ CChartSpace.prototype =
             for(i = 0; i < charts.length; ++i)
             {
                 series = charts[i].series;
-                if(charts[i].getObjectType() === historyitem_type_ScatterChart)
+                if(charts[i].getObjectType() === AscDFH.historyitem_type_ScatterChart)
                 {
                     for(j = 0; j < series.length; ++j)
                     {
@@ -1305,37 +1305,37 @@ CChartSpace.prototype =
         {
             switch (this.chart.plotArea.chart.getObjectType())
             {
-                case historyitem_type_LineChart:
+                case AscDFH.historyitem_type_LineChart:
                 {
                     type = c_oAscChartType.line;
                     break;
                 }
-                case historyitem_type_AreaChart:
+                case AscDFH.historyitem_type_AreaChart:
                 {
                     type = c_oAscChartType.area;
                     break;
                 }
-                case historyitem_type_DoughnutChart:
+                case AscDFH.historyitem_type_DoughnutChart:
                 {
                     type = c_oAscChartType.doughnut;
                     break;
                 }
-                case historyitem_type_PieChart:
+                case AscDFH.historyitem_type_PieChart:
                 {
                     type = c_oAscChartType.pie;
                     break;
                 }
-                case historyitem_type_ScatterChart:
+                case AscDFH.historyitem_type_ScatterChart:
                 {
                     type = c_oAscChartType.scatter;
                     break;
                 }
-                case historyitem_type_StockChart:
+                case AscDFH.historyitem_type_StockChart:
                 {
                     type = c_oAscChartType.stock;
                     break;
                 }
-                case historyitem_type_BarChart:
+                case AscDFH.historyitem_type_BarChart:
                 {
                     if(this.chart.plotArea.chart.barDir === BAR_DIR_BAR)
                         type = c_oAscChartType.hbar;
@@ -1347,7 +1347,7 @@ CChartSpace.prototype =
 
             if(isRealNumber(this.chart.plotArea.chart.grouping))
             {
-                if(!this.chart.plotArea.chart.getObjectType() === historyitem_type_BarChart)
+                if(!this.chart.plotArea.chart.getObjectType() === AscDFH.historyitem_type_BarChart)
                 {
                     switch(this.chart.plotArea.chart.grouping)
                     {
@@ -1416,7 +1416,7 @@ CChartSpace.prototype =
                 for(i = this.chart.plotArea.charts.length-1; i > -1; --i)
                 {
                     chart = this.chart.plotArea.charts[i];
-                    if(chart.upDownBars /*&& chart.getObjectType() !== historyitem_type_StockChart*/)
+                    if(chart.upDownBars /*&& chart.getObjectType() !== AscDFH.historyitem_type_StockChart*/)
                     {
                         if(chart.upDownBars.upBars)
                         {
@@ -1448,7 +1448,7 @@ CChartSpace.prototype =
                     for(j = series.length - 1; j > -1; --j)
                     {
                         ser = series[j];
-                        if(ser.spPr && chart.getObjectType() !== historyitem_type_StockChart)
+                        if(ser.spPr && chart.getObjectType() !== AscDFH.historyitem_type_StockChart)
                         {
                             if(ser.spPr.Fill)
                             {
@@ -1544,7 +1544,7 @@ CChartSpace.prototype =
             var chart_type = this.chart.plotArea.charts[0];
             var first_series = chart_type.series[0] ? chart_type.series[0] : chart_type.getSeriesConstructor();
             removeAllSeriesFromChart(chart_type);
-            if(chart_type.getObjectType() !== historyitem_type_ScatterChart)
+            if(chart_type.getObjectType() !== AscDFH.historyitem_type_ScatterChart)
             {
                 for(var i = 0; i < asc_series.length; ++i)
                 {
@@ -1802,7 +1802,7 @@ CChartSpace.prototype =
 
     Refresh_RecalcData2: function(pageIndex, object)
     {
-        if(object && object.getObjectType && object.getObjectType() === historyitem_type_Title && this.selection.title === object)
+        if(object && object.getObjectType && object.getObjectType() === AscDFH.historyitem_type_Title && this.selection.title === object)
         {
             this.recalcInfo.recalcTitle = object;
         }
@@ -1817,12 +1817,12 @@ CChartSpace.prototype =
     {
         switch(data.Type)
         {
-            case historyitem_ChartSpace_SetStyle:
+            case AscDFH.historyitem_ChartSpace_SetStyle:
             {
                 this.handleUpdateStyle();
                 break;
             }
-            case historyitem_ChartSpace_SetTxPr:
+            case AscDFH.historyitem_ChartSpace_SetTxPr:
             {
                 this.recalcInfo.recalculateChart = true;
                 this.recalcInfo.recalculateLegend = true;
@@ -1838,7 +1838,7 @@ CChartSpace.prototype =
 
     getObjectType: function()
     {
-        return historyitem_type_ChartSpace;
+        return AscDFH.historyitem_type_ChartSpace;
     },
 
     getAllRasterImages: function(images)
@@ -1991,26 +1991,26 @@ CChartSpace.prototype =
 
     setThemeOverride: function(pr)
     {
-        History.Add(this, {Type:historyitem_ChartSpace_SetThemeOverride, oldPr: this.themeOverride, newPr: pr});
+        History.Add(this, {Type:AscDFH.historyitem_ChartSpace_SetThemeOverride, oldPr: this.themeOverride, newPr: pr});
         this.themeOverride = pr;
     },
 
 
     setBDeleted: function(pr)
     {
-        History.Add(this, {Type: historyitem_ShapeSetBDeleted, oldPr: this.bDeleted, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_ShapeSetBDeleted, oldPr: this.bDeleted, newPr: pr});
         this.bDeleted = pr;
     },
     setParent: function (parent)
     {
-        History.Add(this, { Type: historyitem_ChartSpace_SetParent, oldPr: this.parent, newPr: parent });
+        History.Add(this, { Type: AscDFH.historyitem_ChartSpace_SetParent, oldPr: this.parent, newPr: parent });
         this.parent = parent;
     },
 
 
     setChart: function(chart)
     {
-        History.Add(this, {Type: historyitem_ChartSpace_SetChart, oldChart: this.chart, newChart: chart});
+        History.Add(this, {Type: AscDFH.historyitem_ChartSpace_SetChart, oldChart: this.chart, newChart: chart});
         this.chart = chart;
         if(chart)
         {
@@ -2019,58 +2019,58 @@ CChartSpace.prototype =
     },
     setClrMapOvr: function(clrMapOvr)
     {
-        History.Add(this, {Type: historyitem_ChartSpace_SetClrMapOvr, oldClrMapOvr: this.clrMapOvr, newClrMapOvr: clrMapOvr});
+        History.Add(this, {Type: AscDFH.historyitem_ChartSpace_SetClrMapOvr, oldClrMapOvr: this.clrMapOvr, newClrMapOvr: clrMapOvr});
         this.clrMapOvr = clrMapOvr;
     },
     setDate1904: function(date1904)
     {
-        History.Add(this, {Type: historyitem_ChartSpace_SetDate1904, oldDate1904: this.date1904, newDate1904: date1904});
+        History.Add(this, {Type: AscDFH.historyitem_ChartSpace_SetDate1904, oldDate1904: this.date1904, newDate1904: date1904});
         this.date1904 = date1904;
     },
     setExternalData: function(externalData)
     {
-        History.Add(this, {Type: historyitem_ChartSpace_SetExternalData, oldExternalData: this.externalData, newExternalData: externalData});
+        History.Add(this, {Type: AscDFH.historyitem_ChartSpace_SetExternalData, oldExternalData: this.externalData, newExternalData: externalData});
         this.externalData = externalData;
     },
     setLang: function(lang)
     {
-        History.Add(this, {Type: historyitem_ChartSpace_SetLang, oldLang: this.lang, newLang: lang});
+        History.Add(this, {Type: AscDFH.historyitem_ChartSpace_SetLang, oldLang: this.lang, newLang: lang});
         this.lang = lang;
     },
     setPivotSource: function(pivotSource)
     {
-        History.Add(this, {Type: historyitem_ChartSpace_SetPivotSource, oldPivotSource: this.pivotSource, newPivotSource: pivotSource});
+        History.Add(this, {Type: AscDFH.historyitem_ChartSpace_SetPivotSource, oldPivotSource: this.pivotSource, newPivotSource: pivotSource});
         this.pivotSource = pivotSource;
     },
     setPrintSettings: function(printSettings)
     {
-        History.Add(this, {Type: historyitem_ChartSpace_SetPrintSettings, oldPrintSettings: this.printSettings, newPrintSettings: printSettings});
+        History.Add(this, {Type: AscDFH.historyitem_ChartSpace_SetPrintSettings, oldPrintSettings: this.printSettings, newPrintSettings: printSettings});
         this.printSettings = printSettings;
     },
     setProtection: function(protection)
     {
-        History.Add(this, {Type: historyitem_ChartSpace_SetProtection, oldProtection: this.protection, newProtection: protection});
+        History.Add(this, {Type: AscDFH.historyitem_ChartSpace_SetProtection, oldProtection: this.protection, newProtection: protection});
         this.protection = protection;
     },
     setRoundedCorners: function(roundedCorners)
     {
-        History.Add(this, {Type: historyitem_ChartSpace_SetRoundedCorners, oldRoundedCorners: this.roundedCorners, newRoundedCorners: roundedCorners});
+        History.Add(this, {Type: AscDFH.historyitem_ChartSpace_SetRoundedCorners, oldRoundedCorners: this.roundedCorners, newRoundedCorners: roundedCorners});
         this.roundedCorners = roundedCorners;
     },
     setSpPr: function(spPr)
     {
-        History.Add(this, {Type: historyitem_ChartSpace_SetSpPr, oldSpPr: this.spPr, newSpPr: spPr});
+        History.Add(this, {Type: AscDFH.historyitem_ChartSpace_SetSpPr, oldSpPr: this.spPr, newSpPr: spPr});
         this.spPr = spPr;
     },
     setStyle: function(style)
     {
-        History.Add(this, {Type: historyitem_ChartSpace_SetStyle, oldStyle: this.style, newStyle: style});
+        History.Add(this, {Type: AscDFH.historyitem_ChartSpace_SetStyle, oldStyle: this.style, newStyle: style});
         this.style = style;
         this.handleUpdateStyle();
     },
     setTxPr: function(txPr)
     {
-        History.Add(this, {Type: historyitem_ChartSpace_SetTxPr, oldTxPr: this.txPr, newTxPr: txPr});
+        History.Add(this, {Type: AscDFH.historyitem_ChartSpace_SetTxPr, oldTxPr: this.txPr, newTxPr: txPr});
         this.txPr = txPr;
         if(txPr)
         {
@@ -2079,7 +2079,7 @@ CChartSpace.prototype =
     },
     setUserShapes: function(userShapes)
     {
-        History.Add(this, {Type: historyitem_ChartSpace_SetUserShapes, oldUserShapes: this.userShapes, newUserShapes: userShapes});
+        History.Add(this, {Type: AscDFH.historyitem_ChartSpace_SetUserShapes, oldUserShapes: this.userShapes, newUserShapes: userShapes});
         this.userShapes = userShapes;
     },
 
@@ -2121,7 +2121,7 @@ CChartSpace.prototype =
     getBoundsInGroup: CShape.prototype.getBoundsInGroup,
     setGroup: function (group)
     {
-        History.Add(this, { Type: historyitem_ChartSpace_SetGroup, oldPr: this.group, newPr: group });
+        History.Add(this, { Type: AscDFH.historyitem_ChartSpace_SetGroup, oldPr: this.group, newPr: group });
         this.group = group;
     },
 
@@ -2867,7 +2867,7 @@ CChartSpace.prototype =
         {
             series = charts[i].series;
             var bHaveHidden = false, bHaveNoHidden = false;
-            if(charts[i].getObjectType() !== historyitem_type_ScatterChart)
+            if(charts[i].getObjectType() !== AscDFH.historyitem_type_ScatterChart)
             {
                 for(j = 0; j < series.length; ++j)
                 {
@@ -2984,7 +2984,7 @@ CChartSpace.prototype =
             var chart_type = chart_object.getObjectType();
             if(b_checkEmpty)
             {
-                if(chart_type === historyitem_type_ScatterChart)
+                if(chart_type === AscDFH.historyitem_type_ScatterChart)
                 {
                     var x_ax, y_ax;
                     y_ax = this.chart.plotArea.valAx;
@@ -3003,8 +3003,8 @@ CChartSpace.prototype =
                     y_ax.yPoints = null;
                     x_ax.xPoints = null;
                 }
-                else if(chart_type !== historyitem_type_BarChart && (chart_type !== historyitem_type_PieChart && chart_type !== historyitem_type_DoughnutChart)
-                    || (chart_type === historyitem_type_BarChart && chart_object.barDir !== BAR_DIR_BAR))
+                else if(chart_type !== AscDFH.historyitem_type_BarChart && (chart_type !== AscDFH.historyitem_type_PieChart && chart_type !== AscDFH.historyitem_type_DoughnutChart)
+                    || (chart_type === AscDFH.historyitem_type_BarChart && chart_object.barDir !== BAR_DIR_BAR))
                 {
                     var cat_ax, val_ax;
                     val_ax = this.chart.plotArea.valAx;
@@ -3029,7 +3029,7 @@ CChartSpace.prototype =
                         cat_ax.transformYPoints  = null;
                     }
                 }
-                else if(chart_type === historyitem_type_BarChart && chart_object.barDir === BAR_DIR_BAR)
+                else if(chart_type === AscDFH.historyitem_type_BarChart && chart_object.barDir === BAR_DIR_BAR)
                 {
                     var cat_ax, val_ax;
                     var axis_by_types = chart_object.getAxisByTypes();
@@ -3059,7 +3059,7 @@ CChartSpace.prototype =
             }
 
             var bNeedReflect =  this.getNeedReflect();
-            if(chart_type === historyitem_type_ScatterChart)
+            if(chart_type === AscDFH.historyitem_type_ScatterChart)
             {
                 var x_ax, y_ax;
                 y_ax = this.chart.plotArea.valAx;
@@ -3781,8 +3781,8 @@ CChartSpace.prototype =
                     /*new recalc*/
                 }
             }
-            else if(chart_type !== historyitem_type_BarChart && (chart_type !== historyitem_type_PieChart && chart_type !== historyitem_type_DoughnutChart)
-                || (chart_type === historyitem_type_BarChart && chart_object.barDir !== BAR_DIR_BAR))
+            else if(chart_type !== AscDFH.historyitem_type_BarChart && (chart_type !== AscDFH.historyitem_type_PieChart && chart_type !== AscDFH.historyitem_type_DoughnutChart)
+                || (chart_type === AscDFH.historyitem_type_BarChart && chart_object.barDir !== BAR_DIR_BAR))
             {
                 var cat_ax, val_ax;
                 val_ax = this.chart.plotArea.valAx;
@@ -4001,7 +4001,7 @@ CChartSpace.prototype =
                     {
                         labels_pos = TICK_LABEL_POSITION_NONE;
                     }
-                    var cross_between = isRealNumber(val_ax.crossBetween) ? val_ax.crossBetween :  (chart_type === historyitem_type_AreaChart ? CROSS_BETWEEN_MID_CAT : CROSS_BETWEEN_BETWEEN) ;
+                    var cross_between = isRealNumber(val_ax.crossBetween) ? val_ax.crossBetween :  (chart_type === AscDFH.historyitem_type_AreaChart ? CROSS_BETWEEN_MID_CAT : CROSS_BETWEEN_BETWEEN) ;
 
                     var left_val_ax_labels_align = true;//приленгание подписей оси значений к левому краю.
 
@@ -4963,7 +4963,7 @@ CChartSpace.prototype =
                     val_ax.yPoints.sort(function(a, b){return a.val - b.val});
                 }
             }
-            else if(chart_type === historyitem_type_BarChart && chart_object.barDir === BAR_DIR_BAR)
+            else if(chart_type === AscDFH.historyitem_type_BarChart && chart_object.barDir === BAR_DIR_BAR)
             {
                 var cat_ax, val_ax;
                 var axis_by_types = chart_object.getAxisByTypes();
@@ -6252,9 +6252,9 @@ CChartSpace.prototype =
             var max_width = 0, cur_width, max_font_size = 0, cur_font_size, ser, b_line_series;
             var max_word_width = 0;
             this.chart.legend.chart = this;
-            var b_scatter_no_line = false;/*(this.chart.plotArea.chart.getObjectType() === historyitem_type_ScatterChart &&
+            var b_scatter_no_line = false;/*(this.chart.plotArea.chart.getObjectType() === AscDFH.historyitem_type_ScatterChart &&
                 (this.chart.plotArea.chart.scatterStyle === SCATTER_STYLE_MARKER || this.chart.plotArea.chart.scatterStyle === SCATTER_STYLE_NONE));  */
-            if( !this.chart.plotArea.chart.varyColors || (this.chart.plotArea.chart.getObjectType() !== historyitem_type_PieChart && this.chart.plotArea.chart.getObjectType() !== historyitem_type_DoughnutChart) && series.length !== 1)
+            if( !this.chart.plotArea.chart.varyColors || (this.chart.plotArea.chart.getObjectType() !== AscDFH.historyitem_type_PieChart && this.chart.plotArea.chart.getObjectType() !== AscDFH.historyitem_type_DoughnutChart) && series.length !== 1)
             {
                 for(i = 0; i < series.length; ++i)
                 {
@@ -6286,19 +6286,19 @@ CChartSpace.prototype =
                     var pts = getPtsFromSeries(ser);
                     switch(ser.getObjectType())
                     {
-                        case historyitem_type_BarSeries:
-                        case historyitem_type_BubbleSeries:
-                        case historyitem_type_AreaSeries:
-                        case historyitem_type_PieSeries:
+                        case AscDFH.historyitem_type_BarSeries:
+                        case AscDFH.historyitem_type_BubbleSeries:
+                        case AscDFH.historyitem_type_AreaSeries:
+                        case AscDFH.historyitem_type_PieSeries:
                         {
                             union_marker.marker = CreateMarkerGeometryByType(SYMBOL_SQUARE, null);
                             union_marker.marker.pen = ser.compiledSeriesPen;
                             union_marker.marker.brush = ser.compiledSeriesBrush;
                             break;
                         }
-                        case historyitem_type_LineSeries:
-                        case historyitem_type_ScatterSer:
-                        case historyitem_type_SurfaceSeries:
+                        case AscDFH.historyitem_type_LineSeries:
+                        case AscDFH.historyitem_type_ScatterSer:
+                        case AscDFH.historyitem_type_SurfaceSeries:
                         {
                             if(this.chart.view3D)
                             {
@@ -6377,7 +6377,7 @@ CChartSpace.prototype =
 
                     calc_entry.calcMarkerUnion = new CUnionMarker();
                     union_marker = calc_entry.calcMarkerUnion;
-                    if(ser.getObjectType() === historyitem_type_LineSeries && !this.chart.view3D || ser.getObjectType() === historyitem_type_ScatterSer)
+                    if(ser.getObjectType() === AscDFH.historyitem_type_LineSeries && !this.chart.view3D || ser.getObjectType() === AscDFH.historyitem_type_ScatterSer)
                     {
                         if(pt.compiledMarker)
                         {
@@ -6627,7 +6627,7 @@ CChartSpace.prototype =
                                 cat_ax = axis_by_types.catAx[0];
                             }
                         }
-                        if(chart_object && chart_object.getObjectType() === historyitem_type_BarChart && chart_object.barDir === BAR_DIR_BAR &&
+                        if(chart_object && chart_object.getObjectType() === AscDFH.historyitem_type_BarChart && chart_object.barDir === BAR_DIR_BAR &&
                             (cat_ax && cat_ax.scaling && isRealNumber(cat_ax.scaling.orientation) ?  cat_ax.scaling.orientation : ORIENTATION_MIN_MAX) === ORIENTATION_MIN_MAX)
                         {
                             b_reverse_order = true;
@@ -7804,13 +7804,13 @@ CChartSpace.prototype =
             var series = this.chart.plotArea.chart.series;
             var parents = this.getParentObjects();
             var RGBA = {R: 0, G: 0, B: 0, A: 255};
-            if(this.chart.plotArea.chart.varyColors && (series.length === 1 || this.chart.plotArea.chart.getObjectType() === historyitem_type_PieChart || this.chart.plotArea.chart.getObjectType() === historyitem_type_DoughnutChart))
+            if(this.chart.plotArea.chart.varyColors && (series.length === 1 || this.chart.plotArea.chart.getObjectType() === AscDFH.historyitem_type_PieChart || this.chart.plotArea.chart.getObjectType() === AscDFH.historyitem_type_DoughnutChart))
             {
                 for(var ii = 0; ii < series.length; ++ ii)
                 {
                     var ser = series[ii];
                     var pts = getPtsFromSeries(ser);
-                    if(!(this.chart.plotArea.chart.getObjectType() === historyitem_type_LineChart || this.chart.plotArea.chart.getObjectType() === historyitem_type_ScatterChart))
+                    if(!(this.chart.plotArea.chart.getObjectType() === AscDFH.historyitem_type_LineChart || this.chart.plotArea.chart.getObjectType() === AscDFH.historyitem_type_ScatterChart))
                     {
                         var base_fills = getArrayFillsFromBase(style.fill2, getMaxIdx(pts));
                         for(var i = 0; i < pts.length; ++i)
@@ -7874,7 +7874,7 @@ CChartSpace.prototype =
                             }
                             if(ser.spPr && ser.spPr.ln)
                                 compiled_line.merge(ser.spPr.ln);
-                            if(Array.isArray(ser.dPt) && !(ser.getObjectType && ser.getObjectType() === historyitem_type_AreaSeries))
+                            if(Array.isArray(ser.dPt) && !(ser.getObjectType && ser.getObjectType() === AscDFH.historyitem_type_AreaSeries))
                             {
                                 for(var j = 0; j < ser.dPt.length; ++j)
                                 {
@@ -7895,7 +7895,7 @@ CChartSpace.prototype =
                     else
                     {
                         var default_line;
-                        if(this.chart.plotArea.chart.getObjectType() === historyitem_type_ScatterChart && this.chart.plotArea.chart.scatterStyle === SCATTER_STYLE_MARKER || this.chart.plotArea.chart.scatterStyle === SCATTER_STYLE_NONE)
+                        if(this.chart.plotArea.chart.getObjectType() === AscDFH.historyitem_type_ScatterChart && this.chart.plotArea.chart.scatterStyle === SCATTER_STYLE_MARKER || this.chart.plotArea.chart.scatterStyle === SCATTER_STYLE_NONE)
                         {
                             default_line = new CLn();
                             default_line.setFill(new CUniFill());
@@ -7910,7 +7910,7 @@ CChartSpace.prototype =
                         {
                             var compiled_line = new CLn();
                             compiled_line.merge(default_line);
-                            if(!(this.chart.plotArea.chart.getObjectType() === historyitem_type_ScatterChart && this.chart.plotArea.chart.scatterStyle === SCATTER_STYLE_MARKER || this.chart.plotArea.chart.scatterStyle === SCATTER_STYLE_NONE))
+                            if(!(this.chart.plotArea.chart.getObjectType() === AscDFH.historyitem_type_ScatterChart && this.chart.plotArea.chart.scatterStyle === SCATTER_STYLE_MARKER || this.chart.plotArea.chart.scatterStyle === SCATTER_STYLE_NONE))
                                 compiled_line.Fill.merge(base_line_fills[pts[i].idx]);
                             compiled_line.w *= style.line3;
                             if(ser.spPr && ser.spPr.ln)
@@ -7952,8 +7952,8 @@ CChartSpace.prototype =
             {
                 switch(this.chart.plotArea.chart.getObjectType())
                 {
-                    case historyitem_type_LineChart:
-                    case historyitem_type_RadarChart:
+                    case AscDFH.historyitem_type_LineChart:
+                    case AscDFH.historyitem_type_RadarChart:
                     {
                         var base_line_fills = getArrayFillsFromBase(style.line4, getMaxIdx(series));
                         if(!this.chart.view3D)
@@ -8030,7 +8030,7 @@ CChartSpace.prototype =
                                     {
                                         compiled_brush.merge(ser.spPr.Fill);
                                     }
-                                    if(Array.isArray(ser.dPt) && !(ser.getObjectType && ser.getObjectType() === historyitem_type_AreaSeries))
+                                    if(Array.isArray(ser.dPt) && !(ser.getObjectType && ser.getObjectType() === AscDFH.historyitem_type_AreaSeries))
                                     {
                                         for(var k = 0; k < ser.dPt.length; ++k)
                                         {
@@ -8098,7 +8098,7 @@ CChartSpace.prototype =
                                         {
                                             compiled_line.merge(ser.spPr.ln);
                                         }
-                                        if(Array.isArray(ser.dPt) && !(ser.getObjectType && ser.getObjectType() === historyitem_type_AreaSeries))
+                                        if(Array.isArray(ser.dPt) && !(ser.getObjectType && ser.getObjectType() === AscDFH.historyitem_type_AreaSeries))
                                         {
                                             for(var k = 0; k < ser.dPt.length; ++k)
                                             {
@@ -8125,7 +8125,7 @@ CChartSpace.prototype =
                         }
                         break;
                     }
-                    case historyitem_type_ScatterChart:
+                    case AscDFH.historyitem_type_ScatterChart:
                     {
                         var base_line_fills = getArrayFillsFromBase(style.line4, getMaxIdx(series));
                         for(var i = 0; i < series.length; ++i)
@@ -8217,7 +8217,7 @@ CChartSpace.prototype =
                                 {
                                     compiled_brush.merge(ser.spPr.Fill);
                                 }
-                                if(Array.isArray(ser.dPt) && !(ser.getObjectType && ser.getObjectType() === historyitem_type_AreaSeries))
+                                if(Array.isArray(ser.dPt) && !(ser.getObjectType && ser.getObjectType() === AscDFH.historyitem_type_AreaSeries))
                                 {
                                     for(var k = 0; k < ser.dPt.length; ++k)
                                     {
@@ -8285,7 +8285,7 @@ CChartSpace.prototype =
                                     {
                                         compiled_line.merge(ser.spPr.ln);
                                     }
-                                    if(Array.isArray(ser.dPt) && !(ser.getObjectType && ser.getObjectType() === historyitem_type_AreaSeries))
+                                    if(Array.isArray(ser.dPt) && !(ser.getObjectType && ser.getObjectType() === AscDFH.historyitem_type_AreaSeries))
                                     {
                                         for(var k = 0; k < ser.dPt.length; ++k)
                                         {
@@ -8382,7 +8382,7 @@ CChartSpace.prototype =
                     default_marker.spPr.ln.merge(parent_objects.theme.themeElements.fmtScheme.lnStyleLst[0]);
                 }
                 var RGBA = {R:0, G:0, B:0, A: 255};
-                if(oThis.chart.plotArea.chart.varyColors && (oThis.chart.plotArea.chart.series.length === 1 || oThis.chart.plotArea.chart.getObjectType() === historyitem_type_PieChart || oThis.chart.plotArea.chart.getObjectType() === historyitem_type_DoughnutChart))
+                if(oThis.chart.plotArea.chart.varyColors && (oThis.chart.plotArea.chart.series.length === 1 || oThis.chart.plotArea.chart.getObjectType() === AscDFH.historyitem_type_PieChart || oThis.chart.plotArea.chart.getObjectType() === AscDFH.historyitem_type_DoughnutChart))
                 {
                     var ser = oThis.chart.plotArea.chart.series[0], pts;
                     if(ser.marker && ser.marker.symbol === SYMBOL_NONE && (!Array.isArray(ser.dPt) || ser.dPt.length === 0))
@@ -8498,8 +8498,8 @@ CChartSpace.prototype =
             };
             switch (this.chart.plotArea.chart.getObjectType())
             {
-                case historyitem_type_LineChart:
-                case historyitem_type_RadarChart:
+                case AscDFH.historyitem_type_LineChart:
+                case AscDFH.historyitem_type_RadarChart:
                 {
                     if(this.chart.plotArea.chart.marker)
                     {
@@ -8507,7 +8507,7 @@ CChartSpace.prototype =
                     }
                     break;
                 }
-                case historyitem_type_ScatterChart:
+                case AscDFH.historyitem_type_ScatterChart:
                 {
                     if(this.chart.plotArea.chart.scatterStyle === SCATTER_STYLE_MARKER || this.chart.plotArea.chart.scatterStyle === SCATTER_STYLE_LINE_MARKER || this.chart.plotArea.chart.scatterStyle === SCATTER_STYLE_SMOOTH_MARKER)
                     {
@@ -8758,7 +8758,7 @@ CChartSpace.prototype =
                 if(this.chart.plotArea.chart && this.chart.plotArea.chart.series)
                 {
                     var series = this.chart.plotArea.chart.series;
-                    var _len = this.chart.plotArea.chart.getObjectType() === historyitem_type_PieChart ? 1 : series.length;
+                    var _len = this.chart.plotArea.chart.getObjectType() === AscDFH.historyitem_type_PieChart ? 1 : series.length;
                     for(var i = 0; i < _len; ++i)
                     {
                         var ser = series[i];
@@ -8835,12 +8835,12 @@ CChartSpace.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_AutoShapes_SetBFromSerialize:
+            case AscDFH.historyitem_AutoShapes_SetBFromSerialize:
             {
                 this.fromSerialize = data.oldPr;
                 break;
             }
-            case historyitem_AutoShapes_SetDrawingBaseCoors:
+            case AscDFH.historyitem_AutoShapes_SetDrawingBaseCoors:
             {
                 if(this.drawingBase)
                 {
@@ -8859,102 +8859,102 @@ CChartSpace.prototype =
                 }
                 break;
             }
-            case historyitem_AutoShapes_RemoveFromDrawingObjects:
+            case AscDFH.historyitem_AutoShapes_RemoveFromDrawingObjects:
             {
                 addToDrawings(this.worksheet, this, data.Pos);
                 break;
             }
-            case historyitem_AutoShapes_AddToDrawingObjects:
+            case AscDFH.historyitem_AutoShapes_AddToDrawingObjects:
             {
                 deleteDrawingBase(this.worksheet.Drawings, this.Get_Id());
                 break;
             }
-            case historyitem_AutoShapes_SetWorksheet:
+            case AscDFH.historyitem_AutoShapes_SetWorksheet:
             {
                 this.worksheet = data.oldPr;
                 break;
             }
-            case historyitem_ChartSpace_SetParent:
+            case AscDFH.historyitem_ChartSpace_SetParent:
             {
                 this.parent = data.oldPr;
                 break;
             }
-            case historyitem_ShapeSetBDeleted:
+            case AscDFH.historyitem_ShapeSetBDeleted:
             {
                 this.bDeleted = data.oldPr;
                 break;
             }
-            case historyitem_ChartSpace_SetChart:
+            case AscDFH.historyitem_ChartSpace_SetChart:
             {
                 this.chart = data.oldChart;
                 break;
             }
-            case historyitem_ChartSpace_SetClrMapOvr:
+            case AscDFH.historyitem_ChartSpace_SetClrMapOvr:
             {
                 this.clrMapOvr = data.oldClrMapOvr;
                 break;
             }
-            case historyitem_ChartSpace_SetDate1904:
+            case AscDFH.historyitem_ChartSpace_SetDate1904:
             {
                 this.date1904 = data.oldDate1904;
                 break;
             }
-            case historyitem_ChartSpace_SetExternalData:
+            case AscDFH.historyitem_ChartSpace_SetExternalData:
             {
                 this.externalData = data.oldExternalData;
                 break;
             }
-            case historyitem_ChartSpace_SetLang:
+            case AscDFH.historyitem_ChartSpace_SetLang:
             {
                 this.lang = data.oldLang;
                 break;
             }
-            case historyitem_ChartSpace_SetPivotSource:
+            case AscDFH.historyitem_ChartSpace_SetPivotSource:
             {
                 this.pivotSource = data.oldPivotSource;
                 break;
             }
-            case historyitem_ChartSpace_SetPrintSettings:
+            case AscDFH.historyitem_ChartSpace_SetPrintSettings:
             {
                 this.printSettings = data.oldPrintSettings;
                 break;
             }
-            case historyitem_ChartSpace_SetProtection:
+            case AscDFH.historyitem_ChartSpace_SetProtection:
             {
                 this.protection = data.oldProtection;
                 break;
             }
-            case historyitem_ChartSpace_SetRoundedCorners:
+            case AscDFH.historyitem_ChartSpace_SetRoundedCorners:
             {
                 this.roundedCorners = data.oldRoundedCorners;
                 break;
             }
-            case historyitem_ChartSpace_SetSpPr:
+            case AscDFH.historyitem_ChartSpace_SetSpPr:
             {
                 this.spPr = data.oldSpPr;
                 break;
             }
-            case historyitem_ChartSpace_SetStyle:
+            case AscDFH.historyitem_ChartSpace_SetStyle:
             {
                 this.style = data.oldStyle;
                 break;
             }
-            case historyitem_ChartSpace_SetTxPr:
+            case AscDFH.historyitem_ChartSpace_SetTxPr:
             {
                 this.txPr = data.oldTxPr;
                 break;
             }
-            case historyitem_ChartSpace_SetUserShapes:
+            case AscDFH.historyitem_ChartSpace_SetUserShapes:
             {
                 this.userShapes = data.oldUserShapes;
                 break;
             }
-            case historyitem_ChartSpace_SetThemeOverride:
+            case AscDFH.historyitem_ChartSpace_SetThemeOverride:
             {
                 this.themeOverride = data.oldPr;
                 break;
             }
-            case historyitem_ChartSpace_SetGroup:
+            case AscDFH.historyitem_ChartSpace_SetGroup:
             {
                 this.group = data.oldPr;
                 break;
@@ -8966,12 +8966,12 @@ CChartSpace.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_AutoShapes_SetBFromSerialize:
+            case AscDFH.historyitem_AutoShapes_SetBFromSerialize:
             {
                 this.fromSerialize = data.newPr;
                 break;
             }
-            case historyitem_AutoShapes_SetDrawingBaseCoors:
+            case AscDFH.historyitem_AutoShapes_SetDrawingBaseCoors:
             {
                 if(this.drawingBase)
                 {
@@ -8990,103 +8990,103 @@ CChartSpace.prototype =
                 }
                 break;
             }
-            case historyitem_AutoShapes_RemoveFromDrawingObjects:
+            case AscDFH.historyitem_AutoShapes_RemoveFromDrawingObjects:
             {
                 deleteDrawingBase(this.worksheet.Drawings, this.Get_Id());
                 break;
             }
-            case historyitem_AutoShapes_AddToDrawingObjects:
+            case AscDFH.historyitem_AutoShapes_AddToDrawingObjects:
             {
                 addToDrawings(this.worksheet, this, data.Pos);
                 break;
             }
 
-            case historyitem_ChartSpace_SetParent:
+            case AscDFH.historyitem_ChartSpace_SetParent:
             {
                 this.parent = data.newPr;
                 break;
             }
-            case historyitem_AutoShapes_SetWorksheet:
+            case AscDFH.historyitem_AutoShapes_SetWorksheet:
             {
                 this.worksheet = data.newPr;
                 break;
             }
-            case historyitem_ShapeSetBDeleted:
+            case AscDFH.historyitem_ShapeSetBDeleted:
             {
                 this.bDeleted = data.newPr;
                 break;
             }
-            case historyitem_ChartSpace_SetChart:
+            case AscDFH.historyitem_ChartSpace_SetChart:
             {
                 this.chart = data.newChart;
                 break;
             }
-            case historyitem_ChartSpace_SetClrMapOvr:
+            case AscDFH.historyitem_ChartSpace_SetClrMapOvr:
             {
                 this.clrMapOvr = data.newClrMapOvr;
                 break;
             }
-            case historyitem_ChartSpace_SetDate1904:
+            case AscDFH.historyitem_ChartSpace_SetDate1904:
             {
                 this.date1904 = data.newDate1904;
                 break;
             }
-            case historyitem_ChartSpace_SetExternalData:
+            case AscDFH.historyitem_ChartSpace_SetExternalData:
             {
                 this.externalData = data.newExternalData;
                 break;
             }
-            case historyitem_ChartSpace_SetLang:
+            case AscDFH.historyitem_ChartSpace_SetLang:
             {
                 this.lang = data.newLang;
                 break;
             }
-            case historyitem_ChartSpace_SetPivotSource:
+            case AscDFH.historyitem_ChartSpace_SetPivotSource:
             {
                 this.pivotSource = data.newPivotSource;
                 break;
             }
-            case historyitem_ChartSpace_SetPrintSettings:
+            case AscDFH.historyitem_ChartSpace_SetPrintSettings:
             {
                 this.printSettings = data.newPrintSettings;
                 break;
             }
-            case historyitem_ChartSpace_SetProtection:
+            case AscDFH.historyitem_ChartSpace_SetProtection:
             {
                 this.protection = data.newProtection;
                 break;
             }
-            case historyitem_ChartSpace_SetRoundedCorners:
+            case AscDFH.historyitem_ChartSpace_SetRoundedCorners:
             {
                 this.roundedCorners = data.newRoundedCorners;
                 break;
             }
-            case historyitem_ChartSpace_SetSpPr:
+            case AscDFH.historyitem_ChartSpace_SetSpPr:
             {
                 this.spPr = data.newSpPr;
                 break;
             }
-            case historyitem_ChartSpace_SetStyle:
+            case AscDFH.historyitem_ChartSpace_SetStyle:
             {
                 this.style = data.newStyle;
                 break;
             }
-            case historyitem_ChartSpace_SetTxPr:
+            case AscDFH.historyitem_ChartSpace_SetTxPr:
             {
                 this.txPr = data.newTxPr;
                 break;
             }
-            case historyitem_ChartSpace_SetUserShapes:
+            case AscDFH.historyitem_ChartSpace_SetUserShapes:
             {
                 this.userShapes = data.newUserShapes;
                 break;
             }
-            case historyitem_ChartSpace_SetThemeOverride:
+            case AscDFH.historyitem_ChartSpace_SetThemeOverride:
             {
                 this.themeOverride = data.newPr;
                 break;
             }
-            case historyitem_ChartSpace_SetGroup:
+            case AscDFH.historyitem_ChartSpace_SetGroup:
             {
                 this.group = data.newPr;
                 break;
@@ -9099,12 +9099,12 @@ CChartSpace.prototype =
         w.WriteLong(data.Type);
         switch (data.Type)
         {
-            case historyitem_AutoShapes_SetBFromSerialize:
+            case AscDFH.historyitem_AutoShapes_SetBFromSerialize:
             {
                 writeBool(w, data.newPr);
                 break;
             }
-            case historyitem_AutoShapes_SetDrawingBaseCoors:
+            case AscDFH.historyitem_AutoShapes_SetDrawingBaseCoors:
             {
                 writeDouble(w, data.fromCol   );
                 writeDouble(w, data.fromColOff);
@@ -9123,17 +9123,17 @@ CChartSpace.prototype =
                 writeDouble(w, data.cy);
                 break;
             }
-            case historyitem_AutoShapes_RemoveFromDrawingObjects:
+            case AscDFH.historyitem_AutoShapes_RemoveFromDrawingObjects:
             {
                 break;
             }
-            case historyitem_AutoShapes_AddToDrawingObjects:
+            case AscDFH.historyitem_AutoShapes_AddToDrawingObjects:
             {
                 var Pos = data.UseArray ? data.PosArray[0] : data.Pos;
                 writeLong(w, Pos);
                 break;
             }
-            case historyitem_AutoShapes_SetWorksheet:
+            case AscDFH.historyitem_AutoShapes_SetWorksheet:
             {
                 writeBool(w, isRealObject(data.newPr));
                 if(isRealObject(data.newPr))
@@ -9143,89 +9143,89 @@ CChartSpace.prototype =
                 break;
             }
 
-            case historyitem_ChartSpace_SetParent:
+            case AscDFH.historyitem_ChartSpace_SetParent:
             {
                 writeObject(w, data.newPr);
                 break;
             }
-            case historyitem_ShapeSetBDeleted:
+            case AscDFH.historyitem_ShapeSetBDeleted:
             {
                 writeBool(w, data.newPr);
                 break;
             }
-            case historyitem_ChartSpace_SetChart:
+            case AscDFH.historyitem_ChartSpace_SetChart:
             {
                 writeObject(w,data.newChart);
                 break;
             }
-            case historyitem_ChartSpace_SetClrMapOvr:
+            case AscDFH.historyitem_ChartSpace_SetClrMapOvr:
             {
                 writeObject(w,data.newClrMapOvr);
                 break;
             }
-            case historyitem_ChartSpace_SetDate1904:
+            case AscDFH.historyitem_ChartSpace_SetDate1904:
             {
                 writeBool(w,data.newDate1904);
                 break;
             }
-            case historyitem_ChartSpace_SetExternalData:
+            case AscDFH.historyitem_ChartSpace_SetExternalData:
             {
                 writeObject(w,data.newExternalData);
                 break;
             }
-            case historyitem_ChartSpace_SetLang:
+            case AscDFH.historyitem_ChartSpace_SetLang:
             {
                 writeString(w, data.newLang);
                 break;
             }
-            case historyitem_ChartSpace_SetPivotSource:
+            case AscDFH.historyitem_ChartSpace_SetPivotSource:
             {
                 writeObject(w, data.newPivotSource);
                 break;
             }
-            case historyitem_ChartSpace_SetPrintSettings:
+            case AscDFH.historyitem_ChartSpace_SetPrintSettings:
             {
                 writeObject(w, data.newPrintSettings);
                 break;
             }
-            case historyitem_ChartSpace_SetProtection:
+            case AscDFH.historyitem_ChartSpace_SetProtection:
             {
                 writeObject(w, data.newProtection);
                 break;
             }
-            case historyitem_ChartSpace_SetRoundedCorners:
+            case AscDFH.historyitem_ChartSpace_SetRoundedCorners:
             {
                 writeBool(w, data.newRoundedCorners);
                 break;
             }
-            case historyitem_ChartSpace_SetSpPr:
+            case AscDFH.historyitem_ChartSpace_SetSpPr:
             {
                 writeObject(w, data.newSpPr);
                 break;
             }
-            case historyitem_ChartSpace_SetStyle:
+            case AscDFH.historyitem_ChartSpace_SetStyle:
             {
                 writeLong(w, data.newStyle);
                 break;
             }
-            case historyitem_ChartSpace_SetTxPr:
+            case AscDFH.historyitem_ChartSpace_SetTxPr:
             {
                 writeObject(w, data.newTxPr);
                 break;
             }
-            case historyitem_ChartSpace_SetUserShapes:
+            case AscDFH.historyitem_ChartSpace_SetUserShapes:
             {
                 writeString(w, data.newUserShapes);
                 break;
             }
 
-            case historyitem_ChartSpace_SetThemeOverride:
+            case AscDFH.historyitem_ChartSpace_SetThemeOverride:
             {
                 writeObject(w, data.oldPr);
                 break;
             }
 
-            case historyitem_ChartSpace_SetGroup:
+            case AscDFH.historyitem_ChartSpace_SetGroup:
             {
                 writeObject(w, data.newPr);
                 break;
@@ -9238,12 +9238,12 @@ CChartSpace.prototype =
         var type = r.GetLong();
         switch (type)
         {
-            case historyitem_AutoShapes_SetBFromSerialize:
+            case AscDFH.historyitem_AutoShapes_SetBFromSerialize:
             {
                 this.fromSerialize = readBool(r);
                 break;
             }
-            case historyitem_AutoShapes_SetDrawingBaseCoors:
+            case AscDFH.historyitem_AutoShapes_SetDrawingBaseCoors:
             {
                 if(this.drawingBase)
                 {
@@ -9264,12 +9264,12 @@ CChartSpace.prototype =
                 }
                 break;
             }
-            case historyitem_AutoShapes_RemoveFromDrawingObjects:
+            case AscDFH.historyitem_AutoShapes_RemoveFromDrawingObjects:
             {
                 deleteDrawingBase(this.worksheet.Drawings, this.Get_Id());
                 break;
             }
-            case historyitem_AutoShapes_AddToDrawingObjects:
+            case AscDFH.historyitem_AutoShapes_AddToDrawingObjects:
             {
                 var pos = readLong(r);
                 if(this.worksheet)
@@ -9279,93 +9279,93 @@ CChartSpace.prototype =
                 addToDrawings(this.worksheet, this, pos);
                 break;
             }
-            case historyitem_AutoShapes_SetWorksheet:
+            case AscDFH.historyitem_AutoShapes_SetWorksheet:
             {
                 ReadWBModel(this, r);
                 break;
             }
-            case historyitem_ChartSpace_SetParent:
+            case AscDFH.historyitem_ChartSpace_SetParent:
             {
                 this.parent = readObject(r);
                 break;
             }
-            case historyitem_ShapeSetBDeleted:
+            case AscDFH.historyitem_ShapeSetBDeleted:
             {
                 this.bDeleted = readBool(r);
                 break;
             }
-            case historyitem_ChartSpace_SetChart:
+            case AscDFH.historyitem_ChartSpace_SetChart:
             {
                 this.chart = readObject(r);
                 break;
             }
-            case historyitem_ChartSpace_SetClrMapOvr:
+            case AscDFH.historyitem_ChartSpace_SetClrMapOvr:
             {
                 this.clrMapOvr = readObject(r);
                 break;
             }
-            case historyitem_ChartSpace_SetDate1904:
+            case AscDFH.historyitem_ChartSpace_SetDate1904:
             {
                 this.date1904 = readBool(r);
                 break;
             }
-            case historyitem_ChartSpace_SetExternalData:
+            case AscDFH.historyitem_ChartSpace_SetExternalData:
             {
                 this.externalData = readObject(r);
                 break;
             }
-            case historyitem_ChartSpace_SetLang:
+            case AscDFH.historyitem_ChartSpace_SetLang:
             {
                 this.lang = readString(r);
                 break;
             }
-            case historyitem_ChartSpace_SetPivotSource:
+            case AscDFH.historyitem_ChartSpace_SetPivotSource:
             {
                 this.pivotSource = readObject(r);
                 break;
             }
-            case historyitem_ChartSpace_SetPrintSettings:
+            case AscDFH.historyitem_ChartSpace_SetPrintSettings:
             {
                 this.printSettings = readObject(r);
                 break;
             }
-            case historyitem_ChartSpace_SetProtection:
+            case AscDFH.historyitem_ChartSpace_SetProtection:
             {
                 this.protection = readObject(r);
                 break;
             }
-            case historyitem_ChartSpace_SetRoundedCorners:
+            case AscDFH.historyitem_ChartSpace_SetRoundedCorners:
             {
                 this.roundedCorners = readBool(r);
                 break;
             }
-            case historyitem_ChartSpace_SetSpPr:
+            case AscDFH.historyitem_ChartSpace_SetSpPr:
             {
                 this.spPr = readObject(r);
                 break;
             }
-            case historyitem_ChartSpace_SetStyle:
+            case AscDFH.historyitem_ChartSpace_SetStyle:
             {
                 this.style = readLong(r);
                 this.handleUpdateStyle();
                 break;
             }
-            case historyitem_ChartSpace_SetTxPr:
+            case AscDFH.historyitem_ChartSpace_SetTxPr:
             {
                 this.txPr = readObject(r);
                 break;
             }
-            case historyitem_ChartSpace_SetUserShapes:
+            case AscDFH.historyitem_ChartSpace_SetUserShapes:
             {
                 this.userShapes = readString(r);
                 break;
             }
-            case historyitem_ChartSpace_SetThemeOverride:
+            case AscDFH.historyitem_ChartSpace_SetThemeOverride:
             {
                 this.themeOverride = readObject(r);
                 break;
             }
-            case historyitem_ChartSpace_SetGroup:
+            case AscDFH.historyitem_ChartSpace_SetGroup:
             {
                 this.group = readObject(r);
                 break;
@@ -9666,7 +9666,7 @@ CExternalData.prototype =
     {},
     getObjectType: function()
     {
-        return historyitem_type_ExternalData;
+        return AscDFH.historyitem_type_ExternalData;
     },
     Write_ToBinary2: function (w)
     {
@@ -9681,13 +9681,13 @@ CExternalData.prototype =
 
     setAutoUpdate: function(pr)
     {
-        History.Add(this, {Type: historyitem_ExternalData_SetAutoUpdate, oldPr: this.autoUpdate, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_ExternalData_SetAutoUpdate, oldPr: this.autoUpdate, newPr: pr});
         this.autoUpdate = pr;
     },
 
     setId: function(pr)
     {
-        History.Add(this, {Type: historyitem_ExternalData_SetId, oldPr: this.id, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_ExternalData_SetId, oldPr: this.id, newPr: pr});
         this.id = pr;
     },
 
@@ -9695,12 +9695,12 @@ CExternalData.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_ExternalData_SetAutoUpdate:
+            case AscDFH.historyitem_ExternalData_SetAutoUpdate:
             {
                 this.autoUpdate = data.oldPr;
                 break;
             }
-            case historyitem_ExternalData_SetId:
+            case AscDFH.historyitem_ExternalData_SetId:
             {
                 this.id = data.oldPr;
                 break;
@@ -9712,12 +9712,12 @@ CExternalData.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_ExternalData_SetAutoUpdate:
+            case AscDFH.historyitem_ExternalData_SetAutoUpdate:
             {
                 this.autoUpdate = data.newPr;
                 break;
             }
-            case historyitem_ExternalData_SetId:
+            case AscDFH.historyitem_ExternalData_SetId:
             {
                 this.id = data.newPr;
                 break;
@@ -9730,12 +9730,12 @@ CExternalData.prototype =
         w.WriteLong(data.Type);
         switch (data.Type)
         {
-            case historyitem_ExternalData_SetAutoUpdate:
+            case AscDFH.historyitem_ExternalData_SetAutoUpdate:
             {
                 writeBool(data.newPr);
                 break;
             }
-            case historyitem_ExternalData_SetId:
+            case AscDFH.historyitem_ExternalData_SetId:
             {
                 writeString(data.newPr);
                 break;
@@ -9748,12 +9748,12 @@ CExternalData.prototype =
         var type = r.GetLong();
         switch (type)
         {
-            case historyitem_ExternalData_SetAutoUpdate:
+            case AscDFH.historyitem_ExternalData_SetAutoUpdate:
             {
                 this.autoUpdate = readBool(r);
                 break;
             }
-            case historyitem_ExternalData_SetId:
+            case AscDFH.historyitem_ExternalData_SetId:
             {
                 this.id = readString(r);
                 break;
@@ -9783,7 +9783,7 @@ CPivotSource.prototype =
 
     getObjectType: function()
     {
-        return historyitem_type_PivotSource;
+        return AscDFH.historyitem_type_PivotSource;
     },
     Write_ToBinary2: function (w)
     {
@@ -9798,13 +9798,13 @@ CPivotSource.prototype =
 
     setFmtId: function(pr)
     {
-        History.Add(this, {Type:historyitem_PivotSource_SetFmtId, oldPr: this.fmtId, newPr: pr});
+        History.Add(this, {Type:AscDFH.historyitem_PivotSource_SetFmtId, oldPr: this.fmtId, newPr: pr});
         this.fmtId = pr;
     },
 
     setName: function(pr)
     {
-        History.Add(this, {Type:historyitem_PivotSource_SetName, oldPr: this.name, newPr: pr});
+        History.Add(this, {Type:AscDFH.historyitem_PivotSource_SetName, oldPr: this.name, newPr: pr});
         this.name = pr;
     },
 
@@ -9812,12 +9812,12 @@ CPivotSource.prototype =
     {
         switch(data.Type)
         {
-            case historyitem_PivotSource_SetFmtId:
+            case AscDFH.historyitem_PivotSource_SetFmtId:
             {
                 this.fmtId = data.oldPr;
                 break;
             }
-            case historyitem_PivotSource_SetName:
+            case AscDFH.historyitem_PivotSource_SetName:
             {
                 this.name = data.oldPr;
                 break;
@@ -9829,12 +9829,12 @@ CPivotSource.prototype =
     {
         switch(data.Type)
         {
-            case historyitem_PivotSource_SetFmtId:
+            case AscDFH.historyitem_PivotSource_SetFmtId:
             {
                 this.fmtId = data.newPr;
                 break;
             }
-            case historyitem_PivotSource_SetName:
+            case AscDFH.historyitem_PivotSource_SetName:
             {
                 this.name = data.newPr;
                 break;
@@ -9861,12 +9861,12 @@ CPivotSource.prototype =
         w.WriteLong(data.Type);
         switch (data.Type)
         {
-            case historyitem_PivotSource_SetFmtId:
+            case AscDFH.historyitem_PivotSource_SetFmtId:
             {
                 writeLong(w, data.newPr);
                 break;
             }
-            case historyitem_PivotSource_SetName:
+            case AscDFH.historyitem_PivotSource_SetName:
             {
                 writeString(w, data.newPr);
                 break;
@@ -9879,12 +9879,12 @@ CPivotSource.prototype =
         var type = r.GetLong();
         switch (type)
         {
-            case historyitem_PivotSource_SetFmtId:
+            case AscDFH.historyitem_PivotSource_SetFmtId:
             {
                 this.fmtId = readLong(r);
                 break;
             }
-            case historyitem_PivotSource_SetName:
+            case AscDFH.historyitem_PivotSource_SetName:
             {
                 this.name = readString(r);
                 break;
@@ -9919,7 +9919,7 @@ CProtection.prototype =
 
     getObjectType: function()
     {
-        return historyitem_type_Protection;
+        return AscDFH.historyitem_type_Protection;
     },
     Write_ToBinary2: function (w)
     {
@@ -9934,27 +9934,27 @@ CProtection.prototype =
 
     setChartObject: function(pr)
     {
-        History.Add(this, {Type: historyitem_Protection_SetChartObject, newPr: pr, oldPr:this.chartObject});
+        History.Add(this, {Type: AscDFH.historyitem_Protection_SetChartObject, newPr: pr, oldPr:this.chartObject});
         this.chartObject = pr;
     },
     setData: function(pr)
     {
-        History.Add(this, {Type: historyitem_Protection_SetData, newPr: pr, oldPr:this.data});
+        History.Add(this, {Type: AscDFH.historyitem_Protection_SetData, newPr: pr, oldPr:this.data});
         this.data = pr;
     },
     setFormatting: function(pr)
     {
-        History.Add(this, {Type: historyitem_Protection_SetFormatting, newPr: pr, oldPr:this.formatting});
+        History.Add(this, {Type: AscDFH.historyitem_Protection_SetFormatting, newPr: pr, oldPr:this.formatting});
         this.formatting = pr;
     },
     setSelection: function(pr)
     {
-        History.Add(this, {Type: historyitem_Protection_SetSelection, newPr: pr, oldPr:this.selection});
+        History.Add(this, {Type: AscDFH.historyitem_Protection_SetSelection, newPr: pr, oldPr:this.selection});
         this.selection = pr;
     },
     setUserInterface: function(pr)
     {
-        History.Add(this, {Type: historyitem_Protection_SetUserInterface, newPr: pr, oldPr:this.userInterface});
+        History.Add(this, {Type: AscDFH.historyitem_Protection_SetUserInterface, newPr: pr, oldPr:this.userInterface});
         this.userInterface = pr;
     },
 
@@ -9979,27 +9979,27 @@ CProtection.prototype =
     {
         switch(data.Type)
         {
-            case historyitem_Protection_SetChartObject:
+            case AscDFH.historyitem_Protection_SetChartObject:
             {
                 this.chartObject = data.oldPr;
                 break;
             }
-            case historyitem_Protection_SetData:
+            case AscDFH.historyitem_Protection_SetData:
             {
                 this.data = data.oldPr;
                 break;
             }
-            case historyitem_Protection_SetFormatting:
+            case AscDFH.historyitem_Protection_SetFormatting:
             {
                 this.formatting = data.oldPr;
                 break;
             }
-            case historyitem_Protection_SetSelection:
+            case AscDFH.historyitem_Protection_SetSelection:
             {
                 this.selection = data.oldPr;
                 break;
             }
-            case historyitem_Protection_SetUserInterface:
+            case AscDFH.historyitem_Protection_SetUserInterface:
             {
                 this.userInterface = data.oldPr;
                 break;
@@ -10011,27 +10011,27 @@ CProtection.prototype =
     {
         switch(data.Type)
         {
-            case historyitem_Protection_SetChartObject:
+            case AscDFH.historyitem_Protection_SetChartObject:
             {
                 this.chartObject = data.newPr;
                 break;
             }
-            case historyitem_Protection_SetData:
+            case AscDFH.historyitem_Protection_SetData:
             {
                 this.data = data.oldPr;
                 break;
             }
-            case historyitem_Protection_SetFormatting:
+            case AscDFH.historyitem_Protection_SetFormatting:
             {
                 this.formatting = data.newPr;
                 break;
             }
-            case historyitem_Protection_SetSelection:
+            case AscDFH.historyitem_Protection_SetSelection:
             {
                 this.selection = data.newPr;
                 break;
             }
-            case historyitem_Protection_SetUserInterface:
+            case AscDFH.historyitem_Protection_SetUserInterface:
             {
                 this.userInterface = data.newPr;
                 break;
@@ -10044,11 +10044,11 @@ CProtection.prototype =
         w.WriteLong(data.Type);
         switch(data.Type)
         {
-            case historyitem_Protection_SetChartObject:
-            case historyitem_Protection_SetData:
-            case historyitem_Protection_SetFormatting:
-            case historyitem_Protection_SetSelection:
-            case historyitem_Protection_SetUserInterface:
+            case AscDFH.historyitem_Protection_SetChartObject:
+            case AscDFH.historyitem_Protection_SetData:
+            case AscDFH.historyitem_Protection_SetFormatting:
+            case AscDFH.historyitem_Protection_SetSelection:
+            case AscDFH.historyitem_Protection_SetUserInterface:
             {
                 writeBool(w, data.newPr);
                 break;
@@ -10061,27 +10061,27 @@ CProtection.prototype =
         var type = r.GetLong();
         switch(type)
         {
-            case historyitem_Protection_SetChartObject:
+            case AscDFH.historyitem_Protection_SetChartObject:
             {
                 this.chartObject = readBool(r);
                 break;
             }
-            case historyitem_Protection_SetData:
+            case AscDFH.historyitem_Protection_SetData:
             {
                 this.data = readBool(r);
                 break;
             }
-            case historyitem_Protection_SetFormatting:
+            case AscDFH.historyitem_Protection_SetFormatting:
             {
                 this.formatting = readBool(r);
                 break;
             }
-            case historyitem_Protection_SetSelection:
+            case AscDFH.historyitem_Protection_SetSelection:
             {
                 this.selection = readBool(r);
                 break;
             }
-            case historyitem_Protection_SetUserInterface:
+            case AscDFH.historyitem_Protection_SetUserInterface:
             {
                 this.userInterface = readBool(r);
                 break;
@@ -10129,7 +10129,7 @@ CPrintSettings.prototype =
 
     getObjectType: function()
     {
-        return historyitem_type_PrintSettings;
+        return AscDFH.historyitem_type_PrintSettings;
     },
 
     Write_ToBinary2: function (w)
@@ -10145,17 +10145,17 @@ CPrintSettings.prototype =
 
     setHeaderFooter: function(pr)
     {
-        History.Add(this, {Type: historyitem_PrintSettingsSetHeaderFooter, oldPr: this.headerFooter, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_PrintSettingsSetHeaderFooter, oldPr: this.headerFooter, newPr: pr});
         this.headerFooter = pr;
     },
     setPageMargins: function(pr)
     {
-        History.Add(this, {Type: historyitem_PrintSettingsSetPageMargins, oldPr: this.pageMargins, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_PrintSettingsSetPageMargins, oldPr: this.pageMargins, newPr: pr});
         this.pageMargins = pr;
     },
     setPageSetup: function(pr)
     {
-        History.Add(this, {Type: historyitem_PrintSettingsSetPageSetup, oldPr: this.pageSetup, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_PrintSettingsSetPageSetup, oldPr: this.pageSetup, newPr: pr});
         this.pageSetup = pr;
     },
 
@@ -10163,17 +10163,17 @@ CPrintSettings.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_PrintSettingsSetHeaderFooter:
+            case AscDFH.historyitem_PrintSettingsSetHeaderFooter:
             {
                 this.headerFooter = data.oldPr;
                 break;
             }
-            case historyitem_PrintSettingsSetPageMargins:
+            case AscDFH.historyitem_PrintSettingsSetPageMargins:
             {
                 this.pageMargins = data.oldPr;
                 break;
             }
-            case historyitem_PrintSettingsSetPageSetup:
+            case AscDFH.historyitem_PrintSettingsSetPageSetup:
             {
                 this.pageSetup = data.oldPr;
                 break;
@@ -10185,17 +10185,17 @@ CPrintSettings.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_PrintSettingsSetHeaderFooter:
+            case AscDFH.historyitem_PrintSettingsSetHeaderFooter:
             {
                 this.headerFooter = data.newPr;
                 break;
             }
-            case historyitem_PrintSettingsSetPageMargins:
+            case AscDFH.historyitem_PrintSettingsSetPageMargins:
             {
                 this.pageMargins = data.newPr;
                 break;
             }
-            case historyitem_PrintSettingsSetPageSetup:
+            case AscDFH.historyitem_PrintSettingsSetPageSetup:
             {
                 this.pageSetup = data.newPr;
                 break;
@@ -10208,9 +10208,9 @@ CPrintSettings.prototype =
         w.WriteLong(data.Type);
         switch (data.Type)
         {
-            case historyitem_PrintSettingsSetHeaderFooter:
-            case historyitem_PrintSettingsSetPageMargins:
-            case historyitem_PrintSettingsSetPageSetup:
+            case AscDFH.historyitem_PrintSettingsSetHeaderFooter:
+            case AscDFH.historyitem_PrintSettingsSetPageMargins:
+            case AscDFH.historyitem_PrintSettingsSetPageSetup:
             {
                 writeObject(w, data.newPr);
                 break;
@@ -10223,17 +10223,17 @@ CPrintSettings.prototype =
         var type = r.GetLong();
         switch (type)
         {
-            case historyitem_PrintSettingsSetHeaderFooter:
+            case AscDFH.historyitem_PrintSettingsSetHeaderFooter:
             {
                 this.headerFooter = readObject(r);
                 break;
             }
-            case historyitem_PrintSettingsSetPageMargins:
+            case AscDFH.historyitem_PrintSettingsSetPageMargins:
             {
                 this.pageMargins = readObject(r);
                 break;
             }
-            case historyitem_PrintSettingsSetPageSetup:
+            case AscDFH.historyitem_PrintSettingsSetPageSetup:
             {
                 this.pageSetup = readObject(r);
                 break;
@@ -10316,53 +10316,53 @@ CHeaderFooterChart.prototype =
 
     getObjectType: function()
     {
-        return historyitem_type_HeaderFooterChart;
+        return AscDFH.historyitem_type_HeaderFooterChart;
     },
 
 
     setAlignWithMargins: function(pr)
     {
-        History.Add(this, {Type: historyitem_HeaderFooterChartSetAlignWithMargins, oldPr:this.alignWithMargins, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_HeaderFooterChartSetAlignWithMargins, oldPr:this.alignWithMargins, newPr: pr});
         this.alignWithMargins = pr;
     },
     setDifferentFirst: function(pr)
     {
-        History.Add(this, {Type: historyitem_HeaderFooterChartSetDifferentFirst, oldPr:this.differentFirst, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_HeaderFooterChartSetDifferentFirst, oldPr:this.differentFirst, newPr: pr});
         this.differentFirst = pr;
     },
     setDifferentOddEven: function(pr)
     {
-        History.Add(this, {Type: historyitem_HeaderFooterChartSetDifferentOddEven, oldPr:this.differentOddEven, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_HeaderFooterChartSetDifferentOddEven, oldPr:this.differentOddEven, newPr: pr});
         this.differentOddEven = pr;
     },
     setEvenFooter: function(pr)
     {
-        History.Add(this, {Type: historyitem_HeaderFooterChartSetEvenFooter, oldPr:this.evenFooter, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_HeaderFooterChartSetEvenFooter, oldPr:this.evenFooter, newPr: pr});
         this.evenFooter = pr;
     },
     setEvenHeader: function(pr)
     {
-        History.Add(this, {Type: historyitem_HeaderFooterChartSetEvenHeader, oldPr:this.evenHeader, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_HeaderFooterChartSetEvenHeader, oldPr:this.evenHeader, newPr: pr});
         this.evenHeader = pr;
     },
     setFirstFooter: function(pr)
     {
-        History.Add(this, {Type: historyitem_HeaderFooterChartSetFirstFooter, oldPr:this.firstFooter, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_HeaderFooterChartSetFirstFooter, oldPr:this.firstFooter, newPr: pr});
         this.firstFooter = pr;
     },
     setFirstHeader: function(pr)
     {
-        History.Add(this, {Type: historyitem_HeaderFooterChartSetFirstHeader, oldPr:this.firstHeader, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_HeaderFooterChartSetFirstHeader, oldPr:this.firstHeader, newPr: pr});
         this.firstHeader = pr;
     },
     setOddFooter: function(pr)
     {
-        History.Add(this, {Type: historyitem_HeaderFooterChartSetOddFooter, oldPr:this.oddFooter, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_HeaderFooterChartSetOddFooter, oldPr:this.oddFooter, newPr: pr});
         this.oddFooter = pr;
     },
     setOddHeader: function(pr)
     {
-        History.Add(this, {Type: historyitem_HeaderFooterChartSetOddHeader, oldPr:this.oddHeader, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_HeaderFooterChartSetOddHeader, oldPr:this.oddHeader, newPr: pr});
         this.oddHeader = pr;
     },
 
@@ -10370,47 +10370,47 @@ CHeaderFooterChart.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_HeaderFooterChartSetAlignWithMargins:
+            case AscDFH.historyitem_HeaderFooterChartSetAlignWithMargins:
             {
                 this.alignWithMargins = data.oldPr;
                 break;
             }
-            case historyitem_HeaderFooterChartSetDifferentFirst:
+            case AscDFH.historyitem_HeaderFooterChartSetDifferentFirst:
             {
                 this.differentFirst = data.oldPr;
                 break;
             }
-            case historyitem_HeaderFooterChartSetDifferentOddEven:
+            case AscDFH.historyitem_HeaderFooterChartSetDifferentOddEven:
             {
                 this.differentOddEven = data.oldPr;
                 break;
             }
-            case historyitem_HeaderFooterChartSetEvenFooter:
+            case AscDFH.historyitem_HeaderFooterChartSetEvenFooter:
             {
                 this.evenFooter = data.oldPr;
                 break;
             }
-            case historyitem_HeaderFooterChartSetEvenHeader:
+            case AscDFH.historyitem_HeaderFooterChartSetEvenHeader:
             {
                 this.evenHeader = data.oldPr;
                 break;
             }
-            case historyitem_HeaderFooterChartSetFirstFooter:
+            case AscDFH.historyitem_HeaderFooterChartSetFirstFooter:
             {
                 this.firstFooter = data.oldPr;
                 break;
             }
-            case historyitem_HeaderFooterChartSetFirstHeader:
+            case AscDFH.historyitem_HeaderFooterChartSetFirstHeader:
             {
                 this.firstHeader = data.oldPr;
                 break;
             }
-            case historyitem_HeaderFooterChartSetOddFooter:
+            case AscDFH.historyitem_HeaderFooterChartSetOddFooter:
             {
                 this.oddFooter = data.oldPr;
                 break;
             }
-            case historyitem_HeaderFooterChartSetOddHeader:
+            case AscDFH.historyitem_HeaderFooterChartSetOddHeader:
             {
                 this.oddHeader = data.oldPr;
                 break;
@@ -10422,47 +10422,47 @@ CHeaderFooterChart.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_HeaderFooterChartSetAlignWithMargins:
+            case AscDFH.historyitem_HeaderFooterChartSetAlignWithMargins:
             {
                 this.alignWithMargins = data.newPr;
                 break;
             }
-            case historyitem_HeaderFooterChartSetDifferentFirst:
+            case AscDFH.historyitem_HeaderFooterChartSetDifferentFirst:
             {
                 this.differentFirst = data.newPr;
                 break;
             }
-            case historyitem_HeaderFooterChartSetDifferentOddEven:
+            case AscDFH.historyitem_HeaderFooterChartSetDifferentOddEven:
             {
                 this.differentOddEven = data.newPr;
                 break;
             }
-            case historyitem_HeaderFooterChartSetEvenFooter:
+            case AscDFH.historyitem_HeaderFooterChartSetEvenFooter:
             {
                 this.evenFooter = data.newPr;
                 break;
             }
-            case historyitem_HeaderFooterChartSetEvenHeader:
+            case AscDFH.historyitem_HeaderFooterChartSetEvenHeader:
             {
                 this.evenHeader = data.newPr;
                 break;
             }
-            case historyitem_HeaderFooterChartSetFirstFooter:
+            case AscDFH.historyitem_HeaderFooterChartSetFirstFooter:
             {
                 this.firstFooter = data.newPr;
                 break;
             }
-            case historyitem_HeaderFooterChartSetFirstHeader:
+            case AscDFH.historyitem_HeaderFooterChartSetFirstHeader:
             {
                 this.firstHeader = data.newPr;
                 break;
             }
-            case historyitem_HeaderFooterChartSetOddFooter:
+            case AscDFH.historyitem_HeaderFooterChartSetOddFooter:
             {
                 this.oddFooter = data.newPr;
                 break;
             }
-            case historyitem_HeaderFooterChartSetOddHeader:
+            case AscDFH.historyitem_HeaderFooterChartSetOddHeader:
             {
                 this.oddHeader = data.newPr;
                 break;
@@ -10475,19 +10475,19 @@ CHeaderFooterChart.prototype =
         w.WriteLong(data.Type);
         switch (data.Type)
         {
-            case historyitem_HeaderFooterChartSetAlignWithMargins:
-            case historyitem_HeaderFooterChartSetDifferentFirst:
-            case historyitem_HeaderFooterChartSetDifferentOddEven:
+            case AscDFH.historyitem_HeaderFooterChartSetAlignWithMargins:
+            case AscDFH.historyitem_HeaderFooterChartSetDifferentFirst:
+            case AscDFH.historyitem_HeaderFooterChartSetDifferentOddEven:
             {
                 writeBool(w, data.newPr);
                 break;
             }
-            case historyitem_HeaderFooterChartSetEvenFooter:
-            case historyitem_HeaderFooterChartSetEvenHeader:
-            case historyitem_HeaderFooterChartSetFirstFooter:
-            case historyitem_HeaderFooterChartSetFirstHeader:
-            case historyitem_HeaderFooterChartSetOddFooter:
-            case historyitem_HeaderFooterChartSetOddHeader:
+            case AscDFH.historyitem_HeaderFooterChartSetEvenFooter:
+            case AscDFH.historyitem_HeaderFooterChartSetEvenHeader:
+            case AscDFH.historyitem_HeaderFooterChartSetFirstFooter:
+            case AscDFH.historyitem_HeaderFooterChartSetFirstHeader:
+            case AscDFH.historyitem_HeaderFooterChartSetOddFooter:
+            case AscDFH.historyitem_HeaderFooterChartSetOddHeader:
             {
                 writeString(w, data.newPr);
                 break;
@@ -10500,47 +10500,47 @@ CHeaderFooterChart.prototype =
         var type = r.GetLong();
         switch (type)
         {
-            case historyitem_HeaderFooterChartSetAlignWithMargins:
+            case AscDFH.historyitem_HeaderFooterChartSetAlignWithMargins:
             {
                 this.alignWithMargins = readBool(r);
                 break;
             }
-            case historyitem_HeaderFooterChartSetDifferentFirst:
+            case AscDFH.historyitem_HeaderFooterChartSetDifferentFirst:
             {
                 this.differentFirst = readBool(r);
                 break;
             }
-            case historyitem_HeaderFooterChartSetDifferentOddEven:
+            case AscDFH.historyitem_HeaderFooterChartSetDifferentOddEven:
             {
                 this.differentOddEven = readBool(r);
                 break;
             }
-            case historyitem_HeaderFooterChartSetEvenFooter:
+            case AscDFH.historyitem_HeaderFooterChartSetEvenFooter:
             {
                 this.evenFooter = readString(r);
                 break;
             }
-            case historyitem_HeaderFooterChartSetEvenHeader:
+            case AscDFH.historyitem_HeaderFooterChartSetEvenHeader:
             {
                 this.evenHeader = readString(r);
                 break;
             }
-            case historyitem_HeaderFooterChartSetFirstFooter:
+            case AscDFH.historyitem_HeaderFooterChartSetFirstFooter:
             {
                 this.firstFooter = readString(r);
                 break;
             }
-            case historyitem_HeaderFooterChartSetFirstHeader:
+            case AscDFH.historyitem_HeaderFooterChartSetFirstHeader:
             {
                 this.firstHeader = readString(r);
                 break;
             }
-            case historyitem_HeaderFooterChartSetOddFooter:
+            case AscDFH.historyitem_HeaderFooterChartSetOddFooter:
             {
                 this.oddFooter = readString(r);
                 break;
             }
-            case historyitem_HeaderFooterChartSetOddHeader:
+            case AscDFH.historyitem_HeaderFooterChartSetOddHeader:
             {
                 this.oddHeader = readString(r);
                 break;
@@ -10605,37 +10605,37 @@ CPageMarginsChart.prototype =
 
     getObjectType: function()
     {
-        return historyitem_type_PageMarginsChart;
+        return AscDFH.historyitem_type_PageMarginsChart;
     },
 
     setB: function(pr)
     {
-        History.Add(this, {Type: historyitem_PageMarginsSetB, oldPr: this.b, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_PageMarginsSetB, oldPr: this.b, newPr: pr});
         this.b = pr;
     },
     setFooter: function(pr)
     {
-        History.Add(this, {Type: historyitem_PageMarginsSetFooter, oldPr: this.footer, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_PageMarginsSetFooter, oldPr: this.footer, newPr: pr});
         this.footer = pr;
     },
     setHeader: function(pr)
     {
-        History.Add(this, {Type: historyitem_PageMarginsSetHeader, oldPr: this.header, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_PageMarginsSetHeader, oldPr: this.header, newPr: pr});
         this.header = pr;
     },
     setL: function(pr)
     {
-        History.Add(this, {Type: historyitem_PageMarginsSetL, oldPr: this.l, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_PageMarginsSetL, oldPr: this.l, newPr: pr});
         this.l = pr;
     },
     setR: function(pr)
     {
-        History.Add(this, {Type: historyitem_PageMarginsSetR, oldPr: this.r, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_PageMarginsSetR, oldPr: this.r, newPr: pr});
         this.r = pr;
     },
     setT: function(pr)
     {
-        History.Add(this, {Type: historyitem_PageMarginsSetT, oldPr: this.t, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_PageMarginsSetT, oldPr: this.t, newPr: pr});
         this.t = pr;
     },
 
@@ -10643,32 +10643,32 @@ CPageMarginsChart.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_PageMarginsSetB:
+            case AscDFH.historyitem_PageMarginsSetB:
             {
                 this.b = data.oldPr;
                 break;
             }
-            case historyitem_PageMarginsSetFooter:
+            case AscDFH.historyitem_PageMarginsSetFooter:
             {
                 this.footer = data.oldPr;
                 break;
             }
-            case historyitem_PageMarginsSetHeader:
+            case AscDFH.historyitem_PageMarginsSetHeader:
             {
                 this.header = data.oldPr;
                 break;
             }
-            case historyitem_PageMarginsSetL:
+            case AscDFH.historyitem_PageMarginsSetL:
             {
                 this.l = data.oldPr;
                 break;
             }
-            case historyitem_PageMarginsSetR:
+            case AscDFH.historyitem_PageMarginsSetR:
             {
                 this.r = data.oldPr;
                 break;
             }
-            case historyitem_PageMarginsSetT:
+            case AscDFH.historyitem_PageMarginsSetT:
             {
                 this.t = data.oldPr;
                 break;
@@ -10680,32 +10680,32 @@ CPageMarginsChart.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_PageMarginsSetB:
+            case AscDFH.historyitem_PageMarginsSetB:
             {
                 this.b = data.newPr;
                 break;
             }
-            case historyitem_PageMarginsSetFooter:
+            case AscDFH.historyitem_PageMarginsSetFooter:
             {
                 this.footer = data.newPr;
                 break;
             }
-            case historyitem_PageMarginsSetHeader:
+            case AscDFH.historyitem_PageMarginsSetHeader:
             {
                 this.header = data.newPr;
                 break;
             }
-            case historyitem_PageMarginsSetL:
+            case AscDFH.historyitem_PageMarginsSetL:
             {
                 this.l = data.newPr;
                 break;
             }
-            case historyitem_PageMarginsSetR:
+            case AscDFH.historyitem_PageMarginsSetR:
             {
                 this.r = data.newPr;
                 break;
             }
-            case historyitem_PageMarginsSetT:
+            case AscDFH.historyitem_PageMarginsSetT:
             {
                 this.t = data.newPr;
                 break;
@@ -10718,12 +10718,12 @@ CPageMarginsChart.prototype =
         w.WriteLong(data.Type);
         switch (data.Type)
         {
-            case historyitem_PageMarginsSetB:
-            case historyitem_PageMarginsSetFooter:
-            case historyitem_PageMarginsSetHeader:
-            case historyitem_PageMarginsSetL:
-            case historyitem_PageMarginsSetR:
-            case historyitem_PageMarginsSetT:
+            case AscDFH.historyitem_PageMarginsSetB:
+            case AscDFH.historyitem_PageMarginsSetFooter:
+            case AscDFH.historyitem_PageMarginsSetHeader:
+            case AscDFH.historyitem_PageMarginsSetL:
+            case AscDFH.historyitem_PageMarginsSetR:
+            case AscDFH.historyitem_PageMarginsSetT:
             {
                 writeDouble(w, data.newPr);
                 break;
@@ -10736,32 +10736,32 @@ CPageMarginsChart.prototype =
         var type = r.GetLong();
         switch (type)
         {
-            case historyitem_PageMarginsSetB:
+            case AscDFH.historyitem_PageMarginsSetB:
             {
                 this.b = readDouble(r);
                 break;
             }
-            case historyitem_PageMarginsSetFooter:
+            case AscDFH.historyitem_PageMarginsSetFooter:
             {
                 this.footer = readDouble(r);
                 break;
             }
-            case historyitem_PageMarginsSetHeader:
+            case AscDFH.historyitem_PageMarginsSetHeader:
             {
                 this.header = readDouble(r);
                 break;
             }
-            case historyitem_PageMarginsSetL:
+            case AscDFH.historyitem_PageMarginsSetL:
             {
                 this.l = readDouble(r);
                 break;
             }
-            case historyitem_PageMarginsSetR:
+            case AscDFH.historyitem_PageMarginsSetR:
             {
                 this.r = readDouble(r);
                 break;
             }
-            case historyitem_PageMarginsSetT:
+            case AscDFH.historyitem_PageMarginsSetT:
             {
                 this.t = readDouble(r);
                 break;
@@ -10845,61 +10845,61 @@ CPageSetup.prototype =
 
     getObjectType: function()
     {
-        return historyitem_type_PageSetup;
+        return AscDFH.historyitem_type_PageSetup;
     },
     setBlackAndWhite: function(pr)
     {
-        History.Add(this, {Type: historyitem_PageSetupSetBlackAndWhite, oldPr: this.blackAndWhite, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_PageSetupSetBlackAndWhite, oldPr: this.blackAndWhite, newPr: pr});
         this.blackAndWhite = pr;
     },
     setCopies: function(pr)
     {
-        History.Add(this, {Type: historyitem_PageSetupSetCopies, oldPr: this.copies, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_PageSetupSetCopies, oldPr: this.copies, newPr: pr});
         this.copies = pr;
     },
     setDraft: function(pr)
     {
-        History.Add(this, {Type: historyitem_PageSetupSetDraft, oldPr: this.draft, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_PageSetupSetDraft, oldPr: this.draft, newPr: pr});
         this.draft = pr;
     },
     setFirstPageNumber: function(pr)
     {
-        History.Add(this, {Type: historyitem_PageSetupSetFirstPageNumber, oldPr: this.firstPageNumber, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_PageSetupSetFirstPageNumber, oldPr: this.firstPageNumber, newPr: pr});
         this.firstPageNumber = pr;
     },
     setHorizontalDpi: function(pr)
     {
-        History.Add(this, {Type: historyitem_PageSetupSetHorizontalDpi, oldPr: this.horizontalDpi, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_PageSetupSetHorizontalDpi, oldPr: this.horizontalDpi, newPr: pr});
         this.horizontalDpi = pr;
     },
     setOrientation: function(pr)
     {
-        History.Add(this, {Type: historyitem_PageSetupSetOrientation, oldPr: this.orientation, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_PageSetupSetOrientation, oldPr: this.orientation, newPr: pr});
         this.orientation = pr;
     },
     setPaperHeight: function(pr)
     {
-        History.Add(this, {Type: historyitem_PageSetupSetPaperHeight, oldPr: this.paperHeight, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_PageSetupSetPaperHeight, oldPr: this.paperHeight, newPr: pr});
         this.paperHeight = pr;
     },
     setPaperSize: function(pr)
     {
-        History.Add(this, {Type: historyitem_PageSetupSetPaperSize, oldPr: this.paperSize, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_PageSetupSetPaperSize, oldPr: this.paperSize, newPr: pr});
         this.paperSize = pr;
     },
     setPaperWidth: function(pr)
     {
-        History.Add(this, {Type: historyitem_PageSetupSetPaperWidth, oldPr: this.paperWidth, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_PageSetupSetPaperWidth, oldPr: this.paperWidth, newPr: pr});
         this.paperWidth = pr;
     },
     setUseFirstPageNumb: function(pr)
     {
-        History.Add(this, {Type: historyitem_PageSetupSetUseFirstPageNumb, oldPr: this.useFirstPageNumb, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_PageSetupSetUseFirstPageNumb, oldPr: this.useFirstPageNumb, newPr: pr});
         this.useFirstPageNumb = pr;
     },
     setVerticalDpi: function(pr)
     {
-        History.Add(this, {Type: historyitem_PageSetupSetVerticalDpi, oldPr: this.verticalDpi, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_PageSetupSetVerticalDpi, oldPr: this.verticalDpi, newPr: pr});
         this.verticalDpi = pr;
     },
 
@@ -10907,57 +10907,57 @@ CPageSetup.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_PageSetupSetBlackAndWhite:
+            case AscDFH.historyitem_PageSetupSetBlackAndWhite:
             {
                 this.blackAndWhite = data.oldPr;
                 break;
             }
-            case historyitem_PageSetupSetCopies:
+            case AscDFH.historyitem_PageSetupSetCopies:
             {
                 this.copies = data.oldPr;
                 break;
             }
-            case historyitem_PageSetupSetDraft:
+            case AscDFH.historyitem_PageSetupSetDraft:
             {
                 this.draft = data.oldPr;
                 break;
             }
-            case historyitem_PageSetupSetFirstPageNumber:
+            case AscDFH.historyitem_PageSetupSetFirstPageNumber:
             {
                 this.firstPageNumber = data.oldPr;
                 break;
             }
-            case historyitem_PageSetupSetHorizontalDpi:
+            case AscDFH.historyitem_PageSetupSetHorizontalDpi:
             {
                 this.horizontalDpi = data.oldPr;
                 break;
             }
-            case historyitem_PageSetupSetOrientation:
+            case AscDFH.historyitem_PageSetupSetOrientation:
             {
                 this.orientation = data.oldPr;
                 break;
             }
-            case historyitem_PageSetupSetPaperHeight:
+            case AscDFH.historyitem_PageSetupSetPaperHeight:
             {
                 this.paperHeight = data.oldPr;
                 break;
             }
-            case historyitem_PageSetupSetPaperSize:
+            case AscDFH.historyitem_PageSetupSetPaperSize:
             {
                 this.paperSize = data.oldPr;
                 break;
             }
-            case historyitem_PageSetupSetPaperWidth:
+            case AscDFH.historyitem_PageSetupSetPaperWidth:
             {
                 this.paperWidth = data.oldPr;
                 break;
             }
-            case historyitem_PageSetupSetUseFirstPageNumb:
+            case AscDFH.historyitem_PageSetupSetUseFirstPageNumb:
             {
                 this.useFirstPageNumb = data.oldPr;
                 break;
             }
-            case historyitem_PageSetupSetVerticalDpi:
+            case AscDFH.historyitem_PageSetupSetVerticalDpi:
             {
                 this.verticalDpi = data.oldPr;
                 break;
@@ -10969,57 +10969,57 @@ CPageSetup.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_PageSetupSetBlackAndWhite:
+            case AscDFH.historyitem_PageSetupSetBlackAndWhite:
             {
                 this.blackAndWhite = data.newPr;
                 break;
             }
-            case historyitem_PageSetupSetCopies:
+            case AscDFH.historyitem_PageSetupSetCopies:
             {
                 this.copies = data.newPr;
                 break;
             }
-            case historyitem_PageSetupSetDraft:
+            case AscDFH.historyitem_PageSetupSetDraft:
             {
                 this.draft = data.newPr;
                 break;
             }
-            case historyitem_PageSetupSetFirstPageNumber:
+            case AscDFH.historyitem_PageSetupSetFirstPageNumber:
             {
                 this.firstPageNumber = data.newPr;
                 break;
             }
-            case historyitem_PageSetupSetHorizontalDpi:
+            case AscDFH.historyitem_PageSetupSetHorizontalDpi:
             {
                 this.horizontalDpi = data.newPr;
                 break;
             }
-            case historyitem_PageSetupSetOrientation:
+            case AscDFH.historyitem_PageSetupSetOrientation:
             {
                 this.orientation = data.newPr;
                 break;
             }
-            case historyitem_PageSetupSetPaperHeight:
+            case AscDFH.historyitem_PageSetupSetPaperHeight:
             {
                 this.paperHeight = data.newPr;
                 break;
             }
-            case historyitem_PageSetupSetPaperSize:
+            case AscDFH.historyitem_PageSetupSetPaperSize:
             {
                 this.paperSize = data.newPr;
                 break;
             }
-            case historyitem_PageSetupSetPaperWidth:
+            case AscDFH.historyitem_PageSetupSetPaperWidth:
             {
                 this.paperWidth = data.newPr;
                 break;
             }
-            case historyitem_PageSetupSetUseFirstPageNumb:
+            case AscDFH.historyitem_PageSetupSetUseFirstPageNumb:
             {
                 this.useFirstPageNumb = data.newPr;
                 break;
             }
-            case historyitem_PageSetupSetVerticalDpi:
+            case AscDFH.historyitem_PageSetupSetVerticalDpi:
             {
                 this.verticalDpi = data.newPr;
                 break;
@@ -11032,25 +11032,25 @@ CPageSetup.prototype =
         w.WriteLong(data.Type);
         switch (data.Type)
         {
-            case historyitem_PageSetupSetBlackAndWhite:
-            case historyitem_PageSetupSetDraft:
-            case historyitem_PageSetupSetUseFirstPageNumb:
+            case AscDFH.historyitem_PageSetupSetBlackAndWhite:
+            case AscDFH.historyitem_PageSetupSetDraft:
+            case AscDFH.historyitem_PageSetupSetUseFirstPageNumb:
             {
                 writeBool(w, data.newPr);
                 break;
             }
-            case historyitem_PageSetupSetCopies:
-            case historyitem_PageSetupSetFirstPageNumber:
-            case historyitem_PageSetupSetHorizontalDpi:
-            case historyitem_PageSetupSetOrientation:
-            case historyitem_PageSetupSetPaperSize:
-            case historyitem_PageSetupSetVerticalDpi:
+            case AscDFH.historyitem_PageSetupSetCopies:
+            case AscDFH.historyitem_PageSetupSetFirstPageNumber:
+            case AscDFH.historyitem_PageSetupSetHorizontalDpi:
+            case AscDFH.historyitem_PageSetupSetOrientation:
+            case AscDFH.historyitem_PageSetupSetPaperSize:
+            case AscDFH.historyitem_PageSetupSetVerticalDpi:
             {
                 writeLong(w, data.newPr);
                 break;
             }
-            case historyitem_PageSetupSetPaperHeight:
-            case historyitem_PageSetupSetPaperWidth:
+            case AscDFH.historyitem_PageSetupSetPaperHeight:
+            case AscDFH.historyitem_PageSetupSetPaperWidth:
             {
                 writeDouble(w, data.newPr);
                 break;
@@ -11063,57 +11063,57 @@ CPageSetup.prototype =
         var type = r.GetLong();
         switch (type)
         {
-            case historyitem_PageSetupSetBlackAndWhite:
+            case AscDFH.historyitem_PageSetupSetBlackAndWhite:
             {
                 this.blackAndWhite = readBool(r);
                 break;
             }
-            case historyitem_PageSetupSetCopies:
+            case AscDFH.historyitem_PageSetupSetCopies:
             {
                 this.copies = readLong(r);
                 break;
             }
-            case historyitem_PageSetupSetDraft:
+            case AscDFH.historyitem_PageSetupSetDraft:
             {
                 this.draft = readBool(r);
                 break;
             }
-            case historyitem_PageSetupSetFirstPageNumber:
+            case AscDFH.historyitem_PageSetupSetFirstPageNumber:
             {
                 this.firstPageNumber = readLong(r);
                 break;
             }
-            case historyitem_PageSetupSetHorizontalDpi:
+            case AscDFH.historyitem_PageSetupSetHorizontalDpi:
             {
                 this.horizontalDpi = readLong(r);
                 break;
             }
-            case historyitem_PageSetupSetOrientation:
+            case AscDFH.historyitem_PageSetupSetOrientation:
             {
                 this.orientation = readLong(r);
                 break;
             }
-            case historyitem_PageSetupSetPaperHeight:
+            case AscDFH.historyitem_PageSetupSetPaperHeight:
             {
                 this.paperHeight = readDouble(r);
                 break;
             }
-            case historyitem_PageSetupSetPaperSize:
+            case AscDFH.historyitem_PageSetupSetPaperSize:
             {
                 this.paperSize = readLong(r);
                 break;
             }
-            case historyitem_PageSetupSetPaperWidth:
+            case AscDFH.historyitem_PageSetupSetPaperWidth:
             {
                 this.paperWidth = readDouble(r);
                 break;
             }
-            case historyitem_PageSetupSetUseFirstPageNumb:
+            case AscDFH.historyitem_PageSetupSetUseFirstPageNumb:
             {
                 this.useFirstPageNumb = readBool(r);
                 break;
             }
-            case historyitem_PageSetupSetVerticalDpi:
+            case AscDFH.historyitem_PageSetupSetVerticalDpi:
             {
                 this.verticalDpi = readLong(r);
                 break;
@@ -12533,12 +12533,12 @@ function checkBlipFillRasterImages(sp)
 {
     switch (sp.getObjectType())
     {
-        case historyitem_type_Shape:
+        case AscDFH.historyitem_type_Shape:
         {
             checkSpPrRasterImages(sp.spPr);
             break;
         }
-        case historyitem_type_ImageShape:
+        case AscDFH.historyitem_type_ImageShape:
         {
             if(sp.blipFill)
             {
@@ -12548,7 +12548,7 @@ function checkBlipFillRasterImages(sp)
             }
             break;
         }
-        case historyitem_type_ChartSpace:
+        case AscDFH.historyitem_type_ChartSpace:
         {
             checkSpPrRasterImages(sp.spPr);
             var chart = sp.chart;
@@ -12581,7 +12581,7 @@ function checkBlipFillRasterImages(sp)
             }
             break;
         }
-        case historyitem_type_GroupShape:
+        case AscDFH.historyitem_type_GroupShape:
         {
             for(var i = 0; i < sp.spTree.length; ++i)
             {
@@ -12589,7 +12589,7 @@ function checkBlipFillRasterImages(sp)
             }
             break;
         }
-        case historyitem_type_GraphicFrame:
+        case AscDFH.historyitem_type_GraphicFrame:
         {
             break;
         }

@@ -2201,7 +2201,7 @@ CDocumentContent.prototype =
         var LastPara = this.Content[this.Content.length - 1];
         var LastPara2 = LastPara;
 
-        History.Create_NewPoint(historydescription_Document_DocumentContentExtendToPos);
+        History.Create_NewPoint(AscDFH.historydescription_Document_DocumentContentExtendToPos);
         History.Set_Additional_ExtendDocumentToPos();
 
         while ( true )
@@ -8376,7 +8376,7 @@ CDocumentContent.prototype =
             NextObj = null;
 
         this.private_RecalculateNumbering([NewObject]);
-        History.Add( this, { Type : historyitem_DocumentContent_AddItem, Pos : Position, Item : NewObject } );
+        History.Add( this, { Type : AscDFH.historyitem_DocumentContent_AddItem, Pos : Position, Item : NewObject } );
         this.Content.splice( Position, 0, NewObject );
         NewObject.Set_Parent( this );
         NewObject.Set_DocumentNext( NextObj );
@@ -8415,7 +8415,7 @@ CDocumentContent.prototype =
         for ( var Index = 0; Index < Count; Index++ )
             this.Content[Position + Index].PreDelete();
 
-        History.Add( this, { Type : historyitem_DocumentContent_RemoveItem, Pos : Position, Items : this.Content.slice( Position, Position + Count ) } );
+        History.Add( this, { Type : AscDFH.historyitem_DocumentContent_RemoveItem, Pos : Position, Items : this.Content.slice( Position, Position + Count ) } );
         var Elements = this.Content.splice( Position, Count );
         this.private_RecalculateNumbering(Elements);
 
@@ -8453,7 +8453,7 @@ CDocumentContent.prototype =
         for ( var Index = 0; Index < Count; Index++ )
             this.Content[Index].PreDelete();
 
-        History.Add( this, { Type : historyitem_DocumentContent_RemoveItem, Pos : 0, Items : this.Content.slice( 0, this.Content.length ) } );
+        History.Add( this, { Type : AscDFH.historyitem_DocumentContent_RemoveItem, Pos : 0, Items : this.Content.slice( 0, this.Content.length ) } );
         this.Content = [];
     },
 
@@ -8499,7 +8499,7 @@ CDocumentContent.prototype =
 
         switch ( Type )
         {
-            case historyitem_DocumentContent_AddItem:
+            case AscDFH.historyitem_DocumentContent_AddItem:
             {
                 var Elements = this.Content.splice( Data.Pos, 1 );
                 this.private_RecalculateNumbering(Elements);
@@ -8507,7 +8507,7 @@ CDocumentContent.prototype =
                 break;
             }
 
-            case historyitem_DocumentContent_RemoveItem:
+            case AscDFH.historyitem_DocumentContent_RemoveItem:
             {
                 var Pos = Data.Pos;
 
@@ -8528,7 +8528,7 @@ CDocumentContent.prototype =
 
         switch ( Type )
         {
-            case historyitem_DocumentContent_AddItem:
+            case AscDFH.historyitem_DocumentContent_AddItem:
             {
                 var Pos = Data.Pos;
                 this.Content.splice( Pos, 0, Data.Item );
@@ -8537,7 +8537,7 @@ CDocumentContent.prototype =
                 break;
             }
 
-            case historyitem_DocumentContent_RemoveItem:
+            case AscDFH.historyitem_DocumentContent_RemoveItem:
             {
                 var Elements = this.Content.splice( Data.Pos, Data.Items.length );
                 this.private_RecalculateNumbering(Elements);
@@ -8723,8 +8723,8 @@ CDocumentContent.prototype =
 
         switch ( Type )
         {
-            case historyitem_DocumentContent_AddItem:
-            case historyitem_DocumentContent_RemoveItem:
+            case AscDFH.historyitem_DocumentContent_AddItem:
+            case AscDFH.historyitem_DocumentContent_RemoveItem:
             {
                 for ( CurPage = this.Pages.length - 1; CurPage > 0; CurPage-- )
                 {
@@ -8857,7 +8857,7 @@ CDocumentContent.prototype =
         // Long : тип класса
         // Long : тип изменений
 
-        Writer.WriteLong( historyitem_type_DocumentContent );
+        Writer.WriteLong( AscDFH.historyitem_type_DocumentContent );
 
         var Type = Data.Type;
 
@@ -8866,7 +8866,7 @@ CDocumentContent.prototype =
 
         switch ( Type )
         {
-            case  historyitem_DocumentContent_AddItem:
+            case  AscDFH.historyitem_DocumentContent_AddItem:
             {
                 // Long     : Количество элементов
                 // Array of :
@@ -8893,7 +8893,7 @@ CDocumentContent.prototype =
                 break;
             }
 
-            case historyitem_DocumentContent_RemoveItem:
+            case AscDFH.historyitem_DocumentContent_RemoveItem:
             {
                 // Long          : Количество удаляемых элементов
                 // Array of Long : позиции удаляемых элементов
@@ -8936,12 +8936,12 @@ CDocumentContent.prototype =
         var Type = Data.Type;
         switch ( Type )
         {
-            case historyitem_DocumentContent_AddItem:
+            case AscDFH.historyitem_DocumentContent_AddItem:
             {
                 break;
             }
 
-            case historyitem_DocumentContent_RemoveItem:
+            case AscDFH.historyitem_DocumentContent_RemoveItem:
             {
                 break;
             }
@@ -8957,14 +8957,14 @@ CDocumentContent.prototype =
         // Long : тип изменений
 
         var ClassType = Reader.GetLong();
-        if ( historyitem_type_DocumentContent != ClassType )
+        if ( AscDFH.historyitem_type_DocumentContent != ClassType )
             return;
 
         var Type = Reader.GetLong();
 
         switch ( Type )
         {
-            case historyitem_DocumentContent_AddItem:
+            case AscDFH.historyitem_DocumentContent_AddItem:
             {
                 // Long     : Количество элементов
                 // Array of :
@@ -9006,7 +9006,7 @@ CDocumentContent.prototype =
                 break;
             }
 
-            case historyitem_DocumentContent_RemoveItem:
+            case AscDFH.historyitem_DocumentContent_RemoveItem:
             {
                 // Long          : Количество удаляемых элементов
                 // Array of Long : позиции удаляемых элементов
@@ -9053,7 +9053,7 @@ CDocumentContent.prototype =
 
     Write_ToBinary2 : function(Writer)
     {
-        Writer.WriteLong( historyitem_type_DocumentContent );
+        Writer.WriteLong( AscDFH.historyitem_type_DocumentContent );
 
         // String : Id текущего элемента
         // Long   : StartPage

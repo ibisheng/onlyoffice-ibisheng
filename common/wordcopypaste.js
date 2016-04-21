@@ -178,7 +178,7 @@ function Editor_Copy_Button(api, bCut)
 {
 	
 	if(bCut)
-		History.Create_NewPoint(historydescription_Cut);
+		History.Create_NewPoint(AscDFH.historydescription_Cut);
 	
     if(AscBrowser.isIE)
     {
@@ -374,7 +374,7 @@ function Editor_Copy(api, bCut)
                 __oncut = null;
 
                 if (false === api.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Paragraph_Content)) {
-					api.WordControl.m_oLogicDocument.Create_NewHistoryPoint(historydescription_Document_CutHotKey);
+					api.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_CutHotKey);
                     api.WordControl.m_oLogicDocument.Remove(1, true, true);
                     api.WordControl.m_oLogicDocument.Document_UpdateSelectionState();
                 }
@@ -425,7 +425,7 @@ function Editor_Copy(api, bCut)
         if(true == bCut)
         {
             //������� ���������� ��������
-            api.WordControl.m_oLogicDocument.Create_NewHistoryPoint(historydescription_Document_CutHotKey);
+            api.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_CutHotKey);
             api.WordControl.m_oLogicDocument.Remove(1, true, true);
             api.WordControl.m_oLogicDocument.Document_UpdateSelectionState();
         }
@@ -2134,7 +2134,7 @@ function Editor_Paste_Button(api)
         document.body.style["user-select"] = "none";
         document.body.style["-webkit-user-select"] = "none";
 
-		History.Create_NewPoint(historydescription_PasteButtonIE);
+		History.Create_NewPoint(AscDFH.historydescription_PasteButtonIE);
         editor.incrementCounterLongAction();
         Editor_Paste(api, false);
         return true;
@@ -2144,7 +2144,7 @@ function Editor_Paste_Button(api)
 		var ElemToSelect = document.getElementById( PasteElementsId.COPY_ELEMENT_ID );
 		if(ElemToSelect && ElemToSelect.innerHTML !== "&nbsp;" && ElemToSelect.innerHTML !== "")
 		{
-			History.Create_NewPoint(historydescription_PasteButtonNotIE);
+			History.Create_NewPoint(AscDFH.historydescription_PasteButtonNotIE);
             editor.incrementCounterLongAction();
 			Editor_Paste_Exec(api, ElemToSelect);
 		}
@@ -3009,7 +3009,7 @@ PasteProcessor.prototype =
 					//если находимся внутри шейп, вставляем html
 					if(this.oDocument.Parent && this.oDocument.Parent instanceof CShape)
 					{
-						if(oThis.oDocument && oThis.oDocument.Parent && oThis.oDocument.Parent.parent && oThis.oDocument.Parent.parent.parent && oThis.oDocument.Parent.parent.parent.getObjectType && oThis.oDocument.Parent.parent.parent.getObjectType() == historyitem_type_Chart)
+						if(oThis.oDocument && oThis.oDocument.Parent && oThis.oDocument.Parent.parent && oThis.oDocument.Parent.parent.parent && oThis.oDocument.Parent.parent.parent.getObjectType && oThis.oDocument.Parent.parent.parent.getObjectType() == AscDFH.historyitem_type_Chart)
 							base64 = null;
 						base64FromExcel = null;
 					}
@@ -3269,7 +3269,7 @@ PasteProcessor.prototype =
                     oThis.aContent = [];
                     
 					//если находимся внутри текстовой области диаграммы, то не вставляем ссылки
-					if(oThis.oDocument && oThis.oDocument.Parent && oThis.oDocument.Parent.parent && oThis.oDocument.Parent.parent.parent && oThis.oDocument.Parent.parent.parent.getObjectType && oThis.oDocument.Parent.parent.parent.getObjectType() == historyitem_type_Chart)
+					if(oThis.oDocument && oThis.oDocument.Parent && oThis.oDocument.Parent.parent && oThis.oDocument.Parent.parent.parent && oThis.oDocument.Parent.parent.parent.getObjectType && oThis.oDocument.Parent.parent.parent.getObjectType() == AscDFH.historyitem_type_Chart)
 					{
 						var hyperlinks = node.getElementsByTagName("a");
 						if(hyperlinks && hyperlinks.length)
@@ -4496,7 +4496,7 @@ PasteProcessor.prototype =
                 }
                 switch(oGraphicObj.getObjectType())
                 {
-                    case historyitem_type_ImageShape:
+                    case AscDFH.historyitem_type_ImageShape:
                     {
                         sImageUrl = oGraphicObj.getImageUrl();
                         if(typeof sImageUrl === "string" && sImageUrl.length > 0)
@@ -4506,15 +4506,15 @@ PasteProcessor.prototype =
                         }
                         break;
                     }
-                    case historyitem_type_Shape:
+                    case AscDFH.historyitem_type_Shape:
                     {
                         break;
                     }
-                    case historyitem_type_ChartSpace:
+                    case AscDFH.historyitem_type_ChartSpace:
                     {
                         break;
                     }
-                    case historyitem_type_GroupShape:
+                    case AscDFH.historyitem_type_GroupShape:
                     {
                         this._getImagesFromExcelShapes(null, oGraphicObj.spTree, aPastedImages, aUrls);
                         break;
@@ -5426,7 +5426,7 @@ PasteProcessor.prototype =
 			
 			//заглушка для вставки в excel внутрь шейпа
 			var tempRpr;
-			if(this.pasteInExcel === true && this.oDocument && this.oDocument.Parent && this.oDocument.Parent.parent && this.oDocument.Parent.parent.getObjectType() == historyitem_type_Shape)
+			if(this.pasteInExcel === true && this.oDocument && this.oDocument.Parent && this.oDocument.Parent.parent && this.oDocument.Parent.parent.getObjectType() == AscDFH.historyitem_type_Shape)
 			{
 				tempRpr = new CTextPr();
 				tempRpr.Underline = rPr.Underline;
@@ -7647,7 +7647,7 @@ function Editor_CopyPaste_Create(api)
 			ElemToSelect.innerHTML = "";
 			Editor_Copy_Event(e, ElemToSelect);
 
-            api.WordControl.m_oLogicDocument.Create_NewHistoryPoint(historydescription_Document_CutHotKey);
+            api.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_CutHotKey);
 			api.WordControl.m_oLogicDocument.Remove(1, true, true);
 			api.WordControl.m_oLogicDocument.Document_UpdateSelectionState();
 		}

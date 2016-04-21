@@ -557,14 +557,14 @@ CShape.prototype.Refresh_RecalcData2 = function()
             var oMainGroup = this.getMainGroup();
             if(oMainGroup.parent)
             {
-                oMainGroup.parent.Refresh_RecalcData({Type: historyitem_SetExtent});
+                oMainGroup.parent.Refresh_RecalcData({Type: AscDFH.historyitem_SetExtent});
             }
         }
         else
         {
             if(this.parent)
             {
-                this.parent.Refresh_RecalcData({Type: historyitem_SetExtent});
+                this.parent.Refresh_RecalcData({Type: AscDFH.historyitem_SetExtent});
             }
         }
         return;

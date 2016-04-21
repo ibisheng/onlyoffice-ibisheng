@@ -75,14 +75,14 @@ ParaField.prototype.Get_Bounds = function()
 };
 ParaField.prototype.Add_ToContent = function(Pos, Item, UpdatePosition)
 {
-    History.Add( this, { Type : historyitem_Field_AddItem, Pos : Pos, EndPos : Pos, Items : [ Item ] } );
+    History.Add( this, { Type : AscDFH.historyitem_Field_AddItem, Pos : Pos, EndPos : Pos, Items : [ Item ] } );
     ParaField.superclass.Add_ToContent.apply(this, arguments);
 };
 ParaField.prototype.Remove_FromContent = function(Pos, Count, UpdatePosition)
 {
     // Получим массив удаляемых элементов
     var DeletedItems = this.Content.slice( Pos, Pos + Count );
-    History.Add( this, { Type : historyitem_Field_RemoveItem, Pos : Pos, EndPos : Pos + Count - 1, Items : DeletedItems } );
+    History.Add( this, { Type : AscDFH.historyitem_Field_RemoveItem, Pos : Pos, EndPos : Pos + Count - 1, Items : DeletedItems } );
 
     ParaField.superclass.Remove_FromContent.apply(this, arguments);
 };
@@ -349,7 +349,7 @@ ParaField.prototype.Undo = function(Data)
     var Type = Data.Type;
     switch(Type)
     {
-        case historyitem_Field_AddItem :
+        case AscDFH.historyitem_Field_AddItem :
         {
             this.Content.splice( Data.Pos, Data.EndPos - Data.Pos + 1 );
             this.protected_UpdateSpellChecking();
@@ -357,7 +357,7 @@ ParaField.prototype.Undo = function(Data)
             break;
         }
 
-        case historyitem_Field_RemoveItem :
+        case AscDFH.historyitem_Field_RemoveItem :
         {
             var Pos = Data.Pos;
 
@@ -376,7 +376,7 @@ ParaField.prototype.Redo = function(Data)
     var Type = Data.Type;
     switch(Type)
     {
-        case historyitem_Field_AddItem :
+        case AscDFH.historyitem_Field_AddItem :
         {
             var Pos = Data.Pos;
 
@@ -389,7 +389,7 @@ ParaField.prototype.Redo = function(Data)
             break;
         }
 
-        case historyitem_Field_RemoveItem :
+        case AscDFH.historyitem_Field_RemoveItem :
         {
             this.Content.splice( Data.Pos, Data.EndPos - Data.Pos + 1 );
             this.private_UpdateTrackRevisions();
@@ -407,7 +407,7 @@ ParaField.prototype.Save_Changes = function(Data, Writer)
     // Long : тип класса
     // Long : тип изменений
 
-    Writer.WriteLong(historyitem_type_Field);
+    Writer.WriteLong(AscDFH.historyitem_type_Field);
 
     var Type = Data.Type;
 
@@ -416,7 +416,7 @@ ParaField.prototype.Save_Changes = function(Data, Writer)
 
     switch(Type)
     {
-        case historyitem_Field_AddItem :
+        case AscDFH.historyitem_Field_AddItem :
         {
             // Long     : Количество элементов
             // Array of :
@@ -443,7 +443,7 @@ ParaField.prototype.Save_Changes = function(Data, Writer)
             break;
         }
 
-        case historyitem_Field_RemoveItem :
+        case AscDFH.historyitem_Field_RemoveItem :
         {
             // Long          : Количество удаляемых элементов
             // Array of Long : позиции удаляемых элементов
@@ -484,14 +484,14 @@ ParaField.prototype.Load_Changes = function(Reader)
     // Long : тип изменений
 
     var ClassType = Reader.GetLong();
-    if ( historyitem_type_Field != ClassType )
+    if ( AscDFH.historyitem_type_Field != ClassType )
         return;
 
     var Type = Reader.GetLong();
 
     switch ( Type )
     {
-        case historyitem_Field_AddItem :
+        case AscDFH.historyitem_Field_AddItem :
         {
             // Long     : Количество элементов
             // Array of :
@@ -518,7 +518,7 @@ ParaField.prototype.Load_Changes = function(Reader)
             break;
         }
 
-        case historyitem_Field_RemoveItem:
+        case AscDFH.historyitem_Field_RemoveItem:
         {
             // Long          : Количество удаляемых элементов
             // Array of Long : позиции удаляемых элементов
@@ -544,7 +544,7 @@ ParaField.prototype.Load_Changes = function(Reader)
 };
 ParaField.prototype.Write_ToBinary2 = function(Writer)
 {
-    Writer.WriteLong(historyitem_type_Field);
+    Writer.WriteLong(AscDFH.historyitem_type_Field);
 
     // String : Id
     // Long   : FieldType

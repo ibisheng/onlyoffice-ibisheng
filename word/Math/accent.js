@@ -465,7 +465,7 @@ function CAccent(props)
 }
 AscCommon.extendClass(CAccent, CMathBase);
 
-CAccent.prototype.ClassType = historyitem_type_acc;
+CAccent.prototype.ClassType = AscDFH.historyitem_type_acc;
 CAccent.prototype.kind      = MATH_ACCENT;
 
 CAccent.prototype.init = function(props)

@@ -63,12 +63,12 @@ MasterSlide.prototype =
 
     getObjectType: function()
     {
-        return historyitem_type_SlideMaster;
+        return AscDFH.historyitem_type_SlideMaster;
     },
 
     setThemeIndex: function(index)
     {
-        History.Add(this, {Type: historyitem_SlideMasterSetThemeIndex, oldPr: this.ThemeIndex, newPr: index});
+        History.Add(this, {Type: AscDFH.historyitem_SlideMasterSetThemeIndex, oldPr: this.ThemeIndex, newPr: index});
         this.ThemeIndex = index;
     },
 
@@ -76,48 +76,48 @@ MasterSlide.prototype =
     {
         switch(data.Type)
         {
-            case historyitem_SlideMasterSetSize:
+            case AscDFH.historyitem_SlideMasterSetSize:
             {
                 this.Width  = data.oldW;
                 this.Height = data.oldH;
                 break;
             }
-            case historyitem_SlideMasterSetThemeIndex:
+            case AscDFH.historyitem_SlideMasterSetThemeIndex:
             {
                 this.ThemeIndex = data.oldPr;
                 break;
             }
-            case historyitem_SlideMasterAddToSpTree:
+            case AscDFH.historyitem_SlideMasterAddToSpTree:
             {
                 this.cSld.spTree.splice(data.Pos, 1);
                 break;
             }
-            case historyitem_SlideMasterSetTheme :
+            case AscDFH.historyitem_SlideMasterSetTheme :
             {
                 this.Theme = data.oldPr;
                 break;
             }
-            case historyitem_SlideMasterSetBg               :
+            case AscDFH.historyitem_SlideMasterSetBg               :
             {
                 this.cSld.Bg = data.oldPr;
                 break;
             }
-            case historyitem_SlideMasterSetTxStyles         :
+            case AscDFH.historyitem_SlideMasterSetTxStyles         :
             {
                 this.txStyles = data.oldPr;
                 break;
             }
-            case historyitem_SlideMasterSetCSldName         :
+            case AscDFH.historyitem_SlideMasterSetCSldName         :
             {
                 this.cSld.name = data.oldPr;
                 break;
             }
-            case historyitem_SlideMasterSetClrMapOverride   :
+            case AscDFH.historyitem_SlideMasterSetClrMapOverride   :
             {
                 this.clrMap = data.oldPr;
                 break;
             }
-            case historyitem_SlideMasterAddLayout           :
+            case AscDFH.historyitem_SlideMasterAddLayout           :
             {
                 this.sldLayoutLst.splice(data.Pos, 1);
                 break;
@@ -129,48 +129,48 @@ MasterSlide.prototype =
     {
         switch(data.Type)
         {
-            case historyitem_SlideMasterSetSize:
+            case AscDFH.historyitem_SlideMasterSetSize:
             {
                 this.Width  = data.newW;
                 this.Height = data.newH;
                 break;
             }
-            case historyitem_SlideMasterSetThemeIndex:
+            case AscDFH.historyitem_SlideMasterSetThemeIndex:
             {
                 this.ThemeIndex = data.newPr;
                 break;
             }
-            case historyitem_SlideMasterAddToSpTree:
+            case AscDFH.historyitem_SlideMasterAddToSpTree:
             {
                 this.cSld.spTree.splice(data.Pos, 0, data.Item);
                 break;
             }
-            case historyitem_SlideMasterSetTheme :
+            case AscDFH.historyitem_SlideMasterSetTheme :
             {
                 this.Theme = data.newPr;
                 break;
             }
-            case historyitem_SlideMasterSetBg               :
+            case AscDFH.historyitem_SlideMasterSetBg               :
             {
                 this.cSld.Bg = data.newPr;
                 break;
             }
-            case historyitem_SlideMasterSetTxStyles         :
+            case AscDFH.historyitem_SlideMasterSetTxStyles         :
             {
                 this.txStyles = data.newPr;
                 break;
             }
-            case historyitem_SlideMasterSetCSldName         :
+            case AscDFH.historyitem_SlideMasterSetCSldName         :
             {
                 this.cSld.name = data.newPr;
                 break;
             }
-            case historyitem_SlideMasterSetClrMapOverride   :
+            case AscDFH.historyitem_SlideMasterSetClrMapOverride   :
             {
                 this.clrMap = data.newPr;
                 break;
             }
-            case historyitem_SlideMasterAddLayout           :
+            case AscDFH.historyitem_SlideMasterAddLayout           :
             {
                 this.sldLayoutLst.splice(data.Pos, 0, data.Item);
                 break;
@@ -180,7 +180,7 @@ MasterSlide.prototype =
 
     Write_ToBinary2: function(w)
     {
-        w.WriteLong(historyitem_type_SlideMaster);
+        w.WriteLong(AscDFH.historyitem_type_SlideMaster);
         w.WriteString2(this.Id);
         writeObject(w, this.theme);
     },
@@ -196,38 +196,38 @@ MasterSlide.prototype =
         w.WriteLong(data.Type);
         switch(data.Type)
         {
-            case historyitem_SlideMasterSetSize:
+            case AscDFH.historyitem_SlideMasterSetSize:
             {
                 writeDouble(w, data.newW);
                 writeDouble(w, data.newH);
                 break;
             }
-            case historyitem_SlideMasterAddToSpTree:
-            case historyitem_SlideMasterAddLayout           :
+            case AscDFH.historyitem_SlideMasterAddToSpTree:
+            case AscDFH.historyitem_SlideMasterAddLayout           :
             {
                 writeLong(w, data.Pos);
                 writeObject(w, data.Item);
                 break;
             }
-            case historyitem_SlideMasterSetBg :
-            case historyitem_SlideMasterSetTxStyles         :
+            case AscDFH.historyitem_SlideMasterSetBg :
+            case AscDFH.historyitem_SlideMasterSetTxStyles         :
             {
                 data.newPr.Write_ToBinary(w);
                 break;
             }
-            case historyitem_SlideMasterSetCSldName         :
+            case AscDFH.historyitem_SlideMasterSetCSldName         :
             {
                 writeString(w, data.newPr);
                 break;
             }
 
-            case historyitem_SlideMasterSetTheme :
-            case historyitem_SlideMasterSetClrMapOverride   :
+            case AscDFH.historyitem_SlideMasterSetTheme :
+            case AscDFH.historyitem_SlideMasterSetClrMapOverride   :
             {
                 writeObject(w, data.newPr);
                 break;
             }
-            case historyitem_SlideMasterSetThemeIndex:
+            case AscDFH.historyitem_SlideMasterSetThemeIndex:
             {
                 writeLong(w, data.newPr);
                 break;
@@ -240,25 +240,25 @@ MasterSlide.prototype =
         var type = r.GetLong();
         switch(type)
         {
-            case historyitem_SlideMasterSetSize:
+            case AscDFH.historyitem_SlideMasterSetSize:
             {
                 this.Width  = readDouble(r);
                 this.Height = readDouble(r);
                 break;
             }
-            case historyitem_SlideMasterAddToSpTree:
+            case AscDFH.historyitem_SlideMasterAddToSpTree:
             {
                 var Pos = readLong(r);
                 var Item = readObject(r);
                 this.cSld.spTree.splice(Pos, 0, Item);
                 break;
             }
-            case historyitem_SlideMasterSetTheme :
+            case AscDFH.historyitem_SlideMasterSetTheme :
             {
                 this.Theme = readObject(r);
                 break;
             }
-            case historyitem_SlideMasterSetBg               :
+            case AscDFH.historyitem_SlideMasterSetBg               :
             {
                 this.cSld.Bg = new CBg();
                 this.cSld.Bg.Read_FromBinary(r);
@@ -276,30 +276,30 @@ MasterSlide.prototype =
                 }
                 break;
             }
-            case historyitem_SlideMasterSetTxStyles         :
+            case AscDFH.historyitem_SlideMasterSetTxStyles         :
             {
                 this.txStyles = new CTextStyles();
                 this.txStyles.Read_FromBinary(r);
                 break;
             }
-            case historyitem_SlideMasterSetCSldName         :
+            case AscDFH.historyitem_SlideMasterSetCSldName         :
             {
                 this.cSld.name = readString(r);
                 break;
             }
-            case historyitem_SlideMasterSetClrMapOverride   :
+            case AscDFH.historyitem_SlideMasterSetClrMapOverride   :
             {
                 this.clrMap = readObject(r);
                 break;
             }
-            case historyitem_SlideMasterAddLayout           :
+            case AscDFH.historyitem_SlideMasterAddLayout           :
             {
                 var Pos = readLong(r);
                 var Item = readObject(r);
                 this.sldLayoutLst.splice(Pos, 0, Item);
                 break;
             }
-            case historyitem_SlideMasterSetThemeIndex:
+            case AscDFH.historyitem_SlideMasterSetThemeIndex:
             {
                 this.ThemeIndex = readLong(r);
                 if (isRealNumber(this.ThemeIndex) && editor && editor.ThemeLoader)
@@ -583,7 +583,7 @@ MasterSlide.prototype =
 
     setSlideSize: function(w, h)
     {
-        History.Add(this, {Type: historyitem_SlideMasterSetSize, oldW: this.Width, oldH: this.Height, newW: w, newH: h});
+        History.Add(this, {Type: AscDFH.historyitem_SlideMasterSetSize, oldW: this.Width, oldH: this.Height, newW: w, newH: h});
         this.Width = w;
         this.Height = h;
     },
@@ -592,43 +592,43 @@ MasterSlide.prototype =
 
     setTheme: function(theme)
     {
-        History.Add(this, {Type: historyitem_SlideMasterSetTheme, oldPr: this.Theme, newPr: theme});
+        History.Add(this, {Type: AscDFH.historyitem_SlideMasterSetTheme, oldPr: this.Theme, newPr: theme});
         this.Theme = theme;
     },
 
     shapeAdd: function(pos, item)
     {
         this.checkDrawingUniNvPr(item);
-        History.Add(this, {Type: historyitem_SlideMasterAddToSpTree, Pos: pos, Item: item});
+        History.Add(this, {Type: AscDFH.historyitem_SlideMasterAddToSpTree, Pos: pos, Item: item});
         this.cSld.spTree.splice(pos, 0, item);
     },
 
     changeBackground: function(bg)
     {
-        History.Add(this, {Type: historyitem_SlideMasterSetBg, oldPr: this.cSld.Bg , newPr: bg});
+        History.Add(this, {Type: AscDFH.historyitem_SlideMasterSetBg, oldPr: this.cSld.Bg , newPr: bg});
         this.cSld.Bg = bg;
     },
 
     setTxStyles: function(txStyles)
     {
-        History.Add(this, {Type: historyitem_SlideMasterSetTxStyles, oldPr: this.txStyles, newPr: txStyles});
+        History.Add(this, {Type: AscDFH.historyitem_SlideMasterSetTxStyles, oldPr: this.txStyles, newPr: txStyles});
         this.txStyles = txStyles;
     },
 
     setCSldName: function(name)
     {
-        History.Add(this, {Type: historyitem_SlideMasterSetCSldName,oldPr: this.cSld.name, newPr: name});
+        History.Add(this, {Type: AscDFH.historyitem_SlideMasterSetCSldName,oldPr: this.cSld.name, newPr: name});
         this.cSld.name = name;
     },
     setClMapOverride: function(clrMap)
     {
-        History.Add(this, {Type: historyitem_SlideMasterSetClrMapOverride, oldPr: this.clrMap, newPr: clrMap});
+        History.Add(this, {Type: AscDFH.historyitem_SlideMasterSetClrMapOverride, oldPr: this.clrMap, newPr: clrMap});
         this.clrMap = clrMap;
     },
 
     addToSldLayoutLstToPos: function(pos, obj)
     {
-        History.Add(this, {Type: historyitem_SlideMasterAddLayout, Item: obj, Pos:pos});
+        History.Add(this, {Type: AscDFH.historyitem_SlideMasterAddLayout, Item: obj, Pos:pos});
         this.sldLayoutLst.splice(pos, 0, obj);
 
     },

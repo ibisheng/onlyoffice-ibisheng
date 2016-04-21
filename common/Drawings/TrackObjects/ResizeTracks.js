@@ -338,7 +338,7 @@ function ResizeTrackShapeImage(originalObject, cardDirection)
         this.resizedRot = originalObject.rot;
 
         this.transform = originalObject.transform.CreateDublicate();
-        this.geometry = !(originalObject.getObjectType() === historyitem_type_ChartSpace) && originalObject.spPr && originalObject.spPr.geometry ?  originalObject.spPr.geometry.createDuplicate() : (function(){ var geometry = CreateGeometry("rect"); geometry.Recalculate(5, 5); return geometry})();
+        this.geometry = !(originalObject.getObjectType() === AscDFH.historyitem_type_ChartSpace) && originalObject.spPr && originalObject.spPr.geometry ?  originalObject.spPr.geometry.createDuplicate() : (function(){ var geometry = CreateGeometry("rect"); geometry.Recalculate(5, 5); return geometry})();
 
         if(!originalObject.isChart())
         {
@@ -915,7 +915,7 @@ function ResizeTrackShapeImage(originalObject, cardDirection)
             xfrm.setOffY(this.resizedPosY/scale_coefficients.cy + ch_off_y);
             xfrm.setExtX(this.resizedExtX/scale_coefficients.cx);
             xfrm.setExtY(this.resizedExtY/scale_coefficients.cy);
-            if(this.originalObject.getObjectType() !== historyitem_type_ChartSpace)
+            if(this.originalObject.getObjectType() !== AscDFH.historyitem_type_ChartSpace)
             {
                 xfrm.setFlipH(this.resizedflipH);
                 xfrm.setFlipV(this.resizedflipV);
@@ -1618,7 +1618,7 @@ function ShapeForResizeInGroup(originalObject, parentTrack)
         this.bSwapCoef = !(checkNormalRotate(this.rot));
         this.centerDistX = this.x + this.extX*0.5 - this.parentTrack.extX*0.5;
         this.centerDistY = this.y + this.extY*0.5 - this.parentTrack.extY*0.5;
-        this.geometry = !(originalObject.getObjectType() === historyitem_type_ChartSpace) && originalObject.spPr.geometry !== null ? originalObject.spPr.geometry.createDuplicate() : null;
+        this.geometry = !(originalObject.getObjectType() === AscDFH.historyitem_type_ChartSpace) && originalObject.spPr.geometry !== null ? originalObject.spPr.geometry.createDuplicate() : null;
         if(this.geometry)
         {
             this.geometry.Recalculate(this.extX, this.extY);

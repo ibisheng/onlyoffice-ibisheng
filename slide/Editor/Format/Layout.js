@@ -48,7 +48,7 @@ SlideLayout.prototype =
 
     getObjectType: function()
     {
-        return historyitem_type_SlideLayout;
+        return AscDFH.historyitem_type_SlideLayout;
     },
 
 
@@ -56,58 +56,58 @@ SlideLayout.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_SlideLayoutSetSize:
+            case AscDFH.historyitem_SlideLayoutSetSize:
             {
                 this.Width  = data.oldW;
                 this.Height = data.oldH;
                 break;
             }
-            case historyitem_SlideLayoutSetMaster      :
+            case AscDFH.historyitem_SlideLayoutSetMaster      :
             {
                 this.Master = data.oldPr;
                 break;
             }
-            case historyitem_SlideLayoutSetMatchingName  :
+            case AscDFH.historyitem_SlideLayoutSetMatchingName  :
             {
                 this.matchingName = data.oldPr;
                 break;
             }
-            case historyitem_SlideLayoutSetType          :
+            case AscDFH.historyitem_SlideLayoutSetType          :
             {
                 this.type = data.oldPr;
                 break;
             }
-            case historyitem_SlideLayoutSetBg            :
+            case AscDFH.historyitem_SlideLayoutSetBg            :
             {
                 this.cSld.Bg = data.oldPr;
                 break;
             }
-            case historyitem_SlideLayoutSetCSldName      :
+            case AscDFH.historyitem_SlideLayoutSetCSldName      :
             {
                 this.cSld.name = data.oldPr;
                 break;
             }
-            case historyitem_SlideLayoutSetShow          :
+            case AscDFH.historyitem_SlideLayoutSetShow          :
             {
                 this.show = data.oldPr;
                 break;
             }
-            case historyitem_SlideLayoutSetShowPhAnim    :
+            case AscDFH.historyitem_SlideLayoutSetShowPhAnim    :
             {
                 this.showMasterPhAnim = data.oldPr;
                 break;
             }
-            case historyitem_SlideLayoutSetShowMasterSp  :
+            case AscDFH.historyitem_SlideLayoutSetShowMasterSp  :
             {
                 this.showMasterSp = data.oldPr;
                 break;
             }
-            case historyitem_SlideLayoutSetClrMapOverride:
+            case AscDFH.historyitem_SlideLayoutSetClrMapOverride:
             {
                 this.clrMap = data.oldPr;
                 break;
             }
-            case historyitem_SlideLayoutAddToSpTree      :
+            case AscDFH.historyitem_SlideLayoutAddToSpTree      :
             {
                 this.cSld.spTree.splice(data.Pos, 1);
                 break;
@@ -119,58 +119,58 @@ SlideLayout.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_SlideLayoutSetSize:
+            case AscDFH.historyitem_SlideLayoutSetSize:
             {
                 this.Width  = data.newW;
                 this.Height = data.newH;
                 break;
             }
-            case historyitem_SlideLayoutSetMaster      :
+            case AscDFH.historyitem_SlideLayoutSetMaster      :
             {
                 this.Master = data.newPr;
                 break;
             }
-            case historyitem_SlideLayoutSetMatchingName  :
+            case AscDFH.historyitem_SlideLayoutSetMatchingName  :
             {
                 this.matchingName = data.newPr;
                 break;
             }
-            case historyitem_SlideLayoutSetType          :
+            case AscDFH.historyitem_SlideLayoutSetType          :
             {
                 this.type = data.newPr;
                 break;
             }
-            case historyitem_SlideLayoutSetBg            :
+            case AscDFH.historyitem_SlideLayoutSetBg            :
             {
                 this.cSld.Bg = data.newPr;
                 break;
             }
-            case historyitem_SlideLayoutSetCSldName      :
+            case AscDFH.historyitem_SlideLayoutSetCSldName      :
             {
                 this.cSld.name = data.newPr;
                 break;
             }
-            case historyitem_SlideLayoutSetShow          :
+            case AscDFH.historyitem_SlideLayoutSetShow          :
             {
                 this.show = data.newPr;
                 break;
             }
-            case historyitem_SlideLayoutSetShowPhAnim    :
+            case AscDFH.historyitem_SlideLayoutSetShowPhAnim    :
             {
                 this.showMasterPhAnim = data.newPr;
                 break;
             }
-            case historyitem_SlideLayoutSetShowMasterSp  :
+            case AscDFH.historyitem_SlideLayoutSetShowMasterSp  :
             {
                 this.showMasterSp = data.newPr;
                 break;
             }
-            case historyitem_SlideLayoutSetClrMapOverride:
+            case AscDFH.historyitem_SlideLayoutSetClrMapOverride:
             {
                 this.clrMap = data.newPr;
                 break;
             }
-            case historyitem_SlideLayoutAddToSpTree      :
+            case AscDFH.historyitem_SlideLayoutAddToSpTree      :
             {
                 this.cSld.spTree.splice(data.Pos, 0, data.Item);
                 break;
@@ -184,42 +184,42 @@ SlideLayout.prototype =
         w.WriteLong(data.Type);
         switch (data.Type)
         {
-            case historyitem_SlideLayoutSetSize:
+            case AscDFH.historyitem_SlideLayoutSetSize:
             {
                 writeDouble(w, data.newW);
                 writeDouble(w, data.newH);
                 break;
             }
-            case historyitem_SlideLayoutSetMaster      :
-            case historyitem_SlideLayoutSetClrMapOverride:
+            case AscDFH.historyitem_SlideLayoutSetMaster      :
+            case AscDFH.historyitem_SlideLayoutSetClrMapOverride:
             {
                 writeObject(w, data.newPr);
                 break;
             }
-            case historyitem_SlideLayoutSetMatchingName  :
-            case historyitem_SlideLayoutSetCSldName      :
+            case AscDFH.historyitem_SlideLayoutSetMatchingName  :
+            case AscDFH.historyitem_SlideLayoutSetCSldName      :
             {
                 writeString(w, data.newPr);
                 break;
             }
-            case historyitem_SlideLayoutSetType          :
+            case AscDFH.historyitem_SlideLayoutSetType          :
             {
                 writeLong(w, data.newPr);
                 break;
             }
-            case historyitem_SlideLayoutSetBg            :
+            case AscDFH.historyitem_SlideLayoutSetBg            :
             {
                 data.newPr.Write_ToBinary(w);
                 break;
             }
-            case historyitem_SlideLayoutSetShow          :
-            case historyitem_SlideLayoutSetShowPhAnim    :
-            case historyitem_SlideLayoutSetShowMasterSp  :
+            case AscDFH.historyitem_SlideLayoutSetShow          :
+            case AscDFH.historyitem_SlideLayoutSetShowPhAnim    :
+            case AscDFH.historyitem_SlideLayoutSetShowMasterSp  :
             {
                 writeBool(w, data.newPr);
                 break;
             }
-            case historyitem_SlideLayoutAddToSpTree      :
+            case AscDFH.historyitem_SlideLayoutAddToSpTree      :
             {
                 writeLong(w, data.Pos);
                 writeObject(w, data.Item);
@@ -233,28 +233,28 @@ SlideLayout.prototype =
         var type = r.GetLong();
         switch (type)
         {
-            case historyitem_SlideLayoutSetSize:
+            case AscDFH.historyitem_SlideLayoutSetSize:
             {
                 this.Width  = readDouble(r);
                 this.Height = readDouble(r);
                 break;
             }
-            case historyitem_SlideLayoutSetMaster      :
+            case AscDFH.historyitem_SlideLayoutSetMaster      :
             {
                 this.Master = readObject(r);
                 break;
             }
-            case historyitem_SlideLayoutSetMatchingName  :
+            case AscDFH.historyitem_SlideLayoutSetMatchingName  :
             {
                 this.matchingName = readString(r);
                 break;
             }
-            case historyitem_SlideLayoutSetType          :
+            case AscDFH.historyitem_SlideLayoutSetType          :
             {
                 this.type = readLong(r);
                 break;
             }
-            case historyitem_SlideLayoutSetBg            :
+            case AscDFH.historyitem_SlideLayoutSetBg            :
             {
                 this.cSld.Bg = new CBg();
                 this.cSld.Bg.Read_FromBinary(r);
@@ -273,32 +273,32 @@ SlideLayout.prototype =
                 }
                 break;
             }
-            case historyitem_SlideLayoutSetCSldName      :
+            case AscDFH.historyitem_SlideLayoutSetCSldName      :
             {
                 this.cSld.name = readString(r);
                 break;
             }
-            case historyitem_SlideLayoutSetShow          :
+            case AscDFH.historyitem_SlideLayoutSetShow          :
             {
                 this.show = readBool(r);
                 break;
             }
-            case historyitem_SlideLayoutSetShowPhAnim    :
+            case AscDFH.historyitem_SlideLayoutSetShowPhAnim    :
             {
                 this.showMasterPhAnim = readBool(r);
                 break;
             }
-            case historyitem_SlideLayoutSetShowMasterSp  :
+            case AscDFH.historyitem_SlideLayoutSetShowMasterSp  :
             {
                 this.showMasterSp = readBool(r);
                 break;
             }
-            case historyitem_SlideLayoutSetClrMapOverride:
+            case AscDFH.historyitem_SlideLayoutSetClrMapOverride:
             {
                 this.clrMap = readObject(r);
                 break;
             }
-            case historyitem_SlideLayoutAddToSpTree      :
+            case AscDFH.historyitem_SlideLayoutAddToSpTree      :
             {
                 var Pos = readLong(r);
                 var Item = readObject(r);
@@ -310,7 +310,7 @@ SlideLayout.prototype =
 
     Write_ToBinary2: function(w)
     {
-        w.WriteLong(historyitem_type_SlideLayout);
+        w.WriteLong(AscDFH.historyitem_type_SlideLayout);
         w.WriteString2(this.Id);
     },
 
@@ -322,54 +322,54 @@ SlideLayout.prototype =
 
     setMaster: function(master)
     {
-        History.Add(this, {Type: historyitem_SlideLayoutSetMaster, oldPr: this.Master, newPr:master});
+        History.Add(this, {Type: AscDFH.historyitem_SlideLayoutSetMaster, oldPr: this.Master, newPr:master});
         this.Master = master;
     },
     setMatchingName: function(name)
     {
-        History.Add(this, {Type: historyitem_SlideLayoutSetMatchingName, oldPr: this.matchingName, newPr:name});
+        History.Add(this, {Type: AscDFH.historyitem_SlideLayoutSetMatchingName, oldPr: this.matchingName, newPr:name});
         this.matchingName = name;
     },
 
     setType: function(type)
     {
-        History.Add(this, {Type:historyitem_SlideLayoutSetType, oldPr: this.type, newPr:type});
+        History.Add(this, {Type:AscDFH.historyitem_SlideLayoutSetType, oldPr: this.type, newPr:type});
         this.type = type;
     },
 
     changeBackground: function(bg)
     {
-        History.Add(this, {Type: historyitem_SlideLayoutSetBg, oldPr: this.cSld.Bg, newPr: bg});
+        History.Add(this, {Type: AscDFH.historyitem_SlideLayoutSetBg, oldPr: this.cSld.Bg, newPr: bg});
         this.cSld.Bg = bg;
     },
 
     setCSldName: function(name)
     {
-        History.Add(this, {Type: historyitem_SlideLayoutSetCSldName,oldPr: this.cSld.name, newPr: name});
+        History.Add(this, {Type: AscDFH.historyitem_SlideLayoutSetCSldName,oldPr: this.cSld.name, newPr: name});
         this.cSld.name = name;
     },
     setShow: function(bShow)
     {
-        History.Add(this, {Type:historyitem_SlideLayoutSetShow, oldPr: this.show, newPr: bShow});
+        History.Add(this, {Type:AscDFH.historyitem_SlideLayoutSetShow, oldPr: this.show, newPr: bShow});
         this.show = bShow;
     },
 
     setShowPhAnim: function(bShow)
     {
-        History.Add(this, {Type: historyitem_SlideLayoutSetShowPhAnim, oldPr: this.showMasterPhAnim, newPr: bShow});
+        History.Add(this, {Type: AscDFH.historyitem_SlideLayoutSetShowPhAnim, oldPr: this.showMasterPhAnim, newPr: bShow});
         this.showMasterPhAnim = bShow;
     },
 
     setShowMasterSp: function(bShow)
     {
-        History.Add(this, {Type: historyitem_SlideLayoutSetShowMasterSp, oldPr: this.showMasterSp, newPr: bShow});
+        History.Add(this, {Type: AscDFH.historyitem_SlideLayoutSetShowMasterSp, oldPr: this.showMasterSp, newPr: bShow});
         this.showMasterSp = bShow;
 
     },
 
     setClMapOverride: function(clrMap)
     {
-        History.Add(this, {Type: historyitem_SlideLayoutSetClrMapOverride, oldClrMap: this.clrMap, newClrMap: clrMap});
+        History.Add(this, {Type: AscDFH.historyitem_SlideLayoutSetClrMapOverride, oldClrMap: this.clrMap, newClrMap: clrMap});
         this.clrMap = clrMap;
     },
 
@@ -377,14 +377,14 @@ SlideLayout.prototype =
     {
 
         this.checkDrawingUniNvPr(item);
-        History.Add(this, {Type: historyitem_SlideLayoutAddToSpTree, Pos: pos, Item: item});
+        History.Add(this, {Type: AscDFH.historyitem_SlideLayoutAddToSpTree, Pos: pos, Item: item});
         this.cSld.spTree.splice(pos, 0, item);
     },
 
 
     setSlideSize: function(w, h)
     {
-        History.Add(this, {Type: historyitem_SlideLayoutSetSize, oldW: this.Width, oldH: this.Height, newW: w, newH: h});
+        History.Add(this, {Type: AscDFH.historyitem_SlideLayoutSetSize, oldW: this.Width, oldH: this.Height, newW: w, newH: h});
         this.Width = w;
         this.Height = h;
     },

@@ -50,7 +50,7 @@ function CFraction(props)
 }
 AscCommon.extendClass(CFraction, CMathBase);
 
-CFraction.prototype.ClassType = historyitem_type_frac;
+CFraction.prototype.ClassType = AscDFH.historyitem_type_frac;
 CFraction.prototype.kind      = MATH_FRACTION;
 
 CFraction.prototype.init = function(props)

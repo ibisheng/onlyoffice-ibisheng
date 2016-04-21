@@ -76,7 +76,7 @@ Slide.prototype =
 {
     getObjectType: function()
     {
-        return historyitem_type_Slide;
+        return AscDFH.historyitem_type_Slide;
     },
 
     getDrawingDocument: function()
@@ -349,7 +349,7 @@ Slide.prototype =
 
     addToRecalculate: function()
     {
-        History.RecalcData_Add({Type: historyrecalctype_Drawing, Object: this});
+        History.RecalcData_Add({Type: AscDFH.historyitem_recalctype_Drawing, Object: this});
     },
 
     Refresh_RecalcData: function(data)
@@ -358,12 +358,12 @@ Slide.prototype =
         {
             switch(data.Type)
             {
-                case historyitem_SlideSetBg:
+                case AscDFH.historyitem_SlideSetBg:
                 {
                     this.recalcInfo.recalculateBackground = true;
                     break;
                 }
-                case historyitem_SlideSetLayout:
+                case AscDFH.historyitem_SlideSetLayout:
                 {
                     this.checkSlideTheme();
                     break;
@@ -375,7 +375,7 @@ Slide.prototype =
 
     Write_ToBinary2: function(w)
     {
-        w.WriteLong(historyitem_type_Slide);
+        w.WriteLong(AscDFH.historyitem_type_Slide);
         w.WriteString2(this.Id);
     },
 
@@ -388,53 +388,53 @@ Slide.prototype =
     {
         switch(data.Type)
         {
-            case historyitem_SlideSetComments:
+            case AscDFH.historyitem_SlideSetComments:
             {
                 this.slideComments = data.oldPr;
                 break;
             }
-            case historyitem_SlideSetShow:
+            case AscDFH.historyitem_SlideSetShow:
             {
                 this.show = data.oldPr;
                 break;
             }
-            case historyitem_SlideSetShowPhAnim:
+            case AscDFH.historyitem_SlideSetShowPhAnim:
             {
                 this.showMasterPhAnim = data.oldPr;
                 break;
             }
-            case historyitem_SlideSetShowMasterSp:
+            case AscDFH.historyitem_SlideSetShowMasterSp:
             {
                 this.showMasterSp = data.oldPr;
                 break;
             }
-            case historyitem_SlideSetLayout:
+            case AscDFH.historyitem_SlideSetLayout:
             {
                 this.Layout = data.oldPr;
                 break;
             }
-            case historyitem_SlideSetNum:
+            case AscDFH.historyitem_SlideSetNum:
             {
                 this.num = data.oldPr;
                 break;
             }
-            case historyitem_SlideSetTiming:
+            case AscDFH.historyitem_SlideSetTiming:
             {
                 this.timing = data.oldPr;
                 break;
             }
-            case historyitem_SlideSetSize:
+            case AscDFH.historyitem_SlideSetSize:
             {
                 this.Width  = data.oldW;
                 this.Height = data.oldH;
                 break;
             }
-            case historyitem_SlideSetBg:
+            case AscDFH.historyitem_SlideSetBg:
             {
                 this.cSld.Bg = data.oldPr;
                 break;
             }
-            case historyitem_SlideSetLocks:
+            case AscDFH.historyitem_SlideSetLocks:
             {
                 this.deleteLock     = null;
                 this.backgroundLock = null;
@@ -443,22 +443,22 @@ Slide.prototype =
                 this.layoutLock     = null;
                 break;
             }
-            case historyitem_SlideAddToSpTree:
+            case AscDFH.historyitem_SlideAddToSpTree:
             {
                 this.cSld.spTree.splice(data.Pos, 1);
                 break;
             }
-            case historyitem_SlideRemoveFromSpTree:
+            case AscDFH.historyitem_SlideRemoveFromSpTree:
             {
                 this.cSld.spTree.splice(data.Pos, 0, data.Item);
                 break;
             }
-            case historyitem_SlideSetCSldName:
+            case AscDFH.historyitem_SlideSetCSldName:
             {
                 this.cSld.name = data.oldPr;
                 break;
             }
-            case historyitem_SlideSetClrMapOverride:
+            case AscDFH.historyitem_SlideSetClrMapOverride:
             {
                 this.clrMap = data.oldPr;
                 break;
@@ -470,53 +470,53 @@ Slide.prototype =
     {
         switch(data.Type)
         {
-            case historyitem_SlideSetComments:
+            case AscDFH.historyitem_SlideSetComments:
             {
                 this.slideComments = data.newPr;
                 break;
             }
-            case historyitem_SlideSetShow:
+            case AscDFH.historyitem_SlideSetShow:
             {
                 this.show = data.newPr;
                 break;
             }
-            case historyitem_SlideSetShowPhAnim:
+            case AscDFH.historyitem_SlideSetShowPhAnim:
             {
                 this.showMasterPhAnim = data.newPr;
                 break;
             }
-            case historyitem_SlideSetShowMasterSp:
+            case AscDFH.historyitem_SlideSetShowMasterSp:
             {
                 this.showMasterSp = data.newPr;
                 break;
             }
-            case historyitem_SlideSetLayout:
+            case AscDFH.historyitem_SlideSetLayout:
             {
                 this.Layout = data.newPr;
                 break;
             }
-            case historyitem_SlideSetNum:
+            case AscDFH.historyitem_SlideSetNum:
             {
                 this.num = data.newPr;
                 break;
             }
-            case historyitem_SlideSetTiming:
+            case AscDFH.historyitem_SlideSetTiming:
             {
                 this.timing = data.newPr;
                 break;
             }
-            case historyitem_SlideSetSize:
+            case AscDFH.historyitem_SlideSetSize:
             {
                 this.Width  = data.newW;
                 this.Height = data.newH;
                 break;
             }
-            case historyitem_SlideSetBg:
+            case AscDFH.historyitem_SlideSetBg:
             {
                 this.cSld.Bg = data.newPr;
                 break;
             }
-            case historyitem_SlideSetLocks:
+            case AscDFH.historyitem_SlideSetLocks:
             {
                 this.deleteLock     = data.deleteLock    ;
                 this.backgroundLock = data.backgroundLock;
@@ -525,22 +525,22 @@ Slide.prototype =
                 this.layoutLock     = data.layoutLock    ;
                 break;
             }
-            case historyitem_SlideAddToSpTree:
+            case AscDFH.historyitem_SlideAddToSpTree:
             {
                 this.cSld.spTree.splice(data.Pos, 0, data.Item);
                 break;
             }
-            case historyitem_SlideRemoveFromSpTree:
+            case AscDFH.historyitem_SlideRemoveFromSpTree:
             {
                 this.cSld.spTree.splice(data.Pos, 1);
                 break;
             }
-            case historyitem_SlideSetCSldName:
+            case AscDFH.historyitem_SlideSetCSldName:
             {
                 this.cSld.name = data.newPr;
                 break;
             }
-            case historyitem_SlideSetClrMapOverride:
+            case AscDFH.historyitem_SlideSetClrMapOverride:
             {
                 this.clrMap = data.newPr;
                 break;
@@ -553,38 +553,38 @@ Slide.prototype =
         w.WriteLong(data.Type);
         switch(data.Type)
         {
-            case historyitem_SlideSetComments:
-            case historyitem_SlideSetLayout:
-            case historyitem_SlideSetClrMapOverride:
+            case AscDFH.historyitem_SlideSetComments:
+            case AscDFH.historyitem_SlideSetLayout:
+            case AscDFH.historyitem_SlideSetClrMapOverride:
             {
                 writeObject(w, data.newPr);
                 break;
             }
-            case historyitem_SlideSetShow:
-            case historyitem_SlideSetShowPhAnim:
-            case historyitem_SlideSetShowMasterSp:
+            case AscDFH.historyitem_SlideSetShow:
+            case AscDFH.historyitem_SlideSetShowPhAnim:
+            case AscDFH.historyitem_SlideSetShowMasterSp:
             {
                 writeBool(w, data.newPr);
                 break;
             }
-            case historyitem_SlideSetNum:
+            case AscDFH.historyitem_SlideSetNum:
             {
                 writeLong(w, data.newPr);
                 break;
             }
-            case historyitem_SlideSetTiming:
-            case historyitem_SlideSetBg:
+            case AscDFH.historyitem_SlideSetTiming:
+            case AscDFH.historyitem_SlideSetBg:
             {
                 data.newPr.Write_ToBinary(w);
                 break;
             }
-            case historyitem_SlideSetSize:
+            case AscDFH.historyitem_SlideSetSize:
             {
                 writeDouble(w, data.newW);
                 writeDouble(w, data.newH);
                 break;
             }
-            case historyitem_SlideSetLocks:
+            case AscDFH.historyitem_SlideSetLocks:
             {
                 writeObject(w, data.deleteLock    );
                 writeObject(w, data.backgroundLock);
@@ -593,20 +593,20 @@ Slide.prototype =
                 writeObject(w, data.layoutLock    );
                 break;
             }
-            case historyitem_SlideAddToSpTree:
+            case AscDFH.historyitem_SlideAddToSpTree:
             {
                 var Pos = data.UseArray ? data.PosArray[0] : data.Pos;
                 writeLong(w, Pos);
                 writeObject(w, data.Item);
                 break;
             }
-            case historyitem_SlideRemoveFromSpTree:
+            case AscDFH.historyitem_SlideRemoveFromSpTree:
             {
                 var Pos = data.UseArray ? data.PosArray[0] : data.Pos;
                 writeLong(w, data.Pos);
                 break;
             }
-            case historyitem_SlideSetCSldName:
+            case AscDFH.historyitem_SlideSetCSldName:
             {
                 writeString(w, data.newPr);
                 break;
@@ -619,49 +619,49 @@ Slide.prototype =
         var type = r.GetLong();
         switch(type)
         {
-            case historyitem_SlideSetComments:
+            case AscDFH.historyitem_SlideSetComments:
             {
                 this.slideComments = readObject(r);
                 break;
             }
-            case historyitem_SlideSetShow:
+            case AscDFH.historyitem_SlideSetShow:
             {
                 this.show = readBool(r);
                 break;
             }
-            case historyitem_SlideSetShowPhAnim:
+            case AscDFH.historyitem_SlideSetShowPhAnim:
             {
                 this.showMasterPhAnim = readBool(r);
                 break;
             }
-            case historyitem_SlideSetShowMasterSp:
+            case AscDFH.historyitem_SlideSetShowMasterSp:
             {
                 this.showMasterSp = readBool(r);
                 break;
             }
-            case historyitem_SlideSetLayout:
+            case AscDFH.historyitem_SlideSetLayout:
             {
                 this.Layout = readObject(r);
                 break;
             }
-            case historyitem_SlideSetNum:
+            case AscDFH.historyitem_SlideSetNum:
             {
                 this.num = readLong(r);
                 break;
             }
-            case historyitem_SlideSetTiming:
+            case AscDFH.historyitem_SlideSetTiming:
             {
                 this.timing = new CAscSlideTiming();
                 this.timing.Read_FromBinary(r);
                 break;
             }
-            case historyitem_SlideSetSize:
+            case AscDFH.historyitem_SlideSetSize:
             {
                 this.Width  = readDouble(r);
                 this.Height = readDouble(r);
                 break;
             }
-            case historyitem_SlideSetBg:
+            case AscDFH.historyitem_SlideSetBg:
             {
                 this.cSld.Bg = new CBg();
                 this.cSld.Bg.Read_FromBinary(r);
@@ -680,7 +680,7 @@ Slide.prototype =
                 }
                 break;
             }
-            case historyitem_SlideSetLocks:
+            case AscDFH.historyitem_SlideSetLocks:
             {
                 this.deleteLock     = readObject(r);
                 this.backgroundLock = readObject(r);
@@ -689,7 +689,7 @@ Slide.prototype =
                 this.layoutLock     = readObject(r);
                 break;
             }
-            case historyitem_SlideAddToSpTree:
+            case AscDFH.historyitem_SlideAddToSpTree:
             {
                 var Pos = readLong(r);
                 var Item = readObject(r);
@@ -697,7 +697,7 @@ Slide.prototype =
                 this.cSld.spTree.splice(ChangesPos, 0, Item);
                 break;
             }
-            case historyitem_SlideRemoveFromSpTree:
+            case AscDFH.historyitem_SlideRemoveFromSpTree:
             {
                 var Pos = readLong(r);
                 var ChangesPos = this.m_oContentChanges.Check( AscCommon.contentchanges_Remove, Pos );
@@ -707,12 +707,12 @@ Slide.prototype =
                 }
                 break;
             }
-            case historyitem_SlideSetCSldName:
+            case AscDFH.historyitem_SlideSetCSldName:
             {
                 this.cSld.name = readString(r);
                 break;
             }
-            case historyitem_SlideSetClrMapOverride:
+            case AscDFH.historyitem_SlideSetClrMapOverride:
             {
                 this.clrMap = readObject(r);
                 this.recalcInfo.recalculateBackground = true;
@@ -724,38 +724,38 @@ Slide.prototype =
 
     setSlideComments: function(comments)
     {
-        History.Add(this, {Type:historyitem_SlideSetComments, oldPr: this.slideComments, newPr: comments});
+        History.Add(this, {Type:AscDFH.historyitem_SlideSetComments, oldPr: this.slideComments, newPr: comments});
         this.slideComments = comments;
     },
 
 
     setShow: function(bShow)
     {
-        History.Add(this, {Type:historyitem_SlideSetShow, oldPr: this.show, newPr: bShow});
+        History.Add(this, {Type:AscDFH.historyitem_SlideSetShow, oldPr: this.show, newPr: bShow});
         this.show = bShow;
     },
 
     setShowPhAnim: function(bShow)
     {
-        History.Add(this, {Type: historyitem_SlideSetShowPhAnim, oldPr: this.showMasterPhAnim, newPr: bShow});
+        History.Add(this, {Type: AscDFH.historyitem_SlideSetShowPhAnim, oldPr: this.showMasterPhAnim, newPr: bShow});
         this.showMasterPhAnim = bShow;
     },
 
     setShowMasterSp: function(bShow)
     {
-        History.Add(this, {Type: historyitem_SlideSetShowMasterSp, oldPr: this.showMasterSp, newPr: bShow});
+        History.Add(this, {Type: AscDFH.historyitem_SlideSetShowMasterSp, oldPr: this.showMasterSp, newPr: bShow});
         this.showMasterSp = bShow;
     },
 
     setLayout: function(layout)
     {
-        History.Add(this, {Type: historyitem_SlideSetLayout, oldPr: this.Layout, newPr: layout});
+        History.Add(this, {Type: AscDFH.historyitem_SlideSetLayout, oldPr: this.Layout, newPr: layout});
         this.Layout = layout;
     },
 
     setSlideNum: function(num)
     {
-        History.Add(this, {Type: historyitem_SlideSetNum, oldPr: this.num, newPr: num});
+        History.Add(this, {Type: AscDFH.historyitem_SlideSetNum, oldPr: this.num, newPr: num});
         this.num = num;
     },
 
@@ -763,19 +763,19 @@ Slide.prototype =
     {
         var oldTiming = this.timing.createDuplicate();
         this.timing.applyProps(timing);
-        History.Add(this, {Type: historyitem_SlideSetTiming, oldPr: oldTiming, newPr: this.timing.createDuplicate()});
+        History.Add(this, {Type: AscDFH.historyitem_SlideSetTiming, oldPr: oldTiming, newPr: this.timing.createDuplicate()});
     },
 
     setSlideSize: function(w, h)
     {
-        History.Add(this, {Type: historyitem_SlideSetSize, oldW: this.Width, oldH: this.Height, newW: w, newH: h});
+        History.Add(this, {Type: AscDFH.historyitem_SlideSetSize, oldW: this.Width, oldH: this.Height, newW: w, newH: h});
         this.Width = w;
         this.Height = h;
     },
 
     changeBackground: function(bg)
     {
-        History.Add(this, {Type: historyitem_SlideSetBg, oldPr: this.cSld.Bg , newPr: bg});
+        History.Add(this, {Type: AscDFH.historyitem_SlideSetBg, oldPr: this.cSld.Bg , newPr: bg});
         this.cSld.Bg = bg;
     },
 
@@ -786,7 +786,7 @@ Slide.prototype =
         this.timingLock = timingLock;
         this.transitionLock = transitionLock;
         this.layoutLock = layoutLock;
-        History.Add(this, {Type: historyitem_SlideSetLocks, deleteLock: deleteLock, backgroundLock: backgroundLock, timingLock: timingLock,
+        History.Add(this, {Type: AscDFH.historyitem_SlideSetLocks, deleteLock: deleteLock, backgroundLock: backgroundLock, timingLock: timingLock,
         transitionLock: transitionLock, layoutLock: layoutLock})
     },
 
@@ -794,7 +794,7 @@ Slide.prototype =
     {
         this.checkDrawingUniNvPr(item);
         var _pos = isRealNumber(pos) ? pos : this.cSld.spTree.length;
-        History.Add(this, {Type: historyitem_SlideAddToSpTree, Pos: _pos, Item: item});
+        History.Add(this, {Type: AscDFH.historyitem_SlideAddToSpTree, Pos: _pos, Item: item});
         this.cSld.spTree.splice(_pos, 0, item);
     },
 
@@ -805,11 +805,11 @@ Slide.prototype =
         {
             switch (drawing.getObjectType())
             {
-                case historyitem_type_ChartSpace:
+                case AscDFH.historyitem_type_ChartSpace:
                 {
                     break;
                 }
-                case historyitem_type_GroupShape:
+                case AscDFH.historyitem_type_GroupShape:
                 {
                     if(!drawing.nvGrpSpPr)
                     {
@@ -823,7 +823,7 @@ Slide.prototype =
                     }
                     break;
                 }
-                case historyitem_type_ImageShape:
+                case AscDFH.historyitem_type_ImageShape:
                 {
                     if(!drawing.nvPicPr)
                     {
@@ -833,7 +833,7 @@ Slide.prototype =
                     }
                     break;
                 }
-                case historyitem_type_Shape:
+                case AscDFH.historyitem_type_Shape:
                 {
                     if(!drawing.nvSpPr)
                     {
@@ -854,7 +854,7 @@ Slide.prototype =
         {
             if(sp_tree[i].Get_Id() === id)
             {
-                History.Add(this, {Type: historyitem_SlideRemoveFromSpTree, Pos: i, Item: sp_tree[i]});
+                History.Add(this, {Type: AscDFH.historyitem_SlideRemoveFromSpTree, Pos: i, Item: sp_tree[i]});
                 sp_tree.splice(i, 1);
                 return i;
             }
@@ -869,13 +869,13 @@ Slide.prototype =
 
     setCSldName: function(name)
     {
-        History.Add(this, {Type: historyitem_SlideSetCSldName,oldPr: this.cSld.name, newPr: name});
+        History.Add(this, {Type: AscDFH.historyitem_SlideSetCSldName,oldPr: this.cSld.name, newPr: name});
         this.cSld.name = name;
     },
 
     setClMapOverride: function(clrMap)
     {
-        History.Add(this, {Type: historyitem_SlideSetClrMapOverride, oldPr: this.clrMap, newPr: clrMap});
+        History.Add(this, {Type: AscDFH.historyitem_SlideSetClrMapOverride, oldPr: this.clrMap, newPr: clrMap});
         this.clrMap = clrMap;
     },
 
@@ -1261,7 +1261,7 @@ Slide.prototype =
         for(var i = 0; i < sp_tree.length; ++i)
         {
             var sp = sp_tree[i];
-            if(sp.getObjectType() === historyitem_type_Shape || sp.getObjectType() === historyitem_type_ImageShape)
+            if(sp.getObjectType() === AscDFH.historyitem_type_Shape || sp.getObjectType() === AscDFH.historyitem_type_ImageShape)
             {
                 if(sp.isPlaceholder && sp.isPlaceholder())
                 {
@@ -1404,11 +1404,11 @@ PropLocker.prototype = {
 
     getObjectType: function()
     {
-        return historyitem_type_PropLocker;
+        return AscDFH.historyitem_type_PropLocker;
     },
     setObjectId: function(id)
     {
-        History.Add(this, {Type: historyitem_PropLockerSetId, oldId: this.objectId, newId: id});
+        History.Add(this, {Type: AscDFH.historyitem_PropLockerSetId, oldId: this.objectId, newId: id});
         this.objectId = id;
     },
     Get_Id: function()
@@ -1417,7 +1417,7 @@ PropLocker.prototype = {
     },
     Write_ToBinary2: function(w)
     {
-        w.WriteLong(historyitem_type_PropLocker);
+        w.WriteLong(AscDFH.historyitem_type_PropLocker);
         w.WriteString2(this.Id);
     },
 
@@ -1430,7 +1430,7 @@ PropLocker.prototype = {
     {
         switch(data.Type)
         {
-            case historyitem_PropLockerSetId:
+            case AscDFH.historyitem_PropLockerSetId:
             {
                 this.objectId = data.oldId;
                 break;
@@ -1442,7 +1442,7 @@ PropLocker.prototype = {
     {
         switch(data.Type)
         {
-            case historyitem_PropLockerSetId:
+            case AscDFH.historyitem_PropLockerSetId:
             {
                 this.objectId = data.newId;
                 break;
@@ -1455,7 +1455,7 @@ PropLocker.prototype = {
         w.WriteLong(data.Type);
         switch(data.Type)
         {
-            case historyitem_PropLockerSetId:
+            case AscDFH.historyitem_PropLockerSetId:
             {
                 writeString(w, data.newId);
                 break;
@@ -1468,7 +1468,7 @@ PropLocker.prototype = {
         var type = r.GetLong();
         switch(type)
         {
-            case historyitem_PropLockerSetId:
+            case AscDFH.historyitem_PropLockerSetId:
             {
                 this.objectId = readString(r);
                 break;
@@ -1530,7 +1530,7 @@ SlideComments.prototype =
 {
     getObjectType: function()
     {
-        return historyitem_type_SlideComments;
+        return AscDFH.historyitem_type_SlideComments;
     },
 
     Get_Id: function()
@@ -1555,7 +1555,7 @@ SlideComments.prototype =
 
     addComment: function(comment)
     {
-        History.Add(this, {Type: historyitem_SlideCommentsAddComment, objectId: comment.Get_Id(), Pos:this.comments.length});
+        History.Add(this, {Type: AscDFH.historyitem_SlideCommentsAddComment, objectId: comment.Get_Id(), Pos:this.comments.length});
         this.comments.splice(this.comments.length, 0, comment);
         comment.slideComments = this;
     },
@@ -1590,7 +1590,7 @@ SlideComments.prototype =
         {
             if(this.comments[i].Get_Id() === id)
             {
-                History.Add(this, {Type: historyitem_SlideCommentsRemoveComment, Pos: i, id: id});
+                History.Add(this, {Type: AscDFH.historyitem_SlideCommentsRemoveComment, Pos: i, id: id});
                 this.comments.splice(i, 1);
                 editor.sync_RemoveComment(id);
                 return;
@@ -1624,7 +1624,7 @@ SlideComments.prototype =
 
     Write_ToBinary2: function(w)
     {
-        w.WriteLong(historyitem_type_SlideComments);
+        w.WriteLong(AscDFH.historyitem_type_SlideComments);
         w.WriteString2(this.Id);
         writeObject(w, this.slide);
     },
@@ -1637,7 +1637,7 @@ SlideComments.prototype =
 
     Refresh_RecalcData: function()
     {
-        History.RecalcData_Add({Type: historyrecalctype_Drawing, Object: this});
+        History.RecalcData_Add({Type: AscDFH.historyitem_recalctype_Drawing, Object: this});
     },
 
     Save_Changes: function(data, w)
@@ -1646,14 +1646,14 @@ SlideComments.prototype =
         switch(data.Type)
         {
 
-            case historyitem_SlideCommentsAddComment:
+            case AscDFH.historyitem_SlideCommentsAddComment:
             {
                 var Pos = data.UseArray ? data.PosArray[0] : data.Pos;
                 w.WriteLong(Pos);
                 w.WriteString2(data.objectId);
                 break;
             }
-            case historyitem_SlideCommentsRemoveComment:
+            case AscDFH.historyitem_SlideCommentsRemoveComment:
             {
                 var Pos = data.UseArray ? data.PosArray[0] : data.Pos;
                 w.WriteLong(Pos);
@@ -1667,7 +1667,7 @@ SlideComments.prototype =
         var type = r.GetLong();
         switch(type)
         {
-            case historyitem_SlideCommentsAddComment:
+            case AscDFH.historyitem_SlideCommentsAddComment:
             {
                 var pos = r.GetLong();
                 var id = r.GetString2();
@@ -1677,7 +1677,7 @@ SlideComments.prototype =
                 editor.sync_AddComment( id, this.comments[pos2].Data);
                 break;
             }
-            case historyitem_SlideCommentsRemoveComment:
+            case AscDFH.historyitem_SlideCommentsRemoveComment:
             {
                 var pos = r.GetLong();
                 var pos2 = this.m_oContentChanges.Check( AscCommon.contentchanges_Remove, pos);
@@ -1693,7 +1693,7 @@ SlideComments.prototype =
     {
         switch(data.Type)
         {
-            case historyitem_SlideCommentsAddComment:
+            case AscDFH.historyitem_SlideCommentsAddComment:
             {
                 this.comments.splice(data.Pos, 1);
                 editor.sync_RemoveComment( data.objectId );
@@ -1701,7 +1701,7 @@ SlideComments.prototype =
                 break;
             }
 
-            case historyitem_SlideCommentsRemoveComment:
+            case AscDFH.historyitem_SlideCommentsRemoveComment:
             {
                 this.comments.splice(data.Pos, 0, g_oTableId.Get_ById(data.id));
                 editor.sync_AddComment( this.comments[data.Pos].Get_Id(), this.comments[data.Pos].Data);
@@ -1714,14 +1714,14 @@ SlideComments.prototype =
     {
         switch(data.Type)
         {
-            case historyitem_SlideCommentsAddComment:
+            case AscDFH.historyitem_SlideCommentsAddComment:
             {
                 this.comments.splice(data.Pos, 0, g_oTableId.Get_ById(data.objectId));
                 editor.sync_AddComment( data.objectId, this.comments[data.Pos].Data);
 
                 break;
             }
-            case historyitem_SlideCommentsRemoveComment:
+            case AscDFH.historyitem_SlideCommentsRemoveComment:
             {
                 this.comments.splice(data.Pos, 1);
                 editor.sync_RemoveComment(data.id);

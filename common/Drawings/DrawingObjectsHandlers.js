@@ -89,8 +89,8 @@ function handleFloatObjects(drawingObjectsController, drawingArr, e, x, y, group
         drawing = drawingArr[i];
         switch(drawing.getObjectType())
         {
-            case historyitem_type_Shape:
-            case historyitem_type_ImageShape:
+            case AscDFH.historyitem_type_Shape:
+            case AscDFH.historyitem_type_ImageShape:
             {
                 ret = handleShapeImage(drawing, drawingObjectsController, e, x, y, group, pageIndex, bWord);
                 if(ret)
@@ -99,7 +99,7 @@ function handleFloatObjects(drawingObjectsController, drawingArr, e, x, y, group
                 }
                 break;
             }
-            case historyitem_type_ChartSpace:
+            case AscDFH.historyitem_type_ChartSpace:
             {
                 ret = handleChart(drawing, drawingObjectsController, e, x, y, group, pageIndex, bWord);
                 if(ret)
@@ -108,7 +108,7 @@ function handleFloatObjects(drawingObjectsController, drawingArr, e, x, y, group
                 }
                 break;
             }
-            case historyitem_type_GroupShape:
+            case AscDFH.historyitem_type_GroupShape:
             {
                 ret = handleGroup(drawing, drawingObjectsController, e, x, y, group, pageIndex, bWord);
                 if(ret)
@@ -117,7 +117,7 @@ function handleFloatObjects(drawingObjectsController, drawingArr, e, x, y, group
                 }
                 break;
             }
-            case historyitem_type_GraphicFrame:
+            case AscDFH.historyitem_type_GraphicFrame:
             {
                 ret = handleFloatTable(drawing, drawingObjectsController, e, x, y, group, pageIndex);
                 if(ret)
@@ -196,15 +196,15 @@ function handleGroup(drawing, drawingObjectsController, e, x, y, group, pageInde
         var cur_grouped_object = grouped_objects[j];
         switch (cur_grouped_object.getObjectType())
         {
-            case historyitem_type_Shape:
-            case historyitem_type_ImageShape:
+            case AscDFH.historyitem_type_Shape:
+            case AscDFH.historyitem_type_ImageShape:
             {
                 ret = handleShapeImageInGroup(drawingObjectsController, drawing, cur_grouped_object, e, x, y, pageIndex, bWord);
                 if(ret)
                     return ret;
                 break;
             }
-            case historyitem_type_ChartSpace:
+            case AscDFH.historyitem_type_ChartSpace:
             {
                 var ret, i, title;
                 if(cur_grouped_object.hit(x, y))
@@ -567,7 +567,7 @@ function handleInlineHitNoText(drawing, drawingObjects, e, x, y, pageIndex, bInS
             drawingObjects.changeCurrentState(new PreMoveInlineObject(drawingObjects, drawing, bIsSelected, !bInSelect, pageIndex, x, y));
             if(e.ClickCount > 1 && !e.ShiftKey && !e.CtrlKey && ((drawingObjects.selection.groupSelection && drawingObjects.selection.groupSelection.selectedObjects.length === 1) || drawingObjects.selectedObjects.length === 1))
             {
-                if (drawing.getObjectType() === historyitem_type_ChartSpace && drawingObjects.handleChartDoubleClick)
+                if (drawing.getObjectType() === AscDFH.historyitem_type_ChartSpace && drawingObjects.handleChartDoubleClick)
                     drawingObjects.handleChartDoubleClick(drawing.parent, drawing, e, x, y, pageIndex);
                 else if (2 == e.ClickCount && drawing.parent instanceof ParaDrawing && drawing.parent.Is_MathEquation())
                     drawingObjects.handleMathDrawingDoubleClick(drawing.parent, e, x, y, pageIndex);
@@ -596,22 +596,22 @@ function handleInlineObjects(drawingObjectsController, drawingArr, e, x, y, page
 
         switch(drawing.getObjectType())
         {
-            case historyitem_type_Shape:
-            case historyitem_type_ImageShape:
+            case AscDFH.historyitem_type_Shape:
+            case AscDFH.historyitem_type_ImageShape:
             {
                 ret = handleInlineShapeImage(drawing, drawingObjectsController, e, x, y, pageIndex);
                 if(ret)
                     return ret;
                 break;
             }
-            case historyitem_type_ChartSpace:
+            case AscDFH.historyitem_type_ChartSpace:
             {
                 ret  = handleInlineChart(drawing, drawingObjectsController, e, x, y, pageIndex);
                 if(ret)
                     return ret;
                 break;
             }
-            case historyitem_type_GroupShape:
+            case AscDFH.historyitem_type_GroupShape:
             {
                 ret = handleGroup(drawing, drawingObjectsController, e, x, y, null, pageIndex, bWord);
                 if(ret)
@@ -632,7 +632,7 @@ function handleMouseUpPreMoveState(drawingObjects, e, x, y, pageIndex, bWord)
     {
         switch (state.majorObject.getObjectType())
         {
-            case historyitem_type_GroupShape:
+            case AscDFH.historyitem_type_GroupShape:
             {
                 state.drawingObjects.checkChartTextSelection();
                 state.drawingObjects.resetSelection();
@@ -644,7 +644,7 @@ function handleMouseUpPreMoveState(drawingObjects, e, x, y, pageIndex, bWord)
                 state.drawingObjects.document && state.drawingObjects.document.Document_UpdateInterfaceState();
                 break;
             }
-            case historyitem_type_ChartSpace:
+            case AscDFH.historyitem_type_ChartSpace:
             {
                 break;
             }

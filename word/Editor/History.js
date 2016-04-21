@@ -86,13 +86,13 @@ CHistory.prototype =
             if (Point.Items.length > 0)
             {
                 var FirstItem = Point.Items[0];
-                if (FirstItem.Class === Class && historyitem_TableId_Description === FirstItem.Data.Type)
+                if (FirstItem.Class === Class && AscDFH.historyitem_TableId_Description === FirstItem.Data.Type)
                     Point.Items.splice(0, 1);
             }
 
             var Data =
             {
-                Type         : historyitem_TableId_Description,
+                Type         : AscDFH.historyitem_TableId_Description,
                 FileCheckSum : this.FileCheckSum,
                 FileSize     : this.FileSize,
                 Description  : Point.Description,
@@ -389,33 +389,33 @@ CHistory.prototype =
 
         var bPresentation = !(typeof CPresentation === "undefined");
         var bSlide = !(typeof Slide === "undefined");
-        if ( ( Class instanceof CDocument        && ( historyitem_Document_AddItem        === Data.Type || historyitem_Document_RemoveItem        === Data.Type ) ) ||
-            ( Class instanceof CDocumentContent && ( historyitem_DocumentContent_AddItem === Data.Type || historyitem_DocumentContent_RemoveItem === Data.Type ) ) ||
-            ( Class instanceof CTable           && ( historyitem_Table_AddRow            === Data.Type || historyitem_Table_RemoveRow            === Data.Type ) ) ||
-            ( Class instanceof CTableRow        && ( historyitem_TableRow_AddCell        === Data.Type || historyitem_TableRow_RemoveCell        === Data.Type ) ) ||
-            ( Class instanceof Paragraph        && ( historyitem_Paragraph_AddItem       === Data.Type || historyitem_Paragraph_RemoveItem       === Data.Type ) ) ||
-            ( Class instanceof ParaHyperlink    && ( historyitem_Hyperlink_AddItem       === Data.Type || historyitem_Hyperlink_RemoveItem       === Data.Type ) ) ||
-            ( Class instanceof ParaRun          && ( historyitem_ParaRun_AddItem         === Data.Type || historyitem_ParaRun_RemoveItem         === Data.Type ) ) ||
-            ( bPresentation && Class instanceof CPresentation && (historyitem_Presentation_AddSlide === Data.Type || historyitem_Presentation_RemoveSlide === Data.Type)) ||
-            ( bSlide && Class instanceof Slide && (historyitem_SlideAddToSpTree === Data.Type || historyitem_SlideRemoveFromSpTree === Data.Type))
+        if ( ( Class instanceof CDocument        && ( AscDFH.historyitem_Document_AddItem        === Data.Type || AscDFH.historyitem_Document_RemoveItem        === Data.Type ) ) ||
+            ( Class instanceof CDocumentContent && ( AscDFH.historyitem_DocumentContent_AddItem === Data.Type || AscDFH.historyitem_DocumentContent_RemoveItem === Data.Type ) ) ||
+            ( Class instanceof CTable           && ( AscDFH.historyitem_Table_AddRow            === Data.Type || AscDFH.historyitem_Table_RemoveRow            === Data.Type ) ) ||
+            ( Class instanceof CTableRow        && ( AscDFH.historyitem_TableRow_AddCell        === Data.Type || AscDFH.historyitem_TableRow_RemoveCell        === Data.Type ) ) ||
+            ( Class instanceof Paragraph        && ( AscDFH.historyitem_Paragraph_AddItem       === Data.Type || AscDFH.historyitem_Paragraph_RemoveItem       === Data.Type ) ) ||
+            ( Class instanceof ParaHyperlink    && ( AscDFH.historyitem_Hyperlink_AddItem       === Data.Type || AscDFH.historyitem_Hyperlink_RemoveItem       === Data.Type ) ) ||
+            ( Class instanceof ParaRun          && ( AscDFH.historyitem_ParaRun_AddItem         === Data.Type || AscDFH.historyitem_ParaRun_RemoveItem         === Data.Type ) ) ||
+            ( bPresentation && Class instanceof CPresentation && (AscDFH.historyitem_Presentation_AddSlide === Data.Type || AscDFH.historyitem_Presentation_RemoveSlide === Data.Type)) ||
+            ( bSlide && Class instanceof Slide && (AscDFH.historyitem_SlideAddToSpTree === Data.Type || AscDFH.historyitem_SlideRemoveFromSpTree === Data.Type))
             )
         {
-            var bAdd = ( ( Class instanceof CDocument        && historyitem_Document_AddItem        === Data.Type ) ||
-                ( Class instanceof CDocumentContent && historyitem_DocumentContent_AddItem === Data.Type ) ||
-                ( Class instanceof CTable           && historyitem_Table_AddRow            === Data.Type ) ||
-                ( Class instanceof CTableRow        && historyitem_TableRow_AddCell        === Data.Type ) ||
-                ( Class instanceof Paragraph        && historyitem_Paragraph_AddItem       === Data.Type ) ||
-                ( Class instanceof ParaHyperlink    && historyitem_Hyperlink_AddItem       === Data.Type ) ||
-                ( Class instanceof ParaRun          && historyitem_ParaRun_AddItem         === Data.Type ) ||
-                ( bPresentation && Class instanceof CPresentation && (historyitem_Presentation_AddSlide === Data.Type )) ||
-                ( bSlide && Class instanceof Slide && (historyitem_SlideAddToSpTree === Data.Type))
+            var bAdd = ( ( Class instanceof CDocument        && AscDFH.historyitem_Document_AddItem        === Data.Type ) ||
+                ( Class instanceof CDocumentContent && AscDFH.historyitem_DocumentContent_AddItem === Data.Type ) ||
+                ( Class instanceof CTable           && AscDFH.historyitem_Table_AddRow            === Data.Type ) ||
+                ( Class instanceof CTableRow        && AscDFH.historyitem_TableRow_AddCell        === Data.Type ) ||
+                ( Class instanceof Paragraph        && AscDFH.historyitem_Paragraph_AddItem       === Data.Type ) ||
+                ( Class instanceof ParaHyperlink    && AscDFH.historyitem_Hyperlink_AddItem       === Data.Type ) ||
+                ( Class instanceof ParaRun          && AscDFH.historyitem_ParaRun_AddItem         === Data.Type ) ||
+                ( bPresentation && Class instanceof CPresentation && (AscDFH.historyitem_Presentation_AddSlide === Data.Type )) ||
+                ( bSlide && Class instanceof Slide && (AscDFH.historyitem_SlideAddToSpTree === Data.Type))
                 ) ? true : false;
 
             var Count = 1;
 
             if ( ( Class instanceof Paragraph ) ||  ( Class instanceof ParaHyperlink) || ( Class instanceof ParaRun ) ||
-                ( Class instanceof CDocument        && historyitem_Document_RemoveItem        === Data.Type ) ||
-                ( Class instanceof CDocumentContent && historyitem_DocumentContent_RemoveItem === Data.Type ) )
+                ( Class instanceof CDocument        && AscDFH.historyitem_Document_RemoveItem        === Data.Type ) ||
+                ( Class instanceof CDocumentContent && AscDFH.historyitem_DocumentContent_RemoveItem === Data.Type ) )
                 Count = Data.Items.length;
 
             var ContentChanges = new AscCommon.CContentChangesElement( ( bAdd == true ? AscCommon.contentchanges_Add : AscCommon.contentchanges_Remove ), Data.Pos, Count, Item );
@@ -429,20 +429,20 @@ CHistory.prototype =
         }
         if(this.CollaborativeEditing.AddPosExtChanges && Class instanceof CXfrm)
         {
-            if(historyitem_Xfrm_SetOffX  === Data.Type ||
-                historyitem_Xfrm_SetOffY === Data.Type ||
-                historyitem_Xfrm_SetExtX === Data.Type ||
-                historyitem_Xfrm_SetExtY === Data.Type ||
-                historyitem_Xfrm_SetChOffX === Data.Type ||
-                historyitem_Xfrm_SetChOffY === Data.Type ||
-                historyitem_Xfrm_SetChExtX === Data.Type ||
-                historyitem_Xfrm_SetChExtY  === Data.Type)
+            if(AscDFH.historyitem_Xfrm_SetOffX  === Data.Type ||
+                AscDFH.historyitem_Xfrm_SetOffY === Data.Type ||
+                AscDFH.historyitem_Xfrm_SetExtX === Data.Type ||
+                AscDFH.historyitem_Xfrm_SetExtY === Data.Type ||
+                AscDFH.historyitem_Xfrm_SetChOffX === Data.Type ||
+                AscDFH.historyitem_Xfrm_SetChOffY === Data.Type ||
+                AscDFH.historyitem_Xfrm_SetChExtX === Data.Type ||
+                AscDFH.historyitem_Xfrm_SetChExtY  === Data.Type)
             {
                 this.CollaborativeEditing.AddPosExtChanges(Item,
-                    historyitem_Xfrm_SetOffX  === Data.Type ||
-                    historyitem_Xfrm_SetExtX === Data.Type ||
-                        historyitem_Xfrm_SetChOffX === Data.Type ||
-                        historyitem_Xfrm_SetChExtX === Data.Type );
+                    AscDFH.historyitem_Xfrm_SetOffX  === Data.Type ||
+                    AscDFH.historyitem_Xfrm_SetExtX === Data.Type ||
+                        AscDFH.historyitem_Xfrm_SetChOffX === Data.Type ||
+                        AscDFH.historyitem_Xfrm_SetChExtX === Data.Type );
             }
         }
     },
@@ -479,7 +479,7 @@ CHistory.prototype =
 
         switch ( Data.Type )
         {
-            case historyrecalctype_Flow:
+            case AscDFH.historyitem_recalctype_Flow:
             {
                 var bNew = true;
                 for ( var Index = 0; Index < this.RecalculateData.Flow.length; Index++ )
@@ -497,7 +497,7 @@ CHistory.prototype =
                 break;
             }
 
-            case historyrecalctype_HdrFtr:
+            case AscDFH.historyitem_recalctype_HdrFtr:
             {
                 if ( null === Data.Data )
                     break;
@@ -518,7 +518,7 @@ CHistory.prototype =
                 break
             }
 
-            case historyrecalctype_Inline:
+            case AscDFH.historyitem_recalctype_Inline:
             {
                 if ( (Data.Data.Pos < this.RecalculateData.Inline.Pos) || (Data.Data.Pos === this.RecalculateData.Inline.Pos && Data.Data.PageNum < this.RecalculateData.Inline.PageNum) || this.RecalculateData.Inline.Pos < 0 )
                 {
@@ -528,7 +528,7 @@ CHistory.prototype =
 
                 break;
             }
-            case historyrecalctype_Drawing:
+            case AscDFH.historyitem_recalctype_Drawing:
             {
                 if(!this.RecalculateData.Drawings.All)
                 {
@@ -636,10 +636,10 @@ CHistory.prototype =
 
         var StartIndex1 = 0;
         var StartIndex2 = 0;
-        if (Point1.Items.length > 0 && Point1.Items[0].Data && historyitem_TableId_Description === Point1.Items[0].Data.Type)
+        if (Point1.Items.length > 0 && Point1.Items[0].Data && AscDFH.historyitem_TableId_Description === Point1.Items[0].Data.Type)
             StartIndex1 = 1;
 
-        if (Point2.Items.length > 0 && Point2.Items[0].Data && historyitem_TableId_Description === Point2.Items[0].Data.Type)
+        if (Point2.Items.length > 0 && Point2.Items[0].Data && AscDFH.historyitem_TableId_Description === Point2.Items[0].Data.Type)
             StartIndex2 = 1;
 
         var PrevItem = null;
@@ -678,7 +678,7 @@ CHistory.prototype =
             Items      : Point1.Items.concat(Point2.Items),
             Time       : Point1.Time,
             Additional : {},
-            Description: historydescription_Document_AddLetterUnion
+            Description: AscDFH.historydescription_Document_AddLetterUnion
         };
 
 		if (null !== this.SavedIndex && this.SavedIndex >= this.Points.length - 2)

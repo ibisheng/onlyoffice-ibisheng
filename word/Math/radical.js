@@ -395,7 +395,7 @@ function CRadical(props)
 }
 AscCommon.extendClass(CRadical, CMathBase);
 
-CRadical.prototype.ClassType = historyitem_type_rad;
+CRadical.prototype.ClassType = AscDFH.historyitem_type_rad;
 CRadical.prototype.kind      = MATH_RADICAL;
 
 CRadical.prototype.init = function(props)

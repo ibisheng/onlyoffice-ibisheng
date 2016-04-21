@@ -168,13 +168,13 @@ CTextBody.prototype =
 
     setParent: function(pr)
     {
-        History.Add(this, {Type: historyitem_TextBodySetParent, oldPr: this.parent, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_TextBodySetParent, oldPr: this.parent, newPr: pr});
         this.parent = pr;
     },
 
     setBodyPr: function(pr)
     {
-        History.Add(this, {Type: historyitem_TextBodySetBodyPr, oldPr: this.bodyPr, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_TextBodySetBodyPr, oldPr: this.bodyPr, newPr: pr});
         this.bodyPr = pr;
         if(this.parent && this.parent.recalcInfo)
         {
@@ -197,32 +197,32 @@ CTextBody.prototype =
 
     setContent: function(pr)
     {
-        History.Add(this, {Type: historyitem_TextBodySetContent, oldPr: this.content, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_TextBodySetContent, oldPr: this.content, newPr: pr});
         this.content = pr;
     },
 
     setLstStyle: function(lstStyle)
     {
-        History.Add(this, {Type:historyitem_TextBodySetLstStyle, oldPr: this.lstStyle, newPr: lstStyle});
+        History.Add(this, {Type:AscDFH.historyitem_TextBodySetLstStyle, oldPr: this.lstStyle, newPr: lstStyle});
         this.lstStyle = lstStyle;
     },
 
     getObjectType: function()
     {
-        return historyitem_type_TextBody;
+        return AscDFH.historyitem_type_TextBody;
     },
 
     Undo: function(data)
     {
         switch(data.Type)
         {
-            case historyitem_TextBodySetParent:
+            case AscDFH.historyitem_TextBodySetParent:
             {
                 this.parent = data.oldPr;
                 break;
             }
 
-            case historyitem_TextBodySetBodyPr:
+            case AscDFH.historyitem_TextBodySetBodyPr:
             {
                 this.bodyPr = data.oldPr;
 
@@ -233,12 +233,12 @@ CTextBody.prototype =
                 }
                 break;
             }
-            case historyitem_TextBodySetContent:
+            case AscDFH.historyitem_TextBodySetContent:
             {
                 this.content = data.oldPr;
                 break;
             }
-            case historyitem_TextBodySetLstStyle:
+            case AscDFH.historyitem_TextBodySetLstStyle:
             {
                 this.lstStyle = data.oldPr;
                 break;
@@ -250,13 +250,13 @@ CTextBody.prototype =
     {
         switch(data.Type)
         {
-            case historyitem_TextBodySetParent:
+            case AscDFH.historyitem_TextBodySetParent:
             {
                 this.parent = data.newPr;
                 break;
             }
 
-            case historyitem_TextBodySetBodyPr:
+            case AscDFH.historyitem_TextBodySetBodyPr:
             {
                 this.bodyPr = data.newPr;
 
@@ -266,12 +266,12 @@ CTextBody.prototype =
                 }
                 break;
             }
-            case historyitem_TextBodySetContent:
+            case AscDFH.historyitem_TextBodySetContent:
             {
                 this.content = data.newPr;
                 break;
             }
-            case historyitem_TextBodySetLstStyle:
+            case AscDFH.historyitem_TextBodySetLstStyle:
             {
                 this.lstStyle = data.newPr;
                 break;
@@ -280,18 +280,18 @@ CTextBody.prototype =
     },
     Save_Changes: function(data, w)
     {
-        w.WriteLong(historyitem_type_TextBody);
+        w.WriteLong(AscDFH.historyitem_type_TextBody);
         w.WriteLong(data.Type);
         switch(data.Type)
         {
-            case historyitem_TextBodySetParent:
-            case historyitem_TextBodySetContent:
+            case AscDFH.historyitem_TextBodySetParent:
+            case AscDFH.historyitem_TextBodySetContent:
             {
                 writeObject(w, data.newPr);
                 break;
             }
-            case historyitem_TextBodySetBodyPr:
-            case historyitem_TextBodySetLstStyle:
+            case AscDFH.historyitem_TextBodySetBodyPr:
+            case AscDFH.historyitem_TextBodySetLstStyle:
             {
                 w.WriteBool(isRealObject(data.newPr));
                 if(isRealObject(data.newPr))
@@ -305,18 +305,18 @@ CTextBody.prototype =
 
     Load_Changes: function(r)
     {
-        if(r.GetLong() === historyitem_type_TextBody)
+        if(r.GetLong() === AscDFH.historyitem_type_TextBody)
         {
             var type = r.GetLong();
             switch(type)
             {
-                case historyitem_TextBodySetParent:
+                case AscDFH.historyitem_TextBodySetParent:
                 {
                     this.parent = readObject(r);
                     break;
                 }
 
-                case historyitem_TextBodySetBodyPr:
+                case AscDFH.historyitem_TextBodySetBodyPr:
                 {
                     if(r.GetBool())
                     {
@@ -334,12 +334,12 @@ CTextBody.prototype =
                     }
                     break;
                 }
-                case historyitem_TextBodySetContent:
+                case AscDFH.historyitem_TextBodySetContent:
                 {
                     this.content = readObject(r);
                     break;
                 }
-                case historyitem_TextBodySetLstStyle:
+                case AscDFH.historyitem_TextBodySetLstStyle:
                 {
                     if(r.GetBool())
                     {
@@ -359,7 +359,7 @@ CTextBody.prototype =
 
     Write_ToBinary2: function(w)
     {
-        w.WriteLong(historyitem_type_TextBody);
+        w.WriteLong(AscDFH.historyitem_type_TextBody);
         w.WriteString2(this.Id);
     },
 

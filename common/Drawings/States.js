@@ -89,7 +89,7 @@ StartAddNewShape.prototype =
 
                 if(bLock)
                 {
-                    History.Create_NewPoint(historydescription_CommonStatesAddNewShape);
+                    History.Create_NewPoint(AscDFH.historydescription_CommonStatesAddNewShape);
                     var shape = track.getShape(false, oThis.drawingObjects.getDrawingDocument(), oThis.drawingObjects.drawingObjects);
 
                     if(!(oThis.drawingObjects.drawingObjects && oThis.drawingObjects.drawingObjects.cSld))
@@ -418,7 +418,7 @@ ChangeAdjState.prototype =
             {
                 track.trackEnd();
                 drawingObjects.startRecalculate();
-            },[], false, historydescription_CommonDrawings_ChangeAdj);
+            },[], false, AscDFH.historydescription_CommonDrawings_ChangeAdj);
 
         }
         this.drawingObjects.clearTrackObjects();
@@ -503,7 +503,7 @@ RotateState.prototype =
             {
                 var i, copy;
                 this.drawingObjects.resetSelection();
-                History.Create_NewPoint(historydescription_CommonDrawings_CopyCtrl);
+                History.Create_NewPoint(AscDFH.historydescription_CommonDrawings_CopyCtrl);
                 for(i = 0; i < tracks.length; ++i)
                 {
                     copy = tracks[i].originalObject.copy();
@@ -512,7 +512,7 @@ RotateState.prototype =
                     {
                         copy.setParent2(this.drawingObjects.drawingObjects);
                         if(!copy.spPr || !copy.spPr.xfrm
-                            || (copy.getObjectType() === historyitem_type_GroupShape && !copy.spPr.xfrm.isNotNullForGroup() || copy.getObjectType() !== historyitem_type_GroupShape && !copy.spPr.xfrm.isNotNull()))
+                            || (copy.getObjectType() === AscDFH.historyitem_type_GroupShape && !copy.spPr.xfrm.isNotNullForGroup() || copy.getObjectType() !== AscDFH.historyitem_type_GroupShape && !copy.spPr.xfrm.isNotNull()))
                         {
                             copy.recalculateTransform();
                         }
@@ -622,7 +622,7 @@ RotateState.prototype =
                             }
                             oThis.drawingObjects.drawingObjects.checkGraphicObjectPosition(0, 0, Math.max.apply(Math, arr_x2), Math.max.apply(Math, arr_y2));
                         }
-                    }, [], false, historydescription_CommonDrawings_EndTrack);
+                    }, [], false, AscDFH.historydescription_CommonDrawings_EndTrack);
             }
 
         }
@@ -1264,7 +1264,7 @@ TextAddState.prototype =
             this.startY = undefined;
         }
         this.majorObject.selectionSetEnd(e, x, y, pageIndex);
-        if(!(this.majorObject.getObjectType() === historyitem_type_GraphicFrame && this.majorObject.graphicObject.Selection.Type2 === table_Selection_Border))
+        if(!(this.majorObject.getObjectType() === AscDFH.historyitem_type_GraphicFrame && this.majorObject.graphicObject.Selection.Type2 === table_Selection_Border))
             this.drawingObjects.updateSelectionState();
     },
     onMouseUp: function(e, x, y, pageIndex)

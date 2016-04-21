@@ -179,7 +179,7 @@ CDLbl.prototype =
 
     getObjectType: function()
     {
-        return historyitem_type_DLbl;
+        return AscDFH.historyitem_type_DLbl;
     },
 
     createDuplicate: function()
@@ -1290,77 +1290,77 @@ CDLbl.prototype =
 
     setDelete: function(pr)
     {
-        History.Add(this, {Type: historyitem_DLbl_SetDelete, oldPr: this.bDelete  , newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_DLbl_SetDelete, oldPr: this.bDelete  , newPr: pr});
         this.bDelete = pr;
     },
     setDLblPos: function(pr)
     {
-        History.Add(this, {Type: historyitem_DLbl_SetDLblPos, oldPr: this.dLblPos  , newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_DLbl_SetDLblPos, oldPr: this.dLblPos  , newPr: pr});
         this.dLblPos = pr;
     },
     setIdx: function(pr)
     {
-        History.Add(this, {Type: historyitem_DLbl_SetIdx, oldPr: this.idx  , newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_DLbl_SetIdx, oldPr: this.idx  , newPr: pr});
         this.idx = pr;
     },
     setLayout: function(pr)
     {
-        History.Add(this, {Type: historyitem_DLbl_SetLayout, oldPr: this.layout  , newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_DLbl_SetLayout, oldPr: this.layout  , newPr: pr});
         this.layout = pr;
     },
     setNumFmt: function(pr)
     {
-        History.Add(this, {Type: historyitem_DLbl_SetNumFmt, oldPr: this.numFmt  , newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_DLbl_SetNumFmt, oldPr: this.numFmt  , newPr: pr});
         this.numFmt = pr;
     },
     setSeparator: function(pr)
     {
-        History.Add(this, {Type: historyitem_DLbl_SetSeparator, oldPr: this.separator  , newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_DLbl_SetSeparator, oldPr: this.separator  , newPr: pr});
         this.separator = pr;
     },
     setShowBubbleSize: function(pr)
     {
-        History.Add(this, {Type: historyitem_DLbl_SetShowBubbleSize, oldPr: this.showBubbleSize  , newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_DLbl_SetShowBubbleSize, oldPr: this.showBubbleSize  , newPr: pr});
         this.showBubbleSize = pr;
     },
     setShowCatName: function(pr)
     {
-        History.Add(this, {Type: historyitem_DLbl_SetShowCatName, oldPr: this.showCatName  , newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_DLbl_SetShowCatName, oldPr: this.showCatName  , newPr: pr});
         this.showCatName = pr;
     },
     setShowLegendKey: function(pr)
     {
-        History.Add(this, {Type: historyitem_DLbl_SetShowLegendKey, oldPr: this.showLegendKey  , newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_DLbl_SetShowLegendKey, oldPr: this.showLegendKey  , newPr: pr});
         this.showLegendKey = pr;
     },
     setShowPercent: function(pr)
     {
-        History.Add(this, {Type: historyitem_DLbl_SetShowPercent, oldPr: this.showPercent  , newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_DLbl_SetShowPercent, oldPr: this.showPercent  , newPr: pr});
         this.showPercent = pr;
     },
     setShowSerName: function(pr)
     {
-        History.Add(this, {Type: historyitem_DLbl_SetShowSerName, oldPr: this.showSerName  , newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_DLbl_SetShowSerName, oldPr: this.showSerName  , newPr: pr});
         this.showSerName = pr;
     },
     setShowVal: function(pr)
     {
-        History.Add(this, {Type: historyitem_DLbl_SetShowVal, oldPr: this.showVal  , newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_DLbl_SetShowVal, oldPr: this.showVal  , newPr: pr});
         this.showVal = pr;
     },
     setSpPr: function(pr)
     {
-        History.Add(this, {Type: historyitem_DLbl_SetSpPr, oldPr: this.spPr  , newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_DLbl_SetSpPr, oldPr: this.spPr  , newPr: pr});
         this.spPr = pr;
     },
     setTx: function(pr)
     {
-        History.Add(this, {Type: historyitem_DLbl_SetTx, oldPr: this.tx  , newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_DLbl_SetTx, oldPr: this.tx  , newPr: pr});
         this.tx = pr;
     },
     setTxPr: function(pr)
     {
-        History.Add(this, {Type: historyitem_DLbl_SetTxPr, oldPr: this.txPr  , newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_DLbl_SetTxPr, oldPr: this.txPr  , newPr: pr});
         this.txPr = pr;
         if(this.txPr)
         {
@@ -1381,77 +1381,77 @@ CDLbl.prototype =
     {
         switch(data.Type)
         {
-            case historyitem_DLbl_SetDelete:
+            case AscDFH.historyitem_DLbl_SetDelete:
             {
                 this.bDelete = data.oldPr;
                 break;
             }
-            case historyitem_DLbl_SetDLblPos:
+            case AscDFH.historyitem_DLbl_SetDLblPos:
             {
                 this.dLblPos = data.oldPr;
                 break;
             }
-            case historyitem_DLbl_SetIdx:
+            case AscDFH.historyitem_DLbl_SetIdx:
             {
                 this.idx = data.oldPr;
                 break;
             }
-            case historyitem_DLbl_SetLayout:
+            case AscDFH.historyitem_DLbl_SetLayout:
             {
                 this.layout = data.oldPr;
                 break;
             }
-            case historyitem_DLbl_SetNumFmt:
+            case AscDFH.historyitem_DLbl_SetNumFmt:
             {
                 this.numFmt = data.oldPr;
                 break;
             }
-            case historyitem_DLbl_SetSeparator:
+            case AscDFH.historyitem_DLbl_SetSeparator:
             {
                 this.separator = data.oldPr;
                 break;
             }
-            case historyitem_DLbl_SetShowBubbleSize:
+            case AscDFH.historyitem_DLbl_SetShowBubbleSize:
             {
                 this.showBubbleSize = data.oldPr;
                 break;
             }
-            case historyitem_DLbl_SetShowCatName:
+            case AscDFH.historyitem_DLbl_SetShowCatName:
             {
                 this.showCatName = data.oldPr;
                 break;
             }
-            case historyitem_DLbl_SetShowLegendKey:
+            case AscDFH.historyitem_DLbl_SetShowLegendKey:
             {
                 this.showLegendKey = data.oldPr;
                 break;
             }
-            case historyitem_DLbl_SetShowPercent:
+            case AscDFH.historyitem_DLbl_SetShowPercent:
             {
                 this.showPercent = data.oldPr;
                 break;
             }
-            case historyitem_DLbl_SetShowSerName:
+            case AscDFH.historyitem_DLbl_SetShowSerName:
             {
                 this.showSerName = data.oldPr;
                 break;
             }
-            case historyitem_DLbl_SetShowVal:
+            case AscDFH.historyitem_DLbl_SetShowVal:
             {
                 this.showVal = data.oldPr;
                 break;
             }
-            case historyitem_DLbl_SetSpPr:
+            case AscDFH.historyitem_DLbl_SetSpPr:
             {
                 this.spPr = data.oldPr;
                 break;
             }
-            case historyitem_DLbl_SetTx:
+            case AscDFH.historyitem_DLbl_SetTx:
             {
                 this.tx = data.oldPr;
                 break;
             }
-            case historyitem_DLbl_SetTxPr:
+            case AscDFH.historyitem_DLbl_SetTxPr:
             {
                 this.txPr = data.oldPr;
                 break;
@@ -1463,77 +1463,77 @@ CDLbl.prototype =
     {
         switch(data.Type)
         {
-            case historyitem_DLbl_SetDelete:
+            case AscDFH.historyitem_DLbl_SetDelete:
             {
                 this.bDelete = data.newPr;
                 break;
             }
-            case historyitem_DLbl_SetDLblPos:
+            case AscDFH.historyitem_DLbl_SetDLblPos:
             {
                 this.dLblPos = data.newPr;
                 break;
             }
-            case historyitem_DLbl_SetIdx:
+            case AscDFH.historyitem_DLbl_SetIdx:
             {
                 this.idx = data.newPr;
                 break;
             }
-            case historyitem_DLbl_SetLayout:
+            case AscDFH.historyitem_DLbl_SetLayout:
             {
                 this.layout = data.newPr;
                 break;
             }
-            case historyitem_DLbl_SetNumFmt:
+            case AscDFH.historyitem_DLbl_SetNumFmt:
             {
                 this.numFmt = data.newPr;
                 break;
             }
-            case historyitem_DLbl_SetSeparator:
+            case AscDFH.historyitem_DLbl_SetSeparator:
             {
                 this.separator = data.newPr;
                 break;
             }
-            case historyitem_DLbl_SetShowBubbleSize:
+            case AscDFH.historyitem_DLbl_SetShowBubbleSize:
             {
                 this.showBubbleSize = data.newPr;
                 break;
             }
-            case historyitem_DLbl_SetShowCatName:
+            case AscDFH.historyitem_DLbl_SetShowCatName:
             {
                 this.showCatName = data.newPr;
                 break;
             }
-            case historyitem_DLbl_SetShowLegendKey:
+            case AscDFH.historyitem_DLbl_SetShowLegendKey:
             {
                 this.showLegendKey = data.newPr;
                 break;
             }
-            case historyitem_DLbl_SetShowPercent:
+            case AscDFH.historyitem_DLbl_SetShowPercent:
             {
                 this.showPercent = data.newPr;
                 break;
             }
-            case historyitem_DLbl_SetShowSerName:
+            case AscDFH.historyitem_DLbl_SetShowSerName:
             {
                 this.showSerName = data.newPr;
                 break;
             }
-            case historyitem_DLbl_SetShowVal:
+            case AscDFH.historyitem_DLbl_SetShowVal:
             {
                 this.showVal = data.newPr;
                 break;
             }
-            case historyitem_DLbl_SetSpPr:
+            case AscDFH.historyitem_DLbl_SetSpPr:
             {
                 this.spPr = data.newPr;
                 break;
             }
-            case historyitem_DLbl_SetTx:
+            case AscDFH.historyitem_DLbl_SetTx:
             {
                 this.tx = data.newPr;
                 break;
             }
-            case historyitem_DLbl_SetTxPr:
+            case AscDFH.historyitem_DLbl_SetTxPr:
             {
                 this.txPr = data.newPr;
                 break;
@@ -1546,8 +1546,8 @@ CDLbl.prototype =
         w.WriteLong(data.Type);
         switch(data.Type)
         {
-            case historyitem_DLbl_SetDLblPos:
-            case historyitem_DLbl_SetIdx:
+            case AscDFH.historyitem_DLbl_SetDLblPos:
+            case AscDFH.historyitem_DLbl_SetIdx:
             {
                 w.WriteBool(isRealNumber(data.newPr));
                 if(isRealNumber(data.newPr))
@@ -1556,11 +1556,11 @@ CDLbl.prototype =
                 }
                 break;
             }
-            case historyitem_DLbl_SetLayout:
-            case historyitem_DLbl_SetSpPr:
-            case historyitem_DLbl_SetTx:
-            case historyitem_DLbl_SetTxPr:
-            case historyitem_DLbl_SetNumFmt:
+            case AscDFH.historyitem_DLbl_SetLayout:
+            case AscDFH.historyitem_DLbl_SetSpPr:
+            case AscDFH.historyitem_DLbl_SetTx:
+            case AscDFH.historyitem_DLbl_SetTxPr:
+            case AscDFH.historyitem_DLbl_SetNumFmt:
             {
                 w.WriteBool(isRealObject(data.newPr));
                 if(isRealObject(data.newPr))
@@ -1569,7 +1569,7 @@ CDLbl.prototype =
                 }
                 break;
             }
-            case historyitem_DLbl_SetSeparator:
+            case AscDFH.historyitem_DLbl_SetSeparator:
             {
                 w.WriteBool(typeof  data.newPr === "string");
                 if(typeof  data.newPr === "string")
@@ -1578,13 +1578,13 @@ CDLbl.prototype =
                 }
                 break;
             }
-            case historyitem_DLbl_SetDelete:
-            case historyitem_DLbl_SetShowBubbleSize:
-            case historyitem_DLbl_SetShowCatName:
-            case historyitem_DLbl_SetShowLegendKey:
-            case historyitem_DLbl_SetShowPercent:
-            case historyitem_DLbl_SetShowSerName:
-            case historyitem_DLbl_SetShowVal:
+            case AscDFH.historyitem_DLbl_SetDelete:
+            case AscDFH.historyitem_DLbl_SetShowBubbleSize:
+            case AscDFH.historyitem_DLbl_SetShowCatName:
+            case AscDFH.historyitem_DLbl_SetShowLegendKey:
+            case AscDFH.historyitem_DLbl_SetShowPercent:
+            case AscDFH.historyitem_DLbl_SetShowSerName:
+            case AscDFH.historyitem_DLbl_SetShowVal:
             {
                 w.WriteBool(isRealBool(data.newPr));
                 if(isRealBool(data.newPr))
@@ -1601,7 +1601,7 @@ CDLbl.prototype =
         var type = r.GetLong();
         switch(type)
         {
-            case historyitem_DLbl_SetDelete:
+            case AscDFH.historyitem_DLbl_SetDelete:
             {
                 if(r.GetBool())
                 {
@@ -1613,7 +1613,7 @@ CDLbl.prototype =
                 }
                 break;
             }
-            case historyitem_DLbl_SetDLblPos:
+            case AscDFH.historyitem_DLbl_SetDLblPos:
             {
                 if(r.GetBool())
                 {
@@ -1625,7 +1625,7 @@ CDLbl.prototype =
                 }
                 break;
             }
-            case historyitem_DLbl_SetIdx:
+            case AscDFH.historyitem_DLbl_SetIdx:
             {
                 if(r.GetBool())
                 {
@@ -1637,7 +1637,7 @@ CDLbl.prototype =
                 }
                 break;
             }
-            case historyitem_DLbl_SetLayout:
+            case AscDFH.historyitem_DLbl_SetLayout:
             {
                 if(r.GetBool())
                 {
@@ -1649,7 +1649,7 @@ CDLbl.prototype =
                 }
                 break;
             }
-            case historyitem_DLbl_SetNumFmt:
+            case AscDFH.historyitem_DLbl_SetNumFmt:
             {
                 if(r.GetBool())
                 {
@@ -1661,7 +1661,7 @@ CDLbl.prototype =
                 }
                 break;
             }
-            case historyitem_DLbl_SetSeparator:
+            case AscDFH.historyitem_DLbl_SetSeparator:
             {
                 if(r.GetBool())
                 {
@@ -1674,7 +1674,7 @@ CDLbl.prototype =
                 break;
 
             }
-            case historyitem_DLbl_SetShowBubbleSize:
+            case AscDFH.historyitem_DLbl_SetShowBubbleSize:
             {
                 if(r.GetBool())
                 {
@@ -1686,7 +1686,7 @@ CDLbl.prototype =
                 }
                 break;
             }
-            case historyitem_DLbl_SetShowCatName:
+            case AscDFH.historyitem_DLbl_SetShowCatName:
             {
                 if(r.GetBool())
                 {
@@ -1698,7 +1698,7 @@ CDLbl.prototype =
                 }
                 break;
             }
-            case historyitem_DLbl_SetShowLegendKey:
+            case AscDFH.historyitem_DLbl_SetShowLegendKey:
             {
                 if(r.GetBool())
                 {
@@ -1710,7 +1710,7 @@ CDLbl.prototype =
                 }
                 break;
             }
-            case historyitem_DLbl_SetShowPercent:
+            case AscDFH.historyitem_DLbl_SetShowPercent:
             {
                 if(r.GetBool())
                 {
@@ -1722,7 +1722,7 @@ CDLbl.prototype =
                 }
                 break;
             }
-            case historyitem_DLbl_SetShowSerName:
+            case AscDFH.historyitem_DLbl_SetShowSerName:
             {
                 if(r.GetBool())
                 {
@@ -1734,7 +1734,7 @@ CDLbl.prototype =
                 }
                 break;
             }
-            case historyitem_DLbl_SetShowVal:
+            case AscDFH.historyitem_DLbl_SetShowVal:
             {
                 if(r.GetBool())
                 {
@@ -1746,7 +1746,7 @@ CDLbl.prototype =
                 }
                 break;
             }
-            case historyitem_DLbl_SetSpPr:
+            case AscDFH.historyitem_DLbl_SetSpPr:
             {
                 if(r.GetBool())
                 {
@@ -1758,7 +1758,7 @@ CDLbl.prototype =
                 }
                 break;
             }
-            case historyitem_DLbl_SetTx:
+            case AscDFH.historyitem_DLbl_SetTx:
             {
                 if(r.GetBool())
                 {
@@ -1770,7 +1770,7 @@ CDLbl.prototype =
                 }
                 break;
             }
-            case historyitem_DLbl_SetTxPr:
+            case AscDFH.historyitem_DLbl_SetTxPr:
             {
                 if(r.GetBool())
                 {
@@ -1822,53 +1822,53 @@ CPlotArea.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 break;
             }
-            case historyitem_PlotArea_RemoveAxis:
+            case AscDFH.historyitem_PlotArea_RemoveAxis:
             {
                 break;
             }
-            case historyitem_PlotArea_RemoveChart:
+            case AscDFH.historyitem_PlotArea_RemoveChart:
             {
                 break;
             }
-            case historyitem_PlotArea_AddChart:
+            case AscDFH.historyitem_PlotArea_AddChart:
             {
                 if(this.parent && this.parent.parent)
                     this.parent.parent.handleUpdateType();
                 break;
             }
-            case historyitem_PlotArea_SetCatAx:
+            case AscDFH.historyitem_PlotArea_SetCatAx:
             {
                 break;
             }
-            case historyitem_PlotArea_SetDateAx:
+            case AscDFH.historyitem_PlotArea_SetDateAx:
             {
                 break;
             }
-            case historyitem_PlotArea_SetDTable:
+            case AscDFH.historyitem_PlotArea_SetDTable:
             {
                 break;
             }
-            case historyitem_PlotArea_SetLayout:
+            case AscDFH.historyitem_PlotArea_SetLayout:
             {
                 break;
             }
-            case historyitem_PlotArea_SetSerAx:
+            case AscDFH.historyitem_PlotArea_SetSerAx:
             {
                 break;
             }
-            case historyitem_PlotArea_SetSpPr:
+            case AscDFH.historyitem_PlotArea_SetSpPr:
             {
                 break;
             }
-            case historyitem_PlotArea_SetValAx:
+            case AscDFH.historyitem_PlotArea_SetValAx:
             {
                 break;
             }
-            case historyitem_PlotArea_AddAxis:
+            case AscDFH.historyitem_PlotArea_AddAxis:
             {
                 break;
             }
@@ -1880,7 +1880,7 @@ CPlotArea.prototype =
 
     getObjectType: function()
     {
-        return historyitem_type_PlotArea;
+        return AscDFH.historyitem_type_PlotArea;
     },
 
     createDuplicate: function()
@@ -1970,7 +1970,7 @@ CPlotArea.prototype =
                 return;
         }
         //если такой оси нет, можно добавлять.
-        History.Add(this, {Type: historyitem_PlotArea_AddAxis, newPr:axis});
+        History.Add(this, {Type: AscDFH.historyitem_PlotArea_AddAxis, newPr:axis});
         this.axId.push(axis);
         axis.setParent(this);
 
@@ -1990,7 +1990,7 @@ CPlotArea.prototype =
             pos = idx;
         else
             pos = this.charts.length;
-        History.Add(this, {Type: historyitem_PlotArea_AddChart, newPr:pr, pos: pos});
+        History.Add(this, {Type: AscDFH.historyitem_PlotArea_AddChart, newPr:pr, pos: pos});
         this.charts.splice(pos, 0, pr);
         pr.setParent(this);
         if(this.parent && this.parent.parent)
@@ -2002,7 +2002,7 @@ CPlotArea.prototype =
     {
         if(this.charts[pos])
         {
-            History.Add(this, {Type: historyitem_PlotArea_RemoveChart, pos: pos, newPr: this.charts[pos]});
+            History.Add(this, {Type: AscDFH.historyitem_PlotArea_RemoveChart, pos: pos, newPr: this.charts[pos]});
             var chart  = this.charts.splice(pos, 1)[0];
 
             //удалим все оси этой диаграммы, проверив прежде нет ли ссылок на данные оси в других диаграммах
@@ -2047,7 +2047,7 @@ CPlotArea.prototype =
         {
             if(this.axId[i] === axis)
             {
-                History.Add(this, {Type: historyitem_PlotArea_RemoveAxis, newPr: axis, pos: i});
+                History.Add(this, {Type: AscDFH.historyitem_PlotArea_RemoveAxis, newPr: axis, pos: i});
                 this.axId.splice(i, 1);
             }
         }
@@ -2055,37 +2055,37 @@ CPlotArea.prototype =
 
     setCatAx: function(pr)
     {
-        History.Add(this, {Type: historyitem_PlotArea_SetCatAx, oldPr: this.catAx, newPr:pr});
+        History.Add(this, {Type: AscDFH.historyitem_PlotArea_SetCatAx, oldPr: this.catAx, newPr:pr});
         this.catAx = pr;
     },
 
     setDateAx: function(pr)
     {
-        History.Add(this, {Type: historyitem_PlotArea_SetDateAx, oldPr: this.dateAx, newPr:pr});
+        History.Add(this, {Type: AscDFH.historyitem_PlotArea_SetDateAx, oldPr: this.dateAx, newPr:pr});
         this.dateAx = pr;
     },
 
     setDTable: function(pr)
     {
-        History.Add(this, {Type: historyitem_PlotArea_SetDTable, oldPr: this.dTable, newPr:pr});
+        History.Add(this, {Type: AscDFH.historyitem_PlotArea_SetDTable, oldPr: this.dTable, newPr:pr});
         this.dTable = pr;
     },
 
     setLayout: function(pr)
     {
-        History.Add(this, {Type: historyitem_PlotArea_SetLayout, oldPr: this.layout, newPr:pr});
+        History.Add(this, {Type: AscDFH.historyitem_PlotArea_SetLayout, oldPr: this.layout, newPr:pr});
         this.layout = pr;
     },
 
     setSerAx: function(pr)
     {
-        History.Add(this, {Type: historyitem_PlotArea_SetSerAx, oldPr: this.serAx, newPr:pr});
+        History.Add(this, {Type: AscDFH.historyitem_PlotArea_SetSerAx, oldPr: this.serAx, newPr:pr});
         this.serAx = pr;
     },
 
     setSpPr: function(pr)
     {
-        History.Add(this, {Type: historyitem_PlotArea_SetSpPr, oldPr: this.spPr, newPr:pr});
+        History.Add(this, {Type: AscDFH.historyitem_PlotArea_SetSpPr, oldPr: this.spPr, newPr:pr});
         this.spPr = pr;
         if(pr)
         {
@@ -2095,7 +2095,7 @@ CPlotArea.prototype =
 
     setValAx: function(pr)
     {
-        History.Add(this, {Type: historyitem_PlotArea_SetValAx, oldPr: this.valAx, newPr:pr});
+        History.Add(this, {Type: AscDFH.historyitem_PlotArea_SetValAx, oldPr: this.valAx, newPr:pr});
         this.valAx = pr;
     },
 
@@ -2145,13 +2145,13 @@ CPlotArea.prototype =
             var axis = this.axId[i];
             switch(axis.getObjectType())
             {
-                case historyitem_type_CatAx:
-                case historyitem_type_DateAx:
+                case AscDFH.historyitem_type_CatAx:
+                case AscDFH.historyitem_type_DateAx:
                 {
                     ret.catAx.push(axis);
                     break;
                 }
-                case historyitem_type_ValAx:
+                case AscDFH.historyitem_type_ValAx:
                 {
                     ret.valAx.push(axis);
                     break;
@@ -2164,7 +2164,7 @@ CPlotArea.prototype =
 
     setParent: function(pr)
     {
-        History.Add(this, {Type: historyitem_CommonChartFormat_SetParent, oldPr: this.parent, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_CommonChartFormat_SetParent, oldPr: this.parent, newPr: pr});
         this.parent = pr;
     },
 
@@ -2172,22 +2172,22 @@ CPlotArea.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 this.parent = data.oldPr;
                 break;
             }
-            case historyitem_PlotArea_RemoveAxis:
+            case AscDFH.historyitem_PlotArea_RemoveAxis:
             {
                 this.axId.splice(data.pos, 0, data.newPr);
                 break;
             }
-            case historyitem_PlotArea_RemoveChart:
+            case AscDFH.historyitem_PlotArea_RemoveChart:
             {
                 this.charts.splice(data.pos, 0, data.newPr);
                 break;
             }
-            case historyitem_PlotArea_AddChart:
+            case AscDFH.historyitem_PlotArea_AddChart:
             {
                 for(var i = this.charts.length - 1; i > -1; --i)
                 {
@@ -2201,42 +2201,42 @@ CPlotArea.prototype =
                     this.parent.parent.handleUpdateType();
                 break;
             }
-            case historyitem_PlotArea_SetCatAx:
+            case AscDFH.historyitem_PlotArea_SetCatAx:
             {
                 this.catAx = data.oldPr;
                 break;
             }
-            case historyitem_PlotArea_SetDateAx:
+            case AscDFH.historyitem_PlotArea_SetDateAx:
             {
                 this.dateAx = data.oldPr;
                 break;
             }
-            case historyitem_PlotArea_SetDTable:
+            case AscDFH.historyitem_PlotArea_SetDTable:
             {
                 this.dTable = data.oldPr;
                 break;
             }
-            case historyitem_PlotArea_SetLayout:
+            case AscDFH.historyitem_PlotArea_SetLayout:
             {
                 this.layout = data.oldPr;
                 break;
             }
-            case historyitem_PlotArea_SetSerAx:
+            case AscDFH.historyitem_PlotArea_SetSerAx:
             {
                 this.serAx = data.oldPr;
                 break;
             }
-            case historyitem_PlotArea_SetSpPr:
+            case AscDFH.historyitem_PlotArea_SetSpPr:
             {
                 this.spPr = data.oldPr;
                 break;
             }
-            case historyitem_PlotArea_SetValAx:
+            case AscDFH.historyitem_PlotArea_SetValAx:
             {
                 this.valAx = data.oldPr;
                 break;
             }
-            case historyitem_PlotArea_AddAxis:
+            case AscDFH.historyitem_PlotArea_AddAxis:
             {
                 for(var  i = this.axId.length - 1; i > -1; --i)
                 {
@@ -2255,64 +2255,64 @@ CPlotArea.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 this.parent = data.newPr;
                 break;
             }
-            case historyitem_PlotArea_RemoveAxis:
+            case AscDFH.historyitem_PlotArea_RemoveAxis:
             {
                 this.axId.splice(data.pos, 1);
                 break;
             }
-            case historyitem_PlotArea_RemoveChart:
+            case AscDFH.historyitem_PlotArea_RemoveChart:
             {
                 this.charts.splice(data.pos, 1);
                 break;
             }
-            case historyitem_PlotArea_AddChart:
+            case AscDFH.historyitem_PlotArea_AddChart:
             {
                 this.charts.splice(data.pos, 0, data.newPr);
                 if(this.parent && this.parent.parent)
                     this.parent.parent.handleUpdateType();
                 break;
             }
-            case historyitem_PlotArea_SetCatAx:
+            case AscDFH.historyitem_PlotArea_SetCatAx:
             {
                 this.catAx = data.newPr;
                 break;
             }
-            case historyitem_PlotArea_SetDateAx:
+            case AscDFH.historyitem_PlotArea_SetDateAx:
             {
                 this.dateAx = data.newPr;
                 break;
             }
-            case historyitem_PlotArea_SetDTable:
+            case AscDFH.historyitem_PlotArea_SetDTable:
             {
                 this.dTable = data.newPr;
                 break;
             }
-            case historyitem_PlotArea_SetLayout:
+            case AscDFH.historyitem_PlotArea_SetLayout:
             {
                 this.layout = data.newPr;
                 break;
             }
-            case historyitem_PlotArea_SetSerAx:
+            case AscDFH.historyitem_PlotArea_SetSerAx:
             {
                 this.serAx = data.newPr;
                 break;
             }
-            case historyitem_PlotArea_SetSpPr:
+            case AscDFH.historyitem_PlotArea_SetSpPr:
             {
                 this.spPr = data.newPr;
                 break;
             }
-            case historyitem_PlotArea_SetValAx:
+            case AscDFH.historyitem_PlotArea_SetValAx:
             {
                 this.valAx = data.newPr;
                 break;
             }
-            case historyitem_PlotArea_AddAxis:
+            case AscDFH.historyitem_PlotArea_AddAxis:
             {
                 this.axId.push(data.newPr);
                 break;
@@ -2325,27 +2325,27 @@ CPlotArea.prototype =
         w.WriteLong(data.Type);
         switch (data.Type)
         {
-            case historyitem_PlotArea_SetCatAx:
-            case historyitem_PlotArea_SetDateAx:
-            case historyitem_PlotArea_SetDTable:
-            case historyitem_PlotArea_SetLayout:
-            case historyitem_PlotArea_SetSerAx:
-            case historyitem_PlotArea_SetSpPr:
-            case historyitem_PlotArea_SetValAx:
-            case historyitem_PlotArea_AddAxis:
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_PlotArea_SetCatAx:
+            case AscDFH.historyitem_PlotArea_SetDateAx:
+            case AscDFH.historyitem_PlotArea_SetDTable:
+            case AscDFH.historyitem_PlotArea_SetLayout:
+            case AscDFH.historyitem_PlotArea_SetSerAx:
+            case AscDFH.historyitem_PlotArea_SetSpPr:
+            case AscDFH.historyitem_PlotArea_SetValAx:
+            case AscDFH.historyitem_PlotArea_AddAxis:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 writeObject(w, data.newPr);
                 break;
             }
-            case historyitem_PlotArea_AddChart:
+            case AscDFH.historyitem_PlotArea_AddChart:
             {
                 writeObject(w, data.newPr);
                 writeLong(w, data.pos);
                 break;
             }
-            case historyitem_PlotArea_RemoveChart:
-            case historyitem_PlotArea_RemoveAxis:
+            case AscDFH.historyitem_PlotArea_RemoveChart:
+            case AscDFH.historyitem_PlotArea_RemoveAxis:
             {
                 writeLong(w, data.pos);
                 break;
@@ -2358,12 +2358,12 @@ CPlotArea.prototype =
         var type = r.GetLong();
         switch (type)
         {
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 this.parent = readObject(r);
                 break;
             }
-            case historyitem_PlotArea_AddChart:
+            case AscDFH.historyitem_PlotArea_AddChart:
             {
                 var chart = readObject(r);
                 var pos = readLong(r);
@@ -2372,54 +2372,54 @@ CPlotArea.prototype =
                     this.parent.parent.handleUpdateType();
                 break;
             }
-            case historyitem_PlotArea_SetCatAx:
+            case AscDFH.historyitem_PlotArea_SetCatAx:
             {
                 this.catAx = readObject(r);
                 break;
             }
-            case historyitem_PlotArea_SetDateAx:
+            case AscDFH.historyitem_PlotArea_SetDateAx:
             {
                 this.dateAx = readObject(r);
                 break;
             }
-            case historyitem_PlotArea_SetDTable:
+            case AscDFH.historyitem_PlotArea_SetDTable:
             {
                 this.dTable = readObject(r);
                 break;
             }
-            case historyitem_PlotArea_SetLayout:
+            case AscDFH.historyitem_PlotArea_SetLayout:
             {
                 this.layout = readObject(r);
                 break;
             }
-            case historyitem_PlotArea_SetSerAx:
+            case AscDFH.historyitem_PlotArea_SetSerAx:
             {
                 this.serAx = readObject(r);
                 break;
             }
-            case historyitem_PlotArea_SetSpPr:
+            case AscDFH.historyitem_PlotArea_SetSpPr:
             {
                 this.spPr = readObject(r);
                 break;
             }
-            case historyitem_PlotArea_SetValAx:
+            case AscDFH.historyitem_PlotArea_SetValAx:
             {
                 this.valAx = readObject(r);
                 break;
             }
-            case historyitem_PlotArea_AddAxis:
+            case AscDFH.historyitem_PlotArea_AddAxis:
             {
                 var axis = readObject(r);
                 this.axId.push(axis);
                 break;
             }
-            case historyitem_PlotArea_RemoveChart:
+            case AscDFH.historyitem_PlotArea_RemoveChart:
             {
                 var pos = readLong(r);
                 this.charts.splice(pos, 1);
                 break;
             }
-            case historyitem_PlotArea_RemoveAxis:
+            case AscDFH.historyitem_PlotArea_RemoveAxis:
             {
                 var pos = readLong(r);
                 this.axId.splice(pos, 1);
@@ -2460,19 +2460,19 @@ CBarChart.prototype =
 
     set3D: function(pr)
     {
-        History.Add(this, {Type: historyitem_BarChart_Set3D, oldPr: this.b3D, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_BarChart_Set3D, oldPr: this.b3D, newPr: pr});
         this.b3D = pr;
     },
 
     setGapDepth: function(pr)
     {
-        History.Add(this, {Type: historyitem_BarChart_SetGapDepth, oldPr: this.gapDepth, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_BarChart_SetGapDepth, oldPr: this.gapDepth, newPr: pr});
         this.gapDepth = pr;
     },
 
     setShape: function(pr)
     {
-        History.Add(this, {Type: historyitem_BarChart_SetShape, oldPr: this.shape, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_BarChart_SetShape, oldPr: this.shape, newPr: pr});
         this.shape = pr;
     },
 
@@ -2485,7 +2485,7 @@ CBarChart.prototype =
     {
         if(this.series[idx])
         {
-            History.Add(this, {Type: historyitem_CommonChart_RemoveSeries, oldPr: idx, newPr: this.series.splice(idx, 1)[0]});
+            History.Add(this, {Type: AscDFH.historyitem_CommonChart_RemoveSeries, oldPr: idx, newPr: this.series.splice(idx, 1)[0]});
         }
     },
 
@@ -2564,7 +2564,7 @@ CBarChart.prototype =
 
     getObjectType: function()
     {
-        return historyitem_type_BarChart;
+        return AscDFH.historyitem_type_BarChart;
     },
 
 
@@ -2574,22 +2574,22 @@ CBarChart.prototype =
             return;
         switch(data.Type)
         {
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 break;
             }
-            case historyitem_CommonChart_RemoveSeries:
+            case AscDFH.historyitem_CommonChart_RemoveSeries:
             {
                 break;
             }
-            case historyitem_BarChart_AddAxId:
+            case AscDFH.historyitem_BarChart_AddAxId:
             {
                 break;
             }
-            case historyitem_BarChart_SetBarDir:
-            case historyitem_BarChart_Set3D:
-            case historyitem_BarChart_SetGapDepth:
-            case historyitem_BarChart_SetShape:
+            case AscDFH.historyitem_BarChart_SetBarDir:
+            case AscDFH.historyitem_BarChart_Set3D:
+            case AscDFH.historyitem_BarChart_SetGapDepth:
+            case AscDFH.historyitem_BarChart_SetShape:
             {
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
                 {
@@ -2597,7 +2597,7 @@ CBarChart.prototype =
                 }
                 break;
             }
-            case historyitem_BarChart_SetDLbls:
+            case AscDFH.historyitem_BarChart_SetDLbls:
             {
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
                 {
@@ -2605,11 +2605,11 @@ CBarChart.prototype =
                 }
                 break;
             }
-            case historyitem_BarChart_SetGapWidth:
+            case AscDFH.historyitem_BarChart_SetGapWidth:
             {
                 break;
             }
-            case historyitem_BarChart_SetGrouping:
+            case AscDFH.historyitem_BarChart_SetGrouping:
             {
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
                 {
@@ -2617,11 +2617,11 @@ CBarChart.prototype =
                 }
                 break;
             }
-            case historyitem_BarChart_SetOverlap:
+            case AscDFH.historyitem_BarChart_SetOverlap:
             {
                 break;
             }
-            case historyitem_BarChart_AddSer:
+            case AscDFH.historyitem_BarChart_AddSer:
             {
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
                 {
@@ -2629,11 +2629,11 @@ CBarChart.prototype =
                 }
                 break;
             }
-            case historyitem_BarChart_SetSerLines:
+            case AscDFH.historyitem_BarChart_SetSerLines:
             {
                 break;
             }
-            case historyitem_BarChart_SetVaryColors:
+            case AscDFH.historyitem_BarChart_SetVaryColors:
             {
                 break;
             }
@@ -2693,13 +2693,13 @@ CBarChart.prototype =
     {
         if(!pr)
             return;
-        History.Add(this, {Type: historyitem_BarChart_AddAxId, pr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_BarChart_AddAxId, pr: pr});
         this.axId.push(pr);
     },
 
     setBarDir: function(pr)
     {
-        History.Add(this, {Type: historyitem_BarChart_SetBarDir, oldPr: this.barDir, newPr:pr});
+        History.Add(this, {Type: AscDFH.historyitem_BarChart_SetBarDir, oldPr: this.barDir, newPr:pr});
         this.barDir = pr;
         if(this.parent && this.parent.parent && this.parent.parent.parent)
         {
@@ -2709,7 +2709,7 @@ CBarChart.prototype =
 
     setDLbls     : function(pr)
     {
-        History.Add(this, {Type: historyitem_BarChart_SetDLbls, oldPr: this.dLbls, newPr:pr});
+        History.Add(this, {Type: AscDFH.historyitem_BarChart_SetDLbls, oldPr: this.dLbls, newPr:pr});
         this.dLbls = pr;
         if(this.parent && this.parent.parent && this.parent.parent.parent)
         {
@@ -2718,12 +2718,12 @@ CBarChart.prototype =
     },
     setGapWidth: function(pr)
     {
-        History.Add(this, {Type: historyitem_BarChart_SetGapWidth, oldPr: this.gapWidth, newPr:pr});
+        History.Add(this, {Type: AscDFH.historyitem_BarChart_SetGapWidth, oldPr: this.gapWidth, newPr:pr});
         this.gapWidth = pr;
     },
     setGrouping: function(pr)
     {
-        History.Add(this, {Type: historyitem_BarChart_SetGrouping, oldPr: this.grouping, newPr:pr});
+        History.Add(this, {Type: AscDFH.historyitem_BarChart_SetGrouping, oldPr: this.grouping, newPr:pr});
         this.grouping = pr;
         if(this.parent && this.parent.parent && this.parent.parent.parent)
         {
@@ -2732,12 +2732,12 @@ CBarChart.prototype =
     },
     setOverlap: function(pr)
     {
-        History.Add(this, {Type: historyitem_BarChart_SetOverlap, oldPr: this.overlap, newPr:pr});
+        History.Add(this, {Type: AscDFH.historyitem_BarChart_SetOverlap, oldPr: this.overlap, newPr:pr});
         this.overlap = pr;
     },
     addSer: function(pr)
     {
-        History.Add(this, {Type: historyitem_BarChart_AddSer, pr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_BarChart_AddSer, pr: pr});
         this.series.push(pr);
         pr.setParent(this);
         if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -2747,18 +2747,18 @@ CBarChart.prototype =
     },
     setSerLines: function(pr)
     {
-        History.Add(this, {Type: historyitem_BarChart_SetSerLines, oldPr: this.serLines, newPr:pr});
+        History.Add(this, {Type: AscDFH.historyitem_BarChart_SetSerLines, oldPr: this.serLines, newPr:pr});
         this.serLines = pr;
     },
     setVaryColors: function(pr)
     {
-        History.Add(this, {Type: historyitem_BarChart_SetVaryColors, oldPr: this.varyColors, newPr:pr});
+        History.Add(this, {Type: AscDFH.historyitem_BarChart_SetVaryColors, oldPr: this.varyColors, newPr:pr});
         this.varyColors = pr;
     },
 
     setParent: function(pr)
     {
-        History.Add(this, {Type: historyitem_CommonChartFormat_SetParent, oldPr: this.parent, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_CommonChartFormat_SetParent, oldPr: this.parent, newPr: pr});
         this.parent = pr;
     },
 
@@ -2766,32 +2766,32 @@ CBarChart.prototype =
     {
         switch(data.Type)
         {
-            case historyitem_BarChart_SetShape:
+            case AscDFH.historyitem_BarChart_SetShape:
             {
                 this.shape = data.oldPr;
                 break;
             }
-            case historyitem_BarChart_Set3D:
+            case AscDFH.historyitem_BarChart_Set3D:
             {
                 this.b3D = data.oldPr;
                 break;
             }
-            case historyitem_BarChart_SetGapDepth:
+            case AscDFH.historyitem_BarChart_SetGapDepth:
             {
                 this.gapDepth = data.oldPr;
                 break;
             }
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 this.parent = data.oldPr;
                 break;
             }
-            case historyitem_CommonChart_RemoveSeries:
+            case AscDFH.historyitem_CommonChart_RemoveSeries:
             {
                 this.series.splice(data.oldPr, 0, data.newPr);
                 break;
             }
-            case historyitem_BarChart_AddAxId:
+            case AscDFH.historyitem_BarChart_AddAxId:
             {
                 for(var i = this.axId.length - 1; i > -1; --i)
                 {
@@ -2803,7 +2803,7 @@ CBarChart.prototype =
                 }
                 break;
             }
-            case historyitem_BarChart_SetBarDir:
+            case AscDFH.historyitem_BarChart_SetBarDir:
             {
                 this.barDir = data.oldPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -2812,7 +2812,7 @@ CBarChart.prototype =
                 }
                 break;
             }
-            case historyitem_BarChart_SetDLbls:
+            case AscDFH.historyitem_BarChart_SetDLbls:
             {
                 this.dLbls = data.oldPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -2821,12 +2821,12 @@ CBarChart.prototype =
                 }
                 break;
             }
-            case historyitem_BarChart_SetGapWidth:
+            case AscDFH.historyitem_BarChart_SetGapWidth:
             {
                 this.gapWidth = data.oldPr;
                 break;
             }
-            case historyitem_BarChart_SetGrouping:
+            case AscDFH.historyitem_BarChart_SetGrouping:
             {
                 this.grouping = data.oldPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -2835,12 +2835,12 @@ CBarChart.prototype =
                 }
                 break;
             }
-            case historyitem_BarChart_SetOverlap:
+            case AscDFH.historyitem_BarChart_SetOverlap:
             {
                 this.overlap = data.oldPr;
                 break;
             }
-            case historyitem_BarChart_AddSer:
+            case AscDFH.historyitem_BarChart_AddSer:
             {
                 for(var i = this.series.length - 1; i > -1; --i)
                 {
@@ -2856,12 +2856,12 @@ CBarChart.prototype =
                 }
                 break;
             }
-            case historyitem_BarChart_SetSerLines:
+            case AscDFH.historyitem_BarChart_SetSerLines:
             {
                 this.serLines = data.oldPr;
                 break;
             }
-            case historyitem_BarChart_SetVaryColors:
+            case AscDFH.historyitem_BarChart_SetVaryColors:
             {
                 this.varyColors = data.oldPr;
                 break;
@@ -2873,37 +2873,37 @@ CBarChart.prototype =
     {
         switch(data.Type)
         {
-            case historyitem_BarChart_SetShape:
+            case AscDFH.historyitem_BarChart_SetShape:
             {
                 this.shape = data.newPr;
                 break;
             }
-            case historyitem_BarChart_Set3D:
+            case AscDFH.historyitem_BarChart_Set3D:
             {
                 this.b3D = data.newPr;
                 break;
             }
-            case historyitem_BarChart_SetGapDepth:
+            case AscDFH.historyitem_BarChart_SetGapDepth:
             {
                 this.gapDepth = data.newPr;
                 break;
             }
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 this.parent = data.newPr;
                 break;
             }
-            case historyitem_CommonChart_RemoveSeries:
+            case AscDFH.historyitem_CommonChart_RemoveSeries:
             {
                 this.series.splice(data.oldPr, 1);
                 break;
             }
-            case historyitem_BarChart_AddAxId:
+            case AscDFH.historyitem_BarChart_AddAxId:
             {
                 this.axId.push(data.pr);
                 break;
             }
-            case historyitem_BarChart_SetBarDir:
+            case AscDFH.historyitem_BarChart_SetBarDir:
             {
                 this.barDir = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -2912,7 +2912,7 @@ CBarChart.prototype =
                 }
                 break;
             }
-            case historyitem_BarChart_SetDLbls:
+            case AscDFH.historyitem_BarChart_SetDLbls:
             {
                 this.dLbls = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -2921,12 +2921,12 @@ CBarChart.prototype =
                 }
                 break;
             }
-            case historyitem_BarChart_SetGapWidth:
+            case AscDFH.historyitem_BarChart_SetGapWidth:
             {
                 this.gapWidth = data.newPr;
                 break;
             }
-            case historyitem_BarChart_SetGrouping:
+            case AscDFH.historyitem_BarChart_SetGrouping:
             {
                 this.grouping = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -2935,12 +2935,12 @@ CBarChart.prototype =
                 }
                 break;
             }
-            case historyitem_BarChart_SetOverlap:
+            case AscDFH.historyitem_BarChart_SetOverlap:
             {
                 this.overlap = data.newPr;
                 break;
             }
-            case historyitem_BarChart_AddSer:
+            case AscDFH.historyitem_BarChart_AddSer:
             {
                 this.series.push(data.pr);
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -2949,12 +2949,12 @@ CBarChart.prototype =
                 }
                 break;
             }
-            case historyitem_BarChart_SetSerLines:
+            case AscDFH.historyitem_BarChart_SetSerLines:
             {
                 this.serLines = data.newPr;
                 break;
             }
-            case historyitem_BarChart_SetVaryColors:
+            case AscDFH.historyitem_BarChart_SetVaryColors:
             {
                 this.varyColors = data.newPr;
                 break;
@@ -2968,49 +2968,49 @@ CBarChart.prototype =
 
         switch(data.Type)
         {
-            case historyitem_BarChart_Set3D:
+            case AscDFH.historyitem_BarChart_Set3D:
             {
                 writeBool(w, data.newPr);
                 break;
             }
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 writeObject(w, data.newPr);
                 break;
             }
 
-            case historyitem_BarChart_SetShape:
+            case AscDFH.historyitem_BarChart_SetShape:
             {
                 writeLong(w, data.newPr);
                 break;
             }
-            case historyitem_CommonChart_RemoveSeries:
+            case AscDFH.historyitem_CommonChart_RemoveSeries:
             {
                 writeLong(w, data.oldPr);
                 break;
             }
-            case historyitem_BarChart_AddAxId:
-            case historyitem_BarChart_AddSer:
+            case AscDFH.historyitem_BarChart_AddAxId:
+            case AscDFH.historyitem_BarChart_AddSer:
             {
                 writeObject(w, data.pr);
                 break;
             }
-            case historyitem_BarChart_SetBarDir:
-            case historyitem_BarChart_SetGapWidth:
-            case historyitem_BarChart_SetGapDepth:
-            case historyitem_BarChart_SetGrouping:
-            case historyitem_BarChart_SetOverlap:
+            case AscDFH.historyitem_BarChart_SetBarDir:
+            case AscDFH.historyitem_BarChart_SetGapWidth:
+            case AscDFH.historyitem_BarChart_SetGapDepth:
+            case AscDFH.historyitem_BarChart_SetGrouping:
+            case AscDFH.historyitem_BarChart_SetOverlap:
             {
                 writeLong(w, data.newPr);
                 break;
             }
-            case historyitem_BarChart_SetDLbls:
-            case historyitem_BarChart_SetSerLines:
+            case AscDFH.historyitem_BarChart_SetDLbls:
+            case AscDFH.historyitem_BarChart_SetSerLines:
             {
                 writeObject(w, data.newPr);
                 break;
             }
-            case historyitem_BarChart_SetVaryColors:
+            case AscDFH.historyitem_BarChart_SetVaryColors:
             {
                 writeBool(w, data.newPr);
                 break;
@@ -3023,35 +3023,35 @@ CBarChart.prototype =
         var type = r.GetLong();
         switch (type)
         {
-            case historyitem_BarChart_Set3D:
+            case AscDFH.historyitem_BarChart_Set3D:
             {
                 this.b3D = readBool(r);
                 break;
             }
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 this.parent = readObject(r);
                 break;
             }
-            case historyitem_BarChart_SetShape:
+            case AscDFH.historyitem_BarChart_SetShape:
             {
                 this.shape = readLong(r);
                 break;
             }
-            case historyitem_CommonChart_RemoveSeries:
+            case AscDFH.historyitem_CommonChart_RemoveSeries:
             {
                 var pos = readLong(r);
                 this.series.splice(pos, 1);
                 break;
             }
-            case historyitem_BarChart_AddAxId:
+            case AscDFH.historyitem_BarChart_AddAxId:
             {
                 var ax = readObject(r);
                 if(isRealObject(ax))
                     this.axId.push(ax);
                 break;
             }
-            case historyitem_BarChart_SetBarDir:
+            case AscDFH.historyitem_BarChart_SetBarDir:
             {
                 this.barDir = readLong(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -3060,7 +3060,7 @@ CBarChart.prototype =
                 }
                 break;
             }
-            case historyitem_BarChart_SetDLbls:
+            case AscDFH.historyitem_BarChart_SetDLbls:
             {
                 this.dLbls = readObject(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -3069,17 +3069,17 @@ CBarChart.prototype =
                 }
                 break;
             }
-            case historyitem_BarChart_SetGapWidth:
+            case AscDFH.historyitem_BarChart_SetGapWidth:
             {
                 this.gapWidth = readLong(r);
                 break;
             }
-            case historyitem_BarChart_SetGapDepth:
+            case AscDFH.historyitem_BarChart_SetGapDepth:
             {
                 this.gapDepth = readLong(r);
                 break;
             }
-            case historyitem_BarChart_SetGrouping:
+            case AscDFH.historyitem_BarChart_SetGrouping:
             {
                 this.grouping = readLong(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -3088,12 +3088,12 @@ CBarChart.prototype =
                 }
                 break;
             }
-            case historyitem_BarChart_SetOverlap:
+            case AscDFH.historyitem_BarChart_SetOverlap:
             {
                 this.overlap = readLong(r);
                 break;
             }
-            case historyitem_BarChart_AddSer:
+            case AscDFH.historyitem_BarChart_AddSer:
             {
                 var ser = readObject(r);
                 if(isRealObject(ser))
@@ -3104,12 +3104,12 @@ CBarChart.prototype =
                 }
                 break;
             }
-            case historyitem_BarChart_SetSerLines:
+            case AscDFH.historyitem_BarChart_SetSerLines:
             {
                 this.serLines = readObject(r);
                 break;
             }
-            case historyitem_BarChart_SetVaryColors:
+            case AscDFH.historyitem_BarChart_SetVaryColors:
             {
                 this.varyColors = readBool(r);
                 break;
@@ -3141,7 +3141,7 @@ CAreaChart.prototype =
     {
         if(this.series[idx])
         {
-            History.Add(this, {Type: historyitem_CommonChart_RemoveSeries, oldPr: idx, newPr: this.series.splice(idx, 1)[0]});
+            History.Add(this, {Type: AscDFH.historyitem_CommonChart_RemoveSeries, oldPr: idx, newPr: this.series.splice(idx, 1)[0]});
         }
     },
 
@@ -3184,19 +3184,19 @@ CAreaChart.prototype =
             return;
         switch (data.Type)
         {
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 break;
             }
-            case historyitem_CommonChart_RemoveSeries:
+            case AscDFH.historyitem_CommonChart_RemoveSeries:
             {
                 break;
             }
-            case historyitem_AreaChart_AddAxId:
+            case AscDFH.historyitem_AreaChart_AddAxId:
             {
                 break
             }
-            case historyitem_AreaChart_SetDLbls:
+            case AscDFH.historyitem_AreaChart_SetDLbls:
             {
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
                 {
@@ -3204,11 +3204,11 @@ CAreaChart.prototype =
                 }
                 break
             }
-            case historyitem_AreaChart_SetDropLines:
+            case AscDFH.historyitem_AreaChart_SetDropLines:
             {
                 break
             }
-            case historyitem_AreaChart_SetGrouping:
+            case AscDFH.historyitem_AreaChart_SetGrouping:
             {
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
                 {
@@ -3216,11 +3216,11 @@ CAreaChart.prototype =
                 }
                 break
             }
-            case historyitem_AreaChart_SetVaryColors:
+            case AscDFH.historyitem_AreaChart_SetVaryColors:
             {
                 break
             }
-            case historyitem_AreaChart_AddSer:
+            case AscDFH.historyitem_AreaChart_AddSer:
             {
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
                 {
@@ -3233,7 +3233,7 @@ CAreaChart.prototype =
 
     getObjectType: function()
     {
-        return  historyitem_type_AreaChart;
+        return  AscDFH.historyitem_type_AreaChart;
     },
 
     getAllRasterImages: CBarChart.prototype.getAllRasterImages,
@@ -3285,13 +3285,13 @@ CAreaChart.prototype =
     {
         if(!pr)
             return;
-        History.Add(this, {Type: historyitem_AreaChart_AddAxId, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_AreaChart_AddAxId, newPr: pr});
         this.axId.push(pr);
     },
 
     setDLbls: function(pr)
     {
-        History.Add(this, {Type: historyitem_AreaChart_SetDLbls, oldPr: this.dLbls, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_AreaChart_SetDLbls, oldPr: this.dLbls, newPr: pr});
         this.dLbls = pr;
         if(this.dLbls)
         {
@@ -3305,12 +3305,12 @@ CAreaChart.prototype =
 
     setDropLines: function(pr)
     {
-        History.Add(this, {Type: historyitem_AreaChart_SetDropLines, oldPr: this.dropLines, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_AreaChart_SetDropLines, oldPr: this.dropLines, newPr: pr});
         this.dropLines = pr;
     },
     setGrouping: function(pr)
     {
-        History.Add(this, {Type: historyitem_AreaChart_SetGrouping, oldPr: this.grouping, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_AreaChart_SetGrouping, oldPr: this.grouping, newPr: pr});
         this.grouping = pr;
         if(this.parent && this.parent.parent && this.parent.parent.parent)
         {
@@ -3319,7 +3319,7 @@ CAreaChart.prototype =
     },
     addSer: function(ser)
     {
-        History.Add(this, {Type: historyitem_AreaChart_AddSer, ser: ser});
+        History.Add(this, {Type: AscDFH.historyitem_AreaChart_AddSer, ser: ser});
         this.series.push(ser);
         ser.setParent(this);
         if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -3329,13 +3329,13 @@ CAreaChart.prototype =
     },
     setVaryColors: function(pr)
     {
-        History.Add(this, {Type: historyitem_AreaChart_SetVaryColors, oldPr: this.varyColors, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_AreaChart_SetVaryColors, oldPr: this.varyColors, newPr: pr});
         this.varyColors = pr;
     },
 
     setParent: function(pr)
     {
-        History.Add(this, {Type: historyitem_CommonChartFormat_SetParent, oldPr: this.parent, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_CommonChartFormat_SetParent, oldPr: this.parent, newPr: pr});
         this.parent = pr;
     },
 
@@ -3343,17 +3343,17 @@ CAreaChart.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 this.parent = data.oldPr;
                 break;
             }
-            case historyitem_CommonChart_RemoveSeries:
+            case AscDFH.historyitem_CommonChart_RemoveSeries:
             {
                 this.series.splice(data.oldPr, 0, data.newPr);
                 break;
             }
-            case historyitem_AreaChart_AddAxId:
+            case AscDFH.historyitem_AreaChart_AddAxId:
             {
                 for(var i = this.axId.length - 1; i > -1; --i)
                 {
@@ -3365,7 +3365,7 @@ CAreaChart.prototype =
                 }
                 break
             }
-            case historyitem_AreaChart_SetDLbls:
+            case AscDFH.historyitem_AreaChart_SetDLbls:
             {
                 this.dLbls = data.oldPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -3374,12 +3374,12 @@ CAreaChart.prototype =
                 }
                 break
             }
-            case historyitem_AreaChart_SetDropLines:
+            case AscDFH.historyitem_AreaChart_SetDropLines:
             {
                 this.dropLines = data.oldPr;
                 break
             }
-            case historyitem_AreaChart_SetGrouping:
+            case AscDFH.historyitem_AreaChart_SetGrouping:
             {
                 this.grouping = data.oldPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -3388,12 +3388,12 @@ CAreaChart.prototype =
                 }
                 break
             }
-            case historyitem_AreaChart_SetVaryColors:
+            case AscDFH.historyitem_AreaChart_SetVaryColors:
             {
                 this.varyColors = data.oldPr;
                 break
             }
-            case historyitem_AreaChart_AddSer:
+            case AscDFH.historyitem_AreaChart_AddSer:
             {
                 for(var i = this.series.length - 1; i >- 1; --i)
                 {
@@ -3416,22 +3416,22 @@ CAreaChart.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 this.parent = data.newPr;
                 break;
             }
-            case historyitem_CommonChart_RemoveSeries:
+            case AscDFH.historyitem_CommonChart_RemoveSeries:
             {
                 this.series.splice(data.oldPr, 1);
                 break;
             }
-            case historyitem_AreaChart_AddAxId:
+            case AscDFH.historyitem_AreaChart_AddAxId:
             {
                 this.axId.push(data.newPr);
                 break
             }
-            case historyitem_AreaChart_SetDLbls:
+            case AscDFH.historyitem_AreaChart_SetDLbls:
             {
                 this.dLbls = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -3440,12 +3440,12 @@ CAreaChart.prototype =
                 }
                 break
             }
-            case historyitem_AreaChart_SetDropLines:
+            case AscDFH.historyitem_AreaChart_SetDropLines:
             {
                 this.dropLines = data.newPr;
                 break
             }
-            case historyitem_AreaChart_SetGrouping:
+            case AscDFH.historyitem_AreaChart_SetGrouping:
             {
                 this.grouping = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -3454,12 +3454,12 @@ CAreaChart.prototype =
                 }
                 break
             }
-            case historyitem_AreaChart_SetVaryColors:
+            case AscDFH.historyitem_AreaChart_SetVaryColors:
             {
                 this.varyColors = data.newPr;
                 break
             }
-            case historyitem_AreaChart_AddSer:
+            case AscDFH.historyitem_AreaChart_AddSer:
             {
                 if(isRealObject(data.ser))
                 {
@@ -3479,34 +3479,34 @@ CAreaChart.prototype =
         w.WriteLong(data.Type);
         switch (data.Type)
         {
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 writeObject(w, data.newPr);
                 break;
             }
-            case historyitem_CommonChart_RemoveSeries:
+            case AscDFH.historyitem_CommonChart_RemoveSeries:
             {
                 writeLong(w, data.oldPr);
                 break;
             }
-            case historyitem_AreaChart_AddAxId:
-            case historyitem_AreaChart_SetDLbls:
-            case historyitem_AreaChart_SetDropLines:
+            case AscDFH.historyitem_AreaChart_AddAxId:
+            case AscDFH.historyitem_AreaChart_SetDLbls:
+            case AscDFH.historyitem_AreaChart_SetDropLines:
             {
                 writeObject(w, data.newPr);
                 break
             }
-            case historyitem_AreaChart_SetGrouping:
+            case AscDFH.historyitem_AreaChart_SetGrouping:
             {
                 writeLong(w, data.newPr);
                 break
             }
-            case historyitem_AreaChart_SetVaryColors:
+            case AscDFH.historyitem_AreaChart_SetVaryColors:
             {
                 writeBool(w, data.newPr);
                 break
             }
-            case historyitem_AreaChart_AddSer:
+            case AscDFH.historyitem_AreaChart_AddSer:
             {
                 writeObject(w, data.ser);
                 break;
@@ -3519,18 +3519,18 @@ CAreaChart.prototype =
         var type = r.GetLong();
         switch (type)
         {
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 this.parent = readObject(r);
                 break;
             }
-            case historyitem_CommonChart_RemoveSeries:
+            case AscDFH.historyitem_CommonChart_RemoveSeries:
             {
                 var pos = readLong(r);
                 this.series.splice(pos, 1);
                 break;
             }
-            case historyitem_AreaChart_AddAxId:
+            case AscDFH.historyitem_AreaChart_AddAxId:
             {
                 var ax = readObject(r);
                 if(isRealObject(ax))
@@ -3539,7 +3539,7 @@ CAreaChart.prototype =
                 }
                 break
             }
-            case historyitem_AreaChart_SetDLbls:
+            case AscDFH.historyitem_AreaChart_SetDLbls:
             {
                 this.dLbls = readObject(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -3548,12 +3548,12 @@ CAreaChart.prototype =
                 }
                 break
             }
-            case historyitem_AreaChart_SetDropLines:
+            case AscDFH.historyitem_AreaChart_SetDropLines:
             {
                 this.dropLines = readObject(r);
                 break
             }
-            case historyitem_AreaChart_SetGrouping:
+            case AscDFH.historyitem_AreaChart_SetGrouping:
             {
                 this.grouping = readLong(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -3562,12 +3562,12 @@ CAreaChart.prototype =
                 }
                 break
             }
-            case historyitem_AreaChart_SetVaryColors:
+            case AscDFH.historyitem_AreaChart_SetVaryColors:
             {
                 this.varyColors = readBool(r);
                 break
             }
-            case historyitem_AreaChart_AddSer:
+            case AscDFH.historyitem_AreaChart_AddSer:
             {
                 var ser = readObject(r);
                 if(isRealObject(ser))
@@ -3666,7 +3666,7 @@ CAreaSeries.prototype =
 
     getObjectType: function()
     {
-        return historyitem_type_AreaSeries;
+        return AscDFH.historyitem_type_AreaSeries;
     },
 
     Write_ToBinary2: function(w)
@@ -3909,12 +3909,12 @@ CAreaSeries.prototype =
 
     setCat: function(pr)
     {
-        History.Add(this, {Type: historyitem_AreaSeries_SetCat, oldPr: this.cat, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_AreaSeries_SetCat, oldPr: this.cat, newPr: pr});
         this.cat = pr;
     },
     setDLbls: function(pr)
     {
-        History.Add(this, {Type: historyitem_AreaSeries_SetDLbls, oldPr: this.dLbls, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_AreaSeries_SetDLbls, oldPr: this.dLbls, newPr: pr});
         this.dLbls = pr;
         if(this.dLbls)
         {
@@ -3923,7 +3923,7 @@ CAreaSeries.prototype =
     },
     addDPt: function(pr)
     {
-        History.Add(this, {Type: historyitem_AreaSeries_SetDPt, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_AreaSeries_SetDPt, newPr: pr});
         this.dPt.push(pr);
     },
 
@@ -3931,50 +3931,50 @@ CAreaSeries.prototype =
     {
         if(this.dPt[idx])
         {
-            History.Add(this, {Type: historyitem_CommonSeries_RemoveDPt, idx: idx, pt: this.dPt[idx]});
+            History.Add(this, {Type: AscDFH.historyitem_CommonSeries_RemoveDPt, idx: idx, pt: this.dPt[idx]});
             this.dPt.splice(idx, 1);
         }
     },
 
     setErrBars: function(pr)
     {
-        History.Add(this, {Type: historyitem_AreaSeries_SetErrBars, oldPr: this.errBars, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_AreaSeries_SetErrBars, oldPr: this.errBars, newPr: pr});
         this.errBars = pr;
     },
     setIdx: function(pr)
     {
-        History.Add(this, {Type: historyitem_AreaSeries_SetIdx, oldPr: this.idx, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_AreaSeries_SetIdx, oldPr: this.idx, newPr: pr});
         this.idx = pr;
     },
     setOrder: function(pr)
     {
-        History.Add(this, {Type: historyitem_AreaSeries_SetOrder, oldPr: this.order, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_AreaSeries_SetOrder, oldPr: this.order, newPr: pr});
         this.order = pr;
     },
     setPictureOptions: function(pr)
     {
-        History.Add(this, {Type: historyitem_AreaSeries_SetPictureOptions, oldPr: this.pictureOptions, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_AreaSeries_SetPictureOptions, oldPr: this.pictureOptions, newPr: pr});
         this.pictureOptions = pr;
     },
     setSpPr: function(pr)
     {
-        History.Add(this, {Type: historyitem_AreaSeries_SetSpPr, oldPr: this.spPr, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_AreaSeries_SetSpPr, oldPr: this.spPr, newPr: pr});
         this.spPr = pr;
     },
     setTrendline: function(pr)
     {
-        History.Add(this, {Type: historyitem_AreaSeries_SetTrendline, oldPr: this.trendline, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_AreaSeries_SetTrendline, oldPr: this.trendline, newPr: pr});
         this.trendline = pr;
     },
     setTx: function(pr)
     {
-        History.Add(this, {Type: historyitem_AreaSeries_SetTx, oldPr: this.trendline, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_AreaSeries_SetTx, oldPr: this.trendline, newPr: pr});
         this.tx = pr;
     },
 
     setVal: function(pr)
     {
-        History.Add(this, {Type: historyitem_AreaSeries_SetVal, oldPr: this.trendline, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_AreaSeries_SetVal, oldPr: this.trendline, newPr: pr});
         this.val = pr;
         if(this.val && this.val.setParent)
         {
@@ -3984,7 +3984,7 @@ CAreaSeries.prototype =
 
     setParent: function(pr)
     {
-        History.Add(this, {Type: historyitem_CommonChartFormat_SetParent, oldPr: this.parent, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_CommonChartFormat_SetParent, oldPr: this.parent, newPr: pr});
         this.parent = pr;
     },
 
@@ -3992,22 +3992,22 @@ CAreaSeries.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 this.parent = data.oldPr;
                 break;
             }
-            case historyitem_CommonSeries_RemoveDPt:
+            case AscDFH.historyitem_CommonSeries_RemoveDPt:
             {
                 this.dPt.splice(data.idx, 0, data.pt);
                 break;
             }
-            case historyitem_AreaSeries_SetCat:
+            case AscDFH.historyitem_AreaSeries_SetCat:
             {
                 this.cat = data.oldPr;
                 break;
             }
-            case historyitem_AreaSeries_SetDLbls:
+            case AscDFH.historyitem_AreaSeries_SetDLbls:
             {
                 this.dLbls = data.oldPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateDataLabels)
@@ -4016,47 +4016,47 @@ CAreaSeries.prototype =
                 }
                 break;
             }
-            case historyitem_AreaSeries_SetDPt:
+            case AscDFH.historyitem_AreaSeries_SetDPt:
             {
                 findPrAndRemove(this.dPt, data.newPr);
                 break;
             }
-            case historyitem_AreaSeries_SetErrBars:
+            case AscDFH.historyitem_AreaSeries_SetErrBars:
             {
                 this.errBars = data.oldPr;
                 break;
             }
-            case historyitem_AreaSeries_SetIdx:
+            case AscDFH.historyitem_AreaSeries_SetIdx:
             {
                 this.idx = data.oldPr;
                 break;
             }
-            case historyitem_AreaSeries_SetOrder:
+            case AscDFH.historyitem_AreaSeries_SetOrder:
             {
                 this.order = data.oldPr;
                 break;
             }
-            case historyitem_AreaSeries_SetPictureOptions:
+            case AscDFH.historyitem_AreaSeries_SetPictureOptions:
             {
                 this.pictureOptions = data.oldPr;
                 break;
             }
-            case historyitem_AreaSeries_SetSpPr:
+            case AscDFH.historyitem_AreaSeries_SetSpPr:
             {
                 this.spPr = data.oldPr;
                 break;
             }
-            case historyitem_AreaSeries_SetTrendline:
+            case AscDFH.historyitem_AreaSeries_SetTrendline:
             {
                 this.trendline = data.oldPr;
                 break;
             }
-            case historyitem_AreaSeries_SetTx:
+            case AscDFH.historyitem_AreaSeries_SetTx:
             {
                 this.tx = data.oldPr;
                 break;
             }
-            case historyitem_AreaSeries_SetVal:
+            case AscDFH.historyitem_AreaSeries_SetVal:
             {
                 this.val = data.oldPr;
                 break;
@@ -4068,22 +4068,22 @@ CAreaSeries.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 this.parent = data.newPr;
                 break;
             }
-            case historyitem_CommonSeries_RemoveDPt:
+            case AscDFH.historyitem_CommonSeries_RemoveDPt:
             {
                 this.dPt.splice(data.idx, 1);
                 break;
             }
-            case historyitem_AreaSeries_SetCat:
+            case AscDFH.historyitem_AreaSeries_SetCat:
             {
                 this.cat = data.newPr;
                 break;
             }
-            case historyitem_AreaSeries_SetDLbls:
+            case AscDFH.historyitem_AreaSeries_SetDLbls:
             {
                 this.dLbls = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateDataLabels)
@@ -4092,47 +4092,47 @@ CAreaSeries.prototype =
                 }
                 break;
             }
-            case historyitem_AreaSeries_SetDPt:
+            case AscDFH.historyitem_AreaSeries_SetDPt:
             {
                 this.dPt.push(data.newPr);
                 break;
             }
-            case historyitem_AreaSeries_SetErrBars:
+            case AscDFH.historyitem_AreaSeries_SetErrBars:
             {
                 this.errBars = data.newPr;
                 break;
             }
-            case historyitem_AreaSeries_SetIdx:
+            case AscDFH.historyitem_AreaSeries_SetIdx:
             {
                 this.idx = data.newPr;
                 break;
             }
-            case historyitem_AreaSeries_SetOrder:
+            case AscDFH.historyitem_AreaSeries_SetOrder:
             {
                 this.order = data.newPr;
                 break;
             }
-            case historyitem_AreaSeries_SetPictureOptions:
+            case AscDFH.historyitem_AreaSeries_SetPictureOptions:
             {
                 this.pictureOptions = data.newPr;
                 break;
             }
-            case historyitem_AreaSeries_SetSpPr:
+            case AscDFH.historyitem_AreaSeries_SetSpPr:
             {
                 this.spPr = data.newPr;
                 break;
             }
-            case historyitem_AreaSeries_SetTrendline:
+            case AscDFH.historyitem_AreaSeries_SetTrendline:
             {
                 this.trendline = data.newPr;
                 break;
             }
-            case historyitem_AreaSeries_SetTx:
+            case AscDFH.historyitem_AreaSeries_SetTx:
             {
                 this.tx = data.newPr;
                 break;
             }
-            case historyitem_AreaSeries_SetVal:
+            case AscDFH.historyitem_AreaSeries_SetVal:
             {
                 this.val = data.newPr;
                 break;
@@ -4145,31 +4145,31 @@ CAreaSeries.prototype =
         w.WriteLong(data.Type);
         switch (data.Type)
         {
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 writeObject(w, data.newPr);
                 break;
             }
-            case historyitem_AreaSeries_SetCat:
-            case historyitem_AreaSeries_SetDLbls:
-            case historyitem_AreaSeries_SetDPt:
-            case historyitem_AreaSeries_SetErrBars:
-            case historyitem_AreaSeries_SetPictureOptions:
-            case historyitem_AreaSeries_SetSpPr:
-            case historyitem_AreaSeries_SetTrendline:
-            case historyitem_AreaSeries_SetTx:
-            case historyitem_AreaSeries_SetVal:
+            case AscDFH.historyitem_AreaSeries_SetCat:
+            case AscDFH.historyitem_AreaSeries_SetDLbls:
+            case AscDFH.historyitem_AreaSeries_SetDPt:
+            case AscDFH.historyitem_AreaSeries_SetErrBars:
+            case AscDFH.historyitem_AreaSeries_SetPictureOptions:
+            case AscDFH.historyitem_AreaSeries_SetSpPr:
+            case AscDFH.historyitem_AreaSeries_SetTrendline:
+            case AscDFH.historyitem_AreaSeries_SetTx:
+            case AscDFH.historyitem_AreaSeries_SetVal:
             {
                 writeObject(w, data.newPr);
                 break;
             }
-            case historyitem_AreaSeries_SetIdx:
-            case historyitem_AreaSeries_SetOrder:
+            case AscDFH.historyitem_AreaSeries_SetIdx:
+            case AscDFH.historyitem_AreaSeries_SetOrder:
             {
                 writeLong(w, data.newPr);
                 break;
             }
-            case historyitem_CommonSeries_RemoveDPt:
+            case AscDFH.historyitem_CommonSeries_RemoveDPt:
             {
                 writeLong(w, data.idx);
                 break;
@@ -4182,17 +4182,17 @@ CAreaSeries.prototype =
         var type = r.GetLong();
         switch (type)
         {
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 this.parent = readObject(r);
                 break;
             }
-            case historyitem_AreaSeries_SetCat:
+            case AscDFH.historyitem_AreaSeries_SetCat:
             {
                 this.cat = readObject(r);
                 break;
             }
-            case historyitem_AreaSeries_SetDLbls:
+            case AscDFH.historyitem_AreaSeries_SetDLbls:
             {
                 this.dLbls = readObject(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateDataLabels)
@@ -4201,42 +4201,42 @@ CAreaSeries.prototype =
                 }
                 break;
             }
-            case historyitem_AreaSeries_SetDPt:
+            case AscDFH.historyitem_AreaSeries_SetDPt:
             {
                 this.dPt.push(readObject(r));
                 break;
             }
-            case historyitem_AreaSeries_SetErrBars:
+            case AscDFH.historyitem_AreaSeries_SetErrBars:
             {
                 this.errBars = readObject(r);
                 break;
             }
-            case historyitem_AreaSeries_SetIdx:
+            case AscDFH.historyitem_AreaSeries_SetIdx:
             {
                 this.idx = readLong(r);
                 break;
             }
-            case historyitem_AreaSeries_SetOrder:
+            case AscDFH.historyitem_AreaSeries_SetOrder:
             {
                 this.order = readLong(r);
                 break;
             }
-            case historyitem_AreaSeries_SetPictureOptions:
+            case AscDFH.historyitem_AreaSeries_SetPictureOptions:
             {
                 this.pictureOptions = readObject(r);
                 break;
             }
-            case historyitem_AreaSeries_SetSpPr:
+            case AscDFH.historyitem_AreaSeries_SetSpPr:
             {
                 this.spPr = readObject(r);
                 break;
             }
-            case historyitem_AreaSeries_SetTrendline:
+            case AscDFH.historyitem_AreaSeries_SetTrendline:
             {
                 this.trendline = readObject(r);
                 break;
             }
-            case historyitem_CommonSeries_RemoveDPt:
+            case AscDFH.historyitem_CommonSeries_RemoveDPt:
             {
                 var pos = readLong(r);
                 if(isRealNumber(pos))
@@ -4246,12 +4246,12 @@ CAreaSeries.prototype =
                 break;
             }
 
-            case historyitem_AreaSeries_SetTx:
+            case AscDFH.historyitem_AreaSeries_SetTx:
             {
                 this.tx = readObject(r);
                 break;
             }
-            case historyitem_AreaSeries_SetVal:
+            case AscDFH.historyitem_AreaSeries_SetVal:
             {
                 this.val = readObject(r);
                 break;
@@ -4664,7 +4664,7 @@ CCatAx.prototype =
 
     getObjectType: function()
     {
-        return historyitem_type_CatAx;
+        return AscDFH.historyitem_type_CatAx;
     },
 
     Write_ToBinary2: function(w)
@@ -4680,13 +4680,13 @@ CCatAx.prototype =
 
     setParent: function(pr)
     {
-        History.Add(this, {Type: historyitem_CommonChartFormat_SetParent, oldPr: this.parent, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_CommonChartFormat_SetParent, oldPr: this.parent, newPr: pr});
         this.parent = pr;
     },
 
     setAuto: function(pr)
     {
-        History.Add(this, {Type: historyitem_CatAxSetAuto, oldPr: this.auto, newPr:pr});
+        History.Add(this, {Type: AscDFH.historyitem_CatAxSetAuto, oldPr: this.auto, newPr:pr});
         this.auto = pr;
         if(this.parent && this.parent.parent && this.parent.parent.parent)
         {
@@ -4695,12 +4695,12 @@ CCatAx.prototype =
     },
     setAxId: function(pr)
     {
-        History.Add(this, {Type: historyitem_CatAxSetAxId, oldPr: this.axId, newPr:pr});
+        History.Add(this, {Type: AscDFH.historyitem_CatAxSetAxId, oldPr: this.axId, newPr:pr});
         this.axId = pr;
     },
     setAxPos: function(pr)
     {
-        History.Add(this, {Type: historyitem_CatAxSetAxPos, oldPr: this.axPos, newPr:pr});
+        History.Add(this, {Type: AscDFH.historyitem_CatAxSetAxPos, oldPr: this.axPos, newPr:pr});
         this.axPos = pr;
         if(this.parent && this.parent.parent && this.parent.parent.parent)
         {
@@ -4709,7 +4709,7 @@ CCatAx.prototype =
     },
     setCrossAx: function(pr)
     {
-        History.Add(this, {Type: historyitem_CatAxSetCrossAx, oldPr: this.crossAx, newPr:pr});
+        History.Add(this, {Type: AscDFH.historyitem_CatAxSetCrossAx, oldPr: this.crossAx, newPr:pr});
         this.crossAx = pr;
         if(this.parent && this.parent.parent && this.parent.parent.parent)
         {
@@ -4718,7 +4718,7 @@ CCatAx.prototype =
     },
     setCrosses: function(pr)
     {
-        History.Add(this, {Type: historyitem_CatAxSetCrosses, oldPr: this.crosses, newPr:pr});
+        History.Add(this, {Type: AscDFH.historyitem_CatAxSetCrosses, oldPr: this.crosses, newPr:pr});
         this.crosses = pr;
         if(this.parent && this.parent.parent && this.parent.parent.parent)
         {
@@ -4727,7 +4727,7 @@ CCatAx.prototype =
     },
     setCrossesAt: function(pr)
     {
-        History.Add(this, {Type: historyitem_CatAxSetCrossesAt, oldPr: this.crossesAt, newPr:pr});
+        History.Add(this, {Type: AscDFH.historyitem_CatAxSetCrossesAt, oldPr: this.crossesAt, newPr:pr});
         this.crossesAt = pr;
         if(this.parent && this.parent.parent && this.parent.parent.parent)
         {
@@ -4736,7 +4736,7 @@ CCatAx.prototype =
     },
     setDelete: function(pr)
     {
-        History.Add(this, {Type: historyitem_CatAxSetDelete, oldPr: this.bDelete, newPr:pr});
+        History.Add(this, {Type: AscDFH.historyitem_CatAxSetDelete, oldPr: this.bDelete, newPr:pr});
         this.bDelete = pr;
         if(this.parent && this.parent.parent && this.parent.parent.parent)
         {
@@ -4745,12 +4745,12 @@ CCatAx.prototype =
     },
     setExtLst: function(pr)
     {
-        History.Add(this, {Type: historyitem_CatAxSetExtLst, oldPr: this.extLst, newPr:pr});
+        History.Add(this, {Type: AscDFH.historyitem_CatAxSetExtLst, oldPr: this.extLst, newPr:pr});
         this.extLst = pr;
     },
     setLblAlgn: function(pr)
     {
-        History.Add(this, {Type: historyitem_CatAxSetLblAlgn, oldPr: this.lblAlgn, newPr:pr});
+        History.Add(this, {Type: AscDFH.historyitem_CatAxSetLblAlgn, oldPr: this.lblAlgn, newPr:pr});
         this.lblAlgn = pr;
         if(this.parent && this.parent.parent && this.parent.parent.parent)
         {
@@ -4759,7 +4759,7 @@ CCatAx.prototype =
     },
     setLblOffset: function(pr)
     {
-        History.Add(this, {Type: historyitem_CatAxSetLblOffset, oldPr: this.lblOffset, newPr:pr});
+        History.Add(this, {Type: AscDFH.historyitem_CatAxSetLblOffset, oldPr: this.lblOffset, newPr:pr});
         this.lblOffset = pr;
         if(this.parent && this.parent.parent && this.parent.parent.parent)
         {
@@ -4768,7 +4768,7 @@ CCatAx.prototype =
     },
     setMajorGridlines: function(pr)
     {
-        History.Add(this, {Type: historyitem_CatAxSetMajorGridlines, oldPr: this.majorGridlines, newPr:pr});
+        History.Add(this, {Type: AscDFH.historyitem_CatAxSetMajorGridlines, oldPr: this.majorGridlines, newPr:pr});
         this.majorGridlines = pr;
         if(this.parent && this.parent.parent && this.parent.parent.parent)
         {
@@ -4777,7 +4777,7 @@ CCatAx.prototype =
     },
     setMajorTickMark: function(pr)
     {
-        History.Add(this, {Type: historyitem_CatAxSetMajorTickMark, oldPr: this.majorTickMark, newPr:pr});
+        History.Add(this, {Type: AscDFH.historyitem_CatAxSetMajorTickMark, oldPr: this.majorTickMark, newPr:pr});
         this.majorTickMark = pr;
         if(this.parent && this.parent.parent && this.parent.parent.parent)
         {
@@ -4786,7 +4786,7 @@ CCatAx.prototype =
     },
     setMinorGridlines: function(pr)
     {
-        History.Add(this, {Type: historyitem_CatAxSetMinorGridlines, oldPr: this.minorGridlines, newPr:pr});
+        History.Add(this, {Type: AscDFH.historyitem_CatAxSetMinorGridlines, oldPr: this.minorGridlines, newPr:pr});
         this.minorGridlines = pr;
 
         if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -4796,7 +4796,7 @@ CCatAx.prototype =
     },
     setMinorTickMark: function(pr)
     {
-        History.Add(this, {Type: historyitem_CatAxSetMinorTickMark, oldPr: this.minorTickMark, newPr:pr});
+        History.Add(this, {Type: AscDFH.historyitem_CatAxSetMinorTickMark, oldPr: this.minorTickMark, newPr:pr});
         this.minorTickMark = pr;
         if(this.parent && this.parent.parent && this.parent.parent.parent)
         {
@@ -4805,7 +4805,7 @@ CCatAx.prototype =
     },
     setNoMultiLvlLbl: function(pr)
     {
-        History.Add(this, {Type: historyitem_CatAxSetNoMultiLvlLbl, oldPr: this.noMultiLvlLbl, newPr:pr});
+        History.Add(this, {Type: AscDFH.historyitem_CatAxSetNoMultiLvlLbl, oldPr: this.noMultiLvlLbl, newPr:pr});
         this.noMultiLvlLbl = pr;
         if(this.parent && this.parent.parent && this.parent.parent.parent)
         {
@@ -4814,7 +4814,7 @@ CCatAx.prototype =
     },
     setNumFmt: function(pr)
     {
-        History.Add(this, {Type: historyitem_CatAxSetNumFmt, oldPr: this.numFmt, newPr:pr});
+        History.Add(this, {Type: AscDFH.historyitem_CatAxSetNumFmt, oldPr: this.numFmt, newPr:pr});
         this.numFmt = pr;
         if(this.parent && this.parent.parent && this.parent.parent.parent)
         {
@@ -4823,7 +4823,7 @@ CCatAx.prototype =
     },
     setScaling: function(pr)
     {
-        History.Add(this, {Type: historyitem_CatAxSetScaling, oldPr: this.scaling, newPr:pr});
+        History.Add(this, {Type: AscDFH.historyitem_CatAxSetScaling, oldPr: this.scaling, newPr:pr});
         this.scaling = pr;
         if(this.scaling)
         {
@@ -4836,7 +4836,7 @@ CCatAx.prototype =
     },
     setSpPr: function(pr)
     {
-        History.Add(this, {Type: historyitem_CatAxSetSpPr, oldPr: this.spPr, newPr:pr});
+        History.Add(this, {Type: AscDFH.historyitem_CatAxSetSpPr, oldPr: this.spPr, newPr:pr});
         this.spPr = pr;
         if(this.parent && this.parent.parent && this.parent.parent.parent)
         {
@@ -4845,7 +4845,7 @@ CCatAx.prototype =
     },
     setTickLblPos: function(pr)
     {
-        History.Add(this, {Type: historyitem_CatAxSetTickLblPos, oldPr: this.tickLblPos, newPr:pr});
+        History.Add(this, {Type: AscDFH.historyitem_CatAxSetTickLblPos, oldPr: this.tickLblPos, newPr:pr});
         this.tickLblPos = pr;
         if(this.parent && this.parent.parent && this.parent.parent.parent)
         {
@@ -4854,12 +4854,12 @@ CCatAx.prototype =
     },
     setTickLblSkip: function(pr)
     {
-        History.Add(this, {Type: historyitem_CatAxSetTickLblSkip, oldPr: this.tickLblSkip, newPr:pr});
+        History.Add(this, {Type: AscDFH.historyitem_CatAxSetTickLblSkip, oldPr: this.tickLblSkip, newPr:pr});
         this.tickLblSkip = pr;
     },
     setTickMarkSkip: function(pr)
     {
-        History.Add(this, {Type: historyitem_CatAxSetTickMarkSkip, oldPr: this.tickMarkSkip, newPr:pr});
+        History.Add(this, {Type: AscDFH.historyitem_CatAxSetTickMarkSkip, oldPr: this.tickMarkSkip, newPr:pr});
         this.tickMarkSkip = pr;
         if(this.parent && this.parent.parent && this.parent.parent.parent)
         {
@@ -4868,7 +4868,7 @@ CCatAx.prototype =
     },
     setTitle: function(pr)
     {
-        History.Add(this, {Type: historyitem_CatAxSetTitle, oldPr: this.title, newPr:pr});
+        History.Add(this, {Type: AscDFH.historyitem_CatAxSetTitle, oldPr: this.title, newPr:pr});
         this.title = pr;
         if(pr)
         {
@@ -4888,7 +4888,7 @@ CCatAx.prototype =
 
     setTxPr: function(pr)
     {
-        History.Add(this, {Type: historyitem_CatAxSetTxPr, oldPr: this.txPr, newPr:pr});
+        History.Add(this, {Type: AscDFH.historyitem_CatAxSetTxPr, oldPr: this.txPr, newPr:pr});
         this.txPr = pr;
         if(this.txPr)
         {
@@ -4904,12 +4904,12 @@ CCatAx.prototype =
     {
         switch(data.Type)
         {
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 this.parent = data.oldPr;
                 break;
             }
-            case historyitem_CatAxSetAuto:
+            case AscDFH.historyitem_CatAxSetAuto:
             {
                 this.auto = data.oldPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -4918,17 +4918,17 @@ CCatAx.prototype =
                 }
                 break;
             }
-            case historyitem_CatAxSetAxId:
+            case AscDFH.historyitem_CatAxSetAxId:
             {
                 this.axId = data.oldPr;
                 break;
             }
-            case historyitem_CatAxSetAxPos:
+            case AscDFH.historyitem_CatAxSetAxPos:
             {
                 this.axPos = data.oldPr;
                 break;
             }
-            case historyitem_CatAxSetCrossAx:
+            case AscDFH.historyitem_CatAxSetCrossAx:
             {
                 this.crossAx = data.oldPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -4937,7 +4937,7 @@ CCatAx.prototype =
                 }
                 break;
             }
-            case historyitem_CatAxSetCrosses:
+            case AscDFH.historyitem_CatAxSetCrosses:
             {
                 this.crosses = data.oldPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -4946,7 +4946,7 @@ CCatAx.prototype =
                 }
                 break;
             }
-            case historyitem_CatAxSetCrossesAt:
+            case AscDFH.historyitem_CatAxSetCrossesAt:
             {
                 this.crossesAt = data.oldPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -4955,7 +4955,7 @@ CCatAx.prototype =
                 }
                 break;
             }
-            case historyitem_CatAxSetDelete:
+            case AscDFH.historyitem_CatAxSetDelete:
             {
                 this.bDelete = data.oldPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -4964,12 +4964,12 @@ CCatAx.prototype =
                 }
                 break;
             }
-            case historyitem_CatAxSetExtLst:
+            case AscDFH.historyitem_CatAxSetExtLst:
             {
                 this.extLst = data.oldPr;
                 break;
             }
-            case historyitem_CatAxSetLblAlgn:
+            case AscDFH.historyitem_CatAxSetLblAlgn:
             {
                 this.lblAlgn = data.oldPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -4978,7 +4978,7 @@ CCatAx.prototype =
                 }
                 break;
             }
-            case historyitem_CatAxSetLblOffset:
+            case AscDFH.historyitem_CatAxSetLblOffset:
             {
                 this.lblOffset = data.oldPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -4987,7 +4987,7 @@ CCatAx.prototype =
                 }
                 break;
             }
-            case historyitem_CatAxSetMajorGridlines:
+            case AscDFH.historyitem_CatAxSetMajorGridlines:
             {
                 this.majorGridlines = data.oldPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -4996,7 +4996,7 @@ CCatAx.prototype =
                 }
                 break;
             }
-            case historyitem_CatAxSetMajorTickMark:
+            case AscDFH.historyitem_CatAxSetMajorTickMark:
             {
                 this.majorTickMark = data.oldPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -5005,7 +5005,7 @@ CCatAx.prototype =
                 }
                 break;
             }
-            case historyitem_CatAxSetMinorGridlines:
+            case AscDFH.historyitem_CatAxSetMinorGridlines:
             {
                 this.minorGridlines = data.oldPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -5014,7 +5014,7 @@ CCatAx.prototype =
                 }
                 break;
             }
-            case historyitem_CatAxSetMinorTickMark:
+            case AscDFH.historyitem_CatAxSetMinorTickMark:
             {
                 this.minorTickMark = data.oldPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -5023,7 +5023,7 @@ CCatAx.prototype =
                 }
                 break;
             }
-            case historyitem_CatAxSetNoMultiLvlLbl:
+            case AscDFH.historyitem_CatAxSetNoMultiLvlLbl:
             {
                 this.noMultiLvlLbl = data.oldPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -5032,7 +5032,7 @@ CCatAx.prototype =
                 }
                 break;
             }
-            case historyitem_CatAxSetNumFmt:
+            case AscDFH.historyitem_CatAxSetNumFmt:
             {
                 this.numFmt = data.oldPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -5041,7 +5041,7 @@ CCatAx.prototype =
                 }
                 break;
             }
-            case historyitem_CatAxSetScaling:
+            case AscDFH.historyitem_CatAxSetScaling:
             {
                 this.scaling = data.oldPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -5050,7 +5050,7 @@ CCatAx.prototype =
                 }
                 break;
             }
-            case historyitem_CatAxSetSpPr:
+            case AscDFH.historyitem_CatAxSetSpPr:
             {
                 this.spPr = data.oldPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -5059,7 +5059,7 @@ CCatAx.prototype =
                 }
                 break;
             }
-            case historyitem_CatAxSetTickLblPos:
+            case AscDFH.historyitem_CatAxSetTickLblPos:
             {
                 this.tickLblPos = data.oldPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -5068,7 +5068,7 @@ CCatAx.prototype =
                 }
                 break;
             }
-            case historyitem_CatAxSetTickLblSkip:
+            case AscDFH.historyitem_CatAxSetTickLblSkip:
             {
                 this.tickLblSkip = data.oldPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -5077,7 +5077,7 @@ CCatAx.prototype =
                 }
                 break;
             }
-            case historyitem_CatAxSetTickMarkSkip:
+            case AscDFH.historyitem_CatAxSetTickMarkSkip:
             {
                 this.tickMarkSkip = data.oldPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -5086,7 +5086,7 @@ CCatAx.prototype =
                 }
                 break;
             }
-            case historyitem_CatAxSetTitle:
+            case AscDFH.historyitem_CatAxSetTitle:
             {
                 this.title = data.oldPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -5095,7 +5095,7 @@ CCatAx.prototype =
                 }
                 break;
             }
-            case historyitem_CatAxSetTxPr:
+            case AscDFH.historyitem_CatAxSetTxPr:
             {
                 this.txPr = data.oldPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -5111,12 +5111,12 @@ CCatAx.prototype =
     {
         switch(data.Type)
         {
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 this.parent = data.newPr;
                 break;
             }
-            case historyitem_CatAxSetAuto:
+            case AscDFH.historyitem_CatAxSetAuto:
             {
                 this.auto = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -5125,12 +5125,12 @@ CCatAx.prototype =
                 }
                 break;
             }
-            case historyitem_CatAxSetAxId:
+            case AscDFH.historyitem_CatAxSetAxId:
             {
                 this.axId = data.newPr;
                 break;
             }
-            case historyitem_CatAxSetAxPos:
+            case AscDFH.historyitem_CatAxSetAxPos:
             {
                 this.axPos = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -5139,7 +5139,7 @@ CCatAx.prototype =
                 }
                 break;
             }
-            case historyitem_CatAxSetCrossAx:
+            case AscDFH.historyitem_CatAxSetCrossAx:
             {
                 this.crossAx = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -5148,7 +5148,7 @@ CCatAx.prototype =
                 }
                 break;
             }
-            case historyitem_CatAxSetCrosses:
+            case AscDFH.historyitem_CatAxSetCrosses:
             {
                 this.crosses = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -5157,7 +5157,7 @@ CCatAx.prototype =
                 }
                 break;
             }
-            case historyitem_CatAxSetCrossesAt:
+            case AscDFH.historyitem_CatAxSetCrossesAt:
             {
                 this.crossesAt = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -5166,12 +5166,12 @@ CCatAx.prototype =
                 }
                 break;
             }
-            case historyitem_CatAxSetDelete:
+            case AscDFH.historyitem_CatAxSetDelete:
             {
                 this.bDelete = data.newPr;
                 break;
             }
-            case historyitem_CatAxSetExtLst:
+            case AscDFH.historyitem_CatAxSetExtLst:
             {
                 this.extLst = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -5180,7 +5180,7 @@ CCatAx.prototype =
                 }
                 break;
             }
-            case historyitem_CatAxSetLblAlgn:
+            case AscDFH.historyitem_CatAxSetLblAlgn:
             {
                 this.lblAlgn = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -5189,7 +5189,7 @@ CCatAx.prototype =
                 }
                 break;
             }
-            case historyitem_CatAxSetLblOffset:
+            case AscDFH.historyitem_CatAxSetLblOffset:
             {
                 this.lblOffset = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -5198,7 +5198,7 @@ CCatAx.prototype =
                 }
                 break;
             }
-            case historyitem_CatAxSetMajorGridlines:
+            case AscDFH.historyitem_CatAxSetMajorGridlines:
             {
                 this.majorGridlines = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -5207,7 +5207,7 @@ CCatAx.prototype =
                 }
                 break;
             }
-            case historyitem_CatAxSetMajorTickMark:
+            case AscDFH.historyitem_CatAxSetMajorTickMark:
             {
                 this.majorTickMark = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -5216,7 +5216,7 @@ CCatAx.prototype =
                 }
                 break;
             }
-            case historyitem_CatAxSetMinorGridlines:
+            case AscDFH.historyitem_CatAxSetMinorGridlines:
             {
                 this.minorGridlines = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -5225,7 +5225,7 @@ CCatAx.prototype =
                 }
                 break;
             }
-            case historyitem_CatAxSetMinorTickMark:
+            case AscDFH.historyitem_CatAxSetMinorTickMark:
             {
                 this.minorTickMark = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -5234,7 +5234,7 @@ CCatAx.prototype =
                 }
                 break;
             }
-            case historyitem_CatAxSetNoMultiLvlLbl:
+            case AscDFH.historyitem_CatAxSetNoMultiLvlLbl:
             {
                 this.noMultiLvlLbl = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -5243,7 +5243,7 @@ CCatAx.prototype =
                 }
                 break;
             }
-            case historyitem_CatAxSetNumFmt:
+            case AscDFH.historyitem_CatAxSetNumFmt:
             {
                 this.numFmt = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -5252,7 +5252,7 @@ CCatAx.prototype =
                 }
                 break;
             }
-            case historyitem_CatAxSetScaling:
+            case AscDFH.historyitem_CatAxSetScaling:
             {
                 this.scaling = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -5261,7 +5261,7 @@ CCatAx.prototype =
                 }
                 break;
             }
-            case historyitem_CatAxSetSpPr:
+            case AscDFH.historyitem_CatAxSetSpPr:
             {
                 this.spPr = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -5270,7 +5270,7 @@ CCatAx.prototype =
                 }
                 break;
             }
-            case historyitem_CatAxSetTickLblPos:
+            case AscDFH.historyitem_CatAxSetTickLblPos:
             {
                 this.tickLblPos = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -5279,7 +5279,7 @@ CCatAx.prototype =
                 }
                 break;
             }
-            case historyitem_CatAxSetTickLblSkip:
+            case AscDFH.historyitem_CatAxSetTickLblSkip:
             {
                 this.tickLblSkip = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -5288,7 +5288,7 @@ CCatAx.prototype =
                 }
                 break;
             }
-            case historyitem_CatAxSetTickMarkSkip:
+            case AscDFH.historyitem_CatAxSetTickMarkSkip:
             {
                 this.tickMarkSkip = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -5297,7 +5297,7 @@ CCatAx.prototype =
                 }
                 break;
             }
-            case historyitem_CatAxSetTitle:
+            case AscDFH.historyitem_CatAxSetTitle:
             {
                 this.title = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -5306,7 +5306,7 @@ CCatAx.prototype =
                 }
                 break;
             }
-            case historyitem_CatAxSetTxPr:
+            case AscDFH.historyitem_CatAxSetTxPr:
             {
                 this.txPr = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -5324,117 +5324,117 @@ CCatAx.prototype =
         w.WriteLong(data.Type);
         switch(data.Type)
         {
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 writeObject(w, data.newPr);
                 break;
             }
-            case historyitem_CatAxSetAuto:
+            case AscDFH.historyitem_CatAxSetAuto:
             {
                 writeBool(w, data.newPr);
                 break;
             }
-            case historyitem_CatAxSetAxId:
+            case AscDFH.historyitem_CatAxSetAxId:
             {
                 writeLong(w, data.newPr);
                 break;
             }
-            case historyitem_CatAxSetAxPos:
+            case AscDFH.historyitem_CatAxSetAxPos:
             {
                 writeLong(w, data.newPr);
                 break;
             }
-            case historyitem_CatAxSetCrossAx:
+            case AscDFH.historyitem_CatAxSetCrossAx:
             {
                 writeObject(w, data.newPr);
                 break;
             }
-            case historyitem_CatAxSetCrosses:
+            case AscDFH.historyitem_CatAxSetCrosses:
             {
                 writeLong(w, data.newPr);
                 break;
             }
-            case historyitem_CatAxSetCrossesAt:
+            case AscDFH.historyitem_CatAxSetCrossesAt:
             {
                 writeDouble(w, data.newPr);
                 break;
             }
-            case historyitem_CatAxSetDelete:
+            case AscDFH.historyitem_CatAxSetDelete:
             {
                 writeBool(w, data.newPr);
                 break;
             }
-            case historyitem_CatAxSetLblAlgn:
+            case AscDFH.historyitem_CatAxSetLblAlgn:
             {
                 writeLong(w, data.newPr);
                 break;
             }
-            case historyitem_CatAxSetLblOffset:
+            case AscDFH.historyitem_CatAxSetLblOffset:
             {
                 writeLong(w, data.newPr);
                 break;
             }
-            case historyitem_CatAxSetMajorGridlines:
+            case AscDFH.historyitem_CatAxSetMajorGridlines:
             {
                 writeObject(w, data.newPr);
                 break;
             }
-            case historyitem_CatAxSetMajorTickMark:
+            case AscDFH.historyitem_CatAxSetMajorTickMark:
             {
                 writeLong(w, data.newPr);
                 break;
             }
-            case historyitem_CatAxSetMinorGridlines:
+            case AscDFH.historyitem_CatAxSetMinorGridlines:
             {
                 writeObject(w, data.newPr);
                 break;
             }
-            case historyitem_CatAxSetMinorTickMark:
+            case AscDFH.historyitem_CatAxSetMinorTickMark:
             {
                 writeLong(w, data.newPr);
                 break;
             }
-            case historyitem_CatAxSetNoMultiLvlLbl:
+            case AscDFH.historyitem_CatAxSetNoMultiLvlLbl:
             {
                 writeBool(w, data.newPr);
                 break;
             }
-            case historyitem_CatAxSetNumFmt:
+            case AscDFH.historyitem_CatAxSetNumFmt:
             {
                 writeObject(w, data.newPr);
                 break;
             }
-            case historyitem_CatAxSetScaling:
+            case AscDFH.historyitem_CatAxSetScaling:
             {
                 writeObject(w, data.newPr);
                 break;
             }
-            case historyitem_CatAxSetSpPr:
+            case AscDFH.historyitem_CatAxSetSpPr:
             {
                 writeObject(w, data.newPr);
                 break;
             }
-            case historyitem_CatAxSetTickLblPos:
+            case AscDFH.historyitem_CatAxSetTickLblPos:
             {
                 writeLong(w, data.newPr);
                 break;
             }
-            case historyitem_CatAxSetTickLblSkip:
+            case AscDFH.historyitem_CatAxSetTickLblSkip:
             {
                 writeLong(w, data.newPr);
                 break;
             }
-            case historyitem_CatAxSetTickMarkSkip:
+            case AscDFH.historyitem_CatAxSetTickMarkSkip:
             {
                 writeLong(w, data.newPr);
                 break;
             }
-            case historyitem_CatAxSetTitle:
+            case AscDFH.historyitem_CatAxSetTitle:
             {
                 writeObject(w, data.newPr);
                 break;
             }
-            case historyitem_CatAxSetTxPr:
+            case AscDFH.historyitem_CatAxSetTxPr:
             {
                 writeObject(w, data.newPr);
                 break;
@@ -5447,12 +5447,12 @@ CCatAx.prototype =
         var type = r.GetLong();
         switch(type)
         {
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 this.parent = readObject(r);
                 break;
             }
-            case historyitem_CatAxSetAuto:
+            case AscDFH.historyitem_CatAxSetAuto:
             {
                 this.auto = readBool(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -5461,12 +5461,12 @@ CCatAx.prototype =
                 }
                 break;
             }
-            case historyitem_CatAxSetAxId:
+            case AscDFH.historyitem_CatAxSetAxId:
             {
                 this.axId = readLong(r);
                 break;
             }
-            case historyitem_CatAxSetAxPos:
+            case AscDFH.historyitem_CatAxSetAxPos:
             {
                 this.axPos = readLong(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -5475,7 +5475,7 @@ CCatAx.prototype =
                 }
                 break;
             }
-            case historyitem_CatAxSetCrossAx:
+            case AscDFH.historyitem_CatAxSetCrossAx:
             {
                 this.crossAx = readObject(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -5484,7 +5484,7 @@ CCatAx.prototype =
                 }
                 break;
             }
-            case historyitem_CatAxSetCrosses:
+            case AscDFH.historyitem_CatAxSetCrosses:
             {
                 this.crosses = readLong(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -5493,7 +5493,7 @@ CCatAx.prototype =
                 }
                 break;
             }
-            case historyitem_CatAxSetCrossesAt:
+            case AscDFH.historyitem_CatAxSetCrossesAt:
             {
                 this.crossesAt = readDouble(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -5502,7 +5502,7 @@ CCatAx.prototype =
                 }
                 break;
             }
-            case historyitem_CatAxSetDelete:
+            case AscDFH.historyitem_CatAxSetDelete:
             {
                 this.bDelete = readBool(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -5511,7 +5511,7 @@ CCatAx.prototype =
                 }
                 break;
             }
-            case historyitem_CatAxSetLblAlgn:
+            case AscDFH.historyitem_CatAxSetLblAlgn:
             {
                 this.lblAlgn = readLong(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -5520,7 +5520,7 @@ CCatAx.prototype =
                 }
                 break;
             }
-            case historyitem_CatAxSetLblOffset:
+            case AscDFH.historyitem_CatAxSetLblOffset:
             {
                 this.lblOffset = readLong(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -5529,7 +5529,7 @@ CCatAx.prototype =
                 }
                 break;
             }
-            case historyitem_CatAxSetMajorGridlines:
+            case AscDFH.historyitem_CatAxSetMajorGridlines:
             {
                 this.majorGridlines = readObject(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -5538,7 +5538,7 @@ CCatAx.prototype =
                 }
                 break;
             }
-            case historyitem_CatAxSetMajorTickMark:
+            case AscDFH.historyitem_CatAxSetMajorTickMark:
             {
                 this.majorTickMark = readLong(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -5547,7 +5547,7 @@ CCatAx.prototype =
                 }
                 break;
             }
-            case historyitem_CatAxSetMinorGridlines:
+            case AscDFH.historyitem_CatAxSetMinorGridlines:
             {
                 this.minorGridlines = readObject(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -5556,7 +5556,7 @@ CCatAx.prototype =
                 }
                 break;
             }
-            case historyitem_CatAxSetMinorTickMark:
+            case AscDFH.historyitem_CatAxSetMinorTickMark:
             {
                 this.minorTickMark = readLong(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -5565,7 +5565,7 @@ CCatAx.prototype =
                 }
                 break;
             }
-            case historyitem_CatAxSetNoMultiLvlLbl:
+            case AscDFH.historyitem_CatAxSetNoMultiLvlLbl:
             {
                 this.noMultiLvlLbl = readBool(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -5574,7 +5574,7 @@ CCatAx.prototype =
                 }
                 break;
             }
-            case historyitem_CatAxSetNumFmt:
+            case AscDFH.historyitem_CatAxSetNumFmt:
             {
                 this.numFmt = readObject(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -5583,7 +5583,7 @@ CCatAx.prototype =
                 }
                 break;
             }
-            case historyitem_CatAxSetScaling:
+            case AscDFH.historyitem_CatAxSetScaling:
             {
                 this.scaling = readObject(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -5592,7 +5592,7 @@ CCatAx.prototype =
                 }
                 break;
             }
-            case historyitem_CatAxSetSpPr:
+            case AscDFH.historyitem_CatAxSetSpPr:
             {
                 this.spPr = readObject(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -5601,7 +5601,7 @@ CCatAx.prototype =
                 }
                 break;
             }
-            case historyitem_CatAxSetTickLblPos:
+            case AscDFH.historyitem_CatAxSetTickLblPos:
             {
                 this.tickLblPos = readLong(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -5610,7 +5610,7 @@ CCatAx.prototype =
                 }
                 break;
             }
-            case historyitem_CatAxSetTickLblSkip:
+            case AscDFH.historyitem_CatAxSetTickLblSkip:
             {
                 this.tickLblSkip = readLong(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -5619,7 +5619,7 @@ CCatAx.prototype =
                 }
                 break;
             }
-            case historyitem_CatAxSetTickMarkSkip:
+            case AscDFH.historyitem_CatAxSetTickMarkSkip:
             {
                 this.tickMarkSkip = readLong(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -5628,7 +5628,7 @@ CCatAx.prototype =
                 }
                 break;
             }
-            case historyitem_CatAxSetTitle:
+            case AscDFH.historyitem_CatAxSetTitle:
             {
                 this.title = readObject(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -5637,7 +5637,7 @@ CCatAx.prototype =
                 }
                 break;
             }
-            case historyitem_CatAxSetTxPr:
+            case AscDFH.historyitem_CatAxSetTxPr:
             {
                 this.txPr = readObject(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -5695,7 +5695,7 @@ CDateAx.prototype =
 
     getObjectType: function()
     {
-        return historyitem_type_DateAx;
+        return AscDFH.historyitem_type_DateAx;
     },
 
     Refresh_RecalcData2: function(pageIndex, object)
@@ -5767,7 +5767,7 @@ CDateAx.prototype =
 
     setAuto: function(pr)
     {
-        History.Add(this, {Type:historyitem_DateAxAuto, oldPr: this.auto, newPr: pr});
+        History.Add(this, {Type:AscDFH.historyitem_DateAxAuto, oldPr: this.auto, newPr: pr});
         this.auto = pr;
         if(this.parent && this.parent.parent && this.parent.parent.parent)
         {
@@ -5777,13 +5777,13 @@ CDateAx.prototype =
     },
     setAxId: function(pr)
     {
-        History.Add(this, {Type:historyitem_DateAxAxId, oldPr: this.axId, newPr: pr});
+        History.Add(this, {Type:AscDFH.historyitem_DateAxAxId, oldPr: this.axId, newPr: pr});
         this.axId = pr;
 
     },
     setAxPos: function(pr)
     {
-        History.Add(this, {Type:historyitem_DateAxAxPos, oldPr: this.axPos, newPr: pr});
+        History.Add(this, {Type:AscDFH.historyitem_DateAxAxPos, oldPr: this.axPos, newPr: pr});
         this.axPos = pr;
         if(this.parent && this.parent.parent && this.parent.parent.parent)
         {
@@ -5793,7 +5793,7 @@ CDateAx.prototype =
     },
     setBaseTimeUnit: function(pr)
     {
-        History.Add(this, {Type:historyitem_DateAxBaseTimeUnit, oldPr: this.baseTimeUnit, newPr: pr});
+        History.Add(this, {Type:AscDFH.historyitem_DateAxBaseTimeUnit, oldPr: this.baseTimeUnit, newPr: pr});
         this.baseTimeUnit = pr;
         if(this.parent && this.parent.parent && this.parent.parent.parent)
         {
@@ -5803,7 +5803,7 @@ CDateAx.prototype =
     },
     setCrossAx: function(pr)
     {
-        History.Add(this, {Type:historyitem_DateAxCrossAx, oldPr: this.crossAx, newPr: pr});
+        History.Add(this, {Type:AscDFH.historyitem_DateAxCrossAx, oldPr: this.crossAx, newPr: pr});
         this.crossAx = pr;
         if(this.parent && this.parent.parent && this.parent.parent.parent)
         {
@@ -5813,7 +5813,7 @@ CDateAx.prototype =
     },
     setCrosses: function(pr)
     {
-        History.Add(this, {Type:historyitem_DateAxCrosses, oldPr: this.crosses, newPr: pr});
+        History.Add(this, {Type:AscDFH.historyitem_DateAxCrosses, oldPr: this.crosses, newPr: pr});
         this.crosses = pr;
         if(this.parent && this.parent.parent && this.parent.parent.parent)
         {
@@ -5823,7 +5823,7 @@ CDateAx.prototype =
     },
     setCrossesAt: function(pr)
     {
-        History.Add(this, {Type:historyitem_DateAxCrossesAt, oldPr: this.crossesAt, newPr: pr});
+        History.Add(this, {Type:AscDFH.historyitem_DateAxCrossesAt, oldPr: this.crossesAt, newPr: pr});
         this.crossesAt = pr;
         if(this.parent && this.parent.parent && this.parent.parent.parent)
         {
@@ -5833,7 +5833,7 @@ CDateAx.prototype =
     },
     setDelete: function(pr)
     {
-        History.Add(this, {Type:historyitem_DateAxDelete, oldPr: this.bDelete, newPr: pr});
+        History.Add(this, {Type:AscDFH.historyitem_DateAxDelete, oldPr: this.bDelete, newPr: pr});
         this.bDelete = pr;
         if(this.parent && this.parent.parent && this.parent.parent.parent)
         {
@@ -5843,7 +5843,7 @@ CDateAx.prototype =
     },
     setLblOffset: function(pr)
     {
-        History.Add(this, {Type:historyitem_DateAxLblOffset, oldPr: this.lblOffset, newPr: pr});
+        History.Add(this, {Type:AscDFH.historyitem_DateAxLblOffset, oldPr: this.lblOffset, newPr: pr});
         this.lblOffset = pr;
         if(this.parent && this.parent.parent && this.parent.parent.parent)
         {
@@ -5853,7 +5853,7 @@ CDateAx.prototype =
     },
     setMajorGridlines: function(pr)
     {
-        History.Add(this, {Type:historyitem_DateAxMajorGridlines, oldPr: this.majorGridlines, newPr: pr});
+        History.Add(this, {Type:AscDFH.historyitem_DateAxMajorGridlines, oldPr: this.majorGridlines, newPr: pr});
         this.majorGridlines = pr;
         if(this.parent && this.parent.parent && this.parent.parent.parent)
         {
@@ -5863,7 +5863,7 @@ CDateAx.prototype =
     },
     setMajorTickMark: function(pr)
     {
-        History.Add(this, {Type:historyitem_DateAxMajorTickMark, oldPr: this.majorTickMark, newPr: pr});
+        History.Add(this, {Type:AscDFH.historyitem_DateAxMajorTickMark, oldPr: this.majorTickMark, newPr: pr});
         this.majorTickMark = pr;
         if(this.parent && this.parent.parent && this.parent.parent.parent)
         {
@@ -5873,7 +5873,7 @@ CDateAx.prototype =
     },
     setMajorTimeUnit: function(pr)
     {
-        History.Add(this, {Type:historyitem_DateAxMajorTimeUnit, oldPr: this.majorTimeUnit, newPr: pr});
+        History.Add(this, {Type:AscDFH.historyitem_DateAxMajorTimeUnit, oldPr: this.majorTimeUnit, newPr: pr});
         this.majorTimeUnit = pr;
         if(this.parent && this.parent.parent && this.parent.parent.parent)
         {
@@ -5883,7 +5883,7 @@ CDateAx.prototype =
     },
     setMajorUnit: function(pr)
     {
-        History.Add(this, {Type:historyitem_DateAxMajorUnit, oldPr: this.majorUnit, newPr: pr});
+        History.Add(this, {Type:AscDFH.historyitem_DateAxMajorUnit, oldPr: this.majorUnit, newPr: pr});
         this.majorUnit = pr;
         if(this.parent && this.parent.parent && this.parent.parent.parent)
         {
@@ -5893,7 +5893,7 @@ CDateAx.prototype =
     },
     setMinorGridlines: function(pr)
     {
-        History.Add(this, {Type:historyitem_DateAxMajorGridlines, oldPr: this.majorGridlines, newPr: pr});
+        History.Add(this, {Type:AscDFH.historyitem_DateAxMajorGridlines, oldPr: this.majorGridlines, newPr: pr});
         this.majorGridlines = pr;
         if(this.parent && this.parent.parent && this.parent.parent.parent)
         {
@@ -5903,7 +5903,7 @@ CDateAx.prototype =
     },
     setMinorTickMark: function(pr)
     {
-        History.Add(this, {Type:historyitem_DateAxMinorTickMark, oldPr: this.minorTickMark, newPr: pr});
+        History.Add(this, {Type:AscDFH.historyitem_DateAxMinorTickMark, oldPr: this.minorTickMark, newPr: pr});
         this.minorTickMark = pr;
         if(this.parent && this.parent.parent && this.parent.parent.parent)
         {
@@ -5913,7 +5913,7 @@ CDateAx.prototype =
     },
     setMinorTimeUnit: function(pr)
     {
-        History.Add(this, {Type:historyitem_DateAxMinorTimeUnit, oldPr: this.minorTimeUnit, newPr: pr});
+        History.Add(this, {Type:AscDFH.historyitem_DateAxMinorTimeUnit, oldPr: this.minorTimeUnit, newPr: pr});
         this.minorTimeUnit = pr;
         if(this.parent && this.parent.parent && this.parent.parent.parent)
         {
@@ -5923,7 +5923,7 @@ CDateAx.prototype =
     ///
     setMinorUnit: function(pr)
     {
-        History.Add(this, {Type:historyitem_DateAxMinorUnit, oldPr: this.minorUnit, newPr: pr});
+        History.Add(this, {Type:AscDFH.historyitem_DateAxMinorUnit, oldPr: this.minorUnit, newPr: pr});
         this.minorUnit = pr;
         if(this.parent && this.parent.parent && this.parent.parent.parent)
         {
@@ -5932,7 +5932,7 @@ CDateAx.prototype =
     },
     setNumFmt: function(pr)
     {
-        History.Add(this, {Type:historyitem_DateAxNumFmt, oldPr: this.numFmt, newPr: pr});
+        History.Add(this, {Type:AscDFH.historyitem_DateAxNumFmt, oldPr: this.numFmt, newPr: pr});
         this.numFmt = pr;
         if(this.parent && this.parent.parent && this.parent.parent.parent)
         {
@@ -5941,7 +5941,7 @@ CDateAx.prototype =
     },
     setScaling: function(pr)
     {
-        History.Add(this, {Type:historyitem_DateAxScaling, oldPr: this.scaling, newPr: pr});
+        History.Add(this, {Type:AscDFH.historyitem_DateAxScaling, oldPr: this.scaling, newPr: pr});
         this.scaling = pr;
         if(this.scaling)
         {
@@ -5954,7 +5954,7 @@ CDateAx.prototype =
     },
     setSpPr: function(pr)
     {
-        History.Add(this, {Type:historyitem_DateAxSpPr, oldPr: this.spPr, newPr: pr});
+        History.Add(this, {Type:AscDFH.historyitem_DateAxSpPr, oldPr: this.spPr, newPr: pr});
         this.spPr = pr;
         if(this.parent && this.parent.parent && this.parent.parent.parent)
         {
@@ -5963,7 +5963,7 @@ CDateAx.prototype =
     },
     setTickLblPos: function(pr)
     {
-        History.Add(this, {Type:historyitem_DateAxTickLblPos, oldPr: this.tickLblPos, newPr: pr});
+        History.Add(this, {Type:AscDFH.historyitem_DateAxTickLblPos, oldPr: this.tickLblPos, newPr: pr});
         this.tickLblPos = pr;
         if(this.parent && this.parent.parent && this.parent.parent.parent)
         {
@@ -5972,7 +5972,7 @@ CDateAx.prototype =
     },
     setTitle: function(pr)
     {
-        History.Add(this, {Type:historyitem_DateAxTitle, oldPr: this.title, newPr: pr});
+        History.Add(this, {Type:AscDFH.historyitem_DateAxTitle, oldPr: this.title, newPr: pr});
         this.title = pr;
         if(pr)
         {
@@ -5991,7 +5991,7 @@ CDateAx.prototype =
 
     setTxPr: function(pr)
     {
-        History.Add(this, {Type:historyitem_DateAxTxPr, oldPr: this.txPr, newPr: pr});
+        History.Add(this, {Type:AscDFH.historyitem_DateAxTxPr, oldPr: this.txPr, newPr: pr});
         this.txPr = pr;
         if(this.txPr)
         {
@@ -6018,7 +6018,7 @@ CDateAx.prototype =
 
     setParent: function(pr)
     {
-        History.Add(this, {Type: historyitem_CommonChartFormat_SetParent, oldPr: this.parent, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_CommonChartFormat_SetParent, oldPr: this.parent, newPr: pr});
         this.parent = pr;
     },
 
@@ -6026,12 +6026,12 @@ CDateAx.prototype =
     {
         switch(data.Type)
         {
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 this.parent = data.oldPr;
                 break;
             }
-            case historyitem_DateAxAuto:
+            case AscDFH.historyitem_DateAxAuto:
             {
                 this.auto = data.oldPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -6040,12 +6040,12 @@ CDateAx.prototype =
                 }
                 break;
             }
-            case historyitem_DateAxAxId:
+            case AscDFH.historyitem_DateAxAxId:
             {
                 this.axId = data.oldPr;
                 break;
             }
-            case historyitem_DateAxAxPos:
+            case AscDFH.historyitem_DateAxAxPos:
             {
                 this.axPos = data.oldPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -6054,7 +6054,7 @@ CDateAx.prototype =
                 }
                 break;
             }
-            case historyitem_DateAxBaseTimeUnit:
+            case AscDFH.historyitem_DateAxBaseTimeUnit:
             {
                 this.baseTimeUnit = data.oldPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -6063,7 +6063,7 @@ CDateAx.prototype =
                 }
                 break;
             }
-            case historyitem_DateAxCrossAx:
+            case AscDFH.historyitem_DateAxCrossAx:
             {
                 this.crossAx = data.oldPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -6072,7 +6072,7 @@ CDateAx.prototype =
                 }
                 break;
             }
-            case historyitem_DateAxCrosses:
+            case AscDFH.historyitem_DateAxCrosses:
             {
                 this.crosses = data.oldPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -6081,7 +6081,7 @@ CDateAx.prototype =
                 }
                 break;
             }
-            case historyitem_DateAxCrossesAt:
+            case AscDFH.historyitem_DateAxCrossesAt:
             {
                 this.crossesAt = data.oldPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -6090,7 +6090,7 @@ CDateAx.prototype =
                 }
                 break;
             }
-            case historyitem_DateAxDelete:
+            case AscDFH.historyitem_DateAxDelete:
             {
                 this.bDelete = data.oldPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -6099,7 +6099,7 @@ CDateAx.prototype =
                 }
                 break;
             }
-            case historyitem_DateAxLblOffset:
+            case AscDFH.historyitem_DateAxLblOffset:
             {
                 this.lblOffset = data.oldPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -6108,7 +6108,7 @@ CDateAx.prototype =
                 }
                 break;
             }
-            case historyitem_DateAxMajorGridlines:
+            case AscDFH.historyitem_DateAxMajorGridlines:
             {
                 this.majorGridlines = data.oldPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -6117,7 +6117,7 @@ CDateAx.prototype =
                 }
                 break;
             }
-            case historyitem_DateAxMajorTickMark:
+            case AscDFH.historyitem_DateAxMajorTickMark:
             {
                 this.majorTickMark = data.oldPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -6126,7 +6126,7 @@ CDateAx.prototype =
                 }
                 break;
             }
-            case historyitem_DateAxMajorTimeUnit:
+            case AscDFH.historyitem_DateAxMajorTimeUnit:
             {
                 this.majorTimeUnit = data.oldPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -6135,7 +6135,7 @@ CDateAx.prototype =
                 }
                 break;
             }
-            case historyitem_DateAxMajorUnit:
+            case AscDFH.historyitem_DateAxMajorUnit:
             {
                 this.majorUnit = data.oldPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -6144,7 +6144,7 @@ CDateAx.prototype =
                 }
                 break;
             }
-            case historyitem_DateAxMinorGridlines:
+            case AscDFH.historyitem_DateAxMinorGridlines:
             {
                 this.minorGridlines = data.oldPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -6153,7 +6153,7 @@ CDateAx.prototype =
                 }
                 break;
             }
-            case historyitem_DateAxMinorTickMark:
+            case AscDFH.historyitem_DateAxMinorTickMark:
             {
                 this.minorTickMark = data.oldPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -6162,7 +6162,7 @@ CDateAx.prototype =
                 }
                 break;
             }
-            case historyitem_DateAxMinorTimeUnit:
+            case AscDFH.historyitem_DateAxMinorTimeUnit:
             {
                 this.minorTimeUnit = data.oldPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -6172,7 +6172,7 @@ CDateAx.prototype =
                 break;
             }
 
-            case historyitem_DateAxMinorUnit:
+            case AscDFH.historyitem_DateAxMinorUnit:
             {
                 this.minorUnit = data.oldPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -6181,7 +6181,7 @@ CDateAx.prototype =
                 }
                 break;
             }
-            case historyitem_DateAxNumFmt:
+            case AscDFH.historyitem_DateAxNumFmt:
             {
                 this.numFmt = data.oldPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -6190,7 +6190,7 @@ CDateAx.prototype =
                 }
                 break;
             }
-            case historyitem_DateAxScaling:
+            case AscDFH.historyitem_DateAxScaling:
             {
                 this.scaling = data.oldPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -6199,7 +6199,7 @@ CDateAx.prototype =
                 }
                 break;
             }
-            case historyitem_DateAxSpPr:
+            case AscDFH.historyitem_DateAxSpPr:
             {
                 this.spPr = data.oldPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -6208,7 +6208,7 @@ CDateAx.prototype =
                 }
                 break;
             }
-            case historyitem_DateAxTickLblPos:
+            case AscDFH.historyitem_DateAxTickLblPos:
             {
                 this.tickLblPos = data.oldPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -6217,7 +6217,7 @@ CDateAx.prototype =
                 }
                 break;
             }
-            case historyitem_DateAxTitle:
+            case AscDFH.historyitem_DateAxTitle:
             {
                 this.title = data.oldPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -6226,7 +6226,7 @@ CDateAx.prototype =
                 }
                 break;
             }
-            case historyitem_DateAxTxPr:
+            case AscDFH.historyitem_DateAxTxPr:
             {
                 this.txPr = data.oldPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -6242,13 +6242,13 @@ CDateAx.prototype =
     {
         switch(data.Type)
         {
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 this.parent = data.newPr;
                 break;
             }
 
-            case historyitem_DateAxAuto:
+            case AscDFH.historyitem_DateAxAuto:
             {
                 this.auto = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -6257,7 +6257,7 @@ CDateAx.prototype =
                 }
                 break;
             }
-            case historyitem_DateAxAxId:
+            case AscDFH.historyitem_DateAxAxId:
             {
                 this.axId = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -6266,7 +6266,7 @@ CDateAx.prototype =
                 }
                 break;
             }
-            case historyitem_DateAxAxPos:
+            case AscDFH.historyitem_DateAxAxPos:
             {
                 this.axPos = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -6275,7 +6275,7 @@ CDateAx.prototype =
                 }
                 break;
             }
-            case historyitem_DateAxBaseTimeUnit:
+            case AscDFH.historyitem_DateAxBaseTimeUnit:
             {
                 this.baseTimeUnit = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -6284,7 +6284,7 @@ CDateAx.prototype =
                 }
                 break;
             }
-            case historyitem_DateAxCrossAx:
+            case AscDFH.historyitem_DateAxCrossAx:
             {
                 this.crossAx = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -6293,7 +6293,7 @@ CDateAx.prototype =
                 }
                 break;
             }
-            case historyitem_DateAxCrosses:
+            case AscDFH.historyitem_DateAxCrosses:
             {
                 this.crosses = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -6302,7 +6302,7 @@ CDateAx.prototype =
                 }
                 break;
             }
-            case historyitem_DateAxCrossesAt:
+            case AscDFH.historyitem_DateAxCrossesAt:
             {
                 this.crossesAt = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -6311,7 +6311,7 @@ CDateAx.prototype =
                 }
                 break;
             }
-            case historyitem_DateAxDelete:
+            case AscDFH.historyitem_DateAxDelete:
             {
                 this.bDelete = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -6320,7 +6320,7 @@ CDateAx.prototype =
                 }
                 break;
             }
-            case historyitem_DateAxLblOffset:
+            case AscDFH.historyitem_DateAxLblOffset:
             {
                 this.lblOffset = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -6329,7 +6329,7 @@ CDateAx.prototype =
                 }
                 break;
             }
-            case historyitem_DateAxMajorGridlines:
+            case AscDFH.historyitem_DateAxMajorGridlines:
             {
                 this.majorGridlines = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -6338,7 +6338,7 @@ CDateAx.prototype =
                 }
                 break;
             }
-            case historyitem_DateAxMajorTickMark:
+            case AscDFH.historyitem_DateAxMajorTickMark:
             {
                 this.majorTickMark = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -6347,7 +6347,7 @@ CDateAx.prototype =
                 }
                 break;
             }
-            case historyitem_DateAxMajorTimeUnit:
+            case AscDFH.historyitem_DateAxMajorTimeUnit:
             {
                 this.majorTimeUnit = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -6356,7 +6356,7 @@ CDateAx.prototype =
                 }
                 break;
             }
-            case historyitem_DateAxMajorUnit:
+            case AscDFH.historyitem_DateAxMajorUnit:
             {
                 this.majorUnit = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -6365,7 +6365,7 @@ CDateAx.prototype =
                 }
                 break;
             }
-            case historyitem_DateAxMinorGridlines:
+            case AscDFH.historyitem_DateAxMinorGridlines:
             {
                 this.minorGridlines = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -6374,7 +6374,7 @@ CDateAx.prototype =
                 }
                 break;
             }
-            case historyitem_DateAxMinorTickMark:
+            case AscDFH.historyitem_DateAxMinorTickMark:
             {
                 this.minorTickMark = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -6383,7 +6383,7 @@ CDateAx.prototype =
                 }
                 break;
             }
-            case historyitem_DateAxMinorTimeUnit:
+            case AscDFH.historyitem_DateAxMinorTimeUnit:
             {
                 this.minorTimeUnit = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -6394,7 +6394,7 @@ CDateAx.prototype =
             }
 
 
-            case historyitem_DateAxMinorUnit:
+            case AscDFH.historyitem_DateAxMinorUnit:
             {
                 this.minorUnit = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -6403,7 +6403,7 @@ CDateAx.prototype =
                 }
                 break;
             }
-            case historyitem_DateAxNumFmt:
+            case AscDFH.historyitem_DateAxNumFmt:
             {
                 this.numFmt = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -6412,7 +6412,7 @@ CDateAx.prototype =
                 }
                 break;
             }
-            case historyitem_DateAxScaling:
+            case AscDFH.historyitem_DateAxScaling:
             {
                 this.scaling = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -6421,7 +6421,7 @@ CDateAx.prototype =
                 }
                 break;
             }
-            case historyitem_DateAxSpPr:
+            case AscDFH.historyitem_DateAxSpPr:
             {
                 this.spPr = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -6430,7 +6430,7 @@ CDateAx.prototype =
                 }
                 break;
             }
-            case historyitem_DateAxTickLblPos:
+            case AscDFH.historyitem_DateAxTickLblPos:
             {
                 this.tickLblPos = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -6439,7 +6439,7 @@ CDateAx.prototype =
                 }
                 break;
             }
-            case historyitem_DateAxTitle:
+            case AscDFH.historyitem_DateAxTitle:
             {
                 this.title = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -6448,7 +6448,7 @@ CDateAx.prototype =
                 }
                 break;
             }
-            case historyitem_DateAxTxPr:
+            case AscDFH.historyitem_DateAxTxPr:
             {
                 this.txPr = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -6465,122 +6465,122 @@ CDateAx.prototype =
         w.WriteLong(data.Type);
         switch(data.Type)
         {
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 writeObject(w, data.newPr);
                 break;
             }
-            case historyitem_DateAxAuto:
+            case AscDFH.historyitem_DateAxAuto:
             {
                 writeBool(w, data.newPr);
                 break;
             }
-            case historyitem_DateAxAxId:
+            case AscDFH.historyitem_DateAxAxId:
             {
                 writeString(w, data.newPr);
                 break;
             }
-            case historyitem_DateAxAxPos:
+            case AscDFH.historyitem_DateAxAxPos:
             {
                 writeLong(w, data.newPr);
                 break;
             }
-            case historyitem_DateAxBaseTimeUnit:
+            case AscDFH.historyitem_DateAxBaseTimeUnit:
             {
                 writeDouble(w, data.newPr);
                 break;
             }
-            case historyitem_DateAxCrossAx:
+            case AscDFH.historyitem_DateAxCrossAx:
             {
                 writeObject(w, data.newPr);
                 break;
             }
-            case historyitem_DateAxCrosses:
+            case AscDFH.historyitem_DateAxCrosses:
             {
                 writeLong(w, data.newPr);
                 break;
             }
-            case historyitem_DateAxCrossesAt:
+            case AscDFH.historyitem_DateAxCrossesAt:
             {
                 writeDouble(w, data.newPr);
                 break;
             }
-            case historyitem_DateAxDelete:
+            case AscDFH.historyitem_DateAxDelete:
             {
                 writeBool(w, data.newPr);
                 break;
             }
-            case historyitem_DateAxLblOffset:
+            case AscDFH.historyitem_DateAxLblOffset:
             {
                 writeLong(w, data.newPr);
                 break;
             }
-            case historyitem_DateAxMajorGridlines:
+            case AscDFH.historyitem_DateAxMajorGridlines:
             {
                 writeObject(w, data.newPr);
                 break;
             }
-            case historyitem_DateAxMajorTickMark:
+            case AscDFH.historyitem_DateAxMajorTickMark:
             {
                 writeLong(w, data.newPr);
                 break;
             }
-            case historyitem_DateAxMajorTimeUnit:
+            case AscDFH.historyitem_DateAxMajorTimeUnit:
             {
                 writeDouble(w, data.newPr);
                 break;
             }
-            case historyitem_DateAxMajorUnit:
+            case AscDFH.historyitem_DateAxMajorUnit:
             {
                 writeDouble(w, data.newPr);
                 break;
             }
-            case historyitem_DateAxMinorGridlines:
+            case AscDFH.historyitem_DateAxMinorGridlines:
             {
                 writeObject(w, data.newPr);
                 break;
             }
-            case historyitem_DateAxMinorTickMark:
+            case AscDFH.historyitem_DateAxMinorTickMark:
             {
                 writeLong(w, data.newPr);
                 break;
             }
-            case historyitem_DateAxMinorTimeUnit:
+            case AscDFH.historyitem_DateAxMinorTimeUnit:
             {
                 writeDouble(w, data.newPr);
                 break;
             }
-            case historyitem_DateAxMinorUnit:
+            case AscDFH.historyitem_DateAxMinorUnit:
             {
                 writeDouble(w, data.newPr);
                 break;
             }
-            case historyitem_DateAxNumFmt:
+            case AscDFH.historyitem_DateAxNumFmt:
             {
                 writeObject(w, data.newPr);
                 break;
             }
-            case historyitem_DateAxScaling:
+            case AscDFH.historyitem_DateAxScaling:
             {
                 writeObject(w, data.newPr);
                 break;
             }
-            case historyitem_DateAxSpPr:
+            case AscDFH.historyitem_DateAxSpPr:
             {
                 writeObject(w, data.newPr);
                 break;
             }
-            case historyitem_DateAxTickLblPos:
+            case AscDFH.historyitem_DateAxTickLblPos:
             {
                 writeLong(w, data.newPr);
                 break;
             }
-            case historyitem_DateAxTitle:
+            case AscDFH.historyitem_DateAxTitle:
             {
                 writeObject(w, data.newPr);
                 break;
             }
-            case historyitem_DateAxTxPr:
+            case AscDFH.historyitem_DateAxTxPr:
             {
                 writeObject(w, data.newPr);
                 break;
@@ -6593,12 +6593,12 @@ CDateAx.prototype =
         var type = r.GetLong();
         switch(type)
         {
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 this.parent = readObject(r);
                 break;
             }
-            case historyitem_DateAxAuto:
+            case AscDFH.historyitem_DateAxAuto:
             {
                 this.auto = readBool(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -6607,12 +6607,12 @@ CDateAx.prototype =
                 }
                 break;
             }
-            case historyitem_DateAxAxId:
+            case AscDFH.historyitem_DateAxAxId:
             {
                 this.axId = readString(r);
                 break;
             }
-            case historyitem_DateAxAxPos:
+            case AscDFH.historyitem_DateAxAxPos:
             {
                 this.axPos = readLong(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -6621,7 +6621,7 @@ CDateAx.prototype =
                 }
                 break;
             }
-            case historyitem_DateAxBaseTimeUnit:
+            case AscDFH.historyitem_DateAxBaseTimeUnit:
             {
                 this.baseTimeUnit = readDouble(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -6630,7 +6630,7 @@ CDateAx.prototype =
                 }
                 break;
             }
-            case historyitem_DateAxCrossAx:
+            case AscDFH.historyitem_DateAxCrossAx:
             {
                 this.crossAx = readObject(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -6639,7 +6639,7 @@ CDateAx.prototype =
                 }
                 break;
             }
-            case historyitem_DateAxCrosses:
+            case AscDFH.historyitem_DateAxCrosses:
             {
                 this.crosses = readLong(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -6648,7 +6648,7 @@ CDateAx.prototype =
                 }
                 break;
             }
-            case historyitem_DateAxCrossesAt:
+            case AscDFH.historyitem_DateAxCrossesAt:
             {
                 this.crossesAt = readDouble(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -6657,7 +6657,7 @@ CDateAx.prototype =
                 }
                 break;
             }
-            case historyitem_DateAxDelete:
+            case AscDFH.historyitem_DateAxDelete:
             {
                 this.bDelete = readBool(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -6666,7 +6666,7 @@ CDateAx.prototype =
                 }
                 break;
             }
-            case historyitem_DateAxLblOffset:
+            case AscDFH.historyitem_DateAxLblOffset:
             {
                 this.lblOffset = readLong(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -6675,7 +6675,7 @@ CDateAx.prototype =
                 }
                 break;
             }
-            case historyitem_DateAxMajorGridlines:
+            case AscDFH.historyitem_DateAxMajorGridlines:
             {
                 this.majorGridlines = readObject(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -6684,7 +6684,7 @@ CDateAx.prototype =
                 }
                 break;
             }
-            case historyitem_DateAxMajorTickMark:
+            case AscDFH.historyitem_DateAxMajorTickMark:
             {
                 this.majorTickMark = readLong(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -6693,7 +6693,7 @@ CDateAx.prototype =
                 }
                 break;
             }
-            case historyitem_DateAxMajorTimeUnit:
+            case AscDFH.historyitem_DateAxMajorTimeUnit:
             {
                 this.majorTimeUnit = readDouble(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -6702,7 +6702,7 @@ CDateAx.prototype =
                 }
                 break;
             }
-            case historyitem_DateAxMajorUnit:
+            case AscDFH.historyitem_DateAxMajorUnit:
             {
                 this.majorUnit = readDouble(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -6711,7 +6711,7 @@ CDateAx.prototype =
                 }
                 break;
             }
-            case historyitem_DateAxMinorGridlines:
+            case AscDFH.historyitem_DateAxMinorGridlines:
             {
                 this.minorGridlines = readObject(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -6720,7 +6720,7 @@ CDateAx.prototype =
                 }
                 break;
             }
-            case historyitem_DateAxMinorTickMark:
+            case AscDFH.historyitem_DateAxMinorTickMark:
             {
                 this.minorTickMark = readLong(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -6729,7 +6729,7 @@ CDateAx.prototype =
                 }
                 break;
             }
-            case historyitem_DateAxMinorTimeUnit:
+            case AscDFH.historyitem_DateAxMinorTimeUnit:
             {
                 this.minorTimeUnit = readDouble(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -6738,7 +6738,7 @@ CDateAx.prototype =
                 }
                 break;
             }
-            case historyitem_DateAxMinorUnit:
+            case AscDFH.historyitem_DateAxMinorUnit:
             {
                 this.minorUnit = readDouble(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -6747,7 +6747,7 @@ CDateAx.prototype =
                 }
                 break;
             }
-            case historyitem_DateAxNumFmt:
+            case AscDFH.historyitem_DateAxNumFmt:
             {
                 this.numFmt = readObject(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -6756,7 +6756,7 @@ CDateAx.prototype =
                 }
                 break;
             }
-            case historyitem_DateAxScaling:
+            case AscDFH.historyitem_DateAxScaling:
             {
                 this.scaling = readObject(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -6765,7 +6765,7 @@ CDateAx.prototype =
                 }
                 break;
             }
-            case historyitem_DateAxSpPr:
+            case AscDFH.historyitem_DateAxSpPr:
             {
                 this.spPr = readObject(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -6774,7 +6774,7 @@ CDateAx.prototype =
                 }
                 break;
             }
-            case historyitem_DateAxTickLblPos:
+            case AscDFH.historyitem_DateAxTickLblPos:
             {
                 this.tickLblPos = readLong(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -6783,7 +6783,7 @@ CDateAx.prototype =
                 }
                 break;
             }
-            case historyitem_DateAxTitle:
+            case AscDFH.historyitem_DateAxTitle:
             {
                 this.title = readObject(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -6792,7 +6792,7 @@ CDateAx.prototype =
                 }
                 break;
             }
-            case historyitem_DateAxTxPr:
+            case AscDFH.historyitem_DateAxTxPr:
             {
                 this.txPr = readObject(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -6837,7 +6837,7 @@ CSerAx.prototype =
 {
     getObjectType: function()
     {
-        return historyitem_type_SerAx;
+        return AscDFH.historyitem_type_SerAx;
     },
 
     Get_Id: function()
@@ -6908,12 +6908,12 @@ CSerAx.prototype =
 
     setAxId: function(pr)
     {
-        History.Add(this, {Type: historyitem_SerAxSetAxId, oldPr: this.axId, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_SerAxSetAxId, oldPr: this.axId, newPr: pr});
         this.axId = pr;
     },
     setAxPos: function(pr)
     {
-        History.Add(this, {Type: historyitem_SerAxSetAxPos, oldPr: this.axPos, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_SerAxSetAxPos, oldPr: this.axPos, newPr: pr});
         this.axPos = pr;
         if(this.parent && this.parent.parent && this.parent.parent.parent)
         {
@@ -6922,7 +6922,7 @@ CSerAx.prototype =
     },
     setCrossAx: function(pr)
     {
-        History.Add(this, {Type: historyitem_SerAxSetCrossAx, oldPr: this.crossAx, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_SerAxSetCrossAx, oldPr: this.crossAx, newPr: pr});
         this.crossAx = pr;
         if(this.parent && this.parent.parent && this.parent.parent.parent)
         {
@@ -6931,7 +6931,7 @@ CSerAx.prototype =
     },
     setCrosses: function(pr)
     {
-        History.Add(this, {Type: historyitem_SerAxSetCrosses, oldPr: this.crosses, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_SerAxSetCrosses, oldPr: this.crosses, newPr: pr});
         this.crosses = pr;
         if(this.parent && this.parent.parent && this.parent.parent.parent)
         {
@@ -6940,7 +6940,7 @@ CSerAx.prototype =
     },
     setCrossesAt: function(pr)
     {
-        History.Add(this, {Type: historyitem_SerAxSetCrossesAt, oldPr: this.crossesAt, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_SerAxSetCrossesAt, oldPr: this.crossesAt, newPr: pr});
         this.crossesAt = pr;
         if(this.parent && this.parent.parent && this.parent.parent.parent)
         {
@@ -6949,7 +6949,7 @@ CSerAx.prototype =
     },
     setDelete: function(pr)
     {
-        History.Add(this, {Type: historyitem_SerAxSetDelete, oldPr: this.bDelete, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_SerAxSetDelete, oldPr: this.bDelete, newPr: pr});
         this.bDelete = pr;
         if(this.parent && this.parent.parent && this.parent.parent.parent)
         {
@@ -6958,7 +6958,7 @@ CSerAx.prototype =
     },
     setMajorGridlines: function(pr)
     {
-        History.Add(this, {Type: historyitem_SerAxSetMajorGridlines, oldPr: this.majorGridlines, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_SerAxSetMajorGridlines, oldPr: this.majorGridlines, newPr: pr});
         this.majorGridlines = pr;
         if(this.parent && this.parent.parent && this.parent.parent.parent)
         {
@@ -6967,7 +6967,7 @@ CSerAx.prototype =
     },
     setMajorTickMark: function(pr)
     {
-        History.Add(this, {Type: historyitem_SerAxSetMajorTickMark, oldPr: this.majorTickMark, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_SerAxSetMajorTickMark, oldPr: this.majorTickMark, newPr: pr});
         this.majorTickMark = pr;
         if(this.parent && this.parent.parent && this.parent.parent.parent)
         {
@@ -6976,7 +6976,7 @@ CSerAx.prototype =
     },
     setMinorGridlines: function(pr)
     {
-        History.Add(this, {Type: historyitem_SerAxSetMinorGridlines, oldPr: this.majorGridlines, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_SerAxSetMinorGridlines, oldPr: this.majorGridlines, newPr: pr});
         this.majorGridlines = pr;
         if(this.parent && this.parent.parent && this.parent.parent.parent)
         {
@@ -6985,7 +6985,7 @@ CSerAx.prototype =
     },
     setMinorTickMark: function(pr)
     {
-        History.Add(this, {Type: historyitem_SerAxSetMinorTickMark, oldPr: this.minorTickMark, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_SerAxSetMinorTickMark, oldPr: this.minorTickMark, newPr: pr});
         this.minorTickMark = pr;
         if(this.parent && this.parent.parent && this.parent.parent.parent)
         {
@@ -6994,7 +6994,7 @@ CSerAx.prototype =
     },
     setNumFmt: function(pr)
     {
-        History.Add(this, {Type: historyitem_SerAxSetNumFmt, oldPr: this.numFmt, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_SerAxSetNumFmt, oldPr: this.numFmt, newPr: pr});
         this.numFmt = pr;
         if(this.parent && this.parent.parent && this.parent.parent.parent)
         {
@@ -7003,7 +7003,7 @@ CSerAx.prototype =
     },
     setScaling: function(pr)
     {
-        History.Add(this, {Type: historyitem_SerAxSetScaling, oldPr: this.scaling, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_SerAxSetScaling, oldPr: this.scaling, newPr: pr});
         this.scaling = pr;
         if(this.scaling)
         {
@@ -7016,7 +7016,7 @@ CSerAx.prototype =
     },
     setSpPr: function(pr)
     {
-        History.Add(this, {Type: historyitem_SerAxSetSpPr, oldPr: this.spPr, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_SerAxSetSpPr, oldPr: this.spPr, newPr: pr});
         this.spPr = pr;
         if(this.parent && this.parent.parent && this.parent.parent.parent)
         {
@@ -7025,7 +7025,7 @@ CSerAx.prototype =
     },
     setTickLblPos: function(pr)
     {
-        History.Add(this, {Type: historyitem_SerAxSetTickLblPos, oldPr: this.tickLblPos, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_SerAxSetTickLblPos, oldPr: this.tickLblPos, newPr: pr});
         this.tickLblPos = pr;
         if(this.parent && this.parent.parent && this.parent.parent.parent)
         {
@@ -7034,7 +7034,7 @@ CSerAx.prototype =
     },
     setTickLblSkip: function(pr)
     {
-        History.Add(this, {Type: historyitem_SerAxSetTickLblSkip, oldPr: this.tickLblSkip, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_SerAxSetTickLblSkip, oldPr: this.tickLblSkip, newPr: pr});
         this.tickLblSkip = pr;
         if(this.parent && this.parent.parent && this.parent.parent.parent)
         {
@@ -7043,7 +7043,7 @@ CSerAx.prototype =
     },
     setTickMarkSkip: function(pr)
     {
-        History.Add(this, {Type: historyitem_SerAxSetTickMarkSkip, oldPr: this.tickMarkSkip, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_SerAxSetTickMarkSkip, oldPr: this.tickMarkSkip, newPr: pr});
         this.tickMarkSkip = pr;
         if(this.parent && this.parent.parent && this.parent.parent.parent)
         {
@@ -7052,7 +7052,7 @@ CSerAx.prototype =
     },
     setTitle: function(pr)
     {
-        History.Add(this, {Type: historyitem_SerAxSetTitle, oldPr: this.title, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_SerAxSetTitle, oldPr: this.title, newPr: pr});
         this.title = pr;
         if(pr)
         {
@@ -7071,7 +7071,7 @@ CSerAx.prototype =
 
     setTxPr: function(pr)
     {
-        History.Add(this, {Type: historyitem_SerAxSetTxPr, oldPr: this.txPr, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_SerAxSetTxPr, oldPr: this.txPr, newPr: pr});
         this.txPr = pr;
         if(this.txPr)
         {
@@ -7085,7 +7085,7 @@ CSerAx.prototype =
 
     setParent: function(pr)
     {
-        History.Add(this, {Type: historyitem_CommonChartFormat_SetParent, oldPr: this.parent, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_CommonChartFormat_SetParent, oldPr: this.parent, newPr: pr});
         this.parent = pr;
     },
 
@@ -7093,7 +7093,7 @@ CSerAx.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 this.parent = data.oldPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -7102,12 +7102,12 @@ CSerAx.prototype =
                 }
                 break;
             }
-            case historyitem_SerAxSetAxId:
+            case AscDFH.historyitem_SerAxSetAxId:
             {
                 this.axId = data.oldPr;
                 break;
             }
-            case historyitem_SerAxSetAxPos:
+            case AscDFH.historyitem_SerAxSetAxPos:
             {
                 this.axPos = data.oldPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -7116,7 +7116,7 @@ CSerAx.prototype =
                 }
                 break;
             }
-            case historyitem_SerAxSetCrossAx:
+            case AscDFH.historyitem_SerAxSetCrossAx:
             {
                 this.crossAx = data.oldPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -7125,7 +7125,7 @@ CSerAx.prototype =
                 }
                 break;
             }
-            case historyitem_SerAxSetCrosses:
+            case AscDFH.historyitem_SerAxSetCrosses:
             {
                 this.crosses = data.oldPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -7134,7 +7134,7 @@ CSerAx.prototype =
                 }
                 break;
             }
-            case historyitem_SerAxSetCrossesAt:
+            case AscDFH.historyitem_SerAxSetCrossesAt:
             {
                 this.crossesAt = data.oldPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -7143,7 +7143,7 @@ CSerAx.prototype =
                 }
                 break;
             }
-            case historyitem_SerAxSetDelete:
+            case AscDFH.historyitem_SerAxSetDelete:
             {
                 this.bDelete = data.oldPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -7152,7 +7152,7 @@ CSerAx.prototype =
                 }
                 break;
             }
-            case historyitem_SerAxSetMajorGridlines:
+            case AscDFH.historyitem_SerAxSetMajorGridlines:
             {
                 this.majorGridlines = data.oldPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -7161,7 +7161,7 @@ CSerAx.prototype =
                 }
                 break;
             }
-            case historyitem_SerAxSetMajorTickMark:
+            case AscDFH.historyitem_SerAxSetMajorTickMark:
             {
                 this.majorTickMark = data.oldPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -7170,7 +7170,7 @@ CSerAx.prototype =
                 }
                 break;
             }
-            case historyitem_SerAxSetMinorGridlines:
+            case AscDFH.historyitem_SerAxSetMinorGridlines:
             {
                 this.minorGridlines = data.oldPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -7179,7 +7179,7 @@ CSerAx.prototype =
                 }
                 break;
             }
-            case historyitem_SerAxSetMinorTickMark:
+            case AscDFH.historyitem_SerAxSetMinorTickMark:
             {
                 this.minorTickMark = data.oldPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -7188,7 +7188,7 @@ CSerAx.prototype =
                 }
                 break;
             }
-            case historyitem_SerAxSetNumFmt:
+            case AscDFH.historyitem_SerAxSetNumFmt:
             {
                 this.numFmt = data.oldPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -7197,7 +7197,7 @@ CSerAx.prototype =
                 }
                 break;
             }
-            case historyitem_SerAxSetScaling:
+            case AscDFH.historyitem_SerAxSetScaling:
             {
                 this.scaling = data.oldPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -7206,7 +7206,7 @@ CSerAx.prototype =
                 }
                 break;
             }
-            case historyitem_SerAxSetSpPr:
+            case AscDFH.historyitem_SerAxSetSpPr:
             {
                 this.spPr = data.oldPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -7215,7 +7215,7 @@ CSerAx.prototype =
                 }
                 break;
             }
-            case historyitem_SerAxSetTickLblPos:
+            case AscDFH.historyitem_SerAxSetTickLblPos:
             {
                 this.tickLblPos = data.oldPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -7224,7 +7224,7 @@ CSerAx.prototype =
                 }
                 break;
             }
-            case historyitem_SerAxSetTickLblSkip:
+            case AscDFH.historyitem_SerAxSetTickLblSkip:
             {
                 this.tickLblSkip = data.oldPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -7233,7 +7233,7 @@ CSerAx.prototype =
                 }
                 break;
             }
-            case historyitem_SerAxSetTickMarkSkip:
+            case AscDFH.historyitem_SerAxSetTickMarkSkip:
             {
                 this.tickMarkSkip = data.oldPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -7242,7 +7242,7 @@ CSerAx.prototype =
                 }
                 break;
             }
-            case historyitem_SerAxSetTitle:
+            case AscDFH.historyitem_SerAxSetTitle:
             {
                 this.title = data.oldPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -7251,7 +7251,7 @@ CSerAx.prototype =
                 }
                 break;
             }
-            case historyitem_SerAxSetTxPr:
+            case AscDFH.historyitem_SerAxSetTxPr:
             {
                 this.txPr = data.oldPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -7267,17 +7267,17 @@ CSerAx.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 this.parent = data.newPr;
                 break;
             }
-            case historyitem_SerAxSetAxId:
+            case AscDFH.historyitem_SerAxSetAxId:
             {
                 this.axId = data.newPr;
                 break;
             }
-            case historyitem_SerAxSetAxPos:
+            case AscDFH.historyitem_SerAxSetAxPos:
             {
                 this.axPos = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -7286,7 +7286,7 @@ CSerAx.prototype =
                 }
                 break;
             }
-            case historyitem_SerAxSetCrossAx:
+            case AscDFH.historyitem_SerAxSetCrossAx:
             {
                 this.crossAx = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -7295,7 +7295,7 @@ CSerAx.prototype =
                 }
                 break;
             }
-            case historyitem_SerAxSetCrosses:
+            case AscDFH.historyitem_SerAxSetCrosses:
             {
                 this.crosses = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -7304,7 +7304,7 @@ CSerAx.prototype =
                 }
                 break;
             }
-            case historyitem_SerAxSetCrossesAt:
+            case AscDFH.historyitem_SerAxSetCrossesAt:
             {
                 this.crossesAt = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -7313,7 +7313,7 @@ CSerAx.prototype =
                 }
                 break;
             }
-            case historyitem_SerAxSetDelete:
+            case AscDFH.historyitem_SerAxSetDelete:
             {
                 this.bDelete = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -7322,7 +7322,7 @@ CSerAx.prototype =
                 }
                 break;
             }
-            case historyitem_SerAxSetMajorGridlines:
+            case AscDFH.historyitem_SerAxSetMajorGridlines:
             {
                 this.majorGridlines = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -7331,7 +7331,7 @@ CSerAx.prototype =
                 }
                 break;
             }
-            case historyitem_SerAxSetMajorTickMark:
+            case AscDFH.historyitem_SerAxSetMajorTickMark:
             {
                 this.majorTickMark = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -7340,7 +7340,7 @@ CSerAx.prototype =
                 }
                 break;
             }
-            case historyitem_SerAxSetMinorGridlines:
+            case AscDFH.historyitem_SerAxSetMinorGridlines:
             {
                 this.minorGridlines = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -7349,7 +7349,7 @@ CSerAx.prototype =
                 }
                 break;
             }
-            case historyitem_SerAxSetMinorTickMark:
+            case AscDFH.historyitem_SerAxSetMinorTickMark:
             {
                 this.minorTickMark = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -7358,7 +7358,7 @@ CSerAx.prototype =
                 }
                 break;
             }
-            case historyitem_SerAxSetNumFmt:
+            case AscDFH.historyitem_SerAxSetNumFmt:
             {
                 this.numFmt = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -7367,7 +7367,7 @@ CSerAx.prototype =
                 }
                 break;
             }
-            case historyitem_SerAxSetScaling:
+            case AscDFH.historyitem_SerAxSetScaling:
             {
                 this.scaling = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -7376,7 +7376,7 @@ CSerAx.prototype =
                 }
                 break;
             }
-            case historyitem_SerAxSetSpPr:
+            case AscDFH.historyitem_SerAxSetSpPr:
             {
                 this.spPr = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -7385,7 +7385,7 @@ CSerAx.prototype =
                 }
                 break;
             }
-            case historyitem_SerAxSetTickLblPos:
+            case AscDFH.historyitem_SerAxSetTickLblPos:
             {
                 this.tickLblPos = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -7394,7 +7394,7 @@ CSerAx.prototype =
                 }
                 break;
             }
-            case historyitem_SerAxSetTickLblSkip:
+            case AscDFH.historyitem_SerAxSetTickLblSkip:
             {
                 this.tickLblSkip = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -7403,7 +7403,7 @@ CSerAx.prototype =
                 }
                 break;
             }
-            case historyitem_SerAxSetTickMarkSkip:
+            case AscDFH.historyitem_SerAxSetTickMarkSkip:
             {
                 this.tickMarkSkip = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -7412,7 +7412,7 @@ CSerAx.prototype =
                 }
                 break;
             }
-            case historyitem_SerAxSetTitle:
+            case AscDFH.historyitem_SerAxSetTitle:
             {
                 this.title = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -7421,7 +7421,7 @@ CSerAx.prototype =
                 }
                 break;
             }
-            case historyitem_SerAxSetTxPr:
+            case AscDFH.historyitem_SerAxSetTxPr:
             {
                 this.txPr = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -7450,97 +7450,97 @@ CSerAx.prototype =
         switch (data.Type)
         {
 
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 writeObject(w, data.newPr);
                 break;
             }
-            case historyitem_SerAxSetAxId:
+            case AscDFH.historyitem_SerAxSetAxId:
             {
                 writeLong(w, data.newPr);
                 break;
             }
-            case historyitem_SerAxSetAxPos:
+            case AscDFH.historyitem_SerAxSetAxPos:
             {
                 writeLong(w, data.newPr);
                 break;
             }
-            case historyitem_SerAxSetCrossAx:
+            case AscDFH.historyitem_SerAxSetCrossAx:
             {
                 writeObject(w, data.newPr);
                 break;
             }
-            case historyitem_SerAxSetCrosses:
+            case AscDFH.historyitem_SerAxSetCrosses:
             {
                 writeLong(w, data.newPr);
                 break;
             }
-            case historyitem_SerAxSetCrossesAt:
+            case AscDFH.historyitem_SerAxSetCrossesAt:
             {
                 writeDouble(w, data.newPr);
                 break;
             }
-            case historyitem_SerAxSetDelete:
+            case AscDFH.historyitem_SerAxSetDelete:
             {
                 writeBool(w,data.newPr);
                 break;
             }
-            case historyitem_SerAxSetMajorGridlines:
+            case AscDFH.historyitem_SerAxSetMajorGridlines:
             {
                 writeObject(w, data.newPr);
                 break;
             }
-            case historyitem_SerAxSetMajorTickMark:
+            case AscDFH.historyitem_SerAxSetMajorTickMark:
             {
                 writeLong(w, data.newPr);
                 break;
             }
-            case historyitem_SerAxSetMinorGridlines:
+            case AscDFH.historyitem_SerAxSetMinorGridlines:
             {
                 writeObject(w, data.newPr);
                 break;
             }
-            case historyitem_SerAxSetMinorTickMark:
+            case AscDFH.historyitem_SerAxSetMinorTickMark:
             {
                 writeLong(w, data.newPr);
                 break;
             }
-            case historyitem_SerAxSetNumFmt:
+            case AscDFH.historyitem_SerAxSetNumFmt:
             {
                 writeObject(w, data.newPr);
                 break;
             }
-            case historyitem_SerAxSetScaling:
+            case AscDFH.historyitem_SerAxSetScaling:
             {
                 writeObject(w, data.newPr);
                 break;
             }
-            case historyitem_SerAxSetSpPr:
+            case AscDFH.historyitem_SerAxSetSpPr:
             {
                 writeObject(w, data.newPr);
                 break;
             }
-            case historyitem_SerAxSetTickLblPos:
+            case AscDFH.historyitem_SerAxSetTickLblPos:
             {
                 writeLong(w, data.newPr);
                 break;
             }
-            case historyitem_SerAxSetTickLblSkip:
+            case AscDFH.historyitem_SerAxSetTickLblSkip:
             {
                 writeLong(w, data.newPr);
                 break;
             }
-            case historyitem_SerAxSetTickMarkSkip:
+            case AscDFH.historyitem_SerAxSetTickMarkSkip:
             {
                 writeLong(w, data.newPr);
                 break;
             }
-            case historyitem_SerAxSetTitle:
+            case AscDFH.historyitem_SerAxSetTitle:
             {
                 writeObject(w, data.newPr);
                 break;
             }
-            case historyitem_SerAxSetTxPr:
+            case AscDFH.historyitem_SerAxSetTxPr:
             {
                 writeObject(w, data.newPr);
                 break;
@@ -7553,7 +7553,7 @@ CSerAx.prototype =
         var type = r.GetLong();
         switch (type)
         {
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 this.parent = readObject(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -7562,12 +7562,12 @@ CSerAx.prototype =
                 }
                 break;
             }
-            case historyitem_SerAxSetAxId:
+            case AscDFH.historyitem_SerAxSetAxId:
             {
                 this.axId = readLong(r);
                 break;
             }
-            case historyitem_SerAxSetAxPos:
+            case AscDFH.historyitem_SerAxSetAxPos:
             {
                 this.axPos = readLong(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -7576,7 +7576,7 @@ CSerAx.prototype =
                 }
                 break;
             }
-            case historyitem_SerAxSetCrossAx:
+            case AscDFH.historyitem_SerAxSetCrossAx:
             {
                 this.crossAx = readObject(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -7585,7 +7585,7 @@ CSerAx.prototype =
                 }
                 break;
             }
-            case historyitem_SerAxSetCrosses:
+            case AscDFH.historyitem_SerAxSetCrosses:
             {
                 this.crosses = readLong(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -7594,7 +7594,7 @@ CSerAx.prototype =
                 }
                 break;
             }
-            case historyitem_SerAxSetCrossesAt:
+            case AscDFH.historyitem_SerAxSetCrossesAt:
             {
                 this.crossesAt = readDouble(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -7603,7 +7603,7 @@ CSerAx.prototype =
                 }
                 break;
             }
-            case historyitem_SerAxSetDelete:
+            case AscDFH.historyitem_SerAxSetDelete:
             {
                 this.bDelete = readDouble(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -7612,7 +7612,7 @@ CSerAx.prototype =
                 }
                 break;
             }
-            case historyitem_SerAxSetMajorGridlines:
+            case AscDFH.historyitem_SerAxSetMajorGridlines:
             {
                 this.majorGridlines = readObject(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -7621,7 +7621,7 @@ CSerAx.prototype =
                 }
                 break;
             }
-            case historyitem_SerAxSetMajorTickMark:
+            case AscDFH.historyitem_SerAxSetMajorTickMark:
             {
                 this.majorTickMark = readLong(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -7630,7 +7630,7 @@ CSerAx.prototype =
                 }
                 break;
             }
-            case historyitem_SerAxSetMinorGridlines:
+            case AscDFH.historyitem_SerAxSetMinorGridlines:
             {
                 this.minorGridlines = readObject(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -7639,7 +7639,7 @@ CSerAx.prototype =
                 }
                 break;
             }
-            case historyitem_SerAxSetMinorTickMark:
+            case AscDFH.historyitem_SerAxSetMinorTickMark:
             {
                 this.minorTickMark = readLong(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -7648,7 +7648,7 @@ CSerAx.prototype =
                 }
                 break;
             }
-            case historyitem_SerAxSetNumFmt:
+            case AscDFH.historyitem_SerAxSetNumFmt:
             {
                 this.numFmt = readObject(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -7657,7 +7657,7 @@ CSerAx.prototype =
                 }
                 break;
             }
-            case historyitem_SerAxSetScaling:
+            case AscDFH.historyitem_SerAxSetScaling:
             {
                 this.scaling = readObject(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -7666,7 +7666,7 @@ CSerAx.prototype =
                 }
                 break;
             }
-            case historyitem_SerAxSetSpPr:
+            case AscDFH.historyitem_SerAxSetSpPr:
             {
                 this.spPr = readObject(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -7675,7 +7675,7 @@ CSerAx.prototype =
                 }
                 break;
             }
-            case historyitem_SerAxSetTickLblPos:
+            case AscDFH.historyitem_SerAxSetTickLblPos:
             {
                 this.tickLblPos = readLong(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -7684,7 +7684,7 @@ CSerAx.prototype =
                 }
                 break;
             }
-            case historyitem_SerAxSetTickLblSkip:
+            case AscDFH.historyitem_SerAxSetTickLblSkip:
             {
                 this.tickLblSkip = readLong(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -7693,7 +7693,7 @@ CSerAx.prototype =
                 }
                 break;
             }
-            case historyitem_SerAxSetTickMarkSkip:
+            case AscDFH.historyitem_SerAxSetTickMarkSkip:
             {
                 this.tickMarkSkip = readLong(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -7702,7 +7702,7 @@ CSerAx.prototype =
                 }
                 break;
             }
-            case historyitem_SerAxSetTitle:
+            case AscDFH.historyitem_SerAxSetTitle:
             {
                 this.title = readObject(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -7711,7 +7711,7 @@ CSerAx.prototype =
                 }
                 break;
             }
-            case historyitem_SerAxSetTxPr:
+            case AscDFH.historyitem_SerAxSetTxPr:
             {
                 this.txPr = readObject(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -7830,7 +7830,7 @@ CValAx.prototype =
 
     getObjectType: function()
     {
-        return historyitem_type_ValAx;
+        return AscDFH.historyitem_type_ValAx;
     },
 
     Write_ToBinary2: function(w)
@@ -7847,12 +7847,12 @@ CValAx.prototype =
 
     setAxId: function(pr)
     {
-        History.Add(this, {Type: historyitem_ValAxSetAxId, oldPr: this.axId, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_ValAxSetAxId, oldPr: this.axId, newPr: pr});
         this.axId = pr;
     },
     setAxPos: function(pr)
     {
-        History.Add(this, {Type: historyitem_ValAxSetAxPos, oldPr: this.axPos, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_ValAxSetAxPos, oldPr: this.axPos, newPr: pr});
         this.axPos = pr;
 
         if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -7862,7 +7862,7 @@ CValAx.prototype =
     },
     setCrossAx: function(pr)
     {
-        History.Add(this, {Type: historyitem_ValAxSetCrossAx, oldPr: this.crossAx, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_ValAxSetCrossAx, oldPr: this.crossAx, newPr: pr});
         this.crossAx = pr;
 
         if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -7872,7 +7872,7 @@ CValAx.prototype =
     },
     setCrossBetween: function(pr)
     {
-        History.Add(this, {Type: historyitem_ValAxSetCrossBetween, oldPr: this.crossBetween, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_ValAxSetCrossBetween, oldPr: this.crossBetween, newPr: pr});
         this.crossBetween = pr;
 
         if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -7882,7 +7882,7 @@ CValAx.prototype =
     },
     setCrosses: function(pr)
     {
-        History.Add(this, {Type: historyitem_ValAxSetCrosses, oldPr: this.crosses, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_ValAxSetCrosses, oldPr: this.crosses, newPr: pr});
         this.crosses = pr;
         if(this.parent && this.parent.parent && this.parent.parent.parent)
         {
@@ -7891,7 +7891,7 @@ CValAx.prototype =
     },
     setCrossesAt: function(pr)
     {
-        History.Add(this, {Type: historyitem_ValAxSetCrossesAt, oldPr: this.crossesAt, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_ValAxSetCrossesAt, oldPr: this.crossesAt, newPr: pr});
         this.crossesAt = pr;
 
         if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -7901,7 +7901,7 @@ CValAx.prototype =
     },
     setDelete: function(pr)
     {
-        History.Add(this, {Type: historyitem_ValAxSetDelete, oldPr: this.bDelete, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_ValAxSetDelete, oldPr: this.bDelete, newPr: pr});
         this.bDelete = pr;
         if(this.parent && this.parent.parent && this.parent.parent.parent)
         {
@@ -7910,7 +7910,7 @@ CValAx.prototype =
     },
     setDispUnits: function(pr)
     {
-        History.Add(this, {Type: historyitem_ValAxSetDispUnits, oldPr: this.dispUnits, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_ValAxSetDispUnits, oldPr: this.dispUnits, newPr: pr});
         this.dispUnits = pr;
         if(this.dispUnits)
         {
@@ -7923,12 +7923,12 @@ CValAx.prototype =
     },
     setExtLst: function(pr)
     {
-        History.Add(this, {Type: historyitem_ValAxSetExtLst, oldPr: this.extLst, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_ValAxSetExtLst, oldPr: this.extLst, newPr: pr});
         this.extLst = pr;
     },
     setMajorGridlines: function(pr)
     {
-        History.Add(this, {Type: historyitem_ValAxSetMajorGridlines, oldPr: this.majorGridlines, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_ValAxSetMajorGridlines, oldPr: this.majorGridlines, newPr: pr});
         this.majorGridlines = pr;
         if(this.parent && this.parent.parent && this.parent.parent.parent)
         {
@@ -7937,7 +7937,7 @@ CValAx.prototype =
     },
     setMajorTickMark: function(pr)
     {
-        History.Add(this, {Type: historyitem_ValAxSetMajorTickMark, oldPr: this.majorTickMark, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_ValAxSetMajorTickMark, oldPr: this.majorTickMark, newPr: pr});
         this.majorTickMark = pr;
 
         if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -7947,7 +7947,7 @@ CValAx.prototype =
     },
     setMajorUnit: function(pr)
     {
-        History.Add(this, {Type: historyitem_ValAxSetMajorUnit, oldPr: this.majorUnit, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_ValAxSetMajorUnit, oldPr: this.majorUnit, newPr: pr});
         this.majorUnit = pr;
         if(this.parent && this.parent.parent && this.parent.parent.parent)
         {
@@ -7956,7 +7956,7 @@ CValAx.prototype =
     },
     setMinorGridlines: function(pr)
     {
-        History.Add(this, {Type: historyitem_ValAxSetMinorGridlines, oldPr: this.minorGridlines, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_ValAxSetMinorGridlines, oldPr: this.minorGridlines, newPr: pr});
         this.minorGridlines = pr;
         if(this.parent && this.parent.parent && this.parent.parent.parent)
         {
@@ -7965,7 +7965,7 @@ CValAx.prototype =
     },
     setMinorTickMark: function(pr)
     {
-        History.Add(this, {Type: historyitem_ValAxSetMinorTickMark, oldPr: this.minorTickMark, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_ValAxSetMinorTickMark, oldPr: this.minorTickMark, newPr: pr});
         this.minorTickMark = pr;
 
         if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -7975,7 +7975,7 @@ CValAx.prototype =
     },
     setMinorUnit: function(pr)
     {
-        History.Add(this, {Type: historyitem_ValAxSetMinorUnit, oldPr: this.minorUnit, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_ValAxSetMinorUnit, oldPr: this.minorUnit, newPr: pr});
         this.minorUnit = pr;
 
         if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -7985,7 +7985,7 @@ CValAx.prototype =
     },
     setNumFmt: function(pr)
     {
-        History.Add(this, {Type: historyitem_ValAxSetNumFmt, oldPr: this.numFmt, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_ValAxSetNumFmt, oldPr: this.numFmt, newPr: pr});
         this.numFmt = pr;
 
         if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -7995,7 +7995,7 @@ CValAx.prototype =
     },
     setScaling: function(pr)
     {
-        History.Add(this, {Type: historyitem_ValAxSetScaling, oldPr: this.scaling, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_ValAxSetScaling, oldPr: this.scaling, newPr: pr});
         this.scaling = pr;
         if(this.scaling)
         {
@@ -8008,7 +8008,7 @@ CValAx.prototype =
     },
     setSpPr: function(pr)
     {
-        History.Add(this, {Type: historyitem_ValAxSetSpPr, oldPr: this.spPr, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_ValAxSetSpPr, oldPr: this.spPr, newPr: pr});
         this.spPr = pr;
 
         if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -8018,7 +8018,7 @@ CValAx.prototype =
     },
     setTickLblPos: function(pr)
     {
-        History.Add(this, {Type: historyitem_ValAxSetTickLblPos, oldPr: this.tickLblPos, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_ValAxSetTickLblPos, oldPr: this.tickLblPos, newPr: pr});
         this.tickLblPos = pr;
 
         if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -8028,7 +8028,7 @@ CValAx.prototype =
     },
     setTitle: function(pr)
     {
-        History.Add(this, {Type: historyitem_ValAxSetTitle, oldPr: this.title, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_ValAxSetTitle, oldPr: this.title, newPr: pr});
         this.title = pr;
         if(pr)
         {
@@ -8047,7 +8047,7 @@ CValAx.prototype =
 
     setTxPr: function(pr)
     {
-        History.Add(this, {Type: historyitem_ValAxSetTxPr, oldPr: this.txPr, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_ValAxSetTxPr, oldPr: this.txPr, newPr: pr});
         this.txPr = pr;
         if(this.txPr)
         {
@@ -8061,7 +8061,7 @@ CValAx.prototype =
 
     setParent: function(pr)
     {
-        History.Add(this, {Type: historyitem_CommonChartFormat_SetParent, oldPr: this.parent, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_CommonChartFormat_SetParent, oldPr: this.parent, newPr: pr});
         this.parent = pr;
     },
 
@@ -8070,7 +8070,7 @@ CValAx.prototype =
         switch(data.Type)
         {
 
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 this.parent = data.oldPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -8079,7 +8079,7 @@ CValAx.prototype =
                 }
                 break;
             }
-            case historyitem_ValAxSetAxId:
+            case AscDFH.historyitem_ValAxSetAxId:
             {
                 this.axId = data.oldPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -8088,7 +8088,7 @@ CValAx.prototype =
                 }
                 break;
             }
-            case historyitem_ValAxSetAxPos:
+            case AscDFH.historyitem_ValAxSetAxPos:
             {
                 this.axPos = data.oldPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -8097,7 +8097,7 @@ CValAx.prototype =
                 }
                 break;
             }
-            case historyitem_ValAxSetCrossAx:
+            case AscDFH.historyitem_ValAxSetCrossAx:
             {
                 this.crossAx = data.oldPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -8106,7 +8106,7 @@ CValAx.prototype =
                 }
                 break;
             }
-            case historyitem_ValAxSetCrossBetween:
+            case AscDFH.historyitem_ValAxSetCrossBetween:
             {
                 this.crossBetween = data.oldPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -8115,7 +8115,7 @@ CValAx.prototype =
                 }
                 break;
             }
-            case historyitem_ValAxSetCrosses:
+            case AscDFH.historyitem_ValAxSetCrosses:
             {
                 this.crosses = data.oldPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -8124,7 +8124,7 @@ CValAx.prototype =
                 }
                 break;
             }
-            case historyitem_ValAxSetCrossesAt:
+            case AscDFH.historyitem_ValAxSetCrossesAt:
             {
                 this.crossesAt = data.oldPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -8133,7 +8133,7 @@ CValAx.prototype =
                 }
                 break;
             }
-            case historyitem_ValAxSetDelete:
+            case AscDFH.historyitem_ValAxSetDelete:
             {
                 this.bDelete = data.oldPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -8142,7 +8142,7 @@ CValAx.prototype =
                 }
                 break;
             }
-            case historyitem_ValAxSetDispUnits:
+            case AscDFH.historyitem_ValAxSetDispUnits:
             {
                 this.dispUnits = data.oldPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -8151,7 +8151,7 @@ CValAx.prototype =
                 }
                 break;
             }
-            case historyitem_ValAxSetMajorGridlines:
+            case AscDFH.historyitem_ValAxSetMajorGridlines:
             {
                 this.majorGridlines = data.oldPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -8160,7 +8160,7 @@ CValAx.prototype =
                 }
                 break;
             }
-            case historyitem_ValAxSetMajorTickMark:
+            case AscDFH.historyitem_ValAxSetMajorTickMark:
             {
                 this.majorTickMark = data.oldPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -8169,7 +8169,7 @@ CValAx.prototype =
                 }
                 break;
             }
-            case historyitem_ValAxSetMajorUnit:
+            case AscDFH.historyitem_ValAxSetMajorUnit:
             {
                 this.majorUnit = data.oldPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -8178,7 +8178,7 @@ CValAx.prototype =
                 }
                 break;
             }
-            case historyitem_ValAxSetMinorGridlines:
+            case AscDFH.historyitem_ValAxSetMinorGridlines:
             {
                 this.minorGridlines = data.oldPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -8187,7 +8187,7 @@ CValAx.prototype =
                 }
                 break;
             }
-            case historyitem_ValAxSetMinorTickMark:
+            case AscDFH.historyitem_ValAxSetMinorTickMark:
             {
                 this.minorTickMark = data.oldPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -8196,7 +8196,7 @@ CValAx.prototype =
                 }
                 break;
             }
-            case historyitem_ValAxSetMinorUnit:
+            case AscDFH.historyitem_ValAxSetMinorUnit:
             {
                 this.minorUnit = data.oldPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -8205,7 +8205,7 @@ CValAx.prototype =
                 }
                 break;
             }
-            case historyitem_ValAxSetNumFmt:
+            case AscDFH.historyitem_ValAxSetNumFmt:
             {
                 this.numFmt = data.oldPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -8214,7 +8214,7 @@ CValAx.prototype =
                 }
                 break;
             }
-            case historyitem_ValAxSetScaling:
+            case AscDFH.historyitem_ValAxSetScaling:
             {
                 this.scaling = data.oldPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -8223,12 +8223,12 @@ CValAx.prototype =
                 }
                 break;
             }
-            case historyitem_ValAxSetSpPr:
+            case AscDFH.historyitem_ValAxSetSpPr:
             {
                 this.axId = data.oldPr;
                 break;
             }
-            case historyitem_ValAxSetTickLblPos:
+            case AscDFH.historyitem_ValAxSetTickLblPos:
             {
                 this.tickLblPos = data.oldPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -8237,7 +8237,7 @@ CValAx.prototype =
                 }
                 break;
             }
-            case historyitem_ValAxSetTitle:
+            case AscDFH.historyitem_ValAxSetTitle:
             {
                 this.title = data.oldPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -8246,7 +8246,7 @@ CValAx.prototype =
                 }
                 break;
             }
-            case historyitem_ValAxSetTxPr:
+            case AscDFH.historyitem_ValAxSetTxPr:
             {
                 this.txPr = data.oldPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -8263,12 +8263,12 @@ CValAx.prototype =
     {
         switch(data.Type)
         {
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 this.parent = data.newPr;
                 break;
             }
-            case historyitem_ValAxSetAxId:
+            case AscDFH.historyitem_ValAxSetAxId:
             {
                 this.axId = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -8277,7 +8277,7 @@ CValAx.prototype =
                 }
                 break;
             }
-            case historyitem_ValAxSetAxPos:
+            case AscDFH.historyitem_ValAxSetAxPos:
             {
                 this.axPos = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -8286,7 +8286,7 @@ CValAx.prototype =
                 }
                 break;
             }
-            case historyitem_ValAxSetCrossAx:
+            case AscDFH.historyitem_ValAxSetCrossAx:
             {
                 this.crossAx = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -8295,7 +8295,7 @@ CValAx.prototype =
                 }
                 break;
             }
-            case historyitem_ValAxSetCrossBetween:
+            case AscDFH.historyitem_ValAxSetCrossBetween:
             {
                 this.crossBetween = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -8304,7 +8304,7 @@ CValAx.prototype =
                 }
                 break;
             }
-            case historyitem_ValAxSetCrosses:
+            case AscDFH.historyitem_ValAxSetCrosses:
             {
                 this.crosses = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -8313,7 +8313,7 @@ CValAx.prototype =
                 }
                 break;
             }
-            case historyitem_ValAxSetCrossesAt:
+            case AscDFH.historyitem_ValAxSetCrossesAt:
             {
                 this.crossesAt = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -8322,7 +8322,7 @@ CValAx.prototype =
                 }
                 break;
             }
-            case historyitem_ValAxSetDelete:
+            case AscDFH.historyitem_ValAxSetDelete:
             {
                 this.bDelete = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -8331,7 +8331,7 @@ CValAx.prototype =
                 }
                 break;
             }
-            case historyitem_ValAxSetDispUnits:
+            case AscDFH.historyitem_ValAxSetDispUnits:
             {
                 this.dispUnits = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -8340,7 +8340,7 @@ CValAx.prototype =
                 }
                 break;
             }
-            case historyitem_ValAxSetMajorGridlines:
+            case AscDFH.historyitem_ValAxSetMajorGridlines:
             {
                 this.majorGridlines = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -8349,7 +8349,7 @@ CValAx.prototype =
                 }
                 break;
             }
-            case historyitem_ValAxSetMajorTickMark:
+            case AscDFH.historyitem_ValAxSetMajorTickMark:
             {
                 this.majorTickMark = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -8358,7 +8358,7 @@ CValAx.prototype =
                 }
                 break;
             }
-            case historyitem_ValAxSetMajorUnit:
+            case AscDFH.historyitem_ValAxSetMajorUnit:
             {
                 this.majorUnit = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -8367,7 +8367,7 @@ CValAx.prototype =
                 }
                 break;
             }
-            case historyitem_ValAxSetMinorGridlines:
+            case AscDFH.historyitem_ValAxSetMinorGridlines:
             {
                 this.minorGridlines = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -8376,7 +8376,7 @@ CValAx.prototype =
                 }
                 break;
             }
-            case historyitem_ValAxSetMinorTickMark:
+            case AscDFH.historyitem_ValAxSetMinorTickMark:
             {
                 this.minorTickMark = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -8385,7 +8385,7 @@ CValAx.prototype =
                 }
                 break;
             }
-            case historyitem_ValAxSetMinorUnit:
+            case AscDFH.historyitem_ValAxSetMinorUnit:
             {
                 this.minorUnit = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -8394,7 +8394,7 @@ CValAx.prototype =
                 }
                 break;
             }
-            case historyitem_ValAxSetNumFmt:
+            case AscDFH.historyitem_ValAxSetNumFmt:
             {
                 this.numFmt = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -8403,7 +8403,7 @@ CValAx.prototype =
                 }
                 break;
             }
-            case historyitem_ValAxSetScaling:
+            case AscDFH.historyitem_ValAxSetScaling:
             {
                 this.scaling = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -8412,7 +8412,7 @@ CValAx.prototype =
                 }
                 break;
             }
-            case historyitem_ValAxSetSpPr:
+            case AscDFH.historyitem_ValAxSetSpPr:
             {
                 this.axId = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -8421,7 +8421,7 @@ CValAx.prototype =
                 }
                 break;
             }
-            case historyitem_ValAxSetTickLblPos:
+            case AscDFH.historyitem_ValAxSetTickLblPos:
             {
                 this.tickLblPos = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -8430,7 +8430,7 @@ CValAx.prototype =
                 }
                 break;
             }
-            case historyitem_ValAxSetTitle:
+            case AscDFH.historyitem_ValAxSetTitle:
             {
                 this.title = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -8439,7 +8439,7 @@ CValAx.prototype =
                 }
                 break;
             }
-            case historyitem_ValAxSetTxPr:
+            case AscDFH.historyitem_ValAxSetTxPr:
             {
                 this.txPr = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -8456,107 +8456,107 @@ CValAx.prototype =
         w.WriteLong(data.Type);
         switch(data.Type)
         {
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 writeObject(w, data.newPr);
                 break;
             }
-            case historyitem_ValAxSetAxId:
+            case AscDFH.historyitem_ValAxSetAxId:
             {
                 writeLong(w, data.newPr);
                 break;
             }
-            case historyitem_ValAxSetAxPos:
+            case AscDFH.historyitem_ValAxSetAxPos:
             {
                 writeLong(w, data.newPr);
                 break;
             }
-            case historyitem_ValAxSetCrossAx:
+            case AscDFH.historyitem_ValAxSetCrossAx:
             {
                 writeObject(w, data.newPr);
                 break;
             }
-            case historyitem_ValAxSetCrossBetween:
+            case AscDFH.historyitem_ValAxSetCrossBetween:
             {
                 writeLong(w, data.newPr);
                 break;
             }
-            case historyitem_ValAxSetCrosses:
+            case AscDFH.historyitem_ValAxSetCrosses:
             {
                 writeLong(w, data.newPr);
                 break;
             }
-            case historyitem_ValAxSetCrossesAt:
+            case AscDFH.historyitem_ValAxSetCrossesAt:
             {
                 writeDouble(w, data.newPr);
                 break;
             }
-            case historyitem_ValAxSetDelete:
+            case AscDFH.historyitem_ValAxSetDelete:
             {
                 writeBool(w, data.newPr);
                 break;
             }
-            case historyitem_ValAxSetDispUnits:
+            case AscDFH.historyitem_ValAxSetDispUnits:
             {
                 writeObject(w, data.newPr);
                 break;
             }
-            case historyitem_ValAxSetMajorGridlines:
+            case AscDFH.historyitem_ValAxSetMajorGridlines:
             {
                 writeObject(w, data.newPr);
                 break;
             }
-            case historyitem_ValAxSetMajorTickMark:
+            case AscDFH.historyitem_ValAxSetMajorTickMark:
             {
                 writeLong(w, data.newPr);
                 break;
             }
-            case historyitem_ValAxSetMajorUnit:
+            case AscDFH.historyitem_ValAxSetMajorUnit:
             {
                 writeDouble(w, data.newPr);
                 break;
             }
-            case historyitem_ValAxSetMinorGridlines:
+            case AscDFH.historyitem_ValAxSetMinorGridlines:
             {
                 writeObject(w, data.newPr);
                 break;
             }
-            case historyitem_ValAxSetMinorTickMark:
+            case AscDFH.historyitem_ValAxSetMinorTickMark:
             {
                 writeLong(w, data.newPr);
                 break;
             }
-            case historyitem_ValAxSetMinorUnit:
+            case AscDFH.historyitem_ValAxSetMinorUnit:
             {
                 writeDouble(w, data.newPr);
                 break;
             }
-            case historyitem_ValAxSetNumFmt:
+            case AscDFH.historyitem_ValAxSetNumFmt:
             {
                 writeObject(w, data.newPr);
                 break;
             }
-            case historyitem_ValAxSetScaling:
+            case AscDFH.historyitem_ValAxSetScaling:
             {
                 writeObject(w, data.newPr);
                 break;
             }
-            case historyitem_ValAxSetSpPr:
+            case AscDFH.historyitem_ValAxSetSpPr:
             {
                 writeObject(w, data.newPr);
                 break;
             }
-            case historyitem_ValAxSetTickLblPos:
+            case AscDFH.historyitem_ValAxSetTickLblPos:
             {
                 writeLong(w, data.newPr);
                 break;
             }
-            case historyitem_ValAxSetTitle:
+            case AscDFH.historyitem_ValAxSetTitle:
             {
                 writeObject(w, data.newPr);
                 break;
             }
-            case historyitem_ValAxSetTxPr:
+            case AscDFH.historyitem_ValAxSetTxPr:
             {
                 writeObject(w, data.newPr);
                 break;
@@ -8569,17 +8569,17 @@ CValAx.prototype =
         var type = r.GetLong();
         switch(type)
         {
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 this.parent = readObject(r);
                 break;
             }
-            case historyitem_ValAxSetAxId:
+            case AscDFH.historyitem_ValAxSetAxId:
             {
                 this.axId = readLong(r);
                 break;
             }
-            case historyitem_ValAxSetAxPos:
+            case AscDFH.historyitem_ValAxSetAxPos:
             {
                 this.axPos = readLong(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -8588,7 +8588,7 @@ CValAx.prototype =
                 }
                 break;
             }
-            case historyitem_ValAxSetCrossAx:
+            case AscDFH.historyitem_ValAxSetCrossAx:
             {
                 this.crossAx = readObject(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -8597,7 +8597,7 @@ CValAx.prototype =
                 }
                 break;
             }
-            case historyitem_ValAxSetCrossBetween:
+            case AscDFH.historyitem_ValAxSetCrossBetween:
             {
                 this.crossBetween = readLong(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -8606,7 +8606,7 @@ CValAx.prototype =
                 }
                 break;
             }
-            case historyitem_ValAxSetCrosses:
+            case AscDFH.historyitem_ValAxSetCrosses:
             {
                 this.crosses = readLong(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -8615,7 +8615,7 @@ CValAx.prototype =
                 }
                 break;
             }
-            case historyitem_ValAxSetCrossesAt:
+            case AscDFH.historyitem_ValAxSetCrossesAt:
             {
                 this.crossesAt = readDouble(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -8624,7 +8624,7 @@ CValAx.prototype =
                 }
                 break;
             }
-            case historyitem_ValAxSetDelete:
+            case AscDFH.historyitem_ValAxSetDelete:
             {
                 this.bDelete = readBool(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -8633,7 +8633,7 @@ CValAx.prototype =
                 }
                 break;
             }
-            case historyitem_ValAxSetDispUnits:
+            case AscDFH.historyitem_ValAxSetDispUnits:
             {
                 this.dispUnits = readObject(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -8642,7 +8642,7 @@ CValAx.prototype =
                 }
                 break;
             }
-            case historyitem_ValAxSetMajorGridlines:
+            case AscDFH.historyitem_ValAxSetMajorGridlines:
             {
                 this.majorGridlines = readObject(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -8651,7 +8651,7 @@ CValAx.prototype =
                 }
                 break;
             }
-            case historyitem_ValAxSetMajorTickMark:
+            case AscDFH.historyitem_ValAxSetMajorTickMark:
             {
                 this.majorTickMark = readLong(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -8660,7 +8660,7 @@ CValAx.prototype =
                 }
                 break;
             }
-            case historyitem_ValAxSetMajorUnit:
+            case AscDFH.historyitem_ValAxSetMajorUnit:
             {
                 this.majorUnit = readDouble(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -8669,7 +8669,7 @@ CValAx.prototype =
                 }
                 break;
             }
-            case historyitem_ValAxSetMinorGridlines:
+            case AscDFH.historyitem_ValAxSetMinorGridlines:
             {
                 this.minorGridlines = readObject(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -8678,7 +8678,7 @@ CValAx.prototype =
                 }
                 break;
             }
-            case historyitem_ValAxSetMinorTickMark:
+            case AscDFH.historyitem_ValAxSetMinorTickMark:
             {
                 this.minorTickMark = readLong(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -8687,7 +8687,7 @@ CValAx.prototype =
                 }
                 break;
             }
-            case historyitem_ValAxSetMinorUnit:
+            case AscDFH.historyitem_ValAxSetMinorUnit:
             {
                 this.minorUnit = readDouble(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -8696,7 +8696,7 @@ CValAx.prototype =
                 }
                 break;
             }
-            case historyitem_ValAxSetNumFmt:
+            case AscDFH.historyitem_ValAxSetNumFmt:
             {
                 this.numFmt = readObject(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -8705,7 +8705,7 @@ CValAx.prototype =
                 }
                 break;
             }
-            case historyitem_ValAxSetScaling:
+            case AscDFH.historyitem_ValAxSetScaling:
             {
                 this.scaling = readObject(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -8714,7 +8714,7 @@ CValAx.prototype =
                 }
                 break;
             }
-            case historyitem_ValAxSetSpPr:
+            case AscDFH.historyitem_ValAxSetSpPr:
             {
                 this.spPr = readObject(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -8723,7 +8723,7 @@ CValAx.prototype =
                 }
                 break;
             }
-            case historyitem_ValAxSetTickLblPos:
+            case AscDFH.historyitem_ValAxSetTickLblPos:
             {
                 this.tickLblPos = readLong(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -8732,7 +8732,7 @@ CValAx.prototype =
                 }
                 break;
             }
-            case historyitem_ValAxSetTitle:
+            case AscDFH.historyitem_ValAxSetTitle:
             {
                 this.title = readObject(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -8741,7 +8741,7 @@ CValAx.prototype =
                 }
                 break;
             }
-            case historyitem_ValAxSetTxPr:
+            case AscDFH.historyitem_ValAxSetTxPr:
             {
                 this.txPr = readObject(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -9126,18 +9126,18 @@ CBandFmt.prototype =
 
     getObjectType: function()
     {
-        return historyitem_type_BandFmt;
+        return AscDFH.historyitem_type_BandFmt;
     },
 
     setIdx: function(pr)
     {
-        History.Add(this, {Type: historyitem_BandFmt_SetIdx, oldPr: this.idx, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_BandFmt_SetIdx, oldPr: this.idx, newPr: pr});
         this.idx = pr;
     },
 
     setSpPr: function(pr)
     {
-        History.Add(this, {Type: historyitem_BandFmt_SetSpPr, oldPr: this.spPr, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_BandFmt_SetSpPr, oldPr: this.spPr, newPr: pr});
         this.spPr = pr;
     },
 
@@ -9156,12 +9156,12 @@ CBandFmt.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_BandFmt_SetIdx:
+            case AscDFH.historyitem_BandFmt_SetIdx:
             {
                 this.idx = data.oldPr;
                 break;
             }
-            case historyitem_BandFmt_SetSpPr:
+            case AscDFH.historyitem_BandFmt_SetSpPr:
             {
                 this.spPr = data.oldPr;
                 break;
@@ -9173,12 +9173,12 @@ CBandFmt.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_BandFmt_SetIdx:
+            case AscDFH.historyitem_BandFmt_SetIdx:
             {
                 this.idx = data.newPr;
                 break;
             }
-            case historyitem_BandFmt_SetSpPr:
+            case AscDFH.historyitem_BandFmt_SetSpPr:
             {
                 this.spPr = data.newPr;
                 break;
@@ -9191,7 +9191,7 @@ CBandFmt.prototype =
         w.WriteLong(data.Type);
         switch (data.Type)
         {
-            case historyitem_BandFmt_SetIdx:
+            case AscDFH.historyitem_BandFmt_SetIdx:
             {
                 w.WriteBool(isRealNumber(data.newPr));
                 if(isRealNumber(data.newPr))
@@ -9200,7 +9200,7 @@ CBandFmt.prototype =
                 }
                 break;
             }
-            case historyitem_BandFmt_SetSpPr:
+            case AscDFH.historyitem_BandFmt_SetSpPr:
             {
 
                 w.WriteBool(isRealObject(data.newPr));
@@ -9218,7 +9218,7 @@ CBandFmt.prototype =
         var type = r.GetLong();
         switch (type)
         {
-            case historyitem_BandFmt_SetIdx:
+            case AscDFH.historyitem_BandFmt_SetIdx:
             {
                 if(r.GetBool())
                 {
@@ -9230,7 +9230,7 @@ CBandFmt.prototype =
                 }
                 break;
             }
-            case historyitem_BandFmt_SetSpPr:
+            case AscDFH.historyitem_BandFmt_SetSpPr:
             {
                 this.spPr = data.newPr;
                 if(r.GetBool())
@@ -9299,14 +9299,14 @@ CBarSeries.prototype =
     {
         if(this.dPt[idx])
         {
-            History.Add(this, {Type: historyitem_CommonSeries_RemoveDPt, idx: idx, pt: this.dPt[idx]});
+            History.Add(this, {Type: AscDFH.historyitem_CommonSeries_RemoveDPt, idx: idx, pt: this.dPt[idx]});
             this.dPt.splice(idx, 1);
         }
     },
 
     getObjectType: function()
     {
-        return historyitem_type_BarSeries;
+        return AscDFH.historyitem_type_BarSeries;
     },
 
     createDuplicate: function()
@@ -9423,12 +9423,12 @@ CBarSeries.prototype =
 
     setCat: function(pr)
     {
-        History.Add(this, {Type: historyitem_BarSeries_SetCat, oldPr: this.cat, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_BarSeries_SetCat, oldPr: this.cat, newPr: pr});
         this.cat = pr;
     },
     setDLbls: function(pr)
     {
-        History.Add(this, {Type: historyitem_BarSeries_SetDLbls, oldPr: this.dLbls, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_BarSeries_SetDLbls, oldPr: this.dLbls, newPr: pr});
         this.dLbls = pr;
         if(this.dLbls)
         {
@@ -9437,57 +9437,57 @@ CBarSeries.prototype =
     },
     addDPt: function(pr)
     {
-        History.Add(this, {Type: historyitem_BarSeries_SetDPt, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_BarSeries_SetDPt, newPr: pr});
         this.dPt.push(pr);
     },
     setErrBars: function(pr)
     {
-        History.Add(this, {Type: historyitem_BarSeries_SetErrBars, oldPr: this.errBars, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_BarSeries_SetErrBars, oldPr: this.errBars, newPr: pr});
         this.errBars = pr;
     },
     setIdx: function(pr)
     {
-        History.Add(this, {Type: historyitem_BarSeries_SetIdx, oldPr: this.idx, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_BarSeries_SetIdx, oldPr: this.idx, newPr: pr});
         this.idx = pr;
     },
     setInvertIfNegative: function(pr)
     {
-        History.Add(this, {Type: historyitem_BarSeries_SetInvertIfNegative, oldPr: this.invertIfNegative, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_BarSeries_SetInvertIfNegative, oldPr: this.invertIfNegative, newPr: pr});
         this.invertIfNegative = pr;
     },
     setOrder: function(pr)
     {
-        History.Add(this, {Type: historyitem_BarSeries_SetOrder, oldPr: this.order, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_BarSeries_SetOrder, oldPr: this.order, newPr: pr});
         this.order = pr;
     },
     setPictureOptions: function(pr)
     {
-        History.Add(this, {Type: historyitem_BarSeries_SetPictureOptions, oldPr: this.pictureOptions, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_BarSeries_SetPictureOptions, oldPr: this.pictureOptions, newPr: pr});
         this.pictureOptions = pr;
     },
     setShape: function(pr)
     {
-        History.Add(this, {Type: historyitem_BarSeries_SetShape, oldPr: this.shape, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_BarSeries_SetShape, oldPr: this.shape, newPr: pr});
         this.shape = pr;
     },
     setSpPr: function(pr)
     {
-        History.Add(this, {Type: historyitem_BarSeries_SetSpPr, oldPr: this.spPr, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_BarSeries_SetSpPr, oldPr: this.spPr, newPr: pr});
         this.spPr = pr;
     },
     setTrendline: function(pr)
     {
-        History.Add(this, {Type: historyitem_BarSeries_SetTrendline, oldPr: this.trendline, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_BarSeries_SetTrendline, oldPr: this.trendline, newPr: pr});
         this.trendline = pr;
     },
     setTx: function(pr)
     {
-        History.Add(this, {Type: historyitem_BarSeries_SetTx, oldPr: this.tx, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_BarSeries_SetTx, oldPr: this.tx, newPr: pr});
         this.tx = pr;
     },
     setVal: function(pr)
     {
-        History.Add(this, {Type: historyitem_BarSeries_SetVal, oldPr: this.val, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_BarSeries_SetVal, oldPr: this.val, newPr: pr});
         this.val = pr;
         if(this.val && this.val.setParent)
         {
@@ -9497,7 +9497,7 @@ CBarSeries.prototype =
 
     setParent: function(pr)
     {
-        History.Add(this, {Type: historyitem_CommonChartFormat_SetParent, oldPr: this.parent, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_CommonChartFormat_SetParent, oldPr: this.parent, newPr: pr});
         this.parent = pr;
     },
 
@@ -9505,22 +9505,22 @@ CBarSeries.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 this.parent = data.oldPr;
                 break;
             }
-            case historyitem_CommonSeries_RemoveDPt:
+            case AscDFH.historyitem_CommonSeries_RemoveDPt:
             {
                 this.dPt.splice(data.idx, 0, data.pt);
                 break;
             }
-            case historyitem_BarSeries_SetCat:
+            case AscDFH.historyitem_BarSeries_SetCat:
             {
                 this.cat = data.oldPr;
                 break;
             }
-            case historyitem_BarSeries_SetDLbls:
+            case AscDFH.historyitem_BarSeries_SetDLbls:
             {
                 this.dLbls = data.oldPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateDataLabels)
@@ -9529,57 +9529,57 @@ CBarSeries.prototype =
                 }
                 break;
             }
-            case historyitem_BarSeries_SetDPt:
+            case AscDFH.historyitem_BarSeries_SetDPt:
             {
                 findPrAndRemove(this.dPt, data.newPr);
                 break;
             }
-            case historyitem_BarSeries_SetErrBars:
+            case AscDFH.historyitem_BarSeries_SetErrBars:
             {
                 this.errBars = data.oldPr;
                 break;
             }
-            case historyitem_BarSeries_SetIdx:
+            case AscDFH.historyitem_BarSeries_SetIdx:
             {
                 this.idx = data.oldPr;
                 break;
             }
-            case historyitem_BarSeries_SetInvertIfNegative:
+            case AscDFH.historyitem_BarSeries_SetInvertIfNegative:
             {
                 this.invertIfNegative = data.oldPr;
                 break;
             }
-            case historyitem_BarSeries_SetOrder:
+            case AscDFH.historyitem_BarSeries_SetOrder:
             {
                 this.order = data.oldPr;
                 break;
             }
-            case historyitem_BarSeries_SetPictureOptions:
+            case AscDFH.historyitem_BarSeries_SetPictureOptions:
             {
                 this.pictureOptions = data.oldPr;
                 break;
             }
-            case historyitem_BarSeries_SetShape:
+            case AscDFH.historyitem_BarSeries_SetShape:
             {
                 this.shape = data.oldPr;
                 break;
             }
-            case historyitem_BarSeries_SetSpPr:
+            case AscDFH.historyitem_BarSeries_SetSpPr:
             {
                 this.spPr = data.oldPr;
                 break;
             }
-            case historyitem_BarSeries_SetTrendline:
+            case AscDFH.historyitem_BarSeries_SetTrendline:
             {
                 this.trendline = data.oldPr;
                 break;
             }
-            case historyitem_BarSeries_SetTx:
+            case AscDFH.historyitem_BarSeries_SetTx:
             {
                 this.tx = data.oldPr;
                 break;
             }
-            case historyitem_BarSeries_SetVal:
+            case AscDFH.historyitem_BarSeries_SetVal:
             {
                 this.val = data.oldPr;
                 break;
@@ -9591,22 +9591,22 @@ CBarSeries.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 this.parent = data.newPr;
                 break;
             }
-            case historyitem_CommonSeries_RemoveDPt:
+            case AscDFH.historyitem_CommonSeries_RemoveDPt:
             {
                 this.dPt.splice(data.idx, 1);
                 break;
             }
-            case historyitem_BarSeries_SetCat:
+            case AscDFH.historyitem_BarSeries_SetCat:
             {
                 this.cat = data.newPr;
                 break;
             }
-            case historyitem_BarSeries_SetDLbls:
+            case AscDFH.historyitem_BarSeries_SetDLbls:
             {
                 this.dLbls = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateDataLabels)
@@ -9615,57 +9615,57 @@ CBarSeries.prototype =
                 }
                 break;
             }
-            case historyitem_BarSeries_SetDPt:
+            case AscDFH.historyitem_BarSeries_SetDPt:
             {
                 this.dPt.push(data.newPr);
                 break;
             }
-            case historyitem_BarSeries_SetErrBars:
+            case AscDFH.historyitem_BarSeries_SetErrBars:
             {
                 this.errBars = data.newPr;
                 break;
             }
-            case historyitem_BarSeries_SetIdx:
+            case AscDFH.historyitem_BarSeries_SetIdx:
             {
                 this.idx = data.newPr;
                 break;
             }
-            case historyitem_BarSeries_SetInvertIfNegative:
+            case AscDFH.historyitem_BarSeries_SetInvertIfNegative:
             {
                 this.invertIfNegative = data.newPr;
                 break;
             }
-            case historyitem_BarSeries_SetOrder:
+            case AscDFH.historyitem_BarSeries_SetOrder:
             {
                 this.order = data.newPr;
                 break;
             }
-            case historyitem_BarSeries_SetPictureOptions:
+            case AscDFH.historyitem_BarSeries_SetPictureOptions:
             {
                 this.pictureOptions = data.newPr;
                 break;
             }
-            case historyitem_BarSeries_SetShape:
+            case AscDFH.historyitem_BarSeries_SetShape:
             {
                 this.shape = data.newPr;
                 break;
             }
-            case historyitem_BarSeries_SetSpPr:
+            case AscDFH.historyitem_BarSeries_SetSpPr:
             {
                 this.spPr = data.newPr;
                 break;
             }
-            case historyitem_BarSeries_SetTrendline:
+            case AscDFH.historyitem_BarSeries_SetTrendline:
             {
                 this.trendline = data.newPr;
                 break;
             }
-            case historyitem_BarSeries_SetTx:
+            case AscDFH.historyitem_BarSeries_SetTx:
             {
                 this.tx = data.newPr;
                 break;
             }
-            case historyitem_BarSeries_SetVal:
+            case AscDFH.historyitem_BarSeries_SetVal:
             {
                 this.val = data.newPr;
                 break;
@@ -9679,37 +9679,37 @@ CBarSeries.prototype =
         w.WriteLong(data.Type);
         switch (data.Type)
         {
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 writeObject(w, data.newPr);
                 break;
             }
-            case historyitem_BarSeries_SetCat:
-            case historyitem_BarSeries_SetDLbls:
-            case historyitem_BarSeries_SetDPt:
-            case historyitem_BarSeries_SetErrBars:
-            case historyitem_BarSeries_SetPictureOptions:
-            case historyitem_BarSeries_SetShape:
-            case historyitem_BarSeries_SetSpPr:
-            case historyitem_BarSeries_SetTrendline:
-            case historyitem_BarSeries_SetTx:
-            case historyitem_BarSeries_SetVal:
+            case AscDFH.historyitem_BarSeries_SetCat:
+            case AscDFH.historyitem_BarSeries_SetDLbls:
+            case AscDFH.historyitem_BarSeries_SetDPt:
+            case AscDFH.historyitem_BarSeries_SetErrBars:
+            case AscDFH.historyitem_BarSeries_SetPictureOptions:
+            case AscDFH.historyitem_BarSeries_SetShape:
+            case AscDFH.historyitem_BarSeries_SetSpPr:
+            case AscDFH.historyitem_BarSeries_SetTrendline:
+            case AscDFH.historyitem_BarSeries_SetTx:
+            case AscDFH.historyitem_BarSeries_SetVal:
             {
                 writeObject(w, data.newPr);
                 break;
             }
-            case historyitem_BarSeries_SetIdx:
-            case historyitem_BarSeries_SetOrder:
+            case AscDFH.historyitem_BarSeries_SetIdx:
+            case AscDFH.historyitem_BarSeries_SetOrder:
             {
                 writeLong(w, data.newPr);
                 break;
             }
-            case historyitem_BarSeries_SetInvertIfNegative:
+            case AscDFH.historyitem_BarSeries_SetInvertIfNegative:
             {
                 writeBool(w, data.newPr);
                 break;
             }
-            case historyitem_CommonSeries_RemoveDPt:
+            case AscDFH.historyitem_CommonSeries_RemoveDPt:
             {
                 writeLong(w, data.idx);
                 break;
@@ -9722,17 +9722,17 @@ CBarSeries.prototype =
         var type = r.GetLong();
         switch (type)
         {
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 this.parent = readObject(r);
                 break;
             }
-            case historyitem_BarSeries_SetCat:
+            case AscDFH.historyitem_BarSeries_SetCat:
             {
                 this.cat = readObject(r);
                 break;
             }
-            case historyitem_BarSeries_SetDLbls:
+            case AscDFH.historyitem_BarSeries_SetDLbls:
             {
                 this.dLbls = readObject(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateDataLabels)
@@ -9741,62 +9741,62 @@ CBarSeries.prototype =
                 }
                 break;
             }
-            case historyitem_BarSeries_SetDPt:
+            case AscDFH.historyitem_BarSeries_SetDPt:
             {
                 this.dPt.push(readObject(r));
                 break;
             }
-            case historyitem_BarSeries_SetErrBars:
+            case AscDFH.historyitem_BarSeries_SetErrBars:
             {
                 this.errBars = readObject(r);
                 break;
             }
-            case historyitem_BarSeries_SetIdx:
+            case AscDFH.historyitem_BarSeries_SetIdx:
             {
                 this.idx = readLong(r);
                 break;
             }
-            case historyitem_BarSeries_SetInvertIfNegative:
+            case AscDFH.historyitem_BarSeries_SetInvertIfNegative:
             {
                 this.invertIfNegative = readBool(r);
                 break;
             }
-            case historyitem_BarSeries_SetOrder:
+            case AscDFH.historyitem_BarSeries_SetOrder:
             {
                 this.order = readLong(r);
                 break;
             }
-            case historyitem_BarSeries_SetPictureOptions:
+            case AscDFH.historyitem_BarSeries_SetPictureOptions:
             {
                 this.pictureOptions = readObject(r);
                 break;
             }
-            case historyitem_BarSeries_SetShape:
+            case AscDFH.historyitem_BarSeries_SetShape:
             {
                 this.shape = readObject(r);
                 break;
             }
-            case historyitem_BarSeries_SetSpPr:
+            case AscDFH.historyitem_BarSeries_SetSpPr:
             {
                 this.spPr = readObject(r);
                 break;
             }
-            case historyitem_BarSeries_SetTrendline:
+            case AscDFH.historyitem_BarSeries_SetTrendline:
             {
                 this.trendline = readObject(r);
                 break;
             }
-            case historyitem_BarSeries_SetTx:
+            case AscDFH.historyitem_BarSeries_SetTx:
             {
                 this.tx = readObject(r);
                 break;
             }
-            case historyitem_BarSeries_SetVal:
+            case AscDFH.historyitem_BarSeries_SetVal:
             {
                 this.val = readObject(r);
                 break;
             }
-            case historyitem_CommonSeries_RemoveDPt:
+            case AscDFH.historyitem_CommonSeries_RemoveDPt:
             {
                 var pos = readLong(r);
                 if(isRealNumber(pos))
@@ -9842,7 +9842,7 @@ CBubbleChart.prototype =
     {
         if(this.series[idx])
         {
-            History.Add(this, {Type: historyitem_CommonChart_RemoveSeries, oldPr: idx, newPr: this.series.splice(idx, 1)[0]});
+            History.Add(this, {Type: AscDFH.historyitem_CommonChart_RemoveSeries, oldPr: idx, newPr: this.series.splice(idx, 1)[0]});
         }
     },
     getSeriesConstructor: function()
@@ -9851,7 +9851,7 @@ CBubbleChart.prototype =
     },
     getObjectType: function()
     {
-        return historyitem_type_BubbleChart;
+        return AscDFH.historyitem_type_BubbleChart;
     },
 
     getDefaultDataLabelsPosition: function()
@@ -9902,22 +9902,22 @@ CBubbleChart.prototype =
     {
         if(!pr)
             return;
-        History.Add(this, {Type:historyitem_BubbleChart_AddAxId, newPr: pr});
+        History.Add(this, {Type:AscDFH.historyitem_BubbleChart_AddAxId, newPr: pr});
         this.axId.push(pr);
     },
     setBubble3D: function(pr)
     {
-        History.Add(this, {Type:historyitem_BubbleChart_SetBubble3D, oldPr: this.bubble3D, newPr: pr});
+        History.Add(this, {Type:AscDFH.historyitem_BubbleChart_SetBubble3D, oldPr: this.bubble3D, newPr: pr});
         this.bubble3D = pr;
     },
     setBubbleScale: function(pr)
     {
-        History.Add(this, {Type:historyitem_BubbleChart_SetBubbleScale, oldPr: this.bubbleScale, newPr: pr});
+        History.Add(this, {Type:AscDFH.historyitem_BubbleChart_SetBubbleScale, oldPr: this.bubbleScale, newPr: pr});
         this.bubbleScale = pr;
     },
     setDLbls: function(pr)
     {
-        History.Add(this, {Type:historyitem_BubbleChart_SetDLbls, oldPr: this.dLbls, newPr: pr});
+        History.Add(this, {Type:AscDFH.historyitem_BubbleChart_SetDLbls, oldPr: this.dLbls, newPr: pr});
         this.dLbls = pr;
         if(this.dLbls)
         {
@@ -9930,7 +9930,7 @@ CBubbleChart.prototype =
     },
     addSer: function(ser)
     {
-        History.Add(this, {Type:historyitem_BubbleChart_AddSerie, newPr: ser});
+        History.Add(this, {Type:AscDFH.historyitem_BubbleChart_AddSerie, newPr: ser});
         this.series.push(ser);
         ser.setParent(this);
         if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -9940,24 +9940,24 @@ CBubbleChart.prototype =
     },
     setShowNegBubbles: function(pr)
     {
-        History.Add(this, {Type:historyitem_BubbleChart_SetShowNegBubbles, oldPr: this.showNegBubbles, newPr: pr});
+        History.Add(this, {Type:AscDFH.historyitem_BubbleChart_SetShowNegBubbles, oldPr: this.showNegBubbles, newPr: pr});
         this.showNegBubbles = pr;
     },
     setSizeRepresents: function(pr)
     {
-        History.Add(this, {Type:historyitem_BubbleChart_SetSizeRepresents, oldPr: this.sizeRepresents, newPr: pr});
+        History.Add(this, {Type:AscDFH.historyitem_BubbleChart_SetSizeRepresents, oldPr: this.sizeRepresents, newPr: pr});
         this.sizeRepresents = pr;
     },
     setVaryColors: function(pr)
     {
-        History.Add(this, {Type:historyitem_BubbleChart_SetVaryColors, oldPr: this.varyColors, newPr: pr});
+        History.Add(this, {Type:AscDFH.historyitem_BubbleChart_SetVaryColors, oldPr: this.varyColors, newPr: pr});
         this.varyColors = pr;
     },
 
 
     setParent: function(pr)
     {
-        History.Add(this, {Type: historyitem_CommonChartFormat_SetParent, oldPr: this.parent, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_CommonChartFormat_SetParent, oldPr: this.parent, newPr: pr});
         this.parent = pr;
     },
 
@@ -9965,17 +9965,17 @@ CBubbleChart.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 this.parent = data.oldPr;
                 break;
             }
-            case historyitem_CommonChart_RemoveSeries:
+            case AscDFH.historyitem_CommonChart_RemoveSeries:
             {
                 this.series.splice(data.oldPr, 0, data.newPr);
                 break;
             }
-            case historyitem_BubbleChart_AddAxId:
+            case AscDFH.historyitem_BubbleChart_AddAxId:
             {
                 for(var i = this.axId.length - 1; i > -1; --i)
                 {
@@ -9987,17 +9987,17 @@ CBubbleChart.prototype =
                 }
                 break;
             }
-            case historyitem_BubbleChart_SetBubble3D:
+            case AscDFH.historyitem_BubbleChart_SetBubble3D:
             {
                 this.bubble3D = data.oldPr;
                 break;
             }
-            case historyitem_BubbleChart_SetBubbleScale:
+            case AscDFH.historyitem_BubbleChart_SetBubbleScale:
             {
                 this.bubbleScale = data.oldPr;
                 break;
             }
-            case historyitem_BubbleChart_SetDLbls:
+            case AscDFH.historyitem_BubbleChart_SetDLbls:
             {
                 this.dLbls = data.oldPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -10006,7 +10006,7 @@ CBubbleChart.prototype =
                 }
                 break;
             }
-            case historyitem_BubbleChart_AddSerie:
+            case AscDFH.historyitem_BubbleChart_AddSerie:
             {
                 for(var i = this.series.length - 1; i > -1; --i)
                 {
@@ -10018,17 +10018,17 @@ CBubbleChart.prototype =
                 }
                 break;
             }
-            case historyitem_BubbleChart_SetShowNegBubbles:
+            case AscDFH.historyitem_BubbleChart_SetShowNegBubbles:
             {
                 this.showNegBubbles = data.oldPr;
                 break;
             }
-            case historyitem_BubbleChart_SetSizeRepresents:
+            case AscDFH.historyitem_BubbleChart_SetSizeRepresents:
             {
                 this.sizeRepresents = data.oldPr;
                 break;
             }
-            case historyitem_BubbleChart_SetVaryColors:
+            case AscDFH.historyitem_BubbleChart_SetVaryColors:
             {
                 this.varyColors = data.oldPr;
                 break;
@@ -10040,32 +10040,32 @@ CBubbleChart.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 this.parent = data.newPr;
                 break;
             }
-            case historyitem_CommonChart_RemoveSeries:
+            case AscDFH.historyitem_CommonChart_RemoveSeries:
             {
                 this.series.splice(data.oldPr, 1);
                 break;
             }
-            case historyitem_BubbleChart_AddAxId:
+            case AscDFH.historyitem_BubbleChart_AddAxId:
             {
                 this.axId.push(data.newPr);
                 break;
             }
-            case historyitem_BubbleChart_SetBubble3D:
+            case AscDFH.historyitem_BubbleChart_SetBubble3D:
             {
                 this.bubble3D = data.newPr;
                 break;
             }
-            case historyitem_BubbleChart_SetBubbleScale:
+            case AscDFH.historyitem_BubbleChart_SetBubbleScale:
             {
                 this.bubbleScale = data.newPr;
                 break;
             }
-            case historyitem_BubbleChart_SetDLbls:
+            case AscDFH.historyitem_BubbleChart_SetDLbls:
             {
                 this.dLbls = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -10074,22 +10074,22 @@ CBubbleChart.prototype =
                 }
                 break;
             }
-            case historyitem_BubbleChart_AddSerie:
+            case AscDFH.historyitem_BubbleChart_AddSerie:
             {
                 this.series.push(data.newPr);
                 break;
             }
-            case historyitem_BubbleChart_SetShowNegBubbles:
+            case AscDFH.historyitem_BubbleChart_SetShowNegBubbles:
             {
                 this.showNegBubbles = data.newPr;
                 break;
             }
-            case historyitem_BubbleChart_SetSizeRepresents:
+            case AscDFH.historyitem_BubbleChart_SetSizeRepresents:
             {
                 this.sizeRepresents = data.newPr;
                 break;
             }
-            case historyitem_BubbleChart_SetVaryColors:
+            case AscDFH.historyitem_BubbleChart_SetVaryColors:
             {
                 this.varyColors = data.newPr;
                 break;
@@ -10102,36 +10102,36 @@ CBubbleChart.prototype =
         w.WriteLong(data.Type);
         switch (data.Type)
         {
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 writeObject(w, data.newPr);
                 break;
             }
-            case historyitem_CommonChart_RemoveSeries:
+            case AscDFH.historyitem_CommonChart_RemoveSeries:
             {
                 writeLong(w, data.oldPr);
                 break;
             }
-            case historyitem_BubbleChart_AddAxId:
-            case historyitem_BubbleChart_SetDLbls:
+            case AscDFH.historyitem_BubbleChart_AddAxId:
+            case AscDFH.historyitem_BubbleChart_SetDLbls:
             {
                 writeObject(w, data.newPr);
                 break;
             }
-            case historyitem_BubbleChart_SetBubble3D:
-            case historyitem_BubbleChart_SetShowNegBubbles:
-            case historyitem_BubbleChart_SetVaryColors:
+            case AscDFH.historyitem_BubbleChart_SetBubble3D:
+            case AscDFH.historyitem_BubbleChart_SetShowNegBubbles:
+            case AscDFH.historyitem_BubbleChart_SetVaryColors:
             {
                 writeBool(w, data.newPr);
                 break;
             }
-            case historyitem_BubbleChart_SetBubbleScale:
-            case historyitem_BubbleChart_SetSizeRepresents:
+            case AscDFH.historyitem_BubbleChart_SetBubbleScale:
+            case AscDFH.historyitem_BubbleChart_SetSizeRepresents:
             {
                 writeLong(w, data.newPr);
                 break;
             }
-            case historyitem_BubbleChart_AddSerie:
+            case AscDFH.historyitem_BubbleChart_AddSerie:
             {
                 var ser = readObject(r);
                 if(isRealObject(ser))
@@ -10148,18 +10148,18 @@ CBubbleChart.prototype =
         var type = r.GetLong();
         switch (type)
         {
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 this.parent = readObject(r);
                 break;
             }
-            case historyitem_CommonChart_RemoveSeries:
+            case AscDFH.historyitem_CommonChart_RemoveSeries:
             {
                 var pos = readLong(r);
                 this.series.splice(pos, 1);
                 break;
             }
-            case historyitem_BubbleChart_AddAxId:
+            case AscDFH.historyitem_BubbleChart_AddAxId:
             {
                 var ax = readObject(r);
                 if(isRealObject(ax))
@@ -10168,17 +10168,17 @@ CBubbleChart.prototype =
                 }
                 break;
             }
-            case historyitem_BubbleChart_SetBubble3D:
+            case AscDFH.historyitem_BubbleChart_SetBubble3D:
             {
                 this.bubble3D = readBool(r);
                 break;
             }
-            case historyitem_BubbleChart_SetBubbleScale:
+            case AscDFH.historyitem_BubbleChart_SetBubbleScale:
             {
                 this.bubbleScale = readLong(r);
                 break;
             }
-            case historyitem_BubbleChart_SetDLbls:
+            case AscDFH.historyitem_BubbleChart_SetDLbls:
             {
                 this.dLbls = readObject(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -10187,7 +10187,7 @@ CBubbleChart.prototype =
                 }
                 break;
             }
-            case historyitem_BubbleChart_AddSerie:
+            case AscDFH.historyitem_BubbleChart_AddSerie:
             {
                 var ser = readObject(r);
                 if(isRealObject(ser))
@@ -10196,17 +10196,17 @@ CBubbleChart.prototype =
                 }
                 break;
             }
-            case historyitem_BubbleChart_SetShowNegBubbles:
+            case AscDFH.historyitem_BubbleChart_SetShowNegBubbles:
             {
                 this.showNegBubbles = readBool(r);
                 break;
             }
-            case historyitem_BubbleChart_SetSizeRepresents:
+            case AscDFH.historyitem_BubbleChart_SetSizeRepresents:
             {
                 this.sizeRepresents = readLong(r);
                 break;
             }
-            case historyitem_BubbleChart_SetVaryColors:
+            case AscDFH.historyitem_BubbleChart_SetVaryColors:
             {
                 this.varyColors = readBool(r);
                 break;
@@ -10249,7 +10249,7 @@ CBubbleSeries.prototype =
 
     getObjectType: function()
     {
-        return historyitem_type_BubbleSeries;
+        return AscDFH.historyitem_type_BubbleSeries;
     },
 
     cd: function()
@@ -10259,7 +10259,7 @@ CBubbleSeries.prototype =
     {
         if(this.dPt[idx])
         {
-            History.Add(this, {Type: historyitem_CommonSeries_RemoveDPt, idx: idx, pt: this.dPt[idx]});
+            History.Add(this, {Type: AscDFH.historyitem_CommonSeries_RemoveDPt, idx: idx, pt: this.dPt[idx]});
             this.dPt.splice(idx, 1);
         }
     },
@@ -10337,7 +10337,7 @@ CBubbleSeries.prototype =
 
     setParent: function(pr)
     {
-        History.Add(this, {Type: historyitem_CommonChartFormat_SetParent, oldPr: this.parent, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_CommonChartFormat_SetParent, oldPr: this.parent, newPr: pr});
         this.parent = pr;
     },
 
@@ -10345,27 +10345,27 @@ CBubbleSeries.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 this.parent = data.oldPr;
                 break;
             }
-            case historyitem_CommonSeries_RemoveDPt:
+            case AscDFH.historyitem_CommonSeries_RemoveDPt:
             {
                 this.dPt.splice(data.idx, 0, data.pt);
                 break;
             }
-            case historyitem_BubbleSeries_SetBubble3D:
+            case AscDFH.historyitem_BubbleSeries_SetBubble3D:
             {
                 this.bubble3D = data.oldPr;
                 break;
             }
-            case historyitem_BubbleSeries_SetBubbleSize:
+            case AscDFH.historyitem_BubbleSeries_SetBubbleSize:
             {
                 this.bubbleSize = data.oldPr;
                 break;
             }
-            case historyitem_BubbleSeries_SetDLbls:
+            case AscDFH.historyitem_BubbleSeries_SetDLbls:
             {
                 this.dLbls = data.oldPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateDataLabels)
@@ -10374,52 +10374,52 @@ CBubbleSeries.prototype =
                 }
                 break;
             }
-            case historyitem_BubbleSeries_SetDPt:
+            case AscDFH.historyitem_BubbleSeries_SetDPt:
             {
                 findPrAndRemove(this.dPt, data.newPr);
                 break;
             }
-            case historyitem_BubbleSeries_SetErrBars:
+            case AscDFH.historyitem_BubbleSeries_SetErrBars:
             {
                 this.errBars = data.oldPr;
                 break;
             }
-            case historyitem_BubbleSeries_SetIdx:
+            case AscDFH.historyitem_BubbleSeries_SetIdx:
             {
                 this.idx = data.oldPr;
                 break;
             }
-            case historyitem_BubbleSeries_SetInvertIfNegative:
+            case AscDFH.historyitem_BubbleSeries_SetInvertIfNegative:
             {
                 this.invertIfNegative = data.oldPr;
                 break;
             }
-            case historyitem_BubbleSeries_SetOrder:
+            case AscDFH.historyitem_BubbleSeries_SetOrder:
             {
                 this.order = data.oldPr;
                 break;
             }
-            case historyitem_BubbleSeries_SetSpPr:
+            case AscDFH.historyitem_BubbleSeries_SetSpPr:
             {
                 this.spPr = data.oldPr;
                 break;
             }
-            case historyitem_BubbleSeries_SetTrendline:
+            case AscDFH.historyitem_BubbleSeries_SetTrendline:
             {
                 this.trendline = data.oldPr;
                 break;
             }
-            case historyitem_BubbleSeries_SetTx:
+            case AscDFH.historyitem_BubbleSeries_SetTx:
             {
                 this.tx = data.oldPr;
                 break;
             }
-            case historyitem_BubbleSeries_SetXVal:
+            case AscDFH.historyitem_BubbleSeries_SetXVal:
             {
                 this.xVal = data.oldPr;
                 break;
             }
-            case historyitem_BubbleSeries_SetYVal:
+            case AscDFH.historyitem_BubbleSeries_SetYVal:
             {
                 this.yVal = data.oldPr;
                 break;
@@ -10431,27 +10431,27 @@ CBubbleSeries.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 this.parent = data.newPr;
                 break;
             }
-            case historyitem_CommonSeries_RemoveDPt:
+            case AscDFH.historyitem_CommonSeries_RemoveDPt:
             {
                 this.dPt.splice(data.idx, 1);
                 break;
             }
-            case historyitem_BubbleSeries_SetBubble3D:
+            case AscDFH.historyitem_BubbleSeries_SetBubble3D:
             {
                 this.bubble3D = data.newPr;
                 break;
             }
-            case historyitem_BubbleSeries_SetBubbleSize:
+            case AscDFH.historyitem_BubbleSeries_SetBubbleSize:
             {
                 this.bubbleSize = data.newPr;
                 break;
             }
-            case historyitem_BubbleSeries_SetDLbls:
+            case AscDFH.historyitem_BubbleSeries_SetDLbls:
             {
                 this.dLbls = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateDataLabels)
@@ -10460,52 +10460,52 @@ CBubbleSeries.prototype =
                 }
                 break;
             }
-            case historyitem_BubbleSeries_SetDPt:
+            case AscDFH.historyitem_BubbleSeries_SetDPt:
             {
                 this.dPt.push(data.newPr);
                 break;
             }
-            case historyitem_BubbleSeries_SetErrBars:
+            case AscDFH.historyitem_BubbleSeries_SetErrBars:
             {
                 this.errBars = data.newPr;
                 break;
             }
-            case historyitem_BubbleSeries_SetIdx:
+            case AscDFH.historyitem_BubbleSeries_SetIdx:
             {
                 this.idx = data.newPr;
                 break;
             }
-            case historyitem_BubbleSeries_SetInvertIfNegative:
+            case AscDFH.historyitem_BubbleSeries_SetInvertIfNegative:
             {
                 this.invertIfNegative = data.newPr;
                 break;
             }
-            case historyitem_BubbleSeries_SetOrder:
+            case AscDFH.historyitem_BubbleSeries_SetOrder:
             {
                 this.order = data.newPr;
                 break;
             }
-            case historyitem_BubbleSeries_SetSpPr:
+            case AscDFH.historyitem_BubbleSeries_SetSpPr:
             {
                 this.spPr = data.newPr;
                 break;
             }
-            case historyitem_BubbleSeries_SetTrendline:
+            case AscDFH.historyitem_BubbleSeries_SetTrendline:
             {
                 this.trendline = data.newPr;
                 break;
             }
-            case historyitem_BubbleSeries_SetTx:
+            case AscDFH.historyitem_BubbleSeries_SetTx:
             {
                 this.tx = data.newPr;
                 break;
             }
-            case historyitem_BubbleSeries_SetXVal:
+            case AscDFH.historyitem_BubbleSeries_SetXVal:
             {
                 this.xVal = data.newPr;
                 break;
             }
-            case historyitem_BubbleSeries_SetYVal:
+            case AscDFH.historyitem_BubbleSeries_SetYVal:
             {
                 this.yVal = data.newPr;
                 break;
@@ -10518,37 +10518,37 @@ CBubbleSeries.prototype =
         w.WriteLong(data.Type);
         switch (data.Type)
         {
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 writeObject(w, data.newPr);
                 break;
             }
-            case historyitem_BubbleSeries_SetBubble3D:
-            case historyitem_BubbleSeries_SetInvertIfNegative:
+            case AscDFH.historyitem_BubbleSeries_SetBubble3D:
+            case AscDFH.historyitem_BubbleSeries_SetInvertIfNegative:
             {
                 writeBool(w, data.newPr);
                 break;
             }
-            case historyitem_BubbleSeries_SetBubbleSize:
-            case historyitem_BubbleSeries_SetDLbls:
-            case historyitem_BubbleSeries_SetDPt:
-            case historyitem_BubbleSeries_SetErrBars:
-            case historyitem_BubbleSeries_SetSpPr:
-            case historyitem_BubbleSeries_SetTrendline:
-            case historyitem_BubbleSeries_SetTx:
-            case historyitem_BubbleSeries_SetXVal:
-            case historyitem_BubbleSeries_SetYVal:
+            case AscDFH.historyitem_BubbleSeries_SetBubbleSize:
+            case AscDFH.historyitem_BubbleSeries_SetDLbls:
+            case AscDFH.historyitem_BubbleSeries_SetDPt:
+            case AscDFH.historyitem_BubbleSeries_SetErrBars:
+            case AscDFH.historyitem_BubbleSeries_SetSpPr:
+            case AscDFH.historyitem_BubbleSeries_SetTrendline:
+            case AscDFH.historyitem_BubbleSeries_SetTx:
+            case AscDFH.historyitem_BubbleSeries_SetXVal:
+            case AscDFH.historyitem_BubbleSeries_SetYVal:
             {
                 writeObject(w, data.newPr);
                 break;
             }
-            case historyitem_BubbleSeries_SetIdx:
-            case historyitem_BubbleSeries_SetOrder:
+            case AscDFH.historyitem_BubbleSeries_SetIdx:
+            case AscDFH.historyitem_BubbleSeries_SetOrder:
             {
                 writeLong(w, data.newPr);
                 break;
             }
-            case historyitem_CommonSeries_RemoveDPt:
+            case AscDFH.historyitem_CommonSeries_RemoveDPt:
             {
                 writeLong(w, data.idx);
                 break;
@@ -10561,12 +10561,12 @@ CBubbleSeries.prototype =
         var type = r.GetLong();
         switch (type)
         {
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 this.parent = readObject(r);
                 break;
             }
-            case historyitem_CommonSeries_RemoveDPt:
+            case AscDFH.historyitem_CommonSeries_RemoveDPt:
             {
                 var pos = readLong(r);
                 if(isRealNumber(pos))
@@ -10575,17 +10575,17 @@ CBubbleSeries.prototype =
                 }
                 break;
             }
-            case historyitem_BubbleSeries_SetBubble3D:
+            case AscDFH.historyitem_BubbleSeries_SetBubble3D:
             {
                 this.bubble3D = readBool(r);
                 break;
             }
-            case historyitem_BubbleSeries_SetBubbleSize:
+            case AscDFH.historyitem_BubbleSeries_SetBubbleSize:
             {
                 this.bubbleSize = readObject(r);
                 break;
             }
-            case historyitem_BubbleSeries_SetDLbls:
+            case AscDFH.historyitem_BubbleSeries_SetDLbls:
             {
                 this.dLbls = readObject(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateDataLabels)
@@ -10594,52 +10594,52 @@ CBubbleSeries.prototype =
                 }
                 break;
             }
-            case historyitem_BubbleSeries_SetDPt:
+            case AscDFH.historyitem_BubbleSeries_SetDPt:
             {
                 this.dPt.push(readObject(r));
                 break;
             }
-            case historyitem_BubbleSeries_SetErrBars:
+            case AscDFH.historyitem_BubbleSeries_SetErrBars:
             {
                 this.errBars = readObject(r);
                 break;
             }
-            case historyitem_BubbleSeries_SetIdx:
+            case AscDFH.historyitem_BubbleSeries_SetIdx:
             {
                 this.idx = readLong(r);
                 break;
             }
-            case historyitem_BubbleSeries_SetInvertIfNegative:
+            case AscDFH.historyitem_BubbleSeries_SetInvertIfNegative:
             {
                 this.invertIfNegative = readBool(r);
                 break;
             }
-            case historyitem_BubbleSeries_SetOrder:
+            case AscDFH.historyitem_BubbleSeries_SetOrder:
             {
                 this.order = readLong(r);
                 break;
             }
-            case historyitem_BubbleSeries_SetSpPr:
+            case AscDFH.historyitem_BubbleSeries_SetSpPr:
             {
                 this.spPr = readObject(r);
                 break;
             }
-            case historyitem_BubbleSeries_SetTrendline:
+            case AscDFH.historyitem_BubbleSeries_SetTrendline:
             {
                 this.trendline = readObject(r);
                 break;
             }
-            case historyitem_BubbleSeries_SetTx:
+            case AscDFH.historyitem_BubbleSeries_SetTx:
             {
                 this.tx = readObject(r);
                 break;
             }
-            case historyitem_BubbleSeries_SetXVal:
+            case AscDFH.historyitem_BubbleSeries_SetXVal:
             {
                 this.xVal = readObject(r);
                 break;
             }
-            case historyitem_BubbleSeries_SetYVal:
+            case AscDFH.historyitem_BubbleSeries_SetYVal:
             {
                 this.yVal = readObject(r);
                 break;
@@ -10649,17 +10649,17 @@ CBubbleSeries.prototype =
 
     setBubble3D: function(pr)
     {
-        History.Add(this, {Type: historyitem_BubbleSeries_SetBubble3D, oldPr: this.bubble3D, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_BubbleSeries_SetBubble3D, oldPr: this.bubble3D, newPr: pr});
         this.bubble3D = pr;
     },
     setBubbleSize: function(pr)
     {
-        History.Add(this, {Type: historyitem_BubbleSeries_SetBubbleSize, oldPr: this.bubbleSize, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_BubbleSeries_SetBubbleSize, oldPr: this.bubbleSize, newPr: pr});
         this.bubbleSize = pr;
     },
     setDLbls: function(pr)
     {
-        History.Add(this, {Type: historyitem_BubbleSeries_SetDLbls, oldPr: this.dLbls, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_BubbleSeries_SetDLbls, oldPr: this.dLbls, newPr: pr});
         this.dLbls = pr;
         if(this.dLbls)
         {
@@ -10668,52 +10668,52 @@ CBubbleSeries.prototype =
     },
     addDPt: function(pr)
     {
-        History.Add(this, {Type: historyitem_BubbleSeries_SetDPt, oldPr: this.dPt, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_BubbleSeries_SetDPt, oldPr: this.dPt, newPr: pr});
         this.dPt.push(pr);
     },
     setErrBars: function(pr)
     {
-        History.Add(this, {Type: historyitem_BubbleSeries_SetErrBars, oldPr: this.errBars, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_BubbleSeries_SetErrBars, oldPr: this.errBars, newPr: pr});
         this.errBars = pr;
     },
     setIdx: function(pr)
     {
-        History.Add(this, {Type: historyitem_BubbleSeries_SetIdx, oldPr: this.idx, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_BubbleSeries_SetIdx, oldPr: this.idx, newPr: pr});
         this.idx = pr;
     },
     setInvertIfNegative: function(pr)
     {
-        History.Add(this, {Type: historyitem_BubbleSeries_SetInvertIfNegative, oldPr: this.invertIfNegative, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_BubbleSeries_SetInvertIfNegative, oldPr: this.invertIfNegative, newPr: pr});
         this.invertIfNegative = pr;
     },
     setOrder: function(pr)
     {
-        History.Add(this, {Type: historyitem_BubbleSeries_SetOrder, oldPr: this.order, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_BubbleSeries_SetOrder, oldPr: this.order, newPr: pr});
         this.order = pr;
     },
     setSpPr: function(pr)
     {
-        History.Add(this, {Type: historyitem_BubbleSeries_SetSpPr, oldPr: this.spPr, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_BubbleSeries_SetSpPr, oldPr: this.spPr, newPr: pr});
         this.spPr = pr;
     },
     setTrendline: function(pr)
     {
-        History.Add(this, {Type: historyitem_BubbleSeries_SetTrendline, oldPr: this.trendline, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_BubbleSeries_SetTrendline, oldPr: this.trendline, newPr: pr});
         this.trendline = pr;
     },
     setTx: function(pr)
     {
-        History.Add(this, {Type: historyitem_BubbleSeries_SetTx, oldPr: this.tx, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_BubbleSeries_SetTx, oldPr: this.tx, newPr: pr});
         this.tx = pr;
     },
     setXVal: function(pr)
     {
-        History.Add(this, {Type: historyitem_BubbleSeries_SetXVal, oldPr: this.xVal, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_BubbleSeries_SetXVal, oldPr: this.xVal, newPr: pr});
         this.xVal = pr;
     },
     setYVal: function(pr)
     {
-        History.Add(this, {Type: historyitem_BubbleSeries_SetYVal, oldPr: this.yVal, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_BubbleSeries_SetYVal, oldPr: this.yVal, newPr: pr});
         this.yVal = pr;
         if(this.yVal && this.yVal.setParent)
         {
@@ -10785,7 +10785,7 @@ CCat.prototype =
 
     getObjectType: function()
     {
-        return historyitem_type_Cat;
+        return AscDFH.historyitem_type_Cat;
     },
 
     setFromOtherObject: function(o)
@@ -10805,27 +10805,27 @@ CCat.prototype =
 
     setMultiLvlStrRef: function(pr)
     {
-        History.Add(this, {Type: historyitem_Cat_SetMultiLvlStrRef, oldPr: this.multiLvlStrRef, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_Cat_SetMultiLvlStrRef, oldPr: this.multiLvlStrRef, newPr: pr});
         this.multiLvlStrRef = pr;
     },
     setNumLit: function(pr)
     {
-        History.Add(this, {Type: historyitem_Cat_SetNumLit, oldPr: this.multiLvlStrRef, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_Cat_SetNumLit, oldPr: this.multiLvlStrRef, newPr: pr});
         this.numLit = pr;
     },
     setNumRef: function(pr)
     {
-        History.Add(this, {Type: historyitem_Cat_SetNumRef, oldPr: this.multiLvlStrRef, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_Cat_SetNumRef, oldPr: this.multiLvlStrRef, newPr: pr});
         this.numRef = pr;
     },
     setStrLit: function(pr)
     {
-        History.Add(this, {Type: historyitem_Cat_SetStrLit, oldPr: this.multiLvlStrRef, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_Cat_SetStrLit, oldPr: this.multiLvlStrRef, newPr: pr});
         this.strLit = pr;
     },
     setStrRef: function(pr)
     {
-        History.Add(this, {Type: historyitem_Cat_SetStrRef, oldPr: this.multiLvlStrRef, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_Cat_SetStrRef, oldPr: this.multiLvlStrRef, newPr: pr});
         this.strRef = pr;
     },
 
@@ -10833,27 +10833,27 @@ CCat.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_Cat_SetMultiLvlStrRef:
+            case AscDFH.historyitem_Cat_SetMultiLvlStrRef:
             {
                 this.multiLvlStrRef = data.oldPr;
                 break;
             }
-            case historyitem_Cat_SetNumLit:
+            case AscDFH.historyitem_Cat_SetNumLit:
             {
                 this.numLit = data.oldPr;
                 break;
             }
-            case historyitem_Cat_SetNumRef:
+            case AscDFH.historyitem_Cat_SetNumRef:
             {
                 this.numRef = data.oldPr;
                 break;
             }
-            case historyitem_Cat_SetStrLit:
+            case AscDFH.historyitem_Cat_SetStrLit:
             {
                 this.strLit = data.oldPr;
                 break;
             }
-            case historyitem_Cat_SetStrRef:
+            case AscDFH.historyitem_Cat_SetStrRef:
             {
                 this.strRef = data.oldPr;
                 break;
@@ -10865,27 +10865,27 @@ CCat.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_Cat_SetMultiLvlStrRef:
+            case AscDFH.historyitem_Cat_SetMultiLvlStrRef:
             {
                 this.multiLvlStrRef = data.newPr;
                 break;
             }
-            case historyitem_Cat_SetNumLit:
+            case AscDFH.historyitem_Cat_SetNumLit:
             {
                 this.numLit = data.newPr;
                 break;
             }
-            case historyitem_Cat_SetNumRef:
+            case AscDFH.historyitem_Cat_SetNumRef:
             {
                 this.numRef = data.newPr;
                 break;
             }
-            case historyitem_Cat_SetStrLit:
+            case AscDFH.historyitem_Cat_SetStrLit:
             {
                 this.strLit = data.newPr;
                 break;
             }
-            case historyitem_Cat_SetStrRef:
+            case AscDFH.historyitem_Cat_SetStrRef:
             {
                 this.strRef = data.newPr;
                 break;
@@ -10898,11 +10898,11 @@ CCat.prototype =
         w.WriteLong(data.Type);
         switch (data.Type)
         {
-            case historyitem_Cat_SetMultiLvlStrRef:
-            case historyitem_Cat_SetNumLit:
-            case historyitem_Cat_SetNumRef:
-            case historyitem_Cat_SetStrLit:
-            case historyitem_Cat_SetStrRef:
+            case AscDFH.historyitem_Cat_SetMultiLvlStrRef:
+            case AscDFH.historyitem_Cat_SetNumLit:
+            case AscDFH.historyitem_Cat_SetNumRef:
+            case AscDFH.historyitem_Cat_SetStrLit:
+            case AscDFH.historyitem_Cat_SetStrRef:
             {
                 writeObject(w, data.newPr);
                 break;
@@ -10915,27 +10915,27 @@ CCat.prototype =
         var type = r.GetLong();
         switch (type)
         {
-            case historyitem_Cat_SetMultiLvlStrRef:
+            case AscDFH.historyitem_Cat_SetMultiLvlStrRef:
             {
                 this.multiLvlStrRef = readObject(r);
                 break;
             }
-            case historyitem_Cat_SetNumLit:
+            case AscDFH.historyitem_Cat_SetNumLit:
             {
                 this.numLit = readObject(r);
                 break;
             }
-            case historyitem_Cat_SetNumRef:
+            case AscDFH.historyitem_Cat_SetNumRef:
             {
                 this.numRef = readObject(r);
                 break;
             }
-            case historyitem_Cat_SetStrLit:
+            case AscDFH.historyitem_Cat_SetStrLit:
             {
                 this.strLit = readObject(r);
                 break;
             }
-            case historyitem_Cat_SetStrRef:
+            case AscDFH.historyitem_Cat_SetStrRef:
             {
                 this.strRef = readObject(r);
                 break;
@@ -10989,7 +10989,7 @@ CChartText.prototype =
 
     setChart: function(pr)
     {
-        History.Add(this, {Type: historyitem_ChartFormatSetChart, oldPr: this.chart, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_ChartFormatSetChart, oldPr: this.chart, newPr: pr});
         this.chart = pr;
     },
 
@@ -11001,7 +11001,7 @@ CChartText.prototype =
 
     setParent: function(pr)
     {
-        History.Add(this, {Type: historyitem_CommonChartFormat_SetParent, oldPr: this.parent, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_CommonChartFormat_SetParent, oldPr: this.parent, newPr: pr});
         this.parent = pr;
     },
 
@@ -11027,7 +11027,7 @@ CChartText.prototype =
 
     getObjectType: function()
     {
-        return historyitem_type_ChartText;
+        return AscDFH.historyitem_type_ChartText;
     },
 
     Write_ToBinary2: function(w)
@@ -11043,13 +11043,13 @@ CChartText.prototype =
 
     setRich: function(pr)
     {
-        History.Add(this, {Type: historyitem_ChartText_SetRich, oldPr: this.rich, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_ChartText_SetRich, oldPr: this.rich, newPr: pr});
         this.rich = pr;
     },
 
     setStrRef: function(pr)
     {
-        History.Add(this, {Type: historyitem_ChartText_SetStrRef, oldPr: this.strRef, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_ChartText_SetStrRef, oldPr: this.strRef, newPr: pr});
         this.strRef = pr;
     },
 
@@ -11057,22 +11057,22 @@ CChartText.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 this.parent = data.oldPr;
                 break;
             }
-            case historyitem_ChartFormatSetChart:
+            case AscDFH.historyitem_ChartFormatSetChart:
             {
                 this.chart = data.oldPr;
                 break;
             }
-            case historyitem_ChartText_SetRich:
+            case AscDFH.historyitem_ChartText_SetRich:
             {
                 this.rich = data.oldPr;
                 break;
             }
-            case historyitem_ChartText_SetStrRef:
+            case AscDFH.historyitem_ChartText_SetStrRef:
             {
                 this.strRef = data.oldPr;
                 break;
@@ -11085,22 +11085,22 @@ CChartText.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 this.parent = data.newPr;
                 break;
             }
-            case historyitem_ChartFormatSetChart:
+            case AscDFH.historyitem_ChartFormatSetChart:
             {
                 this.chart = data.newPr;
                 break;
             }
-            case historyitem_ChartText_SetRich:
+            case AscDFH.historyitem_ChartText_SetRich:
             {
                 this.rich = data.newPr;
                 break;
             }
-            case historyitem_ChartText_SetStrRef:
+            case AscDFH.historyitem_ChartText_SetStrRef:
             {
                 this.strRef = data.newPr;
                 break;
@@ -11114,10 +11114,10 @@ CChartText.prototype =
         w.WriteLong(data.Type);
         switch (data.Type)
         {
-            case historyitem_ChartText_SetRich:
-            case historyitem_ChartText_SetStrRef:
-            case historyitem_ChartFormatSetChart:
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_ChartText_SetRich:
+            case AscDFH.historyitem_ChartText_SetStrRef:
+            case AscDFH.historyitem_ChartFormatSetChart:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 writeObject(w, data.newPr);
                 break;
@@ -11130,22 +11130,22 @@ CChartText.prototype =
         var type = r.GetLong();
         switch (type)
         {
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 this.parent = readObject(r);
                 break;
             }
-            case historyitem_ChartText_SetRich:
+            case AscDFH.historyitem_ChartText_SetRich:
             {
                 this.rich = readObject(r);
                 break;
             }
-            case historyitem_ChartText_SetStrRef:
+            case AscDFH.historyitem_ChartText_SetStrRef:
             {
                 this.strRef = readObject(r);
                 break;
             }
-            case historyitem_ChartFormatSetChart:
+            case AscDFH.historyitem_ChartFormatSetChart:
             {
                 this.chart = readObject(r);
                 break;
@@ -11238,7 +11238,7 @@ CDLbls.prototype =
 
     setParent: function(pr)
     {
-        History.Add(this, {Type: historyitem_CommonChartFormat_SetParent, oldPr: this.parent, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_CommonChartFormat_SetParent, oldPr: this.parent, newPr: pr});
         this.parent = pr;
     },
 
@@ -11291,7 +11291,7 @@ CDLbls.prototype =
     },
     getObjectType: function()
     {
-        return historyitem_type_DLbls;
+        return AscDFH.historyitem_type_DLbls;
     },
 
     findDLblByIdx: function(idx)
@@ -11335,7 +11335,7 @@ CDLbls.prototype =
 
     setDelete: function(pr)
     {
-        History.Add(this, {Type: historyitem_DLbls_SetDelete, oldPr: this.bDelete, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_DLbls_SetDelete, oldPr: this.bDelete, newPr: pr});
         this.bDelete = pr;
         if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateDataLabels)
         {
@@ -11344,7 +11344,7 @@ CDLbls.prototype =
     },
     addDLbl: function(pr)
     {
-        History.Add(this, {Type: historyitem_DLbls_SetDLbl, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_DLbls_SetDLbl, newPr: pr});
         this.dLbl.push(pr);
         if(pr)
         {
@@ -11353,7 +11353,7 @@ CDLbls.prototype =
     },
     setDLblPos: function(pr)
     {
-        History.Add(this, {Type: historyitem_DLbls_SetDLblPos, oldPr: this.dLblPos, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_DLbls_SetDLblPos, oldPr: this.dLblPos, newPr: pr});
         this.dLblPos = pr;
         if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateDataLabels)
         {
@@ -11362,17 +11362,17 @@ CDLbls.prototype =
     },
     setLeaderLines: function(pr)
     {
-        History.Add(this, {Type: historyitem_DLbls_SetLeaderLines, oldPr: this.leaderLines, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_DLbls_SetLeaderLines, oldPr: this.leaderLines, newPr: pr});
         this.leaderLines = pr;
     },
     setNumFmt: function(pr)
     {
-        History.Add(this, {Type: historyitem_DLbls_SetNumFmt, oldPr: this.numFmt, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_DLbls_SetNumFmt, oldPr: this.numFmt, newPr: pr});
         this.numFmt = pr;
     },
     setSeparator: function(pr)
     {
-        History.Add(this, {Type: historyitem_DLbls_SetSeparator, oldPr: this.separator, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_DLbls_SetSeparator, oldPr: this.separator, newPr: pr});
         this.separator = pr;
         if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateDataLabels)
         {
@@ -11381,12 +11381,12 @@ CDLbls.prototype =
     },
     setShowBubbleSize: function(pr)
     {
-        History.Add(this, {Type: historyitem_DLbls_SetShowBubbleSize, oldPr: this.showBubbleSize, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_DLbls_SetShowBubbleSize, oldPr: this.showBubbleSize, newPr: pr});
         this.showBubbleSize = pr;
     },
     setShowCatName: function(pr)
     {
-        History.Add(this, {Type: historyitem_DLbls_SetShowCatName, oldPr: this.showCatName, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_DLbls_SetShowCatName, oldPr: this.showCatName, newPr: pr});
         this.showCatName = pr;
         if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateDataLabels)
         {
@@ -11395,7 +11395,7 @@ CDLbls.prototype =
     },
     setShowLeaderLines: function(pr)
     {
-        History.Add(this, {Type: historyitem_DLbls_SetShowLeaderLines, oldPr: this.showLeaderLines, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_DLbls_SetShowLeaderLines, oldPr: this.showLeaderLines, newPr: pr});
         this.showLeaderLines = pr;
         if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateDataLabels)
         {
@@ -11404,7 +11404,7 @@ CDLbls.prototype =
     },
     setShowLegendKey: function(pr)
     {
-        History.Add(this, {Type: historyitem_DLbls_SetShowLegendKey, oldPr: this.showLegendKey, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_DLbls_SetShowLegendKey, oldPr: this.showLegendKey, newPr: pr});
         this.showLegendKey = pr;
         if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateDataLabels)
         {
@@ -11413,12 +11413,12 @@ CDLbls.prototype =
     },
     setShowPercent: function(pr)
     {
-        History.Add(this, {Type: historyitem_DLbls_SetShowPercent, oldPr: this.showPercent, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_DLbls_SetShowPercent, oldPr: this.showPercent, newPr: pr});
         this.showPercent = pr;
     },
     setShowSerName: function(pr)
     {
-        History.Add(this, {Type: historyitem_DLbls_SetShowSerName, oldPr: this.showSerName, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_DLbls_SetShowSerName, oldPr: this.showSerName, newPr: pr});
         this.showSerName = pr;
         if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateDataLabels)
         {
@@ -11427,7 +11427,7 @@ CDLbls.prototype =
     },
     setShowVal: function(pr)
     {
-        History.Add(this, {Type: historyitem_DLbls_SetShowVal, oldPr: this.showVal, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_DLbls_SetShowVal, oldPr: this.showVal, newPr: pr});
         this.showVal = pr;
         if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateDataLabels)
         {
@@ -11436,7 +11436,7 @@ CDLbls.prototype =
     },
     setSpPr: function(pr)
     {
-        History.Add(this, {Type: historyitem_DLbls_SetSpPr, oldPr: this.spPr, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_DLbls_SetSpPr, oldPr: this.spPr, newPr: pr});
         this.spPr = pr;
         if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateDataLabels)
         {
@@ -11445,7 +11445,7 @@ CDLbls.prototype =
     },
     setTxPr: function(pr)
     {
-        History.Add(this, {Type: historyitem_DLbls_SetTxPr, oldPr: this.txPr, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_DLbls_SetTxPr, oldPr: this.txPr, newPr: pr});
         this.txPr = pr;
         if(pr)
         {
@@ -11461,17 +11461,17 @@ CDLbls.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 this.parent = data.oldPr;
                 break;
             }
-            case historyitem_DLbls_SetDelete:
+            case AscDFH.historyitem_DLbls_SetDelete:
             {
                 this.bDelete = data.oldPr;
                 break;
             }
-            case historyitem_DLbls_SetDLbl:
+            case AscDFH.historyitem_DLbls_SetDLbl:
             {
                 for(var i = this.dLbl.length - 1; i > -1; --i)
                 {
@@ -11483,67 +11483,67 @@ CDLbls.prototype =
                 }
                 break;
             }
-            case historyitem_DLbls_SetDLblPos:
+            case AscDFH.historyitem_DLbls_SetDLblPos:
             {
                 this.dLblPos = data.oldPr;
                 break;
             }
-            case historyitem_DLbls_SetLeaderLines:
+            case AscDFH.historyitem_DLbls_SetLeaderLines:
             {
                 this.leaderLines = data.oldPr;
                 break;
             }
-            case historyitem_DLbls_SetNumFmt:
+            case AscDFH.historyitem_DLbls_SetNumFmt:
             {
                 this.numFmt = data.oldPr;
                 break;
             }
-            case historyitem_DLbls_SetSeparator:
+            case AscDFH.historyitem_DLbls_SetSeparator:
             {
                 this.separator = data.oldPr;
                 break;
             }
-            case historyitem_DLbls_SetShowBubbleSize:
+            case AscDFH.historyitem_DLbls_SetShowBubbleSize:
             {
                 this.bubbleSize = data.oldPr;
                 break;
             }
-            case historyitem_DLbls_SetShowCatName:
+            case AscDFH.historyitem_DLbls_SetShowCatName:
             {
                 this.showCatName = data.oldPr;
                 break;
             }
-            case historyitem_DLbls_SetShowLeaderLines:
+            case AscDFH.historyitem_DLbls_SetShowLeaderLines:
             {
                 this.showLeaderLines = data.oldPr;
                 break;
             }
-            case historyitem_DLbls_SetShowLegendKey:
+            case AscDFH.historyitem_DLbls_SetShowLegendKey:
             {
                 this.showLegendKey = data.oldPr;
                 break;
             }
-            case historyitem_DLbls_SetShowPercent:
+            case AscDFH.historyitem_DLbls_SetShowPercent:
             {
                 this.showPercent = data.oldPr;
                 break;
             }
-            case historyitem_DLbls_SetShowSerName:
+            case AscDFH.historyitem_DLbls_SetShowSerName:
             {
                 this.showSerName = data.oldPr;
                 break;
             }
-            case historyitem_DLbls_SetShowVal:
+            case AscDFH.historyitem_DLbls_SetShowVal:
             {
                 this.showVal = data.oldPr;
                 break;
             }
-            case historyitem_DLbls_SetSpPr:
+            case AscDFH.historyitem_DLbls_SetSpPr:
             {
                 this.spPr = data.oldPr;
                 break;
             }
-            case historyitem_DLbls_SetTxPr:
+            case AscDFH.historyitem_DLbls_SetTxPr:
             {
                 this.txPr = data.oldPr;
                 break;
@@ -11559,17 +11559,17 @@ CDLbls.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 this.parent = data.newPr;
                 break;
             }
-            case historyitem_DLbls_SetDelete:
+            case AscDFH.historyitem_DLbls_SetDelete:
             {
                 this.bDelete = data.newPr;
                 break;
             }
-            case historyitem_DLbls_SetDLbl:
+            case AscDFH.historyitem_DLbls_SetDLbl:
             {
                 this.dLbl.push(data.newPr);
                 if(data.newPr)
@@ -11578,67 +11578,67 @@ CDLbls.prototype =
                 }
                 break;
             }
-            case historyitem_DLbls_SetDLblPos:
+            case AscDFH.historyitem_DLbls_SetDLblPos:
             {
                 this.dLblPos = data.newPr;
                 break;
             }
-            case historyitem_DLbls_SetLeaderLines:
+            case AscDFH.historyitem_DLbls_SetLeaderLines:
             {
                 this.leaderLines = data.newPr;
                 break;
             }
-            case historyitem_DLbls_SetNumFmt:
+            case AscDFH.historyitem_DLbls_SetNumFmt:
             {
                 this.numFmt = data.newPr;
                 break;
             }
-            case historyitem_DLbls_SetSeparator:
+            case AscDFH.historyitem_DLbls_SetSeparator:
             {
                 this.separator = data.newPr;
                 break;
             }
-            case historyitem_DLbls_SetShowBubbleSize:
+            case AscDFH.historyitem_DLbls_SetShowBubbleSize:
             {
                 this.showBubbleSize = data.newPr;
                 break;
             }
-            case historyitem_DLbls_SetShowCatName:
+            case AscDFH.historyitem_DLbls_SetShowCatName:
             {
                 this.showCatName = data.newPr;
                 break;
             }
-            case historyitem_DLbls_SetShowLeaderLines:
+            case AscDFH.historyitem_DLbls_SetShowLeaderLines:
             {
                 this.showLeaderLines = data.newPr;
                 break;
             }
-            case historyitem_DLbls_SetShowLegendKey:
+            case AscDFH.historyitem_DLbls_SetShowLegendKey:
             {
                 this.showLegendKey = data.newPr;
                 break;
             }
-            case historyitem_DLbls_SetShowPercent:
+            case AscDFH.historyitem_DLbls_SetShowPercent:
             {
                 this.showPercent = data.newPr;
                 break;
             }
-            case historyitem_DLbls_SetShowSerName:
+            case AscDFH.historyitem_DLbls_SetShowSerName:
             {
                 this.showSerName = data.newPr;
                 break;
             }
-            case historyitem_DLbls_SetShowVal:
+            case AscDFH.historyitem_DLbls_SetShowVal:
             {
                 this.showVal = data.newPr;
                 break;
             }
-            case historyitem_DLbls_SetSpPr:
+            case AscDFH.historyitem_DLbls_SetSpPr:
             {
                 this.spPr = data.newPr;
                 break;
             }
-            case historyitem_DLbls_SetTxPr:
+            case AscDFH.historyitem_DLbls_SetTxPr:
             {
                 this.txPr = data.newPr;
                 break;
@@ -11655,38 +11655,38 @@ CDLbls.prototype =
         w.WriteLong(data.Type);
         switch (data.Type)
         {
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 writeObject(w, data.newPr);
                 break;
             }
-            case historyitem_DLbls_SetDelete:
-            case historyitem_DLbls_SetShowBubbleSize:
-            case historyitem_DLbls_SetShowCatName:
-            case historyitem_DLbls_SetShowLeaderLines:
-            case historyitem_DLbls_SetShowLegendKey:
-            case historyitem_DLbls_SetShowPercent:
-            case historyitem_DLbls_SetShowSerName:
-            case historyitem_DLbls_SetShowVal:
+            case AscDFH.historyitem_DLbls_SetDelete:
+            case AscDFH.historyitem_DLbls_SetShowBubbleSize:
+            case AscDFH.historyitem_DLbls_SetShowCatName:
+            case AscDFH.historyitem_DLbls_SetShowLeaderLines:
+            case AscDFH.historyitem_DLbls_SetShowLegendKey:
+            case AscDFH.historyitem_DLbls_SetShowPercent:
+            case AscDFH.historyitem_DLbls_SetShowSerName:
+            case AscDFH.historyitem_DLbls_SetShowVal:
             {
                 writeBool(w, data.newPr);
                 break;
             }
-            case historyitem_DLbls_SetDLbl:
-            case historyitem_DLbls_SetLeaderLines:
-            case historyitem_DLbls_SetNumFmt:
-            case historyitem_DLbls_SetSpPr:
-            case historyitem_DLbls_SetTxPr:
+            case AscDFH.historyitem_DLbls_SetDLbl:
+            case AscDFH.historyitem_DLbls_SetLeaderLines:
+            case AscDFH.historyitem_DLbls_SetNumFmt:
+            case AscDFH.historyitem_DLbls_SetSpPr:
+            case AscDFH.historyitem_DLbls_SetTxPr:
             {
                 writeObject(w, data.newPr);
                 break;
             }
-            case historyitem_DLbls_SetDLblPos:
+            case AscDFH.historyitem_DLbls_SetDLblPos:
             {
                 writeLong(w, data.newPr);
                 break;
             }
-            case historyitem_DLbls_SetSeparator:
+            case AscDFH.historyitem_DLbls_SetSeparator:
             {
                 writeString(w, data.newPr);
                 break;
@@ -11699,17 +11699,17 @@ CDLbls.prototype =
         var type = r.GetLong();
         switch (type)
         {
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 this.parent = readObject(r);
                 break;
             }
-            case historyitem_DLbls_SetDelete:
+            case AscDFH.historyitem_DLbls_SetDelete:
             {
                 this.bDelete = readBool(r);
                 break;
             }
-            case historyitem_DLbls_SetDLbl:
+            case AscDFH.historyitem_DLbls_SetDLbl:
             {
                 var d_lbl = readObject(r);
                 if(d_lbl)
@@ -11719,67 +11719,67 @@ CDLbls.prototype =
                 }
                 break;
             }
-            case historyitem_DLbls_SetDLblPos:
+            case AscDFH.historyitem_DLbls_SetDLblPos:
             {
                 this.dLblPos = readLong(r);
                 break;
             }
-            case historyitem_DLbls_SetLeaderLines:
+            case AscDFH.historyitem_DLbls_SetLeaderLines:
             {
                 this.leaderLines = readObject(r);
                 break;
             }
-            case historyitem_DLbls_SetNumFmt:
+            case AscDFH.historyitem_DLbls_SetNumFmt:
             {
                 this.numFmt = readObject(r);
                 break;
             }
-            case historyitem_DLbls_SetSeparator:
+            case AscDFH.historyitem_DLbls_SetSeparator:
             {
                 this.separator = readString(r);
                 break;
             }
-            case historyitem_DLbls_SetShowBubbleSize:
+            case AscDFH.historyitem_DLbls_SetShowBubbleSize:
             {
                 this.showBubbleSize = readBool(r);
                 break;
             }
-            case historyitem_DLbls_SetShowCatName:
+            case AscDFH.historyitem_DLbls_SetShowCatName:
             {
                 this.showCatName = readBool(r);
                 break;
             }
-            case historyitem_DLbls_SetShowLeaderLines:
+            case AscDFH.historyitem_DLbls_SetShowLeaderLines:
             {
                 this.showLeaderLines = readBool(r);
                 break;
             }
-            case historyitem_DLbls_SetShowLegendKey:
+            case AscDFH.historyitem_DLbls_SetShowLegendKey:
             {
                 this.showLegendKey = readBool(r);
                 break;
             }
-            case historyitem_DLbls_SetShowPercent:
+            case AscDFH.historyitem_DLbls_SetShowPercent:
             {
                 this.showPercent = readBool(r);
                 break;
             }
-            case historyitem_DLbls_SetShowSerName:
+            case AscDFH.historyitem_DLbls_SetShowSerName:
             {
                 this.showSerName = readBool(r);
                 break;
             }
-            case historyitem_DLbls_SetShowVal:
+            case AscDFH.historyitem_DLbls_SetShowVal:
             {
                 this.showVal = readBool(r);
                 break;
             }
-            case historyitem_DLbls_SetSpPr:
+            case AscDFH.historyitem_DLbls_SetSpPr:
             {
                 this.spPr = readObject(r);
                 break;
             }
-            case historyitem_DLbls_SetTxPr:
+            case AscDFH.historyitem_DLbls_SetTxPr:
             {
                 this.txPr = readObject(r);
                 break;
@@ -11824,7 +11824,7 @@ CDPt.prototype =
 
     getObjectType: function()
     {
-        return historyitem_type_DPt;
+        return AscDFH.historyitem_type_DPt;
     },
 
     createDuplicate: function()
@@ -11862,43 +11862,43 @@ CDPt.prototype =
 
     setBubble3D: function(pr)
     {
-        History.Add(this, {Type: historyitem_DPt_SetBubble3D, oldPr: this.bubble3D, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_DPt_SetBubble3D, oldPr: this.bubble3D, newPr: pr});
         this.bubble3D = pr;
     },
 
     setExplosion: function(pr)
     {
-        History.Add(this, {Type: historyitem_DPt_SetExplosion, oldPr: this.explosion, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_DPt_SetExplosion, oldPr: this.explosion, newPr: pr});
         this.explosion = pr;
     },
 
     setIdx: function(pr)
     {
-        History.Add(this, {Type: historyitem_DPt_SetIdx, oldPr: this.idx, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_DPt_SetIdx, oldPr: this.idx, newPr: pr});
         this.idx = pr;
     },
 
     setInvertIfNegative: function(pr)
     {
-        History.Add(this, {Type: historyitem_DPt_SetInvertIfNegative, oldPr: this.invertIfNegative, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_DPt_SetInvertIfNegative, oldPr: this.invertIfNegative, newPr: pr});
         this.invertIfNegative = pr;
     },
 
     setMarker: function(pr)
     {
-        History.Add(this, {Type: historyitem_DPt_SetMarker, oldPr: this.marker, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_DPt_SetMarker, oldPr: this.marker, newPr: pr});
         this.marker = pr;
     },
 
     setPictureOptions: function(pr)
     {
-        History.Add(this, {Type: historyitem_DPt_SetPictureOptions, oldPr: this.pictureOptions, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_DPt_SetPictureOptions, oldPr: this.pictureOptions, newPr: pr});
         this.pictureOptions = pr;
     },
 
     setSpPr: function(pr)
     {
-        History.Add(this, {Type: historyitem_DPt_SetSpPr, oldPr: this.spPr, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_DPt_SetSpPr, oldPr: this.spPr, newPr: pr});
         this.spPr = pr;
     },
 
@@ -11906,37 +11906,37 @@ CDPt.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_DPt_SetBubble3D:
+            case AscDFH.historyitem_DPt_SetBubble3D:
             {
                 this.bubble3D = data.oldPr;
                 break;
             }
-            case historyitem_DPt_SetExplosion:
+            case AscDFH.historyitem_DPt_SetExplosion:
             {
                 this.explosion = data.oldPr;
                 break;
             }
-            case historyitem_DPt_SetIdx:
+            case AscDFH.historyitem_DPt_SetIdx:
             {
                 this.idx = data.oldPr;
                 break;
             }
-            case historyitem_DPt_SetInvertIfNegative:
+            case AscDFH.historyitem_DPt_SetInvertIfNegative:
             {
                 this.invertIfNegative = data.oldPr;
                 break;
             }
-            case historyitem_DPt_SetMarker:
+            case AscDFH.historyitem_DPt_SetMarker:
             {
                 this.marker = data.oldPr;
                 break;
             }
-            case historyitem_DPt_SetPictureOptions:
+            case AscDFH.historyitem_DPt_SetPictureOptions:
             {
                 this.pictureOptions = data.oldPr;
                 break;
             }
-            case historyitem_DPt_SetSpPr:
+            case AscDFH.historyitem_DPt_SetSpPr:
             {
                 this.spPr = data.oldPr;
                 break;
@@ -11948,37 +11948,37 @@ CDPt.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_DPt_SetBubble3D:
+            case AscDFH.historyitem_DPt_SetBubble3D:
             {
                 this.bubble3D = data.newPr;
                 break;
             }
-            case historyitem_DPt_SetExplosion:
+            case AscDFH.historyitem_DPt_SetExplosion:
             {
                 this.explosion = data.newPr;
                 break;
             }
-            case historyitem_DPt_SetIdx:
+            case AscDFH.historyitem_DPt_SetIdx:
             {
                 this.idx = data.newPr;
                 break;
             }
-            case historyitem_DPt_SetInvertIfNegative:
+            case AscDFH.historyitem_DPt_SetInvertIfNegative:
             {
                 this.invertIfNegative = data.newPr;
                 break;
             }
-            case historyitem_DPt_SetMarker:
+            case AscDFH.historyitem_DPt_SetMarker:
             {
                 this.marker = data.newPr;
                 break;
             }
-            case historyitem_DPt_SetPictureOptions:
+            case AscDFH.historyitem_DPt_SetPictureOptions:
             {
                 this.pictureOptions = data.newPr;
                 break;
             }
-            case historyitem_DPt_SetSpPr:
+            case AscDFH.historyitem_DPt_SetSpPr:
             {
                 this.spPr = data.newPr;
                 break;
@@ -11991,8 +11991,8 @@ CDPt.prototype =
         w.WriteLong(data.Type);
         switch (data.Type)
         {
-            case historyitem_DPt_SetBubble3D:
-            case historyitem_DPt_SetInvertIfNegative:
+            case AscDFH.historyitem_DPt_SetBubble3D:
+            case AscDFH.historyitem_DPt_SetInvertIfNegative:
             {
                 w.WriteBool(isRealBool(data.newPr));
                 if(isRealBool(data.newPr))
@@ -12001,8 +12001,8 @@ CDPt.prototype =
                 }
                 break;
             }
-            case historyitem_DPt_SetExplosion:
-            case historyitem_DPt_SetIdx:
+            case AscDFH.historyitem_DPt_SetExplosion:
+            case AscDFH.historyitem_DPt_SetIdx:
             {
                 w.WriteBool(isRealNumber(data.newPr));
                 if(isRealNumber(data.newPr))
@@ -12011,9 +12011,9 @@ CDPt.prototype =
                 }
                 break;
             }
-            case historyitem_DPt_SetMarker:
-            case historyitem_DPt_SetPictureOptions:
-            case historyitem_DPt_SetSpPr:
+            case AscDFH.historyitem_DPt_SetMarker:
+            case AscDFH.historyitem_DPt_SetPictureOptions:
+            case AscDFH.historyitem_DPt_SetSpPr:
             {
                 w.WriteBool(isRealObject(data.newPr));
                 if(isRealObject(data.newPr))
@@ -12030,7 +12030,7 @@ CDPt.prototype =
         var type = r.GetLong();
         switch (type)
         {
-            case historyitem_DPt_SetBubble3D:
+            case AscDFH.historyitem_DPt_SetBubble3D:
             {
                 if(r.GetBool())
                 {
@@ -12042,7 +12042,7 @@ CDPt.prototype =
                 }
                 break;
             }
-            case historyitem_DPt_SetExplosion:
+            case AscDFH.historyitem_DPt_SetExplosion:
             {
                 if(r.GetBool())
                 {
@@ -12054,7 +12054,7 @@ CDPt.prototype =
                 }
                 break;
             }
-            case historyitem_DPt_SetIdx:
+            case AscDFH.historyitem_DPt_SetIdx:
             {
                 if(r.GetBool())
                 {
@@ -12066,7 +12066,7 @@ CDPt.prototype =
                 }
                 break;
             }
-            case historyitem_DPt_SetInvertIfNegative:
+            case AscDFH.historyitem_DPt_SetInvertIfNegative:
             {
                 if(r.GetBool())
                 {
@@ -12078,7 +12078,7 @@ CDPt.prototype =
                 }
                 break;
             }
-            case historyitem_DPt_SetMarker:
+            case AscDFH.historyitem_DPt_SetMarker:
             {
                 if(r.GetBool())
                 {
@@ -12090,7 +12090,7 @@ CDPt.prototype =
                 }
                 break;
             }
-            case historyitem_DPt_SetPictureOptions:
+            case AscDFH.historyitem_DPt_SetPictureOptions:
             {
                 if(r.GetBool())
                 {
@@ -12102,7 +12102,7 @@ CDPt.prototype =
                 }
                 break;
             }
-            case historyitem_DPt_SetSpPr:
+            case AscDFH.historyitem_DPt_SetSpPr:
             {
                 if(r.GetBool())
                 {
@@ -12144,7 +12144,7 @@ CDTable.prototype =
 
     getObjectType: function()
     {
-        return historyitem_type_DTable;
+        return AscDFH.historyitem_type_DTable;
     },
 
     Write_ToBinary2: function(w)
@@ -12174,32 +12174,32 @@ CDTable.prototype =
 
     setShowHorzBorder: function(pr)
     {
-        History.Add(this, {Type: historyitem_DTable_SetShowHorzBorder, oldPr: this.showHorzBorder, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_DTable_SetShowHorzBorder, oldPr: this.showHorzBorder, newPr: pr});
         this.showHorzBorder = pr;
     },
     setShowKeys: function(pr)
     {
-        History.Add(this, {Type: historyitem_DTable_SetShowKeys, oldPr: this.showHorzBorder, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_DTable_SetShowKeys, oldPr: this.showHorzBorder, newPr: pr});
         this.showKeys = pr;
     },
     setShowOutline: function(pr)
     {
-        History.Add(this, {Type: historyitem_DTable_SetShowOutline, oldPr: this.showHorzBorder, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_DTable_SetShowOutline, oldPr: this.showHorzBorder, newPr: pr});
         this.showOutline = pr;
     },
     setShowVertBorder: function(pr)
     {
-        History.Add(this, {Type: historyitem_DTable_SetShowVertBorder, oldPr: this.showHorzBorder, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_DTable_SetShowVertBorder, oldPr: this.showHorzBorder, newPr: pr});
         this.showVertBorder = pr;
     },
     setSpPr: function(pr)
     {
-        History.Add(this, {Type: historyitem_DTable_SetSpPr, oldPr: this.showHorzBorder, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_DTable_SetSpPr, oldPr: this.showHorzBorder, newPr: pr});
         this.spPr = pr;
     },
     setTxPr: function(pr)
     {
-        History.Add(this, {Type: historyitem_DTable_SetTxPr, oldPr: this.showHorzBorder, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_DTable_SetTxPr, oldPr: this.showHorzBorder, newPr: pr});
         this.txPr = pr;
     },
 
@@ -12207,35 +12207,35 @@ CDTable.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_DTable_SetShowHorzBorder:
+            case AscDFH.historyitem_DTable_SetShowHorzBorder:
             {
                 this.showHorzBorder = data.oldPr;
                 break;
             }
 
-            case historyitem_DTable_SetShowKeys:
+            case AscDFH.historyitem_DTable_SetShowKeys:
             {
                 this.showKeys = data.oldPr;
                 break;
             }
-            case historyitem_DTable_SetShowOutline:
+            case AscDFH.historyitem_DTable_SetShowOutline:
             {
                 this.showOutline = data.oldPr;
                 break;
             }
 
-            case historyitem_DTable_SetShowVertBorder:
+            case AscDFH.historyitem_DTable_SetShowVertBorder:
             {
                 this.showVertBorder = data.oldPr;
                 break;
             }
-            case historyitem_DTable_SetSpPr:
+            case AscDFH.historyitem_DTable_SetSpPr:
             {
                 this.spPr = data.oldPr;
                 break;
             }
 
-            case historyitem_DTable_SetTxPr:
+            case AscDFH.historyitem_DTable_SetTxPr:
             {
                 this.txPr = data.oldPr;
                 break;
@@ -12247,35 +12247,35 @@ CDTable.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_DTable_SetShowHorzBorder:
+            case AscDFH.historyitem_DTable_SetShowHorzBorder:
             {
                 this.showHorzBorder = data.newPr;
                 break;
             }
 
-            case historyitem_DTable_SetShowKeys:
+            case AscDFH.historyitem_DTable_SetShowKeys:
             {
                 this.showKeys = data.newPr;
                 break;
             }
-            case historyitem_DTable_SetShowOutline:
+            case AscDFH.historyitem_DTable_SetShowOutline:
             {
                 this.showOutline = data.newPr;
                 break;
             }
 
-            case historyitem_DTable_SetShowVertBorder:
+            case AscDFH.historyitem_DTable_SetShowVertBorder:
             {
                 this.showVertBorder = data.newPr;
                 break;
             }
-            case historyitem_DTable_SetSpPr:
+            case AscDFH.historyitem_DTable_SetSpPr:
             {
                 this.spPr = data.newPr;
                 break;
             }
 
-            case historyitem_DTable_SetTxPr:
+            case AscDFH.historyitem_DTable_SetTxPr:
             {
                 this.txPr = data.newPr;
                 break;
@@ -12288,10 +12288,10 @@ CDTable.prototype =
         w.WriteLong(data.Type);
         switch (data.Type)
         {
-            case historyitem_DTable_SetShowHorzBorder:
-            case historyitem_DTable_SetShowKeys:
-            case historyitem_DTable_SetShowOutline:
-            case historyitem_DTable_SetShowVertBorder:
+            case AscDFH.historyitem_DTable_SetShowHorzBorder:
+            case AscDFH.historyitem_DTable_SetShowKeys:
+            case AscDFH.historyitem_DTable_SetShowOutline:
+            case AscDFH.historyitem_DTable_SetShowVertBorder:
             {
                 w.WriteBool(isRealBool(data.newPr));
                 if(isRealBool(data.newPr))
@@ -12301,8 +12301,8 @@ CDTable.prototype =
                 break;
             }
 
-            case historyitem_DTable_SetSpPr:
-            case historyitem_DTable_SetTxPr:
+            case AscDFH.historyitem_DTable_SetSpPr:
+            case AscDFH.historyitem_DTable_SetTxPr:
             {
                 this.spPr = data.newPr;
                 w.WriteBool(isRealObject(data.newPr));
@@ -12320,7 +12320,7 @@ CDTable.prototype =
         var type = r.GetLong();
         switch (type)
         {
-            case historyitem_DTable_SetShowHorzBorder:
+            case AscDFH.historyitem_DTable_SetShowHorzBorder:
             {
                 if(r.GetBool())
                 {
@@ -12333,7 +12333,7 @@ CDTable.prototype =
                 break;
             }
 
-            case historyitem_DTable_SetShowKeys:
+            case AscDFH.historyitem_DTable_SetShowKeys:
             {
                 if(r.GetBool())
                 {
@@ -12345,7 +12345,7 @@ CDTable.prototype =
                 }
                 break;
             }
-            case historyitem_DTable_SetShowOutline:
+            case AscDFH.historyitem_DTable_SetShowOutline:
             {
                 if(r.GetBool())
                 {
@@ -12358,7 +12358,7 @@ CDTable.prototype =
                 break;
             }
 
-            case historyitem_DTable_SetShowVertBorder:
+            case AscDFH.historyitem_DTable_SetShowVertBorder:
             {
                 if(r.GetBool())
                 {
@@ -12370,7 +12370,7 @@ CDTable.prototype =
                 }
                 break;
             }
-            case historyitem_DTable_SetSpPr:
+            case AscDFH.historyitem_DTable_SetSpPr:
             {
                 if(r.GetBool())
                 {
@@ -12383,7 +12383,7 @@ CDTable.prototype =
                 break;
             }
 
-            case historyitem_DTable_SetTxPr:
+            case AscDFH.historyitem_DTable_SetTxPr:
             {
                 if(r.GetBool())
                 {
@@ -12505,7 +12505,7 @@ CDispUnits.prototype =
 
     setParent: function(pr)
     {
-        History.Add(this, {Type: historyitem_DispUnitsSetParent, oldPr: this.parent, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_DispUnitsSetParent, oldPr: this.parent, newPr: pr});
         this.parent = pr;
     },
 
@@ -12523,12 +12523,12 @@ CDispUnits.prototype =
 
     getObjectType: function()
     {
-        return historyitem_type_DispUnits;
+        return AscDFH.historyitem_type_DispUnits;
     },
 
     setBuiltInUnit: function(pr)
     {
-        History.Add(this, {Type: historyitem_DispUnitsSetBuiltInUnit, oldPr: this.builtInUnit, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_DispUnitsSetBuiltInUnit, oldPr: this.builtInUnit, newPr: pr});
         this.builtInUnit = pr;
         if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateInternalChart)
         {
@@ -12537,7 +12537,7 @@ CDispUnits.prototype =
     },
     setCustUnit: function(pr)
     {
-        History.Add(this, {Type: historyitem_DispUnitsSetCustUnit, oldPr: this.custUnit, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_DispUnitsSetCustUnit, oldPr: this.custUnit, newPr: pr});
         this.custUnit = pr;
         if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateInternalChart)
         {
@@ -12546,7 +12546,7 @@ CDispUnits.prototype =
     },
     setDispUnitsLbl: function(pr)
     {
-        History.Add(this, {Type: historyitem_DispUnitsSetDispUnitsLbl, oldPr: this.dispUnitsLbl, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_DispUnitsSetDispUnitsLbl, oldPr: this.dispUnitsLbl, newPr: pr});
         this.dispUnitsLbl = pr;
         if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateInternalChart)
         {
@@ -12558,12 +12558,12 @@ CDispUnits.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_DispUnitsSetParent:
+            case AscDFH.historyitem_DispUnitsSetParent:
             {
                 this.parent = data.oldPr;
                 break;
             }
-            case historyitem_DispUnitsSetBuiltInUnit:
+            case AscDFH.historyitem_DispUnitsSetBuiltInUnit:
             {
                 this.builtInUnit = data.oldPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateInternalChart)
@@ -12572,7 +12572,7 @@ CDispUnits.prototype =
                 }
                 break;
             }
-            case historyitem_DispUnitsSetCustUnit:
+            case AscDFH.historyitem_DispUnitsSetCustUnit:
             {
                 this.custUnit = data.oldPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateInternalChart)
@@ -12581,7 +12581,7 @@ CDispUnits.prototype =
                 }
                 break;
             }
-            case historyitem_DispUnitsSetDispUnitsLbl:
+            case AscDFH.historyitem_DispUnitsSetDispUnitsLbl:
             {
                 this.dispUnitsLbl = data.oldPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateInternalChart)
@@ -12597,12 +12597,12 @@ CDispUnits.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_DispUnitsSetParent:
+            case AscDFH.historyitem_DispUnitsSetParent:
             {
                 this.parent = data.newPr;
                 break;
             }
-            case historyitem_DispUnitsSetBuiltInUnit:
+            case AscDFH.historyitem_DispUnitsSetBuiltInUnit:
             {
                 this.builtInUnit = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateInternalChart)
@@ -12611,7 +12611,7 @@ CDispUnits.prototype =
                 }
                 break;
             }
-            case historyitem_DispUnitsSetCustUnit:
+            case AscDFH.historyitem_DispUnitsSetCustUnit:
             {
                 this.custUnit = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateInternalChart)
@@ -12620,7 +12620,7 @@ CDispUnits.prototype =
                 }
                 break;
             }
-            case historyitem_DispUnitsSetDispUnitsLbl:
+            case AscDFH.historyitem_DispUnitsSetDispUnitsLbl:
             {
                 this.dispUnitsLbl = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateInternalChart)
@@ -12648,18 +12648,18 @@ CDispUnits.prototype =
         w.WriteLong(data.Type);
         switch (data.Type)
         {
-            case historyitem_DispUnitsSetBuiltInUnit:
+            case AscDFH.historyitem_DispUnitsSetBuiltInUnit:
             {
                 writeLong(w, data.newPr);
                 break;
             }
-            case historyitem_DispUnitsSetCustUnit:
+            case AscDFH.historyitem_DispUnitsSetCustUnit:
             {
                 writeDouble(w, data.newPr);
                 break;
             }
-            case historyitem_DispUnitsSetParent:
-            case historyitem_DispUnitsSetDispUnitsLbl:
+            case AscDFH.historyitem_DispUnitsSetParent:
+            case AscDFH.historyitem_DispUnitsSetDispUnitsLbl:
             {
                 writeObject(w, data.newPr);
                 break;
@@ -12672,12 +12672,12 @@ CDispUnits.prototype =
         var type = r.GetLong();
         switch (type)
         {
-            case historyitem_DispUnitsSetParent:
+            case AscDFH.historyitem_DispUnitsSetParent:
             {
                 this.parent = readObject(r);
                 break;
             }
-            case historyitem_DispUnitsSetBuiltInUnit:
+            case AscDFH.historyitem_DispUnitsSetBuiltInUnit:
             {
                 this.builtInUnit = readLong(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateInternalChart)
@@ -12686,7 +12686,7 @@ CDispUnits.prototype =
                 }
                 break;
             }
-            case historyitem_DispUnitsSetCustUnit:
+            case AscDFH.historyitem_DispUnitsSetCustUnit:
             {
                 this.custUnit = readDouble(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateInternalChart)
@@ -12695,7 +12695,7 @@ CDispUnits.prototype =
                 }
                 break;
             }
-            case historyitem_DispUnitsSetDispUnitsLbl:
+            case AscDFH.historyitem_DispUnitsSetDispUnitsLbl:
             {
                 this.dispUnitsLbl = readObject(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateInternalChart)
@@ -12735,15 +12735,15 @@ CDoughnutChart.prototype =
 
         switch (data.Type)
         {
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 break;
             }
-            case historyitem_CommonChart_RemoveSeries:
+            case AscDFH.historyitem_CommonChart_RemoveSeries:
             {
                 break;
             }
-            case historyitem_DoughnutChart_SetDLbls :
+            case AscDFH.historyitem_DoughnutChart_SetDLbls :
             {
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
                 {
@@ -12751,15 +12751,15 @@ CDoughnutChart.prototype =
                 }
                 break;
             }
-            case historyitem_DoughnutChart_SetFirstSliceAng :
+            case AscDFH.historyitem_DoughnutChart_SetFirstSliceAng :
             {
                 break;
             }
-            case historyitem_DoughnutChart_SetHoleSize :
+            case AscDFH.historyitem_DoughnutChart_SetHoleSize :
             {
                 break;
             }
-            case historyitem_DoughnutChart_AddSer:
+            case AscDFH.historyitem_DoughnutChart_AddSer:
             {
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
                 {
@@ -12767,7 +12767,7 @@ CDoughnutChart.prototype =
                 }
                 break;
             }
-            case historyitem_DoughnutChart_SetVaryColor :
+            case AscDFH.historyitem_DoughnutChart_SetVaryColor :
             {
                 break;
             }
@@ -12777,7 +12777,7 @@ CDoughnutChart.prototype =
     {
         if(this.series[idx])
         {
-            History.Add(this, {Type: historyitem_CommonChart_RemoveSeries, oldPr: idx, newPr: this.series.splice(idx, 1)[0]});
+            History.Add(this, {Type: AscDFH.historyitem_CommonChart_RemoveSeries, oldPr: idx, newPr: this.series.splice(idx, 1)[0]});
         }
     },
 
@@ -12809,7 +12809,7 @@ CDoughnutChart.prototype =
 
     getObjectType: function()
     {
-        return historyitem_type_DoughnutChart;
+        return AscDFH.historyitem_type_DoughnutChart;
     },
 
 
@@ -12855,7 +12855,7 @@ CDoughnutChart.prototype =
 
     setDLbls: function(pr)
     {
-        History.Add(this, {Type: historyitem_DoughnutChart_SetDLbls, oldPr: this.dLbls, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_DoughnutChart_SetDLbls, oldPr: this.dLbls, newPr: pr});
         this.dLbls = pr;
         if(this.dLbls)
         {
@@ -12868,18 +12868,18 @@ CDoughnutChart.prototype =
     },
     setFirstSliceAng: function(pr)
     {
-        History.Add(this, {Type: historyitem_DoughnutChart_SetFirstSliceAng, oldPr: this.firstSliceAng, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_DoughnutChart_SetFirstSliceAng, oldPr: this.firstSliceAng, newPr: pr});
         this.firstSliceAng = pr;
     },
     setHoleSize: function(pr)
     {
-        History.Add(this, {Type: historyitem_DoughnutChart_SetHoleSize, oldPr: this.holeSize, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_DoughnutChart_SetHoleSize, oldPr: this.holeSize, newPr: pr});
         this.holeSize = pr;
     },
 
     addSer: function(ser)
     {
-        History.Add(this, {Type: historyitem_DoughnutChart_AddSer, ser: ser});
+        History.Add(this, {Type: AscDFH.historyitem_DoughnutChart_AddSer, ser: ser});
         this.series.push(ser);
         ser.setParent(this);
         if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -12890,13 +12890,13 @@ CDoughnutChart.prototype =
 
     setVaryColors: function(pr)
     {
-        History.Add(this, {Type: historyitem_DoughnutChart_SetVaryColor, oldPr: this.varyColors, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_DoughnutChart_SetVaryColor, oldPr: this.varyColors, newPr: pr});
         this.varyColors = pr;
     },
 
     setParent: function(pr)
     {
-        History.Add(this, {Type: historyitem_CommonChartFormat_SetParent, oldPr: this.parent, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_CommonChartFormat_SetParent, oldPr: this.parent, newPr: pr});
         this.parent = pr;
     },
 
@@ -12904,17 +12904,17 @@ CDoughnutChart.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 this.parent = data.oldPr;
                 break;
             }
-            case historyitem_CommonChart_RemoveSeries:
+            case AscDFH.historyitem_CommonChart_RemoveSeries:
             {
                 this.series.splice(data.oldPr, 0, data.newPr);
                 break;
             }
-            case historyitem_DoughnutChart_SetDLbls :
+            case AscDFH.historyitem_DoughnutChart_SetDLbls :
             {
                 this.dLbls = data.oldPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -12923,17 +12923,17 @@ CDoughnutChart.prototype =
                 }
                 break;
             }
-            case historyitem_DoughnutChart_SetFirstSliceAng :
+            case AscDFH.historyitem_DoughnutChart_SetFirstSliceAng :
             {
                 this.firstSliceAng = data.oldPr;
                 break;
             }
-            case historyitem_DoughnutChart_SetHoleSize :
+            case AscDFH.historyitem_DoughnutChart_SetHoleSize :
             {
                 this.holeSize = data.oldPr;
                 break;
             }
-            case historyitem_DoughnutChart_AddSer:
+            case AscDFH.historyitem_DoughnutChart_AddSer:
             {
                 for(var i = this.series.length - 1; i >- 1; --i)
                 {
@@ -12949,7 +12949,7 @@ CDoughnutChart.prototype =
                 }
                 break;
             }
-            case historyitem_DoughnutChart_SetVaryColor :
+            case AscDFH.historyitem_DoughnutChart_SetVaryColor :
             {
                 this.varyColors = data.oldPr;
                 break;
@@ -12961,17 +12961,17 @@ CDoughnutChart.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 this.parent = data.newPr;
                 break;
             }
-            case historyitem_CommonChart_RemoveSeries:
+            case AscDFH.historyitem_CommonChart_RemoveSeries:
             {
                 this.series.splice(data.oldPr, 1);
                 break;
             }
-            case historyitem_DoughnutChart_SetDLbls :
+            case AscDFH.historyitem_DoughnutChart_SetDLbls :
             {
                 this.dLbls = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -12980,17 +12980,17 @@ CDoughnutChart.prototype =
                 }
                 break;
             }
-            case historyitem_DoughnutChart_SetFirstSliceAng :
+            case AscDFH.historyitem_DoughnutChart_SetFirstSliceAng :
             {
                 this.firstSliceAng = data.newPr;
                 break;
             }
-            case historyitem_DoughnutChart_SetHoleSize :
+            case AscDFH.historyitem_DoughnutChart_SetHoleSize :
             {
                 this.holeSize = data.newPr;
                 break;
             }
-            case historyitem_DoughnutChart_AddSer:
+            case AscDFH.historyitem_DoughnutChart_AddSer:
             {
                 if(isRealObject(data.ser))
                 {
@@ -13002,7 +13002,7 @@ CDoughnutChart.prototype =
                 }
                 break;
             }
-            case historyitem_DoughnutChart_SetVaryColor :
+            case AscDFH.historyitem_DoughnutChart_SetVaryColor :
             {
                 this.varyColors = data.newPr;
                 break;
@@ -13015,17 +13015,17 @@ CDoughnutChart.prototype =
         w.WriteLong(data.Type);
         switch (data.Type)
         {
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 writeObject(w, data.newPr);
                 break;
             }
-            case historyitem_CommonChart_RemoveSeries:
+            case AscDFH.historyitem_CommonChart_RemoveSeries:
             {
                 writeLong(w, data.oldPr);
                 break;
             }
-            case historyitem_DoughnutChart_SetDLbls :
+            case AscDFH.historyitem_DoughnutChart_SetDLbls :
             {
                 w.WriteBool(isRealObject(data.newPr));
                 if(isRealObject(data.newPr))
@@ -13034,8 +13034,8 @@ CDoughnutChart.prototype =
                 }
                 break;
             }
-            case historyitem_DoughnutChart_SetFirstSliceAng :
-            case historyitem_DoughnutChart_SetHoleSize :
+            case AscDFH.historyitem_DoughnutChart_SetFirstSliceAng :
+            case AscDFH.historyitem_DoughnutChart_SetHoleSize :
             {
                 w.WriteBool(isRealNumber(data.newPr));
                 if(isRealNumber(data.newPr))
@@ -13044,7 +13044,7 @@ CDoughnutChart.prototype =
                 }
                 break;
             }
-            case historyitem_DoughnutChart_AddSer:
+            case AscDFH.historyitem_DoughnutChart_AddSer:
             {
                 w.WriteBool(isRealObject(data.ser));
                 if(isRealObject(data.ser))
@@ -13053,7 +13053,7 @@ CDoughnutChart.prototype =
                 }
                 break;
             }
-            case historyitem_DoughnutChart_SetVaryColor :
+            case AscDFH.historyitem_DoughnutChart_SetVaryColor :
             {
                 w.WriteBool(isRealBool(data.newPr));
                 if(isRealBool(data.newPr))
@@ -13070,18 +13070,18 @@ CDoughnutChart.prototype =
         var type = r.GetLong();
         switch (type)
         {
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 this.parent = readObject(r);
                 break;
             }
-            case historyitem_CommonChart_RemoveSeries:
+            case AscDFH.historyitem_CommonChart_RemoveSeries:
             {
                 var pos = readLong(r);
                 this.series.splice(pos, 1);
                 break;
             }
-            case historyitem_DoughnutChart_SetDLbls :
+            case AscDFH.historyitem_DoughnutChart_SetDLbls :
             {
                 if(r.GetBool())
                 {
@@ -13097,7 +13097,7 @@ CDoughnutChart.prototype =
                 }
                 break;
             }
-            case historyitem_DoughnutChart_SetFirstSliceAng :
+            case AscDFH.historyitem_DoughnutChart_SetFirstSliceAng :
             {
                 if(r.GetBool())
                 {
@@ -13109,7 +13109,7 @@ CDoughnutChart.prototype =
                 }
                 break;
             }
-            case historyitem_DoughnutChart_SetHoleSize :
+            case AscDFH.historyitem_DoughnutChart_SetHoleSize :
             {
                 if(r.GetBool())
                 {
@@ -13121,7 +13121,7 @@ CDoughnutChart.prototype =
                 }
                 break;
             }
-            case historyitem_DoughnutChart_AddSer:
+            case AscDFH.historyitem_DoughnutChart_AddSer:
             {
                 if(r.GetBool())
                 {
@@ -13137,7 +13137,7 @@ CDoughnutChart.prototype =
                 }
                 break;
             }
-            case historyitem_DoughnutChart_SetVaryColor :
+            case AscDFH.historyitem_DoughnutChart_SetVaryColor :
             {
                 if(r.GetBool())
                 {
@@ -13216,7 +13216,7 @@ CErrBars.prototype =
 
     getObjectType: function()
     {
-        return historyitem_type_ErrBars;
+        return AscDFH.historyitem_type_ErrBars;
     },
 
     Write_ToBinary2: function(w)
@@ -13232,42 +13232,42 @@ CErrBars.prototype =
 
     setErrBarType: function(pr)
     {
-        History.Add(this, {Type: historyitem_ErrBars_SetErrBarType, oldPr: this.errBarType, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_ErrBars_SetErrBarType, oldPr: this.errBarType, newPr: pr});
         this.errBarType = pr;
     },
     setErrDir: function(pr)
     {
-        History.Add(this, {Type: historyitem_ErrBars_SetErrDir, oldPr: this.errDir, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_ErrBars_SetErrDir, oldPr: this.errDir, newPr: pr});
         this.errDir = pr;
     },
     setErrValType: function(pr)
     {
-        History.Add(this, {Type: historyitem_ErrBars_SetErrValType, oldPr: this.errDir, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_ErrBars_SetErrValType, oldPr: this.errDir, newPr: pr});
         this.errValType = pr;
     },
     setMinus: function(pr)
     {
-        History.Add(this, {Type: historyitem_ErrBars_SetMinus, oldPr: this.minus, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_ErrBars_SetMinus, oldPr: this.minus, newPr: pr});
         this.minus = pr;
     },
     setNoEndCap: function(pr)
     {
-        History.Add(this, {Type: historyitem_ErrBars_SetNoEndCap, oldPr: this.noEndCap, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_ErrBars_SetNoEndCap, oldPr: this.noEndCap, newPr: pr});
         this.noEndCap = pr;
     },
     setPlus: function(pr)
     {
-        History.Add(this, {Type: historyitem_ErrBars_SetPlus, oldPr: this.plus, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_ErrBars_SetPlus, oldPr: this.plus, newPr: pr});
         this.plus = pr;
     },
     setSpPr: function(pr)
     {
-        History.Add(this, {Type: historyitem_ErrBars_SetSpPr, oldPr: this.spPr, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_ErrBars_SetSpPr, oldPr: this.spPr, newPr: pr});
         this.spPr = pr;
     },
     setVal: function(pr)
     {
-        History.Add(this, {Type: historyitem_ErrBars_SetVal, oldPr: this.val, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_ErrBars_SetVal, oldPr: this.val, newPr: pr});
         this.val = pr;
     },
 
@@ -13275,42 +13275,42 @@ CErrBars.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_ErrBars_SetErrBarType:
+            case AscDFH.historyitem_ErrBars_SetErrBarType:
             {
                 this.errBarType = data.oldPr;
                 break;
             }
-            case historyitem_ErrBars_SetErrDir:
+            case AscDFH.historyitem_ErrBars_SetErrDir:
             {
                 this.errDir = data.oldPr;
                 break;
             }
-            case historyitem_ErrBars_SetErrValType:
+            case AscDFH.historyitem_ErrBars_SetErrValType:
             {
                 this.errValType = data.oldPr;
                 break;
             }
-            case historyitem_ErrBars_SetMinus:
+            case AscDFH.historyitem_ErrBars_SetMinus:
             {
                 this.minus = data.oldPr;
                 break;
             }
-            case historyitem_ErrBars_SetNoEndCap:
+            case AscDFH.historyitem_ErrBars_SetNoEndCap:
             {
                 this.noEndCap = data.oldPr;
                 break;
             }
-            case historyitem_ErrBars_SetPlus:
+            case AscDFH.historyitem_ErrBars_SetPlus:
             {
                 this.plus = data.oldPr;
                 break;
             }
-            case historyitem_ErrBars_SetSpPr:
+            case AscDFH.historyitem_ErrBars_SetSpPr:
             {
                 this.spPr = data.oldPr;
                 break;
             }
-            case historyitem_ErrBars_SetVal:
+            case AscDFH.historyitem_ErrBars_SetVal:
             {
                 this.val = data.oldPr;
                 break;
@@ -13322,42 +13322,42 @@ CErrBars.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_ErrBars_SetErrBarType:
+            case AscDFH.historyitem_ErrBars_SetErrBarType:
             {
                 this.errBarType = data.newPr;
                 break;
             }
-            case historyitem_ErrBars_SetErrDir:
+            case AscDFH.historyitem_ErrBars_SetErrDir:
             {
                 this.errDir = data.newPr;
                 break;
             }
-            case historyitem_ErrBars_SetErrValType:
+            case AscDFH.historyitem_ErrBars_SetErrValType:
             {
                 this.errValType = data.newPr;
                 break;
             }
-            case historyitem_ErrBars_SetMinus:
+            case AscDFH.historyitem_ErrBars_SetMinus:
             {
                 this.minus = data.newPr;
                 break;
             }
-            case historyitem_ErrBars_SetNoEndCap:
+            case AscDFH.historyitem_ErrBars_SetNoEndCap:
             {
                 this.noEndCap = data.newPr;
                 break;
             }
-            case historyitem_ErrBars_SetPlus:
+            case AscDFH.historyitem_ErrBars_SetPlus:
             {
                 this.plus = data.newPr;
                 break;
             }
-            case historyitem_ErrBars_SetSpPr:
+            case AscDFH.historyitem_ErrBars_SetSpPr:
             {
                 this.spPr = data.newPr;
                 break;
             }
-            case historyitem_ErrBars_SetVal:
+            case AscDFH.historyitem_ErrBars_SetVal:
             {
                 this.val = data.newPr;
                 break;
@@ -13370,9 +13370,9 @@ CErrBars.prototype =
         w.WriteLong(data.Type);
         switch (data.Type)
         {
-            case historyitem_ErrBars_SetErrBarType:
-            case historyitem_ErrBars_SetErrDir:
-            case historyitem_ErrBars_SetErrValType:
+            case AscDFH.historyitem_ErrBars_SetErrBarType:
+            case AscDFH.historyitem_ErrBars_SetErrDir:
+            case AscDFH.historyitem_ErrBars_SetErrValType:
             {
                 w.WriteBool(isRealNumber(data.newPr));
                 if(isRealNumber(data.newPr))
@@ -13381,9 +13381,9 @@ CErrBars.prototype =
                 }
                 break;
             }
-            case historyitem_ErrBars_SetMinus:
-            case historyitem_ErrBars_SetPlus:
-            case historyitem_ErrBars_SetSpPr:
+            case AscDFH.historyitem_ErrBars_SetMinus:
+            case AscDFH.historyitem_ErrBars_SetPlus:
+            case AscDFH.historyitem_ErrBars_SetSpPr:
             {
                 w.WriteBool(isRealObject(data.newPr));
                 if(isRealObject(data.newPr))
@@ -13392,7 +13392,7 @@ CErrBars.prototype =
                 }
                 break;
             }
-            case historyitem_ErrBars_SetNoEndCap:
+            case AscDFH.historyitem_ErrBars_SetNoEndCap:
             {
                 w.WriteBool(isRealBool(data.newPr));
                 if(isRealBool(data.newPr))
@@ -13401,7 +13401,7 @@ CErrBars.prototype =
                 }
                 break;
             }
-            case historyitem_ErrBars_SetVal:
+            case AscDFH.historyitem_ErrBars_SetVal:
             {
                 w.WriteBool(isRealNumber(data.newPr));
                 if(isRealNumber(data.newPr))
@@ -13418,7 +13418,7 @@ CErrBars.prototype =
         var type = r.GetLong();
         switch (type)
         {
-            case historyitem_ErrBars_SetErrBarType:
+            case AscDFH.historyitem_ErrBars_SetErrBarType:
             {
                 if(r.GetBool())
                 {
@@ -13430,7 +13430,7 @@ CErrBars.prototype =
                 }
                 break;
             }
-            case historyitem_ErrBars_SetErrDir:
+            case AscDFH.historyitem_ErrBars_SetErrDir:
             {
                 if(r.GetBool())
                 {
@@ -13442,7 +13442,7 @@ CErrBars.prototype =
                 }
                 break;
             }
-            case historyitem_ErrBars_SetErrValType:
+            case AscDFH.historyitem_ErrBars_SetErrValType:
             {
                 if(r.GetBool())
                 {
@@ -13454,7 +13454,7 @@ CErrBars.prototype =
                 }
                 break;
             }
-            case historyitem_ErrBars_SetMinus:
+            case AscDFH.historyitem_ErrBars_SetMinus:
             {
                 if(r.GetBool())
                 {
@@ -13466,7 +13466,7 @@ CErrBars.prototype =
                 }
                 break;
             }
-            case historyitem_ErrBars_SetNoEndCap:
+            case AscDFH.historyitem_ErrBars_SetNoEndCap:
             {
                 if(r.GetBool())
                 {
@@ -13478,7 +13478,7 @@ CErrBars.prototype =
                 }
                 break;
             }
-            case historyitem_ErrBars_SetPlus:
+            case AscDFH.historyitem_ErrBars_SetPlus:
             {
                 if(r.GetBool())
                 {
@@ -13490,7 +13490,7 @@ CErrBars.prototype =
                 }
                 break;
             }
-            case historyitem_ErrBars_SetSpPr:
+            case AscDFH.historyitem_ErrBars_SetSpPr:
             {
                 if(r.GetBool())
                 {
@@ -13502,7 +13502,7 @@ CErrBars.prototype =
                 }
                 break;
             }
-            case historyitem_ErrBars_SetVal:
+            case AscDFH.historyitem_ErrBars_SetVal:
             {
                 if(r.GetBool())
                 {
@@ -13579,60 +13579,60 @@ CLayout.prototype =
 
     getObjectType: function()
     {
-        return historyitem_type_Layout;
+        return AscDFH.historyitem_type_Layout;
     },
 
     setH: function(pr)
     {
-        History.Add(this, {Type:historyitem_Layout_SetH, oldPr: this.h, newPr: pr});
+        History.Add(this, {Type:AscDFH.historyitem_Layout_SetH, oldPr: this.h, newPr: pr});
         this.h = pr;
     },
 
     setHMode: function(pr)
     {
-        History.Add(this, {Type:historyitem_Layout_SetHMode, oldPr: this.hMode, newPr: pr});
+        History.Add(this, {Type:AscDFH.historyitem_Layout_SetHMode, oldPr: this.hMode, newPr: pr});
         this.hMode = pr;
     },
 
     setLayoutTarget: function(pr)
     {
-        History.Add(this, {Type:historyitem_Layout_SetLayoutTarget, oldPr: this.layoutTarget, newPr: pr});
+        History.Add(this, {Type:AscDFH.historyitem_Layout_SetLayoutTarget, oldPr: this.layoutTarget, newPr: pr});
         this.layoutTarget = pr;
     },
 
     setW: function(pr)
     {
-        History.Add(this, {Type:historyitem_Layout_SetW, oldPr: this.w, newPr: pr});
+        History.Add(this, {Type:AscDFH.historyitem_Layout_SetW, oldPr: this.w, newPr: pr});
         this.w = pr;
     },
 
     setWMode: function(pr)
     {
-        History.Add(this, {Type:historyitem_Layout_SetWMode, oldPr: this.wMode, newPr: pr});
+        History.Add(this, {Type:AscDFH.historyitem_Layout_SetWMode, oldPr: this.wMode, newPr: pr});
         this.wMode = pr;
     },
 
     setX: function(pr)
     {
-        History.Add(this, {Type:historyitem_Layout_SetX, oldPr: this.x, newPr: pr});
+        History.Add(this, {Type:AscDFH.historyitem_Layout_SetX, oldPr: this.x, newPr: pr});
         this.x = pr;
     },
 
     setXMode: function(pr)
     {
-        History.Add(this, {Type:historyitem_Layout_SetXMode, oldPr: this.xMode, newPr: pr});
+        History.Add(this, {Type:AscDFH.historyitem_Layout_SetXMode, oldPr: this.xMode, newPr: pr});
         this.xMode = pr;
     },
 
     setY: function(pr)
     {
-        History.Add(this, {Type:historyitem_Layout_SetY, oldPr: this.y, newPr: pr});
+        History.Add(this, {Type:AscDFH.historyitem_Layout_SetY, oldPr: this.y, newPr: pr});
         this.y = pr;
     },
 
     setYMode: function(pr)
     {
-        History.Add(this, {Type:historyitem_Layout_SetYMode, oldPr: this.yMode, newPr: pr});
+        History.Add(this, {Type:AscDFH.historyitem_Layout_SetYMode, oldPr: this.yMode, newPr: pr});
         this.yMode = pr;
     },
 
@@ -13640,47 +13640,47 @@ CLayout.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_Layout_SetH:
+            case AscDFH.historyitem_Layout_SetH:
             {
                 this.h = data.oldPr;
                 break;
             }
-            case historyitem_Layout_SetHMode:
+            case AscDFH.historyitem_Layout_SetHMode:
             {
                 this.hMode = data.oldPr;
                 break
             }
-            case historyitem_Layout_SetLayoutTarget:
+            case AscDFH.historyitem_Layout_SetLayoutTarget:
             {
                 this.layoutTarget = data.oldPr;
                 break
             }
-            case historyitem_Layout_SetW:
+            case AscDFH.historyitem_Layout_SetW:
             {
                 this.w = data.oldPr;
                 break
             }
-            case historyitem_Layout_SetWMode:
+            case AscDFH.historyitem_Layout_SetWMode:
             {
                 this.wMode = data.oldPr;
                 break
             }
-            case historyitem_Layout_SetX:
+            case AscDFH.historyitem_Layout_SetX:
             {
                 this.x = data.oldPr;
                 break
             }
-            case historyitem_Layout_SetXMode:
+            case AscDFH.historyitem_Layout_SetXMode:
             {
                 this.xMode = data.oldPr;
                 break
             }
-            case historyitem_Layout_SetY:
+            case AscDFH.historyitem_Layout_SetY:
             {
                 this.y = data.oldPr;
                 break
             }
-            case historyitem_Layout_SetYMode:
+            case AscDFH.historyitem_Layout_SetYMode:
             {
                 this.yMode = data.oldPr;
                 break
@@ -13692,47 +13692,47 @@ CLayout.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_Layout_SetH:
+            case AscDFH.historyitem_Layout_SetH:
             {
                 this.h = data.newPr;
                 break;
             }
-            case historyitem_Layout_SetHMode:
+            case AscDFH.historyitem_Layout_SetHMode:
             {
                 this.hMode = data.newPr;
                 break
             }
-            case historyitem_Layout_SetLayoutTarget:
+            case AscDFH.historyitem_Layout_SetLayoutTarget:
             {
                 this.layoutTarget = data.newPr;
                 break
             }
-            case historyitem_Layout_SetW:
+            case AscDFH.historyitem_Layout_SetW:
             {
                 this.w = data.newPr;
                 break
             }
-            case historyitem_Layout_SetWMode:
+            case AscDFH.historyitem_Layout_SetWMode:
             {
                 this.wMode = data.newPr;
                 break
             }
-            case historyitem_Layout_SetX:
+            case AscDFH.historyitem_Layout_SetX:
             {
                 this.x = data.newPr;
                 break
             }
-            case historyitem_Layout_SetXMode:
+            case AscDFH.historyitem_Layout_SetXMode:
             {
                 this.xMode = data.newPr;
                 break
             }
-            case historyitem_Layout_SetY:
+            case AscDFH.historyitem_Layout_SetY:
             {
                 this.y = data.newPr;
                 break
             }
-            case historyitem_Layout_SetYMode:
+            case AscDFH.historyitem_Layout_SetYMode:
             {
                 this.yMode = data.newPr;
                 break
@@ -13746,10 +13746,10 @@ CLayout.prototype =
         w.WriteLong(data.Type);
         switch (data.Type)
         {
-            case historyitem_Layout_SetH:
-            case historyitem_Layout_SetW:
-            case historyitem_Layout_SetX:
-            case historyitem_Layout_SetY:
+            case AscDFH.historyitem_Layout_SetH:
+            case AscDFH.historyitem_Layout_SetW:
+            case AscDFH.historyitem_Layout_SetX:
+            case AscDFH.historyitem_Layout_SetY:
             {
                 w.WriteBool(isRealNumber(data.newPr));
                 if(isRealNumber(data.newPr))
@@ -13758,11 +13758,11 @@ CLayout.prototype =
                 }
                 break;
             }
-            case historyitem_Layout_SetHMode:
-            case historyitem_Layout_SetWMode:
-            case historyitem_Layout_SetXMode:
-            case historyitem_Layout_SetYMode:
-            case historyitem_Layout_SetLayoutTarget:
+            case AscDFH.historyitem_Layout_SetHMode:
+            case AscDFH.historyitem_Layout_SetWMode:
+            case AscDFH.historyitem_Layout_SetXMode:
+            case AscDFH.historyitem_Layout_SetYMode:
+            case AscDFH.historyitem_Layout_SetLayoutTarget:
             {
                 w.WriteBool(isRealNumber(data.newPr));
                 if(isRealNumber(data.newPr))
@@ -13781,7 +13781,7 @@ CLayout.prototype =
         var type = r.GetLong();
         switch (type)
         {
-            case historyitem_Layout_SetH:
+            case AscDFH.historyitem_Layout_SetH:
             {
                 if(r.GetBool())
                 {
@@ -13793,7 +13793,7 @@ CLayout.prototype =
                 }
                 break;
             }
-            case historyitem_Layout_SetHMode:
+            case AscDFH.historyitem_Layout_SetHMode:
             {
                 if(r.GetBool())
                 {
@@ -13805,7 +13805,7 @@ CLayout.prototype =
                 }
                 break
             }
-            case historyitem_Layout_SetLayoutTarget:
+            case AscDFH.historyitem_Layout_SetLayoutTarget:
             {
                 if(r.GetBool())
                 {
@@ -13817,7 +13817,7 @@ CLayout.prototype =
                 }
                 break
             }
-            case historyitem_Layout_SetW:
+            case AscDFH.historyitem_Layout_SetW:
             {
                 if(r.GetBool())
                 {
@@ -13829,7 +13829,7 @@ CLayout.prototype =
                 }
                 break
             }
-            case historyitem_Layout_SetWMode:
+            case AscDFH.historyitem_Layout_SetWMode:
             {
                 if(r.GetBool())
                 {
@@ -13841,7 +13841,7 @@ CLayout.prototype =
                 }
                 break
             }
-            case historyitem_Layout_SetX:
+            case AscDFH.historyitem_Layout_SetX:
             {
                 if(r.GetBool())
                 {
@@ -13853,7 +13853,7 @@ CLayout.prototype =
                 }
                 break
             }
-            case historyitem_Layout_SetXMode:
+            case AscDFH.historyitem_Layout_SetXMode:
             {
                 if(r.GetBool())
                 {
@@ -13865,7 +13865,7 @@ CLayout.prototype =
                 }
                 break
             }
-            case historyitem_Layout_SetY:
+            case AscDFH.historyitem_Layout_SetY:
             {
                 if(r.GetBool())
                 {
@@ -13877,7 +13877,7 @@ CLayout.prototype =
                 }
                 break
             }
-            case historyitem_Layout_SetYMode:
+            case AscDFH.historyitem_Layout_SetYMode:
             {
                 if(r.GetBool())
                 {
@@ -14158,17 +14158,17 @@ CLegend.prototype =
 
     getObjectType: function()
     {
-        return historyitem_type_Legend;
+        return AscDFH.historyitem_type_Legend;
     },
 
     setLayout: function(layout)
     {
-        History.Add(this, {Type: historyitem_Legend_SetLayout,oldPr: this.layout, newPr: layout});
+        History.Add(this, {Type: AscDFH.historyitem_Legend_SetLayout,oldPr: this.layout, newPr: layout});
         this.layout = layout;
     },
     addLegendEntry: function(legendEntry)
     {
-        History.Add(this, {Type: historyitem_Legend_AddLegendEntry, entry: legendEntry});
+        History.Add(this, {Type: AscDFH.historyitem_Legend_AddLegendEntry, entry: legendEntry});
         this.legendEntryes.push(legendEntry);
         legendEntry.parent = this;
     },
@@ -14182,7 +14182,7 @@ CLegend.prototype =
     },
     setLegendPos: function(legendPos)
     {
-        History.Add(this, {Type: historyitem_Legend_SetLegendPos,oldPr: this.legendPos, newPr: legendPos});
+        History.Add(this, {Type: AscDFH.historyitem_Legend_SetLegendPos,oldPr: this.legendPos, newPr: legendPos});
         this.legendPos = legendPos;
         if(this.parent && this.parent.parent)
         {
@@ -14191,7 +14191,7 @@ CLegend.prototype =
     },
     setOverlay: function(overlay)
     {
-        History.Add(this, {Type: historyitem_Legend_SetOverlay,oldPr: this.overlay, newPr: overlay});
+        History.Add(this, {Type: AscDFH.historyitem_Legend_SetOverlay,oldPr: this.overlay, newPr: overlay});
         this.overlay = overlay;
         if(this.parent && this.parent.parent)
         {
@@ -14200,12 +14200,12 @@ CLegend.prototype =
     },
     setSpPr: function(spPr)
     {
-        History.Add(this, {Type: historyitem_Legend_SetSpPr,oldPr: this.spPr, newPr: spPr});
+        History.Add(this, {Type: AscDFH.historyitem_Legend_SetSpPr,oldPr: this.spPr, newPr: spPr});
         this.spPr = spPr;
     },
     setTxPr: function(txPr)
     {
-        History.Add(this, {Type: historyitem_Legend_SetTxPr,oldPr: this.txPr, newPr: txPr});
+        History.Add(this, {Type: AscDFH.historyitem_Legend_SetTxPr,oldPr: this.txPr, newPr: txPr});
         this.txPr = txPr;
         if(txPr)
         {
@@ -14233,7 +14233,7 @@ CLegend.prototype =
 
     setParent: function(pr)
     {
-        History.Add(this, {Type: historyitem_CommonChartFormat_SetParent, oldPr: this.parent, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_CommonChartFormat_SetParent, oldPr: this.parent, newPr: pr});
         this.parent = pr;
     },
 
@@ -14241,17 +14241,17 @@ CLegend.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 this.parent = data.oldPr;
                 break;
             }
-            case historyitem_Legend_SetLayout:
+            case AscDFH.historyitem_Legend_SetLayout:
             {
                 this.layout = data.oldPr;
                 break;
             }
-            case historyitem_Legend_AddLegendEntry:
+            case AscDFH.historyitem_Legend_AddLegendEntry:
             {
                 for(var i = this.legendEntryes.length-1; i > -1; --i)
                 {
@@ -14263,7 +14263,7 @@ CLegend.prototype =
                 }
                 break;
             }
-            case historyitem_Legend_SetLegendPos:
+            case AscDFH.historyitem_Legend_SetLegendPos:
             {
                 this.legendPos = data.oldPr;
                 if(this.parent && this.parent.parent)
@@ -14272,7 +14272,7 @@ CLegend.prototype =
                 }
                 break;
             }
-            case historyitem_Legend_SetOverlay:
+            case AscDFH.historyitem_Legend_SetOverlay:
             {
                 this.overlay = data.oldPr;
                 if(this.parent && this.parent.parent)
@@ -14281,12 +14281,12 @@ CLegend.prototype =
                 }
                 break;
             }
-            case historyitem_Legend_SetSpPr:
+            case AscDFH.historyitem_Legend_SetSpPr:
             {
                 this.spPr = data.oldPr;
                 break;
             }
-            case historyitem_Legend_SetTxPr:
+            case AscDFH.historyitem_Legend_SetTxPr:
             {
                 this.txPr = data.oldPr;
                 break;
@@ -14298,24 +14298,24 @@ CLegend.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 this.parent = data.newPr;
                 break;
             }
 
-            case historyitem_Legend_SetLayout:
+            case AscDFH.historyitem_Legend_SetLayout:
             {
                 this.layout = data.newPr;
                 break;
             }
-            case historyitem_Legend_AddLegendEntry:
+            case AscDFH.historyitem_Legend_AddLegendEntry:
             {
                 this.legendEntryes.push(data.entry);
                 data.entry.parent = this;
                 break;
             }
-            case historyitem_Legend_SetLegendPos:
+            case AscDFH.historyitem_Legend_SetLegendPos:
             {
                 this.legendPos = data.newPr;
                 if(this.parent && this.parent.parent)
@@ -14324,7 +14324,7 @@ CLegend.prototype =
                 }
                 break;
             }
-            case historyitem_Legend_SetOverlay:
+            case AscDFH.historyitem_Legend_SetOverlay:
             {
                 this.overlay = data.newPr;
                 if(this.parent && this.parent.parent)
@@ -14333,12 +14333,12 @@ CLegend.prototype =
                 }
                 break;
             }
-            case historyitem_Legend_SetSpPr:
+            case AscDFH.historyitem_Legend_SetSpPr:
             {
                 this.spPr = data.newPr;
                 break;
             }
-            case historyitem_Legend_SetTxPr:
+            case AscDFH.historyitem_Legend_SetTxPr:
             {
                 this.txPr = data.newPr;
                 break;
@@ -14353,14 +14353,14 @@ CLegend.prototype =
         w.WriteLong(data.Type);
         switch (data.Type)
         {
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 writeObject(w, data.newPr);
                 break;
             }
-            case historyitem_Legend_SetLayout:
-            case historyitem_Legend_SetSpPr:
-            case historyitem_Legend_SetTxPr:
+            case AscDFH.historyitem_Legend_SetLayout:
+            case AscDFH.historyitem_Legend_SetSpPr:
+            case AscDFH.historyitem_Legend_SetTxPr:
             {
                 w.WriteBool(isRealObject(data.newPr));
                 if(isRealObject(data.newPr))
@@ -14369,7 +14369,7 @@ CLegend.prototype =
                 }
                 break;
             }
-            case historyitem_Legend_AddLegendEntry:
+            case AscDFH.historyitem_Legend_AddLegendEntry:
             {
                 w.WriteBool(isRealObject(data.entry));
                 if(isRealObject(data.entry))
@@ -14378,7 +14378,7 @@ CLegend.prototype =
                 }
                 break;
             }
-            case historyitem_Legend_SetLegendPos:
+            case AscDFH.historyitem_Legend_SetLegendPos:
             {
                 w.WriteBool(isRealNumber(data.newPr));
                 if(isRealNumber(data.newPr))
@@ -14387,7 +14387,7 @@ CLegend.prototype =
                 }
                 break;
             }
-            case historyitem_Legend_SetOverlay:
+            case AscDFH.historyitem_Legend_SetOverlay:
             {
                 w.WriteBool(isRealBool(data.newPr));
                 if(isRealBool(data.newPr))
@@ -14406,12 +14406,12 @@ CLegend.prototype =
         var type = r.GetLong();
         switch(type)
         {
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 this.parent = readObject(r);
                 break;
             }
-            case historyitem_Legend_SetLayout:
+            case AscDFH.historyitem_Legend_SetLayout:
             {
                 if(r.GetBool())
                 {
@@ -14423,7 +14423,7 @@ CLegend.prototype =
                 }
                 break;
             }
-            case historyitem_Legend_AddLegendEntry:
+            case AscDFH.historyitem_Legend_AddLegendEntry:
             {
                 if(r.GetBool())
                 {
@@ -14436,7 +14436,7 @@ CLegend.prototype =
                 }
                 break;
             }
-            case historyitem_Legend_SetLegendPos:
+            case AscDFH.historyitem_Legend_SetLegendPos:
             {
                 if(r.GetBool())
                 {
@@ -14452,7 +14452,7 @@ CLegend.prototype =
                 }
                 break;
             }
-            case historyitem_Legend_SetOverlay:
+            case AscDFH.historyitem_Legend_SetOverlay:
             {
                 if(r.GetBool())
                 {
@@ -14468,7 +14468,7 @@ CLegend.prototype =
                 }
                 break;
             }
-            case historyitem_Legend_SetSpPr:
+            case AscDFH.historyitem_Legend_SetSpPr:
             {
                 if(r.GetBool())
                 {
@@ -14480,7 +14480,7 @@ CLegend.prototype =
                 }
                 break;
             }
-            case historyitem_Legend_SetTxPr:
+            case AscDFH.historyitem_Legend_SetTxPr:
             {
                 if(r.GetBool())
                 {
@@ -14511,7 +14511,7 @@ CLegendEntry.prototype =
 {
     getObjectType: function()
     {
-        return historyitem_type_LegendEntry;
+        return AscDFH.historyitem_type_LegendEntry;
     },
 
     createDuplicate: function()
@@ -14546,12 +14546,12 @@ CLegendEntry.prototype =
 
     setDelete: function(pr)
     {
-        History.Add(this, {Type: historyitem_LegendEntry_SetDelete, oldPr: this.bDelete, newPr:pr});
+        History.Add(this, {Type: AscDFH.historyitem_LegendEntry_SetDelete, oldPr: this.bDelete, newPr:pr});
         this.bDelete = pr;
     },
     setIdx: function(pr)
     {
-        History.Add(this, {Type: historyitem_LegendEntry_SetIdx, oldPr: this.idx, newPr:pr});
+        History.Add(this, {Type: AscDFH.historyitem_LegendEntry_SetIdx, oldPr: this.idx, newPr:pr});
         this.idx = pr;
     },
 
@@ -14565,7 +14565,7 @@ CLegendEntry.prototype =
 
     setTxPr: function(pr)
     {
-        History.Add(this, {Type: historyitem_LegendEntry_SetTxPr, oldPr: this.txPr, newPr:pr});
+        History.Add(this, {Type: AscDFH.historyitem_LegendEntry_SetTxPr, oldPr: this.txPr, newPr:pr});
         this.txPr = pr;
         if(this.txPr)
         {
@@ -14577,17 +14577,17 @@ CLegendEntry.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_LegendEntry_SetDelete:
+            case AscDFH.historyitem_LegendEntry_SetDelete:
             {
                 this.bDelete = data.oldPr;
                 break;
             }
-            case historyitem_LegendEntry_SetIdx:
+            case AscDFH.historyitem_LegendEntry_SetIdx:
             {
                 this.idx = data.oldPr;
                 break;
             }
-            case historyitem_LegendEntry_SetTxPr:
+            case AscDFH.historyitem_LegendEntry_SetTxPr:
             {
                 this.txPr = data.oldPr;
                 break;
@@ -14599,17 +14599,17 @@ CLegendEntry.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_LegendEntry_SetDelete:
+            case AscDFH.historyitem_LegendEntry_SetDelete:
             {
                 this.bDelete = data.newPr;
                 break;
             }
-            case historyitem_LegendEntry_SetIdx:
+            case AscDFH.historyitem_LegendEntry_SetIdx:
             {
                 this.idx = data.newPr;
                 break;
             }
-            case historyitem_LegendEntry_SetTxPr:
+            case AscDFH.historyitem_LegendEntry_SetTxPr:
             {
                 this.txPr = data.newPr;
                 break;
@@ -14623,7 +14623,7 @@ CLegendEntry.prototype =
         w.WriteLong(data.Type);
         switch (data.Type)
         {
-            case historyitem_LegendEntry_SetDelete:
+            case AscDFH.historyitem_LegendEntry_SetDelete:
             {
                 w.WriteBool(isRealBool(data.newPr));
                 if(isRealBool(data.newPr))
@@ -14632,7 +14632,7 @@ CLegendEntry.prototype =
                 }
                 break;
             }
-            case historyitem_LegendEntry_SetIdx:
+            case AscDFH.historyitem_LegendEntry_SetIdx:
             {
                 w.WriteBool(isRealNumber(data.newPr));
                 if(isRealNumber(data.newPr))
@@ -14641,7 +14641,7 @@ CLegendEntry.prototype =
                 }
                 break;
             }
-            case historyitem_LegendEntry_SetTxPr:
+            case AscDFH.historyitem_LegendEntry_SetTxPr:
             {
                 w.WriteBool(isRealObject(data.newPr));
                 if(isRealObject(data.newPr))
@@ -14660,7 +14660,7 @@ CLegendEntry.prototype =
         var type = r.GetLong();
         switch (type)
         {
-            case historyitem_LegendEntry_SetDelete:
+            case AscDFH.historyitem_LegendEntry_SetDelete:
             {
                 if(r.GetBool())
                 {
@@ -14672,7 +14672,7 @@ CLegendEntry.prototype =
                 }
                 break;
             }
-            case historyitem_LegendEntry_SetIdx:
+            case AscDFH.historyitem_LegendEntry_SetIdx:
             {
                 if(r.GetBool())
                 {
@@ -14684,7 +14684,7 @@ CLegendEntry.prototype =
                 }
                 break;
             }
-            case historyitem_LegendEntry_SetTxPr:
+            case AscDFH.historyitem_LegendEntry_SetTxPr:
             {
                 if(r.GetBool())
                 {
@@ -14737,19 +14737,19 @@ CLineChart.prototype =
             return;
         switch (data.Type)
         {
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 break;
             }
-            case historyitem_CommonChart_RemoveSeries:
+            case AscDFH.historyitem_CommonChart_RemoveSeries:
             {
                 break;
             }
-            case historyitem_LineChart_AddAxId:
+            case AscDFH.historyitem_LineChart_AddAxId:
             {
                 break
             }
-            case historyitem_LineChart_SetDLbls:
+            case AscDFH.historyitem_LineChart_SetDLbls:
             {
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
                 {
@@ -14757,11 +14757,11 @@ CLineChart.prototype =
                 }
                 break
             }
-            case historyitem_LineChart_SetDropLines:
+            case AscDFH.historyitem_LineChart_SetDropLines:
             {
                 break
             }
-            case historyitem_LineChart_SetGrouping:
+            case AscDFH.historyitem_LineChart_SetGrouping:
             {
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
                 {
@@ -14769,19 +14769,11 @@ CLineChart.prototype =
                 }
                 break
             }
-            case historyitem_LineChart_SetHiLowLines:
+            case AscDFH.historyitem_LineChart_SetHiLowLines:
             {
                 break
             }
-            case historyitem_LineChart_SetMarker:
-            {
-                if(this.parent && this.parent.parent && this.parent.parent.parent)
-                {
-                    this.parent.parent.parent.handleUpdateType();
-                }
-                break
-            }
-            case historyitem_LineChart_AddSer:
+            case AscDFH.historyitem_LineChart_SetMarker:
             {
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
                 {
@@ -14789,7 +14781,7 @@ CLineChart.prototype =
                 }
                 break
             }
-            case historyitem_LineChart_SetSmooth:
+            case AscDFH.historyitem_LineChart_AddSer:
             {
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
                 {
@@ -14797,11 +14789,19 @@ CLineChart.prototype =
                 }
                 break
             }
-            case historyitem_LineChart_SetUpDownBars:
+            case AscDFH.historyitem_LineChart_SetSmooth:
+            {
+                if(this.parent && this.parent.parent && this.parent.parent.parent)
+                {
+                    this.parent.parent.parent.handleUpdateType();
+                }
+                break
+            }
+            case AscDFH.historyitem_LineChart_SetUpDownBars:
             {
                 break
             }
-            case historyitem_LineChart_SetVaryColors:
+            case AscDFH.historyitem_LineChart_SetVaryColors:
             {
                 break
             }
@@ -14812,7 +14812,7 @@ CLineChart.prototype =
     {
         if(this.series[idx])
         {
-            History.Add(this, {Type: historyitem_CommonChart_RemoveSeries, oldPr: idx, newPr: this.series.splice(idx, 1)[0]});
+            History.Add(this, {Type: AscDFH.historyitem_CommonChart_RemoveSeries, oldPr: idx, newPr: this.series.splice(idx, 1)[0]});
         }
     },
 
@@ -14830,7 +14830,7 @@ CLineChart.prototype =
 
     getObjectType: function()
     {
-        return  historyitem_type_LineChart;
+        return  AscDFH.historyitem_type_LineChart;
     },
 
     createDuplicate: function()
@@ -14944,13 +14944,13 @@ CLineChart.prototype =
     {
         if(!pr)
             return;
-        History.Add(this, {Type: historyitem_LineChart_AddAxId, newPr:pr});
+        History.Add(this, {Type: AscDFH.historyitem_LineChart_AddAxId, newPr:pr});
         this.axId.push(pr);
     },
 
     setDLbls: function(pr)
     {
-        History.Add(this, {Type: historyitem_LineChart_SetDLbls, oldPr: this.dLbls, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_LineChart_SetDLbls, oldPr: this.dLbls, newPr: pr});
         this.dLbls = pr;
         if(this.dLbls)
         {
@@ -14964,12 +14964,12 @@ CLineChart.prototype =
 
     setDropLines: function(pr)
     {
-        History.Add(this, {Type: historyitem_LineChart_SetDropLines, oldPr: this.dropLines, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_LineChart_SetDropLines, oldPr: this.dropLines, newPr: pr});
         this.dropLines = pr;
     },
     setGrouping: function(pr)
     {
-        History.Add(this, {Type: historyitem_LineChart_SetGrouping, oldPr: this.grouping, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_LineChart_SetGrouping, oldPr: this.grouping, newPr: pr});
         this.grouping = pr;
         if(this.parent && this.parent.parent && this.parent.parent.parent)
         {
@@ -14978,12 +14978,12 @@ CLineChart.prototype =
     },
     setHiLowLines: function(pr)
     {
-        History.Add(this, {Type: historyitem_LineChart_SetHiLowLines, oldPr: this.hiLowLines, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_LineChart_SetHiLowLines, oldPr: this.hiLowLines, newPr: pr});
         this.hiLowLines = pr;
     },
     setMarker: function(pr)
     {
-        History.Add(this, {Type: historyitem_LineChart_SetMarker, oldPr: this.marker, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_LineChart_SetMarker, oldPr: this.marker, newPr: pr});
         this.marker = pr;
         if(this.parent && this.parent.parent && this.parent.parent.parent)
         {
@@ -14992,7 +14992,7 @@ CLineChart.prototype =
     },
     addSer: function(ser)
     {
-        History.Add(this, {Type: historyitem_LineChart_AddSer, newPr: ser});
+        History.Add(this, {Type: AscDFH.historyitem_LineChart_AddSer, newPr: ser});
         this.series.push(ser);
         ser.setParent(this);
         if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -15002,7 +15002,7 @@ CLineChart.prototype =
     },
     setSmooth: function(pr)
     {
-        History.Add(this, {Type: historyitem_LineChart_SetSmooth, oldPr: this.smooth, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_LineChart_SetSmooth, oldPr: this.smooth, newPr: pr});
         this.smooth = pr;
         if(this.parent && this.parent.parent && this.parent.parent.parent)
         {
@@ -15011,7 +15011,7 @@ CLineChart.prototype =
     },
     setUpDownBars: function(pr)
     {
-        History.Add(this, {Type: historyitem_LineChart_SetUpDownBars, oldPr: this.upDownBars, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_LineChart_SetUpDownBars, oldPr: this.upDownBars, newPr: pr});
         this.upDownBars = pr;
         if(pr && pr.setParent)
         {
@@ -15020,13 +15020,13 @@ CLineChart.prototype =
     },
     setVaryColors: function(pr)
     {
-        History.Add(this, {Type: historyitem_LineChart_SetVaryColors, oldPr: this.varyColors, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_LineChart_SetVaryColors, oldPr: this.varyColors, newPr: pr});
         this.varyColors = pr;
     },
 
     setParent: function(pr)
     {
-        History.Add(this, {Type: historyitem_CommonChartFormat_SetParent, oldPr: this.parent, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_CommonChartFormat_SetParent, oldPr: this.parent, newPr: pr});
         this.parent = pr;
     },
 
@@ -15034,17 +15034,17 @@ CLineChart.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 this.parent = data.oldPr;
                 break;
             }
-            case historyitem_CommonChart_RemoveSeries:
+            case AscDFH.historyitem_CommonChart_RemoveSeries:
             {
                 this.series.splice(data.oldPr, 0, data.newPr);
                 break;
             }
-            case historyitem_LineChart_AddAxId:
+            case AscDFH.historyitem_LineChart_AddAxId:
             {
                 for(var i = this.axId.length-1; i > -1; --i)
                 {
@@ -15056,7 +15056,7 @@ CLineChart.prototype =
                 }
                 break
             }
-            case historyitem_LineChart_SetDLbls:
+            case AscDFH.historyitem_LineChart_SetDLbls:
             {
                 this.dLbls = data.oldPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -15065,12 +15065,12 @@ CLineChart.prototype =
                 }
                 break
             }
-            case historyitem_LineChart_SetDropLines:
+            case AscDFH.historyitem_LineChart_SetDropLines:
             {
                 this.dropLines = data.oldPr;
                 break
             }
-            case historyitem_LineChart_SetGrouping:
+            case AscDFH.historyitem_LineChart_SetGrouping:
             {
                 this.grouping = data.oldPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -15079,12 +15079,12 @@ CLineChart.prototype =
                 }
                 break
             }
-            case historyitem_LineChart_SetHiLowLines:
+            case AscDFH.historyitem_LineChart_SetHiLowLines:
             {
                 this.hiLowLines = data.oldPr;
                 break
             }
-            case historyitem_LineChart_SetMarker:
+            case AscDFH.historyitem_LineChart_SetMarker:
             {
                 this.marker = data.oldPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -15093,7 +15093,7 @@ CLineChart.prototype =
                 }
                 break
             }
-            case historyitem_LineChart_AddSer:
+            case AscDFH.historyitem_LineChart_AddSer:
             {
                 for(var i = this.series.length - 1; i > -1; --i)
                 {
@@ -15109,7 +15109,7 @@ CLineChart.prototype =
                 }
                 break
             }
-            case historyitem_LineChart_SetSmooth:
+            case AscDFH.historyitem_LineChart_SetSmooth:
             {
                 this.smooth = data.oldPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -15118,12 +15118,12 @@ CLineChart.prototype =
                 }
                 break
             }
-            case historyitem_LineChart_SetUpDownBars:
+            case AscDFH.historyitem_LineChart_SetUpDownBars:
             {
                 this.upDownBars = data.oldPr;
                 break
             }
-            case historyitem_LineChart_SetVaryColors:
+            case AscDFH.historyitem_LineChart_SetVaryColors:
             {
                 this.varyColors = data.oldPr;
                 break
@@ -15135,22 +15135,22 @@ CLineChart.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 this.parent = data.newPr;
                 break;
             }
-            case historyitem_CommonChart_RemoveSeries:
+            case AscDFH.historyitem_CommonChart_RemoveSeries:
             {
                 this.series.splice(data.oldPr, 1);
                 break;
             }
-            case historyitem_LineChart_AddAxId:
+            case AscDFH.historyitem_LineChart_AddAxId:
             {
                 this.axId.push(data.newPr);
                 break
             }
-            case historyitem_LineChart_SetDLbls:
+            case AscDFH.historyitem_LineChart_SetDLbls:
             {
                 this.dLbls = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -15159,12 +15159,12 @@ CLineChart.prototype =
                 }
                 break
             }
-            case historyitem_LineChart_SetDropLines:
+            case AscDFH.historyitem_LineChart_SetDropLines:
             {
                 this.dropLines = data.newPr;
                 break
             }
-            case historyitem_LineChart_SetGrouping:
+            case AscDFH.historyitem_LineChart_SetGrouping:
             {
                 this.grouping = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -15173,12 +15173,12 @@ CLineChart.prototype =
                 }
                 break
             }
-            case historyitem_LineChart_SetHiLowLines:
+            case AscDFH.historyitem_LineChart_SetHiLowLines:
             {
                 this.hiLowLines = data.newPr;
                 break
             }
-            case historyitem_LineChart_SetMarker:
+            case AscDFH.historyitem_LineChart_SetMarker:
             {
                 this.marker = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -15187,7 +15187,7 @@ CLineChart.prototype =
                 }
                 break
             }
-            case historyitem_LineChart_AddSer:
+            case AscDFH.historyitem_LineChart_AddSer:
             {
                 this.series.push(data.newPr);
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -15196,7 +15196,7 @@ CLineChart.prototype =
                 }
                 break
             }
-            case historyitem_LineChart_SetSmooth:
+            case AscDFH.historyitem_LineChart_SetSmooth:
             {
                 this.smooth = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -15205,12 +15205,12 @@ CLineChart.prototype =
                 }
                 break
             }
-            case historyitem_LineChart_SetUpDownBars:
+            case AscDFH.historyitem_LineChart_SetUpDownBars:
             {
                 this.upDownBars = data.newPr;
                 break
             }
-            case historyitem_LineChart_SetVaryColors:
+            case AscDFH.historyitem_LineChart_SetVaryColors:
             {
                 this.varyColors = data.newPr;
                 break
@@ -15223,34 +15223,34 @@ CLineChart.prototype =
         w.WriteLong(data.Type);
         switch (data.Type)
         {
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 writeObject(w, data.newPr);
                 break;
             }
-            case historyitem_CommonChart_RemoveSeries:
+            case AscDFH.historyitem_CommonChart_RemoveSeries:
             {
                 writeLong(w, data.oldPr);
                 break;
             }
-            case historyitem_LineChart_AddAxId:
-            case historyitem_LineChart_SetDLbls:
-            case historyitem_LineChart_SetDropLines:
-            case historyitem_LineChart_SetHiLowLines:
-            case historyitem_LineChart_AddSer:
-            case historyitem_LineChart_SetUpDownBars:
+            case AscDFH.historyitem_LineChart_AddAxId:
+            case AscDFH.historyitem_LineChart_SetDLbls:
+            case AscDFH.historyitem_LineChart_SetDropLines:
+            case AscDFH.historyitem_LineChart_SetHiLowLines:
+            case AscDFH.historyitem_LineChart_AddSer:
+            case AscDFH.historyitem_LineChart_SetUpDownBars:
             {
                 writeObject(w, data.newPr);
                 break
             }
-            case historyitem_LineChart_SetGrouping:
+            case AscDFH.historyitem_LineChart_SetGrouping:
             {
                 writeLong(w, data.newPr);
                 break
             }
-            case historyitem_LineChart_SetMarker:
-            case historyitem_LineChart_SetSmooth:
-            case historyitem_LineChart_SetVaryColors:
+            case AscDFH.historyitem_LineChart_SetMarker:
+            case AscDFH.historyitem_LineChart_SetSmooth:
+            case AscDFH.historyitem_LineChart_SetVaryColors:
             {
                 writeBool(w, data.newPr);
                 break
@@ -15263,18 +15263,18 @@ CLineChart.prototype =
         var type = r.GetLong();
         switch (type)
         {
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 this.parent = readObject(r);
                 break;
             }
-            case historyitem_CommonChart_RemoveSeries:
+            case AscDFH.historyitem_CommonChart_RemoveSeries:
             {
                 var pos = readLong(r);
                 this.series.splice(pos, 1);
                 break;
             }
-            case historyitem_LineChart_AddAxId:
+            case AscDFH.historyitem_LineChart_AddAxId:
             {
                 var ax = readObject(r);
                 if(isRealObject(ax))
@@ -15283,7 +15283,7 @@ CLineChart.prototype =
                 }
                 break
             }
-            case historyitem_LineChart_SetDLbls:
+            case AscDFH.historyitem_LineChart_SetDLbls:
             {
                 this.dLbls = readObject(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -15292,12 +15292,12 @@ CLineChart.prototype =
                 }
                 break
             }
-            case historyitem_LineChart_SetDropLines:
+            case AscDFH.historyitem_LineChart_SetDropLines:
             {
                 this.dropLines = readObject(r);
                 break
             }
-            case historyitem_LineChart_SetGrouping:
+            case AscDFH.historyitem_LineChart_SetGrouping:
             {
                 this.grouping = readLong(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -15306,12 +15306,12 @@ CLineChart.prototype =
                 }
                 break
             }
-            case historyitem_LineChart_SetHiLowLines:
+            case AscDFH.historyitem_LineChart_SetHiLowLines:
             {
                 this.hiLowLines = readObject(r);
                 break
             }
-            case historyitem_LineChart_SetMarker:
+            case AscDFH.historyitem_LineChart_SetMarker:
             {
                 this.marker = readBool(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -15320,7 +15320,7 @@ CLineChart.prototype =
                 }
                 break
             }
-            case historyitem_LineChart_AddSer:
+            case AscDFH.historyitem_LineChart_AddSer:
             {
                 var ser = readObject(r);
                 if(isRealObject(ser))
@@ -15333,7 +15333,7 @@ CLineChart.prototype =
                 }
                 break
             }
-            case historyitem_LineChart_SetSmooth:
+            case AscDFH.historyitem_LineChart_SetSmooth:
             {
                 this.smooth = readBool(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -15342,12 +15342,12 @@ CLineChart.prototype =
                 }
                 break
             }
-            case historyitem_LineChart_SetUpDownBars:
+            case AscDFH.historyitem_LineChart_SetUpDownBars:
             {
                 this.upDownBars = readObject(r);
                 break
             }
-            case historyitem_LineChart_SetVaryColors:
+            case AscDFH.historyitem_LineChart_SetVaryColors:
             {
                 this.varyColors = readBool(r);
                 break
@@ -15386,7 +15386,7 @@ CLineSeries.prototype =
 
     setParent: function(pr)
     {
-        History.Add(this, {Type: historyitem_CommonChartFormat_SetParent, oldPr: this.parent, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_CommonChartFormat_SetParent, oldPr: this.parent, newPr: pr});
         this.parent = pr;
     },
 
@@ -15395,7 +15395,7 @@ CLineSeries.prototype =
     {
         if(this.dPt[idx])
         {
-            History.Add(this, {Type: historyitem_CommonSeries_RemoveDPt, idx: idx, pt: this.dPt[idx]});
+            History.Add(this, {Type: AscDFH.historyitem_CommonSeries_RemoveDPt, idx: idx, pt: this.dPt[idx]});
             this.dPt.splice(idx, 1);
         }
     },
@@ -15449,7 +15449,7 @@ CLineSeries.prototype =
 
     getObjectType: function()
     {
-        return historyitem_type_LineSeries;
+        return AscDFH.historyitem_type_LineSeries;
     },
 
     documentCreateFontMap: CAreaSeries.prototype.documentCreateFontMap,
@@ -15520,12 +15520,12 @@ CLineSeries.prototype =
 
     setCat: function(pr)
     {
-        History.Add(this, {Type: historyitem_LineSeries_SetCat, oldPr: this.cat, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_LineSeries_SetCat, oldPr: this.cat, newPr: pr});
         this.cat = pr;
     },
     setDLbls: function(pr)
     {
-        History.Add(this, {Type: historyitem_LineSeries_SetDLbls, oldPr: this.dLbls, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_LineSeries_SetDLbls, oldPr: this.dLbls, newPr: pr});
         this.dLbls = pr;
         if(this.dLbls)
         {
@@ -15534,22 +15534,22 @@ CLineSeries.prototype =
     },
     addDPt: function(pr)
     {
-        History.Add(this, {Type: historyitem_LineSeries_SetDPt, oldPr: this.dPt, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_LineSeries_SetDPt, oldPr: this.dPt, newPr: pr});
         this.dPt.push(pr);
     },
     setErrBars: function(pr)
     {
-        History.Add(this, {Type: historyitem_LineSeries_SetErrBars, oldPr: this.errBars, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_LineSeries_SetErrBars, oldPr: this.errBars, newPr: pr});
         this.errBars = pr;
     },
     setIdx: function(pr)
     {
-        History.Add(this, {Type: historyitem_LineSeries_SetIdx, oldPr: this.idx, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_LineSeries_SetIdx, oldPr: this.idx, newPr: pr});
         this.idx = pr;
     },
     setMarker: function(pr)
     {
-        History.Add(this, {Type: historyitem_LineSeries_SetMarker, oldPr: this.marker, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_LineSeries_SetMarker, oldPr: this.marker, newPr: pr});
         this.marker = pr;
         if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateInternalChart)
         {
@@ -15558,12 +15558,12 @@ CLineSeries.prototype =
     },
     setOrder: function(pr)
     {
-        History.Add(this, {Type: historyitem_LineSeries_SetOrder, oldPr: this.order, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_LineSeries_SetOrder, oldPr: this.order, newPr: pr});
         this.order = pr;
     },
     setSmooth: function(pr)
     {
-        History.Add(this, {Type: historyitem_LineSeries_SetSmooth, oldPr: this.smooth, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_LineSeries_SetSmooth, oldPr: this.smooth, newPr: pr});
         this.smooth = pr;
         if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateInternalChart)
         {
@@ -15572,7 +15572,7 @@ CLineSeries.prototype =
     },
     setSpPr: function(pr)
     {
-        History.Add(this, {Type: historyitem_LineSeries_SetSpPr, oldPr: this.spPr, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_LineSeries_SetSpPr, oldPr: this.spPr, newPr: pr});
         this.spPr = pr;
         if(this.spPr && this.spPr.parent !== this)
         {
@@ -15581,17 +15581,17 @@ CLineSeries.prototype =
     },
     setTrendline: function(pr)
     {
-        History.Add(this, {Type: historyitem_LineSeries_SetTrendline, oldPr: this.trendline, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_LineSeries_SetTrendline, oldPr: this.trendline, newPr: pr});
         this.trendline = pr;
     },
     setTx: function(pr)
     {
-        History.Add(this, {Type: historyitem_LineSeries_SetTx, oldPr: this.tx, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_LineSeries_SetTx, oldPr: this.tx, newPr: pr});
         this.tx = pr;
     },
     setVal: function(pr)
     {
-        History.Add(this, {Type: historyitem_LineSeries_SetVal, oldPr: this.val, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_LineSeries_SetVal, oldPr: this.val, newPr: pr});
         this.val = pr;
         if(this.val && this.val.setParent)
         {
@@ -15611,22 +15611,22 @@ CLineSeries.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 this.parent = data.oldPr;
                 break;
             }
-            case historyitem_CommonSeries_RemoveDPt:
+            case AscDFH.historyitem_CommonSeries_RemoveDPt:
             {
                 this.dPt.splice(data.idx, 0, data.pt);
                 break;
             }
-            case historyitem_LineSeries_SetCat:
+            case AscDFH.historyitem_LineSeries_SetCat:
             {
                 this.cat = data.oldPr;
                 break;
             }
-            case historyitem_LineSeries_SetDLbls:
+            case AscDFH.historyitem_LineSeries_SetDLbls:
             {
                 this.dLbls = data.oldPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateDataLabels)
@@ -15635,22 +15635,22 @@ CLineSeries.prototype =
                 }
                 break;
             }
-            case historyitem_LineSeries_SetDPt:
+            case AscDFH.historyitem_LineSeries_SetDPt:
             {
                 findPrAndRemove(this.dPt, data.newPr);
                 break;
             }
-            case historyitem_LineSeries_SetErrBars:
+            case AscDFH.historyitem_LineSeries_SetErrBars:
             {
                 this.errBars = data.oldPr;
                 break;
             }
-            case historyitem_LineSeries_SetIdx:
+            case AscDFH.historyitem_LineSeries_SetIdx:
             {
                 this.idx = data.oldPr;
                 break;
             }
-            case historyitem_LineSeries_SetMarker:
+            case AscDFH.historyitem_LineSeries_SetMarker:
             {
                 this.marker = data.oldPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateInternalChart)
@@ -15659,12 +15659,12 @@ CLineSeries.prototype =
                 }
                 break;
             }
-            case historyitem_LineSeries_SetOrder:
+            case AscDFH.historyitem_LineSeries_SetOrder:
             {
                 this.order = data.oldPr;
                 break;
             }
-            case historyitem_LineSeries_SetSmooth:
+            case AscDFH.historyitem_LineSeries_SetSmooth:
             {
                 this.smooth = data.oldPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateInternalChart)
@@ -15673,22 +15673,22 @@ CLineSeries.prototype =
                 }
                 break;
             }
-            case historyitem_LineSeries_SetSpPr:
+            case AscDFH.historyitem_LineSeries_SetSpPr:
             {
                 this.spPr = data.oldPr;
                 break;
             }
-            case historyitem_LineSeries_SetTrendline:
+            case AscDFH.historyitem_LineSeries_SetTrendline:
             {
                 this.trendline = data.oldPr;
                 break;
             }
-            case historyitem_LineSeries_SetTx:
+            case AscDFH.historyitem_LineSeries_SetTx:
             {
                 this.tx = data.oldPr;
                 break;
             }
-            case historyitem_LineSeries_SetVal:
+            case AscDFH.historyitem_LineSeries_SetVal:
             {
                 this.val = data.oldPr;
                 break;
@@ -15700,22 +15700,22 @@ CLineSeries.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 this.parent = data.newPr;
                 break;
             }
-            case historyitem_CommonSeries_RemoveDPt:
+            case AscDFH.historyitem_CommonSeries_RemoveDPt:
             {
                 this.dPt.splice(data.idx, 1);
                 break;
             }
-            case historyitem_LineSeries_SetCat:
+            case AscDFH.historyitem_LineSeries_SetCat:
             {
                 this.cat = data.newPr;
                 break;
             }
-            case historyitem_LineSeries_SetDLbls:
+            case AscDFH.historyitem_LineSeries_SetDLbls:
             {
                 this.dLbls = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateDataLabels)
@@ -15724,22 +15724,22 @@ CLineSeries.prototype =
                 }
                 break;
             }
-            case historyitem_LineSeries_SetDPt:
+            case AscDFH.historyitem_LineSeries_SetDPt:
             {
                 this.dPt.push(data.newPr);
                 break;
             }
-            case historyitem_LineSeries_SetErrBars:
+            case AscDFH.historyitem_LineSeries_SetErrBars:
             {
                 this.errBars = data.newPr;
                 break;
             }
-            case historyitem_LineSeries_SetIdx:
+            case AscDFH.historyitem_LineSeries_SetIdx:
             {
                 this.idx = data.newPr;
                 break;
             }
-            case historyitem_LineSeries_SetMarker:
+            case AscDFH.historyitem_LineSeries_SetMarker:
             {
                 this.marker = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateInternalChart)
@@ -15748,12 +15748,12 @@ CLineSeries.prototype =
                 }
                 break;
             }
-            case historyitem_LineSeries_SetOrder:
+            case AscDFH.historyitem_LineSeries_SetOrder:
             {
                 this.order = data.newPr;
                 break;
             }
-            case historyitem_LineSeries_SetSmooth:
+            case AscDFH.historyitem_LineSeries_SetSmooth:
             {
                 this.smooth = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateInternalChart)
@@ -15762,22 +15762,22 @@ CLineSeries.prototype =
                 }
                 break;
             }
-            case historyitem_LineSeries_SetSpPr:
+            case AscDFH.historyitem_LineSeries_SetSpPr:
             {
                 this.spPr = data.newPr;
                 break;
             }
-            case historyitem_LineSeries_SetTrendline:
+            case AscDFH.historyitem_LineSeries_SetTrendline:
             {
                 this.trendline = data.newPr;
                 break;
             }
-            case historyitem_LineSeries_SetTx:
+            case AscDFH.historyitem_LineSeries_SetTx:
             {
                 this.tx = data.newPr;
                 break;
             }
-            case historyitem_LineSeries_SetVal:
+            case AscDFH.historyitem_LineSeries_SetVal:
             {
                 this.val = data.newPr;
                 break;
@@ -15790,36 +15790,36 @@ CLineSeries.prototype =
         w.WriteLong(data.Type);
         switch (data.Type)
         {
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 writeObject(w, data.newPr);
                 break;
             }
-            case historyitem_LineSeries_SetCat:
-            case historyitem_LineSeries_SetDLbls:
-            case historyitem_LineSeries_SetDPt:
-            case historyitem_LineSeries_SetErrBars:
-            case historyitem_LineSeries_SetMarker:
-            case historyitem_LineSeries_SetSpPr:
-            case historyitem_LineSeries_SetTrendline:
-            case historyitem_LineSeries_SetTx:
-            case historyitem_LineSeries_SetVal:
+            case AscDFH.historyitem_LineSeries_SetCat:
+            case AscDFH.historyitem_LineSeries_SetDLbls:
+            case AscDFH.historyitem_LineSeries_SetDPt:
+            case AscDFH.historyitem_LineSeries_SetErrBars:
+            case AscDFH.historyitem_LineSeries_SetMarker:
+            case AscDFH.historyitem_LineSeries_SetSpPr:
+            case AscDFH.historyitem_LineSeries_SetTrendline:
+            case AscDFH.historyitem_LineSeries_SetTx:
+            case AscDFH.historyitem_LineSeries_SetVal:
             {
                 writeObject(w, data.newPr);
                 break;
             }
-            case historyitem_LineSeries_SetIdx:
-            case historyitem_LineSeries_SetOrder:
+            case AscDFH.historyitem_LineSeries_SetIdx:
+            case AscDFH.historyitem_LineSeries_SetOrder:
             {
                 writeLong(w, data.newPr);
                 break;
             }
-            case historyitem_LineSeries_SetSmooth:
+            case AscDFH.historyitem_LineSeries_SetSmooth:
             {
                 writeBool(w, data.newPr);
                 break;
             }
-            case historyitem_CommonSeries_RemoveDPt:
+            case AscDFH.historyitem_CommonSeries_RemoveDPt:
             {
                 writeLong(w, data.idx);
                 break;
@@ -15832,17 +15832,17 @@ CLineSeries.prototype =
         var type = r.GetLong();
         switch (type)
         {
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 this.parent = readObject(r);
                 break;
             }
-            case historyitem_LineSeries_SetCat:
+            case AscDFH.historyitem_LineSeries_SetCat:
             {
                 this.cat = readObject(r);
                 break;
             }
-            case historyitem_LineSeries_SetDLbls:
+            case AscDFH.historyitem_LineSeries_SetDLbls:
             {
                 this.dLbls = readObject(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateDataLabels)
@@ -15851,22 +15851,22 @@ CLineSeries.prototype =
                 }
                 break;
             }
-            case historyitem_LineSeries_SetDPt:
+            case AscDFH.historyitem_LineSeries_SetDPt:
             {
                 this.dPt.push(readObject(r));
                 break;
             }
-            case historyitem_LineSeries_SetErrBars:
+            case AscDFH.historyitem_LineSeries_SetErrBars:
             {
                 this.errBars = readObject(r);
                 break;
             }
-            case historyitem_LineSeries_SetIdx:
+            case AscDFH.historyitem_LineSeries_SetIdx:
             {
                 this.idx = readLong(r);
                 break;
             }
-            case historyitem_LineSeries_SetMarker:
+            case AscDFH.historyitem_LineSeries_SetMarker:
             {
                 this.marker = readObject(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateInternalChart)
@@ -15875,12 +15875,12 @@ CLineSeries.prototype =
                 }
                 break;
             }
-            case historyitem_LineSeries_SetOrder:
+            case AscDFH.historyitem_LineSeries_SetOrder:
             {
                 this.order = readLong(r);
                 break;
             }
-            case historyitem_LineSeries_SetSmooth:
+            case AscDFH.historyitem_LineSeries_SetSmooth:
             {
                 this.smooth = readBool(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateInternalChart)
@@ -15889,27 +15889,27 @@ CLineSeries.prototype =
                 }
                 break;
             }
-            case historyitem_LineSeries_SetSpPr:
+            case AscDFH.historyitem_LineSeries_SetSpPr:
             {
                 this.spPr = readObject(r);
                 break;
             }
-            case historyitem_LineSeries_SetTrendline:
+            case AscDFH.historyitem_LineSeries_SetTrendline:
             {
                 this.trendline = readObject(r);
                 break;
             }
-            case historyitem_LineSeries_SetTx:
+            case AscDFH.historyitem_LineSeries_SetTx:
             {
                 this.tx = readObject(r);
                 break;
             }
-            case historyitem_LineSeries_SetVal:
+            case AscDFH.historyitem_LineSeries_SetVal:
             {
                 this.val = readObject(r);
                 break;
             }
-            case historyitem_CommonSeries_RemoveDPt:
+            case AscDFH.historyitem_CommonSeries_RemoveDPt:
             {
                 var pos = readLong(r);
                 if(isRealNumber(pos))
@@ -15969,7 +15969,7 @@ CMarker.prototype =
 
     getObjectType: function()
     {
-        return historyitem_type_Marker;
+        return AscDFH.historyitem_type_Marker;
     },
 
     Write_ToBinary2: function(w)
@@ -16026,19 +16026,19 @@ CMarker.prototype =
 
     setSize: function(pr)
     {
-        History.Add(this, {Type: historyitem_Marker_SetSize, oldPr: this.size, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_Marker_SetSize, oldPr: this.size, newPr: pr});
         this.size = pr;
     },
 
     setSpPr: function(pr)
     {
-        History.Add(this, {Type: historyitem_Marker_SetSpPr, oldPr: this.spPr, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_Marker_SetSpPr, oldPr: this.spPr, newPr: pr});
         this.spPr = pr;
     },
 
     setSymbol: function(pr)
     {
-        History.Add(this, {Type: historyitem_Marker_SetSymbol, oldPr: this.symbol, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_Marker_SetSymbol, oldPr: this.symbol, newPr: pr});
         this.symbol = pr;
     },
 
@@ -16046,17 +16046,17 @@ CMarker.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_Marker_SetSize:
+            case AscDFH.historyitem_Marker_SetSize:
             {
                 this.size = data.oldPr;
                 break;
             }
-            case historyitem_Marker_SetSpPr:
+            case AscDFH.historyitem_Marker_SetSpPr:
             {
                 this.spPr = data.oldPr;
                 break;
             }
-            case historyitem_Marker_SetSymbol:
+            case AscDFH.historyitem_Marker_SetSymbol:
             {
                 this.symbol = data.oldPr;
                 break;
@@ -16068,17 +16068,17 @@ CMarker.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_Marker_SetSize:
+            case AscDFH.historyitem_Marker_SetSize:
             {
                 this.size = data.newPr;
                 break;
             }
-            case historyitem_Marker_SetSpPr:
+            case AscDFH.historyitem_Marker_SetSpPr:
             {
                 this.spPr = data.newPr;
                 break;
             }
-            case historyitem_Marker_SetSymbol:
+            case AscDFH.historyitem_Marker_SetSymbol:
             {
                 this.symbol = data.newPr;
                 break;
@@ -16091,8 +16091,8 @@ CMarker.prototype =
         w.WriteLong(data.Type);
         switch (data.Type)
         {
-            case historyitem_Marker_SetSize:
-            case historyitem_Marker_SetSymbol:
+            case AscDFH.historyitem_Marker_SetSize:
+            case AscDFH.historyitem_Marker_SetSymbol:
             {
                 w.WriteBool(isRealNumber(data.newPr));
                 if(isRealNumber(data.newPr))
@@ -16101,7 +16101,7 @@ CMarker.prototype =
                 }
                 break;
             }
-            case historyitem_Marker_SetSpPr:
+            case AscDFH.historyitem_Marker_SetSpPr:
             {
                 w.WriteBool(isRealObject(data.newPr));
                 if(isRealObject(data.newPr))
@@ -16118,7 +16118,7 @@ CMarker.prototype =
         var type = r.GetLong();
         switch (type)
         {
-            case historyitem_Marker_SetSize:
+            case AscDFH.historyitem_Marker_SetSize:
             {
                 if(r.GetBool())
                 {
@@ -16130,7 +16130,7 @@ CMarker.prototype =
                 }
                 break;
             }
-            case historyitem_Marker_SetSpPr:
+            case AscDFH.historyitem_Marker_SetSpPr:
             {
                 if(r.GetBool())
                 {
@@ -16142,7 +16142,7 @@ CMarker.prototype =
                 }
                 break;
             }
-            case historyitem_Marker_SetSymbol:
+            case AscDFH.historyitem_Marker_SetSymbol:
             {
                 if(r.GetBool())
                 {
@@ -16195,7 +16195,7 @@ CMinusPlus.prototype =
 
     getObjectType: function()
     {
-        return historyitem_type_MinusPlus;
+        return AscDFH.historyitem_type_MinusPlus;
     },
 
     Write_ToBinary2: function(w)
@@ -16212,13 +16212,13 @@ CMinusPlus.prototype =
 
     setNumLit: function(pr)
     {
-        History.Add(this, {Type: historyitem_MinusPlus_SetnNumLit, oldPr: this.numLit, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_MinusPlus_SetnNumLit, oldPr: this.numLit, newPr: pr});
         this.numLit = pr;
     },
 
     setNumRef: function(pr)
     {
-        History.Add(this, {Type: historyitem_MinusPlus_SetnNumRef, oldPr: this.numRef, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_MinusPlus_SetnNumRef, oldPr: this.numRef, newPr: pr});
         this.numRef = pr;
     },
 
@@ -16226,12 +16226,12 @@ CMinusPlus.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_MinusPlus_SetnNumLit:
+            case AscDFH.historyitem_MinusPlus_SetnNumLit:
             {
                 this.numLit = data.oldPr;
                 break;
             }
-            case historyitem_MinusPlus_SetnNumRef:
+            case AscDFH.historyitem_MinusPlus_SetnNumRef:
             {
                 this.numRef = data.oldPr;
                 break;
@@ -16243,12 +16243,12 @@ CMinusPlus.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_MinusPlus_SetnNumLit:
+            case AscDFH.historyitem_MinusPlus_SetnNumLit:
             {
                 this.numLit = data.newPr;
                 break;
             }
-            case historyitem_MinusPlus_SetnNumRef:
+            case AscDFH.historyitem_MinusPlus_SetnNumRef:
             {
                 this.numRef = data.newPr;
                 break;
@@ -16261,8 +16261,8 @@ CMinusPlus.prototype =
         w.WriteLong(data.Type);
         switch (data.Type)
         {
-            case historyitem_MinusPlus_SetnNumLit:
-            case historyitem_MinusPlus_SetnNumRef:
+            case AscDFH.historyitem_MinusPlus_SetnNumLit:
+            case AscDFH.historyitem_MinusPlus_SetnNumRef:
             {
                 w.WriteBool(isRealObject(data.newPr));
                 if(isRealObject(data.newPr))
@@ -16279,7 +16279,7 @@ CMinusPlus.prototype =
         var type = r.GetLong();
         switch (type)
         {
-            case historyitem_MinusPlus_SetnNumLit:
+            case AscDFH.historyitem_MinusPlus_SetnNumLit:
             {
                 if(r.GetBool())
                 {
@@ -16291,7 +16291,7 @@ CMinusPlus.prototype =
                 }
                 break;
             }
-            case historyitem_MinusPlus_SetnNumRef:
+            case AscDFH.historyitem_MinusPlus_SetnNumRef:
             {
                 if(r.GetBool())
                 {
@@ -16342,18 +16342,18 @@ CMultiLvlStrCache.prototype =
 
     getObjectType: function()
     {
-        return historyitem_type_MultiLvlStrCache;
+        return AscDFH.historyitem_type_MultiLvlStrCache;
     },
 
     setLvl: function(pr)
     {
-        History.Add(this, {Type: historyitem_MultiLvlStrCache_SetLvl, newPr: pr, oldPr: this.lvl.length});
+        History.Add(this, {Type: AscDFH.historyitem_MultiLvlStrCache_SetLvl, newPr: pr, oldPr: this.lvl.length});
         this.lvl.push(pr);
     },
 
     setPtCount: function(pr)
     {
-        History.Add(this, {Type: historyitem_MultiLvlStrCache_SetPtCount, newPr: pr, oldPr: this.ptCount});
+        History.Add(this, {Type: AscDFH.historyitem_MultiLvlStrCache_SetPtCount, newPr: pr, oldPr: this.ptCount});
         this.ptCount = pr;
     },
 
@@ -16372,12 +16372,12 @@ CMultiLvlStrCache.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_MultiLvlStrCache_SetLvl:
+            case AscDFH.historyitem_MultiLvlStrCache_SetLvl:
             {
                 this.lvl.splice(data.oldPr, 1);
                 break;
             }
-            case historyitem_MultiLvlStrCache_SetPtCount:
+            case AscDFH.historyitem_MultiLvlStrCache_SetPtCount:
             {
                 this.ptCount = data.oldPr;
                 break;
@@ -16389,12 +16389,12 @@ CMultiLvlStrCache.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_MultiLvlStrCache_SetLvl:
+            case AscDFH.historyitem_MultiLvlStrCache_SetLvl:
             {
                 this.lvl.splice(data.oldPr, 0, data.newPr);
                 break;
             }
-            case historyitem_MultiLvlStrCache_SetPtCount:
+            case AscDFH.historyitem_MultiLvlStrCache_SetPtCount:
             {
                 this.ptCount = data.newPr;
                 break;
@@ -16407,13 +16407,13 @@ CMultiLvlStrCache.prototype =
         w.WriteLong(data.Type);
         switch (data.Type)
         {
-            case historyitem_MultiLvlStrCache_SetLvl:
+            case AscDFH.historyitem_MultiLvlStrCache_SetLvl:
             {
                 writeObject(w, data.newPr);
                 writeLong(w, data.oldPr);
                 break;
             }
-            case historyitem_MultiLvlStrCache_SetPtCount:
+            case AscDFH.historyitem_MultiLvlStrCache_SetPtCount:
             {
                 writeLong(w, data.newPr);
                 break;
@@ -16426,14 +16426,14 @@ CMultiLvlStrCache.prototype =
         var type = r.GetLong();
         switch (type)
         {
-            case historyitem_MultiLvlStrCache_SetLvl:
+            case AscDFH.historyitem_MultiLvlStrCache_SetLvl:
             {
                 var str_pt = readObject(r);
                 var pos = readLong(r);
                 this.lvl.splice(pos, 0, str_pt);
                 break;
             }
-            case historyitem_MultiLvlStrCache_SetPtCount:
+            case AscDFH.historyitem_MultiLvlStrCache_SetPtCount:
             {
                 this.ptCount = readLong(r);
                 break;
@@ -16464,7 +16464,7 @@ CMultiLvlStrRef.prototype =
 
     getObjectType:  function()
     {
-        return historyitem_type_MultiLvlStrRef;
+        return AscDFH.historyitem_type_MultiLvlStrRef;
     },
 
     Write_ToBinary2: function(w)
@@ -16491,13 +16491,13 @@ CMultiLvlStrRef.prototype =
 
     setF: function(pr)
     {
-        History.Add(this, {Type: historyitem_MultiLvlStrRef_SetF, oldPr: this.f, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_MultiLvlStrRef_SetF, oldPr: this.f, newPr: pr});
         this.f = pr;
     },
 
     setMultiLvlStrCache: function(pr)
     {
-        History.Add(this, {Type: historyitem_MultiLvlStrRef_SetMultiLvlStrCache, oldPr: this.multiLvlStrCache, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_MultiLvlStrRef_SetMultiLvlStrCache, oldPr: this.multiLvlStrCache, newPr: pr});
         this.multiLvlStrCache = pr;
     },
 
@@ -16505,12 +16505,12 @@ CMultiLvlStrRef.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_MultiLvlStrRef_SetF:
+            case AscDFH.historyitem_MultiLvlStrRef_SetF:
             {
                 this.f = data.oldPr;
                 break;
             }
-            case historyitem_MultiLvlStrRef_SetMultiLvlStrCache:
+            case AscDFH.historyitem_MultiLvlStrRef_SetMultiLvlStrCache:
             {
                 this.multiLvlStrCache = data.oldPr;
                 break;
@@ -16522,12 +16522,12 @@ CMultiLvlStrRef.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_MultiLvlStrRef_SetF:
+            case AscDFH.historyitem_MultiLvlStrRef_SetF:
             {
                 this.f = data.newPr;
                 break;
             }
-            case historyitem_MultiLvlStrRef_SetMultiLvlStrCache:
+            case AscDFH.historyitem_MultiLvlStrRef_SetMultiLvlStrCache:
             {
                 this.multiLvlStrCache = data.newPr;
                 break;
@@ -16540,12 +16540,12 @@ CMultiLvlStrRef.prototype =
         w.WriteLong(data.Type);
         switch (data.Type)
         {
-            case historyitem_MultiLvlStrRef_SetF:
+            case AscDFH.historyitem_MultiLvlStrRef_SetF:
             {
                 writeString(w, data.newPr);
                 break;
             }
-            case historyitem_MultiLvlStrRef_SetMultiLvlStrCache:
+            case AscDFH.historyitem_MultiLvlStrRef_SetMultiLvlStrCache:
             {
                 writeObject(w, data.newPr);
                 break;
@@ -16558,12 +16558,12 @@ CMultiLvlStrRef.prototype =
         var type = r.GetLong();
         switch (type)
         {
-            case historyitem_MultiLvlStrRef_SetF:
+            case AscDFH.historyitem_MultiLvlStrRef_SetF:
             {
                 this.f = readString(r);
                 break;
             }
-            case historyitem_MultiLvlStrRef_SetMultiLvlStrCache:
+            case AscDFH.historyitem_MultiLvlStrRef_SetMultiLvlStrCache:
             {
                 this.multiLvlStrCache = readObject(r);
                 break;
@@ -16593,7 +16593,7 @@ CNumRef.prototype =
 
     Refresh_RecalcData: function(data)
     {
-        if(data && data.Type === historyitem_NumRef_SetF && this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent
+        if(data && data.Type === AscDFH.historyitem_NumRef_SetF && this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent
             && this.parent.parent.parent.parent.parent && this.parent.parent.parent.parent.parent.parent && this.parent.parent.parent.parent.parent.parent.handleUpdateInternalChart)
         {
             this.parent.parent.parent.parent.parent.parent.handleUpdateInternalChart();
@@ -16615,7 +16615,7 @@ CNumRef.prototype =
 
     getObjectType: function()
     {
-        return historyitem_type_NumRef;
+        return AscDFH.historyitem_type_NumRef;
     },
 
     Write_ToBinary2: function(w)
@@ -16631,13 +16631,13 @@ CNumRef.prototype =
 
     setParent: function(pr)
     {
-        History.Add(this, {Type: historyitem_CommonChartFormat_SetParent, oldPr: this.parent, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_CommonChartFormat_SetParent, oldPr: this.parent, newPr: pr});
         this.parent = pr;
     },
 
     setF: function(pr)
     {
-        History.Add(this, {Type: historyitem_NumRef_SetF, oldPr: this.f, newPr: pr });
+        History.Add(this, {Type: AscDFH.historyitem_NumRef_SetF, oldPr: this.f, newPr: pr });
         this.f = pr;
 
         if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent
@@ -16654,7 +16654,7 @@ CNumRef.prototype =
 
     setNumCache: function(pr)
     {
-        History.Add(this, {Type: historyitem_NumRef_SetNumCache, oldPr: this.numCache, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_NumRef_SetNumCache, oldPr: this.numCache, newPr: pr});
         this.numCache = pr;
     },
 
@@ -16662,7 +16662,7 @@ CNumRef.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_NumRef_SetF:
+            case AscDFH.historyitem_NumRef_SetF:
             {
                 this.f = data.oldPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent
@@ -16673,12 +16673,12 @@ CNumRef.prototype =
                 }
                 break;
             }
-            case historyitem_NumRef_SetNumCache:
+            case AscDFH.historyitem_NumRef_SetNumCache:
             {
                 this.numCache = data.oldPr;
                 break;
             }
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 this.parent = data.oldPr;
                 break;
@@ -16690,7 +16690,7 @@ CNumRef.prototype =
     {
         switch(data.Type)
         {
-            case historyitem_NumRef_SetF:
+            case AscDFH.historyitem_NumRef_SetF:
             {
                 this.f = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent
@@ -16701,12 +16701,12 @@ CNumRef.prototype =
                 }
                 break;
             }
-            case historyitem_NumRef_SetNumCache:
+            case AscDFH.historyitem_NumRef_SetNumCache:
             {
                 this.numCache = data.newPr;
                 break;
             }
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 this.parent = data.newPr;
                 break;
@@ -16719,13 +16719,13 @@ CNumRef.prototype =
         w.WriteLong(data.Type);
         switch(data.Type)
         {
-            case historyitem_NumRef_SetF:
+            case AscDFH.historyitem_NumRef_SetF:
             {
                 writeString(w, data.newPr);
                 break;
             }
-            case historyitem_NumRef_SetNumCache:
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_NumRef_SetNumCache:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 writeObject(w, data.newPr);
                 break;
@@ -16738,7 +16738,7 @@ CNumRef.prototype =
         var type = r.GetLong();
         switch (type)
         {
-            case historyitem_NumRef_SetF:
+            case AscDFH.historyitem_NumRef_SetF:
             {
                 this.f = readString(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent
@@ -16749,12 +16749,12 @@ CNumRef.prototype =
                 }
                 break;
             }
-            case historyitem_NumRef_SetNumCache:
+            case AscDFH.historyitem_NumRef_SetNumCache:
             {
                 this.numCache = readObject(r);
                 break;
             }
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 this.parent = readObject(r);
                 break;
@@ -16796,7 +16796,7 @@ CNumericPoint.prototype =
 
     getObjectType: function()
     {
-        return historyitem_type_NumericPoint;
+        return AscDFH.historyitem_type_NumericPoint;
     },
 
     Write_ToBinary2: function(w)
@@ -16812,13 +16812,13 @@ CNumericPoint.prototype =
 
     setFormatCode: function(pr)
     {
-        History.Add(this, {Type: historyitem_NumericPoint_SetFormatCode, oldPr: this.formatCode, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_NumericPoint_SetFormatCode, oldPr: this.formatCode, newPr: pr});
         this.formatCode = pr;
     },
 
     setIdx: function(pr)
     {
-        History.Add(this, {Type: historyitem_NumericPoint_SetIdx, oldPr: this.idx, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_NumericPoint_SetIdx, oldPr: this.idx, newPr: pr});
         this.idx = pr;
     },
 
@@ -16829,7 +16829,7 @@ CNumericPoint.prototype =
         {
             _pr = 0;
         }
-        History.Add(this, {Type: historyitem_NumericPoint_SetVal, oldPr: this.val, newPr: _pr});
+        History.Add(this, {Type: AscDFH.historyitem_NumericPoint_SetVal, oldPr: this.val, newPr: _pr});
         this.val = _pr;
     },
 
@@ -16837,17 +16837,17 @@ CNumericPoint.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_NumericPoint_SetFormatCode:
+            case AscDFH.historyitem_NumericPoint_SetFormatCode:
             {
                 this.formatCode = data.oldPr;
                 break;
             }
-            case historyitem_NumericPoint_SetIdx:
+            case AscDFH.historyitem_NumericPoint_SetIdx:
             {
                 this.idx = data.oldPr;
                 break;
             }
-            case historyitem_NumericPoint_SetVal:
+            case AscDFH.historyitem_NumericPoint_SetVal:
             {
                 this.val = data.oldPr;
                 break;
@@ -16859,17 +16859,17 @@ CNumericPoint.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_NumericPoint_SetFormatCode:
+            case AscDFH.historyitem_NumericPoint_SetFormatCode:
             {
                 this.formatCode = data.newPr;
                 break;
             }
-            case historyitem_NumericPoint_SetIdx:
+            case AscDFH.historyitem_NumericPoint_SetIdx:
             {
                 this.idx = data.newPr;
                 break;
             }
-            case historyitem_NumericPoint_SetVal:
+            case AscDFH.historyitem_NumericPoint_SetVal:
             {
                 this.val = data.newPr;
                 break;
@@ -16882,7 +16882,7 @@ CNumericPoint.prototype =
         w.WriteLong(data.Type);
         switch (data.Type)
         {
-            case historyitem_NumericPoint_SetFormatCode:
+            case AscDFH.historyitem_NumericPoint_SetFormatCode:
             {
                 w.WriteBool(typeof data.newPr === "string");
                 if(typeof data.newPr === "string")
@@ -16891,7 +16891,7 @@ CNumericPoint.prototype =
                 }
                 break;
             }
-            case historyitem_NumericPoint_SetIdx:
+            case AscDFH.historyitem_NumericPoint_SetIdx:
             {
                 this.idx = data.newPr;
                 w.WriteBool(isRealNumber(data.newPr));
@@ -16901,7 +16901,7 @@ CNumericPoint.prototype =
                 }
                 break;
             }
-            case historyitem_NumericPoint_SetVal:
+            case AscDFH.historyitem_NumericPoint_SetVal:
             {
                 writeString(w, data.newPr + "");
                 break;
@@ -16914,7 +16914,7 @@ CNumericPoint.prototype =
         var type = r.GetLong();
         switch(type)
         {
-            case historyitem_NumericPoint_SetFormatCode:
+            case AscDFH.historyitem_NumericPoint_SetFormatCode:
             {
                 if(r.GetBool())
                 {
@@ -16926,7 +16926,7 @@ CNumericPoint.prototype =
                 }
                 break;
             }
-            case historyitem_NumericPoint_SetIdx:
+            case AscDFH.historyitem_NumericPoint_SetIdx:
             {
                 if(r.GetBool())
                 {
@@ -16938,7 +16938,7 @@ CNumericPoint.prototype =
                 }
                 break;
             }
-            case historyitem_NumericPoint_SetVal:
+            case AscDFH.historyitem_NumericPoint_SetVal:
             {
                 this.val = parseFloat(readString(r));
                 break;
@@ -16977,7 +16977,7 @@ CNumFmt.prototype =
 
     getObjectType: function()
     {
-        return historyitem_type_NumFmt;
+        return AscDFH.historyitem_type_NumFmt;
     },
 
     Write_ToBinary2: function(w)
@@ -16993,13 +16993,13 @@ CNumFmt.prototype =
 
     setFormatCode: function(pr)
     {
-        History.Add(this, {Type: historyitem_NumFmt_SetFormatCode, oldPr: this.formatCode, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_NumFmt_SetFormatCode, oldPr: this.formatCode, newPr: pr});
         this.formatCode = pr;
     },
 
     setSourceLinked: function(pr)
     {
-        History.Add(this, {Type: historyitem_NumFmt_SetSourceLinked, oldPr: this.sourceLinked, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_NumFmt_SetSourceLinked, oldPr: this.sourceLinked, newPr: pr});
         this.sourceLinked = pr;
     },
 
@@ -17007,12 +17007,12 @@ CNumFmt.prototype =
     {
         switch(data.Type)
         {
-            case historyitem_NumFmt_SetFormatCode:
+            case AscDFH.historyitem_NumFmt_SetFormatCode:
             {
                 this.formatCode = data.oldPr;
                 break;
             }
-            case historyitem_NumFmt_SetSourceLinked:
+            case AscDFH.historyitem_NumFmt_SetSourceLinked:
             {
                 this.sourceLinked = data.oldPr;
                 break;
@@ -17024,12 +17024,12 @@ CNumFmt.prototype =
     {
         switch(data.Type)
         {
-            case historyitem_NumFmt_SetFormatCode:
+            case AscDFH.historyitem_NumFmt_SetFormatCode:
             {
                 this.formatCode = data.newPr;
                 break;
             }
-            case historyitem_NumFmt_SetSourceLinked:
+            case AscDFH.historyitem_NumFmt_SetSourceLinked:
             {
                 this.sourceLinked = data.newPr;
                 break;
@@ -17042,12 +17042,12 @@ CNumFmt.prototype =
         w.WriteLong(data.Type);
         switch (data.Type)
         {
-            case historyitem_NumFmt_SetFormatCode:
+            case AscDFH.historyitem_NumFmt_SetFormatCode:
             {
                 writeString(w, data.newPr);
                 break;
             }
-            case historyitem_NumFmt_SetSourceLinked:
+            case AscDFH.historyitem_NumFmt_SetSourceLinked:
             {
                 writeBool(w, data.newPr);
                 break;
@@ -17061,12 +17061,12 @@ CNumFmt.prototype =
         var type = r.GetLong();
         switch (type)
         {
-            case historyitem_NumFmt_SetFormatCode:
+            case AscDFH.historyitem_NumFmt_SetFormatCode:
             {
                 this.formatCode = readString(r);
                 break;
             }
-            case historyitem_NumFmt_SetSourceLinked:
+            case AscDFH.historyitem_NumFmt_SetSourceLinked:
             {
 
                 this.sourceLinked = readBool(r);
@@ -17103,7 +17103,7 @@ CNumLit.prototype =
     {
         if(this.pts[idx])
         {
-            History.Add(this, {Type: historyitem_CommonLit_RemoveDPt, idx: idx, pt: this.pts[idx]});
+            History.Add(this, {Type: AscDFH.historyitem_CommonLit_RemoveDPt, idx: idx, pt: this.pts[idx]});
             this.pts.splice(idx, 1);
         }
     },
@@ -17142,7 +17142,7 @@ CNumLit.prototype =
 
     getObjectType: function()
     {
-        return historyitem_type_NumLit;
+        return AscDFH.historyitem_type_NumLit;
     },
 
     Write_ToBinary2: function(w)
@@ -17158,19 +17158,19 @@ CNumLit.prototype =
 
     setFormatCode: function(pr)
     {
-        History.Add(this, {Type:historyitem_NumLit_SetFormatCode, oldPr: this.formatCode, newPr: pr});
+        History.Add(this, {Type:AscDFH.historyitem_NumLit_SetFormatCode, oldPr: this.formatCode, newPr: pr});
         this.formatCode = pr;
     },
 
     addPt: function(pr)
     {
-        History.Add(this, {Type:historyitem_NumLit_AddPt, pt: pr});
+        History.Add(this, {Type:AscDFH.historyitem_NumLit_AddPt, pt: pr});
         this.pts.push(pr);
     },
 
     setPtCount: function(pr)
     {
-        History.Add(this, {Type:historyitem_NumLit_SetPtCount, oldPr: this.ptCount, newPr: pr});
+        History.Add(this, {Type:AscDFH.historyitem_NumLit_SetPtCount, oldPr: this.ptCount, newPr: pr});
         this.ptCount = pr;
     },
 
@@ -17178,13 +17178,13 @@ CNumLit.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_NumLit_SetFormatCode:
+            case AscDFH.historyitem_NumLit_SetFormatCode:
             {
                 this.formatCode = data.oldPr;
                 break;
             }
 
-            case historyitem_NumLit_AddPt:
+            case AscDFH.historyitem_NumLit_AddPt:
             {
                 for(var i = this.pts.length - 1; i > -1; --i)
                 {
@@ -17196,13 +17196,13 @@ CNumLit.prototype =
                 break;
             }
 
-            case historyitem_NumLit_SetPtCount:
+            case AscDFH.historyitem_NumLit_SetPtCount:
             {
                 this.ptCount = data.oldPr;
                 break;
             }
 
-            case historyitem_CommonLit_RemoveDPt:
+            case AscDFH.historyitem_CommonLit_RemoveDPt:
             {
                 this.pts.splice(data.idx, 0, data.pt);
                 break;
@@ -17214,24 +17214,24 @@ CNumLit.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_NumLit_SetFormatCode:
+            case AscDFH.historyitem_NumLit_SetFormatCode:
             {
                 this.formatCode = data.newPr;
                 break;
             }
 
-            case historyitem_NumLit_AddPt:
+            case AscDFH.historyitem_NumLit_AddPt:
             {
                 this.pts.push(data.pt);
                 break;
             }
 
-            case historyitem_NumLit_SetPtCount:
+            case AscDFH.historyitem_NumLit_SetPtCount:
             {
                 this.ptCount = data.newPr;
                 break;
             }
-            case historyitem_CommonLit_RemoveDPt:
+            case AscDFH.historyitem_CommonLit_RemoveDPt:
             {
                 this.pts.splice(data.idx, 1);
                 break;
@@ -17244,25 +17244,25 @@ CNumLit.prototype =
         w.WriteLong(data.Type);
         switch (data.Type)
         {
-            case historyitem_NumLit_SetFormatCode:
+            case AscDFH.historyitem_NumLit_SetFormatCode:
             {
                 writeString(w, data.newPr);
                 break;
             }
 
-            case historyitem_NumLit_AddPt:
+            case AscDFH.historyitem_NumLit_AddPt:
             {
                 writeObject(w, data.pt);
                 break;
             }
 
-            case historyitem_NumLit_SetPtCount:
+            case AscDFH.historyitem_NumLit_SetPtCount:
             {
                 writeLong(w, data.newPr);
                 break;
             }
 
-            case historyitem_CommonLit_RemoveDPt:
+            case AscDFH.historyitem_CommonLit_RemoveDPt:
             {
                 w.WriteLong(data.idx);
                 break;
@@ -17275,13 +17275,13 @@ CNumLit.prototype =
         var type = r.GetLong();
         switch (type)
         {
-            case historyitem_NumLit_SetFormatCode:
+            case AscDFH.historyitem_NumLit_SetFormatCode:
             {
                 this.formatCode = readString(r);
                 break;
             }
 
-            case historyitem_NumLit_AddPt:
+            case AscDFH.historyitem_NumLit_AddPt:
             {
                 var pt = readObject(r);
                 if(isRealObject(pt))
@@ -17291,12 +17291,12 @@ CNumLit.prototype =
                 break;
             }
 
-            case historyitem_NumLit_SetPtCount:
+            case AscDFH.historyitem_NumLit_SetPtCount:
             {
                 this.ptCount = readLong(r);
                 break;
             }
-            case historyitem_CommonLit_RemoveDPt:
+            case AscDFH.historyitem_CommonLit_RemoveDPt:
             {
                 var idx = r.GetLong();
                 this.pts.splice(idx, 1);
@@ -17356,7 +17356,7 @@ COfPieChart.prototype =
     {
         if(this.series[idx])
         {
-            History.Add(this, {Type: historyitem_CommonChart_RemoveSeries, oldPr: idx, newPr: this.series.splice(idx, 1)[0]});
+            History.Add(this, {Type: AscDFH.historyitem_CommonChart_RemoveSeries, oldPr: idx, newPr: this.series.splice(idx, 1)[0]});
         }
     },
 
@@ -17395,7 +17395,7 @@ COfPieChart.prototype =
 
     getObjectType: function()
     {
-        return historyitem_type_OfPieChart;
+        return AscDFH.historyitem_type_OfPieChart;
     },
 
     getAllRasterImages: function(images)
@@ -17432,12 +17432,12 @@ COfPieChart.prototype =
 
     addCustSplit: function(pr)
     {
-        History.Add(this, {Type: historyitem_OfPieChart_AddCustSplit, nSplit:pr, pos: this.custSplit.length});
+        History.Add(this, {Type: AscDFH.historyitem_OfPieChart_AddCustSplit, nSplit:pr, pos: this.custSplit.length});
         this.custSplit.push(pr);
     },
     setDLbls: function(pr)
     {
-        History.Add(this, {Type: historyitem_OfPieChart_SetDLbls, oldPr: this.dLbls, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_OfPieChart_SetDLbls, oldPr: this.dLbls, newPr: pr});
         this.dLbls = pr;
         if(this.dLbls)
         {
@@ -17450,22 +17450,22 @@ COfPieChart.prototype =
     },
     setGapWidth: function(pr)
     {
-        History.Add(this, {Type: historyitem_OfPieChart_SetGapWidth, oldPr: this.gapWidth, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_OfPieChart_SetGapWidth, oldPr: this.gapWidth, newPr: pr});
         this.gapWidth = pr;
     },
     setOfPieType: function(pr)
     {
-        History.Add(this, {Type: historyitem_OfPieChart_SetOfPieType, oldPr: this.ofPieType, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_OfPieChart_SetOfPieType, oldPr: this.ofPieType, newPr: pr});
         this.ofPieType = pr;
     },
     setSecondPieSize: function(pr)
     {
-        History.Add(this, {Type: historyitem_OfPieChart_SetSecondPieSize, oldPr: this.secondPieSize, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_OfPieChart_SetSecondPieSize, oldPr: this.secondPieSize, newPr: pr});
         this.secondPieSize = pr;
     },
     addSer: function(ser)
     {
-        History.Add(this, {Type: historyitem_OfPieChart_AddSer, ser: ser});
+        History.Add(this, {Type: AscDFH.historyitem_OfPieChart_AddSer, ser: ser});
         this.series.push(ser);
         ser.setParent(this);
         if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -17475,28 +17475,28 @@ COfPieChart.prototype =
     },
     setSerLines: function(pr)
     {
-        History.Add(this, {Type: historyitem_OfPieChart_SetSerLines, oldPr: this.serLines, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_OfPieChart_SetSerLines, oldPr: this.serLines, newPr: pr});
         this.serLines = pr;
     },
     setSplitPos: function(pr)
     {
-        History.Add(this, {Type: historyitem_OfPieChart_SetSplitPos, oldPr: this.splitPos, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_OfPieChart_SetSplitPos, oldPr: this.splitPos, newPr: pr});
         this.splitPos = pr;
     },
     setSplitType: function(pr)
     {
-        History.Add(this, {Type: historyitem_OfPieChart_SetSplitType, oldPr: this.splitType, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_OfPieChart_SetSplitType, oldPr: this.splitType, newPr: pr});
         this.splitType = pr;
     },
     setVaryColors: function(pr)
     {
-        History.Add(this, {Type: historyitem_OfPieChart_SetVaryColors, oldPr: this.varyColors, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_OfPieChart_SetVaryColors, oldPr: this.varyColors, newPr: pr});
         this.varyColors = pr;
     },
 
     setParent: function(pr)
     {
-        History.Add(this, {Type: historyitem_CommonChartFormat_SetParent, oldPr: this.parent, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_CommonChartFormat_SetParent, oldPr: this.parent, newPr: pr});
         this.parent = pr;
     },
 
@@ -17504,23 +17504,23 @@ COfPieChart.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 this.parent = data.oldPr;
                 break;
             }
-            case historyitem_CommonChart_RemoveSeries:
+            case AscDFH.historyitem_CommonChart_RemoveSeries:
             {
                 this.series.splice(data.oldPr, 0, data.newPr);
                 break;
             }
-            case historyitem_OfPieChart_AddCustSplit:
+            case AscDFH.historyitem_OfPieChart_AddCustSplit:
             {
                 if(this.custSplit[data.pos] === data.nSplit)
                     this.custSplit.splice(data.pos, 1);
                 break;
             }
-            case historyitem_OfPieChart_SetDLbls:
+            case AscDFH.historyitem_OfPieChart_SetDLbls:
             {
                 this.dLbls = data.oldPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -17529,22 +17529,22 @@ COfPieChart.prototype =
                 }
                 break;
             }
-            case historyitem_OfPieChart_SetGapWidth:
+            case AscDFH.historyitem_OfPieChart_SetGapWidth:
             {
                 this.gapWidth = data.oldPr;
                 break;
             }
-            case historyitem_OfPieChart_SetOfPieType:
+            case AscDFH.historyitem_OfPieChart_SetOfPieType:
             {
                 this.ofPieType = data.oldPr;
                 break;
             }
-            case historyitem_OfPieChart_SetSecondPieSize:
+            case AscDFH.historyitem_OfPieChart_SetSecondPieSize:
             {
                 this.secondPieSize = data.oldPr;
                 break;
             }
-            case historyitem_OfPieChart_AddSer:
+            case AscDFH.historyitem_OfPieChart_AddSer:
             {
                 for(var i = this.series.length - 1; i > -1; --i)
                 {
@@ -17560,22 +17560,22 @@ COfPieChart.prototype =
                 }
                 break;
             }
-            case historyitem_OfPieChart_SetSerLines:
+            case AscDFH.historyitem_OfPieChart_SetSerLines:
             {
                 this.serLines = data.oldPr;
                 break;
             }
-            case historyitem_OfPieChart_SetSplitPos:
+            case AscDFH.historyitem_OfPieChart_SetSplitPos:
             {
                 this.splitPos = data.oldPr;
                 break;
             }
-            case historyitem_OfPieChart_SetSplitType:
+            case AscDFH.historyitem_OfPieChart_SetSplitType:
             {
                 this.splitType = data.oldPr;
                 break;
             }
-            case historyitem_OfPieChart_SetVaryColors:
+            case AscDFH.historyitem_OfPieChart_SetVaryColors:
             {
                 this.varyColors = data.oldPr;
                 break;
@@ -17587,22 +17587,22 @@ COfPieChart.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 this.parent = data.newPr;
                 break;
             }
-            case historyitem_CommonChart_RemoveSeries:
+            case AscDFH.historyitem_CommonChart_RemoveSeries:
             {
                 this.series.splice(data.oldPr, 1);
                 break;
             }
-            case historyitem_OfPieChart_AddCustSplit:
+            case AscDFH.historyitem_OfPieChart_AddCustSplit:
             {
                 this.custSplit.splice(data.pos, data.nSplit);
                 break;
             }
-            case historyitem_OfPieChart_SetDLbls:
+            case AscDFH.historyitem_OfPieChart_SetDLbls:
             {
                 this.dLbls = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -17611,22 +17611,22 @@ COfPieChart.prototype =
                 }
                 break;
             }
-            case historyitem_OfPieChart_SetGapWidth:
+            case AscDFH.historyitem_OfPieChart_SetGapWidth:
             {
                 this.gapWidth = data.newPr;
                 break;
             }
-            case historyitem_OfPieChart_SetOfPieType:
+            case AscDFH.historyitem_OfPieChart_SetOfPieType:
             {
                 this.ofPieType = data.newPr;
                 break;
             }
-            case historyitem_OfPieChart_SetSecondPieSize:
+            case AscDFH.historyitem_OfPieChart_SetSecondPieSize:
             {
                 this.secondPieSize = data.newPr;
                 break;
             }
-            case historyitem_OfPieChart_AddSer:
+            case AscDFH.historyitem_OfPieChart_AddSer:
             {
                 if(isRealObject(data.ser))
                 {
@@ -17638,22 +17638,22 @@ COfPieChart.prototype =
                 }
                 break;
             }
-            case historyitem_OfPieChart_SetSerLines:
+            case AscDFH.historyitem_OfPieChart_SetSerLines:
             {
                 this.serLines = data.newPr;
                 break;
             }
-            case historyitem_OfPieChart_SetSplitPos:
+            case AscDFH.historyitem_OfPieChart_SetSplitPos:
             {
                 this.splitPos = data.newPr;
                 break;
             }
-            case historyitem_OfPieChart_SetSplitType:
+            case AscDFH.historyitem_OfPieChart_SetSplitType:
             {
                 this.splitType = data.newPr;
                 break;
             }
-            case historyitem_OfPieChart_SetVaryColors:
+            case AscDFH.historyitem_OfPieChart_SetVaryColors:
             {
                 this.varyColors = data.newPr;
                 break;
@@ -17666,17 +17666,17 @@ COfPieChart.prototype =
         w.WriteLong(data.Type);
         switch (data.Type)
         {
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 writeObject(w, data.newPr);
                 break;
             }
-            case historyitem_CommonChart_RemoveSeries:
+            case AscDFH.historyitem_CommonChart_RemoveSeries:
             {
                 writeLong(w, data.oldPr);
                 break;
             }
-            case historyitem_OfPieChart_AddCustSplit:
+            case AscDFH.historyitem_OfPieChart_AddCustSplit:
             {
                 w.WriteBool(isRealNumber(data.pos) && isRealNumber(data.nSplit));
                 if(isRealNumber(data.pos) && isRealNumber(data.nSplit))
@@ -17686,8 +17686,8 @@ COfPieChart.prototype =
                 }
                 break;
             }
-            case historyitem_OfPieChart_SetDLbls:
-            case historyitem_OfPieChart_SetSerLines:
+            case AscDFH.historyitem_OfPieChart_SetDLbls:
+            case AscDFH.historyitem_OfPieChart_SetSerLines:
             {
                 w.WriteBool(isRealObject(data.newPr));
                 if(isRealObject(data.newPr))
@@ -17696,10 +17696,10 @@ COfPieChart.prototype =
                 }
                 break;
             }
-            case historyitem_OfPieChart_SetGapWidth:
-            case historyitem_OfPieChart_SetOfPieType:
-            case historyitem_OfPieChart_SetSecondPieSize:
-            case historyitem_OfPieChart_SetSplitType:
+            case AscDFH.historyitem_OfPieChart_SetGapWidth:
+            case AscDFH.historyitem_OfPieChart_SetOfPieType:
+            case AscDFH.historyitem_OfPieChart_SetSecondPieSize:
+            case AscDFH.historyitem_OfPieChart_SetSplitType:
             {
                 w.WriteBool(isRealNumber(data.newPr));
                 if(isRealNumber(data.newPr))
@@ -17708,7 +17708,7 @@ COfPieChart.prototype =
                 }
                 break;
             }
-            case historyitem_OfPieChart_AddSer:
+            case AscDFH.historyitem_OfPieChart_AddSer:
             {
                 w.WriteBool(isRealObject(data.ser));
                 if(isRealObject(data.ser))
@@ -17717,7 +17717,7 @@ COfPieChart.prototype =
                 }
                 break;
             }
-            case historyitem_OfPieChart_SetSplitPos:
+            case AscDFH.historyitem_OfPieChart_SetSplitPos:
             {
                 w.WriteBool(isRealNumber(data.newPr));
                 if(isRealNumber(data.newPr))
@@ -17726,7 +17726,7 @@ COfPieChart.prototype =
                 }
                 break;
             }
-            case historyitem_OfPieChart_SetVaryColors:
+            case AscDFH.historyitem_OfPieChart_SetVaryColors:
             {
                 w.WriteBool(isRealBool(data.newPr));
                 if(isRealBool(data.newPr))
@@ -17743,18 +17743,18 @@ COfPieChart.prototype =
         var type = r.GetLong();
         switch (type)
         {
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 this.parent = readObject(r);
                 break;
             }
-            case historyitem_CommonChart_RemoveSeries:
+            case AscDFH.historyitem_CommonChart_RemoveSeries:
             {
                 var pos = readLong(r);
                 this.series.splice(pos, 1);
                 break;
             }
-            case historyitem_OfPieChart_AddCustSplit:
+            case AscDFH.historyitem_OfPieChart_AddCustSplit:
             {
                 if(r.GetBool())
                 {
@@ -17764,7 +17764,7 @@ COfPieChart.prototype =
                 }
                 break;
             }
-            case historyitem_OfPieChart_SetDLbls:
+            case AscDFH.historyitem_OfPieChart_SetDLbls:
             {
                 if(r.GetBool())
                 {
@@ -17780,7 +17780,7 @@ COfPieChart.prototype =
                 }
                 break;
             }
-            case historyitem_OfPieChart_SetGapWidth:
+            case AscDFH.historyitem_OfPieChart_SetGapWidth:
             {
                 if(r.GetBool())
                 {
@@ -17792,7 +17792,7 @@ COfPieChart.prototype =
                 }
                 break;
             }
-            case historyitem_OfPieChart_SetOfPieType:
+            case AscDFH.historyitem_OfPieChart_SetOfPieType:
             {
                 if(r.GetBool())
                 {
@@ -17804,7 +17804,7 @@ COfPieChart.prototype =
                 }
                 break;
             }
-            case historyitem_OfPieChart_SetSecondPieSize:
+            case AscDFH.historyitem_OfPieChart_SetSecondPieSize:
             {
                 if(r.GetBool())
                 {
@@ -17816,7 +17816,7 @@ COfPieChart.prototype =
                 }
                 break;
             }
-            case historyitem_OfPieChart_AddSer:
+            case AscDFH.historyitem_OfPieChart_AddSer:
             {
                 if(r.GetBool())
                 {
@@ -17832,7 +17832,7 @@ COfPieChart.prototype =
                 }
                 break;
             }
-            case historyitem_OfPieChart_SetSerLines:
+            case AscDFH.historyitem_OfPieChart_SetSerLines:
             {
                 if(r.GetBool())
                 {
@@ -17844,7 +17844,7 @@ COfPieChart.prototype =
                 }
                 break;
             }
-            case historyitem_OfPieChart_SetSplitPos:
+            case AscDFH.historyitem_OfPieChart_SetSplitPos:
             {
                 if(r.GetBool())
                 {
@@ -17856,7 +17856,7 @@ COfPieChart.prototype =
                 }
                 break;
             }
-            case historyitem_OfPieChart_SetSplitType:
+            case AscDFH.historyitem_OfPieChart_SetSplitType:
             {
                 if(r.GetBool())
                 {
@@ -17868,7 +17868,7 @@ COfPieChart.prototype =
                 }
                 break;
             }
-            case historyitem_OfPieChart_SetVaryColors:
+            case AscDFH.historyitem_OfPieChart_SetVaryColors:
             {
                 if(r.GetBool())
                 {
@@ -17925,7 +17925,7 @@ CPictureOptions.prototype =
 
     getObjectType: function()
     {
-        return historyitem_type_PictureOptions;
+        return AscDFH.historyitem_type_PictureOptions;
     },
 
     Write_ToBinary2: function(w)
@@ -17941,27 +17941,27 @@ CPictureOptions.prototype =
 
     setApplyToEnd: function(pr)
     {
-        History.Add(this, {Type: historyitem_PictureOptions_SetApplyToEnd, oldPr: this.applyToEnd, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_PictureOptions_SetApplyToEnd, oldPr: this.applyToEnd, newPr: pr});
         this.applyToEnd = pr;
     },
     setApplyToFront: function(pr)
     {
-        History.Add(this, {Type: historyitem_PictureOptions_SetApplyToFront, oldPr: this.applyToFront, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_PictureOptions_SetApplyToFront, oldPr: this.applyToFront, newPr: pr});
         this.applyToFront = pr;
     },
     setApplyToSides: function(pr)
     {
-        History.Add(this, {Type: historyitem_PictureOptions_SetApplyToSides, oldPr: this.applyToSides, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_PictureOptions_SetApplyToSides, oldPr: this.applyToSides, newPr: pr});
         this.applyToSides = pr;
     },
     setPictureFormat: function(pr)
     {
-        History.Add(this, {Type: historyitem_PictureOptions_SetPictureFormat, oldPr: this.pictureFormat, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_PictureOptions_SetPictureFormat, oldPr: this.pictureFormat, newPr: pr});
         this.pictureFormat = pr;
     },
     setPictureStackUnit: function(pr)
     {
-        History.Add(this, {Type: historyitem_PictureOptions_SetPictureStackUnit, oldPr: this.pictureStackUnit, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_PictureOptions_SetPictureStackUnit, oldPr: this.pictureStackUnit, newPr: pr});
         this.pictureStackUnit = pr;
     },
 
@@ -17969,27 +17969,27 @@ CPictureOptions.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_PictureOptions_SetApplyToEnd:
+            case AscDFH.historyitem_PictureOptions_SetApplyToEnd:
             {
                 this.applyToEnd = data.oldPr;
                 break;
             }
-            case historyitem_PictureOptions_SetApplyToFront:
+            case AscDFH.historyitem_PictureOptions_SetApplyToFront:
             {
                 this.applyToFront = data.oldPr;
                 break;
             }
-            case historyitem_PictureOptions_SetApplyToSides:
+            case AscDFH.historyitem_PictureOptions_SetApplyToSides:
             {
                 this.applyToSides = data.oldPr;
                 break;
             }
-            case historyitem_PictureOptions_SetPictureFormat:
+            case AscDFH.historyitem_PictureOptions_SetPictureFormat:
             {
                 this.pictureFormat = data.oldPr;
                 break;
             }
-            case historyitem_PictureOptions_SetPictureStackUnit:
+            case AscDFH.historyitem_PictureOptions_SetPictureStackUnit:
             {
                 this.pictureStackUnit = data.oldPr;
                 break;
@@ -18001,27 +18001,27 @@ CPictureOptions.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_PictureOptions_SetApplyToEnd:
+            case AscDFH.historyitem_PictureOptions_SetApplyToEnd:
             {
                 this.applyToEnd = data.newPr;
                 break;
             }
-            case historyitem_PictureOptions_SetApplyToFront:
+            case AscDFH.historyitem_PictureOptions_SetApplyToFront:
             {
                 this.applyToFront = data.newPr;
                 break;
             }
-            case historyitem_PictureOptions_SetApplyToSides:
+            case AscDFH.historyitem_PictureOptions_SetApplyToSides:
             {
                 this.applyToSides = data.newPr;
                 break;
             }
-            case historyitem_PictureOptions_SetPictureFormat:
+            case AscDFH.historyitem_PictureOptions_SetPictureFormat:
             {
                 this.pictureFormat = data.newPr;
                 break;
             }
-            case historyitem_PictureOptions_SetPictureStackUnit:
+            case AscDFH.historyitem_PictureOptions_SetPictureStackUnit:
             {
                 this.pictureStackUnit = data.newPr;
                 break;
@@ -18034,19 +18034,19 @@ CPictureOptions.prototype =
         w.WriteLong(data.Type);
         switch (data.Type)
         {
-            case historyitem_PictureOptions_SetApplyToEnd:
-            case historyitem_PictureOptions_SetApplyToFront:
-            case historyitem_PictureOptions_SetApplyToSides:
+            case AscDFH.historyitem_PictureOptions_SetApplyToEnd:
+            case AscDFH.historyitem_PictureOptions_SetApplyToFront:
+            case AscDFH.historyitem_PictureOptions_SetApplyToSides:
             {
                 writeBool(w, data.newPr);
                 break;
             }
-            case historyitem_PictureOptions_SetPictureFormat:
+            case AscDFH.historyitem_PictureOptions_SetPictureFormat:
             {
                 writeLong(w, data.newPr);
                 break;
             }
-            case historyitem_PictureOptions_SetPictureStackUnit:
+            case AscDFH.historyitem_PictureOptions_SetPictureStackUnit:
             {
                 writeDouble(w, data.newPr);
                 break;
@@ -18059,27 +18059,27 @@ CPictureOptions.prototype =
         var type = r.GetLong();
         switch (type)
         {
-            case historyitem_PictureOptions_SetApplyToEnd:
+            case AscDFH.historyitem_PictureOptions_SetApplyToEnd:
             {
                 this.applyToEnd = readBool(r);
                 break;
             }
-            case historyitem_PictureOptions_SetApplyToFront:
+            case AscDFH.historyitem_PictureOptions_SetApplyToFront:
             {
                 this.applyToFront = readBool(r);
                 break;
             }
-            case historyitem_PictureOptions_SetApplyToSides:
+            case AscDFH.historyitem_PictureOptions_SetApplyToSides:
             {
                 this.applyToSides= readBool(r);
                 break;
             }
-            case historyitem_PictureOptions_SetPictureFormat:
+            case AscDFH.historyitem_PictureOptions_SetPictureFormat:
             {
                 this.pictureFormat = readLong(r);
                 break;
             }
-            case historyitem_PictureOptions_SetPictureStackUnit:
+            case AscDFH.historyitem_PictureOptions_SetPictureStackUnit:
             {
                 this.pictureStackUnit = readDouble(r);
                 break;
@@ -18117,15 +18117,15 @@ CPieChart.prototype =
 
         switch (data.Type)
         {
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 break;
             }
-            case historyitem_CommonChart_RemoveSeries:
+            case AscDFH.historyitem_CommonChart_RemoveSeries:
             {
                 break;
             }
-            case historyitem_PieChart_SetDLbls:
+            case AscDFH.historyitem_PieChart_SetDLbls:
             {
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
                 {
@@ -18133,11 +18133,11 @@ CPieChart.prototype =
                 }
                 break;
             }
-            case historyitem_PieChart_SetFirstSliceAng:
+            case AscDFH.historyitem_PieChart_SetFirstSliceAng:
             {
                 break;
             }
-            case historyitem_PieChart_AddSer:
+            case AscDFH.historyitem_PieChart_AddSer:
             {
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
                 {
@@ -18145,7 +18145,7 @@ CPieChart.prototype =
                 }
                 break;
             }
-            case historyitem_PieChart_SetVaryColors:
+            case AscDFH.historyitem_PieChart_SetVaryColors:
             {
                 break;
             }
@@ -18156,7 +18156,7 @@ CPieChart.prototype =
     {
         if(this.series[idx])
         {
-            History.Add(this, {Type: historyitem_CommonChart_RemoveSeries, oldPr: idx, newPr: this.series.splice(idx, 1)[0]});
+            History.Add(this, {Type: AscDFH.historyitem_CommonChart_RemoveSeries, oldPr: idx, newPr: this.series.splice(idx, 1)[0]});
         }
     },
 
@@ -18188,7 +18188,7 @@ CPieChart.prototype =
 
     getObjectType: function()
     {
-        return historyitem_type_PieChart;
+        return AscDFH.historyitem_type_PieChart;
     },
 
 
@@ -18235,7 +18235,7 @@ CPieChart.prototype =
 
     setDLbls: function(pr)
     {
-        History.Add(this, {Type: historyitem_PieChart_SetDLbls, oldPr: this.dLbls, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_PieChart_SetDLbls, oldPr: this.dLbls, newPr: pr});
         this.dLbls = pr;
         if(this.dLbls)
         {
@@ -18249,13 +18249,13 @@ CPieChart.prototype =
 
     setFirstSliceAng: function(pr)
     {
-        History.Add(this, {Type: historyitem_PieChart_SetFirstSliceAng, oldPr: this.firstSliceAng, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_PieChart_SetFirstSliceAng, oldPr: this.firstSliceAng, newPr: pr});
         this.firstSliceAng = pr;
     },
 
     addSer: function(ser)
     {
-        History.Add(this, {Type: historyitem_PieChart_AddSer, ser: ser});
+        History.Add(this, {Type: AscDFH.historyitem_PieChart_AddSer, ser: ser});
         this.series.push(ser);
         ser.setParent(this);
         if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -18265,13 +18265,13 @@ CPieChart.prototype =
     },
     setVaryColors: function(pr)
     {
-        History.Add(this, {Type: historyitem_PieChart_SetVaryColors, oldPr: this.varyColors, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_PieChart_SetVaryColors, oldPr: this.varyColors, newPr: pr});
         this.varyColors = pr;
     },
 
     setParent: function(pr)
     {
-        History.Add(this, {Type: historyitem_CommonChartFormat_SetParent, oldPr: this.parent, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_CommonChartFormat_SetParent, oldPr: this.parent, newPr: pr});
         this.parent = pr;
     },
 
@@ -18279,17 +18279,17 @@ CPieChart.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 this.parent = data.oldPr;
                 break;
             }
-            case historyitem_CommonChart_RemoveSeries:
+            case AscDFH.historyitem_CommonChart_RemoveSeries:
             {
                 this.series.splice(data.oldPr, 0, data.newPr);
                 break;
             }
-            case historyitem_PieChart_SetDLbls:
+            case AscDFH.historyitem_PieChart_SetDLbls:
             {
                 this.dLbls = data.oldPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -18298,12 +18298,12 @@ CPieChart.prototype =
                 }
                 break;
             }
-            case historyitem_PieChart_SetFirstSliceAng:
+            case AscDFH.historyitem_PieChart_SetFirstSliceAng:
             {
                 this.firstSliceAng = data.oldPr;
                 break;
             }
-            case historyitem_PieChart_AddSer:
+            case AscDFH.historyitem_PieChart_AddSer:
             {
                 for(var i = this.series.length - 1; i > -1; --i)
                 {
@@ -18319,7 +18319,7 @@ CPieChart.prototype =
                 }
                 break;
             }
-            case historyitem_PieChart_SetVaryColors:
+            case AscDFH.historyitem_PieChart_SetVaryColors:
             {
                 this.varyColors = data.oldPr;
                 break;
@@ -18331,17 +18331,17 @@ CPieChart.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 this.parent = data.newPr;
                 break;
             }
-            case historyitem_CommonChart_RemoveSeries:
+            case AscDFH.historyitem_CommonChart_RemoveSeries:
             {
                 this.series.splice(data.oldPr, 1);
                 break;
             }
-            case historyitem_PieChart_SetDLbls:
+            case AscDFH.historyitem_PieChart_SetDLbls:
             {
                 this.dLbls = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -18350,12 +18350,12 @@ CPieChart.prototype =
                 }
                 break;
             }
-            case historyitem_PieChart_SetFirstSliceAng:
+            case AscDFH.historyitem_PieChart_SetFirstSliceAng:
             {
                 this.firstSliceAng = data.newPr;
                 break;
             }
-            case historyitem_PieChart_AddSer:
+            case AscDFH.historyitem_PieChart_AddSer:
             {
                 this.series.push(data.ser);
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -18364,7 +18364,7 @@ CPieChart.prototype =
                 }
                 break;
             }
-            case historyitem_PieChart_SetVaryColors:
+            case AscDFH.historyitem_PieChart_SetVaryColors:
             {
                 this.varyColors = data.newPr;
                 break;
@@ -18377,17 +18377,17 @@ CPieChart.prototype =
         w.WriteLong(data.Type);
         switch (data.Type)
         {
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 writeObject(w, data.newPr);
                 break;
             }
-            case historyitem_CommonChart_RemoveSeries:
+            case AscDFH.historyitem_CommonChart_RemoveSeries:
             {
                 writeLong(w, data.oldPr);
                 break;
             }
-            case historyitem_PieChart_SetDLbls:
+            case AscDFH.historyitem_PieChart_SetDLbls:
             {
                 w.WriteBool(isRealObject(data.newPr));
                 if(isRealObject(data.newPr))
@@ -18396,7 +18396,7 @@ CPieChart.prototype =
                 }
                 break;
             }
-            case historyitem_PieChart_SetFirstSliceAng:
+            case AscDFH.historyitem_PieChart_SetFirstSliceAng:
             {
                 w.WriteBool(isRealNumber(data.newPr));
                 if(isRealNumber(data.newPr))
@@ -18405,7 +18405,7 @@ CPieChart.prototype =
                 }
                 break;
             }
-            case historyitem_PieChart_AddSer:
+            case AscDFH.historyitem_PieChart_AddSer:
             {
                 w.WriteBool(isRealObject(data.ser));
                 if(isRealObject(data.ser))
@@ -18414,7 +18414,7 @@ CPieChart.prototype =
                 }
                 break;
             }
-            case historyitem_PieChart_SetVaryColors:
+            case AscDFH.historyitem_PieChart_SetVaryColors:
             {
                 w.WriteBool(isRealBool(data.newPr));
                 if(isRealBool(data.newPr))
@@ -18430,18 +18430,18 @@ CPieChart.prototype =
         var type = r.GetLong();
         switch (type)
         {
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 this.parent = readObject(r);
                 break;
             }
-            case historyitem_CommonChart_RemoveSeries:
+            case AscDFH.historyitem_CommonChart_RemoveSeries:
             {
                 var pos = readLong(r);
                 this.series.splice(pos, 1);
                 break;
             }
-            case historyitem_PieChart_SetDLbls:
+            case AscDFH.historyitem_PieChart_SetDLbls:
             {
                 if(r.GetBool())
                 {
@@ -18457,7 +18457,7 @@ CPieChart.prototype =
                 }
                 break;
             }
-            case historyitem_PieChart_SetFirstSliceAng:
+            case AscDFH.historyitem_PieChart_SetFirstSliceAng:
             {
                 if(r.GetBool())
                 {
@@ -18469,7 +18469,7 @@ CPieChart.prototype =
                 }
                 break;
             }
-            case historyitem_PieChart_AddSer:
+            case AscDFH.historyitem_PieChart_AddSer:
             {
                 if(r.GetBool())
                 {
@@ -18485,7 +18485,7 @@ CPieChart.prototype =
                 }
                 break;
             }
-            case historyitem_PieChart_SetVaryColors:
+            case AscDFH.historyitem_PieChart_SetVaryColors:
             {
                 if(r.GetBool())
                 {
@@ -18537,7 +18537,7 @@ CPieSeries.prototype =
     {
         if(this.dPt[idx])
         {
-            History.Add(this, {Type: historyitem_CommonSeries_RemoveDPt, idx: idx, pt: this.dPt[idx]});
+            History.Add(this, {Type: AscDFH.historyitem_CommonSeries_RemoveDPt, idx: idx, pt: this.dPt[idx]});
             this.dPt.splice(idx, 1);
         }
     },
@@ -18577,7 +18577,7 @@ CPieSeries.prototype =
 
     getObjectType: function()
     {
-        return historyitem_type_PieSeries;
+        return AscDFH.historyitem_type_PieSeries;
     },
 
 
@@ -18642,12 +18642,12 @@ CPieSeries.prototype =
 
     setCat: function(pr)
     {
-        History.Add(this, {Type: historyitem_PieSeries_SetCat, oldPr: this.cat, newPr:pr});
+        History.Add(this, {Type: AscDFH.historyitem_PieSeries_SetCat, oldPr: this.cat, newPr:pr});
         this.cat = pr;
     },
     setDLbls: function(pr)
     {
-        History.Add(this, {Type: historyitem_PieSeries_SetDLbls, oldPr: this.dLbls, newPr:pr});
+        History.Add(this, {Type: AscDFH.historyitem_PieSeries_SetDLbls, oldPr: this.dLbls, newPr:pr});
         this.dLbls = pr;
         if(this.dLbls)
         {
@@ -18656,37 +18656,37 @@ CPieSeries.prototype =
     },
     addDPt: function(pr)
     {
-        History.Add(this, {Type: historyitem_PieSeries_SetDPt, oldPr: this.dPt, newPr:pr});
+        History.Add(this, {Type: AscDFH.historyitem_PieSeries_SetDPt, oldPr: this.dPt, newPr:pr});
         this.dPt.push(pr);
     },
     setExplosion: function(pr)
     {
-        History.Add(this, {Type: historyitem_PieSeries_SetExplosion, oldPr: this.explosion, newPr:pr});
+        History.Add(this, {Type: AscDFH.historyitem_PieSeries_SetExplosion, oldPr: this.explosion, newPr:pr});
         this.explosion = pr;
     },
     setIdx: function(pr)
     {
-        History.Add(this, {Type: historyitem_PieSeries_SetIdx, oldPr: this.idx, newPr:pr});
+        History.Add(this, {Type: AscDFH.historyitem_PieSeries_SetIdx, oldPr: this.idx, newPr:pr});
         this.idx = pr;
     },
     setOrder: function(pr)
     {
-        History.Add(this, {Type: historyitem_PieSeries_SetOrder, oldPr: this.order, newPr:pr});
+        History.Add(this, {Type: AscDFH.historyitem_PieSeries_SetOrder, oldPr: this.order, newPr:pr});
         this.order = pr;
     },
     setSpPr: function(pr)
     {
-        History.Add(this, {Type: historyitem_PieSeries_SetSpPr, oldPr: this.spPr, newPr:pr});
+        History.Add(this, {Type: AscDFH.historyitem_PieSeries_SetSpPr, oldPr: this.spPr, newPr:pr});
         this.spPr = pr;
     },
     setTx: function(pr)
     {
-        History.Add(this, {Type: historyitem_PieSeries_SetTx, oldPr: this.tx, newPr:pr});
+        History.Add(this, {Type: AscDFH.historyitem_PieSeries_SetTx, oldPr: this.tx, newPr:pr});
         this.tx = pr;
     },
     setVal: function(pr)
     {
-        History.Add(this, {Type: historyitem_PieSeries_SetVal, oldPr: this.val, newPr:pr});
+        History.Add(this, {Type: AscDFH.historyitem_PieSeries_SetVal, oldPr: this.val, newPr:pr});
         this.val = pr;
         if(this.val && this.val.setParent)
         {
@@ -18696,7 +18696,7 @@ CPieSeries.prototype =
 
     setParent: function(pr)
     {
-        History.Add(this, {Type: historyitem_CommonChartFormat_SetParent, oldPr: this.parent, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_CommonChartFormat_SetParent, oldPr: this.parent, newPr: pr});
         this.parent = pr;
     },
 
@@ -18704,22 +18704,22 @@ CPieSeries.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 this.parent = data.oldPr;
                 break;
             }
-            case historyitem_CommonSeries_RemoveDPt:
+            case AscDFH.historyitem_CommonSeries_RemoveDPt:
             {
                 this.dPt.splice(data.idx, 0, data.pt);
                 break;
             }
-            case historyitem_PieSeries_SetCat:
+            case AscDFH.historyitem_PieSeries_SetCat:
             {
                 this.cat = data.oldPr;
                 break;
             }
-            case historyitem_PieSeries_SetDLbls:
+            case AscDFH.historyitem_PieSeries_SetDLbls:
             {
                 this.dLbls = data.oldPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateDataLabels)
@@ -18728,37 +18728,37 @@ CPieSeries.prototype =
                 }
                 break;
             }
-            case historyitem_PieSeries_SetDPt:
+            case AscDFH.historyitem_PieSeries_SetDPt:
             {
                 findPrAndRemove(this.dPt, data.newPr);
                 break;
             }
-            case historyitem_PieSeries_SetExplosion:
+            case AscDFH.historyitem_PieSeries_SetExplosion:
             {
                 this.explosion = data.oldPr;
                 break;
             }
-            case historyitem_PieSeries_SetIdx:
+            case AscDFH.historyitem_PieSeries_SetIdx:
             {
                 this.idx = data.oldPr;
                 break;
             }
-            case historyitem_PieSeries_SetOrder:
+            case AscDFH.historyitem_PieSeries_SetOrder:
             {
                 this.order = data.oldPr;
                 break;
             }
-            case historyitem_PieSeries_SetSpPr:
+            case AscDFH.historyitem_PieSeries_SetSpPr:
             {
                 this.spPr = data.oldPr;
                 break;
             }
-            case historyitem_PieSeries_SetTx:
+            case AscDFH.historyitem_PieSeries_SetTx:
             {
                 this.tx = data.oldPr;
                 break;
             }
-            case historyitem_PieSeries_SetVal:
+            case AscDFH.historyitem_PieSeries_SetVal:
             {
                 this.val = data.oldPr;
                 break;
@@ -18770,22 +18770,22 @@ CPieSeries.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 this.parent = data.newPr;
                 break;
             }
-            case historyitem_CommonSeries_RemoveDPt:
+            case AscDFH.historyitem_CommonSeries_RemoveDPt:
             {
                 this.dPt.splice(data.idx, 1);
                 break;
             }
-            case historyitem_PieSeries_SetCat:
+            case AscDFH.historyitem_PieSeries_SetCat:
             {
                 this.cat = data.newPr;
                 break;
             }
-            case historyitem_PieSeries_SetDLbls:
+            case AscDFH.historyitem_PieSeries_SetDLbls:
             {
                 this.dLbls = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateDataLabels)
@@ -18794,37 +18794,37 @@ CPieSeries.prototype =
                 }
                 break;
             }
-            case historyitem_PieSeries_SetDPt:
+            case AscDFH.historyitem_PieSeries_SetDPt:
             {
                 this.dPt.push(data.newPr);
                 break;
             }
-            case historyitem_PieSeries_SetExplosion:
+            case AscDFH.historyitem_PieSeries_SetExplosion:
             {
                 this.explosion = data.newPr;
                 break;
             }
-            case historyitem_PieSeries_SetIdx:
+            case AscDFH.historyitem_PieSeries_SetIdx:
             {
                 this.idx = data.newPr;
                 break;
             }
-            case historyitem_PieSeries_SetOrder:
+            case AscDFH.historyitem_PieSeries_SetOrder:
             {
                 this.order = data.newPr;
                 break;
             }
-            case historyitem_PieSeries_SetSpPr:
+            case AscDFH.historyitem_PieSeries_SetSpPr:
             {
                 this.spPr = data.newPr;
                 break;
             }
-            case historyitem_PieSeries_SetTx:
+            case AscDFH.historyitem_PieSeries_SetTx:
             {
                 this.tx = data.newPr;
                 break;
             }
-            case historyitem_PieSeries_SetVal:
+            case AscDFH.historyitem_PieSeries_SetVal:
             {
                 this.val = data.newPr;
                 break;
@@ -18837,29 +18837,29 @@ CPieSeries.prototype =
         w.WriteLong(data.Type);
         switch (data.Type)
         {
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 writeObject(w, data.newPr);
                 break;
             }
-            case historyitem_PieSeries_SetCat:
-            case historyitem_PieSeries_SetDLbls:
-            case historyitem_PieSeries_SetDPt:
-            case historyitem_PieSeries_SetSpPr:
-            case historyitem_PieSeries_SetTx:
-            case historyitem_PieSeries_SetVal:
+            case AscDFH.historyitem_PieSeries_SetCat:
+            case AscDFH.historyitem_PieSeries_SetDLbls:
+            case AscDFH.historyitem_PieSeries_SetDPt:
+            case AscDFH.historyitem_PieSeries_SetSpPr:
+            case AscDFH.historyitem_PieSeries_SetTx:
+            case AscDFH.historyitem_PieSeries_SetVal:
             {
                 writeObject(w, data.newPr);
                 break;
             }
-            case historyitem_PieSeries_SetExplosion:
-            case historyitem_PieSeries_SetIdx:
-            case historyitem_PieSeries_SetOrder:
+            case AscDFH.historyitem_PieSeries_SetExplosion:
+            case AscDFH.historyitem_PieSeries_SetIdx:
+            case AscDFH.historyitem_PieSeries_SetOrder:
             {
                 writeLong(w, data.newPr);
                 break;
             }
-            case historyitem_CommonSeries_RemoveDPt:
+            case AscDFH.historyitem_CommonSeries_RemoveDPt:
             {
                 writeLong(w, data.idx);
                 break;
@@ -18872,12 +18872,12 @@ CPieSeries.prototype =
         var type = r.GetLong();
         switch (type)
         {
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 this.parent = readObject(r);
                 break;
             }
-            case historyitem_CommonSeries_RemoveDPt:
+            case AscDFH.historyitem_CommonSeries_RemoveDPt:
             {
                 var pos = readLong(r);
                 if(isRealNumber(pos))
@@ -18886,12 +18886,12 @@ CPieSeries.prototype =
                 }
                 break;
             }
-            case historyitem_PieSeries_SetCat:
+            case AscDFH.historyitem_PieSeries_SetCat:
             {
                 this.cat = readObject(r);
                 break;
             }
-            case historyitem_PieSeries_SetDLbls:
+            case AscDFH.historyitem_PieSeries_SetDLbls:
             {
                 this.dLbls = readObject(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateDataLabels)
@@ -18900,37 +18900,37 @@ CPieSeries.prototype =
                 }
                 break;
             }
-            case historyitem_PieSeries_SetDPt:
+            case AscDFH.historyitem_PieSeries_SetDPt:
             {
                 this.dPt.push(readObject(r));
                 break;
             }
-            case historyitem_PieSeries_SetExplosion:
+            case AscDFH.historyitem_PieSeries_SetExplosion:
             {
                 this.explosion = readLong(r);
                 break;
             }
-            case historyitem_PieSeries_SetIdx:
+            case AscDFH.historyitem_PieSeries_SetIdx:
             {
                 this.idx = readLong(r);
                 break;
             }
-            case historyitem_PieSeries_SetOrder:
+            case AscDFH.historyitem_PieSeries_SetOrder:
             {
                 this.order = readLong(r);
                 break;
             }
-            case historyitem_PieSeries_SetSpPr:
+            case AscDFH.historyitem_PieSeries_SetSpPr:
             {
                 this.spPr = readObject(r);
                 break;
             }
-            case historyitem_PieSeries_SetTx:
+            case AscDFH.historyitem_PieSeries_SetTx:
             {
                 this.tx = readObject(r);
                 break;
             }
-            case historyitem_PieSeries_SetVal:
+            case AscDFH.historyitem_PieSeries_SetVal:
             {
                 this.val = readObject(r);
                 break;
@@ -18986,7 +18986,7 @@ CPivotFmt.prototype =
 
     getObjectType: function()
     {
-        return historyitem_type_PivotFmt;
+        return AscDFH.historyitem_type_PivotFmt;
     },
 
     Write_ToBinary2: function(w)
@@ -19002,31 +19002,31 @@ CPivotFmt.prototype =
 
     setLbl: function(pr)
     {
-        History.Add(this, {Type:historyitem_PivotFmt_SetDLbl, oldPr:this.dLbl, newPr: pr});
+        History.Add(this, {Type:AscDFH.historyitem_PivotFmt_SetDLbl, oldPr:this.dLbl, newPr: pr});
         this.dLbl = pr;
     },
 
     setIdx: function(pr)
     {
-        History.Add(this, {Type:historyitem_PivotFmt_SetIdx, oldPr:this.idx, newPr: pr});
+        History.Add(this, {Type:AscDFH.historyitem_PivotFmt_SetIdx, oldPr:this.idx, newPr: pr});
         this.idx = pr;
     },
 
     setMarker: function(pr)
     {
-        History.Add(this, {Type:historyitem_PivotFmt_SetMarker, oldPr:this.marker, newPr: pr});
+        History.Add(this, {Type:AscDFH.historyitem_PivotFmt_SetMarker, oldPr:this.marker, newPr: pr});
         this.marker = pr;
     },
 
     setSpPr: function(pr)
     {
-        History.Add(this, {Type:historyitem_PivotFmt_SetSpPr, oldPr:this.spPr, newPr: pr});
+        History.Add(this, {Type:AscDFH.historyitem_PivotFmt_SetSpPr, oldPr:this.spPr, newPr: pr});
         this.spPr = pr;
     },
 
     setTxPr: function(pr)
     {
-        History.Add(this, {Type:historyitem_PivotFmt_SetTxPr, oldPr:this.txPr, newPr: pr});
+        History.Add(this, {Type:AscDFH.historyitem_PivotFmt_SetTxPr, oldPr:this.txPr, newPr: pr});
         this.txPr = pr;
     },
 
@@ -19034,27 +19034,27 @@ CPivotFmt.prototype =
     {
         switch(data.Type)
         {
-            case historyitem_PivotFmt_SetDLbl:
+            case AscDFH.historyitem_PivotFmt_SetDLbl:
             {
                 this.dLbl = data.oldPr;
                 break;
             }
-            case historyitem_PivotFmt_SetIdx:
+            case AscDFH.historyitem_PivotFmt_SetIdx:
             {
                 this.idx = data.oldPr;
                 break;
             }
-            case historyitem_PivotFmt_SetMarker:
+            case AscDFH.historyitem_PivotFmt_SetMarker:
             {
                 this.marker = data.oldPr;
                 break;
             }
-            case historyitem_PivotFmt_SetSpPr:
+            case AscDFH.historyitem_PivotFmt_SetSpPr:
             {
                 this.spPr = data.oldPr;
                 break;
             }
-            case historyitem_PivotFmt_SetTxPr:
+            case AscDFH.historyitem_PivotFmt_SetTxPr:
             {
                 this.txPr = data.oldPr;
                 break;
@@ -19066,27 +19066,27 @@ CPivotFmt.prototype =
     {
         switch(data.Type)
         {
-            case historyitem_PivotFmt_SetDLbl:
+            case AscDFH.historyitem_PivotFmt_SetDLbl:
             {
                 this.dLbl = data.newPr;
                 break;
             }
-            case historyitem_PivotFmt_SetIdx:
+            case AscDFH.historyitem_PivotFmt_SetIdx:
             {
                 this.idx = data.newPr;
                 break;
             }
-            case historyitem_PivotFmt_SetMarker:
+            case AscDFH.historyitem_PivotFmt_SetMarker:
             {
                 this.marker = data.newPr;
                 break;
             }
-            case historyitem_PivotFmt_SetSpPr:
+            case AscDFH.historyitem_PivotFmt_SetSpPr:
             {
                 this.spPr = data.newPr;
                 break;
             }
-            case historyitem_PivotFmt_SetTxPr:
+            case AscDFH.historyitem_PivotFmt_SetTxPr:
             {
                 this.txPr = data.newPr;
                 break;
@@ -19099,10 +19099,10 @@ CPivotFmt.prototype =
         w.WriteLong(data.Type);
         switch(data.Type)
         {
-            case historyitem_PivotFmt_SetDLbl:
-            case historyitem_PivotFmt_SetMarker:
-            case historyitem_PivotFmt_SetSpPr:
-            case historyitem_PivotFmt_SetTxPr:
+            case AscDFH.historyitem_PivotFmt_SetDLbl:
+            case AscDFH.historyitem_PivotFmt_SetMarker:
+            case AscDFH.historyitem_PivotFmt_SetSpPr:
+            case AscDFH.historyitem_PivotFmt_SetTxPr:
             {
                 w.WriteBool(isRealObject(data.newPr));
                 if(isRealObject(data.newPr))
@@ -19111,7 +19111,7 @@ CPivotFmt.prototype =
                 }
                 break;
             }
-            case historyitem_PivotFmt_SetIdx:
+            case AscDFH.historyitem_PivotFmt_SetIdx:
             {
                 w.WriteBool(isRealNumber(data.newPr));
                 if(isRealNumber(data.newPr))
@@ -19128,7 +19128,7 @@ CPivotFmt.prototype =
         var type = r.GetLong();
         switch(type)
         {
-            case historyitem_PivotFmt_SetDLbl:
+            case AscDFH.historyitem_PivotFmt_SetDLbl:
             {
                 if(r.GetBool())
                 {
@@ -19140,7 +19140,7 @@ CPivotFmt.prototype =
                 }
                 break;
             }
-            case historyitem_PivotFmt_SetIdx:
+            case AscDFH.historyitem_PivotFmt_SetIdx:
             {
                 if(r.GetBool())
                 {
@@ -19152,7 +19152,7 @@ CPivotFmt.prototype =
                 }
                 break;
             }
-            case historyitem_PivotFmt_SetMarker:
+            case AscDFH.historyitem_PivotFmt_SetMarker:
             {
                 if(r.GetBool())
                 {
@@ -19164,7 +19164,7 @@ CPivotFmt.prototype =
                 }
                 break;
             }
-            case historyitem_PivotFmt_SetSpPr:
+            case AscDFH.historyitem_PivotFmt_SetSpPr:
             {
                 if(r.GetBool())
                 {
@@ -19176,7 +19176,7 @@ CPivotFmt.prototype =
                 }
                 break;
             }
-            case historyitem_PivotFmt_SetTxPr:
+            case AscDFH.historyitem_PivotFmt_SetTxPr:
             {
                 if(r.GetBool())
                 {
@@ -19220,7 +19220,7 @@ CRadarChart.prototype =
     {
         if(this.series[idx])
         {
-            History.Add(this, {Type: historyitem_CommonChart_RemoveSeries, oldPr: idx, newPr: this.series.splice(idx, 1)[0]});
+            History.Add(this, {Type: AscDFH.historyitem_CommonChart_RemoveSeries, oldPr: idx, newPr: this.series.splice(idx, 1)[0]});
         }
     },
 
@@ -19252,19 +19252,19 @@ CRadarChart.prototype =
             return;
         switch(data.Type)
         {
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 break;
             }
-            case historyitem_CommonChart_RemoveSeries:
+            case AscDFH.historyitem_CommonChart_RemoveSeries:
             {
                 break;
             }
-            case historyitem_RadarChart_AddAxId:
+            case AscDFH.historyitem_RadarChart_AddAxId:
             {
                 break;
             }
-            case historyitem_RadarChart_SetDLbls:
+            case AscDFH.historyitem_RadarChart_SetDLbls:
             {
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
                 {
@@ -19272,11 +19272,11 @@ CRadarChart.prototype =
                 }
                 break;
             }
-            case historyitem_RadarChart_SetRadarStyle:
+            case AscDFH.historyitem_RadarChart_SetRadarStyle:
             {
                 break;
             }
-            case historyitem_RadarChart_AddSer:
+            case AscDFH.historyitem_RadarChart_AddSer:
             {
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
                 {
@@ -19284,7 +19284,7 @@ CRadarChart.prototype =
                 }
                 break;
             }
-            case historyitem_RadarChart_SetVaryColors:
+            case AscDFH.historyitem_RadarChart_SetVaryColors:
             {
                 break;
             }
@@ -19309,7 +19309,7 @@ CRadarChart.prototype =
 
     getObjectType: function()
     {
-        return historyitem_type_RadarChart;
+        return AscDFH.historyitem_type_RadarChart;
     },
 
 
@@ -19325,13 +19325,13 @@ CRadarChart.prototype =
     {
         if(!pr)
             return;
-        History.Add(this, {Type: historyitem_RadarChart_AddAxId, newPr:pr});
+        History.Add(this, {Type: AscDFH.historyitem_RadarChart_AddAxId, newPr:pr});
         this.axId.push(pr);
     },
 
     setDLbls: function(pr)
     {
-        History.Add(this, {Type: historyitem_RadarChart_SetDLbls, oldPr: this.dLbls, newPr:pr});
+        History.Add(this, {Type: AscDFH.historyitem_RadarChart_SetDLbls, oldPr: this.dLbls, newPr:pr});
         this.dLbls = pr;
         if(this.dLbls)
         {
@@ -19345,13 +19345,13 @@ CRadarChart.prototype =
 
     setRadarStyle: function(pr)
     {
-        History.Add(this, {Type: historyitem_RadarChart_SetRadarStyle, oldPr: this.radarStyle, newPr:pr});
+        History.Add(this, {Type: AscDFH.historyitem_RadarChart_SetRadarStyle, oldPr: this.radarStyle, newPr:pr});
         this.radarStyle = pr;
     },
 
     addSer: function(ser)
     {
-        History.Add(this, {Type: historyitem_RadarChart_AddSer, ser: ser});
+        History.Add(this, {Type: AscDFH.historyitem_RadarChart_AddSer, ser: ser});
         this.series.push(ser);
         ser.setParent(this);
         if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -19362,13 +19362,13 @@ CRadarChart.prototype =
 
     setVaryColors: function(pr)
     {
-        History.Add(this, {Type: historyitem_RadarChart_SetVaryColors, oldPr: this.varyColors, newPr:pr});
+        History.Add(this, {Type: AscDFH.historyitem_RadarChart_SetVaryColors, oldPr: this.varyColors, newPr:pr});
         this.varyColors = pr;
     },
 
     setParent: function(pr)
     {
-        History.Add(this, {Type: historyitem_CommonChartFormat_SetParent, oldPr: this.parent, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_CommonChartFormat_SetParent, oldPr: this.parent, newPr: pr});
         this.parent = pr;
     },
 
@@ -19377,17 +19377,17 @@ CRadarChart.prototype =
     {
         switch(data.Type)
         {
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 this.parent = data.oldPr;
                 break;
             }
-            case historyitem_CommonChart_RemoveSeries:
+            case AscDFH.historyitem_CommonChart_RemoveSeries:
             {
                 this.series.splice(data.oldPr, 0, data.newPr);
                 break;
             }
-            case historyitem_RadarChart_AddAxId:
+            case AscDFH.historyitem_RadarChart_AddAxId:
             {
                 for(var i = this.axId.length - 1; i > -1; --i)
                 {
@@ -19399,7 +19399,7 @@ CRadarChart.prototype =
                 }
                 break;
             }
-            case historyitem_RadarChart_SetDLbls:
+            case AscDFH.historyitem_RadarChart_SetDLbls:
             {
                 this.dLbls = data.oldPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -19408,12 +19408,12 @@ CRadarChart.prototype =
                 }
                 break;
             }
-            case historyitem_RadarChart_SetRadarStyle:
+            case AscDFH.historyitem_RadarChart_SetRadarStyle:
             {
                 this.radarStyle = data.oldPr;
                 break;
             }
-            case historyitem_RadarChart_AddSer:
+            case AscDFH.historyitem_RadarChart_AddSer:
             {
                 for(var i = this.series.length - 1; i >  -1; --i)
                 {
@@ -19429,7 +19429,7 @@ CRadarChart.prototype =
                 }
                 break;
             }
-            case historyitem_RadarChart_SetVaryColors:
+            case AscDFH.historyitem_RadarChart_SetVaryColors:
             {
                 this.varyColors = data.oldPr;
                 break;
@@ -19441,22 +19441,22 @@ CRadarChart.prototype =
     {
         switch(data.Type)
         {
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 this.parent = data.newPr;
                 break;
             }
-            case historyitem_CommonChart_RemoveSeries:
+            case AscDFH.historyitem_CommonChart_RemoveSeries:
             {
                 this.series.splice(data.oldPr, 1);
                 break;
             }
-            case historyitem_RadarChart_AddAxId:
+            case AscDFH.historyitem_RadarChart_AddAxId:
             {
                 this.axId.push(data.newPr);
                 break;
             }
-            case historyitem_RadarChart_SetDLbls:
+            case AscDFH.historyitem_RadarChart_SetDLbls:
             {
                 this.dLbls = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -19465,12 +19465,12 @@ CRadarChart.prototype =
                 }
                 break;
             }
-            case historyitem_RadarChart_SetRadarStyle:
+            case AscDFH.historyitem_RadarChart_SetRadarStyle:
             {
                 this.radarStyle = data.newPr;
                 break;
             }
-            case historyitem_RadarChart_AddSer:
+            case AscDFH.historyitem_RadarChart_AddSer:
             {
                 this.series.push(data.ser);
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -19479,7 +19479,7 @@ CRadarChart.prototype =
                 }
                 break;
             }
-            case historyitem_RadarChart_SetVaryColors:
+            case AscDFH.historyitem_RadarChart_SetVaryColors:
             {
                 this.varyColors = data.newPr;
                 break;
@@ -19492,23 +19492,23 @@ CRadarChart.prototype =
         w.WriteLong(data.Type);
         switch(data.Type)
         {
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 writeObject(w, data.newPr);
                 break;
             }
-            case historyitem_CommonChart_RemoveSeries:
+            case AscDFH.historyitem_CommonChart_RemoveSeries:
             {
                 writeLong(w, data.oldPr);
                 break;
             }
-            case historyitem_RadarChart_AddAxId:
+            case AscDFH.historyitem_RadarChart_AddAxId:
             {
                 writeObject(w, data.newPr);
                 break;
             }
-            case historyitem_RadarChart_SetDLbls:
-            case historyitem_RadarChart_SetRadarStyle:
+            case AscDFH.historyitem_RadarChart_SetDLbls:
+            case AscDFH.historyitem_RadarChart_SetRadarStyle:
             {
                 w.WriteBool(isRealObject(data.newPr));
                 if(isRealObject(data.newPr))
@@ -19517,7 +19517,7 @@ CRadarChart.prototype =
                 }
                 break;
             }
-            case historyitem_RadarChart_AddSer:
+            case AscDFH.historyitem_RadarChart_AddSer:
             {
                 w.WriteBool(isRealObject(data.ser));
                 if(isRealObject(data.ser))
@@ -19526,7 +19526,7 @@ CRadarChart.prototype =
                 }
                 break;
             }
-            case historyitem_RadarChart_SetVaryColors:
+            case AscDFH.historyitem_RadarChart_SetVaryColors:
             {
                 this.varyColors = data.newPr;
                 w.WriteBool(isRealBool(data.newPr));
@@ -19544,25 +19544,25 @@ CRadarChart.prototype =
         var type = r.GetLong();
         switch(type)
         {
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 this.parent = readObject(r);
                 break;
             }
-            case historyitem_CommonChart_RemoveSeries:
+            case AscDFH.historyitem_CommonChart_RemoveSeries:
             {
                 var pos = readLong(r);
                 this.series.splice(pos, 1);
                 break;
             }
-            case historyitem_RadarChart_AddAxId:
+            case AscDFH.historyitem_RadarChart_AddAxId:
             {
                 var axis = readObject(r);
                 if(axis)
                     this.axId.push(axis);
                 break;
             }
-            case historyitem_RadarChart_SetDLbls:
+            case AscDFH.historyitem_RadarChart_SetDLbls:
             {
                 if(r.GetBool())
                 {
@@ -19578,7 +19578,7 @@ CRadarChart.prototype =
                 }
                 break;
             }
-            case historyitem_RadarChart_SetRadarStyle:
+            case AscDFH.historyitem_RadarChart_SetRadarStyle:
             {
                 if(r.GetBool())
                 {
@@ -19590,7 +19590,7 @@ CRadarChart.prototype =
                 }
                 break;
             }
-            case historyitem_RadarChart_AddSer:
+            case AscDFH.historyitem_RadarChart_AddSer:
             {
                 if(r.GetBool())
                 {
@@ -19606,7 +19606,7 @@ CRadarChart.prototype =
                 }
                 break;
             }
-            case historyitem_RadarChart_SetVaryColors:
+            case AscDFH.historyitem_RadarChart_SetVaryColors:
             {
                 if(r.GetBool())
                 {
@@ -19664,7 +19664,7 @@ CRadarSeries.prototype =
     {
         if(this.dPt[idx])
         {
-            History.Add(this, {Type: historyitem_CommonSeries_RemoveDPt, idx: idx, pt: this.dPt[idx]});
+            History.Add(this, {Type: AscDFH.historyitem_CommonSeries_RemoveDPt, idx: idx, pt: this.dPt[idx]});
             this.dPt.splice(idx, 1);
         }
     },
@@ -19707,7 +19707,7 @@ CRadarSeries.prototype =
 
     getObjectType: function()
     {
-        return historyitem_type_RadarSeries;
+        return AscDFH.historyitem_type_RadarSeries;
     },
 
     documentCreateFontMap: CAreaSeries.prototype.documentCreateFontMap,
@@ -19733,7 +19733,7 @@ CRadarSeries.prototype =
 
     setCat: function(pr)
     {
-        History.Add(this, {Type: historyitem_RadarSeries_SetCat, oldPr: this.cat, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_RadarSeries_SetCat, oldPr: this.cat, newPr: pr});
         this.cat = pr;
     },
 
@@ -19773,7 +19773,7 @@ CRadarSeries.prototype =
 
     setDLbls: function(pr)
     {
-        History.Add(this, {Type: historyitem_RadarSeries_SetCat, oldPr: this.dLbls, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_RadarSeries_SetCat, oldPr: this.dLbls, newPr: pr});
         this.dLbls = pr;
         if(this.dLbls)
         {
@@ -19782,37 +19782,37 @@ CRadarSeries.prototype =
     },
     addDPt: function(pr)
     {
-        History.Add(this, {Type: historyitem_RadarSeries_SetCat, oldPr: this.dPt, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_RadarSeries_SetCat, oldPr: this.dPt, newPr: pr});
         this.dPt.push(pr);
     },
     setIdx: function(pr)
     {
-        History.Add(this, {Type: historyitem_RadarSeries_SetCat, oldPr: this.idx, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_RadarSeries_SetCat, oldPr: this.idx, newPr: pr});
         this.idx = pr;
     },
     setMarker: function(pr)
     {
-        History.Add(this, {Type: historyitem_RadarSeries_SetCat, oldPr: this.marker, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_RadarSeries_SetCat, oldPr: this.marker, newPr: pr});
         this.marker = pr;
     },
     setOrder: function(pr)
     {
-        History.Add(this, {Type: historyitem_RadarSeries_SetCat, oldPr: this.order, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_RadarSeries_SetCat, oldPr: this.order, newPr: pr});
         this.order = pr;
     },
     setSpPr: function(pr)
     {
-        History.Add(this, {Type: historyitem_RadarSeries_SetCat, oldPr: this.spPr, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_RadarSeries_SetCat, oldPr: this.spPr, newPr: pr});
         this.spPr = pr;
     },
     setTx: function(pr)
     {
-        History.Add(this, {Type: historyitem_RadarSeries_SetCat, oldPr: this.tx, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_RadarSeries_SetCat, oldPr: this.tx, newPr: pr});
         this.tx = pr;
     },
     setVal: function(pr)
     {
-        History.Add(this, {Type: historyitem_RadarSeries_SetCat, oldPr: this.val, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_RadarSeries_SetCat, oldPr: this.val, newPr: pr});
         this.val = pr;
         if(this.val && this.val.setParent)
         {
@@ -19822,7 +19822,7 @@ CRadarSeries.prototype =
 
     setParent: function(pr)
     {
-        History.Add(this, {Type: historyitem_CommonChartFormat_SetParent, oldPr: this.parent, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_CommonChartFormat_SetParent, oldPr: this.parent, newPr: pr});
         this.parent = pr;
     },
 
@@ -19831,22 +19831,22 @@ CRadarSeries.prototype =
         switch (data.Type)
         {
 
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 this.parent = data.oldPr;
                 break;
             }
-            case historyitem_CommonSeries_RemoveDPt:
+            case AscDFH.historyitem_CommonSeries_RemoveDPt:
             {
                 this.dPt.splice(data.idx, 0, data.pt);
                 break;
             }
-            case historyitem_RadarSeries_SetCat:
+            case AscDFH.historyitem_RadarSeries_SetCat:
             {
                 this.cat = data.oldPr;
                 break;
             }
-            case historyitem_RadarSeries_SetDLbls:
+            case AscDFH.historyitem_RadarSeries_SetDLbls:
             {
                 this.dLbls = data.oldPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateDataLabels)
@@ -19855,37 +19855,37 @@ CRadarSeries.prototype =
                 }
                 break;
             }
-            case historyitem_RadarSeries_SetDPt:
+            case AscDFH.historyitem_RadarSeries_SetDPt:
             {
                 findPrAndRemove(this.dPt, data.newPr);
                 break;
             }
-            case historyitem_RadarSeries_SetIdx:
+            case AscDFH.historyitem_RadarSeries_SetIdx:
             {
                 this.idx = data.oldPr;
                 break;
             }
-            case historyitem_RadarSeries_SetMarker:
+            case AscDFH.historyitem_RadarSeries_SetMarker:
             {
                 this.marker = data.oldPr;
                 break;
             }
-            case historyitem_RadarSeries_SetOrder:
+            case AscDFH.historyitem_RadarSeries_SetOrder:
             {
                 this.order = data.oldPr;
                 break;
             }
-            case historyitem_RadarSeries_SetSpPr:
+            case AscDFH.historyitem_RadarSeries_SetSpPr:
             {
                 this.spPr = data.oldPr;
                 break;
             }
-            case historyitem_RadarSeries_SetTx:
+            case AscDFH.historyitem_RadarSeries_SetTx:
             {
                 this.tx = data.oldPr;
                 break;
             }
-            case historyitem_RadarSeries_SetVal:
+            case AscDFH.historyitem_RadarSeries_SetVal:
             {
                 this.val = data.oldPr;
                 break;
@@ -19897,22 +19897,22 @@ CRadarSeries.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 this.parent = data.newPr;
                 break;
             }
-            case historyitem_CommonSeries_RemoveDPt:
+            case AscDFH.historyitem_CommonSeries_RemoveDPt:
             {
                 this.dPt.splice(data.idx, 1);
                 break;
             }
-            case historyitem_RadarSeries_SetCat:
+            case AscDFH.historyitem_RadarSeries_SetCat:
             {
                 this.cat = data.newPr;
                 break;
             }
-            case historyitem_RadarSeries_SetDLbls:
+            case AscDFH.historyitem_RadarSeries_SetDLbls:
             {
                 this.dLbls = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateDataLabels)
@@ -19921,37 +19921,37 @@ CRadarSeries.prototype =
                 }
                 break;
             }
-            case historyitem_RadarSeries_SetDPt:
+            case AscDFH.historyitem_RadarSeries_SetDPt:
             {
                 this.addDPt(data.newPr);
                 break;
             }
-            case historyitem_RadarSeries_SetIdx:
+            case AscDFH.historyitem_RadarSeries_SetIdx:
             {
                 this.idx = data.newPr;
                 break;
             }
-            case historyitem_RadarSeries_SetMarker:
+            case AscDFH.historyitem_RadarSeries_SetMarker:
             {
                 this.marker = data.newPr;
                 break;
             }
-            case historyitem_RadarSeries_SetOrder:
+            case AscDFH.historyitem_RadarSeries_SetOrder:
             {
                 this.order = data.newPr;
                 break;
             }
-            case historyitem_RadarSeries_SetSpPr:
+            case AscDFH.historyitem_RadarSeries_SetSpPr:
             {
                 this.spPr = data.newPr;
                 break;
             }
-            case historyitem_RadarSeries_SetTx:
+            case AscDFH.historyitem_RadarSeries_SetTx:
             {
                 this.tx = data.newPr;
                 break;
             }
-            case historyitem_RadarSeries_SetVal:
+            case AscDFH.historyitem_RadarSeries_SetVal:
             {
                 this.val = data.newPr;
                 break;
@@ -19964,29 +19964,29 @@ CRadarSeries.prototype =
         w.WriteLong(data.Type);
         switch (data.Type)
         {
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 writeObject(w, data.newPr);
                 break;
             }
-            case historyitem_RadarSeries_SetCat:
-            case historyitem_RadarSeries_SetDLbls:
-            case historyitem_RadarSeries_SetDPt:
-            case historyitem_RadarSeries_SetMarker:
-            case historyitem_RadarSeries_SetSpPr:
-            case historyitem_RadarSeries_SetTx:
-            case historyitem_RadarSeries_SetVal:
+            case AscDFH.historyitem_RadarSeries_SetCat:
+            case AscDFH.historyitem_RadarSeries_SetDLbls:
+            case AscDFH.historyitem_RadarSeries_SetDPt:
+            case AscDFH.historyitem_RadarSeries_SetMarker:
+            case AscDFH.historyitem_RadarSeries_SetSpPr:
+            case AscDFH.historyitem_RadarSeries_SetTx:
+            case AscDFH.historyitem_RadarSeries_SetVal:
             {
                 writeObject(w, data.newPr);
                 break;
             }
-            case historyitem_RadarSeries_SetIdx:
-            case historyitem_RadarSeries_SetOrder:
+            case AscDFH.historyitem_RadarSeries_SetIdx:
+            case AscDFH.historyitem_RadarSeries_SetOrder:
             {
                 writeLong(w, data.newPr);
                 break;
             }
-            case historyitem_CommonSeries_RemoveDPt:
+            case AscDFH.historyitem_CommonSeries_RemoveDPt:
             {
                 writeLong(w, data.idx);
                 break;
@@ -19999,12 +19999,12 @@ CRadarSeries.prototype =
         var type = r.GetLong();
         switch (type)
         {
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 this.parent = readObject(r);
                 break;
             }
-            case historyitem_CommonSeries_RemoveDPt:
+            case AscDFH.historyitem_CommonSeries_RemoveDPt:
             {
                 var pos = readLong(r);
                 if(isRealNumber(pos))
@@ -20013,12 +20013,12 @@ CRadarSeries.prototype =
                 }
                 break;
             }
-            case historyitem_RadarSeries_SetCat:
+            case AscDFH.historyitem_RadarSeries_SetCat:
             {
                 this.cat = readObject(r);
                 break;
             }
-            case historyitem_RadarSeries_SetDLbls:
+            case AscDFH.historyitem_RadarSeries_SetDLbls:
             {
                 this.dLbls = readObject(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateDataLabels)
@@ -20027,37 +20027,37 @@ CRadarSeries.prototype =
                 }
                 break;
             }
-            case historyitem_RadarSeries_SetDPt:
+            case AscDFH.historyitem_RadarSeries_SetDPt:
             {
                 this.dPt.push(readObject(r));
                 break;
             }
-            case historyitem_RadarSeries_SetIdx:
+            case AscDFH.historyitem_RadarSeries_SetIdx:
             {
                 this.idx = readLong(r);
                 break;
             }
-            case historyitem_RadarSeries_SetMarker:
+            case AscDFH.historyitem_RadarSeries_SetMarker:
             {
                 this.marker = readObject(r);
                 break;
             }
-            case historyitem_RadarSeries_SetOrder:
+            case AscDFH.historyitem_RadarSeries_SetOrder:
             {
                 this.order = readLong(r);
                 break;
             }
-            case historyitem_RadarSeries_SetSpPr:
+            case AscDFH.historyitem_RadarSeries_SetSpPr:
             {
                 this.spPr = readObject(r);
                 break;
             }
-            case historyitem_RadarSeries_SetTx:
+            case AscDFH.historyitem_RadarSeries_SetTx:
             {
                 this.tx = readObject(r);
                 break;
             }
-            case historyitem_RadarSeries_SetVal:
+            case AscDFH.historyitem_RadarSeries_SetVal:
             {
                 this.val = readObject(r);
                 break;
@@ -20105,7 +20105,7 @@ CScaling.prototype =
 
     getObjectType: function()
     {
-        return historyitem_type_Scaling;
+        return AscDFH.historyitem_type_Scaling;
     },
 
     Write_ToBinary2: function(w)
@@ -20121,13 +20121,13 @@ CScaling.prototype =
 
     setParent: function(pr)
     {
-        History.Add(this, {Type: historyitem_Scaling_SetParent, oldPr: this.parent, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_Scaling_SetParent, oldPr: this.parent, newPr: pr});
         this.parent = pr;
     },
 
     setLogBase: function(pr)
     {
-        History.Add(this, {Type: historyitem_Scaling_SetLogBase, oldPr: this.logBase, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_Scaling_SetLogBase, oldPr: this.logBase, newPr: pr});
         this.logBase = pr;
         if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateInternalChart)
         {
@@ -20137,7 +20137,7 @@ CScaling.prototype =
 
     setMax: function(pr)
     {
-        History.Add(this, {Type: historyitem_Scaling_SetMax, oldPr: this.max, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_Scaling_SetMax, oldPr: this.max, newPr: pr});
         this.max = pr;
         if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateInternalChart)
         {
@@ -20147,7 +20147,7 @@ CScaling.prototype =
 
     setMin: function(pr)
     {
-        History.Add(this, {Type: historyitem_Scaling_SetMin, oldPr: this.min, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_Scaling_SetMin, oldPr: this.min, newPr: pr});
         this.min = pr;
         if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateInternalChart)
         {
@@ -20157,7 +20157,7 @@ CScaling.prototype =
 
     setOrientation: function(pr)
     {
-        History.Add(this, {Type: historyitem_Scaling_SetOrientation, oldPr: this.orientation, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_Scaling_SetOrientation, oldPr: this.orientation, newPr: pr});
         this.orientation = pr;
         if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateInternalChart)
         {
@@ -20169,12 +20169,12 @@ CScaling.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_Scaling_SetParent:
+            case AscDFH.historyitem_Scaling_SetParent:
             {
                 this.parent = data.oldPr;
                 break;
             }
-            case historyitem_Scaling_SetLogBase:
+            case AscDFH.historyitem_Scaling_SetLogBase:
             {
                 this.logBase = data.oldPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateInternalChart)
@@ -20183,7 +20183,7 @@ CScaling.prototype =
                 }
                 break;
             }
-            case historyitem_Scaling_SetMax:
+            case AscDFH.historyitem_Scaling_SetMax:
             {
                 this.max = data.oldPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateInternalChart)
@@ -20192,7 +20192,7 @@ CScaling.prototype =
                 }
                 break;
             }
-            case historyitem_Scaling_SetMin:
+            case AscDFH.historyitem_Scaling_SetMin:
             {
                 this.min = data.oldPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateInternalChart)
@@ -20201,7 +20201,7 @@ CScaling.prototype =
                 }
                 break;
             }
-            case historyitem_Scaling_SetOrientation:
+            case AscDFH.historyitem_Scaling_SetOrientation:
             {
                 this.orientation = data.oldPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateInternalChart)
@@ -20217,12 +20217,12 @@ CScaling.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_Scaling_SetParent:
+            case AscDFH.historyitem_Scaling_SetParent:
             {
                 this.parent = data.newPr;
                 break;
             }
-            case historyitem_Scaling_SetLogBase:
+            case AscDFH.historyitem_Scaling_SetLogBase:
             {
                 this.logBase = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateInternalChart)
@@ -20231,7 +20231,7 @@ CScaling.prototype =
                 }
                 break;
             }
-            case historyitem_Scaling_SetMax:
+            case AscDFH.historyitem_Scaling_SetMax:
             {
                 this.max = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateInternalChart)
@@ -20240,7 +20240,7 @@ CScaling.prototype =
                 }
                 break;
             }
-            case historyitem_Scaling_SetMin:
+            case AscDFH.historyitem_Scaling_SetMin:
             {
                 this.min = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateInternalChart)
@@ -20249,7 +20249,7 @@ CScaling.prototype =
                 }
                 break;
             }
-            case historyitem_Scaling_SetOrientation:
+            case AscDFH.historyitem_Scaling_SetOrientation:
             {
                 this.orientation = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateInternalChart)
@@ -20266,19 +20266,19 @@ CScaling.prototype =
         w.WriteLong(data.Type);
         switch (data.Type)
         {
-            case historyitem_Scaling_SetParent:
+            case AscDFH.historyitem_Scaling_SetParent:
             {
                 writeObject(w, data.newPr);
                 break;
             }
-            case historyitem_Scaling_SetLogBase:
-            case historyitem_Scaling_SetMax:
-            case historyitem_Scaling_SetMin:
+            case AscDFH.historyitem_Scaling_SetLogBase:
+            case AscDFH.historyitem_Scaling_SetMax:
+            case AscDFH.historyitem_Scaling_SetMin:
             {
                 writeDouble(w, data.newPr);
                 break;
             }
-            case historyitem_Scaling_SetOrientation:
+            case AscDFH.historyitem_Scaling_SetOrientation:
             {
                 writeLong(w, data.newPr);
                 break;
@@ -20291,12 +20291,12 @@ CScaling.prototype =
         var type = r.GetLong();
         switch (type)
         {
-            case historyitem_Scaling_SetParent:
+            case AscDFH.historyitem_Scaling_SetParent:
             {
                 this.parent = readObject(r);
                 break;
             }
-            case historyitem_Scaling_SetLogBase:
+            case AscDFH.historyitem_Scaling_SetLogBase:
             {
                 this.logBase = readDouble(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateInternalChart)
@@ -20305,7 +20305,7 @@ CScaling.prototype =
                 }
                 break;
             }
-            case historyitem_Scaling_SetMax:
+            case AscDFH.historyitem_Scaling_SetMax:
             {
                 this.max = readDouble(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateInternalChart)
@@ -20314,7 +20314,7 @@ CScaling.prototype =
                 }
                 break;
             }
-            case historyitem_Scaling_SetMin:
+            case AscDFH.historyitem_Scaling_SetMin:
             {
                 this.min = readDouble(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateInternalChart)
@@ -20323,7 +20323,7 @@ CScaling.prototype =
                 }
                 break;
             }
-            case historyitem_Scaling_SetOrientation:
+            case AscDFH.historyitem_Scaling_SetOrientation:
             {
                 this.orientation = readLong(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateInternalChart)
@@ -20372,19 +20372,19 @@ CScatterChart.prototype =
             return;
         switch(data.Type)
         {
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 break;
             }
-            case historyitem_CommonChart_RemoveSeries:
+            case AscDFH.historyitem_CommonChart_RemoveSeries:
             {
                 break;
             }
-            case historyitem_ScatterChart_AddAxId:
+            case AscDFH.historyitem_ScatterChart_AddAxId:
             {
                 break;
             }
-            case historyitem_ScatterChart_SetDLbls:
+            case AscDFH.historyitem_ScatterChart_SetDLbls:
             {
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
                 {
@@ -20392,7 +20392,7 @@ CScatterChart.prototype =
                 }
                 break;
             }
-            case historyitem_ScatterChart_SetScatterStyle:
+            case AscDFH.historyitem_ScatterChart_SetScatterStyle:
             {
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
                 {
@@ -20400,7 +20400,7 @@ CScatterChart.prototype =
                 }
                 break;
             }
-            case historyitem_ScatterChart_AddSer:
+            case AscDFH.historyitem_ScatterChart_AddSer:
             {
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
                 {
@@ -20408,7 +20408,7 @@ CScatterChart.prototype =
                 }
                 break;
             }
-            case historyitem_ScatterChart_SetVaryColors:
+            case AscDFH.historyitem_ScatterChart_SetVaryColors:
             {
                 break;
             }
@@ -20431,7 +20431,7 @@ CScatterChart.prototype =
     {
         if(this.series[idx])
         {
-            History.Add(this, {Type: historyitem_CommonChart_RemoveSeries, oldPr: idx, newPr: this.series.splice(idx, 1)[0]});
+            History.Add(this, {Type: AscDFH.historyitem_CommonChart_RemoveSeries, oldPr: idx, newPr: this.series.splice(idx, 1)[0]});
         }
     },
 
@@ -20463,7 +20463,7 @@ CScatterChart.prototype =
 
     getObjectType: function()
     {
-        return historyitem_type_ScatterChart;
+        return AscDFH.historyitem_type_ScatterChart;
     },
 
 
@@ -20498,13 +20498,13 @@ CScatterChart.prototype =
     {
         if(!pr)
             return;
-        History.Add(this, {Type: historyitem_ScatterChart_AddAxId, newPr:pr});
+        History.Add(this, {Type: AscDFH.historyitem_ScatterChart_AddAxId, newPr:pr});
         this.axId.push(pr);
     },
 
     setDLbls: function(pr)
     {
-        History.Add(this, {Type: historyitem_ScatterChart_SetDLbls, oldPr: this.dLbls, newPr:pr});
+        History.Add(this, {Type: AscDFH.historyitem_ScatterChart_SetDLbls, oldPr: this.dLbls, newPr:pr});
         this.dLbls = pr;
         if(this.dLbls)
         {
@@ -20518,7 +20518,7 @@ CScatterChart.prototype =
 
     setScatterStyle: function(pr)
     {
-        History.Add(this, {Type: historyitem_ScatterChart_SetScatterStyle, oldPr: this.scatterStyle, newPr:pr});
+        History.Add(this, {Type: AscDFH.historyitem_ScatterChart_SetScatterStyle, oldPr: this.scatterStyle, newPr:pr});
         this.scatterStyle = pr;
         if(this.parent && this.parent.parent && this.parent.parent.parent)
         {
@@ -20528,7 +20528,7 @@ CScatterChart.prototype =
 
     addSer: function(ser)
     {
-        History.Add(this, {Type: historyitem_ScatterChart_AddSer, newPr: ser});
+        History.Add(this, {Type: AscDFH.historyitem_ScatterChart_AddSer, newPr: ser});
         this.series.push(ser);
         ser.setParent(this);
         if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -20539,13 +20539,13 @@ CScatterChart.prototype =
 
     setVaryColors: function(pr)
     {
-        History.Add(this, {Type: historyitem_ScatterChart_SetVaryColors, oldPr: this.varyColors, newPr:pr});
+        History.Add(this, {Type: AscDFH.historyitem_ScatterChart_SetVaryColors, oldPr: this.varyColors, newPr:pr});
         this.varyColors = pr;
     },
 
     setParent: function(pr)
     {
-        History.Add(this, {Type: historyitem_CommonChartFormat_SetParent, oldPr: this.parent, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_CommonChartFormat_SetParent, oldPr: this.parent, newPr: pr});
         this.parent = pr;
     },
 
@@ -20553,17 +20553,17 @@ CScatterChart.prototype =
     {
         switch(data.Type)
         {
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 this.parent = data.oldPr;
                 break;
             }
-            case historyitem_CommonChart_RemoveSeries:
+            case AscDFH.historyitem_CommonChart_RemoveSeries:
             {
                 this.series.splice(data.oldPr, 0, data.newPr);
                 break;
             }
-            case historyitem_ScatterChart_AddAxId:
+            case AscDFH.historyitem_ScatterChart_AddAxId:
             {
                 for(var i = this.axId.length - 1; i > -1; --i)
                 {
@@ -20574,7 +20574,7 @@ CScatterChart.prototype =
                 }
                 break;
             }
-            case historyitem_ScatterChart_SetDLbls:
+            case AscDFH.historyitem_ScatterChart_SetDLbls:
             {
                 this.dLbls = data.oldPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -20583,7 +20583,7 @@ CScatterChart.prototype =
                 }
                 break;
             }
-            case historyitem_ScatterChart_SetScatterStyle:
+            case AscDFH.historyitem_ScatterChart_SetScatterStyle:
             {
                 this.scatterStyle = data.oldPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -20592,7 +20592,7 @@ CScatterChart.prototype =
                 }
                 break;
             }
-            case historyitem_ScatterChart_AddSer:
+            case AscDFH.historyitem_ScatterChart_AddSer:
             {
                 for(var i = this.series.length - 1; i >  -1; --i)
                 {
@@ -20608,7 +20608,7 @@ CScatterChart.prototype =
                 }
                 break;
             }
-            case historyitem_ScatterChart_SetVaryColors:
+            case AscDFH.historyitem_ScatterChart_SetVaryColors:
             {
                 this.varyColors = data.oldPr;
                 break;
@@ -20620,22 +20620,22 @@ CScatterChart.prototype =
     {
         switch(data.Type)
         {
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 this.parent = data.newPr;
                 break;
             }
-            case historyitem_CommonChart_RemoveSeries:
+            case AscDFH.historyitem_CommonChart_RemoveSeries:
             {
                 this.series.splice(data.oldPr, 1);
                 break;
             }
-            case historyitem_ScatterChart_AddAxId:
+            case AscDFH.historyitem_ScatterChart_AddAxId:
             {
                 this.axId.push(data.newPr);
                 break;
             }
-            case historyitem_ScatterChart_SetDLbls:
+            case AscDFH.historyitem_ScatterChart_SetDLbls:
             {
                 this.dLbls = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -20644,7 +20644,7 @@ CScatterChart.prototype =
                 }
                 break;
             }
-            case historyitem_ScatterChart_SetScatterStyle:
+            case AscDFH.historyitem_ScatterChart_SetScatterStyle:
             {
                 this.scatterStyle = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -20653,7 +20653,7 @@ CScatterChart.prototype =
                 }
                 break;
             }
-            case historyitem_ScatterChart_AddSer:
+            case AscDFH.historyitem_ScatterChart_AddSer:
             {
                 this.series.push(data.newPr);
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -20662,7 +20662,7 @@ CScatterChart.prototype =
                 }
                 break;
             }
-            case historyitem_ScatterChart_SetVaryColors:
+            case AscDFH.historyitem_ScatterChart_SetVaryColors:
             {
                 this.varyColors = data.newPr;
                 break;
@@ -20675,17 +20675,17 @@ CScatterChart.prototype =
         w.WriteLong(data.Type);
         switch(data.Type)
         {
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 writeObject(w, data.newPr);
                 break;
             }
-            case historyitem_CommonChart_RemoveSeries:
+            case AscDFH.historyitem_CommonChart_RemoveSeries:
             {
                 writeLong(w, data.oldPr);
                 break;
             }
-            case historyitem_ScatterChart_SetDLbls:
+            case AscDFH.historyitem_ScatterChart_SetDLbls:
             {
                 w.WriteBool(isRealObject(data.newPr));
                 if(isRealObject(data.newPr))
@@ -20694,14 +20694,14 @@ CScatterChart.prototype =
                 }
                 break;
             }
-            case historyitem_ScatterChart_SetScatterStyle:
+            case AscDFH.historyitem_ScatterChart_SetScatterStyle:
             {
                 writeLong(w, data.newPr);
                 break;
             }
 
-            case historyitem_ScatterChart_AddAxId:
-            case historyitem_ScatterChart_AddSer:
+            case AscDFH.historyitem_ScatterChart_AddAxId:
+            case AscDFH.historyitem_ScatterChart_AddSer:
             {
                 w.WriteBool(isRealObject(data.newPr));
                 if(isRealObject(data.newPr))
@@ -20710,7 +20710,7 @@ CScatterChart.prototype =
                 }
                 break;
             }
-            case historyitem_ScatterChart_SetVaryColors:
+            case AscDFH.historyitem_ScatterChart_SetVaryColors:
             {
                 this.varyColors = data.newPr;
                 w.WriteBool(isRealBool(data.newPr));
@@ -20728,18 +20728,18 @@ CScatterChart.prototype =
         var type = r.GetLong();
         switch(type)
         {
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 this.parent = readObject(r);
                 break;
             }
-            case historyitem_CommonChart_RemoveSeries:
+            case AscDFH.historyitem_CommonChart_RemoveSeries:
             {
                 var pos = readLong(r);
                 this.series.splice(pos, 1);
                 break;
             }
-            case historyitem_ScatterChart_AddAxId:
+            case AscDFH.historyitem_ScatterChart_AddAxId:
             {
                 if(r.GetBool())
                 {
@@ -20751,7 +20751,7 @@ CScatterChart.prototype =
                 }
                 break;
             }
-            case historyitem_ScatterChart_SetDLbls:
+            case AscDFH.historyitem_ScatterChart_SetDLbls:
             {
                 if(r.GetBool())
                 {
@@ -20767,7 +20767,7 @@ CScatterChart.prototype =
                 }
                 break;
             }
-            case historyitem_ScatterChart_SetScatterStyle:
+            case AscDFH.historyitem_ScatterChart_SetScatterStyle:
             {
                 this.scatterStyle = readLong(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -20776,7 +20776,7 @@ CScatterChart.prototype =
                 }
                 break;
             }
-            case historyitem_ScatterChart_AddSer:
+            case AscDFH.historyitem_ScatterChart_AddSer:
             {
                 if(r.GetBool())
                 {
@@ -20792,7 +20792,7 @@ CScatterChart.prototype =
                 }
                 break;
             }
-            case historyitem_ScatterChart_SetVaryColors:
+            case AscDFH.historyitem_ScatterChart_SetVaryColors:
             {
                 if(r.GetBool())
                 {
@@ -20837,7 +20837,7 @@ CScatterSeries.prototype =
 
     setParent: function(pr)
     {
-        History.Add(this, {Type: historyitem_CommonChartFormat_SetParent, oldPr: this.parent, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_CommonChartFormat_SetParent, oldPr: this.parent, newPr: pr});
         this.parent = pr;
     },
 
@@ -20847,7 +20847,7 @@ CScatterSeries.prototype =
     {
         if(this.dPt[idx])
         {
-            History.Add(this, {Type: historyitem_CommonSeries_RemoveDPt, idx: idx, pt: this.dPt[idx]});
+            History.Add(this, {Type: AscDFH.historyitem_CommonSeries_RemoveDPt, idx: idx, pt: this.dPt[idx]});
             this.dPt.splice(idx, 1);
         }
     },
@@ -20899,7 +20899,7 @@ CScatterSeries.prototype =
 
     getObjectType: function()
     {
-        return historyitem_type_ScatterSer;
+        return AscDFH.historyitem_type_ScatterSer;
     },
 
     getAllRasterImages: CAreaSeries.prototype.getAllRasterImages,
@@ -20965,7 +20965,7 @@ CScatterSeries.prototype =
 
     setDLbls: function(pr)
     {
-        History.Add(this, {Type: historyitem_ScatterSer_SetDLbls, oldPr: this.dLbls, newPr:pr});
+        History.Add(this, {Type: AscDFH.historyitem_ScatterSer_SetDLbls, oldPr: this.dLbls, newPr:pr});
         this.dLbls = pr;
         if(this.dLbls)
         {
@@ -20974,57 +20974,57 @@ CScatterSeries.prototype =
     },
     addDPt: function(pr)
     {
-        History.Add(this, {Type: historyitem_ScatterSer_SetDPt, oldPr: this.dPt, newPr:pr});
+        History.Add(this, {Type: AscDFH.historyitem_ScatterSer_SetDPt, oldPr: this.dPt, newPr:pr});
         this.dPt.push(pr);
     },
     setErrBars: function(pr)
     {
-        History.Add(this, {Type: historyitem_ScatterSer_SetErrBars, oldPr: this.errBars, newPr:pr});
+        History.Add(this, {Type: AscDFH.historyitem_ScatterSer_SetErrBars, oldPr: this.errBars, newPr:pr});
         this.errBars = pr;
     },
     setIdx: function(pr)
     {
-        History.Add(this, {Type: historyitem_ScatterSer_SetIdx, oldPr: this.idx, newPr:pr});
+        History.Add(this, {Type: AscDFH.historyitem_ScatterSer_SetIdx, oldPr: this.idx, newPr:pr});
         this.idx = pr;
     },
     setMarker: function(pr)
     {
-        History.Add(this, {Type: historyitem_ScatterSer_SetMarker, oldPr: this.marker, newPr:pr});
+        History.Add(this, {Type: AscDFH.historyitem_ScatterSer_SetMarker, oldPr: this.marker, newPr:pr});
         this.marker = pr;
     },
     setOrder: function(pr)
     {
-        History.Add(this, {Type: historyitem_ScatterSer_SetOrder, oldPr: this.order, newPr:pr});
+        History.Add(this, {Type: AscDFH.historyitem_ScatterSer_SetOrder, oldPr: this.order, newPr:pr});
         this.order = pr;
     },
     setSmooth: function(pr)
     {
-        History.Add(this, {Type: historyitem_ScatterSer_SetSmooth, oldPr: this.smooth, newPr:pr});
+        History.Add(this, {Type: AscDFH.historyitem_ScatterSer_SetSmooth, oldPr: this.smooth, newPr:pr});
         this.smooth = pr;
     },
     setSpPr: function(pr)
     {
-        History.Add(this, {Type: historyitem_ScatterSer_SetSpPr, oldPr: this.spPr, newPr:pr});
+        History.Add(this, {Type: AscDFH.historyitem_ScatterSer_SetSpPr, oldPr: this.spPr, newPr:pr});
         this.spPr = pr;
     },
     setTrendline: function(pr)
     {
-        History.Add(this, {Type: historyitem_ScatterSer_SetTrendline, oldPr: this.trendline, newPr:pr});
+        History.Add(this, {Type: AscDFH.historyitem_ScatterSer_SetTrendline, oldPr: this.trendline, newPr:pr});
         this.trendline = pr;
     },
     setTx: function(pr)
     {
-        History.Add(this, {Type: historyitem_ScatterSer_SetTx, oldPr: this.tx, newPr:pr});
+        History.Add(this, {Type: AscDFH.historyitem_ScatterSer_SetTx, oldPr: this.tx, newPr:pr});
         this.tx = pr;
     },
     setXVal: function(pr)
     {
-        History.Add(this, {Type: historyitem_ScatterSer_SetXVal, oldPr: this.xVal, newPr:pr});
+        History.Add(this, {Type: AscDFH.historyitem_ScatterSer_SetXVal, oldPr: this.xVal, newPr:pr});
         this.xVal = pr;
     },
     setYVal: function(pr)
     {
-        History.Add(this, {Type: historyitem_ScatterSer_SetYVal, oldPr: this.yVal, newPr:pr});
+        History.Add(this, {Type: AscDFH.historyitem_ScatterSer_SetYVal, oldPr: this.yVal, newPr:pr});
         this.yVal = pr;
         if(this.yVal && this.yVal.setParent)
         {
@@ -21036,17 +21036,17 @@ CScatterSeries.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 this.parent = data.oldPr;
                 break;
             }
-            case historyitem_CommonSeries_RemoveDPt:
+            case AscDFH.historyitem_CommonSeries_RemoveDPt:
             {
                 this.dPt.splice(data.idx, 0, data.pt);
                 break;
             }
-            case historyitem_ScatterSer_SetDLbls:
+            case AscDFH.historyitem_ScatterSer_SetDLbls:
             {
                 this.dLbls = data.oldPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateDataLabels)
@@ -21055,57 +21055,57 @@ CScatterSeries.prototype =
                 }
                 break;
             }
-            case historyitem_ScatterSer_SetDPt:
+            case AscDFH.historyitem_ScatterSer_SetDPt:
             {
                 findPrAndRemove(this.dPt, data.newPr);
                 break;
             }
-            case historyitem_ScatterSer_SetErrBars:
+            case AscDFH.historyitem_ScatterSer_SetErrBars:
             {
                 this.errBars = data.oldPr;
                 break;
             }
-            case historyitem_ScatterSer_SetIdx:
+            case AscDFH.historyitem_ScatterSer_SetIdx:
             {
                 this.idx = data.oldPr;
                 break;
             }
-            case historyitem_ScatterSer_SetMarker:
+            case AscDFH.historyitem_ScatterSer_SetMarker:
             {
                 this.marker = data.oldPr;
                 break;
             }
-            case historyitem_ScatterSer_SetOrder:
+            case AscDFH.historyitem_ScatterSer_SetOrder:
             {
                 this.order = data.oldPr;
                 break;
             }
-            case historyitem_ScatterSer_SetSmooth:
+            case AscDFH.historyitem_ScatterSer_SetSmooth:
             {
                 this.smooth = data.oldPr;
                 break;
             }
-            case historyitem_ScatterSer_SetSpPr:
+            case AscDFH.historyitem_ScatterSer_SetSpPr:
             {
                 this.spPr = data.oldPr;
                 break;
             }
-            case historyitem_ScatterSer_SetTrendline:
+            case AscDFH.historyitem_ScatterSer_SetTrendline:
             {
                 this.trendline = data.oldPr;
                 break;
             }
-            case historyitem_ScatterSer_SetTx:
+            case AscDFH.historyitem_ScatterSer_SetTx:
             {
                 this.tx = data.oldPr;
                 break;
             }
-            case historyitem_ScatterSer_SetXVal:
+            case AscDFH.historyitem_ScatterSer_SetXVal:
             {
                 this.xVal = data.oldPr;
                 break;
             }
-            case historyitem_ScatterSer_SetYVal:
+            case AscDFH.historyitem_ScatterSer_SetYVal:
             {
                 this.yVal = data.oldPr;
                 break;
@@ -21117,17 +21117,17 @@ CScatterSeries.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 this.parent = data.newPr;
                 break;
             }
-            case historyitem_CommonSeries_RemoveDPt:
+            case AscDFH.historyitem_CommonSeries_RemoveDPt:
             {
                 this.dPt.splice(data.idx, 1);
                 break;
             }
-            case historyitem_ScatterSer_SetDLbls:
+            case AscDFH.historyitem_ScatterSer_SetDLbls:
             {
                 this.dLbls = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.handleUpdateDataLabels)
@@ -21136,57 +21136,57 @@ CScatterSeries.prototype =
                 }
                 break;
             }
-            case historyitem_ScatterSer_SetDPt:
+            case AscDFH.historyitem_ScatterSer_SetDPt:
             {
                 this.dPt.push(data.newPr);
                 break;
             }
-            case historyitem_ScatterSer_SetErrBars:
+            case AscDFH.historyitem_ScatterSer_SetErrBars:
             {
                 this.errBars = data.newPr;
                 break;
             }
-            case historyitem_ScatterSer_SetIdx:
+            case AscDFH.historyitem_ScatterSer_SetIdx:
             {
                 this.idx = data.newPr;
                 break;
             }
-            case historyitem_ScatterSer_SetMarker:
+            case AscDFH.historyitem_ScatterSer_SetMarker:
             {
                 this.marker = data.newPr;
                 break;
             }
-            case historyitem_ScatterSer_SetOrder:
+            case AscDFH.historyitem_ScatterSer_SetOrder:
             {
                 this.order = data.newPr;
                 break;
             }
-            case historyitem_ScatterSer_SetSmooth:
+            case AscDFH.historyitem_ScatterSer_SetSmooth:
             {
                 this.smooth = data.newPr;
                 break;
             }
-            case historyitem_ScatterSer_SetSpPr:
+            case AscDFH.historyitem_ScatterSer_SetSpPr:
             {
                 this.spPr = data.newPr;
                 break;
             }
-            case historyitem_ScatterSer_SetTrendline:
+            case AscDFH.historyitem_ScatterSer_SetTrendline:
             {
                 this.trendline = data.newPr;
                 break;
             }
-            case historyitem_ScatterSer_SetTx:
+            case AscDFH.historyitem_ScatterSer_SetTx:
             {
                 this.tx = data.newPr;
                 break;
             }
-            case historyitem_ScatterSer_SetXVal:
+            case AscDFH.historyitem_ScatterSer_SetXVal:
             {
                 this.xVal = data.newPr;
                 break;
             }
-            case historyitem_ScatterSer_SetYVal:
+            case AscDFH.historyitem_ScatterSer_SetYVal:
             {
                 this.yVal = data.newPr;
                 break;
@@ -21199,20 +21199,20 @@ CScatterSeries.prototype =
         w.WriteLong(data.Type);
         switch (data.Type)
         {
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 writeObject(w, data.newPr);
                 break;
             }
-            case historyitem_ScatterSer_SetDLbls:
-            case historyitem_ScatterSer_SetDPt:
-            case historyitem_ScatterSer_SetErrBars:
-            case historyitem_ScatterSer_SetMarker:
-            case historyitem_ScatterSer_SetSpPr:
-            case historyitem_ScatterSer_SetTrendline:
-            case historyitem_ScatterSer_SetTx:
-            case historyitem_ScatterSer_SetXVal:
-            case historyitem_ScatterSer_SetYVal:
+            case AscDFH.historyitem_ScatterSer_SetDLbls:
+            case AscDFH.historyitem_ScatterSer_SetDPt:
+            case AscDFH.historyitem_ScatterSer_SetErrBars:
+            case AscDFH.historyitem_ScatterSer_SetMarker:
+            case AscDFH.historyitem_ScatterSer_SetSpPr:
+            case AscDFH.historyitem_ScatterSer_SetTrendline:
+            case AscDFH.historyitem_ScatterSer_SetTx:
+            case AscDFH.historyitem_ScatterSer_SetXVal:
+            case AscDFH.historyitem_ScatterSer_SetYVal:
             {
                 w.WriteBool(isRealObject(data.newPr));
                 if(isRealObject(data.newPr))
@@ -21221,8 +21221,8 @@ CScatterSeries.prototype =
                 }
                 break;
             }
-            case historyitem_ScatterSer_SetIdx:
-            case historyitem_ScatterSer_SetOrder:
+            case AscDFH.historyitem_ScatterSer_SetIdx:
+            case AscDFH.historyitem_ScatterSer_SetOrder:
             {
                 w.WriteBool(isRealNumber(data.newPr));
                 if(isRealNumber(data.newPr))
@@ -21231,7 +21231,7 @@ CScatterSeries.prototype =
                 }
                 break;
             }
-            case historyitem_ScatterSer_SetSmooth:
+            case AscDFH.historyitem_ScatterSer_SetSmooth:
             {
                 w.WriteBool(isRealBool(data.newPr));
                 if(isRealBool(data.newPr))
@@ -21240,7 +21240,7 @@ CScatterSeries.prototype =
                 }
                 break;
             }
-            case historyitem_CommonSeries_RemoveDPt:
+            case AscDFH.historyitem_CommonSeries_RemoveDPt:
             {
                 writeLong(w, data.idx);
                 break;
@@ -21253,12 +21253,12 @@ CScatterSeries.prototype =
         var type = r.GetLong();
         switch (type)
         {
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 this.parent = readObject(r);
                 break;
             }
-            case historyitem_ScatterSer_SetDLbls:
+            case AscDFH.historyitem_ScatterSer_SetDLbls:
             {
                 if(r.GetBool())
                 {
@@ -21274,12 +21274,12 @@ CScatterSeries.prototype =
                 }
                 break;
             }
-            case historyitem_ScatterSer_SetDPt:
+            case AscDFH.historyitem_ScatterSer_SetDPt:
             {
                 this.dPt.push(readObject(r));
                 break;
             }
-            case historyitem_ScatterSer_SetErrBars:
+            case AscDFH.historyitem_ScatterSer_SetErrBars:
             {
                 if(r.GetBool())
                 {
@@ -21291,7 +21291,7 @@ CScatterSeries.prototype =
                 }
                 break;
             }
-            case historyitem_ScatterSer_SetIdx:
+            case AscDFH.historyitem_ScatterSer_SetIdx:
             {
                 if(r.GetBool())
                 {
@@ -21303,7 +21303,7 @@ CScatterSeries.prototype =
                 }
                 break;
             }
-            case historyitem_ScatterSer_SetMarker:
+            case AscDFH.historyitem_ScatterSer_SetMarker:
             {
                 if(r.GetBool())
                 {
@@ -21315,7 +21315,7 @@ CScatterSeries.prototype =
                 }
                 break;
             }
-            case historyitem_ScatterSer_SetOrder:
+            case AscDFH.historyitem_ScatterSer_SetOrder:
             {
                 if(r.GetBool())
                 {
@@ -21327,7 +21327,7 @@ CScatterSeries.prototype =
                 }
                 break;
             }
-            case historyitem_ScatterSer_SetSmooth:
+            case AscDFH.historyitem_ScatterSer_SetSmooth:
             {
                 if(r.GetBool())
                 {
@@ -21339,7 +21339,7 @@ CScatterSeries.prototype =
                 }
                 break;
             }
-            case historyitem_ScatterSer_SetSpPr:
+            case AscDFH.historyitem_ScatterSer_SetSpPr:
             {
                 if(r.GetBool())
                 {
@@ -21351,7 +21351,7 @@ CScatterSeries.prototype =
                 }
                 break;
             }
-            case historyitem_ScatterSer_SetTrendline:
+            case AscDFH.historyitem_ScatterSer_SetTrendline:
             {
                 if(r.GetBool())
                 {
@@ -21363,7 +21363,7 @@ CScatterSeries.prototype =
                 }
                 break;
             }
-            case historyitem_ScatterSer_SetTx:
+            case AscDFH.historyitem_ScatterSer_SetTx:
             {
                 if(r.GetBool())
                 {
@@ -21375,7 +21375,7 @@ CScatterSeries.prototype =
                 }
                 break;
             }
-            case historyitem_ScatterSer_SetXVal:
+            case AscDFH.historyitem_ScatterSer_SetXVal:
             {
                 if(r.GetBool())
                 {
@@ -21387,7 +21387,7 @@ CScatterSeries.prototype =
                 }
                 break;
             }
-            case historyitem_ScatterSer_SetYVal:
+            case AscDFH.historyitem_ScatterSer_SetYVal:
             {
                 if(r.GetBool())
                 {
@@ -21399,7 +21399,7 @@ CScatterSeries.prototype =
                 }
                 break;
             }
-            case historyitem_CommonSeries_RemoveDPt:
+            case AscDFH.historyitem_CommonSeries_RemoveDPt:
             {
                 var pos = readLong(r);
                 if(isRealNumber(pos))
@@ -21444,7 +21444,7 @@ CTx.prototype =
 
     getObjectType: function()
     {
-        return historyitem_type_Tx;
+        return AscDFH.historyitem_type_Tx;
     },
 
     Write_ToBinary2: function(w)
@@ -21460,13 +21460,13 @@ CTx.prototype =
 
     setStrRef: function(pr)
     {
-        History.Add(this, {Type: historyitem_Tx_SetStrRef, oldPr: this.strRef, newPr:pr});
+        History.Add(this, {Type: AscDFH.historyitem_Tx_SetStrRef, oldPr: this.strRef, newPr:pr});
         this.strRef = pr;
     },
 
     setVal: function(pr)
     {
-        History.Add(this, {Type: historyitem_Tx_SetVal, oldPr: this.strRef, newPr:pr});
+        History.Add(this, {Type: AscDFH.historyitem_Tx_SetVal, oldPr: this.strRef, newPr:pr});
         this.val = pr;
     },
 
@@ -21474,12 +21474,12 @@ CTx.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_Tx_SetStrRef:
+            case AscDFH.historyitem_Tx_SetStrRef:
             {
                 this.strRef = data.oldPr;
                 break;
             }
-            case historyitem_Tx_SetVal:
+            case AscDFH.historyitem_Tx_SetVal:
             {
                 this.val = data.oldPr;
                 break;
@@ -21491,12 +21491,12 @@ CTx.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_Tx_SetStrRef:
+            case AscDFH.historyitem_Tx_SetStrRef:
             {
                 this.strRef = data.newPr;
                 break;
             }
-            case historyitem_Tx_SetVal:
+            case AscDFH.historyitem_Tx_SetVal:
             {
                 this.val = data.newPr;
                 break;
@@ -21509,12 +21509,12 @@ CTx.prototype =
         w.WriteLong(data.Type);
         switch (data.Type)
         {
-            case historyitem_Tx_SetStrRef:
+            case AscDFH.historyitem_Tx_SetStrRef:
             {
                 writeObject(w, data.newPr);
                 break;
             }
-            case historyitem_Tx_SetVal:
+            case AscDFH.historyitem_Tx_SetVal:
             {
                 this.val = writeString(w, data.newPr);
                 break;
@@ -21527,12 +21527,12 @@ CTx.prototype =
         var type = r.GetLong();
         switch (type)
         {
-            case historyitem_Tx_SetStrRef:
+            case AscDFH.historyitem_Tx_SetStrRef:
             {
                 this.strRef = readObject(r);
                 break;
             }
-            case historyitem_Tx_SetVal:
+            case AscDFH.historyitem_Tx_SetVal:
             {
                 this.val = readString(r);
                 break;
@@ -21616,7 +21616,7 @@ CStockChart.prototype =
     {
         if(this.series[idx])
         {
-            History.Add(this, {Type: historyitem_CommonChart_RemoveSeries, oldPr: idx, newPr: this.series.splice(idx, 1)[0]});
+            History.Add(this, {Type: AscDFH.historyitem_CommonChart_RemoveSeries, oldPr: idx, newPr: this.series.splice(idx, 1)[0]});
         }
     },
 
@@ -21652,7 +21652,7 @@ CStockChart.prototype =
 
     getObjectType: function()
     {
-        return  historyitem_type_StockChart;
+        return  AscDFH.historyitem_type_StockChart;
     },
 
     documentCreateFontMap: CBarChart.prototype.documentCreateFontMap,
@@ -21679,13 +21679,13 @@ CStockChart.prototype =
     {
         if(!pr)
             return;
-        History.Add(this, {Type: historyitem_StockChart_AddAxId, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_StockChart_AddAxId, newPr: pr});
         this.axId.push(pr);
     },
 
     setDLbls: function(pr)
     {
-        History.Add(this, {Type: historyitem_StockChart_SetDLbls, oldPr: this.dLbls, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_StockChart_SetDLbls, oldPr: this.dLbls, newPr: pr});
         this.dLbls = pr;
         if(this.dLbls)
         {
@@ -21699,17 +21699,17 @@ CStockChart.prototype =
 
     setDropLines: function(pr)
     {
-        History.Add(this, {Type: historyitem_StockChart_SetDropLines, oldPr: this.dropLines, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_StockChart_SetDropLines, oldPr: this.dropLines, newPr: pr});
         this.dropLines = pr;
     },
     setHiLowLines: function(pr)
     {
-        History.Add(this, {Type: historyitem_StockChart_SetHiLowLines, oldPr: this.hiLowLines, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_StockChart_SetHiLowLines, oldPr: this.hiLowLines, newPr: pr});
         this.hiLowLines = pr;
     },
     addSer: function(ser)
     {
-        History.Add(this, {Type: historyitem_StockChart_AddSer, oldPr: this.series.length, newPr: ser});
+        History.Add(this, {Type: AscDFH.historyitem_StockChart_AddSer, oldPr: this.series.length, newPr: ser});
         this.series.push(ser);
         ser.setParent(this);
         if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -21719,7 +21719,7 @@ CStockChart.prototype =
     },
     setUpDownBars: function(pr)
     {
-        History.Add(this, {Type: historyitem_StockChart_SetUpDownBars, oldPr: this.upDownBars, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_StockChart_SetUpDownBars, oldPr: this.upDownBars, newPr: pr});
         this.upDownBars = pr;
         if(pr && pr.setParent)
         {
@@ -21729,7 +21729,7 @@ CStockChart.prototype =
 
     setParent: function(pr)
     {
-        History.Add(this, {Type: historyitem_CommonChartFormat_SetParent, oldPr: this.parent, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_CommonChartFormat_SetParent, oldPr: this.parent, newPr: pr});
         this.parent = pr;
     },
 
@@ -21737,18 +21737,18 @@ CStockChart.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 this.parent = data.oldPr;
                 break;
             }
-            case historyitem_CommonChart_RemoveSeries:
+            case AscDFH.historyitem_CommonChart_RemoveSeries:
             {
                 this.series.splice(data.oldPr, 0, data.newPr);
                 break;
             }
 
-            case historyitem_StockChart_AddAxId:
+            case AscDFH.historyitem_StockChart_AddAxId:
             {
                 for(var i = this.axId.length-1; i > -1; --i)
                 {
@@ -21760,7 +21760,7 @@ CStockChart.prototype =
                 }
                 break
             }
-            case historyitem_StockChart_SetDLbls:
+            case AscDFH.historyitem_StockChart_SetDLbls:
             {
                 this.dLbls = data.oldPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -21769,17 +21769,17 @@ CStockChart.prototype =
                 }
                 break
             }
-            case historyitem_StockChart_SetDropLines:
+            case AscDFH.historyitem_StockChart_SetDropLines:
             {
                 this.dropLines = data.oldPr;
                 break
             }
-            case historyitem_StockChart_SetHiLowLines:
+            case AscDFH.historyitem_StockChart_SetHiLowLines:
             {
                 this.hiLowLines = data.oldPr;
                 break
             }
-            case historyitem_StockChart_AddSer:
+            case AscDFH.historyitem_StockChart_AddSer:
             {
                 this.series.splice(data.oldPr, 1);
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -21788,7 +21788,7 @@ CStockChart.prototype =
                 }
                 break
             }
-            case historyitem_StockChart_SetUpDownBars:
+            case AscDFH.historyitem_StockChart_SetUpDownBars:
             {
                 this.upDownBars = data.oldPr;
                 break
@@ -21800,22 +21800,22 @@ CStockChart.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 this.parent = data.newPr;
                 break;
             }
-            case historyitem_CommonChart_RemoveSeries:
+            case AscDFH.historyitem_CommonChart_RemoveSeries:
             {
                 this.series.splice(data.oldPr, 1);
                 break;
             }
-            case historyitem_StockChart_AddAxId:
+            case AscDFH.historyitem_StockChart_AddAxId:
             {
                 this.axId.push(data.newPr);
                 break
             }
-            case historyitem_StockChart_SetDLbls:
+            case AscDFH.historyitem_StockChart_SetDLbls:
             {
                 this.dLbls = data.newPr;
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -21824,17 +21824,17 @@ CStockChart.prototype =
                 }
                 break
             }
-            case historyitem_StockChart_SetDropLines:
+            case AscDFH.historyitem_StockChart_SetDropLines:
             {
                 this.dropLines = data.newPr;
                 break
             }
-            case historyitem_StockChart_SetHiLowLines:
+            case AscDFH.historyitem_StockChart_SetHiLowLines:
             {
                 this.hiLowLines = data.newPr;
                 break
             }
-            case historyitem_StockChart_AddSer:
+            case AscDFH.historyitem_StockChart_AddSer:
             {
                 this.series.push(data.newPr);
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -21843,7 +21843,7 @@ CStockChart.prototype =
                 }
                 break
             }
-            case historyitem_StockChart_SetUpDownBars:
+            case AscDFH.historyitem_StockChart_SetUpDownBars:
             {
                 this.upDownBars = data.newPr;
                 break
@@ -21857,22 +21857,22 @@ CStockChart.prototype =
         switch (data.Type)
         {
 
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 writeObject(w, data.newPr);
                 break;
             }
-            case historyitem_CommonChart_RemoveSeries:
+            case AscDFH.historyitem_CommonChart_RemoveSeries:
             {
                 writeLong(w, data.oldPr);
                 break;
             }
-            case historyitem_StockChart_AddAxId:
-            case historyitem_StockChart_SetDLbls:
-            case historyitem_StockChart_SetDropLines:
-            case historyitem_StockChart_SetHiLowLines:
-            case historyitem_StockChart_AddSer:
-            case historyitem_StockChart_SetUpDownBars:
+            case AscDFH.historyitem_StockChart_AddAxId:
+            case AscDFH.historyitem_StockChart_SetDLbls:
+            case AscDFH.historyitem_StockChart_SetDropLines:
+            case AscDFH.historyitem_StockChart_SetHiLowLines:
+            case AscDFH.historyitem_StockChart_AddSer:
+            case AscDFH.historyitem_StockChart_SetUpDownBars:
             {
                 writeObject(w, data.newPr);
                 break
@@ -21885,18 +21885,18 @@ CStockChart.prototype =
         var type = r.GetLong();
         switch (type)
         {
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 this.parent = readObject(r);
                 break;
             }
-            case historyitem_CommonChart_RemoveSeries:
+            case AscDFH.historyitem_CommonChart_RemoveSeries:
             {
                 var pos = readLong(r);
                 this.series.splice(pos, 1);
                 break;
             }
-            case historyitem_StockChart_AddAxId:
+            case AscDFH.historyitem_StockChart_AddAxId:
             {
                 var ax = readObject(r);
                 if(isRealObject(ax))
@@ -21905,7 +21905,7 @@ CStockChart.prototype =
                 }
                 break
             }
-            case historyitem_StockChart_SetDLbls:
+            case AscDFH.historyitem_StockChart_SetDLbls:
             {
                 this.dLbls = readObject(r);
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -21914,17 +21914,17 @@ CStockChart.prototype =
                 }
                 break
             }
-            case historyitem_StockChart_SetDropLines:
+            case AscDFH.historyitem_StockChart_SetDropLines:
             {
                 this.dropLines = readObject(r);
                 break
             }
-            case historyitem_StockChart_SetHiLowLines:
+            case AscDFH.historyitem_StockChart_SetHiLowLines:
             {
                 this.hiLowLines = readObject(r);
                 break
             }
-            case historyitem_StockChart_AddSer:
+            case AscDFH.historyitem_StockChart_AddSer:
             {
                 var ser = readObject(r);
                 if(isRealObject(ser))
@@ -21933,7 +21933,7 @@ CStockChart.prototype =
                 }
                 break
             }
-            case historyitem_StockChart_SetUpDownBars:
+            case AscDFH.historyitem_StockChart_SetUpDownBars:
             {
                 this.upDownBars = readObject(r);
                 break
@@ -21966,7 +21966,7 @@ CStrCache.prototype =
     {
         if(this.pt[idx])
         {
-            History.Add(this, {Type: historyitem_CommonLit_RemoveDPt, idx: idx, pt: this.pt[idx]});
+            History.Add(this, {Type: AscDFH.historyitem_CommonLit_RemoveDPt, idx: idx, pt: this.pt[idx]});
             this.pt.splice(idx, 1);
         }
     },
@@ -22004,7 +22004,7 @@ CStrCache.prototype =
 
     getObjectType: function()
     {
-        return historyitem_type_StrCache;
+        return AscDFH.historyitem_type_StrCache;
     },
 
     Write_ToBinary2: function(w)
@@ -22020,13 +22020,13 @@ CStrCache.prototype =
 
     addPt: function(pr)
     {
-        History.Add(this, {Type: historyitem_StrCache_AddPt, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_StrCache_AddPt, newPr: pr});
         this.pt.push(pr);
     },
 
     setPtCount: function(pr)
     {
-        History.Add(this, {Type: historyitem_StrCache_SetPtCount, oldPr: this.ptCount, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_StrCache_SetPtCount, oldPr: this.ptCount, newPr: pr});
         this.ptCount = pr;
     },
 
@@ -22034,7 +22034,7 @@ CStrCache.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_StrCache_AddPt:
+            case AscDFH.historyitem_StrCache_AddPt:
             {
                 for(var i = 0; i < this.pt.length; ++i)
                 {
@@ -22046,12 +22046,12 @@ CStrCache.prototype =
                 }
                 break;
             }
-            case historyitem_StrCache_SetPtCount:
+            case AscDFH.historyitem_StrCache_SetPtCount:
             {
                 this.ptCount = data.oldPr;
                 break;
             }
-            case historyitem_CommonLit_RemoveDPt:
+            case AscDFH.historyitem_CommonLit_RemoveDPt:
             {
                 this.pt.splice(data.idx, 0, data.pt);
                 break;
@@ -22063,17 +22063,17 @@ CStrCache.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_StrCache_AddPt:
+            case AscDFH.historyitem_StrCache_AddPt:
             {
                 this.pt.push(data.newPr);
                 break;
             }
-            case historyitem_StrCache_SetPtCount:
+            case AscDFH.historyitem_StrCache_SetPtCount:
             {
                 this.ptCount = data.newPr;
                 break;
             }
-            case historyitem_CommonLit_RemoveDPt:
+            case AscDFH.historyitem_CommonLit_RemoveDPt:
             {
                 this.pt.splice(data.idx, 1);
                 break;
@@ -22086,17 +22086,17 @@ CStrCache.prototype =
         w.WriteLong(data.Type);
         switch (data.Type)
         {
-            case historyitem_StrCache_AddPt:
+            case AscDFH.historyitem_StrCache_AddPt:
             {
                 writeObject(w, data.newPr);
                 break;
             }
-            case historyitem_StrCache_SetPtCount:
+            case AscDFH.historyitem_StrCache_SetPtCount:
             {
                 writeLong(w, data.newPr);
                 break;
             }
-            case historyitem_CommonLit_RemoveDPt:
+            case AscDFH.historyitem_CommonLit_RemoveDPt:
             {
                 w.WriteLong(data.idx);
                 break;
@@ -22109,7 +22109,7 @@ CStrCache.prototype =
         var type = r.GetLong();
         switch (type)
         {
-            case historyitem_StrCache_AddPt:
+            case AscDFH.historyitem_StrCache_AddPt:
             {
                 var pt = readObject(r);
                 if(pt)
@@ -22118,13 +22118,13 @@ CStrCache.prototype =
                 }
                 break;
             }
-            case historyitem_StrCache_SetPtCount:
+            case AscDFH.historyitem_StrCache_SetPtCount:
             {
                 this.ptCount = readLong(r);
                 break;
             }
 
-            case historyitem_CommonLit_RemoveDPt:
+            case AscDFH.historyitem_CommonLit_RemoveDPt:
             {
                 var idx = r.GetLong();
                 this.pt.splice(idx, 1);
@@ -22168,7 +22168,7 @@ CStringLiteral.prototype =
 
     getObjectType: function()
     {
-        return historyitem_type_StringLiteral;
+        return AscDFH.historyitem_type_StringLiteral;
     },
 
 
@@ -22185,13 +22185,13 @@ CStringLiteral.prototype =
 
     setPt: function(pr)
     {
-        History.Add(this, {Type: historyitem_StringLiteral_SetPt, newPr: pr, oldPr: this.pt});
+        History.Add(this, {Type: AscDFH.historyitem_StringLiteral_SetPt, newPr: pr, oldPr: this.pt});
         this.pt = pr;
     },
 
     setPtCount: function(pr)
     {
-        History.Add(this, {Type: historyitem_StringLiteral_SetPtCount, newPr: pr, oldPr: this.ptCount});
+        History.Add(this, {Type: AscDFH.historyitem_StringLiteral_SetPtCount, newPr: pr, oldPr: this.ptCount});
         this.ptCount = pr;
     },
 
@@ -22199,12 +22199,12 @@ CStringLiteral.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_StringLiteral_SetPt:
+            case AscDFH.historyitem_StringLiteral_SetPt:
             {
                 this.pt = data.oldPr;
                 break;
             }
-            case historyitem_StringLiteral_SetPtCount:
+            case AscDFH.historyitem_StringLiteral_SetPtCount:
             {
                 this.ptCount = data.oldPr;
                 break;
@@ -22216,12 +22216,12 @@ CStringLiteral.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_StringLiteral_SetPt:
+            case AscDFH.historyitem_StringLiteral_SetPt:
             {
                 this.pt = data.newPr;
                 break;
             }
-            case historyitem_StringLiteral_SetPtCount:
+            case AscDFH.historyitem_StringLiteral_SetPtCount:
             {
                 this.ptCount = data.newPr;
                 break;
@@ -22234,12 +22234,12 @@ CStringLiteral.prototype =
         w.WriteLong(data.Type);
         switch (data.Type)
         {
-            case historyitem_StringLiteral_SetPt:
+            case AscDFH.historyitem_StringLiteral_SetPt:
             {
                 writeObject(w, data.newPr);
                 break;
             }
-            case historyitem_StringLiteral_SetPtCount:
+            case AscDFH.historyitem_StringLiteral_SetPtCount:
             {
                 writeLong(w, data.newPr);
                 break;
@@ -22252,12 +22252,12 @@ CStringLiteral.prototype =
         var type = r.GetLong();
         switch (type)
         {
-            case historyitem_StringLiteral_SetPt:
+            case AscDFH.historyitem_StringLiteral_SetPt:
             {
                 this.pt = readObject(r);
                 break;
             }
-            case historyitem_StringLiteral_SetPtCount:
+            case AscDFH.historyitem_StringLiteral_SetPtCount:
             {
                 this.ptCount = readLong(r);
                 break;
@@ -22296,7 +22296,7 @@ CStringPoint.prototype =
 
     getObjectType: function()
     {
-        return historyitem_type_StrPoint;
+        return AscDFH.historyitem_type_StrPoint;
     },
 
     Write_ToBinary2: function(w)
@@ -22312,13 +22312,13 @@ CStringPoint.prototype =
 
     setIdx: function(pr)
     {
-        History.Add(this, {Type: historyitem_StrPoint_SetIdx, oldPr: this.idx, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_StrPoint_SetIdx, oldPr: this.idx, newPr: pr});
         this.idx = pr;
     },
 
     setVal: function(pr)
     {
-        History.Add(this, {Type: historyitem_StrPoint_SetVal, oldPr: this.val, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_StrPoint_SetVal, oldPr: this.val, newPr: pr});
         this.val = pr;
     },
 
@@ -22326,12 +22326,12 @@ CStringPoint.prototype =
     {
         switch (data)
         {
-            case historyitem_StrPoint_SetIdx:
+            case AscDFH.historyitem_StrPoint_SetIdx:
             {
                 this.idx = data.oldPr;
                 break;
             }
-            case historyitem_StrPoint_SetVal:
+            case AscDFH.historyitem_StrPoint_SetVal:
             {
                 this.val = data.oldPr;
                 break;
@@ -22343,12 +22343,12 @@ CStringPoint.prototype =
     {
         switch (data)
         {
-            case historyitem_StrPoint_SetIdx:
+            case AscDFH.historyitem_StrPoint_SetIdx:
             {
                 this.idx = data.newPr;
                 break;
             }
-            case historyitem_StrPoint_SetVal:
+            case AscDFH.historyitem_StrPoint_SetVal:
             {
                 this.val = data.newPr;
                 break;
@@ -22361,12 +22361,12 @@ CStringPoint.prototype =
         w.WriteLong(data.Type);
         switch (data.Type)
         {
-            case historyitem_StrPoint_SetIdx:
+            case AscDFH.historyitem_StrPoint_SetIdx:
             {
                 writeLong(w, data.newPr);
                 break;
             }
-            case historyitem_StrPoint_SetVal:
+            case AscDFH.historyitem_StrPoint_SetVal:
             {
                 writeString(w, data.newPr);
                 break;
@@ -22379,12 +22379,12 @@ CStringPoint.prototype =
         var type = r.GetLong();
         switch(type)
         {
-            case historyitem_StrPoint_SetIdx:
+            case AscDFH.historyitem_StrPoint_SetIdx:
             {
                 this.idx = readLong(r);
                 break;
             }
-            case historyitem_StrPoint_SetVal:
+            case AscDFH.historyitem_StrPoint_SetVal:
             {
                 this.val = readString(r);
                 break;
@@ -22427,7 +22427,7 @@ CStrRef.prototype =
 
     getObjectType: function()
     {
-        return historyitem_type_StrRef;
+        return AscDFH.historyitem_type_StrRef;
     },
 
     Write_ToBinary2: function(w)
@@ -22443,13 +22443,13 @@ CStrRef.prototype =
 
     setF: function(pr)
     {
-        History.Add(this, {Type: historyitem_StrRef_SetF, oldPr: this.f, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_StrRef_SetF, oldPr: this.f, newPr: pr});
         this.f = pr;
     },
 
     setStrCache: function(pr)
     {
-        History.Add(this, {Type: historyitem_StrRef_SetStrCache, oldPr: this.strCache, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_StrRef_SetStrCache, oldPr: this.strCache, newPr: pr});
         this.strCache = pr;
     },
 
@@ -22457,12 +22457,12 @@ CStrRef.prototype =
     {
         switch(data.Type)
         {
-            case historyitem_StrRef_SetF:
+            case AscDFH.historyitem_StrRef_SetF:
             {
                 this.f = data.oldPr;
                 break;
             }
-            case historyitem_StrRef_SetStrCache:
+            case AscDFH.historyitem_StrRef_SetStrCache:
             {
                 this.strCache = data.oldPr;
                 break;
@@ -22474,12 +22474,12 @@ CStrRef.prototype =
     {
         switch(data.Type)
         {
-            case historyitem_StrRef_SetF:
+            case AscDFH.historyitem_StrRef_SetF:
             {
                 this.f = data.newPr;
                 break;
             }
-            case historyitem_StrRef_SetStrCache:
+            case AscDFH.historyitem_StrRef_SetStrCache:
             {
                 this.strCache = data.newPr;
                 break;
@@ -22492,12 +22492,12 @@ CStrRef.prototype =
         w.WriteLong(data.Type);
         switch (data.Type)
         {
-            case historyitem_StrRef_SetF:
+            case AscDFH.historyitem_StrRef_SetF:
             {
                 writeString(w, data.newPr);
                 break;
             }
-            case historyitem_StrRef_SetStrCache:
+            case AscDFH.historyitem_StrRef_SetStrCache:
             {
                 writeObject(w, data.newPr);
                 break;
@@ -22510,12 +22510,12 @@ CStrRef.prototype =
         var type = r.GetLong();
         switch (type)
         {
-            case historyitem_StrRef_SetF:
+            case AscDFH.historyitem_StrRef_SetF:
             {
                 this.f = readString(r);
                 break;
             }
-            case historyitem_StrRef_SetStrCache:
+            case AscDFH.historyitem_StrRef_SetStrCache:
             {
                 this.strCache = readObject(r);
                 break;
@@ -22550,23 +22550,23 @@ CSurfaceChart.prototype =
             return;
         switch (data.Type)
         {
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 break;
             }
-            case historyitem_CommonChart_RemoveSeries:
+            case AscDFH.historyitem_CommonChart_RemoveSeries:
             {
                 break;
             }
-            case historyitem_SurfaceChart_AddAxId:
+            case AscDFH.historyitem_SurfaceChart_AddAxId:
             {
                 break;
             }
-            case historyitem_SurfaceChart_AddBandFmt:
+            case AscDFH.historyitem_SurfaceChart_AddBandFmt:
             {
                 break;
             }
-            case historyitem_SurfaceChart_AddSer:
+            case AscDFH.historyitem_SurfaceChart_AddSer:
             {
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
                 {
@@ -22574,7 +22574,7 @@ CSurfaceChart.prototype =
                 }
                 break;
             }
-            case historyitem_SurfaceChart_SetWireframe:
+            case AscDFH.historyitem_SurfaceChart_SetWireframe:
             {
                 break;
             }
@@ -22585,7 +22585,7 @@ CSurfaceChart.prototype =
     {
         if(this.series[idx])
         {
-            History.Add(this, {Type: historyitem_CommonChart_RemoveSeries, oldPr: idx, newPr: this.series.splice(idx, 1)[0]});
+            History.Add(this, {Type: AscDFH.historyitem_CommonChart_RemoveSeries, oldPr: idx, newPr: this.series.splice(idx, 1)[0]});
         }
     },
 
@@ -22616,7 +22616,7 @@ CSurfaceChart.prototype =
 
     getObjectType: function()
     {
-        return historyitem_type_SurfaceChart;
+        return AscDFH.historyitem_type_SurfaceChart;
     },
 
 
@@ -22660,19 +22660,19 @@ CSurfaceChart.prototype =
     {
         if(!pr)
             return;
-        History.Add(this, {Type: historyitem_SurfaceChart_AddAxId, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_SurfaceChart_AddAxId, newPr: pr});
         this.axId.push(pr);
     },
 
     addBandFmt: function(fmt)
     {
-        History.Add(this, {Type: historyitem_SurfaceChart_AddBandFmt, newPr: fmt});
+        History.Add(this, {Type: AscDFH.historyitem_SurfaceChart_AddBandFmt, newPr: fmt});
         this.bandFmts.push(fmt);
     },
 
     addSer: function(ser)
     {
-        History.Add(this, {Type: historyitem_SurfaceChart_AddSer, newPr: ser});
+        History.Add(this, {Type: AscDFH.historyitem_SurfaceChart_AddSer, newPr: ser});
         this.series.push(ser);
         ser.setParent(this);
         if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -22683,13 +22683,13 @@ CSurfaceChart.prototype =
 
     setWireframe: function(pr)
     {
-        History.Add(this, {Type: historyitem_SurfaceChart_SetWireframe, oldPr: this.wireframe, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_SurfaceChart_SetWireframe, oldPr: this.wireframe, newPr: pr});
         this.wireframe = pr;
     },
 
     setParent: function(pr)
     {
-        History.Add(this, {Type: historyitem_CommonChartFormat_SetParent, oldPr: this.parent, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_CommonChartFormat_SetParent, oldPr: this.parent, newPr: pr});
         this.parent = pr;
     },
 
@@ -22697,17 +22697,17 @@ CSurfaceChart.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 this.parent = data.oldPr;
                 break;
             }
-            case historyitem_CommonChart_RemoveSeries:
+            case AscDFH.historyitem_CommonChart_RemoveSeries:
             {
                 this.series.splice(data.oldPr, 0, data.newPr);
                 break;
             }
-            case historyitem_SurfaceChart_AddAxId:
+            case AscDFH.historyitem_SurfaceChart_AddAxId:
             {
                 for(var i = this.axId.length - 1; i > -1; --i)
                 {
@@ -22719,7 +22719,7 @@ CSurfaceChart.prototype =
                 }
                 break;
             }
-            case historyitem_SurfaceChart_AddBandFmt:
+            case AscDFH.historyitem_SurfaceChart_AddBandFmt:
             {
                 for(var i = this.bandFmts.length - 1; i > -1; --i)
                 {
@@ -22731,7 +22731,7 @@ CSurfaceChart.prototype =
                 }
                 break;
             }
-            case historyitem_SurfaceChart_AddSer:
+            case AscDFH.historyitem_SurfaceChart_AddSer:
             {
                 for(var i = this.series.length - 1; i > -1; --i)
                 {
@@ -22747,7 +22747,7 @@ CSurfaceChart.prototype =
                 }
                 break;
             }
-            case historyitem_SurfaceChart_SetWireframe:
+            case AscDFH.historyitem_SurfaceChart_SetWireframe:
             {
                 this.wireframe = data.oldPr;
                 break;
@@ -22759,27 +22759,27 @@ CSurfaceChart.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 this.parent = data.newPr;
                 break;
             }
-            case historyitem_CommonChart_RemoveSeries:
+            case AscDFH.historyitem_CommonChart_RemoveSeries:
             {
                 this.series.splice(data.oldPr, 1);
                 break;
             }
-            case historyitem_SurfaceChart_AddAxId:
+            case AscDFH.historyitem_SurfaceChart_AddAxId:
             {
                 this.axId.push(data.newPr);
                 break;
             }
-            case historyitem_SurfaceChart_AddBandFmt:
+            case AscDFH.historyitem_SurfaceChart_AddBandFmt:
             {
                 this.bandFmts.push(data.newPr);
                 break;
             }
-            case historyitem_SurfaceChart_AddSer:
+            case AscDFH.historyitem_SurfaceChart_AddSer:
             {
                 this.series.push(data.newPr);
                 if(this.parent && this.parent.parent && this.parent.parent.parent)
@@ -22788,7 +22788,7 @@ CSurfaceChart.prototype =
                 }
                 break;
             }
-            case historyitem_SurfaceChart_SetWireframe:
+            case AscDFH.historyitem_SurfaceChart_SetWireframe:
             {
                 this.wireframe = data.newPr;
                 break;
@@ -22801,19 +22801,19 @@ CSurfaceChart.prototype =
         w.WriteLong(data.Type);
         switch (data.Type)
         {
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 writeObject(w, data.newPr);
                 break;
             }
-            case historyitem_CommonChart_RemoveSeries:
+            case AscDFH.historyitem_CommonChart_RemoveSeries:
             {
                 writeLong(w, data.oldPr);
                 break;
             }
-            case historyitem_SurfaceChart_AddAxId:
-            case historyitem_SurfaceChart_AddBandFmt:
-            case historyitem_SurfaceChart_AddSer:
+            case AscDFH.historyitem_SurfaceChart_AddAxId:
+            case AscDFH.historyitem_SurfaceChart_AddBandFmt:
+            case AscDFH.historyitem_SurfaceChart_AddSer:
             {
                 w.WriteBool(isRealObject(data.newPr));
                 if(isRealObject(data.newPr))
@@ -22822,7 +22822,7 @@ CSurfaceChart.prototype =
                 }
                 break;
             }
-            case historyitem_SurfaceChart_SetWireframe:
+            case AscDFH.historyitem_SurfaceChart_SetWireframe:
             {
                 w.WriteLong(isRealBool(data.newPr));
                 if(isRealBool(data.newPr))
@@ -22839,18 +22839,18 @@ CSurfaceChart.prototype =
         var type = r.GetLong();
         switch (type)
         {
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 this.parent = readObject(r);
                 break;
             }
-            case historyitem_CommonChart_RemoveSeries:
+            case AscDFH.historyitem_CommonChart_RemoveSeries:
             {
                 var pos = readLong(r);
                 this.series.splice(pos, 1);
                 break;
             }
-            case historyitem_SurfaceChart_AddAxId:
+            case AscDFH.historyitem_SurfaceChart_AddAxId:
             {
                 if(r.GetBool())
                 {
@@ -22862,7 +22862,7 @@ CSurfaceChart.prototype =
                 }
                 break;
             }
-            case historyitem_SurfaceChart_AddBandFmt:
+            case AscDFH.historyitem_SurfaceChart_AddBandFmt:
             {
                 if(r.GetBool())
                 {
@@ -22874,7 +22874,7 @@ CSurfaceChart.prototype =
                 }
                 break;
             }
-            case historyitem_SurfaceChart_AddSer:
+            case AscDFH.historyitem_SurfaceChart_AddSer:
             {
                 if(r.GetBool())
                 {
@@ -22890,7 +22890,7 @@ CSurfaceChart.prototype =
                 }
                 break;
             }
-            case historyitem_SurfaceChart_SetWireframe:
+            case AscDFH.historyitem_SurfaceChart_SetWireframe:
             {
                 if(r.GetBool())
                 {
@@ -22936,7 +22936,7 @@ CSurfaceSeries.prototype =
 
     setParent: function(pr)
     {
-        History.Add(this, {Type: historyitem_CommonChartFormat_SetParent, oldPr: this.parent, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_CommonChartFormat_SetParent, oldPr: this.parent, newPr: pr});
         this.parent = pr;
     },
 
@@ -22944,7 +22944,7 @@ CSurfaceSeries.prototype =
     {
         if(this.dPt[idx])
         {
-            History.Add(this, {Type: historyitem_CommonSeries_RemoveDPt, idx: idx, pt: this.dPt[idx]});
+            History.Add(this, {Type: AscDFH.historyitem_CommonSeries_RemoveDPt, idx: idx, pt: this.dPt[idx]});
             this.dPt.splice(idx, 1);
         }
     },
@@ -22976,7 +22976,7 @@ CSurfaceSeries.prototype =
 
     getObjectType: function()
     {
-        return historyitem_type_SurfaceSeries;
+        return AscDFH.historyitem_type_SurfaceSeries;
     },
 
     documentCreateFontMap: CAreaSeries.prototype.documentCreateFontMap,
@@ -23032,42 +23032,42 @@ CSurfaceSeries.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 this.parent = data.oldPr;
                 break;
             }
-            case historyitem_CommonSeries_RemoveDPt:
+            case AscDFH.historyitem_CommonSeries_RemoveDPt:
             {
                 this.dPt.splice(data.idx, 0, data.pt);
                 break;
             }
-            case historyitem_SurfaceSeries_SetCat:
+            case AscDFH.historyitem_SurfaceSeries_SetCat:
             {
                 this.cat = data.oldPr;
                 break;
             }
-            case historyitem_SurfaceSeries_SetIdx:
+            case AscDFH.historyitem_SurfaceSeries_SetIdx:
             {
                 this.idx = data.oldPr;
                 break;
             }
-            case historyitem_SurfaceSeries_SetOrder:
+            case AscDFH.historyitem_SurfaceSeries_SetOrder:
             {
                 this.order = data.oldPr;
                 break;
             }
-            case historyitem_SurfaceSeries_SetSpPr:
+            case AscDFH.historyitem_SurfaceSeries_SetSpPr:
             {
                 this.spPr = data.oldPr;
                 break;
             }
-            case historyitem_SurfaceSeries_SetTx:
+            case AscDFH.historyitem_SurfaceSeries_SetTx:
             {
                 this.tx = data.oldPr;
                 break;
             }
-            case historyitem_SurfaceSeries_SetVal:
+            case AscDFH.historyitem_SurfaceSeries_SetVal:
             {
                 this.val = data.oldPr;
                 break;
@@ -23079,42 +23079,42 @@ CSurfaceSeries.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 this.parent = data.newPr;
                 break;
             }
-            case historyitem_CommonSeries_RemoveDPt:
+            case AscDFH.historyitem_CommonSeries_RemoveDPt:
             {
                 this.dPt.splice(data.idx, 1);
                 break;
             }
-            case historyitem_SurfaceSeries_SetCat:
+            case AscDFH.historyitem_SurfaceSeries_SetCat:
             {
                 this.cat = data.newPr;
                 break;
             }
-            case historyitem_SurfaceSeries_SetIdx:
+            case AscDFH.historyitem_SurfaceSeries_SetIdx:
             {
                 this.idx = data.newPr;
                 break;
             }
-            case historyitem_SurfaceSeries_SetOrder:
+            case AscDFH.historyitem_SurfaceSeries_SetOrder:
             {
                 this.order = data.newPr;
                 break;
             }
-            case historyitem_SurfaceSeries_SetSpPr:
+            case AscDFH.historyitem_SurfaceSeries_SetSpPr:
             {
                 this.spPr = data.newPr;
                 break;
             }
-            case historyitem_SurfaceSeries_SetTx:
+            case AscDFH.historyitem_SurfaceSeries_SetTx:
             {
                 this.tx = data.newPr;
                 break;
             }
-            case historyitem_SurfaceSeries_SetVal:
+            case AscDFH.historyitem_SurfaceSeries_SetVal:
             {
                 this.val = data.newPr;
                 break;
@@ -23127,26 +23127,26 @@ CSurfaceSeries.prototype =
         w.WriteLong(data.Type);
         switch (data.Type)
         {
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 writeObject(w, data.newPr);
                 break;
             }
-            case historyitem_SurfaceSeries_SetCat:
-            case historyitem_SurfaceSeries_SetSpPr:
-            case historyitem_SurfaceSeries_SetTx:
-            case historyitem_SurfaceSeries_SetVal:
+            case AscDFH.historyitem_SurfaceSeries_SetCat:
+            case AscDFH.historyitem_SurfaceSeries_SetSpPr:
+            case AscDFH.historyitem_SurfaceSeries_SetTx:
+            case AscDFH.historyitem_SurfaceSeries_SetVal:
             {
                 writeObject(w, data.newPr);
                 break;
             }
-            case historyitem_SurfaceSeries_SetIdx:
-            case historyitem_SurfaceSeries_SetOrder:
+            case AscDFH.historyitem_SurfaceSeries_SetIdx:
+            case AscDFH.historyitem_SurfaceSeries_SetOrder:
             {
                 writeLong(w, data.newPr);
                 break;
             }
-            case historyitem_CommonSeries_RemoveDPt:
+            case AscDFH.historyitem_CommonSeries_RemoveDPt:
             {
                 writeLong(w, data.idx);
                 break;
@@ -23159,42 +23159,42 @@ CSurfaceSeries.prototype =
         var type = r.GetLong();
         switch (type)
         {
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 this.parent = readObject(r);
                 break;
             }
-            case historyitem_SurfaceSeries_SetCat:
+            case AscDFH.historyitem_SurfaceSeries_SetCat:
             {
                 this.cat = readObject(r);
                 break;
             }
-            case historyitem_SurfaceSeries_SetIdx:
+            case AscDFH.historyitem_SurfaceSeries_SetIdx:
             {
                 this.idx = readLong(r);
                 break;
             }
-            case historyitem_SurfaceSeries_SetOrder:
+            case AscDFH.historyitem_SurfaceSeries_SetOrder:
             {
                 this.order = readLong(r);
                 break;
             }
-            case historyitem_SurfaceSeries_SetSpPr:
+            case AscDFH.historyitem_SurfaceSeries_SetSpPr:
             {
                 this.spPr = readObject(r);
                 break;
             }
-            case historyitem_SurfaceSeries_SetTx:
+            case AscDFH.historyitem_SurfaceSeries_SetTx:
             {
                 this.tx = readObject(r);
                 break;
             }
-            case historyitem_SurfaceSeries_SetVal:
+            case AscDFH.historyitem_SurfaceSeries_SetVal:
             {
                 this.val = readObject(r);
                 break;
             }
-            case historyitem_CommonSeries_RemoveDPt:
+            case AscDFH.historyitem_CommonSeries_RemoveDPt:
             {
                 var pos = readLong(r);
                 if(isRealNumber(pos))
@@ -23209,32 +23209,32 @@ CSurfaceSeries.prototype =
 
     setCat: function(pr)
     {
-        History.Add(this, {Type: historyitem_SurfaceSeries_SetCat, oldPr: this.cat, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_SurfaceSeries_SetCat, oldPr: this.cat, newPr: pr});
         this.cat = pr;
     },
     setIdx: function(pr)
     {
-        History.Add(this, {Type: historyitem_SurfaceSeries_SetIdx, oldPr: this.idx, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_SurfaceSeries_SetIdx, oldPr: this.idx, newPr: pr});
         this.idx = pr;
     },
     setOrder: function(pr)
     {
-        History.Add(this, {Type: historyitem_SurfaceSeries_SetOrder, oldPr: this.order, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_SurfaceSeries_SetOrder, oldPr: this.order, newPr: pr});
         this.order = pr;
     },
     setSpPr: function(pr)
     {
-        History.Add(this, {Type: historyitem_SurfaceSeries_SetSpPr, oldPr: this.spPr, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_SurfaceSeries_SetSpPr, oldPr: this.spPr, newPr: pr});
         this.spPr = pr;
     },
     setTx: function(pr)
     {
-        History.Add(this, {Type: historyitem_SurfaceSeries_SetTx, oldPr: this.tx, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_SurfaceSeries_SetTx, oldPr: this.tx, newPr: pr});
         this.tx = pr;
     },
     setVal: function(pr)
     {
-        History.Add(this, {Type: historyitem_SurfaceSeries_SetVal, oldPr: this.val, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_SurfaceSeries_SetVal, oldPr: this.val, newPr: pr});
         this.val = pr;
         if(this.val && this.val.setParent)
         {
@@ -23467,7 +23467,7 @@ CTitle.prototype =
 
     getObjectType: function()
     {
-        return  historyitem_type_Title;
+        return  AscDFH.historyitem_type_Title;
     },
 
     Write_ToBinary2: function(w)
@@ -23677,7 +23677,7 @@ CTitle.prototype =
     {
         if(this.parent)
         {
-            if(this.parent.getObjectType() === historyitem_type_Chart)
+            if(this.parent.getObjectType() === AscDFH.historyitem_type_Chart)
             {
                 if(this.parent.plotArea && this.parent.plotArea.charts.length === 1 && Array.isArray(this.parent.plotArea.charts[0].series)
                     && this.parent.plotArea.charts[0].series.length === 1 && this.parent.plotArea.charts[0].series[0].tx)
@@ -23774,24 +23774,24 @@ CTitle.prototype =
 
     setLayout: function(pr)
     {
-        History.Add(this, {Type: historyitem_Title_SetLayout, oldPr: this.layout, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_Title_SetLayout, oldPr: this.layout, newPr: pr});
         this.layout = pr;
     },
     setOverlay: function(pr)
     {
-        History.Add(this, {Type: historyitem_Title_SetOverlay, oldPr: this.overlay, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_Title_SetOverlay, oldPr: this.overlay, newPr: pr});
         this.overlay = pr;
     },
 
 
     setSpPr: function(pr)
     {
-        History.Add(this, {Type: historyitem_Title_SetSpPr, oldPr: this.spPr, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_Title_SetSpPr, oldPr: this.spPr, newPr: pr});
         this.spPr = pr;
     },
     setTx: function(pr)
     {
-        History.Add(this, {Type: historyitem_Title_SetTx, oldPr: this.tx, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_Title_SetTx, oldPr: this.tx, newPr: pr});
         this.tx = pr;
         if(this.tx)
         {
@@ -23800,7 +23800,7 @@ CTitle.prototype =
     },
     setTxPr: function(pr)
     {
-        History.Add(this, {Type: historyitem_Title_SetTxPr, oldPr: this.txPr, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_Title_SetTxPr, oldPr: this.txPr, newPr: pr});
         this.txPr = pr;
         if(this.txPr)
         {
@@ -23811,7 +23811,7 @@ CTitle.prototype =
 
     setParent: function(pr)
     {
-        History.Add(this, {Type: historyitem_CommonChartFormat_SetParent, oldPr: this.parent, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_CommonChartFormat_SetParent, oldPr: this.parent, newPr: pr});
         this.parent = pr;
     },
 
@@ -23819,33 +23819,33 @@ CTitle.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 this.parent = data.oldPr;
                 break;
             }
-            case historyitem_Title_SetLayout:
+            case AscDFH.historyitem_Title_SetLayout:
             {
                 this.layout = data.oldPr;
                 break;
             }
-            case historyitem_Title_SetOverlay:
+            case AscDFH.historyitem_Title_SetOverlay:
             {
                 this.overlay = data.oldPr;
                 break;
             }
-            case historyitem_Title_SetSpPr:
+            case AscDFH.historyitem_Title_SetSpPr:
             {
                 this.spPr = data.oldPr;
                 break;
             }
-            case historyitem_Title_SetTx:
+            case AscDFH.historyitem_Title_SetTx:
             {
                 this.tx = data.oldPr;
                 this.Refresh_RecalcData2();
                 break;
             }
-            case historyitem_Title_SetTxPr:
+            case AscDFH.historyitem_Title_SetTxPr:
             {
                 this.txPr = data.oldPr;
                 break;
@@ -23857,33 +23857,33 @@ CTitle.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 this.parent = data.newPr;
                 break;
             }
-            case historyitem_Title_SetLayout:
+            case AscDFH.historyitem_Title_SetLayout:
             {
                 this.layout = data.newPr;
                 break;
             }
-            case historyitem_Title_SetOverlay:
+            case AscDFH.historyitem_Title_SetOverlay:
             {
                 this.overlay = data.newPr;
                 break;
             }
-            case historyitem_Title_SetSpPr:
+            case AscDFH.historyitem_Title_SetSpPr:
             {
                 this.spPr = data.newPr;
                 break;
             }
-            case historyitem_Title_SetTx:
+            case AscDFH.historyitem_Title_SetTx:
             {
                 this.tx = data.newPr;
                 this.Refresh_RecalcData2();
                 break;
             }
-            case historyitem_Title_SetTxPr:
+            case AscDFH.historyitem_Title_SetTxPr:
             {
                 this.txPr = data.newPr;
                 break;
@@ -23896,20 +23896,20 @@ CTitle.prototype =
         w.WriteLong(data.Type);
         switch (data.Type)
         {
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 writeObject(w, data.newPr);
                 break;
             }
-            case historyitem_Title_SetLayout:
-            case historyitem_Title_SetSpPr:
-            case historyitem_Title_SetTx:
-            case historyitem_Title_SetTxPr:
+            case AscDFH.historyitem_Title_SetLayout:
+            case AscDFH.historyitem_Title_SetSpPr:
+            case AscDFH.historyitem_Title_SetTx:
+            case AscDFH.historyitem_Title_SetTxPr:
             {
                 writeObject(w, data.newPr);
                 break;
             }
-            case historyitem_Title_SetOverlay:
+            case AscDFH.historyitem_Title_SetOverlay:
             {
                 writeBool(w, data.newPr);
                 break;
@@ -23922,33 +23922,33 @@ CTitle.prototype =
         var type = r.GetLong();
         switch (type)
         {
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 this.parent = readObject(r);
                 break;
             }
-            case historyitem_Title_SetLayout:
+            case AscDFH.historyitem_Title_SetLayout:
             {
                 this.layout = readObject(r);
                 break;
             }
-            case historyitem_Title_SetOverlay:
+            case AscDFH.historyitem_Title_SetOverlay:
             {
                 this.overlay = readBool(r);
                 break;
             }
-            case historyitem_Title_SetSpPr:
+            case AscDFH.historyitem_Title_SetSpPr:
             {
                 this.spPr = readObject(r);
                 break;
             }
-            case historyitem_Title_SetTx:
+            case AscDFH.historyitem_Title_SetTx:
             {
                 this.tx = readObject(r);
                 this.Refresh_RecalcData2();
                 break;
             }
-            case historyitem_Title_SetTxPr:
+            case AscDFH.historyitem_Title_SetTxPr:
             {
                 this.txPr = readObject(r);
                 break;
@@ -23995,72 +23995,72 @@ CTrendLine.prototype =
 
     getObjectType: function()
     {
-        return historyitem_type_TrendLine;
+        return AscDFH.historyitem_type_TrendLine;
     },
 
     setBackward: function(pr)
     {
-        History.Add(this, {Type:historyitem_Trendline_SetBackward, oldPr: this.backward, newPr: pr});
+        History.Add(this, {Type:AscDFH.historyitem_Trendline_SetBackward, oldPr: this.backward, newPr: pr});
         this.backward = pr;
     },
 
     setDispEq: function(pr)
     {
-        History.Add(this, {Type:historyitem_Trendline_SetDispEq, oldPr: this.dispEq, newPr: pr});
+        History.Add(this, {Type:AscDFH.historyitem_Trendline_SetDispEq, oldPr: this.dispEq, newPr: pr});
         this.dispEq = pr;
     },
 
     setDispRSqr: function(pr)
     {
-        History.Add(this, {Type:historyitem_Trendline_SetDispRSqr, oldPr: this.dispRSqr, newPr: pr});
+        History.Add(this, {Type:AscDFH.historyitem_Trendline_SetDispRSqr, oldPr: this.dispRSqr, newPr: pr});
         this.dispRSqr = pr;
     },
 
     setForward: function(pr)
     {
-        History.Add(this, {Type:historyitem_Trendline_SetForward, oldPr: this.forward, newPr: pr});
+        History.Add(this, {Type:AscDFH.historyitem_Trendline_SetForward, oldPr: this.forward, newPr: pr});
         this.forward = pr;
     },
 
     setIntercept: function(pr)
     {
-        History.Add(this, {Type:historyitem_Trendline_SetIntercept, oldPr: this.intercept, newPr: pr});
+        History.Add(this, {Type:AscDFH.historyitem_Trendline_SetIntercept, oldPr: this.intercept, newPr: pr});
         this.intercept = pr;
     },
 
     setName: function(pr)
     {
-        History.Add(this, {Type:historyitem_Trendline_SetName, oldPr: this.name, newPr: pr});
+        History.Add(this, {Type:AscDFH.historyitem_Trendline_SetName, oldPr: this.name, newPr: pr});
         this.name = pr;
     },
 
     setOrder: function(pr)
     {
-        History.Add(this, {Type:historyitem_Trendline_SetOrder, oldPr: this.order, newPr: pr});
+        History.Add(this, {Type:AscDFH.historyitem_Trendline_SetOrder, oldPr: this.order, newPr: pr});
         this.order = pr;
     },
 
     setPeriod: function(pr)
     {
-        History.Add(this, {Type:historyitem_Trendline_SetPeriod, oldPr: this.period, newPr: pr});
+        History.Add(this, {Type:AscDFH.historyitem_Trendline_SetPeriod, oldPr: this.period, newPr: pr});
         this.period = pr;
     },
 
     setSpPr: function(pr)
     {
-        History.Add(this, {Type:historyitem_Trendline_SetSpPr, oldPr: this.spPr, newPr: pr});
+        History.Add(this, {Type:AscDFH.historyitem_Trendline_SetSpPr, oldPr: this.spPr, newPr: pr});
         this.spPr = pr;
     },
 
     setTrendlineLbl: function(pr)
     {
-        History.Add(this, {Type:historyitem_Trendline_SetTrendlineLbl, oldPr: this.trendlineLbl, newPr: pr});
+        History.Add(this, {Type:AscDFH.historyitem_Trendline_SetTrendlineLbl, oldPr: this.trendlineLbl, newPr: pr});
         this.trendlineLbl = pr;
     },
 
     setTrendlineType: function(pr)
     {
-        History.Add(this, {Type:historyitem_Trendline_SetTrendlineType, oldPr: this.trendlineType, newPr: pr});
+        History.Add(this, {Type:AscDFH.historyitem_Trendline_SetTrendlineType, oldPr: this.trendlineType, newPr: pr});
         this.trendlineType = pr;
     },
 
@@ -24129,57 +24129,57 @@ CTrendLine.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_Trendline_SetBackward:
+            case AscDFH.historyitem_Trendline_SetBackward:
             {
                 this.backward = data.oldPr;
                 break;
             }
-            case historyitem_Trendline_SetDispEq:
+            case AscDFH.historyitem_Trendline_SetDispEq:
             {
                 this.dispEq = data.oldPr;
                 break;
             }
-            case historyitem_Trendline_SetDispRSqr:
+            case AscDFH.historyitem_Trendline_SetDispRSqr:
             {
                 this.dispRSqr = data.oldPr;
                 break;
             }
-            case historyitem_Trendline_SetForward:
+            case AscDFH.historyitem_Trendline_SetForward:
             {
                 this.forward = data.oldPr;
                 break;
             }
-            case historyitem_Trendline_SetIntercept:
+            case AscDFH.historyitem_Trendline_SetIntercept:
             {
                 this.intercept = data.oldPr;
                 break;
             }
-            case historyitem_Trendline_SetName:
+            case AscDFH.historyitem_Trendline_SetName:
             {
                 this.name = data.oldPr;
                 break;
             }
-            case historyitem_Trendline_SetOrder:
+            case AscDFH.historyitem_Trendline_SetOrder:
             {
                 this.order = data.oldPr;
                 break;
             }
-            case historyitem_Trendline_SetPeriod:
+            case AscDFH.historyitem_Trendline_SetPeriod:
             {
                 this.period = data.oldPr;
                 break;
             }
-            case historyitem_Trendline_SetSpPr:
+            case AscDFH.historyitem_Trendline_SetSpPr:
             {
                 this.spPr = data.oldPr;
                 break;
             }
-            case historyitem_Trendline_SetTrendlineLbl:
+            case AscDFH.historyitem_Trendline_SetTrendlineLbl:
             {
                 this.trendlineLbl = data.oldPr;
                 break;
             }
-            case historyitem_Trendline_SetTrendlineType:
+            case AscDFH.historyitem_Trendline_SetTrendlineType:
             {
                 this.trendlineType = data.oldPr;
                 break;
@@ -24191,57 +24191,57 @@ CTrendLine.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_Trendline_SetBackward:
+            case AscDFH.historyitem_Trendline_SetBackward:
             {
                 this.backward = data.newPr;
                 break;
             }
-            case historyitem_Trendline_SetDispEq:
+            case AscDFH.historyitem_Trendline_SetDispEq:
             {
                 this.dispEq = data.newPr;
                 break;
             }
-            case historyitem_Trendline_SetDispRSqr:
+            case AscDFH.historyitem_Trendline_SetDispRSqr:
             {
                 this.dispRSqr = data.newPr;
                 break;
             }
-            case historyitem_Trendline_SetForward:
+            case AscDFH.historyitem_Trendline_SetForward:
             {
                 this.forward = data.newPr;
                 break;
             }
-            case historyitem_Trendline_SetIntercept:
+            case AscDFH.historyitem_Trendline_SetIntercept:
             {
                 this.intercept = data.newPr;
                 break;
             }
-            case historyitem_Trendline_SetName:
+            case AscDFH.historyitem_Trendline_SetName:
             {
                 this.name = data.newPr;
                 break;
             }
-            case historyitem_Trendline_SetOrder:
+            case AscDFH.historyitem_Trendline_SetOrder:
             {
                 this.order = data.newPr;
                 break;
             }
-            case historyitem_Trendline_SetPeriod:
+            case AscDFH.historyitem_Trendline_SetPeriod:
             {
                 this.period = data.newPr;
                 break;
             }
-            case historyitem_Trendline_SetSpPr:
+            case AscDFH.historyitem_Trendline_SetSpPr:
             {
                 this.spPr = data.newPr;
                 break;
             }
-            case historyitem_Trendline_SetTrendlineLbl:
+            case AscDFH.historyitem_Trendline_SetTrendlineLbl:
             {
                 this.trendlineLbl = data.newPr;
                 break;
             }
-            case historyitem_Trendline_SetTrendlineType:
+            case AscDFH.historyitem_Trendline_SetTrendlineType:
             {
                 this.trendlineType = data.newPr;
                 break;
@@ -24255,33 +24255,33 @@ CTrendLine.prototype =
         w.WriteLong(data.Type);
         switch (data.Type)
         {
-            case historyitem_Trendline_SetBackward:
-            case historyitem_Trendline_SetForward:
-            case historyitem_Trendline_SetIntercept:
+            case AscDFH.historyitem_Trendline_SetBackward:
+            case AscDFH.historyitem_Trendline_SetForward:
+            case AscDFH.historyitem_Trendline_SetIntercept:
             {
                 writeDouble(w, data.newPr);
                 break;
             }
-            case historyitem_Trendline_SetDispEq:
-            case historyitem_Trendline_SetDispRSqr:
+            case AscDFH.historyitem_Trendline_SetDispEq:
+            case AscDFH.historyitem_Trendline_SetDispRSqr:
             {
                 writeBool(w, data.newPr);
                 break;
             }
-            case historyitem_Trendline_SetName:
+            case AscDFH.historyitem_Trendline_SetName:
             {
                 writeString(w, data.newPr);
                 break;
             }
-            case historyitem_Trendline_SetOrder:
-            case historyitem_Trendline_SetPeriod:
-            case historyitem_Trendline_SetTrendlineType:
+            case AscDFH.historyitem_Trendline_SetOrder:
+            case AscDFH.historyitem_Trendline_SetPeriod:
+            case AscDFH.historyitem_Trendline_SetTrendlineType:
             {
                 writeLong(w, data.newPr);
                 break;
             }
-            case historyitem_Trendline_SetSpPr:
-            case historyitem_Trendline_SetTrendlineLbl:
+            case AscDFH.historyitem_Trendline_SetSpPr:
+            case AscDFH.historyitem_Trendline_SetTrendlineLbl:
             {
                 writeObject(w, data.newPr);
                 break;
@@ -24296,57 +24296,57 @@ CTrendLine.prototype =
         var type = r.GetLong();
         switch (type)
         {
-            case historyitem_Trendline_SetBackward:
+            case AscDFH.historyitem_Trendline_SetBackward:
             {
                 this.backward = readDouble(r);
                 break;
             }
-            case historyitem_Trendline_SetDispEq:
+            case AscDFH.historyitem_Trendline_SetDispEq:
             {
                 this.dispEq = readBool(r);
                 break;
             }
-            case historyitem_Trendline_SetDispRSqr:
+            case AscDFH.historyitem_Trendline_SetDispRSqr:
             {
                 this.dispRSqr = readBool(r);
                 break;
             }
-            case historyitem_Trendline_SetForward:
+            case AscDFH.historyitem_Trendline_SetForward:
             {
                 this.forward = readDouble(r);
                 break;
             }
-            case historyitem_Trendline_SetIntercept:
+            case AscDFH.historyitem_Trendline_SetIntercept:
             {
                 this.intercept = readDouble(r);
                 break;
             }
-            case historyitem_Trendline_SetName:
+            case AscDFH.historyitem_Trendline_SetName:
             {
                 this.name = readString(r);
                 break;
             }
-            case historyitem_Trendline_SetOrder:
+            case AscDFH.historyitem_Trendline_SetOrder:
             {
                 this.order = readLong(r);
                 break;
             }
-            case historyitem_Trendline_SetPeriod:
+            case AscDFH.historyitem_Trendline_SetPeriod:
             {
                 this.period = readLong(r);
                 break;
             }
-            case historyitem_Trendline_SetSpPr:
+            case AscDFH.historyitem_Trendline_SetSpPr:
             {
                 this.spPr = readObject(r);
                 break;
             }
-            case historyitem_Trendline_SetTrendlineLbl:
+            case AscDFH.historyitem_Trendline_SetTrendlineLbl:
             {
                 this.trendlineLbl = readObject(r);
                 break;
             }
-            case historyitem_Trendline_SetTrendlineType:
+            case AscDFH.historyitem_Trendline_SetTrendlineType:
             {
                 this.trendlineType = readLong(r);
                 break;
@@ -24379,24 +24379,24 @@ CUpDownBars.prototype =
 
     getObjectType: function()
     {
-        return historyitem_type_UpDownBars;
+        return AscDFH.historyitem_type_UpDownBars;
     },
     setDownBars: function(pr)
     {
-        History.Add(this, {Type: historyitem_UpDownBars_SetDownBars, oldPr: this.downBars, newPr:pr});
+        History.Add(this, {Type: AscDFH.historyitem_UpDownBars_SetDownBars, oldPr: this.downBars, newPr:pr});
         this.downBars = pr;
     },
 
     setGapWidth: function(pr)
     {
 
-        History.Add(this, {Type: historyitem_UpDownBars_SetGapWidth, oldPr: this.downBars, newPr:pr});
+        History.Add(this, {Type: AscDFH.historyitem_UpDownBars_SetGapWidth, oldPr: this.downBars, newPr:pr});
         this.gapWidth = pr;
     },
 
     setUpBars: function(pr)
     {
-        History.Add(this, {Type: historyitem_UpDownBars_SetUpBars, oldPr: this.downBars, newPr:pr});
+        History.Add(this, {Type: AscDFH.historyitem_UpDownBars_SetUpBars, oldPr: this.downBars, newPr:pr});
         this.upBars = pr;
     },
 
@@ -24423,17 +24423,17 @@ CUpDownBars.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_UpDownBars_SetDownBars:
+            case AscDFH.historyitem_UpDownBars_SetDownBars:
             {
                 this.downBars = data.oldPr;
                 break;
             }
-            case historyitem_UpDownBars_SetGapWidth:
+            case AscDFH.historyitem_UpDownBars_SetGapWidth:
             {
                 this.gapWidth = data.oldPr;
                 break;
             }
-            case historyitem_UpDownBars_SetUpBars:
+            case AscDFH.historyitem_UpDownBars_SetUpBars:
             {
                 this.upBars = data.oldPr;
                 break;
@@ -24445,17 +24445,17 @@ CUpDownBars.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_UpDownBars_SetDownBars:
+            case AscDFH.historyitem_UpDownBars_SetDownBars:
             {
                 this.downBars = data.newPr;
                 break;
             }
-            case historyitem_UpDownBars_SetGapWidth:
+            case AscDFH.historyitem_UpDownBars_SetGapWidth:
             {
                 this.gapWidth = data.newPr;
                 break;
             }
-            case historyitem_UpDownBars_SetUpBars:
+            case AscDFH.historyitem_UpDownBars_SetUpBars:
             {
                 this.upBars = data.newPr;
                 break;
@@ -24479,13 +24479,13 @@ CUpDownBars.prototype =
         w.WriteLong(data.Type);
         switch (data.Type)
         {
-            case historyitem_UpDownBars_SetDownBars:
-            case historyitem_UpDownBars_SetUpBars:
+            case AscDFH.historyitem_UpDownBars_SetDownBars:
+            case AscDFH.historyitem_UpDownBars_SetUpBars:
             {
                 writeObject(w, data.newPr);
                 break;
             }
-            case historyitem_UpDownBars_SetGapWidth:
+            case AscDFH.historyitem_UpDownBars_SetGapWidth:
             {
                 writeLong(w, data.newPr);
                 break;
@@ -24498,17 +24498,17 @@ CUpDownBars.prototype =
         var type = r.GetLong();
         switch (type)
         {
-            case historyitem_UpDownBars_SetDownBars:
+            case AscDFH.historyitem_UpDownBars_SetDownBars:
             {
                 this.downBars = readObject(r);
                 break;
             }
-            case historyitem_UpDownBars_SetGapWidth:
+            case AscDFH.historyitem_UpDownBars_SetGapWidth:
             {
                 this.gapWidth = readLong(r);
                 break;
             }
-            case historyitem_UpDownBars_SetUpBars:
+            case AscDFH.historyitem_UpDownBars_SetUpBars:
             {
                 this.upBars = readObject(r);
                 break;
@@ -24542,7 +24542,7 @@ CXVal.prototype =
 
     getObjectType: function()
     {
-        return historyitem_type_XVal;
+        return AscDFH.historyitem_type_XVal;
     },
 
     Write_ToBinary2: function(w)
@@ -24598,31 +24598,31 @@ CXVal.prototype =
 
     setMultiLvlStrRef: function(pr)
     {
-        History.Add(this, {Type: historyitem_XVal_SetMultiLvlStrRef, oldPr: this.multiLvlStrRef, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_XVal_SetMultiLvlStrRef, oldPr: this.multiLvlStrRef, newPr: pr});
         this.multiLvlStrRef = pr;
     },
 
     setNumLit: function(pr)
     {
-        History.Add(this, {Type: historyitem_XVal_SetNumLit, oldPr: this.numLit, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_XVal_SetNumLit, oldPr: this.numLit, newPr: pr});
         this.numLit = pr;
     },
 
     setNumRef: function(pr)
     {
-        History.Add(this, {Type: historyitem_XVal_SetNumRef, oldPr: this.numRef, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_XVal_SetNumRef, oldPr: this.numRef, newPr: pr});
         this.numRef = pr;
     },
 
     setStrLit: function(pr)
     {
-        History.Add(this, {Type: historyitem_XVal_SetStrLit, oldPr: this.strLit, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_XVal_SetStrLit, oldPr: this.strLit, newPr: pr});
         this.strLit = pr;
     },
 
     setStrRef: function(pr)
     {
-        History.Add(this, {Type: historyitem_XVal_SetStrRef, oldPr: this.strRef, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_XVal_SetStrRef, oldPr: this.strRef, newPr: pr});
         this.strRef = pr;
     },
 
@@ -24630,27 +24630,27 @@ CXVal.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_XVal_SetMultiLvlStrRef:
+            case AscDFH.historyitem_XVal_SetMultiLvlStrRef:
             {
                 this.multiLvlStrRef = data.oldPr;
                 break;
             }
-            case historyitem_XVal_SetNumLit:
+            case AscDFH.historyitem_XVal_SetNumLit:
             {
                 this.numLit = data.oldPr;
                 break;
             }
-            case historyitem_XVal_SetNumRef:
+            case AscDFH.historyitem_XVal_SetNumRef:
             {
                 this.numRef = data.oldPr;
                 break;
             }
-            case historyitem_XVal_SetStrLit:
+            case AscDFH.historyitem_XVal_SetStrLit:
             {
                 this.strLit = data.oldPr;
                 break;
             }
-            case historyitem_XVal_SetStrRef:
+            case AscDFH.historyitem_XVal_SetStrRef:
             {
                 this.strRef = data.oldPr;
                 break;
@@ -24662,27 +24662,27 @@ CXVal.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_XVal_SetMultiLvlStrRef:
+            case AscDFH.historyitem_XVal_SetMultiLvlStrRef:
             {
                 this.multiLvlStrRef = data.newPr;
                 break;
             }
-            case historyitem_XVal_SetNumLit:
+            case AscDFH.historyitem_XVal_SetNumLit:
             {
                 this.numLit = data.newPr;
                 break;
             }
-            case historyitem_XVal_SetNumRef:
+            case AscDFH.historyitem_XVal_SetNumRef:
             {
                 this.numRef = data.newPr;
                 break;
             }
-            case historyitem_XVal_SetStrLit:
+            case AscDFH.historyitem_XVal_SetStrLit:
             {
                 this.strLit = data.newPr;
                 break;
             }
-            case historyitem_XVal_SetStrRef:
+            case AscDFH.historyitem_XVal_SetStrRef:
             {
                 this.strRef = data.newPr;
                 break;
@@ -24695,11 +24695,11 @@ CXVal.prototype =
         w.WriteLong(data.Type);
         switch (data.Type)
         {
-            case historyitem_XVal_SetMultiLvlStrRef:
-            case historyitem_XVal_SetNumLit:
-            case historyitem_XVal_SetNumRef:
-            case historyitem_XVal_SetStrLit:
-            case historyitem_XVal_SetStrRef:
+            case AscDFH.historyitem_XVal_SetMultiLvlStrRef:
+            case AscDFH.historyitem_XVal_SetNumLit:
+            case AscDFH.historyitem_XVal_SetNumRef:
+            case AscDFH.historyitem_XVal_SetStrLit:
+            case AscDFH.historyitem_XVal_SetStrRef:
             {
                 writeObject(w, data.newPr);
                 break;
@@ -24712,27 +24712,27 @@ CXVal.prototype =
         var type = r.GetLong();
         switch (type)
         {
-            case historyitem_XVal_SetMultiLvlStrRef:
+            case AscDFH.historyitem_XVal_SetMultiLvlStrRef:
             {
                 this.multiLvlStrRef = readObject(r);
                 break;
             }
-            case historyitem_XVal_SetNumLit:
+            case AscDFH.historyitem_XVal_SetNumLit:
             {
                 this.numLit =  readObject(r);
                 break;
             }
-            case historyitem_XVal_SetNumRef:
+            case AscDFH.historyitem_XVal_SetNumRef:
             {
                 this.numRef =  readObject(r);
                 break;
             }
-            case historyitem_XVal_SetStrLit:
+            case AscDFH.historyitem_XVal_SetStrLit:
             {
                 this.strLit =  readObject(r);
                 break;
             }
-            case historyitem_XVal_SetStrRef:
+            case AscDFH.historyitem_XVal_SetStrRef:
             {
                 this.strRef =  readObject(r);
                 break;
@@ -24781,12 +24781,12 @@ CYVal.prototype =
 
     getObjectType: function()
     {
-        return historyitem_type_YVal;
+        return AscDFH.historyitem_type_YVal;
     },
 
     setParent: function(pr)
     {
-        History.Add(this, {Type: historyitem_CommonChartFormat_SetParent, oldPr: this.parent, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_CommonChartFormat_SetParent, oldPr: this.parent, newPr: pr});
         this.parent = pr;
     },
 
@@ -24811,13 +24811,13 @@ CYVal.prototype =
 
     setNumLit: function(pr)
     {
-        History.Add(this, {Type:historyitem_YVal_SetNumLit, oldPr: this.numLit, newPr: pr});
+        History.Add(this, {Type:AscDFH.historyitem_YVal_SetNumLit, oldPr: this.numLit, newPr: pr});
         this.numLit = pr;
     },
 
     setNumRef: function(pr)
     {
-        History.Add(this, {Type:historyitem_YVal_SetNumRef, oldPr: this.numRef, newPr: pr});
+        History.Add(this, {Type:AscDFH.historyitem_YVal_SetNumRef, oldPr: this.numRef, newPr: pr});
         this.numRef = pr;
         if(this.numRef && this.numRef.setParent)
         {
@@ -24829,17 +24829,17 @@ CYVal.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_YVal_SetNumLit:
+            case AscDFH.historyitem_YVal_SetNumLit:
             {
                 this.numLit = data.oldPr;
                 break;
             }
-            case historyitem_YVal_SetNumRef:
+            case AscDFH.historyitem_YVal_SetNumRef:
             {
                 this.numRef = data.oldPr;
                 break;
             }
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 this.parent = data.oldPr;
                 break;
@@ -24851,17 +24851,17 @@ CYVal.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_YVal_SetNumLit:
+            case AscDFH.historyitem_YVal_SetNumLit:
             {
                 this.numLit = data.newPr;
                 break;
             }
-            case historyitem_YVal_SetNumRef:
+            case AscDFH.historyitem_YVal_SetNumRef:
             {
                 this.numRef = data.newPr;
                 break;
             }
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 this.parent = data.newPr;
                 break;
@@ -24874,9 +24874,9 @@ CYVal.prototype =
         w.WriteLong(data.Type);
         switch (data.Type)
         {
-            case historyitem_YVal_SetNumLit:
-            case historyitem_YVal_SetNumRef:
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_YVal_SetNumLit:
+            case AscDFH.historyitem_YVal_SetNumRef:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                     writeObject(w, data.newPr);
                     break;
@@ -24889,17 +24889,17 @@ CYVal.prototype =
         var type = r.GetLong();
         switch (type)
         {
-            case historyitem_YVal_SetNumLit:
+            case AscDFH.historyitem_YVal_SetNumLit:
             {
                 this.numLit = readObject(r);
                 break;
             }
-            case historyitem_YVal_SetNumRef:
+            case AscDFH.historyitem_YVal_SetNumRef:
             {
                 this.numRef = readObject(r);
                 break;
             }
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 this.parent = readObject(r);
                 break;
@@ -24948,7 +24948,7 @@ CChart.prototype =
 
     getObjectType: function()
     {
-        return  historyitem_type_Chart;
+        return  AscDFH.historyitem_type_Chart;
     },
 
     getParentObjects: function()
@@ -25046,27 +25046,27 @@ CChart.prototype =
 
     setAutoTitleDeleted: function(autoTitleDeleted)
     {
-        History.Add(this, {Type: historyitem_Chart_SetAutoTitleDeleted, oldAutoTitleDeleted: this.autoTitleDeleted, newAutoTitleDeleted: autoTitleDeleted});
+        History.Add(this, {Type: AscDFH.historyitem_Chart_SetAutoTitleDeleted, oldAutoTitleDeleted: this.autoTitleDeleted, newAutoTitleDeleted: autoTitleDeleted});
         this.autoTitleDeleted = autoTitleDeleted;
     },
     setBackWall: function(backWall)
     {
-        History.Add(this, {Type: historyitem_Chart_SetBackWall, oldBackWall: this.backWall, newBackWall: backWall});
+        History.Add(this, {Type: AscDFH.historyitem_Chart_SetBackWall, oldBackWall: this.backWall, newBackWall: backWall});
         this.backWall = backWall;
     },
     setDispBlanksAs: function(dispBlanksAs)
     {
-        History.Add(this, {Type: historyitem_Chart_SetDispBlanksAs, oldDispBlanksAs: this.dispBlanksAs, newDispBlanksAs: dispBlanksAs});
+        History.Add(this, {Type: AscDFH.historyitem_Chart_SetDispBlanksAs, oldDispBlanksAs: this.dispBlanksAs, newDispBlanksAs: dispBlanksAs});
         this.dispBlanksAs = dispBlanksAs;
     },
     setFloor: function(floor)
     {
-        History.Add(this, {Type: historyitem_Chart_SetFloor, oldFloor: this.floor, newFloor: floor});
+        History.Add(this, {Type: AscDFH.historyitem_Chart_SetFloor, oldFloor: this.floor, newFloor: floor});
         this.floor = floor;
     },
     setLegend: function(legend)
     {
-        History.Add(this, {Type: historyitem_Chart_SetLegend, oldLegend: this.legend, newLegend: legend});
+        History.Add(this, {Type: AscDFH.historyitem_Chart_SetLegend, oldLegend: this.legend, newLegend: legend});
         this.legend = legend;
         if(legend)
         {
@@ -25075,12 +25075,12 @@ CChart.prototype =
     },
     setPivotFmts: function(pivotFmt)
     {
-        History.Add(this, {Type: historyitem_Chart_AddPivotFmt, pivotFmt: pivotFmt});
+        History.Add(this, {Type: AscDFH.historyitem_Chart_AddPivotFmt, pivotFmt: pivotFmt});
         this.pivotFmts.push(pivotFmt);
     },
     setPlotArea: function(plotArea)
     {
-        History.Add(this, {Type: historyitem_Chart_SetPlotArea, oldPlotArea: this.plotArea, newPlotArea: plotArea});
+        History.Add(this, {Type: AscDFH.historyitem_Chart_SetPlotArea, oldPlotArea: this.plotArea, newPlotArea: plotArea});
         this.plotArea = plotArea;
         if(plotArea)
         {
@@ -25089,22 +25089,22 @@ CChart.prototype =
     },
     setPlotVisOnly: function(plotVisOnly)
     {
-        History.Add(this, {Type: historyitem_Chart_SetPlotVisOnly, oldPlotVisOnly: this.plotVisOnly, newPlotVisOnly: plotVisOnly});
+        History.Add(this, {Type: AscDFH.historyitem_Chart_SetPlotVisOnly, oldPlotVisOnly: this.plotVisOnly, newPlotVisOnly: plotVisOnly});
         this.plotVisOnly = plotVisOnly;
     },
     setShowDLblsOverMax: function(showDLblsOverMax)
     {
-        History.Add(this, {Type: historyitem_Chart_SetShowDLblsOverMax, oldShowDLblsOverMax: this.showDLblsOverMax, newShowDLblsOverMax: showDLblsOverMax});
+        History.Add(this, {Type: AscDFH.historyitem_Chart_SetShowDLblsOverMax, oldShowDLblsOverMax: this.showDLblsOverMax, newShowDLblsOverMax: showDLblsOverMax});
         this.showDLblsOverMax = showDLblsOverMax;
     },
     setSideWall: function(sideWall)
     {
-        History.Add(this, {Type: historyitem_Chart_SetSideWall, oldSideWall: this.sideWall, newSideWall: sideWall});
+        History.Add(this, {Type: AscDFH.historyitem_Chart_SetSideWall, oldSideWall: this.sideWall, newSideWall: sideWall});
         this.sideWall = sideWall;
     },
     setTitle: function(title)
     {
-        History.Add(this, {Type: historyitem_Chart_SetTitle, oldTitle: this.title, newTitle: title});
+        History.Add(this, {Type: AscDFH.historyitem_Chart_SetTitle, oldTitle: this.title, newTitle: title});
         this.title = title;
         if(title)
         {
@@ -25118,7 +25118,7 @@ CChart.prototype =
 
     setView3D: function(view3D)
     {
-        History.Add(this, {Type: historyitem_Chart_SetView3D, oldView3D: this.view3D, newView3D: view3D});
+        History.Add(this, {Type: AscDFH.historyitem_Chart_SetView3D, oldView3D: this.view3D, newView3D: view3D});
         this.view3D = view3D;
         if(this.parent)
         {
@@ -25128,7 +25128,7 @@ CChart.prototype =
 
     setParent: function(pr)
     {
-        History.Add(this, {Type: historyitem_CommonChartFormat_SetParent, oldPr: this.parent, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_CommonChartFormat_SetParent, oldPr: this.parent, newPr: pr});
         this.parent = pr;
     },
 
@@ -25137,37 +25137,37 @@ CChart.prototype =
         switch (data.Type)
         {
 
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 this.parent = data.oldPr;
                 break;
             }
-            case historyitem_Chart_SetAutoTitleDeleted:
+            case AscDFH.historyitem_Chart_SetAutoTitleDeleted:
             {
                 this.autoTitleDeleted = data.oldAutoTitleDeleted;
                 break;
             }
-            case historyitem_Chart_SetBackWall:
+            case AscDFH.historyitem_Chart_SetBackWall:
             {
                 this.backWall = data.oldBackWall;
                 break;
             }
-            case historyitem_Chart_SetDispBlanksAs:
+            case AscDFH.historyitem_Chart_SetDispBlanksAs:
             {
                 this.dispBlanksAs = data.oldDispBlanksAs;
                 break;
             }
-            case historyitem_Chart_SetFloor:
+            case AscDFH.historyitem_Chart_SetFloor:
             {
                 this.floor = data.oldFloor;
                 break;
             }
-            case historyitem_Chart_SetLegend:
+            case AscDFH.historyitem_Chart_SetLegend:
             {
                 this.legend = data.oldLegend;
                 break;
             }
-            case historyitem_Chart_AddPivotFmt:
+            case AscDFH.historyitem_Chart_AddPivotFmt:
             {
                 for(var i = this.pivotFmts.length - 1; i > -1; --i)
                 {
@@ -25179,22 +25179,22 @@ CChart.prototype =
                 }
                 break;
             }
-            case historyitem_Chart_SetPlotArea:
+            case AscDFH.historyitem_Chart_SetPlotArea:
             {
                 this.plotArea = data.oldPlotArea;
                 break;
             }
-            case historyitem_Chart_SetPlotVisOnly:
+            case AscDFH.historyitem_Chart_SetPlotVisOnly:
             {
                 this.plotVisOnly = data.oldPlotVisOnly;
                 break;
             }
-            case historyitem_Chart_SetShowDLblsOverMax:
+            case AscDFH.historyitem_Chart_SetShowDLblsOverMax:
             {
                 this.showDLblsOverMax = data.oldShowDLblsOverMax;
                 break;
             }
-            case historyitem_Chart_SetTitle:
+            case AscDFH.historyitem_Chart_SetTitle:
             {
                 this.title = data.oldTitle;
 
@@ -25204,12 +25204,12 @@ CChart.prototype =
                 }
                 break;
             }
-            case historyitem_Chart_SetSideWall:
+            case AscDFH.historyitem_Chart_SetSideWall:
             {
                 this.sideWall = data.oldSideWall;
                 break;
             }
-            case historyitem_Chart_SetView3D:
+            case AscDFH.historyitem_Chart_SetView3D:
             {
                 this.view3D = data.oldView3D;
                 if(this.parent)
@@ -25225,57 +25225,57 @@ CChart.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 this.parent = data.newPr;
                 break;
             }
-            case historyitem_Chart_SetAutoTitleDeleted:
+            case AscDFH.historyitem_Chart_SetAutoTitleDeleted:
             {
                 this.autoTitleDeleted = data.newAutoTitleDeleted;
                 break;
             }
-            case historyitem_Chart_SetBackWall:
+            case AscDFH.historyitem_Chart_SetBackWall:
             {
                 this.backWall = data.newBackWall;
                 break;
             }
-            case historyitem_Chart_SetDispBlanksAs:
+            case AscDFH.historyitem_Chart_SetDispBlanksAs:
             {
                 this.dispBlanksAs = data.newDispBlanksAs;
                 break;
             }
-            case historyitem_Chart_SetFloor:
+            case AscDFH.historyitem_Chart_SetFloor:
             {
                 this.floor = data.newFloor;
                 break;
             }
-            case historyitem_Chart_SetLegend:
+            case AscDFH.historyitem_Chart_SetLegend:
             {
                 this.legend = data.newLegend;
                 break;
             }
-            case historyitem_Chart_AddPivotFmt:
+            case AscDFH.historyitem_Chart_AddPivotFmt:
             {
                 this.pivotFmts.push(data.pivotFmt);
                 break;
             }
-            case historyitem_Chart_SetPlotArea:
+            case AscDFH.historyitem_Chart_SetPlotArea:
             {
                 this.plotArea = data.newPlotArea;
                 break;
             }
-            case historyitem_Chart_SetPlotVisOnly:
+            case AscDFH.historyitem_Chart_SetPlotVisOnly:
             {
                 this.plotVisOnly = data.newPlotVisOnly;
                 break;
             }
-            case historyitem_Chart_SetShowDLblsOverMax:
+            case AscDFH.historyitem_Chart_SetShowDLblsOverMax:
             {
                 this.showDLblsOverMax = data.newShowDLblsOverMax;
                 break;
             }
-            case historyitem_Chart_SetTitle:
+            case AscDFH.historyitem_Chart_SetTitle:
             {
                 this.title = data.newTitle;
                 if(this.parent)
@@ -25284,12 +25284,12 @@ CChart.prototype =
                 }
                 break;
             }
-            case historyitem_Chart_SetSideWall:
+            case AscDFH.historyitem_Chart_SetSideWall:
             {
                 this.sideWall = data.newSideWall;
                 break;
             }
-            case historyitem_Chart_SetView3D:
+            case AscDFH.historyitem_Chart_SetView3D:
             {
                 this.view3D = data.newView3D;
                 if(this.parent)
@@ -25306,67 +25306,67 @@ CChart.prototype =
         w.WriteLong(data.Type);
         switch (data.Type)
         {
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 writeObject(w, data.newPr);
                 break;
             }
-            case historyitem_Chart_SetAutoTitleDeleted:
+            case AscDFH.historyitem_Chart_SetAutoTitleDeleted:
             {
                 writeBool(w, data.newAutoTitleDeleted);
                 break;
             }
-            case historyitem_Chart_SetBackWall:
+            case AscDFH.historyitem_Chart_SetBackWall:
             {
                 writeObject(w, data.newBackWall);
                 break;
             }
-            case historyitem_Chart_SetDispBlanksAs:
+            case AscDFH.historyitem_Chart_SetDispBlanksAs:
             {
                 writeLong(w, data.newDispBlanksAs);
                 break;
             }
-            case historyitem_Chart_SetFloor:
+            case AscDFH.historyitem_Chart_SetFloor:
             {
                 writeObject(w, data.newFloor);
                 break;
             }
-            case historyitem_Chart_SetLegend:
+            case AscDFH.historyitem_Chart_SetLegend:
             {
                 writeObject(w, data.newLegend);
                 break;
             }
-            case historyitem_Chart_AddPivotFmt:
+            case AscDFH.historyitem_Chart_AddPivotFmt:
             {
                 writeObject(w, data.pivotFmt);
                 break;
             }
-            case historyitem_Chart_SetPlotArea:
+            case AscDFH.historyitem_Chart_SetPlotArea:
             {
                 writeObject(w, data.newPlotArea);
                 break;
             }
-            case historyitem_Chart_SetPlotVisOnly:
+            case AscDFH.historyitem_Chart_SetPlotVisOnly:
             {
                 writeBool(w, data.newPlotVisOnly);
                 break;
             }
-            case historyitem_Chart_SetShowDLblsOverMax:
+            case AscDFH.historyitem_Chart_SetShowDLblsOverMax:
             {
                 writeBool(w, data.newShowDLblsOverMax);
                 break;
             }
-            case historyitem_Chart_SetTitle:
+            case AscDFH.historyitem_Chart_SetTitle:
             {
                 writeObject(w, data.newTitle);
                 break;
             }
-            case historyitem_Chart_SetSideWall:
+            case AscDFH.historyitem_Chart_SetSideWall:
             {
                 writeObject(w, data.newSideWall);
                 break;
             }
-            case historyitem_Chart_SetView3D:
+            case AscDFH.historyitem_Chart_SetView3D:
             {
                 writeObject(w, data.newView3D);
                 break;
@@ -25379,37 +25379,37 @@ CChart.prototype =
         var type = r.GetLong();
         switch (type)
         {
-            case historyitem_CommonChartFormat_SetParent:
+            case AscDFH.historyitem_CommonChartFormat_SetParent:
             {
                 this.parent = readObject(r);
                 break;
             }
-            case historyitem_Chart_SetAutoTitleDeleted:
+            case AscDFH.historyitem_Chart_SetAutoTitleDeleted:
             {
                 this.autoTitleDeleted = readBool(r);
                 break;
             }
-            case historyitem_Chart_SetBackWall:
+            case AscDFH.historyitem_Chart_SetBackWall:
             {
                 this.backWall = readObject(r);
                 break;
             }
-            case historyitem_Chart_SetDispBlanksAs:
+            case AscDFH.historyitem_Chart_SetDispBlanksAs:
             {
                 this.dispBlanksAs = readLong(r);
                 break;
             }
-            case historyitem_Chart_SetFloor:
+            case AscDFH.historyitem_Chart_SetFloor:
             {
                 this.floor = readObject(r);
                 break;
             }
-            case historyitem_Chart_SetLegend:
+            case AscDFH.historyitem_Chart_SetLegend:
             {
                 this.legend = readObject(r);
                 break;
             }
-            case historyitem_Chart_AddPivotFmt:
+            case AscDFH.historyitem_Chart_AddPivotFmt:
             {
                 var pivot_fmt = readObject(r);
                 if(isRealObject(pivot_fmt))
@@ -25418,22 +25418,22 @@ CChart.prototype =
                 }
                 break;
             }
-            case historyitem_Chart_SetPlotArea:
+            case AscDFH.historyitem_Chart_SetPlotArea:
             {
                 this.plotArea = readObject(r);
                 break;
             }
-            case historyitem_Chart_SetPlotVisOnly:
+            case AscDFH.historyitem_Chart_SetPlotVisOnly:
             {
                 this.plotVisOnly = readBool(r);
                 break;
             }
-            case historyitem_Chart_SetShowDLblsOverMax:
+            case AscDFH.historyitem_Chart_SetShowDLblsOverMax:
             {
                 this.showDLblsOverMax = readBool(r);
                 break;
             }
-            case historyitem_Chart_SetTitle:
+            case AscDFH.historyitem_Chart_SetTitle:
             {
                 this.title = readObject(r);
                 if(this.parent)
@@ -25442,12 +25442,12 @@ CChart.prototype =
                 }
                 break;
             }
-            case historyitem_Chart_SetSideWall:
+            case AscDFH.historyitem_Chart_SetSideWall:
             {
                 this.sideWall = readObject(r);
                 break;
             }
-            case historyitem_Chart_SetView3D:
+            case AscDFH.historyitem_Chart_SetView3D:
             {
                 this.view3D = readObject(r);
                 if(this.parent)
@@ -25483,7 +25483,7 @@ CChartWall.prototype =
 
     getObjectType: function()
     {
-        return historyitem_type_ChartWall;
+        return AscDFH.historyitem_type_ChartWall;
     },
 
 
@@ -25522,18 +25522,18 @@ CChartWall.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_ChartWall_SetPictureOptions:
+            case AscDFH.historyitem_ChartWall_SetPictureOptions:
             {
                 this.pictureOptions = data.oldPr;
                 break;
             }
 
-            case historyitem_ChartWall_SetSpPr:
+            case AscDFH.historyitem_ChartWall_SetSpPr:
             {
                 this.spPr = data.oldPr;
                 break;
             }
-            case historyitem_ChartWall_SetThickness:
+            case AscDFH.historyitem_ChartWall_SetThickness:
             {
                 this.thickness = data.oldPr;
                 break;
@@ -25545,18 +25545,18 @@ CChartWall.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_ChartWall_SetPictureOptions:
+            case AscDFH.historyitem_ChartWall_SetPictureOptions:
             {
                 this.pictureOptions = data.newPr;
                 break;
             }
 
-            case historyitem_ChartWall_SetSpPr:
+            case AscDFH.historyitem_ChartWall_SetSpPr:
             {
                 this.spPr = data.newPr;
                 break;
             }
-            case historyitem_ChartWall_SetThickness:
+            case AscDFH.historyitem_ChartWall_SetThickness:
             {
                 this.thickness = data.newPr;
                 break;
@@ -25566,17 +25566,17 @@ CChartWall.prototype =
 
     setPictureOptions: function(pr)
     {
-        History.Add(this, {Type: historyitem_ChartWall_SetPictureOptions, oldPr: this.pictureOptions, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_ChartWall_SetPictureOptions, oldPr: this.pictureOptions, newPr: pr});
         this.pictureOptions = pr;
     },
     setSpPr: function(pr)
     {
-        History.Add(this, {Type: historyitem_ChartWall_SetSpPr, oldPr: this.spPr, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_ChartWall_SetSpPr, oldPr: this.spPr, newPr: pr});
         this.spPr = pr;
     },
     setThickness: function(pr)
     {
-        History.Add(this, {Type: historyitem_ChartWall_SetThickness, oldPr: this.thickness, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_ChartWall_SetThickness, oldPr: this.thickness, newPr: pr});
         this.thickness = pr;
     },
 
@@ -25585,18 +25585,18 @@ CChartWall.prototype =
         w.WriteLong(data.Type);
         switch (data.Type)
         {
-            case historyitem_ChartWall_SetPictureOptions:
+            case AscDFH.historyitem_ChartWall_SetPictureOptions:
             {
                 writeObject(w, data.newPr);
                 break;
             }
 
-            case historyitem_ChartWall_SetSpPr:
+            case AscDFH.historyitem_ChartWall_SetSpPr:
             {
                 writeObject(w, data.newPr);
                 break;
             }
-            case historyitem_ChartWall_SetThickness:
+            case AscDFH.historyitem_ChartWall_SetThickness:
             {
                 writeLong(w, data.newPr);
                 break;
@@ -25609,18 +25609,18 @@ CChartWall.prototype =
         var type = r.GetLong();
         switch(type)
         {
-            case historyitem_ChartWall_SetPictureOptions:
+            case AscDFH.historyitem_ChartWall_SetPictureOptions:
             {
                 this.pictureOptions = readObject(r);
                 break;
             }
 
-            case historyitem_ChartWall_SetSpPr:
+            case AscDFH.historyitem_ChartWall_SetSpPr:
             {
                 this.spPr = readObject(r);
                 break;
             }
-            case historyitem_ChartWall_SetThickness:
+            case AscDFH.historyitem_ChartWall_SetThickness:
             {
                 this.thickness = readLong(r);
                 break;
@@ -25654,7 +25654,7 @@ CView3d.prototype =
 
     getObjectType: function()
     {
-        return historyitem_type_View3d;
+        return AscDFH.historyitem_type_View3d;
     },
 
     createDuplicate: function()
@@ -25683,32 +25683,32 @@ CView3d.prototype =
 
     setDepthPercent: function(pr)
     {
-        History.Add(this, {Type: historyitem_View3d_SetDepthPercent, oldPr: this.depthPercent, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_View3d_SetDepthPercent, oldPr: this.depthPercent, newPr: pr});
         this.depthPercent = pr;
     },
     setHPercent: function(pr)
     {
-        History.Add(this, {Type: historyitem_View3d_SetHPercent, oldPr: this.hPercent, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_View3d_SetHPercent, oldPr: this.hPercent, newPr: pr});
         this.hPercent = pr;
     },
     setPerspective: function(pr)
     {
-        History.Add(this, {Type: historyitem_View3d_SetPerspective, oldPr: this.perspective, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_View3d_SetPerspective, oldPr: this.perspective, newPr: pr});
         this.perspective = pr;
     },
     setRAngAx: function(pr)
     {
-        History.Add(this, {Type: historyitem_View3d_SetRAngAx, oldPr: this.rAngAx, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_View3d_SetRAngAx, oldPr: this.rAngAx, newPr: pr});
         this.rAngAx = pr;
     },
     setRotX: function(pr)
     {
-        History.Add(this, {Type: historyitem_View3d_SetRotX, oldPr: this.rotX, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_View3d_SetRotX, oldPr: this.rotX, newPr: pr});
         this.rotX = pr;
     },
     setRotY: function(pr)
     {
-        History.Add(this, {Type: historyitem_View3d_SetRotY, oldPr: this.rotY, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_View3d_SetRotY, oldPr: this.rotY, newPr: pr});
         this.rotY = pr;
     },
 
@@ -25716,32 +25716,32 @@ CView3d.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_View3d_SetDepthPercent:
+            case AscDFH.historyitem_View3d_SetDepthPercent:
             {
                 this.depthPercent = data.oldPr;
                 break;
             }
-            case historyitem_View3d_SetHPercent:
+            case AscDFH.historyitem_View3d_SetHPercent:
             {
                 this.hPercent = data.oldPr;
                 break;
             }
-            case historyitem_View3d_SetPerspective:
+            case AscDFH.historyitem_View3d_SetPerspective:
             {
                 this.perspective = data.oldPr;
                 break;
             }
-            case historyitem_View3d_SetRAngAx:
+            case AscDFH.historyitem_View3d_SetRAngAx:
             {
                 this.rAngAx = data.oldPr;
                 break;
             }
-            case historyitem_View3d_SetRotX:
+            case AscDFH.historyitem_View3d_SetRotX:
             {
                 this.rotX = data.oldPr;
                 break;
             }
-            case historyitem_View3d_SetRotY:
+            case AscDFH.historyitem_View3d_SetRotY:
             {
                 this.rotY = data.oldPr;
                 break;
@@ -25753,32 +25753,32 @@ CView3d.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_View3d_SetDepthPercent:
+            case AscDFH.historyitem_View3d_SetDepthPercent:
             {
                 this.depthPercent = data.newPr;
                 break;
             }
-            case historyitem_View3d_SetHPercent:
+            case AscDFH.historyitem_View3d_SetHPercent:
             {
                 this.hPercent = data.newPr;
                 break;
             }
-            case historyitem_View3d_SetPerspective:
+            case AscDFH.historyitem_View3d_SetPerspective:
             {
                 this.perspective = data.newPr;
                 break;
             }
-            case historyitem_View3d_SetRAngAx:
+            case AscDFH.historyitem_View3d_SetRAngAx:
             {
                 this.rAngAx = data.newPr;
                 break;
             }
-            case historyitem_View3d_SetRotX:
+            case AscDFH.historyitem_View3d_SetRotX:
             {
                 this.rotX = data.newPr;
                 break;
             }
-            case historyitem_View3d_SetRotY:
+            case AscDFH.historyitem_View3d_SetRotY:
             {
                 this.rotY = data.newPr;
                 break;
@@ -25791,16 +25791,16 @@ CView3d.prototype =
         w.WriteLong(data.Type);
         switch (data.Type)
         {
-            case historyitem_View3d_SetDepthPercent:
-            case historyitem_View3d_SetHPercent:
-            case historyitem_View3d_SetPerspective:
-            case historyitem_View3d_SetRotX:
-            case historyitem_View3d_SetRotY:
+            case AscDFH.historyitem_View3d_SetDepthPercent:
+            case AscDFH.historyitem_View3d_SetHPercent:
+            case AscDFH.historyitem_View3d_SetPerspective:
+            case AscDFH.historyitem_View3d_SetRotX:
+            case AscDFH.historyitem_View3d_SetRotY:
             {
                 writeLong(w, data.newPr);
                 break;
             }
-            case historyitem_View3d_SetRAngAx:
+            case AscDFH.historyitem_View3d_SetRAngAx:
             {
                 writeBool(w, data.newPr);
                 break;
@@ -25813,32 +25813,32 @@ CView3d.prototype =
         var type = r.GetLong();
         switch (type)
         {
-            case historyitem_View3d_SetDepthPercent:
+            case AscDFH.historyitem_View3d_SetDepthPercent:
             {
                 this.depthPercent = readLong(r);
                 break;
             }
-            case historyitem_View3d_SetHPercent:
+            case AscDFH.historyitem_View3d_SetHPercent:
             {
                 this.hPercent = readLong(r);
                 break;
             }
-            case historyitem_View3d_SetPerspective:
+            case AscDFH.historyitem_View3d_SetPerspective:
             {
                 this.perspective = readLong(r);
                 break;
             }
-            case historyitem_View3d_SetRAngAx:
+            case AscDFH.historyitem_View3d_SetRAngAx:
             {
                 this.rAngAx = readBool(r);
                 break;
             }
-            case historyitem_View3d_SetRotX:
+            case AscDFH.historyitem_View3d_SetRotX:
             {
                 this.rotX = readLong(r);
                 break;
             }
-            case historyitem_View3d_SetRotY:
+            case AscDFH.historyitem_View3d_SetRotY:
             {
                 this.rotY = readLong(r);
                 break;

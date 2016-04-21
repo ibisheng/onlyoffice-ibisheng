@@ -264,7 +264,7 @@ CStylesPainter.prototype =
             var brdL = new CDocumentBorder();
             brdL.Set_FromObject(_brdL);
             brdL.Space = 0;
-            par.Set_Border(brdL, historyitem_Paragraph_Borders_Left);
+            par.Set_Border(brdL, AscDFH.historyitem_Paragraph_Borders_Left);
         }
 
         var _brdT = style.ParaPr.Brd.Top;
@@ -273,7 +273,7 @@ CStylesPainter.prototype =
             var brd = new CDocumentBorder();
             brd.Set_FromObject(_brdT);
             brd.Space = 0;
-            par.Set_Border(brd, historyitem_Paragraph_Borders_Top);
+            par.Set_Border(brd, AscDFH.historyitem_Paragraph_Borders_Top);
         }
 
         var _brdB = style.ParaPr.Brd.Bottom;
@@ -282,7 +282,7 @@ CStylesPainter.prototype =
             var brd = new CDocumentBorder();
             brd.Set_FromObject(_brdB);
             brd.Space = 0;
-            par.Set_Border(brd, historyitem_Paragraph_Borders_Bottom);
+            par.Set_Border(brd, AscDFH.historyitem_Paragraph_Borders_Bottom);
         }
 
         var _brdR = style.ParaPr.Brd.Right;
@@ -291,7 +291,7 @@ CStylesPainter.prototype =
             var brd = new CDocumentBorder();
             brd.Set_FromObject(_brdR);
             brd.Space = 0;
-            par.Set_Border(brd, historyitem_Paragraph_Borders_Right);
+            par.Set_Border(brd, AscDFH.historyitem_Paragraph_Borders_Right);
         }
 
         var _ind = new CParaInd();

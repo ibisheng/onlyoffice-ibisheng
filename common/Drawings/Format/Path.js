@@ -38,7 +38,7 @@ Path.prototype = {
     },
     getObjectType: function()
     {
-        return historyitem_type_Path;
+        return AscDFH.historyitem_type_Path;
     },
 
     Write_ToBinary2: function(w)
@@ -117,37 +117,37 @@ Path.prototype = {
 
     setStroke: function(pr)
     {
-        History.Add(this, {Type: historyitem_PathSetStroke, oldPr: this.stroke, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_PathSetStroke, oldPr: this.stroke, newPr: pr});
         this.stroke = pr;
     },
 
     setExtrusionOk: function(pr)
     {
-        History.Add(this, {Type: historyitem_PathSetExtrusionOk, oldPr: this.extrusionOk, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_PathSetExtrusionOk, oldPr: this.extrusionOk, newPr: pr});
         this.extrusionOk = pr;
     },
 
     setFill: function(pr)
     {
-        History.Add(this, {Type: historyitem_PathSetFill, oldPr: this.fill, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_PathSetFill, oldPr: this.fill, newPr: pr});
         this.fill = pr;
     },
 
     setPathH: function(pr)
     {
-        History.Add(this, {Type: historyitem_PathSetPathH, oldPr: this.pathH, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_PathSetPathH, oldPr: this.pathH, newPr: pr});
         this.pathH = pr;
     },
 
     setPathW: function(pr)
     {
-        History.Add(this, {Type: historyitem_PathSetPathW, oldPr: this.pathW, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_PathSetPathW, oldPr: this.pathW, newPr: pr});
         this.pathW = pr;
     },
 
     addPathCommand: function(cmd)
     {
-        History.Add(this, {Type: historyitem_PathAddPathCommand, newPr: cmd});
+        History.Add(this, {Type: AscDFH.historyitem_PathAddPathCommand, newPr: cmd});
         this.ArrPathCommandInfo.push(cmd);
     },
 
@@ -187,32 +187,32 @@ Path.prototype = {
     {
         switch(data.Type)
         {
-            case historyitem_PathSetStroke:
+            case AscDFH.historyitem_PathSetStroke:
             {
                 this.stroke = data.oldPr;
                 break;
             }
-            case historyitem_PathSetExtrusionOk:
+            case AscDFH.historyitem_PathSetExtrusionOk:
             {
                 this.extrusionOk = data.oldPr;
                 break;
             }
-            case historyitem_PathSetFill:
+            case AscDFH.historyitem_PathSetFill:
             {
                 this.fill = data.oldPr;
                 break;
             }
-            case historyitem_PathSetPathH:
+            case AscDFH.historyitem_PathSetPathH:
             {
                 this.pathH = data.oldPr;
                 break;
             }
-            case historyitem_PathSetPathW:
+            case AscDFH.historyitem_PathSetPathW:
             {
                 this.pathW = data.oldPr;
                 break;
             }
-            case historyitem_PathAddPathCommand:
+            case AscDFH.historyitem_PathAddPathCommand:
             {
                 this.ArrPathCommandInfo.splice(this.ArrPathCommandInfo.length - 1, 1);
             }
@@ -223,32 +223,32 @@ Path.prototype = {
     {
         switch(data.Type)
         {
-            case historyitem_PathSetStroke:
+            case AscDFH.historyitem_PathSetStroke:
             {
                 this.stroke = data.newPr;
                 break;
             }
-            case historyitem_PathSetExtrusionOk:
+            case AscDFH.historyitem_PathSetExtrusionOk:
             {
                 this.extrusionOk = data.newPr;
                 break;
             }
-            case historyitem_PathSetFill:
+            case AscDFH.historyitem_PathSetFill:
             {
                 this.fill = data.newPr;
                 break;
             }
-            case historyitem_PathSetPathH:
+            case AscDFH.historyitem_PathSetPathH:
             {
                 this.pathH = data.newPr;
                 break;
             }
-            case historyitem_PathSetPathW:
+            case AscDFH.historyitem_PathSetPathW:
             {
                 this.pathW = data.newPr;
                 break;
             }
-            case historyitem_PathAddPathCommand:
+            case AscDFH.historyitem_PathAddPathCommand:
             {
                 this.ArrPathCommandInfo.push(data.newPr);
             }
@@ -260,24 +260,24 @@ Path.prototype = {
         w.WriteLong(data.Type);
         switch (data.Type)
         {
-            case historyitem_PathSetStroke:
-            case historyitem_PathSetExtrusionOk:
+            case AscDFH.historyitem_PathSetStroke:
+            case AscDFH.historyitem_PathSetExtrusionOk:
             {
                 writeBool(w, data.newPr);
                 break;
             }
-            case historyitem_PathSetFill:
+            case AscDFH.historyitem_PathSetFill:
             {
                 writeString(w, data.newPr);
                 break;
             }
-            case historyitem_PathSetPathH:
-            case historyitem_PathSetPathW:
+            case AscDFH.historyitem_PathSetPathH:
+            case AscDFH.historyitem_PathSetPathW:
             {
                 writeLong(w, data.newPr);
                 break;
             }
-            case historyitem_PathAddPathCommand:
+            case AscDFH.historyitem_PathAddPathCommand:
             {
                 switch (data.newPr.id)
                 {
@@ -339,32 +339,32 @@ Path.prototype = {
         var type = r.GetLong();
         switch (type)
         {
-            case historyitem_PathSetStroke:
+            case AscDFH.historyitem_PathSetStroke:
             {
                 this.stroke = readBool(r);
                 break;
             }
-            case historyitem_PathSetExtrusionOk:
+            case AscDFH.historyitem_PathSetExtrusionOk:
             {
                 this.extrusionOk = readBool(r);
                 break;
             }
-            case historyitem_PathSetFill:
+            case AscDFH.historyitem_PathSetFill:
             {
                 this.fill = readString(r);
                 break;
             }
-            case historyitem_PathSetPathH:
+            case AscDFH.historyitem_PathSetPathH:
             {
                 this.pathH = readLong(r);
                 break;
             }
-            case historyitem_PathSetPathW:
+            case AscDFH.historyitem_PathSetPathW:
             {
                 this.pathW = readLong(r);
                 break;
             }
-            case historyitem_PathAddPathCommand:
+            case AscDFH.historyitem_PathAddPathCommand:
             {
                 if(r.GetBool())
                 {

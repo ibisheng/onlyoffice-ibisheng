@@ -436,7 +436,7 @@ DrawingObjectsController.prototype.canIncreaseParagraphLevel = function(bIncreas
     if(content)
     {
         var target_text_object = getTargetTextObject(this);
-        if(target_text_object && target_text_object.getObjectType() === historyitem_type_Shape
+        if(target_text_object && target_text_object.getObjectType() === AscDFH.historyitem_type_Shape
             && (!target_text_object.isPlaceholder() || !target_text_object.getPhType() !== phType_title && target_text_object.getPhType() !== phType_ctrTitle))
         {
             return content.Can_IncreaseParagraphLevel(bIncrease);
@@ -467,12 +467,12 @@ DrawingObjectsController.prototype.onKeyPress = function(e)
         if( window["Asc"]["editor"].collaborativeEditing.getFast()){
             this.checkSelectedObjectsAndCallbackNoCheckLock(function(){
                 this.paragraphAdd( new ParaText( String.fromCharCode( Code ) ) );
-            }, [], false, historydescription_Spreadsheet_ParagraphAdd);
+            }, [], false, AscDFH.historydescription_Spreadsheet_ParagraphAdd);
         }
         else{
             this.checkSelectedObjectsAndCallback(function(){
                 this.paragraphAdd( new ParaText( String.fromCharCode( Code ) ) );
-            }, [], false, historydescription_Spreadsheet_ParagraphAdd);
+            }, [], false, AscDFH.historydescription_Spreadsheet_ParagraphAdd);
         }
         bRetValue = true;
     }

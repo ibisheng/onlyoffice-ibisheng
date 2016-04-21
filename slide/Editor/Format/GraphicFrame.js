@@ -149,13 +149,13 @@ CGraphicFrame.prototype =
 
     setSpPr: function(spPr)
     {
-        History.Add(this, {Type:historyitem_GraphicFrameSetSpPr, oldPr: this.spPr, newPr: spPr});
+        History.Add(this, {Type:AscDFH.historyitem_GraphicFrameSetSpPr, oldPr: this.spPr, newPr: spPr});
         this.spPr = spPr;
     },
 
     setGraphicObject: function(graphicObject)
     {
-        History.Add(this, {Type: historyitem_GraphicFrameSetGraphicObject, oldPr: this.graphicObject, newPr: graphicObject});
+        History.Add(this, {Type: AscDFH.historyitem_GraphicFrameSetGraphicObject, oldPr: this.graphicObject, newPr: graphicObject});
         this.graphicObject = graphicObject;
         if(this.graphicObject)
         {
@@ -165,25 +165,25 @@ CGraphicFrame.prototype =
 
     setNvSpPr: function(pr)
     {
-        History.Add(this, {Type: historyitem_GraphicFrameSetSetNvSpPr, oldPr: this.nvGraphicFramePr, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_GraphicFrameSetSetNvSpPr, oldPr: this.nvGraphicFramePr, newPr: pr});
         this.nvGraphicFramePr = pr;
     },
 
     setParent: function(parent)
     {
-        History.Add(this, {Type:historyitem_GraphicFrameSetSetParent, oldPr: this.parent, newPr: parent});
+        History.Add(this, {Type:AscDFH.historyitem_GraphicFrameSetSetParent, oldPr: this.parent, newPr: parent});
         this.parent = parent;
     },
 
     setGroup: function(group)
     {
-        History.Add(this, {Type: historyitem_GraphicFrameSetSetGroup, oldPr: this.group, newPr: group});
+        History.Add(this, {Type: AscDFH.historyitem_GraphicFrameSetSetGroup, oldPr: this.group, newPr: group});
         this.group = group;
     },
 
     getObjectType: function()
     {
-        return historyitem_type_GraphicFrame;
+        return AscDFH.historyitem_type_GraphicFrame;
     },
 
     Search : function(Str, Props, SearchEngine, Type)
@@ -672,7 +672,7 @@ CGraphicFrame.prototype =
                 {
                     if(!editor.isViewMode && editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Drawing_Props) === false)
                     {
-                        History.Create_NewPoint(historydescription_Presentation_TableBorder);
+                        History.Create_NewPoint(AscDFH.historydescription_Presentation_TableBorder);
                     }
                     else
                     {
@@ -977,7 +977,7 @@ CGraphicFrame.prototype =
 
     setParent2: function(parent)
     {
-        History.Add(this, {Type:historyitem_GraphicFrameSetSetParent, oldPr: this.parent, newPr: parent});
+        History.Add(this, {Type:AscDFH.historyitem_GraphicFrameSetSetParent, oldPr: this.parent, newPr: parent});
         this.parent = parent;
     },
 
@@ -1077,17 +1077,17 @@ CGraphicFrame.prototype =
     {
         switch(data.Type)
         {
-            case historyitem_ShapeSetBDeleted:
+            case AscDFH.historyitem_ShapeSetBDeleted:
             {
                 this.bDeleted = data.oldPr;
                 break;
             }
-            case historyitem_GraphicFrameSetSpPr         :
+            case AscDFH.historyitem_GraphicFrameSetSpPr         :
             {
                 this.spPr = data.oldPr;
                 break;
             }
-            case historyitem_GraphicFrameSetGraphicObject:
+            case AscDFH.historyitem_GraphicFrameSetGraphicObject:
             {
                 this.graphicObject = data.oldPr;
                 if(this.graphicObject)
@@ -1096,17 +1096,17 @@ CGraphicFrame.prototype =
                 }
                 break;
             }
-            case historyitem_GraphicFrameSetSetNvSpPr    :
+            case AscDFH.historyitem_GraphicFrameSetSetNvSpPr    :
             {
                 this.nvGraphicFramePr = data.oldPr;
                 break;
             }
-            case historyitem_GraphicFrameSetSetParent    :
+            case AscDFH.historyitem_GraphicFrameSetSetParent    :
             {
                 this.parent = data.oldPr;
                 break;
             }
-            case historyitem_GraphicFrameSetSetGroup     :
+            case AscDFH.historyitem_GraphicFrameSetSetGroup     :
             {
                 this.group = data.oldPr;
                 break;
@@ -1118,17 +1118,17 @@ CGraphicFrame.prototype =
     {
         switch(data.Type)
         {
-            case historyitem_ShapeSetBDeleted:
+            case AscDFH.historyitem_ShapeSetBDeleted:
             {
                 this.bDeleted = data.newPr;
                 break;
             }
-            case historyitem_GraphicFrameSetSpPr         :
+            case AscDFH.historyitem_GraphicFrameSetSpPr         :
             {
                 this.spPr = data.newPr;
                 break;
             }
-            case historyitem_GraphicFrameSetGraphicObject:
+            case AscDFH.historyitem_GraphicFrameSetGraphicObject:
             {
                 this.graphicObject = data.newPr;
                 if(this.graphicObject)
@@ -1137,17 +1137,17 @@ CGraphicFrame.prototype =
                 }
                 break;
             }
-            case historyitem_GraphicFrameSetSetNvSpPr    :
+            case AscDFH.historyitem_GraphicFrameSetSetNvSpPr    :
             {
                 this.nvGraphicFramePr = data.newPr;
                 break;
             }
-            case historyitem_GraphicFrameSetSetParent    :
+            case AscDFH.historyitem_GraphicFrameSetSetParent    :
             {
                 this.parent = data.newPr;
                 break;
             }
-            case historyitem_GraphicFrameSetSetGroup     :
+            case AscDFH.historyitem_GraphicFrameSetSetGroup     :
             {
                 this.group = data.newPr;
                 break;
@@ -1160,16 +1160,16 @@ CGraphicFrame.prototype =
         w.WriteLong(data.Type);
         switch(data.Type)
         {
-            case historyitem_GraphicFrameSetSpPr          :
-            case historyitem_GraphicFrameSetGraphicObject :
-            case historyitem_GraphicFrameSetSetNvSpPr     :
-            case historyitem_GraphicFrameSetSetParent     :
-            case historyitem_GraphicFrameSetSetGroup      :
+            case AscDFH.historyitem_GraphicFrameSetSpPr          :
+            case AscDFH.historyitem_GraphicFrameSetGraphicObject :
+            case AscDFH.historyitem_GraphicFrameSetSetNvSpPr     :
+            case AscDFH.historyitem_GraphicFrameSetSetParent     :
+            case AscDFH.historyitem_GraphicFrameSetSetGroup      :
             {
                 writeObject(w, data.newPr);
                 break;
             }
-            case historyitem_ShapeSetBDeleted:
+            case AscDFH.historyitem_ShapeSetBDeleted:
             {
                 writeBool(w, data.newPr);
                 break;
@@ -1182,17 +1182,17 @@ CGraphicFrame.prototype =
         var  type = r.GetLong();
         switch(type)
         {
-            case historyitem_ShapeSetBDeleted:
+            case AscDFH.historyitem_ShapeSetBDeleted:
             {
                 this.bDeleted = readBool(r);
                 break;
             }
-            case historyitem_GraphicFrameSetSpPr         :
+            case AscDFH.historyitem_GraphicFrameSetSpPr         :
             {
                 this.spPr = readObject(r);
                 break;
             }
-            case historyitem_GraphicFrameSetGraphicObject:
+            case AscDFH.historyitem_GraphicFrameSetGraphicObject:
             {
                 this.graphicObject = readObject(r);
                 if(this.graphicObject)
@@ -1201,17 +1201,17 @@ CGraphicFrame.prototype =
                 }
                 break;
             }
-            case historyitem_GraphicFrameSetSetNvSpPr    :
+            case AscDFH.historyitem_GraphicFrameSetSetNvSpPr    :
             {
                 this.nvGraphicFramePr = readObject(r);
                 break;
             }
-            case historyitem_GraphicFrameSetSetParent    :
+            case AscDFH.historyitem_GraphicFrameSetSetParent    :
             {
                 this.parent = readObject(r);
                 break;
             }
-            case historyitem_GraphicFrameSetSetGroup     :
+            case AscDFH.historyitem_GraphicFrameSetSetGroup     :
             {
                 this.group = readObject(r);
                 break;
@@ -1221,7 +1221,7 @@ CGraphicFrame.prototype =
 
     Write_ToBinary2: function(w)
     {
-        w.WriteLong(historyitem_type_GraphicFrame);
+        w.WriteLong(AscDFH.historyitem_type_GraphicFrame);
         w.WriteString2(this.Id);
     },
 

@@ -701,7 +701,7 @@ function CTableOutlineDr()
 
         if (!_table.Is_Inline())
         {
-            word_control.m_oLogicDocument.Create_NewHistoryPoint(historydescription_Presentation_TableMoveFromRulers);
+            word_control.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Presentation_TableMoveFromRulers);
             switch (this.TrackTablePos)
             {
                 case 1:
@@ -752,7 +752,7 @@ function CTableOutlineDr()
             if (null != this.InlinePos)
             {
                 // inline move
-                word_control.m_oLogicDocument.Create_NewHistoryPoint(historydescription_Presentation_TableMoveFromRulersInline);
+                word_control.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Presentation_TableMoveFromRulersInline);
                 _table.Move(this.InlinePos.X, this.InlinePos.Y, this.InlinePos.Page);
             }
         }
@@ -5020,7 +5020,7 @@ function CThumbnailsManager()
 					if(this.m_oWordControl.m_oLogicDocument.viewMode === false)
 					{
 						var _presentation = this.m_oWordControl.m_oLogicDocument;
-						History.Create_NewPoint(historydescription_Presentation_MoveSlidesToEnd);
+						History.Create_NewPoint(AscDFH.historydescription_Presentation_MoveSlidesToEnd);
 						var _selection_array = this.GetSelectedArray();
 						_presentation.moveSlides(_selection_array, _presentation.Slides.length);
 						_presentation.Recalculate();
@@ -5058,7 +5058,7 @@ function CThumbnailsManager()
 						}
 						if(can_move)
 						{
-							History.Create_NewPoint(historydescription_Presentation_MoveSlidesNextPos);
+							History.Create_NewPoint(AscDFH.historydescription_Presentation_MoveSlidesNextPos);
 							for(var i = first_index; i > -1; --i)
 							{
 								_presentation.moveSlides([_selected_array[i]], _selected_array[i] + 2);
@@ -5187,7 +5187,7 @@ function CThumbnailsManager()
 						{							
 							if (!AscCommon.AscBrowser.isSafariMacOs)
 							{
-								this.m_oWordControl.m_oLogicDocument.Create_NewHistoryPoint(historydescription_Presentation_PasteOnThumbnails);
+								this.m_oWordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Presentation_PasteOnThumbnails);
 
 								window.GlobalPasteFlag = true;
                                 editor.incrementCounterLongAction();
@@ -5199,7 +5199,7 @@ function CThumbnailsManager()
 							{
 								if (0 === window.GlobalPasteFlagCounter)
 								{
-									this.m_oWordControl.m_oLogicDocument.Create_NewHistoryPoint(historydescription_Presentation_PasteOnThumbnailsSafari);
+									this.m_oWordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Presentation_PasteOnThumbnailsSafari);
 
                     AscCommon.SafariIntervalFocus();
 									window.GlobalPasteFlag = true;
@@ -5271,7 +5271,7 @@ function CThumbnailsManager()
 					if(this.m_oWordControl.m_oLogicDocument.viewMode === false)
 					{
 						var _presentation = this.m_oWordControl.m_oLogicDocument;
-						History.Create_NewPoint(historydescription_Presentation_MoveSlidesToStart);
+						History.Create_NewPoint(AscDFH.historydescription_Presentation_MoveSlidesToStart);
 						var _selection_array = this.GetSelectedArray();
 						_presentation.moveSlides(_selection_array, 0);
 						_presentation.Recalculate();
@@ -5309,7 +5309,7 @@ function CThumbnailsManager()
 						}
 						if(can_move)
 						{
-							History.Create_NewPoint(historydescription_Presentation_MoveSlidesPrevPos);
+							History.Create_NewPoint(AscDFH.historydescription_Presentation_MoveSlidesPrevPos);
 							for(var i = first_index; i > -1; --i)
 							{
 								_presentation.moveSlides([_selected_array[i]], _selected_array[i] - 1);

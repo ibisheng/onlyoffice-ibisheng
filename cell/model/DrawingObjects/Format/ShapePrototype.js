@@ -7,7 +7,7 @@ CShape.prototype.setDrawingObjects = function(drawingObjects)
 };
 CShape.prototype.setWorksheet = function(worksheet)
 {
-    History.Add(this, {Type: historyitem_AutoShapes_SetWorksheet, oldPr: this.worksheet, newPr: worksheet});
+    History.Add(this, {Type: AscDFH.historyitem_AutoShapes_SetWorksheet, oldPr: this.worksheet, newPr: worksheet});
     this.worksheet = worksheet;
     if(this.spTree)
     {
@@ -191,7 +191,7 @@ CShape.prototype.addToDrawingObjects =  function(pos)
 {
     var controller = this.getDrawingObjectsController();
     var position = addToDrawings(this.worksheet, this, pos, /*lockByDefault*/undefined, undefined);
-    var data = {Type: historyitem_AutoShapes_AddToDrawingObjects, Pos: position};
+    var data = {Type: AscDFH.historyitem_AutoShapes_AddToDrawingObjects, Pos: position};
     History.Add(this, data);
     this.worksheet.addContentChanges(new AscCommon.CContentChangesElement(AscCommon.contentchanges_Add, data.Pos, 1, data));
 };
@@ -202,7 +202,7 @@ CShape.prototype.deleteDrawingBase = function()
     var position = deleteDrawingBase(this.worksheet.Drawings, this.Get_Id());
     if(isRealNumber(position))
     {
-        var data = {Type: historyitem_AutoShapes_RemoveFromDrawingObjects, Pos: position};
+        var data = {Type: AscDFH.historyitem_AutoShapes_RemoveFromDrawingObjects, Pos: position};
         History.Add(this, data);
         this.worksheet.addContentChanges(new AscCommon.CContentChangesElement(AscCommon.contentchanges_Remove, data.Pos, 1, data));
     }

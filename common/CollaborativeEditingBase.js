@@ -41,7 +41,7 @@ CCollaborativeChanges.prototype.Apply_Data = function()
     var Type      = LoadData.Reader.GetLong();
     var Class     = null;
 
-    if (historyitem_type_HdrFtr === Type)
+    if (AscDFH.historyitem_type_HdrFtr === Type)
         Class = editor.WordControl.m_oLogicDocument.HdrFtr;
     else
         Class = AscCommon.g_oTableId.Get_ById(ClassId);
@@ -512,7 +512,7 @@ CCollaborativeEditingBase.prototype.Lock_NeedLock = function()
         {
             var Lock = Class.Lock;
             Lock.Set_Type( AscCommon.locktype_Other, false );
-            if(Class.getObjectType && Class.getObjectType() === historyitem_type_Slide)
+            if(Class.getObjectType && Class.getObjectType() === AscDFH.historyitem_type_Slide)
             {
                 editor.WordControl.m_oLogicDocument.DrawingDocument.UnLockSlide && editor.WordControl.m_oLogicDocument.DrawingDocument.UnLockSlide(Class.num);
             }

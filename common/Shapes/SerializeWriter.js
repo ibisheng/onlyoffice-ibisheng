@@ -1504,22 +1504,22 @@ function CBinaryFileWriter()
 				
 				switch(spTree[i].getObjectType())
                 {
-                    case historyitem_type_Shape:
+                    case AscDFH.historyitem_type_Shape:
                     {
 						oThis.WriteShape(spTree[i]);
                         break;
                     }
-                    case historyitem_type_ImageShape:
+                    case AscDFH.historyitem_type_ImageShape:
                     {
                         oThis.WriteImage(spTree[i]);
                         break;
                     }
-                    case historyitem_type_GroupShape:
+                    case AscDFH.historyitem_type_GroupShape:
                     {
                         oThis.WriteGroupShape(spTree[i]);
                         break;
                     }
-                    case historyitem_type_ChartSpace:
+                    case AscDFH.historyitem_type_ChartSpace:
                     {
                         oThis.WriteChart(spTree[i]);
                         break;
@@ -3224,22 +3224,22 @@ function CBinaryFileWriter()
 
 				switch(spTree[i].getObjectType())
                 {
-                    case historyitem_type_Shape:
+                    case AscDFH.historyitem_type_Shape:
                     {
 						oThis.WriteShape(spTree[i]);
                         break;
                     }
-                    case historyitem_type_ImageShape:
+                    case AscDFH.historyitem_type_ImageShape:
                     {
                         oThis.WriteImage(spTree[i]);
                         break;
                     }
-                    case historyitem_type_GroupShape:
+                    case AscDFH.historyitem_type_GroupShape:
                     {
                         oThis.WriteGroupShape(spTree[i]);
                         break;
                     }
-                    case historyitem_type_ChartSpace:
+                    case AscDFH.historyitem_type_ChartSpace:
                     {
                         oThis.WriteChart(spTree[i]);
                         break;

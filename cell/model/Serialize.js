@@ -6069,7 +6069,7 @@
 
                // res = c_oSerConstants.ReadUnknown;
                 var oGraphicObject = window.global_pptx_content_loader.ReadGraphicObject(this.stream, this.curWorksheet);
-                if(null != oGraphicObject && !((oGraphicObject.getObjectType() === historyitem_type_Shape || oGraphicObject.getObjectType() === historyitem_type_ImageShape) && !oGraphicObject.spPr))
+                if(null != oGraphicObject && !((oGraphicObject.getObjectType() === AscDFH.historyitem_type_Shape || oGraphicObject.getObjectType() === AscDFH.historyitem_type_ImageShape) && !oGraphicObject.spPr))
                 {
                     oDrawing.graphicObject = oGraphicObject;
 					//TODO при copy/paste в word из excel пропадает метод setDrawingBase

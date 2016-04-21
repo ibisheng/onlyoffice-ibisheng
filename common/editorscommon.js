@@ -1887,7 +1887,7 @@ CTableId.prototype.Add = function(Class, Id)
         Class.Id = Id;
         this.m_aPairs[Id] = Class;
 
-        History.Add(this, { Type : historyitem_TableId_Add, Id : Id, Class : Class  });
+        History.Add(this, { Type : AscDFH.historyitem_TableId_Add, Id : Id, Class : Class  });
     }
 };
 CTableId.prototype.TurnOff = function()
@@ -1931,7 +1931,7 @@ CTableId.prototype.Reset_Id = function(Class, Id_new, Id_old)
         delete this.m_aPairs[Id_old];
         this.m_aPairs[Id_new] = Class;
 
-        History.Add(this, { Type : historyitem_TableId_Reset, Id_new : Id_new, Id_old : Id_old  });
+        History.Add(this, { Type : AscDFH.historyitem_TableId_Reset, Id_new : Id_new, Id_old : Id_old  });
     }
     else
     {
@@ -1978,144 +1978,144 @@ CTableId.prototype.Read_Class_FromBinary = function(Reader)
 
     switch( ElementType )
     {
-        case historyitem_type_Paragraph                : Element = new Paragraph(); break;
-        case historyitem_type_TextPr                   : Element = new ParaTextPr(); break;
-        case historyitem_type_Hyperlink                : Element = new ParaHyperlink(); break;
-        case historyitem_type_Drawing                  : Element = new ParaDrawing(); break;
-        case historyitem_type_Table                    : Element = new CTable(); break;
-        case historyitem_type_TableRow                 : Element = new CTableRow(); break;
-        case historyitem_type_TableCell                : Element = new CTableCell(); break;
-        case historyitem_type_DocumentContent          : Element = new CDocumentContent(); break;
-        case historyitem_type_HdrFtr                   : Element = new CHeaderFooter(); break;
-        case historyitem_type_AbstractNum              : Element = new CAbstractNum(); break;
-        case historyitem_type_Comment                  : Element = new CComment(); break;
-        case historyitem_type_Style                    : Element = new CStyle(); break;
-        case historyitem_type_CommentMark              : Element = new ParaComment(); break;
-        case historyitem_type_ParaRun                  : Element = new ParaRun(); break;
-        case historyitem_type_Section                  : Element = new CSectionPr(); break;
-        case historyitem_type_Field                    : Element = new ParaField(); break;
+        case AscDFH.historyitem_type_Paragraph                : Element = new Paragraph(); break;
+        case AscDFH.historyitem_type_TextPr                   : Element = new ParaTextPr(); break;
+        case AscDFH.historyitem_type_Hyperlink                : Element = new ParaHyperlink(); break;
+        case AscDFH.historyitem_type_Drawing                  : Element = new ParaDrawing(); break;
+        case AscDFH.historyitem_type_Table                    : Element = new CTable(); break;
+        case AscDFH.historyitem_type_TableRow                 : Element = new CTableRow(); break;
+        case AscDFH.historyitem_type_TableCell                : Element = new CTableCell(); break;
+        case AscDFH.historyitem_type_DocumentContent          : Element = new CDocumentContent(); break;
+        case AscDFH.historyitem_type_HdrFtr                   : Element = new CHeaderFooter(); break;
+        case AscDFH.historyitem_type_AbstractNum              : Element = new CAbstractNum(); break;
+        case AscDFH.historyitem_type_Comment                  : Element = new CComment(); break;
+        case AscDFH.historyitem_type_Style                    : Element = new CStyle(); break;
+        case AscDFH.historyitem_type_CommentMark              : Element = new ParaComment(); break;
+        case AscDFH.historyitem_type_ParaRun                  : Element = new ParaRun(); break;
+        case AscDFH.historyitem_type_Section                  : Element = new CSectionPr(); break;
+        case AscDFH.historyitem_type_Field                    : Element = new ParaField(); break;
 
-        case historyitem_type_DefaultShapeDefinition   : Element = new DefaultShapeDefinition(); break;
-        case historyitem_type_CNvPr                    : Element = new CNvPr(); break;
-        case historyitem_type_NvPr                     : Element = new NvPr(); break;
-        case historyitem_type_Ph                       : Element = new Ph(); break;
-        case historyitem_type_UniNvPr                  : Element = new UniNvPr(); break;
-        case historyitem_type_StyleRef                 : Element = new StyleRef(); break;
-        case historyitem_type_FontRef                  : Element = new FontRef(); break;
-        case historyitem_type_Chart                    : Element = new CChart(); break;
-        case historyitem_type_ChartSpace               : Element = new CChartSpace(); break;
-        case historyitem_type_Legend                   : Element = new CLegend(); break;
-        case historyitem_type_Layout                   : Element = new CLayout(); break;
-        case historyitem_type_LegendEntry              : Element = new CLegendEntry(); break;
-        case historyitem_type_PivotFmt                 : Element = new CPivotFmt(); break;
-        case historyitem_type_DLbl                     : Element = new CDLbl(); break;
-        case historyitem_type_Marker                   : Element = new CMarker(); break;
-        case historyitem_type_PlotArea                 : Element = new CPlotArea(); break;
-        case historyitem_type_NumFmt                   : Element = new CNumFmt(); break;
-        case historyitem_type_Scaling                  : Element = new CScaling(); break;
-        case historyitem_type_DTable                   : Element = new CDTable(); break;
-        case historyitem_type_LineChart                : Element = new CLineChart(); break;
-        case historyitem_type_DLbls                    : Element = new CDLbls(); break;
-        case historyitem_type_UpDownBars               : Element = new CUpDownBars(); break;
-        case historyitem_type_BarChart                 : Element = new CBarChart(); break;
-        case historyitem_type_BubbleChart              : Element = new CBubbleChart(); break;
-        case historyitem_type_DoughnutChart            : Element = new CDoughnutChart(); break;
-        case historyitem_type_OfPieChart               : Element = new COfPieChart(); break;
-        case historyitem_type_PieChart                 : Element = new CPieChart(); break;
-        case historyitem_type_RadarChart               : Element = new CRadarChart(); break;
-        case historyitem_type_ScatterChart             : Element = new CScatterChart(); break;
-        case historyitem_type_StockChart               : Element = new CStockChart(); break;
-        case historyitem_type_SurfaceChart             : Element = new CSurfaceChart(); break;
-        case historyitem_type_BandFmt                  : Element = new CBandFmt(); break;
-        case historyitem_type_AreaChart                : Element = new CAreaChart(); break;
-        case historyitem_type_ScatterSer               : Element = new CScatterSeries(); break;
-        case historyitem_type_DPt                      : Element = new CDPt(); break;
-        case historyitem_type_ErrBars                  : Element = new CErrBars(); break;
-        case historyitem_type_MinusPlus                : Element = new CMinusPlus(); break;
-        case historyitem_type_NumLit                   : Element = new CNumLit(); break;
-        case historyitem_type_NumericPoint             : Element = new CNumericPoint(); break;
-        case historyitem_type_NumRef                   : Element = new CNumRef(); break;
-        case historyitem_type_TrendLine                : Element = new CTrendLine(); break;
-        case historyitem_type_Tx                       : Element = new CTx(); break;
-        case historyitem_type_StrRef                   : Element = new CStrRef(); break;
-        case historyitem_type_StrCache                 : Element = new CStrCache(); break;
-        case historyitem_type_StrPoint                 : Element = new CStringPoint(); break;
-        case historyitem_type_XVal                     : Element = new CXVal(); break;
-        case historyitem_type_MultiLvlStrRef           : Element = new CMultiLvlStrRef(); break;
-        case historyitem_type_MultiLvlStrCache         : Element = new CMultiLvlStrCache(); break;
-        case historyitem_type_StringLiteral            : Element = new CStringLiteral(); break;
-        case historyitem_type_YVal                     : Element = new CYVal(); break;
-        case historyitem_type_AreaSeries               : Element = new CAreaSeries(); break;
-        case historyitem_type_Cat                      : Element = new CCat(); break;
-        case historyitem_type_PictureOptions           : Element = new CPictureOptions(); break;
-        case historyitem_type_RadarSeries              : Element = new CRadarSeries(); break;
-        case historyitem_type_BarSeries                : Element = new CBarSeries(); break;
-        case historyitem_type_LineSeries               : Element = new CLineSeries(); break;
-        case historyitem_type_PieSeries                : Element = new CPieSeries(); break;
-        case historyitem_type_SurfaceSeries            : Element = new CSurfaceSeries(); break;
-        case historyitem_type_BubbleSeries             : Element = new CBubbleSeries(); break;
-        case historyitem_type_ExternalData             : Element = new CExternalData(); break;
-        case historyitem_type_PivotSource              : Element = new CPivotSource(); break;
-        case historyitem_type_Protection               : Element = new CProtection(); break;
-        case historyitem_type_ChartWall                : Element = new CChartWall(); break;
-        case historyitem_type_View3d                   : Element = new CView3d(); break;
-        case historyitem_type_ChartText                : Element = new CChartText(); break;
-        case historyitem_type_ShapeStyle               : Element = new CShapeStyle(); break;
-        case historyitem_type_Xfrm                     : Element = new CXfrm(); break;
-        case historyitem_type_SpPr                     : Element = new CSpPr(); break;
-        case historyitem_type_ClrScheme                : Element = new ClrScheme(); break;
-        case historyitem_type_ClrMap                   : Element = new ClrMap(); break;
-        case historyitem_type_ExtraClrScheme           : Element = new ExtraClrScheme(); break;
-        case historyitem_type_FontCollection           : Element = new FontCollection(); break;
-        case historyitem_type_FontScheme               : Element = new FontScheme(); break;
-        case historyitem_type_FormatScheme             : Element = new FmtScheme(); break;
-        case historyitem_type_ThemeElements            : Element = new ThemeElements(); break;
-        case historyitem_type_HF                       : Element = new HF(); break;
-        case historyitem_type_BgPr                     : Element = new CBgPr(); break;
-        case historyitem_type_Bg                       : Element = new CBg(); break;
-        case historyitem_type_PrintSettings            : Element = new CPrintSettings(); break;
-        case historyitem_type_HeaderFooterChart        : Element = new CHeaderFooterChart(); break;
-        case historyitem_type_PageMarginsChart         : Element = new CPageMarginsChart(); break;
-        case historyitem_type_PageSetup                : Element = new CPageSetup(); break;
-        case historyitem_type_Shape                    : Element = new CShape(); break;
-        case historyitem_type_DispUnits                : Element = new CDispUnits(); break;
-        case historyitem_type_GroupShape               : Element = new CGroupShape(); break;
-        case historyitem_type_ImageShape               : Element = new CImageShape(); break;
-        case historyitem_type_Geometry                 : Element = new Geometry(); break;
-        case historyitem_type_Path                     : Element = new Path(); break;
-        case historyitem_type_TextBody                 : Element = new CTextBody(); break;
-        case historyitem_type_CatAx                    : Element = new CCatAx(); break;
-        case historyitem_type_ValAx                    : Element = new CValAx(); break;
-        case historyitem_type_WrapPolygon              : Element = new CWrapPolygon(); break;
-        case historyitem_type_DateAx                   : Element = new CDateAx(); break;
-        case historyitem_type_SerAx                    : Element = new CSerAx(); break;
-        case historyitem_type_Title                    : Element = new CTitle(); break;
+        case AscDFH.historyitem_type_DefaultShapeDefinition   : Element = new DefaultShapeDefinition(); break;
+        case AscDFH.historyitem_type_CNvPr                    : Element = new CNvPr(); break;
+        case AscDFH.historyitem_type_NvPr                     : Element = new NvPr(); break;
+        case AscDFH.historyitem_type_Ph                       : Element = new Ph(); break;
+        case AscDFH.historyitem_type_UniNvPr                  : Element = new UniNvPr(); break;
+        case AscDFH.historyitem_type_StyleRef                 : Element = new StyleRef(); break;
+        case AscDFH.historyitem_type_FontRef                  : Element = new FontRef(); break;
+        case AscDFH.historyitem_type_Chart                    : Element = new CChart(); break;
+        case AscDFH.historyitem_type_ChartSpace               : Element = new CChartSpace(); break;
+        case AscDFH.historyitem_type_Legend                   : Element = new CLegend(); break;
+        case AscDFH.historyitem_type_Layout                   : Element = new CLayout(); break;
+        case AscDFH.historyitem_type_LegendEntry              : Element = new CLegendEntry(); break;
+        case AscDFH.historyitem_type_PivotFmt                 : Element = new CPivotFmt(); break;
+        case AscDFH.historyitem_type_DLbl                     : Element = new CDLbl(); break;
+        case AscDFH.historyitem_type_Marker                   : Element = new CMarker(); break;
+        case AscDFH.historyitem_type_PlotArea                 : Element = new CPlotArea(); break;
+        case AscDFH.historyitem_type_NumFmt                   : Element = new CNumFmt(); break;
+        case AscDFH.historyitem_type_Scaling                  : Element = new CScaling(); break;
+        case AscDFH.historyitem_type_DTable                   : Element = new CDTable(); break;
+        case AscDFH.historyitem_type_LineChart                : Element = new CLineChart(); break;
+        case AscDFH.historyitem_type_DLbls                    : Element = new CDLbls(); break;
+        case AscDFH.historyitem_type_UpDownBars               : Element = new CUpDownBars(); break;
+        case AscDFH.historyitem_type_BarChart                 : Element = new CBarChart(); break;
+        case AscDFH.historyitem_type_BubbleChart              : Element = new CBubbleChart(); break;
+        case AscDFH.historyitem_type_DoughnutChart            : Element = new CDoughnutChart(); break;
+        case AscDFH.historyitem_type_OfPieChart               : Element = new COfPieChart(); break;
+        case AscDFH.historyitem_type_PieChart                 : Element = new CPieChart(); break;
+        case AscDFH.historyitem_type_RadarChart               : Element = new CRadarChart(); break;
+        case AscDFH.historyitem_type_ScatterChart             : Element = new CScatterChart(); break;
+        case AscDFH.historyitem_type_StockChart               : Element = new CStockChart(); break;
+        case AscDFH.historyitem_type_SurfaceChart             : Element = new CSurfaceChart(); break;
+        case AscDFH.historyitem_type_BandFmt                  : Element = new CBandFmt(); break;
+        case AscDFH.historyitem_type_AreaChart                : Element = new CAreaChart(); break;
+        case AscDFH.historyitem_type_ScatterSer               : Element = new CScatterSeries(); break;
+        case AscDFH.historyitem_type_DPt                      : Element = new CDPt(); break;
+        case AscDFH.historyitem_type_ErrBars                  : Element = new CErrBars(); break;
+        case AscDFH.historyitem_type_MinusPlus                : Element = new CMinusPlus(); break;
+        case AscDFH.historyitem_type_NumLit                   : Element = new CNumLit(); break;
+        case AscDFH.historyitem_type_NumericPoint             : Element = new CNumericPoint(); break;
+        case AscDFH.historyitem_type_NumRef                   : Element = new CNumRef(); break;
+        case AscDFH.historyitem_type_TrendLine                : Element = new CTrendLine(); break;
+        case AscDFH.historyitem_type_Tx                       : Element = new CTx(); break;
+        case AscDFH.historyitem_type_StrRef                   : Element = new CStrRef(); break;
+        case AscDFH.historyitem_type_StrCache                 : Element = new CStrCache(); break;
+        case AscDFH.historyitem_type_StrPoint                 : Element = new CStringPoint(); break;
+        case AscDFH.historyitem_type_XVal                     : Element = new CXVal(); break;
+        case AscDFH.historyitem_type_MultiLvlStrRef           : Element = new CMultiLvlStrRef(); break;
+        case AscDFH.historyitem_type_MultiLvlStrCache         : Element = new CMultiLvlStrCache(); break;
+        case AscDFH.historyitem_type_StringLiteral            : Element = new CStringLiteral(); break;
+        case AscDFH.historyitem_type_YVal                     : Element = new CYVal(); break;
+        case AscDFH.historyitem_type_AreaSeries               : Element = new CAreaSeries(); break;
+        case AscDFH.historyitem_type_Cat                      : Element = new CCat(); break;
+        case AscDFH.historyitem_type_PictureOptions           : Element = new CPictureOptions(); break;
+        case AscDFH.historyitem_type_RadarSeries              : Element = new CRadarSeries(); break;
+        case AscDFH.historyitem_type_BarSeries                : Element = new CBarSeries(); break;
+        case AscDFH.historyitem_type_LineSeries               : Element = new CLineSeries(); break;
+        case AscDFH.historyitem_type_PieSeries                : Element = new CPieSeries(); break;
+        case AscDFH.historyitem_type_SurfaceSeries            : Element = new CSurfaceSeries(); break;
+        case AscDFH.historyitem_type_BubbleSeries             : Element = new CBubbleSeries(); break;
+        case AscDFH.historyitem_type_ExternalData             : Element = new CExternalData(); break;
+        case AscDFH.historyitem_type_PivotSource              : Element = new CPivotSource(); break;
+        case AscDFH.historyitem_type_Protection               : Element = new CProtection(); break;
+        case AscDFH.historyitem_type_ChartWall                : Element = new CChartWall(); break;
+        case AscDFH.historyitem_type_View3d                   : Element = new CView3d(); break;
+        case AscDFH.historyitem_type_ChartText                : Element = new CChartText(); break;
+        case AscDFH.historyitem_type_ShapeStyle               : Element = new CShapeStyle(); break;
+        case AscDFH.historyitem_type_Xfrm                     : Element = new CXfrm(); break;
+        case AscDFH.historyitem_type_SpPr                     : Element = new CSpPr(); break;
+        case AscDFH.historyitem_type_ClrScheme                : Element = new ClrScheme(); break;
+        case AscDFH.historyitem_type_ClrMap                   : Element = new ClrMap(); break;
+        case AscDFH.historyitem_type_ExtraClrScheme           : Element = new ExtraClrScheme(); break;
+        case AscDFH.historyitem_type_FontCollection           : Element = new FontCollection(); break;
+        case AscDFH.historyitem_type_FontScheme               : Element = new FontScheme(); break;
+        case AscDFH.historyitem_type_FormatScheme             : Element = new FmtScheme(); break;
+        case AscDFH.historyitem_type_ThemeElements            : Element = new ThemeElements(); break;
+        case AscDFH.historyitem_type_HF                       : Element = new HF(); break;
+        case AscDFH.historyitem_type_BgPr                     : Element = new CBgPr(); break;
+        case AscDFH.historyitem_type_Bg                       : Element = new CBg(); break;
+        case AscDFH.historyitem_type_PrintSettings            : Element = new CPrintSettings(); break;
+        case AscDFH.historyitem_type_HeaderFooterChart        : Element = new CHeaderFooterChart(); break;
+        case AscDFH.historyitem_type_PageMarginsChart         : Element = new CPageMarginsChart(); break;
+        case AscDFH.historyitem_type_PageSetup                : Element = new CPageSetup(); break;
+        case AscDFH.historyitem_type_Shape                    : Element = new CShape(); break;
+        case AscDFH.historyitem_type_DispUnits                : Element = new CDispUnits(); break;
+        case AscDFH.historyitem_type_GroupShape               : Element = new CGroupShape(); break;
+        case AscDFH.historyitem_type_ImageShape               : Element = new CImageShape(); break;
+        case AscDFH.historyitem_type_Geometry                 : Element = new Geometry(); break;
+        case AscDFH.historyitem_type_Path                     : Element = new Path(); break;
+        case AscDFH.historyitem_type_TextBody                 : Element = new CTextBody(); break;
+        case AscDFH.historyitem_type_CatAx                    : Element = new CCatAx(); break;
+        case AscDFH.historyitem_type_ValAx                    : Element = new CValAx(); break;
+        case AscDFH.historyitem_type_WrapPolygon              : Element = new CWrapPolygon(); break;
+        case AscDFH.historyitem_type_DateAx                   : Element = new CDateAx(); break;
+        case AscDFH.historyitem_type_SerAx                    : Element = new CSerAx(); break;
+        case AscDFH.historyitem_type_Title                    : Element = new CTitle(); break;
 
-        case historyitem_type_Math						: Element = new ParaMath(false); break;
-        case historyitem_type_MathContent				: Element = new CMathContent(); break;
-        case historyitem_type_acc						: Element = new CAccent(); break;
-        case historyitem_type_bar						: Element = new CBar(); break;
-        case historyitem_type_box						: Element = new CBox(); break;
-        case historyitem_type_borderBox					: Element = new CBorderBox(); break;
-        case historyitem_type_delimiter					: Element = new CDelimiter(); break;
-        case historyitem_type_eqArr						: Element = new CEqArray(); break;
-        case historyitem_type_frac                      : Element = new CFraction(); break;
-        case historyitem_type_mathFunc					: Element = new CMathFunc(); break;
-        case historyitem_type_groupChr					: Element = new CGroupCharacter(); break;
-        case historyitem_type_lim						: Element = new CLimit(); break;
-        case historyitem_type_matrix					: Element = new CMathMatrix(); break;
-        case historyitem_type_nary						: Element = new CNary(); break;
-        case historyitem_type_phant						: Element = new CPhantom(); break;
-        case historyitem_type_rad						: Element = new CRadical(); break;
-        case historyitem_type_deg_subsup				: Element = new CDegreeSubSup(); break;
-        case historyitem_type_deg						: Element = new CDegree(); break;
-        case historyitem_type_Slide                     : Element = new Slide(); break;
-        case  historyitem_type_SlideLayout              : Element = new SlideLayout(); break;
-        case  historyitem_type_SlideMaster              : Element = new MasterSlide(); break;
-        case  historyitem_type_SlideComments            : Element = new SlideComments(); break;
-        case  historyitem_type_PropLocker               : Element = new PropLocker(); break;
-        case  historyitem_type_Theme                    : Element = new CTheme(); break;
-        case  historyitem_type_GraphicFrame             : Element = new CGraphicFrame(); break;
+        case AscDFH.historyitem_type_Math						: Element = new ParaMath(false); break;
+        case AscDFH.historyitem_type_MathContent				: Element = new CMathContent(); break;
+        case AscDFH.historyitem_type_acc						: Element = new CAccent(); break;
+        case AscDFH.historyitem_type_bar						: Element = new CBar(); break;
+        case AscDFH.historyitem_type_box						: Element = new CBox(); break;
+        case AscDFH.historyitem_type_borderBox					: Element = new CBorderBox(); break;
+        case AscDFH.historyitem_type_delimiter					: Element = new CDelimiter(); break;
+        case AscDFH.historyitem_type_eqArr						: Element = new CEqArray(); break;
+        case AscDFH.historyitem_type_frac                      : Element = new CFraction(); break;
+        case AscDFH.historyitem_type_mathFunc					: Element = new CMathFunc(); break;
+        case AscDFH.historyitem_type_groupChr					: Element = new CGroupCharacter(); break;
+        case AscDFH.historyitem_type_lim						: Element = new CLimit(); break;
+        case AscDFH.historyitem_type_matrix					: Element = new CMathMatrix(); break;
+        case AscDFH.historyitem_type_nary						: Element = new CNary(); break;
+        case AscDFH.historyitem_type_phant						: Element = new CPhantom(); break;
+        case AscDFH.historyitem_type_rad						: Element = new CRadical(); break;
+        case AscDFH.historyitem_type_deg_subsup				: Element = new CDegreeSubSup(); break;
+        case AscDFH.historyitem_type_deg						: Element = new CDegree(); break;
+        case AscDFH.historyitem_type_Slide                     : Element = new Slide(); break;
+        case  AscDFH.historyitem_type_SlideLayout              : Element = new SlideLayout(); break;
+        case  AscDFH.historyitem_type_SlideMaster              : Element = new MasterSlide(); break;
+        case  AscDFH.historyitem_type_SlideComments            : Element = new SlideComments(); break;
+        case  AscDFH.historyitem_type_PropLocker               : Element = new PropLocker(); break;
+        case  AscDFH.historyitem_type_Theme                    : Element = new CTheme(); break;
+        case  AscDFH.historyitem_type_GraphicFrame             : Element = new CGraphicFrame(); break;
     }
 
     if ( null !== Element )
@@ -2132,7 +2132,7 @@ CTableId.prototype.Save_Changes = function(Data, Writer)
     // Long : тип класса
     // Long : тип изменений
 
-    Writer.WriteLong( historyitem_type_TableId );
+    Writer.WriteLong( AscDFH.historyitem_type_TableId );
 
     var Type = Data.Type;
 
@@ -2140,7 +2140,7 @@ CTableId.prototype.Save_Changes = function(Data, Writer)
     Writer.WriteLong( Type );
     switch ( Type )
     {
-        case historyitem_TableId_Add :
+        case AscDFH.historyitem_TableId_Add :
         {
             // String   : Id элемента
             // Varibale : сам элемент
@@ -2151,7 +2151,7 @@ CTableId.prototype.Save_Changes = function(Data, Writer)
             break;
         }
 
-        case historyitem_TableId_Reset:
+        case AscDFH.historyitem_TableId_Reset:
         {
             // String : Id_new
             // String : Id_old
@@ -2162,7 +2162,7 @@ CTableId.prototype.Save_Changes = function(Data, Writer)
             break;
         }
 
-        case historyitem_TableId_Description:
+        case AscDFH.historyitem_TableId_Description:
         {
             // Long : FileCheckSum
             // Long : FileSize
@@ -2201,14 +2201,14 @@ CTableId.prototype.Load_Changes = function(Reader, Reader2)
     // Long : тип изменений
 
     var ClassType = Reader.GetLong();
-    if ( historyitem_type_TableId != ClassType )
+    if ( AscDFH.historyitem_type_TableId != ClassType )
         return;
 
     var Type = Reader.GetLong();
 
     switch ( Type )
     {
-        case historyitem_Common_AddWatermark:
+        case AscDFH.historyitem_Common_AddWatermark:
         {
             var sUrl = Reader.GetString2();
             if('undefined' != typeof editor && editor.WordControl && editor.WordControl.m_oLogicDocument)
@@ -2253,7 +2253,7 @@ CTableId.prototype.Load_Changes = function(Reader, Reader2)
             }
             break;
         }
-        case historyitem_TableId_Add:
+        case AscDFH.historyitem_TableId_Add:
         {
             // String   : Id элемента
             // Varibale : сам элемент
@@ -2266,7 +2266,7 @@ CTableId.prototype.Load_Changes = function(Reader, Reader2)
             break;
         }
 
-        case historyitem_TableId_Reset:
+        case AscDFH.historyitem_TableId_Reset:
         {
             // String : Id_new
             // String : Id_old
@@ -2285,7 +2285,7 @@ CTableId.prototype.Load_Changes = function(Reader, Reader2)
             break;
         }
 
-        case historyitem_TableId_Description:
+        case AscDFH.historyitem_TableId_Description:
         {
             // Long : FileCheckSum
             // Long : FileSize

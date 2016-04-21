@@ -45,7 +45,7 @@ CImageShape.prototype =
 
     getObjectType: function()
     {
-        return historyitem_type_ImageShape;
+        return AscDFH.historyitem_type_ImageShape;
     },
 
     Write_ToBinary2: function(w)
@@ -61,42 +61,42 @@ CImageShape.prototype =
 
     setBDeleted: function(pr)
     {
-        History.Add(this, {Type: historyitem_ShapeSetBDeleted, oldPr: this.bDeleted, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_ShapeSetBDeleted, oldPr: this.bDeleted, newPr: pr});
         this.bDeleted = pr;
     },
 
 
     setNvPicPr: function(pr)
     {
-        History.Add(this, {Type:historyitem_ImageShapeSetNvPicPr, oldPr: this.nvPicPr, newPr: pr});
+        History.Add(this, {Type:AscDFH.historyitem_ImageShapeSetNvPicPr, oldPr: this.nvPicPr, newPr: pr});
         this.nvPicPr = pr;
     },
     setSpPr: function(pr)
     {
-        History.Add(this, {Type:historyitem_ImageShapeSetSpPr, oldPr: this.spPr, newPr: pr});
+        History.Add(this, {Type:AscDFH.historyitem_ImageShapeSetSpPr, oldPr: this.spPr, newPr: pr});
         this.spPr = pr;
     },
     setBlipFill: function(pr)
     {
-        History.Add(this, {Type:historyitem_ImageShapeSetBlipFill, oldPr: this.blipFill, newPr: pr});
+        History.Add(this, {Type:AscDFH.historyitem_ImageShapeSetBlipFill, oldPr: this.blipFill, newPr: pr});
         this.blipFill = pr;
     },
 
     setParent: function(pr)
     {
-        History.Add(this, {Type: historyitem_ImageShapeSetParent, oldPr: this.parent, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_ImageShapeSetParent, oldPr: this.parent, newPr: pr});
         this.parent = pr;
     },
 
     setGroup: function(pr)
     {
-        History.Add(this, {Type: historyitem_ImageShapeSetGroup, oldPr: this.group, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_ImageShapeSetGroup, oldPr: this.group, newPr: pr});
         this.group = pr;
     },
 
     setStyle: function(pr)
     {
-        History.Add(this, {Type: historyitem_ImageShapeSetStyle, oldPr: this.style, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_ImageShapeSetStyle, oldPr: this.style, newPr: pr});
         this.style = pr;
     },
 
@@ -515,7 +515,7 @@ CImageShape.prototype =
     {
         switch(data.Type)
         {
-            case historyitem_ImageShapeSetBlipFill:
+            case AscDFH.historyitem_ImageShapeSetBlipFill:
             {
                 this.recalcBrush();
                 this.recalcFill();
@@ -658,7 +658,7 @@ CImageShape.prototype =
 
     setNvSpPr: function(pr)
     {
-        History.Add(this, {Type: historyitem_ImageShapeSetNvPicPr, oldPr: this.nvPicPr, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_ImageShapeSetNvPicPr, oldPr: this.nvPicPr, newPr: pr});
         this.nvPicPr = pr;
     },
 
@@ -674,12 +674,12 @@ CImageShape.prototype =
     {
         switch(data.Type)
         {
-            case historyitem_AutoShapes_SetBFromSerialize:
+            case AscDFH.historyitem_AutoShapes_SetBFromSerialize:
             {
                 this.fromSerialize = data.oldPr;
                 break;
             }
-            case historyitem_AutoShapes_SetDrawingBaseCoors:
+            case AscDFH.historyitem_AutoShapes_SetDrawingBaseCoors:
             {
                 if(this.drawingBase)
                 {
@@ -698,52 +698,52 @@ CImageShape.prototype =
                 }
                 break;
             }
-            case historyitem_AutoShapes_RemoveFromDrawingObjects:
+            case AscDFH.historyitem_AutoShapes_RemoveFromDrawingObjects:
             {
                 addToDrawings(this.worksheet, this, data.Pos);
                 break;
             }
-            case historyitem_AutoShapes_AddToDrawingObjects:
+            case AscDFH.historyitem_AutoShapes_AddToDrawingObjects:
             {
                 deleteDrawingBase(this.worksheet.Drawings, this.Get_Id());
                 break;
             }
-            case historyitem_AutoShapes_SetWorksheet:
+            case AscDFH.historyitem_AutoShapes_SetWorksheet:
             {
                 this.worksheet = data.oldPr;
                 break;
             }
-            case historyitem_ShapeSetBDeleted:
+            case AscDFH.historyitem_ShapeSetBDeleted:
             {
                 this.bDeleted = data.oldPr;
                 break;
             }
-            case historyitem_ImageShapeSetNvPicPr:
+            case AscDFH.historyitem_ImageShapeSetNvPicPr:
             {
                 this.nvPicPr = data.oldPr;
                 break;
             }
-            case historyitem_ImageShapeSetSpPr:
+            case AscDFH.historyitem_ImageShapeSetSpPr:
             {
                 this.spPr = data.oldPr;
                 break;
             }
-            case historyitem_ImageShapeSetBlipFill:
+            case AscDFH.historyitem_ImageShapeSetBlipFill:
             {
                 this.blipFill = data.oldPr;
                 break;
             }
-            case historyitem_ImageShapeSetParent:
+            case AscDFH.historyitem_ImageShapeSetParent:
             {
                 this.parent = data.oldPr;
                 break;
             }
-            case historyitem_ImageShapeSetGroup:
+            case AscDFH.historyitem_ImageShapeSetGroup:
             {
                 this.group = data.oldPr;
                 break;
             }
-            case historyitem_ImageShapeSetStyle:
+            case AscDFH.historyitem_ImageShapeSetStyle:
             {
                 this.style = data.oldPr;
                 break;
@@ -755,12 +755,12 @@ CImageShape.prototype =
     {
         switch(data.Type)
         {
-            case historyitem_AutoShapes_SetBFromSerialize:
+            case AscDFH.historyitem_AutoShapes_SetBFromSerialize:
             {
                 this.fromSerialize = data.newPr;
                 break;
             }
-            case historyitem_AutoShapes_SetDrawingBaseCoors:
+            case AscDFH.historyitem_AutoShapes_SetDrawingBaseCoors:
             {
                 if(this.drawingBase)
                 {
@@ -779,52 +779,52 @@ CImageShape.prototype =
                 }
                 break;
             }
-            case historyitem_AutoShapes_RemoveFromDrawingObjects:
+            case AscDFH.historyitem_AutoShapes_RemoveFromDrawingObjects:
             {
                 deleteDrawingBase(this.worksheet.Drawings, this.Get_Id());
                 break;
             }
-            case historyitem_AutoShapes_AddToDrawingObjects:
+            case AscDFH.historyitem_AutoShapes_AddToDrawingObjects:
             {
                 addToDrawings(this.worksheet, this, data.Pos);
                 break;
             }
-            case historyitem_AutoShapes_SetWorksheet:
+            case AscDFH.historyitem_AutoShapes_SetWorksheet:
             {
                 this.worksheet = data.newPr;
                 break;
             }
-            case historyitem_ShapeSetBDeleted:
+            case AscDFH.historyitem_ShapeSetBDeleted:
             {
                 this.bDeleted = data.newPr;
                 break;
             }
-            case historyitem_ImageShapeSetNvPicPr:
+            case AscDFH.historyitem_ImageShapeSetNvPicPr:
             {
                 this.nvPicPr = data.newPr;
                 break;
             }
-            case historyitem_ImageShapeSetSpPr:
+            case AscDFH.historyitem_ImageShapeSetSpPr:
             {
                 this.spPr = data.newPr;
                 break;
             }
-            case historyitem_ImageShapeSetBlipFill:
+            case AscDFH.historyitem_ImageShapeSetBlipFill:
             {
                 this.blipFill = data.newPr;
                 break;
             }
-            case historyitem_ImageShapeSetParent:
+            case AscDFH.historyitem_ImageShapeSetParent:
             {
                 this.parent = data.newPr;
                 break;
             }
-            case historyitem_ImageShapeSetGroup:
+            case AscDFH.historyitem_ImageShapeSetGroup:
             {
                 this.group = data.newPr;
                 break;
             }
-            case historyitem_ImageShapeSetStyle:
+            case AscDFH.historyitem_ImageShapeSetStyle:
             {
                 this.style = data.newPr;
                 break;
@@ -837,12 +837,12 @@ CImageShape.prototype =
         w.WriteLong(data.Type);
         switch(data.Type)
         {
-            case historyitem_AutoShapes_SetBFromSerialize:
+            case AscDFH.historyitem_AutoShapes_SetBFromSerialize:
             {
                 writeBool(w, data.newPr);
                 break;
             }
-            case historyitem_AutoShapes_SetDrawingBaseCoors:
+            case AscDFH.historyitem_AutoShapes_SetDrawingBaseCoors:
             {
                 writeDouble(w, data.fromCol   );
                 writeDouble(w, data.fromColOff);
@@ -860,17 +860,17 @@ CImageShape.prototype =
                 writeDouble(w, data.cy);
                 break;
             }
-            case historyitem_AutoShapes_RemoveFromDrawingObjects:
+            case AscDFH.historyitem_AutoShapes_RemoveFromDrawingObjects:
             {
                 break;
             }
-            case historyitem_AutoShapes_AddToDrawingObjects:
+            case AscDFH.historyitem_AutoShapes_AddToDrawingObjects:
             {
                 var Pos = data.UseArray ? data.PosArray[0] : data.Pos;
                 writeLong(w, Pos);
                 break;
             }
-            case historyitem_AutoShapes_SetWorksheet:
+            case AscDFH.historyitem_AutoShapes_SetWorksheet:
             {
                 writeBool(w,isRealObject(data.newPr));
                 if(isRealObject(data.newPr))
@@ -879,22 +879,22 @@ CImageShape.prototype =
                 }
                 break;
             }
-            case historyitem_ImageShapeSetNvPicPr:
-            case historyitem_ImageShapeSetSpPr:
-            case historyitem_ImageShapeSetParent:
-            case historyitem_ImageShapeSetGroup:
-            case historyitem_ImageShapeSetStyle:
+            case AscDFH.historyitem_ImageShapeSetNvPicPr:
+            case AscDFH.historyitem_ImageShapeSetSpPr:
+            case AscDFH.historyitem_ImageShapeSetParent:
+            case AscDFH.historyitem_ImageShapeSetGroup:
+            case AscDFH.historyitem_ImageShapeSetStyle:
             {
                 writeObject(w, data.newPr);
                 break;
             }
-            case historyitem_ShapeSetBDeleted:
+            case AscDFH.historyitem_ShapeSetBDeleted:
             {
                 writeBool(w, data.newPr);
                 break;
             }
 
-            case historyitem_ImageShapeSetBlipFill:
+            case AscDFH.historyitem_ImageShapeSetBlipFill:
             {
                 w.WriteBool(isRealObject(data.newPr));
                 if(isRealObject(data.newPr))
@@ -911,12 +911,12 @@ CImageShape.prototype =
         var type = r.GetLong();
         switch(type)
         {
-            case historyitem_AutoShapes_SetBFromSerialize:
+            case AscDFH.historyitem_AutoShapes_SetBFromSerialize:
             {
                 this.fromSerialize = readBool(r);
                 break;
             }
-            case historyitem_AutoShapes_SetDrawingBaseCoors:
+            case AscDFH.historyitem_AutoShapes_SetDrawingBaseCoors:
             {
                 if(this.drawingBase)
                 {
@@ -937,12 +937,12 @@ CImageShape.prototype =
                 }
                 break;
             }
-            case historyitem_AutoShapes_RemoveFromDrawingObjects:
+            case AscDFH.historyitem_AutoShapes_RemoveFromDrawingObjects:
             {
                 deleteDrawingBase(this.worksheet.Drawings, this.Get_Id());
                 break;
             }
-            case historyitem_AutoShapes_AddToDrawingObjects:
+            case AscDFH.historyitem_AutoShapes_AddToDrawingObjects:
             {
                 var pos = readLong(r);
                 if(this.worksheet)
@@ -952,28 +952,28 @@ CImageShape.prototype =
                 addToDrawings(this.worksheet, this, pos);
                 break;
             }
-            case historyitem_AutoShapes_SetWorksheet:
+            case AscDFH.historyitem_AutoShapes_SetWorksheet:
             {
                 ReadWBModel(this, r);
                 break;
             }
-            case historyitem_ShapeSetBDeleted:
+            case AscDFH.historyitem_ShapeSetBDeleted:
             {
                 this.bDeleted = readBool(r);
                 break;
             }
-            case historyitem_ImageShapeSetNvPicPr:
+            case AscDFH.historyitem_ImageShapeSetNvPicPr:
             {
                 this.nvPicPr = readObject(r);
                 break;
             }
-            case historyitem_ImageShapeSetSpPr:
+            case AscDFH.historyitem_ImageShapeSetSpPr:
             {
                 this.spPr = readObject(r);
                 break;
             }
 
-            case historyitem_ImageShapeSetBlipFill:
+            case AscDFH.historyitem_ImageShapeSetBlipFill:
             {
                 if(r.GetBool())
                 {
@@ -995,17 +995,17 @@ CImageShape.prototype =
                 this.handleUpdateFill();
                 break;
             }
-            case historyitem_ImageShapeSetParent:
+            case AscDFH.historyitem_ImageShapeSetParent:
             {
                 this.parent = readObject(r);
                 break;
             }
-            case historyitem_ImageShapeSetGroup:
+            case AscDFH.historyitem_ImageShapeSetGroup:
             {
                 this.group = readObject(r);
                 break;
             }
-            case historyitem_ImageShapeSetStyle:
+            case AscDFH.historyitem_ImageShapeSetStyle:
             {
                 this.style = readObject(r);
                 break;

@@ -42,24 +42,24 @@ CWrapPolygon.prototype =
 
     getObjectType: function()
     {
-        return historyitem_type_WrapPolygon;
+        return AscDFH.historyitem_type_WrapPolygon;
     },
 
     setEdited: function(pr)
     {
-        History.Add(this, {Type: historyitem_WrapPolygonSetEdited, oldPr: this.edited, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_WrapPolygonSetEdited, oldPr: this.edited, newPr: pr});
         this.edited = pr;
     },
 
     setArrRelPoints: function(pr)
     {
-        History.Add(this, {Type:historyitem_WrapPolygonSetRelPoints, oldPr: this.relativeArrPoints, newPr: pr});
+        History.Add(this, {Type:AscDFH.historyitem_WrapPolygonSetRelPoints, oldPr: this.relativeArrPoints, newPr: pr});
         this.relativeArrPoints = pr;
     },
 
     setWrapSide: function(pr)
     {
-        History.Add(this, {Type: historyitem_WrapPolygonSetWrapSide, oldPr: this.wrapSide, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_WrapPolygonSetWrapSide, oldPr: this.wrapSide, newPr: pr});
         this.wrapSide = pr;
     },
 
@@ -87,7 +87,7 @@ CWrapPolygon.prototype =
 
     Write_ToBinary2: function(writer)
     {
-        writer.WriteLong(historyitem_type_WrapPolygon);
+        writer.WriteLong(AscDFH.historyitem_type_WrapPolygon);
         writer.WriteString2(this.Get_Id());
         writeObject(writer, this.wordGraphicObject);
     },
@@ -752,17 +752,17 @@ CWrapPolygon.prototype =
     {
         switch(data.Type)
         {
-            case historyitem_WrapPolygonSetEdited:
+            case AscDFH.historyitem_WrapPolygonSetEdited:
             {
                 this.edited = data.oldPr;
                 break;
             }
-            case historyitem_WrapPolygonSetRelPoints:
+            case AscDFH.historyitem_WrapPolygonSetRelPoints:
             {
                 this.relativeArrPoints = data.oldPr;
                 break;
             }
-            case historyitem_WrapPolygonSetWrapSide:
+            case AscDFH.historyitem_WrapPolygonSetWrapSide:
             {
                 this.wrapSide = data.oldPr;
                 break;
@@ -774,18 +774,18 @@ CWrapPolygon.prototype =
     {
         switch(data.Type)
         {
-            case historyitem_WrapPolygonSetEdited:
+            case AscDFH.historyitem_WrapPolygonSetEdited:
             {
                 this.edited = data.newPr;
                 break;
             }
-            case historyitem_WrapPolygonSetRelPoints:
+            case AscDFH.historyitem_WrapPolygonSetRelPoints:
             {
                 this.relativeArrPoints = data.newPr;
                 break;
             }
 
-            case historyitem_WrapPolygonSetWrapSide:
+            case AscDFH.historyitem_WrapPolygonSetWrapSide:
             {
                 this.wrapSide = data.newPr;
                 break;
@@ -795,16 +795,16 @@ CWrapPolygon.prototype =
 
     Save_Changes: function(data, writer)
     {
-        writer.WriteLong(historyitem_type_WrapPolygon);
+        writer.WriteLong(AscDFH.historyitem_type_WrapPolygon);
         writer.WriteLong(data.Type);
         switch(data.Type)
         {
-            case historyitem_WrapPolygonSetEdited:
+            case AscDFH.historyitem_WrapPolygonSetEdited:
             {
                 writeBool(writer, data.newPr);
                 break;
             }
-            case historyitem_WrapPolygonSetRelPoints:
+            case AscDFH.historyitem_WrapPolygonSetRelPoints:
             {
                 writer.WriteLong(data.newPr.length);
                 for(var i = 0; i < data.newPr.length; ++i)
@@ -815,7 +815,7 @@ CWrapPolygon.prototype =
                 break;
             }
 
-            case historyitem_WrapPolygonSetWrapSide:
+            case AscDFH.historyitem_WrapPolygonSetWrapSide:
             {
                 writeLong(writer, data.newPr);
                 break;
@@ -825,16 +825,16 @@ CWrapPolygon.prototype =
 
     Load_Changes: function(reader)
     {
-        if(reader.GetLong() !== historyitem_type_WrapPolygon)
+        if(reader.GetLong() !== AscDFH.historyitem_type_WrapPolygon)
             return;
         switch (reader.GetLong())
         {
-            case historyitem_WrapPolygonSetEdited:
+            case AscDFH.historyitem_WrapPolygonSetEdited:
             {
                 this.edited = readBool(reader);
                 break;
             }
-            case historyitem_WrapPolygonSetRelPoints:
+            case AscDFH.historyitem_WrapPolygonSetRelPoints:
             {
                 var l = reader.GetLong();
                 var rel_arr = [], x, y;
@@ -848,7 +848,7 @@ CWrapPolygon.prototype =
                 break;
             }
 
-            case historyitem_WrapPolygonSetWrapSide:
+            case AscDFH.historyitem_WrapPolygonSetWrapSide:
             {
                 this.wrapSide = readLong(reader);
                 break;

@@ -253,7 +253,7 @@ function CComment(Parent, Data)
     
     this.Set_Data = function(Data)
     {
-        History.Add( this, { Type : historyitem_Comment_Change, New : Data, Old : this.Data } );
+        History.Add( this, { Type : AscDFH.historyitem_Comment_Change, New : Data, Old : this.Data } );
         this.Data = Data;
     };
 
@@ -285,7 +285,7 @@ function CComment(Parent, Data)
             Data : Data
         };
 
-        History.Add( this, { Type : historyitem_Comment_TypeInfo, New : New, Old : this.m_oTypeInfo } );
+        History.Add( this, { Type : AscDFH.historyitem_Comment_TypeInfo, New : New, Old : this.m_oTypeInfo } );
 
         this.m_oTypeInfo = New;
 
@@ -310,14 +310,14 @@ function CComment(Parent, Data)
 
         switch ( Type )
         {
-            case historyitem_Comment_Change:
+            case AscDFH.historyitem_Comment_Change:
             {
                 this.Data = Data.Old;
                 editor.sync_ChangeCommentData( this.Id, this.Data );
                 break;
             }
 
-            case historyitem_Comment_TypeInfo:
+            case AscDFH.historyitem_Comment_TypeInfo:
             {
                 this.m_oTypeInfo = Data.Old;
                 break;
@@ -331,14 +331,14 @@ function CComment(Parent, Data)
 
         switch ( Type )
         {
-            case historyitem_Comment_Change:
+            case AscDFH.historyitem_Comment_Change:
             {
                 this.Data = Data.New;
                 editor.sync_ChangeCommentData( this.Id, this.Data );
                 break;
             }
 
-            case historyitem_Comment_TypeInfo:
+            case AscDFH.historyitem_Comment_TypeInfo:
             {
                 this.m_oTypeInfo = Data.New;
                 break;
@@ -359,7 +359,7 @@ function CComment(Parent, Data)
         // Long : тип класса
         // Long : тип изменений
 
-        Writer.WriteLong( historyitem_type_Comment );
+        Writer.WriteLong( AscDFH.historyitem_type_Comment );
 
         var Type = Data.Type;
 
@@ -368,14 +368,14 @@ function CComment(Parent, Data)
 
         switch ( Type )
         {
-            case historyitem_Comment_Change:
+            case AscDFH.historyitem_Comment_Change:
             {
                 // Variable : Data
                 Data.New.Write_ToBinary2( Writer );
                 break;
             }
 
-            case historyitem_Comment_TypeInfo:
+            case AscDFH.historyitem_Comment_TypeInfo:
             {
                 // Long : тип
                 //  Если comment_type_HdrFtr
@@ -404,12 +404,12 @@ function CComment(Parent, Data)
         var Type = Data.Type;
         switch ( Type )
         {
-            case  historyitem_Comment_Change:
+            case  AscDFH.historyitem_Comment_Change:
             {
                 break;
             }
 
-            case  historyitem_Comment_TypeInfo:
+            case  AscDFH.historyitem_Comment_TypeInfo:
             {
                 break;
             }
@@ -425,14 +425,14 @@ function CComment(Parent, Data)
         // Long : тип изменений
 
         var ClassType = Reader.GetLong();
-        if ( historyitem_type_Comment != ClassType )
+        if ( AscDFH.historyitem_type_Comment != ClassType )
             return;
 
         var Type = Reader.GetLong();
 
         switch ( Type )
         {
-            case historyitem_Comment_Change:
+            case AscDFH.historyitem_Comment_Change:
             {
                 // Variable : Data
                 this.Data.Read_FromBinary2( Reader );
@@ -440,7 +440,7 @@ function CComment(Parent, Data)
                 break;
             }
 
-            case historyitem_Comment_TypeInfo:
+            case AscDFH.historyitem_Comment_TypeInfo:
             {
                 // Long : тип
                 //  Если comment_type_HdrFtr
@@ -474,7 +474,7 @@ function CComment(Parent, Data)
 
     this.Write_ToBinary2 = function(Writer)
     {
-        Writer.WriteLong( historyitem_type_Comment );
+        Writer.WriteLong( AscDFH.historyitem_type_Comment );
 
         // String   : Id
         // Variable : Data
@@ -580,7 +580,7 @@ function CComments()
     {
         var Id = Comment.Get_Id();
 
-        History.Add( this, { Type : historyitem_Comments_Add, Id : Id, Comment : Comment } );
+        History.Add( this, { Type : AscDFH.historyitem_Comments_Add, Id : Id, Comment : Comment } );
         this.m_aComments[Id] = Comment;
     };
 
@@ -596,7 +596,7 @@ function CComments()
     {
         if ( "undefined" != typeof(this.m_aComments[Id]) )
         {
-            History.Add( this, { Type : historyitem_Comments_Remove, Id : Id, Comment : this.m_aComments[Id] } );
+            History.Add( this, { Type : AscDFH.historyitem_Comments_Remove, Id : Id, Comment : this.m_aComments[Id] } );
 
             // Сначала удаляем комментарий из списка комментариев, чтобы данная функция не зацикливалась на вызове Remove_Marks
             var Comment = this.m_aComments[Id];
@@ -694,14 +694,14 @@ function CComments()
 
         switch ( Type )
         {
-            case historyitem_Comments_Add:
+            case AscDFH.historyitem_Comments_Add:
             {
                 delete this.m_aComments[Data.Id];
                 editor.sync_RemoveComment( Data.Id );
                 break;
             }
 
-            case historyitem_Comments_Remove:
+            case AscDFH.historyitem_Comments_Remove:
             {
                 this.m_aComments[Data.Id] = Data.Comment;
                 editor.sync_AddComment( Data.Id, Data.Comment.Data );
@@ -716,14 +716,14 @@ function CComments()
 
         switch ( Type )
         {
-            case historyitem_Comments_Add:
+            case AscDFH.historyitem_Comments_Add:
             {
                 this.m_aComments[Data.Id] = Data.Comment;
                 editor.sync_AddComment( Data.Id, Data.Comment.Data );
                 break;
             }
 
-            case historyitem_Comments_Remove:
+            case AscDFH.historyitem_Comments_Remove:
             {
                 delete this.m_aComments[Data.Id];
                 editor.sync_RemoveComment( Data.Id );
@@ -745,7 +745,7 @@ function CComments()
         // Long : тип класса
         // Long : тип изменений
 
-        Writer.WriteLong( historyitem_type_Comments );
+        Writer.WriteLong( AscDFH.historyitem_type_Comments );
 
         var Type = Data.Type;
 
@@ -754,7 +754,7 @@ function CComments()
 
         switch ( Type )
         {
-            case historyitem_Comments_Add:
+            case AscDFH.historyitem_Comments_Add:
             {
                 // String : Id комментария
 
@@ -763,7 +763,7 @@ function CComments()
                 break;
             }
 
-            case historyitem_Comments_Remove:
+            case AscDFH.historyitem_Comments_Remove:
             {
                 // String : Id комментария
 
@@ -782,12 +782,12 @@ function CComments()
         var Type = Data.Type;
         switch ( Type )
         {
-            case  historyitem_Comments_Add:
+            case  AscDFH.historyitem_Comments_Add:
             {
                 break;
             }
 
-            case historyitem_Comments_Remove:
+            case AscDFH.historyitem_Comments_Remove:
             {
                 break;
             }
@@ -803,14 +803,14 @@ function CComments()
         // Long : тип изменений
 
         var ClassType = Reader.GetLong();
-        if ( historyitem_type_Comments != ClassType )
+        if ( AscDFH.historyitem_type_Comments != ClassType )
             return;
 
         var Type = Reader.GetLong();
 
         switch ( Type )
         {
-            case historyitem_Comments_Add:
+            case AscDFH.historyitem_Comments_Add:
             {
                 // String : Id комментария
 
@@ -822,7 +822,7 @@ function CComments()
                 break;
             }
 
-            case historyitem_Comments_Remove:
+            case AscDFH.historyitem_Comments_Remove:
             {
                 // String : Id комментария
 
@@ -878,7 +878,7 @@ ParaComment.prototype =
     {
         if (this.CommentId !== NewCommentId)
         {
-            History.Add(this, { Type : historyitem_ParaComment_CommentId, Old : this.CommentId, New : NewCommentId });
+            History.Add(this, { Type : AscDFH.historyitem_ParaComment_CommentId, Old : this.CommentId, New : NewCommentId });
             this.CommentId = NewCommentId;
         }
     },
@@ -1334,7 +1334,7 @@ ParaComment.prototype =
 
         switch ( Type )
         {
-            case  historyitem_ParaComment_CommentId:
+            case  AscDFH.historyitem_ParaComment_CommentId:
             {
                 this.CommentId = Data.Old;
                 break;
@@ -1348,7 +1348,7 @@ ParaComment.prototype =
 
         switch ( Type )
         {
-            case  historyitem_ParaComment_CommentId:
+            case  AscDFH.historyitem_ParaComment_CommentId:
             {
                 this.CommentId = Data.New;
                 break;
@@ -1362,7 +1362,7 @@ ParaComment.prototype =
         // Long : тип класса
         // Long : тип изменений
 
-        Writer.WriteLong( historyitem_type_ParaComment );
+        Writer.WriteLong( AscDFH.historyitem_type_ParaComment );
 
         var Type = Data.Type;
 
@@ -1371,7 +1371,7 @@ ParaComment.prototype =
 
         switch ( Type )
         {
-            case  historyitem_ParaComment_CommentId:
+            case  AscDFH.historyitem_ParaComment_CommentId:
             {
                 // String : CommentId
                 Writer.WriteString2(Data.New);
@@ -1387,14 +1387,14 @@ ParaComment.prototype =
         // Long : тип изменений
 
         var ClassType = Reader.GetLong();
-        if ( historyitem_type_ParaComment != ClassType )
+        if ( AscDFH.historyitem_type_ParaComment != ClassType )
             return;
 
         var Type = Reader.GetLong();
 
         switch ( Type )
         {
-            case  historyitem_ParaComment_CommentId:
+            case  AscDFH.historyitem_ParaComment_CommentId:
             {
                 // String : CommentId
                 this.CommentId = Reader.GetString2();
@@ -1418,7 +1418,7 @@ ParaComment.prototype =
     
     Write_ToBinary2 : function(Writer)
     {
-        Writer.WriteLong( historyitem_type_CommentMark );
+        Writer.WriteLong( AscDFH.historyitem_type_CommentMark );
 
         // String   : Id
         // String   : Id комментария

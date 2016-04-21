@@ -415,7 +415,7 @@ function CDegree(props, bInside)
     AscCommon.g_oTableId.Add( this, this.Id );
 }
 AscCommon.extendClass(CDegree, CDegreeBase);
-CDegree.prototype.ClassType = historyitem_type_deg;
+CDegree.prototype.ClassType = AscDFH.historyitem_type_deg;
 CDegree.prototype.kind      = MATH_DEGREE;
 CDegree.prototype.init = function(props)
 {
@@ -871,7 +871,7 @@ function CDegreeSubSup(props, bInside)
     AscCommon.g_oTableId.Add( this, this.Id );
 }
 AscCommon.extendClass(CDegreeSubSup, CDegreeSubSupBase);
-CDegreeSubSup.prototype.ClassType = historyitem_type_deg_subsup;
+CDegreeSubSup.prototype.ClassType = AscDFH.historyitem_type_deg_subsup;
 CDegreeSubSup.prototype.kind      = MATH_DEGREESubSup;
 CDegreeSubSup.prototype.init = function(props)
 {

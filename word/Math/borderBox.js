@@ -198,7 +198,7 @@ function CBorderBox(props)
     AscCommon.g_oTableId.Add(this, this.Id);
 }
 AscCommon.extendClass(CBorderBox, CMathBase);
-CBorderBox.prototype.ClassType = historyitem_type_borderBox;
+CBorderBox.prototype.ClassType = AscDFH.historyitem_type_borderBox;
 CBorderBox.prototype.kind      = MATH_BORDER_BOX;
 CBorderBox.prototype.init = function(props)
 {
@@ -751,7 +751,7 @@ function CBox(props)
     AscCommon.g_oTableId.Add( this, this.Id );
 }
 AscCommon.extendClass(CBox, CMathBase);
-CBox.prototype.ClassType = historyitem_type_box;
+CBox.prototype.ClassType = AscDFH.historyitem_type_box;
 CBox.prototype.kind      = MATH_BOX;
 CBox.prototype.init = function(props)
 {
@@ -967,7 +967,7 @@ function CBar(props)
     AscCommon.g_oTableId.Add( this, this.Id );
 }
 AscCommon.extendClass(CBar, CCharacter);
-CBar.prototype.ClassType = historyitem_type_bar;
+CBar.prototype.ClassType = AscDFH.historyitem_type_bar;
 CBar.prototype.kind      = MATH_BAR;
 CBar.prototype.init = function(props)
 {
@@ -1165,7 +1165,7 @@ function CPhantom(props)
     AscCommon.g_oTableId.Add( this, this.Id );
 }
 AscCommon.extendClass(CPhantom, CMathBase);
-CPhantom.prototype.ClassType = historyitem_type_phant;
+CPhantom.prototype.ClassType = AscDFH.historyitem_type_phant;
 CPhantom.prototype.kind      = MATH_PHANTOM;
 CPhantom.prototype.init = function(props)
 {

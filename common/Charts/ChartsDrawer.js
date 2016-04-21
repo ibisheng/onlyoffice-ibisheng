@@ -48,7 +48,7 @@ CChartsDrawer.prototype =
 		this.calcProp = {};
 		
 		//nDimensionCount - flag for 3d/2d charts
-		//TODO пока включаю только гистограммы(=== historyitem_type_BarChart)
+		//TODO пока включаю только гистограммы(=== AscDFH.historyitem_type_BarChart)
 		if(this._isSwitchCurrent3DChart(chartSpace))
 		{
 			standartMarginForCharts = 16;
@@ -458,7 +458,7 @@ CChartsDrawer.prototype =
 		
 		var pxToMM = this.calcProp.pxToMM;
 		
-		var isHBar = (chartSpace.chart.plotArea.chart.getObjectType() == historyitem_type_BarChart && chartSpace.chart.plotArea.chart.barDir === BAR_DIR_BAR) ? true : false;
+		var isHBar = (chartSpace.chart.plotArea.chart.getObjectType() == AscDFH.historyitem_type_BarChart && chartSpace.chart.plotArea.chart.barDir === BAR_DIR_BAR) ? true : false;
 		
 		//если точки рассчитаны - ставим маргин в зависимости от них
 		var marginOnPoints = this._calculateMarginOnPoints(chartSpace, isHBar);
@@ -1673,12 +1673,12 @@ CChartsDrawer.prototype =
 		
 		switch ( typeChart )
 		{
-			case historyitem_type_LineChart:
+			case AscDFH.historyitem_type_LineChart:
 			{
 				this.calcProp.type = "Line";
 				break;
 			}
-			case historyitem_type_BarChart:
+			case AscDFH.historyitem_type_BarChart:
 			{
 				if(chartProp.chart.plotArea.chart.barDir !== BAR_DIR_BAR)
 					this.calcProp.type = "Bar";
@@ -1686,37 +1686,37 @@ CChartsDrawer.prototype =
 					this.calcProp.type = "HBar";
 				break;
 			}
-			case historyitem_type_PieChart:
+			case AscDFH.historyitem_type_PieChart:
 			{
 				this.calcProp.type = "Pie";
 				break;
 			}
-			case historyitem_type_AreaChart:
+			case AscDFH.historyitem_type_AreaChart:
 			{
 				this.calcProp.type = "Area";
 				break;
 			}
-			case historyitem_type_ScatterChart:
+			case AscDFH.historyitem_type_ScatterChart:
 			{
 				this.calcProp.type = "Scatter";
 				break;
 			}
-			case historyitem_type_StockChart:
+			case AscDFH.historyitem_type_StockChart:
 			{
 				this.calcProp.type = "Stock";
 				break;
 			}
-			case historyitem_type_DoughnutChart:
+			case AscDFH.historyitem_type_DoughnutChart:
 			{
 				this.calcProp.type = "DoughnutChart";
 				break;
 			}
-			case historyitem_type_RadarChart:
+			case AscDFH.historyitem_type_RadarChart:
 			{
 				this.calcProp.type = "Radar";
 				break;
 			}
-			case historyitem_type_BubbleChart:
+			case AscDFH.historyitem_type_BubbleChart:
 			{
 				//this.calcProp.type = "BubbleChart";
 				this.calcProp.type = "Scatter";
@@ -2577,11 +2577,11 @@ CChartsDrawer.prototype =
 		{
 			var isPerspective = !chartSpace.chart.view3D.rAngAx;
 			
-			var isBar = typeChart === historyitem_type_BarChart && chart && chart.barDir !== BAR_DIR_BAR;
-			var isHBar = typeChart === historyitem_type_BarChart && chart && chart.barDir === BAR_DIR_BAR;
-			var isLine = typeChart === historyitem_type_LineChart;
-			var isPie = typeChart === historyitem_type_PieChart;
-			var isArea = typeChart === historyitem_type_AreaChart;
+			var isBar = typeChart === AscDFH.historyitem_type_BarChart && chart && chart.barDir !== BAR_DIR_BAR;
+			var isHBar = typeChart === AscDFH.historyitem_type_BarChart && chart && chart.barDir === BAR_DIR_BAR;
+			var isLine = typeChart === AscDFH.historyitem_type_LineChart;
+			var isPie = typeChart === AscDFH.historyitem_type_PieChart;
+			var isArea = typeChart === AscDFH.historyitem_type_AreaChart;
 			
 			if(!isPerspective && (isBar || isLine || isHBar || isPie))
 			{

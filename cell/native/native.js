@@ -3264,7 +3264,7 @@ function OfflineEditor () {
             var chart;
             var controller = this.worksheet.objectRender.controller;
             var selected_objects = controller.selection.groupSelection ? controller.selection.groupSelection.selectedObjects : controller.selectedObjects;
-            if(selected_objects.length === 1 && selected_objects[0].getObjectType() === historyitem_type_ChartSpace)
+            if(selected_objects.length === 1 && selected_objects[0].getObjectType() === AscDFH.historyitem_type_ChartSpace)
             {
                 chart = selected_objects[0];
                 __selectDrawingObjectRange(chart, this.worksheet);
@@ -5801,16 +5801,16 @@ function offline_mouse_down(x, y, pin, isViewerMode, isFormulaEditMode, isRangeR
         var isimage = false;
         var controller = ws.objectRender.controller;
         var selected_objects = controller.selection.groupSelection ? controller.selection.groupSelection.selectedObjects : controller.selectedObjects;
-        if (selected_objects.length === 1 && selected_objects[0].getObjectType() === historyitem_type_ChartSpace) {
+        if (selected_objects.length === 1 && selected_objects[0].getObjectType() === AscDFH.historyitem_type_ChartSpace) {
             ischart = true;
         }
-        else if (selected_objects.length === 1 && selected_objects[0].getObjectType() === historyitem_type_Shape) {
+        else if (selected_objects.length === 1 && selected_objects[0].getObjectType() === AscDFH.historyitem_type_Shape) {
             var shapeObj = selected_objects[0];
             if (shapeObj.spPr && shapeObj.spPr.geometry && shapeObj.spPr.geometry.preset === "line") {
                 window.AscAlwaysSaveAspectOnResizeTrack = false;
             }
         }
-        else if (selected_objects.length === 1 && selected_objects[0].getObjectType() === historyitem_type_ImageShape) {
+        else if (selected_objects.length === 1 && selected_objects[0].getObjectType() === AscDFH.historyitem_type_ImageShape) {
             isimage = true;
         }
 
@@ -6029,7 +6029,7 @@ function offline_get_charts_ranges() {
     var chart;
     var controller = ws.objectRender.controller;
     var selected_objects = controller.selection.groupSelection ? controller.selection.groupSelection.selectedObjects : controller.selectedObjects;
-    if (selected_objects.length === 1 && selected_objects[0].getObjectType() === historyitem_type_ChartSpace) {
+    if (selected_objects.length === 1 && selected_objects[0].getObjectType() === AscDFH.historyitem_type_ChartSpace) {
         chart = selected_objects[0];
         ranges = ranges ? ranges : _api.wb.getWorksheet().__chartsRanges([chart.bbox.seriesBBox]);
         cattbbox = chart.bbox.catBBox ? _api.wb.getWorksheet().__chartsRanges([chart.bbox.catBBox]) : null;

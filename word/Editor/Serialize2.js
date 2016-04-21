@@ -8500,7 +8500,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 
         if(oParaDrawing.GraphicObj)
         {
-            if(oParaDrawing.GraphicObj.getObjectType() !== historyitem_type_ChartSpace)//диаграммы могут быть без spPr
+            if(oParaDrawing.GraphicObj.getObjectType() !== AscDFH.historyitem_type_ChartSpace)//диаграммы могут быть без spPr
             {
                 if(!oParaDrawing.GraphicObj.spPr)
                 {
@@ -8510,7 +8510,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
             if(oParaDrawing.GraphicObj)
             {
                 if(drawing_Anchor == oParaDrawing.DrawingType && typeof History.RecalcData_Add === "function")//TODO некорректная проверка typeof
-                    History.RecalcData_Add( { Type : historyrecalctype_Flow, Data : oParaDrawing});
+                    History.RecalcData_Add( { Type : AscDFH.historyitem_recalctype_Flow, Data : oParaDrawing});
             }
         }
 		oDrawing.content = oParaDrawing;

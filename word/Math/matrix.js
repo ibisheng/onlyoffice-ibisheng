@@ -622,7 +622,7 @@ function CMathMatrix(props)
 }
 AscCommon.extendClass(CMathMatrix, CMatrixBase);
 
-CMathMatrix.prototype.ClassType = historyitem_type_matrix;
+CMathMatrix.prototype.ClassType = AscDFH.historyitem_type_matrix;
 CMathMatrix.prototype.kind      = MATH_MATRIX;
 CMathMatrix.prototype.init = function(props)
 {
@@ -1297,7 +1297,7 @@ function CEqArray(props)
 }
 AscCommon.extendClass(CEqArray, CMatrixBase);
 
-CEqArray.prototype.ClassType = historyitem_type_eqArr;
+CEqArray.prototype.ClassType = AscDFH.historyitem_type_eqArr;
 CEqArray.prototype.kind      = MATH_EQ_ARRAY;
 
 CEqArray.prototype.init = function(props)

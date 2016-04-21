@@ -846,7 +846,7 @@ CComment.prototype =
 {
     getObjectType: function()
     {
-        return historyitem_type_Comment;
+        return AscDFH.historyitem_type_Comment;
     },
 
     hit: function(x, y)
@@ -867,7 +867,7 @@ CComment.prototype =
 
     setPosition: function(x, y)
     {
-        History.Add(this, {Type: historyitem_Comment_Position, oldOffsetX: this.x, newOffsetX: x, oldOffsetY: this.y, newOffsetY: y});
+        History.Add(this, {Type: AscDFH.historyitem_Comment_Position, oldOffsetX: this.x, newOffsetX: x, oldOffsetY: this.y, newOffsetY: y});
         this.x = x;
         this.y = y;
     },
@@ -948,7 +948,7 @@ CComment.prototype =
 
     Set_Data: function(Data)
     {
-        History.Add( this, { Type : historyitem_Comment_Change, New : Data, Old : this.Data } );
+        History.Add( this, { Type : AscDFH.historyitem_Comment_Change, New : Data, Old : this.Data } );
         this.Data = Data;
     },
 
@@ -980,7 +980,7 @@ CComment.prototype =
             Data : Data
         };
 
-        History.Add( this, { Type : historyitem_Comment_TypeInfo, New : New, Old : this.m_oTypeInfo } );
+        History.Add( this, { Type : AscDFH.historyitem_Comment_TypeInfo, New : New, Old : this.m_oTypeInfo } );
 
         this.m_oTypeInfo = New;
 
@@ -1006,20 +1006,20 @@ CComment.prototype =
 
         switch ( Type )
         {
-            case historyitem_Comment_Change:
+            case AscDFH.historyitem_Comment_Change:
             {
                 this.Data = Data.Old;
                 editor.sync_ChangeCommentData( this.Id, this.Data );
                 break;
             }
 
-            case historyitem_Comment_TypeInfo:
+            case AscDFH.historyitem_Comment_TypeInfo:
             {
                 this.m_oTypeInfo = Data.Old;
                 break;
             }
 
-            case historyitem_Comment_Position:
+            case AscDFH.historyitem_Comment_Position:
             {
                 this.x = Data.oldOffsetX;
                 this.y = Data.oldOffsetY;
@@ -1034,20 +1034,20 @@ CComment.prototype =
 
         switch ( Type )
         {
-            case historyitem_Comment_Change:
+            case AscDFH.historyitem_Comment_Change:
             {
                 this.Data = Data.New;
                 editor.sync_ChangeCommentData( this.Id, this.Data );
                 break;
             }
 
-            case historyitem_Comment_TypeInfo:
+            case AscDFH.historyitem_Comment_TypeInfo:
             {
                 this.m_oTypeInfo = Data.New;
                 break;
             }
 
-            case historyitem_Comment_Position:
+            case AscDFH.historyitem_Comment_Position:
             {
                 this.x = Data.newOffsetX;
                 this.y = Data.newOffsetY;
@@ -1075,7 +1075,7 @@ CComment.prototype =
         // Long : тип класса
         // Long : тип изменений
 
-        Writer.WriteLong( historyitem_type_Comment );
+        Writer.WriteLong( AscDFH.historyitem_type_Comment );
 
         var Type = Data.Type;
 
@@ -1084,14 +1084,14 @@ CComment.prototype =
 
         switch ( Type )
         {
-            case historyitem_Comment_Change:
+            case AscDFH.historyitem_Comment_Change:
             {
                 // Variable : Data
                 Data.New.Write_ToBinary2( Writer );
                 break;
             }
 
-            case historyitem_Comment_TypeInfo:
+            case AscDFH.historyitem_Comment_TypeInfo:
             {
                 // Long : тип
                 //  Если comment_type_HdrFtr
@@ -1109,7 +1109,7 @@ CComment.prototype =
 
                 break;
             }
-            case historyitem_Comment_Position:
+            case AscDFH.historyitem_Comment_Position:
             {
                 Writer.WriteBool(isRealNumber(Data.newOffsetX) && isRealNumber(Data.newOffsetY));
                 if(isRealNumber(Data.newOffsetX) && isRealNumber(Data.newOffsetY))
@@ -1130,12 +1130,12 @@ CComment.prototype =
         var Type = Data.Type;
         switch ( Type )
         {
-            case  historyitem_Comment_Change:
+            case  AscDFH.historyitem_Comment_Change:
             {
                 break;
             }
 
-            case  historyitem_Comment_TypeInfo:
+            case  AscDFH.historyitem_Comment_TypeInfo:
             {
                 break;
             }
@@ -1151,14 +1151,14 @@ CComment.prototype =
         // Long : тип изменений
 
         var ClassType = Reader.GetLong();
-        if ( historyitem_type_Comment != ClassType )
+        if ( AscDFH.historyitem_type_Comment != ClassType )
             return;
 
         var Type = Reader.GetLong();
 
         switch ( Type )
         {
-            case historyitem_Comment_Change:
+            case AscDFH.historyitem_Comment_Change:
             {
                 // Variable : Data
                 this.Data.Read_FromBinary2( Reader );
@@ -1166,7 +1166,7 @@ CComment.prototype =
                 break;
             }
 
-            case historyitem_Comment_TypeInfo:
+            case AscDFH.historyitem_Comment_TypeInfo:
             {
                 // Long : тип
                 //  Если comment_type_HdrFtr
@@ -1183,7 +1183,7 @@ CComment.prototype =
                 break;
             }
 
-            case historyitem_Comment_Position:
+            case AscDFH.historyitem_Comment_Position:
             {
                 if(Reader.GetBool())
                 {
@@ -1215,7 +1215,7 @@ CComment.prototype =
 
     Write_ToBinary2: function(Writer)
     {
-        Writer.WriteLong( historyitem_type_Comment );
+        Writer.WriteLong( AscDFH.historyitem_type_Comment );
 
         // String   : Id
         // Variable : Data
