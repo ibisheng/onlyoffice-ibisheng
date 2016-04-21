@@ -7011,7 +7011,7 @@ DrawingObjectsController.prototype =
 
     createImage: function(rasterImageId, x, y, extX, extY)
     {
-        var image = new CImageShape();
+        var image = new AscFormat.CImageShape();
         image.setSpPr(new AscFormat.CSpPr());
         image.spPr.setParent(image);
         image.spPr.setGeometry(AscFormat.CreateGeometry("rect"));

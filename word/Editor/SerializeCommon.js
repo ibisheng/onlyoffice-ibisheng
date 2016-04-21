@@ -436,7 +436,7 @@ function CPPTXContentLoader()
     {
         var s = this.stream;
 
-        var pic = new CImageShape();
+        var pic = new AscFormat.CImageShape();
         pic.setBDeleted(false);
         pic.setParent(this.TempMainObject == null ? this.ParaDrawing : null);
 

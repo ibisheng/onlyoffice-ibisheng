@@ -221,7 +221,7 @@ Slide.prototype =
                     _index = _glyph.nvSpPr.nvPr.ph.idx;
                     _type = _glyph.nvSpPr.nvPr.ph.type;
                 }
-                if(_glyph instanceof CImageShape)
+                if(_glyph instanceof AscFormat.CImageShape)
                 {
                     _index = _glyph.nvPicPr.nvPr.ph.idx;
                     _type = _glyph.nvPicPr.nvPr.ph.type;
@@ -284,7 +284,7 @@ Slide.prototype =
                     {
                         _type = _glyph.nvSpPr.nvPr.ph.type;
                     }
-                    if(_glyph instanceof CImageShape)
+                    if(_glyph instanceof AscFormat.CImageShape)
                     {
                         _type = _glyph.nvPicPr.nvPr.ph.type;
                     }

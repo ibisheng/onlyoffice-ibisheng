@@ -2014,7 +2014,7 @@ CopyProcessor.prototype =
             {
                 this.oPresentationWriter.WriteShape(oGraphicObj);
             }
-            else if(oGraphicObj instanceof CImageShape)
+            else if(oGraphicObj instanceof AscFormat.CImageShape)
             {
                 this.oPresentationWriter.WriteImage(oGraphicObj);
             }

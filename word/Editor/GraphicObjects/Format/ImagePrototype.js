@@ -2,6 +2,7 @@
 
 // Import
 var CShape = AscFormat.CShape;
+var CImageShape = AscFormat.CImageShape;
 
 CImageShape.prototype.Get_Theme = CShape.prototype.Get_Theme;
 CImageShape.prototype.Get_ColorMap = CShape.prototype.Get_ColorMap;

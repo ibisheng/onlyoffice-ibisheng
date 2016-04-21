@@ -2,6 +2,7 @@
 
 // Import
 var CShape = AscFormat.CShape;
+var CImageShape = AscFormat.CImageShape;
 
 CImageShape.prototype.addToDrawingObjects =  CShape.prototype.addToDrawingObjects;
 CImageShape.prototype.setDrawingObjects = CShape.prototype.setDrawingObjects;
