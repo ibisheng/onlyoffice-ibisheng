@@ -1,5 +1,11 @@
 "use strict";
 
+(
+/**
+* @param {Window} window
+* @param {undefined} undefined
+*/
+function (window, undefined) {
 // Import
 var c_oAscSizeRelFromH = AscCommon.c_oAscSizeRelFromH;
 var c_oAscSizeRelFromV = AscCommon.c_oAscSizeRelFromV;
@@ -2156,16 +2162,7 @@ CGroupShape.prototype =
     }
 };
 
-function normalizeRotate(rot)
-{
-    var new_rot = rot;
-    if(AscFormat.isRealNumber(new_rot))
-    {
-        while(new_rot >= 2*Math.PI)
-            new_rot -= 2*Math.PI;
-        while(new_rot < 0)
-            new_rot += 2*Math.PI;
-        return new_rot;
-    }
-    return new_rot;
-}
+    //--------------------------------------------------------export----------------------------------------------------
+    window['AscFormat'] = window['AscFormat'] || {};
+    window['AscFormat'].CGroupShape = CGroupShape;
+})(window);

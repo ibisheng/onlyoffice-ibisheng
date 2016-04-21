@@ -19,6 +19,7 @@
 		"../common/Drawings/Format/Shape.js",
 		"../common/Drawings/Format/Path.js",
 		"../common/Drawings/Format/Image.js",
+		"../common/Drawings/Format/GroupShape.js",
         "../common/Charts/charts.js",
 		
 		"../common/scroll.js",
@@ -83,7 +84,6 @@
         "../common/Drawings/CommonController.js",
         "../cell/view/DrawingObjectsController.js",
         "../slide/Editor/DrawingObjectsController.js",
-        "../common/Drawings/Format/GroupShape.js",
         "../common/Drawings/Format/ChartSpace.js",
         "../common/Drawings/Format/ChartFormat.js",
         "../common/Drawings/Format/TextBody.js",

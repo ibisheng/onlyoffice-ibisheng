@@ -2295,7 +2295,7 @@ CGraphicObjects.prototype =
         var x_arr_max = [], y_arr_max = [];
         for(var i = 0; i < arrDrawings.length; ++i)
         {
-            var rot = normalizeRotate(AscFormat.isRealNumber(arrDrawings[i].rot) ? arrDrawings[i].rot : 0);
+            var rot = AscFormat.normalizeRotate(AscFormat.isRealNumber(arrDrawings[i].rot) ? arrDrawings[i].rot : 0);
             if (checkNormalRotate(rot))
             {
                 l = arrDrawings[i].posX;
@@ -2422,7 +2422,7 @@ CGraphicObjects.prototype =
                     drawing.Set_DrawingType(drawing_Anchor);
                     drawing.Set_WrappingType(cur_group.parent.wrappingType);
                     drawing.CheckWH();
-                    sp.spPr.xfrm.setRot(normalizeRotate(sp.rot + cur_group.rot));
+                    sp.spPr.xfrm.setRot(AscFormat.normalizeRotate(sp.rot + cur_group.rot));
                     sp.spPr.xfrm.setOffX(0);
                     sp.spPr.xfrm.setOffY(0);
                     sp.spPr.xfrm.setFlipH(cur_group.spPr.xfrm.flipH === true ? !(sp.spPr.xfrm.flipH === true) : sp.spPr.xfrm.flipH === true);
@@ -2612,7 +2612,7 @@ CGraphicObjects.prototype =
                                 rel_yc = cur_group.group.invertTransform.TransformPointY(xc, yc);
                                 sp.spPr.xfrm.setOffX(rel_xc - hc);
                                 sp.spPr.xfrm.setOffY(rel_yc - vc);
-                                sp.spPr.xfrm.setRot(normalizeRotate(cur_group.rot + sp.rot));
+                                sp.spPr.xfrm.setRot(AscFormat.normalizeRotate(cur_group.rot + sp.rot));
                                 sp.spPr.xfrm.setFlipH(cur_group.spPr.xfrm.flipH === true ? !(sp.spPr.xfrm.flipH === true) : sp.spPr.xfrm.flipH === true);
                                 sp.spPr.xfrm.setFlipV(cur_group.spPr.xfrm.flipV === true ? !(sp.spPr.xfrm.flipV === true) : sp.spPr.xfrm.flipV === true);
                                 sp.setGroup(cur_group.group);
@@ -2640,7 +2640,7 @@ CGraphicObjects.prototype =
                                 sp = cur_group.spTree[0];
                                 sp.spPr.xfrm.setOffX(0);
                                 sp.spPr.xfrm.setOffY(0);
-                                sp.spPr.xfrm.setRot(normalizeRotate(cur_group.rot + sp.rot));
+                                sp.spPr.xfrm.setRot(AscFormat.normalizeRotate(cur_group.rot + sp.rot));
                                 sp.spPr.xfrm.setFlipH(cur_group.spPr.xfrm.flipH === true ? !(sp.spPr.xfrm.flipH === true) : sp.spPr.xfrm.flipH === true);
                                 sp.spPr.xfrm.setFlipV(cur_group.spPr.xfrm.flipV === true ? !(sp.spPr.xfrm.flipV === true) : sp.spPr.xfrm.flipV === true);
                                 sp.setGroup(null);

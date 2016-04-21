@@ -4938,7 +4938,7 @@ function BinaryPPTYLoader()
     {
         var s = this.stream;
 
-        var shape = new CGroupShape();
+        var shape = new AscFormat.CGroupShape();
         shape.setBDeleted(false);
         this.TempGroupObject = shape;
 

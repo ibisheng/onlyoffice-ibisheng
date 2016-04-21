@@ -486,7 +486,7 @@ function SetXfrmFromMetrics(oDrawing, metrics)
     var rot = AscFormat.isRealNumber(oDrawing.spPr.xfrm.rot) ? normalizeRotate(oDrawing.spPr.xfrm.rot) : 0;
 
     var metricExtX, metricExtY;
-    if(!(oDrawing instanceof CGroupShape))
+    if(!(oDrawing instanceof AscFormat.CGroupShape))
     {
         metricExtX = metrics.extX;
         metricExtY = metrics.extY;
@@ -2439,7 +2439,7 @@ CShape.prototype =
                 var rot = this.spPr && this.spPr.xfrm && AscFormat.isRealNumber(this.spPr.xfrm.rot) ? normalizeRotate(this.spPr.xfrm.rot) : 0;
                 this.rot = rot;
                 var metricExtX, metricExtY;
-                if(!(this instanceof CGroupShape))
+                if(!(this instanceof AscFormat.CGroupShape))
                 {
                     metricExtX = metrics.extX;
                     metricExtY = metrics.extY;
@@ -5791,7 +5791,21 @@ function getParaDrawing(oDrawing)
     return null;
 }
 
-    //----------------------------------------------------------export----------------------------------------------------
+    function normalizeRotate(rot)
+    {
+        var new_rot = rot;
+        if(AscFormat.isRealNumber(new_rot))
+        {
+            while(new_rot >= 2*Math.PI)
+                new_rot -= 2*Math.PI;
+            while(new_rot < 0)
+                new_rot += 2*Math.PI;
+            return new_rot;
+        }
+        return new_rot;
+    }
+
+    //--------------------------------------------------------export----------------------------------------------------
     window['AscFormat'] = window['AscFormat'] || {};
     window['AscFormat'].CheckObjectLine = CheckObjectLine;
     window['AscFormat'].CreateUniFillByUniColorCopy = CreateUniFillByUniColorCopy;
@@ -5802,4 +5816,5 @@ function getParaDrawing(oDrawing)
     window['AscFormat'].CShape = CShape;
     window['AscFormat'].CreateBinaryReader = CreateBinaryReader;
     window['AscFormat'].getParaDrawing = getParaDrawing;
+    window['AscFormat'].normalizeRotate = normalizeRotate;
 })(window);

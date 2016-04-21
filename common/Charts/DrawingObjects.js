@@ -1091,7 +1091,7 @@ function DrawingObjects() {
         if ( _t.isGraphicObject() ) {
 
             var rot = AscFormat.isRealNumber(_t.graphicObject.rot) ? _t.graphicObject.rot : 0;
-            rot = normalizeRotate(rot);
+            rot = AscFormat.normalizeRotate(rot);
 
             var fromX, fromY, toX, toY;
             if (checkNormalRotate(rot))
@@ -1786,7 +1786,7 @@ function DrawingObjects() {
             else if (graphicObject instanceof CChartSpace)
                 printChart(graphicObject, ctx, top, left);
             // Group
-            else if ( graphicObject instanceof CGroupShape )
+            else if ( graphicObject instanceof AscFormat.CGroupShape )
                 printGroup(graphicObject, ctx, top, left);
         }
 
@@ -1868,7 +1868,7 @@ function DrawingObjects() {
 
         function printGroup(graphicObject, ctx, top, left) {
 
-            if ( (graphicObject instanceof CGroupShape) && graphicObject && ctx ) {
+            if ( (graphicObject instanceof AscFormat.CGroupShape) && graphicObject && ctx ) {
                 for ( var i = 0; i < graphicObject.arrGraphicObjects.length; i++ ) {
                     var graphicItem = graphicObject.arrGraphicObjects[i];
 
@@ -2867,7 +2867,7 @@ function DrawingObjects() {
 
 
                         var rot = AscFormat.isRealNumber(obj.graphicObject.spPr.xfrm.rot) ? obj.graphicObject.spPr.xfrm.rot : 0;
-                        rot = normalizeRotate(rot);
+                        rot = AscFormat.normalizeRotate(rot);
                         if (checkNormalRotate(rot))
                         {
                             obj.graphicObject.spPr.xfrm.setOffX(pxToMm(coords.x));
@@ -3655,7 +3655,7 @@ function DrawingObjects() {
                     CheckSpPrXfrm(drawingObject.graphicObject);
 
                     var rot = AscFormat.isRealNumber(drawingObject.graphicObject.spPr.xfrm.rot) ? drawingObject.graphicObject.spPr.xfrm.rot : 0;
-                    rot = normalizeRotate(rot);
+                    rot = AscFormat.normalizeRotate(rot);
                     if (checkNormalRotate(rot)) {
                         drawingObject.graphicObject.spPr.xfrm.setOffX(pxToMm(coords.x));
                         drawingObject.graphicObject.spPr.xfrm.setOffY(pxToMm(coords.y));
@@ -3676,7 +3676,7 @@ function DrawingObjects() {
                     CheckSpPrXfrm(drawingObject.graphicObject);
 
                     var rot = AscFormat.isRealNumber(drawingObject.graphicObject.spPr.xfrm.rot) ? drawingObject.graphicObject.spPr.xfrm.rot : 0;
-                    rot = normalizeRotate(rot);
+                    rot = AscFormat.normalizeRotate(rot);
                     if (checkNormalRotate(rot)) {
                         drawingObject.graphicObject.spPr.xfrm.setOffX(pxToMm(coords.x));
                         drawingObject.graphicObject.spPr.xfrm.setOffY(pxToMm(coords.y));

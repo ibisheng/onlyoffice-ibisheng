@@ -581,7 +581,7 @@ RotateState.prototype =
                             {
                                 drawing = oThis.drawingObjects.selectedObjects[i];
                                 var rot = AscFormat.isRealNumber(drawing.spPr.xfrm.rot) ? drawing.spPr.xfrm.rot : 0;
-                                rot = normalizeRotate(rot);
+                                rot = AscFormat.normalizeRotate(rot);
                                 arr_x2.push(drawing.spPr.xfrm.offX);
                                 arr_y2.push(drawing.spPr.xfrm.offY);
                                 arr_x2.push(drawing.spPr.xfrm.offX + drawing.spPr.xfrm.extX);

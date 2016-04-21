@@ -380,7 +380,7 @@ function CheckSpPrXfrm2(object)
 
 function checkNormalRotate(rot)
 {
-    var _rot = normalizeRotate(rot);
+    var _rot = AscFormat.normalizeRotate(rot);
     return (_rot >= 0 && _rot < Math.PI * 0.25) || (_rot >= 3 * Math.PI * 0.25 && _rot < 5 * Math.PI * 0.25) || (_rot >= 7 * Math.PI * 0.25 && _rot < 2 * Math.PI);
 }
 
@@ -4487,7 +4487,7 @@ DrawingObjectsController.prototype =
                                 rel_yc = cur_group.group.invertTransform.TransformPointY(xc, yc);
                                 sp.spPr.xfrm.setOffX(rel_xc - hc);
                                 sp.spPr.xfrm.setOffY(rel_yc - vc);
-                                sp.spPr.xfrm.setRot(normalizeRotate(cur_group.rot + sp.rot));
+                                sp.spPr.xfrm.setRot(AscFormat.normalizeRotate(cur_group.rot + sp.rot));
                                 sp.spPr.xfrm.setFlipH(cur_group.spPr.xfrm.flipH === true ? !(sp.spPr.xfrm.flipH === true) : sp.spPr.xfrm.flipH === true);
                                 sp.spPr.xfrm.setFlipV(cur_group.spPr.xfrm.flipV === true ? !(sp.spPr.xfrm.flipV === true) : sp.spPr.xfrm.flipV === true);
                                 sp.setGroup(cur_group.group);
@@ -4514,7 +4514,7 @@ DrawingObjectsController.prototype =
                                 sp = cur_group.spTree[0];
                                 sp.spPr.xfrm.setOffX(cur_group.spPr.xfrm.offX + sp.spPr.xfrm.offX);
                                 sp.spPr.xfrm.setOffY(cur_group.spPr.xfrm.offY + sp.spPr.xfrm.offY);
-                                sp.spPr.xfrm.setRot(normalizeRotate(cur_group.rot + sp.rot));
+                                sp.spPr.xfrm.setRot(AscFormat.normalizeRotate(cur_group.rot + sp.rot));
                                 sp.spPr.xfrm.setFlipH(cur_group.spPr.xfrm.flipH === true ? !(sp.spPr.xfrm.flipH === true) : sp.spPr.xfrm.flipH === true);
                                 sp.spPr.xfrm.setFlipV(cur_group.spPr.xfrm.flipV === true ? !(sp.spPr.xfrm.flipV === true) : sp.spPr.xfrm.flipV === true);
                                 sp.setGroup(null);
@@ -5906,7 +5906,7 @@ DrawingObjectsController.prototype =
         var max_y = bounds.maxY;
         var min_x = bounds.minX;
         var min_y = bounds.minY;
-        var group = new CGroupShape();
+        var group = new AscFormat.CGroupShape();
         group.setSpPr(new AscFormat.CSpPr());
         group.spPr.setParent(group);
         group.spPr.setXfrm(new AscFormat.CXfrm());
@@ -5988,7 +5988,7 @@ DrawingObjectsController.prototype =
                 for(j = 0; j < sp_tree.length; ++j)
                 {
                     sp = sp_tree[j];
-                    sp.spPr.xfrm.setRot(normalizeRotate(sp.rot + cur_group.rot));
+                    sp.spPr.xfrm.setRot(AscFormat.normalizeRotate(sp.rot + cur_group.rot));
                     sp.spPr.xfrm.setOffX(sp.spPr.xfrm.offX + cur_group.spPr.xfrm.offX);
                     sp.spPr.xfrm.setOffY(sp.spPr.xfrm.offY + cur_group.spPr.xfrm.offY);
                     sp.spPr.xfrm.setFlipH(cur_group.spPr.xfrm.flipH === true ? !(sp.spPr.xfrm.flipH === true) : sp.spPr.xfrm.flipH === true);
