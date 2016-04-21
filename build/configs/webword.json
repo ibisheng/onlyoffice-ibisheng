@@ -55,7 +55,6 @@
         "../common/Drawings/DrawingObjectsHandlers.js",
         "../common/Drawings/Hit.js",
         "../common/Drawings/Joined.js",
-        "../common/Drawings/Math.js",
         "../common/Drawings/Format/Image.js",
         "../common/Drawings/Format/GroupShape.js",
         "../common/Drawings/Format/ChartSpace.js",

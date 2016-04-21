@@ -75,7 +75,6 @@
         "../cell/view/EventsController.js",
         "../cell/view/WorkbookView.js",
         "../word/Editor/SerializeCommon.js",
-        "../common/Drawings/Math.js",
         "../common/Drawings/ArcTo.js",
         "../word/Drawing/ColorArray.js",
         "../common/Shapes/Serialize.js",

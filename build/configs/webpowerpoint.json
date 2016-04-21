@@ -74,7 +74,6 @@
         "../common/Shapes/Serialize.js",
         "../common/Shapes/SerializeWriter.js",
         "../word/Editor/SerializeCommon.js",
-        "../common/Drawings/Math.js",
         "../common/Drawings/ArcTo.js",
         "../word/Drawing/ColorArray.js",
         "../slide/Editor/Format/Presentation.js",
