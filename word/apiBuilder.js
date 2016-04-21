@@ -58,6 +58,7 @@
     /**
      * Class representing a table.
      * @constructor
+     * @extends {ApiTablePr}
      */
     function ApiTable(Table)
     {
@@ -119,6 +120,7 @@
     /**
      * Class representing a table row.
      * @constructor
+     * @extends {ApiTableRowPr}
      */
     function ApiTableRow(Row)
     {
@@ -128,13 +130,25 @@
     AscCommon.extendClass(ApiTableRow, ApiTableRowPr);
 
     /**
+     * Class representing a table cell proprties.
+     * @constructor
+     */
+    function ApiTableCellPr(Parent, CellPr)
+    {
+        this.Parent = Parent;
+        this.CellPr = CellPr;
+    }
+    /**
      * Class representing a table cell.
      * @constructor
+     * @extends {ApiTableCellPr}
      */
     function ApiTableCell(Cell)
     {
+        ApiTableCell.superclass.constructor.call(this, this, Cell.Pr.Copy());
         this.Cell = Cell;
     }
+    AscCommon.extendClass(ApiTableCell, ApiTableCellPr);
 
     /**
      * Class representing a numbering properties.
@@ -962,62 +976,6 @@
     ApiTableCell.prototype.GetContent = function()
     {
         return new ApiDocument(this.Cell.Content);
-    };
-    /**
-     * Set the preferred width for this cell.
-     * @param {("auto" | "twips" | "percent" | "nil")} sType - Specifies the meaning of the width value.
-     * @param {number} [nValue]
-     */
-    ApiTableCell.prototype.SetWidth = function(sType, nValue)
-    {
-        var CellW = null;
-        if ("auto" === sType)
-            CellW = new CTableMeasurement(tblwidth_Auto, 0);
-        else if ("twips" === sType)
-            CellW = new CTableMeasurement(tblwidth_Mm, private_Twips2MM(nValue));
-        else if ("percent" === sType)
-            CellW = new CTableMeasurement(tblwidth_Pct, nValue);
-
-        if (CellW)
-            this.Cell.Set_W(CellW);
-    };
-    /**
-     * Specify the vertical alignment for text within the current table cell.
-     * @param {("top" | "center" | "bottom")} sType
-     */
-    ApiTableCell.prototype.SetVerticalAlign = function(sType)
-    {
-        if ("top" === sType)
-            this.Cell.Set_VAlign(vertalignjc_Top);
-        else if ("bottom" === sType)
-            this.Cell.Set_VAlign(vertalignjc_Bottom);
-        else if ("center" === sType)
-            this.Cell.Set_VAlign(vertalignjc_Center);
-    };
-    /**
-     * Specify the shading which shall be applied to the extents of the current table cell.
-     * @param {ShdType} sType
-     * @param {byte} r
-     * @param {byte} g
-     * @param {byte} b
-     * @param {boolean} [isAuto=false]
-     */
-    ApiTableCell.prototype.SetShd = function(sType, r, g, b, isAuto)
-    {
-        this.Cell.Set_Shd(private_GetShd(sType, r, g, b, isAuto));
-    };
-    /**
-     * Specify the direction of the text flow for this table cell.
-     * @param {("lrtb" | "tbrl" | "btlr")} sType
-     */
-    ApiTableCell.prototype.SetTextDirection = function(sType)
-    {
-        if ("lrtb" === sType)
-            this.Cell.Set_TextDirection(textdirection_LRTB);
-        else if ("tbrl" === sType)
-            this.Cell.Set_TextDirection(textdirection_TBRL);
-        else if ("btlr" === sType)
-            this.Cell.Set_TextDirection(textdirection_BTLR);
     };
 
     //------------------------------------------------------------------------------------------------------------------
@@ -1970,6 +1928,7 @@
     // ApiTableRowPr
     //
     //------------------------------------------------------------------------------------------------------------------
+
     /**
      * Set the height of the current table row within the current table.
      * @param {("auto" | "atLeast")} sHRule - Specifies the meaning of the height specified for this table row.
@@ -1993,6 +1952,233 @@
     ApiTableRowPr.prototype.SetTableHeader = function(isHeader)
     {
         this.RowPr.TableHeader = private_GetBoolean(isHeader);
+        this.private_OnChange();
+    };
+
+    //------------------------------------------------------------------------------------------------------------------
+    //
+    // ApiTableCellPr
+    //
+    //------------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Specify the shading which shall be applied to the extents of the current table cell.
+     * @param {ShdType} sType
+     * @param {byte} r
+     * @param {byte} g
+     * @param {byte} b
+     * @param {boolean} [isAuto=false]
+     */
+    ApiTableCellPr.prototype.SetShd = function(sType, r, g, b, isAuto)
+    {
+        this.CellPr.Shd = private_GetShd(sType, r, g, b, isAuto);
+        this.private_OnChange();
+    };
+    /**
+     * Specifies the amount of space which shall be left between the bottom extent of the cell contents and the border
+     * of a specific table cell within a table.
+     * @param {?twips} nValue - If this value is <code>null</code>, then default table cell bottom margin shall be used,
+     * otherwise override the table cell bottom margin with specified value for the current cell.
+     */
+    ApiTableCellPr.prototype.SetCellMarginBottom = function(nValue)
+    {
+        if (!this.CellPr.TableCellMar)
+        {
+            this.CellPr.TableCellMar =
+            {
+                Bottom : undefined,
+                Left   : undefined,
+                Right  : undefined,
+                Top    : undefined
+            };
+        }
+
+        if (null === nValue)
+            this.CellPr.TableCellMar.Bottom = undefined;
+        else
+            this.CellPr.TableCellMar.Bottom = private_GetTableMeasure("twips", nValue);
+        this.private_OnChange();
+    };
+    /**
+     * Specifies the amount of space which shall be left between the left extent of the current cell contents and the
+     * left edge border of a specific individual table cell within a table.
+     * @param {?twips} nValue - If this value is <code>null</code>, then default table cell bottom margin shall be used,
+     * otherwise override the table cell bottom margin with specified value for the current cell.
+     */
+    ApiTableCellPr.prototype.SetCellMarginLeft = function(nValue)
+    {
+        if (!this.CellPr.TableCellMar)
+        {
+            this.CellPr.TableCellMar =
+            {
+                Bottom : undefined,
+                Left   : undefined,
+                Right  : undefined,
+                Top    : undefined
+            };
+        }
+
+        if (null === nValue)
+            this.CellPr.TableCellMar.Left = undefined;
+        else
+            this.CellPr.TableCellMar.Left = private_GetTableMeasure("twips", nValue);
+        this.private_OnChange();
+    };
+    /**
+     * Specifies the amount of space which shall be left between the right extent of the current cell contents and the
+     * right edge border of a specific individual table cell within a table.
+     * @param {?twips} nValue - If this value is <code>null</code>, then default table cell bottom margin shall be used,
+     * otherwise override the table cell bottom margin with specified value for the current cell.
+     */
+    ApiTableCellPr.prototype.SetCellMarginRight = function(nValue)
+    {
+        if (!this.CellPr.TableCellMar)
+        {
+            this.CellPr.TableCellMar =
+            {
+                Bottom : undefined,
+                Left   : undefined,
+                Right  : undefined,
+                Top    : undefined
+            };
+        }
+
+        if (null === nValue)
+            this.CellPr.TableCellMar.Right = undefined;
+        else
+            this.CellPr.TableCellMar.Right = private_GetTableMeasure("twips", nValue);
+        this.private_OnChange();
+    };
+    /**
+     * Specifies the amount of space which shall be left between the top extent of the current cell contents and the
+     * top edge border of a specific individual table cell within a table.
+     * @param {?twips} nValue - If this value is <code>null</code>, then default table cell bottom margin shall be used,
+     * otherwise override the table cell bottom margin with specified value for the current cell.
+     */
+    ApiTableCellPr.prototype.SetCellMarginTop = function(nValue)
+    {
+        if (!this.CellPr.TableCellMar)
+        {
+            this.CellPr.TableCellMar =
+            {
+                Bottom : undefined,
+                Left   : undefined,
+                Right  : undefined,
+                Top    : undefined
+            };
+        }
+
+        if (null === nValue)
+            this.CellPr.TableCellMar.Top = undefined;
+        else
+            this.CellPr.TableCellMar.Top = private_GetTableMeasure("twips", nValue);
+        this.private_OnChange();
+    };
+    /**
+     * Set the border which shall be displayed at the bottom of the current table cell.
+     * @param {BorderType} sType - The style of border.
+     * @param {pt_8} nSize - The width of the current border.
+     * @param {pt} nSpace - The spacing offset that shall be used to place this border.
+     * @param {byte} r
+     * @param {byte} g
+     * @param {byte} b
+     */
+    ApiTableCellPr.prototype.SetCellBorderBottom = function(sType, nSize, nSpace, r, g, b)
+    {
+        this.CellPr.TableCellBorders.Bottom = private_GetTableBorder(sType, nSize, nSpace, r, g, b);
+        this.private_OnChange();
+    };
+    /**
+     * Set the border which shall be displayed on the left edge of the current table cell.
+     * @param {BorderType} sType - The style of border.
+     * @param {pt_8} nSize - The width of the current border.
+     * @param {pt} nSpace - The spacing offset that shall be used to place this border.
+     * @param {byte} r
+     * @param {byte} g
+     * @param {byte} b
+     */
+    ApiTableCellPr.prototype.SetCellBorderLeft = function(sType, nSize, nSpace, r, g, b)
+    {
+        this.CellPr.TableCellBorders.Left = private_GetTableBorder(sType, nSize, nSpace, r, g, b);
+        this.private_OnChange();
+    };
+    /**
+     * Set the border which shall be displayed on the right edge of the current table cell.
+     * @param {BorderType} sType - The style of border.
+     * @param {pt_8} nSize - The width of the current border.
+     * @param {pt} nSpace - The spacing offset that shall be used to place this border.
+     * @param {byte} r
+     * @param {byte} g
+     * @param {byte} b
+     */
+    ApiTableCellPr.prototype.SetCellBorderRight = function(sType, nSize, nSpace, r, g, b)
+    {
+        this.CellPr.TableCellBorders.Right = private_GetTableBorder(sType, nSize, nSpace, r, g, b);
+        this.private_OnChange();
+    };
+    /**
+     * Set the border which shall be displayed at the top of the current table cell.
+     * @param {BorderType} sType - The style of border.
+     * @param {pt_8} nSize - The width of the current border.
+     * @param {pt} nSpace - The spacing offset that shall be used to place this border.
+     * @param {byte} r
+     * @param {byte} g
+     * @param {byte} b
+     */
+    ApiTableCellPr.prototype.SetCellBorderTop = function(sType, nSize, nSpace, r, g, b)
+    {
+        this.CellPr.TableCellBorders.Top = private_GetTableBorder(sType, nSize, nSpace, r, g, b);
+        this.private_OnChange();
+    };
+    /**
+     * Set the preferred width for this cell.
+     * @param {TableWidth} sType - Specifies the meaning of the width value.
+     * @param {number} [nValue]
+     */
+    ApiTableCellPr.prototype.SetWidth = function(sType, nValue)
+    {
+        this.CellPr.TableCellW = private_GetTableMeasure(sType, nValue);
+        this.private_OnChange();
+    };
+    /**
+     * Specify the vertical alignment for text within the current table cell.
+     * @param {("top" | "center" | "bottom")} sType
+     */
+    ApiTableCellPr.prototype.SetVerticalAlign = function(sType)
+    {
+        if ("top" === sType)
+            this.CellPr.VAlign = vertalignjc_Top;
+        else if ("bottom" === sType)
+            this.CellPr.VAlign = vertalignjc_Bottom;
+        else if ("center" === sType)
+            this.CellPr.VAlign = vertalignjc_Center;
+        
+        this.private_OnChange();
+    };
+    /**
+     * Specify the direction of the text flow for this table cell.
+     * @param {("lrtb" | "tbrl" | "btlr")} sType
+     */
+    ApiTableCellPr.prototype.SetTextDirection = function(sType)
+    {
+        if ("lrtb" === sType)
+            this.CellPr.TextDirection = textdirection_LRTB;
+        else if ("tbrl" === sType)
+            this.CellPr.TextDirection = textdirection_TBRL;
+        else if ("btlr" === sType)
+            this.CellPr.TextDirection = textdirection_BTLR;
+
+        this.private_OnChange();
+    };
+    /**
+     * Specifies how this table cell shall be laid out when the parent table is displayed in a document. This setting
+     * only affects the behavior of the cell when the table layout for this table {@link ApiTablePr#SetTableLayout} is
+     * set to use the <code>"autofit"</code> algorithm.
+     * @param {boolean} isNoWrap
+     */
+    ApiTableCellPr.prototype.SetNoWrap = function(isNoWrap)
+    {
+        this.CellPr.NoWrap = private_GetBoolean(isNoWrap);
         this.private_OnChange();
     };
 
@@ -2054,16 +2240,24 @@
     ApiTableRow.prototype["GetCell"]                 = ApiTableRow.prototype.GetCell;
 
     ApiTableCell.prototype["GetContent"]             = ApiTableCell.prototype.GetContent;
-    ApiTableCell.prototype["SetWidth"]               = ApiTableCell.prototype.SetWidth;
-    ApiTableCell.prototype["SetVerticalAlign"]       = ApiTableCell.prototype.SetVerticalAlign;
-    ApiTableCell.prototype["SetShd"]                 = ApiTableCell.prototype.SetShd;
-    ApiTableCell.prototype["SetTextDirection"]       = ApiTableCell.prototype.SetTextDirection;
 
     ApiStyle.prototype["GetName"]                    = ApiStyle.prototype.GetName;
     ApiStyle.prototype["SetName"]                    = ApiStyle.prototype.SetName;
     ApiStyle.prototype["GetType"]                    = ApiStyle.prototype.GetType;
     ApiStyle.prototype["GetTextPr"]                  = ApiStyle.prototype.GetTextPr;
     ApiStyle.prototype["GetParaPr"]                  = ApiStyle.prototype.GetParaPr;
+
+    ApiNumbering.prototype["GetLevel"]               = ApiNumbering.prototype.GetLevel;
+
+    ApiNumberingLevel.prototype["GetNumbering"]      = ApiNumberingLevel.prototype.GetNumbering;
+    ApiNumberingLevel.prototype["GetLevelIndex"]     = ApiNumberingLevel.prototype.GetLevelIndex;
+    ApiNumberingLevel.prototype["GetTextPr"]         = ApiNumberingLevel.prototype.GetTextPr;
+    ApiNumberingLevel.prototype["GetParaPr"]         = ApiNumberingLevel.prototype.GetParaPr;
+    ApiNumberingLevel.prototype["SetTemplateType"]   = ApiNumberingLevel.prototype.SetTemplateType;
+    ApiNumberingLevel.prototype["SetCustomType"]     = ApiNumberingLevel.prototype.SetCustomType;
+    ApiNumberingLevel.prototype["SetRestart"]        = ApiNumberingLevel.prototype.SetRestart;
+    ApiNumberingLevel.prototype["SetStart"]          = ApiNumberingLevel.prototype.SetStart;
+    ApiNumberingLevel.prototype["SetSuff"]           = ApiNumberingLevel.prototype.SetSuff;
 
     ApiTextPr.prototype["SetStyle"]                  = ApiTextPr.prototype.SetStyle;
     ApiTextPr.prototype["SetBold"]                   = ApiTextPr.prototype.SetBold;
@@ -2105,18 +2299,6 @@
     ApiParaPr.prototype["SetTabs"]                   = ApiParaPr.prototype.SetTabs;
     ApiParaPr.prototype["SetNumPr"]                  = ApiParaPr.prototype.SetNumPr;
 
-    ApiNumbering.prototype["GetLevel"]               = ApiNumbering.prototype.GetLevel;
-    
-    ApiNumberingLevel.prototype["GetNumbering"]      = ApiNumberingLevel.prototype.GetNumbering;
-    ApiNumberingLevel.prototype["GetLevelIndex"]     = ApiNumberingLevel.prototype.GetLevelIndex;
-    ApiNumberingLevel.prototype["GetTextPr"]         = ApiNumberingLevel.prototype.GetTextPr;
-    ApiNumberingLevel.prototype["GetParaPr"]         = ApiNumberingLevel.prototype.GetParaPr;
-    ApiNumberingLevel.prototype["SetTemplateType"]   = ApiNumberingLevel.prototype.SetTemplateType;
-    ApiNumberingLevel.prototype["SetCustomType"]     = ApiNumberingLevel.prototype.SetCustomType;
-    ApiNumberingLevel.prototype["SetRestart"]        = ApiNumberingLevel.prototype.SetRestart;
-    ApiNumberingLevel.prototype["SetStart"]          = ApiNumberingLevel.prototype.SetStart;
-    ApiNumberingLevel.prototype["SetSuff"]           = ApiNumberingLevel.prototype.SetSuff;
-
     ApiTablePr.prototype["SetStyleColBandSize"]      = ApiTablePr.prototype.SetStyleColBandSize;
     ApiTablePr.prototype["SetStyleRowBandSize"]      = ApiTablePr.prototype.SetStyleRowBandSize;
     ApiTablePr.prototype["SetJc"]                    = ApiTablePr.prototype.SetJc;
@@ -2138,6 +2320,20 @@
 
     ApiTableRowPr.prototype["SetHeight"]             = ApiTableRowPr.prototype.SetHeight;
     ApiTableRowPr.prototype["SetTableHeader"]        = ApiTableRowPr.prototype.SetTableHeader;
+
+    ApiTableCellPr.prototype["SetShd"]               = ApiTableCellPr.prototype.SetShd;
+    ApiTableCellPr.prototype["SetCellMarginBottom"]  = ApiTableCellPr.prototype.SetCellMarginBottom;
+    ApiTableCellPr.prototype["SetCellMarginLeft"]    = ApiTableCellPr.prototype.SetCellMarginLeft;
+    ApiTableCellPr.prototype["SetCellMarginRight"]   = ApiTableCellPr.prototype.SetCellMarginRight;
+    ApiTableCellPr.prototype["SetCellMarginTop"]     = ApiTableCellPr.prototype.SetCellMarginTop;
+    ApiTableCellPr.prototype["SetCellBorderBottom"]  = ApiTableCellPr.prototype.SetCellBorderBottom;
+    ApiTableCellPr.prototype["SetCellBorderLeft"]    = ApiTableCellPr.prototype.SetCellBorderLeft;
+    ApiTableCellPr.prototype["SetCellBorderRight"]   = ApiTableCellPr.prototype.SetCellBorderRight;
+    ApiTableCellPr.prototype["SetCellBorderTop"]     = ApiTableCellPr.prototype.SetCellBorderTop;
+    ApiTableCellPr.prototype["SetWidth"]             = ApiTableCellPr.prototype.SetWidth;
+    ApiTableCellPr.prototype["SetVerticalAlign"]     = ApiTableCellPr.prototype.SetVerticalAlign;
+    ApiTableCellPr.prototype["SetTextDirection"]     = ApiTableCellPr.prototype.SetTextDirection;
+    ApiTableCellPr.prototype["SetNoWrap"]            = ApiTableCellPr.prototype.SetNoWrap;
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Private area
@@ -2365,6 +2561,11 @@
         this.Row.Set_Pr(oApiTableRowPr.RowPr);
         oApiTableRowPr.RowPr = this.Row.Pr.Copy();
     };
+    ApiTableCell.prototype.OnChangeTableCellPr = function(oApiTableCellPr)
+    {
+        this.Cell.Set_Pr(oApiTableCellPr.CellPr);
+        oApiTableCellPr.CellPr = this.Cell.Pr.Copy();
+    };
     ApiTextPr.prototype.private_OnChange = function()
     {
         this.Parent.OnChangeTextPr(this);
@@ -2380,6 +2581,10 @@
     ApiTableRowPr.prototype.private_OnChange = function()
     {
         this.Parent.OnChangeTableRowPr(this);
+    };
+    ApiTableCellPr.prototype.private_OnChange = function()
+    {
+        this.Parent.OnChangeTableCellPr(this);
     };
 
 }(window, null));
@@ -2895,11 +3100,12 @@ function TEST_BUILDER2()
     //------------------------------------------------------------------------------------------------------------------
     var Api = editor;
     var oDocument  = Api.GetDocument();
+    var oParagraph, oTable, oTableRow, oCell, oCellContent;
 
     //------------------------------------------------------------------------------------------------------------------
     // TextPr
     //------------------------------------------------------------------------------------------------------------------
-    var oParagraph = Api.CreateParagraph();
+    oParagraph = Api.CreateParagraph();
     oDocument.Push(oParagraph);
 
     oParagraph.AddText("Plain");
@@ -3133,7 +3339,7 @@ function TEST_BUILDER2()
     //------------------------------------------------------------------------------------------------------------------
     // TablePr
     //------------------------------------------------------------------------------------------------------------------
-    var oTable = Api.CreateTable(3, 3);
+    oTable = Api.CreateTable(3, 3);
     oDocument.Push(oTable);
     oTable.SetJc("left");
 
@@ -3202,7 +3408,7 @@ function TEST_BUILDER2()
     //------------------------------------------------------------------------------------------------------------------
     oTable = Api.CreateTable(3, 3);
     oDocument.Push(oTable);
-    var oTableRow = oTable.GetRow(0);
+    oTableRow = oTable.GetRow(0);
     oTableRow.SetHeight("auto");
     oTableRow = oTable.GetRow(1);
     oTableRow.SetHeight("atLeast", 1000);
@@ -3218,6 +3424,85 @@ function TEST_BUILDER2()
     //------------------------------------------------------------------------------------------------------------------
     // TableCellPr
     //------------------------------------------------------------------------------------------------------------------
+    oTable = Api.CreateTable(3, 3);
+    oDocument.Push(oTable);
+    oTableRow = oTable.GetRow(0);
+    oCell = oTableRow.GetCell(1);
+    oCell.SetShd("clear", 255, 0, 0);
+    oTableRow = oTable.GetRow(1);
+    oCell = oTableRow.GetCell(0);
+    oCell.SetCellBorderTop("single", 32, 0, 0, 255, 0);
+    oCell.SetCellBorderBottom("single", 64, 0, 0, 255, 0);
+    oCell.SetCellBorderLeft("single", 32, 0, 0, 0, 255);
+    oCell.SetCellBorderRight("single", 16, 0, 0, 0, 255);
+
+    oTable = Api.CreateTable(3, 3);
+    oDocument.Push(oTable);
+    oTableRow = oTable.GetRow(0);
+    oCell = oTableRow.GetCell(1);
+    oCell.SetCellMarginBottom(300);
+    oCell.SetCellMarginLeft(100);
+    oCell.SetCellMarginRight(null);
+    oCell.SetCellMarginTop(400);
+
+    oTable = Api.CreateTable(3, 3);
+    oDocument.Push(oTable);
+    oTableRow = oTable.GetRow(0);
+    oCell = oTableRow.GetCell(0);
+    oCell.SetWidth("twips", 2000);
+    oTableRow = oTable.GetRow(1);
+    oTableRow.SetHeight("atLeast", 2000);
+    oCell = oTableRow.GetCell(0);
+    oCell.SetVerticalAlign("top");
+    oCellContent = oCell.GetContent();
+    oParagraph = oCellContent.GetElement(0);
+    oParagraph.AddText("Top");
+    oCell = oTableRow.GetCell(1);
+    oCell.SetVerticalAlign("center");
+    oCellContent = oCell.GetContent();
+    oParagraph = oCellContent.GetElement(0);
+    oParagraph.AddText("Center");
+    oCell = oTableRow.GetCell(2);
+    oCell.SetVerticalAlign("bottom");
+    oCellContent = oCell.GetContent();
+    oParagraph = oCellContent.GetElement(0);
+    oParagraph.AddText("Bottom");
+    oTableRow = oTable.GetRow(2);
+    oCell = oTableRow.GetCell(0);
+    oCell.SetTextDirection("lrtb");
+    oCellContent = oCell.GetContent();
+    oParagraph = oCellContent.GetElement(0);
+    oParagraph.AddText("left to right");
+    oParagraph.AddLineBreak();
+    oParagraph.AddText("top to bottom");
+    oCell = oTableRow.GetCell(1);
+    oCell.SetTextDirection("tbrl");
+    oCellContent = oCell.GetContent();
+    oParagraph = oCellContent.GetElement(0);
+    oParagraph.AddText("top to bottom");
+    oParagraph.AddLineBreak();
+    oParagraph.AddText("right to left");
+    oCell = oTableRow.GetCell(2);
+    oCell.SetTextDirection("btlr");
+    oCellContent = oCell.GetContent();
+    oParagraph = oCellContent.GetElement(0);
+    oParagraph.AddText("bottom to top");
+    oParagraph.AddLineBreak();
+    oParagraph.AddText("left to right");
+
+    oTable = Api.CreateTable(3, 3);
+    oDocument.Push(oTable);
+    oTableRow = oTable.GetRow(0);
+    oCell = oTableRow.GetCell(0);
+    oCell.SetNoWrap(false);
+    oCellContent = oCell.GetContent();
+    oParagraph = oCellContent.GetElement(0);
+    oParagraph.AddText("Wrap Wrap Wrap Wrap Wrap Wrap Wrap Wrap Wrap");
+    oCell = oTableRow.GetCell(1);
+    oCell.SetNoWrap(true);
+    oCellContent = oCell.GetContent();
+    oParagraph = oCellContent.GetElement(0);
+    oParagraph.AddText("No wrap No wrap No wrap No wrap No wrap No wrap No wrap");
 
     //------------------------------------------------------------------------------------------------------------------
     oLD.Recalculate_FromStart();
