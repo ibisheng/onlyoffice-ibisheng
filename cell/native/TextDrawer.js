@@ -137,12 +137,12 @@ CDocContentStructure.prototype.checkByWarpStruct = function(oWarpStruct, dWidth,
                 var bArcDown = "textArchDown" !== oWarpStruct.preset && i < 1;
                 if(!AscFormat.isRealNumber(oWarpedObject.x) || !AscFormat.isRealNumber(oWarpedObject.y) )
                 {
-                    CheckGeometryByPolygon(oWarpedObject, oPolygon, bArcDown, XLimit*dKoeff, dContentHeight, dKoeff, nDivCount > 1 ? oBoundsChecker.Bounds : null);
+                    CheckAscFormat.GeometryByPolygon(oWarpedObject, oPolygon, bArcDown, XLimit*dKoeff, dContentHeight, dKoeff, nDivCount > 1 ? oBoundsChecker.Bounds : null);
                 }
                 else
                 {
                     oNextPointOnPolygon = this.checkTransformByOddPath(oMatrix, oWarpedObject, aWarpedObjects[t+1], oNextPointOnPolygon, dContentHeight, dKoeff, bArcDown, oPolygon, XLimit);
-                    TransformGeometry(oWarpedObject, oMatrix);
+                    TransformAscFormat.Geometry(oWarpedObject, oMatrix);
                 }
             }
         }
@@ -1197,7 +1197,7 @@ CTextDrawer.prototype =
                         {
                             if(oLastCommand.m_aContent.length === 0)
                             {
-                                oLastCommand.m_aContent.push(new ObjectToDraw(this.GetFillFromTextPr(this.m_oTextPr), this.GetPenFromTextPr(this.m_oTextPr), this.Width, this.Height, new Geometry(), this.m_oTransform, x, y, this.m_oCurComment));
+                                oLastCommand.m_aContent.push(new ObjectToDraw(this.GetFillFromTextPr(this.m_oTextPr), this.GetPenFromTextPr(this.m_oTextPr), this.Width, this.Height, new AscFormat.Geometry(), this.m_oTransform, x, y, this.m_oCurComment));
                             }
                             oLastObjectToDraw = oLastCommand.m_aContent[oLastCommand.m_aContent.length - 1];
 
@@ -1209,7 +1209,7 @@ CTextDrawer.prototype =
                                 }
                                 else
                                 {
-                                    oLastCommand.m_aContent.push(new ObjectToDraw(this.GetFillFromTextPr(this.m_oTextPr), this.GetPenFromTextPr(this.m_oTextPr), this.Width, this.Height, new Geometry(), this.m_oTransform, x, y));
+                                    oLastCommand.m_aContent.push(new ObjectToDraw(this.GetFillFromTextPr(this.m_oTextPr), this.GetPenFromTextPr(this.m_oTextPr), this.Width, this.Height, new AscFormat.Geometry(), this.m_oTransform, x, y));
                                     oLastObjectToDraw = oLastCommand.m_aContent[oLastCommand.m_aContent.length - 1];
                                 }
                             }
@@ -1219,7 +1219,7 @@ CTextDrawer.prototype =
                         {
                             if(oLastCommand.m_aBorders.length === 0)
                             {
-                                oLastCommand.m_aBorders.push(new ObjectToDraw(this.m_oFill, this.m_oLine, this.Width, this.Height, new Geometry(), this.m_oTransform, x, y))
+                                oLastCommand.m_aBorders.push(new ObjectToDraw(this.m_oFill, this.m_oLine, this.Width, this.Height, new AscFormat.Geometry(), this.m_oTransform, x, y))
                             }
                             oLastObjectToDraw = oLastCommand.m_aBorders[oLastCommand.m_aBorders.length - 1];
 
@@ -1231,7 +1231,7 @@ CTextDrawer.prototype =
                                 }
                                 else
                                 {
-                                    oLastCommand.m_aBorders.push(new ObjectToDraw(this.m_oFill, this.m_oLine, this.Width, this.Height, new Geometry(), this.m_oTransform, x, y));
+                                    oLastCommand.m_aBorders.push(new ObjectToDraw(this.m_oFill, this.m_oLine, this.Width, this.Height, new AscFormat.Geometry(), this.m_oTransform, x, y));
                                     oLastObjectToDraw = oLastCommand.m_aBorders[oLastCommand.m_aBorders.length - 1];
                                 }
                             }
@@ -1241,7 +1241,7 @@ CTextDrawer.prototype =
                         {
                             if(oLastCommand.m_aBackgrounds.length === 0)
                             {
-                                oLastCommand.m_aBackgrounds.push(new ObjectToDraw(this.m_oFill, this.m_oLine, this.Width, this.Height, new Geometry(), this.m_oTransform, x, y))
+                                oLastCommand.m_aBackgrounds.push(new ObjectToDraw(this.m_oFill, this.m_oLine, this.Width, this.Height, new AscFormat.Geometry(), this.m_oTransform, x, y))
                             }
                             oLastObjectToDraw = oLastCommand.m_aBackgrounds[oLastCommand.m_aBackgrounds.length - 1];
 
@@ -1253,7 +1253,7 @@ CTextDrawer.prototype =
                                 }
                                 else
                                 {
-                                    oLastCommand.m_aBackgrounds.push(new ObjectToDraw(this.m_oFill, this.m_oLine, this.Width, this.Height, new Geometry(), this.m_oTransform, x, y));
+                                    oLastCommand.m_aBackgrounds.push(new ObjectToDraw(this.m_oFill, this.m_oLine, this.Width, this.Height, new AscFormat.Geometry(), this.m_oTransform, x, y));
                                     oLastObjectToDraw = oLastCommand.m_aBackgrounds[oLastCommand.m_aBackgrounds.length - 1];
                                 }
                             }
@@ -1265,7 +1265,7 @@ CTextDrawer.prototype =
                             {
                                 oBrushColor = this.m_oBrush.Color1;
                                 oPenColor = this.m_oPen.Color;
-                                oLastCommand.m_aUnderlinesStrikeouts.push(new ObjectToDraw(this.GetFillFromTextPr(this.m_oTextPr), this.GetPenFromTextPr(this.m_oTextPr), this.Width, this.Height, new Geometry(), this.m_oTransform, x, y))
+                                oLastCommand.m_aUnderlinesStrikeouts.push(new ObjectToDraw(this.GetFillFromTextPr(this.m_oTextPr), this.GetPenFromTextPr(this.m_oTextPr), this.Width, this.Height, new AscFormat.Geometry(), this.m_oTransform, x, y))
                             }
                             oLastObjectToDraw = oLastCommand.m_aUnderlinesStrikeouts[oLastCommand.m_aUnderlinesStrikeouts.length - 1];
 
@@ -1277,7 +1277,7 @@ CTextDrawer.prototype =
                                 }
                                 else
                                 {
-                                    oLastCommand.m_aUnderlinesStrikeouts.push(new ObjectToDraw(this.GetFillFromTextPr(this.m_oTextPr), this.GetPenFromTextPr(this.m_oTextPr), this.Width, this.Height, new Geometry(), this.m_oTransform, x, y));
+                                    oLastCommand.m_aUnderlinesStrikeouts.push(new ObjectToDraw(this.GetFillFromTextPr(this.m_oTextPr), this.GetPenFromTextPr(this.m_oTextPr), this.Width, this.Height, new AscFormat.Geometry(), this.m_oTransform, x, y));
                                     oLastObjectToDraw = oLastCommand.m_aUnderlinesStrikeouts[oLastCommand.m_aUnderlinesStrikeouts.length - 1];
                                 }
                             }
@@ -1287,7 +1287,7 @@ CTextDrawer.prototype =
                         {
                             if(oLastCommand.m_aParagraphBackgrounds.length === 0)
                             {
-                                oLastCommand.m_aParagraphBackgrounds.push(new ObjectToDraw(this.m_oFill, this.m_oLine, this.Width, this.Height, new Geometry(), this.m_oTransform, x, y))
+                                oLastCommand.m_aParagraphBackgrounds.push(new ObjectToDraw(this.m_oFill, this.m_oLine, this.Width, this.Height, new AscFormat.Geometry(), this.m_oTransform, x, y))
                             }
                             oLastObjectToDraw = oLastCommand.m_aParagraphBackgrounds[oLastCommand.m_aParagraphBackgrounds.length - 1];
 
@@ -1299,7 +1299,7 @@ CTextDrawer.prototype =
                                 }
                                 else
                                 {
-                                    oLastCommand.m_aParagraphBackgrounds.push(new ObjectToDraw(this.m_oFill, this.m_oLine, this.Width, this.Height, new Geometry(), this.m_oTransform, x, y));
+                                    oLastCommand.m_aParagraphBackgrounds.push(new ObjectToDraw(this.m_oFill, this.m_oLine, this.Width, this.Height, new AscFormat.Geometry(), this.m_oTransform, x, y));
                                     oLastObjectToDraw = oLastCommand.m_aParagraphBackgrounds[oLastCommand.m_aParagraphBackgrounds.length - 1];
                                 }
                             }
@@ -1314,7 +1314,7 @@ CTextDrawer.prototype =
                     {
                         oBrushColor = this.m_oBrush.Color1;
                         oPenColor = this.m_oPen.Color;
-                        oLastCommand.m_aBorders.push(new ObjectToDraw(this.m_oFill, this.m_oLine, this.Width, this.Height, new Geometry(), this.m_oTransform, x, y));
+                        oLastCommand.m_aBorders.push(new ObjectToDraw(this.m_oFill, this.m_oLine, this.Width, this.Height, new AscFormat.Geometry(), this.m_oTransform, x, y));
                     }
                     oLastObjectToDraw = oLastCommand.m_aBorders[oLastCommand.m_aBorders.length - 1];
 
@@ -1326,7 +1326,7 @@ CTextDrawer.prototype =
                         }
                         else
                         {
-                            oLastCommand.m_aBorders.push(new ObjectToDraw(this.m_oFill, this.m_oLine, this.Width, this.Height, new Geometry(), this.m_oTransform, x, y));
+                            oLastCommand.m_aBorders.push(new ObjectToDraw(this.m_oFill, this.m_oLine, this.Width, this.Height, new AscFormat.Geometry(), this.m_oTransform, x, y));
                             oLastObjectToDraw = oLastCommand.m_aBorders[oLastCommand.m_aBorders.length - 1];
                         }
                     }
@@ -1412,14 +1412,14 @@ CTextDrawer.prototype =
     {
         if(this.bCheckLines)
         {
-            if(Math.abs(x - this.lastX) < EPSILON_TEXT_AUTOFIT && Math.abs(x - this.lastX) < Math.abs(y - this.lastY))
+            if(Math.abs(x - this.lastX) < AscFormat.EPSILON_TEXT_AUTOFIT && Math.abs(x - this.lastX) < Math.abs(y - this.lastY))
             {
                 this.checkCurveBezier(this.lastX, this.lastY, this.lastX, this.lastY  + (y - this.lastY)/3, this.lastX, this.lastY + 2*(y - this.lastY)/3, x, y, PATH_DIV_EPSILON);
                 this.lastX = x;
                 this.lastY = y;
                 return;
             }
-            else if(Math.abs(y - this.lastY) < EPSILON_TEXT_AUTOFIT && Math.abs(y - this.lastY) < Math.abs(x - this.lastX))
+            else if(Math.abs(y - this.lastY) < AscFormat.EPSILON_TEXT_AUTOFIT && Math.abs(y - this.lastY) < Math.abs(x - this.lastX))
             {
                 this.checkCurveBezier(this.lastX, this.lastY, this.lastX + (x - this.lastX)/3, this.lastY, this.lastX + 2*(x - this.lastX)/3, this.lastY, x, y, PATH_DIV_EPSILON);
                 this.lastX = x;
@@ -2157,22 +2157,22 @@ PolygonWrapper.prototype.getPointOnPolygon = function(dCT, bNeedPoints)
         var nRightIndex = nTempIndex, nLeftIndex = nIndex;
         var oLeftPoint = oPoint1, oRightPoint = oPoint2;
         var dx = oPoint1.x - oPoint2.x, dy = oPoint1.y - oPoint2.y;
-        while(nRightIndex + 1 < this.oPolygon.length && Math.abs(dx) < EPSILON_TEXT_AUTOFIT && Math.abs(dy) < EPSILON_TEXT_AUTOFIT)
+        while(nRightIndex + 1 < this.oPolygon.length && Math.abs(dx) < AscFormat.EPSILON_TEXT_AUTOFIT && Math.abs(dy) < AscFormat.EPSILON_TEXT_AUTOFIT)
         {
 
             dx =  oRightPoint.x - oLeftPoint.x;
             dy =  oRightPoint.y - oLeftPoint.y;
             oRightPoint = this.oPolygon[++nRightIndex]
         }
-        while(nLeftIndex > 0 && Math.abs(dx) < EPSILON_TEXT_AUTOFIT && Math.abs(dy) < EPSILON_TEXT_AUTOFIT)
+        while(nLeftIndex > 0 && Math.abs(dx) < AscFormat.EPSILON_TEXT_AUTOFIT && Math.abs(dy) < AscFormat.EPSILON_TEXT_AUTOFIT)
         {
             dx =  oRightPoint.x - oLeftPoint.x;
             dy =  oRightPoint.y - oLeftPoint.y;
             oLeftPoint = this.oPolygon[--nLeftIndex];
         }
-        if(Math.abs(dx) < EPSILON_TEXT_AUTOFIT && Math.abs(dy) < EPSILON_TEXT_AUTOFIT)
+        if(Math.abs(dx) < AscFormat.EPSILON_TEXT_AUTOFIT && Math.abs(dy) < AscFormat.EPSILON_TEXT_AUTOFIT)
         {
-            oRetPoint1 = {x: oRetPoint1.x + EPSILON_TEXT_AUTOFIT, y: oRetPoint1.y};
+            oRetPoint1 = {x: oRetPoint1.x + AscFormat.EPSILON_TEXT_AUTOFIT, y: oRetPoint1.y};
         }
         else
         {
@@ -2265,7 +2265,7 @@ function ObjectsToDrawBetweenTwoPolygons(aObjectsToDraw, oBoundsController, oPol
     }
 }
 
-function TransformPointGeometry(x, y, oTransform)
+function TransformPointAscFormat.Geometry(x, y, oTransform)
 {
     var oRet = {x: 0, y: 0};
     oRet.x = oTransform.TransformPointX(x,y);
@@ -2274,7 +2274,7 @@ function TransformPointGeometry(x, y, oTransform)
 }
 
 
-function TransformGeometry(oObjectToDraw, oTransform)
+function TransformAscFormat.Geometry(oObjectToDraw, oTransform)
 {
     var oCommand, oPoint, oPath, t, j, aPathLst;
     aPathLst = oObjectToDraw.geometry.pathLst;
@@ -2289,7 +2289,7 @@ function TransformGeometry(oObjectToDraw, oTransform)
                 case moveTo:
                 case lineTo:
                 {
-                    oPoint = TransformPointGeometry(oCommand.X, oCommand.Y, oTransform);
+                    oPoint = TransformPointAscFormat.Geometry(oCommand.X, oCommand.Y, oTransform);
                     oCommand.X = oPoint.x;
                     oCommand.Y = oPoint.y;
                     break;
@@ -2297,23 +2297,23 @@ function TransformGeometry(oObjectToDraw, oTransform)
 
                 case bezier3:
                 {
-                    oPoint = TransformPointGeometry(oCommand.X0, oCommand.Y0, oTransform);
+                    oPoint = TransformPointAscFormat.Geometry(oCommand.X0, oCommand.Y0, oTransform);
                     oCommand.X0 = oPoint.x;
                     oCommand.Y0 = oPoint.y;
-                    oPoint = TransformPointGeometry(oCommand.X1, oCommand.Y1, oTransform);
+                    oPoint = TransformPointAscFormat.Geometry(oCommand.X1, oCommand.Y1, oTransform);
                     oCommand.X1 = oPoint.x;
                     oCommand.Y1 = oPoint.y;
                     break;
                 }
                 case bezier4:
                 {
-                    oPoint = TransformPointGeometry(oCommand.X0, oCommand.Y0, oTransform);
+                    oPoint = TransformPointAscFormat.Geometry(oCommand.X0, oCommand.Y0, oTransform);
                     oCommand.X0 = oPoint.x;
                     oCommand.Y0 = oPoint.y;
-                    oPoint = TransformPointGeometry(oCommand.X1, oCommand.Y1, oTransform);
+                    oPoint = TransformPointAscFormat.Geometry(oCommand.X1, oCommand.Y1, oTransform);
                     oCommand.X1 = oPoint.x;
                     oCommand.Y1 = oPoint.y;
-                    oPoint = TransformPointGeometry(oCommand.X2, oCommand.Y2, oTransform);
+                    oPoint = TransformPointAscFormat.Geometry(oCommand.X2, oCommand.Y2, oTransform);
                     oCommand.X2 = oPoint.x;
                     oCommand.Y2 = oPoint.y;
                     break;
@@ -2383,7 +2383,7 @@ function TransformPointPolygon(x, y, oPolygon, bFlag, XLimit, ContentHeight, dKo
     return oRet;
 }
 
-function CheckGeometryByPolygon(oObjectToDraw, oPolygon, bFlag, XLimit, ContentHeight, dKoeff, oBounds)
+function CheckAscFormat.GeometryByPolygon(oObjectToDraw, oPolygon, bFlag, XLimit, ContentHeight, dKoeff, oBounds)
 {
     var oCommand, oPoint, oPath, t, j, aPathLst;
     aPathLst = oObjectToDraw.geometry.pathLst;

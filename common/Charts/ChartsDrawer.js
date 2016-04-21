@@ -1,5 +1,8 @@
 "use strict";
 
+// Import
+var cToDeg = AscFormat.cToDeg;
+
 var global3DPersperctive = 30;
 var globalBasePercent = 100;
 var globalGapDepth = 150;
@@ -2115,12 +2118,12 @@ CChartsDrawer.prototype =
 	calculatePositionLabelsCatAxFromAngle: function(chartSpace)
 	{
 		var res = null;
-	
+
 		var angleOy = chartSpace.chart.view3D && chartSpace.chart.view3D.rotY ? (- chartSpace.chart.view3D.rotY / 360) * (Math.PI * 2) : 0;
 		if(chartSpace.chart.view3D && !chartSpace.chart.view3D.rAngAx && angleOy !== 0)
 		{
 			var angleOy = Math.abs(angleOy);
-	
+
 			if(angleOy >= Math.PI / 2 && angleOy < 3 * Math.PI / 2)
 				res = true;
 			else
@@ -3027,7 +3030,7 @@ drawBarChart.prototype =
 			up: 4,
 			unfront: 5
 		};
-				
+
 		var drawVerges = function(i, j, paths, onlyLessNull, start, stop)
 				{
 			var brush, pen, options;
@@ -3036,7 +3039,7 @@ drawBarChart.prototype =
 					{
 						pen = options.pen;
 						brush = options.brush;
-					
+
 				for(var k = start; k <= stop; k++)
 					{
 					t._drawBar3D(paths[k], pen, brush, k);
@@ -3061,7 +3064,7 @@ drawBarChart.prototype =
 			{
 			draw(true, verges.down, verges.up);
 			draw(false, verges.down, verges.up);
-		
+
 			draw(true, verges.unfront, verges.unfront);
 			draw(false, verges.unfront, verges.unfront);
 			
@@ -3639,7 +3642,7 @@ drawLineChart.prototype =
 			seria = t.chartProp.series[j];
 				brush = seria.brush;
 				pen = seria.pen;
-				
+
 			if(!(!t.paths.series[j] || !t.paths.series[j][i] || !seria.val.numRef.numCache.pts[i]))
 			{
 				if(seria.val.numRef.numCache.pts[i].pen)
@@ -3653,7 +3656,7 @@ drawLineChart.prototype =
 				}
 			}
 		};
-				
+
 		
 		//рисуем по сериям
 		var onSeries = function(onlyLessNull)

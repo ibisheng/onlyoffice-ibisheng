@@ -10,8 +10,7 @@ var moveTo=0,
 var PATH_COMMAND_START = 0x101;
 var PATH_COMMAND_END = 0x102;
 
-var cToRad = Math.PI / 10800000.0;
-var cToDeg = 1/cToRad;
+var cToRad = AscFormat.cToRad;
 var cToRad2 = (Math.PI/60000)/180;
 
 function Path()

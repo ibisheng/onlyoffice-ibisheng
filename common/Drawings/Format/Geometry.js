@@ -1,4 +1,12 @@
 "use strict";
+
+(
+/**
+* @param {Window} window
+* @param {undefined} undefined
+*/
+function (window, undefined) {
+
 var EPSILON_TEXT_AUTOFIT = 0.001;
 var FORMULA_TYPE_MULT_DIV = 0,
     FORMULA_TYPE_PLUS_MINUS = 1,
@@ -17,10 +25,6 @@ var FORMULA_TYPE_MULT_DIV = 0,
     FORMULA_TYPE_TAN = 14,
     FORMULA_TYPE_VALUE = 15,
     FORMULA_TYPE_MIN = 16;
-
-var APPROXIMATE_EPSILON = 1;
-var APPROXIMATE_EPSILON2 = 3;
-var APPROXIMATE_EPSILON3 = 5;
 
 
 var cToRad = Math.PI/(60000*180);
@@ -1217,7 +1221,7 @@ Geometry.prototype=
     {
         var used_epsilon;
         if(typeof epsilon !== "number" || isNaN(epsilon))
-            used_epsilon = APPROXIMATE_EPSILON;
+            used_epsilon = AscFormat.APPROXIMATE_EPSILON;
         else
             used_epsilon = epsilon;
         var arr_polygons = [];
@@ -1505,3 +1509,16 @@ function ComparisonEdgeByTopPoint(graphEdge1, graphEdge2)
 {
     return Math.min(graphEdge1.point1.y, graphEdge1.point2.y) - Math.min(graphEdge2.point1.y, graphEdge2.point2.y);
 }
+
+    //--------------------------------------------------------export----------------------------------------------------
+    window['AscFormat'] = window['AscFormat'] || {};
+    window['AscFormat'].Geometry = Geometry;
+    window['AscFormat'].GraphEdge = GraphEdge;
+
+    window['AscFormat'].EPSILON_TEXT_AUTOFIT = EPSILON_TEXT_AUTOFIT;
+    window['AscFormat'].APPROXIMATE_EPSILON = 1;
+    window['AscFormat'].APPROXIMATE_EPSILON2 = 3;
+    window['AscFormat'].APPROXIMATE_EPSILON3 = 5;
+    window['AscFormat'].cToRad = cToRad;
+    window['AscFormat'].cToDeg = cToDeg;
+})(window);

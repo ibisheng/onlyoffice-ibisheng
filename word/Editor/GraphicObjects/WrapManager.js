@@ -453,7 +453,7 @@ CWrapPolygon.prototype =
                 var transformed_x1 = transform.TransformPointX(cur_polygon[point_index].x, cur_polygon[point_index].y);
                 var transformed_y1 = transform.TransformPointY(cur_polygon[point_index].x, cur_polygon[point_index].y);
 
-                if (Math.abs(transformed_x1 - polygon_point0.x) < APPROXIMATE_EPSILON && Math.abs(transformed_y1 - polygon_point0.y) < APPROXIMATE_EPSILON)
+                if (Math.abs(transformed_x1 - polygon_point0.x) < AscFormat.APPROXIMATE_EPSILON && Math.abs(transformed_y1 - polygon_point0.y) < AscFormat.APPROXIMATE_EPSILON)
                     continue;
 
                 var _prev = polygon_point0;
@@ -463,7 +463,7 @@ CWrapPolygon.prototype =
                 polygon_point0.y = transformed_y1;
 
                 arrPoints.push(polygon_point0);
-                arrEdges.push(new GraphEdge(_prev, polygon_point0));
+                arrEdges.push(new AscFormat.GraphEdge(_prev, polygon_point0));
             }
         }
         if(arrPoints.length < 2)
@@ -478,14 +478,14 @@ CWrapPolygon.prototype =
             var cur_point = arrPoints[point_index];
             for(var point_index2 = point_index + 1; point_index2 < arrPoints.length-1; ++point_index2)
             {
-                if(Math.abs(arrPoints[point_index2].y - cur_point.y) < APPROXIMATE_EPSILON2 && Math.abs(arrPoints[point_index2].x - cur_point.x) < APPROXIMATE_EPSILON2)
+                if(Math.abs(arrPoints[point_index2].y - cur_point.y) < AscFormat.APPROXIMATE_EPSILON2 && Math.abs(arrPoints[point_index2].x - cur_point.x) < AscFormat.APPROXIMATE_EPSILON2)
                 {
                     arrPoints.splice(point_index2, 1);
                     --point_index2;
                 }
                 else
                 {
-                    if(Math.abs(arrPoints[point_index2].y - cur_point.y) >= APPROXIMATE_EPSILON2)
+                    if(Math.abs(arrPoints[point_index2].y - cur_point.y) >= AscFormat.APPROXIMATE_EPSILON2)
                         break;
                 }
             }
@@ -580,7 +580,7 @@ CWrapPolygon.prototype =
                 left_path_arr.splice(point_index, 1);
                 --point_index;
             }
-            if(l_prev < APPROXIMATE_EPSILON3 && l_last < APPROXIMATE_EPSILON3 && Math.abs(Math.acos((dx_last*dx_prev + dy_last*dy_prev)/(l_last*l_prev)) - Math.PI) < APPROXIMATE_ANGLE)
+            if(l_prev < AscFormat.APPROXIMATE_EPSILON3 && l_last < AscFormat.APPROXIMATE_EPSILON3 && Math.abs(Math.acos((dx_last*dx_prev + dy_last*dy_prev)/(l_last*l_prev)) - Math.PI) < APPROXIMATE_ANGLE)
             {
                 left_path_arr.splice(point_index, 1);
                 --point_index;
@@ -603,7 +603,7 @@ CWrapPolygon.prototype =
                 right_path_arr.splice(point_index, 1);
                 --point_index;
             }
-            if(l_prev < APPROXIMATE_EPSILON3 && l_last < APPROXIMATE_EPSILON3 && Math.abs(Math.acos((dx_last*dx_prev + dy_last*dy_prev)/(l_last*l_prev)) - Math.PI) < APPROXIMATE_ANGLE)
+            if(l_prev < AscFormat.APPROXIMATE_EPSILON3 && l_last < AscFormat.APPROXIMATE_EPSILON3 && Math.abs(Math.acos((dx_last*dx_prev + dy_last*dy_prev)/(l_last*l_prev)) - Math.PI) < APPROXIMATE_ANGLE)
             {
                 right_path_arr.splice(point_index, 1);
                 --point_index;

@@ -177,7 +177,7 @@ function Spline(drawingObjects, theme, master, layout, slide, pageIndex)
             }
             else
             {
-                var bezier_polygon = partition_bezier4(last_x, last_y, path_command.x1, path_command.y1, path_command.x2, path_command.y2, path_command.x3, path_command.y3, APPROXIMATE_EPSILON);
+                var bezier_polygon = partition_bezier4(last_x, last_y, path_command.x1, path_command.y1, path_command.x2, path_command.y2, path_command.x3, path_command.y3, AscFormat.APPROXIMATE_EPSILON);
                 for(var point_index = 1; point_index < bezier_polygon.length; ++point_index)
                 {
                     var cur_point = bezier_polygon[point_index];
@@ -225,7 +225,7 @@ function Spline(drawingObjects, theme, master, layout, slide, pageIndex)
         shape.spPr.xfrm.setExtY(yMax - yMin);
         shape.setStyle(AscFormat.CreateDefaultShapeStyle());
 
-        var geometry = new Geometry();
+        var geometry = new AscFormat.Geometry();
         var w = xMax - xMin, h = yMax-yMin;
         var kw, kh, pathW, pathH;
         if(w > 0)

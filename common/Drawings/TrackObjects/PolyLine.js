@@ -146,7 +146,7 @@ function PolyLine (drawingObjects, theme, master, layout, slide, pageIndex)
         shape.spPr.xfrm.setExtX(xMax-xMin);
         shape.spPr.xfrm.setExtY(yMax - yMin);
         shape.setStyle(AscFormat.CreateDefaultShapeStyle());
-        var geometry = new Geometry();
+        var geometry = new AscFormat.Geometry();
 
 
         var w = xMax - xMin, h = yMax-yMin;

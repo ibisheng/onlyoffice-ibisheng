@@ -394,7 +394,7 @@ function PolarAdjustmentTrack(originalShape, adjIndex, bTextWarp)
             while(_angle >= 2*Math.PI)
                 _angle -= 2*Math.PI;
 
-            _angle *= cToDeg;
+            _angle *= AscFormat.cToDeg;
             if(_angle >= this.minimalAngle && _angle <= this.maximalAngle)
             {
                 this.geometry.gdLst[this.adjastment.gdRefAng]= _angle;
