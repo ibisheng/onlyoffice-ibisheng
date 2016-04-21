@@ -4420,7 +4420,7 @@ function CThumbnailsManager()
             }
             else
             {
-                word_control.m_oScrollThumb_ = new ScrollObject( "id_vertical_scroll_thmbnl",settings);
+                word_control.m_oScrollThumb_ = new AscCommon.ScrollObject( "id_vertical_scroll_thmbnl",settings);
                 word_control.m_oScrollThumb_.bind("scrollvertical",function(evt){
                     oThis.verticalScroll(this,evt.scrollD,evt.maxScrollY);
                 });

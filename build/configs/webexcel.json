@@ -13,7 +13,11 @@
         "../common/NumFormat.js",
 
         "../common/Drawings/Format/Constants.js",
+		"../common/Drawings/Format/Format.js",
         "../common/Charts/charts.js",
+		
+		"../common/scroll.js",
+		"../cell/view/iscroll.js",
 
         "../common/wordcopypaste.js",
 
@@ -61,7 +65,6 @@
         "../cell/model/History.js",
         "../cell/model/CellComment.js",
         "../cell/view/mobileTouch.js",
-        "../cell/view/iscroll.js",
         "../cell/view/StringRender.js",
         "../cell/view/CellTextRender.js",
         "../cell/view/CellEditorView.js",
@@ -69,7 +72,6 @@
         "../cell/view/HandlerList.js",
         "../cell/view/EventsController.js",
         "../cell/view/WorkbookView.js",
-        "../common/scroll.js",
         "../word/Editor/SerializeCommon.js",
         "../common/Drawings/Math.js",
         "../common/Drawings/ArcTo.js",
@@ -89,7 +91,6 @@
         "../common/Drawings/TrackObjects/Spline.js",
         "../common/Drawings/TrackObjects/MoveTracks.js",
         "../common/Drawings/CommonController.js",
-        "../common/Drawings/Format/Format.js",
         "../common/Drawings/Format/CreateGeometry.js",
         "../common/Drawings/Format/Geometry.js",
         "../common/Drawings/Format/Path.js",

@@ -349,7 +349,7 @@
 			this.vsbHSt = document.getElementById("ws-v-scroll-helper").style;
 
 			if (!this.vsbApi) {
-				this.vsbApi = new ScrollObject(this.vsb.id, opt);
+				this.vsbApi = new AscCommon.ScrollObject(this.vsb.id, opt);
 				this.vsbApi.bind("scrollvertical", function(evt) {
 					self.handlers.trigger("scrollY", evt.scrollPositionY / opt.vscrollStep);
 				});
@@ -372,7 +372,7 @@
 			this.hsbHSt = document.getElementById("ws-h-scroll-helper").style;
 
 			if (!this.hsbApi) {
-				this.hsbApi = new ScrollObject(this.hsb.id, $.extend(true, {}, opt, {wheelScrollLines: 1}));
+				this.hsbApi = new AscCommon.ScrollObject(this.hsb.id, $.extend(true, {}, opt, {wheelScrollLines: 1}));
 				this.hsbApi.bind("scrollhorizontal",function(evt) {
 					self.handlers.trigger("scrollX", evt.scrollPositionX / opt.hscrollStep);
 				});

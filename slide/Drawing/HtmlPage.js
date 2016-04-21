@@ -2278,7 +2278,7 @@ function CEditorPage(api)
             if (this.m_oScrollHor_)
                 this.m_oScrollHor_.Repos(settings, true, undefined);//unbind("scrollhorizontal")
             else {
-                this.m_oScrollHor_ = new ScrollObject( "id_horizontal_scroll",settings);
+                this.m_oScrollHor_ = new AscCommon.ScrollObject( "id_horizontal_scroll",settings);
                 this.m_oScrollHor_.bind("scrollhorizontal",function(evt){
                     oThis.horizontalScroll(this,evt.scrollD,evt.maxScrollX);
                 });
@@ -2302,7 +2302,7 @@ function CEditorPage(api)
         else
         {
 
-            this.m_oScrollVer_ = new ScrollObject( "id_vertical_scroll",
+            this.m_oScrollVer_ = new AscCommon.ScrollObject( "id_vertical_scroll",
                 settings
             );
 
@@ -2337,7 +2337,7 @@ function CEditorPage(api)
             }
             else
             {
-                this.m_oScrollNotes_ = new ScrollObject( "id_vertical_scroll_notes",settings);
+                this.m_oScrollNotes_ = new AscCommon.ScrollObject( "id_vertical_scroll_notes",settings);
                 this.m_oScrollNotes_.bind("scrollvertical",function(evt){
                 });
                 this.m_oScrollNotesApi = this.m_oScrollNotes_;

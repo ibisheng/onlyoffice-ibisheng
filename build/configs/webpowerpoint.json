@@ -13,7 +13,10 @@
         "../common/NumFormat.js",
 
         "../common/Drawings/Format/Constants.js",
+		"../common/Drawings/Format/Format.js",
         "../common/Charts/charts.js",
+		
+		"../common/scroll.js",
 
         "../common/wordcopypaste.js",
 
@@ -48,7 +51,6 @@
         "../word/Editor/Table/TableCell.js",
         "../word/Editor/Common.js",
         "../word/Editor/Sections.js",
-        "../common/scroll.js",
         "../word/Editor/History.js",
         "../common/Drawings/Hit.js",
         "../common/Drawings/States.js",
@@ -77,7 +79,6 @@
         "../common/Drawings/CommonController.js",
         "../cell/view/DrawingObjectsController.js",
         "../slide/Editor/DrawingObjectsController.js",
-        "../common/Drawings/Format/Format.js",
         "../common/Drawings/Format/CreateGeometry.js",
         "../common/Drawings/Format/Geometry.js",
         "../common/Drawings/Format/Path.js",

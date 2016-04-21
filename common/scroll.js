@@ -1,5 +1,10 @@
 "use strict";
 
+(	/**
+* @param {Window} window
+* @param {undefined} undefined
+*/
+function (window, undefined) {
 var debug = false;
 
 var ScrollArrowType = {
@@ -23,7 +28,7 @@ var ArrowStatus = {
     upLeftArrowNonActive_downRightArrowActive:3,
     upLeftArrowNonActive_downRightArrowNonActive:4,
     arrowHover:5
-}
+};
 
 function GetClientWidth( elem ) {
     var _w = elem.clientWidth;
@@ -280,7 +285,7 @@ CArrowDrawer.prototype.InitSize = function ( sizeW, sizeH, is_retina ) {
         this.SizeW >>= 1;
         this.SizeH >>= 1;
     }
-}
+};
 CArrowDrawer.prototype.drawArrow = function ( type, mode, ctx, w, h ) {
 
     ctx.beginPath();
@@ -560,7 +565,7 @@ CArrowDrawer.prototype.drawArrow = function ( type, mode, ctx, w, h ) {
 
     this.lastArrowStatus1 = mode;
 
-}
+};
 CArrowDrawer.prototype.drawTopLeftArrow = function(type,mode,ctx,w,h){
 
     clearTimeout( this.fadeInTimeout1 );
@@ -988,7 +993,7 @@ CArrowDrawer.prototype.drawTopLeftArrow = function(type,mode,ctx,w,h){
 
     this.lastArrowStatus1 = mode;
 
-}
+};
 CArrowDrawer.prototype.drawBottomRightArrow = function(type,mode,ctx,w,h){
 
     clearTimeout( this.fadeInTimeout2 );
@@ -1425,7 +1430,7 @@ CArrowDrawer.prototype.drawBottomRightArrow = function(type,mode,ctx,w,h){
     }
 
     this.lastArrowStatus2 = mode;
-}
+};
 
 function _HEXTORGB_( colorHEX ) {
     return {
@@ -1463,7 +1468,7 @@ function ScrollObject( elemID, settings, dbg ) {
             }
         }
         return _st;
-    }
+    };
 
     var scrollSettings = {
         showArrows:false,
@@ -1581,8 +1586,8 @@ function ScrollObject( elemID, settings, dbg ) {
     if ( window.devicePixelRatio == 2 )
         this.IsRetina = true;
 
-    this.piperImgVert = [document.createElement( 'canvas' ), document.createElement( 'canvas' )]
-    this.piperImgHor = [document.createElement( 'canvas' ), document.createElement( 'canvas' )]
+    this.piperImgVert = [document.createElement( 'canvas' ), document.createElement( 'canvas' )];
+    this.piperImgHor = [document.createElement( 'canvas' ), document.createElement( 'canvas' )];
 
     this.piperImgVert[0].height = 13;
     this.piperImgVert[1].height = 13;
@@ -3313,3 +3318,8 @@ ScrollObject.prototype = {
         handle( that );
     }
 };
+
+    //---------------------------------------------------------export---------------------------------------------------
+    window['AscCommon'] = window['AscCommon'] || {};
+    window["AscCommon"].ScrollObject = ScrollObject;
+})(window);

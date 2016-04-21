@@ -1230,6 +1230,7 @@
 
     dummyStyle = null;	// for the sake of it
 
-    window.CTouchScroll = CTouchScroll;
-	window.CTouchScroll;
+    //---------------------------------------------------------export---------------------------------------------------
+    window['AscCommonExcel'] = window['AscCommonExcel'] || {};
+    window["AscCommonExcel"].CTouchScroll = CTouchScroll;
 })( window, document );

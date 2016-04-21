@@ -1232,8 +1232,9 @@ function prefixStyle (style) {
 }
 
 dummyStyle = null;	// for the sake of it
-
-window.CTouchScroll = CTouchScroll;
-window.CTouchScroll;
+	
+	//---------------------------------------------------------export---------------------------------------------------
+	window['AscCommon'] = window['AscCommon'] || {};
+	window["AscCommon"].CTouchScroll = CTouchScroll;
 
 })(window, document);
