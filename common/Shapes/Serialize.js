@@ -4395,7 +4395,7 @@ function BinaryPPTYLoader()
                     if (0 == _at)
                     {
                         var tmpStr = s.GetString2();
-                        geom = CreateGeometry(tmpStr);
+                        geom = AscFormat.CreateGeometry(tmpStr);
                         geom.isLine = tmpStr == "line";
                         geom.setPreset(tmpStr);
                     }
@@ -4425,7 +4425,7 @@ function BinaryPPTYLoader()
                 var _s = s.cur;
                 var _e = _s + _len;
 
-                geom = CreateGeometry("");
+                geom = AscFormat.CreateGeometry("");
                 geom.preset = null;
                 while (s.cur < _e)
                 {
@@ -6724,7 +6724,7 @@ function BinaryPPTYLoader()
                             {
                                 var sPrst = s.GetUChar();
                                 bodyPr.prstTxWarp = AscFormat.ExecuteNoHistory(function () {
-                                    return CreatePrstTxWarpGeometry(getPrstByNumber(sPrst));
+                                    return AscFormat.CreatePrstTxWarpGeometry(AscFormat.getPrstByNumber(sPrst));
                                 }, this, []);
                                 break;
                             }

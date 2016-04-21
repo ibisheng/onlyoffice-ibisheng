@@ -2809,7 +2809,7 @@ function CBinaryFileWriter()
         if (image.spPr.geometry === undefined || image.spPr.geometry == null)
         {
             // powerpoint!
-            image.spPr.geometry = CreateGeometry("rect");
+            image.spPr.geometry = AscFormat.CreateGeometry("rect");
         }
 
         var unifill = new AscFormat.CUniFill();
@@ -3454,7 +3454,7 @@ function CBinaryFileWriter()
     this.WritePrstTxWarp = function(prstTxWarp)
     {
         oThis.WriteUChar(g_nodeAttributeStart);
-        oThis._WriteLimit1(0, getNumByTxPrst(prstTxWarp.preset));
+        oThis._WriteLimit1(0, AscFormat.getNumByTxPrst(prstTxWarp.preset));
         oThis.WriteUChar(g_nodeAttributeEnd);
         oThis.WriteAdj(prstTxWarp.gdLst, prstTxWarp.avLst, 0);
     }

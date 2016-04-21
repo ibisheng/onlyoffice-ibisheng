@@ -7014,7 +7014,7 @@ DrawingObjectsController.prototype =
         var image = new CImageShape();
         image.setSpPr(new AscFormat.CSpPr());
         image.spPr.setParent(image);
-        image.spPr.setGeometry(CreateGeometry("rect"));
+        image.spPr.setGeometry(AscFormat.CreateGeometry("rect"));
         image.spPr.setXfrm(new AscFormat.CXfrm());
         image.spPr.xfrm.setParent(image.spPr);
         image.spPr.xfrm.setOffX(x);
@@ -7065,7 +7065,7 @@ DrawingObjectsController.prototype =
         oXfrm.setParent(oSpPr);
         oSpPr.setFill(CreateNoFillUniFill());
         oSpPr.setLn(CreateNoFillLine());
-        oSpPr.setGeometry(CreateGeometry("rect"));
+        oSpPr.setGeometry(AscFormat.CreateGeometry("rect"));
         oSpPr.geometry.setParent(oSpPr);
         oShape.setSpPr(oSpPr);
         oSpPr.setParent(oShape);
@@ -7169,7 +7169,7 @@ DrawingObjectsController.prototype =
         oBodyPr.anchorCtr = false;
         oBodyPr.forceAA = false;
         oBodyPr.compatLnSpc = true;
-        oBodyPr.prstTxWarp = AscFormat.ExecuteNoHistory(function(){return CreatePrstTxWarpGeometry("textNoShape");}, this, []);
+        oBodyPr.prstTxWarp = AscFormat.ExecuteNoHistory(function(){return AscFormat.CreatePrstTxWarpGeometry("textNoShape");}, this, []);
         oBodyPr.textFit = new AscFormat.CTextFit();
         oBodyPr.textFit.type = AscFormat.text_fit_Auto;
         if(bWord)

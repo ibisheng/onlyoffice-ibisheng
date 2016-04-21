@@ -9511,7 +9511,7 @@ CBodyPr.prototype =
         ExecuteNoHistory(function(){
             if(r.GetBool())
             {
-                this.prstTxWarp = CreatePrstTxWarpGeometry(readString(r));
+                this.prstTxWarp = AscFormat.CreatePrstTxWarpGeometry(readString(r));
                 var count = r.GetLong();
                 for(var i = 0; i < count; ++i)
                 {
