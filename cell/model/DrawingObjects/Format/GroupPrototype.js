@@ -1,5 +1,8 @@
 "use strict";
 
+// Import
+var CShape = AscFormat.CShape;
+
 CGroupShape.prototype.addToRecalculate = function()
 {
     if(this.drawingObjects && this.drawingObjects.controller)

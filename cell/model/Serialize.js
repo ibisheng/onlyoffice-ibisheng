@@ -2846,7 +2846,7 @@
                             {
                                 var oRet = oDrawing.graphicObject.copy();
                                 var oMetrics = oDrawing.getGraphicObjectMetrics();
-                                SetXfrmFromMetrics(oRet, oMetrics);
+                                AscFormat.SetXfrmFromMetrics(oRet, oMetrics);
                                 return oRet;
                             }, this, []);
                             var oOldGrObject = oDrawing.graphicObject;

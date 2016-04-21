@@ -1,5 +1,8 @@
 "use strict";
 
+// Import
+var CShape = AscFormat.CShape;
+
 function getChartTranslateManager()
 {
     return editor.chartTranslate;

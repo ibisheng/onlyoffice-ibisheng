@@ -1,3 +1,8 @@
+"use strict";
+
+// Import
+var CShape = AscFormat.CShape;
+
 CShape.prototype.setRecalculateInfo = function()
 {
     this.recalcInfo =
@@ -506,7 +511,7 @@ CShape.prototype.recalculateShapeStyleForParagraph = function()
         var shape_text_pr = new CTextPr();
         if(this.style.fontRef.Color)
         {
-            shape_text_pr.Unifill = CreateUniFillByUniColorCopy(this.style.fontRef.Color);
+            shape_text_pr.Unifill = AscFormat.CreateUniFillByUniColorCopy(this.style.fontRef.Color);
         }
         if(this.style.fontRef.idx === AscFormat.fntStyleInd_major)
         {

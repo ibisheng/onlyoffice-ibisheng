@@ -820,7 +820,7 @@ TextArtPreviewManager.prototype.getShapeByPrst = function(prst)
 };
 TextArtPreviewManager.prototype.getShape =  function()
 {
-	var oShape = new CShape();
+	var oShape = new AscFormat.CShape();
 	var oParent = null, oWorkSheet = null;
 	var bWord = true;
 	if(window["Asc"]["editor"])

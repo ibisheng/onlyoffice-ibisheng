@@ -1,5 +1,12 @@
 "use strict";
 
+(
+/**
+* @param {Window} window
+* @param {undefined} undefined
+*/
+function (window, undefined) {
+
 // Import
 var c_oAscSizeRelFromH = AscCommon.c_oAscSizeRelFromH;
 var c_oAscSizeRelFromV = AscCommon.c_oAscSizeRelFromV;
@@ -19,16 +26,6 @@ function CheckWordArtTextPr(oRun)
     if(oTextPr.TextFill || oTextPr.TextOutline || (oTextPr.Unifill && oTextPr.Unifill.fill && (oTextPr.Unifill.fill.type !== c_oAscFill.FILL_TYPE_SOLID || oTextPr.Unifill.transparent != null && oTextPr.Unifill.transparent < 254.5)))
         return true;
     return false;
-}
-
-
-function CopyPageSize(oPageSize)
-{
-    var oRet = new CSectionPageSize();
-    oRet.W      = oPageSize.W
-    oRet.H      = oPageSize.H
-    oRet.Orient = oPageSize.Orient;
-    return oRet;
 }
 
 function hitToHandles(x, y, object)
@@ -162,49 +159,6 @@ function hitToHandles(x, y, object)
         return _ret_value;
 
     return -1;
-}
-
-function getRotateAngle(x, y, object)
-{
-    var transform = object.getTransformMatrix();
-    var rotate_distance = object.convertPixToMM(TRACK_DISTANCE_ROTATE);
-    var hc = object.extX * 0.5;
-    var vc = object.extY * 0.5;
-    var xc_t = transform.TransformPointX(hc, vc);
-    var yc_t = transform.TransformPointY(hc, vc);
-    var rot_x_t = transform.TransformPointX(hc, -rotate_distance);
-    var rot_y_t = transform.TransformPointY(hc, -rotate_distance);
-
-    var invert_transform = object.getInvertTransform();
-    var rel_x = invert_transform.TransformPointX(x, y);
-
-    var v1_x, v1_y, v2_x, v2_y;
-    v1_x = x - xc_t;
-    v1_y = y - yc_t;
-
-    v2_x = rot_x_t - xc_t;
-    v2_y = rot_y_t - yc_t;
-
-    var flip_h = object.getFullFlipH();
-    var flip_v = object.getFullFlipV();
-    var same_flip = flip_h && flip_v || !flip_h && !flip_v;
-    var angle = rel_x > object.extX * 0.5 ? Math.atan2(Math.abs(v1_x * v2_y - v1_y * v2_x), v1_x * v2_x + v1_y * v2_y) : -Math.atan2(Math.abs(v1_x * v2_y - v1_y * v2_x), v1_x * v2_x + v1_y * v2_y);
-    return same_flip ? angle : -angle;
-}
-
-function getBoundsInGroup(shape)
-{
-    var r = shape.rot;
-    if (!AscFormat.isRealNumber(r) || checkNormalRotate(r)) {
-        return { minX: shape.x, minY: shape.y, maxX: shape.x + shape.extX, maxY: shape.y + shape.extY };
-    }
-    else {
-        var hc = shape.extX * 0.5;
-        var vc = shape.extY * 0.5;
-        var xc = shape.x + hc;
-        var yc = shape.y + vc;
-        return { minX: xc - vc, minY: yc - hc, maxX: xc + vc, maxY: yc + hc };
-    }
 }
 
 function CreateUniFillByUniColorCopy(uniColor)
@@ -523,7 +477,7 @@ function CheckExcelDrawingXfrm(xfrm)
             xfrm.setOffY(xfrm.offY - dPosY);
         }
     }
-};
+}
 
 
 function SetXfrmFromMetrics(oDrawing, metrics)
@@ -4893,7 +4847,17 @@ CShape.prototype =
     },
 
     getBoundsInGroup: function () {
-        return getBoundsInGroup(this);
+        var r = this.rot;
+        if (!AscFormat.isRealNumber(r) || checkNormalRotate(r)) {
+            return { minX: this.x, minY: this.y, maxX: this.x + this.extX, maxY: this.y + this.extY };
+        }
+        else {
+            var hc = this.extX * 0.5;
+            var vc = this.extY * 0.5;
+            var xc = this.x + hc;
+            var yc = this.y + vc;
+            return { minX: xc - vc, minY: yc - hc, maxX: xc + vc, maxY: yc + hc };
+        }
     },
 
     canChangeAdjustments: function () {
@@ -5826,3 +5790,16 @@ function getParaDrawing(oDrawing)
     }
     return null;
 }
+
+    //----------------------------------------------------------export----------------------------------------------------
+    window['AscFormat'] = window['AscFormat'] || {};
+    window['AscFormat'].CheckObjectLine = CheckObjectLine;
+    window['AscFormat'].CreateUniFillByUniColorCopy = CreateUniFillByUniColorCopy;
+    window['AscFormat'].CreateUniFillByUniColor = CreateUniFillByUniColor;
+    window['AscFormat'].ConvertParagraphToPPTX = ConvertParagraphToPPTX;
+    window['AscFormat'].ConvertParagraphToWord = ConvertParagraphToWord;
+    window['AscFormat'].SetXfrmFromMetrics = SetXfrmFromMetrics;
+    window['AscFormat'].CShape = CShape;
+    window['AscFormat'].CreateBinaryReader = CreateBinaryReader;
+    window['AscFormat'].getParaDrawing = getParaDrawing;
+})(window);

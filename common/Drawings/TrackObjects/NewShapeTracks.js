@@ -354,7 +354,7 @@ function NewShapeTrack(presetGeom, startX, startY, theme, master, layout, slide,
 
     this.getShape = function(bFromWord, DrawingDocument, drawingObjects)
     {
-        var shape = new CShape();
+        var shape = new AscFormat.CShape();
         if(drawingObjects)
         {
             shape.setDrawingObjects(drawingObjects);

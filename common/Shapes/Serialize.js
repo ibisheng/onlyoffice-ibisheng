@@ -4867,7 +4867,7 @@ function BinaryPPTYLoader()
     {
         var s = this.stream;
 
-        var shape = new CShape(this.TempMainObject);
+        var shape = new AscFormat.CShape(this.TempMainObject);
         if (null != this.TempGroupObject)
             shape.Container = this.TempGroupObject;
 
@@ -5218,7 +5218,7 @@ function BinaryPPTYLoader()
     {
         var s = this.stream;
 
-        var shape = new CShape();
+        var shape = new AscFormat.CShape();
         shape.setBDeleted(false);
 
         var _rec_start = s.cur;

@@ -28,7 +28,7 @@ var DISTANCE_TO_TEXT_LEFTRIGHT = 3.2;
 
 function CheckShapeBodyAutoFitReset(oShape, bNoResetRelSize)
 {
-    var oParaDrawing = getParaDrawing(oShape);
+    var oParaDrawing = AscFormat.getParaDrawing(oShape);
     if(oParaDrawing && !(bNoResetRelSize === true))
     {
         if(oParaDrawing.SizeRelH)
@@ -40,7 +40,7 @@ function CheckShapeBodyAutoFitReset(oShape, bNoResetRelSize)
             oParaDrawing.SetSizeRelV(undefined);
         }
     }
-    if(oShape instanceof CShape)
+    if(oShape instanceof AscFormat.CShape)
     {
         var oPropsToSet = null;
         if(oShape.bWordShape)
@@ -1044,7 +1044,7 @@ DrawingObjectsController.prototype =
         {
             if(this.selection.textSelection.selectStartPage === pageIndex)
             {
-                drawingDocument.DrawTrack(AscFormat.TYPE_TRACK.TEXT, this.selection.textSelection.getTransformMatrix(), 0, 0, this.selection.textSelection.extX, this.selection.textSelection.extY, CheckObjectLine(this.selection.textSelection), this.selection.textSelection.canRotate());
+                drawingDocument.DrawTrack(AscFormat.TYPE_TRACK.TEXT, this.selection.textSelection.getTransformMatrix(), 0, 0, this.selection.textSelection.extX, this.selection.textSelection.extY, AscFormat.CheckObjectLine(this.selection.textSelection), this.selection.textSelection.canRotate());
                 if(this.selection.textSelection.drawAdjustments)
                     this.selection.textSelection.drawAdjustments(drawingDocument);
             }
@@ -1058,7 +1058,7 @@ DrawingObjectsController.prototype =
                 {
                     for(i = 0; i < this.selection.groupSelection.selectedObjects.length ; ++i)
                     {
-                        drawingDocument.DrawTrack(AscFormat.TYPE_TRACK.TEXT, this.selection.groupSelection.selectedObjects[i].transform, 0, 0, this.selection.groupSelection.selectedObjects[i].extX, this.selection.groupSelection.selectedObjects[i].extY, CheckObjectLine(this.selection.groupSelection.selectedObjects[i]), this.selection.groupSelection.selectedObjects[i].canRotate());
+                        drawingDocument.DrawTrack(AscFormat.TYPE_TRACK.TEXT, this.selection.groupSelection.selectedObjects[i].transform, 0, 0, this.selection.groupSelection.selectedObjects[i].extX, this.selection.groupSelection.selectedObjects[i].extY, AscFormat.CheckObjectLine(this.selection.groupSelection.selectedObjects[i]), this.selection.groupSelection.selectedObjects[i].canRotate());
                     }
                 }
                 else if(this.selection.groupSelection.selection.chartSelection)
@@ -1103,7 +1103,7 @@ DrawingObjectsController.prototype =
                 {
                     for(i = 0; i < this.selection.groupSelection.selectedObjects.length ; ++i)
                     {
-                        drawingDocument.DrawTrack(AscFormat.TYPE_TRACK.SHAPE, this.selection.groupSelection.selectedObjects[i].transform, 0, 0, this.selection.groupSelection.selectedObjects[i].extX, this.selection.groupSelection.selectedObjects[i].extY, CheckObjectLine(this.selection.groupSelection.selectedObjects[i]), this.selection.groupSelection.selectedObjects[i].canRotate());
+                        drawingDocument.DrawTrack(AscFormat.TYPE_TRACK.SHAPE, this.selection.groupSelection.selectedObjects[i].transform, 0, 0, this.selection.groupSelection.selectedObjects[i].extX, this.selection.groupSelection.selectedObjects[i].extY, AscFormat.CheckObjectLine(this.selection.groupSelection.selectedObjects[i]), this.selection.groupSelection.selectedObjects[i].canRotate());
                     }
                 }
 
@@ -1162,7 +1162,7 @@ DrawingObjectsController.prototype =
             {
                 if(this.selectedObjects[i].selectStartPage === pageIndex)
                 {
-                    drawingDocument.DrawTrack(AscFormat.TYPE_TRACK.SHAPE, this.selectedObjects[i].getTransformMatrix(), 0, 0, this.selectedObjects[i].extX, this.selectedObjects[i].extY, CheckObjectLine(this.selectedObjects[i]), this.selectedObjects[i].canRotate());
+                    drawingDocument.DrawTrack(AscFormat.TYPE_TRACK.SHAPE, this.selectedObjects[i].getTransformMatrix(), 0, 0, this.selectedObjects[i].extX, this.selectedObjects[i].extY, AscFormat.CheckObjectLine(this.selectedObjects[i]), this.selectedObjects[i].canRotate());
                 }
             }
             if(this.selectedObjects.length === 1 && this.selectedObjects[0].drawAdjustments && this.selectedObjects[0].selectStartPage === pageIndex)
@@ -5655,7 +5655,7 @@ DrawingObjectsController.prototype =
         {
             nSelectStartPage = oTargetTextObject.selectStartPage;
         }
-        if((!(oTargetTextObject instanceof CShape)) && this.document)
+        if((!(oTargetTextObject instanceof AscFormat.CShape)) && this.document)
         {
             if(this.selectedObjects.length === 1 && this.selectedObjects[0].parent)
             {
@@ -7039,7 +7039,7 @@ DrawingObjectsController.prototype =
         if (MainLogicDocument && true === TrackRevisions)
             MainLogicDocument.Set_TrackRevisions(false);
 
-        var oShape = new CShape();
+        var oShape = new AscFormat.CShape();
         oShape.setWordShape(bWord === true);
         oShape.setBDeleted(false);
         if(wsModel)

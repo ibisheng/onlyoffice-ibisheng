@@ -14,6 +14,8 @@ var align_Center = AscCommon.align_Center;
 var align_Justify = AscCommon.align_Justify;
 var g_oDocumentUrls = AscCommon.g_oDocumentUrls;
 
+var CShape = AscFormat.CShape;
+
 var c_oAscError = Asc.c_oAscError;
 var c_oAscShdClear = Asc.c_oAscShdClear;
 var c_oAscShdNil = Asc.c_oAscShdNil;
@@ -3151,7 +3153,7 @@ PasteProcessor.prototype =
 					
 					window.global_pptx_content_loader.Clear();
 
-					var _stream = CreateBinaryReader(base64FromPresentation, 0, base64FromPresentation.length);
+					var _stream = AscFormat.CreateBinaryReader(base64FromPresentation, 0, base64FromPresentation.length);
                     var stream = new FileStream(_stream.data, _stream.size);
                     var p_url = stream.GetString2();
                     var p_width = stream.GetULong()/100000;
@@ -3170,7 +3172,7 @@ PasteProcessor.prototype =
 							var aContent = [];
 							for(var i = 0; i < docContent.length; i++)
 							{
-								aContent[i] = ConvertParagraphToWord(docContent[i].Element, this.oDocument);
+								aContent[i] = AscFormat.ConvertParagraphToWord(docContent[i].Element, this.oDocument);
 							}						
 							this.aContent = aContent;
 	
@@ -3353,7 +3355,7 @@ PasteProcessor.prototype =
                 {
                     window.global_pptx_content_loader.Clear();
 
-					var _stream = CreateBinaryReader(base64, 0, base64.length);
+					var _stream = AscFormat.CreateBinaryReader(base64, 0, base64.length);
                     var stream = new FileStream(_stream.data, _stream.size);
                     var p_url = stream.GetString2();
                     var p_width = stream.GetULong()/100000;
@@ -3762,7 +3764,7 @@ PasteProcessor.prototype =
                         element.Get_AllDrawingObjects(drawings);
 						if(type_Paragraph == element.GetType())//paragraph
 						{
-							selectedElement.Element = ConvertParagraphToPPTX(element);
+							selectedElement.Element = AscFormat.ConvertParagraphToPPTX(element);
 							elements.push(selectedElement);
 						}
 						else if(type_Table == element.GetType())//table
@@ -4388,7 +4390,7 @@ PasteProcessor.prototype =
 				{
                     if(cDocumentContent.Content[n] instanceof Paragraph)
                     {
-                        cDocumentContent.Content[nIndex] = ConvertParagraphToPPTX(cDocumentContent.Content[nIndex]);
+                        cDocumentContent.Content[nIndex] = AscFormat.ConvertParagraphToPPTX(cDocumentContent.Content[nIndex]);
                         ++nIndex;
                     }
 

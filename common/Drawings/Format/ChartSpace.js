@@ -8,6 +8,8 @@ var g_oIdCounter = AscCommon.g_oIdCounter;
 var g_oTableId = AscCommon.g_oTableId;
 var oNumFormatCache = AscCommon.oNumFormatCache;
 
+var CShape = AscFormat.CShape;
+
 var c_oAscNumFormatType = Asc.c_oAscNumFormatType;
 
 var EFFECT_NONE = 0;
@@ -295,8 +297,8 @@ function checkFiniteNumber(num)
 }
 
 var G_O_VISITED_HLINK_COLOR = CreateUniFillSolidFillWidthTintOrShade(CreateUnifillSolidFillSchemeColorByIndex(10), 0);
-var G_O_NO_ACTIVE_COMMENT_BRUSH = CreateUniFillByUniColor(AscFormat.CreateUniColorRGB(248, 231, 195));
-var G_O_ACTIVE_COMMENT_BRUSH = CreateUniFillByUniColor(AscFormat.CreateUniColorRGB(240, 200, 120));
+var G_O_NO_ACTIVE_COMMENT_BRUSH = AscFormat.CreateUniFillByUniColor(AscFormat.CreateUniColorRGB(248, 231, 195));
+var G_O_ACTIVE_COMMENT_BRUSH = AscFormat.CreateUniFillByUniColor(AscFormat.CreateUniColorRGB(240, 200, 120));
 /*function addPointToMap(map, worksheet, row, col, pt)
 {
     if(!Array.isArray(map[worksheet.getId()+""]))

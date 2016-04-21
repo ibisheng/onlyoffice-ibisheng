@@ -1,5 +1,8 @@
 "use strict";
 
+// Import
+var CShape = AscFormat.CShape;
+
 var G_O_DEFAULT_COLOR_MAP = AscFormat.GenerateDefaultColorMap();
 
 CShape.prototype.setDrawingObjects = function(drawingObjects)

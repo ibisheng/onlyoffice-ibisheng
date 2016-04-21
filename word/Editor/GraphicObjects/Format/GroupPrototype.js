@@ -1,3 +1,7 @@
+"use strict";
+
+// Import
+var CShape = AscFormat.CShape;
 
 CGroupShape.prototype.addToRecalculate = CShape.prototype.addToRecalculate;
 

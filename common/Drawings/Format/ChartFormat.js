@@ -4,6 +4,8 @@
 var g_oIdCounter = AscCommon.g_oIdCounter;
 var g_oTableId = AscCommon.g_oTableId;
 
+var CShape = AscFormat.CShape;
+
 var c_oAscChartLegendShowSettings = Asc.c_oAscChartLegendShowSettings;
 var c_oAscChartDataLabelsPos = Asc.c_oAscChartDataLabelsPos;
 var c_oAscValAxisRule = Asc.c_oAscValAxisRule;

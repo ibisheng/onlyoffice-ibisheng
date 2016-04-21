@@ -216,7 +216,7 @@ Slide.prototype =
             _glyph = _sp_tree[_shape_index];
             if(_glyph.isPlaceholder())
             {
-                if(_glyph instanceof CShape)
+                if(_glyph instanceof AscFormat.CShape)
                 {
                     _index = _glyph.nvSpPr.nvPr.ph.idx;
                     _type = _glyph.nvSpPr.nvPr.ph.type;
@@ -280,7 +280,7 @@ Slide.prototype =
                 _glyph = _sp_tree[_shape_index];
                 if(_glyph.isPlaceholder())
                 {
-                    if(_glyph instanceof CShape)
+                    if(_glyph instanceof AscFormat.CShape)
                     {
                         _type = _glyph.nvSpPr.nvPr.ph.type;
                     }

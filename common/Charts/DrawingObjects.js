@@ -171,7 +171,7 @@ asc_CChartBinary.prototype = {
     getChartSpace: function(workSheet)
     {
         var binary = this["binary"];
-        var stream = CreateBinaryReader(this["binary"], 0, this["binary"].length);
+        var stream = AscFormat.CreateBinaryReader(this["binary"], 0, this["binary"].length);
         //надо сбросить то, что остался после открытия документа
         window.global_pptx_content_loader.Clear();
         var oNewChartSpace = new CChartSpace();
@@ -185,7 +185,7 @@ asc_CChartBinary.prototype = {
         var binary = this["themeBinary"];
         if(binary)
         {
-            var stream = CreateBinaryReader(binary, 0, binary.length);
+            var stream = AscFormat.CreateBinaryReader(binary, 0, binary.length);
             var oBinaryReader = new BinaryPPTYLoader();
 
             oBinaryReader.stream = new FileStream();
@@ -204,7 +204,7 @@ asc_CChartBinary.prototype = {
         var binary = this["colorMapBinary"];
         if(binary)
         {
-            var stream = CreateBinaryReader(binary, 0, binary.length);
+            var stream = AscFormat.CreateBinaryReader(binary, 0, binary.length);
             var oBinaryReader = new BinaryPPTYLoader();
 
             oBinaryReader.stream = new FileStream();
@@ -1780,7 +1780,7 @@ function DrawingObjects() {
             if ( graphicObject instanceof CImageShape )
                 printImage(graphicObject, ctx, top, left);
             // Shape
-            else if ( graphicObject instanceof CShape )
+            else if ( graphicObject instanceof AscFormat.CShape )
                 printShape(graphicObject, ctx, top, left);
             // Chart
             else if (graphicObject instanceof CChartSpace)
@@ -1809,7 +1809,7 @@ function DrawingObjects() {
 
         function printShape(graphicObject, ctx, top, left) {
 
-            if ( (graphicObject instanceof CShape) && graphicObject && ctx ) {
+            if ( (graphicObject instanceof AscFormat.CShape) && graphicObject && ctx ) {
                 // Save
                 var tx = graphicObject.transform.tx;
                 var ty = graphicObject.transform.ty;
@@ -1875,7 +1875,7 @@ function DrawingObjects() {
                     if ( graphicItem instanceof CImageShape )
                         printImage(graphicItem, ctx, top, left);
 
-                    else if ( graphicItem instanceof CShape )
+                    else if ( graphicItem instanceof AscFormat.CShape )
                         printShape(graphicItem, ctx, top, left);
 
                     else if (graphicItem instanceof CChartSpace )

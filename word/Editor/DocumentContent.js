@@ -248,7 +248,7 @@ CDocumentContent.prototype =
 
     Get_PageFields : function(PageIndex)
     {
-        if (true === this.Parent.Is_Cell() || (undefined !== CShape && this.Parent instanceof CShape))
+        if (true === this.Parent.Is_Cell() || (undefined !== AscFormat.CShape && this.Parent instanceof AscFormat.CShape))
         {
             if ( PageIndex < this.Pages.length && PageIndex >= 0 )
             {

@@ -1758,7 +1758,7 @@
 			{
 				window.global_pptx_content_loader.Clear();
 
-				var _stream = CreateBinaryReader(base64, 0, base64.length);
+				var _stream = AscFormat.CreateBinaryReader(base64, 0, base64.length);
 				var stream = new FileStream(_stream.data, _stream.size);
 				var p_url = stream.GetString2();
 				var p_width = stream.GetULong()/100000;

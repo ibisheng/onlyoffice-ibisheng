@@ -1,5 +1,8 @@
 "use strict";
 
+// Import
+var CShape = AscFormat.CShape;
+
 CImageShape.prototype.Get_Theme = CShape.prototype.Get_Theme;
 CImageShape.prototype.Get_ColorMap = CShape.prototype.Get_ColorMap;
 CImageShape.prototype.addToRecalculate = CShape.prototype.addToRecalculate;

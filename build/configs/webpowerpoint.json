@@ -14,6 +14,7 @@
 
         "../common/Drawings/Format/Constants.js",
 		"../common/Drawings/Format/Format.js",
+		"../common/Drawings/Format/Shape.js",
         "../common/Charts/charts.js",
 		
 		"../common/scroll.js",
@@ -82,7 +83,6 @@
         "../common/Drawings/Format/CreateGeometry.js",
         "../common/Drawings/Format/Geometry.js",
         "../common/Drawings/Format/Path.js",
-        "../common/Drawings/Format/Shape.js",
         "../common/Drawings/Format/Image.js",
         "../common/Drawings/Format/GroupShape.js",
         "../common/Drawings/Format/ChartSpace.js",

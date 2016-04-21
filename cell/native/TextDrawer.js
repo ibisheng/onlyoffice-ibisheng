@@ -936,7 +936,7 @@ CTextDrawer.prototype =
 
     set_fillColor: function(R, G, B)
     {
-        this.m_oFill = CreateUniFillByUniColor(AscFormat.CreateUniColorRGB(R, G, B));
+        this.m_oFill = AscFormat.CreateUniFillByUniColor(AscFormat.CreateUniColorRGB(R, G, B));
         this.Get_PathToDraw(false, true);
     },
 
@@ -2059,11 +2059,11 @@ CTextDrawer.prototype =
             if(this.m_oBrush.Color1.R !== -1)
             {
                 var Color = this.m_oBrush.Color1;
-                return CreateUniFillByUniColor(AscFormat.CreateUniColorRGB(Color.R, Color.G, Color.B));
+                return AscFormat.CreateUniFillByUniColor(AscFormat.CreateUniColorRGB(Color.R, Color.G, Color.B));
             }
             else
             {
-                return CreateUniFillByUniColor(AscFormat.CreateUniColorRGB(0, 0, 0));
+                return AscFormat.CreateUniFillByUniColor(AscFormat.CreateUniColorRGB(0, 0, 0));
             }
         }
     },

@@ -76,7 +76,7 @@ function OverlayObject(geometry, extX, extY, brush, pen, transform )
         {
             if (window["NATIVE_EDITOR_ENJINE"] === true)
             {
-                var _shape = new CShape();
+                var _shape = new AscFormat.CShape();
 				_shape.extX = this.ext.cx;
 				_shape.extY = this.ext.cy;
 				

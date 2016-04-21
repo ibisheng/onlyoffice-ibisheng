@@ -7764,7 +7764,7 @@ CTextPr.prototype =
             );
             if(this.FontRef.Color && !this.Unifill)
             {
-                this.Unifill = CreateUniFillByUniColorCopy(this.FontRef.Color);
+                this.Unifill = AscFormat.CreateUniFillByUniColorCopy(this.FontRef.Color);
             }
         }
     },

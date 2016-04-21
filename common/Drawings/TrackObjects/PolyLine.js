@@ -121,7 +121,7 @@ function PolyLine (drawingObjects, theme, master, layout, slide, pageIndex)
 
 
 
-        var shape = new CShape();
+        var shape = new AscFormat.CShape();
 
      //  if(drawingObjects)
      //  {

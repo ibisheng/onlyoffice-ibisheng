@@ -4628,7 +4628,7 @@ function CDrawingDocument(drawingObjects)
 
         AscFormat.ExecuteNoHistory(function()
         {
-            var shape = new CShape();
+            var shape = new AscFormat.CShape();
             shape.setTxBody(CreateTextBodyFromString("", this, shape));
             //var par = new Paragraph(this, null, 0, 0, 0, 1000, 1000, true);
             var par = shape.txBody.content.Content[0];

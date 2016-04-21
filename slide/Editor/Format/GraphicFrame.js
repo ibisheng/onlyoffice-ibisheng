@@ -1,4 +1,8 @@
 "use strict";
+
+// Import
+var CShape = AscFormat.CShape;
+
 function CGraphicFrame()
 {
     this.parent = null;

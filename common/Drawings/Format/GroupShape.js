@@ -4,6 +4,8 @@
 var c_oAscSizeRelFromH = AscCommon.c_oAscSizeRelFromH;
 var c_oAscSizeRelFromV = AscCommon.c_oAscSizeRelFromV;
 
+var CShape = AscFormat.CShape;
+
 function CGroupShape()
 {
 
@@ -288,11 +290,7 @@ CGroupShape.prototype =
         }
     },
 
-    getBoundsInGroup: function()
-    {
-        return getBoundsInGroup(this);
-    },
-
+    getBoundsInGroup: CShape.prototype.getBoundsInGroup,
     getBase64Img: CShape.prototype.getBase64Img,
 
     convertToWord: function(document)
@@ -475,7 +473,7 @@ CGroupShape.prototype =
             {
 
                 var dExtX = this.spPr.xfrm.extX, dExtY = this.spPr.xfrm.extY;
-                var oParaDrawing = getParaDrawing(this);
+                var oParaDrawing = AscFormat.getParaDrawing(this);
                 if(oParaDrawing)
                 {
                     if(oParaDrawing.SizeRelH || oParaDrawing.SizeRelV)

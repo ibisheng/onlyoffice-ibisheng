@@ -938,7 +938,7 @@ CTextDrawer.prototype =
 
     set_fillColor: function(R, G, B)
     {
-        this.m_oFill = CreateUniFillByUniColor(AscFormat.CreateUniColorRGB(R, G, B));
+        this.m_oFill = AscFormat.CreateUniFillByUniColor(AscFormat.CreateUniColorRGB(R, G, B));
         this.Get_PathToDraw(false, true);
     },
 
@@ -1743,7 +1743,7 @@ CTextDrawer.prototype =
                 var oUnifill = oCopyTextPr.TextFill ? oCopyTextPr.TextFill : oCopyTextPr.Unifill;
                 if((!oUnifill || !oUnifill.fill ||!oUnifill.fill.type === Asc.c_oAscFill._SOLID || !oUnifill.fill.color) && oCopyTextPr.Color)
                 {
-                    oUnifill = CreateUniFillByUniColor(AscFormat.CreateUniColorRGB(oCopyTextPr.Color.r, oCopyTextPr.Color.g, oCopyTextPr.Color.b))
+                    oUnifill = AscFormat.CreateUniFillByUniColor(AscFormat.CreateUniColorRGB(oCopyTextPr.Color.r, oCopyTextPr.Color.g, oCopyTextPr.Color.b))
                 }
                 if(oUnifill)
                 {
@@ -1852,7 +1852,7 @@ CTextDrawer.prototype =
                 var oUnifill = oCopyTextPr.TextFill ? oCopyTextPr.TextFill : oCopyTextPr.Unifill;
                 if((!oUnifill || !oUnifill.fill ||!oUnifill.fill.type === Asc.c_oAscFill.FILL_TYPE_SOLID || !oUnifill.fill.color) && oCopyTextPr.Color)
                 {
-                    oUnifill = CreateUniFillByUniColor(AscFormat.CreateUniColorRGB(oCopyTextPr.Color.r, oCopyTextPr.Color.g, oCopyTextPr.Color.b))
+                    oUnifill = AscFormat.CreateUniFillByUniColor(AscFormat.CreateUniColorRGB(oCopyTextPr.Color.r, oCopyTextPr.Color.g, oCopyTextPr.Color.b))
                 }
                 if(oUnifill)
                 {
@@ -2151,11 +2151,11 @@ CTextDrawer.prototype =
             if(this.m_oBrush.Color1.R !== -1)
             {
                 var Color = this.m_oBrush.Color1;
-                return CreateUniFillByUniColor(AscFormat.CreateUniColorRGB(Color.R, Color.G, Color.B));
+                return AscFormat.CreateUniFillByUniColor(AscFormat.CreateUniColorRGB(Color.R, Color.G, Color.B));
             }
             else
             {
-                return CreateUniFillByUniColor(AscFormat.CreateUniColorRGB(0, 0, 0));
+                return AscFormat.CreateUniFillByUniColor(AscFormat.CreateUniColorRGB(0, 0, 0));
             }
         }
     },
