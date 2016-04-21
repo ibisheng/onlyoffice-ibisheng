@@ -137,12 +137,12 @@ CDocContentStructure.prototype.checkByWarpStruct = function(oWarpStruct, dWidth,
                 var bArcDown = "textArchDown" !== oWarpStruct.preset && i < 1;
                 if(!AscFormat.isRealNumber(oWarpedObject.x) || !AscFormat.isRealNumber(oWarpedObject.y) )
                 {
-                    CheckAscFormat.GeometryByPolygon(oWarpedObject, oPolygon, bArcDown, XLimit*dKoeff, dContentHeight, dKoeff, nDivCount > 1 ? oBoundsChecker.Bounds : null);
+                    CheckGeometryByPolygon(oWarpedObject, oPolygon, bArcDown, XLimit*dKoeff, dContentHeight, dKoeff, nDivCount > 1 ? oBoundsChecker.Bounds : null);
                 }
                 else
                 {
                     oNextPointOnPolygon = this.checkTransformByOddPath(oMatrix, oWarpedObject, aWarpedObjects[t+1], oNextPointOnPolygon, dContentHeight, dKoeff, bArcDown, oPolygon, XLimit);
-                    TransformAscFormat.Geometry(oWarpedObject, oMatrix);
+                    TransformGeometry(oWarpedObject, oMatrix);
                 }
             }
         }
@@ -2265,7 +2265,7 @@ function ObjectsToDrawBetweenTwoPolygons(aObjectsToDraw, oBoundsController, oPol
     }
 }
 
-function TransformPointAscFormat.Geometry(x, y, oTransform)
+function TransformPointGeometry(x, y, oTransform)
 {
     var oRet = {x: 0, y: 0};
     oRet.x = oTransform.TransformPointX(x,y);
@@ -2274,7 +2274,7 @@ function TransformPointAscFormat.Geometry(x, y, oTransform)
 }
 
 
-function TransformAscFormat.Geometry(oObjectToDraw, oTransform)
+function TransformGeometry(oObjectToDraw, oTransform)
 {
     var oCommand, oPoint, oPath, t, j, aPathLst;
     aPathLst = oObjectToDraw.geometry.pathLst;
@@ -2289,7 +2289,7 @@ function TransformAscFormat.Geometry(oObjectToDraw, oTransform)
                 case moveTo:
                 case lineTo:
                 {
-                    oPoint = TransformPointAscFormat.Geometry(oCommand.X, oCommand.Y, oTransform);
+                    oPoint = TransformPointGeometry(oCommand.X, oCommand.Y, oTransform);
                     oCommand.X = oPoint.x;
                     oCommand.Y = oPoint.y;
                     break;
@@ -2297,23 +2297,23 @@ function TransformAscFormat.Geometry(oObjectToDraw, oTransform)
 
                 case bezier3:
                 {
-                    oPoint = TransformPointAscFormat.Geometry(oCommand.X0, oCommand.Y0, oTransform);
+                    oPoint = TransformPointGeometry(oCommand.X0, oCommand.Y0, oTransform);
                     oCommand.X0 = oPoint.x;
                     oCommand.Y0 = oPoint.y;
-                    oPoint = TransformPointAscFormat.Geometry(oCommand.X1, oCommand.Y1, oTransform);
+                    oPoint = TransformPointGeometry(oCommand.X1, oCommand.Y1, oTransform);
                     oCommand.X1 = oPoint.x;
                     oCommand.Y1 = oPoint.y;
                     break;
                 }
                 case bezier4:
                 {
-                    oPoint = TransformPointAscFormat.Geometry(oCommand.X0, oCommand.Y0, oTransform);
+                    oPoint = TransformPointGeometry(oCommand.X0, oCommand.Y0, oTransform);
                     oCommand.X0 = oPoint.x;
                     oCommand.Y0 = oPoint.y;
-                    oPoint = TransformPointAscFormat.Geometry(oCommand.X1, oCommand.Y1, oTransform);
+                    oPoint = TransformPointGeometry(oCommand.X1, oCommand.Y1, oTransform);
                     oCommand.X1 = oPoint.x;
                     oCommand.Y1 = oPoint.y;
-                    oPoint = TransformPointAscFormat.Geometry(oCommand.X2, oCommand.Y2, oTransform);
+                    oPoint = TransformPointGeometry(oCommand.X2, oCommand.Y2, oTransform);
                     oCommand.X2 = oPoint.x;
                     oCommand.Y2 = oPoint.y;
                     break;
@@ -2383,7 +2383,7 @@ function TransformPointPolygon(x, y, oPolygon, bFlag, XLimit, ContentHeight, dKo
     return oRet;
 }
 
-function CheckAscFormat.GeometryByPolygon(oObjectToDraw, oPolygon, bFlag, XLimit, ContentHeight, dKoeff, oBounds)
+function CheckGeometryByPolygon(oObjectToDraw, oPolygon, bFlag, XLimit, ContentHeight, dKoeff, oBounds)
 {
     var oCommand, oPoint, oPath, t, j, aPathLst;
     aPathLst = oObjectToDraw.geometry.pathLst;
