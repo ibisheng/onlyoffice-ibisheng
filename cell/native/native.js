@@ -2683,7 +2683,7 @@ function asc_ReadCBorder(s, p) {
     return null;
 }
 function asc_ReadAdjustPrint(s, p) {
-    var adjustPrint = new asc.asc_CAdjustPrint();
+    var adjustPrint = new window["Asc"].asc_CAdjustPrint();
 
     var next = true;
     while (next)
@@ -2891,7 +2891,7 @@ function asc_ReadCHyperLink(_params, _cursor) {
     return _settings;
 }
 function asc_ReadAddFormatTableOptions(s, p) {
-    var format = new asc.AddFormatTableOptions();
+    var format = new window["Asc"].AddFormatTableOptions();
 
     var next = true;
     while (next)
@@ -3237,7 +3237,7 @@ function OfflineEditor () {
                 return;
 
             var BB = drawing.bbox.seriesBBox;
-            var range = asc.Range(BB.c1, BB.r1, BB.c2, BB.r2, true);
+            var range = window["Asc"].Range(BB.c1, BB.r1, BB.c2, BB.r2, true);
             worksheet.arrActiveChartsRanges.push(range);
             worksheet.isChartAreaEditMode = true;
             worksheet._drawSelection();
@@ -3458,9 +3458,9 @@ function OfflineEditor () {
                 _graphics.SetIntegerGrid(false);
         };
 
-        var asc_Range = asc.Range;
-        var asc_round = asc.round;
-        var asc_typeof = asc.typeOf;
+        var asc_Range = window["Asc"].Range;
+        var asc_round = window["Asc"].round;
+        var asc_typeof = window["Asc"].typeOf;
 
         /**
          * header styles
@@ -3484,7 +3484,7 @@ function OfflineEditor () {
 
         var kNone = "none";
 
-        asc.WorksheetView.prototype.__drawColumnHeaders = function (drawingCtx, start, end, style, offsetXForDraw, offsetYForDraw) {
+        window["Asc"].WorksheetView.prototype.__drawColumnHeaders = function (drawingCtx, start, end, style, offsetXForDraw, offsetYForDraw) {
             if (undefined === drawingCtx && false === this.model.sheetViews[0].asc_getShowRowColHeaders())
                 return;
 
@@ -3521,7 +3521,7 @@ function OfflineEditor () {
             }
         };
 
-        asc.WorksheetView.prototype.__drawHeader = function (drawingCtx, x, y, w, h, style, isColHeader, index) {
+        window["Asc"].WorksheetView.prototype.__drawHeader = function (drawingCtx, x, y, w, h, style, isColHeader, index) {
             // Для отрисовки невидимого столбца/строки
             var isZeroHeader = false;
             if (-1 !== index) {
@@ -3620,7 +3620,7 @@ function OfflineEditor () {
             }
         };
 
-        asc.WorksheetView.prototype.__drawRowHeaders = function (drawingCtx, start, end, style, offsetXForDraw, offsetYForDraw) {
+        window["Asc"].WorksheetView.prototype.__drawRowHeaders = function (drawingCtx, start, end, style, offsetXForDraw, offsetYForDraw) {
             if (undefined === drawingCtx && false === this.model.sheetViews[0].asc_getShowRowColHeaders())
                 return;
 
@@ -3657,13 +3657,13 @@ function OfflineEditor () {
             }
         };
 
-        asc.WorksheetView.prototype.__drawGrid = function (drawingCtx, c1, r1, c2, r2, leftFieldInPt, topFieldInPt, width, height) {
+        window["Asc"].WorksheetView.prototype.__drawGrid = function (drawingCtx, c1, r1, c2, r2, leftFieldInPt, topFieldInPt, width, height) {
             var range = new asc_Range(c1, r1, c2, r2);
             this._prepareCellTextMetricsCache(range);
             this._drawGrid(drawingCtx, range, leftFieldInPt, topFieldInPt, width, height);
         };
 
-        asc.WorksheetView.prototype.__drawCellsAndBorders = function (drawingCtx,  c1, r1, c2, r2, offsetXForDraw, offsetYForDraw, istoplayer) {
+        window["Asc"].WorksheetView.prototype.__drawCellsAndBorders = function (drawingCtx,  c1, r1, c2, r2, offsetXForDraw, offsetYForDraw, istoplayer) {
             var range = new asc_Range(c1, r1, c2, r2);
 
             if (false === istoplayer) {
@@ -3697,7 +3697,7 @@ function OfflineEditor () {
             this.visibleRange = oldrange;
         };
 
-        asc.WorksheetView.prototype.__selection = function (c1, r1, c2, r2, isFrozen) {
+        window["Asc"].WorksheetView.prototype.__selection = function (c1, r1, c2, r2, isFrozen) {
 
             var native_selection = [];
 
@@ -3706,7 +3706,7 @@ function OfflineEditor () {
             this.visibleRange = new asc_Range(c1, r1, c2, r2);
 
             isFrozen = !!isFrozen;
-            if (asc["editor"].isStartAddShape || this.objectRender.selectedGraphicObjectsExists()) {
+            if (window["Asc"]["editor"].isStartAddShape || this.objectRender.selectedGraphicObjectsExists()) {
                 //if (this.isChartAreaEditMode) {
                 //    this._drawFormulaRanges(this.arrActiveChartsRanges);
                 //}
@@ -4066,7 +4066,7 @@ function OfflineEditor () {
             //}
         };
 
-        asc.WorksheetView.prototype.__changeSelectionTopLeft = function (x, y, isCoord, isSelectMode, isTopLeft) {
+        window["Asc"].WorksheetView.prototype.__changeSelectionTopLeft = function (x, y, isCoord, isSelectMode, isTopLeft) {
             //var ar = (this.isFormulaEditMode) ? this.arrActiveFormulaRanges[this.arrActiveFormulaRanges.length - 1] : this.activeRange;
 
             var isMoveActiveCellToLeftTop = false;
@@ -4133,13 +4133,13 @@ function OfflineEditor () {
             return this._calcActiveRangeOffset(x,y);
         };
 
-        asc.WorksheetView.prototype.__chartsRanges = function(ranges) {
+        window["Asc"].WorksheetView.prototype.__chartsRanges = function(ranges) {
 
             if (ranges) {
                 return this.__drawFormulaRanges(ranges, 0, 0, Asc.c_oAscSelectionType.RangeChart);
             }
 
-            if (asc["editor"].isStartAddShape || this.objectRender.selectedGraphicObjectsExists()) {
+            if (window["Asc"]["editor"].isStartAddShape || this.objectRender.selectedGraphicObjectsExists()) {
                 if (this.isChartAreaEditMode && this.arrActiveChartsRanges.length) {
                     return this.__drawFormulaRanges(this.arrActiveChartsRanges, 0, 0, Asc.c_oAscSelectionType.RangeChart);
                 }
@@ -4148,7 +4148,7 @@ function OfflineEditor () {
             return null;
         };
 
-        asc.WorksheetView.prototype.__drawFormulaRanges = function (arrRanges, offsetX, offsetY, rangetype) {
+        window["Asc"].WorksheetView.prototype.__drawFormulaRanges = function (arrRanges, offsetX, offsetY, rangetype) {
             var ranges = [],i = 0, type = 0, left = 0, right  = 0, top = 0, bottom = 0;
             var addt, addl, addr, addb, colsCount = this.cols.length - 1, rowsCount = this.rows.length - 1;
             var defaultWidth = this.model.getDefaultWidth();
@@ -4862,7 +4862,7 @@ function OfflineEditor () {
         var imageUrl = options[0];
 
         function ascCvtRatio(fromUnits, toUnits) {
-            return asc.getCvtRatio(fromUnits, toUnits, objectRender.getContext().getPPIX());
+            return window["Asc"].getCvtRatio(fromUnits, toUnits, objectRender.getContext().getPPIX());
         }
         function ptToMm(val) {
             return val * ascCvtRatio(1, 3);
@@ -4993,7 +4993,7 @@ function OfflineEditor () {
         var bottom  = params[4];
 
         function ascCvtRatio(fromUnits, toUnits) {
-            return asc.getCvtRatio(fromUnits, toUnits, objectRender.getContext().getPPIX());
+            return window["Asc"].getCvtRatio(fromUnits, toUnits, objectRender.getContext().getPPIX());
         }
         function ptToMm(val) {
             return val * ascCvtRatio(1, 3);
@@ -5091,7 +5091,7 @@ function OfflineEditor () {
 
         // STYLE MANAGER
 
-        asc.asc_CStylesPainter.prototype.generateStylesAll = function (cellStylesAll, fmgrGraphics, oFont, stringRenderer) {
+        window["Asc"].asc_CStylesPainter.prototype.generateStylesAll = function (cellStylesAll, fmgrGraphics, oFont, stringRenderer) {
 
             var pxTomm = 1.0; // 72.0 / 96.0;
 
@@ -5110,9 +5110,9 @@ function OfflineEditor () {
             this.generateDefaultStyles(cellStylesAll, fmgrGraphics, oFont, stringRenderer);
             this.generateDocumentStyles(cellStylesAll, fmgrGraphics, oFont, stringRenderer);
         };
-        asc.asc_CStylesPainter.prototype.generateDefaultStyles = function (cellStylesAll, fmgrGraphics, oFont, stringRenderer) {
+        window["Asc"].asc_CStylesPainter.prototype.generateDefaultStyles = function (cellStylesAll, fmgrGraphics, oFont, stringRenderer) {
             var cellStyles = cellStylesAll.DefaultStyles;
-            var oGraphics = new asc.DrawingContext({canvas: null, units: 0/*pt*/, fmgrGraphics: fmgrGraphics, font: oFont});
+            var oGraphics = new window["Asc"].DrawingContext({canvas: null, units: 0/*pt*/, fmgrGraphics: fmgrGraphics, font: oFont});
 
             var oStyle, oCustomStyle; var styleIndex = 0;
             for (var i = 0; i < cellStyles.length; ++i) {
@@ -5130,9 +5130,9 @@ function OfflineEditor () {
                 ++styleIndex;
             }
         };
-        asc.asc_CStylesPainter.prototype.generateDocumentStyles = function (cellStylesAll, fmgrGraphics, oFont, stringRenderer) {
+        window["Asc"].asc_CStylesPainter.prototype.generateDocumentStyles = function (cellStylesAll, fmgrGraphics, oFont, stringRenderer) {
             var cellStyles = cellStylesAll.CustomStyles;
-            var oGraphics = new asc.DrawingContext({canvas: null, units: 0/*pt*/, fmgrGraphics: fmgrGraphics, font: oFont});
+            var oGraphics = new window["Asc"].DrawingContext({canvas: null, units: 0/*pt*/, fmgrGraphics: fmgrGraphics, font: oFont});
 
             var oStyle; var styleIndex = 10000;
             for (var i = 0; i < cellStyles.length; ++i) {
@@ -5147,7 +5147,7 @@ function OfflineEditor () {
                 ++styleIndex;
             }
         };
-        asc.asc_CStylesPainter.prototype.drawStyle = function (oGraphics, stringRenderer, oStyle, sStyleName, nIndex) {
+        window["Asc"].asc_CStylesPainter.prototype.drawStyle = function (oGraphics, stringRenderer, oStyle, sStyleName, nIndex) {
 
             var oColor = oStyle.getFill();
             if (null !== oColor) {
@@ -5178,7 +5178,7 @@ function OfflineEditor () {
             var oFontColor = fc !== null ? fc : new AscCommon.CColor(0, 0, 0);
             var format = oStyle.getFont();
             // Для размера шрифта делаем ограничение для превью в 16pt (у Excel 18pt, но и высота превью больше 22px)
-            var oFont = new asc.FontProperties(format.fn, (16 < format.fs) ? 16 : format.fs, format.b, format.i, format.u, format.s);
+            var oFont = new window["Asc"].FontProperties(format.fn, (16 < format.fs) ? 16 : format.fs, format.b, format.i, format.u, format.s);
 
             var width_padding = 3; // 4 * 72 / 96
 
@@ -5197,10 +5197,10 @@ function OfflineEditor () {
         var styleThumbnailWidth  = Math.floor(92.0 * pxToMM);
         var styleThumbnailHeight = Math.floor(48.0 * pxToMM);
 
-        asc.WorkbookView.prototype = Object.create (asc.WorkbookView.prototype);
-        asc.WorkbookView.prototype.constructor = asc.WorkbookView;
+        window["Asc"].WorkbookView.prototype = Object.create (window["Asc"].WorkbookView.prototype);
+        window["Asc"].WorkbookView.prototype.constructor = window["Asc"].WorkbookView;
 
-        asc.WorkbookView.prototype.af_getTablePictures =  function(wb, fmgrGraphics, oFont) {
+        window["Asc"].WorkbookView.prototype.af_getTablePictures =  function(wb, fmgrGraphics, oFont) {
 
             window['native'].SetStylesType(1);
 
@@ -5266,7 +5266,7 @@ function OfflineEditor () {
             }
             return result;
         };
-        asc.WorkbookView.prototype.af_getSmallIconTable = function(canvas, style, fmgrGraphics, oFont) {
+        window["Asc"].WorkbookView.prototype.af_getSmallIconTable = function(canvas, style, fmgrGraphics, oFont) {
 
             var ctx = new Asc.DrawingContext({canvas: canvas, units: 0/*pt*/, fmgrGraphics: fmgrGraphics, font: oFont});
             var styleOptions = style;
@@ -5836,7 +5836,7 @@ function offline_mouse_down(x, y, pin, isViewerMode, isFormulaEditMode, isRangeR
 
             ws.startCellMoveResizeRange = null;
 
-            var rangeChange = new asc.Range(resizeRange[0], resizeRange[1], resizeRange[2], resizeRange[3]);
+            var rangeChange = new window["Asc"].Range(resizeRange[0], resizeRange[1], resizeRange[2], resizeRange[3]);
             var target = {
                 formulaRange: rangeChange,
                 row: ct.row, //isChartRange ? ct.row : targetRow,
@@ -5893,7 +5893,7 @@ function offline_mouse_move(x, y, isViewerMode, isRangeResize, isChartRange, ind
         if (!isViewerMode) {
             var ct = ws.getCursorTypeFromXY(x, y, isViewerMode);
 
-            var rangeChange = new asc.Range(resizeRange[0], resizeRange[1], resizeRange[2], resizeRange[3]);
+            var rangeChange = new window["Asc"].Range(resizeRange[0], resizeRange[1], resizeRange[2], resizeRange[3]);
             var target = {
                 //formulaRange: rangeChange,
                 row: isChartRange ? ct.row : targetRow,
