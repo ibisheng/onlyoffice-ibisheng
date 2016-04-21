@@ -80,8 +80,8 @@ function NewShapeTrack(presetGeom, startX, startY, theme, master, layout, slide,
             brush.merge(fill);
             if(slide)
             {
-                brush = CreateNoFillUniFill();
-                pen = CreateNoFillLine();
+                brush = AscFormat.CreateNoFillUniFill();
+                pen = AscFormat.CreateNoFillLine();
             }
         }
 

@@ -6084,7 +6084,7 @@
         this.ReadGraphicFrame = function (type, length, oDrawing) {
             var res = c_oSerConstants.ReadOk;
             if (c_oSer_DrawingType.Chart2 == type) {
-                var oNewChartSpace = new CChartSpace();
+                var oNewChartSpace = new AscFormat.CChartSpace();
                 var oBinaryChartReader = new BinaryChartReader(this.stream);
                 res = oBinaryChartReader.ExternalReadCT_ChartSpace(length, oNewChartSpace, this.curWorksheet);
                 oDrawing.graphicObject = oNewChartSpace;

@@ -978,7 +978,7 @@ CTextDrawer.prototype =
                 {
                     if(oShd.Color)
                     {
-                        this.m_oFill = CreateUnfilFromRGB(oShd.Color.r, oShd.Color.g, oShd.Color.b);
+                        this.m_oFill = AscFormat.CreateUnfilFromRGB(oShd.Color.r, oShd.Color.g, oShd.Color.b);
                     }
                     else
                     {
@@ -1003,7 +1003,7 @@ CTextDrawer.prototype =
     {
         if(oBorder && oBorder.Value !== border_None)
         {
-            this.m_oLine = CreatePenFromParams(oBorder.Unifill ? oBorder.Unifill : CreateUnfilFromRGB(oBorder.Color.r, oBorder.Color.g, oBorder.Color.b), this.m_oPen.Style, this.m_oPen.LineCap, this.m_oPen.LineJoin, this.m_oPen.LineWidth, this.m_oPen.Size);
+            this.m_oLine = CreatePenFromParams(oBorder.Unifill ? oBorder.Unifill : AscFormat.CreateUnfilFromRGB(oBorder.Color.r, oBorder.Color.g, oBorder.Color.b), this.m_oPen.Style, this.m_oPen.LineCap, this.m_oPen.LineJoin, this.m_oPen.LineWidth, this.m_oPen.Size);
         }
         else
         {
@@ -2050,7 +2050,7 @@ CTextDrawer.prototype =
             }
             if(oTextPr.Color)
             {
-                return CreateUnfilFromRGB(oTextPr.Color.r, oTextPr.Color.g, oTextPr.Color.b)
+                return AscFormat.CreateUnfilFromRGB(oTextPr.Color.r, oTextPr.Color.g, oTextPr.Color.b)
             }
             return null;
         }

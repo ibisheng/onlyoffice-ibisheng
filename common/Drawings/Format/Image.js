@@ -959,7 +959,7 @@ CImageShape.prototype =
             }
             case AscDFH.historyitem_AutoShapes_SetWorksheet:
             {
-                ReadWBModel(this, r);
+                AscFormat.ReadWBModel(this, r);
                 break;
             }
             case AscDFH.historyitem_ShapeSetBDeleted:

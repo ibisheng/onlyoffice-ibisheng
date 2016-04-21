@@ -2301,7 +2301,7 @@ CClosedPathIntegral.prototype.drawGlyph = function(parameters)
         var oTextOutline = oCompiledPr.TextOutline;
 
         var oCompiledPr2 = oCompiledPr.Copy();
-        oCompiledPr2.TextFill = CreateNoFillUniFill();
+        oCompiledPr2.TextFill = AscFormat.CreateNoFillUniFill();
         oCompiledPr2.Unifill  = null;
         oCompiledPr2.Color    = null;
         pGraphics.SetTextPr(oCompiledPr2, PDSE.Theme);

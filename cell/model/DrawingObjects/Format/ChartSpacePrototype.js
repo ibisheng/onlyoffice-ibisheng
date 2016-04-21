@@ -2,6 +2,7 @@
 
 // Import
 var CShape = AscFormat.CShape;
+var CChartSpace = AscFormat.CChartSpace;
 
 function getChartTranslateManager()
 {

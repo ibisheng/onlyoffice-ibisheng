@@ -9,6 +9,8 @@ var c_oAscCellAnchorType = AscCommon.c_oAscCellAnchorType;
 var c_oAscLockTypes = AscCommon.c_oAscLockTypes;
 var parserHelp = AscCommon.parserHelp;
 
+var BBoxInfo = AscCommon.BBoxInfo;
+
 var c_oAscError = Asc.c_oAscError;
 var c_oAscInsertOptions = Asc.c_oAscInsertOptions;
 var c_oAscDeleteOptions = Asc.c_oAscDeleteOptions;
@@ -174,7 +176,7 @@ asc_CChartBinary.prototype = {
         var stream = AscFormat.CreateBinaryReader(this["binary"], 0, this["binary"].length);
         //надо сбросить то, что остался после открытия документа
         window.global_pptx_content_loader.Clear();
-        var oNewChartSpace = new CChartSpace();
+        var oNewChartSpace = new AscFormat.CChartSpace();
         var oBinaryChartReader = new BinaryChartReader(stream);
         oBinaryChartReader.ExternalReadCT_ChartSpace(stream.size , oNewChartSpace, workSheet);
         return oNewChartSpace;
@@ -328,7 +330,7 @@ function CreateSparklineMarker(oUniFill)
     oMarker.size = 10;
     oMarker.spPr = new AscFormat.CSpPr();
     oMarker.spPr.Fill = oUniFill;
-    oMarker.spPr.ln = CreateNoFillLine();
+    oMarker.spPr.ln = AscFormat.CreateNoFillLine();
     return oMarker;
 }
 
@@ -338,7 +340,7 @@ function CreateUniFillFromExcelColor(oExcelColor)
     if(oExcelColor instanceof ThemeColor)
     {
 
-        oUnifill = CreateUnifillSolidFillSchemeColorByIndex(map_themeExcel_to_themePresentation[oExcelColor.theme]);
+        oUnifill = AscFormat.CreateUnifillSolidFillSchemeColorByIndex(map_themeExcel_to_themePresentation[oExcelColor.theme]);
         if(oExcelColor.tint != null)
         {
             var unicolor = oUnifill.fill.color;
@@ -358,11 +360,11 @@ function CreateUniFillFromExcelColor(oExcelColor)
             unicolor.Mods.addMod(mod);
         }
 
-        //oUnifill = CreateUniFillSchemeColorWidthTint(map_themeExcel_to_themePresentation[oExcelColor.theme], oExcelColor.tint != null ? oExcelColor.tint : 0);
+        //oUnifill = AscFormat.CreateUniFillSchemeColorWidthTint(map_themeExcel_to_themePresentation[oExcelColor.theme], oExcelColor.tint != null ? oExcelColor.tint : 0);
     }
     else
     {
-        oUnifill = CreateUnfilFromRGB(oExcelColor.getR(), oExcelColor.getG(), oExcelColor.getB())
+        oUnifill = AscFormat.CreateUnfilFromRGB(oExcelColor.getR(), oExcelColor.getG(), oExcelColor.getB())
     }
     return oUnifill;
 }
@@ -494,13 +496,13 @@ CSparklineView.prototype.initFromSparkline = function(oSparkline, oSparklineGrou
             chart_space.setSpPr(new AscFormat.CSpPr());
 
         var new_line = new AscFormat.CLn();
-        new_line.setFill(CreateNoFillUniFill());
+        new_line.setFill(AscFormat.CreateNoFillUniFill());
         chart_space.spPr.setLn(new_line);
-        chart_space.spPr.setFill(CreateNoFillUniFill());
+        chart_space.spPr.setFill(AscFormat.CreateNoFillUniFill());
         if(!chart_space.chart.plotArea.spPr)
         {
             chart_space.chart.plotArea.setSpPr(new AscFormat.CSpPr());
-            chart_space.chart.plotArea.spPr.setFill(CreateNoFillUniFill());
+            chart_space.chart.plotArea.spPr.setFill(AscFormat.CreateNoFillUniFill());
         }
         var oAxis = chart_space.chart.plotArea.getAxisByTypes();
         oAxis.valAx[0].setDelete(true);
@@ -566,7 +568,7 @@ CSparklineView.prototype.initFromSparkline = function(oSparkline, oSparklineGrou
                 oSeries.addDPt(oDPt);
             }
         }
-        var aSeriesPoints = getPtsFromSeries(oSerie);
+        var aSeriesPoints = AscFormat.getPtsFromSeries(oSerie);
         var aMaxPoints = null, aMinPoints = null;
         if(aSeriesPoints.length > 0)
         {
@@ -804,7 +806,7 @@ CSparklineView.prototype.setMinMaxValAx = function(minVal, maxVal, oSparklineGro
 
         if(oSparklineGroup.displayXAxis)
         {
-             var  aSeriesPoints = getPtsFromSeries(this.chartSpace.chart.plotArea.charts[0].series[0]);
+             var  aSeriesPoints = AscFormat.getPtsFromSeries(this.chartSpace.chart.plotArea.charts[0].series[0]);
             if(aSeriesPoints.length > 1)
             {
                 aSeriesPoints = [].concat(aSeriesPoints);
@@ -1783,7 +1785,7 @@ function DrawingObjects() {
             else if ( graphicObject instanceof AscFormat.CShape )
                 printShape(graphicObject, ctx, top, left);
             // Chart
-            else if (graphicObject instanceof CChartSpace)
+            else if (graphicObject instanceof AscFormat.CChartSpace)
                 printChart(graphicObject, ctx, top, left);
             // Group
             else if ( graphicObject instanceof AscFormat.CGroupShape )
@@ -1847,7 +1849,7 @@ function DrawingObjects() {
 
         function printChart(graphicObject, ctx, top, left) {
 
-            if ( (graphicObject instanceof CChartSpace) && graphicObject && ctx ) {
+            if ( (graphicObject instanceof AscFormat.CChartSpace) && graphicObject && ctx ) {
 
                 // Save
                 var tx = graphicObject.transform.tx;
@@ -1878,7 +1880,7 @@ function DrawingObjects() {
                     else if ( graphicItem instanceof AscFormat.CShape )
                         printShape(graphicItem, ctx, top, left);
 
-                    else if (graphicItem instanceof CChartSpace )
+                    else if (graphicItem instanceof AscFormat.CChartSpace )
                         printChart(graphicItem, ctx, top, left);
                 }
             }
@@ -2477,7 +2479,7 @@ function DrawingObjects() {
                     oSparklineView.initFromSparkline(oSparklineGroup.arrSparklines[i], oSparklineGroup, worksheet);
                     oSparklineGroup.addView(oSparklineView, i);
                 }
-                var aPoints = getPtsFromSeries(oSparklineGroup.arrCachedSparklines[i].chartSpace.chart.plotArea.charts[0].series[0]);
+                var aPoints = AscFormat.getPtsFromSeries(oSparklineGroup.arrCachedSparklines[i].chartSpace.chart.plotArea.charts[0].series[0]);
                 for(j = 0; j < aPoints.length; ++j)
                 {
                     if(Asc.SparklineAxisMinMax.Group === oSparklineGroup.maxAxisType)
@@ -2987,7 +2989,7 @@ function DrawingObjects() {
                             sStartCellId === sEndCellId ? sStartCellId :
                                 sStartCellId + ':' + sEndCellId);
                     }
-					var chartSeries = getChartSeries(worksheet.model, options, catHeadersBBox, serHeadersBBox);
+					var chartSeries = AscFormat.getChartSeries(worksheet.model, options, catHeadersBBox, serHeadersBBox);
 					drawingObject.rebuildSeriesFromAsc(chartSeries);
                     _this.controller.startRecalculate();
                     _this.sendGraphicObjectProps();
@@ -3483,7 +3485,7 @@ function DrawingObjects() {
             settings.putTitle(Asc.c_oAscChartTitleShowSettings.noOverlay);
             settings.putShowHorAxis(true);
             settings.putShowVerAxis(true);
-            var series = getChartSeries(worksheet.model, settings);
+            var series = AscFormat.getChartSeries(worksheet.model, settings);
             if(series && series.series.length > 1)
             {
                 settings.putLegendPos(Asc.c_oAscChartLegendShowSettings.right);

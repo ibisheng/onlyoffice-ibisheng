@@ -1873,8 +1873,8 @@ CMathBase.prototype.Make_ShdColor = function(PDSE, CurTextPr)
 
         if ( true === PDSE.VisitedHyperlink && ( undefined === this.CtrPrp.Color && undefined === this.CtrPrp.Unifill ) )
         {
-            G_O_VISITED_HLINK_COLOR.check(PDSE.Theme, PDSE.ColorMap);
-            RGBA = G_O_VISITED_HLINK_COLOR.getRGBAColor();
+            AscFormat.G_O_VISITED_HLINK_COLOR.check(PDSE.Theme, PDSE.ColorMap);
+            RGBA = AscFormat.G_O_VISITED_HLINK_COLOR.getRGBAColor();
             pGraphics.p_color( RGBA.R, RGBA.G, RGBA.B, RGBA.A );
             pGraphics.b_color1( RGBA.R, RGBA.G, RGBA.B, RGBA.A );
         }
@@ -1888,8 +1888,8 @@ CMathBase.prototype.Make_ShdColor = function(PDSE, CurTextPr)
     {
         if ( true === PDSE.VisitedHyperlink && ( undefined === this.CtrPrp.Color && undefined === this.CtrPrp.Unifill ) )
         {
-            G_O_VISITED_HLINK_COLOR.check(PDSE.Theme, PDSE.ColorMap);
-            RGBA = G_O_VISITED_HLINK_COLOR.getRGBAColor();
+            AscFormat.G_O_VISITED_HLINK_COLOR.check(PDSE.Theme, PDSE.ColorMap);
+            RGBA = AscFormat.G_O_VISITED_HLINK_COLOR.getRGBAColor();
             pGraphics.p_color( RGBA.R, RGBA.G, RGBA.B, RGBA.A );
             pGraphics.b_color1( RGBA.R, RGBA.G, RGBA.B, RGBA.A );
         }

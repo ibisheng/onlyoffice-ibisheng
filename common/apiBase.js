@@ -132,7 +132,7 @@ baseEditorsApi.prototype._baseInit = function() {
     t._uploadCallback(error, files);
   });
 
-  CHART_STYLE_MANAGER = new CChartStyleManager();
+  AscFormat.CHART_STYLE_MANAGER.init();
 };
 baseEditorsApi.prototype._editorNameById = function() {
   var res = '';

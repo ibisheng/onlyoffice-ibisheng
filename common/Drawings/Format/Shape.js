@@ -192,7 +192,7 @@ function CopyRunToPPTX(Run, Paragraph, bHyper)
     {
         if(!RunPr.Unifill)
         {
-            RunPr.Unifill = CreateUniFillSchemeColorWidthTint(11, 0);
+            RunPr.Unifill = AscFormat.CreateUniFillSchemeColorWidthTint(11, 0);
         }
         RunPr.Underline = true;
     }
@@ -364,7 +364,7 @@ function CheckWordRunPr(Pr)
             case c_oAscFill.FILL_TYPE_BLIP:
             {
                 NewRPr = Pr.Copy();
-                NewRPr.TextFill = CreateUnfilFromRGB(0, 0, 0);
+                NewRPr.TextFill = AscFormat.CreateUnfilFromRGB(0, 0, 0);
                 NewRPr.Unifill = undefined;
                 break;
             }
@@ -4351,7 +4351,7 @@ CShape.prototype =
         {
             return this.brush;
         }
-        return CreateNoFillUniFill();
+        return AscFormat.CreateNoFillUniFill();
     },
 
     getStroke: function () {
@@ -4359,7 +4359,7 @@ CShape.prototype =
         {
             return this.pen;
         }
-        var ret = CreateNoFillLine();
+        var ret = AscFormat.CreateNoFillLine();
         ret.w = 0;
         return ret;
     },
@@ -5317,7 +5317,7 @@ CShape.prototype =
                 }
                 case AscDFH.historyitem_AutoShapes_SetWorksheet:
                 {
-                    ReadWBModel(this, r);
+                    AscFormat.ReadWBModel(this, r);
                     break;
                 }
                 case AscDFH.historyitem_ShapeSetBDeleted:

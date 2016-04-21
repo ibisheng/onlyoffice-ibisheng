@@ -2499,7 +2499,7 @@ DrawingObjectsController.prototype =
                             catHeadersBBox = {r1: chart_space.bbox.serBBox.r1, r2: chart_space.bbox.serBBox.r2,
 								c1: chart_space.bbox.serBBox.c1, c2: chart_space.bbox.serBBox.c2};
                     }
-					var chartSeries = getChartSeries(ws_view.model, chartSettings, catHeadersBBox, serHeadersBBox);
+					var chartSeries = AscFormat.getChartSeries(ws_view.model, chartSettings, catHeadersBBox, serHeadersBBox);
                     chart_space.clearFormatting(true);
                     b_clear_formatting = true;
                     chart_space.rebuildSeriesFromAsc(chartSeries);
@@ -2596,7 +2596,7 @@ DrawingObjectsController.prototype =
             }
             if(!val_ax || !cat_ax)
             {
-                var axis_obj = CreateDefaultAxises(need_num_fmt);
+                var axis_obj = AscFormat.CreateDefaultAxises(need_num_fmt);
                 cat_ax = axis_obj.catAx;
                 val_ax = axis_obj.valAx;
             }
@@ -2827,7 +2827,7 @@ DrawingObjectsController.prototype =
 
                     if(bNeed3D)
                     {
-                        chart.setView3D(CreateView3d(15, 20, true, c_oAscChartTypeSettings.barNormal3dPerspective === type ? 100 : undefined));
+                        chart.setView3D(AscFormat.CreateView3d(15, 20, true, c_oAscChartTypeSettings.barNormal3dPerspective === type ? 100 : undefined));
                         chart.setDefaultWalls();
                         new_chart_type.set3D(true);
                     }
@@ -2981,7 +2981,7 @@ DrawingObjectsController.prototype =
                     }
                     if(type === c_oAscChartTypeSettings.line3d)
                     {
-                        chart.setView3D(CreateView3d(15, 20, true, 100));
+                        chart.setView3D(AscFormat.CreateView3d(15, 20, true, 100));
                         chart.setDefaultWalls();
                     }
                     else
@@ -3018,7 +3018,7 @@ DrawingObjectsController.prototype =
                     new_chart_type.setVaryColors(true);
                     if(type === c_oAscChartTypeSettings.pie3d)
                     {
-                        chart.setView3D(CreateView3d(30, 0, true, 100));
+                        chart.setView3D(AscFormat.CreateView3d(30, 0, true, 100));
                         chart.setDefaultWalls();
                     }
                     else
@@ -3167,7 +3167,7 @@ DrawingObjectsController.prototype =
                         new_chart_type.series[j].setMarker(null);
                     }
                     new_chart_type.setScatterStyle(SCATTER_STYLE_MARKER);
-                    axis_obj = CreateScatterAxis(); //cat - 0, val - 1
+                    axis_obj = AscFormat.CreateScatterAxis(); //cat - 0, val - 1
                     new_chart_type.addAxId(axis_obj.catAx);
                     new_chart_type.addAxId(axis_obj.valAx);
                     plot_area.addAxis(axis_obj.catAx);
@@ -3589,7 +3589,7 @@ DrawingObjectsController.prototype =
                     {
                         chart_type.series[j].setSmooth(null);
                     }
-                    chart_type.series[j].spPr.setLn(CreateNoFillLine());
+                    chart_type.series[j].spPr.setLn(AscFormat.CreateNoFillLine());
                 }
             }
             else
@@ -3718,7 +3718,7 @@ DrawingObjectsController.prototype =
                     {
                         chart_type.series[j].setSpPr(new AscFormat.CSpPr());
                     }
-                    chart_type.series[j].spPr.setLn(CreateNoFillLine());
+                    chart_type.series[j].spPr.setLn(AscFormat.CreateNoFillLine());
                 }
                 if(chartSettings.showMarker)
                 {
@@ -4179,55 +4179,55 @@ DrawingObjectsController.prototype =
 		switch (options.type) {
 			case c_oAscChartTypeSettings.lineNormal:
 			case c_oAscChartTypeSettings.lineNormalMarker:
-				return CreateLineChart(chartSeries, GROUPING_STANDARD, bUseCache, options);
+				return AscFormat.CreateLineChart(chartSeries, GROUPING_STANDARD, bUseCache, options);
 			case c_oAscChartTypeSettings.lineStacked:
 			case c_oAscChartTypeSettings.lineStackedMarker:
-				return CreateLineChart(chartSeries, GROUPING_STACKED, bUseCache, options);
+				return AscFormat.CreateLineChart(chartSeries, GROUPING_STACKED, bUseCache, options);
 			case c_oAscChartTypeSettings.lineStackedPer:
 			case c_oAscChartTypeSettings.lineStackedPerMarker:
-				return CreateLineChart(chartSeries, GROUPING_PERCENT_STACKED, bUseCache, options);
+				return AscFormat.CreateLineChart(chartSeries, GROUPING_PERCENT_STACKED, bUseCache, options);
             case c_oAscChartTypeSettings.line3d:
-                return CreateLineChart(chartSeries, GROUPING_STANDARD, bUseCache, options, true);
+                return AscFormat.CreateLineChart(chartSeries, GROUPING_STANDARD, bUseCache, options, true);
 			case c_oAscChartTypeSettings.barNormal:
-				return CreateBarChart(chartSeries, BAR_GROUPING_CLUSTERED, bUseCache, options);
+				return AscFormat.CreateBarChart(chartSeries, BAR_GROUPING_CLUSTERED, bUseCache, options);
 			case c_oAscChartTypeSettings.barStacked:
-				return CreateBarChart(chartSeries, BAR_GROUPING_STACKED, bUseCache, options);
+				return AscFormat.CreateBarChart(chartSeries, BAR_GROUPING_STACKED, bUseCache, options);
 			case c_oAscChartTypeSettings.barStackedPer:
-				return CreateBarChart(chartSeries, BAR_GROUPING_PERCENT_STACKED, bUseCache, options);
+				return AscFormat.CreateBarChart(chartSeries, BAR_GROUPING_PERCENT_STACKED, bUseCache, options);
             case c_oAscChartTypeSettings.barNormal3d:
-                return CreateBarChart(chartSeries, BAR_GROUPING_CLUSTERED, bUseCache, options, true);
+                return AscFormat.CreateBarChart(chartSeries, BAR_GROUPING_CLUSTERED, bUseCache, options, true);
             case c_oAscChartTypeSettings.barStacked3d:
-                return CreateBarChart(chartSeries, BAR_GROUPING_STACKED, bUseCache, options, true);
+                return AscFormat.CreateBarChart(chartSeries, BAR_GROUPING_STACKED, bUseCache, options, true);
             case c_oAscChartTypeSettings.barStackedPer3d:
-                return CreateBarChart(chartSeries, BAR_GROUPING_PERCENT_STACKED, bUseCache, options, true);
+                return AscFormat.CreateBarChart(chartSeries, BAR_GROUPING_PERCENT_STACKED, bUseCache, options, true);
             case c_oAscChartTypeSettings.barNormal3dPerspective:
-                return CreateBarChart(chartSeries, BAR_GROUPING_STANDARD, bUseCache, options, true, true);
+                return AscFormat.CreateBarChart(chartSeries, BAR_GROUPING_STANDARD, bUseCache, options, true, true);
 			case c_oAscChartTypeSettings.hBarNormal:
-				return CreateHBarChart(chartSeries, BAR_GROUPING_CLUSTERED, bUseCache, options);
+				return AscFormat.CreateHBarChart(chartSeries, BAR_GROUPING_CLUSTERED, bUseCache, options);
 			case c_oAscChartTypeSettings.hBarStacked:
-				return CreateHBarChart(chartSeries, BAR_GROUPING_STACKED, bUseCache, options);
+				return AscFormat.CreateHBarChart(chartSeries, BAR_GROUPING_STACKED, bUseCache, options);
 			case c_oAscChartTypeSettings.hBarStackedPer:
-				return CreateHBarChart(chartSeries, BAR_GROUPING_PERCENT_STACKED, bUseCache, options);
+				return AscFormat.CreateHBarChart(chartSeries, BAR_GROUPING_PERCENT_STACKED, bUseCache, options);
             case c_oAscChartTypeSettings.hBarNormal3d:
-                return CreateHBarChart(chartSeries, BAR_GROUPING_CLUSTERED, bUseCache, options, true);
+                return AscFormat.CreateHBarChart(chartSeries, BAR_GROUPING_CLUSTERED, bUseCache, options, true);
             case c_oAscChartTypeSettings.hBarStacked3d:
-                return CreateHBarChart(chartSeries, BAR_GROUPING_STACKED, bUseCache, options, true);
+                return AscFormat.CreateHBarChart(chartSeries, BAR_GROUPING_STACKED, bUseCache, options, true);
             case c_oAscChartTypeSettings.hBarStackedPer3d:
-                return CreateHBarChart(chartSeries, BAR_GROUPING_PERCENT_STACKED, bUseCache, options, true);
+                return AscFormat.CreateHBarChart(chartSeries, BAR_GROUPING_PERCENT_STACKED, bUseCache, options, true);
 			case c_oAscChartTypeSettings.areaNormal:
-				return CreateAreaChart(chartSeries, GROUPING_STANDARD, bUseCache, options);
+				return AscFormat.CreateAreaChart(chartSeries, GROUPING_STANDARD, bUseCache, options);
 			case c_oAscChartTypeSettings.areaStacked:
-				return CreateAreaChart(chartSeries, GROUPING_STACKED, bUseCache, options);
+				return AscFormat.CreateAreaChart(chartSeries, GROUPING_STACKED, bUseCache, options);
 			case c_oAscChartTypeSettings.areaStackedPer:
-				return CreateAreaChart(chartSeries, GROUPING_PERCENT_STACKED, bUseCache, options);
+				return AscFormat.CreateAreaChart(chartSeries, GROUPING_PERCENT_STACKED, bUseCache, options);
 			case c_oAscChartTypeSettings.stock:
-				return CreateStockChart(chartSeries, bUseCache, options);
+				return AscFormat.CreateStockChart(chartSeries, bUseCache, options);
 			case c_oAscChartTypeSettings.doughnut:
-				return CreatePieChart(chartSeries, true, bUseCache, options);
+				return AscFormat.CreatePieChart(chartSeries, true, bUseCache, options);
 			case c_oAscChartTypeSettings.pie:
-				return CreatePieChart(chartSeries, false, bUseCache, options);
+				return AscFormat.CreatePieChart(chartSeries, false, bUseCache, options);
             case c_oAscChartTypeSettings.pie3d:
-                return CreatePieChart(chartSeries, false, bUseCache, options, true);
+                return AscFormat.CreatePieChart(chartSeries, false, bUseCache, options, true);
 			case c_oAscChartTypeSettings.scatter:
 			case c_oAscChartTypeSettings.scatterLine:
 			case c_oAscChartTypeSettings.scatterLineMarker:
@@ -4235,7 +4235,7 @@ DrawingObjectsController.prototype =
 			case c_oAscChartTypeSettings.scatterNone:
 			case c_oAscChartTypeSettings.scatterSmooth:
 			case c_oAscChartTypeSettings.scatterSmoothMarker:
-				return CreateScatterChart(chartSeries, bUseCache, options);
+				return AscFormat.CreateScatterChart(chartSeries, bUseCache, options);
 			// radar return CreateRadarChart(chartSeries);
 		}
 
@@ -4244,7 +4244,7 @@ DrawingObjectsController.prototype =
 
 	getChartSpace: function(worksheet, options)
 	{
-		var chartSeries = getChartSeries(worksheet, options);
+		var chartSeries = AscFormat.getChartSeries(worksheet, options);
 		return this._getChartSpace(chartSeries, options);
 	},
 
@@ -6725,7 +6725,7 @@ DrawingObjectsController.prototype =
                 }
                 else if(oTextPr.Color)
                 {
-                    oTextArtProperties.Fill = CreateUnfilFromRGB(oTextPr.Color.r, oTextPr.Color.g, oTextPr.Color.b);
+                    oTextArtProperties.Fill = AscFormat.CreateUnfilFromRGB(oTextPr.Color.r, oTextPr.Color.g, oTextPr.Color.b);
                 }
                 oTextArtProperties.Line = oTextPr.TextOutline;
                 if(oTextArtProperties.Fill)
@@ -7066,8 +7066,8 @@ DrawingObjectsController.prototype =
         oXfrm.setExtY(1828800/36000);
         oSpPr.setXfrm(oXfrm);
         oXfrm.setParent(oSpPr);
-        oSpPr.setFill(CreateNoFillUniFill());
-        oSpPr.setLn(CreateNoFillLine());
+        oSpPr.setFill(AscFormat.CreateNoFillUniFill());
+        oSpPr.setLn(AscFormat.CreateNoFillLine());
         oSpPr.setGeometry(AscFormat.CreateGeometry("rect"));
         oSpPr.geometry.setParent(oSpPr);
         oShape.setSpPr(oSpPr);

@@ -264,11 +264,11 @@ ObjectToDraw.prototype =
                 {
                     if(this.Comment.Additional.CommentId === editor.WordControl.m_oLogicDocument.Comments.Get_CurrentId())
                     {
-                        this.brush = G_O_ACTIVE_COMMENT_BRUSH;
+                        this.brush = AscFormat.G_O_ACTIVE_COMMENT_BRUSH;
                     }
                     else
                     {
-                        this.brush = G_O_NO_ACTIVE_COMMENT_BRUSH;
+                        this.brush = AscFormat.G_O_NO_ACTIVE_COMMENT_BRUSH;
                     }
                     var oComm = this.Comment;
                     Para && editor.WordControl.m_oLogicDocument.Comments.Add_DrawingRect(oComm.x0, oComm.y0, oComm.x1 - oComm.x0, oComm.y1 - oComm.y0, graphics.PageNum, this.Comment.Additional.CommentId, global_MatrixTransformer.Invert(oTransform));

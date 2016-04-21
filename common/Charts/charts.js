@@ -7,6 +7,10 @@
 */
 function (window, undefined) {
 // Import
+
+	var CreateNoFillLine = AscFormat.CreateNoFillLine;
+	var CreateNoFillUniFill = AscFormat.CreateNoFillUniFill;
+	
 var c_oAscChartTypeSettings = Asc.c_oAscChartTypeSettings;
 var c_oAscTickMark = Asc.c_oAscTickMark;
 
@@ -851,7 +855,7 @@ TextArtPreviewManager.prototype.getShape =  function()
 	oTrack.track({}, oShape.convertPixToMM(this.canvasWidth), oShape.convertPixToMM(this.canvasHeight));
 	oShape = oTrack.getShape(bWord, oShape.getDrawingDocument(), oShape.drawingObjects);
     oShape.setStyle(null);
-    oShape.spPr.setFill(CreateUnfilFromRGB(255, 255, 255));
+    oShape.spPr.setFill(AscFormat.CreateUnfilFromRGB(255, 255, 255));
 	var oBodypr = oShape.getBodyPr().createDuplicate();
 	oBodypr.lIns = 0;
 	oBodypr.tIns = 0;

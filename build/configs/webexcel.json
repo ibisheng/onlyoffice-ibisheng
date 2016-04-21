@@ -21,6 +21,7 @@
 		"../common/Drawings/Format/Path.js",
 		"../common/Drawings/Format/Image.js",
 		"../common/Drawings/Format/GroupShape.js",
+		"../common/Drawings/Format/ChartSpace.js",
         "../common/Charts/charts.js",
 		
 		"../common/scroll.js",
@@ -96,7 +97,6 @@
         "../common/Drawings/TrackObjects/PolyLine.js",
         "../common/Drawings/TrackObjects/Spline.js",
         "../common/Drawings/TrackObjects/MoveTracks.js",
-        "../common/Drawings/Format/ChartSpace.js",
         "../common/Drawings/Format/ChartFormat.js",
         "../common/Drawings/Format/TextBody.js",
         "../common/Drawings/TextDrawer.js",

@@ -8704,7 +8704,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 		else if( c_oSerImageType2.Chart2 === type )
         {
 			res = c_oSerConstants.ReadUnknown;
-			var oNewChartSpace = new CChartSpace();
+			var oNewChartSpace = new AscFormat.CChartSpace();
             var oBinaryChartReader = new BinaryChartReader(this.stream);
             res = oBinaryChartReader.ExternalReadCT_ChartSpace(length, oNewChartSpace, this.Document);
             oNewChartSpace.setBDeleted(false);

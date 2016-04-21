@@ -1,5 +1,12 @@
 "use strict";
 
+(
+/**
+* @param {Window} window
+* @param {undefined} undefined
+*/
+function (window, undefined) {
+
 // Import
 var c_oAscChartType = AscCommon.c_oAscChartType;
 var c_oAscChartSubType = AscCommon.c_oAscChartSubType;
@@ -131,10 +138,15 @@ function CreateUnifillSolidFillSchemeColorByIndex(index)
 function CChartStyleManager()
 {
     this.styles = [];
-    AscFormat.ExecuteNoHistory(
-        function()
-        {
-            var DefaultDataPointPerDataPoint =
+}
+
+CChartStyleManager.prototype =
+{
+    init: function() {
+        AscFormat.ExecuteNoHistory(
+          function()
+          {
+              var DefaultDataPointPerDataPoint =
                 [
                     [
                         CreateUniFillSchemeColorWidthTint(8, 0.885),
@@ -169,69 +181,66 @@ function CChartStyleManager()
                         CreateUniFillSchemeColorWidthTint(8, 0.3)
                     ]
                 ];
-            var s = DefaultDataPointPerDataPoint;
-            var f = CreateUniFillSchemeColorWidthTint;
-            this.styles[0] = new CChartStyle(EFFECT_NONE, EFFECT_SUBTLE, s[0], EFFECT_SUBTLE, EFFECT_NONE, [], 3, s[0], 7);
-            this.styles[1] = new CChartStyle(EFFECT_NONE, EFFECT_SUBTLE, s[1], EFFECT_SUBTLE, EFFECT_NONE, [], 3, s[1], 7);
-            for(var i = 2; i < 8; ++i)
-            {
-                this.styles[i] = new CChartStyle(EFFECT_NONE, EFFECT_SUBTLE, [f(i - 2,0)], EFFECT_SUBTLE, EFFECT_NONE, [], 3, [f(i - 2,0)], 7);
-            }
-            this.styles[8] = new CChartStyle(EFFECT_SUBTLE, EFFECT_SUBTLE, s[0], EFFECT_SUBTLE, EFFECT_SUBTLE,  [f(12,0)], 5, s[0], 9);
-            this.styles[9] = new CChartStyle(EFFECT_SUBTLE, EFFECT_SUBTLE, s[1], EFFECT_SUBTLE, EFFECT_SUBTLE,  [f(12,0)], 5, s[1], 9);
-            for(i = 10; i < 16; ++i)
-            {
-                this.styles[i] = new CChartStyle(EFFECT_SUBTLE, EFFECT_SUBTLE, [f(i-10,0)], EFFECT_SUBTLE, EFFECT_SUBTLE,  [f(12,0)], 5, [f(i-10,0)], 9);
-            }
-            this.styles[16] = new CChartStyle(EFFECT_MODERATE, EFFECT_INTENSE, s[0], EFFECT_SUBTLE, EFFECT_NONE,  [], 5, s[0], 9);
-            this.styles[17] = new CChartStyle(EFFECT_MODERATE, EFFECT_INTENSE, s[1], EFFECT_INTENSE, EFFECT_NONE,  [], 5, s[1], 9);
-            for(i = 18; i < 24; ++i)
-            {
-                this.styles[i] = new CChartStyle(EFFECT_MODERATE, EFFECT_INTENSE, [f(i-18,0)], EFFECT_SUBTLE, EFFECT_NONE,  [], 5, [f(i-18,0)], 9);
-            }
-            this.styles[24] = new CChartStyle(EFFECT_INTENSE, EFFECT_INTENSE, s[0], EFFECT_SUBTLE, EFFECT_NONE,  [], 7, s[0], 13);
-            this.styles[25] = new CChartStyle(EFFECT_MODERATE, EFFECT_INTENSE, s[1], EFFECT_SUBTLE, EFFECT_NONE,  [], 7, s[1], 13);
-            for(i = 26; i < 32; ++i)
-            {
-                this.styles[i] = new CChartStyle(EFFECT_MODERATE, EFFECT_INTENSE, [f(i-26,0)], EFFECT_SUBTLE, EFFECT_NONE,  [], 7, [f(i-26,0)], 13);
-            }
-            this.styles[32] = new CChartStyle(EFFECT_NONE, EFFECT_SUBTLE, s[0], EFFECT_SUBTLE, EFFECT_SUBTLE,  [f(8, -0.5)], 5, s[0], 9);
-            this.styles[33] = new CChartStyle(EFFECT_NONE, EFFECT_SUBTLE, s[1], EFFECT_SUBTLE, EFFECT_SUBTLE,  s[2], 5, s[1], 9);
-            for(i = 34; i < 40; ++i)
-            {
-                this.styles[i] = new CChartStyle(EFFECT_NONE, EFFECT_SUBTLE, [f(i - 34, 0)], EFFECT_SUBTLE, EFFECT_SUBTLE, [f(i-34, -0.5)], 5, [f(i-34, 0)], 9);
-            }
-            this.styles[40] = new CChartStyle(EFFECT_INTENSE, EFFECT_INTENSE, s[3], EFFECT_SUBTLE, EFFECT_NONE, [], 5, s[3], 9);
-            this.styles[41] = new CChartStyle(EFFECT_INTENSE, EFFECT_INTENSE, s[1], EFFECT_INTENSE, EFFECT_NONE, [], 5, s[1], 9);
-            for(i = 42; i < 48; ++i)
-            {
-                this.styles[i] = new CChartStyle(EFFECT_INTENSE, EFFECT_INTENSE, [f(i-42, 0)], EFFECT_SUBTLE, EFFECT_NONE, [], 5, [f(i-42, 0)], 9);
-            }
+              var s = DefaultDataPointPerDataPoint;
+              var f = CreateUniFillSchemeColorWidthTint;
+              this.styles[0] = new CChartStyle(EFFECT_NONE, EFFECT_SUBTLE, s[0], EFFECT_SUBTLE, EFFECT_NONE, [], 3, s[0], 7);
+              this.styles[1] = new CChartStyle(EFFECT_NONE, EFFECT_SUBTLE, s[1], EFFECT_SUBTLE, EFFECT_NONE, [], 3, s[1], 7);
+              for(var i = 2; i < 8; ++i)
+              {
+                  this.styles[i] = new CChartStyle(EFFECT_NONE, EFFECT_SUBTLE, [f(i - 2,0)], EFFECT_SUBTLE, EFFECT_NONE, [], 3, [f(i - 2,0)], 7);
+              }
+              this.styles[8] = new CChartStyle(EFFECT_SUBTLE, EFFECT_SUBTLE, s[0], EFFECT_SUBTLE, EFFECT_SUBTLE,  [f(12,0)], 5, s[0], 9);
+              this.styles[9] = new CChartStyle(EFFECT_SUBTLE, EFFECT_SUBTLE, s[1], EFFECT_SUBTLE, EFFECT_SUBTLE,  [f(12,0)], 5, s[1], 9);
+              for(i = 10; i < 16; ++i)
+              {
+                  this.styles[i] = new CChartStyle(EFFECT_SUBTLE, EFFECT_SUBTLE, [f(i-10,0)], EFFECT_SUBTLE, EFFECT_SUBTLE,  [f(12,0)], 5, [f(i-10,0)], 9);
+              }
+              this.styles[16] = new CChartStyle(EFFECT_MODERATE, EFFECT_INTENSE, s[0], EFFECT_SUBTLE, EFFECT_NONE,  [], 5, s[0], 9);
+              this.styles[17] = new CChartStyle(EFFECT_MODERATE, EFFECT_INTENSE, s[1], EFFECT_INTENSE, EFFECT_NONE,  [], 5, s[1], 9);
+              for(i = 18; i < 24; ++i)
+              {
+                  this.styles[i] = new CChartStyle(EFFECT_MODERATE, EFFECT_INTENSE, [f(i-18,0)], EFFECT_SUBTLE, EFFECT_NONE,  [], 5, [f(i-18,0)], 9);
+              }
+              this.styles[24] = new CChartStyle(EFFECT_INTENSE, EFFECT_INTENSE, s[0], EFFECT_SUBTLE, EFFECT_NONE,  [], 7, s[0], 13);
+              this.styles[25] = new CChartStyle(EFFECT_MODERATE, EFFECT_INTENSE, s[1], EFFECT_SUBTLE, EFFECT_NONE,  [], 7, s[1], 13);
+              for(i = 26; i < 32; ++i)
+              {
+                  this.styles[i] = new CChartStyle(EFFECT_MODERATE, EFFECT_INTENSE, [f(i-26,0)], EFFECT_SUBTLE, EFFECT_NONE,  [], 7, [f(i-26,0)], 13);
+              }
+              this.styles[32] = new CChartStyle(EFFECT_NONE, EFFECT_SUBTLE, s[0], EFFECT_SUBTLE, EFFECT_SUBTLE,  [f(8, -0.5)], 5, s[0], 9);
+              this.styles[33] = new CChartStyle(EFFECT_NONE, EFFECT_SUBTLE, s[1], EFFECT_SUBTLE, EFFECT_SUBTLE,  s[2], 5, s[1], 9);
+              for(i = 34; i < 40; ++i)
+              {
+                  this.styles[i] = new CChartStyle(EFFECT_NONE, EFFECT_SUBTLE, [f(i - 34, 0)], EFFECT_SUBTLE, EFFECT_SUBTLE, [f(i-34, -0.5)], 5, [f(i-34, 0)], 9);
+              }
+              this.styles[40] = new CChartStyle(EFFECT_INTENSE, EFFECT_INTENSE, s[3], EFFECT_SUBTLE, EFFECT_NONE, [], 5, s[3], 9);
+              this.styles[41] = new CChartStyle(EFFECT_INTENSE, EFFECT_INTENSE, s[1], EFFECT_INTENSE, EFFECT_NONE, [], 5, s[1], 9);
+              for(i = 42; i < 48; ++i)
+              {
+                  this.styles[i] = new CChartStyle(EFFECT_INTENSE, EFFECT_INTENSE, [f(i-42, 0)], EFFECT_SUBTLE, EFFECT_NONE, [], 5, [f(i-42, 0)], 9);
+              }
 
-            this.defaultLineStyles = [];
-            this.defaultLineStyles[0] = new ChartLineStyle(f(15, 0.75), f(15, 0.5), f(15, 0.75), f(15, 0), EFFECT_SUBTLE);
-            for(i = 0; i < 32; ++i)
-            {
-                this.defaultLineStyles[i] = this.defaultLineStyles[0];
-            }
-            this.defaultLineStyles[32] = new ChartLineStyle(f(8, 0.75), f(8, 0.5), f(8, 0.75), f(8, 0), EFFECT_SUBTLE);
-            this.defaultLineStyles[33] = this.defaultLineStyles[32];
-            this.defaultLineStyles[34] = new ChartLineStyle(f(8, 0.75), f(8, 0.5), f(8, 0.75), f(8, 0), EFFECT_SUBTLE);
-            for(i = 35; i < 40; ++i)
-            {
-                this.defaultLineStyles[i] = this.defaultLineStyles[34];
-            }
-            this.defaultLineStyles[40] = new ChartLineStyle(f(8, 0.75), f(8, 0.9), f(12, 0), f(12, 0), EFFECT_NONE);
-            for(i = 41; i < 48; ++i)
-            {
-                this.defaultLineStyles[i] = this.defaultLineStyles[40];
-            }
-        },
-        this, []);
-}
-
-CChartStyleManager.prototype =
-{
+              this.defaultLineStyles = [];
+              this.defaultLineStyles[0] = new ChartLineStyle(f(15, 0.75), f(15, 0.5), f(15, 0.75), f(15, 0), EFFECT_SUBTLE);
+              for(i = 0; i < 32; ++i)
+              {
+                  this.defaultLineStyles[i] = this.defaultLineStyles[0];
+              }
+              this.defaultLineStyles[32] = new ChartLineStyle(f(8, 0.75), f(8, 0.5), f(8, 0.75), f(8, 0), EFFECT_SUBTLE);
+              this.defaultLineStyles[33] = this.defaultLineStyles[32];
+              this.defaultLineStyles[34] = new ChartLineStyle(f(8, 0.75), f(8, 0.5), f(8, 0.75), f(8, 0), EFFECT_SUBTLE);
+              for(i = 35; i < 40; ++i)
+              {
+                  this.defaultLineStyles[i] = this.defaultLineStyles[34];
+              }
+              this.defaultLineStyles[40] = new ChartLineStyle(f(8, 0.75), f(8, 0.9), f(12, 0), f(12, 0), EFFECT_NONE);
+              for(i = 41; i < 48; ++i)
+              {
+                  this.defaultLineStyles[i] = this.defaultLineStyles[40];
+              }
+          },
+          this, []);
+    },
     getStyleByIndex: function(index)
     {
         if(AscFormat.isRealNumber(index))
@@ -250,6 +259,8 @@ CChartStyleManager.prototype =
         return this.defaultLineStyles[2];
     }
 };
+
+CHART_STYLE_MANAGER = new CChartStyleManager();
 
 function ChartLineStyle(axisAndMajorGridLines, minorGridlines, chartArea, otherLines, floorChartArea)
 {
@@ -9476,9 +9487,7 @@ CChartSpace.prototype =
         return null;
     }
 };
-
-
-
+    
 function getPtsFromSeries(ser)
 {
     if(ser)
@@ -9500,8 +9509,7 @@ function getPtsFromSeries(ser)
     }
     return [];
 }
-
-
+    
 function getCatStringPointsFromSeries(ser)
 {
     if(ser && ser.cat)
@@ -9525,9 +9533,7 @@ function getMaxIdx(arr)
         arr[i].idx > max_idx && (max_idx = arr[i].idx);
     return max_idx+1;
 }
-
-
-
+    
 function getArrayFillsFromBase(arrBaseFills, needFillsCount)
 {
     var ret = [];
@@ -9620,9 +9626,7 @@ function CreateUniFillSolidFillWidthTintOrShade(unifill, effectVal)
     }
     return ret;
 }
-
-
-
+    
 function CreateUnifillSolidFillSchemeColor(colorId, tintOrShade)
 {
     var unifill = new AscFormat.CUniFill();
@@ -10772,10 +10776,6 @@ CPageMarginsChart.prototype =
     }
 };
 
-
-var PAGE_SETUP_ORIENTATION_DEFAULT = 0;
-var PAGE_SETUP_ORIENTATION_LANDSCAPE = 1;
-var PAGE_SETUP_ORIENTATION_PORTRAIT = 2;
 function CPageSetup()
 {
     this.blackAndWhite     = null;
@@ -12597,3 +12597,47 @@ function checkBlipFillRasterImages(sp)
         }
     }
 }
+
+    //--------------------------------------------------------export----------------------------------------------------
+    window['AscFormat'] = window['AscFormat'] || {};
+    window['AscFormat'].CHART_STYLE_MANAGER = CHART_STYLE_MANAGER;
+    window['AscFormat'].ReadWBModel = ReadWBModel;
+    window['AscFormat'].checkBlackUnifill = checkBlackUnifill;
+    window['AscFormat'].BBoxInfo = BBoxInfo;
+    window['AscFormat'].CreateUnifillSolidFillSchemeColorByIndex = CreateUnifillSolidFillSchemeColorByIndex;
+    window['AscFormat'].CreateUniFillSchemeColorWidthTint = CreateUniFillSchemeColorWidthTint;
+    window['AscFormat'].G_O_VISITED_HLINK_COLOR = G_O_VISITED_HLINK_COLOR;
+    window['AscFormat'].G_O_NO_ACTIVE_COMMENT_BRUSH = G_O_NO_ACTIVE_COMMENT_BRUSH;
+    window['AscFormat'].G_O_ACTIVE_COMMENT_BRUSH = G_O_ACTIVE_COMMENT_BRUSH;
+    window['AscFormat'].CChartSpace = CChartSpace;
+    window['AscFormat'].getPtsFromSeries = getPtsFromSeries;
+    window['AscFormat'].CreateUnfilFromRGB = CreateUnfilFromRGB;
+    window['AscFormat'].CreateUniFillSolidFillWidthTintOrShade = CreateUniFillSolidFillWidthTintOrShade;
+    window['AscFormat'].CreateUnifillSolidFillSchemeColor = CreateUnifillSolidFillSchemeColor;
+    window['AscFormat'].CreateNoFillLine = CreateNoFillLine;
+    window['AscFormat'].CreateNoFillUniFill = CreateNoFillUniFill;
+    window['AscFormat'].CExternalData = CExternalData;
+    window['AscFormat'].CPivotSource = CPivotSource;
+    window['AscFormat'].CProtection = CProtection;
+    window['AscFormat'].CPrintSettings = CPrintSettings;
+    window['AscFormat'].CHeaderFooterChart = CHeaderFooterChart;
+    window['AscFormat'].CPageMarginsChart = CPageMarginsChart;
+    window['AscFormat'].CPageSetup = CPageSetup;
+    window['AscFormat'].CreateView3d = CreateView3d;
+    window['AscFormat'].CreateLineChart = CreateLineChart;
+    window['AscFormat'].CreateBarChart = CreateBarChart;
+    window['AscFormat'].CreateHBarChart = CreateHBarChart;
+    window['AscFormat'].CreateAreaChart = CreateAreaChart;
+    window['AscFormat'].CreatePieChart = CreatePieChart;
+    window['AscFormat'].CreateScatterChart = CreateScatterChart;
+    window['AscFormat'].CreateStockChart = CreateStockChart;
+    window['AscFormat'].CreateDefaultAxises = CreateDefaultAxises;
+    window['AscFormat'].CreateScatterAxis = CreateScatterAxis;
+    window['AscFormat'].getChartSeries = getChartSeries;
+    window['AscFormat'].checkSpPrRasterImages = checkSpPrRasterImages;
+    window['AscFormat'].checkBlipFillRasterImages = checkBlipFillRasterImages;
+
+    window['AscFormat'].PAGE_SETUP_ORIENTATION_DEFAULT = 0;
+    window['AscFormat'].PAGE_SETUP_ORIENTATION_LANDSCAPE = 1;
+    window['AscFormat'].PAGE_SETUP_ORIENTATION_PORTRAIT = 2;
+})(window);

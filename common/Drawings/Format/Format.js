@@ -8311,7 +8311,7 @@ CTheme.prototype =
     {
         if(idx === 0 || idx === 1000)
         {
-            return CreateNoFillUniFill();
+            return AscFormat.CreateNoFillUniFill();
         }
         var ret;
         if (idx >= 1 && idx <= 999)

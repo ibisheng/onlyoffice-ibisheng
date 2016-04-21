@@ -1599,7 +1599,7 @@ parserHelper.prototype.checkDataRange = function (model, wb, dialogType, dataRan
                 chartSettings.putType(Asc.c_oAscChartTypeSettings.stock);
                 chartSettings.putRange(sDataRange);
                 chartSettings.putInColumns(!isRows);
-                var chartSeries = getChartSeries (sheetModel, chartSettings).series;
+                var chartSeries = AscFormat.getChartSeries (sheetModel, chartSettings).series;
 				if (minStockVal !== chartSeries.length || !chartSeries[0].Val || !chartSeries[0].Val.NumCache || chartSeries[0].Val.NumCache.length < minStockVal)
 					return Asc.c_oAscError.ID.StockChartError;
 			} else if (intervalSeries > maxSeries)
@@ -2003,7 +2003,7 @@ CTableId.prototype.Read_Class_FromBinary = function(Reader)
         case AscDFH.historyitem_type_StyleRef                 : Element = new AscFormat.StyleRef(); break;
         case AscDFH.historyitem_type_FontRef                  : Element = new AscFormat.FontRef(); break;
         case AscDFH.historyitem_type_Chart                    : Element = new CChart(); break;
-        case AscDFH.historyitem_type_ChartSpace               : Element = new CChartSpace(); break;
+        case AscDFH.historyitem_type_ChartSpace               : Element = new AscFormat.CChartSpace(); break;
         case AscDFH.historyitem_type_Legend                   : Element = new CLegend(); break;
         case AscDFH.historyitem_type_Layout                   : Element = new CLayout(); break;
         case AscDFH.historyitem_type_LegendEntry              : Element = new CLegendEntry(); break;
@@ -2054,9 +2054,9 @@ CTableId.prototype.Read_Class_FromBinary = function(Reader)
         case AscDFH.historyitem_type_PieSeries                : Element = new CPieSeries(); break;
         case AscDFH.historyitem_type_SurfaceSeries            : Element = new CSurfaceSeries(); break;
         case AscDFH.historyitem_type_BubbleSeries             : Element = new CBubbleSeries(); break;
-        case AscDFH.historyitem_type_ExternalData             : Element = new CExternalData(); break;
-        case AscDFH.historyitem_type_PivotSource              : Element = new CPivotSource(); break;
-        case AscDFH.historyitem_type_Protection               : Element = new CProtection(); break;
+        case AscDFH.historyitem_type_ExternalData             : Element = new AscFormat.CExternalData(); break;
+        case AscDFH.historyitem_type_PivotSource              : Element = new AscFormat.CPivotSource(); break;
+        case AscDFH.historyitem_type_Protection               : Element = new AscFormat.CProtection(); break;
         case AscDFH.historyitem_type_ChartWall                : Element = new CChartWall(); break;
         case AscDFH.historyitem_type_View3d                   : Element = new CView3d(); break;
         case AscDFH.historyitem_type_ChartText                : Element = new CChartText(); break;
@@ -2073,10 +2073,10 @@ CTableId.prototype.Read_Class_FromBinary = function(Reader)
         case AscDFH.historyitem_type_HF                       : Element = new AscFormat.HF(); break;
         case AscDFH.historyitem_type_BgPr                     : Element = new AscFormat.CBgPr(); break;
         case AscDFH.historyitem_type_Bg                       : Element = new AscFormat.CBg(); break;
-        case AscDFH.historyitem_type_PrintSettings            : Element = new CPrintSettings(); break;
-        case AscDFH.historyitem_type_HeaderFooterChart        : Element = new CHeaderFooterChart(); break;
-        case AscDFH.historyitem_type_PageMarginsChart         : Element = new CPageMarginsChart(); break;
-        case AscDFH.historyitem_type_PageSetup                : Element = new CPageSetup(); break;
+        case AscDFH.historyitem_type_PrintSettings            : Element = new AscFormat.CPrintSettings(); break;
+        case AscDFH.historyitem_type_HeaderFooterChart        : Element = new AscFormat.CHeaderFooterChart(); break;
+        case AscDFH.historyitem_type_PageMarginsChart         : Element = new AscFormat.CPageMarginsChart(); break;
+        case AscDFH.historyitem_type_PageSetup                : Element = new AscFormat.CPageSetup(); break;
         case AscDFH.historyitem_type_Shape                    : Element = new AscFormat.CShape(); break;
         case AscDFH.historyitem_type_DispUnits                : Element = new CDispUnits(); break;
         case AscDFH.historyitem_type_GroupShape               : Element = new AscFormat.CGroupShape(); break;

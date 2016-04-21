@@ -1119,9 +1119,9 @@ BinaryChartWriter.prototype.WriteCT_PageSetup = function (oVal) {
     if (null != oVal.orientation) {
         var nVal = null;
         switch (oVal.orientation) {
-            case PAGE_SETUP_ORIENTATION_DEFAULT: nVal = st_pagesetuporientationDEFAULT; break;
-            case PAGE_SETUP_ORIENTATION_PORTRAIT: nVal = st_pagesetuporientationPORTRAIT; break;
-            case PAGE_SETUP_ORIENTATION_LANDSCAPE: nVal = st_pagesetuporientationLANDSCAPE; break;
+            case AscFormat.PAGE_SETUP_ORIENTATION_DEFAULT: nVal = st_pagesetuporientationDEFAULT; break;
+            case AscFormat.PAGE_SETUP_ORIENTATION_PORTRAIT: nVal = st_pagesetuporientationPORTRAIT; break;
+            case AscFormat.PAGE_SETUP_ORIENTATION_LANDSCAPE: nVal = st_pagesetuporientationLANDSCAPE; break;
         }
         if (null != nVal) {
             this.bs.WriteItem(c_oserct_pagesetupORIENTATION, function () {
@@ -5306,14 +5306,14 @@ BinaryChartReader.prototype.ReadCT_ChartSpace = function (type, length, val, cur
         val.setClrMapOvr(this.ReadClrOverride(length));
     }
     else if (c_oserct_chartspacePIVOTSOURCE === type) {
-        var oNewVal = new CPivotSource();
+        var oNewVal = new AscFormat.CPivotSource();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_PivotSource(t, l, oNewVal);
         });
         val.setPivotSource(oNewVal);
     }
     else if (c_oserct_chartspacePROTECTION === type) {
-        var oNewVal = new CProtection();
+        var oNewVal = new AscFormat.CProtection();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_Protection(t, l, oNewVal);
         });
@@ -5343,7 +5343,7 @@ BinaryChartReader.prototype.ReadCT_ChartSpace = function (type, length, val, cur
     //    val.m_externalData = oNewVal;
     //}
     else if (c_oserct_chartspacePRINTSETTINGS === type) {
-        var oNewVal = new CPrintSettings();
+        var oNewVal = new AscFormat.CPrintSettings();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_PrintSettings(t, l, oNewVal);
         });
@@ -5637,9 +5637,9 @@ BinaryChartReader.prototype.ReadCT_PageSetup = function (type, length, val) {
     }
     else if (c_oserct_pagesetupORIENTATION === type) {
         switch (this.stream.GetUChar()) {
-            case st_pagesetuporientationDEFAULT: val.setOrientation(PAGE_SETUP_ORIENTATION_DEFAULT); break;
-            case st_pagesetuporientationPORTRAIT: val.setOrientation(PAGE_SETUP_ORIENTATION_PORTRAIT); break;
-            case st_pagesetuporientationLANDSCAPE: val.setOrientation(PAGE_SETUP_ORIENTATION_LANDSCAPE); break;
+            case st_pagesetuporientationDEFAULT: val.setOrientation(AscFormat.PAGE_SETUP_ORIENTATION_DEFAULT); break;
+            case st_pagesetuporientationPORTRAIT: val.setOrientation(AscFormat.PAGE_SETUP_ORIENTATION_PORTRAIT); break;
+            case st_pagesetuporientationLANDSCAPE: val.setOrientation(AscFormat.PAGE_SETUP_ORIENTATION_LANDSCAPE); break;
         }
     }
     else if (c_oserct_pagesetupBLACKANDWHITE === type) {
@@ -5727,21 +5727,21 @@ BinaryChartReader.prototype.ReadCT_PrintSettings = function (type, length, val) 
     var res = c_oSerConstants.ReadOk;
     var oThis = this;
     if (c_oserct_printsettingsHEADERFOOTER === type) {
-        var oNewVal = new CHeaderFooterChart();
+        var oNewVal = new AscFormat.CHeaderFooterChart();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_HeaderFooter(t, l, oNewVal);
         });
         val.setHeaderFooter(oNewVal);
     }
     else if (c_oserct_printsettingsPAGEMARGINS === type) {
-        var oNewVal = new CPageMarginsChart();
+        var oNewVal = new AscFormat.CPageMarginsChart();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_PageMargins(t, l, oNewVal);
         });
         val.setPageMargins(oNewVal);
     }
     else if (c_oserct_printsettingsPAGESETUP === type) {
-        var oNewVal = new CPageSetup();
+        var oNewVal = new AscFormat.CPageSetup();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_PageSetup(t, l, oNewVal);
         });

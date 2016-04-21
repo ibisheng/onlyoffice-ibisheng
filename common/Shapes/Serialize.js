@@ -5323,7 +5323,7 @@ function BinaryPPTYLoader()
                     _stream.cur = s.cur;
                     _stream.size = s.size;
 
-                    _chart = new CChartSpace();
+                    _chart = new AscFormat.CChartSpace();
                     _chart.setBDeleted(false);
                     var oBinaryChartReader = new BinaryChartReader(_stream);
                     oBinaryChartReader.ExternalReadCT_ChartSpace(_length, _chart, this.presentation);
@@ -5421,14 +5421,14 @@ function BinaryPPTYLoader()
                     var _length = s.GetLong();
                     var _pos = s.cur;
 
-                    if(typeof CChartSpace !== "undefined")
+                    if(typeof AscFormat.CChartSpace !== "undefined")
                     {
                         var _stream = new FT_Stream2();
                         _stream.data = s.data;
                         _stream.pos = s.pos;
                         _stream.cur = s.cur;
                         _stream.size = s.size;
-                        _chart = new CChartSpace();
+                        _chart = new AscFormat.CChartSpace();
                         _chart.setBDeleted(false);
                         window.global_pptx_content_loader.ImageMapChecker = this.ImageMapChecker;
                         window.global_pptx_content_loader.Reader.ImageMapChecker = this.ImageMapChecker;
@@ -7620,7 +7620,7 @@ function BinaryPPTYLoader()
                                         }
                                         if(!_run.Unifill)
                                         {
-                                            _run.Unifill = CreateUniFillSchemeColorWidthTint(11, 0);
+                                            _run.Unifill = AscFormat.CreateUniFillSchemeColorWidthTint(11, 0);
                                         }
                                         _run.Underline = true;
                                     }

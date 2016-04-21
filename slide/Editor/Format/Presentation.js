@@ -9,6 +9,8 @@ var g_oTableId = AscCommon.g_oTableId;
 var Editor_Copy = AscCommon.Editor_Copy;
 var Editor_Paste = AscCommon.Editor_Paste;
 
+var CreateUnifillSolidFillSchemeColor = AscFormat.CreateUnifillSolidFillSchemeColor;
+
 var History = null;
 var recalcSlideInterval = 30;
 

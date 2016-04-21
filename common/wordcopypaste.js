@@ -2022,7 +2022,7 @@ CopyProcessor.prototype =
             {
                 this.oPresentationWriter.WriteGroupShape(oGraphicObj);
             }
-            else if(oGraphicObj instanceof CChartSpace)
+            else if(oGraphicObj instanceof AscFormat.CChartSpace)
             {
                 this.oPresentationWriter.WriteChart(oGraphicObj);
             }
@@ -3856,7 +3856,7 @@ PasteProcessor.prototype =
                                         presentationSelectedContent.Drawings[i].Drawing.setBDeleted(true);
                                     }
                                     presentationSelectedContent.Drawings[i].Drawing = presentationSelectedContent.Drawings[i].Drawing.convertToPPTX(oThis.oDocument.DrawingDocument);
-                                    checkBlipFillRasterImages(presentationSelectedContent.Drawings[i].Drawing);
+                                  AscFormat.checkBlipFillRasterImages(presentationSelectedContent.Drawings[i].Drawing);
                                 }
                             }
                             oThis.api.pre_Paste(fonts, oImageMap, paste_callback);
@@ -3870,7 +3870,7 @@ PasteProcessor.prototype =
 							if(!(presentationSelectedContent.Drawings[i].Drawing instanceof CGraphicFrame))
                             {
                                 presentationSelectedContent.Drawings[i].Drawing = presentationSelectedContent.Drawings[i].Drawing.convertToPPTX(oThis.oDocument.DrawingDocument);
-                                checkBlipFillRasterImages(presentationSelectedContent.Drawings[i].Drawing);
+                              AscFormat.checkBlipFillRasterImages(presentationSelectedContent.Drawings[i].Drawing);
                             }
 						}
 						
@@ -6686,7 +6686,7 @@ PasteProcessor.prototype =
                     if(this.pasteInExcel)
                     {
                         var TextPr = new CTextPr();
-                        TextPr.Unifill = CreateUniFillSchemeColorWidthTint(11, 0);
+                        TextPr.Unifill = AscFormat.CreateUniFillSchemeColorWidthTint(11, 0);
                         TextPr.Underline = true;
                         oHyperlink.Apply_TextPr( TextPr, undefined, true );
                     }

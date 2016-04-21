@@ -656,7 +656,7 @@ CStyle.prototype =
         {
             FontFamily: { Name : "Arial", Index : -1 },
             Color     : { r : 0, g : 0, b : 0 },
-            Unifill   : CreateUnfilFromRGB(0,0,0)
+            Unifill   : AscFormat.CreateUnfilFromRGB(0,0,0)
 
         };
 
@@ -2653,7 +2653,7 @@ CStyle.prototype =
         {
             Color     : { r : 0x00, g : 0x00, b : 0xFF },
             Underline : true,
-            Unifill   : CreateUniFillSchemeColorWidthTint(11, 0)
+            Unifill   : AscFormat.CreateUniFillSchemeColorWidthTint(11, 0)
         };
 
         this.Set_UiPriority( 99 );
