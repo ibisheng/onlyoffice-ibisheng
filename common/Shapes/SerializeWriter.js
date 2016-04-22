@@ -2191,6 +2191,12 @@ function CBinaryFileWriter()
                 oThis.EndRecord();
                 break;
             }
+            case c_oAscFill.FILL_TYPE_GRP:
+            {
+                oThis.StartRecord(c_oAscFill.FILL_TYPE_GRP);
+                oThis.EndRecord();
+                break;
+            }
             case c_oAscFill.FILL_TYPE_GRAD:
             {
                 oThis.StartRecord(c_oAscFill.FILL_TYPE_GRAD);

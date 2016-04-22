@@ -2512,6 +2512,11 @@ function BinaryPPTYLoader()
                     uni_fill.setFill(new AscFormat.CNoFill());
                     break;
                 }
+                case c_oAscFill.FILL_TYPE_GRP:
+                {
+                    uni_fill.setFill(new AscFormat.CGrpFill());
+                    break;
+                }
             }
         }
 

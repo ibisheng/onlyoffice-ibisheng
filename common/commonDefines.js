@@ -616,8 +616,8 @@ var c_oAscFill = {
 	FILL_TYPE_NOFILL : 2,
 	FILL_TYPE_SOLID	 : 3,
   FILL_TYPE_GRAD   : 4,
-	FILL_TYPE_PATT   : 5
-
+	FILL_TYPE_PATT   : 5,
+	FILL_TYPE_GRP   : 6
 };
 
 // Chart defines
@@ -1266,6 +1266,7 @@ window['Asc']['c_oAscFill'] = window['Asc'].c_oAscFill = c_oAscFill;
   prot['FILL_TYPE_SOLID'] = prot.FILL_TYPE_SOLID;
   prot['FILL_TYPE_GRAD'] = prot.FILL_TYPE_GRAD;
   prot['FILL_TYPE_PATT'] = prot.FILL_TYPE_PATT;
+  prot['FILL_TYPE_GRP'] = prot.FILL_TYPE_GRP;
 window['Asc']['c_oAscFillGradType'] = window['Asc'].c_oAscFillGradType = c_oAscFillGradType;
   prot = c_oAscFillGradType;
   prot['GRAD_LINEAR'] = prot.GRAD_LINEAR;

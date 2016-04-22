@@ -2991,6 +2991,87 @@ CNoFill.prototype =
     }
 };
 
+function CGrpFill()
+{
+    this.type = c_oAscFill.FILL_TYPE_GRP;
+}
+
+CGrpFill.prototype =
+{
+    Get_Id: function()
+    {
+        return this.Id;
+    },
+
+    Refresh_RecalcData: function()
+    {},
+
+    check: function()
+    {},
+
+    getObjectType: function()
+    {
+        return AscDFH.historyitem_type_GrpFill;
+    },
+
+
+
+    Write_ToBinary: function(w)
+    {
+        w.WriteLong(c_oAscFill.FILL_TYPE_GRP);
+    },
+
+    Read_FromBinary: function(r)
+    {
+    },
+
+
+    checkWordMods: function()
+    {
+        return false;
+
+    },
+
+    convertToPPTXMods: function()
+    {
+    },
+
+    canConvertPPTXModsToWord: function()
+    {
+        return false;
+    },
+
+    convertToWordMods: function()
+    {
+    },
+
+    createDuplicate : function()
+    {
+        return new CGrpFill();
+    },
+
+    IsIdentical : function(fill)
+    {
+        if(fill == null)
+        {
+            return false;
+        }
+        return fill.type ===  c_oAscFill.FILL_TYPE_GRP;
+    },
+    compare : function(grpfill)
+    {
+        if(grpfill == null)
+        {
+            return null;
+        }
+        if(grpfill.type === this.type)
+        {
+            return new CGrpFill();
+        }
+        return null;
+    }
+};
+
 
 function CreateBlackRGBUnifill()
 {
@@ -3043,6 +3124,7 @@ CUniFill.prototype =
                 case c_oAscFill.FILL_TYPE_NONE:
                 case c_oAscFill.FILL_TYPE_BLIP:
                 case c_oAscFill.FILL_TYPE_NOFILL:
+                case c_oAscFill.FILL_TYPE_GRP:
                 {
                     break;
                 }
@@ -3090,6 +3172,7 @@ CUniFill.prototype =
                 case c_oAscFill.FILL_TYPE_NONE:
                 case c_oAscFill.FILL_TYPE_BLIP:
                 case c_oAscFill.FILL_TYPE_NOFILL:
+                case c_oAscFill.FILL_TYPE_GRP:
                 {
                     break;
                 }
@@ -3217,6 +3300,12 @@ CUniFill.prototype =
                 case c_oAscFill.FILL_TYPE_PATT:
                 {
                     this.fill = new CPattFill();
+                    this.fill.Read_FromBinary(r);
+                    break;
+                }
+                case c_oAscFill.FILL_TYPE_GRP:
+                {
+                    this.fill = new CGrpFill();
                     this.fill.Read_FromBinary(r);
                     break;
                 }
@@ -11153,6 +11242,11 @@ function CreateAscFill(unifill)
             ret.type = c_oAscFill.FILL_TYPE_NOFILL;
             break;
         }
+        case c_oAscFill.FILL_TYPE_GRP:
+        {
+            ret.type = c_oAscFill.FILL_TYPE_GRP;
+            break;
+        }
         default:
             break;
     }
@@ -11182,6 +11276,11 @@ function CorrectUniFill(asc_fill, unifill, editorId)
             case c_oAscFill.FILL_TYPE_NOFILL:
             {
                 ret.fill = new CNoFill();
+                break;
+            }
+            case c_oAscFill.FILL_TYPE_GRP:
+            {
+                ret.fill = new CGrpFill();
                 break;
             }
             case c_oAscFill.FILL_TYPE_BLIP:
@@ -11809,6 +11908,7 @@ function CorrectUniColor(asc_color, unicolor, flag)
     window['AscFormat'].CGradFill = CGradFill;
     window['AscFormat'].CPattFill = CPattFill;
     window['AscFormat'].CNoFill = CNoFill;
+	window['AscFormat'].CGrpFill = CGrpFill;
     window['AscFormat'].CUniFill = CUniFill;
     window['AscFormat'].CompareUniFill = CompareUniFill;
     window['AscFormat'].CompareUnifillBool = CompareUnifillBool;

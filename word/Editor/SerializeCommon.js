@@ -516,7 +516,7 @@ function CPPTXContentLoader()
                 case 1:
                 {
                     var spPr = new AscFormat.CSpPr();
-                    this.ReadSpPr(spPr);
+                    this.Reader.ReadGrSpPr(spPr);
                     shape.setSpPr(spPr);
                     shape.spPr.setParent(shape);
                     break;

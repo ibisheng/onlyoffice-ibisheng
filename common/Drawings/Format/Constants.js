@@ -1191,6 +1191,7 @@ window['AscDFH'].historyitem_type_SlideComments = 1119;
 window['AscDFH'].historyitem_type_PropLocker = 1120;
 window['AscDFH'].historyitem_type_Theme = 1121;
 window['AscDFH'].historyitem_type_GraphicFrame = 1122;
+window['AscDFH'].historyitem_type_GrpFill = 1123;
 
 
 
