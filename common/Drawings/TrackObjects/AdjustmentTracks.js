@@ -105,7 +105,7 @@ function XYAdjustmentTrack(originalShape, adjIndex, bTextWarp)
                 this.refY = _ref_y;
             }
         }
-        this.overlayObject = new OverlayObject(this.geometry, this.shapeWidth, this.shapeHeight, oBrush, oPen, this.transform);
+        this.overlayObject = new AscFormat.OverlayObject(this.geometry, this.shapeWidth, this.shapeHeight, oBrush, oPen, this.transform);
 
 
     }, this, []);
@@ -346,7 +346,7 @@ function PolarAdjustmentTrack(originalShape, adjIndex, bTextWarp)
 
         }
 
-        this.overlayObject = new OverlayObject(this.geometry, this.shapeWidth, this.shapeHeight, oBrush, oPen, this.transform);
+        this.overlayObject = new AscFormat.OverlayObject(this.geometry, this.shapeWidth, this.shapeHeight, oBrush, oPen, this.transform);
 
     }, this, []);
 

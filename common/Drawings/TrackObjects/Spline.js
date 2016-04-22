@@ -1,8 +1,6 @@
 "use strict";
 
-var K=1/4;
-
-var mt=0, lt=1, cb=2, cl=3;
+(function(window, undefined){
 
 function SplineCommandMoveTo(x, y)
 {
@@ -351,3 +349,11 @@ function SplineForDrawer(spline)
         g.ds();
     }
 }
+
+    //--------------------------------------------------------export----------------------------------------------------
+    window['AscFormat'] = window['AscFormat'] || {};
+    window['AscFormat'].SplineCommandMoveTo = SplineCommandMoveTo;
+    window['AscFormat'].SplineCommandLineTo = SplineCommandLineTo;
+    window['AscFormat'].SplineCommandBezier = SplineCommandBezier;
+    window['AscFormat'].Spline = Spline;
+})(window);

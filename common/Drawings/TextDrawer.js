@@ -3,6 +3,7 @@
 // Import
 var Geometry = AscFormat.Geometry;
 var EPSILON_TEXT_AUTOFIT = AscFormat.EPSILON_TEXT_AUTOFIT;
+var ObjectToDraw = AscFormat.ObjectToDraw;
 
 var PATH_DIV_EPSILON = 0.1;
 var UNDERLINE_DIV_EPSILON = 3;

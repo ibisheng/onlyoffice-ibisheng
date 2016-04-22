@@ -72,17 +72,17 @@ StartAddNewShape.prototype =
             if(!this.bMoved && this instanceof StartAddNewShape)
             {
                 var ext_x, ext_y;
-                if(typeof SHAPE_EXT[this.preset] === "number")
+                if(typeof AscFormat.SHAPE_EXT[this.preset] === "number")
                 {
-                    ext_x = SHAPE_EXT[this.preset];
+                    ext_x = AscFormat.SHAPE_EXT[this.preset];
                 }
                 else
                 {
                     ext_x = 25.4;
                 }
-                if(typeof SHAPE_ASPECTS[this.preset] === "number")
+                if(typeof AscFormat.SHAPE_ASPECTS[this.preset] === "number")
                 {
-                    var _aspect = SHAPE_ASPECTS[this.preset];
+                    var _aspect = AscFormat.SHAPE_ASPECTS[this.preset];
                     ext_y = ext_x/_aspect;
                 }
                 else
@@ -1311,8 +1311,8 @@ SplineBezierState.prototype =
             return {objectId: "1", bMarker: true};
         this.drawingObjects.startTrackPos = {x: x, y: y, pageIndex: pageIndex};
         this.drawingObjects.clearTrackObjects();
-        this.drawingObjects.addTrackObject(new Spline(this.drawingObjects, this.drawingObjects.getTheme(), null, null, null, pageIndex));
-        this.drawingObjects.arrTrackObjects[0].path.push(new SplineCommandMoveTo(x, y));
+        this.drawingObjects.addTrackObject(new AscFormat.Spline(this.drawingObjects, this.drawingObjects.getTheme(), null, null, null, pageIndex));
+        this.drawingObjects.arrTrackObjects[0].path.push(new AscFormat.SplineCommandMoveTo(x, y));
         this.drawingObjects.changeCurrentState(new SplineBezierState33(this.drawingObjects, x, y,pageIndex));
         this.drawingObjects.checkChartTextSelection();
         this.drawingObjects.resetSelection();
@@ -1374,7 +1374,7 @@ SplineBezierState33.prototype =
             tr_x = tr_point.X;
             tr_y = tr_point.Y;
         }
-        this.drawingObjects.arrTrackObjects[0].path.push(new SplineCommandLineTo(tr_x, tr_y));
+        this.drawingObjects.arrTrackObjects[0].path.push(new AscFormat.SplineCommandLineTo(tr_x, tr_y));
         this.drawingObjects.changeCurrentState(new SplineBezierState2(this.drawingObjects, this.pageIndex));
         this.drawingObjects.updateOverlay();
     },
@@ -1526,10 +1526,10 @@ SplineBezierState3.prototype =
 
 
         spline.path.length = 1;
-        spline.path.push(new SplineCommandBezier(x1, y1, x2, y2, x3, y3));
+        spline.path.push(new AscFormat.SplineCommandBezier(x1, y1, x2, y2, x3, y3));
 
 
-        spline.path.push(new SplineCommandBezier(x4, y4, x5, y5, x6, y6));
+        spline.path.push(new AscFormat.SplineCommandBezier(x4, y4, x5, y5, x6, y6));
         this.drawingObjects.updateOverlay();
         this.drawingObjects.changeCurrentState(new SplineBezierState4(this.drawingObjects, this.pageIndex));
     },
@@ -1764,7 +1764,7 @@ SplineBezierState5.prototype =
         lastCommand.y2 = y2;
 
 
-        spline.path.push(new SplineCommandBezier(x4, y4, x5, y5, x6, y6));
+        spline.path.push(new AscFormat.SplineCommandBezier(x4, y4, x5, y5, x6, y6));
         this.drawingObjects.updateOverlay();
         this.drawingObjects.changeCurrentState(new SplineBezierState4(this.drawingObjects, this.pageIndex));
     },

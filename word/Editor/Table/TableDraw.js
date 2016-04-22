@@ -108,7 +108,7 @@ CTable.prototype.private_DrawTableBackgroundAndOuterBorder = function(pGraphics,
         var Transform = this.Parent.transform.CreateDublicate();
         global_MatrixTransformer.TranslateAppend(Transform, Math.min(X_left_new, X_right_new), Math.min(Y_top, Y_bottom));
         pGraphics.transform3(Transform, false);
-        ShapeDrawer.fromShape2(new ObjectToDraw(TableShd.Unifill, null, Math.abs(X_right_new - X_left_new), Math.abs(this.Pages[0].Bounds.Bottom - Y_top), null, Transform), pGraphics, null);
+        ShapeDrawer.fromShape2(new AscFormat.ObjectToDraw(TableShd.Unifill, null, Math.abs(X_right_new - X_left_new), Math.abs(this.Pages[0].Bounds.Bottom - Y_top), null, Transform), pGraphics, null);
         ShapeDrawer.draw(null);
         pGraphics.RestoreGrState();
     }
@@ -428,7 +428,7 @@ CTable.prototype.private_DrawCellsBackround = function(pGraphics, PNum, Row_star
                             global_MatrixTransformer.TranslateAppend(Transform, Math.min(X_cell_start, X_cell_end), Math.min(Y, Y + RealHeight));
 
                             pGraphics.transform3(Transform, false);
-                            ShapeDrawer.fromShape2(new ObjectToDraw(CellShd.Unifill, null, Math.abs(X_cell_end - X_cell_start), Math.abs(RealHeight), null, Transform), pGraphics, null);
+                            ShapeDrawer.fromShape2(new AscFormat.ObjectToDraw(CellShd.Unifill, null, Math.abs(X_cell_end - X_cell_start), Math.abs(RealHeight), null, Transform), pGraphics, null);
                             ShapeDrawer.draw(null);
                         }
                     }
@@ -521,7 +521,7 @@ CTable.prototype.private_DrawCellsBackround = function(pGraphics, PNum, Row_star
                             var Transform = this.Parent.transform.CreateDublicate();
                             global_MatrixTransformer.TranslateAppend(Transform, Math.min(X_cell_start, X_cell_end), Math.min(Y, Y + RealHeight));
                             pGraphics.transform3(Transform, false);
-                            ShapeDrawer.fromShape2(new ObjectToDraw(CellShd.Unifill, null, Math.abs(X_cell_end - X_cell_start), Math.abs(RealHeight), null, Transform), pGraphics, null);
+                            ShapeDrawer.fromShape2(new AscFormat.ObjectToDraw(CellShd.Unifill, null, Math.abs(X_cell_end - X_cell_start), Math.abs(RealHeight), null, Transform), pGraphics, null);
                             ShapeDrawer.draw(null);
                         }
                     }

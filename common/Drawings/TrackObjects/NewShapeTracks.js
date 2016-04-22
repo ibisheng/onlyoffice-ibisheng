@@ -2,6 +2,80 @@
 
 (function(window, undefined){
 
+    var MIN_SHAPE_SIZE = 1.27;//размер меньше которого нельзя уменшить автофигуру или картинку по горизонтали или вертикали
+    var MIN_SHAPE_SIZE_DIV2 = MIN_SHAPE_SIZE/2.0;
+
+    var SHAPE_ASPECTS = {};
+    SHAPE_ASPECTS["can"] = 3616635/4810125;
+    SHAPE_ASPECTS["moon"] = 457200/914400;
+    SHAPE_ASPECTS["leftBracket"] = 73152/914400;
+    SHAPE_ASPECTS["rightBracket"] = 73152/914400;
+    SHAPE_ASPECTS["leftBrace"] = 155448/914400;
+    SHAPE_ASPECTS["rightBrace"] = 155448/914400;
+    SHAPE_ASPECTS["triangle"] = 1060704/914400;
+    SHAPE_ASPECTS["parallelogram"] = 1216152/914400;
+    SHAPE_ASPECTS["trapezoid"] = 914400/1216152;
+    SHAPE_ASPECTS["pentagon"] = 960120/914400;
+    SHAPE_ASPECTS["hexagon"] = 1060704/914400;
+    SHAPE_ASPECTS["bracePair"] = 1069848/914400;
+    SHAPE_ASPECTS["rightArrow"] = 978408/484632;
+    SHAPE_ASPECTS["leftArrow"] = 978408/484632;
+    SHAPE_ASPECTS["upArrow"] = 484632/978408;
+    SHAPE_ASPECTS["downArrow"] = 484632/978408;
+    SHAPE_ASPECTS["leftRightArrow"] = 1216152/484632;
+    SHAPE_ASPECTS["upDownArrow"] = 484632/1216152;
+    SHAPE_ASPECTS["bentArrow"] = 813816/868680;
+    SHAPE_ASPECTS["uturnArrow"] = 886968/877824;
+    SHAPE_ASPECTS["bentUpArrow"] = 850392/731520;
+    SHAPE_ASPECTS["curvedRightArrow"] = 731520/1216152;
+    SHAPE_ASPECTS["curvedLeftArrow"] = 731520/1216152;
+    SHAPE_ASPECTS["curvedUpArrow"] = 1216152/731520;
+    SHAPE_ASPECTS["curvedDownArrow"] = 1216152/731520;
+    SHAPE_ASPECTS["stripedRightArrow"] = 978408/484632;
+    SHAPE_ASPECTS["notchedRightArrow"] = 978408/484632;
+    SHAPE_ASPECTS["homePlate"] = 978408/484632;
+    SHAPE_ASPECTS["leftRightArrowCallout"] = 1216152/576072;
+    SHAPE_ASPECTS["flowChartProcess"] = 914400/612648;
+    SHAPE_ASPECTS["flowChartAlternateProcess"] = 914400/612648;
+    SHAPE_ASPECTS["flowChartDecision"] = 914400/612648;
+    SHAPE_ASPECTS["flowChartInputOutput"] = 914400/612648;
+    SHAPE_ASPECTS["flowChartPredefinedProcess"] = 914400/612648;
+    SHAPE_ASPECTS["flowChartDocument"] = 914400/612648;
+    SHAPE_ASPECTS["flowChartMultidocument"] = 1060704/758952;
+    SHAPE_ASPECTS["flowChartTerminator"] = 914400/301752;
+    SHAPE_ASPECTS["flowChartPreparation"] = 1060704/612648;
+    SHAPE_ASPECTS["flowChartManualInput"] = 914400/457200;
+    SHAPE_ASPECTS["flowChartManualOperation"] = 914400/612648;
+    SHAPE_ASPECTS["flowChartPunchedCard"] = 914400/804672;
+    SHAPE_ASPECTS["flowChartPunchedTape"] = 914400/804672;
+    SHAPE_ASPECTS["flowChartPunchedTape"] = 457200/914400;
+    SHAPE_ASPECTS["flowChartSort"] = 457200/914400;
+    SHAPE_ASPECTS["flowChartOnlineStorage"] = 914400/612648;
+    SHAPE_ASPECTS["flowChartMagneticDisk"] = 914400/612648;
+    SHAPE_ASPECTS["flowChartMagneticDrum"] = 914400/685800;
+    SHAPE_ASPECTS["flowChartDisplay"] = 914400/612648;
+    SHAPE_ASPECTS["ribbon2"] = 1216152/612648;
+    SHAPE_ASPECTS["ribbon"] = 1216152/612648;
+    SHAPE_ASPECTS["ellipseRibbon2"] = 1216152/758952;
+    SHAPE_ASPECTS["ellipseRibbon"] = 1216152/758952;
+    SHAPE_ASPECTS["verticalScroll"] = 1033272/1143000;
+    SHAPE_ASPECTS["horizontalScroll"] = 1143000/1033272;
+    SHAPE_ASPECTS["wedgeRectCallout"] = 914400/612648;
+    SHAPE_ASPECTS["wedgeRoundRectCallout"] = 914400/612648;
+    SHAPE_ASPECTS["wedgeEllipseCallout"] = 914400/612648;
+    SHAPE_ASPECTS["cloudCallout"] = 914400/612648;
+    SHAPE_ASPECTS["borderCallout1"] = 914400/612648;
+    SHAPE_ASPECTS["borderCallout2"] = 914400/612648;
+    SHAPE_ASPECTS["borderCallout3"] = 914400/612648;
+    SHAPE_ASPECTS["accentCallout1"] = 914400/612648;
+    SHAPE_ASPECTS["accentCallout2"] = 914400/612648;
+    SHAPE_ASPECTS["accentCallout3"] = 914400/612648;
+    SHAPE_ASPECTS["callout1"] = 914400/612648;
+    SHAPE_ASPECTS["callout2"] = 914400/612648;
+    SHAPE_ASPECTS["callout3"] = 914400/612648;
+    SHAPE_ASPECTS["accentBorderCallout1"] = 914400/612648;
+    SHAPE_ASPECTS["accentBorderCallout2"] = 914400/612648;
+    SHAPE_ASPECTS["accentBorderCallout3"] = 914400/612648;
 
 function NewShapeTrack(presetGeom, startX, startY, theme, master, layout, slide, pageIndex)
 {
@@ -125,7 +199,7 @@ function NewShapeTrack(presetGeom, startX, startY, theme, master, layout, slide,
 
         this.isLine = this.presetGeom === "line";
 
-        this.overlayObject = new OverlayObject(geometry, 5, 5, brush, pen, this.transform);
+        this.overlayObject = new AscFormat.OverlayObject(geometry, 5, 5, brush, pen, this.transform);
         this.shape = null;
 
     }, this, []);
@@ -199,7 +273,7 @@ function NewShapeTrack(presetGeom, startX, startY, theme, master, layout, slide,
         {
 
             var new_width, new_height;
-            var prop_coefficient = (typeof SHAPE_ASPECTS[this.presetGeom] === "number" ? SHAPE_ASPECTS[this.presetGeom] : 1);
+            var prop_coefficient = (typeof AscFormat.SHAPE_ASPECTS[this.presetGeom] === "number" ? AscFormat.SHAPE_ASPECTS[this.presetGeom] : 1);
             if(abs_dist_y === 0)
             {
                 new_width = abs_dist_x > MIN_SHAPE_SIZE ? abs_dist_x : MIN_SHAPE_SIZE;
@@ -280,7 +354,7 @@ function NewShapeTrack(presetGeom, startX, startY, theme, master, layout, slide,
         else
         {
             var new_width, new_height;
-            var prop_coefficient = (typeof SHAPE_ASPECTS[this.presetGeom] === "number" ? SHAPE_ASPECTS[this.presetGeom] : 1);
+            var prop_coefficient = (typeof AscFormat.SHAPE_ASPECTS[this.presetGeom] === "number" ? AscFormat.SHAPE_ASPECTS[this.presetGeom] : 1);
             if(abs_dist_y === 0)
             {
                 new_width = abs_dist_x > MIN_SHAPE_SIZE_DIV2 ? abs_dist_x*2 : MIN_SHAPE_SIZE;
@@ -524,5 +598,6 @@ function NewShapeTrack(presetGeom, startX, startY, theme, master, layout, slide,
 }
     //--------------------------------------------------------export----------------------------------------------------
     window['AscFormat'] = window['AscFormat'] || {};
+    window['AscFormat'].SHAPE_ASPECTS = SHAPE_ASPECTS;
     window['AscFormat'].NewShapeTrack = NewShapeTrack;
 })(window);

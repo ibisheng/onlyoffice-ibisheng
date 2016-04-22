@@ -18,11 +18,11 @@ function MoveShapeImageTrack(originalObject)
     }
     else
     {
-        var pen_brush = CreatePenBrushForChartTrack();
+        var pen_brush = AscFormat.CreatePenBrushForChartTrack();
         this.brush = pen_brush.brush;
         this.pen = pen_brush.pen;
     }
-    this.overlayObject = new OverlayObject(!(this.originalObject.getObjectType() === AscDFH.historyitem_type_ChartSpace)&& this.originalObject.spPr && this.originalObject.spPr.geometry, this.originalObject.extX, this.originalObject.extY, this.brush, this.pen, this.transform);
+    this.overlayObject = new AscFormat.OverlayObject(!(this.originalObject.getObjectType() === AscDFH.historyitem_type_ChartSpace)&& this.originalObject.spPr && this.originalObject.spPr.geometry, this.originalObject.extX, this.originalObject.extY, this.brush, this.pen, this.transform);
 
     this.groupInvertMatrix = null;
     if(this.originalObject.group)
@@ -164,11 +164,11 @@ function MoveShapeImageTrackInGroup(originalObject)
     }
     else
     {
-        var pen_brush = CreatePenBrushForChartTrack();
+        var pen_brush = AscFormat.CreatePenBrushForChartTrack();
         this.brush = pen_brush.brush;
         this.pen = pen_brush.pen;
     }
-    this.overlayObject = new OverlayObject(!(this.originalObject.getObjectType() === AscDFH.historyitem_type_ChartSpace)&& this.originalObject.spPr && this.originalObject.spPr.geometry, this.originalObject.extX, this.originalObject.extY, this.brush, this.pen, this.transform);
+    this.overlayObject = new AscFormat.OverlayObject(!(this.originalObject.getObjectType() === AscDFH.historyitem_type_ChartSpace)&& this.originalObject.spPr && this.originalObject.spPr.geometry, this.originalObject.extX, this.originalObject.extY, this.brush, this.pen, this.transform);
     this.inv = global_MatrixTransformer.Invert(originalObject.group.transform);
     this.inv.tx = 0;
     this.inv.ty = 0;
@@ -243,7 +243,7 @@ function MoveGroupTrack(originalObject)
         var gr_obj_transform_copy = arr_graphic_objects[i].transform.CreateDublicate();
         global_MatrixTransformer.MultiplyAppend(gr_obj_transform_copy, group_invert_transform);
         this.arrTransforms2[i] = gr_obj_transform_copy;
-        this.overlayObjects[i] = new OverlayObject(!( arr_graphic_objects[i].getObjectType() === AscDFH.historyitem_type_ChartSpace)&& arr_graphic_objects[i].spPr.geometry, arr_graphic_objects[i].extX, arr_graphic_objects[i].extY,
+        this.overlayObjects[i] = new AscFormat.OverlayObject(!( arr_graphic_objects[i].getObjectType() === AscDFH.historyitem_type_ChartSpace)&& arr_graphic_objects[i].spPr.geometry, arr_graphic_objects[i].extX, arr_graphic_objects[i].extY,
             arr_graphic_objects[i].brush,  arr_graphic_objects[i].pen, new CMatrix());
     }
 
