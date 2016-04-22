@@ -196,7 +196,7 @@ NullState.prototype =
         if(selection.groupSelection)
         {
 
-            ret = handleSelectedObjects(this.drawingObjects, e, x, y, selection.groupSelection, pageIndex, false);
+            ret = AscFormat.handleSelectedObjects(this.drawingObjects, e, x, y, selection.groupSelection, pageIndex, false);
             if(ret)
             {
                 if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
@@ -211,7 +211,7 @@ NullState.prototype =
                 }
                 return ret;
             }
-            ret = handleFloatObjects(this.drawingObjects, selection.groupSelection.arrGraphicObjects, e, x, y, selection.groupSelection, pageIndex, false);
+            ret = AscFormat.handleFloatObjects(this.drawingObjects, selection.groupSelection.arrGraphicObjects, e, x, y, selection.groupSelection, pageIndex, false);
             if(ret)
             {
                 if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
@@ -229,7 +229,7 @@ NullState.prototype =
         }
         else if(selection.chartSelection)
         {}
-        ret = handleSelectedObjects(this.drawingObjects, e, x, y, null, pageIndex, false);
+        ret = AscFormat.handleSelectedObjects(this.drawingObjects, e, x, y, null, pageIndex, false);
         if(ret)
         {
             if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
@@ -245,7 +245,7 @@ NullState.prototype =
             return ret;
         }
 
-        ret = handleFloatObjects(this.drawingObjects, this.drawingObjects.getDrawingArray(), e, x, y, null, pageIndex, false);
+        ret = AscFormat.handleFloatObjects(this.drawingObjects, this.drawingObjects.getDrawingArray(), e, x, y, null, pageIndex, false);
         if(ret)
         {
             if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
@@ -409,7 +409,7 @@ ChangeAdjState.prototype =
             this.onMouseUp(e, x, y, pageIndex);
             return;
         }
-        var t = CheckCoordsNeedPage(x, y, pageIndex, this.majorObject.selectStartPage, this.drawingObjects.getDrawingDocument());
+        var t = AscFormat.CheckCoordsNeedPage(x, y, pageIndex, this.majorObject.selectStartPage, this.drawingObjects.getDrawingDocument());
         this.drawingObjects.arrTrackObjects[0].track(t.x, t.y);
         this.drawingObjects.updateOverlay();
     },
@@ -492,7 +492,7 @@ RotateState.prototype =
             this.onMouseUp(e, x, y, pageIndex);
             return;
         }
-        var coords = CheckCoordsNeedPage(x, y, pageIndex, this.majorObject.selectStartPage, this.drawingObjects.getDrawingDocument());
+        var coords = AscFormat.CheckCoordsNeedPage(x, y, pageIndex, this.majorObject.selectStartPage, this.drawingObjects.getDrawingDocument());
         this.drawingObjects.handleRotateTrack(e, coords.x, coords.y);
     },
 
@@ -701,7 +701,7 @@ ResizeState.prototype =
             this.onMouseUp(e, x, y, pageIndex);
             return;
         }
-        var coords = CheckCoordsNeedPage(x, y, pageIndex, this.majorObject.selectStartPage, this.drawingObjects.getDrawingDocument());
+        var coords = AscFormat.CheckCoordsNeedPage(x, y, pageIndex, this.majorObject.selectStartPage, this.drawingObjects.getDrawingDocument());
         var resize_coef = this.majorObject.getResizeCoefficients(this.handleNum, coords.x, coords.y);
         this.drawingObjects.trackResizeObjects(resize_coef.kd1, resize_coef.kd2, e);
         this.drawingObjects.updateOverlay();
@@ -750,7 +750,7 @@ PreMoveState.prototype =
 
     onMouseUp: function(e, x, y, pageIndex)
     {
-        return handleMouseUpPreMoveState(this.drawingObjects, e, x, y, pageIndex, true)
+        return AscFormat.handleMouseUpPreMoveState(this.drawingObjects, e, x, y, pageIndex, true)
     }
 };
 
