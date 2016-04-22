@@ -886,6 +886,9 @@
      */
     ApiTable.prototype.MergeCells = function(aCells)
     {
+        private_StartSilentMode();
+        this.private_PrepareTableForActions();
+
         var oTable            = this.Table;
         oTable.Selection.Use  = true;
         oTable.Selection.Type = table_Selection_Cell;
@@ -921,10 +924,10 @@
             oTable.Selection.Data.splice(nResultPos, 0, oPos);
         }
 
-        this.Table.private_UpdateCellsGrid();
-
         var isMerged = this.Table.Cell_Merge(true);
         oTable.Selection_Remove();
+
+        private_EndSilentMode();
 
         if (true === isMerged)
             return new ApiTableCell(this.Table.CurCell);
@@ -966,6 +969,106 @@
             private_GetBoolean(isHorBand),
             private_GetBoolean(isVerBand));
         this.Table.Set_TableLook(oTableLook);
+    };
+    /**
+     * Add a new row to the current table.
+     * @param {ApiTableCell} [oCell] - If not specified a new row will be added to the end of the table.
+     * @param {boolean} [isBefore=false] - Add a new row before or after the specified cell. If no cell is specified
+     * then this parameter will be ignored.
+     * @returns {ApiTableRow}
+     */
+    ApiTable.prototype.AddRow = function(oCell, isBefore)
+    {
+        private_StartSilentMode();
+        this.private_PrepareTableForActions();
+
+        var _isBefore = private_GetBoolean(isBefore, false);
+        var _oCell = (oCell instanceof ApiTableCell ? oCell.Cell : undefined);
+        if (_oCell && this.Table !== _oCell.Row.Table)
+            _oCell = undefined;
+
+        if (!_oCell)
+        {
+            _oCell = this.Table.Content[this.Table.Content.length - 1].Get_Cell(0);
+            _isBefore = false;
+        }
+
+        var nRowIndex = true === _isBefore ? _oCell.Row.Index : _oCell.Row.Index + 1;
+
+        this.Table.Selection_Remove();
+        this.Table.CurCell = _oCell;
+        this.Table.Row_Add(_isBefore);
+
+        private_EndSilentMode();
+        return new ApiTableRow(this.Table.Content[nRowIndex]);
+    };
+    /**
+     * Add a new column to the end of the current table.
+     * @param {ApiTableCell} [oCell] - If not specified a new column will be added to the end of the table.
+     * @param {boolean} [isBefore=false] - Add a new column before or after the specified cell. If no cell is specified
+     * then this parameter will be ignored.
+     */
+    ApiTable.prototype.AddColumn = function(oCell, isBefore)
+    {
+        private_StartSilentMode();
+        this.private_PrepareTableForActions();
+
+        var _isBefore = private_GetBoolean(isBefore, false);
+        var _oCell = (oCell instanceof ApiTableCell ? oCell.Cell : undefined);
+        if (_oCell && this.Table !== _oCell.Row.Table)
+            _oCell = undefined;
+
+        if (!_oCell)
+        {
+            _oCell = this.Table.Content[0].Get_Cell(this.Table.Content[0].Get_CellsCount() - 1);
+            _isBefore = false;
+        }
+
+        this.Table.Selection_Remove();
+        this.Table.CurCell = _oCell;
+        this.Table.Col_Add(_isBefore);
+
+        private_EndSilentMode();
+    };
+    /**
+     * Remove the table row with a specified cell.
+     * @param {ApiTableCell} oCell
+     * @returns {boolean} Is the table empty after removing.
+     */
+    ApiTable.prototype.RemoveRow = function(oCell)
+    {
+        if (!(oCell instanceof ApiTableCell) || this.Table !== oCell.Cell.Row.Table)
+            return false;
+
+        private_StartSilentMode();
+        this.private_PrepareTableForActions();
+
+        this.Table.Selection_Remove();
+        this.Table.CurCell = oCell.Cell;
+        var isEmpty = !(this.Table.Row_Remove());
+
+        private_EndSilentMode();
+        return isEmpty;
+    };
+    /**
+     * Remove the table column with a specified cell.
+     * @param {ApiTableCell} oCell
+     * @returns {boolean} Is the table empty after removing.
+     */
+    ApiTable.prototype.RemoveColumn = function(oCell)
+    {
+        if (!(oCell instanceof ApiTableCell) || this.Table !== oCell.Cell.Row.Table)
+            return false;
+
+        private_StartSilentMode();
+        this.private_PrepareTableForActions();
+
+        this.Table.Selection_Remove();
+        this.Table.CurCell = oCell.Cell;
+        var isEmpty = !(this.Table.Col_Remove());
+
+        private_EndSilentMode();
+        return isEmpty;
     };
 
     //------------------------------------------------------------------------------------------------------------------
@@ -2403,12 +2506,17 @@
     ApiSection.prototype["RemoveFooter"]             = ApiSection.prototype.RemoveFooter;
     ApiSection.prototype["SetTitlePage"]             = ApiSection.prototype.SetTitlePage;
 
-	ApiTable.prototype["SetJc"]                      = ApiTable.prototype.SetJc;
+    ApiTable.prototype["SetJc"]                      = ApiTable.prototype.SetJc;
     ApiTable.prototype["GetRowsCount"]               = ApiTable.prototype.GetRowsCount;
     ApiTable.prototype["GetRow"]                     = ApiTable.prototype.GetRow;
     ApiTable.prototype["MergeCells"]                 = ApiTable.prototype.MergeCells;
     ApiTable.prototype["SetStyle"]                   = ApiTable.prototype.SetStyle;
     ApiTable.prototype["SetTableLook"]               = ApiTable.prototype.SetTableLook;
+    ApiTable.prototype["AddRow"]                     = ApiTable.prototype.AddRow;
+    ApiTable.prototype["AddColumn"]                  = ApiTable.prototype.AddColumn;
+    ApiTable.prototype["RemoveRow"]                  = ApiTable.prototype.RemoveRow;
+    ApiTable.prototype["RemoveColumn"]               = ApiTable.prototype.RemoveColumn;
+
 
     ApiTableRow.prototype["GetCellsCount"]           = ApiTableRow.prototype.GetCellsCount;
     ApiTableRow.prototype["GetCell"]                 = ApiTableRow.prototype.GetCell;
@@ -2682,6 +2790,15 @@
         return 25.4 / 72.0 / 8 * pt;
     }
 
+    function private_StartSilentMode()
+    {
+        private_GetLogicDocument().Start_SilentMode();
+    }
+    function private_EndSilentMode()
+    {
+        private_GetLogicDocument().End_SilentMode(false);
+    }
+
     ApiDocument.prototype.OnChangeParaPr = function(oApiParaPr)
     {
         var oStyles = this.Document.Get_Styles();
@@ -2721,6 +2838,11 @@
     {
         this.Table.Set_Pr(oApiTablePr.TablePr);
         oApiTablePr.TablePr = this.Table.Pr.Copy();
+    };
+    ApiTable.prototype.private_PrepareTableForActions = function()
+    {
+        this.Table.private_RecalculateGrid();
+        this.Table.private_UpdateCellsGrid();
     };
     ApiStyle.prototype.OnChangeTextPr = function(oApiTextPr)
     {
@@ -3872,6 +3994,35 @@ function TEST_BUILDER2()
     oTableStyle.GetConditionalTableStyle("wholeTable").GetTablePr().SetTableBorderBottom("single", 4, 0, 0, 0, 0);
     oTableStyle.GetConditionalTableStyle("wholeTable").GetTablePr().SetTableBorderInsideV("single", 4, 0, 0, 0, 0);
     oTableStyle.GetConditionalTableStyle("wholeTable").GetTablePr().SetTableBorderInsideH("single", 4, 0, 0, 0, 0);
+
+    //------------------------------------------------------------------------------------------------------------------
+    // Add column and row
+    //------------------------------------------------------------------------------------------------------------------
+    oTable = Api.CreateTable(3, 3);
+    oDocument.Push(oTable);
+    oTable.GetRow(0).GetCell(0).GetContent().GetElement(0).AddText("Start rows count " + oTable.GetRowsCount() + " start columns count 3");
+    oTableRow = oTable.AddRow(oTable.GetRow(1).GetCell(0), true);
+    oTableRow.GetCell(0).GetContent().GetElement(0).AddText("A new row in position 1");
+    oTableRow = oTable.AddRow();
+    oTableRow.GetCell(0).GetContent().GetElement(0).AddText("A new row without position");
+    oTableRow.GetCell(oTableRow.GetCellsCount() - 1).GetContent().GetElement(0).AddText("Last cell before add column");
+    oTable.AddColumn();
+    oTableRow.GetCell(oTableRow.GetCellsCount() - 1).GetContent().GetElement(0).AddText("Last cell after add column");
+
+    oParagraph = Api.CreateParagraph();
+    oDocument.Push(oParagraph);
+    oParagraph.AddText("Remove row 1, remove column 3");
+    oTable = Api.CreateTable(5, 5);
+    oDocument.Push(oTable);
+    for (var nRowIndex = 0; nRowIndex < 5; ++nRowIndex)
+    {
+        for (var nCellIndex = 0; nCellIndex < 5; ++nCellIndex)
+        {
+            oTable.GetRow(nRowIndex).GetCell(nCellIndex).GetContent().GetElement(0).AddText("" + nRowIndex + nCellIndex);
+        }
+    }
+    oTable.RemoveRow(oTable.GetRow(1).GetCell(0));
+    oTable.RemoveColumn(oTable.GetRow(0).GetCell(3));
 
     //------------------------------------------------------------------------------------------------------------------
     oLD.Recalculate_FromStart();
