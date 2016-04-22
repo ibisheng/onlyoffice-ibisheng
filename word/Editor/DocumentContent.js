@@ -1179,7 +1179,7 @@ CDocumentContent.prototype =
 
         if (pGraphics.Start_Command)
         {
-            pGraphics.Start_Command(DRAW_COMMAND_CONTENT);
+            pGraphics.Start_Command(AscFormat.DRAW_COMMAND_CONTENT);
         }
 
         var ClipInfo = this.ClipInfo[CurPage];

@@ -1,5 +1,7 @@
 "use strict";
 
+(function(window, undefined){
+
 // Import
 var Geometry = AscFormat.Geometry;
 var EPSILON_TEXT_AUTOFIT = AscFormat.EPSILON_TEXT_AUTOFIT;
@@ -2576,3 +2578,20 @@ function GetRectContentWidth(oContent, dMaxWidth)
     }
     return max_width + 2;
 }
+
+    //--------------------------------------------------------export----------------------------------------------------
+    window['AscFormat'] = window['AscFormat'] || {};
+    window['AscFormat'].PATH_DIV_EPSILON = PATH_DIV_EPSILON;
+    window['AscFormat'].ParaDrawingStruct = ParaDrawingStruct;
+    window['AscFormat'].DRAW_COMMAND_TABLE = DRAW_COMMAND_TABLE;
+    window['AscFormat'].DRAW_COMMAND_CONTENT = DRAW_COMMAND_CONTENT;
+    window['AscFormat'].DRAW_COMMAND_PARAGRAPH = DRAW_COMMAND_PARAGRAPH;
+    window['AscFormat'].DRAW_COMMAND_LINE = DRAW_COMMAND_LINE;
+    window['AscFormat'].DRAW_COMMAND_DRAWING = DRAW_COMMAND_DRAWING;
+    window['AscFormat'].DRAW_COMMAND_HIDDEN_ELEM = DRAW_COMMAND_HIDDEN_ELEM;
+    window['AscFormat'].DRAW_COMMAND_NO_CREATE_GEOM = DRAW_COMMAND_NO_CREATE_GEOM;
+    window['AscFormat'].DRAW_COMMAND_TABLE_ROW = DRAW_COMMAND_TABLE_ROW;
+    window['AscFormat'].CreatePenFromParams = CreatePenFromParams;
+    window['AscFormat'].CTextDrawer = CTextDrawer;
+    window['AscFormat'].PolygonWrapper = PolygonWrapper;
+})(window);

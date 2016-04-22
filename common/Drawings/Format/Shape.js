@@ -5551,7 +5551,7 @@ CShape.prototype =
         {
             var bNeedRecalc = this.checkNeedRecalcDocContentForTxWarp(oBodyPr), dOneLineWidth, dMinPolygonLength = 0, dKoeff = 1;
             var oTheme = this.Get_Theme(), oColorMap = this.Get_ColorMap();
-            var oTextDrawer = new CTextDrawer(dWidth, dHeight, true, oTheme, bNeedRecalc);
+            var oTextDrawer = new AscFormat.CTextDrawer(dWidth, dHeight, true, oTheme, bNeedRecalc);
             oTextDrawer.bCheckLines = bTransform && bNeedWarp;
             var oContentToDraw = oContent;
             if(bNeedRecalc && bNeedWarp)

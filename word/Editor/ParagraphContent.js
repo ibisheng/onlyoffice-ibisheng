@@ -4620,7 +4620,7 @@ ParaDrawing.prototype =
     {
         if(pGraphics.Start_Command)
         {
-            pGraphics.m_aDrawings.push(new ParaDrawingStruct(pageIndex, this));
+            pGraphics.m_aDrawings.push(new AscFormat.ParaDrawingStruct(pageIndex, this));
             return;
         }
         if ( this.Is_Inline() )

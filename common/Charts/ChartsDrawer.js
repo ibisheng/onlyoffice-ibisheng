@@ -3144,7 +3144,7 @@ drawBarChart.prototype =
 		//в excel всегда темные боковые стороны, лицевая и задняя стороны светлые
 		//pen = this.cChartSpace.chart.plotArea.valAx.compiledMajorGridLines;
 		//pen.setFill(brush);
-		pen = CreatePenFromParams(brush, undefined, undefined, undefined, undefined, 0.1);
+		pen = AscFormat.CreatePenFromParams(brush, undefined, undefined, undefined, undefined, 0.1);
 		if(k != 5 && k != 0)
 		{
 			var  props = this.cChartSpace.getParentObjects();
@@ -3747,13 +3747,13 @@ drawLineChart.prototype =
 			cColorMod.name = "shade";
 			duplicateBrush.fill.color.Mods.addMod(cColorMod);
 			duplicateBrush.calculate(props.theme, props.slide, props.layout, props.master, new AscFormat.CUniColor().RGBA);
-			pen = CreatePenFromParams(duplicateBrush, undefined, undefined, undefined, undefined, 0.1);
+			pen = AscFormat.CreatePenFromParams(duplicateBrush, undefined, undefined, undefined, undefined, 0.1);
 			//pen.setFill(duplicateBrush);
 			this.cChartDrawer.drawPath(path, pen, duplicateBrush);
 		}
 		else
 		{
-			pen = CreatePenFromParams(brush, undefined, undefined, undefined, undefined, 0.1);
+			pen = AscFormat.CreatePenFromParams(brush, undefined, undefined, undefined, undefined, 0.1);
 			this.cChartDrawer.drawPath(path, pen, brush);
 		}
 	}
@@ -4316,7 +4316,7 @@ drawAreaChart.prototype =
 		//в excel всегда темные боковые стороны, лицевая и задняя стороны светлые
 		//pen = this.cChartSpace.chart.plotArea.valAx.compiledMajorGridLines;
 		//pen.setFill(brush);
-		pen = CreatePenFromParams(brush, undefined, undefined, undefined, undefined, 0.1);
+		pen = AscFormat.CreatePenFromParams(brush, undefined, undefined, undefined, undefined, 0.1);
 		if(k != 5 && k != 0)
 		{
 			var  props = this.cChartSpace.getParentObjects();
@@ -6512,7 +6512,7 @@ drawHBarChart.prototype =
 		//в excel всегда темные боковые стороны, лицевая и задняя стороны светлые
 		//pen = this.cChartSpace.chart.plotArea.valAx.compiledMajorGridLines;
 		//pen.setFill(brush);
-		pen = CreatePenFromParams(brush, undefined, undefined, undefined, undefined, 0.1);
+		pen = AscFormat.CreatePenFromParams(brush, undefined, undefined, undefined, undefined, 0.1);
 		if(k != 5 && k != 0)
 		{
 			var  props = this.cChartSpace.getParentObjects();
@@ -7264,8 +7264,8 @@ drawPieChart.prototype =
 							duplicateBrush.fill.color.Mods.addMod(cColorMod);	
 						
 						duplicateBrush.calculate(props.theme, props.slide, props.layout, props.master, new AscFormat.CUniColor().RGBA);
-						var upPen = CreatePenFromParams(brush, undefined, undefined, undefined, undefined, 0);
-						var frontPen = CreatePenFromParams(duplicateBrush, undefined, undefined, undefined, undefined, 0);
+						var upPen = AscFormat.CreatePenFromParams(brush, undefined, undefined, undefined, undefined, 0);
+						var frontPen = AscFormat.CreatePenFromParams(duplicateBrush, undefined, undefined, undefined, undefined, 0);
 						//pen.setFill(duplicateBrush);
 						//if(!(i === numCache.length - 1 && j === path.length - 1))
 							this.cChartDrawer.drawPath(path[j].frontPath, frontPen, duplicateBrush);
@@ -7301,8 +7301,8 @@ drawPieChart.prototype =
 							duplicateBrush.fill.color.Mods.addMod(cColorMod);	
 						
 						duplicateBrush.calculate(props.theme, props.slide, props.layout, props.master, new AscFormat.CUniColor().RGBA);
-						var upPen = CreatePenFromParams(brush, undefined, undefined, undefined, undefined, 0);
-						var frontPen = CreatePenFromParams(duplicateBrush, undefined, undefined, undefined, undefined, 0);
+						var upPen = AscFormat.CreatePenFromParams(brush, undefined, undefined, undefined, undefined, 0);
+						var frontPen = AscFormat.CreatePenFromParams(duplicateBrush, undefined, undefined, undefined, undefined, 0);
 						//pen.setFill(duplicateBrush);
 						//if(!(i === numCache.length - 1 && j === path.length - 1))
 							//this.cChartDrawer.drawPath(path[j].frontPath, frontPen, duplicateBrush);

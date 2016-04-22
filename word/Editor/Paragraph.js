@@ -1262,7 +1262,7 @@ Paragraph.prototype =
 
         if(pGraphics.Start_Command)
         {
-            pGraphics.Start_Command(DRAW_COMMAND_PARAGRAPH);
+            pGraphics.Start_Command(AscFormat.DRAW_COMMAND_PARAGRAPH);
         }
 
         var Pr = this.Get_CompiledPr();
@@ -1521,7 +1521,7 @@ Paragraph.prototype =
                 {
                     if(pGraphics.Start_Command)
                     {
-                        pGraphics.Start_Command(DRAW_COMMAND_LINE, this.Lines[CurLine], CurLine, 4)
+                        pGraphics.Start_Command(AscFormat.DRAW_COMMAND_LINE, this.Lines[CurLine], CurLine, 4)
                     }
 
                     var TempX0 = this.Lines[CurLine].Ranges[CurRange].X;
@@ -1645,7 +1645,7 @@ Paragraph.prototype =
 
                 if(pGraphics.Start_Command)
                 {
-                    pGraphics.Start_Command(DRAW_COMMAND_LINE, this.Lines[CurLine], CurLine, 2);
+                    pGraphics.Start_Command(AscFormat.DRAW_COMMAND_LINE, this.Lines[CurLine], CurLine, 2);
                 }
                 var aShd = PDSH.Shd;
                 var Element = aShd.Get_Next();
@@ -1751,7 +1751,7 @@ Paragraph.prototype =
 
             if(pGraphics.Start_Command)
             {
-                pGraphics.Start_Command(DRAW_COMMAND_LINE, this.Lines[CurLine], CurLine, 1)
+                pGraphics.Start_Command(AscFormat.DRAW_COMMAND_LINE, this.Lines[CurLine], CurLine, 1)
             }
             //----------------------------------------------------------------------------------------------------------
             // Рисуем боковые линии границы параграфа
@@ -1833,7 +1833,7 @@ Paragraph.prototype =
             var RangesCount = Line.Ranges.length;
             if(pGraphics.Start_Command)
             {
-                pGraphics.Start_Command(DRAW_COMMAND_LINE, Line, CurLine, 0);
+                pGraphics.Start_Command(AscFormat.DRAW_COMMAND_LINE, Line, CurLine, 0);
             }
 
             for ( var CurRange = 0; CurRange < RangesCount; CurRange++ )
@@ -2025,7 +2025,7 @@ Paragraph.prototype =
 
             if(pGraphics.Start_Command)
             {
-                pGraphics.Start_Command(DRAW_COMMAND_LINE, Line, CurLine, 3)
+                pGraphics.Start_Command(AscFormat.DRAW_COMMAND_LINE, Line, CurLine, 3)
             }
 
             var Baseline        = Page.Y + Line.Y;
@@ -2284,7 +2284,7 @@ Paragraph.prototype =
 
             if (pGraphics.Start_Command)
             {
-                pGraphics.Start_Command(DRAW_COMMAND_LINE, this.Lines[StartLine], StartLine, 1);
+                pGraphics.Start_Command(AscFormat.DRAW_COMMAND_LINE, this.Lines[StartLine], StartLine, 1);
             }
             var RangesCount = this.Lines[StartLine].Ranges.length;
             for (var CurRange = 0; CurRange < RangesCount; CurRange++)
@@ -2318,7 +2318,7 @@ Paragraph.prototype =
             var RangesCount = this.Lines[StartLine].Ranges.length;
             if (pGraphics.Start_Command)
             {
-                pGraphics.Start_Command(DRAW_COMMAND_LINE, this.Lines[StartLine], StartLine, 1);
+                pGraphics.Start_Command(AscFormat.DRAW_COMMAND_LINE, this.Lines[StartLine], StartLine, 1);
             }
             for (var CurRange = 0; CurRange < RangesCount; CurRange++)
             {
@@ -2375,7 +2375,7 @@ Paragraph.prototype =
             var RangesCount = this.Lines[EndLine].Ranges.length;
             if (pGraphics.Start_Command)
             {
-                pGraphics.Start_Command(DRAW_COMMAND_LINE, this.Lines[EndLine], EndLine, 1);
+                pGraphics.Start_Command(AscFormat.DRAW_COMMAND_LINE, this.Lines[EndLine], EndLine, 1);
             }
             for (var CurRange = 0; CurRange < RangesCount; CurRange++)
             {

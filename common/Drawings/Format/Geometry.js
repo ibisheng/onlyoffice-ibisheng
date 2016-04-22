@@ -1082,12 +1082,12 @@ Geometry.prototype=
 
     getMaxPathPolygonLength: function()
     {
-        var aByPaths = this.getArrayPolygonsByPaths(PATH_DIV_EPSILON);
+        var aByPaths = this.getArrayPolygonsByPaths(AscFormat.PATH_DIV_EPSILON);
 
         var dLength = 0;
         for(var i = 0; i < aByPaths.length; ++i)
         {
-            var oWarpPathPolygon = new PolygonWrapper(aByPaths[i]);
+            var oWarpPathPolygon = new AscFormat.PolygonWrapper(aByPaths[i]);
             if(dLength < oWarpPathPolygon.dLen)
             {
                 dLength = oWarpPathPolygon.dLen;
@@ -1097,12 +1097,12 @@ Geometry.prototype=
     },
     getMinPathPolygonLength: function()
     {
-        var aByPaths = this.getArrayPolygonsByPaths(PATH_DIV_EPSILON);
+        var aByPaths = this.getArrayPolygonsByPaths(AscFormat.PATH_DIV_EPSILON);
 
         var dLength = 10000000;
         for(var i = 0; i < aByPaths.length; ++i)
         {
-            var oWarpPathPolygon = new PolygonWrapper(aByPaths[i]);
+            var oWarpPathPolygon = new AscFormat.PolygonWrapper(aByPaths[i]);
             if(dLength > oWarpPathPolygon.dLen)
             {
                 dLength = oWarpPathPolygon.dLen;

@@ -541,7 +541,7 @@ CTable.prototype.private_DrawCellsContent = function(pGraphics, PNum, Row_start,
     {
         if(pGraphics.Start_Command)
         {
-            pGraphics.Start_Command(DRAW_COMMAND_TABLE_ROW);
+            pGraphics.Start_Command(AscFormat.DRAW_COMMAND_TABLE_ROW);
         }
         var HeaderPage = this.HeaderInfo.Pages[PNum];
         for ( var CurRow = 0; CurRow < this.HeaderInfo.Count; CurRow++ )
@@ -576,7 +576,7 @@ CTable.prototype.private_DrawCellsContent = function(pGraphics, PNum, Row_start,
 
         if(pGraphics.Start_Command)
         {
-            pGraphics.Start_Command(DRAW_COMMAND_TABLE_ROW);
+            pGraphics.Start_Command(AscFormat.DRAW_COMMAND_TABLE_ROW);
         }
         for ( var CurCell = 0; CurCell < CellsCount; CurCell++ )
         {
