@@ -26,7 +26,7 @@ function CheckObjectLine(obj)
 
 function CheckWordArtTextPr(oRun)
 {
-    var oTextPr = oRun.Get_CompiledPr()
+    var oTextPr = oRun.Get_CompiledPr();
     if(oTextPr.TextFill || oTextPr.TextOutline || (oTextPr.Unifill && oTextPr.Unifill.fill && (oTextPr.Unifill.fill.type !== c_oAscFill.FILL_TYPE_SOLID || oTextPr.Unifill.transparent != null && oTextPr.Unifill.transparent < 254.5)))
         return true;
     return false;
@@ -1119,6 +1119,24 @@ CShape.prototype =
                     }
                 }
                 this.compiledFill = this.spPr.Fill.createDuplicate();
+                if(this.compiledFill && this.compiledFill.fill && this.compiledFill.fill.type === c_oAscFill.FILL_TYPE_GRP)
+                {
+                    if(this.group)
+                    {
+                        var group_compiled_fill = this.group.getCompiledFill();
+                        if (isRealObject(group_compiled_fill) && isRealObject(group_compiled_fill.fill)) {
+                            this.compiledFill = group_compiled_fill.createDuplicate();
+                        }
+                        else
+                        {
+                            this.compiledFill = null;
+                        }
+                    }
+                    else
+                    {
+                        this.compiledFill = null;
+                    }
+                }
             }
             else if (isRealObject(this.group)) {
                 var group_compiled_fill = this.group.getCompiledFill();
@@ -1201,8 +1219,24 @@ CShape.prototype =
     getCompiledTransparent: function () {
         if (this.recalcInfo.recalculateTransparent) {
             this.compiledTransparent = null;
-            if (isRealObject(this.spPr) && isRealObject(this.spPr.Fill) && AscFormat.isRealNumber(this.spPr.Fill.transparent))
-                this.compiledTransparent = this.spPr.Fill.transparent;
+            if (isRealObject(this.spPr) && isRealObject(this.spPr.Fill))
+            {
+                if(AscFormat.isRealNumber(this.spPr.Fill.transparent))
+                {
+                    this.compiledTransparent = this.spPr.Fill.transparent;
+                }
+                else
+                {
+                    if(this.spPr.Fill && this.spPr.Fill.fill && this.spPr.Fill.fill.type === c_oAscFill.FILL_TYPE_GRP)
+                    {
+                        if(this.group && this.group.spPr && this.group.spPr.Fill && AscFormat.isRealNumber(this.group.spPr.Fill.transparent))
+                        {
+                            this.compiledTransparent = this.group.spPr.Fill.transparent;
+                        }
+                    }
+                }
+
+            }
             else if (isRealObject(this.group)) {
                 var group_transparent = this.group.getCompiledTransparent();
                 if (AscFormat.isRealNumber(group_transparent)) {

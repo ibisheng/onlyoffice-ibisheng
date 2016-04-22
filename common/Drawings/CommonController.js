@@ -6030,6 +6030,10 @@ DrawingObjectsController.prototype =
                     sp.spPr.xfrm.setFlipH(cur_group.spPr.xfrm.flipH === true ? !(sp.spPr.xfrm.flipH === true) : sp.spPr.xfrm.flipH === true);
                     sp.spPr.xfrm.setFlipV(cur_group.spPr.xfrm.flipV === true ? !(sp.spPr.xfrm.flipV === true) : sp.spPr.xfrm.flipV === true);
                     sp.setGroup(null);
+                    if(sp.spPr.Fill && sp.spPr.Fill.fill && sp.spPr.Fill.fill.type === Asc.c_oAscFill.FILL_TYPE_GRP && cur_group.spPr && cur_group.spPr.Fill)
+                    {
+                        sp.spPr.setFill(cur_group.spPr.Fill.createDuplicate());
+                    }
                     sp.addToDrawingObjects();
                     sp.checkDrawingBaseCoords();
                     this.selectObject(sp, 0);

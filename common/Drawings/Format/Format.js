@@ -11242,11 +11242,6 @@ function CreateAscFill(unifill)
             ret.type = c_oAscFill.FILL_TYPE_NOFILL;
             break;
         }
-        case c_oAscFill.FILL_TYPE_GRP:
-        {
-            ret.type = c_oAscFill.FILL_TYPE_GRP;
-            break;
-        }
         default:
             break;
     }
