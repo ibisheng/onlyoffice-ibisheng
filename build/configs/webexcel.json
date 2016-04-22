@@ -11,6 +11,8 @@
         "../common/apiCommon.js",
         "../common/editorscommon.js",
         "../common/NumFormat.js",
+		
+		"../common/Drawings/ArcTo.js",
 
         "../common/Drawings/Format/Constants.js",
 		"../common/Drawings/CommonController.js",
@@ -83,7 +85,6 @@
         "../cell/view/EventsController.js",
         "../cell/view/WorkbookView.js",
         "../word/Editor/SerializeCommon.js",
-        "../common/Drawings/ArcTo.js",
         "../common/Drawings/ColorArray.js",
         "../common/Shapes/Serialize.js",
         "../common/Shapes/SerializeWriter.js",

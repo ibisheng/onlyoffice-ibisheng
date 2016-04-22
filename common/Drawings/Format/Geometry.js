@@ -6,6 +6,8 @@
 * @param {undefined} undefined
 */
 function (window, undefined) {
+    // Import
+    var ArcToCurvers = AscFormat.ArcToCurvers;
 
 var EPSILON_TEXT_AUTOFIT = 0.001;
 var FORMULA_TYPE_MULT_DIV = 0,

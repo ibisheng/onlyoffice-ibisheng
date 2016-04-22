@@ -15,6 +15,9 @@ var moveTo=0,
 
 // Import
 var cToRad = AscFormat.cToRad;
+var HitToArc = AscFormat.HitToArc;
+var ArcToCurvers = AscFormat.ArcToCurvers;
+var ArcToOnCanvas = AscFormat.ArcToOnCanvas;
 
 var cToRad2 = (Math.PI/60000)/180;
 
