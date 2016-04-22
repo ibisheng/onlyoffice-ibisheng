@@ -150,6 +150,9 @@
         "../common/Local/common.js",
         "../slide/Local/api.js"
       ],
+	  "mobile_banners": [
+		"../slide/Native/native.js"
+	  ],
       "mobile": [
         "../../web-apps/vendor/xregexp/xregexp-all-min.js",
         "../common/browser.js",
@@ -158,7 +161,6 @@
         "../common/Native/Wrappers/DrawingStream.js",
         "../common/Native/Wrappers/ShapeDrawer.js",
         "../common/Native/Wrappers/Overlay.js",
-        "../slide/Native/native.js",
         "../slide/Native/Wrappers/api.js",
         "../slide/Native/Wrappers/HtmlPage.js",
         "../slide/Native/Wrappers/DrawingDocument.js"

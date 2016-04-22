@@ -154,6 +154,7 @@
         "../common/Local/common.js",
         "../word/Local/api.js"
       ],
+	  "mobile_banners": [],
       "exclude_mobile": [],
       "dst": "../word/sdk-all.js",
       "externs": [

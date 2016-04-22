@@ -72,10 +72,12 @@ module.exports = function(grunt) {
 		grunt.file.mkdir( packageFile['compile']['sdk']['log'] );
 		var map_file_path = packageFile['compile']['sdk']['dst'] + '.map';
 		var map_record_file_path = map_file_path + '.tmp';
+		var tmp_sdk_path = packageFile['compile']['sdk']['dst'] + '.tmp';
 		var concat_src = [
 			packageFile['compile']['sdk']['dst'],
 			packageFile['compile']['defines']['dst'],
 			map_record_file_path ];
+		var concat_src_with_banner_file = [];
 		var srcFiles = packageFile['compile']['sdk']['common'];
 		var sdkOpt = {
 			compilation_level: compilation_level,
@@ -103,6 +105,7 @@ module.exports = function(grunt) {
 			if(mobileFiles){
 				srcFiles = mobileFiles.concat(srcFiles);
 			}
+			concat_src_with_banner_file = concat_src_with_banner_file.concat(packageFile['compile']['sdk']['mobile_banners']);
 		}
 		
 		if (!grunt.option('noprivate')) {
@@ -111,7 +114,9 @@ module.exports = function(grunt) {
 		if (grunt.option('desktop')) {
 			srcFiles = srcFiles.concat(packageFile['compile']['sdk']['desktop']);
 		}
-	
+		
+		concat_src_with_banner_file = concat_src_with_banner_file.concat(tmp_sdk_path)
+
 		grunt.initConfig({
 			pkg: packageFile,
 			'closure-compiler': {
@@ -129,18 +134,23 @@ module.exports = function(grunt) {
 				}
 			},
 			concat: {
+				sdk: {
 				options: {
 					banner: '(function(window, undefined) {',
 					footer: '})(window);'
 					},
-				dist: {
 					src: concat_src,
+					dest: tmp_sdk_path
+				},
+				bannerFile: {
+					src: concat_src_with_banner_file,
 					dest: '<%= pkg.compile.sdk.dst %>'
 					}
 			},
 			clean: [ 
 				packageFile['compile']['defines']['dst'],
-				map_record_file_path
+				map_record_file_path,
+				tmp_sdk_path
 			],
 			replace: {
 				version: {
@@ -161,5 +171,5 @@ module.exports = function(grunt) {
 	grunt.registerTask('compile_sdk', ['compile_sdk_init:' + level, 'closure-compiler', 'concat', 'replace', 'clean']);
 	grunt.registerTask('compile_sdk_native', ['compile_sdk_init:' + level, 'closure-compiler:sdk', 'concat', 'replace', 'clean']);
 		
-	grunt.registerTask('default', ['build_all']);
+	grunt.registerTask('default', ['build_webpowerpoint']);
 };

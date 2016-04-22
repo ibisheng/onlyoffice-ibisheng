@@ -167,6 +167,7 @@
         "../common/Local/common.js",
         "../cell/Local/api.js"
       ],
+	  "mobile_banners": [],
       "exclude_mobile": [],
       "dst": "../cell/sdk-all.js",
       "externs": [
