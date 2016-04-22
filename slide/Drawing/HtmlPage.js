@@ -1,5 +1,8 @@
 "use strict";
 
+// Import
+var MOVE_DELTA = AscFormat.MOVE_DELTA;
+
 var g_dDpiX = 96.0;
 var g_dDpiY = 96.0;
 

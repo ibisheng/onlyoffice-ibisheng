@@ -3,6 +3,7 @@
 // Import
 var DrawingObjectsController = AscFormat.DrawingObjectsController;
 var HANDLE_EVENT_MODE_HANDLE = AscFormat.HANDLE_EVENT_MODE_HANDLE;
+var MOVE_DELTA = AscFormat.MOVE_DELTA;
 
 
 DrawingObjectsController.prototype.getTheme = function()
@@ -144,7 +145,7 @@ DrawingObjectsController.prototype.resetSelect = function()
     this.resetSelection();
     this.clearPreTrackObjects();
     this.clearTrackObjects();
-    this.changeCurrentState(new NullState(this));
+    this.changeCurrentState(new AscFormat.NullState(this));
 };
 
 
@@ -173,7 +174,7 @@ DrawingObjectsController.prototype.checkSelectedObjectsAndFireCallback = functio
 DrawingObjectsController.prototype.showChartSettings  =  function()
 {
     editor.asc_doubleClickOnChart(this.getChartObject());
-    this.changeCurrentState(new NullState(this));
+    this.changeCurrentState(new AscFormat.NullState(this));
 };
 DrawingObjectsController.prototype.getColorMapOverride  =  function()
 {
@@ -333,7 +334,7 @@ PreMoveCommentState.prototype =
         editor.sync_ShowComment(this.comment.Id, Coords.X, Coords.Y );
         editor.WordControl.m_oLogicDocument.noShowContextMenu = true;
         this.drawingObjects.clearPreTrackObjects();
-        this.drawingObjects.changeCurrentState(new NullState(this.drawingObjects));
+        this.drawingObjects.changeCurrentState(new AscFormat.NullState(this.drawingObjects));
     }
 };
 
@@ -381,7 +382,7 @@ MoveCommentState.prototype =
         }
         this.drawingObjects.clearTrackObjects();
         this.drawingObjects.updateOverlay();
-        this.drawingObjects.changeCurrentState(new NullState(this.drawingObjects));
+        this.drawingObjects.changeCurrentState(new AscFormat.NullState(this.drawingObjects));
 
     }
 };

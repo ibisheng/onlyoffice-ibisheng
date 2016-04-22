@@ -114,7 +114,7 @@ function CGraphicObjects(document, drawingDocument, api)
     this.arrTrackObjects = [];
 
 
-    this.curState = new NullState(this);
+    this.curState = new AscFormat.NullState(this);
 
     this.selectionInfo =
     {
@@ -147,7 +147,7 @@ function CGraphicObjects(document, drawingDocument, api)
 
     this.handleEventMode = HANDLE_EVENT_MODE_HANDLE;
 
-    this.nullState = new NullState(this);
+    this.nullState = new AscFormat.NullState(this);
     this.bNoCheckChartTextSelection = false;
 
     this.Id = AscCommon.g_oIdCounter.Get_NewId();
@@ -1111,7 +1111,7 @@ CGraphicObjects.prototype =
                 DocContent.Selection.Start = true;
             }
 
-            this.changeCurrentState(new StartAddNewShape(this, sPreset));
+            this.changeCurrentState(new AscFormat.StartAddNewShape(this, sPreset));
             this.OnMouseDown({}, dX, dY, nPageIndex);
             if(AscFormat.isRealNumber(dExtX) && AscFormat.isRealNumber(dExtY))
             {
@@ -1208,14 +1208,14 @@ CGraphicObjects.prototype =
         {
             editor.asc_doubleClickOnChart(this.getChartObject());
         }
-        this.changeCurrentState(new NullState(this));
+        this.changeCurrentState(new AscFormat.NullState(this));
         this.document.OnMouseUp(e, x, y, pageIndex);
     },
 
     handleMathDrawingDoubleClick : function(drawing, e, x, y, pageIndex)
     {
         drawing.Convert_ToMathObject();
-        this.changeCurrentState(new NullState(this));
+        this.changeCurrentState(new AscFormat.NullState(this));
         this.document.OnMouseUp(e, x, y, pageIndex);
     },
 
@@ -2833,7 +2833,7 @@ CGraphicObjects.prototype =
         this.clearPreTrackObjects();
         this.clearTrackObjects();
         this.resetSelection();
-        this.changeCurrentState(new NullState(this));
+        this.changeCurrentState(new AscFormat.NullState(this));
         return this.loadDocumentStateAfterLoadChanges(oState);
     },
 
@@ -3165,22 +3165,22 @@ CGraphicObjects.prototype =
         {
             case "spline":
             {
-                this.changeCurrentState(new SplineBezierState(this));
+                this.changeCurrentState(new AscFormat.SplineBezierState(this));
                 break;
             }
             case "polyline1":
             {
-                this.changeCurrentState(new PolyLineAddState(this));
+                this.changeCurrentState(new AscFormat.PolyLineAddState(this));
                 break;
             }
             case "polyline2":
             {
-                this.changeCurrentState(new AddPolyLine2State(this));
+                this.changeCurrentState(new AscFormat.AddPolyLine2State(this));
                 break;
             }
             default :
             {
-                this.changeCurrentState(new StartAddNewShape(this, preset));
+                this.changeCurrentState(new AscFormat.StartAddNewShape(this, preset));
                 break;
             }
         }

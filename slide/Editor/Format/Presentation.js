@@ -2100,10 +2100,10 @@ CPresentation.prototype =
             if(this.Slides[this.CurPage])
             {
                 var oDrawingObjects = this.Slides[this.CurPage].graphicObjects;
-                if(oDrawingObjects.curState instanceof  StartAddNewShape
-                    || oDrawingObjects.curState instanceof  SplineBezierState
-                    || oDrawingObjects.curState instanceof  PolyLineAddState
-                    || oDrawingObjects.curState instanceof  AddPolyLine2State
+                if(oDrawingObjects.curState instanceof  AscFormat.StartAddNewShape
+                    || oDrawingObjects.curState instanceof  AscFormat.SplineBezierState
+                    || oDrawingObjects.curState instanceof  AscFormat.PolyLineAddState
+                    || oDrawingObjects.curState instanceof  AscFormat.AddPolyLine2State
                     || oDrawingObjects.arrTrackObjects.length > 0)
                 {
                     oDrawingObjects.changeCurrentState(new NullState(oDrawingObjects));

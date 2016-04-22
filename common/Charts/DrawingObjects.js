@@ -13,6 +13,7 @@ var c_oAscLockTypes = AscCommon.c_oAscLockTypes;
 var parserHelp = AscCommon.parserHelp;
 
 var BBoxInfo = AscFormat.BBoxInfo;
+var MOVE_DELTA = AscFormat.MOVE_DELTA;
 
 var c_oAscError = Asc.c_oAscError;
 var c_oAscInsertOptions = Asc.c_oAscInsertOptions;
@@ -1264,7 +1265,7 @@ function DrawingObjects() {
             _this.controller.clearPreTrackObjects();
             _this.controller.clearTrackObjects();
             _this.controller.resetSelection();
-            _this.controller.changeCurrentState(new NullState(this.controller));
+            _this.controller.changeCurrentState(new AscFormat.NullState(this.controller));
             if(oStateBeforeLoadChanges){
                 _this.controller.loadDocumentStateAfterLoadChanges(oStateBeforeLoadChanges);
             }

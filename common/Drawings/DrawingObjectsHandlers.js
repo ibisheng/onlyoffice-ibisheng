@@ -252,7 +252,7 @@ function handleGroup(drawing, drawingObjectsController, e, x, y, group, pageInde
                                 cur_grouped_object.selectTitle(title, pageIndex);
                                 cur_grouped_object.selection.textSelection = title;
                                 title.selectionSetStart(e, x, y, pageIndex);
-                                drawingObjectsController.changeCurrentState(new TextAddState(drawingObjectsController, title, x, y));
+                                drawingObjectsController.changeCurrentState(new AscFormat.TextAddState(drawingObjectsController, title, x, y));
                                 if(e.ClickCount <= 1)
                                 {
                                     drawingObjectsController.updateSelectionState();
@@ -472,7 +472,7 @@ function handleInternalChart(drawing, drawingObjectsController, e, x, y, group, 
                         drawing.selection.textSelection = title;
                     }
                     title.selectionSetStart(e, x, y, pageIndex);
-                    drawingObjectsController.changeCurrentState(new TextAddState(drawingObjectsController, title, x, y));
+                    drawingObjectsController.changeCurrentState(new AscFormat.TextAddState(drawingObjectsController, title, x, y));
                     if(e.ClickCount <= 1)
                     {
                         drawingObjectsController.updateSelectionState();
@@ -549,6 +549,47 @@ function handleInlineChart(drawing, drawingObjectsController, e, x, y, pageIndex
     {
         return ret;
     }
+                else
+                {
+                    return {objectId: drawing.Get_Id(), cursorType: "move", bMarker: false};
+                }
+            }
+            else if(hit_in_text_rect)
+            {
+                if(drawingObjectsController.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
+                {
+                    drawingObjectsController.checkChartTextSelection();
+                    drawingObjectsController.resetSelection();
+                    drawingObjectsController.selectObject(drawing, pageIndex);
+                    drawingObjectsController.selection.chartSelection = drawing;
+                    drawing.selectTitle(title, pageIndex);
+                    drawing.selection.textSelection = title;
+                    title.selectionSetStart(e, x, y, pageIndex);
+                    drawingObjectsController.changeCurrentState(new AscFormat.TextAddState(drawingObjectsController, title, x, y));
+                    if(e.ClickCount <= 1)
+                    {
+                        drawingObjectsController.updateSelectionState();
+                    }
+                    return true;
+                }
+                else
+                {
+                    if(drawingObjectsController.document)
+                    {
+                        var content = title.getDocContent();
+                        var invert_transform_text = title.invertTransformText, tx, ty;
+                        if(content && invert_transform_text)
+                        {
+                            tx = invert_transform_text.TransformPointX(x, y);
+                            ty = invert_transform_text.TransformPointY(x, y);
+                            content.Update_CursorType(tx, ty, 0);
+                        }
+                    }
+                    return {objectId: drawing.Get_Id(), cursorType: "text", title: title};
+                }
+            }
+        }
+    }
     return handleInlineShapeImage(drawing, drawingObjectsController, e, x, y, pageIndex);
 }
 
@@ -567,7 +608,7 @@ function handleInlineHitNoText(drawing, drawingObjects, e, x, y, pageIndex, bInS
             drawingObjects.checkChartTextSelection();
             drawingObjects.resetSelection();
             drawing.select(drawingObjects, pageIndex);
-            drawingObjects.changeCurrentState(new PreMoveInlineObject(drawingObjects, drawing, bIsSelected, !bInSelect, pageIndex, x, y));
+            drawingObjects.changeCurrentState(new AscFormat.PreMoveInlineObject(drawingObjects, drawing, bIsSelected, !bInSelect, pageIndex, x, y));
             if(e.ClickCount > 1 && !e.ShiftKey && !e.CtrlKey && ((drawingObjects.selection.groupSelection && drawingObjects.selection.groupSelection.selectedObjects.length === 1) || drawingObjects.selectedObjects.length === 1))
             {
                 if (drawing.getObjectType() === AscDFH.historyitem_type_ChartSpace && drawingObjects.handleChartDoubleClick)
@@ -630,7 +671,7 @@ function handleMouseUpPreMoveState(drawingObjects, e, x, y, pageIndex, bWord)
 {
     var state = drawingObjects.curState;
     state.drawingObjects.clearPreTrackObjects();
-    state.drawingObjects.changeCurrentState(new NullState(state.drawingObjects));
+    state.drawingObjects.changeCurrentState(new AscFormat.NullState(state.drawingObjects));
     if(!state.shift && !state.ctrl && state.bInside && state.majorObjectIsSelected && e.Button !== g_mouse_button_right)
     {
         switch (state.majorObject.getObjectType())
@@ -682,7 +723,7 @@ function handleFloatTable(drawing, drawingObjectsController, e, x, y, group, pag
                     drawingObjectsController.selectObject(group, pageIndex);
                     drawingObjectsController.selection.groupSelection = group;
                 }
-                drawingObjectsController.changeCurrentState(new TextAddState(drawingObjectsController, drawing, x, y));
+                drawingObjectsController.changeCurrentState(new AscFormat.TextAddState(drawingObjectsController, drawing, x, y));
                 return true;
             }
             else

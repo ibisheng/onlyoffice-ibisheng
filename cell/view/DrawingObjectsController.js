@@ -39,7 +39,7 @@ AscCommon.CContentChangesElement.prototype.Refresh_BinaryData = function()
 
 function CheckIdSatetShapeAdd(state)
 {
-    return !(state instanceof NullState);
+    return !(state instanceof AscFormat.NullState);
 }
 DrawingObjectsController.prototype.getTheme = function()
 {
@@ -355,7 +355,7 @@ DrawingObjectsController.prototype.isPointInDrawingObjects = function(x, y, e)
 
 DrawingObjectsController.prototype.handleDoubleClickOnChart = function(chart)
 {
-    this.changeCurrentState(new NullState());
+    this.changeCurrentState(new AscFormat.NullState());
 };
 
 DrawingObjectsController.prototype.addImageFromParams = function(rasterImageId, x, y, extX, extY)

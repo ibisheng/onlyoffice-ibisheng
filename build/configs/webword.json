@@ -21,6 +21,7 @@
 
         "../common/Drawings/Format/Constants.js",
 		"../common/Drawings/CommonController.js",
+		"../word/Editor/GraphicObjects/DrawingStates.js",
 		"../common/Drawings/Format/CreateGeometry.js",
 		"../common/Drawings/Format/Geometry.js",
 		"../common/Drawings/Format/Format.js",
@@ -69,7 +70,6 @@
         "../word/Editor/GraphicObjects/Format/GroupPrototype.js",
         "../word/Editor/GraphicObjects/Format/ChartSpacePrototype.js",
         "../slide/Editor/Format/GraphicFrame.js",
-        "../word/Editor/GraphicObjects/DrawingStates.js",
         "../word/Editor/GraphicObjects/GraphicObjects.js",
         "../word/Editor/GraphicObjects/GraphicPage.js",
         "../word/Editor/GraphicObjects/WrapManager.js",

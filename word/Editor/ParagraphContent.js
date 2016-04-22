@@ -23,6 +23,7 @@
 var g_oTableId = AscCommon.g_oTableId;
 
 var HitInLine = AscFormat.HitInLine;
+var MOVE_DELTA = AscFormat.MOVE_DELTA;
 
 var c_oAscRelativeFromH = Asc.c_oAscRelativeFromH;
 var c_oAscRelativeFromV = Asc.c_oAscRelativeFromV;
@@ -3997,9 +3998,6 @@ var WRAPPING_TYPE_SQUARE = 0x01;
 var WRAPPING_TYPE_THROUGH = 0x02;
 var WRAPPING_TYPE_TIGHT = 0x03;
 var WRAPPING_TYPE_TOP_AND_BOTTOM = 0x04;
-
-var MOVE_DELTA = 0.0000001;
-
 
 //Horizontal Relative Positioning Types
 var HOR_REL_POS_TYPE_CHAR = 0x00;

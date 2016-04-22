@@ -1210,7 +1210,7 @@ Slide.prototype =
     showChartSettings:  function()
     {
         editor.asc_fireCallback("asc_doubleClickOnChart", this.graphicObjects.getChartObject());
-        this.graphicObjects.changeCurrentState(new NullState(this.graphicObjects));
+        this.graphicObjects.changeCurrentState(new AscFormat.NullState(this.graphicObjects));
     },
 
 

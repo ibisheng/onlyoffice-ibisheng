@@ -1,5 +1,7 @@
 "use strict";
 
+(function(window, undefined){
+
 // Import
 var HANDLE_EVENT_MODE_HANDLE = AscFormat.HANDLE_EVENT_MODE_HANDLE;
 var HANDLE_EVENT_MODE_CURSOR = AscFormat.HANDLE_EVENT_MODE_CURSOR;
@@ -2067,3 +2069,25 @@ AddPolyLine2State3.prototype =
         }
     }
 };
+
+    //--------------------------------------------------------export----------------------------------------------------
+    window['AscFormat'] = window['AscFormat'] || {};
+    window['AscFormat'].MOVE_DELTA = MOVE_DELTA;
+    window['AscFormat'].SNAP_DISTANCE = SNAP_DISTANCE;
+    window['AscFormat'].StartAddNewShape = StartAddNewShape;
+    window['AscFormat'].NullState = NullState;
+    window['AscFormat'].PreChangeAdjState = PreChangeAdjState;
+    window['AscFormat'].PreRotateState = PreRotateState;
+    window['AscFormat'].PreResizeState = PreResizeState;
+    window['AscFormat'].PreMoveState = PreMoveState;
+    window['AscFormat'].MoveState = MoveState;
+    window['AscFormat'].PreMoveInGroupState = PreMoveInGroupState;
+    window['AscFormat'].MoveInGroupState = MoveInGroupState;
+    window['AscFormat'].PreRotateInGroupState = PreRotateInGroupState;
+    window['AscFormat'].PreResizeInGroupState = PreResizeInGroupState;
+    window['AscFormat'].PreChangeAdjInGroupState = PreChangeAdjInGroupState;
+    window['AscFormat'].TextAddState = TextAddState;
+    window['AscFormat'].SplineBezierState = SplineBezierState;
+    window['AscFormat'].PolyLineAddState = PolyLineAddState;
+    window['AscFormat'].AddPolyLine2State = AddPolyLine2State;
+})(window);

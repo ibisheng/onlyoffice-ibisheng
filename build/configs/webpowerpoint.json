@@ -18,6 +18,7 @@
 
         "../common/Drawings/Format/Constants.js",
 		"../common/Drawings/CommonController.js",
+		"../common/Drawings/States.js",
 		"../common/Drawings/Format/CreateGeometry.js",
 		"../common/Drawings/Format/Geometry.js",
 		"../common/Drawings/Format/Format.js",
@@ -66,7 +67,6 @@
         "../word/Editor/Common.js",
         "../word/Editor/Sections.js",
         "../word/Editor/History.js",
-        "../common/Drawings/States.js",
         "../common/Drawings/DrawingObjectsHandlers.js",
         "../common/Drawings/TrackObjects/AdjustmentTracks.js",
         "../common/Drawings/TrackObjects/ResizeTracks.js",
