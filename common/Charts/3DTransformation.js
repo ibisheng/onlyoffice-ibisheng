@@ -3,6 +3,9 @@
 // Import
 var ORIENTATION_MIN_MAX = AscFormat.ORIENTATION_MIN_MAX;
 
+var globalBasePercent = 100;
+var global3DPersperctive = 30; // ToDo а нужна ли она в ChartsDrawer ?
+
 /** @constructor */
 function Processor3D(width, height, left, right, bottom, top, chartSpace, chartsDrawer) {
 	this.widthCanvas = width;

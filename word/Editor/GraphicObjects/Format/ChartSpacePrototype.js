@@ -196,7 +196,7 @@ CChartSpace.prototype.recalculateTransform = CShape.prototype.recalculateTransfo
 CChartSpace.prototype.recalculateChart = function()
 {
     if(this.chartObj == null)
-        this.chartObj =  new CChartsDrawer();
+        this.chartObj =  new AscFormat.CChartsDrawer();
     this.chartObj.reCalculate(this);
 };
 CChartSpace.prototype.canResize = CShape.prototype.canResize;
