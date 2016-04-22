@@ -9142,7 +9142,7 @@ CTable.prototype =
             History.Add( this, { Type : AscDFH.historyitem_Table_TableStyle, Old : this.TableStyle, New : StyleId } );
             this.TableStyle = StyleId;
 
-            this.Recalc_CompiledPr();
+            this.Recalc_CompiledPr2();
         }
     },
 

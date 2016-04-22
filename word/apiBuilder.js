@@ -170,6 +170,18 @@
     }
 
     /**
+     * Class representing a set of formatting properties which shall be conditionally applied to the parts of a table
+     * which match the requirement specified on the <code>Type</code>.
+     * @constructor
+     */
+    function ApiTableStylePr(Type, Parent, TableStylePr)
+    {
+        this.Type         = Type;
+        this.Parent       = Parent;
+        this.TableStylePr = TableStylePr;
+    }
+
+    /**
      * Twentieths of a point (equivalent to 1/1440th of an inch).
      * @typedef {number} twips
      */
@@ -232,6 +244,26 @@
      * @typedef {("auto" | "twips" | "nul" | "percent")} TableWidth
      */
 
+    /**
+     * This simple type specifies possible values for the sections of the table to which the current conditional
+     * formatting properties shall be applied when this table style is used.
+     * <b>"topLeftCell"</b> - Specifies that the table formatting applies to the top left cell. <br/>
+     * <b>"topRightCell"</b> - Specifies that the table formatting applies to the top right cell. <br/>
+     * <b>"bottomLeftCell"</b> - Specifies that the table formatting applies to the bottom left cell.<br/>
+     * <b>"bottomRightCell"</b> - Specifies that the table formatting applies to the bottom right cell.<br/>
+     * <b>"firstRow"</b> - Specifies that the table formatting applies to the first row. <br/>
+     * <b>"lastRow"</b> - Specifies that the table formatting applies to the last row. <br/>
+     * <b>"firstColumn"</b> - Specifies that the table formatting applies to the first column. Any subsequent row which
+     * is in <i>table header</i>{@link ApiTableRowPr#SetTableHeader} shall also use this conditional format.<br/>
+     * <b>"lastColumn"</b> - Specifies that the table formatting applies to the last column. <br/>
+     * <b>"bandedColumn"</b> - Specifies that the table formatting applies to odd numbered groupings of rows.<br/>
+     * <b>"bandedColumnEven"</b> - Specifies that the table formatting applies to even numbered groupings of rows.<br/>
+     * <b>"bandedRow"</b> - Specifies that the table formatting applies to odd numbered groupings of columns.<br/>
+     * <b>"bandedRowEven"</b> - Specifies that the table formatting applies to even numbered groupings of columns.<br/>
+     * <b>"wholeTable"</b> - Specifies that the conditional formatting applies to the whole table.<br/>
+     * @typedef {("topLeftCell" | "topRightCell" | "bottomLeftCell" | "bottomRightCell" | "firstRow" | "lastRow" | "firstColumn" | "lastColumn" | "bandedColumn" | "bandedColumnEven" | "bandedRow" | "bandedRowEven" | "wholeTable")} TableStyleOverrideType
+     */
+
     //------------------------------------------------------------------------------------------------------------------
     //
     // Base Api
@@ -269,7 +301,7 @@
             return null;
 
         var oTable = new CTable(private_GetDrawingDocument(), private_GetLogicDocument(), true, 0, 0, 0, 0, 0, nRows, nCols, [], false);
-        oTable.private_RecalculateGridOpen();
+        oTable.Set_TableStyle2(undefined);
         return new ApiTable(oTable);
     };
 
@@ -377,7 +409,7 @@
         else if ("numbering" === sType)
             nStyleType = styletype_Numbering;
 
-        var oStyle        = new CStyle(sStyleName, null, null, nStyleType, (styletype_Table !== nStyleType ? false : true));
+        var oStyle        = new CStyle(sStyleName, null, null, nStyleType, false);
         oStyle.qFormat    = true;
         oStyle.uiPriority = 1;
         var oStyles       = this.Document.Get_Styles();
@@ -1067,6 +1099,54 @@
             return null;
 
         return new ApiTableCellPr(this, this.Style.TableCellPr.Copy());
+    };
+    /**
+     * Specifies the reference of the parent style from which this style inherits in the style inheritance.
+     * @param {ApiStyle} oStyle
+     */
+    ApiStyle.prototype.SetBasedOn = function(oStyle)
+    {
+        if (!(oStyle instanceof ApiStyle) || this.Style.Get_Type() !== oStyle.Style.Get_Type())
+            return;
+
+        this.Style.Set_BasedOn(oStyle.Style.Get_Id());
+    };
+    /**
+     * Get a set of formatting properties which shall be conditionally applied to the parts of a table which match the
+     * requirement specified on the <code>sType</code> parameter.
+     * @param {TableStyleOverrideType} [sType="wholeTable"]
+     * @returns {ApiTableStylePr}
+     */
+    ApiStyle.prototype.GetConditionalTableStyle = function(sType)
+    {
+        if ("topLeftCell" === sType)
+            return new ApiTableStylePr(sType, this, this.Style.TableTLCell.Copy());
+        else if ("topRightCell" === sType)
+            return new ApiTableStylePr(sType, this, this.Style.TableTRCell.Copy());
+        else if ("bottomLeftCell" === sType)
+            return new ApiTableStylePr(sType, this, this.Style.TableBLCell.Copy());
+        else if ("bottomRightCell" === sType)
+            return new ApiTableStylePr(sType, this, this.Style.TableBRCell.Copy());
+        else if ("firstRow" === sType)
+            return new ApiTableStylePr(sType, this, this.Style.TableFirstRow.Copy());
+        else if ("lastRow" === sType)
+            return new ApiTableStylePr(sType, this, this.Style.TableLastRow.Copy());
+        else if ("firstColumn" === sType)
+            return new ApiTableStylePr(sType, this, this.Style.TableFirstCol.Copy());
+        else if ("lastColumn" === sType)
+            return new ApiTableStylePr(sType, this, this.Style.TableLastCol.Copy());
+        else if ("bandedColumn" === sType)
+            return new ApiTableStylePr(sType, this, this.Style.TableBand1Vert.Copy());
+        else if("bandedColumnEven" === sType)
+            return new ApiTableStylePr(sType, this, this.Style.TableBand2Vert.Copy());
+        else if ("bandedRow" === sType)
+            return new ApiTableStylePr(sType, this, this.Style.TableBand1Horz.Copy());
+        else if ("bandedRowEven" === sType)
+            return new ApiTableStylePr(sType, this, this.Style.TableBand2Horz.Copy());
+        else if ("wholeTable" === sType)
+            return new ApiTableStylePr(sType, this, this.Style.TableWholeTable.Copy());
+
+        return new ApiTableStylePr(sType, this, this.Style.TableWholeTable.Copy());
     };
 
 
@@ -2216,6 +2296,66 @@
         this.private_OnChange();
     };
 
+    //------------------------------------------------------------------------------------------------------------------
+    //
+    // ApiTableStylePr
+    //
+    //------------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Get the type of the current conditional style.
+     * @returns {TableStyleOverrideType}
+     */
+    ApiTableStylePr.prototype.GetType = function()
+    {
+        return this.Type;
+    };
+    /**
+     * Get the set of run properties which shall be applied to all runs within a table which match the conditional
+     * formatting type.
+     * @returns {ApiTextPr}
+     */
+    ApiTableStylePr.prototype.GetTextPr = function()
+    {
+        return new ApiTextPr(this, this.TableStylePr.TextPr);
+    };
+    /**
+     * Get the set of paragraph properties which shall be applied to all paragraphs within a table which match the
+     * conditional formatting type.
+     * @returns {ApiParaPr}
+     */
+    ApiTableStylePr.prototype.GetParaPr = function()
+    {
+        return new ApiParaPr(this, this.TableStylePr.ParaPr);
+    };
+    /**
+     * Get the set of table properties which shall be applied to all regions within a table which match the conditional
+     * formatting type.
+     * @returns {ApiTablePr}
+     */
+    ApiTableStylePr.prototype.GetTablePr = function()
+    {
+        return new ApiTablePr(this, this.TableStylePr.TablePr);
+    };
+    /**
+     * Get  the set of table row properties which shall be applied to all rows within a table which match the
+     * conditional formatting type.
+     * @returns {ApiTableRowPr}
+     */
+    ApiTableStylePr.prototype.GetTableRowPr = function()
+    {
+        return new ApiTableRowPr(this, this.TableStylePr.TableRowPr);
+    };
+    /**
+     * Get the set of table cell properties which shall be applied to all regions within a table which match the
+     * conditional formatting type.
+     * @returns {ApiTableCellPr}
+     */
+    ApiTableStylePr.prototype.GetTableCellPr = function()
+    {
+        return new ApiTableCellPr(this, this.TableStylePr.TableCellPr);
+    };
+
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Export
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -2283,6 +2423,8 @@
     ApiStyle.prototype["GetTablePr"]                 = ApiStyle.prototype.GetTablePr;
     ApiStyle.prototype["GetTableRowPr"]              = ApiStyle.prototype.GetTableRowPr;
     ApiStyle.prototype["GetTableCellPr"]             = ApiStyle.prototype.GetTableCellPr;
+    ApiStyle.prototype["SetBasedOn"]                 = ApiStyle.prototype.SetBasedOn;
+    ApiStyle.prototype["GetConditionalTableStyle"]   = ApiStyle.prototype.GetConditionalTableStyle;
 
 
     ApiNumbering.prototype["GetLevel"]               = ApiNumbering.prototype.GetLevel;
@@ -2373,6 +2515,12 @@
     ApiTableCellPr.prototype["SetTextDirection"]     = ApiTableCellPr.prototype.SetTextDirection;
     ApiTableCellPr.prototype["SetNoWrap"]            = ApiTableCellPr.prototype.SetNoWrap;
 
+    ApiTableStylePr.prototype["GetType "]            = ApiTableStylePr.prototype.GetType;
+    ApiTableStylePr.prototype["GetTextPr"]           = ApiTableStylePr.prototype.GetTextPr;
+    ApiTableStylePr.prototype["GetParaPr"]           = ApiTableStylePr.prototype.GetParaPr;
+    ApiTableStylePr.prototype["GetTablePr"]          = ApiTableStylePr.prototype.GetTablePr;
+    ApiTableStylePr.prototype["GetTableRowPr"]       = ApiTableStylePr.prototype.GetTableRowPr;
+    ApiTableStylePr.prototype["GetTableCellPr"]      = ApiTableStylePr.prototype.GetTableCellPr;
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Private area
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -2599,6 +2747,91 @@
         this.Style.Set_TableCellPr(oApiTableCellPr.CellPr);
         oApiTableCellPr.CellPr = this.Style.TableCellPr.Copy();
     };
+    ApiStyle.prototype.OnChangeTableStylePr = function(oApiTableStylePr)
+    {
+        var sType = oApiTableStylePr.GetType();
+        switch(sType)
+        {
+            case "topLeftCell":
+            {
+                this.Style.Set_TableTLCell(oApiTableStylePr.TableStylePr);
+                oApiTableStylePr.TableStylePr = this.Style.TableTLCell.Copy();
+                break;
+            }
+            case "topRightCell":
+            {
+                this.Style.Set_TableTRCell(oApiTableStylePr.TableStylePr);
+                oApiTableStylePr.TableStylePr = this.Style.TableTRCell.Copy();
+                break;
+            }
+            case "bottomLeftCell":
+            {
+                this.Style.Set_TableBLCell(oApiTableStylePr.TableStylePr);
+                oApiTableStylePr.TableStylePr = this.Style.TableBLCell.Copy();
+                break;
+            }
+            case "bottomRightCell":
+            {
+                this.Style.Set_TableBRCell(oApiTableStylePr.TableStylePr);
+                oApiTableStylePr.TableStylePr = this.Style.TableBRCell.Copy();
+                break;
+            }
+            case "firstRow":
+            {
+                this.Style.Set_TableFirstRow(oApiTableStylePr.TableStylePr);
+                oApiTableStylePr.TableStylePr = this.Style.TableFirstRow.Copy();
+                break;
+            }
+            case "lastRow":
+            {
+                this.Style.Set_TableLastRow(oApiTableStylePr.TableStylePr);
+                oApiTableStylePr.TableStylePr = this.Style.TableLastRow.Copy();
+                break;
+            }
+            case "firstColumn":
+            {
+                this.Style.Set_TableFirstCol(oApiTableStylePr.TableStylePr);
+                oApiTableStylePr.TableStylePr = this.Style.TableFirstCol.Copy();
+                break;
+            }
+            case "lastColumn":
+            {
+                this.Style.Set_TableLastCol(oApiTableStylePr.TableStylePr);
+                oApiTableStylePr.TableStylePr = this.Style.TableLastCol.Copy();
+                break;
+            }
+            case "bandedColumn":
+            {
+                this.Style.Set_TableBand1Vert(oApiTableStylePr.TableStylePr);
+                oApiTableStylePr.TableStylePr = this.Style.TableBand1Vert.Copy();
+                break;
+            }
+            case "bandedColumnEven":
+            {
+                this.Style.Set_TableBand2Vert(oApiTableStylePr.TableStylePr);
+                oApiTableStylePr.TableStylePr = this.Style.TableBand2Vert.Copy();
+                break;
+            }
+            case "bandedRow":
+            {
+                this.Style.Set_TableBand1Horz(oApiTableStylePr.TableStylePr);
+                oApiTableStylePr.TableStylePr = this.Style.TableBand1Horz.Copy();
+                break;
+            }
+            case "bandedRowEven":
+            {
+                this.Style.Set_TableBand2Horz(oApiTableStylePr.TableStylePr);
+                oApiTableStylePr.TableStylePr = this.Style.TableBand2Horz.Copy();
+                break;
+            }
+            case "wholeTable":
+            {
+                this.Style.Set_TableWholeTable(oApiTableStylePr.TableStylePr);
+                oApiTableStylePr.TableStylePr = this.Style.TableWholeTable.Copy();
+                break;
+            }
+        }
+    };
     ApiNumberingLevel.prototype.OnChangeTextPr = function(oApiTextPr)
     {
         this.Num.Set_TextPr(this.Lvl, oApiTextPr.TextPr);
@@ -2639,6 +2872,30 @@
     {
         this.Parent.OnChangeTableCellPr(this);
     };
+    ApiTableStylePr.prototype.private_OnChange = function()
+    {
+        this.Parent.OnChangeTableStylePr(this);
+    };
+    ApiTableStylePr.prototype.OnChangeTextPr = function()
+    {
+        this.private_OnChange();
+    };
+    ApiTableStylePr.prototype.OnChangeParaPr = function()
+    {
+        this.private_OnChange();
+    };
+    ApiTableStylePr.prototype.OnChangeTablePr = function()
+    {
+        this.private_OnChange();
+    };
+    ApiTableStylePr.prototype.OnChangeTableRowPr = function()
+    {
+        this.private_OnChange();
+    };
+    ApiTableStylePr.prototype.OnChangeTableCellPr = function()
+    {
+        this.private_OnChange();
+    };
 
 }(window, null));
 
@@ -2665,7 +2922,7 @@ function TEST_BUILDER()
     oFinalSection.SetType("continuous");
 
     // Генерим стили, которые будем использовать в документе
-    var oTextPr, oParaPr;
+    var oTextPr, oParaPr, oTablePr;
 
     oTextPr = oDocument.GetDefaultTextPr();
     oTextPr.SetFontSize(22);
@@ -2702,6 +2959,40 @@ function TEST_BUILDER()
     oTextPr.SetFontSize(32);
     oTextPr.SetFontFamily("Calibri Light");
 
+    var oNormalTableStyle = oDocument.GetDefaultStyle("table");
+    oTablePr = oNormalTableStyle.GetTablePr();
+    oTablePr.SetTableInd(0);
+    oTablePr.SetTableCellMarginTop(0);
+    oTablePr.SetTableCellMarginLeft(108);
+    oTablePr.SetTableCellMarginRight(108);
+    oTablePr.SetTableCellMarginBottom(0);
+
+    var oTableGridStyle = oDocument.CreateStyle("TableGrid", "table");
+    oTableGridStyle.SetBasedOn(oNormalTableStyle);
+    oParaPr = oTableGridStyle.GetParaPr();
+    oParaPr.SetSpacingAfter(0);
+    oParaPr.SetSpacingLine("auto", 240);
+    oTablePr = oTableGridStyle.GetTablePr();
+    oTablePr.SetTableInd(0);
+    oTablePr.SetTableBorderTop("single", 4, 0, 0, 0, 0);
+    oTablePr.SetTableBorderLeft("single", 4, 0, 0, 0, 0);
+    oTablePr.SetTableBorderRight("single", 4, 0, 0, 0, 0);
+    oTablePr.SetTableBorderBottom("single", 4, 0, 0, 0, 0);
+    oTablePr.SetTableBorderInsideH("single", 4, 0, 0, 0, 0);
+    oTablePr.SetTableBorderInsideV("single", 4, 0, 0, 0, 0);
+    oTablePr.SetTableCellMarginTop(0);
+    oTablePr.SetTableCellMarginLeft(108);
+    oTablePr.SetTableCellMarginBottom(0);
+    oTablePr.SetTableCellMarginRight(108);
+
+    var oFooterStyle = oDocument.CreateStyle("Footer", "paragraph");
+    oParaPr = oFooterStyle.GetParaPr();
+    oParaPr.SetTabs([4680, 9360], ["center", "right"]);
+    oParaPr.SetSpacingAfter(0);
+    oParaPr.SetJc("left");
+    oTextPr = oFooterStyle.GetTextPr();
+    oTextPr.SetColor(0, 0, 0, true);
+    oTextPr.SetFontSize(22);
 
     var oParagraph = Api.CreateParagraph();
     oParagraph.SetSpacingLine(276, "auto");
@@ -2881,7 +3172,6 @@ function TEST_BUILDER()
     oParagraph.AddText("new products.   ");
 
 
-    var oTableGridStyle = oDocument.GetStyle("TableGrid");
     var oTable = Api.CreateTable(2, 2);
     oDocument.Push(oTable);
     oTable.SetStyle(oTableGridStyle);
@@ -3062,13 +3352,6 @@ function TEST_BUILDER()
     oTable.SetJc("right");
     oTable.SetTableLook(true, true, false, false, true, false);
 
-    oTable.SetTableBorderLeft("none");
-    oTable.SetTableBorderRight("none");
-    oTable.SetTableBorderTop("none");
-    oTable.SetTableBorderBottom("none");
-    oTable.SetTableBorderInsideV("none");
-
-
     oRow = oTable.GetRow(0);
     if (oRow)
     {
@@ -3125,7 +3408,7 @@ function TEST_BUILDER()
             oCell.SetWidth("auto");
             oCellContent = oCell.GetContent();
             oParagraph = oCellContent.GetElement(0);
-            oParagraph.SetStyle("Footer");
+            oParagraph.SetStyle(oFooterStyle);
             oParagraph.SetJc("right");
             oParagraph.AddText("Hayden Management");
             oParagraph.AddText(" | Confidential");
@@ -3136,7 +3419,7 @@ function TEST_BUILDER()
             oCell.SetWidth("auto");
             oCellContent = oCell.GetContent();
             oParagraph = oCellContent.GetElement(0);
-            oParagraph.SetStyle("Footer");
+            oParagraph.SetStyle(oFooterStyle);
             oParagraph.SetJc("right");
             // TODO: Добавить автофигуру
         }
@@ -3556,6 +3839,39 @@ function TEST_BUILDER2()
     oCellContent = oCell.GetContent();
     oParagraph = oCellContent.GetElement(0);
     oParagraph.AddText("No wrap No wrap No wrap No wrap No wrap No wrap No wrap");
+
+    //------------------------------------------------------------------------------------------------------------------
+    // TableStylePr
+    //------------------------------------------------------------------------------------------------------------------
+    oTableStyle = oDocument.CreateStyle("CustomTableStyle", "table");
+    oTable = Api.CreateTable(10, 10);
+    oDocument.Push(oTable);
+    oTable.SetStyle(oTableStyle);
+    oTable.SetTableLook(true, true, true, true, true, true);
+
+    oTableStyle.GetConditionalTableStyle("topLeftCell").GetTableCellPr().SetShd("clear", 255, 0, 0);
+    oTableStyle.GetConditionalTableStyle("topRightCell").GetTableCellPr().SetShd("clear", 0, 255, 0);
+    oTableStyle.GetConditionalTableStyle("bottomLeftCell").GetTableCellPr().SetShd("clear", 0, 0, 255);
+    oTableStyle.GetConditionalTableStyle("bottomRightCell").GetTableCellPr().SetShd("clear", 255, 255, 0);
+
+    oTableStyle.GetConditionalTableStyle("firstRow").GetParaPr().SetShd("clear", 255, 0, 0);
+    oTableStyle.GetConditionalTableStyle("lastRow").GetParaPr().SetShd("clear", 0, 255, 0);
+    oTableStyle.GetConditionalTableStyle("firstColumn").GetParaPr().SetShd("clear", 0, 0, 255);
+    oTableStyle.GetConditionalTableStyle("lastColumn").GetParaPr().SetShd("clear", 255, 255, 0);
+
+    oTableStyle.GetConditionalTableStyle("bandedRow").GetTableRowPr().SetHeight("atLeast", 500);
+    oTableStyle.GetConditionalTableStyle("bandedRowEven").GetTableRowPr().SetHeight("atLeast", 1000);
+
+    oTableStyle.GetConditionalTableStyle("bandedColumn").GetTextPr().SetBold(true);
+    oTableStyle.GetConditionalTableStyle("bandedColumnEven").GetTextPr().SetItalic(true);
+
+    oTableStyle.GetConditionalTableStyle("wholeTable").GetParaPr().SetSpacingAfter(0);
+    oTableStyle.GetConditionalTableStyle("wholeTable").GetTablePr().SetTableBorderLeft("single", 4, 0, 0, 0, 0);
+    oTableStyle.GetConditionalTableStyle("wholeTable").GetTablePr().SetTableBorderRight("single", 4, 0, 0, 0, 0);
+    oTableStyle.GetConditionalTableStyle("wholeTable").GetTablePr().SetTableBorderTop("single", 4, 0, 0, 0, 0);
+    oTableStyle.GetConditionalTableStyle("wholeTable").GetTablePr().SetTableBorderBottom("single", 4, 0, 0, 0, 0);
+    oTableStyle.GetConditionalTableStyle("wholeTable").GetTablePr().SetTableBorderInsideV("single", 4, 0, 0, 0, 0);
+    oTableStyle.GetConditionalTableStyle("wholeTable").GetTablePr().SetTableBorderInsideH("single", 4, 0, 0, 0, 0);
 
     //------------------------------------------------------------------------------------------------------------------
     oLD.Recalculate_FromStart();
