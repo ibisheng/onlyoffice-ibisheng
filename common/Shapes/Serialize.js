@@ -7333,7 +7333,7 @@ function BinaryPPTYLoader()
                         {
                             txbody.content.Internal_Content_RemoveAll();
                             txbody.content.Internal_Content_Add(txbody.content.Content.length,  new Paragraph(txbody.content.DrawingDocument, txbody.content, 0, 0, 0, 0, 0, true));
-                            AddToContentFromString(txbody.content, str_field);
+                            AscFormat.AddToContentFromString(txbody.content, str_field);
 
                             if(_paragraph.f_runPr || _paragraph.f_paraPr)
                             {

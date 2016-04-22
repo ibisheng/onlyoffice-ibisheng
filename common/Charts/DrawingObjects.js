@@ -9,7 +9,7 @@ var c_oAscCellAnchorType = AscCommon.c_oAscCellAnchorType;
 var c_oAscLockTypes = AscCommon.c_oAscLockTypes;
 var parserHelp = AscCommon.parserHelp;
 
-var BBoxInfo = AscCommon.BBoxInfo;
+var BBoxInfo = AscFormat.BBoxInfo;
 
 var c_oAscError = Asc.c_oAscError;
 var c_oAscInsertOptions = Asc.c_oAscInsertOptions;
@@ -325,8 +325,8 @@ function CSparklineView()
 
 function CreateSparklineMarker(oUniFill)
 {
-    var oMarker = new CMarker();
-    oMarker.symbol = SYMBOL_DIAMOND;
+    var oMarker = new AscFormat.CMarker();
+    oMarker.symbol = AscFormat.SYMBOL_DIAMOND;
     oMarker.size = 10;
     oMarker.spPr = new AscFormat.CSpPr();
     oMarker.spPr.Fill = oUniFill;
@@ -538,7 +538,7 @@ CSparklineView.prototype.initFromSparkline = function(oSparkline, oSparklineGrou
                         return;
                     }
                 }
-                var oDPt = new CDPt();
+                var oDPt = new AscFormat.CDPt();
                 oDPt.idx = nIdx;
                 oDPt.marker = CreateSparklineMarker(CreateUniFillFromExcelColor(oExcelColor));
                 oSeries.addDPt(oDPt);
@@ -561,7 +561,7 @@ CSparklineView.prototype.initFromSparkline = function(oSparkline, oSparklineGrou
                         return;
                     }
                 }
-                var oDPt = new CDPt();
+                var oDPt = new AscFormat.CDPt();
                 oDPt.idx = nIdx;
                 oDPt.spPr = new AscFormat.CSpPr();
                 oDPt.spPr.Fill = CreateUniFillFromExcelColor(oExcelColor);
@@ -790,7 +790,7 @@ CSparklineView.prototype.setMinMaxValAx = function(minVal, maxVal, oSparklineGro
         {
             if(!oValAx.scaling)
             {
-                oValAx.setScaling(new CScaling());
+                oValAx.setScaling(new AscFormat.CScaling());
             }
             oValAx.scaling.setMin(minVal);
         }
@@ -798,7 +798,7 @@ CSparklineView.prototype.setMinMaxValAx = function(minVal, maxVal, oSparklineGro
         {
             if(!oValAx.scaling)
             {
-                oValAx.setScaling(new CScaling());
+                oValAx.setScaling(new AscFormat.CScaling());
             }
             oValAx.scaling.setMax(maxVal);
         }

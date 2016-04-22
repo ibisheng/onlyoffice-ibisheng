@@ -3325,7 +3325,7 @@ Woorksheet.prototype.copyDrawingObjects=function(oNewWs, wsFrom)
     {
         var drawingObjects = new DrawingObjects();
         oNewWs.Drawings = [];
-        NEW_WORKSHEET_DRAWING_DOCUMENT = oNewWs.DrawingDocument;
+      AscFormat.NEW_WORKSHEET_DRAWING_DOCUMENT = oNewWs.DrawingDocument;
         for(var i = 0; i < this.Drawings.length; ++i)
         {
             var drawingObject = drawingObjects.cloneDrawingObject(this.Drawings[i]);
@@ -3336,7 +3336,7 @@ Woorksheet.prototype.copyDrawingObjects=function(oNewWs, wsFrom)
             drawingObject.graphicObject.setDrawingBaseCoords(drawingBase.from.col, drawingBase.from.colOff, drawingBase.from.row, drawingBase.from.rowOff, drawingBase.to.col, drawingBase.to.colOff, drawingBase.to.row, drawingBase.to.rowOff, drawingBase.Pos.X, drawingBase.Pos.Y, drawingBase.ext.cx, drawingBase.ext.cy);
             oNewWs.Drawings[oNewWs.Drawings.length - 1] = drawingObject;
         }
-        NEW_WORKSHEET_DRAWING_DOCUMENT = null;
+      AscFormat.NEW_WORKSHEET_DRAWING_DOCUMENT = null;
         drawingObjects.pushToAObjects(oNewWs.Drawings);
         drawingObjects.updateChartReferences2(parserHelp.getEscapeSheetName(wsFrom.sName), parserHelp.getEscapeSheetName(oNewWs.sName));
     }

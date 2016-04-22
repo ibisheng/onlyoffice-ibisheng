@@ -561,7 +561,7 @@ CShape.prototype.recalculateContent2 = function()
             }
             var text = typeof pHText[0][this.nvSpPr.nvPr.ph.type] === "string" && pHText[0][this.nvSpPr.nvPr.ph.type].length > 0 ?  pHText[0][this.nvSpPr.nvPr.ph.type] : pHText[0][AscFormat.phType_body];
             if (!this.txBody.content2)
-                this.txBody.content2 = CreateDocContentFromString(text, this.getDrawingDocument(), this.txBody);
+                this.txBody.content2 = AscFormat.CreateDocContentFromString(text, this.getDrawingDocument(), this.txBody);
             else
             {
                 this.txBody.content2.Recalc_AllParagraphs_CompiledPr();

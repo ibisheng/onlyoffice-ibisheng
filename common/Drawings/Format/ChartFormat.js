@@ -1,5 +1,12 @@
 "use strict";
 
+(
+/**
+* @param {Window} window
+* @param {undefined} undefined
+*/
+function (window, undefined) {
+
 // Import
 var g_oIdCounter = AscCommon.g_oIdCounter;
 var g_oTableId = AscCommon.g_oTableId;
@@ -18,9 +25,6 @@ var c_oAscBetweenLabelsRule = Asc.c_oAscBetweenLabelsRule;
 var c_oAscLabelsPosition = Asc.c_oAscLabelsPosition;
 var c_oAscAxisType = Asc.c_oAscAxisType;
 
-
-var GLOBAL_AX_ID_COUNTER = 1000;
-
 function findPrAndRemove(arr, pr)
 {
     for(var i = arr.length-1; i > -1; --i)
@@ -32,58 +36,6 @@ function findPrAndRemove(arr, pr)
         }
     }
 }
-
-function removePtsFromLit(lit)
-{
-    var i;
-    var start_idx = Array.isArray(lit.pts) ? lit.pts.length - 1 : (Array.isArray(lit.pt) ? lit.pt.length - 1 : -1);
-    for(i = start_idx; i > -1; --i)
-    {
-        lit.removeDPt(i);
-    }
-}
-
-function removeDPtsFromSeries(series)
-{
-    if(Array.isArray(series.dPt))
-    {
-        for(var i = series.dPt.length - 1; i > -1; --i)
-        {
-            series.removeDPt(i);
-        }
-    }
-}
-
-function checkParagraphDefFonts(map, par)
-{
-    par && par.Pr && par.Pr.DefaultRunPr && checkRFonts(map, par.Pr.DefaultRunPr.RFonts);
-}
-function checkTxBodyDefFonts(map, txBody)
-{
-    txBody && txBody.content && txBody.content.Content[0] && checkParagraphDefFonts(map, txBody.content.Content[0]);
-}
-
-function checkRFonts(map, rFonts)
-{
-    if(rFonts)
-    {
-        if(rFonts.Ascii && typeof rFonts.Ascii.Name && rFonts.Ascii.Name.length > 0)
-            map[rFonts.Ascii.Name] = true;
-        if(rFonts.EastAsia && typeof rFonts.EastAsia.Name && rFonts.EastAsia.Name.length > 0)
-            map[rFonts.EastAsia.Name] = true;
-        if(rFonts.CS && typeof rFonts.CS.Name && rFonts.CS.Name.length > 0)
-            map[rFonts.CS.Name] = true;
-        if(rFonts.HAnsi && typeof rFonts.HAnsi.Name && rFonts.HAnsi.Name.length > 0)
-            map[rFonts.HAnsi.Name] = true;
-    }
-}
-
-function removeAllSeriesFromChart(chart)
-{
-    for(var i = chart.series.length-1; i > -1; --i)
-        chart.removeSeries(i);
-}
-
 
 function getMinMaxFromArrPoints(aPoints)
 {
@@ -106,7 +58,6 @@ function getMinMaxFromArrPoints(aPoints)
 
 
 var SCALE_INSET_COEFF = 1.016;//Возможно придется уточнять
-var NEW_WORKSHEET_DRAWING_DOCUMENT = null;
 function CDLbl()
 {
     this.bDelete = null;
@@ -1024,7 +975,7 @@ CDLbl.prototype =
     initDefault: function(nDefaultPosition)
     {
         this.setDelete(false);
-        this.setDLblPos(AscFormat.isRealNumber(nDefaultPosition) ? nDefaultPosition : DLBL_POS_IN_BASE);
+        this.setDLblPos(AscFormat.isRealNumber(nDefaultPosition) ? nDefaultPosition : c_oAscChartDataLabelsPos.inBase);
         this.setIdx(null);
         this.setLayout(null);
         this.setNumFmt(null);
@@ -1864,9 +1815,6 @@ CPlotArea.prototype =
         }
     },
 
-
-
-
     getObjectType: function()
     {
         return AscDFH.historyitem_type_PlotArea;
@@ -1893,7 +1841,7 @@ CPlotArea.prototype =
         for(i = 0; i < len; i++)
         {
             var oAxis = this.axId[i].createDuplicate();
-            oAxis.setAxId(++GLOBAL_AX_ID_COUNTER);
+            oAxis.setAxId(++AscFormat.Ax_Counter.GLOBAL_AX_ID_COUNTER);
             c.addAxis(oAxis);
         }
 
@@ -2509,11 +2457,11 @@ CBarChart.prototype =
 
     getDefaultDataLabelsPosition: function()
     {
-        if(!AscFormat.isRealNumber(this.grouping) || this.grouping === BAR_GROUPING_CLUSTERED || this.grouping === BAR_GROUPING_STANDARD)
+        if(!AscFormat.isRealNumber(this.grouping) || this.grouping === AscFormat.BAR_GROUPING_CLUSTERED || this.grouping === AscFormat.BAR_GROUPING_STANDARD)
         {
-            return DLBL_POS_OUT_END;
+            return c_oAscChartDataLabelsPos.outEnd;
         }
-        return DLBL_POS_CTR;
+        return c_oAscChartDataLabelsPos.ctr;
     },
 
     documentCreateFontMap: function(allFonts)
@@ -3136,7 +3084,7 @@ CAreaChart.prototype =
 
     getDefaultDataLabelsPosition: function()
     {
-        return DLBL_POS_CTR;
+        return c_oAscChartDataLabelsPos.ctr;
     },
 
 
@@ -4267,16 +4215,6 @@ var LBL_ALG_CTR = 0;
 var LBL_ALG_L = 1;
 var LBL_ALG_R = 2;
 
-var TICK_MARK_CROSS = 0;
-var TICK_MARK_IN = 1;
-var TICK_MARK_NONE = 2;
-var TICK_MARK_OUT = 3;
-
-var TICK_LABEL_POSITION_HIGH    = 0;
-var TICK_LABEL_POSITION_LOW     = 1;
-var TICK_LABEL_POSITION_NEXT_TO = 2;
-var TICK_LABEL_POSITION_NONE    = 3;
-
 var TIME_UNIT_DAYS = 0;
 var TIME_UNIT_MONTHS = 1;
 var TIME_UNIT_YEARS = 2;
@@ -4468,19 +4406,19 @@ CCatAx.prototype =
         {
             ret.putLabelsPosition(c_oAscLabelsPosition.betweenDivisions);
         }
-        if(AscFormat.isRealNumber(this.tickLblPos) && AscFormat.isRealNumber(REV_MENU_SETTINGS_LABELS_POS[this.tickLblPos]))
-            ret.putTickLabelsPos(REV_MENU_SETTINGS_LABELS_POS[this.tickLblPos]);
+        if(AscFormat.isRealNumber(this.tickLblPos))
+            ret.putTickLabelsPos(this.tickLblPos);
         else
             ret.putTickLabelsPos(c_oAscTickLabelsPos.TICK_LABEL_POSITION_NEXT_TO);
 
         //настройки засечек на оси
-        if(AscFormat.isRealNumber(this.majorTickMark) && AscFormat.isRealNumber(REV_MENU_SETTINGS_TICK_MARK[this.majorTickMark]))
-            ret.putMajorTickMark(REV_MENU_SETTINGS_TICK_MARK[this.majorTickMark]);
+        if(AscFormat.isRealNumber(this.majorTickMark))
+            ret.putMajorTickMark(this.majorTickMark);
         else
-            ret.putMajorTickMark( c_oAscTickMark.TICK_MARK_NONE);
+            ret.putMajorTickMark(c_oAscTickMark.TICK_MARK_NONE);
 
-        if(AscFormat.isRealNumber(this.minorTickMark) && AscFormat.isRealNumber(REV_MENU_SETTINGS_TICK_MARK[this.minorTickMark]))
-            ret.putMinorTickMark(REV_MENU_SETTINGS_TICK_MARK[this.minorTickMark]);
+        if(AscFormat.isRealNumber(this.minorTickMark))
+            ret.putMinorTickMark(this.minorTickMark);
         else
             ret.putMinorTickMark(c_oAscTickMark.TICK_MARK_NONE);
         return ret;
@@ -4555,21 +4493,21 @@ CCatAx.prototype =
             //TODO
         }
 
-        if(AscFormat.isRealNumber(majorTickMark) && AscFormat.isRealNumber(MENU_SETTINGS_TICK_MARK[majorTickMark]) && this.majorTickMark !== MENU_SETTINGS_TICK_MARK[majorTickMark])
+        if(AscFormat.isRealNumber(majorTickMark) && this.majorTickMark !== majorTickMark)
         {
-            this.setMajorTickMark(MENU_SETTINGS_TICK_MARK[majorTickMark]);
+            this.setMajorTickMark(majorTickMark);
             bChanged = true;
         }
 
-        if(AscFormat.isRealNumber(minorTickMark) && AscFormat.isRealNumber(MENU_SETTINGS_TICK_MARK[minorTickMark]) && this.minorTickMark !== MENU_SETTINGS_TICK_MARK[minorTickMark])
+        if(AscFormat.isRealNumber(minorTickMark) && this.minorTickMark !== minorTickMark)
         {
-            this.setMinorTickMark(MENU_SETTINGS_TICK_MARK[minorTickMark]);
+            this.setMinorTickMark(minorTickMark);
             bChanged = true;
         }
 
-        if(AscFormat.isRealNumber(tickLabelsPos) && AscFormat.isRealNumber(MENU_SETTINGS_LABELS_POS[tickLabelsPos]) && this.tickLblPos !== MENU_SETTINGS_LABELS_POS[tickLabelsPos])
+        if(AscFormat.isRealNumber(tickLabelsPos) && this.tickLblPos !== tickLabelsPos)
         {
-            this.setTickLblPos(MENU_SETTINGS_LABELS_POS[tickLabelsPos]);
+            this.setTickLblPos(tickLabelsPos);
             bChanged = true;
         }
 
@@ -5638,8 +5576,6 @@ CCatAx.prototype =
         }
     }
 };
-
-
 
 function CDateAx()
 {
@@ -8799,9 +8735,9 @@ CValAx.prototype =
         if(isRealObject(this.dispUnits))
         {
             var disp_units = this.dispUnits;
-            if(AscFormat.isRealNumber(disp_units.builtInUnit) && AscFormat.isRealNumber(REV_MENU_SETTINGS_MAP[disp_units.builtInUnit]))
+            if(AscFormat.isRealNumber(disp_units.builtInUnit))
             {
-                ret.putDispUnitsRule(REV_MENU_SETTINGS_MAP[disp_units.builtInUnit]);
+                ret.putDispUnitsRule(disp_units.builtInUnit);
                 ret.putShowUnitsOnChart(isRealObject(disp_units.dispUnitsLbl));
             }
             else if(AscFormat.isRealNumber(disp_units.custUnit))
@@ -8823,18 +8759,18 @@ CValAx.prototype =
         }
 
         //настройки засечек на оси
-        if(AscFormat.isRealNumber(this.majorTickMark) && AscFormat.isRealNumber(REV_MENU_SETTINGS_TICK_MARK[this.majorTickMark]))
-            ret.putMajorTickMark(REV_MENU_SETTINGS_TICK_MARK[this.majorTickMark]);
+        if(AscFormat.isRealNumber(this.majorTickMark))
+            ret.putMajorTickMark(this.majorTickMark);
         else
             ret.putMajorTickMark( c_oAscTickMark.TICK_MARK_NONE);
 
-        if(AscFormat.isRealNumber(this.minorTickMark) && AscFormat.isRealNumber(REV_MENU_SETTINGS_TICK_MARK[this.minorTickMark]))
-            ret.putMinorTickMark(REV_MENU_SETTINGS_TICK_MARK[this.minorTickMark]);
+        if(AscFormat.isRealNumber(this.minorTickMark))
+            ret.putMinorTickMark(this.minorTickMark);
         else
             ret.putMinorTickMark(c_oAscTickMark.TICK_MARK_NONE);
 
-        if(AscFormat.isRealNumber(this.tickLblPos) && AscFormat.isRealNumber(REV_MENU_SETTINGS_LABELS_POS[this.tickLblPos]))
-            ret.putTickLabelsPos(REV_MENU_SETTINGS_LABELS_POS[this.tickLblPos]);
+        if(AscFormat.isRealNumber(this.tickLblPos))
+            ret.putTickLabelsPos(this.tickLblPos);
         else
             ret.putTickLabelsPos(c_oAscTickLabelsPos.TICK_LABEL_POSITION_NEXT_TO);
 
@@ -8976,16 +8912,16 @@ CValAx.prototype =
                     bChanged = true;
                 }
             }
-            else if(AscFormat.isRealNumber(MENU_SETTINGS_MAP[props.dispUnitsRule]))
+            else
             {
                 if(!this.dispUnits)
                 {
                     this.setDispUnits(new CDispUnits());
                     bChanged = true;
                 }
-                if(this.dispUnits.builtInUnit !== MENU_SETTINGS_MAP[props.dispUnitsRule])
+                if(this.dispUnits.builtInUnit !== props.dispUnitsRule)
                 {
-                    this.dispUnits.setBuiltInUnit(MENU_SETTINGS_MAP[props.dispUnitsRule]);
+                    this.dispUnits.setBuiltInUnit(props.dispUnitsRule);
                     bChanged = true;
                 }
                 if(AscFormat.isRealBool(this.showUnitsOnChart))
@@ -8996,21 +8932,21 @@ CValAx.prototype =
             }
         }
 
-        if(AscFormat.isRealNumber(props.majorTickMark) && AscFormat.isRealNumber(MENU_SETTINGS_TICK_MARK[props.majorTickMark]) && this.majorTickMark !== MENU_SETTINGS_TICK_MARK[props.majorTickMark])
+        if(AscFormat.isRealNumber(props.majorTickMark) && this.majorTickMark !== props.majorTickMark)
         {
-            this.setMajorTickMark(MENU_SETTINGS_TICK_MARK[props.majorTickMark]);
+            this.setMajorTickMark(props.majorTickMark);
             bChanged = true;
         }
 
-        if(AscFormat.isRealNumber(props.minorTickMark) && AscFormat.isRealNumber(MENU_SETTINGS_TICK_MARK[props.minorTickMark]) && this.minorTickMark !== MENU_SETTINGS_TICK_MARK[props.minorTickMark])
+        if(AscFormat.isRealNumber(props.minorTickMark) && this.minorTickMark !== props.minorTickMark)
         {
-            this.setMinorTickMark(MENU_SETTINGS_TICK_MARK[props.minorTickMark]);
+            this.setMinorTickMark(props.minorTickMark);
             bChanged = true;
         }
 
-        if(AscFormat.isRealNumber(props.tickLabelsPos) && AscFormat.isRealNumber(MENU_SETTINGS_LABELS_POS[props.tickLabelsPos]) && this.tickLblPos !== MENU_SETTINGS_LABELS_POS[props.tickLabelsPos])
+        if(AscFormat.isRealNumber(props.tickLabelsPos) && this.tickLblPos !== props.tickLabelsPos)
         {
-            this.setTickLblPos(MENU_SETTINGS_LABELS_POS[props.tickLabelsPos]);
+            this.setTickLblPos(props.tickLabelsPos);
             bChanged = true;
         }
 
@@ -9235,23 +9171,6 @@ CBandFmt.prototype =
         }
     }
 };
-
-var BAR_DIR_BAR = 0;
-var BAR_DIR_COL = 1;
-
-var BAR_GROUPING_CLUSTERED = 0;
-var BAR_GROUPING_PERCENT_STACKED = 1;
-var BAR_GROUPING_STACKED = 2;
-var BAR_GROUPING_STANDARD = 3;
-
-var BAR_SHAPE_CONE = 0;
-var BAR_SHAPE_CONETOMAX = 1;
-var BAR_SHAPE_BOX = 2;
-var BAR_SHAPE_CYLINDER = 3;
-var BAR_SHAPE_PYRAMID = 4;
-var BAR_SHAPE_PYRAMIDTOMAX = 5;
-
-
 
 function CBarSeries()
 {
@@ -9798,10 +9717,6 @@ CBarSeries.prototype =
     }
 };
 
-
-var SIZE_REPRESENTS_AREA = 0;
-var SIZE_REPRESENTS_W = 1;
-
 function CBubbleChart()
 {
     this.axId          = [];
@@ -9845,7 +9760,7 @@ CBubbleChart.prototype =
 
     getDefaultDataLabelsPosition: function()
     {
-        return DLBL_POS_R;
+        return c_oAscChartDataLabelsPos.r;
     },
 
 
@@ -11143,47 +11058,6 @@ CChartText.prototype =
     }
 };
 
-
-var DLBL_POS_B = 0;
-var DLBL_POS_BEST_FIT = 1;
-var DLBL_POS_CTR     = 2;
-var DLBL_POS_IN_BASE = 3;
-var DLBL_POS_IN_END = 4;
-var DLBL_POS_L = 5;
-var DLBL_POS_OUT_END = 6;
-var DLBL_POS_R = 7;
-var DLBL_POS_T = 8;
-
-
-var DLBL_POS_DEFINES_MAP = [];
-DLBL_POS_DEFINES_MAP[c_oAscChartDataLabelsPos.b]       =   DLBL_POS_B;
-DLBL_POS_DEFINES_MAP[c_oAscChartDataLabelsPos.bestFit] =   DLBL_POS_BEST_FIT;
-DLBL_POS_DEFINES_MAP[c_oAscChartDataLabelsPos.ctr]     =   DLBL_POS_CTR;
-DLBL_POS_DEFINES_MAP[c_oAscChartDataLabelsPos.inBase]  =   DLBL_POS_IN_BASE;
-DLBL_POS_DEFINES_MAP[c_oAscChartDataLabelsPos.inEnd]   =   DLBL_POS_IN_END;
-DLBL_POS_DEFINES_MAP[c_oAscChartDataLabelsPos.l]       =   DLBL_POS_L;
-DLBL_POS_DEFINES_MAP[c_oAscChartDataLabelsPos.outEnd]  =   DLBL_POS_OUT_END;
-DLBL_POS_DEFINES_MAP[c_oAscChartDataLabelsPos.r]       =   DLBL_POS_R;
-DLBL_POS_DEFINES_MAP[c_oAscChartDataLabelsPos.t]       =   DLBL_POS_T;
-
-var BAR_DATA_LABELS_POS_MAP = {};
-
-
-
-
-var REV_DLBL_POS_DEFINES_MAP = [];
-REV_DLBL_POS_DEFINES_MAP[DLBL_POS_B       ] =   c_oAscChartDataLabelsPos.b      ;
-REV_DLBL_POS_DEFINES_MAP[DLBL_POS_BEST_FIT] =   c_oAscChartDataLabelsPos.bestFit;
-REV_DLBL_POS_DEFINES_MAP[DLBL_POS_CTR     ] =   c_oAscChartDataLabelsPos.ctr    ;
-REV_DLBL_POS_DEFINES_MAP[DLBL_POS_IN_BASE ] =   c_oAscChartDataLabelsPos.inBase ;
-REV_DLBL_POS_DEFINES_MAP[DLBL_POS_IN_END  ] =   c_oAscChartDataLabelsPos.inEnd  ;
-REV_DLBL_POS_DEFINES_MAP[DLBL_POS_L       ] =   c_oAscChartDataLabelsPos.l      ;
-REV_DLBL_POS_DEFINES_MAP[DLBL_POS_OUT_END ] =   c_oAscChartDataLabelsPos.outEnd ;
-REV_DLBL_POS_DEFINES_MAP[DLBL_POS_R       ] =   c_oAscChartDataLabelsPos.r      ;
-REV_DLBL_POS_DEFINES_MAP[DLBL_POS_T       ] =   c_oAscChartDataLabelsPos.t      ;
-
-
-
 function CDLbls()
 {
     this.bDelete          = null;
@@ -11271,10 +11145,10 @@ CDLbls.prototype =
 
     documentCreateFontMap: function(allFonts)
     {
-        checkTxBodyDefFonts(allFonts, this.txPr);
+        AscFormat.checkTxBodyDefFonts(allFonts, this.txPr);
         for(var i = 0; i < this.dLbl.length; ++i)
         {
-            this.dLbl[i] && checkTxBodyDefFonts(allFonts, this.dLbl[i].txPr);
+            this.dLbl[i] && AscFormat.checkTxBodyDefFonts(allFonts, this.dLbl[i].txPr);
             this.dLbl[i].tx && this.dLbl[i].tx.rich && this.dLbl[i].tx.rich.content && this.dLbl[i].tx.rich.content.Document_Get_AllFontNames(allFonts);
         }
     },
@@ -12388,77 +12262,16 @@ CDTable.prototype =
     }
 };
 
-
-
-var BUILT_IN_UNIT_BILLIONS = 0;
-var BUILT_IN_UNIT_HUNDRED_MILLIONS = 1;
-var BUILT_IN_UNIT_HUNDREDS = 2;
-var BUILT_IN_UNIT_HUNDRED_THOUSANDS = 3;
-var BUILT_IN_UNIT_MILLIONS = 4;
-var BUILT_IN_UNIT_TEN_MILLIONS = 5;
-var BUILT_IN_UNIT_TEN_THOUSANDS = 6;
-var BUILT_IN_UNIT_TRILLIONS = 7;
-var BUILT_IN_UNIT_THOUSANDS = 8;
-
 var UNIT_MULTIPLIERS = [];
-UNIT_MULTIPLIERS[BUILT_IN_UNIT_BILLIONS]           = 1.0/1000000000.0;
-UNIT_MULTIPLIERS[BUILT_IN_UNIT_HUNDRED_MILLIONS]   = 1.0/100000000.0;
-UNIT_MULTIPLIERS[BUILT_IN_UNIT_HUNDREDS]           = 1.0/100.0;
-UNIT_MULTIPLIERS[BUILT_IN_UNIT_HUNDRED_THOUSANDS]  = 1.0/100000.0;
-UNIT_MULTIPLIERS[BUILT_IN_UNIT_MILLIONS]           = 1.0/1000000.0;
-UNIT_MULTIPLIERS[BUILT_IN_UNIT_TEN_MILLIONS]       = 1.0/10000000.0;
-UNIT_MULTIPLIERS[BUILT_IN_UNIT_TEN_THOUSANDS]      = 1.0/10000.0;
-UNIT_MULTIPLIERS[BUILT_IN_UNIT_TRILLIONS]          = 1.0/1000000000000.0;
-UNIT_MULTIPLIERS[BUILT_IN_UNIT_THOUSANDS]          = 1.0/1000.0;
-
-var MENU_SETTINGS_MAP = [];
-MENU_SETTINGS_MAP[c_oAscValAxUnits.BILLIONS]           = BUILT_IN_UNIT_BILLIONS;
-MENU_SETTINGS_MAP[c_oAscValAxUnits.HUNDRED_MILLIONS]   = BUILT_IN_UNIT_HUNDRED_MILLIONS;
-MENU_SETTINGS_MAP[c_oAscValAxUnits.HUNDREDS]           = BUILT_IN_UNIT_HUNDREDS;
-MENU_SETTINGS_MAP[c_oAscValAxUnits.HUNDRED_THOUSANDS]  = BUILT_IN_UNIT_HUNDRED_THOUSANDS;
-MENU_SETTINGS_MAP[c_oAscValAxUnits.MILLIONS]           = BUILT_IN_UNIT_MILLIONS;
-MENU_SETTINGS_MAP[c_oAscValAxUnits.TEN_MILLIONS]       = BUILT_IN_UNIT_TEN_MILLIONS;
-MENU_SETTINGS_MAP[c_oAscValAxUnits.TEN_THOUSANDS]      = BUILT_IN_UNIT_TEN_THOUSANDS;
-MENU_SETTINGS_MAP[c_oAscValAxUnits.TRILLIONS]          = BUILT_IN_UNIT_TRILLIONS;
-MENU_SETTINGS_MAP[c_oAscValAxUnits.THOUSANDS]          = BUILT_IN_UNIT_THOUSANDS;
-
-var REV_MENU_SETTINGS_MAP = [];
-
-REV_MENU_SETTINGS_MAP[BUILT_IN_UNIT_BILLIONS        ]  = c_oAscValAxUnits.BILLIONS         ;
-REV_MENU_SETTINGS_MAP[BUILT_IN_UNIT_HUNDRED_MILLIONS]  = c_oAscValAxUnits.HUNDRED_MILLIONS ;
-REV_MENU_SETTINGS_MAP[BUILT_IN_UNIT_HUNDREDS        ]  = c_oAscValAxUnits.HUNDREDS         ;
-REV_MENU_SETTINGS_MAP[BUILT_IN_UNIT_HUNDRED_THOUSANDS] = c_oAscValAxUnits.HUNDRED_THOUSANDS;
-REV_MENU_SETTINGS_MAP[BUILT_IN_UNIT_MILLIONS        ]  = c_oAscValAxUnits.MILLIONS         ;
-REV_MENU_SETTINGS_MAP[BUILT_IN_UNIT_TEN_MILLIONS    ]  = c_oAscValAxUnits.TEN_MILLIONS     ;
-REV_MENU_SETTINGS_MAP[BUILT_IN_UNIT_TEN_THOUSANDS   ]  = c_oAscValAxUnits.TEN_THOUSANDS    ;
-REV_MENU_SETTINGS_MAP[BUILT_IN_UNIT_TRILLIONS       ]  = c_oAscValAxUnits.TRILLIONS        ;
-REV_MENU_SETTINGS_MAP[BUILT_IN_UNIT_THOUSANDS]         = c_oAscValAxUnits.THOUSANDS        ;
-
-
-
-var MENU_SETTINGS_TICK_MARK = [];
-MENU_SETTINGS_TICK_MARK[c_oAscTickMark.TICK_MARK_CROSS] = TICK_MARK_CROSS;
-MENU_SETTINGS_TICK_MARK[c_oAscTickMark.TICK_MARK_IN   ] = TICK_MARK_IN   ;
-MENU_SETTINGS_TICK_MARK[c_oAscTickMark.TICK_MARK_NONE ] = TICK_MARK_NONE ;
-MENU_SETTINGS_TICK_MARK[c_oAscTickMark.TICK_MARK_OUT  ] = TICK_MARK_OUT  ;
-
-var REV_MENU_SETTINGS_TICK_MARK = [];
-REV_MENU_SETTINGS_TICK_MARK[ TICK_MARK_CROSS] =  c_oAscTickMark.TICK_MARK_CROSS;
-REV_MENU_SETTINGS_TICK_MARK[ TICK_MARK_IN   ] =  c_oAscTickMark.TICK_MARK_IN   ;
-REV_MENU_SETTINGS_TICK_MARK[ TICK_MARK_NONE ] =  c_oAscTickMark.TICK_MARK_NONE ;
-REV_MENU_SETTINGS_TICK_MARK[ TICK_MARK_OUT  ] =  c_oAscTickMark.TICK_MARK_OUT  ;
-
-
-var MENU_SETTINGS_LABELS_POS = [];
-MENU_SETTINGS_LABELS_POS[c_oAscTickLabelsPos.TICK_LABEL_POSITION_HIGH   ] = TICK_LABEL_POSITION_HIGH   ;
-MENU_SETTINGS_LABELS_POS[c_oAscTickLabelsPos.TICK_LABEL_POSITION_LOW    ] = TICK_LABEL_POSITION_LOW    ;
-MENU_SETTINGS_LABELS_POS[c_oAscTickLabelsPos.TICK_LABEL_POSITION_NEXT_TO] = TICK_LABEL_POSITION_NEXT_TO;
-MENU_SETTINGS_LABELS_POS[c_oAscTickLabelsPos.TICK_LABEL_POSITION_NONE   ] = TICK_LABEL_POSITION_NONE   ;
-var REV_MENU_SETTINGS_LABELS_POS = [];
-REV_MENU_SETTINGS_LABELS_POS[TICK_LABEL_POSITION_HIGH    ] = c_oAscTickLabelsPos.TICK_LABEL_POSITION_HIGH   ;
-REV_MENU_SETTINGS_LABELS_POS[TICK_LABEL_POSITION_LOW     ] = c_oAscTickLabelsPos.TICK_LABEL_POSITION_LOW    ;
-REV_MENU_SETTINGS_LABELS_POS[TICK_LABEL_POSITION_NEXT_TO ] = c_oAscTickLabelsPos.TICK_LABEL_POSITION_NEXT_TO;
-REV_MENU_SETTINGS_LABELS_POS[TICK_LABEL_POSITION_NONE    ] = c_oAscTickLabelsPos.TICK_LABEL_POSITION_NONE   ;
+UNIT_MULTIPLIERS[c_oAscValAxUnits.BILLIONS]           = 1.0/1000000000.0;
+UNIT_MULTIPLIERS[c_oAscValAxUnits.HUNDRED_MILLIONS]   = 1.0/100000000.0;
+UNIT_MULTIPLIERS[c_oAscValAxUnits.HUNDREDS]           = 1.0/100.0;
+UNIT_MULTIPLIERS[c_oAscValAxUnits.HUNDRED_THOUSANDS]  = 1.0/100000.0;
+UNIT_MULTIPLIERS[c_oAscValAxUnits.MILLIONS]           = 1.0/1000000.0;
+UNIT_MULTIPLIERS[c_oAscValAxUnits.TEN_MILLIONS]       = 1.0/10000000.0;
+UNIT_MULTIPLIERS[c_oAscValAxUnits.TEN_THOUSANDS]      = 1.0/10000.0;
+UNIT_MULTIPLIERS[c_oAscValAxUnits.TRILLIONS]          = 1.0/1000000000000.0;
+UNIT_MULTIPLIERS[c_oAscValAxUnits.THOUSANDS]          = 1.0/1000.0;
 
 function CDispUnits()
 {
@@ -12697,7 +12510,6 @@ CDispUnits.prototype =
     }
 };
 
-
 function CDoughnutChart()
 {
     this.dLbls = null;
@@ -12772,7 +12584,7 @@ CDoughnutChart.prototype =
 
     getDefaultDataLabelsPosition: function()
     {
-        return DLBL_POS_CTR;
+        return c_oAscChartDataLabelsPos.ctr;
     },
 
     getSeriesConstructor: function()
@@ -13142,20 +12954,6 @@ CDoughnutChart.prototype =
     }
 };
 
-
-var ERR_BAR_TYPE_BOTH = 0;
-var ERR_BAR_TYPE_MINUS = 1;
-var ERR_BAR_TYPE_PLUS = 2;
-
-var ERR_DIR_X = 0;
-var ERR_DIR_Y = 1;
-
-var ERR_VAL_TYPE_CUST = 0;
-var ERR_VAL_TYPE_FIXED_VAL = 1;
-var ERR_VAL_TYPE_PERCENTAGE = 2;
-var ERR_VAL_TYPE_STD_DEV = 3;
-var ERR_VAL_TYPE_STD_ERR = 4;
-
 function CErrBars()
 {
     this.errBarType = null;
@@ -13506,14 +13304,6 @@ CErrBars.prototype =
         }
     }
 };
-
-
-
-var LAYOUT_TARGET_INNER = 0;
-var LAYOUT_TARGET_OUTER = 1;
-
-var LAYOUT_MODE_EDGE = 0;
-var LAYOUT_MODE_FACTOR = 1;
 
 function CLayout()
 {
@@ -13882,32 +13672,6 @@ CLayout.prototype =
     }
 };
 
-
-var LEGEND_POS_L = 0;
-var LEGEND_POS_T = 1;
-var LEGEND_POS_R = 2;
-var LEGEND_POS_B = 3;
-var LEGEND_POS_TR = 4;
-
-
-var LEGEND_POS_MAP = [];
-LEGEND_POS_MAP[c_oAscChartLegendShowSettings.left] = LEGEND_POS_L;
-LEGEND_POS_MAP[c_oAscChartLegendShowSettings.top] = LEGEND_POS_T;
-LEGEND_POS_MAP[c_oAscChartLegendShowSettings.right] = LEGEND_POS_R;
-LEGEND_POS_MAP[c_oAscChartLegendShowSettings.bottom] = LEGEND_POS_B;
-LEGEND_POS_MAP[c_oAscChartLegendShowSettings.leftOverlay] = LEGEND_POS_L;
-LEGEND_POS_MAP[c_oAscChartLegendShowSettings.rightOverlay] = LEGEND_POS_R;
-
-
-var REV_LEGEND_POS_MAP = [];
-REV_LEGEND_POS_MAP[LEGEND_POS_L] =  c_oAscChartLegendShowSettings.left        ;
-REV_LEGEND_POS_MAP[LEGEND_POS_T] =  c_oAscChartLegendShowSettings.top         ;
-REV_LEGEND_POS_MAP[LEGEND_POS_R] =  c_oAscChartLegendShowSettings.right       ;
-REV_LEGEND_POS_MAP[LEGEND_POS_B] =  c_oAscChartLegendShowSettings.bottom      ;
-REV_LEGEND_POS_MAP[LEGEND_POS_L] =  c_oAscChartLegendShowSettings.leftOverlay ;
-REV_LEGEND_POS_MAP[LEGEND_POS_R] =  c_oAscChartLegendShowSettings.rightOverlay;
-
-
 function CLegend()
 {
     this.layout = null;
@@ -13975,6 +13739,16 @@ CLegend.prototype =
     Read_FromBinary2: function (r)
     {
         this.Id = r.GetString2();
+    },
+    
+    updateLegendPos: function() {
+        if (this.overlay) {
+            if (c_oAscChartLegendShowSettings.left === this.legendPos) {
+                this.legendPos = c_oAscChartLegendShowSettings.leftOverlay;
+            } else if (c_oAscChartLegendShowSettings.right === this.legendPos) {
+                this.legendPos = c_oAscChartLegendShowSettings.rightOverlay;
+            }
+        }
     },
 
 
@@ -14688,12 +14462,7 @@ CLegendEntry.prototype =
         }
     }
 };
-
-
-
-var GROUPING_PERCENT_STACKED = 0;
-var GROUPING_STACKED = 1;
-var GROUPING_STANDARD = 2;
+    
 function CLineChart()
 {
     this.axId       = [];
@@ -14814,7 +14583,7 @@ CLineChart.prototype =
 
     getDefaultDataLabelsPosition: function()
     {
-        return DLBL_POS_R;
+        return c_oAscChartDataLabelsPos.r;
     },
 
     getObjectType: function()
@@ -17295,16 +17064,6 @@ CNumLit.prototype =
     }
 };
 
-
-var OF_PIE_TYPE_BAR = 0;
-var OF_PIE_TYPE_PIE = 1;
-
-var SPLIT_TYPE_AUTO = 0;
-var SPLIT_TYPE_CUST = 1;
-var SPLIT_TYPE_PERCENT = 2;
-var SPLIT_TYPE_POS = 3;
-var SPLIT_TYPE_VAL = 4;
-
 function COfPieChart()
 {
     this.custSplit     = [];
@@ -17351,7 +17110,7 @@ COfPieChart.prototype =
 
     getDefaultDataLabelsPosition: function()
     {
-        return DLBL_POS_BEST_FIT;
+        return c_oAscChartDataLabelsPos.bestFit;
     },
 
     createDuplicate: function()
@@ -17873,11 +17632,6 @@ COfPieChart.prototype =
     }
 };
 
-
-var PICTURE_FORMAT_STACK = 0;
-var PICTURE_FORMAT_STACK_SCALE = 1;
-var PICTURE_FORMAT_STACK_STRETCH = 2;
-
 function CPictureOptions()
 {
     this.applyToEnd       = null;
@@ -18151,7 +17905,7 @@ CPieChart.prototype =
 
     getDefaultDataLabelsPosition: function()
     {
-        return DLBL_POS_BEST_FIT;
+        return c_oAscChartDataLabelsPos.bestFit;
     },
 
     getSeriesConstructor: function()
@@ -19181,11 +18935,6 @@ CPivotFmt.prototype =
     }
 };
 
-var RADAR_STYLE_STANDARD = 0;
-var RADAR_STYLE_MARKER = 1;
-var RADAR_STYLE_FILLED = 2;
-
-
 function CRadarChart()
 {
     this.axId        = [];
@@ -19232,7 +18981,7 @@ CRadarChart.prototype =
 
     getDefaultDataLabelsPosition: function()
     {
-        return DLBL_POS_OUT_END;
+        return c_oAscChartDataLabelsPos.outEnd;
     },
 
     Refresh_RecalcData: function(data)
@@ -20325,14 +20074,6 @@ CScaling.prototype =
     }
 };
 
-
-var SCATTER_STYLE_LINE = 0;
-var SCATTER_STYLE_LINE_MARKER = 1;
-var SCATTER_STYLE_MARKER = 2;
-var SCATTER_STYLE_NONE = 3;
-var SCATTER_STYLE_SMOOTH = 4;
-var SCATTER_STYLE_SMOOTH_MARKER = 5;
-
 function CScatterChart()
 {
     this.axId        = [];
@@ -20426,7 +20167,7 @@ CScatterChart.prototype =
 
     getDefaultDataLabelsPosition: function()
     {
-        return DLBL_POS_R;
+        return c_oAscChartDataLabelsPos.r;
     },
 
     getSeriesConstructor: function()
@@ -21554,7 +21295,7 @@ CStockChart.prototype =
 
     getDefaultDataLabelsPosition: function()
     {
-        return DLBL_POS_R;
+        return c_oAscChartDataLabelsPos.r;
     },
 
     setFromOtherChart: function(c)
@@ -22585,7 +22326,7 @@ CSurfaceChart.prototype =
 
     getDefaultDataLabelsPosition: function()
     {
-        return DLBL_POS_CTR;
+        return c_oAscChartDataLabelsPos.ctr;
     },
 
     createDuplicate: function()
@@ -23231,12 +22972,6 @@ CSurfaceSeries.prototype =
         }
     }
 };
-
-
-function checkVerticalTitle(title)
-{
-    return false;
-}
 
 
 function CTitle()
@@ -23945,14 +23680,6 @@ CTitle.prototype =
         }
     }
 };
-
-
-var TRENDLINE_TYPE_EXP = 0;
-var TRENDLINE_TYPE_LINEAR = 1;
-var TRENDLINE_TYPE_LOG = 2;
-var TRENDLINE_TYPE_MOVING_AVG = 3;
-var TRENDLINE_TYPE_POLY = 4;
-var TRENDLINE_TYPE_POWER = 5;
 
 function CTrendLine()
 {
@@ -24896,10 +24623,6 @@ CYVal.prototype =
         }
     }
 };
-
-var DISP_BLANKS_AS_GAP = 0;
-var DISP_BLANKS_AS_SPAN = 1;
-var DISP_BLANKS_AS_ZERO = 2;
 
 
 function CChart()
@@ -26283,3 +26006,112 @@ function CreateMarkerGeometryByType(type, src)
     ret2.spPr.geometry = ret;
     return ret2;
 }
+
+    //--------------------------------------------------------export----------------------------------------------------
+    window['AscFormat'] = window['AscFormat'] || {};
+    window['AscFormat'].CDLbl = CDLbl;
+    window['AscFormat'].CPlotArea = CPlotArea;
+    window['AscFormat'].CBarChart = CBarChart;
+    window['AscFormat'].CAreaChart = CAreaChart;
+    window['AscFormat'].CAreaSeries = CAreaSeries;
+    window['AscFormat'].CCatAx = CCatAx;
+    window['AscFormat'].CDateAx = CDateAx;
+    window['AscFormat'].CSerAx = CSerAx;
+    window['AscFormat'].CValAx = CValAx;
+    window['AscFormat'].CBandFmt = CBandFmt;
+    window['AscFormat'].CBarSeries = CBarSeries;
+    window['AscFormat'].CBubbleChart = CBubbleChart;
+    window['AscFormat'].CBubbleSeries = CBubbleSeries;
+    window['AscFormat'].CCat = CCat;
+    window['AscFormat'].CChartText = CChartText;
+    window['AscFormat'].CDLbls = CDLbls;
+    window['AscFormat'].CDPt = CDPt;
+    window['AscFormat'].CDTable = CDTable;
+    window['AscFormat'].CDispUnits = CDispUnits;
+    window['AscFormat'].CDoughnutChart = CDoughnutChart;
+    window['AscFormat'].CErrBars = CErrBars;
+    window['AscFormat'].CLayout = CLayout;
+    window['AscFormat'].CLegend = CLegend;
+    window['AscFormat'].CLegendEntry = CLegendEntry;
+    window['AscFormat'].CLineChart = CLineChart;
+    window['AscFormat'].CLineSeries = CLineSeries;
+    window['AscFormat'].CMarker = CMarker;
+    window['AscFormat'].CMinusPlus = CMinusPlus;
+    window['AscFormat'].CMultiLvlStrCache = CMultiLvlStrCache;
+    window['AscFormat'].CMultiLvlStrRef = CMultiLvlStrRef;
+    window['AscFormat'].CNumRef = CNumRef;
+    window['AscFormat'].CNumericPoint = CNumericPoint;
+    window['AscFormat'].CNumFmt = CNumFmt;
+    window['AscFormat'].CNumLit = CNumLit;
+    window['AscFormat'].COfPieChart = COfPieChart;
+    window['AscFormat'].CPictureOptions = CPictureOptions;
+    window['AscFormat'].CPieChart = CPieChart;
+    window['AscFormat'].CPieSeries = CPieSeries;
+    window['AscFormat'].CPivotFmt = CPivotFmt;
+    window['AscFormat'].CRadarChart = CRadarChart;
+    window['AscFormat'].CRadarSeries = CRadarSeries;
+    window['AscFormat'].CScaling = CScaling;
+    window['AscFormat'].CScatterChart = CScatterChart;
+    window['AscFormat'].CScatterSeries = CScatterSeries;
+    window['AscFormat'].CTx = CTx;
+    window['AscFormat'].CStockChart = CStockChart;
+    window['AscFormat'].CStrCache = CStrCache;
+    window['AscFormat'].CStringLiteral = CStringLiteral;
+    window['AscFormat'].CStringPoint = CStringPoint;
+    window['AscFormat'].CStrRef = CStrRef;
+    window['AscFormat'].CSurfaceChart = CSurfaceChart;
+    window['AscFormat'].CSurfaceSeries = CSurfaceSeries;
+    window['AscFormat'].CTitle = CTitle;
+    window['AscFormat'].CTrendLine = CTrendLine;
+    window['AscFormat'].CUpDownBars = CUpDownBars;
+    window['AscFormat'].CXVal = CXVal;
+    window['AscFormat'].CYVal = CYVal;
+    window['AscFormat'].CChart = CChart;
+    window['AscFormat'].CChartWall = CChartWall;
+    window['AscFormat'].CView3d = CView3d;
+    window['AscFormat'].CreateTextBodyFromString = CreateTextBodyFromString;
+    window['AscFormat'].CreateDocContentFromString = CreateDocContentFromString;
+    window['AscFormat'].AddToContentFromString = AddToContentFromString;
+    window['AscFormat'].CValAxisLabels = CValAxisLabels;
+    window['AscFormat'].CalcLegendEntry = CalcLegendEntry;
+    window['AscFormat'].CUnionMarker = CUnionMarker;
+    window['AscFormat'].CreateMarkerGeometryByType = CreateMarkerGeometryByType;
+
+    window['AscFormat'].NEW_WORKSHEET_DRAWING_DOCUMENT = null;
+    
+    window['AscFormat'].AX_POS_L = AX_POS_L;
+    window['AscFormat'].AX_POS_T = AX_POS_T;
+    window['AscFormat'].AX_POS_R = AX_POS_R;
+    window['AscFormat'].AX_POS_B = AX_POS_B;
+    
+    window['AscFormat'].CROSSES_AUTO_ZERO = CROSSES_AUTO_ZERO;
+    window['AscFormat'].CROSSES_MAX = CROSSES_MAX;
+    window['AscFormat'].CROSSES_MIN = CROSSES_MIN;
+
+    window['AscFormat'].LBL_ALG_CTR = LBL_ALG_CTR;
+    window['AscFormat'].LBL_ALG_L = LBL_ALG_L;
+    window['AscFormat'].LBL_ALG_R = LBL_ALG_R;
+
+    window['AscFormat'].TIME_UNIT_DAYS = TIME_UNIT_DAYS;
+    window['AscFormat'].TIME_UNIT_MONTHS = TIME_UNIT_MONTHS;
+    window['AscFormat'].TIME_UNIT_YEARS = TIME_UNIT_YEARS;
+
+    window['AscFormat'].CROSS_BETWEEN_BETWEEN = CROSS_BETWEEN_BETWEEN;
+    window['AscFormat'].CROSS_BETWEEN_MID_CAT = CROSS_BETWEEN_MID_CAT;
+
+    window['AscFormat'].SYMBOL_CIRCLE = SYMBOL_CIRCLE;
+    window['AscFormat'].SYMBOL_DASH = SYMBOL_DASH;
+    window['AscFormat'].SYMBOL_DIAMOND = SYMBOL_DIAMOND;
+    window['AscFormat'].SYMBOL_DOT = SYMBOL_DOT;
+    window['AscFormat'].SYMBOL_NONE = SYMBOL_NONE;
+    window['AscFormat'].SYMBOL_PICTURE = SYMBOL_PICTURE;
+    window['AscFormat'].SYMBOL_PLUS = SYMBOL_PLUS;
+    window['AscFormat'].SYMBOL_SQUARE = SYMBOL_SQUARE;
+    window['AscFormat'].SYMBOL_STAR = SYMBOL_STAR;
+    window['AscFormat'].SYMBOL_TRIANGLE = SYMBOL_TRIANGLE;
+    window['AscFormat'].SYMBOL_X = SYMBOL_X;
+    window['AscFormat'].MARKER_SYMBOL_TYPE = MARKER_SYMBOL_TYPE;
+
+    window['AscFormat'].ORIENTATION_MAX_MIN = ORIENTATION_MAX_MIN;
+    window['AscFormat'].ORIENTATION_MIN_MAX = ORIENTATION_MIN_MAX;
+})(window);

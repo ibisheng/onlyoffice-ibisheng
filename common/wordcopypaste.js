@@ -3985,7 +3985,7 @@ PasteProcessor.prototype =
                     }
                     var shape = new CShape();
                     shape.setParent(presentation.Slides[presentation.CurPage]);
-                    shape.setTxBody(CreateTextBodyFromString("", presentation.DrawingDocument, shape));
+                    shape.setTxBody(AscFormat.CreateTextBodyFromString("", presentation.DrawingDocument, shape));
                     arrShapes.push(shape);
 					
                     oThis._ExecutePresentation(node, {}, true, true, false, arrShapes, arrImages, arrTables);
@@ -7512,7 +7512,7 @@ PasteProcessor.prototype =
         var presentation = editor.WordControl.m_oLogicDocument;
         var shape = new CShape();
         shape.setParent(presentation.Slides[presentation.CurPage]);
-        shape.setTxBody(CreateTextBodyFromString("", presentation.DrawingDocument, shape));
+        shape.setTxBody(AscFormat.CreateTextBodyFromString("", presentation.DrawingDocument, shape));
         arrShapes2.push(shape);
         this._ExecutePresentation(node, {}, true, true, false, arrShapes2, arrImages2, arrTables);
         if(arrShapes2.length > 0)

@@ -20,6 +20,7 @@ var c_oAscFillBlipType = Asc.c_oAscFillBlipType;
 var c_oAscStrokeType = Asc.c_oAscStrokeType;
 var asc_CShapeProperty = Asc.asc_CShapeProperty;
 
+
 // COLOR -----------------------
 /*
  var map_color_scheme = {};
@@ -341,6 +342,9 @@ function checkTableCellPr(cellPr, slide, layout, master, theme)
     return cellPr;
 }
 
+var Ax_Counter = {
+    GLOBAL_AX_ID_COUNTER : 1000
+};
 var TYPE_TRACK = {
     SHAPE : 0,
     GROUP : 0,
@@ -11863,6 +11867,7 @@ function CorrectUniColor(asc_color, unicolor, flag)
     window['AscFormat'].CreateUnifillFromAscColor = CreateUnifillFromAscColor;
     window['AscFormat'].CorrectUniColor = CorrectUniColor;
 
+    window['AscFormat'].Ax_Counter = Ax_Counter;
     window['AscFormat'].TYPE_TRACK = TYPE_TRACK;
     window['AscFormat'].TYPE_KIND = TYPE_KIND;
     window['AscFormat'].ar_arrow = ar_arrow;

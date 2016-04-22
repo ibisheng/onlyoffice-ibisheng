@@ -3,6 +3,10 @@
 // Import
 var cToDeg = AscFormat.cToDeg;
 var Path = AscFormat.Path;
+var ORIENTATION_MIN_MAX = AscFormat.ORIENTATION_MIN_MAX;
+
+var c_oAscTickMark = Asc.c_oAscTickMark;
+var c_oAscChartDataLabelsPos = Asc.c_oAscChartDataLabelsPos;
 
 var global3DPersperctive = 30;
 var globalBasePercent = 100;
@@ -312,7 +316,7 @@ CChartsDrawer.prototype =
 		var y = (this.calcProp.chartGutter._top + this.calcProp.trueHeight / 2) / this.calcProp.pxToMM - heightTitle / 2;
 		var x = standartMarginForCharts / this.calcProp.pxToMM;
 		
-		if(chartSpace.chart.legend && !chartSpace.chart.legend.overlay && chartSpace.chart.legend.legendPos == LEGEND_POS_L)
+		if(chartSpace.chart.legend && chartSpace.chart.legend.legendPos === c_oAscChartLegendShowSettings.left)
 		{
 			x += chartSpace.chart.legend.extX;
 		}
@@ -361,7 +365,7 @@ CChartsDrawer.prototype =
 			y = (this.calcProp.heightCanvas - standartMarginForCharts) / this.calcProp.pxToMM -  heightTitle;
 			x = (this.calcProp.chartGutter._left + this.calcProp.trueWidth / 2) / this.calcProp.pxToMM - widthTitle / 2;
 			
-			if(chartSpace.chart.legend && !chartSpace.chart.legend.overlay && chartSpace.chart.legend.legendPos == LEGEND_POS_B)
+			if(chartSpace.chart.legend && !chartSpace.chart.legend.overlay && chartSpace.chart.legend.legendPos == c_oAscChartLegendShowSettings.bottom)
 			{
 				y -= chartSpace.chart.legend.extY;
 			}
@@ -374,7 +378,7 @@ CChartsDrawer.prototype =
 			if(chartSpace.chart.title !== null && !chartSpace.chart.title.overlay)
 				y += chartSpace.chart.title.extY;
 			
-			if(chartSpace.chart.legend && !chartSpace.chart.legend.overlay && chartSpace.chart.legend.legendPos == LEGEND_POS_T)
+			if(chartSpace.chart.legend && !chartSpace.chart.legend.overlay && chartSpace.chart.legend.legendPos == c_oAscChartLegendShowSettings.top)
 			{
 				y += chartSpace.chart.legend.extY;
 			}
@@ -397,13 +401,14 @@ CChartsDrawer.prototype =
 		
 		switch ( chartSpace.chart.legend.legendPos )
 		{
-			case LEGEND_POS_L:
+			case c_oAscChartLegendShowSettings.left:
+			case c_oAscChartLegendShowSettings.leftOverlay:
 			{
 				x = standartMarginForCharts / 2 / this.calcProp.pxToMM;
 				y = this.calcProp.heightCanvas / 2 / this.calcProp.pxToMM - heightLegend / 2;
 				break;
 			}
-			case LEGEND_POS_T:
+			case c_oAscChartLegendShowSettings.top:
 			{
 				x = this.calcProp.widthCanvas / 2 / this.calcProp.pxToMM - widthLegend / 2;
 				y = standartMarginForCharts / 2 / this.calcProp.pxToMM;
@@ -414,19 +419,20 @@ CChartsDrawer.prototype =
 				}
 				break;
 			}
-			case LEGEND_POS_R:
+			case c_oAscChartLegendShowSettings.right:
+			case c_oAscChartLegendShowSettings.rightOverlay:
 			{
 				x = (this.calcProp.widthCanvas - standartMarginForCharts / 2) / this.calcProp.pxToMM  - widthLegend;
 				y = (this.calcProp.heightCanvas / 2) / this.calcProp.pxToMM - heightLegend / 2;
 				break;
 			}
-			case LEGEND_POS_B:
+			case c_oAscChartLegendShowSettings.bottom:
 			{
 				x = this.calcProp.widthCanvas / 2 / this.calcProp.pxToMM - widthLegend / 2;
 				y = (this.calcProp.heightCanvas - standartMarginForCharts / 2) / this.calcProp.pxToMM - heightLegend;
 				break;
 			}
-			case LEGEND_POS_TR:
+			case c_oAscChartLegendShowSettings.topRight:
 			{
 				x = (this.calcProp.widthCanvas - standartMarginForCharts / 2) / this.calcProp.pxToMM  - widthLegend;
 				y = standartMarginForCharts / 2 / this.calcProp.pxToMM;
@@ -462,7 +468,7 @@ CChartsDrawer.prototype =
 		
 		var pxToMM = this.calcProp.pxToMM;
 		
-		var isHBar = (chartSpace.chart.plotArea.chart.getObjectType() == AscDFH.historyitem_type_BarChart && chartSpace.chart.plotArea.chart.barDir === BAR_DIR_BAR) ? true : false;
+		var isHBar = (chartSpace.chart.plotArea.chart.getObjectType() == AscDFH.historyitem_type_BarChart && chartSpace.chart.plotArea.chart.barDir === AscFormat.BAR_DIR_BAR) ? true : false;
 		
 		//если точки рассчитаны - ставим маргин в зависимости от них
 		var marginOnPoints = this._calculateMarginOnPoints(chartSpace, isHBar);
@@ -511,27 +517,29 @@ CChartsDrawer.prototype =
 		{
 			switch ( chartSpace.chart.legend.legendPos )
 			{
-				case LEGEND_POS_L:
+				case c_oAscChartLegendShowSettings.left:
+				case c_oAscChartLegendShowSettings.leftOverlay:
 				{
 					leftKey += chartSpace.chart.legend.extX;
 					break;
 				}
-				case LEGEND_POS_T:
+				case c_oAscChartLegendShowSettings.top:
 				{
 					topKey += chartSpace.chart.legend.extY;
 					break;
 				}
-				case LEGEND_POS_R:
+				case c_oAscChartLegendShowSettings.right:
+				case c_oAscChartLegendShowSettings.rightOverlay:
 				{
 					rightKey += chartSpace.chart.legend.extX;
 					break;
 				}
-				case LEGEND_POS_B:
+				case c_oAscChartLegendShowSettings.bottom:
 				{
 					bottomKey += chartSpace.chart.legend.extY;
 					break;
 				}
-				case LEGEND_POS_TR:
+				case c_oAscChartLegendShowSettings.topRight:
 				{
 					rightKey += chartSpace.chart.legend.extX;
 					break;
@@ -639,7 +647,7 @@ CChartsDrawer.prototype =
 				
 				if(catAx.scaling.orientation == ORIENTATION_MIN_MAX)
 				{
-					if(valAx.crossBetween == CROSS_BETWEEN_BETWEEN)
+					if(valAx.crossBetween == AscFormat.CROSS_BETWEEN_BETWEEN)
 						curBetween = diffPoints / 2;
 					
 					calculateTop  = catAx.yPoints[catAx.yPoints.length - 1].pos - curBetween;
@@ -647,7 +655,7 @@ CChartsDrawer.prototype =
 				}
 				else
 				{
-					if(valAx.crossBetween == CROSS_BETWEEN_BETWEEN)
+					if(valAx.crossBetween == AscFormat.CROSS_BETWEEN_BETWEEN)
 						curBetween = diffPoints / 2;
 					
 					calculateTop  = catAx.yPoints[0].pos - curBetween;
@@ -660,7 +668,7 @@ CChartsDrawer.prototype =
 				
 				if(catAx.scaling.orientation == ORIENTATION_MIN_MAX)
 				{
-					if(valAx.crossBetween == CROSS_BETWEEN_BETWEEN)
+					if(valAx.crossBetween == AscFormat.CROSS_BETWEEN_BETWEEN)
 						curBetween = diffPoints / 2;
 					
 					calculateLeft  = catAx.xPoints[0].pos - curBetween;
@@ -668,7 +676,7 @@ CChartsDrawer.prototype =
 				}
 				else
 				{
-					if(valAx.crossBetween == CROSS_BETWEEN_BETWEEN)
+					if(valAx.crossBetween == AscFormat.CROSS_BETWEEN_BETWEEN)
 						curBetween = diffPoints / 2;
 					
 					calculateLeft  = catAx.xPoints[catAx.xPoints.length - 1].pos - curBetween;
@@ -732,14 +740,14 @@ CChartsDrawer.prototype =
 		{
 			if(orientationCatAx)
 			{
-				if(valAx.crossBetween == CROSS_BETWEEN_BETWEEN)
+				if(valAx.crossBetween == AscFormat.CROSS_BETWEEN_BETWEEN)
 					leftDownPointY = catAx.yPoints[0].pos + Math.abs((catAx.interval) / 2);
 				else
 					leftDownPointY = catAx.yPoints[0].pos;
 			}
 			else
 			{
-				if(valAx.crossBetween == CROSS_BETWEEN_BETWEEN)
+				if(valAx.crossBetween == AscFormat.CROSS_BETWEEN_BETWEEN)
 					leftDownPointY = catAx.yPoints[catAx.yPoints.length - 1].pos + Math.abs((catAx.interval) / 2);
 				else
 					leftDownPointY = catAx.yPoints[catAx.yPoints.length - 1].pos;
@@ -755,14 +763,14 @@ CChartsDrawer.prototype =
 			
 			if(orientationCatAx)
 			{
-				if(valAx.crossBetween == CROSS_BETWEEN_BETWEEN)
+				if(valAx.crossBetween == AscFormat.CROSS_BETWEEN_BETWEEN)
 					rightUpPointY = catAx.yPoints[catAx.yPoints.length - 1].pos - Math.abs((catAx.interval) / 2);
 				else
 					rightUpPointY = catAx.yPoints[catAx.yPoints.length - 1].pos;
 			}
 			else
 			{
-				if(valAx.crossBetween == CROSS_BETWEEN_BETWEEN)
+				if(valAx.crossBetween == AscFormat.CROSS_BETWEEN_BETWEEN)
 					rightUpPointY = catAx.yPoints[0].pos - Math.abs((catAx.interval) / 2);
 				else
 					rightUpPointY = catAx.yPoints[0].pos;
@@ -845,7 +853,7 @@ CChartsDrawer.prototype =
 			}
 			else
 			{
-				if(valAx.crossBetween == CROSS_BETWEEN_BETWEEN)
+				if(valAx.crossBetween == AscFormat.CROSS_BETWEEN_BETWEEN)
 					leftDownPointX = catAx.xPoints[0].pos - (catAx.interval) / 2;
 				else
 					leftDownPointX = catAx.xPoints[0].pos;
@@ -863,7 +871,7 @@ CChartsDrawer.prototype =
 			}
 			else
 			{
-				if(valAx.crossBetween == CROSS_BETWEEN_BETWEEN)
+				if(valAx.crossBetween == AscFormat.CROSS_BETWEEN_BETWEEN)
 					rightUpPointX = catAx.xPoints[catAx.xPoints.length - 1].pos + (catAx.interval) / 2;
 				else
 					rightUpPointX = catAx.xPoints[catAx.xPoints.length - 1].pos;
@@ -1684,7 +1692,7 @@ CChartsDrawer.prototype =
 			}
 			case AscDFH.historyitem_type_BarChart:
 			{
-				if(chartProp.chart.plotArea.chart.barDir !== BAR_DIR_BAR)
+				if(chartProp.chart.plotArea.chart.barDir !== AscFormat.BAR_DIR_BAR)
 					this.calcProp.type = "Bar";
 				else 
 					this.calcProp.type = "HBar";
@@ -1730,11 +1738,11 @@ CChartsDrawer.prototype =
 		
 		var grouping = chartProp.chart.plotArea.chart.grouping;
 		if(this.calcProp.type == "Line" || this.calcProp.type == "Area")
-			this.calcProp.subType = (grouping === GROUPING_PERCENT_STACKED) ? "stackedPer" : (grouping === GROUPING_STACKED) ? "stacked" : "normal";
-		else if(this.nDimensionCount === 3 && grouping === BAR_GROUPING_STANDARD)
+			this.calcProp.subType = (grouping === AscFormat.GROUPING_PERCENT_STACKED) ? "stackedPer" : (grouping === AscFormat.GROUPING_STACKED) ? "stacked" : "normal";
+		else if(this.nDimensionCount === 3 && grouping === AscFormat.BAR_GROUPING_STANDARD)
 			this.calcProp.subType = "standard";
 		else
-			this.calcProp.subType = (grouping === BAR_GROUPING_PERCENT_STACKED) ? "stackedPer" : (grouping === BAR_GROUPING_STACKED) ? "stacked" : "normal";
+			this.calcProp.subType = (grouping === AscFormat.BAR_GROUPING_PERCENT_STACKED) ? "stackedPer" : (grouping === AscFormat.BAR_GROUPING_STACKED) ? "stacked" : "normal";
 		
 		
 		this.calcProp.xaxispos = null;
@@ -1817,26 +1825,26 @@ CChartsDrawer.prototype =
 		var result;
 
 		/*
-		var SYMBOL_PICTURE = 5;*/
+		var AscFormat.SYMBOL_PICTURE = 5;*/
 		
 		path.moveTo(x * pathW, y * pathW);
 		
 		switch ( symbol )
 		{
-			case SYMBOL_DASH:
+			case AscFormat.SYMBOL_DASH:
 			{
 				path.moveTo((x - halfSize) * pathW, y * pathW);
 				path.lnTo((x + halfSize) * pathW, y * pathW);
 				break;
 			}
-			case SYMBOL_DOT:
+			case AscFormat.SYMBOL_DOT:
 			{
 				path.moveTo((x - halfSize / 2) * pathW, y * pathW);
 				path.lnTo((x + halfSize / 2) * pathW, y * pathW);
 				break;
 			}
 			
-			case SYMBOL_PLUS:
+			case AscFormat.SYMBOL_PLUS:
 			{
 				path.moveTo(x * pathW, (y  + halfSize) * pathW);
 				path.lnTo(x * pathW, (y  - halfSize) * pathW);
@@ -1845,14 +1853,14 @@ CChartsDrawer.prototype =
 				break;
 			}
 			
-			case SYMBOL_CIRCLE:
+			case AscFormat.SYMBOL_CIRCLE:
 			{
 				path.moveTo((x + halfSize) * pathW, y * pathW);
 				path.arcTo(halfSize * pathW, halfSize * pathW, 0, Math.PI * 2 * cToDeg);
 				break;
 			}
 			
-			case SYMBOL_STAR:
+			case AscFormat.SYMBOL_STAR:
 			{
 				path.moveTo((x - halfSize) * pathW, (y  + halfSize) * pathW);
 				path.lnTo((x + halfSize) * pathW, (y  - halfSize) * pathW);
@@ -1863,7 +1871,7 @@ CChartsDrawer.prototype =
 				break;
 			}
 			
-			case SYMBOL_X:
+			case AscFormat.SYMBOL_X:
 			{
 				path.moveTo((x - halfSize) * pathW, (y  + halfSize) * pathW);
 				path.lnTo((x + halfSize) * pathW, (y  - halfSize) * pathW);
@@ -1872,7 +1880,7 @@ CChartsDrawer.prototype =
 				break;
 			}
 			
-			case SYMBOL_TRIANGLE:
+			case AscFormat.SYMBOL_TRIANGLE:
 			{
 				path.moveTo((x - size/Math.sqrt(3)) * pathW, (y  + size/3) * pathW);
 				path.lnTo(x * pathW, (y  - (2/3)*size) * pathW);
@@ -1881,7 +1889,7 @@ CChartsDrawer.prototype =
 				break;
 			}
 			
-			case SYMBOL_SQUARE:
+			case AscFormat.SYMBOL_SQUARE:
 			{
 				path.moveTo((x - halfSize) * pathW, (y + halfSize) * pathW);
 				path.lnTo((x - halfSize) * pathW, (y - halfSize) * pathW);
@@ -1891,7 +1899,7 @@ CChartsDrawer.prototype =
 				break;
 			}
 			
-			case SYMBOL_DIAMOND:
+			case AscFormat.SYMBOL_DIAMOND:
 			{
 				path.moveTo((x - halfSize) * pathW, y * pathW);
 				path.lnTo(x * pathW, (y  - halfSize) * pathW);
@@ -2581,8 +2589,8 @@ CChartsDrawer.prototype =
 		{
 			var isPerspective = !chartSpace.chart.view3D.rAngAx;
 			
-			var isBar = typeChart === AscDFH.historyitem_type_BarChart && chart && chart.barDir !== BAR_DIR_BAR;
-			var isHBar = typeChart === AscDFH.historyitem_type_BarChart && chart && chart.barDir === BAR_DIR_BAR;
+			var isBar = typeChart === AscDFH.historyitem_type_BarChart && chart && chart.barDir !== AscFormat.BAR_DIR_BAR;
+			var isHBar = typeChart === AscDFH.historyitem_type_BarChart && chart && chart.barDir === AscFormat.BAR_DIR_BAR;
 			var isLine = typeChart === AscDFH.historyitem_type_LineChart;
 			var isPie = typeChart === AscDFH.historyitem_type_PieChart;
 			var isArea = typeChart === AscDFH.historyitem_type_AreaChart;
@@ -2942,17 +2950,17 @@ drawBarChart.prototype =
 				
 		switch ( point.compiledDlb.dLblPos )
 		{
-			case DLBL_POS_BEST_FIT:
+			case c_oAscChartDataLabelsPos.bestFit:
 			{
 				break;
 			}
-			case DLBL_POS_CTR:
+			case c_oAscChartDataLabelsPos.ctr:
 			{
 				centerX = x + w/2 - width/2;
 				centerY = y - h/2 - height/2;
 				break;
 			}
-			case DLBL_POS_IN_BASE:
+			case c_oAscChartDataLabelsPos.inBase:
 			{
 				centerX = x + w/2 - width/2;
 				centerY = y;
@@ -2960,7 +2968,7 @@ drawBarChart.prototype =
 					centerY = y - height;
 				break;
 			}
-			case DLBL_POS_IN_END:
+			case c_oAscChartDataLabelsPos.inEnd:
 			{
 				centerX = x + w/2 - width/2;
 				centerY = y - h;
@@ -2968,7 +2976,7 @@ drawBarChart.prototype =
 					centerY = centerY - height;	
 				break;
 			}
-			case DLBL_POS_OUT_END:
+			case c_oAscChartDataLabelsPos.outEnd:
 			{
 				centerX = x + w/2 - width/2;
 				centerY = y - h - height;
@@ -3440,30 +3448,30 @@ drawLineChart.prototype =
 		
 		switch ( point.compiledDlb.dLblPos )
 		{
-			case DLBL_POS_B:
+			case c_oAscChartDataLabelsPos.b:
 			{
 				centerY = centerY + height/2 + constMargin;
 				break;
 			}
-			case DLBL_POS_BEST_FIT:
+			case c_oAscChartDataLabelsPos.bestFit:
 			{
 				break;
 			}
-			case DLBL_POS_CTR:
+			case c_oAscChartDataLabelsPos.ctr:
 			{
 				break;
 			}
-			case DLBL_POS_L:
+			case c_oAscChartDataLabelsPos.l:
 			{
 				centerX = centerX - width/2 - constMargin;
 				break;
 			}
-			case DLBL_POS_R:
+			case c_oAscChartDataLabelsPos.r:
 			{
 				centerX = centerX + width/2 + constMargin;
 				break;
 			}
-			case DLBL_POS_T:
+			case c_oAscChartDataLabelsPos.t:
 			{
 				centerY = centerY - height/2 - constMargin;
 				break;
@@ -4000,30 +4008,30 @@ drawAreaChart.prototype =
 		
 		switch ( point.compiledDlb.dLblPos )
 		{
-			case DLBL_POS_B:
+			case c_oAscChartDataLabelsPos.b:
 			{
 				centerY = centerY + height/2 + constMargin;
 				break;
 			}
-			case DLBL_POS_BEST_FIT:
+			case c_oAscChartDataLabelsPos.bestFit:
 			{
 				break;
 			}
-			case DLBL_POS_CTR:
+			case c_oAscChartDataLabelsPos.ctr:
 			{
 				break;
 			}
-			case DLBL_POS_L:
+			case c_oAscChartDataLabelsPos.l:
 			{
 				centerX = centerX - width/2 - constMargin;
 				break;
 			}
-			case DLBL_POS_R:
+			case c_oAscChartDataLabelsPos.r:
 			{
 				centerX = centerX + width/2 + constMargin;
 				break;
 			}
-			case DLBL_POS_T:
+			case c_oAscChartDataLabelsPos.t:
 			{
 				centerY = centerY - height/2 - constMargin;
 				break;
@@ -6257,17 +6265,17 @@ drawHBarChart.prototype =
 				
 		switch ( point.compiledDlb.dLblPos )
 		{
-			case DLBL_POS_BEST_FIT:
+			case c_oAscChartDataLabelsPos.bestFit:
 			{
 				break;
 			}
-			case DLBL_POS_CTR:
+			case c_oAscChartDataLabelsPos.ctr:
 			{
 				centerX = x + w/2 - width/2;
 				centerY = y - h/2 - height/2;
 				break;
 			}
-			case DLBL_POS_IN_BASE:
+			case c_oAscChartDataLabelsPos.inBase:
 			{
 				centerX = x;
 				centerY = y - h/2 - height/2;
@@ -6275,7 +6283,7 @@ drawHBarChart.prototype =
 					centerX = x - width;
 				break;
 			}
-			case DLBL_POS_IN_END:
+			case c_oAscChartDataLabelsPos.inEnd:
 			{
 				centerX = x + w - width;
 				centerY = y - h/2 - height/2;
@@ -6283,7 +6291,7 @@ drawHBarChart.prototype =
 					centerX = x + w;
 				break;
 			}
-			case DLBL_POS_OUT_END:
+			case c_oAscChartDataLabelsPos.outEnd:
 			{
 				centerX = x + w;
 				centerY = y - h/2 - height/2;
@@ -7131,25 +7139,25 @@ drawPieChart.prototype =
 		//TODO высчитать позиции, как в екселе +  ограничения
 		switch ( point.compiledDlb.dLblPos )
 		{
-			case DLBL_POS_BEST_FIT:
+			case c_oAscChartDataLabelsPos.bestFit:
 			{
 				centerX = centerX + (radius / 2) * Math.cos(-1 * stAng - swAng / 2) - width / 2;
 				centerY = centerY - (radius / 2) * Math.sin(-1 * stAng - swAng / 2) - height / 2;
 				break;
 			}
-			case DLBL_POS_CTR:
+			case c_oAscChartDataLabelsPos.ctr:
 			{
 				centerX = centerX + (radius / 2) * Math.cos(-1 * stAng - swAng / 2) - width / 2;
 				centerY = centerY - (radius / 2) * Math.sin(-1 * stAng - swAng / 2) - height / 2;
 				break;
 			}
-			case DLBL_POS_IN_BASE:
+			case c_oAscChartDataLabelsPos.inBase:
 			{
 				centerX = centerX + (radius / 2) * Math.cos(-1 * stAng - swAng / 2) - width / 2;
 				centerY = centerY - (radius / 2) * Math.sin(-1 * stAng - swAng / 2) - height / 2;
 				break;
 			}
-			case DLBL_POS_IN_END:
+			case c_oAscChartDataLabelsPos.inEnd:
 			{
 				tempCenterX = centerX + (radius) * Math.cos(-1 * stAng - swAng / 2);
 				tempCenterY = centerY - (radius) * Math.sin(-1 * stAng - swAng / 2);
@@ -7176,7 +7184,7 @@ drawPieChart.prototype =
 				}
 				break;
 			}
-			case DLBL_POS_OUT_END:
+			case c_oAscChartDataLabelsPos.outEnd:
 			{
 				tempCenterX = centerX + (radius) * Math.cos(-1 * stAng - swAng / 2);
 				tempCenterY = centerY - (radius) * Math.sin(-1 * stAng - swAng / 2);
@@ -7647,13 +7655,13 @@ drawDoughnutChart.prototype =
 		
 		switch ( point.compiledDlb.dLblPos )
 		{
-			case DLBL_POS_CTR:
+			case c_oAscChartDataLabelsPos.ctr:
 			{
 				centerX = centerX  - width / 2;
 				centerY = centerY - height / 2;
 				break;
 			}
-			case DLBL_POS_IN_BASE:
+			case c_oAscChartDataLabelsPos.inBase:
 			{
 				centerX = centerX  - width / 2;
 				centerY = centerY - height / 2;
@@ -7886,30 +7894,30 @@ drawRadarChart.prototype =
 		
 		switch ( point.compiledDlb.dLblPos )
 		{
-			case DLBL_POS_B:
+			case c_oAscChartDataLabelsPos.b:
 			{
 				centerY = centerY + height/2 + constMargin;
 				break;
 			}
-			case DLBL_POS_BEST_FIT:
+			case c_oAscChartDataLabelsPos.bestFit:
 			{
 				break;
 			}
-			case DLBL_POS_CTR:
+			case c_oAscChartDataLabelsPos.ctr:
 			{
 				break;
 			}
-			case DLBL_POS_L:
+			case c_oAscChartDataLabelsPos.l:
 			{
 				centerX = centerX - width/2 - constMargin;
 				break;
 			}
-			case DLBL_POS_R:
+			case c_oAscChartDataLabelsPos.r:
 			{
 				centerX = centerX + width/2 + constMargin;
 				break;
 			}
-			case DLBL_POS_T:
+			case c_oAscChartDataLabelsPos.t:
 			{
 				centerY = centerY - height/2 - constMargin;
 				break;
@@ -8409,30 +8417,30 @@ drawScatterChart.prototype =
 		
 		switch ( point.compiledDlb.dLblPos )
 		{
-			case DLBL_POS_B:
+			case c_oAscChartDataLabelsPos.b:
 			{
 				centerY = centerY + height/2 + constMargin;
 				break;
 			}
-			case DLBL_POS_BEST_FIT:
+			case c_oAscChartDataLabelsPos.bestFit:
 			{
 				break;
 			}
-			case DLBL_POS_CTR:
+			case c_oAscChartDataLabelsPos.ctr:
 			{
 				break;
 			}
-			case DLBL_POS_L:
+			case c_oAscChartDataLabelsPos.l:
 			{
 				centerX = centerX - width/2 - constMargin;
 				break;
 			}
-			case DLBL_POS_R:
+			case c_oAscChartDataLabelsPos.r:
 			{
 				centerX = centerX + width/2 + constMargin;
 				break;
 			}
-			case DLBL_POS_T:
+			case c_oAscChartDataLabelsPos.t:
 			{
 				centerY = centerY - height/2 - constMargin;
 				break;
@@ -8731,30 +8739,30 @@ drawStockChart.prototype =
 		
 		switch ( point.compiledDlb.dLblPos )
 		{
-			case DLBL_POS_B:
+			case c_oAscChartDataLabelsPos.b:
 			{
 				centerY = centerY + height/2 + constMargin;
 				break;
 			}
-			case DLBL_POS_BEST_FIT:
+			case c_oAscChartDataLabelsPos.bestFit:
 			{
 				break;
 			}
-			case DLBL_POS_CTR:
+			case c_oAscChartDataLabelsPos.ctr:
 			{
 				break;
 			}
-			case DLBL_POS_L:
+			case c_oAscChartDataLabelsPos.l:
 			{
 				centerX = centerX - width/2 - constMargin;
 				break;
 			}
-			case DLBL_POS_R:
+			case c_oAscChartDataLabelsPos.r:
 			{
 				centerX = centerX + width/2 + constMargin;
 				break;
 			}
-			case DLBL_POS_T:
+			case c_oAscChartDataLabelsPos.t:
 			{
 				centerY = centerY - height/2 - constMargin;
 				break;
@@ -8999,30 +9007,30 @@ drawBubbleChart.prototype =
 		
 		switch ( point.compiledDlb.dLblPos )
 		{
-			case DLBL_POS_B:
+			case c_oAscChartDataLabelsPos.b:
 			{
 				centerY = centerY + height/2 + constMargin;
 				break;
 			}
-			case DLBL_POS_BEST_FIT:
+			case c_oAscChartDataLabelsPos.bestFit:
 			{
 				break;
 			}
-			case DLBL_POS_CTR:
+			case c_oAscChartDataLabelsPos.ctr:
 			{
 				break;
 			}
-			case DLBL_POS_L:
+			case c_oAscChartDataLabelsPos.l:
 			{
 				centerX = centerX - width/2 - constMargin;
 				break;
 			}
-			case DLBL_POS_R:
+			case c_oAscChartDataLabelsPos.r:
 			{
 				centerX = centerX + width/2 + constMargin;
 				break;
 			}
-			case DLBL_POS_T:
+			case c_oAscChartDataLabelsPos.t:
 			{
 				centerY = centerY - height/2 - constMargin;
 				break;
@@ -9149,7 +9157,7 @@ gridChart.prototype =
 		
 		var crossBetween = this.cChartSpace.chart.plotArea.valAx.crossBetween;
 		var crossDiff;
-		if(crossBetween == CROSS_BETWEEN_BETWEEN && this.cChartSpace.chart.plotArea.valAx.posY)
+		if(crossBetween == AscFormat.CROSS_BETWEEN_BETWEEN && this.cChartSpace.chart.plotArea.valAx.posY)
 			crossDiff = yPoints[1] ? Math.abs((yPoints[1].pos - yPoints[0].pos) / 2) : Math.abs(yPoints[0].pos - this.cChartSpace.chart.plotArea.valAx.posY);
 		
 		if(this.chartProp.type == "Radar")
@@ -9285,7 +9293,7 @@ gridChart.prototype =
 		
 		var crossBetween = this.cChartSpace.chart.plotArea.valAx.crossBetween;
 		var crossDiff;
-		if(crossBetween == CROSS_BETWEEN_BETWEEN && this.cChartSpace.chart.plotArea.valAx.posX && this.chartProp.type != "HBar")
+		if(crossBetween == AscFormat.CROSS_BETWEEN_BETWEEN && this.cChartSpace.chart.plotArea.valAx.posX && this.chartProp.type != "HBar")
 			crossDiff = xPoints[1] ? Math.abs((xPoints[1].pos - xPoints[0].pos) / 2) : Math.abs(xPoints[0].pos - this.cChartSpace.chart.plotArea.valAx.posX);
 			
 		for(var i = 0; i < xPoints.length; i++)
@@ -9648,23 +9656,23 @@ catAxisChart.prototype =
 		
 		switch ( this.cChartSpace.chart.plotArea.catAx.majorTickMark )
 		{
-			case TICK_MARK_CROSS:
+			case c_oAscTickMark.TICK_MARK_CROSS:
 			{
 				widthLine = 5;
 				crossMajorStep = 5;
 				break;
 			}
-			case TICK_MARK_IN:
+			case c_oAscTickMark.TICK_MARK_IN:
 			{
 				widthLine = -5;
 				break;
 			}
-			case TICK_MARK_NONE:
+			case c_oAscTickMark.TICK_MARK_NONE:
 			{
 				widthLine = 0;
 				break;
 			}
-			case TICK_MARK_OUT:
+			case c_oAscTickMark.TICK_MARK_OUT:
 			{
 				widthLine = 5;
 				break;
@@ -9673,23 +9681,23 @@ catAxisChart.prototype =
 		
 		switch ( this.cChartSpace.chart.plotArea.catAx.minorTickMark )
 		{
-			case TICK_MARK_CROSS:
+			case c_oAscTickMark.TICK_MARK_CROSS:
 			{
 				widthMinorLine = 3;
 				crossMinorStep = 3;
 				break;
 			}
-			case TICK_MARK_IN:
+			case c_oAscTickMark.TICK_MARK_IN:
 			{
 				widthMinorLine = -3;
 				break;
 			}
-			case TICK_MARK_NONE:
+			case c_oAscTickMark.TICK_MARK_NONE:
 			{
 				widthMinorLine = 0;
 				break;
 			}
-			case TICK_MARK_OUT:
+			case c_oAscTickMark.TICK_MARK_OUT:
 			{
 				widthMinorLine = 3;
 				break;
@@ -9742,7 +9750,7 @@ catAxisChart.prototype =
 		
 		//сдвиг, если положение оси - между делениями
 		var firstDiff = 0, posYtemp;
-		if(this.cChartSpace.chart.plotArea.valAx.crossBetween == CROSS_BETWEEN_BETWEEN)
+		if(this.cChartSpace.chart.plotArea.valAx.crossBetween == AscFormat.CROSS_BETWEEN_BETWEEN)
 			firstDiff = yPoints[1] ? Math.abs(yPoints[1].pos - yPoints[0].pos) : Math.abs(yPoints[0].pos - this.cChartSpace.chart.plotArea.valAx.posY) * 2;
 			
 		var tickMarkSkip = this.cChartSpace.chart.plotArea.catAx.tickMarkSkip ? this.cChartSpace.chart.plotArea.catAx.tickMarkSkip : 1;
@@ -9806,7 +9814,7 @@ catAxisChart.prototype =
 		var posX, posMinorX, k;
 		
 		var firstDiff = 0, posXtemp;
-		if(this.cChartSpace.chart.plotArea.valAx.crossBetween == CROSS_BETWEEN_BETWEEN && this.chartProp.type != "Scatter")
+		if(this.cChartSpace.chart.plotArea.valAx.crossBetween == AscFormat.CROSS_BETWEEN_BETWEEN && this.chartProp.type != "Scatter")
 		{
 			if(xPoints[1])
 				firstDiff = Math.abs(xPoints[1].pos - xPoints[0].pos);
@@ -9999,23 +10007,23 @@ valAxisChart.prototype =
 		var crossMinorStep = 0;
 		switch ( this.cChartSpace.chart.plotArea.valAx.majorTickMark )
 		{
-			case TICK_MARK_CROSS:
+			case c_oAscTickMark.TICK_MARK_CROSS:
 			{
 				widthLine = 5;
 				crossMajorStep = 5;
 				break;
 			}
-			case TICK_MARK_IN:
+			case c_oAscTickMark.TICK_MARK_IN:
 			{
 				widthLine = 5;
 				break;
 			}
-			case TICK_MARK_NONE:
+			case c_oAscTickMark.TICK_MARK_NONE:
 			{
 				widthLine = 0;
 				break;
 			}
-			case TICK_MARK_OUT:
+			case c_oAscTickMark.TICK_MARK_OUT:
 			{
 				widthLine = -5;
 				break;
@@ -10024,23 +10032,23 @@ valAxisChart.prototype =
 		
 		switch ( this.cChartSpace.chart.plotArea.valAx.minorTickMark )
 		{
-			case TICK_MARK_CROSS:
+			case c_oAscTickMark.TICK_MARK_CROSS:
 			{
 				widthMinorLine = 3;
 				crossMinorStep = 3;
 				break;
 			}
-			case TICK_MARK_IN:
+			case c_oAscTickMark.TICK_MARK_IN:
 			{
 				widthMinorLine = 3;
 				break;
 			}
-			case TICK_MARK_NONE:
+			case c_oAscTickMark.TICK_MARK_NONE:
 			{
 				widthMinorLine = 0;
 				break;
 			}
-			case TICK_MARK_OUT:
+			case c_oAscTickMark.TICK_MARK_OUT:
 			{
 				widthMinorLine = -3;
 				break;
@@ -10318,23 +10326,23 @@ serAxisChart.prototype =
 
 		switch ( this.cChartSpace.chart.plotArea.valAx.majorTickMark )
 		{
-			case TICK_MARK_CROSS:
+			case c_oAscTickMark.TICK_MARK_CROSS:
 			{
 				widthLine = -5;
 				crossMajorStep = 5;
 				break;
 			}
-			case TICK_MARK_IN:
+			case c_oAscTickMark.TICK_MARK_IN:
 			{
 				widthLine = -5;
 				break;
 			}
-			case TICK_MARK_NONE:
+			case c_oAscTickMark.TICK_MARK_NONE:
 			{
 				widthLine = 0;
 				break;
 			}
-			case TICK_MARK_OUT:
+			case c_oAscTickMark.TICK_MARK_OUT:
 			{
 				widthLine = 5;
 				break;

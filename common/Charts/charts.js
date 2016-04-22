@@ -344,7 +344,7 @@ ChartPreviewManager.prototype.getChartByType = function(type)
             case c_oAscChartTypeSettings.areaStacked:
             case c_oAscChartTypeSettings.areaStackedPer:
             {
-                cat_ax_props.putLabelsPosition(CROSS_BETWEEN_BETWEEN);
+                cat_ax_props.putLabelsPosition(AscFormat.CROSS_BETWEEN_BETWEEN);
                 vert_axis_settings = val_ax_props;
                 hor_axis_settings = cat_ax_props;
                 break;

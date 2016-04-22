@@ -139,9 +139,9 @@ CChartSpace.prototype.recalcDLbls = function()
 
 CChartSpace.prototype.addToSetPosition = function(dLbl)
 {
-    if(dLbl instanceof CDLbl)
+    if(dLbl instanceof AscFormat.CDLbl)
         this.recalcInfo.dataLbls.push(dLbl);
-    else if(dLbl instanceof CTitle)
+    else if(dLbl instanceof AscFormat.CTitle)
         this.recalcInfo.axisLabels.push(dLbl);
 };
 
