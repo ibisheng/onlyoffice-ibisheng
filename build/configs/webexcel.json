@@ -12,6 +12,11 @@
         "../common/editorscommon.js",
         "../common/NumFormat.js",
 		
+		"../common/FontsFreeType/font_engine.js",
+        "../common/FontsFreeType/FontFile.js",
+        "../common/FontsFreeType/FontManager.js",
+        "../common/FontsFreeType/font_map.js",
+		
 		"../common/Drawings/Hit.js",
 		"../common/Drawings/ArcTo.js",
 		"../common/Drawings/ColorArray.js",
@@ -50,10 +55,6 @@
         "../common/wordcopypaste.js",
 
         "../cell/apiDefines.js",
-        "../common/FontsFreeType/font_engine.js",
-        "../common/FontsFreeType/FontFile.js",
-        "../common/FontsFreeType/FontManager.js",
-        "../common/FontsFreeType/font_map.js",
         "../word/Drawing/HatchPattern.js",
         "../word/Drawing/WorkEvents.js",
         "../word/Drawing/Externals.js",
