@@ -6638,7 +6638,7 @@ window["asc_nativeOnSpellCheck"] = function (response)
 
 asc_docs_api.prototype._onNeedParams = function(data) {
   var cp = {'codepage': AscCommon.c_oAscCodePageUtf8, 'encodings': AscCommon.getEncodingParams()};
-  this.asc_fireCallback("asc_onAdvancedOptions", new asc.asc_CAdvancedOptions(c_oAscAdvancedOptionsID.TXT, cp), this.advancedOptionsAction);
+  this.asc_fireCallback("asc_onAdvancedOptions", new Asc.asc_CAdvancedOptions(c_oAscAdvancedOptionsID.TXT, cp), this.advancedOptionsAction);
 };
 asc_docs_api.prototype._onOpenCommand = function(data) {
   var t = this;
@@ -6700,7 +6700,7 @@ function _downloadAs(editor, command, filetype, actionType, options, fCallbackRe
 		}
 		var cp = {'codepage': AscCommon.c_oAscCodePageUtf8, 'encodings': AscCommon.getEncodingParams()};
 		editor.downloadType = options.downloadType;
-		editor.asc_fireCallback("asc_onAdvancedOptions", new asc.asc_CAdvancedOptions(c_oAscAdvancedOptionsID.TXT, cp), editor.advancedOptionsAction);
+		editor.asc_fireCallback("asc_onAdvancedOptions", new Asc.asc_CAdvancedOptions(c_oAscAdvancedOptionsID.TXT, cp), editor.advancedOptionsAction);
 		return;
 	} else if (c_oAscFileType.HTML === filetype && null == options.oDocumentMailMerge && null == options.oMailMergeSendData) {
 		//в asc_nativeGetHtml будет вызван select all, чтобы выделился документ должны выйти из колонтитулов и автофигур
@@ -6711,7 +6711,7 @@ function _downloadAs(editor, command, filetype, actionType, options, fCallbackRe
 		//сделано через сервер, потому что нет простого механизма сохранения на клиенте
 		dataContainer.data = '\ufeff' + window["asc_docs_api"].prototype["asc_nativeGetHtml"].call(editor);
 	} else {
-		if (options.txtOptions instanceof asc.asc_CTXTAdvancedOptions) {
+		if (options.txtOptions instanceof Asc.asc_CTXTAdvancedOptions) {
 			oAdditionalData["codepage"] = options.txtOptions.asc_getCodePage();
 		}
 		var oLogicDocument;
