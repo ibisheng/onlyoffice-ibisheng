@@ -15,13 +15,25 @@
     var Api = window["asc_docs_api"];
 
     /**
-     * Class representing a document.
+     * Class representing a container for paragraphs and tables.
+     * @param Document
      * @constructor
      */
-    function ApiDocument(Document)
+    function ApiDocumentContent(Document)
     {
         this.Document = Document;
     }
+
+    /**
+     * Class representing a document.
+     * @constructor
+     * @extends {ApiDocumentContent}
+     */
+    function ApiDocument(Document)
+    {
+        ApiDocument.superclass.constructor.call(this, Document);
+    }
+    AscCommon.extendClass(ApiDocument, ApiDocumentContent);
 
     /**
      * Class representing a paragraph properties.
@@ -307,22 +319,15 @@
 
     //------------------------------------------------------------------------------------------------------------------
     //
-    // ApiDocument
+    // ApiDocumentContent
     //
     //------------------------------------------------------------------------------------------------------------------
 
     /**
-     * Create new history point.
-     */
-    ApiDocument.prototype.CreateNewHistoryPoint = function()
-    {
-        this.Document.Create_NewHistoryPoint(AscDFH.historydescription_Document_ApiBuilder);
-    };
-    /**
      * Get the number of elements.
      * @returns {number}
      */
-    ApiDocument.prototype.GetElementsCount = function()
+    ApiDocumentContent.prototype.GetElementsCount = function()
     {
         return this.Document.Content.length;
     };
@@ -330,7 +335,7 @@
      * Get element by position
      * @returns {?DocumentElement}
      */
-    ApiDocument.prototype.GetElement = function(nPos)
+    ApiDocumentContent.prototype.GetElement = function(nPos)
     {
         if (!this.Document.Content[nPos])
             return null;
@@ -348,7 +353,7 @@
      * @param {number} nPos
      * @param {DocumentElement} oElement
      */
-    ApiDocument.prototype.AddElement = function(nPos, oElement)
+    ApiDocumentContent.prototype.AddElement = function(nPos, oElement)
     {
         if (oElement instanceof ApiParagraph || oElement instanceof ApiTable)
         {
@@ -362,7 +367,7 @@
      * Push paragraph or table
      * @param {DocumentElement} oElement
      */
-    ApiDocument.prototype.Push = function(oElement)
+    ApiDocumentContent.prototype.Push = function(oElement)
     {
         if (oElement instanceof ApiParagraph || oElement instanceof ApiTable)
         {
@@ -375,9 +380,23 @@
     /**
      * Remove all elements from the current document.
      */
-    ApiDocument.prototype.RemoveAllElements = function()
+    ApiDocumentContent.prototype.RemoveAllElements = function()
     {
         this.Document.Content = [];
+    };
+
+    //------------------------------------------------------------------------------------------------------------------
+    //
+    // ApiDocument
+    //
+    //------------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Create new history point.
+     */
+    ApiDocument.prototype.CreateNewHistoryPoint = function()
+    {
+        this.Document.Create_NewHistoryPoint(AscDFH.historydescription_Document_ApiBuilder);
     };
     /**
      * Get style by style name
@@ -481,7 +500,7 @@
     ApiDocument.prototype.CreateSection = function(oParagraph)
     {
         if (!(oParagraph instanceof ApiParagraph))
-            return;
+            return null;
 
         var oSectPr = new CSectionPr(this.Document);
         oParagraph.private_GetImpl().Set_SectionPr(oSectPr);
@@ -751,7 +770,7 @@
      * Get the content for the specified type of header.
      * @param {HdrFtrType} sType - Type of header.
      * @param {boolean} [isCreate=false] - Create a header or not if there is no header with specified type in the current section.
-     * @returns {?ApiDocument}
+     * @returns {?ApiDocumentContent}
      */
     ApiSection.prototype.GetHeader = function(sType, isCreate)
     {
@@ -778,7 +797,7 @@
                 this.Section.Set_Header_Default(oHeader);
         }
 
-        return new ApiDocument(oHeader.Get_DocumentContent());
+        return new ApiDocumentContent(oHeader.Get_DocumentContent());
     };
     /**
      * Remove a header of the specified type from the current section. After removing the header will be inherited from
@@ -799,7 +818,7 @@
      * Get the content for the specified type of footer.
      * @param {HdrFtrType} sType - Type of footer.
      * @param {boolean} [isCreate=false] - Create a footer or not if there is no footer with specified type in the current section.
-     * @returns {?ApiDocument}
+     * @returns {?ApiDocumentContent}
      */
     ApiSection.prototype.GetFooter = function(sType, isCreate)
     {
@@ -826,7 +845,7 @@
                 this.Section.Set_Footer_Default(oFooter);
         }
 
-        return new ApiDocument(oFooter.Get_DocumentContent());
+        return new ApiDocumentContent(oFooter.Get_DocumentContent());
     };
     /**
      * Remove a footer of the specified type from the current section. After removing the footer will be inherited from
@@ -925,12 +944,13 @@
         }
 
         var isMerged = this.Table.Cell_Merge(true);
+        var oMergedCell = this.Table.CurCell;
         oTable.Selection_Remove();
 
         private_EndSilentMode();
 
         if (true === isMerged)
-            return new ApiTableCell(this.Table.CurCell);
+            return new ApiTableCell(oMergedCell);
 
         return null;
     };
@@ -1106,11 +1126,11 @@
 
     /**
      * Get cell content.
-     * @returns {ApiDocument}
+     * @returns {ApiDocumentContent}
      */
     ApiTableCell.prototype.GetContent = function()
     {
-        return new ApiDocument(this.Cell.Content);
+        return new ApiDocumentContent(this.Cell.Content);
     };
 
     //------------------------------------------------------------------------------------------------------------------
@@ -2466,14 +2486,15 @@
     Api.prototype["CreateParagraph"]                 = Api.prototype.CreateParagraph;
     Api.prototype["CreateTable"]                     = Api.prototype.CreateTable;
 
+    ApiDocumentContent.prototype["GetElementsCount"] = ApiDocumentContent.prototype.GetElementsCount;
+    ApiDocumentContent.prototype["GetElement"]       = ApiDocumentContent.prototype.GetElement;
+    ApiDocumentContent.prototype["AddElement"]       = ApiDocumentContent.prototype.AddElement;
+    ApiDocumentContent.prototype["Push"]             = ApiDocumentContent.prototype.Push;
+    ApiDocumentContent.prototype["RemoveAllElements"]= ApiDocumentContent.prototype.RemoveAllElements;
+
 	ApiDocument.prototype["Create_NewHistoryPoint"]  = ApiDocument.prototype.Create_NewHistoryPoint;
 	ApiDocument.prototype["GetDefaultTextPr"]        = ApiDocument.prototype.GetDefaultTextPr;
 	ApiDocument.prototype["GetDefaultParaPr"]        = ApiDocument.prototype.GetDefaultParaPr;
-    ApiDocument.prototype["GetElementsCount"]        = ApiDocument.prototype.GetElementsCount;
-    ApiDocument.prototype["GetElement"]              = ApiDocument.prototype.GetElement;
-    ApiDocument.prototype["AddElement"]              = ApiDocument.prototype.AddElement;
-    ApiDocument.prototype["Push"]                    = ApiDocument.prototype.Push;
-    ApiDocument.prototype["RemoveAllElements"]       = ApiDocument.prototype.RemoveAllElements;
     ApiDocument.prototype["GetStyle"]                = ApiDocument.prototype.GetStyle;
     ApiDocument.prototype["CreateStyle"]             = ApiDocument.prototype.CreateStyle;
     ApiDocument.prototype["GetDefaultStyle"]         = ApiDocument.prototype.GetDefaultStyle;
@@ -3996,7 +4017,7 @@ function TEST_BUILDER2()
     oTableStyle.GetConditionalTableStyle("wholeTable").GetTablePr().SetTableBorderInsideH("single", 4, 0, 0, 0, 0);
 
     //------------------------------------------------------------------------------------------------------------------
-    // Add column and row
+    // Add/Remove/Merge column and row
     //------------------------------------------------------------------------------------------------------------------
     oTable = Api.CreateTable(3, 3);
     oDocument.Push(oTable);
@@ -4023,6 +4044,13 @@ function TEST_BUILDER2()
     }
     oTable.RemoveRow(oTable.GetRow(1).GetCell(0));
     oTable.RemoveColumn(oTable.GetRow(0).GetCell(3));
+
+    oTable = Api.CreateTable(5, 5);
+    oDocument.Push(oTable);
+
+    oCell = oTable.MergeCells([oTable.GetRow(1).GetCell(1), oTable.GetRow(1).GetCell(2), oTable.GetRow(2).GetCell(1), oTable.GetRow(2).GetCell(2)]);
+    oCell.GetContent().GetElement(0).AddText("Merged cell");
+
 
     //------------------------------------------------------------------------------------------------------------------
     oLD.Recalculate_FromStart();
