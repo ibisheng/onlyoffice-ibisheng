@@ -27,6 +27,7 @@
         "../common/Charts/charts.js",
 		"../common/Charts/DrawingArea.js",
 		"../common/Charts/DrawingObjects.js",
+		"../common/Charts/3DTransformation.js",
 		"../common/Charts/ChartsDrawer.js",
 		
 		"../common/scroll.js",
@@ -43,7 +44,6 @@
         "../slide/Drawing/ThemeLoader.js",
         "../common/SerializeCommonWordExcel.js",
         "../common/SerializeChart.js",
-        "../common/Charts/3DTransformation.js",
         "../word/Editor/Serialize2.js",
         "../word/Editor/Styles.js",
         "../word/Editor/Numbering.js",

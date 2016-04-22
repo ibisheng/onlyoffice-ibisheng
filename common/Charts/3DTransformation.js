@@ -1,5 +1,12 @@
 "use strict";
 
+(
+/**
+* @param {Window} window
+* @param {undefined} undefined
+*/
+function (window, undefined) {
+
 // Import
 var ORIENTATION_MIN_MAX = AscFormat.ORIENTATION_MIN_MAX;
 
@@ -2341,3 +2348,9 @@ Point3D.prototype =
 		return C;
 	}
 };
+
+	//----------------------------------------------------------export----------------------------------------------------
+	window['AscFormat'] = window['AscFormat'] || {};
+	window['AscFormat'].Processor3D = Processor3D;
+	window['AscFormat'].Point3D = Point3D;
+})(window);

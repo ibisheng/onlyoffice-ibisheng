@@ -27,6 +27,7 @@
         "../common/Charts/charts.js",
 		"../common/Charts/DrawingArea.js",
 		"../common/Charts/DrawingObjects.js",
+		"../common/Charts/3DTransformation.js",
 		"../common/Charts/ChartsDrawer.js",
 		
 		"../common/scroll.js",
@@ -35,7 +36,6 @@
         "../common/wordcopypaste.js",
 
         "../cell/apiDefines.js",
-        "../common/Charts/3DTransformation.js",
         "../common/FontsFreeType/font_engine.js",
         "../common/FontsFreeType/FontFile.js",
         "../common/FontsFreeType/FontManager.js",
