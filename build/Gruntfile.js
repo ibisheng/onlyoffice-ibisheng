@@ -72,7 +72,7 @@ module.exports = function(grunt) {
 		grunt.file.mkdir( packageFile['compile']['sdk']['log'] );
 		var map_file_path = packageFile['compile']['sdk']['dst'] + '.map';
 		var map_record_file_path = map_file_path + '.tmp';
-		var tmp_sdk_path = packageFile['compile']['sdk']['dst'] + '.tmp';
+		var tmp_sdk_path = 'sdk-js.tmp';
 		var concat_src = [
 			packageFile['compile']['sdk']['dst'],
 			packageFile['compile']['defines']['dst'],
@@ -171,5 +171,5 @@ module.exports = function(grunt) {
 	grunt.registerTask('compile_sdk', ['compile_sdk_init:' + level, 'closure-compiler', 'concat', 'replace', 'clean']);
 	grunt.registerTask('compile_sdk_native', ['compile_sdk_init:' + level, 'closure-compiler:sdk', 'concat', 'replace', 'clean']);
 		
-	grunt.registerTask('default', ['build_all']);
+	grunt.registerTask('default', ['build_webpowerpoint']);
 };
