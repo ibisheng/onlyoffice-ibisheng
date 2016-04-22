@@ -22,6 +22,8 @@
 // Import
 var g_oTableId = AscCommon.g_oTableId;
 
+var HitInLine = AscFormat.HitInLine;
+
 var c_oAscRelativeFromH = Asc.c_oAscRelativeFromH;
 var c_oAscRelativeFromV = Asc.c_oAscRelativeFromV;
 

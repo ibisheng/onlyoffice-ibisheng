@@ -12,6 +12,7 @@
         "../common/editorscommon.js",
         "../common/NumFormat.js",
 		
+		"../common/Drawings/Hit.js",
 		"../common/Drawings/ArcTo.js",
 		"../common/Drawings/ColorArray.js",
 
@@ -65,7 +66,6 @@
         "../word/Editor/Common.js",
         "../word/Editor/Sections.js",
         "../word/Editor/History.js",
-        "../common/Drawings/Hit.js",
         "../common/Drawings/States.js",
         "../common/Drawings/DrawingObjectsHandlers.js",
         "../common/Drawings/TrackObjects/AdjustmentTracks.js",

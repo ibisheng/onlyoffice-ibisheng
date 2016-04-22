@@ -15,6 +15,7 @@
         "../common/editorscommon.js",
         "../common/NumFormat.js",
 		
+		"../common/Drawings/Hit.js",
 		"../common/Drawings/ArcTo.js",
 		"../common/Drawings/ColorArray.js",
 
@@ -61,7 +62,6 @@
         "../common/Drawings/TrackObjects/RotateTracks.js",
         "../common/Drawings/TrackObjects/Spline.js",
         "../common/Drawings/DrawingObjectsHandlers.js",
-        "../common/Drawings/Hit.js",
         "../common/Drawings/Joined.js",
         "../common/Drawings/TextDrawer.js",
         "../word/Editor/GraphicObjects/Format/ShapePrototype.js",

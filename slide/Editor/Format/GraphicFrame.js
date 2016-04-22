@@ -2,6 +2,7 @@
 
 // Import
 var CShape = AscFormat.CShape;
+var HitInLine = AscFormat.HitInLine;
 
 function CGraphicFrame()
 {

@@ -11,7 +11,8 @@ function (window, undefined) {
 var c_oAscSizeRelFromH = AscCommon.c_oAscSizeRelFromH;
 var c_oAscSizeRelFromV = AscCommon.c_oAscSizeRelFromV;
 
-    var checkNormalRotate = AscFormat.checkNormalRotate;
+var checkNormalRotate = AscFormat.checkNormalRotate;
+var HitInLine = AscFormat.HitInLine;
 
 var c_oAscFill = Asc.c_oAscFill;
 

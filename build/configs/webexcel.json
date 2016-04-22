@@ -12,6 +12,7 @@
         "../common/editorscommon.js",
         "../common/NumFormat.js",
 		
+		"../common/Drawings/Hit.js",
 		"../common/Drawings/ArcTo.js",
 		"../common/Drawings/ColorArray.js",
 
@@ -90,7 +91,6 @@
         "../common/Shapes/SerializeWriter.js",
         "../common/SerializeCommonWordExcel.js",
         "../common/SerializeChart.js",
-        "../common/Drawings/Hit.js",
         "../common/Drawings/States.js",
         "../common/Drawings/DrawingObjectsHandlers.js",
         "../common/Drawings/TrackObjects/AdjustmentTracks.js",

@@ -1,6 +1,6 @@
 "use strict";
 
-
+(function(){
 function HitInLine(context, px, py, x0, y0, x1, y1)
 {
    /* var l = Math.min(x0, x1);
@@ -112,5 +112,9 @@ function HitInBezier3(context, px, py, x0, y0, x1, y1, x2, y2)
     return context.isPointInPath(px, py);
 }
 
-
-
+    //--------------------------------------------------------export----------------------------------------------------
+    window['AscFormat'] = window['AscFormat'] || {};
+    window['AscFormat'].HitInLine = HitInLine;
+    window['AscFormat'].HitInBezier4 = HitInBezier4;
+    window['AscFormat'].HitInBezier3 = HitInBezier3;
+})();
