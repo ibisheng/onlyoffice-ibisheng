@@ -83,7 +83,7 @@
         "../common/Shapes/SerializeWriter.js",
         "../word/Editor/SerializeCommon.js",
         "../common/Drawings/ArcTo.js",
-        "../word/Drawing/ColorArray.js",
+        "../common/Drawings/ColorArray.js",
         "../slide/Editor/Format/Presentation.js",
         "../cell/view/DrawingObjectsController.js",
         "../slide/Editor/DrawingObjectsController.js",

@@ -84,7 +84,7 @@
         "../cell/view/WorkbookView.js",
         "../word/Editor/SerializeCommon.js",
         "../common/Drawings/ArcTo.js",
-        "../word/Drawing/ColorArray.js",
+        "../common/Drawings/ColorArray.js",
         "../common/Shapes/Serialize.js",
         "../common/Shapes/SerializeWriter.js",
         "../common/SerializeCommonWordExcel.js",
