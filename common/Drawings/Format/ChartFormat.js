@@ -25561,7 +25561,7 @@ CView3d.prototype =
 
 function CreateTextBodyFromString(str, drawingDocument, parent)
 {
-    var tx_body = new CTextBody();
+    var tx_body = new AscFormat.CTextBody();
     tx_body.setParent(parent);
     tx_body.setBodyPr(new AscFormat.CBodyPr());
     var old_is_doc_editor = false;

@@ -5,6 +5,25 @@ var CShape = AscFormat.CShape;
 
 var G_O_DEFAULT_COLOR_MAP = AscFormat.GenerateDefaultColorMap();
 
+var pHText = [];
+pHText[0] = [];//rus         ""                                                          ;
+pHText[0][AscFormat.phType_body]  =    "Slide text";             //"Текст слайда" ;                              ;
+pHText[0][AscFormat.phType_chart]    = "Chart";         // "Диаграмма" ;                                     ;
+pHText[0][AscFormat.phType_clipArt]  = "ClipArt";// "Текст слайда" ; //(Clip Art)                   ;
+pHText[0][AscFormat.phType_ctrTitle] = "Slide title";// "Заголовок слайда" ; //(Centered Title)     ;
+pHText[0][AscFormat.phType_dgm]      = "Diagram";// "Диаграмма";// (Diagram)                        ;
+pHText[0][AscFormat.phType_dt]       = "Date and time";// "Дата и время";// (Date and Time)         ;
+pHText[0][AscFormat.phType_ftr]      = "Footer";// "Нижний колонтитул";// (Footer)                  ;
+pHText[0][AscFormat.phType_hdr]      = "Header";// "Верхний колонтитул"; //(Header)                 ;
+pHText[0][AscFormat.phType_media]    = "Media";// "Текст слайда"; //(Media)                         ;
+pHText[0][AscFormat.phType_obj]      = "Slide text";// "Текст слайда"; //(Object)                   ;
+pHText[0][AscFormat.phType_pic]      = "Picture";// "Вставка рисунка"; //(Picture)                  ;
+pHText[0][AscFormat.phType_sldImg]   = "Image";// "Вставка рисунка"; //(Slide Image)                ;
+pHText[0][AscFormat.phType_sldNum]   = "Slide number";// "Номер слайда"; //(Slide Number)           ;
+pHText[0][AscFormat.phType_subTitle] = "Slide subtitle";// "Подзаголовок слайда"; //(Subtitle)      ;
+pHText[0][AscFormat.phType_tbl]      = "Table";// "Таблица"; //(Table)                              ;
+pHText[0][AscFormat.phType_title]    = "Slide title";// "Заголовок слайда" ;  //(Title)             ;
+
 CRFonts.prototype.Merge = function(RFonts)
 {
     if ( undefined !== RFonts.Ascii )
@@ -770,11 +789,11 @@ CShape.prototype.Set_CurrentElement = function(bUpdate, pageIndex)
     }
 };
 
-CTextBody.prototype.Get_Worksheet = function()
+AscFormat.CTextBody.prototype.Get_Worksheet = function()
 {
     return this.parent && this.parent.Get_Worksheet && this.parent.Get_Worksheet();
 };
-CTextBody.prototype.getDrawingDocument = function()
+AscFormat.CTextBody.prototype.getDrawingDocument = function()
 {
     return this.parent && this.parent.getDrawingDocument && this.parent.getDrawingDocument();
 };

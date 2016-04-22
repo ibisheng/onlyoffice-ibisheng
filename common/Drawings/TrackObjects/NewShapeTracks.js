@@ -427,7 +427,7 @@ function NewShapeTrack(presetGeom, startX, startY, theme, master, layout, slide,
             }
             else
             {
-                shape.setTxBody(new CTextBody());
+                shape.setTxBody(new AscFormat.CTextBody());
                 var content = new CDocumentContent(shape.txBody, DrawingDocument, 0, 0, 0, 0, false, false, true);
                 shape.txBody.setParent(shape);
                 shape.txBody.setContent(content);

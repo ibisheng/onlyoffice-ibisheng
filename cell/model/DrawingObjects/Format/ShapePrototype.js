@@ -516,11 +516,11 @@ CShape.prototype.Get_Worksheet = function()
     return this.worksheet;
 };
 
-CTextBody.prototype.Get_Worksheet = function()
+AscFormat.CTextBody.prototype.Get_Worksheet = function()
 {
     return this.parent && this.parent.Get_Worksheet && this.parent.Get_Worksheet();
 };
-CTextBody.prototype.getDrawingDocument = function()
+AscFormat.CTextBody.prototype.getDrawingDocument = function()
 {
     return this.parent && this.parent.getDrawingDocument && this.parent.getDrawingDocument();
 };

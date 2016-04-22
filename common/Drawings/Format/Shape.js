@@ -684,7 +684,7 @@ CShape.prototype =
             c.setStyle(this.style.createDuplicate());
         }
         if (this.textBoxContent) {
-            var tx_body = new CTextBody();
+            var tx_body = new AscFormat.CTextBody();
             tx_body.setParent(c);
             if (this.bodyPr) {
                 tx_body.setBodyPr(this.bodyPr.createDuplicate());
@@ -773,7 +773,7 @@ CShape.prototype =
     },
 
     createTextBody: function () {
-        var tx_body = new CTextBody();
+        var tx_body = new AscFormat.CTextBody();
         tx_body.setParent(this);
         tx_body.setContent(new CDocumentContent(tx_body, this.getDrawingDocument(), 0, 0, 0, 20000, false, false, true));
         tx_body.setBodyPr(new AscFormat.CBodyPr());
@@ -4548,7 +4548,7 @@ CShape.prototype =
             {
                 if(!this.txBody)
                 {
-                    this.setTxBody(new CTextBody());
+                    this.setTxBody(new AscFormat.CTextBody());
                     var content = new CDocumentContent(this.txBody, this.getDrawingDocument(), 0, 0, 0, 0, false, false, true);
                     this.txBody.setParent(this);
                     this.txBody.setContent(content);

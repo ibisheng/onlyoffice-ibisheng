@@ -7273,13 +7273,13 @@ function BinaryPPTYLoader()
             }
             else
             {
-                txbody = new CTextBody();
+                txbody = new AscFormat.CTextBody();
                 txbody.setParent(shape);
             }
         }
         else
         {
-            txbody = new CTextBody();
+            txbody = new AscFormat.CTextBody();
         }
         var s = this.stream;
 
@@ -7380,7 +7380,7 @@ function BinaryPPTYLoader()
             txbody = shape.txPr;
         else
         {
-            shape.txPr = new CTextBody();
+            shape.txPr = new AscFormat.CTextBody();
             txbody = shape.txPr;
         }
         var s = this.stream;

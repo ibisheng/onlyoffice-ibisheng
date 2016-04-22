@@ -1,15 +1,11 @@
 "use strict";
 
+(
 /**
- * Created with JetBrains WebStorm.
- * User: Sergey.Luzyanin
- * Date: 6/26/13
- * Time: 11:55 AM
- * To change this template use File | Settings | File Templates.
- */
-
-
-
+* @param {Window} window
+* @param {undefined} undefined
+*/
+function (window, undefined) {
 
 var  field_type_slidenum   = 0;
 var  field_type_datetime   = 1;
@@ -26,26 +22,6 @@ var  field_type_datetime10 = 11;
 var  field_type_datetime11 = 12;
 var  field_type_datetime12 = 13;
 var  field_type_datetime13 = 14;
-
-var pHText = [];
-pHText[0] = [];//rus         ""                                                          ;
-pHText[0][AscFormat.phType_body]  =    "Slide text";             //"Текст слайда" ;                              ;
-pHText[0][AscFormat.phType_chart]    = "Chart";         // "Диаграмма" ;                                     ;
-pHText[0][AscFormat.phType_clipArt]  = "ClipArt";// "Текст слайда" ; //(Clip Art)                   ;
-pHText[0][AscFormat.phType_ctrTitle] = "Slide title";// "Заголовок слайда" ; //(Centered Title)     ;
-pHText[0][AscFormat.phType_dgm]      = "Diagram";// "Диаграмма";// (Diagram)                        ;
-pHText[0][AscFormat.phType_dt]       = "Date and time";// "Дата и время";// (Date and Time)         ;
-pHText[0][AscFormat.phType_ftr]      = "Footer";// "Нижний колонтитул";// (Footer)                  ;
-pHText[0][AscFormat.phType_hdr]      = "Header";// "Верхний колонтитул"; //(Header)                 ;
-pHText[0][AscFormat.phType_media]    = "Media";// "Текст слайда"; //(Media)                         ;
-pHText[0][AscFormat.phType_obj]      = "Slide text";// "Текст слайда"; //(Object)                   ;
-pHText[0][AscFormat.phType_pic]      = "Picture";// "Вставка рисунка"; //(Picture)                  ;
-pHText[0][AscFormat.phType_sldImg]   = "Image";// "Вставка рисунка"; //(Slide Image)                ;
-pHText[0][AscFormat.phType_sldNum]   = "Slide number";// "Номер слайда"; //(Slide Number)           ;
-pHText[0][AscFormat.phType_subTitle] = "Slide subtitle";// "Подзаголовок слайда"; //(Subtitle)      ;
-pHText[0][AscFormat.phType_tbl]      = "Table";// "Таблица"; //(Table)                              ;
-pHText[0][AscFormat.phType_title]    = "Slide title";// "Заголовок слайда" ;  //(Title)             ;
-
 
 var field_months = [];
 field_months[0] = [];//rus
@@ -820,22 +796,7 @@ CTextBody.prototype =
     }
 };
 
-function CreateParaContentFromString(str)
-{
-    if (str == '\t')
-    {
-        return new ParaTab();
-    }
-    else if (str == '\n')
-    {
-        return new ParaNewLine( break_Line );
-    }
-    else if (str != ' ')
-    {
-        return new ParaText(str);
-    }
-    else
-    {
-        return new ParaSpace(1);
-    }
-}
+    //--------------------------------------------------------export----------------------------------------------------
+    window['AscFormat'] = window['AscFormat'] || {};
+    window['AscFormat'].CTextBody = CTextBody;
+})(window);
