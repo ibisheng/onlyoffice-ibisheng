@@ -16,6 +16,7 @@
         "../common/NumFormat.js",
 		
 		"../common/Drawings/ArcTo.js",
+		"../common/Drawings/ColorArray.js",
 
         "../common/Drawings/Format/Constants.js",
 		"../common/Drawings/CommonController.js",
@@ -59,7 +60,6 @@
         "../common/Drawings/TrackObjects/ResizeTracks.js",
         "../common/Drawings/TrackObjects/RotateTracks.js",
         "../common/Drawings/TrackObjects/Spline.js",
-        "../common/Drawings/ColorArray.js",
         "../common/Drawings/DrawingObjectsHandlers.js",
         "../common/Drawings/Hit.js",
         "../common/Drawings/Joined.js",

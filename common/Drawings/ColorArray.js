@@ -1,5 +1,7 @@
 "use strict";
 
+(function(){
+
 function CShapeColor(r, g, b){
     this.r = r;
     this.g = g;
@@ -130,3 +132,8 @@ function HSLToRGB(HSLColor) {  //{h : 0..360, s : 0..1, l : 0..1}
     if(b>255) b=255;
     return {r : r, g : g, b : b};//{r : 0..255, g : 0..255, b : 0..255}
 }
+
+    //--------------------------------------------------------export----------------------------------------------------
+    window['AscFormat'] = window['AscFormat'] || {};
+    window['AscFormat'].CShapeColor = CShapeColor;
+})();
