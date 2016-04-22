@@ -1764,7 +1764,7 @@ asc_docs_api.prototype.ShapeApply = function(prop)
             bShapeTexture = false;
         }
     }
-    if (!isNullOrEmptyString(image_url)){
+    if (!AscCommon.isNullOrEmptyString(image_url)){
         var sImageUrl = null;
         if(!g_oDocumentUrls.getImageLocal(image_url)){
           sImageUrl = image_url;
@@ -2890,7 +2890,7 @@ asc_docs_api.prototype.ImgApply = function(obj){
 	ImagePr.ImageUrl = obj.ImageUrl;
 
 
-	if(!isNullOrEmptyString(ImagePr.ImageUrl)){
+	if(!AscCommon.isNullOrEmptyString(ImagePr.ImageUrl)){
       var sImageUrl = null;
       if(!g_oDocumentUrls.getImageLocal(ImagePr.ImageUrl)){
         sImageUrl = ImagePr.ImageUrl;
@@ -4668,7 +4668,7 @@ asc_docs_api.prototype.asc_addChartDrawingObject = function(chartBinary)
     /**/
 
     // Приводим бинарик к объекту типа CChartAsGroup и добавляем объект
-    if ( isObject(chartBinary) )
+    if ( AscFormat.isObject(chartBinary) )
     {
         //if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) )
         {

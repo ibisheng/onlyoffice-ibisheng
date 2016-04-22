@@ -2469,7 +2469,7 @@ var editor;
 
     var ws = this.wb.getWorksheet();
     var fReplaceCallback = null, sImageUrl = null;
-    if(!isNullOrEmptyString(props.ImageUrl)){
+    if(!AscCommon.isNullOrEmptyString(props.ImageUrl)){
       if(!g_oDocumentUrls.getImageLocal(props.ImageUrl)){
         sImageUrl = props.ImageUrl;
         fReplaceCallback = function(sLocalUrl){
@@ -2478,7 +2478,7 @@ var editor;
       }
     }
     else if(props.ShapeProperties && props.ShapeProperties.fill && props.ShapeProperties.fill.fill &&
-    !isNullOrEmptyString(props.ShapeProperties.fill.fill.url)){
+    !AscCommon.isNullOrEmptyString(props.ShapeProperties.fill.fill.url)){
       if(!g_oDocumentUrls.getImageLocal(props.ShapeProperties.fill.fill.url)){
         sImageUrl = props.ShapeProperties.fill.fill.url;
         fReplaceCallback = function(sLocalUrl){
@@ -2610,7 +2610,7 @@ var editor;
       var drawing_area = worksheet.objectRender.drawingArea;
       if (drawing_area) {
         for (var i = 0; i < drawing_area.frozenPlaces.length; ++i) {
-          worksheet.objectRender.showDrawingObjects(false, new GraphicOption(worksheet, AscCommonExcel.c_oAscGraphicOption.ScrollVertical, drawing_area.frozenPlaces[i].range, {offsetX: 0, offsetY: 0}));
+          worksheet.objectRender.showDrawingObjects(false, new AscFormat.GraphicOption(worksheet, AscCommonExcel.c_oAscGraphicOption.ScrollVertical, drawing_area.frozenPlaces[i].range, {offsetX: 0, offsetY: 0}));
             worksheet.objectRender.controller && worksheet.objectRender.controller.getGraphicObjectProps();
         }
       }

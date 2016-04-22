@@ -1162,7 +1162,7 @@
     };
 
     WorksheetView.prototype._prepareDrawingObjects = function () {
-        this.objectRender = new DrawingObjects();
+        this.objectRender = new AscFormat.DrawingObjects();
         if ( !window["NATIVE_EDITOR_ENJINE"] || window['IS_NATIVE_EDITOR'] || window['DoctRendererMode'] ) {
             this.objectRender.init( this );
         }
@@ -5866,7 +5866,7 @@
             this._drawGrid( /*drawingCtx*/ undefined, range );
             this._drawCellsAndBorders( /*drawingCtx*/undefined, range );
             this._drawAutoF( range, offsetX, offsetY );
-            this.objectRender.showDrawingObjectsEx( false, new GraphicOption( this, c_oAscGraphicOption.ScrollVertical, range, {
+            this.objectRender.showDrawingObjectsEx( false, new AscFormat.GraphicOption( this, c_oAscGraphicOption.ScrollVertical, range, {
                 offsetX: offsetX, offsetY: offsetY
             } ) );
             if ( 0 < cFrozen ) {
@@ -5876,7 +5876,7 @@
                 this._drawGrid( /*drawingCtx*/ undefined, range, offsetX );
                 this._drawCellsAndBorders( /*drawingCtx*/undefined, range, offsetX );
                 this._drawAutoF( range, offsetX, offsetY );
-                this.objectRender.showDrawingObjectsEx( false, new GraphicOption( this, c_oAscGraphicOption.ScrollVertical, range, {
+                this.objectRender.showDrawingObjectsEx( false, new AscFormat.GraphicOption( this, c_oAscGraphicOption.ScrollVertical, range, {
                     offsetX: offsetX, offsetY: offsetY
                 } ) );
             }
@@ -6024,7 +6024,7 @@
             this._drawGrid( /*drawingCtx*/ undefined, range );
             this._drawCellsAndBorders( /*drawingCtx*/undefined, range );
             this._drawAutoF( range, offsetX, offsetY );
-            this.objectRender.showDrawingObjectsEx( false, new GraphicOption( this, c_oAscGraphicOption.ScrollHorizontal, range, {
+            this.objectRender.showDrawingObjectsEx( false, new AscFormat.GraphicOption( this, c_oAscGraphicOption.ScrollHorizontal, range, {
                 offsetX: offsetX, offsetY: offsetY
             } ) );
             if ( rFrozen ) {
@@ -6034,7 +6034,7 @@
                 this._drawGrid( /*drawingCtx*/ undefined, range, undefined, offsetY );
                 this._drawCellsAndBorders( /*drawingCtx*/undefined, range, undefined, offsetY );
                 this._drawAutoF( range, offsetX, offsetY );
-                this.objectRender.showDrawingObjectsEx( false, new GraphicOption( this, c_oAscGraphicOption.ScrollHorizontal, range, {
+                this.objectRender.showDrawingObjectsEx( false, new AscFormat.GraphicOption( this, c_oAscGraphicOption.ScrollHorizontal, range, {
                     offsetX: offsetX, offsetY: offsetY
                 } ) );
             }
@@ -6060,7 +6060,7 @@
 
     // x,y - абсолютные координаты относительно листа (без учета заголовков)
     WorksheetView.prototype.findCellByXY = function ( x, y, canReturnNull, skipCol, skipRow ) {
-        var r = 0, c = 0, tmpRow, tmpCol, result = new CCellObjectInfo();
+        var r = 0, c = 0, tmpRow, tmpCol, result = new AscFormat.CCellObjectInfo();
         if ( canReturnNull ) {
             result.col = result.row = null;
         }
@@ -10235,7 +10235,7 @@
         var isCheckChangeAutoFilter;
         var functionModelAction = null;
         var lockDraw = false;	// Параметр, при котором не будет отрисовки (т.к. мы просто обновляем информацию на неактивном листе)
-        var oChangeData = new CChangeTableData( null, null, null, null ); // Обновление для диаграмм
+        var oChangeData = new AscFormat.CChangeTableData( null, null, null, null ); // Обновление для диаграмм
 
         var onChangeWorksheetCallback = function ( isSuccess ) {
             if ( false === isSuccess ) {
@@ -11166,7 +11166,7 @@
             cell = this.model._getCellNoEmpty( row, col );
             if ( cell ) {
                 value = cell.getValue();
-                if ( !isNumber( value ) ) {
+                if ( !AscCommon.isNumber( value ) ) {
                     valueLowCase = value.toLowerCase();
                     if ( !objValues.hasOwnProperty( valueLowCase ) ) {
                         arrValues.push( value );
@@ -11696,7 +11696,7 @@
             this._updateSelectionNameAndInfo();
         }
 
-        this.objectRender.rebuildChartGraphicObjects( new CChangeTableData( null, null, null, null, arrChanged ) );
+        this.objectRender.rebuildChartGraphicObjects( new AscFormat.CChangeTableData( null, null, null, null, arrChanged ) );
         this.cellCommentator.updateCommentPosition();
         this.handlers.trigger( "onDocumentPlaceChanged" );
         this.draw( lockDraw );
@@ -12083,7 +12083,7 @@
             if ( this.objectRender && this.objectRender.drawingArea ) {
                 this.objectRender.drawingArea.reinitRanges();
             }
-            var oChangeData = new CChangeTableData( null, null, null, null ); // Обновление для диаграмм
+            var oChangeData = new AscFormat.CChangeTableData( null, null, null, null ); // Обновление для диаграмм
             oChangeData.change = new asc_Range( range.c1, 0, range.c2, gc_nMaxRow0 );
             this.objectRender.rebuildChartGraphicObjects( oChangeData );
             this.draw();

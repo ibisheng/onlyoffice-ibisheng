@@ -5966,7 +5966,7 @@
             var oThis = this;
             if ( c_oSerWorksheetsTypes.Drawing == type )
             {
-                var objectRender = new DrawingObjects();
+                var objectRender = new AscFormat.DrawingObjects();
                 var oFlags = {from: false, to: false, pos: false, ext: false};
                 var oNewDrawing = objectRender.createDrawingObject();
                 res = this.bcr.Read1(length, function(t, l) {

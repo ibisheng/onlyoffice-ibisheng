@@ -438,7 +438,7 @@ var UndoRedoDataTypes = new function() {
 			case this.StyleAlign: return new Align();break;
 			case this.CommentData: return new Asc.asc_CCommentData();break;
 			case this.CompositeCommentData: return new AscCommonExcel.CompositeCommentData();break;
-			case this.ChartSeriesData: return new asc_CChartSeria();break;
+			case this.ChartSeriesData: return new AscFormat.asc_CChartSeria();break;
 			case this.SheetAdd: return new UndoRedoData_SheetAdd();break;
 			case this.SheetRemove: return new UndoRedoData_SheetRemove();break;
 			case this.SheetPositions: return new UndoRedoData_SheetPositions();break;

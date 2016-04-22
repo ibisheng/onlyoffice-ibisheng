@@ -3442,14 +3442,14 @@ CShape.prototype =
     },
 
     getCardDirectionByNum: function (num) {
-        var num_north = this.getNumByCardDirection(CARD_DIRECTION_N);
+        var num_north = this.getNumByCardDirection(AscFormat.CARD_DIRECTION_N);
         var full_flip_h = this.getFullFlipH();
         var full_flip_v = this.getFullFlipV();
         var same_flip = !full_flip_h && !full_flip_v || full_flip_h && full_flip_v;
         if (same_flip)
-            return ((num - num_north) + CARD_DIRECTION_N + 8) % 8;
+            return ((num - num_north) + AscFormat.CARD_DIRECTION_N + 8) % 8;
 
-        return (CARD_DIRECTION_N - (num - num_north) + 8) % 8;
+        return (AscFormat.CARD_DIRECTION_N - (num - num_north) + 8) % 8;
     },
 
     getNumByCardDirection: function (cardDirection) {

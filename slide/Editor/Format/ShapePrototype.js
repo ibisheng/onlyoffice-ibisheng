@@ -126,7 +126,7 @@ function addToDrawings(worksheet, graphic, position, lockByDefault)
     }
     if(!drawingObjects)
     {
-        drawingObjects = new DrawingObjects();
+        drawingObjects = new AscFormat.DrawingObjects();
     }
 
     var drawingObject = drawingObjects.createDrawingObject();

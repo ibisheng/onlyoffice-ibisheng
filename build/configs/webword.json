@@ -29,6 +29,7 @@
 		"../common/Drawings/Format/TextBody.js",
         "../common/Charts/charts.js",
 		"../common/Charts/DrawingArea.js",
+		"../common/Charts/DrawingObjects.js",
 		
 		"../common/scroll.js",
 		"../common/Scrolls/iscroll.js",
@@ -49,7 +50,6 @@
         "../word/Drawing/translations.js",
         "../common/Charts/ChartsDrawer.js",
         "../common/Charts/3DTransformation.js",
-        "../common/Charts/DrawingObjects.js",
         "../common/Drawings/TrackObjects/AdjustmentTracks.js",
         "../common/Drawings/TrackObjects/MoveTracks.js",
         "../common/Drawings/TrackObjects/NewShapeTracks.js",

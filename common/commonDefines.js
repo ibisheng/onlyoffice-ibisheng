@@ -725,6 +725,38 @@ var c_oAscMouseMoveDataTypes = {
   LockedObject: 2
 };
 
+  // selection type
+  var c_oAscSelectionType = {
+    RangeCells: 1,
+    RangeCol: 2,
+    RangeRow: 3,
+    RangeMax: 4,
+    RangeImage: 5,
+    RangeChart: 6,
+    RangeShape: 7,
+    RangeShapeText: 8,
+    RangeChartText: 9,
+    RangeFrozen: 10
+  };
+  var c_oAscInsertOptions = {
+    InsertCellsAndShiftRight: 1,
+    InsertCellsAndShiftDown: 2,
+    InsertColumns: 3,
+    InsertRows: 4,
+    InsertTableRowAbove: 5,
+    InsertTableRowBelow: 6,
+    InsertTableColLeft: 7,
+    InsertTableColRight: 8
+  };
+
+  var c_oAscDeleteOptions = {
+    DeleteCellsAndShiftLeft: 1,
+    DeleteCellsAndShiftTop: 2,
+    DeleteColumns: 3,
+    DeleteRows: 4,
+    DeleteTable: 5
+  };
+
 
 // Print default options (in mm)
 var c_oAscPrintDefaultSettings = {
@@ -1299,6 +1331,35 @@ window['Asc']['c_oAscDocumentUnits'] = window['Asc'].c_oAscDocumentUnits = c_oAs
   prot['Point'] = prot.Point;
 window['Asc']['c_oAscMaxTooltipLength'] = window['Asc'].c_oAscMaxTooltipLength = c_oAscMaxTooltipLength;
 window['Asc']['c_oAscMaxCellOrCommentLength'] = window['Asc'].c_oAscMaxCellOrCommentLength = c_oAscMaxCellOrCommentLength;
+  window['Asc']['c_oAscSelectionType'] = window['Asc'].c_oAscSelectionType = c_oAscSelectionType;
+  prot = c_oAscSelectionType;
+  prot['RangeCells'] = prot.RangeCells;
+  prot['RangeCol'] = prot.RangeCol;
+  prot['RangeRow'] = prot.RangeRow;
+  prot['RangeMax'] = prot.RangeMax;
+  prot['RangeImage'] = prot.RangeImage;
+  prot['RangeChart'] = prot.RangeChart;
+  prot['RangeShape'] = prot.RangeShape;
+  prot['RangeShapeText'] = prot.RangeShapeText;
+  prot['RangeChartText'] = prot.RangeChartText;
+  prot['RangeFrozen'] = prot.RangeFrozen;
+  window['Asc']['c_oAscInsertOptions'] = window['Asc'].c_oAscInsertOptions = c_oAscInsertOptions;
+  prot = c_oAscInsertOptions;
+  prot['InsertCellsAndShiftRight'] = prot.InsertCellsAndShiftRight;
+  prot['InsertCellsAndShiftDown'] = prot.InsertCellsAndShiftDown;
+  prot['InsertColumns'] = prot.InsertColumns;
+  prot['InsertRows'] = prot.InsertRows;
+  prot['InsertTableRowAbove'] = prot.InsertTableRowAbove;
+  prot['InsertTableRowBelow'] = prot.InsertTableRowBelow;
+  prot['InsertTableColLeft'] = prot.InsertTableColLeft;
+  prot['InsertTableColRight'] = prot.InsertTableColRight;
+  window['Asc']['c_oAscDeleteOptions'] = window['Asc'].c_oAscDeleteOptions = c_oAscDeleteOptions;
+  prot = c_oAscDeleteOptions;
+  prot['DeleteCellsAndShiftLeft'] = prot.DeleteCellsAndShiftLeft;
+  prot['DeleteCellsAndShiftTop'] = prot.DeleteCellsAndShiftTop;
+  prot['DeleteColumns'] = prot.DeleteColumns;
+  prot['DeleteRows'] = prot.DeleteRows;
+  prot['DeleteTable'] = prot.DeleteTable;
 
   window['AscCommon'] = window['AscCommon'] || {};
   window["AscCommon"].g_cCharDelimiter = g_cCharDelimiter;

@@ -1,8 +1,11 @@
 "use strict";
 
-if ( !window["Asc"] ) {		// Для вставки диаграмм в Word
-    window["Asc"] = {};
-}
+(
+/**
+* @param {Window} window
+* @param {undefined} undefined
+*/
+function (window, undefined) {
 
 // Import
 var c_oAscCellAnchorType = AscCommon.c_oAscCellAnchorType;
@@ -18,14 +21,6 @@ var c_oAscSelectionType = Asc.c_oAscSelectionType;
 
 function isObject(what) {
     return ( (what != null) && (typeof(what) == "object") );
-}
-
-function isNumber(n) {
-    return !isNaN(parseFloat(n)) && isFinite(n);
-}
-
-function isNullOrEmptyString(str) {
-    return (str == undefined) || (str == null) || (str == "");
 }
 
 function DrawingBounds(minX, maxX, minY, maxY)
@@ -57,12 +52,6 @@ function CCellObjectInfo () {
 	this.rowOffPx = 0;
 }
 
-
-//{ ASC Classes
-
-//-----------------------------------------------------------------------------------
-// Chart style
-//-----------------------------------------------------------------------------------
 /** @constructor */
 function asc_CChartStyle() {
     this.style = null;
@@ -77,21 +66,6 @@ asc_CChartStyle.prototype = {
     asc_setImageUrl: function(imageUrl) { this.imageUrl = imageUrl; }
 };
 
-//{ asc_CChartStyle export
-window["Asc"].asc_CChartStyle = asc_CChartStyle;
-window["Asc"]["asc_CChartStyle"] = asc_CChartStyle;
-var prot = asc_CChartStyle.prototype;
-
-prot["asc_getStyle"] = prot.asc_getStyle;
-prot["asc_setStyle"] = prot.asc_setStyle;
-
-prot["asc_getImageUrl"] = prot.asc_getImageUrl;
-prot["asc_setImageUrl"] = prot.asc_setImageUrl;
-//}
-
-//-----------------------------------------------------------------------------------
-// Chart translate
-//-----------------------------------------------------------------------------------
 /** @constructor */
 function asc_CChartTranslate() {
 
@@ -116,27 +90,6 @@ asc_CChartTranslate.prototype = {
     asc_setSeries: function(val) { this.series = val; }
 };
 
-//{ asc_CChartTranslate export
-window["Asc"].asc_CChartTranslate = asc_CChartTranslate;
-window["Asc"]["asc_CChartTranslate"] = asc_CChartTranslate;
-prot = asc_CChartTranslate.prototype;
-
-prot["asc_getTitle"] = prot.asc_getTitle;
-prot["asc_setTitle"] = prot.asc_setTitle;
-
-prot["asc_getXAxis"] = prot.asc_getXAxis;
-prot["asc_setXAxis"] = prot.asc_setXAxis;
-
-prot["asc_getYAxis"] = prot.asc_getYAxis;
-prot["asc_setYAxis"] = prot.asc_setYAxis;
-
-prot["asc_getSeries"] = prot.asc_getSeries;
-prot["asc_setSeries"] = prot.asc_setSeries;
-//}
-
-//-----------------------------------------------------------------------------------
-// Chart binary
-//-----------------------------------------------------------------------------------
 /** @constructor */
 function asc_CChartBinary(chart) {
 
@@ -225,22 +178,6 @@ asc_CChartBinary.prototype = {
 
 };
 
-//{ asc_CChartBinary export
-window["Asc"].asc_CChartBinary = asc_CChartBinary;
-window["Asc"]["asc_CChartBinary"] = asc_CChartBinary;
-prot = asc_CChartBinary.prototype;
-
-prot["asc_getBinary"] = prot.asc_getBinary;
-prot["asc_setBinary"] = prot.asc_setBinary;
-prot["asc_getThemeBinary"] = prot.asc_getThemeBinary;
-prot["asc_setThemeBinary"] = prot.asc_setThemeBinary;
-prot["asc_setColorMapBinary"] = prot.asc_setColorMapBinary;
-prot["asc_getColorMapBinary"] = prot.asc_getColorMapBinary;
-//}
-
-//-----------------------------------------------------------------------------------
-// Chart series
-//-----------------------------------------------------------------------------------
 /** @constructor */
 function asc_CChartSeria() {
     this.Val = { Formula: "", NumCache: [] };
@@ -278,38 +215,6 @@ asc_CChartSeria.prototype = {
     asc_getFormatCode: function() { return this.FormatCode; },
     asc_setFormatCode: function(format) { this.FormatCode = format; }
 };
-
-//{ asc_CChartSeria export
-window["Asc"].asc_CChartSeria = asc_CChartSeria;
-window["Asc"]["asc_CChartSeria"] = asc_CChartSeria;
-prot = asc_CChartSeria.prototype;
-
-prot["asc_getValFormula"] = prot.asc_getValFormula;
-prot["asc_setValFormula"] = prot.asc_setValFormula;
-
-prot["asc_getxValFormula"] = prot.asc_getxValFormula;
-prot["asc_setxValFormula"] = prot.asc_setxValFormula;
-
-prot["asc_getCatFormula"] = prot.asc_getCatFormula;
-prot["asc_setCatFormula"] = prot.asc_setCatFormula;
-
-prot["asc_getTitle"] = prot.asc_getTitle;
-prot["asc_setTitle"] = prot.asc_setTitle;
-
-prot["asc_getTitleFormula"] = prot.asc_getTitleFormula;
-prot["asc_setTitleFormula"] = prot.asc_setTitleFormula;
-
-prot["asc_getMarkerSize"] = prot.asc_getMarkerSize;
-prot["asc_setMarkerSize"] = prot.asc_setMarkerSize;
-
-prot["asc_getMarkerSymbol"] = prot.asc_getMarkerSymbol;
-prot["asc_setMarkerSymbol"] = prot.asc_setMarkerSymbol;
-
-prot["asc_getFormatCode"] = prot.asc_getFormatCode;
-prot["asc_setFormatCode"] = prot.asc_setFormatCode;
-//}
-
-
 
 var nSparklineMultiplier = 3.75;
 
@@ -3287,7 +3192,7 @@ function DrawingObjects() {
         var objectProperties = props;
 
 		var _img;
-        if ( !isNullOrEmptyString(objectProperties.ImageUrl) ) {
+        if ( !AscCommon.isNullOrEmptyString(objectProperties.ImageUrl) ) {
             _img = api.ImageLoader.LoadImage(objectProperties.ImageUrl, 1);
 
             if (null != _img) {
@@ -3301,7 +3206,7 @@ function DrawingObjects() {
             }
         }
         else if ( objectProperties.ShapeProperties && objectProperties.ShapeProperties.fill && objectProperties.ShapeProperties.fill.fill &&
-            !isNullOrEmptyString(objectProperties.ShapeProperties.fill.fill.url) ) {
+            !AscCommon.isNullOrEmptyString(objectProperties.ShapeProperties.fill.fill.url) ) {
 
             if (window['IS_NATIVE_EDITOR']) {
                 _this.controller.setGraphicObjectProps( objectProperties );
@@ -3977,26 +3882,60 @@ function CoordsManager(ws) {
     }
 }
 
-//{ Common
+    //--------------------------------------------------------export----------------------------------------------------
+    var prot;
+    window['AscFormat'] = window['AscFormat'] || {};
+    window['AscFormat'].isObject = isObject;
+    window['AscFormat'].CCellObjectInfo = CCellObjectInfo;
 
+    window["AscFormat"].asc_CChartStyle = asc_CChartStyle;
+    prot = asc_CChartStyle.prototype;
+    prot["asc_getStyle"] = prot.asc_getStyle;
+    prot["asc_setStyle"] = prot.asc_setStyle;
+    prot["asc_getImageUrl"] = prot.asc_getImageUrl;
+    prot["asc_setImageUrl"] = prot.asc_setImageUrl;
 
+    window["Asc"]["asc_CChartTranslate"] = window["Asc"].asc_CChartTranslate = asc_CChartTranslate;
+    prot = asc_CChartTranslate.prototype;
+    prot["asc_getTitle"] = prot.asc_getTitle;
+    prot["asc_setTitle"] = prot.asc_setTitle;
+    prot["asc_getXAxis"] = prot.asc_getXAxis;
+    prot["asc_setXAxis"] = prot.asc_setXAxis;
+    prot["asc_getYAxis"] = prot.asc_getYAxis;
+    prot["asc_setYAxis"] = prot.asc_setYAxis;
+    prot["asc_getSeries"] = prot.asc_getSeries;
+    prot["asc_setSeries"] = prot.asc_setSeries;
 
+    window["Asc"]["asc_CChartBinary"] = window["Asc"].asc_CChartBinary = asc_CChartBinary;
+    prot = asc_CChartBinary.prototype;
+    prot["asc_getBinary"] = prot.asc_getBinary;
+    prot["asc_setBinary"] = prot.asc_setBinary;
+    prot["asc_getThemeBinary"] = prot.asc_getThemeBinary;
+    prot["asc_setThemeBinary"] = prot.asc_setThemeBinary;
+    prot["asc_setColorMapBinary"] = prot.asc_setColorMapBinary;
+    prot["asc_getColorMapBinary"] = prot.asc_getColorMapBinary;
 
-var CARD_DIRECTION_N = 0;
-var CARD_DIRECTION_NE = 1;
-var CARD_DIRECTION_E = 2;
-var CARD_DIRECTION_SE = 3;
-var CARD_DIRECTION_S = 4;
-var CARD_DIRECTION_SW = 5;
-var CARD_DIRECTION_W = 6;
-var CARD_DIRECTION_NW = 7;
+    window["AscFormat"].asc_CChartSeria = asc_CChartSeria;
+    prot = asc_CChartSeria.prototype;
+    prot["asc_getValFormula"] = prot.asc_getValFormula;
+    prot["asc_setValFormula"] = prot.asc_setValFormula;
+    prot["asc_getxValFormula"] = prot.asc_getxValFormula;
+    prot["asc_setxValFormula"] = prot.asc_setxValFormula;
+    prot["asc_getCatFormula"] = prot.asc_getCatFormula;
+    prot["asc_setCatFormula"] = prot.asc_setCatFormula;
+    prot["asc_getTitle"] = prot.asc_getTitle;
+    prot["asc_setTitle"] = prot.asc_setTitle;
+    prot["asc_getTitleFormula"] = prot.asc_getTitleFormula;
+    prot["asc_setTitleFormula"] = prot.asc_setTitleFormula;
+    prot["asc_getMarkerSize"] = prot.asc_getMarkerSize;
+    prot["asc_setMarkerSize"] = prot.asc_setMarkerSize;
+    prot["asc_getMarkerSymbol"] = prot.asc_getMarkerSymbol;
+    prot["asc_setMarkerSymbol"] = prot.asc_setMarkerSymbol;
+    prot["asc_getFormatCode"] = prot.asc_getFormatCode;
+    prot["asc_setFormatCode"] = prot.asc_setFormatCode;
 
-var CURSOR_TYPES_BY_CARD_DIRECTION = [];
-CURSOR_TYPES_BY_CARD_DIRECTION[CARD_DIRECTION_N]  = "n-resize";
-CURSOR_TYPES_BY_CARD_DIRECTION[CARD_DIRECTION_NE] = "ne-resize";
-CURSOR_TYPES_BY_CARD_DIRECTION[CARD_DIRECTION_E]  = "e-resize";
-CURSOR_TYPES_BY_CARD_DIRECTION[CARD_DIRECTION_SE] = "se-resize";
-CURSOR_TYPES_BY_CARD_DIRECTION[CARD_DIRECTION_S]  = "s-resize";
-CURSOR_TYPES_BY_CARD_DIRECTION[CARD_DIRECTION_SW] = "sw-resize";
-CURSOR_TYPES_BY_CARD_DIRECTION[CARD_DIRECTION_W]  = "w-resize";
-CURSOR_TYPES_BY_CARD_DIRECTION[CARD_DIRECTION_NW] = "nw-resize";
+    window["AscFormat"].CChangeTableData = CChangeTableData;
+    window["AscFormat"].GraphicOption = GraphicOption;
+    window["AscFormat"].DrawingObjects = DrawingObjects;
+    window["AscFormat"].ClickCounter = ClickCounter;
+})(window);

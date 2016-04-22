@@ -2242,7 +2242,7 @@ CTableId.prototype.Load_Changes = function(Reader, Reader2)
                 var oWsModel = window["Asc"]["editor"].wbModel.aWorksheets[0];
                 if(oWsModel)
                 {
-                    var objectRender = new DrawingObjects();
+                    var objectRender = new AscFormat.DrawingObjects();
                     var oNewDrawing = objectRender.createDrawingObject(AscCommon.c_oAscCellAnchorType.cellanchorAbsolute);
                     var oImage = AscFormat.DrawingObjectsController.prototype.createWatermarkImage(sUrl);
                     oNewDrawing.ext.cx = oImage.spPr.xfrm.extX;
@@ -2596,6 +2596,11 @@ function getUserColorById(userId, userName, isDark, isNumericValue)
     var oColor = true === isDark ? res.Dark : res.Light;
     return true === isNumericValue ? ((oColor.r << 16) & 0xFF0000) | ((oColor.g << 8) & 0xFF00) | (oColor.b & 0xFF) : oColor;
 }
+  
+  function isNullOrEmptyString(str) {
+    return (str == undefined) || (str == null) || (str == "");
+  }
+  
 function CUserCacheColor(nColor)
 {
   this.Light = null;
@@ -2662,6 +2667,7 @@ window["SetDoctRendererParams"] = function(_params)
   window["AscCommon"].prepareUrl = prepareUrl;
   window["AscCommon"].extendClass = extendClass;
   window["AscCommon"].getUserColorById = getUserColorById;
+  window["AscCommon"].isNullOrEmptyString = isNullOrEmptyString;
 
   window["AscCommon"].DocumentUrls = DocumentUrls;
   window["AscCommon"].CLock = CLock;

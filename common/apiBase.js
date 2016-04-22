@@ -65,7 +65,7 @@ function baseEditorsApi(name) {
   this.isDocumentCanSave = false;			// Флаг, говорит о возможности сохранять документ (активна кнопка save или нет)
 
   // Chart
-  this.chartTranslate = new asc_CChartTranslate();
+  this.chartTranslate = new Asc.asc_CChartTranslate();
   this.textArtTranslate = new Asc.asc_TextArtTranslate();
   this.chartPreviewManager = new AscCommon.ChartPreviewManager();
   this.textArtPreviewManager = new AscCommon.TextArtPreviewManager();

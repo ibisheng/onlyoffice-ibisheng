@@ -26,6 +26,7 @@
 		"../common/Drawings/Format/TextBody.js",
         "../common/Charts/charts.js",
 		"../common/Charts/DrawingArea.js",
+		"../common/Charts/DrawingObjects.js",
 		
 		"../common/scroll.js",
 
@@ -39,7 +40,6 @@
         "../word/Drawing/Externals.js",
         "../common/GlobalLoaders.js",
         "../slide/Drawing/ThemeLoader.js",
-        "../common/Charts/DrawingObjects.js",
         "../common/SerializeCommonWordExcel.js",
         "../common/SerializeChart.js",
         "../common/Charts/ChartsDrawer.js",

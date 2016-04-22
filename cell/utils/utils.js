@@ -875,11 +875,6 @@
 			else
 				return val.replace(/^\s+|\s+$/g,'');  
 		}
-		
-		function isNumber(val) {
-			var valTrim = trim(val);
-			return (valTrim - 0) == valTrim && valTrim.length > 0;
-		}
 
 		function isNumberInfinity(val) {
 		    var valTrim = trim(val);
@@ -1549,7 +1544,7 @@
 		/*
 		 * Export
 		 * -----------------------------------------------------------------------------
-		 */
+		 */		
 		window["Asc"].applyFunction = applyFunction;
 		window["Asc"].typeOf = typeOf;
 		window["Asc"].lastIndexOf = lastIndexOf;
@@ -1562,7 +1557,6 @@
 		window["Asc"].incDecFonSize = incDecFonSize;
 		window["Asc"].outputDebugStr = outputDebugStr;
 		window["Asc"].profileTime = profileTime;
-		window["Asc"].isNumber = isNumber;
 		window["Asc"].isNumberInfinity = isNumberInfinity;
 		window["Asc"].trim = trim;
 		window["Asc"].arrayToLowerCase = arrayToLowerCase;

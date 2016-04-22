@@ -39,25 +39,6 @@ var c_oAscSortOptions = {
   Descending: 2
 };
 
-var c_oAscInsertOptions = {
-  InsertCellsAndShiftRight: 1,
-  InsertCellsAndShiftDown: 2,
-  InsertColumns: 3,
-  InsertRows: 4,
-  InsertTableRowAbove: 5,
-  InsertTableRowBelow: 6,
-  InsertTableColLeft: 7,
-  InsertTableColRight: 8
-};
-
-var c_oAscDeleteOptions = {
-  DeleteCellsAndShiftLeft: 1,
-  DeleteCellsAndShiftTop: 2,
-  DeleteColumns: 3,
-  DeleteRows: 4,
-  DeleteTable: 5
-};
-
 var c_oAscBorderOptions = {
   Top: 0,
   Right: 1,
@@ -82,20 +63,6 @@ var c_oAscDrawDepOptions = {
   Master: 0,
   Slave: 1,
   Clear: 2
-};
-
-// selection type
-var c_oAscSelectionType = {
-  RangeCells: 1,
-  RangeCol: 2,
-  RangeRow: 3,
-  RangeMax: 4,
-  RangeImage: 5,
-  RangeChart: 6,
-  RangeShape: 7,
-  RangeShapeText: 8,
-  RangeChartText: 9,
-  RangeFrozen: 10
 };
 
 var c_oAscSelectionDialogType = {
@@ -332,23 +299,6 @@ var c_oAscPopUpSelectorType = {
   prot['Merge'] = prot.Merge;
   prot['MergeCenter'] = prot.MergeCenter;
   prot['MergeAcross'] = prot.MergeAcross;
-  window['Asc']['c_oAscInsertOptions'] = window['Asc'].c_oAscInsertOptions = c_oAscInsertOptions;
-  prot = c_oAscInsertOptions;
-  prot['InsertCellsAndShiftRight'] = prot.InsertCellsAndShiftRight;
-  prot['InsertCellsAndShiftDown'] = prot.InsertCellsAndShiftDown;
-  prot['InsertColumns'] = prot.InsertColumns;
-  prot['InsertRows'] = prot.InsertRows;
-  prot['InsertTableRowAbove'] = prot.InsertTableRowAbove;
-  prot['InsertTableRowBelow'] = prot.InsertTableRowBelow;
-  prot['InsertTableColLeft'] = prot.InsertTableColLeft;
-  prot['InsertTableColRight'] = prot.InsertTableColRight;
-  window['Asc']['c_oAscDeleteOptions'] = window['Asc'].c_oAscDeleteOptions = c_oAscDeleteOptions;
-  prot = c_oAscDeleteOptions;
-  prot['DeleteCellsAndShiftLeft'] = prot.DeleteCellsAndShiftLeft;
-  prot['DeleteCellsAndShiftTop'] = prot.DeleteCellsAndShiftTop;
-  prot['DeleteColumns'] = prot.DeleteColumns;
-  prot['DeleteRows'] = prot.DeleteRows;
-  prot['DeleteTable'] = prot.DeleteTable;
   window['Asc']['c_oAscBorderOptions'] = window['Asc'].c_oAscBorderOptions = c_oAscBorderOptions;
   prot = c_oAscBorderOptions;
   prot['Top'] = prot.Top;
@@ -367,18 +317,6 @@ var c_oAscPopUpSelectorType = {
   prot['Formula'] = prot.Formula;
   prot['Comments'] = prot.Comments;
   prot['Hyperlinks'] = prot.Hyperlinks;
-  window['Asc']['c_oAscSelectionType'] = window['Asc'].c_oAscSelectionType = c_oAscSelectionType;
-  prot = c_oAscSelectionType;
-  prot['RangeCells'] = prot.RangeCells;
-  prot['RangeCol'] = prot.RangeCol;
-  prot['RangeRow'] = prot.RangeRow;
-  prot['RangeMax'] = prot.RangeMax;
-  prot['RangeImage'] = prot.RangeImage;
-  prot['RangeChart'] = prot.RangeChart;
-  prot['RangeShape'] = prot.RangeShape;
-  prot['RangeShapeText'] = prot.RangeShapeText;
-  prot['RangeChartText'] = prot.RangeChartText;
-  prot['RangeFrozen'] = prot.RangeFrozen;
   window['Asc']['c_oAscSelectionDialogType'] = window['Asc'].c_oAscSelectionDialogType = c_oAscSelectionDialogType;
   prot = c_oAscSelectionDialogType;
   prot['None'] = prot.None;

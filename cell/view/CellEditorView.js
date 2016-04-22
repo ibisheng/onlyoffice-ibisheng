@@ -159,7 +159,7 @@
 		this._formula = null;
 
 		// Обработчик кликов
-		this.clickCounter = new ClickCounter();
+		this.clickCounter = new AscFormat.ClickCounter();
 
 		this._init( settings );
 
@@ -321,7 +321,7 @@
 				// Делаем замену текста на автодополнение, если есть select и текст полностью совпал.
 				if (this.selectionBegin !== this.selectionEnd && !isFormula) {
 					var s = this._getFragmentsText(this.options.fragments);
-					if (!isNumber(s)) {
+					if (!AscCommon.isNumber(s)) {
 						var arrAutoComplete = this._getAutoComplete(s.toLowerCase());
 						if (1 === arrAutoComplete.length) {
 							var newValue = arrAutoComplete[0];
@@ -2554,7 +2554,7 @@
 		var newChar = String.fromCharCode( event.which );
 		t._addChars( newChar );
 		// При первом быстром вводе стоит добавить в конце проценты (для процентного формата и только для числа)
-		if ( t.options.isAddPersentFormat && isNumber( newChar ) ) {
+		if ( t.options.isAddPersentFormat && AscCommon.isNumber( newChar ) ) {
 			t.options.isAddPersentFormat = false;
 			tmpCursorPos = t.cursorPos;
 			t.undoMode = true;
@@ -2565,7 +2565,7 @@
 		}
 		if ( t.textRender.getEndOfText() === t.cursorPos && !t.isFormula() ) {
 			var s = t._getFragmentsText( t.options.fragments );
-			if ( !isNumber( s ) ) {
+			if ( !AscCommon.isNumber( s ) ) {
 				var arrAutoComplete = t._getAutoComplete( s.toLowerCase() );
 				var lengthInput = s.length;
 				if ( 1 === arrAutoComplete.length ) {

@@ -50,6 +50,25 @@ var DISTANCE_TO_TEXT_LEFTRIGHT = 3.2;
     var SCATTER_STYLE_SMOOTH = 4;
     var SCATTER_STYLE_SMOOTH_MARKER = 5;
 
+    var CARD_DIRECTION_N = 0;
+    var CARD_DIRECTION_NE = 1;
+    var CARD_DIRECTION_E = 2;
+    var CARD_DIRECTION_SE = 3;
+    var CARD_DIRECTION_S = 4;
+    var CARD_DIRECTION_SW = 5;
+    var CARD_DIRECTION_W = 6;
+    var CARD_DIRECTION_NW = 7;
+
+    var CURSOR_TYPES_BY_CARD_DIRECTION = [];
+    CURSOR_TYPES_BY_CARD_DIRECTION[CARD_DIRECTION_N]  = "n-resize";
+    CURSOR_TYPES_BY_CARD_DIRECTION[CARD_DIRECTION_NE] = "ne-resize";
+    CURSOR_TYPES_BY_CARD_DIRECTION[CARD_DIRECTION_E]  = "e-resize";
+    CURSOR_TYPES_BY_CARD_DIRECTION[CARD_DIRECTION_SE] = "se-resize";
+    CURSOR_TYPES_BY_CARD_DIRECTION[CARD_DIRECTION_S]  = "s-resize";
+    CURSOR_TYPES_BY_CARD_DIRECTION[CARD_DIRECTION_SW] = "sw-resize";
+    CURSOR_TYPES_BY_CARD_DIRECTION[CARD_DIRECTION_W]  = "w-resize";
+    CURSOR_TYPES_BY_CARD_DIRECTION[CARD_DIRECTION_NW] = "nw-resize";
+
     function removeDPtsFromSeries(series)
     {
         if(Array.isArray(series.dPt))
@@ -4311,7 +4330,7 @@ DrawingObjectsController.prototype =
             var bIsScatter = (c_oAscChartTypeSettings.scatter <= type && type <= c_oAscChartTypeSettings.scatterSmoothMarker);
 
             Cat = { Formula: "Sheet1!$A$2:$A$7", NumCache: [createItem("USA"), createItem("CHN"), createItem("RUS"), createItem("GBR"), createItem("GER"), createItem("JPN")] };
-            seria = new asc_CChartSeria();
+            seria = new AscFormat.asc_CChartSeria();
             seria.Val.Formula = "Sheet1!$B$2:$B$7";
             seria.Val.NumCache = [ createItem(46), createItem(38), createItem(24), createItem(29), createItem(11), createItem(7) ];
             seria.TxCache.Formula = "Sheet1!$B$1";
@@ -4322,7 +4341,7 @@ DrawingObjectsController.prototype =
                 seria.xVal = Cat;
             series.push(seria);
 
-            seria = new asc_CChartSeria();
+            seria = new AscFormat.asc_CChartSeria();
             seria.Val.Formula = "Sheet1!$C$2:$C$7";
             seria.Val.NumCache = [ createItem(29), createItem(27), createItem(26), createItem(17), createItem(19), createItem(14) ];
             seria.TxCache.Formula = "Sheet1!$C$1";
@@ -4333,7 +4352,7 @@ DrawingObjectsController.prototype =
                 seria.xVal = Cat;
             series.push(seria);
 
-            seria = new asc_CChartSeria();
+            seria = new AscFormat.asc_CChartSeria();
             seria.Val.Formula = "Sheet1!$D$2:$D$7";
             seria.Val.NumCache = [ createItem(29), createItem(23), createItem(32), createItem(19), createItem(14), createItem(17) ];
             seria.TxCache.Formula = "Sheet1!$D$1";
@@ -4349,7 +4368,7 @@ DrawingObjectsController.prototype =
         else
         {
             Cat = { Formula: "Sheet1!$A$2:$A$6", NumCache: [createItem2(38719, "d\-mmm\-yy"), createItem2(38720, "d\-mmm\-yy"), createItem2(38721, "d\-mmm\-yy"), createItem2(38722, "d\-mmm\-yy"), createItem2(38723, "d\-mmm\-yy")], formatCode: "d\-mmm\-yy" };
-            seria = new asc_CChartSeria();
+            seria = new AscFormat.asc_CChartSeria();
             seria.Val.Formula = "Sheet1!$B$2:$B$6";
             seria.Val.NumCache = [ createItem(40), createItem(21), createItem(37), createItem(49), createItem(32)];
             seria.TxCache.Formula = "Sheet1!$B$1";
@@ -4357,7 +4376,7 @@ DrawingObjectsController.prototype =
             seria.Cat = Cat;
             series.push(seria);
 
-            seria = new asc_CChartSeria();
+            seria = new AscFormat.asc_CChartSeria();
             seria.Val.Formula = "Sheet1!$C$2:$C$6";
             seria.Val.NumCache = [ createItem(57), createItem(54), createItem(52), createItem(59), createItem(34)];
             seria.TxCache.Formula = "Sheet1!$C$1";
@@ -4365,7 +4384,7 @@ DrawingObjectsController.prototype =
             seria.Cat = Cat;
             series.push(seria);
 
-            seria = new asc_CChartSeria();
+            seria = new AscFormat.asc_CChartSeria();
             seria.Val.Formula = "Sheet1!$D$2:$D$6";
             seria.Val.NumCache = [ createItem(10), createItem(14), createItem(14), createItem(12), createItem(6)];
             seria.TxCache.Formula = "Sheet1!$D$1";
@@ -4373,7 +4392,7 @@ DrawingObjectsController.prototype =
             seria.Cat = Cat;
             series.push(seria);
 
-            seria = new asc_CChartSeria();
+            seria = new AscFormat.asc_CChartSeria();
             seria.Val.Formula = "Sheet1!$E$2:$E$6";
             seria.Val.NumCache = [ createItem(24), createItem(35), createItem(48), createItem(35), createItem(15)];
             seria.TxCache.Formula = "Sheet1!$E$1";
@@ -8740,6 +8759,7 @@ function getAbsoluteRectBoundsArr(aDrawings)
     window['AscFormat'].SCATTER_STYLE_NONE = SCATTER_STYLE_NONE;
     window['AscFormat'].SCATTER_STYLE_SMOOTH = SCATTER_STYLE_SMOOTH;
     window['AscFormat'].SCATTER_STYLE_SMOOTH_MARKER = SCATTER_STYLE_SMOOTH_MARKER;
+    window['AscFormat'].CARD_DIRECTION_N = CARD_DIRECTION_N;
     window['AscFormat'].removeDPtsFromSeries = removeDPtsFromSeries;
     window['AscFormat'].checkTxBodyDefFonts = checkTxBodyDefFonts;
     window['AscFormat'].CheckShapeBodyAutoFitReset = CheckShapeBodyAutoFitReset;

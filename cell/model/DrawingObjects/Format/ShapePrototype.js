@@ -127,7 +127,7 @@ function addToDrawings(worksheet, graphic, position, lockByDefault, anchor)
     }
     if(!drawingObjects)
     {
-        drawingObjects = new DrawingObjects();
+        drawingObjects = new AscFormat.DrawingObjects();
     }
     var oldDrawingBase = graphic.drawingBase;
 
