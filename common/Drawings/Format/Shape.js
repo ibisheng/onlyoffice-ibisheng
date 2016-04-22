@@ -8,6 +8,8 @@
 function (window, undefined) {
 
 // Import
+var g_memory = AscFonts.g_memory;
+    
 var c_oAscSizeRelFromH = AscCommon.c_oAscSizeRelFromH;
 var c_oAscSizeRelFromV = AscCommon.c_oAscSizeRelFromV;
 

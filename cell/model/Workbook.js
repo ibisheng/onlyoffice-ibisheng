@@ -1,6 +1,8 @@
 "use strict";
 
 // Import
+var g_memory = AscFonts.g_memory;
+
 var CellValueType = AscCommon.CellValueType;
 var c_oAscBorderStyles = AscCommon.c_oAscBorderStyles;
 var fSortAscending = AscCommon.fSortAscending;

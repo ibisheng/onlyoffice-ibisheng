@@ -1,5 +1,22 @@
 "use strict";
 
+// Import
+var FT_Get_Sfnt_Table = AscFonts.FT_Get_Sfnt_Table;
+var FT_Matrix = AscFonts.FT_Matrix;
+var FT_Set_Char_Size = AscFonts.FT_Set_Char_Size;
+var FT_Set_Transform = AscFonts.FT_Set_Transform;
+var __FT_CharmapRec = AscFonts.__FT_CharmapRec;
+var FT_Set_Charmap = AscFonts.FT_Set_Charmap;
+var FT_Get_Char_Index = AscFonts.FT_Get_Char_Index;
+var FT_Load_Glyph = AscFonts.FT_Load_Glyph;
+var FT_Get_Glyph = AscFonts.FT_Get_Glyph;
+var FT_BBox = AscFonts.FT_BBox;
+var FT_Glyph_Get_CBox = AscFonts.FT_Glyph_Get_CBox;
+var FT_Done_Glyph = AscFonts.FT_Done_Glyph;
+var FT_Outline_Decompose = AscFonts.FT_Outline_Decompose;
+var FT_Render_Glyph = AscFonts.FT_Render_Glyph;
+var raster_memory = AscFonts.raster_memory;
+
 function CCMapIndex()
 {
     this.index = 0;

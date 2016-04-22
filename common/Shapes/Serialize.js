@@ -1,6 +1,8 @@
 "use strict";
 
 // Import
+var g_memory = AscFonts.g_memory;
+
 var c_oAscShdClear = Asc.c_oAscShdClear;
 var c_oAscColor = Asc.c_oAscColor;
 var c_oAscFill = Asc.c_oAscFill;

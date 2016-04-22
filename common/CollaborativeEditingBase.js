@@ -6,6 +6,8 @@
  * Time: 12:01
  */
 
+// Import
+var g_memory = AscFonts.g_memory;
 
 var FOREIGN_CURSOR_LABEL_HIDETIME = 1500;
 

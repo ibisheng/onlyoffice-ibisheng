@@ -1,4 +1,5 @@
 "use strict";
+var g_memory = AscFonts.g_memory;
 
 function CPageMeta()
 {

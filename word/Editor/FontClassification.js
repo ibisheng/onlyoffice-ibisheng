@@ -1,5 +1,8 @@
 "use strict";
 
+// Import
+var g_memory = AscFonts.g_memory;
+
 var fontslot_ASCII    = 0x00;
 var fontslot_EastAsia = 0x01;
 var fontslot_CS       = 0x02;

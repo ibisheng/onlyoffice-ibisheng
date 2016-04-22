@@ -23,6 +23,9 @@ var History = {};
 window["Asc"] = {};
 var Asc = window["Asc"];
 
+window["AscFonts"] = {};
+var AscFonts = window["AscFonts"];
+
 window["AscCommon"] = {};
 var AscCommon = window["AscCommon"];
 

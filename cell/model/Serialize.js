@@ -2,6 +2,7 @@
 (function(window, undefined) {
 
       // Import
+      var g_memory = AscFonts.g_memory;
       var CellValueType = AscCommon.CellValueType;
       var c_oAscCellAnchorType = AscCommon.c_oAscCellAnchorType;
       var c_oAscBorderStyles = AscCommon.c_oAscBorderStyles;

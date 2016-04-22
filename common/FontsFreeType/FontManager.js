@@ -1,6 +1,11 @@
 "use strict";
 
 // Import
+var FT_Open_Args = AscFonts.FT_Open_Args;
+var FT_Library = AscFonts.FT_Library;
+var FT_Set_Char_Size = AscFonts.FT_Set_Char_Size;
+var raster_memory = AscFonts.raster_memory;
+
 var AscBrowser = AscCommon.AscBrowser;
 
 var g_bIsAppleDevices = AscBrowser.isAppleDevices;

@@ -1,5 +1,7 @@
 "use strict";
 
+(function(window, undefined){
+
 function _FT_Common()
 {
 
@@ -41817,3 +41819,26 @@ function FT_CMap_New(clazz, init_data, charmap)
     return cmap;
 }
 
+  //--------------------------------------------------------export----------------------------------------------------
+  window['AscFonts'] = window['AscFonts'] || {};
+  window['AscFonts'].FT_Common = FT_Common;
+  window['AscFonts'].FT_Stream = FT_Stream;
+  window['AscFonts'].g_memory = g_memory;
+  window['AscFonts'].FT_Get_Sfnt_Table = FT_Get_Sfnt_Table;
+  window['AscFonts'].FT_BBox = FT_BBox;
+  window['AscFonts'].FT_Matrix = FT_Matrix;
+  window['AscFonts'].FT_Open_Args = FT_Open_Args;
+  window['AscFonts'].__FT_CharmapRec = __FT_CharmapRec;
+  window['AscFonts'].FT_Outline_Decompose = FT_Outline_Decompose;
+  window['AscFonts'].FT_Library = FT_Library;
+  window['AscFonts'].FT_Set_Char_Size = FT_Set_Char_Size;
+  window['AscFonts'].FT_Get_Char_Index = FT_Get_Char_Index;
+  window['AscFonts'].FT_Set_Charmap = FT_Set_Charmap;
+  window['AscFonts'].FT_Glyph_Get_CBox = FT_Glyph_Get_CBox;
+  window['AscFonts'].FT_Get_Glyph = FT_Get_Glyph;
+  window['AscFonts'].FT_Done_Glyph = FT_Done_Glyph;
+  window['AscFonts'].FT_Load_Glyph = FT_Load_Glyph;
+  window['AscFonts'].FT_Set_Transform = FT_Set_Transform;
+  window['AscFonts'].FT_Render_Glyph = FT_Render_Glyph;
+  window['AscFonts'].raster_memory = raster_memory;
+})(window);

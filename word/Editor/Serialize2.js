@@ -1,6 +1,8 @@
 "use strict";
 
 // Import
+var g_memory = AscFonts.g_memory;
+
 var align_Right = AscCommon.align_Right;
 var align_Left = AscCommon.align_Left;
 var align_Center = AscCommon.align_Center;
