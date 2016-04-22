@@ -25,6 +25,7 @@
 		"../common/Drawings/Format/ChartFormat.js",
 		"../common/Drawings/Format/TextBody.js",
         "../common/Charts/charts.js",
+		"../common/Charts/DrawingArea.js",
 		
 		"../common/scroll.js",
 
@@ -43,7 +44,6 @@
         "../common/SerializeChart.js",
         "../common/Charts/ChartsDrawer.js",
         "../common/Charts/3DTransformation.js",
-        "../common/Charts/DrawingArea.js",
         "../word/Editor/Serialize2.js",
         "../word/Editor/Styles.js",
         "../word/Editor/Numbering.js",

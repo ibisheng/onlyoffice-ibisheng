@@ -3243,7 +3243,7 @@ function OfflineEditor () {
             worksheet._drawSelection();
         }
 
-        DrawingArea.prototype.drawSelection = function(drawingDocument) {
+        AscFormat.DrawingArea.prototype.drawSelection = function(drawingDocument) {
 
             offlineEditor.flushTextMeasurer();
 

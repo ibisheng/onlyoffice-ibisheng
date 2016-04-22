@@ -375,7 +375,7 @@
 
         this.collaborativeEditing = collaborativeEditing;
 
-        this.drawingArea = new DrawingArea( this );
+        this.drawingArea = new AscFormat.DrawingArea( this );
         this.cellCommentator = new AscCommonExcel.CCellCommentator(this);
         this.objectRender = null;
 
