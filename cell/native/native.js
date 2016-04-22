@@ -4429,8 +4429,8 @@ function OfflineEditor () {
         var left = worksheet.cols[worksheet.cols.length - 1].left;
         var top =  worksheet.rows[worksheet.rows.length - 1].top;
 
-        left += (gc_nMaxCol - worksheet.cols.length) * worksheet.defaultColWidth;
-        top += (gc_nMaxRow - worksheet.rows.length) * worksheet.defaultRowHeight;
+        left += (AscCommon.gc_nMaxCol - worksheet.cols.length) * worksheet.defaultColWidth;
+        top += (AscCommon.gc_nMaxRow - worksheet.rows.length) * worksheet.defaultRowHeight;
 
         return [left, top];
     };
@@ -4908,7 +4908,7 @@ function OfflineEditor () {
 
                 var findVal = pxToPt(realLeftOffset + width);
                 var toCell = worksheet.findCellByXY(findVal, 0, true, false, true);
-                while (toCell.col === null && worksheet.cols.length < gc_nMaxCol) {
+                while (toCell.col === null && worksheet.cols.length < AscCommon.gc_nMaxCol) {
                     worksheet.expandColsOnScroll(true);
                     toCell = worksheet.findCellByXY(findVal, 0, true, false, true);
                 }
@@ -4917,7 +4917,7 @@ function OfflineEditor () {
 
                 findVal = pxToPt(realTopOffset + height);
                 toCell = worksheet.findCellByXY(0, findVal, true, true, false);
-                while (toCell.row === null && worksheet.rows.length < gc_nMaxRow) {
+                while (toCell.row === null && worksheet.rows.length < AscCommon.gc_nMaxRow) {
                     worksheet.expandRowsOnScroll(true);
                     toCell = worksheet.findCellByXY(0, findVal, true, true, false);
                 }

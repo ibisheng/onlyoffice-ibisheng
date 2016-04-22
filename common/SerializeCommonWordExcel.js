@@ -945,3 +945,8 @@ function isRealObject(obj)
 {
     return obj !== null && typeof obj === "object";
 }
+
+//--------------------------------------------------------export----------------------------------------------------
+window['AscCommon'] = window['AscCommon'] || {};
+window['AscCommon'].gc_nMaxRow = gc_nMaxRow;
+window['AscCommon'].gc_nMaxCol = gc_nMaxCol;
