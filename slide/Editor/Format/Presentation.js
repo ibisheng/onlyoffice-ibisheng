@@ -3726,7 +3726,7 @@ CPresentation.prototype =
 
     CreateAndAddShapeFromSelectedContent : function(oDocContent)
     {
-        var track_object = new NewShapeTrack("textRect", 0, 0, this.Slides[this.CurPage].Layout.Master.Theme, this.Slides[this.CurPage].Layout.Master, this.Slides[this.CurPage].Layout, this.Slides[this.CurPage], this.CurPage);
+        var track_object = new AscFormat.NewShapeTrack("textRect", 0, 0, this.Slides[this.CurPage].Layout.Master.Theme, this.Slides[this.CurPage].Layout.Master, this.Slides[this.CurPage].Layout, this.Slides[this.CurPage], this.CurPage);
         track_object.track({}, 0, 0);
         var shape = track_object.getShape(false, this.DrawingDocument, this.Slides[this.CurPage]);
         shape.setParent(this.Slides[this.CurPage]);

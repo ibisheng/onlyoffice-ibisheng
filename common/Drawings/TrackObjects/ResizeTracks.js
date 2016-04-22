@@ -1,13 +1,5 @@
 "use strict";
 
-/**
- * Created with JetBrains WebStorm.
- * User: Sergey.Luzyanin
- * Date: 6/27/13
- * Time: 4:35 PM
- * To change this template use File | Settings | File Templates.
- */
-
 var TRANSLATE_HANDLE_NO_FLIP = [];
 TRANSLATE_HANDLE_NO_FLIP[0] = 0;
 TRANSLATE_HANDLE_NO_FLIP[1] = 1;

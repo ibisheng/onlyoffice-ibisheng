@@ -42,7 +42,7 @@ StartAddNewShape.prototype =
                 slide = oParentObjects.slide;
             }
         }
-        this.drawingObjects.arrPreTrackObjects.push(new NewShapeTrack(this.preset, x, y, this.drawingObjects.getTheme(), master, layout, slide, 0));
+        this.drawingObjects.arrPreTrackObjects.push(new AscFormat.NewShapeTrack(this.preset, x, y, this.drawingObjects.getTheme(), master, layout, slide, 0));
         this.bStart = true;
         this.drawingObjects.swapTrackObjects();
     },
@@ -1795,7 +1795,7 @@ PolyLineAddState.prototype =
             return {objectId: "1", bMarker: true};
         this.drawingObjects.startTrackPos = {x: x, y: y, pageIndex:pageIndex};
         this.drawingObjects.clearTrackObjects();
-        this.drawingObjects.addTrackObject(new PolyLine(this.drawingObjects, this.drawingObjects.getTheme(), null, null, null, pageIndex));
+        this.drawingObjects.addTrackObject(new AscFormat.PolyLine(this.drawingObjects, this.drawingObjects.getTheme(), null, null, null, pageIndex));
         this.drawingObjects.arrTrackObjects[0].arrPoint.push({x : x, y: y});
         this.drawingObjects.checkChartTextSelection();
         this.drawingObjects.resetSelection();
@@ -1911,7 +1911,7 @@ AddPolyLine2State.prototype =
         this.drawingObjects.resetSelection();
         this.drawingObjects.updateOverlay();
         this.drawingObjects.clearTrackObjects();
-        this.drawingObjects.addTrackObject(new PolyLine(this.drawingObjects, this.drawingObjects.getTheme(), null, null, null, pageIndex));
+        this.drawingObjects.addTrackObject(new AscFormat.PolyLine(this.drawingObjects, this.drawingObjects.getTheme(), null, null, null, pageIndex));
         this.drawingObjects.arrTrackObjects[0].arrPoint.push({x : x, y: y});
         this.drawingObjects.changeCurrentState(new AddPolyLine2State2(this.drawingObjects, x, y));
     },

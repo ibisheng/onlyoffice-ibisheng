@@ -35,6 +35,11 @@
 		"../common/Charts/3DTransformation.js",
 		"../common/Charts/ChartsDrawer.js",
 		
+		"../common/Drawings/TrackObjects/AdjustmentTracks.js",
+        "../common/Drawings/TrackObjects/MoveTracks.js",
+        "../common/Drawings/TrackObjects/NewShapeTracks.js",
+        "../common/Drawings/TrackObjects/PolyLine.js",
+		
 		"../common/scroll.js",
 		"../cell/view/iscroll.js",
 
@@ -93,13 +98,9 @@
         "../common/SerializeCommonWordExcel.js",
         "../common/SerializeChart.js",
         "../common/Drawings/DrawingObjectsHandlers.js",
-        "../common/Drawings/TrackObjects/AdjustmentTracks.js",
         "../common/Drawings/TrackObjects/ResizeTracks.js",
         "../common/Drawings/TrackObjects/RotateTracks.js",
-        "../common/Drawings/TrackObjects/NewShapeTracks.js",
-        "../common/Drawings/TrackObjects/PolyLine.js",
         "../common/Drawings/TrackObjects/Spline.js",
-        "../common/Drawings/TrackObjects/MoveTracks.js",
         "../common/Drawings/TextDrawer.js",
         "../cell/view/DrawingObjectsController.js",
         "../cell/model/DrawingObjects/Graphics.js",

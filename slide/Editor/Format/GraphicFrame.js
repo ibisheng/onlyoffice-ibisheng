@@ -572,7 +572,7 @@ CGraphicFrame.prototype =
 
     createMoveTrack: function()
     {
-        return new MoveShapeImageTrack(this);
+        return new AscFormat.MoveShapeImageTrack(this);
     },
 
     getSnapArrays: function(snapX, snapY)

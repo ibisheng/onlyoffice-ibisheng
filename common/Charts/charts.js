@@ -851,7 +851,7 @@ TextArtPreviewManager.prototype.getShape =  function()
 		}
 	}
 	var oParentObjects = oShape.getParentObjects();
-	var oTrack = new NewShapeTrack("textRect", 0, 0, oParentObjects.theme, oParentObjects.master, oParentObjects.layout, oParentObjects.slide, 0);
+	var oTrack = new AscFormat.NewShapeTrack("textRect", 0, 0, oParentObjects.theme, oParentObjects.master, oParentObjects.layout, oParentObjects.slide, 0);
 	oTrack.track({}, oShape.convertPixToMM(this.canvasWidth), oShape.convertPixToMM(this.canvasHeight));
 	oShape = oTrack.getShape(bWord, oShape.getDrawingDocument(), oShape.drawingObjects);
     oShape.setStyle(null);

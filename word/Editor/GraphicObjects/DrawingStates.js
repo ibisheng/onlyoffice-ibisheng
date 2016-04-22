@@ -42,7 +42,7 @@ StartAddNewShape.prototype =
         this.startX = x;
         this.startY = y;
         this.drawingObjects.arrPreTrackObjects.length = 0;
-        this.drawingObjects.arrPreTrackObjects.push(new NewShapeTrack(this.preset, x, y, this.drawingObjects.document.theme, null, null, null, pageIndex));
+        this.drawingObjects.arrPreTrackObjects.push(new AscFormat.NewShapeTrack(this.preset, x, y, this.drawingObjects.document.theme, null, null, null, pageIndex));
         this.bStart = true;
         this.drawingObjects.swapTrackObjects();
         return true;
@@ -1981,7 +1981,7 @@ PolyLineAddState.prototype =
             return {objectId: null, bMarker: true};
         this.drawingObjects.startTrackPos = {x: x, y: y, pageIndex:pageIndex};
         this.drawingObjects.clearTrackObjects();
-        this.drawingObjects.addTrackObject(new PolyLine(this.drawingObjects, this.drawingObjects.document.theme, null, null, null, pageIndex));
+        this.drawingObjects.addTrackObject(new AscFormat.PolyLine(this.drawingObjects, this.drawingObjects.document.theme, null, null, null, pageIndex));
         this.drawingObjects.arrTrackObjects[0].arrPoint.push({x : x, y: y});
         this.drawingObjects.resetSelection();
         this.drawingObjects.updateOverlay();
@@ -2077,7 +2077,7 @@ AddPolyLine2State.prototype =
         this.drawingObjects.resetSelection();
         this.drawingObjects.updateOverlay();
         this.drawingObjects.clearTrackObjects();
-        this.drawingObjects.addTrackObject(new PolyLine(this.drawingObjects, this.drawingObjects.document.theme, null, null, null, pageIndex));
+        this.drawingObjects.addTrackObject(new AscFormat.PolyLine(this.drawingObjects, this.drawingObjects.document.theme, null, null, null, pageIndex));
         this.drawingObjects.arrTrackObjects[0].arrPoint.push({x : x, y: y});
         this.drawingObjects.changeCurrentState(new AddPolyLine2State2(this.drawingObjects, x, y));
     },

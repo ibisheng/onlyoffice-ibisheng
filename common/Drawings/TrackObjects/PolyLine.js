@@ -1,5 +1,7 @@
 "use strict";
 
+(function(window, undefined){
+
 function PolyLine (drawingObjects, theme, master, layout, slide, pageIndex)
 {
 
@@ -224,3 +226,8 @@ function PolylineForDrawer(polyline)
         g.ds();
     };
 }
+
+    //--------------------------------------------------------export----------------------------------------------------
+    window['AscFormat'] = window['AscFormat'] || {};
+    window['AscFormat'].PolyLine = PolyLine;
+})(window);

@@ -1,5 +1,7 @@
 "use strict";
 
+(function(window, undefined){
+
 
 function NewShapeTrack(presetGeom, startX, startY, theme, master, layout, slide, pageIndex)
 {
@@ -520,3 +522,7 @@ function NewShapeTrack(presetGeom, startX, startY, theme, master, layout, slide,
         return boundsChecker.Bounds;
     }
 }
+    //--------------------------------------------------------export----------------------------------------------------
+    window['AscFormat'] = window['AscFormat'] || {};
+    window['AscFormat'].NewShapeTrack = NewShapeTrack;
+})(window);

@@ -38,6 +38,11 @@
 		"../common/Charts/3DTransformation.js",
 		"../common/Charts/ChartsDrawer.js",
 		
+		"../common/Drawings/TrackObjects/AdjustmentTracks.js",
+        "../common/Drawings/TrackObjects/MoveTracks.js",
+        "../common/Drawings/TrackObjects/NewShapeTracks.js",
+        "../common/Drawings/TrackObjects/PolyLine.js",
+		
 		"../common/scroll.js",
 		"../common/Scrolls/iscroll.js",
 
@@ -55,10 +60,6 @@
         "../word/Drawing/Externals.js",
         "../common/GlobalLoaders.js",
         "../word/Drawing/translations.js",
-        "../common/Drawings/TrackObjects/AdjustmentTracks.js",
-        "../common/Drawings/TrackObjects/MoveTracks.js",
-        "../common/Drawings/TrackObjects/NewShapeTracks.js",
-        "../common/Drawings/TrackObjects/PolyLine.js",
         "../common/Drawings/TrackObjects/ResizeTracks.js",
         "../common/Drawings/TrackObjects/RotateTracks.js",
         "../common/Drawings/TrackObjects/Spline.js",

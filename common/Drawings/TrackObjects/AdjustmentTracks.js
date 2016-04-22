@@ -1,5 +1,7 @@
 "use strict";
 
+(function(window, undefined){
+
 function XYAdjustmentTrack(originalShape, adjIndex, bTextWarp)
 {
     AscFormat.ExecuteNoHistory(function(){
@@ -460,3 +462,9 @@ function PolarAdjustmentTrack(originalShape, adjIndex, bTextWarp)
     };
 }
 PolarAdjustmentTrack.prototype.getBounds = XYAdjustmentTrack.prototype.getBounds;
+
+    //--------------------------------------------------------export----------------------------------------------------
+    window['AscFormat'] = window['AscFormat'] || {};
+    window['AscFormat'].XYAdjustmentTrack = XYAdjustmentTrack;
+    window['AscFormat'].PolarAdjustmentTrack = PolarAdjustmentTrack;
+})(window);

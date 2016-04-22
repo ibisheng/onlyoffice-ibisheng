@@ -35,6 +35,11 @@
 		"../common/Charts/3DTransformation.js",
 		"../common/Charts/ChartsDrawer.js",
 		
+		"../common/Drawings/TrackObjects/AdjustmentTracks.js",
+        "../common/Drawings/TrackObjects/MoveTracks.js",
+        "../common/Drawings/TrackObjects/NewShapeTracks.js",
+        "../common/Drawings/TrackObjects/PolyLine.js",
+		
 		"../common/scroll.js",
 
         "../common/wordcopypaste.js",
@@ -68,13 +73,9 @@
         "../word/Editor/Sections.js",
         "../word/Editor/History.js",
         "../common/Drawings/DrawingObjectsHandlers.js",
-        "../common/Drawings/TrackObjects/AdjustmentTracks.js",
         "../common/Drawings/TrackObjects/ResizeTracks.js",
         "../common/Drawings/TrackObjects/RotateTracks.js",
-        "../common/Drawings/TrackObjects/NewShapeTracks.js",
-        "../common/Drawings/TrackObjects/PolyLine.js",
         "../common/Drawings/TrackObjects/Spline.js",
-        "../common/Drawings/TrackObjects/MoveTracks.js",
         "../word/Drawing/HatchPattern.js",
         "../word/Drawing/Graphics.js",
         "../common/Overlay.js",

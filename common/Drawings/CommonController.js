@@ -630,7 +630,7 @@ DrawingObjectsController.prototype =
             this.arrPreTrackObjects.length = 0;
             if(hit.adjPolarFlag === false)
             {
-                this.arrPreTrackObjects.push(new XYAdjustmentTrack(selectedObject, hit.adjNum, hit.warp));
+                this.arrPreTrackObjects.push(new AscFormat.XYAdjustmentTrack(selectedObject, hit.adjNum, hit.warp));
             }
             else
             {

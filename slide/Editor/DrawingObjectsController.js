@@ -263,7 +263,7 @@ DrawingObjectsController.prototype.handleSlideComments  =  function(e, x, y, pag
             if(this.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
             {
                 comments[i].selected = true;
-                this.addPreTrackObject(new MoveComment(comments[i]));
+                this.addPreTrackObject(new AscFormat.MoveComment(comments[i]));
                 this.changeCurrentState(new PreMoveCommentState(this, x, y, comments[i]));
                 if(i !== index_selected)
                 {
