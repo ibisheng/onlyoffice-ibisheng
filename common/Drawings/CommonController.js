@@ -2630,7 +2630,7 @@ DrawingObjectsController.prototype =
                 {
                     chart.setLegend(new AscFormat.CLegend());
                 }
-                if(chart.legend.legendPos !== legend_pos_settings)
+                if(chart.legend.legendPos !== legend_pos_settings && legend_pos_settings !== c_oAscChartLegendShowSettings.layout)
                     chart.legend.setLegendPos(legend_pos_settings);
                 var b_overlay = c_oAscChartLegendShowSettings.leftOverlay === legend_pos_settings || legend_pos_settings === c_oAscChartLegendShowSettings.rightOverlay;
                 if(chart.legend.overlay !== b_overlay)
@@ -3932,7 +3932,7 @@ DrawingObjectsController.prototype =
 
         if(chart.legend)
         {
-            ret.putLegendPos(AscFormat.isRealNumber(chart.legend.legendPos) ? chart.legend.legendPos : c_oAscChartLegendShowSettings.layout);
+            ret.putLegendPos(AscFormat.isRealNumber(chart.legend.legendPos) ? chart.legend.legendPos : c_oAscChartLegendShowSettings.bottom);
         }
         else
         {
