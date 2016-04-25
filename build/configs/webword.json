@@ -20,7 +20,7 @@
 		"../common/FontsFreeType/font_map.js",
         "../common/FontsFreeType/FontManager.js",
 		
-		"../word/Drawing/Metafile.js",
+		"../common/Drawings/Metafile.js",
 		"../common/FontsFreeType/TextMeasurer.js",
 		
 		"../common/Drawings/Hit.js",
@@ -55,7 +55,7 @@
 		"../common/Drawings/DrawingObjectsHandlers.js",
 		"../common/Drawings/TextDrawer.js",
 		
-		"../word/Drawing/Externals.js",
+		"../common/Drawings/Externals.js",
 		"../common/GlobalLoaders.js",
 		
 		"../common/scroll.js",
