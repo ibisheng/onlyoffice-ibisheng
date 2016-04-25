@@ -4,7 +4,6 @@ module.exports = function(grunt) {
 	var path = grunt.option('src') || './configs';
 	var level = grunt.option('level') || 'ADVANCED';
 	var formatting = grunt.option('formatting') || '';
-	var nomap = grunt.option('nomap') || '';
 	
 	grunt.loadNpmTasks('grunt-contrib-clean');
 	grunt.loadNpmTasks('grunt-contrib-concat');
@@ -69,14 +68,10 @@ module.exports = function(grunt) {
 	grunt.registerTask('build_all', ['build_webword_init', 'build_sdk', 'build_webexcel_init', 'build_sdk', 'build_webpowerpoint_init', 'build_sdk']);
 
 	grunt.registerTask('compile_sdk_init', function(compilation_level) {
-		grunt.file.mkdir( packageFile['compile']['sdk']['log'] );
-		var map_file_path = packageFile['compile']['sdk']['dst'] + '.map';
-		var map_record_file_path = map_file_path + '.tmp';
 		var tmp_sdk_path = 'sdk-js.tmp';
 		var concat_src = [
 			packageFile['compile']['sdk']['dst'],
-			packageFile['compile']['defines']['dst'],
-			map_record_file_path ];
+			packageFile['compile']['defines']['dst']];
 		var concat_src_with_banner_file = [];
 		var srcFiles = packageFile['compile']['sdk']['common'];
 		var sdkOpt = {
@@ -91,10 +86,6 @@ module.exports = function(grunt) {
 		if (formatting) {
 			definesOpt['formatting'] = sdkOpt['formatting'] = formatting;
 		}
-		if (!nomap) {
-			sdkOpt['variable_renaming_report'] = packageFile['compile']['sdk']['log'] + '/variable.map';
-			sdkOpt['property_renaming_report'] = packageFile['compile']['sdk']['log'] + '/property.map';
-		}		
 		
 		if (grunt.option('mobile')) {				
 			var excludeFiles = packageFile['compile']['sdk']['exclude_mobile']
@@ -152,7 +143,6 @@ module.exports = function(grunt) {
 			},
 			clean: [ 
 				packageFile['compile']['defines']['dst'],
-				map_record_file_path,
 				tmp_sdk_path
 			],
 			replace: {
