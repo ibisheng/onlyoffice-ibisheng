@@ -9974,7 +9974,7 @@
                                 var hyperLink = newVal.getHyperlink();
                                 if ( hyperLink != null ) {
                                     hyperLink.Ref = range;
-                                    range.setHyperlink( hyperLink );
+                                    range.setHyperlink( hyperLink, true );
                                 }
                             }
                             //если замержили range
