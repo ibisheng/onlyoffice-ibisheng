@@ -114,6 +114,9 @@ module.exports = function(grunt) {
 		if (grunt.option('desktop')) {
 			srcFiles = srcFiles.concat(packageFile['compile']['sdk']['desktop']);
 		}
+		if (grunt.option('builder')) {
+			srcFiles = srcFiles.concat(packageFile['compile']['sdk']['builder']);
+		}
 		
 		concat_src_with_banner_file = concat_src_with_banner_file.concat(tmp_sdk_path)
 

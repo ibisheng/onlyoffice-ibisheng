@@ -153,6 +153,9 @@
         "../word/Private/TrackRevisions.js",
         "../common/Private/Locks.js"
       ],
+      "builder": [
+        "../word/apiBuilder.js"
+      ],
       "desktop": [
         "../common/Local/common.js",
         "../word/Local/api.js"

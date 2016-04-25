@@ -166,6 +166,8 @@
         "../common/Private/license.js",
         "../cell/Private/comments.js"
       ],
+      "builder": [
+      ],
       "desktop": [
         "../common/Local/common.js",
         "../cell/Local/api.js"

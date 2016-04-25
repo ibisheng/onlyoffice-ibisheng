@@ -149,6 +149,8 @@
         "../slide/Private/comments.js",
         "../common/Private/Locks.js"
       ],
+      "builder": [
+      ],
       "desktop": [
         "../common/Local/common.js",
         "../slide/Local/api.js"
