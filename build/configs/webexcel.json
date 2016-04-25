@@ -197,7 +197,7 @@
 		"../common/FontsFreeType/TextMeasurer.js",
 		"../cell/model/DrawingObjects/Graphics.js"		
 	  ],
-      "dst": "../cell/script.bin",
+      "dst": "../cell/sdk-all.js",
       "externs": [
         "../common/Build/Externs.js",
         "../../web-apps/vendor/jquery/jquery.min.js",
