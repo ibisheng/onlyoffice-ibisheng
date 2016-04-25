@@ -21,6 +21,7 @@
         "../common/FontsFreeType/FontManager.js",
 		
 		"../word/Drawing/Metafile.js",
+		"../common/FontsFreeType/TextMeasurer.js",
 		
 		"../common/Drawings/Hit.js",
 		"../common/Drawings/ArcTo.js",
