@@ -13,6 +13,7 @@ function (window, undefined) {
 	
 var c_oAscChartTypeSettings = Asc.c_oAscChartTypeSettings;
 var c_oAscTickMark = Asc.c_oAscTickMark;
+var c_oAscTickLabelsPos = Asc.c_oAscTickLabelsPos;
 
 function ChartPreviewManager() {
 	this.previewGroups = [];
@@ -296,7 +297,7 @@ ChartPreviewManager.prototype.getChartByType = function(type)
 		var val_ax_props = new AscCommon.asc_ValAxisSettings();
 		val_ax_props.putMinValRule(Asc.c_oAscValAxisRule.auto);
 		val_ax_props.putMaxValRule(Asc.c_oAscValAxisRule.auto);
-		val_ax_props.putTickLabelsPos(Asc.c_oAscTickLabelsPos.TICK_LABEL_POSITION_NONE);
+		val_ax_props.putTickLabelsPos(c_oAscTickLabelsPos.TICK_LABEL_POSITION_NONE);
 		val_ax_props.putInvertValOrder(false);
 		val_ax_props.putDispUnitsRule(Asc.c_oAscValAxUnits.none);
 		val_ax_props.putMajorTickMark(c_oAscTickMark.TICK_MARK_NONE);
@@ -307,7 +308,7 @@ ChartPreviewManager.prototype.getChartByType = function(type)
 		var cat_ax_props = new AscCommon.asc_CatAxisSettings();
 		cat_ax_props.putIntervalBetweenLabelsRule(Asc.c_oAscBetweenLabelsRule.auto);
 		cat_ax_props.putLabelsPosition(Asc.c_oAscLabelsPosition.betweenDivisions);
-		cat_ax_props.putTickLabelsPos(Asc.c_oAscTickLabelsPos.TICK_LABEL_POSITION_NONE);
+		cat_ax_props.putTickLabelsPos(c_oAscTickLabelsPos.TICK_LABEL_POSITION_NONE);
 		cat_ax_props.putLabelsAxisDistance(100);
 		cat_ax_props.putMajorTickMark(c_oAscTickMark.TICK_MARK_NONE);
 		cat_ax_props.putMinorTickMark(c_oAscTickMark.TICK_MARK_NONE);
@@ -375,15 +376,15 @@ ChartPreviewManager.prototype.getChartByType = function(type)
 		{
 			if(chart_space.chart.plotArea.valAx)
 			{
-				chart_space.chart.plotArea.valAx.setTickLblPos(TICK_LABEL_POSITION_NONE);
-				chart_space.chart.plotArea.valAx.setMajorTickMark(TICK_MARK_NONE);
-				chart_space.chart.plotArea.valAx.setMinorTickMark(TICK_MARK_NONE);
+				chart_space.chart.plotArea.valAx.setTickLblPos(c_oAscTickLabelsPos.TICK_LABEL_POSITION_NONE);
+				chart_space.chart.plotArea.valAx.setMajorTickMark(c_oAscTickMark.TICK_MARK_NONE);
+				chart_space.chart.plotArea.valAx.setMinorTickMark(c_oAscTickMark.TICK_MARK_NONE);
 			}
 			if(chart_space.chart.plotArea.catAx)
 			{
-				chart_space.chart.plotArea.catAx.setTickLblPos(TICK_LABEL_POSITION_NONE);
-				chart_space.chart.plotArea.catAx.setMajorTickMark(TICK_MARK_NONE);
-				chart_space.chart.plotArea.catAx.setMinorTickMark(TICK_MARK_NONE);
+				chart_space.chart.plotArea.catAx.setTickLblPos(c_oAscTickLabelsPos.TICK_LABEL_POSITION_NONE);
+				chart_space.chart.plotArea.catAx.setMajorTickMark(c_oAscTickMark.TICK_MARK_NONE);
+				chart_space.chart.plotArea.catAx.setMinorTickMark(c_oAscTickMark.TICK_MARK_NONE);
 			}
 		}
 		if(!chart_space.spPr)
