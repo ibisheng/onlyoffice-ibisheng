@@ -23,7 +23,7 @@ var FOCUS_OBJECT_NOTES          = 2;
 var COMMENT_WIDTH   = 18;
 var COMMENT_HEIGHT  = 16;
 
-CTextMeasurer.prototype.GetAscender = function()
+AscCommon.CTextMeasurer.prototype.GetAscender = function()
 {
     var UnitsPerEm = this.m_oManager.m_lUnits_Per_Em;
     //var Ascender   = this.m_oManager.m_lAscender;
@@ -31,7 +31,7 @@ CTextMeasurer.prototype.GetAscender = function()
 
     return Ascender * this.m_oLastFont.SetUpSize / UnitsPerEm * g_dKoef_pt_to_mm;
 };
-CTextMeasurer.prototype.GetDescender = function()
+AscCommon.CTextMeasurer.prototype.GetDescender = function()
 {
     var UnitsPerEm = this.m_oManager.m_lUnits_Per_Em;
     //var Descender  = this.m_oManager.m_lDescender;
@@ -39,7 +39,7 @@ CTextMeasurer.prototype.GetDescender = function()
 
     return Descender * this.m_oLastFont.SetUpSize / UnitsPerEm * g_dKoef_pt_to_mm;
 };
-CTextMeasurer.prototype.GetHeight = function()
+AscCommon.CTextMeasurer.prototype.GetHeight = function()
 {
     var UnitsPerEm = this.m_oManager.m_lUnits_Per_Em;
     //var Height     = this.m_oManager.m_lLineHeight;
