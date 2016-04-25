@@ -574,7 +574,7 @@ CImageShape.prototype =
         var _transform = transform ? transform :this.transform;
         graphics.SetIntegerGrid(false);
         graphics.transform3(_transform, false);
-        var shape_drawer = new CShapeDrawer();
+        var shape_drawer = new AscCommon.CShapeDrawer();
         shape_drawer.fromShape2(this, graphics, this.spPr.geometry);
         shape_drawer.draw(this.spPr.geometry);
         if(!this.group)

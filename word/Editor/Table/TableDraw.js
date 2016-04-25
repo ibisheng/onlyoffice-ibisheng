@@ -103,7 +103,7 @@ CTable.prototype.private_DrawTableBackgroundAndOuterBorder = function(pGraphics,
         var X_right_new = Page.X + Row.Get_CellInfo(CellsCount - 1).X_grid_end;
         pGraphics.SaveGrState();
         pGraphics.SetIntegerGrid(false);
-        var ShapeDrawer = new CShapeDrawer();
+        var ShapeDrawer = new AscCommon.CShapeDrawer();
         TableShd.Unifill && TableShd.Unifill.check(this.Get_Theme(), this.Get_ColorMap());
         var Transform = this.Parent.transform.CreateDublicate();
         global_MatrixTransformer.TranslateAppend(Transform, Math.min(X_left_new, X_right_new), Math.min(Y_top, Y_bottom));
@@ -422,7 +422,7 @@ CTable.prototype.private_DrawCellsBackround = function(pGraphics, PNum, Row_star
                         //}
                         //else TODO: Сделать нормальную отрисовку.
                         {
-                            var ShapeDrawer = new CShapeDrawer();
+                            var ShapeDrawer = new AscCommon.CShapeDrawer();
                             CellShd.Unifill.check(Theme, ColorMap);
                             var Transform = this.Parent.transform.CreateDublicate();
                             global_MatrixTransformer.TranslateAppend(Transform, Math.min(X_cell_start, X_cell_end), Math.min(Y, Y + RealHeight));
@@ -516,7 +516,7 @@ CTable.prototype.private_DrawCellsBackround = function(pGraphics, PNum, Row_star
                         //}
                         //else TODO: Сделать нормальную отрисовку.
                         {
-                            var ShapeDrawer = new CShapeDrawer();
+                            var ShapeDrawer = new AscCommon.CShapeDrawer();
                             CellShd.Unifill.check(Theme, ColorMap);
                             var Transform = this.Parent.transform.CreateDublicate();
                             global_MatrixTransformer.TranslateAppend(Transform, Math.min(X_cell_start, X_cell_end), Math.min(Y, Y + RealHeight));

@@ -196,7 +196,7 @@ CChartsDrawer.prototype =
     {
 		this.cChartSpace = chartSpace;
 		
-		var cShapeDrawer = new CShapeDrawer();
+		var cShapeDrawer = new AscCommon.CShapeDrawer();
 		cShapeDrawer.Graphics = graphics;
 		this.calcProp.series = chartSpace.chart.plotArea.chart.series;
 		

@@ -1873,3 +1873,7 @@ function ShapeToImageConverter(shape, pageIndex)
     }
     return _ret;
 }
+
+//------------------------------------------------------------export----------------------------------------------------
+window['AscCommon'] = window['AscCommon'] || {};
+window['AscCommon'].CShapeDrawer = CShapeDrawer;

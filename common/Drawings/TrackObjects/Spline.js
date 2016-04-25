@@ -74,7 +74,7 @@ function Spline(drawingObjects, theme, master, layout, slide, pageIndex)
         graphics.SetIntegerGrid(false);
         graphics.transform3(this.Matrix);
 
-        var shape_drawer = new CShapeDrawer();
+        var shape_drawer = new AscCommon.CShapeDrawer();
         shape_drawer.fromShape(this, graphics);
         shape_drawer.draw(this);
     };
@@ -310,7 +310,7 @@ function SplineForDrawer(spline)
         graphics.SetIntegerGrid(false);
         graphics.transform3(this.Matrix);
 
-        var shape_drawer = new CShapeDrawer();
+        var shape_drawer = new AscCommon.CShapeDrawer();
         shape_drawer.fromShape(this, graphics);
         shape_drawer.draw(this);
     };
