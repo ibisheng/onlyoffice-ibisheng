@@ -169,9 +169,35 @@
         "../common/Local/common.js",
         "../cell/Local/api.js"
       ],
-	  "mobile_banners": [],
-      "exclude_mobile": [],
-      "dst": "../cell/sdk-all.js",
+	  "mobile": [
+	    "../../web-apps/vendor/xregexp/xregexp-all-min.js",
+		"../../web-apps/vendor/underscore/underscore-min.js",
+		"../common/Native/jquery_native.js",
+        "../common/Native/Wrappers/memory.js",
+        "../common/Native/Wrappers/TextMeasurerWrapper.js",
+        "../common/Native/Wrappers/DrawingStream.js",
+		"../cell/native/DrawingContext.js",
+		"../cell/native/Graphics.js",
+        "../cell/native/Overlay.js",
+		"../common/Native/Wrappers/ShapeDrawer.js",
+        "../cell/native/DrawingDocument.js"
+      ],
+	  "mobile_banners": [
+	  "../cell/native/native.js"
+	  ],
+      "exclude_mobile": [
+        "../common/Overlay.js",
+        "../common/Controls.js",
+		"../cell/graphics/DrawingContext.js",
+        "../cell/model/DrawingObjects/ShapeDrawer.js",
+        "../cell/model/DrawingObjects/DrawingDocument.js", 
+		"../common/FontsFreeType/font_engine.js",
+        "../common/FontsFreeType/FontFile.js",
+        "../common/FontsFreeType/FontManager.js",
+		"../common/FontsFreeType/TextMeasurer.js",
+		"../cell/model/DrawingObjects/Graphics.js"		
+	  ],
+      "dst": "../cell/script.bin",
       "externs": [
         "../common/Build/Externs.js",
         "../../web-apps/vendor/jquery/jquery.min.js",

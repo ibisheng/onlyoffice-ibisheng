@@ -665,3 +665,7 @@ function FT_Stream(data, size)
 }
 
 window["fts"] = FT_Stream;
+
+window['AscFonts'].FT_Memory = FT_Memory;
+window['AscFonts'].FT_Stream = FT_Stream;
+window['AscFonts'].g_memory = g_memory;

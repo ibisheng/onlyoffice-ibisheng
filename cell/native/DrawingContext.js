@@ -5,7 +5,7 @@
  * Author: Dmitry.Sokolov@avsmedia.net
  * Date:   Nov 21, 2011
  */
-(function (/** jQuery */$, /** Window */window, undefined) {
+(function (/** Window */window, undefined) {
 
     /*
      * Import
@@ -13,8 +13,6 @@
      */
 
     var asc = window["Asc"];
-    var asc_round = asc.round;
-    var asc_floor = asc.floor;
 
     function colorObjToAscColor(color) {
         var oRes = null;
@@ -568,10 +566,10 @@
     DrawingContext.prototype.changeZoom = function (factor) {
         if (factor <= 0) {throw "Scale factor must be >= 0";}
 
-        factor = asc_round(factor * 1000) / 1000;
+        factor = Asc.round(factor * 1000) / 1000;
 
-        this.ppiX = asc_round(this.ppiX / this.scaleFactor * factor * 1000) / 1000;
-        this.ppiY = asc_round(this.ppiY / this.scaleFactor * factor * 1000) / 1000;
+        this.ppiX = Asc.round(this.ppiX / this.scaleFactor * factor * 1000) / 1000;
+        this.ppiY = Asc.round(this.ppiY / this.scaleFactor * factor * 1000) / 1000;
         this.scaleFactor = factor;
 
         // reinitialize
@@ -587,8 +585,8 @@
      * @param {Number} height  New height in current units
      */
     DrawingContext.prototype.resetSize = function (width, height) {
-        var w = asc_round( width  * getCvtRatio(this.units, 0/*px*/, this.ppiX) ),
-            h = asc_round( height * getCvtRatio(this.units, 0/*px*/, this.ppiY) );
+        var w = Asc.round( width  * getCvtRatio(this.units, 0/*px*/, this.ppiX) ),
+            h = Asc.round( height * getCvtRatio(this.units, 0/*px*/, this.ppiY) );
         if (w !== this.canvas.width) {
             this.canvas.width = w;
         }
@@ -604,8 +602,8 @@
      * @param {Number} height  New height in current units
      */
     DrawingContext.prototype.expand = function (width, height) {
-        var w = asc_round( width  * getCvtRatio(this.units, 0/*px*/, this.ppiX) ),
-            h = asc_round( height * getCvtRatio(this.units, 0/*px*/, this.ppiY) );
+        var w = Asc.round( width  * getCvtRatio(this.units, 0/*px*/, this.ppiX) ),
+            h = Asc.round( height * getCvtRatio(this.units, 0/*px*/, this.ppiY) );
         if (w > this.canvas.width) {
             this.canvas.width = w;
         }
@@ -825,7 +823,7 @@
         res.descender = factor * d;
         res.lineGap	= factor * (fm.m_lLineHeight - fm.m_lAscender - d);
 
-        var face = AscCommon.g_oTextMeasurer.Measurer['GetFace']();
+        var face = g_oTextMeasurer.Measurer['GetFace']();
         res.nat_scale = face[0];
         res.nat_y1 = face[1];
         res.nat_y2 = face[2];
@@ -873,7 +871,7 @@
             if (_info.SrcBold)      flag |= 0x04;
             if (_info.SrcItalic)    flag |= 0x08;
 
-            napi_fontInfo = AscCommon.g_oTextMeasurer.Measurer["LoadFont"](_info.Path, _info.FaceIndex, this.font.FontSize, flag);
+            napi_fontInfo = g_oTextMeasurer.Measurer["LoadFont"](_info.Path, _info.FaceIndex, this.font.FontSize, flag);
 
             this.napi_fmt[1].m_lUnits_Per_Em    = napi_fontInfo[3];
             this.napi_fmt[1].m_lAscender        = napi_fontInfo[0];
@@ -898,7 +896,7 @@
             if (_info.SrcBold)      flag |= 0x04;
             if (_info.SrcItalic)    flag |= 0x08;
 
-            napi_fontInfo = AscCommon.g_oTextMeasurer.Measurer["LoadFont"](_info.Path, _info.FaceIndex, this.font.FontSize, flag);
+            napi_fontInfo = g_oTextMeasurer.Measurer["LoadFont"](_info.Path, _info.FaceIndex, this.font.FontSize, flag);
 
             this.nctx["PD_LoadFont"](_info.Path, _info.FaceIndex, this.font.FontSize, flag);
 
@@ -958,7 +956,7 @@
             r  = getCvtRatio(0/*px*/, units >= 0 && units <=3 ? units : this.units, this.ppiX);
         for (var tmp, w = 0, w2 = 0, i = 0; i < text.length; ++i) {
 
-            var bounds = AscCommon.g_oTextMeasurer.Measurer["GetDrawingBox"](text.charCodeAt(i));
+            var bounds = g_oTextMeasurer.Measurer["GetDrawingBox"](text.charCodeAt(i));
             tmp = {
                 fAdvanceX: bounds[0],
                 oBBox: {
@@ -969,7 +967,7 @@
                 }
             };
 
-            w += asc_round(tmp.fAdvanceX); // asc_round - убрали что бы текст не скакал
+            w += Asc.round(tmp.fAdvanceX); // asc_round - убрали что бы текст не скакал
         }
         w2 = w - tmp.fAdvanceX + tmp.oBBox.fMaxX - tmp.oBBox.fMinX + 1;
         return this._calcTextMetrics(w * r, w2 * r, fm, r);
@@ -981,8 +979,8 @@
 
         if ( !(nW > 0 && nH > 0) ) {return;}
 
-        var nX = asc_floor(fmgr.m_oGlyphString.m_fX + pGlyph.fX + pGlyph.oBitmap.nX);
-        var nY = asc_floor(fmgr.m_oGlyphString.m_fY + pGlyph.fY - pGlyph.oBitmap.nY);
+        var nX = Asc.floor(fmgr.m_oGlyphString.m_fX + pGlyph.fX + pGlyph.oBitmap.nX);
+        var nY = Asc.floor(fmgr.m_oGlyphString.m_fY + pGlyph.fY - pGlyph.oBitmap.nY);
 
         var _r = this.fillColor.r;
         var _g = this.fillColor.g;
@@ -1035,7 +1033,7 @@
 
             this.nctx["PD_FillText"](_x, _y, lUnicode);
 
-            _x += asc_round(AscCommon.g_oTextMeasurer.Measurer["MeasureChar"](lUnicode));
+            _x += Asc.round(g_oTextMeasurer.Measurer["MeasureChar"](lUnicode));
         }
 
         return this;
@@ -1283,10 +1281,10 @@
             _x = this._mft.transformPointX(x, y),
             _y = this._mft.transformPointY(x, y);
         return {
-            x: asc_round(_x),
-            y: asc_round(_y),
-            w: wh ? asc_round(this._mft.transformPointX(x2, y2) - _x) : undefined,
-            h: wh ? asc_round(this._mft.transformPointY(x2, y2) - _y) : undefined
+            x: Asc.round(_x),
+            y: Asc.round(_y),
+            w: wh ? Asc.round(this._mft.transformPointX(x2, y2) - _x) : undefined,
+            h: wh ? Asc.round(this._mft.transformPointY(x2, y2) - _y) : undefined
         };
     };
 
@@ -1331,4 +1329,4 @@
     window["Asc"].DrawingContext   = DrawingContext;
     window["Asc"].Matrix           = Matrix;
 
-})(jQuery, window);
+})(window);
