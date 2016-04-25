@@ -1,6 +1,8 @@
 "use strict";
 
 // Import
+var g_fontApplication = AscFonts.g_fontApplication;
+
 var AscBrowser = AscCommon.AscBrowser;
 
 var g_dDpiX = 96.0;
@@ -4221,7 +4223,7 @@ function CEditorPage(api)
             }
         }*/
 
-        if (_language == LanguagesFontSelectTypes.Unknown)
+        if (_language == AscFonts.LanguagesFontSelectTypes.Unknown)
         {
             oThis.m_oLogicDocument.TextBox_Put(oThis.TextBoxInput.value);
             this.ReinitTB();

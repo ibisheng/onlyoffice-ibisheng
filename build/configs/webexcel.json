@@ -14,8 +14,8 @@
 		
 		"../common/FontsFreeType/font_engine.js",
         "../common/FontsFreeType/FontFile.js",
+		"../common/FontsFreeType/font_map.js",
         "../common/FontsFreeType/FontManager.js",
-        "../common/FontsFreeType/font_map.js",
 		
 		"../common/Drawings/Hit.js",
 		"../common/Drawings/ArcTo.js",

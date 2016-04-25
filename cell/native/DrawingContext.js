@@ -864,7 +864,7 @@
         var _fontinfo, _info, flag, napi_fontInfo;
 
         if (angle && 0 != angle) {
-            _fontinfo = g_fontApplication.GetFontInfo(this.font.FontFamily.Name, fontStyle, this.LastFontOriginInfo);
+            _fontinfo = AscFonts.g_fontApplication.GetFontInfo(this.font.FontFamily.Name, fontStyle, this.LastFontOriginInfo);
             _info = GetLoadInfoForMeasurer(_fontinfo, fontStyle);
 
             flag = 0;
@@ -889,7 +889,7 @@
 
         } else {
 
-            _fontinfo = g_fontApplication.GetFontInfo(this.font.FontFamily.Name, fontStyle, this.LastFontOriginInfo);
+            _fontinfo = AscFonts.g_fontApplication.GetFontInfo(this.font.FontFamily.Name, fontStyle, this.LastFontOriginInfo);
             _info = GetLoadInfoForMeasurer(_fontinfo, fontStyle);
 
             flag = 0;

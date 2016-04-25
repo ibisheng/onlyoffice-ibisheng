@@ -9,6 +9,8 @@ function (window, undefined) {
 
 // Import
 var g_memory = AscFonts.g_memory;
+var DecodeBase64Char = AscFonts.DecodeBase64Char;
+var b64_decode = AscFonts.b64_decode;
     
 var c_oAscSizeRelFromH = AscCommon.c_oAscSizeRelFromH;
 var c_oAscSizeRelFromV = AscCommon.c_oAscSizeRelFromV;

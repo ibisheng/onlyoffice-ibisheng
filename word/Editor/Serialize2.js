@@ -3,6 +3,9 @@
 // Import
 var g_memory = AscFonts.g_memory;
 var FontStyle = AscFonts.FontStyle;
+var DecodeBase64Char = AscFonts.DecodeBase64Char;
+var b64_decode = AscFonts.b64_decode;
+var g_fontApplication = AscFonts.g_fontApplication;
 
 var align_Right = AscCommon.align_Right;
 var align_Left = AscCommon.align_Left;

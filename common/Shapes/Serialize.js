@@ -2,6 +2,8 @@
 
 // Import
 var g_memory = AscFonts.g_memory;
+var DecodeBase64Char = AscFonts.DecodeBase64Char;
+var b64_decode = AscFonts.b64_decode;
 
 var c_oAscShdClear = Asc.c_oAscShdClear;
 var c_oAscColor = Asc.c_oAscColor;

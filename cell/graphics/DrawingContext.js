@@ -12,6 +12,7 @@
 	 * -----------------------------------------------------------------------------
 	 */
 	var FontStyle = AscFonts.FontStyle;
+	var g_fontApplication = AscFonts.g_fontApplication;
 
 	var asc = window["Asc"];
 	var asc_round = asc.round;

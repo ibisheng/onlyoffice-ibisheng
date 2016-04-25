@@ -4,6 +4,7 @@
 var CColor = AscCommon.CColor;
 
 var FontStyle = AscFonts.FontStyle;
+var g_fontApplication = AscFonts.g_fontApplication;
 
 var g_fontManager = new AscFonts.CFontManager();
 g_fontManager.Initialize(true);

@@ -1,9 +1,10 @@
 "use strict";
 
 // Import
-var CColor = AscCommon.CColor;
-
 var FontStyle = AscFonts.FontStyle;
+var g_fontApplication = AscFonts.g_fontApplication;
+
+var CColor = AscCommon.CColor;
 
 var g_dDpiX = 96.0;
 var g_dDpiY = 96.0;

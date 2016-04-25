@@ -58,13 +58,13 @@ CFontFileLoader.prototype.LoadFontAsync = function(basePath, _callback, isEmbed)
 		{
 			var __font_data_idx = g_fonts_streams.length;
 			var _uintData = new Uint8Array(this.response);
-			g_fonts_streams[__font_data_idx] = new FT_Stream(_uintData, _uintData.length);
+			g_fonts_streams[__font_data_idx] = new AscFonts.FT_Stream(_uintData, _uintData.length);
 			oThis.SetStreamIndex(__font_data_idx);
 		}
 		else
 		{
 			var __font_data_idx = g_fonts_streams.length;
-			g_fonts_streams[__font_data_idx] = CreateFontData3(this.responseText);
+			g_fonts_streams[__font_data_idx] = AscFonts.CreateFontData3(this.responseText);
 			oThis.SetStreamIndex(__font_data_idx);
 
 			if (null != oThis.callback)

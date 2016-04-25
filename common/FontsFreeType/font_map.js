@@ -1,10 +1,21 @@
 "use strict";
 
+(function(window, undefined){
+
 // Import
 var FT_Common = AscFonts.FT_Common;
 var FT_Stream = AscFonts.FT_Stream;
 var g_memory = AscFonts.g_memory;
-var FontStyle = AscFonts.FontStyle;
+
+    var FontStyle =
+    {
+        FontStyleRegular:    0,
+        FontStyleBold:       1,
+        FontStyleItalic:     2,
+        FontStyleBoldItalic: 3,
+        FontStyleUnderline:  4,
+        FontStyleStrikeout:  8
+    };
 
 var charA = "A".charCodeAt(0);
 var charZ = "Z".charCodeAt(0);
@@ -2944,3 +2955,16 @@ function CApplicationFonts()
 }
 
 var g_fontApplication = new CApplicationFonts();
+
+    //------------------------------------------------------export------------------------------------------------------
+    window['AscFonts'] = window['AscFonts'] || {};
+    window['AscFonts'].FontStyle = FontStyle;
+    window['AscFonts'].DecodeBase64Char = DecodeBase64Char;
+    window['AscFonts'].b64_decode = b64_decode;
+    window['AscFonts'].CreateFontData2 = CreateFontData2;
+    window['AscFonts'].CreateFontData3 = CreateFontData3;
+    window['AscFonts'].CreateFontData4 = CreateFontData4;
+    window['AscFonts'].LanguagesFontSelectTypes = LanguagesFontSelectTypes;
+
+    window['AscFonts'].g_fontApplication = g_fontApplication;
+})(window);

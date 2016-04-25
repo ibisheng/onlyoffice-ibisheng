@@ -1430,7 +1430,7 @@ asc_docs_api.prototype.sync_SearchEndCallback = function(){
 asc_docs_api.prototype.put_TextPrFontName = function(name)
 {
 	var loader = window.g_font_loader;
-    var fontinfo = g_fontApplication.GetFontInfo(name);
+    var fontinfo = AscFonts.g_fontApplication.GetFontInfo(name);
 	var isasync = loader.LoadFont(fontinfo);
 	if (false === isasync)
     {

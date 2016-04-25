@@ -1,11 +1,12 @@
 "use strict";
 
 // Import
+var FontStyle = AscFonts.FontStyle;
+var g_fontApplication = AscFonts.g_fontApplication;
+
 var CColor = AscCommon.CColor;
 var CAscMathCategory = AscCommon.CAscMathCategory;
 var g_oTableId = AscCommon.g_oTableId;
-
-var FontStyle = AscFonts.FontStyle;
 
 var g_fontManager = new AscFonts.CFontManager();
 g_fontManager.Initialize(true);

@@ -8,6 +8,8 @@
 
 // Import
 var g_memory = AscFonts.g_memory;
+var DecodeBase64Char = AscFonts.DecodeBase64Char;
+var b64_decode = AscFonts.b64_decode;
 
 var FOREIGN_CURSOR_LABEL_HIDETIME = 1500;
 

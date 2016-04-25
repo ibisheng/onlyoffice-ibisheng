@@ -20,6 +20,8 @@
 //       CParagraph.
 
 // Import
+var g_fontApplication = AscFonts.g_fontApplication;
+
 var g_oTableId = AscCommon.g_oTableId;
 
 var HitInLine = AscFormat.HitInLine;

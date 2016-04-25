@@ -55,7 +55,7 @@ CTextMeasurerWrapper.prototype =
             _lastSetUp.SetUpSize = _size;
             _lastSetUp.SetUpStyle = _style;
 
-            var _fontinfo = g_fontApplication.GetFontInfo(_lastSetUp.SetUpName, _lastSetUp.SetUpStyle, this.LastFontOriginInfo);
+            var _fontinfo = AscFonts.g_fontApplication.GetFontInfo(_lastSetUp.SetUpName, _lastSetUp.SetUpStyle, this.LastFontOriginInfo);
             var _info = GetLoadInfoForMeasurer(_fontinfo, _lastSetUp.SetUpStyle);
 
             var flag = 0;
@@ -157,7 +157,7 @@ CTextMeasurerWrapper.prototype =
     {
         var _code = text.charCodeAt(0);
         if (null != this.LastFontOriginInfo.Replace)
-            _code = g_fontApplication.GetReplaceGlyph(_code, this.LastFontOriginInfo.Replace);
+            _code = AscFonts.g_fontApplication.GetReplaceGlyph(_code, this.LastFontOriginInfo.Replace);
 
         var _width = this.Measurer["MeasureChar"](_code);
         return { Width : _width, Height : 0 };
@@ -166,7 +166,7 @@ CTextMeasurerWrapper.prototype =
     {
         var _code = text.charCodeAt(0);
         if (null != this.LastFontOriginInfo.Replace)
-            _code = g_fontApplication.GetReplaceGlyph(_code, this.LastFontOriginInfo.Replace);
+            _code = AscFonts.g_fontApplication.GetReplaceGlyph(_code, this.LastFontOriginInfo.Replace);
 
         var _bounds = this.Measurer["GetDrawingBox"](_code);
 
@@ -183,7 +183,7 @@ CTextMeasurerWrapper.prototype =
     MeasureCode : function(lUnicode)
     {
         if (null != this.LastFontOriginInfo.Replace)
-            lUnicode = g_fontApplication.GetReplaceGlyph(lUnicode, this.LastFontOriginInfo.Replace);
+            lUnicode = AscFonts.g_fontApplication.GetReplaceGlyph(lUnicode, this.LastFontOriginInfo.Replace);
 
         var _bounds = this.Measurer["GetDrawingBox"](lUnicode);
 
@@ -196,7 +196,7 @@ CTextMeasurerWrapper.prototype =
     Measure2Code : function(lUnicode)
     {
         if (null != this.LastFontOriginInfo.Replace)
-            lUnicode = g_fontApplication.GetReplaceGlyph(lUnicode, this.LastFontOriginInfo.Replace);
+            lUnicode = AscFonts.g_fontApplication.GetReplaceGlyph(lUnicode, this.LastFontOriginInfo.Replace);
 
         var _bounds = this.Measurer["GetDrawingBox"](lUnicode);
 

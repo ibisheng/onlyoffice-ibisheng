@@ -1,6 +1,9 @@
 "use strict";
 
 (function(document){
+    // Import
+    var CreateFontData2 = AscFonts.CreateFontData2;
+    var g_fontApplication = AscFonts.g_fontApplication;
 
     function CEmbeddedCutFontsLoader()
     {
@@ -38,7 +41,7 @@
             document.getElementsByTagName('head')[0].appendChild(scriptElem);
 
             this.Api.asyncFontsDocumentStartLoaded();
-        }
+        };
 
         this._callback_font_load = function()
         {
@@ -47,7 +50,7 @@
 
             oThis.CurrentFindFileParse = 0;
             setTimeout(oThis.parse_font, 10);
-        },
+        };
 
         this.parse_font = function()
         {
@@ -65,7 +68,7 @@
             }
 
             setTimeout(oThis.parse_font, 10);
-        }
+        };
 
         this.init_cut_fonts = function(_fonts)
         {

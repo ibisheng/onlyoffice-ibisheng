@@ -3,6 +3,9 @@
 
       // Import
       var g_memory = AscFonts.g_memory;
+      var DecodeBase64Char = AscFonts.DecodeBase64Char;
+      var b64_decode = AscFonts.b64_decode;
+      
       var CellValueType = AscCommon.CellValueType;
       var c_oAscCellAnchorType = AscCommon.c_oAscCellAnchorType;
       var c_oAscBorderStyles = AscCommon.c_oAscBorderStyles;

@@ -1497,7 +1497,7 @@ CTextDrawer.prototype =
         if (font.Bold == true)
             style += 1;
 
-        var fontinfo = g_fontApplication.GetFontInfo(font.FontFamily.Name, style, this.LastFontOriginInfo);
+        var fontinfo = AscFonts.g_fontApplication.GetFontInfo(font.FontFamily.Name, style, this.LastFontOriginInfo);
         style = fontinfo.GetBaseStyle(style);
 
         if (this.m_oFont.Name != fontinfo.Name)
@@ -1532,7 +1532,7 @@ CTextDrawer.prototype =
 
         if (null != this.LastFontOriginInfo.Replace)
         {
-            code = g_fontApplication.GetReplaceGlyph(code, this.LastFontOriginInfo.Replace);
+            code = AscFonts.g_fontApplication.GetReplaceGlyph(code, this.LastFontOriginInfo.Replace);
         }
 
         window["native"]["PD_FillText"](x, y, code); // TODO:
@@ -1619,7 +1619,7 @@ CTextDrawer.prototype =
         if (_lastFont.Bold == true)
             style += 1;
 
-        var fontinfo = g_fontApplication.GetFontInfo(_lastFont.Name, style, this.LastFontOriginInfo);
+        var fontinfo = AscFonts.g_fontApplication.GetFontInfo(_lastFont.Name, style, this.LastFontOriginInfo);
         style = fontinfo.GetBaseStyle(style);
 
         if (this.m_oFont.Name != fontinfo.Name)

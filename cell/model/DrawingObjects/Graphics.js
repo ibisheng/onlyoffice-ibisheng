@@ -1,9 +1,10 @@
 "use strict";
 
 // Import
-var c_oAscLockTypes = AscCommon.c_oAscLockTypes;
-
 var FontStyle = AscFonts.FontStyle;
+var g_fontApplication = AscFonts.g_fontApplication;
+
+var c_oAscLockTypes = AscCommon.c_oAscLockTypes;
 
 window.g_fontManager2 = null;
 window.g_fontManager2;

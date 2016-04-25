@@ -181,7 +181,7 @@ function CTextMeasurer()
             _lastSetUp.SetUpSize = font.FontSize;
             _lastSetUp.SetUpStyle = oFontStyle;
 
-            g_fontApplication.LoadFont(_lastSetUp.SetUpName, window.g_font_loader, this.m_oManager, _lastSetUp.SetUpSize, _lastSetUp.SetUpStyle, 72, 72, undefined, this.LastFontOriginInfo);
+            AscFonts.g_fontApplication.LoadFont(_lastSetUp.SetUpName, window.g_font_loader, this.m_oManager, _lastSetUp.SetUpSize, _lastSetUp.SetUpStyle, 72, 72, undefined, this.LastFontOriginInfo);
         }
     };
 
@@ -194,7 +194,7 @@ function CTextMeasurer()
             _lastSetUp.SetUpSize = _size;
             _lastSetUp.SetUpStyle = _style;
 
-            g_fontApplication.LoadFont(_lastSetUp.SetUpName, window.g_font_loader, this.m_oManager, _lastSetUp.SetUpSize, _lastSetUp.SetUpStyle, 72, 72, undefined, this.LastFontOriginInfo);
+            AscFonts.g_fontApplication.LoadFont(_lastSetUp.SetUpName, window.g_font_loader, this.m_oManager, _lastSetUp.SetUpSize, _lastSetUp.SetUpStyle, 72, 72, undefined, this.LastFontOriginInfo);
         }
     };
 
@@ -278,7 +278,7 @@ function CTextMeasurer()
             _lastFont.SetUpSize = _lastFont.Size;
             _lastFont.SetUpStyle = _style;
 
-            g_fontApplication.LoadFont(_lastFont.SetUpName, window.g_font_loader, this.m_oManager, _lastFont.SetUpSize, _lastFont.SetUpStyle, 72, 72, undefined, this.LastFontOriginInfo);
+            AscFonts.g_fontApplication.LoadFont(_lastFont.SetUpName, window.g_font_loader, this.m_oManager, _lastFont.SetUpSize, _lastFont.SetUpStyle, 72, 72, undefined, this.LastFontOriginInfo);
         }
     };
 
@@ -299,7 +299,7 @@ function CTextMeasurer()
 
         var _code = text.charCodeAt(0);
         if (null != this.LastFontOriginInfo.Replace)
-            _code = g_fontApplication.GetReplaceGlyph(_code, this.LastFontOriginInfo.Replace);
+            _code = AscFonts.g_fontApplication.GetReplaceGlyph(_code, this.LastFontOriginInfo.Replace);
 
         var Temp = this.m_oManager.MeasureChar( _code);
 		
@@ -314,7 +314,7 @@ function CTextMeasurer()
 
         var _code = text.charCodeAt(0);
         if (null != this.LastFontOriginInfo.Replace)
-            _code = g_fontApplication.GetReplaceGlyph(_code, this.LastFontOriginInfo.Replace);
+            _code = AscFonts.g_fontApplication.GetReplaceGlyph(_code, this.LastFontOriginInfo.Replace);
 
         var Temp = this.m_oManager.MeasureChar( _code );
 
@@ -330,7 +330,7 @@ function CTextMeasurer()
         var Height = 0;
 
         if (null != this.LastFontOriginInfo.Replace)
-            lUnicode = g_fontApplication.GetReplaceGlyph(lUnicode, this.LastFontOriginInfo.Replace);
+            lUnicode = AscFonts.g_fontApplication.GetReplaceGlyph(lUnicode, this.LastFontOriginInfo.Replace);
 
         var Temp = this.m_oManager.MeasureChar( lUnicode );
 
@@ -344,7 +344,7 @@ function CTextMeasurer()
         var Width  = 0;
 
         if (null != this.LastFontOriginInfo.Replace)
-            lUnicode = g_fontApplication.GetReplaceGlyph(lUnicode, this.LastFontOriginInfo.Replace);
+            lUnicode = AscFonts.g_fontApplication.GetReplaceGlyph(lUnicode, this.LastFontOriginInfo.Replace);
 
         var Temp = this.m_oManager.MeasureChar( lUnicode );
 
