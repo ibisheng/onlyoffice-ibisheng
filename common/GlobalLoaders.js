@@ -1,9 +1,15 @@
 "use strict";
 
-(function(document){
+(function(window, document){
     // Import
     var CreateFontData2 = AscFonts.CreateFontData2;
     var g_fontApplication = AscFonts.g_fontApplication;
+    var CFontFileLoader = AscFonts.CFontFileLoader;
+    var FONT_TYPE_EMBEDDED = AscFonts.FONT_TYPE_EMBEDDED;
+    var CFontInfo = AscFonts.CFontInfo;
+    var ImageLoadStatus = AscFonts.ImageLoadStatus;
+    var CImage = AscFonts.CImage;
+    var g_fonts_streams = AscFonts.g_fonts_streams;
 
     function CEmbeddedCutFontsLoader()
     {
@@ -82,7 +88,7 @@
 
                 if (_info === undefined)
                 {
-                    _info = new CFontInfo(_font.Name, "", FONT_TYPE_ADDITIONAL_CUT, -1, -1, -1, -1, -1, -1, -1, -1);
+                    _info = new CFontInfo(_font.Name, "", AscFonts.FONT_TYPE_ADDITIONAL_CUT, -1, -1, -1, -1, -1, -1, -1, -1);
                     this.map_name_cutindex[_font.Name] = _info;
                 }
 
@@ -123,9 +129,9 @@
 
         // теперь вся информация о всех возможных шрифтах. Они во всех редакторах должны быть одни и те же
         this.fontFilesPath = "";
-        this.fontFiles = window.g_font_files;
-        this.fontInfos = window.g_font_infos;
-        this.map_font_index = window.g_map_font_index;
+        this.fontFiles = AscFonts.g_font_files;
+        this.fontInfos = AscFonts.g_font_infos;
+        this.map_font_index = AscFonts.g_map_font_index;
 
         // теперь вся информация о всех встроенных шрифтах. Они должны удаляться при подгрузке нового файла
         this.embeddedFilesPath = "";
@@ -205,10 +211,10 @@
             if (undefined == standarts)
             {
                 standarts = [];
-                for (var i = 0; i < window.g_font_infos.length; i++)
+                for (var i = 0; i < this.fontInfos.length; i++)
                 {
-                    if (window.g_font_infos[i].Name != "ASCW3")
-                        standarts.push(window.g_font_infos[i].Name);
+                    if (this.fontInfos[i].Name != "ASCW3")
+                        standarts.push(this.fontInfos[i].Name);
                 }
             }
 
@@ -217,7 +223,7 @@
             var _map = this.map_font_index;
             for (var i = 0; i < _count; i++)
             {
-                _infos[_map[standarts[i]]].Type = FONT_TYPE_STANDART;
+                _infos[_map[standarts[i]]].Type = AscFonts.FONT_TYPE_STANDART;
             }
         };
 
@@ -247,9 +253,9 @@
             for (var i = 0; i < this.fontInfos.length; i++)
             {
                 var info = this.fontInfos[i];
-                if (FONT_TYPE_STANDART == info.Type)
+                if (AscFonts.FONT_TYPE_STANDART == info.Type)
                 {
-                    var __font = new CFont(info.Name, "", info.Type, info.Thumbnail);
+                    var __font = new AscFonts.CFont(info.Name, "", info.Type, info.Thumbnail);
                     gui_fonts[gui_count++] = __font;
                 }
             }
@@ -261,11 +267,11 @@
                 {
                     var info = this.AddLoadFonts(_fonts[i].name, _fonts[i].NeedStyles);
 
-                    if (info.Type == FONT_TYPE_ADDITIONAL)
+                    if (info.Type == AscFonts.FONT_TYPE_ADDITIONAL)
                     {
                         if (info.name != "ASCW3")
                         {
-                            var __font = new CFont(info.Name, "", info.Type, info.Thumbnail);
+                            var __font = new AscFonts.CFont(info.Name, "", info.Type, info.Thumbnail);
                             gui_fonts[gui_count++] = __font;
                         }
                     }
@@ -655,30 +661,25 @@
             oImage.Image.src = oImage.src;
         }
     }
-	
-    // exports
-    window.g_font_loader    = new CGlobalFontLoader();
-	window.g_font_loader;
-    window.g_image_loader   = new CGlobalImageLoader();
-	window.g_image_loader;
 
-    window.g_flow_anchor = new Image();
-	window.g_flow_anchor;
-    window.g_flow_anchor.asc_complete = false;
-    window.g_flow_anchor.onload = function(){
-        window.g_flow_anchor.asc_complete = true;
+    var g_flow_anchor = new Image();
+    g_flow_anchor.asc_complete = false;
+    g_flow_anchor.onload = function(){
+        g_flow_anchor.asc_complete = true;
     };
-    window.g_flow_anchor.src = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA0AAAAPBAMAAADNDVhEAAAAIVBMVEUAAAANDQ0NDQ0NDQ0NDQ0NDQ0AAAANDQ0NDQ0NDQ0NDQ1jk7YPAAAACnRSTlMAGkD4mb9c5s9TDghpXQAAAFZJREFUCNdjYGBgW8YABlxcIBLBZ1gAEfZa5QWiGRkWMAIpAaA4iHQE0YwODEtANMsChkIwv4BBWQBICyswMC1iWADEDAzKoUuDFUAGNC9uABvIaQkkABpxD6lFb9lRAAAAAElFTkSuQmCC";
+    g_flow_anchor.src = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA0AAAAPBAMAAADNDVhEAAAAIVBMVEUAAAANDQ0NDQ0NDQ0NDQ0NDQ0AAAANDQ0NDQ0NDQ0NDQ1jk7YPAAAACnRSTlMAGkD4mb9c5s9TDghpXQAAAFZJREFUCNdjYGBgW8YABlxcIBLBZ1gAEfZa5QWiGRkWMAIpAaA4iHQE0YwODEtANMsChkIwv4BBWQBICyswMC1iWADEDAzKoUuDFUAGNC9uABvIaQkkABpxD6lFb9lRAAAAAElFTkSuQmCC";
 
-    window.g_flow_anchor2 = new Image();
-	window.g_flow_anchor2;
-    window.g_flow_anchor2.asc_complete = false;
-    window.g_flow_anchor2.onload = function(){
-        window.g_flow_anchor2.asc_complete = true;
+    var g_flow_anchor2 = new Image();
+    g_flow_anchor2.asc_complete = false;
+    g_flow_anchor2.onload = function(){
+        g_flow_anchor2.asc_complete = true;
     };
-    window.g_flow_anchor2.src = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABoAAAAeCAMAAAAFBf7qAAAAOVBMVEUAAAAAAAAAAAAAAAAJCQkAAAAJCQkAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJCQknI0ZQAAAAEnRSTlMAx9ITlAfyPHxn68yecTAl5qt6y0BvAAAAt0lEQVQoz8WS0QrDIAxFk0ajtlXb+/8fuzAprltg7Gnn4aIcvAgJTSSoBiGPoIAGV60qoquvIIL110IJgPONmKIlMI73MiwGRoZvahbKVSizcDKU8QeVPDXEIr6ShVB9VUEn2FOMkwL8VwjUtuypvDWiHeVTFeyWkZHfVQZHGm4XMhKQyJB9GKMxuHQSBlioF7u2q7kzgO2AcWwW3F8mWRmGKgyu91mK1Tzh4ixVVkBzJI/EnGjyACbfCaO3eIWRAAAAAElFTkSuQmCC";
+    g_flow_anchor2.src = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABoAAAAeCAMAAAAFBf7qAAAAOVBMVEUAAAAAAAAAAAAAAAAJCQkAAAAJCQkAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJCQknI0ZQAAAAEnRSTlMAx9ITlAfyPHxn68yecTAl5qt6y0BvAAAAt0lEQVQoz8WS0QrDIAxFk0ajtlXb+/8fuzAprltg7Gnn4aIcvAgJTSSoBiGPoIAGV60qoquvIIL110IJgPONmKIlMI73MiwGRoZvahbKVSizcDKU8QeVPDXEIr6ShVB9VUEn2FOMkwL8VwjUtuypvDWiHeVTFeyWkZHfVQZHGm4XMhKQyJB9GKMxuHQSBlioF7u2q7kzgO2AcWwW3F8mWRmGKgyu91mK1Tzh4ixVVkBzJI/EnGjyACbfCaO3eIWRAAAAAElFTkSuQmCC";
 
-window['CGlobalFontLoader'] = CGlobalFontLoader;
-CGlobalFontLoader.prototype['SetStreamIndexEmb'] = CGlobalFontLoader.prototype.SetStreamIndexEmb;
-
-})(window.document);
+    //---------------------------------------------------------export---------------------------------------------------
+    window['AscCommon'] = window['AscCommon'] || {};
+    window['AscCommon'].g_font_loader = new CGlobalFontLoader();
+    window['AscCommon'].g_image_loader = new CGlobalImageLoader();
+    window['AscCommon'].g_flow_anchor = g_flow_anchor;
+    window['AscCommon'].g_flow_anchor2 = g_flow_anchor2;
+})(window, window.document);

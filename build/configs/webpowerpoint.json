@@ -52,13 +52,14 @@
 		"../common/Drawings/DrawingObjectsHandlers.js",
 		"../common/Drawings/TextDrawer.js",
 		
+		"../word/Drawing/Externals.js",
+		"../common/GlobalLoaders.js",
+		
 		"../common/scroll.js",
 
         "../common/wordcopypaste.js",
 
         "../slide/apiDefines.js",
-        "../word/Drawing/Externals.js",
-        "../common/GlobalLoaders.js",
         "../slide/Drawing/ThemeLoader.js",
         "../common/SerializeCommonWordExcel.js",
         "../common/SerializeChart.js",

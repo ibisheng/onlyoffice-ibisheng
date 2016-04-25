@@ -8,6 +8,7 @@ function(window, undefined) {
 
 // Import
 var g_fontApplication = AscFonts.g_fontApplication;
+var CFont = AscFonts.CFont;
   
 var AscBrowser = AscCommon.AscBrowser;
 var align_Right = AscCommon.align_Right;
@@ -7691,7 +7692,7 @@ function CreateImageFromBinary(bin, nW, nH)
     if (nW === undefined || nH === undefined)
     {
         var _image = editor.ImageLoader.map_image_index[bin];
-        if (_image != undefined && _image.Image != null && _image.Status == ImageLoadStatus.Complete)
+        if (_image != undefined && _image.Image != null && _image.Status == AscFonts.ImageLoadStatus.Complete)
         {
             var _w = Math.max(1, Page_Width - (X_Left_Margin + X_Right_Margin));
             var _h = Math.max(1, Page_Height - (Y_Top_Margin + Y_Bottom_Margin));

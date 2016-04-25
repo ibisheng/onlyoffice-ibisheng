@@ -2432,7 +2432,7 @@ CAutoshapeTrack.prototype =
 
     drawFlowAnchor : function(x, y)
     {
-        var _flow_anchor = this.m_oOverlay.IsRetina ? window.g_flow_anchor2 : window.g_flow_anchor;
+        var _flow_anchor = this.m_oOverlay.IsRetina ? AscCommon.g_flow_anchor2 : AscCommon.g_flow_anchor;
         if (!_flow_anchor || !_flow_anchor.asc_complete || (!editor || !editor.ShowParaMarks))
             return;
 

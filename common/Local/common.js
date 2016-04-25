@@ -19,7 +19,7 @@ baseEditorsApi.prototype._onEndPermissions = function()
 /////////////////////////////////////////////////////////
 //////////////       FONTS       ////////////////////////
 /////////////////////////////////////////////////////////
-CFontFileLoader.prototype.LoadFontAsync = function(basePath, _callback, isEmbed)
+AscFonts.CFontFileLoader.prototype.LoadFontAsync = function(basePath, _callback, isEmbed)
 {
 	this.callback = _callback;
     if (-1 != this.Status)
@@ -54,17 +54,18 @@ CFontFileLoader.prototype.LoadFontAsync = function(basePath, _callback, isEmbed)
 
 		oThis.Status = 0;
 
+		var fontStreams = AscFonts.g_fonts_streams;
 		if (this.response)
 		{
-			var __font_data_idx = g_fonts_streams.length;
+			var __font_data_idx = fontStreams.length;
 			var _uintData = new Uint8Array(this.response);
-			g_fonts_streams[__font_data_idx] = new AscFonts.FT_Stream(_uintData, _uintData.length);
+			fontStreams[__font_data_idx] = new AscFonts.FT_Stream(_uintData, _uintData.length);
 			oThis.SetStreamIndex(__font_data_idx);
 		}
 		else
 		{
-			var __font_data_idx = g_fonts_streams.length;
-			g_fonts_streams[__font_data_idx] = AscFonts.CreateFontData3(this.responseText);
+			var __font_data_idx = fontStreams.length;
+			fontStreams[__font_data_idx] = AscFonts.CreateFontData3(this.responseText);
 			oThis.SetStreamIndex(__font_data_idx);
 
 			if (null != oThis.callback)

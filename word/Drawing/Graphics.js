@@ -885,7 +885,7 @@ CGraphics.prototype =
         }
 
         var _img = editor.ImageLoader.map_image_index[img];
-        if (_img != undefined && _img.Status == ImageLoadStatus.Loading)
+        if (_img != undefined && _img.Status == AscFonts.ImageLoadStatus.Loading)
         {
             // TODO: IMAGE_LOADING
         }
@@ -970,7 +970,7 @@ CGraphics.prototype =
     },
     font : function(font_id,font_size)
     {
-        window.g_font_infos[window.g_map_font_index[font_id]].LoadFont(editor.FontLoader, this.IsUseFonts2 ? this.m_oFontManager2 : this.m_oFontManager,
+        AscFonts.g_font_infos[window.g_map_font_index[font_id]].LoadFont(editor.FontLoader, this.IsUseFonts2 ? this.m_oFontManager2 : this.m_oFontManager,
             Math.max(font_size, 1), 0, this.m_dDpiX, this.m_dDpiY, this.m_oTransform);
     },
     SetFont : function(font)
@@ -1001,7 +1001,7 @@ CGraphics.prototype =
         _last_font.SetUpSize = font.FontSize;
         _last_font.SetUpStyle = oFontStyle;
 
-        g_fontApplication.LoadFont(_last_font.SetUpName, window.g_font_loader, _font_manager, font.FontSize, oFontStyle, this.m_dDpiX, this.m_dDpiY, this.m_oTransform, this.LastFontOriginInfo);
+        g_fontApplication.LoadFont(_last_font.SetUpName, AscCommon.g_font_loader, _font_manager, font.FontSize, oFontStyle, this.m_dDpiX, this.m_dDpiY, this.m_oTransform, this.LastFontOriginInfo);
 
         var _mD = _last_font.SetUpMatrix;
         var _mS = this.m_oTransform;
@@ -1089,7 +1089,7 @@ CGraphics.prototype =
             _lastFont.SetUpSize = _lastFont.Size;
             _lastFont.SetUpStyle = _style;
 
-            g_fontApplication.LoadFont(_lastFont.SetUpName, window.g_font_loader, _font_manager, _lastFont.SetUpSize, _lastFont.SetUpStyle, this.m_dDpiX, this.m_dDpiY, this.m_oTransform, this.LastFontOriginInfo);
+            g_fontApplication.LoadFont(_lastFont.SetUpName, AscCommon.g_font_loader, _font_manager, _lastFont.SetUpSize, _lastFont.SetUpStyle, this.m_dDpiX, this.m_dDpiY, this.m_oTransform, this.LastFontOriginInfo);
 
             var _mD = _lastFont.SetUpMatrix;
             var _mS = this.m_oTransform;
@@ -2597,7 +2597,7 @@ CGraphics.prototype =
 
     drawFlowAnchor : function(x, y)
     {
-        if (!window.g_flow_anchor || !window.g_flow_anchor.asc_complete || (!editor || !editor.ShowParaMarks))
+        if (!AscCommon.g_flow_anchor || !AscCommon.g_flow_anchor.asc_complete || (!editor || !editor.ShowParaMarks))
             return;
 
         if (false === this.m_bIntegerGrid)
@@ -2608,7 +2608,7 @@ CGraphics.prototype =
         var _x = this.m_oFullTransform.TransformPointX(x,y) >> 0;
         var _y = this.m_oFullTransform.TransformPointY(x,y) >> 0;
 
-        this.m_oContext.drawImage(window.g_flow_anchor, _x, _y);
+        this.m_oContext.drawImage(AscCommon.g_flow_anchor, _x, _y);
 
         if (false === this.m_bIntegerGrid)
         {

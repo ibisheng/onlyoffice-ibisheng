@@ -397,7 +397,7 @@ function CDocMeta()
         var fontsCount = stream.GetLong();
         for (var i = 0; i < fontsCount; i++)
         {
-            this.Fonts[i] = new CFont("font" + i, "embedded" + i, FONT_TYPE_EMBEDDED, "", null);
+            this.Fonts[i] = new AscFonts.CFont("font" + i, "embedded" + i, AscFonts.FONT_TYPE_EMBEDDED, "", null);
         }
 
         for (var i = 0; i < this.PagesCount; i++)
@@ -432,7 +432,7 @@ function CDocMeta()
             this.Drawings.splice(0, this.Drawings.length);
         }
 
-        window.g_font_loader.LoadEmbeddedFonts("fonts/", this.Fonts);
+        AscCommon.g_font_loader.LoadEmbeddedFonts("fonts/", this.Fonts);
     }
 
     this.InitDocument = function(drDoc)

@@ -102,11 +102,6 @@ CStylesPainter.prototype.get_STYLE_THUMBNAIL_WIDTH = function() { return this.ST
 CStylesPainter.prototype.get_STYLE_THUMBNAIL_HEIGHT = function() { return this.STYLE_THUMBNAIL_HEIGHT; };
 CStylesPainter.prototype.get_IsRetinaEnabled = function() { return this.IsRetinaEnabled; };
 
-CFont.prototype.asc_getFontId = function() { return this.id; };
-CFont.prototype.asc_getFontName = function() { return this.name; };
-CFont.prototype.asc_getFontThumbnail = function() { return this.thumbnail; };
-CFont.prototype.asc_getFontType = function() { return this.type; };
-
 var DocumentPageSize = new function() {
     this.oSizes = [{name:"US Letter", w_mm: 215.9, h_mm: 279.4, w_tw: 12240, h_tw: 15840},
         {name:"US Legal", w_mm: 215.9, h_mm: 355.6, w_tw: 12240, h_tw: 20160},
@@ -1135,7 +1130,7 @@ asc_docs_api.prototype.put_FramePr = function(Obj)
 {
     if ( undefined != Obj.FontFamily )
     {
-        var loader   = window.g_font_loader;
+        var loader   = AscCommon.g_font_loader;
         var fontinfo = g_fontApplication.GetFontInfo(Obj.FontFamily);
         var isasync  = loader.LoadFont(fontinfo, editor.asyncFontEndLoaded_DropCap, Obj);
         Obj.FontFamily = new asc_CTextFontFamily( { Name : fontinfo.Name, Index : -1 } );
@@ -2381,7 +2376,7 @@ asc_docs_api.prototype.sync_SearchEndCallback = function()
 /*setters*/
 asc_docs_api.prototype.put_TextPrFontName = function(name)
 {
-	var loader = window.g_font_loader;
+	var loader = AscCommon.g_font_loader;
 	var fontinfo = g_fontApplication.GetFontInfo(name);
 	var isasync = loader.LoadFont(fontinfo);
 	if (false === isasync)
@@ -6861,7 +6856,7 @@ asc_docs_api.prototype.asc_setDrawCollaborationMarks = function (bDraw)
 
 asc_docs_api.prototype.asc_AddMath = function(Type)
 {
-    var loader = window.g_font_loader;
+    var loader = AscCommon.g_font_loader;
     var fontinfo = g_fontApplication.GetFontInfo("Cambria Math");
     var isasync = loader.LoadFont(fontinfo);
     if (false === isasync)

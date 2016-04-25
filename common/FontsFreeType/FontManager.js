@@ -347,7 +347,7 @@ function LoadFontFile(library, stream_index, name, faceindex)
 {
     var args = new FT_Open_Args();
     args.flags = 0x02;
-    args.stream = g_fonts_streams[stream_index];
+    args.stream = AscFonts.g_fonts_streams[stream_index];
 
     var face = library.FT_Open_Face(args, faceindex);
     if (null == face)
@@ -452,19 +452,20 @@ function CDefaultFont()
         var _indexB = fontInfo.indexB != -1 ? fontInfo.indexB : _defaultIndex;
         var _indexBI = fontInfo.indexBI != -1 ? fontInfo.indexBI : _defaultIndex;
 
-        font = window.g_font_infos[_indexR];
+        var fontInfos = AscFonts.g_font_infos;
+        font = fontInfos[_indexR];
         this.m_arrDefaultFont[0] = this.m_oLibrary.LoadFont(font.stream_index, font.id, fontInfo.faceIndexR);
         this.m_arrDefaultFont[0].UpdateStyles(false, false);
 
-        font = window.g_font_infos[_indexB];
+        font = fontInfos[_indexB];
         this.m_arrDefaultFont[1] = this.m_oLibrary.LoadFont(font.stream_index, font.id, fontInfo.faceIndexB);
         this.m_arrDefaultFont[1].UpdateStyles(true, false);
 
-        font = window.g_font_infos[_indexI];
+        font = fontInfos[_indexI];
         this.m_arrDefaultFont[2] = this.m_oLibrary.LoadFont(font.stream_index, font.id, fontInfo.faceIndexI);
         this.m_arrDefaultFont[2].UpdateStyles(false, true);
 
-        font = window.g_font_infos[_indexBI];
+        font = fontInfos[_indexBI];
         this.m_arrDefaultFont[3] = this.m_oLibrary.LoadFont(font.stream_index, font.id, fontInfo.faceIndexBI);
         this.m_arrDefaultFont[3].UpdateStyles(true, true);
     };

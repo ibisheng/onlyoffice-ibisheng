@@ -391,14 +391,6 @@ CAscChartProp.prototype.putStyle = function(v)
 CAscChartProp.prototype.changeType = function(v)
 {
     return this.ChartProperties && this.ChartProperties.changeType(v);
-}
-
-
-// [!dirty hack for minimizer - don't delete this comment!] function CFont ()
-CFont.prototype.asc_getFontId = function() { return this.id; }
-CFont.prototype.asc_getFontName = function() { return this.name; }
-CFont.prototype.asc_getFontThumbnail = function() { return this.thumbnail; }
-CFont.prototype.asc_getFontType = function() { return this.type; }
 
 function CLayoutThumbnail()
 {

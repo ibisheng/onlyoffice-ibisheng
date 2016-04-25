@@ -6,6 +6,7 @@ var g_oTextMeasurer = AscCommon.g_oTextMeasurer;
 
 var FontStyle = AscFonts.FontStyle;
 var g_fontApplication = AscFonts.g_fontApplication;
+var ImageLoadStatus = AscFonts.ImageLoadStatus;
 
 var g_fontManager = new AscFonts.CFontManager();
 g_fontManager.Initialize(true);
@@ -160,7 +161,7 @@ function CTableOutlineDr()
     var ctx = this.image.getContext('2d');
     var _data = ctx.createImageData(13, 13);
 
-    DecodeBase64(_data, image_64);
+    AscFonts.DecodeBase64(_data, image_64);
     ctx.putImageData(_data, 0, 0);
 
     _data = null;
@@ -2260,7 +2261,7 @@ function CDrawingDocument()
         var api = this.m_oWordControl.m_oApi;
         for (var i in map_used)
         {
-            var key = GenerateMapId(api, map_used[i].Name, map_used[i].Style, map_used[i].Size);
+            var key = AscFonts.GenerateMapId(api, map_used[i].Name, map_used[i].Style, map_used[i].Size);
             map_keys[key] = true;
         }
 
@@ -2291,7 +2292,7 @@ function CDrawingDocument()
         var dstfonts = [];
         for (var i in map_keys)
         {
-            dstfonts[dstfonts.length] = new CFont(i, 0, "", 0, null);
+            dstfonts[dstfonts.length] = new AscFonts.CFont(i, 0, "", 0, null);
         }
         this.m_oWordControl.m_oLogicDocument.Fonts = dstfonts;
         return;
@@ -3798,7 +3799,7 @@ function CThumbnailsManager()
     this.SetFont = function(font)
     {
         if (-1 == font.FontFamily.Index)
-            font.FontFamily.Index = window.g_map_font_index[font.FontFamily.Name];
+            font.FontFamily.Index = AscFonts.g_map_font_index[font.FontFamily.Name];
 
         if (font.FontFamily.Index == undefined || font.FontFamily.Index == -1)
             return;
@@ -3814,7 +3815,7 @@ function CThumbnailsManager()
         else if ( bItalic && bBold )
             oFontStyle = FontStyle.FontStyleBoldItalic;
 
-		g_fontApplication.LoadFont(font.FontFamily.Name, window.g_font_loader, this.m_oFontManager, font.FontSize, oFontStyle, 96, 96);
+		g_fontApplication.LoadFont(font.FontFamily.Name, AscCommon.g_font_loader, this.m_oFontManager, font.FontSize, oFontStyle, 96, 96);
     }
 
     this.Init = function()

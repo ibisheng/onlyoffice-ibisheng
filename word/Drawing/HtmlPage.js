@@ -4235,7 +4235,7 @@ function CEditorPage(api)
             var _check_obj = _fontSelections.checkPasteText(_textPr, _language);
             if (_check_obj.is_async)
             {
-                var loader = window.g_font_loader;
+                var loader = AscCommon.g_font_loader;
                 var fontinfo = g_fontApplication.GetFontInfo(_check_obj.name);
                 var isasync = loader.LoadFont(fontinfo);
                 if (false === isasync)

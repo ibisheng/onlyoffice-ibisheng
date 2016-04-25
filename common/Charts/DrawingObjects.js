@@ -3166,7 +3166,7 @@ function DrawingObjects() {
             var imageUrl = selectedObjects[0].getImageUrl();
 
             var _image = api.ImageLoader.map_image_index[AscCommon.getFullImageSrc2(imageUrl)];
-            if (_image != undefined && _image.Image != null && _image.Status == ImageLoadStatus.Complete) {
+            if (_image != undefined && _image.Image != null && _image.Status == AscFonts.ImageLoadStatus.Complete) {
 
                 var _w = 1, _h = 1;
                 var bIsCorrect = false;

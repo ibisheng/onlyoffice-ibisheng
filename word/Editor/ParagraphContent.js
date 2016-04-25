@@ -7106,7 +7106,7 @@ ParaDrawing.prototype =
     {
         // TODO: Вообще здесь нужно запрашивать шрифты, которые использовались в старой формуле,
         //      но пока это только 1 шрифт "Cambria Math".
-        var loader = window.g_font_loader;
+        var loader = AscCommon.g_font_loader;
         var fontinfo = g_fontApplication.GetFontInfo("Cambria Math");
         var isasync = loader.LoadFont(fontinfo, ConvertEquationToMathCallback, this);
         if (false === isasync)

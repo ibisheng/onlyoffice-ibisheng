@@ -21,8 +21,8 @@ function baseEditorsApi(name) {
 
   this.isMobileVersion = false;
 
-  this.FontLoader = window.g_font_loader;
-  this.ImageLoader = window.g_image_loader;
+  this.FontLoader = AscCommon.g_font_loader;
+  this.ImageLoader = AscCommon.g_image_loader;
   this.FontLoader.put_Api(this);
   this.ImageLoader.put_Api(this);
   this.FontLoader.SetStandartFonts();

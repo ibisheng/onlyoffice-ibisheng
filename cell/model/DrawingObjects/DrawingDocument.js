@@ -158,7 +158,7 @@ function CTableOutlineDr()
     var ctx = this.image.getContext('2d');
     var _data = ctx.createImageData(13, 13);
 
-    DecodeBase64(_data, image_64);
+    AscFonts.DecodeBase64(_data, image_64);
     ctx.putImageData(_data, 0, 0);
 
     _data = null;
@@ -3690,7 +3690,7 @@ function CDrawingDocument(drawingObjects)
         var api = this.m_oWordControl.m_oApi;
         for (var i in map_used)
         {
-            var key = GenerateMapId(api, map_used[i].Name, map_used[i].Style, map_used[i].Size);
+            var key = AscFonts.GenerateMapId(api, map_used[i].Name, map_used[i].Style, map_used[i].Size);
             map_keys[key] = true;
         }
 
@@ -3722,7 +3722,7 @@ function CDrawingDocument(drawingObjects)
         var dstfonts = [];
         for (var i in map_keys)
         {
-            dstfonts[dstfonts.length] = new CFont(i, 0, "", 0, null);
+            dstfonts[dstfonts.length] = new AscFonts.CFont(i, 0, "", 0, null);
         }
         this.m_oWordControl.m_oLogicDocument.Fonts = dstfonts;
         return;
@@ -4064,7 +4064,7 @@ function CDrawingDocument(drawingObjects)
 
 		var api = window["Asc"]["editor"];
         var _img = api.ImageLoader.map_image_index[AscCommon.getFullImageSrc2(this.LastDrawingUrl)];
-        if (_img != undefined && _img.Image != null && _img.Status != ImageLoadStatus.Loading)
+        if (_img != undefined && _img.Image != null && _img.Status != AscFonts.ImageLoadStatus.Loading)
         {
             var _x = 0;
             var _y = 0;
@@ -4136,7 +4136,7 @@ function CDrawingDocument(drawingObjects)
 
         var api = window["Asc"]["editor"];
         var _img = api.ImageLoader.map_image_index[AscCommon.getFullImageSrc2(this.LastDrawingUrlTextArt)];
-        if (_img != undefined && _img.Image != null && _img.Status != ImageLoadStatus.Loading)
+        if (_img != undefined && _img.Image != null && _img.Status != AscFonts.ImageLoadStatus.Loading)
         {
             var _x = 0;
             var _y = 0;

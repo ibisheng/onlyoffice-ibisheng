@@ -903,7 +903,7 @@ CShapeDrawer.prototype =
                 var editor = window["Asc"]["editor"];
                 var _img = editor.ImageLoader.map_image_index[getFullImageSrc2(this.UniFill.fill.RasterImageId)];
                 var _img_native = this.UniFill.fill.canvas;
-                if ((!_img_native) && (_img == undefined || _img.Image == null || _img.Status == ImageLoadStatus.Loading))
+                if ((!_img_native) && (_img == undefined || _img.Image == null || _img.Status == AscFonts.ImageLoadStatus.Loading))
                 {
                     this.Graphics.save();
                     this.Graphics.clip();

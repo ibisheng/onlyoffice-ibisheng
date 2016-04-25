@@ -1,22 +1,17 @@
 "use strict";
 
+(function(window, document){
+
 // Import
 var FontStyle = AscFonts.FontStyle;
 var DecodeBase64Char = AscFonts.DecodeBase64Char;
 var b64_decode = AscFonts.b64_decode;
 var FT_Stream = AscFonts.FT_Stream;
 
-window.g_fontNamesEncoder = undefined;
-window.g_fontNamesEncoder;
+var g_fontNamesEncoder = undefined;
 
-window.g_font_files = undefined;
-window.g_font_files;
-
-window.g_font_infos = undefined;
-window.g_font_infos;
-
-window.g_map_font_index = {};
-window.g_map_font_index;
+var g_map_font_index = {};
+var g_fonts_streams = [];
 
 function ZBase32Encoder()
 {
@@ -393,11 +388,11 @@ function CFontFileLoader(id)
 
         var xhr = new XMLHttpRequest();
 
-        if (!window.g_fontNamesEncoder)
-            window.g_fontNamesEncoder = new ZBase32Encoder();
+        if (!g_fontNamesEncoder)
+            g_fontNamesEncoder = new ZBase32Encoder();
 
         //var _name = this.Id;
-        var _name = window.g_fontNamesEncoder.Encode(this.Id) + ".js";
+        var _name = g_fontNamesEncoder.Encode(this.Id) + ".js";
 
         xhr.open('GET', basePath + "odttf/" + _name, true); // TODO:
 
@@ -539,11 +534,11 @@ CFontFileLoader.prototype.LoadFontAsync = function(basePath, _callback, isEmbed)
 	var src;
 	if (this.IsNeedAddJSToFontPath)
 	{
-		if (!window.g_fontNamesEncoder)
-			window.g_fontNamesEncoder = new ZBase32Encoder();
+		if (!g_fontNamesEncoder)
+			g_fontNamesEncoder = new ZBase32Encoder();
 
 		//var _name = this.Id + ".js";
-		var _name = window.g_fontNamesEncoder.Encode(this.Id + ".js") + ".js";
+		var _name = g_fontNamesEncoder.Encode(this.Id + ".js") + ".js";
 		src = basePath + "js/" + _name;
 	}
 	else
@@ -922,7 +917,7 @@ CFontInfo.prototype =
     LoadFont : function(font_loader, fontManager, fEmSize, lStyle, dHorDpi, dVerDpi, transform)
     {
         // сначала нужно проверить на обрезанный шрифт
-        var _embedded_cur = window.g_font_loader.embedded_cut_manager;
+        var _embedded_cur = AscCommon.g_font_loader.embedded_cut_manager;
         if (_embedded_cur.bIsCutFontsUse)
         {
             if (this.Type != FONT_TYPE_ADDITIONAL_CUT)
@@ -931,7 +926,7 @@ CFontInfo.prototype =
 
                 if (_font_info !== undefined)
                 {
-                    return _font_info.LoadFont(window.g_font_loader, fontManager, fEmSize, lStyle, dHorDpi, dVerDpi, transform);
+                    return _font_info.LoadFont(AscCommon.g_font_loader, fontManager, fEmSize, lStyle, dHorDpi, dVerDpi, transform);
                 }
             }
         }
@@ -1088,7 +1083,7 @@ CFontInfo.prototype =
 
                 if (_font_info !== undefined)
                 {
-                    return _font_info.LoadFont(window.g_font_loader, fontManager, fEmSize, lStyle, dHorDpi, dVerDpi, transform);
+                    return _font_info.LoadFont(AscCommon.g_font_loader, fontManager, fEmSize, lStyle, dHorDpi, dVerDpi, transform);
                 }
             }
         }
@@ -1383,6 +1378,10 @@ function CFont(name, id, type, thumbnail, style)
     else
         this.NeedStyles = fontstyle_mask_regular | fontstyle_mask_italic | fontstyle_mask_bold | fontstyle_mask_bolditalic;
 }
+CFont.prototype.asc_getFontId = function() { return this.id; };
+CFont.prototype.asc_getFontName = function() { return this.name; };
+CFont.prototype.asc_getFontThumbnail = function() { return this.thumbnail; };
+CFont.prototype.asc_getFontType = function() { return this.type; };
 
 var ImageLoadStatus =
 {
@@ -1396,8 +1395,6 @@ function CImage(src)
     this.Image  = null;
     this.Status = ImageLoadStatus.Complete;
 }
-
-var g_fonts_streams = [];
 
 function DecodeBase64(imData, szSrc)
 {
@@ -1471,7 +1468,6 @@ function DecodeBase64(imData, szSrc)
 }
 
 // ALL_FONTS_PART -------------------------------------------------------------
-(function(document){
 
     if (undefined === window["__fonts_files"] && window["native"]["GenerateAllFonts"])
     {
@@ -1480,22 +1476,20 @@ function DecodeBase64(imData, szSrc)
     }
 
     var __len_files = window["__fonts_files"].length;
-
-    window.g_font_files = new Array(__len_files);
+    var g_font_files = new Array(__len_files);
     for (var i = 0; i < __len_files; i++)
     {
-        window.g_font_files[i] = new CFontFileLoader(window["__fonts_files"][i]);
+        g_font_files[i] = new CFontFileLoader(window["__fonts_files"][i]);
     }
 
     var __len_infos = window["__fonts_infos"].length;
-
-    window.g_font_infos = new Array(__len_infos);
+    var g_font_infos = new Array(__len_infos);
 	
     for (var i = 0; i < __len_infos; i++)
     {
         var _info = window["__fonts_infos"][i];
-        window.g_font_infos[i] = new CFontInfo(_info[0], i, 0, _info[1], _info[2], _info[3], _info[4], _info[5], _info[6], _info[7], _info[8]);
-        window.g_map_font_index[_info[0]] = i;
+        g_font_infos[i] = new CFontInfo(_info[0], i, 0, _info[1], _info[2], _info[3], _info[4], _info[5], _info[6], _info[7], _info[8]);
+        g_map_font_index[_info[0]] = i;
     }
 
     /////////////////////////////////////////////////////////////////////
@@ -1505,18 +1499,44 @@ function DecodeBase64(imData, szSrc)
     var _ind_wngds3 = g_fonts_streams.length;
     g_fonts_streams[_ind_wngds3] = AscFonts.CreateFontData2("AAEAAAARAQAABAAQTFRTSMgBAWkAAAIMAAAACU9TLzI5/eoAAAABmAAAAGBWRE1Yb8J3OwAAAhgAAAXgY21hcPBr8H4AAAjAAAAASGN2dCBAjTlRAAASGAAAAn5mcGdtgM3J1AAACQgAAAdFZ2FzcAAXAAkAABmgAAAAEGdseWalB9HFAAAUmAAAAORoZG14G81RIAAAB/gAAADIaGVhZAUoUMgAAAEcAAAANmhoZWEOZANxAAABVAAAACRobXR4FGIB2gAAAfgAAAAUbG9jYQBoALoAABV8AAAADG1heHAITQdkAAABeAAAACBuYW1lDC7+vAAAFYgAAAPJcG9zdONgvM0AABlUAAAASXByZXB9uZ8bAAAQUAAAAcYAAQAAAAEAAPQVs0xfDzz1ABsIAAAAAADPTriwAAAAAM+3TU8AgAAABnUFyAAAAAwAAQAAAAAAAAABAAAHbP5QAAAHIQCA/foGdQABAAAAAAAAAAAAAAAAAAAABQABAAAABQAJAAIAAAAAAAIAEAAUAE0AAAfoB0UAAAAAAAMFGAGQAAUAAATOBM4AAAMWBM4EzgAAAxYAZAMgDAAFBAECAQgHBwcHAAAAAAAAAAAAAAAAAAAAAE1TICAAQPAi8DgGKwGkADEHbAGwgAAAAAAAAAD/////AAAAIAAABAAAgAAAAAAE0gAAByEArQRvAK0AAAAFZAEBZGQAAAAAAAABAAEBAQEBAAwA+Aj/AAgACP/+AAkACP/9AAoACf/+AAsACv/+AAwAC//+AA0ADP/9AA4ADf/9AA8ADv/9ABAADv/9ABEAD//9ABIAEf/8ABMAEv/7ABQAE//7ABUAFP/7ABYAFf/7ABcAFv/7ABgAF//7ABkAGP/6ABoAGP/6ABsAGP/6ABwAGf/7AB0AGv/7AB4AHP/5AB8AHf/5ACAAHv/5ACEAH//4ACIAIP/5ACMAIf/5ACQAIf/4ACUAIv/4ACYAI//4ACcAJP/4ACgAJf/4ACkAJv/3ACoAKP/2ACsAKf/2ACwAKf/2AC0AKv/2AC4AKv/3AC8AK//2ADAALP/2ADEALf/2ADIALv/2ADMAL//1ADQAMP/1ADUAMf/1ADYAM//0ADcANP/0ADgANP/0ADkANf/zADoANv/zADsAN//zADwAOP/zAD0AOf/zAD4AOf/zAD8AOv/zAEAAO//yAEEAPP/zAEIAPf/yAEMAPv/yAEQAP//xAEUAQP/xAEYAQf/xAEcAQv/xAEgAQ//xAEkARP/xAEoARf/wAEsARv/wAEwARv/wAE0ASP/vAE4ASf/vAE8ASf/vAFAASv/vAFEAS//uAFIATP/uAFMATf/vAFQATv/vAFUAT//uAFYAT//uAFcAUP/uAFgAUf/uAFkAU//tAFoAVP/sAFsAVf/sAFwAVv/sAF0AV//sAF4AWP/sAF8AWf/sAGAAWf/rAGEAWf/rAGIAWv/rAGMAW//rAGQAXP/rAGUAXv/qAGYAX//qAGcAYP/qAGgAYf/qAGkAYv/qAGoAYv/pAGsAY//pAGwAZP/pAG0AZf/pAG4AZv/pAG8AZ//pAHAAaP/oAHEAav/nAHIAav/nAHMAa//nAHQAa//nAHUAbP/nAHYAbf/nAHcAbv/mAHgAb//nAHkAcP/nAHoAcf/nAHsAcv/mAHwAc//mAH0Adf/lAH4Adf/lAH8Adv/lAIAAd//lAIEAeP/kAIIAef/kAIMAev/kAIQAev/kAIUAe//kAIYAfP/kAIcAff/kAIgAff/jAIkAf//iAIoAgP/iAIsAgf/iAIwAgv/iAI0Ag//iAI4AhP/iAI8Ahf/iAJAAhv/hAJEAh//hAJIAh//hAJMAiP/hAJQAiv/gAJUAiv/gAJYAi//gAJcAjP/gAJgAjf/gAJkAjv/fAJoAj//fAJsAkP/fAJwAkP/fAJ0Akf/fAJ4Akv/fAJ8Ak//fAKAAlf/eAKEAlv/dAKIAl//dAKMAmP/dAKQAmf/dAKUAmv/dAKYAmv/dAKcAmv/dAKgAm//cAKkAnP/cAKoAnf/cAKsAnv/cAKwAoP/bAK0Aof/bAK4Aov/bAK8Ao//aALAAo//bALEApP/bALIApf/aALMApv/aALQAp//aALUAqP/aALYAqf/aALcAqv/ZALgAq//ZALkArP/YALoArP/YALsArf/YALwArv/YAL0Ar//YAL4AsP/YAL8Asf/XAMAAsv/XAMEAs//XAMIAtP/XAMMAtf/XAMQAtv/WAMUAt//WAMYAuP/WAMcAuf/VAMgAuv/VAMkAu//VAMoAu//VAMsAvP/VAMwAvf/VAM0Avv/VAM4Avv/VAM8Av//VANAAwf/TANEAwv/TANIAw//TANMAxP/TANQAxf/TANUAxv/TANYAx//TANcAyP/T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");
     _wngds3.SetStreamIndex(_ind_wngds3);
-    window.g_font_files[window.g_font_files.length] = _wngds3;
+    g_font_files.push(_wngds3);
 
-    var _ind_info_wngds3 = window.g_font_infos.length;
-    window.g_font_infos[_ind_info_wngds3] = new CFontInfo("ASCW3", 0, FONT_TYPE_ADDITIONAL, window.g_font_files.length - 1, 0, -1, -1, -1, -1, -1, -1);
-    window.g_map_font_index["ASCW3"] = _ind_info_wngds3;
+    var _ind_info_wngds3 = g_font_infos.length;
+    g_font_infos[_ind_info_wngds3] = new CFontInfo("ASCW3", 0, FONT_TYPE_ADDITIONAL, g_font_files.length - 1, 0, -1, -1, -1, -1, -1, -1);
+    g_map_font_index["ASCW3"] = _ind_info_wngds3;
     /////////////////////////////////////////////////////////////////////
 
     // удаляем временные переменные
     delete window["__fonts_files"];
     delete window["__fonts_infos"];
 
-})(window.document);
+    //------------------------------------------------------export------------------------------------------------------
+    var prot;
+    window['AscFonts'] = window['AscFonts'] || {};
+    window['AscFonts'].g_font_files = g_font_files;
+    window['AscFonts'].g_font_infos = g_font_infos;
+    window['AscFonts'].g_map_font_index = g_map_font_index;
+    window['AscFonts'].g_fonts_streams = g_fonts_streams;
+
+    window['AscFonts'].FONT_TYPE_ADDITIONAL = FONT_TYPE_ADDITIONAL;
+    window['AscFonts'].FONT_TYPE_STANDART = FONT_TYPE_STANDART;
+    window['AscFonts'].FONT_TYPE_EMBEDDED = FONT_TYPE_EMBEDDED;
+    window['AscFonts'].FONT_TYPE_ADDITIONAL_CUT = FONT_TYPE_ADDITIONAL_CUT;
+
+    window['AscFonts'].CFontFileLoader = CFontFileLoader;
+    window['AscFonts'].GenerateMapId = GenerateMapId;
+    window['AscFonts'].CFontInfo = CFontInfo;
+    window['AscFonts'].CFont = CFont;
+    prot = CFont.prototype;
+    prot['asc_getFontId'] = prot.asc_getFontId;
+    prot['asc_getFontName'] = prot.asc_getFontName;
+    prot['asc_getFontThumbnail'] = prot.asc_getFontThumbnail;
+    prot['asc_getFontType'] = prot.asc_getFontType;
+    window['AscFonts'].ImageLoadStatus = ImageLoadStatus;
+    window['AscFonts'].CImage = CImage;
+    window['AscFonts'].DecodeBase64 = DecodeBase64;
+
+})(window, window.document);
 
 // сначала хотел писать "вытеснение" из этого мапа.
 // но тогда нужно хранить base64 строки. Это не круто. По памяти - даже

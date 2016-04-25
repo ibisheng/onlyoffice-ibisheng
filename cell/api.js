@@ -1094,7 +1094,7 @@ var editor;
     this.asyncMethodCallback = callback;
     var arrLoadFonts = [];
     for (var i in fonts)
-      arrLoadFonts.push(new CFont(i, 0, "", 0));
+      arrLoadFonts.push(new AscFonts.CFont(i, 0, "", 0));
     History.loadFonts(arrLoadFonts);
     this.FontLoader.LoadDocumentFonts2(arrLoadFonts);
   };

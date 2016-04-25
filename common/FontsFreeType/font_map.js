@@ -1735,7 +1735,7 @@ CFontSelectList.prototype =
 
         var _info = g_fontApplication.GetFontInfo(_fontFamily.Name, oFontStyle);
 
-        var _id = _info.GetFontID(window.g_font_loader, oFontStyle);
+        var _id = _info.GetFontID(AscCommon.g_font_loader, oFontStyle);
         var _select = this.List[this.ListMap[_id.id]];
 
         if (0 != _lang.CodePage1Mask)
@@ -1810,11 +1810,11 @@ CFontSelectList.prototype =
         var _error = 0x01000000;
         var _name = "";
 
-        var _len = window.g_font_infos.length;
+        var _len = AscFonts.g_font_infos.length;
         for (var i = 0; i < _len; i++)
         {
-            var _info = window.g_font_infos[i];
-            var _id = _info.GetFontID(window.g_font_loader, _style);
+            var _info = AscFonts.g_font_infos[i];
+            var _id = _info.GetFontID(AscCommon.g_font_loader, _style);
             var _select = this.List[this.ListMap[_id.id]];
 
             if (!_select)
@@ -2794,7 +2794,7 @@ function CApplicationFonts()
     this.LoadFont = function(name, font_loader, fontManager, fEmSize, lStyle, dHorDpi, dVerDpi, transform, objDst)
     {
         var _font = this.GetFontFileWeb(name, lStyle);
-        var font_name_index = window.g_map_font_index[_font.m_wsFontName];
+        var font_name_index = AscFonts.g_map_font_index[_font.m_wsFontName];
         if (undefined !== objDst)
         {
             objDst.Name = _font.m_wsFontName;
@@ -2803,7 +2803,7 @@ function CApplicationFonts()
 
         // используем стиль, пришедший извне, а не стиль _font
         // так как подвираем вез стиля в Web версии
-        return window.g_font_infos[font_name_index].LoadFont(window.g_font_loader, fontManager, fEmSize, /*_font.GetStyle()*/lStyle, dHorDpi, dVerDpi, transform);
+        return AscFonts.g_font_infos[font_name_index].LoadFont(AscCommon.g_font_loader, fontManager, fEmSize, /*_font.GetStyle()*/lStyle, dHorDpi, dVerDpi, transform);
     };
 
     this.CheckReplaceGlyphsMap = function(name, objDst)
@@ -2880,7 +2880,7 @@ function CApplicationFonts()
     this.GetFontInfo = function(name, lStyle, objDst)
     {
         var _font = this.GetFontFileWeb(name, lStyle);
-        var font_name_index = window.g_map_font_index[_font.m_wsFontName];
+        var font_name_index = AscFonts.g_map_font_index[_font.m_wsFontName];
 
         if (undefined !== objDst)
         {
@@ -2888,7 +2888,7 @@ function CApplicationFonts()
             objDst.Replace = this.CheckReplaceGlyphsMap(name, objDst);
         }
 
-        return window.g_font_infos[font_name_index];
+        return AscFonts.g_font_infos[font_name_index];
     };
     this.GetFontInfoName = function(name, objDst)
     {

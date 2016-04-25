@@ -1812,7 +1812,7 @@
               }
 
               var _image = api.ImageLoader.map_image_index[AscCommon.getFullImageSrc2(this.ImageUrl)];
-              if (_image != undefined && _image.Image != null && _image.Status == ImageLoadStatus.Complete)
+              if (_image != undefined && _image.Image != null && _image.Status == AscFonts.ImageLoadStatus.Complete)
               {
                   var _w = Math.max(1, _page_width - (_page_x_left_margin + _page_x_right_margin));
                   var _h = Math.max(1, _page_height - (_page_y_top_margin + _page_y_bottom_margin));

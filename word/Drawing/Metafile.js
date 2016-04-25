@@ -1275,7 +1275,7 @@ CMetafile.prototype =
     },
 	FillTextCode : function(x,y,code)
     {
-        var _font_info = window.g_font_infos[window.g_map_font_index[this.m_oFont.Name]];       
+        var _font_info = AscFonts.g_font_infos[window.g_map_font_index[this.m_oFont.Name]];       
 
         if (code < 0xFFFF)
             return this.FillText(x, y, String.fromCharCode(code));
@@ -1295,7 +1295,7 @@ CMetafile.prototype =
 
         var _old_pos = this.Memory.pos;
 
-        g_fontApplication.LoadFont(_font_info.Name, window.g_font_loader, AscCommon.g_oTextMeasurer.m_oManager, this.m_oFont.FontSize, Math.max(this.m_oFont.Style, 0), 72, 72);
+        g_fontApplication.LoadFont(_font_info.Name, AscCommon.g_font_loader, AscCommon.g_oTextMeasurer.m_oManager, this.m_oFont.FontSize, Math.max(this.m_oFont.Style, 0), 72, 72);
 
         if (null != this.LastFontOriginInfo.Replace)
         {
@@ -1325,7 +1325,7 @@ CMetafile.prototype =
 
         var _old_pos = this.Memory.pos;
 
-        g_fontApplication.LoadFont(this.m_oFont.Name, window.g_font_loader, AscCommon.g_oTextMeasurer.m_oManager, this.m_oFont.FontSize, Math.max(this.m_oFont.Style, 0), 72, 72);
+        g_fontApplication.LoadFont(this.m_oFont.Name, AscCommon.g_font_loader, AscCommon.g_oTextMeasurer.m_oManager, this.m_oFont.FontSize, Math.max(this.m_oFont.Style, 0), 72, 72);
         AscCommon.g_oTextMeasurer.m_oManager.LoadStringPathCode(gid, true, x, y, this);
 
         // start (1) + draw(1) + typedraw(4) + end(1) = 7!

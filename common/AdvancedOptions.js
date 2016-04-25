@@ -148,20 +148,6 @@
 		prot["asc_getDelimiterName"]			= prot.asc_getDelimiterName;
 		prot["asc_setDelimiterName"]			= prot.asc_setDelimiterName;
 
-		CFont.prototype= {
-			asc_getFontId : function() { return this.id; },
-			asc_getFontName : function() { return this.name; },
-			asc_getFontThumbnail : function() { return this.thumbnail; },
-			asc_getFontType : function() { return this.type; }
-		};
-
-		window["Asc"].CFont = window["Asc"]["CFont"] = CFont;
-		prot = CFont.prototype;
-		prot["asc_getFontId"]			= prot.asc_getFontId;
-		prot["asc_getFontName"]			= prot.asc_getFontName;
-		prot["asc_getFontThumbnail"]	= prot.asc_getFontThumbnail;
-		prot["asc_getFontType"]			= prot.asc_getFontType;
-
 		/** @constructor */
 		function asc_CFormulaGroup(name){
 			this.groupName = name;

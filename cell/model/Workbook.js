@@ -2524,7 +2524,7 @@ Workbook.prototype.generateFontMap2=function(){
 
 	var aRes = [];
 	for(var i in oFontMap)
-		aRes.push(new CFont(i, 0, "", 0));
+		aRes.push(new AscFonts.CFont(i, 0, "", 0));
 	return aRes;
 };
 Workbook.prototype.recalcWB = function(isRecalcWB){

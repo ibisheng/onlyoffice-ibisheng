@@ -52,6 +52,9 @@
 		"../common/Drawings/DrawingObjectsHandlers.js",
 		"../common/Drawings/TextDrawer.js",
 		
+		"../word/Drawing/Externals.js",
+		"../common/GlobalLoaders.js",
+		
 		"../common/scroll.js",
 		"../cell/view/iscroll.js",
 
@@ -60,8 +63,6 @@
         "../cell/apiDefines.js",
         "../word/Drawing/HatchPattern.js",
         "../word/Drawing/WorkEvents.js",
-        "../word/Drawing/Externals.js",
-        "../common/GlobalLoaders.js",
         "../cell/document/empty-workbook.js",
         "../cell/utils/utils.js",
         "../cell/model/UndoRedo.js",

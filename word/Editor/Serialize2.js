@@ -5844,7 +5844,7 @@ function BinaryFileReader(doc, openParams)
       AscFormat.checkThemeFonts(AllFonts, fontScheme);
 		
         for (var i in AllFonts)
-            aPrepeareFonts.push(new CFont(i, 0, "", 0));
+            aPrepeareFonts.push(new AscFonts.CFont(i, 0, "", 0));
         //создаем список используемых картинок
         var oPastedImagesUnique = {};
         var aPastedImages = window.global_pptx_content_loader.End_UseFullUrl();
@@ -12412,7 +12412,7 @@ CFontsCharMap.prototype =
         else if ( bItalic && bBold )
             oFontStyle = FontStyle.FontStyleBoldItalic;
 
-        var _id = font_info.GetFontID(window.g_font_loader, oFontStyle);
+        var _id = font_info.GetFontID(AscCommon.g_font_loader, oFontStyle);
 
         var _find_index = _id.id + "_teamlab_" + _id.faceIndex;
         if (this.CurrentFontName != _find_index)
@@ -12428,7 +12428,7 @@ CFontsCharMap.prototype =
                 _find.Name = family;
                 _find.Id = _id.id;
                 _find.FaceIndex = _id.faceIndex;
-                _find.IsEmbedded = (font_info.type == FONT_TYPE_EMBEDDED);
+                _find.IsEmbedded = (font_info.type == AscFonts.FONT_TYPE_EMBEDDED);
 
                 this.CurrentFontInfo = _find;
                 this.map_fonts[_find_index] = _find;
