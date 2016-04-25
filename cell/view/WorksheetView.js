@@ -13240,7 +13240,10 @@
         var intersectionTables = this.model.autoFilters.getTableIntersectionRange(range);
         if (0 < intersectionTables.length) {
             var tablePart = intersectionTables[0];
-            if (range.r1 !== tablePart.Ref.r1)//первая строка таблицы не равна первой строке выделенного диапазона
+			if(range.isOneCell())
+			{
+				res = c_oAscError.ID.FTChangeTableRangeError
+			}else if (range.r1 !== tablePart.Ref.r1)//первая строка таблицы не равна первой строке выделенного диапазона
             {
                 res = c_oAscError.ID.FTChangeTableRangeError;
             } else if (intersectionTables.length !== 1)//выделено несколько таблиц
