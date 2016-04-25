@@ -4,6 +4,7 @@
 var FT_Common = AscFonts.FT_Common;
 var FT_Stream = AscFonts.FT_Stream;
 var g_memory = AscFonts.g_memory;
+var FontStyle = AscFonts.FontStyle;
 
 var charA = "A".charCodeAt(0);
 var charZ = "Z".charCodeAt(0);

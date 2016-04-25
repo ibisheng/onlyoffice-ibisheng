@@ -3,13 +3,15 @@
 // Import
 var CColor = AscCommon.CColor;
 
+var FontStyle = AscFonts.FontStyle;
+
 var g_dDpiX = 96.0;
 var g_dDpiY = 96.0;
 
 var g_dKoef_mm_to_pix = g_dDpiX / 25.4;
 var g_dKoef_pix_to_mm = 25.4 / g_dDpiX;
 
-var g_fontManager = new CFontManager();
+var g_fontManager = new AscFonts.CFontManager();
 g_fontManager.Initialize(true);
 
 function SetHintsProps(bIsHinting, bIsSubpixHinting)
@@ -145,7 +147,7 @@ function CTableOutline(Table, PageNum, X, Y, W, H)
 
 function CTextMeasurer()
 {
-    this.m_oManager     = new CFontManager();
+    this.m_oManager     = new AscFonts.CFontManager();
 
     this.m_oFont        = null;
 

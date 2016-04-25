@@ -2,13 +2,13 @@
 
 // Import
 var g_memory = AscFonts.g_memory;
+var FontStyle = AscFonts.FontStyle;
 
 var align_Right = AscCommon.align_Right;
 var align_Left = AscCommon.align_Left;
 var align_Center = AscCommon.align_Center;
 var align_Justify = AscCommon.align_Justify;
 var c_oAscWrapStyle = AscCommon.c_oAscWrapStyle;
-var c_oAscLimLoc = AscCommon.c_oAscLimLoc;
 
 var c_oAscXAlign = Asc.c_oAscXAlign;
 var c_oAscYAlign = Asc.c_oAscYAlign;

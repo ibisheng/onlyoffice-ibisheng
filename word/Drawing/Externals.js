@@ -1,5 +1,8 @@
 "use strict";
 
+// Import
+var FontStyle = AscFonts.FontStyle;
+
 window.g_fontNamesEncoder = undefined;
 window.g_fontNamesEncoder;
 

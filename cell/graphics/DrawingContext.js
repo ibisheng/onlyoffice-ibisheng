@@ -11,6 +11,7 @@
 	 * Import
 	 * -----------------------------------------------------------------------------
 	 */
+	var FontStyle = AscFonts.FontStyle;
 
 	var asc = window["Asc"];
 	var asc_round = asc.round;
@@ -1221,7 +1222,7 @@
 	/**
 	 * @param {Number} w         Ширина текста
 	 * @param {Number} wBB       Ширина Bound Box текста
-	 * @param {CFontManager} fm  Объект CFontManager для получения метрик шрифта
+	 * @param {AscFonts.CFontManager} fm  Объект AscFonts.CFontManager для получения метрик шрифта
 	 * @param {Number} r         Коэффициент перевода pt -> в текущие единицы измерения (this.units)
 	 * @return {TextMetrics}
 	 */

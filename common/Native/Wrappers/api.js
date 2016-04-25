@@ -4930,15 +4930,6 @@ asc_docs_api.prototype.sync_DocSizeCallback = function(width,height)
 // endsectionPr -----------------------------------------------------------------------------------------
 
 // font engine -------------------------------------
-var FONT_ITALIC_ANGLE   = 0.3090169943749;
-var FT_ENCODING_UNICODE = 1970170211;
-var FT_ENCODING_NONE    = 0;
-var FT_ENCODING_MS_SYMBOL   = 1937337698;
-var FT_ENCODING_APPLE_ROMAN = 1634889070;
-
-var LOAD_MODE = 40970;
-var REND_MODE = 0;
-
 var FontStyle =
 {
     FontStyleRegular:    0,
@@ -4949,34 +4940,11 @@ var FontStyle =
     FontStyleStrikeout:  8
 };
 
-var EGlyphState =
-{
-    glyphstateNormal:   0,
-    glyphstateDeafault: 1,
-    glyphstateMiss:     2
-};
-
-function CPoint1()
-{
-    this.fX = 0;
-    this.fY = 0;
-    this.fWidth = 0;
-    this.fHeight = 0;
-};
-
-function CPoint2()
-{
-    this.fLeft = 0;
-    this.fTop = 0;
-    this.fRight = 0;
-    this.fBottom = 0;
-};
-
 function CFontManager()
 {
     this.m_oLibrary = {};
     this.Initialize = function(){};
-};
+}
 
 function CStylesPainter()
 {

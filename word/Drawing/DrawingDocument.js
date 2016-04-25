@@ -5,7 +5,9 @@ var CColor = AscCommon.CColor;
 var CAscMathCategory = AscCommon.CAscMathCategory;
 var g_oTableId = AscCommon.g_oTableId;
 
-var g_fontManager = new CFontManager();
+var FontStyle = AscFonts.FontStyle;
+
+var g_fontManager = new AscFonts.CFontManager();
 g_fontManager.Initialize(true);
 
 function SetHintsProps(bIsHinting, bIsSubpixHinting)
@@ -214,7 +216,7 @@ function CTableOutline(Table, PageNum, X, Y, W, H)
 
 function CTextMeasurer()
 {
-    this.m_oManager     = new CFontManager();
+    this.m_oManager     = new AscFonts.CFontManager();
 
     this.m_oFont        = null;
 
@@ -7553,7 +7555,7 @@ function CMathPainter(_api)
         //raster_koef = 2;
 
         // CREATE image!!!
-        var _total_image = new CRasterHeapTotal();
+        var _total_image = new AscFonts.CRasterHeapTotal();
         _total_image.CreateFirstChuck(1500 * raster_koef, 5000 * raster_koef);
 
         _total_image.Chunks[0].FindOnlyEqualHeight = true;

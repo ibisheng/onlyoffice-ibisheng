@@ -3,6 +3,8 @@
 // Import
 var c_oAscLockTypes = AscCommon.c_oAscLockTypes;
 
+var FontStyle = AscFonts.FontStyle;
+
 window.g_fontManager2 = null;
 window.g_fontManager2;
 
@@ -856,7 +858,7 @@ CGraphics.prototype =
         {
             if (window.g_fontManager2 == null)
             {
-                window.g_fontManager2 = new CFontManager();
+                window.g_fontManager2 = new AscFonts.CFontManager();
                 window.g_fontManager2.Initialize(true);
             }
 

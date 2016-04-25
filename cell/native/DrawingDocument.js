@@ -6,7 +6,7 @@ var g_dDpiY = 96.0;
 var g_dKoef_mm_to_pix = g_dDpiX / 25.4;
 var g_dKoef_pix_to_mm = 25.4 / g_dDpiX;
 
-var g_fontManager = new CFontManager();
+var g_fontManager = new AscFonts.CFontManager();
 g_fontManager.Initialize(true);
 
 function SetHintsProps(bIsHinting, bIsSubpixHinting)
@@ -142,7 +142,7 @@ function CTableOutline(Table, PageNum, X, Y, W, H)
 
 function CTextMeasurer()
 {
-    this.m_oManager     = new CFontManager();
+    this.m_oManager     = new AscFonts.CFontManager();
 
     this.m_oFont        = null;
 
@@ -166,13 +166,13 @@ function CTextMeasurer()
         var bItalic = true === font.Italic;
         var bBold   = true === font.Bold;
 
-        var oFontStyle = FontStyle.FontStyleRegular;
+        var oFontStyle = AscFonts.FontStyle.FontStyleRegular;
         if ( !bItalic && bBold )
-            oFontStyle = FontStyle.FontStyleBold;
+            oFontStyle = AscFonts.FontStyle.FontStyleBold;
         else if ( bItalic && !bBold )
-            oFontStyle = FontStyle.FontStyleItalic;
+            oFontStyle = AscFonts.FontStyle.FontStyleItalic;
         else if ( bItalic && bBold )
-            oFontStyle = FontStyle.FontStyleBoldItalic;
+            oFontStyle = AscFonts.FontStyle.FontStyleBoldItalic;
 
         var _lastSetUp = this.m_oLastFont;
         if (_lastSetUp.SetUpName != font.FontFamily.Name || _lastSetUp.SetUpSize != font.FontSize || _lastSetUp.SetUpStyle != oFontStyle)

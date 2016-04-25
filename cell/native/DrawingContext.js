@@ -853,13 +853,13 @@
         italic = true === font.Italic;
         bold   = true === font.Bold;
 
-        fontStyle = FontStyle.FontStyleRegular;
+        fontStyle = AscFonts.FontStyle.FontStyleRegular;
         if ( !italic && bold )
-            fontStyle = FontStyle.FontStyleBold;
+            fontStyle = AscFonts.FontStyle.FontStyleBold;
         else if ( italic && !bold )
-            fontStyle = FontStyle.FontStyleItalic;
+            fontStyle = AscFonts.FontStyle.FontStyleItalic;
         else if ( italic && bold )
-            fontStyle = FontStyle.FontStyleBoldItalic;
+            fontStyle = AscFonts.FontStyle.FontStyleBoldItalic;
 
         var _fontinfo, _info, flag, napi_fontInfo;
 
@@ -1303,7 +1303,7 @@
     /**
      * @param {Number} w         Ширина текста
      * @param {Number} wBB       Ширина Bound Box текста
-     * @param {CFontManager} fm  Объект CFontManager для получения метрик шрифта
+     * @param {AscFonts.CFontManager} fm  Объект AscFonts.CFontManager для получения метрик шрифта
      * @param {Number} r         Коэффициент перевода pt -> в текущие единицы измерения (this.units)
      * @return {TextMetrics}
      */
