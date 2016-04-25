@@ -16,7 +16,7 @@ function CTextMeasurerWrapper()
     this.Descender      = 0;
     this.Height         = 0;
     this.UnitsPerEm     = 0;
-};
+}
 
 CTextMeasurerWrapper.prototype =
 {
@@ -221,6 +221,19 @@ CTextMeasurerWrapper.prototype =
     GetHeight : function()
     {
         return this.Height;
+    },
+
+    Flush : function()
+    {
+        this.m_oFont = null;
+        this.m_oTextPr = null;
+        this.m_oGrFonts = new CGrRFonts();
+        this.m_oLastFont = new CFontSetup();
+        this.LastFontOriginInfo = { Name : "", Replace : null };
+        this.Ascender  = 0;
+        this.Descender = 0;
+        this.Height = 0;
+        this.UnitsPerEm = 0;
     }
 };
 
@@ -367,7 +380,7 @@ function GetLoadInfoForMeasurer(info, lStyle)
         SrcBold     : bSrcBold,
         SrcItalic   : bSrcItalic
     };
-};
+}
 
 CTextMeasurerWrapper.prototype["Init"] = CTextMeasurerWrapper.prototype.Init;
 

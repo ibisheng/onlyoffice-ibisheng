@@ -5711,15 +5711,7 @@ function OfflineEditor () {
     this.offline_afteInit = function () {window.AscAlwaysSaveAspectOnResizeTrack = true;};
 
     this.flushTextMeasurer = function () {
-        AscCommon.g_oTextMeasurer.m_oFont = null;
-        AscCommon.g_oTextMeasurer.m_oTextPr = null;
-        AscCommon.g_oTextMeasurer.m_oGrFonts = new CGrRFonts();
-        AscCommon.g_oTextMeasurer.m_oLastFont = new CFontSetup();
-        AscCommon.g_oTextMeasurer.LastFontOriginInfo = { Name : "", Replace : null };
-        AscCommon.g_oTextMeasurer.Ascender  = 0;
-        AscCommon.g_oTextMeasurer.Descender = 0;
-        AscCommon.g_oTextMeasurer.Height = 0;
-        AscCommon.g_oTextMeasurer.UnitsPerEm = 0;
+        AscCommon.g_oTextMeasurer.Flush();
     };
 }
 var _s = new OfflineEditor();
