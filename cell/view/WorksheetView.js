@@ -12419,7 +12419,11 @@
 			var typeFilter = filter ? filter.getType() : null;
 			var autoFilter = typeFilter !== null && typeFilter === g_nFiltersType.autoFilter ? filter : filter.AutoFilter;
 			
-			if(autoFilter && autoFilter.FilterColumns)//проверяем скрытые ячейки
+			if(filter.HeaderRowCount === 0)
+			{
+				result = false;
+			}
+			else if(autoFilter && autoFilter.FilterColumns)//проверяем скрытые ячейки
 			{
 				var colId = col - autoFilter.Ref.c1;
 				for(var i = 0; i < autoFilter.FilterColumns.length; i++)
