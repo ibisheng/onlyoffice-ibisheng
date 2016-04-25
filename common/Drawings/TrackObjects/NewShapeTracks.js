@@ -88,7 +88,7 @@ function NewShapeTrack(presetGeom, startX, startY, theme, master, layout, slide,
     this.extX = null;
     this.extY = null;
     this.arrowsCount = 0;
-    this.transform = new CMatrix();
+    this.transform = new AscCommon.CMatrix();
     this.pageIndex = pageIndex;
     this.theme = theme;
 

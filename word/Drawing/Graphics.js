@@ -9,6 +9,7 @@ var locktype_Mine = AscCommon.locktype_Mine;
 var locktype_Other = AscCommon.locktype_Other;
 var locktype_Other2 = AscCommon.locktype_Other2;
 var AscBrowser = AscCommon.AscBrowser;
+var CMatrixL = AscCommon.CMatrixL;
 
 window.g_fontManager2 = null;
 window.g_fontManager2;
@@ -297,8 +298,8 @@ function CGraphics()
 
     // RFonts
     this.m_oTextPr      = null;
-    this.m_oGrFonts     = new CGrRFonts();
-    this.m_oLastFont    = new CFontSetup();
+    this.m_oGrFonts     = new AscCommon.CGrRFonts();
+    this.m_oLastFont    = new AscCommon.CFontSetup();
 
     this.LastFontOriginInfo = { Name : "", Replace : null };
 
@@ -313,7 +314,7 @@ function CGraphics()
 
     this.IsDemonstrationMode = false;
 
-    this.GrState = new CGrState();
+    this.GrState = new AscCommon.CGrState();
     this.GrState.Parent = this;
 
     this.globalAlpha = 1;
@@ -2835,7 +2836,7 @@ CGraphics.prototype =
             this.m_oFontManager2 = window.g_fontManager2;
 
             if (null == this.m_oLastFont2)
-                this.m_oLastFont2 = new CFontSetup();
+                this.m_oLastFont2 = new AscCommon.CFontSetup();
 
             this.IsUseFonts2 = true;
         }

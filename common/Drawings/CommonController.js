@@ -1231,7 +1231,7 @@ DrawingObjectsController.prototype =
         else if(this.selection.wrapPolygonSelection)
         {
             if(this.selection.wrapPolygonSelection.selectStartPage === pageIndex)
-                drawingDocument.AutoShapesTrack.DrawEditWrapPointsPolygon(this.selection.wrapPolygonSelection.parent.wrappingPolygon.calculatedPoints, new CMatrix());
+                drawingDocument.AutoShapesTrack.DrawEditWrapPointsPolygon(this.selection.wrapPolygonSelection.parent.wrappingPolygon.calculatedPoints, new AscCommon.CMatrix());
         }
         else
         {
@@ -6413,7 +6413,7 @@ DrawingObjectsController.prototype =
             oRet = oRet.CreateDublicate();
             return oRet;
         }
-        return new CMatrix();
+        return new AscCommon.CMatrix();
     },
 
     drawTextSelection: function(num)
@@ -8065,9 +8065,9 @@ function CSlideBoundsChecker()
     this.m_oCurFont     = null;
     this.m_oTextPr      = null;
 
-    this.m_oCoordTransform  = new CMatrixL();
-    this.m_oTransform       = new CMatrixL();
-    this.m_oFullTransform   = new CMatrixL();
+    this.m_oCoordTransform  = new AscCommon.CMatrixL();
+    this.m_oTransform       = new AscCommon.CMatrixL();
+    this.m_oFullTransform   = new AscCommon.CMatrixL();
 
     this.IsNoSupportTextDraw = true;
 

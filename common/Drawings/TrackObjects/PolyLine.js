@@ -9,8 +9,8 @@ function PolyLine (drawingObjects, theme, master, layout, slide, pageIndex)
 
         this.drawingObjects = drawingObjects;
         this.arrPoint = [];
-        this.Matrix = new CMatrixL();
-        this.TransformMatrix = new CMatrixL();
+        this.Matrix = new AscCommon.CMatrixL();
+        this.TransformMatrix = new AscCommon.CMatrixL();
 
         this.pageIndex = pageIndex;
         this.style  = AscFormat.CreateDefaultShapeStyle();

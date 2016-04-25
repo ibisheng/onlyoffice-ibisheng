@@ -228,7 +228,7 @@ function CCollaborativeEditingBase()
     this.m_aDC          = {}; // Массив(ассоциативный) классов DocumentContent
     this.m_aChangedClasses = {}; // Массив(ассоциативный) классов, в которых есть изменения выделенные цветом
 
-    this.m_oMemory      = new CMemory(); // Глобальные класс для сохранения
+    this.m_oMemory      = new AscCommon.CMemory(); // Глобальные класс для сохранения
 
     this.m_aCursorsToUpdate        = {}; // Курсоры, которые нужно обновить после принятия изменений
     this.m_aCursorsToUpdateShortId = {};

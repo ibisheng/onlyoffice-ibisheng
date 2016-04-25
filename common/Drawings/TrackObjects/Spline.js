@@ -49,8 +49,8 @@ function Spline(drawingObjects, theme, master, layout, slide, pageIndex)
 
         this.drawingObjects = drawingObjects;
 
-        this.Matrix = new CMatrix();
-        this.TransformMatrix = new CMatrix();
+        this.Matrix = new AscCommon.CMatrix();
+        this.TransformMatrix = new AscCommon.CMatrix();
 
         this.style  = AscFormat.CreateDefaultShapeStyle();
 

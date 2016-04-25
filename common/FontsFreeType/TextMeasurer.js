@@ -9,8 +9,8 @@
 
         // RFonts
         this.m_oTextPr = null;
-        this.m_oGrFonts = new CGrRFonts();
-        this.m_oLastFont = new CFontSetup();
+        this.m_oGrFonts = new AscCommon.CGrRFonts();
+        this.m_oLastFont = new AscCommon.CFontSetup();
 
         this.LastFontOriginInfo = {Name : "", Replace : null};
     }
@@ -289,4 +289,3 @@
     window['AscCommon'].CTextMeasurer = CTextMeasurer;
     window['AscCommon'].g_oTextMeasurer = g_oTextMeasurer;
 })(window);
-

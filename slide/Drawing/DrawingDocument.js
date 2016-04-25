@@ -946,9 +946,9 @@ function CDrawingDocument()
 
     this.ToRenderer = function()
     {
-        var Renderer = new CDocumentRenderer();
+        var Renderer = new AscCommon.CDocumentRenderer();
         Renderer.IsNoDrawingEmptyPlaceholder = true;
-        Renderer.VectorMemoryForPrint = new CMemory();
+        Renderer.VectorMemoryForPrint = new AscCommon.CMemory();
         var old_marks = this.m_oWordControl.m_oApi.ShowParaMarks;
         this.m_oWordControl.m_oApi.ShowParaMarks = false;
         this.RenderDocument(Renderer);
@@ -963,7 +963,7 @@ function CDrawingDocument()
 
     this.ToRenderer2 = function()
     {
-        var Renderer = new CDocumentRenderer();
+        var Renderer = new AscCommon.CDocumentRenderer();
 
         var old_marks = this.m_oWordControl.m_oApi.ShowParaMarks;
         this.m_oWordControl.m_oApi.ShowParaMarks = false;
@@ -988,8 +988,8 @@ function CDrawingDocument()
 
         if (-1 == this.m_lCurrentRendererPage)
         {
-            this.m_oDocRenderer = new CDocumentRenderer();
-            this.m_oDocRenderer.VectorMemoryForPrint = new CMemory();
+            this.m_oDocRenderer = new AscCommon.CDocumentRenderer();
+            this.m_oDocRenderer.VectorMemoryForPrint = new AscCommon.CMemory();
             this.m_lCurrentRendererPage = 0;
             this.m_bOldShowMarks = this.m_oWordControl.m_oApi.ShowParaMarks;
             this.m_oWordControl.m_oApi.ShowParaMarks = false;
@@ -5010,7 +5010,7 @@ function DrawBackground(graphics, unifill, w, h)
 
     _shape.brush = unifill;
     _shape.pen = null;
-    _shape.TransformMatrix = new CMatrix();
+    _shape.TransformMatrix = new AscCommon.CMatrix();
     _shape.extX = w;
     _shape.extY = h;
     _shape.check_bounds = function(checker)

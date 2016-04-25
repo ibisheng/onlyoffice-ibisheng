@@ -2856,7 +2856,7 @@ Workbook.prototype.SerializeHistory = function(){
 	var aActions = this.aCollaborativeActions.concat(History.GetSerializeArray());
 	if(aActions.length > 0)
 	{
-		var oMemory = new CMemory();
+		var oMemory = new AscCommon.CMemory();
 		var bChangeSheetPlace = false;
 		for(var i = 0, length = aActions.length; i < length; ++i)
 		{

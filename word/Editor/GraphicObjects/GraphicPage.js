@@ -320,7 +320,7 @@ CGraphicPage.prototype =
             _graphic_object = _graphic_objects[_object_index].graphicObject;
             var _transform = _graphic_object.getTransformMatrix();
             if(_transform === null)
-                _transform = new CMatrix();
+                _transform = new AscCommon.CMatrix();
 
             var _extensions = _graphic_object.getExtensions();
             if(_extensions === null)

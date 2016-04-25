@@ -29,8 +29,8 @@ function CGroupShape()
     this.rot = null;
     this.flipH = null;
     this.flipV = null;
-    this.transform = new CMatrix();
-    this.localTransform = new CMatrix();
+    this.transform = new AscCommon.CMatrix();
+    this.localTransform = new AscCommon.CMatrix();
     this.invertTransform = null;
     this.brush  = null;
     this.pen = null;

@@ -2584,7 +2584,7 @@ function CTransitionAnimation(htmlpage)
                 var _xC = _xDst + _wDst / 2;
                 var _yC = _yDst + _hDst / 2;
 
-                var localTransform = new CMatrixL();
+                var localTransform = new AscCommon.CMatrixL();
                 global_MatrixTransformer.TranslateAppend(localTransform, -_xC, -_yC);
                 global_MatrixTransformer.ScaleAppend(localTransform, _scale, _scale);
                 global_MatrixTransformer.RotateRadAppend(localTransform, _angle);

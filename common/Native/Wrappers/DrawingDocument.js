@@ -761,7 +761,7 @@ CDrawingDocument.prototype =
         if (matrix)
         {
             if (null == this.TextMatrix)
-                this.TextMatrix = new CMatrix();
+                this.TextMatrix = new AscCommon.CMatrix();
             this.TextMatrix.sx = matrix.sx;
             this.TextMatrix.shy = matrix.shy;
             this.TextMatrix.shx = matrix.shx;
@@ -2846,8 +2846,8 @@ CDrawingDocument.prototype =
 
     ToRenderer : function()
     {
-        var Renderer = new CDocumentRenderer();
-        Renderer.VectorMemoryForPrint = new CMemory();
+        var Renderer = new AscCommon.CDocumentRenderer();
+        Renderer.VectorMemoryForPrint = new AscCommon.CMemory();
         var old_marks = this.m_oWordControl.m_oApi.ShowParaMarks;
         this.m_oWordControl.m_oApi.ShowParaMarks = false;
         this.RenderDocument(Renderer);

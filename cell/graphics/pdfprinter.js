@@ -12,12 +12,12 @@ var vector_koef = 25.4 / 72;
 
 function CPdfPrinter()
 {
-    this.DocumentRenderer = new CDocumentRenderer();
-    this.DocumentRenderer.VectorMemoryForPrint = new CMemory();
+    this.DocumentRenderer = new AscCommon.CDocumentRenderer();
+    this.DocumentRenderer.VectorMemoryForPrint = new AscCommon.CMemory();
 
     this.font = new window["Asc"].FontProperties("Arial", -1);
-    this.Transform = new CMatrix();
-    this.InvertTransform = new CMatrix();
+    this.Transform = new AscCommon.CMatrix();
+    this.InvertTransform = new AscCommon.CMatrix();
 
     this.bIsSimpleCommands = false;
 

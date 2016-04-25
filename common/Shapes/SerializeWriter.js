@@ -133,11 +133,11 @@ function CBinaryFileWriter()
     };
     this.GetBase64Memory = function()
     {
-        return Base64Encode(this.data,this.pos, 0);
+        return AscCommon.Base64Encode(this.data,this.pos, 0);
     };
     this.GetBase64Memory2 = function(nPos, nLen)
     {
-        return Base64Encode(this.data, nLen, nPos);
+        return AscCommon.Base64Encode(this.data, nLen, nPos);
     };
     this.GetCurPosition = function()
     {
@@ -2863,7 +2863,7 @@ function CBinaryFileWriter()
 
     this.WriteChart2 = function(grObj)
     {
-        var _memory = new CMemory(true);
+        var _memory = new AscCommon.CMemory(true);
         _memory.ImData = oThis.ImData;
         _memory.data = oThis.data;
         _memory.len = oThis.len;

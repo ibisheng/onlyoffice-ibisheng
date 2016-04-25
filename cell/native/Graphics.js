@@ -387,7 +387,7 @@ function CGlobalMatrixTransformer()
 
     this.MultiplyPrepend = function(m1, m2)
     {
-        var m = new CMatrixL();
+        var m = new AscCommon.CMatrixL();
         m.sx     = m2.sx;
         m.shx    = m2.shx;
         m.shy    = m2.shy;
@@ -405,7 +405,7 @@ function CGlobalMatrixTransformer()
 
     this.CreateDublicateM = function(matrix)
     {
-        var m = new CMatrixL();
+        var m = new AscCommon.CMatrixL();
         m.sx     = matrix.sx;
         m.shx    = matrix.shx;
         m.shy    = matrix.shy;
@@ -465,11 +465,11 @@ function CGraphics()
     this.m_oFontManager = null;
     this.m_bIsFillTextCanvasColor = 0;
 
-    this.m_oCoordTransform  = new CMatrixL();
-    this.m_oBaseTransform   = new CMatrixL();
-    this.m_oTransform       = new CMatrixL();
-    this.m_oFullTransform   = new CMatrixL();
-    this.m_oInvertFullTransform = new CMatrixL();
+    this.m_oCoordTransform  = new AscCommon.CMatrixL();
+    this.m_oBaseTransform   = new AscCommon.CMatrixL();
+    this.m_oTransform       = new AscCommon.CMatrixL();
+    this.m_oFullTransform   = new AscCommon.CMatrixL();
+    this.m_oInvertFullTransform = new AscCommon.CMatrixL();
 
     this.ArrayPoints = null;
 
@@ -483,8 +483,8 @@ function CGraphics()
 
     // RFonts
     this.m_oTextPr      = null;
-    this.m_oGrFonts     = new CGrRFonts();
-    this.m_oLastFont    = new CFontSetup();
+    this.m_oGrFonts     = new AscCommon.CGrRFonts();
+    this.m_oLastFont    = new AscCommon.CFontSetup();
 
     this.LastFontOriginInfo = { Name : "", Replace : null };
 
@@ -497,7 +497,7 @@ function CGraphics()
     this.TextureFillTransformScaleY = 1;
     this.IsThumbnail = false;
 
-    this.GrState = new CGrState();
+    this.GrState = new AscCommon.CGrState();
     this.GrState.Parent = this;
 
     this.globalAlpha = 1;
@@ -571,8 +571,8 @@ CGraphics.prototype =
     ClearParams : function()
     {
         this.m_oTextPr      = null;
-        this.m_oGrFonts     = new CGrRFonts();
-        this.m_oLastFont    = new CFontSetup();
+        this.m_oGrFonts     = new AscCommon.CGrRFonts();
+        this.m_oLastFont    = new AscCommon.CFontSetup();
 
         this.IsUseFonts2    = false;
         this.m_oLastFont2   = null;

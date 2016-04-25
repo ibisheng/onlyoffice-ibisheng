@@ -220,7 +220,7 @@ function getImageFromChanges (name) {
 	var ext = GetFileExtension(name);
 	if (null !== ext && oZipChanges && (file = oZipChanges.files[name])) {
 		var oFileArray = file.asUint8Array();
-		return 'data:image/' + ext + ';base64,' + Base64Encode(oFileArray, oFileArray.length, 0);
+		return 'data:image/' + ext + ';base64,' + AscCommon.Base64Encode(oFileArray, oFileArray.length, 0);
 	}
 	return null;
 }

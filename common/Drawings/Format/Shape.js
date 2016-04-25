@@ -14,6 +14,7 @@ var b64_decode = AscFonts.b64_decode;
     
 var c_oAscSizeRelFromH = AscCommon.c_oAscSizeRelFromH;
 var c_oAscSizeRelFromV = AscCommon.c_oAscSizeRelFromV;
+var CMatrix = AscCommon.CMatrix;
 
 var checkNormalRotate = AscFormat.checkNormalRotate;
 var HitInLine = AscFormat.HitInLine;

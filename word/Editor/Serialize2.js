@@ -964,7 +964,7 @@ function initMathRevisions(elem ,props) {
 
 function BinaryFileWriter(doc, bMailMergeDocx, bMailMergeHtml)
 {
-    this.memory = new CMemory();
+    this.memory = new AscCommon.CMemory();
     this.Document = doc;
     this.nLastFilePos = 0;
     this.nRealTableCount = 0;
@@ -12357,7 +12357,7 @@ CFontsCharMap.prototype =
 
     EndWork : function()
     {
-        var mem = new CMemory();
+        var mem = new AscCommon.CMemory();
         mem.Init();
 
         for (var i in this.map_fonts)

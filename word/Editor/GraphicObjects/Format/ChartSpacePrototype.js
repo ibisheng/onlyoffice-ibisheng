@@ -101,7 +101,7 @@ CChartSpace.prototype.setRecalculateInfo = function()
     this.baseColors = [];
 
     this.chartObj = null;
-    this.localTransform = new CMatrix();
+    this.localTransform = new AscCommon.CMatrix();
     this.snapArrayX = [];
     this.snapArrayY = [];
     this.rectGeometry = AscFormat.ExecuteNoHistory(function(){return  AscFormat.CreateGeometry("rect");},  this, []);

@@ -3,6 +3,8 @@
 (function(window, undefined){
 
 // Import
+var CMatrix = AscCommon.CMatrix;
+    
 var c_oAscFill = Asc.c_oAscFill;
 
 var MIN_ANGLE = 0.07;

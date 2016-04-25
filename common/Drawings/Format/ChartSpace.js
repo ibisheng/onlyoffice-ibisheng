@@ -467,7 +467,7 @@ function CChartSpace()
     this.themeOverride = null;
 
     this.calculatedChart = null;
-    this.transform = new CMatrix();
+    this.transform = new AscCommon.CMatrix();
 
 
     this.bDeleted = true;

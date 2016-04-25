@@ -2563,9 +2563,9 @@ function CSlideBoundsChecker()
 
     this.m_oCurFont     = null;
 
-    this.m_oCoordTransform  = new CMatrixL();
-    this.m_oTransform       = new CMatrixL();
-    this.m_oFullTransform   = new CMatrixL();
+    this.m_oCoordTransform  = new AscCommon.CMatrixL();
+    this.m_oTransform       = new AscCommon.CMatrixL();
+    this.m_oFullTransform   = new AscCommon.CMatrixL();
 
     this.IsNoSupportTextDraw = true;
 

@@ -7359,7 +7359,7 @@ window["asc_docs_api"].prototype["asc_nativeCheckPdfRenderer"] = function(_memor
 		_memory2.WriteString2   = _memory1["WriteString2"];
 	}
 	
-	var _printer = new CDocumentRenderer();
+	var _printer = new AscCommon.CDocumentRenderer();
 	_printer.Memory				    = _memory1;
 	_printer.VectorMemoryForPrint	= _memory2;
 	return _printer;
@@ -7380,8 +7380,8 @@ window["asc_docs_api"].prototype["asc_nativePrint"] = function(_printer, _page)
 
             window["AscDesktopEditor"]["Print_Start"](this.DocumentUrl, pagescount, "", this.getCurrentPage());
 
-            var oDocRenderer = new CDocumentRenderer();
-            oDocRenderer.VectorMemoryForPrint = new CMemory();
+            var oDocRenderer = new AscCommon.CDocumentRenderer();
+            oDocRenderer.VectorMemoryForPrint = new AscCommon.CMemory();
             var bOldShowMarks = this.ShowParaMarks;
             this.ShowParaMarks = false;
 
@@ -7420,8 +7420,8 @@ window["asc_docs_api"].prototype["asc_nativeGetPDF"] = function()
 {
     var pagescount = this["asc_nativePrintPagesCount"]();
 
-    var _renderer = new CDocumentRenderer();
-    _renderer.VectorMemoryForPrint = new CMemory();
+    var _renderer = new AscCommon.CDocumentRenderer();
+    _renderer.VectorMemoryForPrint = new AscCommon.CMemory();
     var _bOldShowMarks = this.ShowParaMarks;
     this.ShowParaMarks = false;
 

@@ -5,6 +5,9 @@
  * @param {undefined} undefined
  */
 function (window, undefined) {
+    // Import
+    var MATRIX_ORDER_PREPEND = AscCommon.MATRIX_ORDER_PREPEND;
+    
 function CMobileTouchManager()
 {
     this.AnimateScroll  = false;
@@ -1669,7 +1672,7 @@ CMobileTouchManager.prototype.CheckTableRules = function(overlay)
 
             ctx.lineWidth = 1 / dKoef;
 
-            var _coord_transform = new CMatrix();
+        var _coord_transform = new AscCommon.CMatrix();
             _coord_transform.sx = dKoef;
             _coord_transform.sy = dKoef;
             _coord_transform.tx = xDst;
@@ -1944,7 +1947,7 @@ CMobileTouchManager.prototype.CheckTableRules2 = function(overlay)
 
             ctx.lineWidth = 1 / dKoef;
 
-            var _coord_transform = new CMatrix();
+        var _coord_transform = new AscCommon.CMatrix();
             _coord_transform.sx = dKoef;
             _coord_transform.sy = dKoef;
             _coord_transform.tx = xDst;

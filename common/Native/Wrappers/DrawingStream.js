@@ -505,8 +505,8 @@ function CDrawingStream(_writer)
     this.Native = (undefined === _writer) ? window["native"] : _writer;
 
     this.m_oTextPr      = null;
-    this.m_oGrFonts     = new CGrRFonts();
-    this.m_oLastFont    = new CFontSetup();
+    this.m_oGrFonts     = new AscCommon.CGrRFonts();
+    this.m_oLastFont    = new AscCommon.CFontSetup();
 
     this.LastFontOriginInfo = { Name : "", Replace : null };
 
@@ -524,8 +524,8 @@ CDrawingStream.prototype =
     ClearParams : function()
     {
         this.m_oTextPr      = null;
-        this.m_oGrFonts     = new CGrRFonts();
-        this.m_oLastFont    = new CFontSetup();
+        this.m_oGrFonts     = new AscCommon.CGrRFonts();
+        this.m_oLastFont    = new AscCommon.CFontSetup();
 
         this.IsUseFonts2    = false;
         this.m_oLastFont2   = null;

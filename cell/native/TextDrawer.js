@@ -82,7 +82,7 @@ CDocContentStructure.prototype.checkByWarpStruct = function(oWarpStruct, dWidth,
 {
     var i, j, t, aByPaths,  aWarpedObjects = [];
     var bOddPaths = oWarpStruct.pathLst.length / 2 - ((oWarpStruct.pathLst.length / 2) >> 0) > 0;
-    var nDivCount = bOddPaths ? oWarpStruct.pathLst.length : oWarpStruct.pathLst.length >> 1, oNextPointOnPolygon, oObjectToDrawNext, oMatrix = new CMatrix();
+    var nDivCount = bOddPaths ? oWarpStruct.pathLst.length : oWarpStruct.pathLst.length >> 1, oNextPointOnPolygon, oObjectToDrawNext, oMatrix = new AscCommon.CMatrix();
     aByPaths = oWarpStruct.getArrayPolygonsByPaths(PATH_DIV_EPSILON);
     var nLastIndex = 0, dTmp, oBoundsChecker, oTemp, nIndex, aWarpedObjects2 = [];
     oBoundsChecker = new CSlideBoundsChecker();
@@ -197,7 +197,7 @@ CDocContentStructure.prototype.checkContentReduct = function(oWarpStruct, dWidth
                 var oWarpedObject = aWarpedObjects[t];
                 if(AscFormat.isRealNumber(oWarpedObject.x) && AscFormat.isRealNumber(oWarpedObject.y) )
                 {
-                    oMatrix = new CMatrix();
+                    oMatrix = new AscCommon.CMatrix();
                     oBoundsChecker.Bounds.ClearNoAttack();
                     oNextPointOnPolygon = this.checkTransformByOddPath(oMatrix, oWarpedObject, aWarpedObjects[t+1], oNextPointOnPolygon, dContentHeight, dKoeff, bArcDown, oPolygon, XLimit);
                     oWarpedObject.draw(oBoundsChecker);
@@ -826,7 +826,7 @@ function CTextDrawer(dWidth, dHeight, bDivByLInes, oTheme, bDivGlyphs)
     this.m_oTheme = oTheme;
     this.Width = dWidth;
     this.Height = dHeight;
-    this.m_oTransform = new CMatrix();
+    this.m_oTransform = new AscCommon.CMatrix();
     this.pathW = 43200;
     this.pathH = 43200;
 
@@ -839,7 +839,7 @@ function CTextDrawer(dWidth, dHeight, bDivByLInes, oTheme, bDivGlyphs)
     this.m_aDrawings = [];
     // RFonts
     this.m_oTextPr      = null;
-    this.m_oGrFonts     = new CGrRFonts();
+    this.m_oGrFonts     = new AscCommon.CGrRFonts();
     this.m_oCurComment     = null;
 
     this.m_oPen     = new CPen();
@@ -855,10 +855,10 @@ function CTextDrawer(dWidth, dHeight, bDivByLInes, oTheme, bDivGlyphs)
     this.m_oBrush.Color2.R  = -1;
 
     // просто чтобы не создавать каждый раз
-    this.m_oFontSlotFont = new CFontSetup();
+    this.m_oFontSlotFont = new AscCommon.CFontSetup();
     this.LastFontOriginInfo = { Name : "", Replace : null };
 
-    this.GrState = new CGrState();
+    this.GrState = new AscCommon.CGrState();
     this.GrState.Parent = this;
 
     this.m_bDivByLines = bDivByLInes === true;

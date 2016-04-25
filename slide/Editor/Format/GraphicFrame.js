@@ -16,7 +16,7 @@ function CGraphicFrame()
     this.y = null;
     this.extX = null;
     this.extY = null;
-    this.transform = new CMatrix();
+    this.transform = new AscCommon.CMatrix();
     this.compiledHierarchy = [];
     this.snapArrayX = [];
     this.snapArrayY = [];

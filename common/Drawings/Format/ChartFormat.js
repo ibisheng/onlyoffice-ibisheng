@@ -10,6 +10,7 @@ function (window, undefined) {
 // Import
 var g_oIdCounter = AscCommon.g_oIdCounter;
 var g_oTableId = AscCommon.g_oTableId;
+var CMatrix = AscCommon.CMatrix;
 
 var CShape = AscFormat.CShape;
 var checkSpPrRasterImages = AscFormat.checkSpPrRasterImages;

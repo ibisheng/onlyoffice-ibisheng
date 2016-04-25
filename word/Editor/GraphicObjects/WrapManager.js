@@ -431,7 +431,7 @@ CWrapPolygon.prototype =
     calculate: function(drawing)
     {
         var arrPolygons = drawing.getArrayWrapPolygons();
-        var transform = new CMatrix();
+        var transform = new AscCommon.CMatrix();
         var arrEdges = [];
         var arrPoints = [];
         var polygonsCount = arrPolygons.length;
@@ -1023,7 +1023,7 @@ function TrackNewPointWrapPolygon(originalObject, point1)
         this.arrPoints[i].y = originalObject.parent.wrappingPolygon.calculatedPoints[i].y;
     }
     this.arrPoints.splice(point1+1, 0, {x: null, y: null});
-    this.matrix = new CMatrix();
+    this.matrix = new AscCommon.CMatrix();
     this.point2 = originalObject.parent.wrappingPolygon.calculatedPoints[point1 + 1] ? originalObject.parent.wrappingPolygon.calculatedPoints[point1 + 1] : originalObject.parent.wrappingPolygon.calculatedPoints[0];
 }
 
@@ -1053,7 +1053,7 @@ function TrackPointWrapPointWrapPolygon(originalObject, point)
     this.pointCoord.y = originalObject.parent.wrappingPolygon.calculatedPoints[point].y;
     this.point1 = originalObject.parent.wrappingPolygon.calculatedPoints[point - 1] ? originalObject.parent.wrappingPolygon.calculatedPoints[point - 1] : originalObject.parent.wrappingPolygon.calculatedPoints[originalObject.parent.wrappingPolygon.calculatedPoints.length-1];
     this.point2 = originalObject.parent.wrappingPolygon.calculatedPoints[point + 1] ? originalObject.parent.wrappingPolygon.calculatedPoints[point + 1] : originalObject.parent.wrappingPolygon.calculatedPoints[0];
-    this.matrix = new CMatrix();
+    this.matrix = new AscCommon.CMatrix();
     this.pageIndex = originalObject.selectStartPage;
 }
 

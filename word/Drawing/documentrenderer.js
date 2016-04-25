@@ -360,7 +360,7 @@ function CDocMeta()
     this.Drawings = [];
 
     this.Selection = new CDocMetaSelection();
-    this.TextMatrix = new CMatrix();
+    this.TextMatrix = new AscCommon.CMatrix();
 
     this.SearchInfo =
     {
@@ -733,7 +733,7 @@ function CDocMeta()
                     var _tr = null;
                     if (10 == _type || 11 == _type)
                     {
-                        _tr = new CMatrix();
+                        _tr = new AscCommon.CMatrix();
                         _tr.sx = s.GetDouble();
                         _tr.shy = s.GetDouble();
                         _tr.shx = s.GetDouble();

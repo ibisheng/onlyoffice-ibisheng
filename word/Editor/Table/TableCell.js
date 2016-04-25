@@ -928,13 +928,13 @@ CTableCell.prototype =
 
         if (textdirection_BTLR === TextDirection)
         {
-            Transform = new CMatrix();
+            Transform = new AscCommon.CMatrix();
             global_MatrixTransformer.RotateRadAppend(Transform, 0.5 *  Math.PI);
             global_MatrixTransformer.TranslateAppend(Transform, this.Temp.X_start, this.Temp.Y_end);
         }
         else if (textdirection_TBRL === TextDirection)
         {
-            var Transform = new CMatrix();
+            var Transform = new AscCommon.CMatrix();
             global_MatrixTransformer.RotateRadAppend(Transform, -0.5 *  Math.PI);
             global_MatrixTransformer.TranslateAppend(Transform, this.Temp.X_end, this.Temp.Y_start);
         }

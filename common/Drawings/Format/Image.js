@@ -26,7 +26,7 @@ function CImageShape()
     this.rot = null;
     this.flipH = null;
     this.flipV = null;
-    this.transform = new CMatrix();
+    this.transform = new AscCommon.CMatrix();
     this.invertTransform = null;
     this.cursorTypes = [];
     this.brush  = null;

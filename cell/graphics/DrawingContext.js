@@ -118,8 +118,8 @@
 
 
 	/** @const */
-	var MATRIX_ORDER_PREPEND = 0,
-		MATRIX_ORDER_APPEND  = 1;
+	var MATRIX_ORDER_PREPEND = AscCommon.MATRIX_ORDER_PREPEND;
+	var MATRIX_ORDER_APPEND  = AscCommon.MATRIX_ORDER_APPEND;
 
 	/**
 	 * @constructor

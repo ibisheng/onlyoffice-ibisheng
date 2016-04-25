@@ -2628,10 +2628,7 @@
 							url = cloneImg.graphicObject.brush.fill.RasterImageId;
 						else if(cloneImg.graphicObject && (cloneImg.graphicObject.isShape() || cloneImg.graphicObject.isImage() || cloneImg.graphicObject.isGroup() || cloneImg.graphicObject.isChart()))
 						{
-							var cMemory = new CMemory();
-							
 							var altAttr = null;
-							//altAttr = cloneImg.graphicObject.writeToBinaryForCopyPaste(cMemory);
 							var isImage = cloneImg.graphicObject.isImage();
 							var imageUrl;
 							if(isImage)

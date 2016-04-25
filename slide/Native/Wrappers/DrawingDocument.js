@@ -479,7 +479,7 @@ function CDrawingDocument()
         if (matrix)
         {
             if (null == this.TextMatrix)
-                this.TextMatrix = new CMatrix();
+                this.TextMatrix = new AscCommon.CMatrix();
             this.TextMatrix.sx = matrix.sx;
             this.TextMatrix.shy = matrix.shy;
             this.TextMatrix.shx = matrix.shx;

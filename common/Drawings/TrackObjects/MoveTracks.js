@@ -1,6 +1,8 @@
 "use strict";
 
 (function(window, undefined){
+    // Import
+    var CMatrix = AscCommon.CMatrix;
 
 function MoveShapeImageTrack(originalObject)
 {

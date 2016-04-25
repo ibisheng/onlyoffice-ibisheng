@@ -3723,7 +3723,7 @@
     /** @constructor */
     function BinaryFileWriter(wb, isCopyPaste)
     {
-        this.Memory = new CMemory();
+        this.Memory = new AscCommon.CMemory();
         this.wb = wb;
         this.isCopyPaste = isCopyPaste;
         this.nLastFilePos = 0;

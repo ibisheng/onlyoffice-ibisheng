@@ -97,7 +97,7 @@ function asc_CChartBinary(chart) {
     this["binary"] = null;
     if (chart && chart.getObjectType() === AscDFH.historyitem_type_ChartSpace)
     {
-        var writer = new BinaryChartWriter(new CMemory(false)), pptx_writer;
+        var writer = new BinaryChartWriter(new AscCommon.CMemory(false)), pptx_writer;
         writer.WriteCT_ChartSpace(chart);
         this["binary"] = writer.memory.pos + ";" + writer.memory.GetBase64Memory();
         if(chart.theme)
@@ -2467,7 +2467,7 @@ function DrawingObjects() {
                 if(oDrawingContext instanceof CPdfPrinter)
                 {
                     graphics.SaveGrState();
-                    var _baseTransform = new CMatrix();
+                    var _baseTransform = new AscCommon.CMatrix();
                     _baseTransform.sx /= nSparklineMultiplier;
                     _baseTransform.sy /= nSparklineMultiplier;
 

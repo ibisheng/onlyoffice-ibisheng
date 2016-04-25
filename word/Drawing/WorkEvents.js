@@ -2289,13 +2289,13 @@ function CMobileTouchManager()
 
             ctx.lineWidth = 1 / dKoef;
 
-            var _coord_transform = new CMatrix();
+            var _coord_transform = new AscCommon.CMatrix();
             _coord_transform.sx = dKoef;
             _coord_transform.sy = dKoef;
             _coord_transform.tx = xDst;
             _coord_transform.ty = yDst;
 
-            _coord_transform.Multiply(_table_outline_dr.TableMatrix, MATRIX_ORDER_PREPEND);
+            _coord_transform.Multiply(_table_outline_dr.TableMatrix, AscCommon.MATRIX_ORDER_PREPEND);
             ctx.setTransform(_coord_transform.sx,_coord_transform.shy,_coord_transform.shx,_coord_transform.sy,_coord_transform.tx,_coord_transform.ty);
 
             this.TableMovePoint = { X : _tableOutline.X, Y : _tableOutline.Y };
@@ -2564,13 +2564,13 @@ function CMobileTouchManager()
 
             ctx.lineWidth = 1 / dKoef;
 
-            var _coord_transform = new CMatrix();
+            var _coord_transform = new AscCommon.CMatrix();
             _coord_transform.sx = dKoef;
             _coord_transform.sy = dKoef;
             _coord_transform.tx = xDst;
             _coord_transform.ty = yDst;
 
-            _coord_transform.Multiply(_table_outline_dr.TableMatrix, MATRIX_ORDER_PREPEND);
+            _coord_transform.Multiply(_table_outline_dr.TableMatrix, AscCommon.MATRIX_ORDER_PREPEND);
             ctx.setTransform(_coord_transform.sx,_coord_transform.shy,_coord_transform.shx,_coord_transform.sy,_coord_transform.tx,_coord_transform.ty);
 
             this.TableMovePoint = { X : _tableOutline.X, Y : _tableOutline.Y };
