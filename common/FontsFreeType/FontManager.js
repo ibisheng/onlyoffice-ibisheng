@@ -5,6 +5,7 @@ var FT_Open_Args = AscFonts.FT_Open_Args;
 var FT_Library = AscFonts.FT_Library;
 var FT_Set_Char_Size = AscFonts.FT_Set_Char_Size;
 var raster_memory = AscFonts.raster_memory;
+var CFontFile = AscFonts.CFontFile;
 
 var AscBrowser = AscCommon.AscBrowser;
 
@@ -231,7 +232,7 @@ CGlyphData.prototype =
             ctxD.putImageData(pixDst, 0, 0, 0, 0, w, h);
         }
     }
-}
+};
 
 function TGlyphBitmap()
 {

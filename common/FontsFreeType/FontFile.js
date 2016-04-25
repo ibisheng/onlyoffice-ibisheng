@@ -1,5 +1,7 @@
 "use strict";
 
+(function(window, undefined){
+
 // Import
 var FT_Get_Sfnt_Table = AscFonts.FT_Get_Sfnt_Table;
 var FT_Matrix = AscFonts.FT_Matrix;
@@ -1759,4 +1761,9 @@ function CFontFile(fileName, faceIndex)
            worker._e();
        }
     }
-};
+}
+
+  //--------------------------------------------------------export------------------------------------------------------
+  window['AscFonts'] = window['AscFonts'] || {};
+  window['AscFonts'].CFontFile = CFontFile;
+})(window);
