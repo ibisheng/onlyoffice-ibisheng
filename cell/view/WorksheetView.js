@@ -13239,12 +13239,15 @@
         var intersectionTables = this.model.autoFilters.getTableIntersectionRange(range);
         if (0 < intersectionTables.length) {
             var tablePart = intersectionTables[0];
-            if (range.r1 !== tablePart.Ref.r1)//первая строка таблицы не равно первой строке выделенного диапазона
+            if (range.r1 !== tablePart.Ref.r1)//первая строка таблицы не равна первой строке выделенного диапазона
             {
                 res = c_oAscError.ID.FTChangeTableRangeError;
             } else if (intersectionTables.length !== 1)//выделено несколько таблиц
             {
                 res = c_oAscError.ID.FTRangeIncludedOtherTables;
+            }else if (this.model.AutoFilter && this.model.AutoFilter.Ref && this.model.AutoFilter.Ref.isIntersect(range))
+            {
+                res = c_oAscError.ID.FTChangeTableRangeError;
             }
         } else {
             res = c_oAscError.ID.FTChangeTableRangeError;
