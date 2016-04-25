@@ -3381,6 +3381,9 @@ UndoRedoWoorksheet.prototype = {
 			}
 			range = ws.getRange3(bbox.r1, bbox.c1, bbox.r2, bbox.c2);
 			range._sortByArray(bbox, places);
+			
+			worksheetView = this.wb.oApi.wb.getWorksheetById(nSheetId);
+			worksheetView.model.autoFilters.resetTableStyles(bbox);
 		}
 		else if(AscCH.historyitem_Worksheet_MoveRange == Type)
 		{

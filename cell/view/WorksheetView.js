@@ -11990,8 +11990,9 @@
 			{
 				History.Create_NewPoint();
 				History.StartTransaction();
-				t.model.autoFilters.sortColFilter( type, cellId, ar, sortProps, displayName );
+				
 				t.cellCommentator.sortComments(sortProps.sortRange.sort(type == 'ascending', sortProps.startCol));
+				t.model.autoFilters.sortColFilter( type, cellId, ar, sortProps, displayName );
 				
 				t._onUpdateFormatTable(sortProps.sortRange.bbox, false);
 				History.EndTransaction();

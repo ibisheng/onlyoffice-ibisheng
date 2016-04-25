@@ -1509,7 +1509,9 @@
 					curFilter.SortState.SortConditions[0].ConditionDescending = resType;
 
 					if(curFilter.TableStyleInfo)
+					{
 						t._setColorStyleTable(curFilter.Ref, curFilter);
+					}
 					t._addHistoryObj({oldFilter: oldFilter}, AscCH.historyitem_AutoFilter_Sort,
 						{activeCells: cellIdRange, type: type, cellId: cellId}, null, curFilter.Ref);
 					History.EndTransaction();
@@ -4415,6 +4417,22 @@
 						var ref = worksheet.TableParts[i].Ref;
 						if(ref.r1 >= range.r1 && ref.r2 <= range.r2)
 							this._setColorStyleTable(ref, worksheet.TableParts[i]);
+					}
+				}
+			},
+			
+			resetTableStyles: function(range)
+			{
+				var worksheet = this.worksheet;
+				if(worksheet.TableParts && worksheet.TableParts.length > 0)
+				{
+					for(var i = 0; i < worksheet.TableParts.length; i++)
+					{
+						var ref = worksheet.TableParts[i].Ref;
+						if(ref.isIntersect(range))
+						{
+							this._setColorStyleTable(ref, worksheet.TableParts[i]);
+						}
 					}
 				}
 			},
