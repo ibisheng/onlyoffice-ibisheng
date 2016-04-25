@@ -1707,7 +1707,13 @@ var g_oUndoRedoData_AutoFilterProperties = {
 		moveTo              : 7,
 		bWithoutFilter      : 8,
 		displayName         : 9,
-        val                 : 10
+        val                 : 10,
+		ShowColumnStripes   : 11,
+		ShowFirstColumn     : 12,
+		ShowLastColumn      : 13,
+		ShowRowStripes      : 14,
+		HeaderRowCount      : 15,
+		TotalsRowCount      : 16
 	};
 function UndoRedoData_AutoFilter() {
 	this.Properties = g_oUndoRedoData_AutoFilterProperties;
@@ -1725,6 +1731,14 @@ function UndoRedoData_AutoFilter() {
 	this.bWithoutFilter     = null;
 	this.displayName        = null;
     this.val                = null;
+
+    this.ShowColumnStripes  = null;
+    this.ShowFirstColumn    = null;
+    this.ShowLastColumn     = null;
+    this.ShowRowStripes     = null;
+
+    this.HeaderRowCount     = null;
+    this.TotalsRowCount     = null;
 }
 UndoRedoData_AutoFilter.prototype = {
 	getType : function ()
@@ -1750,6 +1764,12 @@ UndoRedoData_AutoFilter.prototype = {
 			case this.Properties.bWithoutFilter: return this.bWithoutFilter; break;
 			case this.Properties.displayName: return this.displayName; break;
             case this.Properties.val: return this.val; break;
+            case this.Properties.ShowColumnStripes: return this.ShowColumnStripes; break;
+            case this.Properties.ShowFirstColumn: return this.ShowFirstColumn; break;
+            case this.Properties.ShowLastColumn: return this.ShowLastColumn; break;
+            case this.Properties.ShowRowStripes: return this.ShowRowStripes; break;
+            case this.Properties.HeaderRowCount: return this.HeaderRowCount; break;
+            case this.Properties.TotalsRowCount: return this.TotalsRowCount; break;
 		}
 
 		return null;
@@ -1769,6 +1789,12 @@ UndoRedoData_AutoFilter.prototype = {
 			case this.Properties.bWithoutFilter: this.bWithoutFilter = value;break;
 			case this.Properties.displayName: this.displayName = value;break;
             case this.Properties.val: this.val = value;break;
+            case this.Properties.ShowColumnStripes: this.ShowColumnStripes = value;break;
+            case this.Properties.ShowFirstColumn: this.ShowFirstColumn = value;break;
+            case this.Properties.ShowLastColumn: this.ShowLastColumn = value;break;
+            case this.Properties.ShowRowStripes: this.ShowRowStripes = value;break;
+            case this.Properties.HeaderRowCount: this.HeaderRowCount = value;break;
+            case this.Properties.TotalsRowCount: this.TotalsRowCount = value;break;
 		}
 		return null;
 	},

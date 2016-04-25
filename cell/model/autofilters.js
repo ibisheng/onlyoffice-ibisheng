@@ -281,7 +281,7 @@
 
 			constructor: AutoFilters,
 			
-			addAutoFilter: function(styleName, activeRange, addFormatTableOptionsObj, offLock, bWithoutFilter, tablePartDisplayName)
+			addAutoFilter: function(styleName, activeRange, addFormatTableOptionsObj, offLock, bWithoutFilter, tablePartDisplayName, pasteStyleObj)
 			{
 				var worksheet = this.worksheet, t = this, cloneFilter;
 				var isTurnOffHistory = worksheet.workbook.bUndoChanges || worksheet.workbook.bRedoChanges;
@@ -332,7 +332,7 @@
 						}
 
 						//add to model
-						var newTablePart = t._addNewFilter(filterRange, styleName, bWithoutFilter, tablePartDisplayName);
+						var newTablePart = t._addNewFilter(filterRange, styleName, bWithoutFilter, tablePartDisplayName, pasteStyleObj);
 						var newDisplayName = newTablePart && newTablePart.DisplayName ? newTablePart.DisplayName : null;
 
 						if(styleName)
@@ -340,7 +340,7 @@
 
 						//history
 						t._addHistoryObj({Ref: filterRange}, AscCH.historyitem_AutoFilter_Add,
-							{activeCells: filterRange, styleName: styleName, addFormatTableOptionsObj: addFormatTableOptionsObj, displayName: newDisplayName}, null, filterRange, bWithoutFilter);
+							{activeCells: filterRange, styleName: styleName, addFormatTableOptionsObj: addFormatTableOptionsObj, displayName: newDisplayName, pasteStyleObj: pasteStyleObj}, null, filterRange, bWithoutFilter);
 						History.SetSelectionRedo(filterRange);
 					}
 
@@ -687,7 +687,7 @@
 				History.TurnOff();
 				switch (type) {
 					case AscCH.historyitem_AutoFilter_Add:
-						this.addAutoFilter(data.styleName, data.activeCells, data.addFormatTableOptionsObj, null, data.bWithoutFilter, data.displayName);
+						this.addAutoFilter(data.styleName, data.activeCells, data.addFormatTableOptionsObj, null, data.bWithoutFilter, data.displayName, data);
 						break;
 					case AscCH.historyitem_AutoFilter_Delete:
 						this.deleteAutoFilter(data.activeCells);
@@ -2427,6 +2427,17 @@
 					oHistoryObject.bWithoutFilter       = bWithoutFilter ? bWithoutFilter : false;
 					oHistoryObject.displayName          = redoObject.displayName;
 					oHistoryObject.val                  = redoObject.val;
+					
+					if(redoObject.pasteStyleObj)
+					{
+						oHistoryObject.ShowColumnStripes  = redoObject.pasteStyleObj.ShowColumnStripes;
+						oHistoryObject.ShowFirstColumn    = redoObject.pasteStyleObj.ShowFirstColumn;
+						oHistoryObject.ShowLastColumn     = redoObject.pasteStyleObj.ShowLastColumn;
+						oHistoryObject.ShowRowStripes     = redoObject.pasteStyleObj.ShowRowStripes;
+
+						oHistoryObject.HeaderRowCount     = redoObject.pasteStyleObj.HeaderRowCount;
+						oHistoryObject.TotalsRowCount     = redoObject.pasteStyleObj.TotalsRowCount;
+					}
 				}
 				else
 				{
@@ -2994,7 +3005,7 @@
 					return ar;
 			},
 			
-			_addNewFilter: function(ref, style, bWithoutFilter, tablePartDisplayName)
+			_addNewFilter: function(ref, style, bWithoutFilter, tablePartDisplayName, pasteTablePartObj)
 			{
 				var worksheet = this.worksheet;
 				var newFilter;
@@ -3052,12 +3063,28 @@
 					else
 						newFilter.DisplayName = worksheet.workbook.dependencyFormulas.getNextTableName(worksheet, ref);
 					
+					
 					newFilter.TableStyleInfo = new TableStyleInfo();
 					newFilter.TableStyleInfo.Name = style;
-					newFilter.TableStyleInfo.ShowColumnStripes = false;
-					newFilter.TableStyleInfo.ShowFirstColumn = false;
-					newFilter.TableStyleInfo.ShowLastColumn = false;
-					newFilter.TableStyleInfo.ShowRowStripes = true;
+					
+					if(pasteTablePartObj && pasteTablePartObj.ShowColumnStripes !== null && pasteTablePartObj.ShowColumnStripes !== undefined)
+					{
+						newFilter.TableStyleInfo.ShowColumnStripes = pasteTablePartObj.ShowColumnStripes;
+						newFilter.TableStyleInfo.ShowFirstColumn = pasteTablePartObj.ShowFirstColumn;
+						newFilter.TableStyleInfo.ShowLastColumn = pasteTablePartObj.ShowLastColumn;
+						newFilter.TableStyleInfo.ShowRowStripes = pasteTablePartObj.ShowRowStripes;
+						
+						newFilter.HeaderRowCount = pasteTablePartObj.HeaderRowCount;
+						newFilter.TotalsRowCount = pasteTablePartObj.TotalsRowCount;
+					}
+					else
+					{
+						newFilter.TableStyleInfo.ShowColumnStripes = false;
+						newFilter.TableStyleInfo.ShowFirstColumn = false;
+						newFilter.TableStyleInfo.ShowLastColumn = false;
+						newFilter.TableStyleInfo.ShowRowStripes = true;
+					}
+					
 					
 					newFilter.TableColumns = tableColumns;
 					
