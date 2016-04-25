@@ -2476,6 +2476,11 @@
 						var ref = filter.Ref;
 						var tableRange = new Asc.Range(ref.c1, ref.r1, ref.c2, ref.r1);
 						
+						if(filter.HeaderRowCount === 0)
+						{
+							continue;
+						}
+						
 						//в этом случае нашли ячейки(ячейку), которая входит в состав заголовка фильтра
 						var intersection = range.intersection(tableRange);
 						if(intersection != null)
