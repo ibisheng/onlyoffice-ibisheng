@@ -441,8 +441,18 @@ CChartSpace.prototype.recalculate = function()
 
         if(b_recalc_legend && this.chart && this.chart.legend)
         {
+            var bResetLegendPos = false;
+            if(!AscFormat.isRealNumber(this.chart.legend.legendPos))
+            {
+                this.chart.legend.legendPos = c_oAscChartLegendShowSettings.bottom;
+                bResetLegendPos = true;
+            }
             var pos = this.chartObj.reCalculatePositionText("legend", this, this.chart.legend);
             this.chart.legend.setPosition(pos.x, pos.y);
+            if(bResetLegendPos)
+            {
+                this.chart.legend.legendPos = null;
+            }
         }
         if(this.recalcInfo.recalculateTextPr)
         {

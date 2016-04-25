@@ -6506,7 +6506,7 @@ CChartSpace.prototype =
             }
             else if(!isRealObject(legend.layout) || !isRealObject(legend.layout.manualLayout))
             {
-                legend_pos = c_oAscChartLegendShowSettings.left;
+                legend_pos = c_oAscChartLegendShowSettings.bottom;
             }
             var legend_width, legend_height;
             if(AscFormat.isRealNumber(legend_pos)
