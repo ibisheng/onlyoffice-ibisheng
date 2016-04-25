@@ -187,6 +187,11 @@ asc_docs_api.prototype.asc_isOffline = function()
 {
 	return true;
 };
+asc_docs_api.prototype.SetThemesPath = function(path)
+{
+	this.ThemeLoader.ThemesUrl = path;
+	this.ThemeLoader.ThemesUrlAbs = path;
+};
 
 asc_docs_api.prototype["asc_addImage"] = asc_docs_api.prototype.asc_addImage;
 asc_docs_api.prototype["AddImageUrl"] = asc_docs_api.prototype.AddImageUrl;
@@ -195,6 +200,7 @@ asc_docs_api.prototype["asc_Save"] = asc_docs_api.prototype.asc_Save;
 asc_docs_api.prototype["asc_DownloadAs"] = asc_docs_api.prototype.asc_DownloadAs;
 asc_docs_api.prototype["asc_isOffline"] = asc_docs_api.prototype.asc_isOffline;
 asc_docs_api.prototype["SetDocumentModified"] = asc_docs_api.prototype.SetDocumentModified;
+asc_docs_api.prototype["SetThemesPath"] = asc_docs_api.prototype.SetThemesPath;
 
 window["DesktopOfflineAppDocumentAddImageEnd"] = function(url)
 {

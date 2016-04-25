@@ -23,6 +23,31 @@ var FOCUS_OBJECT_NOTES          = 2;
 var COMMENT_WIDTH   = 18;
 var COMMENT_HEIGHT  = 16;
 
+CTextMeasurer.prototype.GetAscender = function()
+{
+    var UnitsPerEm = this.m_oManager.m_lUnits_Per_Em;
+    //var Ascender   = this.m_oManager.m_lAscender;
+    var Ascender   = ( 0 !== this.m_oManager.m_lLineHeight ) ? 1.2 * UnitsPerEm * this.m_oManager.m_lAscender / this.m_oManager.m_lLineHeight : this.m_oManager.m_lAscender;
+
+    return Ascender * this.m_oLastFont.SetUpSize / UnitsPerEm * g_dKoef_pt_to_mm;
+};
+CTextMeasurer.prototype.GetDescender = function()
+{
+    var UnitsPerEm = this.m_oManager.m_lUnits_Per_Em;
+    //var Descender  = this.m_oManager.m_lDescender;
+    var Descender  = ( 0 !== this.m_oManager.m_lLineHeight ) ? 1.2 * UnitsPerEm * this.m_oManager.m_lDescender / this.m_oManager.m_lLineHeight : this.m_oManager.m_lDescender;
+
+    return Descender * this.m_oLastFont.SetUpSize / UnitsPerEm * g_dKoef_pt_to_mm;
+};
+CTextMeasurer.prototype.GetHeight = function()
+{
+    var UnitsPerEm = this.m_oManager.m_lUnits_Per_Em;
+    //var Height     = this.m_oManager.m_lLineHeight;
+    var Height     = ( 0 !== this.m_oManager.m_lLineHeight ) ? 1.2 * UnitsPerEm : this.m_oManager.m_lLineHeight;
+
+    return Height * this.m_oLastFont.SetUpSize / UnitsPerEm * g_dKoef_pt_to_mm;
+};
+
 function CTableMarkup(Table)
 {
     this.Internal =
