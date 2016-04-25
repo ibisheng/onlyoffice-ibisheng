@@ -3593,11 +3593,11 @@ DrawingObjectsController.prototype =
 
         if(chart_type.getObjectType() === AscDFH.historyitem_type_LineChart )
         {
-            if(!AscFormat.isRealBool(chartSettings.showMarker) || chart.view3D)
+            if(!AscFormat.isRealBool(chartSettings.showMarker) || AscFormat.CChartsDrawer.prototype._isSwitchCurrent3DChart(chartSpace))
             {
                 chartSettings.showMarker = false;
             }
-            if(!AscFormat.isRealBool(chartSettings.bLine) || chart.view3D)
+            if(!AscFormat.isRealBool(chartSettings.bLine) || AscFormat.CChartsDrawer.prototype._isSwitchCurrent3DChart(chartSpace))
             {
                 chartSettings.bLine = true;
             }
@@ -3872,10 +3872,6 @@ DrawingObjectsController.prototype =
         }
         ret.putVertGridLines(calc_grid_lines(hor_axis));
 
-
-
-
-
         ret.putHorAxisLabel(hor_axis && hor_axis.title ? c_oAscChartHorAxisLabelShowSettings.noOverlay : c_oAscChartTitleShowSettings.none);
         var _label;
         if(vert_axis && vert_axis.title)
@@ -3943,7 +3939,7 @@ DrawingObjectsController.prototype =
         var calc_chart_type;
         if(chart_type_object_type === AscDFH.historyitem_type_PieChart)
         {
-            if(!chart.view3D)
+            if(!AscFormat.CChartsDrawer.prototype._isSwitchCurrent3DChart(chart_space))
             {
                 calc_chart_type = c_oAscChartTypeSettings.pie;
             }
@@ -3959,7 +3955,7 @@ DrawingObjectsController.prototype =
         else if(chart_type_object_type === AscDFH.historyitem_type_BarChart)
         {
             var b_hbar = chart_type.barDir === BAR_DIR_BAR;
-            var bView3d = chart.view3D && chart_type.b3D;
+            var bView3d = AscFormat.CChartsDrawer.prototype._isSwitchCurrent3DChart(chart_space);
             if(b_hbar)
             {
                 switch(chart_type.grouping)
@@ -4036,7 +4032,7 @@ DrawingObjectsController.prototype =
                 }
                 default        :
                 {
-                    if(!chart.view3D)
+                    if(!AscFormat.CChartsDrawer.prototype._isSwitchCurrent3DChart(chart_space))
                     {
                         calc_chart_type = c_oAscChartTypeSettings.lineNormal;
                     }

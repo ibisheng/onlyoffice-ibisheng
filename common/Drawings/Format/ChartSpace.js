@@ -6352,7 +6352,7 @@ CChartSpace.prototype =
                         case AscDFH.historyitem_type_ScatterSer:
                         case AscDFH.historyitem_type_SurfaceSeries:
                         {
-                            if(this.chart.view3D)
+                            if(AscFormat.CChartsDrawer.prototype._isSwitchCurrent3DChart(this))
                             {
                                 union_marker.marker = AscFormat.CreateMarkerGeometryByType(AscFormat.SYMBOL_SQUARE, null);
                                 union_marker.marker.pen = ser.compiledSeriesPen;
@@ -6375,7 +6375,7 @@ CChartSpace.prototype =
                                 union_marker.lineMarker = AscFormat.CreateMarkerGeometryByType(AscFormat.SYMBOL_DASH, null);
                                 union_marker.lineMarker.pen = ser.compiledSeriesPen.createDuplicate(); //Копируем, так как потом возможно придется изменять толщину линии;
                             }
-                            if(!b_scatter_no_line && !this.chart.view3D)
+                            if(!b_scatter_no_line && !AscFormat.CChartsDrawer.prototype._isSwitchCurrent3DChart(this))
                                 b_line_series = true;
                             break;
                         }
@@ -6429,7 +6429,7 @@ CChartSpace.prototype =
 
                     calc_entry.calcMarkerUnion = new AscFormat.CUnionMarker();
                     union_marker = calc_entry.calcMarkerUnion;
-                    if(ser.getObjectType() === AscDFH.historyitem_type_LineSeries && !this.chart.view3D || ser.getObjectType() === AscDFH.historyitem_type_ScatterSer)
+                    if(ser.getObjectType() === AscDFH.historyitem_type_LineSeries && !AscFormat.CChartsDrawer.prototype._isSwitchCurrent3DChart(this) || ser.getObjectType() === AscDFH.historyitem_type_ScatterSer)
                     {
                         if(pt.compiledMarker)
                         {
@@ -6442,7 +6442,7 @@ CChartSpace.prototype =
                             union_marker.lineMarker = AscFormat.CreateMarkerGeometryByType(AscFormat.SYMBOL_DASH, null);
                             union_marker.lineMarker.pen = pt.pen;
                         }
-                        if(!b_scatter_no_line && !this.chart.view3D)
+                        if(!b_scatter_no_line && !AscFormat.CChartsDrawer.prototype._isSwitchCurrent3DChart(this))
                             b_line_series = true;
                     }
                     else
@@ -7609,7 +7609,7 @@ CChartSpace.prototype =
         {
             var plot_area = this.chart.plotArea;
             var default_brush;
-            if(this.chart.view3D)
+            if(AscFormat.CChartsDrawer.prototype._isSwitchCurrent3DChart(this))
             {
                 default_brush = CreateNoFillUniFill();
             }
@@ -8011,7 +8011,7 @@ CChartSpace.prototype =
                     case AscDFH.historyitem_type_RadarChart:
                     {
                         var base_line_fills = getArrayFillsFromBase(style.line4, getMaxIdx(series));
-                        if(!this.chart.view3D)
+                        if(!AscFormat.CChartsDrawer.prototype._isSwitchCurrent3DChart(this))
                         {
                             for(var i = 0; i < series.length; ++i)
                             {
