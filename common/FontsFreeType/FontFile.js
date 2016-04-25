@@ -18,6 +18,7 @@ var FT_Done_Glyph = AscFonts.FT_Done_Glyph;
 var FT_Outline_Decompose = AscFonts.FT_Outline_Decompose;
 var FT_Render_Glyph = AscFonts.FT_Render_Glyph;
 var raster_memory = AscFonts.raster_memory;
+var FT_Get_Charmap_Index = AscFonts.FT_Get_Charmap_Index;
 
   var FONT_ITALIC_ANGLE = 0.3090169943749;
   var FT_ENCODING_UNICODE = 1970170211;

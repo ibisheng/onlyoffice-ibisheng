@@ -102,6 +102,11 @@ prot.getImageLocal = function(url){
 	var _first = this.documentUrl + "/media/";
 	if (0 == url.indexOf(_first))
 		return url.substring(_first.length);
+
+	if (window.editor && window.editor.ThemeLoader && 0 == url.indexOf(editor.ThemeLoader.ThemesUrlAbs)) {
+		return url.substring(editor.ThemeLoader.ThemesUrlAbs.length);
+	}
+
 	return null;
 };
 prot.imagePath2Local = function(imageLocal){
