@@ -120,6 +120,11 @@
     }
     return undefined;
   };
+  CDocsCoApi.prototype.setDocId = function(docId) {
+    if (this._CoAuthoringApi) {
+      return this._CoAuthoringApi.setDocId(docId)
+    }
+  };
 
   CDocsCoApi.prototype.auth = function(isViewer, opt_openCmd) {
     if (this._CoAuthoringApi && this._onlineWork) {
@@ -1159,6 +1164,10 @@
   };
   DocsCoApi.prototype.getDocId = function() {
     return this._docid;
+  };
+  DocsCoApi.prototype.setDocId = function(docId) {
+    //todo возможно надо менять sockjs_url
+    this._docid = docId;
   };
   // Авторизация (ее нужно делать после выставления состояния редактора view-mode)
   DocsCoApi.prototype.auth = function(isViewer, opt_openCmd) {

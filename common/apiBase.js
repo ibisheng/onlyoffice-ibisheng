@@ -174,6 +174,9 @@ baseEditorsApi.prototype.asc_setDocInfo = function(oDocInfo) {
     this.User = new AscCommon.asc_CUser();
     this.User.setId(this.DocInfo.get_UserId());
     this.User.setUserName(this.DocInfo.get_UserName());
+
+	//чтобы в versionHistory был один documentId для auth и open 
+	this.CoAuthoringApi.setDocId(this.documentId);
   }
 
   if (undefined !== window["AscDesktopEditor"] && offlineMode != this.documentUrl) {
