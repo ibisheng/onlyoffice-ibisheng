@@ -379,4 +379,5 @@ window["CreateMainTextMeasurerWrapper"] = function()
 {
 	g_oTextMeasurer = new CTextMeasurerWrapper();
 	g_oTextMeasurer.Init();
+    window['AscCommon'].g_oTextMeasurer = g_oTextMeasurer;
 };

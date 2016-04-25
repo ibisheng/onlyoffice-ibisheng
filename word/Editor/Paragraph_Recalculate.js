@@ -1,9 +1,7 @@
 "use strict";
-/**
- * User: Ilja.Kirillov
- * Date: 16.09.14
- * Time: 12:04
- */
+
+// Import
+var g_oTextMeasurer = AscCommon.g_oTextMeasurer;
 
 // TODO: В колонтитулах быстрые пересчеты отключены. Надо реализовать.
 

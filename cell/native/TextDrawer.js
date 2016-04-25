@@ -1528,7 +1528,7 @@ CTextDrawer.prototype =
         {
             this.Get_PathToDraw(false, true, x, y);
         }
-        g_oTextMeasurer.SetFontInternal(this.m_oFont.Name, this.m_oFont.FontSize, Math.max(this.m_oFont.Style, 0));
+        AscCommon.g_oTextMeasurer.SetFontInternal(this.m_oFont.Name, this.m_oFont.FontSize, Math.max(this.m_oFont.Style, 0));
 
         if (null != this.LastFontOriginInfo.Replace)
         {
@@ -1540,7 +1540,7 @@ CTextDrawer.prototype =
     },
     tg : function(gid,x,y)
     {
-        g_oTextMeasurer.SetFontInternal(this.m_oFont.Name, this.m_oFont.FontSize, Math.max(this.m_oFont.Style, 0));
+        AscCommon.g_oTextMeasurer.SetFontInternal(this.m_oFont.Name, this.m_oFont.FontSize, Math.max(this.m_oFont.Style, 0));
         window["native"]["PD_FillTextG"](x, y, gid); // TODO:
        // g_oTextMeasurer.m_oManager.LoadStringPathCode(gid, true, x, y, this);
     },

@@ -825,7 +825,7 @@
         res.descender = factor * d;
         res.lineGap	= factor * (fm.m_lLineHeight - fm.m_lAscender - d);
 
-        var face = g_oTextMeasurer.Measurer['GetFace']();
+        var face = AscCommon.g_oTextMeasurer.Measurer['GetFace']();
         res.nat_scale = face[0];
         res.nat_y1 = face[1];
         res.nat_y2 = face[2];
@@ -873,7 +873,7 @@
             if (_info.SrcBold)      flag |= 0x04;
             if (_info.SrcItalic)    flag |= 0x08;
 
-            napi_fontInfo = g_oTextMeasurer.Measurer["LoadFont"](_info.Path, _info.FaceIndex, this.font.FontSize, flag);
+            napi_fontInfo = AscCommon.g_oTextMeasurer.Measurer["LoadFont"](_info.Path, _info.FaceIndex, this.font.FontSize, flag);
 
             this.napi_fmt[1].m_lUnits_Per_Em    = napi_fontInfo[3];
             this.napi_fmt[1].m_lAscender        = napi_fontInfo[0];
@@ -898,7 +898,7 @@
             if (_info.SrcBold)      flag |= 0x04;
             if (_info.SrcItalic)    flag |= 0x08;
 
-            napi_fontInfo = g_oTextMeasurer.Measurer["LoadFont"](_info.Path, _info.FaceIndex, this.font.FontSize, flag);
+            napi_fontInfo = AscCommon.g_oTextMeasurer.Measurer["LoadFont"](_info.Path, _info.FaceIndex, this.font.FontSize, flag);
 
             this.nctx["PD_LoadFont"](_info.Path, _info.FaceIndex, this.font.FontSize, flag);
 
@@ -958,7 +958,7 @@
             r  = getCvtRatio(0/*px*/, units >= 0 && units <=3 ? units : this.units, this.ppiX);
         for (var tmp, w = 0, w2 = 0, i = 0; i < text.length; ++i) {
 
-            var bounds = g_oTextMeasurer.Measurer["GetDrawingBox"](text.charCodeAt(i));
+            var bounds = AscCommon.g_oTextMeasurer.Measurer["GetDrawingBox"](text.charCodeAt(i));
             tmp = {
                 fAdvanceX: bounds[0],
                 oBBox: {
@@ -1035,7 +1035,7 @@
 
             this.nctx["PD_FillText"](_x, _y, lUnicode);
 
-            _x += asc_round(g_oTextMeasurer.Measurer["MeasureChar"](lUnicode));
+            _x += asc_round(AscCommon.g_oTextMeasurer.Measurer["MeasureChar"](lUnicode));
         }
 
         return this;

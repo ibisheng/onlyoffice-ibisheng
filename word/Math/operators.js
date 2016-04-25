@@ -1,5 +1,8 @@
 "use strict";
 
+// Import
+var g_oTextMeasurer = AscCommon.g_oTextMeasurer;
+
 function CGlyphOperator()
 {
     this.loc =  null;

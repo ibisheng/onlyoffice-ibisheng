@@ -1,5 +1,8 @@
 "use strict";
 
+// Import
+var g_oTextMeasurer = AscCommon.g_oTextMeasurer;
+
 function CMathDegreePr()
 {
     this.type = DEGREE_SUPERSCRIPT;

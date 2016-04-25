@@ -1,5 +1,8 @@
 "use strict";
 
+// Import
+var g_oTextMeasurer = AscCommon.g_oTextMeasurer;
+
 // 0x300  accent grave
 // 0x301  accent acute
 // 0x307  one dot

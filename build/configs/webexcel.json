@@ -17,6 +17,8 @@
 		"../common/FontsFreeType/font_map.js",
         "../common/FontsFreeType/FontManager.js",
 		
+		"../word/Drawing/Metafile.js",
+		
 		"../common/Drawings/Hit.js",
 		"../common/Drawings/ArcTo.js",
 		"../common/Drawings/ColorArray.js",
@@ -58,7 +60,6 @@
         "../word/Drawing/HatchPattern.js",
         "../word/Drawing/WorkEvents.js",
         "../word/Drawing/Externals.js",
-        "../word/Drawing/Metafile.js",
         "../common/GlobalLoaders.js",
         "../cell/document/empty-workbook.js",
         "../cell/utils/utils.js",

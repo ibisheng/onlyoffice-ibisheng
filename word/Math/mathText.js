@@ -1,5 +1,8 @@
 "use strict";
 
+// Import
+var g_oTextMeasurer = AscCommon.g_oTextMeasurer;
+
 //change FontSize
 // api 2003: asc_docs_api.prototype.put_TextPrFontSize
 //Document: Paragraph_Add

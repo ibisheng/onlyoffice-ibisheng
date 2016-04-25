@@ -2201,3 +2201,491 @@ CDocumentRenderer.prototype =
         this._restoreDumpedVectors = null;
     }
 };
+
+var MATRIX_ORDER_PREPEND    = 0;
+var MATRIX_ORDER_APPEND     = 1;
+
+function CMatrix()
+{
+    this.sx     = 1.0;
+    this.shx    = 0.0;
+    this.shy    = 0.0;
+    this.sy     = 1.0;
+    this.tx     = 0.0;
+    this.ty     = 0.0;
+}
+
+CMatrix.prototype =
+{
+    Reset : function(){
+        this.sx     = 1.0;
+        this.shx    = 0.0;
+        this.shy    = 0.0;
+        this.sy     = 1.0;
+        this.tx     = 0.0;
+        this.ty     = 0.0;
+    },
+    // ���������
+    Multiply : function(matrix,order){
+        if (MATRIX_ORDER_PREPEND == order)
+        {
+            var m = new CMatrix();
+            m.sx     = matrix.sx;
+            m.shx    = matrix.shx;
+            m.shy    = matrix.shy;
+            m.sy     = matrix.sy;
+            m.tx     = matrix.tx;
+            m.ty     = matrix.ty;
+            m.Multiply(this, MATRIX_ORDER_APPEND);
+            this.sx     = m.sx;
+            this.shx    = m.shx;
+            this.shy    = m.shy;
+            this.sy     = m.sy;
+            this.tx     = m.tx;
+            this.ty     = m.ty;
+        }
+        else
+        {
+            var t0 = this.sx  * matrix.sx + this.shy * matrix.shx;
+            var t2 = this.shx * matrix.sx + this.sy  * matrix.shx;
+            var t4 = this.tx  * matrix.sx + this.ty  * matrix.shx + matrix.tx;
+            this.shy = this.sx * matrix.shy + this.shy * matrix.sy;
+            this.sy  = this.shx * matrix.shy + this.sy * matrix.sy;
+            this.ty  = this.tx  * matrix.shy + this.ty * matrix.sy + matrix.ty;
+            this.sx  = t0;
+            this.shx = t2;
+            this.tx  = t4;
+        }
+        return this;
+    },
+    // � ������ ������� ������ ���������� (��� �������� �����������)
+    Translate : function(x,y,order){
+        var m = new CMatrix();
+        m.tx  = x;
+        m.ty  = y;
+        this.Multiply(m,order);
+    },
+    Scale : function(x,y,order){
+        var m = new CMatrix();
+        m.sx  = x;
+        m.sy  = y;
+        this.Multiply(m,order);
+    },
+    Rotate : function(a,order){
+        var m = new CMatrix();
+        var rad = deg2rad(a);
+        m.sx  = Math.cos(rad);
+        m.shx = Math.sin(rad);
+        m.shy = -Math.sin(rad);
+        m.sy  = Math.cos(rad);
+        this.Multiply(m,order);
+    },
+    RotateAt : function(a,x,y,order){
+        this.Translate(-x,-y,order);
+        this.Rotate(a,order);
+        this.Translate(x,y,order);
+    },
+    // determinant
+    Determinant : function(){
+        return this.sx * this.sy - this.shy * this.shx;
+    },
+    // invert
+    Invert : function(){
+        var det = this.Determinant();
+        if (0.0001 > Math.abs(det))
+            return;
+        var d = 1 / det;
+
+        var t0 = this.sy * d;
+        this.sy =  this.sx * d;
+        this.shy = -this.shy * d;
+        this.shx = -this.shx * d;
+
+        var t4 = -this.tx * t0  - this.ty * this.shx;
+        this.ty = -this.tx * this.shy - this.ty * this.sy;
+
+        this.sx = t0;
+        this.tx = t4;
+        return this;
+    },
+    // transform point
+    TransformPointX : function(x,y){
+        return x * this.sx  + y * this.shx + this.tx;
+    },
+    TransformPointY : function(x,y){
+        return x * this.shy + y * this.sy  + this.ty;
+    },
+    // calculate rotate angle
+    GetRotation : function(){
+        var x1 = 0.0;
+        var y1 = 0.0;
+        var x2 = 1.0;
+        var y2 = 0.0;
+        this.TransformPoint(x1, y1);
+        this.TransformPoint(x2, y2);
+        var a = Math.atan2(y2-y1,x2-x1);
+        return rad2deg(a);
+    },
+    // ������� ���������
+    CreateDublicate : function(){
+        var m = new CMatrix();
+        m.sx     = this.sx;
+        m.shx    = this.shx;
+        m.shy    = this.shy;
+        m.sy     = this.sy;
+        m.tx     = this.tx;
+        m.ty     = this.ty;
+        return m;
+    },
+
+    IsIdentity : function()
+    {
+        if (this.sx == 1.0 &&
+          this.shx == 0.0 &&
+          this.shy == 0.0 &&
+          this.sy == 1.0 &&
+          this.tx == 0.0 &&
+          this.ty == 0.0)
+        {
+            return true;
+        }
+        return false;
+    },
+    IsIdentity2 : function()
+    {
+        if (this.sx == 1.0 &&
+          this.shx == 0.0 &&
+          this.shy == 0.0 &&
+          this.sy == 1.0)
+        {
+            return true;
+        }
+        return false;
+    }
+};
+
+function CMatrixL()
+{
+    this.sx     = 1.0;
+    this.shx    = 0.0;
+    this.shy    = 0.0;
+    this.sy     = 1.0;
+    this.tx     = 0.0;
+    this.ty     = 0.0;
+}
+
+CMatrixL.prototype =
+{
+    CreateDublicate : function()
+    {
+        var m = new CMatrixL();
+        m.sx     = this.sx;
+        m.shx    = this.shx;
+        m.shy    = this.shy;
+        m.sy     = this.sy;
+        m.tx     = this.tx;
+        m.ty     = this.ty;
+        return m;
+    },
+    Reset : function()
+    {
+        this.sx     = 1.0;
+        this.shx    = 0.0;
+        this.shy    = 0.0;
+        this.sy     = 1.0;
+        this.tx     = 0.0;
+        this.ty     = 0.0;
+    },
+    TransformPointX : function(x,y)
+    {
+        return x * this.sx  + y * this.shx + this.tx;
+    },
+    TransformPointY : function(x,y)
+    {
+        return x * this.shy + y * this.sy  + this.ty;
+    }
+};
+
+function CTextMeasurer()
+{
+    this.m_oManager     = new AscFonts.CFontManager();
+
+    this.m_oFont        = null;
+
+    // RFonts
+    this.m_oTextPr      = null;
+    this.m_oGrFonts     = new CGrRFonts();
+    this.m_oLastFont    = new CFontSetup();
+
+    this.LastFontOriginInfo = { Name : "", Replace : null };
+
+    this.Init = function()
+    {
+        this.m_oManager.Initialize();
+    };
+
+    this.SetStringGid = function(bGID)
+    {
+        this.m_oManager.SetStringGID(bGID);
+    };
+
+    this.SetFont = function(font)
+    {
+        if (!font)
+            return;
+
+        this.m_oFont = font;
+
+        var bItalic = true === font.Italic;
+        var bBold   = true === font.Bold;
+
+        var oFontStyle = FontStyle.FontStyleRegular;
+        if ( !bItalic && bBold )
+            oFontStyle = FontStyle.FontStyleBold;
+        else if ( bItalic && !bBold )
+            oFontStyle = FontStyle.FontStyleItalic;
+        else if ( bItalic && bBold )
+            oFontStyle = FontStyle.FontStyleBoldItalic;
+
+        var _lastSetUp = this.m_oLastFont;
+        if (_lastSetUp.SetUpName != font.FontFamily.Name || _lastSetUp.SetUpSize != font.FontSize || _lastSetUp.SetUpStyle != oFontStyle)
+        {
+            _lastSetUp.SetUpName = font.FontFamily.Name;
+            _lastSetUp.SetUpSize = font.FontSize;
+            _lastSetUp.SetUpStyle = oFontStyle;
+
+            g_fontApplication.LoadFont(_lastSetUp.SetUpName, window.g_font_loader, this.m_oManager, _lastSetUp.SetUpSize, _lastSetUp.SetUpStyle, 72, 72, undefined, this.LastFontOriginInfo);
+        }
+    };
+
+    this.SetFontInternal = function(_name, _size, _style)
+    {
+        var _lastSetUp = this.m_oLastFont;
+        if (_lastSetUp.SetUpName != _name || _lastSetUp.SetUpSize != _size || _lastSetUp.SetUpStyle != _style)
+        {
+            _lastSetUp.SetUpName = _name;
+            _lastSetUp.SetUpSize = _size;
+            _lastSetUp.SetUpStyle = _style;
+
+            g_fontApplication.LoadFont(_lastSetUp.SetUpName, window.g_font_loader, this.m_oManager, _lastSetUp.SetUpSize, _lastSetUp.SetUpStyle, 72, 72, undefined, this.LastFontOriginInfo);
+        }
+    };
+
+    this.SetTextPr = function(textPr, theme)
+    {
+        this.m_oTextPr = textPr;
+        if (theme)
+            this.m_oGrFonts.checkFromTheme(theme.themeElements.fontScheme, this.m_oTextPr.RFonts);
+        else
+            this.m_oGrFonts = this.m_oTextPr.RFonts;
+    };
+
+    this.SetFontSlot = function(slot, fontSizeKoef)
+    {
+        var _rfonts = this.m_oGrFonts;
+        var _lastFont = this.m_oLastFont;
+
+        switch (slot)
+        {
+            case fontslot_ASCII:
+            {
+                _lastFont.Name   = _rfonts.Ascii.Name;
+                _lastFont.Index  = _rfonts.Ascii.Index;
+
+                _lastFont.Size = this.m_oTextPr.FontSize;
+                _lastFont.Bold = this.m_oTextPr.Bold;
+                _lastFont.Italic = this.m_oTextPr.Italic;
+
+                break;
+            }
+            case fontslot_CS:
+            {
+                _lastFont.Name   = _rfonts.CS.Name;
+                _lastFont.Index  = _rfonts.CS.Index;
+
+                _lastFont.Size = this.m_oTextPr.FontSizeCS;
+                _lastFont.Bold = this.m_oTextPr.BoldCS;
+                _lastFont.Italic = this.m_oTextPr.ItalicCS;
+
+                break;
+            }
+            case fontslot_EastAsia:
+            {
+                _lastFont.Name   = _rfonts.EastAsia.Name;
+                _lastFont.Index  = _rfonts.EastAsia.Index;
+
+                _lastFont.Size = this.m_oTextPr.FontSize;
+                _lastFont.Bold = this.m_oTextPr.Bold;
+                _lastFont.Italic = this.m_oTextPr.Italic;
+
+                break;
+            }
+            case fontslot_HAnsi:
+            default:
+            {
+                _lastFont.Name   = _rfonts.HAnsi.Name;
+                _lastFont.Index  = _rfonts.HAnsi.Index;
+
+                _lastFont.Size = this.m_oTextPr.FontSize;
+                _lastFont.Bold = this.m_oTextPr.Bold;
+                _lastFont.Italic = this.m_oTextPr.Italic;
+
+                break;
+            }
+        }
+
+        if (undefined !== fontSizeKoef)
+            _lastFont.Size *= fontSizeKoef;
+
+        var _style = 0;
+        if (_lastFont.Italic)
+            _style += 2;
+        if (_lastFont.Bold)
+            _style += 1;
+
+        if (_lastFont.Name != _lastFont.SetUpName || _lastFont.Size != _lastFont.SetUpSize || _style != _lastFont.SetUpStyle)
+        {
+            _lastFont.SetUpName = _lastFont.Name;
+            _lastFont.SetUpSize = _lastFont.Size;
+            _lastFont.SetUpStyle = _style;
+
+            g_fontApplication.LoadFont(_lastFont.SetUpName, window.g_font_loader, this.m_oManager, _lastFont.SetUpSize, _lastFont.SetUpStyle, 72, 72, undefined, this.LastFontOriginInfo);
+        }
+    };
+
+    this.GetTextPr = function()
+    {
+        return this.m_oTextPr;
+    };
+
+    this.GetFont = function()
+    {
+        return this.m_oFont;
+    };
+
+    this.Measure = function(text)
+    {
+        var Width  = 0;
+        var Height = 0;
+
+        var _code = text.charCodeAt(0);
+        if (null != this.LastFontOriginInfo.Replace)
+            _code = g_fontApplication.GetReplaceGlyph(_code, this.LastFontOriginInfo.Replace);
+
+        var Temp = this.m_oManager.MeasureChar( _code );
+
+        Width  = Temp.fAdvanceX * 25.4 / 72;
+        Height = 0;//Temp.fHeight;
+
+        return { Width : Width, Height : Height };
+    };
+    this.Measure2 = function(text)
+    {
+        var Width  = 0;
+
+        var _code = text.charCodeAt(0);
+        if (null != this.LastFontOriginInfo.Replace)
+            _code = g_fontApplication.GetReplaceGlyph(_code, this.LastFontOriginInfo.Replace);
+
+        var Temp = this.m_oManager.MeasureChar( _code, true );
+
+        Width  = Temp.fAdvanceX * 25.4 / 72;
+
+        if (Temp.oBBox.rasterDistances == null)
+        {
+            return {
+                Width  : Width,
+                Ascent : (Temp.oBBox.fMaxY * 25.4 / 72),
+                Height : ((Temp.oBBox.fMaxY - Temp.oBBox.fMinY) * 25.4 / 72),
+                WidthG : ((Temp.oBBox.fMaxX - Temp.oBBox.fMinX) * 25.4 / 72),
+                rasterOffsetX: 0,
+                rasterOffsetY: 0
+            };
+        }
+
+        return {
+            Width  : Width,
+            Ascent : (Temp.oBBox.fMaxY * 25.4 / 72),
+            Height : ((Temp.oBBox.fMaxY - Temp.oBBox.fMinY) * 25.4 / 72),
+            WidthG : ((Temp.oBBox.fMaxX - Temp.oBBox.fMinX) * 25.4 / 72),
+            rasterOffsetX: Temp.oBBox.rasterDistances.dist_l * 25.4 / 72,
+            rasterOffsetY: Temp.oBBox.rasterDistances.dist_t * 25.4 / 72
+        };
+    };
+
+    this.MeasureCode = function(lUnicode)
+    {
+        var Width  = 0;
+        var Height = 0;
+
+        if (null != this.LastFontOriginInfo.Replace)
+            lUnicode = g_fontApplication.GetReplaceGlyph(lUnicode, this.LastFontOriginInfo.Replace);
+
+        var Temp = this.m_oManager.MeasureChar( lUnicode );
+
+        Width  = Temp.fAdvanceX * 25.4 / 72;
+        Height = ((Temp.oBBox.fMaxY - Temp.oBBox.fMinY) * 25.4 / 72);
+
+        return { Width : Width, Height : Height, Ascent : (Temp.oBBox.fMaxY * 25.4 / 72) };
+    };
+    this.Measure2Code = function(lUnicode)
+    {
+        var Width  = 0;
+
+        if (null != this.LastFontOriginInfo.Replace)
+            lUnicode = g_fontApplication.GetReplaceGlyph(lUnicode, this.LastFontOriginInfo.Replace);
+
+        var Temp = this.m_oManager.MeasureChar( lUnicode, true );
+
+        Width  = Temp.fAdvanceX * 25.4 / 72;
+
+        if (Temp.oBBox.rasterDistances == null)
+        {
+            return {
+                Width  : Width,
+                Ascent : (Temp.oBBox.fMaxY * 25.4 / 72),
+                Height : ((Temp.oBBox.fMaxY - Temp.oBBox.fMinY) * 25.4 / 72),
+                WidthG : ((Temp.oBBox.fMaxX - Temp.oBBox.fMinX) * 25.4 / 72),
+                rasterOffsetX: 0,
+                rasterOffsetY: 0
+            };
+        }
+
+        return {
+            Width  : Width,
+            Ascent : (Temp.oBBox.fMaxY * 25.4 / 72),
+            Height : ((Temp.oBBox.fMaxY - Temp.oBBox.fMinY) * 25.4 / 72),
+            WidthG : ((Temp.oBBox.fMaxX - Temp.oBBox.fMinX) * 25.4 / 72),
+            rasterOffsetX: (Temp.oBBox.rasterDistances.dist_l + Temp.oBBox.fMinX) * 25.4 / 72,
+            rasterOffsetY: Temp.oBBox.rasterDistances.dist_t * 25.4 / 72
+        };
+    };
+
+    this.GetAscender = function()
+    {
+        var UnitsPerEm = this.m_oManager.m_lUnits_Per_Em;
+        var Ascender   = this.m_oManager.m_lAscender;
+
+        return Ascender * this.m_oLastFont.SetUpSize / UnitsPerEm * g_dKoef_pt_to_mm;
+    };
+    this.GetDescender = function()
+    {
+        var UnitsPerEm = this.m_oManager.m_lUnits_Per_Em;
+        var Descender  = this.m_oManager.m_lDescender;
+
+        return Descender * this.m_oLastFont.SetUpSize / UnitsPerEm * g_dKoef_pt_to_mm;
+    };
+    this.GetHeight = function()
+    {
+        var UnitsPerEm = this.m_oManager.m_lUnits_Per_Em;
+        var Height     = this.m_oManager.m_lLineHeight;
+
+        return Height * this.m_oLastFont.SetUpSize / UnitsPerEm * g_dKoef_pt_to_mm;
+    };
+}
+var g_oTextMeasurer = new CTextMeasurer();
+g_oTextMeasurer.Init();
+
+//------------------------------------------------------------export----------------------------------------------------
+window['AscCommon'] = window['AscCommon'] || {};
+window['AscCommon'].g_oTextMeasurer = g_oTextMeasurer;

@@ -4,6 +4,8 @@
 
 // Import
 var g_fontApplication = AscFonts.g_fontApplication;
+
+var g_oTextMeasurer = AscCommon.g_oTextMeasurer;
     
 var Geometry = AscFormat.Geometry;
 var EPSILON_TEXT_AUTOFIT = AscFormat.EPSILON_TEXT_AUTOFIT;

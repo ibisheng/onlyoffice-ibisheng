@@ -20,6 +20,8 @@
 		"../common/FontsFreeType/font_map.js",
         "../common/FontsFreeType/FontManager.js",
 		
+		"../word/Drawing/Metafile.js",
+		
 		"../common/Drawings/Hit.js",
 		"../common/Drawings/ArcTo.js",
 		"../common/Drawings/ColorArray.js",
@@ -105,7 +107,6 @@
         "../common/Overlay.js",
         "../word/Drawing/HatchPattern.js",
         "../word/Drawing/ShapeDrawer.js",
-        "../word/Drawing/Metafile.js",
         "../common/CollaborativeEditingBase.js",
         "../word/Drawing/DrawingDocument.js",
         "../word/Drawing/GraphicsEvents.js",
