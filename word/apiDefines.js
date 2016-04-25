@@ -52,6 +52,10 @@ var c_oAscCollaborativeMarksShowType = {
   LastChanges: 1
 };
 
+/**
+ * Типы горизонтального прилегания для автофигур.
+ * @type {{Center: number, Inside: number, Left: number, Outside: number, Right: number}}
+ */
 var c_oAscAlignH = {
   Center: 0x00,
   Inside: 0x01,
@@ -67,6 +71,10 @@ var c_oAscChangeLevel = {
   BringBackward: 0x03
 };
 
+/**
+ * Типы вертикального прилегания для автофигур.
+ * @type {{Bottom: number, Center: number, Inside: number, Outside: number, Top: number}}
+ */
 var c_oAscAlignV = {
   Bottom: 0x00,
   Center: 0x01,
