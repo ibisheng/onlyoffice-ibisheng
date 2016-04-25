@@ -4424,6 +4424,7 @@
 			resetTableStyles: function(range)
 			{
 				var worksheet = this.worksheet;
+				
 				if(worksheet.TableParts && worksheet.TableParts.length > 0)
 				{
 					for(var i = 0; i < worksheet.TableParts.length; i++)
