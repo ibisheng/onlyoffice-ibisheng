@@ -339,7 +339,7 @@
 		};
 
 		CCollaborativeEditing.prototype.getLockInfo = function (typeElem, subType, sheetId, info) {
-			var oLockInfo = new asc.asc_CLockInfo();
+			var oLockInfo = new AscCommonExcel.asc_CLockInfo();
 			oLockInfo["sheetId"] = sheetId;
 			oLockInfo["type"] = typeElem;
 			oLockInfo["subType"] = subType;
