@@ -3633,9 +3633,9 @@ asc_docs_api.prototype.OpenDocumentEndCallback = function()
                         theme_load_info.Layouts[j] = _masters[i].sldLayoutLst[j];
 
                     var th_info = {};
-                    th_info["Name"] = "Doc Theme " + i;
-                    th_info["Url"] = "";
-                    th_info["Thumbnail"] = _masters[i].ImageBase64;
+                    th_info.Name = "Doc Theme " + i;
+                    th_info.Url = "";
+                    th_info.Thumbnail = _masters[i].ImageBase64;
 
                     var th = new CAscThemeInfo(th_info);
                     this.ThemeLoader.Themes.DocumentThemes[this.ThemeLoader.Themes.DocumentThemes.length] = th;

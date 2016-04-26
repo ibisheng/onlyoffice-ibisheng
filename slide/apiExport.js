@@ -1,6 +1,4 @@
-if (undefined === window['Asc']) {
-  window['Asc'] = {};
-}
+window['Asc'] = window['Asc'] || {};
 window['Asc']['asc_docs_api'] = asc_docs_api;
 asc_docs_api.prototype['asc_GetFontThumbnailsPath'] = asc_docs_api.prototype.asc_GetFontThumbnailsPath;
 asc_docs_api.prototype['pre_Save'] = asc_docs_api.prototype.pre_Save;
@@ -467,10 +465,6 @@ CAscSlideProps.prototype['get_LockTranzition'] = CAscSlideProps.prototype.get_Lo
 CAscSlideProps.prototype['put_LockTranzition'] = CAscSlideProps.prototype.put_LockTranzition;
 CAscSlideProps.prototype['get_LockRemove'] = CAscSlideProps.prototype.get_LockRemove;
 CAscSlideProps.prototype['put_LockRemove'] = CAscSlideProps.prototype.put_LockRemove;
-CAscThemeInfo.prototype['get_Name'] = CAscThemeInfo.prototype.get_Name;
-CAscThemeInfo.prototype['get_Url'] = CAscThemeInfo.prototype.get_Url;
-CAscThemeInfo.prototype['get_Image'] = CAscThemeInfo.prototype.get_Image;
-CAscThemeInfo.prototype['get_Index'] = CAscThemeInfo.prototype.get_Index;
 CAscThemes.prototype['get_EditorThemes'] = CAscThemes.prototype.get_EditorThemes;
 CAscThemes.prototype['get_DocumentThemes'] = CAscThemes.prototype.get_DocumentThemes;
 window['Asc']['CAscChartProp'] = CAscChartProp;

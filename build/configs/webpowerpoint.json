@@ -66,6 +66,8 @@
         "../common/wordcopypaste.js",
 
         "../slide/apiDefines.js",
+		"../slide/themes/Themes.js",
+		
         "../slide/Drawing/ThemeLoader.js",
         "../word/Editor/Serialize2.js",
         "../word/Editor/Styles.js",
