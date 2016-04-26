@@ -1275,7 +1275,7 @@ CMetafile.prototype =
     },
 	FillTextCode : function(x,y,code)
     {
-        var _font_info = AscFonts.g_font_infos[window.g_map_font_index[this.m_oFont.Name]];       
+        var _font_info = AscFonts.g_font_infos[AscFonts.g_map_font_index[this.m_oFont.Name]];       
 
         if (code < 0xFFFF)
             return this.FillText(x, y, String.fromCharCode(code));
