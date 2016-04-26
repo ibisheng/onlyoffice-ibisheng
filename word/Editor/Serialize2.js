@@ -1986,7 +1986,7 @@ function Binary_rPrWriter(memory, saveParams)
             {
                 this.memory.WriteByte(c_oSerProp_rPrType.HighLightTyped);
                 this.memory.WriteByte(c_oSerPropLenType.Byte);
-                this.memory.WriteByte(c_oSer_ColorType.Auto);
+                this.memory.WriteByte(AscCommon.c_oSer_ColorType.Auto);
             }
             else
             {
@@ -6905,7 +6905,7 @@ function Binary_rPrReader(doc, oReadResult, stream)
                 break;
             case c_oSerProp_rPrType.HighLightTyped:
                 var nHighLightTyped = this.stream.GetUChar();
-                if(nHighLightTyped == c_oSer_ColorType.Auto)
+                if(nHighLightTyped == AscCommon.c_oSer_ColorType.Auto)
                     rPr.HighLight = highlight_None;
                 break;
 			case c_oSerProp_rPrType.RStyle:

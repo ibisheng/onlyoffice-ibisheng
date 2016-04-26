@@ -1104,6 +1104,7 @@ function isRealObject(obj)
   window['AscCommon'] = window['AscCommon'] || {};
   window['AscCommon'].c_oSerConstants = c_oSerConstants;
   window['AscCommon'].c_oSerPropLenType = c_oSerPropLenType;
+  window['AscCommon'].c_oSer_ColorType = c_oSer_ColorType;
   window['AscCommon'].c_oSerBorderType = c_oSerBorderType;
   window['AscCommon'].c_oSerBordersType = c_oSerBordersType;
   window['AscCommon'].c_oSerPaddingType = c_oSerPaddingType;
