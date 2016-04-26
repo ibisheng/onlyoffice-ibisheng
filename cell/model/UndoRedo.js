@@ -448,12 +448,12 @@ var UndoRedoDataTypes = new function() {
 			case this.SheetPositions: return new UndoRedoData_SheetPositions();break;
 			case this.ClrScheme: return new UndoRedoData_ClrScheme();break;
 			case this.AutoFilter: return new UndoRedoData_AutoFilter(); break;
-			case this.AutoFiltersOptions: return new Asc.AutoFiltersOptions(); break;
-			case this.AutoFilterObj: return new Asc.AutoFilterObj(); break;
+			case this.AutoFiltersOptions: return new AscCommonExcel.AutoFiltersOptions(); break;
+			case this.AutoFilterObj: return new AscCommonExcel.AutoFilterObj(); break;
 			case this.CustomFilters: return new Asc.CustomFilters(); break;
 			case this.CustomFilter: return new Asc.CustomFilter(); break;
-			case this.AutoFiltersOptionsElements: return new Asc.AutoFiltersOptionsElements(); break;
-			case this.AddFormatTableOptions: return new Asc.AddFormatTableOptions(); break;
+			case this.AutoFiltersOptionsElements: return new AscCommonExcel.AutoFiltersOptionsElements(); break;
+			case this.AddFormatTableOptions: return new AscCommonExcel.AddFormatTableOptions(); break;
 			case this.SingleProperty: return new UndoRedoData_SingleProperty(); break;
 			case this.RgbColor: return new RgbColor(); break;
 			case this.ThemeColor: return new ThemeColor(); break;

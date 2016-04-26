@@ -2775,7 +2775,7 @@ function asc_ReadCHyperLink(_params, _cursor) {
     return _settings;
 }
 function asc_ReadAddFormatTableOptions(s, p) {
-    var format = new window["Asc"].AddFormatTableOptions();
+    var format = new AscCommonExcel.AddFormatTableOptions();
 
     var next = true;
     while (next)
@@ -4676,7 +4676,7 @@ function OfflineEditor () {
     this.offline_print = function(s, p) {
         var adjustPrint = asc_ReadAdjustPrint(s, p);
         var pagesData   = _api.wb.calcPagesPrint(adjustPrint);
-        var pdfWriter   = new CPdfPrinter();
+        var pdfWriter   = new AscCommonExcel.CPdfPrinter();
         var isEndPrint  = _api.wb.printSheet(pdfWriter, pagesData);
         return pdfWriter.DocumentRenderer.Memory.GetBase64Memory();
     };

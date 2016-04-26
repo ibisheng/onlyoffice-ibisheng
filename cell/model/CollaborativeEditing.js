@@ -1,23 +1,12 @@
 "use strict";
 
-/*
- * Author: Alexander.Trofimov
- * Date: 30.10.12
- */
-
-(	/**
- 	* @param {jQuery} $
- 	* @param {Window} window
- 	* @param {undefined} undefined
- 	*/
-	function ($, window, undefined) {
+(function (window, undefined) {
 		/*
 		 * Import
 		 * -----------------------------------------------------------------------------
 		 */
-		var asc					= window["Asc"];
-		var asc_applyFunction	= asc.applyFunction;
-		var asc_Range			= asc.Range;
+		var asc_applyFunction	= Asc.applyFunction;
+		var asc_Range			= Asc.Range;
 
 		var c_oAscLockTypes = AscCommon.c_oAscLockTypes;
 
@@ -39,7 +28,7 @@
 
 			this.m_nUseType					= 1;  // 1 - 1 клиент и мы сохраняем историю, -1 - несколько клиентов, 0 - переход из -1 в 1
 
-			this.handlers					= new asc.asc_CHandlersList(handlers);
+			this.handlers					= new Asc.asc_CHandlersList(handlers);
 			this.m_bIsViewerMode			= !!isViewerMode; // Режим Viewer-а
 			this.m_bGlobalLock				= false; // Глобальный lock
 			this.m_bGlobalLockEditCell		= false; // Глобальный lock (для редактирования ячейки) - отключаем смену select-а, но разрешаем сразу вводить
@@ -1051,11 +1040,12 @@
 		};
 
 		//----------------------------------------------------------export----------------------------------------------------
+		window['Asc'] = window['Asc'] || {};
 		window['AscCommonExcel'] = window['AscCommonExcel'] || {};
 		window['AscCommonExcel'].CLock = CLock;
-		
-		asc.CCollaborativeEditing = CCollaborativeEditing;
-		asc.CRecalcIndexElement = CRecalcIndexElement;
-		asc.CRecalcIndex = CRecalcIndex;
+
+		window['Asc'].CCollaborativeEditing = CCollaborativeEditing;
+		window['Asc'].CRecalcIndexElement = CRecalcIndexElement;
+		window['Asc'].CRecalcIndex = CRecalcIndex;
 	}
-)(jQuery, window);
+)(window);

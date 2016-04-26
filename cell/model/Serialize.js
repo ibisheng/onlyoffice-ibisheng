@@ -5579,7 +5579,7 @@
                     return oThis.ReadComments(t,l, oWorksheet);
                 });
             } else if (c_oSerWorksheetsTypes.ConditionalFormatting === type) {
-                oConditionalFormatting = new Asc.CConditionalFormatting();
+                oConditionalFormatting = new AscCommonExcel.CConditionalFormatting();
                 res = this.bcr.Read1(length, function (t, l) {
                     return oThis.ReadConditionalFormatting(t, l, oConditionalFormatting);
                 });
@@ -6310,7 +6310,7 @@
                 oConditionalFormatting.SqRef = this.stream.GetString2LE(length);
             }
             else if (c_oSer_ConditionalFormatting.ConditionalFormattingRule === type) {
-                oConditionalFormattingRule = new Asc.CConditionalFormattingRule();
+                oConditionalFormattingRule = new AscCommonExcel.CConditionalFormattingRule();
                 res = this.bcr.Read1(length, function (t, l) {
                     return oThis.ReadConditionalFormattingRule(t, l, oConditionalFormattingRule);
                 });
@@ -6355,23 +6355,23 @@
             else if (c_oSer_ConditionalFormattingRule.Type === type)
                 oConditionalFormattingRule.Type = this.stream.GetUChar();
             else if (c_oSer_ConditionalFormattingRule.ColorScale === type) {
-                oConditionalFormattingRuleElement = new Asc.CColorScale();
+                oConditionalFormattingRuleElement = new AscCommonExcel.CColorScale();
                 res = this.bcr.Read1(length, function (t, l) {
                     return oThis.ReadColorScale(t, l, oConditionalFormattingRuleElement);
                 });
                 oConditionalFormattingRule.aRuleElements.push(oConditionalFormattingRuleElement);
             } else if (c_oSer_ConditionalFormattingRule.DataBar === type) {
-                oConditionalFormattingRuleElement = new Asc.CDataBar();
+                oConditionalFormattingRuleElement = new AscCommonExcel.CDataBar();
                 res = this.bcr.Read1(length, function (t, l) {
                     return oThis.ReadDataBar(t, l, oConditionalFormattingRuleElement);
                 });
                 oConditionalFormattingRule.aRuleElements.push(oConditionalFormattingRuleElement);
             } else if (c_oSer_ConditionalFormattingRule.FormulaCF === type) {
-                oConditionalFormattingRuleElement = new Asc.CFormulaCF();
+                oConditionalFormattingRuleElement = new AscCommonExcel.CFormulaCF();
                 oConditionalFormattingRuleElement.Text = this.stream.GetString2LE(length);
                 oConditionalFormattingRule.aRuleElements.push(oConditionalFormattingRuleElement);
             } else if (c_oSer_ConditionalFormattingRule.IconSet === type) {
-                oConditionalFormattingRuleElement = new Asc.CIconSet();
+                oConditionalFormattingRuleElement = new AscCommonExcel.CIconSet();
                 res = this.bcr.Read1(length, function (t, l) {
                     return oThis.ReadIconSet(t, l, oConditionalFormattingRuleElement);
                 });
@@ -6385,7 +6385,7 @@
             var oThis = this;
             var oObject = null;
             if (c_oSer_ConditionalFormattingRuleColorScale.CFVO === type) {
-                oObject = new Asc.CConditionalFormatValueObject();
+                oObject = new AscCommonExcel.CConditionalFormatValueObject();
                 res = this.bcr.Read1(length, function (t, l) {
                     return oThis.ReadCFVO(t, l, oObject);
                 });
@@ -6415,7 +6415,7 @@
 					oDataBar.Color = color;
 				}
             } else if (c_oSer_ConditionalFormattingDataBar.CFVO === type) {
-                oObject = new Asc.CConditionalFormatValueObject();
+                oObject = new AscCommonExcel.CConditionalFormatValueObject();
                 res = this.bcr.Read1(length, function (t, l) {
                     return oThis.ReadCFVO(t, l, oObject);
                 });
@@ -6437,7 +6437,7 @@
             else if (c_oSer_ConditionalFormattingIconSet.ShowValue === type)
                 oIconSet.ShowValue = this.stream.GetBool();
             else if (c_oSer_ConditionalFormattingIconSet.CFVO === type) {
-                oObject = new Asc.CConditionalFormatValueObject();
+                oObject = new AscCommonExcel.CConditionalFormatValueObject();
                 res = this.bcr.Read1(length, function (t, l) {
                     return oThis.ReadCFVO(t, l, oObject);
                 });

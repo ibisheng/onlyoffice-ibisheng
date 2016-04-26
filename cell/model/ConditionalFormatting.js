@@ -1,21 +1,10 @@
 "use strict";
 
-/*
- * Author: Alexander.Trofimov
- * Date: 30.10.12
- */
-
-(	/**
- * @param {Window} window
- * @param {undefined} undefined
- */
-	function (window, undefined) {
+(function (window, undefined) {
 	/*
 	 * Import
 	 * -----------------------------------------------------------------------------
 	 */
-	var asc				= window["Asc"];
-	
 	var FT_Common = AscFonts.FT_Common;
 
 	/**
@@ -243,12 +232,13 @@
 	 * Export
 	 * -----------------------------------------------------------------------------
 	 */
-	asc.CConditionalFormatting = CConditionalFormatting;
-	asc.CConditionalFormattingRule = CConditionalFormattingRule;
-	asc.CColorScale = CColorScale;
-	asc.CDataBar = CDataBar;
-	asc.CFormulaCF = CFormulaCF;
-	asc.CIconSet = CIconSet;
-	asc.CConditionalFormatValueObject = CConditionalFormatValueObject;
-	asc.CGradient = CGradient;
+	window['AscCommonExcel'] = window['AscCommonExcel'] || {};
+	window['AscCommonExcel'].CConditionalFormatting = CConditionalFormatting;
+	window['AscCommonExcel'].CConditionalFormattingRule = CConditionalFormattingRule;
+	window['AscCommonExcel'].CColorScale = CColorScale;
+	window['AscCommonExcel'].CDataBar = CDataBar;
+	window['AscCommonExcel'].CFormulaCF = CFormulaCF;
+	window['AscCommonExcel'].CIconSet = CIconSet;
+	window['AscCommonExcel'].CConditionalFormatValueObject = CConditionalFormatValueObject;
+	window['AscCommonExcel'].CGradient = CGradient;
 })(window);

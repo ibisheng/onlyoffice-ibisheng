@@ -4579,11 +4579,11 @@
 		 * Export
 		 * -----------------------------------------------------------------------------
 		 */
-		window["Asc"].AutoFilters				= AutoFilters;
+		window['AscCommonExcel'] = window['AscCommonExcel'] || {};
+		window["AscCommonExcel"].AutoFilters				= AutoFilters;
 
-		window["Asc"]["AutoFiltersOptions"]		= window["Asc"].AutoFiltersOptions = AutoFiltersOptions;
+		window["AscCommonExcel"].AutoFiltersOptions = AutoFiltersOptions;
 		prot									= AutoFiltersOptions.prototype;
-
 		prot["asc_setSortState"]				= prot.asc_setSortState;
 		prot["asc_getSortState"]				= prot.asc_getSortState;
 		prot["asc_getValues"]					= prot.asc_getValues;
@@ -4591,27 +4591,27 @@
 		prot["asc_getCellId"]					= prot.asc_getCellId;
 		prot["asc_getDisplayName"]				= prot.asc_getDisplayName;
 		
-		window["Asc"]["AutoFilterObj"]		    = window["Asc"].AutoFilterObj = AutoFilterObj;
+		window["AscCommonExcel"].AutoFilterObj = AutoFilterObj;
 		prot									= AutoFilterObj.prototype;
 		prot["asc_getType"]						= prot.asc_getType;
 		prot["asc_setFilter"]					= prot.asc_setFilter;
 		prot["asc_setType"]						= prot.asc_setType;
 		prot["asc_getFilter"]					= prot.asc_getFilter;
 		
-		window["Asc"]["AutoFiltersOptionsElements"]	= window["Asc"].AutoFiltersOptionsElements = AutoFiltersOptionsElements;
+		window["AscCommonExcel"].AutoFiltersOptionsElements = AutoFiltersOptionsElements;
 		prot									= AutoFiltersOptionsElements.prototype;
 		prot["asc_getText"]						= prot.asc_getText;
 		prot["asc_getVisible"]					= prot.asc_getVisible;
 		prot["asc_setVisible"]					= prot.asc_setVisible;
 		
-		window["Asc"]["AddFormatTableOptions"]	= window["Asc"].AddFormatTableOptions = AddFormatTableOptions;
+		window["AscCommonExcel"].AddFormatTableOptions = AddFormatTableOptions;
 		prot									= AddFormatTableOptions.prototype;
 		prot["asc_getRange"]					= prot.asc_getRange;
 		prot["asc_getIsTitle"]					= prot.asc_getIsTitle;
 		prot["asc_setRange"]					= prot.asc_setRange;
 		prot["asc_setIsTitle"]					= prot.asc_setIsTitle;
 
-		window["Asc"]["formatTablePictures"]	= window["Asc"].formatTablePictures = formatTablePictures;
+		window["AscCommonExcel"].formatTablePictures = formatTablePictures;
 		prot									= formatTablePictures.prototype;
 		prot["asc_getName"]					   	= prot.asc_getName;
 		prot["asc_getDisplayName"]				= prot.asc_getDisplayName;

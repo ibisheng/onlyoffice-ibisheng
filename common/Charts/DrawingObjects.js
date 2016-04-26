@@ -2434,7 +2434,7 @@ function DrawingObjects() {
     {
 
         var graphics, i, j;
-        if(oDrawingContext instanceof CPdfPrinter)
+        if(oDrawingContext instanceof AscCommonExcel.CPdfPrinter)
         {
             graphics = oDrawingContext.DocumentRenderer;
         }
@@ -2466,7 +2466,7 @@ function DrawingObjects() {
                     continue;
                 }
 
-                if(oDrawingContext instanceof CPdfPrinter)
+                if(oDrawingContext instanceof AscCommonExcel.CPdfPrinter)
                 {
                     graphics.SaveGrState();
                     var _baseTransform = new AscCommon.CMatrix();
@@ -2478,14 +2478,14 @@ function DrawingObjects() {
 
                 oSparklineGroup.arrCachedSparklines[j].draw(graphics, _offX, _offY);
 
-                if(oDrawingContext instanceof CPdfPrinter)
+                if(oDrawingContext instanceof AscCommonExcel.CPdfPrinter)
                 {
                     graphics.SetBaseTransform(null);
                     graphics.RestoreGrState();
                 }
             }
         }
-        if(oDrawingContext instanceof CPdfPrinter)
+        if(oDrawingContext instanceof AscCommonExcel.CPdfPrinter)
         {
         }
         else

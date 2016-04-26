@@ -1,12 +1,6 @@
 "use strict";
 
-function _rect()
-{
-    this.x = 0;
-    this.y = 0;
-    this.w = 0;
-    this.h = 0;
-}
+(function (window, undefined) {
 
 var vector_koef = 25.4 / 72;
 
@@ -709,3 +703,8 @@ CPdfPrinter.prototype =
     }
 };
 
+    //--------------------------------------------------------export----------------------------------------------------
+    window['AscCommonExcel'] = window['AscCommonExcel'] || {};
+    window['AscCommonExcel'].vector_koef = vector_koef;
+    window['AscCommonExcel'].CPdfPrinter = CPdfPrinter;
+})(window);

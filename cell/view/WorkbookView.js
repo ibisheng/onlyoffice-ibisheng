@@ -2606,7 +2606,7 @@
                         type: 'custom',
                         image: this.af_getSmallIconTable(canvas, customStyles[i], fmgrGraphics, oFont, props)
                     };
-                    result[n] = new Asc.formatTablePictures(options);
+                    result[n] = new AscCommonExcel.formatTablePictures(options);
                     n++;
                 }
             }
@@ -2625,7 +2625,7 @@
                         type: 'default',
                         image: this.af_getSmallIconTable(canvas, defaultStyles[i], fmgrGraphics, oFont, props)
                     };
-                    result[n] = new Asc.formatTablePictures(options);
+                    result[n] = new AscCommonExcel.formatTablePictures(options);
                     n++;
                 }
             }

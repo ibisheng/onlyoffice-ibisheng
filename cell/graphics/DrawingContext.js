@@ -1,10 +1,5 @@
 "use strict";
 
-/* DrawingContext.js
- *
- * Author: Dmitry.Sokolov@avsmedia.net
- * Date:   Nov 21, 2011
- */
 (function (/** Window */window, undefined) {
 
 	/*
@@ -1241,6 +1236,7 @@
 	 * -----------------------------------------------------------------------------
 	 */
 
+	window['Asc'] = window['Asc'] || {};
 	window["Asc"].getCvtRatio      = getCvtRatio;
 	window["Asc"].calcNearestPt    = calcNearestPt;
 	window["Asc"].colorObjToAscColor = colorObjToAscColor;
@@ -1250,5 +1246,4 @@
 	window["Asc"].FontMetrics      = FontMetrics;
 	window["Asc"].DrawingContext   = DrawingContext;
 	window["Asc"].Matrix           = Matrix;
-
 })(window);

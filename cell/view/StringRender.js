@@ -213,7 +213,7 @@
                 this.drawingCtx.updateTransforms();
             } else {
 
-                mbt.translate((x + dx) * vector_koef, (y + dy) * vector_koef);
+                mbt.translate((x + dx) * AscCommonExcel.vector_koef, (y + dy) * AscCommonExcel.vector_koef);
                 mbt.multiply(m, 0);
 
                 drawingCtx.setTransform(mbt.sx, mbt.shy, mbt.shx, mbt.sy, mbt.tx, mbt.ty);

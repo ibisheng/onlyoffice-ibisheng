@@ -75,7 +75,6 @@
         "../cell/apiDefines.js",
         "../cell/document/empty-workbook.js",
         "../cell/utils/utils.js",
-		
         "../cell/model/UndoRedo.js",
         "../cell/model/clipboard.js",
         "../cell/model/autofilters.js",
@@ -83,6 +82,7 @@
         "../cell/graphics/pdfprinter.js",
         "../cell/model/CollaborativeEditing.js",
         "../cell/model/ConditionalFormatting.js",
+		
         "../cell/model/FormulaObjects/parserFormula.js",
         "../cell/model/FormulaObjects/_xlfnFunctions.js",
         "../cell/model/FormulaObjects/dateandtimeFunctions.js",
