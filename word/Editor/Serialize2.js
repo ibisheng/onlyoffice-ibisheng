@@ -474,10 +474,6 @@ var c_oSer_pgMarType = {
     Header:4,
     Footer:5
 };
-var c_oSer_ColorType = {
-    None: 0,
-    Auto: 1
-};
 var c_oSer_CommentsType = {
 	Comment: 0,
 	Id: 1,
@@ -1990,7 +1986,7 @@ function Binary_rPrWriter(memory, saveParams)
             {
                 this.memory.WriteByte(c_oSerProp_rPrType.HighLightTyped);
                 this.memory.WriteByte(c_oSerPropLenType.Byte);
-                this.memory.WriteByte(c_oSer_ColorType.None);
+                this.memory.WriteByte(c_oSer_ColorType.Auto);
             }
             else
             {
@@ -6909,7 +6905,7 @@ function Binary_rPrReader(doc, oReadResult, stream)
                 break;
             case c_oSerProp_rPrType.HighLightTyped:
                 var nHighLightTyped = this.stream.GetUChar();
-                if(nHighLightTyped == c_oSer_ColorType.None)
+                if(nHighLightTyped == c_oSer_ColorType.Auto)
                     rPr.HighLight = highlight_None;
                 break;
 			case c_oSerProp_rPrType.RStyle:
