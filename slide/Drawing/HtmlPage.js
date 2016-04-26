@@ -3,6 +3,13 @@
 // Import
 var MOVE_DELTA = AscFormat.MOVE_DELTA;
 
+var g_anchor_left = AscCommon.g_anchor_left;
+var g_anchor_top = AscCommon.g_anchor_top;
+var g_anchor_right = AscCommon.g_anchor_right;
+var g_anchor_bottom = AscCommon.g_anchor_bottom;
+var CreateControlContainer = AscCommon.CreateControlContainer;
+var CreateControl = AscCommon.CreateControl;
+
 var g_dDpiX = 96.0;
 var g_dDpiY = 96.0;
 
@@ -121,7 +128,7 @@ function CEditorPage(api)
     this.m_oMainView        = null;
     this.m_oEditor          = null;
     this.m_oOverlay         = null;
-    this.m_oOverlayApi      = new COverlay();
+    this.m_oOverlayApi      = new AscCommon.COverlay();
     this.m_oOverlayApi.m_bIsAlwaysUpdateOverlay = true;
     // ->
     // ------------------------------------------------------------------
@@ -500,7 +507,7 @@ function CEditorPage(api)
         this.m_oOverlayApi.m_oHtmlPage = this;
         this.m_oOverlayApi.Clear();
 
-        this.m_oDrawingDocument.AutoShapesTrack = new CAutoshapeTrack();
+        this.m_oDrawingDocument.AutoShapesTrack = new AscCommon.CAutoshapeTrack();
         this.m_oDrawingDocument.AutoShapesTrack.init2(this.m_oOverlayApi);
 
         this.SlideDrawer.m_oWordControl = this;

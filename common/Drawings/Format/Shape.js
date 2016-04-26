@@ -44,7 +44,7 @@ function hitToHandles(x, y, object)
     var t_x, t_y;
     t_x = invert_transform.TransformPointX(x, y);
     t_y = invert_transform.TransformPointY(x, y);
-    var radius = object.convertPixToMM(TRACK_CIRCLE_RADIUS);
+    var radius = object.convertPixToMM(AscCommon.TRACK_CIRCLE_RADIUS);
 
     if(typeof global_mouseEvent !== "undefined" && isRealObject(global_mouseEvent) && AscFormat.isRealNumber(global_mouseEvent.KoefPixToMM))
     {
@@ -141,7 +141,7 @@ function hitToHandles(x, y, object)
 
     if(object.canRotate && object.canRotate() && !check_line)
     {
-        var rotate_distance = object.convertPixToMM(TRACK_DISTANCE_ROTATE);
+        var rotate_distance = object.convertPixToMM(AscCommon.TRACK_DISTANCE_ROTATE);
         dist_y = t_y + rotate_distance;
         sqr_y = dist_y * dist_y;
         dist_x = t_x - hc;
@@ -4270,7 +4270,7 @@ CShape.prototype =
 
     getRotateAngle: function (x, y) {
         var transform = this.getTransformMatrix();
-        var rotate_distance = this.convertPixToMM(TRACK_DISTANCE_ROTATE);
+        var rotate_distance = this.convertPixToMM(AscCommon.TRACK_DISTANCE_ROTATE);
         var hc = this.extX * 0.5;
         var vc = this.extY * 0.5;
         var xc_t = transform.TransformPointX(hc, vc);
@@ -4805,7 +4805,7 @@ CShape.prototype =
             invert_transform = this.getInvertTransform();
             t_x = invert_transform.TransformPointX(x, y);
             t_y = invert_transform.TransformPointY(x, y);
-            ret = this.spPr.geometry.hitToAdj(t_x, t_y, this.convertPixToMM(global_mouseEvent.KoefPixToMM * TRACK_CIRCLE_RADIUS));
+            ret = this.spPr.geometry.hitToAdj(t_x, t_y, this.convertPixToMM(global_mouseEvent.KoefPixToMM * AscCommon.TRACK_CIRCLE_RADIUS));
             if(ret.hit)
             {
                 ret.warp = false;
@@ -4817,7 +4817,7 @@ CShape.prototype =
             invert_transform = this.invertTransformTextWordArt;
             t_x = invert_transform.TransformPointX(x, y);
             t_y = invert_transform.TransformPointY(x, y);
-            ret = this.recalcInfo.warpGeometry.hitToAdj(t_x, t_y, this.convertPixToMM(global_mouseEvent.KoefPixToMM * TRACK_CIRCLE_RADIUS));
+            ret = this.recalcInfo.warpGeometry.hitToAdj(t_x, t_y, this.convertPixToMM(global_mouseEvent.KoefPixToMM * AscCommon.TRACK_CIRCLE_RADIUS));
             ret.warp = true;
             return ret;
         }
@@ -4871,7 +4871,7 @@ CShape.prototype =
             HitInLine(_hit_context, x_t, y_t, this.extX, 0, this.extX, this.extY) ||
             HitInLine(_hit_context, x_t, y_t, this.extX, this.extY, 0, this.extY) ||
             HitInLine(_hit_context, x_t, y_t, 0, this.extY, 0, 0) ||
-            (this.canRotate && this.canRotate() && HitInLine(_hit_context, x_t, y_t, this.extX * 0.5, 0, this.extX * 0.5, -this.convertPixToMM(TRACK_DISTANCE_ROTATE))));
+            (this.canRotate && this.canRotate() && HitInLine(_hit_context, x_t, y_t, this.extX * 0.5, 0, this.extX * 0.5, -this.convertPixToMM(AscCommon.TRACK_DISTANCE_ROTATE))));
     },
 
     canRotate: function () {

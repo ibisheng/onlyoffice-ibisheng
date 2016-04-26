@@ -6862,7 +6862,7 @@ ParaDrawing.prototype =
     {
         if(this.wrappingPolygon && this.wrappingPolygon.arrPoints.length > 0)
         {
-            var radius = this.drawingDocument.GetMMPerDot(TRACK_CIRCLE_RADIUS);
+            var radius = this.drawingDocument.GetMMPerDot(AscCommon.TRACK_CIRCLE_RADIUS);
             var arr_point = this.wrappingPolygon.calculatedPoints;
             var point_count = arr_point.length;
             var dx, dy;

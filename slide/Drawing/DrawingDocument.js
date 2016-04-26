@@ -11,12 +11,6 @@ var ImageLoadStatus = AscFonts.ImageLoadStatus;
 var g_fontManager = new AscFonts.CFontManager();
 g_fontManager.Initialize(true);
 
-var TRACK_CIRCLE_RADIUS     = 5;
-var TRACK_RECT_SIZE2        = 4;
-var TRACK_RECT_SIZE         = 8;
-var TRACK_DISTANCE_ROTATE   = 25;
-var TRACK_ADJUSTMENT_SIZE   = 10;
-
 var FOCUS_OBJECT_THUMBNAILS     = 0;
 var FOCUS_OBJECT_MAIN           = 1;
 var FOCUS_OBJECT_NOTES          = 2;

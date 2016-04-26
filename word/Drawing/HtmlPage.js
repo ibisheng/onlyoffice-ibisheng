@@ -4,6 +4,12 @@
 var g_fontApplication = AscFonts.g_fontApplication;
 
 var AscBrowser = AscCommon.AscBrowser;
+var g_anchor_left = AscCommon.g_anchor_left;
+var g_anchor_top = AscCommon.g_anchor_top;
+var g_anchor_right = AscCommon.g_anchor_right;
+var g_anchor_bottom = AscCommon.g_anchor_bottom;
+var CreateControlContainer = AscCommon.CreateControlContainer;
+var CreateControl = AscCommon.CreateControl;
 
 var g_dDpiX = 96.0;
 var g_dDpiY = 96.0;
@@ -99,7 +105,7 @@ function CEditorPage(api)
     this.ReaderModeDivWrapper = null;
     this.ReaderModeDiv      = null;
 
-    this.m_oOverlayApi      = new COverlay();
+    this.m_oOverlayApi      = new AscCommon.COverlay();
     this.m_bIsIE            = (AscBrowser.isIE || window.opera) ? true : false;
 
     this.m_oPanelRight_buttonRulers    = null;
@@ -454,7 +460,7 @@ function CEditorPage(api)
         this.m_oOverlayApi.m_oHtmlPage = this;
         this.m_oOverlayApi.Clear();
 
-        this.m_oDrawingDocument.AutoShapesTrack = new CAutoshapeTrack();
+        this.m_oDrawingDocument.AutoShapesTrack = new AscCommon.CAutoshapeTrack();
         this.m_oDrawingDocument.AutoShapesTrack.init2(this.m_oOverlayApi);
 
         this.OnResize(true);

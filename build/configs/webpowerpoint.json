@@ -62,6 +62,8 @@
 		"../common/Drawings/Externals.js",
 		"../common/GlobalLoaders.js",
 		"../common/CollaborativeEditingBase.js",
+		"../common/Controls.js",
+		"../common/Overlay.js",
 		
 		"../common/scroll.js",
 
@@ -77,7 +79,6 @@
         "../slide/Editor/CollaborativeEditing.js",
         "../word/Drawing/GraphicsEvents.js",
         "../word/Drawing/WorkEvents.js",
-        "../common/Controls.js",
         "../word/Drawing/Rulers.js",
         "../word/Editor/Table.js",
         "../word/Editor/Table/TableRecalculate.js",
@@ -89,7 +90,6 @@
         "../word/Editor/History.js",
         "../word/Drawing/HatchPattern.js",
         "../word/Drawing/Graphics.js",
-        "../common/Overlay.js",
         "../word/Drawing/ShapeDrawer.js",
         "../slide/Drawing/Transitions.js",
         "../slide/Drawing/DrawingDocument.js",

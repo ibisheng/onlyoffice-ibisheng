@@ -5336,11 +5336,6 @@ asc_docs_api.prototype["Native_Editor_Initialize_Settings"] = function(_params)
     }
 
     AscCommon.AscBrowser.isRetina = this.WordControl.m_oDrawingDocument.IsRetina;
-
-    if (this.WordControl.m_oDrawingDocument.IsRetina && this.WordControl.m_oDrawingDocument.IsMobile)
-    {
-        TRACK_DISTANCE_ROTATE <<= 1;
-    }
 };
 
 /***************************** COPY|PASTE *******************************/
