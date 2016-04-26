@@ -308,6 +308,11 @@
      * @typedef {("bottomMargin" | "topMargin" | "margin" | "page" | "line" | "paragraph")} RelFromV
      */
 
+    /**
+     * English measure unit. 1mm = 36000EMUs, 1inch = 914400EMUs
+     * @typedef {number} EMU
+     */
+
     //------------------------------------------------------------------------------------------------------------------
     //
     // Base Api
@@ -360,14 +365,14 @@
     /**
      * Create a drawing object.
      * @memberof Api
-     * @param {twips} nWidth
-     * @param {twips} nHeight
+     * @param {EMU} nWidth
+     * @param {EMU} nHeight
      * @returns {ApiDrawing}
      */
     Api.prototype.CreateDrawing = function(nWidth, nHeight)
     {
-        var nW = private_Twips2MM(nWidth);
-        var nH = private_Twips2MM(nHeight);
+        var nW = private_EMU2MM(nWidth);
+        var nH = private_EMU2MM(nHeight);
 
         var oDrawing = new ParaDrawing(nW, nH, null, private_GetDrawingDocument(), private_GetLogicDocument(), null);
         var oImage = private_GetLogicDocument().DrawingObjects.createImage("", 0, 0, nW, nH);
@@ -2877,12 +2882,12 @@
     };
     /**
      * Set the size of the bounding box.
-     * @param {twips} nWidth
-     * @param {twips} nHeight
+     * @param {EMU} nWidth
+     * @param {EMU} nHeight
      */
     ApiDrawing.prototype.SetSize = function(nWidth, nHeight)
     {
-        this.Drawing.setExtent(private_Twips2MM(nWidth), private_Twips2MM(nHeight));
+        this.Drawing.setExtent(private_EMU2MM(nWidth), private_EMU2MM(nHeight));
     };
     /**
      * Set the wrapping type of this drawing object.
@@ -2936,24 +2941,60 @@
     };
 
     /**
-     * Set the horizontal alignment.
-     * @param {RelFromH} sRelativeFrom
+     * Specifies how a floating object shall be horizontally aligned.
+     * @param {RelFromH} [sRelativeFrom="page"]
      * @param {("left" | "right" | "center")} [sAlign="left"]
      */
     ApiDrawing.prototype.SetHorAlign = function(sRelativeFrom, sAlign)
     {
-
-        this.Drawing.Set_PositionH();
+        var nAlign        = private_GetAlignH(sAlign);
+        var nRelativeFrom = private_GetRelativeFromH(sRelativeFrom);
+        this.Drawing.Set_PositionH(nRelativeFrom, true, nAlign, false);
     };
     /**
-     * Set the vertical alignment.
-     * @param {RelFromV} sRelativeFrom
+     * Specifies how a floating object shall be vertically aligned.
+     * @param {RelFromV} [sRelativeFrom="page"]
      * @param {("top" | "bottom" | "center")} [sAlign="top"]
      */
     ApiDrawing.prototype.SetVerAlign = function(sRelativeFrom, sAlign)
     {
-
-
+        var nAlign        = private_GetAlignV(sAlign);
+        var nRelativeFrom = private_GetRelativeFromV(sRelativeFrom);
+        this.Drawing.Set_PositionV(nRelativeFrom, true, nAlign, false);
+    };
+    /**
+     * Set an absolute measurement for the horizontal positioning of a floating object.
+     * @param {RelFromH} sRelativeFrom
+     * @param {EMU} nDistance
+     */
+    ApiDrawing.prototype.SetHorPosition = function(sRelativeFrom, nDistance)
+    {
+        var nValue        = private_EMU2MM(nDistance);
+        var nRelativeFrom = private_GetRelativeFromH(sRelativeFrom);
+        this.Drawing.Set_PositionH(nRelativeFrom, false, nValue, false);
+    };
+    /**
+     * Set an absolute measurement for the vertical positioning of a floating object.
+     * @param {RelFromH} sRelativeFrom
+     * @param {EMU} nDistance
+     */
+    ApiDrawing.prototype.SetVerPosition = function(sRelativeFrom, nDistance)
+    {
+        var nValue        = private_EMU2MM(nDistance);
+        var nRelativeFrom = private_GetRelativeFromV(sRelativeFrom);
+        this.Drawing.Set_PositionV(nRelativeFrom, false, nValue, false);
+    };
+    /**
+     * Specifies the minimum distance which shall be maintained between the edges of this drawing object and any
+     * subsequent text.
+     * @param {EMU} nLeft
+     * @param {EMU} nTop
+     * @param {EMU} nRight
+     * @param {EMU} nBottom
+     */
+    ApiDrawing.prototype.SetDistances = function(nLeft, nTop, nRight, nBottom)
+    {
+        this.Drawing.Set_Distance(private_EMU2MM(nLeft), private_EMU2MM(nTop), private_EMU2MM(nRight), private_EMU2MM(nBottom));
     };
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -3161,6 +3202,15 @@
     ApiTableStylePr.prototype["GetTablePr"]          = ApiTableStylePr.prototype.GetTablePr;
     ApiTableStylePr.prototype["GetTableRowPr"]       = ApiTableStylePr.prototype.GetTableRowPr;
     ApiTableStylePr.prototype["GetTableCellPr"]      = ApiTableStylePr.prototype.GetTableCellPr;
+
+    ApiDrawing.prototype["GetClassType"]             = ApiDrawing.prototype.GetClassType;
+    ApiDrawing.prototype["SetSize"]                  = ApiDrawing.prototype.SetSize;
+    ApiDrawing.prototype["SetWrappingStyle"]         = ApiDrawing.prototype.SetWrappingStyle;
+    ApiDrawing.prototype["SetHorAlign"]              = ApiDrawing.prototype.SetHorAlign;
+    ApiDrawing.prototype["SetVerAlign"]              = ApiDrawing.prototype.SetVerAlign;
+    ApiDrawing.prototype["SetHorPosition"]           = ApiDrawing.prototype.SetHorPosition;
+    ApiDrawing.prototype["SetVerPosition"]           = ApiDrawing.prototype.SetVerPosition;
+    ApiDrawing.prototype["SetDistances"]             = ApiDrawing.prototype.SetDistances;
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Private area
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -3183,6 +3233,11 @@
     function private_Twips2MM(twips)
     {
         return 25.4 / 72.0 / 20 * twips;
+    }
+
+    function private_EMU2MM(EMU)
+    {
+        return EMU / 36000.0;
     }
 
     function private_GetHps(hps)
@@ -3352,6 +3407,41 @@
             return c_oAscAlignV.Center;
 
         return c_oAscAlignV.Center;
+    }
+    function private_GetRelativeFromH(sRel)
+    {
+        if ("character" === sRel)
+            return Asc.c_oAscRelativeFromH.Character;
+        else if ("column" === sRel)
+            return Asc.c_oAscRelativeFromH.Column;
+        else if ("leftMargin" === sRel)
+            return Asc.c_oAscRelativeFromH.LeftMargin;
+        else if ("rightMargin" === sRel)
+            return Asc.c_oAscRelativeFromH.RightMargin;
+        else if ("margin" === sRel)
+            return Asc.c_oAscRelativeFromH.Margin;
+        else if ("page" === sRel)
+            return Asc.c_oAscRelativeFromH.Page;
+
+        return Asc.c_oAscRelativeFromH.Page;
+    }
+
+    function private_GetRelativeFromV(sRel)
+    {
+        if ("bottomMargin" === sRel)
+            return Asc.c_oAscRelativeFromV.BottomMargin;
+        else if ("topMargin" === sRel)
+            return Asc.c_oAscRelativeFromV.TopMargin;
+        else if ("margin" === sRel)
+            return Asc.c_oAscRelativeFromV.Margin;
+        else if ("page" === sRel)
+            return Asc.c_oAscRelativeFromV.Page;
+        else if ("line" === sRel)
+            return Asc.c_oAscRelativeFromV.Line;
+        else if ("paragraph" === sRel)
+            return Asc.c_oAscRelativeFromV.Paragraph;
+
+        return Asc.c_oAscRelativeFromV.Page;
     }
 
     ApiDocument.prototype.OnChangeParaPr = function(oApiParaPr)
@@ -3591,7 +3681,7 @@ function TEST_BUILDER()
 
     var Api = editor;
 
-    var oRun;
+    var oParagraph, oRun, oDrawing, oParaMark;
     var oDocument     = Api.GetDocument();
     var oNoSpacingStyle = oDocument.GetStyle("No Spacing");
     var oFinalSection   = oDocument.GetFinalSection();
@@ -3675,27 +3765,50 @@ function TEST_BUILDER()
     oTextPr.SetColor(0, 0, 0, true);
     oTextPr.SetFontSize(22);
 
-    var oParagraph = Api.CreateParagraph();
+    oParagraph = Api.CreateParagraph();
     oParagraph.SetSpacingLine(276, "auto");
     oParagraph.SetJc("left");
-    var oEndRun = oParagraph.GetParagraphMarkTextPr();
-    oEndRun.SetFontSize(52);
-    oEndRun.SetColor(0x14, 0x14, 0x14, false);
-    oEndRun.SetSpacing(5);
+    oParaMark = oParagraph.GetParagraphMarkTextPr();
+    oParaMark.SetFontSize(52);
+    oParaMark.SetColor(0x14, 0x14, 0x14, false);
+    oParaMark.SetSpacing(5);
     oParagraph.AddPageBreak();
-    // TODO: Добавить 2 автофигуры
+    // TODO: Заполнить автофигуру
+    oDrawing = Api.CreateDrawing(5363210, 9655810);
+    oDrawing.SetWrappingStyle("inFront");
+    oDrawing.SetHorPosition("page", 155575);
+    oDrawing.SetVerPosition("page", 201295);
+    oParagraph.AddDrawing(oDrawing);
+    // TODO: Заполнить автофигуру
+    oDrawing = Api.CreateDrawing(1880870, 9655810);
+    oDrawing.SetWrappingStyle("inFront");
+    oDrawing.SetHorPosition("page", 5673725);
+    oDrawing.SetVerPosition("page", 201295);
+    oParagraph.AddDrawing(oDrawing);
     oDocument.Push(oParagraph);
 
 
     oParagraph = Api.CreateParagraph();
     oParagraph.SetStyle(oNoSpacingStyle);
-    // TODO: Добавить aвтофигуру
+    // TODO: Заполнить aвтофигуру
+    oDrawing = Api.CreateDrawing(5930900, 395605);
+    oDrawing.SetWrappingStyle("topAndBottom");
+    oDrawing.SetHorAlign("margin", "left");
+    oDrawing.SetVerPosition("paragraph", 5715);
+    oDrawing.SetDistances(114300, 0, 114300, 0);
+    oParagraph.AddDrawing(oDrawing);
     oDocument.Push(oParagraph);
 
 
     oParagraph = Api.CreateParagraph();
     oParagraph.SetStyle(oHeading1Style);
-    // TODO: Добавить aвтофигуру
+    // TODO: Заполнить aвтофигуру
+    oDrawing = Api.CreateDrawing(720725, 1204595);
+    oDrawing.SetWrappingStyle("tight");
+    oDrawing.SetHorAlign("margin", "left");
+    oDrawing.SetVerPosition("page", 1810470);
+    oDrawing.SetDistances(114300, 0, 114300, 0);
+    oParagraph.AddDrawing(oDrawing);
     oParagraph.AddText("Overview");
     oDocument.Push(oParagraph);
 
@@ -3711,7 +3824,13 @@ function TEST_BUILDER()
     oParagraph.SetStyle(oHeading1Style);
     oParagraph.SetSpacingAfter(100, true);
     oParagraph.SetSpacingBefore(100, true);
-    // TODO: Добавить aвтофигуру
+    // TODO: Заполнить aвтофигуру
+    oDrawing = Api.CreateDrawing(2695575, 2276475);
+    oDrawing.SetWrappingStyle("tight");
+    oDrawing.SetHorPosition("column", 3756901);
+    oDrawing.SetVerPosition("paragraph", 473470);
+    oDrawing.SetDistances(114300, 0, 114300, 0);
+    oParagraph.AddDrawing(oDrawing);
     oParagraph.AddText("Summary");
     oDocument.Push(oParagraph);
 
@@ -3719,7 +3838,13 @@ function TEST_BUILDER()
     oParagraph = Api.CreateParagraph();
     oParagraph.SetSpacingAfter(100, true);
     oParagraph.SetSpacingBefore(100, true);
-    // TODO: Добавить автофигуру
+    // TODO: Заполнить автофигуру
+    oDrawing = Api.CreateDrawing(3212465, 963295);
+    oDrawing.SetWrappingStyle("topAndBottom");
+    oDrawing.SetHorPosition("margin", 370205);
+    oDrawing.SetVerPosition("paragraph", 1170888);
+    oDrawing.SetDistances(114300, 0, 114300, 0);
+    oParagraph.AddDrawing(oDrawing);
     oParagraph.AddText("After years of market research and focused creative effort we are in a position to take our “Innovate 1” to market. We have a three phase approach in place to complete the product and take the product to market.  The first step of this initiative is to test the market.  Once we have identified the market, then we will make any final product product to drive that effectively keeps down costs while meeting sales goals. ");
     oDocument.Push(oParagraph);
 
@@ -3732,7 +3857,13 @@ function TEST_BUILDER()
     oParagraph.SetStyle(oHeading1Style);
     oParagraph.SetSpacingAfter(100, true);
     oParagraph.SetSpacingBefore(100, true);
-    // TODO: Добавить автофигуру
+    // TODO: Заполнить автофигуру
+    oDrawing = Api.CreateDrawing(4051300, 2347595);
+    oDrawing.SetWrappingStyle("tight");
+    oDrawing.SetHorPosition("column", 2347595);
+    oDrawing.SetVerPosition("paragraph", 346075);
+    oDrawing.SetDistances(114300, 0, 114300, 0);
+    oParagraph.AddDrawing(oDrawing);
     oParagraph.AddText("Financial Overview");
     oDocument.Push(oParagraph);
 
@@ -3778,13 +3909,25 @@ function TEST_BUILDER()
 
     oParagraph = Api.CreateParagraph();
     oParagraph.SetStyle(oSubtitleStyle);
-    // TODO: Добавить автофигуру
+    // TODO: Заполнить автофигуру
+    oDrawing = Api.CreateDrawing(2718435, 762000);
+    oDrawing.SetWrappingStyle("square");
+    oDrawing.SetHorAlign("margin", "right");
+    oDrawing.SetVerPosition("paragraph", 17780);
+    oDrawing.SetDistances(114300, 0, 114300, 0);
+    oParagraph.AddDrawing(oDrawing);
     oParagraph.AddText("Legal Issues");
     oDocument.Push(oParagraph);
 
 
     oParagraph = Api.CreateParagraph();
-    // TODO: Добавить автофигуру
+    // TODO: Заполнить автофигуру
+    oDrawing = Api.CreateDrawing(2741295, 2273300);
+    oDrawing.SetWrappingStyle("square");
+    oDrawing.SetHorAlign("margin", "right");
+    oDrawing.SetVerPosition("paragraph", 632460);
+    oDrawing.SetDistances(114300, 0, 114300, 0);
+    oParagraph.AddDrawing(oDrawing);
     oParagraph.AddText("To support the new product, the Legal Department will maintain a centralized repository for all patent investigations as well as marketing claims.  The release team will adhere to all of the standardized processes for releasing new products.   ");
     oDocument.Push(oParagraph);
 
@@ -4102,9 +4245,16 @@ function TEST_BUILDER()
             oParagraph = oCellContent.GetElement(0);
             oParagraph.SetStyle(oFooterStyle);
             oParagraph.SetJc("right");
-            // TODO: Добавить автофигуру
+            // TODO: Заполнить автофигуру
+            oDrawing = Api.CreateDrawing(495300, 481965);
+            oDrawing.SetWrappingStyle("inline");
+            oParagraph.AddDrawing(oDrawing);
         }
     }
+
+    oParagraph = Api.CreateParagraph();
+    oDocContent.Push(oParagraph);
+    oParagraph.SetStyle(oFooterStyle);
 
     //------------------------------------------------------------------------------------------------------------------
     oLD.Recalculate_FromStart(true);
@@ -4609,16 +4759,28 @@ function TEST_BUILDER2()
     //------------------------------------------------------------------------------------------------------------------
     oParagraph = Api.CreateParagraph();
     oDocument.Push(oParagraph);
-    oDrawing = Api.CreateDrawing(1000, 2000);
+    oDrawing = Api.CreateDrawing(1000 * 635, 2000 * 635);
     oParagraph.AddDrawing(oDrawing);
 
-    oDrawing = Api.CreateDrawing(1000, 2000);
+    oDrawing = Api.CreateDrawing(1000 * 635, 2000 * 635);
     oParagraph.AddDrawing(oDrawing);
-    oDrawing.SetSize(2000, 2000);
+    oDrawing.SetSize(2000 * 635, 2000 * 635);
 
-    oDrawing = Api.CreateDrawing(1000, 2000);
+    oDrawing = Api.CreateDrawing(1000 * 635, 2000 * 635);
     oParagraph.AddDrawing(oDrawing);
     oDrawing.SetWrappingStyle("square");
+
+    oDrawing = Api.CreateDrawing(1000 * 635, 2000 * 635);
+    oParagraph.AddDrawing(oDrawing);
+    oDrawing.SetWrappingStyle("inFront");
+    oDrawing.SetHorAlign("margin", "right");
+    oDrawing.SetVerAlign("page", "bottom");
+
+    oDrawing = Api.CreateDrawing(1000 * 635, 2000 * 635);
+    oParagraph.AddDrawing(oDrawing);
+    oDrawing.SetWrappingStyle("inFront");
+    oDrawing.SetHorPosition("page", 36000 * 30);
+    oDrawing.SetVerPosition("page", 36000 * 60);
 
     //------------------------------------------------------------------------------------------------------------------
     oLD.Recalculate_FromStart();
