@@ -3156,9 +3156,9 @@ function CDemonstrationManager(htmlpage)
     // manipulators
     this.onKeyDown = function(e)
     {
-        check_KeyboardEvent(e);
+        AscCommon.check_KeyboardEvent(e);
 
-        switch (global_keyboardEvent.KeyCode)
+        switch (AscCommon.global_keyboardEvent.KeyCode)
         {
             case 13:    // enter
             case 32:    // space

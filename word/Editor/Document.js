@@ -9333,7 +9333,7 @@ CDocument.prototype =
 
             if ( true === SelectionUse_old && true === MouseEvent.ShiftKey && true === bOldSelectionIsCommon )
             {
-                this.Selection_SetEnd( X, Y, {Type : g_mouse_event_type_up, ClickCount : 1} );
+                this.Selection_SetEnd( X, Y, {Type : AscCommon.g_mouse_event_type_up, ClickCount : 1} );
                 this.Selection.Use      = true;
                 this.Selection.Start    = true;
                 this.Selection.EndPos   = ContentPos;
@@ -9343,7 +9343,7 @@ CDocument.prototype =
             {
                 var ElementPageIndex = this.private_GetElementPageIndexByXY(ContentPos, X, Y, this.CurPage);
                 Item.Selection_SetStart(X, Y, ElementPageIndex, MouseEvent, bTableBorder);
-                Item.Selection_SetEnd(X, Y, ElementPageIndex, {Type : g_mouse_event_type_move, ClickCount : 1}, bTableBorder);
+                Item.Selection_SetEnd(X, Y, ElementPageIndex, {Type : AscCommon.g_mouse_event_type_move, ClickCount : 1}, bTableBorder);
 
                 if ( !(type_Table == Item.GetType() && true == bTableBorder) )
                 {
@@ -9388,7 +9388,7 @@ CDocument.prototype =
         if ( docpostype_HdrFtr === this.CurPos.Type )
         {
             this.HdrFtr.Selection_SetEnd(  X, Y, this.CurPage, MouseEvent );
-            if ( g_mouse_event_type_up == MouseEvent.Type )
+            if ( AscCommon.g_mouse_event_type_up == MouseEvent.Type )
             {
                 if ( true != this.DrawingObjects.isPolylineAddition() )
                     this.Selection.Start = false;
@@ -9400,7 +9400,7 @@ CDocument.prototype =
         }
         else if ( docpostype_DrawingObjects === this.CurPos.Type )
         {
-            if ( g_mouse_event_type_up == MouseEvent.Type )
+            if ( AscCommon.g_mouse_event_type_up == MouseEvent.Type )
             {
                 this.DrawingObjects.OnMouseUp( MouseEvent, X, Y, this.CurPage );
 
@@ -9429,7 +9429,7 @@ CDocument.prototype =
             var ElementPageIndex = this.private_GetElementPageIndexByXY(this.Selection.Data.Pos, X, Y, this.CurPage);
             Item.Selection_SetEnd(X, Y, ElementPageIndex, MouseEvent, true);
 
-            if ( g_mouse_event_type_up == MouseEvent.Type )
+            if ( AscCommon.g_mouse_event_type_up == MouseEvent.Type )
             {
                 this.Selection.Start = false;
 
@@ -9483,7 +9483,7 @@ CDocument.prototype =
         // Направление селекта: 1 - прямое, -1 - обратное, 0 - отмечен 1 элемент документа
         var Direction = ( ContentPos > this.Selection.StartPos ? 1 : ( ContentPos < this.Selection.StartPos ? -1 : 0 )  );
 
-        if ( g_mouse_event_type_up == MouseEvent.Type )
+        if ( AscCommon.g_mouse_event_type_up == MouseEvent.Type )
         {
             // Останаливаем селект в глобальном классе. Кроме этого мы должны остановить селект в
             // стартовом элементе селекта.
@@ -10518,18 +10518,18 @@ CDocument.prototype =
             else if ( true === editor.isMarkerFormat )
             {
                 editor.sync_MarkerFormatCallback( false );
-                this.Update_CursorType( this.CurPos.RealX, this.CurPos.RealY, this.CurPage, new CMouseEventHandler() );
+                this.Update_CursorType( this.CurPos.RealX, this.CurPos.RealY, this.CurPage, new AscCommon.CMouseEventHandler() );
             }
             else if ( c_oAscFormatPainterState.kOff !== editor.isPaintFormat )
             {
                 editor.sync_PaintFormatCallback( c_oAscFormatPainterState.kOff );
-                this.Update_CursorType( this.CurPos.RealX, this.CurPos.RealY, this.CurPage, new CMouseEventHandler() );
+                this.Update_CursorType( this.CurPos.RealX, this.CurPos.RealY, this.CurPage, new AscCommon.CMouseEventHandler() );
             }
             else if(editor.isStartAddShape)
             {
                 editor.sync_StartAddShapeCallback( false );
                 editor.sync_EndAddShape();
-                this.Update_CursorType( this.CurPos.RealX, this.CurPos.RealY, this.CurPage, new CMouseEventHandler() );
+                this.Update_CursorType( this.CurPos.RealX, this.CurPos.RealY, this.CurPage, new AscCommon.CMouseEventHandler() );
             }
             else if ( docpostype_DrawingObjects === this.CurPos.Type || (docpostype_HdrFtr === this.CurPos.Type && null != this.HdrFtr.CurHdrFtr && docpostype_DrawingObjects === this.HdrFtr.CurHdrFtr.Content.CurPos.Type ) )
             {
@@ -10592,10 +10592,10 @@ CDocument.prototype =
 
             if ( true === e.AltKey )
             {
-                var MouseEvent = new CMouseEventHandler();
+                var MouseEvent = new AscCommon.CMouseEventHandler();
 
                 MouseEvent.ClickCount = 1;
-                MouseEvent.Type = g_mouse_event_type_down;
+                MouseEvent.Type = AscCommon.g_mouse_event_type_down;
 
                 this.CurPage--;
 
@@ -10604,7 +10604,7 @@ CDocument.prototype =
 
                 this.Selection_SetStart( 0, 0, MouseEvent );
 
-                MouseEvent.Type = g_mouse_event_type_up;
+                MouseEvent.Type = AscCommon.g_mouse_event_type_up;
                 this.Selection_SetEnd( 0, 0, MouseEvent );
             }
             else
@@ -10698,10 +10698,10 @@ CDocument.prototype =
 
             if ( true === e.AltKey )
             {
-                var MouseEvent = new CMouseEventHandler();
+                var MouseEvent = new AscCommon.CMouseEventHandler();
 
                 MouseEvent.ClickCount = 1;
-                MouseEvent.Type = g_mouse_event_type_down;
+                MouseEvent.Type = AscCommon.g_mouse_event_type_down;
 
                 this.CurPage++;
 
@@ -10711,7 +10711,7 @@ CDocument.prototype =
 
                 this.Selection_SetStart( 0, 0, MouseEvent );
 
-                MouseEvent.Type = g_mouse_event_type_up;
+                MouseEvent.Type = AscCommon.g_mouse_event_type_up;
                 this.Selection_SetEnd( 0, 0, MouseEvent );
             }
             else
@@ -11397,7 +11397,7 @@ CDocument.prototype =
             this.SearchEngine.Reset_Current();
 
         // Обработка правой кнопки мыши происходит на событии MouseUp
-        if ( g_mouse_button_right === e.Button )
+        if ( AscCommon.g_mouse_button_right === e.Button )
             return;
 
         // Если мы только что расширяли документ двойным щелчком, то отменяем это действие
@@ -11478,7 +11478,7 @@ CDocument.prototype =
         }
 
         // Если мы нажимали правую кнопку мыши, тогда нам надо сделать
-        if ( g_mouse_button_right === e.Button )
+        if ( AscCommon.g_mouse_button_right === e.Button )
         {
             if ( true === this.Selection.Start )
                 return;
@@ -11528,13 +11528,13 @@ CDocument.prototype =
                 {
                     // TODO : Если в MouseEvent будет использоваться что-то кроме ClickCount, Type и CtrlKey, добавить здесь
                     ClickCount : 1,
-                    Type       : g_mouse_event_type_down,
+                    Type       : AscCommon.g_mouse_event_type_down,
                     CtrlKey    : false,
-                    Button     : g_mouse_button_right
+                    Button     : AscCommon.g_mouse_button_right
                 };
                 this.Selection_SetStart( X, Y, MouseEvent_new );
 
-                MouseEvent_new.Type = g_mouse_event_type_up;
+                MouseEvent_new.Type = AscCommon.g_mouse_event_type_up;
                 this.Selection_SetEnd( X, Y, MouseEvent_new );
 
                 this.Document_UpdateSelectionState();
@@ -11547,7 +11547,7 @@ CDocument.prototype =
 
             return;
         }
-        else if ( g_mouse_button_left === e.Button )
+        else if ( AscCommon.g_mouse_button_left === e.Button )
         {
             if ( true === this.Comments.Is_Use() )
             {
@@ -14522,7 +14522,7 @@ CDocument.prototype =
             if ( undefined === rFonts )
             {
                 var Count = sText.length;
-                var e = global_keyboardEvent;
+                var e = AscCommon.global_keyboardEvent;
                 for ( var Index = 0; Index < Count; Index++ )
                 {
                     var _char = sText.charAt(Index);
@@ -15121,10 +15121,10 @@ CDocument.prototype.private_StartSelectionFromCurPos = function()
 
     if ( null !== CurPara )
     {
-        var MouseEvent = new CMouseEventHandler();
+        var MouseEvent = new AscCommon.CMouseEventHandler();
 
         MouseEvent.ClickCount = 1;
-        MouseEvent.Type = g_mouse_event_type_down;
+        MouseEvent.Type = AscCommon.g_mouse_event_type_down;
 
         var X = CurPara.CurPos.RealX;
         var Y = CurPara.CurPos.RealY;
@@ -15141,7 +15141,7 @@ CDocument.prototype.private_StartSelectionFromCurPos = function()
 
         this.CurPage = CurPara.Get_StartPage_Absolute() + CurPara.CurPos.PagesPos;
         this.Selection_SetStart(X, Y, MouseEvent);
-        MouseEvent.Type = g_mouse_event_type_move;
+        MouseEvent.Type = AscCommon.g_mouse_event_type_move;
         this.Selection_SetEnd(X, Y, MouseEvent);
     }
 };

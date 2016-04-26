@@ -672,7 +672,7 @@ function handleMouseUpPreMoveState(drawingObjects, e, x, y, pageIndex, bWord)
     var state = drawingObjects.curState;
     state.drawingObjects.clearPreTrackObjects();
     state.drawingObjects.changeCurrentState(new AscFormat.NullState(state.drawingObjects));
-    if(!state.shift && !state.ctrl && state.bInside && state.majorObjectIsSelected && e.Button !== g_mouse_button_right)
+    if(!state.shift && !state.ctrl && state.bInside && state.majorObjectIsSelected && e.Button !== AscCommon.g_mouse_button_right)
     {
         switch (state.majorObject.getObjectType())
         {

@@ -6064,7 +6064,7 @@ Paragraph.prototype =
         var SelectionStartPos = this.Get_ParaContentPos( true, true );
         var SelectionEndPos   = this.Get_ParaContentPos( true, false );
 
-        if ( 0 === SelectionStartPos.Compare( SelectionEndPos ) && g_mouse_event_type_up === MouseEvent.Type )
+        if ( 0 === SelectionStartPos.Compare( SelectionEndPos ) && AscCommon.g_mouse_event_type_up === MouseEvent.Type )
         {
             var NumPr = this.Numbering_Get();
             if ( true === SearchPosXY.Numbering && undefined != NumPr )
@@ -9150,7 +9150,7 @@ Paragraph.prototype =
         else
             MMData.Type      = AscCommon.c_oAscMouseMoveDataTypes.Common;
 
-        if ( null != Hyperlink && true === global_keyboardEvent.CtrlKey )
+        if ( null != Hyperlink && true === AscCommon.global_keyboardEvent.CtrlKey )
             this.DrawingDocument.SetCursorType( "pointer", MMData );
         else
             this.DrawingDocument.SetCursorType( "default", MMData );

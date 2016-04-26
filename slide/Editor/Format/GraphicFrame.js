@@ -663,7 +663,7 @@ CGraphicFrame.prototype =
 
     selectionSetStart: function(e, x, y, slideIndex)
     {
-        if ( g_mouse_button_right === e.Button )
+        if ( AscCommon.g_mouse_button_right === e.Button )
         {
             this.rightButtonFlag = true;
             return;
@@ -673,7 +673,7 @@ CGraphicFrame.prototype =
             var tx, ty;
             tx = this.invertTransform.TransformPointX(x, y);
             ty = this.invertTransform.TransformPointY(x, y);
-            if(g_mouse_event_type_down === e.Type)
+            if(AscCommon.g_mouse_event_type_down === e.Type)
             {
                 if(this.graphicObject.Is_TableBorder( tx, ty, 0))
                 {
@@ -695,11 +695,11 @@ CGraphicFrame.prototype =
 
     selectionSetEnd: function(e, x, y, slideIndex)
     {
-        if(g_mouse_event_type_move === e.Type)
+        if(AscCommon.g_mouse_event_type_move === e.Type)
         {
             this.rightButtonFlag = false;
         }
-        if(this.rightButtonFlag && g_mouse_event_type_up === e.Type)
+        if(this.rightButtonFlag && AscCommon.g_mouse_event_type_up === e.Type)
         {
             this.rightButtonFlag = false;
             return;

@@ -2114,7 +2114,7 @@ CPresentation.prototype =
                         oDrawingObjects.updateOverlay();
                     }
                     editor.sync_EndAddShape();
-                    this.Update_CursorType( 0, 0,  new CMouseEventHandler() );
+                    this.Update_CursorType( 0, 0,  new AscCommon.CMouseEventHandler() );
                     return;
                 }
                 var oTargetTextObject = AscFormat.getTargetTextObject(oDrawingObjects);
@@ -2913,7 +2913,7 @@ CPresentation.prototype =
             this.DrawingDocument.CheckTargetShow();
             this.Document_UpdateSelectionState();
         }
-        if(e.Button === g_mouse_button_right && !this.noShowContextMenu)
+        if(e.Button === AscCommon.g_mouse_button_right && !this.noShowContextMenu)
         {
             var ContextData = new CContextMenuData();
             var ConvertedPos = this.DrawingDocument.ConvertCoordsToCursorWR( X, Y, PageIndex );
@@ -2961,7 +2961,7 @@ CPresentation.prototype =
             else
             {
 
-                var Pos = editor.WordControl.m_oDrawingDocument.ConvertCoordsFromCursor2(global_mouseEvent.X, global_mouseEvent.Y);
+                var Pos = editor.WordControl.m_oDrawingDocument.ConvertCoordsFromCursor2(AscCommon.global_mouseEvent.X, AscCommon.global_mouseEvent.Y);
                 var Coords1 = editor.WordControl.m_oDrawingDocument.ConvertCoordsToCursorWR_Comment( 0, 0, this.CurPage);
                 return  { X0 : Coords1.X, X1 : Coords1.X, Y : Coords1.Y};
             }
@@ -4287,7 +4287,7 @@ CPresentation.prototype =
         array.sort(AscCommon.fSortAscending);
         var deleted = [], i;
 
-        if(!(bCopy === true || global_mouseEvent.CtrlKey))
+        if(!(bCopy === true || AscCommon.global_mouseEvent.CtrlKey))
         {
             for(i = array.length -1; i > - 1; --i)
             {

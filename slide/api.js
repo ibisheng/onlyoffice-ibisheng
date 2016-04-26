@@ -15,6 +15,7 @@ var mapAscServerErrorToAscError = AscCommon.mapAscServerErrorToAscError;
 var g_oIdCounter = AscCommon.g_oIdCounter;
 var g_oTableId = AscCommon.g_oTableId;
 var PasteElementsId = AscCommon.PasteElementsId;
+var global_mouseEvent = AscCommon.global_mouseEvent;
 
 var c_oAscError = Asc.c_oAscError;
 var c_oAscFileType = Asc.c_oAscFileType;
@@ -1082,7 +1083,7 @@ asc_docs_api.prototype.Copy = function()
 {
     if (window["AscDesktopEditor"])
     {
-        var _e = new CKeyboardEvent();
+        var _e = new AscCommon.CKeyboardEvent();
         _e.CtrlKey = true;
         _e.KeyCode = 67;
 
@@ -1101,7 +1102,7 @@ asc_docs_api.prototype.Cut = function()
 {
     if (window["AscDesktopEditor"])
     {
-        var _e = new CKeyboardEvent();
+        var _e = new AscCommon.CKeyboardEvent();
         _e.CtrlKey = true;
         _e.KeyCode = 88;
 
@@ -1117,7 +1118,7 @@ asc_docs_api.prototype.Paste = function()
 {
     if (window["AscDesktopEditor"])
     {
-        var _e = new CKeyboardEvent();
+        var _e = new AscCommon.CKeyboardEvent();
         _e.CtrlKey = true;
         _e.KeyCode = 86;
 
@@ -4387,8 +4388,8 @@ asc_docs_api.prototype.UpdateInterfaceState = function()
 
 asc_docs_api.prototype.OnMouseUp = function(x, y)
 {
-    var _e = CreateMouseUpEventObject(x, y);
-    Window_OnMouseUp(_e);
+    var _e = AscCommon.CreateMouseUpEventObject(x, y);
+  AscCommon.Window_OnMouseUp(_e);
 
     //this.WordControl.onMouseUpExternal(x, y);
 };

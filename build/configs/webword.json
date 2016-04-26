@@ -25,6 +25,7 @@
 		
 		"../common/Drawings/Metafile.js",
 		"../common/FontsFreeType/TextMeasurer.js",
+		"../common/Drawings/WorkEvents.js",
 		
 		"../common/Shapes/EditorSettings.js",
 		"../common/Shapes/Serialize.js",
@@ -116,7 +117,6 @@
         "../word/Drawing/ShapeDrawer.js",
         "../word/Drawing/DrawingDocument.js",
         "../word/Drawing/GraphicsEvents.js",
-        "../word/Drawing/WorkEvents.js",
         "../word/Drawing/Rulers.js",
         "../word/Drawing/HtmlPage.js",
         "../word/Drawing/documentrenderer.js",

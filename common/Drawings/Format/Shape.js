@@ -16,6 +16,7 @@ var c_oAscSizeRelFromH = AscCommon.c_oAscSizeRelFromH;
 var c_oAscSizeRelFromV = AscCommon.c_oAscSizeRelFromV;
 var CMatrix = AscCommon.CMatrix;
 var isRealObject = AscCommon.isRealObject;
+var global_mouseEvent = AscCommon.global_mouseEvent;
 
 var checkNormalRotate = AscFormat.checkNormalRotate;
 var HitInLine = AscFormat.HitInLine;
@@ -3733,7 +3734,7 @@ CShape.prototype =
             var tx, ty;
             tx = this.invertTransformText.TransformPointX(x, y);
             ty = this.invertTransformText.TransformPointY(x, y);
-            if(e.Button === g_mouse_button_right)
+            if(e.Button === AscCommon.g_mouse_button_right)
             {
                 if(content.Selection_Check(tx, ty,  0))
                 {
@@ -3755,7 +3756,7 @@ CShape.prototype =
             var tx, ty;
             tx = this.invertTransformText.TransformPointX(x, y);
             ty = this.invertTransformText.TransformPointY(x, y);
-            if(!(e.Type === g_mouse_event_type_up && this.rightButtonFlag))
+            if(!(e.Type === AscCommon.g_mouse_event_type_up && this.rightButtonFlag))
             {
                 content.Selection_SetEnd(tx, ty, slideIndex, e);
             }

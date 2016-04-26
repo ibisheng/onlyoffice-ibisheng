@@ -2983,8 +2983,8 @@ function CDrawingDocument(drawingObjects)
         {
             this.LockCursorType("default");
 
-            var _x = global_mouseEvent.X;
-            var _y = global_mouseEvent.Y;
+            var _x = AscCommon.global_mouseEvent.X;
+            var _y = AscCommon.global_mouseEvent.Y;
             var posMouse = this.ConvertCoordsFromCursor2(_x, _y);
 
             this.TableOutlineDr.InlinePos = this.m_oWordControl.m_oLogicDocument.Get_NearestPos(posMouse.Page, posMouse.X, posMouse.Y);

@@ -3,6 +3,8 @@
 // Import
 var CColor = AscCommon.CColor;
 var g_oTextMeasurer = AscCommon.g_oTextMeasurer;
+var global_keyboardEvent = AscCommon.global_keyboardEvent;
+var global_mouseEvent = AscCommon.global_mouseEvent;
 
 var FontStyle = AscFonts.FontStyle;
 var g_fontApplication = AscFonts.g_fontApplication;
@@ -3304,7 +3306,7 @@ function CThumbnailsManager()
             // кто-то зажал мышку. кто-то другой
             return false;
         }
-        check_MouseDownEvent(e);
+        AscCommon.check_MouseDownEvent(e);
         global_mouseEvent.LockMouse();
 
         if (global_mouseEvent.Sender != control)
@@ -3537,7 +3539,7 @@ function CThumbnailsManager()
             // кто-то зажал мышку. кто-то другой
             return;
         }
-        check_MouseMoveEvent(e);
+        AscCommon.check_MouseMoveEvent(e);
         if (global_mouseEvent.Sender != control)
         {
             // такого быть не должно
@@ -3685,7 +3687,7 @@ function CThumbnailsManager()
 
     this.onMouseUp = function(e)
     {
-        check_MouseUpEvent(e);
+        AscCommon.check_MouseUpEvent(e);
         global_mouseEvent.UnLockMouse();
 
         var control = oThis.m_oWordControl.m_oThumbnails.HtmlElement;
@@ -4541,7 +4543,7 @@ function CThumbnailsManager()
             return false;
         }
 
-        check_KeyboardEvent(e);
+        AscCommon.check_KeyboardEvent(e);
         switch (global_keyboardEvent.KeyCode)
         {
             case 13:    // enter

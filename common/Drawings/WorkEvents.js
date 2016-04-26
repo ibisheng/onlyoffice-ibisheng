@@ -1,5 +1,7 @@
 "use strict";
 
+(function(window, undefined){
+
 // Import
 var AscBrowser = AscCommon.AscBrowser;
 
@@ -13,11 +15,9 @@ var g_mouse_button_left     = 0;
 var g_mouse_button_center   = 1;
 var g_mouse_button_right    = 2;
 
-var g_mouse_event_settings_lock  = 1;
-var g_mouse_event_settings_count = 2;
-
-window.g_bIsMouseUpLockedSend = undefined;
-window.g_bIsMouseUpLockedSend;
+var MouseUpLock = {
+    MouseUpLockedSend: false
+};
 
 function CMouseEventHandler()
 {
@@ -260,11 +260,11 @@ function check_MouseUpEvent(e)
         lockedElement = global_mouseEvent.Sender;
     }
 
-    if (global_mouseEvent.IsLocked == true && global_mouseEvent.Sender != newSender && false === window.g_bIsMouseUpLockedSend)
+    if (global_mouseEvent.IsLocked == true && global_mouseEvent.Sender != newSender && false === MouseUpLock.MouseUpLockedSend)
     {
         Window_OnMouseUp(e);
     }
-    window.g_bIsMouseUpLockedSend = true;
+    MouseUpLock.MouseUpLockedSend = true;
     global_mouseEvent.Sender = newSender;
 
     global_mouseEvent.UnLockMouse();
@@ -334,7 +334,7 @@ function check_MouseDownEvent(e, isClicks)
         global_mouseEvent.ClickCount     = 1;
     }
 
-    window.g_bIsMouseUpLockedSend = false;
+    MouseUpLock.MouseUpLockedSend = false;
 }
 
 function check_MouseDownEvent2(x, y)
@@ -352,7 +352,7 @@ function check_MouseDownEvent2(x, y)
     global_mouseEvent.LastClickTime  = -1;
     global_mouseEvent.ClickCount     = 1;
 
-    window.g_bIsMouseUpLockedSend = false;
+    MouseUpLock.MouseUpLockedSend = false;
 }
 
 function global_OnMouseWheel(e)
@@ -411,9 +411,9 @@ function Window_OnMouseMove(e)
 }
 function Window_OnMouseUp(e)
 {
-    if (false === window.g_bIsMouseUpLockedSend)
+    if (false === MouseUpLock.MouseUpLockedSend)
     {
-        window.g_bIsMouseUpLockedSend = true;
+        MouseUpLock.MouseUpLockedSend = true;
         if (global_mouseEvent.IsLocked)
         {
             if (undefined != global_mouseEvent.Sender.onmouseup && null != global_mouseEvent.Sender.onmouseup)
@@ -2780,3 +2780,28 @@ function LoadMobileImages()
     window.g_table_track_diamond.src = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABMAAAATCAYAAAByUDbMAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAmdJREFUeNqck0toE1EUQO9MakqbKi5CqyIIIm0hDUTIQuhGKtSqIEQRXIjZda92Iemu6iJGdKFWhCI2JJhAVi2ouJBuulKXXWgM2OYzNb8Z8898cr2vHT9pZhLxwWF493OYefMuICL04ArxXn92re2a1DTtliBp6F0s4WZeQ9r7/kumKMqcIGo4fU/E8ZtFPL0g4mZORYrPm/XwYLBUVZ3LV7jA9SdF2CrgTmxbQvA+lSAjcXcpP2/Ux5uLREiKlrbcdokHL8XNhPy/in4LyxZTIW/0aWaiXkKOHZwgCMe4geFv1x6lIClZgbNYoddCTYaRoSaEbhyFQZDG7Hb7F56jlclk+gBbIFey0CwLoNR/gCrXQVWanVCc5VmdXM5SmwbpdHof8+x8ptvtzubTnx9EfU440l+AppQEpSaB2qiC2qz/gfYszvJ2Sw4iPgdU84nHLpcr1XZmTqdz+cP6u1exO5Nw2FaCBjU0q0WQ62WQScKebN+QUmDvlyC2MAkbn9ZiDodj6ZeDnTSn0xeJRLbcJycO3p6dGVtd24CCWAatBdDSVHqzCqjVHIzYarByfxo+rr997fF4FqkvTZTYP9wdg13pfuIEcS4UCq2msmWcuBpE29QyDp2Noe1MEEcvv8RESsJoNPqG6i4Qo8QB9iJt42Qo/F7C8UvP0XrqIR6/+IxEoqmoYzb3CsPh8EqShFOzQfyaLHYVGQ76HuFMIBBYisfjCb/f/4L2581EDE4XtC26Mkw4SAwTh3R5hV1+IkvUqE/t6DOS/SUc0KVsJBSiSjSMRF1lupDX7yITa0SL6ltm9T8FGADChEYX8dVTaAAAAABJRU5ErkJggg==";
 
 }
+
+    //--------------------------------------------------------export----------------------------------------------------
+    window['AscCommon'] = window['AscCommon'] || {};
+    window['AscCommon'].g_mouse_event_type_down = g_mouse_event_type_down;
+    window['AscCommon'].g_mouse_event_type_move = g_mouse_event_type_move;
+    window['AscCommon'].g_mouse_event_type_up = g_mouse_event_type_up;
+    window['AscCommon'].g_mouse_button_left = g_mouse_button_left;
+    window['AscCommon'].g_mouse_button_center = g_mouse_button_center;
+    window['AscCommon'].g_mouse_button_right = g_mouse_button_right;
+    window['AscCommon'].MouseUpLock = MouseUpLock;
+    window['AscCommon'].CMouseEventHandler = CMouseEventHandler;
+    window['AscCommon'].CKeyboardEvent = CKeyboardEvent;
+    window['AscCommon'].global_mouseEvent = global_mouseEvent;
+    window['AscCommon'].global_keyboardEvent = global_keyboardEvent;
+    window['AscCommon'].check_KeyboardEvent = check_KeyboardEvent;
+    window['AscCommon'].check_KeyboardEvent2 = check_KeyboardEvent2;
+    window['AscCommon'].check_MouseMoveEvent = check_MouseMoveEvent;
+    window['AscCommon'].CreateMouseUpEventObject = CreateMouseUpEventObject;
+    window['AscCommon'].check_MouseUpEvent = check_MouseUpEvent;
+    window['AscCommon'].check_MouseDownEvent = check_MouseDownEvent;
+    window['AscCommon'].Window_OnMouseUp = Window_OnMouseUp;
+    window['AscCommon'].button_eventHandlers = button_eventHandlers;
+    window['AscCommon'].CMobileTouchManager = CMobileTouchManager;
+    window['AscCommon'].CReaderTouchManager = CReaderTouchManager;
+})(window);

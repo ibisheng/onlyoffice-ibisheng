@@ -500,19 +500,19 @@ function Editor_Copy_Event(e, ElemToSelect)
 		// нужно лдибо копить команды клавиатуры, либо насильно заранее сделать моусАп самому.
 		// мы выбараем второе
 
-		oWordControl.onMouseUpExternal(global_mouseEvent.X, global_mouseEvent.Y);
+		oWordControl.onMouseUpExternal(AscCommon.global_mouseEvent.X, AscCommon.global_mouseEvent.Y);
 	}
 
 	if (oWordControl.IsFocus === false)
 	{
 		// некоторые команды нужно продолжать обрабатывать
-		if (!oWordControl.onKeyDownNoActiveControl(global_keyboardEvent))
+		if (!oWordControl.onKeyDownNoActiveControl(AscCommon.global_keyboardEvent))
 			return;
 	}
 
 	if (null == oWordControl.m_oLogicDocument)
 	{
-		var bIsPrev = (oWordControl.m_oDrawingDocument.m_oDocumentRenderer.OnKeyDown(global_keyboardEvent) === true) ? false : true;
+		var bIsPrev = (oWordControl.m_oDrawingDocument.m_oDocumentRenderer.OnKeyDown(AscCommon.global_keyboardEvent) === true) ? false : true;
 		if (false === bIsPrev)
 		{
 			e.preventDefault();

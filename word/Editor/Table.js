@@ -138,7 +138,7 @@ function CTable(DrawingDocument, Parent, Inline, PageNum, X, Y, XLimit, YLimit, 
             X          : 0,
             Y          : 0,
             PageIndex  : 0,
-            MouseEvent : { ClickCount : 1, Type : g_mouse_event_type_down, CtrlKey : false }
+            MouseEvent : { ClickCount : 1, Type : AscCommon.g_mouse_event_type_down, CtrlKey : false }
         },
         EndPos   :
         {
@@ -146,7 +146,7 @@ function CTable(DrawingDocument, Parent, Inline, PageNum, X, Y, XLimit, YLimit, 
             X          : 0,
             Y          : 0,
             PageIndex  : 0,
-            MouseEvent : { ClickCount : 1, Type : g_mouse_event_type_down, CtrlKey : false }
+            MouseEvent : { ClickCount : 1, Type : AscCommon.g_mouse_event_type_down, CtrlKey : false }
         },
         Type     : table_Selection_Text,
         Data     : null,
@@ -6037,7 +6037,7 @@ CTable.prototype =
             this.Selection.Data2.X = _X;
             this.Selection.Data2.Y = _Y;
 
-            if (MouseEvent.Type === g_mouse_event_type_up)
+            if (MouseEvent.Type === AscCommon.g_mouse_event_type_up)
             {
                 // Обрабатываем случай, когда граница не изменила своего первоначального положения
                 if (Math.abs(_X - this.Selection.Data2.StartCX) < 0.001 && Math.abs(_Y - this.Selection.Data2.StartCY) < 0.001)
@@ -6432,7 +6432,7 @@ CTable.prototype =
             var Cell = this.Selection.Data2;
             Cell.Content_Selection_SetEnd(X, Y, CurPage - Cell.Content.Get_StartPage_Relative(), MouseEvent);
 
-            if (MouseEvent.Type === g_mouse_event_type_up)
+            if (MouseEvent.Type === AscCommon.g_mouse_event_type_up)
             {
                 this.Selection.Type2 = table_Selection_Common;
                 this.Selection.Data2 = null;
@@ -6460,7 +6460,7 @@ CTable.prototype =
 
             this.CurCell.Content_Selection_SetEnd(X, Y, CurPage - this.CurCell.Content.Get_StartPage_Relative(), MouseEvent);
 
-            if (g_mouse_event_type_up == MouseEvent.Type)
+            if (AscCommon.g_mouse_event_type_up == MouseEvent.Type)
                 this.Selection.Start = false;
 
             if (false === this.CurCell.Content.Selection.Use)
@@ -6473,7 +6473,7 @@ CTable.prototype =
         }
         else
         {
-            if (g_mouse_event_type_up == MouseEvent.Type)
+            if (AscCommon.g_mouse_event_type_up == MouseEvent.Type)
                 this.Selection.Start = false;
 
             this.Selection.Type = table_Selection_Cell;

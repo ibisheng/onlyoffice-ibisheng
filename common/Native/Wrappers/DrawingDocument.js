@@ -1,3 +1,7 @@
+
+// Import
+var global_mouseEvent = AscCommon.global_mouseEvent;
+
 function CTableMarkup(Table)
 {
     this.Internal =
@@ -1183,7 +1187,7 @@ CDrawingDocument.prototype =
 
     CorrectRulerPosition : function(pos)
     {
-        if (global_keyboardEvent.AltKey)
+        if (AscCommon.global_keyboardEvent.AltKey)
             return pos;
 
         return ((pos / 2.5 + 0.5) >> 0) * 2.5;
@@ -1286,7 +1290,7 @@ CDrawingDocument.prototype =
     {
         this.InlineTextTrackEnabled = false;
 
-        this.LogicDocument.On_DragTextEnd(this.InlineTextTrack, global_keyboardEvent.CtrlKey);
+        this.LogicDocument.On_DragTextEnd(this.InlineTextTrack, AscCommon.global_keyboardEvent.CtrlKey);
         this.InlineTextTrack = null;
         this.InlineTextTrackPage = -1;
         this.Native["DD_EndTrackText"]();
@@ -1970,16 +1974,16 @@ CDrawingDocument.prototype =
         this.StartUpdateOverlay();
 
         this.IsKeyDownButNoPress = true;
-        this.bIsUseKeyPress = (this.LogicDocument.OnKeyDown(global_keyboardEvent) === true) ? false : true;
+        this.bIsUseKeyPress = (this.LogicDocument.OnKeyDown(AscCommon.global_keyboardEvent) === true) ? false : true;
 
         this.EndUpdateOverlay();
     },
 
     OnKeyUp : function(e)
     {
-        global_keyboardEvent.AltKey = false;
-        global_keyboardEvent.CtrlKey = false;
-        global_keyboardEvent.ShiftKey = false;
+        AscCommon.global_keyboardEvent.AltKey = false;
+        AscCommon.global_keyboardEvent.CtrlKey = false;
+        AscCommon.global_keyboardEvent.ShiftKey = false;
     },
 
     OnKeyPress : function(e)
@@ -1993,7 +1997,7 @@ CDrawingDocument.prototype =
         check_KeyboardEvent(e);
 
         this.StartUpdateOverlay();
-        var retValue = this.LogicDocument.OnKeyPress(global_keyboardEvent);
+        var retValue = this.LogicDocument.OnKeyPress(AscCommon.global_keyboardEvent);
         this.EndUpdateOverlay();
         return retValue;
     },
@@ -2022,21 +2026,21 @@ CDrawingDocument.prototype =
                 {
                     this.IsKeyDownButNoPress = true;
                     check_KeyboardEvent_Array(_params, _offset);
-                    this.bIsUseKeyPress = (this.LogicDocument.OnKeyDown(global_keyboardEvent) === true) ? false : true;
+                    this.bIsUseKeyPress = (this.LogicDocument.OnKeyDown(AscCommon.global_keyboardEvent) === true) ? false : true;
                     break;
                 }
                 case 5: // Press
                 {
                     this.StartUpdateOverlay();
                     check_KeyboardEvent_Array(_params, _offset);
-                    this.LogicDocument.OnKeyPress(global_keyboardEvent);
+                    this.LogicDocument.OnKeyPress(AscCommon.global_keyboardEvent);
                     break;
                 }
                 case 6: // up
                 {
-                    global_keyboardEvent.AltKey = false;
-                    global_keyboardEvent.CtrlKey = false;
-                    global_keyboardEvent.ShiftKey = false;
+                    AscCommon.global_keyboardEvent.AltKey = false;
+                    AscCommon.global_keyboardEvent.CtrlKey = false;
+                    AscCommon.global_keyboardEvent.ShiftKey = false;
                     break;
                 }
                 default:
@@ -2860,27 +2864,27 @@ CDrawingDocument.prototype =
 
 function check_KeyboardEvent(e)
 {
-    global_keyboardEvent.AltKey     = ((e["Flags"] & 0x01) == 0x01);
-    global_keyboardEvent.CtrlKey    = ((e["Flags"] & 0x02) == 0x02);
-    global_keyboardEvent.ShiftKey   = ((e["Flags"] & 0x04) == 0x04);
+    AscCommon.global_keyboardEvent.AltKey     = ((e["Flags"] & 0x01) == 0x01);
+    AscCommon.global_keyboardEvent.CtrlKey    = ((e["Flags"] & 0x02) == 0x02);
+    AscCommon.global_keyboardEvent.ShiftKey   = ((e["Flags"] & 0x04) == 0x04);
 
-    global_keyboardEvent.Sender = null;
+    AscCommon.global_keyboardEvent.Sender = null;
 
-    global_keyboardEvent.CharCode   = e["CharCode"];
-    global_keyboardEvent.KeyCode    = e["KeyCode"];
-    global_keyboardEvent.Which      = null;
+    AscCommon.global_keyboardEvent.CharCode   = e["CharCode"];
+    AscCommon.global_keyboardEvent.KeyCode    = e["KeyCode"];
+    AscCommon.global_keyboardEvent.Which      = null;
 }
 function check_KeyboardEvent_Array(_params, i)
 {
-    global_keyboardEvent.AltKey     = ((_params[i + 1] & 0x01) == 0x01);
-    global_keyboardEvent.CtrlKey    = ((_params[i + 1] & 0x02) == 0x02);
-    global_keyboardEvent.ShiftKey   = ((_params[i + 1] & 0x04) == 0x04);
+    AscCommon.global_keyboardEvent.AltKey     = ((_params[i + 1] & 0x01) == 0x01);
+    AscCommon.global_keyboardEvent.CtrlKey    = ((_params[i + 1] & 0x02) == 0x02);
+    AscCommon.global_keyboardEvent.ShiftKey   = ((_params[i + 1] & 0x04) == 0x04);
 
-    global_keyboardEvent.Sender = null;
+    AscCommon.global_keyboardEvent.Sender = null;
 
-    global_keyboardEvent.CharCode   = _params[i + 3];
-    global_keyboardEvent.KeyCode    = _params[i + 2];
-    global_keyboardEvent.Which      = null;
+    AscCommon.global_keyboardEvent.CharCode   = _params[i + 3];
+    AscCommon.global_keyboardEvent.KeyCode    = _params[i + 2];
+    AscCommon.global_keyboardEvent.Which      = null;
 }
 
 function check_MouseDownEvent(e, isClicks)
@@ -2892,7 +2896,7 @@ function check_MouseDownEvent(e, isClicks)
     global_mouseEvent.CtrlKey    = ((e["Flags"] & 0x02) == 0x02);
     global_mouseEvent.ShiftKey   = ((e["Flags"] & 0x04) == 0x04);
 
-    global_mouseEvent.Type      = g_mouse_event_type_down;
+    global_mouseEvent.Type      = AscCommon.g_mouse_event_type_down;
     global_mouseEvent.Button    = e["Button"];
 
     global_mouseEvent.Sender    = null;
@@ -2918,7 +2922,7 @@ function check_MouseMoveEvent(e)
     global_mouseEvent.CtrlKey    = ((e["Flags"] & 0x02) == 0x02);
     global_mouseEvent.ShiftKey   = ((e["Flags"] & 0x04) == 0x04);
 
-    global_mouseEvent.Type      = g_mouse_event_type_move;
+    global_mouseEvent.Type      = AscCommon.g_mouse_event_type_move;
     global_mouseEvent.Button    = e["Button"];
 }
 
@@ -2931,7 +2935,7 @@ function check_MouseUpEvent(e)
     global_mouseEvent.CtrlKey    = ((e["Flags"] & 0x02) == 0x02);
     global_mouseEvent.ShiftKey   = ((e["Flags"] & 0x04) == 0x04);
 
-    global_mouseEvent.Type      = g_mouse_event_type_up;
+    global_mouseEvent.Type      = AscCommon.g_mouse_event_type_up;
     global_mouseEvent.Button    = e["Button"];
 
     global_mouseEvent.Sender    = null;

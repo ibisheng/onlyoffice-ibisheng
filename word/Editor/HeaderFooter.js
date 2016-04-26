@@ -2111,7 +2111,7 @@ CHeaderFooterController.prototype =
             if ( true === bActivate )
             {
                 var NewMouseEvent = {};
-                NewMouseEvent.Type       = g_mouse_event_type_up;
+                NewMouseEvent.Type       = AscCommon.g_mouse_event_type_up;
                 NewMouseEvent.ClickCount = 1;
                 this.CurHdrFtr.Selection_SetEnd( X, Y, PageIndex, NewMouseEvent );
                 this.CurHdrFtr.Content.Cursor_MoveToStartPos(false);

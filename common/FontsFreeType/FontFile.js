@@ -3,6 +3,8 @@
 (function(window, undefined){
 
 // Import
+var AscBrowser = AscCommon.AscBrowser;
+
 var FT_Get_Sfnt_Table = AscFonts.FT_Get_Sfnt_Table;
 var FT_Matrix = AscFonts.FT_Matrix;
 var FT_Set_Char_Size = AscFonts.FT_Set_Char_Size;

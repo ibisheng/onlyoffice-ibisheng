@@ -1,6 +1,9 @@
 "use strict";
 
 (function(window, undefined){
+    // Import
+    var global_mouseEvent = AscCommon.global_mouseEvent;
+    
 function HitInLine(context, px, py, x0, y0, x1, y1)
 {
    /* var l = Math.min(x0, x1);
