@@ -1702,6 +1702,21 @@
 				return false;
 			},
 			
+			unmergeTablesAfterMove: function(arnTo)
+			{
+				var worksheet = this.worksheet;
+				
+				var intersectionRangeWithTableParts = this._intersectionRangeWithTableParts(arnTo);
+				if(intersectionRangeWithTableParts && intersectionRangeWithTableParts.length)
+				{
+					for(var i = 0; i < intersectionRangeWithTableParts.length; i++)
+					{
+						var tablePart = intersectionRangeWithTableParts[i];
+						worksheet.mergeManager.remove(tablePart.Ref.clone());
+					}
+				}
+			},
+			
 			_setStyleTablePartsAfterOpenRows: function(ref)
 			{
 				var worksheet = this.worksheet;
