@@ -2481,6 +2481,26 @@
 				var val;
 				var cell;
 				var generateName;
+				
+				var checkRepeateColumnName = function(val, tableColumns)
+				{
+					var res = false;
+					
+					if(tableColumns && tableColumns.length)
+					{
+						for(var i = 0; i < tableColumns.length; i++)
+						{
+							if(tableColumns[i].Name.toLowerCase() === val.toLowerCase())
+							{
+								res = true;
+								break;
+							}
+						}
+					}
+					
+					return res;
+				};
+				
 				if(worksheet.TableParts)
 				{
 					//TODO: buildRecalc вызывать из модели!!!
@@ -2509,6 +2529,13 @@
 									
 								cell = worksheet.getCell3(ref.r1, j);
 								val = cell.getValue();
+								
+								//проверка на повторение уже существующих заголовков
+								if(checkRepeateColumnName(val, filter.TableColumns))
+								{
+									val = "";
+								}
+								
 								//если не пустая изменяем TableColumns
 								if(val != "" && intersection.c1 <= j && intersection.c2 >= j )
 								{
