@@ -1,10 +1,4 @@
 "use strict";
-
-/* Utils.js
- *
- * Author: Dmitry.Sokolov@avsmedia.net
- * Date:   Jan 25, 2012
- */
 (
 	/**
 	 * @param {Window} window
@@ -13,15 +7,12 @@
 	function (window, undefined) {
 
 		// Import
-		var asc = window["Asc"] ? window["Asc"] : (window["Asc"] = {});
-		var prot;
-
 		var c_oAscPrintDefaultSettings = AscCommon.c_oAscPrintDefaultSettings;
 		var gc_nMaxRow0 = AscCommon.gc_nMaxRow0;
 		var gc_nMaxCol0 = AscCommon.gc_nMaxCol0;
 		var g_oCellAddressUtils = AscCommon.g_oCellAddressUtils;
 
-		var c_oAscSelectionType = asc.c_oAscSelectionType;
+		var c_oAscSelectionType = Asc.c_oAscSelectionType;
 
 
 		/** @const */
@@ -866,7 +857,7 @@
 
 		function outputDebugStr(channel) {
 			var c = window.console;
-			if (asc.g_debug_mode && c && c[channel] && c[channel].apply) {
+			if (Asc.g_debug_mode && c && c[channel] && c[channel].apply) {
 				c[channel].apply(this, Array.prototype.slice.call(arguments, 1));
 			}
 		}
@@ -1329,7 +1320,7 @@
         var oCanvas = document.createElement('canvas');
         oCanvas.width = this.styleThumbnailWidthWithRetina;
         oCanvas.height = this.styleThumbnailHeightWithRetina;
-        var oGraphics = new asc.DrawingContext({canvas: oCanvas, units: 1/*pt*/, fmgrGraphics: fmgrGraphics, font: oFont});
+        var oGraphics = new Asc.DrawingContext({canvas: oCanvas, units: 1/*pt*/, fmgrGraphics: fmgrGraphics, font: oFont});
 
         var oStyle, oCustomStyle;
         this.defaultStyles = [];
@@ -1351,7 +1342,7 @@
         var oCanvas = document.createElement('canvas');
         oCanvas.width = this.styleThumbnailWidthWithRetina;
         oCanvas.height = this.styleThumbnailHeightWithRetina;
-        var oGraphics = new asc.DrawingContext({canvas: oCanvas, units: 1/*pt*/, fmgrGraphics: fmgrGraphics, font: oFont});
+        var oGraphics = new Asc.DrawingContext({canvas: oCanvas, units: 1/*pt*/, fmgrGraphics: fmgrGraphics, font: oFont});
 
         var oStyle;
         this.docStyles = [];
@@ -1395,7 +1386,7 @@
         var oFontColor = fc !== null ? fc : new AscCommon.CColor(0, 0, 0);
         var format = oStyle.getFont();
         // Для размера шрифта делаем ограничение для превью в 16pt (у Excel 18pt, но и высота превью больше 22px)
-        var oFont = new asc.FontProperties(format.fn, (16 < format.fs) ? 16 : format.fs, format.b, format.i, format.u, format.s);
+        var oFont = new Asc.FontProperties(format.fn, (16 < format.fs) ? 16 : format.fs, format.b, format.i, format.u, format.s);
 
         var width_padding = 3; // 4 * 72 / 96
 
@@ -1547,7 +1538,10 @@
 		/*
 		 * Export
 		 * -----------------------------------------------------------------------------
-		 */		
+		 */
+		var prot;
+		window['Asc'] = window['Asc'] || {};
+		window['AscCommonExcel'] = window['AscCommonExcel'] || {};
 		window["Asc"].applyFunction = applyFunction;
 		window["Asc"].typeOf = typeOf;
 		window["Asc"].lastIndexOf = lastIndexOf;
@@ -1568,16 +1562,16 @@
 		window["Asc"].getEndValueRange = getEndValueRange;
 
 		window["Asc"].Range = Range;
-		window["Asc"].ActiveRange = ActiveRange;
-		window["Asc"].FormulaRange = FormulaRange;
-		window["Asc"].VisibleRange = VisibleRange;
-		window["Asc"].g_oRangeCache = g_oRangeCache;
+		window["AscCommonExcel"].ActiveRange = ActiveRange;
+		window["AscCommonExcel"].FormulaRange = FormulaRange;
+		window["AscCommonExcel"].VisibleRange = VisibleRange;
+		window["AscCommonExcel"].g_oRangeCache = g_oRangeCache;
 
-		window["Asc"].HandlersList = HandlersList;
+		window["AscCommonExcel"].HandlersList = HandlersList;
 
-		window["Asc"].RedoObjectParam = RedoObjectParam;
+		window["AscCommonExcel"].RedoObjectParam = RedoObjectParam;
 
-		window["Asc"]["asc_CMouseMoveData"] = window["Asc"].asc_CMouseMoveData = asc_CMouseMoveData;
+		window["AscCommonExcel"].asc_CMouseMoveData = asc_CMouseMoveData;
 		prot = asc_CMouseMoveData.prototype;
 		prot["asc_getType"] = prot.asc_getType;
 		prot["asc_getX"] = prot.asc_getX;
@@ -1642,19 +1636,19 @@
 		prot["asc_setGridLines"] = prot.asc_setGridLines;
 		prot["asc_setHeadings"] = prot.asc_setHeadings;
 
-		window["Asc"].CPagePrint = CPagePrint;
-		window["Asc"].CPrintPagesData = CPrintPagesData;
+		window["AscCommonExcel"].CPagePrint = CPagePrint;
+		window["AscCommonExcel"].CPrintPagesData = CPrintPagesData;
 
 		window["Asc"]["asc_CAdjustPrint"] = window["Asc"].asc_CAdjustPrint = asc_CAdjustPrint;
 		prot = asc_CAdjustPrint.prototype;
 		prot["asc_getPrintType"] = prot.asc_getPrintType;
 		prot["asc_setPrintType"] = prot.asc_setPrintType;
 
-		window["Asc"].asc_CLockInfo = asc_CLockInfo;
+		window["AscCommonExcel"].asc_CLockInfo = asc_CLockInfo;
 
-		window["Asc"].asc_CCollaborativeRange = asc_CCollaborativeRange;
+		window["AscCommonExcel"].asc_CCollaborativeRange = asc_CCollaborativeRange;
 
-		window["Asc"]["asc_CSheetViewSettings"] = window["Asc"].asc_CSheetViewSettings = asc_CSheetViewSettings;
+		window["AscCommonExcel"].asc_CSheetViewSettings = asc_CSheetViewSettings;
 		prot = asc_CSheetViewSettings.prototype;
 		prot["asc_getShowGridLines"] = prot.asc_getShowGridLines;
 		prot["asc_getShowRowColHeaders"] = prot.asc_getShowRowColHeaders;
@@ -1662,18 +1656,18 @@
 		prot["asc_setShowGridLines"] = prot.asc_setShowGridLines;
 		prot["asc_setShowRowColHeaders"] = prot.asc_setShowRowColHeaders;
 
-		window["Asc"]["asc_CPane"] = window["Asc"].asc_CPane = asc_CPane;
+		window["AscCommonExcel"].asc_CPane = asc_CPane;
 
-		window["Asc"]["asc_CStylesPainter"] = window["Asc"].asc_CStylesPainter = asc_CStylesPainter;
+		window["AscCommonExcel"].asc_CStylesPainter = asc_CStylesPainter;
 		prot = asc_CStylesPainter.prototype;
 		prot["asc_getStyleThumbnailWidth"] = prot.asc_getStyleThumbnailWidth;
 		prot["asc_getStyleThumbnailHeight"] = prot.asc_getStyleThumbnailHeight;
 		prot["asc_getDefaultStyles"] = prot.asc_getDefaultStyles;
 		prot["asc_getDocStyles"] = prot.asc_getDocStyles;
 
-		window["Asc"]["asc_CSheetPr"] = window["Asc"].asc_CSheetPr = asc_CSheetPr;
+		window["AscCommonExcel"].asc_CSheetPr = asc_CSheetPr;
 
-		window["Asc"]["asc_CSelectionMathInfo"] = window["Asc"].asc_CSelectionMathInfo = asc_CSelectionMathInfo;
+		window["AscCommonExcel"].asc_CSelectionMathInfo = asc_CSelectionMathInfo;
 		prot = asc_CSelectionMathInfo.prototype;
 		prot["asc_getCount"] = prot.asc_getCount;
 		prot["asc_getCountNumbers"] = prot.asc_getCountNumbers;
@@ -1694,7 +1688,7 @@
 		prot["asc_setReplaceWith"] = prot.asc_setReplaceWith;
 		prot["asc_setIsReplaceAll"] = prot.asc_setIsReplaceAll;
 
-		window["Asc"]["asc_CCompleteMenu"] = window["Asc"].asc_CCompleteMenu = asc_CCompleteMenu;
+		window["AscCommonExcel"].asc_CCompleteMenu = asc_CCompleteMenu;
 		prot = asc_CCompleteMenu.prototype;
 		prot["asc_getName"] = prot.asc_getName;
 		prot["asc_getType"] = prot.asc_getType;

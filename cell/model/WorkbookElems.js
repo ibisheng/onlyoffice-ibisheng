@@ -4485,7 +4485,7 @@ function sparkline() {
 	this.f = null;
 }
 sparkline.prototype.setSqref = function(sqref) {
-	this.sqref = Asc.g_oRangeCache.getAscRange(sqref);
+	this.sqref = AscCommonExcel.g_oRangeCache.getAscRange(sqref);
 };
 sparkline.prototype.checkInRange = function(range) {
 	return this.sqref ? range.isIntersect(this.sqref) : false;

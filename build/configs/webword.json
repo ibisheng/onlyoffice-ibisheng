@@ -76,6 +76,9 @@
         "../common/wordcopypaste.js",
 
         "../word/apiDefines.js",
+		
+		"../cell/utils/utils.js",
+		
         "../word/Drawing/translations.js",
         "../word/Editor/GraphicObjects/Format/ShapePrototype.js",
         "../word/Editor/GraphicObjects/Format/ImagePrototype.js",
@@ -139,7 +142,6 @@
         "../word/Math/operators.js",
         "../word/Math/accent.js",
         "../word/Math/borderBox.js",
-        "../cell/utils/utils.js",
         "../cell/model/CellComment.js",
         "../cell/model/Serialize.js",
         "../cell/model/WorkbookElems.js",

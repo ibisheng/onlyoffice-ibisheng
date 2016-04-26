@@ -1573,9 +1573,9 @@ parserHelper.prototype.checkDataRange = function (model, wb, dialogType, dataRan
         }
 		if (null === dataRange || !sheetModel)
 			return Asc.c_oAscError.ID.DataRangeError;
-		dataRange = Asc.g_oRangeCache.getAscRange(dataRange.range);
+		dataRange = AscCommonExcel.g_oRangeCache.getAscRange(dataRange.range);
 	} else
-		dataRange = Asc.g_oRangeCache.getAscRange(dataRange);
+		dataRange = AscCommonExcel.g_oRangeCache.getAscRange(dataRange);
 
 	if (null === dataRange)
 		return Asc.c_oAscError.ID.DataRangeError;

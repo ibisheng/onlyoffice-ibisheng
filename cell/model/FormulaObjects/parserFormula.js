@@ -961,7 +961,7 @@ cArea3D.prototype.changeSheet = function ( lastName, newName ) {
 };
 cArea3D.prototype.toString = function () {
   var wsFrom = this._wb.getWorksheetById(this.wsFrom).getName(), wsTo = this._wb.getWorksheetById(this.wsTo)
-    .getName(), name = Asc.g_oRangeCache.getActiveRange(this._cells);
+    .getName(), name = AscCommonExcel.g_oRangeCache.getActiveRange(this._cells);
     name = name && name.getName ? name.getName() : this._cells;
 
     return parserHelp.get3DRef( wsFrom !== wsTo ? wsFrom + ':' + wsTo : wsFrom, name );

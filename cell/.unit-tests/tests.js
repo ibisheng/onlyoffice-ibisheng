@@ -276,14 +276,14 @@ $(function () {
 			equal(3, 3, msg+", handler3() is called");
 		}
 
-		var l1 = new Asc.HandlersList(),
-		    l2 = Asc.HandlersList({}),
-		    l3 = new Asc.HandlersList({"onEvent1":handler1, "onEvent2":handler2});
+		var l1 = new AscCommonExcel.HandlersList(),
+		    l2 = AscCommonExcel.HandlersList({}),
+		    l3 = new AscCommonExcel.HandlersList({"onEvent1":handler1, "onEvent2":handler2});
 
 		expect(15);
 
-		ok(l1 instanceof Asc.HandlersList, "new Asc.HandlersList() instanceof Asc.HandlersList");  //1
-		ok(l2 instanceof Asc.HandlersList, "Asc.HandlersList({}) instanceof Asc.HandlersList");    //2
+		ok(l1 instanceof AscCommonExcel.HandlersList, "new Asc.HandlersList() instanceof Asc.HandlersList");  //1
+		ok(l2 instanceof AscCommonExcel.HandlersList, "Asc.HandlersList({}) instanceof Asc.HandlersList");    //2
 
 		l3.trigger("onEvent1", "trigger event without args");                                         //3
 		l3.trigger("onEvent2", "trigger event with arg 'p1'", "p1");                                  //4

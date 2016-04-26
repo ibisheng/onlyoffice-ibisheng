@@ -4974,7 +4974,7 @@ function OfflineEditor () {
 
         // STYLE MANAGER
 
-        window["Asc"].asc_CStylesPainter.prototype.generateStylesAll = function (cellStylesAll, fmgrGraphics, oFont, stringRenderer) {
+        AscCommonExcel.asc_CStylesPainter.prototype.generateStylesAll = function (cellStylesAll, fmgrGraphics, oFont, stringRenderer) {
 
             var pxTomm = 1.0; // 72.0 / 96.0;
 
@@ -4993,7 +4993,7 @@ function OfflineEditor () {
             this.generateDefaultStyles(cellStylesAll, fmgrGraphics, oFont, stringRenderer);
             this.generateDocumentStyles(cellStylesAll, fmgrGraphics, oFont, stringRenderer);
         };
-        window["Asc"].asc_CStylesPainter.prototype.generateDefaultStyles = function (cellStylesAll, fmgrGraphics, oFont, stringRenderer) {
+        AscCommonExcel.asc_CStylesPainter.prototype.generateDefaultStyles = function (cellStylesAll, fmgrGraphics, oFont, stringRenderer) {
             var cellStyles = cellStylesAll.DefaultStyles;
             var oGraphics = new window["Asc"].DrawingContext({canvas: null, units: 0/*pt*/, fmgrGraphics: fmgrGraphics, font: oFont});
 
@@ -5013,7 +5013,7 @@ function OfflineEditor () {
                 ++styleIndex;
             }
         };
-        window["Asc"].asc_CStylesPainter.prototype.generateDocumentStyles = function (cellStylesAll, fmgrGraphics, oFont, stringRenderer) {
+        AscCommonExcel.asc_CStylesPainter.prototype.generateDocumentStyles = function (cellStylesAll, fmgrGraphics, oFont, stringRenderer) {
             var cellStyles = cellStylesAll.CustomStyles;
             var oGraphics = new window["Asc"].DrawingContext({canvas: null, units: 0/*pt*/, fmgrGraphics: fmgrGraphics, font: oFont});
 
@@ -5030,7 +5030,7 @@ function OfflineEditor () {
                 ++styleIndex;
             }
         };
-        window["Asc"].asc_CStylesPainter.prototype.drawStyle = function (oGraphics, stringRenderer, oStyle, sStyleName, nIndex) {
+        AscCommonExcel.asc_CStylesPainter.prototype.drawStyle = function (oGraphics, stringRenderer, oStyle, sStyleName, nIndex) {
 
             var oColor = oStyle.getFill();
             if (null !== oColor) {

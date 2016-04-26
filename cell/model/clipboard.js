@@ -1827,7 +1827,7 @@
 			
 			_checkPasteFromBinaryExcel: function(worksheet, isWriteError)
 			{
-				var activeCellsPasteFragment = Asc.g_oRangeCache.getAscRange(this.activeRange);
+				var activeCellsPasteFragment = AscCommonExcel.g_oRangeCache.getAscRange(this.activeRange);
 				var rMax = (activeCellsPasteFragment.r2 - activeCellsPasteFragment.r1) + worksheet.activeRange.r1;
 				var cMax = (activeCellsPasteFragment.c2 - activeCellsPasteFragment.c1) + worksheet.activeRange.c1;
 				

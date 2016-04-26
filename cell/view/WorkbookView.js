@@ -27,10 +27,10 @@
   var asc_applyFunction = asc.applyFunction;
   var asc_round = asc.round;
   var asc_typeof = asc.typeOf;
-  var asc_CMM = asc.asc_CMouseMoveData;
-  var asc_CPrintPagesData = asc.CPrintPagesData;
+  var asc_CMM = AscCommonExcel.asc_CMouseMoveData;
+  var asc_CPrintPagesData = AscCommonExcel.CPrintPagesData;
   var asc_getcvt = asc.getCvtRatio;
-  var asc_CSP = asc.asc_CStylesPainter;
+  var asc_CSP = AscCommonExcel.asc_CStylesPainter;
   var c_oTargetType = AscCommonExcel.c_oTargetType;
   var c_oAscError = asc.c_oAscError;
   var c_oAscCleanOptions = asc.c_oAscCleanOptions;
@@ -1795,7 +1795,7 @@
       formulaName = formulaName.toUpperCase();
       for (i = 0; i < this.formulasList.length; ++i) {
         if (0 === this.formulasList[i].indexOf(formulaName)) {
-          arrResult.push(new Asc.asc_CCompleteMenu(this.formulasList[i], c_oAscPopUpSelectorType.Func));
+          arrResult.push(new AscCommonExcel.asc_CCompleteMenu(this.formulasList[i], c_oAscPopUpSelectorType.Func));
         }
       }
       defNamesList = this.getDefinedNames(Asc.c_oAscGetDefinedNamesList.WorksheetWorkbook);
@@ -1803,7 +1803,7 @@
       for (i = 0; i < defNamesList.length; ++i) {
         defName = defNamesList[i];
         if (0 === defName.Name.toLowerCase().indexOf(formulaName)) {
-          arrResult.push(new Asc.asc_CCompleteMenu(defName.Name, !defName.isTable ? c_oAscPopUpSelectorType.Range : c_oAscPopUpSelectorType.Table));
+          arrResult.push(new AscCommonExcel.asc_CCompleteMenu(defName.Name, !defName.isTable ? c_oAscPopUpSelectorType.Range : c_oAscPopUpSelectorType.Table));
         }
       }
     }

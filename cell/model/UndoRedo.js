@@ -457,7 +457,7 @@ var UndoRedoDataTypes = new function() {
 			case this.SingleProperty: return new UndoRedoData_SingleProperty(); break;
 			case this.RgbColor: return new RgbColor(); break;
 			case this.ThemeColor: return new ThemeColor(); break;
-			case this.SheetViewSettings: return new Asc.asc_CSheetViewSettings(); break;
+			case this.SheetViewSettings: return new AscCommonExcel.asc_CSheetViewSettings(); break;
             case this.GraphicObjects: return new UndoRedoDataGraphicObjects();break;
             case this.GlobalTableIdAdd: return new UndoRedoData_GTableIdAdd(); break;
 
@@ -3017,7 +3017,7 @@ UndoRedoCell.prototype = {
 			var collaborativeEditing = this.wb.oApi.collaborativeEditing;
 			nRow = collaborativeEditing.getLockOtherRow2(nSheetId, nRow);
 			nCol = collaborativeEditing.getLockOtherColumn2(nSheetId, nCol);
-			var oLockInfo = new Asc.asc_CLockInfo();
+			var oLockInfo = new AscCommonExcel.asc_CLockInfo();
 			oLockInfo["sheetId"] = nSheetId;
 			oLockInfo["type"] = c_oAscLockTypeElem.Range;
 			oLockInfo["rangeOrObjectId"] = new Asc.Range(nCol, nRow, nCol, nRow);
@@ -3134,7 +3134,7 @@ UndoRedoWoorksheet.prototype = {
 			{
 				nRow = collaborativeEditing.getLockOtherRow2(nSheetId, nRow);
 				nCol = collaborativeEditing.getLockOtherColumn2(nSheetId, nCol);
-				oLockInfo = new Asc.asc_CLockInfo();
+				oLockInfo = new AscCommonExcel.asc_CLockInfo();
 				oLockInfo["sheetId"] = nSheetId;
 				oLockInfo["type"] = c_oAscLockTypeElem.Range;
 				oLockInfo["rangeOrObjectId"] = new Asc.Range(nCol, nRow, nCol, nRow);
@@ -3177,7 +3177,7 @@ UndoRedoWoorksheet.prototype = {
 			        index = collaborativeEditing.getLockOtherColumn2(nSheetId, index);
 			        range = new Asc.Range(index, 0, index, gc_nMaxRow0);
 			    }
-			    oLockInfo = new Asc.asc_CLockInfo();
+			    oLockInfo = new AscCommonExcel.asc_CLockInfo();
 			    oLockInfo["sheetId"] = nSheetId;
 			    oLockInfo["type"] = c_oAscLockTypeElem.Range;
 			    oLockInfo["rangeOrObjectId"] = range;
@@ -3195,7 +3195,7 @@ UndoRedoWoorksheet.prototype = {
 			if(false != this.wb.bCollaborativeChanges)
 			{
 				index = collaborativeEditing.getLockOtherRow2(nSheetId, index);
-				oLockInfo = new Asc.asc_CLockInfo();
+				oLockInfo = new AscCommonExcel.asc_CLockInfo();
 				oLockInfo["sheetId"] = nSheetId;
 				oLockInfo["type"] = c_oAscLockTypeElem.Range;
 				oLockInfo["rangeOrObjectId"] = new Asc.Range(0, index, gc_nMaxCol0, index);
@@ -3222,7 +3222,7 @@ UndoRedoWoorksheet.prototype = {
 				from = collaborativeEditing.getLockOtherRow2(nSheetId, from);
 				to = collaborativeEditing.getLockOtherRow2(nSheetId, to);
 				
-				oLockInfo = new Asc.asc_CLockInfo();
+				oLockInfo = new AscCommonExcel.asc_CLockInfo();
 				oLockInfo["sheetId"] = nSheetId;
 				oLockInfo["type"] = c_oAscLockTypeElem.Range;
 				oLockInfo["rangeOrObjectId"] = new Asc.Range(0, from, gc_nMaxCol0, to);
@@ -3250,7 +3250,7 @@ UndoRedoWoorksheet.prototype = {
 				to = collaborativeEditing.getLockOtherRow2(nSheetId, to);
 				if(false == ((true == bUndo && AscCH.historyitem_Worksheet_AddRows == Type) || (false == bUndo && AscCH.historyitem_Worksheet_RemoveRows == Type)))
 				{
-					oLockInfo = new Asc.asc_CLockInfo();
+					oLockInfo = new AscCommonExcel.asc_CLockInfo();
 					oLockInfo["sheetId"] = nSheetId;
 					oLockInfo["type"] = c_oAscLockTypeElem.Range;
 					oLockInfo["rangeOrObjectId"] = new Asc.Range(0, from, gc_nMaxCol0, to);
@@ -3286,7 +3286,7 @@ UndoRedoWoorksheet.prototype = {
 				to = collaborativeEditing.getLockOtherColumn2(nSheetId, to);
 				if(false == ((true == bUndo && AscCH.historyitem_Worksheet_AddCols == Type) || (false == bUndo && AscCH.historyitem_Worksheet_RemoveCols == Type)))
 				{
-					oLockInfo = new Asc.asc_CLockInfo();
+					oLockInfo = new AscCommonExcel.asc_CLockInfo();
 					oLockInfo["sheetId"] = nSheetId;
 					oLockInfo["type"] = c_oAscLockTypeElem.Range;
 					oLockInfo["rangeOrObjectId"] = new Asc.Range(from, 0, to, gc_nMaxRow0);
@@ -3327,7 +3327,7 @@ UndoRedoWoorksheet.prototype = {
 				c2 = collaborativeEditing.getLockOtherColumn2(nSheetId, c2);
 				if(false == ((true == bUndo && AscCH.historyitem_Worksheet_ShiftCellsLeft == Type) || (false == bUndo && AscCH.historyitem_Worksheet_ShiftCellsRight == Type)))
 				{
-					oLockInfo = new Asc.asc_CLockInfo();
+					oLockInfo = new AscCommonExcel.asc_CLockInfo();
 					oLockInfo["sheetId"] = nSheetId;
 					oLockInfo["type"] = c_oAscLockTypeElem.Range;
 					oLockInfo["rangeOrObjectId"] = new Asc.Range(c1, r1, c2, r2);
@@ -3364,7 +3364,7 @@ UndoRedoWoorksheet.prototype = {
 				c2 = collaborativeEditing.getLockOtherColumn2(nSheetId, c2);
 				if(false == ((true == bUndo && AscCH.historyitem_Worksheet_ShiftCellsTop == Type) || (false == bUndo && AscCH.historyitem_Worksheet_ShiftCellsBottom == Type)))
 				{
-					oLockInfo = new Asc.asc_CLockInfo();
+					oLockInfo = new AscCommonExcel.asc_CLockInfo();
 					oLockInfo["sheetId"] = nSheetId;
 					oLockInfo["type"] = c_oAscLockTypeElem.Range;
 					oLockInfo["rangeOrObjectId"] = new Asc.Range(c1, r1, c2, r2);
@@ -3402,7 +3402,7 @@ UndoRedoWoorksheet.prototype = {
 					var place = Data.places[i];
 					place.from = collaborativeEditing.getLockOtherRow2(nSheetId, place.from);
 					place.to = collaborativeEditing.getLockOtherRow2(nSheetId, place.to);
-					oLockInfo = new Asc.asc_CLockInfo();
+					oLockInfo = new AscCommonExcel.asc_CLockInfo();
 					oLockInfo["sheetId"] = nSheetId;
 					oLockInfo["type"] = c_oAscLockTypeElem.Range;
 					oLockInfo["rangeOrObjectId"] = new Asc.Range(bbox.c1, place.from, bbox.c2, place.from);
@@ -3666,7 +3666,7 @@ UndoRedoRowCol.prototype = {
 		if(false != this.wb.bCollaborativeChanges)
 		{
 			var collaborativeEditing = this.wb.oApi.collaborativeEditing;
-			var oLockInfo = new Asc.asc_CLockInfo();
+			var oLockInfo = new AscCommonExcel.asc_CLockInfo();
 			oLockInfo["sheetId"] = nSheetId;
 			oLockInfo["type"] = c_oAscLockTypeElem.Range;
 			if(this.bRow)

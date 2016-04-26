@@ -74,8 +74,8 @@
 
         "../cell/apiDefines.js",
         "../cell/document/empty-workbook.js",
-		
         "../cell/utils/utils.js",
+		
         "../cell/model/UndoRedo.js",
         "../cell/model/clipboard.js",
         "../cell/model/autofilters.js",

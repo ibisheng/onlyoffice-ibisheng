@@ -31,7 +31,7 @@
 	var asc_search = asc.search;
 	var asc_lastidx = asc.lastIndexOf;
 
-	var asc_HL = asc.HandlersList;
+	var asc_HL = AscCommonExcel.HandlersList;
 	var asc_incDecFonSize = asc.incDecFonSize;
 
 
@@ -790,7 +790,7 @@
 	};
 
 	CellEditor.prototype._parseRangeStr = function ( s ) {
-		var range = asc.g_oRangeCache.getActiveRange( s );
+		var range = AscCommonExcel.g_oRangeCache.getActiveRange( s );
 		return range ? range.clone() : null;
 	};
 

@@ -44,9 +44,9 @@
     var asc_incDecFonSize = asc.incDecFonSize;
     var asc_debug = asc.outputDebugStr;
     var asc_Range = asc.Range;
-    var asc_ActiveRange = asc.ActiveRange;
-    var asc_CMM = asc.asc_CMouseMoveData;
-    var asc_VR = asc.VisibleRange;
+    var asc_ActiveRange = AscCommonExcel.ActiveRange;
+    var asc_CMM = AscCommonExcel.asc_CMouseMoveData;
+    var asc_VR = AscCommonExcel.VisibleRange;
 
     var asc_CCellFlag = asc.asc_CCellFlag;
     var asc_CFont = asc.asc_CFont;
@@ -56,8 +56,7 @@
     var asc_CPageOptions = asc.asc_CPageOptions;
     var asc_CPageSetup = asc.asc_CPageSetup;
     var asc_CPageMargins = asc.asc_CPageMargins;
-    var asc_CPagePrint = asc.CPagePrint;
-    var asc_CSelectionMathInfo = asc.asc_CSelectionMathInfo;
+    var asc_CPagePrint = AscCommonExcel.CPagePrint;
     var asc_CAutoFilterInfo = asc.asc_CAutoFilterInfo;
 
     var c_oTargetType = AscCommonExcel.c_oTargetType;
@@ -76,6 +75,7 @@
     var c_oAscAutoFilterTypes = asc.c_oAscAutoFilterTypes;
     var c_oAscChangeTableStyleInfo = asc.c_oAscChangeTableStyleInfo;
     var c_oAscChangeSelectionFormatTable = asc.c_oAscChangeSelectionFormatTable;
+    var asc_CSelectionMathInfo = AscCommonExcel.asc_CSelectionMathInfo;
 
     /*
      * Constants
@@ -3502,7 +3502,7 @@
             if ( null === this.topLeftFrozenCell ) {
                 isUpdate = true;
             }
-            var pane = this.model.sheetViews[0].pane = new asc.asc_CPane();
+            var pane = this.model.sheetViews[0].pane = new AscCommonExcel.asc_CPane();
             this.topLeftFrozenCell = pane.topLeftFrozenCell = new AscCommon.CellAddress( row, col, 0 );
         }
         this.visibleRange.c1 = col;
@@ -6537,7 +6537,7 @@
                 // Пересчет для входящих ячеек в добавленные строки/столбцы
                 var isIntersection = this._recalcRangeByInsertRowsAndColumns( sheetId, selectRangeRecalc );
                 if ( false === isIntersection ) {
-                    lockInfo = this.collaborativeEditing.getLockInfo( c_oAscLockTypeElem.Range, /*subType*/null, sheetId, new asc.asc_CCollaborativeRange( selectRangeRecalc.c1, selectRangeRecalc.r1, selectRangeRecalc.c2, selectRangeRecalc.r2 ) );
+                    lockInfo = this.collaborativeEditing.getLockInfo( c_oAscLockTypeElem.Range, /*subType*/null, sheetId, new AscCommonExcel.asc_CCollaborativeRange( selectRangeRecalc.c1, selectRangeRecalc.r1, selectRangeRecalc.c2, selectRangeRecalc.r2 ) );
                     isLocked = this.collaborativeEditing.getLockIntersection( lockInfo, c_oAscLockTypes.kLockTypeOther, /*bCheckOnlyLockAll*/false );
                     if ( false !== isLocked ) {
                         // Кто-то сделал lock
@@ -7391,7 +7391,7 @@
         // Пересчет для входящих ячеек в добавленные строки/столбцы
         var isIntersection = this._recalcRangeByInsertRowsAndColumns( sheetId, ar );
         if ( false === isIntersection ) {
-            var lockInfo = this.collaborativeEditing.getLockInfo( c_oAscLockTypeElem.Range, /*subType*/null, sheetId, new asc.asc_CCollaborativeRange( ar.c1, ar.r1, ar.c2, ar.r2 ) );
+            var lockInfo = this.collaborativeEditing.getLockInfo( c_oAscLockTypeElem.Range, /*subType*/null, sheetId, new AscCommonExcel.asc_CCollaborativeRange( ar.c1, ar.r1, ar.c2, ar.r2 ) );
 
             if ( false !== this.collaborativeEditing.getLockIntersection( lockInfo, c_oAscLockTypes.kLockTypeOther, /*bCheckOnlyLockAll*/false ) ) {
                 // Уже ячейку кто-то редактирует
@@ -9252,7 +9252,7 @@
             var range;
             var tablePartRange;
             var activeRange = window["Asc"]["editor"].wb.clipboard.activeRange;
-            var refInsertBinary = Asc.g_oRangeCache.getAscRange( activeRange );
+            var refInsertBinary = AscCommonExcel.g_oRangeCache.getAscRange( activeRange );
             var diffRow;
             var diffCol;
             for ( var aF = 0; aF < aFilters.length; aF++ ) {
@@ -9631,7 +9631,7 @@
         var numFor = 0;
 
         var pasteRange = window["Asc"]["editor"].wb.clipboard.activeRange;
-        var activeCellsPasteFragment = Asc.g_oRangeCache.getAscRange( pasteRange );
+        var activeCellsPasteFragment = AscCommonExcel.g_oRangeCache.getAscRange( pasteRange );
         var rMax = (activeCellsPasteFragment.r2 - activeCellsPasteFragment.r1) + arn.r1 + 1;
         var cMax = (activeCellsPasteFragment.c2 - activeCellsPasteFragment.c1) + arn.c1 + 1;
 
@@ -10062,7 +10062,7 @@
         var subType = c_oAscLockTypeElemSubType.ChangeProperties;
         var ar = this.activeRange;
 
-        var lockInfo = this.collaborativeEditing.getLockInfo( c_oAscLockTypeElem.Range, /*subType*/subType, sheetId, new asc.asc_CCollaborativeRange( ar.c1, ar.r1, ar.c2, ar.r2 ) );
+        var lockInfo = this.collaborativeEditing.getLockInfo( c_oAscLockTypeElem.Range, /*subType*/subType, sheetId, new AscCommonExcel.asc_CCollaborativeRange( ar.c1, ar.r1, ar.c2, ar.r2 ) );
 
         if ( false === this.collaborativeEditing.getCollaborativeEditing() ) {
             // Пользователь редактирует один: не ждем ответа, а сразу продолжаем редактирование
@@ -10155,7 +10155,7 @@
             }
 
             if ( false === isIntersection ) {
-                var lockInfo = this.collaborativeEditing.getLockInfo( c_oAscLockTypeElem.Range, /*subType*/subType, sheetId, new asc.asc_CCollaborativeRange( ar.c1, ar.r1, ar.c2, ar.r2 ) );
+                var lockInfo = this.collaborativeEditing.getLockInfo( c_oAscLockTypeElem.Range, /*subType*/subType, sheetId, new AscCommonExcel.asc_CCollaborativeRange( ar.c1, ar.r1, ar.c2, ar.r2 ) );
 
                 if ( false !== this.collaborativeEditing.getLockIntersection( lockInfo, c_oAscLockTypes.kLockTypeOther, /*bCheckOnlyLockAll*/false ) ) {
                     // Уже ячейку кто-то редактирует
@@ -11048,7 +11048,7 @@
     };
 
     WorksheetView.prototype.findCell = function ( reference ) {
-        var range = asc.g_oRangeCache.getAscRange( reference );
+        var range = AscCommonExcel.g_oRangeCache.getAscRange( reference );
         if ( !range ) {
 
             var _C2H50H_ = this.model.workbook.getDefinesNames( reference, this.model.workbook.getActiveWs().getId() ), sheetName, ref;
@@ -11081,7 +11081,7 @@
                     if ( sheetName[0] == "'" && sheetName[sheetName.length - 1] == "'" ) {
                         sheetName = sheetName.substring( 1, sheetName.length - 1 );
                     }
-                    range = asc.g_oRangeCache.getAscRange( ref );
+                    range = AscCommonExcel.g_oRangeCache.getAscRange( ref );
                     sheetName = this.model.workbook.getWorksheetByName( sheetName );
                 }
                 else if ( _C2H50H_.parsedRef.RefPos.length == 1 && _C2H50H_.parsedRef.outStack.length == 1 ) {
@@ -11800,7 +11800,7 @@
 			var res = false;
 			var worksheet = t.model;
 
-			var activeRange = Asc.g_oRangeCache.getAscRange(addFormatTableOptionsObj.asc_getRange());
+			var activeRange = AscCommonExcel.g_oRangeCache.getAscRange(addFormatTableOptionsObj.asc_getRange());
 			if(activeRange && worksheet.AutoFilter && activeRange.containsRange(worksheet.AutoFilter.Ref) && activeRange.r1 === worksheet.AutoFilter.Ref.r1)
 				res = true;
 				
@@ -13234,7 +13234,7 @@
 	WorksheetView.prototype.af_changeTableRange = function(tableName, range)
     {
 		var t = this;
-		range = Asc.g_oRangeCache.getAscRange(range);
+		range = AscCommonExcel.g_oRangeCache.getAscRange(range);
 		
 		var callback = function (isSuccess) {
 			if ( false === isSuccess ) {

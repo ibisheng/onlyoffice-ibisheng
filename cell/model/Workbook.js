@@ -110,7 +110,7 @@ DependencyGraph.prototype = {
         if ( !bRes ) {
             var nodesSheetArea = this.nodesArea[sheetId];
             if ( null != nodesSheetArea ) {
-                var bbox = Asc.g_oRangeCache.getAscRange( cellId );
+                var bbox = AscCommonExcel.g_oRangeCache.getAscRange( cellId );
                 bRes = nodesSheetArea.get( bbox ).all.length > 0;
             }
         }
@@ -628,7 +628,7 @@ DependencyGraph.prototype = {
 					var sheetId = elem[0];
 					var cellId = elem[1];
 					//нужно обавлять в oSheetRanges даже несушествующие node, чтобы поддержать именении ячеек в SUM(A1:B2)
-					this._getNodeDependenceNodeToRange(sheetId, Asc.g_oRangeCache.getAscRange(cellId), oSheetRanges);
+					this._getNodeDependenceNodeToRange(sheetId, AscCommonExcel.g_oRangeCache.getAscRange(cellId), oSheetRanges);
 					node = this.getNode(sheetId, cellId);
 					if ( node && null == oRes.oWeightMap[node.nodeId] ) {
 						//все node из aElems записываем в master
@@ -1234,7 +1234,7 @@ function Vertex(sheetId, cellId, wb){
 	
 	this.sheetId = sheetId;
 	this.cellId = cellId;
-	this.bbox = Asc.g_oRangeCache.getAscRange(this.cellId);
+	this.bbox = AscCommonExcel.g_oRangeCache.getAscRange(this.cellId);
 	this.isArea = !this.bbox.isOneCell();
 	this.valid = true;
 	this.nodeId = getVertexId(this.sheetId, this.cellId);
@@ -2969,7 +2969,7 @@ Workbook.prototype.DeserializeHistory = function(aChanges, fCallback){
 
 				History.SetSelection(null);
 				History.SetSelectionRedo(null);
-				var oRedoObjectParam = new Asc.RedoObjectParam();
+				var oRedoObjectParam = new AscCommonExcel.RedoObjectParam();
 				History.UndoRedoPrepare(oRedoObjectParam, false);
 				for (var i = 0, length = aUndoRedoElems.length; i < length; ++i)
 				{
@@ -3037,7 +3037,7 @@ Workbook.prototype.DeserializeHistoryNative = function(oRedoObjectParam, data, i
 			History.Create_NewPoint();
 			History.SetSelection(null);
 			History.SetSelectionRedo(null);
-			oRedoObjectParam = new Asc.RedoObjectParam();
+			oRedoObjectParam = new AscCommonExcel.RedoObjectParam();
 			History.UndoRedoPrepare(oRedoObjectParam, false);
 		}
 		
@@ -3427,7 +3427,7 @@ Woorksheet.prototype.initPostOpen = function(handlers){
 	// Sheet Views
 	if (0 === this.sheetViews.length) {
 		// Даже если не было, создадим
-		this.sheetViews.push(new Asc.asc_CSheetViewSettings());
+		this.sheetViews.push(new AscCommonExcel.asc_CSheetViewSettings());
 	}
 
     if (window['IS_NATIVE_EDITOR']) {
@@ -3562,7 +3562,7 @@ Woorksheet.prototype.getTabColor=function(){
 };
 Woorksheet.prototype.setTabColor=function(color){
 	if (!this.sheetPr)
-		this.sheetPr = new Asc.asc_CSheetPr();
+		this.sheetPr = new AscCommonExcel.asc_CSheetPr();
 
 	History.Create_NewPoint();
 	History.Add(AscCommonExcel.g_oUndoRedoWorksheet, AscCH.historyitem_Worksheet_SetTabColor, this.getId(), null,
@@ -4317,7 +4317,7 @@ Woorksheet.prototype.getRange=function(cellAdd1, cellAdd2){
 	return this.getRange3(nRow1, nCol1, nRow2, nCol2);
 };
 Woorksheet.prototype.getRange2=function(sRange){
-	var bbox = Asc.g_oRangeCache.getAscRange(sRange);
+	var bbox = AscCommonExcel.g_oRangeCache.getAscRange(sRange);
 	if(null != bbox)
 		return Range.prototype.createFromBBox(this, bbox);
 	return null;
@@ -4979,7 +4979,7 @@ Woorksheet.prototype._BuildDependencies=function(cellRange){
 					{
 						//todo случай ,если ref число или именованный диапазон
 						var ref = aRefs[k];
-						var range = Asc.g_oRangeCache.getAscRange(ref);
+						var range = AscCommonExcel.g_oRangeCache.getAscRange(ref);
 						if(null != range)
 						{
 							var oNewElem;

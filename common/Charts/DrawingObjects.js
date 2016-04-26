@@ -1438,7 +1438,7 @@ function DrawingObjects() {
                 }
             }
         }
-        return new asc.ActiveRange(cmin, rmin, cmax, rmax, true);
+        return new AscCommonExcel.ActiveRange(cmin, rmin, cmax, rmax, true);
     };
 
     _this.recalculate =  function(all)
