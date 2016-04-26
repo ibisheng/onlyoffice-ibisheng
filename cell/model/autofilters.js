@@ -1157,7 +1157,7 @@
 								
 							filter.moveRef(diff);								
 						}
-						else if(activeRange.c1 > ref.c1 && activeRange.c2 >= ref.c2 && activeRange.c1 < ref.c2 && diff < 0)//parts of after filter
+						else if(activeRange.c1 > ref.c1 && activeRange.c2 >= ref.c2 && activeRange.c1 <= ref.c2 && diff < 0)//parts of after filter
 						{
 							oldFilter = filter.clone(null);
 							diffColId = activeRange.c1 - ref.c2 - 1;
@@ -1169,7 +1169,7 @@
 							
 							filter.changeRef(diffColId);						
 						}
-						else if((activeRange.c1 >= ref.c1 && activeRange.c1 <= ref.c2 && activeRange.c2 <= ref.c2) || (activeRange.c1 > ref.c1 && activeRange.c2 >= ref.c2 && activeRange.c1 < ref.c2 && diff > 0))//inside
+						else if((activeRange.c1 >= ref.c1 && activeRange.c1 <= ref.c2 && activeRange.c2 <= ref.c2) || (activeRange.c1 > ref.c1 && activeRange.c2 >= ref.c2 && activeRange.c1 < ref.c2 && diff > 0) || (activeRange.c1 >= ref.c1 && activeRange.c1 <= ref.c2 && activeRange.c2 > ref.c2 && diff > 0))//inside
 						{
 							oldFilter = filter.clone(null);
 							
