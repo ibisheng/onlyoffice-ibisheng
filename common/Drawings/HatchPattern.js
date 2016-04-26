@@ -1,5 +1,7 @@
 "use strict";
 
+(function(window, undefined){
+
 var global_hatch_data = [
     /* cross */
     0,0,0,0,0,0,0,0,
@@ -749,3 +751,9 @@ function GetHatchBrush(name, r, g, b, a, br, bg, bb, ba)
     global_hatch_brushes[name] = _brush;
     return _brush;
 }
+
+    //--------------------------------------------------------export----------------------------------------------------
+    window['AscCommon'] = window['AscCommon'] || {};
+    window['AscCommon'].global_hatch_names = global_hatch_names;
+    window['AscCommon'].GetHatchBrush = GetHatchBrush;
+})(window);

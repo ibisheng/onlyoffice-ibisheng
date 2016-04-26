@@ -67,6 +67,7 @@
 		"../common/CollaborativeEditingBase.js",
 		"../common/Controls.js",
 		"../common/Overlay.js",
+		"../common/Drawings/HatchPattern.js",
 		
 		"../common/scroll.js",
 		"../common/Scrolls/iscroll.js",
@@ -112,7 +113,6 @@
         "../word/Editor/FontClassification.js",
         "../word/Editor/Spelling.js",
         "../word/Drawing/Graphics.js",
-        "../word/Drawing/HatchPattern.js",
         "../word/Drawing/ShapeDrawer.js",
         "../word/Drawing/DrawingDocument.js",
         "../word/Drawing/GraphicsEvents.js",

@@ -64,6 +64,7 @@
 		"../common/CollaborativeEditingBase.js",
 		"../common/Controls.js",
 		"../common/Overlay.js",
+		"../common/Drawings/HatchPattern.js",
 		
 		"../common/scroll.js",
 
@@ -88,7 +89,6 @@
         "../word/Editor/Common.js",
         "../word/Editor/Sections.js",
         "../word/Editor/History.js",
-        "../word/Drawing/HatchPattern.js",
         "../word/Drawing/Graphics.js",
         "../word/Drawing/ShapeDrawer.js",
         "../slide/Drawing/Transitions.js",

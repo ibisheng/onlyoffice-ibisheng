@@ -976,7 +976,7 @@ CShapeDrawer.prototype =
 
                 var _ctx = (this.Graphics.IsTrack === true) ? this.Graphics.Graphics.m_oContext : this.Graphics.m_oContext;
 
-                var _patt_name = global_hatch_names[_fill.ftype];
+                var _patt_name = AscCommon.global_hatch_names[_fill.ftype];
                 if (undefined == _patt_name)
                     _patt_name = "cross";
 
@@ -986,7 +986,7 @@ CShapeDrawer.prototype =
                 var __fa = (null === this.UniFill.transparent) ? _fc.A : 255;
                 var __ba = (null === this.UniFill.transparent) ? _bc.A : 255;
 
-                var _test_pattern = GetHatchBrush(_patt_name, _fc.R, _fc.G, _fc.B, __fa, _bc.R, _bc.G, _bc.B, __ba);
+                var _test_pattern = AscCommon.GetHatchBrush(_patt_name, _fc.R, _fc.G, _fc.B, __fa, _bc.R, _bc.G, _bc.B, __ba);
                 var patt = _ctx.createPattern(_test_pattern.Canvas, "repeat");
 
                 _ctx.save();
@@ -1372,7 +1372,7 @@ CShapeDrawer.prototype =
                     var _fill = this.UniFill.fill;
                     if (_fill.type == c_oAscFill.FILL_TYPE_PATT)
                     {
-                        var _patt_name = global_hatch_names[_fill.ftype];
+                        var _patt_name = AscCommon.global_hatch_names[_fill.ftype];
                         if (undefined == _patt_name)
                             _patt_name = "cross";
 
@@ -1382,7 +1382,7 @@ CShapeDrawer.prototype =
                         var __fa = (null === this.UniFill.transparent) ? _fc.A : 255;
                         var __ba = (null === this.UniFill.transparent) ? _bc.A : 255;
 
-                        var _pattern = GetHatchBrush(_patt_name, _fc.R, _fc.G, _fc.B, __fa, _bc.R, _bc.G, _bc.B, __ba);
+                        var _pattern = AscCommon.GetHatchBrush(_patt_name, _fc.R, _fc.G, _fc.B, __fa, _bc.R, _bc.G, _bc.B, __ba);
 
                         var _url64 = "";
                         try
