@@ -162,7 +162,6 @@
 		"../../web-apps/vendor/xregexp/xregexp-all-min.js"
 	  ],
       "mobile": [        
-        "../common/browser.js",
         "../common/Native/Wrappers/memory.js",
         "../common/Native/Wrappers/TextMeasurerWrapper.js",
         "../common/Native/Wrappers/DrawingStream.js",
@@ -171,16 +170,18 @@
         "../slide/Native/native.js",
         "../slide/Native/Wrappers/api.js",
         "../slide/Native/Wrappers/HtmlPage.js",
-        "../slide/Native/Wrappers/DrawingDocument.js"
+        "../slide/Native/Wrappers/DrawingDocument.js",
+		"../cell/native/TextDrawer.js"
       ],
       "exclude_mobile": [
-        "../common/browser.js",
         "../word/Drawing/ShapeDrawer.js",
         "../common/Overlay.js",
         "../slide/Drawing/HtmlPage.js",
         "../slide/Drawing/DrawingDocument.js",
         "../common/FontsFreeType/FontFile.js",
-        "../common/FontsFreeType/FontManager.js"
+        "../common/FontsFreeType/FontManager.js",
+        "../common/FontsFreeType/TextMeasurer.js",
+		"../common/Drawings/TextDrawer.js"
       ],
       "dst": "../slide/sdk-all.js",
       "externs": [

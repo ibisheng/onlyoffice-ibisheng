@@ -94,7 +94,7 @@ module.exports = function(grunt) {
 			});		
 			var mobileFiles = packageFile['compile']['sdk']['mobile'];
 			if(mobileFiles){
-				srcFiles = mobileFiles.concat(srcFiles);
+				srcFiles = srcFiles.concat(mobileFiles);
 			}
 			concat_src_with_banner_file = concat_src_with_banner_file.concat(packageFile['compile']['sdk']['mobile_banners']);
 		}
@@ -164,5 +164,5 @@ module.exports = function(grunt) {
 	grunt.registerTask('compile_sdk', ['compile_sdk_init:' + level, 'closure-compiler', 'concat', 'replace', 'clean']);
 	grunt.registerTask('compile_sdk_native', ['compile_sdk_init:' + level, 'closure-compiler:sdk', 'concat', 'replace', 'clean']);
 		
-	grunt.registerTask('default', ['build_all']);
+	grunt.registerTask('default', ['build_webpowerpoint']);
 };

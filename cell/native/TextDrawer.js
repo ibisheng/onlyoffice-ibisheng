@@ -1,5 +1,7 @@
 "use strict";
 
+(function (window, undefined) {
+
 var PATH_DIV_EPSILON = 0.1;
 var UNDERLINE_DIV_EPSILON = 3;
 
@@ -2479,3 +2481,7 @@ function GetRectContentWidth(oContent, dMaxWidth)
     }
     return max_width + 2;
 }
+    //--------------------------------------------------------export----------------------------------------------------
+    window['AscFormat'] = window['AscFormat'] || {};
+    window['AscFormat'].CTextDrawer = CTextDrawer;
+})(window);

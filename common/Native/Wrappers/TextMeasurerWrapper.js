@@ -373,7 +373,7 @@ function GetLoadInfoForMeasurer(info, lStyle)
     }
 
     return {
-        Path        : window.g_font_files[index].Id,
+        Path        : window.AscFonts.g_font_files[index].Id,
         FaceIndex   : faceIndex,
         NeedBold    : bNeedBold,
         NeedItalic  : bNeedItalic,
