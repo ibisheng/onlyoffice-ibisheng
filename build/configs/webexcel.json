@@ -61,6 +61,7 @@
 		
 		"../common/Drawings/Externals.js",
 		"../common/GlobalLoaders.js",
+		"../common/CollaborativeEditingBase.js",
 		
 		"../common/scroll.js",
 		"../cell/view/iscroll.js",
@@ -157,7 +158,6 @@
         "../word/Math/operators.js",
         "../word/Math/accent.js",
         "../word/Math/borderBox.js",
-        "../common/CollaborativeEditingBase.js",
         "../cell/model/DrawingObjects/GlobalCounters.js",
         "../word/apiCommon.js",
         "../cell/apiCommonExport.js",

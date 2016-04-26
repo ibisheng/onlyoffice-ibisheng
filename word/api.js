@@ -799,7 +799,7 @@ asc_docs_api.prototype.get_PropertyThemeColorSchemes = function()
 // Init CoAuthoring
 asc_docs_api.prototype._coAuthoringSetChange = function(change, oColor)
 {
-	var oChange = new CCollaborativeChanges();
+	var oChange = new AscCommon.CCollaborativeChanges();
 	oChange.Set_Data( change );
 	oChange.Set_Color( oColor );
 	CollaborativeEditing.Add_Changes( oChange );

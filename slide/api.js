@@ -134,7 +134,7 @@ asc_docs_api.prototype.sendEvent = function() {
 // Init CoAuthoring
 asc_docs_api.prototype._coAuthoringSetChange = function(change, oColor)
 {
-	var oChange = new CCollaborativeChanges();
+	var oChange = new AscCommon.CCollaborativeChanges();
 	oChange.Set_Data( change );
 	oChange.Set_Color( oColor );
 	CollaborativeEditing.Add_Changes( oChange );
@@ -344,7 +344,7 @@ asc_docs_api.prototype._coAuthoringInitEnd = function() {
   };
   this.CoAuthoringApi.onSaveChanges = function(e, userId, bFirstLoad) {
     // bSendEvent = false - это означает, что мы загружаем имеющиеся изменения при открытии
-    var Changes = new CCollaborativeChanges();
+    var Changes = new AscCommon.CCollaborativeChanges();
     Changes.Set_Data(e);
     CollaborativeEditing.Add_Changes(Changes);
 
@@ -4843,7 +4843,7 @@ window["asc_docs_api"].prototype["asc_nativeApplyChanges"] = function(changes)
     var _len = changes.length;
 	for (var i = 0; i < _len; i++)
 	{
-	    var Changes = new CCollaborativeChanges();
+	    var Changes = new AscCommon.CCollaborativeChanges();
         Changes.Set_Data( changes[i]);
 	    CollaborativeEditing.Add_Changes( Changes );
 	}

@@ -1,10 +1,6 @@
 "use strict";
 
-/**
- * User: Ilja.Kirillov
- * Date: 25.07.12
- * Time: 12:01
- */
+(function(window, undefined){
 
 // Import
 var g_memory = AscFonts.g_memory;
@@ -847,3 +843,11 @@ CDocumentPositionsManager.prototype.Remove_DocumentPosition = function(DocPos)
         }
     }
 };
+
+    //--------------------------------------------------------export----------------------------------------------------
+    window['AscCommon'] = window['AscCommon'] || {};
+    window['AscCommon'].FOREIGN_CURSOR_LABEL_HIDETIME = FOREIGN_CURSOR_LABEL_HIDETIME;
+    window['AscCommon'].CCollaborativeChanges = CCollaborativeChanges;
+    window['AscCommon'].CCollaborativeEditingBase = CCollaborativeEditingBase;
+    window['AscCommon'].CDocumentPositionsManager = CDocumentPositionsManager;
+})(window);

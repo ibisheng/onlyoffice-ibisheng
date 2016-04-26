@@ -9,21 +9,21 @@
 /**
  *
  * @constructor
- * @extends {CCollaborativeEditingBase}
+ * @extends {AscCommon.CCollaborativeEditingBase}
  */
 function CWordCollaborativeEditing()
 {
     CWordCollaborativeEditing.superclass.constructor.call(this);
 
     this.m_oLogicDocument        = null;
-    this.m_aDocumentPositions    = new CDocumentPositionsManager();
-    this.m_aForeignCursorsPos    = new CDocumentPositionsManager();
+    this.m_aDocumentPositions    = new AscCommon.CDocumentPositionsManager();
+    this.m_aForeignCursorsPos    = new AscCommon.CDocumentPositionsManager();
     this.m_aForeignCursors       = {};
     this.m_aForeignCursorsXY     = {};
     this.m_aForeignCursorsToShow = {};
 }
 
-AscCommon.extendClass(CWordCollaborativeEditing, CCollaborativeEditingBase);
+AscCommon.extendClass(CWordCollaborativeEditing, AscCommon.CCollaborativeEditingBase);
 
 CWordCollaborativeEditing.prototype.Send_Changes = function(IsUserSave, AdditionalInfo, IsUpdateInterface)
 {
@@ -64,7 +64,7 @@ CWordCollaborativeEditing.prototype.Send_Changes = function(IsUserSave, Addition
         for (var Index = 0; Index < Point.Items.length; Index++)
         {
             var Item = Point.Items[Index];
-            var oChanges = new CCollaborativeChanges();
+            var oChanges = new AscCommon.CCollaborativeChanges();
             oChanges.Set_FromUndoRedo(Item.Class, Item.Data, Item.Binary);
             aChanges.push(oChanges.m_pData);
         }
@@ -448,7 +448,7 @@ CWordCollaborativeEditing.prototype.Show_ForeignCursorLabel = function(UserId)
     {
         Cursor.ShowId = null;
         Api.sync_HideForeignCursorLabel(UserId);
-    }, FOREIGN_CURSOR_LABEL_HIDETIME);
+    }, AscCommon.FOREIGN_CURSOR_LABEL_HIDETIME);
 
     var UserShortId = this.m_aForeignCursorsId[UserId] ? this.m_aForeignCursorsId[UserId] : UserId;
     var Color  = AscCommon.getUserColorById(UserShortId, null, true);

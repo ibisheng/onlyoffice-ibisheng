@@ -15985,7 +15985,7 @@ CDocument.prototype.Update_ForeignCursor = function(CursorInfo, UserId, Show, Us
         return;
     }
 
-    var Changes = new CCollaborativeChanges();
+    var Changes = new AscCommon.CCollaborativeChanges();
     var Reader = Changes.Internal_Load_Data2(CursorInfo, 0, CursorInfo.length);
 
     var RunId    = Reader.GetString2();
