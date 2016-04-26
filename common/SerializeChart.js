@@ -5443,9 +5443,9 @@ BinaryChartReader.prototype.ReadSpPr = function (length) {
 
 BinaryChartReader.prototype.ReadClrOverride = function(lenght)
 {
-    var loader = new BinaryPPTYLoader();
+    var loader = new AscCommon.BinaryPPTYLoader();
 
-    loader.stream = new FileStream();
+    loader.stream = new AscCommon.FileStream();
     loader.stream.obj    = this.stream.obj;
     loader.stream.data   = this.stream.data;
     loader.stream.size   = this.stream.size;

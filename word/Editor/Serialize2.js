@@ -11723,7 +11723,7 @@ function Binary_OtherTableReader(doc, oReadResult, stream)
             for (var i = 0; i < _count; i++)
             {
                 var _at = this.stream.GetUChar();
-                if (_at != g_nodeAttributeStart)
+                if (_at != AscCommon.g_nodeAttributeStart)
                     break;
 
                 var _f_i = {};
@@ -11731,7 +11731,7 @@ function Binary_OtherTableReader(doc, oReadResult, stream)
                 while (true)
                 {
                     _at = this.stream.GetUChar();
-                    if (_at == g_nodeAttributeEnd)
+                    if (_at == AscCommon.g_nodeAttributeEnd)
                         break;
 
                     switch (_at)

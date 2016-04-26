@@ -935,6 +935,171 @@ function isRealObject(obj)
     return obj !== null && typeof obj === "object";
 }
 
+  function FileStream(data, size)
+  {
+    this.obj = null;
+    this.data = data;
+    this.size = size;
+    this.pos = 0;
+    this.cur = 0;
+
+    this.Seek = function(_pos)
+    {
+      if (_pos > this.size)
+        return 1;
+      this.pos = _pos;
+      return 0;
+    }
+    this.Seek2 = function(_cur)
+    {
+      if (_cur > this.size)
+        return 1;
+      this.cur = _cur;
+      return 0;
+    }
+    this.Skip = function(_skip)
+    {
+      if (_skip < 0)
+        return 1;
+      return this.Seek(this.pos + _skip);
+    }
+    this.Skip2 = function(_skip)
+    {
+      if (_skip < 0)
+        return 1;
+      return this.Seek2(this.cur + _skip);
+    }
+
+    // 1 bytes
+    this.GetUChar = function()
+    {
+      if (this.cur >= this.size)
+        return 0;
+      return this.data[this.cur++];
+    }
+    this.GetBool = function()
+    {
+      if (this.cur >= this.size)
+        return 0;
+      return (this.data[this.cur++] == 1) ? true : false;
+    }
+
+    // 2 byte
+    this.GetUShort = function()
+    {
+      if (this.cur + 1 >= this.size)
+        return 0;
+      return (this.data[this.cur++] | this.data[this.cur++] << 8);
+    }
+
+    // 4 byte
+    this.GetULong = function()
+    {
+      if (this.cur + 3 >= this.size)
+        return 0;
+      var r =  (this.data[this.cur++] | this.data[this.cur++] << 8 | this.data[this.cur++] << 16 | this.data[this.cur++] << 24);
+      if (r < 0)
+        r += (0xFFFFFFFF + 1);
+      return r;
+    }
+
+    this.GetLong = function()
+    {
+      if (this.cur + 3 >= this.size)
+        return 0;
+      return (this.data[this.cur++] | this.data[this.cur++] << 8 | this.data[this.cur++] << 16 | this.data[this.cur++] << 24);
+    }
+
+    //String
+    this.GetString = function(len)
+    {
+      len *= 2;
+      if (this.cur + len > this.size)
+        return "";
+      var t = "";
+      for (var i = 0; i < len; i+=2)
+      {
+        var _c = this.data[this.cur + i + 1] << 8 | this.data[this.cur + i];
+        if (_c == 0)
+          break;
+
+        t += String.fromCharCode(_c);
+      }
+      this.cur += len;
+      return t;
+    }
+    this.GetString1 = function(len)
+    {
+      if (this.cur + len > this.size)
+        return "";
+      var t = "";
+      for (var i = 0; i < len; i++)
+      {
+        var _c = this.data[this.cur + i];
+        if (_c == 0)
+          break;
+
+        t += String.fromCharCode(_c);
+      }
+      this.cur += len;
+      return t;
+    }
+    this.GetString2 = function()
+    {
+      var len = this.GetULong();
+      return this.GetString(len);
+    }
+
+    this.GetString2A = function()
+    {
+      var len = this.GetULong();
+      return this.GetString1(len);
+    }
+
+    this.EnterFrame = function(count)
+    {
+      if (this.pos >= this.size || this.size - this.pos < count)
+        return 1;
+
+      this.cur = this.pos;
+      this.pos += count;
+      return 0;
+    }
+
+    this.SkipRecord = function()
+    {
+      var _len = this.GetULong();
+      this.Skip2(_len);
+    }
+
+    this.GetPercentage = function()
+    {
+      var s = this.GetString2();
+      var _len = s.length;
+      if (_len == 0)
+        return null;
+
+      var _ret = null;
+      if ((_len - 1) == s.indexOf("%"))
+      {
+        s.substring(0, _len - 1);
+        _ret = parseFloat(s);
+        if (isNaN(_ret))
+          _ret = null;
+      }
+      else
+      {
+        _ret = parseFloat(s);
+        if (isNaN(_ret))
+          _ret = null;
+        else
+          _ret /= 1000;
+      }
+
+      return _ret;
+    }
+  }
+
   //----------------------------------------------------------export----------------------------------------------------
   window['AscCommon'] = window['AscCommon'] || {};
   window['AscCommon'].c_oSerConstants = c_oSerConstants;
@@ -956,4 +1121,7 @@ function isRealObject(obj)
   window['AscCommon'].g_oCellAddressUtils = g_oCellAddressUtils;
   window['AscCommon'].CellAddress = CellAddress;
   window['AscCommon'].isRealObject = isRealObject;
+  window['AscCommon'].FileStream = FileStream;
+  window['AscCommon'].g_nodeAttributeStart = 0xFA;
+  window['AscCommon'].g_nodeAttributeEnd = 0xFB;
 })(window);

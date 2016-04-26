@@ -144,9 +144,9 @@ asc_CChartBinary.prototype = {
         if(binary)
         {
             var stream = AscFormat.CreateBinaryReader(binary, 0, binary.length);
-            var oBinaryReader = new BinaryPPTYLoader();
+            var oBinaryReader = new AscCommon.BinaryPPTYLoader();
 
-            oBinaryReader.stream = new FileStream();
+            oBinaryReader.stream = new AscCommon.FileStream();
             oBinaryReader.stream.obj    = stream.obj;
             oBinaryReader.stream.data   = stream.data;
             oBinaryReader.stream.size   = stream.size;
@@ -163,9 +163,9 @@ asc_CChartBinary.prototype = {
         if(binary)
         {
             var stream = AscFormat.CreateBinaryReader(binary, 0, binary.length);
-            var oBinaryReader = new BinaryPPTYLoader();
+            var oBinaryReader = new AscCommon.BinaryPPTYLoader();
 
-            oBinaryReader.stream = new FileStream();
+            oBinaryReader.stream = new AscCommon.FileStream();
             oBinaryReader.stream.obj    = stream.obj;
             oBinaryReader.stream.data   = stream.data;
             oBinaryReader.stream.size   = stream.size;

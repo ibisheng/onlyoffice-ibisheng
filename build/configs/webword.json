@@ -61,13 +61,14 @@
 		"../common/Drawings/Externals.js",
 		"../common/GlobalLoaders.js",
 		
+		"../common/Shapes/Serialize.js",
+		
 		"../common/scroll.js",
 		"../common/Scrolls/iscroll.js",
 
         "../common/wordcopypaste.js",
 
         "../word/apiDefines.js",
-        "../common/Shapes/Serialize.js",
         "../common/Shapes/SerializeWriter.js",
         "../word/Drawing/translations.js",
         "../word/Editor/GraphicObjects/Format/ShapePrototype.js",

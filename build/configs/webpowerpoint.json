@@ -58,6 +58,8 @@
 		"../common/Drawings/Externals.js",
 		"../common/GlobalLoaders.js",
 		
+		"../common/Shapes/Serialize.js",
+		
 		"../common/scroll.js",
 
         "../common/wordcopypaste.js",
@@ -88,7 +90,6 @@
         "../slide/Drawing/Transitions.js",
         "../slide/Drawing/DrawingDocument.js",
         "../slide/Drawing/HtmlPage.js",
-        "../common/Shapes/Serialize.js",
         "../common/Shapes/SerializeWriter.js",
         "../word/Editor/SerializeCommon.js",
         "../slide/Editor/Format/Presentation.js",

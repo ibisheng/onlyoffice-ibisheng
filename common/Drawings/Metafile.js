@@ -984,7 +984,7 @@ CMetafile.prototype =
 
         this.Memory.WriteByte(CommandType.ctBrushGradient);
 
-        this.Memory.WriteByte(g_nodeAttributeStart);
+        this.Memory.WriteByte(AscCommon.g_nodeAttributeStart);
 
         if (gradFill.path != null && (gradFill.lin == null || gradFill.lin == undefined))
         {
@@ -1036,7 +1036,7 @@ CMetafile.prototype =
                 this.Memory.WriteByte(transparent);
         }
 
-        this.Memory.WriteByte(g_nodeAttributeEnd);
+        this.Memory.WriteByte(AscCommon.g_nodeAttributeEnd);
     },
 
     transform : function(sx,shy,shx,sy,tx,ty)

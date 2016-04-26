@@ -1,6 +1,10 @@
 "use strict";
 
 // Import
+var c_dScalePPTXSizes = AscCommon.c_dScalePPTXSizes;
+var g_nodeAttributeStart = AscCommon.g_nodeAttributeStart;
+var g_nodeAttributeEnd = AscCommon.g_nodeAttributeEnd;
+
 var c_oAscColor = Asc.c_oAscColor;
 var c_oAscFill = Asc.c_oAscFill;
 

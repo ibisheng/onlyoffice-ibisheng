@@ -3157,7 +3157,7 @@ PasteProcessor.prototype =
 					window.global_pptx_content_loader.Clear();
 
 					var _stream = AscFormat.CreateBinaryReader(base64FromPresentation, 0, base64FromPresentation.length);
-                    var stream = new FileStream(_stream.data, _stream.size);
+                    var stream = new AscCommon.FileStream(_stream.data, _stream.size);
                     var p_url = stream.GetString2();
                     var p_width = stream.GetULong()/100000;
                     var p_height = stream.GetULong()/100000;
@@ -3359,7 +3359,7 @@ PasteProcessor.prototype =
                     window.global_pptx_content_loader.Clear();
 
 					var _stream = AscFormat.CreateBinaryReader(base64, 0, base64.length);
-                    var stream = new FileStream(_stream.data, _stream.size);
+                    var stream = new AscCommon.FileStream(_stream.data, _stream.size);
                     var p_url = stream.GetString2();
                     var p_width = stream.GetULong()/100000;
                     var p_height = stream.GetULong()/100000;
@@ -3477,7 +3477,7 @@ PasteProcessor.prototype =
                         {
 							var arr_layouts_id = [];
                             var arr_slides = [];
-                            var loader = new BinaryPPTYLoader();
+                            var loader = new AscCommon.BinaryPPTYLoader();
                             if(!(bDuplicate === true))
                                 loader.Start_UseFullUrl();
                             loader.stream = stream;
@@ -4489,13 +4489,13 @@ PasteProcessor.prototype =
                     if(oGraphicObj.spPr.Fill && oGraphicObj.spPr.Fill.fill && typeof oGraphicObj.spPr.Fill.fill.RasterImageId === "string" && oGraphicObj.spPr.Fill.fill.RasterImageId.length > 0)
                     {
                         sImageUrl = oGraphicObj.spPr.Fill.fill.RasterImageId;
-                        aPastedImages[aPastedImages.length] = new CBuilderImages(oGraphicObj.spPr.Fill.fill, sImageUrl, null, oGraphicObj.spPr, null);
+                        aPastedImages[aPastedImages.length] = new AscCommon.CBuilderImages(oGraphicObj.spPr.Fill.fill, sImageUrl, null, oGraphicObj.spPr, null);
                         aUrls[aUrls.length] = sImageUrl;
                     }
                     if(oGraphicObj.spPr.ln && oGraphicObj.spPr.ln.Fill && oGraphicObj.spPr.ln.Fill.fill && typeof oGraphicObj.spPr.ln.Fill.fill.RasterImageId === "string" && oGraphicObj.spPr.ln.Fill.fill.RasterImageId.length > 0)
                     {
                         sImageUrl = oGraphicObj.spPr.ln.Fill.fill.RasterImageId;
-                        aPastedImages[aPastedImages.length] = new CBuilderImages(oGraphicObj.spPr.ln.Fill.fill, sImageUrl, null, oGraphicObj.spPr, oGraphicObj.spPr.ln.Fill.fill.RasterImageId);
+                        aPastedImages[aPastedImages.length] = new AscCommon.CBuilderImages(oGraphicObj.spPr.ln.Fill.fill, sImageUrl, null, oGraphicObj.spPr, oGraphicObj.spPr.ln.Fill.fill.RasterImageId);
                         aUrls[aUrls.length] = sImageUrl;
                     }
                 }
@@ -4506,7 +4506,7 @@ PasteProcessor.prototype =
                         sImageUrl = oGraphicObj.getImageUrl();
                         if(typeof sImageUrl === "string" && sImageUrl.length > 0)
                         {
-                            aPastedImages[aPastedImages.length] = new CBuilderImages(oGraphicObj.blipFill, sImageUrl, oGraphicObj, null, null);
+                            aPastedImages[aPastedImages.length] = new AscCommon.CBuilderImages(oGraphicObj.blipFill, sImageUrl, oGraphicObj, null, null);
                             aUrls[aUrls.length] = sImageUrl;
                         }
                         break;
@@ -4571,7 +4571,7 @@ PasteProcessor.prototype =
 	
     ReadPresentationText: function(stream)
     {
-        var loader = new BinaryPPTYLoader();
+        var loader = new AscCommon.BinaryPPTYLoader();
         loader.Start_UseFullUrl();
         loader.stream = stream;
         loader.presentation = editor.WordControl.m_oLogicDocument;
@@ -4606,7 +4606,7 @@ PasteProcessor.prototype =
 
     ReadPresentationShapes: function(stream)
     {
-        var loader = new BinaryPPTYLoader();
+        var loader = new AscCommon.BinaryPPTYLoader();
         loader.Start_UseFullUrl();
 		
 		window.global_pptx_content_loader.Reader.Start_UseFullUrl();
@@ -4687,7 +4687,7 @@ PasteProcessor.prototype =
 
     ReadPresentationSlides: function(stream)
     {
-        var loader = new BinaryPPTYLoader();
+        var loader = new AscCommon.BinaryPPTYLoader();
         loader.Start_UseFullUrl();
         loader.stream = stream;
         loader.presentation = editor.WordControl.m_oLogicDocument;
@@ -4707,7 +4707,7 @@ PasteProcessor.prototype =
 
     ReadSlide: function(stream)
     {
-        var loader = new BinaryPPTYLoader();
+        var loader = new AscCommon.BinaryPPTYLoader();
         loader.Start_UseFullUrl();
         loader.stream = stream;
         loader.presentation = editor.WordControl.m_oLogicDocument;

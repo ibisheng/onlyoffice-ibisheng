@@ -6767,7 +6767,7 @@
                 for (var i = 0; i < _count; i++)
                 {
                     var _at = this.stream.GetUChar();
-                    if (_at != g_nodeAttributeStart)
+                    if (_at != AscCommon.g_nodeAttributeStart)
                         break;
 
                     var _f_i = {};
@@ -6775,7 +6775,7 @@
                     while (true)
                     {
                         _at = this.stream.GetUChar();
-                        if (_at == g_nodeAttributeEnd)
+                        if (_at == AscCommon.g_nodeAttributeEnd)
                             break;
 
                         switch (_at)

@@ -1761,7 +1761,7 @@
 				window.global_pptx_content_loader.Clear();
 
 				var _stream = AscFormat.CreateBinaryReader(base64, 0, base64.length);
-				var stream = new FileStream(_stream.data, _stream.size);
+				var stream = new AscCommon.FileStream(_stream.data, _stream.size);
 				var p_url = stream.GetString2();
 				var p_width = stream.GetULong()/100000;
 				var p_height = stream.GetULong()/100000;
@@ -1890,7 +1890,7 @@
 			{
 				History.TurnOff();
 				
-				var loader = new BinaryPPTYLoader();
+				var loader = new AscCommon.BinaryPPTYLoader();
 				loader.presentation = worksheet.model;
 				loader.Start_UseFullUrl();
 				loader.stream = stream;
@@ -1945,7 +1945,7 @@
 			{
 				History.TurnOff();
 				
-				var loader = new BinaryPPTYLoader();
+				var loader = new AscCommon.BinaryPPTYLoader();
 				loader.Start_UseFullUrl();
 				loader.stream = stream;
 				loader.presentation = worksheet.model;
@@ -3867,7 +3867,7 @@
 					return;
 				
 				var sImageUrl = oGraphicObj.blipFill.RasterImageId;
-				aResult._aPastedImages[aResult._aPastedImages.length] = new CBuilderImages(oGraphicObj.blipFill, sImageUrl, oGraphicObj, oGraphicObj.spPr, null);
+				aResult._aPastedImages[aResult._aPastedImages.length] = new AscCommon.CBuilderImages(oGraphicObj.blipFill, sImageUrl, oGraphicObj, oGraphicObj.spPr, null);
 				aResult._images[aResult._images.length] = sImageUrl;
 			},
 			

@@ -105,7 +105,7 @@ function CThemeLoader()
         var g_th = window["g_theme" + (oThis.CurrentLoadThemeIndex + 1)];
         if (g_th !== undefined)
         {
-            var _loader = new BinaryPPTYLoader();
+            var _loader = new AscCommon.BinaryPPTYLoader();
             _loader.Api = oThis.Api;
             _loader.IsThemeLoader = true;
 
