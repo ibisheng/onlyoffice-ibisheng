@@ -459,7 +459,7 @@ var editor;
   spreadsheet_api.prototype.asc_LoadEmptyDocument = function() {
     this.CoAuthoringApi.auth(this.getViewMode());
 
-    var emptyWorkbook = getEmptyWorkbook() + "";
+    var emptyWorkbook = AscCommonExcel.getEmptyWorkbook() + "";
     if (emptyWorkbook.length && (Asc.c_oSerFormat.Signature === emptyWorkbook.substring(0, Asc.c_oSerFormat.Signature.length))) {
       this.isChartEditor = true;
       this._startOpenDocument(emptyWorkbook);
