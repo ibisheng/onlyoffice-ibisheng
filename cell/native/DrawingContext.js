@@ -29,7 +29,7 @@
                 tintExcel = color.tint;
             var tintPresentation = 0;
             var basecolor = g_oColorManager.getThemeColor(color.theme);
-            var oThemeColorTint = g_oThemeColorsDefaultModsSpreadsheet[GetDefaultColorModsIndex(basecolor.getR(), basecolor.getG(), basecolor.getB())];
+            var oThemeColorTint = g_oThemeColorsDefaultModsSpreadsheet[AscCommon.GetDefaultColorModsIndex(basecolor.getR(), basecolor.getG(), basecolor.getB())];
             if(null != oThemeColorTint)
             {
                 for(var i = 0 , length = oThemeColorTint.length; i < length; ++i)

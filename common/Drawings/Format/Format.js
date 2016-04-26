@@ -558,22 +558,6 @@ function CColorMod()
     this.val = 0;
 }
 
-function _create_mod(default_obj)
-{
-	var ret = new CColorMod();
-	ret.name = default_obj["name"];
-	ret.val = default_obj["val"];
-	return ret;
-}
-
-function _create_mods(arr_defaults)
-{
-	var ret = [];
-	for (var i = 0; i < arr_defaults.length; i++)
-		ret.push(_create_mod(arr_defaults[i]));
-	return ret;
-}
-
 CColorMod.prototype =
 {
     getObjectType: function()
@@ -11284,9 +11268,9 @@ function CorrectUniFill(asc_fill, unifill, editorId)
 
                 var _url = _fill.url;
                 var _tx_id = _fill.texture_id;
-                if (null != _tx_id && (0 <= _tx_id) && (_tx_id < g_oUserTexturePresets.length))
+                if (null != _tx_id && (0 <= _tx_id) && (_tx_id < AscCommon.g_oUserTexturePresets.length))
                 {
-                    _url = g_oUserTexturePresets[_tx_id];
+                    _url = AscCommon.g_oUserTexturePresets[_tx_id];
                 }
 
 
@@ -11815,7 +11799,7 @@ function CorrectUniColor(asc_color, unicolor, flag)
             {
                 var _map = editor.WordControl.m_oDrawingDocument.GuiControlColorsMap;
                 _flag = isRealNumber(flag) ? flag : 1;
-                __mods = GetDefaultMods(_map[_id].r, _map[_id].g, _map[_id].b, _pos, _flag);
+                __mods = AscCommon.GetDefaultMods(_map[_id].r, _map[_id].g, _map[_id].b, _pos, _flag);
             }
             else
             {
@@ -11833,15 +11817,14 @@ function CorrectUniColor(asc_color, unicolor, flag)
                         var _rgba = {R:0, G:0, B:0, A:255};
                         _schemeClr.Calculate(_theme, _clrMap.color_map, _rgba);
                         _flag = isRealNumber(flag) ? flag : 0;
-                        __mods = GetDefaultMods(_schemeClr.RGBA.R, _schemeClr.RGBA.G, _schemeClr.RGBA.B, _pos, _flag);
+                        __mods = AscCommon.GetDefaultMods(_schemeClr.RGBA.R, _schemeClr.RGBA.G, _schemeClr.RGBA.B, _pos, _flag);
                     }
                 }
             }
 
             if (null != __mods)
             {
-                for (var modInd = 0; modInd < __mods.length; modInd++)
-                    ret.Mods.Mods[modInd] = _create_mod(__mods[modInd]);
+                ret.Mods.Mods = __mods;
             }
 
             break;
@@ -11884,7 +11867,6 @@ function CorrectUniColor(asc_color, unicolor, flag)
     window['AscFormat'].ExecuteNoHistory = ExecuteNoHistory;
     window['AscFormat'].checkTableCellPr = checkTableCellPr;
     window['AscFormat'].CColorMod = CColorMod;
-    window['AscFormat']._create_mods = _create_mods;
     window['AscFormat'].CColorModifiers = CColorModifiers;
     window['AscFormat'].CSysColor = CSysColor;
     window['AscFormat'].CPrstColor = CPrstColor;

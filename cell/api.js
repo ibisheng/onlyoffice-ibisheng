@@ -160,11 +160,12 @@ var editor;
   spreadsheet_api.prototype.asc_SendControlColors = function() {
     var standart_colors = null;
     if (!this.IsSendStandartColors) {
-      var _c_s = g_oStandartColors.length;
+      var standartColors = AscCommon.g_oStandartColors;
+      var _c_s = standartColors.length;
       standart_colors = new Array(_c_s);
 
       for (var i = 0; i < _c_s; ++i) {
-        standart_colors[i] = new CColor(g_oStandartColors[i]["R"], g_oStandartColors[i]["G"], g_oStandartColors[i]["B"]);
+        standart_colors[i] = new CColor(standartColors[i].R, standartColors[i].G, standartColors[i].B);
       }
 
       this.IsSendStandartColors = true;
@@ -177,7 +178,7 @@ var editor;
 
     for (var i = 0; i < _count; ++i) {
       var basecolor = g_oColorManager.getThemeColor(i);
-      var aTints = g_oThemeColorsDefaultModsSpreadsheet[GetDefaultColorModsIndex(basecolor.getR(), basecolor.getG(), basecolor.getB())];
+      var aTints = g_oThemeColorsDefaultModsSpreadsheet[AscCommon.GetDefaultColorModsIndex(basecolor.getR(), basecolor.getG(), basecolor.getB())];
       for (var j = 0, length = aTints.length; j < length; ++j) {
         var tint = aTints[j];
         var color = g_oColorManager.getThemeColor(i, tint);
@@ -196,47 +197,48 @@ var editor;
     var _c = null;
 
     // user scheme
-    var _count_defaults = g_oUserColorScheme.length;
+    var oColorScheme = AscCommon.g_oUserColorScheme;
+    var _count_defaults = oColorScheme.length;
     for (var i = 0; i < _count_defaults; ++i) {
-      var _obj = g_oUserColorScheme[i];
+      var _obj = oColorScheme[i];
       infos[_index] = new AscCommon.CAscColorScheme();
-      infos[_index].Name = _obj["name"];
+      infos[_index].Name = _obj.name;
 
-      _c = _obj["dk1"];
-      infos[_index].Colors[0] = new CColor(_c["R"], _c["G"], _c["B"]);
+      _c = _obj.dk1;
+      infos[_index].Colors[0] = new CColor(_c.R, _c.G, _c.B);
 
-      _c = _obj["lt1"];
-      infos[_index].Colors[1] = new CColor(_c["R"], _c["G"], _c["B"]);
+      _c = _obj.lt1;
+      infos[_index].Colors[1] = new CColor(_c.R, _c.G, _c.B);
 
-      _c = _obj["dk2"];
-      infos[_index].Colors[2] = new CColor(_c["R"], _c["G"], _c["B"]);
+      _c = _obj.dk2;
+      infos[_index].Colors[2] = new CColor(_c.R, _c.G, _c.B);
 
-      _c = _obj["lt2"];
-      infos[_index].Colors[3] = new CColor(_c["R"], _c["G"], _c["B"]);
+      _c = _obj.lt2;
+      infos[_index].Colors[3] = new CColor(_c.R, _c.G, _c.B);
 
-      _c = _obj["accent1"];
-      infos[_index].Colors[4] = new CColor(_c["R"], _c["G"], _c["B"]);
+      _c = _obj.accent1;
+      infos[_index].Colors[4] = new CColor(_c.R, _c.G, _c.B);
 
-      _c = _obj["accent2"];
-      infos[_index].Colors[5] = new CColor(_c["R"], _c["G"], _c["B"]);
+      _c = _obj.accent2;
+      infos[_index].Colors[5] = new CColor(_c.R, _c.G, _c.B);
 
-      _c = _obj["accent3"];
-      infos[_index].Colors[6] = new CColor(_c["R"], _c["G"], _c["B"]);
+      _c = _obj.accent3;
+      infos[_index].Colors[6] = new CColor(_c.R, _c.G, _c.B);
 
-      _c = _obj["accent4"];
-      infos[_index].Colors[7] = new CColor(_c["R"], _c["G"], _c["B"]);
+      _c = _obj.accent4;
+      infos[_index].Colors[7] = new CColor(_c.R, _c.G, _c.B);
 
-      _c = _obj["accent5"];
-      infos[_index].Colors[8] = new CColor(_c["R"], _c["G"], _c["B"]);
+      _c = _obj.accent5;
+      infos[_index].Colors[8] = new CColor(_c.R, _c.G, _c.B);
 
-      _c = _obj["accent6"];
-      infos[_index].Colors[9] = new CColor(_c["R"], _c["G"], _c["B"]);
+      _c = _obj.accent6;
+      infos[_index].Colors[9] = new CColor(_c.R, _c.G, _c.B);
 
-      _c = _obj["hlink"];
-      infos[_index].Colors[10] = new CColor(_c["R"], _c["G"], _c["B"]);
+      _c = _obj.hlink;
+      infos[_index].Colors[10] = new CColor(_c.R, _c.G, _c.B);
 
-      _c = _obj["folHlink"];
-      infos[_index].Colors[11] = new CColor(_c["R"], _c["G"], _c["B"]);
+      _c = _obj.folHlink;
+      infos[_index].Colors[11] = new CColor(_c.R, _c.G, _c.B);
 
       ++_index;
     }
@@ -1019,17 +1021,17 @@ var editor;
       this.handlers.trigger("asc_onSendThemeColorSchemes", this._gui_color_schemes);
       this._gui_color_schemes = null;
     } else if ("asc_onInitEditorShapes" === name) {
-      this.handlers.trigger("asc_onInitEditorShapes", g_oAutoShapesGroups, g_oAutoShapesTypes);
+      this.handlers.trigger("asc_onInitEditorShapes", AscCommon.g_oAutoShapesGroups, AscCommon.g_oAutoShapesTypes);
     } else if ("asc_onInitEditorTextArts" === name) {
-      this.handlers.trigger("asc_onInitEditorTextArts", [g_oPresetTxWarpGroups, g_PresetTxWarpTypes]);
+      this.handlers.trigger("asc_onInitEditorTextArts", [AscCommon.g_oPresetTxWarpGroups, AscCommon.g_PresetTxWarpTypes]);
     } else if ("asc_onInitStandartTextures" === name) {
-      var _count = g_oUserTexturePresets.length;
+      var _count = AscCommon.g_oUserTexturePresets.length;
       var arr = new Array(_count);
       for (var i = 0; i < _count; ++i) {
         arr[i] = new AscCommon.asc_CTexture();
         arr[i].Id = i;
-        arr[i].Image = g_oUserTexturePresets[i];
-        this.ImageLoader.LoadImage(g_oUserTexturePresets[i], 1);
+        arr[i].Image = AscCommon.g_oUserTexturePresets[i];
+        this.ImageLoader.LoadImage(AscCommon.g_oUserTexturePresets[i], 1);
       }
 
       this.handlers.trigger("asc_onInitStandartTextures", arr);
@@ -2942,48 +2944,49 @@ var editor;
         var theme = t.wbModel.theme;
 
         var oldClrScheme = theme.themeElements.clrScheme;
-        var _count_defaults = g_oUserColorScheme.length;
+        var oColorScheme = AscCommon.g_oUserColorScheme;
+        var _count_defaults = oColorScheme.length;
         if (index_scheme < _count_defaults) {
-          var _obj = g_oUserColorScheme[index_scheme];
+          var _obj = oColorScheme[index_scheme];
           var scheme = new AscFormat.ClrScheme();
-          scheme.name = _obj["name"];
+          scheme.name = _obj.name;
           var _c;
 
-          _c = _obj["dk1"];
-          scheme.colors[8] = AscFormat.CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
+          _c = _obj.dk1;
+          scheme.colors[8] = AscFormat.CreateUniColorRGB(_c.R, _c.G, _c.B);
 
-          _c = _obj["lt1"];
-          scheme.colors[12] = AscFormat.CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
+          _c = _obj.lt1;
+          scheme.colors[12] = AscFormat.CreateUniColorRGB(_c.R, _c.G, _c.B);
 
-          _c = _obj["dk2"];
-          scheme.colors[9] = AscFormat.CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
+          _c = _obj.dk2;
+          scheme.colors[9] = AscFormat.CreateUniColorRGB(_c.R, _c.G, _c.B);
 
-          _c = _obj["lt2"];
-          scheme.colors[13] = AscFormat.CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
+          _c = _obj.lt2;
+          scheme.colors[13] = AscFormat.CreateUniColorRGB(_c.R, _c.G, _c.B);
 
-          _c = _obj["accent1"];
-          scheme.colors[0] = AscFormat.CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
+          _c = _obj.accent1;
+          scheme.colors[0] = AscFormat.CreateUniColorRGB(_c.R, _c.G, _c.B);
 
-          _c = _obj["accent2"];
-          scheme.colors[1] = AscFormat.CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
+          _c = _obj.accent2;
+          scheme.colors[1] = AscFormat.CreateUniColorRGB(_c.R, _c.G, _c.B);
 
-          _c = _obj["accent3"];
-          scheme.colors[2] = AscFormat.CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
+          _c = _obj.accent3;
+          scheme.colors[2] = AscFormat.CreateUniColorRGB(_c.R, _c.G, _c.B);
 
-          _c = _obj["accent4"];
-          scheme.colors[3] = AscFormat.CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
+          _c = _obj.accent4;
+          scheme.colors[3] = AscFormat.CreateUniColorRGB(_c.R, _c.G, _c.B);
 
-          _c = _obj["accent5"];
-          scheme.colors[4] = AscFormat.CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
+          _c = _obj.accent5;
+          scheme.colors[4] = AscFormat.CreateUniColorRGB(_c.R, _c.G, _c.B);
 
-          _c = _obj["accent6"];
-          scheme.colors[5] = AscFormat.CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
+          _c = _obj.accent6;
+          scheme.colors[5] = AscFormat.CreateUniColorRGB(_c.R, _c.G, _c.B);
 
-          _c = _obj["hlink"];
-          scheme.colors[11] = AscFormat.CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
+          _c = _obj.hlink;
+          scheme.colors[11] = AscFormat.CreateUniColorRGB(_c.R, _c.G, _c.B);
 
-          _c = _obj["folHlink"];
-          scheme.colors[10] = AscFormat.CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
+          _c = _obj.folHlink;
+          scheme.colors[10] = AscFormat.CreateUniColorRGB(_c.R, _c.G, _c.B);
 
           theme.themeElements.clrScheme = scheme;
         } else {

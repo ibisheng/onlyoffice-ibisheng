@@ -813,23 +813,23 @@ asc_docs_api.prototype.get_TextProps = function()
 // тут методы, замены евентов
 asc_docs_api.prototype.get_PropertyEditorShapes = function()
 {
-    var ret = [g_oAutoShapesGroups, g_oAutoShapesTypes];
+    var ret = [AscCommon.g_oAutoShapesGroups, AscCommon.g_oAutoShapesTypes];
     return ret;
 };
 asc_docs_api.prototype.get_PropertyEditorTextArts = function()
 {
-    var ret = [g_oPresetTxWarpGroups, g_PresetTxWarpTypes];
+    var ret = [AscCommon.g_oPresetTxWarpGroups, AscCommon.g_PresetTxWarpTypes];
     return ret;
 };
 asc_docs_api.prototype.get_PropertyStandartTextures = function()
 {
-    var _count = g_oUserTexturePresets.length;
+    var _count = AscCommon.g_oUserTexturePresets.length;
     var arr = new Array(_count);
     for (var i = 0; i < _count; ++i)
     {
         arr[i] = new AscCommon.asc_CTexture();
         arr[i].Id = i;
-        arr[i].Image = g_oUserTexturePresets[i];
+        arr[i].Image = AscCommon.g_oUserTexturePresets[i];
     }
     return arr;
 };
@@ -1742,9 +1742,9 @@ asc_docs_api.prototype.ShapeApply = function(prop)
             image_url = prop.fill.fill.asc_getUrl();
 
             var _tx_id = prop.fill.fill.asc_getTextureId();
-            if (null != _tx_id && 0 <= _tx_id && _tx_id < g_oUserTexturePresets.length)
+            if (null != _tx_id && 0 <= _tx_id && _tx_id < AscCommon.g_oUserTexturePresets.length)
             {
-                image_url = g_oUserTexturePresets[_tx_id];
+                image_url = AscCommon.g_oUserTexturePresets[_tx_id];
             }
         }
     }
@@ -1757,9 +1757,9 @@ asc_docs_api.prototype.ShapeApply = function(prop)
             image_url = oFill.fill.asc_getUrl();
 
             var _tx_id = oFill.fill.asc_getTextureId();
-            if (null != _tx_id && 0 <= _tx_id && _tx_id < g_oUserTexturePresets.length)
+            if (null != _tx_id && 0 <= _tx_id && _tx_id < AscCommon.g_oUserTexturePresets.length)
             {
-                image_url = g_oUserTexturePresets[_tx_id];
+                image_url = AscCommon.g_oUserTexturePresets[_tx_id];
             }
             bShapeTexture = false;
         }
@@ -3112,49 +3112,50 @@ asc_docs_api.prototype.sync_SendThemeColorSchemes = function(param)
 
 asc_docs_api.prototype.ChangeColorScheme = function(index_scheme)
 {
-    var _count_defaults = g_oUserColorScheme.length;
+  var oColorScheme = AscCommon.g_oUserColorScheme;
+    var _count_defaults = oColorScheme.length;
     if (index_scheme < _count_defaults)
     {
-        var _obj = g_oUserColorScheme[index_scheme];
+        var _obj = oColorScheme[index_scheme];
         var scheme = new AscFormat.ClrScheme();
-		scheme.name = _obj["name"];
+		scheme.name = _obj.name;
         var _c = null;
 
-        _c = _obj["dk1"];
-        scheme.colors[8] = AscFormat.CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
+        _c = _obj.dk1;
+        scheme.colors[8] = AscFormat.CreateUniColorRGB(_c.R, _c.G, _c.B);
 
-        _c = _obj["lt1"];
-        scheme.colors[12] = AscFormat.CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
+        _c = _obj.lt1;
+        scheme.colors[12] = AscFormat.CreateUniColorRGB(_c.R, _c.G, _c.B);
 
-        _c = _obj["dk2"];
-        scheme.colors[9] = AscFormat.CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
+        _c = _obj.dk2;
+        scheme.colors[9] = AscFormat.CreateUniColorRGB(_c.R, _c.G, _c.B);
 
-        _c = _obj["lt2"];
-        scheme.colors[13] = AscFormat.CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
+        _c = _obj.lt2;
+        scheme.colors[13] = AscFormat.CreateUniColorRGB(_c.R, _c.G, _c.B);
 
-        _c = _obj["accent1"];
-        scheme.colors[0] = AscFormat.CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
+        _c = _obj.accent1;
+        scheme.colors[0] = AscFormat.CreateUniColorRGB(_c.R, _c.G, _c.B);
 
-        _c = _obj["accent2"];
-        scheme.colors[1] = AscFormat.CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
+        _c = _obj.accent2;
+        scheme.colors[1] = AscFormat.CreateUniColorRGB(_c.R, _c.G, _c.B);
 
-        _c = _obj["accent3"];
-        scheme.colors[2] = AscFormat.CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
+        _c = _obj.accent3;
+        scheme.colors[2] = AscFormat.CreateUniColorRGB(_c.R, _c.G, _c.B);
 
-        _c = _obj["accent4"];
-        scheme.colors[3] = AscFormat.CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
+        _c = _obj.accent4;
+        scheme.colors[3] = AscFormat.CreateUniColorRGB(_c.R, _c.G, _c.B);
 
-        _c = _obj["accent5"];
-        scheme.colors[4] = AscFormat.CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
+        _c = _obj.accent5;
+        scheme.colors[4] = AscFormat.CreateUniColorRGB(_c.R, _c.G, _c.B);
 
-        _c = _obj["accent6"];
-        scheme.colors[5] = AscFormat.CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
+        _c = _obj.accent6;
+        scheme.colors[5] = AscFormat.CreateUniColorRGB(_c.R, _c.G, _c.B);
 
-        _c = _obj["hlink"];
-        scheme.colors[11] = AscFormat.CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
+        _c = _obj.hlink;
+        scheme.colors[11] = AscFormat.CreateUniColorRGB(_c.R, _c.G, _c.B);
 
-        _c = _obj["folHlink"];
-        scheme.colors[10] = AscFormat.CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
+        _c = _obj.folHlink;
+        scheme.colors[10] = AscFormat.CreateUniColorRGB(_c.R, _c.G, _c.B);
 
         this.WordControl.m_oLogicDocument.changeColorScheme(scheme);
     }
@@ -3403,7 +3404,7 @@ asc_docs_api.prototype.asyncFontsDocumentStartLoaded = function()
 			}
         }
 
-        _progress.ImagesCount = _count + g_oUserTexturePresets.length;
+        _progress.ImagesCount = _count + AscCommon.g_oUserTexturePresets.length;
         _progress.CurrentImage = 0;
     }
 };
@@ -3470,9 +3471,9 @@ asc_docs_api.prototype.asyncFontsDocumentEndLoaded = function()
         ++_count;
 
     // add const textures
-    var _st_count = g_oUserTexturePresets.length;
+    var _st_count = AscCommon.g_oUserTexturePresets.length;
     for (var i = 0; i < _st_count; i++)
-        _loader_object.ImageMap[_count + i] = g_oUserTexturePresets[i];
+        _loader_object.ImageMap[_count + i] = AscCommon.g_oUserTexturePresets[i];
 
     if (_count > 0)
     {

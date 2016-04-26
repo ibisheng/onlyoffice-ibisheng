@@ -321,7 +321,7 @@ function CorrectAscColor(asc_color)
 			var _id = (_index / 6) >> 0;
 			var _pos = _index - _id * 6;
 			var basecolor = g_oColorManager.getThemeColor(_id);
-			var aTints = g_oThemeColorsDefaultModsSpreadsheet[GetDefaultColorModsIndex(basecolor.getR(), basecolor.getG(), basecolor.getB())];
+			var aTints = g_oThemeColorsDefaultModsSpreadsheet[AscCommon.GetDefaultColorModsIndex(basecolor.getR(), basecolor.getG(), basecolor.getB())];
 			var tint = aTints[_pos];
 			ret = g_oColorManager.getThemeColor(_id, tint);
 			break;

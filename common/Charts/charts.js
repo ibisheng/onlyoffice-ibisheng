@@ -1003,14 +1003,14 @@ function GenerateWordArtPrewiewCode()
 {
 	var oWordArtPreview = new TextArtPreviewManager();
 	var i, j;
-	var oRetString =  "g_PresetTxWarpTypes = \n ["
+	var oRetString =  "g_PresetTxWarpTypes = \n [";
 	for(i = 0; i < g_PresetTxWarpTypes.length; ++i)
 	{
 		var aByTypes = g_PresetTxWarpTypes[i];
 		oRetString += "\n\t[";
 		for(j = 0; j < aByTypes.length; ++j)
 		{
-			oRetString += "\n\t\t{Type: \"" + aByTypes[j].Type + "\", Image: \"" + oWordArtPreview.getWordArtPreview(aByTypes[j].Type) + "\"}" + ((j === aByTypes.length - 1) ? "" : ",");
+			oRetString += "\n\t\t{Type: \"" + aByTypes[j]['Type'] + "\", Image: \"" + oWordArtPreview.getWordArtPreview(aByTypes[j]['Image']) + "\"}" + ((j === aByTypes.length - 1) ? "" : ",");
 		}
 		oRetString += "\n\t]" + (i < (g_PresetTxWarpTypes.length - 1) ? "," : "");
 	}

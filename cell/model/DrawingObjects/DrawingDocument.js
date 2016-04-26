@@ -3882,12 +3882,13 @@ function CDrawingDocument(drawingObjects)
         var standart_colors = null;
         if (!this.IsSendStandartColors)
         {
-            var _c_s = g_oStandartColors.length;
+            var standartColors = AscCommon.g_oStandartColors;
+            var _c_s = standartColors.length;
             standart_colors = new Array(_c_s);
 
             for (var i = 0; i < _c_s; ++i)
             {
-                standart_colors[i] = new CColor(g_oStandartColors[i]["R"], g_oStandartColors[i]["G"], g_oStandartColors[i]["B"]);
+                standart_colors[i] = new CColor(standartColors[i].R, standartColors[i].G, standartColors[i].B);
             }
 
             this.IsSendStandartColors =  true;
@@ -3910,7 +3911,7 @@ function CDrawingDocument(drawingObjects)
             for (var j = 0; j < _count_mods; ++j)
             {
                 var dst_mods = new AscFormat.CColorModifiers();
-                dst_mods.Mods = AscFormat._create_mods(GetDefaultMods(_color_src.r, _color_src.g, _color_src.b, j + 1, 2));
+                dst_mods.Mods = AscCommon.GetDefaultMods(_color_src.r, _color_src.g, _color_src.b, j + 1, 2);
 				
                 var _rgba = {R:_color_src.r, G: _color_src.g, B:_color_src.b, A: 255};
                 dst_mods.Apply(_rgba);
@@ -3931,48 +3932,49 @@ function CDrawingDocument(drawingObjects)
         var _c = null;
 
         // user scheme
-        var _count_defaults = g_oUserColorScheme.length;
+        var oColorScheme = AscCommon.g_oUserColorScheme;
+        var _count_defaults = oColorScheme.length;
         for (var i = 0; i < _count_defaults; ++i)
         {
-            var _obj = g_oUserColorScheme[i];
+            var _obj = oColorScheme[i];
             infos[_index] = new AscCommon.CAscColorScheme();
-            infos[_index].Name = _obj["name"];
+            infos[_index].Name = _obj.name;
 
-            _c = _obj["dk1"];
-            infos[_index].Colors[0] = new CColor(_c["R"], _c["G"], _c["B"]);
+            _c = _obj.dk1;
+            infos[_index].Colors[0] = new CColor(_c.R, _c.G, _c.B);
 
-            _c = _obj["lt1"];
-            infos[_index].Colors[1] = new CColor(_c["R"], _c["G"], _c["B"]);
+            _c = _obj.lt1;
+            infos[_index].Colors[1] = new CColor(_c.R, _c.G, _c.B);
 
-            _c = _obj["dk2"];
-            infos[_index].Colors[2] = new CColor(_c["R"], _c["G"], _c["B"]);
+            _c = _obj.dk2;
+            infos[_index].Colors[2] = new CColor(_c.R, _c.G, _c.B);
 
-            _c = _obj["lt2"];
-            infos[_index].Colors[3] = new CColor(_c["R"], _c["G"], _c["B"]);
+            _c = _obj.lt2;
+            infos[_index].Colors[3] = new CColor(_c.R, _c.G, _c.B);
 
-            _c = _obj["accent1"];
-            infos[_index].Colors[4] = new CColor(_c["R"], _c["G"], _c["B"]);
+            _c = _obj.accent1;
+            infos[_index].Colors[4] = new CColor(_c.R, _c.G, _c.B);
 
-            _c = _obj["accent2"];
-            infos[_index].Colors[5] = new CColor(_c["R"], _c["G"], _c["B"]);
+            _c = _obj.accent2;
+            infos[_index].Colors[5] = new CColor(_c.R, _c.G, _c.B);
 
-            _c = _obj["accent3"];
-            infos[_index].Colors[6] = new CColor(_c["R"], _c["G"], _c["B"]);
+            _c = _obj.accent3;
+            infos[_index].Colors[6] = new CColor(_c.R, _c.G, _c.B);
 
-            _c = _obj["accent4"];
-            infos[_index].Colors[7] = new CColor(_c["R"], _c["G"], _c["B"]);
+            _c = _obj.accent4;
+            infos[_index].Colors[7] = new CColor(_c.R, _c.G, _c.B);
 
-            _c = _obj["accent5"];
-            infos[_index].Colors[8] = new CColor(_c["R"], _c["G"], _c["B"]);
+            _c = _obj.accent5;
+            infos[_index].Colors[8] = new CColor(_c.R, _c.G, _c.B);
 
-            _c = _obj["accent6"];
-            infos[_index].Colors[9] = new CColor(_c["R"], _c["G"], _c["B"]);
+            _c = _obj.accent6;
+            infos[_index].Colors[9] = new CColor(_c.R, _c.G, _c.B);
 
-            _c = _obj["hlink"];
-            infos[_index].Colors[10] = new CColor(_c["R"], _c["G"], _c["B"]);
+            _c = _obj.hlink;
+            infos[_index].Colors[10] = new CColor(_c.R, _c.G, _c.B);
 
-            _c = _obj["folHlink"];
-            infos[_index].Colors[11] = new CColor(_c["R"], _c["G"], _c["B"]);
+            _c = _obj.folHlink;
+            infos[_index].Colors[11] = new CColor(_c.R, _c.G, _c.B);
 
             ++_index;
         }
