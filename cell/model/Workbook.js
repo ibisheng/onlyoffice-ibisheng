@@ -5464,7 +5464,10 @@ Cell.prototype.setValue=function(val,callback, isCopyPaste){
                 oldFP = this.formulaParsed;
 			var cellId = g_oCellAddressUtils.getCellId(this.nRow, this.nCol);
             this.formulaParsed = new parserFormula(val.substring(1),cellId,this.ws);
-			if( !this.formulaParsed.parse( gFormulaLocaleParse, gFormulaLocaleDigetSep ) ){
+			
+			var formulaLocaleParse = isCopyPaste === true ? false : gFormulaLocaleParse;
+			var formulaLocaleDigetSep = isCopyPaste === true ? false : gFormulaLocaleDigetSep;
+			if( !this.formulaParsed.parse( gFormulaLocaleParse, formulaLocaleDigetSep ) ){
 				switch( this.formulaParsed.error[this.formulaParsed.error.length-1] ){
 					case c_oAscError.ID.FrmlWrongFunctionName:
 						break;
