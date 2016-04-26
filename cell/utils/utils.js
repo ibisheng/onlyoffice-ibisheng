@@ -744,7 +744,7 @@
 
 				    if (1 == type) {
 				        if (null == oCacheVal.ascRange) {
-				            var oAscRange = new Asc.Range(c1, r1, c2, r2);
+				            var oAscRange = new Range(c1, r1, c2, r2);
 				            oAscRange.r1Abs = oCacheVal.first.getRowAbs();
 				            oAscRange.c1Abs = oCacheVal.first.getColAbs();
 				            oAscRange.r2Abs = oCacheVal.last.getRowAbs();
@@ -755,7 +755,7 @@
 				    }
 				    else if (2 == type) {
 				        if (null == oCacheVal.activeRange) {
-				            var oActiveRange = new Asc.ActiveRange(c1, r1, c2, r2);
+				            var oActiveRange = new ActiveRange(c1, r1, c2, r2);
 				            oActiveRange.r1Abs = oCacheVal.first.getRowAbs();
 				            oActiveRange.c1Abs = oCacheVal.first.getColAbs();
 				            oActiveRange.r2Abs = oCacheVal.last.getRowAbs();
@@ -778,7 +778,7 @@
 				    }
 				    else {
 				        if (null == oCacheVal.formulaRange) {
-				            var oFormulaRange = new Asc.FormulaRange(c1, r1, c2, r2);
+				            var oFormulaRange = new FormulaRange(c1, r1, c2, r2);
 				            oFormulaRange.r1Abs = oCacheVal.first.getRowAbs();
 				            oFormulaRange.c1Abs = oCacheVal.first.getColAbs();
 				            oFormulaRange.r2Abs = oCacheVal.last.getRowAbs();
