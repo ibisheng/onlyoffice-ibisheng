@@ -4918,14 +4918,14 @@ window["asc_docs_api"].prototype["asc_nativeApplyChanges2"] = function(data, isF
 
 window["asc_docs_api"].prototype["asc_nativeGetFile"] = function()
 {
-	var writer = new CBinaryFileWriter();
+	var writer = new AscCommon.CBinaryFileWriter();
     this.WordControl.m_oLogicDocument.CalculateComments();
     return writer.WriteDocument(this.WordControl.m_oLogicDocument);
 }
 
 window["asc_docs_api"].prototype["asc_nativeGetFileData"] = function()
 {
-    var writer = new CBinaryFileWriter();
+    var writer = new AscCommon.CBinaryFileWriter();
     this.WordControl.m_oLogicDocument.CalculateComments();
     writer.WriteDocument2(this.WordControl.m_oLogicDocument);
 

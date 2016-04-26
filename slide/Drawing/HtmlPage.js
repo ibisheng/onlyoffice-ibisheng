@@ -3635,7 +3635,7 @@ function CEditorPage(api)
 
     this.SaveDocument = function()
     {
-        var writer = new CBinaryFileWriter();
+        var writer = new AscCommon.CBinaryFileWriter();
         this.m_oLogicDocument.CalculateComments();
         var str = writer.WriteDocument(this.m_oLogicDocument);
 		return str;

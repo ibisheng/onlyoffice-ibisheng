@@ -1,5 +1,7 @@
 "use strict";
 
+(function(window, undefined){
+
 // Import
 var c_dScalePPTXSizes = AscCommon.c_dScalePPTXSizes;
 var g_nodeAttributeStart = AscCommon.g_nodeAttributeStart;
@@ -4126,4 +4128,10 @@ function CBinaryFileWriter()
         oThis.WriteRecord2(1, _border.LineRef, oThis.WriteStyleRef);
     }
     // --------------------------------------------------------------------------
-};
+}
+
+    //--------------------------------------------------------export----------------------------------------------------
+    window['AscCommon'] = window['AscCommon'] || {};
+    window['AscCommon'].GUID = GUID;
+    window['AscCommon'].CBinaryFileWriter = CBinaryFileWriter;
+})(window);

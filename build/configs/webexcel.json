@@ -23,6 +23,10 @@
 		"../common/Drawings/Metafile.js",
 		"../common/FontsFreeType/TextMeasurer.js",
 		
+		"../common/Shapes/EditorSettings.js",
+		"../common/Shapes/Serialize.js",
+		"../common/Shapes/SerializeWriter.js",
+		
 		"../common/Drawings/Hit.js",
 		"../common/Drawings/ArcTo.js",
 		"../common/Drawings/ColorArray.js",
@@ -57,9 +61,6 @@
 		
 		"../common/Drawings/Externals.js",
 		"../common/GlobalLoaders.js",
-		
-		"../common/Shapes/EditorSettings.js",
-		"../common/Shapes/Serialize.js",
 		
 		"../common/scroll.js",
 		"../cell/view/iscroll.js",
@@ -106,7 +107,6 @@
         "../cell/view/EventsController.js",
         "../cell/view/WorkbookView.js",
         "../word/Editor/SerializeCommon.js",
-        "../common/Shapes/SerializeWriter.js",
         "../cell/view/DrawingObjectsController.js",
         "../cell/model/DrawingObjects/Graphics.js",
         "../common/Overlay.js",

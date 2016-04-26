@@ -600,7 +600,7 @@ function CopyProcessor(api, onlyBinaryCopy)
 	this.onlyBinaryCopy = onlyBinaryCopy;
 	
 	this.oBinaryFileWriter = new BinaryFileWriter(this.oDocument);
-	this.oPresentationWriter = new CBinaryFileWriter();
+	this.oPresentationWriter = new AscCommon.CBinaryFileWriter();
     this.oPresentationWriter.Start_UseFullUrl();
     if (this.api.ThemeLoader) {
         this.oPresentationWriter.Start_UseDocumentOrigin(this.api.ThemeLoader.ThemesUrlAbs);
@@ -1967,7 +1967,7 @@ CopyProcessor.prototype =
         {
             if(presentation.TableStylesIdMap.hasOwnProperty(key))
             {
-                this.oPresentationWriter.tableStylesGuides[key] = "{" + GUID() + "}"
+                this.oPresentationWriter.tableStylesGuides[key] = "{" + AscCommon.GUID() + "}"
             }
         }
 

@@ -26,6 +26,10 @@
 		"../common/Drawings/Metafile.js",
 		"../common/FontsFreeType/TextMeasurer.js",
 		
+		"../common/Shapes/EditorSettings.js",
+		"../common/Shapes/Serialize.js",
+		"../common/Shapes/SerializeWriter.js",
+		
 		"../common/Drawings/Hit.js",
 		"../common/Drawings/ArcTo.js",
 		"../common/Drawings/ColorArray.js",
@@ -61,16 +65,12 @@
 		"../common/Drawings/Externals.js",
 		"../common/GlobalLoaders.js",
 		
-		"../common/Shapes/EditorSettings.js",
-		"../common/Shapes/Serialize.js",
-		
 		"../common/scroll.js",
 		"../common/Scrolls/iscroll.js",
 
         "../common/wordcopypaste.js",
 
         "../word/apiDefines.js",
-        "../common/Shapes/SerializeWriter.js",
         "../word/Drawing/translations.js",
         "../word/Editor/GraphicObjects/Format/ShapePrototype.js",
         "../word/Editor/GraphicObjects/Format/ImagePrototype.js",
