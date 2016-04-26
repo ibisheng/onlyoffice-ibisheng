@@ -5107,7 +5107,10 @@ FilterColumn.prototype.clone = function() {
 FilterColumn.prototype.isHideValue = function(val, isDateTimeFormat, top10Length) {
 	var res = false;
 	if(this.Filters)
-		res = this.Filters.isHideValue(val, isDateTimeFormat);
+	{
+		this.Filters._initLowerCaseValues();
+		res = this.Filters.isHideValue(val.toLowerCase(), isDateTimeFormat);
+	}
 	else if(this.CustomFiltersObj)
 		res = this.CustomFiltersObj.isHideValue(val);
 	else if(this.Top10)
@@ -5173,6 +5176,8 @@ function Filters() {
 	this.Values = {};
 	this.Dates = [];
 	this.Blank = null;
+	
+	this.lowerCaseValues = null;
 }
 Filters.prototype.clone = function() {
 	var i, res = new Filters();
@@ -5212,6 +5217,7 @@ Filters.prototype.init = function(obj) {
 			allFilterOpenElements = false;
 	}
 	this._sortDate();
+	this._initLowerCaseValues();
 
 	return allFilterOpenElements;
 };
@@ -5227,7 +5233,7 @@ Filters.prototype.isHideValue = function(val, isDateTimeFormat) {
 			res = !this.Blank ? true : false;
 		}
 		else		
-			res = !this.Values[val] ? true : false;
+			res = !this.lowerCaseValues[val] ? true : false;
 	}
 	
 	return res;
@@ -5263,6 +5269,16 @@ Filters.prototype.linearSearch = function(val, array) {
 		return i;
 	else
 		return -1;
+};
+Filters.prototype._initLowerCaseValues = function() {
+	if(this.lowerCaseValues === null)
+	{
+		this.lowerCaseValues = {};
+		for(var i in this.Values)
+		{
+			this.lowerCaseValues[i.toLowerCase()] = true;
+		}
+	}
 };
 Filters.prototype._sortDate = function()
 {
