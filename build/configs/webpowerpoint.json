@@ -58,7 +58,7 @@
 		"../common/Drawings/Externals.js",
 		"../common/GlobalLoaders.js",
 		
-		"../common/Shapes/EditorSettings.js"
+		"../common/Shapes/EditorSettings.js",
 		"../common/Shapes/Serialize.js",
 		
 		"../common/scroll.js",
