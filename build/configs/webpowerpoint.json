@@ -200,13 +200,6 @@
       "map": "sdk-all.js.map",
       "log": "../slide/Build/Log"
     },
-    "defines": {
-      "src": [
-        "../common/Shapes/EditorSettings.js",
-        "../slide/themes/Themes.js"
-      ],
-      "dst": "apiDefines.min.js"
-    },
     "source_map": {
       "url": "http://localhost:8080/sdkjs/slide"
     }

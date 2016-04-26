@@ -216,12 +216,6 @@
       "map": "sdk-all.js.map",
       "log": "../cell/Build/Log"
     },
-    "defines": {
-      "src": [
-        "../common/Shapes/EditorSettings.js"
-      ],
-      "dst": "apiDefines.min.js"
-    },
     "source_map": {
       "url": "http://localhost:8080/sdkjs/cell"
     }
