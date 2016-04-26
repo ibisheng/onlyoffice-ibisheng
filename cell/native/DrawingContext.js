@@ -20,7 +20,7 @@
         var g = color.getG();
         var b = color.getB();
         var bTheme = false;
-        if(color instanceof ThemeColor && null != color.theme)
+        if(color instanceof AscCommonExcel.ThemeColor && null != color.theme)
         {
             var array_colors_types = [6, 15, 7, 16, 0, 1, 2, 3, 4, 5];
             var themePresentation = array_colors_types[color.theme];
@@ -28,8 +28,8 @@
             if(null != color.tint)
                 tintExcel = color.tint;
             var tintPresentation = 0;
-            var basecolor = g_oColorManager.getThemeColor(color.theme);
-            var oThemeColorTint = g_oThemeColorsDefaultModsSpreadsheet[AscCommon.GetDefaultColorModsIndex(basecolor.getR(), basecolor.getG(), basecolor.getB())];
+            var basecolor = AscCommonExcel.g_oColorManager.getThemeColor(color.theme);
+            var oThemeColorTint = AscCommonExcel.g_oThemeColorsDefaultModsSpreadsheet[AscCommon.GetDefaultColorModsIndex(basecolor.getR(), basecolor.getG(), basecolor.getB())];
             if(null != oThemeColorTint)
             {
                 for(var i = 0 , length = oThemeColorTint.length; i < length; ++i)
@@ -710,7 +710,7 @@
     };
 
     /**
-     * @param {RgbColor || ThemeColor || AscCommon.CColor} val
+     * @param {AscCommonExcel.RgbColor || AscCommonExcel.ThemeColor || AscCommon.CColor} val
      * @returns {DrawingContext}
      */
     DrawingContext.prototype.setFillStyle = function (val) {
@@ -730,7 +730,7 @@
     };
 
     /**
-     * @param {RgbColor || ThemeColor || AscCommon.CColor} val
+     * @param {AscCommonExcel.RgbColor || AscCommonExcel.ThemeColor || AscCommon.CColor} val
      * @returns {DrawingContext}
      */
     DrawingContext.prototype.setStrokeStyle = function (val) {

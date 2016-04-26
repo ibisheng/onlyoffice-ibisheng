@@ -419,8 +419,8 @@ var UndoRedoDataTypes = new function() {
 	{
 		switch(nType)
 		{
-			case this.ValueMultiTextElem: return new CCellValueMultiText();break;
-			case this.CellValue:return new CCellValue();break;
+			case this.ValueMultiTextElem: return new AscCommonExcel.CCellValueMultiText();break;
+			case this.CellValue:return new AscCommonExcel.CCellValue();break;
 			case this.CellValueData: return new UndoRedoData_CellValueData();break;
 			case this.CellData: return new UndoRedoData_CellData();break;
 			case this.CellSimpleData: return new UndoRedoData_CellSimpleData();break;
@@ -431,15 +431,15 @@ var UndoRedoDataTypes = new function() {
 			case this.ColProp: return new UndoRedoData_ColProp();break;
 			case this.RowProp: return new UndoRedoData_RowProp();break;
 			case this.BBox: return new UndoRedoData_BBox();break;
-			case this.Hyperlink: return new Hyperlink();break;
+			case this.Hyperlink: return new AscCommonExcel.Hyperlink();break;
 			case this.SortData: return new UndoRedoData_SortData();break;
-			case this.StyleFont: return new Font();break;
-			case this.StyleFill: return new Fill();break;
-			case this.StyleNum: return new Num();break;
-			case this.StyleBorder: return new Border();break;
-			case this.StyleBorderProp: return new BorderProp();break;
-			case this.StyleXfs: return new CellXfs();break;
-			case this.StyleAlign: return new Align();break;
+			case this.StyleFont: return new AscCommonExcel.Font();break;
+			case this.StyleFill: return new AscCommonExcel.Fill();break;
+			case this.StyleNum: return new AscCommonExcel.Num();break;
+			case this.StyleBorder: return new AscCommonExcel.Border();break;
+			case this.StyleBorderProp: return new AscCommonExcel.BorderProp();break;
+			case this.StyleXfs: return new AscCommonExcel.CellXfs();break;
+			case this.StyleAlign: return new AscCommonExcel.Align();break;
 			case this.CommentData: return new Asc.asc_CCommentData();break;
 			case this.CompositeCommentData: return new AscCommonExcel.CompositeCommentData();break;
 			case this.ChartSeriesData: return new AscFormat.asc_CChartSeria();break;
@@ -455,8 +455,8 @@ var UndoRedoDataTypes = new function() {
 			case this.AutoFiltersOptionsElements: return new AscCommonExcel.AutoFiltersOptionsElements(); break;
 			case this.AddFormatTableOptions: return new AscCommonExcel.AddFormatTableOptions(); break;
 			case this.SingleProperty: return new UndoRedoData_SingleProperty(); break;
-			case this.RgbColor: return new RgbColor(); break;
-			case this.ThemeColor: return new ThemeColor(); break;
+			case this.RgbColor: return new AscCommonExcel.RgbColor(); break;
+			case this.ThemeColor: return new AscCommonExcel.ThemeColor(); break;
 			case this.SheetViewSettings: return new AscCommonExcel.asc_CSheetViewSettings(); break;
             case this.GraphicObjects: return new UndoRedoDataGraphicObjects();break;
             case this.GlobalTableIdAdd: return new UndoRedoData_GTableIdAdd(); break;
@@ -877,8 +877,8 @@ function UndoRedoData_RowProp(row){
 	if(null != row)
 	{
 		this.h = row.h;
-		this.hd = 0 != (g_nRowFlag_hd & row.flags);
-		this.CustomHeight = 0 != (g_nRowFlag_CustomHeight & row.flags);
+		this.hd = 0 != (AscCommonExcel.g_nRowFlag_hd & row.flags);
+		this.CustomHeight = 0 != (AscCommonExcel.g_nRowFlag_CustomHeight & row.flags);
 	}
 	else
 	{

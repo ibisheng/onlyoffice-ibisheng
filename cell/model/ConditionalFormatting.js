@@ -225,7 +225,7 @@
 		var g = (this.g1 + ((FT_Common.IntToUInt(this.g2 - this.g1) * indexColor) >> this.base_shift)) & 0xFF;
 		var b = (this.b1 + ((FT_Common.IntToUInt(this.b2 - this.b1) * indexColor) >> this.base_shift)) & 0xFF;
 		//console.log("index=" + indexColor + ": r=" + r + " g=" + g + " b=" + b);
-		return new RgbColor((r << 16) + (g << 8) + b);
+		return new AscCommonExcel.RgbColor((r << 16) + (g << 8) + b);
 	};
 
 	/*

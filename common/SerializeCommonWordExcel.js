@@ -240,7 +240,7 @@ BinaryCommonWriter.prototype.WritePaddings = function(Paddings)
 };
 BinaryCommonWriter.prototype.WriteColorSpreadsheet = function(color)
 {
-	if(color instanceof ThemeColor)
+	if(color instanceof AscCommonExcel.ThemeColor)
 	{
 		if(null != color.theme)
 		{

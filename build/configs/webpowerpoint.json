@@ -75,6 +75,8 @@
 		"../slide/themes/Themes.js",
 		
 		"../cell/utils/utils.js",
+		"../cell/model/WorkbookElems.js",
+		"../cell/model/Serialize.js",
 		
         "../slide/Drawing/ThemeLoader.js",
         "../word/Editor/Serialize2.js",
@@ -144,8 +146,6 @@
         "../slide/apiCommon.js",
         "../word/apiCommon.js",
         "../slide/apiExport.js",
-        "../cell/model/Serialize.js",
-        "../cell/model/WorkbookElems.js",
         "../cell/model/Workbook.js",
         "../cell/model/CellInfo.js"
       ],

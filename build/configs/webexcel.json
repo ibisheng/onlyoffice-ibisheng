@@ -82,7 +82,6 @@
         "../cell/graphics/pdfprinter.js",
         "../cell/model/CollaborativeEditing.js",
         "../cell/model/ConditionalFormatting.js",
-		
         "../cell/model/FormulaObjects/parserFormula.js",
         "../cell/model/FormulaObjects/_xlfnFunctions.js",
         "../cell/model/FormulaObjects/dateandtimeFunctions.js",
@@ -96,8 +95,9 @@
         "../cell/model/FormulaObjects/lookupandreferenceFunctions.js",
         "../cell/model/FormulaObjects/informationFunctions.js",
         "../cell/model/FormulaObjects/logicalFunctions.js",
-        "../cell/model/Serialize.js",
         "../cell/model/WorkbookElems.js",
+		"../cell/model/Serialize.js",
+		
         "../cell/model/Workbook.js",
         "../cell/model/CellInfo.js",
         "../cell/model/History.js",

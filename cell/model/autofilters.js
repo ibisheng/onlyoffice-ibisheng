@@ -305,7 +305,7 @@
 					if(tablePartsContainsRange)
 					{
 						cloneFilter = tablePartsContainsRange.clone(null);
-						tablePartsContainsRange.AutoFilter = new AutoFilter();
+						tablePartsContainsRange.AutoFilter = new AscCommonExcel.AutoFilter();
 						tablePartsContainsRange.AutoFilter.Ref = tablePartsContainsRange.Ref.clone();
 
 						//history
@@ -422,7 +422,7 @@
 					cloneFilter = isTablePartsContainsRange.clone(null);
 
                     if(!isTablePartsContainsRange.TableStyleInfo)
-                        isTablePartsContainsRange.TableStyleInfo = new TableStyleInfo();
+                        isTablePartsContainsRange.TableStyleInfo = new AscCommonExcel.TableStyleInfo();
 					isTablePartsContainsRange.TableStyleInfo.Name = styleName;
 
 					t._setColorStyleTable(isTablePartsContainsRange.Ref, isTablePartsContainsRange);
@@ -483,7 +483,7 @@
 				if(filterObj.filter.TableStyleInfo !== undefined)
 					autoFilter = filterObj.filter.AutoFilter;	
 				if(!autoFilter)
-					autoFilter = new AutoFilter();
+					autoFilter = new AscCommonExcel.AutoFilter();
 				var newFilterColumn;
 				if(filterObj.index !== null)
 				{
@@ -506,7 +506,7 @@
 					
 				
 				//автоматическое расширение диапазона а/ф
-				if(autoFiltersObject.automaticRowCount && filterObj.filter && filterObj.filter.Ref && filterObj.filter.getType() === g_nFiltersType.autoFilter)
+				if(autoFiltersObject.automaticRowCount && filterObj.filter && filterObj.filter.Ref && filterObj.filter.isAutoFilter())
 				{
 					var currentDiff = filterObj.filter.Ref.r2 - filterObj.filter.Ref.r1;
 					var newDiff = autoFiltersObject.automaticRowCount - filterObj.filter.Ref.r1;
@@ -821,7 +821,7 @@
 				}
 				else if(type === AscCH.historyitem_AutoFilter_Sort && cloneData.oldFilter)//сортировка
 				{
-					if(worksheet.AutoFilter && cloneData.oldFilter.getType() === g_nFiltersType.autoFilter)
+					if(worksheet.AutoFilter && cloneData.oldFilter.isAutoFilter())
 						worksheet.AutoFilter = cloneData.oldFilter.clone(null);
 					else if(worksheet.TableParts)
 					{
@@ -852,7 +852,7 @@
 						}
 					}
 				}
-				else if(cloneData.FilterColumns || cloneData.AutoFilter || cloneData.TableColumns || (cloneData.Ref && (cloneData instanceof AutoFilter || cloneData instanceof TablePart)))//add
+				else if(cloneData.FilterColumns || cloneData.AutoFilter || cloneData.TableColumns || (cloneData.Ref && (cloneData instanceof AscCommonExcel.AutoFilter || cloneData instanceof AscCommonExcel.TablePart)))//add
 				{
 					if(cloneData.Ref)
 					{
@@ -1499,10 +1499,10 @@
 						curFilter.SortState = new SortState();
 						curFilter.SortState.Ref = new Asc.Range(startCol, curFilter.Ref.r1, startCol, maxFilterRow);
 						curFilter.SortState.SortConditions = [];
-						curFilter.SortState.SortConditions[0] = new SortCondition();
+						curFilter.SortState.SortConditions[0] = new AscCommonExcel.SortCondition();
 					}
 					if(!curFilter.SortState.SortConditions[0])
-						curFilter.SortState.SortConditions[0] = new SortCondition();
+						curFilter.SortState.SortConditions[0] = new AscCommonExcel.SortCondition();
 						
 					var cellIdRange = new Asc.Range(startCol, filterRef.r1, startCol, filterRef.r1);
 					
@@ -1590,7 +1590,7 @@
 				
 				
 				maxFilterRow = filterRef.r2;
-				if(curFilter.getType() === g_nFiltersType.autoFilter && curFilter.isApplyAutoFilter() === false)//нужно подхватить нижние ячейки в случае, если это не применен а/ф
+				if(curFilter.isAutoFilter() && curFilter.isApplyAutoFilter() === false)//нужно подхватить нижние ячейки в случае, если это не применен а/ф
 				{
 					var automaticRange = this._getAdjacentCellsAF(curFilter.Ref, true);
 					var automaticRowCount = automaticRange.r2;
@@ -3062,7 +3062,7 @@
 				{
 					if(!worksheet.AutoFilter)
 					{
-						newFilter = new AutoFilter();
+						newFilter = new AscCommonExcel.AutoFilter();
 						//ref = Asc.g_oRangeCache.getAscRange(val[0].id + ':' + val[val.length - 1].idNext).clone();
 						newFilter.Ref =  ref;
 						worksheet.AutoFilter = newFilter;
@@ -3099,7 +3099,7 @@
 					
 					if(!bWithoutFilter)
 					{
-						newFilter.AutoFilter = new AutoFilter();
+						newFilter.AutoFilter = new AscCommonExcel.AutoFilter();
 						newFilter.AutoFilter.Ref = ref;
 					}
 
@@ -3112,7 +3112,7 @@
 						newFilter.DisplayName = worksheet.workbook.dependencyFormulas.getNextTableName(worksheet, ref);
 					
 					
-					newFilter.TableStyleInfo = new TableStyleInfo();
+					newFilter.TableStyleInfo = new AscCommonExcel.TableStyleInfo();
 					newFilter.TableStyleInfo.Name = style;
 					
 					if(pasteTablePartObj && pasteTablePartObj.ShowColumnStripes !== null && pasteTablePartObj.ShowColumnStripes !== undefined)
@@ -3386,7 +3386,7 @@
 				
 				var maxFilterRow = ref.r2;
 				var automaticRowCount = null;
-				if(filter.getType() === g_nFiltersType.autoFilter && filter.isApplyAutoFilter() === false)//нужно подхватить нижние ячейки в случае, если это не применен а/ф
+				if(filter.isAutoFilter() && filter.isApplyAutoFilter() === false)//нужно подхватить нижние ячейки в случае, если это не применен а/ф
 				{
 					var automaticRange = this._getAdjacentCellsAF(filter.Ref, true);
 					automaticRowCount = automaticRange.r2;
@@ -3491,7 +3491,7 @@
 					return null;
 				
 				var res = colId;
-				if(filter.getType() !== g_nFiltersType.autoFilter)
+				if(!filter.isAutoFilter())
 					return res;
 				
 				//если находимся в мерженной ячейке, то возвращаем сдвинутый colId
@@ -3563,7 +3563,7 @@
 			_openHiddenRows: function(filter)
 			{
 				var worksheet = this.worksheet;
-				var autoFilter = filter.getType() === g_nFiltersType.autoFilter ? filter : filter.AutoFilter;
+				var autoFilter = filter.isAutoFilter() ? filter : filter.AutoFilter;
 				var isApplyFilter = autoFilter && autoFilter.FilterColumns && autoFilter.FilterColumns.length ? true : false;
 				
 				if(filter && filter.Ref && isApplyFilter)
@@ -3597,7 +3597,7 @@
 			
 			_openAllHiddenRowsByFilter: function(filter)
 			{
-				var autoFilter = filter && filter.getType() ===  g_nFiltersType.tablePart ? filter.AutoFilter : filter;
+				var autoFilter = filter && !filter.isAutoFilter() ? filter.AutoFilter : filter;
 				if(autoFilter && autoFilter.FilterColumns)
 				{
 					var filterColumns = autoFilter.FilterColumns;
@@ -3712,7 +3712,7 @@
 						}
 						else
 						{
-							if(allF[i].getType() ===  g_nFiltersType.autoFilter)
+							if(allF[i].isAutoFilter())
 							{
 								if(isAll === false && activeCells && range && !activeCells.containsRange(range) && !(range.containsRange(activeCells) && activeCells.c1 == activeCells.c2 && activeCells.r1 == activeCells.r2))//если задеваем часть примененного фильтра и добавляем форматированную таблицу
 								{
@@ -3744,7 +3744,7 @@
 						if(this._crossRange(activeCells,range))
 						{
 							//если мы находимся в общем фильтре и нажали на кнопку общего фильтра - тогда нет ошибки
-							if(!(allF[i].getType() ===  g_nFiltersType.autoFilter && allF[i].Ref.r1 === activeCells.r1))
+							if(!(allF[i].isAutoFilter() && allF[i].Ref.r1 === activeCells.r1))
 							{
 								if(!(worksheet.AutoFilter && i == 0 && isAll == true)/* && allF[i].AutoFilter !== undefined*/)
 									num = 'error';
@@ -3822,7 +3822,7 @@
 							s = -1;
 						}
 					}
-					newTableColumn = new TableColumn();
+					newTableColumn = new AscCommonExcel.TableColumn();
 					newTableColumn.Name = valNew;
 					
 					tableColumns[col1 - range.c1] = newTableColumn;

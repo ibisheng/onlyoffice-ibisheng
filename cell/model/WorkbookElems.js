@@ -1,5 +1,7 @@
 ﻿"use strict";
 
+(function(window, undefined){
+
 // Import
 var CellValueType = AscCommon.CellValueType;
 var c_oAscBorderWidth = AscCommon.c_oAscBorderWidth;
@@ -23,27 +25,24 @@ var c_oAscAutoFilterTypes = Asc.c_oAscAutoFilterTypes;
 var c_oAscNumFormatType = Asc.c_oAscNumFormatType;
 
 var g_oColorManager = null;
-var g_nNumsMaxId = 160;
-var g_oDefaultXfId = null;
-var g_oDefaultFont = null;
-var g_oDefaultFill = null;
-var g_oDefaultNum = null;
-var g_oDefaultBorder = null;
-var g_oDefaultAlign = null;
-var g_oDefaultFontAbs = null;
-var g_oDefaultFillAbs = null;
-var g_oDefaultNumAbs = null;
-var g_oDefaultBorderAbs = null;
-var g_oDefaultAlignAbs = null;
+	
+	var g_oDefaultFormat = {
+		XfId: null,
+		Font: null,
+		Fill: null,
+		Num: null,
+		Border: null,
+		Align: null,
+		FontAbs: null,
+		FillAbs: null,
+		NumAbs: null,
+		BorderAbs: null,
+		AlignAbs: null
+	};
 
 var g_nColorTextDefault = 1;
 var g_nColorHyperlink = 10;
 var g_nColorHyperlinkVisited = 11;
-
-var g_nFiltersType = {
-	autoFilter: 1, 
-	tablePart: 2
-};
 
 var g_oThemeColorsDefaultModsSpreadsheet = [
     [0, -4.9989318521683403E-2, -0.14999847407452621, -0.249977111117893, -0.34998626667073579, -0.499984740745262],
@@ -66,11 +65,6 @@ var map_themeExcel_to_themePresentation = {
 	10: 11,
 	11: 10
 };
-var map_themePresentation_to_themeExcel = {};
-(function(){
-	for(var i in map_themeExcel_to_themePresentation)
-		map_themePresentation_to_themeExcel[map_themeExcel_to_themePresentation[i]] = i - 0;
-})();
 function shiftGetBBox(bbox, bHor)
 {
 	var bboxGet = null;
@@ -437,7 +431,7 @@ var g_oFontProperties = {
 function Font(val)
 {
 	if(null == val)
-		val = g_oDefaultFontAbs;
+		val = g_oDefaultFormat.FontAbs;
 	this.Properties = g_oFontProperties;
 	this.fn = val.fn;
 	this.scheme = val.scheme;
@@ -477,22 +471,23 @@ Font.prototype =
 	},
 	merge : function(font)
 	{
+		var defaultFontAbs = g_oDefaultFormat.FontAbs;
 		var oRes = new Font();
-		oRes.fn = this._mergeProperty(this.fn, font.fn, g_oDefaultFontAbs.fn);
-		oRes.scheme = this._mergeProperty(this.scheme, font.scheme, g_oDefaultFontAbs.scheme);
-		oRes.fs = this._mergeProperty(this.fs, font.fs, g_oDefaultFontAbs.fs);
-		oRes.b = this._mergeProperty(this.b, font.b, g_oDefaultFontAbs.b);
-		oRes.i = this._mergeProperty(this.i, font.i, g_oDefaultFontAbs.i);
-		oRes.u = this._mergeProperty(this.u, font.u, g_oDefaultFontAbs.u);
-		oRes.s = this._mergeProperty(this.s, font.s, g_oDefaultFontAbs.s);
+		oRes.fn = this._mergeProperty(this.fn, font.fn, defaultFontAbs.fn);
+		oRes.scheme = this._mergeProperty(this.scheme, font.scheme, defaultFontAbs.scheme);
+		oRes.fs = this._mergeProperty(this.fs, font.fs, defaultFontAbs.fs);
+		oRes.b = this._mergeProperty(this.b, font.b, defaultFontAbs.b);
+		oRes.i = this._mergeProperty(this.i, font.i, defaultFontAbs.i);
+		oRes.u = this._mergeProperty(this.u, font.u, defaultFontAbs.u);
+		oRes.s = this._mergeProperty(this.s, font.s, defaultFontAbs.s);
 		//заглушка excel при merge стилей игнорирует default цвет
 		if(this.c instanceof ThemeColor && g_nColorTextDefault == this.c.theme && null == this.c.tint)
-			oRes.c = this._mergeProperty(font.c, this.c, g_oDefaultFontAbs.c);
+			oRes.c = this._mergeProperty(font.c, this.c, defaultFontAbs.c);
 		else
-			oRes.c = this._mergeProperty(this.c, font.c, g_oDefaultFontAbs.c);
-		oRes.va = this._mergeProperty(this.va, font.va, g_oDefaultFontAbs.va);
-		oRes.skip = this._mergeProperty(this.skip, font.skip, g_oDefaultFontAbs.skip);
-		oRes.repeat = this._mergeProperty(this.repeat, font.repeat, g_oDefaultFontAbs.repeat);
+			oRes.c = this._mergeProperty(this.c, font.c, defaultFontAbs.c);
+		oRes.va = this._mergeProperty(this.va, font.va, defaultFontAbs.va);
+		oRes.skip = this._mergeProperty(this.skip, font.skip, defaultFontAbs.skip);
+		oRes.repeat = this._mergeProperty(this.repeat, font.repeat, defaultFontAbs.repeat);
 		return oRes;
 	},
 	getRgbOrNull : function()
@@ -671,7 +666,7 @@ var g_oFillProperties = {
 function Fill(val)
 {
 	if(null == val)
-		val = g_oDefaultFillAbs;
+		val = g_oDefaultFormat.FillAbs;
 	this.Properties = g_oFillProperties;
 	this.bg = val.bg;
 }
@@ -687,7 +682,7 @@ Fill.prototype =
 	merge : function(fill)
 	{
 		var oRes = new Fill();
-		oRes.bg = this._mergeProperty(this.bg, fill.bg, g_oDefaultFill.bg);
+		oRes.bg = this._mergeProperty(this.bg, fill.bg, g_oDefaultFormat.Fill.bg);
 		return oRes;
 	},
 	getRgbOrNull : function()
@@ -850,7 +845,7 @@ var g_oBorderProperties = {
 function Border(val)
 {
 	if(null == val)
-		val = g_oDefaultBorderAbs;
+		val = g_oDefaultFormat.BorderAbs;
 	this.Properties = g_oBorderProperties;
 	this.l = val.l.clone();
 	this.t = val.t.clone();
@@ -873,16 +868,17 @@ Border.prototype =
 	},
 	merge : function(border)
 	{
+		var defaultBorder = g_oDefaultFormat.Border;
 		var oRes = new Border();
-		oRes.l = this._mergeProperty(this.l, border.l, g_oDefaultBorder.l).clone();
-		oRes.t = this._mergeProperty(this.t, border.t, g_oDefaultBorder.t).clone();
-		oRes.r = this._mergeProperty(this.r, border.r, g_oDefaultBorder.r).clone();
-		oRes.b = this._mergeProperty(this.b, border.b, g_oDefaultBorder.b).clone();
-		oRes.d = this._mergeProperty(this.d, border.d, g_oDefaultBorder.d).clone();
-		oRes.ih = this._mergeProperty(this.ih, border.ih, g_oDefaultBorder.ih).clone();
-		oRes.iv = this._mergeProperty(this.iv, border.iv, g_oDefaultBorder.iv).clone();
-		oRes.dd = this._mergeProperty(this.dd, border.dd, g_oDefaultBorder.dd);
-		oRes.du = this._mergeProperty(this.du, border.du, g_oDefaultBorder.du);
+		oRes.l = this._mergeProperty(this.l, border.l, defaultBorder.l).clone();
+		oRes.t = this._mergeProperty(this.t, border.t, defaultBorder.t).clone();
+		oRes.r = this._mergeProperty(this.r, border.r, defaultBorder.r).clone();
+		oRes.b = this._mergeProperty(this.b, border.b, defaultBorder.b).clone();
+		oRes.d = this._mergeProperty(this.d, border.d, defaultBorder.d).clone();
+		oRes.ih = this._mergeProperty(this.ih, border.ih, defaultBorder.ih).clone();
+		oRes.iv = this._mergeProperty(this.iv, border.iv, defaultBorder.iv).clone();
+		oRes.dd = this._mergeProperty(this.dd, border.dd, defaultBorder.dd);
+		oRes.du = this._mergeProperty(this.du, border.du, defaultBorder.du);
 		return oRes;
 	},
 	getDif : function(val)
@@ -938,15 +934,16 @@ Border.prototype =
     },
 	clean : function()
 	{
-		this.l = g_oDefaultBorder.l.clone();
-		this.t = g_oDefaultBorder.t.clone();
-		this.r = g_oDefaultBorder.r.clone();
-		this.b = g_oDefaultBorder.b.clone();
-		this.d = g_oDefaultBorder.d.clone();
-		this.ih = g_oDefaultBorder.ih.clone();
-		this.iv = g_oDefaultBorder.iv.clone();
-		this.dd = g_oDefaultBorder.dd;
-		this.du = g_oDefaultBorder.du;
+		var defaultBorder = g_oDefaultFormat.Border;
+		this.l = defaultBorder.l.clone();
+		this.t = defaultBorder.t.clone();
+		this.r = defaultBorder.r.clone();
+		this.b = defaultBorder.b.clone();
+		this.d = defaultBorder.d.clone();
+		this.ih = defaultBorder.ih.clone();
+		this.iv = defaultBorder.iv.clone();
+		this.dd = defaultBorder.dd;
+		this.du = defaultBorder.du;
 	},
     mergeInner : function(border){
         if(border){
@@ -1016,7 +1013,7 @@ var g_oNumProperties = {
 function Num(val)
 {
 	if(null == val)
-		val = g_oDefaultNumAbs;
+		val = g_oDefaultFormat.NumAbs;
 	this.Properties = g_oNumProperties;
 	this.f = val.f;
 }
@@ -1025,7 +1022,7 @@ Num.prototype =
 	merge : function(num)
 	{
 		var oRes = new Num();
-		if(g_oDefaultNum.f != this.f)
+		if(g_oDefaultFormat.Num.f != this.f)
 			oRes.f = this.f;
 		else
 			oRes.f = num.f;
@@ -1214,7 +1211,7 @@ var g_oAlignProperties = {
 function Align(val)
 {
 	if(null == val)
-		val = g_oDefaultAlignAbs;
+		val = g_oDefaultFormat.AlignAbs;
 	this.Properties = g_oAlignProperties;
 	this.hor = val.hor;
 	this.indent = val.indent;
@@ -1235,14 +1232,15 @@ Align.prototype =
 	},
 	merge : function(border)
 	{
+		var defaultAlign = g_oDefaultFormat.Align;
 		var oRes = new Align();
-		oRes.hor = this._mergeProperty(this.hor, border.hor, g_oDefaultAlign.hor);
-		oRes.indent = this._mergeProperty(this.indent, border.indent, g_oDefaultAlign.indent);
-		oRes.RelativeIndent = this._mergeProperty(this.RelativeIndent, border.RelativeIndent, g_oDefaultAlign.RelativeIndent);
-		oRes.shrink = this._mergeProperty(this.shrink, border.shrink, g_oDefaultAlign.shrink);
-		oRes.angle = this._mergeProperty(this.angle, border.angle, g_oDefaultAlign.angle);
-		oRes.ver = this._mergeProperty(this.ver, border.ver, g_oDefaultAlign.ver);
-		oRes.wrap = this._mergeProperty(this.wrap, border.wrap, g_oDefaultAlign.wrap);
+		oRes.hor = this._mergeProperty(this.hor, border.hor, defaultAlign.hor);
+		oRes.indent = this._mergeProperty(this.indent, border.indent, defaultAlign.indent);
+		oRes.RelativeIndent = this._mergeProperty(this.RelativeIndent, border.RelativeIndent, defaultAlign.RelativeIndent);
+		oRes.shrink = this._mergeProperty(this.shrink, border.shrink, defaultAlign.shrink);
+		oRes.angle = this._mergeProperty(this.angle, border.angle, defaultAlign.angle);
+		oRes.ver = this._mergeProperty(this.ver, border.ver, defaultAlign.ver);
+		oRes.wrap = this._mergeProperty(this.wrap, border.wrap, defaultAlign.wrap);
 		return oRes;
 	},
 	getDif : function(val)
@@ -1456,7 +1454,7 @@ CCellStyles.prototype._prepareCellStyle = function (name) {
 		this.CustomStyles[i].XfId = ++maxXfId;
 		return this.CustomStyles[i].XfId;
 	}
-	return g_oDefaultXfId;
+	return g_oDefaultFormat.XfId;
 };
 /** @constructor */
 function CCellStyle() {
@@ -1494,28 +1492,28 @@ CCellStyle.prototype.getFill = function () {
 	if (null != this.xfs && null != this.xfs.fill)
 		return this.xfs.fill.bg;
 
-	return g_oDefaultFill.bg;
+	return g_oDefaultFormat.Fill.bg;
 };
 CCellStyle.prototype.getFontColor = function () {
 	if (null != this.xfs && null != this.xfs.font)
 		return this.xfs.font.c;
 
-	return g_oDefaultFont.c;
+	return g_oDefaultFormat.Font.c;
 };
 CCellStyle.prototype.getFont = function () {
 	if (null != this.xfs && null != this.xfs.font)
 		return this.xfs.font;
-	return g_oDefaultFont;
+	return g_oDefaultFormat.Font;
 };
 CCellStyle.prototype.getBorder = function () {
 	if (null != this.xfs && null != this.xfs.border)
 		return this.xfs.border;
-	return g_oDefaultBorder;
+	return g_oDefaultFormat.Border;
 };
 CCellStyle.prototype.getNumFormatStr = function () {
 	if(null != this.xfs && null != this.xfs.num)
 		return this.xfs.num.f;
-	return g_oDefaultNum.f;
+	return g_oDefaultFormat.Num.f;
 };
 /** @constructor */
 function StyleManager(){
@@ -1531,18 +1529,18 @@ StyleManager.prototype =
     init : function(oDefaultXfs)
     {
 		if(null != oDefaultXfs.font)
-			g_oDefaultFont = oDefaultXfs.font.clone();
+			g_oDefaultFormat.Font = oDefaultXfs.font.clone();
 		if(null != oDefaultXfs.fill)
-			g_oDefaultFill = oDefaultXfs.fill.clone();
+			g_oDefaultFormat.Fill = oDefaultXfs.fill.clone();
 		if(null != oDefaultXfs.border)
-			g_oDefaultBorder = oDefaultXfs.border.clone();
+			g_oDefaultFormat.Border = oDefaultXfs.border.clone();
 		if(null != oDefaultXfs.num)
-			g_oDefaultNum = oDefaultXfs.num.clone();
+			g_oDefaultFormat.Num = oDefaultXfs.num.clone();
 		if(null != oDefaultXfs.align)
-			g_oDefaultAlign = oDefaultXfs.align.clone();
+			g_oDefaultFormat.Align = oDefaultXfs.align.clone();
 		if (null !== oDefaultXfs.XfId) {
 			this.oDefaultXfs.XfId = oDefaultXfs.XfId;
-			g_oDefaultXfId = oDefaultXfs.XfId;
+			g_oDefaultFormat.XfId = oDefaultXfs.XfId;
 		}
 		this.oDefaultXfs = oDefaultXfs;
 	},
@@ -1569,14 +1567,14 @@ StyleManager.prototype =
 	{
 		var xfs = this._prepareSet(oItemWithXfs);
 		if(null == xfs.font)
-			xfs.font = g_oDefaultFont.clone();
+			xfs.font = g_oDefaultFormat.Font.clone();
         return xfs;
 	},
     _prepareSetAlign : function(oItemWithXfs)
 	{
         var xfs = this._prepareSet(oItemWithXfs);
 		if(null == xfs.align)
-			xfs.align = g_oDefaultAlign.clone();
+			xfs.align = g_oDefaultFormat.Align.clone();
         return xfs;
 	},
 	_prepareSetCellStyle : function (oItemWithXfs) {
@@ -1590,11 +1588,11 @@ StyleManager.prototype =
 		if(null != xfs && null != xfs.XfId)
 			oRes.oldVal = xfs.XfId;
 		else
-			oRes.oldVal = g_oDefaultXfId;
+			oRes.oldVal = g_oDefaultFormat.XfId;
 		if(null == val) {
 			if(null != xfs) {
 			    xfs = this._prepareSetReference(oItemWithXfs);
-				xfs.XfId = g_oDefaultXfId;
+				xfs.XfId = g_oDefaultFormat.XfId;
             }
 		} else {
 			xfs = this._prepareSetCellStyle(oItemWithXfs);
@@ -1609,7 +1607,7 @@ StyleManager.prototype =
         if(null != xfs && null != xfs.num)
             oRes.oldVal = xfs.num.f;
 		else
-			oRes.oldVal = g_oDefaultNum.f;
+			oRes.oldVal = g_oDefaultFormat.Num.f;
         if(null == val)
         {
             if(null != xfs) {
@@ -1621,7 +1619,7 @@ StyleManager.prototype =
         {
             xfs = this._prepareSet(oItemWithXfs);
             if(null == xfs.num)
-                xfs.num = g_oDefaultNum.clone();
+                xfs.num = g_oDefaultFormat.Num.clone();
             xfs.num.f = val;
         }
 		return oRes;
@@ -1655,14 +1653,14 @@ StyleManager.prototype =
         if(null != xfs && null != xfs.font)
             oRes.oldVal = xfs.font.fn;
 		else
-			oRes.oldVal = g_oDefaultFont.fn;
+			oRes.oldVal = g_oDefaultFormat.Font.fn;
 		//todo undo для scheme
         if(null == val)
         {
             if(null != xfs && null != xfs.font)
 			{
                 xfs = this._prepareSetReference(oItemWithXfs);
-                xfs.font.fn = g_oDefaultFont.fn;
+                xfs.font.fn = g_oDefaultFormat.Font.fn;
                 xfs.font.scheme = Asc.EFontScheme.fontschemeNone;
 			}
         }
@@ -1681,12 +1679,12 @@ StyleManager.prototype =
         if(null != xfs && null != xfs.font)
             oRes.oldVal = xfs.font.fs;
 		else
-			oRes.oldVal = g_oDefaultFont.fs;
+			oRes.oldVal = g_oDefaultFormat.Font.fs;
         if(null == val)
         {
             if(null != xfs && null != xfs.font) {
                 xfs = this._prepareSetReference(oItemWithXfs);
-                xfs.font.fs = g_oDefaultFont.fs;
+                xfs.font.fs = g_oDefaultFormat.Font.fs;
             }
         }
         else
@@ -1703,12 +1701,12 @@ StyleManager.prototype =
         if(null != xfs && null != xfs.font)
             oRes.oldVal = xfs.font.c;
 		else
-			oRes.oldVal = g_oDefaultFont.c;
+			oRes.oldVal = g_oDefaultFormat.Font.c;
         if(null == val)
         {
             if(null != xfs && null != xfs.font) {
                 xfs = this._prepareSetReference(oItemWithXfs);
-                xfs.font.c = g_oDefaultFont.c;
+                xfs.font.c = g_oDefaultFormat.Font.c;
             }
         }
         else
@@ -1725,12 +1723,12 @@ StyleManager.prototype =
         if(null != xfs && null != xfs.font)
             oRes.oldVal = xfs.font.b;
 		else
-			oRes.oldVal = g_oDefaultFont.b;
+			oRes.oldVal = g_oDefaultFormat.Font.b;
         if(null == val)
         {
             if(null != xfs && null != xfs.font) {
                 xfs = this._prepareSetReference(oItemWithXfs);
-                xfs.font.b = g_oDefaultFont.b;
+                xfs.font.b = g_oDefaultFormat.Font.b;
             }
         }
         else
@@ -1747,12 +1745,12 @@ StyleManager.prototype =
         if(null != xfs && null != xfs.font)
             oRes.oldVal = xfs.font.i;
 		else
-			oRes.oldVal = g_oDefaultFont.i;
+			oRes.oldVal = g_oDefaultFormat.Font.i;
         if(null == val)
         {
             if(null != xfs && null != xfs.font) {
                 xfs = this._prepareSetReference(oItemWithXfs);
-                xfs.font.i = g_oDefaultFont.i;
+                xfs.font.i = g_oDefaultFormat.Font.i;
             }
         }
         else
@@ -1769,12 +1767,12 @@ StyleManager.prototype =
         if(null != xfs && null != xfs.font)
             oRes.oldVal = xfs.font.u;
 		else
-			oRes.oldVal = g_oDefaultFont.u;
+			oRes.oldVal = g_oDefaultFormat.Font.u;
         if(null == val)
         {
             if(null != xfs && null != xfs.font) {
                 xfs = this._prepareSetReference(oItemWithXfs);
-                xfs.font.u = g_oDefaultFont.u;
+                xfs.font.u = g_oDefaultFormat.Font.u;
             }
         }
         else
@@ -1791,12 +1789,12 @@ StyleManager.prototype =
         if(null != xfs && null != xfs.font)
             oRes.oldVal = xfs.font.s;
 		else
-			oRes.oldVal = g_oDefaultFont.s;
+			oRes.oldVal = g_oDefaultFormat.Font.s;
         if(null == val)
         {
             if(null != xfs && null != xfs.font) {
                 xfs = this._prepareSetReference(oItemWithXfs);
-                xfs.font.s = g_oDefaultFont.s;
+                xfs.font.s = g_oDefaultFormat.Font.s;
             }
         }
         else
@@ -1813,12 +1811,12 @@ StyleManager.prototype =
         if(null != xfs && null != xfs.font)
             oRes.oldVal = xfs.font.va;
 		else
-			oRes.oldVal = g_oDefaultFont.va;
+			oRes.oldVal = g_oDefaultFormat.Font.va;
         if(null == val)
         {
             if(null != xfs && null != xfs.font) {
                 xfs = this._prepareSetReference(oItemWithXfs);
-                xfs.font.va = g_oDefaultFont.va;
+                xfs.font.va = g_oDefaultFormat.Font.va;
             }
         }
         else
@@ -1835,12 +1833,12 @@ StyleManager.prototype =
         if(null != xfs && null != xfs.align)
             oRes.oldVal = xfs.align.ver;
 		else
-			oRes.oldVal = g_oDefaultAlign.ver;
+			oRes.oldVal = g_oDefaultFormat.Align.ver;
         if(null == val)
         {
             if(null != xfs && null != xfs.align) {
                 xfs = this._prepareSetReference(oItemWithXfs);
-                xfs.align.ver = g_oDefaultAlign.ver;
+                xfs.align.ver = g_oDefaultFormat.Align.ver;
             }
         }
         else
@@ -1857,12 +1855,12 @@ StyleManager.prototype =
         if(null != xfs && null != xfs.align)
             oRes.oldVal = xfs.align.hor;
 		else
-			oRes.oldVal = g_oDefaultAlign.hor;
+			oRes.oldVal = g_oDefaultFormat.Align.hor;
         if(null == val)
         {
             if(null != xfs && null != xfs.align) {
                 xfs = this._prepareSetReference(oItemWithXfs);
-                xfs.align.hor = g_oDefaultAlign.hor;
+                xfs.align.hor = g_oDefaultFormat.Align.hor;
             }
         }
         else
@@ -1879,19 +1877,19 @@ StyleManager.prototype =
         if(null != xfs && null != xfs.fill)
             oRes.oldVal = xfs.fill.bg;
 		else
-			oRes.oldVal = g_oDefaultFill.bg;
+			oRes.oldVal = g_oDefaultFormat.Fill.bg;
         if(null == val)
         {
             if(null != xfs && null != xfs.fill) {
                 xfs = this._prepareSetReference(oItemWithXfs);
-                xfs.fill.bg = g_oDefaultFill.bg;
+                xfs.fill.bg = g_oDefaultFormat.Fill.bg;
             }
         }
         else
         {
             xfs = this._prepareSet(oItemWithXfs);
 			if(null == xfs.fill)
-                xfs.fill = g_oDefaultFill.clone();
+                xfs.fill = g_oDefaultFormat.Fill.clone();
             xfs.fill.bg = val;
         }
 		return oRes;
@@ -1903,7 +1901,7 @@ StyleManager.prototype =
         if(null != xfs && null != xfs.border)
             oRes.oldVal = xfs.border;
 		else
-			oRes.oldVal = g_oDefaultBorder;
+			oRes.oldVal = g_oDefaultFormat.Border;
         if(null == val)
         {
             if(null != xfs && null != xfs.border) {
@@ -1925,12 +1923,12 @@ StyleManager.prototype =
         if(null != xfs && null != xfs.align)
             oRes.oldVal = xfs.align.shrink;
 		else
-			oRes.oldVal = g_oDefaultAlign.shrink;
+			oRes.oldVal = g_oDefaultFormat.Align.shrink;
         if(null == val)
         {
             if(null != xfs && null != xfs.align) {
                 xfs = this._prepareSetReference(oItemWithXfs);
-                xfs.align.shrink = g_oDefaultAlign.shrink;
+                xfs.align.shrink = g_oDefaultFormat.Align.shrink;
             }
         }
         else
@@ -1947,12 +1945,12 @@ StyleManager.prototype =
         if(null != xfs && null != xfs.align)
             oRes.oldVal = xfs.align.wrap;
 		else
-			oRes.oldVal = g_oDefaultAlign.wrap;
+			oRes.oldVal = g_oDefaultFormat.Align.wrap;
         if(null == val)
         {
             if(null != xfs && null != xfs.align) {
                 xfs = this._prepareSetReference(oItemWithXfs);
-                xfs.align.wrap = g_oDefaultAlign.wrap;
+                xfs.align.wrap = g_oDefaultFormat.Align.wrap;
             }
         }
         else
@@ -1990,12 +1988,12 @@ StyleManager.prototype =
         if(null != xfs && null != xfs.align)
             oRes.oldVal = angleFormatToInterface2(xfs.align.angle);
 		else
-			oRes.oldVal = angleFormatToInterface2(g_oDefaultAlign.angle);
+			oRes.oldVal = angleFormatToInterface2(g_oDefaultFormat.Align.angle);
         if(null == val)
         {
             if(null != xfs && null != xfs.align) {
                 xfs = this._prepareSetReference(oItemWithXfs);
-                xfs.align.angle = g_oDefaultAlign.angle;
+                xfs.align.angle = g_oDefaultFormat.Align.angle;
             }
         }
         else
@@ -2929,7 +2927,7 @@ CCellValue.prototype =
 				if(null != xfs && null != xfs.num)
 					oNumFormat = oNumFormatCache.get(xfs.num.f);
 				else
-					oNumFormat = oNumFormatCache.get(g_oDefaultNum.f);
+					oNumFormat = oNumFormatCache.get(g_oDefaultFormat.Num.f);
 				if(false == oNumFormat.isGeneralFormat())
 				{
 					var oAdditionalResult = {};
@@ -3065,7 +3063,7 @@ CCellValue.prototype =
 							if(null != xfs && null != xfs.num)
 								oNumFormat = oNumFormatCache.get(xfs.num.f);
 							else
-								oNumFormat = oNumFormatCache.get(g_oDefaultNum.f);
+								oNumFormat = oNumFormatCache.get(g_oDefaultFormat.Num.f);
 							if(CellValueType.String != this.type && null != oNumFormat && null != this.number)
 							{
 								var nValue = this.number;
@@ -3153,7 +3151,7 @@ CCellValue.prototype =
 		if(null != xfs && null != xfs.font)
 			cellfont = xfs.font;
 		else
-			cellfont = g_oDefaultFont;
+			cellfont = g_oDefaultFormat.Font;
 		if(null != sText){
 			var oNewItem = new Fragment();
 			oNewItem.text = sText;
@@ -3249,7 +3247,7 @@ CCellValue.prototype =
 		if(null != xfs && null != xfs.num)
 			oNumFormat = oNumFormatCache.get(xfs.num.f);
 		else
-			oNumFormat = oNumFormatCache.get(g_oDefaultNum.f);
+			oNumFormat = oNumFormatCache.get(g_oDefaultFormat.Num.f);
 		if(oNumFormat.isTextFormat())
 		{
 			this.type = CellValueType.String;
@@ -3341,7 +3339,7 @@ CCellValue.prototype =
 					var item = aVal[i];
 					var oNewElem = new CCellValueMultiText();
 					oNewElem.text = item.text;
-					oNewElem.format = g_oDefaultFont.clone();
+					oNewElem.format = g_oDefaultFormat.Font.clone();
 					if(null != item.format)
 						oNewElem.format.set(item.format);
 					this.multiText.push(oNewElem);
@@ -3413,7 +3411,7 @@ CCellValue.prototype =
 				
 			if(bSetCellFont)
 			{
-			    if (oIntersectFont.isEqual(g_oDefaultFont))
+			    if (oIntersectFont.isEqual(g_oDefaultFormat.Font))
 					cell.setFont(null, false);
 				else
 					cell.setFont(oIntersectFont, false);
@@ -4690,9 +4688,9 @@ TablePart.prototype.addTableLastColumn = function(activeRange, autoFilters, isAd
 	this.TableColumns = newTableColumns;
 };
 
-TablePart.prototype.getType = function(F)
+TablePart.prototype.isAutoFilter = function()
 {
-	return g_nFiltersType.tablePart;
+	return false;
 };
 
 TablePart.prototype.getTableRangeForFormula = function(objectParam)
@@ -4928,9 +4926,9 @@ AutoFilter.prototype.isApplySortConditions = function() {
 	return res;
 };
 
-AutoFilter.prototype.getType = function()
+AutoFilter.prototype.isAutoFilter = function()
 {
-	return g_nFiltersType.autoFilter;
+	return true;
 };
 
 AutoFilter.prototype.cleanFilters = function() {
@@ -5770,20 +5768,64 @@ AutoFilterDateElem.prototype.convertDateGroupItemToRange = function(oDateGroupIt
 	this.dateTimeGrouping = oDateGroupItem.DateTimeGrouping;
 };
 
-var prot;
+	//----------------------------------------------------------export----------------------------------------------------
+	var prot;
+	window['Asc'] = window['Asc'] || {};
+	window['AscCommonExcel'] = window['AscCommonExcel'] || {};
+	window['AscCommonExcel'].g_oColorManager = g_oColorManager;
+	window['AscCommonExcel'].g_oDefaultFormat = g_oDefaultFormat;
+	window['AscCommonExcel'].g_nColorTextDefault = g_nColorTextDefault;
+	window['AscCommonExcel'].g_nColorHyperlink = g_nColorHyperlink;
+	window['AscCommonExcel'].g_oThemeColorsDefaultModsSpreadsheet = g_oThemeColorsDefaultModsSpreadsheet;
+	window['AscCommonExcel'].map_themeExcel_to_themePresentation = map_themeExcel_to_themePresentation;
+	window['AscCommonExcel'].shiftGetBBox = shiftGetBBox;
+	window['AscCommonExcel'].RgbColor = RgbColor;
+	window['AscCommonExcel'].ThemeColor = ThemeColor;
+	window['AscCommonExcel'].CorrectAscColor = CorrectAscColor;
+	window['AscCommonExcel'].Fragment = Fragment;
+	window['AscCommonExcel'].Font = Font;
+	window['AscCommonExcel'].Fill = Fill;
+	window['AscCommonExcel'].BorderProp = BorderProp;
+	window['AscCommonExcel'].Border = Border;
+	window['AscCommonExcel'].Num = Num;
+	window['AscCommonExcel'].CellXfs = CellXfs;
+	window['AscCommonExcel'].Align = Align;
+	window['AscCommonExcel'].CCellStyles = CCellStyles;
+	window['AscCommonExcel'].CCellStyle = CCellStyle;
+	window['AscCommonExcel'].StyleManager = StyleManager;
+	window['AscCommonExcel'].Hyperlink = Hyperlink;
+	window['AscCommonExcel'].SheetFormatPr = SheetFormatPr;
+	window['AscCommonExcel'].Col = Col;
+	window['AscCommonExcel'].g_nRowFlag_empty = g_nRowFlag_empty;
+	window['AscCommonExcel'].g_nRowFlag_hd = g_nRowFlag_hd;
+	window['AscCommonExcel'].g_nRowFlag_CustomHeight = g_nRowFlag_CustomHeight;
+	window['AscCommonExcel'].Row = Row;
+	window['AscCommonExcel'].CCellValueMultiText = CCellValueMultiText;
+	window['AscCommonExcel'].CCellValue = CCellValue;
+	window['AscCommonExcel'].RangeDataManagerElem = RangeDataManagerElem;
+	window['AscCommonExcel'].RangeDataManager = RangeDataManager;
+	window['AscCommonExcel'].CellArea = CellArea;
+	window['AscCommonExcel'].sparklineGroups = sparklineGroups;
+	window['AscCommonExcel'].sparklineGroup = sparklineGroup;
+	window['AscCommonExcel'].sparkline = sparkline;
+	window['AscCommonExcel'].TablePart = TablePart;
+	window['AscCommonExcel'].AutoFilter = AutoFilter;
+	window['AscCommonExcel'].SortState = SortState;
+	window['AscCommonExcel'].TableColumn = TableColumn;
+	window['AscCommonExcel'].TableStyleInfo = TableStyleInfo;
+	window['AscCommonExcel'].FilterColumn = FilterColumn;
+	window['AscCommonExcel'].Filters = Filters;
+	window['AscCommonExcel'].Filter = Filter;
+	window['AscCommonExcel'].DateGroupItem = DateGroupItem;
+	window['AscCommonExcel'].SortCondition = SortCondition;
+	window['AscCommonExcel'].AutoFilterDateElem = AutoFilterDateElem;
+	
 window["Asc"]["CustomFilters"]			= window["Asc"].CustomFilters = CustomFilters;
 prot									= CustomFilters.prototype;
 prot["asc_getAnd"]						= prot.asc_getAnd;
 prot["asc_getCustomFilters"]			= prot.asc_getCustomFilters;
 prot["asc_setAnd"]						= prot.asc_setAnd;
 prot["asc_setCustomFilters"]			= prot.asc_setCustomFilters;
-
-window["Asc"]["CustomFilter"]			= window["Asc"].CustomFilter = CustomFilter;
-prot									= CustomFilter.prototype;
-prot["asc_getOperator"]					= prot.asc_getOperator;
-prot["asc_getVal"]						= prot.asc_getVal;
-prot["asc_setOperator"]					= prot.asc_setOperator;
-prot["asc_setVal"]						= prot.asc_setVal;
 
 window["Asc"]["CustomFilter"]			= window["Asc"].CustomFilter = CustomFilter;
 prot									= CustomFilter.prototype;
@@ -5818,3 +5860,4 @@ prot["asc_setFilterVal"]				= prot.asc_setFilterVal;
 prot["asc_setPercent"]					= prot.asc_setPercent;
 prot["asc_setTop"]						= prot.asc_setTop;
 prot["asc_setVal"]						= prot.asc_setVal;
+})(window);

@@ -1349,7 +1349,7 @@ VHLOOKUPCache.prototype.get = function ( range, valueForSearching, isValueString
         this.cacheId[sRangeName] = cacheElem;
         var cacheRange = this.cacheRanges[wsId];
         if ( null == cacheRange ) {
-            cacheRange = new RangeDataManager( null );
+            cacheRange = new AscCommonExcel.RangeDataManager( null );
             this.cacheRanges[wsId] = cacheRange;
         }
         cacheRange.add( range.getBBox0(), cacheElem );

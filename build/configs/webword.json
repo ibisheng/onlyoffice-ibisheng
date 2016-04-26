@@ -78,6 +78,8 @@
         "../word/apiDefines.js",
 		
 		"../cell/utils/utils.js",
+		"../cell/model/WorkbookElems.js",
+		"../cell/model/Serialize.js",
 		
         "../word/Drawing/translations.js",
         "../word/Editor/GraphicObjects/Format/ShapePrototype.js",
@@ -143,8 +145,6 @@
         "../word/Math/accent.js",
         "../word/Math/borderBox.js",
         "../cell/model/CellComment.js",
-        "../cell/model/Serialize.js",
-        "../cell/model/WorkbookElems.js",
         "../cell/model/Workbook.js",
         "../cell/model/CellInfo.js"
       ],

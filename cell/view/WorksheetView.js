@@ -1431,13 +1431,13 @@
                 h = -1; // Будет использоваться дефолтная высота строки
                 isCustomHeight = false;
             }
-            else if ( 0 != (g_nRowFlag_hd & row.flags) ) {
+            else if ( 0 != (AscCommonExcel.g_nRowFlag_hd & row.flags) ) {
                 hR = h = 0;  // Скрытая строка, высоту выставляем 0
                 isCustomHeight = true;
                 hiddenH += row.h > 0 ? row.h - this.height_1px : defaultH;
             }
             else {
-                isCustomHeight = 0 != (g_nRowFlag_CustomHeight & row.flags);
+                isCustomHeight = 0 != (AscCommonExcel.g_nRowFlag_CustomHeight & row.flags);
                 // Берем высоту из модели, если она custom(баг 15618), либо дефолтную
                 if ( row.h > 0 && isCustomHeight ) {
                     hR = row.h;
@@ -2978,7 +2978,7 @@
         var bc = null, bw = -1, isNotFirst = false; // cached border color
 
         function drawBorder( type, border, x1, y1, x2, y2 ) {
-            var isStroke = false, isNewColor = !g_oColorManager.isEqual( bc, border.c ), isNewWidth = bw !== border.w;
+            var isStroke = false, isNewColor = !AscCommonExcel.g_oColorManager.isEqual( bc, border.c ), isNewWidth = bw !== border.w;
             if ( isNotFirst && (isNewColor || isNewWidth) ) {
                 ctx.stroke();
                 isStroke = true;
@@ -6367,7 +6367,7 @@
             }
 
             if ( drawingInfo.hyperlink instanceof ParaHyperlink ) {
-                oHyperlink = new Hyperlink();
+                oHyperlink = new AscCommonExcel.Hyperlink();
                 oHyperlink.Tooltip = drawingInfo.hyperlink.ToolTip;
                 var spl = drawingInfo.hyperlink.Value.split( "!" );
                 if ( spl.length === 2 ) {
@@ -7509,7 +7509,7 @@
             var shapeHyperlink = this.objectRender.controller.getHyperlinkInfo();
             if ( shapeHyperlink && (shapeHyperlink instanceof ParaHyperlink) ) {
 
-                var hyperlink = new Hyperlink();
+                var hyperlink = new AscCommonExcel.Hyperlink();
                 hyperlink.Tooltip = shapeHyperlink.ToolTip;
 
                 var spl = shapeHyperlink.Value.split( "!" );
@@ -8922,7 +8922,7 @@
                     }
                     if ( b.color !== null && b.color !== undefined ) {
                         if ( b.color instanceof Asc.asc_CColor ) {
-                            border.c = CorrectAscColor( b.color );
+                            border.c = AscCommonExcel.CorrectAscColor( b.color );
                         }
                     }
                 }
@@ -8997,7 +8997,7 @@
                         range.setBorder( null );
                         break;
                     }
-                    res = new Border();
+                    res = new AscCommonExcel.Border();
                     // Diagonal
                     res.d = makeBorder( val[c_oAscBorderOptions.DiagD] || val[c_oAscBorderOptions.DiagU] );
                     res.dd = val[c_oAscBorderOptions.DiagD] ? true : false;
@@ -9595,7 +9595,7 @@
                             }
                             var link = values[r][c][0].hyperLink;
                             if ( link ) {
-                                var newHyperlink = new Hyperlink();
+                                var newHyperlink = new AscCommonExcel.Hyperlink();
                                 if ( values[r][c][0].hyperLink.search( '#' ) === 0 ) {
                                     newHyperlink.setLocation( link.replace( '#', '' ) );
                                 }
@@ -11034,7 +11034,7 @@
                     v = c.getValueForEdit2().slice( 0, 1 );
                     // Создаем новый массив, т.к. getValueForEdit2 возвращает ссылку
                     newValue = [];
-                    newValue[0] = new Fragment( {text: cellValue, format: v[0].format.clone()} );
+                    newValue[0] = new AscCommonExcel.Fragment( {text: cellValue, format: v[0].format.clone()} );
 
                     t._saveCellValueAfterEdit( oCellEdit, c, newValue, /*flags*/undefined, /*skipNLCheck*/false, /*isNotHistory*/true, /*lockDraw*/true );
                 }
@@ -11519,7 +11519,7 @@
         v = c.getValueForEdit2().slice( 0, 1 );
         // Создаем новый массив, т.к. getValueForEdit2 возвращает ссылку
         copyValue = [];
-        copyValue[0] = new Fragment( {text: text, format: v[0].format.clone()} );
+        copyValue[0] = new AscCommonExcel.Fragment( {text: text, format: v[0].format.clone()} );
 
         var bSuccess = t.openCellEditor( editor, 0, 0, /*isCoord*/false, /*fragments*/undefined, /*cursorPos*/undefined, isFocus, /*isClearCell*/true, /*isHideCursor*/false, /*isQuickInput*/false, activeRange );
         if ( bSuccess ) {
@@ -12432,8 +12432,7 @@
 		var _isShowButtonInFilter = function(col, filter)
 		{
 			var result = true;
-			var typeFilter = filter ? filter.getType() : null;
-			var autoFilter = typeFilter !== null && typeFilter === g_nFiltersType.autoFilter ? filter : filter.AutoFilter;
+			var autoFilter = filter.isAutoFilter() ? filter : filter.AutoFilter;
 			
 			if(filter.HeaderRowCount === 0)
 			{
@@ -12453,7 +12452,7 @@
 					}
 				}
 			}
-			else if(typeFilter !== g_nFiltersType.autoFilter && autoFilter === null)//если форматированная таблица и отсутсвует а/ф
+			else if(!filter.isAutoFilter() && autoFilter === null)//если форматированная таблица и отсутсвует а/ф
 				result = false;
 			
 			return result;

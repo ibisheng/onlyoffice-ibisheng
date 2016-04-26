@@ -1476,7 +1476,7 @@
 				if (jqSpanObject.css('vertical-align') == 'baseline')
 					oNewItem.format.va = '';
 
-				oNewItem.format.c = new RgbColor(this._getBinaryColor(jqSpanObject.css('color')));
+				oNewItem.format.c = new AscCommonExcel.RgbColor(this._getBinaryColor(jqSpanObject.css('color')));
 				if (oNewItem.format.c == '')
 					oNewItem.format.c = null;
 				
@@ -2866,7 +2866,7 @@
 							text = elem.textContent.replace('\t','');
 						if(elem.nodeName.toLowerCase() == 'br')
 							text = '\n';
-						var colorText = new RgbColor(t._getBinaryColor(style.getPropertyValue("color"))); 
+						var colorText = new AscCommonExcel.RgbColor(t._getBinaryColor(style.getPropertyValue("color"))); 
 						if(isText || (isText == '' && typeof isText == 'string'))
 							colorText = null;
 						res.push({
@@ -3479,14 +3479,14 @@
 				var defaultStyle = "solid";
 				var borderStyleName;
 				
-				var formatBorders = oldBorders ? oldBorders : new Border();
+				var formatBorders = oldBorders ? oldBorders : new AscCommonExcel.Border();
 				//top border for cell
 				if(top == cellTable.top && !formatBorders.t.s && borders.Top.Value !== 0/*border_None*/)
 				{
 					borderStyleName = this.clipboard._getBorderStyleName(defaultStyle, this.ws.objectRender.convertMetric(borders.Top.Size,3,1));
 					if (null !== borderStyleName) {
 						formatBorders.t.setStyle(borderStyleName);
-						formatBorders.t.c = new RgbColor(this.clipboard._getBinaryColor("rgb(" + borders.Top.Color.r + "," + borders.Top.Color.g + "," + borders.Top.Color.b + ")"));
+						formatBorders.t.c = new AscCommonExcel.RgbColor(this.clipboard._getBinaryColor("rgb(" + borders.Top.Color.r + "," + borders.Top.Color.g + "," + borders.Top.Color.b + ")"));
 					}
 				}
 				//left border for cell
@@ -3495,7 +3495,7 @@
 					borderStyleName = this.clipboard._getBorderStyleName(defaultStyle, this.ws.objectRender.convertMetric(borders.Left.Size,3,1));
 					if (null !== borderStyleName) {
 						formatBorders.l.setStyle(borderStyleName);
-						formatBorders.l.c = new RgbColor(this.clipboard._getBinaryColor("rgb(" + borders.Left.Color.r + "," + borders.Left.Color.g + "," + borders.Left.Color.b + ")"));
+						formatBorders.l.c = new AscCommonExcel.RgbColor(this.clipboard._getBinaryColor("rgb(" + borders.Left.Color.r + "," + borders.Left.Color.g + "," + borders.Left.Color.b + ")"));
 					}
 				}
 				//bottom border for cell
@@ -3504,7 +3504,7 @@
 					borderStyleName = this.clipboard._getBorderStyleName(defaultStyle, this.ws.objectRender.convertMetric(borders.Bottom.Size,3,1));
 					if (null !== borderStyleName) {
 						formatBorders.b.setStyle(borderStyleName);
-						formatBorders.b.c = new RgbColor(this.clipboard._getBinaryColor("rgb(" + borders.Bottom.Color.r + "," + borders.Bottom.Color.g + "," + borders.Bottom.Color.b + ")"));
+						formatBorders.b.c = new AscCommonExcel.RgbColor(this.clipboard._getBinaryColor("rgb(" + borders.Bottom.Color.r + "," + borders.Bottom.Color.g + "," + borders.Bottom.Color.b + ")"));
 					}
 				}
 				//right border for cell
@@ -3513,7 +3513,7 @@
 					borderStyleName = this.clipboard._getBorderStyleName(defaultStyle, this.ws.objectRender.convertMetric(borders.Right.Size,3,1));
 					if (null !== borderStyleName) {
 						formatBorders.r.setStyle(borderStyleName);
-						formatBorders.r.c = new RgbColor(this.clipboard._getBinaryColor("rgb(" + borders.Right.Color.r + "," + borders.Right.Color.g + "," + borders.Right.Color.b + ")"));
+						formatBorders.r.c = new AscCommonExcel.RgbColor(this.clipboard._getBinaryColor("rgb(" + borders.Right.Color.r + "," + borders.Right.Color.g + "," + borders.Right.Color.b + ")"));
 					}
 				}
 				
@@ -3723,7 +3723,7 @@
 					if(compiledPrCell && compiledPrCell.Shd.Value !== 1/*shd_Nil*/)
 					{	
 						var color = compiledPrCell.Shd.Color;
-						backgroundColor = new RgbColor(this.clipboard._getBinaryColor("rgb(" + color.r + "," + color.g + "," + color.b + ")"));
+						backgroundColor = new AscCommonExcel.RgbColor(this.clipboard._getBinaryColor("rgb(" + color.r + "," + color.g + "," + color.b + ")"));
 					};
 				};
 				
@@ -4145,10 +4145,10 @@
 				else if(paraPr.TextPr.VertAlign == 2)
 					paragraphVertAlign = "subscript";
 
-				var colorParagraph = new RgbColor(this.clipboard._getBinaryColor("rgb(" + paraPr.TextPr.Color.r + "," + paraPr.TextPr.Color.g + "," + paraPr.TextPr.Color.b + ")"));
+				var colorParagraph = new AscCommonExcel.RgbColor(this.clipboard._getBinaryColor("rgb(" + paraPr.TextPr.Color.r + "," + paraPr.TextPr.Color.g + "," + paraPr.TextPr.Color.b + ")"));
 				
 				if(cTextPr.Color)
-					colorText = new RgbColor(this.clipboard._getBinaryColor("rgb(" + cTextPr.Color.r + "," + cTextPr.Color.g + "," + cTextPr.Color.b + ")"));
+					colorText = new AscCommonExcel.RgbColor(this.clipboard._getBinaryColor("rgb(" + cTextPr.Color.r + "," + cTextPr.Color.g + "," + cTextPr.Color.b + ")"));
 				else
 					colorText = null;
 				

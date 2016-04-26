@@ -24,6 +24,7 @@
 	var cElementType = AscCommonExcel.cElementType;
 	var c_oAscCellEditorSelectState = AscCommonExcel.c_oAscCellEditorSelectState;
 	var c_oAscCellEditorState = asc.c_oAscCellEditorState;
+	var Fragment = AscCommonExcel.Fragment;
 
 	var asc_calcnpt = asc.calcNearestPt;
 	var asc_getcvt = asc.getCvtRatio;

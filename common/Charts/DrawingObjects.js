@@ -245,10 +245,10 @@ function CreateSparklineMarker(oUniFill)
 function CreateUniFillFromExcelColor(oExcelColor)
 {
     var oUnifill;
-    if(oExcelColor instanceof ThemeColor)
+    if(oExcelColor instanceof AscCommonExcel.ThemeColor)
     {
 
-        oUnifill = AscFormat.CreateUnifillSolidFillSchemeColorByIndex(map_themeExcel_to_themePresentation[oExcelColor.theme]);
+        oUnifill = AscFormat.CreateUnifillSolidFillSchemeColorByIndex(AscCommonExcel.map_themeExcel_to_themePresentation[oExcelColor.theme]);
         if(oExcelColor.tint != null)
         {
             var unicolor = oUnifill.fill.color;

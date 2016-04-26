@@ -1294,7 +1294,7 @@ NumFormat.prototype =
             {
                 if(null == format)
                     format = new NumFormatFont();
-                format.c = new RgbColor(this.Color);
+                format.c = new AscCommonExcel.RgbColor(this.Color);
             }
             if(null != prev && ((null == prev.format && null == format) || (null != prev.format && null != format && format.isEqual(prev.format))))
             {
