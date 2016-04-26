@@ -11,6 +11,8 @@ function (window, undefined) {
 var c_oAscCellAnchorType = AscCommon.c_oAscCellAnchorType;
 var c_oAscLockTypes = AscCommon.c_oAscLockTypes;
 var parserHelp = AscCommon.parserHelp;
+var gc_nMaxRow = AscCommon.gc_nMaxRow;
+var gc_nMaxCol = AscCommon.gc_nMaxCol;
 
 var BBoxInfo = AscFormat.BBoxInfo;
 var MOVE_DELTA = AscFormat.MOVE_DELTA;
@@ -2884,8 +2886,8 @@ function DrawingObjects() {
                         //}
                     }
 
-                    var startCell = new CellAddress(final_bbox.r1, final_bbox.c1, 0);
-                    var endCell = new CellAddress(final_bbox.r2, final_bbox.c2, 0);
+                    var startCell = new AscCommon.CellAddress(final_bbox.r1, final_bbox.c1, 0);
+                    var endCell = new AscCommon.CellAddress(final_bbox.r2, final_bbox.c2, 0);
 
 
                     if (startCell && endCell)

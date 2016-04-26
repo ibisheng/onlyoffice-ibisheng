@@ -9,6 +9,8 @@ function (window, undefined) {
 // Import
 var CShape = AscFormat.CShape;
 
+var isRealObject = AscCommon.isRealObject;
+
 function CImageShape()
 {
     this.nvPicPr  = null;

@@ -6392,7 +6392,7 @@ ParaRun.prototype.Apply_Pr = function(TextPr)
         if(!this.Paragraph.bFromDocument)
         {
             var oCompiledPr = this.Get_CompiledPr(true);
-            this.Set_Unifill(AscFormat.CorrectUniFill(TextPr.AscUnifill, oCompiledPr.Unifill, 0), isRealObject(TextPr.AscUnifill) && TextPr.AscUnifill.asc_CheckForseSet() );
+            this.Set_Unifill(AscFormat.CorrectUniFill(TextPr.AscUnifill, oCompiledPr.Unifill, 0), AscCommon.isRealObject(TextPr.AscUnifill) && TextPr.AscUnifill.asc_CheckForseSet() );
             this.Set_Color(undefined);
             this.Set_TextFill(undefined);
         }
@@ -6425,7 +6425,7 @@ ParaRun.prototype.Apply_Pr = function(TextPr)
             }
             this.Set_Unifill(undefined);
             this.Set_Color(undefined);
-            this.Set_TextFill(AscFormat.CorrectUniFill(TextPr.AscFill, oMergeUnifill, 0), isRealObject(TextPr.AscFill) && TextPr.AscFill.asc_CheckForseSet());
+            this.Set_TextFill(AscFormat.CorrectUniFill(TextPr.AscFill, oMergeUnifill, 0), AscCommon.isRealObject(TextPr.AscFill) && TextPr.AscFill.asc_CheckForseSet());
         }
     }
 

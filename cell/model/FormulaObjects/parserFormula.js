@@ -14,6 +14,8 @@ function (window, undefined) {
   var FormulaSeparators = AscCommon.FormulaSeparators;
   var parserHelp = AscCommon.parserHelp;
   var g_oFormatParser = AscCommon.g_oFormatParser;
+  var g_oCellAddressUtils = AscCommon.g_oCellAddressUtils;
+  var CellAddress = AscCommon.CellAddress;
 
   var c_oAscError = Asc.c_oAscError;
   

@@ -4671,7 +4671,7 @@ asc_docs_api.prototype.AddImageToPage = function(sUrl, nPageIndex, dX, dY, dW, d
 asc_docs_api.prototype.ImgApply = function(obj)
 {
 
-    if(!isRealObject(obj))
+    if(!AscCommon.isRealObject(obj))
         return;
     var ImagePr = obj, AdditionalData, LogicDocument = this.WordControl.m_oLogicDocument;
 
@@ -7207,7 +7207,7 @@ window["asc_docs_api"].prototype["asc_nativeApplyChanges2"] = function(data, isF
     // Чтобы заново созданные параграфы не отображались залоченными
     g_oIdCounter.Set_Load( true );
 	
-    var stream = new FT_Stream2(data, data.length);
+    var stream = new AscCommon.FT_Stream2(data, data.length);
     stream.obj = null;
     var Loader = { Reader : stream, Reader2 : null };
     var _color = new CDocumentColor( 191, 255, 199 );

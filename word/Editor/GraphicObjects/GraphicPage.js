@@ -288,7 +288,7 @@ CGraphicPage.prototype =
             }
         }
 
-        if(!isRealObject(docContent))
+        if(!AscCommon.isRealObject(docContent))
             docContent = this.graphicObjects.document;
 
         findInArrayAndRemoveFromDrawingPage(this, docContent, editor.WordControl.m_oLogicDocument);

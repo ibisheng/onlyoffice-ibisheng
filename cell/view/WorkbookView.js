@@ -815,7 +815,7 @@
   WorkbookView.prototype._onGetSelectionState = function() {
     var ws = this.getWorksheet();
     var res = null;
-    if (isRealObject(ws.objectRender) && isRealObject(ws.objectRender.controller)) {
+    if (AscCommon.isRealObject(ws.objectRender) && AscCommon.isRealObject(ws.objectRender.controller)) {
       res = ws.objectRender.controller.getSelectionState();
     }
     // ToDo лучше на getSelectionState возвращать null

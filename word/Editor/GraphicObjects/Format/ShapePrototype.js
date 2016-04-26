@@ -3,6 +3,8 @@
 // Import
 var CShape = AscFormat.CShape;
 
+var isRealObject = AscCommon.isRealObject;
+
 CShape.prototype.setRecalculateInfo = function()
 {
     this.recalcInfo =

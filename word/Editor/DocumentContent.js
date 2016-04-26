@@ -2293,7 +2293,7 @@ CDocumentContent.prototype =
             if ( type_Paragraph == Item.GetType() )
             {
                 var Drawing;
-                if(!isRealObject(Chart))
+                if(!AscCommon.isRealObject(Chart))
                 {
                     Drawing = new ParaDrawing( W, H, null, this.DrawingDocument, this, null);
                     var Image = this.DrawingObjects.createImage(Img, 0, 0, W, H);

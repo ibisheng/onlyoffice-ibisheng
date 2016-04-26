@@ -897,7 +897,7 @@ MoveState.prototype =
                 for(snap_index = 0; snap_index < trackSnapArrayX.length; ++snap_index)
                 {
                     var snap_obj = AscFormat.GetMinSnapDistanceXObjectByArrays(trackSnapArrayX[snap_index] + curDX, snapHorArray);
-                    if(isRealObject(snap_obj))
+                    if(AscCommon.isRealObject(snap_obj))
                     {
                         dx = snap_obj.dist;
                         if(dx !== null)
@@ -924,7 +924,7 @@ MoveState.prototype =
                     for(var snap_index = 0; snap_index < trackSnapArrayX.length; ++snap_index)
                     {
                         var snap_obj = AscFormat.GetMinSnapDistanceXObject(trackSnapArrayX[snap_index] + curDX, start_arr);
-                        if(isRealObject(snap_obj))
+                        if(AscCommon.isRealObject(snap_obj))
                         {
                             dx = snap_obj.dist;
                             if(dx !== null)
@@ -965,7 +965,7 @@ MoveState.prototype =
                 for(snap_index = 0; snap_index < trackSnapArrayY.length; ++snap_index)
                 {
                     var snap_obj = AscFormat.GetMinSnapDistanceYObjectByArrays(trackSnapArrayY[snap_index] + curDY, snapVerArray);
-                    if(isRealObject(snap_obj))
+                    if(AscCommon.isRealObject(snap_obj))
                     {
                         dy = snap_obj.dist;
                         if(dy !== null)
@@ -992,7 +992,7 @@ MoveState.prototype =
                     for(snap_index = 0; snap_index < trackSnapArrayY.length; ++snap_index)
                     {
                         var snap_obj = AscFormat.GetMinSnapDistanceYObject(trackSnapArrayY[snap_index] + curDY, start_arr);
-                        if(isRealObject(snap_obj))
+                        if(AscCommon.isRealObject(snap_obj))
                         {
                             dy = snap_obj.dist;
                             if(dy !== null)

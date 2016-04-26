@@ -396,7 +396,7 @@ CHistory.prototype.UndoRedoEnd = function (Point, oRedoObjectParam, bUndo) {
 			this.workbook.handlers.trigger("reInit");
 		this.workbook.handlers.trigger("drawWS");
 		if (bUndo) {
-			if (isRealObject(this.lastDrawingObjects)) {
+			if (AscCommon.isRealObject(this.lastDrawingObjects)) {
 				this.lastDrawingObjects.sendGraphicObjectProps();
 				this.lastDrawingObjects = null;
 			}

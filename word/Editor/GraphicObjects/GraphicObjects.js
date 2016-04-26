@@ -4,6 +4,7 @@
 var changestype_Drawing_Props = AscCommon.changestype_Drawing_Props;
 var changestype_2_ElementsArray_and_Type = AscCommon.changestype_2_ElementsArray_and_Type;
 var g_oTableId = AscCommon.g_oTableId;
+var isRealObject = AscCommon.isRealObject;
 
 var DrawingObjectsController = AscFormat.DrawingObjectsController;
 var HANDLE_EVENT_MODE_HANDLE = AscFormat.HANDLE_EVENT_MODE_HANDLE;

@@ -1227,7 +1227,7 @@ function BinaryPPTYLoader()
                 {
                     var _id = s.GetString2();
                    // _style.Id = _id;
-					if(isRealObject(this.presentation.TableStylesIdMap))
+					if(AscCommon.isRealObject(this.presentation.TableStylesIdMap))
 						this.presentation.TableStylesIdMap[_style.Id] = true;
                     this.map_table_styles[_id] = _style;
                     break;
@@ -5326,7 +5326,7 @@ function BinaryPPTYLoader()
                     var _length = s.GetLong();
                     var _pos = s.cur;
 
-                    var _stream = new FT_Stream2();
+                    var _stream = new AscCommon.FT_Stream2();
                     _stream.data = s.data;
                     _stream.pos = s.pos;
                     _stream.cur = s.cur;
@@ -5432,7 +5432,7 @@ function BinaryPPTYLoader()
 
                     if(typeof AscFormat.CChartSpace !== "undefined")
                     {
-                        var _stream = new FT_Stream2();
+                        var _stream = new AscCommon.FT_Stream2();
                         _stream.data = s.data;
                         _stream.pos = s.pos;
                         _stream.cur = s.cur;

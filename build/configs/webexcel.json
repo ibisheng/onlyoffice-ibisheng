@@ -9,6 +9,7 @@
         "../common/docscoapicommon.js",
         "../common/docscoapi.js",
         "../common/apiCommon.js",
+		"../common/SerializeCommonWordExcel.js",
         "../common/editorscommon.js",
         "../common/NumFormat.js",
 		
@@ -103,7 +104,6 @@
         "../word/Editor/SerializeCommon.js",
         "../common/Shapes/Serialize.js",
         "../common/Shapes/SerializeWriter.js",
-        "../common/SerializeCommonWordExcel.js",
         "../common/SerializeChart.js",
         "../cell/view/DrawingObjectsController.js",
         "../cell/model/DrawingObjects/Graphics.js",

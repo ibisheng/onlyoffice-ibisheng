@@ -989,19 +989,19 @@ function CEditorPage(api)
     this.onButtonTabsClick = function()
     {
         var oWordControl = oThis;
-        if (oWordControl.m_nTabsType == g_tabtype_left)
+        if (oWordControl.m_nTabsType == AscCommon.g_tabtype_left)
         {
-            oWordControl.m_nTabsType = g_tabtype_center;
+            oWordControl.m_nTabsType = AscCommon.g_tabtype_center;
             oWordControl.onButtonTabsDraw();
         }
-        else if (oWordControl.m_nTabsType == g_tabtype_center)
+        else if (oWordControl.m_nTabsType == AscCommon.g_tabtype_center)
         {
-            oWordControl.m_nTabsType = g_tabtype_right;
+            oWordControl.m_nTabsType = AscCommon.g_tabtype_right;
             oWordControl.onButtonTabsDraw();
         }
         else
         {
-            oWordControl.m_nTabsType = g_tabtype_left;
+            oWordControl.m_nTabsType = AscCommon.g_tabtype_left;
             oWordControl
                 .onButtonTabsDraw();
         }
@@ -1032,13 +1032,13 @@ function CEditorPage(api)
         _ctx.strokeStyle = "#3E3E3E";
 
         _ctx.lineWidth = 2;
-        if (this.m_nTabsType == g_tabtype_left)
+        if (this.m_nTabsType == AscCommon.g_tabtype_left)
         {
             _ctx.moveTo(8, 9);
             _ctx.lineTo(8, 14);
             _ctx.lineTo(13, 14);
         }
-        else if (this.m_nTabsType == g_tabtype_center)
+        else if (this.m_nTabsType == AscCommon.g_tabtype_center)
         {
             _ctx.moveTo(6, 14);
             _ctx.lineTo(14, 14);

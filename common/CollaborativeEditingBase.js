@@ -115,7 +115,7 @@ CCollaborativeChanges.prototype.Internal_Load_Data2 = function(szSrc, offset, sr
     var dstLen = parseInt(dst_len);
 
     var pointer = g_memory.Alloc(dstLen);
-    var stream = new FT_Stream2(pointer.data, dstLen);
+    var stream = new AscCommon.FT_Stream2(pointer.data, dstLen);
     stream.obj = pointer.obj;
 
     var dstPx = stream.data;

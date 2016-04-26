@@ -1,6 +1,8 @@
 "use strict";
 
 // Import
+var c_oSerConstants = AscCommon.c_oSerConstants;
+
 var c_oAscTickMark = Asc.c_oAscTickMark;
 var c_oAscTickLabelsPos = Asc.c_oAscTickLabelsPos;
 var c_oAscChartDataLabelsPos = Asc.c_oAscChartDataLabelsPos;
@@ -998,7 +1000,7 @@ var TRENDLINE_TYPE_POWER = 5;
 
 function BinaryChartWriter(memory) {
     this.memory = memory;
-    this.bs = new BinaryCommonWriter(this.memory);
+    this.bs = new AscCommon.BinaryCommonWriter(this.memory);
 }
 BinaryChartWriter.prototype.WriteCT_extLst = function (oVal) {
     var oThis = this;
@@ -5280,7 +5282,7 @@ BinaryChartWriter.prototype.WriteAlternateContentFallback = function (oVal) {
 }
 function BinaryChartReader(stream) {
     this.stream = stream;
-    this.bcr = new Binary_CommonReader(this.stream);
+    this.bcr = new AscCommon.Binary_CommonReader(this.stream);
 }
 BinaryChartReader.prototype.ReadCT_extLst = function (type, length, val) {
     var res = c_oSerConstants.ReadOk;

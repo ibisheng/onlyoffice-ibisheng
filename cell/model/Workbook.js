@@ -9,6 +9,11 @@ var fSortAscending = AscCommon.fSortAscending;
 var fSortDescending = AscCommon.fSortDescending;
 var parserHelp = AscCommon.parserHelp;
 var oNumFormatCache = AscCommon.oNumFormatCache;
+var gc_nMaxRow0 = AscCommon.gc_nMaxRow0;
+var gc_nMaxCol0 = AscCommon.gc_nMaxCol0;
+var g_oCellAddressUtils = AscCommon.g_oCellAddressUtils;
+var CellAddress = AscCommon.CellAddress;
+var isRealObject = AscCommon.isRealObject;
 
 var UndoRedoItemSerializable = AscCommonExcel.UndoRedoItemSerializable;
 var UndoRedoData_CellSimpleData = AscCommonExcel.UndoRedoData_CellSimpleData;
@@ -2911,7 +2916,7 @@ Workbook.prototype.DeserializeHistory = function(aChanges, fCallback){
 			aIndexes.push(nIndex);
 		}
 		var pointer = g_memory.Alloc(dstLen);
-		var stream = new FT_Stream2(pointer.data, dstLen);
+		var stream = new AscCommon.FT_Stream2(pointer.data, dstLen);
 		stream.obj = pointer.obj;
 		var nCurOffset = 0;
 		//пробегаемся первый раз чтобы заполнить oFontMap
@@ -3036,7 +3041,7 @@ Workbook.prototype.DeserializeHistoryNative = function(oRedoObjectParam, data, i
 			History.UndoRedoPrepare(oRedoObjectParam, false);
 		}
 		
-		var stream = new FT_Stream2(data, data.length);
+		var stream = new AscCommon.FT_Stream2(data, data.length);
 		stream.obj = null;
 		// Применяем изменения, пока они есть
 		var _count = stream.GetLong();
@@ -6278,13 +6283,13 @@ Range.prototype.isOneCell=function(){
 	return oBBox.r1 == oBBox.r2 && oBBox.c1 == oBBox.c2;
 };
 Range.prototype.isColumn = function(){
-	if(this.first.getRow() == 1 && this.last.getRow() == gc_nMaxRow)
+	if(this.first.getRow() == 1 && this.last.getRow() == AscCommon.gc_nMaxRow)
 		return true;
 	else
 		return false;
 };
 Range.prototype.isRow = function(){
-	if(this.first.getCol() == 1 && this.last.getCol() == gc_nMaxCol)
+	if(this.first.getCol() == 1 && this.last.getCol() == AscCommon.gc_nMaxCol)
 		return true;
 	else
 		return false;

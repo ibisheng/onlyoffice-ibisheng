@@ -285,7 +285,7 @@ DrawingObjectsController.prototype.addChartDrawingObject = function(options)
         chart.setBDeleted(false);
         this.resetSelection();
         var w, h;
-        if(isRealObject(options) && AscFormat.isRealNumber(options.width) && AscFormat.isRealNumber(options.height))
+        if(AscCommon.isRealObject(options) && AscFormat.isRealNumber(options.width) && AscFormat.isRealNumber(options.height))
         {
             w = this.drawingObjects.convertMetric(options.width, 0, 3);
             h = this.drawingObjects.convertMetric(options.height, 0, 3);
@@ -421,7 +421,7 @@ DrawingObjectsController.prototype.setParagraphNumbering = function(Bullet)
 
 DrawingObjectsController.prototype.setParagraphIndent = function(Indent)
 {
-    if(isRealObject(Indent) && AscFormat.isRealNumber(Indent.Left) && Indent.Left < 0)
+    if(AscCommon.isRealObject(Indent) && AscFormat.isRealNumber(Indent.Left) && Indent.Left < 0)
     {
         Indent.Left = 0;
     }

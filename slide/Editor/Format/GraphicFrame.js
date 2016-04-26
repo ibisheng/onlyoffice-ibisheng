@@ -4,6 +4,8 @@
 var CShape = AscFormat.CShape;
 var HitInLine = AscFormat.HitInLine;
 
+var isRealObject = AscCommon.isRealObject;
+
 function CGraphicFrame()
 {
     this.parent = null;

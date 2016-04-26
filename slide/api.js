@@ -234,7 +234,7 @@ asc_docs_api.prototype._coAuthoringInitEnd = function() {
           if (classes[i].indexOf("new_object") > -1 && block_value["type"] === c_oAscLockTypeElemPresentation.Object) {
             var slide_id = block_value["slideId"];
             var delete_lock = g_oTableId.Get_ById(slide_id);
-            if (isRealObject(delete_lock)) {
+            if (AscCommon.isRealObject(delete_lock)) {
               var Lock = delete_lock.Lock;
               var OldType = Lock.Get_Type();
               if (locktype_Other2 === OldType || locktype_Other3 === OldType) {
@@ -1965,7 +1965,7 @@ asc_docs_api.prototype.SetSlideProps = function(prop)
         }
 
         var _old_fill = this.WordControl.m_oLogicDocument.Slides[this.WordControl.m_oLogicDocument.CurPage].backgroundFill;
-        if (isRealObject(_old_fill))
+        if (AscCommon.isRealObject(_old_fill))
             _old_fill = _old_fill.createDuplicate();
         var bg = new AscFormat.CBg();
         bg.bgPr = new AscFormat.CBgPr();
@@ -4682,7 +4682,7 @@ asc_docs_api.prototype.asc_editChartDrawingObject = function(chartBinary)
     /**/
 
     // Находим выделенную диаграмму и накатываем бинарник
-    if ( isRealObject(chartBinary) )
+    if ( AscCommon.isRealObject(chartBinary) )
     {
         this.WordControl.m_oLogicDocument.Edit_Chart(chartBinary["binary"]);
     }
@@ -4699,7 +4699,7 @@ asc_docs_api.prototype.sync_closeChartEditor = function()
 
 function CContextMenuData(oData)
 {
-    if(isRealObject(oData))
+    if(AscCommon.isRealObject(oData))
     {
         this.Type  = oData.Type;
         this.X_abs = oData.X_abs;
@@ -4854,7 +4854,7 @@ window["asc_docs_api"].prototype["asc_nativeApplyChanges2"] = function(data, isF
     // Чтобы заново созданные параграфы не отображались залоченными
     g_oIdCounter.Set_Load( true );
 
-    var stream = new FT_Stream2(data, data.length);
+    var stream = new AscCommon.FT_Stream2(data, data.length);
     stream.obj = null;
     var Loader = { Reader : stream, Reader2 : null };
     var _color = new CDocumentColor( 191, 255, 199 );

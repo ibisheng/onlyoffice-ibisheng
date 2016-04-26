@@ -11,6 +11,8 @@ var cErrorLocal = AscCommon.cErrorLocal;
 var parserHelp = AscCommon.parserHelp;
 var oNumFormatCache = AscCommon.oNumFormatCache;
 var gc_nMaxDigCountView = AscCommon.gc_nMaxDigCountView;
+var gc_nMaxRow0 = AscCommon.gc_nMaxRow0;
+var gc_nMaxCol0 = AscCommon.gc_nMaxCol0;
 
 var UndoRedoDataTypes = AscCommonExcel.UndoRedoDataTypes;
 var UndoRedoData_CellSimpleData = AscCommonExcel.UndoRedoData_CellSimpleData;

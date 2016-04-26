@@ -8,6 +8,7 @@ var changestype_Drawing_Props = AscCommon.changestype_Drawing_Props;
 var g_oTableId = AscCommon.g_oTableId;
 var Editor_Copy = AscCommon.Editor_Copy;
 var Editor_Paste = AscCommon.Editor_Paste;
+var isRealObject = AscCommon.isRealObject;
 
 var CreateUnifillSolidFillSchemeColor = AscFormat.CreateUnifillSolidFillSchemeColor;
 

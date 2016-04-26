@@ -12,6 +12,7 @@
 		 * -----------------------------------------------------------------------------
 		 */
 		var CellValueType = AscCommon.CellValueType;
+		var CellAddress = AscCommon.CellAddress;
 		
 		var UndoRedoDataTypes = AscCommonExcel.UndoRedoDataTypes;
 
@@ -313,8 +314,8 @@
 					}
 					else
 					{
-						if(addNameColumn && filterRange.r2 >= gc_nMaxRow)
-							filterRange.r2 = gc_nMaxRow - 1;
+						if(addNameColumn && filterRange.r2 >= AscCommon.gc_nMaxRow)
+							filterRange.r2 = AscCommon.gc_nMaxRow - 1;
 
 						if(styleName)
 							worksheet.getRange3(filterRange.r1, filterRange.c1, filterRange.r2, filterRange.c2).unmerge();
@@ -963,12 +964,12 @@
 				if(DeleteColumns)//в случае, если удаляем столбцы, тогда расширяем активную область область по всем строкам
 				{
 					activeCells.r1 = 0;
-					activeCells.r2 = gc_nMaxRow - 1;
+					activeCells.r2 = AscCommon.gc_nMaxRow - 1;
 				}
 				else if(DeleteRows)//в случае, если удаляем строки, тогда расширяем активную область область по всем столбцам
 				{
 					activeCells.c1 = 0;
-					activeCells.c2 = gc_nMaxCol - 1;
+					activeCells.c2 = AscCommon.gc_nMaxCol - 1;
 				}
 				
 				History.StartTransaction();
@@ -1105,7 +1106,7 @@
 				if(DeleteColumns)//в случае, если удаляем столбцы, тогда расширяем активную область область по всем строкам
 				{
 					activeRange.r1 = 0;
-					activeRange.r2 = gc_nMaxRow - 1;
+					activeRange.r2 = AscCommon.gc_nMaxRow - 1;
 				}
 				
 				History.StartTransaction();
@@ -1328,7 +1329,7 @@
 				if(DeleteRows)//в случае, если удаляем строки, тогда расширяем активную область область по всем столбцам
 				{
 					activeRange.c1 = 0;
-					activeRange.c2 = gc_nMaxCol - 1;
+					activeRange.c2 = AscCommon.gc_nMaxCol - 1;
 				}
 				
 				History.StartTransaction();
@@ -1870,11 +1871,11 @@
 					var newActiveRange;
 					if(DeleteRows)
 					{
-						newActiveRange = new Asc.Range(0, activeCells.r1, gc_nMaxCol - 1, activeCells.r2);
+						newActiveRange = new Asc.Range(0, activeCells.r1, AscCommon.gc_nMaxCol - 1, activeCells.r2);
 					}
 					else
 					{
-						newActiveRange = new Asc.Range(activeCells.c1, 0, activeCells.c2, gc_nMaxRow - 1);
+						newActiveRange = new Asc.Range(activeCells.c1, 0, activeCells.c2, AscCommon.gc_nMaxRow - 1);
 					}
 					//если активной областью захвачена полнотью форматированная таблица(или её часть) + часть форматированной таблицы - выдаём ошибку
 					if(tableParts)
@@ -3032,7 +3033,7 @@
 					{
 						cell = worksheet.getCell3(row, col);
 						var isMerged = cell.hasMerged();
-						var isMergedAllRow = (isMerged && isMerged.c2 + 1 == gc_nMaxCol && isMerged.c1 === 0) ? true : false;//если замержена вся ячейка
+						var isMergedAllRow = (isMerged && isMerged.c2 + 1 == AscCommon.gc_nMaxCol && isMerged.c1 === 0) ? true : false;//если замержена вся ячейка
 						
 						if((isMerged && isMerged.c2 != col && !isMergedAllRow) || (isMergedAllRow && col !== ref.c1))
 						{	

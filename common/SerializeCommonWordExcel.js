@@ -1,4 +1,5 @@
 "use strict";
+(function(window, undefined){
 
 //зависимости
 //stream
@@ -66,18 +67,6 @@ var c_oSerShdType = {
     Color: 1,
 	ColorTheme: 2
 };
-
-var g_tabtype_left = 0;
-var g_tabtype_right = 1;
-var g_tabtype_center = 2;
-var g_tabtype_clear = 3;
-
-function OpenColor() {
-	this.rgb = null;
-	this.auto = null;
-	this.theme = null;
-	this.tint = null;
-}
 
 function BinaryCommonWriter(memory)
 {
@@ -946,7 +935,25 @@ function isRealObject(obj)
     return obj !== null && typeof obj === "object";
 }
 
-//--------------------------------------------------------export----------------------------------------------------
-window['AscCommon'] = window['AscCommon'] || {};
-window['AscCommon'].gc_nMaxRow = gc_nMaxRow;
-window['AscCommon'].gc_nMaxCol = gc_nMaxCol;
+  //----------------------------------------------------------export----------------------------------------------------
+  window['AscCommon'] = window['AscCommon'] || {};
+  window['AscCommon'].c_oSerConstants = c_oSerConstants;
+  window['AscCommon'].c_oSerPropLenType = c_oSerPropLenType;
+  window['AscCommon'].c_oSerBorderType = c_oSerBorderType;
+  window['AscCommon'].c_oSerBordersType = c_oSerBordersType;
+  window['AscCommon'].c_oSerPaddingType = c_oSerPaddingType;
+  window['AscCommon'].g_tabtype_left = 0;
+  window['AscCommon'].g_tabtype_right = 1;
+  window['AscCommon'].g_tabtype_center = 2;
+  window['AscCommon'].g_tabtype_clear = 3;
+  window['AscCommon'].BinaryCommonWriter = BinaryCommonWriter;
+  window['AscCommon'].Binary_CommonReader = Binary_CommonReader;
+  window['AscCommon'].FT_Stream2 = FT_Stream2;
+  window['AscCommon'].gc_nMaxRow = gc_nMaxRow;
+  window['AscCommon'].gc_nMaxCol = gc_nMaxCol;
+  window['AscCommon'].gc_nMaxRow0 = gc_nMaxRow0;
+  window['AscCommon'].gc_nMaxCol0 = gc_nMaxCol0;
+  window['AscCommon'].g_oCellAddressUtils = g_oCellAddressUtils;
+  window['AscCommon'].CellAddress = CellAddress;
+  window['AscCommon'].isRealObject = isRealObject;
+})(window);

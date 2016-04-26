@@ -14,6 +14,8 @@ var parserHelp = AscCommon.parserHelp;
 var g_oIdCounter = AscCommon.g_oIdCounter;
 var g_oTableId = AscCommon.g_oTableId;
 var oNumFormatCache = AscCommon.oNumFormatCache;
+var CellAddress = AscCommon.CellAddress;
+var isRealObject = AscCommon.isRealObject;
 
 var CShape = AscFormat.CShape;
 var Ax_Counter = AscFormat.Ax_Counter;

@@ -12,6 +12,13 @@ var align_Left = AscCommon.align_Left;
 var align_Center = AscCommon.align_Center;
 var align_Justify = AscCommon.align_Justify;
 var c_oAscWrapStyle = AscCommon.c_oAscWrapStyle;
+var Binary_CommonReader = AscCommon.Binary_CommonReader;
+var BinaryCommonWriter = AscCommon.BinaryCommonWriter;
+var c_oSerPaddingType = AscCommon.c_oSerPaddingType;
+var c_oSerBordersType = AscCommon.c_oSerBordersType;
+var c_oSerBorderType = AscCommon.c_oSerBorderType;
+var c_oSerPropLenType = AscCommon.c_oSerPropLenType;
+var c_oSerConstants = AscCommon.c_oSerConstants;
 
 var c_oAscXAlign = Asc.c_oAscXAlign;
 var c_oAscYAlign = Asc.c_oAscYAlign;
@@ -1569,10 +1576,10 @@ function Binary_pPrWriter(memory, oNumIdMap, oBinaryHeaderFooterTableWriter, sav
         this.memory.WriteByte(c_oSerPropLenType.Byte);
 		switch(TabItem.Value)
 		{
-			case tab_Right: this.memory.WriteByte(g_tabtype_right);break;
-			case tab_Center: this.memory.WriteByte(g_tabtype_center);break;
-			case tab_Clear: this.memory.WriteByte(g_tabtype_clear);break;
-			default:this.memory.WriteByte(g_tabtype_left);
+			case tab_Right: this.memory.WriteByte(AscCommon.g_tabtype_right);break;
+			case tab_Center: this.memory.WriteByte(AscCommon.g_tabtype_center);break;
+			case tab_Clear: this.memory.WriteByte(AscCommon.g_tabtype_clear);break;
+			default:this.memory.WriteByte(AscCommon.g_tabtype_left);
 		}
         
         //pos
@@ -5081,7 +5088,7 @@ function BinaryFileReader(doc, openParams)
         var dstLen = parseInt(dst_len);
 
         var pointer = g_memory.Alloc(dstLen);
-        var stream = new FT_Stream2(pointer.data, dstLen);
+        var stream = new AscCommon.FT_Stream2(pointer.data, dstLen);
         stream.obj = pointer.obj;
 
         var dstPx = stream.data;
@@ -5175,7 +5182,7 @@ function BinaryFileReader(doc, openParams)
     this.ReadData = function(data)
     {
         //try{
-        this.stream = new FT_Stream2(data, data.length);        
+        this.stream = new AscCommon.FT_Stream2(data, data.length);        
         this.PreLoadPrepare();
         this.ReadMainTable();
         this.PostLoadPrepare();
@@ -6539,9 +6546,9 @@ function Binary_pPrReader(doc, oReadResult, stream)
 		{
 			switch(this.stream.GetUChar())
 			{
-				case g_tabtype_right : tab.Value = tab_Right;break;
-				case g_tabtype_center : tab.Value = tab_Center;break;
-				case g_tabtype_clear : tab.Value = tab_Clear;break;
+				case AscCommon.g_tabtype_right : tab.Value = tab_Right;break;
+				case AscCommon.g_tabtype_center : tab.Value = tab_Center;break;
+				case AscCommon.g_tabtype_clear : tab.Value = tab_Clear;break;
 				default : tab.Value = tab_Left;
 			}
 		}

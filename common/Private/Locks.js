@@ -526,7 +526,7 @@ if(typeof CPresentation !== "undefined")
             return true;
         }
 
-        if(CheckType === AscCommon.changestype_None && isRealObject(AdditionalData) && AdditionalData.CheckType === AscCommon.changestype_Table_Properties)
+        if(CheckType === AscCommon.changestype_None && AscCommon.isRealObject(AdditionalData) && AdditionalData.CheckType === AscCommon.changestype_Table_Properties)
         {
             CheckType = AscCommon.changestype_Drawing_Props;
         }
@@ -589,7 +589,7 @@ if(typeof CPresentation !== "undefined")
         if(CheckType === AscCommon.changestype_MoveComment)
         {
             var comment = AscCommon.g_oTableId.Get_ById(AdditionalData);
-            if(isRealObject(comment))
+            if(AscCommon.isRealObject(comment))
             {
                 var slides = this.Slides;
                 var check_slide = null;
@@ -612,7 +612,7 @@ if(typeof CPresentation !== "undefined")
                         }
                     }
                 }
-                if(isRealObject(check_slide))
+                if(AscCommon.isRealObject(check_slide))
                 {
                     if(check_slide.deleteLock.Lock.Type !== locktype_Mine && check_slide.deleteLock.Lock.Type !== locktype_None)
                         return true;

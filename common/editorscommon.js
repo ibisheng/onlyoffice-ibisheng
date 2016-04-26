@@ -15,6 +15,7 @@ var locktype_Other2 = AscCommon.locktype_Other2;
 var locktype_Other3 = AscCommon.locktype_Other3;
 var contentchanges_Add = AscCommon.contentchanges_Add;
 var CColor = AscCommon.CColor;
+var g_oCellAddressUtils = AscCommon.g_oCellAddressUtils;
 
 var c_oAscFileType = Asc.c_oAscFileType;
 
@@ -554,7 +555,7 @@ function test_ws_name2() {
             var match = str.match( rx_ref );
             if (match != null) {
                 var m1 = match[1], m2 = match[2];
-                if ( match.length >= 3 && g_oCellAddressUtils.colstrToColnum( m1.substr( 0, (m1.length - m2.length) ) ) <= gc_nMaxCol && parseInt( m2 ) <= gc_nMaxRow ) {
+                if ( match.length >= 3 && g_oCellAddressUtils.colstrToColnum( m1.substr( 0, (m1.length - m2.length) ) ) <= AscCommon.gc_nMaxCol && parseInt( m2 ) <= AscCommon.gc_nMaxRow ) {
                     return false;
                 }
             }
@@ -579,7 +580,7 @@ function test_defName(){
         if (match != null) {
             m1 = match[1];
             m2 = match[2];
-            if ( match.length >= 3 && g_oCellAddressUtils.colstrToColnum( m1.substr( 0, (m1.length - m2.length) ) ) <= gc_nMaxCol && parseInt( m2 ) <= gc_nMaxRow ) {
+            if ( match.length >= 3 && g_oCellAddressUtils.colstrToColnum( m1.substr( 0, (m1.length - m2.length) ) ) <= AscCommon.gc_nMaxCol && parseInt( m2 ) <= AscCommon.gc_nMaxRow ) {
                 return false;
             }
         }

@@ -10,6 +10,10 @@ function (window, undefined) {
 var c_oAscLockTypeElem = AscCommonExcel.c_oAscLockTypeElem;
 var c_oAscInsertOptions = Asc.c_oAscInsertOptions;
 var c_oAscDeleteOptions = Asc.c_oAscDeleteOptions;
+	
+var gc_nMaxRow0 = AscCommon.gc_nMaxRow0;
+var gc_nMaxCol0 = AscCommon.gc_nMaxCol0;
+var CellAddress = AscCommon.CellAddress;
 
 var c_oUndoRedoSerializeType =
 {
@@ -49,7 +53,7 @@ UndoRedoItemSerializable.prototype = {
 		if(this.oData.getType || this.oClass.Save_Changes)
 		{
 			var oThis = this;
-			var oBinaryCommonWriter = new BinaryCommonWriter(oBinaryWriter);
+			var oBinaryCommonWriter = new AscCommon.BinaryCommonWriter(oBinaryWriter);
 			oBinaryCommonWriter.WriteItemWithLength(function(){oThis.SerializeInner(oBinaryWriter, collaborativeEditing);});
 		}
 	},
@@ -118,7 +122,7 @@ UndoRedoItemSerializable.prototype = {
 			if(null != oData.applyCollaborative)
 				oData.applyCollaborative(nSheetId, collaborativeEditing);
 			oBinaryWriter.WriteByte(nDataType);
-			var oBinaryCommonWriter = new BinaryCommonWriter(oBinaryWriter);
+			var oBinaryCommonWriter = new AscCommon.BinaryCommonWriter(oBinaryWriter);
 			if(oData.Write_ToBinary2)
 				oBinaryCommonWriter.WriteItemWithLength(function(){oData.Write_ToBinary2(oBinaryWriter)});
 			else
@@ -169,7 +173,7 @@ UndoRedoItemSerializable.prototype = {
 				case "array":
 					oBinaryWriter.WriteByte(nItemType);
 					oBinaryWriter.WriteByte(c_oUndoRedoSerializeType.Array);
-					var oBinaryCommonWriter = new BinaryCommonWriter(oBinaryWriter);
+					var oBinaryCommonWriter = new AscCommon.BinaryCommonWriter(oBinaryWriter);
 					oBinaryCommonWriter.WriteItemWithLength(function(){oThis.SerializeDataInner(oBinaryWriter, oItem, true, nSheetId, collaborativeEditing);});
 				break;
 				case "number":
@@ -222,11 +226,11 @@ UndoRedoItemSerializable.prototype = {
 
 	Deserialize : function(oBinaryReader)
 	{
-		var res = c_oSerConstants.ReadOk;
+		var res = AscCommon.c_oSerConstants.ReadOk;
 		res = oBinaryReader.EnterFrame(4);
 		var nLength = oBinaryReader.GetULongLE();
 		res = oBinaryReader.EnterFrame(nLength);
-        if(c_oSerConstants.ReadOk != res)
+        if(AscCommon.c_oSerConstants.ReadOk != res)
             return res;
         var bNoDrawing = oBinaryReader.GetBool();
         if(bNoDrawing)
@@ -1038,7 +1042,7 @@ function UndoRedoData_GTableIdAdd(object, id)
         id: 1
     };
 
-    if( isRealObject(object) && typeof object.getObjectType === "function" )
+    if( AscCommon.isRealObject(object) && typeof object.getObjectType === "function" )
     this.objectType = object.getObjectType();
     this.id = id;
 }

@@ -17,6 +17,9 @@
 		var prot;
 
 		var c_oAscPrintDefaultSettings = AscCommon.c_oAscPrintDefaultSettings;
+		var gc_nMaxRow0 = AscCommon.gc_nMaxRow0;
+		var gc_nMaxCol0 = AscCommon.gc_nMaxCol0;
+		var g_oCellAddressUtils = AscCommon.g_oCellAddressUtils;
 
 		var c_oAscSelectionType = asc.c_oAscSelectionType;
 
@@ -1259,14 +1262,14 @@
 			res.xSplit = this.xSplit;
 			res.ySplit = this.ySplit;
 			res.topLeftFrozenCell = this.topLeftFrozenCell ?
-				new CellAddress(this.topLeftFrozenCell.row, this.topLeftFrozenCell.col) : null;
+				new AscCommon.CellAddress(this.topLeftFrozenCell.row, this.topLeftFrozenCell.col) : null;
 			return res;
 		};
 		asc_CPane.prototype.init = function() {
 			// ToDo Обрабатываем пока только frozen и frozenSplit
 			if ((AscCommonExcel.c_oAscPaneState.Frozen === this.state || AscCommonExcel.c_oAscPaneState.FrozenSplit === this.state) &&
 				(0 < this.xSplit || 0 < this.ySplit)) {
-				this.topLeftFrozenCell = new CellAddress(this.ySplit, this.xSplit, 0);
+				this.topLeftFrozenCell = new AscCommon.CellAddress(this.ySplit, this.xSplit, 0);
 				if (!this.topLeftFrozenCell.isValid())
 					this.topLeftFrozenCell = null;
 			}

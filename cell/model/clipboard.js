@@ -1832,7 +1832,7 @@
 				var cMax = (activeCellsPasteFragment.c2 - activeCellsPasteFragment.c1) + worksheet.activeRange.c1;
 				
 				//если область вставки выходит за пределы доступной области
-				if(cMax > gc_nMaxCol0 || rMax > gc_nMaxRow0)
+				if(cMax > AscCommon.gc_nMaxCol0 || rMax > AscCommon.gc_nMaxRow0)
 				{
 					if(isWriteError)
 						worksheet.handlers.trigger ("onErrorEvent", Asc.c_oAscError.ID.PasteMaxRangeError, Asc.c_oAscError.Level.NoCritical);
@@ -4974,7 +4974,7 @@
 										var paraDrawing = s_arr[i].parent ? s_arr[i].parent : s_arr[i].group.parent;
 										var graphicObj = s_arr[i];
 										
-										if(isRealObject(paraDrawing.Parent))
+										if(AscCommon.isRealObject(paraDrawing.Parent))
 										{
 											var base64_img = paraDrawing.getBase64Img();
 

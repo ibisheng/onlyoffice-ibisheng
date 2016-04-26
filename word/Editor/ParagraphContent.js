@@ -24,6 +24,7 @@ var g_fontApplication = AscFonts.g_fontApplication;
 
 var g_oTableId = AscCommon.g_oTableId;
 var g_oTextMeasurer = AscCommon.g_oTextMeasurer;
+var isRealObject = AscCommon.isRealObject;
 
 var HitInLine = AscFormat.HitInLine;
 var MOVE_DELTA = AscFormat.MOVE_DELTA;

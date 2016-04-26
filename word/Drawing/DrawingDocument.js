@@ -5187,15 +5187,15 @@ function CDrawingDocument()
         for (var i = 0; i < _len; i++)
         {
             if (__tabs[i].Value == tab_Left)
-                _ar[i] = new CTab(__tabs[i].Pos, g_tabtype_left);
+                _ar[i] = new CTab(__tabs[i].Pos, AscCommon.g_tabtype_left);
             else if (__tabs[i].Value == tab_Center)
-                _ar[i] = new CTab(__tabs[i].Pos, g_tabtype_center);
+                _ar[i] = new CTab(__tabs[i].Pos, AscCommon.g_tabtype_center);
             else if (__tabs[i].Value == tab_Right)
-                _ar[i] = new CTab(__tabs[i].Pos, g_tabtype_right);
+                _ar[i] = new CTab(__tabs[i].Pos, AscCommon.g_tabtype_right);
             else
             {
                 // не должно такого быть. но приходит
-                _ar[i] = new CTab(__tabs[i].Pos, g_tabtype_left);
+                _ar[i] = new CTab(__tabs[i].Pos, AscCommon.g_tabtype_left);
             }
         }
 

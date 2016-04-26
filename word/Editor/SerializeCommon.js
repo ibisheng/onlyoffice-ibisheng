@@ -960,7 +960,7 @@ function CPPTXContentWriter()
             this.arrayStackStartsTextBoxContent.push(memory.pos);
 
             var bdtw = new BinaryDocumentTableWriter(memory, Document, oMapCommentId, oNumIdMap, copyParams, saveParams);
-            var bcw = new BinaryCommonWriter(memory);
+            var bcw = new AscCommon.BinaryCommonWriter(memory);
             bcw.WriteItemWithLength(function(){bdtw.WriteDocumentContent(shape.textBoxContent);});
 
             var oldPos = this.arrayStackStartsTextBoxContent[this.arrayStackStartsTextBoxContent.length - 1];
