@@ -99,7 +99,7 @@ function asc_CChartBinary(chart) {
     this["binary"] = null;
     if (chart && chart.getObjectType() === AscDFH.historyitem_type_ChartSpace)
     {
-        var writer = new BinaryChartWriter(new AscCommon.CMemory(false)), pptx_writer;
+        var writer = new AscCommon.BinaryChartWriter(new AscCommon.CMemory(false)), pptx_writer;
         writer.WriteCT_ChartSpace(chart);
         this["binary"] = writer.memory.pos + ";" + writer.memory.GetBase64Memory();
         if(chart.theme)
@@ -133,7 +133,7 @@ asc_CChartBinary.prototype = {
         //надо сбросить то, что остался после открытия документа
         window.global_pptx_content_loader.Clear();
         var oNewChartSpace = new AscFormat.CChartSpace();
-        var oBinaryChartReader = new BinaryChartReader(stream);
+        var oBinaryChartReader = new AscCommon.BinaryChartReader(stream);
         oBinaryChartReader.ExternalReadCT_ChartSpace(stream.size , oNewChartSpace, workSheet);
         return oNewChartSpace;
     },
@@ -336,7 +336,7 @@ CSparklineView.prototype.initFromSparkline = function(oSparkline, oSparklineGrou
         settings.putTitle(c_oAscChartTitleShowSettings.none);
         settings.putHorAxisLabel(c_oAscChartTitleShowSettings.none);
         settings.putVertAxisLabel(c_oAscChartTitleShowSettings.none);
-        settings.putLegendPos(c_oAscChartLegendShowSettings.none);
+        settings.putLegendPos(Asc.c_oAscChartLegendShowSettings.none);
         settings.putHorGridLines(c_oAscGridLinesSettings.none);
         settings.putVertGridLines(c_oAscGridLinesSettings.none);
 

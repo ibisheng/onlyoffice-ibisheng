@@ -5334,7 +5334,7 @@ function BinaryPPTYLoader()
 
                     _chart = new AscFormat.CChartSpace();
                     _chart.setBDeleted(false);
-                    var oBinaryChartReader = new BinaryChartReader(_stream);
+                    var oBinaryChartReader = new AscCommon.BinaryChartReader(_stream);
                     oBinaryChartReader.ExternalReadCT_ChartSpace(_length, _chart, this.presentation);
                     _chart.setBDeleted(false);
 
@@ -5441,7 +5441,7 @@ function BinaryPPTYLoader()
                         _chart.setBDeleted(false);
                         window.global_pptx_content_loader.ImageMapChecker = this.ImageMapChecker;
                         window.global_pptx_content_loader.Reader.ImageMapChecker = this.ImageMapChecker;
-                        var oBinaryChartReader = new BinaryChartReader(_stream);
+                        var oBinaryChartReader = new AscCommon.BinaryChartReader(_stream);
                         oBinaryChartReader.ExternalReadCT_ChartSpace(_length, _chart, this.presentation);
                     }
 

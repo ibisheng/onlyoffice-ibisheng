@@ -4264,7 +4264,7 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
 				this.memory.WriteByte(c_oSerImageType2.Chart2);
 				this.memory.WriteByte(c_oSerPropLenType.Variable);
 				
-				var oBinaryChartWriter = new BinaryChartWriter(this.memory);
+				var oBinaryChartWriter = new AscCommon.BinaryChartWriter(this.memory);
 				this.bs.WriteItemWithLength(function () { oBinaryChartWriter.WriteCT_ChartSpace(img.GraphicObj); });
 			}
 			else
@@ -4401,7 +4401,7 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
 			{
 				this.memory.WriteByte(c_oSerImageType2.Chart2);
 				this.memory.WriteByte(c_oSerPropLenType.Variable);
-				var oBinaryChartWriter = new BinaryChartWriter(this.memory);
+				var oBinaryChartWriter = new AscCommon.BinaryChartWriter(this.memory);
 				this.bs.WriteItemWithLength(function () { oBinaryChartWriter.WriteCT_ChartSpace(img.GraphicObj); });
 			}
 			else
@@ -8717,7 +8717,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
         {
 			res = c_oSerConstants.ReadUnknown;
 			var oNewChartSpace = new AscFormat.CChartSpace();
-            var oBinaryChartReader = new BinaryChartReader(this.stream);
+            var oBinaryChartReader = new AscCommon.BinaryChartReader(this.stream);
             res = oBinaryChartReader.ExternalReadCT_ChartSpace(length, oNewChartSpace, this.Document);
             oNewChartSpace.setBDeleted(false);
             oParaDrawing.Set_GraphicObject(oNewChartSpace);

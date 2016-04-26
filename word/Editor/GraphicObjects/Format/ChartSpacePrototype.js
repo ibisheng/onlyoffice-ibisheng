@@ -444,7 +444,7 @@ CChartSpace.prototype.recalculate = function()
             var bResetLegendPos = false;
             if(!AscFormat.isRealNumber(this.chart.legend.legendPos))
             {
-                this.chart.legend.legendPos = c_oAscChartLegendShowSettings.bottom;
+                this.chart.legend.legendPos = Asc.c_oAscChartLegendShowSettings.bottom;
                 bResetLegendPos = true;
             }
             var pos = this.chartObj.reCalculatePositionText("legend", this, this.chart.legend);

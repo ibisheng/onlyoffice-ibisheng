@@ -15,6 +15,7 @@
 		"../common/SerializeCommonWordExcel.js",
         "../common/editorscommon.js",
         "../common/NumFormat.js",
+		"../common/SerializeChart.js",
 		
 		"../common/FontsFreeType/font_engine.js",
         "../common/FontsFreeType/FontFile.js",
@@ -67,7 +68,6 @@
         "../word/apiDefines.js",
         "../common/Shapes/Serialize.js",
         "../common/Shapes/SerializeWriter.js",
-        "../common/SerializeChart.js",
         "../word/Drawing/translations.js",
         "../word/Editor/GraphicObjects/Format/ShapePrototype.js",
         "../word/Editor/GraphicObjects/Format/ImagePrototype.js",

@@ -2911,7 +2911,7 @@
                 this.bs.WriteItem(c_oSer_DrawingType.pptxDrawing, function(){window.global_pptx_content_writer.WriteDrawing(oThis.memory, oDrawing.graphicObject, null, null, null);});
         };
         this.WriteGraphicFrame = function (oDrawing) {
-            var oBinaryChartWriter = new BinaryChartWriter(this.memory);
+            var oBinaryChartWriter = new AscCommon.BinaryChartWriter(this.memory);
             this.bs.WriteItem(c_oSer_DrawingType.Chart2, function () { oBinaryChartWriter.WriteCT_ChartSpace(oDrawing.graphicObject); });
         };
         this.WriteFromTo = function(oFromTo)
@@ -6101,7 +6101,7 @@
             var res = c_oSerConstants.ReadOk;
             if (c_oSer_DrawingType.Chart2 == type) {
                 var oNewChartSpace = new AscFormat.CChartSpace();
-                var oBinaryChartReader = new BinaryChartReader(this.stream);
+                var oBinaryChartReader = new AscCommon.BinaryChartReader(this.stream);
                 res = oBinaryChartReader.ExternalReadCT_ChartSpace(length, oNewChartSpace, this.curWorksheet);
                 oDrawing.graphicObject = oNewChartSpace;
                 oNewChartSpace.setBDeleted(false);

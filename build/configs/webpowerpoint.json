@@ -12,6 +12,7 @@
 		"../common/SerializeCommonWordExcel.js",
         "../common/editorscommon.js",
         "../common/NumFormat.js",
+		"../common/SerializeChart.js",
 		
 		"../common/FontsFreeType/font_engine.js",
         "../common/FontsFreeType/FontFile.js",
@@ -62,7 +63,6 @@
 
         "../slide/apiDefines.js",
         "../slide/Drawing/ThemeLoader.js",
-        "../common/SerializeChart.js",
         "../word/Editor/Serialize2.js",
         "../word/Editor/Styles.js",
         "../word/Editor/Numbering.js",

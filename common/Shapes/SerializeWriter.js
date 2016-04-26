@@ -2871,7 +2871,7 @@ function CBinaryFileWriter()
 
         oThis.UseContinueWriter = true;
 
-        var oBinaryChartWriter = new BinaryChartWriter(_memory);
+        var oBinaryChartWriter = new AscCommon.BinaryChartWriter(_memory);
         oBinaryChartWriter.WriteCT_ChartSpace(grObj);
 
         oThis.ImData = _memory.ImData;

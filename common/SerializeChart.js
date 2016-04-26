@@ -1,5 +1,7 @@
 "use strict";
 
+(function(window, undefined){
+
 // Import
 var c_oSerConstants = AscCommon.c_oSerConstants;
 
@@ -11085,3 +11087,9 @@ BinaryChartReader.prototype.ReadAlternateContentFallback = function (type, lengt
         res = c_oSerConstants.ReadUnknown;
     return res;
 }
+
+  //----------------------------------------------------------export----------------------------------------------------
+  window['AscCommon'] = window['AscCommon'] || {};
+  window['AscCommon'].BinaryChartWriter = BinaryChartWriter;
+  window['AscCommon'].BinaryChartReader = BinaryChartReader;
+})(window);
