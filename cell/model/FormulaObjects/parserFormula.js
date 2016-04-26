@@ -2765,11 +2765,11 @@ function getFormulasInfo() {
 
     var list = [], a, b, f;
     for ( var type in cFormulaFunctionGroup ) {
-        b = new Asc.asc_CFormulaGroup( type );
+    b = new AscCommon.asc_CFormulaGroup(type);
         for ( var i = 0; i < cFormulaFunctionGroup[type].length; ++i ) {
             a = new cFormulaFunctionGroup[type][i]();
             if ( a.getInfo ) {
-                f = new Asc.asc_CFormula( a.getInfo() );
+        f = new AscCommon.asc_CFormula(a.getInfo());
                 b.asc_addFormulaElement( f );
                 cFormulaFunction[f.asc_getName()] = cFormulaFunctionGroup[type][i];
             }

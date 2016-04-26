@@ -16,6 +16,7 @@
         "../common/editorscommon.js",
         "../common/NumFormat.js",
 		"../common/SerializeChart.js",
+		"../common/AdvancedOptions.js",
 		
 		"../common/FontsFreeType/font_engine.js",
         "../common/FontsFreeType/FontFile.js",
@@ -141,8 +142,7 @@
         "../cell/model/Serialize.js",
         "../cell/model/WorkbookElems.js",
         "../cell/model/Workbook.js",
-        "../cell/model/CellInfo.js",
-        "../common/AdvancedOptions.js"
+        "../cell/model/CellInfo.js"
       ],
       "private": [
         "../common/Private/license.js",

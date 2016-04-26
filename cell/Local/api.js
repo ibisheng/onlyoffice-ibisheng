@@ -50,7 +50,7 @@ var c_oAscError = Asc.c_oAscError;
 	{
 		var cp = JSON.parse("{\"codepage\":46,\"delimiter\":1}");
 		cp['encodings'] = AscCommon.getEncodingParams();
-		this.handlers.trigger("asc_onAdvancedOptions", new asc.asc_CAdvancedOptions(Asc.c_oAscAdvancedOptionsID.CSV, cp), AscCommon.c_oAscAdvancedOptionsAction.Open);
+		this.handlers.trigger("asc_onAdvancedOptions", new AscCommon.asc_CAdvancedOptions(Asc.c_oAscAdvancedOptionsID.CSV, cp), AscCommon.c_oAscAdvancedOptionsAction.Open);
 	};
 	
 	asc['spreadsheet_api'].prototype.asc_addImageDrawingObject = function(url)
