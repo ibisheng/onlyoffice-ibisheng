@@ -12679,9 +12679,83 @@
         autoFilterObject.asc_setAutomaticRowCount(automaticRowCount);
         autoFilterObject.asc_setDiplayName(displayName);
 
+        var columnRange = Asc.Range(rangeButton.c1, autoFilter.Ref.r1 + 1, rangeButton.c1, autoFilter.Ref.r2);
+
+        var filterTypes = this.af_getFilterTypes(columnRange);
+        autoFilterObject.asc_setIsTextFilter(filterTypes.text);
+
+
         this.handlers.trigger("setAutoFiltersDialog", autoFilterObject);
     };
-	
+
+    WorksheetView.prototype.af_getFilterTypes = function(columnRange)
+    {
+        var t = this;
+        var ws = this.model;
+        var res = {text: true, colors: [], fontColors: []};
+
+        var tempText = 0, tempDigit = 0;
+        var alreadyAddColors = {}, alreadyAddFontColors = {};
+        for(var i = columnRange.r1; i <= columnRange.r2; i++)
+        {
+            var cell = ws._getCellNoEmpty(i, columnRange.c1);
+
+            if(!cell)
+            {
+                continue;
+            }
+
+            if(cell.isEmptyText() === false)
+            {
+                var type = cell.getType();
+                if(type === 0)
+                {
+                    tempDigit++;
+                }
+                else
+                {
+                    tempText++;
+                }
+            }
+
+            if(cell.oValue.multiText !== null)
+            {
+                for(var j = 0; j < cell.oValue.multiText.length; j++)
+                {
+                    var fontColor = cell.oValue.multiText[j].format ? cell.oValue.multiText[j].format.c : null;
+                    if(fontColor !== null && alreadyAddFontColors[fontColor.rgb] !== true && g_oColorManager.isEqual(fontColor, g_oDefaultFont.c) === false)
+                    {
+                        res.fontColors.push(fontColor);
+                        alreadyAddFontColors[fontColor.rgb] = true;
+                    }
+                }
+            }
+            else
+            {
+                var fontColor =  cell.xfs && cell.xfs.font ? cell.xfs.font.c : null;
+                if(fontColor !== null && alreadyAddFontColors[fontColor.rgb] !== true && g_oColorManager.isEqual(fontColor, g_oDefaultFont.c) === false)
+                {
+                    res.fontColors.push(fontColor);
+                    alreadyAddFontColors[fontColor.rgb] = true;
+                }
+            }
+
+            var color = cell.getStyle();
+            if(color !== null && color.fill && color.fill.bg && alreadyAddColors[color.fill.bg.rgb] !== true)
+            {
+                res.colors.push(color.fill);
+                alreadyAddColors[color.fill.bg.rgb] = true;
+            }
+        }
+
+        if(tempDigit > tempText)
+        {
+            res.text = false;
+        }
+
+        return res;
+    };
+
 	WorksheetView.prototype.af_changeSelectionTablePart = function(activeRange)
 	{
 		var t = this;
