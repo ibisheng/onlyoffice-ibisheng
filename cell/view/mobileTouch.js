@@ -1251,7 +1251,7 @@ CMobileTouchManager.prototype.CheckZoomCriticalValues = function(zoomMin)
                 {
                     _w >>= 1;
                 }
-                Zoom = 100 * _w * g_dKoef_pix_to_mm / this.HtmlPage.m_dDocumentPageWidth;
+            Zoom = 100 * _w * AscCommon.g_dKoef_pix_to_mm / this.HtmlPage.m_dDocumentPageWidth;
             }
         }
         var _new_value = (Zoom - 0.5) >> 0;
@@ -1617,7 +1617,7 @@ CMobileTouchManager.prototype.CheckTableRules = function(overlay)
             ctx.fillStyle = "#FFFFFF";
             ctx.strokeStyle = "#0000FF";
 
-            var dKoef = (this.HtmlPage.m_nZoomValue * g_dKoef_mm_to_pix / 100);
+        var dKoef = (this.HtmlPage.m_nZoomValue * AscCommon.g_dKoef_mm_to_pix / 100);
             var xDst = this.DrawingDocument.m_arrPages[this.DrawingDocument.m_lCurrentPage].drawingPage.left;
             var yDst = this.DrawingDocument.m_arrPages[this.DrawingDocument.m_lCurrentPage].drawingPage.top;
 
@@ -1680,7 +1680,7 @@ CMobileTouchManager.prototype.CheckTableRules = function(overlay)
         }
         else
         {
-            var dKoef = (this.HtmlPage.m_nZoomValue * g_dKoef_mm_to_pix / 100);
+        var dKoef = (this.HtmlPage.m_nZoomValue * AscCommon.g_dKoef_mm_to_pix / 100);
             var xDst = this.DrawingDocument.m_arrPages[this.DrawingDocument.m_lCurrentPage].drawingPage.left;
             var yDst = this.DrawingDocument.m_arrPages[this.DrawingDocument.m_lCurrentPage].drawingPage.top;
 
@@ -1887,7 +1887,7 @@ CMobileTouchManager.prototype.CheckTableRules2 = function(overlay)
             var ___w = window.g_table_track_diamond.width;
             var ___h = window.g_table_track_diamond.height;
 
-            var dKoef = (this.HtmlPage.m_nZoomValue * g_dKoef_mm_to_pix / 100);
+        var dKoef = (this.HtmlPage.m_nZoomValue * AscCommon.g_dKoef_mm_to_pix / 100);
             var xDst = this.DrawingDocument.m_arrPages[this.DrawingDocument.m_lCurrentPage].drawingPage.left;
             var yDst = this.DrawingDocument.m_arrPages[this.DrawingDocument.m_lCurrentPage].drawingPage.top;
 
@@ -1955,7 +1955,7 @@ CMobileTouchManager.prototype.CheckTableRules2 = function(overlay)
         }
         else
         {
-            var dKoef = (this.HtmlPage.m_nZoomValue * g_dKoef_mm_to_pix / 100);
+        var dKoef = (this.HtmlPage.m_nZoomValue * AscCommon.g_dKoef_mm_to_pix / 100);
             var xDst = this.DrawingDocument.m_arrPages[this.DrawingDocument.m_lCurrentPage].drawingPage.left;
             var yDst = this.DrawingDocument.m_arrPages[this.DrawingDocument.m_lCurrentPage].drawingPage.top;
 

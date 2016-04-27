@@ -2285,7 +2285,7 @@ CGraphics.prototype =
     AddClipRect : function(x, y, w, h)
     {
         //this.ClipManager.AddRect(x, y, w, h);
-        var __rect = new _rect();
+        var __rect = new AscCommon._rect();
         __rect.x = x;
         __rect.y = y;
         __rect.w = w;

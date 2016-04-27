@@ -2782,8 +2782,8 @@ asc_docs_api.prototype.AddImageUrlActionCallback = function(_image)
     var _h = Page_Height - (Y_Top_Margin + Y_Bottom_Margin);
     if (_image.Image != null)
     {
-        var __w = Math.max((_image.Image.width * g_dKoef_pix_to_mm) >> 0, 1);
-        var __h = Math.max((_image.Image.height * g_dKoef_pix_to_mm) >> 0, 1);
+        var __w = Math.max((_image.Image.width * AscCommon.g_dKoef_pix_to_mm) >> 0, 1);
+        var __h = Math.max((_image.Image.height * AscCommon.g_dKoef_pix_to_mm) >> 0, 1);
         _w = Math.max(5, Math.min(_w, __w));
         _h = Math.max(5, Math.min((_w * __h / __w) >> 0));
     }

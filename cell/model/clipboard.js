@@ -22,6 +22,7 @@
 		var History = AscCommon.History;
 		var pptx_content_loader = AscCommon.pptx_content_loader;
 		var pptx_content_writer = AscCommon.pptx_content_writer;
+		var g_dKoef_mm_to_pix = AscCommon.g_dKoef_mm_to_pix;
 
 		var doc = window.document;
 		

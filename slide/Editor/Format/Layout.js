@@ -792,7 +792,7 @@ function CLayoutThumbnailDrawer()
 
         var g = new AscCommon.CGraphics();
         g.init(_ctx, w_px, h_px, this.WidthMM, this.HeightMM);
-        g.m_oFontManager = g_fontManager;
+        g.m_oFontManager = AscCommon.g_fontManager;
 
         g.transform(1,0,0,1,0,0);
 

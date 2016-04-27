@@ -913,8 +913,8 @@ CShapeDrawer.prototype =
 
                     if (bIsThumbnail)
                     {
-                        koefX = __graphics.m_dDpiX / g_dDpiX;
-                        koefY = __graphics.m_dDpiY / g_dDpiX;
+                        koefX = __graphics.m_dDpiX / AscCommon.g_dDpiX;
+                        koefY = __graphics.m_dDpiY / AscCommon.g_dDpiX;
 
                         if (editor.WordControl.bIsRetinaSupport)
                         {
@@ -1807,7 +1807,7 @@ function ShapeToImageConverter(shape, pageIndex)
     AscCommon.IsShapeToImageConverter = true;
     var _bounds_cheker = new AscFormat.CSlideBoundsChecker();
 
-    var dKoef = g_dKoef_mm_to_pix;
+    var dKoef = AscCommon.g_dKoef_mm_to_pix;
     var w_mm = 210;
     var h_mm = 297;
     var w_px = (w_mm * dKoef) >> 0;
@@ -1849,7 +1849,7 @@ function ShapeToImageConverter(shape, pageIndex)
 
     var g = new AscCommon.CGraphics();
     g.init(_ctx, w_px, h_px, w_mm, h_mm);
-    g.m_oFontManager = g_fontManager;
+    g.m_oFontManager = AscCommon.g_fontManager;
 
     g.m_oCoordTransform.tx = -_bounds_cheker.Bounds.min_x;
     g.m_oCoordTransform.ty = -_bounds_cheker.Bounds.min_y;

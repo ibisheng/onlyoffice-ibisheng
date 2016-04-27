@@ -448,7 +448,7 @@ CDocMeta.prototype =
     {
         for (var i = 0; i < this.PagesCount; i++)
         {
-            var _page = new CPage();
+            var _page = new AscCommon.CPage();
             _page.width_mm = this.Pages[i].width_mm;
             _page.height_mm = this.Pages[i].height_mm;
             _page.pageIndex = i;

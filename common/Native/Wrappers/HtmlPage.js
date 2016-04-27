@@ -1,8 +1,3 @@
-var g_dDpiX = 96.0;
-var g_dDpiY = 96.0;
-
-var g_dKoef_mm_to_pix = g_dDpiX / 25.4;
-var g_dKoef_pix_to_mm = 25.4 / g_dDpiX;
 
 var g_bIsMobile =  AscCommon.AscBrowser.isMobile;
 
@@ -72,7 +67,7 @@ function CEditorPage(api)
     this.Width      = 10;
     this.Height     = 10;
 
-    this.m_oDrawingDocument = new CDrawingDocument();
+    this.m_oDrawingDocument = new AscCommon.CDrawingDocument();
     this.m_oLogicDocument   = null;
 
     this.m_oDrawingDocument.m_oWordControl = this;

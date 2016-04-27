@@ -1755,8 +1755,8 @@ asc_docs_api.prototype["Call_Menu_Event"] = function(type, _params)
                             var __w = Math.max(1, _page_width - (_page_x_left_margin + _page_x_right_margin));
                             var __h = Math.max(1, _page_height - (_page_y_top_margin + _page_y_bottom_margin));
 
-                            var wI = (undefined !== _w) ? Math.max(_w * g_dKoef_pix_to_mm, 1) : 1;
-                            var hI = (undefined !== _h) ? Math.max(_h * g_dKoef_pix_to_mm, 1) : 1;
+                            var wI = (undefined !== _w) ? Math.max(_w * AscCommon.g_dKoef_pix_to_mm, 1) : 1;
+                            var hI = (undefined !== _h) ? Math.max(_h * AscCommon.g_dKoef_pix_to_mm, 1) : 1;
 
                             wI = Math.max(5, Math.min(wI, __w));
                             hI = Math.max(5, Math.min(hI, __h));
@@ -4600,8 +4600,8 @@ asc_docs_api.prototype.AddImageUrlNative = function(url, _w, _h, _pageNum)
     var __w = Math.max(1, (_page_width - (_page_x_left_margin + _page_x_right_margin)) / 2);
     var __h = Math.max(1, (_page_height - (_page_y_top_margin + _page_y_bottom_margin)) / 2);
 
-    var wI = (undefined !== _w) ? Math.max(_w * g_dKoef_pix_to_mm, 1) : 1;
-    var hI = (undefined !== _h) ? Math.max(_h * g_dKoef_pix_to_mm, 1) : 1;
+    var wI = (undefined !== _w) ? Math.max(_w * AscCommon.g_dKoef_pix_to_mm, 1) : 1;
+    var hI = (undefined !== _h) ? Math.max(_h * AscCommon.g_dKoef_pix_to_mm, 1) : 1;
 
     if (wI < 5)
         wI = 5;
@@ -5120,7 +5120,7 @@ CStylesPainter.prototype =
     {
         var _w_px = this.STYLE_THUMBNAIL_WIDTH;
         var _h_px = this.STYLE_THUMBNAIL_HEIGHT;
-        var dKoefToMM = g_dKoef_pix_to_mm;
+        var dKoefToMM = AscCommon.g_dKoef_pix_to_mm;
 
         if (AscCommon.AscBrowser.isRetina)
         {
@@ -5491,7 +5491,7 @@ AscCommon.ChartPreviewManager.prototype.createChartPreview = function(_graphics,
 
         window["native"]["DD_StartNativeDraw"](_width_px, _height_px, 50, 50);
 
-        var dKoefToMM = g_dKoef_pix_to_mm;
+        var dKoefToMM = AscCommon.g_dKoef_pix_to_mm;
         if (this.IsRetinaEnabled)
             dKoefToMM /= 2;
 

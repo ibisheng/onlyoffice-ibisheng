@@ -5,6 +5,7 @@
 // Import
 var AscBrowser = AscCommon.AscBrowser;
 var global_MatrixTransformer = AscCommon.global_MatrixTransformer;
+var g_dKoef_mm_to_pix = AscCommon.g_dKoef_mm_to_pix;
 
 // ��������� ��� ����
 var g_mouse_event_type_down  = 0;
@@ -989,7 +990,7 @@ function CMobileTouchManager()
                         var _posx = _invert.TransformPointX(pos.X, pos.Y);
                         var _posy = _invert.TransformPointY(pos.X, pos.Y);
 
-                        var _koef = g_dKoef_pix_to_mm * 100 / this.HtmlPage.m_nZoomValue;
+                        var _koef = AscCommon.g_dKoef_pix_to_mm * 100 / this.HtmlPage.m_nZoomValue;
                         var _eps1 = this.TrackTargetEps * _koef;
 
                         var _offset1 = this.TableRulersRectOffset * _koef;
@@ -1091,7 +1092,7 @@ function CMobileTouchManager()
             {
                 var pos = this.DrawingDocument.ConvertCoordsFromCursor2(global_mouseEvent.X, global_mouseEvent.Y);
 
-                var dKoef = (100 * g_dKoef_pix_to_mm / this.HtmlPage.m_nZoomValue);
+                var dKoef = (100 * AscCommon.g_dKoef_pix_to_mm / this.HtmlPage.m_nZoomValue);
                 global_mouseEvent.KoefPixToMM = 5;
                 if (this.LogicDocument.DrawingObjects.isPointInDrawingObjects2(pos.X, pos.Y, pos.Page))
                 {
@@ -1855,7 +1856,7 @@ function CMobileTouchManager()
                 {
                     _w >>= 1;
                 }
-                Zoom = 100 * _w * g_dKoef_pix_to_mm / this.HtmlPage.m_dDocumentPageWidth;
+                Zoom = 100 * _w * AscCommon.g_dKoef_pix_to_mm / this.HtmlPage.m_dDocumentPageWidth;
             }
         }
         var _new_value = (Zoom - 0.5) >> 0;

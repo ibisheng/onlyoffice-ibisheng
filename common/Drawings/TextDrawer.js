@@ -2013,7 +2013,7 @@ CTextDrawer.prototype =
          return;
          */
 
-        var __rect = new _rect();
+        var __rect = new AscCommon._rect();
         __rect.x = x;
         __rect.y = y;
         __rect.w = w;

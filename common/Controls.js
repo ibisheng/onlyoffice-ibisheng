@@ -1,6 +1,8 @@
 "use strict";
 
 (function(window, undefined){
+    // Import
+    var g_dKoef_mm_to_pix = AscCommon.g_dKoef_mm_to_pix;
 
 function CBounds()
 {

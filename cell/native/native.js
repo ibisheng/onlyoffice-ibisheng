@@ -4898,7 +4898,7 @@ function OfflineEditor () {
 
                 //window["native"]["DD_StartNativeDraw"](_width_px, _height_px, 50, 50);
 
-                var dKoefToMM = g_dKoef_pix_to_mm;
+                var dKoefToMM = AscCommon.g_dKoef_pix_to_mm;
                 if (this.IsRetinaEnabled)
                     dKoefToMM /= 2;
 

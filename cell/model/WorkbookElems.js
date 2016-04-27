@@ -4467,7 +4467,7 @@ sparklineGroup.prototype.draw = function(oDrawingContext) {
 	var graphics = new AscCommon.CGraphics();
 	graphics.init(oDrawingContext.ctx, oDrawingContext.getWidth(0), oDrawingContext.getHeight(0),
 		oDrawingContext.getWidth(3), oDrawingContext.getHeight(3));
-	graphics.m_oFontManager = g_fontManager;
+	graphics.m_oFontManager = AscCommon.g_fontManager;
 	for (var i = 0; i < this.arrCachedSparklines.length; ++i) {
 		this.arrCachedSparklines[i].draw(graphics);
 	}

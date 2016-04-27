@@ -79,7 +79,7 @@ CChartsDrawer.prototype =
 		{
 			this.calcProp.pathH = 1000000000;
 			this.calcProp.pathW = 1000000000;
-			this.calcProp.pxToMM = 1 / g_dKoef_pix_to_mm;
+			this.calcProp.pxToMM = 1 / AscCommon.g_dKoef_pix_to_mm;
 			this.calcProp.widthCanvas = chartSpace.extX * this.calcProp.pxToMM;
 			this.calcProp.heightCanvas = chartSpace.extY * this.calcProp.pxToMM;
 		}
@@ -471,7 +471,7 @@ CChartsDrawer.prototype =
 			standartMarginForCharts = 16;
 		
 		if(!this.calcProp.pxToMM)
-			this.calcProp.pxToMM = 1 / g_dKoef_pix_to_mm;
+			this.calcProp.pxToMM = 1 / AscCommon.g_dKoef_pix_to_mm;
 		
 		var pxToMM = this.calcProp.pxToMM;
 		
@@ -1683,7 +1683,7 @@ CChartsDrawer.prototype =
 	//****functions for UP Functions****
 	preCalculateData: function(chartProp)
 	{
-		this.calcProp.pxToMM = 1 / g_dKoef_pix_to_mm;
+		this.calcProp.pxToMM = 1 / AscCommon.g_dKoef_pix_to_mm;
 		
 		this.calcProp.pathH = 1000000000;
 		this.calcProp.pathW = 1000000000;

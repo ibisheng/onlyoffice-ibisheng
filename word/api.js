@@ -1982,14 +1982,14 @@ asc_docs_api.prototype.asc_setAdvancedOptions = function(idOption, option) {
 asc_docs_api.prototype.SetFontRenderingMode = function(mode)
 {
     if (c_oAscFontRenderingModeType.noHinting === mode)
-        SetHintsProps(false, false);
+      AscCommon.SetHintsProps(false, false);
     else if (c_oAscFontRenderingModeType.hinting === mode)
-        SetHintsProps(true, false);
+      AscCommon.SetHintsProps(true, false);
     else if (c_oAscFontRenderingModeType.hintingAndSubpixeling === mode)
-        SetHintsProps(true, true);
+      AscCommon.SetHintsProps(true, true);
 
     this.WordControl.m_oDrawingDocument.ClearCachePages();
-    g_fontManager.ClearFontsRasterCache();
+  AscCommon.g_fontManager.ClearFontsRasterCache();
 
     if (window.g_fontManager2 !== undefined && window.g_fontManager2 !== null)
         window.g_fontManager2.ClearFontsRasterCache();
@@ -4525,8 +4525,8 @@ asc_docs_api.prototype.AddImageUrlAction = function(url, imgProp)
         var _h = Math.max(1, Page_Height - (Y_Top_Margin + Y_Bottom_Margin));
         if (_image.Image != null)
         {
-            var __w = Math.max(parseInt(_image.Image.width * g_dKoef_pix_to_mm), 1);
-            var __h = Math.max(parseInt(_image.Image.height * g_dKoef_pix_to_mm), 1);
+            var __w = Math.max(parseInt(_image.Image.width * AscCommon.g_dKoef_pix_to_mm), 1);
+            var __h = Math.max(parseInt(_image.Image.height * AscCommon.g_dKoef_pix_to_mm), 1);
             _w = Math.max(5, Math.min(_w, __w));
             _h = Math.max(5, Math.min(parseInt(_w * __h / __w)));
         }
@@ -4575,8 +4575,8 @@ asc_docs_api.prototype.AddImageUrlAction = function(url, imgProp)
             var _h = Math.max(1, Page_Height - (Y_Top_Margin + Y_Bottom_Margin));
             if (_image.Image != null)
             {
-                var __w = Math.max(parseInt(_image.Image.width * g_dKoef_pix_to_mm), 1);
-                var __h = Math.max(parseInt(_image.Image.height * g_dKoef_pix_to_mm), 1);
+                var __w = Math.max(parseInt(_image.Image.width * AscCommon.g_dKoef_pix_to_mm), 1);
+                var __h = Math.max(parseInt(_image.Image.height * AscCommon.g_dKoef_pix_to_mm), 1);
                 _w = Math.max(5, Math.min(_w, __w));
                 _h = Math.max(5, Math.min(parseInt(_w * __h / __w)));
             }

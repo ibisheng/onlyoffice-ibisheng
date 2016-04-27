@@ -113,8 +113,8 @@
         "../cell/view/DrawingObjectsController.js",
         "../cell/model/DrawingObjects/Graphics.js",
         "../cell/model/DrawingObjects/ShapeDrawer.js",
-		
         "../cell/model/DrawingObjects/DrawingDocument.js",
+		
         "../cell/model/DrawingObjects/Format/ShapePrototype.js",
         "../cell/model/DrawingObjects/Format/ImagePrototype.js",
         "../cell/model/DrawingObjects/Format/GroupPrototype.js",

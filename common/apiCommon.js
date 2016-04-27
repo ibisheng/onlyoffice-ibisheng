@@ -1820,8 +1820,8 @@
                   var bIsCorrect = false;
                   if (_image.Image != null)
                   {
-                      var __w = Math.max(parseInt(_image.Image.width * g_dKoef_pix_to_mm), 1);
-                      var __h = Math.max(parseInt(_image.Image.height * g_dKoef_pix_to_mm), 1);
+                      var __w = Math.max(parseInt(_image.Image.width * AscCommon.g_dKoef_pix_to_mm), 1);
+                      var __h = Math.max(parseInt(_image.Image.height * AscCommon.g_dKoef_pix_to_mm), 1);
 
                       var dKoef = Math.max(__w / _w, __h / _h);
                       if (dKoef > 1)

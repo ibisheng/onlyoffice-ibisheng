@@ -19,6 +19,8 @@ var g_oDocumentUrls = AscCommon.g_oDocumentUrls;
   var History = AscCommon.History;
   var pptx_content_loader = AscCommon.pptx_content_loader;
   var pptx_content_writer = AscCommon.pptx_content_writer;
+  var g_dKoef_pix_to_mm = AscCommon.g_dKoef_pix_to_mm;
+  var g_dKoef_mm_to_pix = AscCommon.g_dKoef_mm_to_pix;
 
 var CShape = AscFormat.CShape;
 

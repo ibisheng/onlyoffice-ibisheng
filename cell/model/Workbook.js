@@ -3205,7 +3205,7 @@ function Woorksheet(wb, _index, sId){
     }
   });
   this.hyperlinkManager.setDependenceManager(this.mergeManager);
-  this.DrawingDocument = new CDrawingDocument();
+    this.DrawingDocument = new AscCommon.CDrawingDocument();
   this.sheetViews = [];
   this.aConditionalFormatting = [];
   this.sheetPr = null;

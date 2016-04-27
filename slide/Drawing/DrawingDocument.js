@@ -7,13 +7,12 @@ var global_keyboardEvent = AscCommon.global_keyboardEvent;
 var global_mouseEvent = AscCommon.global_mouseEvent;
 var History = AscCommon.History;
 var global_MatrixTransformer = AscCommon.global_MatrixTransformer;
+var g_dKoef_pix_to_mm = AscCommon.g_dKoef_pix_to_mm;
+var g_dKoef_mm_to_pix = AscCommon.g_dKoef_mm_to_pix;
 
 var FontStyle = AscFonts.FontStyle;
 var g_fontApplication = AscFonts.g_fontApplication;
 var ImageLoadStatus = AscFonts.ImageLoadStatus;
-
-var g_fontManager = new AscFonts.CFontManager();
-g_fontManager.Initialize(true);
 
 var FOCUS_OBJECT_THUMBNAILS     = 0;
 var FOCUS_OBJECT_MAIN           = 1;
@@ -46,107 +45,6 @@ AscCommon.CTextMeasurer.prototype.GetHeight = function()
 
     return Height * this.m_oLastFont.SetUpSize / UnitsPerEm * g_dKoef_pt_to_mm;
 };
-
-function CTableMarkup(Table)
-{
-    this.Internal =
-    {
-        RowIndex  : 0,
-        CellIndex : 0,
-        PageNum   : 0
-    };
-    this.Table = Table;
-    this.X = 0; // Смещение таблицы от начала страницы до первой колонки
-
-    this.Cols    = []; // массив ширин колонок
-    this.Margins = []; // массив левых и правых маргинов
-
-    this.Rows    = []; // массив позиций, высот строк(для данной страницы)
-    // Rows = [ { Y : , H :  }, ... ]
-
-    this.CurCol = 0; // текущая колонка
-    this.CurRow = 0; // текущая строка
-
-    this.TransformX = 0;
-    this.TransformY = 0;
-}
-
-CTableMarkup.prototype =
-{
-    CreateDublicate : function()
-    {
-        var obj = new CTableMarkup(this.Table);
-
-        obj.Internal = { RowIndex : this.Internal.RowIndex, CellIndex : this.Internal.CellIndex, PageNum : this.Internal.PageNum };
-        obj.X = this.X;
-
-        var len = this.Cols.length;
-        for (var i = 0; i < len; i++)
-            obj.Cols[i] = this.Cols[i];
-
-        len = this.Margins.length;
-        for (var i = 0; i < len; i++)
-            obj.Margins[i] = { Left : this.Margins[i].Left, Right : this.Margins[i].Right };
-
-        len = this.Rows.length;
-        for (var i = 0; i < len; i++)
-            obj.Rows[i] = { Y : this.Rows[i].Y, H : this.Rows[i].H };
-
-        obj.CurRow = this.CurRow;
-        obj.CurCol = this.CurCol;
-
-        return obj;
-    },
-
-    CorrectFrom : function()
-    {
-        this.X += this.TransformX;
-
-        var _len = this.Rows.length;
-        for (var i = 0; i < _len; i++)
-        {
-            this.Rows[i].Y += this.TransformY;
-        }
-    },
-
-    CorrectTo : function()
-    {
-        this.X -= this.TransformX;
-
-        var _len = this.Rows.length;
-        for (var i = 0; i < _len; i++)
-        {
-            this.Rows[i].Y -= this.TransformY;
-        }
-    },
-
-    Get_X : function()
-    {
-        return this.X;
-    },
-
-    Get_Y : function()
-    {
-        var _Y = 0;
-        if (this.Rows.length > 0)
-        {
-            _Y = this.Rows[0].Y;
-        }
-        return _Y;
-    }
-};
-
-function CTableOutline(Table, PageNum, X, Y, W, H)
-{
-    this.Table = Table;
-    this.PageNum = PageNum;
-
-    this.X = X;
-    this.Y = Y;
-
-    this.W = W;
-    this.H = H;
-}
 
 function CTableOutlineDr()
 {
@@ -524,14 +422,6 @@ function CCacheManager()
             --this.arrayCount;
         }
     }
-}
-
-function _rect()
-{
-    this.x = 0;
-    this.y = 0;
-    this.w = 0;
-    this.h = 0;
 }
 
 function CDrawingPage()
@@ -1250,7 +1140,7 @@ function CDrawingDocument()
 
         var graphics = new AscCommon.CGraphics();
         graphics.init(ctx, _wPx, _hPx, _wMm, _hMm);
-        graphics.m_oFontManager = g_fontManager;
+        graphics.m_oFontManager = AscCommon.g_fontManager;
 
         graphics.m_oCoordTransform.tx = _xOffset;
         graphics.m_oCoordTransform.ty = _yOffset;
@@ -2253,7 +2143,7 @@ function CDrawingDocument()
         var map_used = this.m_oWordControl.m_oLogicDocument.Document_CreateFontMap();
 
         var _measure_map = g_oTextMeasurer.m_oManager.m_oFontsCache.Fonts;
-        var _drawing_map = g_fontManager.m_oFontsCache.Fonts;
+        var _drawing_map = AscCommon.g_fontManager.m_oFontsCache.Fonts;
 
         var map_keys = {};
         var api = this.m_oWordControl.m_oApi;
@@ -2911,7 +2801,7 @@ function CDrawingDocument()
 
             var graphics = new AscCommon.CGraphics();
             graphics.init(ctx, _canvas.width, _canvas.height, _pageW, _pageH);
-            graphics.m_oFontManager = g_fontManager;
+            graphics.m_oFontManager = AscCommon.g_fontManager;
             graphics.transform(1,0,0,1,0,0);
             logicDoc.TablesForInterface[i].graphicObject.Draw(0, graphics);
 
@@ -5152,7 +5042,7 @@ function CSlideDrawer()
             // и сразу отрисуем его на кешированной картинке
             var g = new AscCommon.CGraphics();
             g.init(this.CachedCanvasCtx, w_px, h_px, w_mm, h_mm);
-            g.m_oFontManager = g_fontManager;
+            g.m_oFontManager = AscCommon.g_fontManager;
 
             if (this.m_oWordControl.bIsRetinaSupport)
                 g.IsRetina = true;
@@ -5230,7 +5120,7 @@ function CSlideDrawer()
 
             var g = new AscCommon.CGraphics();
             g.init(outputCtx, w_px, h_px, w_mm, h_mm);
-            g.m_oFontManager = g_fontManager;
+            g.m_oFontManager = AscCommon.g_fontManager;
 
             if (this.m_oWordControl.bIsRetinaSupport)
                 g.IsRetina = true;
@@ -5264,3 +5154,7 @@ var g_comment_image_offsets = [
     [199, 0, 38, 36],
     [247, 0, 38, 36]
 ];
+
+//--------------------------------------------------------export----------------------------------------------------
+window['AscCommon'] = window['AscCommon'] || {};
+window['AscCommon'].CDrawingDocument = CDrawingDocument;

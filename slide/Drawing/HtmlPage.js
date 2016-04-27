@@ -12,12 +12,8 @@ var CreateControl = AscCommon.CreateControl;
 var global_keyboardEvent = AscCommon.global_keyboardEvent;
 var global_mouseEvent = AscCommon.global_mouseEvent;
 var History = AscCommon.History;
-
-var g_dDpiX = 96.0;
-var g_dDpiY = 96.0;
-
-var g_dKoef_mm_to_pix = g_dDpiX / 25.4;
-var g_dKoef_pix_to_mm = 25.4 / g_dDpiX;
+var g_dKoef_pix_to_mm = AscCommon.g_dKoef_pix_to_mm;
+var g_dKoef_mm_to_pix = AscCommon.g_dKoef_mm_to_pix;
 
 var g_bIsMobile = AscCommon.AscBrowser.isMobile;
 
@@ -184,7 +180,7 @@ function CEditorPage(api)
     this.m_oVerRuler        = new CVerRuler();
     this.m_oVerRuler.IsCanMoveMargins = false;
 
-    this.m_oDrawingDocument = new CDrawingDocument();
+    this.m_oDrawingDocument = new AscCommon.CDrawingDocument();
     this.m_oLogicDocument   = null;
 
     this.m_oLayoutDrawer = new CLayoutThumbnailDrawer();
@@ -798,7 +794,7 @@ function CEditorPage(api)
         this.m_nZoomType = type;
 
         // нужно проверить режим и сбросить кеш грамотно (ie version)
-        g_fontManager.ClearRasterMemory();
+        AscCommon.g_fontManager.ClearRasterMemory();
 
         var oWordControl = oThis;
 

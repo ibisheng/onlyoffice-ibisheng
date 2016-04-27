@@ -629,7 +629,7 @@ Processor3D.prototype.correctPointsPosition = function(chartSpace)
 	if(this.chartsDrawer.calcProp.type === "Pie")
 		return;
 	
-	var pxToMM = 1 / g_dKoef_pix_to_mm;
+	var pxToMM = 1 / AscCommon.g_dKoef_pix_to_mm;
 	var t = this;
 	//коррективы для подписей	
 	var xPoints = chartSpace.chart.plotArea && chartSpace.chart.plotArea.catAx ? chartSpace.chart.plotArea.catAx.xPoints : null;

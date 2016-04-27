@@ -1209,7 +1209,7 @@ function CFontManager()
 
     this.SetHintsProps = function(bIsHinting, bIsSubpixHinting)
     {
-        if (undefined === g_fontManager.m_oLibrary.tt_hint_props)
+        if (undefined === AscCommon.g_fontManager.m_oLibrary.tt_hint_props)
             return;
 
         if (bIsHinting && bIsSubpixHinting)

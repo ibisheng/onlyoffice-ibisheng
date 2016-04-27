@@ -2543,7 +2543,7 @@ ParaMath.prototype.MathToImageConverter = function(bCopy, _canvasInput, _widthPx
 
     AscCommon.IsShapeToImageConverter = true;
 
-    var dKoef = g_dKoef_mm_to_pix;
+    var dKoef = AscCommon.g_dKoef_mm_to_pix;
 
     var JointSize = this.Get_JointSize();
 

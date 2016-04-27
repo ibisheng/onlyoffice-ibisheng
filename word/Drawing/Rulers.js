@@ -3,6 +3,8 @@
 // Import
 var c_oAscDocumentUnits = Asc.c_oAscDocumentUnits;
 var global_mouseEvent = AscCommon.global_mouseEvent;
+var g_dKoef_pix_to_mm = AscCommon.g_dKoef_pix_to_mm;
+var g_dKoef_mm_to_pix = AscCommon.g_dKoef_mm_to_pix;
 
 function CTab(pos,type)
 {

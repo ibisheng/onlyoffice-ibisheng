@@ -192,7 +192,7 @@ CStylesPainter.prototype =
     {
         var _w_px = this.STYLE_THUMBNAIL_WIDTH;
         var _h_px = this.STYLE_THUMBNAIL_HEIGHT;
-        var dKoefToMM = g_dKoef_pix_to_mm;
+        var dKoefToMM = AscCommon.g_dKoef_pix_to_mm;
 
         if (AscCommon.AscBrowser.isRetina)
         {

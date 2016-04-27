@@ -702,7 +702,7 @@ function CMasterThumbnailDrawer()
 
         var g = new AscCommon.CGraphics();
         g.init(_ctx, w_px, h_px, this.WidthMM, this.HeightMM);
-        g.m_oFontManager = g_fontManager;
+        g.m_oFontManager = AscCommon.g_fontManager;
 
         g.transform(1,0,0,1,0,0);
 
@@ -895,10 +895,10 @@ function CMasterThumbnailDrawer()
         par.Recalculate_Page(0);
 
         // сбрасываем дпи
-        g.init(_ctx, w_px, h_px, w_px * g_dKoef_pix_to_mm,  h_px * g_dKoef_pix_to_mm);
+        g.init(_ctx, w_px, h_px, w_px * AscCommon.g_dKoef_pix_to_mm,  h_px * AscCommon.g_dKoef_pix_to_mm);
         g.CalculateFullTransform();
-        _text_x = 8 * g_dKoef_pix_to_mm;
-        _text_y = (h_px - 11) * g_dKoef_pix_to_mm;
+        _text_x = 8 * AscCommon.g_dKoef_pix_to_mm;
+        _text_y = (h_px - 11) * AscCommon.g_dKoef_pix_to_mm;
 
         par.Lines[0].Ranges[0].XVisible = _text_x;
         par.Lines[0].Y = _text_y;

@@ -68,7 +68,7 @@ COverlay.prototype =
         this.m_oContext = context;
         this.m_oControl = AscCommon.CreateControl(controlName);
 
-        this.m_oHtmlPage = new CHtmlPage();
+        this.m_oHtmlPage = new AscCommon.CHtmlPage();
         this.m_oHtmlPage.init(x, y, w_pix, h_pix, w_mm, h_mm);
     },
 
