@@ -19,6 +19,10 @@ var BBoxInfo = AscFormat.BBoxInfo;
 var MOVE_DELTA = AscFormat.MOVE_DELTA;
 
 var c_oAscError = Asc.c_oAscError;
+var c_oAscChartTypeSettings = Asc.c_oAscChartTypeSettings;
+var c_oAscChartTitleShowSettings = Asc.c_oAscChartTitleShowSettings;
+var c_oAscGridLinesSettings = Asc.c_oAscGridLinesSettings;
+var c_oAscValAxisRule = Asc.c_oAscValAxisRule;
 var c_oAscInsertOptions = Asc.c_oAscInsertOptions;
 var c_oAscDeleteOptions = Asc.c_oAscDeleteOptions;
 var c_oAscSelectionType = Asc.c_oAscSelectionType;
@@ -374,24 +378,24 @@ CSparklineView.prototype.initFromSparkline = function(oSparkline, oSparklineGrou
 
 
 
-        val_ax_props.putTickLabelsPos(c_oAscTickLabelsPos.TICK_LABEL_POSITION_NONE);
+        val_ax_props.putTickLabelsPos(Asc.c_oAscTickLabelsPos.TICK_LABEL_POSITION_NONE);
         val_ax_props.putInvertValOrder(false);
-        val_ax_props.putDispUnitsRule(c_oAscValAxUnits.none);
-        val_ax_props.putMajorTickMark(c_oAscTickMark.TICK_MARK_NONE);
-        val_ax_props.putMinorTickMark(c_oAscTickMark.TICK_MARK_NONE);
-        val_ax_props.putCrossesRule(c_oAscCrossesRule.auto);
+        val_ax_props.putDispUnitsRule(Asc.c_oAscValAxUnits.none);
+        val_ax_props.putMajorTickMark(Asc.c_oAscTickMark.TICK_MARK_NONE);
+        val_ax_props.putMinorTickMark(Asc.c_oAscTickMark.TICK_MARK_NONE);
+        val_ax_props.putCrossesRule(Asc.c_oAscCrossesRule.auto);
 
 
 
         var cat_ax_props = new AscCommon.asc_CatAxisSettings();
-        cat_ax_props.putIntervalBetweenLabelsRule(c_oAscBetweenLabelsRule.auto);
-        cat_ax_props.putLabelsPosition(c_oAscLabelsPosition.betweenDivisions);
-        cat_ax_props.putTickLabelsPos(c_oAscTickLabelsPos.TICK_LABEL_POSITION_NONE);
+        cat_ax_props.putIntervalBetweenLabelsRule(Asc.c_oAscBetweenLabelsRule.auto);
+        cat_ax_props.putLabelsPosition(Asc.c_oAscLabelsPosition.betweenDivisions);
+        cat_ax_props.putTickLabelsPos(Asc.c_oAscTickLabelsPos.TICK_LABEL_POSITION_NONE);
         cat_ax_props.putLabelsAxisDistance(100);
-        cat_ax_props.putMajorTickMark(c_oAscTickMark.TICK_MARK_NONE);
-        cat_ax_props.putMinorTickMark(c_oAscTickMark.TICK_MARK_NONE);
+        cat_ax_props.putMajorTickMark(Asc.c_oAscTickMark.TICK_MARK_NONE);
+        cat_ax_props.putMinorTickMark(Asc.c_oAscTickMark.TICK_MARK_NONE);
         cat_ax_props.putIntervalBetweenTick(1);
-        cat_ax_props.putCrossesRule(c_oAscCrossesRule.auto);
+        cat_ax_props.putCrossesRule(Asc.c_oAscCrossesRule.auto);
         if(oSparklineGroup.rightToLeft)
         {
             cat_ax_props.putInvertCatOrder(true);
