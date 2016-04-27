@@ -48,16 +48,16 @@
     var asc_CMM = AscCommonExcel.asc_CMouseMoveData;
     var asc_VR = AscCommonExcel.VisibleRange;
 
-    var asc_CCellFlag = asc.asc_CCellFlag;
-    var asc_CFont = asc.asc_CFont;
-    var asc_CFill = asc.asc_CFill;
-    var asc_CCellInfo = asc.asc_CCellInfo;
+    var asc_CCellFlag = AscCommonExcel.asc_CCellFlag;
+    var asc_CFont = AscCommonExcel.asc_CFont;
+    var asc_CFill = AscCommonExcel.asc_CFill;
+    var asc_CCellInfo = AscCommonExcel.asc_CCellInfo;
     var asc_CHyperlink = asc.asc_CHyperlink;
     var asc_CPageOptions = asc.asc_CPageOptions;
     var asc_CPageSetup = asc.asc_CPageSetup;
     var asc_CPageMargins = asc.asc_CPageMargins;
     var asc_CPagePrint = AscCommonExcel.CPagePrint;
-    var asc_CAutoFilterInfo = asc.asc_CAutoFilterInfo;
+    var asc_CAutoFilterInfo = AscCommonExcel.asc_CAutoFilterInfo;
 
     var c_oTargetType = AscCommonExcel.c_oTargetType;
     var c_oAscCanChangeColWidth = AscCommonExcel.c_oAscCanChangeColWidth;
@@ -7309,7 +7309,7 @@
 		
 		if(curTablePart !== null)
 		{
-			cell_info.formatTableInfo = new asc.asc_CFormatTableInfo();
+			cell_info.formatTableInfo = new AscCommonExcel.asc_CFormatTableInfo();
 			cell_info.formatTableInfo.tableName = curTablePart.DisplayName;
 			
 			if (tableStyleInfo) {
