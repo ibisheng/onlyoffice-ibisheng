@@ -790,7 +790,7 @@ function CLayoutThumbnailDrawer()
 
         var _ctx = this.CanvasImage.getContext('2d');
 
-        var g = new CGraphics();
+        var g = new AscCommon.CGraphics();
         g.init(_ctx, w_px, h_px, this.WidthMM, this.HeightMM);
         g.m_oFontManager = g_fontManager;
 

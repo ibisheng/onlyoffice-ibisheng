@@ -700,7 +700,7 @@ CWrapPolygon.prototype =
             return relArr;
         }
         var transform = drawing.localTransform;
-        var invert_transform = global_MatrixTransformer.Invert(transform);
+        var invert_transform = AscCommon.global_MatrixTransformer.Invert(transform);
         for(var point_index = 0; point_index < aPoints.length; ++point_index)
         {
             var abs_point = aPoints[point_index];

@@ -81,6 +81,7 @@
 		"../cell/model/Workbook.js",
 		"../cell/model/Serialize.js",
 		"../cell/model/CellInfo.js",
+		"../cell/view/DrawingObjectsController.js",
 		
         "../slide/Drawing/ThemeLoader.js",
         "../word/Editor/Serialize2.js",
@@ -96,13 +97,14 @@
         "../word/Editor/Table/TableCell.js",
         "../word/Editor/Common.js",
         "../word/Editor/Sections.js",
+		
         "../word/Drawing/Graphics.js",
+		
         "../word/Drawing/ShapeDrawer.js",
         "../slide/Drawing/Transitions.js",
         "../slide/Drawing/DrawingDocument.js",
         "../slide/Drawing/HtmlPage.js",
         "../slide/Editor/Format/Presentation.js",
-        "../cell/view/DrawingObjectsController.js",
         "../slide/Editor/DrawingObjectsController.js",
         "../slide/Editor/Format/Slide.js",
         "../slide/Editor/Format/SlideMaster.js",

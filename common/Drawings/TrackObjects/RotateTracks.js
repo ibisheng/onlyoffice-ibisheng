@@ -4,6 +4,7 @@
 
 // Import
 var CMatrix = AscCommon.CMatrix;
+var global_MatrixTransformer = AscCommon.global_MatrixTransformer;
     
 var c_oAscFill = Asc.c_oAscFill;
 
@@ -266,7 +267,7 @@ ObjectToDraw.prototype =
             {
                 var Para = AscCommon.g_oTableId.Get_ById( oComment.StartId );
                 if( editor && editor.WordControl && editor.WordControl.m_oLogicDocument && editor.WordControl.m_oLogicDocument.Comments &&
-                    (graphics instanceof CGraphics) && ( editor.WordControl.m_oLogicDocument.Comments.Is_Use() && true != editor.isViewMode))
+                    (graphics instanceof AscCommon.CGraphics) && ( editor.WordControl.m_oLogicDocument.Comments.Is_Use() && true != editor.isViewMode))
                 {
                     if(this.Comment.Additional.CommentId === editor.WordControl.m_oLogicDocument.Comments.Get_CurrentId())
                     {

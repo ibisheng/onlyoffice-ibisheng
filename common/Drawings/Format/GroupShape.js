@@ -11,6 +11,7 @@ var c_oAscSizeRelFromH = AscCommon.c_oAscSizeRelFromH;
 var c_oAscSizeRelFromV = AscCommon.c_oAscSizeRelFromV;
 var isRealObject = AscCommon.isRealObject;
     var History = AscCommon.History;
+    var global_MatrixTransformer = AscCommon.global_MatrixTransformer;
 
 var CShape = AscFormat.CShape;
 

@@ -423,7 +423,7 @@ function CTableOutlineDr()
         this.IsChangeSmall = true;
         this.ChangeSmallPoint = pos;
 
-        if (!this.TableMatrix || global_MatrixTransformer.IsIdentity(this.TableMatrix))
+        if (!this.TableMatrix || AscCommon.global_MatrixTransformer.IsIdentity(this.TableMatrix))
         {
             if (word_control.MobileTouchManager)
             {
@@ -518,7 +518,7 @@ function CTableOutlineDr()
         {
             if (word_control.MobileTouchManager)
             {
-                var _invert = global_MatrixTransformer.Invert(this.TableMatrix);
+                var _invert = AscCommon.global_MatrixTransformer.Invert(this.TableMatrix);
                 var _posx = _invert.TransformPointX(pos.X, pos.Y);
                 var _posy = _invert.TransformPointY(pos.X, pos.Y);
 
@@ -542,7 +542,7 @@ function CTableOutlineDr()
                 return false;
             }
 
-            var _invert = global_MatrixTransformer.Invert(this.TableMatrix);
+            var _invert = AscCommon.global_MatrixTransformer.Invert(this.TableMatrix);
             var _posx = _invert.TransformPointX(pos.X, pos.Y);
             var _posy = _invert.TransformPointY(pos.X, pos.Y);
             switch (this.TrackTablePos)
@@ -765,7 +765,7 @@ function CTableOutlineDr()
         if (transform)
             this.TableMatrix = transform.CreateDublicate();
 
-        if (!this.TableMatrix || global_MatrixTransformer.IsIdentity(this.TableMatrix))
+        if (!this.TableMatrix || AscCommon.global_MatrixTransformer.IsIdentity(this.TableMatrix))
         {
             var pos = word_control.m_oDrawingDocument.ConvertCoordsToCursor(this.TableOutline.X, this.TableOutline.Y, this.TableOutline.PageNum, true);
 
@@ -982,7 +982,7 @@ function CPage()
 
         var selectionArray = this.selectionArray;
 
-        if (null == TextMatrix || global_MatrixTransformer.IsIdentity(TextMatrix))
+        if (null == TextMatrix || AscCommon.global_MatrixTransformer.IsIdentity(TextMatrix))
         {
             for (var i = 0; i < selectionArray.length; i++)
             {
@@ -1602,7 +1602,7 @@ function CPage()
             coords.tx = xDst;
             coords.ty = yDst;
 
-            global_MatrixTransformer.MultiplyAppend(_ft, coords);
+            AscCommon.global_MatrixTransformer.MultiplyAppend(_ft, coords);
 
             ctx.transform(_ft.sx,_ft.shy,_ft.shx,_ft.sy,_ft.tx,_ft.ty);
 
@@ -3791,7 +3791,7 @@ function CDrawingDocument(drawingObjects)
             ctx.fillStyle = "#FFFFFF";
             ctx.fillRect(0, 0, _canvas.width, _canvas.height);
 
-            var graphics = new CGraphics();
+            var graphics = new AscCommon.CGraphics();
             graphics.init(ctx, _canvas.width, _canvas.height, _pageW, _pageH);
             graphics.m_oFontManager = g_fontManager;
             graphics.transform(1,0,0,1,0,0);

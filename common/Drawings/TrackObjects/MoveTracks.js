@@ -3,6 +3,7 @@
 (function(window, undefined){
     // Import
     var CMatrix = AscCommon.CMatrix;
+    var global_MatrixTransformer = AscCommon.global_MatrixTransformer;
 
 function MoveShapeImageTrack(originalObject)
 {

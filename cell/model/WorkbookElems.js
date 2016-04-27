@@ -4464,7 +4464,7 @@ sparklineGroup.prototype.addView = function(oSparklineView, index) {
 	this.arrCachedSparklines[index] = oSparklineView;
 };
 sparklineGroup.prototype.draw = function(oDrawingContext) {
-	var graphics = new CGraphics();
+	var graphics = new AscCommon.CGraphics();
 	graphics.init(oDrawingContext.ctx, oDrawingContext.getWidth(0), oDrawingContext.getHeight(0),
 		oDrawingContext.getWidth(3), oDrawingContext.getHeight(3));
 	graphics.m_oFontManager = g_fontManager;

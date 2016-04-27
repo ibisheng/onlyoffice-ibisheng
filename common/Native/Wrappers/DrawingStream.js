@@ -515,8 +515,8 @@ function CDrawingStream(_writer)
 
     this.m_bIntegerGrid = true;
 
-    this.m_oPen     = new CPen();
-    this.m_oBrush   = new CBrush();
+    this.m_oPen     = new AscCommon.CPen();
+    this.m_oBrush   = new AscCommon.CBrush();
 }
 
 CDrawingStream.prototype =

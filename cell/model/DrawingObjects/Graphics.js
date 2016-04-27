@@ -1,255 +1,14 @@
 "use strict";
 
+(function(window, undefined){
+
 // Import
 var FontStyle = AscFonts.FontStyle;
 var g_fontApplication = AscFonts.g_fontApplication;
 
 var c_oAscLockTypes = AscCommon.c_oAscLockTypes;
 var CMatrixL = AscCommon.CMatrixL;
-
-window.g_fontManager2 = null;
-window.g_fontManager2;
-
-function CClipManager()
-{
-    this.clipRects = [];
-    this.curRect = new _rect();
-    this.BaseObject = null;
-
-    this.AddRect = function(x, y, w, h)
-    {
-        var _count = this.clipRects.length;
-        if (0 == _count)
-        {
-            this.curRect.x = x;
-            this.curRect.y = y;
-            this.curRect.w = w;
-            this.curRect.h = h;
-
-            var _r = new _rect();
-            _r.x = x;
-            _r.y = y;
-            _r.w = w;
-            _r.h = h;
-            this.clipRects[_count] = _r;
-
-            this.BaseObject.SetClip(this.curRect);
-        }
-        else
-        {
-            this.BaseObject.RemoveClip();
-            var _r = new _rect();
-            _r.x = x;
-            _r.y = y;
-            _r.w = w;
-            _r.h = h;
-
-            this.clipRects[_count] = _r;
-            this.curRect = this.IntersectRect(this.curRect, _r);
-            this.BaseObject.SetClip(this.curRect);
-        }
-    }
-    this.RemoveRect = function()
-    {
-        var _count = this.clipRects.length;
-        if (0 != _count)
-        {
-            this.clipRects.splice(_count - 1, 1);
-            --_count;
-
-            this.BaseObject.RemoveClip();
-
-            if (0 != _count)
-            {
-                this.curRect.x = this.clipRects[0].x;
-                this.curRect.y = this.clipRects[0].y;
-                this.curRect.w = this.clipRects[0].w;
-                this.curRect.h = this.clipRects[0].h;
-
-                for (var i = 1; i < _count; i++)
-                    this.curRect = this.IntersectRect(this.curRect, this.clipRects[i]);
-
-                this.BaseObject.SetClip(this.curRect);
-            }
-        }
-    }
-
-    this.IntersectRect = function(r1, r2)
-    {
-        var res = new _rect();
-        res.x = Math.max(r1.x, r2.x);
-        res.y = Math.max(r1.y, r2.y);
-        res.w = Math.min(r1.x + r1.w, r2.x + r2.w) - res.x;
-        res.h = Math.min(r1.y + r1.h, r2.y + r2.h) - res.y;
-
-        if (0 > res.w)
-            res.w = 0;
-        if (0 > res.h)
-            res.h = 0;
-
-        return res;
-    }
-}
-
-function CPen()
-{
-    this.Color      = { R : 255, G : 255, B : 255, A : 255 };
-    this.Style      = 0;
-    this.LineCap    = 0;
-    this.LineJoin   = 0;
-
-    this.LineWidth  = 1;
-}
-function CBrush()
-{
-    this.Color1     = { R : 255, G : 255, B : 255, A : 255 };
-    this.Color2     = { R : 255, G : 255, B : 255, A : 255 };
-    this.Type       = 0;
-}
-
-var bIsChrome   = AscCommon.AscBrowser.isChrome;
-var bIsSafari   = AscCommon.AscBrowser.isSafari;
-var bIsIE       = AscCommon.AscBrowser.isIE;
-var bIsAndroid  = AscCommon.AscBrowser.isAndroid;
-
-function deg2rad(deg){
-    return deg * Math.PI / 180.0;
-}
-function rad2deg(rad){
-    return rad * 180.0 / Math.PI;
-}
-
-function CGlobalMatrixTransformer()
-{
-    this.TranslateAppend = function(m, _tx, _ty)
-    {
-        m.tx += _tx;
-        m.ty += _ty;
-    }
-    this.ScaleAppend = function(m, _sx, _sy)
-    {
-        m.sx     *= _sx;
-        m.shx    *= _sx;
-        m.shy    *= _sy;
-        m.sy     *= _sy;
-        m.tx     *= _sx;
-        m.ty     *= _sy;
-    }
-    this.RotateRadAppend = function(m, _rad)
-    {
-        var _sx  = Math.cos(_rad);
-        var _shx = Math.sin(_rad);
-        var _shy = -Math.sin(_rad);
-        var _sy  = Math.cos(_rad);
-
-        var t0 = m.sx * _sx + m.shy * _shx;
-        var t2 = m.shx * _sx + m.sy * _shx;
-        var t4 = m.tx * _sx + m.ty * _shx;
-        m.shy = m.sx * _shy + m.shy * _sy;
-        m.sy  = m.shx * _shy + m.sy * _sy;
-        m.ty  = m.tx * _shy + m.ty * _sy;
-        m.sx  = t0;
-        m.shx = t2;
-        m.tx  = t4;
-    }
-
-    this.MultiplyAppend = function(m1, m2)
-    {
-        var t0 = m1.sx  * m2.sx + m1.shy * m2.shx;
-        var t2 = m1.shx * m2.sx + m1.sy  * m2.shx;
-        var t4 = m1.tx  * m2.sx + m1.ty  * m2.shx + m2.tx;
-        m1.shy = m1.sx * m2.shy + m1.shy * m2.sy;
-        m1.sy  = m1.shx * m2.shy + m1.sy * m2.sy;
-        m1.ty  = m1.tx  * m2.shy + m1.ty * m2.sy + m2.ty;
-        m1.sx  = t0;
-        m1.shx = t2;
-        m1.tx  = t4;
-    }
-
-    this.Invert = function(m)
-    {
-        var newM = m.CreateDublicate();
-        var det = newM.sx * newM.sy - newM.shy * newM.shx;
-        if (0.0001 > Math.abs(det))
-            return newM;
-
-        var d = 1 / det;
-
-        var t0 = newM.sy * d;
-        newM.sy =  newM.sx * d;
-        newM.shy = -newM.shy * d;
-        newM.shx = -newM.shx * d;
-
-        var t4 = -newM.tx * t0  - newM.ty * newM.shx;
-        newM.ty = -newM.tx * newM.shy - newM.ty * newM.sy;
-
-        newM.sx = t0;
-        newM.tx = t4;
-        return newM;
-    }
-
-    this.MultiplyAppendInvert = function(m1, m2)
-    {
-        var m = this.Invert(m2);
-        this.MultiplyAppend(m1, m);
-    }
-
-    this.MultiplyPrepend = function(m1, m2)
-    {
-        var m = new CMatrixL();
-        m.sx     = m2.sx;
-        m.shx    = m2.shx;
-        m.shy    = m2.shy;
-        m.sy     = m2.sy;
-        m.tx     = m2.tx;
-        m.ty     = m2.ty;
-        this.MultiplyAppend(m, m1);
-        m1.sx     = m.sx;
-        m1.shx    = m.shx;
-        m1.shy    = m.shy;
-        m1.sy     = m.sy;
-        m1.tx     = m.tx;
-        m1.ty     = m.ty;
-    }
-
-    this.CreateDublicateM = function(matrix)
-    {
-        var m = new CMatrixL();
-        m.sx     = matrix.sx;
-        m.shx    = matrix.shx;
-        m.shy    = matrix.shy;
-        m.sy     = matrix.sy;
-        m.tx     = matrix.tx;
-        m.ty     = matrix.ty;
-    }
-
-    this.IsIdentity = function(m)
-    {
-        if (m.sx == 1.0 &&
-            m.shx == 0.0 &&
-            m.shy == 0.0 &&
-            m.sy == 1.0 &&
-            m.tx == 0.0 &&
-            m.ty == 0.0)
-        {
-            return true;
-        }
-        return false;
-    }
-    this.IsIdentity2 = function(m)
-    {
-        if (m.sx == 1.0 &&
-            m.shx == 0.0 &&
-            m.shy == 0.0 &&
-            m.sy == 1.0)
-        {
-            return true;
-        }
-        return false;
-    }
-}
-
-var global_MatrixTransformer = new CGlobalMatrixTransformer();
+var global_MatrixTransformer = AscCommon.global_MatrixTransformer;
 
 function CGraphics()
 {
@@ -267,8 +26,8 @@ function CGraphics()
     this.textBB_r       = -10000;
     this.textBB_b       = -10000;
 
-    this.m_oPen     = new CPen();
-    this.m_oBrush   = new CBrush();
+    this.m_oPen     = new AscCommon.CPen();
+    this.m_oBrush   = new AscCommon.CBrush();
 	this.m_oAutoShapesTrack = null;
 
     this.m_oFontManager = null;
@@ -299,7 +58,7 @@ function CGraphics()
 
     this.m_bIntegerGrid = true;
 
-    this.ClipManager = new CClipManager();
+    this.ClipManager = new AscCommon.CClipManager();
     this.ClipManager.BaseObject = this;
 
     this.TextureFillTransformScaleX = 1;
@@ -654,13 +413,13 @@ CGraphics.prototype =
     {
         if (!global_MatrixTransformer.IsIdentity2(_transform))
         {
-            if (window.g_fontManager2 == null)
+            if (!AscCommon.g_fontManager2)
             {
-                window.g_fontManager2 = new AscFonts.CFontManager();
-                window.g_fontManager2.Initialize(true);
+                AscCommon.g_fontManager2 = new AscFonts.CFontManager();
+                AscCommon.g_fontManager2.Initialize(true);
             }
 
-            this.m_oFontManager2 = window.g_fontManager2;
+            this.m_oFontManager2 = AscCommon.g_fontManager2;
 
             if (null == this.m_oLastFont2)
                 this.m_oLastFont2 = new AscCommon.CFontSetup();
@@ -2569,3 +2328,8 @@ CGraphics.prototype =
         };
     }
 };
+
+    //------------------------------------------------------------export----------------------------------------------------
+    window['AscCommon'] = window['AscCommon'] || {};
+    window['AscCommon'].CGraphics = CGraphics;
+})(window);

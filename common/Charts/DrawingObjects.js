@@ -1823,7 +1823,7 @@ function DrawingObjects() {
     };
 
     _this.clipGraphicsCanvas = function(canvas, graphicOption) {
-        if ( canvas instanceof CGraphics ) {
+        if ( canvas instanceof AscCommon.CGraphics ) {
 
             var x, y, w, h;
 
@@ -1865,7 +1865,7 @@ function DrawingObjects() {
     };
 
     _this.restoreGraphicsCanvas = function(canvas) {
-        if ( canvas instanceof CGraphics ) {
+        if ( canvas instanceof AscCommon.CGraphics ) {
             canvas.m_oContext.restore();
 
             // этот рестор нужен для восстановления сложных вложенных клипов
@@ -2445,7 +2445,7 @@ function DrawingObjects() {
         }
         else
         {
-            graphics = new CGraphics();
+            graphics = new AscCommon.CGraphics();
             graphics.init(oDrawingContext.ctx, oDrawingContext.getWidth(0), oDrawingContext.getHeight(0),
                 oDrawingContext.getWidth(3)*nSparklineMultiplier, oDrawingContext.getHeight(3)*nSparklineMultiplier);
             graphics.m_oFontManager = g_fontManager;

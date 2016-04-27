@@ -1555,7 +1555,7 @@ parserHelper.prototype.getEscapeSheetName = function (sheet) {
 /**
  * Проверяем ссылку на валидность для диаграммы или автофильтра
  * @param {AscCommonExcel.Workbook} model
- * @param {WorkbookView} wb
+ * @param {AscCommonExcel.WorkbookView} wb
  * @param {Asc.c_oAscSelectionDialogType} dialogType
  * @param {string} dataRange
  * @param {boolean} fullCheck

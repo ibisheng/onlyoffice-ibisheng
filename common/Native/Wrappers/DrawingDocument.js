@@ -155,7 +155,7 @@ function CTableOutlineDr()
         this.IsChangeSmall = true;
         this.ChangeSmallPoint = pos;
 
-        if (!this.TableMatrix || global_MatrixTransformer.IsIdentity(this.TableMatrix))
+        if (!this.TableMatrix || AscCommon.global_MatrixTransformer.IsIdentity(this.TableMatrix))
         {
             switch (this.TrackTablePos)
             {
@@ -224,7 +224,7 @@ function CTableOutlineDr()
         }
         else
         {
-            var _invert = global_MatrixTransformer.Invert(this.TableMatrix);
+            var _invert = AscCommon.global_MatrixTransformer.Invert(this.TableMatrix);
             var _posx = _invert.TransformPointX(pos.X, pos.Y);
             var _posy = _invert.TransformPointY(pos.X, pos.Y);
             switch (this.TrackTablePos)
@@ -452,7 +452,7 @@ function CTableOutlineDr()
 
         var _bounds = this.Native["DD_GetControlSizes"]();
 
-        if (!this.TableMatrix || global_MatrixTransformer.IsIdentity(this.TableMatrix))
+        if (!this.TableMatrix || AscCommon.global_MatrixTransformer.IsIdentity(this.TableMatrix))
         {
             var pos = drDoc.__DD_ConvertCoordsToCursor(this.TableOutline.X, this.TableOutline.Y, this.TableOutline.PageNum);
 

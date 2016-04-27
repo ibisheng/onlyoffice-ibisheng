@@ -54,9 +54,9 @@ var editor;
     this.topLineEditorName = inputName;
     this.topLineEditorElement = null;
 
-    this.controller = new asc.asc_CEventsController();
+    this.controller = new AscCommonExcel.asc_CEventsController();
 
-    this.handlers = new asc.asc_CHandlersList(eventsHandlers);
+    this.handlers = new AscCommonExcel.asc_CHandlersList(eventsHandlers);
     // Вид печати
     this.adjustPrint = null;
 
@@ -1525,7 +1525,7 @@ var editor;
       return;
     }
 
-    this.wb = new asc.WorkbookView(this.wbModel, this.controller, this.handlers, this.HtmlElement, this.topLineEditorElement, this, this.collaborativeEditing, this.fontRenderingMode);
+    this.wb = new AscCommonExcel.WorkbookView(this.wbModel, this.controller, this.handlers, this.HtmlElement, this.topLineEditorElement, this, this.collaborativeEditing, this.fontRenderingMode);
 
     this.DocumentLoadComplete = true;
 
@@ -3154,7 +3154,7 @@ var editor;
     g_oIdCounter.Set_Load(false);
 
     this._coAuthoringInit();
-    this.wb = new asc.WorkbookView(this.wbModel, this.controller, this.handlers, window["_null_object"], window["_null_object"], this, this.collaborativeEditing, this.fontRenderingMode);
+    this.wb = new AscCommonExcel.WorkbookView(this.wbModel, this.controller, this.handlers, window["_null_object"], window["_null_object"], this, this.collaborativeEditing, this.fontRenderingMode);
   };
 
   spreadsheet_api.prototype.asc_nativeCalculateFile = function() {

@@ -2,6 +2,7 @@
 
 // Import
 var History = AscCommon.History;
+var global_MatrixTransformer = AscCommon.global_MatrixTransformer;
 
 //----------------------------------------------------------------------------------------------------------------------
 // Класс CTableCell

@@ -411,12 +411,12 @@ function NewShapeTrack(presetGeom, startX, startY, theme, master, layout, slide,
         this.transform.Reset();
         var hc = this.extX * 0.5;
         var vc = this.extY * 0.5;
-        global_MatrixTransformer.TranslateAppend(this.transform, -hc, -vc);
+        AscCommon.global_MatrixTransformer.TranslateAppend(this.transform, -hc, -vc);
         if (this.flipH)
-            global_MatrixTransformer.ScaleAppend(this.transform, -1, 1);
+            AscCommon.global_MatrixTransformer.ScaleAppend(this.transform, -1, 1);
         if (this.flipV)
-            global_MatrixTransformer.ScaleAppend(this.transform, 1, -1);
-        global_MatrixTransformer.TranslateAppend(this.transform, this.x + hc, this.y + vc);
+            AscCommon.global_MatrixTransformer.ScaleAppend(this.transform, 1, -1);
+        AscCommon.global_MatrixTransformer.TranslateAppend(this.transform, this.x + hc, this.y + vc);
     };
 
     this.draw = function(overlay)

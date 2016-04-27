@@ -565,7 +565,7 @@ CChartSpace.prototype.updateTransformMatrix  = function()
     var posY = this.localTransform.ty + this.posY;
 
     this.transform = this.localTransform.CreateDublicate();
-    global_MatrixTransformer.TranslateAppend(this.transform, this.posX, this.posY);
+    AscCommon.global_MatrixTransformer.TranslateAppend(this.transform, this.posX, this.posY);
 
     var oParentTransform = null;
     if(this.parent && this.parent.Get_ParentParagraph)
@@ -577,12 +577,12 @@ CChartSpace.prototype.updateTransformMatrix  = function()
 
             if(oParentTransform)
             {
-                global_MatrixTransformer.MultiplyAppend(this.transform, oParentTransform);
+                AscCommon.global_MatrixTransformer.MultiplyAppend(this.transform, oParentTransform);
             }
         }
     }
 
-    this.invertTransform = global_MatrixTransformer.Invert(this.transform);
+    this.invertTransform = AscCommon.global_MatrixTransformer.Invert(this.transform);
     this.updateChildLabelsTransform(posX,posY);
     this.checkShapeChildTransform(oParentTransform);
 };

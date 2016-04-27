@@ -17,6 +17,7 @@ var oNumFormatCache = AscCommon.oNumFormatCache;
 var CellAddress = AscCommon.CellAddress;
 var isRealObject = AscCommon.isRealObject;
     var History = AscCommon.History;
+    var global_MatrixTransformer = AscCommon.global_MatrixTransformer;
 
 var CShape = AscFormat.CShape;
 var Ax_Counter = AscFormat.Ax_Counter;

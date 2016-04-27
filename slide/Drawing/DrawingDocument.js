@@ -6,6 +6,7 @@ var g_oTextMeasurer = AscCommon.g_oTextMeasurer;
 var global_keyboardEvent = AscCommon.global_keyboardEvent;
 var global_mouseEvent = AscCommon.global_mouseEvent;
 var History = AscCommon.History;
+var global_MatrixTransformer = AscCommon.global_MatrixTransformer;
 
 var FontStyle = AscFonts.FontStyle;
 var g_fontApplication = AscFonts.g_fontApplication;
@@ -1247,7 +1248,7 @@ function CDrawingDocument()
         var _yOffset = (((_hPx + _pxBoundsH) / 2) - baseLineOffset * g_dKoef_mm_to_pix) >> 0;
         var _xOffset = ((_wPx - _pxBoundsW) / 2) >> 0;
 
-        var graphics = new CGraphics();
+        var graphics = new AscCommon.CGraphics();
         graphics.init(ctx, _wPx, _hPx, _wMm, _hMm);
         graphics.m_oFontManager = g_fontManager;
 
@@ -2908,7 +2909,7 @@ function CDrawingDocument()
             ctx.fillStyle = "#FFFFFF";
             ctx.fillRect(0, 0, _canvas.width, _canvas.height);
 
-            var graphics = new CGraphics();
+            var graphics = new AscCommon.CGraphics();
             graphics.init(ctx, _canvas.width, _canvas.height, _pageW, _pageH);
             graphics.m_oFontManager = g_fontManager;
             graphics.transform(1,0,0,1,0,0);
@@ -4129,7 +4130,7 @@ function CThumbnailsManager()
             }
 
             // создаем отрисовщик
-            var g = new CGraphics();
+            var g = new AscCommon.CGraphics();
             g.init(context, _width, _height, _width * g_dKoef_pix_to_mm, _height * g_dKoef_pix_to_mm);
             g.m_oFontManager = this.m_oFontManager;
             g.transform(1,0,0,1,0,0);
@@ -4384,7 +4385,7 @@ function CThumbnailsManager()
             {
                 page.cachedImage = this.m_oCacheManager.Lock(w, h);
 
-                var g = new CGraphics();
+                var g = new AscCommon.CGraphics();
                 g.IsNoDrawingEmptyPlaceholder = true;
                 g.IsThumbnail = true;
                 g.init(page.cachedImage.image.ctx, w, h, this.SlideWidth, this.SlideHeight);
@@ -5149,7 +5150,7 @@ function CSlideDrawer()
             }
 
             // и сразу отрисуем его на кешированной картинке
-            var g = new CGraphics();
+            var g = new AscCommon.CGraphics();
             g.init(this.CachedCanvasCtx, w_px, h_px, w_mm, h_mm);
             g.m_oFontManager = g_fontManager;
 
@@ -5227,7 +5228,7 @@ function CSlideDrawer()
             var w_px = (w_mm * dKoef) >> 0;
             var h_px = (h_mm * dKoef) >> 0;
 
-            var g = new CGraphics();
+            var g = new AscCommon.CGraphics();
             g.init(outputCtx, w_px, h_px, w_mm, h_mm);
             g.m_oFontManager = g_fontManager;
 

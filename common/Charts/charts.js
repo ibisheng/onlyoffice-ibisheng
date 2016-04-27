@@ -438,7 +438,7 @@ ChartPreviewManager.prototype.createChartPreview = function(type, styleIndex) {
 
         var _canvas = this._canvas_charts;
         var ctx = _canvas.getContext('2d');
-        var graphics = new CGraphics();
+        var graphics = new AscCommon.CGraphics();
         graphics.init(ctx, _canvas.width, _canvas.height, 50, 50);
         graphics.m_oFontManager = g_fontManager;
         graphics.transform(1,0,0,1,0,0);
@@ -917,7 +917,7 @@ TextArtPreviewManager.prototype.getWordArtPreview = function(prst)
 {
 	var _canvas = this.getCanvas();
 	var ctx = _canvas.getContext('2d');
-	var graphics = new CGraphics();
+	var graphics = new AscCommon.CGraphics();
 	var oShape = this.getShapeByPrst(prst);
     if(!oShape)
     {
@@ -952,7 +952,7 @@ TextArtPreviewManager.prototype.generateTextArtStyles = function()
         }
         var _canvas = this.getCanvas();
         var ctx = _canvas.getContext('2d');
-        var graphics = new CGraphics();
+        var graphics = new AscCommon.CGraphics();
         var oShape = this.getTAShape();
         if(!oShape)
         {

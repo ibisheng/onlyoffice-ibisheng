@@ -2573,7 +2573,7 @@ ParaMath.prototype.MathToImageConverter = function(bCopy, _canvasInput, _widthPx
 
     var _ctx = _canvas.getContext('2d');
 
-    var g = new CGraphics();
+    var g = new AscCommon.CGraphics();
     g.init(_ctx, w_px, h_px, w_mm, h_mm);
     g.m_oFontManager = g_fontManager;
 

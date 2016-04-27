@@ -13,6 +13,7 @@ var g_oTableId = AscCommon.g_oTableId;
 var CMatrix = AscCommon.CMatrix;
 var isRealObject = AscCommon.isRealObject;
     var History = AscCommon.History;
+    var global_MatrixTransformer = AscCommon.global_MatrixTransformer;
 
 var CShape = AscFormat.CShape;
 var checkSpPrRasterImages = AscFormat.checkSpPrRasterImages;

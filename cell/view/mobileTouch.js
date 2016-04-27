@@ -1201,7 +1201,7 @@ CMobileTouchManager.prototype.CheckSelectEnd = function(bIsAttack)
             var pos1 = null;
             var pos4 = null;
 
-            if (!_matrix || global_MatrixTransformer.IsIdentity(_matrix))
+        if (!_matrix || AscCommon.global_MatrixTransformer.IsIdentity(_matrix))
             {
                 pos1 = this.DrawingDocument.ConvertCoordsToCursorWR(this.RectSelect1.x, this.RectSelect1.y, this.PageSelect1);
                 pos4 = this.DrawingDocument.ConvertCoordsToCursorWR(this.RectSelect2.x + this.RectSelect2.w, this.RectSelect2.y + this.RectSelect2.h, this.PageSelect2);
@@ -1291,7 +1291,7 @@ CMobileTouchManager.prototype.OnScrollAnimationEnd = function()
             var pos4 = null;
 
             var _matrix = this.DrawingDocument.TextMatrix;
-            if (!_matrix || global_MatrixTransformer.IsIdentity(_matrix))
+        if (!_matrix || AscCommon.global_MatrixTransformer.IsIdentity(_matrix))
             {
                 pos1 = this.DrawingDocument.ConvertCoordsToCursorWR(this.RectSelect1.x, this.RectSelect1.y, this.PageSelect1);
                 pos4 = this.DrawingDocument.ConvertCoordsToCursorWR(this.RectSelect2.x + this.RectSelect2.w, this.RectSelect2.y + this.RectSelect2.h, this.PageSelect2);
@@ -1322,7 +1322,7 @@ CMobileTouchManager.prototype.CheckSelect = function(overlay)
 
         var _matrix = this.DrawingDocument.TextMatrix;
 
-        if (!_matrix || global_MatrixTransformer.IsIdentity(_matrix))
+    if (!_matrix || AscCommon.global_MatrixTransformer.IsIdentity(_matrix))
         {
             var pos1 = this.DrawingDocument.ConvertCoordsToCursorWR(this.RectSelect1.x, this.RectSelect1.y, this.PageSelect1);
             var pos2 = this.DrawingDocument.ConvertCoordsToCursorWR(this.RectSelect1.x, this.RectSelect1.y + this.RectSelect1.h, this.PageSelect1);
@@ -1433,7 +1433,7 @@ CMobileTouchManager.prototype.CheckSelect2 = function(overlay)
 
         var _matrix = this.DrawingDocument.TextMatrix;
 
-        if (!_matrix || global_MatrixTransformer.IsIdentity(_matrix))
+    if (!_matrix || AscCommon.global_MatrixTransformer.IsIdentity(_matrix))
         {
             var pos1 = this.DrawingDocument.ConvertCoordsToCursorWR(this.RectSelect1.x, this.RectSelect1.y, this.PageSelect1);
             var pos2 = this.DrawingDocument.ConvertCoordsToCursorWR(this.RectSelect1.x, this.RectSelect1.y + this.RectSelect1.h, this.PageSelect1);
@@ -1578,7 +1578,7 @@ CMobileTouchManager.prototype.CheckTableRules = function(overlay)
             _tableW += _cols[i];
         }
 
-        if (!_table_outline_dr.TableMatrix || global_MatrixTransformer.IsIdentity(_table_outline_dr.TableMatrix))
+    if (!_table_outline_dr.TableMatrix || AscCommon.global_MatrixTransformer.IsIdentity(_table_outline_dr.TableMatrix))
         {
             this.TableMovePoint = { X : _tableOutline.X, Y : _tableOutline.Y };
 
@@ -1828,7 +1828,7 @@ CMobileTouchManager.prototype.CheckTableRules2 = function(overlay)
             _tableW += _cols[i];
         }
 
-        if (!_table_outline_dr.TableMatrix || global_MatrixTransformer.IsIdentity(_table_outline_dr.TableMatrix))
+    if (!_table_outline_dr.TableMatrix || AscCommon.global_MatrixTransformer.IsIdentity(_table_outline_dr.TableMatrix))
         {
             this.TableMovePoint = { X : _tableOutline.X, Y : _tableOutline.Y };
 

@@ -29,7 +29,7 @@
 
 			this.m_nUseType					= 1;  // 1 - 1 клиент и мы сохраняем историю, -1 - несколько клиентов, 0 - переход из -1 в 1
 
-			this.handlers					= new Asc.asc_CHandlersList(handlers);
+			this.handlers					= new AscCommonExcel.asc_CHandlersList(handlers);
 			this.m_bIsViewerMode			= !!isViewerMode; // Режим Viewer-а
 			this.m_bGlobalLock				= false; // Глобальный lock
 			this.m_bGlobalLockEditCell		= false; // Глобальный lock (для редактирования ячейки) - отключаем смену select-а, но разрешаем сразу вводить

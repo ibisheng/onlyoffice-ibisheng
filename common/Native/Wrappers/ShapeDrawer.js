@@ -995,7 +995,7 @@ CShapeDrawer.prototype =
             // и отправляем на отрисовку (с матрицей)
 
             var trans = (this.Graphics.IsTrack === true) ? this.Graphics.Graphics.m_oFullTransform : this.Graphics.m_oFullTransform;
-            var trans1 = global_MatrixTransformer.Invert(trans);
+            var trans1 = AscCommon.global_MatrixTransformer.Invert(trans);
 
             var x1 = trans.TransformPointX(0, 0);
             var y1 = trans.TransformPointY(0, 0);
@@ -1293,7 +1293,7 @@ CShapeDrawer.prototype =
             // и отправляем на отрисовку (с матрицей)
 
             var trans = this.Graphics.GetTransform();
-            var trans1 = global_MatrixTransformer.Invert(trans);
+            var trans1 = AscCommon.global_MatrixTransformer.Invert(trans);
 
             var lineSize = this.Graphics.GetLineWidth();
 
@@ -1452,7 +1452,7 @@ CShapeDrawer.prototype =
             return points;
         }
 
-        var grad_a = deg2rad(angle);
+        var grad_a = AscCommon.deg2rad(angle);
         if (!scale)
         {
             if (angle > 0 && angle < 90)

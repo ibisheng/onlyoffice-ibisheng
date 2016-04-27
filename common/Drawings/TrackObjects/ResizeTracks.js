@@ -1,6 +1,8 @@
 "use strict";
 
 (function(window, undefined){
+    // Import
+    var global_MatrixTransformer = AscCommon.global_MatrixTransformer;
 
 var TRANSLATE_HANDLE_NO_FLIP = [];
 TRANSLATE_HANDLE_NO_FLIP[0] = 0;

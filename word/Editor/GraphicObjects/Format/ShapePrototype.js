@@ -4,6 +4,7 @@
 var CShape = AscFormat.CShape;
 
 var isRealObject = AscCommon.isRealObject;
+var global_MatrixTransformer = AscCommon.global_MatrixTransformer;
 
 CShape.prototype.setRecalculateInfo = function()
 {

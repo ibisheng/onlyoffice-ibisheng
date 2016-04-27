@@ -103,13 +103,6 @@
         return (y + p + a) / ppi * 72;
     }
 
-    function deg2rad(deg){
-        return deg * Math.PI / 180.0;
-    }
-
-    function rad2deg(rad){
-        return rad * 180.0 / Math.PI;
-    }
     /**
      * @constructor
      */
@@ -194,7 +187,7 @@
 
     Matrix.prototype.rotate = function (a, order) {
         var m = new Matrix();
-        var rad = deg2rad(a);
+        var rad = AscCommon.deg2rad(a);
         m.sx  = Math.cos(rad);
         m.shx = Math.sin(rad);
         m.shy = -Math.sin(rad);
@@ -246,7 +239,7 @@
         this.transformPoint(x1, y1);
         this.transformPoint(x2, y2);
         var a = Math.atan2(y2-y1, x2-x1);
-        return rad2deg(a);
+        return AscCommon.rad2deg(a);
     };
 
     /**

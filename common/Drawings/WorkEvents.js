@@ -4,6 +4,7 @@
 
 // Import
 var AscBrowser = AscCommon.AscBrowser;
+var global_MatrixTransformer = AscCommon.global_MatrixTransformer;
 
 // ��������� ��� ����
 var g_mouse_event_type_down  = 0;

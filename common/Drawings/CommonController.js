@@ -8169,7 +8169,7 @@ CSlideBoundsChecker.prototype =
         this.m_oFullTransform.sy = this.m_oTransform.sy;
         this.m_oFullTransform.tx = this.m_oTransform.tx;
         this.m_oFullTransform.ty = this.m_oTransform.ty;
-        global_MatrixTransformer.MultiplyAppend(this.m_oFullTransform, this.m_oCoordTransform);
+        AscCommon.global_MatrixTransformer.MultiplyAppend(this.m_oFullTransform, this.m_oCoordTransform);
     },
     // path commands
     _s : function()
