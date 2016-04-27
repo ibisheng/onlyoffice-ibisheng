@@ -5,6 +5,7 @@ echo "Building for mobile"
 echo "----------------------------------------"
 
 BASEDIR="$(cd "$(dirname "$0")" && pwd)"
+cd $BASEDIR
 
 npm install
 grunt --level=WHITESPACE_ONLY --mobile=true --formatting=PRETTY_PRINT
