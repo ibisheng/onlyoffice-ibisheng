@@ -2243,10 +2243,21 @@ Workbook.prototype.insertWorksheet = function (index, sheet, cwf) {
 	this.aWorksheetsById[sheet.getId()] = sheet;
 	this._updateWorksheetIndexes(wsActive);
 	this._insertWorksheetFormula(index);
+	this._insertTablePartsName(sheet);
 	//восстанавливаем список ячеек с формулами для sheet
 	this.cwf[sheet.getId()] = cwf;
 	sheet._BuildDependencies(cwf.cells);
 	sortDependency(this);
+};
+Workbook.prototype._insertTablePartsName = function (sheet) {
+	if(sheet && sheet.TableParts && sheet.TableParts.length)
+	{
+		for(var i = 0; i < sheet.TableParts.length; i++)
+		{	
+			var oNewTable = sheet.TableParts[i];
+			this.dependencyFormulas.addTableName(oNewTable.DisplayName, sheet, oNewTable.Ref);
+		}
+	}
 };
 Workbook.prototype._insertWorksheetFormula=function(index){
 	if( index > 0 && index < this.aWorksheets.length - 1 ){
