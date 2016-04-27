@@ -4965,9 +4965,7 @@ function OfflineEditor () {
 }
 var _s = new OfflineEditor();
 
-function offline_of() {
-    console.log('offline_open_file');
-    _s.openFile();}
+function offline_of() {_s.openFile();}
 function offline_stz(v) {_s.zoom = v; _api.asc_setZoom(v);}
 function offline_ds(x, y, width, height, ratio, istoplayer) {_s.drawSheet(x, y, width, height, ratio, istoplayer);}
 function offline_dh(x, y, width, height, type, ratio) {_s.drawHeader(x, y, width, height, type, ratio);}
