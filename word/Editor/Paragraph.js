@@ -134,8 +134,8 @@ function Paragraph(DrawingDocument, Parent, PageNum, X, Y, XLimit, YLimit, bFrom
     if (false === AscCommon.g_oIdCounter.m_bLoad && true === History.Is_On())
     {
         this.Lock.Set_Type(AscCommon.locktype_Mine, false);
-        if (CollaborativeEditing)
-            CollaborativeEditing.Add_Unlock2(this);
+        if (AscCommon.CollaborativeEditing)
+            AscCommon.CollaborativeEditing.Add_Unlock2(this);
     }
 
     this.DeleteCommentOnRemove    = true; // Удаляем ли комменты в функциях Internal_Content_Remove
@@ -11717,7 +11717,7 @@ Paragraph.prototype =
                             Element.Set_Paragraph(this);
 
                         this.Content.splice(Pos, 0, Element);
-                        CollaborativeEditing.Update_DocumentPositionsOnAdd(this, Pos);
+                        AscCommon.CollaborativeEditing.Update_DocumentPositionsOnAdd(this, Pos);
 
                         if (Element.Recalc_RunsCompiledPr)
                             Element.Recalc_RunsCompiledPr();
@@ -11745,7 +11745,7 @@ Paragraph.prototype =
                         continue;
 
                     this.Content.splice(ChangesPos, 1);
-                    CollaborativeEditing.Update_DocumentPositionsOnRemove(this, ChangesPos, 1);
+                    AscCommon.CollaborativeEditing.Update_DocumentPositionsOnRemove(this, ChangesPos, 1);
                 }
 
                 this.private_ResetSelection();
@@ -12521,7 +12521,7 @@ Paragraph.prototype =
             }
         }
 
-        CollaborativeEditing.Add_NewObject( this );
+        AscCommon.CollaborativeEditing.Add_NewObject( this );
 
         this.bFromDocument = Reader.GetBool();
         if(!this.bFromDocument)
@@ -12539,7 +12539,7 @@ Paragraph.prototype =
         }
         else
         {
-            CollaborativeEditing.Add_LinkData(this, {});
+            AscCommon.CollaborativeEditing.Add_LinkData(this, {});
         }
 
         this.PageNum = 0;
@@ -13192,7 +13192,7 @@ Paragraph.prototype.Get_StyleFromFormatting = function()
 Paragraph.prototype.private_AddCollPrChange = function(Color)
 {
     this.CollPrChange = Color;
-    CollaborativeEditing.Add_ChangedClass(this);
+    AscCommon.CollaborativeEditing.Add_ChangedClass(this);
 };
 Paragraph.prototype.private_GetCollPrChange = function()
 {

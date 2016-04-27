@@ -1984,7 +1984,7 @@ function CEditorPage(api)
             {
                 oWordControl.TextBoxInputFocus = false;
 
-                CollaborativeEditing.m_bGlobalLock = false;
+                AscCommon.CollaborativeEditing.m_bGlobalLock = false;
                 this.TextBoxInput.style.zIndex = -1;
                 this.TextBoxInput.style.top = "-1000px";
                 this.TextBoxInputFocus = false;
@@ -2025,7 +2025,7 @@ function CEditorPage(api)
         {
             oWordControl.TextBoxInputFocus = false;
 
-            CollaborativeEditing.m_bGlobalLock = false;
+            AscCommon.CollaborativeEditing.m_bGlobalLock = false;
             this.TextBoxInput.style.zIndex = -1;
             this.TextBoxInput.style.top = "-1000px";
             this.TextBoxInputFocus = false;
@@ -3111,7 +3111,7 @@ function CEditorPage(api)
 
             if (!_bIsWaitScheme)
             {
-                var _interval = (CollaborativeEditing.m_nUseType <= 0) ? oWordControl.m_nIntervalSlowAutosave : oWordControl.m_nIntervalFastAutosave;
+                var _interval = (AscCommon.CollaborativeEditing.m_nUseType <= 0) ? oWordControl.m_nIntervalSlowAutosave : oWordControl.m_nIntervalFastAutosave;
 
                 if ((_curTime - oWordControl.m_nLastAutosaveTime) > _interval && !oWordControl.m_oDrawingDocument.TransitionSlide.IsPlaying() && !oWordControl.m_oApi.isLongAction())
                 {
@@ -3512,7 +3512,7 @@ function CEditorPage(api)
             return;
 
         oThis.TextBoxInputFocus = true;
-        CollaborativeEditing.m_bGlobalLock = true;
+        AscCommon.CollaborativeEditing.m_bGlobalLock = true;
         oThis.CheckTextBoxInputPos();
         oThis.TextBoxInput.style.zIndex = 90;
     }
@@ -3590,7 +3590,7 @@ function CEditorPage(api)
 
     this.onChangeTB = function()
     {
-        CollaborativeEditing.m_bGlobalLock = false;
+        AscCommon.CollaborativeEditing.m_bGlobalLock = false;
         this.TextBoxInput.style.zIndex = -1;
         this.TextBoxInput.style.top = "-1000px";
         this.TextBoxInputFocus = false;

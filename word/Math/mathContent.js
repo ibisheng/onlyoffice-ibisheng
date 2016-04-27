@@ -2085,7 +2085,7 @@ CMathContent.prototype.Load_Changes = function(Reader)
                 {
                     this.Content.splice(Pos, 0, Element);
                     Element.Recalc_RunsCompiledPr();
-                    CollaborativeEditing.Update_DocumentPositionsOnAdd(this, Pos);
+                    AscCommon.CollaborativeEditing.Update_DocumentPositionsOnAdd(this, Pos);
                 }
             }
 
@@ -2102,7 +2102,7 @@ CMathContent.prototype.Load_Changes = function(Reader)
             {
                 var ChangesPos = Reader.GetLong();
                 this.Content.splice(ChangesPos, 1);
-                CollaborativeEditing.Update_DocumentPositionsOnRemove(this, ChangesPos, 1);
+                AscCommon.CollaborativeEditing.Update_DocumentPositionsOnRemove(this, ChangesPos, 1);
             }
 
             break;

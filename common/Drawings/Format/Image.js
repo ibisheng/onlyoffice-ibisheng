@@ -989,11 +989,11 @@ CImageShape.prototype =
                     this.blipFill = new AscFormat.CBlipFill();
                     r.GetLong();
                     this.blipFill.Read_FromBinary(r);
-                    if(typeof CollaborativeEditing !== "undefined")
+                    if(typeof AscCommon.CollaborativeEditing !== "undefined")
                     {
                         if(typeof this.blipFill.RasterImageId === "string" && this.blipFill.RasterImageId.length > 0)
                         {
-							CollaborativeEditing.Add_NewImage(AscCommon.getFullImageSrc2(this.blipFill.RasterImageId));
+                            AscCommon.CollaborativeEditing.Add_NewImage(AscCommon.getFullImageSrc2(this.blipFill.RasterImageId));
                         }
                     }
                 }

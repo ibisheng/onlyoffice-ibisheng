@@ -261,8 +261,8 @@ CCollaborativeEditing.prototype.OnEnd_Load_Objects = function()
     // Данная функция вызывается, когда загрузились внешние объекты (картинки и шрифты)
 
     // Снимаем лок
-    CollaborativeEditing.m_bGlobalLock = false;
-    CollaborativeEditing.m_bGlobalLockSelection = false;
+    AscCommon.CollaborativeEditing.m_bGlobalLock = false;
+    AscCommon.CollaborativeEditing.m_bGlobalLockSelection = false;
 
     // Запускаем полный пересчет документа
     var LogicDocument = editor.WordControl.m_oLogicDocument;
@@ -360,22 +360,22 @@ CCollaborativeEditing.prototype.OnEnd_CheckLock = function()
 
 CCollaborativeEditing.prototype.OnCallback_AskLock = function(result)
 {
-    if (true === CollaborativeEditing.m_bGlobalLock)
+    if (true === AscCommon.CollaborativeEditing.m_bGlobalLock)
     {
-        if (false == editor.checkLongActionCallback(CollaborativeEditing.OnCallback_AskLock, result))
+        if (false == editor.checkLongActionCallback(AscCommon.CollaborativeEditing.OnCallback_AskLock, result))
             return;
 
         // Снимаем глобальный лок
-        CollaborativeEditing.m_bGlobalLock = false;
+        AscCommon.CollaborativeEditing.m_bGlobalLock = false;
 
         if (result["lock"])
         {
             // Пробегаемся по массиву и проставляем, что залочено нами
 
-            var Count = CollaborativeEditing.m_aCheckLocks.length;
+            var Count = AscCommon.CollaborativeEditing.m_aCheckLocks.length;
             for ( var Index = 0; Index < Count; Index++ )
             {
-                var oItem = CollaborativeEditing.m_aCheckLocks[Index];
+                var oItem = AscCommon.CollaborativeEditing.m_aCheckLocks[Index];
                 var item;
                 switch(oItem["type"])
                 {
@@ -402,7 +402,7 @@ CCollaborativeEditing.prototype.OnCallback_AskLock = function(result)
                         Class.Lock.Set_Type( AscCommon.locktype_Mine );
                         if(Class instanceof Slide)
                             editor.WordControl.m_oLogicDocument.DrawingDocument.UnLockSlide(Class.num);
-                        CollaborativeEditing.Add_Unlock2( Class );
+                        AscCommon.CollaborativeEditing.Add_Unlock2( Class );
                     }
                 }
             }
@@ -664,4 +664,6 @@ CCollaborativeEditing.prototype.Update_ForeignCursorLabelPosition = function(Use
     editor.sync_ShowForeignCursorLabel(UserId, X, Y, Color);
 };
 
-var CollaborativeEditing = new CCollaborativeEditing();
+//--------------------------------------------------------export----------------------------------------------------
+window['AscCommon'] = window['AscCommon'] || {};
+window['AscCommon'].CollaborativeEditing = new CCollaborativeEditing();

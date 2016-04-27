@@ -1054,7 +1054,7 @@ var editor;
 
   spreadsheet_api.prototype.asc_SetFastCollaborative = function(bFast) {
     if (this.collaborativeEditing) {
-      CollaborativeEditing.Set_Fast(bFast);
+      AscCommon.CollaborativeEditing.Set_Fast(bFast);
       this.collaborativeEditing.setFast(bFast);
     }
   };
@@ -1420,7 +1420,7 @@ var editor;
     } else if (this.wb && !window["NATIVE_EDITOR_ENJINE"]) {
       // Нужно послать 'обновить свойства' (иначе для удаления данных не обновится строка формул).
       // ToDo Возможно стоит обновлять только строку формул
-      CollaborativeEditing.Load_Images();
+      AscCommon.CollaborativeEditing.Load_Images();
       this.wb._onWSSelectionChanged(null);
       this.wb.getWorksheet().updateVisibleRange();
     }
@@ -1594,7 +1594,7 @@ var editor;
         this.sync_StartAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
       }
 
-      CollaborativeEditing.Clear_CollaborativeMarks();
+      AscCommon.CollaborativeEditing.Clear_CollaborativeMarks();
       // Принимаем чужие изменения
       this.collaborativeEditing.applyChanges();
 
@@ -3051,7 +3051,7 @@ var editor;
     }
     if (!History.Is_Modified(true) && !(this.collaborativeEditing.getCollaborativeEditing() && 0 !== this.collaborativeEditing.getOwnLocksLength())) {
       if (this.collaborativeEditing.getFast() && this.collaborativeEditing.haveOtherChanges()) {
-        CollaborativeEditing.Clear_CollaborativeMarks();
+        AscCommon.CollaborativeEditing.Clear_CollaborativeMarks();
 
         // Принимаем чужие изменения
         this.collaborativeEditing.applyChanges();

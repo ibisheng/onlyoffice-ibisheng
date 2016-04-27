@@ -13,10 +13,10 @@ if(typeof CDocument !== "undefined")
 {
     CDocument.prototype.Document_Is_SelectionLocked = function(CheckType, AdditionalData, DontLockInFastMode)
     {
-        if ( true === CollaborativeEditing.Get_GlobalLock() )
+        if ( true === AscCommon.CollaborativeEditing.Get_GlobalLock() )
             return true;
 
-        CollaborativeEditing.OnStart_CheckLock();
+        AscCommon.CollaborativeEditing.OnStart_CheckLock();
 
         this.private_DocumentIsSelectionLocked(CheckType);
 
@@ -61,7 +61,7 @@ if(typeof CDocument !== "undefined")
             }
         }
 
-        var bResult = CollaborativeEditing.OnEnd_CheckLock(DontLockInFastMode);
+        var bResult = AscCommon.CollaborativeEditing.OnEnd_CheckLock(DontLockInFastMode);
 
         if ( true === bResult )
         {
@@ -121,7 +121,7 @@ if(typeof CDocument !== "undefined")
                                 var CurElement = this.Content[this.CurPos.ContentPos];
 
                                 if ( AscCommon.changestype_Document_Content_Add === CheckType && type_Paragraph === CurElement.GetType() && true === CurElement.Cursor_IsEnd() )
-                                    CollaborativeEditing.Add_CheckLock(false);
+                                    AscCommon.CollaborativeEditing.Add_CheckLock(false);
                                 else
                                     this.Content[this.CurPos.ContentPos].Document_Is_SelectionLocked(CheckType);
                             }
@@ -171,7 +171,7 @@ CAbstractNum.prototype.Document_Is_SelectionLocked = function(CheckType)
         case AscCommon.changestype_Document_Content_Add:
         case AscCommon.changestype_Image_Properties:
         {
-            CollaborativeEditing.Add_CheckLock(true);
+            AscCommon.CollaborativeEditing.Add_CheckLock(true);
             break;
         }
     }
@@ -231,7 +231,7 @@ CStyle.prototype.Document_Is_SelectionLocked = function(CheckType)
         case AscCommon.changestype_Table_RemoveCells:
         case AscCommon.changestype_HdrFtr:
         {
-            CollaborativeEditing.Add_CheckLock(true);
+            AscCommon.CollaborativeEditing.Add_CheckLock(true);
             break;
         }
     }
@@ -252,7 +252,7 @@ CStyles.prototype.Document_Is_SelectionLocked = function(CheckType)
         case AscCommon.changestype_Table_RemoveCells:
         case AscCommon.changestype_HdrFtr:
         {
-            CollaborativeEditing.Add_CheckLock(true);
+            AscCommon.CollaborativeEditing.Add_CheckLock(true);
             break;
         }
     }
@@ -298,7 +298,7 @@ CDocumentContent.prototype.Document_Is_SelectionLocked = function(CheckType)
                         var CurElement = this.Content[this.CurPos.ContentPos];
 
                         if ( AscCommon.changestype_Document_Content_Add === CheckType && type_Paragraph === CurElement.GetType() && true === CurElement.Cursor_IsEnd() )
-                            CollaborativeEditing.Add_CheckLock(false);
+                            AscCommon.CollaborativeEditing.Add_CheckLock(false);
                         else
                             this.Content[this.CurPos.ContentPos].Document_Is_SelectionLocked(CheckType);
                     }
@@ -417,7 +417,7 @@ Paragraph.prototype.Document_Is_SelectionLocked = function(CheckType)
         case AscCommon.changestype_Table_RemoveCells:
         case AscCommon.changestype_HdrFtr:
         {
-            CollaborativeEditing.Add_CheckLock(true);
+            AscCommon.CollaborativeEditing.Add_CheckLock(true);
             break;
         }
     }
@@ -498,7 +498,7 @@ CTable.prototype.Document_Is_SelectionLocked = function(CheckType, bCheckInner)
         case AscCommon.changestype_Document_SectPr:
         case AscCommon.changestype_HdrFtr:
         {
-            CollaborativeEditing.Add_CheckLock(true);
+            AscCommon.CollaborativeEditing.Add_CheckLock(true);
             break;
         }
     }
@@ -517,7 +517,7 @@ if(typeof CPresentation !== "undefined")
 {
     CPresentation.prototype.Document_Is_SelectionLocked =  function(CheckType, AdditionalData)
     {
-        if ( true === CollaborativeEditing.Get_GlobalLock() )
+        if ( true === AscCommon.CollaborativeEditing.Get_GlobalLock() )
             return true;
         if(this.Slides.length === 0)
             return false;
@@ -536,7 +536,7 @@ if(typeof CPresentation !== "undefined")
         var slide_id = cur_slide.deleteLock.Get_Id();
 
 
-        CollaborativeEditing.OnStart_CheckLock();
+        AscCommon.CollaborativeEditing.OnStart_CheckLock();
 
         if(CheckType === AscCommon.changestype_Drawing_Props)
         {
@@ -765,7 +765,7 @@ if(typeof CPresentation !== "undefined")
             this.slideSizeLock.Lock.Check(check_obj);
         }
 
-        var bResult = CollaborativeEditing.OnEnd_CheckLock();
+        var bResult = AscCommon.CollaborativeEditing.OnEnd_CheckLock();
 
         if ( true === bResult )
         {

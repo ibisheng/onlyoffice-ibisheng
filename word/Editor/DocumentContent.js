@@ -8993,7 +8993,7 @@ CDocumentContent.prototype =
 
                         this.Content.splice( Pos, 0, Element );
                         this.private_RecalculateNumbering([Element]);
-                        CollaborativeEditing.Update_DocumentPositionsOnAdd(this, Pos);
+                        AscCommon.CollaborativeEditing.Update_DocumentPositionsOnAdd(this, Pos);
                         this.protected_ReindexContent(Pos);
                     }
                 }
@@ -9018,7 +9018,7 @@ CDocumentContent.prototype =
 
                     var Elements = this.Content.splice( Pos, 1 );
                     this.private_RecalculateNumbering(Elements);
-                    CollaborativeEditing.Update_DocumentPositionsOnRemove(this, Pos, 1);
+                    AscCommon.CollaborativeEditing.Update_DocumentPositionsOnRemove(this, Pos, 1);
                     this.protected_ReindexContent(Pos);
 
                     if ( Pos > 0 )
@@ -9132,7 +9132,7 @@ CDocumentContent.prototype =
             }
         }
 
-        CollaborativeEditing.Add_LinkData( this, LinkData );
+        AscCommon.CollaborativeEditing.Add_LinkData( this, LinkData );
 
         var b_worksheet = Reader.GetBool();
         if(b_worksheet)

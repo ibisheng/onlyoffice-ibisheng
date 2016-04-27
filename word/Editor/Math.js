@@ -4676,7 +4676,7 @@ CChangesMathRemoveItems.prototype.Load_Changes = function(Reader, Class)
 
     this.Redo(Class);
 
-    CollaborativeEditing.Update_DocumentPositionsOnRemove(Class, this.Pos, Count);
+    AscCommon.CollaborativeEditing.Update_DocumentPositionsOnRemove(Class, this.Pos, Count);
 };
 
 function CChangesMathDelimiterGrow(NewValue, OldValue)
@@ -5216,7 +5216,7 @@ CChangesMathMatrixRemoveRow.prototype.Load_Changes = function(Reader, Class)
 
     this.Redo(Class);
 
-    CollaborativeEditing.Update_DocumentPositionsOnRemove(Class, this.Pos, Count);
+    AscCommon.CollaborativeEditing.Update_DocumentPositionsOnRemove(Class, this.Pos, Count);
 };
 
 function CChangesMathMatrixAddColumn(Pos, Items)

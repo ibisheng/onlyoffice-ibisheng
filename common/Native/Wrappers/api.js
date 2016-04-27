@@ -5308,7 +5308,7 @@ asc_docs_api.prototype["Native_Editor_Initialize_Settings"] = function(_params)
                 if (_val === true)
                 {
                     this.ShowParaMarks = false;
-                    CollaborativeEditing.m_bGlobalLock = true;
+                    AscCommon.CollaborativeEditing.m_bGlobalLock = true;
 
                     this.isViewMode = true;
                     this.WordControl.m_oDrawingDocument.IsViewMode = true;

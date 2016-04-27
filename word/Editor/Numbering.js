@@ -196,8 +196,8 @@ function CAbstractNum(Type)
     if ( false === AscCommon.g_oIdCounter.m_bLoad )
     {
         this.Lock.Set_Type(AscCommon.locktype_Mine, false);
-        if (typeof CollaborativeEditing !== "undefined")
-            CollaborativeEditing.Add_Unlock2( this );
+        if (typeof AscCommon.CollaborativeEditing !== "undefined")
+            AscCommon.CollaborativeEditing.Add_Unlock2( this );
     }
 
     this.NumStyleLink = undefined;
@@ -1771,7 +1771,7 @@ CAbstractNum.prototype =
         }
 
         // Сразу нельзя запускать пересчет, т.к. возможно еще не все ссылки проставлены
-        CollaborativeEditing.Add_EndActions(this, {iLvl : iLvl});
+        AscCommon.CollaborativeEditing.Add_EndActions(this, {iLvl : iLvl});
     },
 
     Write_ToBinary2 : function(Writer)

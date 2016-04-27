@@ -244,7 +244,7 @@ ParaField.prototype.Restore_StandardTemplate = function()
     // В любом случае сначала восстанавливаем исходное содержимое.
     this.Restore_Template();
 
-    if (fieldtype_MERGEFIELD === this.FieldType && true === CollaborativeEditing.Is_SingleUser() && 1 === this.Arguments.length)
+    if (fieldtype_MERGEFIELD === this.FieldType && true === AscCommon.CollaborativeEditing.Is_SingleUser() && 1 === this.Arguments.length)
     {
         var oRun = this.private_GetMappedRun("«" + this.Arguments[0] + "»");
         this.Remove_FromContent(0, this.Content.length);
@@ -507,7 +507,7 @@ ParaField.prototype.Load_Changes = function(Reader)
                 if ( null != Element )
                 {
                     this.Content.splice( Pos, 0, Element );
-                    CollaborativeEditing.Update_DocumentPositionsOnAdd(this, Pos);
+                    AscCommon.CollaborativeEditing.Update_DocumentPositionsOnAdd(this, Pos);
                 }
             }
             this.private_UpdateTrackRevisions();
@@ -531,7 +531,7 @@ ParaField.prototype.Load_Changes = function(Reader)
                     continue;
 
                 this.Content.splice( ChangesPos, 1 );
-                CollaborativeEditing.Update_DocumentPositionsOnRemove(this, ChangesPos, 1);
+                AscCommon.CollaborativeEditing.Update_DocumentPositionsOnRemove(this, ChangesPos, 1);
             }
             this.private_UpdateTrackRevisions();
             this.protected_UpdateSpellChecking();

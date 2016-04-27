@@ -254,7 +254,7 @@ CDocument.prototype.Preview_MailMergeResult = function(Index)
     {
         this.MailMergePreview = true;
         this.Selection_Remove();
-        CollaborativeEditing.m_bGlobalLock = true;
+        AscCommon.CollaborativeEditing.m_bGlobalLock = true;
     }
 
     this.FieldsManager.Update_MailMergeFields(this.MailMergeMap[Index]);
@@ -268,7 +268,7 @@ CDocument.prototype.EndPreview_MailMergeResult = function()
         return;
 
     this.MailMergePreview = false;
-    CollaborativeEditing.m_bGlobalLock = false;
+    AscCommon.CollaborativeEditing.m_bGlobalLock = false;
 
     this.FieldsManager.Restore_MailMergeTemplate();
     this.Recalculate_FromStart(true);

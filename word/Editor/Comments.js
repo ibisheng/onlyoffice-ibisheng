@@ -220,7 +220,7 @@ function CComment(Parent, Data)
     if ( false === AscCommon.g_oIdCounter.m_bLoad )
     {
         this.Lock.Set_Type( AscCommon.locktype_Mine, false );
-        CollaborativeEditing.Add_Unlock2( this );
+        AscCommon.CollaborativeEditing.Add_Unlock2( this );
     }
     
     this.Copy = function()

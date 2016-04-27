@@ -1453,7 +1453,7 @@ ParaRun.prototype.Split = function (ContentPos, Depth)
 ParaRun.prototype.Split2 = function(CurPos, Parent, ParentPos)
 {
     History.Add(this, {Type : AscDFH.historyitem_ParaRun_OnStartSplit, Pos : CurPos});
-    CollaborativeEditing.OnStart_SplitRun(this, CurPos);
+    AscCommon.CollaborativeEditing.OnStart_SplitRun(this, CurPos);
 
     // Если задается Parent и ParentPos, тогда ран автоматически добавляется в родительский класс
     var UpdateParent    = (undefined !== Parent && undefined !== ParentPos && this === Parent.Content[ParentPos] ? true : false);
@@ -1591,7 +1591,7 @@ ParaRun.prototype.Split2 = function(CurPos, Parent, ParentPos)
     }
 
     History.Add(this, {Type : AscDFH.historyitem_ParaRun_OnEndSplit, NewRun : NewRun});
-    CollaborativeEditing.OnEnd_SplitRun(NewRun);
+    AscCommon.CollaborativeEditing.OnEnd_SplitRun(NewRun);
     return NewRun;
 };
 
@@ -6212,7 +6212,7 @@ ParaRun.prototype.Apply_TextPr = function(TextPr, IncFontSize, ApplyToAll)
 ParaRun.prototype.Split_Run = function(Pos)
 {
     History.Add(this, {Type : AscDFH.historyitem_ParaRun_OnStartSplit, Pos : Pos});
-    CollaborativeEditing.OnStart_SplitRun(this, Pos);
+    AscCommon.CollaborativeEditing.OnStart_SplitRun(this, Pos);
 
     // Создаем новый ран
     var bMathRun = this.Type == para_Math_Run;
@@ -6294,7 +6294,7 @@ ParaRun.prototype.Split_Run = function(Pos)
     }
 
     History.Add(this, {Type : AscDFH.historyitem_ParaRun_OnEndSplit, NewRun : NewRun});
-    CollaborativeEditing.OnEnd_SplitRun(NewRun);
+    AscCommon.CollaborativeEditing.OnEnd_SplitRun(NewRun);
     return NewRun;
 };
 
@@ -8609,12 +8609,12 @@ ParaRun.prototype.Load_Changes = function(Reader, Reader2, Color)
                     {
                         this.CollaborativeMarks.Update_OnAdd( Pos );
                         this.CollaborativeMarks.Add( Pos, Pos + 1, Color );
-                        CollaborativeEditing.Add_ChangedClass(this);
+                        AscCommon.CollaborativeEditing.Add_ChangedClass(this);
                     }
 
                     this.Content.splice(Pos, 0, Element);
                     this.private_UpdatePositionsOnAdd(Pos);
-                    CollaborativeEditing.Update_DocumentPositionsOnAdd(this, Pos);
+                    AscCommon.CollaborativeEditing.Update_DocumentPositionsOnAdd(this, Pos);
                 }
             }
 
@@ -8641,7 +8641,7 @@ ParaRun.prototype.Load_Changes = function(Reader, Reader2, Color)
                 this.CollaborativeMarks.Update_OnRemove(ChangesPos, 1);
                 this.Content.splice(ChangesPos, 1);
                 this.private_UpdatePositionsOnRemove(ChangesPos, 1);
-                CollaborativeEditing.Update_DocumentPositionsOnRemove(this, ChangesPos, 1);
+                AscCommon.CollaborativeEditing.Update_DocumentPositionsOnRemove(this, ChangesPos, 1);
             }
 
             this.RecalcInfo.Measure = true;
@@ -8658,11 +8658,11 @@ ParaRun.prototype.Load_Changes = function(Reader, Reader2, Color)
             this.Pr.Read_FromBinary( Reader );
 
             var unifill = this.Pr.Unifill;
-            if(typeof CollaborativeEditing !== "undefined")
+            if(typeof AscCommon.CollaborativeEditing !== "undefined")
             {
                 if(unifill && unifill.fill && unifill.fill.type === Asc.c_oAscFill.FILL_TYPE_BLIP && typeof unifill.fill.RasterImageId === "string" && unifill.fill.RasterImageId.length > 0)
                 {
-                    CollaborativeEditing.Add_NewImage(AscCommon.getFullImageSrc2(unifill.fill.RasterImageId));
+                    AscCommon.CollaborativeEditing.Add_NewImage(AscCommon.getFullImageSrc2(unifill.fill.RasterImageId));
                 }
             }
 
@@ -8777,11 +8777,11 @@ ParaRun.prototype.Load_Changes = function(Reader, Reader2, Color)
                 var unifill = new AscFormat.CUniFill();
                 unifill.Read_FromBinary(Reader);
                 this.Pr.Unifill = unifill;
-                if(typeof CollaborativeEditing !== "undefined")
+                if(typeof AscCommon.CollaborativeEditing !== "undefined")
                 {
                     if(unifill.fill && unifill.fill.type === Asc.c_oAscFill.FILL_TYPE_BLIP && typeof unifill.fill.RasterImageId === "string" && unifill.fill.RasterImageId.length > 0)
                     {
-                        CollaborativeEditing.Add_NewImage(AscCommon.getFullImageSrc2(unifill.fill.RasterImageId));
+                        AscCommon.CollaborativeEditing.Add_NewImage(AscCommon.getFullImageSrc2(unifill.fill.RasterImageId));
                     }
                 }
             }
@@ -9278,14 +9278,14 @@ ParaRun.prototype.Load_Changes = function(Reader, Reader2, Color)
         {
             // Long
             var Pos = Reader.GetLong();
-            CollaborativeEditing.OnStart_SplitRun(this, Pos);
+            AscCommon.CollaborativeEditing.OnStart_SplitRun(this, Pos);
             break;
         }
         case AscDFH.historyitem_ParaRun_OnEndSplit:
         {
             // String2
             var RunId = Reader.GetString2();
-            CollaborativeEditing.OnEnd_SplitRun(g_oTableId.Get_ById(RunId));
+            AscCommon.CollaborativeEditing.OnEnd_SplitRun(g_oTableId.Get_ById(RunId));
             break;
         }
         case AscDFH.historyitem_ParaRun_MathAlnAt:
@@ -9432,7 +9432,7 @@ ParaRun.prototype.private_IsCollPrChangeMine = function()
 ParaRun.prototype.private_AddCollPrChangeOther = function(Color)
 {
     this.CollPrChangeOther = Color;
-    CollaborativeEditing.Add_ChangedClass(this);
+    AscCommon.CollaborativeEditing.Add_ChangedClass(this);
 };
 ParaRun.prototype.private_GetCollPrChangeOther = function()
 {

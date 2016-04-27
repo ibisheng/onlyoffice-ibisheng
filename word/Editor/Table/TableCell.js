@@ -2552,7 +2552,7 @@ CTableCell.prototype =
 
         this.Content = AscCommon.g_oTableId.Get_ById( Reader.GetString2() );
 
-        CollaborativeEditing.Add_NewObject( this );
+        AscCommon.CollaborativeEditing.Add_NewObject( this );
     },
 
     Load_LinkData : function(LinkData)

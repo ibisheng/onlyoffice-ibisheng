@@ -150,8 +150,8 @@ CWordCollaborativeEditing.prototype.OnEnd_Load_Objects = function()
     // Данная функция вызывается, когда загрузились внешние объекты (картинки и шрифты)
 
     // Снимаем лок
-    CollaborativeEditing.m_bGlobalLock = false;
-    CollaborativeEditing.m_bGlobalLockSelection = false;
+    AscCommon.CollaborativeEditing.m_bGlobalLock = false;
+    AscCommon.CollaborativeEditing.m_bGlobalLockSelection = false;
 
     // Запускаем полный пересчет документа
     var LogicDocument = editor.WordControl.m_oLogicDocument;
@@ -241,7 +241,7 @@ CWordCollaborativeEditing.prototype.OnEnd_CheckLock = function(DontLockInFastMod
 };
 CWordCollaborativeEditing.prototype.OnCallback_AskLock = function(result)
 {
-    var oThis   = CollaborativeEditing;
+    var oThis   = AscCommon.CollaborativeEditing;
     var oEditor = editor;
 
     if (true === oThis.m_bGlobalLock)
@@ -542,4 +542,6 @@ CWordCollaborativeEditing.prototype.Update_ForeignCursorLabelPosition = function
     Api.sync_ShowForeignCursorLabel(UserId, X, Y, Color);
 };
 
-var CollaborativeEditing = new CWordCollaborativeEditing();
+//--------------------------------------------------------export----------------------------------------------------
+window['AscCommon'] = window['AscCommon'] || {};
+window['AscCommon'].CollaborativeEditing = new CWordCollaborativeEditing();

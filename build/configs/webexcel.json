@@ -114,6 +114,7 @@
         "../cell/model/DrawingObjects/Graphics.js",
         "../cell/model/DrawingObjects/ShapeDrawer.js",
         "../cell/model/DrawingObjects/DrawingDocument.js",
+		"../cell/model/DrawingObjects/GlobalCounters.js",
 		
         "../cell/model/DrawingObjects/Format/ShapePrototype.js",
         "../cell/model/DrawingObjects/Format/ImagePrototype.js",
@@ -159,7 +160,6 @@
         "../word/Math/operators.js",
         "../word/Math/accent.js",
         "../word/Math/borderBox.js",
-        "../cell/model/DrawingObjects/GlobalCounters.js",
         "../word/apiCommon.js",
         "../cell/apiCommonExport.js",
         "../common/apiBase.js",

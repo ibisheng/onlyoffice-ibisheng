@@ -188,7 +188,7 @@ CCollaborativeChanges.prototype.Internal_Save_Data = function(Class, Data, Binar
 
     if ( "undefined" != typeof(Class.Save_Changes2) )
     {
-        var Writer2 = CollaborativeEditing.m_oMemory;
+        var Writer2 = AscCommon.CollaborativeEditing.m_oMemory;
         Writer2.Seek(0);
         if ( true === Class.Save_Changes2( Data, Writer2 ) )
             return Len + ";" + Writer.GetBase64Memory2(Pos, Len) + ";" + Writer2.GetCurPosition() + ";" + Writer2.GetBase64Memory();
@@ -430,10 +430,10 @@ CCollaborativeEditingBase.prototype.Release_Locks = function()
 };
 CCollaborativeEditingBase.prototype.OnStart_Load_Objects = function()
 {
-    CollaborativeEditing.m_bGlobalLock = true;
-    CollaborativeEditing.m_bGlobalLockSelection = true;
+    AscCommon.CollaborativeEditing.m_bGlobalLock = true;
+    AscCommon.CollaborativeEditing.m_bGlobalLockSelection = true;
     // Вызываем функцию для загрузки необходимых элементов (новые картинки и шрифты)
-    editor.pre_Save(CollaborativeEditing.m_aNewImages);
+    editor.pre_Save(AscCommon.CollaborativeEditing.m_aNewImages);
 };
 CCollaborativeEditingBase.prototype.OnEnd_Load_Objects = function()
 {

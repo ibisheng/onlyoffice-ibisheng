@@ -598,8 +598,8 @@ CDrawingCollaborativeTarget.prototype =
         }
 		
 		
-        if (CollaborativeEditing)
-            CollaborativeEditing.Update_ForeignCursorLabelPosition(this.Id, this.HtmlElementX, this.HtmlElementY, this.Color);
+        if (AscCommon.CollaborativeEditing)
+            AscCommon.CollaborativeEditing.Update_ForeignCursorLabelPosition(this.Id, this.HtmlElementX, this.HtmlElementY, this.Color);
 
         // 3) добавить, если нужно
         if (bIsHtmlElementCreate)

@@ -837,7 +837,7 @@ CDocumentFieldsManager.prototype.Replace_MailMergeFields = function(Map)
 };
 CDocumentFieldsManager.prototype.Restore_MailMergeTemplate = function()
 {
-    if (true === CollaborativeEditing.Is_SingleUser())
+    if (true === AscCommon.CollaborativeEditing.Is_SingleUser())
     {
         // В такой ситуации мы восстанавливаем стандартный текст полей. Чтобы это сделать нам сначала надо пробежаться
         // по всем таким полям, определить параграфы, в которых необходимо восстановить поля. Залочить эти параграфы,
@@ -933,7 +933,7 @@ function CDocument(DrawingDocument, isMainLogicDocument)
     this.History              = History;
     this.IdCounter            = AscCommon.g_oIdCounter;
     this.TableId              = g_oTableId;
-    this.CollaborativeEditing = (("undefined" !== typeof(CWordCollaborativeEditing) && CollaborativeEditing instanceof CWordCollaborativeEditing) ? CollaborativeEditing : null);
+    this.CollaborativeEditing = (("undefined" !== typeof(CWordCollaborativeEditing) && AscCommon.CollaborativeEditing instanceof CWordCollaborativeEditing) ? AscCommon.CollaborativeEditing : null);
     this.Api                  = editor;
     //------------------------------------------------------------------------
     if (false !== isMainLogicDocument)
@@ -3074,7 +3074,7 @@ CDocument.prototype =
         if (true === this.TurnOffRecalcCurPos)
             return;
 
-        if ( true === CollaborativeEditing.m_bGlobalLockSelection )
+        if ( true === AscCommon.CollaborativeEditing.m_bGlobalLockSelection )
             return;
 
         this.DrawingDocument.UpdateTargetTransform(null);
@@ -3107,7 +3107,7 @@ CDocument.prototype =
         if (true === this.TurnOffRecalcCurPos)
             return;
 
-        if (true === CollaborativeEditing.m_bGlobalLockSelection)
+        if (true === AscCommon.CollaborativeEditing.m_bGlobalLockSelection)
             return;
 
         if (docpostype_HdrFtr === this.CurPos.Type)
@@ -11109,7 +11109,7 @@ CDocument.prototype =
             }
         else if ( e.KeyCode == 83 && false === editor.isViewMode && true === e.CtrlKey ) // Ctrl + S - save
         {
-            if (true === this.History.Have_Changes() || CollaborativeEditing.m_aChanges.length > 0)
+            if (true === this.History.Have_Changes() || AscCommon.CollaborativeEditing.m_aChanges.length > 0)
             {
                 this.DrawingDocument.m_oWordControl.m_oApi.asc_Save(false);
             }
@@ -12841,7 +12841,7 @@ CDocument.prototype =
         if (true === this.TurnOffInterfaceEvents)
             return;
 
-        if ( true === CollaborativeEditing.m_bGlobalLockSelection )
+        if ( true === AscCommon.CollaborativeEditing.m_bGlobalLockSelection )
             return;
         
         // Удаляем весь список
@@ -12913,7 +12913,7 @@ CDocument.prototype =
         if (true === this.TurnOffInterfaceEvents)
             return;
 
-        if ( true === CollaborativeEditing.m_bGlobalLockSelection )
+        if ( true === AscCommon.CollaborativeEditing.m_bGlobalLockSelection )
             return;
 
         this.DrawingDocument.Set_RulerState_Start();
@@ -13042,7 +13042,7 @@ CDocument.prototype =
         if (true === this.TurnOffInterfaceEvents)
             return;
 
-        if ( true === CollaborativeEditing.m_bGlobalLockSelection )
+        if ( true === AscCommon.CollaborativeEditing.m_bGlobalLockSelection )
             return;
 
         this.DrawingDocument.UpdateTargetTransform(null);
@@ -13153,7 +13153,7 @@ CDocument.prototype =
         if (true === this.TurnOffInterfaceEvents)
             return;
 
-        if ( true === CollaborativeEditing.m_bGlobalLockSelection )
+        if ( true === AscCommon.CollaborativeEditing.m_bGlobalLockSelection )
             return;
        
         // TODO: Возможно стоит перенсти эту проверку в класс CHistory и присылать
@@ -13170,7 +13170,7 @@ CDocument.prototype =
         if (true === this.TurnOffInterfaceEvents)
             return;
 
-        if ( true === CollaborativeEditing.m_bGlobalLockSelection )
+        if ( true === AscCommon.CollaborativeEditing.m_bGlobalLockSelection )
             return;
 
         // Во время работы селекта не обновляем состояние
@@ -13185,7 +13185,7 @@ CDocument.prototype =
         if (true === this.TurnOffInterfaceEvents)
             return;
 
-        if ( true === CollaborativeEditing.m_bGlobalLockSelection )
+        if ( true === AscCommon.CollaborativeEditing.m_bGlobalLockSelection )
             return;
 
         // Проверяем можно ли добавить гиперссылку
@@ -13365,7 +13365,7 @@ CDocument.prototype =
 
     Document_Undo : function(Options)
     {
-        if ( true === CollaborativeEditing.Get_GlobalLock() )
+        if ( true === AscCommon.CollaborativeEditing.Get_GlobalLock() )
             return;
 
         this.DrawingDocument.EndTrackTable( null, true );
@@ -13382,7 +13382,7 @@ CDocument.prototype =
 
     Document_Redo : function()
     {
-        if ( true === CollaborativeEditing.Get_GlobalLock() )
+        if ( true === AscCommon.CollaborativeEditing.Get_GlobalLock() )
             return;
 
         this.DrawingDocument.EndTrackTable( null, true );
@@ -14060,7 +14060,7 @@ CDocument.prototype =
                         this.Content.splice(Pos, 0, Element);
                         this.private_RecalculateNumbering([Element]);
 
-                        CollaborativeEditing.Update_DocumentPositionsOnAdd(this, Pos);
+                        AscCommon.CollaborativeEditing.Update_DocumentPositionsOnAdd(this, Pos);
 
                         // Обновим информацию о секциях
                         this.SectionsInfo.Update_OnAdd( Pos, [ Element ] );
@@ -14090,7 +14090,7 @@ CDocument.prototype =
 
                     var Elements = this.Content.splice(Pos, 1);
                     this.private_RecalculateNumbering(Elements);
-                    CollaborativeEditing.Update_DocumentPositionsOnRemove(this, Pos, 1);
+                    AscCommon.CollaborativeEditing.Update_DocumentPositionsOnRemove(this, Pos, 1);
 
                     if ( Pos > 0 )
                     {

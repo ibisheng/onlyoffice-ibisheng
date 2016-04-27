@@ -1564,7 +1564,7 @@ CGraphics.prototype =
 
     DrawLockParagraph : function(lock_type, x, y1, y2)
     {
-		if (lock_type == locktype_None || editor.WordControl.m_oDrawingDocument.IsLockObjectsEnable === false || editor.isViewMode || (lock_type === locktype_Mine && true === CollaborativeEditing.Is_Fast()))
+		if (lock_type == locktype_None || editor.WordControl.m_oDrawingDocument.IsLockObjectsEnable === false || editor.isViewMode || (lock_type === locktype_Mine && true === AscCommon.CollaborativeEditing.Is_Fast()))
 			return;
 
 		if (lock_type == locktype_Mine)
@@ -1656,7 +1656,7 @@ CGraphics.prototype =
 
     DrawLockObjectRect : function(lock_type, x, y, w, h)
     {
-		if (editor.isViewMode || this.IsThumbnail || lock_type == locktype_None || this.IsDemonstrationMode || (lock_type === locktype_Mine && true === CollaborativeEditing.Is_Fast()))
+		if (editor.isViewMode || this.IsThumbnail || lock_type == locktype_None || this.IsDemonstrationMode || (lock_type === locktype_Mine && true === AscCommon.CollaborativeEditing.Is_Fast()))
 			return;
 
 		if (editor.WordControl.m_oDrawingDocument.IsLockObjectsEnable === false && lock_type == locktype_Mine)

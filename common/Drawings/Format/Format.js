@@ -7038,11 +7038,11 @@ CSpPr.prototype =
                     this.Fill.Read_FromBinary(r);
 
 
-                    if(typeof CollaborativeEditing !== "undefined")
+                    if(typeof AscCommon.CollaborativeEditing !== "undefined")
                     {
                         if(this.Fill.fill && this.Fill.fill.type === c_oAscFill.FILL_TYPE_BLIP && typeof this.Fill.fill.RasterImageId === "string" && this.Fill.fill.RasterImageId.length > 0)
                         {
-							CollaborativeEditing.Add_NewImage(AscCommon.getFullImageSrc2(this.Fill.fill.RasterImageId));
+                            AscCommon.CollaborativeEditing.Add_NewImage(AscCommon.getFullImageSrc2(this.Fill.fill.RasterImageId));
                         }
                     }
                 }

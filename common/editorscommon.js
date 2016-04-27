@@ -2394,11 +2394,11 @@ CLock.prototype.Set_Type = function(NewType, Redraw)
 CLock.prototype.Check = function(Id)
 {
 	if ( this.Type === locktype_Mine )
-		CollaborativeEditing.Add_CheckLock( false );
+    AscCommon.CollaborativeEditing.Add_CheckLock( false );
 	else if ( this.Type === locktype_Other || this.Type === locktype_Other2 || this.Type === locktype_Other3 )
-		CollaborativeEditing.Add_CheckLock( true );
+    AscCommon.CollaborativeEditing.Add_CheckLock( true );
 	else
-		CollaborativeEditing.Add_CheckLock( Id );
+    AscCommon.CollaborativeEditing.Add_CheckLock( Id );
 };
 CLock.prototype.Lock = function(bMine)
 {
