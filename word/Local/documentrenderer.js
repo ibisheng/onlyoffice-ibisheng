@@ -40,7 +40,7 @@ CDocMeta.prototype.Load = function(url, doc_bin_base64)
         this.Drawings.splice(0, this.Drawings.length);
     }
 
-    window.g_font_loader.LoadEmbeddedFonts("fonts/", this.Fonts);
+    AscCommon.g_font_loader.LoadEmbeddedFonts("fonts/", this.Fonts);
 
     var oThis = this;
     setInterval(function() {oThis.NativeDrawTimer();}, 40);
@@ -82,6 +82,11 @@ CDocMeta.prototype.NativeDrawTimer = function()
         this.CountWords         = _ret[_current++];
         this.CountSpaces        = _ret[_current++];
         this.CountSymbols       = _ret[_current++];
+
+        if (_page == (this.PagesCount - 1))
+        {
+            this.selectAllCheckEnd();
+        }
     }
 };
 
@@ -128,4 +133,26 @@ CDocMeta.prototype.OnImageLoad = function(obj)
         obj.MetaDoc.stopRenderingPage(obj.Page);
     };
     img.src = _url;
+};
+
+CDocMeta.prototype.selectAllCheckStart = function()
+{
+    if (this.pagestreams[this.PagesCount - 1] !== undefined)
+    {
+        this.waitSelectAll = false;
+        return true;
+    }
+
+    this.waitSelectAll = true;
+    editor.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.SlowOperation);
+};
+
+CDocMeta.prototype.selectAllCheckEnd = function()
+{
+    if (this.waitSelectAll)
+    {
+        this.waitSelectAll = false;
+        editor.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.SlowOperation);
+        this.selectAll();
+    }
 };

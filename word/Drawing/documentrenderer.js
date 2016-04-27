@@ -386,6 +386,7 @@ function CDocMeta()
     };
 
     this.pagestreams = [];
+    this.waitSelectAll = false;
 }
 
 CDocMeta.prototype =
@@ -3154,30 +3155,9 @@ CDocMeta.prototype =
         {
             bRetValue = true;
 
-            var sel = this.Selection;
-
-            sel.Page1 = 0;
-            sel.Line1 = 0;
-            sel.Glyph1 = 0;
-
-            sel.Page2 = 0;
-            sel.Line2 = 0;
-            sel.Glyph2 = 0;
-
-            sel.IsSelection = false;
-
-            if (0 != this.PagesCount)
+            if (this.selectAllCheckStart())
             {
-                var lLinesLastPage = this.GetCountLines(this.PagesCount - 1);
-                if (1 != this.PagesCount || 0 != lLinesLastPage)
-                {
-                    sel.Glyph1 = -2;
-                    sel.Page2 = this.PagesCount - 1;
-                    sel.Line2 = lLinesLastPage;
-                    sel.Glyph2 = -1;
-
-                    this.OnUpdateSelection();
-                }
+                this.selectAll();
             }
         }
         else if ( e.KeyCode == 67 && true === e.CtrlKey ) // Ctrl + C + ...
@@ -3197,6 +3177,45 @@ CDocMeta.prototype =
         }
 
         return bRetValue;
+    },
+
+    selectAll : function()
+    {
+        var sel = this.Selection;
+
+        sel.Page1 = 0;
+        sel.Line1 = 0;
+        sel.Glyph1 = 0;
+
+        sel.Page2 = 0;
+        sel.Line2 = 0;
+        sel.Glyph2 = 0;
+
+        sel.IsSelection = false;
+
+        if (0 != this.PagesCount)
+        {
+            var lLinesLastPage = this.GetCountLines(this.PagesCount - 1);
+            if (1 != this.PagesCount || 0 != lLinesLastPage)
+            {
+                sel.Glyph1 = -2;
+                sel.Page2 = this.PagesCount - 1;
+                sel.Line2 = lLinesLastPage;
+                sel.Glyph2 = -1;
+
+                this.OnUpdateSelection();
+            }
+        }
+    },
+
+    selectAllCheckStart : function()
+    {
+        this.waitSelectAll = false;
+        return true;
+    },
+
+    selectAllCheckEnd : function()
+    {
     },
 
     StartSearch : function(text)
