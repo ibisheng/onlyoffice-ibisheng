@@ -3401,7 +3401,7 @@
     ApiDocumentContent.prototype["RemoveElement"]    = ApiDocumentContent.prototype.RemoveElement;
 
     ApiDocument.prototype["GetClassType"]            = ApiDocument.prototype.GetClassType;
-	ApiDocument.prototype["Create_NewHistoryPoint"]  = ApiDocument.prototype.Create_NewHistoryPoint;
+	ApiDocument.prototype["CreateNewHistoryPoint"]   = ApiDocument.prototype.CreateNewHistoryPoint;
 	ApiDocument.prototype["GetDefaultTextPr"]        = ApiDocument.prototype.GetDefaultTextPr;
 	ApiDocument.prototype["GetDefaultParaPr"]        = ApiDocument.prototype.GetDefaultParaPr;
     ApiDocument.prototype["GetStyle"]                = ApiDocument.prototype.GetStyle;

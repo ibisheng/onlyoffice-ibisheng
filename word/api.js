@@ -7191,7 +7191,7 @@ window["asc_docs_api"].prototype["asc_nativeApplyChanges"] = function(changes)
 
 window["asc_docs_api"].prototype["asc_nativeInitBuilder"] = function()
 {
-    this.asc_setDocInfo(new window["CDocInfo"]());
+    this.asc_setDocInfo(new window["Asc"]["asc_CDocInfo"]());
 };
 
 window["asc_docs_api"].prototype["asc_SetSilentMode"] = function(bEnabled)
