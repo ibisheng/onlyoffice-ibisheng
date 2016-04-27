@@ -321,7 +321,13 @@ function mapAscServerErrorToAscError(nServerError) {
 		case c_oAscServerError.TaskResult : nRes = Asc.c_oAscError.ID.Database; break;
 		case c_oAscServerError.ConvertDownload : nRes = Asc.c_oAscError.ID.DownloadError; break;
 		case c_oAscServerError.ConvertTimeout : nRes = Asc.c_oAscError.ID.ConvertationTimeout; break;
+		case c_oAscServerError.ConvertDRM :
+		case c_oAscServerError.ConvertPASSWORD :
 		case c_oAscServerError.ConvertMS_OFFCRYPTO : nRes = Asc.c_oAscError.ID.ConvertationPassword; break;
+		case c_oAscServerError.ConvertCONVERT_CORRUPTED :
+		case c_oAscServerError.ConvertLIBREOFFICE :
+		case c_oAscServerError.ConvertPARAMS :
+		case c_oAscServerError.ConvertNEED_PARAMS :
 		case c_oAscServerError.ConvertUnknownFormat :
 		case c_oAscServerError.ConvertReadFile :
 		case c_oAscServerError.Convert : nRes = Asc.c_oAscError.ID.ConvertationError; break;
@@ -726,6 +732,12 @@ var c_oAscServerError = {
     ConvertTimeout:-83,
     ConvertReadFile:-84,
     ConvertMS_OFFCRYPTO:-85,
+    ConvertCONVERT_CORRUPTED:-86,
+    ConvertLIBREOFFICE:-87,
+    ConvertPARAMS:-88,
+    ConvertNEED_PARAMS:-89,
+    ConvertDRM:-90,
+    ConvertPASSWORD:-91,
 
     Upload:-100,
     UploadContentLength:-101,

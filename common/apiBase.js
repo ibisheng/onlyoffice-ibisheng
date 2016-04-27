@@ -470,6 +470,9 @@ baseEditorsApi.prototype._coAuthoringInit = function() {
             case "needparams":
               t._onNeedParams(input["data"]);
               break;
+            case "needpassword":
+              t.sendEvent("asc_onError", Asc.c_oAscError.ID.ConvertationPassword, c_oAscError.Level.Critical);
+              break;
             case "err":
               t.sendEvent("asc_onError", AscCommon.mapAscServerErrorToAscError(parseInt(input["data"])), c_oAscError.Level.Critical);
               break;
