@@ -2541,7 +2541,7 @@ ParaMath.prototype.MathToImageConverter = function(bCopy, _canvasInput, _widthPx
 
     History.TurnOn();
 
-    window.IsShapeToImageConverter = true;
+    AscCommon.IsShapeToImageConverter = true;
 
     var dKoef = g_dKoef_mm_to_pix;
 
@@ -2600,7 +2600,7 @@ ParaMath.prototype.MathToImageConverter = function(bCopy, _canvasInput, _widthPx
     if (true === isShowParaMarks)
         par.LogicDocument.Set_ShowParagraphMarks(true, false);
 
-    window.IsShapeToImageConverter = false;
+    AscCommon.IsShapeToImageConverter = false;
 
     if (undefined === _canvasInput)
     {

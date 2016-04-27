@@ -99,8 +99,8 @@
         "../word/Editor/Sections.js",
 		
         "../word/Drawing/Graphics.js",
-		
         "../word/Drawing/ShapeDrawer.js",
+		
         "../slide/Drawing/Transitions.js",
         "../slide/Drawing/DrawingDocument.js",
         "../slide/Drawing/HtmlPage.js",

@@ -123,8 +123,8 @@
         "../word/Editor/Spelling.js",
 		
         "../word/Drawing/Graphics.js",
-		
         "../word/Drawing/ShapeDrawer.js",
+		
         "../word/Drawing/DrawingDocument.js",
         "../word/Drawing/GraphicsEvents.js",
         "../word/Drawing/Rulers.js",

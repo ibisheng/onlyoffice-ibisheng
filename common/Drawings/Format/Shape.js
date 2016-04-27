@@ -3886,7 +3886,7 @@ CShape.prototype =
         }
         if(!AscFormat.isRealNumber(this.x) || !AscFormat.isRealNumber(this.y) || !AscFormat.isRealNumber(this.extX) || !AscFormat.isRealNumber(this.extY))
             return "";
-        var img_object = ShapeToImageConverter(this, this.pageIndex);
+        var img_object = AscCommon.ShapeToImageConverter(this, this.pageIndex);
         if(img_object)
         {
             if(img_object.ImageNative)
@@ -4143,7 +4143,7 @@ CShape.prototype =
                 if (graphics.CheckUseFonts2 !== undefined)
                     graphics.CheckUseFonts2(this.transformText);
 
-                if (window.IsShapeToImageConverter)
+                if (AscCommon.IsShapeToImageConverter)
                 {
                     this.textBoxContent.Set_StartPage(0);
                     result_page_index = 0;

@@ -1,5 +1,7 @@
 "use strict";
 
+(function(window, undefined){
+
 // Import
 var getFullImageSrc2 = AscCommon.getFullImageSrc2;
 
@@ -7,8 +9,6 @@ var CShapeColor = AscFormat.CShapeColor;
 
 var c_oAscFill = Asc.c_oAscFill;
 
-window.IsShapeToImageConverter = false;
-window.IsShapeToImageConverter;
 function DrawLineEnd(xEnd, yEnd, xPrev, yPrev, type, w, len, drawer, trans)
 {
     switch (type)
@@ -1804,7 +1804,7 @@ CShapeDrawer.prototype =
 
 function ShapeToImageConverter(shape, pageIndex)
 {
-	window.IsShapeToImageConverter = true;
+    AscCommon.IsShapeToImageConverter = true;
     var _bounds_cheker = new AscFormat.CSlideBoundsChecker();
 
     var dKoef = g_dKoef_mm_to_pix;
@@ -1857,7 +1857,7 @@ function ShapeToImageConverter(shape, pageIndex)
 
     shape.draw(g, /*pageIndex*/0);
 
-	window.IsShapeToImageConverter = false;
+    AscCommon.IsShapeToImageConverter = false;
 
     var _ret = { ImageNative : _canvas, ImageUrl : "" };
     try
@@ -1877,3 +1877,6 @@ function ShapeToImageConverter(shape, pageIndex)
 //------------------------------------------------------------export----------------------------------------------------
 window['AscCommon'] = window['AscCommon'] || {};
 window['AscCommon'].CShapeDrawer = CShapeDrawer;
+window['AscCommon'].ShapeToImageConverter = ShapeToImageConverter;
+window['AscCommon'].IsShapeToImageConverter = false;
+})(window);

@@ -1253,7 +1253,7 @@ Slide.prototype =
     {
         if(typeof this.cachedImage === "string" && this.cachedImage.length > 0)
             return this.cachedImage;
-        return ShapeToImageConverter(this, 0).ImageUrl;
+        return AscCommon.ShapeToImageConverter(this, 0).ImageUrl;
     },
 
     checkNoTransformPlaceholder: function()
