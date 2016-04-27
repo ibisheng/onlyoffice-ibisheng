@@ -1,13 +1,8 @@
 "use strict";
 
-/**
- * User: Ilja.Kirillov
- * Date: 09.12.11
- * Time: 11:51
- */
-
 // Import
 var g_oTableId = AscCommon.g_oTableId;
+var History = AscCommon.History;
 
 var c_oAscHAnchor = Asc.c_oAscHAnchor;
 var c_oAscXAlign = Asc.c_oAscXAlign;

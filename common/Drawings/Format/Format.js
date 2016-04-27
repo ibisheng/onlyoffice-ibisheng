@@ -12,6 +12,7 @@ var CreateAscColor = AscCommon.CreateAscColor;
 var g_oIdCounter = AscCommon.g_oIdCounter;
 var g_oTableId = AscCommon.g_oTableId;
 var isRealObject = AscCommon.isRealObject;
+var History = AscCommon.History;
 
 var c_oAscColor = Asc.c_oAscColor;
 var c_oAscFill = Asc.c_oAscFill;
@@ -276,11 +277,6 @@ function checkThemeFonts(oFontMap, font_scheme)
 
 function ExecuteNoHistory(f, oThis, args)
 {
-    if(!(History instanceof CHistory))
-    {
-        History = {Add: function(){}};
-    }
-
     History.TurnOff && History.TurnOff();
 
     var b_table_id = false;

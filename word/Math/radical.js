@@ -691,7 +691,7 @@ CRadical.prototype.Apply_MenuProps = function(Props)
     {
         if(true == this.Iterator.IsPlaceholder() && Props.HideDegree !== this.Pr.degHide)
         {
-            History.Add(this, new CChangesMathRadicalHideDegree( Props.HideDegree, this.Pr.degHide ));
+            AscCommon.History.Add(this, new CChangesMathRadicalHideDegree( Props.HideDegree, this.Pr.degHide ));
             this.raw_SetHideDegree(Props.HideDegree);
         }
     }

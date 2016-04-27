@@ -13,6 +13,7 @@ var c_oAscLockTypes = AscCommon.c_oAscLockTypes;
 var parserHelp = AscCommon.parserHelp;
 var gc_nMaxRow = AscCommon.gc_nMaxRow;
 var gc_nMaxCol = AscCommon.gc_nMaxCol;
+    var History = AscCommon.History;
 
 var BBoxInfo = AscFormat.BBoxInfo;
 var MOVE_DELTA = AscFormat.MOVE_DELTA;

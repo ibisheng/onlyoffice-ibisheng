@@ -320,11 +320,11 @@ CDocument.prototype.Get_MailMergedDocument = function(_nStartIndex, _nEndIndex)
     if (null === this.MailMergeMap || nStartIndex > nEndIndex || nStartIndex >= this.MailMergeMap.length)
         return null;
 
-    History.TurnOff();
+    AscCommon.History.TurnOff();
     AscCommon.g_oTableId.TurnOff();
 
     var LogicDocument = new CDocument(undefined, false);
-    History.Document = this;
+    AscCommon.History.Document = this;
 
     // Копируем стили, они все одинаковые для всех документов
     LogicDocument.Styles = this.Styles.Copy();
@@ -404,7 +404,7 @@ CDocument.prototype.Get_MailMergedDocument = function(_nStartIndex, _nEndIndex)
 
     this.FieldsManager = FieldsManager;
     AscCommon.g_oTableId.TurnOn();
-    History.TurnOn();
+    AscCommon.History.TurnOn();
 
     return LogicDocument;
 };

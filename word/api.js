@@ -26,6 +26,7 @@ var g_oIdCounter = AscCommon.g_oIdCounter;
 var g_oTableId = AscCommon.g_oTableId;
 var PasteElementsId = AscCommon.PasteElementsId;
 var global_mouseEvent = AscCommon.global_mouseEvent;
+var History = AscCommon.History;
 
 var c_oAscError = Asc.c_oAscError;
 var c_oAscFileType = Asc.c_oAscFileType;
@@ -215,7 +216,6 @@ function asc_docs_api(name)
         window["AscDesktopEditor"]["CreateEditorApi"]();
     }
 
-    History    = new CHistory();
   g_oTableId.init();
 
 	/************ private!!! **************/

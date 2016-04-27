@@ -3,6 +3,8 @@
 // Import
 var CShape = AscFormat.CShape;
 
+var History = AscCommon.History;
+
 var G_O_DEFAULT_COLOR_MAP = AscFormat.GenerateDefaultColorMap();
 
 CShape.prototype.setDrawingObjects = function(drawingObjects)

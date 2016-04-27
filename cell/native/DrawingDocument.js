@@ -3773,7 +3773,7 @@ function CDrawingDocument(drawingObjects)
         _canvas.height = TABLE_STYLE_HEIGHT_PIX;
         var ctx = _canvas.getContext('2d');
 
-        History.TurnOff();
+        AscCommon.History.TurnOff();
         for (var i1 = 0; i1 < _styles_len; i1++)
         {
             var i = _styles[i1];
@@ -3805,7 +3805,7 @@ function CDrawingDocument(drawingObjects)
             _styleD.Id = i;
             _dst_styles.push(_styleD);
         }
-        History.TurnOn();
+        AscCommon.History.TurnOn();
 
         this.m_oWordControl.m_oApi.sync_InitEditorTableStyles(_dst_styles);
     }

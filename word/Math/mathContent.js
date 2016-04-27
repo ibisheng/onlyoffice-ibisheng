@@ -1,5 +1,8 @@
 "use strict";
 
+// Import
+var History = AscCommon.History;
+
 function CRPI()
 {
     this.bDecreasedComp            = false;

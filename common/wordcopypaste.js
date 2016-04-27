@@ -16,6 +16,7 @@ var align_Left = AscCommon.align_Left;
 var align_Center = AscCommon.align_Center;
 var align_Justify = AscCommon.align_Justify;
 var g_oDocumentUrls = AscCommon.g_oDocumentUrls;
+  var History = AscCommon.History;
 
 var CShape = AscFormat.CShape;
 

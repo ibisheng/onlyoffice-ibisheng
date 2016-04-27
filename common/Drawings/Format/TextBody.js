@@ -9,6 +9,7 @@ function (window, undefined) {
 
     // Import
     var isRealObject = AscCommon.isRealObject;
+    var History = AscCommon.History;
 
 var  field_type_slidenum   = 0;
 var  field_type_datetime   = 1;

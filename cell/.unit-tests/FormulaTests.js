@@ -393,8 +393,7 @@ $( function () {
     if ( Asc.c_oSerFormat.Signature === sData.substring( 0, Asc.c_oSerFormat.Signature.length ) ) {
         var sUrlPath = "offlinedocs/";
         wb = new AscCommonExcel.Workbook( new Asc.asc_CHandlersList(), {wb:{getWorksheet:function(){}}} );
-
-        History = new CHistory(wb);
+        AscCommon.History.init(wb);
 
         AscCommon.g_oTableId.init();
         if ( this.User )

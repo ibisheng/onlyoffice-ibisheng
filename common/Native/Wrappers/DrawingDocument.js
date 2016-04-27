@@ -2196,7 +2196,7 @@ CDrawingDocument.prototype =
 
         var Rows = 5;
 
-        History.TurnOff();
+        AscCommon.History.TurnOff();
         AscCommon.g_oTableId.m_bTurnOff = true;
         for (var i1 = 0; i1 < _styles_len; i1++)
         {
@@ -2260,7 +2260,7 @@ CDrawingDocument.prototype =
             _graphics.ClearParams();
         }
         AscCommon.g_oTableId.m_bTurnOff = false;
-        History.TurnOn();
+        AscCommon.History.TurnOn();
 
         _stream["ClearNoAttack"]();
         _stream["WriteByte"](3);

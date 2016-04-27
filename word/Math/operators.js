@@ -2,6 +2,7 @@
 
 // Import
 var g_oTextMeasurer = AscCommon.g_oTextMeasurer;
+var History = AscCommon.History;
 
 function CGlyphOperator()
 {

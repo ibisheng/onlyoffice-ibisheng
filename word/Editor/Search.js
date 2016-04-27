@@ -267,7 +267,7 @@ CDocument.prototype.Search_Replace = function(NewStr, bAll, Id)
 
     if ( false === this.Document_Is_SelectionLocked( AscCommon.changestype_None, { Type : AscCommon.changestype_2_ElementsArray_and_Type, Elements : CheckParagraphs, CheckType : AscCommon.changestype_Paragraph_Content } ) )
     {
-        History.Create_NewPoint(bAll ? AscDFH.historydescription_Document_ReplaceAll : AscDFH.historydescription_Document_ReplaceSingle);
+        AscCommon.History.Create_NewPoint(bAll ? AscDFH.historydescription_Document_ReplaceAll : AscDFH.historydescription_Document_ReplaceSingle);
 
         if (true === bAll)
         {

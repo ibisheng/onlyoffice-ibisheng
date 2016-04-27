@@ -32,6 +32,7 @@
     var gc_nMaxCol0 = AscCommon.gc_nMaxCol0;
     var gc_nMaxRow = AscCommon.gc_nMaxRow;
     var gc_nMaxCol = AscCommon.gc_nMaxCol;
+    var History = AscCommon.History;
 
     var asc = window["Asc"];
     var asc_applyFunction = asc.applyFunction;

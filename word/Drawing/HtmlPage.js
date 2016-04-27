@@ -12,6 +12,7 @@ var CreateControlContainer = AscCommon.CreateControlContainer;
 var CreateControl = AscCommon.CreateControl;
 var global_keyboardEvent = AscCommon.global_keyboardEvent;
 var global_mouseEvent = AscCommon.global_mouseEvent;
+var History = AscCommon.History;
 
 var g_dDpiX = 96.0;
 var g_dDpiY = 96.0;

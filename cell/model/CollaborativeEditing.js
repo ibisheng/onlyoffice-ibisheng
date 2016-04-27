@@ -9,6 +9,7 @@
 		var asc_Range			= Asc.Range;
 
 		var c_oAscLockTypes = AscCommon.c_oAscLockTypes;
+		var History = AscCommon.History;
 
 		var c_oAscRecalcIndexTypes = AscCommonExcel.c_oAscRecalcIndexTypes;
 		var c_oAscLockTypeElemSubType = AscCommonExcel.c_oAscLockTypeElemSubType;

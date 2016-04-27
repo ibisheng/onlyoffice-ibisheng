@@ -1,15 +1,10 @@
 "use strict";
 
-/**
- * User: Ilja.Kirillov
- * Date: 07.11.11
- * Time: 14:49
- */
-
 // Import
 var align_Right = AscCommon.align_Right;
 var align_Left = AscCommon.align_Left;
 var g_oTextMeasurer = AscCommon.g_oTextMeasurer;
+var History = AscCommon.History;
 
 var numbering_numfmt_None        = 0x0000;
 var numbering_numfmt_Bullet      = 0x1001;

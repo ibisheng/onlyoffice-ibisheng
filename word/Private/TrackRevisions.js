@@ -1,12 +1,8 @@
 "use strict";
-/**
- * User: Ilja.Kirillov
- * Date: 09.10.2015
- * Time: 15:12
- */
 
 // Import
 var changestype_2_ElementsArray_and_Type = AscCommon.changestype_2_ElementsArray_and_Type;
+var History = AscCommon.History;
 
 //----------------------------------------------------------------------------------------------------------------------
 // Работаем с рецензированием

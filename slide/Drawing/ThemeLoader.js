@@ -115,13 +115,13 @@ function CThemeLoader()
             pres.slideLayouts = [];
             pres.DrawingDocument = editor.WordControl.m_oDrawingDocument;
 
-            History.MinorChanges = true;
+            AscCommon.History.MinorChanges = true;
             _loader.Load(g_th, pres);
             for(var i = 0; i < pres.slideMasters.length; ++i)
             {
                 pres.slideMasters[i].setThemeIndex(oThis.CurrentLoadThemeIndex);
             }
-            History.MinorChanges = false;
+            AscCommon.History.MinorChanges = false;
 
             if (oThis.IsReloadBinaryThemeEditorNow)
             {

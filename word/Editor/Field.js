@@ -1,10 +1,7 @@
 "use strict";
 
-/**
- * User: Ilja.Kirillov
- * Date: 19.01.15
- * Time: 12:13
- */
+// Import
+var History = AscCommon.History;
 
 var fieldtype_UNKNOWN    = 0x0000;
 var fieldtype_MERGEFIELD = 0x0001;

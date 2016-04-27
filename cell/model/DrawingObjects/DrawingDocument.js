@@ -6,6 +6,7 @@ var g_fontApplication = AscFonts.g_fontApplication;
 
 var CColor = AscCommon.CColor;
 var g_oTextMeasurer = AscCommon.g_oTextMeasurer;
+var History = AscCommon.History;
 
 var g_dDpiX = 96.0;
 var g_dDpiY = 96.0;

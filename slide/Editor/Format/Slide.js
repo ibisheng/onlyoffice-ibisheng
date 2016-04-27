@@ -2,6 +2,7 @@
 
 // Import
 var g_oTableId = AscCommon.g_oTableId;
+var History = AscCommon.History;
 
 function Slide(presentation, slideLayout, slideNum)
 {

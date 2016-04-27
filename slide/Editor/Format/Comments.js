@@ -8,6 +8,7 @@
 
 // Import
 var g_oTableId = AscCommon.g_oTableId;
+var History = AscCommon.History;
 
 var comments_NoComment        = 0;
 var comments_NonActiveComment = 1;

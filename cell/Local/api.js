@@ -38,12 +38,12 @@ var c_oAscError = Asc.c_oAscError;
 		if (true)
 		{
 			this._startOpenDocument(_data);
-			History.UserSaveMode = true;
+			AscCommon.History.UserSaveMode = true;
 		}
 		
 		DesktopOfflineUpdateLocalName(this);
 		
-		this.onUpdateDocumentModified(History.Is_Modified());
+		this.onUpdateDocumentModified(AscCommon.History.Is_Modified());
 	};
 	
 	asc['spreadsheet_api'].prototype._onNeedParams = function(data) 
@@ -101,7 +101,7 @@ window["DesktopOfflineAppDocumentEndLoad"] = function(_url, _data)
 /////////////////////////////////////////////////////////
 //////////////        CHANGES       /////////////////////
 /////////////////////////////////////////////////////////
-CHistory.prototype.Reset_SavedIndex = function(IsUserSave)
+AscCommon.CHistory.prototype.Reset_SavedIndex = function(IsUserSave)
 {
 	if (true === this.Is_UserSaveMode())
 	{
@@ -119,7 +119,7 @@ CHistory.prototype.Reset_SavedIndex = function(IsUserSave)
 	}
 };
 
-CHistory.prototype.Is_Modified = function(IsNotUserSave, IsNoSavedNoModifyed) 
+AscCommon.CHistory.prototype.Is_Modified = function(IsNotUserSave, IsNoSavedNoModifyed) 
 {
 	var checkIndex = (this.Is_UserSaveMode() && !IsNotUserSave) ? this.UserSavedIndex : this.SavedIndex;
 	if (-1 === this.Index && null === checkIndex && false === this.ForceSave) 
@@ -155,7 +155,7 @@ window["Asc"]['spreadsheet_api'].prototype.onUpdateDocumentModified = function(b
       this._onUpdateDocumentCanSave();
 
       if (undefined !== window["AscDesktopEditor"]) {
-        window["AscDesktopEditor"]["onDocumentModifiedChanged"](History ? History.Is_Modified(undefined, true) : bValue);
+        window["AscDesktopEditor"]["onDocumentModifiedChanged"](AscCommon.History ? AscCommon.History.Is_Modified(undefined, true) : bValue);
       }
     }
 };
@@ -171,7 +171,7 @@ window["Asc"]['spreadsheet_api'].prototype.asc_Save = function (isNoUserSave, is
 	
 	if (this.IsUserSave)
 	{
-		this.LastUserSavedIndex = History.UserSavedIndex;
+		this.LastUserSavedIndex = AscCommon.History.UserSavedIndex;
 	}
 
     if (true === this.canSave && !this.isLongAction())
@@ -215,9 +215,9 @@ window["DesktopOfflineAppDocumentEndSave"] = function(error)
 	if (0 == error)
 		DesktopOfflineUpdateLocalName(window["Asc"]["editor"]);
 	else
-		History.UserSavedIndex = window["Asc"]["editor"].LastUserSavedIndex;		
+		AscCommon.History.UserSavedIndex = window["Asc"]["editor"].LastUserSavedIndex;		
 	
-	window["Asc"]["editor"].onUpdateDocumentModified(History.Is_Modified());
+	window["Asc"]["editor"].onUpdateDocumentModified(AscCommon.History.Is_Modified());
 	window["Asc"]["editor"].LastUserSavedIndex = undefined;
 	
 	if (2 == error)

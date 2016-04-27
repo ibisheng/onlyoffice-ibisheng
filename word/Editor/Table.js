@@ -1,11 +1,5 @@
 "use strict";
 
-/**
-* User: Ilja.Kirillov
-* Date: 20.12.11
-* Time: 14:36
-*/
-
 // TODO: При расчете таблиц есть один баг, который надо будет поправить в будущем:
 //       при разбиении строки на страницы возможен вариант, когда у каких-то ячеек
 //       убирается содержимое на первой странице, а у каких-то - нет. В данном случае
@@ -25,6 +19,7 @@
 var align_Left = AscCommon.align_Left;
 var CMouseMoveData = AscCommon.CMouseMoveData;
 var g_oTableId = AscCommon.g_oTableId;
+var History = AscCommon.History;
 
 var linerule_AtLeast = Asc.linerule_AtLeast;
 var c_oAscError = Asc.c_oAscError;

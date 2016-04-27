@@ -9,6 +9,8 @@ function (window, undefined) {
     // Import
     var DrawingObjectsController = AscFormat.DrawingObjectsController;
 
+    var History = AscCommon.History;
+
 if(window.editor === "undefined" && window["Asc"]["editor"])
 {
     window.editor = window["Asc"]["editor"];

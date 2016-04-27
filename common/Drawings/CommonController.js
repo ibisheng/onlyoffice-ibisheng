@@ -13,6 +13,7 @@ var c_oAscSizeRelFromV = AscCommon.c_oAscSizeRelFromV;
 var c_oAscLockTypes = AscCommon.c_oAscLockTypes;
 var parserHelp = AscCommon.parserHelp;
 var isRealObject = AscCommon.isRealObject;
+    var History = AscCommon.History;
 
 var c_oAscError = Asc.c_oAscError;
 var c_oAscChartTitleShowSettings = Asc.c_oAscChartTitleShowSettings;

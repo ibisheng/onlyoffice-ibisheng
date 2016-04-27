@@ -5,6 +5,7 @@ var CColor = AscCommon.CColor;
 var g_oTextMeasurer = AscCommon.g_oTextMeasurer;
 var global_keyboardEvent = AscCommon.global_keyboardEvent;
 var global_mouseEvent = AscCommon.global_mouseEvent;
+var History = AscCommon.History;
 
 var FontStyle = AscFonts.FontStyle;
 var g_fontApplication = AscFonts.g_fontApplication;

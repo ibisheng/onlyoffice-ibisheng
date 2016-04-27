@@ -5,6 +5,7 @@ var CShape = AscFormat.CShape;
 var HitInLine = AscFormat.HitInLine;
 
 var isRealObject = AscCommon.isRealObject;
+var History = AscCommon.History;
 
 function CGraphicFrame()
 {

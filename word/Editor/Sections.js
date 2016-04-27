@@ -9,6 +9,7 @@
 
 // Import
 var g_oTableId = AscCommon.g_oTableId;
+var History = AscCommon.History;
 
 var section_type_NextPage   = 0x00;
 var section_type_OddPage    = 0x01;

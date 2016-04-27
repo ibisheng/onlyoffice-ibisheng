@@ -9,6 +9,7 @@ var CAscMathCategory = AscCommon.CAscMathCategory;
 var g_oTableId = AscCommon.g_oTableId;
 var g_oTextMeasurer = AscCommon.g_oTextMeasurer;
 var global_mouseEvent = AscCommon.global_mouseEvent;
+var History = AscCommon.History;
 
 var g_fontManager = new AscFonts.CFontManager();
 g_fontManager.Initialize(true);

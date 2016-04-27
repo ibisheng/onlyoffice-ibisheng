@@ -9,6 +9,8 @@ function (window, undefined) {
     // Import
     var ArcToCurvers = AscFormat.ArcToCurvers;
 
+    var History = AscCommon.History;
+
 var EPSILON_TEXT_AUTOFIT = 0.001;
 var FORMULA_TYPE_MULT_DIV = 0,
     FORMULA_TYPE_PLUS_MINUS = 1,

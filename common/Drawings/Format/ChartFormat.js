@@ -12,6 +12,7 @@ var g_oIdCounter = AscCommon.g_oIdCounter;
 var g_oTableId = AscCommon.g_oTableId;
 var CMatrix = AscCommon.CMatrix;
 var isRealObject = AscCommon.isRealObject;
+    var History = AscCommon.History;
 
 var CShape = AscFormat.CShape;
 var checkSpPrRasterImages = AscFormat.checkSpPrRasterImages;

@@ -24,6 +24,8 @@
 		"../common/FontsFreeType/TextMeasurer.js",
 		"../common/Drawings/WorkEvents.js",
 		
+		"../cell/model/History.js",
+		
 		"../common/Shapes/EditorSettings.js",
 		"../common/Shapes/Serialize.js",
 		"../common/Shapes/SerializeWriter.js",
@@ -101,7 +103,6 @@
 		"../cell/model/Serialize.js",
 		"../cell/model/CellInfo.js",
 		
-        "../cell/model/History.js",
         "../cell/view/mobileTouch.js",
         "../cell/view/StringRender.js",
         "../cell/view/CellTextRender.js",

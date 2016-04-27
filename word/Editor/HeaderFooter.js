@@ -1,15 +1,10 @@
 "use strict";
 
-/**
- * User: Ilja.Kirillov
- * Date: 13.12.11
- * Time: 14:51
- */
-
 // Import
 var hdrftr_Header = AscCommon.hdrftr_Header;
 var hdrftr_Footer = AscCommon.hdrftr_Footer;
 var g_oTableId = AscCommon.g_oTableId;
+var History = AscCommon.History;
 
 //-----------------------------------------------------------------------------------
 // Класс работающий с одним колонтитулом

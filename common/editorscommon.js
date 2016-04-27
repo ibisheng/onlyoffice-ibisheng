@@ -1888,7 +1888,7 @@ CTableId.prototype.Add = function(Class, Id)
         Class.Id = Id;
         this.m_aPairs[Id] = Class;
 
-        History.Add(this, { Type : AscDFH.historyitem_TableId_Add, Id : Id, Class : Class  });
+      AscCommon.History.Add(this, { Type : AscDFH.historyitem_TableId_Add, Id : Id, Class : Class  });
     }
 };
 CTableId.prototype.TurnOff = function()
@@ -1932,7 +1932,7 @@ CTableId.prototype.Reset_Id = function(Class, Id_new, Id_old)
         delete this.m_aPairs[Id_old];
         this.m_aPairs[Id_new] = Class;
 
-        History.Add(this, { Type : AscDFH.historyitem_TableId_Reset, Id_new : Id_new, Id_old : Id_old  });
+      AscCommon.History.Add(this, { Type : AscDFH.historyitem_TableId_Reset, Id_new : Id_new, Id_old : Id_old  });
     }
     else
     {
@@ -2482,7 +2482,7 @@ function CContentChangesElement(Type, Pos, Count, Data) {
 
 CContentChangesElement.prototype.Refresh_BinaryData = function()
 {
-	var Binary_Writer = History.BinaryWriter;
+	var Binary_Writer = AscCommon.History.BinaryWriter;
 	var Binary_Pos = Binary_Writer.GetCurPosition();
 
 	this.m_pData.Data.UseArray = true;

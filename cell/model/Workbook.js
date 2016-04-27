@@ -16,6 +16,7 @@ var gc_nMaxCol0 = AscCommon.gc_nMaxCol0;
 var g_oCellAddressUtils = AscCommon.g_oCellAddressUtils;
 var CellAddress = AscCommon.CellAddress;
 var isRealObject = AscCommon.isRealObject;
+  var History = AscCommon.History;
 
 var UndoRedoItemSerializable = AscCommonExcel.UndoRedoItemSerializable;
 var UndoRedoData_CellSimpleData = AscCommonExcel.UndoRedoData_CellSimpleData;

@@ -22,6 +22,7 @@
   var AscBrowser = AscCommon.AscBrowser;
   var CColor = AscCommon.CColor;
   var cBoolLocal = AscCommon.cBoolLocal;
+  var History = AscCommon.History;
 
   var asc = window["Asc"];
   var asc_applyFunction = asc.applyFunction;

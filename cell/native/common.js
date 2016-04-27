@@ -17,8 +17,6 @@ window.IS_NATIVE_EDITOR = true;
 var document = {};
 window.document = document;
 
-var History = {};
-
 window["Asc"] = {};
 var Asc = window["Asc"];
 

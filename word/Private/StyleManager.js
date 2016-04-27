@@ -78,7 +78,7 @@ CDocument.prototype.Add_NewStyle = function(oStyle)
 {
     if (false === this.Document_Is_SelectionLocked(AscCommon.changestype_Document_Styles, {Type : AscCommon.changestype_2_AdditionalTypes, Types : [AscCommon.changestype_Paragraph_Properties]}))
     {
-        History.Create_NewPoint(AscDFH.historydescription_Document_AddNewStyle);
+        AscCommon.History.Create_NewPoint(AscDFH.historydescription_Document_AddNewStyle);
         var NewStyle = this.Styles.Create_StyleFromInterface(oStyle);
         this.Set_ParagraphStyle(NewStyle.Get_Name());
         this.Recalculate();
@@ -97,7 +97,7 @@ CDocument.prototype.Remove_Style = function(sStyleName)
 
     if (false === this.Document_Is_SelectionLocked(AscCommon.changestype_Document_Styles))
     {
-        History.Create_NewPoint(AscDFH.historydescription_Document_RemoveStyle);
+        AscCommon.History.Create_NewPoint(AscDFH.historydescription_Document_RemoveStyle);
         this.Styles.Remove_StyleFromInterface(StyleId);
         this.Recalculate();
         this.Document_UpdateInterfaceState();
@@ -110,7 +110,7 @@ CDocument.prototype.Remove_AllCustomStyles = function()
 {
     if (false === this.Document_Is_SelectionLocked(AscCommon.changestype_Document_Styles))
     {
-        History.Create_NewPoint(AscDFH.historydescription_Document_RemoveAllCustomStyles);
+        AscCommon.History.Create_NewPoint(AscDFH.historydescription_Document_RemoveAllCustomStyles);
         this.Styles.Remove_AllCustomStylesFromInterface();
         this.Recalculate();
         this.Document_UpdateInterfaceState();

@@ -8,6 +8,7 @@
 // Import
 var g_oTableId = AscCommon.g_oTableId;
 var g_oTextMeasurer = AscCommon.g_oTextMeasurer;
+var History = AscCommon.History;
 
 var c_oAscShdNil = Asc.c_oAscShdNil;
 

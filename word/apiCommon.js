@@ -60,7 +60,7 @@ function GenerateTableStyles(drawingDoc, logicDoc, tableLook)
     }
     var ctx = _canvas.getContext('2d');
 
-    History.TurnOff();
+    AscCommon.History.TurnOff();
     for (var i1 = 0; i1 < _styles_len; i1++)
     {
         var i = _styles[i1];
@@ -92,7 +92,7 @@ function GenerateTableStyles(drawingDoc, logicDoc, tableLook)
         _styleD.Id = i;
         _dst_styles.push(_styleD);
     }
-    History.TurnOn();
+    AscCommon.History.TurnOn();
 
     return _dst_styles;
 }

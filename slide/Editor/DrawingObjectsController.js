@@ -5,6 +5,8 @@ var DrawingObjectsController = AscFormat.DrawingObjectsController;
 var HANDLE_EVENT_MODE_HANDLE = AscFormat.HANDLE_EVENT_MODE_HANDLE;
 var MOVE_DELTA = AscFormat.MOVE_DELTA;
 
+var History = AscCommon.History;
+
 
 DrawingObjectsController.prototype.getTheme = function()
 {

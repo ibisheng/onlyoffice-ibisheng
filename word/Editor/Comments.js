@@ -2,12 +2,7 @@
 
 // Import
 var g_oTableId = AscCommon.g_oTableId;
-
-/**
- * User: Ilja.Kirillov
- * Date: 10.10.12
- * Time: 10:38
- */
+var History = AscCommon.History;
 
 function CCommentData()
 {

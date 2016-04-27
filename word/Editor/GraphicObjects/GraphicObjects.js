@@ -6,6 +6,7 @@ var changestype_2_ElementsArray_and_Type = AscCommon.changestype_2_ElementsArray
 var g_oTableId = AscCommon.g_oTableId;
 var isRealObject = AscCommon.isRealObject;
 var global_mouseEvent = AscCommon.global_mouseEvent;
+var History = AscCommon.History;
 
 var DrawingObjectsController = AscFormat.DrawingObjectsController;
 var HANDLE_EVENT_MODE_HANDLE = AscFormat.HANDLE_EVENT_MODE_HANDLE;

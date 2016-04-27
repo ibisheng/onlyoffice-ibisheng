@@ -24,6 +24,8 @@
 		"../common/FontsFreeType/TextMeasurer.js",
 		"../common/Drawings/WorkEvents.js",
 		
+		"../word/Editor/History.js",
+		
 		"../common/Shapes/EditorSettings.js",
 		"../common/Shapes/Serialize.js",
 		"../common/Shapes/SerializeWriter.js",
@@ -94,7 +96,6 @@
         "../word/Editor/Table/TableCell.js",
         "../word/Editor/Common.js",
         "../word/Editor/Sections.js",
-        "../word/Editor/History.js",
         "../word/Drawing/Graphics.js",
         "../word/Drawing/ShapeDrawer.js",
         "../slide/Drawing/Transitions.js",

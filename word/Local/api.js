@@ -11,8 +11,8 @@ asc_docs_api.prototype._OfflineAppDocumentStartLoad = function()
 	this.asc_registerCallback('asc_onDocumentContentReady', function(){
 		DesktopOfflineUpdateLocalName(editor);
 	});
-	
-	History.UserSaveMode = true;
+
+	AscCommon.History.UserSaveMode = true;
     window["AscDesktopEditor"]["LocalStartOpen"]();
 };
 asc_docs_api.prototype._OfflineAppDocumentEndLoad = function(_url, _data)
@@ -61,7 +61,7 @@ window["asc_initAdvancedOptions"] = function()
 /////////////////////////////////////////////////////////
 //////////////        CHANGES       /////////////////////
 /////////////////////////////////////////////////////////
-CHistory.prototype.Reset_SavedIndex = function(IsUserSave)
+AscCommon.CHistory.prototype.Reset_SavedIndex = function(IsUserSave)
 {
 	if (true === this.Is_UserSaveMode())
 	{
@@ -78,7 +78,7 @@ CHistory.prototype.Reset_SavedIndex = function(IsUserSave)
 		this.ForceSave  = false;
 	}
 };
-CHistory.prototype.Have_Changes = function(IsNotUserSave, IsNoSavedNoModifyed)
+AscCommon.CHistory.prototype.Have_Changes = function(IsNotUserSave, IsNoSavedNoModifyed)
 {
 	if (true === this.Is_UserSaveMode() && true !== IsNotUserSave)
 	{
@@ -128,7 +128,7 @@ asc_docs_api.prototype.SetDocumentModified = function(bValue)
 
     if (undefined !== window["AscDesktopEditor"])
     {
-        window["AscDesktopEditor"]["onDocumentModifiedChanged"](History ? History.Have_Changes(undefined, true) : bValue);
+        window["AscDesktopEditor"]["onDocumentModifiedChanged"](AscCommon.History ? AscCommon.History.Have_Changes(undefined, true) : bValue);
     }
 };
 
@@ -139,7 +139,7 @@ asc_docs_api.prototype.asc_Save = function (isNoUserSave, isSaveAs)
 	
 	if (this.IsUserSave)
 	{
-		this.LastUserSavedIndex = History.UserSavedIndex;
+		this.LastUserSavedIndex = AscCommon.History.UserSavedIndex;
 	}
 
     if (true === this.canSave && !this.isLongAction())
@@ -181,7 +181,7 @@ window["DesktopOfflineAppDocumentEndSave"] = function(error)
 	if (error == 0)
 		DesktopOfflineUpdateLocalName(editor);
 	else
-		History.UserSavedIndex = editor.LastUserSavedIndex;
+		AscCommon.History.UserSavedIndex = editor.LastUserSavedIndex;
 	
 	editor.UpdateInterfaceState();
 	editor.LastUserSavedIndex = undefined;

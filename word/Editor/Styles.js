@@ -1,14 +1,9 @@
 "use strict";
 
-/**
- * User: Ilja.Kirillov
- * Date: 11.11.11
- * Time: 14:46
- */
-
 // Import
 var align_Left = AscCommon.align_Left;
 var g_oTableId = AscCommon.g_oTableId;
+var History = AscCommon.History;
 
 var linerule_Auto = Asc.linerule_Auto;
 var c_oAscShdClear = Asc.c_oAscShdClear;

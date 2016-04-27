@@ -1,12 +1,8 @@
 "use strict";
 
-/**
- * Created with JetBrains WebStorm.
- * User: Sergey.Luzyanin
- * Date: 6/26/13
- * Time: 11:48 AM
- * To change this template use File | Settings | File Templates.
- */
+// Import
+var History = AscCommon.History;
+
 function SlideLayout()
 {
 

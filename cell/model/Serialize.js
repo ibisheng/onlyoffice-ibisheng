@@ -14,6 +14,7 @@
       var BinaryCommonWriter = AscCommon.BinaryCommonWriter;
       var c_oSerPropLenType = AscCommon.c_oSerPropLenType;
       var c_oSerConstants = AscCommon.c_oSerConstants;
+    var History = AscCommon.History;
 
       var c_oAscPageOrientation = Asc.c_oAscPageOrientation;
     

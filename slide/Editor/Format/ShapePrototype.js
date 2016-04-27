@@ -79,7 +79,7 @@ CShape.prototype.Is_UseInDocument = function(drawingObjects)
 };
 CShape.prototype.setWorksheet = function(worksheet)
 {
-    History.Add(this, {Type: AscDFH.historyitem_AutoShapes_SetWorksheet, oldPr: this.worksheet, newPr: worksheet});
+    AscCommon.History.Add(this, {Type: AscDFH.historyitem_AutoShapes_SetWorksheet, oldPr: this.worksheet, newPr: worksheet});
     this.worksheet = worksheet;
     if(this.spTree)
     {
@@ -301,7 +301,7 @@ CShape.prototype.recalcTextStyles = function()
 };
 CShape.prototype.addToRecalculate = function()
 {
-    History.RecalcData_Add({Type: AscDFH.historyitem_recalctype_Drawing, Object: this});
+    AscCommon.History.RecalcData_Add({Type: AscDFH.historyitem_recalctype_Drawing, Object: this});
 };
 CShape.prototype.getSlideIndex = function()
 {

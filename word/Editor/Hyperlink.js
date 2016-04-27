@@ -1,8 +1,7 @@
 "use strict";
 
-/**
- * Created by Ilja.Kirillov on 17.02.14.
- */
+// Import
+var History = AscCommon.History;
 
 /**
  *

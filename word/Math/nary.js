@@ -467,19 +467,19 @@ CNary.prototype.Apply_MenuProps = function(Props)
         if(Props.LimLoc !== undefined && false == this.ParaMath.Is_Inline() && this.Pr.limLoc !== Props.LimLoc)
         {
             var LimLoc = Props.LimLoc == c_oAscMathInterfaceNaryLimitLocation.SubSup ? NARY_SubSup : NARY_UndOvr;
-            History.Add(this, new CChangesMathNaryLimLoc(LimLoc, this.Pr.limLoc));
+            AscCommon.History.Add(this, new CChangesMathNaryLimLoc(LimLoc, this.Pr.limLoc));
             this.raw_SetLimLoc(LimLoc);
         }
 
         if(Props.HideUpper !== undefined && Props.HideUpper !== this.Pr.supHide)
         {
-            History.Add(this, new CChangesMathNaryUpperLimit(!this.Pr.supHide, this.Pr.supHide));
+            AscCommon.History.Add(this, new CChangesMathNaryUpperLimit(!this.Pr.supHide, this.Pr.supHide));
             this.raw_HideUpperIterator(!this.Pr.supHide);
         }
 
         if(Props.HideLower !== undefined && Props.HideLower !== this.Pr.subHide)
         {
-            History.Add(this, new CChangesMathNaryLowerLimit(!this.Pr.subHide, this.Pr.subHide));
+            AscCommon.History.Add(this, new CChangesMathNaryLowerLimit(!this.Pr.subHide, this.Pr.subHide));
             this.raw_HideLowerIterator(!this.Pr.subHide);
         }
     }

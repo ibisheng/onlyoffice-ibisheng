@@ -23,6 +23,8 @@ var HitInBezier4 = AscFormat.HitInBezier4;
 var HitInBezier3 = AscFormat.HitInBezier3;
 var MOVE_DELTA = AscFormat.MOVE_DELTA;
 
+    var History = AscCommon.History;
+
 var cToRad2 = (Math.PI/60000)/180;
 
 function Path()

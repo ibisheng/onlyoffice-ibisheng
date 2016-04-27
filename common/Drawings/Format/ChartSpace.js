@@ -16,6 +16,7 @@ var g_oTableId = AscCommon.g_oTableId;
 var oNumFormatCache = AscCommon.oNumFormatCache;
 var CellAddress = AscCommon.CellAddress;
 var isRealObject = AscCommon.isRealObject;
+    var History = AscCommon.History;
 
 var CShape = AscFormat.CShape;
 var Ax_Counter = AscFormat.Ax_Counter;

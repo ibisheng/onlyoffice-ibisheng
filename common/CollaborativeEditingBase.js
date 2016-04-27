@@ -182,7 +182,7 @@ CCollaborativeChanges.prototype.Internal_Load_Data2 = function(szSrc, offset, sr
 };
 CCollaborativeChanges.prototype.Internal_Save_Data = function(Class, Data, Binary)
 {
-    var Writer = History.BinaryWriter;
+    var Writer = AscCommon.History.BinaryWriter;
     var Pos = Binary.Pos;
     var Len = Binary.Len;
 

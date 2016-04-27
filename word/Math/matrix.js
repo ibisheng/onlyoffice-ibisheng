@@ -1,5 +1,8 @@
 "use strict";
 
+// Import
+var History = AscCommon.History;
+
 var MATH_MC_JC = MCJC_CENTER;
 
 function CMathMatrixColumnPr()

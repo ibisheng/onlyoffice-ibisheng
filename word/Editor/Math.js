@@ -1,15 +1,12 @@
 "use strict";
 
-/**
- * Created by Ilja.Kirillov on 18.03.14.
- */
-
 // Import
 var align_Right = AscCommon.align_Right;
 var align_Left = AscCommon.align_Left;
 var align_Center = AscCommon.align_Center;
 var align_Justify = AscCommon.align_Justify;
 var g_oTableId = AscCommon.g_oTableId;
+var History = AscCommon.History;
 
 var g_dMathArgSizeKoeff_1 = 0.76;
 var g_dMathArgSizeKoeff_2 = 0.6498; // 0.76 * 0.855

@@ -114,12 +114,10 @@ function (window, undefined) {
 	window['AscCH'].historyitem_AutoFilter_ChangeTableInfo = 12;
 	window['AscCH'].historyitem_AutoFilter_ChangeTableRef = 13;
 	window['AscCH'].historyitem_AutoFilter_ChangeTableName = 14;
-})(window);
 
-
-function CHistory(workbook)
+function CHistory()
 {
-	this.workbook = workbook;
+	this.workbook = null;
     this.Index    = -1;
     this.Points   = [];
     this.TurnOffHistory = 0;
@@ -139,6 +137,9 @@ function CHistory(workbook)
   this.UserSaveMode   = false;
   this.UserSavedIndex = null;  // Номер точки, на которой произошло последнее сохранение пользователем (не автосохранение)
 }
+CHistory.prototype.init = function(workbook) {
+	this.workbook = workbook;
+};
 CHistory.prototype.Is_UserSaveMode = function() {
   return this.UserSaveMode;
 };
@@ -870,5 +871,10 @@ CHistory.prototype._CheckCanNotAddChanges = function () {
         }
     } catch (e) {
     }
-}
-var History = null;
+};
+
+	//------------------------------------------------------------export--------------------------------------------------
+	window['AscCommon'] = window['AscCommon'] || {};
+	window['AscCommon'].CHistory = CHistory;
+	window['AscCommon'].History = new CHistory();
+})(window);

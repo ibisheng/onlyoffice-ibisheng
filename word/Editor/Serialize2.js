@@ -8517,8 +8517,8 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
             }
             if(oParaDrawing.GraphicObj)
             {
-                if(drawing_Anchor == oParaDrawing.DrawingType && typeof History.RecalcData_Add === "function")//TODO некорректная проверка typeof
-                    History.RecalcData_Add( { Type : AscDFH.historyitem_recalctype_Flow, Data : oParaDrawing});
+                if(drawing_Anchor == oParaDrawing.DrawingType && typeof AscCommon.History.RecalcData_Add === "function")//TODO некорректная проверка typeof
+                  AscCommon.History.RecalcData_Add( { Type : AscDFH.historyitem_recalctype_Flow, Data : oParaDrawing});
             }
         }
 		oDrawing.content = oParaDrawing;

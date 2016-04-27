@@ -8,6 +8,7 @@
 function (window, undefined) {
 // Import
 var CShape = AscFormat.CShape;
+var History = AscCommon.History;
 
 var isRealObject = AscCommon.isRealObject;
 
