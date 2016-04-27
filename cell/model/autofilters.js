@@ -790,7 +790,7 @@
 								worksheet.TableParts[l] = cloneData.oldFilter.clone(null);
 
 								//чистим стиль от старой таблицы
-								var clearRange = new Range(worksheet, cloneData.newFilterRef.r1, cloneData.newFilterRef.c1, cloneData.newFilterRef.r2, cloneData.newFilterRef.c2);
+								var clearRange = new AscCommonExcel.Range(worksheet, cloneData.newFilterRef.r1, cloneData.newFilterRef.c1, cloneData.newFilterRef.r2, cloneData.newFilterRef.c2);
 								clearRange.setTableStyle(null);
 								
 								this._setColorStyleTable(cloneData.oldFilter.Ref, cloneData.oldFilter, null, true);
@@ -977,7 +977,7 @@
 				var changeFilter = function(filter, isTablePart)
 				{
 					var oldFilter = filter.clone(null);
-					var oRange = Range.prototype.createFromBBox(worksheet, oldFilter.Ref);
+					var oRange = AscCommonExcel.Range.prototype.createFromBBox(worksheet, oldFilter.Ref);
 
 					var bbox = oRange.getBBox0();
 
@@ -2159,7 +2159,7 @@
 					{	
 						if(val === false)//снимаем галку - удаляем строку итогов
 						{
-							var clearRange = new Range(worksheet, tablePart.Ref.r2, tablePart.Ref.c1, tablePart.Ref.r2, tablePart.Ref.c2);
+							var clearRange = new AscCommonExcel.Range(worksheet, tablePart.Ref.r2, tablePart.Ref.c1, tablePart.Ref.r2, tablePart.Ref.c2);
 							this._clearRange(clearRange, true);
 							tablePart.changeRef(null, -1);
 							
@@ -2198,7 +2198,7 @@
 					{
 						if(val === false)//снимаем галку
 						{
-							var clearRange = new Range(worksheet, tablePart.Ref.r1, tablePart.Ref.c1, tablePart.Ref.r1, tablePart.Ref.c2);
+							var clearRange = new AscCommonExcel.Range(worksheet, tablePart.Ref.r1, tablePart.Ref.c1, tablePart.Ref.r1, tablePart.Ref.c2);
 							this._clearRange(clearRange, true);
 							tablePart.changeRef(null, 1, true);
 							
@@ -2504,7 +2504,7 @@
 				if(worksheet.TableParts)
 				{
 					//TODO: buildRecalc вызывать из модели!!!
-					buildRecalc(worksheet.workbook, true, true);
+					AscCommonExcel.buildRecalc(worksheet.workbook, true, true);
 					for(var i = 0; i < worksheet.TableParts.length; i++)
 					{
 						var filter = worksheet.TableParts[i];
@@ -3985,7 +3985,7 @@
 			
 			_cleanStyleTable : function(sRef)
 			{
-				var oRange = new Range(this.worksheet, sRef.r1, sRef.c1, sRef.r2, sRef.c2);
+				var oRange = new AscCommonExcel.Range(this.worksheet, sRef.r1, sRef.c1, sRef.r2, sRef.c2);
 				oRange.setTableStyle(null);
 			},
 					
@@ -4212,7 +4212,7 @@
 								//TODO позже не копировать стиль при перемещении всей таблицы
 								if(!bUndoRedoChanges)
 								{
-									var cleanRange = new Range(worksheet, newRange.r1, newRange.c1, newRange.r2, newRange.c2);
+									var cleanRange = new AscCommonExcel.Range(worksheet, newRange.r1, newRange.c1, newRange.r2, newRange.c2);
 									cleanRange.cleanFormat();
 								}
 								this.addAutoFilter(findFilters[i].TableStyleInfo.Name, newRange, null, offLock);

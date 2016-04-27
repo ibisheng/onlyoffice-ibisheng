@@ -4556,7 +4556,7 @@ PasteProcessor.prototype =
 	_readFromBinaryExcel: function(base64)
 	{
 		var oBinaryFileReader = new Asc.BinaryFileReader(true);
-		var tempWorkbook = new Workbook();
+		var tempWorkbook = new AscCommonExcel.Workbook();
         tempWorkbook.theme = this.oDocument.theme ? this.oDocument.theme : this.oLogicDocument.theme;
 		if(!tempWorkbook.theme && this.oLogicDocument.themes && this.oLogicDocument.themes[0])
 			tempWorkbook.theme = this.oLogicDocument.themes[0];

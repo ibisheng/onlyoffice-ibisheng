@@ -1,5 +1,7 @@
 "use strict";
 
+(function(window, undefined){
+
 // Import
 var g_memory = AscFonts.g_memory;
 
@@ -42,18 +44,59 @@ var c_oAscInsertOptions = Asc.c_oAscInsertOptions;
 var c_oAscDeleteOptions = Asc.c_oAscDeleteOptions;
 var c_oAscGetDefinedNamesList = Asc.c_oAscGetDefinedNamesList;
 var c_oAscDefinedNameReason = Asc.c_oAscDefinedNameReason;
-
-var g_nHSLMaxValue = 255;
+  
 var g_nVerticalTextAngle = 255;
-var gc_dDefaultColWidthCharsAttribute;//определяется в WorksheetView.js
-var gc_dDefaultRowHeightAttribute;//определяется в WorksheetView.js
+  //определяется в WorksheetView.js
+var oDefaultMetrics = {
+  ColWidthChars: 0,
+  RowHeight: 0
+};
 var g_sNewSheetNamePattern = "Sheet";
 var g_nSheetNameMaxLength = 31;
 var g_nAllColIndex = -1;
 var g_nAllRowIndex = -1;
-var aStandartNumFormats;
-var aStandartNumFormatsId;
-var start, end, arrRecalc = {}, arrDefNameRecalc = {}, lc = 0, gFormulaLocaleParse = true, gFormulaLocaleDigetSep = true;
+var aStandartNumFormats = [];
+var aStandartNumFormatsId = {};
+var arrRecalc = {}, arrDefNameRecalc = {}, lc = 0;
+var oFormulaLocaleInfo = {
+  Parse: true,
+  DigitSep: true
+};
+
+  (function(){
+    aStandartNumFormats[0] = "General";
+    aStandartNumFormats[1] = "0";
+    aStandartNumFormats[2] = "0.00";
+    aStandartNumFormats[3] = "#,##0";
+    aStandartNumFormats[4] = "#,##0.00";
+    aStandartNumFormats[9] = "0%";
+    aStandartNumFormats[10] = "0.00%";
+    aStandartNumFormats[11] = "0.00E+00";
+    aStandartNumFormats[12] = "# ?/?";
+    aStandartNumFormats[13] = "# ??/??";
+    aStandartNumFormats[14] = "m/d/yyyy";
+    aStandartNumFormats[15] = "d-mmm-yy";
+    aStandartNumFormats[16] = "d-mmm";
+    aStandartNumFormats[17] = "mmm-yy";
+    aStandartNumFormats[18] = "h:mm AM/PM";
+    aStandartNumFormats[19] = "h:mm:ss AM/PM";
+    aStandartNumFormats[20] = "h:mm";
+    aStandartNumFormats[21] = "h:mm:ss";
+    aStandartNumFormats[22] = "m/d/yyyy h:mm";
+    aStandartNumFormats[37] = "#,##0_);(#,##0)";
+    aStandartNumFormats[38] = "#,##0_);[Red](#,##0)";
+    aStandartNumFormats[39] = "#,##0.00_);(#,##0.00)";
+    aStandartNumFormats[40] = "#,##0.00_);[Red](#,##0.00)";
+    aStandartNumFormats[45] = "mm:ss";
+    aStandartNumFormats[46] = "[h]:mm:ss";
+    aStandartNumFormats[47] = "mm:ss.0";
+    aStandartNumFormats[48] = "##0.0E+0";
+    aStandartNumFormats[49] = "@";
+    for(var i in aStandartNumFormats)
+    {
+      aStandartNumFormatsId[aStandartNumFormats[i]] = i - 0;
+    }
+  })();
 
 var c_oRangeType =
 {
@@ -73,11 +116,6 @@ function getRangeType(oBBox){
 		return c_oRangeType.Col;
 	else
 		return c_oRangeType.Range;
-}
-
-function consolelog(text){
-	if( window.g_debug_mode && console && console.log )
-		console.log(text);
 }
 
 /** @constructor */
@@ -1860,6 +1898,16 @@ function buildRecalc(_wb,notrec, bForce){
     if(!notrec)
 	    sortDependency(_wb)
 }
+function buildDefNameAfterRenameWorksheet() {
+  var dN;
+  for(var id in arrDefNameRecalc ){
+    dN  = arrDefNameRecalc[id];
+    if( !dN.parsedRef && dN.Ref ){
+      dN.parsedRef = new parserFormula(dN.Ref, "", ws.workbook.getWorksheet(0));
+      dN.parsedRef.parse();
+    }
+  }
+}
 
 function sortDependency( wb, setCellFormat ) {
 	if ( wb.isNeedCacheClean ){
@@ -1985,43 +2033,6 @@ function angleInterfaceToFormat(val)
 		nRes = 0;
 	return nRes;
 }
-//-------------------------------------------------------------------------------------------------
-(function(){
-	aStandartNumFormats = [];
-	aStandartNumFormats[0] = "General";
-	aStandartNumFormats[1] = "0";
-	aStandartNumFormats[2] = "0.00";
-	aStandartNumFormats[3] = "#,##0";
-	aStandartNumFormats[4] = "#,##0.00";
-	aStandartNumFormats[9] = "0%";
-	aStandartNumFormats[10] = "0.00%";
-	aStandartNumFormats[11] = "0.00E+00";
-	aStandartNumFormats[12] = "# ?/?";
-	aStandartNumFormats[13] = "# ??/??";
-	aStandartNumFormats[14] = "m/d/yyyy";
-	aStandartNumFormats[15] = "d-mmm-yy";
-	aStandartNumFormats[16] = "d-mmm";
-	aStandartNumFormats[17] = "mmm-yy";
-	aStandartNumFormats[18] = "h:mm AM/PM";
-	aStandartNumFormats[19] = "h:mm:ss AM/PM";
-	aStandartNumFormats[20] = "h:mm";
-	aStandartNumFormats[21] = "h:mm:ss";
-	aStandartNumFormats[22] = "m/d/yyyy h:mm";
-	aStandartNumFormats[37] = "#,##0_);(#,##0)";
-	aStandartNumFormats[38] = "#,##0_);[Red](#,##0)";
-	aStandartNumFormats[39] = "#,##0.00_);(#,##0.00)";
-	aStandartNumFormats[40] = "#,##0.00_);[Red](#,##0.00)";
-	aStandartNumFormats[45] = "mm:ss";
-	aStandartNumFormats[46] = "[h]:mm:ss";
-	aStandartNumFormats[47] = "mm:ss.0";
-	aStandartNumFormats[48] = "##0.0E+0";
-	aStandartNumFormats[49] = "@";
-	aStandartNumFormatsId = {};
-	for(var i in aStandartNumFormats)
-	{
-		aStandartNumFormatsId[aStandartNumFormats[i]] = i - 0;
-	}
-})();
 //-------------------------------------------------------------------------------------------------
 /**
  * @constructor
@@ -2966,8 +2977,8 @@ Workbook.prototype.DeserializeHistory = function(aChanges, fCallback){
                         wsViews[i].objectRender.controller.resetSelection();
                     }
                 }
-				gFormulaLocaleParse = false;
-				gFormulaLocaleDigetSep = false;
+      oFormulaLocaleInfo.Parse = false;
+      oFormulaLocaleInfo.DigitSep = false;
                 History.Clear();
 				History.Create_NewPoint();
 
@@ -3006,8 +3017,8 @@ Workbook.prototype.DeserializeHistory = function(aChanges, fCallback){
                         }
                     }
                 }
-				gFormulaLocaleParse = true;
-				gFormulaLocaleDigetSep = true;
+      oFormulaLocaleInfo.Parse = true;
+      oFormulaLocaleInfo.DigitSep = true;
 				History.UndoRedoEnd(null, oRedoObjectParam, false);
 
 				oThis.bCollaborativeChanges = false;
@@ -4121,7 +4132,7 @@ Woorksheet.prototype.setColBestFit=function(bBestFit, width, start, stop){
 	if(0 != start && gc_nMaxCol0 == stop)
 	{
 		var col = null;
-		if(bBestFit && gc_dDefaultColWidthCharsAttribute == width)
+		if(bBestFit && oDefaultMetrics.ColWidthChars == width)
 			col = this.oAllCol;
 		else
 			col = this.getAllCol();
@@ -4137,7 +4148,7 @@ Woorksheet.prototype.setColBestFit=function(bBestFit, width, start, stop){
 	{
 		for(var i = start; i <= stop; i++){
 			var col = null;
-			if(bBestFit && gc_dDefaultColWidthCharsAttribute == width)
+			if(bBestFit && oDefaultMetrics.ColWidthChars == width)
 				col = this._getColNoEmpty(i);
 			else
 				col = this._getCol(i);
@@ -4277,7 +4288,7 @@ Woorksheet.prototype.setRowBestFit=function(bBestFit, height, start, stop){
 		stop = start;
 	History.Create_NewPoint();
 	var oThis = this, i;
-    var isDefaultProp = (true == bBestFit && gc_dDefaultRowHeightAttribute == height);
+    var isDefaultProp = (true == bBestFit && oDefaultMetrics.RowHeight == height);
 	var fProcessRow = function(row){
 		if(row)
 		{
@@ -5472,9 +5483,9 @@ Cell.prototype.setValue=function(val,callback, isCopyPaste){
 			var cellId = g_oCellAddressUtils.getCellId(this.nRow, this.nCol);
             this.formulaParsed = new parserFormula(val.substring(1),cellId,this.ws);
 			
-			var formulaLocaleParse = isCopyPaste === true ? false : gFormulaLocaleParse;
-			var formulaLocaleDigetSep = isCopyPaste === true ? false : gFormulaLocaleDigetSep;
-			if( !this.formulaParsed.parse( gFormulaLocaleParse, formulaLocaleDigetSep ) ){
+			var formulaLocaleParse = isCopyPaste === true ? false : oFormulaLocaleInfo.Parse;
+			var formulaLocaleDigetSep = isCopyPaste === true ? false : oFormulaLocaleInfo.DigitSep;
+			if( !this.formulaParsed.parse( formulaLocaleParse, formulaLocaleDigetSep ) ){
 				switch( this.formulaParsed.error[this.formulaParsed.error.length-1] ){
 					case c_oAscError.ID.FrmlWrongFunctionName:
 						break;
@@ -8940,11 +8951,11 @@ Range.prototype.promote=function(bCtrl, bVertical, nIndex){
 		}
 		History.SetSelectionRedo(oSelectionRedo);
 	}
-	gFormulaLocaleParse = false;
-	gFormulaLocaleDigetSep = false;
+  oFormulaLocaleInfo.Parse = false;
+  oFormulaLocaleInfo.DigitSep = false;
 	_promoteFromTo(oBBox, this.worksheet, oPromoteAscRange, this.worksheet, true, oCanPromote, bCtrl, bVertical, nIndex);
-	gFormulaLocaleParse = true;
-	gFormulaLocaleDigetSep = true;
+  oFormulaLocaleInfo.Parse = true;
+  oFormulaLocaleInfo.DigitSep = true;
 	return true;
 };
 function _promoteFromTo(from, wsFrom, to, wsTo, bIsPromote, oCanPromote, bCtrl, bVertical, nIndex) {
@@ -9730,3 +9741,28 @@ DrawingObjectsManager.prototype.rebuildCharts = function(data)
         }
     }
 };
+
+  window['AscCommonExcel'] = window['AscCommonExcel'] || {};
+  window['AscCommonExcel'].g_nVerticalTextAngle = g_nVerticalTextAngle;
+  window['AscCommonExcel'].oDefaultMetrics = oDefaultMetrics;
+  window['AscCommonExcel'].g_nAllColIndex = g_nAllColIndex;
+  window['AscCommonExcel'].g_nAllRowIndex = g_nAllRowIndex;
+  window['AscCommonExcel'].aStandartNumFormats = aStandartNumFormats;
+  window['AscCommonExcel'].aStandartNumFormatsId = aStandartNumFormatsId;
+  window['AscCommonExcel'].oFormulaLocaleInfo = oFormulaLocaleInfo;
+  window['AscCommonExcel'].DependencyGraph = DependencyGraph;
+  window['AscCommonExcel'].getVertexId = getVertexId;
+  window['AscCommonExcel'].lockDraw = lockDraw;
+  window['AscCommonExcel'].unLockDraw = unLockDraw;
+  window['AscCommonExcel'].buildRecalc = buildRecalc;
+  window['AscCommonExcel'].buildDefNameAfterRenameWorksheet = buildDefNameAfterRenameWorksheet;
+  window['AscCommonExcel'].angleFormatToInterface2 = angleFormatToInterface2;
+  window['AscCommonExcel'].angleInterfaceToFormat = angleInterfaceToFormat;
+  window['AscCommonExcel'].Workbook = Workbook;
+  window['AscCommonExcel'].Woorksheet = Woorksheet;
+  window['AscCommonExcel'].Cell = Cell;
+  window['AscCommonExcel'].Range = Range;
+  window['AscCommonExcel'].preparePromoteFromTo = preparePromoteFromTo;
+  window['AscCommonExcel'].promoteFromTo = promoteFromTo;
+  window['AscCommonExcel'].DefinedName = DefinedName;
+})(window);

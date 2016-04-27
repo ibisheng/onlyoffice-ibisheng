@@ -79,8 +79,9 @@
 		
 		"../cell/utils/utils.js",
 		"../cell/model/WorkbookElems.js",
+		"../cell/model/Workbook.js",
 		"../cell/model/Serialize.js",
-		"../cell/model/CellInfo.js"
+		"../cell/model/CellInfo.js",
 		
         "../word/Drawing/translations.js",
         "../word/Editor/GraphicObjects/Format/ShapePrototype.js",
@@ -144,8 +145,7 @@
         "../word/Math/radical.js",
         "../word/Math/operators.js",
         "../word/Math/accent.js",
-        "../word/Math/borderBox.js",
-        "../cell/model/Workbook.js",
+        "../word/Math/borderBox.js"
       ],
       "private": [
         "../common/Private/license.js",

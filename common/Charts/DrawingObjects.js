@@ -2089,14 +2089,14 @@ function DrawingObjects() {
             for (var i = 0; i < aObjects.length; i++) {
                 aObjects[i].graphicObject.deleteDrawingBase();
             }
-            var listRange = new Range(worksheet.model, 0, 0, worksheet.nRowsCount - 1, worksheet.nColsCount - 1);
+            var listRange = new AscCommonExcel.Range(worksheet.model, 0, 0, worksheet.nRowsCount - 1, worksheet.nColsCount - 1);
             listRange.cleanAll();
             worksheet._clean();
             History.Clear();
 
             History.TurnOff();
             aObjects.length = 0;
-            var listRange = new Range(worksheet.model, 0, 0, worksheet.nRowsCount - 1, worksheet.nColsCount - 1);
+            var listRange = new AscCommonExcel.Range(worksheet.model, 0, 0, worksheet.nRowsCount - 1, worksheet.nColsCount - 1);
             listRange.cleanAll();
             if ( worksheet.isChartAreaEditMode ) {
                 worksheet.isChartAreaEditMode = false;

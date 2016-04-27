@@ -97,10 +97,10 @@
         "../cell/model/FormulaObjects/logicalFunctions.js",
 		"../cell/model/CellComment.js",
         "../cell/model/WorkbookElems.js",
+		"../cell/model/Workbook.js",
 		"../cell/model/Serialize.js",
 		"../cell/model/CellInfo.js",
 		
-        "../cell/model/Workbook.js",
         "../cell/model/History.js",
         "../cell/view/mobileTouch.js",
         "../cell/view/StringRender.js",

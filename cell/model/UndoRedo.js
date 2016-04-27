@@ -833,9 +833,10 @@ function UndoRedoData_ColProp(col){
 UndoRedoData_ColProp.prototype = {
 	isEqual : function(val)
 	{
+		var defaultColWidth = AscCommonExcel.oDefaultMetrics.ColWidthChars;
 		return this.hd == val.hd && this.CustomWidth == val.CustomWidth && ((this.BestFit == val.BestFit && this.width == val.width) ||
-			((null == this.width || gc_dDefaultColWidthCharsAttribute == this.width) && (null == this.BestFit || true == this.BestFit) &&
-			(null == val.width || gc_dDefaultColWidthCharsAttribute == val.width) && (null == val.BestFit || true == val.BestFit)));
+			((null == this.width || defaultColWidth == this.width) && (null == this.BestFit || true == this.BestFit) &&
+			(null == val.width || defaultColWidth == val.width) && (null == val.BestFit || true == val.BestFit)));
 	},
 	getType : function()
 	{
@@ -890,9 +891,10 @@ function UndoRedoData_RowProp(row){
 UndoRedoData_RowProp.prototype = {
 	isEqual : function(val)
 	{
+		var defaultRowHeight = AscCommonExcel.oDefaultMetrics.RowHeight;
 		return this.hd == val.hd && ((this.CustomHeight == val.CustomHeight && this.h == val.h) ||
-			((null == this.h || gc_dDefaultRowHeightAttribute == this.h) && (null == this.CustomHeight || false == this.CustomHeight) &&
-			(null == val.h || gc_dDefaultRowHeightAttribute == val.h) && (null == val.CustomHeight || false == val.CustomHeight)));
+			((null == this.h || defaultRowHeight == this.h) && (null == this.CustomHeight || false == this.CustomHeight) &&
+			(null == val.h || defaultRowHeight == val.h) && (null == val.CustomHeight || false == val.CustomHeight)));
 	},
 	getType : function()
 	{
@@ -3170,7 +3172,7 @@ UndoRedoWoorksheet.prototype = {
 			index = Data.index;
 			if(false != this.wb.bCollaborativeChanges)
 			{
-			    if (g_nAllColIndex == index) {
+			    if (AscCommonExcel.g_nAllColIndex == index) {
 			        range = new Asc.Range(0, 0, gc_nMaxCol0, gc_nMaxRow0);
 			    }
 			    else {
@@ -3514,14 +3516,7 @@ UndoRedoWoorksheet.prototype = {
 						if(null != oConflictWs)
 							oConflictWs.renameWsToCollaborate(this.wb.getUniqueSheetNameFrom(oConflictWs.getName(), true));
 					}
-                    var dN;
-                    for(var id in arrDefNameRecalc ){
-                        dN  = arrDefNameRecalc[id];
-                        if( !dN.parsedRef && dN.Ref ){
-                            dN.parsedRef = new AscCommonExcel.parserFormula(dN.Ref, "", ws.workbook.getWorksheet(0));
-                            dN.parsedRef.parse();
-                        }
-                    }
+					AscCommonExcel.buildDefNameAfterRenameWorksheet();
 				}
 				ws.setName(name, true);
 			}
@@ -3676,7 +3671,7 @@ UndoRedoRowCol.prototype = {
 			}
 			else
 			{
-			    if (g_nAllColIndex == nIndex) {
+			    if (AscCommonExcel.g_nAllColIndex == nIndex) {
 			        oLockInfo["rangeOrObjectId"] = new Asc.Range(0, 0, gc_nMaxCol0, gc_nMaxRow0);
 			    }
 			    else{

@@ -40,6 +40,7 @@ var g_oColorManager = null;
 		AlignAbs: null
 	};
 
+var g_nHSLMaxValue = 255;
 var g_nColorTextDefault = 1;
 var g_nColorHyperlink = 10;
 var g_nColorHyperlinkVisited = 11;
@@ -1984,11 +1985,11 @@ StyleManager.prototype =
     {
         var xfs = oItemWithXfs.xfs;
 		var oRes = {newVal: val, oldVal: null};
-		val = angleInterfaceToFormat(val);
+		val = AscCommonExcel.angleInterfaceToFormat(val);
         if(null != xfs && null != xfs.align)
-            oRes.oldVal = angleFormatToInterface2(xfs.align.angle);
+            oRes.oldVal = AscCommonExcel.angleFormatToInterface2(xfs.align.angle);
 		else
-			oRes.oldVal = angleFormatToInterface2(g_oDefaultFormat.Align.angle);
+			oRes.oldVal = AscCommonExcel.angleFormatToInterface2(g_oDefaultFormat.Align.angle);
         if(null == val)
         {
             if(null != xfs && null != xfs.align) {
@@ -2006,7 +2007,7 @@ StyleManager.prototype =
 	setVerticalText : function(oItemWithXfs, val)
     {
 		if(true == val)
-			return this.setAngle(oItemWithXfs, g_nVerticalTextAngle);
+			return this.setAngle(oItemWithXfs, AscCommonExcel.g_nVerticalTextAngle);
 		else
 			return this.setAngle(oItemWithXfs, 0);
     }
@@ -2250,7 +2251,7 @@ Col.prototype =
 		return this.xfs;
 	},
 	_getUpdateRange: function () {
-	    if (g_nAllColIndex == this.index)
+	    if (AscCommonExcel.g_nAllColIndex == this.index)
 	        return new Asc.Range(0, 0, gc_nMaxCol0, gc_nMaxRow0);
 	    else
 	        return new Asc.Range(this.index, 0, this.index, gc_nMaxRow0);
@@ -2528,7 +2529,7 @@ Row.prototype =
 		return this.xfs;
 	},
 	_getUpdateRange: function () {
-	    if (g_nAllRowIndex == this.index)
+	    if (AscCommonExcel.g_nAllRowIndex == this.index)
 	        return new Asc.Range(0, 0, gc_nMaxCol0, gc_nMaxRow0);
 	    else
 	        return new Asc.Range(0, this.index, gc_nMaxCol0, this.index);

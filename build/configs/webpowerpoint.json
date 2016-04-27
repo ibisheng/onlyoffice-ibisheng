@@ -76,8 +76,9 @@
 		
 		"../cell/utils/utils.js",
 		"../cell/model/WorkbookElems.js",
+		"../cell/model/Workbook.js",
 		"../cell/model/Serialize.js",
-		"../cell/model/CellInfo.js"
+		"../cell/model/CellInfo.js",
 		
         "../slide/Drawing/ThemeLoader.js",
         "../word/Editor/Serialize2.js",
@@ -146,8 +147,7 @@
         "../slide/api.js",
         "../slide/apiCommon.js",
         "../word/apiCommon.js",
-        "../slide/apiExport.js",
-        "../cell/model/Workbook.js",
+        "../slide/apiExport.js"
       ],
       "private": [
         "../common/Private/license.js",

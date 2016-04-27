@@ -392,7 +392,7 @@ $( function () {
         sData = data + "";
     if ( Asc.c_oSerFormat.Signature === sData.substring( 0, Asc.c_oSerFormat.Signature.length ) ) {
         var sUrlPath = "offlinedocs/";
-        wb = new Workbook( new Asc.asc_CHandlersList(), {wb:{getWorksheet:function(){}}} );
+        wb = new AscCommonExcel.Workbook( new Asc.asc_CHandlersList(), {wb:{getWorksheet:function(){}}} );
 
         History = new CHistory(wb);
 
@@ -1237,7 +1237,7 @@ $( function () {
 
     test( "Test: \"TEXT\"", function () {
 
-        wb.dependencyFormulas = new DependencyGraph( wb );
+        wb.dependencyFormulas = new AscCommonExcel.DependencyGraph( wb );
 
         oParser = new parserFormula( "TEXT(1234.567,\"$0.00\")", "A2", ws );
         ok( oParser.parse() );
@@ -1251,7 +1251,7 @@ $( function () {
 
     test( "Test: \"WORKDAY\"", function () {
 
-        wb.dependencyFormulas = new DependencyGraph( wb );
+        wb.dependencyFormulas = new AscCommonExcel.DependencyGraph( wb );
 
         oParser = new parserFormula( "WORKDAY(DATE(2006,1,1),0)", "A2", ws );
         ok( oParser.parse() );

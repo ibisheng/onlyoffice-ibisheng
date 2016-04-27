@@ -2482,7 +2482,7 @@
                     if(null != ws.oSheetFormatPr.dDefaultColWidth)
                         oRes.width = ws.oSheetFormatPr.dDefaultColWidth;
                     else
-                        oRes.width = gc_dDefaultColWidthCharsAttribute;
+                        oRes.width = AscCommonExcel.oDefaultMetrics.ColWidthChars;
                 }
                 if(null != col.xfs)
                     oRes.xfsid = oThis.prepareXfs(col.xfs);
@@ -3174,7 +3174,7 @@
         {
             var numid = null;
             //стандартные форматы не записываем в map, на них можно ссылаться по id
-            var nStandartId = aStandartNumFormatsId[num.f];
+            var nStandartId = AscCommonExcel.aStandartNumFormatsId[num.f];
             if(null == nStandartId)
             {
                 var sHash = this._getStringFromObjWithProperty(num);
@@ -4683,7 +4683,7 @@
                 }
                 else
                 {
-                    var sStandartNumFormat  = aStandartNumFormats[oNum.id];
+                    var sStandartNumFormat  = AscCommonExcel.aStandartNumFormats[oNum.id];
                     if(null != sStandartNumFormat)
                         sFormat = sStandartNumFormat;
                 }
@@ -5331,7 +5331,7 @@
             var oThis = this;
             if ( c_oSerWorkbookTypes.DefinedName == type )
             {
-                var oNewDefinedName = new DefinedName();
+                var oNewDefinedName = new AscCommonExcel.DefinedName();
                 res = this.bcr.Read1(length, function(t,l){
                     return oThis.ReadDefinedName(t,l,oNewDefinedName);
                 });
@@ -5391,7 +5391,7 @@
             {
                 this.aMerged = [];
                 this.aHyperlinks = [];
-                var oNewWorksheet = new Woorksheet(this.wb, wb.aWorksheets.length);
+                var oNewWorksheet = new AscCommonExcel.Woorksheet(this.wb, wb.aWorksheets.length);
                 oNewWorksheet.aFormulaExt = [];
 				
 				//TODO при copy/paste в word из excel необходимо подменить DrawingDocument из word - пересмотреть правку!
@@ -5872,7 +5872,7 @@
             var oThis = this;
             if ( c_oSerRowTypes.Cell == type )
             {
-                var oNewCell = new Cell(ws);
+                var oNewCell = new AscCommonExcel.Cell(ws);
                 res = this.bcr.Read1(length, function(t,l){
                     return oThis.ReadCell(t,l, ws, oNewCell, row.index);
                 });

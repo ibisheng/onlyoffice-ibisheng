@@ -103,7 +103,7 @@
   /**
    * Widget for displaying and editing Workbook object
    * -----------------------------------------------------------------------------
-   * @param {Workbook} model                        Workbook
+   * @param {AscCommonExcel.Workbook} model                        Workbook
    * @param {asc_CEventsController} controller          Events controller
    * @param {HandlersList} handlers                  Events handlers for WorkbookView events
    * @param {Element} elem                          Container element
@@ -2018,8 +2018,9 @@
   };
 
   WorkbookView.prototype.undo = function() {
-	gFormulaLocaleParse = false;
-	gFormulaLocaleDigetSep = false;
+    var oFormulaLocaleInfo = AscCommonExcel.oFormulaLocaleInfo;
+    oFormulaLocaleInfo.Parse = false;
+    oFormulaLocaleInfo.DigitSep = false;
     if (!this.getCellEditMode()) {
       if (!History.Undo() && this.collaborativeEditing.getFast() && this.collaborativeEditing.getCollaborativeEditing()) {
         this.Api.sync_TryUndoInFastCollaborative();
@@ -2027,8 +2028,8 @@
     } else {
       this.cellEditor.undo();
     }
-	gFormulaLocaleParse = true;
-	gFormulaLocaleDigetSep = true;
+    oFormulaLocaleInfo.Parse = true;
+    oFormulaLocaleInfo.DigitSep = true;
   };
 
   WorkbookView.prototype.redo = function() {

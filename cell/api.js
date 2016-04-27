@@ -467,7 +467,7 @@ var editor;
   };
 
   spreadsheet_api.prototype._openDocument = function(data) {
-    var wb = new Workbook(this.handlers, this);
+    var wb = new AscCommonExcel.Workbook(this.handlers, this);
     this.initGlobalObjects(wb);
     this.wbModel = wb;
     var oBinaryFileReader = new Asc.BinaryFileReader();
@@ -3139,7 +3139,7 @@ var editor;
     this.User.setId("TM");
     this.User.setUserName("native");
 
-    this.wbModel = new Workbook(this.handlers, this);
+    this.wbModel = new AscCommonExcel.Workbook(this.handlers, this);
     this.initGlobalObjects(this.wbModel);
 
     var oBinaryFileReader = new Asc.BinaryFileReader();

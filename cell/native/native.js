@@ -3378,6 +3378,7 @@ function OfflineEditor () {
             var addt, addl, addr, addb, colsCount = this.cols.length - 1, rowsCount = this.rows.length - 1;
             var defaultWidth = this.model.getDefaultWidth();
             defaultWidth = (typeof defaultWidth === "number" && defaultWidth >= 0) ? defaultWidth : -1;
+            var defaultRowHeight = AscCommonExcel.oDefaultMetrics.RowHeight;
 
             for (i = 0; i < arrRanges.length; ++i) {
                 ranges.push(undefined !== rangetype ? rangetype : arrRanges[i].type);
@@ -3400,7 +3401,7 @@ function OfflineEditor () {
                         left = this.cols[arrRanges[i].c1].left - offsetX;
 
                     if (addt > 0)
-                        top = this.rows[rowsCount - 1].top + addt * gc_dDefaultRowHeightAttribute - offsetY;
+                        top = this.rows[rowsCount - 1].top + addt * defaultRowHeight - offsetY;
                     else
                         top = this.rows[arrRanges[i].r1].top - offsetY;
 
@@ -3410,7 +3411,7 @@ function OfflineEditor () {
                         right = this.cols[arrRanges[i].c2].left + this.cols[arrRanges[i].c2].width - offsetX;
 
                     if (addb > 0)
-                        bottom = this.rows[rowsCount - 1].top + addb * gc_dDefaultRowHeightAttribute - offsetY;
+                        bottom = this.rows[rowsCount - 1].top + addb * defaultRowHeight - offsetY;
                     else
                         bottom = this.rows[arrRanges[i].r2].top + this.rows[arrRanges[i].r2].height - offsetY;
                 }
@@ -3421,7 +3422,7 @@ function OfflineEditor () {
                         left = this.cols[arrRanges[i].c1].left - offsetX;
 
                     if (addt > 0)
-                        top = this.rows[rowsCount - 1].top + addt * gc_dDefaultRowHeightAttribute - offsetY;
+                        top = this.rows[rowsCount - 1].top + addt * defaultRowHeight - offsetY;
                     else
                         top = this.rows[arrRanges[i].r1].top - offsetY;
 
@@ -3439,14 +3440,14 @@ function OfflineEditor () {
                         left = this.cols[arrRanges[i].c1].left - offsetX;
 
                     if (addt > 0)
-                        top = this.rows[rowsCount - 1].top + addt * gc_dDefaultRowHeightAttribute - offsetY;
+                        top = this.rows[rowsCount - 1].top + addt * defaultRowHeight - offsetY;
                     else
                         top = this.rows[arrRanges[i].r1].top - offsetY;
 
                     right = 0;
 
                     if (addb > 0)
-                        bottom = this.rows[rowsCount - 1].top + addb * gc_dDefaultRowHeightAttribute - offsetY;
+                        bottom = this.rows[rowsCount - 1].top + addb * defaultRowHeight - offsetY;
                     else
                         bottom  = this.rows[arrRanges[i].r2].top + this.rows[arrRanges[i].r2].height - offsetY;
                 }
@@ -3457,7 +3458,7 @@ function OfflineEditor () {
                         left = this.cols[arrRanges[i].c1].left - offsetX;
 
                     if (addt > 0)
-                        top = this.rows[rowsCount - 1].top + addt * gc_dDefaultRowHeightAttribute - offsetY;
+                        top = this.rows[rowsCount - 1].top + addt * defaultRowHeight - offsetY;
                     else
                         top = this.rows[arrRanges[i].r1].top - offsetY;
 
@@ -3470,7 +3471,7 @@ function OfflineEditor () {
                         left = this.cols[Math.max(0,arrRanges[i].c1)].left - offsetX;
 
                     if (addt > 0)
-                        top = this.rows[rowsCount - 1].top + addt * gc_dDefaultRowHeightAttribute - offsetY;
+                        top = this.rows[rowsCount - 1].top + addt * defaultRowHeight - offsetY;
                     else
                         top = this.rows[Math.max(0,arrRanges[i].r1)].top - offsetY;
 
@@ -3480,7 +3481,7 @@ function OfflineEditor () {
                         right = this.cols[Math.max(0,arrRanges[i].c2)].left + this.cols[Math.max(0,arrRanges[i].c2)].width - offsetX;
 
                     if (addb > 0)
-                        bottom = this.rows[rowsCount - 1].top + addb * gc_dDefaultRowHeightAttribute - offsetY;
+                        bottom = this.rows[rowsCount - 1].top + addb * defaultRowHeight - offsetY;
                     else
                         bottom = this.rows[Math.max(0,arrRanges[i].r2)].top + this.rows[Math.max(0,arrRanges[i].r2)].height - offsetY;
                 }

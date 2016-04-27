@@ -1684,7 +1684,7 @@
 			_pasteFromBinaryExcel: function(worksheet, base64, isIntoShape)
 			{
 				var oBinaryFileReader = new Asc.BinaryFileReader(true);
-				var tempWorkbook = new Workbook;
+				var tempWorkbook = new AscCommonExcel.Workbook();
 				var t = this;
 				
 				window.global_pptx_content_loader.Start_UseFullUrl();
