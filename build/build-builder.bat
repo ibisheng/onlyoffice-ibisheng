@@ -1,6 +1,10 @@
 CD /D %~dp0
 call npm install -g grunt-cli
 call npm install
-call grunt --level=WHITESPACE_ONLY --mobile=true --formatting=PRETTY_PRINT
-copy ..\slide\sdk-all.js ..\..\core\test_mobile\sdk-all.js
+rem call grunt --level=WHITESPACE_ONLY --builder=true --formatting=PRETTY_PRINT
+call grunt --level=ADVANCED --builder=true
+copy ..\word\sdk-all.js ..\..\core\build\jsbuilder\sdkjs\word\sdk-all.js
+copy ..\slide\sdk-all.js ..\..\core\build\jsbuilder\sdkjs\slide\sdk-all.js
+copy ..\cell\sdk-all.js ..\..\core\build\jsbuilder\sdkjs\cell\sdk-all.js
+copy ..\common\Native\native.js ..\..\core\build\jsbuilder\sdkjs\common\Native\native.js
 pause
