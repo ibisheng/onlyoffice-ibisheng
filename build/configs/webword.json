@@ -128,7 +128,6 @@
         "../word/Drawing/Rulers.js",
         "../word/Drawing/HtmlPage.js",
         "../word/Drawing/documentrenderer.js",
-        "../word/Editor/SerializeCommon.js",
         "../common/apiBase.js",
         "../word/api.js",
         "../word/apiCommon.js",

@@ -4130,8 +4130,404 @@ function CBinaryFileWriter()
     // --------------------------------------------------------------------------
 }
 
+    function CPPTXContentWriter()
+    {
+        this.BinaryFileWriter = new AscCommon.CBinaryFileWriter();
+        this.BinaryFileWriter.Init();
+        //this.BinaryFileWriter.IsWordWriter = true;
+
+        this.TreeDrawingIndex = 0;
+
+        this.ShapeTextBoxContent = null;
+        this.arrayStackStartsTextBoxContent = [];
+
+        this.arrayStackStarts = [];
+
+        this.Start_UseFullUrl = function()
+        {
+            this.BinaryFileWriter.Start_UseFullUrl();
+        }
+        this.Start_UseDocumentOrigin = function(origin)
+        {
+            this.BinaryFileWriter.Start_UseDocumentOrigin(origin);
+        }
+        this.End_UseFullUrl = function()
+        {
+            return this.BinaryFileWriter.End_UseFullUrl();
+        }
+
+        this._Start = function()
+        {
+            this.ShapeTextBoxContent = new AscCommon.CMemory();
+            this.arrayStackStartsTextBoxContent = [];
+            this.arrayStackStarts = [];
+        }
+        this._End = function()
+        {
+            this.ShapeTextBoxContent = null;
+        }
+        this.WriteTextBody = function(memory, textBody)
+        {
+            if (this.BinaryFileWriter.UseContinueWriter)
+            {
+                this.BinaryFileWriter.ImData = memory.ImData;
+                this.BinaryFileWriter.data = memory.data;
+                this.BinaryFileWriter.len = memory.len;
+                this.BinaryFileWriter.pos = memory.pos;
+            }
+            else
+            {
+                this.TreeDrawingIndex++;
+                this.arrayStackStarts.push(this.BinaryFileWriter.pos);
+            }
+
+            var _writer = this.BinaryFileWriter;
+            _writer.StartRecord(0);
+            _writer.WriteTxBody(textBody);
+            _writer.EndRecord();
+
+            if (this.BinaryFileWriter.UseContinueWriter)
+            {
+                memory.ImData = this.BinaryFileWriter.ImData;
+                memory.data = this.BinaryFileWriter.data;
+                memory.len = this.BinaryFileWriter.len;
+                memory.pos = this.BinaryFileWriter.pos;
+            }
+            else
+            {
+                this.TreeDrawingIndex--;
+
+                var oldPos = this.arrayStackStarts[this.arrayStackStarts.length - 1];
+                memory.WriteBuffer(this.BinaryFileWriter.data, oldPos, this.BinaryFileWriter.pos - oldPos);
+                this.BinaryFileWriter.pos = oldPos;
+
+                this.arrayStackStarts.splice(this.arrayStackStarts.length - 1, 1);
+            }
+        }
+        this.WriteSpPr = function(memory, spPr, type)
+        {
+            if (this.BinaryFileWriter.UseContinueWriter)
+            {
+                this.BinaryFileWriter.ImData = memory.ImData;
+                this.BinaryFileWriter.data = memory.data;
+                this.BinaryFileWriter.len = memory.len;
+                this.BinaryFileWriter.pos = memory.pos;
+            }
+            else
+            {
+                this.TreeDrawingIndex++;
+                this.arrayStackStarts.push(this.BinaryFileWriter.pos);
+            }
+
+            var _writer = this.BinaryFileWriter;
+            _writer.StartRecord(0);
+            if(0 == type)
+                _writer.WriteLn(spPr);
+            else if(1 == type)
+                _writer.WriteUniFill(spPr);
+            else
+                _writer.WriteSpPr(spPr);
+            _writer.EndRecord();
+
+            if (this.BinaryFileWriter.UseContinueWriter)
+            {
+                memory.ImData = this.BinaryFileWriter.ImData;
+                memory.data = this.BinaryFileWriter.data;
+                memory.len = this.BinaryFileWriter.len;
+                memory.pos = this.BinaryFileWriter.pos;
+            }
+            else
+            {
+                this.TreeDrawingIndex--;
+
+                var oldPos = this.arrayStackStarts[this.arrayStackStarts.length - 1];
+                memory.WriteBuffer(this.BinaryFileWriter.data, oldPos, this.BinaryFileWriter.pos - oldPos);
+                this.BinaryFileWriter.pos = oldPos;
+
+                this.arrayStackStarts.splice(this.arrayStackStarts.length - 1, 1);
+            }
+        }
+        this.WriteDrawing = function(memory, grObject, Document, oMapCommentId, oNumIdMap, copyParams, saveParams)
+        {
+            this.TreeDrawingIndex++;
+
+            this.arrayStackStarts.push(this.BinaryFileWriter.pos);
+
+            this.BinaryFileWriter.StartRecord(0);
+            this.BinaryFileWriter.StartRecord(1);
+            switch(grObject.getObjectType())
+            {
+                case AscDFH.historyitem_type_Shape:
+                {
+                    if(grObject.bWordShape)
+                    {
+                        this.WriteShape(grObject, Document, oMapCommentId, oNumIdMap, copyParams, saveParams);
+                    }
+                    else
+                    {
+                        this.WriteShape2(grObject, Document, oMapCommentId, oNumIdMap, copyParams, saveParams);
+                    }
+                    break;
+                }
+                case AscDFH.historyitem_type_ImageShape:
+                {
+                    this.WriteImage(grObject);
+                    break;
+                }
+                case AscDFH.historyitem_type_GroupShape:
+                {
+                    this.WriteGroup(grObject, Document, oMapCommentId, oNumIdMap, copyParams, saveParams);
+                    break;
+                }
+            }
+            this.BinaryFileWriter.EndRecord();
+            this.BinaryFileWriter.EndRecord();
+
+            this.TreeDrawingIndex--;
+
+            var oldPos = this.arrayStackStarts[this.arrayStackStarts.length - 1];
+            memory.WriteBuffer(this.BinaryFileWriter.data, oldPos, this.BinaryFileWriter.pos - oldPos);
+            this.BinaryFileWriter.pos = oldPos;
+
+            this.arrayStackStarts.splice(this.arrayStackStarts.length - 1, 1);
+        }
+
+        this.WriteShape2 = function(shape, Document, oMapCommentId, oNumIdMap, copyParams, saveParams)
+        {
+            var _writer = this.BinaryFileWriter;
+            _writer.WriteShape(shape);
+        }
+
+        this.WriteShape = function(shape, Document, oMapCommentId, oNumIdMap, copyParams, saveParams)
+        {
+            var _writer = this.BinaryFileWriter;
+            _writer.StartRecord(1);
+
+            _writer.WriteUChar(AscCommon.g_nodeAttributeStart);
+            _writer._WriteBool2(0, shape.attrUseBgFill);
+            _writer.WriteUChar(AscCommon.g_nodeAttributeEnd);
+
+            shape.spPr.WriteXfrm = shape.spPr.xfrm;
+
+            shape.spPr.Geometry = shape.spPr.geometry;
+
+            var tmpFill = shape.spPr.Fill;
+            var isUseTmpFill = false;
+            if (tmpFill !== undefined && tmpFill != null)
+            {
+                var trans = ((tmpFill.transparent != null) && (tmpFill.transparent != 255)) ? tmpFill.transparent : null;
+                if (trans != null)
+                {
+                    if (tmpFill.fill === undefined || tmpFill.fill == null)
+                    {
+                        isUseTmpFill = true;
+                        shape.spPr.Fill = shape.brush;
+                    }
+                }
+            }
+
+            //_writer.WriteRecord1(0, shape.nvSpPr, _writer.WriteUniNvPr);
+            _writer.WriteRecord1(1, shape.spPr, _writer.WriteSpPr);
+            _writer.WriteRecord2(2, shape.style, _writer.WriteShapeStyle);
+            //_writer.WriteRecord2(3, shape.txBody, _writer.WriteTxBody);
+
+            if (shape.textBoxContent)
+            {
+                _writer.StartRecord(4);
+
+                var memory = this.ShapeTextBoxContent;
+
+                this.arrayStackStartsTextBoxContent.push(memory.pos);
+
+                var bdtw = new BinaryDocumentTableWriter(memory, Document, oMapCommentId, oNumIdMap, copyParams, saveParams);
+                var bcw = new AscCommon.BinaryCommonWriter(memory);
+                bcw.WriteItemWithLength(function(){bdtw.WriteDocumentContent(shape.textBoxContent);});
+
+                var oldPos = this.arrayStackStartsTextBoxContent[this.arrayStackStartsTextBoxContent.length - 1];
+                _writer.WriteBuffer(memory.data, oldPos, memory.pos - oldPos);
+                memory.pos = oldPos;
+                this.arrayStackStartsTextBoxContent.splice(this.arrayStackStartsTextBoxContent.length - 1, 1);
+
+                _writer.EndRecord();
+
+                _writer.StartRecord(5);
+                _writer.WriteBodyPr(shape.bodyPr);
+                _writer.EndRecord();
+            }
+
+            delete shape.spPr.Geometry;
+            if (isUseTmpFill)
+            {
+                shape.spPr.Fill = tmpFill;
+            }
+
+            delete shape.spPr.WriteXfrm;
+
+            _writer.EndRecord();
+        }
+
+        this.WriteImage = function(image)
+        {
+            var _writer = this.BinaryFileWriter;
+
+            _writer.StartRecord(2);
+            //_writer.WriteRecord1(0, image.nvPicPr, _writer.WriteUniNvPr);
+
+            image.spPr.WriteXfrm = image.spPr.xfrm;
+
+            image.spPr.Geometry = image.spPr.geometry;
+            if (image.spPr.Geometry === undefined || image.spPr.Geometry == null)
+            {
+                // powerpoint!
+                image.spPr.Geometry = AscFormat.CreateGeometry("rect");
+            }
+
+            var _unifill = null;
+            if (image.blipFill instanceof AscFormat.CUniFill)
+            {
+                _unifill = image.blipFill;
+            }
+            else
+            {
+                _unifill = new AscFormat.CUniFill();
+                _unifill.fill = image.blipFill;
+            }
+
+            _writer.WriteRecord1(1, _unifill, _writer.WriteUniFill);
+            _writer.WriteRecord1(2, image.spPr, _writer.WriteSpPr);
+            _writer.WriteRecord2(3, image.style, _writer.WriteShapeStyle);
+
+            delete image.spPr.WriteXfrm;
+            delete image.spPr.Geometry;
+
+            _writer.EndRecord();
+        }
+
+        this.WriteImageBySrc = function(memory, src, w, h)
+        {
+            this.arrayStackStarts.push(this.BinaryFileWriter.pos);
+
+            var _writer = this.BinaryFileWriter;
+
+            _writer.StartRecord(0);
+            _writer.StartRecord(1);
+
+            _writer.StartRecord(2);
+            //_writer.WriteRecord1(0, image.nvPicPr, _writer.WriteUniNvPr);
+
+            var spPr = new AscFormat.CSpPr();
+            spPr.WriteXfrm = new AscFormat.CXfrm();
+            spPr.WriteXfrm.offX = 0;
+            spPr.WriteXfrm.offY = 0;
+            spPr.WriteXfrm.extX = w;
+            spPr.WriteXfrm.extY = h;
+
+            spPr.Geometry = AscFormat.CreateGeometry("rect");
+
+            var _unifill = new AscFormat.CUniFill();
+            _unifill.fill = new AscFormat.CBlipFill();
+            _unifill.fill.RasterImageId = src;
+
+            _writer.WriteRecord1(1, _unifill, _writer.WriteUniFill);
+            _writer.WriteRecord1(2, spPr, _writer.WriteSpPr);
+
+            _writer.EndRecord();
+
+            _writer.EndRecord();
+            _writer.EndRecord();
+
+            var oldPos = this.arrayStackStarts[this.arrayStackStarts.length - 1];
+            memory.WriteBuffer(this.BinaryFileWriter.data, oldPos, this.BinaryFileWriter.pos - oldPos);
+            this.BinaryFileWriter.pos = oldPos;
+
+            this.arrayStackStarts.splice(this.arrayStackStarts.length - 1, 1);
+        }
+
+        this.WriteGroup = function(group, Document, oMapCommentId, oNumIdMap, copyParams, saveParams)
+        {
+            var _writer = this.BinaryFileWriter;
+
+            _writer.StartRecord(4);
+
+            group.spPr.WriteXfrm = group.spPr.xfrm;
+            //if (group.spPr.WriteXfrm)
+            //{
+            //    group.spPr.WriteXfrm.chOffX = 0;
+            //    group.spPr.WriteXfrm.chOffY = 0;
+            //    group.spPr.WriteXfrm.chExtX = group.spPr.WriteXfrm.extX;
+            //    group.spPr.WriteXfrm.chExtY = group.spPr.WriteXfrm.extY;
+            //}
+
+            //_writer.WriteRecord1(0, group.nvGrpSpPr, oThis.WriteUniNvPr);
+            _writer.WriteRecord1(1, group.spPr, _writer.WriteGrpSpPr);
+
+            delete group.spPr.WriteXfrm;
+
+            var spTree = group.spTree;
+            var _len = spTree.length;
+            if (0 != _len)
+            {
+                _writer.StartRecord(2);
+                _writer.WriteULong(_len);
+
+                for (var i = 0; i < _len; i++)
+                {
+                    _writer.StartRecord(0);
+
+                    var elem = spTree[i];
+                    switch(elem.getObjectType())
+                    {
+                        case AscDFH.historyitem_type_Shape:
+                        {
+                            if(elem.bWordShape)
+                            {
+                                this.WriteShape(elem, Document, oMapCommentId, oNumIdMap, copyParams, saveParams);
+                            }
+                            else
+                            {
+                                this.WriteShape2(elem, Document, oMapCommentId, oNumIdMap, copyParams, saveParams);
+                            }
+                            break;
+                        }
+                        case AscDFH.historyitem_type_ImageShape:
+                        {
+                            this.WriteImage(elem);
+                            break;
+                        }
+                        case AscDFH.historyitem_type_GroupShape:
+                        {
+                            this.WriteGroup(elem, Document, oMapCommentId, oNumIdMap, copyParams, saveParams);
+                            break;
+                        }
+                        case AscDFH.historyitem_type_ChartSpace:
+                        {
+                            this.BinaryFileWriter.WriteChart(elem);
+                            break;
+                        }
+                    }
+
+                    _writer.EndRecord(0);
+                }
+
+                _writer.EndRecord();
+            }
+
+            _writer.EndRecord();
+        }
+
+        this.WriteTheme = function(memory, theme)
+        {
+            this.BinaryFileWriter.pos = 0;
+            this.BinaryFileWriter.WriteTheme(theme);
+
+            memory.WriteBuffer(this.BinaryFileWriter.data, 0, this.BinaryFileWriter.pos);
+            this.BinaryFileWriter.pos = 0;
+        }
+    }
+
     //--------------------------------------------------------export----------------------------------------------------
     window['AscCommon'] = window['AscCommon'] || {};
     window['AscCommon'].GUID = GUID;
     window['AscCommon'].CBinaryFileWriter = CBinaryFileWriter;
+    window['AscCommon'].pptx_content_writer = new CPPTXContentWriter();
 })(window);

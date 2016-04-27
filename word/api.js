@@ -666,7 +666,7 @@ asc_docs_api.prototype.OpenDocument2 = function(url, gObject)
 
 		// проверяем какие шрифты нужны
 		this.WordControl.m_oDrawingDocument.CheckFontNeeds();
-		window.global_pptx_content_loader.CheckImagesNeeds(this.WordControl.m_oLogicDocument);
+    AscCommon.pptx_content_loader.CheckImagesNeeds(this.WordControl.m_oLogicDocument);
 
 		//this.FontLoader.LoadEmbeddedFonts(this.DocumentUrl, this.WordControl.m_oLogicDocument.EmbeddedFonts);
 		this.FontLoader.LoadDocumentFonts(this.WordControl.m_oLogicDocument.Fonts, false);
@@ -7051,7 +7051,7 @@ asc_docs_api.prototype.asc_CloseFile = function()
 	var oLogicDocument = this.WordControl.m_oLogicDocument;
 	oLogicDocument.Stop_Recalculate();
 	oLogicDocument.Stop_CheckSpelling();
-	window.global_pptx_content_loader.ImageMapChecker = {};
+  AscCommon.pptx_content_loader.ImageMapChecker = {};
 
     this.WordControl.m_oDrawingDocument.CloseFile();
 };

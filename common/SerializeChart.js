@@ -1107,13 +1107,13 @@ BinaryChartWriter.prototype.WriteCT_ChartSpace = function (oVal) {
     // });
     // }
     if (null != oVal.themeOverride)
-	    this.bs.WriteItem(c_oserct_chartspaceTHEMEOVERRIDE, function () { window.global_pptx_content_writer.WriteTheme(oThis.memory, oVal.themeOverride); });
+	    this.bs.WriteItem(c_oserct_chartspaceTHEMEOVERRIDE, function () { AscCommon.pptx_content_writer.WriteTheme(oThis.memory, oVal.themeOverride); });
 }
 BinaryChartWriter.prototype.WriteSpPr = function (oVal) {
-    window.global_pptx_content_writer.WriteSpPr(this.memory, oVal);
+  AscCommon.pptx_content_writer.WriteSpPr(this.memory, oVal);
 }
 BinaryChartWriter.prototype.WriteTxPr = function (oVal) {
-    window.global_pptx_content_writer.WriteTextBody(this.memory, oVal);
+  AscCommon.pptx_content_writer.WriteTextBody(this.memory, oVal);
 }
 BinaryChartWriter.prototype.percentToString = function (val, bInteger, bSign) {
     var sRes;
@@ -5428,7 +5428,7 @@ BinaryChartReader.prototype.ReadCT_ChartSpace = function (type, length, val, cur
         // val.m_extLst = oNewVal;
     }
     else if (c_oserct_chartspaceTHEMEOVERRIDE === type) {
-        var theme = window.global_pptx_content_loader.ReadTheme(this, this.stream);
+        var theme = AscCommon.pptx_content_loader.ReadTheme(this, this.stream);
         if (null != theme)
             val.setThemeOverride(theme);
         res = c_oSerConstants.ReadUnknown;
@@ -5438,7 +5438,7 @@ BinaryChartReader.prototype.ReadCT_ChartSpace = function (type, length, val, cur
     return res;
 }
 BinaryChartReader.prototype.ReadSpPr = function (length) {
-    return window.global_pptx_content_loader.ReadShapeProperty(this.stream);
+    return AscCommon.pptx_content_loader.ReadShapeProperty(this.stream);
 }
 
 BinaryChartReader.prototype.ReadClrOverride = function(lenght)
@@ -5466,7 +5466,7 @@ BinaryChartReader.prototype.ReadClrOverride = function(lenght)
 
 BinaryChartReader.prototype.ReadTxPr = function (length) {
     var cur = this.stream.cur;
-    var ret = window.global_pptx_content_loader.ReadTextBody(null, this.stream, null, this.curWorksheet);
+    var ret = AscCommon.pptx_content_loader.ReadTextBody(null, this.stream, null, this.curWorksheet);
     this.stream.cur = cur + length;
     return ret;
 }

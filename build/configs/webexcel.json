@@ -111,7 +111,6 @@
         "../cell/view/HandlerList.js",
         "../cell/view/EventsController.js",
         "../cell/view/WorkbookView.js",
-        "../word/Editor/SerializeCommon.js",
         "../cell/view/DrawingObjectsController.js",
         "../cell/model/DrawingObjects/Graphics.js",
         "../cell/model/DrawingObjects/ShapeDrawer.js",

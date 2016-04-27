@@ -101,7 +101,6 @@
         "../slide/Drawing/Transitions.js",
         "../slide/Drawing/DrawingDocument.js",
         "../slide/Drawing/HtmlPage.js",
-        "../word/Editor/SerializeCommon.js",
         "../slide/Editor/Format/Presentation.js",
         "../cell/view/DrawingObjectsController.js",
         "../slide/Editor/DrawingObjectsController.js",

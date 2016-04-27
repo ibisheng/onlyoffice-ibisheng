@@ -15,6 +15,8 @@
       var c_oSerPropLenType = AscCommon.c_oSerPropLenType;
       var c_oSerConstants = AscCommon.c_oSerConstants;
     var History = AscCommon.History;
+    var pptx_content_loader = AscCommon.pptx_content_loader;
+    var pptx_content_writer = AscCommon.pptx_content_writer;
 
       var c_oAscPageOrientation = Asc.c_oAscPageOrientation;
     
@@ -2911,9 +2913,9 @@
                 this.bs.WriteItem(c_oSer_DrawingType.GraphicFrame, function () { oThis.WriteGraphicFrame(oDrawing); });
             }
             else if(curDrawing)
-                this.bs.WriteItem(c_oSer_DrawingType.pptxDrawing, function(){window.global_pptx_content_writer.WriteDrawing(oThis.memory, curDrawing, null, null, null);});
+                this.bs.WriteItem(c_oSer_DrawingType.pptxDrawing, function(){pptx_content_writer.WriteDrawing(oThis.memory, curDrawing, null, null, null);});
             else
-                this.bs.WriteItem(c_oSer_DrawingType.pptxDrawing, function(){window.global_pptx_content_writer.WriteDrawing(oThis.memory, oDrawing.graphicObject, null, null, null);});
+                this.bs.WriteItem(c_oSer_DrawingType.pptxDrawing, function(){pptx_content_writer.WriteDrawing(oThis.memory, oDrawing.graphicObject, null, null, null);});
         };
         this.WriteGraphicFrame = function (oDrawing) {
             var oBinaryChartWriter = new AscCommon.BinaryChartWriter(this.memory);
@@ -3734,7 +3736,7 @@
         this.WriteOtherContent = function()
         {
             var oThis = this;
-            this.bs.WriteItem(c_oSer_OtherType.Theme, function(){window.global_pptx_content_writer.WriteTheme(oThis.memory, oThis.wb.theme);});
+            this.bs.WriteItem(c_oSer_OtherType.Theme, function(){pptx_content_writer.WriteTheme(oThis.memory, oThis.wb.theme);});
         };
     }
     /** @constructor */
@@ -3749,17 +3751,17 @@
         this.Write = function(idWorksheet)
         {
             //если idWorksheet не null, то надо серализовать только его.
-            window.global_pptx_content_writer._Start();
+            pptx_content_writer._Start();
             this.WriteMainTable(idWorksheet);
-            window.global_pptx_content_writer._End();
+            pptx_content_writer._End();
             return this.WriteFileHeader(this.Memory.GetCurPosition()) + this.Memory.GetBase64Memory();
         };
         this.Write2 = function(idWorksheet)
         {
             //если idWorksheet не null, то надо серализовать только его.
-            window.global_pptx_content_writer._Start();
+            pptx_content_writer._Start();
             this.WriteMainTable(idWorksheet);
-            window.global_pptx_content_writer._End();
+            pptx_content_writer._End();
         };
         this.WriteFileHeader = function(nDataSize)
         {
@@ -6089,7 +6091,7 @@
             {
 
                // res = c_oSerConstants.ReadUnknown;
-                var oGraphicObject = window.global_pptx_content_loader.ReadGraphicObject(this.stream, this.curWorksheet);
+                var oGraphicObject = pptx_content_loader.ReadGraphicObject(this.stream, this.curWorksheet);
                 if(null != oGraphicObject && !((oGraphicObject.getObjectType() === AscDFH.historyitem_type_Shape || oGraphicObject.getObjectType() === AscDFH.historyitem_type_ImageShape) && !oGraphicObject.spPr))
                 {
                     oDrawing.graphicObject = oGraphicObject;
@@ -6823,7 +6825,7 @@
             }
             else if ( c_oSer_OtherType.Theme === type )
             {
-                this.wb.theme = window.global_pptx_content_loader.ReadTheme(this, this.stream);
+                this.wb.theme = pptx_content_loader.ReadTheme(this, this.stream);
                 res = c_oSerConstants.ReadUnknown;
             }
             else
@@ -7044,7 +7046,7 @@
         };
         this.Read = function(data, wb)
         {
-            window.global_pptx_content_loader.Clear();
+            pptx_content_loader.Clear();
 			var pasteBinaryFromExcel = false;
 			if(this.copyPasteObj && this.copyPasteObj.isCopyPaste && typeof editor != "undefined" && editor)
 				pasteBinaryFromExcel = true;
@@ -7063,7 +7065,7 @@
 			if(!pasteBinaryFromExcel)
 				History.TurnOn();
 			//чтобы удалялся stream с бинарником
-			window.global_pptx_content_loader.Clear(true);
+			pptx_content_loader.Clear(true);
         };
         this.ReadData = function(data, wb)
         {
