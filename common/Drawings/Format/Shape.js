@@ -5616,7 +5616,7 @@ CShape.prototype =
                     editor.WordControl.m_oLogicDocument.TurnOn_Recalculate(false);
                 }
                 dMinPolygonLength = warpGeometry.getMinPathPolygonLength();
-                dOneLineWidth = GetRectContentWidth(oContentToDraw);
+                dOneLineWidth = AscFormat.GetRectContentWidth(oContentToDraw);
                 if(dOneLineWidth > dMinPolygonLength)
                 {
                     dKoeff = dMinPolygonLength/dOneLineWidth;
