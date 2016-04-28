@@ -14,8 +14,6 @@ var changestype_Paragraph_Content = AscCommon.changestype_Paragraph_Content;
 var changestype_2_Element_and_Type = AscCommon.changestype_2_Element_and_Type;
 var changestype_2_ElementsArray_and_Type = AscCommon.changestype_2_ElementsArray_and_Type;
 var g_oTableId = AscCommon.g_oTableId;
-var Editor_Copy = AscCommon.Editor_Copy;
-var Editor_Paste = AscCommon.Editor_Paste;
 var History = AscCommon.History;
 
 var c_oAscHAnchor = Asc.c_oAscHAnchor;
@@ -10880,7 +10878,7 @@ CDocument.prototype =
         {
             if ( true === e.CtrlKey ) // Ctrl + Insert (аналогично Ctrl + C)
             {
-                Editor_Copy(this.Api);
+                AscCommon.Editor_Copy(this.Api);
                 bRetValue = keydownresult_PreventKeyPress;
             }
             else if ( true === e.ShiftKey && false === editor.isViewMode ) // Shift + Insert (аналогично Ctrl + V)
@@ -10895,7 +10893,7 @@ CDocument.prototype =
 
                             window.GlobalPasteFlag = true;
                             editor.incrementCounterLongAction();
-                            Editor_Paste(this.DrawingDocument.m_oWordControl.m_oApi, true);
+                            AscCommon.Editor_Paste(this.DrawingDocument.m_oWordControl.m_oApi, true);
                             bRetValue = keydownresult_PreventKeyPress;
                         }
                         else
@@ -10907,7 +10905,7 @@ CDocument.prototype =
                                 AscCommon.SafariIntervalFocus();
                                 window.GlobalPasteFlag = true;
                                 editor.incrementCounterLongAction();
-                                Editor_Paste(this.DrawingDocument.m_oWordControl.m_oApi, true);
+                                AscCommon.Editor_Paste(this.DrawingDocument.m_oWordControl.m_oApi, true);
                                 bRetValue = keydownresult_PreventKeyPress;
                             }
                         }
@@ -10930,7 +10928,7 @@ CDocument.prototype =
             {
                 if ( false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content) )
                 {
-                    Editor_Copy(this.Api, true);
+                    AscCommon.Editor_Copy(this.Api, true);
                 }
                 bRetValue = keydownresult_PreventKeyPress;
             }
@@ -11008,7 +11006,7 @@ CDocument.prototype =
             }
             else // Ctrl + C - copy
             {
-                Editor_Copy(this.Api);
+                AscCommon.Editor_Copy(this.Api);
                 bRetValue = keydownresult_PreventKeyPress;
             }
         }
@@ -11149,7 +11147,7 @@ CDocument.prototype =
 
                             window.GlobalPasteFlag = true;
                             editor.incrementCounterLongAction();
-                            Editor_Paste(this.DrawingDocument.m_oWordControl.m_oApi, true);
+                            AscCommon.Editor_Paste(this.DrawingDocument.m_oWordControl.m_oApi, true);
                             bRetValue = keydownresult_PreventKeyPress;
                         }
                         else
@@ -11161,7 +11159,7 @@ CDocument.prototype =
                                 AscCommon.SafariIntervalFocus();
                                 window.GlobalPasteFlag = true;
                                 editor.incrementCounterLongAction();
-                                Editor_Paste(this.DrawingDocument.m_oWordControl.m_oApi, true);
+                                AscCommon.Editor_Paste(this.DrawingDocument.m_oWordControl.m_oApi, true);
                                 bRetValue = keydownresult_PreventKeyPress;
                             }
                         }
@@ -11178,7 +11176,7 @@ CDocument.prototype =
         {
             if ( false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content) )
             {
-                Editor_Copy(this.Api, true);
+                AscCommon.Editor_Copy(this.Api, true);
             }
             bRetValue = keydownresult_PreventKeyPress;
         }
