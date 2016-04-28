@@ -47,6 +47,7 @@
 		"../common/Drawings/Format/ChartSpace.js",
 		"../common/Drawings/Format/ChartFormat.js",
 		"../common/Drawings/Format/TextBody.js",
+		"../common/Drawings/Format/GraphicFrame.js",
         "../common/Charts/charts.js",
 		"../common/Charts/DrawingArea.js",
 		"../common/Charts/DrawingObjects.js",
@@ -120,7 +121,6 @@
         "../cell/model/DrawingObjects/Format/GroupPrototype.js",
         "../cell/model/DrawingObjects/Format/ChartSpacePrototype.js",
 		
-        "../slide/Editor/Format/GraphicFrame.js",
         "../word/Editor/Comments.js",
         "../word/Editor/Styles.js",
         "../word/Editor/FlowObjects.js",
