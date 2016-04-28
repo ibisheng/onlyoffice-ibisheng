@@ -28,6 +28,7 @@
 		"../common/editor/paragraph.js",
 		"../common/editor/document.js",
 		"../common/editor/documentContent.js",
+		"../common/editor/styles.js",
 		
 		"../common/Shapes/EditorSettings.js",
 		"../common/Shapes/Serialize.js",
@@ -125,7 +126,6 @@
         "../cell/model/DrawingObjects/Format/ChartSpacePrototype.js",
 		
         "../word/Editor/Comments.js",
-        "../word/Editor/Styles.js",
         "../word/Editor/FlowObjects.js",
         "../word/Editor/ParagraphContent.js",
         "../word/Editor/ParagraphContentBase.js",
