@@ -3116,7 +3116,7 @@ var editor;
       AscCommonExcel.cFormulaFunctionToLocale = {};
       var localName;
       for (var i in AscCommonExcel.cFormulaFunction) {
-        localName = oLocalizedData[i] ? oLocalizedData[i]['n'] : null;
+        localName = oLocalizedData[i] ? oLocalizedData[i] : null;
         localName = localName ? localName : i;
         AscCommonExcel.cFormulaFunctionLocalized[localName] = AscCommonExcel.cFormulaFunction[i];
         AscCommonExcel.cFormulaFunctionToLocale[i] = localName;
