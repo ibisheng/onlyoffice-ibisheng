@@ -269,8 +269,8 @@ ChartPreviewManager.prototype.getChartByType = function(type)
 		var chartSeries = {series: this.getAscChartSeriesDefault(type), parsedHeaders: {bLeft: true, bTop: true}};
 		var chart_space = AscFormat.DrawingObjectsController.prototype._getChartSpace(chartSeries, settings, true);
         chart_space.bPreview = true;
-		if (Asc.editor && AscCommon.c_oEditorId.Spreadsheet === Asc.editor.getEditorId()) {
-			var api_sheet = Asc.editor;
+		if (Asc['editor'] && AscCommon.c_oEditorId.Spreadsheet === Asc['editor'].getEditorId()) {
+			var api_sheet = Asc['editor'];
 			chart_space.setWorksheet(api_sheet.wb.getWorksheet().model);
 		} else {
 			if (editor && editor.WordControl && editor.WordControl.m_oLogicDocument.Slides &&
@@ -825,8 +825,8 @@ TextArtPreviewManager.prototype.getShape =  function()
 	var oShape = new AscFormat.CShape();
 	var oParent = null, oWorkSheet = null;
 	var bWord = true;
-	if (Asc.editor && AscCommon.c_oEditorId.Spreadsheet === Asc.editor.getEditorId()) {
-		var api_sheet = Asc.editor;
+	if (Asc['editor'] && AscCommon.c_oEditorId.Spreadsheet === Asc['editor'].getEditorId()) {
+		var api_sheet = Asc['editor'];
 		oShape.setWorksheet(api_sheet.wb.getWorksheet().model);
 		oWorkSheet = api_sheet.wb.getWorksheet().model;
 		bWord = false;
