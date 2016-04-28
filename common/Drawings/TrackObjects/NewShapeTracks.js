@@ -496,7 +496,7 @@ function NewShapeTrack(presetGeom, startX, startY, theme, master, layout, slide,
             }
             if(bFromWord)
             {
-                shape.setTextBoxContent(new CDocumentContent(shape, DrawingDocument, 0, 0, 0, 0, false, false, false));
+                shape.setTextBoxContent(new AscCommon.CDocumentContent(shape, DrawingDocument, 0, 0, 0, 0, false, false, false));
                 var body_pr = new AscFormat.CBodyPr();
                 body_pr.setDefault();
                 shape.setBodyPr(body_pr);
@@ -504,7 +504,7 @@ function NewShapeTrack(presetGeom, startX, startY, theme, master, layout, slide,
             else
             {
                 shape.setTxBody(new AscFormat.CTextBody());
-                var content = new CDocumentContent(shape.txBody, DrawingDocument, 0, 0, 0, 0, false, false, true);
+                var content = new AscCommon.CDocumentContent(shape.txBody, DrawingDocument, 0, 0, 0, 0, false, false, true);
                 shape.txBody.setParent(shape);
                 shape.txBody.setContent(content);
                 var body_pr = new AscFormat.CBodyPr();

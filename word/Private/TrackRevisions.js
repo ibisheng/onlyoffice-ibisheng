@@ -560,7 +560,7 @@ CHeaderFooterController.prototype.Reject_RevisionChanges = function(Type, bAll)
 //----------------------------------------------------------------------------------------------------------------------
 // CDocumentContent
 //----------------------------------------------------------------------------------------------------------------------
-CDocumentContent.prototype.Accept_RevisionChanges = function(Type, bAll)
+AscCommon.CDocumentContent.prototype.Accept_RevisionChanges = function(Type, bAll)
 {
     if (docpostype_Content === this.CurPos.Type || true === bAll)
     {
@@ -629,7 +629,7 @@ CDocumentContent.prototype.Accept_RevisionChanges = function(Type, bAll)
         this.DrawingObjects.Accept_RevisionChanges(Type, bAll);
     }
 };
-CDocumentContent.prototype.Reject_RevisionChanges = function(Type, bAll)
+AscCommon.CDocumentContent.prototype.Reject_RevisionChanges = function(Type, bAll)
 {
     if (docpostype_Content === this.CurPos.Type || true === bAll)
     {
@@ -698,7 +698,7 @@ CDocumentContent.prototype.Reject_RevisionChanges = function(Type, bAll)
         this.DrawingObjects.Reject_RevisionChanges(Type, bAll);
     }
 };
-CDocumentContent.prototype.Get_RevisionsChangeParagraph = function(SearchEngine)
+AscCommon.CDocumentContent.prototype.Get_RevisionsChangeParagraph = function(SearchEngine)
 {
     if (true === SearchEngine.Is_Found())
         return;

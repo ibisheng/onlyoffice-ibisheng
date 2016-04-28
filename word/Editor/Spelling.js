@@ -742,7 +742,7 @@ CDocument.prototype.TurnOn_CheckSpelling = function()
 //----------------------------------------------------------------------------------------------------------------------
 // CDocumentContent
 //----------------------------------------------------------------------------------------------------------------------
-CDocumentContent.prototype.Restart_CheckSpelling = function()
+AscCommon.CDocumentContent.prototype.Restart_CheckSpelling = function()
 {
     var Count = this.Content.length;
     for ( var Index = 0; Index < Count; Index++ )

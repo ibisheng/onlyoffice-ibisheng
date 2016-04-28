@@ -1,5 +1,7 @@
 "use strict";
 
+(function(window, undefined){
+
 // Import
 var g_oTableId = AscCommon.g_oTableId;
 var History = AscCommon.History;
@@ -9944,3 +9946,8 @@ CDocumentContentBase.prototype.Get_ContentPosition = function(bSelection, bStart
 
     return PosArray;
 };
+
+    //--------------------------------------------------------export----------------------------------------------------
+    window['AscCommon'] = window['AscCommon'] || {};
+    window['AscCommon'].CDocumentContent = CDocumentContent;
+})(window);

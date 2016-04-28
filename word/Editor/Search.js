@@ -427,7 +427,7 @@ CDocument.prototype.Search_Get_Selection = function()
 //----------------------------------------------------------------------------------------------------------------------
 // CDocumentContent
 //----------------------------------------------------------------------------------------------------------------------
-CDocumentContent.prototype.Search = function(Str, Props, SearchEngine, Type)
+AscCommon.CDocumentContent.prototype.Search = function(Str, Props, SearchEngine, Type)
 {
     // Поиск в основном документе
     var Count = this.Content.length;
@@ -437,7 +437,7 @@ CDocumentContent.prototype.Search = function(Str, Props, SearchEngine, Type)
     }
 };
 
-CDocumentContent.prototype.Search_GetId = function(bNext, bCurrent)
+AscCommon.CDocumentContent.prototype.Search_GetId = function(bNext, bCurrent)
 {
     // Получим Id найденного элемента
     var Id = null;

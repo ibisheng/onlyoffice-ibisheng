@@ -878,7 +878,7 @@ function CMasterThumbnailDrawer()
 
          * */
 
-        var docContent = new CDocumentContent(editor.WordControl.m_oLogicDocument, editor.WordControl.m_oDrawingDocument, 0, 0,1000, 1000, false, false, true);
+        var docContent = new AscCommon.CDocumentContent(editor.WordControl.m_oLogicDocument, editor.WordControl.m_oDrawingDocument, 0, 0,1000, 1000, false, false, true);
         var par = docContent.Content[0];
         par.Cursor_MoveToStartPos();
         var _paraPr = new CParaPr();

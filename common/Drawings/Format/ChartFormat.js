@@ -25585,7 +25585,7 @@ function CreateTextBodyFromString(str, drawingDocument, parent)
 
 function CreateDocContentFromString(str, drawingDocument, parent)
 {
-    var content = new CDocumentContent(parent, drawingDocument, 0, 0, 0, 0, false, false, true);
+    var content = new AscCommon.CDocumentContent(parent, drawingDocument, 0, 0, 0, 0, false, false, true);
     AddToContentFromString(content, str);
     return content;
 }

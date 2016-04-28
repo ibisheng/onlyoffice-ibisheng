@@ -386,7 +386,7 @@ CHistory.prototype =
         var bPresentation = !(typeof CPresentation === "undefined");
         var bSlide = !(typeof Slide === "undefined");
         if ( ( Class instanceof CDocument        && ( AscDFH.historyitem_Document_AddItem        === Data.Type || AscDFH.historyitem_Document_RemoveItem        === Data.Type ) ) ||
-            ( Class instanceof CDocumentContent && ( AscDFH.historyitem_DocumentContent_AddItem === Data.Type || AscDFH.historyitem_DocumentContent_RemoveItem === Data.Type ) ) ||
+            ( Class instanceof AscCommon.CDocumentContent && ( AscDFH.historyitem_DocumentContent_AddItem === Data.Type || AscDFH.historyitem_DocumentContent_RemoveItem === Data.Type ) ) ||
             ( Class instanceof CTable           && ( AscDFH.historyitem_Table_AddRow            === Data.Type || AscDFH.historyitem_Table_RemoveRow            === Data.Type ) ) ||
             ( Class instanceof CTableRow        && ( AscDFH.historyitem_TableRow_AddCell        === Data.Type || AscDFH.historyitem_TableRow_RemoveCell        === Data.Type ) ) ||
             ( Class instanceof Paragraph        && ( AscDFH.historyitem_Paragraph_AddItem       === Data.Type || AscDFH.historyitem_Paragraph_RemoveItem       === Data.Type ) ) ||
@@ -397,7 +397,7 @@ CHistory.prototype =
             )
         {
             var bAdd = ( ( Class instanceof CDocument        && AscDFH.historyitem_Document_AddItem        === Data.Type ) ||
-                ( Class instanceof CDocumentContent && AscDFH.historyitem_DocumentContent_AddItem === Data.Type ) ||
+                ( Class instanceof AscCommon.CDocumentContent && AscDFH.historyitem_DocumentContent_AddItem === Data.Type ) ||
                 ( Class instanceof CTable           && AscDFH.historyitem_Table_AddRow            === Data.Type ) ||
                 ( Class instanceof CTableRow        && AscDFH.historyitem_TableRow_AddCell        === Data.Type ) ||
                 ( Class instanceof Paragraph        && AscDFH.historyitem_Paragraph_AddItem       === Data.Type ) ||
@@ -411,7 +411,7 @@ CHistory.prototype =
 
             if ( ( Class instanceof Paragraph ) ||  ( Class instanceof ParaHyperlink) || ( Class instanceof ParaRun ) ||
                 ( Class instanceof CDocument        && AscDFH.historyitem_Document_RemoveItem        === Data.Type ) ||
-                ( Class instanceof CDocumentContent && AscDFH.historyitem_DocumentContent_RemoveItem === Data.Type ) )
+                ( Class instanceof AscCommon.CDocumentContent && AscDFH.historyitem_DocumentContent_RemoveItem === Data.Type ) )
                 Count = Data.Items.length;
 
             var ContentChanges = new AscCommon.CContentChangesElement( ( bAdd == true ? AscCommon.contentchanges_Add : AscCommon.contentchanges_Remove ), Data.Pos, Count, Item );

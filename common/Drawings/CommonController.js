@@ -14,6 +14,7 @@ var c_oAscLockTypes = AscCommon.c_oAscLockTypes;
 var parserHelp = AscCommon.parserHelp;
 var isRealObject = AscCommon.isRealObject;
     var History = AscCommon.History;
+    var CDocumentContent = AscCommon.CDocumentContent;
 
 var c_oAscError = Asc.c_oAscError;
 var c_oAscChartTitleShowSettings = Asc.c_oAscChartTitleShowSettings;
