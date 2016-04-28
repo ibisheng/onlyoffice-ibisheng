@@ -20,6 +20,14 @@
       var c_oAscDropCap = Asc.c_oAscDropCap;
       // ---------------------------------------------------------------------------------------------------------------
 
+      var Page_Width     = 210;
+      var Page_Height    = 297;
+      
+      var X_Left_Margin   = 30;  // 3   cm
+      var X_Right_Margin  = 15;  // 1.5 cm
+      var Y_Bottom_Margin = 20;  // 2   cm
+      var Y_Top_Margin    = 20;  // 2   cm
+
       var c_oAscArrUserColors = [16757719, 7929702, 56805, 10081791, 12884479, 16751001, 6748927, 16762931, 6865407,
           15650047, 16737894, 3407768, 16759142, 10852863, 6750176, 16774656, 13926655, 13815039, 3397375, 11927347,
           16752947, 9404671, 4980531, 16744678, 3407830, 15919360, 16731553, 52479, 13330175, 16743219, 3386367, 14221056,
@@ -2220,6 +2228,15 @@
        */
       window['AscCommon'] = window['AscCommon'] || {};
       window['Asc'] = window['Asc'] || {};
+
+
+      window["AscCommon"].Page_Width = Page_Width;
+      window["AscCommon"].Page_Height = Page_Height;
+      
+      window["AscCommon"].X_Left_Margin = X_Left_Margin;
+      window["AscCommon"].X_Right_Margin = X_Right_Margin;
+      window["AscCommon"].Y_Bottom_Margin = Y_Bottom_Margin;
+      window["AscCommon"].Y_Top_Margin = Y_Top_Margin;
 
       window['Asc']['c_oAscArrUserColors'] = window['Asc'].c_oAscArrUserColors = c_oAscArrUserColors;
 

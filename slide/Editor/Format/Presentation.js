@@ -10,6 +10,8 @@ var Editor_Copy = AscCommon.Editor_Copy;
 var Editor_Paste = AscCommon.Editor_Paste;
 var isRealObject = AscCommon.isRealObject;
 var History = AscCommon.History;
+var keydownresult_PreventAll = AscCommon.keydownresult_PreventAll;
+var keydownresult_PreventKeyPress = AscCommon.keydownresult_PreventKeyPress;
 
 var CreateUnifillSolidFillSchemeColor = AscFormat.CreateUnifillSolidFillSchemeColor;
 
@@ -368,7 +370,7 @@ function CPresentation(DrawingDocument)
     this.StartPage = 0; // Для совместимости с CDocumentContent
     this.CurPage   = 0;
 
-    this.Orientation = orientation_Portrait; // ориентация страницы
+    this.Orientation = Asc.c_oAscPageOrientation.PagePortrait; // ориентация страницы
 
     this.slidesToUnlock = [];
 
@@ -983,7 +985,7 @@ CPresentation.prototype =
 
         for(var i = 0; i < this.Slides.length; ++i)
         {
-            this.Slides[i].Search( Str, Props, this.SearchEngine, search_Common );
+            this.Slides[i].Search( Str, Props, this.SearchEngine, AscCommon.search_Common );
         }
         this.DrawingDocument.ClearCachePages();
         this.DrawingDocument.FirePaint();
@@ -2020,7 +2022,7 @@ CPresentation.prototype =
     OnKeyDown : function(e)
     {
         var bUpdateSelection = true;
-        var bRetValue = keydownresult_PreventNothing;
+        var bRetValue = AscCommon.keydownresult_PreventNothing;
 
         if ( e.KeyCode == 8 && false === editor.isViewMode ) // BackSpace
         {
@@ -2799,7 +2801,7 @@ CPresentation.prototype =
             bRetValue = keydownresult_PreventAll;
         }
 
-        if ( bRetValue & keydownflags_PreventKeyPress && true === bUpdateSelection )
+        if ( bRetValue & AscCommon.keydownflags_PreventKeyPress && true === bUpdateSelection )
             this.Document_UpdateSelectionState();
 
         return bRetValue;
@@ -3184,7 +3186,7 @@ CPresentation.prototype =
 
     Get_PageSizesByDrawingObjects: function()
     {
-        return {W: Page_Width, H: Page_Height};
+        return {W: AscCommon.Page_Width, H: AscCommon.Page_Height};
     },
 //-----------------------------------------------------------------------------------
 // Дополнительные функции
@@ -3666,7 +3668,7 @@ CPresentation.prototype =
                                 if(target_text_object.graphicObject)
                                 {
                                     var GraphicFrame = target_text_object.copy();
-                                    var SelectedContent = new CSelectedContent();
+                                    var SelectedContent = new AscCommon.CSelectedContent();
                                     target_text_object.graphicObject.Get_SelectedContent(SelectedContent);
                                     var Table = SelectedContent.Elements[0].Element;
                                     GraphicFrame.setGraphicObject(Table);
@@ -3678,7 +3680,7 @@ CPresentation.prototype =
                             {
                                 if(doc_content)
                                 {
-                                    var SelectedContent = new CSelectedContent();
+                                    var SelectedContent = new AscCommon.CSelectedContent();
                                     doc_content.Get_SelectedContent(SelectedContent);
                                     ret.DocContent = SelectedContent;
                                 }
@@ -3694,7 +3696,7 @@ CPresentation.prototype =
                                 if(doc_content)
                                 {
 
-                                    var SelectedContent = new CSelectedContent();
+                                    var SelectedContent = new AscCommon.CSelectedContent();
                                     doc_content.Set_ApplyToAll(true);
                                     doc_content.Get_SelectedContent(SelectedContent);
                                     doc_content.Set_ApplyToAll(false);

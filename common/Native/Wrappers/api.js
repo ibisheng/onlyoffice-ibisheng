@@ -67,7 +67,7 @@ asc_docs_api.prototype["Call_OnKeyboardEvent"] = function(e)
 
 asc_docs_api.prototype["Call_CalculateResume"] = function()
 {
-    Document_Recalculate_Page();
+    AscCommon.Document_Recalculate_Page();
 };
 
 asc_docs_api.prototype["Call_TurnOffRecalculate"] = function()
@@ -1736,12 +1736,12 @@ asc_docs_api.prototype["Call_Menu_Event"] = function(type, _params)
                             _imagePr.ImageUrl = undefined;
 
                             var _section_select = this.WordControl.m_oLogicDocument.Get_PageSizesByDrawingObjects();
-                            var _page_width = Page_Width;
-                            var _page_height = Page_Height;
-                            var _page_x_left_margin = X_Left_Margin;
-                            var _page_y_top_margin = Y_Top_Margin;
-                            var _page_x_right_margin = X_Right_Margin;
-                            var _page_y_bottom_margin = Y_Bottom_Margin;
+                            var _page_width = AscCommon.Page_Width;
+                            var _page_height = AscCommon.Page_Height;
+                            var _page_x_left_margin = AscCommon.X_Left_Margin;
+                            var _page_y_top_margin = AscCommon.Y_Top_Margin;
+                            var _page_x_right_margin = AscCommon.X_Right_Margin;
+                            var _page_y_bottom_margin = AscCommon.Y_Bottom_Margin;
 
                             if (_section_select)
                             {
@@ -4581,12 +4581,12 @@ asc_docs_api.prototype.StartAddShape = function(sPreset, is_apply)
 asc_docs_api.prototype.AddImageUrlNative = function(url, _w, _h, _pageNum)
 {
     var _section_select = this.WordControl.m_oLogicDocument.Get_PageSizesByDrawingObjects();
-    var _page_width             = Page_Width;
-    var _page_height            = Page_Height;
-    var _page_x_left_margin     = X_Left_Margin;
-    var _page_y_top_margin      = Y_Top_Margin;
-    var _page_x_right_margin    = X_Right_Margin;
-    var _page_y_bottom_margin   = Y_Bottom_Margin;
+    var _page_width             = AscCommon.Page_Width;
+    var _page_height            = AscCommon.Page_Height;
+    var _page_x_left_margin     = AscCommon.X_Left_Margin;
+    var _page_y_top_margin      = AscCommon.Y_Top_Margin;
+    var _page_x_right_margin    = AscCommon.X_Right_Margin;
+    var _page_y_bottom_margin   = AscCommon.Y_Bottom_Margin;
 
     if (_section_select)
     {
@@ -4884,12 +4884,12 @@ asc_docs_api.prototype.change_PageOrient = function(isPortrait)
         this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
         if (isPortrait)
         {
-            this.WordControl.m_oLogicDocument.Set_DocumentOrientation(orientation_Portrait);
+            this.WordControl.m_oLogicDocument.Set_DocumentOrientation(Asc.c_oAscPageOrientation.PagePortrait);
             this.DocumentOrientation = isPortrait;
         }
         else
         {
-            this.WordControl.m_oLogicDocument.Set_DocumentOrientation(orientation_Landscape);
+            this.WordControl.m_oLogicDocument.Set_DocumentOrientation(Asc.c_oAscPageOrientation.PageLandscape);
             this.DocumentOrientation = isPortrait;
         }
         this.sync_PageOrientCallback(editor.get_DocumentOrientation());

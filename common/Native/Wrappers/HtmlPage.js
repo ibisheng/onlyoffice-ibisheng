@@ -1,29 +1,6 @@
 
 var g_bIsMobile =  AscCommon.AscBrowser.isMobile;
 
-var Page_Width     = 210;
-var Page_Height    = 297;
-
-var X_Left_Margin   = 30;  // 3   cm
-var X_Right_Margin  = 15;  // 1.5 cm
-var Y_Bottom_Margin = 20;  // 2   cm
-var Y_Top_Margin    = 20;  // 2   cm
-
-var X_Left_Field   = X_Left_Margin;
-var X_Right_Field  = Page_Width  - X_Right_Margin;
-var Y_Bottom_Field = Page_Height - Y_Bottom_Margin;
-var Y_Top_Field    = Y_Top_Margin;
-
-var docpostype_Content     = 0x00;
-var docpostype_HdrFtr      = 0x02;
-
-var selectionflag_Common        = 0x00;
-var selectionflag_Numbering     = 0x01;
-var selectionflag_DrawingObject = 0x002;
-
-var orientation_Portrait  = 0x00;
-var orientation_Landscape = 0x01;
-
 var tableSpacingMinValue = 0.02;//0.02мм
 
 var GlobalSkinTeamlab = {

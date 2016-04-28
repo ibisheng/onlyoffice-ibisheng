@@ -637,7 +637,7 @@ CGraphicFrame.prototype =
 
     Get_PageLimits : function(PageIndex)
     {
-        return { X : 0, Y : 0, XLimit : Page_Width, YLimit : Page_Height };
+        return { X : 0, Y : 0, XLimit : AscCommon.Page_Width, YLimit : AscCommon.Page_Height };
     },
 
     getParentObjects: CShape.prototype.getParentObjects,

@@ -2440,7 +2440,7 @@ CDocMeta.prototype =
                             }
 
                             //console.log(_text);
-                            editor.WordControl.m_oDrawingDocument.AddPageSearch(_text, _rects, search_Common);
+                            editor.WordControl.m_oDrawingDocument.AddPageSearch(_text, _rects, AscCommon.search_Common);
 
                             /*
                             // âñå íàéäåíî. íóæíî äîáàâèòü ðåêòû

@@ -21,6 +21,8 @@ var g_oDocumentUrls = AscCommon.g_oDocumentUrls;
   var pptx_content_writer = AscCommon.pptx_content_writer;
   var g_dKoef_pix_to_mm = AscCommon.g_dKoef_pix_to_mm;
   var g_dKoef_mm_to_pix = AscCommon.g_dKoef_mm_to_pix;
+  var CSelectedContent = AscCommon.CSelectedContent;
+  var CSelectedElement = AscCommon.CSelectedElement;
 
 var CShape = AscFormat.CShape;
   var CGraphicFrame = AscFormat.CGraphicFrame;
@@ -29,6 +31,9 @@ var c_oAscError = Asc.c_oAscError;
 var c_oAscShdClear = Asc.c_oAscShdClear;
 var c_oAscShdNil = Asc.c_oAscShdNil;
 var c_oAscXAlign = Asc.c_oAscXAlign;
+
+  var X_Right_Field  = AscCommon.Page_Width  - AscCommon.X_Right_Margin;
+  var Y_Bottom_Field = AscCommon.Page_Height - AscCommon.Y_Bottom_Margin;
 
 function CDocumentReaderMode()
 {
@@ -1337,9 +1342,9 @@ CopyProcessor.prototype =
 					var TableWidth = table.TableSumGrid[ table.TableSumGrid.length - 1 ];
 					var nLeft = PositionH.Value;
 					var nRight = nLeft + TableWidth;
-					var nFromLeft = Math.abs(nLeft - X_Left_Margin);
-					var nFromCenter = Math.abs((Page_Width - X_Right_Margin + X_Left_Margin) / 2 - (nLeft + nRight) / 2);
-					var nFromRight = Math.abs(Page_Width - nRight - X_Right_Margin);
+					var nFromLeft = Math.abs(nLeft - AscCommon.X_Left_Margin);
+					var nFromCenter = Math.abs((AscCommon.Page_Width - AscCommon.X_Right_Margin + AscCommon.X_Left_Margin) / 2 - (nLeft + nRight) / 2);
+					var nFromRight = Math.abs(AscCommon.Page_Width - nRight - AscCommon.X_Right_Margin);
 					if(nFromRight < nFromLeft || nFromCenter < nFromLeft)
 					{
 						if(nFromRight < nFromCenter)
@@ -2176,7 +2181,7 @@ function CanPaste(oDocument)
     var oTargetDoc = oDocument;
     if(PasteElementsId.g_bIsDocumentCopyPaste)
     {
-        if ( docpostype_HdrFtr === oTargetDoc.CurPos.Type )
+        if ( AscCommon.docpostype_HdrFtr === oTargetDoc.CurPos.Type )
         {
             if(null != oTargetDoc.HdrFtr.CurHdrFtr)
                 oTargetDoc = oTargetDoc.HdrFtr.CurHdrFtr.Content;
@@ -2601,7 +2606,7 @@ function PasteProcessor(api, bUploadImage, bUploadFonts, bNested, pasteInExcel)
     this.bInBlock = null;
 
     //������ �������� � ������� ��������� �������� ��� ������
-    this.dMaxWidth = Page_Width - X_Left_Margin - X_Right_Margin;
+    this.dMaxWidth = AscCommon.Page_Width - AscCommon.X_Left_Margin - AscCommon.X_Right_Margin;
     //���������� ������(�������� ��� ������� ������� �������, ������ ��� ������� ����������� ������ � ��������� � ������� ����� �������� ���� �����������)
     this.dScaleKoef = 1;
     this.bUseScaleKoef = false;
@@ -2619,7 +2624,7 @@ PasteProcessor.prototype =
     {
         if(PasteElementsId.g_bIsDocumentCopyPaste)
         {
-            if(docpostype_HdrFtr === oDocument.CurPos.Type)
+            if(AscCommon.docpostype_HdrFtr === oDocument.CurPos.Type)
             {
                 if(null != oDocument.HdrFtr && null != oDocument.HdrFtr.CurHdrFtr && null != oDocument.HdrFtr.CurHdrFtr.Content)
                 {
@@ -2628,7 +2633,7 @@ PasteProcessor.prototype =
                 }
             }
 
-            if(oDocument.CurPos.Type === docpostype_DrawingObjects)
+            if(oDocument.CurPos.Type === AscCommon.docpostype_DrawingObjects)
             {
                 var content = oDocument.DrawingObjects.getTargetDocContent(true);
                 if(content)
@@ -2715,7 +2720,7 @@ PasteProcessor.prototype =
             var bNeedMoveCursor = History.Is_LastPointNeedRecalc();
             this.oRecalcDocument.Recalculate();
             
-            if ((oDocument.CurPos.Type !== docpostype_DrawingObjects || true === this.oLogicDocument.DrawingObjects.isSelectedText()) && true === bNeedMoveCursor)
+            if ((oDocument.CurPos.Type !== AscCommon.docpostype_DrawingObjects || true === this.oLogicDocument.DrawingObjects.isSelectedText()) && true === bNeedMoveCursor)
             {
                 this.oLogicDocument.Cursor_MoveRight(false, false, true);
             }
@@ -3748,7 +3753,7 @@ PasteProcessor.prototype =
 					
 					var tempCDocument = function()
 					{
-						return new CDocument( this.oDocument.DrawingDocument, false);
+						return new AscCommon.CDocument( this.oDocument.DrawingDocument, false);
 					}
 					//создаём темповый CDocument
 					this.oDocument = AscFormat.ExecuteNoHistory(tempCDocument , this, []);
@@ -5124,9 +5129,9 @@ PasteProcessor.prototype =
             if(null != Ind.Left && null != Ind.Right)
             {
                 //30 ����������� ��� � �� �������
-                var dif = Page_Width - X_Left_Margin - X_Right_Margin - Ind.Left - Ind.Right;
+                var dif = AscCommon.Page_Width - AscCommon.X_Left_Margin - AscCommon.X_Right_Margin - Ind.Left - Ind.Right;
                 if(dif < 30)
-                    Ind.Right = Page_Width - X_Left_Margin - X_Right_Margin - Ind.Left - 30;
+                    Ind.Right = AscCommon.Page_Width - AscCommon.X_Left_Margin - AscCommon.X_Right_Margin - Ind.Left - 30;
             }
             var text_indent = computedStyle.getPropertyValue( "text-indent" );
             if(text_indent && null != (text_indent = this._ValueToMm(text_indent)))
@@ -6074,7 +6079,7 @@ PasteProcessor.prototype =
 			{
 				var margin_left = computedStyle.getPropertyValue( "margin-left" );
 				//todo возможно надо еще учесть ширину таблицы
-				if(margin_left && null != (margin_left = this._ValueToMm(margin_left)) && margin_left < Page_Width - X_Left_Margin)
+				if(margin_left && null != (margin_left = this._ValueToMm(margin_left)) && margin_left < AscCommon.Page_Width - AscCommon.X_Left_Margin)
 					table.Set_TableInd(margin_left);
 			}
             var background_color = computedStyle.getPropertyValue( "background-color" );
@@ -7327,7 +7332,7 @@ PasteProcessor.prototype =
             {
                 var margin_left = computedStyle.getPropertyValue( "margin-left" );
                 //todo возможно надо еще учесть ширину таблицы
-                if(margin_left && null != (margin_left = this._ValueToMm(margin_left)) && margin_left < Page_Width - X_Left_Margin)
+                if(margin_left && null != (margin_left = this._ValueToMm(margin_left)) && margin_left < AscCommon.Page_Width - AscCommon.X_Left_Margin)
                     table.Set_TableInd(margin_left);
             }
             var background_color = computedStyle.getPropertyValue( "background-color" );
@@ -7700,8 +7705,8 @@ function CreateImageFromBinary(bin, nW, nH)
         var _image = editor.ImageLoader.map_image_index[bin];
         if (_image != undefined && _image.Image != null && _image.Status == AscFonts.ImageLoadStatus.Complete)
         {
-            var _w = Math.max(1, Page_Width - (X_Left_Margin + X_Right_Margin));
-            var _h = Math.max(1, Page_Height - (Y_Top_Margin + Y_Bottom_Margin));
+            var _w = Math.max(1, AscCommon.Page_Width - (AscCommon.X_Left_Margin + AscCommon.X_Right_Margin));
+            var _h = Math.max(1, AscCommon.Page_Height - (AscCommon.Y_Top_Margin + AscCommon.Y_Bottom_Margin));
 
             var bIsCorrect = false;
             if (_image.Image != null)

@@ -20,7 +20,7 @@ CTable.prototype.Recalculate_Page = function(PageIndex)
     this.private_RecalculatePageXY(PageIndex);
 
     if (true !== this.private_RecalculateCheckPageColumnBreak(PageIndex))
-        return recalcresult_NextPage | recalcresultflags_Column;
+        return AscCommon.recalcresult_NextPage | AscCommon.recalcresultflags_Column;
 
     this.private_RecalculatePositionX(PageIndex);
 
@@ -28,7 +28,7 @@ CTable.prototype.Recalculate_Page = function(PageIndex)
 
     this.private_RecalculatePositionY(PageIndex);
 
-    if (Result & recalcresult_NextElement)
+    if (Result & AscCommon.recalcresult_NextElement)
         this.RecalcInfo.Reset(false);
 
     return Result;
@@ -1900,7 +1900,7 @@ CTable.prototype.private_RecalculatePage = function(CurPage)
                 Cell.Content.Reset( X_content_start, Y_content_start, X_content_end, Y_content_end );
                 Cell.Content.Set_ClipInfo(0, Page.X + CellMetrics.X_cell_start, Page.X + CellMetrics.X_cell_end);
 
-                if ( recalcresult2_NextPage === Cell.Content.Recalculate_Page( 0, true ) )
+                if ( AscCommon.recalcresult2_NextPage === Cell.Content.Recalculate_Page( 0, true ) )
                 {
                     bHeaderNextPage = true;
                     break;
@@ -2337,7 +2337,7 @@ CTable.prototype.private_RecalculatePage = function(CurPage)
                     Cell.Content.Shift( 0, ShiftDx, ShiftDy );
                     Cell.Content.Update_EndInfo();
                 }
-                else if ( recalcresult2_NextPage === Cell.Content.Recalculate_Page( CellPageIndex, true ) )
+                else if ( AscCommon.recalcresult2_NextPage === Cell.Content.Recalculate_Page( CellPageIndex, true ) )
                 {
                     Cell.PagesCount = Cell.Content.Pages.length + 1;
                     bNextPage = true;
@@ -2511,7 +2511,7 @@ CTable.prototype.private_RecalculatePage = function(CurPage)
                 var CellPageIndex = CurPage - Cell.Content.Get_StartPage_Relative();
                 if (CellPageIndex < Cell.PagesCount)
                 {
-                    if (recalcresult2_NextPage === Cell.Content.Recalculate_Page(CellPageIndex, true))
+                    if (AscCommon.recalcresult2_NextPage === Cell.Content.Recalculate_Page(CellPageIndex, true))
                     {
                         Cell.PagesCount = Cell.Content.Pages.length + 1;
                         bNextPage = true;
@@ -2903,9 +2903,9 @@ CTable.prototype.private_RecalculatePage = function(CurPage)
     this.Bounds = this.Pages[this.Pages.length - 1].Bounds;
 
     if ( true == bNextPage )
-        return recalcresult_NextPage;
+        return AscCommon.recalcresult_NextPage;
     else
-        return recalcresult_NextElement;
+        return AscCommon.recalcresult_NextElement;
 };
 CTable.prototype.private_RecalculatePositionY = function(CurPage)
 {

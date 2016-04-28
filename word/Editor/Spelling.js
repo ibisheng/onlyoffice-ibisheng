@@ -686,7 +686,7 @@ function SpellCheck_CallBack(Obj)
 //----------------------------------------------------------------------------------------------------------------------
 // CDocument
 //----------------------------------------------------------------------------------------------------------------------
-CDocument.prototype.Set_DefaultLanguage = function(NewLangId)
+AscCommon.CDocument.prototype.Set_DefaultLanguage = function(NewLangId)
 {    
     // Устанавливаем словарь по умолчанию
     var Styles = this.Styles;    
@@ -700,13 +700,13 @@ CDocument.prototype.Set_DefaultLanguage = function(NewLangId)
     this.Document_UpdateInterfaceState();
 };
 
-CDocument.prototype.Get_DefaultLanguage = function()
+AscCommon.CDocument.prototype.Get_DefaultLanguage = function()
 {
     var Styles = this.Styles;
     return Styles.Default.TextPr.Lang.Val;
 };
 
-CDocument.prototype.Restart_CheckSpelling = function()
+AscCommon.CDocument.prototype.Restart_CheckSpelling = function()
 {
     this.Spelling.Reset();
     
@@ -720,21 +720,21 @@ CDocument.prototype.Restart_CheckSpelling = function()
     }
 };
 
-CDocument.prototype.Stop_CheckSpelling = function()
+AscCommon.CDocument.prototype.Stop_CheckSpelling = function()
 {
     this.Spelling.Reset();
 };
 
-CDocument.prototype.Continue_CheckSpelling = function()
+AscCommon.CDocument.prototype.Continue_CheckSpelling = function()
 {
     this.Spelling.Continue_CheckSpelling();
 };
 
-CDocument.prototype.TurnOff_CheckSpelling = function()
+AscCommon.CDocument.prototype.TurnOff_CheckSpelling = function()
 {
     this.Spelling.TurnOff();
 };
-CDocument.prototype.TurnOn_CheckSpelling = function()
+AscCommon.CDocument.prototype.TurnOn_CheckSpelling = function()
 {
     this.Spelling.TurnOn();
 };
@@ -762,7 +762,7 @@ CHeaderFooter.prototype.Restart_CheckSpelling = function()
 //----------------------------------------------------------------------------------------------------------------------
 // CDocumentSectionsInfo
 //----------------------------------------------------------------------------------------------------------------------
-CDocumentSectionsInfo.prototype.Restart_CheckSpelling = function()
+AscCommon.CDocumentSectionsInfo.prototype.Restart_CheckSpelling = function()
 {
     var bEvenOdd = EvenAndOddHeaders;
     var Count = this.Elements.length;

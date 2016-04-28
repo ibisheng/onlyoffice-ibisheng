@@ -9,6 +9,7 @@
 var g_oTableId = AscCommon.g_oTableId;
 var g_oTextMeasurer = AscCommon.g_oTextMeasurer;
 var History = AscCommon.History;
+var recalcresultflags_Page = AscCommon.recalcresultflags_Page;
 
 var c_oAscShdNil = Asc.c_oAscShdNil;
 
@@ -2749,7 +2750,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                             if (null != Para.Get_DocumentPrev() && true != Para.Parent.Is_TableCellContent() && 0 === CurPage)
                             {
                                 Para.Recalculate_Drawing_AddPageBreak(0, 0, true);
-                                PRS.RecalcResult = recalcresult_NextPage;
+                                PRS.RecalcResult = AscCommon.recalcresult_NextPage;
                                 PRS.NewRange = true;
                                 return;
                             }
@@ -2758,7 +2759,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                                 if (ParaLine != Para.Pages[CurPage].FirstLine)
                                 {
                                     Para.Recalculate_Drawing_AddPageBreak(ParaLine, CurPage, false);
-                                    PRS.RecalcResult = recalcresult_NextPage;
+                                    PRS.RecalcResult = AscCommon.recalcresult_NextPage;
                                     PRS.NewRange = true;
                                     return;
                                 }
@@ -2937,7 +2938,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                         Item.Flags.NewLine = true;
 
                         // PageBreak вне самого верхнего документа не надо учитывать
-                        if (!(Para.Parent instanceof CDocument) || true !== Para.Is_Inline())
+                        if (!(Para.Parent instanceof AscCommon.CDocument) || true !== Para.Is_Inline())
                         {
                             // TODO: Продумать, как избавиться от данного элемента, т.к. удалять его при пересчете нельзя,
                             //       иначе будут проблемы с совместным редактированием.
@@ -3514,7 +3515,7 @@ ParaRun.prototype.Recalculate_Range_Spaces = function(PRSA, _CurLine, _CurRange,
                         if (Math.abs(Item.X - oRecalcObj.X) > 0.001 || Math.abs(Item.Y - oRecalcObj.Y) > 0.001 || Item.PageNum !== oRecalcObj.PageNum)
                         {
                             // Положение картинок не совпало, отправляем пересчет текущей страницы.
-                            PRSA.RecalcResult = recalcresult_CurPage | recalcresultflags_Page;
+                            PRSA.RecalcResult = AscCommon.recalcresult_CurPage | recalcresultflags_Page;
                             return;
                         }
 
@@ -3533,13 +3534,13 @@ ParaRun.prototype.Recalculate_Range_Spaces = function(PRSA, _CurLine, _CurRange,
                         {
                             // Обновляем позицию объекта
                             Item.Update_Position(PRSA.Paragraph, new CParagraphLayout( PRSA.X, PRSA.Y , PageAbs, PRSA.LastW, ColumnStartX, ColumnEndX, X_Left_Margin, X_Right_Margin, Page_Width, Top_Margin, Bottom_Margin, Page_H, PageFields.X, PageFields.Y, Para.Pages[CurPage].Y + Para.Lines[CurLine].Y - Para.Lines[CurLine].Metrics.Ascent, Para.Pages[CurPage].Y), PageLimits, PageLimitsOrigin, _CurLine);
-                            LDRecalcInfo.Set_FlowObject( Item, 0, recalcresult_NextElement, -1 );
+                            LDRecalcInfo.Set_FlowObject( Item, 0, AscCommon.recalcresult_NextElement, -1 );
 
                             // TODO: Добавить проверку на не попадание в предыдущие колонки
                             if (0 === PRSA.CurPage && Item.wrappingPolygon.top > PRSA.PageY + 0.001 && Item.wrappingPolygon.left > PRSA.PageX + 0.001)
-                                PRSA.RecalcResult = recalcresult_CurPagePara;
+                                PRSA.RecalcResult = AscCommon.recalcresult_CurPagePara;
                             else
-                                PRSA.RecalcResult = recalcresult_CurPage | recalcresultflags_Page;
+                                PRSA.RecalcResult = AscCommon.recalcresult_CurPage | recalcresultflags_Page;
 
                             return;
                         }
@@ -3568,16 +3569,16 @@ ParaRun.prototype.Recalculate_Range_Spaces = function(PRSA, _CurLine, _CurRange,
                                 // Обновляем позицию объекта
                                 Item.Update_Position(PRSA.Paragraph, new CParagraphLayout( PRSA.X, PRSA.Y, PageAbs, PRSA.LastW, ColumnStartX, ColumnEndX, X_Left_Margin, X_Right_Margin, Page_Width, Top_Margin, Bottom_Margin, Page_H, PageFields.X, PageFields.Y, Para.Pages[CurPage].Y + Para.Lines[CurLine].Y - Para.Lines[CurLine].Metrics.Ascent, Para.Pages[CurPage].Y), PageLimits, PageLimitsOrigin, _CurLine);
 
-                                LDRecalcInfo.Set_FlowObject( Item, 0, recalcresult_NextElement, -1 );
+                                LDRecalcInfo.Set_FlowObject( Item, 0, AscCommon.recalcresult_NextElement, -1 );
                                 LDRecalcInfo.Set_PageBreakBefore( false );
-                                PRSA.RecalcResult = recalcresult_CurPage | recalcresultflags_Page;
+                                PRSA.RecalcResult = AscCommon.recalcresult_CurPage | recalcresultflags_Page;
                                 return;
                             }
                             else
                             {
                                 LDRecalcInfo.Set_PageBreakBefore( true );
                                 DrawingObjects.removeById( Item.PageNum, Item.Get_Id() );
-                                PRSA.RecalcResult = recalcresult_PrevPage | recalcresultflags_Page;
+                                PRSA.RecalcResult = AscCommon.recalcresult_PrevPage | recalcresultflags_Page;
                                 return;
                             }
                         }

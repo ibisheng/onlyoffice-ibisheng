@@ -2403,7 +2403,7 @@ CTable.prototype =
 
     Get_AbsoluteColumn : function(CurPage)
     {
-        if (this.Parent instanceof CDocument)
+        if (this.Parent instanceof AscCommon.CDocument)
             return this.private_GetColumnIndex(CurPage);
 
         return this.Parent.Get_AbsoluteColumn(this.private_GetRelativePageIndex(CurPage));
@@ -6497,7 +6497,7 @@ CTable.prototype =
         var Page    = this.Pages[CurPage];
         var PageAbs = this.private_GetAbsolutePageIndex(CurPage);
 
-        if (this.Parent && selectionflag_Numbering === this.Parent.Selection.Flag)
+        if (this.Parent && AscCommon.selectionflag_Numbering === this.Parent.Selection.Flag)
         {
             for (var CurRow = 0, RowsCount = this.Get_RowsCount(); CurRow < RowsCount; ++CurRow)
             {
@@ -7972,7 +7972,7 @@ CTable.prototype =
             // Сначала проверим выделена ли таблица целиком, если да, тогда просто копируем ее.
             if ( true === this.ApplyToAll )
             {
-                SelectedContent.Add( new CSelectedElement(this.Copy(this.Parent), true) );
+                SelectedContent.Add( new AscCommon.CSelectedElement(this.Copy(this.Parent), true) );
                 return;
             }
 
@@ -8041,7 +8041,7 @@ CTable.prototype =
 
             if ( true === bAllSelected )
             {
-                SelectedContent.Add( new CSelectedElement(this.Copy(this.Parent), true) );
+                SelectedContent.Add( new AscCommon.CSelectedElement(this.Copy(this.Parent), true) );
                 return;
             }
 
@@ -8177,7 +8177,7 @@ CTable.prototype =
             if ( Table.Content.length > 0 && Table.Content[0].Get_CellsCount() > 0 )
                 Table.CurCell = Table.Content[0].Get_Cell(0);
 
-            SelectedContent.Add( new CSelectedElement(Table, false) );
+            SelectedContent.Add( new AscCommon.CSelectedElement(Table, false) );
         }
         else
         {
@@ -8414,7 +8414,7 @@ CTable.prototype =
         else
         {
             var CellContent = this.CurCell.Content;
-            if (this.LogicDocument && true === this.LogicDocument.UseTextShd && docpostype_Content === CellContent.CurPos.Type && true !== CellContent.Selection.Use && type_Paragraph === CellContent.Content[CellContent.CurPos.ContentPos].GetType())
+            if (this.LogicDocument && true === this.LogicDocument.UseTextShd && AscCommon.docpostype_Content === CellContent.CurPos.Type && true !== CellContent.Selection.Use && type_Paragraph === CellContent.Content[CellContent.CurPos.ContentPos].GetType())
             {
                 this.CurCell.Set_Shd( Shd );
                 this.CurCell.Content.ReDraw();                

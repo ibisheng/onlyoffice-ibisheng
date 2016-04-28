@@ -132,7 +132,7 @@ CWordCollaborativeEditing.prototype.Release_Locks = function()
 
             if (this.m_aNeedUnlock[Index] instanceof CHeaderFooterController)
                 editor.sync_UnLockHeaderFooters();
-            else if (this.m_aNeedUnlock[Index] instanceof CDocument)
+            else if (this.m_aNeedUnlock[Index] instanceof AscCommon.CDocument)
                 editor.sync_UnLockDocumentProps();
             else if (this.m_aNeedUnlock[Index] instanceof CComment)
                 editor.sync_UnLockComment(this.m_aNeedUnlock[Index].Get_Id());
