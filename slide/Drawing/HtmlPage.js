@@ -3352,6 +3352,9 @@ function CEditorPage(api)
             this.m_oDrawingDocument.IsEmptyPresentation = true;
         }
 
+        if (this.m_oDrawingDocument.TransitionSlide.IsPlaying())
+            this.m_oDrawingDocument.TransitionSlide.End(true);
+
         if (lPageNum != -1 && (lPageNum < 0 || lPageNum >= drDoc.SlidesCount))
             return;
 

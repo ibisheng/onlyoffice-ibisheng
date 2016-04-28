@@ -2615,7 +2615,7 @@ CGraphics.prototype =
 
     DrawPresentationComment : function(type, x, y, w, h)
     {
-        if (this.IsThumbnail)
+        if (this.IsThumbnail || this.IsDemonstrationMode)
             return;
 
         if (this.m_bIntegerGrid)

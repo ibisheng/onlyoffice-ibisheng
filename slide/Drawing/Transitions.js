@@ -249,8 +249,19 @@ function CTransitionAnimation(htmlpage)
         }
     }
 
+    this.StopIfPlaying = function()
+    {
+        if (this.IsPlaying())
+        {
+            __cancelFrame(this.TimerId);
+            this.TimerId = null;
+        }
+    }
+
     this.Start = function(isButtonPreview)
     {
+        this.StopIfPlaying();
+
         if (true == isButtonPreview)
         {
             this.CalculateRect();
