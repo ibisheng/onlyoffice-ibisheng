@@ -3184,7 +3184,7 @@ function CEditorPage(api)
                 }
                 ctx.beginPath();
 
-                if (drDoc.CurrentSearchNavi)
+                if (drDoc.CurrentSearchNavi && drDoc.m_oDocumentRenderer.SearchResults.Show)
                 {
                     var _pageNum = drDoc.CurrentSearchNavi[0].PageNum;
                     ctx.fillStyle = "rgba(51,102,204,255)";
