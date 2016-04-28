@@ -3823,82 +3823,59 @@ cSUBTOTAL.prototype.Calculate = function ( arg ) {
 
 	switch ( arg0 ) {
 		case cSubTotalFunctionType.includes.AVERAGE:
-			this.value = (new cAVERAGE()).Calculate(arg.slice(1));
+		case cSubTotalFunctionType.excludes.AVERAGE:
+			this.value = (new AscCommonExcel.cAVERAGE()).Calculate(arg.slice(1));
 			break;
 		case cSubTotalFunctionType.includes.COUNT:
-			this.value = (new cCOUNT()).Calculate(arg.slice(1));
+		case cSubTotalFunctionType.excludes.COUNT:
+			this.value = (new AscCommonExcel.cCOUNT()).Calculate(arg.slice(1));
 			break;
 		case cSubTotalFunctionType.includes.COUNTA:
-			this.value = (new cCOUNTA()).Calculate(arg.slice(1));
+		case cSubTotalFunctionType.excludes.COUNTA:
+			this.value = (new AscCommonExcel.cCOUNTA()).Calculate(arg.slice(1));
 			break;
 		case cSubTotalFunctionType.includes.MAX:
-			this.value = (new cMAX()).Calculate(arg.slice(1));
+		case cSubTotalFunctionType.excludes.MAX:
+			this.value = (new AscCommonExcel.cMAX()).Calculate(arg.slice(1));
 			break;
 		case cSubTotalFunctionType.includes.MIN:
-			this.value = (new cMIN()).Calculate(arg.slice(1));
+		case cSubTotalFunctionType.excludes.MIN:
+			this.value = (new AscCommonExcel.cMIN()).Calculate(arg.slice(1));
 			break;
 		case cSubTotalFunctionType.includes.PRODUCT:
-			this.value = (new cPRODUCT()).Calculate(arg.slice(1));
-			break;
-		case cSubTotalFunctionType.includes.STDEV:
-			this.value = (new cSTDEV()).Calculate(arg.slice(1));
-			break;
-		case cSubTotalFunctionType.includes.STDEVP:
-			this.value = (new cSTDEVP()).Calculate(arg.slice(1));
-			break;
-		case cSubTotalFunctionType.includes.SUM:
-			this.value = (new cSUM()).Calculate(arg.slice(1));
-			break;
-		case cSubTotalFunctionType.includes.VAR:
-			this.value = (new cVAR()).Calculate(arg.slice(1));
-			break;
-		case cSubTotalFunctionType.includes.VARP:
-			this.value = (new cVARP()).Calculate(arg.slice(1));
-			break;
-
-		case cSubTotalFunctionType.excludes.AVERAGE:
-			this.value = (new cAVERAGE()).Calculate(arg.slice(1));
-			break;
-		case cSubTotalFunctionType.excludes.COUNT:
-			this.value = (new cCOUNT()).Calculate(arg.slice(1));
-			break;
-		case cSubTotalFunctionType.excludes.COUNTA:
-			this.value = (new cCOUNTA()).Calculate(arg.slice(1));
-			break;
-		case cSubTotalFunctionType.excludes.MAX:
-			this.value = (new cMAX()).Calculate(arg.slice(1));
-			break;
-		case cSubTotalFunctionType.excludes.MIN:
-			this.value = (new cMIN()).Calculate(arg.slice(1));
-			break;
 		case cSubTotalFunctionType.excludes.PRODUCT:
 			this.value = (new cPRODUCT()).Calculate(arg.slice(1));
 			break;
+		case cSubTotalFunctionType.includes.STDEV:
 		case cSubTotalFunctionType.excludes.STDEV:
-			this.value = (new cSTDEV()).Calculate(arg.slice(1));
+			this.value = (new AscCommonExcel.cSTDEV()).Calculate(arg.slice(1));
 			break;
+		case cSubTotalFunctionType.includes.STDEVP:
 		case cSubTotalFunctionType.excludes.STDEVP:
-			this.value = (new cSTDEVP()).Calculate(arg.slice(1));
+			this.value = (new AscCommonExcel.cSTDEVP()).Calculate(arg.slice(1));
 			break;
+		case cSubTotalFunctionType.includes.SUM:
 		case cSubTotalFunctionType.excludes.SUM:
 			this.value = (new cSUM()).Calculate(arg.slice(1));
 			break;
+		case cSubTotalFunctionType.includes.VAR:
 		case cSubTotalFunctionType.excludes.VAR:
-			this.value = (new cVAR()).Calculate(arg.slice(1));
+			this.value = (new AscCommonExcel.cVAR()).Calculate(arg.slice(1));
 			break;
+		case cSubTotalFunctionType.includes.VARP:
 		case cSubTotalFunctionType.excludes.VARP:
-			this.value = (new cVARP()).Calculate(arg.slice(1));
+			this.value = (new AscCommonExcel.cVARP()).Calculate(arg.slice(1));
 			break;
 	}
 
 	return this.value;
-}
+};
 cSUBTOTAL.prototype.getInfo = function () {
 	return {
 		name:this.name,
 		args:"( function-number , argument-list )"
 	};
-}
+};
 
 function cSUM() {
 //    cBaseFunction.call( this, "SUM" );

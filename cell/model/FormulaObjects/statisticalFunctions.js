@@ -5672,4 +5672,13 @@ cZTEST.prototype = Object.create( cBaseFunction.prototype );
     window['AscCommonExcel'].phi = phi;
     window['AscCommonExcel'].gauss = gauss;
     window['AscCommonExcel'].gaussinv = gaussinv;
+
+    window['AscCommonExcel'].cAVERAGE = cAVERAGE;
+    window['AscCommonExcel'].cCOUNT = cCOUNT;
+    window['AscCommonExcel'].cCOUNTA = cCOUNTA;
+    window['AscCommonExcel'].cMAX = cMAX;
+    window['AscCommonExcel'].cMIN = cMIN;
+    window['AscCommonExcel'].cSTDEV = cSTDEV;
+    window['AscCommonExcel'].cSTDEVP = cSTDEVP;
+    window['AscCommonExcel'].cVAR = cVAR;
 })(window);
