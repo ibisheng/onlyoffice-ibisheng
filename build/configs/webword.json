@@ -30,6 +30,7 @@
 		"../word/Editor/History.js",
 		"../common/editor/document.js",
 		"../common/editor/documentContent.js",
+		"../common/editor/paragraph.js",
 		
 		"../common/Shapes/EditorSettings.js",
 		"../common/Shapes/Serialize.js",
@@ -106,7 +107,6 @@
         "../word/Editor/Field.js",
         "../word/Editor/Run.js",
         "../word/Editor/Math.js",
-        "../word/Editor/Paragraph.js",
         "../word/Editor/Paragraph_Recalculate.js",
         "../word/Editor/Sections.js",
         "../word/Editor/Numbering.js",

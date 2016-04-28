@@ -535,10 +535,6 @@ function CComment(Parent, Data)
     g_oTableId.Add( this, this.Id );
 }
 
-var comments_NoComment        = 0;
-var comments_NonActiveComment = 1;
-var comments_ActiveComment    = 2;
-
 function CComments()
 {
     this.Id     = AscCommon.g_oIdCounter.Get_NewId();

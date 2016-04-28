@@ -14320,7 +14320,7 @@ function CParagraphDrawStateHightlights()
 
     this.DrawComments = true;
     this.Comments     = [];
-    this.CommentsFlag = comments_NoComment;
+    this.CommentsFlag = AscCommon.comments_NoComment;
 
     this.SearchCounter = 0;
 
@@ -14413,14 +14413,14 @@ CParagraphDrawStateHightlights.prototype =
         var CommLen = this.Comments.length;
 
         // Сначала проверим есть ли вообще комментарии
-        this.CommentsFlag = ( CommLen > 0 ? comments_NonActiveComment : comments_NoComment );
+        this.CommentsFlag = ( CommLen > 0 ? AscCommon.comments_NonActiveComment : AscCommon.comments_NoComment );
 
         // Проверим является ли какой-либо комментарий активным
         for ( var CurPos = 0; CurPos < CommLen; CurPos++ )
         {
             if ( CurComment === this.Comments[CurPos] )
             {
-                this.CommentsFlag = comments_ActiveComment;
+                this.CommentsFlag = AscCommon.comments_ActiveComment;
                 break
             }
         }
