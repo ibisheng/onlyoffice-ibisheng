@@ -24,6 +24,8 @@
 		var pptx_content_writer = AscCommon.pptx_content_writer;
 		var g_dKoef_mm_to_pix = AscCommon.g_dKoef_mm_to_pix;
 
+		var CGraphicFrame = AscFormat.CGraphicFrame;
+
 		var doc = window.document;
 		
 		var isTruePaste = false;

@@ -1430,7 +1430,7 @@ CPresentation.prototype =
             RowHeight = Height / Rows;
         }
 
-        var graphic_frame = new CGraphicFrame();
+        var graphic_frame = new AscFormat.CGraphicFrame();
         graphic_frame.setParent(Parent);
         graphic_frame.setSpPr(new AscFormat.CSpPr());
         graphic_frame.spPr.setParent(graphic_frame);

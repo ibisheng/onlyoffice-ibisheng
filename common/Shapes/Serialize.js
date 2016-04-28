@@ -4869,7 +4869,7 @@ function BinaryPPTYLoader()
                             case 5:
                             {
                                 var _ret = null;
-                                if ("undefined" != typeof(CGraphicFrame))
+                                if ("undefined" != typeof(AscFormat.CGraphicFrame))
                                     _ret = this.ReadGrFrame();
                                 else
                                     _ret = this.ReadChartDataInGroup(shape);
@@ -5212,7 +5212,7 @@ function BinaryPPTYLoader()
         var _rec_start = s.cur;
         var _end_rec = _rec_start + s.GetULong() + 4;
 
-        var _graphic_frame = new CGraphicFrame();
+        var _graphic_frame = new AscFormat.CGraphicFrame();
         _graphic_frame.setParent2(this.TempMainObject);
         this.TempGroupObject = _graphic_frame;
 

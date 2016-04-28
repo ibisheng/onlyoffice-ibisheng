@@ -23,6 +23,7 @@ var g_oDocumentUrls = AscCommon.g_oDocumentUrls;
   var g_dKoef_mm_to_pix = AscCommon.g_dKoef_mm_to_pix;
 
 var CShape = AscFormat.CShape;
+  var CGraphicFrame = AscFormat.CGraphicFrame;
 
 var c_oAscError = Asc.c_oAscError;
 var c_oAscShdClear = Asc.c_oAscShdClear;
