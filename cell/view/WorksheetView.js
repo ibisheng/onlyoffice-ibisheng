@@ -12683,6 +12683,8 @@
 
         var filterTypes = this.af_getFilterTypes(columnRange);
         autoFilterObject.asc_setIsTextFilter(filterTypes.text);
+		autoFilterObject.asc_setColorsFill(filterTypes.colors);
+		autoFilterObject.asc_setColorsFont(filterTypes.fontColors);
 
 
         this.handlers.trigger("setAutoFiltersDialog", autoFilterObject);
@@ -12693,7 +12695,18 @@
         var t = this;
         var ws = this.model;
         var res = {text: true, colors: [], fontColors: []};
-
+		
+		var getAscColor = function(color)
+		{
+			var ascColor = new Asc.asc_CColor();
+			ascColor.asc_putR(color.getR());
+			ascColor.asc_putG(color.getG());
+			ascColor.asc_putB(color.getB());
+			ascColor.asc_putA(color.getA());
+			
+			return ascColor;
+		};
+		
         var tempText = 0, tempDigit = 0;
         var alreadyAddColors = {}, alreadyAddFontColors = {};
         for(var i = columnRange.r1; i <= columnRange.r2; i++)
@@ -12725,7 +12738,9 @@
                     var fontColor = cell.oValue.multiText[j].format ? cell.oValue.multiText[j].format.c : null;
                     if(fontColor !== null && alreadyAddFontColors[fontColor.rgb] !== true && g_oColorManager.isEqual(fontColor, g_oDefaultFont.c) === false)
                     {
-                        res.fontColors.push(fontColor);
+                        var ascFontColor = getAscColor(fontColor);
+						
+						res.fontColors.push(ascFontColor);
                         alreadyAddFontColors[fontColor.rgb] = true;
                     }
                 }
@@ -12735,7 +12750,9 @@
                 var fontColor =  cell.xfs && cell.xfs.font ? cell.xfs.font.c : null;
                 if(fontColor !== null && alreadyAddFontColors[fontColor.rgb] !== true && g_oColorManager.isEqual(fontColor, g_oDefaultFont.c) === false)
                 {
-                    res.fontColors.push(fontColor);
+                    var ascFontColor = getAscColor(fontColor);
+					
+					res.fontColors.push(ascFontColor);
                     alreadyAddFontColors[fontColor.rgb] = true;
                 }
             }
@@ -12743,7 +12760,9 @@
             var color = cell.getStyle();
             if(color !== null && color.fill && color.fill.bg && alreadyAddColors[color.fill.bg.rgb] !== true)
             {
-                res.colors.push(color.fill);
+                var ascColor = getAscColor(color.fill.bg);
+				
+				res.colors.push(ascColor);
                 alreadyAddColors[color.fill.bg.rgb] = true;
             }
         }
