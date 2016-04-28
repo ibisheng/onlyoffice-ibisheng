@@ -502,6 +502,9 @@ CShape.prototype.recalculateShapeStyleForParagraph = function()
     this.textStyleForParagraph = {TextPr: styles.Default.TextPr.Copy(), ParaPr: styles.Default.ParaPr.Copy()};
     var DefId = styles.Default.Paragraph;
     var DefaultStyle = styles.Style[DefId];
+
+    this.textStyleForParagraph.ParaPr.Merge( g_oDocumentDefaultParaPr );
+    this.textStyleForParagraph.TextPr.Merge( g_oDocumentDefaultTextPr );
     if(DefaultStyle)
     {
         this.textStyleForParagraph.ParaPr.Merge( DefaultStyle.ParaPr );

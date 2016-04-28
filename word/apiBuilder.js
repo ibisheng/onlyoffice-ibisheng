@@ -4184,6 +4184,7 @@ function TEST_BUILDER()
     var oRun2 = oParagraph2.AddText("HAYDEN MANAGEMENT");
     oRun2.SetFontSize(64);
     oRun2.SetColor(255, 255, 255);
+    oRun2.SetFontFamily("Calibri Light");
     oParagraph2.SetBottomBorder("single", 1, 0, 255, 104, 0);
     oDocContent.Push(oParagraph2);
     oParagraph2 = Api.CreateParagraph();
