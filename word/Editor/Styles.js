@@ -4795,7 +4795,7 @@ CStyles.prototype =
                 continue;
 
             var AbstractNum = Numbering.Get_AbstractNum(NumPr.NumId);
-            if (!Num)
+            if (!AbstractNum)
                 continue;
 
             var iLvl = (NumPr.Lvl ? NumPr.Lvl : 0);
