@@ -269,18 +269,15 @@ ChartPreviewManager.prototype.getChartByType = function(type)
 		var chartSeries = {series: this.getAscChartSeriesDefault(type), parsedHeaders: {bLeft: true, bTop: true}};
 		var chart_space = AscFormat.DrawingObjectsController.prototype._getChartSpace(chartSeries, settings, true);
         chart_space.bPreview = true;
-		if(window["Asc"]["editor"])
-		{
-			var api_sheet = window["Asc"]["editor"];
+		if (Asc.editor && AscCommon.c_oEditorId.Spreadsheet === Asc.editor.getEditorId()) {
+			var api_sheet = Asc.editor;
 			chart_space.setWorksheet(api_sheet.wb.getWorksheet().model);
+		} else {
+			if (editor && editor.WordControl && editor.WordControl.m_oLogicDocument.Slides &&
+				editor.WordControl.m_oLogicDocument.Slides[editor.WordControl.m_oLogicDocument.CurPage]) {
+				chart_space.setParent(editor.WordControl.m_oLogicDocument.Slides[editor.WordControl.m_oLogicDocument.CurPage]);
+			}
 		}
-        else
-        {
-            if(editor && editor.WordControl && editor.WordControl.m_oLogicDocument.Slides && editor.WordControl.m_oLogicDocument.Slides[editor.WordControl.m_oLogicDocument.CurPage])
-            {
-                chart_space.setParent(editor.WordControl.m_oLogicDocument.Slides[editor.WordControl.m_oLogicDocument.CurPage]);
-            }
-        }
 		AscFormat.CheckSpPrXfrm(chart_space);
 		chart_space.spPr.xfrm.setOffX(0);
 		chart_space.spPr.xfrm.setOffY(0);
@@ -828,27 +825,20 @@ TextArtPreviewManager.prototype.getShape =  function()
 	var oShape = new AscFormat.CShape();
 	var oParent = null, oWorkSheet = null;
 	var bWord = true;
-	if(window["Asc"]["editor"])
-	{
-		var api_sheet = window["Asc"]["editor"];
+	if (Asc.editor && AscCommon.c_oEditorId.Spreadsheet === Asc.editor.getEditorId()) {
+		var api_sheet = Asc.editor;
 		oShape.setWorksheet(api_sheet.wb.getWorksheet().model);
 		oWorkSheet = api_sheet.wb.getWorksheet().model;
 		bWord = false;
-	}
-	else
-	{
-		if(editor && editor.WordControl && Array.isArray(editor.WordControl.m_oLogicDocument.Slides))
-		{
-            if(editor.WordControl.m_oLogicDocument.Slides[editor.WordControl.m_oLogicDocument.CurPage])
-            {
-                oShape.setParent(editor.WordControl.m_oLogicDocument.Slides[editor.WordControl.m_oLogicDocument.CurPage]);
-                oParent = editor.WordControl.m_oLogicDocument.Slides[editor.WordControl.m_oLogicDocument.CurPage];
-                bWord = false;
-            }
-            else
-            {
-                return null;
-            }
+	} else {
+		if (editor && editor.WordControl && Array.isArray(editor.WordControl.m_oLogicDocument.Slides)) {
+			if (editor.WordControl.m_oLogicDocument.Slides[editor.WordControl.m_oLogicDocument.CurPage]) {
+				oShape.setParent(editor.WordControl.m_oLogicDocument.Slides[editor.WordControl.m_oLogicDocument.CurPage]);
+				oParent = editor.WordControl.m_oLogicDocument.Slides[editor.WordControl.m_oLogicDocument.CurPage];
+				bWord = false;
+			} else {
+				return null;
+			}
 		}
 	}
 	var oParentObjects = oShape.getParentObjects();

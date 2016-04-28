@@ -3706,7 +3706,7 @@ CAreaSeries.prototype =
                 return this.tx.strRef.strCache.pt[0].val;
             }
         }
-        return getChartTranslateManager().asc_getSeries() + " " + (this.idx + 1) ;
+        return AscFormat.getChartTranslateManager().asc_getSeries() + " " + (this.idx + 1) ;
     },
 
     getCatName: function(idx)
@@ -23421,17 +23421,17 @@ CTitle.prototype =
                         return oTx.strRef.strCache.pt[0].val;
                     }
                 }
-                return getChartTranslateManager().asc_getTitle();
+                return AscFormat.getChartTranslateManager().asc_getTitle();
             }
             else
             {
                 if(this.parent.axPos === AX_POS_B || this.parent.axPos === AX_POS_T)
                 {
-                    return getChartTranslateManager().asc_getXAxis();
+                    return AscFormat.getChartTranslateManager().asc_getXAxis();
                 }
                 else
                 {
-                    return getChartTranslateManager().asc_getYAxis();
+                    return AscFormat.getChartTranslateManager().asc_getYAxis();
                 }
             }
         }

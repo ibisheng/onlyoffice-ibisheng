@@ -708,3 +708,7 @@ CTablePr.prototype.Init_Default = function()
     this.TableW                = new CTableMeasurement(tblwidth_Auto, 0);
     this.TableLayout           = tbllayout_AutoFit;
 };
+
+//----------------------------------------------------------export----------------------------------------------------
+window['AscFormat'] = window['AscFormat'] || {};
+window['AscFormat'].getChartTranslateManager = getChartTranslateManager;

@@ -115,6 +115,7 @@ function baseEditorsApi(name) {
 }
 baseEditorsApi.prototype._baseInit = function() {
   var t = this;
+  //Asc.editor = Asc['editor'] = AscCommon['editor'] = AscCommon.editor = this; // ToDo сделать это!
   this.HtmlElement = document.getElementById(this.HtmlElementName);
 
   // init OnMessage
@@ -148,6 +149,9 @@ baseEditorsApi.prototype._editorNameById = function() {
       break;
   }
   return res;
+};
+baseEditorsApi.prototype.getEditorId = function() {
+  return this.editorId;
 };
 baseEditorsApi.prototype.asc_GetFontThumbnailsPath = function() {
   return '../Common/Images/';

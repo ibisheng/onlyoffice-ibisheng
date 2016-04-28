@@ -1,9 +1,12 @@
 "use strict";
 
+(function(window, undefined){
+
 // Import
 var CShape = AscFormat.CShape;
 var CChartSpace = AscFormat.CChartSpace;
 
+    // ToDo перенести в один файл!
 function getChartTranslateManager()
 {
     return window["Asc"]["editor"].chartTranslate;
@@ -483,3 +486,8 @@ CChartSpace.prototype.recalculateLocalTransform = CShape.prototype.recalculateLo
 
 CChartSpace.prototype.Get_Theme = CShape.prototype.Get_Theme;
 CChartSpace.prototype.Get_ColorMap = CShape.prototype.Get_ColorMap;
+
+    //----------------------------------------------------------export----------------------------------------------------
+    window['AscFormat'] = window['AscFormat'] || {};
+    window['AscFormat'].getChartTranslateManager = getChartTranslateManager;
+})(window);

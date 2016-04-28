@@ -1,5 +1,7 @@
 "use strict";
 
+(function(window, undefined){
+
 // Import
 var CShape = AscFormat.CShape;
 var CImageShape = AscFormat.CImageShape;
@@ -168,3 +170,4 @@ CImageShape.prototype.getCardDirectionByNum = CShape.prototype.getCardDirectionB
 CImageShape.prototype.getResizeCoefficients = CShape.prototype.getResizeCoefficients;
 CImageShape.prototype.check_bounds = CShape.prototype.check_bounds;
 CImageShape.prototype.normalize = CShape.prototype.normalize;
+})(window);
