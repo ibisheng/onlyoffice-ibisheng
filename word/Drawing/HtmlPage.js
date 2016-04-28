@@ -1499,6 +1499,14 @@ function CEditorPage(api)
             positionMinY = (oWordControl.m_oMainContent.AbsolutePosition.T + oWordControl.m_oTopRuler_horRuler.AbsolutePosition.B) * g_dKoef_mm_to_pix +
                 oWordControl.Y;
 
+        // если находимся в самом верху (без тулбара) - то наверх не будем скроллиться
+        // делаем заглушку
+        var minPosY = 20;
+        if (oThis.bIsRetinaSupport)
+            minPosY *= 2;
+        if (positionMinY < minPosY)
+            positionMinY = minPosY;
+
         var positionMaxY = oWordControl.m_oMainContent.AbsolutePosition.B * g_dKoef_mm_to_pix + oWordControl.Y;
 
         var scrollYVal = 0;
