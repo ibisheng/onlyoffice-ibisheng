@@ -211,6 +211,39 @@
     }
 
     /**
+     * Class representing a image.
+     * @constructor
+     * */
+    function ApiImage(Image)
+    {
+        ApiImage.superclass.constructor.call(this, Image.parent);
+        this.Image = Image
+    }
+    AscCommon.extendClass(ApiImage, ApiDrawing);
+
+    /**
+     * Class representing a shape.
+     * @constructor
+     * */
+    function ApiShape(Shape)
+    {
+        ApiShape.superclass.constructor.call(this, Shape.parent);
+        this.Shape = Shape;
+    }
+    AscCommon.extendClass(ApiShape, ApiDrawing);
+
+    /**
+     * Class representing a Chart.
+     * @constructor
+     * */
+    function ApiChart(Chart)
+    {
+        ApiChart.superclass.constructor.call(this, Chart.parent);
+        this.Chart = Chart;
+    }
+    AscCommon.extendClass(ApiChart, ApiDrawing);
+
+    /**
      * Twentieths of a point (equivalent to 1/1440th of an inch).
      * @typedef {number} twips
      */
@@ -313,6 +346,20 @@
      * @typedef {number} EMU
      */
 
+    /**
+    * This type specifies the preset shape geometry that is to be used for a shape
+    * @typedef {("accentBorderCallout1" | "accentBorderCallout2" | "accentBorderCallout3" | "accentCallout1" | "accentCallout2" | "accentCallout3" | "actionButtonBackPrevious" | "actionButtonBeginning" | "actionButtonBlank" | "actionButtonDocument" | "actionButtonEnd" | "actionButtonForwardNext" | "actionButtonHelp" | "actionButtonHome" | "actionButtonInformation" | "actionButtonMovie" | "actionButtonReturn" | "actionButtonSound" | "arc" | "bentArrow" | "bentConnector2" | "bentConnector3" | "bentConnector4" | "bentConnector5" | "bentUpArrow" | "bevel" | "blockArc" | "borderCallout1" | "borderCallout2" | "borderCallout3" | "bracePair" | "bracketPair" | "callout1" | "callout2" | "callout3" | "can" | "chartPlus" | "chartStar" | "chartX" | "chevron" | "chord" | "circularArrow" | "cloud" | "cloudCallout" | "corner" | "cornerTabs" | "cube" | "curvedConnector2" | "curvedConnector3" | "curvedConnector4" | "curvedConnector5" | "curvedDownArrow" | "curvedLeftArrow" | "curvedRightArrow" | "curvedUpArrow" | "decagon" | "diagStripe" | "diamond" | "dodecagon" | "donut" | "doubleWave" | "downArrow" | "downArrowCallout" | "ellipse" | "ellipseRibbon" | "ellipseRibbon2" | "flowChartAlternateProcess" | "flowChartCollate" | "flowChartConnector" | "flowChartDecision" | "flowChartDelay" | "flowChartDisplay" | "flowChartDocument" | "flowChartExtract" | "flowChartInputOutput" | "flowChartInternalStorage" | "flowChartMagneticDisk" | "flowChartMagneticDrum" | "flowChartMagneticTape" | "flowChartManualInput" | "flowChartManualOperation" | "flowChartMerge" | "flowChartMultidocument" | "flowChartOfflineStorage" | "flowChartOffpageConnector" | "flowChartOnlineStorage" | "flowChartOr" | "flowChartPredefinedProcess" | "flowChartPreparation" | "flowChartProcess" | "flowChartPunchedCard" | "flowChartPunchedTape" | "flowChartSort" | "flowChartSummingJunction" | "flowChartTerminator" | "foldedCorner" | "frame" | "funnel" | "gear6" | "gear9" | "halfFrame" | "heart" | "heptagon" | "hexagon" | "homePlate" | "horizontalScroll" | "irregularSeal1" | "irregularSeal2" | "leftArrow" | "leftArrowCallout" | "leftBrace" | "leftBracket" | "leftCircularArrow" | "leftRightArrow" | "leftRightArrowCallout" | "leftRightCircularArrow" | "leftRightRibbon" | "leftRightUpArrow" | "leftUpArrow" | "lightningBolt" | "line" | "lineInv" | "mathDivide" | "mathEqual" | "mathMinus" | "mathMultiply" | "mathNotEqual" | "mathPlus" | "moon" | "nonIsoscelesTrapezoid" | "noSmoking" | "notchedRightArrow" | "octagon" | "parallelogram" | "pentagon" | "pie" | "pieWedge" | "plaque" | "plaqueTabs" | "plus" | "quadArrow" | "quadArrowCallout" | "rect" | "ribbon" | "ribbon2" | "rightArrow" | "rightArrowCallout" | "rightBrace" | "rightBracket" | "round1Rect" | "round2DiagRect" | "round2SameRect" | "roundRect" | "rtTriangle" | "smileyFace" | "snip1Rect" | "snip2DiagRect" | "snip2SameRect" | "snipRoundRect" | "squareTabs" | "star10" | "star12" | "star16" | "star24" | "star32" | "star4" | "star5" | "star6" | "star7" | "star8" | "straightConnector1" | "stripedRightArrow" | "sun" | "swooshArrow" | "teardrop" | "trapezoid" | "triangle" | "upArrowCallout" | "upDownArrow" | "upDownArrow" | "upDownArrowCallout" | "uturnArrow" | "verticalScroll" | "wave" | "wedgeEllipseCallout" | "wedgeRectCallout" | "wedgeRoundRectCallout")} ShapeType
+    */
+
+    /**
+     * This type specifies the types, create charts
+     * @typedef {("bar" | "barStacked" | "barStackedPercent" | "bar3D" | "barStacked3D" | "barStackedPercent3D" | "barStackedPercent3DPerspective" | "horizontalBar" | "horizontalBarStacked" | "horizontalBarStackedPercent" | "horizontalBar3D" | "horizontalBarStacked3D" | "horizontalBarStackedPercent3D" | "lineNormal" | "lineStacked" | "lineStackedPercent" | "line3D" | "pie" | "pie3D" | "doughnut" | "scatter" | "stock")} ChartType
+     */
+
+
+    /**
+     * @typedef {("top" | "center" | "bottom")} VerticalTextAlign
+     * */
     //------------------------------------------------------------------------------------------------------------------
     //
     // Base Api
@@ -379,6 +426,200 @@
         oImage.setParent(oDrawing);
         oDrawing.Set_GraphicObject(oImage);
         return new ApiDrawing(oDrawing);
+    };
+
+    /**
+     * Create a image.
+     * @memberof Api
+     * @param {string} sImageSrc
+     * @param {EMU} nWidth
+     * @param {EMU} nHeight
+     * @returns {ApiImage}
+     */
+    Api.prototype.CreateImage = function(sImageSrc, nWidth, nHeight)
+    {
+        var nW = private_EMU2MM(nWidth);
+        var nH = private_EMU2MM(nHeight);
+
+        var oDrawing = new ParaDrawing(nW, nH, null, private_GetDrawingDocument(), private_GetLogicDocument(), null);
+        var oImage = private_GetLogicDocument().DrawingObjects.createImage(sImageSrc, 0, 0, nW, nH);
+        oImage.setParent(oDrawing);
+        oDrawing.Set_GraphicObject(oImage);
+        return new ApiImage(oImage);
+    };
+
+    /**
+     * Create a shape.
+     * @memberof Api
+     * @param {ShapeType} [sType="rect"]
+     * @param {EMU} nWidth
+     * @param {EMU} nHeight
+     * @returns {ApiShape}
+     * */
+    Api.prototype.CreateShape = function(sType, nWidth, nHeight)
+    {
+        var oLogicDocument = private_GetLogicDocument();
+        var oDrawingDocuemnt = private_GetDrawingDocument();
+        var nW = private_EMU2MM(nWidth);
+        var nH = private_EMU2MM(nHeight);
+        var oDrawing = new ParaDrawing(nW, nH, null, oDrawingDocuemnt, oLogicDocument, null);
+        var oShapeTrack = new AscFormat.NewShapeTrack(sType, 0, 0, oLogicDocument.theme, null, null, null, 0);
+        oShapeTrack.track({}, nW, nH);
+        var oShape = oShapeTrack.getShape(true, oDrawingDocuemnt, null);
+        oShape.setParent(oDrawing);
+        oDrawing.Set_GraphicObject(oShape);
+        oShape.createTextBoxContent();
+        return new ApiShape(oShape);
+    };
+
+    /**
+     * Create a chart.
+     * @memberof Api
+     * @param {ChartType} [sType="bar"]
+     * @param {Array} aSeries
+     * @param {EMU} nWidth
+     * @param {EMU} nHeight
+     * @returns {ApiChart}
+     * */
+    Api.prototype.CreateChart = function(sType, aSeries, nWidth, nHeight)
+    {
+        var oDrawingDocument = private_GetDrawingDocument();
+        var oLogicDocument = private_GetLogicDocument();
+        var nW = private_EMU2MM(nWidth);
+        var nH = private_EMU2MM(nHeight);
+        var settings = new AscCommon.asc_ChartSettings();
+        switch (sType)
+        {
+            case "bar" :
+            {
+                settings.type = Asc.c_oAscChartTypeSettings.barNormal;
+                break;
+            }
+            case "barStacked":
+            {
+                settings.type = Asc.c_oAscChartTypeSettings.barStacked;
+                break;
+            }
+            case "barStackedPercent":
+            {
+                settings.type = Asc.c_oAscChartTypeSettings.barStackedPer;
+                break;
+            }
+            case "bar3D":
+            {
+                settings.type = Asc.c_oAscChartTypeSettings.barNormal3d;
+                break;
+            }
+            case "barStacked3D":
+            {
+                settings.type = Asc.c_oAscChartTypeSettings.barStacked3d;
+                break;
+            }
+            case "barStackedPercent3D":
+            {
+                settings.type = Asc.c_oAscChartTypeSettings.barStackedPer3d;
+                break;
+            }
+            case "barStackedPercent3DPerspective":
+            {
+                settings.type = Asc.c_oAscChartTypeSettings.barNormal3dPerspective;
+                break;
+            }
+            case "horizontalBar":
+            {
+                settings.type = Asc.c_oAscChartTypeSettings.hBarNormal;
+                break;
+            }
+            case "horizontalBarStacked":
+            {
+                settings.type = Asc.c_oAscChartTypeSettings.hBarStacked;
+                break;
+            }
+            case "horizontalBarStackedPercent":
+            {
+                settings.type = Asc.c_oAscChartTypeSettings.hBarStackedPer;
+                break;
+            }
+            case "horizontalBar3D":
+            {
+                settings.type = Asc.c_oAscChartTypeSettings.hBarNormal3d;
+                break;
+            }
+            case "horizontalBarStacked3D":
+            {
+                settings.type = Asc.c_oAscChartTypeSettings.hBarStacked3d;
+                break;
+            }
+            case "horizontalBarStackedPercent3D":
+            {
+                settings.type = Asc.c_oAscChartTypeSettings.hBarStackedPer3d;
+                break;
+            }
+            case "lineNormal":
+            {
+                settings.type = Asc.c_oAscChartTypeSettings.lineNormal;
+                break;
+            }
+            case "lineStacked":
+            {
+                settings.type = Asc.c_oAscChartTypeSettings.lineStacked;
+                break;
+            }
+            case "lineStackedPercent":
+            {
+                settings.type = Asc.c_oAscChartTypeSettings.lineStackedPer;
+                break;
+            }
+            case "line3D":
+            {
+                settings.type = Asc.c_oAscChartTypeSettings.line3d;
+                break;
+            }
+            case "pie":
+            {
+                settings.type = Asc.c_oAscChartTypeSettings.pie;
+                break;
+            }
+            case "pie3D":
+            {
+                settings.type = Asc.c_oAscChartTypeSettings.pie3d;
+                break;
+            }
+            case "doughnut":
+            {
+                settings.type = Asc.c_oAscChartTypeSettings.doughnut;
+                break;
+            }
+            case "scatter":
+            {
+                settings.type = Asc.c_oAscChartTypeSettings.scatter;
+                break;
+            }
+            case "stock":
+            {
+                settings.type = Asc.c_oAscChartTypeSettings.stock;
+                break;
+            }
+        }
+        var aAscSeries = [];
+        for(var i = 0; i < aSeries.length; ++i)
+        {
+            var oAscSeries = new AscFormat.asc_CChartSeria();
+            oAscSeries.Val.NumCache = [];
+            var aData = aSeries[i];
+            for(var j = 0; j < aData.length; ++j)
+            {
+                oAscSeries.Val.NumCache.push({ numFormatStr: "General", isDateTimeFormat: false, val: value, isHidden: false });
+            }
+            aAscSeries.push(oAscSeries);
+        }
+        var chartSeries = {series: aAscSeries, parsedHeaders: {bLeft: true, bTop: true}};
+        var oDrawing = new ParaDrawing( nW, nH, null, oDrawingDocument, this, null);
+        var oChartSpace = AscFormat.DrawingObjectsController.prototype._getChartSpace(chartSeries, settings, true);
+        oChartSpace.setParent(oDrawing);
+        oDrawing.Set_GraphicObject(oChartSpace);
+        oDrawing.setExtent( oChartSpace.spPr.xfrm.extX, oChartSpace.spPr.xfrm.extY );
+        return new ApiChart(oChartSpace);
     };
 
     //------------------------------------------------------------------------------------------------------------------
@@ -2997,6 +3238,146 @@
         this.Drawing.Set_Distance(private_EMU2MM(nLeft), private_EMU2MM(nTop), private_EMU2MM(nRight), private_EMU2MM(nBottom));
     };
 
+
+    //------------------------------------------------------------------------------------------------------------------
+    //
+    // ApiImage
+    //
+    //------------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Get the type of this class.
+     * @returns {"image"}
+     */
+    ApiImage.prototype.GetClassType = function()
+    {
+        return "image";
+    };
+
+    //------------------------------------------------------------------------------------------------------------------
+    //
+    // ApiShape
+    //
+    //------------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Get the type of this class.
+     * @returns {"shape"}
+     */
+    ApiShape.prototype.GetClassType = function()
+    {
+        return "shape";
+    };
+
+    /**
+     * Set the fill color of shape
+     * @param {byte} r
+     * @param {byte} g
+     * @param {byte} b
+     */
+    ApiShape.prototype.SetFillColor = function(r, g, b)
+    {
+        if(this.Shape)
+        {
+            this.Shape.spPr.setFill(AscFormat.CreateUnfilFromRGB(r, g, b));
+        }
+    };
+
+    /**
+     * Set the fill color of shape
+     * @param {byte} r
+     * @param {byte} g
+     * @param {byte} b
+     */
+    ApiShape.prototype.SetLineColor = function(r, g, b)
+    {
+        if(this.Shape)
+        {
+            if(!this.Shape.spPr.ln)
+            {
+                this.Shape.recalculatePen();
+                this.Shape.spPr.setLn(this.Shape.pen.createDuplicate());
+            }
+            this.Shape.spPr.ln.setFill(AscFormat.CreateUnfilFromRGB(r, g, b));
+        }
+    };
+
+    /**
+     * Set the line width color of shape
+     * @param {EMU} nWidth
+     */
+    ApiShape.prototype.SetLineWidth = function(nWidth)
+    {
+        if(this.Shape)
+        {
+            if(!this.Shape.spPr.ln)
+            {
+                this.Shape.recalculatePen();
+                this.Shape.spPr.setLn(this.Shape.pen.createDuplicate());
+            }
+            this.Shape.spPr.ln.setW(nWidth);
+        }
+    };
+
+    /**
+     * Set the line width color of shape
+     * @returns {ApiDocumentContent}
+     */
+    ApiShape.prototype.GetDocContent = function()
+    {
+        if(this.Shape && this.Shape.textBoxContent)
+        {
+            return new ApiDocumentContent(this.Shape.textBoxContent);
+        }
+        return null;
+    };
+
+    /**
+     * Set shape's content vertical align
+     * @param {VerticalTextAlign} VerticalAlign
+     */
+    ApiShape.prototype.SetVerticalTextAlign = function(VerticalAlign)
+    {
+        if(this.Shape)
+        {
+            switch(VerticalAlign)
+            {
+                case "top":
+                {
+                    this.Shape.setVerticalAlign(4);
+                    break;
+                }
+                case "center":
+                {
+                    this.Shape.setVerticalAlign(1);
+                    break;
+                }
+                case "bottom":
+                {
+                    this.Shape.setVerticalAlign(0);
+                    break;
+                }
+            }
+        }
+    };
+
+
+    //------------------------------------------------------------------------------------------------------------------
+    //
+    // ApiChart
+    //
+    //------------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Get the type of this class.
+     * @returns {"chart"}
+     */
+    ApiChart.prototype.GetClassType = function()
+    {
+        return "chart";
+    };
+
+
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Export
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -3005,6 +3386,9 @@
     Api.prototype["CreateTable"]                     = Api.prototype.CreateTable;
     Api.prototype["CreateRun"]                       = Api.prototype.CreateRun;
     Api.prototype["CreateDrawing"]                   = Api.prototype.CreateDrawing;
+    Api.prototype["CreateImage"]                     = Api.prototype.CreateImage;
+    Api.prototype["CreateShape"]                     = Api.prototype.CreateShape;
+    Api.prototype["CreateChart"]                     = Api.prototype.CreateChart;
 
     ApiUnsupported.prototype["GetClassType"]         = ApiUnsupported.prototype.GetClassType;
 
@@ -3211,6 +3595,17 @@
     ApiDrawing.prototype["SetHorPosition"]           = ApiDrawing.prototype.SetHorPosition;
     ApiDrawing.prototype["SetVerPosition"]           = ApiDrawing.prototype.SetVerPosition;
     ApiDrawing.prototype["SetDistances"]             = ApiDrawing.prototype.SetDistances;
+
+    ApiImage.prototype["GetClassType"]               = ApiImage.prototype.GetClassType;
+
+    ApiShape.prototype["GetClassType"]               = ApiShape.prototype.GetClassType;
+    ApiShape.prototype["SetFillColor"]               = ApiShape.prototype.SetFillColor;
+    ApiShape.prototype["SetLineColor"]               = ApiShape.prototype.SetLineColor;
+    ApiShape.prototype["SetLineWidth"]               = ApiShape.prototype.SetLineWidth;
+    ApiShape.prototype["GetDocContent"]              = ApiShape.prototype.GetDocContent;
+    ApiShape.prototype["SetVerticalTextAlign"]       = ApiShape.prototype.SetVerticalTextAlign;
+
+    ApiChart.prototype["GetClassType"]               = ApiChart.prototype.GetClassType;
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Private area
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -3774,16 +4169,70 @@ function TEST_BUILDER()
     oParaMark.SetSpacing(5);
     oParagraph.AddPageBreak();
     // TODO: Заполнить автофигуру
-    oDrawing = Api.CreateDrawing(5363210, 9655810);
+    oDrawing = Api.CreateShape("rect",5363210, 9655810);
+    oParagraph.AddDrawing(oDrawing);
     oDrawing.SetWrappingStyle("inFront");
     oDrawing.SetHorPosition("page", 155575);
     oDrawing.SetVerPosition("page", 201295);
-    oParagraph.AddDrawing(oDrawing);
-    // TODO: Заполнить автофигуру
-    oDrawing = Api.CreateDrawing(1880870, 9655810);
+    oDrawing.SetFillColor(38, 38, 38);
+    oDrawing.SetLineColor(38, 38, 38);
+
+    var oDocContent = oDrawing.GetDocContent();
+    oDocContent.RemoveAllElements();
+    var oParagraph2 = Api.CreateParagraph();
+    oParagraph2.SetJc("right");
+    var oRun2 = oParagraph2.AddText("HAYDEN MANAGEMENT");
+    oRun2.SetFontSize(64);
+    oRun2.SetColor(255, 255, 255);
+    oParagraph2.SetBottomBorder("single", 1, 0, 255, 104, 0);
+    oDocContent.Push(oParagraph2);
+    oParagraph2 = Api.CreateParagraph();
+    oParagraph2.SetJc("right");
+    oRun2 = oParagraph2.AddText("Product Launch Revenue Plan");
+    oRun2.SetFontSize(44);
+    oRun2.SetColor(255, 255, 255);
+    oRun2.SetFontFamily("Calibri Light");
+    oDocContent.Push(oParagraph2);
+    oParagraph2 = Api.CreateParagraph();
+    oParagraph2.SetJc("right");
+    oDocContent.Push(oParagraph2);
+    oParagraph2 = Api.CreateParagraph();
+    oParagraph2.SetJc("right");
+    oDocContent.Push(oParagraph2);
+    oParagraph2 = Api.CreateParagraph();
+    oParagraph2.SetJc("right");
+    oDocContent.Push(oParagraph2);
+    oParagraph2 = Api.CreateParagraph();
+    oParagraph2.SetJc("right");
+    oRun2 = oParagraph2.AddText("Confidential");
+    oRun2.SetFontSize(28);
+    oRun2.SetColor(255, 255, 255);
+    oRun2.SetFontFamily("Calibri Light");
+    oDocContent.Push(oParagraph2);
+    oParagraph2 = Api.CreateParagraph();
+    oParagraph2.SetJc("right");
+    oRun2 = oParagraph2.AddText("May 2013");
+    oRun2.SetFontSize(28);
+    oRun2.SetColor(255, 255, 255);
+    oRun2.SetFontFamily("Calibri Light");
+    oDocContent.Push(oParagraph2);
+    oParagraph2 = Api.CreateParagraph();
+    oParagraph2.SetJc("right");
+    oDocContent.Push(oParagraph2);
+    oParagraph2 = Api.CreateParagraph();
+    oParagraph2.SetJc("right");
+    oDocContent.Push(oParagraph2);
+    oParagraph2 = Api.CreateParagraph();
+    oParagraph2.SetJc("right");
+    oDocContent.Push(oParagraph2);
+
+
+    oDrawing = Api.CreateShape("rect", 1880870, 9655810);
     oDrawing.SetWrappingStyle("inFront");
     oDrawing.SetHorPosition("page", 5673725);
     oDrawing.SetVerPosition("page", 201295);
+    oDrawing.SetFillColor(255, 104, 0);
+    oDrawing.SetLineColor(255, 104, 0);
     oParagraph.AddDrawing(oDrawing);
     oDocument.Push(oParagraph);
 
@@ -4168,7 +4617,7 @@ function TEST_BUILDER()
 
     // Filling ups header and footer
     oSection1.SetTitlePage(true);
-    var oDocContent = oSection1.GetHeader("default", true);
+    oDocContent = oSection1.GetHeader("default", true);
     oDocContent.RemoveAllElements();
     oTable = Api.CreateTable(2, 1);
     oDocContent.Push(oTable);
