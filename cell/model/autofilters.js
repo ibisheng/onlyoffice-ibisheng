@@ -3396,90 +3396,86 @@
 						maxFilterRow = automaticRowCount;
 				}
 				
-				var individualCount, count, tempResult;
-				// ToDo Нужно проверить, я не очень понял, зачем тут была проверка...
-				if (true) {
-					individualCount = 0;
-					count = 0;
-					for(var i = ref.r1 + 1; i <= maxFilterRow; i++)
+				
+				var individualCount = 0, count = 0, tempResult;
+				for(var i = ref.r1 + 1; i <= maxFilterRow; i++)
+				{
+					//max strings
+					if(individualCount > maxIndividualValues)
+						break;
+					
+					//not apply filter by current button
+					if(null === currentFilterColumn && worksheet.getRowHidden(i) === true)
 					{
-						//max strings
-						if(individualCount > maxIndividualValues)
-							break;
+						individualCount++;
+						continue;
+					}
+					
+					//value in current column
+					var cell = worksheet.getCell3(i, colId + ref.c1);
+					var text = cell.getValueWithFormat();
+					var val = cell.getValueWithoutFormat();
+					var textLowerCase = text.toLowerCase();
+					
+					isDateTimeFormat = cell.getNumFormat().isDateTimeFormat();
+					
+					//if(isDateTimeFormat)
+						//dataValue = NumFormat.prototype.parseDate(val);
 						
-						//not apply filter by current button
-						if(null === currentFilterColumn && worksheet.getRowHidden(i) === true)
-						{
-							individualCount++;
-							continue;
-						}
-						
-						//value in current column
-						var cell = worksheet.getCell3(i, colId + ref.c1);
-						var text = cell.getValueWithFormat();
-						var val = cell.getValueWithoutFormat();
-						var textLowerCase = text.toLowerCase();
-						
-						isDateTimeFormat = cell.getNumFormat().isDateTimeFormat();
-						
-						//if(isDateTimeFormat)
-							//dataValue = NumFormat.prototype.parseDate(val);
-							
-						//check duplicate value
-						if(temp.hasOwnProperty(textLowerCase))
-							continue;
-						
-						//apply filter by current button
-						if(null !== currentFilterColumn)
-						{
-							if(!this._hiddenAnotherFilter(filterColumns, colId, i, ref.c1))//filter another button
-							{
-								tempResult = new AutoFiltersOptionsElements();
-								tempResult.val = val;
-								tempResult.text = text;
-								tempResult.isDateFormat = cell.getNumFormat().isDateTimeFormat();
-								
-								//filter current button
-								var checkValue = isDateTimeFormat ? val : text;
-								if (!currentFilterColumn.Top10 && !currentFilterColumn.CustomFiltersObj &&
-									!currentFilterColumn.ColorFilter && !currentFilterColumn.isHideValue(checkValue, isDateTimeFormat))
-								{
-									if(isOpenHiddenRows)
-										worksheet.setRowHidden(false, i, i);
-									tempResult.visible = true;
-								}
-								else
-								{
-									if(isOpenHiddenRows)
-										worksheet.setRowHidden(false, i, i);
-									tempResult.visible = false;
-								}
-									
-								
-								addValueToMenuObj(tempResult, count);
-								
-								temp[textLowerCase] = 1;
-								count++;
-							}
-						}
-						else
+					//check duplicate value
+					if(temp.hasOwnProperty(textLowerCase))
+						continue;
+					
+					//apply filter by current button
+					if(null !== currentFilterColumn)
+					{
+						if(!this._hiddenAnotherFilter(filterColumns, colId, i, ref.c1))//filter another button
 						{
 							tempResult = new AutoFiltersOptionsElements();
-							tempResult.visible = true;
 							tempResult.val = val;
 							tempResult.text = text;
 							tempResult.isDateFormat = cell.getNumFormat().isDateTimeFormat();
 							
-							if(isOpenHiddenRows)
-								worksheet.setRowHidden(false, i, i);
+							//filter current button
+							var checkValue = isDateTimeFormat ? val : text;
+							if (!currentFilterColumn.Top10 && !currentFilterColumn.CustomFiltersObj &&
+								!currentFilterColumn.ColorFilter && !currentFilterColumn.isHideValue(checkValue, isDateTimeFormat))
+							{
+								if(isOpenHiddenRows)
+									worksheet.setRowHidden(false, i, i);
+								tempResult.visible = true;
+							}
+							else
+							{
+								if(isOpenHiddenRows)
+									worksheet.setRowHidden(false, i, i);
+								tempResult.visible = false;
+							}
+								
 							
 							addValueToMenuObj(tempResult, count);
+							
 							temp[textLowerCase] = 1;
 							count++;
 						}
-						
-						individualCount++;
 					}
+					else
+					{
+						tempResult = new AutoFiltersOptionsElements();
+						tempResult.visible = true;
+						tempResult.val = val;
+						tempResult.text = text;
+						tempResult.isDateFormat = cell.getNumFormat().isDateTimeFormat();
+						
+						if(isOpenHiddenRows)
+							worksheet.setRowHidden(false, i, i);
+						
+						addValueToMenuObj(tempResult, count);
+						temp[textLowerCase] = 1;
+						count++;
+					}
+					
+					individualCount++;
 				}
 
 				return {values: this._sortArrayMinMax(values), automaticRowCount: automaticRowCount};
