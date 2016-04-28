@@ -558,6 +558,6 @@ function RotateTrackGroup(originalObject)
     window['AscFormat'] = window['AscFormat'] || {};
     window['AscFormat'].OverlayObject = OverlayObject;
     window['AscFormat'].ObjectToDraw = ObjectToDraw;
-    window['AscFormat'].RotateTrackGroup = RotateTrackShapeImage;
+    window['AscFormat'].RotateTrackShapeImage = RotateTrackShapeImage;
     window['AscFormat'].RotateTrackGroup = RotateTrackGroup;
 })(window);
