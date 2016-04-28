@@ -23,6 +23,7 @@ var g_oDocumentUrls = AscCommon.g_oDocumentUrls;
   var g_dKoef_mm_to_pix = AscCommon.g_dKoef_mm_to_pix;
   var CSelectedContent = AscCommon.CSelectedContent;
   var CSelectedElement = AscCommon.CSelectedElement;
+  var type_Paragraph = AscCommon.type_Paragraph;
 
 var CShape = AscFormat.CShape;
   var CGraphicFrame = AscFormat.CGraphicFrame;
@@ -2836,8 +2837,8 @@ PasteProcessor.prototype =
                     }
                     Item.Internal_Content_Add(nContentPos, TextPr);
                 }
-                Item.RecalcInfo.Set_Type_0(pararecalc_0_All);
-                Item.RecalcInfo.Set_Type_0_Spell(pararecalc_0_Spell_All);
+                Item.RecalcInfo.Set_Type_0(AscCommon.pararecalc_0_All);
+                Item.RecalcInfo.Set_Type_0_Spell(AscCommon.pararecalc_0_Spell_All);
                 this.oRecalcDocument.ContentLastChangePos = this.oRecalcDocument.CurPos.ContentPos;
             }
             else
@@ -2846,7 +2847,7 @@ PasteProcessor.prototype =
                 var LastPosCurDoc = oDoc.CurPos.ContentPos;
                 //����� ��������� ��������
                 var oSourceFirstPar = Item;
-                var oSourceLastPar = new Paragraph(oDoc.DrawingDocument, oDoc, 0, 50, 50, X_Right_Field, Y_Bottom_Field );
+                var oSourceLastPar = new AscCommon.Paragraph(oDoc.DrawingDocument, oDoc, 0, 50, 50, X_Right_Field, Y_Bottom_Field );
                 if(true !== oSourceFirstPar.Cursor_IsEnd() || oSourceFirstPar.IsEmpty())
                     oSourceFirstPar.Split(oSourceLastPar);
                 var oInsFirstPar = aNewContent[0];
@@ -2917,8 +2918,8 @@ PasteProcessor.prototype =
                     LastPosCurDoc--;
                 }
                 this.oRecalcDocument.ContentLastChangePos = LastPos;
-                Item.RecalcInfo.Set_Type_0(pararecalc_0_All);
-                Item.RecalcInfo.Set_Type_0_Spell(pararecalc_0_Spell_All);
+                Item.RecalcInfo.Set_Type_0(AscCommon.pararecalc_0_All);
+                Item.RecalcInfo.Set_Type_0_Spell(AscCommon.pararecalc_0_Spell_All);
                 oDoc.CurPos.ContentPos = LastPosCurDoc;
             }
         }
@@ -2927,7 +2928,7 @@ PasteProcessor.prototype =
 		for(var  i = 0;  i < content.length; ++i)
 		{
             content[i].Recalc_CompiledPr();
-			content[i].RecalcInfo.Set_Type_0(pararecalc_0_All);
+			content[i].RecalcInfo.Set_Type_0(AscCommon.pararecalc_0_All);
 		}
 	},
     ReadFromBinary : function(sBase64)
@@ -4114,7 +4115,7 @@ PasteProcessor.prototype =
 				if(isGraphicFrame && drawings.length > 1 && drawings[i].base64)//если кроме таблички(при вставке из презентаций) содержатся ещё данные, вставляем в виде base64
 				{
 					if(!tempParagraph)
-						tempParagraph = new Paragraph(this.oDocument.DrawingDocument, this.oDocument, 0, 0, 0, 0, 0);
+						tempParagraph = new AscCommon.Paragraph(this.oDocument.DrawingDocument, this.oDocument, 0, 0, 0, 0, 0);
 					
 					extX = drawings[i].ExtX;
 					extY = drawings[i].ExtY;
@@ -4144,7 +4145,7 @@ PasteProcessor.prototype =
 				else
 				{
 					if(!tempParagraph)
-						tempParagraph = new Paragraph(this.oDocument.DrawingDocument, this.oDocument, 0, 0, 0, 0, 0);
+						tempParagraph = new AscCommon.Paragraph(this.oDocument.DrawingDocument, this.oDocument, 0, 0, 0, 0, 0);
 					
 					extX = drawings[i].ExtX;
 					extY = drawings[i].ExtY;
@@ -4402,7 +4403,7 @@ PasteProcessor.prototype =
 				var nIndex = 0;
 				for(var n = 0; n < cDocumentContent.Content.length; n++)
 				{
-                    if(cDocumentContent.Content[n] instanceof Paragraph)
+                    if(cDocumentContent.Content[n] instanceof AscCommon.Paragraph)
                     {
                         cDocumentContent.Content[nIndex] = AscFormat.ConvertParagraphToPPTX(cDocumentContent.Content[nIndex]);
                         ++nIndex;
@@ -5710,7 +5711,7 @@ PasteProcessor.prototype =
 		if(this.pasteInPresentationShape)
 			bFromPresentation = true;
 			
-		this.oCurPar = new Paragraph(this.oDocument.DrawingDocument, this.oDocument, 0, 50, 50, X_Right_Field, Y_Bottom_Field, this.oDocument.bPresentation === true );
+		this.oCurPar = new AscCommon.Paragraph(this.oDocument.DrawingDocument, this.oDocument, 0, 50, 50, X_Right_Field, Y_Bottom_Field, this.oDocument.bPresentation === true );
         this.oCurParContentPos = this.oCurPar.CurPos.ContentPos;
         this.oCurRun = new ParaRun(this.oCurPar);
         this.oCurRunContentPos = 0;
@@ -6289,7 +6290,7 @@ PasteProcessor.prototype =
         if(0 == oPasteProcessor.aContent.length)
         {
             var oDocContent = cell.Content;
-            var oNewPar = new Paragraph(oDocContent.DrawingDocument, oDocContent, 0, 50, 50, X_Right_Field, Y_Bottom_Field );
+            var oNewPar = new AscCommon.Paragraph(oDocContent.DrawingDocument, oDocContent, 0, 50, 50, X_Right_Field, Y_Bottom_Field );
             //���������� ��������� ��������� - ����� ��� ����������� �� ������ � ������ ���� ��� ����������� ������ ������
 			var oNewSpacing = new CParaSpacing();
 			oNewSpacing.Set_FromObject({After: 0, Before: 0, Line: Asc.linerule_Auto});

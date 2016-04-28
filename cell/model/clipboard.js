@@ -4254,7 +4254,7 @@
 				{
 					var elem = aDocumentContent[i];
 					var oNewElem = null;
-					if(type_Paragraph == elem.GetType())
+					if(AscCommon.type_Paragraph == elem.GetType())
 					{
 						oNewElem = new DocumentContentBoundsElement(elem, c_oAscBoundsElementType.Paragraph, oRes);
 						oNewElem.width = 1;
@@ -4908,7 +4908,7 @@
 				{
 					var Item = oDocument.Content[Index];
 
-					if ( type_Paragraph === Item.GetType() )
+					if ( AscCommon.type_Paragraph === Item.GetType() )
 					{
 						//todo ����� ������ ��� �������� ������ ���� Index == End
 						//this.oBinaryFileWriter.CopyParagraph(Item);
@@ -4988,7 +4988,7 @@
 											{
 												var wrappingType = oDocument.DrawingObjects.selection.groupSelection.parent.wrappingType;
 												var DrawingType = oDocument.DrawingObjects.selection.groupSelection.parent.DrawingType;
-												var tempParagraph = new Paragraph(oDocument, oDocument, 0, 0, 0, 0, 0);
+												var tempParagraph = new AscCommon.Paragraph(oDocument, oDocument, 0, 0, 0, 0, 0);
 												var index = 0;
 												
 												tempParagraph.Content.unshift(new ParaRun());

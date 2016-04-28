@@ -382,7 +382,7 @@
      */
     Api.prototype.CreateParagraph = function()
     {
-        return new ApiParagraph(new Paragraph(private_GetDrawingDocument(), private_GetLogicDocument()));
+        return new ApiParagraph(new AscCommon.Paragraph(private_GetDrawingDocument(), private_GetLogicDocument()));
     };
     /**
      * Create a new table.
@@ -669,9 +669,9 @@
             return null;
 
         var Type = this.Document.Content[nPos].Get_Type();
-        if (type_Paragraph === Type)
+        if (AscCommon.type_Paragraph === Type)
             return new ApiParagraph(this.Document.Content[nPos]);
-        else if (type_Paragraph === Type)
+        else if (AscCommon.type_Paragraph === Type)
             return new ApiTable(this.Document.Content[nPos]);
 
         return null;

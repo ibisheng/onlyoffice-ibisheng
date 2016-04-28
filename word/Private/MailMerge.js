@@ -370,7 +370,7 @@ CDocument.prototype.Get_MailMergedDocument = function(_nStartIndex, _nEndIndex)
         }
 
         // Добавляем дополнительный параграф с окончанием секции
-        var SectionPara = new Paragraph(this.DrawingDocument, this, 0, 0, 0, 0, 0);
+        var SectionPara = new AscCommon.Paragraph(this.DrawingDocument, this, 0, 0, 0, 0, 0);
         var SectPr = new CSectionPr();
         SectPr.Copy(this.SectPr, true);
         SectPr.Set_Type(section_type_NextPage);
@@ -384,7 +384,7 @@ CDocument.prototype.Get_MailMergedDocument = function(_nStartIndex, _nEndIndex)
     this.ForceCopySectPr  = false;
 
     // Добавляем дополнительный параграф в самом конце для последней секции документа
-    var SectPara = new Paragraph(this.DrawingDocument, this, 0, 0, 0, 0, 0);
+    var SectPara = new AscCommon.Paragraph(this.DrawingDocument, this, 0, 0, 0, 0, 0);
     LogicDocument.Content[OverallIndex++] = SectPara;
     LogicDocument.SectPr.Copy(this.SectPr);
     LogicDocument.SectPr.Set_Type(section_type_Continuous);

@@ -7016,12 +7016,12 @@ DrawingObjectsController.prototype =
         if ( true === ParaPr.Spacing.AfterAutoSpacing )
             ParaPr.Spacing.After = spacing_Auto;
         else if ( undefined === ParaPr.Spacing.AfterAutoSpacing )
-            ParaPr.Spacing.After = UnknownValue;
+            ParaPr.Spacing.After = AscCommon.UnknownValue;
 
         if ( true === ParaPr.Spacing.BeforeAutoSpacing )
             ParaPr.Spacing.Before = spacing_Auto;
         else if ( undefined === ParaPr.Spacing.BeforeAutoSpacing )
-            ParaPr.Spacing.Before = UnknownValue;
+            ParaPr.Spacing.Before = AscCommon.UnknownValue;
 
         if ( -1 === ParaPr.PStyle )
             ParaPr.StyleName = "";
@@ -7033,12 +7033,12 @@ DrawingObjectsController.prototype =
         if ( true === ParaPr.Spacing.AfterAutoSpacing )
             ParaPr.Spacing.After = spacing_Auto;
         else if ( undefined === ParaPr.Spacing.AfterAutoSpacing )
-            ParaPr.Spacing.After = UnknownValue;
+            ParaPr.Spacing.After = AscCommon.UnknownValue;
 
         if ( true === ParaPr.Spacing.BeforeAutoSpacing )
             ParaPr.Spacing.Before = spacing_Auto;
         else if ( undefined === ParaPr.Spacing.BeforeAutoSpacing )
-            ParaPr.Spacing.Before = UnknownValue;
+            ParaPr.Spacing.Before = AscCommon.UnknownValue;
 
         trigger("asc_onParaSpacingLine", new AscCommon.asc_CParagraphSpacing( ParaPr.Spacing ));
 
@@ -7151,7 +7151,7 @@ DrawingObjectsController.prototype =
                 oContent.Recalculate_Page(0, true);
 
                 var paragraph = oContent.Content[oContent.CurPos.ContentPos];
-                if (null != paragraph && type_Paragraph == paragraph.GetType())
+                if (null != paragraph && AscCommon.type_Paragraph == paragraph.GetType())
                 {
                     oNearestPos = { Paragraph: paragraph, ContentPos: paragraph.Get_ParaContentPos(false, false) };
                     paragraph.Check_NearestPos(oNearestPos);

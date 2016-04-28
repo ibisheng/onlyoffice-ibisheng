@@ -3829,7 +3829,7 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
         for ( var i = 0, length = Content.length; i < length; ++i )
         {
             var item = Content[i];
-            if ( type_Paragraph === item.GetType() )
+            if ( AscCommon.type_Paragraph === item.GetType() )
             {
                 this.memory.WriteByte(c_oSerParType.Par);
                 this.bs.WriteItemWithLength(function(){oThis.WriteParapraph(item);});
@@ -5668,7 +5668,7 @@ function BinaryFileReader(doc, openParams)
 		this.Document.Content = this.oReadResult.DocumentContent;
 		if(this.Document.Content.length == 0)
         {
-            var oNewParagraph = new Paragraph(this.Document.DrawingDocument, this.Document, 0, 0, 0, 0, 0 );
+            var oNewParagraph = new AscCommon.Paragraph(this.Document.DrawingDocument, this.Document, 0, 0, 0, 0, 0 );
             this.Document.Content.push(oNewParagraph);
         }
 		// for(var i = 0, length = this.oReadResult.aPostOpenStyleNumCallbacks.length; i < length; ++i)
@@ -5867,7 +5867,7 @@ function BinaryFileReader(doc, openParams)
 			
 			if(this.Document.Content.length == 0)
 			{
-				var oNewParagraph = new Paragraph(this.Document.DrawingDocument, this.Document, 0, 0, 0, 0, 0 );
+				var oNewParagraph = new AscCommon.Paragraph(this.Document.DrawingDocument, this.Document, 0, 0, 0, 0, 0 );
 				this.Document.Content.push(oNewParagraph);
 			};
 			
@@ -7957,7 +7957,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 				if(this.openParams.parCount >= g_nErrorParagraphCount)
 					throw new Error(g_sErrorCharCountMessage);
 			}
-            var oNewParagraph = new Paragraph(this.Document.DrawingDocument, this.Document, 0, 0, 0, 0, 0 );
+            var oNewParagraph = new AscCommon.Paragraph(this.Document.DrawingDocument, this.Document, 0, 0, 0, 0, 0 );
             res = this.bcr.Read1(length, function(t, l){
                 return oThis.ReadParagraph(t,l, oNewParagraph, Content);
             });

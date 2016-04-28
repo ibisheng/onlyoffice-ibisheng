@@ -7,6 +7,7 @@ var recalcresult_NextPage = AscCommon.recalcresult_NextPage;
 var recalcresult_NextLine = AscCommon.recalcresult_NextLine;
 var recalcresult_CurLine = AscCommon.recalcresult_CurLine;
 var recalcresultflags_Column = AscCommon.recalcresultflags_Column;
+var Paragraph = AscCommon.Paragraph;
 
 // TODO: В колонтитулах быстрые пересчеты отключены. Надо реализовать.
 
@@ -622,7 +623,7 @@ Paragraph.prototype.private_RecalculatePageKeepNext    = function(CurLine, CurPa
         // тогда мы должны пересчитать предыдущую страницу, с учетом того, что предыдущий параграф
         // надо начать с новой страницы.
         var Curr = this.Get_DocumentPrev();
-        while (null != Curr && type_Paragraph === Curr.GetType() && undefined === Curr.Get_SectionPr())
+        while (null != Curr && AscCommon.type_Paragraph === Curr.GetType() && undefined === Curr.Get_SectionPr())
         {
             var CurrKeepNext = Curr.Get_CompiledPr2(false).ParaPr.KeepNext;
             if ((true === CurrKeepNext && Curr.Pages.length > 1) || false === CurrKeepNext || true !== Curr.Is_Inline() || true === Curr.Check_PageBreak())
@@ -632,10 +633,10 @@ Paragraph.prototype.private_RecalculatePageKeepNext    = function(CurLine, CurPa
             else
             {
                 var Prev = Curr.Get_DocumentPrev();
-                if (null === Prev || (type_Paragraph === Prev.GetType() && undefined !== Prev.Get_SectionPr()))
+                if (null === Prev || (AscCommon.type_Paragraph === Prev.GetType() && undefined !== Prev.Get_SectionPr()))
                     break;
 
-                if (type_Paragraph != Prev.GetType() || false === Prev.Get_CompiledPr2(false).ParaPr.KeepNext)
+                if (AscCommon.type_Paragraph != Prev.GetType() || false === Prev.Get_CompiledPr2(false).ParaPr.KeepNext)
                 {
                     if (true === this.Parent.RecalcInfo.Can_RecalcObject())
                     {
@@ -723,7 +724,7 @@ Paragraph.prototype.private_RecalculatePageBreak       = function(CurLine, CurPa
             {
                 bNeedPageBreak = false;
             }
-            else if (this.Parent === this.LogicDocument && type_Paragraph === Prev.GetType() && undefined !== Prev.Get_SectionPr())
+            else if (this.Parent === this.LogicDocument && AscCommon.type_Paragraph === Prev.GetType() && undefined !== Prev.Get_SectionPr())
             {
                 var PrevSectPr = Prev.Get_SectionPr();
                 var CurSectPr = this.LogicDocument.SectionsInfo.Get_SectPr(this.Index).SectPr;
@@ -760,7 +761,7 @@ Paragraph.prototype.private_RecalculatePageBreak       = function(CurLine, CurPa
 
             var PrevElement = this.Get_DocumentPrev();
 
-            if (null !== PrevElement && type_Paragraph === PrevElement.Get_Type() && true === PrevElement.Is_Empty() && undefined !== PrevElement.Get_SectionPr())
+            if (null !== PrevElement && AscCommon.type_Paragraph === PrevElement.Get_Type() && true === PrevElement.Is_Empty() && undefined !== PrevElement.Get_SectionPr())
                 PrevElement = PrevElement.Get_DocumentPrev();
 
             if (0 !== CurPage && true !== this.Check_EmptyPages(CurPage - 1))
@@ -769,10 +770,10 @@ Paragraph.prototype.private_RecalculatePageBreak       = function(CurLine, CurPa
                 if (-1 !== EndLine && this.Lines[EndLine].Info & paralineinfo_BreakRealPage)
                     isPageBreakOnPrevLine = true;
             }
-            else if (null !== PrevElement && type_Paragraph === PrevElement.Get_Type())
+            else if (null !== PrevElement && AscCommon.type_Paragraph === PrevElement.Get_Type())
             {
                 var bNeedPageBreak = true;
-                if (type_Paragraph === PrevElement.GetType() && undefined !== PrevElement.Get_SectionPr())
+                if (AscCommon.type_Paragraph === PrevElement.GetType() && undefined !== PrevElement.Get_SectionPr())
                 {
                     var PrevSectPr = PrevElement.Get_SectionPr();
                     var CurSectPr  = this.LogicDocument.SectionsInfo.Get_SectPr(this.Index).SectPr;
@@ -789,7 +790,7 @@ Paragraph.prototype.private_RecalculatePageBreak       = function(CurLine, CurPa
             }
 
             // ColumnBreak для случая CurPage > 0 не разбираем здесь, т.к. он срабатывает автоматически
-            if (0 === CurPage && null !== PrevElement && type_Paragraph === PrevElement.Get_Type())
+            if (0 === CurPage && null !== PrevElement && AscCommon.type_Paragraph === PrevElement.Get_Type())
             {
                 var EndLine = PrevElement.Pages[PrevElement.Pages.length - 1].EndLine;
                 if (-1 !== EndLine && !(PrevElement.Lines[EndLine].Info & paralineinfo_BreakRealPage) && PrevElement.Lines[EndLine].Info & paralineinfo_BreakPage)
@@ -2304,13 +2305,13 @@ function CParaPage(X, Y, XLimit, YLimit, FirstLine)
     this.XLimit    = XLimit;
     this.YLimit    = YLimit;
     this.FirstLine = FirstLine;
-    this.Bounds    = new CDocumentBounds( X, Y, XLimit, Y );
+    this.Bounds    = new AscCommon.CDocumentBounds( X, Y, XLimit, Y );
     this.StartLine = FirstLine; // Номер строки, с которой начинается данная страница
     this.EndLine   = FirstLine; // Номер последней строки на данной странице
     this.TextPr    = null;      // Расситанные текстовые настройки для начала страницы
 
     this.Drawings  = [];
-    this.EndInfo   = new CParagraphPageEndInfo();
+    this.EndInfo   = new AscCommon.CParagraphPageEndInfo();
 }
 
 CParaPage.prototype =
@@ -2322,7 +2323,7 @@ CParaPage.prototype =
         this.XLimit    = XLimit;
         this.YLimit    = YLimit;
         this.FirstLine = FirstLine;
-        this.Bounds    = new CDocumentBounds( X, Y, XLimit, Y );
+        this.Bounds    = new AscCommon.CDocumentBounds( X, Y, XLimit, Y );
         this.StartLine = FirstLine;
         this.Drawings  = [];
     },
@@ -2451,12 +2452,12 @@ function CParagraphRecalculateStateWrap(Para)
     this.End      = false;
     this.RangeY   = false; // Текущая строка переносится по Y из-за обтекания
 
-    this.CurPos       = new CParagraphContentPos();
+    this.CurPos       = new AscCommon.CParagraphContentPos();
 
-    this.NumberingPos = new CParagraphContentPos(); // Позиция элемента вместе с которым идет нумерация
+    this.NumberingPos = new AscCommon.CParagraphContentPos(); // Позиция элемента вместе с которым идет нумерация
 
     this.MoveToLBP    = false;                      // Делаем ли разрыв в позиции this.LineBreakPos
-    this.LineBreakPos = new CParagraphContentPos(); // Последняя позиция в которой можно будет добавить разрыв
+    this.LineBreakPos = new AscCommon.CParagraphContentPos(); // Последняя позиция в которой можно будет добавить разрыв
     // отрезка или строки, если что-то не умещается (например,
     // если у нас не убирается слово, то разрыв ставим перед ним)
 
@@ -2477,7 +2478,7 @@ function CParagraphRecalculateStateWrap(Para)
     this.bMath_OneLine       = false;
     this.bMathWordLarge      = false;
     this.bEndRunToContent    = false;
-    this.PosEndRun           = new CParagraphContentPos();
+    this.PosEndRun           = new AscCommon.CParagraphContentPos();
 
     // параметры, необходимые для расчета разбиения по операторам
     // у "крайних" в строке операторов/мат объектов сооответствующий Gap равен нулю
@@ -2530,7 +2531,7 @@ CParagraphRecalculateStateWrap.prototype =
         this.bMath_OneLine       = false;
         this.bMathWordLarge      = false;
         this.bEndRunToContent    = false;
-        this.PosEndRun           = new CParagraphContentPos();
+        this.PosEndRun           = new AscCommon.CParagraphContentPos();
 
         this.OperGapRight        = 0;
         this.OperGapLeft         = 0;
@@ -2565,13 +2566,13 @@ CParagraphRecalculateStateWrap.prototype =
         this.XRange          = X;
 
         this.MoveToLBP    = false;
-        this.LineBreakPos = new CParagraphContentPos();
+        this.LineBreakPos = new AscCommon.CParagraphContentPos();
 
         // for ParaMath
         this.bMath_OneLine    = false;
         this.bMathWordLarge   = false;
         this.bEndRunToContent = false;
-        this.PosEndRun        = new CParagraphContentPos();
+        this.PosEndRun        = new AscCommon.CParagraphContentPos();
 
         this.OperGapRight        = 0;
         this.OperGapLeft         = 0;
@@ -2745,7 +2746,7 @@ CParagraphRecalculateStateWrap.prototype =
             if (Bullet.Get_Type() >= numbering_presentationnumfrmt_ArabicPeriod)
             {
                 var Prev = Para.Prev;
-                while (null != Prev && type_Paragraph === Prev.GetType())
+                while (null != Prev && AscCommon.type_Paragraph === Prev.GetType())
                 {
                     var PrevLevel = Prev.PresentationPr.Level;
                     var PrevBullet = Prev.Get_PresentationNumbering();

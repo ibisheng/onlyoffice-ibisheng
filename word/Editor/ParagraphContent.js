@@ -5272,7 +5272,7 @@ ParaDrawing.prototype =
 
     Get_ParentParagraph: function()
     {
-        if(this.Parent instanceof Paragraph )
+        if(this.Parent instanceof AscCommon.Paragraph )
             return this.Parent;
         if(this.Parent instanceof ParaRun)
             return this.Parent.Paragraph;
@@ -5285,7 +5285,7 @@ ParaDrawing.prototype =
 
         var LogicDocument = this.DrawingDocument.m_oLogicDocument;
 
-        var Para = new Paragraph(this.DrawingDocument, LogicDocument);
+        var Para = new AscCommon.Paragraph(this.DrawingDocument, LogicDocument);
         var DrawingRun = new ParaRun( Para );
         DrawingRun.Add_ToContent( 0, this );
 
@@ -5867,7 +5867,7 @@ ParaDrawing.prototype =
         if(isRealObject(this.GraphicObj) && typeof this.GraphicObj.getCurrentParagraph === "function")
             return this.GraphicObj.getCurrentParagraph();
 
-        if (this.Parent instanceof Paragraph)
+        if (this.Parent instanceof AscCommon.Paragraph)
             return this.Parent;
     },
     getSelectedText: function(bClearText)
@@ -7120,7 +7120,7 @@ ParaDrawing.prototype =
     private_ConvertToMathObject : function()
     {
         var Para = this.Get_Paragraph();
-        if (undefined === Para || null === Para || !(Para instanceof Paragraph))
+        if (undefined === Para || null === Para || !(Para instanceof AscCommon.Paragraph))
             return;
 
         var ParaContentPos = Para.Get_PosByDrawing(this.Get_Id());

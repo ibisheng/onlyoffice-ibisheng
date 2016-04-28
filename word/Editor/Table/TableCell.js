@@ -566,7 +566,7 @@ CTableCell.prototype =
             if ( 0 === this.Row.Index && undefined !== this.Row.Table && null !== this.Row.Table )
             {
                 var Prev = this.Row.Table.Get_DocumentPrev();
-                if ( null !== Prev && type_Paragraph === Prev.GetType() )
+                if ( null !== Prev && AscCommon.type_Paragraph === Prev.GetType() )
                     return Prev;
             }
 
@@ -580,7 +580,7 @@ CTableCell.prototype =
             return null;
 
         var Element = PrevCell.Content.Content[Count - 1];
-        if ( type_Paragraph !== Element.GetType() )
+        if ( AscCommon.type_Paragraph !== Element.GetType() )
             return null;
 
         return Element;

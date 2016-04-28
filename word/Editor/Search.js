@@ -780,7 +780,7 @@ CTable.prototype.Search_GetId = function(bNext, bCurrent)
 //----------------------------------------------------------------------------------------------------------------------
 // Paragraph
 //----------------------------------------------------------------------------------------------------------------------
-Paragraph.prototype.Search = function(Str, Props, SearchEngine, Type)
+AscCommon.Paragraph.prototype.Search = function(Str, Props, SearchEngine, Type)
 {
     var bMatchCase = Props.MatchCase;
     var ParaSearch = new CParagraphSearch(this, Str, Props, SearchEngine, Type);
@@ -817,8 +817,8 @@ Paragraph.prototype.Search = function(Str, Props, SearchEngine, Type)
             ResultStr = "\<b\>" + _Str + "\</b\>";
 
             var LeaveCount = MaxShowValue - _Str.length;
-            var RunElementsAfter  = new CParagraphRunElements(EndPos, LeaveCount);
-            var RunElementsBefore = new CParagraphRunElements(StartPos, LeaveCount);
+            var RunElementsAfter  = new AscCommon.CParagraphRunElements(EndPos, LeaveCount);
+            var RunElementsBefore = new AscCommon.CParagraphRunElements(StartPos, LeaveCount);
 
             this.Get_NextRunElements(RunElementsAfter);
             this.Get_PrevRunElements(RunElementsBefore);
@@ -873,7 +873,7 @@ Paragraph.prototype.Search = function(Str, Props, SearchEngine, Type)
     }
 };
 
-Paragraph.prototype.Search_GetId = function(bNext, bCurrent)
+AscCommon.Paragraph.prototype.Search_GetId = function(bNext, bCurrent)
 {
     // Определим позицию, начиная с которой мы будем искать ближайший найденный элемент
     var ContentPos = null;
@@ -937,7 +937,7 @@ Paragraph.prototype.Search_GetId = function(bNext, bCurrent)
     return null;
 };
 
-Paragraph.prototype.Add_SearchResult = function(Id, StartContentPos, EndContentPos, Type)
+AscCommon.Paragraph.prototype.Add_SearchResult = function(Id, StartContentPos, EndContentPos, Type)
 {
     var SearchResult = new CParagraphSearchElement( StartContentPos, EndContentPos, Type, Id );
 
@@ -950,7 +950,7 @@ Paragraph.prototype.Add_SearchResult = function(Id, StartContentPos, EndContentP
     this.Content[EndContentPos.Get(0)].Add_SearchResult( SearchResult, false, EndContentPos, 1 );
 };
 
-Paragraph.prototype.Clear_SearchResults = function()
+AscCommon.Paragraph.prototype.Clear_SearchResults = function()
 {
     for ( var Id in this.SearchResults )
     {
@@ -972,7 +972,7 @@ Paragraph.prototype.Clear_SearchResults = function()
     this.SearchResults = {};
 };
 
-Paragraph.prototype.Remove_SearchResult = function(Id)
+AscCommon.Paragraph.prototype.Remove_SearchResult = function(Id)
 {
     var SearchResult = this.SearchResults[Id];
     if ( undefined !== SearchResult )
@@ -1234,7 +1234,7 @@ function CParagraphSearch(Paragraph, Str, Props, SearchEngine, Type)
     this.SearchEngine = SearchEngine;
     this.Type         = Type;
 
-    this.ContentPos   = new CParagraphContentPos();
+    this.ContentPos   = new AscCommon.CParagraphContentPos();
 
     this.StartPos     = null; // Запоминаем здесь стартовую позицию поиска
     this.SearchIndex  = 0;    // Номер символа, с которым мы проверяем совпадение

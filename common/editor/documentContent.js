@@ -10,6 +10,8 @@ var History = AscCommon.History;
     var selectionflag_Common = AscCommon.selectionflag_Common;
     var selectionflag_Numbering = AscCommon.selectionflag_Numbering;
     var recalcresult_NextElement = AscCommon.recalcresult_NextElement;
+    var Paragraph = AscCommon.Paragraph;
+    var type_Paragraph = AscCommon.type_Paragraph;
 
 var c_oAscHAnchor = Asc.c_oAscHAnchor;
 var c_oAscXAlign = Asc.c_oAscXAlign;
@@ -6829,13 +6831,13 @@ CDocumentContent.prototype =
                 Pr = Pr.Compare(TempPr);
             }
 
-            if ( Pr.Ind.Left == UnknownValue )
+            if ( Pr.Ind.Left == AscCommon.UnknownValue )
                 Pr.Ind.Left = StartPr.Ind.Left;
 
-            if ( Pr.Ind.Right == UnknownValue )
+            if ( Pr.Ind.Right == AscCommon.UnknownValue )
                 Pr.Ind.Right = StartPr.Ind.Right;
 
-            if ( Pr.Ind.FirstLine == UnknownValue )
+            if ( Pr.Ind.FirstLine == AscCommon.UnknownValue )
                 Pr.Ind.FirstLine = StartPr.Ind.FirstLine;
 
             Result_ParaPr = Pr;

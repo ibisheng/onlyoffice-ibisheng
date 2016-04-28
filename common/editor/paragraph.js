@@ -1,5 +1,7 @@
 "use strict";
 
+(function(window, undefined){
+
 // При добавлении нового элемента ParagraphContent, добавить его обработку в
 // следующие функции:
 // Internal_Recalculate1, Internal_Recalculate2, Draw, Add,
@@ -15134,3 +15136,24 @@ CParagraphRevisionsChangesChecker.prototype.Get_PrChangeUserId = function()
 {
     return this.TextPr.UserId;
 };
+
+    //--------------------------------------------------------export----------------------------------------------------
+    window['AscCommon'] = window['AscCommon'] || {};
+    window['AscCommon'].Paragraph = Paragraph;
+    window['AscCommon'].CDocumentBounds = CDocumentBounds;
+    window['AscCommon'].CParagraphPageEndInfo = CParagraphPageEndInfo;
+    window['AscCommon'].CParaPos = CParaPos;
+    window['AscCommon'].CParagraphContentPos = CParagraphContentPos;
+    window['AscCommon'].CParagraphSearchPos = CParagraphSearchPos;
+    window['AscCommon'].CParagraphGetText = CParagraphGetText;
+    window['AscCommon'].CParagraphElementNearPos = CParagraphElementNearPos;
+    window['AscCommon'].CRunRecalculateObject = CRunRecalculateObject;
+    window['AscCommon'].CParagraphRunElements = CParagraphRunElements;
+
+    window['AscCommon'].type_Paragraph = type_Paragraph;
+    window['AscCommon'].UnknownValue = UnknownValue;
+    window['AscCommon'].REVIEW_COLOR = REVIEW_COLOR;
+    window['AscCommon'].pararecalc_0_All = pararecalc_0_All;
+    window['AscCommon'].pararecalc_0_Spell_All = pararecalc_0_Spell_All;
+    window['AscCommon'].pararecalc_0_Spell_None = pararecalc_0_Spell_None;
+})(window);

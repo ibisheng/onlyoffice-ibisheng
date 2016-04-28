@@ -3251,7 +3251,7 @@ CMathContent.prototype.Get_CurrentParaPos = function()
     if ( this.CurPos >= 0 && this.CurPos < this.Content.length )
         return this.Content[this.CurPos].Get_CurrentParaPos();
 
-    return new CParaPos( this.StartRange, this.StartLine, 0, 0 );
+    return new AscCommon.CParaPos( this.StartRange, this.StartLine, 0, 0 );
 };
 CMathContent.prototype.Get_ParaContentPos = function(bSelection, bStart, ContentPos)
 {
@@ -3879,7 +3879,7 @@ CMathContent.prototype.Selection_CheckParaContentPos = function(ContentPos, Dept
 };
 CMathContent.prototype.Check_NearestPos = function(ParaNearPos, Depth)
 {
-    var HyperNearPos = new CParagraphElementNearPos();
+    var HyperNearPos = new AscCommon.CParagraphElementNearPos();
     HyperNearPos.NearPos = ParaNearPos.NearPos;
     HyperNearPos.Depth   = Depth;
 
