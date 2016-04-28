@@ -101,6 +101,8 @@
         "../word/Drawing/Graphics.js",
         "../word/Drawing/ShapeDrawer.js",
 		
+		"../slide/Editor/Format/ShapePrototype.js",
+		
         "../slide/Drawing/Transitions.js",
         "../slide/Drawing/DrawingDocument.js",
         "../slide/Drawing/HtmlPage.js",
@@ -140,7 +142,7 @@
         "../word/Editor/Spelling.js",
         "../word/Editor/Search.js",
         "../word/Editor/FontClassification.js",
-        "../slide/Editor/Format/ShapePrototype.js",
+        
         "../slide/Editor/Format/ImagePrototype.js",
         "../slide/Editor/Format/GroupPrototype.js",
         "../slide/Editor/Format/ChartSpacePrototype.js",

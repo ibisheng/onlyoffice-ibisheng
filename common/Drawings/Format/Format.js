@@ -323,7 +323,7 @@ function checkTableCellPr(cellPr, slide, layout, master, theme)
     }
     else
     {
-        color_map = G_O_DEFAULT_COLOR_MAP;
+        color_map = AscFormat.G_O_DEFAULT_COLOR_MAP;
     }
 
     checkObjectUnifill(cellPr.Shd, theme, color_map);
@@ -11843,6 +11843,19 @@ function CorrectUniColor(asc_color, unicolor, flag)
     return ret;
 }
 
+    function deleteDrawingBase(aObjects, graphicId)
+    {
+        var position = null;
+        for (var i = 0; i < aObjects.length; i++) {
+            if ( aObjects[i].graphicObject.Get_Id() == graphicId ) {
+                aObjects.splice(i, 1);
+                position = i;
+                break;
+            }
+        }
+        return position;
+    }
+
     //----------------------------------------------------------export----------------------------------------------------
     window['AscFormat'] = window['AscFormat'] || {};
     window['AscFormat'].CreateFontRef = CreateFontRef;
@@ -11940,6 +11953,7 @@ function CorrectUniColor(asc_color, unicolor, flag)
     window['AscFormat'].CreateAscTextArtProps = CreateAscTextArtProps;
     window['AscFormat'].CreateUnifillFromAscColor = CreateUnifillFromAscColor;
     window['AscFormat'].CorrectUniColor = CorrectUniColor;
+    window['AscFormat'].deleteDrawingBase = deleteDrawingBase;
 
     window['AscFormat'].Ax_Counter = Ax_Counter;
     window['AscFormat'].TYPE_TRACK = TYPE_TRACK;

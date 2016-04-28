@@ -977,7 +977,7 @@ Slide.prototype =
         {
             return this.Layout.Master.clrMap;
         }
-        return G_O_DEFAULT_COLOR_MAP;
+        return AscFormat.G_O_DEFAULT_COLOR_MAP;
     },
 
     recalculate: function()

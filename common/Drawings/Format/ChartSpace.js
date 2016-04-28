@@ -8920,12 +8920,12 @@ CChartSpace.prototype =
             }
             case AscDFH.historyitem_AutoShapes_RemoveFromDrawingObjects:
             {
-                addToDrawings(this.worksheet, this, data.Pos);
+                AscFormat.addToDrawings(this.worksheet, this, data.Pos);
                 break;
             }
             case AscDFH.historyitem_AutoShapes_AddToDrawingObjects:
             {
-                deleteDrawingBase(this.worksheet.Drawings, this.Get_Id());
+                AscFormat.deleteDrawingBase(this.worksheet.Drawings, this.Get_Id());
                 break;
             }
             case AscDFH.historyitem_AutoShapes_SetWorksheet:
@@ -9051,12 +9051,12 @@ CChartSpace.prototype =
             }
             case AscDFH.historyitem_AutoShapes_RemoveFromDrawingObjects:
             {
-                deleteDrawingBase(this.worksheet.Drawings, this.Get_Id());
+                AscFormat.deleteDrawingBase(this.worksheet.Drawings, this.Get_Id());
                 break;
             }
             case AscDFH.historyitem_AutoShapes_AddToDrawingObjects:
             {
-                addToDrawings(this.worksheet, this, data.Pos);
+                AscFormat.addToDrawings(this.worksheet, this, data.Pos);
                 break;
             }
 
@@ -9325,7 +9325,7 @@ CChartSpace.prototype =
             }
             case AscDFH.historyitem_AutoShapes_RemoveFromDrawingObjects:
             {
-                deleteDrawingBase(this.worksheet.Drawings, this.Get_Id());
+                AscFormat.deleteDrawingBase(this.worksheet.Drawings, this.Get_Id());
                 break;
             }
             case AscDFH.historyitem_AutoShapes_AddToDrawingObjects:
@@ -9335,7 +9335,7 @@ CChartSpace.prototype =
                 {
                     pos = this.worksheet.contentChanges.Check(AscCommon.contentchanges_Add, pos);
                 }
-                addToDrawings(this.worksheet, this, pos);
+                AscFormat.addToDrawings(this.worksheet, this, pos);
                 break;
             }
             case AscDFH.historyitem_AutoShapes_SetWorksheet:
