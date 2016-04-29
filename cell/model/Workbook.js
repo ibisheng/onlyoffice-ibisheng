@@ -1050,11 +1050,11 @@ DependencyGraph.prototype = {
     },
     changeDefName:function ( oldDefName, newDefName ) {
 
-        var ws = this.wb.getWorksheet( oldDefName.LocalSheetId ), sheetId = null;
-        ws ? sheetId = ws.getId() : null;
+        var ws = this.wb.getWorksheet( oldDefName.LocalSheetId );
+      var sheetId = ws ? ws.getId() : null;
 
         var oldN = this.getDefNameNodeByName( oldDefName.Name, sheetId ),
-            res = null, sheetNodeList, nodeId,
+            sheetNodeList, nodeId,
             name = oldDefName.Name;
 
         sheetNodeList = this.defNameSheets[sheetId || "WB"];
@@ -1073,17 +1073,22 @@ DependencyGraph.prototype = {
         this.defNameList[oldN.nodeId] = oldN;
         sheetNodeList[oldN.nodeId] = oldN;
 
-        if(oldDefName.isTable){
-            var tableParts = this.wb.getActiveWs().TableParts;
-            for(var i = 0; i < tableParts.length; i++){
-                if( tableParts[i].DisplayName == name ){
-                    tableParts[i].DisplayName = oldN.Name;
+        if (oldDefName.isTable) {
+          var dataRange = parserHelp.parse3DRef(oldDefName.Ref);
+          if (dataRange) {
+            var sheetDefName = this.wb.getWorksheetByName(dataRange.sheet);
+            if (sheetDefName) {
+              var tableParts = sheetDefName.TableParts;
+              for (var i = 0; i < tableParts.length; i++) {
+                if (tableParts[i].DisplayName == name) {
+                  tableParts[i].DisplayName = oldN.Name;
                 }
+              }
             }
-        }
-        else{
-            oldN.deleteAllMasterEdges();
-            addToArrDefNameRecalc(oldN);
+          }
+        } else {
+          oldN.deleteAllMasterEdges();
+          addToArrDefNameRecalc(oldN);
         }
 
         return oldN;
