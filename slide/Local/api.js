@@ -97,7 +97,7 @@ AscCommon.CHistory.prototype.Have_Changes = function(IsNotUserSave, IsNoSavedNoM
 	
 window["DesktopOfflineAppDocumentApplyChanges"] = function(_changes)
 {
-	editor._coAuthoringSetChanges(_changes, new AscCommon.CDocumentColor( 191, 255, 199 ));
+	editor._coAuthoringSetChanges(_changes, new CDocumentColor( 191, 255, 199 ));
     //editor["asc_nativeApplyChanges"](_changes);
 	//editor["asc_nativeCalculateFile"]();
 };

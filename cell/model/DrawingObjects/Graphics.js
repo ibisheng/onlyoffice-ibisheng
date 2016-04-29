@@ -1670,7 +1670,7 @@ CGraphics.prototype =
             return;
         }
 
-        var pen_w = parseInt((this.m_dDpiX * penW / AscCommon.g_dKoef_in_to_mm) + 0.5);
+        var pen_w = parseInt((this.m_dDpiX * penW / g_dKoef_in_to_mm) + 0.5);
         if (0 == pen_w)
             pen_w = 1;
 
@@ -1751,7 +1751,7 @@ CGraphics.prototype =
             return;
         }
 
-        var pen_w = ((this.m_dDpiX * penW / AscCommon.g_dKoef_in_to_mm) + 0.5) >> 0;
+        var pen_w = ((this.m_dDpiX * penW / g_dKoef_in_to_mm) + 0.5) >> 0;
         if (0 == pen_w)
             pen_w = 1;
 
@@ -1811,7 +1811,7 @@ CGraphics.prototype =
             return;
         }
 
-        var pen_w = ((this.m_dDpiX * penW / AscCommon.g_dKoef_in_to_mm) + 0.5) >> 0;
+        var pen_w = ((this.m_dDpiX * penW / g_dKoef_in_to_mm) + 0.5) >> 0;
         if (0 == pen_w)
             pen_w = 1;
 
@@ -1883,7 +1883,7 @@ CGraphics.prototype =
             return;
         }
 
-        var pen_w = Math.max(((this.m_dDpiX * penW / AscCommon.g_dKoef_in_to_mm) + 0.5) >> 0, 1);
+        var pen_w = Math.max(((this.m_dDpiX * penW / g_dKoef_in_to_mm) + 0.5) >> 0, 1);
 
         var _x = (this.m_oFullTransform.TransformPointX(x,y) >> 0) + 0.5;
         var _r = (this.m_oFullTransform.TransformPointX(r,y) >> 0) + 0.5;
@@ -1891,7 +1891,7 @@ CGraphics.prototype =
         if (leftMW != 0)
         {
             var _center = _x;
-            var pen_mw = Math.max(((this.m_dDpiX * Math.abs(leftMW) * 2 / AscCommon.g_dKoef_in_to_mm) + 0.5) >> 0, 1);
+            var pen_mw = Math.max(((this.m_dDpiX * Math.abs(leftMW) * 2 / g_dKoef_in_to_mm) + 0.5) >> 0, 1);
             if (leftMW < 0)
             {
                 if ((pen_mw % 2) == 0)
@@ -1918,7 +1918,7 @@ CGraphics.prototype =
         if (rightMW != 0)
         {
             var _center = _r;
-            var pen_mw = Math.max(((this.m_dDpiX * Math.abs(rightMW) * 2 / AscCommon.g_dKoef_in_to_mm) + 0.5) >> 0, 1);
+            var pen_mw = Math.max(((this.m_dDpiX * Math.abs(rightMW) * 2 / g_dKoef_in_to_mm) + 0.5) >> 0, 1);
             if (rightMW < 0)
             {
                 if ((pen_mw % 2) == 0)

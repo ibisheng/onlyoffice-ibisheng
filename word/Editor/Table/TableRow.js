@@ -43,7 +43,7 @@ function CTableRow(Table, Cols, TableGrid)
         NeedRecalc : true
     };
 
-    this.Pr = new AscCommon.CTableRowPr();
+    this.Pr = new CTableRowPr();
 
     // Данные два параметра нужны для контроля кардинальности изменений, которые
     // происходят внутри ячеек данной строки.
@@ -325,7 +325,7 @@ CTableRow.prototype =
                 NewBefore.WBefore = OldBefore.WBefore;
             else if ( undefined != WBefore )
             {
-                NewBefore.WBefore = new AscCommon.CTableMeasurement(AscCommon.tblwidth_Auto, 0);
+                NewBefore.WBefore = new CTableMeasurement(tblwidth_Auto, 0);
                 NewBefore.WBefore.Set_FromObject(WBefore);
             }
 
@@ -379,7 +379,7 @@ CTableRow.prototype =
                 NewAfter.WAfter = OldAfter.WAfter;
             else if ( undefined != WAfter )
             {
-                NewAfter.WAfter = new AscCommon.CTableMeasurement(AscCommon.tblwidth_Auto, 0);
+                NewAfter.WAfter = new CTableMeasurement(tblwidth_Auto, 0);
                 NewAfter.WAfter.Set_FromObject(WAfter);
             }
 
@@ -444,7 +444,7 @@ CTableRow.prototype =
             return;
 
         var OldHeight = undefined != this.Pr.Height ? this.Pr.Height : undefined;
-        var NewHeight = undefined != Value  ? new AscCommon.CTableRowHeight( Value, HRule ): undefined;
+        var NewHeight = undefined != Value  ? new CTableRowHeight( Value, HRule ): undefined;
 
         History.Add( this, { Type : AscDFH.historyitem_TableRow_Height, Old : OldHeight, New : NewHeight } );
 
@@ -1187,7 +1187,7 @@ CTableRow.prototype =
                     this.Pr.WBefore = undefined;
                 else
                 {
-                    this.Pr.WBefore = new AscCommon.CTableMeasurement(AscCommon.tblwidth_Auto, 0);
+                    this.Pr.WBefore = new CTableMeasurement(tblwidth_Auto, 0);
                     this.Pr.WBefore.Read_FromBinary( Reader );
                 }
 
@@ -1215,7 +1215,7 @@ CTableRow.prototype =
                     this.Pr.WAfter = undefined;
                 else
                 {
-                    this.Pr.WAfter = new AscCommon.CTableMeasurement(AscCommon.tblwidth_Auto, 0);
+                    this.Pr.WAfter = new CTableMeasurement(tblwidth_Auto, 0);
                     this.Pr.WAfter.Read_FromBinary( Reader );
                 }
 
@@ -1257,7 +1257,7 @@ CTableRow.prototype =
                     this.Pr.Height = undefined;
                 else
                 {
-                    this.Pr.Height = new AscCommon.CTableRowHeight(0, Asc.linerule_Auto);
+                    this.Pr.Height = new CTableRowHeight(0, Asc.linerule_Auto);
                     this.Pr.Height.Read_FromBinary( Reader );
                 }
 
@@ -1335,7 +1335,7 @@ CTableRow.prototype =
             case AscDFH.historyitem_TableRow_Pr:
             {
                 // CTableRowPr
-                this.Pr = new AscCommon.CTableRowPr();
+                this.Pr = new CTableRowPr();
                 this.Pr.Read_FromBinary( Reader );
 
                 this.Recalc_CompiledPr();
@@ -1372,7 +1372,7 @@ CTableRow.prototype =
         // Array variables : сами ячейки
 
         this.Id = Reader.GetString2();
-        this.Pr = new AscCommon.CTableRowPr()
+        this.Pr = new CTableRowPr()
         this.Pr.Read_FromBinary( Reader );
         this.Recalc_CompiledPr();
 

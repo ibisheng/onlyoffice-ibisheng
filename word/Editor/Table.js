@@ -20,12 +20,6 @@ var align_Left = AscCommon.align_Left;
 var CMouseMoveData = AscCommon.CMouseMoveData;
 var g_oTableId = AscCommon.g_oTableId;
 var History = AscCommon.History;
-var CTableMeasurement = AscCommon.CTableMeasurement;
-var CDocumentBorder = AscCommon.CDocumentBorder;
-var vmerge_Continue = AscCommon.vmerge_Continue;
-var vmerge_Restart = AscCommon.vmerge_Restart;
-var tblwidth_Mm = AscCommon.tblwidth_Mm;
-var tblwidth_Auto = AscCommon.tblwidth_Auto;
 
 var linerule_AtLeast = Asc.linerule_AtLeast;
 var c_oAscError = Asc.c_oAscError;
@@ -90,7 +84,7 @@ function CTable(DrawingDocument, Parent, Inline, PageNum, X, Y, XLimit, YLimit, 
         NeedRecalc : true   // Нужно ли пересчитать скомпилированный стиль
     };
 
-    this.Pr = new AscCommon.CTablePr();
+    this.Pr = new CTablePr();
     this.Pr.TableW = new CTableMeasurement(tblwidth_Auto, 0);
 
     this.TableGridNeedRecalc = true;
@@ -669,17 +663,17 @@ CTable.prototype =
 
         switch(Pr.CellsVAlign)
         {
-            case AscCommon.vertalignjc_Top    : Pr.CellsVAlign = c_oAscVertAlignJc.Top; break;
-            case AscCommon.vertalignjc_Bottom : Pr.CellsVAlign = c_oAscVertAlignJc.Bottom; break;
-            case AscCommon.vertalignjc_Center : Pr.CellsVAlign = c_oAscVertAlignJc.Center; break;
+            case vertalignjc_Top    : Pr.CellsVAlign = c_oAscVertAlignJc.Top; break;
+            case vertalignjc_Bottom : Pr.CellsVAlign = c_oAscVertAlignJc.Bottom; break;
+            case vertalignjc_Center : Pr.CellsVAlign = c_oAscVertAlignJc.Center; break;
             default                 : Pr.CellsVAlign = null; break;
         }
 
         switch(Pr.CellsTextDirection)
         {
-            case AscCommon.textdirection_LRTB  : Pr.CellsTextDirection = c_oAscCellTextDirection.LRTB; break;
-            case AscCommon.textdirection_TBRL  : Pr.CellsTextDirection = c_oAscCellTextDirection.TBRL; break;
-            case AscCommon.textdirection_BTLR  : Pr.CellsTextDirection = c_oAscCellTextDirection.BTLR; break;
+            case textdirection_LRTB  : Pr.CellsTextDirection = c_oAscCellTextDirection.LRTB; break;
+            case textdirection_TBRL  : Pr.CellsTextDirection = c_oAscCellTextDirection.TBRL; break;
+            case textdirection_BTLR  : Pr.CellsTextDirection = c_oAscCellTextDirection.BTLR; break;
             default                  : Pr.CellsTextDirection = null; break;
         }
 
@@ -764,7 +758,7 @@ CTable.prototype =
         if ( true === this.Parent.Is_InTable() )
             Pr.TableLayout = undefined;
         else
-            Pr.TableLayout = (TablePr.TableLayout === AscCommon.tbllayout_AutoFit ? c_oAscTableLayout.AutoFit : c_oAscTableLayout.Fixed );
+            Pr.TableLayout = (TablePr.TableLayout === tbllayout_AutoFit ? c_oAscTableLayout.AutoFit : c_oAscTableLayout.Fixed );
 
         if(!this.bPresentation)
         {
@@ -1149,7 +1143,7 @@ CTable.prototype =
             }
             else
             {
-                this.Set_TableW(AscCommon.tblwidth_Pct, Math.abs(Props.TableWidth));
+                this.Set_TableW(tblwidth_Pct, Math.abs(Props.TableWidth));
                 bRecalc_All = true;
             }
         }
@@ -1157,7 +1151,7 @@ CTable.prototype =
         // TableLayout
         if ( undefined != Props.TableLayout )
         {
-            this.Set_TableLayout( ( Props.TableLayout === c_oAscTableLayout.AutoFit ? AscCommon.tbllayout_AutoFit : AscCommon.tbllayout_Fixed ) );
+            this.Set_TableLayout( ( Props.TableLayout === c_oAscTableLayout.AutoFit ? tbllayout_AutoFit : tbllayout_Fixed ) );
             bRecalc_All = true;
         }
 
@@ -1912,9 +1906,9 @@ CTable.prototype =
             var TextDirection = undefined;
             switch (Props.CellsTextDirection)
             {
-                case c_oAscCellTextDirection.LRTB: TextDirection = AscCommon.textdirection_LRTB; break;
-                case c_oAscCellTextDirection.TBRL: TextDirection = AscCommon.textdirection_TBRL; break;
-                case c_oAscCellTextDirection.BTLR: TextDirection = AscCommon.textdirection_BTLR; break;
+                case c_oAscCellTextDirection.LRTB: TextDirection = textdirection_LRTB; break;
+                case c_oAscCellTextDirection.TBRL: TextDirection = textdirection_TBRL; break;
+                case c_oAscCellTextDirection.BTLR: TextDirection = textdirection_BTLR; break;
             }
 
             if (undefined !== TextDirection)
@@ -1971,7 +1965,7 @@ CTable.prototype =
                     else if (Props.CellsWidth > -0.001)
                         Cell.Set_W(new CTableMeasurement(tblwidth_Mm, Props.CellsWidth));
                     else
-                        Cell.Set_W(new CTableMeasurement(AscCommon.tblwidth_Pct, Math.abs(Props.CellsWidth)));
+                        Cell.Set_W(new CTableMeasurement(tblwidth_Pct, Math.abs(Props.CellsWidth)));
                 }
             }
             else
@@ -1981,7 +1975,7 @@ CTable.prototype =
                 else if (Props.CellsWidth > -0.001)
                     this.CurCell.Set_W(new CTableMeasurement(tblwidth_Mm, Props.CellsWidth));
                 else
-                    this.CurCell.Set_W(new CTableMeasurement(AscCommon.tblwidth_Pct, Math.abs(Props.CellsWidth)));
+                    this.CurCell.Set_W(new CTableMeasurement(tblwidth_Pct, Math.abs(Props.CellsWidth)));
             }
         }
 
@@ -2132,7 +2126,7 @@ CTable.prototype =
         if ( null != CellSpacing )
         {
             var Table_Border_Top = this.Get_Borders().Top;
-            if ( AscCommon.border_Single === Table_Border_Top.Value )
+            if ( border_Single === Table_Border_Top.Value )
                 Y += Table_Border_Top.Size;
 
             if ( true === bHeader || 0 === CurPage || ( 1 === CurPage && true != this.RowsInfo[0].FirstPage ) )
@@ -2165,7 +2159,7 @@ CTable.prototype =
 
                 var ResultBorder = this.Internal_CompareBorders( CurBorder, TableBorders.Top, false, true );
 
-                if ( AscCommon.border_Single === ResultBorder.Value && MaxTopBorder < ResultBorder.Size )
+                if ( border_Single === ResultBorder.Value && MaxTopBorder < ResultBorder.Size )
                     MaxTopBorder = ResultBorder.Size;
             }
         }
@@ -2209,7 +2203,7 @@ CTable.prototype =
 
                 var ResultBorder = this.Internal_CompareBorders( CurBorder, TableBorders.Top, false, true );
 
-                if ( AscCommon.border_Single === ResultBorder.Value && MaxTopBorder < ResultBorder.Size )
+                if ( border_Single === ResultBorder.Value && MaxTopBorder < ResultBorder.Size )
                     MaxTopBorder = ResultBorder.Size;
             }
         }
@@ -2260,13 +2254,13 @@ CTable.prototype =
         if ( null != CellSpacing )
         {
             var TableBorder_Left = this.Get_Borders().Left;
-            if ( AscCommon.border_None != TableBorder_Left.Value )
+            if ( border_None != TableBorder_Left.Value )
                 X += TableBorder_Left.Size / 2;
 
             X += CellSpacing;
 
             var CellBorder_Left = Cell.Get_Borders().Left;
-            if ( AscCommon.border_None != CellBorder_Left.Value )
+            if ( border_None != CellBorder_Left.Value )
                 X += CellBorder_Left.Size;
 
             X += Margins.Left.W;
@@ -2277,7 +2271,7 @@ CTable.prototype =
             var CellBorder_Left  = Cell.Get_Borders().Left;
             var Result_Border = this.Internal_CompareBorders( TableBorder_Left, CellBorder_Left, true, false );
 
-            if ( AscCommon.border_None != Result_Border.Value )
+            if ( border_None != Result_Border.Value )
                 X += Math.max( Result_Border.Size / 2, Margins.Left.W );
             else
                 X += Margins.Left.W;
@@ -2300,13 +2294,13 @@ CTable.prototype =
         if (null != CellSpacing)
         {
             var TableBorder_Right = this.Get_Borders().Right;
-            if (AscCommon.border_None != TableBorder_Right.Value)
+            if (border_None != TableBorder_Right.Value)
                 X += TableBorder_Right.Size / 2;
 
             X += CellSpacing;
 
             var CellBorder_Right = Cell.Get_Borders().Right;
-            if (AscCommon.border_None != CellBorder_Right.Value)
+            if (border_None != CellBorder_Right.Value)
                 X += CellBorder_Right.Size;
 
             X += Margins.Right.W;
@@ -2317,7 +2311,7 @@ CTable.prototype =
             var CellBorder_Right  = Cell.Get_Borders().Right;
             var Result_Border     = this.Internal_CompareBorders(TableBorder_Right, CellBorder_Right, true, false);
 
-            if (AscCommon.border_None != Result_Border.Value)
+            if (border_None != Result_Border.Value)
                 X += Math.max(Result_Border.Size / 2, Margins.Right.W);
             else
                 X += Margins.Right.W;
@@ -2877,7 +2871,7 @@ CTable.prototype =
 
                     if (tblwidth_Mm === CellW.Type)
                         CellWW = CellW.W;
-                    else if (AscCommon.tblwidth_Pct === CellW.Type)
+                    else if (tblwidth_Pct === CellW.Type)
                         CellWW = (this.XLimit - this.X) * CellW.W / 100;
 
                     // Если GridSpan > 1, тогда все равно маргины учитываются в первую колоноку спана
@@ -5092,7 +5086,7 @@ CTable.prototype =
                     this.Pr.Shd = undefined;
                 else
                 {
-                    this.Pr.Shd = new AscCommon.CDocumentShd();
+                    this.Pr.Shd = new CDocumentShd();
                     this.Pr.Shd.Read_FromBinary( Reader );
                 }
 
@@ -5291,7 +5285,7 @@ CTable.prototype =
             case AscDFH.historyitem_Table_Pr :
             {
                 // CTablePr
-                this.Pr = new AscCommon.CTablePr();
+                this.Pr = new CTablePr();
                 this.Pr.Read_FromBinary( Reader );
 
                 this.Recalc_CompiledPr2();
@@ -5382,7 +5376,7 @@ CTable.prototype =
         this.XLimit   = Reader.GetDouble();
         this.YLimit   = Reader.GetDouble();
 
-        this.Pr = new AscCommon.CTablePr();
+        this.Pr = new CTablePr();
         this.Pr.Read_FromBinary( Reader );
         this.Recalc_CompiledPr();
 
@@ -6378,8 +6372,8 @@ CTable.prototype =
                         if (Math.abs(NewTableInd - OldTableInd) > 0.001)
                             this.Set_TableInd(NewTableInd);
 
-                        if (AscCommon.tbllayout_AutoFit === this.Get_CompiledPr(false).TablePr.TableLayout)
-                            this.Set_TableLayout(AscCommon.tbllayout_Fixed);
+                        if (tbllayout_AutoFit === this.Get_CompiledPr(false).TablePr.TableLayout)
+                            this.Set_TableLayout(tbllayout_Fixed);
 
                         this.Internal_CreateNewGrid(Rows_info);
                         this.private_RecalculateGrid();
@@ -6556,12 +6550,12 @@ CTable.prototype =
                         var Y_start = this.RowsInfo[RowIndex].Y[CurPage] + this.RowsInfo[RowIndex].TopDy[CurPage] + CellMar.Top.W;
                         var Y_end   = this.TableRowsBottom[LastRow][CurPage] - CellMar.Bottom.W;
 
-                        if (TextDirection === AscCommon.textdirection_BTLR)
+                        if (TextDirection === textdirection_BTLR)
                         {
                             var SelectionW = Math.min(X_end - X_start - CellMar.Left.W, Bounds.Bottom - Bounds.Top);
                             this.DrawingDocument.AddPageSelection(PageAbs, X_start + CellMar.Left.W + Y_offset, Y_start, SelectionW, Y_end - Y_start);
                         }
-                        else if (TextDirection === AscCommon.textdirection_TBRL)
+                        else if (TextDirection === textdirection_TBRL)
                         {
                             var SelectionW = Math.min(X_end - X_start - CellMar.Right.W, Bounds.Bottom - Bounds.Top);
                             this.DrawingDocument.AddPageSelection(PageAbs, X_end - CellMar.Right.W - Y_offset - SelectionW, Y_start, SelectionW, Y_end - Y_start);
@@ -9054,7 +9048,7 @@ CTable.prototype =
         var StyleId = this.Get_Style();
 
         // Считываем свойства для текущего стиля
-        var Pr = Styles.Get_Pr( StyleId, AscCommon.styletype_Table );
+        var Pr = Styles.Get_Pr( StyleId, styletype_Table );
         if(this.bPresentation)
         {
             this.Check_PresentationPr(Pr);
@@ -9542,7 +9536,7 @@ CTable.prototype =
         }
         else if ( undefined === this.Pr.Shd )
         {
-            var Shd = new AscCommon.CDocumentShd();
+            var Shd = new CDocumentShd();
             Shd.Value = Value;
             Shd.Color.Set( r, g, b );
 
@@ -9552,7 +9546,7 @@ CTable.prototype =
         }
         else
         {
-            var Shd = new AscCommon.CDocumentShd();
+            var Shd = new CDocumentShd();
             Shd.Value = Value;
             Shd.Color.Set( r, g, b );
 
@@ -11779,7 +11773,7 @@ CTable.prototype =
                 var Cell = Row.Get_Cell( CurCell );
                 Cell.Set_GridSpan( RowInfo[CurIndex].GridSpan );
                 var WType = Cell.Get_W().Type;
-                if ( tblwidth_Auto != WType && AscCommon.tblwidth_Nil != WType )
+                if ( tblwidth_Auto != WType && tblwidth_Nil != WType )
                 {
                     Cell.Set_W( new CTableMeasurement( tblwidth_Mm, RowInfo[CurIndex].W ) );
                 }
@@ -11818,7 +11812,7 @@ CTable.prototype =
                 if ( Col >= CurGridCol && Col < CurGridCol + GridSpan )
                 {
                     var CellWType = Cell.Get_W().Type;
-                    if ( tblwidth_Auto != CellWType && AscCommon.tblwidth_Nil != CellWType )
+                    if ( tblwidth_Auto != CellWType && tblwidth_Nil != CellWType )
                     {
                         var W = 0;
                         for ( var CurSpan = CurGridCol; CurSpan < CurGridCol + GridSpan; CurSpan++ )
@@ -11860,10 +11854,10 @@ CTable.prototype =
             return Border1;
 
         // Всегда побеждает непустая граница
-        if ( AscCommon.border_None === Border1.Value )
+        if ( border_None === Border1.Value )
             return Border2;
 
-        if ( AscCommon.border_None === Border2.Value )
+        if ( border_None === Border2.Value )
             return Border1;
 
         // TODO: Как только мы реализуем рисование не только простых границ,
@@ -12706,9 +12700,9 @@ CTable.prototype =
 
     private_SetTableLayoutFixedAndUpdateGrid : function(nExceptColNum)
     {
-        if (AscCommon.tbllayout_AutoFit === this.Get_CompiledPr(false).TablePr.TableLayout)
+        if (tbllayout_AutoFit === this.Get_CompiledPr(false).TablePr.TableLayout)
         {
-            this.Set_TableLayout(AscCommon.tbllayout_Fixed);
+            this.Set_TableLayout(tbllayout_Fixed);
 
             // Обновляем сетку таблицы
             var nColsCount = this.TableGrid.length;

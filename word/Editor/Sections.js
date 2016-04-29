@@ -1787,10 +1787,10 @@ CSectionPageMargins.prototype =
 
 function CSectionBorders()
 {
-    this.Top        = new AscCommon.CDocumentBorder();
-    this.Bottom     = new AscCommon.CDocumentBorder();
-    this.Left       = new AscCommon.CDocumentBorder();
-    this.Right      = new AscCommon.CDocumentBorder();
+    this.Top        = new CDocumentBorder();
+    this.Bottom     = new CDocumentBorder();
+    this.Left       = new CDocumentBorder();
+    this.Right      = new CDocumentBorder();
     
     this.Display    = section_borders_DisplayAllPages;
     this.OffsetFrom = section_borders_OffsetFromPage;

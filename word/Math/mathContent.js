@@ -608,7 +608,7 @@ CMPrp.prototype =
     },
     GetTxtPrp: function()
     {
-        var textPrp = new AscCommon.CTextPr();
+        var textPrp = new CTextPr();
 
         if(this.sty == undefined)
         {
@@ -1119,7 +1119,7 @@ CMathContent.prototype.getFirstRPrp  = function()
 };
 CMathContent.prototype.GetCtrPrp = function()       // for placeholder
 {
-    var ctrPrp = new AscCommon.CTextPr();
+    var ctrPrp = new CTextPr();
     if(!this.bRoot)
         ctrPrp.Merge( this.Parent.Get_CompiledCtrPrp_2() );
 
@@ -2193,7 +2193,7 @@ CMathContent.prototype.Load_FromMenu = function(Type, Paragraph)
 {
     this.Paragraph = Paragraph;
 
-    var Pr = {ctrPrp: new AscCommon.CTextPr()};
+    var Pr = {ctrPrp: new CTextPr()};
 
     var MainType = Type >> 24;
 
@@ -5021,7 +5021,7 @@ CMathContent.prototype.Process_AutoCorrect = function(ActionElement)
     }
 
     if (null == AutoCorrectEngine.TextPr)
-        AutoCorrectEngine.TextPr = new AscCommon.CTextPr();
+        AutoCorrectEngine.TextPr = new CTextPr();
     if (null == AutoCorrectEngine.MathPr)
         AutoCorrectEngine.MathPr = new CMPrp();
 

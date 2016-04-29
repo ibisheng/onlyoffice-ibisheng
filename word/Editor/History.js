@@ -592,7 +592,7 @@ CHistory.prototype =
         this.RecalculateData.Update = false;
         for (var NumId in this.RecalculateData.NumPr)
         {
-            var NumPr = new AscCommon.CNumPr();
+            var NumPr = new CNumPr();
             NumPr.NumId = NumId;
             for (var Lvl = 0; Lvl < 9; ++Lvl)
             {

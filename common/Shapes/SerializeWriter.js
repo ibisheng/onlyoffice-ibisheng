@@ -2508,7 +2508,7 @@ function CBinaryFileWriter()
         tPr.pPr = paragraph.Pr;
 		tPr.rPr = paragraph.Pr.DefaultRunPr;
         if (tPr.rPr == null)
-            tPr.rPr = new AscCommon.CTextPr();
+            tPr.rPr = new CTextPr();
 
         oThis.WriteRecord1(0, tPr, oThis.WriteTextParagraphPr);
         oThis.WriteRecord2(1, paragraph.TextPr.Value, oThis.WriteRunProperties);
@@ -2961,7 +2961,7 @@ function CBinaryFileWriter()
                 _cell_info.vMerge = false;
                 _cell_info.isEmpty = false;
 
-                if (_cell.Pr.VMerge == AscCommon.vmerge_Continue)
+                if (_cell.Pr.VMerge == vmerge_Continue)
                     _cell_info.vMerge = true;
 
                 TableGrid.Rows[i].Cells.push(_cell_info);
@@ -3139,17 +3139,17 @@ function CBinaryFileWriter()
         {
             switch(cell.Pr.VAlign)
             {
-                case AscCommon.vertalignjc_Bottom:
+                case vertalignjc_Bottom:
                 {
                     oThis._WriteUChar1(6, 0);
                     break;
                 }
-                case AscCommon.vertalignjc_Center:
+                case vertalignjc_Center:
                 {
                     oThis._WriteUChar1(6, 1);
                     break;
                 }
-                case AscCommon.vertalignjc_Top:
+                case vertalignjc_Top:
                 {
                     oThis._WriteUChar1(6, 4);
                     break;
@@ -3988,7 +3988,7 @@ function CBinaryFileWriter()
 
     this.WriteTableCellBorder = function(_border)
     {
-        if (_border.Value == AscCommon.border_None)
+        if (_border.Value == border_None)
         {
             oThis.StartRecord(0);
             oThis.WriteUChar(g_nodeAttributeStart);
@@ -4070,7 +4070,7 @@ function CBinaryFileWriter()
 
     this.WriteTableCellBorderLineStyle = function(_border)
     {
-        if (_border.Value == AscCommon.border_None)
+        if (_border.Value == border_None)
         {
             oThis.StartRecord(0);
             oThis.WriteUChar(g_nodeAttributeStart);

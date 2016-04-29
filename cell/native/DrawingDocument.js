@@ -222,21 +222,21 @@ function CTextMeasurer()
         var UnitsPerEm = this.m_oManager.m_lUnits_Per_Em;
         var Ascender   = this.m_oManager.m_lAscender;
 
-        return Ascender * this.m_oLastFont.SetUpSize / UnitsPerEm * AscCommon.g_dKoef_pt_to_mm;
+        return Ascender * this.m_oLastFont.SetUpSize / UnitsPerEm * g_dKoef_pt_to_mm;
     };
     this.GetDescender = function()
     {
         var UnitsPerEm = this.m_oManager.m_lUnits_Per_Em;
         var Descender  = this.m_oManager.m_lDescender;
 
-        return Descender * this.m_oLastFont.SetUpSize / UnitsPerEm * AscCommon.g_dKoef_pt_to_mm;
+        return Descender * this.m_oLastFont.SetUpSize / UnitsPerEm * g_dKoef_pt_to_mm;
     };
     this.GetHeight = function()
     {
         var UnitsPerEm = this.m_oManager.m_lUnits_Per_Em;
         var Height     = this.m_oManager.m_lLineHeight;
 
-        return Height * this.m_oLastFont.SetUpSize / UnitsPerEm * AscCommon.g_dKoef_pt_to_mm;
+        return Height * this.m_oLastFont.SetUpSize / UnitsPerEm * g_dKoef_pt_to_mm;
     };
 }
 
@@ -3634,7 +3634,7 @@ function CDrawingDocument(drawingObjects)
             var i = _styles[i1];
             var _style = logicDoc.Styles.Style[i];
 
-            if (!_style || _style.Type != AscCommon.styletype_Table)
+            if (!_style || _style.Type != styletype_Table)
                 continue;
 
             var table = new CTable(this, logicDoc, true, 0, _x_mar, _y_mar, 1000, 1000, Rows, Cols, Grid);

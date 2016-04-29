@@ -264,21 +264,21 @@
             var UnitsPerEm = this.m_oManager.m_lUnits_Per_Em;
             var Ascender   = this.m_oManager.m_lAscender;
 
-            return Ascender * this.m_oLastFont.SetUpSize / UnitsPerEm * AscCommon.g_dKoef_pt_to_mm;
+            return Ascender * this.m_oLastFont.SetUpSize / UnitsPerEm * g_dKoef_pt_to_mm;
         },
         GetDescender : function()
         {
             var UnitsPerEm = this.m_oManager.m_lUnits_Per_Em;
             var Descender  = this.m_oManager.m_lDescender;
 
-            return Descender * this.m_oLastFont.SetUpSize / UnitsPerEm * AscCommon.g_dKoef_pt_to_mm;
+            return Descender * this.m_oLastFont.SetUpSize / UnitsPerEm * g_dKoef_pt_to_mm;
         },
         GetHeight : function()
         {
             var UnitsPerEm = this.m_oManager.m_lUnits_Per_Em;
             var Height     = this.m_oManager.m_lLineHeight;
 
-            return Height * this.m_oLastFont.SetUpSize / UnitsPerEm * AscCommon.g_dKoef_pt_to_mm;
+            return Height * this.m_oLastFont.SetUpSize / UnitsPerEm * g_dKoef_pt_to_mm;
         }
     };
     var g_oTextMeasurer = new CTextMeasurer();

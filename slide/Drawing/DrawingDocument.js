@@ -27,7 +27,7 @@ AscCommon.CTextMeasurer.prototype.GetAscender = function()
     //var Ascender   = this.m_oManager.m_lAscender;
     var Ascender   = ( 0 !== this.m_oManager.m_lLineHeight ) ? 1.2 * UnitsPerEm * this.m_oManager.m_lAscender / this.m_oManager.m_lLineHeight : this.m_oManager.m_lAscender;
 
-    return Ascender * this.m_oLastFont.SetUpSize / UnitsPerEm * AscCommon.g_dKoef_pt_to_mm;
+    return Ascender * this.m_oLastFont.SetUpSize / UnitsPerEm * g_dKoef_pt_to_mm;
 };
 AscCommon.CTextMeasurer.prototype.GetDescender = function()
 {
@@ -35,7 +35,7 @@ AscCommon.CTextMeasurer.prototype.GetDescender = function()
     //var Descender  = this.m_oManager.m_lDescender;
     var Descender  = ( 0 !== this.m_oManager.m_lLineHeight ) ? 1.2 * UnitsPerEm * this.m_oManager.m_lDescender / this.m_oManager.m_lLineHeight : this.m_oManager.m_lDescender;
 
-    return Descender * this.m_oLastFont.SetUpSize / UnitsPerEm * AscCommon.g_dKoef_pt_to_mm;
+    return Descender * this.m_oLastFont.SetUpSize / UnitsPerEm * g_dKoef_pt_to_mm;
 };
 AscCommon.CTextMeasurer.prototype.GetHeight = function()
 {
@@ -43,7 +43,7 @@ AscCommon.CTextMeasurer.prototype.GetHeight = function()
     //var Height     = this.m_oManager.m_lLineHeight;
     var Height     = ( 0 !== this.m_oManager.m_lLineHeight ) ? 1.2 * UnitsPerEm : this.m_oManager.m_lLineHeight;
 
-    return Height * this.m_oLastFont.SetUpSize / UnitsPerEm * AscCommon.g_dKoef_pt_to_mm;
+    return Height * this.m_oLastFont.SetUpSize / UnitsPerEm * g_dKoef_pt_to_mm;
 };
 
 function CTableOutlineDr()
@@ -1056,8 +1056,8 @@ function CDrawingDocument()
 
         par.Cursor_MoveToStartPos();
 
-        par.Set_Pr(new AscCommon.CParaPr());
-        var _textPr = new AscCommon.CTextPr();
+        par.Set_Pr(new CParaPr());
+        var _textPr = new CTextPr();
         _textPr.FontFamily = { Name : "Arial", Index : -1 };
 
         _textPr.Strikeout  = this.GuiLastTextProps.Strikeout;

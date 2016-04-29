@@ -45,15 +45,6 @@ var align_Center = AscCommon.align_Center;
 var g_oTableId = AscCommon.g_oTableId;
 var g_oTextMeasurer = AscCommon.g_oTextMeasurer;
 var History = AscCommon.History;
-var CParaSpacing = AscCommon.CParaSpacing;
-var CNumPr = AscCommon.CNumPr;
-var CParaPr = AscCommon.CParaPr;
-var CParaInd = AscCommon.CParaInd;
-var CParaTabs = AscCommon.CParaTabs;
-var CDocumentBorder = AscCommon.CDocumentBorder;
-var CDocumentShd = AscCommon.CDocumentShd;
-var CDocumentColor = AscCommon.CDocumentColor;
-var border_Single = AscCommon.border_Single;
 
 var linerule_Exact = Asc.linerule_Exact;
 var c_oAscRelativeFromV = Asc.c_oAscRelativeFromV;
@@ -1167,9 +1158,9 @@ Paragraph.prototype =
     // Проверяем не пустые ли границы
     Internal_Is_NullBorders : function (Borders)
     {
-        if ( AscCommon.border_None != Borders.Top.Value  || AscCommon.border_None != Borders.Bottom.Value ||
-          AscCommon.border_None != Borders.Left.Value || AscCommon.border_None != Borders.Right.Value  ||
-          AscCommon.border_None != Borders.Between.Value )
+        if ( border_None != Borders.Top.Value  || border_None != Borders.Bottom.Value ||
+            border_None != Borders.Left.Value || border_None != Borders.Right.Value  ||
+            border_None != Borders.Between.Value )
             return false;
 
         return true;
@@ -1215,7 +1206,7 @@ Paragraph.prototype =
         var NumPr  = ParaPr.NumPr;
 
         if ( undefined === NumPr || undefined === NumPr.NumId || 0 === NumPr.NumId || "0" === NumPr.NumId )
-            return new AscCommon.CTextPr();
+            return new CTextPr();
 
         var Numbering = this.Parent.Get_Numbering();
         var NumLvl    = Numbering.Get_AbstractNum( NumPr.NumId ).Lvl[NumPr.Lvl];
@@ -1537,7 +1528,7 @@ Paragraph.prototype =
                                 X_start = X - NumberingItem.WidthNum / 2;
 
                             // Если есть выделение текста, рисуем его сначала
-                            if ( AscCommon.highlight_None != NumTextPr.HighLight )
+                            if ( highlight_None != NumTextPr.HighLight )
                                 PDSH.High.Add( Y0, Y1, X_start, X_start + NumberingItem.WidthNum + NumberingItem.WidthSuff, 0, NumTextPr.HighLight.r, NumTextPr.HighLight.g, NumTextPr.HighLight.b, undefined, NumTextPr );
                         }
                     }
@@ -2002,10 +1993,10 @@ Paragraph.prototype =
                             }
 
                             if ( true === NumTextPr.Strikeout )
-                                pGraphics.drawHorLine(0, (Y - NumTextPr.FontSize * AscCommon.g_dKoef_pt_to_mm * 0.27), X_start, X_start + NumberingItem.WidthNum, (NumTextPr.FontSize / 18) * AscCommon.g_dKoef_pt_to_mm);
+                                pGraphics.drawHorLine(0, (Y - NumTextPr.FontSize * g_dKoef_pt_to_mm * 0.27), X_start, X_start + NumberingItem.WidthNum, (NumTextPr.FontSize / 18) * g_dKoef_pt_to_mm);
 
                             if ( true === NumTextPr.Underline )
-                                pGraphics.drawHorLine( 0, (Y + this.Lines[CurLine].Metrics.TextDescent * 0.4), X_start, X_start + NumberingItem.WidthNum, (NumTextPr.FontSize / 18) * AscCommon.g_dKoef_pt_to_mm);
+                                pGraphics.drawHorLine( 0, (Y + this.Lines[CurLine].Metrics.TextDescent * 0.4), X_start, X_start + NumberingItem.WidthNum, (NumTextPr.FontSize / 18) * g_dKoef_pt_to_mm);
                         }
                     }
                     else if ( para_PresentationNumbering === this.Numbering.Type )
@@ -2900,7 +2891,7 @@ Paragraph.prototype =
             if ( undefined != CurTextPr.RStyle )
             {
                 var Styles = this.Parent.Get_Styles();
-                var StyleTextPr = Styles.Get_Pr( CurTextPr.RStyle, AscCommon.styletype_Character).TextPr;
+                var StyleTextPr = Styles.Get_Pr( CurTextPr.RStyle, styletype_Character).TextPr;
                 TextPr.Merge( StyleTextPr );
             }
 
@@ -2933,7 +2924,7 @@ Paragraph.prototype =
             if ( undefined != CurTextPr.RStyle )
             {
                 var Styles = this.Parent.Get_Styles();
-                var StyleTextPr = Styles.Get_Pr( CurTextPr.RStyle, AscCommon.styletype_Character).TextPr;
+                var StyleTextPr = Styles.Get_Pr( CurTextPr.RStyle, styletype_Character).TextPr;
                 Lang.Merge( StyleTextPr.Lang );
             }
 
@@ -2946,7 +2937,7 @@ Paragraph.prototype =
 
     Internal_GetTextPr : function(LetterPos)
     {
-        var TextPr = new AscCommon.CTextPr();
+        var TextPr = new CTextPr();
 
         // Ищем ближайший TextPr
         if ( LetterPos < 0 )
@@ -2994,7 +2985,7 @@ Paragraph.prototype =
                     var FName  = TextPr.FontFamily.Name;
                     var FIndex = TextPr.FontFamily.Index;
 
-                    TextPr.RFonts = new AscCommon.CRFonts();
+                    TextPr.RFonts = new CRFonts();
                     TextPr.RFonts.Ascii    = { Name : FName, Index : FIndex };
                     TextPr.RFonts.EastAsia = { Name : FName, Index : FIndex };
                     TextPr.RFonts.HAnsi    = { Name : FName, Index : FIndex };
@@ -3281,11 +3272,11 @@ Paragraph.prototype =
         var Tabs = CompiledPr.Tabs.Copy();
 
         if ( Math.abs(X - X1 / 2) < 12.5 )
-            Tabs.Add( new AscCommon.CParaTab( tab_Center, X1 / 2 ) );
+            Tabs.Add( new CParaTab( tab_Center, X1 / 2 ) );
         else if ( X > X1 - 12.5 )
-            Tabs.Add( new AscCommon.CParaTab( tab_Right, X1 - 0.001 ) );
+            Tabs.Add( new CParaTab( tab_Right, X1 - 0.001 ) );
         else
-            Tabs.Add( new AscCommon.CParaTab( tab_Left, X ) );
+            Tabs.Add( new CParaTab( tab_Left, X ) );
 
         this.Set_Tabs( Tabs );
 
@@ -3392,10 +3383,10 @@ Paragraph.prototype =
                 {
                     var NewX = ParaPr.Ind.Left;
                     if ( true != bShift )
-                        NewX += AscCommon.Default_Tab_Stop;
+                        NewX += Default_Tab_Stop;
                     else
                     {
-                        NewX -= AscCommon.Default_Tab_Stop;
+                        NewX -= Default_Tab_Stop;
 
                         if ( NewX < 0 )
                             NewX = 0;
@@ -5631,7 +5622,7 @@ Paragraph.prototype =
             Hyperlink.Select_All();
 
             // Выставляем специальную текстовую настройку
-            var TextPr = new AscCommon.CTextPr();
+            var TextPr = new CTextPr();
             TextPr.Color     = null;
             TextPr.Underline = null;
             TextPr.RStyle    = editor && editor.isDocumentEditor ? editor.WordControl.m_oLogicDocument.Get_Styles().Get_Default_Hyperlink() : null;
@@ -5878,7 +5869,7 @@ Paragraph.prototype =
 
             this.Internal_Content_Remove( HyperPos );
 
-            var TextPr = new AscCommon.CTextPr();
+            var TextPr = new CTextPr();
             TextPr.RStyle    = null;
             TextPr.Underline = null;
             TextPr.Color     = null;
@@ -6464,7 +6455,7 @@ Paragraph.prototype =
             return TextPr_vis;
         }
         else
-            return new AscCommon.CTextPr();
+            return new CTextPr();
     },
 
     Selection_SelectNumbering : function()
@@ -7172,7 +7163,7 @@ Paragraph.prototype =
             {
                 var NewX = 0;
                 while ( X >= NewX )
-                    NewX += AscCommon.Default_Tab_Stop;
+                    NewX += Default_Tab_Stop;
 
                 X = NewX;
             }
@@ -7693,7 +7684,7 @@ Paragraph.prototype =
         {
             if ( true === Pr.ParaPr.Spacing.BeforeAutoSpacing )
             {
-                Pr.ParaPr.Spacing.Before = 14 * AscCommon.g_dKoef_pt_to_mm;
+                Pr.ParaPr.Spacing.Before = 14 * g_dKoef_pt_to_mm;
             }
         }
 
@@ -7857,7 +7848,7 @@ Paragraph.prototype =
             var StyleId    = this.Style_Get();
 
             // Считываем свойства для текущего стиля
-            var Pr = Styles.Get_Pr( StyleId, AscCommon.styletype_Paragraph, TableStyle, ShapeStyle );
+            var Pr = Styles.Get_Pr( StyleId, styletype_Paragraph, TableStyle, ShapeStyle );
 
             // Если в стиле была задана нумерация сохраним это в специальном поле
             if ( undefined != Pr.ParaPr.NumPr )
@@ -7945,7 +7936,7 @@ Paragraph.prototype =
         var Styles     = styleObject.styles;
 
         // Считываем свойства для текущего стиля
-        var Pr = Styles.Get_Pr( styleObject.lastId, AscCommon.styletype_Paragraph, null);
+        var Pr = Styles.Get_Pr( styleObject.lastId, styletype_Paragraph, null);
 
         var TableStyle = this.Parent.Get_TableStyleForPara();
         if(TableStyle && TableStyle.TextPr)
@@ -7980,7 +7971,7 @@ Paragraph.prototype =
     {
         var Result = Value;
         if (true === UseAuto)
-            Result = 14 * AscCommon.g_dKoef_pt_to_mm;
+            Result = 14 * g_dKoef_pt_to_mm;
 
         return Result;
     },
@@ -8508,7 +8499,7 @@ Paragraph.prototype =
         {
             var Value = _Tabs.Get_Value( StyleTabs.Tabs[Index].Pos );
             if ( tab_Clear != StyleTabs.Tabs[Index] && -1 === Value )
-                _Tabs.Add( new AscCommon.CParaTab(tab_Clear, StyleTabs.Tabs[Index].Pos ) );
+                _Tabs.Add( new CParaTab(tab_Clear, StyleTabs.Tabs[Index].Pos ) );
         }
 
         this.private_AddPrChange();
@@ -9263,7 +9254,7 @@ Paragraph.prototype =
                 if ( undefined != _CurTextPr.RStyle )
                 {
                     var Styles = this.Parent.Get_Styles();
-                    var StyleTextPr = Styles.Get_Pr( _CurTextPr.RStyle, AscCommon.styletype_Character).TextPr;
+                    var StyleTextPr = Styles.Get_Pr( _CurTextPr.RStyle, styletype_Character).TextPr;
                     CurTextPr.Merge( StyleTextPr );
                 }
 
@@ -9621,9 +9612,9 @@ Paragraph.prototype =
             if ( undefined !== FramePr.Wrap )
             {
                 if ( false === FramePr.Wrap )
-                    NewFramePr.Wrap = AscCommon.wrap_NotBeside;
+                    NewFramePr.Wrap = wrap_NotBeside;
                 else if ( true === FramePr.Wrap )
-                    NewFramePr.Wrap = AscCommon.wrap_Around;
+                    NewFramePr.Wrap = wrap_Around;
                 else
                     NewFramePr.Wrap = FramePr.Wrap;
             }
@@ -9690,9 +9681,9 @@ Paragraph.prototype =
             var ParaPr = Para.Get_CompiledPr2(false).ParaPr;
             var Brd    = ParaPr.Brd;
 
-            var _X0 = (undefined != Brd.Left && AscCommon.border_None != Brd.Left.Value ? Math.min(X0, X0 + ParaPr.Ind.Left, X0 + ParaPr.Ind.Left + ParaPr.Ind.FirstLine) : X0 + ParaPr.Ind.Left + ParaPr.Ind.FirstLine);
+            var _X0 = (undefined != Brd.Left && border_None != Brd.Left.Value ? Math.min(X0, X0 + ParaPr.Ind.Left, X0 + ParaPr.Ind.Left + ParaPr.Ind.FirstLine) : X0 + ParaPr.Ind.Left + ParaPr.Ind.FirstLine);
 
-            if ( undefined != Brd.Left && AscCommon.border_None != Brd.Left.Value )
+            if ( undefined != Brd.Left && border_None != Brd.Left.Value )
                 _X0 -= Brd.Left.Size + Brd.Left.Space + 1;
 
             if ( _X0 < X0 )
@@ -9700,7 +9691,7 @@ Paragraph.prototype =
 
             var _X1 = X1 - ParaPr.Ind.Right;
 
-            if ( undefined != Brd.Right && AscCommon.border_None != Brd.Right.Value )
+            if ( undefined != Brd.Right && border_None != Brd.Right.Value )
                 _X1 += Brd.Right.Size + Brd.Right.Space + 1;
 
             if ( _X1 > X1 )
@@ -9709,7 +9700,7 @@ Paragraph.prototype =
 
         var _Y1 = Y1;
         var BottomBorder = Paras[Count - 1].Get_CompiledPr2(false).ParaPr.Brd.Bottom;
-        if ( undefined != BottomBorder && AscCommon.border_None != BottomBorder.Value )
+        if ( undefined != BottomBorder && border_None != BottomBorder.Value )
             _Y1 += BottomBorder.Size + BottomBorder.Space;
 
         if ( _Y1 > Y1 && ( Asc.linerule_Auto === FramePr.HRule || ( Asc.linerule_AtLeast === FramePr.HRule && FrameH >= FramePr.H ) ) )
@@ -12406,7 +12397,7 @@ Paragraph.prototype =
 
                 if ( false === Reader.GetBool() )
                 {
-                    this.Pr.FramePr = new AscCommon.CFramePr();
+                    this.Pr.FramePr = new CFramePr();
                     this.Pr.FramePr.Read_FromBinary( Reader );
                 }
                 else
@@ -13191,8 +13182,8 @@ Paragraph.prototype.Get_StyleFromFormatting = function()
     }
 
     // Мы создаем стиль параграфа и стиль рана, линкуем их и возвращаем стиль параграфа.
-    var oParaStyle = new AscCommon.asc_CStyle();
-    oParaStyle.put_Type(AscCommon.styletype_Paragraph);
+    var oParaStyle = new asc_CStyle();
+    oParaStyle.put_Type(styletype_Paragraph);
     oParaStyle.fill_ParaPr(this.Pr);
 
     var oStyles = this.Parent.Get_Styles();
@@ -13206,8 +13197,8 @@ Paragraph.prototype.Get_StyleFromFormatting = function()
     }
     oParaStyle.fill_TextPr(TextPr);
 
-    var oRunStyle = new AscCommon.asc_CStyle();
-    oRunStyle.put_Type(AscCommon.styletype_Character);
+    var oRunStyle = new asc_CStyle();
+    oRunStyle.put_Type(styletype_Character);
     oRunStyle.fill_TextPr(TextPr);
     var oRStyle = oStyles.Get(TextPr.RStyle);
     if (null !== oRStyle)

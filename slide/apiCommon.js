@@ -1065,7 +1065,7 @@ function CTextProp (obj)
         this.FontSize = (undefined != obj.FontSize) ? obj.FontSize : null;
         this.Color = (undefined != obj.Color && null != obj.Color) ? new AscCommon.CColor (obj.Color.r, obj.Color.g, obj.Color.b) : null;
         this.VertAlign = (undefined != obj.VertAlign) ? obj.VertAlign : null;
-        this.HighLight = (undefined != obj.HighLight) ? obj.HighLight == AscCommon.highlight_None ? obj.HighLight : new AscCommon.CColor (obj.HighLight.r, obj.HighLight.g, obj.HighLight.b) : null;
+        this.HighLight = (undefined != obj.HighLight) ? obj.HighLight == highlight_None ? obj.HighLight : new AscCommon.CColor (obj.HighLight.r, obj.HighLight.g, obj.HighLight.b) : null;
     }
     else
     {
@@ -1095,7 +1095,7 @@ function CTextProp (obj)
         this.FontSize = 12;
         this.Color = new AscCommon.CColor ();
         this.VertAlign = AscCommon.vertalign_Baseline;
-        this.HighLight =AscCommon.highlight_None;
+        this.HighLight =highlight_None;
     }
 }
 CTextProp.prototype.get_Bold = function ()

@@ -24,8 +24,6 @@
 */
 "use strict";
 
-(function(window, undefined){
-
 // Import
 var align_Left = AscCommon.align_Left;
 var g_oTableId = AscCommon.g_oTableId;
@@ -46,10 +44,19 @@ var Default_Font         = "Arial";
 var highlight_None = -1;
 
 var vertalign_Koef_Size  =  0.65;  // Коэффициент изменения размера текста для верхнего и нижнего индексов
+var vertalign_Koef_Super =  0.35;  // Позиция верхнего индекса (относительно размера текста)
+var vertalign_Koef_Sub   = -0.141; // Позиция нижнего индекса (относительно размера текста)
+
+var smallcaps_Koef = 0.8; // Коэффициент изменения размера шрифта для малых прописных букв
+
+var smallcaps_and_script_koef = vertalign_Koef_Size * smallcaps_Koef; // суммарный коэффициент, когда текст одновременно и в индексе, и написан малыми прописными
 
 var g_dKoef_pt_to_mm = 25.4 / 72;
+var g_dKoef_pc_to_mm = g_dKoef_pt_to_mm / 12;
 var g_dKoef_in_to_mm = 25.4;
+var g_dKoef_twips_to_mm = g_dKoef_pt_to_mm / 20;
 var g_dKoef_mm_to_pt = 1 / g_dKoef_pt_to_mm;
+var g_dKoef_mm_to_twips = 1 / g_dKoef_twips_to_mm;
 
 var tblwidth_Auto = 0x00;
 var tblwidth_Mm   = 0x01;
@@ -8824,6 +8831,26 @@ CTextPr.prototype.Get_Shd = function()
 {
     return this.Shd;
 };
+//----------------------------------------------------------------------------------------------------------------------
+// CTextPr Export
+//----------------------------------------------------------------------------------------------------------------------
+CTextPr.prototype['Get_Bold']       = CTextPr.prototype.Get_Bold;
+CTextPr.prototype['Get_Italic']     = CTextPr.prototype.Get_Italic;
+CTextPr.prototype['Get_Strikeout']  = CTextPr.prototype.Get_Strikeout;
+CTextPr.prototype['Get_Underline']  = CTextPr.prototype.Get_Underline;
+CTextPr.prototype['Get_Color']      = CTextPr.prototype.Get_Color;
+CTextPr.prototype['Get_VertAlign']  = CTextPr.prototype.Get_VertAlign;
+CTextPr.prototype['Get_Highlight']  = CTextPr.prototype.Get_Highlight;
+CTextPr.prototype['Get_Spacing']    = CTextPr.prototype.Get_Spacing;
+CTextPr.prototype['Get_DStrikeout'] = CTextPr.prototype.Get_DStrikeout;
+CTextPr.prototype['Get_Caps']       = CTextPr.prototype.Get_Caps;
+CTextPr.prototype['Get_SmallCaps']  = CTextPr.prototype.Get_SmallCaps;
+CTextPr.prototype['Get_Position']   = CTextPr.prototype.Get_Position;
+CTextPr.prototype['Get_FontFamily'] = CTextPr.prototype.Get_FontFamily;
+CTextPr.prototype['Get_FontSize']   = CTextPr.prototype.Get_FontSize;
+CTextPr.prototype['Get_Lang']       = CTextPr.prototype.Get_Lang;
+CTextPr.prototype['Get_Shd']        = CTextPr.prototype.Get_Shd;
+//----------------------------------------------------------------------------------------------------------------------
 
 function CParaTab(Value, Pos)
 {
@@ -10601,6 +10628,28 @@ CParaPr.prototype.Get_PStyle = function()
 {
     return this.PStyle;
 };
+//----------------------------------------------------------------------------------------------------------------------
+// CParaPr Export
+//----------------------------------------------------------------------------------------------------------------------
+CParaPr.prototype['Get_ContextualSpacing']        = CParaPr.prototype.Get_ContextualSpacing;
+CParaPr.prototype['Get_IndLeft']                  = CParaPr.prototype.Get_IndLeft;
+CParaPr.prototype['Get_IndRight']                 = CParaPr.prototype.Get_IndRight;
+CParaPr.prototype['Get_IndFirstLine']             = CParaPr.prototype.Get_IndFirstLine;
+CParaPr.prototype['Get_Jc']                       = CParaPr.prototype.Get_Jc;
+CParaPr.prototype['Get_KeepLines']                = CParaPr.prototype.Get_KeepLines;
+CParaPr.prototype['Get_KeepNext']                 = CParaPr.prototype.Get_KeepNext;
+CParaPr.prototype['Get_PageBreakBefore']          = CParaPr.prototype.Get_PageBreakBefore;
+CParaPr.prototype['Get_SpacingLine']              = CParaPr.prototype.Get_SpacingLine;
+CParaPr.prototype['Get_SpacingLineRule']          = CParaPr.prototype.Get_SpacingLineRule;
+CParaPr.prototype['Get_SpacingBefore']            = CParaPr.prototype.Get_SpacingBefore;
+CParaPr.prototype['Get_SpacingBeforeAutoSpacing'] = CParaPr.prototype.Get_SpacingBeforeAutoSpacing;
+CParaPr.prototype['Get_SpacingAfter']             = CParaPr.prototype.Get_SpacingAfter;
+CParaPr.prototype['Get_SpacingAfterAutoSpacing']  = CParaPr.prototype.Get_SpacingAfterAutoSpacing;
+CParaPr.prototype['Get_WidowControl']             = CParaPr.prototype.Get_WidowControl;
+CParaPr.prototype['Get_Tabs']                     = CParaPr.prototype.Get_Tabs;
+CParaPr.prototype['Get_NumPr']                    = CParaPr.prototype.Get_NumPr;
+CParaPr.prototype['Get_PStyle']                   = CParaPr.prototype.Get_PStyle;
+//----------------------------------------------------------------------------------------------------------------------
 
 function Copy_Bounds(Bounds)
 {
@@ -10683,127 +10732,20 @@ asc_CStyle.prototype.get_TextPr = function()
     return this.TextPr;
 };
 
-    //--------------------------------------------------------export----------------------------------------------------
-    var prot;
-    window['AscCommon'] = window['AscCommon'] || {};
-    window["AscCommon"].CTableStylePr = CTableStylePr;
-    window["AscCommon"].CStyle = CStyle;
-    window["AscCommon"].CStyles = CStyles;
-    window["AscCommon"].CDocumentColor = CDocumentColor;
-    window["AscCommon"].CDocumentShd = CDocumentShd;
-    window["AscCommon"].CDocumentBorder = CDocumentBorder;
-    window["AscCommon"].CTableMeasurement = CTableMeasurement;
-    window["AscCommon"].CTablePr = CTablePr;
-    window["AscCommon"].CTableRowHeight = CTableRowHeight;
-    window["AscCommon"].CTableRowPr = CTableRowPr;
-    window["AscCommon"].CTableCellPr = CTableCellPr;
-    window["AscCommon"].CRFonts = CRFonts;
-    window["AscCommon"].CLang = CLang;
-    window["AscCommon"].CParaTab = CParaTab;
-    window["AscCommon"].CParaTabs = CParaTabs;
-    window["AscCommon"].CParaInd = CParaInd;
-    window["AscCommon"].CParaSpacing = CParaSpacing;
-    window["AscCommon"].CNumPr = CNumPr;
-    window["AscCommon"].CFramePr = CFramePr;
-    window["AscCommon"].CParaPr = CParaPr;
+/*
+ * Export
+ * -----------------------------------------------------------------------------
+ */
+window["Asc"]["asc_CStyle"] = window["Asc"].asc_CStyle = asc_CStyle;
+asc_CStyle.prototype["get_Name"]    = asc_CStyle.prototype.get_Name;
+asc_CStyle.prototype["put_Name"]    = asc_CStyle.prototype.put_Name;
+asc_CStyle.prototype["get_BasedOn"] = asc_CStyle.prototype.get_BasedOn;
+asc_CStyle.prototype["put_BasedOn"] = asc_CStyle.prototype.put_BasedOn;
+asc_CStyle.prototype["get_Next"]    = asc_CStyle.prototype.get_Next;
+asc_CStyle.prototype["put_Next"]    = asc_CStyle.prototype.put_Next;
+asc_CStyle.prototype["get_Type"]    = asc_CStyle.prototype.get_Type;
+asc_CStyle.prototype["put_Type"]    = asc_CStyle.prototype.put_Type;
+asc_CStyle.prototype["get_Link"]    = asc_CStyle.prototype.get_Link;
+asc_CStyle.prototype["put_Link"]    = asc_CStyle.prototype.put_Link;
 
-    window["AscCommon"].CTextPr = CTextPr;
-    prot = CTextPr.prototype;
-    prot['Get_Bold']       = prot.Get_Bold;
-    prot['Get_Italic']     = prot.Get_Italic;
-    prot['Get_Strikeout']  = prot.Get_Strikeout;
-    prot['Get_Underline']  = prot.Get_Underline;
-    prot['Get_Color']      = prot.Get_Color;
-    prot['Get_VertAlign']  = prot.Get_VertAlign;
-    prot['Get_Highlight']  = prot.Get_Highlight;
-    prot['Get_Spacing']    = prot.Get_Spacing;
-    prot['Get_DStrikeout'] = prot.Get_DStrikeout;
-    prot['Get_Caps']       = prot.Get_Caps;
-    prot['Get_SmallCaps']  = prot.Get_SmallCaps;
-    prot['Get_Position']   = prot.Get_Position;
-    prot['Get_FontFamily'] = prot.Get_FontFamily;
-    prot['Get_FontSize']   = prot.Get_FontSize;
-    prot['Get_Lang']       = prot.Get_Lang;
-    prot['Get_Shd']        = prot.Get_Shd;
 
-    prot = CParaPr.prototype;
-    prot['Get_ContextualSpacing']        = prot.Get_ContextualSpacing;
-    prot['Get_IndLeft']                  = prot.Get_IndLeft;
-    prot['Get_IndRight']                 = prot.Get_IndRight;
-    prot['Get_IndFirstLine']             = prot.Get_IndFirstLine;
-    prot['Get_Jc']                       = prot.Get_Jc;
-    prot['Get_KeepLines']                = prot.Get_KeepLines;
-    prot['Get_KeepNext']                 = prot.Get_KeepNext;
-    prot['Get_PageBreakBefore']          = prot.Get_PageBreakBefore;
-    prot['Get_SpacingLine']              = prot.Get_SpacingLine;
-    prot['Get_SpacingLineRule']          = prot.Get_SpacingLineRule;
-    prot['Get_SpacingBefore']            = prot.Get_SpacingBefore;
-    prot['Get_SpacingBeforeAutoSpacing'] = prot.Get_SpacingBeforeAutoSpacing;
-    prot['Get_SpacingAfter']             = prot.Get_SpacingAfter;
-    prot['Get_SpacingAfterAutoSpacing']  = prot.Get_SpacingAfterAutoSpacing;
-    prot['Get_WidowControl']             = prot.Get_WidowControl;
-    prot['Get_Tabs']                     = prot.Get_Tabs;
-    prot['Get_NumPr']                    = prot.Get_NumPr;
-    prot['Get_PStyle']                   = prot.Get_PStyle;
-
-    window["AscCommon"].asc_CStyle = asc_CStyle;
-    prot = asc_CStyle.prototype;
-    prot["get_Name"]    = prot.get_Name;
-    prot["put_Name"]    = prot.put_Name;
-    prot["get_BasedOn"] = prot.get_BasedOn;
-    prot["put_BasedOn"] = prot.put_BasedOn;
-    prot["get_Next"]    = prot.get_Next;
-    prot["put_Next"]    = prot.put_Next;
-    prot["get_Type"]    = prot.get_Type;
-    prot["put_Type"]    = prot.put_Type;
-    prot["get_Link"]    = prot.get_Link;
-    prot["put_Link"]    = prot.put_Link;
-
-    window["AscCommon"].EvenAndOddHeaders = EvenAndOddHeaders;
-
-    window["AscCommon"].Default_Tab_Stop = Default_Tab_Stop;
-
-    window["AscCommon"].highlight_None = highlight_None;
-
-    window["AscCommon"].vertalign_Koef_Size = vertalign_Koef_Size;
-
-    window["AscCommon"].g_dKoef_pt_to_mm = g_dKoef_pt_to_mm;
-    window["AscCommon"].g_dKoef_in_to_mm = g_dKoef_in_to_mm;
-    window["AscCommon"].g_dKoef_mm_to_pt = g_dKoef_mm_to_pt;
-
-    window["AscCommon"].tblwidth_Auto = tblwidth_Auto;
-    window["AscCommon"].tblwidth_Mm = tblwidth_Mm;
-    window["AscCommon"].tblwidth_Nil = tblwidth_Nil;
-    window["AscCommon"].tblwidth_Pct = tblwidth_Pct;
-
-    window["AscCommon"].tbllayout_Fixed = tbllayout_Fixed;
-    window["AscCommon"].tbllayout_AutoFit = tbllayout_AutoFit;
-
-    window["AscCommon"].border_None = border_None;
-    window["AscCommon"].border_Single = border_Single;
-
-    window["AscCommon"].vertalignjc_Top = vertalignjc_Top;
-    window["AscCommon"].vertalignjc_Center = vertalignjc_Center;
-    window["AscCommon"].vertalignjc_Bottom = vertalignjc_Bottom;
-
-    window["AscCommon"].vmerge_Restart = vmerge_Restart;
-    window["AscCommon"].vmerge_Continue = vmerge_Continue;
-
-    window["AscCommon"].spacing_Auto = spacing_Auto;
-
-    window["AscCommon"].styletype_Paragraph = styletype_Paragraph;
-    window["AscCommon"].styletype_Numbering = styletype_Numbering;
-    window["AscCommon"].styletype_Table = styletype_Table;
-    window["AscCommon"].styletype_Character = styletype_Character;
-
-    window["AscCommon"].textdirection_LRTB = textdirection_LRTB;
-    window["AscCommon"].textdirection_TBRL = textdirection_TBRL;
-    window["AscCommon"].textdirection_BTLR = textdirection_BTLR;
-
-    window["AscCommon"].wrap_Around = wrap_Around;
-    window["AscCommon"].wrap_Auto = wrap_Auto;
-    window["AscCommon"].wrap_None = wrap_None;
-    window["AscCommon"].wrap_NotBeside = wrap_NotBeside;
-    window["AscCommon"].wrap_Through = wrap_Through;
-    window["AscCommon"].wrap_Tight = wrap_Tight;
-})(window);

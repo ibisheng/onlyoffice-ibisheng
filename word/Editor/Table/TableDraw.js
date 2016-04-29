@@ -3,8 +3,6 @@
 // Import
 var c_oAscLineDrawingRule = AscCommon.c_oAscLineDrawingRule;
 var global_MatrixTransformer = AscCommon.global_MatrixTransformer;
-var vmerge_Continue = AscCommon.vmerge_Continue;
-var border_Single = AscCommon.border_Single;
 
 CTable.prototype.ReDraw = function()
 {
@@ -792,7 +790,7 @@ CTable.prototype.private_DrawCellsBorders = function(pGraphics, PNum, Row_start,
                                 pGraphics.DrawEmptyTableLine( X_cell_end, Y0, X_cell_end, Y1 );
                             }
                         }
-                        else if ( AscCommon.border_None === CurBorderInfo.Value )
+                        else if ( border_None === CurBorderInfo.Value )
                         {
                             pGraphics.DrawEmptyTableLine( X_cell_end, Y0, X_cell_end, Y1 );
                         }
@@ -1174,7 +1172,7 @@ CTable.prototype.private_DrawCellsBorders = function(pGraphics, PNum, Row_start,
                             pGraphics.DrawEmptyTableLine( X_cell_end, Y0, X_cell_end, Y1 );
                         }
                     }
-                    else if ( AscCommon.border_None === CurBorderInfo.Value )
+                    else if ( border_None === CurBorderInfo.Value )
                     {
                         pGraphics.DrawEmptyTableLine( X_cell_end, Y0, X_cell_end, Y1 );
                     }

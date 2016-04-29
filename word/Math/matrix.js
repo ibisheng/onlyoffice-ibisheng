@@ -373,7 +373,7 @@ CMatrixBase.prototype.recalculateSize = function(oMeasure, RPI)
         var divCenter = 0;
 
         var plH = 0.2743827160493827*FontSize;
-        var minGp = this.SpaceRow.MinGap*FontSize*AscCommon.g_dKoef_pt_to_mm;
+        var minGp = this.SpaceRow.MinGap*FontSize*g_dKoef_pt_to_mm;
         minGp -= plH;
 
         for(var j = 0; j < this.nRow - 1; j++)
@@ -447,7 +447,7 @@ CMatrixBase.prototype.Get_ColumnGap = function(SpaceColumn, FontSize)
     var ColumnGap = this.Get_Gap(SpaceColumn, FontSize, 1);
 
     var wPlh = 0.324*FontSize;
-    var MinGap = SpaceColumn.MinGap / 20 * AscCommon.g_dKoef_pt_to_mm - wPlh;
+    var MinGap = SpaceColumn.MinGap / 20 * g_dKoef_pt_to_mm - wPlh;
 
     return ColumnGap > MinGap ? ColumnGap : MinGap;
 };
@@ -455,7 +455,7 @@ CMatrixBase.prototype.Get_RowSpace = function(SpaceRow, FontSize)
 {
     var LineGap = this.Get_Gap(SpaceRow, FontSize, 7/6);
 
-    var MinGap = SpaceRow.MinGap*FontSize*AscCommon.g_dKoef_pt_to_mm;
+    var MinGap = SpaceRow.MinGap*FontSize*g_dKoef_pt_to_mm;
 
     return LineGap > MinGap ? LineGap : MinGap;
 };
@@ -478,9 +478,9 @@ CMatrixBase.prototype.Get_Gap = function(oSpace, FontSize, coeff)
 
 
     if(oSpace.Rule == 3)
-        Gap = Space*AscCommon.g_dKoef_pt_to_mm;          //pt
+        Gap = Space*g_dKoef_pt_to_mm;          //pt
     else
-        Gap = Space*FontSize*AscCommon.g_dKoef_pt_to_mm; //em
+        Gap = Space*FontSize*g_dKoef_pt_to_mm; //em
 
 
     return Gap;

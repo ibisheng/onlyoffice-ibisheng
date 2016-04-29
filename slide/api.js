@@ -1591,7 +1591,7 @@ asc_docs_api.prototype.paraApply = function(Props)
 
                 if ( undefined != Props.Tabs )
                 {
-                    var Tabs = new AscCommon.CParaTabs();
+                    var Tabs = new CParaTabs();
                     Tabs.Set_FromObject( Props.Tabs.Tabs );
                     graphicObjects.setParagraphTabs( Tabs );
                 }
@@ -1600,7 +1600,7 @@ asc_docs_api.prototype.paraApply = function(Props)
                 {
                     _presentation.Set_DocumentDefaultTab( Props.DefaultTab );
                 }
-                var TextPr = new AscCommon.CTextPr();
+                var TextPr = new CTextPr();
 
                 if ( true === Props.Subscript )
                     TextPr.VertAlign = AscCommon.vertalign_SubScript;
@@ -4859,7 +4859,7 @@ window["asc_docs_api"].prototype["asc_nativeApplyChanges2"] = function(data, isF
     var stream = new AscCommon.FT_Stream2(data, data.length);
     stream.obj = null;
     var Loader = { Reader : stream, Reader2 : null };
-    var _color = new AscCommon.CDocumentColor( 191, 255, 199 );
+    var _color = new CDocumentColor( 191, 255, 199 );
 
     // Применяем изменения, пока они есть
     var _count = Loader.Reader.GetLong();

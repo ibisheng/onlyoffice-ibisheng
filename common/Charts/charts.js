@@ -11,8 +11,6 @@ function (window, undefined) {
 	var CreateNoFillLine = AscFormat.CreateNoFillLine;
 	var CreateNoFillUniFill = AscFormat.CreateNoFillUniFill;
 	
-	var CTextPr = AscCommon.CTextPr;
-	
 var c_oAscChartTypeSettings = Asc.c_oAscChartTypeSettings;
 var c_oAscTickMark = Asc.c_oAscTickMark;
 var c_oAscTickLabelsPos = Asc.c_oAscTickLabelsPos;

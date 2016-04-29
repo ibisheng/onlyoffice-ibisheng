@@ -707,15 +707,15 @@ CChartSpace.prototype =
         return AscFormat.ExecuteNoHistory(function(){
 
             //todo: доработать
-            var styles = new AscCommon.CStyles();
-            var style = new AscCommon.CStyle("dataLblStyle", null, null, null);
-            var text_pr = new AscCommon.CTextPr();
+            var styles = new CStyles();
+            var style = new CStyle("dataLblStyle", null, null, null);
+            var text_pr = new CTextPr();
             text_pr.FontSize = 10;
             text_pr.Unifill = CreateUnfilFromRGB(0,0,0);
             var parent_objects = this.getParentObjects();
             var theme = parent_objects.theme;
 
-            var para_pr = new AscCommon.CParaPr();
+            var para_pr = new CParaPr();
             para_pr.Jc = AscCommon.align_Center;
             para_pr.Spacing.Before = 0.0;
             para_pr.Spacing.After = 0.0;

@@ -215,7 +215,7 @@ ParaDrawing.prototype.Document_Is_SelectionLocked = function(CheckType)
         this.Lock.Check(this.Get_Id());
     }
 };
-AscCommon.CStyle.prototype.Document_Is_SelectionLocked = function(CheckType)
+CStyle.prototype.Document_Is_SelectionLocked = function(CheckType)
 {
     switch ( CheckType )
     {
@@ -236,7 +236,7 @@ AscCommon.CStyle.prototype.Document_Is_SelectionLocked = function(CheckType)
         }
     }
 };
-AscCommon.CStyles.prototype.Document_Is_SelectionLocked = function(CheckType)
+CStyles.prototype.Document_Is_SelectionLocked = function(CheckType)
 {
     switch ( CheckType )
     {

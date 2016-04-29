@@ -43,7 +43,6 @@ var g_oTableId = AscCommon.g_oTableId;
 var History = AscCommon.History;
 var Paragraph = AscCommon.Paragraph;
 var type_Paragraph = AscCommon.type_Paragraph;
-var border_None = AscCommon.border_None;
 
 var c_oAscHAnchor = Asc.c_oAscHAnchor;
 var c_oAscXAlign = Asc.c_oAscXAlign;
@@ -1014,7 +1013,7 @@ function CDocument(DrawingDocument, isMainLogicDocument)
     this.CheckEmptyElementsOnSelection = true; // При выделении проверять или нет пустой параграф в конце/начале выделения.
 
     this.Numbering = new CNumbering();
-    this.Styles    = new AscCommon.CStyles();
+    this.Styles    = new CStyles();
     this.Styles.Set_LogicDocument(this);
 
     this.DrawingDocument = DrawingDocument;
@@ -1695,7 +1694,7 @@ CDocument.prototype =
                 }
                 else if ( true === bEven )
                 {
-                    if ( true === AscCommon.EvenAndOddHeaders )
+                    if ( true === EvenAndOddHeaders )
                         CheckSectIndex = FindIndex;
                 }
                 else
@@ -3611,7 +3610,7 @@ CDocument.prototype =
 
             if ( undefined != LastPara.TextPr.Value.FontSize || undefined !== LastPara.TextPr.Value.RFonts.Ascii )
             {
-                var TextPr = new AscCommon.CTextPr();
+                var TextPr = new CTextPr();
                 TextPr.FontSize   = LastPara.TextPr.Value.FontSize;
                 TextPr.FontSizeCS = LastPara.TextPr.Value.FontSize;
                 TextPr.RFonts     = LastPara.TextPr.Value.RFonts.Copy();
@@ -3973,7 +3972,7 @@ CDocument.prototype =
             var LineTA = OldParagraph.Lines[0].Metrics.TextAscent2;
             var LineTD = OldParagraph.Lines[0].Metrics.TextDescent + OldParagraph.Lines[0].Metrics.LineGap;
 
-            var FramePr = new AscCommon.CFramePr();
+            var FramePr = new CFramePr();
             FramePr.Init_Default_DropCap( bInText );
             NewParagraph.Set_FrameParaPr( OldParagraph );
             NewParagraph.Set_FramePr2( FramePr );
@@ -4239,7 +4238,7 @@ CDocument.prototype =
                                     var FName  = ParaItem.Value.FontFamily.Name;
                                     var FIndex = ParaItem.Value.FontFamily.Index;
 
-                                    ParaItem.Value.RFonts = new AscCommon.CRFonts();
+                                    ParaItem.Value.RFonts = new CRFonts();
                                     ParaItem.Value.RFonts.Ascii    = { Name : FName, Index : FIndex };
                                     ParaItem.Value.RFonts.EastAsia = { Name : FName, Index : FIndex };
                                     ParaItem.Value.RFonts.HAnsi    = { Name : FName, Index : FIndex };
@@ -5960,7 +5959,7 @@ CDocument.prototype =
             var bRetValue = this.HdrFtr.Set_ParagraphTabs(Tabs);
             this.Document_UpdateSelectionState();
             this.Document_UpdateInterfaceState();
-            editor.Update_ParaTab( AscCommon.Default_Tab_Stop, Tabs );
+            editor.Update_ParaTab( Default_Tab_Stop, Tabs );
             return bRetValue;
         }
         else if ( docpostype_DrawingObjects === this.CurPos.Type )
@@ -5968,7 +5967,7 @@ CDocument.prototype =
             var bRetValue = this.DrawingObjects.setParagraphTabs(Tabs);
             this.Document_UpdateSelectionState();
             this.Document_UpdateInterfaceState();
-            editor.Update_ParaTab( AscCommon.Default_Tab_Stop, Tabs );
+            editor.Update_ParaTab( Default_Tab_Stop, Tabs );
             return bRetValue;
         }
         else //if ( docpostype_Content === this.CurPos.Type )
@@ -6009,7 +6008,7 @@ CDocument.prototype =
                 this.Document_UpdateSelectionState();
                 this.Document_UpdateInterfaceState();
 
-                editor.Update_ParaTab( AscCommon.Default_Tab_Stop, Tabs );
+                editor.Update_ParaTab( Default_Tab_Stop, Tabs );
 
                 return;
             }
@@ -6024,12 +6023,12 @@ CDocument.prototype =
 
                 this.Recalculate( true );
 
-                editor.Update_ParaTab( AscCommon.Default_Tab_Stop, Tabs );
+                editor.Update_ParaTab( Default_Tab_Stop, Tabs );
             }
             else if ( type_Table == Item.GetType() )
             {
                 Item.Set_ParagraphTabs( Tabs );
-                editor.Update_ParaTab( AscCommon.Default_Tab_Stop, Tabs );
+                editor.Update_ParaTab( Default_Tab_Stop, Tabs );
             }
 
             this.Document_UpdateSelectionState();
@@ -6300,7 +6299,7 @@ CDocument.prototype =
                                 //        на тот, который прописан в NumInfo.Subtype
 
                                 var LvlText   = "";
-                                var LvlTextPr = new AscCommon.CTextPr();
+                                var LvlTextPr = new CTextPr();
                                 LvlTextPr.RFonts.Set_All( "Times New Roman", -1 );
 
                                 switch ( NumInfo.SubType )
@@ -6776,7 +6775,7 @@ CDocument.prototype =
                                 //    который определен в NumInfo.Subtype
 
                                 var LvlText   = "";
-                                var LvlTextPr = new AscCommon.CTextPr();
+                                var LvlTextPr = new CTextPr();
                                 LvlTextPr.RFonts.Set_All( "Times New Roman", -1 );
 
                                 switch ( NumInfo.SubType )
@@ -8025,7 +8024,7 @@ CDocument.prototype =
                     {
                         var OldFontSize = this.Get_Paragraph_TextPr().FontSize;
                         var NewFontSize = FontSize_IncreaseDecreaseValue(bIncrease, OldFontSize);
-                        var TextPr = new AscCommon.CTextPr();
+                        var TextPr = new CTextPr();
                         TextPr.FontSize = NewFontSize;
                         this.Paragraph_Add(new ParaTextPr(TextPr), true);
 
@@ -8170,9 +8169,9 @@ CDocument.prototype =
                 this.Create_NewHistoryPoint(AscDFH.historydescription_Document_SetTextHighlight);
 
                 if (false === IsColor)
-                    this.Paragraph_Add( new ParaTextPr( { HighLight : AscCommon.highlight_None  } ) );
+                    this.Paragraph_Add( new ParaTextPr( { HighLight : highlight_None  } ) );
                 else
-                    this.Paragraph_Add( new ParaTextPr( { HighLight : new AscCommon.CDocumentColor( r, g, b )  } ) );
+                    this.Paragraph_Add( new ParaTextPr( { HighLight : new CDocumentColor( r, g, b )  } ) );
 
                 this.Document_UpdateInterfaceState();
                 editor.sync_MarkerFormatCallback( false );
@@ -8181,9 +8180,9 @@ CDocument.prototype =
         else
         {
             if ( false === IsColor )
-                this.HighlightColor = AscCommon.highlight_None;
+                this.HighlightColor = highlight_None;
             else
-                this.HighlightColor = new AscCommon.CDocumentColor( r, g, b );
+                this.HighlightColor = new CDocumentColor( r, g, b );
         }
     },
 
@@ -8281,7 +8280,7 @@ CDocument.prototype =
             return this.DrawingObjects.getParagraphParaPr();
         else //if ( docpostype_Content === this.CurPos.Type )
         {
-            var Result_ParaPr = new AscCommon.CParaPr();
+            var Result_ParaPr = new CParaPr();
             if ( true === this.Selection.Use && selectionflag_Common === this.Selection.Flag )
             {
                 var StartPos = this.Selection.StartPos;
@@ -8658,16 +8657,16 @@ CDocument.prototype =
 
     Set_DocumentDefaultTab : function(DTab)
     {
-        this.History.Add( this, { Type : AscDFH.historyitem_Document_DefaultTab, Old : AscCommon.Default_Tab_Stop, New : DTab } );
-        AscCommon.Default_Tab_Stop = DTab;
+        this.History.Add( this, { Type : AscDFH.historyitem_Document_DefaultTab, Old : Default_Tab_Stop, New : DTab } );
+        Default_Tab_Stop = DTab;
     },
     
     Set_DocumentEvenAndOddHeaders : function(Value)
     {
-        if ( Value !== AscCommon.EvenAndOddHeaders )
+        if ( Value !== EvenAndOddHeaders )
         {
-            this.History.Add( this, { Type : AscDFH.historyitem_Document_EvenAndOddHeaders, Old : AscCommon.EvenAndOddHeaders, New : Value } );
-            AscCommon.EvenAndOddHeaders = Value;
+            this.History.Add( this, { Type : AscDFH.historyitem_Document_EvenAndOddHeaders, Old : EvenAndOddHeaders, New : Value } );
+            EvenAndOddHeaders = Value;
         }
     },
 
@@ -8707,7 +8706,7 @@ CDocument.prototype =
                 ParaPr.CanAddImage = true;
 
             if ( undefined != ParaPr.Tabs )
-                editor.Update_ParaTab( AscCommon.Default_Tab_Stop, ParaPr.Tabs );
+                editor.Update_ParaTab( Default_Tab_Stop, ParaPr.Tabs );
 
             if(ParaPr.Shd && ParaPr.Shd.Unifill)
             {
@@ -8752,7 +8751,7 @@ CDocument.prototype =
             if(TextPr.Unifill)
             {
                 var RGBAColor = TextPr.Unifill.getRGBAColor();
-                TextPr.Color = new AscCommon.CDocumentColor(RGBAColor.R, RGBAColor.G, RGBAColor.B, false);
+                TextPr.Color = new CDocumentColor(RGBAColor.R, RGBAColor.G, RGBAColor.B, false);
             }
             if(TextPr.Shd && TextPr.Shd.Unifill)
             {
@@ -11613,14 +11612,14 @@ CDocument.prototype =
                 {
                     this.Create_NewHistoryPoint(AscDFH.historydescription_Document_SetTextHighlight2);
                     var ParaItem = null;
-                    if ( this.HighlightColor != AscCommon.highlight_None )
+                    if ( this.HighlightColor != highlight_None )
                     {
                         var TextPr = this.Get_Paragraph_TextPr();
-                        if ( "undefined" === typeof( TextPr.HighLight ) || null === TextPr.HighLight || AscCommon.highlight_None === TextPr.HighLight ||
+                        if ( "undefined" === typeof( TextPr.HighLight ) || null === TextPr.HighLight || highlight_None === TextPr.HighLight ||
                             this.HighlightColor.r != TextPr.HighLight.r || this.HighlightColor.g != TextPr.HighLight.g || this.HighlightColor.b != TextPr.HighLight.b )
                             ParaItem = new ParaTextPr( { HighLight : this.HighlightColor } );
                         else
-                            ParaItem = new ParaTextPr( { HighLight : AscCommon.highlight_None } );
+                            ParaItem = new ParaTextPr( { HighLight : highlight_None } );
                     }
                     else
                         ParaItem = new ParaTextPr( { HighLight : this.HighlightColor } );
@@ -12107,7 +12106,7 @@ CDocument.prototype =
         var SectionPageInfo = this.Get_SectionPageNumInfo( PageIndex );
 
         var bFirst  = ( true === SectionPageInfo.bFirst && true === SectPr.Get_TitlePage() ? true : false );
-        var bEven   = ( true === SectionPageInfo.bEven  && true === AscCommon.EvenAndOddHeaders      ? true : false );
+        var bEven   = ( true === SectionPageInfo.bEven  && true === EvenAndOddHeaders      ? true : false );
         var bHeader = ( hdrftr_Header === CurHdrFtr.Type ? true : false );
 
         var _CurHdrFtr = SectPr.Get_HdrFtr( bHeader, bFirst, bEven );
@@ -13602,14 +13601,14 @@ CDocument.prototype =
 
             case AscDFH.historyitem_Document_DefaultTab:
             {
-                AscCommon.Default_Tab_Stop = Data.Old;
+                Default_Tab_Stop = Data.Old;
 
                 break;
             }
                 
             case AscDFH.historyitem_Document_EvenAndOddHeaders:
             {
-                AscCommon.EvenAndOddHeaders = Data.Old;
+                EvenAndOddHeaders = Data.Old;
                 break;
             }
                 
@@ -13660,14 +13659,14 @@ CDocument.prototype =
 
             case AscDFH.historyitem_Document_DefaultTab:
             {
-                AscCommon.Default_Tab_Stop = Data.New;
+                Default_Tab_Stop = Data.New;
 
                 break;
             }
 
             case AscDFH.historyitem_Document_EvenAndOddHeaders:
             {
-                AscCommon.EvenAndOddHeaders = Data.New;
+                EvenAndOddHeaders = Data.New;
                 break;
             }
 
@@ -14129,7 +14128,7 @@ CDocument.prototype =
             {
                 // Double : Default Tab
 
-                AscCommon.Default_Tab_Stop = Reader.GetDouble();
+                Default_Tab_Stop = Reader.GetDouble();
 
                 break;
             }
@@ -14137,8 +14136,8 @@ CDocument.prototype =
             case AscDFH.historyitem_Document_EvenAndOddHeaders:
             {
                 // Bool : EvenAndOddHeaders
-
-                AscCommon.EvenAndOddHeaders = Reader.GetBool();
+                
+                EvenAndOddHeaders = Reader.GetBool();
 
                 break;
             }
@@ -14549,7 +14548,7 @@ CDocument.prototype =
                 
                 var RunPr = Para.Get_TextPr();
                 if ( null === RunPr || undefined === RunPr )
-                    RunPr = new AscCommon.CTextPr();
+                    RunPr = new CTextPr();
                 
                 RunPr.RFonts = rFonts;
                 
@@ -14864,7 +14863,7 @@ CDocument.prototype =
         var SectIndex  = this.SectionsInfo.Get_Index(StartIndex);
         var CurSectPr  = this.SectionsInfo.Get_SectPr2(SectIndex).SectPr;
 
-        var bEven  = ( true === _bEven  && true === AscCommon.EvenAndOddHeaders   ? true : false );
+        var bEven  = ( true === _bEven  && true === EvenAndOddHeaders   ? true : false );
         var bFirst = ( true === _bFirst && true === CurSectPr.TitlePage ? true : false );
 
         var CurSectIndex = SectIndex;
@@ -14919,7 +14918,7 @@ CDocument.prototype =
         var SectIndex  = this.SectionsInfo.Get_Index(StartIndex);
         var CurSectPr  = this.SectionsInfo.Get_SectPr2(SectIndex).SectPr;
                 
-        var bEven  = ( true === _bEven  && true === AscCommon.EvenAndOddHeaders   ? true : false );
+        var bEven  = ( true === _bEven  && true === EvenAndOddHeaders   ? true : false );
         var bFirst = ( true === _bFirst && true === CurSectPr.TitlePage ? true : false );
         
         var SectPr = this.SectionsInfo.Get_SectPr2(0).SectPr;       

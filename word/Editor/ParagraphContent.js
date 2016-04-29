@@ -26,7 +26,6 @@ var g_oTableId = AscCommon.g_oTableId;
 var g_oTextMeasurer = AscCommon.g_oTextMeasurer;
 var isRealObject = AscCommon.isRealObject;
 var History = AscCommon.History;
-var CRFonts = AscCommon.CRFonts;
 
 var HitInLine = AscFormat.HitInLine;
 var MOVE_DELTA = AscFormat.MOVE_DELTA;
@@ -131,9 +130,6 @@ var PARATEXT_FLAGS_NON_CAPITALS           = PARATEXT_FLAGS_MASK ^ PARATEXT_FLAGS
 
 var TEXTWIDTH_DIVIDER = 16384;
 
-var smallcaps_Koef = 0.8; // Коэффициент изменения размера шрифта для малых прописных букв
-var smallcaps_and_script_koef = AscCommon.vertalign_Koef_Size * smallcaps_Koef; // суммарный коэффициент, когда текст одновременно и в индексе, и написан малыми прописными
-
 // Класс ParaText
 function ParaText(value)
 {
@@ -168,7 +164,7 @@ ParaText.prototype =
         if ( this.Flags & PARATEXT_FLAGS_FONTKOEF_SCRIPT && this.Flags & PARATEXT_FLAGS_FONTKOEF_SMALLCAPS )
             FontKoef = smallcaps_and_script_koef;
         else if ( this.Flags & PARATEXT_FLAGS_FONTKOEF_SCRIPT )
-            FontKoef = AscCommon.vertalign_Koef_Size;
+            FontKoef = vertalign_Koef_Size;
         else if ( this.Flags & PARATEXT_FLAGS_FONTKOEF_SMALLCAPS )
             FontKoef = smallcaps_Koef;
 
@@ -228,7 +224,7 @@ ParaText.prototype =
         if ( this.Flags & PARATEXT_FLAGS_FONTKOEF_SCRIPT && this.Flags & PARATEXT_FLAGS_FONTKOEF_SMALLCAPS )
             FontKoef = smallcaps_and_script_koef;
         else if ( this.Flags & PARATEXT_FLAGS_FONTKOEF_SCRIPT )
-            FontKoef = AscCommon.vertalign_Koef_Size;
+            FontKoef = vertalign_Koef_Size;
         else if ( this.Flags & PARATEXT_FLAGS_FONTKOEF_SMALLCAPS )
             FontKoef = smallcaps_Koef;
 
@@ -409,7 +405,7 @@ ParaSpace.prototype =
         if ( this.Flags & PARATEXT_FLAGS_FONTKOEF_SCRIPT && this.Flags & PARATEXT_FLAGS_FONTKOEF_SMALLCAPS )
             return smallcaps_and_script_koef;
         else if ( this.Flags & PARATEXT_FLAGS_FONTKOEF_SCRIPT )
-            return AscCommon.vertalign_Koef_Size;
+            return vertalign_Koef_Size;
         else if ( this.Flags & PARATEXT_FLAGS_FONTKOEF_SMALLCAPS )
             return smallcaps_Koef;
         else
@@ -588,7 +584,7 @@ function ParaTextPr(Props)
     this.Id = AscCommon.g_oIdCounter.Get_NewId();
 
     this.Type   = para_TextPr;
-    this.Value  = new AscCommon.CTextPr();
+    this.Value  = new CTextPr();
     this.Parent = null;
     this.CalcValue = this.Value;
 
@@ -1137,7 +1133,7 @@ ParaTextPr.prototype =
     {
         var OldValue = this.Value.Lang;
 
-        var NewValue = new AscCommon.CLang();
+        var NewValue = new CLang();
         if ( undefined != Value )
             NewValue.Set_FromObject( Value );
 
@@ -1413,7 +1409,7 @@ ParaTextPr.prototype =
                 if ( undefined != Data.Old )
                     this.Value.Lang = Data.Old;
                 else
-                    this.Value.Lang = new AscCommon.CLang();
+                    this.Value.Lang = new CLang();
 
                 break;
             }
@@ -1719,7 +1715,7 @@ ParaTextPr.prototype =
                 if ( undefined != Data.New )
                     this.Value.Lang = Data.New;
                 else
-                    this.Value.Lang = new AscCommon.CLang();
+                    this.Value.Lang = new CLang();
 
                 break;
             }
@@ -1895,7 +1891,7 @@ ParaTextPr.prototype =
             {
                 // Variable : TextPr
 
-                var TextPr = new AscCommon.CTextPr();
+                var TextPr = new CTextPr();
                 TextPr[Data.Prop] = Data.New;
                 TextPr.Write_ToBinary( Writer );
 
@@ -2000,7 +1996,7 @@ ParaTextPr.prototype =
                 if ( undefined != Data.New )
                 {
                     Writer.WriteBool(false);
-                    if ( AscCommon.highlight_None != Data.New )
+                    if ( highlight_None != Data.New )
                     {
                         Writer.WriteBool( false );
                         Data.New.Write_ToBinary( Writer );
@@ -2180,7 +2176,7 @@ ParaTextPr.prototype =
             {
                 // Variable : TextPr
 
-                var TextPr = new AscCommon.CTextPr();
+                var TextPr = new CTextPr();
                 TextPr.Read_FromBinary( Reader );
                 this.Value.Merge( TextPr );
 
@@ -2294,7 +2290,7 @@ ParaTextPr.prototype =
                     var r = Reader.GetByte();
                     var g = Reader.GetByte();
                     var b = Reader.GetByte();
-                    this.Value.Color = new AscCommon.CDocumentColor( r, g, b );
+                    this.Value.Color = new CDocumentColor( r, g, b );
                 }
                 else
                     this.Value.Color = undefined;
@@ -2372,11 +2368,11 @@ ParaTextPr.prototype =
                 {
                     if ( true != Reader.GetBool() )
                     {
-                        this.Value.HighLight = new AscCommon.CDocumentColor(0,0,0);
+                        this.Value.HighLight = new CDocumentColor(0,0,0);
                         this.Value.HighLight.Read_FromBinary(Reader);
                     }
                     else
-                        this.Value.HighLight = AscCommon.highlight_None;
+                        this.Value.HighLight = highlight_None;
                 }
                 else
                     this.Value.HighLight = undefined;
@@ -2471,7 +2467,7 @@ ParaTextPr.prototype =
             case AscDFH.historyitem_TextPr_Value:
             {
                 // CTextPr
-                this.Value = new AscCommon.CTextPr();
+                this.Value = new CTextPr();
                 this.Value.Read_FromBinary( Reader );
 
                 break;
@@ -2498,11 +2494,11 @@ ParaTextPr.prototype =
                 // false -> Lang
                 if ( false === Reader.GetBool() )
                 {
-                    this.Value.Lang = new AscCommon.CLang();
+                    this.Value.Lang = new CLang();
                     this.Value.Lang.Read_FromBinary( Reader );
                 }
                 else
-                    this.Value.Lang = new AscCommon.CLang();
+                    this.Value.Lang = new CLang();
 
                 break;
             }
@@ -5263,7 +5259,7 @@ ParaDrawing.prototype =
             Run.Remove_DrawingObject(this.Id);
 
             if (true === Run.Is_InHyperlink())
-                Result = new AscCommon.CTextPr();
+                Result = new CTextPr();
             else
                 Result = Run.Get_TextPr();
         }

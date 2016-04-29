@@ -1,4 +1,9 @@
 "use strict";
+/**
+ * User: Ilja.Kirillov
+ * Date: 03.12.13
+ * Time: 18:28
+ */
   
 // Import
 var g_oTableId = AscCommon.g_oTableId;
@@ -6,19 +11,12 @@ var g_oTextMeasurer = AscCommon.g_oTextMeasurer;
 var History = AscCommon.History;
 var recalcresultflags_Page = AscCommon.recalcresultflags_Page;
 var CParaPos = AscCommon.CParaPos;
-var CTextPr = AscCommon.CTextPr;
-var CRFonts = AscCommon.CRFonts;
-var CDocumentColor = AscCommon.CDocumentColor;
-var g_dKoef_pt_to_mm = AscCommon.g_dKoef_pt_to_mm;
 
 var c_oAscShdNil = Asc.c_oAscShdNil;
 
 var reviewtype_Common = 0x00;
 var reviewtype_Remove = 0x01;
 var reviewtype_Add    = 0x02;
-
-var vertalign_Koef_Super =  0.35;  // Позиция верхнего индекса (относительно размера текста)
-var vertalign_Koef_Sub   = -0.141; // Позиция нижнего индекса (относительно размера текста)
 
 /**
  *
@@ -326,7 +324,7 @@ ParaRun.prototype.Add = function(Item, bMath)
         var nCurrentLanguage  = this.Get_CompiledPr(false).Lang.Val;
         if (-1 !== nRequiredLanguage && nRequiredLanguage !== nCurrentLanguage)
         {
-            var NewLang = new AscCommon.CLang();
+            var NewLang = new CLang();
             NewLang.Val = nRequiredLanguage;
 
             if (this.Is_Empty())
@@ -4264,7 +4262,7 @@ ParaRun.prototype.Draw_HighLights = function(PDSH)
 
                 if ( CommentsFlag != AscCommon.comments_NoComment )
                     aComm.Add( Y0, Y1, X, X + ItemWidthVisible, 0, 0, 0, 0, { Active : CommentsFlag === AscCommon.comments_ActiveComment ? true : false, CommentId : CommentId } );
-                else if ( AscCommon.highlight_None != HighLight )
+                else if ( highlight_None != HighLight )
                     aHigh.Add( Y0, Y1, X, X + ItemWidthVisible, 0, HighLight.r, HighLight.g, HighLight.b, undefined, HighLight );
 
                 if ( true === DrawSearch )
@@ -4284,7 +4282,7 @@ ParaRun.prototype.Draw_HighLights = function(PDSH)
                 {
                     if ( CommentsFlag != AscCommon.comments_NoComment )
                         aComm.Add( Y0, Y1, X, X + ItemWidthVisible, 0, 0, 0, 0, { Active : CommentsFlag === AscCommon.comments_ActiveComment ? true : false, CommentId : CommentId } );
-                    else if ( AscCommon.highlight_None != HighLight )
+                    else if ( highlight_None != HighLight )
                         aHigh.Add( Y0, Y1, X, X + ItemWidthVisible, 0, HighLight.r, HighLight.g, HighLight.b, undefined, HighLight );
 
                     PDSH.Spaces--;
@@ -4606,8 +4604,8 @@ ParaRun.prototype.Draw_Lines = function(PDSL)
     switch(CurTextPr.VertAlign)
     {
         case AscCommon.vertalign_Baseline   : StrikeoutY += -CurTextPr.FontSize * fontCoeff * g_dKoef_pt_to_mm * 0.27; break;
-        case AscCommon.vertalign_SubScript  : StrikeoutY += -CurTextPr.FontSize * fontCoeff * AscCommon.vertalign_Koef_Size * g_dKoef_pt_to_mm * 0.27 - vertalign_Koef_Sub * CurTextPr.FontSize  * fontCoeff * g_dKoef_pt_to_mm; break;
-        case AscCommon.vertalign_SuperScript: StrikeoutY += -CurTextPr.FontSize * fontCoeff * AscCommon.vertalign_Koef_Size * g_dKoef_pt_to_mm * 0.27 - vertalign_Koef_Super * CurTextPr.FontSize * fontCoeff * g_dKoef_pt_to_mm; break;
+        case AscCommon.vertalign_SubScript  : StrikeoutY += -CurTextPr.FontSize * fontCoeff * vertalign_Koef_Size * g_dKoef_pt_to_mm * 0.27 - vertalign_Koef_Sub * CurTextPr.FontSize  * fontCoeff * g_dKoef_pt_to_mm; break;
+        case AscCommon.vertalign_SuperScript: StrikeoutY += -CurTextPr.FontSize * fontCoeff * vertalign_Koef_Size * g_dKoef_pt_to_mm * 0.27 - vertalign_Koef_Super * CurTextPr.FontSize * fontCoeff * g_dKoef_pt_to_mm; break;
     }
 
     var UnderlineY = Y + UndOff -  this.YOffset;
@@ -5868,7 +5866,7 @@ ParaRun.prototype.Internal_Compile_Pr = function ()
     if ( undefined != this.Pr.RStyle )
     {
         var Styles = this.Paragraph.Parent.Get_Styles();
-        var StyleTextPr = Styles.Get_Pr( this.Pr.RStyle, AscCommon.styletype_Character ).TextPr;
+        var StyleTextPr = Styles.Get_Pr( this.Pr.RStyle, styletype_Character ).TextPr;
         TextPr.Merge( StyleTextPr );
     }
 
@@ -5899,7 +5897,7 @@ ParaRun.prototype.Internal_Compile_Pr = function ()
 
             var StyleId    = this.Paragraph.Style_Get();
 
-            var Pr = Styles.Get_Pr( StyleId, AscCommon.styletype_Paragraph, null, null );
+            var Pr = Styles.Get_Pr( StyleId, styletype_Paragraph, null, null );
 
             TextPr.RFonts.Set_FromObject(Pr.TextPr.RFonts);
 
@@ -6730,7 +6728,7 @@ ParaRun.prototype.Get_VertAlign = function()
 ParaRun.prototype.Set_HighLight = function(Value)
 {
     var OldValue = this.Pr.HighLight;
-    if ( (undefined === Value && undefined !== OldValue) || ( AscCommon.highlight_None === Value && AscCommon.highlight_None !== OldValue ) || ( Value instanceof CDocumentColor && ( undefined === OldValue || AscCommon.highlight_None === OldValue || false === Value.Compare(OldValue) ) ) )
+    if ( (undefined === Value && undefined !== OldValue) || ( highlight_None === Value && highlight_None !== OldValue ) || ( Value instanceof CDocumentColor && ( undefined === OldValue || highlight_None === OldValue || false === Value.Compare(OldValue) ) ) )
     {
         this.Pr.HighLight = Value;
         History.Add( this, { Type : AscDFH.historyitem_ParaRun_HighLight, New : Value, Old : OldValue, Color : this.private_IsCollPrChangeMine() } );
@@ -6973,7 +6971,7 @@ ParaRun.prototype.Set_Lang = function(Value)
 {
     var OldValue = this.Pr.Lang;
 
-    this.Pr.Lang = new AscCommon.CLang();
+    this.Pr.Lang = new CLang();
     if ( undefined != Value )
         this.Pr.Lang.Set_FromObject( Value );
 
@@ -7047,7 +7045,7 @@ ParaRun.prototype.Set_Shd = function(Shd)
 
     if ( undefined !== Shd )
     {
-        this.Pr.Shd = new AscCommon.CDocumentShd();
+        this.Pr.Shd = new CDocumentShd();
         this.Pr.Shd.Set_FromObject( Shd );
     }
     else
@@ -7389,7 +7387,7 @@ ParaRun.prototype.Undo = function(Data)
             if ( undefined != Data.Old )
                 this.Pr.Lang = Data.Old;
             else
-                this.Pr.Lang = new AscCommon.CLang();
+                this.Pr.Lang = new CLang();
 
             this.Recalc_CompiledPr(false);
             this.protected_UpdateSpellChecking();
@@ -7829,7 +7827,7 @@ ParaRun.prototype.Redo = function(Data)
             if ( undefined != Data.New )
                 this.Pr.Lang = Data.New;
             else
-                this.Pr.Lang = new AscCommon.CLang();
+                this.Pr.Lang = new CLang();
 
             this.Recalc_CompiledPr(false);
             this.protected_UpdateSpellChecking();
@@ -8190,7 +8188,7 @@ ParaRun.prototype.Save_Changes = function(Data, Writer)
             if ( undefined != Data.New )
             {
                 Writer.WriteBool(false);
-                if ( AscCommon.highlight_None != Data.New )
+                if ( highlight_None != Data.New )
                 {
                     Writer.WriteBool( false );
                     Data.New.Write_ToBinary( Writer );
@@ -8862,7 +8860,7 @@ ParaRun.prototype.Load_Changes = function(Reader, Reader2, Color)
                     this.Pr.HighLight.Read_FromBinary(Reader);
                 }
                 else
-                    this.Pr.HighLight = AscCommon.highlight_None;
+                    this.Pr.HighLight = highlight_None;
             }
             else
                 this.Pr.HighLight = undefined;
@@ -9092,11 +9090,11 @@ ParaRun.prototype.Load_Changes = function(Reader, Reader2, Color)
             bColorPrChange = Reader.GetBool();
             if ( false === Reader.GetBool() )
             {
-                this.Pr.Lang = new AscCommon.CLang();
+                this.Pr.Lang = new CLang();
                 this.Pr.Lang.Read_FromBinary( Reader );
             }
             else
-                this.Pr.Lang = new AscCommon.CLang();
+                this.Pr.Lang = new CLang();
 
             this.Recalc_CompiledPr(true);
             this.protected_UpdateSpellChecking();
@@ -9160,7 +9158,7 @@ ParaRun.prototype.Load_Changes = function(Reader, Reader2, Color)
             bColorPrChange = Reader.GetBool();
             if ( false === Reader.GetBool() )
             {
-                this.Pr.Shd = new AscCommon.CDocumentShd();
+                this.Pr.Shd = new CDocumentShd();
                 this.Pr.Shd.Read_FromBinary( Reader );
             }
             else

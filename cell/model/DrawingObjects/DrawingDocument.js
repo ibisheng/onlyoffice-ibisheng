@@ -4255,9 +4255,9 @@ function CDrawingDocument(drawingObjects)
             var par = shape.txBody.content.Content[0];
             par.Reset(0, 0, 1000, 1000, 0);
             par.Cursor_MoveToStartPos();
-            var _paraPr = new AscCommon.CParaPr();
+            var _paraPr = new CParaPr();
             par.Pr = _paraPr;
-            var _textPr = new AscCommon.CTextPr();
+            var _textPr = new CTextPr();
             _textPr.FontFamily = { Name : "Arial", Index : -1 };
 
             _textPr.Strikeout  = this.GuiLastTextProps.Strikeout;
@@ -4447,7 +4447,7 @@ function CDrawingDocument(drawingObjects)
             var i = _styles[i1];
             var _style = logicDoc.Styles.Style[i];
 
-            if (!_style || _style.Type != AscCommon.styletype_Table)
+            if (!_style || _style.Type != styletype_Table)
                 continue;
 
             var table = new CTable(this, logicDoc, true, 0, _x_mar, _y_mar, 1000, 1000, Rows, Cols, Grid);

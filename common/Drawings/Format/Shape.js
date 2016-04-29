@@ -358,7 +358,7 @@ function CheckWordRunPr(Pr)
 
                             NewRPr = Pr.Copy();
                             var RGBA = Pr.Unifill.fill.color.color.RGBA;
-                            NewRPr.Color = new AscCommon.CDocumentColor(RGBA.R, RGBA.G, RGBA.B);
+                            NewRPr.Color = new CDocumentColor(RGBA.R, RGBA.G, RGBA.B);
                             NewRPr.Unifill = undefined;
                             break;
                         }
@@ -2152,7 +2152,7 @@ CShape.prototype =
     recalculateTextStyles: function (level) {
         return AscFormat.ExecuteNoHistory(function () {
             var parent_objects = this.getParentObjects();
-            var default_style = new AscCommon.CStyle("defaultStyle", null, null, null, true);
+            var default_style = new CStyle("defaultStyle", null, null, null, true);
             default_style.ParaPr.Spacing.LineRule = Asc.linerule_Auto;
             default_style.ParaPr.Spacing.Line = 1;
             default_style.ParaPr.Spacing.Before = 0;
@@ -2175,7 +2175,7 @@ CShape.prototype =
             var master_style;
             if (isRealObject(parent_objects.master) && isRealObject(parent_objects.master.txStyles)) {
                 var master_ppt_styles;
-                master_style = new AscCommon.CStyle("masterStyle", null, null, null, true);
+                master_style = new CStyle("masterStyle", null, null, null, true);
                 if (this.isPlaceholder()) {
                     switch (this.getPlaceholderType()) {
                         case AscFormat.phType_ctrTitle:
@@ -2222,7 +2222,7 @@ CShape.prototype =
                     && isRealObject(hierarchy_shape.txBody.lstStyle.levels)
                     && isRealObject(hierarchy_shape.txBody.lstStyle.levels[level])) {
                     var hierarchy_ppt_style = hierarchy_shape.txBody.lstStyle.levels[level];
-                    var hierarchy_style = new AscCommon.CStyle("hierarchyStyle" + i, null, null, null, true);
+                    var hierarchy_style = new CStyle("hierarchyStyle" + i, null, null, null, true);
                     hierarchy_style.ParaPr = hierarchy_ppt_style.Copy();
                     if (hierarchy_ppt_style.DefaultRunPr) {
                         hierarchy_style.TextPr = hierarchy_ppt_style.DefaultRunPr.Copy();
@@ -2233,7 +2233,7 @@ CShape.prototype =
 
             var ownStyle;
             if (isRealObject(this.txBody) && isRealObject(this.txBody.lstStyle) && isRealObject(this.txBody.lstStyle.levels[level])) {
-                ownStyle = new AscCommon.CStyle("ownStyle", null, null, null, true);
+                ownStyle = new CStyle("ownStyle", null, null, null, true);
                 var own_ppt_style = this.txBody.lstStyle.levels[level];
                 ownStyle.ParaPr = own_ppt_style.Copy();
                 if (own_ppt_style.DefaultRunPr) {
@@ -2243,7 +2243,7 @@ CShape.prototype =
             }
             var shape_text_style;
             if (isRealObject(this.style) && isRealObject(this.style.fontRef)) {
-                shape_text_style = new AscCommon.CStyle("shapeTextStyle", null, null, null, true);
+                shape_text_style = new CStyle("shapeTextStyle", null, null, null, true);
                 var first_name;
                 if (this.style.fontRef.idx === AscFormat.fntStyleInd_major)
                     first_name = "+mj-";
@@ -2262,7 +2262,7 @@ CShape.prototype =
                     shape_text_style.TextPr.Unifill = unifill;
                 }
             }
-            var Styles = new AscCommon.CStyles(false);
+            var Styles = new CStyles(false);
 
 
             var last_style_id;
