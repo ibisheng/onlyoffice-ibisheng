@@ -29,6 +29,7 @@
 		"../common/editor/paragraph.js",
 		"../common/editor/document.js",
 		"../common/editor/documentContent.js",
+		"../common/editor/paragraphContent.js",
 		
 		"../common/Shapes/EditorSettings.js",
 		"../common/Shapes/Serialize.js",
@@ -117,7 +118,6 @@
         "../slide/Editor/Format/Layout.js",
         "../slide/Editor/Format/Comments.js",
         "../word/Editor/Numbering.js",
-        "../word/Editor/ParagraphContent.js",
         "../word/Editor/ParagraphContentBase.js",
         "../word/Editor/Hyperlink.js",
         "../word/Editor/Field.js",

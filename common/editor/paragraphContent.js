@@ -28,9 +28,6 @@ var isRealObject = AscCommon.isRealObject;
 var History = AscCommon.History;
 var CRFonts = AscCommon.CRFonts;
 
-var HitInLine = AscFormat.HitInLine;
-var MOVE_DELTA = AscFormat.MOVE_DELTA;
-
 var c_oAscRelativeFromH = Asc.c_oAscRelativeFromH;
 var c_oAscRelativeFromV = Asc.c_oAscRelativeFromV;
 
@@ -4977,10 +4974,10 @@ ParaDrawing.prototype =
 
 
         if( this.GraphicObj.bNeedUpdatePosition || !(AscFormat.isRealNumber(this.GraphicObj.posX) && AscFormat.isRealNumber(this.GraphicObj.posY)) ||
-            !(Math.abs(this.GraphicObj.posX-_x) < MOVE_DELTA && Math.abs(this.GraphicObj.posY-_y) < MOVE_DELTA))
+            !(Math.abs(this.GraphicObj.posX-_x) < AscFormat.MOVE_DELTA && Math.abs(this.GraphicObj.posY-_y) < AscFormat.MOVE_DELTA))
             this.GraphicObj.updatePosition(_x, _y);
         if( this.GraphicObj.bNeedUpdatePosition || !(AscFormat.isRealNumber(this.wrappingPolygon.posX) && AscFormat.isRealNumber(this.wrappingPolygon.posY)) ||
-            !(Math.abs(this.wrappingPolygon.posX -_x) < MOVE_DELTA && Math.abs(this.wrappingPolygon.posY-_y) < MOVE_DELTA))
+            !(Math.abs(this.wrappingPolygon.posX -_x) < AscFormat.MOVE_DELTA && Math.abs(this.wrappingPolygon.posY-_y) < AscFormat.MOVE_DELTA))
             this.wrappingPolygon.updatePosition(_x, _y);
         this.calculateSnapArrays();
     },
@@ -6889,7 +6886,7 @@ ParaDrawing.prototype =
             vy = cur_point.y - previous_point.y;
             if(Math.abs(vx) > 0 || Math.abs(vy) > 0)
             {
-                if(HitInLine(this.drawingDocument.CanvasHitContext, x, y, previous_point.x, previous_point.y, cur_point.x, cur_point.y))
+                if(AscFormat.HitInLine(this.drawingDocument.CanvasHitContext, x, y, previous_point.x, previous_point.y, cur_point.x, cur_point.y))
                     return {hit: true, hitType: WRAP_HIT_TYPE_SECTION, pointNum1: arr_point.length - 1, pointNum2: 0};
             }
 
@@ -6903,7 +6900,7 @@ ParaDrawing.prototype =
 
                 if(Math.abs(vx) > 0 || Math.abs(vy) > 0)
                 {
-                    if(HitInLine(this.drawingDocument.CanvasHitContext, x, y, previous_point.x, previous_point.y, cur_point.x, cur_point.y))
+                    if(AscFormat.HitInLine(this.drawingDocument.CanvasHitContext, x, y, previous_point.x, previous_point.y, cur_point.x, cur_point.y))
                         return {hit: true, hitType: WRAP_HIT_TYPE_SECTION, pointNum1: point_index-1, pointNum2: point_index};
                 }
             }
