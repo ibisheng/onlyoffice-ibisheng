@@ -672,21 +672,26 @@
         }
         var aAscSeries = [];
         var aAlphaBet = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
-        var oCat;
+        var oCat, i;
         if(aCatNames.length > 0)
         {
-            oCat = { Formula: "Sheet1!$B$1:$" + AscFormat.CalcLiterByLength(aAlphaBet, aCatNames.length + 1) + "$1", NumCache: [aCatNames] };
+            var aNumCache = [];
+            for(i = 0; i < aCatNames.length; ++i)
+            {
+                aNumCache.push({val: aCatNames[i]});
+            }
+            oCat = { Formula: "Sheet1!$B$1:$" + AscFormat.CalcLiterByLength(aAlphaBet, aCatNames.length) + "$1", NumCache: aNumCache };
         }
-        for(var i = 0; i < aSeries.length; ++i)
+        for(i = 0; i < aSeries.length; ++i)
         {
             var oAscSeries = new AscFormat.asc_CChartSeria();
             oAscSeries.Val.NumCache = [];
             var aData = aSeries[i];
-            var sEndLiter = AscFormat.CalcLiterByLength(aAlphaBet, aData.length + 1);
-            oAscSeries.Val.Formula = 'Sheet1!' + '$B$' + (i + 1) + ':$' + sEndLiter + '$' + (i + 1);
+            var sEndLiter = AscFormat.CalcLiterByLength(aAlphaBet, aData.length);
+            oAscSeries.Val.Formula = 'Sheet1!' + '$B$' + (i + 2) + ':$' + sEndLiter + '$' + (i + 2);
             if(aSeriesNames[i])
             {
-                oAscSeries.TxCache.Formula =  'Sheet1!' + '$A$' + (i + 1);
+                oAscSeries.TxCache.Formula =  'Sheet1!' + '$A$' + (i + 2);
                 oAscSeries.TxCache.Tx = aSeriesNames[i];
             }
             if(oCat)
