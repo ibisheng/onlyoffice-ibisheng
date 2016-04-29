@@ -100,7 +100,7 @@ function asc_docs_api(name)
     this.ParcedDocument = false;
 	this.isStartCoAuthoringOnEndLoad = false;	// Подсоединились раньше, чем документ загрузился
 
-    this.DocumentOrientation = false;
+    this.DocumentOrientation = orientation_Portrait ? true : false;
 
     this.SelectedObjectsStack = [];
 
@@ -860,7 +860,7 @@ asc_docs_api.prototype.select_Element = function(Index)
 
 	Document.Selection.Use      = true;
 	Document.Selection.Start    = false;
-	Document.Selection.Flag     = AscCommon.selectionflag_Common;
+	Document.Selection.Flag     = selectionflag_Common;
 
 	Document.Selection.StartPos = Index;
 	Document.Selection.EndPos   = Index;
@@ -2778,8 +2778,8 @@ asc_docs_api.prototype.AddImageUrl = function(url){
 
 asc_docs_api.prototype.AddImageUrlActionCallback = function(_image)
 {
-    var _w = AscCommon.Page_Width - (AscCommon.X_Left_Margin + AscCommon.X_Right_Margin);
-    var _h = AscCommon.Page_Height - (AscCommon.Y_Top_Margin + AscCommon.Y_Bottom_Margin);
+    var _w = Page_Width - (X_Left_Margin + X_Right_Margin);
+    var _h = Page_Height - (Y_Top_Margin + Y_Bottom_Margin);
     if (_image.Image != null)
     {
         var __w = Math.max((_image.Image.width * AscCommon.g_dKoef_pix_to_mm) >> 0, 1);
@@ -4115,8 +4115,8 @@ asc_docs_api.prototype.GoToFooter = function(pageNumber)
 
     var oldClickCount = global_mouseEvent.ClickCount;
     global_mouseEvent.ClickCount = 2;
-    this.WordControl.m_oLogicDocument.OnMouseDown(global_mouseEvent, 0, AscCommon.Page_Height, pageNumber);
-    this.WordControl.m_oLogicDocument.OnMouseUp(global_mouseEvent, 0, AscCommon.Page_Height, pageNumber);
+    this.WordControl.m_oLogicDocument.OnMouseDown(global_mouseEvent, 0, Page_Height, pageNumber);
+    this.WordControl.m_oLogicDocument.OnMouseUp(global_mouseEvent, 0, Page_Height, pageNumber);
 
     this.WordControl.m_oLogicDocument.Document_UpdateInterfaceState();
 
@@ -4224,8 +4224,8 @@ asc_docs_api.prototype.ExitHeader_Footer = function(pageNumber)
 
     var oldClickCount = global_mouseEvent.ClickCount;
     global_mouseEvent.ClickCount = 2;
-    this.WordControl.m_oLogicDocument.OnMouseDown(global_mouseEvent, 0, AscCommon.Page_Height / 2, pageNumber);
-    this.WordControl.m_oLogicDocument.OnMouseUp(global_mouseEvent, 0, AscCommon.Page_Height / 2, pageNumber);
+    this.WordControl.m_oLogicDocument.OnMouseDown(global_mouseEvent, 0, Page_Height / 2, pageNumber);
+    this.WordControl.m_oLogicDocument.OnMouseUp(global_mouseEvent, 0, Page_Height / 2, pageNumber);
 
     this.WordControl.m_oLogicDocument.Document_UpdateInterfaceState();
     
@@ -4737,7 +4737,7 @@ asc_docs_api.prototype._onOpenCommand = function(data) {
 
 		t.OpenDocument2(result.url, result.data);
 		t.DocumentOrientation = (null == t.WordControl.m_oLogicDocument) ? true : !t.WordControl.m_oLogicDocument.Orientation;
-		t.sync_DocSizeCallback(AscCommon.Page_Width, AscCommon.Page_Height);
+		t.sync_DocSizeCallback(Page_Width, Page_Height);
 		t.sync_PageOrientCallback(t.get_DocumentOrientation());
 	});
 };

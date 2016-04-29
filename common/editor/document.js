@@ -24,8 +24,6 @@
 */
 "use strict";
 
-(function(window, undefined){
-
 // TODO: Сейчас Paragraph.Recalculate_FastWholeParagraph работает только на добавлении текста, надо переделать
 //       алгоритм определения изменений, чтобы данная функция работала и при других изменениях.
 
@@ -47,6 +45,19 @@ var c_oAscXAlign = Asc.c_oAscXAlign;
 var c_oAscYAlign = Asc.c_oAscYAlign;
 var c_oAscVAnchor = Asc.c_oAscVAnchor;
 
+var Page_Width     = 210;
+var Page_Height    = 297;
+
+var X_Left_Margin   = 30;  // 3   cm
+var X_Right_Margin  = 15;  // 1.5 cm
+var Y_Bottom_Margin = 20;  // 2   cm
+var Y_Top_Margin    = 20;  // 2   cm
+
+var X_Left_Field   = X_Left_Margin;
+var X_Right_Field  = Page_Width  - X_Right_Margin;
+var Y_Bottom_Field = Page_Height - Y_Bottom_Margin;
+var Y_Top_Field    = Y_Top_Margin;
+
 var docpostype_Content        = 0x00;
 var docpostype_HdrFtr         = 0x02;
 var docpostype_DrawingObjects = 0x03;
@@ -55,7 +66,13 @@ var selectionflag_Common        = 0x000;
 var selectionflag_Numbering     = 0x001;
 var selectionflag_DrawingObject = 0x002;
 
+var orientation_Portrait  = 0x00;
+var orientation_Landscape = 0x01;
+
 var search_Common              = 0x0000; // Поиск в простом тексте
+
+var search_Header              = 0x0100; // Поиск в верхнем колонтитуле
+var search_Footer              = 0x0200; // Поиск в нижнем колонтитуле
 
 var search_HdrFtr_All          = 0x0001; // Поиск в колонтитуле, который находится на всех страницах
 var search_HdrFtr_All_no_First = 0x0002; // Поиск в колонтитуле, который находится на всех страницах, кроме первой
@@ -8650,7 +8667,7 @@ CDocument.prototype =
 
         var SectPr = SectionInfoElement.SectPr;
 
-        return ( SectPr.Get_Orientation() === Asc.c_oAscPageOrientation.PagePortrait ? true : false );
+        return ( SectPr.Get_Orientation() === orientation_Portrait ? true : false );
     },
 
     Set_DocumentDefaultTab : function(DTab)
@@ -16395,7 +16412,7 @@ CDocument.prototype.Set_SectionProps = function(Props)
 
         if (undefined !== Props.get_Orientation())
         {
-            var Orient = Props.get_Orientation();
+            var Orient = Props.get_Orientation() === Asc.c_oAscPageOrientation.PagePortrait ? orientation_Portrait : orientation_Landscape;
             SectPr.Set_Orientation(Orient, false);
         }
 
@@ -17428,61 +17445,3 @@ CDocumentNumberingInfoEngine.prototype.Get_NumInfo = function()
 {
     return this.NumInfo;
 };
-
-    //--------------------------------------------------------export----------------------------------------------------
-    window['AscCommon'] = window['AscCommon'] || {};
-    window['AscCommon'].CSelectedElement = CSelectedElement;
-    window['AscCommon'].CSelectedContent = CSelectedContent;
-    window['AscCommon'].Document_Recalculate_Page = Document_Recalculate_Page;
-    window['AscCommon'].CDocumentPage = CDocumentPage;
-    window['AscCommon'].CDocumentRecalcInfo = CDocumentRecalcInfo;
-    window['AscCommon'].CDocument = CDocument;
-    window['AscCommon'].CDocumentSelectionState = CDocumentSelectionState;
-    window['AscCommon'].CDocumentSectionsInfo = CDocumentSectionsInfo;
-    window['AscCommon'].CRevisionsChangeParagraphSearchEngine = CRevisionsChangeParagraphSearchEngine;
-    window['AscCommon'].CDocumentNumberingInfoEngine = CDocumentNumberingInfoEngine;
-
-    window['AscCommon'].docpostype_Content = docpostype_Content;
-    window['AscCommon'].docpostype_HdrFtr = docpostype_HdrFtr;
-    window['AscCommon'].docpostype_DrawingObjects = docpostype_DrawingObjects;
-
-    window['AscCommon'].selectionflag_Common = selectionflag_Common;
-    window['AscCommon'].selectionflag_Numbering = selectionflag_Numbering;
-    window['AscCommon'].selectionflag_DrawingObject = selectionflag_DrawingObject;
-    
-    window['AscCommon'].search_Common = search_Common;
-    
-    window['AscCommon'].search_HdrFtr_All = search_HdrFtr_All;
-    window['AscCommon'].search_HdrFtr_All_no_First = search_HdrFtr_All_no_First;
-    window['AscCommon'].search_HdrFtr_First = search_HdrFtr_First;
-    window['AscCommon'].search_HdrFtr_Even = search_HdrFtr_Even;
-    window['AscCommon'].search_HdrFtr_Odd = search_HdrFtr_Odd;
-    window['AscCommon'].search_HdrFtr_Odd_no_First = search_HdrFtr_Odd_no_First;
-
-    window['AscCommon'].recalcresult_NextElement = recalcresult_NextElement;
-    window['AscCommon'].recalcresult_PrevPage = recalcresult_PrevPage;
-    window['AscCommon'].recalcresult_CurPage = recalcresult_CurPage;
-    window['AscCommon'].recalcresult_NextPage = recalcresult_NextPage;
-    window['AscCommon'].recalcresult_NextLine = recalcresult_NextLine;
-    window['AscCommon'].recalcresult_CurLine = recalcresult_CurLine;
-    window['AscCommon'].recalcresult_CurPagePara = recalcresult_CurPagePara;
-    window['AscCommon'].recalcresult_PrevLine = recalcresult_PrevLine;
-    
-    window['AscCommon'].recalcresultflags_Column = recalcresultflags_Column;
-    window['AscCommon'].recalcresultflags_Page = recalcresultflags_Page;
-    
-    window['AscCommon'].recalcresult2_End = recalcresult2_End;
-    window['AscCommon'].recalcresult2_NextPage = recalcresult2_NextPage;
-    
-    window['AscCommon'].keydownflags_PreventKeyPress = keydownflags_PreventKeyPress;
-    window['AscCommon'].keydownresult_PreventNothing = keydownresult_PreventNothing;
-    window['AscCommon'].keydownresult_PreventDefault = keydownresult_PreventDefault;
-    window['AscCommon'].keydownresult_PreventKeyPress = keydownresult_PreventKeyPress;
-    window['AscCommon'].keydownresult_PreventAll = keydownresult_PreventAll;
-    
-    window['AscCommon'].document_compatibility_mode_Word14 = document_compatibility_mode_Word14;
-    window['AscCommon'].document_compatibility_mode_Word15 = document_compatibility_mode_Word15;
-    
-    window['AscCommon'].selected_DrawingObject = selected_DrawingObject;
-    window['AscCommon'].selected_DrawingObjectText = selected_DrawingObjectText;
-})(window);

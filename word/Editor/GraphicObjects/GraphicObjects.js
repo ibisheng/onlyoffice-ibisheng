@@ -1093,11 +1093,11 @@ CGraphicObjects.prototype =
 
     addShapeOnPage: function(sPreset, nPageIndex, dX, dY, dExtX, dExtY)
     {
-        if ( AscCommon.docpostype_HdrFtr !== this.document.CurPos.Type || null !== this.document.HdrFtr.CurHdrFtr )
+        if ( docpostype_HdrFtr !== this.document.CurPos.Type || null !== this.document.HdrFtr.CurHdrFtr )
         {
-            if (AscCommon.docpostype_HdrFtr !== this.document.CurPos.Type)
+            if (docpostype_HdrFtr !== this.document.CurPos.Type)
             {
-                this.document.CurPos.Type     = AscCommon.docpostype_DrawingObjects;
+                this.document.CurPos.Type     = docpostype_DrawingObjects;
                 this.document.Selection.Use   = true;
                 this.document.Selection.Start = true;
             }
@@ -1109,7 +1109,7 @@ CGraphicObjects.prototype =
                 var CurHdrFtr = this.document.HdrFtr.CurHdrFtr;
                 var DocContent = CurHdrFtr.Content;
 
-                DocContent.CurPos.Type     = AscCommon.docpostype_DrawingObjects;
+                DocContent.CurPos.Type     = docpostype_DrawingObjects;
                 DocContent.Selection.Use   = true;
                 DocContent.Selection.Start = true;
             }
@@ -1376,7 +1376,7 @@ CGraphicObjects.prototype =
                     para.Internal_Content_Add(para.CurPos.ContentPos, run, true);
                 }
             }
-            SelectedContent.Add( new AscCommon.CSelectedElement( para, true ) );
+            SelectedContent.Add( new CSelectedElement( para, true ) );
         }
     },
 
@@ -1815,12 +1815,12 @@ CGraphicObjects.prototype =
         var content = this.getTargetDocContent();
         if(content)
         {
-            Info.Set_Drawing(AscCommon.selected_DrawingObjectText);
+            Info.Set_Drawing(selected_DrawingObjectText);
             content.Get_SelectedElementsInfo(Info);
         }
         else
         {
-            Info.Set_Drawing(AscCommon.selected_DrawingObject);
+            Info.Set_Drawing(selected_DrawingObject);
         }
         return Info;
     },
@@ -3088,7 +3088,7 @@ CGraphicObjects.prototype =
     getLeftTopSelectedObjectByPage: function(pageIndex)
     {
         var oDrawingPage, oRes;
-        if(this.document.CurPos.Type === AscCommon.docpostype_HdrFtr)
+        if(this.document.CurPos.Type === docpostype_HdrFtr)
         {
             if(this.graphicPages[pageIndex])
             {

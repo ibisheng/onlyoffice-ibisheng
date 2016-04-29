@@ -2215,7 +2215,7 @@ CTableId.prototype.Load_Changes = function(Reader, Reader2)
             if('undefined' != typeof editor && editor.WordControl && editor.WordControl.m_oLogicDocument)
             {
                 var oLogicDocument = editor.WordControl.m_oLogicDocument;
-                if(oLogicDocument instanceof AscCommon.CDocument)
+                if(oLogicDocument instanceof CDocument)
                 {
                     var oParaDrawing = oLogicDocument.DrawingObjects.getTrialImage(sUrl);
                     var oFirstParagraph = oLogicDocument.Get_FirstParagraph();

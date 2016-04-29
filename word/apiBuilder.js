@@ -1269,7 +1269,7 @@
     ApiSection.prototype.SetPageSize = function(nWidth, nHeight, isPortrait)
     {
         this.Section.Set_PageSize(private_Twips2MM(nWidth), private_Twips2MM(nHeight));
-        this.Section.Set_Orientation(false === isPortrait ? Asc.c_oAscPageOrientation.PageLandscape : Asc.c_oAscPageOrientation.PagePortrait, false);
+        this.Section.Set_Orientation(false === isPortrait ? orientation_Landscape : orientation_Portrait, false);
     };
     /**
      * Specify the page margins for all pages in this section.

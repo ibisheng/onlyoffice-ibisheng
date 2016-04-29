@@ -23114,7 +23114,7 @@ CTitle.prototype =
         if(chart && typeof editor !== "undefined" && editor && editor.WordControl && editor.WordControl.m_oLogicDocument)
         {
             var bDocument = false, bPresentation = false, drawing_objects;
-            if(editor.WordControl.m_oLogicDocument instanceof AscCommon.CDocument)
+            if(editor.WordControl.m_oLogicDocument instanceof CDocument)
             {
                 bDocument = true;
                 drawing_objects = editor.WordControl.m_oLogicDocument.DrawingObjects;
@@ -23157,12 +23157,12 @@ CTitle.prototype =
                     var hdr_ftr = para_drawing.DocumentContent.Is_HdrFtr(true);
                     if(hdr_ftr)
                     {
-                        hdr_ftr.Content.CurPos.Type = AscCommon.docpostype_DrawingObjects;
+                        hdr_ftr.Content.CurPos.Type = docpostype_DrawingObjects;
                         hdr_ftr.Set_CurrentElement(bUpdate);
                     }
                     else
                     {
-                        drawing_objects.document.CurPos.Type = AscCommon.docpostype_DrawingObjects;
+                        drawing_objects.document.CurPos.Type = docpostype_DrawingObjects;
                     }
                 }
             }

@@ -17,6 +17,21 @@ var g_dKoef_mm_to_pix = AscCommon.g_dKoef_mm_to_pix;
 
 var g_bIsMobile = AscCommon.AscBrowser.isMobile;
 
+var Page_Width     = 297;
+var Page_Height    = 210;
+
+var X_Left_Margin   = 30;  // 3   cm
+var X_Right_Margin  = 15;  // 1.5 cm
+var Y_Bottom_Margin = 20;  // 2   cm
+var Y_Top_Margin    = 20;  // 2   cm
+
+var X_Left_Field   = X_Left_Margin;
+var X_Right_Field  = Page_Width  - X_Right_Margin;
+var Y_Bottom_Field = Page_Height - Y_Bottom_Margin;
+var Y_Top_Field    = Y_Top_Margin;
+
+
+
 var GlobalSkinTeamlab = {
     Name : "classic",
     RulersButton : true,
@@ -1909,9 +1924,9 @@ function CEditorPage(api)
         oWordControl.IsKeyDownButNoPress = true;
 
         var _ret_mouseDown = oWordControl.m_oLogicDocument.OnKeyDown(global_keyboardEvent);
-        oWordControl.bIsUseKeyPress = ((_ret_mouseDown & AscCommon.keydownresult_PreventKeyPress) != 0) ? false : true;
+        oWordControl.bIsUseKeyPress = ((_ret_mouseDown & keydownresult_PreventKeyPress) != 0) ? false : true;
 
-        if ((_ret_mouseDown & AscCommon.keydownresult_PreventDefault) != 0)
+        if ((_ret_mouseDown & keydownresult_PreventDefault) != 0)
         {
             // убираем превент с альтом. Уж больно итальянцы недовольны.
             e.preventDefault();
@@ -1988,11 +2003,11 @@ function CEditorPage(api)
         oWordControl.StartUpdateOverlay();
 
         var _ret_mouseDown = oWordControl.m_oLogicDocument.OnKeyDown(global_keyboardEvent);
-        oWordControl.bIsUseKeyPress = ((_ret_mouseDown & AscCommon.keydownresult_PreventKeyPress) != 0) ? false : true;
+        oWordControl.bIsUseKeyPress = ((_ret_mouseDown & keydownresult_PreventKeyPress) != 0) ? false : true;
 
         oWordControl.EndUpdateOverlay();
 
-        if ((_ret_mouseDown & AscCommon.keydownresult_PreventDefault) != 0)
+        if ((_ret_mouseDown & keydownresult_PreventDefault) != 0)
         {
             // убираем превент с альтом. Уж больно итальянцы недовольны.
             e.preventDefault();

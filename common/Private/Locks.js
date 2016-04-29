@@ -9,9 +9,9 @@ var locktype_None = AscCommon.locktype_None;
 var locktype_Mine = AscCommon.locktype_Mine;
 var changestype_Paragraph_Content = AscCommon.changestype_Paragraph_Content;
 
-if(typeof AscCommon.CDocument !== "undefined")
+if(typeof CDocument !== "undefined")
 {
-    AscCommon.CDocument.prototype.Document_Is_SelectionLocked = function(CheckType, AdditionalData, DontLockInFastMode)
+    CDocument.prototype.Document_Is_SelectionLocked = function(CheckType, AdditionalData, DontLockInFastMode)
     {
         if ( true === AscCommon.CollaborativeEditing.Get_GlobalLock() )
             return true;
@@ -73,7 +73,7 @@ if(typeof AscCommon.CDocument !== "undefined")
         return bResult;
     };
 
-    AscCommon.CDocument.prototype.private_DocumentIsSelectionLocked = function(CheckType)
+    CDocument.prototype.private_DocumentIsSelectionLocked = function(CheckType)
     {
         if ( AscCommon.changestype_None != CheckType )
         {
@@ -91,19 +91,19 @@ if(typeof AscCommon.CDocument !== "undefined")
             }
             else
             {
-                if ( AscCommon.docpostype_HdrFtr === this.CurPos.Type )
+                if ( docpostype_HdrFtr === this.CurPos.Type )
                 {
                     this.HdrFtr.Document_Is_SelectionLocked(CheckType);
                 }
-                else if ( AscCommon.docpostype_DrawingObjects == this.CurPos.Type )
+                else if ( docpostype_DrawingObjects == this.CurPos.Type )
                 {
                     this.DrawingObjects.documentIsSelectionLocked(CheckType);
                 }
-                else if ( AscCommon.docpostype_Content == this.CurPos.Type )
+                else if ( docpostype_Content == this.CurPos.Type )
                 {
                     switch ( this.Selection.Flag )
                     {
-                        case AscCommon.selectionflag_Common :
+                        case selectionflag_Common :
                         {
                             if ( true === this.Selection.Use )
                             {
@@ -128,7 +128,7 @@ if(typeof AscCommon.CDocument !== "undefined")
 
                             break;
                         }
-                        case AscCommon.selectionflag_Numbering:
+                        case selectionflag_Numbering:
                         {
                             var NumPr = this.Content[this.Selection.Data[0]].Numbering_Get();
                             if ( null != NumPr )
@@ -272,15 +272,15 @@ AscCommon.CDocumentContent.prototype.Document_Is_SelectionLocked = function(Chec
     }
     else
     {
-        if ( AscCommon.docpostype_DrawingObjects === this.CurPos.Type )
+        if ( docpostype_DrawingObjects === this.CurPos.Type )
         {
             this.LogicDocument.DrawingObjects.documentIsSelectionLocked(CheckType);
         }
-        else if ( AscCommon.docpostype_Content == this.CurPos.Type )
+        else if ( docpostype_Content == this.CurPos.Type )
         {
             switch ( this.Selection.Flag )
             {
-                case AscCommon.selectionflag_Common :
+                case selectionflag_Common :
                 {
                     if ( true === this.Selection.Use )
                     {
@@ -305,7 +305,7 @@ AscCommon.CDocumentContent.prototype.Document_Is_SelectionLocked = function(Chec
 
                     break;
                 }
-                case AscCommon.selectionflag_Numbering:
+                case selectionflag_Numbering:
                 {
                     var NumPr = this.Content[this.Selection.Data[0]].Numbering_Get();
                     if ( null != NumPr )

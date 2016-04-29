@@ -7,7 +7,6 @@ var align_Center = AscCommon.align_Center;
 var align_Justify = AscCommon.align_Justify;
 var g_oTableId = AscCommon.g_oTableId;
 var History = AscCommon.History;
-var recalcresult_PrevLine = AscCommon.recalcresult_PrevLine;
 
 var g_dMathArgSizeKoeff_1 = 0.76;
 var g_dMathArgSizeKoeff_2 = 0.6498; // 0.76 * 0.855
@@ -2050,7 +2049,7 @@ ParaMath.prototype.private_RecalculateRangeWrap = function(PRS, ParaPr, Depth)
 
     if(PrevLineObject == null ||  PrevLineObject == this)
     {
-        PRS.RecalcResult = AscCommon.recalcresult_NextLine;
+        PRS.RecalcResult = recalcresult_NextLine;
         //PRS.Reset_RestartPageRecalcInfo();
         // не вызываем функцию Reset_RestartPageRecalcInfo, т.к. в данной функции учитывается флаг, что начали пересчитывать заново
         PRS.RestartPageRecalcInfo.Line   = 0;
@@ -2150,7 +2149,7 @@ ParaMath.prototype.Set_EmptyRange = function(PRS)
 
     this.Root.Math_Set_EmptyRange(PRS.Line, PRS.Range);
 
-    PRS.RecalcResult = AscCommon.recalcresult_NextLine;
+    PRS.RecalcResult = recalcresult_NextLine;
     PRS.RestartPageRecalcInfo.Object = this;
 
     PRS.NewRange = true;

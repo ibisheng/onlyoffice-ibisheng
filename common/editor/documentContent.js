@@ -29,11 +29,6 @@
 // Import
 var g_oTableId = AscCommon.g_oTableId;
 var History = AscCommon.History;
-    var docpostype_Content = AscCommon.docpostype_Content;
-    var docpostype_DrawingObjects = AscCommon.docpostype_DrawingObjects;
-    var selectionflag_Common = AscCommon.selectionflag_Common;
-    var selectionflag_Numbering = AscCommon.selectionflag_Numbering;
-    var recalcresult_NextElement = AscCommon.recalcresult_NextElement;
 
 var c_oAscHAnchor = Asc.c_oAscHAnchor;
 var c_oAscXAlign = Asc.c_oAscXAlign;
@@ -83,7 +78,7 @@ function CDocumentContent(Parent, DrawingDocument, X, Y, XLimit, YLimit, Split, 
 
     this.Pages = [];
 
-    this.RecalcInfo = new AscCommon.CDocumentRecalcInfo();
+    this.RecalcInfo = new CDocumentRecalcInfo();
 
     this.Split = Split; // Разделяем ли на страницы
     this.bPresentation = bPresentation; // Разделяем ли на страницы
@@ -654,7 +649,7 @@ CDocumentContent.prototype =
         if ( true === bStart )
         {
             this.Pages.length         = PageIndex;
-            this.Pages[PageIndex]     = new AscCommon.CDocumentPage();
+            this.Pages[PageIndex]     = new CDocumentPage();
             this.Pages[PageIndex].Pos = StartIndex;
             if (this.LogicDocument)
                 this.LogicDocument.DrawingObjects.resetDrawingArrays(this.Get_AbsolutePage(PageIndex), this);
@@ -686,7 +681,7 @@ CDocumentContent.prototype =
         var YLimit = StartPos.YLimit;
         var XLimit = StartPos.XLimit;
 
-        var Result = AscCommon.recalcresult2_End;
+        var Result = recalcresult2_End;
 
         for ( var Index = StartIndex; Index < Count; Index++ )
         {
@@ -710,7 +705,7 @@ CDocumentContent.prototype =
                     if(this.DrawingObjects)
 						this.DrawingObjects.addFloatTable(new CFlowTable(Element, PageIndex));
 
-                    RecalcResult = AscCommon.recalcresult_CurPage;
+                    RecalcResult = recalcresult_CurPage;
                 }
                 else if ( true === this.RecalcInfo.Check_FlowObject(Element) )
                 {
@@ -725,7 +720,7 @@ CDocumentContent.prototype =
                             Element.Recalculate_Page(0);
 
                             this.RecalcInfo.FlowObjectPage++;
-                            RecalcResult = AscCommon.recalcresult_NextPage;
+                            RecalcResult = recalcresult_NextPage;
                         }
                         else
                         {
@@ -1005,7 +1000,7 @@ CDocumentContent.prototype =
                     {
                         this.RecalcInfo.Set_FrameRecalc(true);
                         this.Content[Index].Start_FromNewPage();
-                        RecalcResult = AscCommon.recalcresult_NextPage;
+                        RecalcResult = recalcresult_NextPage;
                     }
                     else
                     {
@@ -1029,7 +1024,7 @@ CDocumentContent.prototype =
                         else
                         {
                             this.RecalcInfo.Set_FlowObject(Element, FlowCount, recalcresult_NextElement, FlowCount);
-                            RecalcResult = AscCommon.recalcresult_CurPage;
+                            RecalcResult = recalcresult_CurPage;
                         }
                     }
                 }
@@ -1065,7 +1060,7 @@ CDocumentContent.prototype =
                 Y                    = Element.Get_PageBounds(ElementPageIndex).Bottom;
             }
 
-            if (RecalcResult & AscCommon.recalcresult_CurPage)
+            if (RecalcResult & recalcresult_CurPage)
             {
                 return this.Recalculate_Page( PageIndex, false );
             }
@@ -1073,10 +1068,10 @@ CDocumentContent.prototype =
             {
                 // Ничего не делаем
             }
-            else if (RecalcResult & AscCommon.recalcresult_NextPage)
+            else if (RecalcResult & recalcresult_NextPage)
             {
                 this.Pages[PageIndex].EndPos = Index;
-                Result = AscCommon.recalcresult2_NextPage;
+                Result = recalcresult2_NextPage;
                 break;
             }
         }
@@ -1615,7 +1610,7 @@ CDocumentContent.prototype =
     Start_FromNewPage : function()
     {
         this.Pages.length = 1;
-        this.Pages[0] = new AscCommon.CDocumentPage();
+        this.Pages[0] = new CDocumentPage();
 
         var Element = this.Content[0];
         Element.Start_FromNewPage();
@@ -4414,7 +4409,7 @@ CDocumentContent.prototype =
 
             if (true === bNeedSelect)
                 this.Parent.Set_CurrentElement(false, this.Get_StartPage_Absolute());
-            else if (null !== this.LogicDocument && AscCommon.docpostype_HdrFtr === this.LogicDocument.CurPos.Type)
+            else if (null !== this.LogicDocument && docpostype_HdrFtr === this.LogicDocument.CurPos.Type)
             {
                 this.Parent.Set_CurrentElement(false, this.Get_StartPage_Absolute());
                 var DocContent = this;
@@ -9222,7 +9217,7 @@ CDocumentContent.prototype =
     Get_SelectionState2 : function()
     {
         // Сохраняем Id ближайшего элемента в текущем классе
-        var State = new AscCommon.CDocumentSelectionState();
+        var State = new CDocumentSelectionState();
 
         State.Id   = this.Get_Id();
         State.Type = docpostype_Content;
@@ -9823,7 +9818,7 @@ CDocumentContent.prototype.Get_TopDocumentContent = function()
 CDocumentContent.prototype.Get_NumberingInfo = function(NumberingEngine, ParaId, NumPr)
 {
     if (undefined === NumberingEngine || null === NumberingEngine)
-        NumberingEngine = new AscCommon.CDocumentNumberingInfoEngine(ParaId, NumPr, this.Get_Numbering());
+        NumberingEngine = new CDocumentNumberingInfoEngine(ParaId, NumPr, this.Get_Numbering());
 
     for (var Index = 0; Index < this.Content.length; ++Index)
     {

@@ -2127,7 +2127,7 @@
 				
 					var oPasteProcessor;
 					var oTempDrawingDocument = worksheet.model.DrawingDocument;
-					var newCDocument = new AscCommon.CDocument(oTempDrawingDocument, false);
+					var newCDocument = new CDocument(oTempDrawingDocument, false);
 					newCDocument.bFromDocument = true;
 					//TODo!!!!!!
 					newCDocument.Content[0].bFromDocument = true;
@@ -2278,7 +2278,7 @@
 				//передавать CDrawingDocument текущего worksheet
 				var oTempDrawingDocument = worksheet.model.DrawingDocument;
 				
-			    var newCDocument = new AscCommon.CDocument(oTempDrawingDocument, false);
+			    var newCDocument = new CDocument(oTempDrawingDocument, false);
 				newCDocument.bFromDocument = true;
 				newCDocument.theme = this.Api.wbModel.theme;
 				
@@ -3034,7 +3034,7 @@
 						//вставляем табличку из презентаций
 						var oPasteFromBinaryWord = new pasteFromBinaryWord(this, ws);
 						
-						var newCDocument = new AscCommon.CDocument(oTempDrawingDocument, false);
+						var newCDocument = new CDocument(oTempDrawingDocument, false);
 						newCDocument.bFromDocument = true;
 						newCDocument.theme = this.Api.wbModel.theme;
 						
@@ -3151,7 +3151,7 @@
 						//вставляем табличку из презентаций
 						var oPasteFromBinaryWord = new pasteFromBinaryWord(this, ws);
 						
-						var newCDocument = new AscCommon.CDocument(oTempDrawingDocument, false);
+						var newCDocument = new CDocument(oTempDrawingDocument, false);
 						newCDocument.bFromDocument = true;
 						newCDocument.theme = this.Api.wbModel.theme;
 						
@@ -4877,7 +4877,7 @@
 				{
 					if ( true === oDocument.Selection.Use)
 					{
-						if ( AscCommon.selectionflag_DrawingObject === oDocument.Selection.Flag )
+						if ( selectionflag_DrawingObject === oDocument.Selection.Flag )
 						{
 							this.Para = document.createElement("p");
 							this.Para.innerHTML = this.ParseItem(oDocument.Selection.Data.DrawingObject);
@@ -4926,13 +4926,13 @@
 					if(!this.api.DocumentReaderMode)
 					{
 						var Def_pPr = oDocument.Styles.Default.ParaPr;
-						if(AscCommon.docpostype_HdrFtr === oDocument.CurPos.Type)
+						if(docpostype_HdrFtr === oDocument.CurPos.Type)
 						{
 							if(null != oDocument.HdrFtr && null != oDocument.HdrFtr.CurHdrFtr && null != oDocument.HdrFtr.CurHdrFtr.Content)
 								oDocument = oDocument.HdrFtr.CurHdrFtr.Content;
 						}
 
-						if(oDocument.CurPos.Type === AscCommon.docpostype_DrawingObjects)
+						if(oDocument.CurPos.Type === docpostype_DrawingObjects)
 						{
 							var content = oDocument.DrawingObjects.getTargetDocContent();
 							if(content)

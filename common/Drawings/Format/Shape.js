@@ -3259,8 +3259,8 @@ CShape.prototype =
             //oDocContent.Set_StartPage(0);
             oDocContent.Reset(0, 0, oRet.w, 20000);
             var CurPage = 0;
-            var RecalcResult = AscCommon.recalcresult2_NextPage;
-            while ( AscCommon.recalcresult2_End !== RecalcResult  )
+            var RecalcResult = recalcresult2_NextPage;
+            while ( recalcresult2_End !== RecalcResult  )
                 RecalcResult = oDocContent.Recalculate_Page( CurPage++, true );
             oRet.contentH = oDocContent.Get_SummaryHeight();
 
@@ -3789,7 +3789,7 @@ CShape.prototype =
                 if ( true === content.Is_SelectionUse() )
                 {
                     // Выделение нумерации
-                    if ( AscCommon.selectionflag_Numbering == content.Selection.Flag )
+                    if ( selectionflag_Numbering == content.Selection.Flag )
                     {
                         drawing_document.TargetEnd();
                         drawing_document.SelectEnabled(true);

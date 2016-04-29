@@ -1591,7 +1591,7 @@ function ShapeForResizeInGroup(originalObject, parentTrack)
         this.getBounds = function()
         {
             var bounds_checker = new  AscFormat.CSlideBoundsChecker();
-            bounds_checker.init(AscCommon.Page_Width, AscCommon.Page_Height, AscCommon.Page_Width, AscCommon.Page_Height);
+            bounds_checker.init(Page_Width, Page_Height, Page_Width, Page_Height);
             this.draw(bounds_checker);
             return {l: bounds_checker.Bounds.min_x, t: bounds_checker.Bounds.min_y, r: bounds_checker.Bounds.max_x , b: bounds_checker.Bounds.max_y};
         };

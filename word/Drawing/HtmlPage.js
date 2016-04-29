@@ -18,6 +18,29 @@ var g_dKoef_mm_to_pix = AscCommon.g_dKoef_mm_to_pix;
 
 var g_bIsMobile =  AscBrowser.isMobile;
 
+var Page_Width     = 210;
+var Page_Height    = 297;
+
+var X_Left_Margin   = 30;  // 3   cm
+var X_Right_Margin  = 15;  // 1.5 cm
+var Y_Bottom_Margin = 20;  // 2   cm
+var Y_Top_Margin    = 20;  // 2   cm
+
+var X_Left_Field   = X_Left_Margin;
+var X_Right_Field  = Page_Width  - X_Right_Margin;
+var Y_Bottom_Field = Page_Height - Y_Bottom_Margin;
+var Y_Top_Field    = Y_Top_Margin;
+
+var docpostype_Content     = 0x00;
+var docpostype_HdrFtr      = 0x02;
+
+var selectionflag_Common        = 0x00;
+var selectionflag_Numbering     = 0x01;
+var selectionflag_DrawingObject = 0x002;
+
+var orientation_Portrait  = 0x00;
+var orientation_Landscape = 0x01;
+
 var tableSpacingMinValue = 0.02;//0.02мм
 
 var GlobalSkinTeamlab = {
@@ -2385,11 +2408,11 @@ function CEditorPage(api)
 
         oWordControl.IsKeyDownButNoPress = true;
         var _ret_mouseDown = oWordControl.m_oLogicDocument.OnKeyDown(global_keyboardEvent);
-        oWordControl.bIsUseKeyPress = ((_ret_mouseDown & AscCommon.keydownresult_PreventKeyPress) != 0) ? false : true;
+        oWordControl.bIsUseKeyPress = ((_ret_mouseDown & keydownresult_PreventKeyPress) != 0) ? false : true;
 
         oWordControl.EndUpdateOverlay();
 
-        if ((_ret_mouseDown & AscCommon.keydownresult_PreventDefault) != 0)// || (true === global_keyboardEvent.AltKey && !AscBrowser.isMacOs))
+        if ((_ret_mouseDown & keydownresult_PreventDefault) != 0)// || (true === global_keyboardEvent.AltKey && !AscBrowser.isMacOs))
         {
             // убираем превент с альтом. Уж больно итальянцы недовольны.
             e.preventDefault();
@@ -2505,9 +2528,9 @@ function CEditorPage(api)
 
         oWordControl.StartUpdateOverlay();
         var _ret_mouseDown = oWordControl.m_oLogicDocument.OnKeyDown(global_keyboardEvent);
-        oWordControl.bIsUseKeyPress = ((_ret_mouseDown & AscCommon.keydownresult_PreventKeyPress) != 0) ? false : true;
+        oWordControl.bIsUseKeyPress = ((_ret_mouseDown & keydownresult_PreventKeyPress) != 0) ? false : true;
         oWordControl.EndUpdateOverlay();
-        if ((_ret_mouseDown & AscCommon.keydownresult_PreventDefault) != 0)
+        if ((_ret_mouseDown & keydownresult_PreventDefault) != 0)
         {
             e.preventDefault();
             return false;
@@ -2678,7 +2701,7 @@ function CEditorPage(api)
         if (newScrollPos <= 0 || newScrollPos >= this.m_dScrollY_max)
             return res;
 
-		var _heightPageMM = AscCommon.Page_Height;
+		var _heightPageMM = Page_Height;
 		if (this.m_oDrawingDocument.m_arrPages.length > 0)
 			_heightPageMM = this.m_oDrawingDocument.m_arrPages[0].height_mm;
 		var del = 20 + (g_dKoef_mm_to_pix * _heightPageMM * this.m_nZoomValue / 100 + 0.5) >> 0;
@@ -3954,7 +3977,7 @@ function CEditorPage(api)
         {
             if (false === drDoc.IsFreezePage(drDoc.m_lCurrentPage))
             {
-                this.m_oLogicDocument.CurPos.Type = AscCommon.docpostype_Content;
+                this.m_oLogicDocument.CurPos.Type = docpostype_Content;
                 this.m_oLogicDocument.Set_CurPage( drDoc.m_lCurrentPage );
                 this.m_oLogicDocument.Cursor_MoveAt(0, 0, false);
                 this.m_oLogicDocument.RecalculateCurPos();

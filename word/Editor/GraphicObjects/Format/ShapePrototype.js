@@ -663,12 +663,12 @@ CShape.prototype.Set_CurrentElement = function(bUpdate, pageIndex)
         var hdr_ftr = para_drawing.DocumentContent.Is_HdrFtr(true);
         if(hdr_ftr)
         {
-            hdr_ftr.Content.CurPos.Type = AscCommon.docpostype_DrawingObjects;
+            hdr_ftr.Content.CurPos.Type = docpostype_DrawingObjects;
             hdr_ftr.Set_CurrentElement(bUpdate);
         }
         else
         {
-            drawing_objects.document.CurPos.Type = AscCommon.docpostype_DrawingObjects;
+            drawing_objects.document.CurPos.Type = docpostype_DrawingObjects;
             drawing_objects.document.Selection.Use = true;
 
             if ( true === bUpdate )

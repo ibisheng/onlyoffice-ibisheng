@@ -273,7 +273,7 @@ NullState.prototype =
         }
 
         var drawing_page;
-        if(this.drawingObjects.document.CurPos.Type !== AscCommon.docpostype_HdrFtr)
+        if(this.drawingObjects.document.CurPos.Type !== docpostype_HdrFtr)
         {
             drawing_page = this.drawingObjects.graphicPages[pageIndex];
         }

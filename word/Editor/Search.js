@@ -1,7 +1,10 @@
 "use strict";
 
-var search_Header              = 0x0100; // Поиск в верхнем колонтитуле
-var search_Footer              = 0x0200; // Поиск в нижнем колонтитуле
+/**
+ * User: Ilja.Kirillov
+ * Date: 29.05.13
+ * Time: 12:02
+ */
 
 //----------------------------------------------------------------------------------------------------------------------
 // CParagraphSearchElement
@@ -192,7 +195,7 @@ CDocumentSearch.prototype =
 //----------------------------------------------------------------------------------------------------------------------
 // CDocument
 //----------------------------------------------------------------------------------------------------------------------
-AscCommon.CDocument.prototype.Search = function(Str, Props, bDraw)
+CDocument.prototype.Search = function(Str, Props, bDraw)
 {
     var StartTime = new Date().getTime();
 
@@ -206,7 +209,7 @@ AscCommon.CDocument.prototype.Search = function(Str, Props, bDraw)
     var Count = this.Content.length;
     for ( var Index = 0; Index < Count; Index++ )
     {
-        this.Content[Index].Search( Str, Props, this.SearchEngine, AscCommon.search_Common );
+        this.Content[Index].Search( Str, Props, this.SearchEngine, search_Common );
     }
 
     // Поиск в колонтитулах
@@ -223,7 +226,7 @@ AscCommon.CDocument.prototype.Search = function(Str, Props, bDraw)
     return this.SearchEngine;
 };
 
-AscCommon.CDocument.prototype.Search_Select = function(Id)
+CDocument.prototype.Search_Select = function(Id)
 {
     this.Selection_Remove();
     this.SearchEngine.Select(Id, true);
@@ -234,7 +237,7 @@ AscCommon.CDocument.prototype.Search_Select = function(Id)
     this.Document_UpdateRulersState();
 };
 
-AscCommon.CDocument.prototype.Search_Replace = function(NewStr, bAll, Id)
+CDocument.prototype.Search_Replace = function(NewStr, bAll, Id)
 {
     var bResult = false;
 
@@ -304,12 +307,12 @@ AscCommon.CDocument.prototype.Search_Replace = function(NewStr, bAll, Id)
     return bResult;
 };
 
-AscCommon.CDocument.prototype.Search_GetId = function(bNext)
+CDocument.prototype.Search_GetId = function(bNext)
 {
     this.SearchEngine.Set_Direction( bNext );
 
     // Получим Id найденного элемента
-    if ( AscCommon.docpostype_DrawingObjects === this.CurPos.Type )
+    if ( docpostype_DrawingObjects === this.CurPos.Type )
     {
         var ParaDrawing = this.DrawingObjects.getMajorParaDrawing();
 
@@ -321,12 +324,12 @@ AscCommon.CDocument.prototype.Search_GetId = function(bNext)
         ParaDrawing.GoTo_Text( true === bNext ? false : true, false );
     }
 
-    if ( AscCommon.docpostype_Content === this.CurPos.Type )
+    if ( docpostype_Content === this.CurPos.Type )
     {
         var Id = null;
 
         var Pos = this.CurPos.ContentPos;
-        if ( true === this.Selection.Use && AscCommon.selectionflag_Common === this.Selection.Flag )
+        if ( true === this.Selection.Use && selectionflag_Common === this.Selection.Flag )
             Pos = ( true === bNext ? Math.max(this.Selection.StartPos, this.Selection.EndPos) : Math.min(this.Selection.StartPos, this.Selection.EndPos) );
 
         var StartPos = Pos;
@@ -397,7 +400,7 @@ AscCommon.CDocument.prototype.Search_GetId = function(bNext)
             return null;
         }
     }
-    else if ( AscCommon.docpostype_HdrFtr === this.CurPos.Type )
+    else if ( docpostype_HdrFtr === this.CurPos.Type )
     {
         return this.SectionsInfo.Search_GetId( bNext, this.HdrFtr.CurHdrFtr );
     }
@@ -405,7 +408,7 @@ AscCommon.CDocument.prototype.Search_GetId = function(bNext)
     return null;
 };
 
-AscCommon.CDocument.prototype.Search_Set_Selection = function(bSelection)
+CDocument.prototype.Search_Set_Selection = function(bSelection)
 {
     var OldValue = this.SearchEngine.Selection;
     if ( OldValue === bSelection )
@@ -416,7 +419,7 @@ AscCommon.CDocument.prototype.Search_Set_Selection = function(bSelection)
     this.DrawingDocument.FirePaint();
 };
 
-AscCommon.CDocument.prototype.Search_Get_Selection = function()
+CDocument.prototype.Search_Get_Selection = function()
 {
     return this.SearchEngine.Selection;
 };
@@ -441,7 +444,7 @@ AscCommon.CDocumentContent.prototype.Search_GetId = function(bNext, bCurrent)
 
     if ( true === bCurrent )
     {
-        if ( AscCommon.docpostype_DrawingObjects === this.CurPos.Type )
+        if ( docpostype_DrawingObjects === this.CurPos.Type )
         {
             var ParaDrawing = this.DrawingObjects.getMajorParaDrawing();
 
@@ -453,7 +456,7 @@ AscCommon.CDocumentContent.prototype.Search_GetId = function(bNext, bCurrent)
         }
 
         var Pos = this.CurPos.ContentPos;
-        if ( true === this.Selection.Use && AscCommon.selectionflag_Common === this.Selection.Flag )
+        if ( true === this.Selection.Use && selectionflag_Common === this.Selection.Flag )
             Pos = ( true === bNext ? Math.max(this.Selection.StartPos, this.Selection.EndPos) : Math.min(this.Selection.StartPos, this.Selection.EndPos) );
 
         if ( true === bNext )
@@ -542,7 +545,7 @@ CHeaderFooter.prototype.Search_GetId = function(bNext, bCurrent)
 //----------------------------------------------------------------------------------------------------------------------
 // CDocumentSectionsInfo
 //----------------------------------------------------------------------------------------------------------------------
-AscCommon.CDocumentSectionsInfo.prototype.Search = function(Str, Props, SearchEngine)
+CDocumentSectionsInfo.prototype.Search = function(Str, Props, SearchEngine)
 {
     var bEvenOdd = EvenAndOddHeaders;
     var Count = this.Elements.length;
@@ -571,7 +574,7 @@ AscCommon.CDocumentSectionsInfo.prototype.Search = function(Str, Props, SearchEn
     }            
 };
 
-AscCommon.CDocumentSectionsInfo.prototype.Search_GetId = function(bNext, CurHdrFtr)
+CDocumentSectionsInfo.prototype.Search_GetId = function(bNext, CurHdrFtr)
 {       
     var HdrFtrs = [];
     var CurPos  = -1;

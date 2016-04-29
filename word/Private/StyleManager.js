@@ -1,7 +1,9 @@
 "use strict";
-
-// Import
-var CDocument = AscCommon.CDocument;
+/**
+ * User: Ilja.Kirillov
+ * Date: 08.10.2015
+ * Time: 19:51
+ */
 
 //----------------------------------------------------------------------------------------------------------------------
 //  asc_docs_api (Обращение из апи)
@@ -45,11 +47,11 @@ asc_docs_api.prototype['asc_IsDefaultStyleChanged']  = asc_docs_api.prototype.as
  */
 CDocument.prototype.Get_StyleFromFormatting = function()
 {
-    if (AscCommon.docpostype_HdrFtr === this.CurPos.Type)
+    if (docpostype_HdrFtr === this.CurPos.Type)
     {
         return this.HdrFtr.Get_StyleFromFormatting();
     }
-    else if (AscCommon.docpostype_DrawingObjects === this.CurPos.Type)
+    else if (docpostype_DrawingObjects === this.CurPos.Type)
     {
         return this.DrawingObjects.Get_StyleFromFormatting();
     }

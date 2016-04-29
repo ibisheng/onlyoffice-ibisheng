@@ -283,7 +283,7 @@ function asc_docs_api(name)
 
     this.ServerImagesWaitComplete = false;
 
-    this.DocumentOrientation = false;
+    this.DocumentOrientation = orientation_Portrait ? true : false;
 
     this.SelectedObjectsStack = [];
 
@@ -611,7 +611,7 @@ asc_docs_api.prototype.ContentToHTML = function(bIsRet)
 
 asc_docs_api.prototype.InitEditor = function()
 {
-    this.WordControl.m_oLogicDocument   = new AscCommon.CDocument(this.WordControl.m_oDrawingDocument);
+    this.WordControl.m_oLogicDocument   = new CDocument(this.WordControl.m_oDrawingDocument);
     this.WordControl.m_oDrawingDocument.m_oLogicDocument = this.WordControl.m_oLogicDocument;
 	if (!this.isSpellCheckEnable)
 		this.WordControl.m_oLogicDocument.TurnOff_CheckSpelling();
@@ -678,9 +678,9 @@ asc_docs_api.prototype.OpenDocument2 = function(url, gObject)
 	editor.DocumentOrientation = (null == editor.WordControl.m_oLogicDocument) ? true : !editor.WordControl.m_oLogicDocument.Orientation;
 	var sizeMM;
 	if(editor.DocumentOrientation)
-		sizeMM = DocumentPageSize.getSize(AscCommon.Page_Width, AscCommon.Page_Height);
+		sizeMM = DocumentPageSize.getSize(Page_Width, Page_Height);
 	else
-		sizeMM = DocumentPageSize.getSize(AscCommon.Page_Height, AscCommon.Page_Width);
+		sizeMM = DocumentPageSize.getSize(Page_Height, Page_Width);
 	editor.sync_DocSizeCallback(sizeMM.w_mm, sizeMM.h_mm);
 	editor.sync_PageOrientCallback(editor.get_DocumentOrientation());
 							
@@ -853,7 +853,7 @@ asc_docs_api.prototype._coAuthoringInitEnd = function() {
 
         if (Class instanceof CHeaderFooterController) {
           editor.sync_LockHeaderFooters();
-        } else if (Class instanceof AscCommon.CDocument) {
+        } else if (Class instanceof CDocument) {
           editor.sync_LockDocumentProps();
         } else if (Class instanceof CComment) {
           editor.sync_LockComment(Class.Get_Id(), e["user"]);
@@ -916,7 +916,7 @@ asc_docs_api.prototype._coAuthoringInitEnd = function() {
                   editor.sync_UnLockHeaderFooters();
               }
           }
-          else if (Class instanceof AscCommon.CDocument)
+          else if (Class instanceof CDocument)
           {
               if (NewType !== locktype_Mine && NewType !== locktype_None)
               {
@@ -1457,7 +1457,7 @@ asc_docs_api.prototype.select_Element = function(Index)
 
 	Document.Selection.Use      = true;
 	Document.Selection.Start    = false;
-	Document.Selection.Flag     = AscCommon.selectionflag_Common;
+	Document.Selection.Flag     = selectionflag_Common;
 
 	Document.Selection.StartPos = Index;
 	Document.Selection.EndPos   = Index;
@@ -3289,9 +3289,16 @@ asc_docs_api.prototype.change_PageOrient = function(isPortrait)
     {
         this.WordControl.m_oDrawingDocument.m_bIsUpdateDocSize = true;
         this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_SetPageOrientation);
-      this.WordControl.m_oLogicDocument.Set_DocumentOrientation(
-        isPortrait ? Asc.c_oAscPageOrientation.PagePortrait : Asc.c_oAscPageOrientation.PageLandscape);
-      this.DocumentOrientation = isPortrait;
+        if (isPortrait)
+        {
+            this.WordControl.m_oLogicDocument.Set_DocumentOrientation(orientation_Portrait);
+            this.DocumentOrientation = isPortrait;
+        }
+        else
+        {
+            this.WordControl.m_oLogicDocument.Set_DocumentOrientation(orientation_Landscape);
+            this.DocumentOrientation = isPortrait;
+        }
         this.sync_PageOrientCallback(editor.get_DocumentOrientation());
     }
 };
@@ -3314,12 +3321,12 @@ asc_docs_api.prototype.change_DocSize = function(width,height)
 
 asc_docs_api.prototype.get_DocumentWidth = function()
 {
-    return AscCommon.Page_Width;
+    return Page_Width;
 };
 
 asc_docs_api.prototype.get_DocumentHeight = function()
 {
-    return AscCommon.Page_Height;
+    return Page_Height;
 };
 
 function CDocumentSectionProps(SectPr)
@@ -3328,7 +3335,7 @@ function CDocumentSectionProps(SectPr)
     {
         this.W      = SectPr.Get_PageWidth();
         this.H      = SectPr.Get_PageHeight();
-        this.Orient = SectPr.Get_Orientation();
+        this.Orient = orientation_Portrait === SectPr.Get_Orientation() ? Asc.c_oAscPageOrientation.PagePortrait : Asc.c_oAscPageOrientation.PageLandscape;
 
         this.Left   = SectPr.Get_PageMargin_Left();
         this.Top    = SectPr.Get_PageMargin_Top();
@@ -4514,8 +4521,8 @@ asc_docs_api.prototype.AddImageUrlAction = function(url, imgProp)
     var _image = this.ImageLoader.LoadImage(url, 1);
     if (null != _image)
     {
-        var _w = Math.max(1, AscCommon.Page_Width - (AscCommon.X_Left_Margin + AscCommon.X_Right_Margin));
-        var _h = Math.max(1, AscCommon.Page_Height - (AscCommon.Y_Top_Margin + AscCommon.Y_Bottom_Margin));
+        var _w = Math.max(1, Page_Width - (X_Left_Margin + X_Right_Margin));
+        var _h = Math.max(1, Page_Height - (Y_Top_Margin + Y_Bottom_Margin));
         if (_image.Image != null)
         {
             var __w = Math.max(parseInt(_image.Image.width * AscCommon.g_dKoef_pix_to_mm), 1);
@@ -4564,8 +4571,8 @@ asc_docs_api.prototype.AddImageUrlAction = function(url, imgProp)
         this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
         this.asyncImageEndLoaded2 = function(_image)
         {
-            var _w = Math.max(1, AscCommon.Page_Width - (AscCommon.X_Left_Margin + AscCommon.X_Right_Margin));
-            var _h = Math.max(1, AscCommon.Page_Height - (AscCommon.Y_Top_Margin + AscCommon.Y_Bottom_Margin));
+            var _w = Math.max(1, Page_Width - (X_Left_Margin + X_Right_Margin));
+            var _h = Math.max(1, Page_Height - (Y_Top_Margin + Y_Bottom_Margin));
             if (_image.Image != null)
             {
                 var __w = Math.max(parseInt(_image.Image.width * AscCommon.g_dKoef_pix_to_mm), 1);
@@ -6308,9 +6315,9 @@ asc_docs_api.prototype.GoToHeader = function(pageNumber)
 
     var bForceRedraw = false;
     var LogicDocument = this.WordControl.m_oLogicDocument;
-    if (AscCommon.docpostype_HdrFtr !== LogicDocument.CurPos.Type)
+    if (docpostype_HdrFtr !== LogicDocument.CurPos.Type)
     {
-        LogicDocument.CurPos.Type = AscCommon.docpostype_HdrFtr;
+        LogicDocument.CurPos.Type = docpostype_HdrFtr;
         bForceRedraw = true;
     }
 
@@ -6340,9 +6347,9 @@ asc_docs_api.prototype.GoToFooter = function(pageNumber)
 
     var bForceRedraw = false;
     var LogicDocument = this.WordControl.m_oLogicDocument;
-    if (AscCommon.docpostype_HdrFtr !== LogicDocument.CurPos.Type)
+    if (docpostype_HdrFtr !== LogicDocument.CurPos.Type)
     {
-        LogicDocument.CurPos.Type = AscCommon.docpostype_HdrFtr;
+        LogicDocument.CurPos.Type = docpostype_HdrFtr;
         bForceRedraw = true;
     }
 
@@ -6350,8 +6357,8 @@ asc_docs_api.prototype.GoToFooter = function(pageNumber)
     global_mouseEvent.Button = 0;
     global_mouseEvent.ClickCount = 1;
 
-    LogicDocument.OnMouseDown(global_mouseEvent, 0, AscCommon.Page_Height, pageNumber);
-    LogicDocument.OnMouseUp(global_mouseEvent, 0, AscCommon.Page_Height, pageNumber);
+    LogicDocument.OnMouseDown(global_mouseEvent, 0, Page_Height, pageNumber);
+    LogicDocument.OnMouseUp(global_mouseEvent, 0, Page_Height, pageNumber);
     LogicDocument.OnMouseMove(global_mouseEvent, 0, 0, pageNumber);
     LogicDocument.Cursor_MoveLeft();
     LogicDocument.Document_UpdateInterfaceState();
@@ -6372,8 +6379,8 @@ asc_docs_api.prototype.ExitHeader_Footer = function(pageNumber)
 
     var oldClickCount = global_mouseEvent.ClickCount;
     global_mouseEvent.ClickCount = 2;
-    this.WordControl.m_oLogicDocument.OnMouseDown(global_mouseEvent, 0, AscCommon.Page_Height / 2, pageNumber);
-    this.WordControl.m_oLogicDocument.OnMouseUp(global_mouseEvent, 0, AscCommon.Page_Height / 2, pageNumber);
+    this.WordControl.m_oLogicDocument.OnMouseDown(global_mouseEvent, 0, Page_Height / 2, pageNumber);
+    this.WordControl.m_oLogicDocument.OnMouseUp(global_mouseEvent, 0, Page_Height / 2, pageNumber);
 
     this.WordControl.m_oLogicDocument.Document_UpdateInterfaceState();
 
@@ -7121,9 +7128,9 @@ window["asc_docs_api"].prototype["asc_nativeOpenFile"] = function(base64File, ve
 	this.DocumentOrientation = (null == editor.WordControl.m_oLogicDocument) ? true : !editor.WordControl.m_oLogicDocument.Orientation;
 	var sizeMM;
 	if(this.DocumentOrientation)
-		sizeMM = DocumentPageSize.getSize(AscCommon.Page_Width, AscCommon.Page_Height);
+		sizeMM = DocumentPageSize.getSize(Page_Width, Page_Height);
 	else
-		sizeMM = DocumentPageSize.getSize(AscCommon.Page_Height, AscCommon.Page_Width);
+		sizeMM = DocumentPageSize.getSize(Page_Height, Page_Width);
 	this.sync_DocSizeCallback(sizeMM.w_mm, sizeMM.h_mm);
 	this.sync_PageOrientCallback(editor.get_DocumentOrientation());
 

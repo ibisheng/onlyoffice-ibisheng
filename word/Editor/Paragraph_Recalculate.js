@@ -2,11 +2,6 @@
 
 // Import
 var g_oTextMeasurer = AscCommon.g_oTextMeasurer;
-var recalcresult_NextElement = AscCommon.recalcresult_NextElement;
-var recalcresult_NextPage = AscCommon.recalcresult_NextPage;
-var recalcresult_NextLine = AscCommon.recalcresult_NextLine;
-var recalcresult_CurLine = AscCommon.recalcresult_CurLine;
-var recalcresultflags_Column = AscCommon.recalcresultflags_Column;
 
 // TODO: В колонтитулах быстрые пересчеты отключены. Надо реализовать.
 
@@ -561,7 +556,7 @@ Paragraph.prototype.private_RecalculatePage            = function(CurPage, bFirs
             PRS.Reset_RunRecalcInfo();
             PRS.Reset_MathRecalcInfo();
         }
-        else if (RecalcResult & AscCommon.recalcresult_PrevLine)
+        else if (RecalcResult & recalcresult_PrevLine)
         {
             if (PRS.Line < this.Pages[CurPage].StartLine)
                 PRS.Restore_RunRecalcInfo();
@@ -586,7 +581,7 @@ Paragraph.prototype.private_RecalculatePage            = function(CurPage, bFirs
             // из цикла.
             break;
         }
-        else if (RecalcResult & AscCommon.recalcresult_CurPagePara)
+        else if (RecalcResult & recalcresult_CurPagePara)
         {
             // В эту ветку мы попадаем, если в параграфе встретилась картинка, которая находится ниже данного
             // параграфа, и можно пересчитать заново данный параграф.
@@ -615,7 +610,7 @@ Paragraph.prototype.private_RecalculatePageKeepNext    = function(CurLine, CurPa
     // Такая настройка срабатывает в единственном случае:
     // У предыдущего параграфа выставлена данная настройка, а текущий параграф сразу начинается с новой страницы
     // ( при этом у него не выставлен флаг "начать с новой страницы", иначе будет зацикливание здесь ).
-    if (1 === CurPage && true === this.Check_EmptyPages(0) && this.Parent instanceof AscCommon.CDocument && false === ParaPr.PageBreakBefore)
+    if (1 === CurPage && true === this.Check_EmptyPages(0) && this.Parent instanceof CDocument && false === ParaPr.PageBreakBefore)
     {
         // Если у предыдущего параграфа стоит настройка "не отрывать от следующего".
         // И сам параграф не разбит на несколько страниц и не начинается с новой страницы,
@@ -640,7 +635,7 @@ Paragraph.prototype.private_RecalculatePageKeepNext    = function(CurLine, CurPa
                     if (true === this.Parent.RecalcInfo.Can_RecalcObject())
                     {
                         this.Parent.RecalcInfo.Set_KeepNext(Curr, this);
-                        PRS.RecalcResult = AscCommon.recalcresult_PrevPage | recalcresultflags_Column;
+                        PRS.RecalcResult = recalcresult_PrevPage | recalcresultflags_Column;
                         return false;
                     }
                     else
@@ -706,7 +701,7 @@ Paragraph.prototype.private_RecalculatePageBreak       = function(CurLine, CurPa
     if (undefined !== this.Get_SectionPr() && true === this.IsEmpty())
         return true;
 
-    if (this.Parent instanceof AscCommon.CDocument)
+    if (this.Parent instanceof CDocument)
     {
         // Начинаем параграф с новой страницы
         var PageRelative = this.private_GetRelativePageIndex(CurPage) - this.Get_StartPage_Relative();
@@ -907,7 +902,7 @@ Paragraph.prototype.private_RecalculateLine            = function(CurLine, CurPa
 Paragraph.prototype.private_RecalculateLineWidow       = function(CurLine, CurPage, PRS, ParaPr)
 {
     // Висячие строки обрабатываются только внутри основного документа
-    if ( this.Parent instanceof AscCommon.CDocument && true === this.Parent.RecalcInfo.Check_WidowControl(this, CurLine) )
+    if ( this.Parent instanceof CDocument && true === this.Parent.RecalcInfo.Check_WidowControl(this, CurLine) )
     {
         this.Parent.RecalcInfo.Need_ResetWidowControl();
 
@@ -1008,7 +1003,7 @@ Paragraph.prototype.private_RecalculateLineRanges      = function(CurLine, CurPa
         }
 
         // Такое может случиться, если мы насильно переносим автофигуру на следующую страницу
-        if (PRS.RecalcResult & recalcresult_NextPage || PRS.RecalcResult & AscCommon.recalcresult_PrevLine || PRS.RecalcResult & recalcresult_CurLine || PRS.RecalcResult & AscCommon.recalcresult_CurPagePara)
+        if (PRS.RecalcResult & recalcresult_NextPage || PRS.RecalcResult & recalcresult_PrevLine || PRS.RecalcResult & recalcresult_CurLine || PRS.RecalcResult & recalcresult_CurPagePara)
             return false;
 
         CurRange++;
@@ -1297,7 +1292,7 @@ Paragraph.prototype.private_RecalculateLineBottomBound = function(CurLine, CurPa
         var bSkipWidowAndKeepLines = this.private_CheckSkipKeepLinesAndWidowControl(CurPage);
 
         // Проверим висячую строку
-        if (this.Parent instanceof AscCommon.CDocument
+        if (this.Parent instanceof CDocument
             && false === bSkipWidowAndKeepLines
             && true === this.Parent.RecalcInfo.Can_RecalcWidowControl()
             && true === ParaPr.WidowControl
@@ -1310,7 +1305,7 @@ Paragraph.prototype.private_RecalculateLineBottomBound = function(CurLine, CurPa
 
             // TODO: Здесь перенос нужно делать сразу же, если в строке не было объектов с обтеканием
             this.Parent.RecalcInfo.Set_WidowControl(this, CurLine - 1);
-            PRS.RecalcResult = AscCommon.recalcresult_CurPage | recalcresultflags_Column;
+            PRS.RecalcResult = recalcresult_CurPage | recalcresultflags_Column;
             return false;
         }
         else
@@ -1325,12 +1320,12 @@ Paragraph.prototype.private_RecalculateLineBottomBound = function(CurLine, CurPa
             if (true === ParaPr.KeepLines && this.LogicDocument && false === bSkipWidowAndKeepLines)
             {
                 var CompatibilityMode = this.LogicDocument.Get_CompatibilityMode();
-                if (CompatibilityMode <= AscCommon.document_compatibility_mode_Word14)
+                if (CompatibilityMode <= document_compatibility_mode_Word14)
                 {
                     if (null != this.Get_DocumentPrev() && true != this.Parent.Is_TableCellContent() && 0 === CurPage)
                         CurLine = 0;
                 }
-                else if (CompatibilityMode >= AscCommon.document_compatibility_mode_Word15)
+                else if (CompatibilityMode >= document_compatibility_mode_Word15)
                 {
                     // TODO: Разобраться с 2016 вордом
                     if (null != this.Get_DocumentPrev() && 0 === CurPage)
@@ -1519,7 +1514,7 @@ Paragraph.prototype.private_RecalculateLineEnd         = function(CurLine, CurPa
             // Проверим не встречается ли в предыдущей строке BreakPage, если да, тогда не учитываем WidowControl
             var BreakPagePrevLine = (this.Lines[CurLine - 1].Info & paralineinfo_BreakPage) | 0;
 
-            if (this.Parent instanceof AscCommon.CDocument
+            if (this.Parent instanceof CDocument
                 && true === this.Parent.RecalcInfo.Can_RecalcWidowControl()
                 && 0 === BreakPagePrevLine
                 && (1 === CurPage && null != this.Get_DocumentPrev())
@@ -1550,7 +1545,7 @@ Paragraph.prototype.private_RecalculateLineEnd         = function(CurLine, CurPa
                     CurLine = CurLine - 1;
 
                 this.Parent.RecalcInfo.Set_WidowControl(this, CurLine);
-                PRS.RecalcResult = AscCommon.recalcresult_PrevPage | recalcresultflags_Column;
+                PRS.RecalcResult = recalcresult_PrevPage | recalcresultflags_Column;
                 return false;
             }
         }

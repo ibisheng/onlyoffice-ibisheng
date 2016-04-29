@@ -3,7 +3,6 @@
 // Import
 var changestype_2_ElementsArray_and_Type = AscCommon.changestype_2_ElementsArray_and_Type;
 var History = AscCommon.History;
-var CDocument = AscCommon.CDocument;
 
 //----------------------------------------------------------------------------------------------------------------------
 // Работаем с рецензированием
@@ -136,7 +135,7 @@ CDocument.prototype.Get_RevisionsChangeParagraph = function(Direction, CurrentPa
 };
 CDocument.prototype.private_GetRevisionsChangeParagraph = function(Direction, CurrentPara)
 {
-    var SearchEngine = new AscCommon.CRevisionsChangeParagraphSearchEngine(Direction, CurrentPara, this.TrackRevisionsManager);
+    var SearchEngine = new CRevisionsChangeParagraphSearchEngine(Direction, CurrentPara, this.TrackRevisionsManager);
     if (null === CurrentPara)
     {
         CurrentPara = this.Get_CurrentParagraph();
@@ -162,7 +161,7 @@ CDocument.prototype.private_GetRevisionsChangeParagraph = function(Direction, Cu
     }
     else
     {
-        var Pos = (true === this.Selection.Use && AscCommon.docpostype_DrawingObjects !== this.CurPos.Type ? (this.Selection.StartPos <= this.Selection.EndPos ? this.Selection.StartPos : this.Selection.EndPos) : this.CurPos.ContentPos);
+        var Pos = (true === this.Selection.Use && docpostype_DrawingObjects !== this.CurPos.Type ? (this.Selection.StartPos <= this.Selection.EndPos ? this.Selection.StartPos : this.Selection.EndPos) : this.CurPos.ContentPos);
         this.private_GetRevisionsChangeParagraphInDocument(SearchEngine, Pos);
 
         if (true !== SearchEngine.Is_Found())
@@ -373,7 +372,7 @@ CDocument.prototype.Accept_RevisionChanges = function(Type, bAll)
     // 2. Изменение настроек текста
     // 3. Добавление/удаление текста
     // 4. Добавление/удаление параграфа
-    if (AscCommon.docpostype_Content === this.CurPos.Type || true === bAll)
+    if (docpostype_Content === this.CurPos.Type || true === bAll)
     {
         if (true === this.Selection.Use || true === bAll)
         {
@@ -436,11 +435,11 @@ CDocument.prototype.Accept_RevisionChanges = function(Type, bAll)
             }
         }
     }
-    else if (AscCommon.docpostype_HdrFtr === this.CurPos.Type)
+    else if (docpostype_HdrFtr === this.CurPos.Type)
     {
         this.HdrFtr.Accept_RevisionChanges(Type, bAll);
     }
-    else if (AscCommon.docpostype_DrawingObjects === this.CurPos.Type)
+    else if (docpostype_DrawingObjects === this.CurPos.Type)
     {
         this.DrawingObjects.Accept_RevisionChanges(Type, bAll);
     }
@@ -461,7 +460,7 @@ CDocument.prototype.Reject_RevisionChanges = function(Type, bAll)
     // 3. Добавление/удаление текста
     // 4. Добавление/удаление параграфа
 
-    if (AscCommon.docpostype_Content === this.CurPos.Type || true === bAll)
+    if (docpostype_Content === this.CurPos.Type || true === bAll)
     {
         if (true === this.Selection.Use || true === bAll)
         {
@@ -524,11 +523,11 @@ CDocument.prototype.Reject_RevisionChanges = function(Type, bAll)
             }
         }
     }
-    else if (AscCommon.docpostype_HdrFtr === this.CurPos.Type)
+    else if (docpostype_HdrFtr === this.CurPos.Type)
     {
         this.HdrFtr.Reject_RevisionChanges(Type, bAll);
     }
-    else if (AscCommon.docpostype_DrawingObjects === this.CurPos.Type)
+    else if (docpostype_DrawingObjects === this.CurPos.Type)
     {
         this.DrawingObjects.Reject_RevisionChanges(Type, bAll);
     }
@@ -563,7 +562,7 @@ CHeaderFooterController.prototype.Reject_RevisionChanges = function(Type, bAll)
 //----------------------------------------------------------------------------------------------------------------------
 AscCommon.CDocumentContent.prototype.Accept_RevisionChanges = function(Type, bAll)
 {
-    if (AscCommon.docpostype_Content === this.CurPos.Type || true === bAll)
+    if (docpostype_Content === this.CurPos.Type || true === bAll)
     {
         if (true === this.Selection.Use || true === bAll)
         {
@@ -625,14 +624,14 @@ AscCommon.CDocumentContent.prototype.Accept_RevisionChanges = function(Type, bAl
             }
         }
     }
-    else if (AscCommon.docpostype_DrawingObjects === this.CurPos.Type)
+    else if (docpostype_DrawingObjects === this.CurPos.Type)
     {
         this.DrawingObjects.Accept_RevisionChanges(Type, bAll);
     }
 };
 AscCommon.CDocumentContent.prototype.Reject_RevisionChanges = function(Type, bAll)
 {
-    if (AscCommon.docpostype_Content === this.CurPos.Type || true === bAll)
+    if (docpostype_Content === this.CurPos.Type || true === bAll)
     {
         if (true === this.Selection.Use || true === bAll)
         {
@@ -694,7 +693,7 @@ AscCommon.CDocumentContent.prototype.Reject_RevisionChanges = function(Type, bAl
             }
         }
     }
-    else if (AscCommon.docpostype_DrawingObjects === this.CurPos.Type)
+    else if (docpostype_DrawingObjects === this.CurPos.Type)
     {
         this.DrawingObjects.Reject_RevisionChanges(Type, bAll);
     }
