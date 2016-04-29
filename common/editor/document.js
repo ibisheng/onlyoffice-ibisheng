@@ -41,8 +41,6 @@ var changestype_2_Element_and_Type = AscCommon.changestype_2_Element_and_Type;
 var changestype_2_ElementsArray_and_Type = AscCommon.changestype_2_ElementsArray_and_Type;
 var g_oTableId = AscCommon.g_oTableId;
 var History = AscCommon.History;
-var Paragraph = AscCommon.Paragraph;
-var type_Paragraph = AscCommon.type_Paragraph;
 
 var c_oAscHAnchor = Asc.c_oAscHAnchor;
 var c_oAscXAlign = Asc.c_oAscXAlign;
@@ -374,7 +372,7 @@ CDocumentPageSection.prototype.DoNotRecalc_BottomLine = function()
 
 function CDocumentPageColumn()
 {
-    this.Bounds = new AscCommon.CDocumentBounds(0, 0, 0, 0);
+    this.Bounds = new CDocumentBounds(0, 0, 0, 0);
     this.Pos    = 0;
     this.EndPos = -1;
     this.Empty  = true;
@@ -435,7 +433,7 @@ function CDocumentPage()
         Bottom : 0
     };
 
-    this.Bounds = new AscCommon.CDocumentBounds(0,0,0,0);
+    this.Bounds = new CDocumentBounds(0,0,0,0);
     this.Pos    = 0;
     this.EndPos = -1;
 
@@ -16201,7 +16199,7 @@ CDocument.prototype.Get_DocumentPagePositionByContentPosition = function(Content
     if (!Para)
         return null;
 
-    var ParaContentPos = new AscCommon.CParagraphContentPos();
+    var ParaContentPos = new CParagraphContentPos();
     for (var Pos = ParaPos; Pos < Count; ++Pos)
     {
         ParaContentPos.Update(ContentPosition[Pos].Position, Pos - ParaPos);

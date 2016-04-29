@@ -5764,7 +5764,7 @@ function CDrawingDocument()
         var _oldTurn = editor.isViewMode;
         editor.isViewMode = true;
 
-        var par = new AscCommon.Paragraph(this, this.m_oWordControl.m_oLogicDocument, 0, 0, 0, 1000, 1000);
+        var par = new Paragraph(this, this.m_oWordControl.m_oLogicDocument, 0, 0, 0, 1000, 1000);
 
         par.Cursor_MoveToStartPos();
 
@@ -6958,7 +6958,7 @@ CStylesPainter.prototype =
       var hdr = new CHeaderFooter(editor.WordControl.m_oLogicDocument.HdrFtr, editor.WordControl.m_oLogicDocument, editor.WordControl.m_oDrawingDocument, AscCommon.hdrftr_Header);
       var _dc = hdr.Content;//new CDocumentContent(editor.WordControl.m_oLogicDocument, editor.WordControl.m_oDrawingDocument, 0, 0, 0, 0, false, true, false);
 
-      var par = new AscCommon.Paragraph(editor.WordControl.m_oDrawingDocument, _dc, 0, 0, 0, 0, false);
+      var par = new Paragraph(editor.WordControl.m_oDrawingDocument, _dc, 0, 0, 0, 0, false);
       var run = new ParaRun(par, false);
 
       for (var i = 0; i < style.Name.length; i++)

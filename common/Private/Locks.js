@@ -120,7 +120,7 @@ if(typeof AscCommon.CDocument !== "undefined")
                             {
                                 var CurElement = this.Content[this.CurPos.ContentPos];
 
-                                if ( AscCommon.changestype_Document_Content_Add === CheckType && AscCommon.type_Paragraph === CurElement.GetType() && true === CurElement.Cursor_IsEnd() )
+                                if ( AscCommon.changestype_Document_Content_Add === CheckType && type_Paragraph === CurElement.GetType() && true === CurElement.Cursor_IsEnd() )
                                     AscCommon.CollaborativeEditing.Add_CheckLock(false);
                                 else
                                     this.Content[this.CurPos.ContentPos].Document_Is_SelectionLocked(CheckType);
@@ -297,7 +297,7 @@ AscCommon.CDocumentContent.prototype.Document_Is_SelectionLocked = function(Chec
                     {
                         var CurElement = this.Content[this.CurPos.ContentPos];
 
-                        if ( AscCommon.changestype_Document_Content_Add === CheckType && AscCommon.type_Paragraph === CurElement.GetType() && true === CurElement.Cursor_IsEnd() )
+                        if ( AscCommon.changestype_Document_Content_Add === CheckType && type_Paragraph === CurElement.GetType() && true === CurElement.Cursor_IsEnd() )
                             AscCommon.CollaborativeEditing.Add_CheckLock(false);
                         else
                             this.Content[this.CurPos.ContentPos].Document_Is_SelectionLocked(CheckType);
@@ -322,7 +322,7 @@ AscCommon.CDocumentContent.prototype.Document_Is_SelectionLocked = function(Chec
         }
     }
 };
-AscCommon.Paragraph.prototype.Document_Is_SelectionLocked = function(CheckType)
+Paragraph.prototype.Document_Is_SelectionLocked = function(CheckType)
 {
     switch ( CheckType )
     {
@@ -349,7 +349,7 @@ AscCommon.Paragraph.prototype.Document_Is_SelectionLocked = function(CheckType)
                 else
                 {
                     var Prev = this.Get_DocumentPrev();
-                    if ( null != Prev && AscCommon.type_Paragraph === Prev.GetType() )
+                    if ( null != Prev && type_Paragraph === Prev.GetType() )
                         Prev.Lock.Check( Prev.Get_Id() );
                 }
             }
@@ -369,7 +369,7 @@ AscCommon.Paragraph.prototype.Document_Is_SelectionLocked = function(CheckType)
                 if ( EndPos >= this.Content.length - 1 && StartPos > this.Internal_GetStartPos() )
                 {
                     var Next = this.Get_DocumentNext();
-                    if ( null != Next && AscCommon.type_Paragraph === Next.GetType() )
+                    if ( null != Next && type_Paragraph === Next.GetType() )
                         Next.Lock.Check( Next.Get_Id() );
                 }
             }
@@ -384,7 +384,7 @@ AscCommon.Paragraph.prototype.Document_Is_SelectionLocked = function(CheckType)
             if ( true != this.Selection.Use && true === this.Cursor_IsEnd() )
             {
                 var Next = this.Get_DocumentNext();
-                if ( null != Next && AscCommon.type_Paragraph === Next.GetType() )
+                if ( null != Next && type_Paragraph === Next.GetType() )
                     Next.Lock.Check( Next.Get_Id() );
             }
             // Если есть выделение, и знак параграфа попал в выделение и параграф выделен не целиком
@@ -403,7 +403,7 @@ AscCommon.Paragraph.prototype.Document_Is_SelectionLocked = function(CheckType)
                 if ( EndPos >= this.Content.length - 1 && StartPos > this.Internal_GetStartPos() )
                 {
                     var Next = this.Get_DocumentNext();
-                    if ( null != Next && AscCommon.type_Paragraph === Next.GetType() )
+                    if ( null != Next && type_Paragraph === Next.GetType() )
                         Next.Lock.Check( Next.Get_Id() );
                 }
             }

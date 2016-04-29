@@ -2599,7 +2599,7 @@ CTable.prototype =
                             // Параграф начинается до заданной страницы и заканчивается после. Нам нужно разделить его на
                             // 2 параграфа в заданной точке.
 
-                            var NewParagraph = new AscCommon.Paragraph( NewDocContent.DrawingDocument, NewDocContent, 0, 0, 0, 0, 0 );
+                            var NewParagraph = new Paragraph( NewDocContent.DrawingDocument, NewDocContent, 0, 0, 0, 0, 0 );
                             NearestPos.Paragraph.Split( NewParagraph, NearestPos.ContentPos );
                             NewDocContent.Internal_Content_Add(NewIndex + 1, NewParagraph);                            
 
@@ -2615,7 +2615,7 @@ CTable.prototype =
                             // в конец добавляем новый пустой параграф
                             NewIndex++;
                             if ( NewIndex >= NewDocContent.Content.length - 1 )
-                                NewDocContent.Internal_Content_Add(NewDocContent.Content.length, new AscCommon.Paragraph( NewDocContent.DrawingDocument, NewDocContent, 0, 0, 0, 0, 0 ) );
+                                NewDocContent.Internal_Content_Add(NewDocContent.Content.length, new Paragraph( NewDocContent.DrawingDocument, NewDocContent, 0, 0, 0, 0, 0 ) );
                         }
 
                     }
@@ -2676,7 +2676,7 @@ CTable.prototype =
                     }
                     else if ( true != TarParagraph.Cursor_IsStart(ParaContentPos) )
                     {
-                        var NewParagraph = new AscCommon.Paragraph( NewDocContent.DrawingDocument, NewDocContent, 0, 0, 0, 0, 0 );
+                        var NewParagraph = new Paragraph( NewDocContent.DrawingDocument, NewDocContent, 0, 0, 0, 0, 0 );
                         NearestPos.Paragraph.Split( NewParagraph, NearestPos.ContentPos );
                         NewDocContent.Internal_Content_Add( NewIndex + 1, NewParagraph );
 
@@ -8414,7 +8414,7 @@ CTable.prototype =
         else
         {
             var CellContent = this.CurCell.Content;
-            if (this.LogicDocument && true === this.LogicDocument.UseTextShd && AscCommon.docpostype_Content === CellContent.CurPos.Type && true !== CellContent.Selection.Use && AscCommon.type_Paragraph === CellContent.Content[CellContent.CurPos.ContentPos].GetType())
+            if (this.LogicDocument && true === this.LogicDocument.UseTextShd && AscCommon.docpostype_Content === CellContent.CurPos.Type && true !== CellContent.Selection.Use && type_Paragraph === CellContent.Content[CellContent.CurPos.ContentPos].GetType())
             {
                 this.CurCell.Set_Shd( Shd );
                 this.CurCell.Content.ReDraw();                

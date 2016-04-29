@@ -234,8 +234,8 @@ function ConvertParagraphToPPTX(paragraph, drawingDocument, newParent)
     var _drawing_document = isRealObject(drawingDocument) ? drawingDocument : paragraph.DrawingDocument;
     var _new_parent = isRealObject(newParent) ? newParent : paragraph.Parent;
 
-    var new_paragraph = new AscCommon.Paragraph(_drawing_document, _new_parent, 0, 0, 0, 0, 0, true);
-    if(!(paragraph instanceof AscCommon.Paragraph))
+    var new_paragraph = new Paragraph(_drawing_document, _new_parent, 0, 0, 0, 0, 0, true);
+    if(!(paragraph instanceof Paragraph))
         return new_paragraph;
     var oCopyPr = paragraph.Pr.Copy();
 
@@ -434,7 +434,7 @@ function RecalculateDocContentByMaxLine(oDocContent, dMaxWidth, bNeedRecalcAllDr
     for(i = 0;  i < arr_content.length; ++i)
     {
         var oContentElement = arr_content[i];
-        if(oContentElement.Get_Type() === AscCommon.type_Paragraph)
+        if(oContentElement.Get_Type() === type_Paragraph)
         {
             paragraph_lines = arr_content[i].Lines;
             for(j = 0;  j < paragraph_lines.length; ++j)
@@ -708,7 +708,7 @@ CShape.prototype =
             var index = 0;
             for (var i = 0; i < paragraphs.length; ++i) {
                 var cur_par = paragraphs[i];
-                if (cur_par instanceof AscCommon.Paragraph) {
+                if (cur_par instanceof Paragraph) {
                     var new_paragraph = ConvertParagraphToPPTX(cur_par, drawingDocument, new_content);
                     new_content.Internal_Content_Add(index++, new_paragraph, false);
                 }
@@ -5540,7 +5540,7 @@ CShape.prototype =
         for(i = 0; i < oContent.Content.length; ++i)
         {
             oElement = oContent.Content[i];
-            if(oElement.Get_Type() === AscCommon.type_Paragraph)
+            if(oElement.Get_Type() === type_Paragraph)
             {
                 if(this.checkRunWordArtContent(oElement.Content, fCallback))
                 {

@@ -1160,7 +1160,7 @@ ParaMath.prototype.Add = function(Item)
     }
     else if (para_Math === Type)
     {
-        var ContentPos = new AscCommon.CParagraphContentPos();
+        var ContentPos = new CParagraphContentPos();
 
         if(this.bSelectionUse == true)
             this.Get_ParaContentPos(true, true, ContentPos);
@@ -2499,7 +2499,7 @@ ParaMath.prototype.MathToImageConverter = function(bCopy, _canvasInput, _widthPx
     var hdr = new CHeaderFooter(editor.WordControl.m_oLogicDocument.HdrFtr, editor.WordControl.m_oLogicDocument, editor.WordControl.m_oDrawingDocument, AscCommon.hdrftr_Header);
     var _dc = hdr.Content;
 
-    var par = new AscCommon.Paragraph(editor.WordControl.m_oDrawingDocument, _dc, 0, 0, 0, 0, false);
+    var par = new Paragraph(editor.WordControl.m_oDrawingDocument, _dc, 0, 0, 0, 0, false);
 
     if (bCopy)
         par.Internal_Content_Add(0, this.Copy(false), false);
@@ -3099,7 +3099,7 @@ ParaMath.prototype.Is_InInnerContent = function()
  */
 ParaMath.prototype.Handle_AddNewLine = function()
 {
-    var ContentPos = new AscCommon.CParagraphContentPos();
+    var ContentPos = new CParagraphContentPos();
 
     var CurrContent = this.GetSelectContent().Content;
 
@@ -3140,10 +3140,10 @@ ParaMath.prototype.Handle_AddNewLine = function()
         CurrContent.Add_ToContent(1, EqArray);
         CurrContent.Correct_Content(true);
 
-        var CurrentContent = new AscCommon.CParagraphContentPos();
+        var CurrentContent = new CParagraphContentPos();
         this.Get_ParaContentPos(false, false, CurrentContent);
 
-        var RightContentPos = new AscCommon.CParagraphSearchPos();
+        var RightContentPos = new CParagraphSearchPos();
         this.Get_RightPos(RightContentPos, CurrentContent, 0, true);
         this.Set_ParaContentPos(RightContentPos.Pos, 0);
 

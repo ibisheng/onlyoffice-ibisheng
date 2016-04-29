@@ -5140,7 +5140,7 @@ CStylesPainter.prototype =
         var hdr = new CHeaderFooter(_api.WordControl.m_oLogicDocument.HdrFtr, _api.WordControl.m_oLogicDocument, _api.WordControl.m_oDrawingDocument, AscCommon.hdrftr_Header);
         var _dc = hdr.Content;//new CDocumentContent(editor.WordControl.m_oLogicDocument, editor.WordControl.m_oDrawingDocument, 0, 0, 0, 0, false, true, false);
 
-        var par = new AscCommon.Paragraph(_api.WordControl.m_oDrawingDocument, _dc, 0, 0, 0, 0, false);
+        var par = new Paragraph(_api.WordControl.m_oDrawingDocument, _dc, 0, 0, 0, 0, false);
         var run = new ParaRun(par, false);
 
         for (var i = 0; i < style.Name.length; i++)

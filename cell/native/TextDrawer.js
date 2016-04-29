@@ -2468,7 +2468,7 @@ function GetRectContentWidth(oContent, dMaxWidth)
     {
         var par = oContent.Content[i];
 
-        if(par instanceof AscCommon.Paragraph)
+        if(par instanceof Paragraph)
         {
             for(var j = 0; j < par.Lines.length; ++j)
             {

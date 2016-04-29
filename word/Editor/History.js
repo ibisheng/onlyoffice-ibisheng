@@ -389,7 +389,7 @@ CHistory.prototype =
             ( Class instanceof AscCommon.CDocumentContent && ( AscDFH.historyitem_DocumentContent_AddItem === Data.Type || AscDFH.historyitem_DocumentContent_RemoveItem === Data.Type ) ) ||
             ( Class instanceof CTable           && ( AscDFH.historyitem_Table_AddRow            === Data.Type || AscDFH.historyitem_Table_RemoveRow            === Data.Type ) ) ||
             ( Class instanceof CTableRow        && ( AscDFH.historyitem_TableRow_AddCell        === Data.Type || AscDFH.historyitem_TableRow_RemoveCell        === Data.Type ) ) ||
-            ( Class instanceof AscCommon.Paragraph        && ( AscDFH.historyitem_Paragraph_AddItem       === Data.Type || AscDFH.historyitem_Paragraph_RemoveItem       === Data.Type ) ) ||
+            ( Class instanceof Paragraph        && ( AscDFH.historyitem_Paragraph_AddItem       === Data.Type || AscDFH.historyitem_Paragraph_RemoveItem       === Data.Type ) ) ||
             ( Class instanceof ParaHyperlink    && ( AscDFH.historyitem_Hyperlink_AddItem       === Data.Type || AscDFH.historyitem_Hyperlink_RemoveItem       === Data.Type ) ) ||
             ( Class instanceof ParaRun          && ( AscDFH.historyitem_ParaRun_AddItem         === Data.Type || AscDFH.historyitem_ParaRun_RemoveItem         === Data.Type ) ) ||
             ( bPresentation && Class instanceof CPresentation && (AscDFH.historyitem_Presentation_AddSlide === Data.Type || AscDFH.historyitem_Presentation_RemoveSlide === Data.Type)) ||
@@ -400,7 +400,7 @@ CHistory.prototype =
                 ( Class instanceof AscCommon.CDocumentContent && AscDFH.historyitem_DocumentContent_AddItem === Data.Type ) ||
                 ( Class instanceof CTable           && AscDFH.historyitem_Table_AddRow            === Data.Type ) ||
                 ( Class instanceof CTableRow        && AscDFH.historyitem_TableRow_AddCell        === Data.Type ) ||
-                ( Class instanceof AscCommon.Paragraph        && AscDFH.historyitem_Paragraph_AddItem       === Data.Type ) ||
+                ( Class instanceof Paragraph        && AscDFH.historyitem_Paragraph_AddItem       === Data.Type ) ||
                 ( Class instanceof ParaHyperlink    && AscDFH.historyitem_Hyperlink_AddItem       === Data.Type ) ||
                 ( Class instanceof ParaRun          && AscDFH.historyitem_ParaRun_AddItem         === Data.Type ) ||
                 ( bPresentation && Class instanceof CPresentation && (AscDFH.historyitem_Presentation_AddSlide === Data.Type )) ||
@@ -409,7 +409,7 @@ CHistory.prototype =
 
             var Count = 1;
 
-            if ( ( Class instanceof AscCommon.Paragraph ) ||  ( Class instanceof ParaHyperlink) || ( Class instanceof ParaRun ) ||
+            if ( ( Class instanceof Paragraph ) ||  ( Class instanceof ParaHyperlink) || ( Class instanceof ParaRun ) ||
                 ( Class instanceof AscCommon.CDocument        && AscDFH.historyitem_Document_RemoveItem        === Data.Type ) ||
                 ( Class instanceof AscCommon.CDocumentContent && AscDFH.historyitem_DocumentContent_RemoveItem === Data.Type ) )
                 Count = Data.Items.length;
@@ -859,7 +859,7 @@ CHistory.prototype =
 
             var Para = null;
             var Class = Items[0].Class;
-            if (Class instanceof AscCommon.Paragraph)
+            if (Class instanceof Paragraph)
                 Para = Class;
             else if (Class.Get_Paragraph)
                 Para = Class.Get_Paragraph();
@@ -870,7 +870,7 @@ CHistory.prototype =
             {
                 Class = Items[Index].Class;
 
-                if (Class instanceof AscCommon.Paragraph)
+                if (Class instanceof Paragraph)
                 {
                     if (Para != Class)
                         return null;

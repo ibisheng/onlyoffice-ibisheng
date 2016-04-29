@@ -657,7 +657,7 @@ CShape.prototype.Set_CurrentElement = function(bUpdate, pageIndex)
             para_drawing = this.parent;
         }
 
-        if (para_drawing && para_drawing.Parent instanceof AscCommon.Paragraph)
+        if (para_drawing && para_drawing.Parent instanceof Paragraph)
             para_drawing.Parent.Document_SetThisElementCurrent(false);
 
         var hdr_ftr = para_drawing.DocumentContent.Is_HdrFtr(true);

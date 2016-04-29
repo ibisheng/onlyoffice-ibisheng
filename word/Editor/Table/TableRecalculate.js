@@ -140,10 +140,10 @@ CTable.prototype.private_RecalculateCheckPageColumnBreak = function(CurPage)
 
     var PrevElement = this.Get_DocumentPrev();
 
-    if (null !== PrevElement && AscCommon.type_Paragraph === PrevElement.Get_Type() && true === PrevElement.Is_Empty() && undefined !== PrevElement.Get_SectionPr())
+    if (null !== PrevElement && type_Paragraph === PrevElement.Get_Type() && true === PrevElement.Is_Empty() && undefined !== PrevElement.Get_SectionPr())
         PrevElement = PrevElement.Get_DocumentPrev();
 
-    if ((0 === CurPage || true === this.Check_EmptyPages(CurPage - 1)) && null !== PrevElement && AscCommon.type_Paragraph === PrevElement.Get_Type())
+    if ((0 === CurPage || true === this.Check_EmptyPages(CurPage - 1)) && null !== PrevElement && type_Paragraph === PrevElement.Get_Type())
     {
         var bNeedPageBreak = true;
         if (undefined !== PrevElement.Get_SectionPr())
@@ -163,7 +163,7 @@ CTable.prototype.private_RecalculateCheckPageColumnBreak = function(CurPage)
     }
 
     // ColumnBreak для случая CurPage > 0 не разбираем здесь, т.к. он срабатывает автоматически
-    if (0 === CurPage && null !== PrevElement && AscCommon.type_Paragraph === PrevElement.Get_Type())
+    if (0 === CurPage && null !== PrevElement && type_Paragraph === PrevElement.Get_Type())
     {
         var EndLine = PrevElement.Pages[PrevElement.Pages.length - 1].EndLine;
         if (-1 !== EndLine && !(PrevElement.Lines[EndLine].Info & paralineinfo_BreakRealPage) && PrevElement.Lines[EndLine].Info & paralineinfo_BreakPage)
@@ -2992,7 +2992,7 @@ function CTablePage(X, Y, XLimit, YLimit, FirstRow, MaxTopBorder)
     this.Y            = Y;
     this.XLimit       = XLimit;
     this.YLimit       = YLimit;
-    this.Bounds       = new AscCommon.CDocumentBounds(X, Y, XLimit, Y);
+    this.Bounds       = new CDocumentBounds(X, Y, XLimit, Y);
     this.MaxTopBorder = MaxTopBorder;
     this.FirstRow     = FirstRow;
     this.LastRow      = FirstRow;

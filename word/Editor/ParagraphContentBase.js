@@ -135,7 +135,7 @@ CParagraphContentWithContentBase.prototype.protected_FillRangeEndPos = function(
 CParagraphContentWithContentBase.prototype.protected_UpdateSpellChecking = function()
 {
     if(undefined !== this.Paragraph && null !== this.Paragraph)
-        this.Paragraph.RecalcInfo.Set_Type_0_Spell(AscCommon.pararecalc_0_Spell_All);
+        this.Paragraph.RecalcInfo.Set_Type_0_Spell(pararecalc_0_Spell_All);
 };
 CParagraphContentWithContentBase.prototype.Is_UseInDocument = function(Id)
 {
@@ -736,7 +736,7 @@ CParagraphContentWithParagraphLikeContent.prototype.Get_CurrentParaPos = functio
     if (CurPos >= 0 && CurPos < this.Content.length)
         return this.Content[CurPos].Get_CurrentParaPos();
 
-    return new AscCommon.CParaPos(this.StartRange, this.StartLine, 0, 0);
+    return new CParaPos(this.StartRange, this.StartLine, 0, 0);
 };
 CParagraphContentWithParagraphLikeContent.prototype.Apply_TextPr = function(TextPr, IncFontSize, ApplyToAll)
 {
@@ -865,7 +865,7 @@ CParagraphContentWithParagraphLikeContent.prototype.Clear_TextPr = function()
 };
 CParagraphContentWithParagraphLikeContent.prototype.Check_NearestPos = function(ParaNearPos, Depth)
 {
-    var HyperNearPos = new AscCommon.CParagraphElementNearPos();
+    var HyperNearPos = new CParagraphElementNearPos();
     HyperNearPos.NearPos = ParaNearPos.NearPos;
     HyperNearPos.Depth   = Depth;
 
@@ -1278,7 +1278,7 @@ CParagraphContentWithParagraphLikeContent.prototype.Recalculate_PageEndInfo = fu
 };
 CParagraphContentWithParagraphLikeContent.prototype.Save_RecalculateObject = function(Copy)
 {
-    var RecalcObj = new AscCommon.CRunRecalculateObject(this.StartLine, this.StartRange);
+    var RecalcObj = new CRunRecalculateObject(this.StartLine, this.StartRange);
     RecalcObj.Save_Lines( this, Copy );
     RecalcObj.Save_Content( this, Copy );
     return RecalcObj;

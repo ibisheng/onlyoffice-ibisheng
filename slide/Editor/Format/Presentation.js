@@ -3813,7 +3813,7 @@ CPresentation.prototype =
                         this.Slides[this.CurPage].graphicObjects.removeCallback(1);
                     }
                     paragraph = target_doc_content.Content[target_doc_content.CurPos.ContentPos];
-                    if (null != paragraph && AscCommon.type_Paragraph == paragraph.GetType())
+                    if (null != paragraph && type_Paragraph == paragraph.GetType())
                     {
                         NearPos = { Paragraph: paragraph, ContentPos: paragraph.Get_ParaContentPos(false, false) };
                         paragraph.Check_NearestPos(NearPos);

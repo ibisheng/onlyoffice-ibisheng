@@ -1544,7 +1544,7 @@ asc_docs_api.prototype.UpdateParagraphProp = function(ParaPr)
     if ( true === ParaPr.Spacing.AfterAutoSpacing )
         ParaPr.Spacing.After = spacing_Auto;
     else if ( undefined === ParaPr.Spacing.AfterAutoSpacing )
-        ParaPr.Spacing.After = AscCommon.UnknownValue;
+        ParaPr.Spacing.After = UnknownValue;
 
     if ( true === ParaPr.Spacing.BeforeAutoSpacing )
         ParaPr.Spacing.Before = spacing_Auto;
@@ -3184,12 +3184,12 @@ asc_docs_api.prototype.sync_ParaSpacingLine = function(SpacingLine)
     if ( true === SpacingLine.AfterAutoSpacing )
         SpacingLine.After = spacing_Auto;
     else if ( undefined === SpacingLine.AfterAutoSpacing )
-        SpacingLine.After = AscCommon.AscCommon.UnknownValue;
+        SpacingLine.After = UnknownValue;
 
     if ( true === SpacingLine.BeforeAutoSpacing )
         SpacingLine.Before = spacing_Auto;
     else if ( undefined === SpacingLine.BeforeAutoSpacing )
-        SpacingLine.Before = AscCommon.UnknownValue;
+        SpacingLine.Before = UnknownValue;
 
 	this.asc_fireCallback("asc_onParaSpacingLine", new AscCommon.asc_CParagraphSpacing( SpacingLine ));
 };

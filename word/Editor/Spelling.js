@@ -528,13 +528,13 @@ CParaSpellChecker.prototype =
     Update_OnAdd : function(Paragraph, Pos, Item)
     {
         var RecalcInfo = ( undefined !== Paragraph.Paragraph ? Paragraph.Paragraph.RecalcInfo : Paragraph.RecalcInfo );
-        RecalcInfo.Set_Type_0_Spell( AscCommon.pararecalc_0_Spell_All );
+        RecalcInfo.Set_Type_0_Spell( pararecalc_0_Spell_All );
     },
 
     Update_OnRemove : function(Paragraph, Pos, Count)
     {
         var RecalcInfo = ( undefined !== Paragraph.Paragraph ? Paragraph.Paragraph.RecalcInfo : Paragraph.RecalcInfo );
-        RecalcInfo.Set_Type_0_Spell( AscCommon.pararecalc_0_Spell_All );
+        RecalcInfo.Set_Type_0_Spell( pararecalc_0_Spell_All );
     },
 
     Reset_ElementsWithCurPos : function()
@@ -817,9 +817,9 @@ CTable.prototype.Restart_CheckSpelling = function()
 //----------------------------------------------------------------------------------------------------------------------
 // Paragraph
 //----------------------------------------------------------------------------------------------------------------------
-AscCommon.Paragraph.prototype.Restart_CheckSpelling = function()
+Paragraph.prototype.Restart_CheckSpelling = function()
 {
-    this.RecalcInfo.Set_Type_0_Spell( AscCommon.pararecalc_0_Spell_All );
+    this.RecalcInfo.Set_Type_0_Spell( pararecalc_0_Spell_All );
     
     // Пересчитываем скомпилированный стиль для самого параграфа и для всех ранов в данном параграфе
     this.Recalc_CompiledPr();
@@ -832,7 +832,7 @@ AscCommon.Paragraph.prototype.Restart_CheckSpelling = function()
     this.LogicDocument.Spelling.Add_ParagraphToCheck(this.Get_Id(), this);
 };
 
-AscCommon.Paragraph.prototype.Internal_CheckPunctuationBreak = function(_Pos)
+Paragraph.prototype.Internal_CheckPunctuationBreak = function(_Pos)
 {
     // В позиции Pos у нас стоит знак пунктуации, проверяем, идет ли за ним сразу текст
 
@@ -855,20 +855,20 @@ AscCommon.Paragraph.prototype.Internal_CheckPunctuationBreak = function(_Pos)
 
 };
 
-AscCommon.Paragraph.prototype.Internal_CheckSpelling = function()
+Paragraph.prototype.Internal_CheckSpelling = function()
 {
-    if ( AscCommon.pararecalc_0_Spell_None !== this.RecalcInfo.Recalc_0_Spell.Type )
+    if ( pararecalc_0_Spell_None !== this.RecalcInfo.Recalc_0_Spell.Type )
     {
         if (this === g_oTableId.Get_ById(this.Get_Id()))
             this.LogicDocument && this.LogicDocument.Spelling.Add_ParagraphToCheck(this.Get_Id(), this);
     }
 };
 
-AscCommon.Paragraph.prototype.Continue_CheckSpelling = function()
+Paragraph.prototype.Continue_CheckSpelling = function()
 {
     var ParaForceRedraw = undefined;
     var CheckLang = false;
-    if ( AscCommon.pararecalc_0_Spell_None === this.RecalcInfo.Recalc_0_Spell.Type )
+    if ( pararecalc_0_Spell_None === this.RecalcInfo.Recalc_0_Spell.Type )
         return;
     else
     {
@@ -901,7 +901,7 @@ AscCommon.Paragraph.prototype.Continue_CheckSpelling = function()
     }
 
     var PrevPara = this.Get_DocumentPrev();
-    if ( null != PrevPara && AscCommon.type_Paragraph === PrevPara.GetType() && undefined != PrevPara.Get_FramePr() && undefined != PrevPara.Get_FramePr().DropCap )
+    if ( null != PrevPara && type_Paragraph === PrevPara.GetType() && undefined != PrevPara.Get_FramePr() && undefined != PrevPara.Get_FramePr().DropCap )
     {
         if ( this.SpellChecker.Elements.length > 0 )
         {
@@ -954,10 +954,10 @@ AscCommon.Paragraph.prototype.Continue_CheckSpelling = function()
     this.SpellChecker.ParaId   = this.Get_Id();
     this.SpellChecker.Check(ParaForceRedraw );
 
-    this.RecalcInfo.Recalc_0_Spell.Type = AscCommon.pararecalc_0_Spell_None;
+    this.RecalcInfo.Recalc_0_Spell.Type = pararecalc_0_Spell_None;
 };
 
-AscCommon.Paragraph.prototype.Add_SpellCheckerElement = function(Element)
+Paragraph.prototype.Add_SpellCheckerElement = function(Element)
 {   
 //    Element.ClassesS.push( this );
 //    Element.ClassesE.push( this );
@@ -1169,7 +1169,7 @@ ParaField.prototype.Clear_SpellingMarks = function()
 
 function CParagraphSpellCheckerEngine(SpellChecker)
 {
-    this.ContentPos   = new AscCommon.CParagraphContentPos();
+    this.ContentPos   = new CParagraphContentPos();
     this.SpellChecker = SpellChecker;
 
     this.CurLcid    = -1;

@@ -1979,7 +1979,7 @@ CTableId.prototype.Read_Class_FromBinary = function(Reader)
 
     switch( ElementType )
     {
-        case AscDFH.historyitem_type_Paragraph                : Element = new AscCommon.Paragraph(); break;
+        case AscDFH.historyitem_type_Paragraph                : Element = new Paragraph(); break;
         case AscDFH.historyitem_type_TextPr                   : Element = new ParaTextPr(); break;
         case AscDFH.historyitem_type_Hyperlink                : Element = new ParaHyperlink(); break;
         case AscDFH.historyitem_type_Drawing                  : Element = new ParaDrawing(); break;
