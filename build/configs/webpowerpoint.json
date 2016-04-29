@@ -28,7 +28,6 @@
 		"../common/editor/paragraph.js",
 		"../common/editor/document.js",
 		"../common/editor/documentContent.js",
-		"../common/editor/styles.js",
 		
 		"../common/Shapes/EditorSettings.js",
 		"../common/Shapes/Serialize.js",
@@ -90,6 +89,7 @@
 		
         "../slide/Drawing/ThemeLoader.js",
         "../word/Editor/Serialize2.js",
+        "../word/Editor/Styles.js",
         "../word/Editor/Numbering.js",
         "../slide/Editor/CollaborativeEditing.js",
         "../word/Drawing/GraphicsEvents.js",
@@ -116,6 +116,7 @@
         "../slide/Editor/Format/SlideMaster.js",
         "../slide/Editor/Format/Layout.js",
         "../slide/Editor/Format/Comments.js",
+        "../word/Editor/Styles.js",
         "../word/Editor/Numbering.js",
         "../word/Editor/ParagraphContent.js",
         "../word/Editor/ParagraphContentBase.js",

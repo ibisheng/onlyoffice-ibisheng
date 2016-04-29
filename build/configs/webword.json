@@ -31,7 +31,6 @@
 		"../common/editor/paragraph.js",
 		"../common/editor/document.js",
 		"../common/editor/documentContent.js",
-		"../common/editor/styles.js",
 		
 		"../common/Shapes/EditorSettings.js",
 		"../common/Shapes/Serialize.js",
@@ -100,6 +99,7 @@
         "../word/Editor/GraphicObjects/WrapManager.js",
         "../word/Editor/CollaborativeEditing.js",
         "../word/Editor/Comments.js",
+        "../word/Editor/Styles.js",
         "../word/Editor/FlowObjects.js",
         "../word/Editor/ParagraphContent.js",
         "../word/Editor/ParagraphContentBase.js",
