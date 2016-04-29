@@ -1550,7 +1550,7 @@ asc_docs_api.prototype.UpdateParagraphProp = function(ParaPr)
     if ( true === ParaPr.Spacing.BeforeAutoSpacing )
         ParaPr.Spacing.Before = AscCommon.spacing_Auto;
     else if ( undefined === ParaPr.Spacing.BeforeAutoSpacing )
-        ParaPr.Spacing.Before = UnknownValue;
+        ParaPr.Spacing.Before = AscCommon.UnknownValue;
 
     if ( -1 === ParaPr.PStyle )
         ParaPr.StyleName = "";
@@ -3185,7 +3185,7 @@ asc_docs_api.prototype.sync_ParaSpacingLine = function(SpacingLine)
     if ( true === SpacingLine.AfterAutoSpacing )
         SpacingLine.After = AscCommon.spacing_Auto;
     else if ( undefined === SpacingLine.AfterAutoSpacing )
-        SpacingLine.After = AscCommon.AscCommon.UnknownValue;
+        SpacingLine.After = AscCommon.UnknownValue;
 
     if ( true === SpacingLine.BeforeAutoSpacing )
         SpacingLine.Before = AscCommon.spacing_Auto;
