@@ -8840,6 +8840,13 @@
 
                 // Вызовем на всякий случай, т.к. мы можем уже обновиться из-за формул ToDo возможно стоит убрать это в дальнейшем (но нужна переработка формул) - http://bugzserver/show_bug.cgi?id=24505
                 t._updateSelectionNameAndInfo();
+				
+				if(null !== t.model.getRange3( arnTo.r1, arnTo.c1, arnTo.r2, arnTo.c2 ).hasMerged())
+				{
+					t.model.workbook.handlers.trigger( "asc_onConfirmAction", Asc.c_oAscConfirm.ConfirmPutMergeRange, function () {
+						t.model.autoFilters.unmergeTablesAfterMove( arnTo );
+					});
+				}
             };
 
             if ( t.model.autoFilters._searchFiltersInRange( arnFrom ) ) {

@@ -13,7 +13,8 @@ function (window, undefined) {
   var CColor = AscCommon.CColor;
 
 var c_oAscConfirm = {
-  ConfirmReplaceRange: 0
+  ConfirmReplaceRange: 0,
+  ConfirmPutMergeRange: 1
 };
 
 var c_oAscAlignType = {
@@ -293,6 +294,7 @@ var c_oAscPopUpSelectorType = {
   window['Asc']['c_oAscConfirm'] = window['Asc'].c_oAscConfirm = c_oAscConfirm;
   prot = c_oAscConfirm;
   prot['ConfirmReplaceRange'] = prot.ConfirmReplaceRange;
+  prot['ConfirmPutMergeRange'] = prot.ConfirmPutMergeRange;
   window['Asc']['c_oAscMergeOptions'] = window['Asc'].c_oAscMergeOptions = c_oAscMergeOptions;
   prot = c_oAscMergeOptions;
   prot['Unmerge'] = prot.Unmerge;
