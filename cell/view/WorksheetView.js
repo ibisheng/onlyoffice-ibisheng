@@ -8845,6 +8845,8 @@
 				{
 					t.model.workbook.handlers.trigger( "asc_onConfirmAction", Asc.c_oAscConfirm.ConfirmPutMergeRange, function () {
 						t.model.autoFilters.unmergeTablesAfterMove( arnTo );
+						t._updateCellsRange( arnTo, false, true );
+						t._recalculateAfterUpdate( [arnFrom, arnTo] );
 					});
 				}
             };
