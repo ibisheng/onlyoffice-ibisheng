@@ -1051,7 +1051,7 @@ function CDrawingDocument()
         var _oldTurn = editor.isViewMode;
         editor.isViewMode = true;
 
-        var docContent = new AscCommon.CDocumentContent(this.m_oWordControl.m_oLogicDocument, this.m_oWordControl.m_oDrawingDocument, 0, 0,1000, 1000, false, false, true);
+        var docContent = new CDocumentContent(this.m_oWordControl.m_oLogicDocument, this.m_oWordControl.m_oDrawingDocument, 0, 0,1000, 1000, false, false, true);
         var par = docContent.Content[0];
 
         par.Cursor_MoveToStartPos();

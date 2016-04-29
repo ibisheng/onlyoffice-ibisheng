@@ -89,7 +89,7 @@ DrawingObjectsController.prototype.paragraphFormatPaste = function( CopyTextPr, 
     var _this = this;
     this.checkSelectedObjectsAndCallback(function()
     {
-        this.applyTextFunction(AscCommon.CDocumentContent.prototype.Paragraph_Format_Paste, CTable.prototype.Paragraph_Format_Paste, [CopyTextPr, CopyParaPr, Bool]);
+        this.applyTextFunction(CDocumentContent.prototype.Paragraph_Format_Paste, CTable.prototype.Paragraph_Format_Paste, [CopyTextPr, CopyParaPr, Bool]);
     }, [CopyTextPr, CopyParaPr, Bool], false, AscDFH.historydescription_Presentation_ParaFormatPaste);
 };
 

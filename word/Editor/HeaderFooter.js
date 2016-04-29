@@ -23,12 +23,12 @@ function CHeaderFooter(Parent, LogicDocument, DrawingDocument, Type)
     {
         if ( Type === hdrftr_Header )
         {
-            this.Content = new AscCommon.CDocumentContent( this, DrawingDocument, 0, 0, 0, 0, false, true );
+            this.Content = new CDocumentContent( this, DrawingDocument, 0, 0, 0, 0, false, true );
             this.Content.Content[0].Style_Add( this.Get_Styles().Get_Default_Header() );
         }
         else
         {
-            this.Content = new AscCommon.CDocumentContent( this, DrawingDocument, 0, 0, 0, 0, false, true );
+            this.Content = new CDocumentContent( this, DrawingDocument, 0, 0, 0, 0, false, true );
             this.Content.Content[0].Style_Add( this.Get_Styles().Get_Default_Footer() );
         }
     }

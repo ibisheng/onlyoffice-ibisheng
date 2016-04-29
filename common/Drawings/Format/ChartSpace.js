@@ -960,7 +960,7 @@ CChartSpace.prototype =
 
     applyTextFunction: function(docContentFunction, tableFunction, args)
     {
-        if(docContentFunction === AscCommon.CDocumentContent.prototype.Paragraph_Add)
+        if(docContentFunction === CDocumentContent.prototype.Paragraph_Add)
         {
             this.paragraphAdd(args[0], args[1]);
             return;

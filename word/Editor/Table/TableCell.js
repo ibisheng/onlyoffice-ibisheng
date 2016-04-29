@@ -15,7 +15,7 @@ function CTableCell(Row, ColW)
 
     this.Prev = null;
     this.Next = null;
-    this.Content = new AscCommon.CDocumentContent(this, (undefined !== this.Row ? this.Row.Table.DrawingDocument : undefined), 0, 0, 0, 0, false, false, undefined !== this.Row ? this.Row.Table.bPresentation : undefined);
+    this.Content = new CDocumentContent(this, (undefined !== this.Row ? this.Row.Table.DrawingDocument : undefined), 0, 0, 0, 0, false, false, undefined !== this.Row ? this.Row.Table.bPresentation : undefined);
     this.Content.Set_StartPage( ( Row ? this.Row.Table.PageNum : 0 ) );
 
     this.CompiledPr =

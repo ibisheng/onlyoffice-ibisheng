@@ -257,7 +257,7 @@ CStyles.prototype.Document_Is_SelectionLocked = function(CheckType)
         }
     }
 };
-AscCommon.CDocumentContent.prototype.Document_Is_SelectionLocked = function(CheckType)
+CDocumentContent.prototype.Document_Is_SelectionLocked = function(CheckType)
 {
     if ( true === this.ApplyToAll )
     {

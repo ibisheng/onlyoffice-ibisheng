@@ -5902,7 +5902,7 @@ function BinaryFileReader(doc, openParams)
 		var oCommentsNewId = {};
 		//меняем CDocumentContent на Document для возможности вставки комментариев в колонтитул и таблицу
 		var isIntoShape = this.Document && this.Document.Parent && this.Document.Parent instanceof AscFormat.CShape ? true : false;
-		var isIntoDocumentContent = this.Document instanceof AscCommon.CDocumentContent ? true : false;
+		var isIntoDocumentContent = this.Document instanceof CDocumentContent ? true : false;
 		var document = this.Document && isIntoDocumentContent && !isIntoShape ? this.Document.LogicDocument : this.Document;
 		for(var i in this.oReadResult.oComments)
 		{

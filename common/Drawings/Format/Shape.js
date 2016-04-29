@@ -19,7 +19,6 @@ var isRealObject = AscCommon.isRealObject;
 var global_mouseEvent = AscCommon.global_mouseEvent;
     var History = AscCommon.History;
     var global_MatrixTransformer = AscCommon.global_MatrixTransformer;
-    var CDocumentContent = AscCommon.CDocumentContent;
 
 var checkNormalRotate = AscFormat.checkNormalRotate;
 var HitInLine = AscFormat.HitInLine;

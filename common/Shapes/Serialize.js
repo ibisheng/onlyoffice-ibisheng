@@ -7154,7 +7154,7 @@ function BinaryPPTYLoader()
                 {
                     s.Skip2(4);
                     var _c = s.GetULong();
-                    txbody.setContent(new AscCommon.CDocumentContent(txbody, this.presentation ? this.presentation.DrawingDocument : null, 0, 0, 0, 0, 0, 0, true));
+                    txbody.setContent(new CDocumentContent(txbody, this.presentation ? this.presentation.DrawingDocument : null, 0, 0, 0, 0, 0, 0, true));
                     if(_c>0)
                     {
                         txbody.content.Internal_Content_RemoveAll();
@@ -7257,7 +7257,7 @@ function BinaryPPTYLoader()
                      History.TurnOff();
                      }*/
                     if(!txbody.content)
-                        txbody.content = new AscCommon.CDocumentContent(shape, this.presentation ? this.presentation.DrawingDocument : null, 0, 0, 0, 0, 0, 0, true);
+                        txbody.content = new CDocumentContent(shape, this.presentation ? this.presentation.DrawingDocument : null, 0, 0, 0, 0, 0, 0, true);
                     if(_c>0)
                     {
                         txbody.content.Internal_Content_RemoveAll();
@@ -8245,7 +8245,7 @@ function CPres()
                     {
                         var oThis = this.BaseReader;
 
-                        shape.setTextBoxContent(new AscCommon.CDocumentContent(shape, this.LogicDocument.DrawingDocument, 0, 0, 0, 0, false, false));
+                        shape.setTextBoxContent(new CDocumentContent(shape, this.LogicDocument.DrawingDocument, 0, 0, 0, 0, false, false));
 
                         var _old_cont = shape.textBoxContent.Content[0];
 

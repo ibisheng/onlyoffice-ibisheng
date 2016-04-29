@@ -4594,7 +4594,7 @@ PasteProcessor.prototype =
         var count = stream.GetULong() / 100000;
 		
 		//читаем контент, здесь только параграфы
-		var newDocContent = new AscCommon.CDocumentContent(shape.txBody, editor.WordControl.m_oDrawingDocument, 0 , 0, 0, 0, false, false);
+		var newDocContent = new CDocumentContent(shape.txBody, editor.WordControl.m_oDrawingDocument, 0 , 0, 0, 0, false, false);
 		var elements = [], paragraph, selectedElement;
         for(var i = 0; i < count; ++i)
         {
