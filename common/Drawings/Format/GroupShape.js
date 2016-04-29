@@ -404,7 +404,7 @@ CGroupShape.prototype =
         if(!this.group)
         {
             var oLock;
-            if(this.parent instanceof ParaDrawing)
+            if(this.parent instanceof AscCommon.ParaDrawing)
             {
                 oLock = this.parent.Lock;
             }
@@ -742,7 +742,7 @@ CGroupShape.prototype =
         else
         {
             var i;
-            if(paraItem.Type === para_TextPr)
+            if(paraItem.Type === AscCommon.para_TextPr)
             {
                 AscFormat.DrawingObjectsController.prototype.applyDocContentFunction.call(this, AscCommon.CDocumentContent.prototype.Paragraph_Add, [paraItem, bRecalculate], CTable.prototype.Paragraph_Add);
             }
@@ -1081,7 +1081,7 @@ CGroupShape.prototype =
             {
                 this.updateCoordinatesAfterInternalResize();
             }
-            if(this.parent instanceof ParaDrawing)
+            if(this.parent instanceof AscCommon.ParaDrawing)
             {
                 this.parent.CheckWH();
             }

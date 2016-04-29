@@ -7015,11 +7015,11 @@ function BinaryPPTYLoader()
                                         _value = s.GetUChar();
 
                                         if (_value == 0)
-                                            _value = tab_Center;
+                                            _value = AscCommon.tab_Center;
                                         else if (_value == 3)
-                                            _value = tab_Right;
+                                            _value = AscCommon.tab_Right;
                                         else
-                                            _value = tab_Left;
+                                            _value = AscCommon.tab_Left;
 
                                         break;
                                     }
@@ -7493,21 +7493,21 @@ function BinaryPPTYLoader()
                                 {
                                     if (_text[j] == '\t')
                                     {
-                                        new_run.Add_ToContent(pos++, new ParaTab(), false);
+                                        new_run.Add_ToContent(pos++, new AscCommon.ParaTab(), false);
                                     }
                                     else if (_text[j] == '\n')
                                     {
-                                        new_run.Add_ToContent(pos++, new ParaNewLine( break_Line ), false);
+                                        new_run.Add_ToContent(pos++, new AscCommon.ParaNewLine( AscCommon.break_Line ), false);
                                     }
                                     else if (_text[j] == '\r')
                                         ;
                                     else if (_text[j] != ' ')
                                     {
-                                        new_run.Add_ToContent(pos++, new ParaText(_text[j]), false);
+                                        new_run.Add_ToContent(pos++, new AscCommon.ParaText(_text[j]), false);
                                     }
                                     else
                                     {
-                                        new_run.Add_ToContent(pos++, new ParaSpace(1), false);
+                                        new_run.Add_ToContent(pos++, new AscCommon.ParaSpace(1), false);
                                     }
                                 }
 
@@ -7611,7 +7611,7 @@ function BinaryPPTYLoader()
                                     text_pr.Set_FromObject(_run);
                                     new_run.Set_Pr(text_pr);
                                 }
-                                new_run.Add_ToContent( 0, new ParaNewLine(break_Line));
+                                new_run.Add_ToContent( 0, new AscCommon.ParaNewLine(AscCommon.break_Line));
                                 if (hyperlink !== null)
                                 {
                                     hyperlink.Add_ToContent(0, new_run, false);

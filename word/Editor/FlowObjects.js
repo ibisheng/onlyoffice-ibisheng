@@ -80,7 +80,7 @@ function CFlowTable(Table, PageIndex)
     this.W = Bounds.Right  - Bounds.Left;
     this.H = Bounds.Bottom - Bounds.Top;
 
-    this.WrappingType = WRAPPING_TYPE_SQUARE;
+    this.WrappingType = AscCommon.WRAPPING_TYPE_SQUARE;
 }
 
 CFlowTable.prototype =
@@ -113,7 +113,7 @@ CFlowTable.prototype =
 
     getArrayWrapIntervals: function(x0,y0, x1, y1, Y0Sp, Y1Sp, LeftField, RightField, ret, bMathWrap)
     {
-        if(this.WrappingType === WRAPPING_TYPE_THROUGH || this.WrappingType === WRAPPING_TYPE_TIGHT)
+        if(this.WrappingType === AscCommon.WRAPPING_TYPE_THROUGH || this.WrappingType === AscCommon.WRAPPING_TYPE_TIGHT)
         {
             y0 = Y0Sp;
             y1 = Y1Sp;
@@ -123,16 +123,16 @@ CFlowTable.prototype =
         if(y1 < top || y0 > bottom)
             return ret;
 
-        var b_check = false, X0, X1, Y1, WrapType = (bMathWrap === true) ? WRAPPING_TYPE_SQUARE : this.WrappingType;
+        var b_check = false, X0, X1, Y1, WrapType = (bMathWrap === true) ? AscCommon.WRAPPING_TYPE_SQUARE : this.WrappingType;
         switch(WrapType)
         {
-            case WRAPPING_TYPE_NONE:
+            case AscCommon.WRAPPING_TYPE_NONE:
             {
                 return ret;
             }
-            case WRAPPING_TYPE_SQUARE:
-            case WRAPPING_TYPE_THROUGH:
-            case WRAPPING_TYPE_TIGHT:
+            case AscCommon.WRAPPING_TYPE_SQUARE:
+            case AscCommon.WRAPPING_TYPE_THROUGH:
+            case AscCommon.WRAPPING_TYPE_TIGHT:
             {
                 X0 = this.X - AscFormat.getValOrDefault(this.Distance.L, AscFormat.DISTANCE_TO_TEXT_LEFTRIGHT);
                 X1 = this.X + this.W + AscFormat.getValOrDefault(this.Distance.R, AscFormat.DISTANCE_TO_TEXT_LEFTRIGHT);
@@ -140,7 +140,7 @@ CFlowTable.prototype =
                 b_check = true;
                 break;
             }
-            case WRAPPING_TYPE_TOP_AND_BOTTOM:
+            case AscCommon.WRAPPING_TYPE_TOP_AND_BOTTOM:
             {
                 var L = this.X - AscFormat.getValOrDefault(this.Distance.L, AscFormat.DISTANCE_TO_TEXT_LEFTRIGHT);
                 var R = this.X + this.W + AscFormat.getValOrDefault(this.Distance.R, AscFormat.DISTANCE_TO_TEXT_LEFTRIGHT);
@@ -156,7 +156,7 @@ CFlowTable.prototype =
         }
         if(b_check)
         {
-            var dx = this.WrappingType === WRAPPING_TYPE_SQUARE ? 6.35 : 3.175 ;
+            var dx = this.WrappingType === AscCommon.WRAPPING_TYPE_SQUARE ? 6.35 : 3.175 ;
             if(X0  < LeftField + dx)
             {
                 X0 = x0 ;
@@ -199,17 +199,17 @@ function CFlowParagraph(Paragraph, X, Y, W, H, Dx, Dy, StartIndex, FlowCount, Wr
     this.W = W;
     this.H = H;
     
-    this.WrappingType = WRAPPING_TYPE_SQUARE;
+    this.WrappingType = AscCommon.WRAPPING_TYPE_SQUARE;
     
     switch (Wrap)
     {
         case undefined:
         case AscCommon.wrap_Around:
-        case AscCommon.wrap_Auto:      this.WrappingType = WRAPPING_TYPE_SQUARE;         break;        
-        case AscCommon.wrap_None:      this.WrappingType = WRAPPING_TYPE_NONE;           break;
-        case AscCommon.wrap_NotBeside: this.WrappingType = WRAPPING_TYPE_TOP_AND_BOTTOM; break;
-        case AscCommon.wrap_Through:   this.WrappingType = WRAPPING_TYPE_THROUGH;        break;
-        case AscCommon.wrap_Tight:     this.WrappingType = WRAPPING_TYPE_TIGHT;          break;
+        case AscCommon.wrap_Auto:      this.WrappingType = AscCommon.WRAPPING_TYPE_SQUARE;         break;        
+        case AscCommon.wrap_None:      this.WrappingType = AscCommon.WRAPPING_TYPE_NONE;           break;
+        case AscCommon.wrap_NotBeside: this.WrappingType = AscCommon.WRAPPING_TYPE_TOP_AND_BOTTOM; break;
+        case AscCommon.wrap_Through:   this.WrappingType = AscCommon.WRAPPING_TYPE_THROUGH;        break;
+        case AscCommon.wrap_Tight:     this.WrappingType = AscCommon.WRAPPING_TYPE_TIGHT;          break;
     }
 }
 

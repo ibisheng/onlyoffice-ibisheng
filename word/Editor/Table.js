@@ -6838,7 +6838,7 @@ CTable.prototype =
 
     Paragraph_Add : function( ParaItem, bRecalculate )
     {
-        if ( para_TextPr === ParaItem.Type && ( true === this.ApplyToAll || ( true === this.Selection.Use && table_Selection_Cell === this.Selection.Type && this.Selection.Data.length > 0 ) ) )
+        if ( AscCommon.para_TextPr === ParaItem.Type && ( true === this.ApplyToAll || ( true === this.Selection.Use && table_Selection_Cell === this.Selection.Type && this.Selection.Data.length > 0 ) ) )
         {
             var Cells_array = this.Internal_Get_SelectionArray();
             for ( var Index = 0; Index < Cells_array.length; Index++ )
@@ -8205,7 +8205,7 @@ CTable.prototype =
         
         // Добавляем текстовые настройки во все параграфы
         var TextPr = Para.Get_TextPr();
-        this.Paragraph_Add( new ParaTextPr( TextPr ) );
+        this.Paragraph_Add( new AscCommon.ParaTextPr( TextPr ) );
         
         this.ApplyToAll = false;
     },
@@ -10367,7 +10367,7 @@ CTable.prototype =
                     New_Cell.Content.Set_ParagraphStyle( Styles.Get_Name( PStyleId ) );
                 }
 
-                New_Cell.Content.Paragraph_Add( new ParaTextPr( TextPr ) );
+                New_Cell.Content.Paragraph_Add( new AscCommon.ParaTextPr( TextPr ) );
                 New_Cell.Content.Set_ApplyToAll( false );
 
                 if ( true === bBefore )
@@ -10889,7 +10889,7 @@ CTable.prototype =
                         NewCell.Content.Set_ParagraphStyle( Styles.Get_Name( PStyleId ) );
                     }
 
-                    NewCell.Content.Paragraph_Add( new ParaTextPr( TextPr ) );
+                    NewCell.Content.Paragraph_Add( new AscCommon.ParaTextPr( TextPr ) );
                     NewCell.Content.Set_ApplyToAll( false );
 
                     if ( false === bBefore2 )
@@ -10971,7 +10971,7 @@ CTable.prototype =
                         NewCell.Content.Set_ParagraphStyle( Styles.Get_Name( PStyleId ) );
                     }
 
-                    NewCell.Content.Paragraph_Add( new ParaTextPr( TextPr ) );
+                    NewCell.Content.Paragraph_Add( new AscCommon.ParaTextPr( TextPr ) );
                     NewCell.Content.Set_ApplyToAll( false );
 
 

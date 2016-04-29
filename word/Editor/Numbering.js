@@ -24,6 +24,9 @@ var numbering_suff_Tab     = 1;
 var numbering_suff_Space   = 2;
 var numbering_suff_Nothing = 3;
 
+var nbsp_string = String.fromCharCode( 0x00A0 );
+var   sp_string = String.fromCharCode( 0x0032 );
+
 // Преобразовываем число в буквенную строку :
 //  1 -> a
 //  2 -> b

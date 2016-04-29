@@ -23151,7 +23151,7 @@ CTitle.prototype =
                     chart.selection.title = this;
                     para_drawing = chart.parent;
                 }
-                if(bDocument && para_drawing instanceof ParaDrawing)
+                if(bDocument && para_drawing instanceof AscCommon.ParaDrawing)
                 {
 
                     var hdr_ftr = para_drawing.DocumentContent.Is_HdrFtr(true);
@@ -25598,21 +25598,21 @@ function AddToContentFromString(content, str)
         var ch = str[i];
         if (ch == '\t')
         {
-            content.Paragraph_Add( new ParaTab(), false );
+            content.Paragraph_Add( new AscCommon.ParaTab(), false );
         }
         else if (ch == '\n')
         {
-            content.Paragraph_Add( new ParaNewLine(break_Line), false );
+            content.Paragraph_Add( new AscCommon.ParaNewLine(AscCommon.break_Line), false );
         }
         else if (ch == '\r')
             ;
         else if (ch != ' ')
         {
-            content.Paragraph_Add(new ParaText(ch), false );
+            content.Paragraph_Add(new AscCommon.ParaText(ch), false );
         }
         else
         {
-            content.Paragraph_Add(new ParaSpace(1), false );
+            content.Paragraph_Add(new AscCommon.ParaSpace(1), false );
         }
     }
 }

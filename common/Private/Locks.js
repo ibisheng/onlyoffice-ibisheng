@@ -208,7 +208,7 @@ if(typeof CGraphicObjects !== "undefined")
     };
 }
 
-ParaDrawing.prototype.Document_Is_SelectionLocked = function(CheckType)
+AscCommon.ParaDrawing.prototype.Document_Is_SelectionLocked = function(CheckType)
 {
     if(CheckType === AscCommon.changestype_Drawing_Props)
     {

@@ -1475,7 +1475,7 @@ CDocumentContent.prototype =
 
         Para1.Set_Align( Align, false );
         var Run = new ParaRun(Para1, false);
-        Run.Add_ToContent(0, new ParaPageNum());
+        Run.Add_ToContent(0, new AscCommon.ParaPageNum());
         Para1.Add_ToContent(0, Run);
 
         this.Recalculate();
@@ -2299,14 +2299,14 @@ CDocumentContent.prototype =
                 var Drawing;
                 if(!AscCommon.isRealObject(Chart))
                 {
-                    Drawing = new ParaDrawing( W, H, null, this.DrawingDocument, this, null);
+                    Drawing = new AscCommon.ParaDrawing( W, H, null, this.DrawingDocument, this, null);
                     var Image = this.DrawingObjects.createImage(Img, 0, 0, W, H);
                     Image.setParent(Drawing);
                     Drawing.Set_GraphicObject(Image);
                 }
                 else
                 {
-                    Drawing = new ParaDrawing( W, H, null, this.DrawingDocument, this, null);
+                    Drawing = new AscCommon.ParaDrawing( W, H, null, this.DrawingDocument, this, null);
                     var Image = this.DrawingObjects.getChartSpace2(Chart,null);
                     Image.setParent(Drawing);
                     Drawing.Set_GraphicObject(Image);
@@ -2314,8 +2314,8 @@ CDocumentContent.prototype =
                 }
                 if ( true === bFlow )
                 {
-                    Drawing.Set_DrawingType( drawing_Anchor );
-                    Drawing.Set_WrappingType( WRAPPING_TYPE_SQUARE );
+                    Drawing.Set_DrawingType( AscCommon.drawing_Anchor );
+                    Drawing.Set_WrappingType( AscCommon.WRAPPING_TYPE_SQUARE );
                     Drawing.Set_BehindDoc( false );
                     Drawing.Set_Distance( 3.2, 0, 3.2, 0 );
                     Drawing.Set_PositionH(Asc.c_oAscRelativeFromH.Column, false, 0, false);
@@ -2340,12 +2340,12 @@ CDocumentContent.prototype =
             var Item = this.Content[this.CurPos.ContentPos];
             if ( type_Paragraph == Item.GetType() )
             {
-                var  Drawing = new ParaDrawing( 1828800/36000, 1828800/36000, null, this.DrawingDocument, this, null);
+                var  Drawing = new AscCommon.ParaDrawing( 1828800/36000, 1828800/36000, null, this.DrawingDocument, this, null);
                 var TextArt = this.DrawingObjects.createTextArt(nStyle, true);
                 TextArt.setParent(Drawing);
                 Drawing.Set_GraphicObject(TextArt);
-                Drawing.Set_DrawingType( drawing_Anchor );
-                Drawing.Set_WrappingType( WRAPPING_TYPE_NONE );
+                Drawing.Set_DrawingType( AscCommon.drawing_Anchor );
+                Drawing.Set_WrappingType( AscCommon.WRAPPING_TYPE_NONE );
                 Drawing.Set_BehindDoc( false );
                 Drawing.Set_Distance( 3.2, 0, 3.2, 0 );
                 Drawing.Set_PositionH(Asc.c_oAscRelativeFromH.Column, false, 0, false);
@@ -2460,7 +2460,7 @@ CDocumentContent.prototype =
     {
         if ( true === this.ApplyToAll )
         {
-            if ( para_TextPr === ParaItem.Type )
+            if ( AscCommon.para_TextPr === ParaItem.Type )
             {
                 for ( var Index = 0; Index < this.Content.length; Index++ )
                 {
@@ -2485,19 +2485,19 @@ CDocumentContent.prototype =
                 var Type = ParaItem.Get_Type();
                 switch ( Type )
                 {
-                    case para_Math:
-                    case para_NewLine:
-                    case para_Text:
-                    case para_Space:
-                    case para_Tab:
-                    case para_PageNum:
+                    case AscCommon.para_Math:
+                    case AscCommon.para_NewLine:
+                    case AscCommon.para_Text:
+                    case AscCommon.para_Space:
+                    case AscCommon.para_Tab:
+                    case AscCommon.para_PageNum:
                     {
                         // Если у нас что-то заселекчено и мы вводим текст или пробел
                         // и т.д., тогда сначала удаляем весь селект.
                         this.Remove(1, true, false, true);
                         break;
                     }
-                    case para_TextPr:
+                    case AscCommon.para_TextPr:
                     {
                         switch( this.Selection.Flag )
                         {
@@ -2582,7 +2582,7 @@ CDocumentContent.prototype =
             var Item = this.Content[this.CurPos.ContentPos];
             var ItemType = Item.GetType();
 
-            if (para_NewLine === ParaItem.Type && true === ParaItem.Is_PageOrColumnBreak())
+            if (AscCommon.para_NewLine === ParaItem.Type && true === ParaItem.Is_PageOrColumnBreak())
             {
                 if ( type_Paragraph === ItemType )
                 {
@@ -2624,7 +2624,7 @@ CDocumentContent.prototype =
 
                 if ( false != bRecalculate )
                 {
-                    if ( para_TextPr === ParaItem.Type && false === ParaItem.Value.Check_NeedRecalc() )
+                    if ( AscCommon.para_TextPr === ParaItem.Type && false === ParaItem.Value.Check_NeedRecalc() )
                     {
                         // Просто перерисовываем нужные страницы
                         var StartPage = Item.Get_StartPage_Absolute();
@@ -4183,7 +4183,7 @@ CDocumentContent.prototype =
         var Para = NearPos.Paragraph;
         var ParaNearPos = Para.Get_ParaNearestPos(NearPos);
         var LastClass = ParaNearPos.Classes[ParaNearPos.Classes.length - 1];
-        if (para_Math_Run === LastClass.Type)
+        if (AscCommon.para_Math_Run === LastClass.Type)
         {
             var MathRun        = LastClass;
             var NewMathRun     = MathRun.Split(ParaNearPos.NearPos.ContentPos, ParaNearPos.Classes.length - 1);
@@ -4194,7 +4194,7 @@ CDocumentContent.prototype =
             var InsertMathContent = null;
             for (var nPos = 0, nParaLen = Element.Content.length; nPos < nParaLen; nPos++)
             {
-                if (para_Math === Element.Content[nPos].Type)
+                if (AscCommon.para_Math === Element.Content[nPos].Type)
                 {
                     InsertMathContent = Element.Content[nPos];
                     break;
@@ -4207,7 +4207,7 @@ CDocumentContent.prototype =
                 MathContent.Insert_MathContent(InsertMathContent.Root, MathContentPos + 1, true);
             }
         }
-        else if (para_Run === LastClass.Type)
+        else if (AscCommon.para_Run === LastClass.Type)
         {
             var Elements = SelectedContent.Elements;
 
@@ -5836,7 +5836,7 @@ CDocumentContent.prototype =
 
                 if (undefined !== this.LogicDocument && true === this.LogicDocument.UseTextShd && StartPos === EndPos && type_Paragraph === this.Content[StartPos].GetType() && false === this.Content[StartPos].Selection_CheckParaEnd() && selectionflag_Common === this.Selection.Flag)
                 {
-                    this.Paragraph_Add( new ParaTextPr( { Shd : Shd } ) );
+                    this.Paragraph_Add( new AscCommon.ParaTextPr( { Shd : Shd } ) );
                     this.Parent.OnContentRecalculate( false );
                 }
                 else
@@ -6560,7 +6560,7 @@ CDocumentContent.prototype =
                         var NewFontSize = FontSize_IncreaseDecreaseValue(bIncrease, OldFontSize);
                         var TextPr = new AscCommon.CTextPr();
                         TextPr.FontSize = NewFontSize;
-                        this.Paragraph_Add(new ParaTextPr(TextPr), true);
+                        this.Paragraph_Add(new AscCommon.ParaTextPr(TextPr), true);
 
                         this.Recalculate();
                         break;

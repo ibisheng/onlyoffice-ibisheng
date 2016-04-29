@@ -421,7 +421,7 @@
         var nW = private_EMU2MM(nWidth);
         var nH = private_EMU2MM(nHeight);
 
-        var oDrawing = new ParaDrawing(nW, nH, null, private_GetDrawingDocument(), private_GetLogicDocument(), null);
+        var oDrawing = new AscCommon.ParaDrawing(nW, nH, null, private_GetDrawingDocument(), private_GetLogicDocument(), null);
         var oImage = private_GetLogicDocument().DrawingObjects.createImage("", 0, 0, nW, nH);
         oImage.setParent(oDrawing);
         oDrawing.Set_GraphicObject(oImage);
@@ -441,7 +441,7 @@
         var nW = private_EMU2MM(nWidth);
         var nH = private_EMU2MM(nHeight);
 
-        var oDrawing = new ParaDrawing(nW, nH, null, private_GetDrawingDocument(), private_GetLogicDocument(), null);
+        var oDrawing = new AscCommon.ParaDrawing(nW, nH, null, private_GetDrawingDocument(), private_GetLogicDocument(), null);
         var oImage = private_GetLogicDocument().DrawingObjects.createImage(sImageSrc, 0, 0, nW, nH);
         oImage.setParent(oDrawing);
         oDrawing.Set_GraphicObject(oImage);
@@ -462,7 +462,7 @@
         var oDrawingDocuemnt = private_GetDrawingDocument();
         var nW = private_EMU2MM(nWidth);
         var nH = private_EMU2MM(nHeight);
-        var oDrawing = new ParaDrawing(nW, nH, null, oDrawingDocuemnt, oLogicDocument, null);
+        var oDrawing = new AscCommon.ParaDrawing(nW, nH, null, oDrawingDocuemnt, oLogicDocument, null);
         var oShapeTrack = new AscFormat.NewShapeTrack(sType, 0, 0, oLogicDocument.theme, null, null, null, 0);
         oShapeTrack.track({}, nW, nH);
         var oShape = oShapeTrack.getShape(true, oDrawingDocuemnt, null);
@@ -614,7 +614,7 @@
             aAscSeries.push(oAscSeries);
         }
         var chartSeries = {series: aAscSeries, parsedHeaders: {bLeft: true, bTop: true}};
-        var oDrawing = new ParaDrawing( nW, nH, null, oDrawingDocument, this, null);
+        var oDrawing = new AscCommon.ParaDrawing( nW, nH, null, oDrawingDocument, this, null);
         var oChartSpace = AscFormat.DrawingObjectsController.prototype._getChartSpace(chartSeries, settings, true);
         oChartSpace.setParent(oDrawing);
         oDrawing.Set_GraphicObject(oChartSpace);
@@ -908,9 +908,9 @@
         {
             var nChar = sText.charAt(nPos);
             if (" " == nChar)
-                oRun.Add_ToContent(nPos, new ParaSpace(), false);
+                oRun.Add_ToContent(nPos, new AscCommon.ParaSpace(), false);
             else
-                oRun.Add_ToContent(nPos, new ParaText(nChar), false);
+                oRun.Add_ToContent(nPos, new AscCommon.ParaText(nChar), false);
         }
 
         private_PushElementToParagraph(this.Paragraph, oRun);
@@ -923,7 +923,7 @@
     ApiParagraph.prototype.AddPageBreak = function()
     {
         var oRun = new ParaRun(this.Paragraph, false);
-        oRun.Add_ToContent(0, new ParaNewLine(break_Page));
+        oRun.Add_ToContent(0, new AscCommon.ParaNewLine(AscCommon.break_Page));
         private_PushElementToParagraph(this.Paragraph, oRun);
         return new ApiRun(oRun);
     };
@@ -934,7 +934,7 @@
     ApiParagraph.prototype.AddLineBreak = function()
     {
         var oRun = new ParaRun(this.Paragraph, false);
-        oRun.Add_ToContent(0, new ParaNewLine(break_Line));
+        oRun.Add_ToContent(0, new AscCommon.ParaNewLine(AscCommon.break_Line));
         private_PushElementToParagraph(this.Paragraph, oRun);
         return new ApiRun(oRun);
     };
@@ -945,7 +945,7 @@
     ApiParagraph.prototype.AddColumnBreak = function()
     {
         var oRun = new ParaRun(this.Paragraph, false);
-        oRun.Add_ToContent(0, new ParaNewLine(break_Column));
+        oRun.Add_ToContent(0, new AscCommon.ParaNewLine(AscCommon.break_Column));
         private_PushElementToParagraph(this.Paragraph, oRun);
         return new ApiRun(oRun);
     };
@@ -1072,7 +1072,7 @@
     ApiParagraph.prototype.AddTabStop = function()
     {
         var oRun = new ParaRun(this.Paragraph, false);
-        oRun.Add_ToContent(0, new ParaTab());
+        oRun.Add_ToContent(0, new AscCommon.ParaTab());
         private_PushElementToParagraph(this.Paragraph, oRun);
         return new ApiRun(oRun);
     };
@@ -1137,9 +1137,9 @@
         {
             var nChar = sText.charAt(nPos);
             if (" " == nChar)
-                this.Run.Add_ToContent(nLastPos + nPos, new ParaSpace(), false);
+                this.Run.Add_ToContent(nLastPos + nPos, new AscCommon.ParaSpace(), false);
             else
-                this.Run.Add_ToContent(nLastPos + nPos, new ParaText(nChar), false);
+                this.Run.Add_ToContent(nLastPos + nPos, new AscCommon.ParaText(nChar), false);
         }
     };
     /**
@@ -1147,28 +1147,28 @@
      */
     ApiRun.prototype.AddPageBreak = function()
     {
-        this.Run.Add_ToContent(this.Run.Content.length, new ParaNewLine(break_Page));
+        this.Run.Add_ToContent(this.Run.Content.length, new AscCommon.ParaNewLine(AscCommon.break_Page));
     };
     /**
      * Add a line break.
      */
     ApiRun.prototype.AddLineBreak = function()
     {
-        this.Run.Add_ToContent(this.Run.Content.length, new ParaNewLine(break_Line));
+        this.Run.Add_ToContent(this.Run.Content.length, new AscCommon.ParaNewLine(AscCommon.break_Line));
     };
     /**
      * Add a column break.
      */
     ApiRun.prototype.AddColumnBreak = function()
     {
-        this.Run.Add_ToContent(this.Run.Content.length, new ParaNewLine(break_Column));
+        this.Run.Add_ToContent(this.Run.Content.length, new AscCommon.ParaNewLine(AscCommon.break_Column));
     };
     /**
      * Add a tab stop.
      */
     ApiRun.prototype.AddTabStop = function()
     {
-        this.Run.Add_ToContent(this.Run.Content.length, new ParaTab());
+        this.Run.Add_ToContent(this.Run.Content.length, new AscCommon.ParaTab());
     };
     /**
      * Add a drawing.
@@ -3138,44 +3138,44 @@
     {
         if ("inline" === sType)
         {
-            this.Drawing.Set_DrawingType(drawing_Inline);
-            this.Drawing.Set_WrappingType(WRAPPING_TYPE_NONE);
+            this.Drawing.Set_DrawingType(AscCommon.drawing_Inline);
+            this.Drawing.Set_WrappingType(AscCommon.WRAPPING_TYPE_NONE);
             this.Drawing.Set_BehindDoc(false);
         }
         else if ("square" === sType)
         {
-            this.Drawing.Set_DrawingType(drawing_Anchor);
-            this.Drawing.Set_WrappingType(WRAPPING_TYPE_SQUARE);
+            this.Drawing.Set_DrawingType(AscCommon.drawing_Anchor);
+            this.Drawing.Set_WrappingType(AscCommon.WRAPPING_TYPE_SQUARE);
             this.Drawing.Set_BehindDoc(false);
         }
         else if ("tight" === sType)
         {
-            this.Drawing.Set_DrawingType(drawing_Anchor);
-            this.Drawing.Set_WrappingType(WRAPPING_TYPE_TIGHT);
+            this.Drawing.Set_DrawingType(AscCommon.drawing_Anchor);
+            this.Drawing.Set_WrappingType(AscCommon.WRAPPING_TYPE_TIGHT);
             this.Drawing.Set_BehindDoc(false);
         }
         else if ("through" === sType)
         {
-            this.Drawing.Set_DrawingType(drawing_Anchor);
-            this.Drawing.Set_WrappingType(WRAPPING_TYPE_THROUGH);
+            this.Drawing.Set_DrawingType(AscCommon.drawing_Anchor);
+            this.Drawing.Set_WrappingType(AscCommon.WRAPPING_TYPE_THROUGH);
             this.Drawing.Set_BehindDoc(false);
         }
         else if ("topAndBottom" === sType)
         {
-            this.Drawing.Set_DrawingType(drawing_Anchor);
-            this.Drawing.Set_WrappingType(WRAPPING_TYPE_TOP_AND_BOTTOM);
+            this.Drawing.Set_DrawingType(AscCommon.drawing_Anchor);
+            this.Drawing.Set_WrappingType(AscCommon.WRAPPING_TYPE_TOP_AND_BOTTOM);
             this.Drawing.Set_BehindDoc(false);
         }
         else if ("behind" === sType)
         {
-            this.Drawing.Set_DrawingType(drawing_Anchor);
-            this.Drawing.Set_WrappingType(WRAPPING_TYPE_NONE);
+            this.Drawing.Set_DrawingType(AscCommon.drawing_Anchor);
+            this.Drawing.Set_WrappingType(AscCommon.WRAPPING_TYPE_NONE);
             this.Drawing.Set_BehindDoc(true);
         }
         else if ("inFront" === sType)
         {
-            this.Drawing.Set_DrawingType(drawing_Anchor);
-            this.Drawing.Set_WrappingType(WRAPPING_TYPE_NONE);
+            this.Drawing.Set_DrawingType(AscCommon.drawing_Anchor);
+            this.Drawing.Set_WrappingType(AscCommon.WRAPPING_TYPE_NONE);
             this.Drawing.Set_BehindDoc(false);
         }
 
@@ -3647,15 +3647,15 @@
 
     function private_GetTabStop(nPos, sValue)
     {
-        var nType = tab_Left;
+        var nType = AscCommon.tab_Left;
         if ("left" === sValue)
-            nType = tab_Left;
+            nType = AscCommon.tab_Left;
         else if ("right" === sValue)
-            nType = tab_Right;
+            nType = AscCommon.tab_Right;
         else if ("clear" === sValue)
-            nType = tab_Clear;
+            nType = AscCommon.tab_Clear;
         else if ("center" === sValue)
-            nType = tab_Center;
+            nType = AscCommon.tab_Center;
 
         return new AscCommon.CParaTab(nType, private_Twips2MM(nPos));
     }

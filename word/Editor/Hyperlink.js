@@ -14,7 +14,7 @@ function ParaHyperlink()
 
     this.Id = AscCommon.g_oIdCounter.Get_NewId();
 
-    this.Type    = para_Hyperlink;
+    this.Type    = AscCommon.para_Hyperlink;
     this.Value   = "";
     this.Visited = false;
     this.ToolTip = "";
@@ -48,7 +48,7 @@ ParaHyperlink.prototype.Get_SelectedElementsInfo = function(Info)
 
 ParaHyperlink.prototype.Add_ToContent = function(Pos, Item, UpdatePosition)
 {
-    if (para_Hyperlink === Item.Type)
+    if (AscCommon.para_Hyperlink === Item.Type)
     {
         // При добавлении гиперссылки в гиперссылку мы добавляем контент гиперссылки, а не ее целиком
         for (var ItemPos = 0, Count = Item.Content.length; ItemPos < Count; ItemPos++)
@@ -77,8 +77,8 @@ ParaHyperlink.prototype.Add = function(Item)
 {
     switch (Item.Type)
     {
-        case para_Run  :
-        case para_Field:
+        case AscCommon.para_Run  :
+        case AscCommon.para_Field:
         {
             var TextPr = this.Get_FirstTextPr();
             Item.Select_All();
@@ -87,7 +87,7 @@ ParaHyperlink.prototype.Add = function(Item)
 
             var CurPos = this.State.ContentPos;
             var CurItem = this.Content[CurPos];
-            if (para_Run === CurItem.Type || para_Math === CurItem.Type)
+            if (AscCommon.para_Run === CurItem.Type || AscCommon.para_Math === CurItem.Type)
             {
                 var ContentPos = new AscCommon.CParagraphContentPos();
                 this.Content[CurPos].Get_ParaContentPos(false, false, ContentPos);
@@ -100,7 +100,7 @@ ParaHyperlink.prototype.Add = function(Item)
 
                 this.Add_ToContent(CurPos + 1, Item);
 
-                if (para_Field === Item.Type)
+                if (AscCommon.para_Field === Item.Type)
                 {
                     this.State.ContentPos = CurPos + 2;
                     this.Content[this.State.ContentPos].Cursor_MoveToStartPos(false);
@@ -116,14 +116,14 @@ ParaHyperlink.prototype.Add = function(Item)
 
             break;
         }
-        case para_Math :
+        case AscCommon.para_Math :
         {
             var ContentPos = new AscCommon.CParagraphContentPos();
             this.Get_ParaContentPos(false, false, ContentPos);
             var CurPos = ContentPos.Get(0);
 
             // Ран формула делит на части, а в остальные элементы добавляется целиком
-            if (para_Run === this.Content[CurPos].Type)
+            if (AscCommon.para_Run === this.Content[CurPos].Type)
             {
                 // Разделяем текущий элемент (возвращается правая часть)
                 var NewElement = this.Content[CurPos].Split(ContentPos, 1);
@@ -145,7 +145,7 @@ ParaHyperlink.prototype.Add = function(Item)
 
             break;
         }
-        case para_Hyperlink:
+        case AscCommon.para_Hyperlink:
         {
             // Вместо добавления самого элемента добавляем его содержимое
             var Count = Item.Content.length;
@@ -193,7 +193,7 @@ ParaHyperlink.prototype.Clear_TextPr = function()
         var Item = this.Content[Index];
         Item.Clear_TextPr();
 
-        if ( para_Run === Item.Type && null !== HyperlinkStyle )
+        if ( AscCommon.para_Run === Item.Type && null !== HyperlinkStyle )
             Item.Set_RStyle( HyperlinkStyle );
     }
 };
@@ -207,7 +207,7 @@ ParaHyperlink.prototype.Clear_TextFormatting = function( DefHyper )
         var Item = this.Content[Pos];
         Item.Clear_TextFormatting(DefHyper);
 
-        if (para_Run === Item.Type && null !== DefHyper && undefined !== DefHyper)
+        if (AscCommon.para_Run === Item.Type && null !== DefHyper && undefined !== DefHyper)
             Item.Set_RStyle(DefHyper);
     }
 };

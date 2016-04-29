@@ -1002,7 +1002,7 @@ CShape.prototype.setStartPage = function(pageIndex, bNoResetSelectPage, bCheckCo
             if(this.bWordShape && this.checkContentByCallback && this.checkContentByCallback(content,
                 function(oRun){
                     for(var i = 0; i < oRun.Content.length; ++i){
-                        if(oRun.Content[i].Type === para_PageNum){
+                        if(oRun.Content[i].Type === AscCommon.para_PageNum){
                             return true;
                         }
                     }

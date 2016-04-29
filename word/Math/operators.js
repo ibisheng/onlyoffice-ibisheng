@@ -4116,7 +4116,7 @@ CCharacter.prototype.setPosition = function(pos, PosInfo)
 
     this.operator.setPosition(PosOper);
 
-    if(Base.Type == para_Math_Content)
+    if(Base.Type == AscCommon.para_Math_Content)
         PosBase.y += Base.size.ascent;
 
     Base.setPosition(PosBase, PosInfo);

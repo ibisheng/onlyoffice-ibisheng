@@ -899,11 +899,11 @@ CGraphicFrame.prototype =
     {
         if(tableFunction === CTable.prototype.Paragraph_Add)
         {
-            if((args[0].Type === para_NewLine
-                || args[0].Type === para_Text
-                || args[0].Type === para_Space
-                || args[0].Type === para_Tab
-                || args[0].Type === para_PageNum)
+            if((args[0].Type === AscCommon.para_NewLine
+                || args[0].Type === AscCommon.para_Text
+                || args[0].Type === AscCommon.para_Space
+                || args[0].Type === AscCommon.para_Tab
+                || args[0].Type === AscCommon.para_PageNum)
                 && this.graphicObject.Selection.Use)
             {
                 this.graphicObject.Remove(1, true, undefined, true);

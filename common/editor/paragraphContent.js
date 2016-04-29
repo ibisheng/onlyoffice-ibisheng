@@ -1,5 +1,7 @@
 "use strict";
 
+(function(window, undefined){
+
 // Содержимое параграфа должно иметь:
 //
 // 1. Type    - тип
@@ -74,9 +76,6 @@ var break_Page   = 0x02;
 var break_Column = 0x03;
 
 var nbsp_charcode = 0x00A0;
-
-var nbsp_string = String.fromCharCode( 0x00A0 );
-var   sp_string = String.fromCharCode( 0x0032 );
 
 var g_aPunctuation =
     [
@@ -7474,3 +7473,81 @@ function ParagraphContent_Read_FromBinary(Reader)
 
     return Element;
 }
+
+    //--------------------------------------------------------export----------------------------------------------------
+    window['AscCommon'] = window['AscCommon'] || {};
+    window["AscCommon"].ParaText = ParaText;
+    window["AscCommon"].ParaSpace = ParaSpace;
+    window["AscCommon"].ParaTextPr = ParaTextPr;
+    window["AscCommon"].ParaEnd = ParaEnd;
+    window["AscCommon"].ParaNewLine = ParaNewLine;
+    window["AscCommon"].ParaNumbering = ParaNumbering;
+    window["AscCommon"].ParaTab = ParaTab;
+    window["AscCommon"].CParagraphLayout = CParagraphLayout;
+    window["AscCommon"].ParaDrawing = ParaDrawing;
+    window["AscCommon"].ParaPageNum = ParaPageNum;
+    window["AscCommon"].ParaPresentationNumbering = ParaPresentationNumbering;
+    window["AscCommon"].ParagraphContent_Read_FromBinary = ParagraphContent_Read_FromBinary;
+
+    window["AscCommon"].para_Unknown = para_Unknown;
+    window["AscCommon"].para_Empty = para_Empty;
+    window["AscCommon"].para_Text = para_Text;
+    window["AscCommon"].para_Space = para_Space;
+    window["AscCommon"].para_TextPr = para_TextPr;
+    window["AscCommon"].para_End = para_End;
+    window["AscCommon"].para_NewLine = para_NewLine;
+    window["AscCommon"].para_NewLineRendered = para_NewLineRendered;
+    window["AscCommon"].para_InlineBreak = para_InlineBreak;
+    window["AscCommon"].para_PageBreakRendered = para_PageBreakRendered;
+    window["AscCommon"].para_Numbering = para_Numbering;
+    window["AscCommon"].para_Tab = para_Tab;
+    window["AscCommon"].para_Drawing = para_Drawing;
+    window["AscCommon"].para_PageNum = para_PageNum;
+    window["AscCommon"].para_FlowObjectAnchor = para_FlowObjectAnchor;
+    window["AscCommon"].para_HyperlinkStart = para_HyperlinkStart;
+    window["AscCommon"].para_HyperlinkEnd = para_HyperlinkEnd;
+    window["AscCommon"].para_CollaborativeChangesStart = para_CollaborativeChangesStart;
+    window["AscCommon"].para_CollaborativeChangesEnd = para_CollaborativeChangesEnd;
+    window["AscCommon"].para_CommentStart = para_CommentStart;
+    window["AscCommon"].para_CommentEnd = para_CommentEnd;
+    window["AscCommon"].para_PresentationNumbering = para_PresentationNumbering;
+    window["AscCommon"].para_Math = para_Math;
+    window["AscCommon"].para_Run = para_Run;
+    window["AscCommon"].para_Sym = para_Sym;
+    window["AscCommon"].para_Comment = para_Comment;
+    window["AscCommon"].para_Hyperlink = para_Hyperlink;
+    window["AscCommon"].para_Math_Run = para_Math_Run;
+    window["AscCommon"].para_Math_Placeholder = para_Math_Placeholder;
+    window["AscCommon"].para_Math_Composition = para_Math_Composition;
+    window["AscCommon"].para_Math_Text = para_Math_Text;
+    window["AscCommon"].para_Math_Ampersand = para_Math_Ampersand;
+    window["AscCommon"].para_Field = para_Field;
+    window["AscCommon"].para_Math_BreakOperator = para_Math_BreakOperator;
+    window["AscCommon"].para_Math_Content = para_Math_Content;
+
+    window["AscCommon"].break_Line = break_Line;
+    window["AscCommon"].break_Page = break_Page;
+    window["AscCommon"].break_Column = break_Column;
+
+    window["AscCommon"].g_aPunctuation = g_aPunctuation;
+
+    window["AscCommon"].PARATEXT_FLAGS_SPACEAFTER = PARATEXT_FLAGS_SPACEAFTER;
+
+    window["AscCommon"].TEXTWIDTH_DIVIDER = TEXTWIDTH_DIVIDER;
+
+    window["AscCommon"].tab_Clear = tab_Clear;
+    window["AscCommon"].tab_Left = tab_Left;
+    window["AscCommon"].tab_Right = tab_Right;
+    window["AscCommon"].tab_Center = tab_Center;
+    
+    window["AscCommon"].tab_Symbol = tab_Symbol;
+
+    window["AscCommon"].drawing_Inline = drawing_Inline;
+    window["AscCommon"].drawing_Anchor = drawing_Anchor;
+    
+    window["AscCommon"].WRAPPING_TYPE_NONE = WRAPPING_TYPE_NONE;
+    window["AscCommon"].WRAPPING_TYPE_SQUARE = WRAPPING_TYPE_SQUARE;
+    window["AscCommon"].WRAPPING_TYPE_THROUGH = WRAPPING_TYPE_THROUGH;
+    window["AscCommon"].WRAPPING_TYPE_TIGHT = WRAPPING_TYPE_TIGHT;
+    window["AscCommon"].WRAPPING_TYPE_TOP_AND_BOTTOM = WRAPPING_TYPE_TOP_AND_BOTTOM;
+})(window);

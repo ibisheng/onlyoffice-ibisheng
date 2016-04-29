@@ -467,7 +467,7 @@ Paragraph.prototype.private_RecalculateFastRange       = function(CurRange, CurL
     {
         var Item = this.Content[Pos];
 
-        if ( para_Math === Item.Type )
+        if ( AscCommon.para_Math === Item.Type )
         {
             // TODO: Надо бы перенести эту проверку на изменение контента параграфа
             Item.Set_Inline(true === this.Check_MathPara(Pos)? false : true);
@@ -1558,7 +1558,7 @@ Paragraph.prototype.private_RecalculateLineEnd         = function(CurLine, CurPa
 
         // Если у нас нумерация относится к знаку конца параграфа, тогда в такой
         // ситуации не рисуем нумерацию у такого параграфа.
-        if (para_End === this.Numbering.Item.Type && this.Lines[CurLine].Info & paralineinfo_BreakPage)
+        if (AscCommon.para_End === this.Numbering.Item.Type && this.Lines[CurLine].Info & paralineinfo_BreakPage)
         {
             this.Numbering.Item  = null;
             this.Numbering.Run   = null;
@@ -1809,7 +1809,7 @@ Paragraph.prototype.private_RecalculateRange           = function(CurRange, CurL
     {
         var Item = this.Content[Pos];
 
-        if ( para_Math === Item.Type )
+        if ( AscCommon.para_Math === Item.Type )
         {
             var NotInlineMath = this.Check_MathPara(Pos);
             if (true === NotInlineMath && true !== PRS.EmptyLine)
@@ -1889,16 +1889,16 @@ Paragraph.prototype.private_RecalculateGetTabPos = function(X, ParaPr, CurPage, 
 
         if ( true === bCheckLeft && TabPos > PageStart.X + ParaPr.Ind.Left )
         {
-            TabsPos.push( new AscCommon.CParaTab(tab_Left, ParaPr.Ind.Left ) );
+            TabsPos.push( new AscCommon.CParaTab(AscCommon.tab_Left, ParaPr.Ind.Left ) );
             bCheckLeft = false;
         }
 
-        if ( tab_Clear != Tab.Value )
+        if ( AscCommon.tab_Clear != Tab.Value )
             TabsPos.push( Tab );
     }
 
     if ( true === bCheckLeft )
-        TabsPos.push( new AscCommon.CParaTab(tab_Left, ParaPr.Ind.Left ) );
+        TabsPos.push( new AscCommon.CParaTab(AscCommon.tab_Left, ParaPr.Ind.Left ) );
 
     TabsCount = TabsPos.length;
 
@@ -1947,7 +1947,7 @@ Paragraph.prototype.private_RecalculateGetTabPos = function(X, ParaPr, CurPage, 
         NewX = Tab.Pos + PageStart.X;
     }
 
-    return { NewX : NewX, TabValue : ( null === Tab ? tab_Left : Tab.Value ), DefaultTab : (null === Tab ? true : false) };
+    return { NewX : NewX, TabValue : ( null === Tab ? AscCommon.tab_Left : Tab.Value ), DefaultTab : (null === Tab ? true : false) };
 };
 
 Paragraph.prototype.private_CheckSkipKeepLinesAndWidowControl = function(CurPage)
@@ -2650,7 +2650,7 @@ CParagraphRecalculateStateWrap.prototype =
         var NumberingItem = Para.Numbering;
         var NumberingType = Para.Numbering.Type;
 
-        if ( para_Numbering === NumberingType )
+        if ( AscCommon.para_Numbering === NumberingType )
         {
             var NumPr = ParaPr.NumPr;
             if ( undefined === NumPr || undefined === NumPr.NumId || 0 === NumPr.NumId || "0" === NumPr.NumId || ( undefined !== Para.Get_SectionPr() && true === Para.IsEmpty() ) )
@@ -2737,7 +2737,7 @@ CParagraphRecalculateStateWrap.prototype =
                 X += NumberingItem.WidthSuff;
             }
         }
-        else if ( para_PresentationNumbering === NumberingType )
+        else if ( AscCommon.para_PresentationNumbering === NumberingType )
         {
             var Level = Para.PresentationPr.Level;
             var Bullet = Para.PresentationPr.Bullet;

@@ -464,7 +464,7 @@ CTextBody.prototype =
             var item = parg.Content[r];
             switch(item.Type)
             {
-                case para_Run:
+                case AscCommon.para_Run:
                 {
                     if(AscFormat.isRealNumber(item.Pr.FontSize))
                     {
@@ -476,7 +476,7 @@ CTextBody.prototype =
                 }
                     break;
                 }
-                case para_Hyperlink:
+                case AscCommon.para_Hyperlink:
                 {
                     this.checkParagraphContent(item, fontScale, false, paragrRedFontSize);
                     break;

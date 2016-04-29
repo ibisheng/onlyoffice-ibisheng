@@ -203,7 +203,7 @@ CWrapPolygon.prototype =
         var nWrapType, nWrapSide;
         if(bMathWrap === true)
         {
-            nWrapType = WRAPPING_TYPE_SQUARE;
+            nWrapType = AscCommon.WRAPPING_TYPE_SQUARE;
 			nWrapSide = WRAP_TEXT_SIDE_BOTH_SIDES;
         }
         else
@@ -213,17 +213,17 @@ CWrapPolygon.prototype =
         }
         switch(nWrapType)
         {
-            case WRAPPING_TYPE_NONE:
+            case AscCommon.WRAPPING_TYPE_NONE:
             {
                 return ret;
             }
-            case WRAPPING_TYPE_SQUARE:
+            case AscCommon.WRAPPING_TYPE_SQUARE:
             {
                 switch(nWrapSide)
                 {
                     case WRAP_TEXT_SIDE_BOTH_SIDES:
                     {
-                        if(this.wordGraphicObject.wrappingType === WRAPPING_TYPE_THROUGH || this.wordGraphicObject.wrappingType === WRAPPING_TYPE_TIGHT)
+                        if(this.wordGraphicObject.wrappingType === AscCommon.WRAPPING_TYPE_THROUGH || this.wordGraphicObject.wrappingType === AscCommon.WRAPPING_TYPE_TIGHT)
                         {
                             var oDistanse = this.wordGraphicObject.Get_Distance();
                             ret2.push({X0: this.left + oDistanse.L, X1: this.right - oDistanse.R, Y1: this.bottom});
@@ -272,8 +272,8 @@ CWrapPolygon.prototype =
                 ret2.push({X0: x0, X1: x1, Y1: this.bottom});
                 break;
             }
-            case WRAPPING_TYPE_THROUGH:
-            case WRAPPING_TYPE_TIGHT:
+            case AscCommon.WRAPPING_TYPE_THROUGH:
+            case AscCommon.WRAPPING_TYPE_TIGHT:
             {
 
                 var intersection_top = this.getIntersection(y0);
@@ -374,9 +374,9 @@ CWrapPolygon.prototype =
             }
         }
         ret2.sort(function(a, b){return a.X0 - b.X0});
-        if(ret2.length > 0 &&  (nWrapType === WRAPPING_TYPE_SQUARE || nWrapType === WRAPPING_TYPE_TIGHT || nWrapType === WRAPPING_TYPE_THROUGH))
+        if(ret2.length > 0 &&  (nWrapType === AscCommon.WRAPPING_TYPE_SQUARE || nWrapType === AscCommon.WRAPPING_TYPE_TIGHT || nWrapType === AscCommon.WRAPPING_TYPE_THROUGH))
         {
-            var dx = nWrapType === WRAPPING_TYPE_SQUARE ? 6.35 : 3.175 ;
+            var dx = nWrapType === AscCommon.WRAPPING_TYPE_SQUARE ? 6.35 : 3.175 ;
             if(ret2[0].X0  < LeftField + dx)
             {
                 ret2[0].X0 = x0 ;
@@ -974,10 +974,10 @@ CWrapManager.prototype =
             var int0 = arr_intervals[s];
             var int1 = arr_intervals[s+1];
             var dist;
-            if(int0.typeRight === WRAPPING_TYPE_SQUARE || int0.typeRight === WRAPPING_TYPE_TIGHT || int0.typeRight === WRAPPING_TYPE_THROUGH
-                || int1.typeLeft === WRAPPING_TYPE_SQUARE || int1.typeLeft === WRAPPING_TYPE_TIGHT || int1.typeLeft === WRAPPING_TYPE_THROUGH || bMathWrap === true)
+            if(int0.typeRight === AscCommon.WRAPPING_TYPE_SQUARE || int0.typeRight === AscCommon.WRAPPING_TYPE_TIGHT || int0.typeRight === AscCommon.WRAPPING_TYPE_THROUGH
+                || int1.typeLeft === AscCommon.WRAPPING_TYPE_SQUARE || int1.typeLeft === AscCommon.WRAPPING_TYPE_TIGHT || int1.typeLeft === AscCommon.WRAPPING_TYPE_THROUGH || bMathWrap === true)
             {
-                dist = (int0.typeRight === WRAPPING_TYPE_TIGHT || int0.typeRight === WRAPPING_TYPE_THROUGH) || (int1.typeLeft === WRAPPING_TYPE_TIGHT || int1.typeLeft === WRAPPING_TYPE_THROUGH) ? 3.175 : 6.35;
+                dist = (int0.typeRight === AscCommon.WRAPPING_TYPE_TIGHT || int0.typeRight === AscCommon.WRAPPING_TYPE_THROUGH) || (int1.typeLeft === AscCommon.WRAPPING_TYPE_TIGHT || int1.typeLeft === AscCommon.WRAPPING_TYPE_THROUGH) ? 3.175 : 6.35;
                 var d = arr_intervals[s+1].X0 - arr_intervals[s].X1;
                 if(d > 0 && d < dist)
                 {

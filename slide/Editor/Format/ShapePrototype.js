@@ -665,7 +665,7 @@ CShape.prototype.recalculateContent2 = function()
             if(content_ && content_.Content[0])
             {
                 content.Content[0].Pr  = content_.Content[0].Pr;
-                var para_text_pr = new ParaTextPr(content_.Content[0].Get_FirstRunPr());
+                var para_text_pr = new AscCommon.ParaTextPr(content_.Content[0].Get_FirstRunPr());
                 content.Set_ApplyToAll(true);
                 content.Paragraph_Add(para_text_pr);
                 content.Set_ApplyToAll(false);
