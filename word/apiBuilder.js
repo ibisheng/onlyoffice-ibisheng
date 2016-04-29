@@ -614,7 +614,7 @@
             aAscSeries.push(oAscSeries);
         }
         var chartSeries = {series: aAscSeries, parsedHeaders: {bLeft: true, bTop: true}};
-        var oDrawing = new ParaDrawing( nW, nH, null, oDrawingDocument, this, null);
+        var oDrawing = new AscCommon.ParaDrawing( nW, nH, null, oDrawingDocument, null, null);
         var oChartSpace = AscFormat.DrawingObjectsController.prototype._getChartSpace(chartSeries, settings, true);
         oChartSpace.setParent(oDrawing);
         oDrawing.Set_GraphicObject(oChartSpace);
