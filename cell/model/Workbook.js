@@ -4799,7 +4799,10 @@ Woorksheet.prototype._moveRange=function(oBBoxFrom, oBBoxTo, copyRange){
         sortDependency(this.workbook);
 	}
 	
-	this.autoFilters.unmergeTablesAfterMove( oBBoxTo );
+	if(true == this.workbook.bUndoChanges || true == this.workbook.bRedoChanges)
+	{
+		this.autoFilters.unmergeTablesAfterMove( oBBoxTo );
+	}
 	
 	// ToDo возможно нужно уменьшить диапазон обновления
     History.Add(AscCommonExcel.g_oUndoRedoWorksheet, AscCH.historyitem_Worksheet_MoveRange,
