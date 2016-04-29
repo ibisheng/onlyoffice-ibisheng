@@ -25,7 +25,6 @@
 		"../common/Drawings/WorkEvents.js",
 		
 		"../cell/model/History.js",
-		"../common/editor/document.js",
 		"../common/editor/documentContent.js",
 		
 		"../common/Shapes/EditorSettings.js",
@@ -137,6 +136,7 @@
         "../word/Editor/Sections.js",
         "../word/Editor/Numbering.js",
         "../word/Editor/HeaderFooter.js",
+        "../word/Editor/Document.js",
         "../word/Editor/Table.js",
         "../word/Editor/Table/TableRecalculate.js",
         "../word/Editor/Table/TableDraw.js",

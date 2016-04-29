@@ -25,7 +25,6 @@
 		"../common/Drawings/WorkEvents.js",
 		
 		"../word/Editor/History.js",
-		"../common/editor/document.js",
 		"../common/editor/documentContent.js",
 		
 		"../common/Shapes/EditorSettings.js",
@@ -138,6 +137,7 @@
         "../word/Editor/FlowObjects.js",
         "../word/Editor/Paragraph.js",
         "../word/Editor/Paragraph_Recalculate.js",
+        "../word/Editor/Document.js",
         "../word/Editor/HeaderFooter.js",
         "../word/Editor/Math.js",
         "../word/Editor/Spelling.js",
