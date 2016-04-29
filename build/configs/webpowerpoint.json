@@ -25,11 +25,11 @@
 		"../common/Drawings/WorkEvents.js",
 		
 		"../word/Editor/History.js",
-		"../word/Editor/Styles.js",
-		"../word/Editor/ParagraphContent.js",
-		"../word/Editor/Paragraph.js",
-		"../word/Editor/Document.js",
-		"../word/Editor/DocumentContent.js",
+		"../common/editor/styles.js",
+		"../common/editor/paragraphContent.js",
+		"../common/editor/paragraph.js",
+		"../common/editor/document.js",
+		"../common/editor/documentContent.js",
 		
 		"../common/Shapes/EditorSettings.js",
 		"../common/Shapes/Serialize.js",
