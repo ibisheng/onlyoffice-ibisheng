@@ -264,7 +264,7 @@ CWrapPolygon.prototype =
                 }
                 break;
             }
-            case AscCommon.WRAPPING_TYPE_TOP_AND_BOTTOM:
+            case WRAPPING_TYPE_TOP_AND_BOTTOM:
             {
                 if (this.right < LeftField || this.left > RightField)
                     return ret;

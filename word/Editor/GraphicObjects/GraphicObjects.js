@@ -45,7 +45,7 @@ function CBoundsRectForMath(oDrawing)
                         this.B = oDrawing.wrappingPolygon.bottom - this.Distance.B;
                         break;
                     }
-                    case AscCommon.WRAPPING_TYPE_TOP_AND_BOTTOM:
+                    case WRAPPING_TYPE_TOP_AND_BOTTOM:
                     {
                         var oLimits = editor.WordControl.m_oLogicDocument.Get_PageLimits(oDrawing.PageNum);
                         this.L = oLimits.X;
@@ -77,7 +77,7 @@ function CBoundsRectForMath(oDrawing)
                         this.B = oDrawing.Y + oDrawing.H;
                         break;
                     }
-                    case AscCommon.WRAPPING_TYPE_TOP_AND_BOTTOM:
+                    case WRAPPING_TYPE_TOP_AND_BOTTOM:
                     {
                         var oLimits = editor.WordControl.m_oLogicDocument.Get_PageLimits(oDrawing.PageNum);
                         this.L = oLimits.X;
