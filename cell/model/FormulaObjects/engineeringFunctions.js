@@ -479,7 +479,7 @@ Complex.prototype = {
         return c.toString();
     },
     Cos:function () {
-        if ( i ) {
+        if ( this.img ) {
             var a = Math.cos( this.real ) * Math.cosh( this.img );
             this.img = -( Math.sin( this.real ) * Math.sinh( this.img ) );
             this.real = a;
@@ -501,7 +501,7 @@ Complex.prototype = {
 
         var a = this.real, b = this.img,
             c = comp.real, d = comp.img,
-            f = 1 / (c * c + d * d)
+            f = 1 / (c * c + d * d);
 
         if( Math.abs(f) == Infinity ){
             return new cError( cErrorType.not_numeric );
