@@ -1704,9 +1704,9 @@ CGraphicObjects.prototype =
        //     }
        // );
        // editor.UpdateTextPr(oTextPr);
-        editor.Update_ParaTab(Default_Tab_Stop, new CParaTabs());
-        editor.sync_ParaSpacingLine( new CParaSpacing() );
-        editor.Update_ParaInd(new CParaInd());
+        editor.Update_ParaTab(AscCommon.Default_Tab_Stop, new AscCommon.CParaTabs());
+        editor.sync_ParaSpacingLine( new AscCommon.CParaSpacing() );
+        editor.Update_ParaInd(new AscCommon.CParaInd());
         editor.sync_PrAlignCallBack(null);
         editor.sync_ParaStyleName(null);
         editor.sync_ListType({ Type : -1, SubType : -1 });
@@ -2013,7 +2013,7 @@ CGraphicObjects.prototype =
         {
             ret.Shd.Unifill.check(this.document.theme, this.document.Get_ColorMap());
         }
-        return ret ? ret : new CParaPr();
+        return ret ? ret : new AscCommon.CParaPr();
     },
 
     getColorMap: function()
@@ -2065,7 +2065,7 @@ CGraphicObjects.prototype =
         }
         else
         {
-            return new CTextPr();
+            return new AscCommon.CTextPr();
         }
     },
 

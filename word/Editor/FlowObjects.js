@@ -204,12 +204,12 @@ function CFlowParagraph(Paragraph, X, Y, W, H, Dx, Dy, StartIndex, FlowCount, Wr
     switch (Wrap)
     {
         case undefined:
-        case wrap_Around:
-        case wrap_Auto:      this.WrappingType = WRAPPING_TYPE_SQUARE;         break;        
-        case wrap_None:      this.WrappingType = WRAPPING_TYPE_NONE;           break;
-        case wrap_NotBeside: this.WrappingType = WRAPPING_TYPE_TOP_AND_BOTTOM; break;
-        case wrap_Through:   this.WrappingType = WRAPPING_TYPE_THROUGH;        break;
-        case wrap_Tight:     this.WrappingType = WRAPPING_TYPE_TIGHT;          break;
+        case AscCommon.wrap_Around:
+        case AscCommon.wrap_Auto:      this.WrappingType = WRAPPING_TYPE_SQUARE;         break;        
+        case AscCommon.wrap_None:      this.WrappingType = WRAPPING_TYPE_NONE;           break;
+        case AscCommon.wrap_NotBeside: this.WrappingType = WRAPPING_TYPE_TOP_AND_BOTTOM; break;
+        case AscCommon.wrap_Through:   this.WrappingType = WRAPPING_TYPE_THROUGH;        break;
+        case AscCommon.wrap_Tight:     this.WrappingType = WRAPPING_TYPE_TIGHT;          break;
     }
 }
 

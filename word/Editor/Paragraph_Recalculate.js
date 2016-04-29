@@ -1128,9 +1128,9 @@ Paragraph.prototype.private_RecalculateLinePosition    = function(CurLine, CurPa
                 BaseLineOffset += ParaPr.Spacing.Before;
 
             // Добавляем толщину границы параграфа (если граница задана)
-            if ((true === ParaPr.Brd.First || 1 === CurPage) && border_Single === ParaPr.Brd.Top.Value)
+            if ((true === ParaPr.Brd.First || 1 === CurPage) && AscCommon.border_Single === ParaPr.Brd.Top.Value)
                 BaseLineOffset += ParaPr.Brd.Top.Size + ParaPr.Brd.Top.Space;
-            else if (false === ParaPr.Brd.First && border_Single === ParaPr.Brd.Between.Value)
+            else if (false === ParaPr.Brd.First && AscCommon.border_Single === ParaPr.Brd.Between.Value)
                 BaseLineOffset += ParaPr.Brd.Between.Size + ParaPr.Brd.Between.Space;
         }
 
@@ -1156,12 +1156,12 @@ Paragraph.prototype.private_RecalculateLinePosition    = function(CurLine, CurPa
                 Top2    = Top + ParaPr.Spacing.Before;
                 Bottom2 = Top + ParaPr.Spacing.Before + this.Lines[0].Metrics.Ascent + this.Lines[0].Metrics.Descent;
 
-                if ( true === ParaPr.Brd.First && border_Single === ParaPr.Brd.Top.Value )
+                if ( true === ParaPr.Brd.First && AscCommon.border_Single === ParaPr.Brd.Top.Value )
                 {
                     Top2    += ParaPr.Brd.Top.Size + ParaPr.Brd.Top.Space;
                     Bottom2 += ParaPr.Brd.Top.Size + ParaPr.Brd.Top.Space;
                 }
-                else if ( false === ParaPr.Brd.First && border_Single === ParaPr.Brd.Between.Value )
+                else if ( false === ParaPr.Brd.First && AscCommon.border_Single === ParaPr.Brd.Between.Value )
                 {
                     Top2    += ParaPr.Brd.Between.Size + ParaPr.Brd.Between.Space;
                     Bottom2 += ParaPr.Brd.Between.Size + ParaPr.Brd.Between.Space;
@@ -1172,7 +1172,7 @@ Paragraph.prototype.private_RecalculateLinePosition    = function(CurLine, CurPa
                 // Параграф начинается с новой страницы
                 Bottom2 = Top + this.Lines[0].Metrics.Ascent + this.Lines[0].Metrics.Descent;
 
-                if ( border_Single === ParaPr.Brd.Top.Value )
+                if ( AscCommon.border_Single === ParaPr.Brd.Top.Value )
                 {
                     Top2    += ParaPr.Brd.Top.Size + ParaPr.Brd.Top.Space;
                     Bottom2 += ParaPr.Brd.Top.Size + ParaPr.Brd.Top.Space;
@@ -1211,12 +1211,12 @@ Paragraph.prototype.private_RecalculateLinePosition    = function(CurLine, CurPa
                 Top2    = Top + ParaPr.Spacing.Before;
                 Bottom2 = Top + ParaPr.Spacing.Before + this.Lines[0].Metrics.Ascent + this.Lines[0].Metrics.Descent;
 
-                if ( true === ParaPr.Brd.First && border_Single === ParaPr.Brd.Top.Value )
+                if ( true === ParaPr.Brd.First && AscCommon.border_Single === ParaPr.Brd.Top.Value )
                 {
                     Top2    += ParaPr.Brd.Top.Size + ParaPr.Brd.Top.Space;
                     Bottom2 += ParaPr.Brd.Top.Size + ParaPr.Brd.Top.Space;
                 }
-                else if ( false === ParaPr.Brd.First && border_Single === ParaPr.Brd.Between.Value )
+                else if ( false === ParaPr.Brd.First && AscCommon.border_Single === ParaPr.Brd.Between.Value )
                 {
                     Top2    += ParaPr.Brd.Between.Size + ParaPr.Brd.Between.Space;
                     Bottom2 += ParaPr.Brd.Between.Size + ParaPr.Brd.Between.Space;
@@ -1227,7 +1227,7 @@ Paragraph.prototype.private_RecalculateLinePosition    = function(CurLine, CurPa
                 // Параграф начинается с новой страницы
                 Bottom2 = Top + this.Lines[0].Metrics.Ascent + this.Lines[0].Metrics.Descent;
 
-                if ( border_Single === ParaPr.Brd.Top.Value )
+                if ( AscCommon.border_Single === ParaPr.Brd.Top.Value )
                 {
                     Top2    += ParaPr.Brd.Top.Size + ParaPr.Brd.Top.Space;
                     Bottom2 += ParaPr.Brd.Top.Size + ParaPr.Brd.Top.Space;
@@ -1245,11 +1245,11 @@ Paragraph.prototype.private_RecalculateLinePosition    = function(CurLine, CurPa
         Bottom += ParaPr.Spacing.After;
 
         // Если нижняя граница Between, тогда она учитывается в следующем параграфе
-        if ( true === ParaPr.Brd.Last && border_Single === ParaPr.Brd.Bottom.Value )
+        if ( true === ParaPr.Brd.Last && AscCommon.border_Single === ParaPr.Brd.Bottom.Value )
         {
             Bottom += ParaPr.Brd.Bottom.Size + ParaPr.Brd.Bottom.Space;
         }
-        else if ( border_Single === ParaPr.Brd.Between.Value )
+        else if ( AscCommon.border_Single === ParaPr.Brd.Between.Value )
         {
             Bottom += ParaPr.Brd.Between.Space;
         }
@@ -1889,7 +1889,7 @@ Paragraph.prototype.private_RecalculateGetTabPos = function(X, ParaPr, CurPage, 
 
         if ( true === bCheckLeft && TabPos > PageStart.X + ParaPr.Ind.Left )
         {
-            TabsPos.push( new CParaTab(tab_Left, ParaPr.Ind.Left ) );
+            TabsPos.push( new AscCommon.CParaTab(tab_Left, ParaPr.Ind.Left ) );
             bCheckLeft = false;
         }
 
@@ -1898,7 +1898,7 @@ Paragraph.prototype.private_RecalculateGetTabPos = function(X, ParaPr, CurPage, 
     }
 
     if ( true === bCheckLeft )
-        TabsPos.push( new CParaTab(tab_Left, ParaPr.Ind.Left ) );
+        TabsPos.push( new AscCommon.CParaTab(tab_Left, ParaPr.Ind.Left ) );
 
     TabsCount = TabsPos.length;
 
@@ -1931,7 +1931,7 @@ Paragraph.prototype.private_RecalculateGetTabPos = function(X, ParaPr, CurPage, 
         {
             NewX = PageStart.X + ParaPr.Ind.Left;
         }
-        else if (Default_Tab_Stop < 0.001)
+        else if (AscCommon.Default_Tab_Stop < 0.001)
         {
             NewX = X;
         }
@@ -1939,7 +1939,7 @@ Paragraph.prototype.private_RecalculateGetTabPos = function(X, ParaPr, CurPage, 
         {
             NewX = PageStart.X;
             while ( X >= NewX - 0.001 )
-                NewX += Default_Tab_Stop;
+                NewX += AscCommon.Default_Tab_Stop;
         }
     }
     else

@@ -1340,7 +1340,7 @@ CHeaderFooterController.prototype =
                 Pr.Position = SectPr.Get_PageMargins_Header();
             
             Pr.DifferentFirst   = SectPr.Get_TitlePage();
-            Pr.DifferentEvenOdd = EvenAndOddHeaders;
+            Pr.DifferentEvenOdd = AscCommon.EvenAndOddHeaders;
             
             if ( SectPr === this.LogicDocument.SectionsInfo.Get_SectPr2(0).SectPr )
             {
@@ -1354,7 +1354,7 @@ CHeaderFooterController.prototype =
                 var SectionPageInfo = this.LogicDocument.Get_SectionPageNumInfo( PageIndex );
 
                 var bFirst  = ( true === SectionPageInfo.bFirst && true === SectPr.Get_TitlePage() ? true : false );
-                var bEven   = ( true === SectionPageInfo.bEven  && true === EvenAndOddHeaders      ? true : false );
+                var bEven   = ( true === SectionPageInfo.bEven  && true === AscCommon.EvenAndOddHeaders      ? true : false );
                 var bHeader = ( hdrftr_Header === this.CurHdrFtr.Type ? true : false );
 
                 Pr.LinkToPrevious = ( null === SectPr.Get_HdrFtr( bHeader, bFirst, bEven ) ? true : false );

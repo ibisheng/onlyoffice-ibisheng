@@ -4423,11 +4423,11 @@
 				{
 					//Ind
 					if(Def_pPr.Ind.Left != Item_pPr.Ind.Left)
-						apPr.push("margin-left:" + (Item_pPr.Ind.Left * g_dKoef_mm_to_pt) + "pt");
+						apPr.push("margin-left:" + (Item_pPr.Ind.Left * AscCommon.g_dKoef_mm_to_pt) + "pt");
 					if(Def_pPr.Ind.Right != Item_pPr.Ind.Right)
-						apPr.push("margin-right:" + ( Item_pPr.Ind.Right * g_dKoef_mm_to_pt) + "pt");
+						apPr.push("margin-right:" + ( Item_pPr.Ind.Right * AscCommon.g_dKoef_mm_to_pt) + "pt");
 					if(Def_pPr.Ind.FirstLine != Item_pPr.Ind.FirstLine)
-						apPr.push("text-indent:" + (Item_pPr.Ind.FirstLine * g_dKoef_mm_to_pt) + "pt");
+						apPr.push("text-indent:" + (Item_pPr.Ind.FirstLine * AscCommon.g_dKoef_mm_to_pt) + "pt");
 					//Jc
 					if(Def_pPr.Jc != Item_pPr.Jc){
 						switch(Item_pPr.Jc)
@@ -4458,7 +4458,7 @@
 					if(Def_pPr.Spacing.Line != Item_pPr.Spacing.Line)
 					{
 						if(Asc.linerule_AtLeast == Item_pPr.Spacing.LineRule)
-							apPr.push("line-height:"+(Item_pPr.Spacing.Line * g_dKoef_mm_to_pt)+"pt");
+							apPr.push("line-height:"+(Item_pPr.Spacing.Line * AscCommon.g_dKoef_mm_to_pt)+"pt");
 						else if( Asc.linerule_Auto == Item_pPr.Spacing.LineRule)
 						{
 							if(1 == Item_pPr.Spacing.Line)
@@ -4474,9 +4474,9 @@
 					}
 					//��� ������� � word ����� ����� ��� �������� ������������ ������
 					//if(Def_pPr.Spacing.Before != Item_pPr.Spacing.Before)
-					apPr.push("margin-top:" + (Item_pPr.Spacing.Before * g_dKoef_mm_to_pt) + "pt");
+					apPr.push("margin-top:" + (Item_pPr.Spacing.Before * AscCommon.g_dKoef_mm_to_pt) + "pt");
 					//if(Def_pPr.Spacing.After != Item_pPr.Spacing.After)
-					apPr.push("margin-bottom:" + (Item_pPr.Spacing.After * g_dKoef_mm_to_pt) + "pt");
+					apPr.push("margin-bottom:" + (Item_pPr.Spacing.After * AscCommon.g_dKoef_mm_to_pt) + "pt");
 					//Shd
 					if(Def_pPr.Shd.Value != Item_pPr.Shd.Value)
 						apPr.push("background-color:" + this.RGBToCSS(Item_pPr.Shd.Color));
@@ -4551,7 +4551,7 @@
 					aTagStart.push("<u>");
 					aTagEnd.push("</u>");
 				}
-				if (null != Value.HighLight && highlight_None != Value.HighLight)
+				if (null != Value.HighLight && AscCommon.highlight_None != Value.HighLight)
 					aProp.push("background-color:" + this.RGBToCSS(Value.HighLight));
 				
 				var color;
@@ -4560,7 +4560,7 @@
 					var Unifill = Value.Unifill.getRGBAColor();
 					if(Unifill)
 					{
-						color = this.RGBToCSS(new CDocumentColor(Unifill.R, Unifill.G, Unifill.B));
+						color = this.RGBToCSS(new AscCommon.CDocumentColor(Unifill.R, Unifill.G, Unifill.B));
 						aProp.push("color:" + color);
 						aProp.push("mso-style-textfill-fill-color:" + color);
 					}
@@ -4790,14 +4790,14 @@
 			_BorderToStyle : function(border, name)
 			{
 				var res = "";
-				if(border_None == border.Value)
+				if(AscCommon.border_None == border.Value)
 					res += name + ":none;";
 				else
 				{
 					var size = 0.5;
 					var color = { r : 0, g : 0, b : 0 };
 					if(null != border.Size)
-						size = border.Size * g_dKoef_mm_to_pt;
+						size = border.Size * AscCommon.g_dKoef_mm_to_pt;
 					if(null != border.Color)
 						color = border.Color;
 					res += name + ":"+size+"pt solid "+this.RGBToCSS(color)+";";
@@ -4811,15 +4811,15 @@
 				var nMarginTop = 0;
 				var nMarginRight = 1.9;
 				var nMarginBottom = 0;
-				if(null != margins.Left && tblwidth_Mm == margins.Left.Type && null != margins.Left.W)
+				if(null != margins.Left && AscCommon.tblwidth_Mm == margins.Left.Type && null != margins.Left.W)
 					nMarginLeft = margins.Left.W;
-				if(null != margins.Top && tblwidth_Mm == margins.Top.Type && null != margins.Top.W)
+				if(null != margins.Top && AscCommon.tblwidth_Mm == margins.Top.Type && null != margins.Top.W)
 					nMarginTop = margins.Top.W;
-				if(null != margins.Right && tblwidth_Mm == margins.Right.Type && null != margins.Right.W)
+				if(null != margins.Right && AscCommon.tblwidth_Mm == margins.Right.Type && null != margins.Right.W)
 					nMarginRight = margins.Right.W;
-				if(null != margins.Bottom && tblwidth_Mm == margins.Bottom.Type && null != margins.Bottom.W)
+				if(null != margins.Bottom && AscCommon.tblwidth_Mm == margins.Bottom.Type && null != margins.Bottom.W)
 					nMarginBottom = margins.Bottom.W;
-				res = styleName + ":"+(nMarginTop * g_dKoef_mm_to_pt)+"pt "+(nMarginRight * g_dKoef_mm_to_pt)+"pt "+(nMarginBottom * g_dKoef_mm_to_pt)+"pt "+(nMarginLeft * g_dKoef_mm_to_pt)+"pt;";
+				res = styleName + ":"+(nMarginTop * AscCommon.g_dKoef_mm_to_pt)+"pt "+(nMarginRight * AscCommon.g_dKoef_mm_to_pt)+"pt "+(nMarginBottom * AscCommon.g_dKoef_mm_to_pt)+"pt "+(nMarginLeft * AscCommon.g_dKoef_mm_to_pt)+"pt;";
 				return res;
 			},
 			_BordersToStyle : function(borders, bUseInner, bUseBetween, mso, alt)

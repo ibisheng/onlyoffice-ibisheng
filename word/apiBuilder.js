@@ -762,17 +762,17 @@
      */
     ApiDocument.prototype.CreateStyle = function(sStyleName, sType)
     {
-        var nStyleType = styletype_Paragraph;
+        var nStyleType = AscCommon.styletype_Paragraph;
         if ("paragraph" === sType)
-            nStyleType = styletype_Paragraph;
+            nStyleType = AscCommon.styletype_Paragraph;
         else if ("table" === sType)
-            nStyleType = styletype_Table;
+            nStyleType = AscCommon.styletype_Table;
         else if ("run" === sType)
-            nStyleType = styletype_Character;
+            nStyleType = AscCommon.styletype_Character;
         else if ("numbering" === sType)
-            nStyleType = styletype_Numbering;
+            nStyleType = AscCommon.styletype_Numbering;
 
-        var oStyle        = new CStyle(sStyleName, null, null, nStyleType, false);
+        var oStyle        = new AscCommon.CStyle(sStyleName, null, null, nStyleType, false);
         oStyle.qFormat    = true;
         oStyle.uiPriority = 1;
         var oStyles       = this.Document.Get_Styles();
@@ -1500,7 +1500,7 @@
      */
     ApiTable.prototype.SetStyle = function(oStyle)
     {
-        if (!oStyle || !(oStyle instanceof ApiStyle) || styletype_Table !== oStyle.Style.Get_Type())
+        if (!oStyle || !(oStyle instanceof ApiStyle) || AscCommon.styletype_Table !== oStyle.Style.Get_Type())
             return;
 
         this.Table.Set_TableStyle(oStyle.Style.Get_Id(), true);
@@ -1727,13 +1727,13 @@
     {
         var nStyleType = this.Style.Get_Type();
 
-        if (styletype_Paragraph === nStyleType)
+        if (AscCommon.styletype_Paragraph === nStyleType)
             return "paragraph";
-        else if (styletype_Table === nStyleType)
+        else if (AscCommon.styletype_Table === nStyleType)
             return "table";
-        else if (styletype_Character === nStyleType)
+        else if (AscCommon.styletype_Character === nStyleType)
             return "run";
-        else if (styletype_Numbering === nStyleType)
+        else if (AscCommon.styletype_Numbering === nStyleType)
             return "numbering";
 
         return "paragraph";
@@ -1760,7 +1760,7 @@
      */
     ApiStyle.prototype.GetTablePr = function()
     {
-        if (styletype_Table !== this.Style.Get_Type())
+        if (AscCommon.styletype_Table !== this.Style.Get_Type())
             return null;
 
         return new ApiTablePr(this, this.Style.TablePr.Copy());
@@ -1771,7 +1771,7 @@
      */
     ApiStyle.prototype.GetTableRowPr = function()
     {
-        if (styletype_Table !== this.Style.Get_Type())
+        if (AscCommon.styletype_Table !== this.Style.Get_Type())
             return null;
 
         return new ApiTableRowPr(this, this.Style.TableRowPr.Copy());
@@ -1782,7 +1782,7 @@
      */
     ApiStyle.prototype.GetTableCellPr = function()
     {
-        if (styletype_Table !== this.Style.Get_Type())
+        if (AscCommon.styletype_Table !== this.Style.Get_Type())
             return null;
 
         return new ApiTableCellPr(this, this.Style.TableCellPr.Copy());
@@ -1960,9 +1960,9 @@
             isNone = false;
 
         if (true === isNone)
-            this.TextPr.HighLight = highlight_None;
+            this.TextPr.HighLight = AscCommon.highlight_None;
         else
-            this.TextPr.HighLight = new CDocumentColor(r, g, b, false);
+            this.TextPr.HighLight = new AscCommon.CDocumentColor(r, g, b, false);
 
         this.private_OnChange();
     };
@@ -2319,7 +2319,7 @@
         if (!(aPos instanceof Array) || !(aVal instanceof Array) || aPos.length !== aVal.length)
             return;
 
-        var oTabs = new CParaTabs();
+        var oTabs = new AscCommon.CParaTabs();
         for (var nIndex = 0, nCount = aPos.length; nIndex < nCount; ++nIndex)
         {
             oTabs.Add(private_GetTabStop(aPos[nIndex], aVal[nIndex]));
@@ -2339,7 +2339,7 @@
         if (!(oNumPr instanceof ApiNumbering))
             return;
 
-        this.ParaPr.NumPr       = new CNumPr();
+        this.ParaPr.NumPr       = new AscCommon.CNumPr();
         this.ParaPr.NumPr.NumId = oNumPr.Num.Get_Id();
         this.ParaPr.NumPr.Lvl   = undefined;
 
@@ -2434,7 +2434,7 @@
                 this.Num.Set_Lvl_None(this.Lvl);
                 break;
             case "bullet":
-                this.Num.Set_Lvl_Bullet(this.Lvl, sSymbol, new CTextPr());
+                this.Num.Set_Lvl_Bullet(this.Lvl, sSymbol, new AscCommon.CTextPr());
                 break;
             case "1)"    :
                 this.Num.Set_Lvl_Numbered_1(this.Lvl);
@@ -2757,9 +2757,9 @@
     ApiTablePr.prototype.SetTableLayout = function(sType)
     {
         if ("autofit" === sType)
-            this.TablePr.TableLayout = tbllayout_AutoFit;
+            this.TablePr.TableLayout = AscCommon.tbllayout_AutoFit;
         else if ("fixed" === sType)
-            this.TablePr.TableLayout = tbllayout_Fixed;
+            this.TablePr.TableLayout = AscCommon.tbllayout_Fixed;
 
         this.private_OnChange();
     };
@@ -2786,9 +2786,9 @@
     ApiTableRowPr.prototype.SetHeight = function(sHRule, nValue)
     {
         if ("auto" === sHRule)
-            this.RowPr.Height = new CTableRowHeight(0, Asc.linerule_Auto);
+            this.RowPr.Height = new AscCommon.CTableRowHeight(0, Asc.linerule_Auto);
         else if ("atLeast" === sHRule)
-            this.RowPr.Height = new CTableRowHeight(private_Twips2MM(nValue), Asc.linerule_AtLeast);
+            this.RowPr.Height = new AscCommon.CTableRowHeight(private_Twips2MM(nValue), Asc.linerule_AtLeast);
 
         this.private_OnChange();
     };
@@ -3004,11 +3004,11 @@
     ApiTableCellPr.prototype.SetVerticalAlign = function(sType)
     {
         if ("top" === sType)
-            this.CellPr.VAlign = vertalignjc_Top;
+            this.CellPr.VAlign = AscCommon.vertalignjc_Top;
         else if ("bottom" === sType)
-            this.CellPr.VAlign = vertalignjc_Bottom;
+            this.CellPr.VAlign = AscCommon.vertalignjc_Bottom;
         else if ("center" === sType)
-            this.CellPr.VAlign = vertalignjc_Center;
+            this.CellPr.VAlign = AscCommon.vertalignjc_Center;
         
         this.private_OnChange();
     };
@@ -3019,11 +3019,11 @@
     ApiTableCellPr.prototype.SetTextDirection = function(sType)
     {
         if ("lrtb" === sType)
-            this.CellPr.TextDirection = textdirection_LRTB;
+            this.CellPr.TextDirection = AscCommon.textdirection_LRTB;
         else if ("tbrl" === sType)
-            this.CellPr.TextDirection = textdirection_TBRL;
+            this.CellPr.TextDirection = AscCommon.textdirection_TBRL;
         else if ("btlr" === sType)
-            this.CellPr.TextDirection = textdirection_BTLR;
+            this.CellPr.TextDirection = AscCommon.textdirection_BTLR;
 
         this.private_OnChange();
     };
@@ -3642,7 +3642,7 @@
 
     function private_GetColor(r, g, b, Auto)
     {
-        return new CDocumentColor(r, g, b, Auto ? Auto : false);
+        return new AscCommon.CDocumentColor(r, g, b, Auto ? Auto : false);
     }
 
     function private_GetTabStop(nPos, sValue)
@@ -3657,7 +3657,7 @@
         else if ("center" === sValue)
             nType = tab_Center;
 
-        return new CParaTab(nType, private_Twips2MM(nPos));
+        return new AscCommon.CParaTab(nType, private_Twips2MM(nPos));
     }
 
     function private_GetParaAlign(sJc)
@@ -3676,11 +3676,11 @@
 
     function private_GetTableBorder(sType, nSize, nSpace, r, g, b)
     {
-        var oBorder = new CDocumentBorder();
+        var oBorder = new AscCommon.CDocumentBorder();
 
         if ("none" === sType)
         {
-            oBorder.Value = border_None;
+            oBorder.Value = AscCommon.border_None;
             oBorder.Size  = 0;
             oBorder.Space = 0;
             oBorder.Color.Set(0, 0, 0, true);
@@ -3688,7 +3688,7 @@
         else
         {
             if ("single" === sType)
-                oBorder.Value = border_Single;
+                oBorder.Value = AscCommon.border_Single;
 
             oBorder.Size  = private_Pt_8ToMM(nSize);
             oBorder.Space = private_PtToMM(nSpace);
@@ -3700,35 +3700,35 @@
 
     function private_GetTableMeasure(sType, nValue)
     {
-        var nType = tblwidth_Auto;
+        var nType = AscCommon.tblwidth_Auto;
         var nW    = 0;
         if ("auto" === sType)
         {
-            nType = tblwidth_Auto;
+            nType = AscCommon.tblwidth_Auto;
             nW    = 0;
         }
         else if ("nil" === sType)
         {
-            nType = tblwidth_Nil;
+            nType = AscCommon.tblwidth_Nil;
             nW    = 0;
         }
         else if ("percent" === sType)
         {
-            nType = tblwidth_Pct;
+            nType = AscCommon.tblwidth_Pct;
             nW    = private_GetInt(nValue, null, null);
         }
         else if ("twips" === sType)
         {
-            nType = tblwidth_Mm;
+            nType = AscCommon.tblwidth_Mm;
             nW    = private_Twips2MM(nValue);
         }
 
-        return new CTableMeasurement(nType, nW);
+        return new AscCommon.CTableMeasurement(nType, nW);
     }
 
     function private_GetShd(sType, r, g, b, isAuto)
     {
-        var oShd = new CDocumentShd();
+        var oShd = new AscCommon.CDocumentShd();
 
         if ("nil" === sType)
             oShd.Value = Asc.c_oAscShdNil;

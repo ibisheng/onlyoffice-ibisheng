@@ -67,7 +67,7 @@ CTextMeasurerWrapper.prototype =
             var _bounds = this.Measurer["LoadFont"](_info.Path, _info.FaceIndex, _lastSetUp.SetUpSize, flag);
 
             this.UnitsPerEm = _bounds[3];
-            var dKoef = g_dKoef_pt_to_mm * _lastSetUp.SetUpSize / this.UnitsPerEm;
+            var dKoef = AscCommon.g_dKoef_pt_to_mm * _lastSetUp.SetUpSize / this.UnitsPerEm;
             this.Ascender   = _bounds[0] * dKoef;
             this.Descender  = _bounds[1] * dKoef;
             this.Height     = _bounds[2] * dKoef;

@@ -256,7 +256,7 @@ CHistory.prototype.RedoAdd = function(oRedoObjectParam, Class, Type, sheetid, ra
 			}
 			if(Class)
 			{
-				Class.Load_Changes(Data.oBinaryReader, null, new CDocumentColor(255, 255, 255));
+				Class.Load_Changes(Data.oBinaryReader, null, new AscCommon.CDocumentColor(255, 255, 255));
 			}
 		}
 	}
@@ -285,7 +285,7 @@ CHistory.prototype.RedoExecute = function(Point, oRedoObjectParam)
 			else
 			{
 				Item.Data.oBinaryReader.Seek(Item.Data.nPos);
-				Item.Class.Load_Changes(Item.Data.oBinaryReader, null, new CDocumentColor(255, 255, 255));
+				Item.Class.Load_Changes(Item.Data.oBinaryReader, null, new AscCommon.CDocumentColor(255, 255, 255));
 			}
 		}
 		this._addRedoObjectParam(oRedoObjectParam, Item);

@@ -514,7 +514,7 @@ CShape.prototype.recalculateShapeStyleForParagraph = function()
     {
         //this.textStyleForParagraph.ParaPr.Spacing.Line = 1;
         this.textStyleForParagraph.TextPr.Color.Auto = false;
-        var shape_text_pr = new CTextPr();
+        var shape_text_pr = new AscCommon.CTextPr();
         if(this.style.fontRef.Color)
         {
             shape_text_pr.Unifill = AscFormat.CreateUniFillByUniColorCopy(this.style.fontRef.Color);

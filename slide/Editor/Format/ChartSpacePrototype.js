@@ -644,39 +644,39 @@ CTable.prototype.Selection_Draw_Page = function(CurPage)
         }
     }
 };
-CStyle.prototype.Create_NormalTable = function()
+AscCommon.CStyle.prototype.Create_NormalTable = function()
 {
     var TablePr =
     {
         TableInd :
         {
             W    : 0,
-            Type : tblwidth_Mm
+            Type : AscCommon.tblwidth_Mm
         },
         TableCellMar :
         {
             Top :
             {
                 W    : 1.27,
-                Type : tblwidth_Mm
+                Type : AscCommon.tblwidth_Mm
             },
 
             Left :
             {
                 W    : 2.54, // 5.4pt
-                Type : tblwidth_Mm
+                Type : AscCommon.tblwidth_Mm
             },
 
             Bottom :
             {
                 W    : 1.27,
-                Type : tblwidth_Mm
+                Type : AscCommon.tblwidth_Mm
             },
 
             Right :
             {
                 W    : 2.54, // 5.4pt
-                Type : tblwidth_Mm
+                Type : AscCommon.tblwidth_Mm
             }
         }
     };
@@ -687,26 +687,26 @@ CStyle.prototype.Create_NormalTable = function()
     this.Set_TablePr( TablePr );
 };
 
-CTablePr.prototype.Init_Default = function()
+AscCommon.CTablePr.prototype.Init_Default = function()
 {
     this.TableStyleColBandSize = 1;
     this.TableStyleRowBandSize = 1;
     this.Jc                    = AscCommon.align_Left;
-    this.Shd                   = new CDocumentShd();
-    this.TableBorders.Bottom   = new CDocumentBorder();
-    this.TableBorders.Left     = new CDocumentBorder();
-    this.TableBorders.Right    = new CDocumentBorder();
-    this.TableBorders.Top      = new CDocumentBorder();
-    this.TableBorders.InsideH  = new CDocumentBorder();
-    this.TableBorders.InsideV  = new CDocumentBorder();
-    this.TableCellMar.Bottom   = new CTableMeasurement(tblwidth_Mm, 1.27);
-    this.TableCellMar.Left     = new CTableMeasurement(tblwidth_Mm, 2.54/*5.4 * g_dKoef_pt_to_mm*/); // 5.4pt
-    this.TableCellMar.Right    = new CTableMeasurement(tblwidth_Mm, 2.54/*5.4 * g_dKoef_pt_to_mm*/); // 5.4pt
-    this.TableCellMar.Top      = new CTableMeasurement(tblwidth_Mm, 1.27);
+    this.Shd                   = new AscCommon.CDocumentShd();
+    this.TableBorders.Bottom   = new AscCommon.CDocumentBorder();
+    this.TableBorders.Left     = new AscCommon.CDocumentBorder();
+    this.TableBorders.Right    = new AscCommon.CDocumentBorder();
+    this.TableBorders.Top      = new AscCommon.CDocumentBorder();
+    this.TableBorders.InsideH  = new AscCommon.CDocumentBorder();
+    this.TableBorders.InsideV  = new AscCommon.CDocumentBorder();
+    this.TableCellMar.Bottom   = new AscCommon.CTableMeasurement(AscCommon.tblwidth_Mm, 1.27);
+    this.TableCellMar.Left     = new AscCommon.CTableMeasurement(AscCommon.tblwidth_Mm, 2.54/*5.4 * g_dKoef_pt_to_mm*/); // 5.4pt
+    this.TableCellMar.Right    = new AscCommon.CTableMeasurement(AscCommon.tblwidth_Mm, 2.54/*5.4 * g_dKoef_pt_to_mm*/); // 5.4pt
+    this.TableCellMar.Top      = new AscCommon.CTableMeasurement(AscCommon.tblwidth_Mm, 1.27);
     this.TableCellSpacing      = null;
     this.TableInd              = 0;
-    this.TableW                = new CTableMeasurement(tblwidth_Auto, 0);
-    this.TableLayout           = tbllayout_AutoFit;
+    this.TableW                = new AscCommon.CTableMeasurement(AscCommon.tblwidth_Auto, 0);
+    this.TableLayout           = AscCommon.tbllayout_AutoFit;
 };
 
 //----------------------------------------------------------export----------------------------------------------------

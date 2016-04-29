@@ -5768,9 +5768,9 @@ function CDrawingDocument()
 
         par.Cursor_MoveToStartPos();
 
-        var _paraPr = new CParaPr();
+        var _paraPr = new AscCommon.CParaPr();
         par.Pr = _paraPr;
-        var _textPr = new CTextPr();
+        var _textPr = new AscCommon.CTextPr();
         _textPr.FontFamily = { Name : "Arial", Index : -1 };
 
         _textPr.Strikeout  = this.GuiLastTextProps.Strikeout;
@@ -5994,7 +5994,7 @@ function CDrawingDocument()
             var i = _styles[i1];
             var _style = logicDoc.Styles.Style[i];
 
-            if (!_style || _style.Type != styletype_Table)
+            if (!_style || _style.Type != AscCommon.styletype_Table)
                 continue;
 
             if (_table_styles == null)
@@ -6841,7 +6841,7 @@ CStylesPainter.prototype =
         var res = formalStyle.match(/^heading([1-9][0-9]*)$/);
         var index = (res) ? res[1] - 1 : -1;
 
-        var _dr_style = __Styles.Get_Pr(i, styletype_Paragraph);
+        var _dr_style = __Styles.Get_Pr(i, AscCommon.styletype_Paragraph);
         _dr_style.Name = style.Name;
         _dr_style.Id = i;
 
@@ -6952,8 +6952,8 @@ CStylesPainter.prototype =
       g_oTableId.m_bTurnOff = true;
       History.TurnOff();
 
-      var oldDefTabStop = Default_Tab_Stop;
-      Default_Tab_Stop = 1;
+      var oldDefTabStop = AscCommon.Default_Tab_Stop;
+        AscCommon.Default_Tab_Stop = 1;
 
       var hdr = new CHeaderFooter(editor.WordControl.m_oLogicDocument.HdrFtr, editor.WordControl.m_oLogicDocument, editor.WordControl.m_oDrawingDocument, AscCommon.hdrftr_Header);
       var _dc = hdr.Content;//new CDocumentContent(editor.WordControl.m_oLogicDocument, editor.WordControl.m_oDrawingDocument, 0, 0, 0, 0, false, true, false);
@@ -6970,12 +6970,12 @@ CStylesPainter.prototype =
       par.Add_ToContent(0, run);
       par.Style_Add(style.Id, false);
       par.Set_Align(AscCommon.align_Left);
-      par.Set_Tabs(new CParaTabs());
+      par.Set_Tabs(new AscCommon.CParaTabs());
 
       var _brdL = style.ParaPr.Brd.Left;
       if ( undefined !== _brdL && null !== _brdL )
       {
-        var brdL = new CDocumentBorder();
+        var brdL = new AscCommon.CDocumentBorder();
         brdL.Set_FromObject(_brdL);
         brdL.Space = 0;
         par.Set_Border(brdL, AscDFH.historyitem_Paragraph_Borders_Left);
@@ -6984,7 +6984,7 @@ CStylesPainter.prototype =
       var _brdT = style.ParaPr.Brd.Top;
       if ( undefined !== _brdT && null !== _brdT )
       {
-        var brd = new CDocumentBorder();
+        var brd = new AscCommon.CDocumentBorder();
         brd.Set_FromObject(_brdT);
         brd.Space = 0;
         par.Set_Border(brd, AscDFH.historyitem_Paragraph_Borders_Top);
@@ -6993,7 +6993,7 @@ CStylesPainter.prototype =
       var _brdB = style.ParaPr.Brd.Bottom;
       if ( undefined !== _brdB && null !== _brdB )
       {
-        var brd = new CDocumentBorder();
+        var brd = new AscCommon.CDocumentBorder();
         brd.Set_FromObject(_brdB);
         brd.Space = 0;
         par.Set_Border(brd, AscDFH.historyitem_Paragraph_Borders_Bottom);
@@ -7002,19 +7002,19 @@ CStylesPainter.prototype =
       var _brdR = style.ParaPr.Brd.Right;
       if ( undefined !== _brdR && null !== _brdR )
       {
-        var brd = new CDocumentBorder();
+        var brd = new AscCommon.CDocumentBorder();
         brd.Set_FromObject(_brdR);
         brd.Space = 0;
         par.Set_Border(brd, AscDFH.historyitem_Paragraph_Borders_Right);
       }
 
-      var _ind = new CParaInd();
+      var _ind = new AscCommon.CParaInd();
       _ind.FirstLine = 0;
       _ind.Left = 0;
       _ind.Right = 0;
       par.Set_Ind(_ind, false);
 
-      var _sp = new CParaSpacing();
+      var _sp = new AscCommon.CParaSpacing();
       _sp.Line              = 1;
       _sp.LineRule          = Asc.linerule_Auto;
       _sp.Before            = 0;
@@ -7055,7 +7055,7 @@ CStylesPainter.prototype =
 
       graphics.restore();
 
-      Default_Tab_Stop = oldDefTabStop;
+        AscCommon.Default_Tab_Stop = oldDefTabStop;
 
       g_oTableId.m_bTurnOff = false;
       History.TurnOn();

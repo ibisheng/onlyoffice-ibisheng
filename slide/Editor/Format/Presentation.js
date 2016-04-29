@@ -44,7 +44,7 @@ function CreatePresentationTableStyles(Styles, IdMap)
 {
     function CreateMiddleStyle2(schemeId)
     {
-        var style = new CStyle("Middle Style 2 - accent " + (schemeId + 1), null, null, styletype_Table);
+        var style = new AscCommon.CStyle("Middle Style 2 - accent " + (schemeId + 1), null, null, AscCommon.styletype_Table);
         //style.Id = "{" + GUID() + "}";
         style.TablePr.Set_FromObject(
             {
@@ -56,7 +56,7 @@ function CreatePresentationTableStyles(Styles, IdMap)
                         Unifill : CreateUnifillSolidFillSchemeColor(12, 0),
                         Space : 0,
                         Size  : 12700/36000,
-                        Value : border_Single
+                        Value : AscCommon.border_Single
                     },
 
                     Right:
@@ -65,7 +65,7 @@ function CreatePresentationTableStyles(Styles, IdMap)
                         Unifill : CreateUnifillSolidFillSchemeColor(12, 0),
                         Space : 0,
                         Size  : 12700/36000,
-                        Value : border_Single
+                        Value : AscCommon.border_Single
                     },
 
                     Top:
@@ -74,7 +74,7 @@ function CreatePresentationTableStyles(Styles, IdMap)
                         Unifill : CreateUnifillSolidFillSchemeColor(12, 0),
                         Space : 0,
                         Size  : 12700/36000,
-                        Value : border_Single
+                        Value : AscCommon.border_Single
                     },
 
                     Bottom:
@@ -83,7 +83,7 @@ function CreatePresentationTableStyles(Styles, IdMap)
                         Unifill : CreateUnifillSolidFillSchemeColor(12, 0),
                         Space : 0,
                         Size  : 12700/36000,
-                        Value : border_Single
+                        Value : AscCommon.border_Single
                     },
 
                     InsideH:
@@ -92,7 +92,7 @@ function CreatePresentationTableStyles(Styles, IdMap)
                         Unifill : CreateUnifillSolidFillSchemeColor(12, 0),
                         Space : 0,
                         Size  : 12700/36000,
-                        Value : border_Single
+                        Value : AscCommon.border_Single
                     },
 
                     InsideV:
@@ -101,7 +101,7 @@ function CreatePresentationTableStyles(Styles, IdMap)
                         Unifill : CreateUnifillSolidFillSchemeColor(12, 0),
                         Space : 0,
                         Size  : 12700/36000,
-                        Value : border_Single
+                        Value : AscCommon.border_Single
                     }
                 }
             }
@@ -160,7 +160,7 @@ function CreatePresentationTableStyles(Styles, IdMap)
                 Unifill : CreateUnifillSolidFillSchemeColor(12, 0),
                 Space : 0,
                 Size  : 38100/36000,
-                Value : border_Single
+                Value : AscCommon.border_Single
             }
         };
         style.TableLastRow.Set_FromObject(styleObject);
@@ -172,7 +172,7 @@ function CreatePresentationTableStyles(Styles, IdMap)
                 Unifill : CreateUnifillSolidFillSchemeColor(12, 0),
                 Space : 0,
                 Size  : 38100/36000,
-                Value : border_Single
+                Value : AscCommon.border_Single
             }
         };
         styleObject.TextPr =
@@ -510,7 +510,7 @@ CPresentation.prototype =
     createDefaultTableStyles: function()
     {
         //AscFormat.ExecuteNoHistory(function(){
-            this.globalTableStyles = new CStyles();
+            this.globalTableStyles = new AscCommon.CStyles();
             this.DefaultTableStyleId = CreatePresentationTableStyles(this.globalTableStyles, this.TableStylesIdMap);
         //}, this, []);
     },
@@ -1450,7 +1450,7 @@ CPresentation.prototype =
             table.Set_PositionH(Asc.c_oAscHAnchor.Page, false, 0);
             table.Set_PositionV(Asc.c_oAscVAnchor.Page, false, 0);
         }
-        table.Set_TableLayout(tbllayout_Fixed);
+        table.Set_TableLayout(AscCommon.tbllayout_Fixed);
         if(typeof StyleId === "string")
         {
             table.Set_TableStyle(StyleId);
@@ -1821,7 +1821,7 @@ CPresentation.prototype =
 
     Get_Styles: function()
     {
-        var styles = new CStyles();
+        var styles = new AscCommon.CStyles();
         return {styles: styles, lastId: styles.Get_Default_Paragraph()}
     },
 
@@ -1873,7 +1873,7 @@ CPresentation.prototype =
     },
     Get_TextBackGroundColor: function()
     {
-        return new CDocumentColor(255, 255, 255, false);
+        return new AscCommon.CDocumentColor(255, 255, 255, false);
     },
 
 
@@ -1895,7 +1895,7 @@ CPresentation.prototype =
                 return ret;
             }
         }
-        return new CParaPr();
+        return new AscCommon.CParaPr();
     },
 
     Get_Paragraph_TextPr : function()
@@ -1908,7 +1908,7 @@ CPresentation.prototype =
                 return ret;
             }
         }
-        return new CTextPr();
+        return new AscCommon.CTextPr();
     },
 
     Get_Paragraph_TextPr_Copy : function()
@@ -1917,7 +1917,7 @@ CPresentation.prototype =
         {
             return this.Slides[this.CurPage].graphicObjects.getParagraphTextPr();
         }
-        return new CTextPr();
+        return new AscCommon.CTextPr();
     },
 
     Get_Paragraph_ParaPr_Copy : function()
@@ -1926,7 +1926,7 @@ CPresentation.prototype =
         {
             return this.Slides[this.CurPage].graphicObjects.getParagraphParaPr();
         }
-        return new CParaPr();
+        return new AscCommon.CParaPr();
     },
 
 
@@ -1965,7 +1965,7 @@ CPresentation.prototype =
         if ( null != ParaPr )
         {
             if ( undefined != ParaPr.Tabs )
-                editor.Update_ParaTab( Default_Tab_Stop, ParaPr.Tabs );
+                editor.Update_ParaTab( AscCommon.Default_Tab_Stop, ParaPr.Tabs );
 
             editor.UpdateParagraphProp( ParaPr );
         }
@@ -2810,7 +2810,7 @@ CPresentation.prototype =
     Set_DocumentDefaultTab: function(DTab)
     {
        //History.Add( this, { Type : AscDFH.historyitem_Document_DefaultTab, Old : Default_Tab_Stop, New : DTab } );
-        Default_Tab_Stop = DTab;
+        AscCommon.Default_Tab_Stop = DTab;
     },
 
     Set_DocumentMargin: function()
@@ -3226,12 +3226,12 @@ CPresentation.prototype =
             var flag = undefined;
             if(!para_pr)
             {
-                para_pr = new CParaPr();
+                para_pr = new AscCommon.CParaPr();
                 flag = true;
             }
             if(!text_pr)
             {
-                text_pr = new CTextPr();
+                text_pr = new AscCommon.CTextPr();
             }
             editor.textArtPreviewManager.clear();
             var theme = graphic_objects.getTheme();
@@ -3294,11 +3294,11 @@ CPresentation.prototype =
                 editor.sync_TblPropCallback(drawing_props.tableProps);
                 if(!drawing_props.shapeProps)
                 {
-                    if(drawing_props.tableProps.CellsVAlign === vertalignjc_Bottom)
+                    if(drawing_props.tableProps.CellsVAlign === AscCommon.vertalignjc_Bottom)
                     {
                         editor.sync_VerticalTextAlign(AscFormat.VERTICAL_ANCHOR_TYPE_BOTTOM);
                     }
-                    else if(drawing_props.tableProps.CellsVAlign === vertalignjc_Center)
+                    else if(drawing_props.tableProps.CellsVAlign === AscCommon.vertalignjc_Center)
                     {
                         editor.sync_VerticalTextAlign(AscFormat.VERTICAL_ANCHOR_TYPE_CENTER);
                     }
@@ -3867,7 +3867,7 @@ CPresentation.prototype =
             }
             case AscDFH.historyitem_Document_DefaultTab:
             {
-                Default_Tab_Stop = Data.Old;
+                AscCommon.Default_Tab_Stop = Data.Old;
 
                 break;
             }

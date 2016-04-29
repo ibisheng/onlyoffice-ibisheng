@@ -3,6 +3,8 @@
 // Import
 var History = AscCommon.History;
 var global_MatrixTransformer = AscCommon.global_MatrixTransformer;
+var CTableMeasurement = AscCommon.CTableMeasurement;
+var CDocumentBorder = AscCommon.CDocumentBorder;
 
 //----------------------------------------------------------------------------------------------------------------------
 // Класс CTableCell
@@ -25,10 +27,10 @@ function CTableCell(Row, ColW)
         ParaPr     : null, // настройки параграфа
         NeedRecalc : true
     };
-    this.Pr = new CTableCellPr();
+    this.Pr = new AscCommon.CTableCellPr();
 
     if ( undefined != ColW )
-        this.Pr.TableCellW = new CTableMeasurement(tblwidth_Mm, ColW);
+        this.Pr.TableCellW = new CTableMeasurement(AscCommon.tblwidth_Mm, ColW);
 
     // Массивы с рассчитанными стилями для границ данной ячейки.
     // В каждом элементе лежит массив стилей.
@@ -661,7 +663,7 @@ CTableCell.prototype =
         var TextDirection = this.Get_TextDirection();
         var bNeedRestore = false;
         var _transform = undefined;
-        if (textdirection_BTLR === TextDirection || textdirection_TBRL === TextDirection)
+        if (AscCommon.textdirection_BTLR === TextDirection || AscCommon.textdirection_TBRL === TextDirection)
         {
             bNeedRestore = true;
             pGraphics.SaveGrState();
@@ -925,13 +927,13 @@ CTableCell.prototype =
         var Transform = null;
         var TextDirection = this.Get_TextDirection();
 
-        if (textdirection_BTLR === TextDirection)
+        if (AscCommon.textdirection_BTLR === TextDirection)
         {
             Transform = new AscCommon.CMatrix();
             global_MatrixTransformer.RotateRadAppend(Transform, 0.5 *  Math.PI);
             global_MatrixTransformer.TranslateAppend(Transform, this.Temp.X_start, this.Temp.Y_end);
         }
-        else if (textdirection_TBRL === TextDirection)
+        else if (AscCommon.textdirection_TBRL === TextDirection)
         {
             var Transform = new AscCommon.CMatrix();
             global_MatrixTransformer.RotateRadAppend(Transform, -0.5 *  Math.PI);
@@ -1339,7 +1341,7 @@ CTableCell.prototype =
         }
         else if ( undefined === this.Pr.Shd || false === this.Pr.Shd.Compare(Shd) )
         {
-            var _Shd = new CDocumentShd();
+            var _Shd = new AscCommon.CDocumentShd();
             _Shd.Set_FromObject( Shd );
             History.Add( this, { Type : AscDFH.historyitem_TableCell_Shd, Old : ( undefined === this.Pr.Shd ? undefined : this.Pr.Shd ), New : _Shd } );
             this.Pr.Shd = _Shd;
@@ -1416,7 +1418,7 @@ CTableCell.prototype =
     Is_VerticalText : function()
     {
         var TextDirection = this.Get_TextDirection();
-        if (textdirection_BTLR === TextDirection || textdirection_TBRL === TextDirection)
+        if (AscCommon.textdirection_BTLR === TextDirection || AscCommon.textdirection_TBRL === TextDirection)
             return true;
 
         return false;
@@ -1439,7 +1441,7 @@ CTableCell.prototype =
 
     Set_TextDirectionFromApi : function(TextDirection)
     {
-        var isVerticalText = (textdirection_BTLR === TextDirection || textdirection_TBRL === TextDirection) ? true : false;
+        var isVerticalText = (AscCommon.textdirection_BTLR === TextDirection || AscCommon.textdirection_TBRL === TextDirection) ? true : false;
 
         // Во время изменения направления текста меняем высоту строки, если надо и отступы и параграфов внутри ячейки.
         var OldTextDirection = this.Get_TextDirection();
@@ -2287,10 +2289,10 @@ CTableCell.prototype =
                     {
                         this.Pr.TableCellMar =
                         {
-                            Top    : new CTableMeasurement(tblwidth_Auto, 0),
-                            Left   : new CTableMeasurement(tblwidth_Auto, 0),
-                            Bottom : new CTableMeasurement(tblwidth_Auto, 0),
-                            Right  : new CTableMeasurement(tblwidth_Auto, 0)
+                            Top    : new CTableMeasurement(AscCommon.tblwidth_Auto, 0),
+                            Left   : new CTableMeasurement(AscCommon.tblwidth_Auto, 0),
+                            Bottom : new CTableMeasurement(AscCommon.tblwidth_Auto, 0),
+                            Right  : new CTableMeasurement(AscCommon.tblwidth_Auto, 0)
                         };
 
                         this.Pr.TableCellMar.Top.Read_FromBinary( Reader );
@@ -2315,7 +2317,7 @@ CTableCell.prototype =
                     this.Pr.Shd = undefined;
                 else
                 {
-                    this.Pr.Shd = new CDocumentShd();
+                    this.Pr.Shd = new AscCommon.CDocumentShd();
                     this.Pr.Shd.Read_FromBinary( Reader );
                 }
 
@@ -2477,7 +2479,7 @@ CTableCell.prototype =
                     delete this.Pr.TableCellW;
                 else
                 {
-                    this.Pr.TableCellW = new CTableMeasurement(tblwidth_Auto, 0);
+                    this.Pr.TableCellW = new CTableMeasurement(AscCommon.tblwidth_Auto, 0);
                     this.Pr.TableCellW.Read_FromBinary( Reader );
                 }
 
@@ -2489,7 +2491,7 @@ CTableCell.prototype =
             {
                 // CTableCellPr
 
-                this.Pr = new CTableCellPr();
+                this.Pr = new AscCommon.CTableCellPr();
                 this.Pr.Read_FromBinary( Reader );
 
                 this.Recalc_CompiledPr();
@@ -2546,7 +2548,7 @@ CTableCell.prototype =
         // String   : Id DocumentContent
 
         this.Id = Reader.GetString2();
-        this.Pr = new CTableCellPr();
+        this.Pr = new AscCommon.CTableCellPr();
         this.Pr.Read_FromBinary( Reader );
         this.Recalc_CompiledPr();
 

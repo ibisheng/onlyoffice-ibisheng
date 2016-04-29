@@ -518,7 +518,7 @@ CRadical.prototype.recalculateSize = function(oMeasure)
     var sign = this.signRadical.size,
         gSign = this.signRadical.gapSign,
         // в случае смещения baseline контента тоже смещается, и по высоте артгумент может выйти чуть за пределы (т.о. значок интеграла будет расположен чуть выше, чем следовало бы, и размер аргумента выйде за границы)
-        gArg = this.signRadical.gapArg > 2*g_dKoef_pt_to_mm ? this.signRadical.gapArg : 2*g_dKoef_pt_to_mm; // делаем смещение, т.к. для fontSize 11, 14 и меньше высота плейсхолдера не совпадает
+        gArg = this.signRadical.gapArg > 2*AscCommon.g_dKoef_pt_to_mm ? this.signRadical.gapArg : 2*AscCommon.g_dKoef_pt_to_mm; // делаем смещение, т.к. для fontSize 11, 14 и меньше высота плейсхолдера не совпадает
                                                                                                             // с высотой отрисовки плейсхолдера и происходит наложение черты значка радикала и плейсхолдера
 
     var gapBase = gSign + gArg;

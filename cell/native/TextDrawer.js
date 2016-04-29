@@ -1003,7 +1003,7 @@ CTextDrawer.prototype =
 
     SetBorder: function(oBorder)
     {
-        if(oBorder && oBorder.Value !== border_None)
+        if(oBorder && oBorder.Value !== AscCommon.border_None)
         {
             this.m_oLine = CreatePenFromParams(oBorder.Unifill ? oBorder.Unifill : AscFormat.CreateUnfilFromRGB(oBorder.Color.r, oBorder.Color.g, oBorder.Color.b), this.m_oPen.Style, this.m_oPen.LineCap, this.m_oPen.LineJoin, this.m_oPen.LineWidth, this.m_oPen.Size);
         }

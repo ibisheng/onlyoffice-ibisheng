@@ -764,7 +764,7 @@ CHeaderFooter.prototype.Restart_CheckSpelling = function()
 //----------------------------------------------------------------------------------------------------------------------
 AscCommon.CDocumentSectionsInfo.prototype.Restart_CheckSpelling = function()
 {
-    var bEvenOdd = EvenAndOddHeaders;
+    var bEvenOdd = AscCommon.EvenAndOddHeaders;
     var Count = this.Elements.length;
     for ( var Index = 0; Index < Count; Index++ )
     {

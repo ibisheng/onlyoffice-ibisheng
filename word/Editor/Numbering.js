@@ -5,6 +5,8 @@ var align_Right = AscCommon.align_Right;
 var align_Left = AscCommon.align_Left;
 var g_oTextMeasurer = AscCommon.g_oTextMeasurer;
 var History = AscCommon.History;
+var CTextPr = AscCommon.CTextPr;
+var g_dKoef_pt_to_mm = AscCommon.g_dKoef_pt_to_mm;
 
 var numbering_numfmt_None        = 0x0000;
 var numbering_numfmt_Bullet      = 0x1001;
@@ -222,7 +224,7 @@ function CAbstractNum(Type)
 
         Lvl.LvlText = [];
 
-        Lvl.ParaPr = new CParaPr();
+        Lvl.ParaPr = new AscCommon.CParaPr();
         Lvl.ParaPr.Ind.Left      = Left;
         Lvl.ParaPr.Ind.FirstLine = FirstLine;
 
@@ -375,7 +377,7 @@ CAbstractNum.prototype =
             Lvl.LvlText.push(new CLvlText_Num(Index));
             Lvl.LvlText.push(new CLvlText_Text("."));
 
-            Lvl.ParaPr               = new CParaPr();
+            Lvl.ParaPr               = new AscCommon.CParaPr();
             Lvl.ParaPr.Ind.Left      = Left;
             Lvl.ParaPr.Ind.FirstLine = FirstLine;
 
@@ -421,7 +423,7 @@ CAbstractNum.prototype =
             Lvl.LvlText.push(new CLvlText_Num(Index));
             Lvl.LvlText.push(new CLvlText_Text(")"));
 
-            Lvl.ParaPr               = new CParaPr();
+            Lvl.ParaPr               = new AscCommon.CParaPr();
             Lvl.ParaPr.Ind.Left      = Left;
             Lvl.ParaPr.Ind.FirstLine = FirstLine;
 
@@ -499,7 +501,7 @@ CAbstractNum.prototype =
                 Lvl.LvlText.push(new CLvlText_Text("."));
             }
 
-            Lvl.ParaPr               = new CParaPr();
+            Lvl.ParaPr               = new AscCommon.CParaPr();
             Lvl.ParaPr.Ind.Left      = Left;
             Lvl.ParaPr.Ind.FirstLine = FirstLine;
 
@@ -561,7 +563,7 @@ CAbstractNum.prototype =
                     break;
             }
 
-            Lvl.ParaPr               = new CParaPr();
+            Lvl.ParaPr               = new AscCommon.CParaPr();
             Lvl.ParaPr.Ind.Left      = Left;
             Lvl.ParaPr.Ind.FirstLine = FirstLine;
 
@@ -599,7 +601,7 @@ CAbstractNum.prototype =
 
             Lvl.LvlText = [];
 
-            Lvl.ParaPr               = new CParaPr();
+            Lvl.ParaPr               = new AscCommon.CParaPr();
             Lvl.ParaPr.Ind.Left      = Left;
             Lvl.ParaPr.Ind.FirstLine = FirstLine;
 
@@ -1557,7 +1559,7 @@ CAbstractNum.prototype =
             Lvl.PStyle = undefined;
 
         Lvl.TextPr = new CTextPr();
-        Lvl.ParaPr = new CParaPr();
+        Lvl.ParaPr = new AscCommon.CParaPr();
         Lvl.TextPr.Read_FromBinary( Reader );
         Lvl.ParaPr.Read_FromBinary( Reader );
 
@@ -1643,7 +1645,7 @@ CAbstractNum.prototype =
 
     Refresh_RecalcData : function(Data)
     {
-        var NumPr = new CNumPr();
+        var NumPr = new AscCommon.CNumPr();
         NumPr.NumId = this.Id;
         NumPr.Lvl   = Data.Index;
 
@@ -1763,7 +1765,7 @@ CAbstractNum.prototype =
                 // Vairable : ParaPr
 
                 iLvl = Reader.GetLong();
-                this.Lvl[iLvl].ParaPr = new CParaPr();
+                this.Lvl[iLvl].ParaPr = new AscCommon.CParaPr();
                 this.Lvl[iLvl].ParaPr.Read_FromBinary(Reader);
 
                 break;
@@ -1820,7 +1822,7 @@ CAbstractNum.prototype =
         // Ищем все параграфы, который используют данную нумерацию и проставляем у них, то что их стиль 
         // нужно перекомпилировать.
         
-        var NumPr = new CNumPr();
+        var NumPr = new AscCommon.CNumPr();
         NumPr.NumId = this.Id;
         NumPr.Lvl   = iLvl;
 
@@ -1956,7 +1958,7 @@ CNumbering.prototype =
         if ( undefined != AbstractId )
             return AbstractId.Lvl[Lvl].ParaPr;
 
-        return new CParaPr();
+        return new AscCommon.CParaPr();
     },
 
     Get_Format : function(NumId, Lvl)

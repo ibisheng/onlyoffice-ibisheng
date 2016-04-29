@@ -412,7 +412,7 @@ CParagraphContentWithParagraphLikeContent.prototype.Get_FirstTextPr = function(b
             return this.Content[0].Get_FirstTextPr();
     }
     else
-        return new CTextPr();
+        return new AscCommon.CTextPr();
 };
 CParagraphContentWithParagraphLikeContent.prototype.Get_CompiledTextPr = function(Copy)
 {

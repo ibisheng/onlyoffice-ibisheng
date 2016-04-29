@@ -550,9 +550,9 @@ CDLbl.prototype =
         return AscFormat.ExecuteNoHistory(function(){
             if(this.lastStyleObject)
                 return this.lastStyleObject;
-            var styles = new CStyles(false);
-            var style = new CStyle("dataLblStyle", null, null, null);
-            var text_pr = new CTextPr();
+            var styles = new AscCommon.CStyles(false);
+            var style = new AscCommon.CStyle("dataLblStyle", null, null, null);
+            var text_pr = new AscCommon.CTextPr();
             text_pr.FontSize = 10;
             if(this.chart && AscFormat.isRealNumber(this.chart.style) && this.chart.style > 40)
             {
@@ -563,7 +563,7 @@ CDLbl.prototype =
                 text_pr.Unifill = AscFormat.CreateUnfilFromRGB(0,0,0);
             }
 
-            var para_pr = new CParaPr();
+            var para_pr = new AscCommon.CParaPr();
             para_pr.Jc = AscCommon.align_Center;
             para_pr.Spacing.Before = 0.0;
             para_pr.Spacing.After = 0.0;

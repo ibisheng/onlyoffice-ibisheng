@@ -3,6 +3,7 @@
 // Import
 var g_oTextMeasurer = AscCommon.g_oTextMeasurer;
 var History = AscCommon.History;
+var CDocumentColor = AscCommon.CDocumentColor;
 
 /**
  *
@@ -24,9 +25,9 @@ function CMathBase(bInside)
     this.Parent 			 = null;
     this.ParaMath 			 = null; // ссылка на общую формулу
 
-    this.CtrPrp 			 = new CTextPr();
-    this.CompiledCtrPrp 	 = new CTextPr(); 
-    this.TextPrControlLetter = new CTextPr();
+    this.CtrPrp 			 = new AscCommon.CTextPr();
+    this.CompiledCtrPrp 	 = new AscCommon.CTextPr(); 
+    this.TextPrControlLetter = new AscCommon.CTextPr();
 
     this.ArgSize             = new CMathArgSize();
 
@@ -657,7 +658,7 @@ CMathBase.prototype.Set_CompiledCtrPrp = function(Parent, ParaMath, RPI)
     {
         if (undefined === ParaMath || null === ParaMath)
         {
-            this.CompiledCtrPrp = new CTextPr();
+            this.CompiledCtrPrp = new AscCommon.CTextPr();
             this.CompiledCtrPrp.Init_Default();
             return;
         }
@@ -671,7 +672,7 @@ CMathBase.prototype.Set_CompiledCtrPrp = function(Parent, ParaMath, RPI)
         if ( undefined != this.CtrPrp.RStyle )
         {
             var Styles = ParaMath.Paragraph.Parent.Get_Styles();
-            var StyleTextPr = Styles.Get_Pr( this.CtrPrp.RStyle, styletype_Character ).TextPr;
+            var StyleTextPr = Styles.Get_Pr( this.CtrPrp.RStyle, AscCommon.styletype_Character ).TextPr;
             this.CompiledCtrPrp.Merge( StyleTextPr );
         }
 
@@ -961,7 +962,7 @@ CMathBase.prototype.Apply_TextPrToCtrPr = function(TextPr, IncFontSize, ApplyToA
 
         if ( undefined != TextPr.RFonts )
         {
-            var RFonts = new CRFonts();
+            var RFonts = new AscCommon.CRFonts();
             RFonts.Set_All("Cambria Math", -1);
 
             this.raw_SetRFonts(RFonts);
@@ -1024,7 +1025,7 @@ CMathBase.prototype.Set_TextOutline = function(Value)
 CMathBase.prototype.Set_HighLight = function(Value)
 {
     var OldValue = this.CtrPrp.HighLight;
-    if ( (undefined === Value && undefined !== OldValue) || ( highlight_None === Value && highlight_None !== OldValue ) || ( Value instanceof CDocumentColor && ( undefined === OldValue || highlight_None === OldValue || false === Value.Compare(OldValue) ) ) )
+    if ( (undefined === Value && undefined !== OldValue) || ( AscCommon.highlight_None === Value && AscCommon.highlight_None !== OldValue ) || ( Value instanceof CDocumentColor && ( undefined === OldValue || AscCommon.highlight_None === OldValue || false === Value.Compare(OldValue) ) ) )
     {
         History.Add(this, new CChangesMathHighLight(Value, this.CtrPrp.HighLight));
         this.raw_SetHighLight(Value);
@@ -1154,7 +1155,7 @@ CMathBase.prototype.raw_SetShd = function(Shd)
 {
     if ( undefined !== Shd )
     {
-        this.CtrPrp.Shd = new CDocumentShd();
+        this.CtrPrp.Shd = new AscCommon.CDocumentShd();
         this.CtrPrp.Shd.Set_FromObject( Shd );
     }
     else
@@ -1765,7 +1766,7 @@ CMathBase.prototype.Draw_HighLights = function(PDSH, bAll)
 
     var HighLight = ComplCtrPrp.HighLight;
 
-    if ( highlight_None != HighLight )
+    if ( AscCommon.highlight_None != HighLight )
         PDSH.High.Add( Y0, Y1, X, X + Bound.W, 0, HighLight.r, HighLight.g, HighLight.b );
 
 
@@ -1790,9 +1791,9 @@ CMathBase.prototype.Draw_Lines = function(PDSL)
 
     // вычисляем координату Y и LineW также как в Run
     var X          = PDSL.X;
-    var Y          = PDSL.Baseline - CtrPrp.FontSize * fontCoeff * g_dKoef_pt_to_mm * 0.27;
+    var Y          = PDSL.Baseline - CtrPrp.FontSize * fontCoeff * AscCommon.g_dKoef_pt_to_mm * 0.27;
 
-    var LineW      = (CtrPrp.FontSize / 18) * g_dKoef_pt_to_mm;
+    var LineW      = (CtrPrp.FontSize / 18) * AscCommon.g_dKoef_pt_to_mm;
 
     var Para       = PDSL.Paragraph;
 

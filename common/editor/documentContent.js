@@ -2231,7 +2231,7 @@ CDocumentContent.prototype =
 
             if ( undefined != LastPara.TextPr.Value.FontSize || undefined !== LastPara.TextPr.Value.RFonts.Ascii )
             {
-                var TextPr = new CTextPr();
+                var TextPr = new AscCommon.CTextPr();
                 TextPr.FontSize   = LastPara.TextPr.Value.FontSize;
                 TextPr.FontSizeCS = LastPara.TextPr.Value.FontSize;
                 TextPr.RFonts     = LastPara.TextPr.Value.RFonts.Copy();
@@ -2551,7 +2551,7 @@ CDocumentContent.prototype =
                                     var FName  = ParaItem.Value.FontFamily.Name;
                                     var FIndex = ParaItem.Value.FontFamily.Index;
 
-                                    ParaItem.Value.RFonts = new CRFonts();
+                                    ParaItem.Value.RFonts = new AscCommon.CRFonts();
                                     ParaItem.Value.RFonts.Ascii    = { Name : FName, Index : FIndex };
                                     ParaItem.Value.RFonts.EastAsia = { Name : FName, Index : FIndex };
                                     ParaItem.Value.RFonts.HAnsi    = { Name : FName, Index : FIndex };
@@ -4833,7 +4833,7 @@ CDocumentContent.prototype =
                                 //        на тот, который прописан в NumInfo.Subtype
 
                                 var LvlText   = "";
-                                var LvlTextPr = new CTextPr();
+                                var LvlTextPr = new AscCommon.CTextPr();
                                 LvlTextPr.RFonts.Set_All( "Times New Roman", -1 );
 
                                 switch ( NumInfo.SubType )
@@ -5302,7 +5302,7 @@ CDocumentContent.prototype =
                                 //    который определен в NumInfo.Subtype
 
                                 var LvlText   = "";
-                                var LvlTextPr = new CTextPr();
+                                var LvlTextPr = new AscCommon.CTextPr();
                                 LvlTextPr.RFonts.Set_All( "Times New Roman", -1 );
 
                                 switch ( NumInfo.SubType )
@@ -6034,7 +6034,7 @@ CDocumentContent.prototype =
                 this.Recalculate();
 
                 if(editor)
-                    editor.Update_ParaTab( Default_Tab_Stop, Tabs );
+                    editor.Update_ParaTab( AscCommon.Default_Tab_Stop, Tabs );
 
                 return;
             }
@@ -6048,13 +6048,13 @@ CDocumentContent.prototype =
                 this.ContentLastChangePos = this.CurPos.ContentPos;
                 this.Recalculate();
                 if(editor)
-                    editor.Update_ParaTab( Default_Tab_Stop, Tabs );
+                    editor.Update_ParaTab( AscCommon.Default_Tab_Stop, Tabs );
             }
             else if ( type_Table == Item.GetType() )
             {
                 Item.Set_ParagraphTabs( Tabs );
                 if(editor)
-                    editor.Update_ParaTab( Default_Tab_Stop, Tabs );
+                    editor.Update_ParaTab( AscCommon.Default_Tab_Stop, Tabs );
             }
         }
     },
@@ -6558,7 +6558,7 @@ CDocumentContent.prototype =
                     {
                         var OldFontSize = this.Get_Paragraph_TextPr().FontSize;
                         var NewFontSize = FontSize_IncreaseDecreaseValue(bIncrease, OldFontSize);
-                        var TextPr = new CTextPr();
+                        var TextPr = new AscCommon.CTextPr();
                         TextPr.FontSize = NewFontSize;
                         this.Paragraph_Add(new ParaTextPr(TextPr), true);
 
@@ -6795,7 +6795,7 @@ CDocumentContent.prototype =
 
     Get_Paragraph_ParaPr : function()
     {
-        var Result_ParaPr = new CParaPr();
+        var Result_ParaPr = new AscCommon.CParaPr();
 
         if ( true === this.ApplyToAll )
         {
@@ -7148,7 +7148,7 @@ CDocumentContent.prototype =
             }
 
             if ( undefined != ParaPr.Tabs  && editor)
-                editor.Update_ParaTab( Default_Tab_Stop, ParaPr.Tabs );
+                editor.Update_ParaTab( AscCommon.Default_Tab_Stop, ParaPr.Tabs );
 
             if (this.LogicDocument)
             {

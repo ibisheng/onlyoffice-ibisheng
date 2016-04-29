@@ -61,11 +61,11 @@ CGroupShape.prototype.documentUpdateInterfaceState = function()
         var text_pr = AscFormat.DrawingObjectsController.prototype.getParagraphTextPr.call(this);
         if(!para_pr)
         {
-            para_pr = new CParaPr();
+            para_pr = new AscCommon.CParaPr();
         }
         if(!text_pr)
         {
-            text_pr = new CTextPr();
+            text_pr = new AscCommon.CTextPr();
         }
 
         var theme = this.Get_Theme();
@@ -90,7 +90,7 @@ CGroupShape.prototype.documentUpdateInterfaceState = function()
         if(text_pr.Unifill)
         {
             var RGBAColor = text_pr.Unifill.getRGBAColor();
-            text_pr.Color = new CDocumentColor(RGBAColor.R, RGBAColor.G, RGBAColor.B, false);
+            text_pr.Color = new AscCommon.CDocumentColor(RGBAColor.R, RGBAColor.G, RGBAColor.B, false);
         }
         if(text_pr.Shd && text_pr.Shd.Unifill && theme)
         {

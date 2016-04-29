@@ -2094,7 +2094,7 @@ CDrawingDocument.prototype =
             var i = _styles[i1];
             var _style = logicDoc.Styles.Style[i];
 
-            if (!_style || _style.Type != styletype_Table)
+            if (!_style || _style.Type != AscCommon.styletype_Table)
                 continue;
 
             if (_table_styles == null)

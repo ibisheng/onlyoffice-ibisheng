@@ -120,7 +120,7 @@ BinaryCommonWriter.prototype.WriteBorder = function(border)
             var doc = editor.WordControl.m_oLogicDocument;
             border.Unifill.check(doc.Get_Theme(), doc.Get_ColorMap());
             var RGBA = border.Unifill.getRGBAColor();
-            color = new CDocumentColor(RGBA.R, RGBA.G, RGBA.B);
+            color = new AscCommon.CDocumentColor(RGBA.R, RGBA.G, RGBA.B);
         }
         if (null != color && !color.Auto)
             this.WriteColor(c_oSerBorderType.Color, color);
@@ -447,7 +447,7 @@ Binary_CommonReader.prototype.ReadColor = function()
     var r = this.stream.GetUChar();
     var g = this.stream.GetUChar();
     var b = this.stream.GetUChar()
-    return new CDocumentColor(r, g, b);
+    return new AscCommon.CDocumentColor(r, g, b);
 };
 Binary_CommonReader.prototype.ReadShd = function(type, length, Shd, themeColor)
 {

@@ -2210,15 +2210,15 @@ DrawingObjectsController.prototype =
                 var props2 = new CTableProp();
                 if(props.verticalTextAlign === AscFormat.VERTICAL_ANCHOR_TYPE_BOTTOM)
                 {
-                    props2.put_CellsVAlign(vertalignjc_Bottom);
+                    props2.put_CellsVAlign(AscCommon.vertalignjc_Bottom);
                 }
                 else if(props.verticalTextAlign === AscFormat.VERTICAL_ANCHOR_TYPE_CENTER)
                 {
-                    props2.put_CellsVAlign(vertalignjc_Center);
+                    props2.put_CellsVAlign(AscCommon.vertalignjc_Center);
                 }
                 else
                 {
-                    props2.put_CellsVAlign(vertalignjc_Top);
+                    props2.put_CellsVAlign(AscCommon.vertalignjc_Top);
                 }
                 var target_text_object = getTargetTextObject(this);
                 if(target_text_object === objects_by_type.tables[0])
@@ -6616,12 +6616,12 @@ DrawingObjectsController.prototype =
                             {
                                 new_table_props.CellsBackground.Unifill.check(drawing.Get_Theme(), drawing.Get_ColorMap());
                                 var RGBA = new_table_props.CellsBackground.Unifill.getRGBAColor();
-                                new_table_props.CellsBackground.Color = new CDocumentColor(RGBA.R, RGBA.G, RGBA.B, false);
+                                new_table_props.CellsBackground.Color = new AscCommon.CDocumentColor(RGBA.R, RGBA.G, RGBA.B, false);
                                 new_table_props.CellsBackground.Value = Asc.c_oAscShdClear;
                             }
                             else
                             {
-                                new_table_props.CellsBackground.Color = new CDocumentColor(0, 0, 0, false);
+                                new_table_props.CellsBackground.Color = new AscCommon.CDocumentColor(0, 0, 0, false);
                                 new_table_props.CellsBackground.Value = Asc.c_oAscShdNil;
                             }
                         }
@@ -6635,13 +6635,13 @@ DrawingObjectsController.prototype =
                                 {
                                     border.Unifill.check(drawing.Get_Theme(), drawing.Get_ColorMap());
                                     var RGBA = border.Unifill.getRGBAColor();
-                                    border.Color = new CDocumentColor(RGBA.R, RGBA.G, RGBA.B, false);
-                                    border.Value = border_Single;
+                                    border.Color = new AscCommon.CDocumentColor(RGBA.R, RGBA.G, RGBA.B, false);
+                                    border.Value = AscCommon.border_Single;
                                 }
                                 else
                                 {
-                                    border.Color = new CDocumentColor(0, 0, 0, false);
-                                    border.Value = border_Single;
+                                    border.Color = new AscCommon.CDocumentColor(0, 0, 0, false);
+                                    border.Value = AscCommon.border_Single;
                                 }
                             };
                             checkBorder(new_table_props.CellBorders.Top);
@@ -7014,12 +7014,12 @@ DrawingObjectsController.prototype =
         //-----------------------------------------------------------------------------
 
         if ( true === ParaPr.Spacing.AfterAutoSpacing )
-            ParaPr.Spacing.After = spacing_Auto;
+            ParaPr.Spacing.After = AscCommon.spacing_Auto;
         else if ( undefined === ParaPr.Spacing.AfterAutoSpacing )
             ParaPr.Spacing.After = AscCommon.UnknownValue;
 
         if ( true === ParaPr.Spacing.BeforeAutoSpacing )
-            ParaPr.Spacing.Before = spacing_Auto;
+            ParaPr.Spacing.Before = AscCommon.spacing_Auto;
         else if ( undefined === ParaPr.Spacing.BeforeAutoSpacing )
             ParaPr.Spacing.Before = AscCommon.UnknownValue;
 
@@ -7031,12 +7031,12 @@ DrawingObjectsController.prototype =
 
         // ParaPr.Spacing
         if ( true === ParaPr.Spacing.AfterAutoSpacing )
-            ParaPr.Spacing.After = spacing_Auto;
+            ParaPr.Spacing.After = AscCommon.spacing_Auto;
         else if ( undefined === ParaPr.Spacing.AfterAutoSpacing )
             ParaPr.Spacing.After = AscCommon.UnknownValue;
 
         if ( true === ParaPr.Spacing.BeforeAutoSpacing )
-            ParaPr.Spacing.Before = spacing_Auto;
+            ParaPr.Spacing.Before = AscCommon.spacing_Auto;
         else if ( undefined === ParaPr.Spacing.BeforeAutoSpacing )
             ParaPr.Spacing.Before = AscCommon.UnknownValue;
 
@@ -7253,7 +7253,7 @@ DrawingObjectsController.prototype =
         {
             case 0:
             {
-                if ( spacing_Auto === value )
+                if ( AscCommon.spacing_Auto === value )
                     arg = { BeforeAutoSpacing : true };
                 else
                     arg = { Before : value, BeforeAutoSpacing : false };
@@ -7262,7 +7262,7 @@ DrawingObjectsController.prototype =
             }
             case 1:
             {
-                if ( spacing_Auto === value )
+                if ( AscCommon.spacing_Auto === value )
                     arg = { AfterAutoSpacing : true };
                 else
                     arg = { After : value, AfterAutoSpacing : false };
@@ -7465,7 +7465,7 @@ DrawingObjectsController.prototype =
 
             if ( undefined != Props.Tabs )
             {
-                var Tabs = new CParaTabs();
+                var Tabs = new AscCommon.CParaTabs();
                 Tabs.Set_FromObject( Props.Tabs.Tabs );
                 this.setParagraphTabs( Tabs );
             }
@@ -7477,7 +7477,7 @@ DrawingObjectsController.prototype =
 
 
             // TODO: как только разъединят настройки параграфа и текста переделать тут
-            var TextPr = new CTextPr();
+            var TextPr = new AscCommon.CTextPr();
 
             if ( true === Props.Subscript )
                 TextPr.VertAlign = AscCommon.vertalign_SubScript;

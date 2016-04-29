@@ -544,7 +544,7 @@ CHeaderFooter.prototype.Search_GetId = function(bNext, bCurrent)
 //----------------------------------------------------------------------------------------------------------------------
 AscCommon.CDocumentSectionsInfo.prototype.Search = function(Str, Props, SearchEngine)
 {
-    var bEvenOdd = EvenAndOddHeaders;
+    var bEvenOdd = AscCommon.EvenAndOddHeaders;
     var Count = this.Elements.length;
     for ( var Index = 0; Index < Count; Index++ )
     {
@@ -576,7 +576,7 @@ AscCommon.CDocumentSectionsInfo.prototype.Search_GetId = function(bNext, CurHdrF
     var HdrFtrs = [];
     var CurPos  = -1;
 
-    var bEvenOdd = EvenAndOddHeaders;
+    var bEvenOdd = AscCommon.EvenAndOddHeaders;
     var Count = this.Elements.length;
     for ( var Index = 0; Index < Count; Index++ )
     {

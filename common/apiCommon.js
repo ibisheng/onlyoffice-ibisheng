@@ -1030,8 +1030,8 @@
           else
           {
               this.Color = CreateAscColorCustom(0,0,0);
-              this.Size  = 0.5 * g_dKoef_pt_to_mm;
-              this.Value = border_Single;
+              this.Size  = 0.5 * AscCommon.g_dKoef_pt_to_mm;
+              this.Value = AscCommon.border_Single;
               this.Space = 0;
           }
       }
@@ -1312,7 +1312,7 @@
               this.Brd               = (undefined != obj.Brd     && null != obj.Brd)     ? new asc_CParagraphBorders (obj.Brd) : null;
               this.Shd               = (undefined != obj.Shd     && null != obj.Shd)     ? new asc_CParagraphShd (obj.Shd) : null;
               this.Tabs              = (undefined != obj.Tabs)                           ? new asc_CParagraphTabs(obj.Tabs) : undefined;
-              this.DefaultTab        = Default_Tab_Stop;
+              this.DefaultTab        = AscCommon.Default_Tab_Stop;
               this.Locked            = (undefined != obj.Locked  && null != obj.Locked ) ? obj.Locked : false;
               this.CanAddTable       = (undefined != obj.CanAddTable )                   ? obj.CanAddTable : true;
 

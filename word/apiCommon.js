@@ -66,7 +66,7 @@ function GenerateTableStyles(drawingDoc, logicDoc, tableLook)
         var i = _styles[i1];
         var _style = logicDoc.Styles.Style[i];
 
-        if (!_style || _style.Type != styletype_Table)
+        if (!_style || _style.Type != AscCommon.styletype_Table)
             continue;
 
         var table = new CTable(drawingDoc, logicDoc, true, 0, _x_mar, _y_mar, 1000, 1000, Rows, Cols, Grid);
@@ -98,12 +98,12 @@ function GenerateTableStyles(drawingDoc, logicDoc, tableLook)
 }
 
 // Создаем глобальные дефолтовые стили, чтобы быстро можно было отдать дефолтовые настройки
-var g_oDocumentDefaultTextPr       = new CTextPr();
-var g_oDocumentDefaultParaPr       = new CParaPr();
-var g_oDocumentDefaultTablePr      = new CTablePr();
-var g_oDocumentDefaultTableCellPr  = new CTableCellPr();
-var g_oDocumentDefaultTableRowPr   = new CTableRowPr();
-var g_oDocumentDefaultTableStylePr = new CTableStylePr();
+var g_oDocumentDefaultTextPr       = new AscCommon.CTextPr();
+var g_oDocumentDefaultParaPr       = new AscCommon.CParaPr();
+var g_oDocumentDefaultTablePr      = new AscCommon.CTablePr();
+var g_oDocumentDefaultTableCellPr  = new AscCommon.CTableCellPr();
+var g_oDocumentDefaultTableRowPr   = new AscCommon.CTableRowPr();
+var g_oDocumentDefaultTableStylePr = new AscCommon.CTableStylePr();
 g_oDocumentDefaultTextPr.Init_Default();
 g_oDocumentDefaultParaPr.Init_Default();
 g_oDocumentDefaultTablePr.Init_Default();

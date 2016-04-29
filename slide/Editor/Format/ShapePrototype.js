@@ -26,7 +26,7 @@ pHText[0][AscFormat.phType_subTitle] = "Slide subtitle";// "Подзаголов
 pHText[0][AscFormat.phType_tbl]      = "Table";// "Таблица"; //(Table)                              ;
 pHText[0][AscFormat.phType_title]    = "Slide title";// "Заголовок слайда" ;  //(Title)             ;
 
-CRFonts.prototype.Merge = function(RFonts)
+AscCommon.CRFonts.prototype.Merge = function(RFonts)
 {
     if ( undefined !== RFonts.Ascii )
         this.Ascii = RFonts.Ascii;

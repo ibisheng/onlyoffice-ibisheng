@@ -1013,7 +1013,7 @@ function ParaMath()
 
     this.DispositionOpers   = [];
 
-    this.DefaultTextPr      = new CTextPr();
+    this.DefaultTextPr      = new AscCommon.CTextPr();
 
     this.DefaultTextPr.FontFamily = {Name  : "Cambria Math", Index : -1 };
     this.DefaultTextPr.RFonts.Set_All("Cambria Math", -1);
@@ -1089,7 +1089,7 @@ ParaMath.prototype.Is_StartFromNewLine = function()
 
 ParaMath.prototype.Get_TextPr = function(_ContentPos, Depth)
 {
-    var TextPr = new CTextPr();
+    var TextPr = new AscCommon.CTextPr();
 
     var mTextPr = this.Root.Get_TextPr(_ContentPos, Depth);
     TextPr.Merge( mTextPr );
@@ -1523,7 +1523,7 @@ ParaMath.prototype.Apply_TextPr = function(TextPr, IncFontSize, ApplyToAll)
     {
         var content = this.GetSelectContent().Content;
 
-        var NewTextPr = new CTextPr();
+        var NewTextPr = new AscCommon.CTextPr();
         var bSetInRoot = false;
 
 
@@ -2493,8 +2493,8 @@ ParaMath.prototype.MathToImageConverter = function(bCopy, _canvasInput, _widthPx
 
 	History.TurnOff();
 
-    var oldDefTabStop = Default_Tab_Stop;
-    Default_Tab_Stop = 1;
+    var oldDefTabStop = AscCommon.Default_Tab_Stop;
+    AscCommon.Default_Tab_Stop = 1;
 
     var hdr = new CHeaderFooter(editor.WordControl.m_oLogicDocument.HdrFtr, editor.WordControl.m_oLogicDocument, editor.WordControl.m_oDrawingDocument, AscCommon.hdrftr_Header);
     var _dc = hdr.Content;
@@ -2509,15 +2509,15 @@ ParaMath.prototype.MathToImageConverter = function(bCopy, _canvasInput, _widthPx
     _dc.Internal_Content_Add(0, par, false);
 
     par.Set_Align(align_Left);
-    par.Set_Tabs(new CParaTabs());
+    par.Set_Tabs(new AscCommon.CParaTabs());
 
-    var _ind = new CParaInd();
+    var _ind = new AscCommon.CParaInd();
     _ind.FirstLine = 0;
     _ind.Left = 0;
     _ind.Right = 0;
     par.Set_Ind(_ind, false);
 
-    var _sp = new CParaSpacing();
+    var _sp = new AscCommon.CParaSpacing();
     _sp.Line              = 1;
     _sp.LineRule          = Asc.linerule_Auto;
     _sp.Before            = 0;
@@ -2535,7 +2535,7 @@ ParaMath.prototype.MathToImageConverter = function(bCopy, _canvasInput, _widthPx
     _dc.Reset(0, 0, par.Lines[0].Ranges[0].W + 0.001, 10000);
     _dc.Recalculate_Page(0, true);
 
-    Default_Tab_Stop = oldDefTabStop;
+    AscCommon.Default_Tab_Stop = oldDefTabStop;
 
     if (true === bTurnOnId)
         g_oTableId.m_bTurnOff = false;
@@ -2718,31 +2718,31 @@ ParaMath.prototype.Draw_Lines = function(PDSL)
         var Y          = PDSL.Baseline;
         var UndOff     = PDSL.UnderlineOffset;
         var UnderlineY = Y + UndOff;
-        var LineW      = (FirstRPrp.FontSize / 18) * g_dKoef_pt_to_mm;
+        var LineW      = (FirstRPrp.FontSize / 18) * AscCommon.g_dKoef_pt_to_mm;
 
 
         var BgColor = PDSL.BgColor;
         if ( undefined !== FirstRPrp.Shd && Asc.c_oAscShdNil !== FirstRPrp.Shd.Value )
             BgColor = FirstRPrp.Shd.Get_Color( Para );
-        var AutoColor = ( undefined != BgColor && false === BgColor.Check_BlackAutoColor() ? new CDocumentColor( 255, 255, 255, false ) : new CDocumentColor( 0, 0, 0, false ) );
+        var AutoColor = ( undefined != BgColor && false === BgColor.Check_BlackAutoColor() ? new AscCommon.CDocumentColor( 255, 255, 255, false ) : new AscCommon.CDocumentColor( 0, 0, 0, false ) );
         var CurColor, RGBA, Theme = this.Paragraph.Get_Theme(), ColorMap = this.Paragraph.Get_ColorMap();
 
         // Выставляем цвет обводки
         if ( true === PDSL.VisitedHyperlink && ( undefined === FirstRPrp.Color && undefined === FirstRPrp.Unifill ) )
-            CurColor = new CDocumentColor( 128, 0, 151 );
+            CurColor = new AscCommon.CDocumentColor( 128, 0, 151 );
         else if ( true === FirstRPrp.Color.Auto && !FirstRPrp.Unifill)
-            CurColor = new CDocumentColor( AutoColor.r, AutoColor.g, AutoColor.b );
+            CurColor = new AscCommon.CDocumentColor( AutoColor.r, AutoColor.g, AutoColor.b );
         else
         {
             if(FirstRPrp.Unifill)
             {
                 FirstRPrp.Unifill.check(Theme, ColorMap);
                 RGBA = FirstRPrp.Unifill.getRGBAColor();
-                CurColor = new CDocumentColor( RGBA.R, RGBA.G, RGBA.B );
+                CurColor = new AscCommon.CDocumentColor( RGBA.R, RGBA.G, RGBA.B );
             }
             else
             {
-                CurColor = new CDocumentColor( FirstRPrp.Color.r, FirstRPrp.Color.g, FirstRPrp.Color.b );
+                CurColor = new AscCommon.CDocumentColor( FirstRPrp.Color.r, FirstRPrp.Color.g, FirstRPrp.Color.b );
             }
         }
 
@@ -3487,7 +3487,7 @@ CChangesMathShd.prototype.Load_Changes = function(Reader, Class)
 
     if ( Reader.GetBool() == false)
     {
-        this.New = new CDocumentShd();
+        this.New = new AscCommon.CDocumentShd();
         this.New.Read_FromBinary( Reader );
     }
     else
@@ -3517,7 +3517,7 @@ CChangesMathHighLight.prototype.Save_Changes = function(Writer)
     if ( undefined != this.New )
     {
         Writer.WriteBool(false);
-        if ( highlight_None != this.New )
+        if ( AscCommon.highlight_None != this.New )
         {
             Writer.WriteBool( false );
             this.New.Write_ToBinary( Writer );
@@ -3534,11 +3534,11 @@ CChangesMathHighLight.prototype.Load_Changes = function(Reader, Class)
     {
         if ( Reader.GetBool() == false )
         {
-            this.New = new CDocumentColor(0,0,0);
+            this.New = new AscCommon.CDocumentColor(0,0,0);
             this.New.Read_FromBinary(Reader);
         }
         else
-            this.New = highlight_None;
+            this.New = AscCommon.highlight_None;
     }
     else
         this.New = undefined;
@@ -3580,7 +3580,7 @@ CChangesMathColor.prototype.Load_Changes = function(Reader, Class)
 
     if ( Reader.GetBool() == false)
     {
-        this.New = new CDocumentColor(0, 0, 0, false);
+        this.New = new AscCommon.CDocumentColor(0, 0, 0, false);
         this.New.Read_FromBinary(Reader);
     }
     else

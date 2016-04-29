@@ -823,14 +823,14 @@ function CMasterThumbnailDrawer()
         _color.id = 15;
         _color.Calculate(_theme, null, null, _master, RGBA);
 
-        var _textPr1 = new CTextPr();
+        var _textPr1 = new AscCommon.CTextPr();
         _textPr1.FontFamily = { Name : _theme.themeElements.fontScheme.majorFont.latin, Index : -1 };
         _textPr1.FontSize = 18;
-        _textPr1.Color = new CDocumentColor(_color.RGBA.R, _color.RGBA.G, _color.RGBA.B);
-        var _textPr2 = new CTextPr();
+        _textPr1.Color = new AscCommon.CDocumentColor(_color.RGBA.R, _color.RGBA.G, _color.RGBA.B);
+        var _textPr2 = new AscCommon.CTextPr();
         _textPr2.FontFamily = { Name : _theme.themeElements.fontScheme.minorFont.latin, Index : -1 };
         _textPr2.FontSize = 18;
-        _textPr2.Color = new CDocumentColor(_color.RGBA.R, _color.RGBA.G, _color.RGBA.B);
+        _textPr2.Color = new AscCommon.CDocumentColor(_color.RGBA.R, _color.RGBA.G, _color.RGBA.B);
 
 
         /*
@@ -881,7 +881,7 @@ function CMasterThumbnailDrawer()
         var docContent = new AscCommon.CDocumentContent(editor.WordControl.m_oLogicDocument, editor.WordControl.m_oDrawingDocument, 0, 0,1000, 1000, false, false, true);
         var par = docContent.Content[0];
         par.Cursor_MoveToStartPos();
-        var _paraPr = new CParaPr();
+        var _paraPr = new AscCommon.CParaPr();
         par.Pr = _paraPr;
         var parRun = new ParaRun(par);
         parRun.Set_Pr(_textPr1);
