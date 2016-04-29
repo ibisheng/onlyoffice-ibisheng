@@ -194,7 +194,7 @@
 			
 			asc_getSortState : function() { return this.sortVal; },
 			asc_getDisplayName : function(val) { return this.displayName; },
-            asc_getIsTextFilter : function(val) { return this.IsTextFilter; },
+            asc_getIsTextFilter : function(val) { return this.isTextFilter; },
             asc_getColorsFill : function(val) { return this.colorsFill; },
             asc_getColorsFont : function(val) { return this.colorsFont; }
 		};
