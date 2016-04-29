@@ -10,6 +10,10 @@
 var g_oTableId = AscCommon.g_oTableId;
 var History = AscCommon.History;
 
+var comments_NoComment        = 0;
+var comments_NonActiveComment = 1;
+var comments_ActiveComment    = 2;
+
 function ParaComment(Start, Id)
 {
     this.Id = AscCommon.g_oIdCounter.Get_NewId();

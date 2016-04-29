@@ -4259,8 +4259,8 @@ ParaRun.prototype.Draw_HighLights = function(PDSH)
                 if ( para_Drawing === ItemType && !Item.Is_Inline() )
                     break;
 
-                if ( CommentsFlag != AscCommon.comments_NoComment )
-                    aComm.Add( Y0, Y1, X, X + ItemWidthVisible, 0, 0, 0, 0, { Active : CommentsFlag === AscCommon.comments_ActiveComment ? true : false, CommentId : CommentId } );
+                if ( CommentsFlag != comments_NoComment )
+                    aComm.Add( Y0, Y1, X, X + ItemWidthVisible, 0, 0, 0, 0, { Active : CommentsFlag === comments_ActiveComment ? true : false, CommentId : CommentId } );
                 else if ( highlight_None != HighLight )
                     aHigh.Add( Y0, Y1, X, X + ItemWidthVisible, 0, HighLight.r, HighLight.g, HighLight.b, undefined, HighLight );
 
@@ -4279,8 +4279,8 @@ ParaRun.prototype.Draw_HighLights = function(PDSH)
                 // Пробелы в конце строки (и строку состоящую из пробелов) не подчеркиваем, не зачеркиваем и не выделяем
                 if ( PDSH.Spaces > 0 )
                 {
-                    if ( CommentsFlag != AscCommon.comments_NoComment )
-                        aComm.Add( Y0, Y1, X, X + ItemWidthVisible, 0, 0, 0, 0, { Active : CommentsFlag === AscCommon.comments_ActiveComment ? true : false, CommentId : CommentId } );
+                    if ( CommentsFlag != comments_NoComment )
+                        aComm.Add( Y0, Y1, X, X + ItemWidthVisible, 0, 0, 0, 0, { Active : CommentsFlag === comments_ActiveComment ? true : false, CommentId : CommentId } );
                     else if ( highlight_None != HighLight )
                         aHigh.Add( Y0, Y1, X, X + ItemWidthVisible, 0, HighLight.r, HighLight.g, HighLight.b, undefined, HighLight );
 

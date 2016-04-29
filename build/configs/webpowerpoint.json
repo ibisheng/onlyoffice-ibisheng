@@ -27,7 +27,6 @@
 		"../word/Editor/History.js",
 		"../common/editor/document.js",
 		"../common/editor/documentContent.js",
-		"../common/editor/paragraph.js",
 		
 		"../common/Shapes/EditorSettings.js",
 		"../common/Shapes/Serialize.js",
@@ -137,6 +136,7 @@
         "../word/Math/accent.js",
         "../word/Math/borderBox.js",
         "../word/Editor/FlowObjects.js",
+        "../word/Editor/Paragraph.js",
         "../word/Editor/Paragraph_Recalculate.js",
         "../word/Editor/HeaderFooter.js",
         "../word/Editor/Math.js",

@@ -897,10 +897,6 @@ var changestype_2_Element_and_Type       = 4; // Проверяем возмож
 var changestype_2_ElementsArray_and_Type = 5; // Аналогично предыдущему, только идет массив элементов
 var changestype_2_AdditionalTypes        = 6; // Дополнительные проверки типа 1
 
-  var comments_NoComment        = 0;
-  var comments_NonActiveComment = 1;
-  var comments_ActiveComment    = 2;
-
 var contentchanges_Add    = 1;
 var contentchanges_Remove = 2;
 
@@ -1445,10 +1441,6 @@ window['Asc']['c_oAscMaxCellOrCommentLength'] = window['Asc'].c_oAscMaxCellOrCom
   window["AscCommon"].changestype_2_AdditionalTypes = changestype_2_AdditionalTypes;
   window["AscCommon"].contentchanges_Add = contentchanges_Add;
   window["AscCommon"].contentchanges_Remove = contentchanges_Remove;
-
-  window["AscCommon"].comments_NoComment = comments_NoComment;
-  window["AscCommon"].comments_NonActiveComment = comments_NonActiveComment;
-  window["AscCommon"].comments_ActiveComment = comments_ActiveComment;
 
   window["AscCommon"].offlineMode = offlineMode;
 })(window);

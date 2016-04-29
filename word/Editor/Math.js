@@ -2672,7 +2672,7 @@ ParaMath.prototype.Draw_HighLights = function(PDSH)
             var CommentsFlag  = PDSH.CommentsFlag;
 
             var Bounds = this.Root.Get_LineBound(PDSH.Line, PDSH.Range);
-            Comm.Add(Bounds.Y, Bounds.Y + Bounds.H, Bounds.X, Bounds.X + Bounds.W, 0, 0, 0, 0, { Active : CommentsFlag === AscCommon.comments_ActiveComment ? true : false, CommentId : CommentId } );
+            Comm.Add(Bounds.Y, Bounds.Y + Bounds.H, Bounds.X, Bounds.X + Bounds.W, 0, 0, 0, 0, { Active : CommentsFlag === comments_ActiveComment ? true : false, CommentId : CommentId } );
         }
 
         if (null !== CollFirst)
