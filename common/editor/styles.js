@@ -1080,11 +1080,11 @@ CStyle.prototype =
                 Tabs :
                     [
                         {
-                            Value : AscCommon.tab_Center,
+                            Value : tab_Center,
                             Pos   : CPos
                         },
                         {
-                            Value : AscCommon.tab_Right,
+                            Value : tab_Right,
                             Pos   : RPos
                         }
                     ]
@@ -1123,11 +1123,11 @@ CStyle.prototype =
                 Tabs :
                     [
                         {
-                            Value : AscCommon.tab_Center,
+                            Value : tab_Center,
                             Pos   : CPos
                         },
                         {
-                            Value : AscCommon.tab_Right,
+                            Value : tab_Right,
                             Pos   : RPos
                         }
                     ]
@@ -8892,7 +8892,7 @@ CParaTabs.prototype =
 
                 if ( Math.abs(  Tab.Pos - _Tab.Pos ) < 0.001 )
                 {
-                    if ( AscCommon.tab_Clear === _Tab.Value )
+                    if ( tab_Clear === _Tab.Value )
                         Flag = -2; // таб нужно удалить
                     else
                         Flag = -1; // табы совпали, не надо новый добавлять

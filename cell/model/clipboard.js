@@ -2204,9 +2204,9 @@
 						{
 							var _char = text.charAt(Index);
 							if (" " == _char)
-								isIntoShape.Paragraph_Add(new AscCommon.ParaSpace());
+								isIntoShape.Paragraph_Add(new ParaSpace());
 							else
-								isIntoShape.Paragraph_Add(new AscCommon.ParaText(_char));
+								isIntoShape.Paragraph_Add(new ParaText(_char));
 						}
 					};
 					
@@ -3638,12 +3638,12 @@
 					
 					switch(content[n].Type)
 					{
-						case AscCommon.para_Run://*paraRun*
+						case para_Run://*paraRun*
 						{
 							s = this._parseParaRun(content[n], oNewItem, paraPr, s, row, c1, text);
 							break;
 						};
-						case AscCommon.para_Hyperlink://*hyperLink*
+						case para_Hyperlink://*hyperLink*
 						{	
 							//если несколько ссылок в одном параграфе, то отменяем ссылки
 							if(!oNewItem.doNotApplyHyperlink)
@@ -3665,7 +3665,7 @@
 							{
 								switch(content[n].Content[h].Type)
 								{
-									case AscCommon.para_Run://*paraRun*
+									case para_Run://*paraRun*
 									{
 										s = this._parseParaRun(content[n].Content[h], oNewItem, paraPr, s, row, c1, text);
 										break;
@@ -3760,7 +3760,7 @@
 				var cloneNewItem, formatText;
 			
 				var cTextPr = paraRun.Get_CompiledPr();
-				if(cTextPr && !(paraRunContent.length == 1 && paraRunContent[0] instanceof AscCommon.ParaEnd))//settings for text	
+				if(cTextPr && !(paraRunContent.length == 1 && paraRunContent[0] instanceof ParaEnd))//settings for text	
 					formatText = this._getPrParaRun(paraPr, cTextPr);
 				else if(!formatText)
 					formatText = this._getPrParaRun(paraPr, cTextPr);
@@ -3771,19 +3771,19 @@
 
 					switch(paraRunContent[pR].Type)
 					{
-						case AscCommon.para_Text://*paraText*
+						case para_Text://*paraText*
 						{
 							text += String.fromCharCode(paraRunContent[pR].Value);
 							break;
 						};
 						
-						case AscCommon.para_Space://*paraSpace*
+						case para_Space://*paraSpace*
 						{
 							text += " ";
 							break;
 						};
 						
-						case AscCommon.para_Tab://*paraEnd / paraTab*
+						case para_Tab://*paraEnd / paraTab*
 						{
 							//if(!oNewItem.length)
 							//{
@@ -3812,7 +3812,7 @@
 							break;
 						};
 						
-						case AscCommon.para_Drawing:
+						case para_Drawing:
 						{
 							if(!aResult.addImagesFromWord)
 								aResult.addImagesFromWord = [];
@@ -3822,7 +3822,7 @@
 								this._addImageToMap(paraRunContent[pR]);
 						};
 						
-						case AscCommon.para_End:
+						case para_End:
 						{	
 							if(typeof aResult[row][s + c1] == "object")
 								aResult[row][s + c1][aResult[row][s + c1].length] = oNewItem;
@@ -3901,7 +3901,7 @@
 				if ( paragraph.Numbering )
 				{
 					var NumberingItem = paragraph.Numbering;
-					if ( AscCommon.para_Numbering === NumberingItem.Type )
+					if ( para_Numbering === NumberingItem.Type )
 					{
 						var NumPr = Pr.ParaPr.NumPr;
 						if ( undefined === NumPr || undefined === NumPr.NumId || 0 === NumPr.NumId || "0" === NumPr.NumId )
@@ -4585,16 +4585,16 @@
 				var sRes = "";
 				switch ( ParaItem.Type )
 				{
-					case AscCommon.para_Text:
+					case para_Text:
 						//���������� �����������
 						var sValue = String.fromCharCode(ParaItem.Value);
 						if(sValue)
 							sRes += CopyPasteCorrectString(sValue);
 						break;
-					case AscCommon.para_Space:    sRes += " "; break;
-					case AscCommon.para_Tab:        sRes += "<span style='mso-tab-count:1'>    </span>"; break;
-					case AscCommon.para_NewLine:
-						if( AscCommon.break_Page == ParaItem.BreakType)
+					case para_Space:    sRes += " "; break;
+					case para_Tab:        sRes += "<span style='mso-tab-count:1'>    </span>"; break;
+					case para_NewLine:
+						if( break_Page == ParaItem.BreakType)
 						{
 							//todo ��������� ���� �������� � ������ �����
 							sRes += "<br clear=\"all\" style=\"mso-special-character:line-break;page-break-before:always;\" />";
@@ -4603,8 +4603,8 @@
 							sRes += "<br style=\"mso-special-character:line-break;\" />";
 						break;
 					//������� ������� ����� ��������� ������ �� ���������� ��������
-					case AscCommon.para_End:        this.bOccurEndPar = true; break;
-					case AscCommon.para_Drawing:
+					case para_End:        this.bOccurEndPar = true; break;
+					case para_Drawing:
 						var oGraphicObj = ParaItem.GraphicObj;
 						var sSrc = oGraphicObj.getBase64Img();
 						if(sSrc.length > 0)
@@ -4663,7 +4663,7 @@
 
 				for (var i = ParaStart; i <= ParaEnd; i++) {
 					var item = Container.Content[i];
-					if (AscCommon.para_Run == item.Type) {
+					if (para_Run == item.Type) {
 						var sRunContent = this.CopyRun(item, bUseSelection);
 						if(sRunContent)
 						{
@@ -4680,7 +4680,7 @@
 							sRes += "</span>";
 						}
 					}
-					else if (AscCommon.para_Hyperlink == item.Type) {
+					else if (para_Hyperlink == item.Type) {
 						sRes += "<a";
 						var sValue = item.Get_Value();
 						var sToolTip = item.Get_ToolTip();
@@ -4994,7 +4994,7 @@
 												tempParagraph.Content.unshift(new ParaRun());
 												
 												var paraRun = tempParagraph.Content[index];
-												paraRun.Content.unshift(new AscCommon.ParaDrawing());
+												paraRun.Content.unshift(new ParaDrawing());
 												paraRun.Content[index].wrappingType = wrappingType;
 												paraRun.Content[index].DrawingType = DrawingType;
 												paraRun.Content[index].GraphicObj = graphicObj;

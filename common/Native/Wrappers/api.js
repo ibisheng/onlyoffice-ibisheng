@@ -119,11 +119,11 @@ asc_docs_api.prototype["Call_HR_Tabs"] = function(arrT, arrP)
     for (var i = 0; i < _c; i++)
     {
         if (arrT[i] == 1)
-            _arr.Add( new AscCommon.CParaTab( AscCommon.tab_Left, arrP[i] ) );
+            _arr.Add( new AscCommon.CParaTab( tab_Left, arrP[i] ) );
         if (arrT[i] == 2)
-            _arr.Add( new AscCommon.CParaTab( AscCommon.tab_Right, arrP[i] ) );
+            _arr.Add( new AscCommon.CParaTab( tab_Right, arrP[i] ) );
         if (arrT[i] == 3)
-            _arr.Add( new AscCommon.CParaTab( AscCommon.tab_Center, arrP[i] ) );
+            _arr.Add( new AscCommon.CParaTab( tab_Center, arrP[i] ) );
     }
 
     var _logic = this.WordControl.m_oLogicDocument;
@@ -1146,7 +1146,7 @@ asc_docs_api.prototype["Call_Menu_Event"] = function(type, _params)
             }
 
             this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
-            this.WordControl.m_oLogicDocument.Paragraph_Add(new AscCommon.ParaTextPr(_textPr));
+            this.WordControl.m_oLogicDocument.Paragraph_Add(new ParaTextPr(_textPr));
             this.WordControl.m_oLogicDocument.Document_UpdateInterfaceState();
             break;
         }
@@ -1349,7 +1349,7 @@ asc_docs_api.prototype["Call_Menu_Event"] = function(type, _params)
             }
 
             if (undefined !== _textPr)
-                this.WordControl.m_oLogicDocument.Paragraph_Add(new AscCommon.ParaTextPr(_textPr));
+                this.WordControl.m_oLogicDocument.Paragraph_Add(new ParaTextPr(_textPr));
 
             this.WordControl.m_oLogicDocument.Document_UpdateInterfaceState();
             break;
@@ -4401,7 +4401,7 @@ asc_docs_api.prototype.put_AddPageBreak = function()
         if ( null === Document.Hyperlink_Check(false) )
         {
             Document.Create_NewHistoryPoint();
-            Document.Paragraph_Add( new AscCommon.ParaNewLine( AscCommon.break_Page ) );
+            Document.Paragraph_Add( new ParaNewLine( break_Page ) );
         }
     }
 };
@@ -4434,7 +4434,7 @@ asc_docs_api.prototype.put_AddLineBreak = function()
         if ( null === Document.Hyperlink_Check(false) )
         {
             Document.Create_NewHistoryPoint();
-            Document.Paragraph_Add( new AscCommon.ParaNewLine( AscCommon.para_NewLine ) );
+            Document.Paragraph_Add( new ParaNewLine( para_NewLine ) );
         }
     }
 };
@@ -5145,7 +5145,7 @@ CStylesPainter.prototype =
 
         for (var i = 0; i < style.Name.length; i++)
         {
-            run.Add_ToContent(i, new AscCommon.ParaText(style.Name.charAt(i)), false);
+            run.Add_ToContent(i, new ParaText(style.Name.charAt(i)), false);
         }
 
         _dc.Internal_Content_Add(0, par, false);

@@ -16,7 +16,7 @@ function CMathBase(bInside)
 {
     CMathBase.superclass.constructor.call(this);
 
-    this.Type = AscCommon.para_Math_Composition;
+    this.Type = para_Math_Composition;
 
     this.pos  = new CMathPosition();
     this.size = new CMathSize();
@@ -334,7 +334,7 @@ CMathBase.prototype.setPosition = function(pos, PosInfo)
                 NewPos.x = this.pos.x + this.GapLeft + al.x + this.dW*j + w;
                 NewPos.y = this.pos.y + al.y + this.dH*i + h;
 
-                if(this.elements[i][j].Type == AscCommon.para_Math_Content) // прибавим ascent только для контентов, для вложенных мат объектов не добавляем !
+                if(this.elements[i][j].Type == para_Math_Content) // прибавим ascent только для контентов, для вложенных мат объектов не добавляем !
                     NewPos.y += this.elements[i][j].size.ascent;
 
                 this.elements[i][j].setPosition(NewPos, PosInfo);
@@ -829,7 +829,7 @@ CMathBase.prototype.IsText = function()
 };
 CMathBase.prototype.GetParent = function()
 {
-    return (this.Parent.Type !== AscCommon.para_Math_Composition ? this : this.Parent.GetParent());
+    return (this.Parent.Type !== para_Math_Composition ? this : this.Parent.GetParent());
 };
 CMathBase.prototype.Get_TextPr = function(ContentPos, Depth)
 {
@@ -2052,7 +2052,7 @@ CMathBase.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
             var Item = this.Content[Pos];
 
             var NeedSetReset = CurLine == 0 && CurRange == 0  || Pos !== RangeStartPos;
-            if(Item.Type == AscCommon.para_Math_Content && NeedSetReset)
+            if(Item.Type == para_Math_Content && NeedSetReset)
                 Item.Recalculate_Reset(PRS.Range, PRS.Line, PRS); // обновим StartLine и StartRange
 
             if(Pos == Numb)
@@ -2511,7 +2511,7 @@ CMathBase.prototype.Check_RevisionsChanges = function(Checker, ContentPos, Depth
                     var InParentPos = TempContentPos.Get(TempContentPos.Get_Depth());
                     TempContentPos.Decrease_Depth(1);
                     var Parent = this.Paragraph.Get_ElementByPos(TempContentPos);
-                    if (Parent && Parent.Content && this === Parent.Content[InParentPos] && Parent.Content[InParentPos + 1] && AscCommon.para_Math_Run === Parent.Content[InParentPos + 1].Type)
+                    if (Parent && Parent.Content && this === Parent.Content[InParentPos] && Parent.Content[InParentPos + 1] && para_Math_Run === Parent.Content[InParentPos + 1].Type)
                     {
                         ContentPos.Update(InParentPos + 1, Depth - 1);
                         Parent.Content[InParentPos + 1].Get_StartPos(ContentPos, Depth);

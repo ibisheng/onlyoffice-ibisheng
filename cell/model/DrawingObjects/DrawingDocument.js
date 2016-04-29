@@ -3433,11 +3433,11 @@ function CDrawingDocument(drawingObjects)
 
         for (var i = 0; i < _len; i++)
         {
-            if (__tabs[i].Value == AscCommon.tab_Left)
+            if (__tabs[i].Value == tab_Left)
                 _ar[i] = new CTab(__tabs[i].Pos, AscCommon.g_tabtype_left);
-            else if (__tabs[i].Value == AscCommon.tab_Center)
+            else if (__tabs[i].Value == tab_Center)
                 _ar[i] = new CTab(__tabs[i].Pos, AscCommon.g_tabtype_center);
-            else if (__tabs[i].Value == AscCommon.tab_Right)
+            else if (__tabs[i].Value == tab_Right)
                 _ar[i] = new CTab(__tabs[i].Pos, AscCommon.g_tabtype_right);
         }
 
@@ -4276,7 +4276,6 @@ function CDrawingDocument(drawingObjects)
             _textPr.Spacing    = this.GuiLastTextProps.TextSpacing;
             _textPr.Position   = this.GuiLastTextProps.Position;
 
-            var ParaText = AscCommon.ParaText;
             var parRun = new ParaRun(par); var Pos = 0;
             parRun.Set_Pr(_textPr);
             parRun.Add_ToContent(Pos++,new ParaText("H"), false);
@@ -4284,7 +4283,7 @@ function CDrawingDocument(drawingObjects)
             parRun.Add_ToContent(Pos++,new ParaText("l"), false);
             parRun.Add_ToContent(Pos++,new ParaText("l"), false);
             parRun.Add_ToContent(Pos++,new ParaText("o"), false);
-            parRun.Add_ToContent(Pos++,new AscCommon.ParaSpace(1), false);
+            parRun.Add_ToContent(Pos++,new ParaSpace(1), false);
             parRun.Add_ToContent(Pos++, new ParaText("W"), false);
             parRun.Add_ToContent(Pos++, new ParaText("o"), false);
             parRun.Add_ToContent(Pos++, new ParaText("r"), false);

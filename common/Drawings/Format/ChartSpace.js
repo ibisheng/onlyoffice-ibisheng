@@ -781,7 +781,7 @@ CChartSpace.prototype =
     getParagraphTextPr: function()
     {
         var content;
-        if(paraItem.Type === AscCommon.para_TextPr)
+        if(paraItem.Type === para_TextPr)
         {
             return  GetTextPrFormArrObjects([this.selection.title]);
         }
@@ -8858,7 +8858,7 @@ CChartSpace.prototype =
         if(!this.group)
         {
             var oLock;
-            if(this.parent instanceof AscCommon.ParaDrawing)
+            if(this.parent instanceof ParaDrawing)
             {
                 oLock = this.parent.Lock;
             }

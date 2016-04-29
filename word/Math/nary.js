@@ -1091,7 +1091,7 @@ CNaryOperator.prototype.Draw_Elements = function(PDSE)
 
     var PosLine = this.ParaMath.GetLinePosition(PDSE.Line, PDSE.Range);
 
-    if(this.Type == AscCommon.para_Math_Text)
+    if(this.Type == para_Math_Text)
         this.drawTextElem(PosLine.x, PosLine.y, PDSE.Graphics);
     else
         this.drawGlyph(PosLine.x, PosLine.y, PDSE.Graphics, PDSE);

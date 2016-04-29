@@ -26,18 +26,18 @@ function CBoundsRectForMath(oDrawing)
         this.Distance = oDrawing.Get_Distance();
         switch (oDrawing.Get_Type())
         {
-            case AscCommon.para_Drawing:
+            case para_Drawing:
             {
                 this.WrapType = oDrawing.wrappingType;
                 switch(oDrawing.wrappingType)
                 {
-                    case AscCommon.WRAPPING_TYPE_NONE:
+                    case WRAPPING_TYPE_NONE:
                     {
                         break;
                     }
-                    case AscCommon.WRAPPING_TYPE_SQUARE :
-                    case AscCommon.WRAPPING_TYPE_THROUGH:
-                    case AscCommon.WRAPPING_TYPE_TIGHT:
+                    case WRAPPING_TYPE_SQUARE :
+                    case WRAPPING_TYPE_THROUGH:
+                    case WRAPPING_TYPE_TIGHT:
                     {
                         this.L = oDrawing.wrappingPolygon.left + this.Distance.L;
                         this.R = oDrawing.wrappingPolygon.right - this.Distance.R;
@@ -63,13 +63,13 @@ function CBoundsRectForMath(oDrawing)
                 this.WrapType = oDrawing.WrappingType;
                 switch(oDrawing.WrappingType)
                 {
-                    case AscCommon.WRAPPING_TYPE_NONE:
+                    case WRAPPING_TYPE_NONE:
                     {
                         break;
                     }
-                    case AscCommon.WRAPPING_TYPE_SQUARE :
-                    case AscCommon.WRAPPING_TYPE_THROUGH:
-                    case AscCommon.WRAPPING_TYPE_TIGHT:
+                    case WRAPPING_TYPE_SQUARE :
+                    case WRAPPING_TYPE_THROUGH:
+                    case WRAPPING_TYPE_TIGHT:
                     {
                         this.L = oDrawing.X;
                         this.R = oDrawing.X + oDrawing.W;
@@ -93,7 +93,7 @@ function CBoundsRectForMath(oDrawing)
     }
     else
     {
-        this.WrapType = AscCommon.WRAPPING_TYPE_NONE;
+        this.WrapType = WRAPPING_TYPE_NONE;
         this.Distance = new AscFormat.CDistance(0, 0, 0, 0);
     }
 }
@@ -314,13 +314,13 @@ CGraphicObjects.prototype =
     getTrialImage: function(sImageUrl)
     {
         return AscFormat.ExecuteNoHistory(function(){
-            var oParaDrawing = new AscCommon.ParaDrawing();
+            var oParaDrawing = new ParaDrawing();
             oParaDrawing.Set_PositionH(Asc.c_oAscRelativeFromH.Page, true, c_oAscAlignH.Center, undefined);
             oParaDrawing.Set_PositionV(Asc.c_oAscRelativeFromV.Page, true, c_oAscAlignV.Center, undefined);
-            oParaDrawing.Set_WrappingType(AscCommon.WRAPPING_TYPE_NONE);
+            oParaDrawing.Set_WrappingType(WRAPPING_TYPE_NONE);
             oParaDrawing.Set_BehindDoc( false );
             oParaDrawing.Set_Distance( 3.2, 0, 3.2, 0 );
-            oParaDrawing.Set_DrawingType(AscCommon.drawing_Anchor);
+            oParaDrawing.Set_DrawingType(drawing_Anchor);
             var oShape = this.createWatermarkImage(sImageUrl);
             oParaDrawing.Extent.W = oShape.spPr.xfrm.extX;
             oParaDrawing.Extent.H = oShape.spPr.xfrm.extY;
@@ -1321,7 +1321,7 @@ CGraphicObjects.prototype =
                 {
                     run =  new ParaRun(para, false);
                     selectedObjects[i].recalculate();
-                    drawing = new AscCommon.ParaDrawing(0, 0, selectedObjects[i].copy(), this.document.DrawingDocument, this.document, null);
+                    drawing = new ParaDrawing(0, 0, selectedObjects[i].copy(), this.document.DrawingDocument, this.document, null);
                     drawing.Set_DrawingType(groupParaDrawing.DrawingType);
                     drawing.GraphicObj.setParent(drawing);
                     if(drawing.GraphicObj.spPr && drawing.GraphicObj.spPr.xfrm && AscFormat.isRealNumber(drawing.GraphicObj.spPr.xfrm.offX) && AscFormat.isRealNumber(drawing.GraphicObj.spPr.xfrm.offY))
@@ -1330,7 +1330,7 @@ CGraphicObjects.prototype =
                         drawing.GraphicObj.spPr.xfrm.setOffY(0);
                     }
                     drawing.CheckWH();
-                    if(groupParaDrawing.DrawingType === AscCommon.drawing_Anchor)
+                    if(groupParaDrawing.DrawingType === drawing_Anchor)
                     {
                         drawing.Set_Distance(groupParaDrawing.Distance.L, groupParaDrawing.Distance.T, groupParaDrawing.Distance.R, groupParaDrawing.Distance.B);
                         drawing.Set_WrappingType(groupParaDrawing.wrappingType);
@@ -1349,7 +1349,7 @@ CGraphicObjects.prototype =
                 {
                     run =  new ParaRun(para, false);
                     selectedObjects[i].recalculate();
-                    drawing = new AscCommon.ParaDrawing(0, 0, selectedObjects[i].copy(), this.document.DrawingDocument, this.document, null);
+                    drawing = new ParaDrawing(0, 0, selectedObjects[i].copy(), this.document.DrawingDocument, this.document, null);
 
                     drawing.Set_DrawingType(selectedObjects[i].parent.DrawingType);
                     drawing.GraphicObj.setParent(drawing);
@@ -1359,7 +1359,7 @@ CGraphicObjects.prototype =
                     {
                         drawing.setExtent(selectedObjects[i].parent.Extent.W, selectedObjects[i].parent.Extent.H)
                     }
-                    if(selectedObjects[i].parent.DrawingType === AscCommon.drawing_Anchor)
+                    if(selectedObjects[i].parent.DrawingType === drawing_Anchor)
                     {
                         drawing.Set_Distance(selectedObjects[i].parent.Distance.L, selectedObjects[i].parent.Distance.T, selectedObjects[i].parent.Distance.R, selectedObjects[i].parent.Distance.B);
                         drawing.Set_WrappingType(selectedObjects[i].parent.wrappingType);
@@ -2338,9 +2338,9 @@ CGraphicObjects.prototype =
         }
         var i;
         var common_bounds = this.checkCommonBounds(objects_for_grouping);
-        var para_drawing = new AscCommon.ParaDrawing(common_bounds.maxX - common_bounds.minX, common_bounds.maxY - common_bounds.minY, null, this.drawingDocument, null, null);
-        para_drawing.Set_WrappingType(AscCommon.WRAPPING_TYPE_NONE);
-        para_drawing.Set_DrawingType(AscCommon.drawing_Anchor);
+        var para_drawing = new ParaDrawing(common_bounds.maxX - common_bounds.minX, common_bounds.maxY - common_bounds.minY, null, this.drawingDocument, null, null);
+        para_drawing.Set_WrappingType(WRAPPING_TYPE_NONE);
+        para_drawing.Set_DrawingType(drawing_Anchor);
         for(i = 0; i < objects_for_grouping.length; ++i)
         {
             if(objects_for_grouping[i].checkExtentsByDocContent && objects_for_grouping[i].checkExtentsByDocContent(true))
@@ -2418,7 +2418,7 @@ CGraphicObjects.prototype =
                 for(j = 0; j < sp_tree.length; ++j)
                 {
                     sp = sp_tree[j];
-                    var drawing = new AscCommon.ParaDrawing(0, 0, sp_tree[j], this.drawingDocument, null, null);
+                    var drawing = new ParaDrawing(0, 0, sp_tree[j], this.drawingDocument, null, null);
 
                     var xc, yc, hc = sp.extX/2, vc = sp.extY/2;
                     xc = sp.transform.TransformPointX(hc, vc);
@@ -2426,7 +2426,7 @@ CGraphicObjects.prototype =
 
                     drawing.Set_GraphicObject(sp);
                     sp.setParent(drawing);
-                    drawing.Set_DrawingType(AscCommon.drawing_Anchor);
+                    drawing.Set_DrawingType(drawing_Anchor);
                     drawing.Set_WrappingType(cur_group.parent.wrappingType);
                     drawing.CheckWH();
                     sp.spPr.xfrm.setRot(AscFormat.normalizeRotate(sp.rot + cur_group.rot));
@@ -2858,12 +2858,12 @@ CGraphicObjects.prototype =
     {
         if(this.canChangeWrapPolygon())
         {
-            if(this.selectedObjects[0].parent.wrappingType !== AscCommon.WRAPPING_TYPE_THROUGH && this.selectedObjects[0].parent.wrappingType !== AscCommon.WRAPPING_TYPE_TIGHT)
+            if(this.selectedObjects[0].parent.wrappingType !== WRAPPING_TYPE_THROUGH && this.selectedObjects[0].parent.wrappingType !== WRAPPING_TYPE_TIGHT)
             {
                 if(false === this.document.Document_Is_SelectionLocked(changestype_Drawing_Props, {Type : AscCommon.changestype_2_Element_and_Type , Element : this.selectedObjects[0].parent.Get_ParentParagraph(), CheckType : AscCommon.changestype_Paragraph_Content} ))
                 {
                     History.Create_NewPoint(AscDFH.historydescription_Document_GrObjectsChangeWrapPolygon);
-                    this.selectedObjects[0].parent.Set_WrappingType(AscCommon.WRAPPING_TYPE_TIGHT);
+                    this.selectedObjects[0].parent.Set_WrappingType(WRAPPING_TYPE_TIGHT);
                     this.selectedObjects[0].parent.Check_WrapPolygon();
                     this.document.Recalculate();
                     this.document.Document_UpdateInterfaceState();

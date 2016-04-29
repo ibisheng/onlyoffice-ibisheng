@@ -217,7 +217,7 @@ CStylesPainter.prototype =
 
         for (var i = 0; i < style.Name.length; i++)
         {
-            run.Add_ToContent(i, new AscCommon.ParaText(style.Name.charAt(i)), false);
+            run.Add_ToContent(i, new ParaText(style.Name.charAt(i)), false);
         }
 
         _dc.Internal_Content_Add(0, par, false);

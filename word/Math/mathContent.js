@@ -2,8 +2,6 @@
 
 // Import
 var History = AscCommon.History;
-var para_Math_Composition = AscCommon.para_Math_Composition;
-var para_Math_Run = AscCommon.para_Math_Run;
 
 function CRPI()
 {
@@ -735,7 +733,7 @@ function CMathContent()
 
     this.Content = []; // array of mathElem
 
-    this.Type = AscCommon.para_Math_Content;
+    this.Type = para_Math_Content;
     this.CurPos = 0;
     this.pos    = new CMathPosition();   // относительная позиция
 
@@ -5109,7 +5107,7 @@ CMathContent.prototype.Process_AutoCorrect = function(ActionElement)
 CMathContent.prototype.private_NeedAutoCorrect = function(ActionElement)
 {
 	var CharCode;
-	if (AscCommon.para_Math_Ampersand == ActionElement.Type)
+	if (para_Math_Ampersand == ActionElement.Type)
 		CharCode = 0x26;
 	else
 		CharCode = ActionElement.value;
@@ -5362,7 +5360,7 @@ CMathContent.prototype.private_CanAutoCorrectEquation = function(AutoCorrectionE
 		for (var i=0; i<arrContent[1].length; i++)
 		{
 			var CurElem = arrContent[1][i];
-			if (AscCommon.para_Math_Text == CurElem.Type)
+			if (para_Math_Text == CurElem.Type)
 			{
 				var MathRun = new ParaRun(this.ParaMath.Paragraph, true);
 				MathRun.Set_Pr(AutoCorrectionEngine.TextPr.Copy());
@@ -5376,7 +5374,7 @@ CMathContent.prototype.private_CanAutoCorrectEquation = function(AutoCorrectionE
 		for (var i=0; i<arrContent[0].length; i++)
 		{
 			var CurElem = arrContent[0][i];
-			if (AscCommon.para_Math_Text == CurElem.Type)
+			if (para_Math_Text == CurElem.Type)
 			{
 				var MathRun = new ParaRun(this.ParaMath.Paragraph, true);
 				MathRun.Set_Pr(AutoCorrectionEngine.TextPr.Copy());
@@ -5451,7 +5449,7 @@ CMathContent.prototype.private_CanAutoCorrectEquation = function(AutoCorrectionE
 				for (var l=0; l<Content.length; l++)
 				{
 					var CurElem = Content[l];
-					if (AscCommon.para_Math_Text == CurElem.Type)
+					if (para_Math_Text == CurElem.Type)
 					{
 						var MathRun = new ParaRun(this.ParaMath.Paragraph, true);
 						MathRun.Set_Pr(AutoCorrectionEngine.TextPr.Copy());

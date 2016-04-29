@@ -101,14 +101,14 @@ StartAddNewShape.prototype =
             History.Create_NewPoint(AscDFH.historydescription_Document_AddNewShape);
             var bounds = this.drawingObjects.arrTrackObjects[0].getBounds();
             var shape = this.drawingObjects.arrTrackObjects[0].getShape(true, this.drawingObjects.drawingDocument);
-            var drawing = new AscCommon.ParaDrawing(shape.spPr.xfrm.extX, shape.spPr.xfrm.extY, shape, this.drawingObjects.drawingDocument, this.drawingObjects.document, null);
+            var drawing = new ParaDrawing(shape.spPr.xfrm.extX, shape.spPr.xfrm.extY, shape, this.drawingObjects.drawingDocument, this.drawingObjects.document, null);
             var nearest_pos = this.drawingObjects.document.Get_NearestPos(this.pageIndex, bounds.min_x, bounds.min_y, true, drawing);
             if(false === editor.isViewMode && nearest_pos && false === this.drawingObjects.document.Document_Is_SelectionLocked(AscCommon.changestype_None, {Type : AscCommon.changestype_2_Element_and_Type , Element : nearest_pos.Paragraph, CheckType : AscCommon.changestype_Paragraph_Content} ) && false === editor.isViewMode)
             {
-                drawing.Set_DrawingType(AscCommon.drawing_Anchor);
+                drawing.Set_DrawingType(drawing_Anchor);
                 drawing.Set_GraphicObject(shape);
                 shape.setParent(drawing);
-                drawing.Set_WrappingType(AscCommon.WRAPPING_TYPE_NONE);
+                drawing.Set_WrappingType(WRAPPING_TYPE_NONE);
                 drawing.Set_Distance( 3.2,  0,  3.2, 0 );
                 nearest_pos.Paragraph.Check_NearestPos(nearest_pos);
                 nearest_pos.Page = this.pageIndex;
@@ -494,7 +494,7 @@ MoveInlineObject.prototype =
             if(false === editor.isViewMode && false === this.drawingObjects.document.Document_Is_SelectionLocked(changestype_Drawing_Props, {Type : changestype_2_ElementsArray_and_Type , Elements : check_paragraphs, CheckType : AscCommon.changestype_Paragraph_Content}))
             {
                 History.Create_NewPoint(AscDFH.historydescription_Document_CopyAndMoveInlineObject);
-                var new_para_drawing = new AscCommon.ParaDrawing(this.majorObject.parent.Extent.W, this.majorObject.parent.Extent.H, null, this.drawingObjects.drawingDocument, null, null);
+                var new_para_drawing = new ParaDrawing(this.majorObject.parent.Extent.W, this.majorObject.parent.Extent.H, null, this.drawingObjects.drawingDocument, null, null);
                 var drawing = this.majorObject.copy();
                 drawing.setParent(new_para_drawing);
                 new_para_drawing.Set_GraphicObject(drawing);

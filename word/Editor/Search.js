@@ -143,7 +143,7 @@ CDocumentSearch.prototype =
                 var Len = NewStr.length;
                 for ( var Pos = 0; Pos < Len; Pos++ )
                 {
-                    StartRun.Add_ToContent(RunPos + Pos, ' ' === NewStr[Pos] ? new AscCommon.ParaSpace() : new AscCommon.ParaText(NewStr[Pos]));
+                    StartRun.Add_ToContent(RunPos + Pos, ' ' === NewStr[Pos] ? new ParaSpace() : new ParaText(NewStr[Pos]));
                 }
 
                 // Выделяем старый объект поиска и удаляем его
@@ -832,7 +832,7 @@ AscCommon.Paragraph.prototype.Search = function(Str, Props, SearchEngine, Type)
                     var ItemB = RunElementsBefore.Elements[Index];
                     var ItemA = RunElementsAfter.Elements[Index];
 
-                    ResultStr = (AscCommon.para_Text === ItemB.Type ? ItemB.Value : " ") + ResultStr + (AscCommon.para_Text === ItemA.Type ? ItemA.Value : " ");
+                    ResultStr = (para_Text === ItemB.Type ? ItemB.Value : " ") + ResultStr + (para_Text === ItemA.Type ? ItemA.Value : " ");
                 }
             }
             else if ( RunElementsAfter.Elements.length < LeaveCount_2 )
@@ -841,14 +841,14 @@ AscCommon.Paragraph.prototype.Search = function(Str, Props, SearchEngine, Type)
                 for ( var Index = 0; Index < TempCount; Index++ )
                 {
                     var ItemA = RunElementsAfter.Elements[Index];
-                    ResultStr = ResultStr + (AscCommon.para_Text === ItemA.Type ? ItemA.Value : " ");
+                    ResultStr = ResultStr + (para_Text === ItemA.Type ? ItemA.Value : " ");
                 }
 
                 var TempCount = Math.min( 2 * LeaveCount_2 - RunElementsAfter.Elements.length, RunElementsBefore.Elements.length );
                 for ( var Index = 0; Index < TempCount; Index++ )
                 {
                     var ItemB = RunElementsBefore.Elements[Index];
-                    ResultStr = (AscCommon.para_Text === ItemB.Type ? ItemB.Value : " ") + ResultStr;
+                    ResultStr = (para_Text === ItemB.Type ? ItemB.Value : " ") + ResultStr;
                 }
             }
             else
@@ -857,14 +857,14 @@ AscCommon.Paragraph.prototype.Search = function(Str, Props, SearchEngine, Type)
                 for ( var Index = 0; Index < TempCount; Index++ )
                 {
                     var ItemA = RunElementsAfter.Elements[Index];
-                    ResultStr = ResultStr + (AscCommon.para_Text === ItemA.Type ? ItemA.Value : " ");
+                    ResultStr = ResultStr + (para_Text === ItemA.Type ? ItemA.Value : " ");
                 }
 
                 var TempCount = RunElementsBefore.Elements.length;
                 for ( var Index = 0; Index < TempCount; Index++ )
                 {
                     var ItemB = RunElementsBefore.Elements[Index];
-                    ResultStr = (AscCommon.para_Text === ItemB.Type ? ItemB.Value : " ") + ResultStr;
+                    ResultStr = (para_Text === ItemB.Type ? ItemB.Value : " ") + ResultStr;
                 }
             }
         }
@@ -1014,13 +1014,13 @@ ParaRun.prototype.Search = function(ParaSearch, Depth)
     {
         var Item = this.Content[Pos];
 
-        if ( AscCommon.para_Drawing === Item.Type )
+        if ( para_Drawing === Item.Type )
         {
             Item.Search( Str, Props, SearchEngine, Type );
             ParaSearch.Reset();
         }
 
-        if ( (" " === Str[ParaSearch.SearchIndex] && AscCommon.para_Space === Item.Type)|| (AscCommon.para_Math_Text == Item.Type && Item.value === Str.charCodeAt(ParaSearch.SearchIndex)) || ( AscCommon.para_Text === Item.Type && (  ( true != MatchCase && (String.fromCharCode(Item.Value)).toLowerCase() === Str[ParaSearch.SearchIndex].toLowerCase() ) || ( true === MatchCase && Item.Value === Str.charCodeAt(ParaSearch.SearchIndex) ) ) ) )
+        if ( (" " === Str[ParaSearch.SearchIndex] && para_Space === Item.Type)|| (para_Math_Text == Item.Type && Item.value === Str.charCodeAt(ParaSearch.SearchIndex)) || ( para_Text === Item.Type && (  ( true != MatchCase && (String.fromCharCode(Item.Value)).toLowerCase() === Str[ParaSearch.SearchIndex].toLowerCase() ) || ( true === MatchCase && Item.Value === Str.charCodeAt(ParaSearch.SearchIndex) ) ) ) )
         {
             if ( 0 === ParaSearch.SearchIndex )
             {
@@ -1123,7 +1123,7 @@ ParaRun.prototype.Search_GetId = function(bNext, bUseContentPos, ContentPos, Dep
         for ( var CurPos = StartPos; CurPos < NearPos; CurPos++ )
         {
             var Item = this.Content[CurPos];
-            if ( AscCommon.para_Drawing === Item.Type )
+            if ( para_Drawing === Item.Type )
             {
                 var TempElementId = Item.Search_GetId( true, false );
                 if ( null != TempElementId )
@@ -1152,7 +1152,7 @@ ParaRun.prototype.Search_GetId = function(bNext, bUseContentPos, ContentPos, Dep
         for ( var CurPos = StartPos; CurPos > NearPos; CurPos-- )
         {
             var Item = this.Content[CurPos];
-            if ( AscCommon.para_Drawing === Item.Type )
+            if ( para_Drawing === Item.Type )
             {
                 var TempElementId = Item.Search_GetId( false, false );
                 if ( null != TempElementId )

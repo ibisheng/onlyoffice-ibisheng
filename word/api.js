@@ -27,7 +27,6 @@ var g_oTableId = AscCommon.g_oTableId;
 var PasteElementsId = AscCommon.PasteElementsId;
 var global_mouseEvent = AscCommon.global_mouseEvent;
 var History = AscCommon.History;
-var ParaTextPr = AscCommon.ParaTextPr;
 
 var c_oAscError = Asc.c_oAscError;
 var c_oAscFileType = Asc.c_oAscFileType;
@@ -3593,7 +3592,7 @@ asc_docs_api.prototype.put_AddPageBreak = function()
         if ( null === Document.Hyperlink_Check(false) )
         {
             this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_AddPageBreak);
-            this.WordControl.m_oLogicDocument.Paragraph_Add( new AscCommon.ParaNewLine( AscCommon.break_Page ) );
+            this.WordControl.m_oLogicDocument.Paragraph_Add( new ParaNewLine( break_Page ) );
         }
     }
 };
@@ -3605,7 +3604,7 @@ asc_docs_api.prototype.put_AddColumnBreak = function()
         if (null === Document.Hyperlink_Check(false))
         {
             this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_AddPageBreak);
-            this.WordControl.m_oLogicDocument.Paragraph_Add(new AscCommon.ParaNewLine(AscCommon.break_Column));
+            this.WordControl.m_oLogicDocument.Paragraph_Add(new ParaNewLine(break_Column));
         }
     }
 };

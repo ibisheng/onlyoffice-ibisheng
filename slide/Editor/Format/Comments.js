@@ -19,7 +19,7 @@ function ParaComment(Start, Id)
     this.Start     = Start;
     this.CommentId = Id;
 
-    this.Type  = AscCommon.para_Comment;
+    this.Type  = para_Comment;
 
     this.StartLine  = 0;
     this.StartRange = 0;

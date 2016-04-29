@@ -21,7 +21,7 @@ function ParaField(FieldType, Arguments, Switches)
 
     this.Id = AscCommon.g_oIdCounter.Get_NewId();
 
-    this.Type    = AscCommon.para_Field;
+    this.Type    = para_Field;
 
     this.FieldType = (undefined === FieldType ? fieldtype_UNKNOWN : FieldType);
     this.Arguments = (undefined === Arguments ? []                : Arguments);
@@ -87,8 +87,8 @@ ParaField.prototype.Add = function(Item)
 {
     switch (Item.Type)
     {
-        case AscCommon.para_Run      :
-        case AscCommon.para_Hyperlink:
+        case para_Run      :
+        case para_Hyperlink:
         {
             var TextPr = this.Get_FirstTextPr();
             Item.Select_All();
@@ -97,7 +97,7 @@ ParaField.prototype.Add = function(Item)
 
             var CurPos = this.State.ContentPos;
             var CurItem = this.Content[CurPos];
-            if (AscCommon.para_Run === CurItem.Type)
+            if (para_Run === CurItem.Type)
             {
                 var NewRun = CurItem.Split2(CurItem.State.ContentPos);
                 this.Add_ToContent(CurPos + 1, Item);
@@ -111,14 +111,14 @@ ParaField.prototype.Add = function(Item)
 
             break;
         }
-        case AscCommon.para_Math :
+        case para_Math :
         {
             var ContentPos = new AscCommon.CParagraphContentPos();
             this.Get_ParaContentPos(false, false, ContentPos);
             var CurPos = ContentPos.Get(0);
 
             // Ран формула делит на части, а в остальные элементы добавляется целиком
-            if (AscCommon.para_Run === this.Content[CurPos].Type)
+            if (para_Run === this.Content[CurPos].Type)
             {
                 // Разделяем текущий элемент (возвращается правая часть)
                 var NewElement = this.Content[CurPos].Split(ContentPos, 1);
@@ -140,7 +140,7 @@ ParaField.prototype.Add = function(Item)
 
             break;
         }
-        case AscCommon.para_Field:
+        case para_Field:
         {
             // Вместо добавления самого элемента добавляем его содержимое
             var Count = Item.Content.length;
@@ -327,9 +327,9 @@ ParaField.prototype.private_GetMappedRun = function(Value)
     {
         var Char = Value[Index], oText;
         if (0x20 === Char)
-            oText = new AscCommon.ParaSpace();
+            oText = new ParaSpace();
         else
-            oText = new AscCommon.ParaText(Value[Index]);
+            oText = new ParaText(Value[Index]);
 
         oRun.Add_ToContent(Index, oText);
     }

@@ -2181,11 +2181,11 @@ function CHorRuler()
         for (var i = 0; i < _c; i++)
         {
             if (this.m_arrTabs[i].type == AscCommon.g_tabtype_left)
-                _arr.Add( new AscCommon.CParaTab( AscCommon.tab_Left, this.m_arrTabs[i].pos ) );
+                _arr.Add( new AscCommon.CParaTab( tab_Left, this.m_arrTabs[i].pos ) );
             else if (this.m_arrTabs[i].type == AscCommon.g_tabtype_right)
-                _arr.Add( new AscCommon.CParaTab( AscCommon.tab_Right, this.m_arrTabs[i].pos ) );
+                _arr.Add( new AscCommon.CParaTab( tab_Right, this.m_arrTabs[i].pos ) );
             else if (this.m_arrTabs[i].type == AscCommon.g_tabtype_center)
-                _arr.Add( new AscCommon.CParaTab( AscCommon.tab_Center, this.m_arrTabs[i].pos ) );
+                _arr.Add( new AscCommon.CParaTab( tab_Center, this.m_arrTabs[i].pos ) );
         }
         
         if ( false === this.m_oWordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Paragraph_Properties) )

@@ -223,12 +223,12 @@ CDocument.prototype.Add_MailMergeField = function(Name)
         var oRun = new ParaRun();
 
         var Index = 0;
-        oRun.Add_ToContent(Index++, new AscCommon.ParaText("«"));
+        oRun.Add_ToContent(Index++, new ParaText("«"));
         for (var Len = Name.length; Index <= Len; Index++)
         {
-            oRun.Add_ToContent(Index, new AscCommon.ParaText(Name.charAt(Index - 1)));
+            oRun.Add_ToContent(Index, new ParaText(Name.charAt(Index - 1)));
         }
-        oRun.Add_ToContent(Index, new AscCommon.ParaText("»"));
+        oRun.Add_ToContent(Index, new ParaText("»"));
         oField.Add_ToContent(0, oRun);
 
         this.Register_Field(oField);

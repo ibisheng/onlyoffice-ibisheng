@@ -584,7 +584,7 @@ CImageShape.prototype =
         if(!this.group)
         {
             var oLock;
-            if(this.parent instanceof AscCommon.ParaDrawing)
+            if(this.parent instanceof ParaDrawing)
             {
                 oLock = this.parent.Lock;
             }

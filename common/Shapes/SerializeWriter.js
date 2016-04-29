@@ -1990,9 +1990,9 @@ function CBinaryFileWriter()
         oThis.WriteUChar(g_nodeAttributeStart);
 
         var _algn = 2;
-        if (tab.Value == AscCommon.tab_Center)
+        if (tab.Value == tab_Center)
             _algn = 0;
-        else if (tab.Value == AscCommon.tab_Right)
+        else if (tab.Value == tab_Right)
             _algn = 3;
 
         oThis._WriteLimit2(0, _algn);
@@ -2535,7 +2535,7 @@ function CBinaryFileWriter()
             var _elem = _par_content[i];
             switch (_elem.Type)
             {
-                case AscCommon.para_Run:
+                case para_Run:
                 {
                     var _run_len = _elem.Content.length;
                     var _run_text = "";
@@ -2543,22 +2543,22 @@ function CBinaryFileWriter()
                     {
                         switch (_elem.Content[j].Type)
                         {
-                            case AscCommon.para_Text:
+                            case para_Text:
                             {
                                 _run_text += String.fromCharCode(_elem.Content[j].Value);
                                 break;
                             }
-                            case AscCommon.para_Space :
+                            case para_Space :
                             {
                                 _run_text += ' ';
                                 break;
                             }
-                            case AscCommon.para_Tab :
+                            case para_Tab :
                             {
                                 _run_text += '\t';
                                 break;
                             }
-                            case AscCommon.para_NewLine :
+                            case para_NewLine :
                             {
                                 if("" != _run_text)
                                 {
@@ -2591,7 +2591,7 @@ function CBinaryFileWriter()
                     }
                     break;
                 }
-                case AscCommon.para_Hyperlink:
+                case para_Hyperlink:
                 {
                     var _hObj = { Value : _elem.Value, tooltip: _elem.Get_ToolTip()};
                     var _content_len_h = _elem.Content.length;
@@ -2601,7 +2601,7 @@ function CBinaryFileWriter()
                         var _elem_h = _elem.Content[hi];
                         switch (_elem_h.Type)
                         {
-                            case AscCommon.para_Run:
+                            case para_Run:
                             {
                                 var _run_len = _elem_h.Content.length;
                                 var _run_text = "";
@@ -2609,22 +2609,22 @@ function CBinaryFileWriter()
                                 {
                                     switch (_elem_h.Content[j].Type)
                                     {
-                                        case AscCommon.para_Text:
+                                        case para_Text:
                                         {
                                             _run_text += String.fromCharCode(_elem_h.Content[j].Value);
                                             break;
                                         }
-                                        case AscCommon.para_Space :
+                                        case para_Space :
                                         {
                                             _run_text += ' ';
                                             break;
                                         }
-                                        case AscCommon.para_Tab :
+                                        case para_Tab :
                                         {
                                             _run_text += '\t';
                                             break;
                                         }
-                                        case AscCommon.para_NewLine :
+                                        case para_NewLine :
                                         {
                                             if("" != _run_text)
                                             {

@@ -15,7 +15,6 @@ var parserHelp = AscCommon.parserHelp;
 var isRealObject = AscCommon.isRealObject;
     var History = AscCommon.History;
     var CDocumentContent = AscCommon.CDocumentContent;
-    var ParaTextPr = AscCommon.ParaTextPr;
 
 var c_oAscError = Asc.c_oAscError;
 var c_oAscChartTitleShowSettings = Asc.c_oAscChartTitleShowSettings;
@@ -859,7 +858,7 @@ DrawingObjectsController.prototype =
 
                     if (object.getObjectType() === AscDFH.historyitem_type_ChartSpace && this.handleChartDoubleClick)
                         this.handleChartDoubleClick(drawing, object, e, x, y, pageIndex);
-                    else if (2 == e.ClickCount && drawing instanceof AscCommon.ParaDrawing && drawing.Is_MathEquation())
+                    else if (2 == e.ClickCount && drawing instanceof ParaDrawing && drawing.Is_MathEquation())
                         this.handleMathDrawingDoubleClick(drawing, e, x, y, pageIndex);
                 }
             }
@@ -1608,7 +1607,7 @@ DrawingObjectsController.prototype =
         }
         else
         {
-            if(docContentFunction === CDocumentContent.prototype.Paragraph_Add && args[0].Type === AscCommon.para_TextPr || docContentFunction === CDocumentContent.prototype.Paragraph_Format_Paste)
+            if(docContentFunction === CDocumentContent.prototype.Paragraph_Add && args[0].Type === para_TextPr || docContentFunction === CDocumentContent.prototype.Paragraph_Format_Paste)
             {
                 this.applyDocContentFunction(docContentFunction, args, tableFunction);
             }
@@ -2327,7 +2326,7 @@ DrawingObjectsController.prototype =
                 if(!props.SizeRelH && AscFormat.isRealNumber(props.Width))
                 {
                     objects_by_type.shapes[i].spPr.xfrm.setExtX(props.Width);
-                    if(objects_by_type.shapes[i].parent instanceof AscCommon.ParaDrawing)
+                    if(objects_by_type.shapes[i].parent instanceof ParaDrawing)
                     {
                         objects_by_type.shapes[i].parent.SetSizeRelH({RelativeFrom: c_oAscSizeRelFromH.sizerelfromhPage, Percent: 0})
                     }
@@ -2335,12 +2334,12 @@ DrawingObjectsController.prototype =
                 if(!props.SizeRelV && AscFormat.isRealNumber(props.Height))
                 {
                     objects_by_type.shapes[i].spPr.xfrm.setExtY(props.Height);
-                    if(objects_by_type.shapes[i].parent instanceof AscCommon.ParaDrawing)
+                    if(objects_by_type.shapes[i].parent instanceof ParaDrawing)
                     {
                         objects_by_type.shapes[i].parent.SetSizeRelV({RelativeFrom: c_oAscSizeRelFromV.sizerelfromvPage, Percent: 0});
                     }
                 }
-                if(objects_by_type.shapes[i].parent instanceof AscCommon.ParaDrawing)
+                if(objects_by_type.shapes[i].parent instanceof ParaDrawing)
                 {
                     var oDrawing =  objects_by_type.shapes[i].parent;
                     if (oDrawing.SizeRelH && !oDrawing.SizeRelV)
@@ -5053,7 +5052,7 @@ DrawingObjectsController.prototype =
                 var oThis = this;
                 var callBack = function()
                 {
-                    oThis.paragraphAdd(new AscCommon.ParaTab());
+                    oThis.paragraphAdd(new ParaTab());
                 };
 
                 if(oApi.collaborativeEditing.getFast()){
@@ -5176,7 +5175,7 @@ DrawingObjectsController.prototype =
                 var oThis = this;
                 var callBack = function()
                 {
-                    oThis.paragraphAdd(new AscCommon.ParaSpace(1));
+                    oThis.paragraphAdd(new ParaSpace(1));
                 };
                 if(oApi.collaborativeEditing.getFast()){
                     this.checkSelectedObjectsAndCallbackNoCheckLock(callBack, [], false, AscDFH.historydescription_Spreadsheet_AddSpace);
@@ -5448,13 +5447,13 @@ DrawingObjectsController.prototype =
                 var Item = null;
                 if ( true === ctrlKey && true === e.shiftKey )
                 {
-                    Item = new AscCommon.ParaText( String.fromCharCode( 0x2013 ) );
+                    Item = new ParaText( String.fromCharCode( 0x2013 ) );
                     Item.SpaceAfter = false;
                 }
                 else if ( true === e.shiftKey )
-                    Item = new AscCommon.ParaText( "_" );
+                    Item = new ParaText( "_" );
                 else
-                    Item = new AscCommon.ParaText( "-" );
+                    Item = new ParaText( "-" );
                 oThis.paragraphAdd(Item);
             };
             if(oApi.collaborativeEditing.getFast()){
@@ -6122,9 +6121,9 @@ DrawingObjectsController.prototype =
                     {
                         var Element = paragraph.Content[CurPos];
 
-                        if ( true !== Element.Selection_IsEmpty() && AscCommon.para_Hyperlink !== Element.Type )
+                        if ( true !== Element.Selection_IsEmpty() && para_Hyperlink !== Element.Type )
                             break;
-                        else if ( true !== Element.Selection_IsEmpty() && AscCommon.para_Hyperlink === Element.Type )
+                        else if ( true !== Element.Selection_IsEmpty() && para_Hyperlink === Element.Type )
                         {
                             if ( -1 === HyperPos )
                                 HyperPos = CurPos;
@@ -6133,12 +6132,12 @@ DrawingObjectsController.prototype =
                         }
                     }
 
-                    if ( paragraph.Selection.StartPos === paragraph.Selection.EndPos && AscCommon.para_Hyperlink === paragraph.Content[paragraph.Selection.StartPos].Type )
+                    if ( paragraph.Selection.StartPos === paragraph.Selection.EndPos && para_Hyperlink === paragraph.Content[paragraph.Selection.StartPos].Type )
                         HyperPos = paragraph.Selection.StartPos;
                 }
                 else
                 {
-                    if (AscCommon.para_Hyperlink === paragraph.Content[paragraph.CurPos.ContentPos].Type)
+                    if (para_Hyperlink === paragraph.Content[paragraph.CurPos.ContentPos].Type)
                         HyperPos = paragraph.CurPos.ContentPos;
                 }
                 if ( -1 !== HyperPos )

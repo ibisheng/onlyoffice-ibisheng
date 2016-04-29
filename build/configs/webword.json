@@ -29,10 +29,10 @@
 		
 		"../word/Editor/History.js",
 		"../common/editor/styles.js",
-		"../common/editor/paragraphContent.js",
 		"../common/editor/paragraph.js",
 		"../common/editor/document.js",
 		"../common/editor/documentContent.js",
+		"../common/editor/paragraphContent.js",
 		
 		"../common/Shapes/EditorSettings.js",
 		"../common/Shapes/Serialize.js",

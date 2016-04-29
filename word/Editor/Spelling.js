@@ -841,11 +841,11 @@ AscCommon.Paragraph.prototype.Internal_CheckPunctuationBreak = function(_Pos)
     {
         var Item = this.Content[Pos];
 
-        if ( AscCommon.para_Text === Item.Type &&  false === Item.Is_Punctuation() && false === Item.Is_NBSP() && false === Item.Is_Number() && false === Item.Is_SpecialSymbol() )
+        if ( para_Text === Item.Type &&  false === Item.Is_Punctuation() && false === Item.Is_NBSP() && false === Item.Is_Number() && false === Item.Is_SpecialSymbol() )
         {
             return true;
         }
-        else if ( AscCommon.para_CollaborativeChangesEnd === Item.Type || AscCommon.para_CollaborativeChangesStart === Item.Type )
+        else if ( para_CollaborativeChangesEnd === Item.Type || para_CollaborativeChangesStart === Item.Type )
             continue;
         else
         {
@@ -911,7 +911,7 @@ AscCommon.Paragraph.prototype.Continue_CheckSpelling = function()
             for ( var TempPos = 0; TempPos < StartPos; TempPos++  )
             {
                 var Item = this.Content[TempPos];
-                if ( AscCommon.para_Space === Item.Type )
+                if ( para_Space === Item.Type )
                 {
                     bDontCheckFirstWord = false;
                     break;
@@ -979,7 +979,7 @@ ParaRun.prototype.Restart_CheckSpelling = function()
     {
         var Item = this.Content[nIndex];
 
-        if (AscCommon.para_Drawing === Item.Type)
+        if (para_Drawing === Item.Type)
             Item.Restart_CheckSpelling();
     }
 };
@@ -1014,7 +1014,7 @@ ParaRun.prototype.Check_Spelling = function(SpellCheckerEngine, Depth)
         var Item = this.Content[Pos];
 
         //if ( para_Text === Item.Type && ( false === Item.Is_Punctuation() || ( true === bWord && true === this.Internal_CheckPunctuationBreak( Pos ) ) ) && false === Item.Is_NBSP() && false === Item.Is_Number() && false === Item.Is_SpecialSymbol() )
-        if ( AscCommon.para_Text === Item.Get_Type() && false === Item.Is_Punctuation() && false === Item.Is_NBSP() && false === Item.Is_Number() && false === Item.Is_SpecialSymbol() )
+        if ( para_Text === Item.Get_Type() && false === Item.Is_Punctuation() && false === Item.Is_NBSP() && false === Item.Is_Number() && false === Item.Is_SpecialSymbol() )
         {
             if ( false === bWord )
             {

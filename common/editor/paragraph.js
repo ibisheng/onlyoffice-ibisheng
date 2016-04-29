@@ -54,13 +54,6 @@ var CDocumentBorder = AscCommon.CDocumentBorder;
 var CDocumentShd = AscCommon.CDocumentShd;
 var CDocumentColor = AscCommon.CDocumentColor;
 var border_Single = AscCommon.border_Single;
-var ParaTextPr = AscCommon.ParaTextPr;
-var para_Math = AscCommon.para_Math;
-var para_Hyperlink = AscCommon.para_Hyperlink;
-var para_Comment = AscCommon.para_Comment;
-var para_Run = AscCommon.para_Run;
-var para_TextPr = AscCommon.para_TextPr;
-var para_Text = AscCommon.para_Text;
 
 var linerule_Exact = Asc.linerule_Exact;
 var c_oAscRelativeFromV = Asc.c_oAscRelativeFromV;
@@ -128,11 +121,11 @@ function Paragraph(DrawingDocument, Parent, PageNum, X, Y, XLimit, YLimit, bFrom
 
     if(!(bFromPresentation === true))
     {
-        this.Numbering = new AscCommon.ParaNumbering();
+        this.Numbering = new ParaNumbering();
     }
     else
     {
-        this.Numbering = new AscCommon.ParaPresentationNumbering();
+        this.Numbering = new ParaPresentationNumbering();
     }
     this.ParaEnd   =
     {
@@ -206,7 +199,7 @@ function Paragraph(DrawingDocument, Parent, PageNum, X, Y, XLimit, YLimit, bFrom
     // Добавляем в контент элемент "конец параграфа"
     this.Content = [];
     var EndRun = new ParaRun(this);
-    EndRun.Add_ToContent( 0, new AscCommon.ParaEnd() );
+    EndRun.Add_ToContent( 0, new ParaEnd() );
 
     this.Content[0] = EndRun;
 
@@ -325,7 +318,7 @@ Paragraph.prototype =
         // Поскольку в ране не копируется элемент para_End добавим его здесь отдельно
 
         var EndRun = new ParaRun(Para);
-        EndRun.Add_ToContent( 0, new AscCommon.ParaEnd() );
+        EndRun.Add_ToContent( 0, new ParaEnd() );
         Para.Internal_Content_Add( Para.Content.length, EndRun, false );
         EndRun.Set_Pr(this.TextPr.Value.Copy());
 
@@ -1520,7 +1513,7 @@ Paragraph.prototype =
                     var NumberingType = this.Numbering.Type;
                     var NumberingItem = this.Numbering;
 
-                    if ( AscCommon.para_Numbering === NumberingType )
+                    if ( para_Numbering === NumberingType )
                     {
                         var NumPr = Pr.ParaPr.NumPr;
                         if ( undefined === NumPr || undefined === NumPr.NumId || 0 === NumPr.NumId || "0" === NumPr.NumId )
@@ -1896,7 +1889,7 @@ Paragraph.prototype =
                 if ( true === this.Numbering.Check_Range(CurRange, CurLine) )
                 {
                     var NumberingItem = this.Numbering;
-                    if ( AscCommon.para_Numbering === NumberingItem.Type )
+                    if ( para_Numbering === NumberingItem.Type )
                     {
                         var NumPr = Pr.ParaPr.NumPr;
                         if ( undefined === NumPr || undefined === NumPr.NumId || 0 === NumPr.NumId || "0" === NumPr.NumId || ( undefined !== this.Get_SectionPr() && true === this.IsEmpty() ) )
@@ -1988,9 +1981,9 @@ Paragraph.prototype =
                                 pGraphics.SetFont( {FontFamily: { Name : "ASCW3", Index : -1 }, FontSize: 10, Italic: false, Bold : false} );
 
                                 if ( X0 > 0 )
-                                    pGraphics.FillText2( X1 + X0, Y, String.fromCharCode( AscCommon.tab_Symbol ), 0, TempWidth );
+                                    pGraphics.FillText2( X1 + X0, Y, String.fromCharCode( tab_Symbol ), 0, TempWidth );
                                 else
-                                    pGraphics.FillText2( X1, Y, String.fromCharCode( AscCommon.tab_Symbol ), TempRealWidth - TempWidth, TempWidth );
+                                    pGraphics.FillText2( X1, Y, String.fromCharCode( tab_Symbol ), TempRealWidth - TempWidth, TempWidth );
                             }
 
                             if ( true === NumTextPr.Strikeout || true === NumTextPr.Underline )
@@ -2015,7 +2008,7 @@ Paragraph.prototype =
                                 pGraphics.drawHorLine( 0, (Y + this.Lines[CurLine].Metrics.TextDescent * 0.4), X_start, X_start + NumberingItem.WidthNum, (NumTextPr.FontSize / 18) * AscCommon.g_dKoef_pt_to_mm);
                         }
                     }
-                    else if ( AscCommon.para_PresentationNumbering === this.Numbering.Type )
+                    else if ( para_PresentationNumbering === this.Numbering.Type )
                     {
                         if ( true != this.IsEmpty() )
                         {
@@ -2804,7 +2797,7 @@ Paragraph.prototype =
     {
         var LetterPos = CurPos;
         var bFound = false;
-        var Type = AscCommon.para_Unknown;
+        var Type = para_Unknown;
 
         if ( CurPos < 0 || CurPos >= this.Content.length )
             return { Found : false };
@@ -2838,7 +2831,7 @@ Paragraph.prototype =
     {
         var LetterPos = CurPos;
         var bFound = false;
-        var Type = AscCommon.para_Unknown;
+        var Type = para_Unknown;
 
         if ( CurPos < 0 || CurPos >= this.Content.length )
             return { Found : false };
@@ -2981,11 +2974,11 @@ Paragraph.prototype =
         switch (Item.Get_Type())
         {
             case para_Text:
-            case AscCommon.para_Space:
-            case AscCommon.para_PageNum:
-            case AscCommon.para_Tab:
-            case AscCommon.para_Drawing:
-            case AscCommon.para_NewLine:
+            case para_Space:
+            case para_PageNum:
+            case para_Tab:
+            case para_Drawing:
+            case para_NewLine:
             {
                 // Элементы данного типа добавляем во внутренний элемент
                 this.Content[this.CurPos.ContentPos].Add(Item);
@@ -3046,7 +3039,7 @@ Paragraph.prototype =
                         // 3. Во всех остальных случаях вставляем пустой ран с заданными настройкми и переносим курсор в этот
                         //    ран, чтобы при последующем наборе текст отрисовывался с нужными настройками.
 
-                        if ( null === RItem || AscCommon.para_End === RItem.Type )
+                        if ( null === RItem || para_End === RItem.Type )
                         {
                             this.Apply_TextPr( TextPr );
                             this.TextPr.Apply_TextPr( TextPr );
@@ -3110,7 +3103,7 @@ Paragraph.prototype =
 
                 break;
             }
-            case AscCommon.para_Field:
+            case para_Field:
             {
                 var ContentPos = this.Get_ParaContentPos(false, false);
                 var CurPos = ContentPos.Get(0);
@@ -3288,16 +3281,16 @@ Paragraph.prototype =
         var Tabs = CompiledPr.Tabs.Copy();
 
         if ( Math.abs(X - X1 / 2) < 12.5 )
-            Tabs.Add( new AscCommon.CParaTab( AscCommon.tab_Center, X1 / 2 ) );
+            Tabs.Add( new AscCommon.CParaTab( tab_Center, X1 / 2 ) );
         else if ( X > X1 - 12.5 )
-            Tabs.Add( new AscCommon.CParaTab( AscCommon.tab_Right, X1 - 0.001 ) );
+            Tabs.Add( new AscCommon.CParaTab( tab_Right, X1 - 0.001 ) );
         else
-            Tabs.Add( new AscCommon.CParaTab( AscCommon.tab_Left, X ) );
+            Tabs.Add( new AscCommon.CParaTab( tab_Left, X ) );
 
         this.Set_Tabs( Tabs );
 
         this.Set_ParaContentPos( this.Get_EndPos( false ), false, -1, -1 );
-        this.Add( new AscCommon.ParaTab() );     
+        this.Add( new ParaTab() );     
         
         return true;
     },   
@@ -3339,7 +3332,7 @@ Paragraph.prototype =
                 // 3. Во всех остальных случаях вставляем пустой ран с заданными настройкми и переносим курсор в этот
                 //    ран, чтобы при последующем наборе текст отрисовывался с нужными настройками.
 
-                if ( null === RItem || AscCommon.para_End === RItem.Type )
+                if ( null === RItem || para_End === RItem.Type )
                 {
                     // Изменение настройки для символа параграфа делается внутри
                     this.Apply_TextPr( undefined, bIncrease, false );
@@ -3943,7 +3936,7 @@ Paragraph.prototype =
         if ( true === this.Numbering.Check_Range(CurRange, CurLine) )
         {
             var NumPr = this.Numbering_Get();
-            if ( AscCommon.para_Numbering === this.Numbering.Type && undefined !== NumPr && undefined !== NumPr.NumId && 0 !== NumPr.NumId && "0" !== NumPr.NumId )
+            if ( para_Numbering === this.Numbering.Type && undefined !== NumPr && undefined !== NumPr.NumId && 0 !== NumPr.NumId && "0" !== NumPr.NumId )
             {
                 var NumJc = this.Parent.Get_Numbering().Get_AbstractNum( NumPr.NumId ).Lvl[NumPr.Lvl].Jc;
 
@@ -5136,7 +5129,7 @@ Paragraph.prototype =
             var Item = this.Content[CurPos];
             var ItemType = Item.Type;
 
-            if ( para_Text === ItemType || AscCommon.para_Space === ItemType || AscCommon.para_End === ItemType || AscCommon.para_Tab === ItemType || (AscCommon.para_Drawing === ItemType && true === Item.Is_Inline() ) || AscCommon.para_PageNum === ItemType || AscCommon.para_NewLine === ItemType || AscCommon.para_HyperlinkStart === ItemType || para_Math === ItemType )
+            if ( para_Text === ItemType || para_Space === ItemType || para_End === ItemType || para_Tab === ItemType || (para_Drawing === ItemType && true === Item.Is_Inline() ) || para_PageNum === ItemType || para_NewLine === ItemType || para_HyperlinkStart === ItemType || para_Math === ItemType )
                 break;
 
             CurPos++;
@@ -5152,12 +5145,12 @@ Paragraph.prototype =
             var ItemType = Item.Type;
             var bEnd = false;
 
-            if ( para_Text === ItemType || AscCommon.para_Space === ItemType || AscCommon.para_End === ItemType || AscCommon.para_Tab === ItemType || (AscCommon.para_Drawing === ItemType && true === Item.Is_Inline() ) || AscCommon.para_PageNum === ItemType || AscCommon.para_NewLine === ItemType || para_Math === ItemType )
+            if ( para_Text === ItemType || para_Space === ItemType || para_End === ItemType || para_Tab === ItemType || (para_Drawing === ItemType && true === Item.Is_Inline() ) || para_PageNum === ItemType || para_NewLine === ItemType || para_Math === ItemType )
             {
                 this.CurPos.ContentPos = CurPos + 1;
                 bEnd = true;
             }
-            else if ( AscCommon.para_HyperlinkEnd === ItemType )
+            else if ( para_HyperlinkEnd === ItemType )
             {
                 while ( CurPos < Count - 1 && para_TextPr === this.Content[CurPos + 1].Type )
                     CurPos++;
@@ -5185,7 +5178,7 @@ Paragraph.prototype =
         if ( CurPos <= 0 )
         {
             CurPos = 0;
-            while ( para_TextPr === this.Content[CurPos].Type || AscCommon.para_CollaborativeChangesEnd === this.Content[CurPos].Type || AscCommon.para_CollaborativeChangesStart === this.Content[CurPos].Type )
+            while ( para_TextPr === this.Content[CurPos].Type || para_CollaborativeChangesEnd === this.Content[CurPos].Type || para_CollaborativeChangesStart === this.Content[CurPos].Type )
                 CurPos++;
 
             this.CurPos.ContentPos = CurPos;
@@ -5207,7 +5200,7 @@ Paragraph.prototype =
     // Функция определяет начальную позицию курсора в параграфе
     Internal_GetStartPos : function()
     {
-        var oPos = this.Internal_FindForward( 0, [AscCommon.para_PageNum, AscCommon.para_Drawing, AscCommon.para_Tab, para_Text, AscCommon.para_Space, AscCommon.para_NewLine, AscCommon.para_End, para_Math] );
+        var oPos = this.Internal_FindForward( 0, [para_PageNum, para_Drawing, para_Tab, para_Text, para_Space, para_NewLine, para_End, para_Math] );
         if ( true === oPos.Found )
             return oPos.LetterPos;
 
@@ -5217,7 +5210,7 @@ Paragraph.prototype =
     // Функция определяет конечную позицию в параграфе
     Internal_GetEndPos : function()
     {
-        var Res = this.Internal_FindBackward( this.Content.length - 1, [AscCommon.para_End] );
+        var Res = this.Internal_FindBackward( this.Content.length - 1, [para_End] );
         if ( true === Res.Found )
             return Res.LetterPos;
 
@@ -5245,7 +5238,7 @@ Paragraph.prototype =
         {
             var CurElement = this.Content[CurPos];
 
-            if ((para_Hyperlink === CurElement.Type || para_Math === CurElement.Type || AscCommon.para_Field === CurElement.Type) && true === CurElement.Is_Empty() && true !== CurElement.Is_CheckingNearestPos())
+            if ((para_Hyperlink === CurElement.Type || para_Math === CurElement.Type || para_Field === CurElement.Type) && true === CurElement.Is_Empty() && true !== CurElement.Is_CheckingNearestPos())
             {
                 this.Internal_Content_Remove(CurPos);
                 CurPos++;
@@ -5702,9 +5695,9 @@ Paragraph.prototype =
                 var Char = HyperProps.Text.charAt( NewPos );
 
                 if ( " " == Char )
-                    HyperRun.Add_ToContent( NewPos, new AscCommon.ParaSpace(), false );
+                    HyperRun.Add_ToContent( NewPos, new ParaSpace(), false );
                 else
-                    HyperRun.Add_ToContent( NewPos, new AscCommon.ParaText(Char), false );
+                    HyperRun.Add_ToContent( NewPos, new ParaText(Char), false );
             }
 
             // Разделяем текущий элемент (возвращается правая часть)
@@ -5809,9 +5802,9 @@ Paragraph.prototype =
                     var Char = HyperProps.Text.charAt( NewPos );
 
                     if ( " " == Char )
-                        HyperRun.Add_ToContent( NewPos, new AscCommon.ParaSpace(), false );
+                        HyperRun.Add_ToContent( NewPos, new ParaSpace(), false );
                     else
-                        HyperRun.Add_ToContent( NewPos, new AscCommon.ParaText(Char), false );
+                        HyperRun.Add_ToContent( NewPos, new ParaText(Char), false );
                 }
 
                 // Перемещаем кусор в конец гиперссылки
@@ -6443,7 +6436,7 @@ Paragraph.prototype =
             while ( this.Content[StartPos].Type == para_TextPr )
                 StartPos++;
 
-            var oEnd = this.Internal_FindBackward( EndPos - 1, [ para_Text, AscCommon.para_Space ] );
+            var oEnd = this.Internal_FindBackward( EndPos - 1, [ para_Text, para_Space ] );
 
             if ( oEnd.Found )
                 EndPos = oEnd.LetterPos;
@@ -8062,9 +8055,9 @@ Paragraph.prototype =
                     End   = this.Selection.StartPos;
                 }
 
-                if ( true === this.Internal_FindForward( End, [AscCommon.para_PageNum, AscCommon.para_Drawing, AscCommon.para_Tab, para_Text, AscCommon.para_Space, AscCommon.para_NewLine, AscCommon.para_End, para_Math]).Found )
+                if ( true === this.Internal_FindForward( End, [para_PageNum, para_Drawing, para_Tab, para_Text, para_Space, para_NewLine, para_End, para_Math]).Found )
                     _ApplyPara = false;
-                else if ( true === this.Internal_FindBackward( Start - 1, [AscCommon.para_PageNum, AscCommon.para_Drawing, AscCommon.para_Tab, para_Text, AscCommon.para_Space, AscCommon.para_NewLine, AscCommon.para_End, para_Math]).Found )
+                else if ( true === this.Internal_FindBackward( Start - 1, [para_PageNum, para_Drawing, para_Tab, para_Text, para_Space, para_NewLine, para_End, para_Math]).Found )
                     _ApplyPara = false;
             }
             else
@@ -8514,8 +8507,8 @@ Paragraph.prototype =
         for ( var Index = 0; Index < StyleTabs.Tabs.length; Index++ )
         {
             var Value = _Tabs.Get_Value( StyleTabs.Tabs[Index].Pos );
-            if ( AscCommon.tab_Clear != StyleTabs.Tabs[Index] && -1 === Value )
-                _Tabs.Add( new AscCommon.CParaTab(AscCommon.tab_Clear, StyleTabs.Tabs[Index].Pos ) );
+            if ( tab_Clear != StyleTabs.Tabs[Index] && -1 === Value )
+                _Tabs.Add( new AscCommon.CParaTab(tab_Clear, StyleTabs.Tabs[Index].Pos ) );
         }
 
         this.private_AddPrChange();
@@ -9006,7 +8999,7 @@ Paragraph.prototype =
                 }
 
                 var ParagraphTop = (true != Drawing.Use_TextWrap() ? this.Lines[Para.Pages[CurPage].StartLine].Top + this.Pages[CurPage].Y : this.Pages[CurPage].Y);
-                var Layout = new AscCommon.CParagraphLayout(DrawingLayout.X, DrawingLayout.Y , this.Get_AbsolutePage(CurPage), DrawingLayout.LastW, ColumnStartX, ColumnEndX, X_Left_Margin, X_Right_Margin, Page_Width, Top_Margin, Bottom_Margin, Page_H, PageFields.X, PageFields.Y, this.Pages[CurPage].Y + this.Lines[CurLine].Y - this.Lines[CurLine].Metrics.Ascent, ParagraphTop);
+                var Layout = new CParagraphLayout(DrawingLayout.X, DrawingLayout.Y , this.Get_AbsolutePage(CurPage), DrawingLayout.LastW, ColumnStartX, ColumnEndX, X_Left_Margin, X_Right_Margin, Page_Width, Top_Margin, Bottom_Margin, Page_H, PageFields.X, PageFields.Y, this.Pages[CurPage].Y + this.Lines[CurLine].Y - this.Lines[CurLine].Metrics.Ascent, ParagraphTop);
                 return {ParagraphLayout : Layout, PageLimits : PageLimits};
             }
         }
@@ -9282,11 +9275,11 @@ Paragraph.prototype =
             {
                 FontCharMap.AddChar( Item.Value );
             }
-            else if ( AscCommon.para_Space === Item.Type )
+            else if ( para_Space === Item.Type )
             {
                 FontCharMap.AddChar( ' ' );
             }
-            else if ( AscCommon.para_Numbering === Item.Type )
+            else if ( para_Numbering === Item.Type )
             {
                 var ParaPr = this.CompiledPr.Pr.ParaPr;
                 var NumPr = ParaPr.NumPr;
@@ -9302,7 +9295,7 @@ Paragraph.prototype =
                 Numbering.Document_CreateFontCharMap( FontCharMap, NumTextPr, NumPr, NumInfo );
                 FontCharMap.StartFont( CurTextPr.FontFamily.Name, CurTextPr.Bold, CurTextPr.Italic, CurTextPr.FontSize );
             }
-            else if ( AscCommon.para_PageNum === Item.Type )
+            else if ( para_PageNum === Item.Type )
             {
                 Item.Document_CreateFontCharMap( FontCharMap );
             }
@@ -10198,7 +10191,7 @@ Paragraph.prototype =
 
         // В старый параграф добавим ран с концом параграфа
         var EndRun = new ParaRun( this );
-        EndRun.Add_ToContent( 0, new AscCommon.ParaEnd() );
+        EndRun.Add_ToContent( 0, new ParaEnd() );
 
         this.Internal_Content_Add( this.Content.length, EndRun );
 
@@ -12568,7 +12561,7 @@ Paragraph.prototype =
         this.bFromDocument = Reader.GetBool();
         if(!this.bFromDocument)
         {
-            this.Numbering = new AscCommon.ParaPresentationNumbering();
+            this.Numbering = new ParaPresentationNumbering();
         }
         if(this.bFromDocument || (editor && editor.WordControl && editor.WordControl.m_oDrawingDocument))
         {
@@ -12885,7 +12878,7 @@ Paragraph.prototype =
         var Len = Word.length;
         for ( var Pos = 0; Pos < Len; Pos++ )
         {
-            Class.Add_ToContent( RunPos + Pos,  ( 0x0020 === Word.charCodeAt(Pos) ? new AscCommon.ParaSpace() : new AscCommon.ParaText(Word[Pos]) ) );
+            Class.Add_ToContent( RunPos + Pos,  ( 0x0020 === Word.charCodeAt(Pos) ? new ParaSpace() : new ParaText(Word[Pos]) ) );
         }
 
         // Удалим старое слово
@@ -13141,7 +13134,7 @@ Paragraph.prototype.Start_SelectionFromCurPos = function()
     this.Set_SelectionContentPos(ContentPos, ContentPos);
 };
 /**
- *  Возвращается объект CParagraphContentPos по заданому Id AscCommon.ParaDrawing, если объект
+ *  Возвращается объект CParagraphContentPos по заданому Id ParaDrawing, если объект
  *  не найдет, вернется null.
  */
 Paragraph.prototype.Get_PosByDrawing = function(Id)
@@ -14790,7 +14783,7 @@ CRunRecalculateObject.prototype =
         {
             var Item = Run.Content[Index];
 
-            if ( AscCommon.para_PageNum === Item.Type || AscCommon.para_Drawing === Item.Type )
+            if ( para_PageNum === Item.Type || para_Drawing === Item.Type )
                 this.Content[Index2++] = Item.Save_RecalculateObject(Copy);
         }
     },
@@ -14802,7 +14795,7 @@ CRunRecalculateObject.prototype =
         {
             var Item = Run.Content[Index];
 
-            if ( AscCommon.para_PageNum === Item.Type || AscCommon.para_Drawing === Item.Type )
+            if ( para_PageNum === Item.Type || para_Drawing === Item.Type )
                 Item.Load_RecalculateObject( this.Content[Index2++] );
         }
     },
@@ -14814,7 +14807,7 @@ CRunRecalculateObject.prototype =
         {
             var Item = this.Content[Index];
 
-            if ( AscCommon.para_Drawing === Item.Type && undefined !== Item.FlowPos )
+            if ( para_Drawing === Item.Type && undefined !== Item.FlowPos )
                 FlowPos.push( Item.FlowPos );
         }
     },
@@ -14836,7 +14829,7 @@ CRunRecalculateObject.prototype =
             return true;
 
         // заглушка для однострочных контентов
-        if(OLI.Type == AscCommon.para_Math_Content && OLI.bOneLine == true)
+        if(OLI.Type == para_Math_Content && OLI.bOneLine == true)
             return true;
 
         if ( this.StartLine !== OLI.StartLine || this.StartRange !== OLI.StartRange || CurLine < 0 || CurLine >= this.private_Get_LinesCount() || CurLine >= OLI.protected_GetLinesCount() || CurRange < 0 || CurRange >= this.private_Get_RangesCount(CurLine) || CurRange >= OLI.protected_GetRangesCount(CurLine) )
@@ -14852,7 +14845,7 @@ CRunRecalculateObject.prototype =
         if ( ThisSP !== OtherSP || ThisEP !== OtherEP )
             return false;
 
-        if ( ( (OLI.Content === undefined || para_Run === OLI.Type || AscCommon.para_Math_Run === OLI.Type) && this.Content.length > 0 ) || ( OLI.Content !== undefined && para_Run !== OLI.Type && AscCommon.para_Math_Run !== OLI.Type && OLI.Content.length !== this.Content.length) )
+        if ( ( (OLI.Content === undefined || para_Run === OLI.Type || para_Math_Run === OLI.Type) && this.Content.length > 0 ) || ( OLI.Content !== undefined && para_Run !== OLI.Type && para_Math_Run !== OLI.Type && OLI.Content.length !== this.Content.length) )
             return false;
 
         var ContentLen = this.Content.length;

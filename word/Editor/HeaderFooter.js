@@ -166,7 +166,7 @@ CHeaderFooter.prototype =
             for ( var Index = 0; Index < Count; Index++ )
             {
                 var Obj = AllDrawingObjects[Index];
-                if ( AscCommon.drawing_Anchor === Obj.Get_DrawingType() && true === Obj.Use_TextWrap() )
+                if ( drawing_Anchor === Obj.Get_DrawingType() && true === Obj.Use_TextWrap() )
                 {
                     var oDistance = Obj.Get_Distance();
                     var FlowPos =
@@ -1750,7 +1750,7 @@ CHeaderFooterController.prototype =
 
     Paragraph_Add : function( ParaItem, bRecalculate )
     {
-        if (AscCommon.para_NewLine === ParaItem.Type && true === ParaItem.Is_PageOrColumnBreak())
+        if (para_NewLine === ParaItem.Type && true === ParaItem.Is_PageOrColumnBreak())
             return;
 
         if ( null != this.CurHdrFtr )

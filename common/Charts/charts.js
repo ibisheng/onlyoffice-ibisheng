@@ -12,7 +12,6 @@ function (window, undefined) {
 	var CreateNoFillUniFill = AscFormat.CreateNoFillUniFill;
 	
 	var CTextPr = AscCommon.CTextPr;
-	var ParaText = AscCommon.ParaText;
 	
 var c_oAscChartTypeSettings = Asc.c_oAscChartTypeSettings;
 var c_oAscTickMark = Asc.c_oAscTickMark;
@@ -802,7 +801,7 @@ TextArtPreviewManager.prototype.getShapeByPrst = function(prst)
 	}
 	oContent.Set_ApplyToAll(true);
 	oContent.Set_ParagraphAlign(AscCommon.align_Center);
-	oContent.Paragraph_Add(new AscCommon.ParaTextPr({FontSize: 36, Spacing: TextSpacing}));
+	oContent.Paragraph_Add(new ParaTextPr({FontSize: 36, Spacing: TextSpacing}));
 	oContent.Set_ApplyToAll(false);
 
 	var oBodypr = oShape.getBodyPr().createDuplicate();
@@ -897,7 +896,7 @@ TextArtPreviewManager.prototype.getTAShape = function()
 			oContent.Paragraph_Add(new ParaText(sText[i]), false);
 		}
 		oContent.Set_ApplyToAll(true);
-		oContent.Paragraph_Add(new AscCommon.ParaTextPr({FontSize: 109, RFonts: {Ascii : {Name: "Arial", Index: -1}}}));
+		oContent.Paragraph_Add(new ParaTextPr({FontSize: 109, RFonts: {Ascii : {Name: "Arial", Index: -1}}}));
 		oContent.Set_ParagraphAlign(AscCommon.align_Center);
 		oContent.Set_ParagraphIndent({FirstLine: 0, Left: 0, Right: 0});
 		oContent.Set_ApplyToAll(false);
@@ -966,7 +965,7 @@ TextArtPreviewManager.prototype.generateTextArtStyles = function()
         oContent.Set_ApplyToAll(true);
         for(var i = 0; i < this.aStylesByIndex.length; ++i)
         {
-            oContent.Paragraph_Add(new AscCommon.ParaTextPr(this.aStylesByIndex[i]));
+            oContent.Paragraph_Add(new ParaTextPr(this.aStylesByIndex[i]));
             graphics.init(ctx, _canvas.width, _canvas.height, oShape.extX, oShape.extY);
             graphics.transform(1,0,0,1,0,0);
             oShape.recalcText();

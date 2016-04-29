@@ -812,30 +812,30 @@ CopyProcessor.prototype =
     {
         switch ( ParaItem.Type )
         {
-            case AscCommon.para_Text:
+            case para_Text:
                 //���������� �����������
                 var sValue = AscCommon.encodeSurrogateChar(ParaItem.Value);
                 if(sValue)
 					oTarget.addChild(new CopyElement(CopyPasteCorrectString(sValue), true));
                 break;
-            case AscCommon.para_Space:
+            case para_Space:
 				//TODO пересмотреть обработку пробелов - возможно стоит всегда копировать неразрывный пробел!!!!!
 				//в случае нескольких пробелов друг за другом добавляю неразрывный пробел, иначе добавиться только один
 				//lengthContent - если в элемент добавляется только один пробел, этот элемент не записывается в буфер, поэтому добавляем неразрывный пробел
-				if((nextParaItem && nextParaItem.Type === AscCommon.para_Space) || lengthContent === 1)
+				if((nextParaItem && nextParaItem.Type === para_Space) || lengthContent === 1)
 					oTarget.addChild(new CopyElement("&nbsp;", true));
 				else
 					oTarget.addChild(new CopyElement(" ", true));	
 				break;
-			case AscCommon.para_Tab:
+			case para_Tab:
 				var oSpan = new CopyElement("span");
 				oSpan.oAttributes["style"] = "white-space:pre;";
 				oSpan.addChild(new CopyElement(String.fromCharCode(0x09), true));
 				oTarget.addChild(oSpan);
 				break;
-            case AscCommon.para_NewLine:
+            case para_NewLine:
 				var oBr = new CopyElement("br");
-                if( AscCommon.break_Page == ParaItem.BreakType)
+                if( break_Page == ParaItem.BreakType)
                 {
 					oBr.oAttributes["clear"] = "all";
 					oBr.oAttributes["style"] = "mso-special-character:line-break;page-break-before:always;";
@@ -849,7 +849,7 @@ CopyProcessor.prototype =
 				oSpan.addChild(new CopyElement("&nbsp;", true));
 				oTarget.addChild(oSpan);
                 break;
-            case AscCommon.para_Drawing:
+            case para_Drawing:
                 var oGraphicObj = ParaItem.GraphicObj;
                 var sSrc = oGraphicObj.getBase64Img();
                 if(sSrc.length > 0)
@@ -888,7 +888,7 @@ CopyProcessor.prototype =
                 // _ctx = null;
                 // delete _canvas;
                 break;
-			case AscCommon.para_PageNum:
+			case para_PageNum:
 				if(null != ParaItem.String && "string" == typeof(ParaItem.String))
 					oTarget.addChild(new CopyElement(CopyPasteCorrectString(ParaItem.String), true));
 				break;
@@ -901,7 +901,7 @@ CopyProcessor.prototype =
     CopyRunContent: function (Container, oTarget, bOmitHyperlink) {
         for (var i = 0; i < Container.Content.length; i++) {
             var item = Container.Content[i];
-            if (AscCommon.para_Run == item.Type) {
+            if (para_Run == item.Type) {
 				var oSpan = new CopyElement("span");
                 this.CopyRun(item, oSpan);
                 if(!oSpan.isEmptyChild()){
@@ -909,7 +909,7 @@ CopyProcessor.prototype =
 					oTarget.addChild(oSpan);
 				}
             }
-            else if (AscCommon.para_Hyperlink == item.Type) {
+            else if (para_Hyperlink == item.Type) {
                 if (!bOmitHyperlink) {
 					var oHyperlink = new CopyElement("a");
                     var sValue = item.Get_Value();
@@ -923,7 +923,7 @@ CopyProcessor.prototype =
 				else
 					this.CopyRunContent(item, oTarget, true);
             }
-			else if(AscCommon.para_Math == item.Type){
+			else if(para_Math == item.Type){
                 var sSrc = item.MathToImageConverter();
 				if (null != sSrc && "" != sSrc && null != sSrc.ImageUrl){
 					var oImg = new CopyElement("img");
@@ -933,7 +933,7 @@ CopyProcessor.prototype =
 					oTarget.addChild(oImg);
 				}
 			}
-			else if(AscCommon.para_Field == item.Type)
+			else if(para_Field == item.Type)
 				this.CopyRunContent(item, oTarget);
         }
     },
@@ -2824,17 +2824,17 @@ PasteProcessor.prototype =
                 var nContentLength = oInsertPar.Content.length;
                 if(nContentLength > 2)
                 {
-                    var oFindObj = Item.Internal_FindBackward(Item.CurPos.ContentPos, [AscCommon.para_TextPr]);
+                    var oFindObj = Item.Internal_FindBackward(Item.CurPos.ContentPos, [para_TextPr]);
                     var TextPr = null;
-					if ( true === oFindObj.Found && AscCommon.para_TextPr === oFindObj.Type )
+					if ( true === oFindObj.Found && para_TextPr === oFindObj.Type )
 						TextPr = Item.Content[oFindObj.LetterPos].Copy();
 					else
-						TextPr = new AscCommon.ParaTextPr();
+						TextPr = new ParaTextPr();
                     var nContentPos = Item.CurPos.ContentPos;
                     for(var i = 0; i < nContentLength - 2; ++i)// -2 �� ����������� ����� ���������
                     {
                         var oCurInsItem = oInsertPar.Content[i];
-                        if(AscCommon.para_Numbering != oCurInsItem.Type)
+                        if(para_Numbering != oCurInsItem.Type)
                         {
                             Item.Internal_Content_Add(nContentPos, oCurInsItem);
                             nContentPos++;
@@ -4130,7 +4130,7 @@ PasteProcessor.prototype =
 					
 					tempParaRun = new ParaRun();
 					tempParaRun.Paragraph = null;
-					tempParaRun.Add_ToContent( 0, new AscCommon.ParaDrawing(), false );
+					tempParaRun.Add_ToContent( 0, new ParaDrawing(), false );
 
 					tempParaRun.Content[0].Set_GraphicObject(graphicObj);
 					tempParaRun.Content[0].GraphicObj.setParent(tempParaRun.Content[0]);
@@ -4159,7 +4159,7 @@ PasteProcessor.prototype =
 					
 					tempParaRun = new ParaRun();
 					tempParaRun.Paragraph = null;
-					tempParaRun.Add_ToContent( 0, new AscCommon.ParaDrawing(), false );
+					tempParaRun.Add_ToContent( 0, new ParaDrawing(), false );
 					
 					tempParaRun.Content[0].Set_GraphicObject(graphicObj);
 					tempParaRun.Content[0].GraphicObj.setParent(tempParaRun.Content[0]);
@@ -4362,11 +4362,11 @@ PasteProcessor.prototype =
 						if (null != nUnicode) {
 							var Item;
 							if (0x20 != nUnicode && 0xA0 != nUnicode && 0x2009 != nUnicode) {
-								Item = new AscCommon.ParaText();
+								Item = new ParaText();
 								Item.Set_CharCode(nUnicode);
 							}
 							else
-								Item = new AscCommon.ParaSpace();
+								Item = new ParaSpace();
 							
 							//add text
 							oCurRun.Add_ToContent(k, Item, false);
@@ -5247,7 +5247,7 @@ PasteProcessor.prototype =
                 {
                     var val = this._ValueToMm(aTabs[i]);
                     if(val)
-                        Tabs.Add(new AscCommon.CParaTab(AscCommon.tab_Left, val));
+                        Tabs.Add(new AscCommon.CParaTab(tab_Left, val));
                 }
                 Para.Set_Tabs(Tabs);
             }
@@ -5698,7 +5698,7 @@ PasteProcessor.prototype =
     _Paragraph_Add: function (elem)
     {
         if (null != this.oCurRun) {
-            if (AscCommon.para_Hyperlink == elem.Type) {
+            if (para_Hyperlink == elem.Type) {
                 this._CommitRunToParagraph(true);
                 this._CommitElemToParagraph(elem);
             }
@@ -5748,10 +5748,10 @@ PasteProcessor.prototype =
         for(var i = 0, length = this.nBrCount - nIgnore; i < length; i++)
         {
             if ("always" == pPr["mso-column-break-before"])
-                this._Paragraph_Add(new AscCommon.ParaNewLine(AscCommon.break_Page));
+                this._Paragraph_Add(new ParaNewLine(break_Page));
             else{
                 if (this.bInBlock)
-                    this._Paragraph_Add(new AscCommon.ParaNewLine(AscCommon.break_Line));
+                    this._Paragraph_Add(new ParaNewLine(break_Line));
                 else
                     this._Execute_AddParagraph(node, pPr);
             }
@@ -6402,11 +6402,11 @@ PasteProcessor.prototype =
                             if (null != nUnicode) {
                                 var Item;
                                 if (0x20 != nUnicode && 0xA0 != nUnicode && 0x2009 != nUnicode) {
-                                    Item = new AscCommon.ParaText();
+                                    Item = new ParaText();
                                     Item.Set_CharCode(nUnicode);
                                 }
                                 else
-                                    Item = new AscCommon.ParaSpace();
+                                    Item = new ParaSpace();
                                 this._Paragraph_Add(Item);
                             }
                         }
@@ -6574,7 +6574,7 @@ PasteProcessor.prototype =
                     bAddParagraph = this._Decide_AddParagraph(node.parentNode, pPr, bAddParagraph);
                     bAddParagraph = true;
                     this._Commit_Br(0, node, pPr);
-                    this._Paragraph_Add( new AscCommon.ParaNewLine( AscCommon.break_Page ) );
+                    this._Paragraph_Add( new ParaNewLine( break_Page ) );
                 }
                 else
                 {
@@ -6595,7 +6595,7 @@ PasteProcessor.prototype =
                     bAddParagraph = this._Decide_AddParagraph(node, pPr, bAddParagraph);
                     this._commit_rPr(node);
                     for(var i = 0; i < nTabCount; i++)
-                        this._Paragraph_Add( new AscCommon.ParaTab() );
+                        this._Paragraph_Add( new ParaTab() );
                     return bAddParagraph;
                 }
             }
@@ -6720,7 +6720,7 @@ PasteProcessor.prototype =
 							
 							for(var k = 0; k < oHyperlink.Content.length; k++)
 							{
-								if(oHyperlink.Content[k].Type == AscCommon.para_Run)
+								if(oHyperlink.Content[k].Type == para_Run)
 									oHyperlink.Content[k].Set_RStyle(hyperLinkStyle);
 							}
 						}
@@ -6796,7 +6796,7 @@ PasteProcessor.prototype =
 						if(!this.bIsPlainText)
 						{
 							var rPr = this._read_rPr(node.parentNode);
-							var Item = new AscCommon.ParaTextPr( rPr);
+							var Item = new ParaTextPr( rPr);
 							shape.paragraphAdd(Item);
 						}
                         for(var i = 0, length = value.length; i < length; i++)
@@ -6815,11 +6815,11 @@ PasteProcessor.prototype =
                             if (null != nUnicode) {
                                 var Item;
                                 if (0x20 != nUnicode && 0xA0 != nUnicode && 0x2009 != nUnicode) {
-                                    Item = new AscCommon.ParaText();
+                                    Item = new ParaText();
                                     Item.Value = nUnicode;
                                 }
                                 else
-                                    Item = new AscCommon.ParaSpace();
+                                    Item = new ParaSpace();
                                 shape.paragraphAdd(Item);
                             }
                         }
@@ -6921,11 +6921,11 @@ PasteProcessor.prototype =
             {
                 if("always" == node.style.pageBreakBefore)
                 {
-                    shape.paragraphAdd(new AscCommon.ParaNewLine( AscCommon.break_Line ));
+                    shape.paragraphAdd(new ParaNewLine( break_Line ));
                 }
                 else
                 {
-                    shape.paragraphAdd(new AscCommon.ParaNewLine( AscCommon.break_Line ));
+                    shape.paragraphAdd(new ParaNewLine( break_Line ));
                 }
             }
 
@@ -6938,11 +6938,11 @@ PasteProcessor.prototype =
 					if(!this.bIsPlainText)
 					{
 						var rPr = this._read_rPr(node);
-						var Item = new AscCommon.ParaTextPr( rPr);
+						var Item = new ParaTextPr( rPr);
 						shape.paragraphAdd(Item);
 					}
                     for(var i = 0; i < nTabCount; i++)
-                        shape.paragraphAdd( new AscCommon.ParaTab() );
+                        shape.paragraphAdd( new ParaTab() );
                     return;
                 }
             }
@@ -7749,7 +7749,7 @@ function CreateImageFromBinary(bin, nW, nH)
         w = nW;
         h = nH;
     }
-    var para_drawing = new AscCommon.ParaDrawing(w, h, null, editor.WordControl.m_oLogicDocument.DrawingDocument, editor.WordControl.m_oLogicDocument, null);
+    var para_drawing = new ParaDrawing(w, h, null, editor.WordControl.m_oLogicDocument.DrawingDocument, editor.WordControl.m_oLogicDocument, null);
     var word_image = AscFormat.DrawingObjectsController.prototype.createImage(bin, 0, 0, w, h);
     para_drawing.Set_GraphicObject(word_image);
     word_image.setParent(para_drawing);

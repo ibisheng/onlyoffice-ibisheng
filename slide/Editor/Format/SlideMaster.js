@@ -885,11 +885,11 @@ function CMasterThumbnailDrawer()
         par.Pr = _paraPr;
         var parRun = new ParaRun(par);
         parRun.Set_Pr(_textPr1);
-        parRun.Add_ToContent(0, new AscCommon.ParaText("A"), false);
+        parRun.Add_ToContent(0, new ParaText("A"), false);
         par.Add_ToContent(0, parRun);
         parRun = new ParaRun(par);
         parRun.Set_Pr(_textPr2);
-        parRun.Add_ToContent(0, new AscCommon.ParaText("a"), false);
+        parRun.Add_ToContent(0, new ParaText("a"), false);
         par.Add_ToContent(1, parRun);
 
         par.Recalculate_Page(0);

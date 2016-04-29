@@ -8,7 +8,6 @@ var align_Justify = AscCommon.align_Justify;
 var g_oTableId = AscCommon.g_oTableId;
 var History = AscCommon.History;
 var recalcresult_PrevLine = AscCommon.recalcresult_PrevLine;
-var para_Math_Run = AscCommon.para_Math_Run;
 
 var g_dMathArgSizeKoeff_1 = 0.76;
 var g_dMathArgSizeKoeff_2 = 0.6498; // 0.76 * 0.855
@@ -625,7 +624,7 @@ function Get_WordDocumentDefaultMathSettings()
 
 function MathMenu(type)
 {
-	this.Type = AscCommon.para_Math;
+	this.Type = para_Math;
 	this.Menu = type == undefined ? c_oAscMathType.Default_Text : type;
 }
 MathMenu.prototype =
@@ -984,7 +983,7 @@ function ParaMath()
     ParaMath.superclass.constructor.call(this);
 
     this.Id                 = AscCommon.g_oIdCounter.Get_NewId();
-    this.Type               = AscCommon.para_Math;
+    this.Type               = para_Math;
 
     this.Jc                 = undefined;
 
@@ -1124,7 +1123,7 @@ ParaMath.prototype.Add = function(Item)
         return;
 
     var NewElement = null;
-    if (AscCommon.para_Text === Type)
+    if (para_Text === Type)
     {
         // заглушка для текстовых настроек плейсхолдера
 
@@ -1153,13 +1152,13 @@ ParaMath.prototype.Add = function(Item)
             Run.Add(NewElement, true);
         }
     }
-    else if (AscCommon.para_Space === Type)
+    else if (para_Space === Type)
     {
         NewElement = new CMathText(false);
         NewElement.add(32);
         Run.Add(NewElement, true);
     }
-    else if (AscCommon.para_Math === Type)
+    else if (para_Math === Type)
     {
         var ContentPos = new AscCommon.CParagraphContentPos();
 
@@ -1199,7 +1198,7 @@ ParaMath.prototype.Add = function(Item)
             LogicDocument.Set_TrackRevisions(true);
     }
 
-    if ((AscCommon.para_Text === Type || AscCommon.para_Space === Type) && null !== NewElement)
+    if ((para_Text === Type || para_Space === Type) && null !== NewElement)
     {
         this.bFastRecalculate = oContent.bOneLine == false; // многострочный контент => можно осуществлять быстрый пересчет
 
@@ -1906,7 +1905,7 @@ ParaMath.prototype.private_UpdateWrapSettings = function(PRS)
         {
             var WrapType = Ranges[Pos].typeLeft;
 
-            if(WrapType !== AscCommon.WRAPPING_TYPE_SQUARE && WrapType !== AscCommon.WRAPPING_TYPE_THROUGH && WrapType !== AscCommon.WRAPPING_TYPE_TIGHT)
+            if(WrapType !== WRAPPING_TYPE_SQUARE && WrapType !== WRAPPING_TYPE_THROUGH && WrapType !== WRAPPING_TYPE_TIGHT)
             {
                 // выберем картинку с max RangeY c учетом данного условия, под которой попробуем расположить формулу
                 if(RY_NotWrap == null || RY_NotWrap < Ranges[Pos].Y1)
