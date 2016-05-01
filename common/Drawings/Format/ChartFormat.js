@@ -2050,7 +2050,7 @@ CPlotArea.prototype =
                 return axis_by_types.valAx[i];
         }
 
-        for(var i = 0; i < axis_by_types.valAx.length; ++i)
+        for(var i = 0; i < axis_by_types.catAx.length; ++i)
         {
             if(axis_by_types.catAx[i].axPos === AX_POS_B || axis_by_types.catAx[i].axPos === AX_POS_T)
                 return axis_by_types.catAx[i];
@@ -2070,7 +2070,7 @@ CPlotArea.prototype =
                 return axis_by_types.valAx[i];
         }
 
-        for(var i = 0; i < axis_by_types.valAx.length; ++i)
+        for(var i = 0; i < axis_by_types.catAx.length; ++i)
         {
             if(axis_by_types.catAx[i].axPos === AX_POS_L || axis_by_types.catAx[i].axPos === AX_POS_R)
                 return axis_by_types.catAx[i];

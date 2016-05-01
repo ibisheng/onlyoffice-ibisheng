@@ -881,7 +881,7 @@
     /**
      * Create a blip fill
      * @memberof Api
-     * @param {String} sImageUrl
+     * @param {string} sImageUrl
      * @param {BlipFillType} sBlipFillType
      * @returns {ApiFill}
      * */
@@ -3648,6 +3648,88 @@
         return "chart";
     };
 
+
+    /**
+     *  Specifies a chart title
+     *  @param {string} sTitle
+     * */
+    ApiChart.prototype.SetTitle = function (sTitle)
+    {
+        if(this.Chart)
+        {
+            if(typeof sTitle === "string" && sTitle.length > 0)
+            {
+                this.Chart.chart.setTitle(AscFormat.CTitle());
+                this.Chart.chart.title.setTx(AscFormat.CTx());
+                this.Chart.chart.title.tx.setRich(CreateTextBodyFromString(sTitle, this.Chart.getDrawingDocument(), this.Chart.chart.title.tx))
+            }
+            else
+            {
+                this.Chart.chart.setTitle(null);
+            }
+        }
+    };
+
+    /**
+     *  Specifies a horizontal axis title
+     *  @param {string} sTitle
+     * */
+    ApiChart.prototype.SetHorAxisTitle = function (sTitle)
+    {
+        if(this.Chart)
+        {
+            var horAxis = this.Chart.chart.plotArea.getHorizontalAxis();
+            if(horAxis)
+            {
+                if(typeof sTitle === "string" && sTitle.length > 0)
+                {
+                    horAxis.setTitle(new AscFormat.CTitle());
+                    horAxis.title.setTx(new AscFormat.CChartText());
+                    horAxis.title.tx.setRich(AscFormat.CreateTextBodyFromString(sTitle, this.Chart.getDrawingDocument(), horAxis.title.tx));
+                    horAxis.title.setOverlay(false);
+                }
+                else
+                {
+                    horAxis.setTitle(null);
+                }
+            }
+        }
+    };
+
+    /**
+     *  Specifies a vertical axis title
+     *  @param {string} sTitle
+     * */
+    ApiChart.prototype.SetVerAxisTitle = function (sTitle)
+    {
+        if(this.Chart)
+        {
+            var verAxis = this.Chart.chart.plotArea.getVerticalAxis();
+            if(verAxis)
+            {
+                if(typeof sTitle === "string" && sTitle.length > 0)
+                {
+                    verAxis.setTitle(new AscFormat.CTitle());
+                    verAxis.title.setTx(new AscFormat.CChartText());
+                    verAxis.title.tx.setRich(AscFormat.CreateTextBodyFromString(sTitle, this.Chart.getDrawingDocument(), verAxis.title.tx));
+
+                    var _body_pr = new AscFormat.CBodyPr();
+                    _body_pr.reset();
+                    if(!verAxis.title.txPr)
+                    {
+                        verAxis.title.setTxPr(AscFormat.CreateTextBodyFromString("", this.Chart.getDrawingDocument(), verAxis.title));
+                    }
+                    var _text_body =  verAxis.title.txPr;
+                    _text_body.setBodyPr(_body_pr);
+                    verAxis.title.setOverlay(false);
+                }
+                else
+                {
+                    verAxis.setTitle(null);
+                }
+            }
+        }
+    };
     //------------------------------------------------------------------------------------------------------------------
     //
     // ApiFill
@@ -3982,6 +4064,9 @@
     ApiShape.prototype["SetVerticalTextAlign"]       = ApiShape.prototype.SetVerticalTextAlign;
 
     ApiChart.prototype["GetClassType"]               = ApiChart.prototype.GetClassType;
+    ApiChart.prototype["SetTitle"]                   = ApiChart.prototype.SetTitle;
+    ApiChart.prototype["SetHorAxisTitle"]            = ApiChart.prototype.SetHorAxisTitle;
+    ApiChart.prototype["SetVerAxisTitle"]            = ApiChart.prototype.SetVerAxisTitle;
 
     ApiFill.prototype["GetClassType"]                = ApiFill.prototype.GetClassType;
 
@@ -4773,6 +4858,7 @@ function TEST_BUILDER()
     oDrawing.SetHorPosition("column", 2347595);
     oDrawing.SetVerPosition("paragraph", 346075);
     oDrawing.SetDistances(114300, 0, 114300, 0);
+    oDrawing.SetVerAxisTitle("USD In Hundred Thousands");
     oParagraph.AddDrawing(oDrawing);
     oParagraph.AddText("Financial Overview");
     oDocument.Push(oParagraph);
