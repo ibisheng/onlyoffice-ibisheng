@@ -755,5 +755,6 @@ function GetHatchBrush(name, r, g, b, a, br, bg, bb, ba)
     //--------------------------------------------------------export----------------------------------------------------
     window['AscCommon'] = window['AscCommon'] || {};
     window['AscCommon'].global_hatch_names = global_hatch_names;
+    window['AscCommon'].global_hatch_offsets = global_hatch_offsets;
     window['AscCommon'].GetHatchBrush = GetHatchBrush;
 })(window);

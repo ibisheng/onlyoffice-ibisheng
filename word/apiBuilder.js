@@ -304,6 +304,40 @@
     AscCommon.extendClass(ApiPresetColor, ApiUniColor);
 
     /**
+     * Class represent a base class fill
+     * @constructor
+     * */
+    function ApiFill(UniFill)
+    {
+        this.UniFill = UniFill;
+    }
+
+
+    /**
+     * Class represent a stroke class
+     * @constructor
+     */
+    function ApiStroke(oLn)
+    {
+        this.Ln= oLn;
+    }
+
+
+    /**
+     * Class represent gradient stop
+     * @constructor
+     * */
+    function ApiGradientStop(oApiUniColor, pos)
+    {
+        this.Gs = new AscFormat.CGs();
+        this.Gs.pos = pos;
+        this.Gs.color = oApiUniColor.Unicolor;
+    }
+
+
+
+
+    /**
      * Twentieths of a point (equivalent to 1/1440th of an inch).
      * @typedef {number} twips
      */
@@ -330,6 +364,11 @@
      * A numeric value from 0 to 255.
      * @typedef {number} byte
      */
+
+    /**
+     *  A numeric value from 0 to 359.
+     * @typedef {number} PositiveFixedAngle
+     * */
 
     /**
      * A border type
@@ -427,11 +466,23 @@
     /**
      * @typedef {("aliceBlue" | "antiqueWhite" | "aqua" | "aquamarine" | "azure" | "beige" | "bisque" | "black" | "blanchedAlmond" | "blue" | "blueViolet" | "brown" | "burlyWood" | "cadetBlue" | "chartreuse" | "chocolate" | "coral" | "cornflowerBlue" | "cornsilk" | "crimson" | "cyan" | "darkBlue" | "darkCyan" | "darkGoldenrod" | "darkGray" | "darkGreen" | "darkGrey" | "darkKhaki" | "darkMagenta" | "darkOliveGreen" | "darkOrange" | "darkOrchid" | "darkRed" | "darkSalmon" | "darkSeaGreen" | "darkSlateBlue" | "darkSlateGray" | "darkSlateGrey" | "darkTurquoise" | "darkViolet" | "deepPink" | "deepSkyBlue" | "dimGray" | "dimGrey" | "dkBlue" | "dkCyan" | "dkGoldenrod" | "dkGray" | "dkGreen" | "dkGrey" | "dkKhaki" | "dkMagenta" | "dkOliveGreen" | "dkOrange" | "dkOrchid" | "dkRed" | "dkSalmon" | "dkSeaGreen" | "dkSlateBlue" | "dkSlateGray" | "dkSlateGrey" | "dkTurquoise" | "dkViolet" | "dodgerBlue" | "firebrick" | "floralWhite" | "forestGreen" | "fuchsia" | "gainsboro" | "ghostWhite" | "gold" | "goldenrod" | "gray" | "green" | "greenYellow" | "grey" | "honeydew" | "hotPink" | "indianRed" | "indigo" | "ivory" | "khaki" | "lavender" | "lavenderBlush" | "lawnGreen" | "lemonChiffon" | "lightBlue" | "lightCoral" | "lightCyan" | "lightGoldenrodYellow" | "lightGray" | "lightGreen" | "lightGrey" | "lightPink" | "lightSalmon" | "lightSeaGreen" | "lightSkyBlue" | "lightSlateGray" | "lightSlateGrey" | "lightSteelBlue" | "lightYellow" | "lime" | "limeGreen" | "linen" | "ltBlue" | "ltCoral" | "ltCyan" | "ltGoldenrodYellow" | "ltGray" | "ltGreen" | "ltGrey" | "ltPink" | "ltSalmon" | "ltSeaGreen" | "ltSkyBlue" | "ltSlateGray" | "ltSlateGrey" | "ltSteelBlue" | "ltYellow" | "magenta" | "maroon" | "medAquamarine" | "medBlue" | "mediumAquamarine" | "mediumBlue" | "mediumOrchid" | "mediumPurple" | "mediumSeaGreen" | "mediumSlateBlue" | "mediumSpringGreen" | "mediumTurquoise" | "mediumVioletRed" | "medOrchid" | "medPurple" | "medSeaGreen" | "medSlateBlue" | "medSpringGreen" | "medTurquoise" | "medVioletRed" | "midnightBlue" | "mintCream" | "mistyRose" | "moccasin" | "navajoWhite" | "navy" | "oldLace" | "olive" | "oliveDrab" | "orange" | "orangeRed" | "orchid" | "paleGoldenrod" | "paleGreen" | "paleTurquoise" | "paleVioletRed" | "papayaWhip" | "peachPuff" | "peru" | "pink" | "plum" | "powderBlue" | "purple" | "red" | "rosyBrown" | "royalBlue" | "saddleBrown" | "salmon" | "sandyBrown" | "seaGreen" | "seaShell" | "sienna" | "silver" | "skyBlue" | "slateBlue" | "slateGray" | "slateGrey" | "snow" | "springGreen" | "steelBlue" | "tan" | "teal" | "thistle" | "tomato" | "turquoise" | "violet" | "wheat" | "white" | "whiteSmoke" | "yellow" | "yellowGreen")} PresetColor
      * */
+
+    /**
+     * @typedef {"tile" | "stretch"} BlipFillType
+     * */
+
+    /**
+     * @typedef {"cross" | "dashDnDiag" | "dashHorz" | "dashUpDiag" | "dashVert" | "diagBrick" | "diagCross" | "divot" | "dkDnDiag" | "dkHorz" | "dkUpDiag" | "dkVert" | "dnDiag" | "dotDmnd" | "dotGrid" | "horz" | "horzBrick" | "lgCheck" | "lgConfetti" | "lgGrid" | "ltDnDiag" | "ltHorz" | "ltUpDiag" | "ltVert" | "narHorz" | "narVert" | "openDmnd" | "pct10" | "pct20" | "pct25" | "pct30" | "pct40" | "pct5" | "pct50" | "pct60" | "pct70" | "pct75" | "pct80" | "pct90" | "plaid" | "shingle" | "smCheck" | "smConfetti" | "smGrid" | "solidDmnd" | "sphere" | "trellis" | "upDiag" | "vert" | "wave" | "wdDnDiag" | "wdUpDiag" | "weave" | "zigZag"} PatternType
+     * */
     //------------------------------------------------------------------------------------------------------------------
     //
     // Base Api
     //
     //------------------------------------------------------------------------------------------------------------------
+
+    /**
+     * @typedef {number} PositivePercentage
+     * */
 
     /**
      * Get main document
@@ -521,9 +572,11 @@
      * @param {ShapeType} [sType="rect"]
      * @param {EMU} nWidth
      * @param {EMU} nHeight
+     * @param {ApiFill} oFill
+     * @param {ApiStroke} oStroke
      * @returns {ApiShape}
      * */
-    Api.prototype.CreateShape = function(sType, nWidth, nHeight)
+    Api.prototype.CreateShape = function(sType, nWidth, nHeight, oFill, oStroke)
     {
         var oLogicDocument = private_GetLogicDocument();
         var oDrawingDocuemnt = private_GetDrawingDocument();
@@ -536,6 +589,8 @@
         oShape.setParent(oDrawing);
         oDrawing.Set_GraphicObject(oShape);
         oShape.createTextBoxContent();
+        oShape.spPr.setFill(oFill.UniFill);
+        oShape.spPr.setLn(oStroke.Ln);
         return new ApiShape(oShape);
     };
 
@@ -678,7 +733,7 @@
             var aNumCache = [];
             for(i = 0; i < aCatNames.length; ++i)
             {
-                aNumCache.push({val: aCatNames[i]});
+                aNumCache.push({val: aCatNames[i] + ""});
             }
             oCat = { Formula: "Sheet1!$B$1:$" + AscFormat.CalcLiterByLength(aAlphaBet, aCatNames.length) + "$1", NumCache: aNumCache };
         }
@@ -720,6 +775,173 @@
         oDrawing.setExtent( oChartSpace.spPr.xfrm.extX, oChartSpace.spPr.xfrm.extY );
         return new ApiChart(oChartSpace);
     };
+
+    /**
+     * Create a RGB color
+     * @memberof Api
+     * @param {byte} r
+     * @param {byte} g
+     * @param {byte} b
+     * @returns {ApiRGBColor}
+     */
+    Api.prototype.CreateRGBColor = function(r, g, b)
+    {
+        return new ApiRGBColor(r, g, b);
+    };
+
+    /**
+     * Create a scheme color
+     * @memberof Api
+     * @param {SchemeColorId} sSchemeColorId
+     * @returns {ApiSchemeColor}
+     */
+    Api.prototype.CreateSchemeColor = function(sSchemeColorId)
+    {
+        return new ApiSchemeColor(SchemeColorId);
+    };
+
+    /**
+     * Create preset color
+     * @memberof Api
+     * @param {PresetColor} sPresetColor
+     * @returns {ApiPresetColor};
+     * */
+    Api.prototype.CreatePresetColor = function(sPresetColor)
+    {
+        return new ApiPresetColor(sPresetColor);
+    };
+
+    /**
+     * Create a solid fill
+     * @memberof Api
+     * @param {ApiUniColor} oUniColor
+     * @returns {ApiFill}
+     * */
+    Api.prototype.CreateSolidFill = function(oUniColor)
+    {
+        return new ApiFill(AscFormat.CreateUniFillByUniColor(oUniColor.Unicolor));
+    };
+
+    /**
+     * Create a linear gradient fill
+     * @memberof Api
+     * @param {Array} aGradientStop
+     * @param {PositiveFixedAngle} Angle
+     * @returns {ApiFill}
+     */
+    Api.prototype.CreateLinearGradientFill = function(aGradientStop, Angle)
+    {
+        var oUniFill = new AscFormat.CUniFill();
+        oUniFill.fill = new AscFormat.CGradFill();
+        for(var i = 0; i < aGradientStop.length; ++i)
+        {
+            oUniFill.fill.colors.push(aGradientStop[i].Gs);
+        }
+        oUniFill.lin = new AscFormat.GradLin();
+        oUniFill.lin.angle = Angle*60000;
+        return new ApiFill(oUniFill);
+    };
+
+    /**
+     * Create a radial gradient fill
+     * @memberof Api
+     * @param {Array} aGradientStop
+     * @returns {ApiFill}
+     */
+    Api.prototype.CreateRadialGradientFill = function(aGradientStop)
+    {
+        var oUniFill = new AscFormat.CUniFill();
+        oUniFill.fill = new AscFormat.CGradFill();
+        for(var i = 0; i < aGradientStop.length; ++i)
+        {
+            oUniFill.fill.Gs.push(aGradientStop[i].Gs);
+        }
+        oUniFill.path = new AscFormat.GradPath();
+        return new ApiFill(oUniFill);
+    };
+
+    /**
+     * Create a pattern fill
+     * @memberof Api
+     * @param {PatternType} sPatternType
+     * @param {ApiUniColor} BgColor
+     * @param {ApiUniColor} FgColor
+     * @returns {ApiFill}
+     */
+    Api.prototype.CreatePatternFill= function(sPatternType, BgColor, FgColor)
+    {
+        var oUniFill = new AscFormat.CUniFill();
+        oUniFill.fill = new AscFormat.CPattFill();
+        oUniFill.fill.ftype = AscCommon.global_hatch_offsets[sPatternType];
+        oUniFill.fill.fgClr = FgColor.Unicolor;
+        oUniFill.fill.bgClr = BgColor.Unicolor;
+        return new ApiFill(oUniFill);
+    };
+
+    /**
+     * Create a blip fill
+     * @memberof Api
+     * @param {String} sImageUrl
+     * @param {BlipFillType} sBlipFillType
+     * @returns {ApiFill}
+     * */
+    Api.prototype.CreateBlipFill= function(sImageUrl, sBlipFillType)
+    {
+        var oUniFill = new AscFormat.CUniFill();
+        oUniFill.fill = new AscFormat.CBlipFill();
+        oUniFill.fill.RasterImageId = sImageUrl;
+        if(sBlipFillType === "tile")
+        {
+            oUniFill.fill.tile = new AscFormat.CBlipFillTile();
+        }
+        else if(sBlipFillType === "stretch")
+        {
+            oUniFill.fill.stretch = true;
+        }
+        return new ApiFill(oUniFill);
+    };
+
+    /**
+     * Create no fill
+     * @memberof Api
+     * @returns {ApiFill}
+     * */
+    Api.prototype.CreateNoFill= function(sImageUrl, sBlipFillType)
+    {
+        return new ApiFill(AscFormat.CreateNoFillUniFill());
+    };
+
+    /**
+     * Create a stroke
+     * @memberof Api
+     * @param {EMU} nWidth
+     * @param {ApiFill} oFill
+     * @returns {ApiStroke}
+     * */
+    Api.prototype.CreateStroke = function(nWidth, oFill)
+    {
+        if(nWidth === 0)
+        {
+            return new ApiStroke(AscFormat.CreateNoFillLine());
+        }
+        var oLn = new CLn();
+        oLn.w = nWidth;
+        oLn.Fill = oFill.UniFill;
+        return new ApiStroke(oLn);
+    };
+
+    /**
+     * Create a stroke
+     * @memberof Api
+     * @param {ApiUniColor} oUniColor
+     * @param {PositivePercentage} nPos
+     * @returns {ApiGradientStop}
+     * */
+    Api.prototype.CreateGradientStop = function(oUniColor, nPos)
+    {
+        return new ApiGradientStop(oUniColor, nPos);
+    };
+
 
     //------------------------------------------------------------------------------------------------------------------
     //
@@ -3368,62 +3590,6 @@
         return "shape";
     };
 
-    /**
-     * Set the fill color of shape
-     * @param {byte} r
-     * @param {byte} g
-     * @param {byte} b
-     */
-    ApiShape.prototype.SetFillColor = function(r, g, b)
-    {
-        if(this.Shape)
-        {
-            this.Shape.spPr.setFill(AscFormat.CreateUnfilFromRGB(r, g, b));
-        }
-    };
-
-    /**
-     * Set the fill color of shape
-     * @param {byte} r
-     * @param {byte} g
-     * @param {byte} b
-     */
-    ApiShape.prototype.SetLineColor = function(r, g, b)
-    {
-        if(this.Shape)
-        {
-            if(!this.Shape.spPr.ln)
-            {
-                this.Shape.recalculatePen();
-                this.Shape.spPr.setLn(this.Shape.pen.createDuplicate());
-            }
-            this.Shape.spPr.ln.setFill(AscFormat.CreateUnfilFromRGB(r, g, b));
-        }
-    };
-
-    /**
-     * Set the line width color of shape
-     * @param {EMU} nWidth
-     */
-    ApiShape.prototype.SetLineWidth = function(nWidth)
-    {
-        if(this.Shape)
-        {
-            if(!this.Shape.spPr.ln)
-            {
-                this.Shape.recalculatePen();
-                this.Shape.spPr.setLn(this.Shape.pen.createDuplicate());
-            }
-            if(nWidth === 0)
-            {
-                this.Shape.spPr.ln.setFill(AscFormat.CreateNoFillUniFill());
-            }
-            else
-            {
-                this.Shape.spPr.ln.setW(nWidth);
-            }
-        }
-    };
 
     /**
      * Set the line width color of shape
@@ -3473,7 +3639,6 @@
     // ApiChart
     //
     //------------------------------------------------------------------------------------------------------------------
-
     /**
      * Get the type of this class.
      * @returns {"chart"}
@@ -3481,6 +3646,103 @@
     ApiChart.prototype.GetClassType = function()
     {
         return "chart";
+    };
+
+    //------------------------------------------------------------------------------------------------------------------
+    //
+    // ApiFill
+    //
+    //------------------------------------------------------------------------------------------------------------------
+    /**
+     * Get the type of this class.
+     * @returns {"fill"}
+     */
+    ApiFill.prototype.GetClassType = function()
+    {
+        return "fill";
+    };
+
+    //------------------------------------------------------------------------------------------------------------------
+    //
+    // ApiStroke
+    //
+    //------------------------------------------------------------------------------------------------------------------
+    /**
+     * Get the type of this class.
+     * @returns {"stroke"}
+     */
+    ApiStroke.prototype.GetClassType = function()
+    {
+        return "stroke";
+    };
+
+    //------------------------------------------------------------------------------------------------------------------
+    //
+    // ApiGradientStop
+    //
+    //------------------------------------------------------------------------------------------------------------------
+    /**
+     * Get the type of this class.
+     * @returns {"gradientStop"}
+     */
+    ApiGradientStop.prototype.GetClassType = function ()
+    {
+        return "gradientStop"
+    };
+    //------------------------------------------------------------------------------------------------------------------
+    //
+    // ApiUniColor
+    //
+    //------------------------------------------------------------------------------------------------------------------
+    /**
+     * Get the type of this class.
+     * @returns {"uniColor"}
+     */
+    ApiUniColor.prototype.GetClassType = function ()
+    {
+        return "uniColor"
+    };
+
+    //------------------------------------------------------------------------------------------------------------------
+    //
+    // ApiRGBColor
+    //
+    //------------------------------------------------------------------------------------------------------------------
+    /**
+     * Get the type of this class.
+     * @returns {"rgbColor"}
+     */
+    ApiRGBColor.prototype.GetClassType = function ()
+    {
+        return "rgbColor"
+    };
+
+    //------------------------------------------------------------------------------------------------------------------
+    //
+    // ApiSchemeColor
+    //
+    //------------------------------------------------------------------------------------------------------------------
+    /**
+     * Get the type of this class.
+     * @returns {"schemeColor"}
+     */
+    ApiSchemeColor.prototype.GetClassType = function ()
+    {
+        return "schemeColor"
+    };
+
+    //------------------------------------------------------------------------------------------------------------------
+    //
+    // ApiPresetColor
+    //
+    //------------------------------------------------------------------------------------------------------------------
+    /**
+     * Get the type of this class.
+     * @returns {"presetColor"}
+     */
+    ApiPresetColor.prototype.GetClassType = function ()
+    {
+        return "presetColor"
     };
 
 
@@ -3495,6 +3757,17 @@
     Api.prototype["CreateImage"]                     = Api.prototype.CreateImage;
     Api.prototype["CreateShape"]                     = Api.prototype.CreateShape;
     Api.prototype["CreateChart"]                     = Api.prototype.CreateChart;
+    Api.prototype["CreateRGBColor"]                  = Api.prototype.CreateRGBColor;
+    Api.prototype["CreateSchemeColor"]               = Api.prototype.CreateSchemeColor;
+    Api.prototype["CreatePresetColor"]               = Api.prototype.CreatePresetColor;
+    Api.prototype["CreateSolidFill"]                 = Api.prototype.CreateSolidFill;
+    Api.prototype["CreateLinearGradientFill"]        = Api.prototype.CreateLinearGradientFill;
+    Api.prototype["CreateRadialGradientFill"]        = Api.prototype.CreateRadialGradientFill;
+    Api.prototype["CreatePatternFill"]               = Api.prototype.CreatePatternFill;
+    Api.prototype["CreateBlipFill"]                  = Api.prototype.CreateBlipFill;
+    Api.prototype["CreateNoFill"]                    = Api.prototype.CreateNoFill;
+    Api.prototype["CreateStroke"]                    = Api.prototype.CreateStroke;
+    Api.prototype["CreateGradientStop"]              = Api.prototype.CreateGradientStop;
 
     ApiUnsupported.prototype["GetClassType"]         = ApiUnsupported.prototype.GetClassType;
 
@@ -3705,13 +3978,25 @@
     ApiImage.prototype["GetClassType"]               = ApiImage.prototype.GetClassType;
 
     ApiShape.prototype["GetClassType"]               = ApiShape.prototype.GetClassType;
-    ApiShape.prototype["SetFillColor"]               = ApiShape.prototype.SetFillColor;
-    ApiShape.prototype["SetLineColor"]               = ApiShape.prototype.SetLineColor;
-    ApiShape.prototype["SetLineWidth"]               = ApiShape.prototype.SetLineWidth;
     ApiShape.prototype["GetDocContent"]              = ApiShape.prototype.GetDocContent;
     ApiShape.prototype["SetVerticalTextAlign"]       = ApiShape.prototype.SetVerticalTextAlign;
 
     ApiChart.prototype["GetClassType"]               = ApiChart.prototype.GetClassType;
+
+    ApiFill.prototype["GetClassType"]                = ApiFill.prototype.GetClassType;
+
+    ApiStroke.prototype["GetClassType"]              = ApiStroke.prototype.GetClassType;
+
+    ApiGradientStop.prototype["GetClassType"]        = ApiGradientStop.prototype.GetClassType;
+
+    ApiUniColor.prototype["GetClassType"]            = ApiUniColor.prototype.GetClassType;
+
+    ApiRGBColor.prototype["GetClassType"]            = ApiRGBColor.prototype.GetClassType;
+
+    ApiSchemeColor.prototype["GetClassType"]         = ApiSchemeColor.prototype.GetClassType;
+
+    ApiPresetColor.prototype["GetClassType"]         = ApiPresetColor.prototype.GetClassType;
+
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Private area
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -4274,14 +4559,13 @@ function TEST_BUILDER()
     oParaMark.SetColor(0x14, 0x14, 0x14, false);
     oParaMark.SetSpacing(5);
     oParagraph.AddPageBreak();
-    // TODO: Заполнить автофигуру
-    oDrawing = Api.CreateShape("rect",5363210, 9655810);
+    var oFill = Api.CreateSolidFill(Api.CreateRGBColor(38, 38, 38));
+    var oStroke = Api.CreateStroke(0, Api.CreateNoFill());
+    oDrawing = Api.CreateShape("rect",5363210, 9655810, oFill, oStroke);
     oParagraph.AddDrawing(oDrawing);
     oDrawing.SetWrappingStyle("inFront");
     oDrawing.SetHorPosition("page", 155575);
     oDrawing.SetVerPosition("page", 201295);
-    oDrawing.SetFillColor(38, 38, 38);
-    oDrawing.SetLineWidth(0);
 
     var oDocContent = oDrawing.GetDocContent();
     oDocContent.RemoveAllElements();
@@ -4333,13 +4617,12 @@ function TEST_BUILDER()
     oParagraph2.SetJc("right");
     oDocContent.Push(oParagraph2);
 
-
-    oDrawing = Api.CreateShape("rect", 1880870, 9655810);
+    oFill = Api.CreateSolidFill(Api.CreateRGBColor(255, 104, 0));
+    oStroke = Api.CreateStroke(0, Api.CreateNoFill());
+    oDrawing = Api.CreateShape("rect", 1880870, 9655810, oFill, oStroke);
     oDrawing.SetWrappingStyle("inFront");
     oDrawing.SetHorPosition("page", 5673725);
     oDrawing.SetVerPosition("page", 201295);
-    oDrawing.SetFillColor(255, 104, 0);
-    oDrawing.SetLineWidth(0);
     oParagraph.AddDrawing(oDrawing);
     oDocument.Push(oParagraph);
 
@@ -4347,12 +4630,15 @@ function TEST_BUILDER()
     oParagraph = Api.CreateParagraph();
     oParagraph.SetStyle(oNoSpacingStyle);
 
-    oDrawing = Api.CreateShape("rect", 5930900, 395605);
+    var oGs1 = Api.CreateGradientStop(Api.CreateRGBColor(255, 224, 204), 0);
+    var oGs2 = Api.CreateGradientStop(Api.CreateRGBColor(255, 164, 101), 100000);
+    oFill = Api.CreateLinearGradientFill([oGs1, oGs2], 5400000);
+    oStroke = Api.CreateStroke(0, Api.CreateNoFill());
+    oDrawing = Api.CreateShape("rect", 5930900, 395605, oFill, oStroke);
     oDrawing.SetWrappingStyle("topAndBottom");
     oDrawing.SetHorAlign("margin", "left");
     oDrawing.SetVerPosition("paragraph", 5715);
     oDrawing.SetDistances(114300, 0, 114300, 0);
-    oDrawing.SetFillColor(255, 104, 0);
     oDocContent = oDrawing.GetDocContent();
     oDocContent.RemoveAllElements();
     oParagraph2 = Api.CreateParagraph();
@@ -4407,13 +4693,19 @@ function TEST_BUILDER()
     oParagraph = Api.CreateParagraph();
     oParagraph.SetSpacingAfter(100, true);
     oParagraph.SetSpacingBefore(100, true);
-    // TODO: Заполнить автофигуру
-    oDrawing = Api.CreateShape("rect", 3212465, 963295);
+
+    oFill = Api.CreateSolidFill(Api.CreateRGBColor(255, 104, 0));
+
+    oGs1 = Api.CreateGradientStop(Api.CreateRGBColor(255, 224, 204), 0);
+    oGs2 = Api.CreateGradientStop(Api.CreateRGBColor(255, 164, 101), 100000);
+    oFill = Api.CreateLinearGradientFill([oGs1, oGs2], 5400000);
+
+    oStroke = Api.CreateStroke(0, Api.CreateNoFill());
+    oDrawing = Api.CreateShape("rect", 3212465, 963295, oFill, oStroke);
     oDrawing.SetWrappingStyle("topAndBottom");
     oDrawing.SetHorPosition("margin", 370205);
     oDrawing.SetVerPosition("paragraph", 1170888);
     oDrawing.SetDistances(114300, 0, 114300, 0);
-    oDrawing.SetFillColor(255, 104, 0);
     oDocContent = oDrawing.GetDocContent();
     oDocContent.RemoveAllElements();
     oParagraph2 = Api.CreateParagraph();
@@ -4527,12 +4819,15 @@ function TEST_BUILDER()
 
     oParagraph = Api.CreateParagraph();
     oParagraph.SetStyle(oSubtitleStyle);
-    oDrawing = Api.CreateShape("rect", 2718435, 762000);
+    oGs1 = Api.CreateGradientStop(Api.CreateRGBColor(255, 224, 204), 0);
+    oGs2 = Api.CreateGradientStop(Api.CreateRGBColor(255, 164, 101), 100000);
+    oFill = Api.CreateLinearGradientFill([oGs1, oGs2], 5400000);
+    oStroke = Api.CreateStroke(0, Api.CreateNoFill());
+    oDrawing = Api.CreateShape("rect", 2718435, 762000, oFill, oStroke);
     oDrawing.SetWrappingStyle("square");
     oDrawing.SetHorAlign("margin", "right");
     oDrawing.SetVerPosition("paragraph", 17780);
     oDrawing.SetDistances(114300, 0, 114300, 0);
-    oDrawing.SetFillColor(255, 104, 0);
     var oContent = oDrawing.GetDocContent();
     oContent.RemoveAllElements();
     oParagraph2 = Api.CreateParagraph();
