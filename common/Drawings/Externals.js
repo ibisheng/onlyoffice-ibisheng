@@ -1101,7 +1101,7 @@ CFontInfo.prototype =
         if (bNeedItalic)
             _ext += "nitalic";
 
-        var pFontFile = fontManager.m_oFontsCache.LockFont(fontfile.stream_index, fontfile.Id, faceIndex, fEmSize, _ext);
+        var pFontFile = fontManager.m_oFontsCache.LockFont(fontfile.stream_index, fontfile.Id, faceIndex, fEmSize, _ext, fontManager);
 
         if (!pFontFile)
             pFontFile = fontManager.m_oDefaultFont.GetDefaultFont(bSrcBold, bSrcItalic);

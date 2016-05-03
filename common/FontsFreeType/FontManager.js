@@ -343,7 +343,7 @@ CRasterHeapTotal.prototype =
     }
 };
 
-function LoadFontFile(library, stream_index, name, faceindex)
+function LoadFontFile(library, stream_index, name, faceindex, fontManager)
 {
     var args = new FT_Open_Args();
     args.flags = 0x02;
@@ -360,28 +360,46 @@ function LoadFontFile(library, stream_index, name, faceindex)
     font.m_lDescender = face.descender;
     font.m_lLineHeight = face.height;
 
-    if (window["USE_FONTS_WIN_PARAMS"] === true && face.horizontal && face.os2 && face.os2.version != 0xFFFF)
+    // flag for use always typo (os2 spec)
+    var bIsUseTypeAttack = ((face.os2.fsSelection & 128) == 128) ? true : false;
+    if (fontManager.IsCellMode)
+        bIsUseTypeAttack = false;
+
+    if (fontManager.IsUseWinOS2Params &&
+        face.os2 && face.os2.version != 0xFFFF &&
+        !bIsUseTypeAttack)
     {
-        var bIsUseWin = false;
-        if (face.horizontal.Ascender == 0 || face.horizontal.Descender == 0)
-            bIsUseWin = true;
-        if (face.os2.sTypoAscender == 0 || face.os2.sTypoDescender == 0)
-            bIsUseWin = true;
+        var _winAscent = face.os2.usWinAscent;
+        var _winDescent = -face.os2.usWinDescent;
 
-        var _h1 = face.horizontal.Ascender - face.horizontal.Descender + face.horizontal.Line_Gap;
-        var _h2 = face.os2.sTypoAscender - face.os2.sTypoDescender + face.os2.sTypoLineGap;
-        var _h3 = face.os2.usWinAscent + face.os2.usWinDescent;
-
-        if (_h1 != _h2 && _h2 != _h3 && _h1 != _h3 && (_h3 > _h1 && _h3 > _h2))
-            bIsUseWin = true;
-
-        if (bIsUseWin)
+        // experimantal: for cjk fonts lineheight *= 1.3
+        if ((face.os2.ulUnicodeRange2 & 0x2DF00000) != 0)
         {
-            font.m_lAscender = face.os2.usWinAscent;
-            font.m_lDescender = -face.os2.usWinDescent;
-            font.m_lLineHeight = face.os2.usWinAscent + face.os2.usWinDescent;
+            var _addidive = (0.3 * (_winAscent - _winDescent)) >> 0;
+            _winAscent += ((_addidive + 1) >> 1);
+            _winDescent -= (_addidive >> 1);
+        }
+
+        // TODO:
+        // https://www.microsoft.com/typography/otspec/recom.htm - hhea, not typo!!!
+        if (font.m_lLineHeight < (_winAscent - _winDescent))
+        {
+            font.m_lAscender = _winAscent;
+            font.m_lDescender = _winDescent;
+            font.m_lLineHeight = _winAscent - _winDescent;
         }
     }
+
+    /*
+    // что-то типо этого в экселе... пока выключаем
+    if (fontManager.IsCellMode)
+    {
+        var _addidive = (0.15 * font.m_lLineHeight) >> 0;
+        font.m_lAscender += ((_addidive + 1) >> 1);
+        font.m_lDescender -= (_addidive >> 1);
+        font.m_lLineHeight += _addidive;
+    }
+    */
 
     font.m_nNum_charmaps = face.num_charmaps;
     //if (null == face.charmap && 0 != this.m_nNum_charmaps)
@@ -416,7 +434,7 @@ function CFontFilesCache()
     this.m_lCurrentSize = 0;
     this.Fonts = {};
 
-    this.LockFont = function(stream_index, fontName, faceIndex, fontSize, _ext)
+    this.LockFont = function(stream_index, fontName, faceIndex, fontSize, _ext, fontManager)
     {
         var key = fontName + faceIndex + fontSize;
         if (undefined !== _ext)
@@ -425,7 +443,7 @@ function CFontFilesCache()
         if (pFontFile)
             return pFontFile;
 
-        pFontFile = this.Fonts[key] = LoadFontFile(this.m_oLibrary, stream_index, fontName, faceIndex);
+        pFontFile = this.Fonts[key] = LoadFontFile(this.m_oLibrary, stream_index, fontName, faceIndex, fontManager);
         return pFontFile;
     }
 }
@@ -821,7 +839,8 @@ function CGlyphString()
 	}
 }
 
-function CFontManager()
+// params: { mode: "cell" };
+function CFontManager(params)
 {
 	this.m_oLibrary = null;
 	
@@ -848,7 +867,9 @@ function CFontManager()
 
     this.LOAD_MODE = 40970;
 
-    this.IsAdvanceNeedBoldFonts = true;
+    this.IsCellMode = (params && params.mode == "cell") ? true : false;
+    this.IsAdvanceNeedBoldFonts = this.IsCellMode;
+    this.IsUseWinOS2Params = true;
 
     this.AfterLoad = function()
     {

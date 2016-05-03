@@ -161,10 +161,10 @@
 
     // Теперь у нас 2 FontManager-а на весь документ + 1 для автофигур (а не на каждом листе свой)
     this.fmgrGraphics = [];						// FontManager for draw (1 для обычного + 1 для поворотного текста)
-    this.fmgrGraphics.push(new AscFonts.CFontManager());	// Для обычного
-    this.fmgrGraphics.push(new AscFonts.CFontManager());	// Для поворотного
+    this.fmgrGraphics.push(new AscFonts.CFontManager({mode:"cell"}));	// Для обычного
+    this.fmgrGraphics.push(new AscFonts.CFontManager({mode:"cell"}));	// Для поворотного
     this.fmgrGraphics.push(new AscFonts.CFontManager());	// Для автофигур
-    this.fmgrGraphics.push(new AscFonts.CFontManager());	// Для измерений
+    this.fmgrGraphics.push(new AscFonts.CFontManager({mode:"cell"}));	// Для измерений
 
     this.fmgrGraphics[0].Initialize(true); // IE memory enable
     this.fmgrGraphics[1].Initialize(true); // IE memory enable
