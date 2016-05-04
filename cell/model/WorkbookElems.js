@@ -5923,6 +5923,20 @@ ColorFilter.prototype.asc_getDxf = function () { return this.dxf; };
 
 ColorFilter.prototype.asc_setCellColor = function (val) { this.CellColor = val; };
 ColorFilter.prototype.asc_setDxf = function (val) { this.dxf = val; };
+ColorFilter.prototype.asc_getCColor = function ()
+{ 
+	var ascColor = new Asc.asc_CColor();
+	/*ascColor.asc_putR(color.getR());
+	ascColor.asc_putG(color.getG());
+	ascColor.asc_putB(color.getB());
+	ascColor.asc_putA(color.getA());*/
+	
+	return ascColor;
+};
+ColorFilter.prototype.asc_setCColor = function (asc_CColor) 
+{
+	
+};
 
 /** @constructor */
 function Top10() {
@@ -6330,10 +6344,12 @@ prot["asc_setMaxVal"]					= prot.asc_setMaxVal;
 
 window["Asc"]["ColorFilter"]			= window["Asc"].ColorFilter = ColorFilter;
 prot									= ColorFilter.prototype;
-prot["asc_getCellColor"]				= prot.asc_getType;
-prot["asc_getDxf"]						= prot.asc_getVal;
-prot["asc_setCellColor"]				= prot.asc_setType;
-prot["asc_setDxf"]						= prot.asc_setVal;
+prot["asc_getCellColor"]				= prot.asc_getCellColor;
+prot["asc_getCColor"]					= prot.asc_getCColor;
+prot["asc_getDxf"]						= prot.asc_getDxf;
+prot["asc_setCellColor"]				= prot.asc_setCellColor;
+prot["asc_setDxf"]						= prot.asc_setDxf;
+prot["asc_setCColor"]					= prot.asc_setCColor;
 
 window["Asc"]["Top10"]					= window["Asc"].Top10 = Top10;
 prot									= Top10.prototype;
