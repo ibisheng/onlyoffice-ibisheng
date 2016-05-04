@@ -41,6 +41,7 @@
 		"../common/Drawings/Format/Geometry.js",
 		"../common/Drawings/Format/Format.js",
 		"../common/Drawings/Format/Shape.js",
+		"../slide/Editor/Format/ShapePrototype.js",
 		"../common/Drawings/Format/Path.js",
 		"../common/Drawings/Format/Image.js",
 		"../common/Drawings/Format/GroupShape.js",
@@ -101,8 +102,6 @@
 		
         "../word/Drawing/Graphics.js",
         "../word/Drawing/ShapeDrawer.js",
-		
-		"../slide/Editor/Format/ShapePrototype.js",
 		
         "../slide/Drawing/Transitions.js",
         "../slide/Drawing/DrawingDocument.js",
