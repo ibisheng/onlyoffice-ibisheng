@@ -5312,7 +5312,7 @@ FilterColumn.prototype.clone = function() {
 	res.ShowButton = this.ShowButton;
 	return res;
 };
-FilterColumn.prototype.isHideValue = function(val, isDateTimeFormat, top10Length) {
+FilterColumn.prototype.isHideValue = function(val, isDateTimeFormat, top10Length, cell) {
 	var res = false;
 	if(this.Filters)
 	{
@@ -5324,7 +5324,7 @@ FilterColumn.prototype.isHideValue = function(val, isDateTimeFormat, top10Length
 	else if(this.Top10)
 		res = this.Top10.isHideValue(val, top10Length);
 	else if(this.ColorFilter)
-		res = this.ColorFilter.isHideValue(val);
+		res = this.ColorFilter.isHideValue(cell);
 		
 	return res;
 };
@@ -5344,6 +5344,7 @@ FilterColumn.prototype.createFilter = function(obj) {
 	{
 		case c_oAscAutoFilterTypes.ColorFilter:
 		{
+			this.ColorFilter = obj.filter.filter.clone();
 			break;
 		}
 		case c_oAscAutoFilterTypes.CustomFilters:
@@ -5914,8 +5915,49 @@ ColorFilter.prototype.clone = function() {
 	}
 	return res;
 };
-ColorFilter.prototype.isHideValue = function() {
-	return false;
+ColorFilter.prototype.isHideValue = function(cell) {
+	
+	var res = true;
+	
+	if(this.dxf && this.dxf.fill && this.dxf.fill.bg && cell)
+	{
+		var filterColor = this.dxf.fill.bg;
+		cell = cell.getCells()[0];
+		
+		if(false === this.CellColor)//font color
+		{
+			if(cell.oValue.multiText !== null)
+			{
+				for(var j = 0; j < cell.oValue.multiText.length; j++)
+				{
+					var fontColor = cell.oValue.multiText[j].format ? cell.oValue.multiText[j].format.c : null;
+					if(fontColor !== null && fontColor.rgb === filterColor.rgb)
+					{
+						res = false;
+						break;
+					}
+				}
+			}
+			else
+			{
+				var fontColor =  cell.xfs && cell.xfs.font ? cell.xfs.font.c : null;
+				if(fontColor !== null && fontColor.rgb === filterColor.rgb)
+				{
+					res = false;
+				}
+			}
+		}
+		else
+		{
+			var color = cell.getStyle();
+			if(color !== null && color.fill && color.fill.bg && fontColor.rgb === filterColor.rgb)
+			{
+				res = false;
+			}
+		}
+	}
+	
+	return res;
 };
 
 ColorFilter.prototype.asc_getCellColor = function () { return this.CellColor; };
