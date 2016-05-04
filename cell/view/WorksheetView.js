@@ -11985,7 +11985,7 @@
         this._isLockedAll( onChangeAutoFilterCallback );
     };
 
-    WorksheetView.prototype.applyAutoFilter = function ( type, autoFilterObject ) {
+    WorksheetView.prototype.applyAutoFilter = function ( autoFilterObject ) {
         var t = this;
         var ar = t.activeRange.clone( true );
         var onChangeAutoFilterCallback = function ( isSuccess ) {

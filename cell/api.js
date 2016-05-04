@@ -548,9 +548,9 @@ var editor;
     return ws.changeAutoFilter(tableName, optionType, val);
   };
 
-  spreadsheet_api.prototype.asc_applyAutoFilter = function(type, autoFilterObject) {
+  spreadsheet_api.prototype.asc_applyAutoFilter = function(autoFilterObject) {
     var ws = this.wb.getWorksheet();
-    ws.applyAutoFilter(type, autoFilterObject);
+    ws.applyAutoFilter(autoFilterObject);
   };
 
   spreadsheet_api.prototype.asc_sortColFilter = function(type, cellId, displayName) {
