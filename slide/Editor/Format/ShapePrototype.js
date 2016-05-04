@@ -26,32 +26,6 @@ pHText[0][AscFormat.phType_subTitle] = "Slide subtitle";// "Подзаголов
 pHText[0][AscFormat.phType_tbl]      = "Table";// "Таблица"; //(Table)                              ;
 pHText[0][AscFormat.phType_title]    = "Slide title";// "Заголовок слайда" ;  //(Title)             ;
 
-CRFonts.prototype.Merge = function(RFonts)
-{
-    if ( undefined !== RFonts.Ascii )
-        this.Ascii = RFonts.Ascii;
-
-    if ( undefined != RFonts.EastAsia )
-        this.EastAsia = RFonts.EastAsia;
-    else if ( undefined !== RFonts.Ascii )
-        this.EastAsia = RFonts.Ascii;
-
-    if ( undefined != RFonts.HAnsi )
-        this.HAnsi = RFonts.HAnsi;
-
-    else if ( undefined !== RFonts.Ascii )
-        this.HAnsi = RFonts.Ascii;
-
-    if ( undefined != RFonts.CS )
-        this.CS = RFonts.CS;
-
-    else if ( undefined !== RFonts.Ascii )
-        this.CS = RFonts.Ascii;
-
-    if ( undefined != RFonts.Hint )
-        this.Hint = RFonts.Hint;
-};
-
 CShape.prototype.setDrawingObjects = function(drawingObjects)
 {
 };
@@ -776,15 +750,6 @@ CShape.prototype.Set_CurrentElement = function(bUpdate, pageIndex)
             editor.WordControl.GoToPage(this.parent.num);
         }
     }
-};
-
-AscFormat.CTextBody.prototype.Get_Worksheet = function()
-{
-    return this.parent && this.parent.Get_Worksheet && this.parent.Get_Worksheet();
-};
-AscFormat.CTextBody.prototype.getDrawingDocument = function()
-{
-    return this.parent && this.parent.getDrawingDocument && this.parent.getDrawingDocument();
 };
 
     //--------------------------------------------------------export----------------------------------------------------
