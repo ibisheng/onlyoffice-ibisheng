@@ -136,6 +136,7 @@
         "../word/Editor/FlowObjects.js",
         "../word/Editor/Paragraph.js",
         "../word/Editor/Paragraph_Recalculate.js",
+		"../word/Editor/DocumentContentBase.js",
         "../word/Editor/Document.js",
         "../word/Editor/DocumentContent.js",
         "../word/Editor/HeaderFooter.js",

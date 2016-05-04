@@ -135,6 +135,7 @@
         "../word/Editor/Sections.js",
         "../word/Editor/Numbering.js",
         "../word/Editor/HeaderFooter.js",
+		"../word/Editor/DocumentContentBase.js",
         "../word/Editor/Document.js",
         "../word/Editor/DocumentContent.js",
         "../word/Editor/Table.js",
