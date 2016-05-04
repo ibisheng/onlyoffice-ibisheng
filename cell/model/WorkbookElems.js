@@ -5925,17 +5925,34 @@ ColorFilter.prototype.asc_setCellColor = function (val) { this.CellColor = val; 
 ColorFilter.prototype.asc_setDxf = function (val) { this.dxf = val; };
 ColorFilter.prototype.asc_getCColor = function ()
 { 
-	var ascColor = new Asc.asc_CColor();
-	/*ascColor.asc_putR(color.getR());
-	ascColor.asc_putG(color.getG());
-	ascColor.asc_putB(color.getB());
-	ascColor.asc_putA(color.getA());*/
+	var res = null;
 	
-	return ascColor;
+	if(this.dxf && this.dxf.fill && null !== this.dxf.fill.bg)
+	{
+		var color = this.dxf.fill.bg;
+		
+		var res = new Asc.asc_CColor();
+		res.asc_putR(color.getR());
+		res.asc_putG(color.getG());
+		res.asc_putB(color.getB());
+		res.asc_putA(color.getA());
+	}
+	
+	return res;
 };
 ColorFilter.prototype.asc_setCColor = function (asc_CColor) 
 {
+	if(!this.dxf)
+	{
+		this.dxf = new CellXfs();
+	}
 	
+	if(!this.dxf.bg)
+	{
+		this.dxf.fill = new Fill();
+	}
+	
+	this.dxf.fill.bg = new RgbColor((asc_CColor.asc_getR() << 16) + (asc_CColor.asc_getG() << 8) + asc_CColor.asc_getB());
 };
 
 /** @constructor */
