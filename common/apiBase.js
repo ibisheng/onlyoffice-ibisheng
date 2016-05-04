@@ -1,5 +1,7 @@
 "use strict";
 
+(function(window, undefined){
+
 // Import
 var offlineMode = AscCommon.offlineMode;
 var c_oEditorId = AscCommon.c_oEditorId;
@@ -577,3 +579,8 @@ baseEditorsApi.prototype.asc_isOffline = function() {
 baseEditorsApi.prototype.asc_getUrlType = function(url) {
 	return AscCommon.getUrlType(url);
 };
+
+  //----------------------------------------------------------export----------------------------------------------------
+  window['AscCommon'] = window['AscCommon'] || {};
+  window['AscCommon'].baseEditorsApi = baseEditorsApi;
+})(window);

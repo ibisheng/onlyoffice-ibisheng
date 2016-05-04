@@ -5,7 +5,7 @@ function CheckLicense(licenseUrl, customerId, userId, userFirstName, userLastNam
     callback(true, g_oLicenseResult.Success);
 }
 
-baseEditorsApi.prototype._onEndPermissions = function() 
+AscCommon.baseEditorsApi.prototype._onEndPermissions = function() 
 {
 	if (this.isOnFirstConnectEnd && this.isOnLoadLicense) 
 	{

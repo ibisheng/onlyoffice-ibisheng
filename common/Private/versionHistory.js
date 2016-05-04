@@ -66,7 +66,7 @@
   prot["asc_setArrColors"] = prot.asc_setArrColors;
 })(window);
 
-baseEditorsApi.prototype.asc_showRevision = function(newObj) {
+AscCommon.baseEditorsApi.prototype.asc_showRevision = function(newObj) {
   if (!newObj.docId) {
     return;
   }
@@ -96,4 +96,4 @@ baseEditorsApi.prototype.asc_showRevision = function(newObj) {
     AscCommon.CollaborativeEditing.Apply_Changes();
   }
 };
-baseEditorsApi.prototype['asc_showRevision'] = baseEditorsApi.prototype.asc_showRevision;
+AscCommon.baseEditorsApi.prototype['asc_showRevision'] = AscCommon.baseEditorsApi.prototype.asc_showRevision;

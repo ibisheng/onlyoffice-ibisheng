@@ -44,7 +44,7 @@ var editor;
    * @param eventsHandlers
    * @constructor
    * @returns {spreadsheet_api}
-   * @extends {baseEditorsApi}
+   * @extends {AscCommon.baseEditorsApi}
    */
   function spreadsheet_api(name, inputName, eventsHandlers) {
     spreadsheet_api.superclass.constructor.call(this, name);
@@ -108,7 +108,7 @@ var editor;
     this._init();
     return this;
   }
-  AscCommon.extendClass(spreadsheet_api, baseEditorsApi);
+  AscCommon.extendClass(spreadsheet_api, AscCommon.baseEditorsApi);
 
   spreadsheet_api.prototype.sendEvent = function() {
     this.handlers.trigger.apply(this.handlers, arguments);

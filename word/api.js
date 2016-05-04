@@ -204,7 +204,7 @@ CMailMergeSendData.prototype.put_UserId = function(v){this["userId"] = v;};
  *
  * @param name
  * @constructor
- * @extends {baseEditorsApi}
+ * @extends {AscCommon.baseEditorsApi}
  */
 function asc_docs_api(name)
 {
@@ -321,7 +321,7 @@ function asc_docs_api(name)
 
     //g_clipboardBase.Init(this);
 }
-AscCommon.extendClass(asc_docs_api, baseEditorsApi);
+AscCommon.extendClass(asc_docs_api, AscCommon.baseEditorsApi);
 
 asc_docs_api.prototype.sendEvent = function() {
   this.asc_fireCallback.apply(this, arguments);

@@ -76,11 +76,11 @@ function CheckUserInLicense(customerId, userId, userFirstName, userLastName, oLi
   return res;
 }
 
-baseEditorsApi.prototype._onCheckLicenseEnd = function(err, res) {
+AscCommon.baseEditorsApi.prototype._onCheckLicenseEnd = function(err, res) {
   this.licenseResult = {err: err, res: res};
   this._onEndPermissions();
 };
-baseEditorsApi.prototype._onEndPermissions = function() {
+AscCommon.baseEditorsApi.prototype._onEndPermissions = function() {
   if (this.isOnFirstConnectEnd && this.isOnLoadLicense) {
     var oResult = new AscCommon.asc_CAscEditorPermissions();
     if (null !== this.licenseResult) {

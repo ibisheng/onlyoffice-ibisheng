@@ -36,7 +36,7 @@ var c_oSerFormat = {
  *
  * @param name
  * @constructor
- * @extends {baseEditorsApi}
+ * @extends {AscCommon.baseEditorsApi}
  */
 function asc_docs_api(name)
 {
@@ -123,7 +123,7 @@ function asc_docs_api(name)
             editor = window.editor;
     }
 }
-AscCommon.extendClass(asc_docs_api, baseEditorsApi);
+AscCommon.extendClass(asc_docs_api, AscCommon.baseEditorsApi);
 
 asc_docs_api.prototype.sendEvent = function() {
   this.asc_fireCallback.apply(this, arguments);
