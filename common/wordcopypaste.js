@@ -2374,6 +2374,7 @@ function Body_Paste(api, e)
                     ifr.style.height = '100px';
                     ifr.style.overflow = 'hidden';
                     ifr.style.zIndex = -1000;
+					ifr.setAttribute("sandbox", "");
                     document.body.appendChild(ifr);
                 }
 				else
