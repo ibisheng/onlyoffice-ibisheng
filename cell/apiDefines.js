@@ -37,7 +37,9 @@ var c_oAscMergeOptions = {
 
 var c_oAscSortOptions = {
   Ascending: 1,
-  Descending: 2
+  Descending: 2,
+  ByColorFill: 3,
+  ByColorFont: 4
 };
 
 var c_oAscBorderOptions = {

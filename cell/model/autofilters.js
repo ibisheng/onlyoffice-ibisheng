@@ -1499,7 +1499,7 @@
 				var t = this;
 				
 				if(!sortProps)
-					sortProps = this.getPropForSort(type, cellId, activeRange, displayName);
+					sortProps = this.getPropForSort(cellId, activeRange, displayName);
 					
 				curFilter = sortProps.curFilter, sortRange = sortProps.sortRange, filterRef = sortProps.filterRef, startCol = sortProps.startCol, maxFilterRow = sortProps.maxFilterRow;
 				
@@ -1538,13 +1538,12 @@
 				onSortAutoFilterCallback();
 			},
 						
-			getPropForSort: function(type, cellId, activeRange, displayName)
+			getPropForSort: function(cellId, activeRange, displayName)
 			{
 				var worksheet = this.worksheet;
 				var t = this;
 				var curFilter, sortRange, filterRef, startCol, maxFilterRow;
 				
-				var resType = type == 'ascending';
 				var isCellIdString = false;
 				if(cellId !== undefined && cellId != "" && typeof cellId == 'string')
 				{

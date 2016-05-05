@@ -12009,21 +12009,22 @@
         this._isLockedAll( onChangeAutoFilterCallback );
     };
 
-    WorksheetView.prototype.sortColFilter = function ( type, cellId, displayName ) {
+    WorksheetView.prototype.sortColFilter = function ( type, cellId, displayName, color ) {
         var t = this;
         var ar = this.activeRange.clone( true );
         var onChangeAutoFilterCallback = function ( isSuccess ) {
             if ( false === isSuccess ) {
                 return;
             }
-			var sortProps = t.model.autoFilters.getPropForSort(type, cellId, ar, displayName);
+			var sortProps = t.model.autoFilters.getPropForSort(cellId, ar, displayName);
 
 			var onSortAutoFilterCallBack = function()
 			{
 				History.Create_NewPoint();
 				History.StartTransaction();
 				
-				t.cellCommentator.sortComments(sortProps.sortRange.sort(type == 'ascending', sortProps.startCol));
+				var sort = sortProps.sortRange.sort(type, sortProps.startCol, color);
+				t.cellCommentator.sortComments(sort);
 				t.model.autoFilters.sortColFilter( type, cellId, ar, sortProps, displayName );
 				
 				t._onUpdateFormatTable(sortProps.sortRange.bbox, false);
@@ -12032,7 +12033,7 @@
 			
 			if(null === sortProps)
 			{
-				t.setSelectionInfo("sort", type == 'ascending');
+				t.setSelectionInfo("sort", type);
 			}
 			else if(false !== sortProps)
 			{

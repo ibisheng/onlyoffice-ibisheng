@@ -8563,7 +8563,7 @@ Range.prototype.cleanHyperlinks=function(){
 		this.removeHyperlink(aHyperlinks.inner[i].data);
 	History.EndTransaction();
 };
-Range.prototype.sort=function(nOption, nStartCol, colorText, colorFill){
+Range.prototype.sort=function(nOption, nStartCol, color){
 	//todo горизонтальная сортировка
 	var aMerged = this.worksheet.mergeManager.get(this.bbox);
 	if(aMerged.outer.length > 0 || (aMerged.inner.length > 0 && null == _isSameSizeMerged(this.bbox, aMerged.inner)))
@@ -8577,7 +8577,10 @@ Range.prototype.sort=function(nOption, nStartCol, colorText, colorFill){
 		nStartCol = merged.bbox.c1;
 	}
   this.worksheet.workbook.lockDraw();
-	var isSortColor = !!(colorText || colorFill);
+	var colorFill = nOption === AscCommonExcel.c_oAscSortOptions.ByColorFill ? color : null;
+	var colorText = nOption === AscCommonExcel.c_oAscSortOptions.ByColorFont ? color : null;
+	var isSortColor = !!(colorFill || colorText);
+	
 	var oRes = null;
 	var oThis = this;
 	var bAscent = false;

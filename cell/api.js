@@ -553,9 +553,9 @@ var editor;
     ws.applyAutoFilter(autoFilterObject);
   };
 
-  spreadsheet_api.prototype.asc_sortColFilter = function(type, cellId, displayName) {
+  spreadsheet_api.prototype.asc_sortColFilter = function(type, cellId, displayName, color) {
     var ws = this.wb.getWorksheet();
-    ws.sortColFilter(type, cellId, displayName);
+    ws.sortColFilter(type, cellId, displayName, color);
   };
 
   spreadsheet_api.prototype.asc_getAddFormatTableOptions = function(range) {
