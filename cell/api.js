@@ -19,7 +19,6 @@ var editor;
   var parserHelp = AscCommon.parserHelp;
   var g_oIdCounter = AscCommon.g_oIdCounter;
   var g_oTableId = AscCommon.g_oTableId;
-  var g_aCultureInfos = AscCommon.g_aCultureInfos;
 
   var c_oAscLockTypeElem = AscCommonExcel.c_oAscLockTypeElem;
 
@@ -304,7 +303,7 @@ var editor;
 
   spreadsheet_api.prototype.asc_getLocaleExample = function(val, number, date) {
     var res = '';
-    var cultureInfo = g_aCultureInfos[val];
+    var cultureInfo = AscCommon.g_aCultureInfos[val];
     if (cultureInfo) {
       var numFormatDigit = AscCommon.oNumFormatCache.get('#,##0.00');
 
@@ -336,10 +335,9 @@ var editor;
     return res;
   };
   spreadsheet_api.prototype.asc_getLocaleCurrency = function(val) {
-    var res = '';
-    var cultureInfo = g_aCultureInfos[val];
+    var cultureInfo = AscCommon.g_aCultureInfos[val];
     if (!cultureInfo) {
-      cultureInfo = g_aCultureInfos[1033];
+      cultureInfo = AscCommon.g_aCultureInfos[1033];
     }
     var prefixs = ['_ ', '_-', '_(', '_)'];
     var prefix = prefixs[0];
