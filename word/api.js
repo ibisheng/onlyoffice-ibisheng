@@ -6091,6 +6091,18 @@ asc_docs_api.prototype.asyncImageEndLoaded = function(_image)
 	}
 };
 
+asc_docs_api.prototype.openDocument = function(sData) {
+  if (sData.changes && this.VersionHistory) {
+    this.VersionHistory.changes = sData.changes;
+    this.VersionHistory.applyChanges(this);
+  }
+
+  if (sData.bSerFormat)
+    this.OpenDocument2(sData.url, sData.data);
+  else
+    this.OpenDocument(sData.url, sData.data);
+};
+
 asc_docs_api.prototype.asyncImageEndLoadedBackground = function(_image)
 {
     this.WordControl.m_oDrawingDocument.CheckRasterImageOnScreen(_image.src);
@@ -6645,16 +6657,7 @@ asc_docs_api.prototype._onOpenCommand = function(data) {
 			t.asc_fireCallback("asc_onError",c_oAscError.ID.Unknown,c_oAscError.Level.Critical);
 			return;
 		}
-
-		if (result.changes && t.VersionHistory) {
-			t.VersionHistory.changes = result.changes;
-			t.VersionHistory.applyChanges(t);
-		}
-
-		if (result.bSerFormat)
-			t.OpenDocument2(result.url, result.data);
-		else
-			t.OpenDocument(result.url, result.data);
+    t.onEndLoadFile(result);
 	});
 };
 function _downloadAs(editor, command, filetype, actionType, options, fCallbackRequest) {
