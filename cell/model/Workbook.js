@@ -8577,14 +8577,14 @@ Range.prototype.sort=function(nOption, nStartCol, color){
 		nStartCol = merged.bbox.c1;
 	}
   this.worksheet.workbook.lockDraw();
-	var colorFill = nOption === AscCommonExcel.c_oAscSortOptions.ByColorFill ? color : null;
-	var colorText = nOption === AscCommonExcel.c_oAscSortOptions.ByColorFont ? color : null;
+	var colorFill = nOption === Asc.c_oAscSortOptions.ByColorFill ? color : null;
+	var colorText = nOption === Asc.c_oAscSortOptions.ByColorFont ? color : null;
 	var isSortColor = !!(colorFill || colorText);
 	
 	var oRes = null;
 	var oThis = this;
 	var bAscent = false;
-	if(nOption == AscCommonExcel.c_oAscSortOptions.Ascending)
+	if(nOption == Asc.c_oAscSortOptions.Ascending)
 		bAscent = true;
 	var nRowFirst0 = this.bbox.r1;
 	var nRowLast0 = this.bbox.r2;

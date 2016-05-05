@@ -278,7 +278,6 @@ var c_oAscPopUpSelectorType = {
   //----------------------------------------------------------export----------------------------------------------------
   window['AscCommonExcel'] = window['AscCommonExcel'] || {};
   window['AscCommonExcel'].c_oAscAlignType = c_oAscAlignType;
-  window['AscCommonExcel'].c_oAscSortOptions = c_oAscSortOptions;
   window['AscCommonExcel'].c_oAscDrawDepOptions = c_oAscDrawDepOptions;
   window['AscCommonExcel'].c_oAscGraphicOption = c_oAscGraphicOption;
   window['AscCommonExcel'].c_oAscLockTypeElem = c_oAscLockTypeElem;
@@ -303,6 +302,7 @@ var c_oAscPopUpSelectorType = {
 
   var prot;
   window['Asc'] = window['Asc'] || {};
+  window['Asc']['c_oAscSortOptions'] = window['Asc'].c_oAscSortOptions = c_oAscSortOptions;
   window['Asc']['c_oAscConfirm'] = window['Asc'].c_oAscConfirm = c_oAscConfirm;
   prot = c_oAscConfirm;
   prot['ConfirmReplaceRange'] = prot.ConfirmReplaceRange;
