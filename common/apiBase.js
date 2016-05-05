@@ -601,8 +601,8 @@ baseEditorsApi.prototype.asc_getUrlType = function(url) {
     this.ImageLoader.put_Api(this);
     this.FontLoader.SetStandartFonts();
 
-    this.chartTranslate = new Asc.asc_CChartTranslate();
-    this.textArtTranslate = new Asc.asc_TextArtTranslate();
+    this.chartTranslate = this.chartTranslate ? this.chartTranslate : new Asc.asc_CChartTranslate();
+    this.textArtTranslate = this.textArtTranslate ? this.textArtTranslate : new Asc.asc_TextArtTranslate();
     this.chartPreviewManager = new AscCommon.ChartPreviewManager();
     this.textArtPreviewManager = new AscCommon.TextArtPreviewManager();
 

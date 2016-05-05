@@ -75,30 +75,6 @@ asc_CChartStyle.prototype = {
 };
 
 /** @constructor */
-function asc_CChartTranslate() {
-
-    this.title = "Diagram Title";
-    this.xAxis = "X Axis";
-    this.yAxis = "Y Axis";
-    this.series = "Series";
-}
-
-asc_CChartTranslate.prototype = {
-
-    asc_getTitle: function() { return this.title; },
-    asc_setTitle: function(val) { this.title = val; },
-
-    asc_getXAxis: function() { return this.xAxis; },
-    asc_setXAxis: function(val) { this.xAxis = val; },
-
-    asc_getYAxis: function() { return this.yAxis; },
-    asc_setYAxis: function(val) { this.yAxis = val; },
-
-    asc_getSeries: function() { return this.series; },
-    asc_setSeries: function(val) { this.series = val; }
-};
-
-/** @constructor */
 function asc_CChartBinary(chart) {
 
     this["binary"] = null;
@@ -3902,17 +3878,6 @@ function CoordsManager(ws) {
     prot["asc_setStyle"] = prot.asc_setStyle;
     prot["asc_getImageUrl"] = prot.asc_getImageUrl;
     prot["asc_setImageUrl"] = prot.asc_setImageUrl;
-
-    window["Asc"]["asc_CChartTranslate"] = window["Asc"].asc_CChartTranslate = asc_CChartTranslate;
-    prot = asc_CChartTranslate.prototype;
-    prot["asc_getTitle"] = prot.asc_getTitle;
-    prot["asc_setTitle"] = prot.asc_setTitle;
-    prot["asc_getXAxis"] = prot.asc_getXAxis;
-    prot["asc_setXAxis"] = prot.asc_setXAxis;
-    prot["asc_getYAxis"] = prot.asc_getYAxis;
-    prot["asc_setYAxis"] = prot.asc_setYAxis;
-    prot["asc_getSeries"] = prot.asc_getSeries;
-    prot["asc_setSeries"] = prot.asc_setSeries;
 
     window["Asc"]["asc_CChartBinary"] = window["Asc"].asc_CChartBinary = asc_CChartBinary;
     prot = asc_CChartBinary.prototype;
