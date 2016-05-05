@@ -382,6 +382,7 @@ var UndoRedoDataTypes = new function() {
 	
 	this.CustomFilters = 36;
 	this.CustomFilter = 37;
+    this.ColorFilter = 38;
 
     this.DefinedName = 39;
     this.DefinedNamesChange = 40;
@@ -452,6 +453,7 @@ var UndoRedoDataTypes = new function() {
 			case this.AutoFilterObj: return new AscCommonExcel.AutoFilterObj(); break;
 			case this.CustomFilters: return new Asc.CustomFilters(); break;
 			case this.CustomFilter: return new Asc.CustomFilter(); break;
+            case this.ColorFilter: return new Asc.ColorFilter(); break;
 			case this.AutoFiltersOptionsElements: return new AscCommonExcel.AutoFiltersOptionsElements(); break;
 			case this.AddFormatTableOptions: return new AscCommonExcel.AddFormatTableOptions(); break;
 			case this.SingleProperty: return new UndoRedoData_SingleProperty(); break;

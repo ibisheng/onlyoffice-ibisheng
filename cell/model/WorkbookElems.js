@@ -5902,11 +5902,37 @@ DynamicFilter.prototype.asc_setType = function (val) { this.Type = val; };
 DynamicFilter.prototype.asc_setVal = function (val) { this.Val = val; };
 DynamicFilter.prototype.asc_setMaxVal = function (val) { this.MaxVal = val; };
 
+var g_oColorFilter = {
+	CellColor : 0,
+	dxf	: 1
+};
+
 /** @constructor */
 function ColorFilter() {
+	this.Properties = g_oColorFilter;
+	
 	this.CellColor = null;
 	this.dxf = null;
 }
+ColorFilter.prototype.getType = function() {
+	return UndoRedoDataTypes.ColorFilter;
+};
+ColorFilter.prototype.getProperties = function() {
+	return this.Properties;
+};
+ColorFilter.prototype.getProperty = function(nType) {
+	switch (nType) {
+		case this.Properties.CellColor: return this.CellColor; break;
+		case this.Properties.dxf: return this.dxf; break;
+	}
+	return null;
+};
+ColorFilter.prototype.setProperty = function(nType, value) {
+	switch (nType) {
+		case this.Properties.CellColor: this.CellColor = value;break;
+		case this.Properties.dxf: this.dxf = value;break;
+	}
+};
 ColorFilter.prototype.clone = function() {
 	var res = new ColorFilter();
 	res.CellColor = this.CellColor;
@@ -5950,7 +5976,7 @@ ColorFilter.prototype.isHideValue = function(cell) {
 		else
 		{
 			var color = cell.getStyle();
-			if(color !== null && color.fill && color.fill.bg && fontColor.rgb === filterColor.rgb)
+			if(color !== null && color.fill && color.fill.bg && color.fill.bg.rgb === filterColor.rgb)
 			{
 				res = false;
 			}
