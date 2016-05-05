@@ -917,7 +917,7 @@ function CEditorPage(api)
         oThis.OnResize(true);
     }
 
-    this.zoom_FitToWidth = function()
+    this.calculate_zoom_FitToWidth = function()
     {
         var w = this.m_oEditor.AbsolutePosition.R - this.m_oEditor.AbsolutePosition.L;
 
@@ -939,7 +939,12 @@ function CEditorPage(api)
                 Zoom = 100 * _w * g_dKoef_pix_to_mm / this.m_dDocumentPageWidth;
             }
         }
-        var _new_value = parseInt(Zoom - 0.5);
+        return (Zoom - 0.5) >> 0;
+    }
+
+    this.zoom_FitToWidth = function()
+    {
+        var _new_value = this.calculate_zoom_FitToWidth();
 
         this.m_nZoomType = 1;
         if (_new_value != this.m_nZoomValue)
@@ -3661,6 +3666,26 @@ function CEditorPage(api)
     this.InitControl = function()
     {
         this.CalculateDocumentSize();
+
+        if (window["AscDesktopEditor"] && this.m_oDrawingDocument.m_oDocumentRenderer)
+        {
+            var _new_value = this.calculate_zoom_FitToWidth();
+            if (_new_value < this.m_nZoomValue)
+            {
+                // сначала добавим нужные параметры зума
+                var _newValues = [];
+                _new_value = ((_new_value / 10) >> 0) * 10 - 1;
+                for (var _test_param = 10; _test_param < this.zoom_values[0]; _test_param += 10)
+                {
+                    if (_new_value < _test_param)
+                        _newValues.push(_test_param);
+                }
+                this.zoom_values = [].concat(_newValues, this.zoom_values);
+
+                this.zoom_FitToWidth();
+            }
+        }
+
         //setInterval(this.onTimerScroll, this.m_nTimerScrollInterval);
 
         if (!this.m_oApi.isOnlyReaderMode)
