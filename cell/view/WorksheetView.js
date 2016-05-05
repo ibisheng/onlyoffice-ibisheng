@@ -12679,10 +12679,29 @@
         {
             if(rangeButton.r1 == filter.SortState.SortConditions[0].Ref.r1 && rangeButton.c1 == filter.SortState.SortConditions[0].Ref.c1)
             {
-                if(filter.SortState.SortConditions[0].ConditionDescending == false)
-                    sortVal = 'descending';
-                else
-                    sortVal = 'ascending';
+                var conditionSortBy = filter.SortState.SortConditions[0].ConditionSortBy;
+				switch(conditionSortBy)
+				{
+					case Asc.ESortBy.sortbyCellColor:
+					{
+						sortVal = Asc.c_oAscSortOptions.ByColorFill;
+						break;
+					}
+					case Asc.ESortBy.sortbyFontColor:
+					{
+						sortVal = Asc.c_oAscSortOptions.ByColorFont;
+						break;
+					}
+					default:
+					{
+						if(filter.SortState.SortConditions[0].ConditionDescending == false)
+							sortVal = Asc.c_oAscSortOptions.Descending;
+						else
+							sortVal = Asc.c_oAscSortOptions.Ascending;
+						
+						break;
+					}
+				}
             }
         }
 
