@@ -12773,9 +12773,7 @@
 				{
 					alreadyAddColors[null] = true;
 					
-					var ascColor = new Asc.asc_CColor();
-					ascColor.asc_putType(Asc.c_oAscColor.COLOR_TYPE_NONE);
-					res.colors.push(ascColor);
+					res.colors.push(null);
 				}
 				
 				continue;
@@ -12832,9 +12830,7 @@
 			{
 				alreadyAddColors[null] = true;
 				
-				var ascColor = new Asc.asc_CColor();
-				ascColor.asc_putType(Asc.c_oAscColor.COLOR_TYPE_NONE);
-				res.colors.push(ascColor);
+				res.colors.push(null);
 			}
         }
 
