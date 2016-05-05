@@ -568,6 +568,11 @@ var editor;
     return ws.clearFilter();
   };
   
+  spreadsheet_api.prototype.asc_clearFilterColumn = function(cellId, displayName) {
+    var ws = this.wb.getWorksheet();
+    return ws.clearFilterColumn(cellId, displayName);
+  };
+  
   spreadsheet_api.prototype.asc_changeSelectionFormatTable = function(tableName, optionType) {
     var ws = this.wb.getWorksheet();
     return ws.af_changeSelectionFormatTable(tableName, optionType);

@@ -2416,6 +2416,39 @@
 				return res;
 			},
 			
+			_getColIdColumn: function(filter, cellId)
+			{
+				var res = null;
+				
+				var autoFilter = filter && filter.getType() === g_nFiltersType.tablePart ? filter.AutoFilter : filter;
+				
+				if(autoFilter && autoFilter.FilterColumns && autoFilter.FilterColumns.length)
+				{
+					
+					var rangeCellId = this._idToRange(cellId);
+					var colId = autoFilter.Ref.c2 - rangeCellId.c1;
+					res = this._getTrueColId(filter, colId);
+				}
+				
+				return res;
+			},
+			
+			_getIndexByColId: function(autoFilter, cellId)
+			{
+				var res = null;
+				
+				for(var i = 0; i < autoFilter.FilterColumns.length; i++)
+				{
+					if(autoFilter.FilterColumns[i].ColId === colId)
+					{
+						index = i;
+						break;
+					}
+				}
+				
+				return res;
+			},
+			
 			_hiddenAnotherFilter: function(filterColumns, cellId, r, c)
 			{
 				var worksheet = this.worksheet;
@@ -4290,6 +4323,24 @@
 				this._resetTablePartStyle();
 				
 				return oldFilter.Ref;
+			},
+			
+			clearFilterColumn: function(cellId, displayName)
+			{
+				var filter = this._getFilterByDisplayName(displayName);
+				var autoFilter = filter && filter.getType() === g_nFiltersType.tablePart ? filter.AutoFilter : filter;
+				
+				var colId = this._getColIdColumn(filter, cellId);
+				
+				if(colId !== null)
+				{
+					var index = this._getIndexByColId(filter, colId);
+					this._openHiddenRowsAfterDeleteColumn(autoFilter, colId);
+					
+					autoFilter.FilterColumns.splice(index, 1);
+				}
+				
+				return filter.Ref;
 			},
 			
 			_checkValueInCells: function(n, k, cloneActiveRange)

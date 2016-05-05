@@ -12063,6 +12063,22 @@
         };
         this._isLockedAll( onChangeAutoFilterCallback );
     };
+	
+	 WorksheetView.prototype.clearFilterColumn = function (cellId, displayName) {
+        var t = this;
+		
+        var onChangeAutoFilterCallback = function ( isSuccess ) {
+            if ( false === isSuccess ) {
+                return;
+            }
+
+            var updateRange = t.model.autoFilters.clearFilterColumn( cellId, displayName );
+			
+			if(false !== updateRange)
+				t._onUpdateFormatTable(updateRange, false, true);
+        };
+        this._isLockedAll( onChangeAutoFilterCallback );
+    };
 
     /**
      * Обновление при изменениях форматированной таблицы
