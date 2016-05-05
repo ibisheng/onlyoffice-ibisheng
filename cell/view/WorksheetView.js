@@ -12674,22 +12674,27 @@
             filterObj.type = c_oAscAutoFilterTypes.Filters;
 
         //get sort
-        var sortVal = false;
+        var sortVal = null;
+        var sortColor = null;
         if(filter && filter.SortState && filter.SortState.SortConditions && filter.SortState.SortConditions[0])
         {
-            if(rangeButton.r1 == filter.SortState.SortConditions[0].Ref.r1 && rangeButton.c1 == filter.SortState.SortConditions[0].Ref.c1)
+            var SortConditions = filter.SortState.SortConditions[0];
+            if(rangeButton.r1 == SortConditions.Ref.r1 && rangeButton.c1 == SortConditions.Ref.c1)
             {
-                var conditionSortBy = filter.SortState.SortConditions[0].ConditionSortBy;
+
+                var conditionSortBy = SortConditions.ConditionSortBy;
 				switch(conditionSortBy)
 				{
 					case Asc.ESortBy.sortbyCellColor:
 					{
 						sortVal = Asc.c_oAscSortOptions.ByColorFill;
+                        sortColor = SortConditions.dxf && SortConditions.dxf.fill ? SortConditions.dxf.fill.bg : null;
 						break;
 					}
 					case Asc.ESortBy.sortbyFontColor:
 					{
 						sortVal = Asc.c_oAscSortOptions.ByColorFont;
+                        sortColor = SortConditions.dxf && SortConditions.dxf.font ? SortConditions.dxf.font.c : null;
 						break;
 					}
 					default:
@@ -12698,12 +12703,23 @@
 							sortVal = Asc.c_oAscSortOptions.Descending;
 						else
 							sortVal = Asc.c_oAscSortOptions.Ascending;
-						
+
 						break;
 					}
 				}
             }
         }
+
+        var ascColor = null;
+        if(null !== sortColor)
+        {
+            ascColor = new Asc.asc_CColor();
+            ascColor.asc_putR(sortColor.getR());
+            ascColor.asc_putG(sortColor.getG());
+            ascColor.asc_putB(sortColor.getB());
+            ascColor.asc_putA(sortColor.getA());
+        }
+
 
         //set menu object
         var autoFilterObject = new AscCommonExcel.AutoFiltersOptions();
@@ -12714,6 +12730,7 @@
         autoFilterObject.asc_setFilterObj(filterObj);
         autoFilterObject.asc_setAutomaticRowCount(automaticRowCount);
         autoFilterObject.asc_setDiplayName(displayName);
+        autoFilterObject.asc_setSortColor(ascColor);
 
         var columnRange = Asc.Range(rangeButton.c1, autoFilter.Ref.r1 + 1, rangeButton.c1, autoFilter.Ref.r2);
 

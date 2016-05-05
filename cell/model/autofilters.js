@@ -137,6 +137,7 @@
             this.isTextFilter = null;
             this.colorsFill = null;
             this.colorsFont = null;
+            this.sortColor = null;
 			
 			return this;
 		}
@@ -159,6 +160,7 @@
                     case this.Properties.isTextFilter: return this.isTextFilter; break;
                     case this.Properties.colorsFill: return this.colorsFill; break;
                     case this.Properties.colorsFont: return this.colorsFont; break;
+                    case this.Properties.sortColor: return this.sortColor; break;
 				}
 
 				return null;
@@ -173,6 +175,7 @@
                     case this.Properties.isTextFilter: this.IsTextFilter = value;break;
                     case this.Properties.colorsFill: this.colorsFill = value;break;
                     case this.Properties.colorsFont: this.colorsFont = value;break;
+                    case this.Properties.sortColor: this.sortColor = value;break;
 				}
 			},
 			
@@ -187,16 +190,18 @@
             asc_setIsTextFilter : function(val) { this.isTextFilter = val; },
             asc_setColorsFill : function(val) { this.colorsFill = val; },
             asc_setColorsFont : function(val) { this.colorsFont = val; },
+            asc_setSortColor : function(val) { this.sortColor = val; },
 			
 			asc_getCellId : function() { return this.cellId; },
 			asc_getValues : function() { return this.values; },
 			asc_getFilterObj : function() { return this.filter; },
 			
 			asc_getSortState : function() { return this.sortVal; },
-			asc_getDisplayName : function(val) { return this.displayName; },
-            asc_getIsTextFilter : function(val) { return this.isTextFilter; },
-            asc_getColorsFill : function(val) { return this.colorsFill; },
-            asc_getColorsFont : function(val) { return this.colorsFont; }
+			asc_getDisplayName : function() { return this.displayName; },
+            asc_getIsTextFilter : function() { return this.isTextFilter; },
+            asc_getColorsFill : function() { return this.colorsFill; },
+            asc_getColorsFont : function() { return this.colorsFont; },
+            asc_getSortColor : function() { return this.sortColor; }
 		};
 		
 		var g_oAutoFilterObj = {
@@ -4710,7 +4715,8 @@
         prot["asc_getIsTextFilter"]				= prot.asc_getIsTextFilter;
         prot["asc_getColorsFill"]				= prot.asc_getColorsFill;
         prot["asc_getColorsFont"]				= prot.asc_getColorsFont;
-		
+        prot["asc_getSortColor"]				= prot.asc_getSortColor;
+
 		window["AscCommonExcel"].AutoFilterObj = AutoFilterObj;
 		prot									= AutoFilterObj.prototype;
 		prot["asc_getType"]						= prot.asc_getType;
