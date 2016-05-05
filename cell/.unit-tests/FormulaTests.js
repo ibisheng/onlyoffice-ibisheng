@@ -390,7 +390,7 @@ $( function () {
     var oParser, wb, ws, dif = 1e-9,
         data = getTestWorkbook(),
         sData = data + "";
-    if ( Asc.c_oSerFormat.Signature === sData.substring( 0, Asc.c_oSerFormat.Signature.length ) ) {
+    if ( AscCommon.c_oSerFormat.Signature === sData.substring( 0, AscCommon.c_oSerFormat.Signature.length ) ) {
         var sUrlPath = "offlinedocs/";
         wb = new AscCommonExcel.Workbook( new AscCommonExcel.asc_CHandlersList(), {wb:{getWorksheet:function(){}}} );
         AscCommon.History.init(wb);

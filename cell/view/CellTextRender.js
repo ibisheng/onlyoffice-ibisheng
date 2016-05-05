@@ -40,7 +40,7 @@
 			CellTextRender.superclass.constructor.call(this, drawingCtx);
 
 			/** @type RegExp */
-			this.reWordBegining = XRegExp("[^\\p{L}\\p{N}][\\p{L}\\p{N}]", "i");
+			this.reWordBegining = new XRegExp("[^\\p{L}\\p{N}][\\p{L}\\p{N}]", "i");
 
 			return this;
 		}

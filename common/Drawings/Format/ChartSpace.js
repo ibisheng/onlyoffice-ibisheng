@@ -12644,10 +12644,13 @@ function checkBlipFillRasterImages(sp)
         }
     }
 }
+    
+    function initStyleManager() {
+        CHART_STYLE_MANAGER.init();
+    }
 
     //--------------------------------------------------------export----------------------------------------------------
     window['AscFormat'] = window['AscFormat'] || {};
-    window['AscFormat'].CHART_STYLE_MANAGER = CHART_STYLE_MANAGER;
     window['AscFormat'].BAR_SHAPE_CONE = BAR_SHAPE_CONE;
     window['AscFormat'].BAR_SHAPE_CONETOMAX = BAR_SHAPE_CONETOMAX;
     window['AscFormat'].BAR_SHAPE_BOX = BAR_SHAPE_BOX;
@@ -12696,4 +12699,6 @@ function checkBlipFillRasterImages(sp)
     window['AscFormat'].PAGE_SETUP_ORIENTATION_DEFAULT = 0;
     window['AscFormat'].PAGE_SETUP_ORIENTATION_LANDSCAPE = 1;
     window['AscFormat'].PAGE_SETUP_ORIENTATION_PORTRAIT = 2;
+
+    window['AscFormat'].initStyleManager = initStyleManager;
 })(window);

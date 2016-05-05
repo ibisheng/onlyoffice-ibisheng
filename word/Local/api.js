@@ -23,7 +23,7 @@ asc_docs_api.prototype._OfflineAppDocumentEndLoad = function(_url, _data)
 		this.sendEvent("asc_onError", c_oAscError.ID.ConvertationError, c_oAscError.Level.Critical);
 		return;
 	}
-    if (c_oSerFormat.Signature !== _data.substring(0, c_oSerFormat.Signature.length))
+    if (AscCommon.c_oSerFormat.Signature !== _data.substring(0, AscCommon.c_oSerFormat.Signature.length))
 	{
 		this.OpenDocument(_url, _data);
 	}

@@ -22,12 +22,6 @@
     
     var g_oDefaultFormat = AscCommonExcel.g_oDefaultFormat;
 
-    /** @enum */
-    var c_oSerFormat = {
-        Version		: 2, //1.0.0.2
-        Signature	: "XLSY"
-    };
-    var g_nCurFileVersion = c_oSerFormat.Version;
 //dif:
 //Version:2 добавлены свойства колонок и строк CustomWidth, CustomHeight(раньше считались true)
     /** @enum */
@@ -3765,7 +3759,7 @@
         };
         this.WriteFileHeader = function(nDataSize)
         {
-            return c_oSerFormat.Signature + ";v" + c_oSerFormat.Version + ";" + nDataSize  + ";";
+            return AscCommon.c_oSerFormat.Signature + ";v" + AscCommon.c_oSerFormat.Version + ";" + nDataSize  + ";";
         };
         this.WriteMainTable = function(idWorksheet)
         {
@@ -5663,7 +5657,7 @@
             else if ( c_oSerWorksheetColTypes.Width == type )
             {
                 oCol.width = this.stream.GetDoubleLE();
-                if(g_nCurFileVersion < 2)
+                if(AscCommon.CurFileVersion < 2)
                     oCol.CustomWidth = 1;
             }
             else if ( c_oSerWorksheetColTypes.CustomWidth == type )
@@ -5843,7 +5837,7 @@
             else if ( c_oSerRowTypes.Height == type )
             {
                 oRow.h = this.stream.GetDoubleLE();
-                if(g_nCurFileVersion < 2)
+                if(AscCommon.CurFileVersion < 2)
                     oRow.flags |= AscCommonExcel.g_nRowFlag_CustomHeight;
             }
             else if ( c_oSerRowTypes.CustomHeight == type )
@@ -6930,7 +6924,7 @@
         this.getbase64DecodedData = function(szSrc)
         {
             var nType = 0;
-            var index = c_oSerFormat.Signature.length;
+            var index = AscCommon.c_oSerFormat.Signature.length;
             var version = "";
             var dst_len = "";
             while (true)
@@ -6968,7 +6962,7 @@
             {
                 var nTempVersion = version.substring(1) - 0;
                 if(nTempVersion)
-                    g_nCurFileVersion = nTempVersion;
+                    AscCommon.CurFileVersion = nTempVersion;
             }
             return stream;
         };
@@ -8083,7 +8077,6 @@
     }
 
     window['Asc'] = window['Asc'] || {};
-    window["Asc"].c_oSerFormat = c_oSerFormat;
     window["Asc"].EBorderStyle = EBorderStyle;
     window["Asc"].EUnderline = EUnderline;
     window["Asc"].EVerticalAlignRun = EVerticalAlignRun;

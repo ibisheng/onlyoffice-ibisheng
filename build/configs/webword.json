@@ -131,10 +131,7 @@
         "../word/Drawing/Rulers.js",
         "../word/Drawing/HtmlPage.js",
         "../word/Drawing/documentrenderer.js",
-        "../common/apiBase.js",
-        "../word/api.js",
         "../word/apiCommon.js",
-        "../word/apiExport.js",
         "../word/document/empty.js",
         "../word/Math/mathTypes.js",
         "../word/Math/mathText.js",
@@ -148,7 +145,10 @@
         "../word/Math/radical.js",
         "../word/Math/operators.js",
         "../word/Math/accent.js",
-        "../word/Math/borderBox.js"
+        "../word/Math/borderBox.js",
+		
+		"../common/apiBase.js",
+		"../word/api.js"
       ],
       "private": [
         "../common/Private/license.js",
@@ -169,7 +169,7 @@
       ],
 	  "mobile_banners": [],
       "exclude_mobile": [],
-      "dst": "../word/sdk-all.js",
+      "dst": "../word",
       "externs": [
         "../common/Build/Externs.js",
         "../../web-apps/vendor/jquery/jquery.min.js",

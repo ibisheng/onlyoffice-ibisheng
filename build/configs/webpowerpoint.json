@@ -149,11 +149,11 @@
         "../slide/Editor/Format/ImagePrototype.js",
         "../slide/Editor/Format/GroupPrototype.js",
         "../slide/Editor/Format/ChartSpacePrototype.js",
-        "../common/apiBase.js",
-        "../slide/api.js",
         "../slide/apiCommon.js",
         "../word/apiCommon.js",
-        "../slide/apiExport.js"
+		
+		"../common/apiBase.js",
+        "../slide/api.js"
       ],
       "private": [
         "../common/Private/license.js",
@@ -193,7 +193,7 @@
         "../common/FontsFreeType/TextMeasurer.js",
 		"../common/Drawings/TextDrawer.js"
       ],
-      "dst": "../slide/sdk-all.js",
+      "dst": "../slide",
       "externs": [
         "../common/Build/Externs.js",
         "../../web-apps/vendor/jquery/jquery.min.js",

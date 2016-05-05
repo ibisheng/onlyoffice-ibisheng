@@ -2865,5 +2865,4 @@
       prot["asc_getName"] = prot["get_Name"] = prot.asc_getName;
       prot["asc_getType"] = prot["get_Type"] = prot.asc_getType;
       prot["asc_getImage"] = prot.asc_getImage;
-}
-)(window);
+})(window);

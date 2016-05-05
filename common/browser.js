@@ -5,7 +5,6 @@
 * @param {undefined} undefined
 */
 function (window, undefined) {
-
 var AscBrowser = {
     userAgent : "",
     isIE : false,

@@ -25,11 +25,6 @@ var pptx_content_writer = AscCommon.pptx_content_writer;
 var c_oAscXAlign = Asc.c_oAscXAlign;
 var c_oAscYAlign = Asc.c_oAscYAlign;
 
-var c_oSerFormat = {
-    Version		: 5, //1.0.0.5
-    Signature	: "DOCY"
-};
-var g_nCurFileVersion = c_oSerFormat.Version;
 //dif:
 //Version:2 добавлены свойства стилей qFormat, uiPriority, hidden, semiHidden, unhideWhenUsed, для более ранних бинарников считаем qFormat = true
 //Version:3 все рисованные обьекты открываются через презентации
@@ -1007,7 +1002,7 @@ function BinaryFileWriter(doc, bMailMergeDocx, bMailMergeHtml)
 	}
     this.WriteFileHeader = function(nDataSize)
     {
-        return c_oSerFormat.Signature + ";v" + c_oSerFormat.Version + ";" + nDataSize  + ";";
+        return AscCommon.c_oSerFormat.Signature + ";v" + AscCommon.c_oSerFormat.Version + ";" + nDataSize  + ";";
     }
     this.WriteMainTable = function()
     {
@@ -1156,7 +1151,7 @@ function BinarySigTableWriter(memory)
         //Write stVersion
         this.memory.WriteByte(c_oSerSigTypes.Version);
         this.memory.WriteByte(c_oSerPropLenType.Long);
-        this.memory.WriteLong(c_oSerFormat.Version);
+        this.memory.WriteLong(AscCommon.c_oSerFormat.Version);
     }
 };
 function BinaryStyleTableWriter(memory, doc, oNumIdMap, copyParams, saveParams)
@@ -5056,7 +5051,7 @@ function BinaryFileReader(doc, openParams)
         var nWritten = 0;
 
         var nType = 0;
-        var index = c_oSerFormat.Signature.length;
+        var index = AscCommon.c_oSerFormat.Signature.length;
         var version = "";
         var dst_len = "";
         while (true)
@@ -5156,7 +5151,7 @@ function BinaryFileReader(doc, openParams)
         {
             var nTempVersion = version.substring(1) - 0;
             if(nTempVersion)
-                g_nCurFileVersion = nTempVersion;
+              AscCommon.CurFileVersion = nTempVersion;
         }
         return stream;
     };
@@ -5381,7 +5376,7 @@ function BinaryFileReader(doc, openParams)
 		var oDocStyle = this.Document.Styles;
 		var styles = this.Document.Styles.Style;
         var stDefault = this.Document.Styles.Default;
-		if(g_nCurFileVersion < 2){
+		if(AscCommon.CurFileVersion < 2){
 			for(var i in this.oReadResult.styles)
 				this.oReadResult.styles[i].style.qFormat = true;
 		}		
@@ -7981,7 +7976,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
             if (oNewTable.Content.length > 0) {
               oNewTable.ReIndexing(0);
               oNewTable.Correct_BadTable();
-              if(2 == g_nCurFileVersion && false == oNewTable.Inline)
+              if(2 == AscCommon.CurFileVersion && false == oNewTable.Inline)
               {
                   //делаем смещение левой границы
                   if(false == oNewTable.PositionH.Align)
@@ -8008,7 +8003,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
             });
 			if(null != oAdditional.EvenAndOddHeaders)
 				this.Document.Set_DocumentEvenAndOddHeaders(oAdditional.EvenAndOddHeaders);
-			if(g_nCurFileVersion < 5)
+			if(AscCommon.CurFileVersion < 5)
 			{
 				for(var i = 0; i < this.oReadResult.headers.length; ++i)
 				{
@@ -8422,7 +8417,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
             if (oNewTable.Content.length > 0) {
               oNewTable.ReIndexing(0);
               oNewTable.Correct_BadTable();
-              if(2 == g_nCurFileVersion && false == oNewTable.Inline)
+              if(2 == AscCommon.CurFileVersion && false == oNewTable.Inline)
               {
                   //делаем смещение левой границы
                   if(false == oNewTable.PositionH.Align)

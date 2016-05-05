@@ -5,7 +5,6 @@
 	 * @param {undefined} undefined
 	 */
 	function (window, undefined) {
-
 		// Import
 		var c_oAscPrintDefaultSettings = AscCommon.c_oAscPrintDefaultSettings;
 		var gc_nMaxRow0 = AscCommon.gc_nMaxRow0;
@@ -1542,7 +1541,7 @@
 		var prot;
 		window['Asc'] = window['Asc'] || {};
 		window['AscCommonExcel'] = window['AscCommonExcel'] || {};
-		window["Asc"].applyFunction = applyFunction;
+		window["AscCommonExcel"].applyFunction = applyFunction;
 		window["Asc"].typeOf = typeOf;
 		window["Asc"].lastIndexOf = lastIndexOf;
 		window["Asc"].search = search;
@@ -1692,5 +1691,4 @@
 		prot = asc_CCompleteMenu.prototype;
 		prot["asc_getName"] = prot.asc_getName;
 		prot["asc_getType"] = prot.asc_getType;
-}
-)(window);
+})(window);

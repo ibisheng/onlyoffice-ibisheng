@@ -1,7 +1,6 @@
 "use strict";
 
 (function(window, undefined){
-
 // Import
 var offlineMode = AscCommon.offlineMode;
 var c_oEditorId = AscCommon.c_oEditorId;
@@ -13,21 +12,20 @@ var c_oAscAsyncActionType = Asc.c_oAscAsyncActionType;
 var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 
 /** @constructor */
-function baseEditorsApi(name) {
-  AscFonts.g_fontApplication.Init();
-
-  this.editorId = null;
+function baseEditorsApi(name, editorId) {
+  this.editorId = editorId;
+  this.isLoadFullApi = false;
+  this.openResult = null;
 
   this.HtmlElementName = name;
   this.HtmlElement = null;
 
   this.isMobileVersion = false;
+  
+  this.isViewMode = false;
 
-  this.FontLoader = AscCommon.g_font_loader;
-  this.ImageLoader = AscCommon.g_image_loader;
-  this.FontLoader.put_Api(this);
-  this.ImageLoader.put_Api(this);
-  this.FontLoader.SetStandartFonts();
+  this.FontLoader = null;
+  this.ImageLoader = null;
 
   this.LoadedObject = null;
   this.DocumentType = 0; // 0 - empty, 1 - test, 2 - document (from json)
@@ -67,10 +65,10 @@ function baseEditorsApi(name) {
   this.isDocumentCanSave = false;			// Флаг, говорит о возможности сохранять документ (активна кнопка save или нет)
 
   // Chart
-  this.chartTranslate = new Asc.asc_CChartTranslate();
-  this.textArtTranslate = new Asc.asc_TextArtTranslate();
-  this.chartPreviewManager = new AscCommon.ChartPreviewManager();
-  this.textArtPreviewManager = new AscCommon.TextArtPreviewManager();
+  this.chartTranslate = null;
+  this.textArtTranslate = null;
+  this.chartPreviewManager = null;
+  this.textArtPreviewManager = null;
   // Режим вставки диаграмм в редакторе документов
   this.isChartEditor = false;
   this.isOpenedChartFrame = false;
@@ -117,6 +115,11 @@ function baseEditorsApi(name) {
 }
 baseEditorsApi.prototype._baseInit = function() {
   var t = this;
+  AscCommon.loadSdk(this._editorNameById(), function() {
+    t.isLoadFullApi = true;
+    t._onEndLoadSdk();
+    t.onEndLoadFile(null);
+  });
   //Asc.editor = Asc['editor'] = AscCommon['editor'] = AscCommon.editor = this; // ToDo сделать это!
   this.HtmlElement = document.getElementById(this.HtmlElementName);
 
@@ -134,20 +137,18 @@ baseEditorsApi.prototype._baseInit = function() {
   AscCommon.InitDragAndDrop(this.HtmlElement, function(error, files) {
     t._uploadCallback(error, files);
   });
-
-  AscFormat.CHART_STYLE_MANAGER.init();
 };
 baseEditorsApi.prototype._editorNameById = function() {
   var res = '';
   switch (this.editorId) {
     case c_oEditorId.Word:
-      res = 'Word';
+      res = 'word';
       break;
     case c_oEditorId.Spreadsheet:
-      res = 'Excel';
+      res = 'cell';
       break;
     case c_oEditorId.Presentation:
-      res = 'PowerPoint';
+      res = 'slide';
       break;
   }
   return res;
@@ -579,6 +580,34 @@ baseEditorsApi.prototype.asc_isOffline = function() {
 baseEditorsApi.prototype.asc_getUrlType = function(url) {
 	return AscCommon.getUrlType(url);
 };
+
+  baseEditorsApi.prototype.openDocument = function() {
+  };
+  baseEditorsApi.prototype.onEndLoadFile = function(result) {
+    if (result) {
+      this.openResult = result;
+    }
+    if (this.isLoadFullApi && this.openResult) {
+      this.openDocument(this.openResult);
+    }
+
+  };
+  baseEditorsApi.prototype._onEndLoadSdk = function() {
+    AscFonts.g_fontApplication.Init();
+
+    this.FontLoader = AscCommon.g_font_loader;
+    this.ImageLoader = AscCommon.g_image_loader;
+    this.FontLoader.put_Api(this);
+    this.ImageLoader.put_Api(this);
+    this.FontLoader.SetStandartFonts();
+
+    this.chartTranslate = new Asc.asc_CChartTranslate();
+    this.textArtTranslate = new Asc.asc_TextArtTranslate();
+    this.chartPreviewManager = new AscCommon.ChartPreviewManager();
+    this.textArtPreviewManager = new AscCommon.TextArtPreviewManager();
+
+    AscFormat.initStyleManager();
+  };
 
   //----------------------------------------------------------export----------------------------------------------------
   window['AscCommon'] = window['AscCommon'] || {};

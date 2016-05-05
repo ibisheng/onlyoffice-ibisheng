@@ -8,6 +8,7 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-clean');
 	grunt.loadNpmTasks('grunt-contrib-concat');
 	grunt.loadNpmTasks('grunt-replace');
+	grunt.loadNpmTasks('grunt-split-file');
 	
 	grunt.registerTask('build_webword_init', 'Initialize build WebWord SDK.', function(){
         defaultConfig = path + '/webword.json';
@@ -68,9 +69,10 @@ module.exports = function(grunt) {
 	grunt.registerTask('build_all', ['build_webword_init', 'build_sdk', 'build_webexcel_init', 'build_sdk', 'build_webpowerpoint_init', 'build_sdk']);
 
 	grunt.registerTask('compile_sdk_init', function(compilation_level) {
-		var tmp_sdk_path = 'sdk-js.tmp';
-		var concat_src = [packageFile['compile']['sdk']['dst']];
-		var concat_src_with_banner_file = [];
+		var tmp_sdk_path = 'sdk-js-tmp.js';
+		var sdkDstFolder = packageFile['compile']['sdk']['dst'];
+		var sdkAllDst = sdkDstFolder + '/sdk-all.js';
+		var concat_src = [sdkAllDst];
 		var srcFiles = packageFile['compile']['sdk']['common'];
 		var sdkOpt = {
 			compilation_level: compilation_level,
@@ -90,7 +92,6 @@ module.exports = function(grunt) {
 			if(mobileFiles){
 				srcFiles = srcFiles.concat(mobileFiles);
 			}
-			concat_src_with_banner_file = concat_src_with_banner_file.concat(packageFile['compile']['sdk']['mobile_banners']);
 		}
 		
 		if (!grunt.option('noprivate')) {
@@ -103,16 +104,23 @@ module.exports = function(grunt) {
 			srcFiles = srcFiles.concat(packageFile['compile']['sdk']['builder']);
 		}
 		
-		concat_src_with_banner_file = concat_src_with_banner_file.concat(tmp_sdk_path)
-
 		grunt.initConfig({
 			pkg: packageFile,
 			'closure-compiler': {
 				sdk: {
-					files: {
-						'<%= pkg.compile.sdk.dst %>': srcFiles
+					options: sdkOpt,
+					dest: tmp_sdk_path,
+					src: srcFiles
+				}
 					},
-					options: sdkOpt
+			splitfile: {
+				sdk: {
+					options: {
+					  separator: 'window.split="split";',
+					  prefix: [ "sdk-all-min", "sdk-all" ]
+					},
+					dest: sdkDstFolder,
+					src: tmp_sdk_path
 				}
 			},
 			concat: {
@@ -122,11 +130,7 @@ module.exports = function(grunt) {
 					footer: '})(window);'
 					},
 					src: concat_src,
-					dest: tmp_sdk_path
-				},
-				bannerFile: {
-					src: concat_src_with_banner_file,
-					dest: '<%= pkg.compile.sdk.dst %>'
+					dest: sdkAllDst
 					}
 			},
 			clean: [ 
@@ -148,6 +152,6 @@ module.exports = function(grunt) {
 		});
 	});
 	
-	grunt.registerTask('compile_sdk', ['compile_sdk_init:' + level, 'closure-compiler', 'concat', 'replace', 'clean']);
+	grunt.registerTask('compile_sdk', ['compile_sdk_init:' + level, 'closure-compiler', 'splitfile', 'concat', 'replace', 'clean']);
 	grunt.registerTask('default', ['build_webpowerpoint']);
 };

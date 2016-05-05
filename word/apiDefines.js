@@ -633,6 +633,11 @@ var c_oAscRevisionsObjectType =
   MathEquation : 3
 };
 
+var c_oSerFormat = {
+  Version		: 5, //1.0.0.5
+  Signature	: "DOCY"
+};
+
 window["flat_desine"] = false;
 
 //------------------------------------------------------------export---------------------------------------------------
@@ -773,3 +778,6 @@ prot['ParaRem'] = prot.ParaRem;
 prot['TextPr'] = prot.TextPr;
 prot['ParaPr'] = prot.ParaPr;
 
+window['AscCommon'] = window['AscCommon'] || {};
+window['AscCommon'].c_oSerFormat = c_oSerFormat;
+window['AscCommon'].CurFileVersion = c_oSerFormat.Version;

@@ -20,7 +20,7 @@
   var History = AscCommon.History;
 
   var asc = window["Asc"];
-  var asc_applyFunction = asc.applyFunction;
+  var asc_applyFunction = AscCommonExcel.applyFunction;
   var asc_round = asc.round;
   var asc_typeof = asc.typeOf;
   var asc_CMM = AscCommonExcel.asc_CMouseMoveData;

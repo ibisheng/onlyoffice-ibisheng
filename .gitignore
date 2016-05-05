@@ -1,6 +1,9 @@
 .idea/
+cell/sdk-all-min.js
 cell/sdk-all.js
+slide/sdk-all-min.js
 slide/sdk-all.js
+word/sdk-all-min.js
 word/sdk-all.js
 **/node_modules
 common/AllFonts.js

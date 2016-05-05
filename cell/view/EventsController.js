@@ -10,7 +10,7 @@
 		var AscBrowser = AscCommon.AscBrowser;
 
 		var asc = window["Asc"] ? window["Asc"] : (window["Asc"] = {});
-		var asc_applyFunction = asc.applyFunction;
+		var asc_applyFunction = AscCommonExcel.applyFunction;
 		var c_oTargetType = AscCommonExcel.c_oTargetType;
 
 		/**

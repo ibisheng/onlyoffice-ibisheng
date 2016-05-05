@@ -35,7 +35,7 @@
     var History = AscCommon.History;
 
     var asc = window["Asc"];
-    var asc_applyFunction = asc.applyFunction;
+    var asc_applyFunction = AscCommonExcel.applyFunction;
     var asc_calcnpt = asc.calcNearestPt;
     var asc_getcvt = asc.getCvtRatio;
     var asc_floor = asc.floor;

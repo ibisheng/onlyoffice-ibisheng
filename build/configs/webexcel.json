@@ -2,15 +2,23 @@
   "compile": {
     "sdk": {
       "common": [
-        "../common/Build/License.js",
         "../common/browser.js",
-        "../common/commonDefines.js",
-        "../common/downloaderfiles.js",
-        "../common/docscoapicommon.js",
+		"../common/commonDefines.js",
+		"../common/docscoapicommon.js",
         "../common/docscoapi.js",
-        "../common/apiCommon.js",
+		"../common/apiCommon.js",
 		"../common/SerializeCommonWordExcel.js",
-        "../common/editorscommon.js",
+		"../common/editorscommon.js",
+		"../cell/apiDefines.js",
+		"../cell/utils/utils.js",
+		"../cell/view/HandlerList.js",
+		"../cell/model/CollaborativeEditing.js",
+		"../common/apiBase.js",
+		"../common/Private/license.js",
+		"../cell/api.js",
+		
+		"../common/Build/License.js",
+        "../common/downloaderfiles.js",
         "../common/NumFormat.js",
 		"../common/SerializeChart.js",
 		"../common/AdvancedOptions.js",
@@ -75,15 +83,12 @@
 
         "../common/wordcopypaste.js",
 
-        "../cell/apiDefines.js",
         "../cell/document/empty-workbook.js",
-        "../cell/utils/utils.js",
         "../cell/model/UndoRedo.js",
         "../cell/model/clipboard.js",
         "../cell/model/autofilters.js",
         "../cell/graphics/DrawingContext.js",
         "../cell/graphics/pdfprinter.js",
-        "../cell/model/CollaborativeEditing.js",
         "../cell/model/ConditionalFormatting.js",
         "../cell/model/FormulaObjects/parserFormula.js",
         "../cell/model/FormulaObjects/_xlfnFunctions.js",
@@ -107,7 +112,6 @@
         "../cell/view/StringRender.js",
         "../cell/view/CellTextRender.js",
         "../cell/view/CellEditorView.js",
-        "../cell/view/HandlerList.js",
         "../cell/view/EventsController.js",
 		"../cell/view/WorkbookView.js",
 		"../cell/view/WorksheetView.js",
@@ -161,12 +165,9 @@
         "../word/Math/operators.js",
         "../word/Math/accent.js",
         "../word/Math/borderBox.js",
-        "../word/apiCommon.js",
-        "../common/apiBase.js",
-        "../cell/api.js"
+        "../word/apiCommon.js"
       ],
       "private": [
-        "../common/Private/license.js",
         "../cell/Private/comments.js"
       ],
       "builder": [
@@ -205,7 +206,7 @@
 		"../cell/model/DrawingObjects/Graphics.js",
 		"../cell/view/iscroll.js"
 	  ],
-      "dst": "../cell/sdk-all.js",
+      "dst": "../cell",
       "externs": [
         "../common/Build/Externs.js",
         "../../web-apps/vendor/jquery/jquery.min.js",

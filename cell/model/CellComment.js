@@ -405,18 +405,18 @@ CCellCommentator.prototype.isLockedComment = function(oComment, callbackFunc) {
 
 		if (false === this.worksheet.collaborativeEditing.getCollaborativeEditing()) {
 			// Пользователь редактирует один: не ждем ответа, а сразу продолжаем редактирование
-			Asc.applyFunction(callbackFunc, true);
+			AscCommonExcel.applyFunction(callbackFunc, true);
 			callbackFunc = undefined;
 		}
 		if (false !== this.worksheet.collaborativeEditing.getLockIntersection(lockInfo,
 				AscCommon.c_oAscLockTypes.kLockTypeMine, /*bCheckOnlyLockAll*/false)) {
 			// Редактируем сами
-			Asc.applyFunction(callbackFunc, true);
+			AscCommonExcel.applyFunction(callbackFunc, true);
 			return;
 		} else if (false !== this.worksheet.collaborativeEditing.getLockIntersection(lockInfo,
 				AscCommon.c_oAscLockTypes.kLockTypeOther, /*bCheckOnlyLockAll*/false)) {
 			// Уже ячейку кто-то редактирует
-			Asc.applyFunction(callbackFunc, false);
+			AscCommonExcel.applyFunction(callbackFunc, false);
 			return;
 		}
 

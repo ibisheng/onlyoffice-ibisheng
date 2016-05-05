@@ -2628,6 +2628,22 @@ CUserCacheColor.prototype.init = function(nColor) {
   this.Dark  = new CColor(R, G, B, 255);
 };
 
+  var isLoadSdk = false;
+  function loadScript(url, callback) {
+    var script = document.createElement('script');
+    script.type = 'text/javascript';
+    script.src = url;
+
+    script.onreadystatechange = callback;
+    script.onload = callback;
+
+    // Fire the loading
+    document.head.appendChild(script);
+  }
+  function loadSdk(sdkName, callback) {
+    loadScript('../../../../sdkjs/' + sdkName + '/sdk-all.js', callback);
+  }
+
 var g_oIdCounter = new CIdCounter();
 var g_oTableId = new CTableId();
 
@@ -2674,6 +2690,8 @@ window["SetDoctRendererParams"] = function(_params)
   window["AscCommon"].CLock = CLock;
   window["AscCommon"].CContentChanges = CContentChanges;
   window["AscCommon"].CContentChangesElement = CContentChangesElement;
+
+  window["AscCommon"].loadSdk = loadSdk;
 
   window["AscCommon"].g_oDocumentUrls = g_oDocumentUrls;
   window["AscCommon"].FormulaTablePartInfo = FormulaTablePartInfo;

@@ -105,6 +105,11 @@ var c_oAscLockTypeElemPresentation = {
   Presentation: 3
 };
 
+var c_oSerFormat = {
+  Version		: 1,
+  Signature	: "PPTY"
+};
+
 var TABLE_STYLE_WIDTH_PIX = 70;
 var TABLE_STYLE_HEIGHT_PIX = 50;
 
@@ -169,3 +174,7 @@ prot['Clock_Wedge'] = prot.Clock_Wedge;
 prot['Zoom_In'] = prot.Zoom_In;
 prot['Zoom_Out'] = prot.Zoom_Out;
 prot['Zoom_AndRotate'] = prot.Zoom_AndRotate;
+
+window['AscCommon'] = window['AscCommon'] || {};
+window['AscCommon'].c_oSerFormat = c_oSerFormat;
+window['AscCommon'].CurFileVersion = c_oSerFormat.Version;
