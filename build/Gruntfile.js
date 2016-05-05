@@ -69,6 +69,7 @@ module.exports = function(grunt) {
 	grunt.registerTask('build_all', ['build_webword_init', 'build_sdk', 'build_webexcel_init', 'build_sdk', 'build_webpowerpoint_init', 'build_sdk']);
 
 	grunt.registerTask('compile_sdk_init', function(compilation_level) {
+		var splitLine = '';
 		var tmp_sdk_path = 'sdk-js-tmp.js';
 		var sdkDstFolder = packageFile['compile']['sdk']['dst'];
 		var sdkAllDst = sdkDstFolder + '/sdk-all.js';
@@ -81,6 +82,11 @@ module.exports = function(grunt) {
 		};
 		if (formatting) {
 			sdkOpt['formatting'] = formatting;
+		}
+		if ('ADVANCED' === compilation_level) {
+			splitLine = ('PRETTY_PRINT' === formatting) ? 'window.split = "split";' : 'window.split="split";';
+		} else {
+			splitLine = ('PRETTY_PRINT' === formatting) ? 'window["split"] = "split";' : 'window["split"]="split";';
 		}
 		
 		if (grunt.option('mobile')) {				
@@ -116,7 +122,7 @@ module.exports = function(grunt) {
 			splitfile: {
 				sdk: {
 					options: {
-					  separator: 'window.split="split";',
+					  separator: splitLine,
 					  prefix: [ "sdk-all-min", "sdk-all" ]
 					},
 					dest: sdkDstFolder,
