@@ -2641,7 +2641,7 @@ CUserCacheColor.prototype.init = function(nColor) {
     document.head.appendChild(script);
   }
   function loadSdk(sdkName, callback) {
-    loadScript('../../../../sdkjs/' + sdkName + '/sdk-all.js', callback);
+    loadScript('/sdkjs/' + sdkName + '/sdk-all.js', callback);
   }
 
 var g_oIdCounter = new CIdCounter();
