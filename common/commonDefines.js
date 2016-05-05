@@ -1112,9 +1112,9 @@ window['Asc']['c_oAscChartDataLabelsPos'] = window['Asc'].c_oAscChartDataLabelsP
 window['Asc']['c_oAscGridLinesSettings'] = window['Asc'].c_oAscGridLinesSettings = c_oAscGridLinesSettings;
   prot = c_oAscGridLinesSettings;
   prot['none'] = prot.none;
-  prot['none'] = prot.major;
-  prot['none'] = prot.minor;
-  prot['none'] = prot.majorMinor;
+  prot['major'] = prot.major;
+  prot['minor'] = prot.minor;
+  prot['majorMinor'] = prot.majorMinor;
 window['Asc']['c_oAscChartTypeSettings'] = window['Asc'].c_oAscChartTypeSettings = c_oAscChartTypeSettings;
   prot = c_oAscChartTypeSettings;
   prot['barNormal'] = prot.barNormal;
