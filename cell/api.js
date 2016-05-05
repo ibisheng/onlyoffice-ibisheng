@@ -3310,7 +3310,6 @@ var editor;
   prot = spreadsheet_api.prototype;
 
   prot["asc_GetFontThumbnailsPath"] = prot.asc_GetFontThumbnailsPath;
-  prot["asc_SetFontsPath"] = prot.asc_SetFontsPath;
   prot["asc_setDocInfo"] = prot.asc_setDocInfo;
   prot["asc_getLocaleExample"] = prot.asc_getLocaleExample;
   prot["asc_getLocaleCurrency"] = prot.asc_getLocaleCurrency;
