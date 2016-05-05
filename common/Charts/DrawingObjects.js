@@ -1366,7 +1366,7 @@ function DrawingObjects() {
         {
 			var localUrl = aImagesSync[i];
 			if(api.DocInfo && api.DocInfo.asc_getOfflineApp()) {
-          AscCommon.g_oDocumentUrls.addImageUrl(localUrl, api.FontLoader.fontFilesPath + "../Excel/document/media/" + localUrl);
+          AscCommon.g_oDocumentUrls.addImageUrl(localUrl, "/sdkjs/cell/document/media/" + localUrl);
 			}
             aImagesSync[i] = AscCommon.getFullImageSrc2(localUrl);
         }

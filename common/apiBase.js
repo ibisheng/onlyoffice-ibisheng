@@ -308,8 +308,7 @@ baseEditorsApi.prototype.asc_LoadDocument = function(isVersionHistory) {
   this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Open);
 
   if (offlineMode === this.documentUrl) {
-    // ToDo убрать зависимость от this.FontLoader.fontFilesPath
-    this.documentUrl = this.FontLoader.fontFilesPath + '../' + this._editorNameById() + '/document/';
+    this.documentUrl = '/sdkjs/' + this._editorNameById() + '/document/';
     this.DocInfo.asc_putOfflineApp(true);
     this._OfflineAppDocumentStartLoad();
   }
