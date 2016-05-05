@@ -2505,7 +2505,7 @@
 				if(worksheet.TableParts)
 				{
 					//TODO: buildRecalc вызывать из модели!!!
-					AscCommonExcel.buildRecalc(worksheet.workbook, true, true);
+					AscCommonExcel.buildRecalc(worksheet.workbook, true, false);
 					for(var i = 0; i < worksheet.TableParts.length; i++)
 					{
 						var filter = worksheet.TableParts[i];
