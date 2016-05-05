@@ -8517,7 +8517,7 @@ drawScatterChart.prototype =
 		var y3 = points[k + 2] ? points[k + 2].y : points[k + 1] ? points[k + 1].y : points[k].y;
 		
 		
-		var splineCoords = this.cChartDrawer.calculate_Bezier(x, y, x1, y1, x2, y2, x3, y3, i);
+		var splineCoords = this.cChartDrawer.calculate_Bezier(x, y, x1, y1, x2, y2, x3, y3);
 		
 		x = this.cChartDrawer.getYPosition(splineCoords[0].x, xPoints, true);
 		y = this.cChartDrawer.getYPosition(splineCoords[0].y, yPoints);
