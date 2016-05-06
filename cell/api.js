@@ -1025,8 +1025,6 @@ var editor;
     } else if (null !== this._gui_color_schemes && "asc_onSendThemeColorSchemes" === name) {
       this.handlers.trigger("asc_onSendThemeColorSchemes", this._gui_color_schemes);
       this._gui_color_schemes = null;
-    } else if ("asc_onInitEditorShapes" === name) {
-      this.handlers.trigger("asc_onInitEditorShapes", AscCommon.g_oAutoShapesGroups, AscCommon.g_oAutoShapesTypes);
     } else if ("asc_onInitEditorTextArts" === name) {
       this.handlers.trigger("asc_onInitEditorTextArts", [AscCommon.g_oPresetTxWarpGroups, AscCommon.g_PresetTxWarpTypes]);
     }
@@ -1527,6 +1525,7 @@ var editor;
     this.asc_ApplyColorScheme(false);
 
     this.sendStandartTextures();
+    this.handlers.trigger("asc_onInitEditorShapes", AscCommon.g_oAutoShapesGroups, AscCommon.g_oAutoShapesTypes);
 
     // Применяем пришедшие при открытии изменения
     this._applyFirstLoadChanges();
