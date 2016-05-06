@@ -12027,7 +12027,7 @@
 				
 				var sort = sortProps.sortRange.sort(type, sortProps.startCol, rgbColor);
 				t.cellCommentator.sortComments(sort);
-				t.model.autoFilters.sortColFilter( type, cellId, ar, sortProps, displayName, rgbColor );
+				t.model.autoFilters.sortColFilter(type, cellId, ar, sortProps, displayName, rgbColor);
 				
 				t._onUpdateFormatTable(sortProps.sortRange.bbox, false);
 				History.EndTransaction();
@@ -12073,7 +12073,7 @@
             if ( false === isSuccess ) {
                 return;
             }
-
+			
             var updateRange = t.model.autoFilters.clearFilterColumn( cellId, displayName );
 			
 			if(false !== updateRange)

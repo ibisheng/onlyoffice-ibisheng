@@ -719,7 +719,7 @@
 						this.changeTableStyleInfo(data.styleName, data.activeCells);
 						break;
 					case AscCH.historyitem_AutoFilter_Sort:
-						this.sortColFilter(data.type, data.cellId, data.activeCells, null, null, data.color);
+						this.sortColFilter(data.type, data.cellId, data.activeCells, null, data.displayName, data.color);
 						break;
 					case AscCH.historyitem_AutoFilter_Empty:
 						this.isEmptyAutoFilters(data.activeCells);
@@ -757,6 +757,9 @@
 						break;
 					case AscCH.historyitem_AutoFilter_ChangeTableName:
 						this.changeDisplayNameTable(data.displayName, data.val);
+						break;
+					case AscCH.historyitem_AutoFilter_ClearFilterColumn:
+						this.clearFilterColumn(data.cellId, data.displayName);
 						break;
 				}
 				History.TurnOn();
@@ -841,7 +844,7 @@
 						}
 					}
 				}
-				else if(type === AscCH.historyitem_AutoFilter_Sort && cloneData.oldFilter)//сортировка
+				else if((type === AscCH.historyitem_AutoFilter_Sort || type === AscCH.historyitem_AutoFilter_ClearFilterColumn) && cloneData.oldFilter)//сортировка
 				{
 					if(worksheet.AutoFilter && cloneData.oldFilter.isAutoFilter())
 						worksheet.AutoFilter = cloneData.oldFilter.clone(null);
@@ -1527,14 +1530,14 @@
 					var cellIdRange = new Asc.Range(startCol, filterRef.r1, startCol, filterRef.r1);
 					
 					curFilter.SortState.SortConditions[0].Ref = new Asc.Range(startCol, filterRef.r1, startCol, filterRef.r2);
-					curFilter.SortState.SortConditions[0].ConditionDescending = type;
+					curFilter.SortState.SortConditions[0].ConditionDescending = type === Asc.c_oAscSortOptions.Ascending;
 
 					if(curFilter.TableStyleInfo)
 					{
 						t._setColorStyleTable(curFilter.Ref, curFilter);
 					}
 					t._addHistoryObj({oldFilter: oldFilter}, AscCH.historyitem_AutoFilter_Sort,
-						{activeCells: cellIdRange, type: type, cellId: cellId}, null, curFilter.Ref);
+						{activeCells: cellIdRange, type: type, cellId: cellId, displayName: displayName}, null, curFilter.Ref);
 					History.EndTransaction();
 				};
 						
@@ -1580,7 +1583,7 @@
 						t._setColorStyleTable(curFilter.Ref, curFilter);
 					}
 					t._addHistoryObj({oldFilter: oldFilter}, AscCH.historyitem_AutoFilter_Sort,
-						{activeCells: cellIdRange, type: type, cellId: cellId, color: color}, null, curFilter.Ref);
+						{activeCells: cellIdRange, type: type, cellId: cellId, color: color, displayName: displayName}, null, curFilter.Ref);
 					History.EndTransaction();
 				};
 				
@@ -1589,7 +1592,7 @@
 					case Asc.c_oAscSortOptions.Ascending:
 					case Asc.c_oAscSortOptions.Descending:
 					{
-						onSortAutoFilterCallback(type === Asc.c_oAscSortOptions.Ascending);
+						onSortAutoFilterCallback(type);
 						break;
 					}
 					case Asc.c_oAscSortOptions.ByColorFill:
@@ -4394,7 +4397,12 @@
 				var filter = this._getFilterByDisplayName(displayName);
 				var autoFilter = filter && filter.getType() === g_nFiltersType.tablePart ? filter.AutoFilter : filter;
 				
+				var oldFilter = filter.clone(null);
+				
 				var colId = this._getColIdColumn(filter, cellId);
+				
+				History.Create_NewPoint();
+				History.StartTransaction();
 				
 				if(colId !== null)
 				{
@@ -4405,6 +4413,10 @@
 					
 					this._resetTablePartStyle();
 				}
+				
+				this._addHistoryObj(oldFilter, AscCH.historyitem_AutoFilter_ClearFilterColumn, {cellId: cellId, displayName: displayName, activeCells: filter.Ref}, null, filter.Ref);
+				
+				History.EndTransaction();
 				
 				return filter.Ref;
 			},
