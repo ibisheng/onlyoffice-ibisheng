@@ -2431,14 +2431,14 @@
 				{
 					
 					var rangeCellId = this._idToRange(cellId);
-					var colId = autoFilter.Ref.c2 - rangeCellId.c1;
+					var colId = rangeCellId.c1 - autoFilter.Ref.c1;
 					res = this._getTrueColId(filter, colId);
 				}
 				
 				return res;
 			},
 			
-			_getIndexByColId: function(autoFilter, cellId)
+			_getIndexByColId: function(autoFilter, colId)
 			{
 				var res = null;
 				
@@ -2446,7 +2446,7 @@
 				{
 					if(autoFilter.FilterColumns[i].ColId === colId)
 					{
-						index = i;
+						res = i;
 						break;
 					}
 				}
@@ -4339,10 +4339,12 @@
 				
 				if(colId !== null)
 				{
-					var index = this._getIndexByColId(filter, colId);
+					var index = this._getIndexByColId(autoFilter, colId);
 					this._openHiddenRowsAfterDeleteColumn(autoFilter, colId);
 					
 					autoFilter.FilterColumns.splice(index, 1);
+					
+					this._resetTablePartStyle();
 				}
 				
 				return filter.Ref;
