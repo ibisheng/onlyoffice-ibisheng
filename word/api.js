@@ -5994,6 +5994,10 @@ asc_docs_api.prototype.OpenDocumentEndCallback = function()
     if (!this.isViewMode) {
       this.sendStandartTextures();
       this.WordControl.m_oDrawingDocument.SendMathToMenu();
+
+      if (this.shapeElementId) {
+        this.WordControl.m_oDrawingDocument.InitGuiCanvasShape(this.shapeElementId);
+      }
     }
 
     if (this.isViewMode)
@@ -7051,7 +7055,6 @@ asc_docs_api.prototype._onEndLoadSdk = function() {
   g_oTableId.init();
   this.WordControl = new AscCommonWord.CEditorPage(this);
   this.WordControl.Name = this.HtmlElementName;
-  this.WordControl.m_oDrawingDocument.InitGuiCanvasShape(this.shapeElementId);
 
   this.CurrentTranslate = AscCommonWord.translations_map["en"];
 

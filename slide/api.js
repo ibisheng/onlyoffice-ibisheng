@@ -3675,6 +3675,9 @@ asc_docs_api.prototype.OpenDocumentEndCallback = function()
 
   if (!this.isViewMode) {
     this.sendStandartTextures();
+    if (this.shapeElementId) {
+      this.WordControl.m_oDrawingDocument.InitGuiCanvasShape(this.shapeElementId);
+    }
   }
 
     if (this.isViewMode)
@@ -4733,8 +4736,6 @@ asc_docs_api.prototype._onOpenCommand = function(data) {
 	});
 };
 asc_docs_api.prototype._onEndLoadSdk = function() {
-  this.WordControl.m_oDrawingDocument.InitGuiCanvasShape(this.shapeElementId);
-
   asc_docs_api.superclass._onEndLoadSdk.call(this);
 };
 
