@@ -2641,6 +2641,22 @@ CUserCacheColor.prototype.init = function(nColor) {
 };
 
   function loadScript(url, callback) {
+    if (window["AscDesktopEditor"])
+    {
+        var _ret_param = window["AscDesktopEditor"]["LoadJS"](url);
+        if (_ret_param == 1)
+        {
+            setTimeout(callback, 1);
+            return;
+        }
+        else if (_ret_param == 2)
+        {
+            window["asc_desktop_localModuleId"] = "sdk-all.js";
+            window["asc_desktop_context"] = { "completeLoad" : function() { return callback(); } };
+            return;
+        }
+    }
+
     var script = document.createElement('script');
     script.type = 'text/javascript';
     script.src = url;
