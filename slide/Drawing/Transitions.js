@@ -3119,13 +3119,19 @@ function CDemonstrationManager(htmlpage)
         if (!_is_transition)
             this.SlideNum++;
 
-        if (this.SlideNum > this.SlidesCount)
-            this.End();
-        else
+        if (this.SlideNum >= this.SlidesCount)
         {
-            this.HtmlPage.m_oApi.sync_DemonstrationSlideChanged(this.SlideNum);
-            this.StartSlide(!_is_transition, false);
+            if (this.HtmlPage.m_oApi.m_oLogicDocument.isLoopShowMode())
+                this.SlideNum = 0;
+            else
+            {
+                this.End();
+                return;
+            }
         }
+
+        this.HtmlPage.m_oApi.sync_DemonstrationSlideChanged(this.SlideNum);
+        this.StartSlide(!_is_transition, false);
     }
 
     this.PrevSlide = function()
