@@ -226,7 +226,8 @@ var c_oAscAutoFilterTypes = {
   CustomFilters: 1,
   DynamicFilter: 2,
   Top10: 3,
-  Filters: 4
+  Filters: 4,
+  None: 5
 };
 
 var c_oAscCoAuthoringMeBorderColor = new CColor(22, 156, 0);

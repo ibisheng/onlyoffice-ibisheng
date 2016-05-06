@@ -12672,8 +12672,14 @@
             filterObj.type = c_oAscAutoFilterTypes.Top10;
             filterObj.filter = filters.Top10;
         }
-        else
-            filterObj.type = c_oAscAutoFilterTypes.Filters;
+        else if(filters)
+		{
+			filterObj.type = c_oAscAutoFilterTypes.Filters;
+		}
+		else
+		{
+			filterObj.type = c_oAscAutoFilterTypes.None;
+		}
 
         //get sort
         var sortVal = null;
