@@ -1778,7 +1778,8 @@
 					}
 				}
 				
-				if(worksheet.AutoFilter && worksheet.AutoFilter.Ref && range.intersection(worksheet.AutoFilter.Ref))
+				//пересекается, но не равен фильтрованному диапазону. если равен - то фильтр превращается в таблицу
+				if(worksheet.AutoFilter && worksheet.AutoFilter.Ref && range.intersection(worksheet.AutoFilter.Ref) && !range.isEqual(worksheet.AutoFilter.Ref))
 					return true;
 				
 				return false;
