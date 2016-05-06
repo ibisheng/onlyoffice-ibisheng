@@ -409,7 +409,7 @@ $( function () {
 //        g_oUndoRedoGraphicObjects = new UndoRedoGraphicObjects(wb);
         g_oIdCounter.Set_Load(false);
 
-        var oBinaryFileReader = new Asc.BinaryFileReader();
+        var oBinaryFileReader = new AscCommonExcel.BinaryFileReader();
         oBinaryFileReader.Read( sData, wb );
         ws = wb.getWorksheet( wb.getActive() );
         AscCommonExcel.getFormulasInfo();

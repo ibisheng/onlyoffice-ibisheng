@@ -7061,7 +7061,8 @@ CStylesPainter.prototype =
       History.TurnOn();
     }
   }
-}
+};
+CStylesPainter.prototype.get_MergedStyles = function() { return this.mergedStyles; };
 
 function CMathPainter(_api)
 {
@@ -7282,5 +7283,9 @@ function TransformRectByMatrix(m, arr, offX, offY, koefX, koefY)
 
 //--------------------------------------------------------export----------------------------------------------------
 window['AscCommon'] = window['AscCommon'] || {};
+window['AscCommonWord'] = window['AscCommonWord'] || {};
 window['AscCommon'].CPage = CPage;
 window['AscCommon'].CDrawingDocument = CDrawingDocument;
+
+window['AscCommonWord'].CStylesPainter = CStylesPainter;
+CStylesPainter.prototype['get_MergedStyles'] = CStylesPainter.prototype.get_MergedStyles;

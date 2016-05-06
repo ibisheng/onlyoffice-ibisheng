@@ -2561,3 +2561,7 @@ CVolumeIntegral.prototype.calculateSizeGlyph = function()
 
     return {width : width, height : height};
 };
+
+//--------------------------------------------------------export----------------------------------------------------
+window['AscCommonWord'] = window['AscCommonWord'] || {};
+window['AscCommonWord'].CNary = CNary;

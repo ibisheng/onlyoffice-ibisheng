@@ -40,7 +40,7 @@ function asc_docs_api(name)
     g_oTableId.init();
 
 	/************ private!!! **************/
-    this.WordControl = new CEditorPage(this);
+    this.WordControl = new AscCommonSlide.CEditorPage(this);
     this.WordControl.Name = this.HtmlElementName;
 
   this.documentFormatSave = c_oAscFileType.PPTX;
@@ -94,7 +94,7 @@ function asc_docs_api(name)
     this.ParcedDocument = false;
 	this.isStartCoAuthoringOnEndLoad = false;	// Подсоединились раньше, чем документ загрузился
 
-    this.DocumentOrientation = orientation_Portrait ? true : false;
+    this.DocumentOrientation = false;
 
     this.SelectedObjectsStack = [];
 
@@ -197,7 +197,7 @@ asc_docs_api.prototype._coAuthoringInitEnd = function() {
           } else {
             Lock.Set_Type(locktype_Other, true);
           }
-          if (Class instanceof PropLocker) {
+          if (Class instanceof AscCommonSlide.PropLocker) {
             var object = g_oTableId.Get_ById(Class.objectId);
             if (object instanceof Slide && Class === object.deleteLock) {
               editor.WordControl.m_oLogicDocument.DrawingDocument.LockSlide(object.num);
@@ -206,7 +206,7 @@ asc_docs_api.prototype._coAuthoringInitEnd = function() {
           // Выставляем ID пользователя, залочившего данный элемент
           Lock.Set_UserId(e["user"]);
 
-          if (Class instanceof PropLocker) {
+          if (Class instanceof AscCommonSlide.PropLocker) {
             var object = g_oTableId.Get_ById(Class.objectId);
             if (object instanceof CPresentation) {
               if (Class === editor.WordControl.m_oLogicDocument.themeLock) {
@@ -218,7 +218,7 @@ asc_docs_api.prototype._coAuthoringInitEnd = function() {
               }
             }
           }
-          if (Class instanceof CComment) {
+          if (Class instanceof AscCommon.CComment) {
             editor.sync_LockComment(Class.Get_Id(), e["user"]);
           }
 
@@ -303,7 +303,7 @@ asc_docs_api.prototype._coAuthoringInitEnd = function() {
           }
 
           Lock.Set_Type(NewType, true);
-          if (Class instanceof PropLocker) {
+          if (Class instanceof AscCommonSlide.PropLocker) {
             var object = g_oTableId.Get_ById(Class.objectId);
             if (object instanceof Slide && Class === object.deleteLock) {
               if (NewType !== locktype_Mine && NewType !== locktype_None) {
@@ -556,7 +556,7 @@ asc_docs_api.prototype.CreateCSS = function()
 {
     if (window["flat_desine"] === true)
     {
-        GlobalSkin = GlobalSkinFlat;
+      AscCommonSlide.updateGlobalSkin(AscCommonSlide.GlobalSkinFlat);
     }
 
     var _head = document.getElementsByTagName('head')[0];
@@ -598,22 +598,22 @@ asc_docs_api.prototype.CreateComponents = function()
 {
     this.CreateCSS();
 
-    var _main_border_style = "border-bottom-width: 1px;border-bottom-color:" + GlobalSkin.BorderSplitterColor + "; border-bottom-style: solid;";
-    var _thumbnail_style_right = "border-right-width: 1px;border-right-color:" + GlobalSkin.BorderSplitterColor + "; border-right-style: solid;";
-    if (!GlobalSkin.SupportNotes)
+    var _main_border_style = "border-bottom-width: 1px;border-bottom-color:" + AscCommonSlide.GlobalSkin.BorderSplitterColor + "; border-bottom-style: solid;";
+    var _thumbnail_style_right = "border-right-width: 1px;border-right-color:" + AscCommonSlide.GlobalSkin.BorderSplitterColor + "; border-right-style: solid;";
+    if (!AscCommonSlide.GlobalSkin.SupportNotes)
     {
         _main_border_style = "";
         _thumbnail_style_right = "";
     }
 
-    var _innerHTML = "<div id=\"id_panel_thumbnails\" class=\"block_elem\" style=\"background-color:" + GlobalSkin.BackgroundColorThumbnails + ";" + _thumbnail_style_right + "\">\
+    var _innerHTML = "<div id=\"id_panel_thumbnails\" class=\"block_elem\" style=\"background-color:" + AscCommonSlide.GlobalSkin.BackgroundColorThumbnails + ";" + _thumbnail_style_right + "\">\
 		                            <canvas id=\"id_thumbnails_background\" class=\"block_elem\" style=\"-webkit-user-select: none;background-color:#EBEBEB;z-index:1\"></canvas>\
 		                            <canvas id=\"id_thumbnails\" class=\"block_elem\" style=\"-webkit-user-select: none;z-index:2\"></canvas>\
 		                            <div id=\"id_vertical_scroll_thmbnl\" style=\"left:0;top:0;width:1px;overflow:hidden;position:absolute;\">\
 									    <div id=\"panel_right_scroll_thmbnl\" class=\"block_elem\" style=\"left:0;top:0;width:1px;height:6000px;\"></div>\
 									</div>\
 		                        </div>\
-                            <div id=\"id_main\" class=\"block_elem\" style=\"-moz-user-select:none;-khtml-user-select:none;user-select:none;background-color:" + GlobalSkin.BackgroundColor + ";overflow:hidden;border-left-width: 1px;border-left-color:" + GlobalSkin.BorderSplitterColor + "; border-left-style: solid;" + _main_border_style + "\" UNSELECTABLE=\"on\">\
+                            <div id=\"id_main\" class=\"block_elem\" style=\"-moz-user-select:none;-khtml-user-select:none;user-select:none;background-color:" + AscCommonSlide.GlobalSkin.BackgroundColor + ";overflow:hidden;border-left-width: 1px;border-left-color:" + AscCommonSlide.GlobalSkin.BorderSplitterColor + "; border-left-style: solid;" + _main_border_style + "\" UNSELECTABLE=\"on\">\
 								<div id=\"id_panel_left\" class=\"block_elem\">\
 									<canvas id=\"id_buttonTabs\" class=\"block_elem\"></canvas>\
 									<canvas id=\"id_vert_ruler\" class=\"block_elem\"></canvas>\
@@ -643,7 +643,7 @@ asc_docs_api.prototype.CreateComponents = function()
 
     if (true)
     {
-        _innerHTML += "<div id=\"id_panel_notes\" class=\"block_elem\" style=\"background-color:#FFFFFF;border-left-width: 1px;border-left-color:" + GlobalSkin.BorderSplitterColor + "; border-left-style: solid;border-top-width: 1px;border-top-color:" + GlobalSkin.BorderSplitterColor + "; border-top-style: solid;\">\
+        _innerHTML += "<div id=\"id_panel_notes\" class=\"block_elem\" style=\"background-color:#FFFFFF;border-left-width: 1px;border-left-color:" + AscCommonSlide.GlobalSkin.BorderSplitterColor + "; border-left-style: solid;border-top-width: 1px;border-top-color:" + AscCommonSlide.GlobalSkin.BorderSplitterColor + "; border-top-style: solid;\">\
                                 <canvas id=\"id_notes\" class=\"block_elem\" style=\"background-color:#FFFFFF;z-index:1\"></canvas>\
                                 <div id=\"id_vertical_scroll_notes\" style=\"left:0;top:0;width:16px;overflow:hidden;position:absolute;\">\
                                     <div id=\"panel_right_scroll_notes\" class=\"block_elem\" style=\"left:0;top:0;width:16px;height:6000px;\"></div>\
@@ -653,8 +653,8 @@ asc_docs_api.prototype.CreateComponents = function()
 
 	if (this.HtmlElement != null)
     {
-        if (GlobalSkin.Name == "flat")
-          this.HtmlElement.style.backgroundColor = GlobalSkin.BackgroundColorThumbnails;
+        if (AscCommonSlide.GlobalSkin.Name == "flat")
+          this.HtmlElement.style.backgroundColor = AscCommonSlide.GlobalSkin.BackgroundColorThumbnails;
 
       this.HtmlElement.innerHTML = _innerHTML;
     }
@@ -666,10 +666,6 @@ asc_docs_api.prototype.InitEditor = function()
     this.WordControl.m_oDrawingDocument.m_oLogicDocument = this.WordControl.m_oLogicDocument;
 };
 
-asc_docs_api.prototype.SetInterfaceDrawImagePlaceShape = function(div_id)
-{
-    this.WordControl.m_oDrawingDocument.InitGuiCanvasShape(div_id);
-};
 asc_docs_api.prototype.SetInterfaceDrawImagePlaceSlide = function(div_id)
 {
     this.WordControl.m_oDrawingDocument.InitGuiCanvasSlide(div_id);
@@ -1316,9 +1312,6 @@ asc_docs_api.prototype.sync_HelpCallback = function(url){
 asc_docs_api.prototype.sync_UpdateZoom = function(zoom){
 	this.asc_fireCallback("asc_onZoom", zoom);
 };
-asc_docs_api.prototype.sync_StatusMessage = function(message){
-	this.asc_fireCallback("asc_onMessage", message);
-};
 asc_docs_api.prototype.ClearPropObjCallback = function(prop){//колбэк предшествующий приходу свойств объекта, prop а всякий случай
 
 	this.asc_fireCallback("asc_onClearPropObj", prop);
@@ -1431,7 +1424,7 @@ asc_docs_api.prototype.put_TextPrFontName = function(name)
     {
         if(editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false) {
             History.Create_NewPoint(AscDFH.historydescription_Presentation_ParagraphAdd);
-            this.WordControl.m_oLogicDocument.Paragraph_Add(new ParaTextPr({
+            this.WordControl.m_oLogicDocument.Paragraph_Add(new AscCommonWord.ParaTextPr({
                 FontFamily: {
                     Name: name,
                     Index: -1
@@ -1444,35 +1437,35 @@ asc_docs_api.prototype.put_TextPrFontSize = function(size)
 {
     if(editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false) {
         History.Create_NewPoint(AscDFH.historydescription_Presentation_ParagraphAdd);
-        this.WordControl.m_oLogicDocument.Paragraph_Add(new ParaTextPr({FontSize: Math.min(size, 100)}));
+        this.WordControl.m_oLogicDocument.Paragraph_Add(new AscCommonWord.ParaTextPr({FontSize: Math.min(size, 100)}));
     }
 };
 asc_docs_api.prototype.put_TextPrBold = function(value)
 {
     if(editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false) {
         History.Create_NewPoint(AscDFH.historydescription_Presentation_ParagraphAdd);
-        this.WordControl.m_oLogicDocument.Paragraph_Add(new ParaTextPr({Bold: value}));
+        this.WordControl.m_oLogicDocument.Paragraph_Add(new AscCommonWord.ParaTextPr({Bold: value}));
     }
 };
 asc_docs_api.prototype.put_TextPrItalic = function(value)
 {
     if(editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false) {
         History.Create_NewPoint(AscDFH.historydescription_Presentation_ParagraphAdd);
-        this.WordControl.m_oLogicDocument.Paragraph_Add(new ParaTextPr({Italic: value}));
+        this.WordControl.m_oLogicDocument.Paragraph_Add(new AscCommonWord.ParaTextPr({Italic: value}));
     }
 };
 asc_docs_api.prototype.put_TextPrUnderline = function(value)
 {
     if(editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false) {
         History.Create_NewPoint(AscDFH.historydescription_Presentation_ParagraphAdd);
-        this.WordControl.m_oLogicDocument.Paragraph_Add(new ParaTextPr({Underline: value}));
+        this.WordControl.m_oLogicDocument.Paragraph_Add(new AscCommonWord.ParaTextPr({Underline: value}));
     }
 };
 asc_docs_api.prototype.put_TextPrStrikeout = function(value)
 {
     if(editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false) {
         History.Create_NewPoint(AscDFH.historydescription_Presentation_ParagraphAdd);
-        this.WordControl.m_oLogicDocument.Paragraph_Add(new ParaTextPr({Strikeout: value}));
+        this.WordControl.m_oLogicDocument.Paragraph_Add(new AscCommonWord.ParaTextPr({Strikeout: value}));
     }
 };
 asc_docs_api.prototype.put_PrLineSpacing = function(Type, Value)
@@ -1634,7 +1627,7 @@ asc_docs_api.prototype.paraApply = function(Props)
 
                 if ( undefined != Props.Position )
                     TextPr.Position = Props.Position;
-                graphicObjects.paragraphAdd( new ParaTextPr(TextPr) );
+                graphicObjects.paragraphAdd( new AscCommonWord.ParaTextPr(TextPr) );
                 _presentation.Recalculate();
                 _presentation.Document_UpdateInterfaceState();
             }, [], false, AscDFH.historydescription_Presentation_ParaApply);
@@ -1651,7 +1644,7 @@ asc_docs_api.prototype.put_TextPrBaseline = function(value)
 {
     if(editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false) {
         History.Create_NewPoint(AscDFH.historydescription_Presentation_ParagraphAdd);
-        this.WordControl.m_oLogicDocument.Paragraph_Add(new ParaTextPr({VertAlign: value}));
+        this.WordControl.m_oLogicDocument.Paragraph_Add(new AscCommonWord.ParaTextPr({VertAlign: value}));
     }
 };
 /* 	Маркированный список Type = 0
@@ -2092,7 +2085,7 @@ asc_docs_api.prototype.put_TextColor2 = function(r, g, b)
 {
     if(editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false) {
         History.Create_NewPoint(AscDFH.historydescription_Presentation_ParagraphAdd);
-        this.WordControl.m_oLogicDocument.Paragraph_Add(new ParaTextPr({Color: {r: r, g: g, b: b}}));
+        this.WordControl.m_oLogicDocument.Paragraph_Add(new AscCommonWord.ParaTextPr({Color: {r: r, g: g, b: b}}));
     }
 };
 asc_docs_api.prototype.put_TextColor = function(color)
@@ -2102,7 +2095,7 @@ asc_docs_api.prototype.put_TextColor = function(color)
         var _unifill = new AscFormat.CUniFill();
         _unifill.fill = new AscFormat.CSolidFill();
         _unifill.fill.color = AscFormat.CorrectUniColor(color, _unifill.fill.color, 0);
-        this.WordControl.m_oLogicDocument.Paragraph_Add(new ParaTextPr({Unifill: _unifill}));
+        this.WordControl.m_oLogicDocument.Paragraph_Add(new AscCommonWord.ParaTextPr({Unifill: _unifill}));
     }
 };
 
@@ -2772,8 +2765,8 @@ asc_docs_api.prototype.AddImageUrl = function(url){
 
 asc_docs_api.prototype.AddImageUrlActionCallback = function(_image)
 {
-    var _w = Page_Width - (X_Left_Margin + X_Right_Margin);
-    var _h = Page_Height - (Y_Top_Margin + Y_Bottom_Margin);
+    var _w = AscCommon.Page_Width - (AscCommon.X_Left_Margin + AscCommon.X_Right_Margin);
+    var _h = AscCommon.Page_Height - (AscCommon.Y_Top_Margin + AscCommon.Y_Bottom_Margin);
     if (_image.Image != null)
     {
         var __w = Math.max((_image.Image.width * AscCommon.g_dKoef_pix_to_mm) >> 0, 1);
@@ -3683,6 +3676,10 @@ asc_docs_api.prototype.OpenDocumentEndCallback = function()
         this.WordControl.OnScroll();
     }
 
+  if (!this.isViewMode) {
+    this.sendStandartTextures();
+  }
+
     if (this.isViewMode)
         this.asc_setViewMode(true);
 
@@ -3695,7 +3692,7 @@ asc_docs_api.prototype.asyncFontEndLoaded = function(fontinfo)
     this.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.LoadFont);
     if(editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false) {
         History.Create_NewPoint(AscDFH.historydescription_Presentation_ParagraphAdd);
-        this.WordControl.m_oLogicDocument.Paragraph_Add(new ParaTextPr({FontFamily: {Name: fontinfo.Name, Index: -1}}));
+        this.WordControl.m_oLogicDocument.Paragraph_Add(new AscCommonWord.ParaTextPr({FontFamily: {Name: fontinfo.Name, Index: -1}}));
     }
 };
 
@@ -4109,8 +4106,8 @@ asc_docs_api.prototype.GoToFooter = function(pageNumber)
 
     var oldClickCount = global_mouseEvent.ClickCount;
     global_mouseEvent.ClickCount = 2;
-    this.WordControl.m_oLogicDocument.OnMouseDown(global_mouseEvent, 0, Page_Height, pageNumber);
-    this.WordControl.m_oLogicDocument.OnMouseUp(global_mouseEvent, 0, Page_Height, pageNumber);
+    this.WordControl.m_oLogicDocument.OnMouseDown(global_mouseEvent, 0, AscCommon.Page_Height, pageNumber);
+    this.WordControl.m_oLogicDocument.OnMouseUp(global_mouseEvent, 0, AscCommon.Page_Height, pageNumber);
 
     this.WordControl.m_oLogicDocument.Document_UpdateInterfaceState();
 
@@ -4218,8 +4215,8 @@ asc_docs_api.prototype.ExitHeader_Footer = function(pageNumber)
 
     var oldClickCount = global_mouseEvent.ClickCount;
     global_mouseEvent.ClickCount = 2;
-    this.WordControl.m_oLogicDocument.OnMouseDown(global_mouseEvent, 0, Page_Height / 2, pageNumber);
-    this.WordControl.m_oLogicDocument.OnMouseUp(global_mouseEvent, 0, Page_Height / 2, pageNumber);
+    this.WordControl.m_oLogicDocument.OnMouseDown(global_mouseEvent, 0, AscCommon.Page_Height / 2, pageNumber);
+    this.WordControl.m_oLogicDocument.OnMouseUp(global_mouseEvent, 0, AscCommon.Page_Height / 2, pageNumber);
 
     this.WordControl.m_oLogicDocument.Document_UpdateInterfaceState();
     
@@ -4732,7 +4729,7 @@ asc_docs_api.prototype._onOpenCommand = function(data) {
 
 		t.OpenDocument2(result.url, result.data);
 		t.DocumentOrientation = (null == t.WordControl.m_oLogicDocument) ? true : !t.WordControl.m_oLogicDocument.Orientation;
-		t.sync_DocSizeCallback(Page_Width, Page_Height);
+		t.sync_DocSizeCallback(AscCommon.Page_Width, AscCommon.Page_Height);
 		t.sync_PageOrientCallback(t.get_DocumentOrientation());
 	});
 };
@@ -4854,7 +4851,7 @@ window["asc_docs_api"].prototype["asc_nativeApplyChanges2"] = function(data, isF
     var stream = new AscCommon.FT_Stream2(data, data.length);
     stream.obj = null;
     var Loader = { Reader : stream, Reader2 : null };
-    var _color = new CDocumentColor( 191, 255, 199 );
+    var _color = new AscCommonWord.CDocumentColor( 191, 255, 199 );
 
     // Применяем изменения, пока они есть
     var _count = Loader.Reader.GetLong();
@@ -5080,7 +5077,6 @@ asc_docs_api.prototype['SetThemesPath'] = asc_docs_api.prototype.SetThemesPath;
 asc_docs_api.prototype['CreateCSS'] = asc_docs_api.prototype.CreateCSS;
 asc_docs_api.prototype['CreateComponents'] = asc_docs_api.prototype.CreateComponents;
 asc_docs_api.prototype['InitEditor'] = asc_docs_api.prototype.InitEditor;
-asc_docs_api.prototype['SetInterfaceDrawImagePlaceShape'] = asc_docs_api.prototype.SetInterfaceDrawImagePlaceShape;
 asc_docs_api.prototype['SetInterfaceDrawImagePlaceSlide'] = asc_docs_api.prototype.SetInterfaceDrawImagePlaceSlide;
 asc_docs_api.prototype['SetInterfaceDrawImagePlaceTextArt'] = asc_docs_api.prototype.SetInterfaceDrawImagePlaceTextArt;
 asc_docs_api.prototype['SetInterfaceDrawImagePlace'] = asc_docs_api.prototype.SetInterfaceDrawImagePlace;
@@ -5143,7 +5139,6 @@ asc_docs_api.prototype['sync_AddURLCallback'] = asc_docs_api.prototype.sync_AddU
 asc_docs_api.prototype['sync_ErrorCallback'] = asc_docs_api.prototype.sync_ErrorCallback;
 asc_docs_api.prototype['sync_HelpCallback'] = asc_docs_api.prototype.sync_HelpCallback;
 asc_docs_api.prototype['sync_UpdateZoom'] = asc_docs_api.prototype.sync_UpdateZoom;
-asc_docs_api.prototype['sync_StatusMessage'] = asc_docs_api.prototype.sync_StatusMessage;
 asc_docs_api.prototype['ClearPropObjCallback'] = asc_docs_api.prototype.ClearPropObjCallback;
 asc_docs_api.prototype['CollectHeaders'] = asc_docs_api.prototype.CollectHeaders;
 asc_docs_api.prototype['GetActiveHeader'] = asc_docs_api.prototype.GetActiveHeader;
@@ -5728,9 +5723,6 @@ CTextProp.prototype['get_VertAlign'] = CTextProp.prototype.get_VertAlign;
 CTextProp.prototype['get_HighLight'] = CTextProp.prototype.get_HighLight;
 CParagraphAndTextProp.prototype['get_ParaPr'] = CParagraphAndTextProp.prototype.get_ParaPr;
 CParagraphAndTextProp.prototype['get_TextPr'] = CParagraphAndTextProp.prototype.get_TextPr;
-CAscTableStyle.prototype['get_Id'] = CAscTableStyle.prototype.get_Id;
-CAscTableStyle.prototype['get_Image'] = CAscTableStyle.prototype.get_Image;
-CAscTableStyle.prototype['get_Type'] = CAscTableStyle.prototype.get_Type;
 
 // don't delete this line!!! This line used for split minimize files
 window['split']='split';

@@ -69,6 +69,7 @@ function baseEditorsApi(name, editorId) {
   this.textArtTranslate = null;
   this.chartPreviewManager = null;
   this.textArtPreviewManager = null;
+  this.shapeElementId = null;
   // Режим вставки диаграмм в редакторе документов
   this.isChartEditor = false;
   this.isOpenedChartFrame = false;
@@ -531,6 +532,9 @@ baseEditorsApi.prototype.asc_onOpenChartFrame = function() {
 baseEditorsApi.prototype.asc_onCloseChartFrame = function() {
     this.isOpenedChartFrame = false;
 };
+baseEditorsApi.prototype.asc_setInterfaceDrawImagePlaceShape = function(elementId) {
+  this.shapeElementId = elementId;
+};
 // Add image
 baseEditorsApi.prototype._addImageUrl = function() {
 };
@@ -606,6 +610,19 @@ baseEditorsApi.prototype.asc_getUrlType = function(url) {
     this.textArtPreviewManager = new AscCommon.TextArtPreviewManager();
 
     AscFormat.initStyleManager();
+  };
+
+  baseEditorsApi.prototype.sendStandartTextures = function() {
+    var _count = AscCommon.g_oUserTexturePresets.length;
+    var arr = new Array(_count);
+    for (var i = 0; i < _count; ++i) {
+      arr[i] = new AscCommon.asc_CTexture();
+      arr[i].Id = i;
+      arr[i].Image = AscCommon.g_oUserTexturePresets[i];
+      this.ImageLoader.LoadImage(AscCommon.g_oUserTexturePresets[i], 1);
+    }
+
+    this.sendEvent('asc_onInitStandartTextures', arr);
   };
 
   //----------------------------------------------------------export----------------------------------------------------

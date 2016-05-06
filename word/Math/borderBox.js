@@ -1186,3 +1186,10 @@ CPhantom.prototype.fillContent = function()
     this.setDimension(1, 1);
     this.elements[0][0] = this.getBase();
 };
+
+//--------------------------------------------------------export----------------------------------------------------
+window['AscCommonWord'] = window['AscCommonWord'] || {};
+window['AscCommonWord'].CBar = CBar;
+window['AscCommonWord'].CBox = CBox;
+window['AscCommonWord'].CBorderBox = CBorderBox;
+window['AscCommonWord'].CPhantom = CPhantom;

@@ -6531,3 +6531,7 @@ var g_aMathAutoCorrectTriggerCharCodes =
     0x3F : 1, 0x40 : 1, 0x5B : 1, 0x5C : 1, 0x5D : 1, 0x5E : 1, 0x5F : 1,
     0x60 : 1, 0x7B : 1, 0x7C : 1, 0x7D : 1, 0x7E : 1
 };
+
+//--------------------------------------------------------export----------------------------------------------------
+window['AscCommonWord'] = window['AscCommonWord'] || {};
+window['AscCommonWord'].CMathContent = CMathContent;

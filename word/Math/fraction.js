@@ -773,4 +773,7 @@ CDenominator.prototype.setPosition = function(pos, PosInfo)
 
     CDenominator.superclass.setPosition.call(this, pos, PosInfo);
 };
-//////////
+
+//--------------------------------------------------------export----------------------------------------------------
+window['AscCommonWord'] = window['AscCommonWord'] || {};
+window['AscCommonWord'].CFraction = CFraction;

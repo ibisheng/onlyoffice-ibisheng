@@ -5784,3 +5784,7 @@ CMathRecalculateObject.prototype.Compare = function(PageInfo)
 
     return result;
 };
+
+//--------------------------------------------------------export----------------------------------------------------
+window['AscCommonWord'] = window['AscCommonWord'] || {};
+window['AscCommonWord'].ParaMath = ParaMath;

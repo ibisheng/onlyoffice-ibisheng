@@ -2394,4 +2394,8 @@ function CPresentationBullet()
         this.m_bSizeTx  = Reader.GetBool();
         this.m_bSizePct = Reader.GetBool();
     };
-};
+}
+
+//--------------------------------------------------------export----------------------------------------------------
+window['AscCommonWord'] = window['AscCommonWord'] || {};
+window['AscCommonWord'].CAbstractNum = CAbstractNum;

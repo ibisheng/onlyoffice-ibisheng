@@ -605,7 +605,7 @@ function CopyProcessor(api, onlyBinaryCopy)
     this.oDocument = api.WordControl.m_oLogicDocument;
 	this.onlyBinaryCopy = onlyBinaryCopy;
 	
-	this.oBinaryFileWriter = new BinaryFileWriter(this.oDocument);
+	this.oBinaryFileWriter = new AscCommonWord.BinaryFileWriter(this.oDocument);
 	this.oPresentationWriter = new AscCommon.CBinaryFileWriter();
     this.oPresentationWriter.Start_UseFullUrl();
     if (this.api.ThemeLoader) {
@@ -2929,7 +2929,7 @@ PasteProcessor.prototype =
     ReadFromBinary : function(sBase64)
 	{
         var openParams = { checkFileSize: false, charCount: 0, parCount: 0 };
-        var oBinaryFileReader = new BinaryFileReader(this.oDocument, openParams);
+        var oBinaryFileReader = new AscCommonWord.BinaryFileReader(this.oDocument, openParams);
         var oRes = oBinaryFileReader.ReadFromString(sBase64, true);
         this.bInBlock = oRes.bInBlock;
         return oRes;
@@ -4562,7 +4562,7 @@ PasteProcessor.prototype =
 	
 	_readFromBinaryExcel: function(base64)
 	{
-		var oBinaryFileReader = new Asc.BinaryFileReader(true);
+		var oBinaryFileReader = new AscCommonExcel.BinaryFileReader(true);
 		var tempWorkbook = new AscCommonExcel.Workbook();
         tempWorkbook.theme = this.oDocument.theme ? this.oDocument.theme : this.oLogicDocument.theme;
 		if(!tempWorkbook.theme && this.oLogicDocument.themes && this.oLogicDocument.themes[0])

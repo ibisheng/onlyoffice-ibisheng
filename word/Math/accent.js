@@ -667,5 +667,9 @@ function CMathMenuAccent(Accent)
     this.Type   = c_oAscMathInterfaceType.Accent;
 }
 AscCommon.extendClass(CMathMenuAccent, CMathMenuBase);
-window["CMathMenuAccent"] = CMathMenuAccent;
 
+//--------------------------------------------------------export----------------------------------------------------
+window['AscCommonWord'] = window['AscCommonWord'] || {};
+window['AscCommonWord'].CAccent = CAccent;
+
+window["CMathMenuAccent"] = CMathMenuAccent;

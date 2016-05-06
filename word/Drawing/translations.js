@@ -1,4 +1,6 @@
-﻿"use strict";
+"use strict";
+
+(function(window, undefined){
 
 var translations_map = {};
 var styles_index_map = {};
@@ -164,3 +166,8 @@ translations_map["lv"].DefaultStyles =
     "Bez atstarpes"
 ];
 translations_map["lv"].StylesText = "AaBbCcDdEeFf";
+
+    //--------------------------------------------------------export----------------------------------------------------
+    window['AscCommonWord'] = window['AscCommonWord'] || {};
+    window['AscCommonWord'].translations_map = translations_map;
+})(window);

@@ -1128,7 +1128,7 @@ asc_docs_api.prototype["Call_Menu_Event"] = function(type, _params)
                     }
                     case 12:
                     {
-                        _textPr.HighLight = highlight_None;
+                        _textPr.HighLight = AscCommonWord.highlight_None;
                         break;
                     }
                     case 13:
@@ -1146,7 +1146,7 @@ asc_docs_api.prototype["Call_Menu_Event"] = function(type, _params)
             }
 
             this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
-            this.WordControl.m_oLogicDocument.Paragraph_Add(new ParaTextPr(_textPr));
+            this.WordControl.m_oLogicDocument.Paragraph_Add(new AscCommonWord.ParaTextPr(_textPr));
             this.WordControl.m_oLogicDocument.Document_UpdateInterfaceState();
             break;
         }
@@ -1349,7 +1349,7 @@ asc_docs_api.prototype["Call_Menu_Event"] = function(type, _params)
             }
 
             if (undefined !== _textPr)
-                this.WordControl.m_oLogicDocument.Paragraph_Add(new ParaTextPr(_textPr));
+                this.WordControl.m_oLogicDocument.Paragraph_Add(new AscCommonWord.ParaTextPr(_textPr));
 
             this.WordControl.m_oLogicDocument.Document_UpdateInterfaceState();
             break;
@@ -1736,12 +1736,12 @@ asc_docs_api.prototype["Call_Menu_Event"] = function(type, _params)
                             _imagePr.ImageUrl = undefined;
 
                             var _section_select = this.WordControl.m_oLogicDocument.Get_PageSizesByDrawingObjects();
-                            var _page_width = Page_Width;
-                            var _page_height = Page_Height;
-                            var _page_x_left_margin = X_Left_Margin;
-                            var _page_y_top_margin = Y_Top_Margin;
-                            var _page_x_right_margin = X_Right_Margin;
-                            var _page_y_bottom_margin = Y_Bottom_Margin;
+                            var _page_width = AscCommon.Page_Width;
+                            var _page_height = AscCommon.Page_Height;
+                            var _page_x_left_margin = AscCommon.X_Left_Margin;
+                            var _page_y_top_margin = AscCommon.Y_Top_Margin;
+                            var _page_x_right_margin = AscCommon.X_Right_Margin;
+                            var _page_y_bottom_margin = AscCommon.Y_Bottom_Margin;
 
                             if (_section_select)
                             {
@@ -4208,7 +4208,7 @@ asc_docs_api.prototype.UpdateTextPr = function(TextPr)
 
     if (TextPr.HighLight !== undefined)
     {
-        if (TextPr.HighLight === highlight_None)
+        if (TextPr.HighLight === AscCommonWord.highlight_None)
         {
             _stream["WriteByte"](12);
         }
@@ -4581,12 +4581,12 @@ asc_docs_api.prototype.StartAddShape = function(sPreset, is_apply)
 asc_docs_api.prototype.AddImageUrlNative = function(url, _w, _h, _pageNum)
 {
     var _section_select = this.WordControl.m_oLogicDocument.Get_PageSizesByDrawingObjects();
-    var _page_width             = Page_Width;
-    var _page_height            = Page_Height;
-    var _page_x_left_margin     = X_Left_Margin;
-    var _page_y_top_margin      = Y_Top_Margin;
-    var _page_x_right_margin    = X_Right_Margin;
-    var _page_y_bottom_margin   = Y_Bottom_Margin;
+    var _page_width             = AscCommon.Page_Width;
+    var _page_height            = AscCommon.Page_Height;
+    var _page_x_left_margin     = AscCommon.X_Left_Margin;
+    var _page_y_top_margin      = AscCommon.Y_Top_Margin;
+    var _page_x_right_margin    = AscCommon.X_Right_Margin;
+    var _page_y_bottom_margin   = AscCommon.Y_Bottom_Margin;
 
     if (_section_select)
     {
@@ -4884,12 +4884,12 @@ asc_docs_api.prototype.change_PageOrient = function(isPortrait)
         this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
         if (isPortrait)
         {
-            this.WordControl.m_oLogicDocument.Set_DocumentOrientation(orientation_Portrait);
+            this.WordControl.m_oLogicDocument.Set_DocumentOrientation(Asc.c_oAscPageOrientation.PagePortrait);
             this.DocumentOrientation = isPortrait;
         }
         else
         {
-            this.WordControl.m_oLogicDocument.Set_DocumentOrientation(orientation_Landscape);
+            this.WordControl.m_oLogicDocument.Set_DocumentOrientation(Asc.c_oAscPageOrientation.PageLandscape);
             this.DocumentOrientation = isPortrait;
         }
         this.sync_PageOrientCallback(editor.get_DocumentOrientation());
@@ -4948,8 +4948,8 @@ function CFontManager()
 
 function CStylesPainter()
 {
-    this.STYLE_THUMBNAIL_WIDTH  = GlobalSkin.STYLE_THUMBNAIL_WIDTH;
-    this.STYLE_THUMBNAIL_HEIGHT = GlobalSkin.STYLE_THUMBNAIL_HEIGHT;
+    this.STYLE_THUMBNAIL_WIDTH  = AscCommonWord.GlobalSkin.STYLE_THUMBNAIL_WIDTH;
+    this.STYLE_THUMBNAIL_HEIGHT = AscCommonWord.GlobalSkin.STYLE_THUMBNAIL_HEIGHT;
 
     this.CurrentTranslate = null;
     this.IsRetinaEnabled = false;
@@ -5140,8 +5140,8 @@ CStylesPainter.prototype =
         var hdr = new CHeaderFooter(_api.WordControl.m_oLogicDocument.HdrFtr, _api.WordControl.m_oLogicDocument, _api.WordControl.m_oDrawingDocument, AscCommon.hdrftr_Header);
         var _dc = hdr.Content;//new CDocumentContent(editor.WordControl.m_oLogicDocument, editor.WordControl.m_oDrawingDocument, 0, 0, 0, 0, false, true, false);
 
-        var par = new Paragraph(_api.WordControl.m_oDrawingDocument, _dc, 0, 0, 0, 0, false);
-        var run = new ParaRun(par, false);
+        var par = new AscCommonWord.Paragraph(_api.WordControl.m_oDrawingDocument, _dc, 0, 0, 0, 0, false);
+        var run = new AscCommonWord.ParaRun(par, false);
 
         for (var i = 0; i < style.Name.length; i++)
         {
@@ -5274,12 +5274,12 @@ asc_docs_api.prototype["Native_Editor_Initialize_Settings"] = function(_params)
         {
             case 0:
             {
-                GlobalSkin.STYLE_THUMBNAIL_WIDTH = _params[_current.pos++];
+                AscCommonWord.GlobalSkin.STYLE_THUMBNAIL_WIDTH = _params[_current.pos++];
                 break;
             }
             case 1:
             {
-                GlobalSkin.STYLE_THUMBNAIL_HEIGHT = _params[_current.pos++];
+                AscCommonWord.GlobalSkin.STYLE_THUMBNAIL_HEIGHT = _params[_current.pos++];
                 break;
             }
             case 2:

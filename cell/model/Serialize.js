@@ -8077,6 +8077,7 @@
     }
 
     window['Asc'] = window['Asc'] || {};
+    window['AscCommonExcel'] = window['AscCommonExcel'] || {};
     window["Asc"].EBorderStyle = EBorderStyle;
     window["Asc"].EUnderline = EUnderline;
     window["Asc"].EVerticalAlignRun = EVerticalAlignRun;
@@ -8103,8 +8104,8 @@
     window["Asc"].CTableStyles = CTableStyles;
     window["Asc"].CTableStyle = CTableStyle;
     window["Asc"].CTableStyleElement = CTableStyleElement;
-    window["Asc"].BinaryFileReader = BinaryFileReader;
-    window["Asc"].BinaryFileWriter = BinaryFileWriter;
+    window["AscCommonExcel"].BinaryFileReader = BinaryFileReader;
+    window["AscCommonExcel"].BinaryFileWriter = BinaryFileWriter;
 
     window["Asc"].getBinaryOtherTableGVar = getBinaryOtherTableGVar;
 })(window);

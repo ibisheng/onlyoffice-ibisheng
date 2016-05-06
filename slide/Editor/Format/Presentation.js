@@ -368,7 +368,7 @@ function CPresentation(DrawingDocument)
     this.StartPage = 0; // Для совместимости с CDocumentContent
     this.CurPage   = 0;
 
-    this.Orientation = orientation_Portrait; // ориентация страницы
+    this.Orientation = Asc.c_oAscPageOrientation.PagePortrait; // ориентация страницы
 
     this.slidesToUnlock = [];
 

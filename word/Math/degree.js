@@ -1181,6 +1181,11 @@ AscCommon.extendClass(CMathMenuScript, CMathMenuBase);
 CMathMenuScript.prototype.get_ScriptType = function(){return this.ScriptType;};
 CMathMenuScript.prototype.put_ScriptType = function(Type){this.ScriptType = Type;};
 
+//--------------------------------------------------------export----------------------------------------------------
+window['AscCommonWord'] = window['AscCommonWord'] || {};
+window['AscCommonWord'].CDegreeSubSup = CDegreeSubSup;
+window['AscCommonWord'].CDegree = CDegree;
+
 window["CMathMenuScript"] = CMathMenuScript;
 CMathMenuScript.prototype["get_ScriptType"] = CMathMenuScript.prototype.get_ScriptType;
 CMathMenuScript.prototype["put_ScriptType"] = CMathMenuScript.prototype.put_ScriptType;

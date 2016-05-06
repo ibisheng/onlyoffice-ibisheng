@@ -130,13 +130,13 @@ CWordCollaborativeEditing.prototype.Release_Locks = function()
         {
             this.m_aNeedUnlock[Index].Lock.Set_Type(AscCommon.locktype_None, false);
 
-            if (this.m_aNeedUnlock[Index] instanceof CHeaderFooterController)
+            if (this.m_aNeedUnlock[Index] instanceof AscCommonWord.CHeaderFooterController)
                 editor.sync_UnLockHeaderFooters();
-            else if (this.m_aNeedUnlock[Index] instanceof CDocument)
+            else if (this.m_aNeedUnlock[Index] instanceof AscCommonWord.CDocument)
                 editor.sync_UnLockDocumentProps();
-            else if (this.m_aNeedUnlock[Index] instanceof CComment)
+            else if (this.m_aNeedUnlock[Index] instanceof AscCommon.CComment)
                 editor.sync_UnLockComment(this.m_aNeedUnlock[Index].Get_Id());
-            else if (this.m_aNeedUnlock[Index] instanceof CGraphicObjects)
+            else if (this.m_aNeedUnlock[Index] instanceof AscCommonWord.CGraphicObjects)
                 editor.sync_UnLockDocumentSchema();
         }
         else if (AscCommon.locktype_Other3 === CurLockType)
@@ -368,7 +368,7 @@ CWordCollaborativeEditing.prototype.Update_ForeignCursorPosition = function(User
 {
     var DrawingDocument = this.m_oLogicDocument.DrawingDocument;
 
-    if (!(Run instanceof ParaRun))
+    if (!(Run instanceof AscCommonWord.ParaRun))
         return;
 
     var Paragraph = Run.Get_Paragraph();

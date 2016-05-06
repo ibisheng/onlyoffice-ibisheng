@@ -1448,3 +1448,7 @@ ParaComment.prototype.Check_RevisionsChanges = function(Checker, ContentPos, Dep
 ParaComment.prototype.Accept_RevisionChanges = function(Type, bAll){};
 ParaComment.prototype.Reject_RevisionChanges = function(Type, bAll){};
 
+//--------------------------------------------------------export----------------------------------------------------
+window['AscCommon'] = window['AscCommon'] || {};
+window['AscCommon'].CComment = CComment;
+window['AscCommon'].ParaComment = ParaComment;

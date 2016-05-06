@@ -1278,3 +1278,8 @@ CComment.prototype =
             editor.WordControl.m_oLogicDocument.Remove_Comment( this.Id, true );
     }
 };
+
+//--------------------------------------------------------export----------------------------------------------------
+window['AscCommon'] = window['AscCommon'] || {};
+window['AscCommon'].CComment = CComment;
+window['AscCommon'].ParaComment = ParaComment;

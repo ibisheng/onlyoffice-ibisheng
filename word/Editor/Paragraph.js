@@ -15134,3 +15134,8 @@ CParagraphRevisionsChangesChecker.prototype.Get_PrChangeUserId = function()
 {
     return this.TextPr.UserId;
 };
+
+//--------------------------------------------------------export----------------------------------------------------
+window['AscCommonWord'] = window['AscCommonWord'] || {};
+window['AscCommonWord'].Paragraph = Paragraph;
+window['AscCommonWord'].UnknownValue = UnknownValue;

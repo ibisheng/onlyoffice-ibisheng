@@ -7473,3 +7473,8 @@ function ParagraphContent_Read_FromBinary(Reader)
 
     return Element;
 }
+
+//--------------------------------------------------------export----------------------------------------------------
+window['AscCommonWord'] = window['AscCommonWord'] || {};
+window['AscCommonWord'].ParaTextPr = ParaTextPr;
+window['AscCommonWord'].ParaDrawing = ParaDrawing;

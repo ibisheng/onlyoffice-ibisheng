@@ -1573,7 +1573,7 @@
     ApiSection.prototype.SetPageSize = function(nWidth, nHeight, isPortrait)
     {
         this.Section.Set_PageSize(private_Twips2MM(nWidth), private_Twips2MM(nHeight));
-        this.Section.Set_Orientation(false === isPortrait ? orientation_Landscape : orientation_Portrait, false);
+        this.Section.Set_Orientation(false === isPortrait ? Asc.c_oAscPageOrientation.PageLandscape : Asc.c_oAscPageOrientation.PagePortrait, false);
     };
     /**
      * Specify the page margins for all pages in this section.
@@ -2264,9 +2264,9 @@
             isNone = false;
 
         if (true === isNone)
-            this.TextPr.HighLight = highlight_None;
+            this.TextPr.HighLight = AscCommonWord.highlight_None;
         else
-            this.TextPr.HighLight = new CDocumentColor(r, g, b, false);
+            this.TextPr.HighLight = new AscCommonWord.CDocumentColor(r, g, b, false);
 
         this.private_OnChange();
     };
@@ -4197,7 +4197,7 @@
 
     function private_GetColor(r, g, b, Auto)
     {
-        return new CDocumentColor(r, g, b, Auto ? Auto : false);
+        return new AscCommonWord.CDocumentColor(r, g, b, Auto ? Auto : false);
     }
 
     function private_GetTabStop(nPos, sValue)

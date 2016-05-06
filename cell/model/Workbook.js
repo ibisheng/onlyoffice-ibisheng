@@ -2956,7 +2956,7 @@ Workbook.prototype.DeserializeHistory = function(aChanges, fCallback){
 		var aUndoRedoElems = [];
 		for (i = 0; i < length; ++i) {
 		    sChange = aChanges[i];
-			var oBinaryFileReader = new Asc.BinaryFileReader();
+			var oBinaryFileReader = new AscCommonExcel.BinaryFileReader();
 			nCurOffset = oBinaryFileReader.getbase64DecodedData2(sChange, aIndexes[i], stream, nCurOffset);
 			var item = new UndoRedoItemSerializable();
 			item.Deserialize(stream);

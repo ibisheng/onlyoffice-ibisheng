@@ -110,3 +110,8 @@ g_oDocumentDefaultTablePr.Init_Default();
 g_oDocumentDefaultTableCellPr.Init_Default();
 g_oDocumentDefaultTableRowPr.Init_Default();
 g_oDocumentDefaultTableStylePr.Init_Default();
+
+//------------------------------------------------------------export----------------------------------------------------
+CAscTableStyle.prototype['get_Id'] = CAscTableStyle.prototype.get_Id;
+CAscTableStyle.prototype['get_Image'] = CAscTableStyle.prototype.get_Image;
+CAscTableStyle.prototype['get_Type'] = CAscTableStyle.prototype.get_Type;

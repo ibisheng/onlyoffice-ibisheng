@@ -937,6 +937,13 @@
                     ( b.length == 1? "0" + b: b);
               }
               return this.hex;
+          },
+
+          Compare: function(Color) {
+              return (this.r === Color.r && this.g === Color.g && this.b === Color.b && this.a === Color.a);
+          },
+          Copy: function() {
+              return new CColor(this.r, this.g, this.b, this.a);
           }
       };
 
@@ -1304,7 +1311,7 @@
               this.Brd               = (undefined != obj.Brd     && null != obj.Brd)     ? new asc_CParagraphBorders (obj.Brd) : null;
               this.Shd               = (undefined != obj.Shd     && null != obj.Shd)     ? new asc_CParagraphShd (obj.Shd) : null;
               this.Tabs              = (undefined != obj.Tabs)                           ? new asc_CParagraphTabs(obj.Tabs) : undefined;
-              this.DefaultTab        = Default_Tab_Stop;
+              this.DefaultTab        = AscCommonWord.Default_Tab_Stop;
               this.Locked            = (undefined != obj.Locked  && null != obj.Locked ) ? obj.Locked : false;
               this.CanAddTable       = (undefined != obj.CanAddTable )                   ? obj.CanAddTable : true;
 
@@ -1817,12 +1824,12 @@
           asc_getOriginSize: function(api)
           {
               var _section_select = api.WordControl.m_oLogicDocument.Get_PageSizesByDrawingObjects();
-              var _page_width             = Page_Width;
-              var _page_height            = Page_Height;
-              var _page_x_left_margin     = X_Left_Margin;
-              var _page_y_top_margin      = Y_Top_Margin;
-              var _page_x_right_margin    = X_Right_Margin;
-              var _page_y_bottom_margin   = Y_Bottom_Margin;
+              var _page_width             = AscCommon.Page_Width;
+              var _page_height            = AscCommon.Page_Height;
+              var _page_x_left_margin     = AscCommon.X_Left_Margin;
+              var _page_y_top_margin      = AscCommon.Y_Top_Margin;
+              var _page_x_right_margin    = AscCommon.X_Right_Margin;
+              var _page_y_bottom_margin   = AscCommon.Y_Bottom_Margin;
 
               if (_section_select)
               {

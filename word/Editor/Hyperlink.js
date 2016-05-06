@@ -632,3 +632,7 @@ function CParaHyperLinkStartState(HyperLink)
         this.Content.push(HyperLink.Content);
     }
 }
+
+//--------------------------------------------------------export----------------------------------------------------
+window['AscCommonWord'] = window['AscCommonWord'] || {};
+window['AscCommonWord'].ParaHyperlink = ParaHyperlink;

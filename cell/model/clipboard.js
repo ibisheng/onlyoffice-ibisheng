@@ -577,7 +577,7 @@
 					cloneActiveRange.r2 = temp;
 				};
 				
-				var oBinaryFileWriter = new Asc.BinaryFileWriter(worksheet.model.workbook, cloneActiveRange);
+				var oBinaryFileWriter = new AscCommonExcel.BinaryFileWriter(worksheet.model.workbook, cloneActiveRange);
 				var sBase64 = oBinaryFileWriter.Write();
 				
 				pptx_content_writer.End_UseFullUrl();
@@ -609,7 +609,7 @@
 						{
 							pptx_content_writer.Start_UseFullUrl();
 							
-							var oBinaryFileWriter = new Asc.BinaryFileWriter(worksheet.model.workbook, worksheet.activeRange);
+							var oBinaryFileWriter = new AscCommonExcel.BinaryFileWriter(worksheet.model.workbook, worksheet.activeRange);
 							var sBase64 = oBinaryFileWriter.Write();
 							if(this.element.children && this.element.children.length == 1 && AscBrowser.isWebkit && (true !== AscBrowser.isSafariMacOs))
 							{
@@ -688,7 +688,7 @@
 					{
 						pptx_content_writer.Start_UseFullUrl();
 						
-						var oBinaryFileWriter = new Asc.BinaryFileWriter(worksheet.model.workbook, worksheet.activeRange);
+						var oBinaryFileWriter = new AscCommonExcel.BinaryFileWriter(worksheet.model.workbook, worksheet.activeRange);
 						var sBase64 = oBinaryFileWriter.Write();
 						
 						//for buttons copy/paste
@@ -1689,7 +1689,7 @@
 			
 			_pasteFromBinaryExcel: function(worksheet, base64, isIntoShape)
 			{
-				var oBinaryFileReader = new Asc.BinaryFileReader(true);
+				var oBinaryFileReader = new AscCommonExcel.BinaryFileReader(true);
 				var tempWorkbook = new AscCommonExcel.Workbook();
 				var t = this;
 				
@@ -2293,7 +2293,7 @@
 				pptx_content_loader.Start_UseFullUrl();
 				
 			    var openParams = { checkFileSize: false, charCount: 0, parCount: 0 };
-			    var oBinaryFileReader = new BinaryFileReader(newCDocument, openParams);
+			    var oBinaryFileReader = new AscCommonWord.BinaryFileReader(newCDocument, openParams);
 			    var oRes = oBinaryFileReader.ReadFromString(sBase64);
 				
 				pptx_content_loader.End_UseFullUrl();
@@ -5326,8 +5326,8 @@
 		}
 
 		//---------------------------------------------------------export---------------------------------------------------
-		window["AscCommonExcel"].Clipboard = Clipboard;
 		window['AscCommonExcel'] = window['AscCommonExcel'] || {};
+		window["AscCommonExcel"].Clipboard = Clipboard;
 		window["AscCommonExcel"].SafariIntervalFocus2 = SafariIntervalFocus2;
 	}
 )(jQuery, window);

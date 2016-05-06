@@ -67,6 +67,12 @@ var c_oSerShdType = {
     Color: 1,
 	ColorTheme: 2
 };
+  var c_oSer_ColorThemeType = {
+    Auto: 0,
+    Color: 1,
+    Tint: 2,
+    Shade: 3
+  };
 
 function BinaryCommonWriter(memory)
 {
@@ -120,7 +126,7 @@ BinaryCommonWriter.prototype.WriteBorder = function(border)
             var doc = editor.WordControl.m_oLogicDocument;
             border.Unifill.check(doc.Get_Theme(), doc.Get_ColorMap());
             var RGBA = border.Unifill.getRGBAColor();
-            color = new CDocumentColor(RGBA.R, RGBA.G, RGBA.B);
+            color = new AscCommonWord.CDocumentColor(RGBA.R, RGBA.G, RGBA.B);
         }
         if (null != color && !color.Auto)
             this.WriteColor(c_oSerBorderType.Color, color);
@@ -196,7 +202,7 @@ BinaryCommonWriter.prototype.WriteShd = function(Shd)
         var doc = editor.WordControl.m_oLogicDocument;
         Shd.Unifill.check(doc.Get_Theme(), doc.Get_ColorMap());
         var RGBA = Shd.Unifill.getRGBAColor();
-        color = new CDocumentColor(RGBA.R, RGBA.G, RGBA.B);
+        color = new AscCommonWord.CDocumentColor(RGBA.R, RGBA.G, RGBA.B);
     }
     if (null != color && !color.Auto)
         this.WriteColor(c_oSerShdType.Color, color);
@@ -446,8 +452,8 @@ Binary_CommonReader.prototype.ReadColor = function()
 {
     var r = this.stream.GetUChar();
     var g = this.stream.GetUChar();
-    var b = this.stream.GetUChar()
-    return new CDocumentColor(r, g, b);
+    var b = this.stream.GetUChar();
+    return new AscCommonWord.CDocumentColor(r, g, b);
 };
 Binary_CommonReader.prototype.ReadShd = function(type, length, Shd, themeColor)
 {

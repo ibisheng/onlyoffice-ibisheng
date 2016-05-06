@@ -2418,3 +2418,8 @@ function CHdrFtrPage()
     this.Header = null;
     this.Footer = null;
 }
+
+//--------------------------------------------------------export----------------------------------------------------
+window['AscCommonWord'] = window['AscCommonWord'] || {};
+window['AscCommonWord'].CHeaderFooter = CHeaderFooter;
+window['AscCommonWord'].CHeaderFooterController = CHeaderFooterController;

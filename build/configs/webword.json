@@ -2,18 +2,25 @@
   "compile": {
     "sdk": {
       "common": [
-        "../common/Build/License.js",
         "../common/browser.js",
-        "../common/commonDefines.js",
-        "../common/downloaderfiles.js",
-        "../common/docscoapicommon.js",
+		"../common/commonDefines.js",
+		"../common/docscoapicommon.js",
         "../common/docscoapi.js",
-        "../common/spellcheckapi.js",
+		"../common/spellcheckapi.js",
         "../common/spellCheckLanguage.js",
         "../common/spellCheckLanguagesAll.js",
-        "../common/apiCommon.js",
+		"../common/apiCommon.js",
 		"../common/SerializeCommonWordExcel.js",
         "../common/editorscommon.js",
+		"../word/apiDefines.js",
+		"../common/CollaborativeEditingBase.js",
+		"../word/Editor/CollaborativeEditing.js",
+		"../common/apiBase.js",
+		"../common/Private/license.js",
+		"../word/api.js",
+		
+		"../common/Build/License.js",
+        "../common/downloaderfiles.js",
         "../common/NumFormat.js",
 		"../common/SerializeChart.js",
 		"../common/AdvancedOptions.js",
@@ -68,7 +75,6 @@
 		
 		"../common/Drawings/Externals.js",
 		"../common/GlobalLoaders.js",
-		"../common/CollaborativeEditingBase.js",
 		"../common/Controls.js",
 		"../common/Overlay.js",
 		"../common/Drawings/HatchPattern.js",
@@ -77,8 +83,6 @@
 		"../common/Scrolls/iscroll.js",
 
         "../common/wordcopypaste.js",
-
-        "../word/apiDefines.js",
 		
 		"../cell/utils/utils.js",
 		"../cell/model/WorkbookElems.js",
@@ -94,7 +98,6 @@
         "../word/Editor/GraphicObjects/GraphicObjects.js",
         "../word/Editor/GraphicObjects/GraphicPage.js",
         "../word/Editor/GraphicObjects/WrapManager.js",
-        "../word/Editor/CollaborativeEditing.js",
         "../word/Editor/Comments.js",
         "../word/Editor/Styles.js",
         "../word/Editor/FlowObjects.js",
@@ -145,13 +148,9 @@
         "../word/Math/radical.js",
         "../word/Math/operators.js",
         "../word/Math/accent.js",
-        "../word/Math/borderBox.js",
-		
-		"../common/apiBase.js",
-		"../word/api.js"
+        "../word/Math/borderBox.js"
       ],
       "private": [
-        "../common/Private/license.js",
         "../common/Private/versionHistory.js",
         "../word/Private/comments.js",
         "../word/Private/StyleManager.js",

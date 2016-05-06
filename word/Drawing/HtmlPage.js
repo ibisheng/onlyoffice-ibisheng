@@ -26,10 +26,8 @@ var X_Right_Margin  = 15;  // 1.5 cm
 var Y_Bottom_Margin = 20;  // 2   cm
 var Y_Top_Margin    = 20;  // 2   cm
 
-var X_Left_Field   = X_Left_Margin;
 var X_Right_Field  = Page_Width  - X_Right_Margin;
 var Y_Bottom_Field = Page_Height - Y_Bottom_Margin;
-var Y_Top_Field    = Y_Top_Margin;
 
 var docpostype_Content     = 0x00;
 var docpostype_HdrFtr      = 0x02;
@@ -37,9 +35,6 @@ var docpostype_HdrFtr      = 0x02;
 var selectionflag_Common        = 0x00;
 var selectionflag_Numbering     = 0x01;
 var selectionflag_DrawingObject = 0x002;
-
-var orientation_Portrait  = 0x00;
-var orientation_Landscape = 0x01;
 
 var tableSpacingMinValue = 0.02;//0.02мм
 
@@ -75,8 +70,21 @@ var GlobalSkinFlat = {
 
 var GlobalSkin = GlobalSkinTeamlab;
 
-window.IS_USE_INPUT = undefined;
-window.IS_USE_INPUT;
+function updateGlobalSkin(newSkin) {
+    GlobalSkin.Name = newSkin.Name;
+    GlobalSkin.RulersButton = newSkin.RulersButton;
+    GlobalSkin.NavigationButtons = newSkin.NavigationButtons;
+    GlobalSkin.BackgroundColor = newSkin.BackgroundColor;
+    GlobalSkin.RulerDark = newSkin.RulerDark;
+    GlobalSkin.RulerLight = newSkin.RulerLight;
+    GlobalSkin.BackgroundScroll = newSkin.BackgroundScroll;
+    GlobalSkin.RulerOutline = newSkin.RulerOutline;
+    GlobalSkin.RulerMarkersFillColor = newSkin.RulerMarkersFillColor;
+    GlobalSkin.PageOutline = newSkin.PageOutline;
+    GlobalSkin.STYLE_THUMBNAIL_WIDTH = newSkin.STYLE_THUMBNAIL_WIDTH;
+    GlobalSkin.STYLE_THUMBNAIL_HEIGHT = newSkin.STYLE_THUMBNAIL_HEIGHT;
+    GlobalSkin.isNeedInvertOnActive = newSkin.isNeedInvertOnActive;
+}
 
 function CEditorPage(api)
 {
@@ -767,24 +775,10 @@ function CEditorPage(api)
                 };
                 */
 
-                window.IS_USE_INPUT = true;
                 this.TextBoxBackground.HtmlElement["oninput"] = function(e)
                 {
                     var val = oThis.TextBoxBackground.HtmlElement.value;
                     oThis.TextBoxBackground.HtmlElement.value = "a";
-
-                    /*
-                    if (!window.IS_USE_INPUT && val == "aa")
-                    {
-                        if (e.preventDefault)
-                            e.preventDefault();
-
-                        e.returnValue = false;
-
-                        window.IS_USE_INPUT = true;
-                        return;
-                    }
-                    */
 
                     if (val.length == 2)
                     {
@@ -4339,7 +4333,17 @@ function CEditorPage(api)
 
 var _message_update = "zero_delay_update";
 
-function sendStatus(Message)
-{
-    editor.sync_StatusMessage(Message);
-}
+//------------------------------------------------------------export----------------------------------------------------
+window['AscCommon'] = window['AscCommon'] || {};
+window['AscCommonWord'] = window['AscCommonWord'] || {};
+window['AscCommonWord'].GlobalSkinFlat = GlobalSkinFlat;
+window['AscCommonWord'].GlobalSkin = GlobalSkin;
+window['AscCommonWord'].updateGlobalSkin = updateGlobalSkin;
+window['AscCommonWord'].CEditorPage = CEditorPage;
+
+window['AscCommon'].Page_Width = Page_Width;
+window['AscCommon'].Page_Height = Page_Height;
+window['AscCommon'].X_Left_Margin = X_Left_Margin;
+window['AscCommon'].X_Right_Margin = X_Right_Margin;
+window['AscCommon'].Y_Bottom_Margin = Y_Bottom_Margin;
+window['AscCommon'].Y_Top_Margin = Y_Top_Margin;

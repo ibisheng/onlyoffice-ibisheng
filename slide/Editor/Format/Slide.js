@@ -1731,3 +1731,9 @@ SlideComments.prototype =
         }
     }
 };
+
+//--------------------------------------------------------export----------------------------------------------------
+window['AscCommonSlide'] = window['AscCommonSlide'] || {};
+window['AscCommonSlide'].Slide = Slide;
+window['AscCommonSlide'].PropLocker = PropLocker;
+window['AscCommonSlide'].SlideComments = SlideComments;

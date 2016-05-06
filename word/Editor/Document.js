@@ -31,10 +31,8 @@ var X_Right_Margin  = 15;  // 1.5 cm
 var Y_Bottom_Margin = 20;  // 2   cm
 var Y_Top_Margin    = 20;  // 2   cm
 
-var X_Left_Field   = X_Left_Margin;
 var X_Right_Field  = Page_Width  - X_Right_Margin;
 var Y_Bottom_Field = Page_Height - Y_Bottom_Margin;
-var Y_Top_Field    = Y_Top_Margin;
 
 var docpostype_Content        = 0x00;
 var docpostype_HdrFtr         = 0x02;
@@ -43,9 +41,6 @@ var docpostype_DrawingObjects = 0x03;
 var selectionflag_Common        = 0x000;
 var selectionflag_Numbering     = 0x001;
 var selectionflag_DrawingObject = 0x002;
-
-var orientation_Portrait  = 0x00;
-var orientation_Landscape = 0x01;
 
 var search_Common              = 0x0000; // Поиск в простом тексте
 
@@ -8622,7 +8617,7 @@ CDocument.prototype.Get_DocumentOrientation        = function()
 
     var SectPr = SectionInfoElement.SectPr;
 
-    return ( SectPr.Get_Orientation() === orientation_Portrait ? true : false );
+    return ( SectPr.Get_Orientation() === Asc.c_oAscPageOrientation.PagePortrait ? true : false );
 };
 CDocument.prototype.Set_DocumentDefaultTab         = function(DTab)
 {
@@ -16333,8 +16328,7 @@ CDocument.prototype.Set_SectionProps = function(Props)
 
         if (undefined !== Props.get_Orientation())
         {
-            var Orient = Props.get_Orientation() === Asc.c_oAscPageOrientation.PagePortrait ? orientation_Portrait : orientation_Landscape;
-            SectPr.Set_Orientation(Orient, false);
+            SectPr.Set_Orientation(Props.get_Orientation(), false);
         }
 
         if (undefined !== Props.get_LeftMargin() || undefined !== Props.get_TopMargin() || undefined !== Props.get_RightMargin() || undefined !== Props.get_BottomMargin())
@@ -17366,3 +17360,15 @@ CDocumentNumberingInfoEngine.prototype.Get_NumInfo = function()
 {
     return this.NumInfo;
 };
+
+//-------------------------------------------------------------export---------------------------------------------------
+window['AscCommon'] = window['AscCommon'] || {};
+window['AscCommonWord'] = window['AscCommonWord'] || {};
+window['AscCommonWord'].CDocument = CDocument;
+
+window['AscCommon'].Page_Width = Page_Width;
+window['AscCommon'].Page_Height = Page_Height;
+window['AscCommon'].X_Left_Margin = X_Left_Margin;
+window['AscCommon'].X_Right_Margin = X_Right_Margin;
+window['AscCommon'].Y_Bottom_Margin = Y_Bottom_Margin;
+window['AscCommon'].Y_Top_Margin = Y_Top_Margin;

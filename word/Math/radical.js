@@ -759,6 +759,10 @@ AscCommon.extendClass(CMathMenuRadical, CMathMenuBase);
 CMathMenuRadical.prototype.get_HideDegree = function(){return this.HideDegree;};
 CMathMenuRadical.prototype.put_HideDegree = function(Hide){this.HideDegree = Hide;};
 
+//--------------------------------------------------------export----------------------------------------------------
+window['AscCommonWord'] = window['AscCommonWord'] || {};
+window['AscCommonWord'].CRadical = CRadical;
+
 window["CMathMenuRadical"] = CMathMenuRadical;
 CMathMenuRadical.prototype["get_HideDegree"] = CMathMenuRadical.prototype.get_HideDegree;
 CMathMenuRadical.prototype["put_HideDegree"] = CMathMenuRadical.prototype.put_HideDegree;

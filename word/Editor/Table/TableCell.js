@@ -2649,3 +2649,7 @@ CTableCellRecalculateObject.prototype =
     }
 
 };
+
+//--------------------------------------------------------export----------------------------------------------------
+window['AscCommonWord'] = window['AscCommonWord'] || {};
+window['AscCommonWord'].CTableCell = CTableCell;

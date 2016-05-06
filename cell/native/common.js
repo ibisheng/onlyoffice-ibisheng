@@ -38,6 +38,12 @@ var AscCH = window["AscCH"];
 window["AscCommonExcel"] = {};
 var AscCommonExcel = window["AscCommonExcel"];
 
+window["AscCommonWord"] = {};
+var AscCommonWord = window["AscCommonWord"];
+
+window["AscCommonSlide"] = {};
+var AscCommonSlide = window["AscCommonSlide"];
+
 function Image() {
     this.src = "";
     this.onload = function()

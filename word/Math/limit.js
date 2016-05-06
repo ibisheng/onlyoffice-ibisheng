@@ -380,3 +380,8 @@ CMathFunc.prototype.fillContent = function()
     this.elements[0][0] = this.getFName();
     this.elements[0][1] = this.getArgument();
 };
+
+//--------------------------------------------------------export----------------------------------------------------
+window['AscCommonWord'] = window['AscCommonWord'] || {};
+window['AscCommonWord'].CMathFunc = CMathFunc;
+window['AscCommonWord'].CLimit = CLimit;

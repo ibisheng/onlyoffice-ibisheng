@@ -689,12 +689,6 @@ var c_oSer_FldSimpleType = {
 	Content: 0,
 	Instr: 1
 };
-var c_oSer_ColorThemeType = {
-	Auto: 0,
-	Color: 1,
-	Tint: 2,
-	Shade: 3
-};
 var c_oSerProp_RevisionType = {
     Author: 0,
     Date: 1,
@@ -12546,3 +12540,8 @@ OpenParStruct.prototype = {
         return this.cur.pos;
     }
 }
+
+//---------------------------------------------------------export---------------------------------------------------
+window['AscCommonWord'] = window['AscCommonWord'] || {};
+window["AscCommonWord"].BinaryFileReader = BinaryFileReader;
+window["AscCommonWord"].BinaryFileWriter = BinaryFileWriter;
