@@ -11013,6 +11013,11 @@ CReviewInfo.prototype.Get_UserId = function()
     return this.UserId;
 };
 
+function CanUpdatePosition(Para, Run) {
+    return (Para && true === Para.Is_UseInDocument() && true === Run.Is_UseInParagraph());
+}
+
 //--------------------------------------------------------export----------------------------------------------------
 window['AscCommonWord'] = window['AscCommonWord'] || {};
 window['AscCommonWord'].ParaRun = ParaRun;
+window['AscCommonWord'].CanUpdatePosition = CanUpdatePosition;

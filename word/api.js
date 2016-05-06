@@ -791,7 +791,7 @@ asc_docs_api.prototype._coAuthoringInitEnd = function() {
   };
   this.CoAuthoringApi.onConnectionStateChanged = function(e) {
     if (true === AscCommon.CollaborativeEditing.Is_Fast() && false === e['state']) {
-      editor.WordControl.m_oLogicDocument.Remove_ForeignCursor(e['id']);
+      t.WordControl.m_oLogicDocument.Remove_ForeignCursor(e['id']);
     }
     t.asc_fireCallback("asc_onConnectionStateChanged", e);
   };
@@ -821,17 +821,17 @@ asc_docs_api.prototype._coAuthoringInitEnd = function() {
         Lock.Set_UserId(e["user"]);
 
         if (Class instanceof AscCommonWord.CHeaderFooterController) {
-          editor.sync_LockHeaderFooters();
+          t.sync_LockHeaderFooters();
         } else if (Class instanceof AscCommonWord.CDocument) {
-          editor.sync_LockDocumentProps();
+          t.sync_LockDocumentProps();
         } else if (Class instanceof AscCommon.CComment) {
-          editor.sync_LockComment(Class.Get_Id(), e["user"]);
+          t.sync_LockComment(Class.Get_Id(), e["user"]);
         } else if (Class instanceof AscCommonWord.CGraphicObjects) {
-          editor.sync_LockDocumentSchema();
+          t.sync_LockDocumentSchema();
         }
 
         // Теперь обновлять состояние необходимо, чтобы обновить локи в режиме рецензирования.
-        editor.WordControl.m_oLogicDocument.Document_UpdateInterfaceState();
+        t.WordControl.m_oLogicDocument.Document_UpdateInterfaceState();
       } else {
         AscCommon.CollaborativeEditing.Add_NeedLock(Id, e["user"]);
       }
@@ -872,50 +872,50 @@ asc_docs_api.prototype._coAuthoringInitEnd = function() {
         Lock.Set_Type(NewType, true);
 
         // Теперь обновлять состояние необходимо, чтобы обновить локи в режиме рецензирования.
-        editor.WordControl.m_oLogicDocument.Document_UpdateInterfaceState();
+        t.WordControl.m_oLogicDocument.Document_UpdateInterfaceState();
 
           if (Class instanceof AscCommonWord.CHeaderFooterController)
           {
               if (NewType !== locktype_Mine && NewType !== locktype_None)
               {
-                  editor.sync_LockHeaderFooters();
+                t.sync_LockHeaderFooters();
               }
               else
               {
-                  editor.sync_UnLockHeaderFooters();
+                t.sync_UnLockHeaderFooters();
               }
           }
           else if (Class instanceof AscCommonWord.CDocument)
           {
               if (NewType !== locktype_Mine && NewType !== locktype_None)
               {
-                  editor.sync_LockDocumentProps();
+                t.sync_LockDocumentProps();
               }
               else
               {
-                  editor.sync_UnLockDocumentProps();
+                t.sync_UnLockDocumentProps();
               }
           }
           else if (Class instanceof AscCommon.CComment)
           {
               if (NewType !== locktype_Mine && NewType !== locktype_None)
               {
-                  editor.sync_LockComment(Class.Get_Id(), e["user"]);
+                t.sync_LockComment(Class.Get_Id(), e["user"]);
               }
               else
               {
-                  editor.sync_UnLockComment(Class.Get_Id());
+                t.sync_UnLockComment(Class.Get_Id());
               }
           }
           else if (Class instanceof AscCommonWord.CGraphicObjects)
           {
               if (NewType !== locktype_Mine && NewType !== locktype_None)
               {
-                  editor.sync_LockDocumentSchema();
+                t.sync_LockDocumentSchema();
               }
               else
               {
-                  editor.sync_UnLockDocumentSchema();
+                t.sync_UnLockDocumentSchema();
               }
           }
       }
@@ -928,7 +928,7 @@ asc_docs_api.prototype._coAuthoringInitEnd = function() {
     if (bFirstLoad) {
       bUseColor = -1 === AscCommon.CollaborativeEditing.m_nUseType;
     }
-    if (editor.CollaborativeMarksShowType === c_oAscCollaborativeMarksShowType.None) {
+    if (t.CollaborativeMarksShowType === c_oAscCollaborativeMarksShowType.None) {
       bUseColor = false;
     }
 
@@ -972,7 +972,7 @@ asc_docs_api.prototype._coAuthoringInitEnd = function() {
   };
   this.CoAuthoringApi.onEndCoAuthoring = function(isStartEvent) {
     AscCommon.CollaborativeEditing.End_CollaborationEditing();
-    editor.asc_setDrawCollaborationMarks(false);
+    t.asc_setDrawCollaborationMarks(false);
   };
 };
 
@@ -6858,6 +6858,13 @@ asc_docs_api.prototype._onEndLoadSdk = function() {
   this.asc_setDrawCollaborationMarks(this.tmpCoMarksDraw);
 
   asc_docs_api.superclass._onEndLoadSdk.call(this);
+};
+
+asc_docs_api.prototype.Stop_Recalculate = function() {
+  this.WordControl.m_oLogicDocument.Stop_Recalculate();
+};
+asc_docs_api.prototype.Document_UpdateUndoRedoState = function() {
+  editor.WordControl.m_oLogicDocument.Document_UpdateUndoRedoState();
 };
 
 window["asc_docs_api"] = asc_docs_api;

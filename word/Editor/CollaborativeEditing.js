@@ -114,7 +114,7 @@ CWordCollaborativeEditing.prototype.Send_Changes = function(IsUserSave, Addition
     }
 
     // TODO: Пока у нас обнуляется история на сохранении нужно обновлять Undo/Redo
-    editor.WordControl.m_oLogicDocument.Document_UpdateUndoRedoState();
+    editor.Document_UpdateUndoRedoState();
 
     // Перерисовываем документ (для обновления локов)
     editor.WordControl.m_oLogicDocument.DrawingDocument.ClearCachePages();
