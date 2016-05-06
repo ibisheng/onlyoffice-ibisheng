@@ -1599,7 +1599,7 @@ function CFontFile(fileName, faceIndex)
                 oSizes.oBitmap.nWidth  = pCurentGliph.bitmap.width;
                 oSizes.oBitmap.nHeight = pCurentGliph.bitmap.rows;
 
-                var _disable_need_bold = (pFace.os2 && (pFace.os2.version != 0xFFFF) && (pFace.os2.usWeightClass >= 800)) ? true : false;
+                var _disable_need_bold = (this.m_pFace.os2 && (this.m_pFace.os2.version != 0xFFFF) && (this.m_pFace.os2.usWeightClass >= 800)) ? true : false;
 
                 var nRowSize = 0;
                 if (this.m_bAntiAliasing && !_disable_need_bold)
