@@ -12804,6 +12804,13 @@
 						res.fontColors.push(ascFontColor);
                         alreadyAddFontColors[fontColor.rgb] = true;
                     }
+					else if(null === fontColor && true !== alreadyAddFontColors[g_oDefaultFont.c.rgb])
+					{
+						var ascFontColor = getAscColor(g_oDefaultFont.c);
+						
+						res.fontColors.push(ascFontColor);
+						alreadyAddFontColors[g_oDefaultFont.c.rgb] = true;
+					}
                 }
             }
             else
@@ -12816,6 +12823,13 @@
 					res.fontColors.push(ascFontColor);
                     alreadyAddFontColors[fontColor.rgb] = true;
                 }
+				else if(null === fontColor && true !== alreadyAddFontColors[g_oDefaultFont.c.rgb])
+				{
+					var ascFontColor = getAscColor(g_oDefaultFont.c);
+					
+					res.fontColors.push(ascFontColor);
+                    alreadyAddFontColors[g_oDefaultFont.c.rgb] = true;
+				}
             }
 
             var color = cell.getStyle();
@@ -12833,7 +12847,17 @@
 				res.colors.push(null);
 			}
         }
-
+		
+		//если один элемент в массиве, не отправляем его в меню
+		if(res.colors.length === 1)
+		{
+			res.colors = [];
+		}
+		if(res.fontColors.length === 1)
+		{
+			res.fontColors = [];
+		}
+		
         if(tempDigit > tempText)
         {
             res.text = false;
