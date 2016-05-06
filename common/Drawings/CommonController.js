@@ -641,7 +641,7 @@ DrawingObjectsController.prototype =
             }
             else
             {
-                this.arrPreTrackObjects.push(new PolarAdjustmentTrack(selectedObject, hit.adjNum, hit.warp));
+                this.arrPreTrackObjects.push(new AscFormat.PolarAdjustmentTrack(selectedObject, hit.adjNum, hit.warp));
             }
             if(!isRealObject(group))
             {
