@@ -676,9 +676,6 @@ asc_docs_api.prototype.SetInterfaceDrawImagePlaceTextArt = function(div_id)
     this.WordControl.m_oDrawingDocument.InitGuiCanvasTextArt(div_id);
 };
 
-asc_docs_api.prototype.SetInterfaceDrawImagePlace = function()
-{};
-
 asc_docs_api.prototype.OpenDocument2 = function(url, gObject)
 {
 	this.InitEditor();
@@ -3707,6 +3704,13 @@ asc_docs_api.prototype.asyncImageEndLoaded = function(_image)
 	}
 };
 
+asc_docs_api.prototype.openDocument = function(sData) {
+  this.OpenDocument2(sData.url, sData.data);
+  this.DocumentOrientation = (null == this.WordControl.m_oLogicDocument) ? true : !this.WordControl.m_oLogicDocument.Orientation;
+  this.sync_DocSizeCallback(AscCommon.Page_Width, AscCommon.Page_Height);
+  this.sync_PageOrientCallback(this.get_DocumentOrientation());
+};
+
 asc_docs_api.prototype.get_PresentationWidth = function()
 {
     if (this.WordControl.m_oLogicDocument == null)
@@ -4726,13 +4730,14 @@ asc_docs_api.prototype._onOpenCommand = function(data) {
 			return;
 		}
     t.onEndLoadFile(result);
-
-		t.OpenDocument2(result.url, result.data);
-		t.DocumentOrientation = (null == t.WordControl.m_oLogicDocument) ? true : !t.WordControl.m_oLogicDocument.Orientation;
-		t.sync_DocSizeCallback(AscCommon.Page_Width, AscCommon.Page_Height);
-		t.sync_PageOrientCallback(t.get_DocumentOrientation());
 	});
 };
+asc_docs_api.prototype._onEndLoadSdk = function() {
+  this.WordControl.m_oDrawingDocument.InitGuiCanvasShape(this.shapeElementId);
+
+  asc_docs_api.superclass._onEndLoadSdk.call(this);
+};
+
 function _downloadAs(editor, filetype, actionType, options)
 {
     if (!options) {
@@ -5079,7 +5084,6 @@ asc_docs_api.prototype['CreateComponents'] = asc_docs_api.prototype.CreateCompon
 asc_docs_api.prototype['InitEditor'] = asc_docs_api.prototype.InitEditor;
 asc_docs_api.prototype['SetInterfaceDrawImagePlaceSlide'] = asc_docs_api.prototype.SetInterfaceDrawImagePlaceSlide;
 asc_docs_api.prototype['SetInterfaceDrawImagePlaceTextArt'] = asc_docs_api.prototype.SetInterfaceDrawImagePlaceTextArt;
-asc_docs_api.prototype['SetInterfaceDrawImagePlace'] = asc_docs_api.prototype.SetInterfaceDrawImagePlace;
 asc_docs_api.prototype['OpenDocument2'] = asc_docs_api.prototype.OpenDocument2;
 asc_docs_api.prototype['asc_getDocumentName'] = asc_docs_api.prototype.asc_getDocumentName;
 asc_docs_api.prototype['asc_registerCallback'] = asc_docs_api.prototype.asc_registerCallback;
