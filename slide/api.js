@@ -1140,70 +1140,76 @@ asc_docs_api.prototype.Share = function(){
 
 };
 
-
-function OnSave_Callback(e) {
+asc_docs_api.prototype.onSaveCallback = function(e) {
+  var t = this;
   if (false == e["saveLock"]) {
-    if (editor.isLongAction()) {
+    if (this.isLongAction()) {
       // Мы не можем в этот момент сохранять, т.к. попали в ситуацию, когда мы залочили сохранение и успели нажать вставку до ответа
       // Нужно снять lock с сохранения
-      editor.CoAuthoringApi.onUnSaveLock = function() {
-        editor.canSave = true;
-        editor.IsUserSave = false;
+      this.CoAuthoringApi.onUnSaveLock = function() {
+        t.canSave = true;
+        t.IsUserSave = false;
       };
-      editor.CoAuthoringApi.unSaveLock();
+      this.CoAuthoringApi.unSaveLock();
       return;
     }
-    editor.sync_StartAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
+    this.sync_StartAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
 
-    if (c_oAscCollaborativeMarksShowType.LastChanges === editor.CollaborativeMarksShowType) {
+    if (c_oAscCollaborativeMarksShowType.LastChanges === this.CollaborativeMarksShowType) {
       AscCommon.CollaborativeEditing.Clear_CollaborativeMarks();
     }
 
     // Принимаем чужие изменения
     AscCommon.CollaborativeEditing.Apply_Changes();
 
-    editor.CoAuthoringApi.onUnSaveLock = function() {
-      editor.CoAuthoringApi.onUnSaveLock = null;
+    this.CoAuthoringApi.onUnSaveLock = function() {
+      t.CoAuthoringApi.onUnSaveLock = null;
 
       // Выставляем, что документ не модифицирован
-      editor.CheckChangedDocument();
-      editor.canSave = true;
-      editor.IsUserSave = false;
-      editor.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
+      t.CheckChangedDocument();
+      t.canSave = true;
+      t.IsUserSave = false;
+      t.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
 
       // Обновляем состояние возможности сохранения документа
-      editor._onUpdateDocumentCanSave();
+      t._onUpdateDocumentCanSave();
 
       if (undefined !== window["AscDesktopEditor"]) {
         window["AscDesktopEditor"]["OnSave"]();
       }
     };
-      var CursorInfo = null;
-      if (true === AscCommon.CollaborativeEditing.Is_Fast()) {
-          CursorInfo = History.Get_DocumentPositionBinary();
-      }
-      // Пересылаем свои изменения
-    AscCommon.CollaborativeEditing.Send_Changes(editor.IsUserSave, {UserId: editor.CoAuthoringApi.getUserConnectionId(), UserShortId : editor.DocInfo.get_UserId(), CursorInfo: CursorInfo});
+    var CursorInfo = null;
+    if (true === AscCommon.CollaborativeEditing.Is_Fast()) {
+      CursorInfo = History.Get_DocumentPositionBinary();
+    }
+    // Пересылаем свои изменения
+    AscCommon.CollaborativeEditing.Send_Changes(this.IsUserSave, {UserId: this.CoAuthoringApi.getUserConnectionId(), UserShortId : this.DocInfo.get_UserId(), CursorInfo: CursorInfo});
   } else {
-    var nState = editor.CoAuthoringApi.get_state();
+    var nState = this.CoAuthoringApi.get_state();
     if (AscCommon.ConnectionState.ClosedCoAuth === nState || AscCommon.ConnectionState.ClosedAll === nState) {
       // Отключаемся от сохранения, соединение потеряно
-      editor.canSave = true;
-      editor.IsUserSave = false;
+      this.canSave = true;
+      this.IsUserSave = false;
     } else {
       var TimeoutInterval = (true === AscCommon.CollaborativeEditing.Is_Fast() ? 1 : 1000);
       setTimeout(function() {
-        editor.CoAuthoringApi.askSaveChanges(OnSave_Callback);
+        t.CoAuthoringApi.askSaveChanges(function(event) {
+          t.onSaveCallback(event);
+        });
       }, TimeoutInterval);
     }
   }
-}
+};
 
 asc_docs_api.prototype.asc_Save = function(isAutoSave) {
   this.IsUserSave = !isAutoSave;
   if (true === this.canSave && !this.isLongAction()) {
     this.canSave = false;
-    this.CoAuthoringApi.askSaveChanges(OnSave_Callback);
+
+    var t = this;
+    this.CoAuthoringApi.askSaveChanges(function(e) {
+      t.onSaveCallback(e);
+    });
   }
 };
 asc_docs_api.prototype.asc_DownloadAs = function(typeFile, bIsDownloadEvent){//передаем число соответствующее своему формату.

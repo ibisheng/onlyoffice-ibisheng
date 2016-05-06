@@ -1828,21 +1828,22 @@ asc_docs_api.prototype.asc_PasteData = function(_format, data1, data2)
     }
 };
 
-function OnSave_Callback(e) {
+asc_docs_api.prototype.onSaveCallback = function(e) {
+  var t = this;
   if (false == e["saveLock"]) {
-    if (editor.isLongAction()) {
+    if (this.isLongAction()) {
       // Мы не можем в этот момент сохранять, т.к. попали в ситуацию, когда мы залочили сохранение и успели нажать вставку до ответа
       // Нужно снять lock с сохранения
-      editor.CoAuthoringApi.onUnSaveLock = function() {
-        editor.canSave = true;
-        editor.IsUserSave = false;
+      this.CoAuthoringApi.onUnSaveLock = function() {
+        t.canSave = true;
+        t.IsUserSave = false;
       };
-      editor.CoAuthoringApi.unSaveLock();
+      this.CoAuthoringApi.unSaveLock();
       return;
     }
-    editor.sync_StartAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
+    this.sync_StartAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
 
-    if (c_oAscCollaborativeMarksShowType.LastChanges === editor.CollaborativeMarksShowType) {
+    if (c_oAscCollaborativeMarksShowType.LastChanges === this.CollaborativeMarksShowType) {
       AscCommon.CollaborativeEditing.Clear_CollaborativeMarks();
     }
 
@@ -1850,17 +1851,17 @@ function OnSave_Callback(e) {
     var HaveOtherChanges = AscCommon.CollaborativeEditing.Have_OtherChanges();
     AscCommon.CollaborativeEditing.Apply_Changes();
 
-    editor.CoAuthoringApi.onUnSaveLock = function() {
-      editor.CoAuthoringApi.onUnSaveLock = null;
+    this.CoAuthoringApi.onUnSaveLock = function() {
+      t.CoAuthoringApi.onUnSaveLock = null;
 
       // Выставляем, что документ не модифицирован
-      editor.CheckChangedDocument();
-      editor.canSave = true;
-      editor.IsUserSave = false;
-      editor.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
+      t.CheckChangedDocument();
+      t.canSave = true;
+      t.IsUserSave = false;
+      t.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
 
       // Обновляем состояние возможности сохранения документа
-      editor._onUpdateDocumentCanSave();
+      t._onUpdateDocumentCanSave();
 
       if (undefined !== window["AscDesktopEditor"]) {
         window["AscDesktopEditor"]["OnSave"]();
@@ -1873,27 +1874,37 @@ function OnSave_Callback(e) {
     }
 
     // Пересылаем свои изменения
-    AscCommon.CollaborativeEditing.Send_Changes(editor.IsUserSave, {UserId: editor.CoAuthoringApi.getUserConnectionId(), UserShortId : editor.DocInfo.get_UserId(), CursorInfo: CursorInfo}, HaveOtherChanges);
+    AscCommon.CollaborativeEditing.Send_Changes(this.IsUserSave, {UserId: this.CoAuthoringApi.getUserConnectionId(), UserShortId : this.DocInfo.get_UserId(), CursorInfo: CursorInfo}, HaveOtherChanges);
   } else {
-    var nState = editor.CoAuthoringApi.get_state();
+    var nState = this.CoAuthoringApi.get_state();
     if (AscCommon.ConnectionState.ClosedCoAuth === nState || AscCommon.ConnectionState.ClosedAll === nState) {
       // Отключаемся от сохранения, соединение потеряно
-      editor.canSave = true;
-      editor.IsUserSave = false;
+      this.canSave = true;
+      this.IsUserSave = false;
     } else {
       var TimeoutInterval = (true === AscCommon.CollaborativeEditing.Is_Fast() ? 1 : 1000);
       setTimeout(function() {
-        editor.CoAuthoringApi.askSaveChanges(OnSave_Callback);
+        t.CoAuthoringApi.askSaveChanges(function(event) {
+          t.onSaveCallback(event);
+        });
       }, TimeoutInterval);
     }
   }
+};
+
+function OnSave_Callback(e) {
+
 }
 
 asc_docs_api.prototype.asc_Save = function(isAutoSave) {
   this.IsUserSave = !isAutoSave;
   if (true === this.canSave && !this.isLongAction()) {
     this.canSave = false;
-    this.CoAuthoringApi.askSaveChanges(OnSave_Callback);
+
+    var t = this;
+    this.CoAuthoringApi.askSaveChanges(function(e) {
+      t.onSaveCallback(e);
+    });
   }
 };
 asc_docs_api.prototype.asc_DownloadOrigin = function(bIsDownloadEvent) {
@@ -3300,130 +3311,6 @@ asc_docs_api.prototype.get_DocumentHeight = function()
     return AscCommon.Page_Height;
 };
 
-function CDocumentSectionProps(SectPr)
-{
-    if (SectPr)
-    {
-        this.W      = SectPr.Get_PageWidth();
-        this.H      = SectPr.Get_PageHeight();
-        this.Orient = SectPr.Get_Orientation();
-
-        this.Left   = SectPr.Get_PageMargin_Left();
-        this.Top    = SectPr.Get_PageMargin_Top();
-        this.Right  = SectPr.Get_PageMargin_Right();
-        this.Bottom = SectPr.Get_PageMargin_Bottom();
-
-        this.Header = SectPr.Get_PageMargins_Header();
-        this.Footer = SectPr.Get_PageMargins_Footer();
-    }
-    else
-    {
-        this.W      = undefined;
-        this.H      = undefined;
-        this.Orient = undefined;
-
-        this.Left   = undefined;
-        this.Top    = undefined;
-        this.Right  = undefined;
-        this.Bottom = undefined;
-
-        this.Header = undefined;
-        this.Footer = undefined;
-    }
-}
-CDocumentSectionProps.prototype.get_W = function()
-{
-    return this.W;
-};
-CDocumentSectionProps.prototype.put_W = function(W)
-{
-    this.W = W;
-};
-CDocumentSectionProps.prototype.get_H = function()
-{
-    return this.H;
-};
-CDocumentSectionProps.prototype.put_H = function(H)
-{
-    this.H = H;
-};
-CDocumentSectionProps.prototype.get_Orientation = function()
-{
-    return this.Orient;
-};
-CDocumentSectionProps.prototype.put_Orientation = function(Orient)
-{
-    this.Orient = Orient;
-};
-CDocumentSectionProps.prototype.get_LeftMargin = function()
-{
-    return this.Left;
-};
-CDocumentSectionProps.prototype.put_LeftMargin = function(Left)
-{
-    this.Left = Left;
-};
-CDocumentSectionProps.prototype.get_TopMargin = function()
-{
-    return this.Top;
-};
-CDocumentSectionProps.prototype.put_TopMargin = function(Top)
-{
-    this.Top = Top;
-};
-CDocumentSectionProps.prototype.get_RightMargin = function()
-{
-    return this.Right;
-};
-CDocumentSectionProps.prototype.put_RightMargin = function(Right)
-{
-    this.Right = Right;
-};
-CDocumentSectionProps.prototype.get_BottomMargin = function()
-{
-    return this.Bottom;
-};
-CDocumentSectionProps.prototype.put_BottomMargin = function(Bottom)
-{
-    this.Bottom = Bottom;
-};
-CDocumentSectionProps.prototype.get_HeaderDistance = function()
-{
-    return this.Header;
-};
-CDocumentSectionProps.prototype.put_HeaderDistance = function(Header)
-{
-    this.Header = Header;
-};
-CDocumentSectionProps.prototype.get_FooterDistance = function()
-{
-    return this.Footer;
-};
-CDocumentSectionProps.prototype.put_FooterDistance = function(Footer)
-{
-    this.Footer = Footer;
-};
-
-window["CDocumentSectionProps"] = CDocumentSectionProps;
-CDocumentSectionProps.prototype["get_W"]              = CDocumentSectionProps.prototype.get_W;
-CDocumentSectionProps.prototype["put_W"]              = CDocumentSectionProps.prototype.put_W;
-CDocumentSectionProps.prototype["get_H"]              = CDocumentSectionProps.prototype.get_H;
-CDocumentSectionProps.prototype["put_H"]              = CDocumentSectionProps.prototype.put_H;
-CDocumentSectionProps.prototype["get_Orientation"]    = CDocumentSectionProps.prototype.get_Orientation;
-CDocumentSectionProps.prototype["put_Orientation"]    = CDocumentSectionProps.prototype.put_Orientation;
-CDocumentSectionProps.prototype["get_LeftMargin"]     = CDocumentSectionProps.prototype.get_LeftMargin;
-CDocumentSectionProps.prototype["put_LeftMargin"]     = CDocumentSectionProps.prototype.put_LeftMargin;
-CDocumentSectionProps.prototype["get_TopMargin"]      = CDocumentSectionProps.prototype.get_TopMargin;
-CDocumentSectionProps.prototype["put_TopMargin"]      = CDocumentSectionProps.prototype.put_TopMargin;
-CDocumentSectionProps.prototype["get_RightMargin"]    = CDocumentSectionProps.prototype.get_RightMargin;
-CDocumentSectionProps.prototype["put_RightMargin"]    = CDocumentSectionProps.prototype.put_RightMargin;
-CDocumentSectionProps.prototype["get_BottomMargin"]   = CDocumentSectionProps.prototype.get_BottomMargin;
-CDocumentSectionProps.prototype["put_BottomMargin"]   = CDocumentSectionProps.prototype.put_BottomMargin;
-CDocumentSectionProps.prototype["get_HeaderDistance"] = CDocumentSectionProps.prototype.get_HeaderDistance;
-CDocumentSectionProps.prototype["put_HeaderDistance"] = CDocumentSectionProps.prototype.put_HeaderDistance;
-CDocumentSectionProps.prototype["get_FooterDistance"] = CDocumentSectionProps.prototype.get_FooterDistance;
-CDocumentSectionProps.prototype["put_FooterDistance"] = CDocumentSectionProps.prototype.put_FooterDistance;
-
 asc_docs_api.prototype.asc_SetSectionProps = function(Props)
 {
     this.WordControl.m_oLogicDocument.Set_SectionProps(Props);
@@ -3438,113 +3325,6 @@ asc_docs_api.prototype.sync_SectionPropsCallback = function(Props)
 };
 asc_docs_api.prototype["asc_SetSectionProps"] = asc_docs_api.prototype.asc_SetSectionProps;
 asc_docs_api.prototype["asc_GetSectionProps"] = asc_docs_api.prototype.asc_GetSectionProps;
-
-function CDocumentColumnProps()
-{
-    this.W     = 0;
-    this.Space = 0;
-}
-CDocumentColumnProps.prototype.put_W = function(W)
-{
-    this.W = W;
-};
-CDocumentColumnProps.prototype.get_W = function()
-{
-    return this.W;
-};
-CDocumentColumnProps.prototype.put_Space = function(Space)
-{
-    this.Space = Space;
-};
-CDocumentColumnProps.prototype.get_Space = function()
-{
-    return this.Space;
-};
-
-function CDocumentColumnsProps()
-{
-    this.EqualWidth = true;
-    this.Num        = 1;
-    this.Sep        = false;
-    this.Space      = 30;
-
-    this.Cols       = [];
-
-    this.TotalWidth = 230;
-}
-CDocumentColumnsProps.prototype.From_SectPr = function(SectPr)
-{
-    var Columns = SectPr.Columns;
-
-    this.TotalWidth = SectPr.Get_PageWidth() - SectPr.Get_PageMargin_Left() - SectPr.Get_PageMargin_Right();
-    this.EqualWidth = Columns.EqualWidth;
-    this.Num        = Columns.Num;
-    this.Sep        = Columns.Sep;
-    this.Space      = Columns.Space;
-
-    for (var Index = 0, Count = Columns.Cols.length; Index < Count; ++Index)
-    {
-        var Col = new CDocumentColumnProps();
-        Col.put_W(Columns.Cols[Index].W);
-        Col.put_Space(Columns.Cols[Index].Space);
-        this.Cols[Index] = Col;
-    }
-};
-CDocumentColumnsProps.prototype.get_EqualWidth = function()
-{
-    return this.EqualWidth;
-};
-CDocumentColumnsProps.prototype.put_EqualWidth = function(EqualWidth)
-{
-    this.EqualWidth = EqualWidth;
-};
-CDocumentColumnsProps.prototype.get_Num = function()
-{
-    return this.Num;
-};
-CDocumentColumnsProps.prototype.put_Num = function(Num)
-{
-    this.Num = Num;
-};
-CDocumentColumnsProps.prototype.get_Sep = function()
-{
-    return this.Sep;
-};
-CDocumentColumnsProps.prototype.put_Sep = function(Sep)
-{
-    this.Sep = Sep;
-};
-CDocumentColumnsProps.prototype.get_Space = function()
-{
-    return this.Space;
-};
-CDocumentColumnsProps.prototype.put_Space = function(Space)
-{
-    this.Space = Space;
-};
-CDocumentColumnsProps.prototype.get_ColsCount = function()
-{
-    return this.Cols.length;
-};
-CDocumentColumnsProps.prototype.get_Col = function(Index)
-{
-    return this.Cols[Index];
-};
-CDocumentColumnsProps.prototype.put_Col = function(Index, Col)
-{
-    this.Cols[Index] = Col;
-};
-CDocumentColumnsProps.prototype.put_ColByValue = function(Index, W, Space)
-{
-    var Col = new CDocumentColumnProps();
-    Col.put_W(W);
-    Col.put_Space(Space);
-    this.Cols[Index] = Col;
-};
-CDocumentColumnsProps.prototype.get_TotalWidth = function()
-{
-    return this.TotalWidth;
-};
 
 asc_docs_api.prototype.asc_SetColumnsProps = function(ColumnsProps)
 {
@@ -8221,26 +8001,6 @@ CRevisionsChange.prototype['put_Type'] = CRevisionsChange.prototype.put_Type;
 CRevisionsChange.prototype['put_XY'] = CRevisionsChange.prototype.put_XY;
 CRevisionsChange.prototype['put_Value'] = CRevisionsChange.prototype.put_Value;
 CRevisionsChange.prototype['get_LockUserId'] = CRevisionsChange.prototype.get_LockUserId;
-
-CDocumentColumnProps.prototype['put_W']     = CDocumentColumnProps.prototype.put_W;
-CDocumentColumnProps.prototype['get_W']     = CDocumentColumnProps.prototype.get_W;
-CDocumentColumnProps.prototype['put_Space'] = CDocumentColumnProps.prototype.put_Space;
-CDocumentColumnProps.prototype['get_Space'] = CDocumentColumnProps.prototype.get_Space;
-
-window['Asc']['CDocumentColumnsProps'] = CDocumentColumnsProps;
-CDocumentColumnsProps.prototype['get_EqualWidth'] = CDocumentColumnsProps.prototype.get_EqualWidth;
-CDocumentColumnsProps.prototype['put_EqualWidth'] = CDocumentColumnsProps.prototype.put_EqualWidth;
-CDocumentColumnsProps.prototype['get_Num']        = CDocumentColumnsProps.prototype.get_Num       ;
-CDocumentColumnsProps.prototype['put_Num']        = CDocumentColumnsProps.prototype.put_Num       ;
-CDocumentColumnsProps.prototype['get_Sep']        = CDocumentColumnsProps.prototype.get_Sep       ;
-CDocumentColumnsProps.prototype['put_Sep']        = CDocumentColumnsProps.prototype.put_Sep       ;
-CDocumentColumnsProps.prototype['get_Space']      = CDocumentColumnsProps.prototype.get_Space     ;
-CDocumentColumnsProps.prototype['put_Space']      = CDocumentColumnsProps.prototype.put_Space     ;
-CDocumentColumnsProps.prototype['get_ColsCount']  = CDocumentColumnsProps.prototype.get_ColsCount ;
-CDocumentColumnsProps.prototype['get_Col']        = CDocumentColumnsProps.prototype.get_Col       ;
-CDocumentColumnsProps.prototype['put_Col']        = CDocumentColumnsProps.prototype.put_Col       ;
-CDocumentColumnsProps.prototype['put_ColByValue'] = CDocumentColumnsProps.prototype.put_ColByValue;
-CDocumentColumnsProps.prototype['get_TotalWidth'] = CDocumentColumnsProps.prototype.get_TotalWidth;
 
 // don't delete this line!!! This line used for split minimize files
 window['split']='split';

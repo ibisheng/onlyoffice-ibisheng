@@ -84,6 +84,217 @@ var keydownresult_PreventDefault  = 0x0001;
 var keydownresult_PreventKeyPress = 0x0002;
 var keydownresult_PreventAll      = 0xFFFF;
 
+function CDocumentColumnProps()
+{
+    this.W     = 0;
+    this.Space = 0;
+}
+CDocumentColumnProps.prototype.put_W = function(W)
+{
+    this.W = W;
+};
+CDocumentColumnProps.prototype.get_W = function()
+{
+    return this.W;
+};
+CDocumentColumnProps.prototype.put_Space = function(Space)
+{
+    this.Space = Space;
+};
+CDocumentColumnProps.prototype.get_Space = function()
+{
+    return this.Space;
+};
+
+function CDocumentColumnsProps()
+{
+    this.EqualWidth = true;
+    this.Num        = 1;
+    this.Sep        = false;
+    this.Space      = 30;
+
+    this.Cols       = [];
+
+    this.TotalWidth = 230;
+}
+CDocumentColumnsProps.prototype.From_SectPr = function(SectPr)
+{
+    var Columns = SectPr.Columns;
+
+    this.TotalWidth = SectPr.Get_PageWidth() - SectPr.Get_PageMargin_Left() - SectPr.Get_PageMargin_Right();
+    this.EqualWidth = Columns.EqualWidth;
+    this.Num        = Columns.Num;
+    this.Sep        = Columns.Sep;
+    this.Space      = Columns.Space;
+
+    for (var Index = 0, Count = Columns.Cols.length; Index < Count; ++Index)
+    {
+        var Col = new CDocumentColumnProps();
+        Col.put_W(Columns.Cols[Index].W);
+        Col.put_Space(Columns.Cols[Index].Space);
+        this.Cols[Index] = Col;
+    }
+};
+CDocumentColumnsProps.prototype.get_EqualWidth = function()
+{
+    return this.EqualWidth;
+};
+CDocumentColumnsProps.prototype.put_EqualWidth = function(EqualWidth)
+{
+    this.EqualWidth = EqualWidth;
+};
+CDocumentColumnsProps.prototype.get_Num = function()
+{
+    return this.Num;
+};
+CDocumentColumnsProps.prototype.put_Num = function(Num)
+{
+    this.Num = Num;
+};
+CDocumentColumnsProps.prototype.get_Sep = function()
+{
+    return this.Sep;
+};
+CDocumentColumnsProps.prototype.put_Sep = function(Sep)
+{
+    this.Sep = Sep;
+};
+CDocumentColumnsProps.prototype.get_Space = function()
+{
+    return this.Space;
+};
+CDocumentColumnsProps.prototype.put_Space = function(Space)
+{
+    this.Space = Space;
+};
+CDocumentColumnsProps.prototype.get_ColsCount = function()
+{
+    return this.Cols.length;
+};
+CDocumentColumnsProps.prototype.get_Col = function(Index)
+{
+    return this.Cols[Index];
+};
+CDocumentColumnsProps.prototype.put_Col = function(Index, Col)
+{
+    this.Cols[Index] = Col;
+};
+CDocumentColumnsProps.prototype.put_ColByValue = function(Index, W, Space)
+{
+    var Col = new CDocumentColumnProps();
+    Col.put_W(W);
+    Col.put_Space(Space);
+    this.Cols[Index] = Col;
+};
+CDocumentColumnsProps.prototype.get_TotalWidth = function()
+{
+    return this.TotalWidth;
+};
+
+function CDocumentSectionProps(SectPr)
+{
+    if (SectPr)
+    {
+        this.W      = SectPr.Get_PageWidth();
+        this.H      = SectPr.Get_PageHeight();
+        this.Orient = SectPr.Get_Orientation();
+
+        this.Left   = SectPr.Get_PageMargin_Left();
+        this.Top    = SectPr.Get_PageMargin_Top();
+        this.Right  = SectPr.Get_PageMargin_Right();
+        this.Bottom = SectPr.Get_PageMargin_Bottom();
+
+        this.Header = SectPr.Get_PageMargins_Header();
+        this.Footer = SectPr.Get_PageMargins_Footer();
+    }
+    else
+    {
+        this.W      = undefined;
+        this.H      = undefined;
+        this.Orient = undefined;
+
+        this.Left   = undefined;
+        this.Top    = undefined;
+        this.Right  = undefined;
+        this.Bottom = undefined;
+
+        this.Header = undefined;
+        this.Footer = undefined;
+    }
+}
+CDocumentSectionProps.prototype.get_W = function()
+{
+    return this.W;
+};
+CDocumentSectionProps.prototype.put_W = function(W)
+{
+    this.W = W;
+};
+CDocumentSectionProps.prototype.get_H = function()
+{
+    return this.H;
+};
+CDocumentSectionProps.prototype.put_H = function(H)
+{
+    this.H = H;
+};
+CDocumentSectionProps.prototype.get_Orientation = function()
+{
+    return this.Orient;
+};
+CDocumentSectionProps.prototype.put_Orientation = function(Orient)
+{
+    this.Orient = Orient;
+};
+CDocumentSectionProps.prototype.get_LeftMargin = function()
+{
+    return this.Left;
+};
+CDocumentSectionProps.prototype.put_LeftMargin = function(Left)
+{
+    this.Left = Left;
+};
+CDocumentSectionProps.prototype.get_TopMargin = function()
+{
+    return this.Top;
+};
+CDocumentSectionProps.prototype.put_TopMargin = function(Top)
+{
+    this.Top = Top;
+};
+CDocumentSectionProps.prototype.get_RightMargin = function()
+{
+    return this.Right;
+};
+CDocumentSectionProps.prototype.put_RightMargin = function(Right)
+{
+    this.Right = Right;
+};
+CDocumentSectionProps.prototype.get_BottomMargin = function()
+{
+    return this.Bottom;
+};
+CDocumentSectionProps.prototype.put_BottomMargin = function(Bottom)
+{
+    this.Bottom = Bottom;
+};
+CDocumentSectionProps.prototype.get_HeaderDistance = function()
+{
+    return this.Header;
+};
+CDocumentSectionProps.prototype.put_HeaderDistance = function(Header)
+{
+    this.Header = Header;
+};
+CDocumentSectionProps.prototype.get_FooterDistance = function()
+{
+    return this.Footer;
+};
+CDocumentSectionProps.prototype.put_FooterDistance = function(Footer)
+{
+    this.Footer = Footer;
+};
+
 function CSelectedElement(Element, SelectedAll)
 {
     this.Element     = Element;
@@ -16369,7 +16580,7 @@ CDocument.prototype.Get_SectionProps = function()
     var CurPos = this.CurPos.ContentPos;
     var SectPr = this.SectionsInfo.Get_SectPr(CurPos).SectPr;
 
-    return new CDocumentSectionProps(SectPr);
+    return new Asc.CDocumentSectionProps(SectPr);
 };
 CDocument.prototype.Get_FirstParagraph = function()
 {
@@ -17366,6 +17577,7 @@ CDocumentNumberingInfoEngine.prototype.Get_NumInfo = function()
 };
 
 //-------------------------------------------------------------export---------------------------------------------------
+window['Asc'] = window['Asc'] || {};
 window['AscCommon'] = window['AscCommon'] || {};
 window['AscCommonWord'] = window['AscCommonWord'] || {};
 window['AscCommonWord'].CDocument = CDocument;
@@ -17376,3 +17588,43 @@ window['AscCommon'].X_Left_Margin = X_Left_Margin;
 window['AscCommon'].X_Right_Margin = X_Right_Margin;
 window['AscCommon'].Y_Bottom_Margin = Y_Bottom_Margin;
 window['AscCommon'].Y_Top_Margin = Y_Top_Margin;
+
+CDocumentColumnProps.prototype['put_W']     = CDocumentColumnProps.prototype.put_W;
+CDocumentColumnProps.prototype['get_W']     = CDocumentColumnProps.prototype.get_W;
+CDocumentColumnProps.prototype['put_Space'] = CDocumentColumnProps.prototype.put_Space;
+CDocumentColumnProps.prototype['get_Space'] = CDocumentColumnProps.prototype.get_Space;
+
+window['Asc']['CDocumentColumnsProps'] = CDocumentColumnsProps;
+CDocumentColumnsProps.prototype['get_EqualWidth'] = CDocumentColumnsProps.prototype.get_EqualWidth;
+CDocumentColumnsProps.prototype['put_EqualWidth'] = CDocumentColumnsProps.prototype.put_EqualWidth;
+CDocumentColumnsProps.prototype['get_Num']        = CDocumentColumnsProps.prototype.get_Num       ;
+CDocumentColumnsProps.prototype['put_Num']        = CDocumentColumnsProps.prototype.put_Num       ;
+CDocumentColumnsProps.prototype['get_Sep']        = CDocumentColumnsProps.prototype.get_Sep       ;
+CDocumentColumnsProps.prototype['put_Sep']        = CDocumentColumnsProps.prototype.put_Sep       ;
+CDocumentColumnsProps.prototype['get_Space']      = CDocumentColumnsProps.prototype.get_Space     ;
+CDocumentColumnsProps.prototype['put_Space']      = CDocumentColumnsProps.prototype.put_Space     ;
+CDocumentColumnsProps.prototype['get_ColsCount']  = CDocumentColumnsProps.prototype.get_ColsCount ;
+CDocumentColumnsProps.prototype['get_Col']        = CDocumentColumnsProps.prototype.get_Col       ;
+CDocumentColumnsProps.prototype['put_Col']        = CDocumentColumnsProps.prototype.put_Col       ;
+CDocumentColumnsProps.prototype['put_ColByValue'] = CDocumentColumnsProps.prototype.put_ColByValue;
+CDocumentColumnsProps.prototype['get_TotalWidth'] = CDocumentColumnsProps.prototype.get_TotalWidth;
+
+window['Asc']['CDocumentSectionProps'] = window['Asc'].CDocumentSectionProps = CDocumentSectionProps;
+CDocumentSectionProps.prototype["get_W"]              = CDocumentSectionProps.prototype.get_W;
+CDocumentSectionProps.prototype["put_W"]              = CDocumentSectionProps.prototype.put_W;
+CDocumentSectionProps.prototype["get_H"]              = CDocumentSectionProps.prototype.get_H;
+CDocumentSectionProps.prototype["put_H"]              = CDocumentSectionProps.prototype.put_H;
+CDocumentSectionProps.prototype["get_Orientation"]    = CDocumentSectionProps.prototype.get_Orientation;
+CDocumentSectionProps.prototype["put_Orientation"]    = CDocumentSectionProps.prototype.put_Orientation;
+CDocumentSectionProps.prototype["get_LeftMargin"]     = CDocumentSectionProps.prototype.get_LeftMargin;
+CDocumentSectionProps.prototype["put_LeftMargin"]     = CDocumentSectionProps.prototype.put_LeftMargin;
+CDocumentSectionProps.prototype["get_TopMargin"]      = CDocumentSectionProps.prototype.get_TopMargin;
+CDocumentSectionProps.prototype["put_TopMargin"]      = CDocumentSectionProps.prototype.put_TopMargin;
+CDocumentSectionProps.prototype["get_RightMargin"]    = CDocumentSectionProps.prototype.get_RightMargin;
+CDocumentSectionProps.prototype["put_RightMargin"]    = CDocumentSectionProps.prototype.put_RightMargin;
+CDocumentSectionProps.prototype["get_BottomMargin"]   = CDocumentSectionProps.prototype.get_BottomMargin;
+CDocumentSectionProps.prototype["put_BottomMargin"]   = CDocumentSectionProps.prototype.put_BottomMargin;
+CDocumentSectionProps.prototype["get_HeaderDistance"] = CDocumentSectionProps.prototype.get_HeaderDistance;
+CDocumentSectionProps.prototype["put_HeaderDistance"] = CDocumentSectionProps.prototype.put_HeaderDistance;
+CDocumentSectionProps.prototype["get_FooterDistance"] = CDocumentSectionProps.prototype.get_FooterDistance;
+CDocumentSectionProps.prototype["put_FooterDistance"] = CDocumentSectionProps.prototype.put_FooterDistance;
