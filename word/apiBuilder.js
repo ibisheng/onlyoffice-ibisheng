@@ -2243,11 +2243,11 @@
     ApiTextPr.prototype.SetVertAlign = function(sType)
     {
         if ("baseline" === sType)
-            this.TextPr.VertAlign = vertalign_Baseline;
+            this.TextPr.VertAlign = AscCommon.vertalign_Baseline;
         else if ("subscript" === sType)
-            this.TextPr.VertAlign = vertalign_SubScript;
+            this.TextPr.VertAlign = AscCommon.vertalign_SubScript;
         else if ("superscript" === sType)
-            this.TextPr.VertAlign = vertalign_SuperScript;
+            this.TextPr.VertAlign = AscCommon.vertalign_SuperScript;
 
         this.private_OnChange();
     };
