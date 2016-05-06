@@ -628,7 +628,7 @@ asc_docs_api.prototype.OpenDocument2 = function(url, gObject)
 {
 	this.InitEditor();
 	this.DocumentType = 2;
-	this.LoadedObjectDS = this.WordControl.m_oLogicDocument.Get_Styles().CopyStyle();
+	this.LoadedObjectDS = this.WordControl.m_oLogicDocument.CopyStyle();
 
 	g_oIdCounter.Set_Load(true);
 
@@ -7081,7 +7081,7 @@ window["asc_docs_api"].prototype["asc_nativeOpenFile"] = function(base64File, ve
 	
 	this.InitEditor();
 	this.DocumentType = 2;
-	this.LoadedObjectDS = this.WordControl.m_oLogicDocument.Get_Styles().CopyStyle();
+	this.LoadedObjectDS = this.WordControl.m_oLogicDocument.CopyStyle();
 	
 	g_oIdCounter.Set_Load(true);
 

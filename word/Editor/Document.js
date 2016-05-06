@@ -11689,6 +11689,10 @@ CDocument.prototype.Get_Styles              = function()
 {
     return this.Styles;
 };
+CDocument.prototype.CopyStyle               = function()
+{
+    return this.Styles.CopyStyle();
+};
 CDocument.prototype.Get_TableStyleForPara   = function()
 {
     return null;
