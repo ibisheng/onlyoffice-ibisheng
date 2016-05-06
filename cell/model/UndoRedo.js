@@ -1721,7 +1721,8 @@ var g_oUndoRedoData_AutoFilterProperties = {
 		ShowLastColumn      : 13,
 		ShowRowStripes      : 14,
 		HeaderRowCount      : 15,
-		TotalsRowCount      : 16
+		TotalsRowCount      : 16,
+		color               : 17
 	};
 function UndoRedoData_AutoFilter() {
 	this.Properties = g_oUndoRedoData_AutoFilterProperties;
@@ -1747,6 +1748,7 @@ function UndoRedoData_AutoFilter() {
 
     this.HeaderRowCount     = null;
     this.TotalsRowCount     = null;
+	this.color              = null;
 }
 UndoRedoData_AutoFilter.prototype = {
 	getType : function ()
@@ -1778,6 +1780,7 @@ UndoRedoData_AutoFilter.prototype = {
             case this.Properties.ShowRowStripes: return this.ShowRowStripes; break;
             case this.Properties.HeaderRowCount: return this.HeaderRowCount; break;
             case this.Properties.TotalsRowCount: return this.TotalsRowCount; break;
+			case this.Properties.color: return this.color; break;
 		}
 
 		return null;
@@ -1803,6 +1806,7 @@ UndoRedoData_AutoFilter.prototype = {
             case this.Properties.ShowRowStripes: this.ShowRowStripes = value;break;
             case this.Properties.HeaderRowCount: this.HeaderRowCount = value;break;
             case this.Properties.TotalsRowCount: this.TotalsRowCount = value;break;
+			case this.Properties.color: this.color = value;break;
 		}
 		return null;
 	},

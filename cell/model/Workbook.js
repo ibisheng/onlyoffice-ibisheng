@@ -8563,7 +8563,7 @@ Range.prototype.cleanHyperlinks=function(){
 		this.removeHyperlink(aHyperlinks.inner[i].data);
 	History.EndTransaction();
 };
-Range.prototype.sort=function(nOption, nStartCol, color){
+Range.prototype.sort=function(nOption, nStartCol, sortColor){
 	//todo горизонтальная сортировка
 	var aMerged = this.worksheet.mergeManager.get(this.bbox);
 	if(aMerged.outer.length > 0 || (aMerged.inner.length > 0 && null == _isSameSizeMerged(this.bbox, aMerged.inner)))
@@ -8577,8 +8577,8 @@ Range.prototype.sort=function(nOption, nStartCol, color){
 		nStartCol = merged.bbox.c1;
 	}
   this.worksheet.workbook.lockDraw();
-	var colorFill = nOption === Asc.c_oAscSortOptions.ByColorFill ? color : null;
-	var colorText = nOption === Asc.c_oAscSortOptions.ByColorFont ? color : null;
+	var colorFill = nOption === Asc.c_oAscSortOptions.ByColorFill;
+	var colorText = nOption === Asc.c_oAscSortOptions.ByColorFont;
 	var isSortColor = !!(colorFill || colorText);
 	
 	var oRes = null;
@@ -8629,15 +8629,20 @@ Range.prototype.sort=function(nOption, nStartCol, color){
 				if(colorFill)
 				{
 					var styleCell = oCell.getStyle();
-					colorFillCell = styleCell !== null ? styleCell.fill : null;
+					colorFillCell = styleCell !== null && styleCell.fill ? styleCell.fill.bg : null;
 				}
 				else if(colorText)
 				{
 					var value2 = oCell.getValue2();
 					for(var n = 0; n < value2.length; n++)
 					{
-						colorsTextCell.push(value2[n].c);
+						if(null === colorsTextCell)
+						{
+							colorsTextCell = [];
 					}
+						
+						colorsTextCell.push(value2[n].format.c);
+				}
 				}
 				
 				var nNumber = null;
@@ -8689,15 +8694,16 @@ Range.prototype.sort=function(nOption, nStartCol, color){
 	var colorFillCmp = function(color1, color2)
 	{
 		var res = false;
+		//TODO возможно так сравнивать не правильно, позже пересмотреть
 		if(colorFill)
 		{
-			res = color1 !== null && color2 !== null && color1.isEqual(color2) === true ? true : false;
+			res = (color1 !== null && color2 !== null && color1.rgb === color2.rgb) || (color1 === color2) ? true : false;
 		}
 		else if(colorText && color1 && color1.length)
 		{
 			for(var n = 0; n < color1.length; n++)
 			{
-				if(color1[n] && color1[n].isEqual(color2))
+				if(color1[n] && color2 !== null && color1[n].rgb === color2.rgb)
 				{
 					res = true;
 					break;
@@ -8712,11 +8718,10 @@ Range.prototype.sort=function(nOption, nStartCol, color){
 	{
 		var newArrayNeedColor = [];
 		var newArrayAnotherColor = [];
-		var sortColor = colorText ? colorText : colorFill;
 		
 		for(var i = 0; i < aSortElems.length; i++)
 		{
-			var color = colorFill ? aSortElems[i].colorFill : aSortElems[i].colorText;
+			var color = colorFill ? aSortElems[i].colorFill : aSortElems[i].colorsText;
 			if(colorFillCmp(color, sortColor))
 			{
 				newArrayNeedColor.push(aSortElems[i]);
@@ -8727,7 +8732,7 @@ Range.prototype.sort=function(nOption, nStartCol, color){
 			}
 		}
 		
-		aSortElems = newArrayAnotherColor.concat(newArrayNeedColor);
+		aSortElems = newArrayNeedColor.concat(newArrayAnotherColor);
 	}
 	else
 	{

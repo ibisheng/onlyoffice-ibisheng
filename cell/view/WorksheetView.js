@@ -12023,9 +12023,11 @@
 				History.Create_NewPoint();
 				History.StartTransaction();
 				
-				var sort = sortProps.sortRange.sort(type, sortProps.startCol, color);
+				var rgbColor = color ? new RgbColor((color.asc_getR() << 16) + (color.asc_getG() << 8) + color.asc_getB()) : null;
+				
+				var sort = sortProps.sortRange.sort(type, sortProps.startCol, rgbColor);
 				t.cellCommentator.sortComments(sort);
-				t.model.autoFilters.sortColFilter( type, cellId, ar, sortProps, displayName );
+				t.model.autoFilters.sortColFilter( type, cellId, ar, sortProps, displayName, rgbColor );
 				
 				t._onUpdateFormatTable(sortProps.sortRange.bbox, false);
 				History.EndTransaction();

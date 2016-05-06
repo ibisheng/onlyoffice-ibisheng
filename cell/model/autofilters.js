@@ -719,7 +719,7 @@
 						this.changeTableStyleInfo(data.styleName, data.activeCells);
 						break;
 					case AscCH.historyitem_AutoFilter_Sort:
-						this.sortColFilter(data.type, data.cellId, data.activeCells);
+						this.sortColFilter(data.type, data.cellId, data.activeCells, null, null, data.color);
 						break;
 					case AscCH.historyitem_AutoFilter_Empty:
 						this.isEmptyAutoFilters(data.activeCells);
@@ -1498,9 +1498,8 @@
 				History.EndTransaction();
 			},
 			
-			sortColFilter: function(type, cellId, activeRange, sortProps, displayName) {
+			sortColFilter: function(type, cellId, activeRange, sortProps, displayName, color) {
 				var curFilter, sortRange, filterRef, startCol, maxFilterRow;
-				var resType = type == 'ascending';
 				var t = this;
 				
 				if(!sortProps)
@@ -1508,7 +1507,7 @@
 					
 				curFilter = sortProps.curFilter, sortRange = sortProps.sortRange, filterRef = sortProps.filterRef, startCol = sortProps.startCol, maxFilterRow = sortProps.maxFilterRow;
 				
-				var onSortAutoFilterCallback = function(success)
+				var onSortAutoFilterCallback = function(type)
 				{
 					History.Create_NewPoint();
 					History.StartTransaction();
@@ -1523,13 +1522,12 @@
 						curFilter.SortState.SortConditions = [];
 						curFilter.SortState.SortConditions[0] = new AscCommonExcel.SortCondition();
 					}
-					if(!curFilter.SortState.SortConditions[0])
 						curFilter.SortState.SortConditions[0] = new AscCommonExcel.SortCondition();
 						
 					var cellIdRange = new Asc.Range(startCol, filterRef.r1, startCol, filterRef.r1);
 					
 					curFilter.SortState.SortConditions[0].Ref = new Asc.Range(startCol, filterRef.r1, startCol, filterRef.r2);
-					curFilter.SortState.SortConditions[0].ConditionDescending = resType;
+					curFilter.SortState.SortConditions[0].ConditionDescending = type;
 
 					if(curFilter.TableStyleInfo)
 					{
@@ -1540,7 +1538,67 @@
 					History.EndTransaction();
 				};
 						
-				onSortAutoFilterCallback();
+				
+				var onSortColorAutoFilterCallback = function(type)
+				{
+					History.Create_NewPoint();
+					History.StartTransaction();
+					
+					var oldFilter = curFilter.clone(null);
+					
+					//изменяем содержимое фильтра
+					if(!curFilter.SortState)
+					{
+						curFilter.SortState = new SortState();
+						curFilter.SortState.Ref = new Asc.Range(startCol, curFilter.Ref.r1, startCol, maxFilterRow);
+						curFilter.SortState.SortConditions = [];
+						curFilter.SortState.SortConditions[0] = new SortCondition();
+					}
+					curFilter.SortState.SortConditions[0] = new SortCondition();
+						
+					var cellIdRange = new Asc.Range(startCol, filterRef.r1, startCol, filterRef.r1);
+					
+					curFilter.SortState.SortConditions[0].Ref = new Asc.Range(startCol, filterRef.r1, startCol, filterRef.r2);
+					
+					
+					curFilter.SortState.SortConditions[0].dxf = new CellXfs();
+					if(type === Asc.c_oAscSortOptions.ByColorFill)
+					{
+						curFilter.SortState.SortConditions[0].dxf.fill = new Fill();
+						curFilter.SortState.SortConditions[0].dxf.fill.bg = color;
+						curFilter.SortState.SortConditions[0].ConditionSortBy = Asc.ESortBy.sortbyCellColor;
+					}
+					else
+					{
+						curFilter.SortState.SortConditions[0].dxf.font = new Font();
+						curFilter.SortState.SortConditions[0].dxf.font.c = color;
+						curFilter.SortState.SortConditions[0].ConditionSortBy = Asc.ESortBy.sortbyFontColor;
+					}
+
+					if(curFilter.TableStyleInfo)
+					{
+						t._setColorStyleTable(curFilter.Ref, curFilter);
+					}
+					t._addHistoryObj({oldFilter: oldFilter}, AscCH.historyitem_AutoFilter_Sort,
+						{activeCells: cellIdRange, type: type, cellId: cellId, color: color}, null, curFilter.Ref);
+					History.EndTransaction();
+				};
+				
+				switch(type)
+				{
+					case Asc.c_oAscSortOptions.Ascending:
+					case Asc.c_oAscSortOptions.Descending:
+					{
+						onSortAutoFilterCallback(type === Asc.c_oAscSortOptions.Ascending);
+						break;
+					}
+					case Asc.c_oAscSortOptions.ByColorFill:
+					case Asc.c_oAscSortOptions.ByColorFont:
+					{
+						onSortColorAutoFilterCallback(type);
+						break;
+					}
+				}
 			},
 						
 			getPropForSort: function(cellId, activeRange, displayName)
@@ -2498,6 +2556,7 @@
 					oHistoryObject.bWithoutFilter       = bWithoutFilter ? bWithoutFilter : false;
 					oHistoryObject.displayName          = redoObject.displayName;
 					oHistoryObject.val                  = redoObject.val;
+					oHistoryObject.color                = redoObject.color;
 					
 					if(redoObject.pasteStyleObj)
 					{
