@@ -19,7 +19,6 @@
 		"../common/Private/license.js",
 		"../word/api.js",
 		
-		"../common/Build/License.js",
         "../common/downloaderfiles.js",
         "../common/NumFormat.js",
 		"../common/SerializeChart.js",

@@ -72,6 +72,7 @@ module.exports = function(grunt) {
 		var splitLine = '';
 		var tmp_sdk_path = 'sdk-js-tmp.js';
 		var sdkDstFolder = packageFile['compile']['sdk']['dst'];
+		var sdkAllMinDst = sdkDstFolder + '/sdk-all-min.js';
 		var sdkAllDst = sdkDstFolder + '/sdk-all.js';
 		var concat_src = [sdkAllDst];
 		var srcFiles = packageFile['compile']['sdk']['common'];
@@ -130,9 +131,13 @@ module.exports = function(grunt) {
 				}
 			},
 			concat: {
+				sdkmin: {
+					src: ['license.js', sdkAllMinDst],
+					dest: sdkAllMinDst
+				},
 				sdk: {
 				options: {
-					banner: '(function(window, undefined) {',
+						banner: '<%= grunt.file.read("license.js") %>' + '\n(function(window, undefined) {',
 					footer: '})(window);'
 					},
 					src: concat_src,

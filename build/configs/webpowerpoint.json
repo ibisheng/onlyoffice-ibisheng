@@ -2,7 +2,6 @@
   "compile": {
     "sdk": {
       "common": [
-        "../common/Build/License.js",
         "../common/browser.js",
         "../common/commonDefines.js",
         "../common/downloaderfiles.js",

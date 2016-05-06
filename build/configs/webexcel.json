@@ -17,7 +17,6 @@
 		"../common/Private/license.js",
 		"../cell/api.js",
 		
-		"../common/Build/License.js",
         "../common/downloaderfiles.js",
         "../common/NumFormat.js",
 		"../common/SerializeChart.js",
