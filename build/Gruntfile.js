@@ -155,11 +155,11 @@ module.exports = function(grunt) {
 							Build: process.env['BUILD_NUMBER']
 						}
 					},
-					files: {
-						'<%= pkg.compile.sdk.dst %>': '<%= pkg.compile.sdk.dst %>'
+					files: [
+						{ src: [sdkAllMinDst, sdkAllDst], dest: sdkDstFolder + '/' }
+					]
 					}
 				}
-			}
 		});
 	});
 	
