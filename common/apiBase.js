@@ -96,6 +96,7 @@ function baseEditorsApi(name, editorId) {
 
   // Version History
   this.VersionHistory = null;				// Объект, который отвечает за точку в списке версий
+  this.VersionHistoryOpen = false;
 
   //Флаги для применения свойств через слайдеры
   this.noCreatePoint = false;
@@ -413,8 +414,17 @@ baseEditorsApi.prototype._coAuthoringInit = function() {
     t.asyncServerIdEndLoaded();
   };
   this.CoAuthoringApi.onFirstConnect = function() {
-    t.isOnFirstConnectEnd = true;
-    t._onEndPermissions();
+    if (t.isOnFirstConnectEnd) {
+      if (t.VersionHistoryOpen) {
+        t.VersionHistoryOpen = false;
+        t.asc_LoadDocument(true);
+      } else {
+        t.CoAuthoringApi.auth(t.getViewMode());
+      }
+    } else {
+      t.isOnFirstConnectEnd = true;
+      t._onEndPermissions();
+    }
   };
   this.CoAuthoringApi.onLicense = function(res) {
     t.licenseResult = res;

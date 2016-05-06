@@ -70,9 +70,6 @@ AscCommon.baseEditorsApi.prototype.asc_showRevision = function(newObj) {
   if (!newObj.docId) {
     return;
   }
-  if (this.isCoAuthoringEnable) {
-    this.asc_coAuthoringDisconnect();
-  }
 
   var bUpdate = true;
   if (null === this.VersionHistory) {
@@ -87,8 +84,12 @@ AscCommon.baseEditorsApi.prototype.asc_showRevision = function(newObj) {
     this.DocInfo.put_Id(this.VersionHistory.docId);
     this.DocInfo.put_Url(this.VersionHistory.url);
     this.documentUrlChanges = this.VersionHistory.urlChanges;
+    this.VersionHistoryOpen = true;
     this.asc_setDocInfo(this.DocInfo);
-    this.asc_LoadDocument(true);
+    this.asc_setViewMode(true);
+
+    //делаем disconnect и reconnect, чтобы docId соединения и документа совпадали, иначе будут проблемы со сборшиком мусора
+    this.CoAuthoringApi.disconnect(true);
   } else if (this.VersionHistory.currentChangeId < newObj.currentChangeId) {
     // Нужно только добавить некоторые изменения
     AscCommon.CollaborativeEditing.Clear_CollaborativeMarks();
