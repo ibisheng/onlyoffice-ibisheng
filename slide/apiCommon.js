@@ -11,6 +11,7 @@ function CAscSlideTiming()
     this.SlideAdvanceOnMouseClick   = undefined;
     this.SlideAdvanceAfter          = undefined;
     this.SlideAdvanceDuration       = undefined;
+    this.ShowLoop                   = undefined;
 }
 
 CAscSlideTiming.prototype.put_TransitionType = function(v) { this.TransitionType = v; }
@@ -26,6 +27,8 @@ CAscSlideTiming.prototype.put_SlideAdvanceAfter = function(v) { this.SlideAdvanc
 CAscSlideTiming.prototype.get_SlideAdvanceAfter = function() { return this.SlideAdvanceAfter; }
 CAscSlideTiming.prototype.put_SlideAdvanceDuration = function(v) { this.SlideAdvanceDuration = v; }
 CAscSlideTiming.prototype.get_SlideAdvanceDuration = function() { return this.SlideAdvanceDuration; }
+CAscSlideTiming.prototype.put_ShowLoop = function(v) {this.ShowLoop = v;};
+CAscSlideTiming.prototype.get_ShowLoop = function() {return this.ShowLoop;};
 
 CAscSlideTiming.prototype.applyProps = function(v)
 {
@@ -42,6 +45,8 @@ CAscSlideTiming.prototype.applyProps = function(v)
         this.SlideAdvanceAfter = v.SlideAdvanceAfter;
     if (undefined !== v.SlideAdvanceDuration && null !== v.SlideAdvanceDuration)
         this.SlideAdvanceDuration = v.SlideAdvanceDuration;
+    if (undefined !== v.ShowLoop && null !== v.ShowLoop)
+        this.ShowLoop = v.ShowLoop;
 }
 
 CAscSlideTiming.prototype.createDuplicate = function(v)
@@ -55,6 +60,7 @@ CAscSlideTiming.prototype.createDuplicate = function(v)
     _slideT.SlideAdvanceOnMouseClick   = this.SlideAdvanceOnMouseClick;
     _slideT.SlideAdvanceAfter          = this.SlideAdvanceAfter;
     _slideT.SlideAdvanceDuration       = this.SlideAdvanceDuration;
+    _slideT.ShowLoop                   = this.ShowLoop;
 
     return _slideT;
 }
@@ -71,6 +77,7 @@ CAscSlideTiming.prototype.makeDuplicate = function(_slideT)
     _slideT.SlideAdvanceOnMouseClick   = this.SlideAdvanceOnMouseClick;
     _slideT.SlideAdvanceAfter          = this.SlideAdvanceAfter;
     _slideT.SlideAdvanceDuration       = this.SlideAdvanceDuration;
+    _slideT.ShowLoop                   = this.ShowLoop;
 }
 
 CAscSlideTiming.prototype.setUndefinedOptions = function()
@@ -82,6 +89,7 @@ CAscSlideTiming.prototype.setUndefinedOptions = function()
     this.SlideAdvanceOnMouseClick   = undefined;
     this.SlideAdvanceAfter          = undefined;
     this.SlideAdvanceDuration       = undefined;
+    this.ShowLoop                   = undefined;
 }
 
 CAscSlideTiming.prototype.setDefaultParams = function()
@@ -93,6 +101,7 @@ CAscSlideTiming.prototype.setDefaultParams = function()
     this.SlideAdvanceOnMouseClick   = true;
     this.SlideAdvanceAfter          = false;
     this.SlideAdvanceDuration       = 10000;
+    this.ShowLoop                   = true;
 }
 
 CAscSlideTiming.prototype.Write_ToBinary = function(w)
@@ -121,6 +130,7 @@ CAscSlideTiming.prototype.Write_ToBinary = function(w)
     w.WriteBool(AscFormat.isRealNumber(this.SlideAdvanceDuration));
     if(AscFormat.isRealNumber(this.SlideAdvanceDuration))
         w.WriteLong(this.SlideAdvanceDuration);
+    AscFormat.writeBool(w, this.ShowLoop);
 };
 
 CAscSlideTiming.prototype.Read_FromBinary = function(r)
@@ -146,6 +156,7 @@ CAscSlideTiming.prototype.Read_FromBinary = function(r)
 
     if(r.GetBool())
         this.SlideAdvanceDuration = r.GetLong();
+    this.ShowLoop = AscFormat.readBool(r);
 };
 
 // ---------------------------------------------------------------
