@@ -4242,6 +4242,7 @@ CStyles.prototype =
         {
             res[StyleId] = this.Style[StyleId].Copy();
         }
+        return res;
     },
 
     Get_DefaultParaPr : function()
