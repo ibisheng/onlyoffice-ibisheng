@@ -1877,7 +1877,7 @@ function addToArrDefNameRecalc(name){
 }
 function buildRecalc(_wb,notrec, bForce){
 	var ws;
-    if( lc > 1 && !bForce) return;
+    if( lc >= 1 && !bForce) return;
     if(!bForce){
         for(var id in arrDefNameRecalc ){
             arrDefNameRecalc[id].rebuild();
@@ -1900,7 +1900,7 @@ function buildRecalc(_wb,notrec, bForce){
             ws._BuildDependencies(_rec);
         }
 	}
-
+    arrRecalc = {};
     if(!notrec)
 	    sortDependency(_wb)
 }
