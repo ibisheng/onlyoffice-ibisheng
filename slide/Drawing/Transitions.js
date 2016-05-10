@@ -3123,19 +3123,16 @@ function CDemonstrationManager(htmlpage)
         if (!_is_transition)
             this.SlideNum++;
 
-        if (this.SlideNum >= this.SlidesCount)
-        {
-            if (this.HtmlPage.m_oApi.WordControl.m_oLogicDocument.isLoopShowMode())
-                this.SlideNum = 0;
-            else
-            {
-                this.End();
-                return;
-            }
-        }
+        if (this.HtmlPage.m_oApi.WordControl.m_oLogicDocument.isLoopShowMode() && (this.SlideNum >= this.SlidesCount))
+            this.SlideNum = 0;
 
-        this.HtmlPage.m_oApi.sync_DemonstrationSlideChanged(this.SlideNum);
-        this.StartSlide(!_is_transition, false);
+        if (this.SlideNum > this.SlidesCount)
+            this.End();
+        else
+        {
+            this.HtmlPage.m_oApi.sync_DemonstrationSlideChanged(this.SlideNum);
+            this.StartSlide(!_is_transition, false);
+        }
     }
 
     this.PrevSlide = function()
