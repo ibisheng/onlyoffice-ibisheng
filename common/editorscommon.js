@@ -2641,7 +2641,7 @@ CUserCacheColor.prototype.init = function(nColor) {
 };
 
   function loadScript(url, callback) {
-    if (window["NATIVE_EDITOR_ENJINE"] === true)
+    if (window["NATIVE_EDITOR_ENJINE"] === true || window["Native"] !== undefined)
     {
         callback();
         return;
