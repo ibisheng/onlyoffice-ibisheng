@@ -545,6 +545,9 @@ baseEditorsApi.prototype.asc_onCloseChartFrame = function() {
 baseEditorsApi.prototype.asc_setInterfaceDrawImagePlaceShape = function(elementId) {
   this.shapeElementId = elementId;
 };
+baseEditorsApi.prototype.asc_getPropertyEditorTextArts = function() {
+  return [AscCommon.g_oPresetTxWarpGroups, AscCommon.g_PresetTxWarpTypes];
+};
 // Add image
 baseEditorsApi.prototype._addImageUrl = function() {
 };

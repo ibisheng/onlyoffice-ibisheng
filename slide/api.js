@@ -804,11 +804,6 @@ asc_docs_api.prototype.get_PropertyEditorShapes = function()
     var ret = [AscCommon.g_oAutoShapesGroups, AscCommon.g_oAutoShapesTypes];
     return ret;
 };
-asc_docs_api.prototype.get_PropertyEditorTextArts = function()
-{
-    var ret = [AscCommon.g_oPresetTxWarpGroups, AscCommon.g_PresetTxWarpTypes];
-    return ret;
-};
 asc_docs_api.prototype.get_PropertyStandartTextures = function()
 {
     var _count = AscCommon.g_oUserTexturePresets.length;
@@ -5100,7 +5095,7 @@ asc_docs_api.prototype['asc_fireCallback'] = asc_docs_api.prototype.asc_fireCall
 asc_docs_api.prototype['asc_checkNeedCallback'] = asc_docs_api.prototype.asc_checkNeedCallback;
 asc_docs_api.prototype['get_TextProps'] = asc_docs_api.prototype.get_TextProps;
 asc_docs_api.prototype['get_PropertyEditorShapes'] = asc_docs_api.prototype.get_PropertyEditorShapes;
-asc_docs_api.prototype['get_PropertyEditorTextArts'] = asc_docs_api.prototype.get_PropertyEditorTextArts;
+asc_docs_api.prototype['asc_getPropertyEditorTextArts'] = asc_docs_api.prototype.asc_getPropertyEditorTextArts;
 asc_docs_api.prototype['get_PropertyStandartTextures'] = asc_docs_api.prototype.get_PropertyStandartTextures;
 asc_docs_api.prototype['get_PropertyEditorThemes'] = asc_docs_api.prototype.get_PropertyEditorThemes;
 asc_docs_api.prototype['get_ContentCount'] = asc_docs_api.prototype.get_ContentCount;

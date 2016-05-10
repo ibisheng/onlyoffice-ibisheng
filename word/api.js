@@ -749,11 +749,6 @@ asc_docs_api.prototype.get_PropertyEditorShapes = function()
     var ret = [AscCommon.g_oAutoShapesGroups, AscCommon.g_oAutoShapesTypes];
     return ret;
 };
-asc_docs_api.prototype.get_PropertyEditorTextArts = function()
-{
-    var ret = [AscCommon.g_oPresetTxWarpGroups, AscCommon.g_PresetTxWarpTypes];
-    return ret;
-};
 asc_docs_api.prototype.get_PropertyThemeColors = function()
 {
     var _ret = [this._gui_control_colors.Colors, this._gui_control_colors.StandartColors];
@@ -7294,7 +7289,7 @@ asc_docs_api.prototype['asc_unregisterCallback'] = asc_docs_api.prototype.asc_un
 asc_docs_api.prototype['asc_fireCallback'] = asc_docs_api.prototype.asc_fireCallback;
 asc_docs_api.prototype['asc_checkNeedCallback'] = asc_docs_api.prototype.asc_checkNeedCallback;
 asc_docs_api.prototype['get_PropertyEditorShapes'] = asc_docs_api.prototype.get_PropertyEditorShapes;
-asc_docs_api.prototype['get_PropertyEditorTextArts'] = asc_docs_api.prototype.get_PropertyEditorTextArts;
+asc_docs_api.prototype['asc_getPropertyEditorTextArts'] = asc_docs_api.prototype.asc_getPropertyEditorTextArts;
 asc_docs_api.prototype['get_PropertyThemeColors'] = asc_docs_api.prototype.get_PropertyThemeColors;
 asc_docs_api.prototype['get_PropertyThemeColorSchemes'] = asc_docs_api.prototype.get_PropertyThemeColorSchemes;
 asc_docs_api.prototype['_coAuthoringSetChange'] = asc_docs_api.prototype._coAuthoringSetChange;

@@ -1025,8 +1025,6 @@ var editor;
     } else if (null !== this._gui_color_schemes && "asc_onSendThemeColorSchemes" === name) {
       this.handlers.trigger("asc_onSendThemeColorSchemes", this._gui_color_schemes);
       this._gui_color_schemes = null;
-    } else if ("asc_onInitEditorTextArts" === name) {
-      this.handlers.trigger("asc_onInitEditorTextArts", [AscCommon.g_oPresetTxWarpGroups, AscCommon.g_PresetTxWarpTypes]);
     }
   };
 
@@ -3425,6 +3423,7 @@ var editor;
   prot["asc_setSelectedDrawingObjectLayer"] = prot.asc_setSelectedDrawingObjectLayer;
   prot["asc_getChartPreviews"] = prot.asc_getChartPreviews;
   prot["asc_getTextArtPreviews"] = prot.asc_getTextArtPreviews;
+  prot['asc_getPropertyEditorTextArts'] = prot.asc_getPropertyEditorTextArts;
   prot["asc_checkDataRange"] = prot.asc_checkDataRange;
   prot["asc_getBinaryFileWriter"] = prot.asc_getBinaryFileWriter;
   prot["asc_getWordChartObject"] = prot.asc_getWordChartObject;
