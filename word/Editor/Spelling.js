@@ -656,32 +656,6 @@ function CParaSpellCheckerElement(StartPos, EndPos, Word, Lang)
 }
 
 CParaSpellCheckerElement.prototype = {};
-//----------------------------------------------------------------------------------------------------------------------
-// SpellCheck_CallBack
-//          Функция ответа от сервера.
-//----------------------------------------------------------------------------------------------------------------------
-function SpellCheck_CallBack(Obj)
-{
-    if ( undefined != Obj && undefined != Obj["ParagraphId"] )
-    {
-        var ParaId = Obj["ParagraphId"];
-        var Paragraph = g_oTableId.Get_ById( ParaId );
-        var Type   = Obj["type"];
-        if ( null != Paragraph )
-        {
-            if ( "spell" === Type )
-            {
-                Paragraph.SpellChecker.Check_CallBack( Obj["RecalcId"], Obj["usrCorrect"] );
-                Paragraph.ReDraw();
-            }
-            else if ( "suggest" === Type )
-            {
-                Paragraph.SpellChecker.Check_CallBack2( Obj["RecalcId"], Obj["ElementId"], Obj["usrSuggest"] );
-                editor.sync_SpellCheckVariantsFound();
-            }
-        }
-    }
-}
 
 //----------------------------------------------------------------------------------------------------------------------
 // CDocument

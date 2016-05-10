@@ -984,18 +984,45 @@ asc_docs_api.prototype._coSpellCheckInit = function() {
 		return; // Error
 	}
 
+  var t = this;
     if (!window["AscDesktopEditor"]) {
         if (this.SpellCheckUrl && this.isSpellCheckEnable)
             this.SpellCheckApi.set_url(this.SpellCheckUrl);
 
         this.SpellCheckApi.onSpellCheck	= function (e) {
             var incomeObject = JSON.parse(e);
-            SpellCheck_CallBack(incomeObject);
+            t.SpellCheck_CallBack(incomeObject);
         };
     }
 
 	this.SpellCheckApi.init(this.documentId);
 };
+  //----------------------------------------------------------------------------------------------------------------------
+  // SpellCheck_CallBack
+  //          Функция ответа от сервера.
+  //----------------------------------------------------------------------------------------------------------------------
+  asc_docs_api.prototype.SpellCheck_CallBack = function(Obj)
+  {
+    if ( undefined != Obj && undefined != Obj["ParagraphId"] )
+    {
+      var ParaId = Obj["ParagraphId"];
+      var Paragraph = g_oTableId.Get_ById( ParaId );
+      var Type   = Obj["type"];
+      if ( null != Paragraph )
+      {
+        if ( "spell" === Type )
+        {
+          Paragraph.SpellChecker.Check_CallBack( Obj["RecalcId"], Obj["usrCorrect"] );
+          Paragraph.ReDraw();
+        }
+        else if ( "suggest" === Type )
+        {
+          Paragraph.SpellChecker.Check_CallBack2( Obj["RecalcId"], Obj["ElementId"], Obj["usrSuggest"] );
+          this.sync_SpellCheckVariantsFound();
+        }
+      }
+    }
+  }
 
 asc_docs_api.prototype.asc_getSpellCheckLanguages = function() {
 	return AscCommon.g_spellCheckLanguages;
@@ -7198,7 +7225,7 @@ function CSpellCheckApi_desktop()
 
     this.onSpellCheck = function(spellData)
     {
-        SpellCheck_CallBack(spellData);
+        editor.SpellCheck_CallBack(spellData);
     };
 
     this.disconnect = function()
