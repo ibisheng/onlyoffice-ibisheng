@@ -172,10 +172,15 @@
       ],
       "builder": [
       ],
-      "desktop": [
-        "../common/Local/common.js",
-        "../cell/Local/api.js"
-      ],
+      "desktop": {
+        "min": [
+		  "../common/Local/license.js"
+		],
+		"common": [
+		  "../common/Local/common.js",
+          "../cell/Local/api.js"
+		]
+	  },
 	  "mobile_banners": [
 	    "../../web-apps/vendor/xregexp/xregexp-all-min.js",
 		"../../web-apps/vendor/underscore/underscore-min.js",

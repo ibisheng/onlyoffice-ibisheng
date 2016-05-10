@@ -163,10 +163,15 @@
       ],
       "builder": [
       ],
-      "desktop": [
-        "../common/Local/common.js",
-        "../slide/Local/api.js"
-      ],
+      "desktop": {
+        "min": [
+		  "../common/Local/license.js"
+		],
+		"common": [
+          "../common/Local/common.js",
+          "../slide/Local/api.js"
+		]
+      },
 	  "mobile_banners": [
 		"../common/Native/native.js",
 		"../common/Native/jquery_native.js",

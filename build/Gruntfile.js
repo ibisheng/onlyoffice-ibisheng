@@ -70,6 +70,7 @@ module.exports = function(grunt) {
 
 	grunt.registerTask('concat_sdk_init', function() {
 		var sdkTmp = 'sdk-tmp.js', sdkAllTmp = 'sdk-all-tmp.js', sdkAllMinTmp = 'sdk-all-min-tmp.js';
+		var srcFilesMin = packageFile['compile']['sdk']['min'];
 		var srcFilesAll = packageFile['compile']['sdk']['common'];
 		var sdkOpt = {
 			compilation_level: 'WHITESPACE_ONLY',
@@ -92,7 +93,8 @@ module.exports = function(grunt) {
 			srcFilesAll = srcFilesAll.concat(packageFile['compile']['sdk']['private']);
 		}
 		if (grunt.option('desktop')) {
-			srcFilesAll = srcFilesAll.concat(packageFile['compile']['sdk']['desktop']);
+			srcFilesMin = srcFilesMin.concat(packageFile['compile']['sdk']['desktop']['min']);
+			srcFilesAll = srcFilesAll.concat(packageFile['compile']['sdk']['desktop']['common']);
 		}
 		if (grunt.option('builder')) {
 			srcFilesAll = srcFilesAll.concat(packageFile['compile']['sdk']['builder']);
@@ -107,7 +109,7 @@ module.exports = function(grunt) {
 						banner: '',
 						footer: 'window["split"]="split";'
 					},
-					src: packageFile['compile']['sdk']['min'],
+					src: srcFilesMin,
 					dest: sdkAllMinTmp
 				},
 				sdk: {

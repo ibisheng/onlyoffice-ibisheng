@@ -161,11 +161,16 @@
       "builder": [
         "../word/apiBuilder.js"
       ],
-      "desktop": [
-        "../common/Local/common.js",
-		"../word/Local/documentrenderer.js",
-        "../word/Local/api.js"
-      ],
+      "desktop": {
+        "min": [
+		  "../common/Local/license.js"
+		],
+		"common": [
+          "../common/Local/common.js",
+		  "../word/Local/documentrenderer.js",
+          "../word/Local/api.js"
+		]
+      },
 	  "mobile_banners": [],
       "exclude_mobile": [],
       "dst": "../word",
