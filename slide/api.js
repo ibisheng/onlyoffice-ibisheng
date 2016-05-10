@@ -14,9 +14,9 @@ var sendCommand = AscCommon.sendCommand;
 var mapAscServerErrorToAscError = AscCommon.mapAscServerErrorToAscError;
 var g_oIdCounter = AscCommon.g_oIdCounter;
 var g_oTableId = AscCommon.g_oTableId;
-var PasteElementsId = AscCommon.PasteElementsId;
-var global_mouseEvent = AscCommon.global_mouseEvent;
-var History = AscCommon.History;
+var PasteElementsId = null;
+var global_mouseEvent = null;
+var History = null;
 
 var c_oAscError = Asc.c_oAscError;
 var c_oAscFileType = Asc.c_oAscFileType;
@@ -26,6 +26,369 @@ var c_oAscTypeSelectElement = Asc.c_oAscTypeSelectElement;
 var c_oAscFill = Asc.c_oAscFill;
 var asc_CShapeFill = Asc.asc_CShapeFill;
 var asc_CFillBlip = Asc.asc_CFillBlip;
+
+function CAscSlideProps()
+{
+  this.Background = null;
+  this.Timing = null;
+  this.lockDelete = null;
+  this.lockLayout = null;
+  this.lockTiming = null;
+  this.lockBackground = null;
+  this.lockTranzition = null;
+  this.lockRemove = null;
+}
+
+CAscSlideProps.prototype.get_background = function(){return this.Background;};
+CAscSlideProps.prototype.put_background = function(v){this.Background = v;};
+CAscSlideProps.prototype.get_timing = function(){return this.Timing;};
+CAscSlideProps.prototype.put_timing = function(v){this.Timing = v;};
+CAscSlideProps.prototype.get_LockDelete = function(){return this.lockDelete;};
+CAscSlideProps.prototype.put_LockDelete = function(v){this.lockDelete = v;};
+CAscSlideProps.prototype.get_LockLayout = function(){return this.lockLayout;};
+CAscSlideProps.prototype.put_LockLayout = function(v){this.lockLayout = v;};
+CAscSlideProps.prototype.get_LockTiming = function(){return this.lockTiming;};
+CAscSlideProps.prototype.put_LockTiming = function(v){this.lockTiming = v;};
+CAscSlideProps.prototype.get_LockBackground = function(){return this.lockBackground;};
+CAscSlideProps.prototype.put_LockBackground = function(v){this.lockBackground = v;};
+CAscSlideProps.prototype.get_LockTranzition = function(){return this.lockTranzition;};
+CAscSlideProps.prototype.put_LockTranzition = function(v){this.lockTranzition = v;};
+CAscSlideProps.prototype.get_LockRemove = function(){return this.lockRemove;};
+CAscSlideProps.prototype.put_LockRemove = function(v){this.lockRemove = v;};
+
+function CAscChartProp( obj )
+{
+  if( obj )
+  {
+
+    this.Width         = (undefined != obj.w) ? obj.w : undefined;
+    this.Height        = (undefined != obj.h) ? obj.h : undefined;
+    this.Position      = new Asc.CPosition({X: obj.x, Y: obj.y});
+
+    this.Locked        = (undefined != obj.locked) ? obj.locked : false;
+
+    this.ChartProperties = (undefined != obj.chartProps) ? obj.chartProps : null;
+
+    this.severalCharts = obj.severalCharts != undefined ? obj.severalCharts : false;
+    this.severalChartTypes = obj.severalChartTypes != undefined ? obj.severalChartTypes : undefined;
+    this.severalChartStyles = obj.severalChartStyles != undefined ? obj.severalChartStyles : undefined;
+  }
+  else
+  {
+    this.Width         = undefined;
+    this.Height        = undefined;
+    this.Position      = undefined;
+    this.Locked   = false;
+
+    this.ChartProperties = new AscCommon.asc_ChartSettings();
+
+    this.severalCharts = false;
+    this.severalChartTypes = undefined;
+    this.severalChartStyles = undefined;
+  }
+}
+CAscChartProp.prototype.get_ChangeLevel = function() { return this.ChangeLevel; };
+CAscChartProp.prototype.put_ChangeLevel = function(v) { this.ChangeLevel = v; };
+
+CAscChartProp.prototype.get_CanBeFlow = function() { return this.CanBeFlow; };
+CAscChartProp.prototype.get_Width = function() { return this.Width; };
+CAscChartProp.prototype.put_Width = function(v) { this.Width = v; };
+CAscChartProp.prototype.get_Height = function() { return this.Height; };
+CAscChartProp.prototype.put_Height = function(v) { this.Height = v; };
+CAscChartProp.prototype.get_WrappingStyle = function() { return this.WrappingStyle; };
+CAscChartProp.prototype.put_WrappingStyle = function(v) { this.WrappingStyle = v; };
+// Возвращается объект класса Asc.asc_CPaddings
+CAscChartProp.prototype.get_Paddings = function() { return this.Paddings; };
+// Аргумент объект класса Asc.asc_CPaddings
+CAscChartProp.prototype.put_Paddings = function(v) { this.Paddings = v; };
+CAscChartProp.prototype.get_AllowOverlap = function() {return this.AllowOverlap;};
+CAscChartProp.prototype.put_AllowOverlap = function(v) {this.AllowOverlap = v;};
+// Возвращается объект класса CPosition
+CAscChartProp.prototype.get_Position = function() { return this.Position; };
+// Аргумент объект класса CPosition
+CAscChartProp.prototype.put_Position = function(v) { this.Position = v; };
+CAscChartProp.prototype.get_PositionH = function()  { return this.PositionH; };
+CAscChartProp.prototype.put_PositionH = function(v) { this.PositionH = v; };
+CAscChartProp.prototype.get_PositionV = function()  { return this.PositionV; };
+CAscChartProp.prototype.put_PositionV = function(v) { this.PositionV = v; };
+CAscChartProp.prototype.get_Value_X = function(RelativeFrom) { if ( null != this.Internal_Position ) return this.Internal_Position.Calculate_X_Value(RelativeFrom);  return 0; };
+CAscChartProp.prototype.get_Value_Y = function(RelativeFrom) { if ( null != this.Internal_Position ) return this.Internal_Position.Calculate_Y_Value(RelativeFrom);  return 0; };
+
+CAscChartProp.prototype.get_ImageUrl = function() { return this.ImageUrl; };
+CAscChartProp.prototype.put_ImageUrl = function(v) { this.ImageUrl = v; };
+CAscChartProp.prototype.get_Group = function() { return this.Group; };
+CAscChartProp.prototype.put_Group = function(v) { this.Group = v; };
+CAscChartProp.prototype.asc_getFromGroup = function() { return this.fromGroup; };
+CAscChartProp.prototype.asc_putFromGroup = function(v) { this.fromGroup = v; };
+
+CAscChartProp.prototype.get_isChartProps = function() { return this.isChartProps; };
+CAscChartProp.prototype.put_isChartPross = function(v) { this.isChartProps = v; };
+
+CAscChartProp.prototype.get_SeveralCharts = function() { return this.severalCharts; };
+CAscChartProp.prototype.put_SeveralCharts = function(v) { this.severalCharts = v; };
+CAscChartProp.prototype.get_SeveralChartTypes = function() { return this.severalChartTypes; };
+CAscChartProp.prototype.put_SeveralChartTypes = function(v) { this.severalChartTypes = v; };
+
+CAscChartProp.prototype.get_SeveralChartStyles = function() { return this.severalChartStyles; };
+CAscChartProp.prototype.put_SeveralChartStyles = function(v) { this.severalChartStyles = v; };
+
+CAscChartProp.prototype.get_VerticalTextAlign = function() { return this.verticalTextAlign; };
+CAscChartProp.prototype.put_VerticalTextAlign = function(v) { this.verticalTextAlign = v; };
+
+CAscChartProp.prototype.get_Locked = function() { return this.Locked; };
+
+CAscChartProp.prototype.get_ChartProperties = function()
+{
+  return this.ChartProperties;
+};
+
+CAscChartProp.prototype.put_ChartProperties = function(v)
+{
+  this.ChartProperties = v;
+};
+
+CAscChartProp.prototype.get_ShapeProperties = function()
+{
+  return this.ShapeProperties;
+};
+
+CAscChartProp.prototype.put_ShapeProperties = function(v)
+{
+  this.ShapeProperties = v;
+};
+
+CAscChartProp.prototype.asc_getType = function()
+{
+  return this.ChartProperties.asc_getType();
+};
+CAscChartProp.prototype.asc_getSubType = function()
+{
+  return this.ChartProperties.asc_getSubType();
+};
+
+CAscChartProp.prototype.asc_getStyleId = function()
+{
+  return this.ChartProperties.asc_getStyleId();
+};
+
+CAscChartProp.prototype.asc_getHeight = function()
+{
+  return this.Height;
+};
+CAscChartProp.prototype.asc_getWidth = function()
+{
+  return this.Width;
+};
+
+CAscChartProp.prototype.asc_setType = function(v)
+{
+  this.ChartProperties.asc_setType(v);
+};
+CAscChartProp.prototype.asc_setSubType = function(v)
+{
+  this.ChartProperties.asc_setSubType(v);
+};
+
+CAscChartProp.prototype.asc_setStyleId = function(v)
+{
+  this.ChartProperties.asc_setStyleId(v);
+};
+
+CAscChartProp.prototype.asc_setHeight = function(v)
+{
+  this.Height = v;
+};
+CAscChartProp.prototype.asc_setWidth = function(v)
+{
+  this.Width = v;
+};
+
+CAscChartProp.prototype.getType = function()
+{
+  return this.ChartProperties && this.ChartProperties.getType();
+};
+CAscChartProp.prototype.putType = function(v)
+{
+  return this.ChartProperties && this.ChartProperties.putType(v);
+};
+
+CAscChartProp.prototype.getStyle = function()
+{
+  return this.ChartProperties && this.ChartProperties.getStyle();
+};
+CAscChartProp.prototype.putStyle = function(v)
+{
+  return this.ChartProperties && this.ChartProperties.putStyle(v);
+}
+
+CAscChartProp.prototype.changeType = function(v)
+{
+  return this.ChartProperties && this.ChartProperties.changeType(v);
+};
+
+function CDocInfoProp(obj)
+{
+  if(obj){
+    this.PageCount = obj.PageCount;
+    this.WordsCount = obj.WordsCount;
+    this.ParagraphCount = obj.ParagraphCount;
+    this.SymbolsCount = obj.SymbolsCount;
+    this.SymbolsWSCount = obj.SymbolsWSCount;
+  }
+  else {
+    this.PageCount = -1;
+    this.WordsCount = -1;
+    this.ParagraphCount = -1;
+    this.SymbolsCount = -1;
+    this.SymbolsWSCount = -1;
+  }
+}
+CDocInfoProp.prototype.get_PageCount = function(){ return this.PageCount; };
+CDocInfoProp.prototype.put_PageCount = function(v){ this.PageCount = v; };
+CDocInfoProp.prototype.get_WordsCount = function(){ return this.WordsCount; };
+CDocInfoProp.prototype.put_WordsCount = function(v){ this.WordsCount = v; };
+CDocInfoProp.prototype.get_ParagraphCount = function(){ return this.ParagraphCount; };
+CDocInfoProp.prototype.put_ParagraphCount = function(v){ this.ParagraphCount = v; };
+CDocInfoProp.prototype.get_SymbolsCount = function(){ return this.SymbolsCount; };
+CDocInfoProp.prototype.put_SymbolsCount = function(v){ this.SymbolsCount = v; };
+CDocInfoProp.prototype.get_SymbolsWSCount = function(){ return this.SymbolsWSCount; };
+CDocInfoProp.prototype.put_SymbolsWSCount = function(v){ this.SymbolsWSCount = v; };
+
+/*----------------------------------------------------------------*/
+/*functions for working with headers*/
+/*
+ структура заголовков, предварительно, выглядит так
+ {
+ headerText: "Header1",//заголовок
+ pageNumber: 0, //содержит номер страницы, где находится искомая последовательность
+ X: 0,//координаты по OX начала последовательности на данной страницы
+ Y: 0,//координаты по OY начала последовательности на данной страницы
+ level: 0//уровень заголовка
+ }
+ заголовки приходят либо в списке, либо последовательно.
+ */
+// CHeader
+function CHeader (obj)
+{
+  if (obj)
+  {
+    this.headerText = (undefined != obj.headerText) ? obj.headerText : null;	//заголовок
+    this.pageNumber = (undefined != obj.pageNumber) ? obj.pageNumber : null;	//содержит номер страницы, где находится искомая последовательность
+    this.X = (undefined != obj.X) ? obj.X : null;								//координаты по OX начала последовательности на данной страницы
+    this.Y = (undefined != obj.Y) ? obj.Y : null;								//координаты по OY начала последовательности на данной страницы
+    this.level = (undefined != obj.level) ? obj.level : null;					//позиция заголовка
+  }
+  else
+  {
+    this.headerText = null;				//заголовок
+    this.pageNumber = null;				//содержит номер страницы, где находится искомая последовательность
+    this.X = null;						//координаты по OX начала последовательности на данной страницы
+    this.Y = null;						//координаты по OY начала последовательности на данной страницы
+    this.level = null;					//позиция заголовка
+  }
+}
+CHeader.prototype.get_headerText = function ()
+{
+  return this.headerText;
+};
+CHeader.prototype.get_pageNumber = function ()
+{
+  return this.pageNumber;
+};
+CHeader.prototype.get_X = function ()
+{
+  return this.X;
+};
+CHeader.prototype.get_Y = function ()
+{
+  return this.Y;
+};
+CHeader.prototype.get_Level = function ()
+{
+  return this.level;
+};
+var _fakeHeaders = [
+  new CHeader ({headerText: "Header1", pageNumber: 0, X: 0, Y: 0, level: 1}),
+  new CHeader ({headerText: "Header2", pageNumber: 0, X: 0, Y: 0, level: 1}),
+  new CHeader ({headerText: "Header3", pageNumber: 0, X: 0, Y: 0, level: 2}),
+  new CHeader ({headerText: "Header4", pageNumber: 0, X: 0, Y: 0, level: 1}),
+  new CHeader ({headerText: "Header5", pageNumber: 0, X: 0, Y: 0, level: 1}),
+  new CHeader ({headerText: "Header5", pageNumber: 0, X: 0, Y: 0, level: 1}),
+  new CHeader ({headerText: "Header5", pageNumber: 0, X: 0, Y: 0, level: 2}),
+  new CHeader ({headerText: "Header5", pageNumber: 0, X: 0, Y: 0, level: 3}),
+  new CHeader ({headerText: "Header3", pageNumber: 0, X: 0, Y: 0, level: 4}),
+  new CHeader ({headerText: "Header3", pageNumber: 0, X: 0, Y: 0, level: 5}),
+  new CHeader ({headerText: "Header3", pageNumber: 0, X: 0, Y: 0, level: 6}),
+  new CHeader ({headerText: "Header4", pageNumber: 0, X: 0, Y: 0, level: 7}),
+  new CHeader ({headerText: "Header5", pageNumber: 0, X: 0, Y: 0, level: 8}),
+  new CHeader ({headerText: "Header5", pageNumber: 0, X: 0, Y: 0, level: 1}),
+  new CHeader ({headerText: "Header5", pageNumber: 0, X: 0, Y: 0, level: 1}),
+  new CHeader ({headerText: "Header5", pageNumber: 0, X: 0, Y: 0, level: 2}),
+  new CHeader ({headerText: "Header5", pageNumber: 0, X: 0, Y: 0, level: 3}),
+  new CHeader ({headerText: "Header6", pageNumber: 0, X: 0, Y: 0, level: 1}),
+  new CHeader ({headerText: "Header5", pageNumber: 0, X: 0, Y: 0, level: 0}),
+  new CHeader ({headerText: "Header5", pageNumber: 0, X: 0, Y: 0, level: 1}),
+  new CHeader ({headerText: "Header5", pageNumber: 0, X: 0, Y: 0, level: 0}),
+  new CHeader ({headerText: "Header5", pageNumber: 0, X: 0, Y: 0, level: 0})
+];
+
+// CSearchResult - returns result of searching
+function CSearchResult (obj)
+{
+  this.Object = obj;
+}
+
+CSearchResult.prototype.get_Text = function ()
+{
+  return this.Object.text;
+};
+
+CSearchResult.prototype.get_Navigator = function ()
+{
+  return this.Object.navigator;
+};
+
+CSearchResult.prototype.put_Navigator = function (obj)
+{
+  this.Object.navigator = obj;
+};
+CSearchResult.prototype.put_Text = function (obj)
+{
+  this.Object.text = obj;
+};
+
+function CTablePropLook(obj)
+{
+  this.FirstCol = false;
+  this.FirstRow = false;
+  this.LastCol  = false;
+  this.LastRow  = false;
+  this.BandHor  = false;
+  this.BandVer  = false;
+
+  if ( obj )
+  {
+    this.FirstCol = ( undefined === obj.m_bFirst_Col ? false : obj.m_bFirst_Col );
+    this.FirstRow = ( undefined === obj.m_bFirst_Row ? false : obj.m_bFirst_Row );
+    this.LastCol  = ( undefined === obj.m_bLast_Col  ? false : obj.m_bLast_Col );
+    this.LastRow  = ( undefined === obj.m_bLast_Row  ? false : obj.m_bLast_Row );
+    this.BandHor  = ( undefined === obj.m_bBand_Hor  ? false : obj.m_bBand_Hor );
+    this.BandVer  = ( undefined === obj.m_bBand_Ver  ? false : obj.m_bBand_Ver );
+  }
+}
+
+CTablePropLook.prototype.get_FirstCol = function() {return this.FirstCol;};
+CTablePropLook.prototype.put_FirstCol = function(v) {this.FirstCol = v;};
+CTablePropLook.prototype.get_FirstRow = function() {return this.FirstRow;};
+CTablePropLook.prototype.put_FirstRow = function(v) {this.FirstRow = v;};
+CTablePropLook.prototype.get_LastCol = function() {return this.LastCol;};
+CTablePropLook.prototype.put_LastCol = function(v) {this.LastCol = v;};
+CTablePropLook.prototype.get_LastRow = function() {return this.LastRow;};
+CTablePropLook.prototype.put_LastRow = function(v) {this.LastRow = v;};
+CTablePropLook.prototype.get_BandHor = function() {return this.BandHor;};
+CTablePropLook.prototype.put_BandHor = function(v) {this.BandHor = v;};
+CTablePropLook.prototype.get_BandVer = function() {return this.BandVer;};
+CTablePropLook.prototype.put_BandVer = function(v) {this.BandVer = v;};
 
 /**
  *
@@ -37,16 +400,17 @@ function asc_docs_api(name)
 {
   asc_docs_api.superclass.constructor.call(this, name, AscCommon.c_oEditorId.Presentation);
 
-    g_oTableId.init();
-
 	/************ private!!! **************/
-    this.WordControl = new AscCommonSlide.CEditorPage(this);
-    this.WordControl.Name = this.HtmlElementName;
+    this.WordControl = null;
 
   this.documentFormatSave = c_oAscFileType.PPTX;
 
-    this.ThemeLoader = new CThemeLoader();
-    this.ThemeLoader.Api = this;
+    this.ThemeLoader = null;
+    this.tmpThemesPath = null;
+    this.tmpIsFreeze = null;
+    this.tmpSlideDiv = null;
+    this.tmpTextArtDiv = null;
+    this.tmpViewRulers = null;
 
     this.DocumentUrl = "";
     this.bNoSendComments = false;
@@ -103,9 +467,6 @@ function asc_docs_api(name)
     // объекты, нужные для отправки в тулбар (шрифты, стили)
     this._gui_editor_themes = null;
     this._gui_document_themes = null;
-    //выставляем тип copypaste
-  PasteElementsId.g_bIsDocumentCopyPaste = false;
-
 
     if (window.editor == undefined)
     {
@@ -201,7 +562,7 @@ asc_docs_api.prototype._coAuthoringInitEnd = function() {
           }
           if (Class instanceof AscCommonSlide.PropLocker) {
             var object = g_oTableId.Get_ById(Class.objectId);
-            if (object instanceof Slide && Class === object.deleteLock) {
+            if (object instanceof AscCommonSlide.Slide && Class === object.deleteLock) {
               editor.WordControl.m_oLogicDocument.DrawingDocument.LockSlide(object.num);
             }
           }
@@ -210,7 +571,7 @@ asc_docs_api.prototype._coAuthoringInitEnd = function() {
 
           if (Class instanceof AscCommonSlide.PropLocker) {
             var object = g_oTableId.Get_ById(Class.objectId);
-            if (object instanceof CPresentation) {
+            if (object instanceof AscCommonSlide.CPresentation) {
               if (Class === editor.WordControl.m_oLogicDocument.themeLock) {
                 editor.asc_fireCallback("asc_onLockDocumentTheme");
               } else if (Class === editor.WordControl.m_oLogicDocument.schemeLock) {
@@ -307,14 +668,14 @@ asc_docs_api.prototype._coAuthoringInitEnd = function() {
           Lock.Set_Type(NewType, true);
           if (Class instanceof AscCommonSlide.PropLocker) {
             var object = g_oTableId.Get_ById(Class.objectId);
-            if (object instanceof Slide && Class === object.deleteLock) {
+            if (object instanceof AscCommonSlide.Slide && Class === object.deleteLock) {
               if (NewType !== locktype_Mine && NewType !== locktype_None) {
                 editor.WordControl.m_oLogicDocument.DrawingDocument.LockSlide(object.num);
               } else {
                 editor.WordControl.m_oLogicDocument.DrawingDocument.UnLockSlide(object.num);
               }
             }
-            if (object instanceof CPresentation) {
+            if (object instanceof AscCommonSlide.CPresentation) {
               if (Class === object.themeLock) {
                 if (NewType !== locktype_Mine && NewType !== locktype_None) {
                   editor.asc_fireCallback("asc_onLockDocumentTheme");
@@ -512,7 +873,7 @@ asc_docs_api.prototype.sync_ChangeLastSelectedElement = function(type, obj)
 			break;
 		case c_oAscTypeSelectElement.Image: oUnkTypeObj = new Asc.asc_CImgProperty( obj );
 			break;
-		case c_oAscTypeSelectElement.Table: oUnkTypeObj = new CTableProp( obj );
+		case c_oAscTypeSelectElement.Table: oUnkTypeObj = new Asc.CTableProp( obj );
 			break;
 		case c_oAscTypeSelectElement.Shape: oUnkTypeObj = obj;
 			break;
@@ -546,6 +907,11 @@ asc_docs_api.prototype.asc_setLocale = function(val) {
 
 asc_docs_api.prototype.SetThemesPath = function(path)
 {
+  if (!this.isLoadFullApi) {
+    this.tmpThemesPath = path;
+    return;
+  }
+
     this.ThemeLoader.ThemesUrl = path;
     if (this.documentOrigin) {
         this.ThemeLoader.ThemesUrlAbs = AscCommon.joinUrls(this.documentOrigin + this.documentPathname, path);
@@ -664,17 +1030,25 @@ asc_docs_api.prototype.CreateComponents = function()
 
 asc_docs_api.prototype.InitEditor = function()
 {
-    this.WordControl.m_oLogicDocument   = new CPresentation(this.WordControl.m_oDrawingDocument);
+    this.WordControl.m_oLogicDocument   = new AscCommonSlide.CPresentation(this.WordControl.m_oDrawingDocument);
     this.WordControl.m_oDrawingDocument.m_oLogicDocument = this.WordControl.m_oLogicDocument;
 };
 
 asc_docs_api.prototype.SetInterfaceDrawImagePlaceSlide = function(div_id)
 {
+  if (!this.isLoadFullApi) {
+    this.tmpSlideDiv = div_id;
+    return;
+  }
     this.WordControl.m_oDrawingDocument.InitGuiCanvasSlide(div_id);
 };
 
 asc_docs_api.prototype.SetInterfaceDrawImagePlaceTextArt = function(div_id)
 {
+  if (!this.isLoadFullApi) {
+    this.tmpTextArtDiv = div_id;
+    return;
+  }
     this.WordControl.m_oDrawingDocument.InitGuiCanvasTextArt(div_id);
 };
 
@@ -796,7 +1170,7 @@ asc_docs_api.prototype.get_TextProps = function()
 	var TextPr = Doc.Get_Paragraph_TextPr();
 
 	// return { ParaPr: ParaPr, TextPr : TextPr };
-	return new CParagraphAndTextProp (ParaPr, TextPr);	// uncomment if this method will be used externally. 20/03/2012 uncommented for testers
+	return new AscCommonSlide.CParagraphAndTextProp (ParaPr, TextPr);	// uncomment if this method will be used externally. 20/03/2012 uncommented for testers
 };
 
 // -------
@@ -2629,7 +3003,7 @@ asc_docs_api.prototype.sync_AlignCellCallback = function(align){
 	this.asc_fireCallback("asc_onAlignCell",align);
 };
 asc_docs_api.prototype.sync_TblPropCallback = function(tblProp){
-    this.SelectedObjectsStack[this.SelectedObjectsStack.length] = new asc_CSelectedObject( c_oAscTypeSelectElement.Table, new CTableProp( tblProp ));
+    this.SelectedObjectsStack[this.SelectedObjectsStack.length] = new asc_CSelectedObject( c_oAscTypeSelectElement.Table, new Asc.CTableProp( tblProp ));
 };
 asc_docs_api.prototype.sync_TblWrapStyleChangedCallback = function(style){
 	this.asc_fireCallback("asc_onTblWrapStyleChanged",style);
@@ -3000,6 +3374,11 @@ asc_docs_api.prototype.sync_ImgPropCallback = function(imgProp){
 
 asc_docs_api.prototype.SetDrawingFreeze = function(bIsFreeze)
 {
+  if (!this.isLoadFullApi) {
+    this.tmpIsFreeze = bIsFreeze;
+    return;
+  }
+
     this.WordControl.DrawingFreeze = bIsFreeze;
 
     var _elem1 = document.getElementById("id_main");
@@ -3595,7 +3974,7 @@ asc_docs_api.prototype.OpenDocumentEndCallback = function()
             {
                 if(_masters[i].ThemeIndex < 0)//только темы презентации
                 {
-                    var theme_load_info = new CThemeLoadInfo();
+                    var theme_load_info = new AscCommonSlide.CThemeLoadInfo();
                     theme_load_info.Master = _masters[i];
                     theme_load_info.Theme = _masters[i].Theme;
 
@@ -3608,7 +3987,7 @@ asc_docs_api.prototype.OpenDocumentEndCallback = function()
                     th_info.Url = "";
                     th_info.Thumbnail = _masters[i].ImageBase64;
 
-                    var th = new CAscThemeInfo(th_info);
+                    var th = new AscCommonSlide.CAscThemeInfo(th_info);
                     this.ThemeLoader.Themes.DocumentThemes[this.ThemeLoader.Themes.DocumentThemes.length] = th;
                     th.Index = -this.ThemeLoader.Themes.DocumentThemes.length;
 
@@ -3789,6 +4168,11 @@ asc_docs_api.prototype.asc_SetViewRulers = function(bRulers)
 {
     //if (false === this.bInit_word_control || true === this.isViewMode)
     //    return;
+
+  if (!this.isLoadFullApi) {
+    this.tmpViewRulers = bRulers;
+    return;
+  }
 
     if (this.WordControl.m_bIsRuler != bRulers)
     {
@@ -4147,7 +4531,6 @@ asc_docs_api.prototype.sync_slidePropCallback = function(slide)
     if (!slide)
         return;
 
-    var bg = slide.cSld.Bg;
     var obj = new CAscSlideProps();
 
     var bgFill = slide.backgroundFill;
@@ -4270,6 +4653,11 @@ asc_docs_api.prototype.getViewMode = function() {
   return this.isViewMode;
 };
 asc_docs_api.prototype.asc_setViewMode = function(isViewMode) {
+  if (!this.isLoadFullApi) {
+    this.isViewMode = isViewMode;
+    return;
+  }
+
   if (isViewMode) {
     this.isViewMode = true;
     this.ShowParaMarks = false;
@@ -4722,10 +5110,45 @@ asc_docs_api.prototype._onOpenCommand = function(data) {
 	});
 };
 asc_docs_api.prototype._onEndLoadSdk = function() {
+  History = AscCommon.History;
+  PasteElementsId = AscCommon.PasteElementsId;
+  global_mouseEvent = AscCommon.global_mouseEvent;
+
+  g_oTableId.init();
+  this.WordControl = new AscCommonSlide.CEditorPage(this);
+  this.WordControl.Name = this.HtmlElementName;
+
+  this.ThemeLoader = new AscCommonSlide.CThemeLoader();
+  this.ThemeLoader.Api = this;
+
+  //выставляем тип copypaste
+  PasteElementsId.g_bIsDocumentCopyPaste = false;
+
+  this.CreateComponents();
+  this.WordControl.Init();
+
+  if (this.tmpThemesPath) {
+    this.SetThemesPath(this.tmpThemesPath);
+  }
+  if (null !== this.tmpIsFreeze) {
+    this.SetDrawingFreeze(this.tmpIsFreeze);
+  }
+  if (this.tmpSlideDiv) {
+    this.SetInterfaceDrawImagePlaceSlide(this.tmpSlideDiv);
+  }
+  if (this.tmpTextArtDiv) {
+    this.SetInterfaceDrawImagePlaceTextArt(this.tmpTextArtDiv);
+  }
+  if (null !== this.tmpViewRulers) {
+    this.asc_SetViewRulers(this.tmpViewRulers);
+  }
+
+  this.asc_setViewMode(this.isViewMode);
+
   asc_docs_api.superclass._onEndLoadSdk.call(this);
 };
 
-asc_docs_api.prototype._downloadAs = function(editor, filetype, actionType, options)
+asc_docs_api.prototype._downloadAs = function(filetype, actionType, options)
 {
   var t = this;
     if (!options) {
@@ -4777,7 +5200,7 @@ asc_docs_api.prototype._downloadAs = function(editor, filetype, actionType, opti
     };
   this.fCurCallback = fCallback;
   AscCommon.saveWithParts(function(fCallback1, oAdditionalData1, dataContainer1){sendCommand(t, fCallback1, oAdditionalData1, dataContainer1);}, fCallback, null, oAdditionalData, dataContainer);
-}
+};
 
 //test
 window["asc_docs_api"] = asc_docs_api;
@@ -4812,7 +5235,7 @@ window["asc_docs_api"].prototype["asc_nativeOpenFile"] = function(base64File, ve
     
     this.LoadedObject = 1;
     g_oIdCounter.Set_Load(false);
-}
+};
 
 window["asc_docs_api"].prototype["asc_nativeCalculateFile"] = function()
 {
@@ -4822,7 +5245,7 @@ window["asc_docs_api"].prototype["asc_nativeCalculateFile"] = function()
     var presentation = this.WordControl.m_oLogicDocument;
     presentation.Recalculate({Drawings: {All: true, Map: {}}});
     presentation.DrawingDocument.OnEndRecalculate();    
-}
+};
 
 window["asc_docs_api"].prototype["asc_nativeApplyChanges"] = function(changes)
 {
@@ -4834,7 +5257,7 @@ window["asc_docs_api"].prototype["asc_nativeApplyChanges"] = function(changes)
     AscCommon.CollaborativeEditing.Add_Changes( Changes );
 	}
   AscCommon.CollaborativeEditing.Apply_OtherChanges();
-}
+};
 
 window["asc_docs_api"].prototype["asc_nativeApplyChanges2"] = function(data, isFull)
 {
@@ -4900,14 +5323,14 @@ window["asc_docs_api"].prototype["asc_nativeApplyChanges2"] = function(data, isF
     }
 
     g_oIdCounter.Set_Load( false );
-}
+};
 
 window["asc_docs_api"].prototype["asc_nativeGetFile"] = function()
 {
 	var writer = new AscCommon.CBinaryFileWriter();
     this.WordControl.m_oLogicDocument.CalculateComments();
     return writer.WriteDocument(this.WordControl.m_oLogicDocument);
-}
+};
 
 window["asc_docs_api"].prototype["asc_nativeGetFileData"] = function()
 {
@@ -4919,7 +5342,7 @@ window["asc_docs_api"].prototype["asc_nativeGetFileData"] = function()
     window["native"]["Save_End"](_header, writer.pos);
 
     return writer.ImData.data;
-}
+};
 
 window["asc_docs_api"].prototype["asc_nativeCheckPdfRenderer"] = function(_memory1, _memory2)
 {
@@ -4950,11 +5373,11 @@ window["asc_docs_api"].prototype["asc_nativeCheckPdfRenderer"] = function(_memor
 	_printer.Memory				    = _memory1;
 	_printer.VectorMemoryForPrint	= _memory2;
 	return _printer;
-},
+};
 
 window["asc_docs_api"].prototype["asc_nativeCalculate"] = function()
 {
-}
+};
 
 window["asc_docs_api"].prototype["asc_nativePrint"] = function(_printer, _page)
 {
@@ -5004,12 +5427,12 @@ window["asc_docs_api"].prototype["asc_nativePrint"] = function(_printer, _page)
     _printer.BeginPage(_logic_doc.Width, _logic_doc.Height);
     _logic_doc.DrawPage(_page, _printer);
     _printer.EndPage();
-}
+};
 
 window["asc_docs_api"].prototype["asc_nativePrintPagesCount"] = function()
 {
 	return this.WordControl.m_oDrawingDocument.SlidesCount;
-}
+};
 
 window["asc_docs_api"].prototype["asc_nativeGetPDF"] = function()
 {
@@ -5061,14 +5484,11 @@ asc_docs_api.prototype['sync_BeginCatchSelectedElements'] = asc_docs_api.prototy
 asc_docs_api.prototype['sync_EndCatchSelectedElements'] = asc_docs_api.prototype.sync_EndCatchSelectedElements;
 asc_docs_api.prototype['getSelectedElements'] = asc_docs_api.prototype.getSelectedElements;
 asc_docs_api.prototype['sync_ChangeLastSelectedElement'] = asc_docs_api.prototype.sync_ChangeLastSelectedElement;
-asc_docs_api.prototype['Init'] = asc_docs_api.prototype.Init;
 asc_docs_api.prototype['asc_getEditorPermissions'] = asc_docs_api.prototype.asc_getEditorPermissions;
 asc_docs_api.prototype['asc_setDocInfo'] = asc_docs_api.prototype.asc_setDocInfo;
 asc_docs_api.prototype['asc_setLocale'] = asc_docs_api.prototype.asc_setLocale;
 asc_docs_api.prototype['asc_LoadDocument'] = asc_docs_api.prototype.asc_LoadDocument;
 asc_docs_api.prototype['SetThemesPath'] = asc_docs_api.prototype.SetThemesPath;
-asc_docs_api.prototype['CreateCSS'] = asc_docs_api.prototype.CreateCSS;
-asc_docs_api.prototype['CreateComponents'] = asc_docs_api.prototype.CreateComponents;
 asc_docs_api.prototype['InitEditor'] = asc_docs_api.prototype.InitEditor;
 asc_docs_api.prototype['SetInterfaceDrawImagePlaceSlide'] = asc_docs_api.prototype.SetInterfaceDrawImagePlaceSlide;
 asc_docs_api.prototype['SetInterfaceDrawImagePlaceTextArt'] = asc_docs_api.prototype.SetInterfaceDrawImagePlaceTextArt;
@@ -5431,6 +5851,8 @@ asc_docs_api.prototype['asc_addComment'] = asc_docs_api.prototype.asc_addComment
 asc_docs_api.prototype['asc_SetFastCollaborative'] = asc_docs_api.prototype.asc_SetFastCollaborative;
 asc_docs_api.prototype['asc_isOffline'] = asc_docs_api.prototype.asc_isOffline;
 asc_docs_api.prototype['asc_getUrlType'] = asc_docs_api.prototype.asc_getUrlType;
+asc_docs_api.prototype["asc_setInterfaceDrawImagePlaceShape"] = asc_docs_api.prototype.asc_setInterfaceDrawImagePlaceShape;
+
 window['asc_CCommentData'] = asc_CCommentData;
 asc_CCommentData.prototype['asc_getText'] = asc_CCommentData.prototype.asc_getText;
 asc_CCommentData.prototype['asc_putText'] = asc_CCommentData.prototype.asc_putText;
@@ -5464,26 +5886,6 @@ CContextMenuData.prototype['get_Type'] = CContextMenuData.prototype.get_Type;
 CContextMenuData.prototype['get_X'] = CContextMenuData.prototype.get_X;
 CContextMenuData.prototype['get_Y'] = CContextMenuData.prototype.get_Y;
 CContextMenuData.prototype['get_IsSlideSelect'] = CContextMenuData.prototype.get_IsSlideSelect;
-window['Asc']['CAscSlideTiming'] = CAscSlideTiming;
-CAscSlideTiming.prototype['put_TransitionType'] = CAscSlideTiming.prototype.put_TransitionType;
-CAscSlideTiming.prototype['get_TransitionType'] = CAscSlideTiming.prototype.get_TransitionType;
-CAscSlideTiming.prototype['put_TransitionOption'] = CAscSlideTiming.prototype.put_TransitionOption;
-CAscSlideTiming.prototype['get_TransitionOption'] = CAscSlideTiming.prototype.get_TransitionOption;
-CAscSlideTiming.prototype['put_TransitionDuration'] = CAscSlideTiming.prototype.put_TransitionDuration;
-CAscSlideTiming.prototype['get_TransitionDuration'] = CAscSlideTiming.prototype.get_TransitionDuration;
-CAscSlideTiming.prototype['put_SlideAdvanceOnMouseClick'] = CAscSlideTiming.prototype.put_SlideAdvanceOnMouseClick;
-CAscSlideTiming.prototype['get_SlideAdvanceOnMouseClick'] = CAscSlideTiming.prototype.get_SlideAdvanceOnMouseClick;
-CAscSlideTiming.prototype['put_SlideAdvanceAfter'] = CAscSlideTiming.prototype.put_SlideAdvanceAfter;
-CAscSlideTiming.prototype['get_SlideAdvanceAfter'] = CAscSlideTiming.prototype.get_SlideAdvanceAfter;
-CAscSlideTiming.prototype['put_SlideAdvanceDuration'] = CAscSlideTiming.prototype.put_SlideAdvanceDuration;
-CAscSlideTiming.prototype['get_SlideAdvanceDuration'] = CAscSlideTiming.prototype.get_SlideAdvanceDuration;
-CAscSlideTiming.prototype['applyProps'] = CAscSlideTiming.prototype.applyProps;
-CAscSlideTiming.prototype['createDuplicate'] = CAscSlideTiming.prototype.createDuplicate;
-CAscSlideTiming.prototype['makeDuplicate'] = CAscSlideTiming.prototype.makeDuplicate;
-CAscSlideTiming.prototype['setUndefinedOptions'] = CAscSlideTiming.prototype.setUndefinedOptions;
-CAscSlideTiming.prototype['setDefaultParams'] = CAscSlideTiming.prototype.setDefaultParams;
-CAscSlideTiming.prototype['Write_ToBinary'] = CAscSlideTiming.prototype.Write_ToBinary;
-CAscSlideTiming.prototype['Read_FromBinary'] = CAscSlideTiming.prototype.Read_FromBinary;
 window['Asc']['CAscSlideProps'] = CAscSlideProps;
 CAscSlideProps.prototype['get_background'] = CAscSlideProps.prototype.get_background;
 CAscSlideProps.prototype['put_background'] = CAscSlideProps.prototype.put_background;
@@ -5501,8 +5903,6 @@ CAscSlideProps.prototype['get_LockTranzition'] = CAscSlideProps.prototype.get_Lo
 CAscSlideProps.prototype['put_LockTranzition'] = CAscSlideProps.prototype.put_LockTranzition;
 CAscSlideProps.prototype['get_LockRemove'] = CAscSlideProps.prototype.get_LockRemove;
 CAscSlideProps.prototype['put_LockRemove'] = CAscSlideProps.prototype.put_LockRemove;
-CAscThemes.prototype['get_EditorThemes'] = CAscThemes.prototype.get_EditorThemes;
-CAscThemes.prototype['get_DocumentThemes'] = CAscThemes.prototype.get_DocumentThemes;
 window['Asc']['CAscChartProp'] = CAscChartProp;
 CAscChartProp.prototype['get_ChangeLevel'] = CAscChartProp.prototype.get_ChangeLevel;
 CAscChartProp.prototype['put_ChangeLevel'] = CAscChartProp.prototype.put_ChangeLevel;
@@ -5561,12 +5961,6 @@ CAscChartProp.prototype['putType'] = CAscChartProp.prototype.putType;
 CAscChartProp.prototype['getStyle'] = CAscChartProp.prototype.getStyle;
 CAscChartProp.prototype['putStyle'] = CAscChartProp.prototype.putStyle;
 CAscChartProp.prototype['changeType'] = CAscChartProp.prototype.changeType;
-CLayoutThumbnail.prototype['getIndex'] = CLayoutThumbnail.prototype.getIndex;
-CLayoutThumbnail.prototype['getType'] = CLayoutThumbnail.prototype.getType;
-CLayoutThumbnail.prototype['get_Image'] = CLayoutThumbnail.prototype.get_Image;
-CLayoutThumbnail.prototype['get_Name'] = CLayoutThumbnail.prototype.get_Name;
-CLayoutThumbnail.prototype['get_Width'] = CLayoutThumbnail.prototype.get_Width;
-CLayoutThumbnail.prototype['get_Height'] = CLayoutThumbnail.prototype.get_Height;
 CDocInfoProp.prototype['get_PageCount'] = CDocInfoProp.prototype.get_PageCount;
 CDocInfoProp.prototype['put_PageCount'] = CDocInfoProp.prototype.put_PageCount;
 CDocInfoProp.prototype['get_WordsCount'] = CDocInfoProp.prototype.get_WordsCount;
@@ -5586,29 +5980,7 @@ CSearchResult.prototype['get_Text'] = CSearchResult.prototype.get_Text;
 CSearchResult.prototype['get_Navigator'] = CSearchResult.prototype.get_Navigator;
 CSearchResult.prototype['put_Navigator'] = CSearchResult.prototype.put_Navigator;
 CSearchResult.prototype['put_Text'] = CSearchResult.prototype.put_Text;
-window['Asc']['CBackground'] = CBackground;
-CBackground.prototype['get_Color'] = CBackground.prototype.get_Color;
-CBackground.prototype['put_Color'] = CBackground.prototype.put_Color;
-CBackground.prototype['get_Value'] = CBackground.prototype.get_Value;
-CBackground.prototype['put_Value'] = CBackground.prototype.put_Value;
-window['Asc']['CTablePositionH'] = CTablePositionH;
-CTablePositionH.prototype['get_RelativeFrom'] = CTablePositionH.prototype.get_RelativeFrom;
-CTablePositionH.prototype['put_RelativeFrom'] = CTablePositionH.prototype.put_RelativeFrom;
-CTablePositionH.prototype['get_UseAlign'] = CTablePositionH.prototype.get_UseAlign;
-CTablePositionH.prototype['put_UseAlign'] = CTablePositionH.prototype.put_UseAlign;
-CTablePositionH.prototype['get_Align'] = CTablePositionH.prototype.get_Align;
-CTablePositionH.prototype['put_Align'] = CTablePositionH.prototype.put_Align;
-CTablePositionH.prototype['get_Value'] = CTablePositionH.prototype.get_Value;
-CTablePositionH.prototype['put_Value'] = CTablePositionH.prototype.put_Value;
-window['Asc']['CTablePositionV'] = CTablePositionV;
-CTablePositionV.prototype['get_RelativeFrom'] = CTablePositionV.prototype.get_RelativeFrom;
-CTablePositionV.prototype['put_RelativeFrom'] = CTablePositionV.prototype.put_RelativeFrom;
-CTablePositionV.prototype['get_UseAlign'] = CTablePositionV.prototype.get_UseAlign;
-CTablePositionV.prototype['put_UseAlign'] = CTablePositionV.prototype.put_UseAlign;
-CTablePositionV.prototype['get_Align'] = CTablePositionV.prototype.get_Align;
-CTablePositionV.prototype['put_Align'] = CTablePositionV.prototype.put_Align;
-CTablePositionV.prototype['get_Value'] = CTablePositionV.prototype.get_Value;
-CTablePositionV.prototype['put_Value'] = CTablePositionV.prototype.put_Value;
+
 window['Asc']['CTablePropLook'] = CTablePropLook;
 CTablePropLook.prototype['get_FirstCol'] = CTablePropLook.prototype.get_FirstCol;
 CTablePropLook.prototype['put_FirstCol'] = CTablePropLook.prototype.put_FirstCol;
@@ -5622,95 +5994,3 @@ CTablePropLook.prototype['get_BandHor'] = CTablePropLook.prototype.get_BandHor;
 CTablePropLook.prototype['put_BandHor'] = CTablePropLook.prototype.put_BandHor;
 CTablePropLook.prototype['get_BandVer'] = CTablePropLook.prototype.get_BandVer;
 CTablePropLook.prototype['put_BandVer'] = CTablePropLook.prototype.put_BandVer;
-window['Asc']['CTableProp'] = CTableProp;
-CTableProp.prototype['get_Width'] = CTableProp.prototype.get_Width;
-CTableProp.prototype['put_Width'] = CTableProp.prototype.put_Width;
-CTableProp.prototype['get_Spacing'] = CTableProp.prototype.get_Spacing;
-CTableProp.prototype['put_Spacing'] = CTableProp.prototype.put_Spacing;
-CTableProp.prototype['get_DefaultMargins'] = CTableProp.prototype.get_DefaultMargins;
-CTableProp.prototype['put_DefaultMargins'] = CTableProp.prototype.put_DefaultMargins;
-CTableProp.prototype['get_CellMargins'] = CTableProp.prototype.get_CellMargins;
-CTableProp.prototype['put_CellMargins'] = CTableProp.prototype.put_CellMargins;
-CTableProp.prototype['get_TableAlignment'] = CTableProp.prototype.get_TableAlignment;
-CTableProp.prototype['put_TableAlignment'] = CTableProp.prototype.put_TableAlignment;
-CTableProp.prototype['get_TableIndent'] = CTableProp.prototype.get_TableIndent;
-CTableProp.prototype['put_TableIndent'] = CTableProp.prototype.put_TableIndent;
-CTableProp.prototype['get_TableWrap'] = CTableProp.prototype.get_TableWrap;
-CTableProp.prototype['put_TableWrap'] = CTableProp.prototype.put_TableWrap;
-CTableProp.prototype['get_TablePaddings'] = CTableProp.prototype.get_TablePaddings;
-CTableProp.prototype['put_TablePaddings'] = CTableProp.prototype.put_TablePaddings;
-CTableProp.prototype['get_TableBorders'] = CTableProp.prototype.get_TableBorders;
-CTableProp.prototype['put_TableBorders'] = CTableProp.prototype.put_TableBorders;
-CTableProp.prototype['get_CellBorders'] = CTableProp.prototype.get_CellBorders;
-CTableProp.prototype['put_CellBorders'] = CTableProp.prototype.put_CellBorders;
-CTableProp.prototype['get_TableBackground'] = CTableProp.prototype.get_TableBackground;
-CTableProp.prototype['put_TableBackground'] = CTableProp.prototype.put_TableBackground;
-CTableProp.prototype['get_CellsBackground'] = CTableProp.prototype.get_CellsBackground;
-CTableProp.prototype['put_CellsBackground'] = CTableProp.prototype.put_CellsBackground;
-CTableProp.prototype['get_Position'] = CTableProp.prototype.get_Position;
-CTableProp.prototype['put_Position'] = CTableProp.prototype.put_Position;
-CTableProp.prototype['get_PositionH'] = CTableProp.prototype.get_PositionH;
-CTableProp.prototype['put_PositionH'] = CTableProp.prototype.put_PositionH;
-CTableProp.prototype['get_PositionV'] = CTableProp.prototype.get_PositionV;
-CTableProp.prototype['put_PositionV'] = CTableProp.prototype.put_PositionV;
-CTableProp.prototype['get_Value_X'] = CTableProp.prototype.get_Value_X;
-CTableProp.prototype['get_Value_Y'] = CTableProp.prototype.get_Value_Y;
-CTableProp.prototype['get_ForSelectedCells'] = CTableProp.prototype.get_ForSelectedCells;
-CTableProp.prototype['put_ForSelectedCells'] = CTableProp.prototype.put_ForSelectedCells;
-CTableProp.prototype['put_CellSelect'] = CTableProp.prototype.put_CellSelect;
-CTableProp.prototype['get_CellSelect'] = CTableProp.prototype.get_CellSelect;
-CTableProp.prototype['get_CanBeFlow'] = CTableProp.prototype.get_CanBeFlow;
-CTableProp.prototype['get_RowsInHeader'] = CTableProp.prototype.get_RowsInHeader;
-CTableProp.prototype['put_RowsInHeader'] = CTableProp.prototype.put_RowsInHeader;
-CTableProp.prototype['get_Locked'] = CTableProp.prototype.get_Locked;
-CTableProp.prototype['get_CellsVAlign'] = CTableProp.prototype.get_CellsVAlign;
-CTableProp.prototype['put_CellsVAlign'] = CTableProp.prototype.put_CellsVAlign;
-CTableProp.prototype['get_TableLook'] = CTableProp.prototype.get_TableLook;
-CTableProp.prototype['put_TableLook'] = CTableProp.prototype.put_TableLook;
-CTableProp.prototype['get_TableStyle'] = CTableProp.prototype.get_TableStyle;
-CTableProp.prototype['put_TableStyle'] = CTableProp.prototype.put_TableStyle;
-window['Asc']['CBorders'] = CBorders;
-CBorders.prototype['get_Left'] = CBorders.prototype.get_Left;
-CBorders.prototype['put_Left'] = CBorders.prototype.put_Left;
-CBorders.prototype['get_Top'] = CBorders.prototype.get_Top;
-CBorders.prototype['put_Top'] = CBorders.prototype.put_Top;
-CBorders.prototype['get_Right'] = CBorders.prototype.get_Right;
-CBorders.prototype['put_Right'] = CBorders.prototype.put_Right;
-CBorders.prototype['get_Bottom'] = CBorders.prototype.get_Bottom;
-CBorders.prototype['put_Bottom'] = CBorders.prototype.put_Bottom;
-CBorders.prototype['get_InsideH'] = CBorders.prototype.get_InsideH;
-CBorders.prototype['put_InsideH'] = CBorders.prototype.put_InsideH;
-CBorders.prototype['get_InsideV'] = CBorders.prototype.get_InsideV;
-CBorders.prototype['put_InsideV'] = CBorders.prototype.put_InsideV;
-window['Asc']['CMargins'] = CMargins;
-CMargins.prototype['get_Left'] = CMargins.prototype.get_Left;
-CMargins.prototype['put_Left'] = CMargins.prototype.put_Left;
-CMargins.prototype['get_Right'] = CMargins.prototype.get_Right;
-CMargins.prototype['put_Right'] = CMargins.prototype.put_Right;
-CMargins.prototype['get_Top'] = CMargins.prototype.get_Top;
-CMargins.prototype['put_Top'] = CMargins.prototype.put_Top;
-CMargins.prototype['get_Bottom'] = CMargins.prototype.get_Bottom;
-CMargins.prototype['put_Bottom'] = CMargins.prototype.put_Bottom;
-CMargins.prototype['get_Flag'] = CMargins.prototype.get_Flag;
-CMargins.prototype['put_Flag'] = CMargins.prototype.put_Flag;
-CParagraphPropEx.prototype['get_ContextualSpacing'] = CParagraphPropEx.prototype.get_ContextualSpacing;
-CParagraphPropEx.prototype['get_Ind'] = CParagraphPropEx.prototype.get_Ind;
-CParagraphPropEx.prototype['get_Jc'] = CParagraphPropEx.prototype.get_Jc;
-CParagraphPropEx.prototype['get_KeepLines'] = CParagraphPropEx.prototype.get_KeepLines;
-CParagraphPropEx.prototype['get_KeepNext'] = CParagraphPropEx.prototype.get_KeepNext;
-CParagraphPropEx.prototype['get_PageBreakBefore'] = CParagraphPropEx.prototype.get_PageBreakBefore;
-CParagraphPropEx.prototype['get_Spacing'] = CParagraphPropEx.prototype.get_Spacing;
-CParagraphPropEx.prototype['get_Shd'] = CParagraphPropEx.prototype.get_Shd;
-CParagraphPropEx.prototype['get_WidowControl'] = CParagraphPropEx.prototype.get_WidowControl;
-CParagraphPropEx.prototype['get_Tabs'] = CParagraphPropEx.prototype.get_Tabs;
-CTextProp.prototype['get_Bold'] = CTextProp.prototype.get_Bold;
-CTextProp.prototype['get_Italic'] = CTextProp.prototype.get_Italic;
-CTextProp.prototype['get_Underline'] = CTextProp.prototype.get_Underline;
-CTextProp.prototype['get_Strikeout'] = CTextProp.prototype.get_Strikeout;
-CTextProp.prototype['get_FontFamily'] = CTextProp.prototype.get_FontFamily;
-CTextProp.prototype['get_FontSize'] = CTextProp.prototype.get_FontSize;
-CTextProp.prototype['get_Color'] = CTextProp.prototype.get_Color;
-CTextProp.prototype['get_VertAlign'] = CTextProp.prototype.get_VertAlign;
-CTextProp.prototype['get_HighLight'] = CTextProp.prototype.get_HighLight;
-CParagraphAndTextProp.prototype['get_ParaPr'] = CParagraphAndTextProp.prototype.get_ParaPr;
-CParagraphAndTextProp.prototype['get_TextPr'] = CParagraphAndTextProp.prototype.get_TextPr;

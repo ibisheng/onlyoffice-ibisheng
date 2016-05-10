@@ -328,7 +328,7 @@ CCollaborativeEditingBase.prototype.Apply_Changes = function()
     // Если нет чужих изменений, тогда и делать ничего не надо
     if (true === OtherChanges)
     {
-        editor.Stop_Recalculate();
+        editor.WordControl.m_oLogicDocument.Stop_Recalculate();
         editor.WordControl.m_oLogicDocument.EndPreview_MailMergeResult();
 
         editor.sync_StartAction(Asc.c_oAscAsyncActionType.BlockInteraction, Asc.c_oAscAsyncAction.ApplyChanges);

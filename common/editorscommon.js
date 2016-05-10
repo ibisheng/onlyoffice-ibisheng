@@ -2238,7 +2238,7 @@ CTableId.prototype.Load_Changes = function(Reader, Reader2)
 						oLogicDocument.DrawingObjects.addGraphicObject(oParaDrawing);
                     }, this, []);
                 }
-                else if(oLogicDocument instanceof CPresentation)
+                else if(oLogicDocument instanceof AscCommonSlide.CPresentation)
                 {
                     if(oLogicDocument.Slides[0])
                     {

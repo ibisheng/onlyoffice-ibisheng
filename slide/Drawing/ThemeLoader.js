@@ -1,5 +1,20 @@
 "use strict";
 
+function CAscThemes()
+{
+    this.EditorThemes = [];
+    this.DocumentThemes = [];
+
+    var _count = AscCommon._presentation_editor_themes.length;
+    for (var i = 0; i < _count; i++)
+    {
+        this.EditorThemes[i] = new CAscThemeInfo(AscCommon._presentation_editor_themes[i]);
+        this.EditorThemes[i].Index = i;
+    }
+}
+CAscThemes.prototype.get_EditorThemes = function(){ return this.EditorThemes; };
+CAscThemes.prototype.get_DocumentThemes = function(){ return this.DocumentThemes; };
+
 function CThemeLoadInfo()
 {
     this.FontMap = null;
@@ -165,3 +180,10 @@ function CThemeLoader()
         this.CurrentLoadThemeIndex = -1;
     };
 }
+
+//-------------------------------------------------------------export---------------------------------------------------
+window['AscCommonSlide'] = window['AscCommonSlide'] || {};
+window['AscCommonSlide'].CThemeLoader = CThemeLoader;
+window['AscCommonSlide'].CThemeLoadInfo = CThemeLoadInfo;
+CAscThemes.prototype['get_EditorThemes'] = CAscThemes.prototype.get_EditorThemes;
+CAscThemes.prototype['get_DocumentThemes'] = CAscThemes.prototype.get_DocumentThemes;

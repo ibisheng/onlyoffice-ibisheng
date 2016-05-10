@@ -6786,13 +6786,6 @@ asc_docs_api.prototype._onEndLoadSdk = function() {
   asc_docs_api.superclass._onEndLoadSdk.call(this);
 };
 
-asc_docs_api.prototype.Stop_Recalculate = function() {
-  this.WordControl.m_oLogicDocument.Stop_Recalculate();
-};
-asc_docs_api.prototype.Document_UpdateUndoRedoState = function() {
-  editor.WordControl.m_oLogicDocument.Document_UpdateUndoRedoState();
-};
-
 window["asc_docs_api"] = asc_docs_api;
 window["asc_docs_api"].prototype["asc_nativeOpenFile"] = function(base64File, version)
 {

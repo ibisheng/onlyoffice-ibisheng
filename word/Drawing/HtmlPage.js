@@ -1601,8 +1601,8 @@ function CEditorPage(api)
             _yOffset += (7 * g_dKoef_mm_to_pix);
         }
 
-        if (window.closeDialogs != undefined)
-            closeDialogs();
+        if (window['closeDialogs'] != undefined)
+            window['closeDialogs']();
 
         AscCommon.check_MouseDownEvent(e, true);
         global_mouseEvent.LockMouse();

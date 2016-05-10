@@ -81,7 +81,7 @@ CCollaborativeEditing.prototype.Send_Changes = function(IsUserSave, AdditionalIn
         {
             editor.WordControl.m_oLogicDocument.DrawingDocument.UnLockSlide(Class.num);
         }
-        if(Class instanceof PropLocker)
+        if(Class instanceof AscCommonSlide.PropLocker)
         {
             var Class2 = AscCommon.g_oTableId.Get_ById(Class.objectId);
             if(Class2 && Class2.getObjectType && Class2.getObjectType() === AscDFH.historyitem_type_Slide && Class2.deleteLock === Class)
@@ -206,14 +206,14 @@ CCollaborativeEditing.prototype.Release_Locks = function()
         var CurLockType = this.m_aNeedUnlock[Index].Lock.Get_Type();
         if  ( AscCommon.locktype_Other3 != CurLockType && AscCommon.locktype_Other != CurLockType )
         {
-            //if(this.m_aNeedUnlock[Index] instanceof Slide)                                                      //TODO: проверять LockObject
+            //if(this.m_aNeedUnlock[Index] instanceof AscCommonSlide.Slide)                                                      //TODO: проверять LockObject
             //    editor.WordControl.m_oLogicDocument.DrawingDocument.UnLockSlide(this.m_aNeedUnlock[Index].num);
             var Class =  this.m_aNeedUnlock[Index];
             this.m_aNeedUnlock[Index].Lock.Set_Type( AscCommon.locktype_None, false);
-            if ( Class instanceof PropLocker )
+            if ( Class instanceof AscCommonSlide.PropLocker )
             {
                 var object = AscCommon.g_oTableId.Get_ById(Class.objectId);
-                if(object instanceof CPresentation)
+                if(object instanceof AscCommonSlide.CPresentation)
                 {
                     if(Class === editor.WordControl.m_oLogicDocument.themeLock)
                     {
@@ -233,7 +233,7 @@ CCollaborativeEditing.prototype.Release_Locks = function()
                     editor.WordControl.m_oLogicDocument.DrawingDocument.UnLockSlide(object.num);
                 }
             }
-            if(Class instanceof CComment)
+            if(Class instanceof AscCommon.CComment)
             {
                 editor.sync_UnLockComment(Class.Get_Id());
             }
@@ -241,7 +241,7 @@ CCollaborativeEditing.prototype.Release_Locks = function()
         else if ( AscCommon.locktype_Other3 === CurLockType )
         {
             this.m_aNeedUnlock[Index].Lock.Set_Type( AscCommon.locktype_Other, false);
-            if(this.m_aNeedUnlock[Index] instanceof Slide)
+            if(this.m_aNeedUnlock[Index] instanceof AscCommonSlide.Slide)
                 editor.WordControl.m_oLogicDocument.DrawingDocument.LockSlide(this.m_aNeedUnlock[Index].num);
         }
         if(this.m_aNeedUnlock[Index].parent && AscFormat.isRealNumber(this.m_aNeedUnlock[Index].parent.num))
@@ -339,7 +339,7 @@ CCollaborativeEditing.prototype.OnEnd_CheckLock = function()
                         if ( null != Class )
                         {
                             Class.Lock.Set_Type( AscCommon.locktype_Mine, false );
-                            if(Class instanceof Slide)
+                            if(Class instanceof AscCommonSlide.Slide)
                                 editor.WordControl.m_oLogicDocument.DrawingDocument.UnLockSlide(Class.num);
                             this.Add_Unlock2( Class );
                         }
@@ -396,7 +396,7 @@ CCollaborativeEditing.prototype.OnCallback_AskLock = function(result)
                     if ( null != Class )
                     {
                         Class.Lock.Set_Type( AscCommon.locktype_Mine );
-                        if(Class instanceof Slide)
+                        if(Class instanceof AscCommonSlide.Slide)
                             editor.WordControl.m_oLogicDocument.DrawingDocument.UnLockSlide(Class.num);
                         AscCommon.CollaborativeEditing.Add_Unlock2( Class );
                     }
@@ -475,7 +475,7 @@ CCollaborativeEditing.prototype.Update_ForeignCursorsPositions = function()
         }
         return;
     }
-    var bTable = (oTargetDocContentOrTable instanceof CTable);
+    var bTable = (oTargetDocContentOrTable instanceof AscCommonWord.CTable);
     for (var UserId in this.m_aForeignCursors){
         var DocPos = this.m_aForeignCursors[UserId];
         if (!DocPos || DocPos.length <= 0)
@@ -490,7 +490,7 @@ CCollaborativeEditing.prototype.Update_ForeignCursorsPositions = function()
 };
 
 CCollaborativeEditing.prototype.Update_ForeignCursorPosition = function(UserId, Run, InRunPos, isRemoveLabel, oTargetDocContentOrTable, bTable){
-    if (!(Run instanceof ParaRun))
+    if (!(Run instanceof AscCommonWord.ParaRun))
         return;
 
     var DrawingDocument = editor.WordControl.m_oDrawingDocument;

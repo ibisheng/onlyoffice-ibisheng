@@ -2,16 +2,22 @@
   "compile": {
     "sdk": {
       "min": [
-	  ],
-	  "common": [
         "../common/browser.js",
         "../common/commonDefines.js",
-        "../common/downloaderfiles.js",
-        "../common/docscoapicommon.js",
+		"../common/docscoapicommon.js",
         "../common/docscoapi.js",
-        "../common/apiCommon.js",
+		"../common/apiCommon.js",
 		"../common/SerializeCommonWordExcel.js",
         "../common/editorscommon.js",
+		"../slide/apiDefines.js",
+		"../common/CollaborativeEditingBase.js",
+		"../slide/Editor/CollaborativeEditing.js",
+		"../common/apiBase.js",
+		"../common/Private/license.js",
+        "../slide/api.js"
+	  ],
+	  "common": [
+        "../common/downloaderfiles.js",
         "../common/NumFormat.js",
 		"../common/SerializeChart.js",
 		"../common/AdvancedOptions.js",
@@ -69,7 +75,6 @@
 		
 		"../common/Drawings/Externals.js",
 		"../common/GlobalLoaders.js",
-		"../common/CollaborativeEditingBase.js",
 		"../common/Controls.js",
 		"../common/Overlay.js",
 		"../common/Drawings/HatchPattern.js",
@@ -78,7 +83,6 @@
 
         "../common/wordcopypaste.js",
 
-        "../slide/apiDefines.js",
 		"../slide/themes/Themes.js",
 		
 		"../cell/utils/utils.js",
@@ -93,7 +97,6 @@
         "../word/Editor/Styles.js",
 		"../slide/Editor/Format/StylesPrototype.js",
         "../word/Editor/Numbering.js",
-        "../slide/Editor/CollaborativeEditing.js",
         "../word/Drawing/GraphicsEvents.js",
         "../word/Drawing/Rulers.js",
         "../word/Editor/Table.js",
@@ -152,13 +155,9 @@
         "../slide/Editor/Format/GroupPrototype.js",
         "../slide/Editor/Format/ChartSpacePrototype.js",
         "../slide/apiCommon.js",
-        "../word/apiCommon.js",
-		
-		"../common/apiBase.js",
-        "../slide/api.js"
+        "../word/apiCommon.js"
       ],
       "private": [
-        "../common/Private/license.js",
         "../slide/Private/comments.js",
         "../common/Private/Locks.js"
       ],

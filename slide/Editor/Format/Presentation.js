@@ -5165,3 +5165,7 @@ function collectSelectedObjects(aSpTree, aCollectArray, bRecursive)
         }
     }
 }
+
+//------------------------------------------------------------export----------------------------------------------------
+window['AscCommonSlide'] = window['AscCommonSlide'] || {};
+window['AscCommonSlide'].CPresentation = CPresentation;
