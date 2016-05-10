@@ -7,83 +7,83 @@ var History = AscCommon.History;
 //----------------------------------------------------------------------------------------------------------------------
 // Работаем с рецензированием
 //----------------------------------------------------------------------------------------------------------------------
-Asc.asc_docs_api.prototype.asc_SetTrackRevisions = function(bTrack)
+Asc['asc_docs_api'].prototype.asc_SetTrackRevisions = function(bTrack)
 {
     return this.WordControl.m_oLogicDocument.Set_TrackRevisions(bTrack);
 };
-Asc.asc_docs_api.prototype.asc_IsTrackRevisions = function()
+Asc['asc_docs_api'].prototype.asc_IsTrackRevisions = function()
 {
     return this.WordControl.m_oLogicDocument.Is_TrackRevisions();
 };
-Asc.asc_docs_api.prototype.sync_BeginCatchRevisionsChanges = function()
+Asc['asc_docs_api'].prototype.sync_BeginCatchRevisionsChanges = function()
 {
     this.RevisionChangesStack = [];
 };
-Asc.asc_docs_api.prototype.sync_EndCatchRevisionsChanges = function()
+Asc['asc_docs_api'].prototype.sync_EndCatchRevisionsChanges = function()
 {
     this.asc_fireCallback("asc_onShowRevisionsChange", this.RevisionChangesStack);
 };
-Asc.asc_docs_api.prototype.sync_AddRevisionsChange = function(Change)
+Asc['asc_docs_api'].prototype.sync_AddRevisionsChange = function(Change)
 {
     this.RevisionChangesStack.push(Change);
 };
-Asc.asc_docs_api.prototype.asc_AcceptChanges = function(Change)
+Asc['asc_docs_api'].prototype.asc_AcceptChanges = function(Change)
 {
     if (undefined !== Change)
         this.WordControl.m_oLogicDocument.Accept_RevisionChange(Change);
     else
         this.WordControl.m_oLogicDocument.Accept_RevisionChangesBySelection();
 };
-Asc.asc_docs_api.prototype.asc_RejectChanges = function(Change)
+Asc['asc_docs_api'].prototype.asc_RejectChanges = function(Change)
 {
     if (undefined !== Change)
         this.WordControl.m_oLogicDocument.Reject_RevisionChange(Change);
     else
         this.WordControl.m_oLogicDocument.Reject_RevisionChangesBySelection();
 };
-Asc.asc_docs_api.prototype.asc_HaveRevisionsChanges = function()
+Asc['asc_docs_api'].prototype.asc_HaveRevisionsChanges = function()
 {
     this.WordControl.m_oLogicDocument.Have_RevisionChanges();
 };
-Asc.asc_docs_api.prototype.asc_HaveNewRevisionsChanges = function()
+Asc['asc_docs_api'].prototype.asc_HaveNewRevisionsChanges = function()
 {
     return this.asc_HaveRevisionsChanges();
 };
-Asc.asc_docs_api.prototype.asc_GetNextRevisionsChange = function()
+Asc['asc_docs_api'].prototype.asc_GetNextRevisionsChange = function()
 {
     return this.WordControl.m_oLogicDocument.Get_NextRevisionChange();
 };
-Asc.asc_docs_api.prototype.asc_GetPrevRevisionsChange = function()
+Asc['asc_docs_api'].prototype.asc_GetPrevRevisionsChange = function()
 {
     return this.WordControl.m_oLogicDocument.Get_PrevRevisionChange();
 };
-Asc.asc_docs_api.prototype.sync_UpdateRevisionsChangesPosition = function(X, Y)
+Asc['asc_docs_api'].prototype.sync_UpdateRevisionsChangesPosition = function(X, Y)
 {
     this.asc_fireCallback("asc_onUpdateRevisionsChangesPosition", X, Y);
 };
-Asc.asc_docs_api.prototype.asc_AcceptAllChanges = function()
+Asc['asc_docs_api'].prototype.asc_AcceptAllChanges = function()
 {
     this.WordControl.m_oLogicDocument.Accept_AllRevisionChanges();
 };
-Asc.asc_docs_api.prototype.asc_RejectAllChanges = function()
+Asc['asc_docs_api'].prototype.asc_RejectAllChanges = function()
 {
     this.WordControl.m_oLogicDocument.Reject_AllRevisionChanges();
 };
 
-Asc.asc_docs_api.prototype['asc_SetTrackRevisions']               = Asc.asc_docs_api.prototype.asc_SetTrackRevisions;
-Asc.asc_docs_api.prototype['asc_IsTrackRevisions']                = Asc.asc_docs_api.prototype.asc_IsTrackRevisions;
-Asc.asc_docs_api.prototype['sync_BeginCatchRevisionsChanges']     = Asc.asc_docs_api.prototype.sync_BeginCatchRevisionsChanges;
-Asc.asc_docs_api.prototype['sync_EndCatchRevisionsChanges']       = Asc.asc_docs_api.prototype.sync_EndCatchRevisionsChanges;
-Asc.asc_docs_api.prototype['sync_AddRevisionsChange']             = Asc.asc_docs_api.prototype.sync_AddRevisionsChange;
-Asc.asc_docs_api.prototype['asc_AcceptChanges']                   = Asc.asc_docs_api.prototype.asc_AcceptChanges;
-Asc.asc_docs_api.prototype['asc_RejectChanges']                   = Asc.asc_docs_api.prototype.asc_RejectChanges;
-Asc.asc_docs_api.prototype['asc_HaveRevisionsChanges']            = Asc.asc_docs_api.prototype.asc_HaveRevisionsChanges;
-Asc.asc_docs_api.prototype['asc_HaveNewRevisionsChanges']         = Asc.asc_docs_api.prototype.asc_HaveNewRevisionsChanges;
-Asc.asc_docs_api.prototype['asc_GetNextRevisionsChange']          = Asc.asc_docs_api.prototype.asc_GetNextRevisionsChange;
-Asc.asc_docs_api.prototype['asc_GetPrevRevisionsChange']          = Asc.asc_docs_api.prototype.asc_GetPrevRevisionsChange;
-Asc.asc_docs_api.prototype['sync_UpdateRevisionsChangesPosition'] = Asc.asc_docs_api.prototype.sync_UpdateRevisionsChangesPosition;
-Asc.asc_docs_api.prototype['asc_AcceptAllChanges']                = Asc.asc_docs_api.prototype.asc_AcceptAllChanges;
-Asc.asc_docs_api.prototype['asc_RejectAllChanges']                = Asc.asc_docs_api.prototype.asc_RejectAllChanges;
+Asc['asc_docs_api'].prototype['asc_SetTrackRevisions']               = Asc['asc_docs_api'].prototype.asc_SetTrackRevisions;
+Asc['asc_docs_api'].prototype['asc_IsTrackRevisions']                = Asc['asc_docs_api'].prototype.asc_IsTrackRevisions;
+Asc['asc_docs_api'].prototype['sync_BeginCatchRevisionsChanges']     = Asc['asc_docs_api'].prototype.sync_BeginCatchRevisionsChanges;
+Asc['asc_docs_api'].prototype['sync_EndCatchRevisionsChanges']       = Asc['asc_docs_api'].prototype.sync_EndCatchRevisionsChanges;
+Asc['asc_docs_api'].prototype['sync_AddRevisionsChange']             = Asc['asc_docs_api'].prototype.sync_AddRevisionsChange;
+Asc['asc_docs_api'].prototype['asc_AcceptChanges']                   = Asc['asc_docs_api'].prototype.asc_AcceptChanges;
+Asc['asc_docs_api'].prototype['asc_RejectChanges']                   = Asc['asc_docs_api'].prototype.asc_RejectChanges;
+Asc['asc_docs_api'].prototype['asc_HaveRevisionsChanges']            = Asc['asc_docs_api'].prototype.asc_HaveRevisionsChanges;
+Asc['asc_docs_api'].prototype['asc_HaveNewRevisionsChanges']         = Asc['asc_docs_api'].prototype.asc_HaveNewRevisionsChanges;
+Asc['asc_docs_api'].prototype['asc_GetNextRevisionsChange']          = Asc['asc_docs_api'].prototype.asc_GetNextRevisionsChange;
+Asc['asc_docs_api'].prototype['asc_GetPrevRevisionsChange']          = Asc['asc_docs_api'].prototype.asc_GetPrevRevisionsChange;
+Asc['asc_docs_api'].prototype['sync_UpdateRevisionsChangesPosition'] = Asc['asc_docs_api'].prototype.sync_UpdateRevisionsChangesPosition;
+Asc['asc_docs_api'].prototype['asc_AcceptAllChanges']                = Asc['asc_docs_api'].prototype.asc_AcceptAllChanges;
+Asc['asc_docs_api'].prototype['asc_RejectAllChanges']                = Asc['asc_docs_api'].prototype.asc_RejectAllChanges;
 //----------------------------------------------------------------------------------------------------------------------
 // CDocument
 //----------------------------------------------------------------------------------------------------------------------

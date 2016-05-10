@@ -11,12 +11,12 @@ var c_oAscError = Asc.c_oAscError;
 //----------------------------------------------------------------------------------------------------------------------
 // Функции для работы с MailMerge
 //----------------------------------------------------------------------------------------------------------------------
-Asc.asc_docs_api.prototype.asc_StartMailMerge = function(oData)
+Asc['asc_docs_api'].prototype.asc_StartMailMerge = function(oData)
 {
     this.mailMergeFileData = oData;
     this.asc_DownloadAs(Asc.c_oAscFileType.JSON);
 };
-Asc.asc_docs_api.prototype.asc_StartMailMergeByList = function(aList)
+Asc['asc_docs_api'].prototype.asc_StartMailMergeByList = function(aList)
 {
     if (!aList || !aList.length || aList.length <= 1)
         aList = [[]];
@@ -67,55 +67,55 @@ Asc.asc_docs_api.prototype.asc_StartMailMergeByList = function(aList)
 
     this.WordControl.m_oLogicDocument.Start_MailMerge(DstList);
 };
-Asc.asc_docs_api.prototype.asc_GetReceptionsCount = function()
+Asc['asc_docs_api'].prototype.asc_GetReceptionsCount = function()
 {
     return this.WordControl.m_oLogicDocument.Get_MailMergeReceptionsCount();
 };
-Asc.asc_docs_api.prototype.asc_GetMailMergeFieldsNameList = function()
+Asc['asc_docs_api'].prototype.asc_GetMailMergeFieldsNameList = function()
 {
     return this.WordControl.m_oLogicDocument.Get_MailMergeFieldsNameList();
 };
-Asc.asc_docs_api.prototype.asc_AddMailMergeField = function(Name)
+Asc['asc_docs_api'].prototype.asc_AddMailMergeField = function(Name)
 {
     this.WordControl.m_oLogicDocument.Add_MailMergeField(Name);
 };
-Asc.asc_docs_api.prototype.asc_SetHighlightMailMergeFields = function(Value)
+Asc['asc_docs_api'].prototype.asc_SetHighlightMailMergeFields = function(Value)
 {
     this.WordControl.m_oLogicDocument.Set_HightlightMailMergeFields(Value);
 };
-Asc.asc_docs_api.prototype.asc_PreviewMailMergeResult = function(Index)
+Asc['asc_docs_api'].prototype.asc_PreviewMailMergeResult = function(Index)
 {
     this.WordControl.m_oLogicDocument.Preview_MailMergeResult(Index);
 };
-Asc.asc_docs_api.prototype.asc_EndPreviewMailMergeResult = function()
+Asc['asc_docs_api'].prototype.asc_EndPreviewMailMergeResult = function()
 {
     this.WordControl.m_oLogicDocument.EndPreview_MailMergeResult();
 };
-Asc.asc_docs_api.prototype.sync_StartMailMerge = function()
+Asc['asc_docs_api'].prototype.sync_StartMailMerge = function()
 {
     this.asc_fireCallback("asc_onStartMailMerge");
 };
-Asc.asc_docs_api.prototype.sync_PreviewMailMergeResult = function(Index)
+Asc['asc_docs_api'].prototype.sync_PreviewMailMergeResult = function(Index)
 {
     this.asc_fireCallback("asc_onPreviewMailMergeResult", Index);
 };
-Asc.asc_docs_api.prototype.sync_EndPreviewMailMergeResult = function()
+Asc['asc_docs_api'].prototype.sync_EndPreviewMailMergeResult = function()
 {
     this.asc_fireCallback("asc_onEndPreviewMailMergeResult");
 };
-Asc.asc_docs_api.prototype.sync_HighlightMailMergeFields = function(Value)
+Asc['asc_docs_api'].prototype.sync_HighlightMailMergeFields = function(Value)
 {
     this.asc_fireCallback("asc_onHighlightMailMergeFields", Value);
 };
-Asc.asc_docs_api.prototype.asc_getMailMergeData = function()
+Asc['asc_docs_api'].prototype.asc_getMailMergeData = function()
 {
     return this.WordControl.m_oLogicDocument.Get_MailMergeReceptionsList();
 };
-Asc.asc_docs_api.prototype.asc_setMailMergeData = function(aList)
+Asc['asc_docs_api'].prototype.asc_setMailMergeData = function(aList)
 {
     this.asc_StartMailMergeByList(aList);
 };
-Asc.asc_docs_api.prototype.asc_sendMailMergeData = function(oData)
+Asc['asc_docs_api'].prototype.asc_sendMailMergeData = function(oData)
 {
     var actionType = Asc.c_oAscAsyncAction.SendMailMerge;
     oData.put_UserId(this.documentUserId);
@@ -141,11 +141,11 @@ Asc.asc_docs_api.prototype.asc_sendMailMergeData = function(oData)
         t.sync_EndAction(Asc.c_oAscAsyncActionType.BlockInteraction, actionType);
     });
 };
-Asc.asc_docs_api.prototype.asc_GetMailMergeFiledValue = function(nIndex, sName)
+Asc['asc_docs_api'].prototype.asc_GetMailMergeFiledValue = function(nIndex, sName)
 {
     return this.WordControl.m_oLogicDocument.Get_MailMergeFileldValue(nIndex, sName);
 };
-Asc.asc_docs_api.prototype.asc_DownloadAsMailMerge = function(typeFile, StartIndex, EndIndex, bIsDownload)
+Asc['asc_docs_api'].prototype.asc_DownloadAsMailMerge = function(typeFile, StartIndex, EndIndex, bIsDownload)
 {
     var oDocumentMailMerge = this.WordControl.m_oLogicDocument.Get_MailMergedDocument(StartIndex, EndIndex);
     if (null != oDocumentMailMerge)
@@ -161,23 +161,23 @@ Asc.asc_docs_api.prototype.asc_DownloadAsMailMerge = function(typeFile, StartInd
     return null != oDocumentMailMerge ? true : false;
 };
 
-Asc.asc_docs_api.prototype['asc_StartMailMerge']              = Asc.asc_docs_api.prototype.asc_StartMailMerge;
-Asc.asc_docs_api.prototype['asc_StartMailMergeByList']        = Asc.asc_docs_api.prototype.asc_StartMailMergeByList;
-Asc.asc_docs_api.prototype['asc_GetReceptionsCount']          = Asc.asc_docs_api.prototype.asc_GetReceptionsCount;
-Asc.asc_docs_api.prototype['asc_GetMailMergeFieldsNameList']  = Asc.asc_docs_api.prototype.asc_GetMailMergeFieldsNameList;
-Asc.asc_docs_api.prototype['asc_AddMailMergeField']           = Asc.asc_docs_api.prototype.asc_AddMailMergeField;
-Asc.asc_docs_api.prototype['asc_SetHighlightMailMergeFields'] = Asc.asc_docs_api.prototype.asc_SetHighlightMailMergeFields;
-Asc.asc_docs_api.prototype['asc_PreviewMailMergeResult']      = Asc.asc_docs_api.prototype.asc_PreviewMailMergeResult;
-Asc.asc_docs_api.prototype['asc_EndPreviewMailMergeResult']   = Asc.asc_docs_api.prototype.asc_EndPreviewMailMergeResult;
-Asc.asc_docs_api.prototype['sync_StartMailMerge']             = Asc.asc_docs_api.prototype.sync_StartMailMerge;
-Asc.asc_docs_api.prototype['sync_PreviewMailMergeResult']     = Asc.asc_docs_api.prototype.sync_PreviewMailMergeResult;
-Asc.asc_docs_api.prototype['sync_EndPreviewMailMergeResult']  = Asc.asc_docs_api.prototype.sync_EndPreviewMailMergeResult;
-Asc.asc_docs_api.prototype['sync_HighlightMailMergeFields']   = Asc.asc_docs_api.prototype.sync_HighlightMailMergeFields;
-Asc.asc_docs_api.prototype['asc_getMailMergeData']            = Asc.asc_docs_api.prototype.asc_getMailMergeData;
-Asc.asc_docs_api.prototype['asc_setMailMergeData']            = Asc.asc_docs_api.prototype.asc_setMailMergeData;
-Asc.asc_docs_api.prototype['asc_sendMailMergeData']           = Asc.asc_docs_api.prototype.asc_sendMailMergeData;
-Asc.asc_docs_api.prototype['asc_GetMailMergeFiledValue']      = Asc.asc_docs_api.prototype.asc_GetMailMergeFiledValue;
-Asc.asc_docs_api.prototype['asc_DownloadAsMailMerge']         = Asc.asc_docs_api.prototype.asc_DownloadAsMailMerge;
+Asc['asc_docs_api'].prototype['asc_StartMailMerge']              = Asc['asc_docs_api'].prototype.asc_StartMailMerge;
+Asc['asc_docs_api'].prototype['asc_StartMailMergeByList']        = Asc['asc_docs_api'].prototype.asc_StartMailMergeByList;
+Asc['asc_docs_api'].prototype['asc_GetReceptionsCount']          = Asc['asc_docs_api'].prototype.asc_GetReceptionsCount;
+Asc['asc_docs_api'].prototype['asc_GetMailMergeFieldsNameList']  = Asc['asc_docs_api'].prototype.asc_GetMailMergeFieldsNameList;
+Asc['asc_docs_api'].prototype['asc_AddMailMergeField']           = Asc['asc_docs_api'].prototype.asc_AddMailMergeField;
+Asc['asc_docs_api'].prototype['asc_SetHighlightMailMergeFields'] = Asc['asc_docs_api'].prototype.asc_SetHighlightMailMergeFields;
+Asc['asc_docs_api'].prototype['asc_PreviewMailMergeResult']      = Asc['asc_docs_api'].prototype.asc_PreviewMailMergeResult;
+Asc['asc_docs_api'].prototype['asc_EndPreviewMailMergeResult']   = Asc['asc_docs_api'].prototype.asc_EndPreviewMailMergeResult;
+Asc['asc_docs_api'].prototype['sync_StartMailMerge']             = Asc['asc_docs_api'].prototype.sync_StartMailMerge;
+Asc['asc_docs_api'].prototype['sync_PreviewMailMergeResult']     = Asc['asc_docs_api'].prototype.sync_PreviewMailMergeResult;
+Asc['asc_docs_api'].prototype['sync_EndPreviewMailMergeResult']  = Asc['asc_docs_api'].prototype.sync_EndPreviewMailMergeResult;
+Asc['asc_docs_api'].prototype['sync_HighlightMailMergeFields']   = Asc['asc_docs_api'].prototype.sync_HighlightMailMergeFields;
+Asc['asc_docs_api'].prototype['asc_getMailMergeData']            = Asc['asc_docs_api'].prototype.asc_getMailMergeData;
+Asc['asc_docs_api'].prototype['asc_setMailMergeData']            = Asc['asc_docs_api'].prototype.asc_setMailMergeData;
+Asc['asc_docs_api'].prototype['asc_sendMailMergeData']           = Asc['asc_docs_api'].prototype.asc_sendMailMergeData;
+Asc['asc_docs_api'].prototype['asc_GetMailMergeFiledValue']      = Asc['asc_docs_api'].prototype.asc_GetMailMergeFiledValue;
+Asc['asc_docs_api'].prototype['asc_DownloadAsMailMerge']         = Asc['asc_docs_api'].prototype.asc_DownloadAsMailMerge;
 //----------------------------------------------------------------------------------------------------------------------
 // Функции для работы с MailMerge
 //----------------------------------------------------------------------------------------------------------------------
