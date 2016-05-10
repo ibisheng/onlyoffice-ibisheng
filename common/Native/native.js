@@ -287,7 +287,7 @@ function NativeOpenFileData(data, version)
 
     if (window.NATIVE_DOCUMENT_TYPE == "presentation" || window.NATIVE_DOCUMENT_TYPE == "document")
     {
-        _api = new window["asc_docs_api"]("");
+        _api = new window["Asc"]["asc_docs_api"]("");
         _api.asc_nativeOpenFile(data, version);
     }
     else
@@ -304,7 +304,7 @@ function NativeOpenFile()
     
     if (window.NATIVE_DOCUMENT_TYPE == "presentation" || window.NATIVE_DOCUMENT_TYPE == "document")
     {
-        _api = new window["asc_docs_api"]("");       
+        _api = new window["Asc"]["asc_docs_api"]("");       
         _api.asc_nativeOpenFile(doc_bin);
     }
     else
@@ -323,7 +323,7 @@ function NativeOpenFile2(_params)
     var doc_bin = window.native.GetFileString(window.g_file_path);
     if (window.NATIVE_DOCUMENT_TYPE == "presentation" || window.NATIVE_DOCUMENT_TYPE == "document")
     {
-        _api = new window["asc_docs_api"]("");
+        _api = new window["Asc"]["asc_docs_api"]("");
 
         if (undefined !== _api.Native_Editor_Initialize_Settings)
         {

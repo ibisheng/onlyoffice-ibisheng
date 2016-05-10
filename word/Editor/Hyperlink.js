@@ -614,7 +614,7 @@ ParaHyperlink.prototype.Document_UpdateInterfaceState = function()
     var HyperText = new CParagraphGetText();
     this.Get_Text( HyperText );
 
-    var HyperProps = new CHyperlinkProperty(this);
+    var HyperProps = new Asc.CHyperlinkProperty(this);
     HyperProps.put_Text( HyperText.Text );
 
     editor.sync_HyperlinkPropCallback(HyperProps);

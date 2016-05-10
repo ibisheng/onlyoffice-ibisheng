@@ -762,7 +762,7 @@ CTable.prototype =
 
         if(!this.bPresentation)
         {
-            this.DrawingDocument.CheckTableStyles( new CTablePropLook( this.TableLook ) );
+            this.DrawingDocument.CheckTableStyles( new Asc.CTablePropLook( this.TableLook ) );
         }
 
         return Pr;

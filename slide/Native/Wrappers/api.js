@@ -25,7 +25,7 @@ window["use_native_fonts_only"] = true;
 window["ftm"] = FT_Memory;
 
 
-asc_docs_api.prototype["Native_Editor_Initialize_Settings"] = function(_params)
+Asc.asc_docs_api.prototype["Native_Editor_Initialize_Settings"] = function(_params)
 {
     window["NativeSupportTimeouts"] = true;
 
@@ -107,7 +107,7 @@ asc_docs_api.prototype["Native_Editor_Initialize_Settings"] = function(_params)
 
 
 
-asc_docs_api.prototype["CheckSlideBounds"] = function(nSlideIndex){
+Asc.asc_docs_api.prototype["CheckSlideBounds"] = function(nSlideIndex){
     var oBoundsChecker = new AscFormat.CSlideBoundsChecker();
     this.WordControl.m_oLogicDocument.Draw(nSlideIndex, oBoundsChecker);
     var oBounds = oBoundsChecker.Bounds;
@@ -116,7 +116,7 @@ asc_docs_api.prototype["CheckSlideBounds"] = function(nSlideIndex){
     ]
 }
 
-asc_docs_api.prototype["GetNativePageMeta"] = function(pageIndex)
+Asc.asc_docs_api.prototype["GetNativePageMeta"] = function(pageIndex)
 {
     this.WordControl.m_oDrawingDocument.RenderPage(pageIndex);
 };

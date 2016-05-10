@@ -5900,7 +5900,7 @@ function CDrawingDocument()
         var bIsChanged = false;
         if (null == this.TableStylesLastLook)
         {
-            this.TableStylesLastLook = new CTablePropLook();
+            this.TableStylesLastLook = new Asc.CTablePropLook();
 
             this.TableStylesLastLook.FirstCol = tableLook.FirstCol;
             this.TableStylesLastLook.FirstRow = tableLook.FirstRow;

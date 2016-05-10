@@ -1058,7 +1058,7 @@ asc_docs_api.prototype.asc_Print = function(bIsDownloadEvent){
         return;
     }
     var options = {downloadType: bIsDownloadEvent ? DownloadType.Print: DownloadType.None};
-	_downloadAs(this, c_oAscFileType.PDF, c_oAscAsyncAction.Print, options);
+	this._downloadAs(c_oAscFileType.PDF, c_oAscAsyncAction.Print, options);
 };
 asc_docs_api.prototype.Undo = function(){
 	this.WordControl.m_oLogicDocument.Document_Undo();
@@ -1214,7 +1214,7 @@ asc_docs_api.prototype.asc_Save = function(isAutoSave) {
 };
 asc_docs_api.prototype.asc_DownloadAs = function(typeFile, bIsDownloadEvent){//передаем число соответствующее своему формату.
 	var options = {downloadType: bIsDownloadEvent ? DownloadType.Download: DownloadType.None};
-	_downloadAs(this, typeFile, c_oAscAsyncAction.DownloadAs, options);
+	this._downloadAs(typeFile, c_oAscAsyncAction.DownloadAs, options);
 };
 asc_docs_api.prototype.Resize = function(){
 	if (false === this.bInit_word_control)
@@ -4745,35 +4745,36 @@ asc_docs_api.prototype._onEndLoadSdk = function() {
   asc_docs_api.superclass._onEndLoadSdk.call(this);
 };
 
-function _downloadAs(editor, filetype, actionType, options)
+asc_docs_api.prototype._downloadAs = function(editor, filetype, actionType, options)
 {
+  var t = this;
     if (!options) {
       options = {};
     }
     if (actionType) {
-      editor.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, actionType);
+      this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, actionType);
     }
     
 	var dataContainer = {data: null, part: null, index: 0, count: 0};
     var command = "save";
 	var oAdditionalData = {};
 	oAdditionalData["c"] = command;
-	oAdditionalData["id"] = editor.documentId;
-	oAdditionalData["userid"] = editor.documentUserId;
-	oAdditionalData["vkey"] = editor.documentVKey;
+	oAdditionalData["id"] = this.documentId;
+	oAdditionalData["userid"] = this.documentUserId;
+	oAdditionalData["vkey"] = this.documentVKey;
 	oAdditionalData["outputformat"] = filetype;
-	oAdditionalData["title"] = AscCommon.changeFileExtention(editor.documentTitle, AscCommon.getExtentionByFormat(filetype));
+	oAdditionalData["title"] = AscCommon.changeFileExtention(this.documentTitle, AscCommon.getExtentionByFormat(filetype));
 	oAdditionalData["savetype"] = AscCommon.c_oAscSaveTypes.CompleteAll;
     if (DownloadType.Print === options.downloadType) {
       oAdditionalData["inline"] = 1;
     }
 	if(c_oAscFileType.PDF == filetype)
 	{
-		var dd = editor.WordControl.m_oDrawingDocument;
+		var dd = this.WordControl.m_oDrawingDocument;
 		dataContainer.data = dd.ToRendererPart();
 	}
 	else
-		dataContainer.data = editor.WordControl.SaveDocument();
+		dataContainer.data = this.WordControl.SaveDocument();
     var fCallback = function(input) {
       var error = c_oAscError.ID.Unknown;
       if(null != input && command == input["type"]) {
@@ -4781,21 +4782,21 @@ function _downloadAs(editor, filetype, actionType, options)
           var url = input["data"];
           if(url) {
             error = c_oAscError.ID.No;
-            editor.processSavedFile(url, options.downloadType);
+            t.processSavedFile(url, options.downloadType);
           }
         } else {
           error = mapAscServerErrorToAscError(parseInt(input["data"]));
         }
       }
       if (c_oAscError.ID.No != error) {
-        editor.asc_fireCallback("asc_onError", error, c_oAscError.Level.NoCritical);
+        t.asc_fireCallback("asc_onError", error, c_oAscError.Level.NoCritical);
       }
       if (actionType) {
-        editor.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, actionType);
+        t.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, actionType);
       }
     };
-	editor.fCurCallback = fCallback;
-  AscCommon.saveWithParts(function(fCallback1, oAdditionalData1, dataContainer1){sendCommand(editor, fCallback1, oAdditionalData1, dataContainer1);}, fCallback, null, oAdditionalData, dataContainer);
+  this.fCurCallback = fCallback;
+  AscCommon.saveWithParts(function(fCallback1, oAdditionalData1, dataContainer1){sendCommand(t, fCallback1, oAdditionalData1, dataContainer1);}, fCallback, null, oAdditionalData, dataContainer);
 }
 
 //test

@@ -8,37 +8,37 @@
 //----------------------------------------------------------------------------------------------------------------------
 //  asc_docs_api (Обращение из апи)
 //----------------------------------------------------------------------------------------------------------------------
-asc_docs_api.prototype.asc_GetStyleFromFormatting = function()
+Asc.asc_docs_api.prototype.asc_GetStyleFromFormatting = function()
 {
     return this.WordControl.m_oLogicDocument.Get_StyleFromFormatting();
 };
-asc_docs_api.prototype.asc_AddNewStyle = function(oStyle)
+Asc.asc_docs_api.prototype.asc_AddNewStyle = function(oStyle)
 {
     this.WordControl.m_oLogicDocument.Add_NewStyle(oStyle);
 };
-asc_docs_api.prototype.asc_RemoveStyle = function(sName)
+Asc.asc_docs_api.prototype.asc_RemoveStyle = function(sName)
 {
     this.WordControl.m_oLogicDocument.Remove_Style(sName);
 };
-asc_docs_api.prototype.asc_RemoveAllCustomStyles = function()
+Asc.asc_docs_api.prototype.asc_RemoveAllCustomStyles = function()
 {
     this.WordControl.m_oLogicDocument.Remove_AllCustomStyles();
 };
-asc_docs_api.prototype.asc_IsStyleDefault = function(sName)
+Asc.asc_docs_api.prototype.asc_IsStyleDefault = function(sName)
 {
     return this.WordControl.m_oLogicDocument.Is_StyleDefault(sName);
 };
-asc_docs_api.prototype.asc_IsDefaultStyleChanged = function(sName)
+Asc.asc_docs_api.prototype.asc_IsDefaultStyleChanged = function(sName)
 {
     return this.WordControl.m_oLogicDocument.Is_DefaultStyleChanged(sName);
 };
 
-asc_docs_api.prototype['asc_GetStyleFromFormatting'] = asc_docs_api.prototype.asc_GetStyleFromFormatting;
-asc_docs_api.prototype['asc_AddNewStyle']            = asc_docs_api.prototype.asc_AddNewStyle;
-asc_docs_api.prototype['asc_RemoveStyle']            = asc_docs_api.prototype.asc_RemoveStyle;
-asc_docs_api.prototype['asc_RemoveAllCustomStyles']  = asc_docs_api.prototype.asc_RemoveAllCustomStyles;
-asc_docs_api.prototype['asc_IsStyleDefault']         = asc_docs_api.prototype.asc_IsStyleDefault;
-asc_docs_api.prototype['asc_IsDefaultStyleChanged']  = asc_docs_api.prototype.asc_IsDefaultStyleChanged;
+Asc.asc_docs_api.prototype['asc_GetStyleFromFormatting'] = Asc.asc_docs_api.prototype.asc_GetStyleFromFormatting;
+Asc.asc_docs_api.prototype['asc_AddNewStyle']            = Asc.asc_docs_api.prototype.asc_AddNewStyle;
+Asc.asc_docs_api.prototype['asc_RemoveStyle']            = Asc.asc_docs_api.prototype.asc_RemoveStyle;
+Asc.asc_docs_api.prototype['asc_RemoveAllCustomStyles']  = Asc.asc_docs_api.prototype.asc_RemoveAllCustomStyles;
+Asc.asc_docs_api.prototype['asc_IsStyleDefault']         = Asc.asc_docs_api.prototype.asc_IsStyleDefault;
+Asc.asc_docs_api.prototype['asc_IsDefaultStyleChanged']  = Asc.asc_docs_api.prototype.asc_IsDefaultStyleChanged;
 //----------------------------------------------------------------------------------------------------------------------
 //  CDocument
 //----------------------------------------------------------------------------------------------------------------------

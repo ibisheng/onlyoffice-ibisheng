@@ -12,7 +12,7 @@
      * @class
      * @name Api
      */
-    var Api = window["asc_docs_api"];
+    var Api = window["Asc"]["asc_docs_api"];
 
     /**
      * Class representing a container for paragraphs and tables.

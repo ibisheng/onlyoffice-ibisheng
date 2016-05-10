@@ -7034,7 +7034,7 @@ PasteProcessor.prototype =
 					
 					if(isPasteHyperlink)
 					{
-						var HyperProps = new CHyperlinkProperty({ Text: text, Value: href, ToolTip: title});
+						var HyperProps = new Asc.CHyperlinkProperty({ Text: text, Value: href, ToolTip: title});
 						this.oDocument.Content[Pos].Hyperlink_Add( HyperProps );
 					}
                 }

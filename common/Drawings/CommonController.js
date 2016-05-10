@@ -2211,7 +2211,7 @@ DrawingObjectsController.prototype =
             }
             if(objects_by_type.tables.length == 1)
             {
-                var props2 = new CTableProp();
+                var props2 = new Asc.CTableProp();
                 if(props.verticalTextAlign === AscFormat.VERTICAL_ANCHOR_TYPE_BOTTOM)
                 {
                     props2.put_CellsVAlign(vertalignjc_Bottom);
