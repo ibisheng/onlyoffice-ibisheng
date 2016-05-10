@@ -68,6 +68,8 @@ var para_Math_Ampersand            = 0x0035; // &
 var para_Field                     = 0x0036; // Поле
 var para_Math_BreakOperator        = 0x0037; // break operator в формуле
 var para_Math_Content              = 0x0038; // math content
+var para_FootnoteReference         = 0x0039; // Ссылка на сноску
+var para_FootnoteRef               = 0x0040; // Номер сноски (должен быть только внутри сноски)
 
 
 
@@ -7439,6 +7441,68 @@ ParaPresentationNumbering.prototype =
     }
 };
 
+
+/**
+ * Класс представляющий ссылку на сноску.
+ * @param {string} sId - Идентификатор сноски.
+ * @constructor
+ */
+function ParaFootnoteReference(sId)
+{
+    this.FootnoteId = sId;
+}
+ParaFootnoteReference.prototype.Type           = para_FootnoteReference;
+ParaFootnoteReference.prototype.Get_Type = function()
+{
+    return para_FootnoteReference;
+};
+ParaFootnoteReference.prototype.Draw           = function(X, Y, Context)
+{
+
+};
+ParaFootnoteReference.prototype.Measure        = function(Context)
+{
+
+};
+ParaFootnoteReference.prototype.Get_Width = function()
+{
+    return 0;
+};
+ParaFootnoteReference.prototype.Get_WidthVisible = function()
+{
+    return 0;
+};
+ParaFootnoteReference.prototype.Set_WidthVisible = function(WidthVisible)
+{
+    return 0;
+    //this.WidthVisible = WidthVisible;
+};
+ParaFootnoteReference.prototype.Is_RealContent = function()
+{
+    return true;
+};
+ParaFootnoteReference.prototype.Can_AddNumbering = function()
+{
+    return true;
+};
+ParaFootnoteReference.prototype.Copy           = function()
+{
+    return new ParaFootnoteReference(sId);
+};
+ParaFootnoteReference.prototype.Write_ToBinary = function(Writer)
+{
+    // Long   : Type
+    // String : FootnoteId
+    Writer.WriteLong(this.Type);
+    Writer.WriteString2(this.FootnoteId);
+};
+ParaFootnoteReference.prototype.Read_FromBinary = function(Reader)
+{
+    // String : FootnoteId
+    this.FootnoteId = Reader.GetString2();
+};
+
+
 function ParagraphContent_Read_FromBinary(Reader)
 {
     var ElementType = Reader.GetLong();
@@ -7466,6 +7530,7 @@ function ParagraphContent_Read_FromBinary(Reader)
         case para_Math_BreakOperator: Element = new CMathText();		     break;
         case para_Math_Ampersand	: Element = new CMathAmp();   		   	 break;
         case para_PresentationNumbering : Element = new ParaPresentationNumbering(); break;
+        case para_FootnoteReference : Element = new ParaFootnoteReference(); break;
     }
 
     if ( null != Element )
