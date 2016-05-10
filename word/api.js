@@ -6390,16 +6390,16 @@ asc_docs_api.prototype.asc_getAnchorPosition = function()
     return new AscCommon.asc_CRect(AnchorPos.X0, AnchorPos.Y, AnchorPos.X1 - AnchorPos.X0, 0);
 };
 
-function spellCheck (editor, rdata) {
+asc_docs_api.prototype.spellCheck = function (rdata) {
   //console.log("start - " + rdata);
   // ToDo проверка на подключение
   switch (rdata.type) {
     case "spell":
     case "suggest":
-      editor.SpellCheckApi.spellCheck(JSON.stringify(rdata));
+      this.SpellCheckApi.spellCheck(JSON.stringify(rdata));
       break;
   }
-}
+};
 
 window["asc_nativeOnSpellCheck"] = function (response)
 {
