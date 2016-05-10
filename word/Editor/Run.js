@@ -1133,32 +1133,10 @@ ParaRun.prototype.Recalculate_CurPos = function(X, Y, CurrentRun, _CurRange, _Cu
             var Item = this.Content[Pos];
             var ItemType = Item.Type;
 
-            switch( ItemType )
-            {
-                case para_Text:
-                case para_Space:
-                case para_Sym:
-                case para_PageNum:
-                case para_Tab:
-                case para_End:
-                case para_NewLine:
-                case para_Math_Text:
-                case para_Math_BreakOperator:
-                case para_Math_Placeholder:
-                case para_Math_Ampersand:
-                {
-                    X += Item.Get_WidthVisible();
-                    break;
-                }
-                case para_Drawing:
-                {
-                    if ( drawing_Inline != Item.DrawingType )
-                        break;
+            if (para_Drawing === ItemType && drawing_Inline !== Item.DrawingType)
+                continue;
 
-                    X += Item.Get_WidthVisible();
-                    break;
-                }
-            }
+            X += Item.Get_WidthVisible();
         }
     }
 
@@ -2271,6 +2249,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
             {
                 case para_Sym:
                 case para_Text:
+                case para_FootnoteReference:
                 {
                     // Отмечаем, что началось слово
                     StartWord = true;
@@ -3110,6 +3089,7 @@ ParaRun.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine, _Cur
             case para_Sym:
             case para_Text:
             case para_PageNum:
+            case para_FootnoteReference:
             {
                 UpdateLineMetricsText = true;
                 break;
@@ -3207,6 +3187,7 @@ ParaRun.prototype.Recalculate_Range_Width = function(PRSC, _CurLine, _CurRange)
         {
             case para_Sym:
             case para_Text:
+            case para_FootnoteReference:
             {
                 PRSC.Letters++;
 
@@ -3357,6 +3338,7 @@ ParaRun.prototype.Recalculate_Range_Spaces = function(PRSA, _CurLine, _CurRange,
         {
             case para_Sym:
             case para_Text:
+            case para_FootnoteReference:
             {
                 var WidthVisible = 0;
 
@@ -4254,6 +4236,7 @@ ParaRun.prototype.Draw_HighLights = function(PDSH)
             case para_Math_BreakOperator:
             case para_Math_Ampersand:
             case para_Sym:
+            case para_FootnoteReference:
             {
                 if ( para_Drawing === ItemType && !Item.Is_Inline() )
                     break;
@@ -4414,19 +4397,25 @@ ParaRun.prototype.Draw_Elements = function(PDSE)
         var ItemType = Item.Type;
 
         var TempY = Y;
-        switch( CurTextPr.VertAlign )
+
+        if (ItemType === para_FootnoteReference)
         {
-            case AscCommon.vertalign_SubScript:
+            Y -= vertalign_Koef_Super * CurTextPr.FontSize * g_dKoef_pt_to_mm;
+        }
+        else
+        {
+            switch (CurTextPr.VertAlign)
             {
-                Y -= vertalign_Koef_Sub * CurTextPr.FontSize * g_dKoef_pt_to_mm;
-
-                break;
-            }
-            case AscCommon.vertalign_SuperScript:
-            {
-                Y -= vertalign_Koef_Super * CurTextPr.FontSize * g_dKoef_pt_to_mm;
-
-                break;
+                case AscCommon.vertalign_SubScript:
+                {
+                    Y -= vertalign_Koef_Sub * CurTextPr.FontSize * g_dKoef_pt_to_mm;
+                    break;
+                }
+                case AscCommon.vertalign_SuperScript:
+                {
+                    Y -= vertalign_Koef_Super * CurTextPr.FontSize * g_dKoef_pt_to_mm;
+                    break;
+                }
             }
         }
 
@@ -4437,6 +4426,7 @@ ParaRun.prototype.Draw_Elements = function(PDSE)
             case para_Tab:
             case para_Text:
             case para_Sym:
+            case para_FootnoteReference:
             {
                 if (para_Tab === ItemType)
                 {
@@ -4707,6 +4697,7 @@ ParaRun.prototype.Draw_Lines = function(PDSL)
             case para_Tab:
             case para_Text:
             case para_Sym:
+            case para_FootnoteReference:
             {
                 if ( para_Drawing != ItemType || Item.Is_Inline() )
                 {

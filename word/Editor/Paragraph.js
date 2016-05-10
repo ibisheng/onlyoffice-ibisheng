@@ -3046,6 +3046,8 @@ Paragraph.prototype =
             case para_Tab:
             case para_Drawing:
             case para_NewLine:
+            case para_FootnoteReference:
+            default:
             {
                 // Элементы данного типа добавляем во внутренний элемент
                 this.Content[this.CurPos.ContentPos].Add(Item);

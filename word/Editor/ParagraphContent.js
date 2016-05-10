@@ -7450,6 +7450,9 @@ ParaPresentationNumbering.prototype =
 function ParaFootnoteReference(sId)
 {
     this.FootnoteId = sId;
+
+    this.Width        = 0;
+    this.WidthVisible = 0;
 }
 ParaFootnoteReference.prototype.Type           = para_FootnoteReference;
 ParaFootnoteReference.prototype.Get_Type = function()
@@ -7458,24 +7461,28 @@ ParaFootnoteReference.prototype.Get_Type = function()
 };
 ParaFootnoteReference.prototype.Draw           = function(X, Y, Context)
 {
-
+    Context.SetFontSlot(fontslot_ASCII, vertalign_Koef_Size);
+    Context.FillTextCode(X, Y, "1".charCodeAt(0));
 };
-ParaFootnoteReference.prototype.Measure        = function(Context)
+ParaFootnoteReference.prototype.Measure        = function(Context, TextPr)
 {
-
+    Context.SetFontSlot(fontslot_ASCII, vertalign_Koef_Size);
+    var Temp = Context.MeasureCode("1".charCodeAt(0));
+    var ResultWidth   = (Math.max((Temp.Width + TextPr.Spacing), 0) * TEXTWIDTH_DIVIDER) | 0;
+    this.Width        = ResultWidth;
+    this.WidthVisible = ResultWidth;
 };
 ParaFootnoteReference.prototype.Get_Width = function()
 {
-    return 0;
+    return (this.Width / TEXTWIDTH_DIVIDER);
 };
 ParaFootnoteReference.prototype.Get_WidthVisible = function()
 {
-    return 0;
+    return (this.WidthVisible / TEXTWIDTH_DIVIDER);
 };
 ParaFootnoteReference.prototype.Set_WidthVisible = function(WidthVisible)
 {
-    return 0;
-    //this.WidthVisible = WidthVisible;
+    this.WidthVisible = (WidthVisible * TEXTWIDTH_DIVIDER) | 0;
 };
 ParaFootnoteReference.prototype.Is_RealContent = function()
 {
