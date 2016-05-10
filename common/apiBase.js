@@ -136,6 +136,11 @@ baseEditorsApi.prototype._init = function() {
 
   AscCommon.loadSdk(this._editorNameById(), function() {
     t.isLoadFullApi = true;
+
+    if (offlineMode === t.documentUrl) {
+      t._OfflineAppDocumentStartLoad();
+    }
+
     t._onEndLoadSdk();
     t.onEndLoadFile(null);
   });
@@ -312,7 +317,6 @@ baseEditorsApi.prototype.asc_LoadDocument = function(isVersionHistory) {
   if (offlineMode === this.documentUrl) {
     this.documentUrl = '/sdkjs/' + this._editorNameById() + '/document/';
     this.DocInfo.asc_putOfflineApp(true);
-    this._OfflineAppDocumentStartLoad();
   }
 };
 baseEditorsApi.prototype._OfflineAppDocumentStartLoad = function() {
