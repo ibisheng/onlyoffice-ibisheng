@@ -1906,9 +1906,33 @@ asc_docs_api.prototype.asc_Save = function(isAutoSave) {
   }
 };
 asc_docs_api.prototype.asc_DownloadOrigin = function(bIsDownloadEvent) {
-    //скачивание оригинального pdf, djvu, xps
-    //todo реализовать не через print
-    this._print(c_oAscAsyncAction.DownloadAs, bIsDownloadEvent ? DownloadType.Download: DownloadType.None);
+  //скачивание оригинального pdf, djvu, xps
+  var downloadType = bIsDownloadEvent ? DownloadType.Download : DownloadType.None;
+  var rData = {
+    "id": this.documentId,
+    "c": 'pathurl',
+    "title": this.documentTitle,
+    "data": 'origin'
+  };
+  var t = this;
+  t.fCurCallback = function(input) {
+    if (null != input && "pathurl" == input["type"]) {
+      if ('ok' == input["status"]) {
+        var url = input["data"];
+        if (url) {
+          t.processSavedFile(url, downloadType);
+        } else {
+          t.handlers.trigger("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
+        }
+      } else {
+        t.handlers.trigger("asc_onError", mapAscServerErrorToAscError(parseInt(input["data"])),
+          c_oAscError.Level.NoCritical);
+      }
+    } else {
+      t.handlers.trigger("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
+    }
+  };
+  sendCommand(this, null, rData);
 };
 asc_docs_api.prototype.asc_DownloadAs = function(typeFile, bIsDownloadEvent) {//передаем число соответствующее своему формату.
 	var actionType = this.mailMergeFileData ? c_oAscAsyncAction.MailMergeLoadFile : c_oAscAsyncAction.DownloadAs;
