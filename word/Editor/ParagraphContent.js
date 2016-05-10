@@ -4641,8 +4641,20 @@ ParaDrawing.prototype =
         if(AscFormat.isRealNumber(this.Extent.W) && AscFormat.isRealNumber(this.Extent.H) && (!this.GraphicObj.checkAutofit || !this.GraphicObj.checkAutofit()) && !this.SizeRelH && !this.SizeRelV)
         {
             var oEffectExtent = this.EffectExtent;
-            this.Width        = this.Extent.W + AscFormat.getValOrDefault(oEffectExtent.L, 0) + AscFormat.getValOrDefault(oEffectExtent.R, 0);
-            this.Height       = this.Extent.H + AscFormat.getValOrDefault(oEffectExtent.T, 0) + AscFormat.getValOrDefault(oEffectExtent.B, 0);
+            var dW, dH;
+            if(AscFormat.checkNormalRotate(AscFormat.isRealNumber(this.GraphicObj.rot) ? this.GraphicObj.rot : 0))
+            {
+                dW = this.Extent.W;
+                dH = this.Extent.H;
+            }
+            else
+            {
+                dH = this.Extent.W;
+                dW = this.Extent.H;
+            }
+
+            this.Width        = dW + AscFormat.getValOrDefault(oEffectExtent.L, 0) + AscFormat.getValOrDefault(oEffectExtent.R, 0);
+            this.Height       = dH + AscFormat.getValOrDefault(oEffectExtent.T, 0) + AscFormat.getValOrDefault(oEffectExtent.B, 0);
             this.WidthVisible = this.Width;
         }
         else
