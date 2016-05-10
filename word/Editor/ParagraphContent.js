@@ -7453,6 +7453,7 @@ function ParaFootnoteReference(sId)
 
     this.Width        = 0;
     this.WidthVisible = 0;
+    this.Height       = 0;
 }
 ParaFootnoteReference.prototype.Type           = para_FootnoteReference;
 ParaFootnoteReference.prototype.Get_Type = function()
@@ -7463,6 +7464,22 @@ ParaFootnoteReference.prototype.Draw           = function(X, Y, Context)
 {
     Context.SetFontSlot(fontslot_ASCII, vertalign_Koef_Size);
     Context.FillTextCode(X, Y, "1".charCodeAt(0));
+
+    // TODO: Надо переделать в отдельную функцию отрисовщика
+    if (editor && editor.ShowParaMarks)
+    {
+        if (Context.m_oContext && Context.m_oContext.setLineDash)
+            Context.m_oContext.setLineDash([1,1]);
+
+        var l = X, t = Y - this.Height, r = X + this.Get_Width(), b = Y;
+        Context.drawHorLineExt(c_oAscLineDrawingRule.Top, t, l, r, 0, 0, 0);
+        Context.drawVerLine(c_oAscLineDrawingRule.Right, l, t, b, 0);
+        Context.drawVerLine(c_oAscLineDrawingRule.Left, r, t, b, 0);
+        Context.drawHorLineExt(c_oAscLineDrawingRule.Top, b, l, r, 0, 0, 0);
+
+        if (Context.m_oContext && Context.m_oContext.setLineDash)
+            Context.m_oContext.setLineDash([]);
+    }
 };
 ParaFootnoteReference.prototype.Measure        = function(Context, TextPr)
 {
@@ -7471,6 +7488,7 @@ ParaFootnoteReference.prototype.Measure        = function(Context, TextPr)
     var ResultWidth   = (Math.max((Temp.Width + TextPr.Spacing), 0) * TEXTWIDTH_DIVIDER) | 0;
     this.Width        = ResultWidth;
     this.WidthVisible = ResultWidth;
+    this.Height       = Temp.Height;
 };
 ParaFootnoteReference.prototype.Get_Width = function()
 {
