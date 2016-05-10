@@ -801,18 +801,6 @@ asc_docs_api.prototype.get_TextProps = function()
 
 // -------
 // тут методы, замены евентов
-asc_docs_api.prototype.get_PropertyStandartTextures = function()
-{
-    var _count = AscCommon.g_oUserTexturePresets.length;
-    var arr = new Array(_count);
-    for (var i = 0; i < _count; ++i)
-    {
-        arr[i] = new AscCommon.asc_CTexture();
-        arr[i].Id = i;
-        arr[i].Image = AscCommon.g_oUserTexturePresets[i];
-    }
-    return arr;
-};
 asc_docs_api.prototype.get_PropertyEditorThemes = function()
 {
     var ret = [this._gui_editor_themes, this._gui_document_themes];
@@ -5093,7 +5081,6 @@ asc_docs_api.prototype['asc_checkNeedCallback'] = asc_docs_api.prototype.asc_che
 asc_docs_api.prototype['get_TextProps'] = asc_docs_api.prototype.get_TextProps;
 asc_docs_api.prototype['asc_getPropertyEditorShapes'] = asc_docs_api.prototype.asc_getPropertyEditorShapes;
 asc_docs_api.prototype['asc_getPropertyEditorTextArts'] = asc_docs_api.prototype.asc_getPropertyEditorTextArts;
-asc_docs_api.prototype['get_PropertyStandartTextures'] = asc_docs_api.prototype.get_PropertyStandartTextures;
 asc_docs_api.prototype['get_PropertyEditorThemes'] = asc_docs_api.prototype.get_PropertyEditorThemes;
 asc_docs_api.prototype['get_ContentCount'] = asc_docs_api.prototype.get_ContentCount;
 asc_docs_api.prototype['select_Element'] = asc_docs_api.prototype.select_Element;
