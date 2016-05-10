@@ -6094,7 +6094,15 @@ ColorFilter.prototype.asc_setCColor = function (asc_CColor)
 		this.dxf.fill = new Fill();
 	}
 	
-	this.dxf.fill.bg = new RgbColor((asc_CColor.asc_getR() << 16) + (asc_CColor.asc_getG() << 8) + asc_CColor.asc_getB());
+	if(null === asc_CColor)
+	{
+		this.dxf.fill.bg = new RgbColor();
+		this.dxf.fill.bg.rgb = null;
+	}
+	else
+	{
+		this.dxf.fill.bg = new RgbColor((asc_CColor.asc_getR() << 16) + (asc_CColor.asc_getG() << 8) + asc_CColor.asc_getB());
+	}
 };
 
 /** @constructor */
