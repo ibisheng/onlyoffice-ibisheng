@@ -6045,12 +6045,20 @@ ColorFilter.prototype.isHideValue = function(cell) {
 				{
 					res = false;
 				}
+				else if(fontColor === null && (null === filterColor || (null !== filterColor && (0 === filterColor.rgb || null === filterColor.rgb))))
+				{
+					res = false;
+				}
 			}
 		}
 		else
 		{
 			var color = cell.getStyle();
 			if(color !== null && color.fill && color.fill.bg && color.fill.bg.rgb === filterColor.rgb)
+			{
+				res = false;
+			}
+			else if(color === null && (null === this.dxf.fill.bg || (null !== this.dxf.fill.bg && null === this.dxf.fill.bg.rgb)))
 			{
 				res = false;
 			}
@@ -6069,7 +6077,7 @@ ColorFilter.prototype.asc_getCColor = function ()
 { 
 	var res = null;
 	
-	if(this.dxf && this.dxf.fill && null !== this.dxf.fill.bg)
+	if(this.dxf && this.dxf.fill && null !== this.dxf.fill.bg && null !== this.dxf.fill.bg.rgb)
 	{
 		var color = this.dxf.fill.bg;
 		
