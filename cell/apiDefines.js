@@ -147,6 +147,44 @@ var c_oAscCustomAutoFilter = {
   doesNotContain: 12
 };
 
+    /** @enum */
+var c_oAscDynamicAutoFilter = {
+    aboveAverage: 1,
+    belowAverage: 2,
+    lastMonth: 3,
+    lastQuarter: 4,
+    lastWeek: 5,
+    lastYear: 6,
+    m1: 7,
+    m10: 8,
+    m11: 9,
+    m12: 10,
+    m2: 11,
+    m3: 12,
+    m4: 13,
+    m5: 14,
+    m6: 15,
+    m7: 16,
+    m8: 17,
+    m9: 18,
+    nextMonth: 19,
+    nextQuarter: 20,
+    nextWeek: 21,
+    nextYear: 22,
+    q1: 23,
+    q2: 24,
+    q3: 25,
+    q4: 26,
+    thisMonth: 27,
+    thisQuarter: 28,
+    thisWeek: 29,
+    thisYear: 30,
+    today: 31,
+    tomorrow: 32,
+    yearToDate: 33,
+    yesterday: 34
+};
+
 var c_oAscChangeFilterOptions = {
   filter: 1,
   style: 2
@@ -376,6 +414,10 @@ var c_oAscPopUpSelectorType = {
   prot['doesNotEndWith'] = prot.doesNotEndWith;
   prot['contains'] = prot.contains;
   prot['doesNotContain'] = prot.doesNotContain;
+  window['Asc']['c_oAscDynamicAutoFilter'] = window['Asc'].c_oAscDynamicAutoFilter = c_oAscDynamicAutoFilter;
+  prot = c_oAscDynamicAutoFilter;
+  prot['aboveAverage'] = prot.aboveAverage;
+  prot['belowAverage'] = prot.belowAverage;
   window['Asc']['c_oAscChangeFilterOptions'] = window['Asc'].c_oAscChangeFilterOptions = c_oAscChangeFilterOptions;
   prot = c_oAscChangeFilterOptions;
   prot['filter'] = prot.filter;

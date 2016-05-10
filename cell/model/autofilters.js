@@ -516,8 +516,11 @@
 				{
 					newFilterColumn = autoFilter.addFilterColumn();
 					newFilterColumn.ColId = filterObj.ColId;
-				}	
+				}
+				
 				var allFilterOpenElements = newFilterColumn.createFilter(autoFiltersObject);
+				newFilterColumn.init(worksheet.getRange3(autoFilter.Ref.r1 + 1, filterObj.ColId + autoFilter.Ref.c1, autoFilter.Ref.r2, filterObj.ColId + autoFilter.Ref.c1));
+				
 				if(allFilterOpenElements && autoFilter.FilterColumns[filterObj.index])
 				{
 					if(autoFilter.FilterColumns[filterObj.index].ShowButton !== false)

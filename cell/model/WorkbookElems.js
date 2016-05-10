@@ -5320,11 +5320,21 @@ FilterColumn.prototype.isHideValue = function(val, isDateTimeFormat, top10Length
 		res = this.Filters.isHideValue(val.toLowerCase(), isDateTimeFormat);
 	}
 	else if(this.CustomFiltersObj)
+	{
 		res = this.CustomFiltersObj.isHideValue(val);
+	}
 	else if(this.Top10)
+	{
 		res = this.Top10.isHideValue(val, top10Length);
+	}
 	else if(this.ColorFilter)
+	{
 		res = this.ColorFilter.isHideValue(cell);
+	}
+	else if(this.DynamicFilter)
+	{
+		res = this.DynamicFilter.isHideValue(val);
+	}
 		
 	return res;
 };
@@ -5354,6 +5364,7 @@ FilterColumn.prototype.createFilter = function(obj) {
 		}	
 		case c_oAscAutoFilterTypes.DynamicFilter:
 		{
+			this.DynamicFilter = obj.filter.filter.clone();
 			break;
 		}
 		case c_oAscAutoFilterTypes.Top10:
@@ -5379,6 +5390,19 @@ FilterColumn.prototype.isApplyAutoFilter = function() {
 		
 	return res;
 };
+
+FilterColumn.prototype.init = function(range) {
+	
+	//добавляем данные, которые не передаются из меню при примененни а/ф(в данном случае только DynamicFilter)
+	if(null !== this.DynamicFilter)
+	{
+		var res = null;
+		this.DynamicFilter.init(range);
+	}
+	
+};
+
+
 
 /** @constructor */
 function Filters() {
@@ -5891,6 +5915,56 @@ DynamicFilter.prototype.clone = function() {
 	res.Type = this.Type;
 	res.Val = this.Val;
 	res.MaxVal = this.MaxVal;
+	return res;
+};
+
+DynamicFilter.prototype.init = function(range) {
+	var res = null;
+	
+	switch(this.Type)
+	{
+		case Asc.c_oAscDynamicAutoFilter.aboveAverage:
+		case Asc.c_oAscDynamicAutoFilter.belowAverage:
+		{
+			var summ = 0;
+			var counter = 0;
+			
+			range_forEachCell(function(cell){
+				var val = parseFloat(cell.getValue());
+				
+				if(!isNaN(val))
+				{
+					summ += parseFloat(val);
+					counter++;
+				}
+				
+			});
+			res = summ / counter;
+			
+			break;
+		}
+	}
+	
+	this.Val = res;
+};
+
+DynamicFilter.prototype.isHideValue = function(val) {
+	var res = false;
+	
+	switch(this.Type)
+	{
+		case Asc.c_oAscDynamicAutoFilter.aboveAverage:
+		{
+			res = val > this.Val ? false : true;
+			break;
+		}
+		case Asc.c_oAscDynamicAutoFilter.belowAverage:
+		{
+			res = val < this.Val ? false : true;
+			break;
+		}
+	}
+	
 	return res;
 };
 
