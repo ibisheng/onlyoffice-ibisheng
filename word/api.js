@@ -240,6 +240,7 @@ function asc_docs_api(name)
 
   this.isCoMarksDraw = false;
   this.tmpCoMarksDraw = false;
+  this.tmpViewRulers = null;
 
 	// Spell Checking
 	this.SpellCheckApi = (window["AscDesktopEditor"] === undefined) ? new AscCommon.CSpellCheckApi() : new CSpellCheckApi_desktop();
@@ -6067,9 +6068,13 @@ asc_docs_api.prototype.asc_SetDocumentPlaceChangedEnabled = function(bEnabled)
 
 asc_docs_api.prototype.asc_SetViewRulers = function(bRulers)
 {
-  return;
     //if (false === this.bInit_word_control || true === this.isViewMode)
     //    return;
+
+  if (!this.isLoadFullApi) {
+    this.tmpViewRulers = bRulers;
+    return;
+  }
 
     if (this.WordControl.m_bIsRuler != bRulers)
     {
@@ -6770,6 +6775,9 @@ asc_docs_api.prototype._onEndLoadSdk = function() {
 
   if (this.tmpFontRenderingMode) {
     this.SetFontRenderingMode(this.tmpFontRenderingMode);
+  }
+  if (null !== this.tmpViewRulers) {
+    this.asc_SetViewRulers(this.tmpViewRulers);
   }
 
   this.asc_setViewMode(this.isViewMode);
