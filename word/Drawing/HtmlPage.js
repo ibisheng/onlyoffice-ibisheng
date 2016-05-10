@@ -3826,9 +3826,6 @@ function CEditorPage(api)
         }
 		
 		oWordControl.m_oApi.asc_fireCallback("asc_onPaintTimer");
-
-		if (true !== is_no_timer)
-			this.m_nPaintTimerId = setTimeout(oWordControl.onTimerScroll2, oWordControl.m_nTimerScrollInterval);
         //window.requestAnimationFrame(oWordControl.onTimerScroll2);
     }
 	this.onTimerScroll2 = function(is_no_timer)
@@ -3839,7 +3836,10 @@ function CEditorPage(api)
 		}
 		catch (err)
 		{			
-		}			
+		}
+
+        if (true !== is_no_timer)
+            this.m_nPaintTimerId = setTimeout(oThis.onTimerScroll2, oThis.m_nTimerScrollInterval);
     }
 
     this.onTimerScroll2_sync = function()
