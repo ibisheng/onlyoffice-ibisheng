@@ -746,11 +746,6 @@ asc_docs_api.prototype.asc_checkNeedCallback = function(name) {
 };
 
 // тут методы, замены евентов
-asc_docs_api.prototype.get_PropertyEditorShapes = function()
-{
-    var ret = [AscCommon.g_oAutoShapesGroups, AscCommon.g_oAutoShapesTypes];
-    return ret;
-};
 asc_docs_api.prototype.get_PropertyThemeColors = function()
 {
     var _ret = [this._gui_control_colors.Colors, this._gui_control_colors.StandartColors];
@@ -1022,7 +1017,7 @@ asc_docs_api.prototype._coSpellCheckInit = function() {
         }
       }
     }
-  }
+  };
 
 asc_docs_api.prototype.asc_getSpellCheckLanguages = function() {
 	return AscCommon.g_spellCheckLanguages;
@@ -7317,7 +7312,7 @@ asc_docs_api.prototype['asc_registerCallback'] = asc_docs_api.prototype.asc_regi
 asc_docs_api.prototype['asc_unregisterCallback'] = asc_docs_api.prototype.asc_unregisterCallback;
 asc_docs_api.prototype['asc_fireCallback'] = asc_docs_api.prototype.asc_fireCallback;
 asc_docs_api.prototype['asc_checkNeedCallback'] = asc_docs_api.prototype.asc_checkNeedCallback;
-asc_docs_api.prototype['get_PropertyEditorShapes'] = asc_docs_api.prototype.get_PropertyEditorShapes;
+asc_docs_api.prototype['asc_getPropertyEditorShapes'] = asc_docs_api.prototype.asc_getPropertyEditorShapes;
 asc_docs_api.prototype['asc_getPropertyEditorTextArts'] = asc_docs_api.prototype.asc_getPropertyEditorTextArts;
 asc_docs_api.prototype['get_PropertyThemeColors'] = asc_docs_api.prototype.get_PropertyThemeColors;
 asc_docs_api.prototype['get_PropertyThemeColorSchemes'] = asc_docs_api.prototype.get_PropertyThemeColorSchemes;

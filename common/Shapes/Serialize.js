@@ -656,9 +656,6 @@ function BinaryPPTYLoader()
 
             //var _editor = this.Api;
             //_editor.sync_InitEditorThemes(_editor.ThemeLoader.Themes.EditorThemes, _editor.ThemeLoader.Themes.DocumentThemes);
-
-            // шейпы посылаются только на подписке
-            //_editor.asc_fireCallback("asc_onInitEditorShapes", g_oAutoShapesGroups, g_oAutoShapesTypes);
         }
         else if (this.Api != null && this.IsThemeLoader)
         {

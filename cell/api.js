@@ -1524,7 +1524,6 @@ var editor;
     this.asc_ApplyColorScheme(false);
 
     this.sendStandartTextures();
-    this.handlers.trigger("asc_onInitEditorShapes", AscCommon.g_oAutoShapesGroups, AscCommon.g_oAutoShapesTypes);
 
     // Применяем пришедшие при открытии изменения
     this._applyFirstLoadChanges();
@@ -3424,6 +3423,7 @@ var editor;
   prot["asc_setSelectedDrawingObjectLayer"] = prot.asc_setSelectedDrawingObjectLayer;
   prot["asc_getChartPreviews"] = prot.asc_getChartPreviews;
   prot["asc_getTextArtPreviews"] = prot.asc_getTextArtPreviews;
+  prot['asc_getPropertyEditorShapes'] = prot.asc_getPropertyEditorShapes;
   prot['asc_getPropertyEditorTextArts'] = prot.asc_getPropertyEditorTextArts;
   prot["asc_checkDataRange"] = prot.asc_checkDataRange;
   prot["asc_getBinaryFileWriter"] = prot.asc_getBinaryFileWriter;

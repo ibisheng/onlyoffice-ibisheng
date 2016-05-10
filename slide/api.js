@@ -801,11 +801,6 @@ asc_docs_api.prototype.get_TextProps = function()
 
 // -------
 // тут методы, замены евентов
-asc_docs_api.prototype.get_PropertyEditorShapes = function()
-{
-    var ret = [AscCommon.g_oAutoShapesGroups, AscCommon.g_oAutoShapesTypes];
-    return ret;
-};
 asc_docs_api.prototype.get_PropertyStandartTextures = function()
 {
     var _count = AscCommon.g_oUserTexturePresets.length;
@@ -5096,7 +5091,7 @@ asc_docs_api.prototype['asc_unregisterCallback'] = asc_docs_api.prototype.asc_un
 asc_docs_api.prototype['asc_fireCallback'] = asc_docs_api.prototype.asc_fireCallback;
 asc_docs_api.prototype['asc_checkNeedCallback'] = asc_docs_api.prototype.asc_checkNeedCallback;
 asc_docs_api.prototype['get_TextProps'] = asc_docs_api.prototype.get_TextProps;
-asc_docs_api.prototype['get_PropertyEditorShapes'] = asc_docs_api.prototype.get_PropertyEditorShapes;
+asc_docs_api.prototype['asc_getPropertyEditorShapes'] = asc_docs_api.prototype.asc_getPropertyEditorShapes;
 asc_docs_api.prototype['asc_getPropertyEditorTextArts'] = asc_docs_api.prototype.asc_getPropertyEditorTextArts;
 asc_docs_api.prototype['get_PropertyStandartTextures'] = asc_docs_api.prototype.get_PropertyStandartTextures;
 asc_docs_api.prototype['get_PropertyEditorThemes'] = asc_docs_api.prototype.get_PropertyEditorThemes;
