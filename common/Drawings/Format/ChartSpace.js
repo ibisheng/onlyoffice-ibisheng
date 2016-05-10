@@ -455,6 +455,7 @@ function CheckIncDecFontSize(oElement, bIncrease, oDrawingDocument,nDefaultSize)
 
 function CChartSpace()
 {
+    CChartSpace.superclass.constructor.call(this);
     this.chart = null;
     this.clrMapOvr = null;
     this.date1904 = null;
@@ -471,16 +472,11 @@ function CChartSpace()
     this.themeOverride = null;
 
     this.calculatedChart = null;
-    this.transform = new AscCommon.CMatrix();
 
 
-    this.bDeleted = true;
-    this.snapArrayX = [];
-    this.snapArrayY = [];
 
 
     this.bbox = null;
-
 
     this.selection =
     {
@@ -497,107 +493,28 @@ function CChartSpace()
         textSelection: null
     };
 
-    this.bounds = {l: 0, t: 0, r: 0, b:0, w: 0, h:0, x: 0, y: 0};
     this.parsedFromulas = [];
     //this.pointsMap = {};
 
-    this.setRecalculateInfo();
-
-    this.Lock = new AscCommon.CLock();
     this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id);
 }
+AscCommon.extendClass(CChartSpace, AscFormat.CGraphicObjectBase);
 
-CChartSpace.prototype =
+CChartSpace.prototype.select = CShape.prototype.select;
+CChartSpace.prototype.checkDrawingBaseCoords = CShape.prototype.checkDrawingBaseCoords;
+CChartSpace.prototype.setDrawingBaseCoords = CShape.prototype.setDrawingBaseCoords;
+CChartSpace.prototype.deleteBFromSerialize = CShape.prototype.deleteBFromSerialize;
+CChartSpace.prototype.setBFromSerialize = CShape.prototype.setBFromSerialize;
+CChartSpace.prototype.recalculateTextPr = function()
 {
-    Get_Id: function()
-    {
-        return this.Id;
-    },
-
-    select: CShape.prototype.select,
-    checkHitToBounds: CShape.prototype.checkHitToBounds,
-    calculateSnapArrays: CShape.prototype.calculateSnapArrays,
-    checkDrawingBaseCoords: CShape.prototype.checkDrawingBaseCoords,
-    setDrawingBaseCoords: CShape.prototype.setDrawingBaseCoords,
-    deleteBFromSerialize: CShape.prototype.deleteBFromSerialize,
-    setBFromSerialize: CShape.prototype.setBFromSerialize,
-
-    drawSelect: function(drawingDocument, nPageIndex)
-    {
-        var i;
-        if(this.selectStartPage === nPageIndex)
-        {
-            drawingDocument.DrawTrack(TYPE_TRACK_SHAPE, this.getTransformMatrix(), 0, 0, this.extX, this.extY, false, this.canRotate());
-            if(this.selection.textSelection)
-            {
-                drawingDocument.DrawTrack(TYPE_TRACK_TEXT, this.selection.textSelection.transform, 0, 0, this.selection.textSelection.extX, this.selection.textSelection.extY, false, false, false);
-            }
-            else if(this.selection.title)
-            {
-                drawingDocument.DrawTrack(TYPE_TRACK_SHAPE, this.selection.title.transform, 0, 0, this.selection.title.extX, this.selection.title.extY, false, false, false);
-            }
-            else if(isRealNumber(this.selection.dataLbls))
-            {
-                var series = this.chart.plotArea.chart.series;
-                var ser = series[this.selection.dataLbls];
-                if(ser)
-                {
-                    var pts = getPtsFromSeries(ser);
-                    if(!isRealNumber(this.selection.dataLbl))
-                    {
-                        for(var i = 0; i < pts.length; ++i)
-                        {
-                            if(pts[i] && pts[i].compiledDlb)
-                            {
-                                drawingDocument.DrawTrack(TYPE_TRACK_SHAPE, pts[i].compiledDlb.transform, 0, 0, pts[i].compiledDlb.extX, pts[i].compiledDlb.extY, false, false);
-                            }
-                        }
-                    }
-                    else
-                    {
-                        if(pts[this.selection.dataLbl] && pts[this.selection.dataLbl].compiledDlb)
-                        {
-                            drawingDocument.DrawTrack(TYPE_TRACK_SHAPE, pts[this.selection.dataLbl].compiledDlb.transform, 0, 0, pts[this.selection.dataLbl].compiledDlb.extX, pts[this.selection.dataLbl].compiledDlb.extY, false, false);
-                        }
-                    }
-                }
-
-            }
-            else if(this.selection.dataLbl)
-            {
-                drawingDocument.DrawTrack(TYPE_TRACK_SHAPE, this.selection.dataLbl.transform, 0, 0, this.selection.dataLbl.extX, this.selection.dataLbl.extY, false, false);
-            }
-            else if(this.selection.legend)
-            {
-                if(isRealNumber(this.selection.legendEntry) && this.chart.legend.calcEntryes[this.selection.legendEntry])
-                {
-                    var oEntry = this.chart.legend.calcEntryes[this.selection.legendEntry];
-                    drawingDocument.DrawTrack(TYPE_TRACK_SHAPE, oEntry.transformText, 0, 0, oEntry.contentWidth, oEntry.contentHeight, false, false);
-                }
-                else
-                {
-                    drawingDocument.DrawTrack(TYPE_TRACK_SHAPE, this.selection.legend.transform, 0, 0, this.selection.legend.extX, this.selection.legend.extY, false, false);
-                }
-            }
-            else if(this.selection.axisLbls)
-            {
-                var oLabels = this.selection.axisLbls.labels;
-                drawingDocument.DrawTrack(TYPE_TRACK_SHAPE, this.transform, oLabels.x, oLabels.y, oLabels.extX, oLabels.extY, false, false);
-            }
-        }
-    },
-
-    recalculateTextPr: function()
-    {
         if(this.txPr && this.txPr.content)
         {
             this.txPr.content.Reset(0, 0, 10, 10);
             this.txPr.content.Recalculate_Page(0, true);
         }
-    },
-
-    getSelectionState: function()
+};
+CChartSpace.prototype.getSelectionState = function()
     {
         var content_selection = null;
         if(this.selection.textSelection)
@@ -619,10 +536,8 @@ CChartSpace.prototype =
             recalcTitle: this.recalcInfo.recalcTitle,
             bRecalculatedTitle: this.recalcInfo.bRecalculatedTitle
         }
-    },
-
-
-    setSelectionState: function(state)
+};
+CChartSpace.prototype.setSelectionState = function(state)
     {
        this.selection.title          = state.title;
        this.selection.legend         = state.legend;
@@ -646,9 +561,8 @@ CChartSpace.prototype =
                    content.Set_SelectionState(state.contentSelection, state.contentSelection.length - 1);
            }
        }
-    },
-
-    loadDocumentStateAfterLoadChanges: function(state)
+};
+CChartSpace.prototype.loadDocumentStateAfterLoadChanges = function(state)
     {
         this.selection.title          = null;
         this.selection.legend         = null;
@@ -659,9 +573,8 @@ CChartSpace.prototype =
         this.selection.textSelection  = null;
         this.selection.plotArea       = null;
         return false;
-    },
-
-    resetInternalSelection: function(noResetContentSelect)
+};
+CChartSpace.prototype.resetInternalSelection = function(noResetContentSelect)
     {
         if(this.selection.title)
         {
@@ -676,10 +589,8 @@ CChartSpace.prototype =
             }
             this.selection.textSelection = null;
         }
-    },
-
-
-    getDocContent: function()
+};
+CChartSpace.prototype.getDocContent = function()
     {
         return null;
         if(!this.txPr)
@@ -687,9 +598,8 @@ CChartSpace.prototype =
             this.setTxPr(AscFormat.CreateTextBodyFromString("", this.getDrawingDocument(), this));
         }
         return this.txPr.content;
-    },
-
-    resetSelection: function(noResetContentSelect)
+};
+CChartSpace.prototype.resetSelection = function(noResetContentSelect)
     {
         this.resetInternalSelection(noResetContentSelect);
         this.selection.title = null;
@@ -700,9 +610,8 @@ CChartSpace.prototype =
         this.selection.dataLbl = null;
         this.selection.textSelection = null;
         this.selection.plotArea = null;
-    },
-
-    getStyles: function()
+};
+CChartSpace.prototype.getStyles = function()
     {
         return AscFormat.ExecuteNoHistory(function(){
 
@@ -776,9 +685,8 @@ CChartSpace.prototype =
             styles.Add(style);
             return {lastId: style.Id, styles: styles};
         }, this, []);
-    },
-
-    getParagraphTextPr: function()
+};
+CChartSpace.prototype.paragraphAdd = function(paraItem, bRecalculate)
     {
         var content;
         if(paraItem.Type === para_TextPr)
@@ -814,14 +722,14 @@ CChartSpace.prototype =
                 {
                     return GetTextPrFormArrObjects(pts, undefined , true);
                 }
-                else
-                {
+        else
+        {
                     var pt = pts[this.selection.dataLbl];
                     if(pt)
                     {
                         return GetTextPrFormArrObjects([pt], undefined , true);
-                    }
-                }
+        }
+    }
             }
         }
         if(this.txPr && this.txPr.content && this.txPr.content.Content[0] && this.txPr.content.Content[0].Pr.DefaultRunPr)
@@ -848,8 +756,8 @@ CChartSpace.prototype =
                     fCallback(this.selection.legend.legendEntryes[i], value, this.getDrawingDocument(), 10);
                     }
                 }
-                else
-                {
+    else
+    {
                     var entry = this.selection.legend.findLegendEntryByIndex(this.selection.legendEntry);
                     if(!entry)
                     {
@@ -951,14 +859,9 @@ CChartSpace.prototype =
                     this.selection.title.tx.rich.content.Set_ApplyToAll(true);
                     this.selection.title.tx.rich.content.Paragraph_Add(_paraItem);
                     this.selection.title.tx.rich.content.Set_ApplyToAll(false);
-                }
-                return;
-            }
-            this.applyLabelsFunction(CheckObjectTextPr, _paraItem.Value);
-        }
-    },
-
-    applyTextFunction: function(docContentFunction, tableFunction, args)
+    }
+};
+CChartSpace.prototype.applyTextFunction = function(docContentFunction, tableFunction, args)
     {
         if(docContentFunction === CDocumentContent.prototype.Paragraph_Add)
         {
@@ -979,9 +882,8 @@ CChartSpace.prototype =
                 editor.WordControl.m_oLogicDocument.TrackRevisions = true;
             }
         }
-    },
-
-    selectTitle: function(title, pageIndex)
+};
+CChartSpace.prototype.selectTitle = function(title, pageIndex)
     {
         title.select(this, pageIndex);
         this.resetInternalSelection();
@@ -992,28 +894,16 @@ CChartSpace.prototype =
         this.selection.dataLbl = null;
         this.selection.textSelection = null;
         this.selection.plotArea = null;
-    },
-
-    recalculateCurPos: AscFormat.DrawingObjectsController.prototype.recalculateCurPos,
-
-    documentUpdateSelectionState: function()
+};
+CChartSpace.prototype.recalculateCurPos = AscFormat.DrawingObjectsController.prototype.recalculateCurPos;
+CChartSpace.prototype.documentUpdateSelectionState = function()
     {
         if(this.selection.textSelection)
         {
             this.selection.textSelection.updateSelectionState();
         }
-    },
-
-    getLegend: function()
-    {
-        if(this.chart)
-        {
-            return this.chart.legend;
-        }
-        return null;
-    },
-
-    getAllTitles: function()
+};
+CChartSpace.prototype.getAllTitles = function()
     {
         var ret = [];
         if(this.chart )
@@ -1035,23 +925,17 @@ CChartSpace.prototype =
             }
         }
         return ret;
-    },
-
-    getMainGroup: function()
+};
+CChartSpace.prototype.getMainGroup = function()
     {
         if(!isRealObject(this.group))
             return this;
         return this.group.getMainGroup();
-    },
-
-    getFill: CShape.prototype.getFill,
-
-    getStroke: CShape.prototype.getStroke,
-
-
-    changeSize: CShape.prototype.changeSize,
-
-    changeFill: function (unifill)
+};
+CChartSpace.prototype.getFill = CShape.prototype.getFill;
+CChartSpace.prototype.getStroke = CShape.prototype.getStroke;
+CChartSpace.prototype.changeSize = CShape.prototype.changeSize;
+CChartSpace.prototype.changeFill = function (unifill)
     {
         if(this.recalcInfo.recalculatePenBrush)
         {
@@ -1060,13 +944,12 @@ CChartSpace.prototype =
         var unifill2 = AscFormat.CorrectUniFill(unifill, this.brush);
         unifill2.convertToPPTXMods();
         this.spPr.setFill(unifill2);
-    },
-    setFill: function (fill) {
+};
+CChartSpace.prototype.setFill = function (fill) {
 
         this.spPr.setFill(fill);
-    },
-
-    changeLine: function (line)
+};
+CChartSpace.prototype.changeLine = function (line)
     {
         if(this.recalcInfo.recalculatePenBrush)
         {
@@ -1078,9 +961,8 @@ CChartSpace.prototype =
             stroke.Fill.convertToPPTXMods();
         }
         this.spPr.setLn(stroke);
-    },
-
-    parseChartFormula: function(sFormula)
+};
+CChartSpace.prototype.parseChartFormula = function(sFormula)
     {
         if(this.worksheet && typeof sFormula === "string" && sFormula.length > 0)
         {
@@ -1112,14 +994,12 @@ CChartSpace.prototype =
             return ret;
         }
         return null;
-    },
-
-    checkBBoxIntersection: function(bbox1, bbox2)
+};
+CChartSpace.prototype.checkBBoxIntersection = function(bbox1, bbox2)
     {
         return !(bbox1.r1 > bbox2.r2 || bbox2.r1 > bbox1.r2 || bbox1.c1 > bbox2.c2 || bbox2.c1 > bbox1.c2)
-    },
-
-    checkSeriesIntersection: function(val, bbox, worksheet)
+};
+CChartSpace.prototype.checkSeriesIntersection = function(val, bbox, worksheet)
     {
         if(val && bbox && worksheet)
         {
@@ -1133,9 +1013,8 @@ CChartSpace.prototype =
             }
         }
         return false;
-    },
-
-    checkVal: function(val)
+};
+CChartSpace.prototype.checkVal = function(val)
     {
         if(val)
         {
@@ -1148,19 +1027,16 @@ CChartSpace.prototype =
                 val.strRef.parsedFormulas = this.parseChartFormula(val.strRef.f);
             }
         }
-    },
-
-    recalculateSeriesFormulas: function()
+};
+CChartSpace.prototype.recalculateSeriesFormulas = function()
     {
         this.checkSeriesRefs(this.checkVal);
-    },
-
-    checkChartIntersection: function(bbox, worksheet)
+};
+CChartSpace.prototype.checkChartIntersection = function(bbox, worksheet)
     {
         return this.checkSeriesRefs(this.checkSeriesIntersection, bbox, worksheet);
-    },
-
-    changeListName: function(val, oldName, newName)
+};
+CChartSpace.prototype.changeListName = function(val, oldName, newName)
     {
         if(val)
         {
@@ -1177,9 +1053,8 @@ CChartSpace.prototype =
                 }
             }
         }
-    },
-
-    checkListName: function(val, oldName)
+};
+CChartSpace.prototype.checkListName = function(val, oldName)
     {
         if(val)
         {
@@ -1195,20 +1070,16 @@ CChartSpace.prototype =
             }
         }
         return false;
-    },
-
-
-    changeChartReferences: function(oldWorksheetName, newWorksheetName)
+};
+CChartSpace.prototype.changeChartReferences = function(oldWorksheetName, newWorksheetName)
     {
         this.checkSeriesRefs(this.changeListName, oldWorksheetName, newWorksheetName);
-    },
-
-    checkChartReferences: function(oldWorksheetName)
+};
+CChartSpace.prototype.checkChartReferences = function(oldWorksheetName)
     {
         return this.checkSeriesRefs(this.checkListName, oldWorksheetName);
-    },
-
-    updateChartReferences: function(oldWorksheetName, newWorksheetName, bNoRebuildCache)
+};
+CChartSpace.prototype.updateChartReferences = function(oldWorksheetName, newWorksheetName, bNoRebuildCache)
     {
         if(this.checkChartReferences(oldWorksheetName))
         {
@@ -1223,18 +1094,15 @@ CChartSpace.prototype =
             }
             this.bNoHandleRecalc = false;
         }
-    },
-
-    updateChartReferences2: function(oldWorksheetName, newWorksheetName)
+};
+CChartSpace.prototype.updateChartReferences2 = function(oldWorksheetName, newWorksheetName)
     {
         if(this.checkChartReferences(oldWorksheetName))
         {
             this.changeChartReferences(oldWorksheetName, newWorksheetName);
         }
-    },
-
-
-    checkSeriesRefs: function(callback, bbox, worksheet)
+};
+CChartSpace.prototype.checkSeriesRefs = function(callback, bbox, worksheet)
     {
         if(this.chart && this.chart.plotArea)
         {
@@ -1272,10 +1140,8 @@ CChartSpace.prototype =
             }
         }
         return false;
-    },
-
-
-    clearCacheVal: function(val)
+};
+CChartSpace.prototype.clearCacheVal = function(val)
     {
         if(!val)
             return;
@@ -1293,9 +1159,8 @@ CChartSpace.prototype =
                 val.strRef.setStrCache(null);
             }
         }
-    },
-
-    checkIntersectionChangedRange: function(data)
+};
+CChartSpace.prototype.checkIntersectionChangedRange = function(data)
     {
         if(!data)
             return true;
@@ -1334,9 +1199,8 @@ CChartSpace.prototype =
             }
         }
         return false;
-    },
-
-    rebuildSeries: function(data)
+};
+CChartSpace.prototype.rebuildSeries = function(data)
     {
         if( this.checkIntersectionChangedRange(data))
         {
@@ -1347,16 +1211,14 @@ CChartSpace.prototype =
             }, this, [])
 
         }
-    },
-
-    checkRemoveCache: function()
+};
+CChartSpace.prototype.checkRemoveCache = function()
     {
         this.handleUpdateInternalChart();
         this.recalcInfo.recalculateReferences = true;
         this.checkSeriesRefs(this.clearCacheVal);
-    },
-
-    getTypeSubType: function()
+};
+CChartSpace.prototype.getTypeSubType = function()
     {
         var type = null, subtype = null;
         if(this.chart && this.chart.plotArea && this.chart.plotArea.chart)
@@ -1452,9 +1314,8 @@ CChartSpace.prototype =
 
         }
         return {type: type, subtype: subtype};
-    },
-
-    clearFormatting: function(bNoClearShapeProps)
+};
+CChartSpace.prototype.clearFormatting = function(bNoClearShapeProps)
     {
         if(this.spPr && !(bNoClearShapeProps === true))
         {
@@ -1522,9 +1383,8 @@ CChartSpace.prototype =
                 }
             }
         }
-    },
-
-    copy: function(drawingDocument)
+};
+CChartSpace.prototype.copy = function(drawingDocument)
     {
         var copy = new CChartSpace();
         if(this.chart)
@@ -1575,26 +1435,23 @@ CChartSpace.prototype =
             copy.setBFromSerialize(true);
         }
         return copy;
-    },
-
-    convertToWord: function(document)
+};
+CChartSpace.prototype.convertToWord = function(document)
     {
         this.setBDeleted(true);
         var oCopy = this.copy();
         oCopy.setBDeleted(false);
         return oCopy;
-    },
-
-    convertToPPTX: function(drawingDocument, worksheet)
+};
+CChartSpace.prototype.convertToPPTX = function(drawingDocument, worksheet)
     {
         var copy = this.copy(drawingDocument);
         copy.setBDeleted(false);
         copy.setWorksheet(worksheet);
         copy.setParent(null);
         return copy;
-    },
-
-    rebuildSeriesFromAsc: function(asc_chart)
+};
+CChartSpace.prototype.rebuildSeriesFromAsc = function(asc_chart)
     {
         if(this.chart && this.chart.plotArea && this.chart.plotArea.charts[0])
         {
@@ -1667,21 +1524,17 @@ CChartSpace.prototype =
             }
             this.recalculateReferences();
         }
-    },
-
-    Write_ToBinary2: function (w)
+};
+CChartSpace.prototype.Write_ToBinary2 = function (w)
     {
         w.WriteLong(this.getObjectType());
         w.WriteString2(this.Id);
-    },
-
-    Read_FromBinary2: function (r)
+};
+CChartSpace.prototype.Read_FromBinary2 = function (r)
     {
         this.Id = r.GetString2();
-    },
-
-
-    handleUpdateType: function()
+};
+CChartSpace.prototype.handleUpdateType = function()
     {
         if(this.bNoHandleRecalc === true)
         {
@@ -1705,9 +1558,8 @@ CChartSpace.prototype =
         this.recalcInfo.recalculateFormulas = true;
         this.chartObj = null;
         this.addToRecalculate();
-    },
-
-    handleUpdateInternalChart: function()
+};
+CChartSpace.prototype.handleUpdateInternalChart = function()
     {
         if(this.bNoHandleRecalc === true)
         {
@@ -1728,21 +1580,18 @@ CChartSpace.prototype =
         this.chartObj = null;
         this.addToRecalculate();
 
-    },
-
-    handleUpdateGridlines: function()
+};
+CChartSpace.prototype.handleUpdateGridlines = function()
     {
         this.recalcInfo.recalculateGridLines = true;
         this.addToRecalculate();
-    },
-
-    handleUpdateDataLabels: function()
+};
+CChartSpace.prototype.handleUpdateDataLabels = function()
     {
         this.recalcInfo.recalculateDLbls = true;
         this.addToRecalculate();
-    },
-
-    updateChildLabelsTransform: function(posX, posY)
+};
+CChartSpace.prototype.updateChildLabelsTransform = function(posX, posY)
     {
 
         if(this.localTransformText)
@@ -1797,10 +1646,8 @@ CChartSpace.prototype =
                 this.chart.legend.updatePosition(posX, posY);
             }
         }
-    },
-
-
-    recalcTitles: function()
+};
+CChartSpace.prototype.recalcTitles = function()
     {
         if(this.chart && this.chart.title)
         {
@@ -1825,10 +1672,8 @@ CChartSpace.prototype =
                 vert_axis.title.recalcInfo.recalcTransformText = true;
             }
         }
-    },
-
-
-    recalcTitles2: function()
+};
+CChartSpace.prototype.recalcTitles2 = function()
     {
         if(this.chart && this.chart.title)
         {
@@ -1856,9 +1701,8 @@ CChartSpace.prototype =
                 vert_axis.title.recalcInfo.recalculateTxBody = true;
             }
         }
-    },
-
-    Refresh_RecalcData2: function(pageIndex, object)
+};
+CChartSpace.prototype.Refresh_RecalcData2 = function(pageIndex, object)
     {
         if(object && object.getObjectType && object.getObjectType() === AscDFH.historyitem_type_Title && this.selection.title === object)
         {
@@ -1869,9 +1713,8 @@ CChartSpace.prototype =
             this.setRecalculateInfo();
         }
         this.addToRecalculate();
-    },
-
-    Refresh_RecalcData: function(data)
+};
+CChartSpace.prototype.Refresh_RecalcData = function(data)
     {
         switch(data.Type)
         {
@@ -1892,14 +1735,12 @@ CChartSpace.prototype =
                 break;
             }
         }
-    },
-
-    getObjectType: function()
+};
+CChartSpace.prototype.getObjectType = function()
     {
         return AscDFH.historyitem_type_ChartSpace;
-    },
-
-    getAllRasterImages: function(images)
+};
+CChartSpace.prototype.getAllRasterImages = function(images)
     {
         if(this.spPr)
         {
@@ -1934,14 +1775,12 @@ CChartSpace.prototype =
                 }
             }
         }
-    },
-
-    getAllContents: function()
+};
+CChartSpace.prototype.getAllContents = function()
     {
 
-    },
-
-    documentGetAllFontNames: function(allFonts)
+};
+CChartSpace.prototype.documentGetAllFontNames = function(allFonts)
     {
         allFonts["+mn-lt"] = 1;
         allFonts["+mn-ea"] = 1;
@@ -1995,9 +1834,8 @@ CChartSpace.prototype =
                 }
             }
         }
-    },
-
-    documentCreateFontMap: function(allFonts)
+};
+CChartSpace.prototype.documentCreateFontMap = function(allFonts)
     {
         if(this.chart)
         {
@@ -2045,28 +1883,23 @@ CChartSpace.prototype =
                 }
             }
         }
-    },
-
-    setThemeOverride: function(pr)
+};
+CChartSpace.prototype.setThemeOverride = function(pr)
     {
         History.Add(this, {Type:AscDFH.historyitem_ChartSpace_SetThemeOverride, oldPr: this.themeOverride, newPr: pr});
         this.themeOverride = pr;
-    },
-
-
-    setBDeleted: function(pr)
+};
+CChartSpace.prototype.setBDeleted = function(pr)
     {
         History.Add(this, {Type: AscDFH.historyitem_ShapeSetBDeleted, oldPr: this.bDeleted, newPr: pr});
         this.bDeleted = pr;
-    },
-    setParent: function (parent)
+};
+CChartSpace.prototype.setParent = function (parent)
     {
         History.Add(this, { Type: AscDFH.historyitem_ChartSpace_SetParent, oldPr: this.parent, newPr: parent });
         this.parent = parent;
-    },
-
-
-    setChart: function(chart)
+};
+CChartSpace.prototype.setChart = function(chart)
     {
         History.Add(this, {Type: AscDFH.historyitem_ChartSpace_SetChart, oldChart: this.chart, newChart: chart});
         this.chart = chart;
@@ -2074,59 +1907,59 @@ CChartSpace.prototype =
         {
             chart.setParent(this);
         }
-    },
-    setClrMapOvr: function(clrMapOvr)
+};
+CChartSpace.prototype.setClrMapOvr = function(clrMapOvr)
     {
         History.Add(this, {Type: AscDFH.historyitem_ChartSpace_SetClrMapOvr, oldClrMapOvr: this.clrMapOvr, newClrMapOvr: clrMapOvr});
         this.clrMapOvr = clrMapOvr;
-    },
-    setDate1904: function(date1904)
+};
+CChartSpace.prototype.setDate1904 = function(date1904)
     {
         History.Add(this, {Type: AscDFH.historyitem_ChartSpace_SetDate1904, oldDate1904: this.date1904, newDate1904: date1904});
         this.date1904 = date1904;
-    },
-    setExternalData: function(externalData)
+};
+CChartSpace.prototype.setExternalData = function(externalData)
     {
         History.Add(this, {Type: AscDFH.historyitem_ChartSpace_SetExternalData, oldExternalData: this.externalData, newExternalData: externalData});
         this.externalData = externalData;
-    },
-    setLang: function(lang)
+};
+CChartSpace.prototype.setLang = function(lang)
     {
         History.Add(this, {Type: AscDFH.historyitem_ChartSpace_SetLang, oldLang: this.lang, newLang: lang});
         this.lang = lang;
-    },
-    setPivotSource: function(pivotSource)
+};
+CChartSpace.prototype.setPivotSource = function(pivotSource)
     {
         History.Add(this, {Type: AscDFH.historyitem_ChartSpace_SetPivotSource, oldPivotSource: this.pivotSource, newPivotSource: pivotSource});
         this.pivotSource = pivotSource;
-    },
-    setPrintSettings: function(printSettings)
+};
+CChartSpace.prototype.setPrintSettings = function(printSettings)
     {
         History.Add(this, {Type: AscDFH.historyitem_ChartSpace_SetPrintSettings, oldPrintSettings: this.printSettings, newPrintSettings: printSettings});
         this.printSettings = printSettings;
-    },
-    setProtection: function(protection)
+};
+CChartSpace.prototype.setProtection = function(protection)
     {
         History.Add(this, {Type: AscDFH.historyitem_ChartSpace_SetProtection, oldProtection: this.protection, newProtection: protection});
         this.protection = protection;
-    },
-    setRoundedCorners: function(roundedCorners)
+};
+CChartSpace.prototype.setRoundedCorners = function(roundedCorners)
     {
         History.Add(this, {Type: AscDFH.historyitem_ChartSpace_SetRoundedCorners, oldRoundedCorners: this.roundedCorners, newRoundedCorners: roundedCorners});
         this.roundedCorners = roundedCorners;
-    },
-    setSpPr: function(spPr)
+};
+CChartSpace.prototype.setSpPr = function(spPr)
     {
         History.Add(this, {Type: AscDFH.historyitem_ChartSpace_SetSpPr, oldSpPr: this.spPr, newSpPr: spPr});
         this.spPr = spPr;
-    },
-    setStyle: function(style)
+};
+CChartSpace.prototype.setStyle = function(style)
     {
         History.Add(this, {Type: AscDFH.historyitem_ChartSpace_SetStyle, oldStyle: this.style, newStyle: style});
         this.style = style;
         this.handleUpdateStyle();
-    },
-    setTxPr: function(txPr)
+};
+CChartSpace.prototype.setTxPr = function(txPr)
     {
         History.Add(this, {Type: AscDFH.historyitem_ChartSpace_SetTxPr, oldTxPr: this.txPr, newTxPr: txPr});
         this.txPr = txPr;
@@ -2134,58 +1967,48 @@ CChartSpace.prototype =
         {
             txPr.setParent(this);
         }
-    },
-    setUserShapes: function(userShapes)
+};
+CChartSpace.prototype.setUserShapes = function(userShapes)
     {
         History.Add(this, {Type: AscDFH.historyitem_ChartSpace_SetUserShapes, oldUserShapes: this.userShapes, newUserShapes: userShapes});
         this.userShapes = userShapes;
-    },
-
-
-    getTransformMatrix: function()
+};
+CChartSpace.prototype.getTransformMatrix = function()
     {
         return this.transform;
-    },
-
-    canRotate: function()
+};
+CChartSpace.prototype.canRotate = function()
     {
         return false;
-    },
-
-    drawAdjustments: function()
-    {},
-
-    isChart: function()
+};
+CChartSpace.prototype.drawAdjustments = function()
+{};
+CChartSpace.prototype.isChart = function()
     {
         return true;
-    },
-
-    isShape: function()
+};
+CChartSpace.prototype.isShape = function()
     {
         return false;
-    },
-
-    isImage: function()
+};
+CChartSpace.prototype.isImage = function()
     {
         return false;
-    },
-
-    isGroup: function()
+};
+CChartSpace.prototype.isGroup = function()
     {
         return false;
-    },
-
-    isPlaceholder: CShape.prototype.isPlaceholder,
-    getBoundsInGroup: CShape.prototype.getBoundsInGroup,
-    setGroup: function (group)
+};
+CChartSpace.prototype.isPlaceholder = CShape.prototype.isPlaceholder;
+CChartSpace.prototype.setGroup = function (group)
     {
         History.Add(this, { Type: AscDFH.historyitem_ChartSpace_SetGroup, oldPr: this.group, newPr: group });
         this.group = group;
-    },
+};
 
-    getBase64Img: CShape.prototype.getBase64Img,
+CChartSpace.prototype.getBase64Img = CShape.prototype.getBase64Img;
 
-    getRangeObjectStr: function()
+CChartSpace.prototype.getRangeObjectStr = function()
     {
         if(this.recalcInfo.recalculateBBox)
         {
@@ -2243,11 +2066,9 @@ CChartSpace.prototype =
             }
         }
         return ret;
-    },
+};
 
-
-
-    recalculateBBox: function()
+CChartSpace.prototype.recalculateBBox = function()
     {
         this.bbox = null;
         this.seriesBBoxes = [];
@@ -2592,9 +2413,9 @@ CChartSpace.prototype =
                 }
             }
         }
-    },
+};
 
-    getCommonBBox: function()
+CChartSpace.prototype.getCommonBBox = function()
     {
         if(this.recalcInfo.recalculateBBox)
         {
@@ -2664,9 +2485,9 @@ CChartSpace.prototype =
         }
         return oRet;
 
-    },
+};
 
-    checkValByNumRef: function(workbook, ser, val, bVertical)
+CChartSpace.prototype.checkValByNumRef = function(workbook, ser, val, bVertical)
     {
         if(val && val.numRef && typeof val.numRef.f === "string"/*(!val.numRef.numCache || val.numRef.numCache.pts.length === 0)*/)
         {
@@ -2812,9 +2633,9 @@ CChartSpace.prototype =
                 ser.isHiddenForLegend = hidden;
             }
         }
-    },
+};
 
-    recalculateReferences: function()
+CChartSpace.prototype.recalculateReferences = function()
     {
         var worksheet = this.worksheet;
         //this.pointsMap = {};
@@ -2976,10 +2797,9 @@ CChartSpace.prototype =
                 }
             }
         }
-    },
+};
 
-
-    checkEmptySeries: function()
+CChartSpace.prototype.checkEmptySeries = function()
     {
         var chart_type = this.chart.plotArea.charts[0];
         var series = chart_type.series;
@@ -3018,18 +2838,18 @@ CChartSpace.prototype =
             }
         }
         return true;
-    },
+};
 
-    getNeedReflect: function()
+CChartSpace.prototype.getNeedReflect = function()
     {
         if(!this.chartObj)
         {
             this.chartObj = new AscFormat.CChartsDrawer();
         }
         return this.chartObj.calculatePositionLabelsCatAxFromAngle(this);
-    },
+};
 
-    recalculateAxis: function()
+CChartSpace.prototype.recalculateAxis = function()
     {
         if(this.chart && this.chart.plotArea && this.chart.plotArea.chart)
         {
@@ -6015,9 +5835,9 @@ CChartSpace.prototype =
                 }
             }
         }
-    },
+};
 
-    checkAxisLabelsTransform: function()
+CChartSpace.prototype.checkAxisLabelsTransform = function()
     {
         if(this.chart && this.chart.plotArea && this.chart.plotArea.chart && this.chart.plotArea.chart.getAxisByTypes)
         {
@@ -6051,24 +5871,24 @@ CChartSpace.prototype =
                         if(!oAxisLabels.bRotated)
                         {
                             for(i = 0; i < oAxisLabels.arrLabels.length; ++i)
-						{
-							oLabel = oAxisLabels.arrLabels[i];
+                        {
+                            oLabel = oAxisLabels.arrLabels[i];
                             if(oLabel)
                             {
                                     var oCPosLabelX, oCPosLabelY;
                                     if(!oAxisLabels.bRotated)
                                     {
                                         oCPosLabelX = oLabel.localTransformText.TransformPointX(oLabel.txBody.content.XLimit/2, 0);
-                                oNewPos = oProcessor3D.convertAndTurnPoint(oCPosLabelX*this.chartObj.calcProp.pxToMM, dPosY, dZPositionCatAxis);
-                                oLabel.setPosition2(oNewPos.x/this.chartObj.calcProp.pxToMM + oLabel.localTransformText.tx - oCPosLabelX, oLabel.localTransformText.ty - dPosY2 + oNewPos.y/this.chartObj.calcProp.pxToMM );
-                            }
+                                    oNewPos = oProcessor3D.convertAndTurnPoint(oCPosLabelX*this.chartObj.calcProp.pxToMM, dPosY, dZPositionCatAxis);
+                                    oLabel.setPosition2(oNewPos.x/this.chartObj.calcProp.pxToMM + oLabel.localTransformText.tx - oCPosLabelX, oLabel.localTransformText.ty - dPosY2 + oNewPos.y/this.chartObj.calcProp.pxToMM );
+                                }
                                     else
                                     {
                                         oCPosLabelX = oLabel.localTransformText.TransformPointX(oLabel.widthForTransform, 0);
                                         oNewPos = oProcessor3D.convertAndTurnPoint(oCPosLabelX*this.chartObj.calcProp.pxToMM, dPosY, dZPositionCatAxis);
                                         oLabel.setPosition2(oNewPos.x/this.chartObj.calcProp.pxToMM + oLabel.x - oCPosLabelX, oLabel.y - dPosY2 + oNewPos.y/this.chartObj.calcProp.pxToMM);
-						}
-					}
+                                }
+                            }
                             }
                         }
                         else
@@ -6165,7 +5985,7 @@ CChartSpace.prototype =
                         }
                         aXPoints.length = 0;
                         aYPoints.length = 0;
-						for(i = 0; i < oAxisLabels.arrLabels.length; ++i)
+                    for(i = 0; i < oAxisLabels.arrLabels.length; ++i)
 						{
 							oLabel = oAxisLabels.arrLabels[i];
                             if(oLabel)
@@ -6286,15 +6106,14 @@ CChartSpace.prototype =
                 }
             }
         }
-        }
-    },
+};
 
-    hitInTextRect: function()
+CChartSpace.prototype.hitInTextRect = function()
     {
         return false;
-    },
+};
 
-    recalculateLegend: function()
+CChartSpace.prototype.recalculateLegend = function()
     {
         if(this.chart && this.chart.legend)
         {
@@ -7084,11 +6903,9 @@ CChartSpace.prototype =
             {
                 calc_entryes[i].checkWidhtContent();
         }
-        }
-    },
+};
 
-
-    internalCalculatePenBrushFloorWall: function(oSide, nSideType)
+CChartSpace.prototype.internalCalculatePenBrushFloorWall = function(oSide, nSideType)
     {
         if(!oSide)
         {
@@ -7189,9 +7006,9 @@ CChartSpace.prototype =
         {
             oSide.pen.calculate(parent_objects.theme, parent_objects.slide, parent_objects.layout, parent_objects.master, {R: 0, G: 0, B: 0, A: 255});
         }
-    },
+};
 
-    recalculateWalls: function()
+CChartSpace.prototype.recalculateWalls = function()
     {
         if(this.chart)
         {
@@ -7199,9 +7016,9 @@ CChartSpace.prototype =
             this.internalCalculatePenBrushFloorWall(this.chart.backWall, 1);
             this.internalCalculatePenBrushFloorWall(this.chart.floor, 2);
         }
-    },
+};
 
-    recalculateUpDownBars: function()
+CChartSpace.prototype.recalculateUpDownBars = function()
     {
         if(this.chart && this.chart.plotArea && this.chart.plotArea.chart && this.chart.plotArea.chart.upDownBars)
         {
@@ -7332,9 +7149,9 @@ CChartSpace.prototype =
                 this.chart.plotArea.chart.upDownBars.downBarsPen = down_bars_line;
             }
         }
-    },
+};
 
-    recalculatePlotAreaChartPen: function()
+CChartSpace.prototype.recalculatePlotAreaChartPen = function()
     {
         if(this.chart && this.chart.plotArea)
         {
@@ -7349,10 +7166,9 @@ CChartSpace.prototype =
                 this.chart.plotArea.pen = null;
             }
         }
-    },
+};
 
-
-    recalculatePenBrush: function()
+CChartSpace.prototype.recalculatePenBrush = function()
     {
         var parents = this.getParentObjects(), RGBA = {R: 0, G: 0, B: 0, A: 255};
         if(this.brush)
@@ -7592,23 +7408,22 @@ CChartSpace.prototype =
                 }
             }
         }
-    },
+};
 
-    getChartSizes: function()
+CChartSpace.prototype.getChartSizes = function()
     {
         if(!this.chartObj)
             this.chartObj = new AscFormat.CChartsDrawer();
         return this.chartObj.calculateSizePlotArea(this);
-    },
+};
 
-
-    getAllSeries:  function()
+CChartSpace.prototype.getAllSeries =  function()
     {
         //TODO:Переделать когда будем поддерживать насколько вложенных чартов
         return this.chart.plotArea.chart.series;
-    },
+};
 
-    recalculatePlotAreaChartBrush: function()
+CChartSpace.prototype.recalculatePlotAreaChartBrush = function()
     {
         if(this.chart && this.chart.plotArea)
         {
@@ -7638,9 +7453,9 @@ CChartSpace.prototype =
             default_brush.calculate(parents.theme, parents.slide, parents.layout, parents.master, {R: 0, G: 0, B: 0, A: 255});
             plot_area.brush = default_brush;
         }
-    },
+};
 
-    recalculateChartPen: function()
+CChartSpace.prototype.recalculateChartPen = function()
     {
         var parent_objects = this.getParentObjects();
         var default_line = new AscFormat.CLn();
@@ -7665,12 +7480,9 @@ CChartSpace.prototype =
         default_line.calculate(parents.theme, parents.slide, parents.layout, parents.master, {R: 0, G: 0, B: 0, A: 255});
         this.pen = default_line;
         checkBlackUnifill(this.pen.Fill, true);
-    },
+};
 
-
-
-
-    recalculateChartBrush: function()
+CChartSpace.prototype.recalculateChartBrush = function()
     {
         var default_brush;
         if(this.style >=1 && this.style <=32)
@@ -7688,11 +7500,9 @@ CChartSpace.prototype =
         default_brush.calculate(parents.theme, parents.slide, parents.layout, parents.master, {R: 0, G: 0, B: 0, A: 255});
         this.brush = default_brush;
 
-    },
+};
 
-
-
-    recalculateAxisTickMark: function()
+CChartSpace.prototype.recalculateAxisTickMark = function()
     {
         if(this.chart && this.chart.plotArea)
         {
@@ -7752,9 +7562,9 @@ CChartSpace.prototype =
             if(this.chart.plotArea.catAx)
                 calcMajorMinorGridLines(this.chart.plotArea.catAx, default_style, subtle_line, parent_objects);
         }
-    },
+};
 
-    getXValAxisValues: function()
+CChartSpace.prototype.getXValAxisValues = function()
     {
         if(!this.chartObj)
         {
@@ -7762,10 +7572,9 @@ CChartSpace.prototype =
         }
         this.chartObj.preCalculateData(this);
         return [].concat(this.chartObj.calcProp.xScale);
-    },
+};
 
-
-    getValAxisValues: function()
+CChartSpace.prototype.getValAxisValues = function()
     {
         if(!this.chartObj)
         {
@@ -7773,9 +7582,9 @@ CChartSpace.prototype =
         }
         this.chartObj.preCalculateData(this);
         return [].concat(this.chartObj.calcProp.scale);
-    },
+};
 
-    getCalcProps: function()
+CChartSpace.prototype.getCalcProps = function()
     {
         if(!this.chartObj)
         {
@@ -7783,10 +7592,9 @@ CChartSpace.prototype =
         }
         this.chartObj.preCalculateData(this);
         return this.chartObj.calcProp;
-    },
+};
 
-
-    recalculateDLbls: function()
+CChartSpace.prototype.recalculateDLbls = function()
     {
         if(this.chart && this.chart.plotArea && this.chart.plotArea.chart && this.chart.plotArea.chart.series)
         {
@@ -7830,9 +7638,9 @@ CChartSpace.prototype =
                 }
             }
         }
-    },
+};
 
-    recalculateHiLowLines: function()
+CChartSpace.prototype.recalculateHiLowLines = function()
     {
         if(this.chart && this.chart.plotArea && (this.chart.plotArea.chart instanceof AscFormat.CStockChart || this.chart.plotArea.chart instanceof AscFormat.CLineChart) && this.chart.plotArea.chart.hiLowLines)
         {
@@ -7854,9 +7662,9 @@ CChartSpace.prototype =
         {
             this.chart.plotArea.chart.calculatedHiLowLines = null;
         }
-    },
+};
 
-    recalculateSeriesColors: function()
+CChartSpace.prototype.recalculateSeriesColors = function()
     {
         if(this.chart && this.chart.plotArea && this.chart.plotArea.chart && this.chart.plotArea.chart.series)
         {
@@ -8374,10 +8182,9 @@ CChartSpace.prototype =
                 }
             }
         }
-    },
+};
 
-
-    recalculateChartTitleEditMode: function(bWord)
+CChartSpace.prototype.recalculateChartTitleEditMode = function(bWord)
     {
         var old_pos_x, old_pos_y, old_pos_cx, old_pos_cy;
         var pos_x, pos_y;
@@ -8402,10 +8209,9 @@ CChartSpace.prototype =
         {
             this.recalcInfo.recalcTitle.updatePosition(this.posX, this.posY);
         }
-    },
+};
 
-
-    recalculateMarkers: function()
+CChartSpace.prototype.recalculateMarkers = function()
     {
         if(this.chart && this.chart.plotArea && this.chart.plotArea.chart)
         {
@@ -8582,9 +8388,9 @@ CChartSpace.prototype =
                 }
             }
         }
-    },
+};
 
-    calcGridLine: function(defaultStyle, spPr, subtleLine, parents)
+CChartSpace.prototype.calcGridLine = function(defaultStyle, spPr, subtleLine, parents)
     {
         if(spPr)
         {
@@ -8615,17 +8421,17 @@ CChartSpace.prototype =
             return compiled_grid_lines;
         }
         return null;
-    },
+};
 
-    calcMajorMinorGridLines: function (axis, defaultStyle, subtleLine, parents)
+CChartSpace.prototype.calcMajorMinorGridLines = function (axis, defaultStyle, subtleLine, parents)
     {
         if(!axis)
             return;
         axis.compiledMajorGridLines = this.calcGridLine(defaultStyle.axisAndMajorGridLines, axis.majorGridlines, subtleLine, parents);
         axis.compiledMinorGridLines = this.calcGridLine(defaultStyle.minorGridlines, axis.minorGridlines, subtleLine, parents);
-    },
+};
 
-    handleTitlesAfterChangeTheme: function()
+CChartSpace.prototype.handleTitlesAfterChangeTheme = function()
     {
         if(this.chart && this.chart.title)
         {
@@ -8644,9 +8450,9 @@ CChartSpace.prototype =
                 vert_axis.title.checkAfterChangeTheme();
             }
         }
-    },
+};
 
-    recalculateGridLines: function()
+CChartSpace.prototype.recalculateGridLines = function()
     {
         if(this.chart && this.chart.plotArea)
         {
@@ -8662,15 +8468,14 @@ CChartSpace.prototype =
             this.calcMajorMinorGridLines(this.chart.plotArea.valAx, default_style, subtle_line, parent_objects);
             this.calcMajorMinorGridLines(this.chart.plotArea.catAx, default_style, subtle_line, parent_objects);
         }
-    },
+};
 
-
-    hitToAdjustment: function()
+CChartSpace.prototype.hitToAdjustment = function()
     {
         return {hit: false};
-    },
+};
 
-    recalculateAxisLabels: function()
+CChartSpace.prototype.recalculateAxisLabels = function()
     {
         if(this.chart && this.chart.title)
         {
@@ -8698,9 +8503,9 @@ CChartSpace.prototype =
                 title.recalculate();
             }
         }
-    },
+};
 
-    recalculateBaseColors: function()
+CChartSpace.prototype.recalculateBaseColors = function()
     {
         if ( this.style && (typeof(this.style) == 'number') )
         {
@@ -8711,10 +8516,9 @@ CChartSpace.prototype =
         }
         else
             this.baseColors = CreateColorMapByIndex(2);
-    },
+};
 
-
-    updateLinks: function()
+CChartSpace.prototype.updateLinks = function()
     {
         //Этот метод нужен, т. к. мы не полностью поддерживаем формат в котором в одном plotArea может быть несколько разных диаграмм(конкретных типов).
         // Здесь мы берем первую из диаграмм лежащих в массиве plotArea.charts, а также выставляем ссылки для осей ;
@@ -8767,9 +8571,9 @@ CChartSpace.prototype =
                 this.chart.plotArea.catAx = null;
             }
         }
-    },
+};
 
-    draw: function(graphics)
+CChartSpace.prototype.draw = function(graphics)
     {
         if(graphics.IsSlideBoundsCheckerType)
         {
@@ -8874,24 +8678,24 @@ CChartSpace.prototype =
                 graphics.RestoreGrState();
             }
         }
-    },
+};
 
-    addToSetPosition: function(dLbl)
+CChartSpace.prototype.addToSetPosition = function(dLbl)
     {
         if(dLbl instanceof AscFormat.CDLbl)
             this.recalcInfo.dataLbls.push(dLbl);
         else if(dLbl instanceof AscFormat.CTitle)
             this.recalcInfo.axisLabels.push(dLbl);
-    },
+};
 
-    recalculateChart: function()
+CChartSpace.prototype.recalculateChart = function()
     {
         if(this.chartObj == null)
             this.chartObj =  new AscFormat.CChartsDrawer();
         this.chartObj.reCalculate(this);
-    },
+};
 
-    Undo: function(data)
+CChartSpace.prototype.Undo = function(data)
     {
         switch (data.Type)
         {
@@ -9020,9 +8824,9 @@ CChartSpace.prototype =
                 break;
             }
         }
-    },
+};
 
-    Redo: function(data)
+CChartSpace.prototype.Redo = function(data)
     {
         switch (data.Type)
         {
@@ -9152,9 +8956,9 @@ CChartSpace.prototype =
                 break;
             }
         }
-    },
+};
 
-    Save_Changes: function(data, w)
+CChartSpace.prototype.Save_Changes = function(data, w)
     {
         w.WriteLong(data.Type);
         switch (data.Type)
@@ -9291,9 +9095,9 @@ CChartSpace.prototype =
                 break;
             }
         }
-    },
+};
 
-    Load_Changes: function(r)
+CChartSpace.prototype.Load_Changes = function(r)
     {
         var type = r.GetLong();
         switch (type)
@@ -9431,10 +9235,9 @@ CChartSpace.prototype =
                 break;
             }                
         }
-    },
+};
 
-
-    Get_RevisionsChangeParagraph: function(SearchEngine){
+CChartSpace.prototype.Get_RevisionsChangeParagraph = function(SearchEngine){
         var titles = this.getAllTitles(), i;
         if(titles.length === 0){
             return;
@@ -9473,18 +9276,18 @@ CChartSpace.prototype =
 				--i;
             }
         }
-    },
+};
 
-    Search : function(Str, Props, SearchEngine, Type)
+CChartSpace.prototype.Search  = function(Str, Props, SearchEngine, Type)
     {
         var titles = this.getAllTitles();
         for(var i = 0; i < titles.length; ++i)
         {
             titles[i].Search(Str, Props, SearchEngine, Type)
         }
-    },
+};
 
-    Search_GetId : function(bNext, bCurrent)
+CChartSpace.prototype.Search_GetId  = function(bNext, bCurrent)
     {
         var Current = -1;
         var titles = this.getAllTitles();
@@ -9532,7 +9335,6 @@ CChartSpace.prototype =
             }
         }
         return null;
-    }
 };
     
 function getPtsFromSeries(ser)
@@ -9720,16 +9522,6 @@ CExternalData.prototype =
     getObjectType: function()
     {
         return AscDFH.historyitem_type_ExternalData;
-    },
-    Write_ToBinary2: function (w)
-    {
-        w.WriteLong(this.getObjectType());
-        w.WriteString2(this.Id);
-    },
-
-    Read_FromBinary2: function (r)
-    {
-        this.Id = r.GetString2();
     },
 
     setAutoUpdate: function(pr)

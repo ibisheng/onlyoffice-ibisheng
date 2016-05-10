@@ -26,7 +26,7 @@ var MOVE_DELTA = AscFormat.MOVE_DELTA;
 
 var c_oAscFill = Asc.c_oAscFill;
 
-var BOUNDS_DELTA = 3;
+
 function CheckObjectLine(obj)
 {
     return (obj instanceof CShape && obj.spPr && obj.spPr.geometry && obj.spPr.geometry.preset === "line");
@@ -542,41 +542,22 @@ function SetXfrmFromMetrics(oDrawing, metrics)
 
 function CShape()
 {
+    CShape.superclass.constructor.call(this);
     this.nvSpPr         = null;
-    this.spPr           = null;
     this.style          = null;
     this.txBody         = null;
     this.bodyPr			= null;
     this.textBoxContent = null;
-    this.parent         = null;//В Word - ParaDrawing, в PowerPoint - Slide;
-    this.group          = null;
     this.drawingBase    = null;//DrawingBase в Excell'е
     this.bWordShape     = null;//если этот флаг стоит в true то автофигура имеет формат как в редакторе документов
-    this.bDeleted = true;
     this.bCheckAutoFitFlag = false;
 
 
-
-    this.x = null;
-    this.y = null;
-    this.extX = null;
-    this.extY = null;
-    this.rot = null;
-    this.flipH = null;
-    this.flipV = null;
-    this.transform = new CMatrix();
-    this.invertTransform = null;
     this.transformText = new CMatrix();
     this.invertTransformText = null;
-    this.brush  = null;
-    this.pen = null;
     this.selected = false;
 
 
-    this.snapArrayX = [];
-    this.snapArrayY = [];
-
-    this.localTransform = new CMatrix();
     this.localTransformText = new CMatrix();
     this.worksheet = null;
     this.cachedImage = null;
@@ -587,42 +568,27 @@ function CShape()
     this.txWarpStructNoTransform = null;
     this.txWarpStructParamarksNoTransform = null;
 
-    this.setRecalculateInfo();
 
-    this.Lock = new AscCommon.CLock();
+
     this.Id = AscCommon.g_oIdCounter.Get_NewId();
     AscCommon.g_oTableId.Add( this, this.Id );
 }
+AscCommon.extendClass(CShape, AscFormat.CGraphicObjectBase);
 
-CShape.prototype =
-{
-    Get_Id: function () {
-        return this.Id;
-    },
-
-    getObjectType: function () {
+CShape.prototype.getObjectType = function () {
         return AscDFH.historyitem_type_Shape;
-    },
+};
 
-    Write_ToBinary2: function (w) {
-        w.WriteLong(AscDFH.historyitem_type_Shape);
-        w.WriteString2(this.Id);
-    },
-
-    Read_FromBinary2: function (r) {
-        this.Id = r.GetString2();
-    },
-
-    Get_AllDrawingObjects: function(DrawingObjects)
+CShape.prototype.Get_AllDrawingObjects = function(DrawingObjects)
     {
         var oContent = this.getDocContent();
         if(oContent)
         {
             oContent.Get_AllDrawingObjects(DrawingObjects);
         }
-    },
+};
 
-    convertToWord: function (document) {
+CShape.prototype.convertToWord = function (document) {
         this.setBDeleted(true);
         var c = new CShape();
         c.setWordShape(true);
@@ -677,9 +643,9 @@ CShape.prototype =
             }
         }
         return c;
-    },
+};
 
-    convertToPPTX: function (drawingDocument, worksheet) {
+CShape.prototype.convertToPPTX = function (drawingDocument, worksheet) {
         var c = new CShape();
         c.setWordShape(false);
         c.setBDeleted(false);
@@ -716,39 +682,39 @@ CShape.prototype =
             c.setTxBody(tx_body);
         }
         return c;
-    },
+};
 
-    documentGetAllFontNames: function (AllFonts) {
+CShape.prototype.documentGetAllFontNames = function (AllFonts) {
         //TODO
         var content = this.getDocContent();
         if (content) {
             content.Document_Get_AllFontNames(AllFonts);
         }
-    },
+};
 
-    documentCreateFontMap: function (map) {
+CShape.prototype.documentCreateFontMap = function (map) {
         var content = this.getDocContent();
         if (content) {
             content.Document_CreateFontMap(map);
         }
-    },
+};
 
-    setBDeleted: function (pr) {
+CShape.prototype.setBDeleted = function (pr) {
         History.Add(this, {Type: AscDFH.historyitem_ShapeSetBDeleted, oldPr: this.bDeleted, newPr: pr});
         this.bDeleted = pr;
-    },
+};
 
-    setNvSpPr: function (pr) {
+CShape.prototype.setNvSpPr = function (pr) {
         History.Add(this, {Type: AscDFH.historyitem_ShapeSetNvSpPr, oldPr: this.nvSpPr, newPr: pr});
         this.nvSpPr = pr;
-    },
+};
 
-    setSpPr: function (spPr) {
+CShape.prototype.setSpPr = function (spPr) {
         History.Add(this, {Type: AscDFH.historyitem_ShapeSetSpPr, oldPr: this.spPr, newPr: spPr});
         this.spPr = spPr;
-    },
+};
 
-    setStyle: function (style) {
+CShape.prototype.setStyle = function (style) {
         History.Add(this, {Type: AscDFH.historyitem_ShapeSetStyle, oldPr: this.style, newPr: style});
         this.style = style;
         var content = this.getDocContent();
@@ -759,49 +725,49 @@ CShape.prototype =
         if (content) {
             content.Recalc_AllParagraphs_CompiledPr();
         }
-    },
+};
 
-    setTxBody: function (txBody) {
+CShape.prototype.setTxBody = function (txBody) {
         History.Add(this, {Type: AscDFH.historyitem_ShapeSetTxBody, oldPr: this.txBody, newPr: txBody});
         this.txBody = txBody;
-    },
+};
 
-    setTextBoxContent: function (textBoxContent) {
+CShape.prototype.setTextBoxContent = function (textBoxContent) {
         History.Add(this, {
             Type: AscDFH.historyitem_ShapeSetTextBoxContent,
             oldPr: this.textBoxContent,
             newPr: textBoxContent
         });
         this.textBoxContent = textBoxContent;
-    },
+};
 
-    setBodyPr: function (pr) {
+CShape.prototype.setBodyPr = function (pr) {
         History.Add(this, {Type: AscDFH.historyitem_ShapeSetBodyPr, oldPr: this.bodyPr, newPr: pr});
         this.bodyPr = pr;
         this.recalcInfo.recalcContent = true;
         this.recalcInfo.recalcTransformText = true;
         this.addToRecalculate();
-    },
+};
 
-    createTextBody: function () {
+CShape.prototype.createTextBody = function () {
         var tx_body = new AscFormat.CTextBody();
         tx_body.setParent(this);
         tx_body.setContent(new CDocumentContent(tx_body, this.getDrawingDocument(), 0, 0, 0, 20000, false, false, true));
         tx_body.setBodyPr(new AscFormat.CBodyPr());
         tx_body.content.Content[0].Set_DocumentIndex(0);
         this.setTxBody(tx_body);
-    },
+};
 
-    createTextBoxContent: function () {
+CShape.prototype.createTextBoxContent = function () {
         var body_pr = new AscFormat.CBodyPr();
         body_pr.setAnchor(1);
         this.setBodyPr(body_pr);
         this.setTextBoxContent(new CDocumentContent(this, this.getDrawingDocument(), 0, 0, 0, 20000, false, false));
         this.textBoxContent.Set_ParagraphAlign(AscCommon.align_Center);
         this.textBoxContent.Content[0].Set_DocumentIndex(0);
-    },
+};
 
-    paragraphAdd: function (paraItem, bRecalculate) {
+CShape.prototype.paragraphAdd = function (paraItem, bRecalculate) {
         var content_to_add = this.getDocContent();
         if (!content_to_add) {
             if (this.bWordShape) {
@@ -815,9 +781,9 @@ CShape.prototype =
         if (content_to_add) {
             content_to_add.Paragraph_Add(paraItem, bRecalculate);
         }
-    },
+};
 
-    applyTextFunction: function (docContentFunction, tableFunction, args)
+CShape.prototype.applyTextFunction = function (docContentFunction, tableFunction, args)
     {
         var content_to_add = this.getDocContent();
         if (!content_to_add)
@@ -841,25 +807,25 @@ CShape.prototype =
         {
             this.checkExtentsByDocContent();
         }
-    },
+};
 
-    clearContent: function () {
+CShape.prototype.clearContent = function () {
         var content = this.getDocContent();
         if (content) {
             content.Set_ApplyToAll(true);
             content.Remove(-1);
             content.Set_ApplyToAll(false);
         }
-    },
+};
 
 
-    setBFromSerialize: function(bVal)
+CShape.prototype.setBFromSerialize = function(bVal)
     {
         History.Add(this, {Type: AscDFH.historyitem_AutoShapes_SetBFromSerialize, oldPr: this.fromSerialize, newPr: bVal});
         this.fromSerialize = bVal;
-    },
+};
 
-    deleteBFromSerialize: function()
+CShape.prototype.deleteBFromSerialize = function()
     {
         if(this.fromSerialize)
         {
@@ -871,9 +837,9 @@ CShape.prototype =
                 SetXfrmFromMetrics(this, metrics);
             }
         }
-    },
+};
 
-    getDocContent: function () {
+CShape.prototype.getDocContent = function () {
         if (this.txBody) {
             return this.txBody.content;
         }
@@ -881,9 +847,9 @@ CShape.prototype =
             return this.textBoxContent;
         }
         return null;
-    },
+};
 
-    getBodyPr: function () {
+CShape.prototype.getBodyPr = function () {
         return AscFormat.ExecuteNoHistory(function () {
 
             if (this.bWordShape) {
@@ -901,16 +867,16 @@ CShape.prototype =
                 return ret;
             }
         }, this, []);
-    },
+};
 
-    Get_RevisionsChangeParagraph: function(SearchEngine){
+CShape.prototype.Get_RevisionsChangeParagraph = function(SearchEngine){
         var oContent = this.getDocContent();
         if(oContent){
             oContent.Get_RevisionsChangeParagraph(SearchEngine);
         }
-    },
+};
 
-    Search: function (Str, Props, SearchEngine, Type) {
+CShape.prototype.Search = function (Str, Props, SearchEngine, Type) {
         if (this.textBoxContent) {
             var dd = this.getDrawingDocument();
             dd.StartSearchTransform(this.transformText);
@@ -923,9 +889,9 @@ CShape.prototype =
             this.txBody.content.Search(Str, Props, SearchEngine, Type);
             //dd.EndSearchTransform();
         }
-    },
+};
 
-    Search_GetId: function (bNext, bCurrent) {
+CShape.prototype.Search_GetId = function (bNext, bCurrent) {
         if (this.textBoxContent)
             return this.textBoxContent.Search_GetId(bNext, bCurrent);
 
@@ -934,9 +900,9 @@ CShape.prototype =
         }
 
         return null;
-    },
+};
 
-    documentUpdateRulersState: function () {
+CShape.prototype.documentUpdateRulersState = function () {
         var content = this.getDocContent();
         if (!content)
             return;
@@ -995,25 +961,25 @@ CShape.prototype =
 
         this.getDrawingDocument().Set_RulerState_Paragraph({L: xc - hc, T: yc - vc, R: xc + hc, B: yc + vc});
         content.Document_UpdateRulersState(AscFormat.isRealNumber(this.selectStartPage) ? this.selectStartPage : 0);
-    },
+};
 
-    setParent: function (parent) {
+CShape.prototype.setParent = function (parent) {
         History.Add(this, {Type: AscDFH.historyitem_ShapeSetParent, oldPr: this.parent, newPr: parent});
         this.parent = parent;
-    },
+};
 
-    setGroup: function (group) {
+CShape.prototype.setGroup = function (group) {
         History.Add(this, {Type: AscDFH.historyitem_ShapeSetGroup, oldPr: this.group, newPr: group});
         this.group = group;
-    },
+};
 
-    getAllImages: function (images) {
+CShape.prototype.getAllImages = function (images) {
         if (this.spPr && this.spPr.Fill && this.spPr.Fill.fill instanceof AscFormat.CBlipFill && typeof this.spPr.Fill.fill.RasterImageId === "string") {
             images[AscCommon.getFullImageSrc2(this.spPr.Fill.fill.RasterImageId)] = true;
         }
-    },
+};
 
-    getAllFonts: function (fonts) {
+CShape.prototype.getAllFonts = function (fonts) {
         if (this.txBody) {
             this.txBody.content.Document_Get_AllFontNames(fonts);
             delete fonts["+mj-lt"];
@@ -1023,32 +989,32 @@ CShape.prototype =
             delete fonts["+mj-cs"];
             delete fonts["+mn-cs"];
         }
-    },
+};
 
-    canFill: function () {
+CShape.prototype.canFill = function () {
         if (this.spPr && this.spPr.geometry) {
             return this.spPr.geometry.canFill();
         }
         return true;
-    },
+};
 
-    isShape: function () {
+CShape.prototype.isShape = function () {
         return true;
-    },
+};
 
-    isImage: function () {
+CShape.prototype.isImage = function () {
         return false;
-    },
+};
 
-    isChart: function () {
+CShape.prototype.isChart = function () {
         return false;
-    },
+};
 
-    isGroup: function () {
+CShape.prototype.isGroup = function () {
         return false;
-    },
+};
 
-    getHierarchy: function () {
+CShape.prototype.getHierarchy = function () {
         //if (this.recalcInfo.recalculateShapeHierarchy)
         {
             this.compiledHierarchy = [];
@@ -1074,9 +1040,9 @@ CShape.prototype =
             this.recalcInfo.recalculateShapeHierarchy = true;
         }
         return this.compiledHierarchy;
-    },
+};
 
-    getPaddings: function () {
+CShape.prototype.getPaddings = function () {
         var paddings = null;
         var shape = this;
         var body_pr;
@@ -1109,9 +1075,9 @@ CShape.prototype =
                 paddings.Bottom = 1.27;
         }
         return paddings;
-    },
+};
 
-    getCompiledFill: function () {
+CShape.prototype.getCompiledFill = function () {
         if (this.recalcInfo.recalculateFill) {
             this.compiledFill = null;
             if (isRealObject(this.spPr) && isRealObject(this.spPr.Fill) && isRealObject(this.spPr.Fill.fill)) {
@@ -1174,23 +1140,23 @@ CShape.prototype =
             this.recalcInfo.recalculateFill = false;
         }
         return this.compiledFill;
-    },
+};
 
-    getMargins: function () {
+CShape.prototype.getMargins = function () {
         if (this.txBody) {
             return this.txBody.getMargins()
         }
         else {
             return null;
         }
-    },
-    Document_UpdateRulersState: function (margins) {
+};
+CShape.prototype.Document_UpdateRulersState = function (margins) {
         if (this.txBody && this.txBody.content) {
             this.txBody.content.Document_UpdateRulersState(this.parent.num, this.getMargins());
         }
-    },
+};
 
-    getCompiledLine: function () {
+CShape.prototype.getCompiledLine = function () {
         if (this.recalcInfo.recalculateLine) {
             this.compiledLine = null;
             if (isRealObject(this.spPr) && isRealObject(this.spPr.ln) && isRealObject(this.spPr.ln)) {
@@ -1223,9 +1189,9 @@ CShape.prototype =
             this.recalcInfo.recalculateLine = false;
         }
         return this.compiledLine;
-    },
+};
 
-    getCompiledTransparent: function () {
+CShape.prototype.getCompiledTransparent = function () {
         if (this.recalcInfo.recalculateTransparent) {
             this.compiledTransparent = null;
             if (isRealObject(this.spPr) && isRealObject(this.spPr.Fill))
@@ -1275,29 +1241,29 @@ CShape.prototype =
             this.recalcInfo.recalculateTransparent = false;
         }
         return this.compiledTransparent;
-    },
+};
 
-    isPlaceholder: function () {
+CShape.prototype.isPlaceholder = function () {
         return isRealObject(this.nvSpPr) && isRealObject(this.nvSpPr.nvPr) && isRealObject(this.nvSpPr.nvPr.ph);
-    },
+};
 
-    getPlaceholderType: function () {
+CShape.prototype.getPlaceholderType = function () {
         return this.isPlaceholder() ? this.nvSpPr.nvPr.ph.type : null;
-    },
+};
 
-    getPlaceholderIndex: function () {
+CShape.prototype.getPlaceholderIndex = function () {
         return this.isPlaceholder() ? this.nvSpPr.nvPr.ph.idx : null;
-    },
+};
 
-    getPhType: function () {
+CShape.prototype.getPhType = function () {
         return this.isPlaceholder() ? this.nvSpPr.nvPr.ph.type : null;
-    },
+};
 
-    getPhIndex: function () {
+CShape.prototype.getPhIndex = function () {
         return this.isPlaceholder() ? this.nvSpPr.nvPr.ph.idx : null;
-    },
+};
 
-    setVerticalAlign: function (align) {
+CShape.prototype.setVerticalAlign = function (align) {
         var new_body_pr = this.getBodyPr();
         if (new_body_pr) {
             new_body_pr = new_body_pr.createDuplicate();
@@ -1311,8 +1277,8 @@ CShape.prototype =
                 }
             }
         }
-    },
-    setVert: function (vert) {
+};
+CShape.prototype.setVert = function (vert) {
         var new_body_pr = this.getBodyPr();
         if (new_body_pr) {
             new_body_pr = new_body_pr.createDuplicate();
@@ -1327,9 +1293,9 @@ CShape.prototype =
             }
         }
         this.checkExtentsByDocContent && this.checkExtentsByDocContent();
-    },
+};
 
-    setPaddings: function (paddings) {
+CShape.prototype.setPaddings = function (paddings) {
         if (paddings) {
 
             var new_body_pr = this.getBodyPr();
@@ -1360,9 +1326,9 @@ CShape.prototype =
                 }
             }
         }
-    },
+};
 
-    recalculateTransformText: function () {
+CShape.prototype.recalculateTransformText = function () {
 
         var oContent = this.getDocContent();
         if (!oContent)
@@ -1403,9 +1369,9 @@ CShape.prototype =
         if (this.checkContentDrawings) {
             this.checkContentDrawings();
         }
-    },
+};
 
-    getFullFlip: function () {
+CShape.prototype.getFullFlip = function () {
         var _transform = this.localTransform;
         var _full_rotate = this.getFullRotate();
         var _full_pos_x_lt = _transform.TransformPointX(0, 0);
@@ -1430,9 +1396,9 @@ CShape.prototype =
             flipH: _rotated_pos_x_lt > _rotated_pos_x_rt,
             flipV: _rotated_pos_y_rt > _rotated_pos_y_rb
         };
-    },
+};
 
-    recalculateTransformText2: function () {
+CShape.prototype.recalculateTransformText2 = function () {
         if (this.txBody === null)
             return;
         if (!this.txBody.content2)
@@ -1746,18 +1712,18 @@ CShape.prototype =
             };
         }
         this.invertTransformText2 = global_MatrixTransformer.Invert(this.transformText2);
-    },
+};
 
-    getTextRect: function () {
+CShape.prototype.getTextRect = function () {
         return this.spPr && this.spPr.geometry && this.spPr.geometry.rect ? this.spPr.geometry.rect : {
             l: 0,
             t: 0,
             r: this.extX,
             b: this.extY
         };
-    },
+};
 
-    checkTransformTextMatrix: function (oMatrix, oContent, oBodyPr, bWordArtTransform, bIgnoreInsets) {
+CShape.prototype.checkTransformTextMatrix = function (oMatrix, oContent, oBodyPr, bWordArtTransform, bIgnoreInsets) {
         oMatrix.Reset();
         var _shape_transform = this.localTransform;
         var _content_height = oContent.Get_SummaryHeight();
@@ -2077,14 +2043,14 @@ CShape.prototype =
             oClipRect = {x: oRect.l + l_ins - Diff, y: oRect.t - Diff + t_ins, w: clipW, h: clipH};
         }
         return oClipRect;
-    },
+};
 
-    setWordShape: function (pr) {
+CShape.prototype.setWordShape = function (pr) {
         History.Add(this, {Type: AscDFH.historyitem_ShapeSetWordShape, oldPr: this.bWordShape, newPr: pr});
         this.bWordShape = pr;
-    },
+};
 
-    selectionCheck: function (X, Y, Page_Abs, NearPos) {
+CShape.prototype.selectionCheck = function (X, Y, Page_Abs, NearPos) {
 
         var content = this.getDocContent();
         if (content) {
@@ -2098,9 +2064,9 @@ CShape.prototype =
             }
         }
         return false;
-    },
+};
 
-    copy: function () {
+CShape.prototype.copy = function () {
         var copy = new CShape();
         if (this.nvSpPr)
             copy.setNvSpPr(this.nvSpPr.createDuplicate());
@@ -2131,9 +2097,9 @@ CShape.prototype =
         copy.cachedPixH = this.cachedPixH;
         copy.cachedPixW = this.cachedPixW;
         return copy;
-    },
+};
 
-    Get_Styles: function (level) {
+CShape.prototype.Get_Styles = function (level) {
 
         var _level = AscFormat.isRealNumber(level) ? level : 0;
         if (this.recalcInfo.recalculateTextStyles[_level]) {
@@ -2145,10 +2111,10 @@ CShape.prototype =
         this.compiledStyles[_level] = undefined;
         return ret;
         //   return this.compiledStyles[_level];
-    },
+};
 
 
-    recalculateTextStyles: function (level) {
+CShape.prototype.recalculateTextStyles = function (level) {
         return AscFormat.ExecuteNoHistory(function () {
             var parent_objects = this.getParentObjects();
             var default_style = new CStyle("defaultStyle", null, null, null, true);
@@ -2321,9 +2287,9 @@ CShape.prototype =
             this.compiledStyles[level] = {styles: Styles, lastId: last_style_id};
             return this.compiledStyles[level];
         }, this, []);
-    },
+};
 
-    recalculateBrush: function () {
+CShape.prototype.recalculateBrush = function () {
         var compiled_style = this.getCompiledStyle();
         var RGBA = {R: 0, G: 0, B: 0, A: 255};
         var parents = this.getParentObjects();
@@ -2353,9 +2319,9 @@ CShape.prototype =
         this.brush.merge(this.getCompiledFill());
         this.brush.transparent = this.getCompiledTransparent();
         this.brush.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
-    },
+};
 
-    recalculatePen: function () {
+CShape.prototype.recalculatePen = function () {
         var compiled_style = this.getCompiledStyle();
         var RGBA = {R: 0, G: 0, B: 0, A: 255};
         var parents = this.getParentObjects();
@@ -2383,14 +2349,14 @@ CShape.prototype =
 
         this.pen.merge(this.getCompiledLine());
         this.pen.calculate(parents.theme, parents.slide, parents.layout, parents.master, RGBA);
-    },
+};
 
-    Get_ParentTextTransform: function()
+CShape.prototype.Get_ParentTextTransform = function()
     {
         return this.transformText.CreateDublicate();
-    },
+};
 
-    isEmptyPlaceholder: function () {
+CShape.prototype.isEmptyPlaceholder = function () {
         if (this.isPlaceholder()) {
             if (this.nvSpPr.nvPr.ph.type == AscFormat.phType_title
                 || this.nvSpPr.nvPr.ph.type == AscFormat.phType_ctrTitle
@@ -2427,10 +2393,10 @@ CShape.prototype =
         else {
             return false;
         }
-    },
+};
 
 
-    changeSize: function (kw, kh) {
+CShape.prototype.changeSize = function (kw, kh) {
         if (this.spPr && this.spPr.xfrm && this.spPr.xfrm.isNotNull()) {
             var xfrm = this.spPr.xfrm;
             xfrm.setOffX(xfrm.offX * kw);
@@ -2439,17 +2405,17 @@ CShape.prototype =
             xfrm.setExtY(xfrm.extY * kh);
         }
         this.recalcTransform && this.recalcTransform();
-    },
+};
 
-    recalculateTransform: function () {
+CShape.prototype.recalculateTransform = function () {
         this.cachedImage = null;
         this.recalculateLocalTransform(this.transform);
         this.invertTransform = global_MatrixTransformer.Invert(this.transform);
         this.localTransform = this.transform.CreateDublicate();
-    },
+};
 
 
-    checkAutofit: function (bIgnoreWordShape) {
+CShape.prototype.checkAutofit = function (bIgnoreWordShape) {
         if (this.bWordShape || bIgnoreWordShape || this.bCheckAutoFitFlag) {
             var content = this.getDocContent();
             if (content) {
@@ -2460,19 +2426,19 @@ CShape.prototype =
             }
         }
         return false;
-    },
+};
 
-    Check_AutoFit: function () {
+CShape.prototype.Check_AutoFit = function () {
         return this.checkAutofit(true) || this.checkContentWordArt(this.getDocContent()) || this.getBodyPr().prstTxWarp != null;
-    },
+};
 
-    checkExtentsByAutofit: function(oShape)
+CShape.prototype.checkExtentsByAutofit = function(oShape)
     {
 
-    },
+};
 
 
-    recalculateLocalTransform: function(transform)
+CShape.prototype.recalculateLocalTransform = function(transform)
     {
         if (!isRealObject(this.group))
         {
@@ -3031,9 +2997,9 @@ CShape.prototype =
         }
         this.localTransform = transform;
         this.transform = transform;
-    },
+};
 
-    CheckNeedRecalcAutoFit : function(oSectPr)
+CShape.prototype.CheckNeedRecalcAutoFit  = function(oSectPr)
     {
         var Width, Height, Width2, Height2;
         var bRet = false;
@@ -3088,10 +3054,10 @@ CShape.prototype =
             }
         }
         return bRet;
-    },
+};
 
 
-    recalculateDocContent: function(oDocContent, oBodyPr)
+CShape.prototype.recalculateDocContent = function(oDocContent, oBodyPr)
     {
         var oRet = {w: 0, h: 0, contentH: 0};
         var l_ins, t_ins, r_ins, b_ins;
@@ -3283,9 +3249,9 @@ CShape.prototype =
             }
         }
         return oRet;
-    },
+};
 
-    checkExtentsByDocContent: function(bForce, bNeedRecalc)
+CShape.prototype.checkExtentsByDocContent = function(bForce, bNeedRecalc)
     {
         if((!this.bWordShape || this.group || bForce) && this.checkAutofit(true))
         {
@@ -3338,10 +3304,10 @@ CShape.prototype =
             return true;
         }
         return false;
-    },
+};
 
 
-    checkDrawingBaseCoords: function()
+CShape.prototype.checkDrawingBaseCoords = function()
     {
         if(this.drawingBase && this.spPr && this.spPr.xfrm && !this.group)
         {
@@ -3401,9 +3367,9 @@ CShape.prototype =
                 oldCy         : oldCy
         });
         }
-    },
+};
 
-    setDrawingBaseCoords: function(fromCol, fromColOff, fromRow, fromRowOff, toCol, toColOff, toRow, toRowOff, posX, posY, extX, extY)
+CShape.prototype.setDrawingBaseCoords = function(fromCol, fromColOff, fromRow, fromRowOff, toCol, toColOff, toRow, toRowOff, posX, posY, extX, extY)
     {
         if(this.drawingBase)
         {
@@ -3451,32 +3417,32 @@ CShape.prototype =
             this.drawingBase.ext.cx = extX;
             this.drawingBase.ext.cy = extY;
         }
-    },
+};
 
-    getTransformMatrix: function ()
+CShape.prototype.getTransformMatrix = function ()
     {
         return this.transform;
-    },
+};
 
-    getTransform: function () {
+CShape.prototype.getTransform = function () {
 
         return { x: this.x, y: this.y, extX: this.extX, extY: this.extY, rot: this.rot, flipH: this.flipH, flipV: this.flipV };
-    },
+};
 
-    getAngle: function (x, y) {
+CShape.prototype.getAngle = function (x, y) {
         var px = this.invertTransform.TransformPointX(x, y);
         var py = this.invertTransform.TransformPointY(x, y);
         return Math.PI * 0.5 + Math.atan2(px - this.extX * 0.5, py - this.extY * 0.5);
-    },
+};
 
 
-    recalculateGeometry: function () {
+CShape.prototype.recalculateGeometry = function () {
         if (this.spPr && isRealObject(this.spPr.geometry)) {
             var transform = this.getTransform();
             this.spPr.geometry.Recalculate(transform.extX, transform.extY);
         }
-    },
-    drawAdjustments: function (drawingDocument) {
+};
+CShape.prototype.drawAdjustments = function (drawingDocument) {
         if (this.spPr && isRealObject(this.spPr.geometry)) {
             this.spPr.geometry.drawAdjustments(drawingDocument, this.transform, false);
         }
@@ -3484,9 +3450,9 @@ CShape.prototype =
         {
             this.recalcInfo.warpGeometry.drawAdjustments(drawingDocument, this.transformTextWordArt, true);
         }
-    },
+};
 
-    getCardDirectionByNum: function (num) {
+CShape.prototype.getCardDirectionByNum = function (num) {
         var num_north = this.getNumByCardDirection(AscFormat.CARD_DIRECTION_N);
         var full_flip_h = this.getFullFlipH();
         var full_flip_v = this.getFullFlipV();
@@ -3495,9 +3461,9 @@ CShape.prototype =
             return ((num - num_north) + AscFormat.CARD_DIRECTION_N + 8) % 8;
 
         return (AscFormat.CARD_DIRECTION_N - (num - num_north) + 8) % 8;
-    },
+};
 
-    getNumByCardDirection: function (cardDirection) {
+CShape.prototype.getNumByCardDirection = function (cardDirection) {
         var hc = this.extX * 0.5;
         var vc = this.extY * 0.5;
         var transform = this.getTransformMatrix();
@@ -3537,9 +3503,9 @@ CShape.prototype =
         if (same_flip)
             return (north_number + cardDirection) % 8;
         return (north_number - cardDirection + 8) % 8;
-    },
+};
 
-    getResizeCoefficients: function (numHandle, x, y) {
+CShape.prototype.getResizeCoefficients = function (numHandle, x, y) {
         var cx, cy;
         cx = this.extX > 0 ? this.extX : 0.01;
         cy = this.extY > 0 ? this.extY : 0.01;
@@ -3567,9 +3533,9 @@ CShape.prototype =
                 return { kd1: (cx - t_x) / cx, kd2: 0 };
         }
         return { kd1: 1, kd2: 1 };
-    },
+};
 
-    select: function (drawingObjectsController, pageIndex)
+CShape.prototype.select = function (drawingObjectsController, pageIndex)
     {
         this.selected = true;
         this.selectStartPage = pageIndex;
@@ -3587,9 +3553,9 @@ CShape.prototype =
         }
         if (i === selected_objects.length)
             selected_objects.push(this);
-    },
+};
 
-    deselect: function (drawingObjectsController) {
+CShape.prototype.deselect = function (drawingObjectsController) {
         this.selected = false;
         this.addTextFlag = false;
         var selected_objects;
@@ -3608,9 +3574,9 @@ CShape.prototype =
             this.graphicObject.Selection_Remove();
         }
         return this;
-    },
+};
 
-    getMainGroup: function () {
+CShape.prototype.getMainGroup = function () {
         if (!isRealObject(this.group))
             return null;
 
@@ -3618,9 +3584,9 @@ CShape.prototype =
         while (isRealObject(cur_group.group))
             cur_group = cur_group.group;
         return cur_group;
-    },
+};
 
-    getGroupHierarchy: function () {
+CShape.prototype.getGroupHierarchy = function () {
         if (this.recalcInfo.recalculateGroupHierarchy) {
             this.groupHierarchy = [];
             if (isRealObject(this.group)) {
@@ -3633,32 +3599,11 @@ CShape.prototype =
             this.recalcInfo.recalculateGroupHierarchy = false;
         }
         return this.groupHierarchy;
-    },
+};
 
-    checkHitToBounds: function(x, y)
-    {
-        if(this.parent  &&(this.getObjectType() === AscDFH.historyitem_type_ImageShape && this.parent.isShapeChild && this.parent.isShapeChild()
-            || this.parent.Get_ParentTextTransform  && this.parent.Get_ParentTextTransform()))
-        {
-            return true;
-        }
-        var _x, _y;
-        if(AscFormat.isRealNumber(this.posX) && AscFormat.isRealNumber(this.posY))
-        {
-            _x = x - this.posX - this.bounds.x;
-            _y = y - this.posY - this.bounds.y;
-        }
-        else
-        {
-            _x = x - this.bounds.x;
-            _y = y - this.bounds.y;
-        }
-        var delta = BOUNDS_DELTA + (this.pen && AscFormat.isRealNumber(this.pen.w) ? this.pen.w/36000 : 0);
-        return _x >= -delta && _x <= this.bounds.w + delta && _y >= -delta && _y <= this.bounds.h + delta;
 
-    },
 
-    hitInTextRectWord: function(x, y)
+CShape.prototype.hitInTextRectWord = function(x, y)
     {
 
         var content = this.getDocContent && this.getDocContent();
@@ -3689,10 +3634,10 @@ CShape.prototype =
             return t_x > x_  && t_x < x_ + w && t_y > y_ && t_y < y_ + h;
         }
         return false;
-    },
+};
 
 
-    hitInTextRect: function (x, y) {
+CShape.prototype.hitInTextRect = function (x, y) {
         var oController = this.getDrawingObjectsController && this.getDrawingObjectsController();
         if(!this.txWarpStruct || !this.recalcInfo.warpGeometry ||
             this.recalcInfo.warpGeometry.preset === "textNoShape" ||
@@ -3713,10 +3658,10 @@ CShape.prototype =
         }
 
         return false;
-    },
+};
 
 
-    updateCursorType: function (x, y, e)
+CShape.prototype.updateCursorType = function (x, y, e)
     {
         if(this.invertTransformText)
         {
@@ -3724,11 +3669,11 @@ CShape.prototype =
             var ty = this.invertTransformText.TransformPointY(x, y);
             this.txBody.content.Update_CursorType(tx, ty, 0);
         }
-    },
+};
 
 
 
-    selectionSetStart: function (e, x, y, slideIndex)
+CShape.prototype.selectionSetStart = function (e, x, y, slideIndex)
     {
         var content = this.getDocContent();
         if (isRealObject(content))
@@ -3749,9 +3694,9 @@ CShape.prototype =
             else
                 content.Selection_SetEnd(tx, ty, slideIndex, e);
         }
-    },
+};
 
-    selectionSetEnd: function (e, x, y, slideIndex)
+CShape.prototype.selectionSetEnd = function (e, x, y, slideIndex)
     {
         var content = this.getDocContent();
         if (isRealObject(content)) {
@@ -3764,14 +3709,14 @@ CShape.prototype =
             }
         }
         delete this.rightButtonFlag;
-    },
+};
 
-    Get_Theme: function()
+CShape.prototype.Get_Theme = function()
     {
         return this.getParentObjects().theme;
-    },
+};
 
-    updateSelectionState: function ()
+CShape.prototype.updateSelectionState = function ()
     {
         var drawing_document = this.getDrawingDocument();
         if(drawing_document)
@@ -3838,32 +3783,9 @@ CShape.prototype =
                 drawing_document.SelectShow();
             }
         }
-    },
+};
 
-    normalize: function () {
-        var new_off_x, new_off_y, new_ext_x, new_ext_y;
-        var xfrm = this.spPr.xfrm;
-        if (!isRealObject(this.group)) {
-            new_off_x = xfrm.offX;
-            new_off_y = xfrm.offY;
-            new_ext_x = xfrm.extX;
-            new_ext_y = xfrm.extY;
-        }
-        else {
-            var scale_scale_coefficients = this.group.getResultScaleCoefficients();
-            new_off_x = scale_scale_coefficients.cx * (xfrm.offX - this.group.spPr.xfrm.chOffX);
-            new_off_y = scale_scale_coefficients.cy * (xfrm.offY - this.group.spPr.xfrm.chOffY);
-            new_ext_x = scale_scale_coefficients.cx * xfrm.extX;
-            new_ext_y = scale_scale_coefficients.cy * xfrm.extY;
-        }
-        var xfrm = this.spPr.xfrm;
-        Math.abs(new_off_x - xfrm.offX) > MOVE_DELTA &&  xfrm.setOffX(new_off_x);
-        Math.abs(new_off_y - xfrm.offY) > MOVE_DELTA &&  xfrm.setOffY(new_off_y);
-        Math.abs(new_ext_x - xfrm.extX) > MOVE_DELTA &&  xfrm.setExtX(new_ext_x);
-        Math.abs(new_ext_y - xfrm.extY) > MOVE_DELTA &&  xfrm.setExtY(new_ext_y);
-    },
-
-    check_bounds: function (checker) {
+CShape.prototype.check_bounds = function (checker) {
         if (this.spPr && this.spPr.geometry) {
             this.spPr.geometry.check_bounds(checker);
         }
@@ -3876,9 +3798,9 @@ CShape.prototype =
             checker._z();
             checker._e();
         }
-    },
+};
 
-    getBase64Img: function ()
+CShape.prototype.getBase64Img = function ()
     {
         if(typeof this.cachedImage === "string")
         {
@@ -3909,9 +3831,9 @@ CShape.prototype =
 
             return "";
         }
-    },
+};
 
-    haveSelectedDrawingInContent: function()
+CShape.prototype.haveSelectedDrawingInContent = function()
     {
         if(this.bWordShape)
         {
@@ -3925,10 +3847,10 @@ CShape.prototype =
             }
         }
         return false;
-    },
+};
 
 
-    clipTextRect: function(graphics)
+CShape.prototype.clipTextRect = function(graphics)
     {
         if(this.clipRect)
         {
@@ -3966,9 +3888,9 @@ CShape.prototype =
                 graphics.transform3(this.transformText, true);
             }
         }
-    },
+};
 
-    draw: function (graphics, transform, transformText, pageIndex) {
+CShape.prototype.draw = function (graphics, transform, transformText, pageIndex) {
 
         if(graphics.updatedRect && this.bounds)
         {
@@ -4269,9 +4191,9 @@ CShape.prototype =
         }
         graphics.SetIntegerGrid(true);
         graphics.reset();
-    },
+};
 
-    getRotateAngle: function (x, y) {
+CShape.prototype.getRotateAngle = function (x, y) {
         var transform = this.getTransformMatrix();
         var rotate_distance = this.convertPixToMM(AscCommon.TRACK_DISTANCE_ROTATE);
         var hc = this.extX * 0.5;
@@ -4296,31 +4218,31 @@ CShape.prototype =
         var same_flip = flip_h && flip_v || !flip_h && !flip_v;
         var angle = rel_x > this.extX * 0.5 ? Math.atan2(Math.abs(v1_x * v2_y - v1_y * v2_x), v1_x * v2_x + v1_y * v2_y) : -Math.atan2(Math.abs(v1_x * v2_y - v1_y * v2_x), v1_x * v2_x + v1_y * v2_y);
         return same_flip ? angle : -angle;
-    },
+};
 
-    getFullFlipH: function () {
+CShape.prototype.getFullFlipH = function () {
         if (!isRealObject(this.group))
             return this.flipH;
         return this.group.getFullFlipH() ? !this.flipH : this.flipH;
-    },
+};
 
-    getFullFlipV: function () {
+CShape.prototype.getFullFlipV = function () {
         if (!isRealObject(this.group))
             return this.flipV;
         return this.group.getFullFlipV() ? !this.flipV : this.flipV;
-    },
+};
 
-    getAspect: function (num) {
+CShape.prototype.getAspect = function (num) {
         var _tmp_x = this.extX != 0 ? this.extX : 0.1;
         var _tmp_y = this.extY != 0 ? this.extY : 0.1;
         return num === 0 || num === 4 ? _tmp_x / _tmp_y : _tmp_y / _tmp_x;
-    },
+};
 
-    getFullRotate: function () {
+CShape.prototype.getFullRotate = function () {
         return !isRealObject(this.group) ? this.rot : this.rot + this.group.getFullRotate();
-    },
+};
 
-    getRectBounds: function () {
+CShape.prototype.getRectBounds = function () {
         var transform = this.getTransformMatrix();
         var w = this.extX;
         var h = this.extY;
@@ -4345,61 +4267,40 @@ CShape.prototype =
                 max_y = cur_y;
         }
         return { minX: min_x, maxX: max_x, minY: min_y, maxY: max_y };
-    },
+};
 
-    getInvertTransform: function ()
+CShape.prototype.getInvertTransform = function ()
     {
         return this.invertTransform ? this.invertTransform : new CMatrix();
-    },
+};
 
-    calculateSnapArrays: function(snapArrayX, snapArrayY)
-    {
-        if(!Array.isArray(snapArrayX) || !Array.isArray(snapArrayX))
-        {
-            snapArrayX = this.snapArrayX;
-            snapArrayY = this.snapArrayY;
-            snapArrayX.length = 0;
-            snapArrayY.length = 0;
-        }
-        var t = this.transform;
-        snapArrayX.push(t.TransformPointX(0, 0));
-        snapArrayY.push(t.TransformPointY(0, 0));
-        snapArrayX.push(t.TransformPointX(this.extX, 0));
-        snapArrayY.push(t.TransformPointY(this.extX, 0));
 
-        snapArrayX.push(t.TransformPointX(this.extX*0.5, this.extY*0.5));
-        snapArrayY.push(t.TransformPointY(this.extX*0.5, this.extY*0.5));
-        snapArrayX.push(t.TransformPointX(this.extX, this.extY));
-        snapArrayY.push(t.TransformPointY(this.extX, this.extY));
-        snapArrayX.push(t.TransformPointX(0, this.extY));
-        snapArrayY.push(t.TransformPointY(0, this.extY));
-    },
 
-    getFullOffset: function () {
+CShape.prototype.getFullOffset = function () {
         if (!isRealObject(this.group))
             return { offX: this.x, offY: this.y };
         var group_offset = this.group.getFullOffset();
         return { offX: this.x + group_offset.offX, offY: this.y + group_offset.offY };
-    },
+};
 
-    getPresetGeom: function () {
+CShape.prototype.getPresetGeom = function () {
         if (this.spPr && this.spPr.geometry) {
             return this.spPr.geometry.preset;
         }
         else {
             return null;
         }
-    },
+};
 
-    getFill: function () {
+CShape.prototype.getFill = function () {
         if(this.brush && this.brush.fill)
         {
             return this.brush;
         }
         return AscFormat.CreateNoFillUniFill();
-    },
+};
 
-    getStroke: function () {
+CShape.prototype.getStroke = function () {
         if(this.pen && this.pen.Fill)
         {
             return this.pen;
@@ -4407,9 +4308,9 @@ CShape.prototype =
         var ret = AscFormat.CreateNoFillLine();
         ret.w = 0;
         return ret;
-    },
+};
 
-    canChangeArrows: function () {
+CShape.prototype.canChangeArrows = function () {
         if (!this.spPr || this.spPr.geometry == null) {
             return false;
         }
@@ -4429,9 +4330,9 @@ CShape.prototype =
             }
         }
         return false;
-    },
+};
 
-    getTextArtProperties: function()
+CShape.prototype.getTextArtProperties = function()
     {
         var oContent = this.getDocContent(), oTextPr, oRet = null;
         if(oContent)
@@ -4476,9 +4377,9 @@ CShape.prototype =
             }
         }
         return oRet;
-    },
+};
 
-    applyTextArtForm: function(sPreset)
+CShape.prototype.applyTextArtForm = function(sPreset)
     {
         var oBodyPr = this.getBodyPr().createDuplicate();
         oBodyPr.prstTxWarp = AscFormat.ExecuteNoHistory(function(){return AscFormat.CreatePrstTxWarpGeometry(sPreset)}, this, []);
@@ -4493,9 +4394,9 @@ CShape.prototype =
                 this.txBody.setBodyPr(oBodyPr);
             }
         }
-    },
+};
 
-    getParagraphParaPr: function () {
+CShape.prototype.getParagraphParaPr = function () {
         if (this.txBody && this.txBody.content) {
             var _result;
             this.txBody.content.Set_ApplyToAll(true);
@@ -4504,9 +4405,9 @@ CShape.prototype =
             return _result;
         }
         return null;
-    },
+};
 
-    getParagraphTextPr: function () {
+CShape.prototype.getParagraphTextPr = function () {
         if (this.txBody && this.txBody.content) {
             var _result;
             this.txBody.content.Set_ApplyToAll(true);
@@ -4515,9 +4416,9 @@ CShape.prototype =
             return _result;
         }
         return null;
-    },
+};
 
-    getAllRasterImages: function(images)
+CShape.prototype.getAllRasterImages = function(images)
     {
         if(this.spPr && this.spPr.Fill && this.spPr.Fill.fill && typeof (this.spPr.Fill.fill.RasterImageId) === "string" && this.spPr.Fill.fill.RasterImageId.length > 0)
             images.push(this.spPr.Fill.fill.RasterImageId);
@@ -4554,9 +4455,9 @@ CShape.prototype =
             }
             this.checkContentByCallback(oContent, fCallback);
         }
-    },
+};
 
-    changePresetGeom: function (sPreset) {
+CShape.prototype.changePresetGeom = function (sPreset) {
 
 
         if(sPreset === "textRect")
@@ -4767,9 +4668,9 @@ CShape.prototype =
         }
         else
             this.spPr.setLn(_new_line);
-    },
+};
 
-    changeFill: function (unifill) {
+CShape.prototype.changeFill = function (unifill) {
 
         if(this.recalcInfo.recalculateBrush)
         {
@@ -4778,13 +4679,13 @@ CShape.prototype =
         var unifill2 = AscFormat.CorrectUniFill(unifill, this.brush);
         unifill2.convertToPPTXMods();
         this.spPr.setFill(unifill2);
-    },
-    setFill: function (fill) {
+};
+CShape.prototype.setFill = function (fill) {
 
         this.spPr.setFill(fill);
-    },
+};
 
-    changeLine: function (line)
+CShape.prototype.changeLine = function (line)
     {
         if(this.recalcInfo.recalculatePen)
         {
@@ -4796,9 +4697,9 @@ CShape.prototype =
             stroke.Fill.convertToPPTXMods();
         }
         this.spPr.setLn(stroke);
-    },
+};
 
-    hitToAdjustment: function (x, y) {
+CShape.prototype.hitToAdjustment = function (x, y) {
         var invert_transform = this.getInvertTransform();
         var t_x, t_y, ret;
         t_x = invert_transform.TransformPointX(x, y);
@@ -4826,19 +4727,18 @@ CShape.prototype =
         }
 
         return { hit: false, adjPolarFlag: null, adjNum: null, warp: false };
-    },
+};
 
-    hitToHandles: function (x, y) {
+CShape.prototype.hitToHandles = function (x, y) {
         return hitToHandles(x, y, this);
 
-    },
+};
 
-    hit: function (x, y) {
+CShape.prototype.hit = function (x, y) {
         return this.hitInInnerArea(x, y) || this.hitInPath(x, y) || this.hitInTextRect(x, y);
-    },
+};
 
-    hitInPath: function (x, y)
-    {
+CShape.prototype.hitInPath = function (x, y) {
         if(!this.checkHitToBounds(x, y))
             return false;
         var invert_transform = this.getInvertTransform();
@@ -4848,11 +4748,11 @@ CShape.prototype =
             return this.spPr.geometry.hitInPath(this.getCanvasContext(), x_t, y_t);
         else
             return this.hitInBoundingRect(x, y);
-    },
+};
 
-    hitInInnerArea: function (x, y) {
-        if ((this.getObjectType && this.getObjectType() === AscDFH.historyitem_type_ChartSpace) || this.brush != null && this.brush.fill != null
-            && this.brush.fill.type != c_oAscFill.FILL_TYPE_NOFILL && this.checkHitToBounds(x, y)) {
+CShape.prototype.hitInInnerArea = function (x, y) {
+    if ((this.getObjectType && this.getObjectType() === AscDFH.historyitem_type_ChartSpace) || (this.brush != null && this.brush.fill != null
+        && this.brush.fill.type != c_oAscFill.FILL_TYPE_NOFILL || this.blipFill) && this.checkHitToBounds(x, y)) {
             var invert_transform = this.getInvertTransform();
             var x_t = invert_transform.TransformPointX(x, y);
             var y_t = invert_transform.TransformPointY(x, y);
@@ -4861,9 +4761,9 @@ CShape.prototype =
             return x_t > 0 && x_t < this.extX && y_t > 0 && y_t < this.extY;
         }
         return false;
-    },
+};
 
-    hitInBoundingRect: function (x, y) {
+CShape.prototype.hitInBoundingRect = function (x, y) {
         var invert_transform = this.getInvertTransform();
         var x_t = invert_transform.TransformPointX(x, y);
         var y_t = invert_transform.TransformPointY(x, y);
@@ -4875,72 +4775,60 @@ CShape.prototype =
             HitInLine(_hit_context, x_t, y_t, this.extX, this.extY, 0, this.extY) ||
             HitInLine(_hit_context, x_t, y_t, 0, this.extY, 0, 0) ||
             (this.canRotate && this.canRotate() && HitInLine(_hit_context, x_t, y_t, this.extX * 0.5, 0, this.extX * 0.5, -this.convertPixToMM(AscCommon.TRACK_DISTANCE_ROTATE))));
-    },
+};
 
-    canRotate: function () {
+CShape.prototype.canRotate = function () {
         return true;
-    },
+};
 
-    canResize: function () {
+CShape.prototype.canResize = function () {
+    return true;
+};
+
+CShape.prototype.canMove = function () {
         return true; //TODO
-    },
+};
 
-    canMove: function () {
-        return true; //TODO
-    },
-
-    canGroup: function () {
+CShape.prototype.canGroup = function () {
         return !this.isPlaceholder(); //TODO
-    },
+};
 
-    getBoundsInGroup: function () {
-        var r = this.rot;
-        if (!AscFormat.isRealNumber(r) || checkNormalRotate(r)) {
-            return { minX: this.x, minY: this.y, maxX: this.x + this.extX, maxY: this.y + this.extY };
-        }
-        else {
-            var hc = this.extX * 0.5;
-            var vc = this.extY * 0.5;
-            var xc = this.x + hc;
-            var yc = this.y + vc;
-            return { minX: xc - vc, minY: yc - hc, maxX: xc + vc, maxY: yc + hc };
-        }
-    },
 
-    canChangeAdjustments: function () {
+
+CShape.prototype.canChangeAdjustments = function () {
         return true; //TODO
-    },
+};
 
-    createRotateTrack: function () {
+CShape.prototype.createRotateTrack = function () {
         return new AscFormat.RotateTrackShapeImage(this);
-    },
+};
 
-    createResizeTrack: function (cardDirection) {
+CShape.prototype.createResizeTrack = function (cardDirection) {
         return new AscFormat.ResizeTrackShapeImage(this, cardDirection);
-    },
+};
 
-    createMoveTrack: function () {
+CShape.prototype.createMoveTrack = function () {
         return new AscFormat.MoveShapeImageTrack(this);
-    },
+};
 
 
-    remove: function (Count, bOnlyText, bRemoveOnlySelection) {
+CShape.prototype.remove = function (Count, bOnlyText, bRemoveOnlySelection) {
         if (this.txBody) {
             this.txBody.content.Remove(Count, bOnlyText, bRemoveOnlySelection);
             this.recalcInfo.recalculateContent = true;
             this.recalcInfo.recalculateTransformText = true;
         }
-    },
+};
 
 
-    Restart_CheckSpelling: function()
+CShape.prototype.Restart_CheckSpelling = function()
     {
         this.recalcInfo.recalculateShapeStyleForParagraph = true;
         var content = this.getDocContent();
         content && content.Restart_CheckSpelling();
-    },
+};
 
-    Refresh_RecalcData: function (data)
+CShape.prototype.Refresh_RecalcData = function (data)
     {
         switch (data.Type)
         {
@@ -5006,9 +4894,9 @@ CShape.prototype =
                 this.Refresh_RecalcData2();
             }
         }
-    },
+};
 
-    Refresh_RecalcData2: function(pageIndex/*для текста*/)
+CShape.prototype.Refresh_RecalcData2 = function(pageIndex/*для текста*/)
     {
         this.recalcContent();
         this.recalcContent2 && this.recalcContent2();
@@ -5020,9 +4908,9 @@ CShape.prototype =
             this.recalcInfo.recalcTitle = this.getDocContent();
             this.recalcInfo.bRecalculatedTitle = true;
         }
-    },
+};
 
-    Undo: function (data)
+CShape.prototype.Undo = function (data)
     {
         switch (data.Type)
         {
@@ -5127,9 +5015,9 @@ CShape.prototype =
                 break;
             }
         }
-    },
+};
 
-    Redo: function (data)
+CShape.prototype.Redo = function (data)
     {
         switch (data.Type)
         {
@@ -5232,9 +5120,9 @@ CShape.prototype =
                 break;
             }
         }
-    },
+};
 
-    Save_Changes: function (data, w)
+CShape.prototype.Save_Changes = function (data, w)
     {
         w.WriteLong(this.getObjectType());
         w.WriteLong(data.Type);
@@ -5310,9 +5198,9 @@ CShape.prototype =
                 break;
             }
         }
-    },
+};
 
-    Load_Changes: function (r)
+CShape.prototype.Load_Changes = function (r)
     {
         if (r.GetLong() === this.getObjectType())
         {
@@ -5434,13 +5322,13 @@ CShape.prototype =
                 }
             }
         }
-    },
+};
 
-    Load_LinkData: function (linkData)
+CShape.prototype.Load_LinkData = function (linkData)
     {
-    },
+};
 
-    Get_PageContentStartPos: function(pageNum)
+CShape.prototype.Get_PageContentStartPos = function(pageNum)
     {
         if(this.textBoxContent)
         {
@@ -5455,61 +5343,32 @@ CShape.prototype =
             }
         }
         return null;
-    },
+};
 
-    OnContentRecalculate: function()
-    {},
+CShape.prototype.OnContentRecalculate = function()
+{};
 
-    recalculateBounds: function()
+CShape.prototype.recalculateBounds = function()
     {
         var boundsChecker = new  AscFormat.CSlideBoundsChecker();
         this.draw(boundsChecker, this.localTransform, this.localTransformText);
         if(!this.group)
         {
-            var tr = this.localTransform;
-            var arr_p_x = [];
-            var arr_p_y = [];
-            arr_p_x.push(tr.TransformPointX(0,0));
-            arr_p_y.push(tr.TransformPointY(0,0));
-            arr_p_x.push(tr.TransformPointX(this.extX,0));
-            arr_p_y.push(tr.TransformPointY(this.extX,0));
-            arr_p_x.push(tr.TransformPointX(this.extX,this.extY));
-            arr_p_y.push(tr.TransformPointY(this.extX,this.extY));
-            arr_p_x.push(tr.TransformPointX(0,this.extY));
-            arr_p_y.push(tr.TransformPointY(0,this.extY));
 
-            arr_p_x.push(boundsChecker.Bounds.min_x);
-            arr_p_x.push(boundsChecker.Bounds.max_x);
-            arr_p_y.push(boundsChecker.Bounds.min_y);
-            arr_p_y.push(boundsChecker.Bounds.max_y);
-
-            var min_b_x = Math.min.apply(Math, arr_p_x);
-            var max_b_x = Math.max.apply(Math, arr_p_x);
-            var min_b_y = Math.min.apply(Math, arr_p_y);
-            var max_b_y = Math.max.apply(Math, arr_p_y);
-
-            this.bounds.l = min_b_x;
-            this.bounds.t = min_b_y;
-            this.bounds.r = max_b_x;
-            this.bounds.b = max_b_y;
+        boundsChecker.CorrectBounds();
         }
-        else
-        {
-
             this.bounds.l = boundsChecker.Bounds.min_x;
             this.bounds.t = boundsChecker.Bounds.min_y;
             this.bounds.r = boundsChecker.Bounds.max_x;
             this.bounds.b = boundsChecker.Bounds.max_y;
-        }
-
 
         this.bounds.x = this.bounds.l;
         this.bounds.y = this.bounds.t;
         this.bounds.w = this.bounds.r - this.bounds.l;
         this.bounds.h = this.bounds.b - this.bounds.t;
-    },
+};
 
-    checkRunWordArtContent: function(aContent, fCallback)
+CShape.prototype.checkRunWordArtContent = function(aContent, fCallback)
     {
         for(var j = 0; j < aContent.length; ++j)
         {
@@ -5529,9 +5388,9 @@ CShape.prototype =
             }
         }
         return false;
-    },
+};
 
-    checkContentByCallback: function(oContent, fCallback)
+CShape.prototype.checkContentByCallback = function(oContent, fCallback)
     {
         if(!oContent)
             return false;
@@ -5563,24 +5422,24 @@ CShape.prototype =
             }
         }
         return false;
-    },
+};
 
-    checkContentWordArt: function(oContent)
+CShape.prototype.checkContentWordArt = function(oContent)
     {
         return this.checkContentByCallback(oContent, CheckWordArtTextPr);
-    },
+};
 
-    checkNeedRecalcDocContentForTxWarp: function(oBodyPr)
+CShape.prototype.checkNeedRecalcDocContentForTxWarp = function(oBodyPr)
     {
         return oBodyPr && oBodyPr.prstTxWarp && (oBodyPr.prstTxWarp.pathLst.length / 2 - ((oBodyPr.prstTxWarp.pathLst.length / 2) >> 0) > 0);
-    },
+};
 
-    chekBodyPrTransform: function(oBodyPr)
+CShape.prototype.chekBodyPrTransform = function(oBodyPr)
     {
         return isRealObject(oBodyPr) && isRealObject(oBodyPr.prstTxWarp) && oBodyPr.prstTxWarp.preset !== "textNoShape";
-    },
+};
 
-    checkTextWarp: function(oContent, oBodyPr, dWidth, dHeight, bNeedNoTransform, bNeedWarp)
+CShape.prototype.checkTextWarp = function(oContent, oBodyPr, dWidth, dHeight, bNeedNoTransform, bNeedWarp)
     {
         var oRet = {oTxWarpStruct: null, oTxWarpStructParamarks: null, oTxWarpStructNoTransform: null, oTxWarpStructParamarksNoTransform: null};
         //return oRet;
@@ -5727,7 +5586,6 @@ CShape.prototype =
             }
         }
         return oRet;
-    }
 };
 
 function CreateBinaryReader(szSrc, offset, srcLen)
@@ -5838,19 +5696,7 @@ function getParaDrawing(oDrawing)
     return null;
 }
 
-    function normalizeRotate(rot)
-    {
-        var new_rot = rot;
-        if(AscFormat.isRealNumber(new_rot))
-        {
-            while(new_rot >= 2*Math.PI)
-                new_rot -= 2*Math.PI;
-            while(new_rot < 0)
-                new_rot += 2*Math.PI;
-            return new_rot;
-        }
-        return new_rot;
-    }
+
 
     //--------------------------------------------------------export----------------------------------------------------
     window['AscFormat'] = window['AscFormat'] || {};
@@ -5863,5 +5709,4 @@ function getParaDrawing(oDrawing)
     window['AscFormat'].CShape = CShape;
     window['AscFormat'].CreateBinaryReader = CreateBinaryReader;
     window['AscFormat'].getParaDrawing = getParaDrawing;
-    window['AscFormat'].normalizeRotate = normalizeRotate;
 })(window);

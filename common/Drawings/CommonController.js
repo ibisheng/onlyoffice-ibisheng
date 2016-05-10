@@ -462,11 +462,7 @@ function CheckSpPrXfrm2(object)
 }
 
 
-function checkNormalRotate(rot)
-{
-    var _rot = AscFormat.normalizeRotate(rot);
-    return (_rot >= 0 && _rot < Math.PI * 0.25) || (_rot >= 3 * Math.PI * 0.25 && _rot < 5 * Math.PI * 0.25) || (_rot >= 7 * Math.PI * 0.25 && _rot < 2 * Math.PI);
-}
+
 
 function getObjectsByTypesFromArr(arr, bGrouped)
 {
@@ -5914,23 +5910,23 @@ DrawingObjectsController.prototype =
     getBoundsForGroup: function(arrDrawings)
     {
         var bounds = arrDrawings[0].getBoundsInGroup();
-        var max_x = bounds.maxX;
-        var max_y = bounds.maxY;
-        var min_x = bounds.minX;
-        var min_y = bounds.minY;
+        var max_x = bounds.r;
+        var max_y = bounds.b;
+        var min_x = bounds.l;
+        var min_y = bounds.t;
         for(var i = 1; i < arrDrawings.length; ++i)
         {
             bounds = arrDrawings[i].getBoundsInGroup();
-            if(max_x < bounds.maxX)
-                max_x = bounds.maxX;
-            if(max_y < bounds.maxY)
-                max_y = bounds.maxY;
-            if(min_x > bounds.minX)
-                min_x = bounds.minX;
-            if(min_y > bounds.minY)
-                min_y = bounds.minY;
+            if(max_x < bounds.r)
+                max_x = bounds.r;
+            if(max_y < bounds.b)
+                max_y = bounds.b;
+            if(min_x > bounds.l)
+                min_x = bounds.l;
+            if(min_y > bounds.t)
+                min_y = bounds.t;
         }
-        return {minX: min_x, maxX: max_x, minY: min_y, maxY: max_y};
+        return new AscFormat.CGraphicBounds(min_x, min_y, max_x, max_y);
     },
 
 
@@ -5941,10 +5937,10 @@ DrawingObjectsController.prototype =
         if(arrDrawings.length < 2)
             return null;
         var bounds = this.getBoundsForGroup(arrDrawings);
-        var max_x = bounds.maxX;
-        var max_y = bounds.maxY;
-        var min_x = bounds.minX;
-        var min_y = bounds.minY;
+        var max_x = bounds.r;
+        var max_y = bounds.b;
+        var min_x = bounds.l;
+        var min_y = bounds.t;
         var group = new AscFormat.CGroupShape();
         group.setSpPr(new AscFormat.CSpPr());
         group.spPr.setParent(group);
@@ -8794,7 +8790,6 @@ function CalcLiterByLength(aAlphaBet, nLength)
     window['AscFormat'].CompareGroups = CompareGroups;
     window['AscFormat'].CheckSpPrXfrm = CheckSpPrXfrm;
     window['AscFormat'].CheckSpPrXfrm2 = CheckSpPrXfrm2;
-    window['AscFormat'].checkNormalRotate = checkNormalRotate;
     window['AscFormat'].getObjectsByTypesFromArr = getObjectsByTypesFromArr;
     window['AscFormat'].getTargetTextObject = getTargetTextObject;
     window['AscFormat'].DrawingObjectsController = DrawingObjectsController;

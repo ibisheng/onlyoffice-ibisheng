@@ -4532,24 +4532,11 @@ ParaDrawing.prototype =
         if (undefined != Props.AllowOverlap)
             this.Set_AllowOverlap(Props.AllowOverlap);
 
-        var bNeedUpdateWH = false, newW = this.Extent.W, newH = this.Extent.H;
         if (undefined != Props.PositionH) {
             this.Set_PositionH(Props.PositionH.RelativeFrom, Props.PositionH.UseAlign, ( true === Props.PositionH.UseAlign ? Props.PositionH.Align : Props.PositionH.Value ), Props.PositionH.Percent);
-            if (Props.PositionH.UseAlign) {
-                bNeedUpdateWH = true;
-                if (isRealObject(this.GraphicObj.bounds) && AscFormat.isRealNumber(this.GraphicObj.bounds.w)) {
-                    newW = this.GraphicObj.bounds.w;
-                }
-            }
         }
         if (undefined != Props.PositionV) {
             this.Set_PositionV(Props.PositionV.RelativeFrom, Props.PositionV.UseAlign, ( true === Props.PositionV.UseAlign ? Props.PositionV.Align : Props.PositionV.Value ), Props.PositionV.Percent);
-            if (this.PositionV.UseAlign) {
-                bNeedUpdateWH = true;
-                if (isRealObject(this.GraphicObj.bounds) && AscFormat.isRealNumber(this.GraphicObj.bounds.h)) {
-                    newH = this.GraphicObj.bounds.h;
-                }
-            }
         }
         if (undefined != Props.SizeRelH) {
             this.SetSizeRelH({
@@ -4575,10 +4562,6 @@ ParaDrawing.prototype =
             this.SetSizeRelH({RelativeFrom: AscCommon.c_oAscSizeRelFromH.sizerelfromhPage, Percent: 0})
         }
 
-        if(bNeedUpdateWH)
-        {
-            this.setExtent(newW, newH);
-        }
         if(bCheckWrapPolygon)
         {
             this.Check_WrapPolygon();
@@ -4590,27 +4573,32 @@ ParaDrawing.prototype =
         if(!this.GraphicObj)
             return;
         var dW, dH, bInline = this.Is_Inline();
-        if(this.PositionH.UseAlign || this.PositionV.UseAlign || bInline)
-        {
-            this.GraphicObj.recalculate();
-        }
-        if(this.PositionH.UseAlign || bInline)
-        {
-            dW = this.GraphicObj.bounds.w;
-        }
-        else
+        this.GraphicObj.recalculate();
+        this.setExtent(this.GraphicObj.spPr.xfrm.extX, this.GraphicObj.spPr.xfrm.extY);
+        if(AscFormat.checkNormalRotate(AscFormat.isRealNumber(this.GraphicObj.rot) ? this.GraphicObj.rot : 0))
         {
             dW = this.GraphicObj.spPr.xfrm.extX;
-        }
-        if(this.PositionV.UseAlign || bInline)
-        {
-            dH = this.GraphicObj.bounds.h;
+            dH = this.GraphicObj.spPr.xfrm.extY;
         }
         else
         {
-            dH = this.GraphicObj.spPr.xfrm.extY;
+            dH = this.GraphicObj.spPr.xfrm.extX;
+            dW = this.GraphicObj.spPr.xfrm.extY;
         }
-        this.setExtent(dW, dH);
+        var xc = this.GraphicObj.localTransform.TransformPointX(this.GraphicObj.extX/2, this.GraphicObj.extY/2);
+        var yc = this.GraphicObj.localTransform.TransformPointY(this.GraphicObj.extX/2, this.GraphicObj.extY/2);
+        var oBounds = this.GraphicObj.bounds;
+        var LineCorrect = 0;
+        if(this.GraphicObj.pen)
+        {
+            LineCorrect = (this.GraphicObj.pen.w == null) ? 12700 : parseInt(this.GraphicObj.pen.w);
+            LineCorrect /= 72000.0;
+        }
+        var EEL = (xc - dW/2) - oBounds.l - LineCorrect;
+        var EET = (yc - dH/2) - oBounds.t - LineCorrect;
+        var EER = oBounds.r + LineCorrect - (xc + dW/2);
+        var EEB = oBounds.b + LineCorrect - (yc + dH/2);
+        this.setEffectExtent(EEL > 0 ? EEL : 0, EET > 0 ? EET : 0, EER > 0 ? EER : 0, EEB > 0 ? EEB : 0);
         this.Check_WrapPolygon();
     },
 
@@ -4652,9 +4640,10 @@ ParaDrawing.prototype =
         }
         if(AscFormat.isRealNumber(this.Extent.W) && AscFormat.isRealNumber(this.Extent.H) && (!this.GraphicObj.checkAutofit || !this.GraphicObj.checkAutofit()) && !this.SizeRelH && !this.SizeRelV)
         {
-            this.Width        = this.Extent.W;
-            this.Height       = this.Extent.H;
-            this.WidthVisible = this.Extent.W;
+            var oEffectExtent = this.EffectExtent;
+            this.Width        = this.Extent.W + AscFormat.getValOrDefault(oEffectExtent.L, 0) + AscFormat.getValOrDefault(oEffectExtent.R, 0);
+            this.Height       = this.Extent.H + AscFormat.getValOrDefault(oEffectExtent.T, 0) + AscFormat.getValOrDefault(oEffectExtent.B, 0);
+            this.WidthVisible = this.Width;
         }
         else
         {
@@ -6586,8 +6575,8 @@ ParaDrawing.prototype =
     {
         this.GraphicObj.snapArrayX.length = 0;
         this.GraphicObj.snapArrayY.length = 0;
-        if(isRealObject(this.GraphicObj) && typeof this.GraphicObj.calculateSnapArrays === "function")
-            this.GraphicObj.calculateSnapArrays(this.GraphicObj.snapArrayX, this.GraphicObj.snapArrayY);
+        if(this.GraphicObj)
+            this.GraphicObj.recalculateSnapArrays();
 
     },
 

@@ -4245,7 +4245,6 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
 			this.memory.WriteByte(c_oSerImageType2.Extent);
 			this.memory.WriteByte(c_oSerPropLenType.Variable);
 			this.bs.WriteItemWithLength(function(){oThis.WriteExtent(img.Extent);});
-			
 			if(null != img.GraphicObj.chart)
 			{
 				this.memory.WriteByte(c_oSerImageType2.Chart2);
@@ -4315,12 +4314,11 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
 				this.memory.WriteByte(c_oSerPropLenType.Byte);
 				this.memory.WriteBool(img.SimplePos.Use);
 			}
-			if(false)
+			if(img.EffectExtent)
 			{
-				var EffectExtent = null;
 				this.memory.WriteByte(c_oSerImageType2.EffectExtent);
 				this.memory.WriteByte(c_oSerPropLenType.Variable);
-				this.bs.WriteItemWithLength(function(){oThis.WriteEffectExtent(EffectExtent);});
+				this.bs.WriteItemWithLength(function(){oThis.WriteEffectExtent(img.EffectExtent);});
 			}
 			if(null != img.Extent)
 			{
@@ -4407,29 +4405,29 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
     };
 	this.WriteEffectExtent = function(EffectExtent)
 	{
-		if(null != EffectExtent.Left)
+		if(null != EffectExtent.L)
 		{
 			this.memory.WriteByte(c_oSerEffectExtent.Left);
 			this.memory.WriteByte(c_oSerPropLenType.Double);
-			this.memory.WriteDouble(EffectExtent.Left);
+			this.memory.WriteDouble(EffectExtent.L);
 		}
-		if(null != EffectExtent.Top)
+		if(null != EffectExtent.T)
 		{
 			this.memory.WriteByte(c_oSerEffectExtent.Top);
 			this.memory.WriteByte(c_oSerPropLenType.Double);
-			this.memory.WriteDouble(EffectExtent.Top);
+			this.memory.WriteDouble(EffectExtent.T);
 		}
-		if(null != EffectExtent.Right)
+		if(null != EffectExtent.R)
 		{
 			this.memory.WriteByte(c_oSerEffectExtent.Right);
 			this.memory.WriteByte(c_oSerPropLenType.Double);
-			this.memory.WriteDouble(EffectExtent.Right);
+			this.memory.WriteDouble(EffectExtent.R);
 		}
-		if(null != EffectExtent.Bottom)
+		if(null != EffectExtent.B)
 		{
 			this.memory.WriteByte(c_oSerEffectExtent.Bottom);
 			this.memory.WriteByte(c_oSerPropLenType.Double);
-			this.memory.WriteDouble(EffectExtent.Bottom);
+			this.memory.WriteDouble(EffectExtent.B);
 		}
 	}
 	this.WriteExtent = function(Extent)
@@ -8750,6 +8748,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 			res = this.bcr.Read2(length, function(t, l){
                     return oThis.ReadEffectExtent(t, l, oReadEffectExtent);
                 });
+            oParaDrawing.setEffectExtent(oReadEffectExtent.L, oReadEffectExtent.T, oReadEffectExtent.R, oReadEffectExtent.B);
 		}
 		else if( c_oSerImageType2.Extent === type )
 		{
@@ -8853,13 +8852,13 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 		var res = c_oSerConstants.ReadOk;
         var oThis = this;
         if( c_oSerEffectExtent.Left === type )
-			oEffectExtent.Left = this.bcr.ReadDouble();
+			oEffectExtent.L = this.bcr.ReadDouble();
 		else if( c_oSerEffectExtent.Top === type )
-			oEffectExtent.Top = this.bcr.ReadDouble();
+			oEffectExtent.T = this.bcr.ReadDouble();
 		else if( c_oSerEffectExtent.Right === type )
-			oEffectExtent.Right = this.bcr.ReadDouble();
+			oEffectExtent.R = this.bcr.ReadDouble();
 		else if( c_oSerEffectExtent.Bottom === type )
-			oEffectExtent.Bottom = this.bcr.ReadDouble();
+			oEffectExtent.B = this.bcr.ReadDouble();
 		else
             res = c_oSerConstants.ReadUnknown;
         return res;
@@ -8987,7 +8986,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 			var DistB = this.bcr.ReadDouble();
 		else if( c_oSerWrapTopBottom.EffectExtent === type )
 		{
-			var EffectExtent = {Left: null, Top: null, Right: null, Bottom: null};
+			var EffectExtent = {L: null, T: null, R: null, B: null};
 			res = this.bcr.Read2(length, function(t, l){
                     return oThis.ReadEffectExtent(t, l, EffectExtent);
                 });

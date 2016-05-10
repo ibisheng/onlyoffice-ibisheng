@@ -41,6 +41,7 @@
 		"../common/Drawings/Format/CreateGeometry.js",
 		"../common/Drawings/Format/Geometry.js",
 		"../common/Drawings/Format/Format.js",
+		"../common/Drawings/Format/GraphicObjectBase.js",
 		"../common/Drawings/Format/Shape.js",
 		"../slide/Editor/Format/ShapePrototype.js",
 		"../common/Drawings/Format/Path.js",

@@ -45,7 +45,6 @@ CChartSpace.prototype.getNumByCardDirection = CShape.prototype.getNumByCardDirec
 CChartSpace.prototype.getCardDirectionByNum = CShape.prototype.getCardDirectionByNum;
 CChartSpace.prototype.getResizeCoefficients = CShape.prototype.getResizeCoefficients;
 CChartSpace.prototype.check_bounds = CShape.prototype.check_bounds;
-CChartSpace.prototype.normalize = CShape.prototype.normalize;
 CChartSpace.prototype.getFullFlipH = CShape.prototype.getFullFlipH;
 CChartSpace.prototype.getFullFlipV = CShape.prototype.getFullFlipV;
 CChartSpace.prototype.Get_Theme = CShape.prototype.Get_Theme;
@@ -101,9 +100,6 @@ CChartSpace.prototype.setRecalculateInfo = function()
     this.baseColors = [];
 
     this.chartObj = null;
-    this.localTransform = new AscCommon.CMatrix();
-    this.snapArrayX = [];
-    this.snapArrayY = [];
     this.rectGeometry = AscFormat.ExecuteNoHistory(function(){return  AscFormat.CreateGeometry("rect");},  this, []);
     this.bNeedUpdatePosition = true;
 };

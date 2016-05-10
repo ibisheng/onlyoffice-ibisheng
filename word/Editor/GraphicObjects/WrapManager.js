@@ -630,14 +630,14 @@ CWrapPolygon.prototype =
     calculateRelToAbs: function(transform, drawing)
     {
 
-        var bounds = drawing.bounds, oDistance = drawing.parent.Get_Distance();
+        var bounds = drawing.bounds, oDistance = drawing.parent.Get_Distance(), oEffectExtent = drawing.parent.EffectExtent;
         if(this.relativeArrPoints.length === 0)
         {
             this.arrPoints.length = 0;
-            this.localLeft = bounds.l - oDistance.L;
-            this.localRight = bounds.r + oDistance.R;
-            this.localTop = bounds.t - oDistance.T;
-            this.localBottom = bounds.b + oDistance.B;
+            this.localLeft = bounds.l - oDistance.L - AscFormat.getValOrDefault(oEffectExtent.L, 0);
+            this.localRight = bounds.r + oDistance.R + AscFormat.getValOrDefault(oEffectExtent.R, 0);
+            this.localTop = bounds.t - oDistance.T - AscFormat.getValOrDefault(oEffectExtent.T, 0);
+            this.localBottom = bounds.b + oDistance.B + AscFormat.getValOrDefault(oEffectExtent.B, 0);
             return;
         }
         var relArr = this.relativeArrPoints;
@@ -672,24 +672,24 @@ CWrapPolygon.prototype =
         }
 
         if(bounds.l < min_x)
-            this.localLeft = bounds.l - oDistance.L;
+            this.localLeft = bounds.l - oDistance.L  - AscFormat.getValOrDefault(oEffectExtent.L, 0);
         else
-            this.localLeft  = min_x - oDistance.L;
+            this.localLeft  = min_x - oDistance.L  - AscFormat.getValOrDefault(oEffectExtent.L, 0);
 
         if(bounds.r > max_x)
-            this.localRight = bounds.r + oDistance.R;
+            this.localRight = bounds.r + oDistance.R + AscFormat.getValOrDefault(oEffectExtent.R, 0);
         else
-            this.localRight = max_x + oDistance.R;
+            this.localRight = max_x + oDistance.R + AscFormat.getValOrDefault(oEffectExtent.R, 0);
 
         if(bounds.t < min_y)
-            this.localTop = bounds.t - oDistance.T;
+            this.localTop = bounds.t - oDistance.T - AscFormat.getValOrDefault(oEffectExtent.T, 0);
         else
-            this.localTop = min_y - oDistance.T;
+            this.localTop = min_y - oDistance.T - AscFormat.getValOrDefault(oEffectExtent.T, 0);
 
         if(bounds.b > max_y)
-            this.localBottom = bounds.b + oDistance.B;
+            this.localBottom = bounds.b + oDistance.B + AscFormat.getValOrDefault(oEffectExtent.B, 0);
         else
-            this.localBottom = max_y + oDistance.B;
+            this.localBottom = max_y + oDistance.B + AscFormat.getValOrDefault(oEffectExtent.B, 0);
     },
 
     calculateAbsToRel: function(drawing, aPoints)

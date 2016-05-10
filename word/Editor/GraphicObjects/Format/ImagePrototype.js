@@ -42,8 +42,6 @@ CImageShape.prototype.setRecalculateInfo = function()
     this.bounds = {l: 0, t: 0, r: 0, b:0, w: 0, h:0};
     this.posX = null;
     this.posY = null;
-    this.snapArrayX = [];
-    this.snapArrayY = [];
 
     this.localTransform = new AscCommon.CMatrix();
     this.localTransformText = new AscCommon.CMatrix();
@@ -185,7 +183,6 @@ CImageShape.prototype.getNumByCardDirection = CShape.prototype.getNumByCardDirec
 CImageShape.prototype.getCardDirectionByNum = CShape.prototype.getCardDirectionByNum;
 CImageShape.prototype.getResizeCoefficients = CShape.prototype.getResizeCoefficients;
 CImageShape.prototype.check_bounds = CShape.prototype.check_bounds;
-CImageShape.prototype.normalize = CShape.prototype.normalize;
 CImageShape.prototype.updatePosition = CShape.prototype.updatePosition;
 CImageShape.prototype.updateTransformMatrix = CShape.prototype.updateTransformMatrix;
 CImageShape.prototype.getDrawingDocument = CShape.prototype.getDrawingDocument;

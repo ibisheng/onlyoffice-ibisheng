@@ -320,7 +320,17 @@ function RotateTrackShapeImage(originalObject)
 {
     this.originalObject = originalObject;
     this.transform = new CMatrix();
-    this.overlayObject = new OverlayObject(originalObject.spPr.geometry, originalObject.extX, originalObject.extY, originalObject.brush, originalObject.pen, this.transform);
+    var brush;
+    if(originalObject.blipFill)
+    {
+        brush = new AscFormat.CUniFill();
+        brush.fill = originalObject.blipFill;
+    }
+    else
+    {
+        brush = originalObject.brush;
+    }
+    this.overlayObject = new OverlayObject(originalObject.spPr.geometry, originalObject.extX, originalObject.extY, brush, originalObject.pen, this.transform);
 
     this.angle = originalObject.rot;
     var full_flip_h = this.originalObject.getFullFlipH();
