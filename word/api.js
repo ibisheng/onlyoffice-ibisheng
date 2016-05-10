@@ -7864,8 +7864,4 @@ asc_CCommentDataWord.prototype['asc_putSolved'] = asc_CCommentDataWord.prototype
 asc_CCommentDataWord.prototype['asc_getReply'] = asc_CCommentDataWord.prototype.asc_getReply;
 asc_CCommentDataWord.prototype['asc_addReply'] = asc_CCommentDataWord.prototype.asc_addReply;
 asc_CCommentDataWord.prototype['asc_getRepliesCount'] = asc_CCommentDataWord.prototype.asc_getRepliesCount;
-
 })(window, window.document);
-
-// don't delete this line!!! This line used for split minimize files
-window['split']='split';

@@ -1,7 +1,9 @@
 {
   "compile": {
     "sdk": {
-      "common": [
+      "min": [
+	  ],
+	  "common": [
         "../common/browser.js",
         "../common/commonDefines.js",
         "../common/downloaderfiles.js",

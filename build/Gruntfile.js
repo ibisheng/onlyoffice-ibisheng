@@ -68,14 +68,75 @@ module.exports = function(grunt) {
 		
 	grunt.registerTask('build_all', ['build_webword_init', 'build_sdk', 'build_webexcel_init', 'build_sdk', 'build_webpowerpoint_init', 'build_sdk']);
 
+	grunt.registerTask('concat_sdk_init', function() {
+		var sdkTmp = 'sdk-tmp.js', sdkAllTmp = 'sdk-all-tmp.js', sdkAllMinTmp = 'sdk-all-min-tmp.js';
+		var srcFilesAll = packageFile['compile']['sdk']['common'];
+		var sdkOpt = {
+			compilation_level: 'WHITESPACE_ONLY',
+			warning_level: 'QUIET',
+			externs: packageFile['compile']['sdk']['externs']
+		};
+		
+		if (grunt.option('mobile')) {				
+			var excludeFiles = packageFile['compile']['sdk']['exclude_mobile']
+			srcFilesAll = srcFilesAll.filter(function(item) {
+				return -1 === excludeFiles.indexOf(item);
+			});		
+			var mobileFiles = packageFile['compile']['sdk']['mobile'];
+			if(mobileFiles){
+				srcFilesAll = srcFilesAll.concat(mobileFiles);
+			}
+		}
+		
+		if (!grunt.option('noprivate')) {
+			srcFilesAll = srcFilesAll.concat(packageFile['compile']['sdk']['private']);
+		}
+		if (grunt.option('desktop')) {
+			srcFilesAll = srcFilesAll.concat(packageFile['compile']['sdk']['desktop']);
+		}
+		if (grunt.option('builder')) {
+			srcFilesAll = srcFilesAll.concat(packageFile['compile']['sdk']['builder']);
+		}
+		
+		grunt.initConfig({
+			concat: {
+				sdkmin: {
+					options: {
+//						banner: '(function(window, undefined) {',
+//						footer: '})(window);window["split"]="split";'
+						banner: '',
+						footer: 'window["split"]="split";'
+					},
+					src: packageFile['compile']['sdk']['min'],
+					dest: sdkAllMinTmp
+				},
+				sdk: {
+					options: {
+						banner: '(function(window, undefined) {',
+						footer: '})(window);'
+					},
+					src: srcFilesAll,
+					dest: sdkAllTmp
+				},
+				all: {
+					src: [sdkAllMinTmp, sdkAllTmp],
+					dest: sdkTmp
+				}
+			},
+			clean: [
+				sdkAllMinTmp,
+				sdkAllTmp
+			]
+		});
+	});
+	
 	grunt.registerTask('compile_sdk_init', function(compilation_level) {
+		var sdkTmp = 'sdk-tmp.js'
 		var splitLine = '';
 		var tmp_sdk_path = 'sdk-js-tmp.js';
 		var sdkDstFolder = packageFile['compile']['sdk']['dst'];
 		var sdkAllMinDst = sdkDstFolder + '/sdk-all-min.js';
 		var sdkAllDst = sdkDstFolder + '/sdk-all.js';
-		var concat_src = [sdkAllDst];
-		var srcFiles = packageFile['compile']['sdk']['common'];
 		var sdkOpt = {
 			compilation_level: compilation_level,
 			warning_level: 'QUIET',
@@ -90,34 +151,12 @@ module.exports = function(grunt) {
 			splitLine = ('PRETTY_PRINT' === formatting) ? 'window["split"] = "split";' : 'window["split"]="split";';
 		}
 		
-		if (grunt.option('mobile')) {				
-			var excludeFiles = packageFile['compile']['sdk']['exclude_mobile']
-			srcFiles = srcFiles.filter(function(item) {
-				return -1 === excludeFiles.indexOf(item);
-			});		
-			var mobileFiles = packageFile['compile']['sdk']['mobile'];
-			if(mobileFiles){
-				srcFiles = srcFiles.concat(mobileFiles);
-			}
-		}
-		
-		if (!grunt.option('noprivate')) {
-			srcFiles = srcFiles.concat(packageFile['compile']['sdk']['private']);
-		}
-		if (grunt.option('desktop')) {
-			srcFiles = srcFiles.concat(packageFile['compile']['sdk']['desktop']);
-		}
-		if (grunt.option('builder')) {
-			srcFiles = srcFiles.concat(packageFile['compile']['sdk']['builder']);
-		}
-		
 		grunt.initConfig({
-			pkg: packageFile,
 			'closure-compiler': {
 				sdk: {
 					options: sdkOpt,
 					dest: tmp_sdk_path,
-					src: srcFiles
+					src: [sdkTmp]
 				}
 					},
 			splitfile: {
@@ -136,15 +175,12 @@ module.exports = function(grunt) {
 					dest: sdkAllMinDst
 				},
 				sdk: {
-				options: {
-						banner: '<%= grunt.file.read("license.js") %>' + '\n(function(window, undefined) {',
-					footer: '})(window);'
-					},
-					src: concat_src,
+					src: ['license.js', sdkAllDst],
 					dest: sdkAllDst
 					}
 			},
 			clean: [ 
+				sdkTmp,
 				tmp_sdk_path
 			],
 			replace: {
@@ -163,6 +199,7 @@ module.exports = function(grunt) {
 		});
 	});
 	
-	grunt.registerTask('compile_sdk', ['compile_sdk_init:' + level, 'closure-compiler', 'splitfile', 'concat', 'replace', 'clean']);
+	grunt.registerTask('concat_sdk', ['concat_sdk_init', 'concat', 'clean']);
+	grunt.registerTask('compile_sdk', ['concat_sdk', 'compile_sdk_init:' + level, 'closure-compiler', 'splitfile', 'concat', 'replace', 'clean']);
 	grunt.registerTask('default', ['build_webpowerpoint']);
 };

@@ -1,8 +1,8 @@
 {
   "compile": {
     "sdk": {
-      "common": [
-        "../common/browser.js",
+      "min": [
+		"../common/browser.js",
 		"../common/commonDefines.js",
 		"../common/docscoapicommon.js",
         "../common/docscoapi.js",
@@ -15,8 +15,9 @@
 		"../cell/model/CollaborativeEditing.js",
 		"../common/apiBase.js",
 		"../common/Private/license.js",
-		"../cell/api.js",
-		
+		"../cell/api.js"
+	  ],
+	  "common": [		
         "../common/downloaderfiles.js",
         "../common/NumFormat.js",
 		"../common/SerializeChart.js",

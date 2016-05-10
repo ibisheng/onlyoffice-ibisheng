@@ -1,8 +1,5 @@
 "use strict";
 
-// Import
-var History = AscCommon.History;
-
 /**
  *
  * @constructor
@@ -28,18 +25,18 @@ CWordCollaborativeEditing.prototype.Send_Changes = function(IsUserSave, Addition
     this.Refresh_DCChanges();
 
     // Генерируем свои изменения
-    var StartPoint = ( null === History.SavedIndex ? 0 : History.SavedIndex + 1 );
+    var StartPoint = ( null === AscCommon.History.SavedIndex ? 0 : AscCommon.History.SavedIndex + 1 );
     var LastPoint = -1;
 
     if (this.m_nUseType <= 0)
     {
         // (ненужные точки предварительно удаляем)
-        History.Clear_Redo();
-        LastPoint = History.Points.length - 1;
+        AscCommon.History.Clear_Redo();
+        LastPoint = AscCommon.History.Points.length - 1;
     }
     else
     {
-        LastPoint = History.Index;
+        LastPoint = AscCommon.History.Index;
     }
 
     // Просчитаем сколько изменений на сервер пересылать не надо
@@ -47,16 +44,16 @@ CWordCollaborativeEditing.prototype.Send_Changes = function(IsUserSave, Addition
     var StartPoint2 = Math.min(StartPoint, LastPoint + 1);
     for (var PointIndex = 0; PointIndex < StartPoint2; PointIndex++)
     {
-        var Point = History.Points[PointIndex];
+        var Point = AscCommon.History.Points[PointIndex];
         SumIndex += Point.Items.length;
     }
-    var deleteIndex = ( null === History.SavedIndex ? null : SumIndex );
+    var deleteIndex = ( null === AscCommon.History.SavedIndex ? null : SumIndex );
 
     var aChanges = [];
     for (var PointIndex = StartPoint; PointIndex <= LastPoint; PointIndex++)
     {
-        var Point = History.Points[PointIndex];
-        History.Update_PointInfoItem(PointIndex, StartPoint, LastPoint, SumIndex, deleteIndex);
+        var Point = AscCommon.History.Points[PointIndex];
+        AscCommon.History.Update_PointInfoItem(PointIndex, StartPoint, LastPoint, SumIndex, deleteIndex);
 
         for (var Index = 0; Index < Point.Items.length; Index++)
         {
@@ -80,31 +77,31 @@ CWordCollaborativeEditing.prototype.Send_Changes = function(IsUserSave, Addition
     this.m_aNeedUnlock.length = 0;
     this.m_aNeedUnlock2.length = 0;
 
-    var deleteIndex = ( null === History.SavedIndex ? null : SumIndex );
+    var deleteIndex = ( null === AscCommon.History.SavedIndex ? null : SumIndex );
     if (0 < aChanges.length || null !== deleteIndex) {
         editor.CoAuthoringApi.saveChanges(aChanges, deleteIndex, AdditionalInfo);
-        History.CanNotAddChanges = true;
+        AscCommon.History.CanNotAddChanges = true;
     } else
         editor.CoAuthoringApi.unLockDocument(true);
 
     if (-1 === this.m_nUseType)
     {
         // Чистим Undo/Redo только во время совместного редактирования
-        History.Clear();
-        History.SavedIndex = null;
+        AscCommon.History.Clear();
+        AscCommon.History.SavedIndex = null;
     }
     else if (0 === this.m_nUseType)
     {
         // Чистим Undo/Redo только во время совместного редактирования
-        History.Clear();
-        History.SavedIndex = null;
+        AscCommon.History.Clear();
+        AscCommon.History.SavedIndex = null;
 
         this.m_nUseType = 1;
     }
     else
     {
         // Обновляем точку последнего сохранения в истории
-        History.Reset_SavedIndex(IsUserSave);
+        AscCommon.History.Reset_SavedIndex(IsUserSave);
     }
 
     if (false !== IsUpdateInterface)
@@ -283,7 +280,7 @@ CWordCollaborativeEditing.prototype.OnCallback_AskLock = function(result)
 
             // Делаем откат на 1 шаг назад и удаляем из Undo/Redo эту последнюю точку
             oEditor.WordControl.m_oLogicDocument.Document_Undo();
-            History.Clear_Redo();
+            AscCommon.History.Clear_Redo();
         }
 
         oEditor.isChartEditor = false;
@@ -544,4 +541,5 @@ CWordCollaborativeEditing.prototype.Update_ForeignCursorLabelPosition = function
 
 //--------------------------------------------------------export----------------------------------------------------
 window['AscCommon'] = window['AscCommon'] || {};
+window['AscCommon'].CWordCollaborativeEditing = CWordCollaborativeEditing;
 window['AscCommon'].CollaborativeEditing = new CWordCollaborativeEditing();

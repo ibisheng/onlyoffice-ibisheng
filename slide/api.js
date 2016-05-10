@@ -5735,6 +5735,3 @@ CTextProp.prototype['get_VertAlign'] = CTextProp.prototype.get_VertAlign;
 CTextProp.prototype['get_HighLight'] = CTextProp.prototype.get_HighLight;
 CParagraphAndTextProp.prototype['get_ParaPr'] = CParagraphAndTextProp.prototype.get_ParaPr;
 CParagraphAndTextProp.prototype['get_TextPr'] = CParagraphAndTextProp.prototype.get_TextPr;
-
-// don't delete this line!!! This line used for split minimize files
-window['split']='split';

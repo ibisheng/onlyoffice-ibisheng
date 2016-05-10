@@ -1252,7 +1252,7 @@ function CDocument(DrawingDocument, isMainLogicDocument)
     this.History              = History;
     this.IdCounter            = AscCommon.g_oIdCounter;
     this.TableId              = g_oTableId;
-    this.CollaborativeEditing = (("undefined" !== typeof(CWordCollaborativeEditing) && AscCommon.CollaborativeEditing instanceof CWordCollaborativeEditing) ? AscCommon.CollaborativeEditing : null);
+    this.CollaborativeEditing = (("undefined" !== typeof(AscCommon.CWordCollaborativeEditing) && AscCommon.CollaborativeEditing instanceof AscCommon.CWordCollaborativeEditing) ? AscCommon.CollaborativeEditing : null);
     this.Api                  = editor;
     //------------------------------------------------------------------------------------------------------------------
     //  Выставляем ссылки на главный класс
