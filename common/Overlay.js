@@ -961,6 +961,7 @@ CAutoshapeTrack.prototype =
         {
             case AscFormat.TYPE_TRACK.SHAPE:
             case AscFormat.TYPE_TRACK.GROUP:
+            case AscFormat.TYPE_TRACK.CHART_TEXT:
             {
                 if (bIsClever)
                 {

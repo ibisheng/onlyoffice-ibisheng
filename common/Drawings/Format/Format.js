@@ -347,7 +347,8 @@ var TYPE_TRACK = {
     GROUP : 0,
     GROUP_PASSIVE : 1,
     TEXT : 2,
-    EMPTY_PH : 3
+    EMPTY_PH : 3,
+    CHART_TEXT : 4
 };
 var TYPE_KIND = {
     SLIDE : 0,
