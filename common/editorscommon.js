@@ -2641,6 +2641,12 @@ CUserCacheColor.prototype.init = function(nColor) {
 };
 
   function loadScript(url, callback) {
+    if (window["NATIVE_EDITOR_ENJINE"] === true)
+    {
+        callback();
+        return;
+    }
+
     if (window["AscDesktopEditor"])
     {
         var _ret_param = window["AscDesktopEditor"]["LoadJS"](url);
