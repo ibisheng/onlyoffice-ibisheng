@@ -185,6 +185,11 @@ var c_oAscDynamicAutoFilter = {
     yesterday: 34
 };
 
+var c_oAscTop10AutoFilter = {
+    max: 1,
+    min: 2
+}
+
 var c_oAscChangeFilterOptions = {
   filter: 1,
   style: 2
@@ -418,6 +423,10 @@ var c_oAscPopUpSelectorType = {
   prot = c_oAscDynamicAutoFilter;
   prot['aboveAverage'] = prot.aboveAverage;
   prot['belowAverage'] = prot.belowAverage;
+  window['Asc']['c_oAscTop10AutoFilter'] = window['Asc'].c_oAscTop10AutoFilter = c_oAscTop10AutoFilter;
+  prot = c_oAscTop10AutoFilter;
+  prot['max'] = prot.max;
+  prot['min'] = prot.min;
   window['Asc']['c_oAscChangeFilterOptions'] = window['Asc'].c_oAscChangeFilterOptions = c_oAscChangeFilterOptions;
   prot = c_oAscChangeFilterOptions;
   prot['filter'] = prot.filter;
