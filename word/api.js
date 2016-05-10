@@ -308,6 +308,8 @@ function asc_docs_api(name)
     this.RevisionChangesStack = [];
 
     //g_clipboardBase.Init(this);
+
+  this._init();
 }
 AscCommon.extendClass(asc_docs_api, AscCommon.baseEditorsApi);
 

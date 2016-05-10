@@ -116,6 +116,8 @@ function asc_docs_api(name)
         if (window["NATIVE_EDITOR_ENJINE"])
             editor = window.editor;
     }
+
+  this._init();
 }
 AscCommon.extendClass(asc_docs_api, AscCommon.baseEditorsApi);
 

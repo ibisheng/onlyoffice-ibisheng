@@ -112,16 +112,10 @@ function baseEditorsApi(name, editorId) {
 
   this.fCurCallback = null;
 
-  this._baseInit();
   return this;
 }
-baseEditorsApi.prototype._baseInit = function() {
+baseEditorsApi.prototype._init = function() {
   var t = this;
-  AscCommon.loadSdk(this._editorNameById(), function() {
-    t.isLoadFullApi = true;
-    t._onEndLoadSdk();
-    t.onEndLoadFile(null);
-  });
   //Asc.editor = Asc['editor'] = AscCommon['editor'] = AscCommon.editor = this; // ToDo сделать это!
   this.HtmlElement = document.getElementById(this.HtmlElementName);
 
@@ -138,6 +132,12 @@ baseEditorsApi.prototype._baseInit = function() {
   // init drag&drop
   AscCommon.InitDragAndDrop(this.HtmlElement, function(error, files) {
     t._uploadCallback(error, files);
+  });
+
+  AscCommon.loadSdk(this._editorNameById(), function() {
+    t.isLoadFullApi = true;
+    t._onEndLoadSdk();
+    t.onEndLoadFile(null);
   });
 };
 baseEditorsApi.prototype._editorNameById = function() {

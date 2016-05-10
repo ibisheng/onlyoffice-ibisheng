@@ -2669,7 +2669,7 @@ CUserCacheColor.prototype.init = function(nColor) {
   }
   function loadSdk(sdkName, callback) {
     if (window['AscNotLoadAllScript']) {
-      setTimeout(callback, 1);
+      callback();
     } else {
       loadScript('./../../../../sdkjs/' + sdkName + '/sdk-all.js', callback);
     }

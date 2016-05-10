@@ -109,6 +109,7 @@ var editor;
   };
 
   spreadsheet_api.prototype._init = function() {
+    spreadsheet_api.superclass._init.call(this);
     this.topLineEditorElement = document.getElementById(this.topLineEditorName);
     // ToDo нужно ли это
     asc['editor'] = ( asc['editor'] || this );
