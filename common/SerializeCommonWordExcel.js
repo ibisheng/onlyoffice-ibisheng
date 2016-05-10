@@ -277,6 +277,7 @@ BinaryCommonWriter.prototype.WriteColorTheme = function(unifill, color)
 	if (null != unifill && null != unifill.fill && null != unifill.fill.color && unifill.fill.color.color instanceof AscFormat.CSchemeColor) {
 		var uniColor = unifill.fill.color;
 		if(null != uniColor.color){
+      var EThemeColor = AscCommonWord.EThemeColor;
 			var nFormatId = EThemeColor.themecolorNone;
 			switch(uniColor.color.id){
 				case 0: nFormatId = EThemeColor.themecolorAccent1;break;
