@@ -137,7 +137,7 @@ baseEditorsApi.prototype._init = function() {
   AscCommon.loadSdk(this._editorNameById(), function() {
     t.isLoadFullApi = true;
 
-    if (t.DocInfo.get_OfflineApp()) {
+    if (t.DocInfo && t.DocInfo.get_OfflineApp()) {
       t._OfflineAppDocumentStartLoad();
     }
 
