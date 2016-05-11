@@ -150,7 +150,7 @@ CTable.prototype.private_RecalculateCheckPageColumnBreak = function(CurPage)
         {
             var PrevSectPr = PrevElement.Get_SectionPr();
             var CurSectPr  = this.LogicDocument.SectionsInfo.Get_SectPr(this.Index).SectPr;
-            if (section_type_Continuous !== CurSectPr.Get_Type() || true !== CurSectPr.Compare_PageSize(PrevSectPr))
+            if (c_oAscSectionBreakType.Continuous !== CurSectPr.Get_Type() || true !== CurSectPr.Compare_PageSize(PrevSectPr))
                 bNeedPageBreak = false;
         }
 

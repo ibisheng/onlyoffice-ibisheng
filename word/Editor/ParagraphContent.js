@@ -2710,11 +2710,11 @@ ParaEnd.prototype =
         var strSectionBreak = "";
         switch ( Type )
         {
-            case section_type_Column     : strSectionBreak = " End of Section "; break;
-            case section_type_Continuous : strSectionBreak = " Section Break (Continuous) "; break;
-            case section_type_EvenPage   : strSectionBreak = " Section Break (Even Page) "; break;
-            case section_type_NextPage   : strSectionBreak = " Section Break (Next Page) "; break;
-            case section_type_OddPage    : strSectionBreak = " Section Break (Odd Page) "; break;
+            case c_oAscSectionBreakType.Column     : strSectionBreak = " End of Section "; break;
+            case c_oAscSectionBreakType.Continuous : strSectionBreak = " Section Break (Continuous) "; break;
+            case c_oAscSectionBreakType.EvenPage   : strSectionBreak = " Section Break (Even Page) "; break;
+            case c_oAscSectionBreakType.NextPage   : strSectionBreak = " Section Break (Next Page) "; break;
+            case c_oAscSectionBreakType.OddPage    : strSectionBreak = " Section Break (Odd Page) "; break;
         }
 
         g_oTextMeasurer.SetFont( {FontFamily: { Name : "Courier New", Index : -1 }, FontSize: 8, Italic: false, Bold : false} );

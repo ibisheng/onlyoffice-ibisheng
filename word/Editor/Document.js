@@ -2011,7 +2011,7 @@ CDocument.prototype.Recalculate = function(bOneParagraph, bRecalcContentLast, _R
         var CurSectInfo    = this.SectionsInfo.Get_SectPr(StartIndex);
         var PrevSectInfo   = this.SectionsInfo.Get_SectPr(PrevStartIndex);
 
-        if (PrevSectInfo !== CurSectInfo && (section_type_Continuous !== CurSectInfo.SectPr.Get_Type() || true !== CurSectInfo.SectPr.Compare_PageSize(PrevSectInfo.SectPr) ))
+        if (PrevSectInfo !== CurSectInfo && (c_oAscSectionBreakType.Continuous !== CurSectInfo.SectPr.Get_Type() || true !== CurSectInfo.SectPr.Compare_PageSize(PrevSectInfo.SectPr) ))
             bNewSection = true;
     }
 
@@ -2250,7 +2250,7 @@ CDocument.prototype.Recalculate_PageColumn                   = function()
                 {
                     var PrevSectPr = PrevElement.Get_SectionPr();
                     var CurSectPr  = this.LogicDocument.SectionsInfo.Get_SectPr(Index).SectPr;
-                    if (section_type_Continuous !== CurSectPr.Get_Type() || true !== CurSectPr.Compare_PageSize(PrevSectPr))
+                    if (c_oAscSectionBreakType.Continuous !== CurSectPr.Get_Type() || true !== CurSectPr.Compare_PageSize(PrevSectPr))
                         bNeedPageBreak = false;
                 }
 
@@ -2374,7 +2374,7 @@ CDocument.prototype.Recalculate_PageColumn                   = function()
                     PageSection.EndPos = Index;
                     Page.EndPos        = Index;
 
-                    if (section_type_Continuous === NextSectInfo.SectPr.Get_Type() && true === CurSectInfo.SectPr.Compare_PageSize(NextSectInfo.SectPr))
+                    if (c_oAscSectionBreakType.Continuous === NextSectInfo.SectPr.Get_Type() && true === CurSectInfo.SectPr.Compare_PageSize(NextSectInfo.SectPr))
                     {
                         // Новая секция начинается на данной странице. Нам надо получить новые поля данной секции, но
                         // на данной странице мы будет использовать только новые горизонтальные поля, а поля по вертикали
@@ -14913,7 +14913,7 @@ CDocument.prototype.Get_SectionPageNumInfo     = function(Page_abs)
         var CurSectInfo  = this.SectionsInfo.Get_SectPr2(SectIndex);
         var PrevSectInfo = this.SectionsInfo.Get_SectPr2(SectIndex - 1);
 
-        if (CurSectInfo !== PrevSectInfo && section_type_Continuous === CurSectInfo.SectPr.Get_Type() && true === CurSectInfo.SectPr.Compare_PageSize(PrevSectInfo.SectPr))
+        if (CurSectInfo !== PrevSectInfo && c_oAscSectionBreakType.Continuous === CurSectInfo.SectPr.Get_Type() && true === CurSectInfo.SectPr.Compare_PageSize(PrevSectInfo.SectPr))
         {
             var ElementIndex = PrevSectInfo.Index;
             if (ElementIndex < this.Content.length - 1 && true !== this.Content[ElementIndex + 1].Is_StartFromNewPage())
@@ -14948,7 +14948,7 @@ CDocument.prototype.Get_SectionPageNumInfo2    = function(Page_abs)
         if (PageNumStart < 0)
             PageNumStart = 1;
 
-        if ((section_type_OddPage === BT && 0 === PageNumStart % 2) || (section_type_EvenPage === BT && 1 === PageNumStart % 2))
+        if ((c_oAscSectionBreakType.OddPage === BT && 0 === PageNumStart % 2) || (c_oAscSectionBreakType.EvenPage === BT && 1 === PageNumStart % 2))
             PageNumStart++;
 
         return {FirstPage : PageNumStart, CurPage : Page_abs + PageNumStart, SectIndex : StartSectIndex};
@@ -14994,7 +14994,7 @@ CDocument.prototype.Get_SectionPageNumInfo2    = function(Page_abs)
         PageNumStart += FP - PrevFP;
         PrevFP = FP;
 
-        if ((section_type_OddPage === BT && 0 === PageNumStart % 2) || (section_type_EvenPage === BT && 1 === PageNumStart % 2))
+        if ((c_oAscSectionBreakType.OddPage === BT && 0 === PageNumStart % 2) || (c_oAscSectionBreakType.EvenPage === BT && 1 === PageNumStart % 2))
             PageNumStart++;
 
         InfoIndex++;

@@ -1772,11 +1772,11 @@ function Binary_pPrWriter(memory, oNumIdMap, oBinaryHeaderFooterTableWriter, sav
 		var nFormatType = null;
 		switch(sectPr.Get_Type())
 		{
-			case section_type_Continuous: nFormatType = ESectionMark.sectionmarkContinious;break;
-			case section_type_EvenPage: nFormatType = ESectionMark.sectionmarkEvenPage;break;
-			case section_type_Column: nFormatType = ESectionMark.sectionmarkNextColumn;break;
-			case section_type_NextPage: nFormatType = ESectionMark.sectionmarkNextPage;break;
-			case section_type_OddPage: nFormatType = ESectionMark.sectionmarkOddPage;break;
+			case c_oAscSectionBreakType.Continuous: nFormatType = ESectionMark.sectionmarkContinious;break;
+			case c_oAscSectionBreakType.EvenPage: nFormatType = ESectionMark.sectionmarkEvenPage;break;
+			case c_oAscSectionBreakType.Column: nFormatType = ESectionMark.sectionmarkNextColumn;break;
+			case c_oAscSectionBreakType.NextPage: nFormatType = ESectionMark.sectionmarkNextPage;break;
+			case c_oAscSectionBreakType.OddPage: nFormatType = ESectionMark.sectionmarkOddPage;break;
 		}
 		if(null != nFormatType)
 		{
@@ -6678,11 +6678,11 @@ function Binary_pPrReader(doc, oReadResult, stream)
 			var nEditorType = null;
 			switch(this.stream.GetByte())
 			{
-				case ESectionMark.sectionmarkContinious: nEditorType = section_type_Continuous;break;
-				case ESectionMark.sectionmarkEvenPage: nEditorType = section_type_EvenPage;break;
-				case ESectionMark.sectionmarkNextColumn: nEditorType = section_type_Column;break;
-				case ESectionMark.sectionmarkNextPage: nEditorType = section_type_NextPage;break;
-				case ESectionMark.sectionmarkOddPage: nEditorType = section_type_OddPage;break;
+				case ESectionMark.sectionmarkContinious: nEditorType = c_oAscSectionBreakType.Continuous;break;
+				case ESectionMark.sectionmarkEvenPage: nEditorType = c_oAscSectionBreakType.EvenPage;break;
+				case ESectionMark.sectionmarkNextColumn: nEditorType = c_oAscSectionBreakType.Column;break;
+				case ESectionMark.sectionmarkNextPage: nEditorType = c_oAscSectionBreakType.NextPage;break;
+				case ESectionMark.sectionmarkOddPage: nEditorType = c_oAscSectionBreakType.OddPage;break;
 			}
 			if(null != nEditorType)
 				oSectPr.Set_Type(nEditorType);

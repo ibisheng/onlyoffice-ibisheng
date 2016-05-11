@@ -371,7 +371,7 @@ CDocument.prototype.Get_MailMergedDocument = function(_nStartIndex, _nEndIndex)
         var SectionPara = new Paragraph(this.DrawingDocument, this, 0, 0, 0, 0, 0);
         var SectPr = new CSectionPr();
         SectPr.Copy(this.SectPr, true);
-        SectPr.Set_Type(section_type_NextPage);
+        SectPr.Set_Type(c_oAscSectionBreakType.NextPage);
         SectionPara.Set_SectionPr(SectPr, false);
         LogicDocument.Content[OverallIndex++] = SectionPara;
 
@@ -385,7 +385,7 @@ CDocument.prototype.Get_MailMergedDocument = function(_nStartIndex, _nEndIndex)
     var SectPara = new Paragraph(this.DrawingDocument, this, 0, 0, 0, 0, 0);
     LogicDocument.Content[OverallIndex++] = SectPara;
     LogicDocument.SectPr.Copy(this.SectPr);
-    LogicDocument.SectPr.Set_Type(section_type_Continuous);
+    LogicDocument.SectPr.Set_Type(c_oAscSectionBreakType.Continuous);
 
     for (var Index = 0, Count = LogicDocument.Content.length; Index < Count; Index++)
     {

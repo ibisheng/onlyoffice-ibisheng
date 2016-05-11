@@ -11,12 +11,6 @@
 var g_oTableId = AscCommon.g_oTableId;
 var History = AscCommon.History;
 
-var section_type_NextPage   = 0x00;
-var section_type_OddPage    = 0x01;
-var section_type_EvenPage   = 0x02;
-var section_type_Continuous = 0x03;
-var section_type_Column     = 0x04;
-
 var section_borders_DisplayAllPages     = 0x00;
 var section_borders_DisplayFirstPage    = 0x01;
 var section_borders_DisplayNotFirstPage = 0x02;
@@ -31,7 +25,7 @@ function CSectionPr(LogicDocument)
 {
     this.Id = AscCommon.g_oIdCounter.Get_NewId();
 
-    this.Type          = section_type_NextPage;
+    this.Type          = c_oAscSectionBreakType.NextPage;
     this.PageSize      = new CSectionPageSize();
     this.PageMargins   = new CSectionPageMargins();
 

@@ -1519,15 +1519,15 @@
     ApiSection.prototype.SetType = function(sType)
     {
         if ("oddPage" === sType)
-            this.Section.Set_Type(section_type_OddPage);
+            this.Section.Set_Type(Asc.c_oAscSectionBreakType.OddPage);
         else if ("evenPage" === sType)
-            this.Section.Set_Type(section_type_EvenPage);
+            this.Section.Set_Type(Asc.c_oAscSectionBreakType.EvenPage);
         else if ("continuous" === sType)
-            this.Section.Set_Type(section_type_Continuous);
+            this.Section.Set_Type(Asc.c_oAscSectionBreakType.Continuous);
         else if ("nextColumn" === sType)
-            this.Section.Set_Type(section_type_Column);
+            this.Section.Set_Type(Asc.c_oAscSectionBreakType.Column);
         else if ("nextPage" === sType)
-            this.Section.Set_Type(section_type_NextPage);
+            this.Section.Set_Type(Asc.c_oAscSectionBreakType.NextPage);
     };
     /**
      * Specify all text columns in the current section are of equal width.
