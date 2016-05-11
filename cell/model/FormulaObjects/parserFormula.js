@@ -1717,7 +1717,7 @@ cStrucTable.prototype.createArea = function ( val, cell ) {
 	return this.area;
 };
 cStrucTable.prototype.buildLocalTableString = function (reservedColumn,local) {
-  return parserHelp.getColumnNameByType();
+  return parserHelp.getColumnNameByType(reservedColumn, local);
 };
 
 /** @constructor */
