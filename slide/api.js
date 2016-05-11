@@ -5853,7 +5853,7 @@ asc_docs_api.prototype['asc_isOffline'] = asc_docs_api.prototype.asc_isOffline;
 asc_docs_api.prototype['asc_getUrlType'] = asc_docs_api.prototype.asc_getUrlType;
 asc_docs_api.prototype["asc_setInterfaceDrawImagePlaceShape"] = asc_docs_api.prototype.asc_setInterfaceDrawImagePlaceShape;
 
-window['asc_CCommentData'] = asc_CCommentData;
+window['Asc']['asc_CCommentData'] = window['Asc'].asc_CCommentData = asc_CCommentData;
 asc_CCommentData.prototype['asc_getText'] = asc_CCommentData.prototype.asc_getText;
 asc_CCommentData.prototype['asc_putText'] = asc_CCommentData.prototype.asc_putText;
 asc_CCommentData.prototype['asc_getTime'] = asc_CCommentData.prototype.asc_getTime;
