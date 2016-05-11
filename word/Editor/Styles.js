@@ -10738,3 +10738,5 @@ window["AscCommonWord"].CStyle = CStyle;
 window["AscCommonWord"].Default_Tab_Stop = Default_Tab_Stop;
 window["AscCommonWord"].highlight_None = highlight_None;
 window["AscCommonWord"].spacing_Auto = spacing_Auto;
+window["AscCommonWord"].wrap_NotBeside = wrap_NotBeside;
+window["AscCommonWord"].wrap_Around = wrap_Around;

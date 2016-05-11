@@ -2396,6 +2396,86 @@ function CPresentationBullet()
     };
 }
 
+function getNumInfoLvl(Lvl) {
+    var NumType    = -1;
+    var NumSubType = -1;
+
+    var NumFormat = Lvl.Format;
+    var NumText   = Lvl.LvlText;
+    var TextLen;
+
+    if ( numbering_numfmt_Bullet === NumFormat )
+    {
+        NumType    = 0;
+        NumSubType = 0;
+
+        TextLen = NumText.length;
+        if ( 1 === TextLen && numbering_lvltext_Text === NumText[0].Type )
+        {
+            var NumVal = NumText[0].Value.charCodeAt(0);
+
+            if ( 0x00B7 === NumVal )
+                NumSubType = 1;
+            else if ( 0x006F === NumVal )
+                NumSubType = 2;
+            else if ( 0x00A7 === NumVal )
+                NumSubType = 3;
+            else if ( 0x0076 === NumVal )
+                NumSubType = 4;
+            else if ( 0x00D8 === NumVal )
+                NumSubType = 5;
+            else if ( 0x00FC === NumVal )
+                NumSubType = 6;
+            else if ( 0x00A8 === NumVal )
+                NumSubType = 7;
+        }
+    }
+    else
+    {
+        NumType    = 1;
+        NumSubType = 0;
+
+        TextLen = NumText.length;
+        if ( 2 === TextLen && numbering_lvltext_Num === NumText[0].Type && numbering_lvltext_Text === NumText[1].Type )
+        {
+            var NumVal2 = NumText[1].Value;
+
+            if ( numbering_numfmt_Decimal === NumFormat )
+            {
+                if ( "." === NumVal2 )
+                    NumSubType = 1;
+                else if ( ")" === NumVal2 )
+                    NumSubType = 2;
+            }
+            else if ( numbering_numfmt_UpperRoman === NumFormat )
+            {
+                if ( "." === NumVal2 )
+                    NumSubType = 3;
+            }
+            else if ( numbering_numfmt_UpperLetter === NumFormat )
+            {
+                if ( "." === NumVal2 )
+                    NumSubType = 4;
+            }
+            else if ( numbering_numfmt_LowerLetter === NumFormat )
+            {
+                if ( ")" === NumVal2 )
+                    NumSubType = 5;
+                else if ( "." === NumVal2 )
+                    NumSubType = 6;
+            }
+            else if ( numbering_numfmt_LowerRoman === NumFormat )
+            {
+                if ( "." === NumVal2 )
+                    NumSubType = 7;
+            }
+        }
+    }
+
+    return {NumType: NumType, NumSubType: NumSubType};
+}
+
 //--------------------------------------------------------export----------------------------------------------------
 window['AscCommonWord'] = window['AscCommonWord'] || {};
 window['AscCommonWord'].CAbstractNum = CAbstractNum;
+window['AscCommonWord'].getNumInfoLvl = getNumInfoLvl;
