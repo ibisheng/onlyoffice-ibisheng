@@ -8924,7 +8924,7 @@
             var mc, r, c, cell;
 
             function makeBorder( b ) {
-                var border = new BorderProp();
+                var border = new AscCommonExcel.BorderProp();
                 if ( b === false ) {
                     border.setStyle( c_oAscBorderStyles.None );
                 }
