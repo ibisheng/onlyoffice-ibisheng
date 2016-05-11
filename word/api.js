@@ -6678,7 +6678,7 @@ asc_docs_api.prototype.asc_AddMath2 = function(Type)
     if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content) )
     {
         this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_AddMath);
-		var MathElement = new MathMenu (Type);
+		var MathElement = new AscCommonWord.MathMenu (Type);
         this.WordControl.m_oLogicDocument.Paragraph_Add( MathElement );
     }
 };
