@@ -613,7 +613,7 @@ asc_docs_api.prototype.InitEditor = function()
 
 asc_docs_api.prototype.InitViewer = function()
 {
-    this.WordControl.m_oDrawingDocument.m_oDocumentRenderer = new CDocMeta();
+    this.WordControl.m_oDrawingDocument.m_oDocumentRenderer = new AscCommonWord.CDocMeta();
 };
 
 asc_docs_api.prototype.OpenDocument = function(url, gObject)
