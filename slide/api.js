@@ -1201,7 +1201,7 @@ asc_docs_api.prototype.select_Element = function(Index)
 
 	Document.Selection.Use      = true;
 	Document.Selection.Start    = false;
-	Document.Selection.Flag     = selectionflag_Common;
+	Document.Selection.Flag     = AscCommon.selectionflag_Common;
 
 	Document.Selection.StartPos = Index;
 	Document.Selection.EndPos   = Index;

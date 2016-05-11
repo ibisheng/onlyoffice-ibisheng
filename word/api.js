@@ -1448,7 +1448,7 @@ asc_docs_api.prototype.select_Element = function(Index)
 
 	Document.Selection.Use      = true;
 	Document.Selection.Start    = false;
-	Document.Selection.Flag     = selectionflag_Common;
+	Document.Selection.Flag     = AscCommon.selectionflag_Common;
 
 	Document.Selection.StartPos = Index;
 	Document.Selection.EndPos   = Index;
@@ -6062,9 +6062,9 @@ asc_docs_api.prototype.GoToHeader = function(pageNumber)
 
     var bForceRedraw = false;
     var LogicDocument = this.WordControl.m_oLogicDocument;
-    if (docpostype_HdrFtr !== LogicDocument.CurPos.Type)
+    if (AscCommonWord.docpostype_HdrFtr !== LogicDocument.CurPos.Type)
     {
-        LogicDocument.CurPos.Type = docpostype_HdrFtr;
+        LogicDocument.CurPos.Type = AscCommonWord.docpostype_HdrFtr;
         bForceRedraw = true;
     }
 
@@ -6094,9 +6094,9 @@ asc_docs_api.prototype.GoToFooter = function(pageNumber)
 
     var bForceRedraw = false;
     var LogicDocument = this.WordControl.m_oLogicDocument;
-    if (docpostype_HdrFtr !== LogicDocument.CurPos.Type)
+    if (AscCommonWord.docpostype_HdrFtr !== LogicDocument.CurPos.Type)
     {
-        LogicDocument.CurPos.Type = docpostype_HdrFtr;
+        LogicDocument.CurPos.Type = AscCommonWord.docpostype_HdrFtr;
         bForceRedraw = true;
     }
 

@@ -17581,6 +17581,7 @@ window['Asc'] = window['Asc'] || {};
 window['AscCommon'] = window['AscCommon'] || {};
 window['AscCommonWord'] = window['AscCommonWord'] || {};
 window['AscCommonWord'].CDocument = CDocument;
+window['AscCommonWord'].docpostype_HdrFtr = docpostype_HdrFtr;
 
 window['AscCommon'].Page_Width = Page_Width;
 window['AscCommon'].Page_Height = Page_Height;
@@ -17588,6 +17589,7 @@ window['AscCommon'].X_Left_Margin = X_Left_Margin;
 window['AscCommon'].X_Right_Margin = X_Right_Margin;
 window['AscCommon'].Y_Bottom_Margin = Y_Bottom_Margin;
 window['AscCommon'].Y_Top_Margin = Y_Top_Margin;
+window['AscCommon'].selectionflag_Common = selectionflag_Common;
 
 CDocumentColumnProps.prototype['put_W']     = CDocumentColumnProps.prototype.put_W;
 CDocumentColumnProps.prototype['get_W']     = CDocumentColumnProps.prototype.get_W;
