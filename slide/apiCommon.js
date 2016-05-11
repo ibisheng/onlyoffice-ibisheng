@@ -834,7 +834,7 @@ CLayoutThumbnail.prototype['get_Name'] = CLayoutThumbnail.prototype.get_Name;
 CLayoutThumbnail.prototype['get_Width'] = CLayoutThumbnail.prototype.get_Width;
 CLayoutThumbnail.prototype['get_Height'] = CLayoutThumbnail.prototype.get_Height;
 
-window['Asc']['CBackground'] = CBackground;
+window['Asc']['CBackground'] = window['Asc'].CBackground = CBackground;
 CBackground.prototype['get_Color'] = CBackground.prototype.get_Color;
 CBackground.prototype['put_Color'] = CBackground.prototype.put_Color;
 CBackground.prototype['get_Value'] = CBackground.prototype.get_Value;
@@ -860,7 +860,7 @@ CTablePositionV.prototype['put_Align'] = CTablePositionV.prototype.put_Align;
 CTablePositionV.prototype['get_Value'] = CTablePositionV.prototype.get_Value;
 CTablePositionV.prototype['put_Value'] = CTablePositionV.prototype.put_Value;
 
-window['Asc']['CTableProp'] = CTableProp;
+window['Asc']['CTableProp'] = window['Asc'].CTableProp = CTableProp;
 CTableProp.prototype['get_Width'] = CTableProp.prototype.get_Width;
 CTableProp.prototype['put_Width'] = CTableProp.prototype.put_Width;
 CTableProp.prototype['get_Spacing'] = CTableProp.prototype.get_Spacing;
@@ -908,7 +908,7 @@ CTableProp.prototype['put_TableLook'] = CTableProp.prototype.put_TableLook;
 CTableProp.prototype['get_TableStyle'] = CTableProp.prototype.get_TableStyle;
 CTableProp.prototype['put_TableStyle'] = CTableProp.prototype.put_TableStyle;
 
-window['Asc']['CBorders'] = CBorders;
+window['Asc']['CBorders'] = window['Asc'].CBorders = CBorders;
 CBorders.prototype['get_Left'] = CBorders.prototype.get_Left;
 CBorders.prototype['put_Left'] = CBorders.prototype.put_Left;
 CBorders.prototype['get_Top'] = CBorders.prototype.get_Top;
@@ -922,7 +922,7 @@ CBorders.prototype['put_InsideH'] = CBorders.prototype.put_InsideH;
 CBorders.prototype['get_InsideV'] = CBorders.prototype.get_InsideV;
 CBorders.prototype['put_InsideV'] = CBorders.prototype.put_InsideV;
 
-window['Asc']['CMargins'] = CMargins;
+window['Asc']['CMargins'] = window['Asc'].CMargins = CMargins;
 CMargins.prototype['get_Left'] = CMargins.prototype.get_Left;
 CMargins.prototype['put_Left'] = CMargins.prototype.put_Left;
 CMargins.prototype['get_Right'] = CMargins.prototype.get_Right;
