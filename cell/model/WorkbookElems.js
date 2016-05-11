@@ -4557,8 +4557,11 @@ TablePart.prototype.changeRef = function(col, row, bIsFirst) {
 		ref.setOffsetLast({offsetCol: col ? col : 0, offsetRow: row ? row : 0});
 	
 	this.Ref = ref;
+	
 	//event
-	this.handlers.trigger("changeRefTablePart", this.DisplayName, this.Ref);
+	var endRow = this.TotalsRowCount && this.TotalsRowCount >= 1 ? this.Ref.r2 - 1 : this.Ref.r2;
+	var refNamedRanges = Asc.Range(this.Ref.c1, this.Ref.r1, this.Ref.c2, endRow);
+	this.handlers.trigger("changeRefTablePart", this.DisplayName, refNamedRanges);
 	
 	if(this.AutoFilter)
 		this.AutoFilter.changeRef(col, row, bIsFirst);
@@ -4743,7 +4746,10 @@ TablePart.prototype.getTableRangeForFormula = function(objectParam)
 			if(endCol === null)
 				endCol = startCol;
 			
-			res = new Asc.Range(this.Ref.c1 + startCol, this.Ref.r1+1, this.Ref.c1 + endCol, this.Ref.r2);
+			var startRow = this.HeaderRowCount === null ? this.Ref.r1 + 1 : this.Ref.r1;
+			var endRow = this.TotalsRowCount > 0 ? this.Ref.r2 - 1 : this.Ref.r2;
+			
+			res = new Asc.Range(this.Ref.c1 + startCol, startRow, this.Ref.c1 + endCol, endRow);
 			break;
 		}
 	}
@@ -4831,6 +4837,7 @@ TablePart.prototype.generateTotalsRowLabel = function()
 	}
 	
 	this.TableColumns[0].generateTotalsRowLabel();
+	this.TableColumns[this.TableColumns.length - 1].generateTotalsRowFunction();
 };
 
 TablePart.prototype.changeDisplayName = function(newName)
@@ -5054,6 +5061,71 @@ TableColumn.prototype.generateTotalsRowLabel = function(){
 	{	
 		this.TotalsRowLabel = "Summary";
 	}
+};
+TableColumn.prototype.generateTotalsRowFunction = function(){
+	//TODO добавить в перевод
+	if(this.TotalsRowFunction === null)
+	{	
+		this.TotalsRowFunction = Asc.ETotalsRowFunction.totalrowfunctionSum;
+	}
+};
+
+TableColumn.prototype.getTotalRowFormula = function(tablePart){
+	var res = null;
+	
+	if(null !== this.TotalsRowFunction)
+	{
+		switch(this.TotalsRowFunction)
+		{
+			case Asc.ETotalsRowFunction.totalrowfunctionAverage:
+			{
+				break;
+			}
+			case Asc.ETotalsRowFunction.totalrowfunctionCount:
+			{
+				break;
+			}
+			case Asc.ETotalsRowFunction.totalrowfunctionCountNums:
+			{
+				break;
+			}
+			case Asc.ETotalsRowFunction.totalrowfunctionCustom:
+			{
+				break;
+			}
+			case Asc.ETotalsRowFunction.totalrowfunctionMax:
+			{
+				break;
+			}
+			case Asc.ETotalsRowFunction.totalrowfunctionMin:
+			{
+				break;
+			}
+			case Asc.ETotalsRowFunction.totalrowfunctionNone:
+			{
+				break;
+			}
+			case Asc.ETotalsRowFunction.totalrowfunctionStdDev:
+			{
+				break;
+			}
+			case Asc.ETotalsRowFunction.totalrowfunctionSum:
+			{
+				res = "=SUBTOTAL(109;" + tablePart.DisplayName + "[" + this.Name + "]";
+				break;
+			}
+			case Asc.ETotalsRowFunction.totalrowfunctionVar:
+			{
+				break;
+			}
+		}
+	}
+	else if(null !== this.TotalsRowFormula)
+	{
+		res = this.TotalsRowFormula;
+	}
+	
+	return res;
 };
 
 /** @constructor */
