@@ -5257,6 +5257,11 @@ asc_docs_api.prototype.sync_currentPageCallback = function(number){
 
 /*----------------------------------------------------------------*/
 asc_docs_api.prototype.asc_enableKeyEvents = function(value){
+  if (!this.isLoadFullApi) {
+    this.tmpFocus = value;
+    return;
+  }
+
 	if (this.WordControl.IsFocus != value) {
 		this.WordControl.IsFocus = value;
 

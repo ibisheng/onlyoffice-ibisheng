@@ -2030,6 +2030,11 @@ var editor;
   };
 
   spreadsheet_api.prototype.asc_enableKeyEvents = function(isEnabled) {
+    if (!this.isLoadFullApi) {
+      this.tmpFocus = value;
+      return;
+    }
+
     if (this.wb) {
       this.wb.enableKeyEventsHandler(isEnabled);
     }

@@ -12,6 +12,7 @@
 		"../common/apiCommon.js",
 		"../common/SerializeCommonWordExcel.js",
         "../common/editorscommon.js",
+		"../common/AdvancedOptions.js",
 		"../word/apiDefines.js",
 		"../common/CollaborativeEditingBase.js",
 		"../word/Editor/CollaborativeEditing.js",
@@ -23,7 +24,6 @@
 		"../common/downloaderfiles.js",
         "../common/NumFormat.js",
 		"../common/SerializeChart.js",
-		"../common/AdvancedOptions.js",
 		
 		"../common/FontsFreeType/font_engine.js",
         "../common/FontsFreeType/FontFile.js",

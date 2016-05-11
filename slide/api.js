@@ -3530,11 +3530,16 @@ asc_docs_api.prototype.ChangeColorScheme = function(index_scheme)
 
 /*----------------------------------------------------------------*/
 asc_docs_api.prototype.asc_enableKeyEvents = function(value){
+  if (!this.isLoadFullApi) {
+    this.tmpFocus = value;
+    return;
+  }
+
 	if (this.WordControl.IsFocus != value) {
 		this.WordControl.IsFocus = value;
 		this.asc_fireCallback("asc_onEnableKeyEventsChanged", value);
 	}
-}
+};
 
 
 //-----------------------------------------------------------------
