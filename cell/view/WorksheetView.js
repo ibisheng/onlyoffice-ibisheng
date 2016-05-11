@@ -12920,7 +12920,7 @@
 		var insertCellsAndShiftDownRight = function(arn, displayName, type)
 		{
 			var range = t.model.getRange3( arn.r1, arn.c1, arn.r2, arn.c2 );
-			var isCheckChangeAutoFilter = t.af_checkInsDelCells( arn, type, "insCell" );
+			var isCheckChangeAutoFilter = t.af_checkInsDelCells( arn, type, "insCell", true );
 			if ( isCheckChangeAutoFilter === false ) {
 				return;
 			}
@@ -13014,7 +13014,7 @@
 		var deleteCellsAndShiftLeftTop = function(arn, type)
 		{
 			var range = t.model.getRange3( arn.r1, arn.c1, arn.r2, arn.c2 );
-			var isCheckChangeAutoFilter = t.af_checkInsDelCells( arn, type, "delCell" );
+			var isCheckChangeAutoFilter = t.af_checkInsDelCells( arn, type, "delCell", true );
 			if ( isCheckChangeAutoFilter === false ) {
 				return;
 			}
@@ -13116,7 +13116,7 @@
 		this.model.autoFilters.changeDisplayNameTable(tableName, newName);
 	};
 	
-	WorksheetView.prototype.af_checkInsDelCells = function(activeRange, val, prop)
+	WorksheetView.prototype.af_checkInsDelCells = function(activeRange, val, prop, isFromFormatTable)
     {
 		var t = this;
         var ws = this.model;
@@ -13132,15 +13132,33 @@
 			switch(val)
 			{
 				case c_oAscInsertOptions.InsertCellsAndShiftDown:
-				{
-					//если внизу находится часть форматированной таблицы или это часть форматированной таблицы
-					if(isPartTablePartsUnderRange)
+				{	
+					if(isFromFormatTable)
 					{
-						res = false;
+						//если внизу находится часть форматированной таблицы или это часть форматированной таблицы
+						if(isPartTablePartsUnderRange)
+						{
+							res = false;
+						}
+						else if(isOneTableIntersection !== null && !(isOneTableIntersection.Ref.c1 === activeRange.c1 && isOneTableIntersection.Ref.c2 === activeRange.c2))
+						{
+							res = false;
+						}
 					}
-					else if(isOneTableIntersection !== null && !(isOneTableIntersection.Ref.c1 === activeRange.c1 && isOneTableIntersection.Ref.c2 === activeRange.c2))
+					else
 					{
-						res = false;
+						if(isPartTablePartsUnderRange)
+						{
+							res = false;
+						}
+						else if(!isOneTableIntersection)
+						{
+							res = false;
+						}
+						else if(isOneTableIntersection && !isOneTableIntersection.Ref.isEqual(activeRange))
+						{
+							res = false;
+						}
 					}
 					
 					break;
@@ -13148,9 +13166,27 @@
 				case c_oAscInsertOptions.InsertCellsAndShiftRight:
 				{
 					//если справа находится часть форматированной таблицы или это часть форматированной таблицы
-					if(isPartTablePartsRightRange)
+					if(isFromFormatTable)
 					{
-						res = false;
+						if(isPartTablePartsRightRange)
+						{
+							res = false;
+						}
+					}
+					else
+					{
+						if(isPartTablePartsRightRange)
+						{
+							res = false;
+						}
+						else if(!isOneTableIntersection)
+						{
+							res = false;
+						}
+						else if(isOneTableIntersection && !isOneTableIntersection.Ref.isEqual(activeRange))
+						{
+							res = false;
+						}
 					}
 					
 					break;
@@ -13174,18 +13210,54 @@
 			{
 				case c_oAscDeleteOptions.DeleteCellsAndShiftTop:
 				{
-					if(isPartTablePartsUnderRange)
+					if(isFromFormatTable)
 					{
-						res = false;
+						if(isPartTablePartsUnderRange)
+						{
+							res = false;
+						}
+					}
+					else
+					{
+						if(isPartTablePartsUnderRange)
+						{
+							res = false;
+						}
+						else if(!isOneTableIntersection)
+						{
+							res = false;
+						}
+						else if(isOneTableIntersection && !isOneTableIntersection.Ref.isEqual(activeRange))
+						{
+							res = false;
+						}
 					}
 					
 					break;
 				}
 				case c_oAscDeleteOptions.DeleteCellsAndShiftLeft:
 				{
-					if(isPartTablePartsRightRange)
+					if(isFromFormatTable)
 					{
-						res = false;
+						if(isPartTablePartsRightRange)
+						{
+							res = false;
+						}
+					}
+					else
+					{
+						if(isPartTablePartsRightRange)
+						{
+							res = false;
+						}
+						else if(!isOneTableIntersection)
+						{
+							res = false;
+						}
+						else if(isOneTableIntersection && !isOneTableIntersection.Ref.isEqual(activeRange))
+						{
+							res = false;
+						}
 					}
 					
 					break;
