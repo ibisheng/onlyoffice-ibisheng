@@ -5929,7 +5929,7 @@ DynamicFilter.prototype.init = function(range) {
 			var summ = 0;
 			var counter = 0;
 			
-			range_forEachCell(function(cell){
+			range._foreach2(function(cell){
 				var val = parseFloat(cell.getValue());
 				
 				if(!isNaN(val))
