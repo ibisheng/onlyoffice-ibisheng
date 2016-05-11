@@ -34,12 +34,9 @@ var c_oAscError = Asc.c_oAscError;
 			this.sendEvent("asc_onError", c_oAscError.ID.ConvertationError, c_oAscError.Level.Critical);
 			return;
 		}
-	
-		if (true)
-		{
-			this._startOpenDocument(_data);
-			AscCommon.History.UserSaveMode = true;
-		}
+
+		this.openDocument(_data);
+		AscCommon.History.UserSaveMode = true;
 		
 		DesktopOfflineUpdateLocalName(this);
 		
