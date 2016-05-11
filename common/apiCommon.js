@@ -1029,8 +1029,8 @@
           else
           {
               this.Color = CreateAscColorCustom(0,0,0);
-              this.Size  = 0.5 * g_dKoef_pt_to_mm;
-              this.Value = border_Single;
+              this.Size  = 0.5 * AscCommonWord.g_dKoef_pt_to_mm;
+              this.Value = AscCommonWord.border_Single;
               this.Space = 0;
           }
       }
