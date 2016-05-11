@@ -25,7 +25,7 @@ function CSectionPr(LogicDocument)
 {
     this.Id = AscCommon.g_oIdCounter.Get_NewId();
 
-    this.Type          = c_oAscSectionBreakType.NextPage;
+    this.Type          = 'undefined' !== typeof c_oAscSectionBreakType ? undefined : c_oAscSectionBreakType.NextPage;
     this.PageSize      = new CSectionPageSize();
     this.PageMargins   = new CSectionPageMargins();
 
