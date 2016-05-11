@@ -459,12 +459,7 @@ var editor;
 
   spreadsheet_api.prototype.asc_LoadEmptyDocument = function() {
     this.CoAuthoringApi.auth(this.getViewMode());
-
-    var emptyWorkbook = AscCommonExcel.getEmptyWorkbook() + "";
-    if (emptyWorkbook.length && (AscCommon.c_oSerFormat.Signature === emptyWorkbook.substring(0, AscCommon.c_oSerFormat.Signature.length))) {
-      this.isChartEditor = true;
-      this.openDocument(emptyWorkbook);
-    }
+    this.onEndLoadFile(true);
   };
 
   spreadsheet_api.prototype._openDocument = function(data) {
@@ -1093,6 +1088,16 @@ var editor;
   };
 
   spreadsheet_api.prototype.openDocument = function(sData) {
+    if (true === sData) {
+      // Empty Document
+      sData = AscCommonExcel.getEmptyWorkbook() + "";
+      if (sData.length && (AscCommon.c_oSerFormat.Signature === sData.substring(0, AscCommon.c_oSerFormat.Signature.length))) {
+        this.isChartEditor = true;
+      } else {
+        return;
+      }
+    }
+
     this.wbModel = this._openDocument(sData);
 
     this.FontLoader.LoadDocumentFonts(this.wbModel.generateFontMap2());

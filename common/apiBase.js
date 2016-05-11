@@ -294,7 +294,7 @@ baseEditorsApi.prototype.asc_LoadDocument = function(isVersionHistory) {
   this.advancedOptionsAction = AscCommon.c_oAscAdvancedOptionsAction.Open;
   var rData = null;
   if (offlineMode !== this.documentUrl) {
-	  var rData = {
+	  rData = {
       "c": 'open',
       "id": this.documentId,
       "userid": this.documentUserId,
