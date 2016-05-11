@@ -5869,7 +5869,7 @@ asc_CCommentData.prototype['asc_putSolved'] = asc_CCommentData.prototype.asc_put
 asc_CCommentData.prototype['asc_getReply'] = asc_CCommentData.prototype.asc_getReply;
 asc_CCommentData.prototype['asc_addReply'] = asc_CCommentData.prototype.asc_addReply;
 asc_CCommentData.prototype['asc_getRepliesCount'] = asc_CCommentData.prototype.asc_getRepliesCount;
-window['Asc']['CHyperlinkProperty'] = CHyperlinkProperty;
+window['Asc']['CHyperlinkProperty'] = window['Asc'].CHyperlinkProperty = CHyperlinkProperty;
 CHyperlinkProperty.prototype['get_Value'] = CHyperlinkProperty.prototype.get_Value;
 CHyperlinkProperty.prototype['put_Value'] = CHyperlinkProperty.prototype.put_Value;
 CHyperlinkProperty.prototype['get_ToolTip'] = CHyperlinkProperty.prototype.get_ToolTip;
@@ -5981,7 +5981,7 @@ CSearchResult.prototype['get_Navigator'] = CSearchResult.prototype.get_Navigator
 CSearchResult.prototype['put_Navigator'] = CSearchResult.prototype.put_Navigator;
 CSearchResult.prototype['put_Text'] = CSearchResult.prototype.put_Text;
 
-window['Asc']['CTablePropLook'] = CTablePropLook;
+window['Asc']['CTablePropLook'] = window['Asc'].CTablePropLook = CTablePropLook;
 CTablePropLook.prototype['get_FirstCol'] = CTablePropLook.prototype.get_FirstCol;
 CTablePropLook.prototype['put_FirstCol'] = CTablePropLook.prototype.put_FirstCol;
 CTablePropLook.prototype['get_FirstRow'] = CTablePropLook.prototype.get_FirstRow;

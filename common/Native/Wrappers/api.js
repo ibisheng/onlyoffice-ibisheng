@@ -2510,7 +2510,7 @@ function asc_menu_WriteCellBorders(_type, _borders, _stream)
 
 function asc_menu_ReadCellBackground(_params, _cursor)
 {
-    var _background = new CBackground();
+    var _background = new Asc.CBackground();
     var _continue = true;
     while (_continue)
     {
