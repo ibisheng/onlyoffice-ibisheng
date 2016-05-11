@@ -1944,7 +1944,7 @@ asc_docs_api.prototype.paraApply = function(Props)
                 {
                     _presentation.Set_DocumentDefaultTab( Props.DefaultTab );
                 }
-                var TextPr = new CTextPr();
+                var TextPr = new AscCommonWord.CTextPr();
 
                 if ( true === Props.Subscript )
                     TextPr.VertAlign = AscCommon.vertalign_SubScript;

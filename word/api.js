@@ -2713,7 +2713,7 @@ asc_docs_api.prototype.paraApply = function(Props)
 
 
         // TODO: как только разъединят настройки параграфа и текста переделать тут
-        var TextPr = new CTextPr();
+        var TextPr = new AscCommonWord.CTextPr();
 
         if ( true === Props.Subscript )
             TextPr.VertAlign = AscCommon.vertalign_SubScript;
