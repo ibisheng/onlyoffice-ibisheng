@@ -6,7 +6,7 @@
 
     function checkNormalRotate(rot)
     {
-        var _rot = AscFormat.normalizeRotate(rot);
+        var _rot = normalizeRotate(rot);
         return (_rot >= 0 && _rot < Math.PI * 0.25) || (_rot >= 3 * Math.PI * 0.25 && _rot < 5 * Math.PI * 0.25) || (_rot >= 7 * Math.PI * 0.25 && _rot < 2 * Math.PI);
     }
 
