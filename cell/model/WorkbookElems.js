@@ -5908,12 +5908,42 @@ CustomFilter.prototype.asc_getVal = function () { return this.Val; };
 CustomFilter.prototype.asc_setOperator = function (val) { this.Operator = val; };
 CustomFilter.prototype.asc_setVal = function (val) { this.Val = val; };
 
+
+var g_oDynamicFilter = {
+	Type : 0,
+	Val	: 1,
+	MaxVal: 2
+};
+
 /** @constructor */
 function DynamicFilter() {
+	this.Properties = g_oDynamicFilter;
+	
 	this.Type = null;
 	this.Val = null;
 	this.MaxVal = null;
 }
+DynamicFilter.prototype.getType = function() {
+	return UndoRedoDataTypes.DynamicFilter;
+};
+DynamicFilter.prototype.getProperties = function() {
+	return this.Properties;
+};
+DynamicFilter.prototype.getProperty = function(nType) {
+	switch (nType) {
+		case this.Properties.Type: return this.Type; break;
+		case this.Properties.Val: return this.Val; break;
+		case this.Properties.MaxVal: return this.MaxVal; break;
+	}
+	return null;
+};
+DynamicFilter.prototype.setProperty = function(nType, value) {
+	switch (nType) {
+		case this.Properties.Type: this.Type = value;break;
+		case this.Properties.Val: this.Val = value;break;
+		case this.Properties.MaxVal: this.MaxVal = value;break;
+	}
+};
 DynamicFilter.prototype.clone = function() {
 	var res = new DynamicFilter();
 	res.Type = this.Type;
@@ -6117,13 +6147,45 @@ ColorFilter.prototype.asc_setCColor = function (asc_CColor)
 	}
 };
 
+var g_oTop10 = {
+	FilterVal : 0,
+	Percent	: 1,
+	Top: 2,
+	Val: 3
+};
+
 /** @constructor */
 function Top10() {
+	this.Properties = g_oTop10;
+	
 	this.FilterVal = null;
 	this.Percent = null;
 	this.Top = null;
 	this.Val = null;
 }
+Top10.prototype.getType = function() {
+	return UndoRedoDataTypes.Top10;
+};
+Top10.prototype.getProperties = function() {
+	return this.Properties;
+};
+Top10.prototype.getProperty = function(nType) {
+	switch (nType) {
+		case this.Properties.FilterVal: return this.FilterVal; break;
+		case this.Properties.Percent: return this.Percent; break;
+		case this.Properties.Top: return this.Top; break;
+		case this.Properties.Val: return this.Val; break;
+	}
+	return null;
+};
+Top10.prototype.setProperty = function(nType, value) {
+	switch (nType) {
+		case this.Properties.FilterVal: this.FilterVal = value;break;
+		case this.Properties.Percent: this.Percent = value;break;
+		case this.Properties.Top: this.Top = value;break;
+		case this.Properties.Val: this.Val = value;break;
+	}
+};
 Top10.prototype.clone = function() {
 	var res = new Top10();
 	res.FilterVal = this.FilterVal;

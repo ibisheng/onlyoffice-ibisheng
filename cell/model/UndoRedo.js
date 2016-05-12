@@ -416,6 +416,9 @@ var UndoRedoDataTypes = new function() {
     this.ParagraphParaItemAdd = 68;
 	this.SheetPr = 69;
 
+    this.DynamicFilter = 75;
+    this.Top10 = 76;
+
     this.Create = function(nType)
 	{
 		switch(nType)
@@ -454,6 +457,8 @@ var UndoRedoDataTypes = new function() {
 			case this.CustomFilters: return new Asc.CustomFilters(); break;
 			case this.CustomFilter: return new Asc.CustomFilter(); break;
             case this.ColorFilter: return new Asc.ColorFilter(); break;
+            case this.DynamicFilter: return new Asc.DynamicFilter(); break;
+            case this.Top10: return new Asc.Top10(); break;
 			case this.AutoFiltersOptionsElements: return new AscCommonExcel.AutoFiltersOptionsElements(); break;
 			case this.AddFormatTableOptions: return new AscCommonExcel.AddFormatTableOptions(); break;
 			case this.SingleProperty: return new UndoRedoData_SingleProperty(); break;
