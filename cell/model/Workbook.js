@@ -5204,7 +5204,7 @@ Woorksheet.prototype._RecalculatedFunctions=function(cell,bad,setCellFormat){
                         r = r[0];
                     if ( r && r.getNumFormatStr ) {
                         var sCurFormat = c.getNumFormatStr();
-                        if ( g_oDefaultFormat.Num.f == sCurFormat ) {
+                        if ( g_oDefaultFormat.Num.getFormat() == sCurFormat ) {
                             var sNewFormat = r.getNumFormatStr();
                             if ( sCurFormat != sNewFormat )
                                 c.setNumFormat( sNewFormat );
@@ -5493,9 +5493,9 @@ Cell.prototype.setValue=function(val,callback, isCopyPaste){
 	if(!isCopyPaste){
 		var sNumFormat;
 		if(null != this.xfs && null != this.xfs.num)
-			sNumFormat = this.xfs.num.f;
+			sNumFormat = this.xfs.num.getFormat();
 		else
-			sNumFormat = g_oDefaultFormat.Num.f;
+			sNumFormat = g_oDefaultFormat.Num.getFormat();
 		var numFormat = oNumFormatCache.get(sNumFormat);
 		bIsTextFormat = numFormat.isTextFormat();
 	}
@@ -5675,9 +5675,9 @@ Cell.prototype.shiftNumFormat=function(nShift, dDigitsCount){
 	var bGeneral = true;
     var sNumFormat;
     if(null != this.xfs && null != this.xfs.num)
-        sNumFormat = this.xfs.num.f;
+        sNumFormat = this.xfs.num.getFormat();
     else
-        sNumFormat = g_oDefaultFormat.Num.f;
+        sNumFormat = g_oDefaultFormat.Num.getFormat();
 	if("General" != sNumFormat)
 	{
 		var oCurNumFormat = oNumFormatCache.get(sNumFormat);
@@ -5929,8 +5929,8 @@ Cell.prototype.getValue2=function(dDigitsCount, fIsFitMeasurer){
 };
 Cell.prototype.getNumFormatStr=function(){
 	if(null != this.xfs && null != this.xfs.num)
-            return this.xfs.num.f;
-	return g_oDefaultFormat.Num.f;
+            return this.xfs.num.getFormat();
+	return g_oDefaultFormat.Num.getFormat();
 };
 Cell.prototype.getNumFormat=function(){
     return oNumFormatCache.get(this.getNumFormatStr());
@@ -7160,19 +7160,19 @@ Range.prototype.getNumFormatStr=function(){
     {
 	    var xfs = cell.getCompiledStyle();
         if(null != xfs && null != xfs.num)
-            return xfs.num.f;
+            return xfs.num.getFormat();
     }
 	else
 	{
 		//стили столбов и колонок
 		var row = this.worksheet._getRowNoEmpty(nRow);
 		if(null != row && null != row.xfs && null != row.xfs.num)
-			return row.xfs.num.f;
+			return row.xfs.num.getFormat();
 		var col = this.worksheet._getColNoEmptyWithAll(nCol);
 		if(null != col && null != col.xfs && null != col.xfs.num)
-			return col.xfs.num.f;
+			return col.xfs.num.getFormat();
 	}
-    return g_oDefaultFormat.Num.f;
+    return g_oDefaultFormat.Num.getFormat();
 };
 Range.prototype.getNumFormatType=function(){
 	return this.getNumFormat().getType();
@@ -9156,8 +9156,8 @@ function _promoteFromTo(from, wsFrom, to, wsTo, bIsPromote, oCanPromote, bCtrl, 
 									}
 								}
 							}
-							if(null != oCell.xfs && null != oCell.xfs.num && null != oCell.xfs.num.f){
-								var numFormat = oNumFormatCache.get(oCell.xfs.num.f);
+							if(null != oCell.xfs && null != oCell.xfs.num && null != oCell.xfs.num.getFormat()){
+								var numFormat = oNumFormatCache.get(oCell.xfs.num.getFormat());
 								if(numFormat.isDateTimeFormat())
 									bDate = true;
 							}

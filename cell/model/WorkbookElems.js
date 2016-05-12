@@ -1018,34 +1018,119 @@ function Num(val)
 		val = g_oDefaultFormat.NumAbs;
 	this.Properties = g_oNumProperties;
 	this.f = val.f;
+  this.id = val.id;
 }
 Num.prototype =
 {
+  setFormat: function(f, opt_id) {
+    this.f = f;
+    this.id = opt_id;
+  },
+  getFormat: function() {
+    var res = this.f;
+    if (null != this.id) {
+      if (15 <= this.id && this.id <= 17) {
+        var separator;
+        if ('/' == AscCommon.g_oDefaultCultureInfo.DateSeparator) {
+          separator = '-';
+        } else {
+          separator = '/';
+        }
+        switch (this.id) {
+          case 15:
+            res = 'd' + separator + 'mmm' + separator + 'yy';
+            break;
+          case 16:
+            res = 'd' + separator + 'mmm';
+            break;
+          case 17:
+            res = 'mmm' + separator + 'yy';
+            break;
+        }
+      } else {
+        switch (this.id) {
+          case 5:
+            res = AscCommonExcel.getCurrencyFormatSimple(null, false, true, false);
+            break;
+          case 6:
+            res = AscCommonExcel.getCurrencyFormatSimple(null, false, true, true);
+            break;
+          case 7:
+            res = AscCommonExcel.getCurrencyFormatSimple(null, true, true, false);
+            break;
+          case 8:
+            res = AscCommonExcel.getCurrencyFormatSimple(null, true, true, true);
+            break;
+          case 37:
+            res = AscCommonExcel.getCurrencyFormatSimple(null, false, false, false);
+            break;
+          case 38:
+            res = AscCommonExcel.getCurrencyFormatSimple(null, false, false, true);
+            break;
+          case 39:
+            res = AscCommonExcel.getCurrencyFormatSimple(null, true, false, false);
+            break;
+          case 40:
+            res = AscCommonExcel.getCurrencyFormatSimple(null, true, false, true);
+            break;
+          case 41:
+            res = AscCommonExcel.getCurrencyFormat(null, false, false, false);
+            break;
+          case 42:
+            res = AscCommonExcel.getCurrencyFormat(null, false, true, false);
+            break;
+          case 43:
+            res = AscCommonExcel.getCurrencyFormat(null, true, false, false);
+            break;
+          case 44:
+            res = AscCommonExcel.getCurrencyFormat(null, true, true, false);
+            break;
+        }
+      }
+    }
+    return res;
+  },
+  _mergeProperty : function(first, second, def)
+  {
+    if(def != first)
+      return first;
+    else
+      return second;
+  },
 	merge : function(num)
 	{
 		var oRes = new Num();
-		if(g_oDefaultFormat.Num.f != this.f)
-			oRes.f = this.f;
-		else
-			oRes.f = num.f;
+    oRes.f = this._mergeProperty(this.f, num.f, g_oDefaultFormat.Num.f);
+    oRes.id = this._mergeProperty(this.id, num.id, g_oDefaultFormat.Num.id);
 		return oRes;
 	},
-	getDif : function(val)
-	{
-		var oRes = new Num(this);
-		var bEmpty = true;
-		if(this.f == val.f)
-			oRes.f =  null;
-		else
-			bEmpty = false;
-		if(bEmpty)
-			oRes = null;
-		return oRes;
-	},
-	isEqual : function(val)
-	{
-		return this.f == val.f;
-	},
+  getDif: function(val) {
+    var oRes = new Num(this);
+    var bEmpty = true;
+    if (this.f == val.f) {
+      oRes.f = null;
+    } else {
+      bEmpty = false;
+    }
+    if (this.id == val.id) {
+      oRes.id = null;
+    } else {
+      bEmpty = false;
+    }
+    if (bEmpty) {
+      oRes = null;
+    }
+    return oRes;
+  },
+  isEqual: function(val) {
+    if (null != this.id && null != val.id) {
+      return this.id == val.id;
+    } else if (null != this.id || null != val.id) {
+      return false;
+    } else {
+      return this.f == val.f;
+    }
+  },
     clone : function()
     {
         return new Num(this);
@@ -1062,14 +1147,14 @@ Num.prototype =
 	{
 		switch(nType)
 		{
-			case this.Properties.f: return this.f;break;
+			case this.Properties.f: return this.getFormat();break;
 		}
 	},
 	setProperty : function(nType, value)
 	{
 		switch(nType)
 		{
-			case this.Properties.f: this.f = value;break;
+			case this.Properties.f: this.setFormat(value);break;
 		}
 	}
 };
@@ -1514,8 +1599,8 @@ CCellStyle.prototype.getBorder = function () {
 };
 CCellStyle.prototype.getNumFormatStr = function () {
 	if(null != this.xfs && null != this.xfs.num)
-		return this.xfs.num.f;
-	return g_oDefaultFormat.Num.f;
+		return this.xfs.num.getFormat();
+	return g_oDefaultFormat.Num.getFormat();
 };
 /** @constructor */
 function StyleManager(){
@@ -1607,9 +1692,9 @@ StyleManager.prototype =
         var xfs = oItemWithXfs.xfs;
         var oRes = {newVal: val, oldVal: null};
         if(null != xfs && null != xfs.num)
-            oRes.oldVal = xfs.num.f;
+            oRes.oldVal = xfs.num.getFormat();
 		else
-			oRes.oldVal = g_oDefaultFormat.Num.f;
+			oRes.oldVal = g_oDefaultFormat.Num.getFormat();
         if(null == val)
         {
             if(null != xfs) {
@@ -1622,7 +1707,7 @@ StyleManager.prototype =
             xfs = this._prepareSet(oItemWithXfs);
             if(null == xfs.num)
                 xfs.num = g_oDefaultFormat.Num.clone();
-            xfs.num.f = val;
+            xfs.num.setFormat(val);
         }
 		return oRes;
 	},
@@ -2927,9 +3012,9 @@ CCellValue.prototype =
 				var oNumFormat;
 				var xfs = cell.getCompiledStyle();
 				if(null != xfs && null != xfs.num)
-					oNumFormat = oNumFormatCache.get(xfs.num.f);
+					oNumFormat = oNumFormatCache.get(xfs.num.getFormat());
 				else
-					oNumFormat = oNumFormatCache.get(g_oDefaultFormat.Num.f);
+					oNumFormat = oNumFormatCache.get(g_oDefaultFormat.Num.getFormat());
 				if(false == oNumFormat.isGeneralFormat())
 				{
 					var oAdditionalResult = {};
@@ -3063,9 +3148,9 @@ CCellValue.prototype =
 						{
 							var oNumFormat;
 							if(null != xfs && null != xfs.num)
-								oNumFormat = oNumFormatCache.get(xfs.num.f);
+								oNumFormat = oNumFormatCache.get(xfs.num.getFormat());
 							else
-								oNumFormat = oNumFormatCache.get(g_oDefaultFormat.Num.f);
+								oNumFormat = oNumFormatCache.get(g_oDefaultFormat.Num.getFormat());
 							if(CellValueType.String != this.type && null != oNumFormat && null != this.number)
 							{
 								var nValue = this.number;
@@ -3247,9 +3332,9 @@ CCellValue.prototype =
 		var oNumFormat;
 		var xfs = cell.getCompiledStyle();
 		if(null != xfs && null != xfs.num)
-			oNumFormat = oNumFormatCache.get(xfs.num.f);
+			oNumFormat = oNumFormatCache.get(xfs.num.getFormat());
 		else
-			oNumFormat = oNumFormatCache.get(g_oDefaultFormat.Num.f);
+			oNumFormat = oNumFormatCache.get(g_oDefaultFormat.Num.getFormat());
 		if(oNumFormat.isTextFormat())
 		{
 			this.type = CellValueType.String;
@@ -5854,6 +5939,222 @@ AutoFilterDateElem.prototype.convertDateGroupItemToRange = function(oDateGroupIt
 	this.dateTimeGrouping = oDateGroupItem.DateTimeGrouping;
 };
 
+function getCurrencyFormatSimple(opt_cultureInfo, opt_fraction, opt_currency, opt_red) {
+  var cultureInfo = opt_cultureInfo ? opt_cultureInfo : AscCommon.g_oDefaultCultureInfo;
+  var numberFormat = opt_fraction ? '#,##0.00' : '#,##0';
+  var signCurrencyFormat;
+  var signCurrencyFormatEnd;
+  if (opt_currency) {
+    signCurrencyFormat = signCurrencyFormatEnd = '"' + cultureInfo.CurrencySymbol + '"';
+  } else {
+    signCurrencyFormatEnd = signCurrencyFormat = '';
+    for (var i = 0; i < cultureInfo.CurrencySymbol.length; ++i) {
+      signCurrencyFormatEnd += '_' + cultureInfo.CurrencySymbol[i];
+    }
+  }
+  var red = opt_red ? '[Red]' : '';
+
+  var prefixs = ['_ ', '_-', '_(', '_)'];
+  var postfix = '';
+  var positiveFormat;
+  var negativeFormat;
+  switch (cultureInfo.CurrencyNegativePattern) {
+    case 0:
+      postfix = prefixs[3];
+      negativeFormat = '\\(' + signCurrencyFormat + numberFormat + '\\)';
+      break;
+    case 1:
+      negativeFormat = '\\-' + signCurrencyFormat + numberFormat;
+      break;
+    case 2:
+      negativeFormat = signCurrencyFormat + '\\ \\-' + numberFormat;
+      break;
+    case 3:
+      postfix = prefixs[1];
+      negativeFormat = signCurrencyFormat + '\\ ' + numberFormat + '\\-';
+      break;
+    case 4:
+      postfix = prefixs[3];
+      negativeFormat = '\\(' + numberFormat + signCurrencyFormatEnd + '\\)';
+      break;
+    case 5:
+      negativeFormat = '\\-' + numberFormat + signCurrencyFormatEnd;
+      break;
+    case 6:
+      negativeFormat = numberFormat + '\\-' + signCurrencyFormatEnd;
+      break;
+    case 7:
+      postfix = prefixs[1];
+      negativeFormat = numberFormat + signCurrencyFormatEnd + '\\-';
+      break;
+    case 8:
+      negativeFormat = '\\-' + numberFormat + '\\ ' + signCurrencyFormatEnd;
+      break;
+    case 9:
+      negativeFormat = '\\-' + signCurrencyFormat + '\\ ' + numberFormat;
+      break;
+    case 10:
+      postfix = prefixs[1];
+      negativeFormat = numberFormat + '\\ ' + signCurrencyFormatEnd + '\\-';
+      break;
+    case 11:
+      postfix = prefixs[1];
+      negativeFormat = signCurrencyFormat + '\\ ' + numberFormat + '\\-';
+      break;
+    case 12:
+      negativeFormat = signCurrencyFormat + '\\ \\-' + numberFormat;
+      break;
+    case 13:
+      negativeFormat = numberFormat + '\\-\\ ' + signCurrencyFormatEnd;
+      break;
+    case 14:
+      postfix = prefixs[3];
+      negativeFormat = '(' + signCurrencyFormat + numberFormat + '\\)';
+      break;
+    case 15:
+      postfix = prefixs[3];
+      negativeFormat = '\\(' + numberFormat + signCurrencyFormatEnd + '\\)';
+      break;
+  }
+  switch (cultureInfo.CurrencyPositivePattern) {
+    case 0:
+      positiveFormat = signCurrencyFormat + numberFormat;
+      break;
+    case 1:
+      positiveFormat = numberFormat + signCurrencyFormatEnd;
+      break;
+    case 2:
+      positiveFormat = signCurrencyFormat + '\\ ' + numberFormat;
+      break;
+    case 3:
+      positiveFormat = numberFormat + '\\ ' + signCurrencyFormatEnd;
+      break;
+  }
+  positiveFormat = positiveFormat + postfix;
+  return positiveFormat + ';' + red + negativeFormat;
+}
+
+function getCurrencyFormat(opt_cultureInfo, opt_fraction, opt_currency, opt_currencyLocale) {
+  var cultureInfo = opt_cultureInfo ? opt_cultureInfo : AscCommon.g_oDefaultCultureInfo;
+  var numberFormat;
+  var nullSignFormat;
+  if (opt_fraction) {
+    numberFormat = '#,##0.00';
+    nullSignFormat = '* "-"??';
+  } else {
+    numberFormat = '#,##0';
+    nullSignFormat = '* "-"';
+  }
+  var signCurrencyFormat;
+  var signCurrencyFormatEnd;
+  if (opt_currency) {
+    if (opt_currencyLocale) {
+      signCurrencyFormat = '[$' + cultureInfo.CurrencySymbol + '-' + cultureInfo.LCID.toString(16).toUpperCase() + ']';
+    } else {
+      signCurrencyFormat = '"' + cultureInfo.CurrencySymbol + '"';
+    }
+    signCurrencyFormatEnd = signCurrencyFormat;
+  } else {
+    signCurrencyFormatEnd = signCurrencyFormat = '';
+    for (var i = 0; i < cultureInfo.CurrencySymbol.length; ++i) {
+      signCurrencyFormatEnd += '_' + cultureInfo.CurrencySymbol[i];
+    }
+  }
+
+  var prefixs = ['_ ', '_-', '_(', '_)'];
+  var prefix = prefixs[0];
+  var postfix = prefixs[0];
+  var positiveNumberFormat = '* ' + numberFormat;
+  var positiveFormat;
+  var negativeFormat;
+  var nullFormat;
+  switch (cultureInfo.CurrencyNegativePattern) {
+    case 0:
+      prefix = prefixs[2];
+      postfix = prefixs[3];
+      negativeFormat = prefix + signCurrencyFormat + '* \\(' + numberFormat + '\\)';
+      break;
+    case 1:
+      prefix = postfix = prefixs[1];
+      negativeFormat = '\\-' + signCurrencyFormat + '* ' + numberFormat + postfix;
+      break;
+    case 2:
+      negativeFormat = prefix + signCurrencyFormat + '\\ * \\-' + numberFormat + postfix;
+      break;
+    case 3:
+      prefix = postfix = prefixs[1];
+      negativeFormat = prefix + signCurrencyFormat + '\\ * ' + numberFormat + '\\-';
+      break;
+    case 4:
+      prefix = prefixs[2];
+      postfix = prefixs[3];
+      negativeFormat = prefix + '* \\(' + numberFormat + '\\)' + signCurrencyFormatEnd + postfix;
+      break;
+    case 5:
+      prefix = postfix = prefixs[1];
+      negativeFormat = '\\-* ' + numberFormat + signCurrencyFormatEnd + postfix;
+      break;
+    case 6:
+      negativeFormat = prefix + '* ' + numberFormat + '\\-' + signCurrencyFormatEnd + postfix;
+      break;
+    case 7:
+      negativeFormat = prefix + '* ' + numberFormat + signCurrencyFormatEnd + '\\-';
+      break;
+    case 8:
+      prefix = postfix = prefixs[1];
+      negativeFormat = '\\-* ' + numberFormat + '\\ ' + signCurrencyFormatEnd + postfix;
+      break;
+    case 9:
+      prefix = postfix = prefixs[1];
+      negativeFormat = '\\-' + signCurrencyFormat + '\\ * ' + numberFormat + postfix;
+      break;
+    case 10:
+      negativeFormat = prefix + '* ' + numberFormat + '\\ ' + signCurrencyFormatEnd + '\\-';
+      break;
+    case 11:
+      negativeFormat = prefix + signCurrencyFormat + '\\ * ' + numberFormat + '\\-';
+      break;
+    case 12:
+      negativeFormat = prefix + signCurrencyFormat + '\\ * \\-' + numberFormat + postfix;
+      break;
+    case 13:
+      negativeFormat = prefix + '* ' + numberFormat + '\\-\\ ' + signCurrencyFormatEnd + postfix;
+      break;
+    case 14:
+      prefix = prefixs[2];
+      postfix = prefixs[3];
+      negativeFormat = prefix + signCurrencyFormat + '\\ * \\(' + numberFormat + '\\)';
+      break;
+    case 15:
+      prefix = prefixs[2];
+      postfix = prefixs[3];
+      negativeFormat = prefix + '* \\(' + numberFormat + '\\)\\ ' + signCurrencyFormatEnd + postfix;
+      break;
+  }
+  switch (cultureInfo.CurrencyPositivePattern) {
+    case 0:
+      positiveFormat = signCurrencyFormat + positiveNumberFormat;
+      nullFormat = signCurrencyFormat + nullSignFormat;
+      break;
+    case 1:
+      positiveFormat = positiveNumberFormat + signCurrencyFormatEnd;
+      nullFormat = nullSignFormat + signCurrencyFormatEnd;
+      break;
+    case 2:
+      positiveFormat = signCurrencyFormat + '\\ ' + positiveNumberFormat;
+      nullFormat = signCurrencyFormat + '\\ ' + nullSignFormat;
+      break;
+    case 3:
+      positiveFormat = positiveNumberFormat + '\\ ' + signCurrencyFormatEnd;
+      nullFormat = nullSignFormat + '\\ ' + signCurrencyFormatEnd;
+      break;
+  }
+  positiveFormat = prefix + positiveFormat + postfix;
+  nullFormat = prefix + nullFormat + postfix;
+  var textFormat = prefix + '@' + postfix;
+  return positiveFormat + ';' + negativeFormat + ';' + nullFormat + ';' + textFormat;
+}
+
 	//----------------------------------------------------------export----------------------------------------------------
 	var prot;
 	window['Asc'] = window['Asc'] || {};
@@ -5905,6 +6206,8 @@ AutoFilterDateElem.prototype.convertDateGroupItemToRange = function(oDateGroupIt
 	window['AscCommonExcel'].DateGroupItem = DateGroupItem;
 	window['AscCommonExcel'].SortCondition = SortCondition;
 	window['AscCommonExcel'].AutoFilterDateElem = AutoFilterDateElem;
+  window['AscCommonExcel'].getCurrencyFormatSimple = getCurrencyFormatSimple;
+  window['AscCommonExcel'].getCurrencyFormat = getCurrencyFormat;
 	
 window["Asc"]["CustomFilters"]			= window["Asc"].CustomFilters = CustomFilters;
 prot									= CustomFilters.prototype;

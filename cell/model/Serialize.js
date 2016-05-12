@@ -1610,7 +1610,7 @@
                 {
                     var dxf = this.aDxfs[i];
                     if(dxf && dxf.num)
-                        oDxfsNumFormatToId[dxf.num.f] = this.oBinaryWorksheetsTableWriter.getNumIdByFormat(dxf.num);
+                        oDxfsNumFormatToId[dxf.num.getFormat()] = this.oBinaryWorksheetsTableWriter.getNumIdByFormat(dxf.num);
                 }
                 this.bs.WriteItem(c_oSerStylesTypes.Dxfs, function(){oThis.WriteDxfs(oThis.aDxfs, oDxfsNumFormatToId);});
             }
@@ -1826,7 +1826,7 @@
             {
                 var num = this.oNumMap[i];
                 if(false == num.val.isEqual(g_oDefaultFormat.NumAbs))
-                    this.bs.WriteItem(c_oSerStylesTypes.NumFmt, function(){oThis.WriteNum({id: num.index, f: num.val.f});});
+                    this.bs.WriteItem(c_oSerStylesTypes.NumFmt, function(){oThis.WriteNum({id: num.index, f: num.val.getFormat()});});
             }
         };
         this.WriteNum = function(num)
@@ -2028,9 +2028,9 @@
                 this.bs.WriteItem(c_oSer_Dxf.Font, function(){oThis.WriteFont(Dxf.font);});
             if(null != Dxf.num && null != oDxfsNumFormatToId)
             {
-                var numId = oDxfsNumFormatToId[Dxf.num.f];
+                var numId = oDxfsNumFormatToId[Dxf.num.getFormat()];
                 if(null != numId)
-                    this.bs.WriteItem(c_oSer_Dxf.NumFmt, function(){oThis.WriteNum({id: numId, f: Dxf.num.f});});
+                    this.bs.WriteItem(c_oSer_Dxf.NumFmt, function(){oThis.WriteNum({id: numId, f: Dxf.num.getFormat()});});
             }
         };
         this.WriteCellStyles = function (cellStyles) {
@@ -3167,27 +3167,30 @@
 
             return sStyle;
         };
-        this.getNumIdByFormat = function(num)
-        {
-            var numid = null;
-            //стандартные форматы не записываем в map, на них можно ссылаться по id
-            var nStandartId = AscCommonExcel.aStandartNumFormatsId[num.f];
-            if(null == nStandartId)
-            {
-                var sHash = this._getStringFromObjWithProperty(num);
-                var elem = this.oNumMap[sHash];
-                if(null == elem)
-                {
-                    numid = this.nNumMapIndex++;
-                    this.oNumMap[sHash] = {index: numid, val: num};
-                }
-                else
-                    numid = elem.index;
-            }
-            else
-                numid = nStandartId;
-            return numid;
-        };
+      this.getNumIdByFormat = function(num) {
+        var numid = null;
+        //стандартные форматы не записываем в map, на них можно ссылаться по id
+        var nStandartId;
+        if (null != num.id) {
+          nStandartId = num.id;
+        } else {
+          nStandartId = AscCommonExcel.aStandartNumFormatsId[num.getFormat()];
+        }
+
+        if (null == nStandartId) {
+          var sHash = this._getStringFromObjWithProperty(num);
+          var elem = this.oNumMap[sHash];
+          if (null == elem) {
+            numid = this.nNumMapIndex++;
+            this.oNumMap[sHash] = {index: numid, val: num};
+          } else {
+            numid = elem.index;
+          }
+        } else {
+          numid = nStandartId;
+        }
+        return numid;
+      };
         this.prepareXfs = function(xfs)
         {
             var nXfsId = 0;
@@ -4658,44 +4661,32 @@
             if(null != xfs.align && g_oDefaultFormat.AlignAbs.isEqual(xfs.align))
                 xfs.align = null;
         };
-        this.ParseNum = function(oNum, oNumFmts)
-        {
-            var oRes = null;
-            var sFormat = null;
-            if(null != oNum && null != oNum.f)
-                sFormat = oNum.f;
-            else
-            {
-                if(5 <= oNum.id && oNum.id <= 8)
-                {
-                    //В спецификации нет стилей для чисел 5-8, экспериментально установлено, что это денежный формат, зависящий от локали.
-                    //Устанавливаем как в Engilsh(US)
-                    switch(oNum.id)
-                    {
-                        case 5: sFormat = "$#,##0_);($#,##0)";break;
-                        case 6: sFormat = "$#,##0_);[Red]($#,##0)";break;
-                        case 7: sFormat = "$#,##0.00_);($#,##0.00)";break;
-                        case 8: sFormat = "$#,##0.00_);[Red]($#,##0.00)";break;
-                    }
-                }
-                else
-                {
-                    var sStandartNumFormat  = AscCommonExcel.aStandartNumFormats[oNum.id];
-                    if(null != sStandartNumFormat)
-                        sFormat = sStandartNumFormat;
-                }
-                if(null == sFormat)
-                    sFormat = "General";
-                if(null != oNumFmts)
-                    oNumFmts[oNum.id] = {id:oNum.id, f: sFormat};
-            }
-            if(null != sFormat)
-            {
-                oRes = new AscCommonExcel.Num();
-                oRes.f = sFormat;
-            }
-            return oRes;
-        };
+      this.ParseNum = function(oNum, oNumFmts) {
+        var oRes = null;
+        var sFormat = null;
+        if (null != oNum && null != oNum.f) {
+          sFormat = oNum.f;
+        } else {
+          var sStandartNumFormat = AscCommonExcel.aStandartNumFormats[oNum.id];
+          if (null != sStandartNumFormat) {
+            sFormat = sStandartNumFormat;
+          }
+          if (null == sFormat) {
+            sFormat = "General";
+          }
+          if (null != oNumFmts) {
+            oNumFmts[oNum.id] = {id: oNum.id, f: sFormat};
+          }
+        }
+        if (null != sFormat) {
+          oRes = new AscCommonExcel.Num();
+          oRes.f = sFormat;
+          if ((5 <= oNum.id && oNum.id <= 8) || (15 <= oNum.id && oNum.id <= 17) || (37 <= oNum.id && oNum.id <= 44)) {
+            oRes.id = oNum.id;
+          }
+        }
+        return oRes;
+      };
         this.ReadStylesContent = function (type, length, oStyleObject) {
             var res = c_oSerConstants.ReadOk;
             var oThis = this;
