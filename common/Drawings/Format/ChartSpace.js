@@ -827,6 +827,16 @@ CChartSpace.prototype.paragraphAdd = function(paraItem, bRecalculate)
 
     paragraphIncDecFontSize: function(bIncrease)
             {
+    if(this.selection.textSelection)
+    {
+        this.selection.textSelection.checkDocContent();
+        var content = this.selection.textSelection.getDocContent();
+        if(content)
+        {
+            content.Paragraph_IncDecFontSize(bIncrease);
+        }
+        return;
+    }
         this.applyLabelsFunction(CheckIncDecFontSize, bIncrease);
     },
 
