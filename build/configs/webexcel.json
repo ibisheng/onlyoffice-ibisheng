@@ -182,14 +182,18 @@
           "../cell/Local/api.js"
 		]
 	  },
-	  "mobile_banners": [
-	    "../../web-apps/vendor/xregexp/xregexp-all-min.js",
-		"../../web-apps/vendor/underscore/underscore-min.js",
-		"../cell/native/common.js",
-		"../common/Native/Wrappers/memory.js",
-		"../common/Native/jquery_native.js",
-		"../cell/native/DrawingContext.js"
+	  "mobile_banners": {
+        "min": [
+	      "../../web-apps/vendor/xregexp/xregexp-all-min.js",
+		  "../../web-apps/vendor/underscore/underscore-min.js",
+		  "../cell/native/common.js",
+		  "../common/Native/Wrappers/memory.js",
+		  "../common/Native/jquery_native.js"
 		],
+		"common": [
+		  "../cell/native/DrawingContext.js"
+		]
+	  },
 	  "mobile": [	 
         "../common/Native/Wrappers/TextMeasurerWrapper.js",
         "../common/Native/Wrappers/DrawingStream.js",

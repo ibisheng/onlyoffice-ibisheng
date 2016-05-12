@@ -172,7 +172,10 @@
           "../word/Local/api.js"
 		]
       },
-	  "mobile_banners": [],
+	  "mobile_banners": {
+		  "min": [],
+		  "common": []
+	  },
       "exclude_mobile": [],
       "dst": "../word",
       "externs": [

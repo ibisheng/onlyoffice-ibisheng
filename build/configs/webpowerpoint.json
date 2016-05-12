@@ -172,11 +172,14 @@
           "../slide/Local/api.js"
 		]
       },
-	  "mobile_banners": [
-		"../common/Native/native.js",
-		"../common/Native/jquery_native.js",
-		"../../web-apps/vendor/xregexp/xregexp-all-min.js"
-	  ],
+	  "mobile_banners": {
+		  "min": [
+		    "../common/Native/native.js",
+		    "../common/Native/jquery_native.js",
+		    "../../web-apps/vendor/xregexp/xregexp-all-min.js"
+	    ],
+		"common": []
+	  },
       "mobile": [        
         "../common/Native/Wrappers/memory.js",
         "../common/Native/Wrappers/TextMeasurerWrapper.js",
