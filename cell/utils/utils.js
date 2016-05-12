@@ -447,6 +447,40 @@
 			}
 		};
 
+		/**
+		 *
+     * @constructor
+		 * @extends {Range}
+     */
+		function Range3D() {
+			this.sheet = '';
+
+			if (2 == arguments.length) {
+				var range = arguments[0];
+				Range3D.superclass.constructor.call(this, range.c1, range.r1, range.c2, range.r2);
+				// ToDo стоит пересмотреть конструкторы.
+				this.r1Abs = range.r1Abs;
+				this.c1Abs = range.c1Abs;
+				this.r2Abs = range.r2Abs;
+				this.c2Abs = range.c2Abs;
+
+				this.sheet = arguments[1];
+			} else if (arguments.length > 1) {
+				ActiveRange.superclass.constructor.apply(this, arguments);
+			} else {
+				ActiveRange.superclass.constructor.call(this, 0, 0, 0, 0);
+      }
+		}
+		AscCommon.extendClass(Range3D, Range);
+		Range3D.prototype.isIntersect = function () {
+			var oRes = true;
+			
+			if (2 == arguments.length) {
+				oRes = this.sheet === arguments[1];
+			}
+			return oRes && Range3D.superclass.isIntersect.apply(this, arguments);
+		};
+
     /**
      *
      * @constructor
@@ -679,6 +713,15 @@
 			getAscRange : function(sRange)
 			{
 				return this._getRange(sRange, 1);
+			},
+			getRange3D : function(sRange)
+			{
+				var res = AscCommon.parserHelp.parse3DRef(sRange);
+				if (!res) {
+					return null;
+				}
+				var range = this._getRange(res.range, 1);
+				return range ? new Range3D(range, res.sheet) : null;
 			},
 			getActiveRange : function(sRange)
 			{
@@ -1561,6 +1604,7 @@
 		window["Asc"].getEndValueRange = getEndValueRange;
 
 		window["Asc"].Range = Range;
+		window["AscCommonExcel"].Range3D = Range3D;
 		window["AscCommonExcel"].ActiveRange = ActiveRange;
 		window["AscCommonExcel"].FormulaRange = FormulaRange;
 		window["AscCommonExcel"].VisibleRange = VisibleRange;
