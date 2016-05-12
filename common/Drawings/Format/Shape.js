@@ -5352,11 +5352,6 @@ CShape.prototype.recalculateBounds = function()
     {
         var boundsChecker = new  AscFormat.CSlideBoundsChecker();
         this.draw(boundsChecker, this.localTransform, this.localTransformText);
-        if(!this.group)
-        {
-
-        boundsChecker.CorrectBounds();
-        }
             this.bounds.l = boundsChecker.Bounds.min_x;
             this.bounds.t = boundsChecker.Bounds.min_y;
             this.bounds.r = boundsChecker.Bounds.max_x;
