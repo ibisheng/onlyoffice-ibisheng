@@ -4768,6 +4768,11 @@ ParaDrawing.prototype =
         {
             c.setExtent(this.Extent.W, this.Extent.H);
         }
+        var EE = this.EffectExtent;
+        if(EE.L > 0 || EE.T > 0 || EE.R || EE.B)
+        {
+            c.setEffectExtent(EE.L, EE.T, EE.R, EE.B);
+        }
         if (this.ParaMath)
             c.Set_ParaMath(this.ParaMath.Copy());
         return c;
@@ -7053,6 +7058,8 @@ ParaDrawing.prototype =
         c.Set_AllowOverlap(this.AllowOverlap);
         c.Set_WrappingType(this.wrappingType);
         c.Set_BehindDoc(this.behindDoc);
+        var EE = this.EffectExtent;
+        c.setEffectExtent(EE.L, EE.T, EE.R, EE.B);
         return c;
     },
 
@@ -7445,44 +7452,34 @@ ParaPresentationNumbering.prototype =
 
 /**
  * Класс представляющий ссылку на сноску.
- * @param {CFootEndnote} Footnote - Ссылка на сноску.
+ * @param {string} sId - Идентификатор сноски.
  * @constructor
  */
-function ParaFootnoteReference(Footnote)
+function ParaFootnoteReference(sId)
 {
-    this.Footnote     = Footnote;
+    this.FootnoteId = sId;
 
     this.Width        = 0;
     this.WidthVisible = 0;
-    this.Number       = 1;
+    this.Height       = 0;
 }
-ParaFootnoteReference.prototype.Type             = para_FootnoteReference;
-ParaFootnoteReference.prototype.Get_Type         = function()
+ParaFootnoteReference.prototype.Type           = para_FootnoteReference;
+ParaFootnoteReference.prototype.Get_Type = function()
 {
     return para_FootnoteReference;
 };
-ParaFootnoteReference.prototype.Draw             = function(X, Y, Context, PDSE)
+ParaFootnoteReference.prototype.Draw           = function(X, Y, Context)
 {
     Context.SetFontSlot(fontslot_ASCII, vertalign_Koef_Size);
-    g_oTextMeasurer.SetFontSlot(fontslot_ASCII, vertalign_Koef_Size);
-
-    // TODO: Пока делаем обычный вариант с типом Decimal
-    var _X = X;
-    var T = Numbering_Number_To_String(this.Number);
-    for (var nPos = 0; nPos < T.length; ++nPos)
-    {
-        var Char = T.charAt(nPos);
-        Context.FillText(_X, Y, Char);
-        _X += g_oTextMeasurer.Measure(Char).Width;
-    }
+    Context.FillTextCode(X, Y, "1".charCodeAt(0));
 
     // TODO: Надо переделать в отдельную функцию отрисовщика
     if (editor && editor.ShowParaMarks)
     {
         if (Context.m_oContext && Context.m_oContext.setLineDash)
-            Context.m_oContext.setLineDash([1, 1]);
+            Context.m_oContext.setLineDash([1,1]);
 
-        var l = X, t = PDSE.LineTop, r = X + this.Get_Width(), b = PDSE.BaseLine;
+        var l = X, t = Y - this.Height, r = X + this.Get_Width(), b = Y;
         Context.drawHorLineExt(c_oAscLineDrawingRule.Top, t, l, r, 0, 0, 0);
         Context.drawVerLine(c_oAscLineDrawingRule.Right, l, t, b, 0);
         Context.drawVerLine(c_oAscLineDrawingRule.Left, r, t, b, 0);
@@ -7492,24 +7489,16 @@ ParaFootnoteReference.prototype.Draw             = function(X, Y, Context, PDSE)
             Context.m_oContext.setLineDash([]);
     }
 };
-ParaFootnoteReference.prototype.Measure          = function(Context, TextPr)
+ParaFootnoteReference.prototype.Measure        = function(Context, TextPr)
 {
     Context.SetFontSlot(fontslot_ASCII, vertalign_Koef_Size);
-
-    // TODO: Пока делаем обычный вариант с типом Decimal
-    var X = 0;
-    var T = Numbering_Number_To_String(this.Number);
-    for (var nPos = 0; nPos < T.length; ++nPos)
-    {
-        var Char = T.charAt(nPos);
-        X += Context.Measure(Char).Width;
-    }
-
-    var ResultWidth   = (Math.max((X + TextPr.Spacing), 0) * TEXTWIDTH_DIVIDER) | 0;
+    var Temp = Context.MeasureCode("1".charCodeAt(0));
+    var ResultWidth   = (Math.max((Temp.Width + TextPr.Spacing), 0) * TEXTWIDTH_DIVIDER) | 0;
     this.Width        = ResultWidth;
     this.WidthVisible = ResultWidth;
+    this.Height       = Temp.Height;
 };
-ParaFootnoteReference.prototype.Get_Width        = function()
+ParaFootnoteReference.prototype.Get_Width = function()
 {
     return (this.Width / TEXTWIDTH_DIVIDER);
 };
@@ -7521,7 +7510,7 @@ ParaFootnoteReference.prototype.Set_WidthVisible = function(WidthVisible)
 {
     this.WidthVisible = (WidthVisible * TEXTWIDTH_DIVIDER) | 0;
 };
-ParaFootnoteReference.prototype.Is_RealContent   = function()
+ParaFootnoteReference.prototype.Is_RealContent = function()
 {
     return true;
 };
@@ -7529,25 +7518,21 @@ ParaFootnoteReference.prototype.Can_AddNumbering = function()
 {
     return true;
 };
-ParaFootnoteReference.prototype.Copy             = function()
+ParaFootnoteReference.prototype.Copy           = function()
 {
     return new ParaFootnoteReference(sId);
 };
-ParaFootnoteReference.prototype.Write_ToBinary   = function(Writer)
+ParaFootnoteReference.prototype.Write_ToBinary = function(Writer)
 {
     // Long   : Type
     // String : FootnoteId
     Writer.WriteLong(this.Type);
     Writer.WriteString2(this.FootnoteId);
 };
-ParaFootnoteReference.prototype.Read_FromBinary  = function(Reader)
+ParaFootnoteReference.prototype.Read_FromBinary = function(Reader)
 {
     // String : FootnoteId
     this.FootnoteId = Reader.GetString2();
-};
-ParaFootnoteReference.prototype.Get_Footnote     = function()
-{
-    return this.Footnote;
 };
 
 
