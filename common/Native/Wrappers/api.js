@@ -114,7 +114,7 @@ Asc['asc_docs_api'].prototype["Call_Common"] = function(type, param)
 
 Asc['asc_docs_api'].prototype["Call_HR_Tabs"] = function(arrT, arrP)
 {
-    var _arr = new CParaTabs();
+    var _arr = new AscCommonWord.CParaTabs();
     var _c = arrT.length;
     for (var i = 0; i < _c; i++)
     {
@@ -5142,7 +5142,7 @@ CStylesPainter.prototype =
         par.Add_ToContent(0, run);
         par.Style_Add(style.Id, false);
         par.Set_Align(AscCommon.align_Left);
-        par.Set_Tabs(new CParaTabs());
+        par.Set_Tabs(new AscCommonWord.CParaTabs());
 
         var _brdL = style.ParaPr.Brd.Left;
         if ( undefined !== _brdL && null !== _brdL )

@@ -2701,7 +2701,7 @@ asc_docs_api.prototype.paraApply = function(Props)
 
         if ( undefined != Props.Tabs )
         {
-            var Tabs = new CParaTabs();
+            var Tabs = new AscCommonWord.CParaTabs();
             Tabs.Set_FromObject( Props.Tabs.Tabs );
             this.WordControl.m_oLogicDocument.Set_ParagraphTabs( Tabs );
         }
