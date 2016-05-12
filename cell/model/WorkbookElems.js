@@ -4571,7 +4571,6 @@ function sparkline() {
 	this.sqref = null;
 	this.f = null;
 	this._f = null;
-	this.fSheet = null;
 }
 sparkline.prototype.setSqref = function(sqref) {
 	this.sqref = AscCommonExcel.g_oRangeCache.getAscRange(sqref);
