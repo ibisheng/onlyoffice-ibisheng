@@ -6166,6 +6166,7 @@ Top10.prototype.init = function(range, reWrite){
 		{
 			var arr = [];
 			var alreadyAddValues = {};
+			var count = 0;
 			range._foreach2(function(cell){
 				var val = parseFloat(cell.getValue());
 				
@@ -6173,6 +6174,7 @@ Top10.prototype.init = function(range, reWrite){
 				{
 					arr.push(val);
 					alreadyAddValues[val] = 1;
+					count++;
 				}
 			});
 			
@@ -6192,7 +6194,16 @@ Top10.prototype.init = function(range, reWrite){
 					return res; 
 				});
 				
-				res = arr[this.Val - 1];
+				if(this.Percent)
+				{
+					var num = parseInt(count * (this.Val / 100));
+					res = arr[num - 1];
+				}
+				else
+				{
+					res = arr[this.Val - 1];
+				}
+				
 			}
 		}
 	}
