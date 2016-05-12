@@ -5369,6 +5369,7 @@ FilterColumn.prototype.createFilter = function(obj) {
 		}
 		case c_oAscAutoFilterTypes.Top10:
 		{
+			this.Top10 = obj.filter.filter.clone();
 			break;
 		}	
 		case c_oAscAutoFilterTypes.Filters:
@@ -5396,8 +5397,11 @@ FilterColumn.prototype.init = function(range) {
 	//добавляем данные, которые не передаются из меню при примененни а/ф(в данном случае только DynamicFilter)
 	if(null !== this.DynamicFilter)
 	{
-		var res = null;
 		this.DynamicFilter.init(range);
+	}
+	else if(null !== this.Top10)
+	{
+		this.Top10.init(range);
 	}
 	
 };
@@ -6129,8 +6133,75 @@ Top10.prototype.clone = function() {
 	return res;
 };
 Top10.prototype.isHideValue = function(val, top10Length) {
-	return;
+	var res = false;
+	
+	if(null !== this.filterVal)
+	{
+		if(this.Top)
+		{
+			if(val < this.FilterVal)
+			{
+				res = true;
+			}
+		}
+		else
+		{
+			if(val > this.FilterVal)
+			{
+				res = true;
+			}
+		}
+	}
+	
+	return res;
 };
+
+Top10.prototype.init = function(range, reWrite){
+	var res = null;
+	var t = this;
+	
+	if(null === this.FilterVal || true === reWrite)
+	{	
+		if(range)
+		{
+			var arr = [];
+			var alreadyAddValues = {};
+			range._foreach2(function(cell){
+				var val = parseFloat(cell.getValue());
+				
+				if(!isNaN(val) && !alreadyAddValues[val])
+				{
+					arr.push(val);
+					alreadyAddValues[val] = 1;
+				}
+			});
+			
+			if(arr.length)
+			{
+				arr.sort(function(a, b){
+					var res;
+					if(t.Top)
+					{
+						res = b - a;
+					}
+					else
+					{
+						res = a - b;
+					}
+					
+					return res; 
+				});
+				
+				res = arr[this.Val - 1];
+			}
+		}
+	}
+	
+	if(null !== res)
+	{
+		this.FilterVal = res;
+	}
+}; 
 
 Top10.prototype.asc_getFilterVal = function () { return this.FilterVal; };
 Top10.prototype.asc_getPercent = function () { return this.Percent; };

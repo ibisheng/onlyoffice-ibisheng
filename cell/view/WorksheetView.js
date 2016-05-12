@@ -12655,7 +12655,7 @@
         if(filters && filters.ColorFilter)
         {
             filterObj.type = c_oAscAutoFilterTypes.ColorFilter;
-            filterObj.filter = filters.ColorFilter;
+            filterObj.filter = filters.ColorFilter.clone();
         }
         else if(filters && filters.CustomFiltersObj && filters.CustomFiltersObj.CustomFilters)
         {
@@ -12665,12 +12665,12 @@
         else if(filters && filters.DynamicFilter)
         {
             filterObj.type = c_oAscAutoFilterTypes.DynamicFilter;
-            filterObj.filter = filters.DynamicFilter;
+            filterObj.filter = filters.DynamicFilter.clone();
         }
         else if(filters && filters.Top10)
         {
             filterObj.type = c_oAscAutoFilterTypes.Top10;
-            filterObj.filter = filters.Top10;
+            filterObj.filter = filters.Top10.clone();
         }
         else if(filters)
 		{
