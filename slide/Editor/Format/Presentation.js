@@ -2708,7 +2708,7 @@ CPresentation.prototype =
                 {
                     var oPosition = this.Slides[this.CurPage].graphicObjects.getContextMenuPosition(0);
                     var ConvertedPos = this.DrawingDocument.ConvertCoordsToCursorWR( oPosition.X, oPosition.Y, this.PageNum );
-                    editor.sync_ContextMenuCallback(new CContextMenuData({ Type : c_oAscContextMenuTypes.Main, X_abs : ConvertedPos.X, Y_abs : ConvertedPos.Y }) );
+                    editor.sync_ContextMenuCallback(new AscCommonSlide.CContextMenuData({ Type : c_oAscContextMenuTypes.Main, X_abs : ConvertedPos.X, Y_abs : ConvertedPos.Y }) );
                 }
             }
 
@@ -2915,7 +2915,7 @@ CPresentation.prototype =
         }
         if(e.Button === AscCommon.g_mouse_button_right && !this.noShowContextMenu)
         {
-            var ContextData = new CContextMenuData();
+            var ContextData = new AscCommonSlide.CContextMenuData();
             var ConvertedPos = this.DrawingDocument.ConvertCoordsToCursorWR( X, Y, PageIndex );
             ContextData.X_abs = ConvertedPos.X;
             ContextData.Y_abs = ConvertedPos.Y;

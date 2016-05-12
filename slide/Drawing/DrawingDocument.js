@@ -3217,7 +3217,7 @@ function CThumbnailsManager()
         {
             if (global_mouseEvent.Button == 2)
             {
-                var _data = new CContextMenuData();
+                var _data = new AscCommonSlide.CContextMenuData();
                 _data.Type = c_oAscContextMenuTypes.Thumbnails;
                 _data.X_abs = global_mouseEvent.X - ((oThis.m_oWordControl.m_oThumbnails.AbsolutePosition.L * g_dKoef_mm_to_pix) >> 0) - oThis.m_oWordControl.X;
                 _data.Y_abs = global_mouseEvent.Y - ((oThis.m_oWordControl.m_oThumbnails.AbsolutePosition.T * g_dKoef_mm_to_pix) >> 0) - oThis.m_oWordControl.Y;
@@ -3306,7 +3306,7 @@ function CThumbnailsManager()
 
                 if (global_mouseEvent.Button == 2 && !global_keyboardEvent.CtrlKey)
                 {
-                    var _data = new CContextMenuData();
+                    var _data = new AscCommonSlide.CContextMenuData();
                     _data.Type = c_oAscContextMenuTypes.Thumbnails;
                     _data.X_abs = global_mouseEvent.X - ((oThis.m_oWordControl.m_oThumbnails.AbsolutePosition.L * g_dKoef_mm_to_pix) >> 0) - oThis.m_oWordControl.X;
                     _data.Y_abs = global_mouseEvent.Y - ((oThis.m_oWordControl.m_oThumbnails.AbsolutePosition.T * g_dKoef_mm_to_pix) >> 0) - oThis.m_oWordControl.Y;
@@ -3335,7 +3335,7 @@ function CThumbnailsManager()
 
         if (global_mouseEvent.Button == 2 && !global_keyboardEvent.CtrlKey)
         {
-            var _data = new CContextMenuData();
+            var _data = new AscCommonSlide.CContextMenuData();
             _data.Type = c_oAscContextMenuTypes.Thumbnails;
             _data.X_abs = global_mouseEvent.X - ((oThis.m_oWordControl.m_oThumbnails.AbsolutePosition.L * g_dKoef_mm_to_pix) >> 0) - oThis.m_oWordControl.X;
             _data.Y_abs = global_mouseEvent.Y - ((oThis.m_oWordControl.m_oThumbnails.AbsolutePosition.T * g_dKoef_mm_to_pix) >> 0) - oThis.m_oWordControl.Y;
@@ -4831,7 +4831,7 @@ function CThumbnailsManager()
                 var ConvertedPos = this.GetThumbnailPagePosition(nSlideIndex );
                 if(ConvertedPos)
                 {
-                    editor.sync_ContextMenuCallback(new CContextMenuData({ Type : c_oAscContextMenuTypes.Thumbnails, X_abs : ConvertedPos.X, Y_abs : ConvertedPos.Y, IsSlideSelect: true }) );
+                    editor.sync_ContextMenuCallback(new AscCommonSlide.CContextMenuData({ Type : c_oAscContextMenuTypes.Thumbnails, X_abs : ConvertedPos.X, Y_abs : ConvertedPos.Y, IsSlideSelect: true }) );
                 }
                 return false;
             }
@@ -4845,7 +4845,7 @@ function CThumbnailsManager()
                     var ConvertedPos = this.GetThumbnailPagePosition(nSlideIndex );
                     if(ConvertedPos)
                     {
-                        editor.sync_ContextMenuCallback(new CContextMenuData({ Type : c_oAscContextMenuTypes.Thumbnails, X_abs : ConvertedPos.X, Y_abs : ConvertedPos.Y, IsSlideSelect: true }) );
+                        editor.sync_ContextMenuCallback(new AscCommonSlide.CContextMenuData({ Type : c_oAscContextMenuTypes.Thumbnails, X_abs : ConvertedPos.X, Y_abs : ConvertedPos.Y, IsSlideSelect: true }) );
                     }
                     return false;
                 }
