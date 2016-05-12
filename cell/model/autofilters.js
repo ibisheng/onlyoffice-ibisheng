@@ -520,6 +520,11 @@
 				
 				var allFilterOpenElements = newFilterColumn.createFilter(autoFiltersObject);
 				newFilterColumn.init(worksheet.getRange3(autoFilter.Ref.r1 + 1, filterObj.ColId + autoFilter.Ref.c1, autoFilter.Ref.r2, filterObj.ColId + autoFilter.Ref.c1));
+				//for add to history
+				if(newFilterColumn.Top10 && newFilterColumn.Top10.FilterVal && autoFiltersObject.filter && autoFiltersObject.filter.filter)
+				{
+					autoFiltersObject.filter.filter.FilterVal = newFilterColumn.Top10.FilterVal;
+				}
 				
 				if(allFilterOpenElements && autoFilter.FilterColumns[filterObj.index])
 				{
