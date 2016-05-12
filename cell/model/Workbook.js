@@ -4796,7 +4796,7 @@ Woorksheet.prototype._moveRange=function(oBBoxFrom, oBBoxTo, copyRange){
 	var sBBoxToName = oBBoxTo.getName();
 	this.workbook.needRecalc.nodes[getVertexId(this.getId(), sBBoxToName)] = [this.getId(), sBBoxToName];
 	this.workbook.needRecalc.length++;
-	if (this.workbook.lockCounter){
+	if (!this.workbook.lockCounter){
 		/*
 			Если необходим пересчет, то по списку пересчитываемых ячеек сортируем граф зависимостей и пересчиываем в получившемся порядке. Плохим ячейкам с цикличискими ссылками выставляем ошибку "#REF!".
 		*/
@@ -5566,7 +5566,7 @@ Cell.prototype.setValue=function(val,callback, isCopyPaste){
 		DataNew = this.getValueData();
 	if(History.Is_On() && false == DataOld.isEqual(DataNew))
 	    History.Add(AscCommonExcel.g_oUndoRedoCell, AscCH.historyitem_Cell_ChangeValue, this.ws.getId(), new Asc.Range(this.nCol, this.nRow, this.nCol, this.nRow), new UndoRedoData_CellSimpleData(this.nRow, this.nCol, DataOld, DataNew));
-    if (this.ws.workbook.lockCounter) {
+    if (!this.ws.workbook.lockCounter) {
 		/*
 			Если необходим пересчет, то по списку пересчитываемых ячеек сортируем граф зависимостей и пересчиываем в получившемся порядке. Плохим ячейкам с цикличискими ссылками выставляем ошибку "#REF!".
 		*/
@@ -8722,7 +8722,7 @@ Range.prototype._sortByArray=function(oBBox, aSortData, bUndo){
 		}
 	}
 
-	if (this.worksheet.workbook.lockCounter)
+	if (!this.worksheet.workbook.lockCounter)
     this.worksheet.workbook.sortDependency();
 	if(false == this.worksheet.workbook.bUndoChanges && (false == this.worksheet.workbook.bRedoChanges || true == this.worksheet.workbook.bCollaborativeChanges))
 	{
