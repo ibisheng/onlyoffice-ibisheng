@@ -4457,9 +4457,6 @@ function sparklineGroup() {
 	this.arrSparklines = [];
 	this.arrCachedSparklines = [];
 }
-sparklineGroup.prototype.clearCached = function() {
-	this.arrCachedSparklines.length = 0;
-};
 sparklineGroup.prototype.addView = function(oSparklineView, index) {
 	this.arrCachedSparklines[index] = oSparklineView;
 };
@@ -4472,10 +4469,15 @@ sparklineGroup.prototype.draw = function(oDrawingContext) {
 		this.arrCachedSparklines[i].draw(graphics);
 	}
 };
-sparklineGroup.prototype.updateCache = function(range) {
+sparklineGroup.prototype.updateCache = function(sheet, ranges) {
 	for (var i = 0; i < this.arrSparklines.length; ++i) {
-		if (range.intersectionSimple(this.arrSparklines[i].f)) {
-			this.arrCachedSparklines[i] = null;
+		if (sheet === this.arrSparklines[i].fSheet) {
+			for (var j = 0; j < ranges.length; ++j) {
+				if (ranges[j].intersectionSimple(this.arrSparklines[i].fRange)) {
+					this.arrCachedSparklines[i] = null;
+					break;
+				}
+			}
 		}
 	}
 };
@@ -4483,9 +4485,19 @@ sparklineGroup.prototype.updateCache = function(range) {
 function sparkline() {
 	this.sqref = null;
 	this.f = null;
+	this.fRange = null;
+	this.fSheet = null;
 }
 sparkline.prototype.setSqref = function(sqref) {
 	this.sqref = AscCommonExcel.g_oRangeCache.getAscRange(sqref);
+};
+sparkline.prototype.setF = function(f) {
+	this.f = f;
+	var res = parserHelp.parse3DRef(this.f);
+	if (res) {
+		this.fSheet = res.sheet;
+		this.fRange = AscCommonExcel.g_oRangeCache.getAscRange(res.range);
+	}
 };
 sparkline.prototype.checkInRange = function(range) {
 	return this.sqref ? range.isIntersect(this.sqref) : false;

@@ -3151,6 +3151,11 @@ Workbook.prototype.getTableNameColumnByIndex = function(tableName, columnIndex){
     }
 	return res;
 };
+Workbook.prototype.updateSparklineCache = function(sheet, ranges) {
+  for (var i = 0; i < this.aWorksheets.length; ++i) {
+    this.aWorksheets[i].updateSparklineCache(sheet, ranges);
+  }
+};
 //-------------------------------------------------------------------------------------------------
 /**
  * @constructor
@@ -5367,6 +5372,14 @@ Woorksheet.prototype.expandRangeByMerged = function(range){
 Woorksheet.prototype.createTablePart = function(){
 	
 	return new AscCommonExcel.TablePart(this.handlers);
+};
+Woorksheet.prototype.onUpdateRanges = function(ranges) {
+  this.workbook.updateSparklineCache(this.sName, ranges);
+};
+Woorksheet.prototype.updateSparklineCache = function(sheet, ranges) {
+  for (var i = 0; i < this.sparklineGroups.arrSparklineGroup.length; ++i) {
+    this.sparklineGroups.arrSparklineGroup[i].updateCache(sheet, ranges);
+  }
 };
 //-------------------------------------------------------------------------------------------------
 /**

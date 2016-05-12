@@ -6629,7 +6629,7 @@
 		this.ReadSparkline = function (type, length, oSparkline) {
             var res = c_oSerConstants.ReadOk;
             if (c_oSer_Sparkline.SparklineRef === type) {
-				oSparkline.f = this.stream.GetString2LE(length);
+				oSparkline.setF(this.stream.GetString2LE(length));
 			} else if (c_oSer_Sparkline.SparklineSqRef === type) {
 				oSparkline.setSqref(this.stream.GetString2LE(length));
 			} else
