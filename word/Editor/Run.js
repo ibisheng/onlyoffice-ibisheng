@@ -2256,6 +2256,9 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
                     // При проверке, убирается ли слово, мы должны учитывать ширину предшествующих пробелов.
                     var LetterLen = Item.Width / TEXTWIDTH_DIVIDER;//var LetterLen = Item.Get_Width();
+                    
+                    if (para_FootnoteReference === ItemType)
+                        PRS.Add_FootnoteReference(Item.Get_Footnote(), Pos);
 
                     if (true !== Word)
                     {
@@ -4436,7 +4439,7 @@ ParaRun.prototype.Draw_Elements = function(PDSE)
 
                 if (para_Drawing != ItemType || Item.Is_Inline())
                 {
-                    Item.Draw(X, Y - this.YOffset, pGraphics);
+                    Item.Draw(X, Y - this.YOffset, pGraphics, PDSE);
                     X += Item.Get_WidthVisible();
                 }
 

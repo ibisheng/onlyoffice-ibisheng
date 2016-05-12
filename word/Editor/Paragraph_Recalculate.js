@@ -2792,6 +2792,11 @@ CParagraphRecalculateStateWrap.prototype =
         NumberingItem.LineAscent = LineAscent;
 
         return X;
+    },
+
+    Add_FootnoteReference : function(sId, oPos)
+    {
+
     }
 };
 

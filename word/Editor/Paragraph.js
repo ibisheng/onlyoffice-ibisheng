@@ -1947,6 +1947,7 @@ Paragraph.prototype =
 
                 var Range = Line.Ranges[CurRange];
 
+                PDSE.Set_LineMetrics(Y, Y - Line.Metrics.Ascent, Y + Line.Metrics.Descent);
                 PDSE.Reset_Range( CurPage, CurLine, CurRange, X, Y );
 
                 var StartPos = Range.StartPos;
@@ -14574,6 +14575,10 @@ function CParagraphDrawStateElements()
 
     this.X = 0;
     this.Y = 0;
+
+    this.LineTop    = 0;
+    this.LineBottom = 0;
+    this.BaseLine   = 0;
 }
 
 CParagraphDrawStateElements.prototype =
@@ -14599,6 +14604,13 @@ CParagraphDrawStateElements.prototype =
 
         this.X = X;
         this.Y = Y;
+    },
+
+    Set_LineMetrics : function(BaseLine, Top, Bottom)
+    {
+        this.LineTop    = Top;
+        this.LineBottom = Bottom;
+        this.BaseLine   = BaseLine;
     }
 };
 

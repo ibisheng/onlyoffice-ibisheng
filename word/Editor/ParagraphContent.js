@@ -7445,34 +7445,44 @@ ParaPresentationNumbering.prototype =
 
 /**
  * Класс представляющий ссылку на сноску.
- * @param {string} sId - Идентификатор сноски.
+ * @param {CFootEndnote} Footnote - Ссылка на сноску.
  * @constructor
  */
-function ParaFootnoteReference(sId)
+function ParaFootnoteReference(Footnote)
 {
-    this.FootnoteId = sId;
+    this.Footnote     = Footnote;
 
     this.Width        = 0;
     this.WidthVisible = 0;
-    this.Height       = 0;
+    this.Number       = 1;
 }
-ParaFootnoteReference.prototype.Type           = para_FootnoteReference;
-ParaFootnoteReference.prototype.Get_Type = function()
+ParaFootnoteReference.prototype.Type             = para_FootnoteReference;
+ParaFootnoteReference.prototype.Get_Type         = function()
 {
     return para_FootnoteReference;
 };
-ParaFootnoteReference.prototype.Draw           = function(X, Y, Context)
+ParaFootnoteReference.prototype.Draw             = function(X, Y, Context, PDSE)
 {
     Context.SetFontSlot(fontslot_ASCII, vertalign_Koef_Size);
-    Context.FillTextCode(X, Y, "1".charCodeAt(0));
+    g_oTextMeasurer.SetFontSlot(fontslot_ASCII, vertalign_Koef_Size);
+
+    // TODO: Пока делаем обычный вариант с типом Decimal
+    var _X = X;
+    var T = Numbering_Number_To_String(this.Number);
+    for (var nPos = 0; nPos < T.length; ++nPos)
+    {
+        var Char = T.charAt(nPos);
+        Context.FillText(_X, Y, Char);
+        _X += g_oTextMeasurer.Measure(Char).Width;
+    }
 
     // TODO: Надо переделать в отдельную функцию отрисовщика
     if (editor && editor.ShowParaMarks)
     {
         if (Context.m_oContext && Context.m_oContext.setLineDash)
-            Context.m_oContext.setLineDash([1,1]);
+            Context.m_oContext.setLineDash([1, 1]);
 
-        var l = X, t = Y - this.Height, r = X + this.Get_Width(), b = Y;
+        var l = X, t = PDSE.LineTop, r = X + this.Get_Width(), b = PDSE.BaseLine;
         Context.drawHorLineExt(c_oAscLineDrawingRule.Top, t, l, r, 0, 0, 0);
         Context.drawVerLine(c_oAscLineDrawingRule.Right, l, t, b, 0);
         Context.drawVerLine(c_oAscLineDrawingRule.Left, r, t, b, 0);
@@ -7482,16 +7492,24 @@ ParaFootnoteReference.prototype.Draw           = function(X, Y, Context)
             Context.m_oContext.setLineDash([]);
     }
 };
-ParaFootnoteReference.prototype.Measure        = function(Context, TextPr)
+ParaFootnoteReference.prototype.Measure          = function(Context, TextPr)
 {
     Context.SetFontSlot(fontslot_ASCII, vertalign_Koef_Size);
-    var Temp = Context.MeasureCode("1".charCodeAt(0));
-    var ResultWidth   = (Math.max((Temp.Width + TextPr.Spacing), 0) * TEXTWIDTH_DIVIDER) | 0;
+
+    // TODO: Пока делаем обычный вариант с типом Decimal
+    var X = 0;
+    var T = Numbering_Number_To_String(this.Number);
+    for (var nPos = 0; nPos < T.length; ++nPos)
+    {
+        var Char = T.charAt(nPos);
+        X += Context.Measure(Char).Width;
+    }
+
+    var ResultWidth   = (Math.max((X + TextPr.Spacing), 0) * TEXTWIDTH_DIVIDER) | 0;
     this.Width        = ResultWidth;
     this.WidthVisible = ResultWidth;
-    this.Height       = Temp.Height;
 };
-ParaFootnoteReference.prototype.Get_Width = function()
+ParaFootnoteReference.prototype.Get_Width        = function()
 {
     return (this.Width / TEXTWIDTH_DIVIDER);
 };
@@ -7503,7 +7521,7 @@ ParaFootnoteReference.prototype.Set_WidthVisible = function(WidthVisible)
 {
     this.WidthVisible = (WidthVisible * TEXTWIDTH_DIVIDER) | 0;
 };
-ParaFootnoteReference.prototype.Is_RealContent = function()
+ParaFootnoteReference.prototype.Is_RealContent   = function()
 {
     return true;
 };
@@ -7511,21 +7529,25 @@ ParaFootnoteReference.prototype.Can_AddNumbering = function()
 {
     return true;
 };
-ParaFootnoteReference.prototype.Copy           = function()
+ParaFootnoteReference.prototype.Copy             = function()
 {
     return new ParaFootnoteReference(sId);
 };
-ParaFootnoteReference.prototype.Write_ToBinary = function(Writer)
+ParaFootnoteReference.prototype.Write_ToBinary   = function(Writer)
 {
     // Long   : Type
     // String : FootnoteId
     Writer.WriteLong(this.Type);
     Writer.WriteString2(this.FootnoteId);
 };
-ParaFootnoteReference.prototype.Read_FromBinary = function(Reader)
+ParaFootnoteReference.prototype.Read_FromBinary  = function(Reader)
 {
     // String : FootnoteId
     this.FootnoteId = Reader.GetString2();
+};
+ParaFootnoteReference.prototype.Get_Footnote     = function()
+{
+    return this.Footnote;
 };
 
 
