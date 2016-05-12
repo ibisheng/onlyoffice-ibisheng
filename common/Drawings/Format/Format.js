@@ -921,66 +921,104 @@ CColorModifiers.prototype =
 
                 this.HSL2RGB(HSL, RGBA);
             }
-       else if (colorMod.name == "wordShade")
-       {
-           var val_ = colorMod.val/255;
-           //GBA.R = Math.max(0, (RGBA.R * (1 - val_)) >> 0);
-           //GBA.G = Math.max(0, (RGBA.G * (1 - val_)) >> 0);
-           //GBA.B = Math.max(0, (RGBA.B * (1 - val_)) >> 0);
+            else if (colorMod.name == "wordShade")
+            {
+                var val_ = colorMod.val/255;
+                //GBA.R = Math.max(0, (RGBA.R * (1 - val_)) >> 0);
+                //GBA.G = Math.max(0, (RGBA.G * (1 - val_)) >> 0);
+                //GBA.B = Math.max(0, (RGBA.B * (1 - val_)) >> 0);
 
 
-           //RGBA.R = Math.max(0,  ((1 - val_)*(- RGBA.R) + RGBA.R) >> 0);
-           //RGBA.G = Math.max(0,  ((1 - val_)*(- RGBA.G) + RGBA.G) >> 0);
-           //RGBA.B = Math.max(0,  ((1 - val_)*(- RGBA.B) + RGBA.B) >> 0);
+                //RGBA.R = Math.max(0,  ((1 - val_)*(- RGBA.R) + RGBA.R) >> 0);
+                //RGBA.G = Math.max(0,  ((1 - val_)*(- RGBA.G) + RGBA.G) >> 0);
+                //RGBA.B = Math.max(0,  ((1 - val_)*(- RGBA.B) + RGBA.B) >> 0);
 
-           var HSL = {H: 0, S: 0, L: 0};
-           this.RGB2HSL(RGBA.R, RGBA.G, RGBA.B, HSL);
+                var HSL = {H: 0, S: 0, L: 0};
+                this.RGB2HSL(RGBA.R, RGBA.G, RGBA.B, HSL);
 
-           if(HSL.L*val_ > max_hls)
-               HSL.L = max_hls;
-           else
-               HSL.L = Math.max(0, (HSL.L * val_) >> 0);
-           this.HSL2RGB(HSL, RGBA);
-       }
-         else if (colorMod.name == "wordTint")
-         {
-             var _val = colorMod.val/255;
-             //RGBA.R = Math.max(0,  ((1 - _val)*(255 - RGBA.R) + RGBA.R) >> 0);
-             //RGBA.G = Math.max(0,  ((1 - _val)*(255 - RGBA.G) + RGBA.G) >> 0);
-             //RGBA.B = Math.max(0,  ((1 - _val)*(255 - RGBA.B) + RGBA.B) >> 0);
+                if(HSL.L*val_ > max_hls)
+                    HSL.L = max_hls;
+                else
+                    HSL.L = Math.max(0, (HSL.L * val_) >> 0);
+                this.HSL2RGB(HSL, RGBA);
+            }
+            else if (colorMod.name == "wordTint")
+            {
+                var _val = colorMod.val/255;
+                //RGBA.R = Math.max(0,  ((1 - _val)*(255 - RGBA.R) + RGBA.R) >> 0);
+                //RGBA.G = Math.max(0,  ((1 - _val)*(255 - RGBA.G) + RGBA.G) >> 0);
+                //RGBA.B = Math.max(0,  ((1 - _val)*(255 - RGBA.B) + RGBA.B) >> 0);
 
-             var HSL = {H: 0, S: 0, L: 0};
-             this.RGB2HSL(RGBA.R, RGBA.G, RGBA.B, HSL);
+                var HSL = {H: 0, S: 0, L: 0};
+                this.RGB2HSL(RGBA.R, RGBA.G, RGBA.B, HSL);
 
-             var L_ = HSL.L*_val + (255 - colorMod.val);
-             if(L_ > max_hls)
-                 HSL.L = max_hls;
-             else
-                 HSL.L = Math.max(0, (L_) >> 0);
-             this.HSL2RGB(HSL, RGBA);
-         }
-         else if (colorMod.name == "shade")
-         {
-             RGBA.R = Math.max(0, scRGB_to_sRGB(sRGB_to_scRGB(RGBA.R/255) * val)*255 >> 0);
-             RGBA.G = Math.max(0, scRGB_to_sRGB(sRGB_to_scRGB(RGBA.G/255) * val)*255 >> 0);
-             RGBA.B = Math.max(0, scRGB_to_sRGB(sRGB_to_scRGB(RGBA.B/255) * val)*255 >> 0);
-         }
-         else if (colorMod.name == "tint")
-         {
-             if(val > 0)
-             {
-                 RGBA.R = Math.max(0, scRGB_to_sRGB(1 - (1 - sRGB_to_scRGB(RGBA.R/255)) * val)*255 >> 0);
-                 RGBA.G = Math.max(0, scRGB_to_sRGB(1 - (1 - sRGB_to_scRGB(RGBA.G/255)) * val)*255 >> 0);
-                 RGBA.B = Math.max(0, scRGB_to_sRGB(1 - (1 - sRGB_to_scRGB(RGBA.B/255)) * val)*255 >> 0);
-             }
-             else
-             {
-                 RGBA.R = Math.max(0, scRGB_to_sRGB(1 - (1 - sRGB_to_scRGB(RGBA.R/255)) * (1-val))*255 >> 0);
-                 RGBA.G = Math.max(0, scRGB_to_sRGB(1 - (1 - sRGB_to_scRGB(RGBA.G/255)) * (1-val))*255 >> 0);
-                 RGBA.B = Math.max(0, scRGB_to_sRGB(1 - (1 - sRGB_to_scRGB(RGBA.B/255)) * (1-val))*255 >> 0);
-             }
-         }
+                var L_ = HSL.L*_val + (255 - colorMod.val);
+                if(L_ > max_hls)
+                    HSL.L = max_hls;
+                else
+                    HSL.L = Math.max(0, (L_) >> 0);
+                this.HSL2RGB(HSL, RGBA);
+            }
+            else if (colorMod.name == "shade")
+            {
+                /*
+                RGBA.R = Math.max(0, scRGB_to_sRGB(sRGB_to_scRGB(RGBA.R/255) * val)*255 >> 0);
+                RGBA.G = Math.max(0, scRGB_to_sRGB(sRGB_to_scRGB(RGBA.G/255) * val)*255 >> 0);
+                RGBA.B = Math.max(0, scRGB_to_sRGB(sRGB_to_scRGB(RGBA.B/255) * val)*255 >> 0);
+                */
+                if (val < 0) val = 0;
+                if (val > 1) val = 1;
+                RGBA.R = (RGBA.R * val) >> 0;
+                RGBA.G = (RGBA.G * val) >> 0;
+                RGBA.B = (RGBA.B * val) >> 0;
+            }
+            else if (colorMod.name == "tint")
+            {
+                /*
+                if(val > 0)
+                {
+                    RGBA.R = Math.max(0, scRGB_to_sRGB(1 - (1 - sRGB_to_scRGB(RGBA.R/255)) * val)*255 >> 0);
+                    RGBA.G = Math.max(0, scRGB_to_sRGB(1 - (1 - sRGB_to_scRGB(RGBA.G/255)) * val)*255 >> 0);
+                    RGBA.B = Math.max(0, scRGB_to_sRGB(1 - (1 - sRGB_to_scRGB(RGBA.B/255)) * val)*255 >> 0);
+                }
+                else
+                {
+                    RGBA.R = Math.max(0, scRGB_to_sRGB(1 - (1 - sRGB_to_scRGB(RGBA.R/255)) * (1-val))*255 >> 0);
+                    RGBA.G = Math.max(0, scRGB_to_sRGB(1 - (1 - sRGB_to_scRGB(RGBA.G/255)) * (1-val))*255 >> 0);
+                    RGBA.B = Math.max(0, scRGB_to_sRGB(1 - (1 - sRGB_to_scRGB(RGBA.B/255)) * (1-val))*255 >> 0);
+                }
+                */
+                if (val < 0) val = 0;
+                if (val > 1) val = 1;
+                RGBA.R = (255 - (255 - RGBA.R) * val) >> 0;
+                RGBA.G = (255 - (255 - RGBA.G) * val) >> 0;
+                RGBA.B = (255 - (255 - RGBA.B) * val) >> 0;
+            }
+            else if (colorMod.name == "gamma")
+            {
+                // LO
+                // 1/2.3 = 0.4347826;
+                RGBA.R = this.applyGamma(RGBA.R, 0.4347826);
+                RGBA.G = this.applyGamma(RGBA.G, 0.4347826);
+                RGBA.B = this.applyGamma(RGBA.B, 0.4347826);
+            }
+            else if (colorMod.name == "invGamma")
+            {
+                RGBA.R = this.applyGamma(RGBA.R, 2.3);
+                RGBA.G = this.applyGamma(RGBA.G, 2.3);
+                RGBA.B = this.applyGamma(RGBA.B, 2.3);
+            }
         }
+    },
+
+    applyGamma : function(c, gamma)
+    {
+        // LO
+        var _max = 256;
+        var _ret = (Math.pow(c / _max, gamma) * _max) >> 0;
+        if (_ret > 255)
+            _ret = 255;
+        return _ret;
     }
 };
 
@@ -2511,6 +2549,8 @@ function CGradFill()
 
     this.lin = null;
     this.path = null;
+
+    this.rotateWithShape = null;
 }
 
 CGradFill.prototype =
@@ -2688,6 +2728,9 @@ CGradFill.prototype =
 
         if (this.path)
             duplicate.path = this.path.createDuplicate();
+
+        if (this.rotateWithShape != null)
+            duplicate.rotateWithShape = this.rotateWithShape;
 
         return duplicate;
     },

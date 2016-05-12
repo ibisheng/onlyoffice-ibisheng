@@ -2208,6 +2208,12 @@ function CBinaryFileWriter()
                 oThis.StartRecord(c_oAscFill.FILL_TYPE_GRAD);
 
                 oThis.WriteUChar(g_nodeAttributeStart);
+
+                if (fill.rotateWithShape === false)
+                {
+                    oThis._WriteBool1(1, false);
+                }
+
                 oThis.WriteUChar(g_nodeAttributeEnd);
 
                 oThis.StartRecord(0);

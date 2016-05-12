@@ -2330,10 +2330,34 @@ CMatrix.prototype =
         var y1 = 0.0;
         var x2 = 1.0;
         var y2 = 0.0;
-        this.TransformPoint(x1, y1);
-        this.TransformPoint(x2, y2);
-        var a = Math.atan2(y2-y1,x2-x1);
-        return rad2deg(a);
+        var _x1 = this.TransformPointX(x1, y1);
+        var _y1 = this.TransformPointY(x1, y1);
+        var _x2 = this.TransformPointX(x2, y2);
+        var _y2 = this.TransformPointY(x2, y2);
+
+        var _y = _y2 - _y1;
+        var _x = _x2 - _x1;
+
+        if (Math.abs(_y) < 0.001)
+        {
+            if (_x > 0)
+                return 0;
+            else
+                return 180;
+        }
+        if (Math.abs(_x) < 0.001)
+        {
+            if (_y > 0)
+                return 90;
+            else
+                return 270;
+        }
+
+        var a = Math.atan2(_y,_x);
+        a = rad2deg(a);
+        if (a < 0)
+            a += 360;
+        return a;
     },
     // ������� ���������
     CreateDublicate : function(){
@@ -2373,47 +2397,7 @@ CMatrix.prototype =
     }
 };
 
-function CMatrixL()
-{
-    this.sx     = 1.0;
-    this.shx    = 0.0;
-    this.shy    = 0.0;
-    this.sy     = 1.0;
-    this.tx     = 0.0;
-    this.ty     = 0.0;
-}
-
-CMatrixL.prototype =
-{
-    CreateDublicate : function()
-    {
-        var m = new CMatrixL();
-        m.sx     = this.sx;
-        m.shx    = this.shx;
-        m.shy    = this.shy;
-        m.sy     = this.sy;
-        m.tx     = this.tx;
-        m.ty     = this.ty;
-        return m;
-    },
-    Reset : function()
-    {
-        this.sx     = 1.0;
-        this.shx    = 0.0;
-        this.shy    = 0.0;
-        this.sy     = 1.0;
-        this.tx     = 0.0;
-        this.ty     = 0.0;
-    },
-    TransformPointX : function(x,y)
-    {
-        return x * this.sx  + y * this.shx + this.tx;
-    },
-    TransformPointY : function(x,y)
-    {
-        return x * this.shy + y * this.sy  + this.ty;
-    }
-};
+var CMatrixL = CMatrix;
 
     function CGlobalMatrixTransformer()
     {

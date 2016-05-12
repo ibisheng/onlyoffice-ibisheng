@@ -2167,7 +2167,7 @@ function BinaryPPTYLoader()
                                 s.Skip2(1);
                                 break;
                             case 1:
-                                s.Skip2(1);
+                                uni_fill.fill.rotateWithShape = s.GetBool();
                                 break;
                             default:
                                 break;

@@ -1059,7 +1059,13 @@ CShapeDrawer.prototype =
                 var gradObj = null;
                 if (_fill.lin)
                 {
-                    var points = this.getGradientPoints(this.min_x, this.min_y, this.max_x, this.max_y, _fill.lin.angle, _fill.lin.scale);
+                    var _angle = _fill.lin.angle;
+                    if (_fill.rotateWithShape === false && this.Graphics.m_oTransform)
+                    {
+                        _angle -= (60000 * this.Graphics.m_oTransform.GetRotation());
+                    }
+
+                    var points = this.getGradientPoints(this.min_x, this.min_y, this.max_x, this.max_y, _angle, _fill.lin.scale);
                     gradObj = _ctx.createLinearGradient(points.x0, points.y0, points.x1, points.y1);
                 }
                 else if (_fill.path)
@@ -1408,7 +1414,13 @@ CShapeDrawer.prototype =
                         var points = null;
                         if (_fill.lin)
                         {
-                            points = this.getGradientPoints(this.min_x, this.min_y, this.max_x, this.max_y, _fill.lin.angle, _fill.lin.scale);
+                            var _angle = _fill.lin.angle;
+                            if (_fill.rotateWithShape === false && this.Graphics.m_oTransform)
+                            {
+                                _angle -= (60000 * this.Graphics.m_oTransform.GetRotation());
+                            }
+
+                            points = this.getGradientPoints(this.min_x, this.min_y, this.max_x, this.max_y, _angle, _fill.lin.scale);
                         }
                         else if (_fill.path)
                         {
