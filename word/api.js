@@ -5079,7 +5079,7 @@ asc_docs_api.prototype.asc_changeComment = function(Id, AscCommentData)
 
     if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_None, { Type : AscCommon.changestype_2_Comment, Id : Id } ) )
     {
-        var CommentData = new CCommentData();
+        var CommentData = new AscCommon.CCommentData();
         CommentData.Read_FromAscCommentData(AscCommentData);
 
         this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_ChangeComment);

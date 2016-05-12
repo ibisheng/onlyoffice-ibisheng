@@ -3646,7 +3646,7 @@ asc_docs_api.prototype.asc_changeComment = function(Id, AscCommentData)
 
     //if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_MoveComment, Id ) )
     {
-        var CommentData = new CCommentData();
+        var CommentData = new AscCommon.CCommentData();
         CommentData.Read_FromAscCommentData(AscCommentData);
 
         this.WordControl.m_oLogicDocument.Change_Comment( Id, CommentData );
