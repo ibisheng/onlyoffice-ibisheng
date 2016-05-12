@@ -4245,6 +4245,12 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
 			this.memory.WriteByte(c_oSerImageType2.Extent);
 			this.memory.WriteByte(c_oSerPropLenType.Variable);
 			this.bs.WriteItemWithLength(function(){oThis.WriteExtent(img.Extent);});
+			if(img.EffectExtent)
+			{
+				this.memory.WriteByte(c_oSerImageType2.EffectExtent);
+				this.memory.WriteByte(c_oSerPropLenType.Variable);
+				this.bs.WriteItemWithLength(function(){oThis.WriteEffectExtent(img.EffectExtent);});
+			}
 			if(null != img.GraphicObj.chart)
 			{
 				this.memory.WriteByte(c_oSerImageType2.Chart2);
