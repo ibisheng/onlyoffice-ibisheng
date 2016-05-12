@@ -1377,7 +1377,7 @@ asc_docs_api.prototype.UpdateParagraphProp = function(ParaPr, bParaPr){
                     ListType.SubType = undefined;
                     if(AscFormat.isRealNumber(ParaPr.Bullet.bulletType.AutoNumType))
                     {
-                        var AutoNumType = g_NumberingArr[ParaPr.Bullet.bulletType.AutoNumType] - 99;
+                        var AutoNumType = AscCommonWord.g_NumberingArr[ParaPr.Bullet.bulletType.AutoNumType] - 99;
                         if(AutoNumType > 0 && AutoNumType < 9)
                         {
                             ListType.SubType = AutoNumType;
