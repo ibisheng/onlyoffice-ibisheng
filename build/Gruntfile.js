@@ -61,11 +61,14 @@ module.exports = function(grunt) {
 		var sdkTmp = 'sdk-tmp.js', sdkAllTmp = 'sdk-all-tmp.js', sdkAllMinTmp = 'sdk-all-min-tmp.js';
 		var srcFilesMin = packageFile['compile']['sdk']['min'];
 		var srcFilesAll = packageFile['compile']['sdk']['common'];
-		var sdkOpt = {
-			compilation_level: 'WHITESPACE_ONLY',
-			warning_level: 'QUIET',
-			externs: packageFile['compile']['sdk']['externs']
+		var sdkOpt = {};
+		
+		if (!grunt.option('noclosure')) {
+			sdkOpt = {
+				banner: '(function(window, undefined) {',
+				footer: '})(window);'
 		};
+		}
 		
 		if (grunt.option('mobile')) {				
 			srcFilesMin = packageFile['compile']['sdk']['mobile_banners']['min'].concat(srcFilesMin);
@@ -105,10 +108,7 @@ module.exports = function(grunt) {
 					dest: sdkAllMinTmp
 				},
 				sdk: {
-					options: {
-						banner: '(function(window, undefined) {',
-						footer: '})(window);'
-					},
+					options: sdkOpt,
 					src: srcFilesAll,
 					dest: sdkAllTmp
 				},
