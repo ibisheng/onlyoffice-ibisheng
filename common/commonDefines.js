@@ -774,6 +774,12 @@ var c_oAscPrintDefaultSettings = {
     PageGridLines: 0,
     PageHeadings: 0
 };
+  
+  var c_oZoomType = {
+    FitToPage   : 1,
+    FitToWidth  : 2,
+    CustomMode  : 3
+  };
 
 var c_oAscEncodings = [
     [ 0,    28596, "ISO-8859-6",       "Arabic (ISO 8859-6)" ],
@@ -1396,6 +1402,7 @@ window['Asc']['c_oAscMaxCellOrCommentLength'] = window['Asc'].c_oAscMaxCellOrCom
   window["AscCommon"].c_oAscUrlType = c_oAscUrlType;
   window["AscCommon"].c_oAscMouseMoveDataTypes = c_oAscMouseMoveDataTypes;
   window["AscCommon"].c_oAscPrintDefaultSettings = c_oAscPrintDefaultSettings;
+  window["AscCommon"].c_oZoomType = c_oZoomType;
   window["AscCommon"].c_oAscEncodings = c_oAscEncodings;
   window["AscCommon"].c_oAscEncodingsMap = c_oAscEncodingsMap;
   window["AscCommon"].c_oAscCodePageUtf8 = c_oAscCodePageUtf8;

@@ -411,6 +411,7 @@ function asc_docs_api(name)
     this.tmpSlideDiv = null;
     this.tmpTextArtDiv = null;
     this.tmpViewRulers = null;
+    this.tmpZoomType = null;
 
     this.DocumentUrl = "";
     this.bNoSendComments = false;
@@ -3413,12 +3414,24 @@ asc_docs_api.prototype.zoomOut = function(){
     this.WordControl.zoom_Out();
 };
 asc_docs_api.prototype.zoomFitToPage = function(){
+  if (!this.isLoadFullApi) {
+    this.tmpZoomType = AscCommon.c_oZoomType.FitToPage;
+    return;
+  }
     this.WordControl.zoom_FitToPage();
 };
 asc_docs_api.prototype.zoomFitToWidth = function(){
+  if (!this.isLoadFullApi) {
+    this.tmpZoomType = AscCommon.c_oZoomType.FitToWidth;
+    return;
+  }
     this.WordControl.zoom_FitToWidth();
 };
 asc_docs_api.prototype.zoomCustomMode = function(){
+  if (!this.isLoadFullApi) {
+    this.tmpZoomType = AscCommon.c_oZoomType.CustomMode;
+    return;
+  }
     this.WordControl.m_nZoomType = 0;
     this.WordControl.zoom_Fire();
 };
@@ -5146,6 +5159,19 @@ asc_docs_api.prototype._onEndLoadSdk = function() {
   }
   if (null !== this.tmpViewRulers) {
     this.asc_SetViewRulers(this.tmpViewRulers);
+  }
+  if (null !== this.tmpZoomType) {
+    switch(this.tmpZoomType) {
+      case AscCommon.c_oZoomType.FitToPage:
+        this.zoomFitToPage();
+        break;
+      case AscCommon.c_oZoomType.FitToWidth:
+        this.zoomFitToWidth();
+        break;
+      case AscCommon.c_oZoomType.CustomMode:
+        this.zoomCustomMode();
+        break;
+    }
   }
 
   this.asc_setViewMode(this.isViewMode);
