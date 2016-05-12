@@ -3033,4 +3033,6 @@ CSlideBoundsChecker.prototype =
 //--------------------------------------------------------export----------------------------------------------------
 window['AscCommon'] = window['AscCommon'] || {};
 window['AscCommon'].COverlay = COverlay;
+window['AscCommon'].TRACK_CIRCLE_RADIUS = TRACK_CIRCLE_RADIUS;
+window['AscCommon'].TRACK_DISTANCE_ROTATE = TRACK_DISTANCE_ROTATE;
 window['AscCommon'].CAutoshapeTrack = CAutoshapeTrack;
