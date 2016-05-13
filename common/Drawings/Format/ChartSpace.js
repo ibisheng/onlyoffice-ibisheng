@@ -465,8 +465,15 @@ function CheckIncDecFontSize(oElement, bIncrease, oDrawingDocument,nDefaultSize)
         oCopyTextPr.FontSize = FontSize_IncreaseDecreaseValue( bIncrease, isRealNumber(oCopyTextPr.FontSize) ? oCopyTextPr.FontSize : nDefaultSize);
         oParaPr.DefaultRunPr = oCopyTextPr;
         oElement.txPr.content.Content[0].Set_Pr(oParaPr);
+            if(oElement.tx && oElement.tx.rich)
+            {
+                oElement.tx.rich.content.Set_ApplyToAll(true);
+                oElement.tx.rich.content.Paragraph_IncDecFontSize(bIncrease);
+                oElement.tx.rich.content.Set_ApplyToAll(false);
+
+            }
+        }
     }
-}
 
 function CChartSpace()
 {
@@ -12602,4 +12609,5 @@ function checkBlipFillRasterImages(sp)
 
     window['AscFormat'].initStyleManager = initStyleManager;
     window['AscFormat'].CheckParagraphTextPr = CheckParagraphTextPr;
+    window['AscFormat'].CheckObjectTextPr = CheckObjectTextPr;
 })(window);

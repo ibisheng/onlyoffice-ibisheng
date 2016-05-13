@@ -1382,7 +1382,7 @@ DrawingObjectsController.prototype =
                 {
                     if(f === CDocumentContent.prototype.Paragraph_Add && args[0].Type === para_TextPr)
                     {
-                        CheckObjectTextPr(arr[i], args[0].Value, oThis.getDrawingDocument());
+                        AscFormat.CheckObjectTextPr(arr[i], args[0].Value, oThis.getDrawingDocument());
                     }
                     if(f === CDocumentContent.prototype.Paragraph_IncDecFontSize)
                     {
@@ -2539,6 +2539,7 @@ DrawingObjectsController.prototype =
         var style_index = chartSettings.getStyle();
         var sRange = chartSettings.getRange();
         var b_clear_formatting = false;
+        chartSpace.resetSelection(true);
         if(this.drawingObjects && this.drawingObjects.getWorksheet && typeof sRange === "string" && sRange.length > 0)
         {
             var ws_view = this.drawingObjects.getWorksheet();
