@@ -1901,7 +1901,7 @@ function angleInterfaceToFormat(val)
 function getUniqueKeys(array) {
   var i, o = {};
   for (i = 0; i < array.length; ++i) {
-    o[array[i]] = !o.hasOwnProperty(array[i]);
+    o[array[i]] = o.hasOwnProperty(array[i]);
   }
   return o;
 }
@@ -3496,7 +3496,7 @@ Woorksheet.prototype._updateConditionalFormatting = function(range) {
   var aRules, oRule;
   var oRuleElement = null;
   var o;
-  var i, j, cell, sqref, values, tmp, min, max, dxf;
+  var i, j, cell, sqref, values, tmp, min, max, dxf, condition;
   for (i = 0; i < aCFs.length; ++i) {
     sqref = aCFs[i].sqref;
     // ToDo убрать null === sqref когда научимся мультиселект обрабатывать (\\192.168.5.2\source\DOCUMENTS\XLSX\Matematika Quantum Sedekah.xlsx)
@@ -3549,8 +3549,16 @@ Woorksheet.prototype._updateConditionalFormatting = function(range) {
               }
             }
             break;
+          case Asc.ECfType.duplicateValues:
           case Asc.ECfType.uniqueValues:
-            o = getUniqueKeys(values.v);
+            if (oRule.dxf) {
+              condition = oRule.type === Asc.ECfType.uniqueValues;
+              values = this._getValuesForConditionalFormatting(sqref);
+              o = getUniqueKeys(values.v);
+              for (cell = 0; cell < values.c.length; ++cell) {
+                values.c[cell].setConditionalFormattingStyle((condition === o[values.v[cell]]) ? null : oRule.dxf);
+              }
+            }
             break;
         }
       }
