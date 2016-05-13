@@ -23266,6 +23266,13 @@ CTitle.prototype =
             }
             this.tx.setRich(this.txBody.createDuplicate2());
             this.tx.rich.setParent(this);
+            if(this.txPr && this.txPr.content && this.txPr.content.Content[0] && this.txPr.content.Content[0].Pr.DefaultRunPr)
+            {
+                for(var i = 0; i < this.tx.rich.content.Content.length; ++i)
+                {
+                    AscFormat.CheckParagraphTextPr(this.tx.rich.content.Content[i], this.txPr.content.Content[0].Pr.DefaultRunPr);
+                }
+            }
             var selection_state = this.txBody.content.Get_SelectionState();
             this.txBody = this.tx.rich;
             this.txBody.content.Set_SelectionState(selection_state, selection_state.length - 1);
