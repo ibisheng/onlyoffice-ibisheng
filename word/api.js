@@ -196,13 +196,13 @@ CMailMergeSendData.prototype.put_UserId = function(v){this["userId"] = v;};
 
 /**
  *
- * @param name
+ * @param config
  * @constructor
  * @extends {AscCommon.baseEditorsApi}
  */
-function asc_docs_api(name)
+function asc_docs_api(config)
 {
-  asc_docs_api.superclass.constructor.call(this, name, AscCommon.c_oEditorId.Word);
+  asc_docs_api.superclass.constructor.call(this, config, AscCommon.c_oEditorId.Word);
 
     if (window["AscDesktopEditor"])
     {

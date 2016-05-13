@@ -33,23 +33,22 @@ var editor;
 
   /**
    *
-   * @param name
-   * @param inputName
+   * @param config
    * @param eventsHandlers
    * @constructor
    * @returns {spreadsheet_api}
    * @extends {AscCommon.baseEditorsApi}
    */
-  function spreadsheet_api(name, inputName, eventsHandlers) {
-    spreadsheet_api.superclass.constructor.call(this, name, AscCommon.c_oEditorId.Spreadsheet);
+  function spreadsheet_api(config) {
+    spreadsheet_api.superclass.constructor.call(this, config, AscCommon.c_oEditorId.Spreadsheet);
 
     /************ private!!! **************/
-    this.topLineEditorName = inputName;
+    this.topLineEditorName = config['id-input'] || '';
     this.topLineEditorElement = null;
 
     this.controller = null;
 
-    this.handlers = new AscCommonExcel.asc_CHandlersList(eventsHandlers);
+    this.handlers = new AscCommonExcel.asc_CHandlersList();
     // Вид печати
     this.adjustPrint = null;
 

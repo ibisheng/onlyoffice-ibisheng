@@ -12,12 +12,12 @@ var c_oAscAsyncActionType = Asc.c_oAscAsyncActionType;
 var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 
 /** @constructor */
-function baseEditorsApi(name, editorId) {
+function baseEditorsApi(config, editorId) {
   this.editorId = editorId;
   this.isLoadFullApi = false;
   this.openResult = null;
 
-  this.HtmlElementName = name;
+  this.HtmlElementName = config['id-view'] || '';
   this.HtmlElement = null;
 
   this.isMobileVersion = false;
