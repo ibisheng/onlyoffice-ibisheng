@@ -91,9 +91,6 @@ module.exports = function(grunt) {
 			srcFilesMin = srcFilesMin.concat(packageFile['compile']['sdk']['desktop']['min']);
 			srcFilesAll = srcFilesAll.concat(packageFile['compile']['sdk']['desktop']['common']);
 		}
-		if (grunt.option('builder')) {
-			srcFilesAll = srcFilesAll.concat(packageFile['compile']['sdk']['builder']);
-		}
 		
 		grunt.initConfig({
 			concat: {

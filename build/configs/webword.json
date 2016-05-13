@@ -149,7 +149,9 @@
         "../word/Math/radical.js",
         "../word/Math/operators.js",
         "../word/Math/accent.js",
-        "../word/Math/borderBox.js"
+        "../word/Math/borderBox.js",
+		
+		"../word/apiBuilder.js"
       ],
       "private": [
         "../common/Private/versionHistory.js",
@@ -158,9 +160,6 @@
         "../word/Private/MailMerge.js",
         "../word/Private/TrackRevisions.js",
         "../common/Private/Locks.js"
-      ],
-      "builder": [
-        "../word/apiBuilder.js"
       ],
       "desktop": {
         "min": [
