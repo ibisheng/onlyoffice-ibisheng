@@ -1067,7 +1067,9 @@ CDLbl.prototype =
         {
             if(noCopyTxBody === true)
             {
+                var oldParent = dLbl.txPr.parent;
                 this.setTxPr(dLbl.txPr);
+                dLbl.txPr.parent = oldParent;
             }
             else
             {
@@ -2652,6 +2654,10 @@ CBarChart.prototype =
     {
         History.Add(this, {Type: AscDFH.historyitem_BarChart_SetDLbls, oldPr: this.dLbls, newPr:pr});
         this.dLbls = pr;
+        if(this.dLbls)
+        {
+            this.dLbls.setParent(this);
+        }
         if(this.parent && this.parent.parent && this.parent.parent.parent)
         {
             this.parent.parent.parent.handleUpdateDataLabels();

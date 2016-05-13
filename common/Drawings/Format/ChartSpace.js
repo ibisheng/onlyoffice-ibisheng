@@ -827,6 +827,11 @@ CChartSpace.prototype.paragraphAdd = function(paraItem, bRecalculate)
                     {
                         entry = new CLegendEntry();
                         entry.setIdx(this.selection.legendEntry);
+                if(this.selection.legend.txPr)
+                {
+                    entry.setTxPr(this.selection.legend.txPr.createDuplicate());
+                }
+
                         this.selection.legend.addLegendEntry(entry);
                     }
                     if(entry)
@@ -880,7 +885,12 @@ CChartSpace.prototype.paragraphAdd = function(paraItem, bRecalculate)
                             {
                                 dLbl = new CDLbl();
                                 dLbl.setIdx(pt.idx);
+                        if(ser.dLbls.txPr)
+                        {
+                            dLbl.merge(ser.dLbls);
+                        }
                                 ser.dLbls.addDLbl(dLbl);
+
                             }
                         fCallback(dLbl, value, this.getDrawingDocument(), 10);
                         }
@@ -7695,7 +7705,7 @@ CChartSpace.prototype.recalculateDLbls = function()
                         compiled_dlb.merge(this.chart.plotArea.chart.dLbls.findDLblByIdx(pt.idx), false);
                     compiled_dlb.merge(ser.dLbls);
                     if(ser.dLbls)
-                        compiled_dlb.merge(ser.dLbls.findDLblByIdx(pt.idx), true);
+                    compiled_dlb.merge(ser.dLbls.findDLblByIdx(pt.idx));
 
                     if(compiled_dlb.checkNoLbl())
                     {

@@ -4769,7 +4769,7 @@ ParaDrawing.prototype =
             c.setExtent(this.Extent.W, this.Extent.H);
         }
         var EE = this.EffectExtent;
-        if(EE.L > 0 || EE.T > 0 || EE.R || EE.B)
+        if(EE.L > 0 || EE.T > 0 || EE.R > 0 || EE.B > 0)
         {
             c.setEffectExtent(EE.L, EE.T, EE.R, EE.B);
         }
