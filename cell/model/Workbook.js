@@ -3509,8 +3509,8 @@ Woorksheet.prototype._updateConditionalFormatting = function(range) {
         oRule = aRules[j];
 
         // ToDo aboveAverage, beginsWith, cellIs, containsBlanks, containsErrors,
-        // ToDo containsText, dataBar, duplicateValues, endsWith, expression, iconSet, notContainsBlanks,
-        // ToDo notContainsErrors, notContainsText, timePeriod, top10, uniqueValues (page 2679)
+        // ToDo dataBar, endsWith, expression, iconSet, notContainsBlanks,
+        // ToDo notContainsErrors, timePeriod, top10 (page 2679)
         switch (oRule.type) {
           case Asc.ECfType.colorScale:
             if (1 !== oRule.aRuleElements.length) {
@@ -3557,6 +3557,16 @@ Woorksheet.prototype._updateConditionalFormatting = function(range) {
               o = getUniqueKeys(values.v);
               for (cell = 0; cell < values.c.length; ++cell) {
                 values.c[cell].setConditionalFormattingStyle((condition === o[values.v[cell]]) ? null : oRule.dxf);
+              }
+            }
+            break;
+          case Asc.ECfType.containsText:
+          case Asc.ECfType.notContainsText:
+            if (oRule.dxf) {
+              condition = oRule.type === Asc.ECfType.containsText;
+              values = this._getValuesForConditionalFormatting(sqref);
+              for (cell = 0; cell < values.c.length; ++cell) {
+                values.c[cell].setConditionalFormattingStyle((condition === (-1 === values.v[cell].indexOf(oRule.text))) ? null : oRule.dxf);
               }
             }
             break;
