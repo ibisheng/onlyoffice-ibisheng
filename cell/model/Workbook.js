@@ -5266,7 +5266,7 @@ Woorksheet.prototype._RecalculatedFunctions=function(cell,bad,setCellFormat){
 		res = new AscCommonExcel.cError( AscCommonExcel.cErrorType.bad_reference )
 	}
 	if(res){
-		if( res.type == cElementType.cell){
+		if( res.type == cElementType.cell || res.type == cElementType.cell3D){
 			var nF = res.numFormat;
 			res = res.getValue();
 			res.numFormat = nF;
