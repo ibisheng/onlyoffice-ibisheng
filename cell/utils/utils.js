@@ -699,6 +699,18 @@
 			return sRes;
 		};
 
+		function MultiplyRange(ranges) {
+			this.ranges = ranges;
+		}
+		MultiplyRange.prototype.isIntersect = function(range) {
+			for (var i = 0; i < this.ranges.length; ++i) {
+				if (range.isIntersect(this.ranges[i])) {
+					return true;
+				}
+			}
+			return false;
+		};
+
 		function VisibleRange(visibleRange, offsetX, offsetY) {
 			this.visibleRange = visibleRange;
 			this.offsetX = offsetX;
@@ -1607,6 +1619,7 @@
 		window["AscCommonExcel"].Range3D = Range3D;
 		window["AscCommonExcel"].ActiveRange = ActiveRange;
 		window["AscCommonExcel"].FormulaRange = FormulaRange;
+		window["AscCommonExcel"].MultiplyRange = MultiplyRange;
 		window["AscCommonExcel"].VisibleRange = VisibleRange;
 		window["AscCommonExcel"].g_oRangeCache = g_oRangeCache;
 

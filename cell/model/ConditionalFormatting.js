@@ -15,50 +15,41 @@
 	 * @memberOf Asc
 	 */
 	function CConditionalFormatting () {
-		if ( !(this instanceof CConditionalFormatting) ) {
-			return new CConditionalFormatting ();
-		}
-
-		this.Pivot = false;
-		this.SqRef = null;
+		this.pivot = false;
+		this.sqref = null;
 		this.aRules = [];
-
-		this.SqRefRange = null;
 
 		return this;
 	}
-	CConditionalFormatting.prototype.clone = function(ws) {
+	CConditionalFormatting.prototype.setSqref = function(sqref) {
+		this.sqref = AscCommonExcel.g_oRangeCache.getAscRange(sqref);
+	};
+	CConditionalFormatting.prototype.clone = function() {
 		var i, res = new CConditionalFormatting();
-		res.Pivot = this.Pivot;
-		res.SqRef = this.SqRef;
+		res.pivot = this.pivot;
+		res.sqref = this.sqref ? this.sqref.clone() : null;
 		for (i = 0; i < this.aRules.length; ++i)
 			res.aRules.push(this.aRules[i].clone());
 
-		res.recalc(ws);
 		return res;
-	};
-	CConditionalFormatting.prototype.recalc = function(ws) {
-		this.SqRefRange = ws.getRange2(this.SqRef);
 	};
 
 	function CConditionalFormattingRule () {
-		if ( !(this instanceof CConditionalFormattingRule) ) {
-			return new CConditionalFormattingRule ();
-		}
-
-		this.AboveAverage = true;
-		this.Bottom = false;
+		this.aboveAverage = true;
+		this.activePresent = false;
+		this.bottom = false;
 		this.dxf = null;
-		this.EqualAverage = false;
-		this.Operator = null;
-		this.Percent = false;
-		this.Priority = null;
-		this.Rank = null;
-		this.StdDev = null;
-		this.StopIfTrue = false;
-		this.Text = null;
-		this.TimePeriod = null;
-		this.Type = null;
+		this.equalAverage = false;
+		this.id = null;
+		this.operator = null;
+		this.percent = false;
+		this.priority = null;
+		this.rank = null;
+		this.stdDev = null;
+		this.stopIfTrue = false;
+		this.text = null;
+		this.timePeriod = null;
+		this.type = null;
 
 		this.aRuleElements = [];
 
@@ -66,20 +57,20 @@
 	}
 	CConditionalFormattingRule.prototype.clone = function() {
 		var i, res = new CConditionalFormattingRule();
-		res.AboveAverage = this.AboveAverage;
-		res.Bottom = this.Bottom;
+		res.aboveAverage = this.aboveAverage;
+		res.bottom = this.bottom;
 		if (this.dxf)
 			res.dxf = this.dxf.clone();
-		res.EqualAverage = this.EqualAverage;
-		res.Operator = this.Operator;
-		res.Percent = this.Percent;
-		res.Priority = this.Priority;
-		res.Rank = this.Rank;
-		res.StdDev = this.StdDev;
-		res.StopIfTrue = this.StopIfTrue;
-		res.Text = this.Text;
-		res.TimePeriod = this.TimePeriod;
-		res.Type = this.Type;
+		res.equalAverage = this.equalAverage;
+		res.operator = this.operator;
+		res.percent = this.percent;
+		res.priority = this.priority;
+		res.rank = this.rank;
+		res.stdDev = this.stdDev;
+		res.stopIfTrue = this.stopIfTrue;
+		res.text = this.text;
+		res.timePeriod = this.timePeriod;
+		res.type = this.type;
 
 		for (i = 0; i < this.aRuleElements.length; ++i)
 			res.aRuleElements.push(this.aRuleElements[i].clone());
@@ -87,10 +78,6 @@
 	};
 
 	function CColorScale () {
-		if ( !(this instanceof CColorScale) ) {
-			return new CColorScale ();
-		}
-
 		this.aCFVOs = [];
 		this.aColors = [];
 
@@ -106,10 +93,6 @@
 	};
 
 	function CDataBar () {
-		if ( !(this instanceof CDataBar) ) {
-			return new CDataBar ();
-		}
-
 		this.MaxLength = 90;
 		this.MinLength = 10;
 		this.ShowValue = true;
@@ -132,10 +115,6 @@
 	};
 
 	function CFormulaCF () {
-		if ( !(this instanceof CFormulaCF) ) {
-			return new CFormulaCF ();
-		}
-
 		this.Text = null;
 
 		return this;
@@ -147,9 +126,6 @@
 	};
 
 	function CIconSet () {
-		if ( !(this instanceof CIconSet) ) {
-			return new CIconSet ();
-		}
 		this.IconSet = Asc.EIconSetType.Traffic3Lights1;
 		this.Percent = true;
 		this.Reverse = false;
@@ -171,10 +147,6 @@
 	};
 
 	function CConditionalFormatValueObject () {
-		if ( !(this instanceof CConditionalFormatValueObject) ) {
-			return new CConditionalFormatValueObject ();
-		}
-
 		this.Gte = true;
 		this.Type = null;
 		this.Val = null;

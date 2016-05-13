@@ -5575,7 +5575,6 @@
                 res = this.bcr.Read1(length, function (t, l) {
                     return oThis.ReadConditionalFormatting(t, l, oConditionalFormatting);
                 });
-                oConditionalFormatting.recalc(oWorksheet);
                 oWorksheet.aConditionalFormatting.push(oConditionalFormatting);
             } else if (c_oSerWorksheetsTypes.SheetViews === type) {
                 res = this.bcr.Read1(length, function (t, l) {
@@ -6297,9 +6296,9 @@
             var oThis = this;
             var oConditionalFormattingRule = null;
             if (c_oSer_ConditionalFormatting.Pivot === type)
-                oConditionalFormatting.Pivot = this.stream.GetBool();
+                oConditionalFormatting.pivot = this.stream.GetBool();
             else if (c_oSer_ConditionalFormatting.SqRef === type) {
-                oConditionalFormatting.SqRef = this.stream.GetString2LE(length);
+                oConditionalFormatting.setSqref(this.stream.GetString2LE(length));
             }
             else if (c_oSer_ConditionalFormatting.ConditionalFormattingRule === type) {
                 oConditionalFormattingRule = new AscCommonExcel.CConditionalFormattingRule();
@@ -6318,34 +6317,34 @@
             var oConditionalFormattingRuleElement = null;
 
             if (c_oSer_ConditionalFormattingRule.AboveAverage === type)
-                oConditionalFormattingRule.AboveAverage = this.stream.GetBool();
+                oConditionalFormattingRule.aboveAverage = this.stream.GetBool();
             else if (c_oSer_ConditionalFormattingRule.Bottom === type)
-                oConditionalFormattingRule.Bottom = this.stream.GetBool();
+                oConditionalFormattingRule.bottom = this.stream.GetBool();
             else if (c_oSer_ConditionalFormattingRule.DxfId === type)
             {
                 var DxfId = this.stream.GetULongLE();
                 oConditionalFormattingRule.dxf = this.Dxfs[DxfId];
             }
             else if (c_oSer_ConditionalFormattingRule.EqualAverage === type)
-                oConditionalFormattingRule.EqualAverage = this.stream.GetBool();
+                oConditionalFormattingRule.equalAverage = this.stream.GetBool();
             else if (c_oSer_ConditionalFormattingRule.Operator === type)
-                oConditionalFormattingRule.Operator = this.stream.GetUChar();
+                oConditionalFormattingRule.operator = this.stream.GetUChar();
             else if (c_oSer_ConditionalFormattingRule.Percent === type)
-                oConditionalFormattingRule.Percent = this.stream.GetBool();
+                oConditionalFormattingRule.percent = this.stream.GetBool();
             else if (c_oSer_ConditionalFormattingRule.Priority === type)
-                oConditionalFormattingRule.Priority = this.stream.GetULongLE();
+                oConditionalFormattingRule.priority = this.stream.GetULongLE();
             else if (c_oSer_ConditionalFormattingRule.Rank === type)
-                oConditionalFormattingRule.Rank = this.stream.GetULongLE();
+                oConditionalFormattingRule.rank = this.stream.GetULongLE();
             else if (c_oSer_ConditionalFormattingRule.StdDev === type)
-                oConditionalFormattingRule.StdDev = this.stream.GetULongLE();
+                oConditionalFormattingRule.stdDev = this.stream.GetULongLE();
             else if (c_oSer_ConditionalFormattingRule.StopIfTrue === type)
-                oConditionalFormattingRule.StopIfTrue = this.stream.GetBool();
+                oConditionalFormattingRule.stopIfTrue = this.stream.GetBool();
             else if (c_oSer_ConditionalFormattingRule.Text === type)
-                oConditionalFormattingRule.Text = this.stream.GetString2LE(length);
+                oConditionalFormattingRule.text = this.stream.GetString2LE(length);
             else if (c_oSer_ConditionalFormattingRule.TimePeriod === type)
-                oConditionalFormattingRule.TimePeriod = this.stream.GetString2LE(length);
+                oConditionalFormattingRule.timePeriod = this.stream.GetString2LE(length);
             else if (c_oSer_ConditionalFormattingRule.Type === type)
-                oConditionalFormattingRule.Type = this.stream.GetUChar();
+                oConditionalFormattingRule.type = this.stream.GetUChar();
             else if (c_oSer_ConditionalFormattingRule.ColorScale === type) {
                 oConditionalFormattingRuleElement = new AscCommonExcel.CColorScale();
                 res = this.bcr.Read1(length, function (t, l) {
