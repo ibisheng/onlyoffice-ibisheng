@@ -6,6 +6,7 @@
 var TRACK_CIRCLE_RADIUS     = 5;
 var TRACK_RECT_SIZE2        = 4;
 var TRACK_RECT_SIZE         = 8;
+var TRACK_RECT_SIZE_CT      = 6;
 var TRACK_DISTANCE_ROTATE   = 25;
 var TRACK_DISTANCE_ROTATE2  = 25;
 var TRACK_ADJUSTMENT_SIZE   = 10;
@@ -944,6 +945,9 @@ CAutoshapeTrack.prototype =
         var bIsRectsTrackY = (_len_y >= 30) ? true : false;
         var bIsRectsTrack = (bIsRectsTrackX || bIsRectsTrackY) ? true : false;
 
+        if (bIsRectsTrack && (type == AscFormat.TYPE_TRACK.CHART_TEXT))
+            bIsRectsTrack = false;
+
 		if (nType == 2)
 		{
 			var _tmp = bIsRectsTrackX;
@@ -1010,7 +1014,10 @@ CAutoshapeTrack.prototype =
                         ctx.beginPath();
                     }
 
-                    ctx.fillStyle = _style_white;
+                    ctx.fillStyle = (type != AscFormat.TYPE_TRACK.CHART_TEXT) ? _style_white : _style_blue;
+                    var TRACK_RECT_SIZE_CUR = (type != AscFormat.TYPE_TRACK.CHART_TEXT) ? TRACK_RECT_SIZE : TRACK_RECT_SIZE_CT;
+                    if (type == AscFormat.TYPE_TRACK.CHART_TEXT)
+                        ctx.strokeStyle = _style_white;
 
                     if (bIsEllipceCorner)
                     {
@@ -1024,13 +1031,13 @@ CAutoshapeTrack.prototype =
                     }
                     else
                     {
-                        overlay.AddRect2(x1 + 0.5, y1 + 0.5, TRACK_RECT_SIZE);
+                        overlay.AddRect2(x1 + 0.5, y1 + 0.5, TRACK_RECT_SIZE_CUR);
                         if (!isLine)
                         {
-                            overlay.AddRect2(x2 + 0.5, y2 + 0.5, TRACK_RECT_SIZE);
-                            overlay.AddRect2(x3 + 0.5, y3 + 0.5, TRACK_RECT_SIZE);
+                            overlay.AddRect2(x2 + 0.5, y2 + 0.5, TRACK_RECT_SIZE_CUR);
+                            overlay.AddRect2(x3 + 0.5, y3 + 0.5, TRACK_RECT_SIZE_CUR);
                         }
-                        overlay.AddRect2(x4 + 0.5, y4 + 0.5, TRACK_RECT_SIZE);
+                        overlay.AddRect2(x4 + 0.5, y4 + 0.5, TRACK_RECT_SIZE_CUR);
                     }
 
                     if (bIsRectsTrack && !isLine)
@@ -1237,7 +1244,10 @@ CAutoshapeTrack.prototype =
                         ctx.beginPath();
                     }
 
-                    ctx.fillStyle = _style_white;
+                    ctx.fillStyle = (type != AscFormat.TYPE_TRACK.CHART_TEXT) ? _style_white : _style_blue;
+                    var TRACK_RECT_SIZE_CUR = (type != AscFormat.TYPE_TRACK.CHART_TEXT) ? TRACK_RECT_SIZE : TRACK_RECT_SIZE_CT;
+                    if (type == AscFormat.TYPE_TRACK.CHART_TEXT)
+                        ctx.strokeStyle = _style_white;
 
 					if (!nIsCleverWithTransform)
 					{
@@ -1253,13 +1263,13 @@ CAutoshapeTrack.prototype =
 						}
 						else
 						{
-							overlay.AddRect3(x1, y1, TRACK_RECT_SIZE, ex1, ey1, ex2, ey2);
+							overlay.AddRect3(x1, y1, TRACK_RECT_SIZE_CUR, ex1, ey1, ex2, ey2);
 							if (!isLine)
 							{
-								overlay.AddRect3(x2, y2, TRACK_RECT_SIZE, ex1, ey1, ex2, ey2);
-								overlay.AddRect3(x3, y3, TRACK_RECT_SIZE, ex1, ey1, ex2, ey2);
+								overlay.AddRect3(x2, y2, TRACK_RECT_SIZE_CUR, ex1, ey1, ex2, ey2);
+								overlay.AddRect3(x3, y3, TRACK_RECT_SIZE_CUR, ex1, ey1, ex2, ey2);
 							}
-							overlay.AddRect3(x4, y4, TRACK_RECT_SIZE, ex1, ey1, ex2, ey2);
+							overlay.AddRect3(x4, y4, TRACK_RECT_SIZE_CUR, ex1, ey1, ex2, ey2);
 						}
 					}
 					else
@@ -1278,15 +1288,15 @@ CAutoshapeTrack.prototype =
 						{
                             if (!isLine)
                             {
-                                overlay.AddRect2(_x1 + 0.5, _y1 + 0.5, TRACK_RECT_SIZE);
-                                overlay.AddRect2(_x2 + 0.5, _y2 + 0.5, TRACK_RECT_SIZE);
-                                overlay.AddRect2(_x3 + 0.5, _y3 + 0.5, TRACK_RECT_SIZE);
-                                overlay.AddRect2(_x4 + 0.5, _y4 + 0.5, TRACK_RECT_SIZE);
+                                overlay.AddRect2(_x1 + 0.5, _y1 + 0.5, TRACK_RECT_SIZE_CUR);
+                                overlay.AddRect2(_x2 + 0.5, _y2 + 0.5, TRACK_RECT_SIZE_CUR);
+                                overlay.AddRect2(_x3 + 0.5, _y3 + 0.5, TRACK_RECT_SIZE_CUR);
+                                overlay.AddRect2(_x4 + 0.5, _y4 + 0.5, TRACK_RECT_SIZE_CUR);
                             }
                             else
                             {
-                                overlay.AddRect2(x1 + 0.5, y1 + 0.5, TRACK_RECT_SIZE);
-                                overlay.AddRect2(x4 + 0.5, y4 + 0.5, TRACK_RECT_SIZE);
+                                overlay.AddRect2(x1 + 0.5, y1 + 0.5, TRACK_RECT_SIZE_CUR);
+                                overlay.AddRect2(x4 + 0.5, y4 + 0.5, TRACK_RECT_SIZE_CUR);
                             }
 						}
 					}
