@@ -3477,9 +3477,7 @@ Woorksheet.prototype._updateConditionalFormatting = function(range) {
   var aCFs = this.aConditionalFormatting;
   var aRules, oRule;
   var oRuleElement = null;
-  var min = Number.MAX_VALUE;
-  var max = -Number.MAX_VALUE;
-  var arrayCells = [];
+  var aValues = [], aCells = [];
   var tmp, i, j, cell, sqref;
   for (i = 0; i < aCFs.length; ++i) {
     sqref = aCFs[i].sqref;
@@ -3491,6 +3489,18 @@ Woorksheet.prototype._updateConditionalFormatting = function(range) {
       aRules = aCFs[i].aRules;
       for (j = 0; j < aRules.length; ++j) {
         oRule = aRules[j];
+
+        this.getRange3(sqref.r1, sqref.c1, sqref.r2, sqref.c2)._setPropertyNoEmpty(null, null, function(c) {
+          if (CellValueType.Number === c.getType() && false === c.isEmptyTextString()) {
+            tmp = parseFloat(c.getValueWithoutFormat());
+            if (isNaN(tmp)) {
+              return;
+            }
+            aCells.push(c);
+            aValues.push(tmp);
+          }
+        });
+
         // ToDo aboveAverage, beginsWith, cellIs, containsBlanks, containsErrors,
         // ToDo containsText, dataBar, duplicateValues, endsWith, expression, iconSet, notContainsBlanks,
         // ToDo notContainsErrors, notContainsText, timePeriod, top10, uniqueValues (page 2679)
@@ -3504,36 +3514,25 @@ Woorksheet.prototype._updateConditionalFormatting = function(range) {
               break;
             }
 
-            this.getRange3(sqref.r1, sqref.c1, sqref.r2, sqref.c2)._setPropertyNoEmpty(null, null, function(c) {
-              if (CellValueType.Number === c.getType() && false === c.isEmptyTextString()) {
-                tmp = parseFloat(c.getValueWithoutFormat());
-                if (isNaN(tmp)) {
-                  return;
-                }
-                arrayCells.push({cell: c, val: tmp});
-                min = Math.min(min, tmp);
-                max = Math.max(max, tmp);
-              }
-            });
-
             // ToDo CFVO Type (formula, max, min, num, percent, percentile) (page 2681)
             // ToDo support 3 colors in rule
-            if (0 < arrayCells.length && 2 === oRuleElement.aColors.length) {
+            if (0 < aCells.length && 2 === oRuleElement.aColors.length) {
               oGradient = new AscCommonExcel.CGradient(oRuleElement.aColors[0], oRuleElement.aColors[1]);
-              oGradient.init(min, max);
+              oGradient.init(Math.min.apply(Math, aValues), Math.max.apply(Math, aValues));
 
-              for (cell = 0; cell < arrayCells.length; ++cell) {
+              for (cell = 0; cell < aCells.length; ++cell) {
                 var dxf = new AscCommonExcel.CellXfs();
-                dxf.fill = new AscCommonExcel.Fill({bg: oGradient.calculateColor(arrayCells[cell].val)});
-                arrayCells[cell].cell.setConditionalFormattingStyle(dxf);
+                dxf.fill = new AscCommonExcel.Fill({bg: oGradient.calculateColor(aValues[cell])});
+                aCells[cell].setConditionalFormattingStyle(dxf);
               }
             }
-
-            arrayCells.length = 0;
-            min = Number.MAX_VALUE;
-            max = -Number.MAX_VALUE;
+            break;
+          case Asc.ECfType.uniqueValues:
             break;
         }
+
+        aCells.length = 0;
+        aValues.length = 0;
       }
     }
   }
