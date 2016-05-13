@@ -20,7 +20,7 @@ function baseEditorsApi(config, editorId) {
   this.HtmlElementName = config['id-view'] || '';
   this.HtmlElement = null;
 
-  this.isMobileVersion = false;
+  this.isMobileVersion = (config['mobile'] === true) ? true : false;
   
   this.isViewMode = false;
 

@@ -5176,6 +5176,9 @@ asc_docs_api.prototype._onEndLoadSdk = function() {
     }
   }
 
+    if (this.isMobileVersion)
+        this.SetMobileVersion(true);
+
   this.asc_setViewMode(this.isViewMode);
 
   asc_docs_api.superclass._onEndLoadSdk.call(this);

@@ -6733,6 +6733,9 @@ asc_docs_api.prototype._onEndLoadSdk = function() {
     }
   }
 
+    if (this.isMobileVersion)
+        this.SetMobileVersion(true);
+
   this.asc_setViewMode(this.isViewMode);
   this.asc_setDrawCollaborationMarks(this.tmpCoMarksDraw);
 
