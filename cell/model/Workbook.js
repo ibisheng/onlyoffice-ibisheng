@@ -5448,7 +5448,7 @@ Cell.prototype.compileXfs=function(){
 			if(null != this.compiledXfs)
 				this.compiledXfs = this.conditionalFormattingXfs.merge(this.compiledXfs);
 			else
-				this.compiledXfs = this.xfs;
+				this.compiledXfs = this.conditionalFormattingXfs;
 		}
 	}
 };
