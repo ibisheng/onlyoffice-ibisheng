@@ -939,7 +939,8 @@
         notContainsText: 13,
         timePeriod: 14,
         top10: 15,
-        uniqueValues: 16
+        uniqueValues: 16,
+        endsWith: 17
     };
     /** @enum */
     var EIconSetType =

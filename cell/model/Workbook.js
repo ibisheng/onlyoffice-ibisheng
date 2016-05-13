@@ -3496,7 +3496,7 @@ Woorksheet.prototype._updateConditionalFormatting = function(range) {
   var aRules, oRule;
   var oRuleElement = null;
   var o;
-  var i, j, cell, sqref, values, tmp, min, max, dxf, condition;
+  var i, j, cell, sqref, values, tmp, min, max, dxf, compareFunction;
   for (i = 0; i < aCFs.length; ++i) {
     sqref = aCFs[i].sqref;
     // ToDo убрать null === sqref когда научимся мультиселект обрабатывать (\\192.168.5.2\source\DOCUMENTS\XLSX\Matematika Quantum Sedekah.xlsx)
@@ -3511,65 +3511,95 @@ Woorksheet.prototype._updateConditionalFormatting = function(range) {
         // ToDo aboveAverage, beginsWith, cellIs, containsBlanks, containsErrors,
         // ToDo dataBar, endsWith, expression, iconSet, notContainsBlanks,
         // ToDo notContainsErrors, timePeriod, top10 (page 2679)
-        switch (oRule.type) {
-          case Asc.ECfType.colorScale:
-            if (1 !== oRule.aRuleElements.length) {
-              break;
-            }
-            oRuleElement = oRule.aRuleElements[0];
-            if (!(oRuleElement instanceof AscCommonExcel.CColorScale)) {
-              break;
-            }
-            min = Number.MAX_VALUE;
-            max = -Number.MAX_VALUE;
-            values = this._getValuesForConditionalFormatting(sqref);
-            for (cell = 0; cell < values.v.length; ++cell) {
-              if (CellValueType.Number === values.c[cell].getType() && !isNaN(tmp = parseFloat(values.v[cell]))) {
-                values.v[cell] = tmp;
-                min = Math.min(min, tmp);
-                max = Math.max(max, tmp);
-              } else {
-                values.v[cell] = null;
-              }
-            }
-
-            // ToDo CFVO Type (formula, max, min, num, percent, percentile) (page 2681)
-            // ToDo support 3 colors in rule
-            if (0 < values.c.length && 2 === oRuleElement.aColors.length) {
-              oGradient = new AscCommonExcel.CGradient(oRuleElement.aColors[0], oRuleElement.aColors[1]);
-              oGradient.init(min, max);
-
-              for (cell = 0; cell < values.c.length; ++cell) {
-                dxf = null;
-                if (null !== values.v[cell]) {
-                  dxf = new AscCommonExcel.CellXfs();
-                  dxf.fill = new AscCommonExcel.Fill({bg: oGradient.calculateColor(values.v[cell])});
-                }
-                values.c[cell].setConditionalFormattingStyle(dxf);
-              }
-            }
+        if (Asc.ECfType.colorScale === oRule.type) {
+          if (1 !== oRule.aRuleElements.length) {
             break;
-          case Asc.ECfType.duplicateValues:
-          case Asc.ECfType.uniqueValues:
-            if (oRule.dxf) {
-              condition = oRule.type === Asc.ECfType.uniqueValues;
-              values = this._getValuesForConditionalFormatting(sqref);
+          }
+          oRuleElement = oRule.aRuleElements[0];
+          if (!(oRuleElement instanceof AscCommonExcel.CColorScale)) {
+            break;
+          }
+          min = Number.MAX_VALUE;
+          max = -Number.MAX_VALUE;
+          values = this._getValuesForConditionalFormatting(sqref);
+          for (cell = 0; cell < values.v.length; ++cell) {
+            if (CellValueType.Number === values.c[cell].getType() && !isNaN(tmp = parseFloat(values.v[cell]))) {
+              values.v[cell] = tmp;
+              min = Math.min(min, tmp);
+              max = Math.max(max, tmp);
+            } else {
+              values.v[cell] = null;
+            }
+          }
+
+          // ToDo CFVO Type (formula, max, min, num, percent, percentile) (page 2681)
+          // ToDo support 3 colors in rule
+          if (0 < values.c.length && 2 === oRuleElement.aColors.length) {
+            oGradient = new AscCommonExcel.CGradient(oRuleElement.aColors[0], oRuleElement.aColors[1]);
+            oGradient.init(min, max);
+
+            for (cell = 0; cell < values.c.length; ++cell) {
+              dxf = null;
+              if (null !== values.v[cell]) {
+                dxf = new AscCommonExcel.CellXfs();
+                dxf.fill = new AscCommonExcel.Fill({bg: oGradient.calculateColor(values.v[cell])});
+              }
+              values.c[cell].setConditionalFormattingStyle(dxf);
+            }
+          }
+        } else {
+          if (!oRule.dxf) {
+            continue;
+          }
+          values = this._getValuesForConditionalFormatting(sqref);
+
+          switch (oRule.type) {
+            case Asc.ECfType.duplicateValues:
+            case Asc.ECfType.uniqueValues:
               o = getUniqueKeys(values.v);
-              for (cell = 0; cell < values.c.length; ++cell) {
-                values.c[cell].setConditionalFormattingStyle((condition === o[values.v[cell]]) ? null : oRule.dxf);
-              }
-            }
-            break;
-          case Asc.ECfType.containsText:
-          case Asc.ECfType.notContainsText:
-            if (oRule.dxf) {
-              condition = oRule.type === Asc.ECfType.containsText;
-              values = this._getValuesForConditionalFormatting(sqref);
-              for (cell = 0; cell < values.c.length; ++cell) {
-                values.c[cell].setConditionalFormattingStyle((condition === (-1 === values.v[cell].indexOf(oRule.text))) ? null : oRule.dxf);
-              }
-            }
-            break;
+              compareFunction = (function(obj, condition){
+                return function(val) {
+                  return condition === obj[val];
+                };
+              })(o, oRule.type === Asc.ECfType.duplicateValues);
+              break;
+            case Asc.ECfType.containsText:
+              compareFunction = (function(text){
+                return function(val) {
+                  return -1 !== val.indexOf(text);
+                };
+              })(oRule.text);
+              break;
+            case Asc.ECfType.notContainsText:
+              compareFunction = (function(text){
+                return function(val) {
+                  return -1 === val.indexOf(text);
+                };
+              })(oRule.text);
+              break;
+            case Asc.ECfType.beginsWith:
+              compareFunction = (function(text){
+                return function(val) {
+                  return val.startsWith(text);
+                };
+              })(oRule.text);
+
+              break;
+            case Asc.ECfType.endsWith:
+              compareFunction = (function(text){
+                return function(val) {
+                  return val.endsWith(text);
+                };
+              })(oRule.text);
+              break;
+            default:
+              continue;
+              break;
+          }
+
+          for (cell = 0; cell < values.c.length; ++cell) {
+            values.c[cell].setConditionalFormattingStyle(compareFunction(values.v[cell]) ? oRule.dxf : null);
+          }
         }
       }
     }
