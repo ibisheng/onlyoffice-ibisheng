@@ -1898,6 +1898,13 @@ function angleInterfaceToFormat(val)
 		nRes = 0;
 	return nRes;
 }
+function getUniqueKeys(array) {
+  var i, o = {};
+  for (i = 0; i < array.length; ++i) {
+    o[array[i]] = !o.hasOwnProperty(array[i]);
+  }
+  return o;
+}
 //-------------------------------------------------------------------------------------------------
 /**
  * @constructor
@@ -3472,13 +3479,24 @@ Woorksheet.prototype.initPostOpen = function(handlers){
 	this.handlers = handlers;
 	this._setHandlersTablePart();
 };
+Woorksheet.prototype._getValuesForConditionalFormatting = function(sqref) {
+  var aValues = [], aCells = [];
+  var tmp;
+  this.getRange3(sqref.r1, sqref.c1, sqref.r2, sqref.c2)._setPropertyNoEmpty(null, null, function(c) {
+    if (!c.isEmptyTextString()) {
+      aCells.push(c);
+      aValues.push(c.getValueWithoutFormat());
+    }
+  });
+  return {c: aCells, v: aValues};
+};
 Woorksheet.prototype._updateConditionalFormatting = function(range) {
   var oGradient = null;
   var aCFs = this.aConditionalFormatting;
   var aRules, oRule;
   var oRuleElement = null;
-  var aValues = [], aCells = [];
-  var tmp, i, j, cell, sqref;
+  var o;
+  var i, j, cell, sqref, values, tmp, min, max, dxf;
   for (i = 0; i < aCFs.length; ++i) {
     sqref = aCFs[i].sqref;
     // ToDo убрать null === sqref когда научимся мультиселект обрабатывать (\\192.168.5.2\source\DOCUMENTS\XLSX\Matematika Quantum Sedekah.xlsx)
@@ -3489,17 +3507,6 @@ Woorksheet.prototype._updateConditionalFormatting = function(range) {
       aRules = aCFs[i].aRules;
       for (j = 0; j < aRules.length; ++j) {
         oRule = aRules[j];
-
-        this.getRange3(sqref.r1, sqref.c1, sqref.r2, sqref.c2)._setPropertyNoEmpty(null, null, function(c) {
-          if (CellValueType.Number === c.getType() && false === c.isEmptyTextString()) {
-            tmp = parseFloat(c.getValueWithoutFormat());
-            if (isNaN(tmp)) {
-              return;
-            }
-            aCells.push(c);
-            aValues.push(tmp);
-          }
-        });
 
         // ToDo aboveAverage, beginsWith, cellIs, containsBlanks, containsErrors,
         // ToDo containsText, dataBar, duplicateValues, endsWith, expression, iconSet, notContainsBlanks,
@@ -3513,26 +3520,39 @@ Woorksheet.prototype._updateConditionalFormatting = function(range) {
             if (!(oRuleElement instanceof AscCommonExcel.CColorScale)) {
               break;
             }
+            min = Number.MAX_VALUE;
+            max = -Number.MAX_VALUE;
+            values = this._getValuesForConditionalFormatting(sqref);
+            for (cell = 0; cell < values.v.length; ++cell) {
+              if (CellValueType.Number === values.c[cell].getType() && !isNaN(tmp = parseFloat(values.v[cell]))) {
+                values.v[cell] = tmp;
+                min = Math.min(min, tmp);
+                max = Math.max(max, tmp);
+              } else {
+                values.v[cell] = null;
+              }
+            }
 
             // ToDo CFVO Type (formula, max, min, num, percent, percentile) (page 2681)
             // ToDo support 3 colors in rule
-            if (0 < aCells.length && 2 === oRuleElement.aColors.length) {
+            if (0 < values.c.length && 2 === oRuleElement.aColors.length) {
               oGradient = new AscCommonExcel.CGradient(oRuleElement.aColors[0], oRuleElement.aColors[1]);
-              oGradient.init(Math.min.apply(Math, aValues), Math.max.apply(Math, aValues));
+              oGradient.init(min, max);
 
-              for (cell = 0; cell < aCells.length; ++cell) {
-                var dxf = new AscCommonExcel.CellXfs();
-                dxf.fill = new AscCommonExcel.Fill({bg: oGradient.calculateColor(aValues[cell])});
-                aCells[cell].setConditionalFormattingStyle(dxf);
+              for (cell = 0; cell < values.c.length; ++cell) {
+                dxf = null;
+                if (null !== values.v[cell]) {
+                  dxf = new AscCommonExcel.CellXfs();
+                  dxf.fill = new AscCommonExcel.Fill({bg: oGradient.calculateColor(values.v[cell])});
+                }
+                values.c[cell].setConditionalFormattingStyle(dxf);
               }
             }
             break;
           case Asc.ECfType.uniqueValues:
+            o = getUniqueKeys(values.v);
             break;
         }
-
-        aCells.length = 0;
-        aValues.length = 0;
       }
     }
   }
@@ -8811,7 +8831,7 @@ function _isSameSizeMerged(bbox, aMerged) {
 		}
 	}
 	return oRes;
-};
+}
 function _canPromote(from, wsFrom, to, wsTo, bIsPromote, nWidth, nHeight, bVertical, nIndex) {
 	var oRes = {oMergedFrom: null, oMergedTo: null};
 	//если надо только удалить внутреннее содержимое не смотрим на замерженость
@@ -8844,7 +8864,7 @@ function _canPromote(from, wsFrom, to, wsTo, bIsPromote, nWidth, nHeight, bVerti
 		}
 	}
 	return oRes;
-};
+}
 // Подготовка Copy Style
 function preparePromoteFromTo(from, to) {
 	var bSuccess = true;
@@ -8860,7 +8880,7 @@ function preparePromoteFromTo(from, to) {
 	} else
 		bSuccess = false;
 	return bSuccess;
-};
+}
 // Перед promoteFromTo обязательно должна быть вызывана функция preparePromoteFromTo
 function promoteFromTo(from, wsFrom, to, wsTo) {
 	var bVertical = true;
@@ -8888,7 +8908,7 @@ function promoteFromTo(from, wsFrom, to, wsTo) {
 		wsTo.mergeManager.remove(to, true);
 		_promoteFromTo(from, wsFrom, to, wsTo, false, oCanPromote, false, bVertical, nIndex);
 	}
-};
+}
 Range.prototype.promote=function(bCtrl, bVertical, nIndex){
 	//todo отдельный метод для promote в таблицах и merge в таблицах
 	var oBBox = this.bbox;
