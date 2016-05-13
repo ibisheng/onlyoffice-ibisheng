@@ -3507,9 +3507,9 @@ Woorksheet.prototype._updateConditionalFormatting = function(range) {
       for (j = 0; j < aRules.length; ++j) {
         oRule = aRules[j];
 
-        // ToDo aboveAverage, cellIs, containsBlanks, containsErrors,
+        // ToDo aboveAverage, cellIs, containsBlanks,
         // ToDo dataBar, expression, iconSet, notContainsBlanks,
-        // ToDo notContainsErrors, timePeriod (page 2679)
+        // ToDo timePeriod (page 2679)
         if (Asc.ECfType.colorScale === oRule.type) {
           if (1 !== oRule.aRuleElements.length) {
             break;
@@ -3617,13 +3617,24 @@ Woorksheet.prototype._updateConditionalFormatting = function(range) {
                 };
               })(oRule.text);
               break;
+            case Asc.ECfType.containsErrors:
+              compareFunction = function(val, c) {
+                return CellValueType.Error === c.getType();
+              };
+              break;
+            case Asc.ECfType.notContainsErrors:
+              compareFunction = function(val, c) {
+                return CellValueType.Error !== c.getType();
+              };
+              break;
             default:
               continue;
               break;
           }
 
           for (cell = 0; cell < values.length; ++cell) {
-            values[cell].c.setConditionalFormattingStyle(compareFunction(values[cell].v) ? oRule.dxf : null);
+            value = values[cell];
+            value.c.setConditionalFormattingStyle(compareFunction(value.v, value.c) ? oRule.dxf : null);
           }
         }
       }
