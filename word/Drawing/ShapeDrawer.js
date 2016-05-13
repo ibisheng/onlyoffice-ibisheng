@@ -1060,9 +1060,14 @@ CShapeDrawer.prototype =
                 if (_fill.lin)
                 {
                     var _angle = _fill.lin.angle;
-                    if (_fill.rotateWithShape === false && this.Graphics.m_oTransform)
+                    if (_fill.rotateWithShape === false)
                     {
-                        _angle -= (60000 * this.Graphics.m_oTransform.GetRotation());
+                        var matrix_transform = (this.Graphics.IsTrack === true) ? this.Graphics.Graphics.m_oTransform : this.Graphics.m_oTransform;
+                        if (matrix_transform)
+                        {
+                            //_angle -= (60000 * this.Graphics.m_oTransform.GetRotation());
+                            _angle = AscCommon.GradientGetAngleNoRotate(_angle, matrix_transform);
+                        }
                     }
 
                     var points = this.getGradientPoints(this.min_x, this.min_y, this.max_x, this.max_y, _angle, _fill.lin.scale);
@@ -1417,7 +1422,8 @@ CShapeDrawer.prototype =
                             var _angle = _fill.lin.angle;
                             if (_fill.rotateWithShape === false && this.Graphics.m_oTransform)
                             {
-                                _angle -= (60000 * this.Graphics.m_oTransform.GetRotation());
+                                //_angle -= (60000 * this.Graphics.m_oTransform.GetRotation());
+                                _angle = AscCommon.GradientGetAngleNoRotate(_angle, this.Graphics.m_oTransform);
                             }
 
                             points = this.getGradientPoints(this.min_x, this.min_y, this.max_x, this.max_y, _angle, _fill.lin.scale);

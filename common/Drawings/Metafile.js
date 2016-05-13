@@ -2397,6 +2397,59 @@ CMatrix.prototype =
     }
 };
 
+    function GradientGetAngleNoRotate(_angle, _transform)
+    {
+        var x1 = 0.0;
+        var y1 = 0.0;
+        var x2 = 1.0;
+        var y2 = 0.0;
+
+        var _matrixRotate = new CMatrix();
+        _matrixRotate.Rotate(-_angle / 60000);
+
+        var _x11 = _matrixRotate.TransformPointX(x1, y1);
+        var _y11 = _matrixRotate.TransformPointY(x1, y1);
+        var _x22 = _matrixRotate.TransformPointX(x2, y2);
+        var _y22 = _matrixRotate.TransformPointY(x2, y2);
+
+        _matrixRotate = global_MatrixTransformer.Invert(_transform);
+
+        var _x1 = _matrixRotate.TransformPointX(_x11, _y11);
+        var _y1 = _matrixRotate.TransformPointY(_x11, _y11);
+        var _x2 = _matrixRotate.TransformPointX(_x22, _y22);
+        var _y2 = _matrixRotate.TransformPointY(_x22, _y22);
+
+        var _y = _y2 - _y1;
+        var _x = _x2 - _x1;
+
+        var a = 0;
+        if (Math.abs(_y) < 0.001)
+        {
+            if (_x > 0)
+                a = 0;
+            else
+                a = 180;
+        }
+        else if (Math.abs(_x) < 0.001)
+        {
+            if (_y > 0)
+                a = 90;
+            else
+                a = 270;
+        }
+        else
+        {
+            a = Math.atan2(_y,_x);
+            a = rad2deg(a);
+        }
+
+        if (a < 0)
+            a += 360;
+
+        console.log(a);
+        return a * 60000;
+    };
+
 var CMatrixL = CMatrix;
 
     function CGlobalMatrixTransformer()
@@ -2803,4 +2856,5 @@ var CMatrixL = CMatrix;
     window['AscCommon'].g_dDpiX = g_dDpiX;
     window['AscCommon'].g_dKoef_mm_to_pix = g_dKoef_mm_to_pix;
     window['AscCommon'].g_dKoef_pix_to_mm = g_dKoef_pix_to_mm;
+    window['AscCommon'].GradientGetAngleNoRotate = GradientGetAngleNoRotate;
 })(window);
