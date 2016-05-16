@@ -13687,7 +13687,7 @@ function CLegend()
     this.layout = null;
     this.legendEntryes = [];
     this.legendPos = null;
-    this.overlay = null;
+    this.overlay = true;
     this.spPr = null;
     this.txPr = null;
 
@@ -22987,7 +22987,7 @@ CSurfaceSeries.prototype =
 function CTitle()
 {
     this.layout  = null;
-    this.overlay = null;
+    this.overlay = true;
     this.spPr    = null;
     this.tx      = null;
     this.txPr    = null;

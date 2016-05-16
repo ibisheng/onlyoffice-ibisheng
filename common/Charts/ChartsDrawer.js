@@ -3349,7 +3349,7 @@ drawLineChart.prototype =
 		
 		for(var i = 0; i < points.length; i++)
 		{	
-			isSplineLine = this.chartProp.series[i].smooth;
+			isSplineLine = this.chartProp.series[i].smooth !== false;
 			
 			if(!points[i])
 				continue;
@@ -3625,7 +3625,7 @@ drawLineChart.prototype =
 		gdLst["h"] = 1;
 		
 
-		var splineCoords = this.cChartDrawer.calculate_Bezier(x, y, x1, y1, x2, y2, x3, y3, i);
+		var splineCoords = this.cChartDrawer.calculate_Bezier(x, y, x1, y1, x2, y2, x3, y3);
 		
 		x = this.cChartDrawer.getYPosition(splineCoords[0].x, xPoints, true);
 		y = this.cChartDrawer.getYPosition(splineCoords[0].y, yPoints);
@@ -8249,7 +8249,7 @@ drawScatterChart.prototype =
 		
 		for(var i = 0; i < points.length; i++)
 		{	
-			isSplineLine = this.chartProp.series[i].smooth;
+			isSplineLine = this.chartProp.series[i].smooth !== false;
 			
 			if(!points[i])
 				continue;

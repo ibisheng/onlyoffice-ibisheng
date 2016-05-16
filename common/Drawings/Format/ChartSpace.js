@@ -8349,7 +8349,7 @@ CChartSpace.prototype.recalculateMarkers = function()
                 var effect_fill = chart_style.fill1;
                 var fill = chart_style.fill2;
                 var line = chart_style.line4;
-                var masrker_default_size = chart_style.markerSize;
+            var masrker_default_size = AscFormat.isRealNumber(oThis.style) ? chart_style.markerSize : 5;
                 var default_marker = new AscFormat.CMarker();
                 default_marker.setSize(masrker_default_size);
                 var parent_objects = oThis.getParentObjects();
@@ -8482,7 +8482,7 @@ CChartSpace.prototype.recalculateMarkers = function()
                 case AscDFH.historyitem_type_LineChart:
                 case AscDFH.historyitem_type_RadarChart:
                 {
-                    if(this.chart.plotArea.chart.marker)
+                if(this.chart.plotArea.chart.marker !== false)
                     {
                         recalculateMarkers2();
                     }

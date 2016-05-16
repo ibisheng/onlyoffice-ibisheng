@@ -4054,16 +4054,13 @@ DrawingObjectsController.prototype =
                 {
                     if(!chart_type.series[j].marker)
                     {
-                        if(!chart_type.series[j].marker)
-                        {
-                            bShowMarker = true;
-                            break;
-                        }
-                        if(chart_type.series[j].marker.symbol !== AscFormat.SYMBOL_NONE)
-                        {
-                            bShowMarker = true;
-                            break;
-                        }
+                        bShowMarker = true;
+                        break;
+                    }
+                    if(chart_type.series[j].marker.symbol !== AscFormat.SYMBOL_NONE)
+                    {
+                        bShowMarker = true;
+                        break;
                     }
                 }
             }
@@ -4081,7 +4078,7 @@ DrawingObjectsController.prototype =
             var b_smooth = true;
             for(var i = 0; i < chart_type.series.length; ++i)
             {
-                if(!chart_type.series[i].smooth)
+                if(chart_type.series[i].smooth === false)
                 {
                     b_smooth = false;
                     break;
