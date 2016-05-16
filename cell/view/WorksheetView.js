@@ -12014,39 +12014,23 @@
         var ar = t.activeRange.clone( true );
 		
 		var isStartRangeIntoFilterOrTable = t.model.autoFilters.isStartRangeContainIntoTableOrFilter(ar);
-		var isApplyAutoFilter = null, iaAddAutoFilter = null, cellId, filterProps;
+		var isApplyAutoFilter = null, iaAddAutoFilter = null, cellId = null;
 		if(null !== isStartRangeIntoFilterOrTable)//into autofilter or format table
 		{
-			if(-1 === isStartRangeIntoFilterOrTable)//autofilter
+			var isFromatTable = !(-1 === isStartRangeIntoFilterOrTable);
+			var filterRef = isFromatTable ? t.model.TableParts[isStartRangeIntoFilterOrTable].Ref : t.model.AutoFilter.Ref;
+			cellId = t.model.autoFilters._rangeToId(Asc.Range(ar.c1, filterRef.r1, ar.c1, filterRef.r1));
+			isApplyAutoFilter = true;
+			
+			if(isFromatTable && !t.model.TableParts[isStartRangeIntoFilterOrTable].AutoFilter)//add autofilter to tablepart
 			{
-				var autoFilter = t.model.AutoFilter;
-				var colId = ar.c1 - autoFilter.Ref.c1;
-				filterProps = {id: null, colId: colId};
-				
-				isApplyAutoFilter = true;
-			}
-			else if(t.model.TableParts[isStartRangeIntoFilterOrTable])//format table
-			{
-				var formatTable = t.model.TableParts[isStartRangeIntoFilterOrTable];
-				if(formatTable.AutoFilter)
-				{
-					var autoFilter = t.model.AutoFilter;
-					var colId = ar.c1 - autoFilter.Ref.c1;
-					filterProps = {id: null, colId: colId};
-					
-					isApplyAutoFilter = true;
-				}
-				else
-				{
-					
-				}
+				iaAddAutoFilter = true;
 			}
 		}
 		else//without filter
 		{
-			
+			iaAddAutoFilter = true;
 		}
-		
 		
 		
 		var onChangeAutoFilterCallback = function ( isSuccess ) {
@@ -12060,11 +12044,28 @@
 			if(null !== isAddAutoFilter)
 			{	
 				t.model.autoFilters.addAutoFilter(null, ar, addFormatTableOptionsObj);
+				if(null === cellId)
+				{
+					cellId = t.model.autoFilters._rangeToId(Asc.Range(ar.startCol, t.model.AutoFilter.Ref.r1, ar.startCol, t.model.AutoFilter.Ref.r1));
+				}
 			}
 			
 			if(null !== isApplyAutoFilter)
 			{
-				var autoFilterObject = t.af_setDialogProp(filterProps, true);
+				autoFilterObject.asc_setCellId(cellId);
+				if(c_oAscAutoFilterTypes.Filters === autoFilterObject.filter.type)
+				{	
+					var autoFiltersOptionsElement = new AutoFiltersOptionsElements();
+					var cell = t.model._getCell( ar.startRow, ar.startCol);
+					var text = cell.getValueWithFormat();
+					var val = cell.getValueWithoutFormat();
+					
+					autoFiltersOptionsElement.visible = true;
+					autoFiltersOptionsElement.val = val;
+					autoFiltersOptionsElement.text = text;
+					autoFiltersOptionsElement.isDateFormat = cell.getNumFormat().isDateTimeFormat();
+					autoFilterObject.values.push(autoFiltersOptionsElement);
+				}
 				
 				
 				var applyFilterProps = t.model.autoFilters.applyAutoFilter( autoFilterObject, ar );
