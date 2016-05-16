@@ -6611,6 +6611,7 @@ DrawingObjectsController.prototype =
                     if(!table_props)
                     {
                         table_props = new_table_props;
+                        new_table_props.Locked = locked;
                         if(new_table_props.CellsBackground)
                         {
                             if(new_table_props.CellsBackground.Unifill && new_table_props.CellsBackground.Unifill.fill && new_table_props.CellsBackground.Unifill.fill.type !== c_oAscFill.FILL_TYPE_NONE)

@@ -9501,20 +9501,23 @@ function getMaxIdx(arr)
 function getArrayFillsFromBase(arrBaseFills, needFillsCount)
 {
     var ret = [];
-    var count_base = arrBaseFills.length;
-
-    var need_create = parseInt(needFillsCount / count_base) + 1;
-
-    for (var i = 0; i < need_create; i++)
+    var nMaxCycleIdx = parseInt((needFillsCount - 1)/arrBaseFills.length);
+    for(var i = 0;  i <  needFillsCount; ++i)
     {
-        for (var j = 0; j < count_base; j++)
+        var nCycleIdx = ( i / arrBaseFills.length ) >> 0;
+        var fShadeTint = ( nCycleIdx + 1 ) / (nMaxCycleIdx + 2) * 1.4 - 0.7;
+
+        if(fShadeTint < 0)
         {
-            var percent = (-70 + 140 * ( (i + 1) / (need_create + 1) )) /100;
-            var color = CreateUniFillSolidFillWidthTintOrShade(arrBaseFills[j], 1 - percent);
-            ret.push( color );
+            fShadeTint = -(1 + fShadeTint);
         }
+        else
+        {
+            fShadeTint = (1 - fShadeTint);
+        }
+        var color = CreateUniFillSolidFillWidthTintOrShade(arrBaseFills[i % arrBaseFills.length], fShadeTint);
+        ret.push(color);
     }
-    ret.splice(needFillsCount, ret.length - needFillsCount);
     return ret;
 }
 

@@ -3210,6 +3210,16 @@ CPresentation.prototype =
         return AllFonts;
     },
 
+
+    Get_GraphicObjectsProps : function()
+    {
+        if(this.Slides[this.CurPage])
+        {
+            return this.Slides[this.CurPage].graphicObjects.getDrawingProps();
+        }
+        return null;
+    },
+
     // Обновляем текущее состояние (определяем где мы находимся, картинка/параграф/таблица/колонтитул)
     Document_UpdateInterfaceState : function()
     {
@@ -3251,12 +3261,6 @@ CPresentation.prototype =
             editor.sync_PrLineSpacingCallBack(para_pr.Spacing);
             if(!target_content)
             {
-               //editor.UpdateParagraphProp( para_pr, flag );
-                //if(selected_objects.length === 1 )
-                //{
-                //    if ( "undefined" != typeof(para_props.Tabs) && null != para_props.Tabs )
-                //        editor.Update_ParaTab( Default_Tab_Stop, para_props.Tabs );//TODO:
-                //}
                 editor.UpdateTextPr(text_pr);
             }
 

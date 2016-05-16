@@ -593,6 +593,10 @@ var cd13 = 1.0/3.0;
 var cd23 = 2.0/3.0;
 var max_hls = 255.0;
 
+var DEC_GAMMA          = 2.3;
+var INC_GAMMA          = 1.0 / DEC_GAMMA;
+var MAX_PERCENT        = 100000;
+
 function CColorModifiers()
 {
     this.Mods = [];
@@ -800,6 +804,36 @@ CColorModifiers.prototype =
         return v1;
     },
 
+    lclRgbCompToCrgbComp: function(value)
+    {
+        return (value * MAX_PERCENT / 255);
+    },
+
+    lclCrgbCompToRgbComp: function(value)
+    {
+        return (value * 255 / MAX_PERCENT);
+    },
+
+    lclGamma: function(nComp, fGamma)
+    {
+        return (Math.pow(nComp/MAX_PERCENT, fGamma)*MAX_PERCENT) >> 0;
+    },
+
+    RgbtoCrgb: function(RGBA)
+    {
+        RGBA.R = this.lclGamma(this.lclRgbCompToCrgbComp(RGBA.R), DEC_GAMMA);
+        RGBA.G = this.lclGamma(this.lclRgbCompToCrgbComp(RGBA.G), DEC_GAMMA);
+        RGBA.B = this.lclGamma(this.lclRgbCompToCrgbComp(RGBA.B), DEC_GAMMA);
+    },
+
+
+    CrgbtoRgb: function(RGBA)
+    {
+        RGBA.R = this.lclCrgbCompToRgbComp(this.lclGamma(RGBA.R, INC_GAMMA)) >> 0;
+        RGBA.G = this.lclCrgbCompToRgbComp(this.lclGamma(RGBA.G, INC_GAMMA)) >> 0;
+        RGBA.B = this.lclCrgbCompToRgbComp(this.lclGamma(RGBA.B, INC_GAMMA)) >> 0;
+    },
+
     Apply : function(RGBA)
     {
         if (null == this.Mods)
@@ -961,52 +995,39 @@ CColorModifiers.prototype =
             }
             else if (colorMod.name == "shade")
             {
-                /*
-                RGBA.R = Math.max(0, scRGB_to_sRGB(sRGB_to_scRGB(RGBA.R/255) * val)*255 >> 0);
-                RGBA.G = Math.max(0, scRGB_to_sRGB(sRGB_to_scRGB(RGBA.G/255) * val)*255 >> 0);
-                RGBA.B = Math.max(0, scRGB_to_sRGB(sRGB_to_scRGB(RGBA.B/255) * val)*255 >> 0);
-                */
+                this.RgbtoCrgb(RGBA);
                 if (val < 0) val = 0;
                 if (val > 1) val = 1;
-                RGBA.R = (RGBA.R * val) >> 0;
-                RGBA.G = (RGBA.G * val) >> 0;
-                RGBA.B = (RGBA.B * val) >> 0;
+                RGBA.R = ((RGBA.R * val)) >> 0;
+                RGBA.G = ((RGBA.G * val)) >> 0;
+                RGBA.B = ((RGBA.B * val)) >> 0;
+                this.CrgbtoRgb(RGBA);
             }
             else if (colorMod.name == "tint")
             {
-                /*
-                if(val > 0)
-                {
-                    RGBA.R = Math.max(0, scRGB_to_sRGB(1 - (1 - sRGB_to_scRGB(RGBA.R/255)) * val)*255 >> 0);
-                    RGBA.G = Math.max(0, scRGB_to_sRGB(1 - (1 - sRGB_to_scRGB(RGBA.G/255)) * val)*255 >> 0);
-                    RGBA.B = Math.max(0, scRGB_to_sRGB(1 - (1 - sRGB_to_scRGB(RGBA.B/255)) * val)*255 >> 0);
-                }
-                else
-                {
-                    RGBA.R = Math.max(0, scRGB_to_sRGB(1 - (1 - sRGB_to_scRGB(RGBA.R/255)) * (1-val))*255 >> 0);
-                    RGBA.G = Math.max(0, scRGB_to_sRGB(1 - (1 - sRGB_to_scRGB(RGBA.G/255)) * (1-val))*255 >> 0);
-                    RGBA.B = Math.max(0, scRGB_to_sRGB(1 - (1 - sRGB_to_scRGB(RGBA.B/255)) * (1-val))*255 >> 0);
-                }
-                */
+                this.RgbtoCrgb(RGBA);
                 if (val < 0) val = 0;
                 if (val > 1) val = 1;
-                RGBA.R = (255 - (255 - RGBA.R) * val) >> 0;
-                RGBA.G = (255 - (255 - RGBA.G) * val) >> 0;
-                RGBA.B = (255 - (255 - RGBA.B) * val) >> 0;
+                RGBA.R = ( MAX_PERCENT - (MAX_PERCENT - RGBA.R) * val );
+                RGBA.G = ( MAX_PERCENT - (MAX_PERCENT - RGBA.G) * val );
+                RGBA.B = ( MAX_PERCENT - (MAX_PERCENT - RGBA.B) * val );
+                this.CrgbtoRgb(RGBA);
             }
             else if (colorMod.name == "gamma")
             {
-                // LO
-                // 1/2.3 = 0.4347826;
-                RGBA.R = this.applyGamma(RGBA.R, 0.4347826);
-                RGBA.G = this.applyGamma(RGBA.G, 0.4347826);
-                RGBA.B = this.applyGamma(RGBA.B, 0.4347826);
+                this.RgbtoCrgb(RGBA);
+                RGBA.R = this.lclGamma(RGBA.R, INC_GAMMA);
+                RGBA.G = this.lclGamma(RGBA.G, INC_GAMMA);
+                RGBA.B = this.lclGamma(RGBA.B, INC_GAMMA);
+                this.CrgbtoRgb(RGBA);
             }
             else if (colorMod.name == "invGamma")
             {
-                RGBA.R = this.applyGamma(RGBA.R, 2.3);
-                RGBA.G = this.applyGamma(RGBA.G, 2.3);
-                RGBA.B = this.applyGamma(RGBA.B, 2.3);
+                this.RgbtoCrgb(RGBA);
+                RGBA.R = this.lclGamma(RGBA.R, DEC_GAMMA);
+                RGBA.G = this.lclGamma(RGBA.G, DEC_GAMMA);
+                RGBA.B = this.lclGamma(RGBA.B, DEC_GAMMA);
+                this.CrgbtoRgb(RGBA);
             }
         }
     },
