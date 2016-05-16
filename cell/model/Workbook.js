@@ -3498,7 +3498,7 @@ Woorksheet.prototype._updateConditionalFormatting = function(range) {
   var aRules, oRule;
   var oRuleElement = null;
   var o;
-  var i, j, l, cell, sqref, values, value, v, tmp, min, mid, max, dxf, compareFunction, nc;
+  var i, j, l, cell, sqref, values, value, v, tmp, min, mid, max, dxf, compareFunction, nc, sum;
   for (i = 0; i < aCFs.length; ++i) {
     sqref = aCFs[i].sqref;
     // ToDo убрать null === sqref когда научимся мультиселект обрабатывать (\\192.168.5.2\source\DOCUMENTS\XLSX\Matematika Quantum Sedekah.xlsx)
@@ -3510,7 +3510,6 @@ Woorksheet.prototype._updateConditionalFormatting = function(range) {
       for (j = 0; j < aRules.length; ++j) {
         oRule = aRules[j];
 
-        // ToDo aboveAverage,
         // ToDo dataBar, expression, iconSet (page 2679)
         if (AscCommonExcel.ECfType.colorScale === oRule.type) {
           if (1 !== oRule.aRuleElements.length) {
@@ -3591,6 +3590,31 @@ Woorksheet.prototype._updateConditionalFormatting = function(range) {
               value = values[cell];
               value.c.setConditionalFormattingStyle((o !== value.v && tmp < nc) ? (++tmp && oRule.dxf) : null);
             }
+          }
+        } else if (AscCommonExcel.ECfType.aboveAverage === oRule.type) {
+          if (!oRule.dxf) {
+            continue;
+          }
+          values = this._getValuesForConditionalFormatting(sqref, false);
+          sum = 0;
+          nc = 0;
+          for (cell = 0; cell < values.length; ++cell) {
+            value = values[cell];
+            if (!value.c.isEmptyTextString(value.v)) {
+              ++nc;
+              if (CellValueType.Number === value.c.getType() && !isNaN(tmp = parseFloat(value.v))) {
+                value.v = tmp;
+                sum += tmp;
+              } else {
+                value.v = null;
+              }
+            }
+          }
+
+          tmp = sum / nc;
+          for (cell = 0; cell < values.length; ++cell) {
+            value = values[cell];
+            value.c.setConditionalFormattingStyle((null !== value.v && oRule.getAverage(value.v, tmp)) ? oRule.dxf : null);
           }
         } else {
           if (!oRule.dxf) {

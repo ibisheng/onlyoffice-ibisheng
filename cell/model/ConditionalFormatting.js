@@ -180,6 +180,17 @@
 		}
 		return res;
 	};
+	CConditionalFormattingRule.prototype.getAverage = function(val, average) {
+		var res = false;
+		// ToDo stdDev
+		if (this.aboveAverage) {
+			res = val > average;
+		} else {
+			res = val < average;
+		}
+		res = res || (this.equalAverage && val == average);
+		return res;
+	};
 
 	function CColorScale () {
 		this.aCFVOs = [];
