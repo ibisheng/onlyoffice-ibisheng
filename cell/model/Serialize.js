@@ -8102,6 +8102,7 @@
     window["Asc"].EIconSetType = EIconSetType;
 	window["Asc"].ECfType = ECfType;
     window["AscCommonExcel"].ECfvoType = ECfvoType;
+    window["AscCommonExcel"].ST_TimePeriod = ST_TimePeriod;
       window["Asc"].ESparklineType = ESparklineType;
       window["Asc"].EDispBlanksAs = EDispBlanksAs;
       window["Asc"].SparklineAxisMinMax = SparklineAxisMinMax;

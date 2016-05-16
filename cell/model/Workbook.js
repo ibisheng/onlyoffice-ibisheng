@@ -3511,8 +3511,7 @@ Woorksheet.prototype._updateConditionalFormatting = function(range) {
         oRule = aRules[j];
 
         // ToDo aboveAverage, cellIs,
-        // ToDo dataBar, expression, iconSet,
-        // ToDo timePeriod (page 2679)
+        // ToDo dataBar, expression, iconSet (page 2679)
         if (Asc.ECfType.colorScale === oRule.type) {
           if (1 !== oRule.aRuleElements.length) {
             break;
@@ -3657,6 +3656,18 @@ Woorksheet.prototype._updateConditionalFormatting = function(range) {
               compareFunction = function(val, c) {
                 return !c.isEmptyTextString();
               };
+              break;
+            case Asc.ECfType.timePeriod:
+              if (oRule.timePeriod) {
+                compareFunction = (function(rule, period) {
+                  return function(val, c) {
+                    var n = parseFloat(val);
+                    return period.start <= n && n <= period.end;
+                  };
+                })(oRule, oRule.getTimePeriod());
+              } else {
+                continue;
+              }
               break;
             default:
               continue;

@@ -76,6 +76,68 @@
 			res.aRuleElements.push(this.aRuleElements[i].clone());
 		return res;
 	};
+	CConditionalFormattingRule.prototype.getTimePeriod = function() {
+		var start, end;
+		var now = new Date();
+		switch (this.timePeriod) {
+			case AscCommonExcel.ST_TimePeriod.last7Days:
+				end = now.getExcelDate();
+				now.setDate(now.getDate() - 7);
+				start = now.getExcelDate();
+				break;
+			case AscCommonExcel.ST_TimePeriod.lastMonth:
+				end = now.getExcelDate();
+				now.setMonth(now.getMonth() - 1);
+				start = now.getExcelDate();
+				break;
+			case AscCommonExcel.ST_TimePeriod.thisMonth:
+				start = now.getExcelDate();
+				now.setMonth(now.getMonth() + 1);
+				end = now.getExcelDate();
+				break;
+			case AscCommonExcel.ST_TimePeriod.nextMonth:
+				now.setMonth(now.getMonth() + 1);
+				start = now.getExcelDate();
+				now.setMonth(now.getMonth() + 1);
+				end = now.getExcelDate();
+				break;
+			case AscCommonExcel.ST_TimePeriod.lastWeek:
+				now.setDate(now.getDate() - now.getDay());
+				end = now.getExcelDate();
+				now.setDate(now.getDate() - 7);
+				start = now.getExcelDate();
+				break;
+			case AscCommonExcel.ST_TimePeriod.thisWeek:
+				now.setDate(now.getDate() - now.getDay());
+				start = now.getExcelDate();
+				now.setDate(now.getDate() + 7);
+				end = now.getExcelDate();
+				break;
+			case AscCommonExcel.ST_TimePeriod.nextWeek:
+				now.setDate(now.getDate() - now.getDay() + 7);
+				start = now.getExcelDate();
+				now.setDate(now.getDate() + 7);
+				end = now.getExcelDate();
+				break;
+			case AscCommonExcel.ST_TimePeriod.yesterday:
+				end = now.getExcelDate();
+				now.setDate(now.getDate() - 1);
+				start = now.getExcelDate();
+				break;
+			case AscCommonExcel.ST_TimePeriod.today:
+				start = now.getExcelDate();
+				now.setDate(now.getDate() + 1);
+				end = now.getExcelDate();
+				break;
+			case AscCommonExcel.ST_TimePeriod.tomorrow:
+				now.setDate(now.getDate() + 1);
+				start = now.getExcelDate();
+				now.setDate(now.getDate() + 1);
+				end = now.getExcelDate();
+				break;
+		}
+		return {start: start, end: end};
+	};
 
 	function CColorScale () {
 		this.aCFVOs = [];
