@@ -5665,109 +5665,167 @@ CustomFilter.prototype.isHideValue = function(val) {
 	var result = false;
 	var isDigitValue = isNaN(val) ? false : true;
 	if(!isDigitValue)
-		val = val.toLowerCase();
-	var checkComplexSymbols = null;
-	var filterVal, position;
-	if(checkComplexSymbols != null)
-		result = checkComplexSymbols;
-	else
 	{
-		if(this.Operator == c_oAscCustomAutoFilter.equals || this.Operator == c_oAscCustomAutoFilter.doesNotEqual)//общие для числа и текста
-		{
-			filterVal = isNaN(this.Val) ? this.Val.toLowerCase() : this.Val;
-			if (this.Operator == c_oAscCustomAutoFilter.equals)//equals
-			{
-				if(val == filterVal)
-					result = true;
-			}
-			else if (this.Operator == c_oAscCustomAutoFilter.doesNotEqual)//doesNotEqual
-			{
-				if(val != filterVal)
-					result = true;
-			}
-		}
-		else if((this.Operator == c_oAscCustomAutoFilter.isGreaterThan ||this.Operator == c_oAscCustomAutoFilter.isGreaterThanOrEqualTo || this.Operator == c_oAscCustomAutoFilter.isLessThan || this.Operator == c_oAscCustomAutoFilter.isLessThanOrEqualTo) && !isNaN(this.Val))//только для чисел
-		{
-			filterVal =  parseFloat(this.Val);
-			val = parseFloat(val);
-			
-			switch (this.Operator)
-			{
-				case c_oAscCustomAutoFilter.isGreaterThan:
-					if(val > filterVal)//isGreaterThan
-						result = true;
-					break;
-				case c_oAscCustomAutoFilter.isGreaterThanOrEqualTo:
-					if(val >= filterVal)//isGreaterThanOrEqualTo
-						result = true;
-					break;
-				case c_oAscCustomAutoFilter.isLessThan:
-					if(val < filterVal)//isLessThan
-						result = true;
-					break;
-				case c_oAscCustomAutoFilter.isLessThanOrEqualTo:
-					if(val <= filterVal)//isLessThanOrEqualTo
-						result = true;
-					break;
-			}
-		}
-		else if(this.Operator == c_oAscCustomAutoFilter.beginsWith || this.Operator == c_oAscCustomAutoFilter.doesNotBeginWith || this.Operator == c_oAscCustomAutoFilter.endsWith || this.Operator == c_oAscCustomAutoFilter.doesNotEndWith || this.Operator == c_oAscCustomAutoFilter.contains || this.Operator == c_oAscCustomAutoFilter.doesNotContain)//только для текста
-		{
-			filterVal = isNaN(this.Val) ? this.Val.toLowerCase() : this.Val;
-			switch (this.Operator)
-			{
-				case c_oAscCustomAutoFilter.beginsWith:
-					if(!isDigitValue)
-					{
-						if(val.startsWith(filterVal))//beginsWith
-							result = true;
-					}
-					break;
-				case c_oAscCustomAutoFilter.doesNotBeginWith: 
-					if(!isDigitValue)
-					{
-						if(!val.startsWith(filterVal))//doesNotBeginWith
-							result = true;
-					}
-					else
-						result = true;
-					break;
-				case c_oAscCustomAutoFilter.endsWith: 
-					if(!isDigitValue)
-					{
-						if(val.endsWith(filterVal))//endsWith
-							result = true;
-					}
-					break;
-				case c_oAscCustomAutoFilter.doesNotEndWith: 
-					if(!isDigitValue)
-					{
-						if(!val.endsWith(filterVal))//doesNotEndWith
-							result = true;
-					}
-					else
-						result = true;
-					break;
-				case c_oAscCustomAutoFilter.contains: 
-					if(!isDigitValue)
-					{
-						if(val.indexOf(filterVal) != -1)//contains
-							result = true;
-					}
-					break;
-				case c_oAscCustomAutoFilter.doesNotContain: 
-					if(!isDigitValue)
-					{
-						if(val.indexOf(filterVal) == -1)//doesNotContain
-							result = true;
-					}
-					else
-						result = true;
-					break
-			}
-		}
+		val = val.toLowerCase();
 	}
 
+	var checkComplexSymbols = null, filterVal;
+	if(checkComplexSymbols != null)
+	{
+		result = checkComplexSymbols;
+	}
+	else
+	{
+		var isNumberFilter = this.Operator == c_oAscCustomAutoFilter.isGreaterThan || this.Operator == c_oAscCustomAutoFilter.isGreaterThanOrEqualTo || this.Operator == c_oAscCustomAutoFilter.isLessThan || this.Operator == c_oAscCustomAutoFilter.isLessThanOrEqualTo;
+		
+		
+		if(c_oAscCustomAutoFilter.equals === this.Operator || c_oAscCustomAutoFilter.doesNotEqual === this.Operator)
+		{
+			filterVal = isNaN(this.Val) ? this.Val.toLowerCase() : this.Val;
+		}
+		else if(isNumberFilter)
+		{
+			if(isNaN(this.Val))
+			{
+				return !result;
+			}
+			else
+			{	
+				filterVal =  parseFloat(this.Val);
+				val = parseFloat(val);
+			}
+		}
+		else
+		{
+			filterVal = isNaN(this.Val) ? this.Val.toLowerCase() : this.Val;
+		}
+		
+		switch (this.Operator)
+		{
+			case c_oAscCustomAutoFilter.equals://equals
+			{
+				if(val === filterVal)
+				{
+					result = true;
+				}
+				
+				break;
+			}
+			case c_oAscCustomAutoFilter.doesNotEqual://doesNotEqual
+			{
+				if(val !== filterVal)
+				{
+					result = true;
+				}
+					
+				break;
+			}
+			
+			case c_oAscCustomAutoFilter.isGreaterThan://isGreaterThan
+			{
+				if(val > filterVal)
+				{
+					result = true;
+				}	
+				
+				break;
+			}
+			case c_oAscCustomAutoFilter.isGreaterThanOrEqualTo://isGreaterThanOrEqualTo
+			{
+				if(val >= filterVal)
+				{
+					result = true;
+				}	
+				
+				break;
+			}
+			case c_oAscCustomAutoFilter.isLessThan://isLessThan
+			{
+				if(val < filterVal)
+				{
+					result = true;
+				}
+				
+				break;
+			}
+			case c_oAscCustomAutoFilter.isLessThanOrEqualTo://isLessThanOrEqualTo
+			{
+				if(val <= filterVal)
+				{
+					result = true;
+				}
+				
+				break;
+			}
+			case c_oAscCustomAutoFilter.beginsWith://beginsWith
+			{
+				if(!isDigitValue)
+				{
+					if(val.startsWith(filterVal))
+						result = true;
+				}
+				
+				break;
+			}
+			case c_oAscCustomAutoFilter.doesNotBeginWith://doesNotBeginWith
+			{
+				if(!isDigitValue)
+				{
+					if(!val.startsWith(filterVal))
+						result = true;
+				}
+				else
+					result = true;
+				
+				break;
+			}
+			case c_oAscCustomAutoFilter.endsWith://endsWith
+			{
+				if(!isDigitValue)
+				{
+					if(val.endsWith(filterVal))
+						result = true;
+				}
+				
+				break;
+			}
+			case c_oAscCustomAutoFilter.doesNotEndWith://doesNotEndWith
+			{
+				if(!isDigitValue)
+				{
+					if(!val.endsWith(filterVal))
+						result = true;
+				}
+				else
+					result = true;
+				
+				break;
+			}
+			case c_oAscCustomAutoFilter.contains://contains
+			{
+				if(!isDigitValue)
+				{
+					if(val.indexOf(filterVal) !== -1)
+						result = true;
+				}
+				
+				break;
+			}
+			case c_oAscCustomAutoFilter.doesNotContain://doesNotContain
+			{
+				if(!isDigitValue)
+				{
+					if(val.indexOf(filterVal) === -1)
+						result = true;
+				}
+				else
+					result = true;
+				
+				break;
+			}
+		}
+	}	
+	
 	return !result;
 };
 
