@@ -3479,14 +3479,17 @@ Woorksheet.prototype.initPostOpen = function(handlers){
 	this.handlers = handlers;
 	this._setHandlersTablePart();
 };
-Woorksheet.prototype._getValuesForConditionalFormatting = function(sqref) {
+Woorksheet.prototype._getValuesForConditionalFormatting = function(sqref, withEmpty) {
   var res = [];
-  var aValues = [], aCells = [];
-  this.getRange3(sqref.r1, sqref.c1, sqref.r2, sqref.c2)._setPropertyNoEmpty(null, null, function(c) {
-    if (!c.isEmptyTextString()) {
-      res.push({c: c, v: c.getValueWithoutFormat()});
-    }
-  });
+  var range = this.getRange3(sqref.r1, sqref.c1, sqref.r2, sqref.c2);
+  var fAction = function(c) {
+    res.push({c: c, v: c.getValueWithoutFormat()});
+  };
+  if (withEmpty) {
+    range._setProperty(null, null, fAction);
+  } else {
+    range._setPropertyNoEmpty(null, null, fAction);
+  }
   return res;
 };
 Woorksheet.prototype._updateConditionalFormatting = function(range) {
@@ -3507,8 +3510,8 @@ Woorksheet.prototype._updateConditionalFormatting = function(range) {
       for (j = 0; j < aRules.length; ++j) {
         oRule = aRules[j];
 
-        // ToDo aboveAverage, cellIs, containsBlanks,
-        // ToDo dataBar, expression, iconSet, notContainsBlanks,
+        // ToDo aboveAverage, cellIs,
+        // ToDo dataBar, expression, iconSet,
         // ToDo timePeriod (page 2679)
         if (Asc.ECfType.colorScale === oRule.type) {
           if (1 !== oRule.aRuleElements.length) {
@@ -3520,7 +3523,7 @@ Woorksheet.prototype._updateConditionalFormatting = function(range) {
           }
           min = Number.MAX_VALUE;
           max = -Number.MAX_VALUE;
-          values = this._getValuesForConditionalFormatting(sqref);
+          values = this._getValuesForConditionalFormatting(sqref, false);
           for (cell = 0; cell < values.v.length; ++cell) {
             value = values[cell];
             if (CellValueType.Number === value.c.getType() && !isNaN(tmp = parseFloat(value.v))) {
@@ -3551,7 +3554,7 @@ Woorksheet.prototype._updateConditionalFormatting = function(range) {
         } else if (Asc.ECfType.top10 === oRule.type) {
           if (oRule.rank > 0 && oRule.dxf) {
             nc = 0;
-            values = this._getValuesForConditionalFormatting(sqref);
+            values = this._getValuesForConditionalFormatting(sqref, false);
             o = oRule.bottom ? -Number.MAX_VALUE : Number.MAX_VALUE;
             for (cell = 0; cell < values.length; ++cell) {
               value = values[cell];
@@ -3579,7 +3582,7 @@ Woorksheet.prototype._updateConditionalFormatting = function(range) {
           if (!oRule.dxf) {
             continue;
           }
-          values = this._getValuesForConditionalFormatting(sqref);
+          values = this._getValuesForConditionalFormatting(sqref, true);
 
           switch (oRule.type) {
             case Asc.ECfType.duplicateValues:
@@ -3628,6 +3631,16 @@ Woorksheet.prototype._updateConditionalFormatting = function(range) {
             case Asc.ECfType.notContainsErrors:
               compareFunction = function(val, c) {
                 return CellValueType.Error !== c.getType();
+              };
+              break;
+            case Asc.ECfType.containsBlanks:
+              compareFunction = function(val, c) {
+                return c.isEmptyTextString();
+              };
+              break;
+            case Asc.ECfType.notContainsBlanks:
+              compareFunction = function(val, c) {
+                return !c.isEmptyTextString();
               };
               break;
             default:
