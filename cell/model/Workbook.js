@@ -3495,7 +3495,7 @@ Woorksheet.prototype._updateConditionalFormatting = function(range) {
   var aRules, oRule;
   var oRuleElement = null;
   var o;
-  var i, j, cell, sqref, values, value, tmp, min, max, dxf, compareFunction;
+  var i, j, cell, sqref, values, value, tmp, min, max, dxf, compareFunction, nc;
   for (i = 0; i < aCFs.length; ++i) {
     sqref = aCFs[i].sqref;
     // ToDo убрать null === sqref когда научимся мультиселект обрабатывать (\\192.168.5.2\source\DOCUMENTS\XLSX\Matematika Quantum Sedekah.xlsx)
@@ -3550,11 +3550,13 @@ Woorksheet.prototype._updateConditionalFormatting = function(range) {
           }
         } else if (Asc.ECfType.top10 === oRule.type) {
           if (oRule.rank > 0 && oRule.dxf) {
+            nc = 0;
             values = this._getValuesForConditionalFormatting(sqref);
             o = oRule.bottom ? -Number.MAX_VALUE : Number.MAX_VALUE;
             for (cell = 0; cell < values.length; ++cell) {
               value = values[cell];
               if (CellValueType.Number === value.c.getType() && !isNaN(tmp = parseFloat(value.v))) {
+                ++nc;
                 value.v = tmp;
               } else {
                 value.v = o;
@@ -3567,9 +3569,10 @@ Woorksheet.prototype._updateConditionalFormatting = function(range) {
             })(oRule.bottom ? -1 : 1));
 
             tmp = 0;
+            nc = oRule.percent ? Math.floor(nc * oRule.rank / 100) : oRule.rank;
             for (cell = 0; cell < values.length; ++cell) {
               value = values[cell];
-              value.c.setConditionalFormattingStyle((o !== value.v && tmp < oRule.rank) ? (++tmp && oRule.dxf) : null);
+              value.c.setConditionalFormattingStyle((o !== value.v && tmp < nc) ? (++tmp && oRule.dxf) : null);
             }
           }
         } else {
