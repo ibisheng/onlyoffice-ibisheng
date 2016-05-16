@@ -12008,6 +12008,95 @@
         };
         this._isLockedAll( onChangeAutoFilterCallback );
     };
+	
+	WorksheetView.prototype.applyAutoFilterByType = function ( autoFilterObject ) {
+        var t = this;
+        var ar = t.activeRange.clone( true );
+		
+		var isStartRangeIntoFilterOrTable = t.model.autoFilters.isStartRangeContainIntoTableOrFilter(ar);
+		var isApplyAutoFilter = null, iaAddAutoFilter = null, cellId, filterProps;
+		if(null !== isStartRangeIntoFilterOrTable)//into autofilter or format table
+		{
+			if(-1 === isStartRangeIntoFilterOrTable)//autofilter
+			{
+				var autoFilter = t.model.AutoFilter;
+				var colId = ar.c1 - autoFilter.Ref.c1;
+				filterProps = {id: null, colId: colId};
+				
+				isApplyAutoFilter = true;
+			}
+			else if(t.model.TableParts[isStartRangeIntoFilterOrTable])//format table
+			{
+				var formatTable = t.model.TableParts[isStartRangeIntoFilterOrTable];
+				if(formatTable.AutoFilter)
+				{
+					var autoFilter = t.model.AutoFilter;
+					var colId = ar.c1 - autoFilter.Ref.c1;
+					filterProps = {id: null, colId: colId};
+					
+					isApplyAutoFilter = true;
+				}
+				else
+				{
+					
+				}
+			}
+		}
+		else//without filter
+		{
+			
+		}
+		
+		
+		
+		var onChangeAutoFilterCallback = function ( isSuccess ) {
+            if ( false === isSuccess ) {
+                return;
+            }
+			
+			History.Create_NewPoint();
+			History.StartTransaction();
+			
+			if(null !== isAddAutoFilter)
+			{	
+				t.model.autoFilters.addAutoFilter(null, ar, addFormatTableOptionsObj);
+			}
+			
+			if(null !== isApplyAutoFilter)
+			{
+				var autoFilterObject = t.af_setDialogProp(filterProps, true);
+				
+				
+				var applyFilterProps = t.model.autoFilters.applyAutoFilter( autoFilterObject, ar );
+				var rowChange = applyFilterProps.rowChange;
+				var rangeOldFilter = applyFilterProps.rangeOldFilter;
+
+				if(null !== rangeOldFilter && !t.model.workbook.bUndoChanges && !t.model.workbook.bRedoChanges)
+				{
+					t._onUpdateFormatTable(rangeOldFilter, false, true);
+				}
+
+				if ( null !== rowChange ) {
+					t.objectRender.updateSizeDrawingObjects( {target: c_oTargetType.RowResize, row: rowChange} );
+				}
+			}
+			
+			History.EndTransaction();
+		};
+		
+		if(null !== isAddAutoFilter)//do not add autoFilter
+		{
+			this._isLockedAll( onChangeAutoFilterCallback );
+		}
+		else//add autofilter + apply
+		{
+			if ( t._checkAddAutoFilter( ar, styleName, addFormatTableOptionsObj ) === true ) {
+				this._isLockedAll( onChangeAutoFilterCallback );
+				this._isLockedDefNames( null, null );
+			}
+		}
+		
+    };
 
     WorksheetView.prototype.sortColFilter = function ( type, cellId, displayName, color ) {
         var t = this;
@@ -12622,7 +12711,7 @@
         return result;
     };
 
-    WorksheetView.prototype.af_setDialogProp = function(filterProp)
+    WorksheetView.prototype.af_setDialogProp = function(filterProp, isReturnProps)
     {
         var ws = this.model;
 
@@ -12651,7 +12740,7 @@
         var cellId = ws.autoFilters._rangeToId(rangeButton);
 
         //get filter object
-        var filterObj = new AscCommonExcel.AutoFilterObj();
+        var filterObj = new Asc.AutoFilterObj();
         if(filters && filters.ColorFilter)
         {
             filterObj.type = c_oAscAutoFilterTypes.ColorFilter;
@@ -12730,7 +12819,7 @@
 
 
         //set menu object
-        var autoFilterObject = new AscCommonExcel.AutoFiltersOptions();
+        var autoFilterObject = new Asc.AutoFiltersOptions();
 
         autoFilterObject.asc_setSortState(sortVal);
         autoFilterObject.asc_setCellId(cellId);
@@ -12747,8 +12836,14 @@
 		autoFilterObject.asc_setColorsFill(filterTypes.colors);
 		autoFilterObject.asc_setColorsFont(filterTypes.fontColors);
 
-
-        this.handlers.trigger("setAutoFiltersDialog", autoFilterObject);
+		if(isReturnProps)
+		{
+			return autoFilterObject;
+		}
+		else
+		{
+			this.handlers.trigger("setAutoFiltersDialog", autoFilterObject);
+		}
     };
 
     WorksheetView.prototype.af_getFilterTypes = function(columnRange)

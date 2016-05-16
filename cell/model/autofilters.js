@@ -1793,6 +1793,33 @@
 				return false;
 			},
 			
+			isStartRangeContainIntoTableOrFilter: function(range)
+			{
+				var res = null;
+				
+				var worksheet = this.worksheet;
+				var tableParts = worksheet.TableParts;
+				
+				var startRange = new Asc.Range(range.startCol, range.startRow, range.startCol, range.startRow);
+				
+				for(var i = 0; i < tableParts.length; i++ )
+				{
+					if(startRange.intersection(tableParts[i].Ref))
+					{
+						res = i;
+						break;
+					}
+				}
+				
+				//пересекается, но не равен фильтрованному диапазону. если равен - то фильтр превращается в таблицу
+				if(worksheet.AutoFilter && worksheet.AutoFilter.Ref && startRange.intersection(worksheet.AutoFilter.Ref))
+				{
+					res = -1;
+				}
+				
+				return res;
+			},
+			
 			unmergeTablesAfterMove: function(arnTo)
 			{
 				var worksheet = this.worksheet;
@@ -4786,7 +4813,7 @@
 		window['AscCommonExcel'] = window['AscCommonExcel'] || {};
 		window["AscCommonExcel"].AutoFilters				= AutoFilters;
 
-		window["AscCommonExcel"].AutoFiltersOptions = AutoFiltersOptions;
+		window["Asc"].AutoFiltersOptions		= AutoFiltersOptions;
 		prot									= AutoFiltersOptions.prototype;
 		prot["asc_setSortState"]				= prot.asc_setSortState;
 		prot["asc_getSortState"]				= prot.asc_getSortState;
@@ -4799,7 +4826,7 @@
         prot["asc_getColorsFont"]				= prot.asc_getColorsFont;
         prot["asc_getSortColor"]				= prot.asc_getSortColor;
 
-		window["AscCommonExcel"].AutoFilterObj = AutoFilterObj;
+		window["Asc"].AutoFilterObj				= AutoFilterObj;
 		prot									= AutoFilterObj.prototype;
 		prot["asc_getType"]						= prot.asc_getType;
 		prot["asc_setFilter"]					= prot.asc_setFilter;
