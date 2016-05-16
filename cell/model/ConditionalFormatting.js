@@ -138,6 +138,48 @@
 		}
 		return {start: start, end: end};
 	};
+	CConditionalFormattingRule.prototype.cellIs = function(val, v1, v2) {
+		var res = false;
+		switch(this.operator) {
+			case AscCommonExcel.ECfOperator.Operator_beginsWith:
+				res = val.endsWith(v1);
+				break;
+			case AscCommonExcel.ECfOperator.Operator_between:
+				res = v1 <= val && val <= v2;
+				break;
+			case AscCommonExcel.ECfOperator.Operator_containsText:
+				res = -1 !== val.indexOf(v1);
+				break;
+			case AscCommonExcel.ECfOperator.Operator_endsWith:
+				res = val.startsWith(v1);
+				break;
+			case AscCommonExcel.ECfOperator.Operator_equal:
+				res = val == v1;
+				break;
+			case AscCommonExcel.ECfOperator.Operator_greaterThan:
+				res = val > v1;
+				break;
+			case AscCommonExcel.ECfOperator.Operator_greaterThanOrEqual:
+				res = val >= v1;
+				break;
+			case AscCommonExcel.ECfOperator.Operator_lessThan:
+				res = val < v1;
+				break;
+			case AscCommonExcel.ECfOperator.Operator_lessThanOrEqual:
+				res = val <= v1;
+				break;
+			case AscCommonExcel.ECfOperator.Operator_notBetween:
+				res = !(v1 <= val && val <= v2);
+				break;
+			case AscCommonExcel.ECfOperator.Operator_notContains:
+				res = -1 === val.indexOf(v1);
+				break;
+			case AscCommonExcel.ECfOperator.Operator_notEqual:
+				res = val != v1;
+				break;
+		}
+		return res;
+	};
 
 	function CColorScale () {
 		this.aCFVOs = [];
@@ -214,6 +256,7 @@
 
 	function CFormulaCF () {
 		this.Text = null;
+		this._f = null;
 
 		return this;
 	}
@@ -221,6 +264,16 @@
 		var res = new CFormulaCF();
 		res.Text = this.Text;
 		return res;
+	};
+	CFormulaCF.prototype.init = function(ws) {
+		if (!this._f) {
+			this._f = new AscCommonExcel.parserFormula(this.Text, '', ws);
+			this._f.parse();
+		}
+	};
+	CFormulaCF.prototype.getValue = function(ws) {
+		this.init(ws);
+		return this._f.calculate().getValue();
 	};
 
 	function CIconSet () {

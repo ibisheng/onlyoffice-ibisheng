@@ -3510,9 +3510,9 @@ Woorksheet.prototype._updateConditionalFormatting = function(range) {
       for (j = 0; j < aRules.length; ++j) {
         oRule = aRules[j];
 
-        // ToDo aboveAverage, cellIs,
+        // ToDo aboveAverage,
         // ToDo dataBar, expression, iconSet (page 2679)
-        if (Asc.ECfType.colorScale === oRule.type) {
+        if (AscCommonExcel.ECfType.colorScale === oRule.type) {
           if (1 !== oRule.aRuleElements.length) {
             break;
           }
@@ -3565,7 +3565,7 @@ Woorksheet.prototype._updateConditionalFormatting = function(range) {
               value.c.setConditionalFormattingStyle(dxf);
             }
           }
-        } else if (Asc.ECfType.top10 === oRule.type) {
+        } else if (AscCommonExcel.ECfType.top10 === oRule.type) {
           if (oRule.rank > 0 && oRule.dxf) {
             nc = 0;
             values = this._getValuesForConditionalFormatting(sqref, false);
@@ -3599,30 +3599,30 @@ Woorksheet.prototype._updateConditionalFormatting = function(range) {
           values = this._getValuesForConditionalFormatting(sqref, true);
 
           switch (oRule.type) {
-            case Asc.ECfType.duplicateValues:
-            case Asc.ECfType.uniqueValues:
+            case AscCommonExcel.ECfType.duplicateValues:
+            case AscCommonExcel.ECfType.uniqueValues:
               o = getUniqueKeys(values);
               compareFunction = (function(obj, condition){
                 return function(val) {
                   return condition === obj[val];
                 };
-              })(o, oRule.type === Asc.ECfType.duplicateValues);
+              })(o, oRule.type === AscCommonExcel.ECfType.duplicateValues);
               break;
-            case Asc.ECfType.containsText:
+            case AscCommonExcel.ECfType.containsText:
               compareFunction = (function(text){
                 return function(val) {
                   return -1 !== val.indexOf(text);
                 };
               })(oRule.text);
               break;
-            case Asc.ECfType.notContainsText:
+            case AscCommonExcel.ECfType.notContainsText:
               compareFunction = (function(text){
                 return function(val) {
                   return -1 === val.indexOf(text);
                 };
               })(oRule.text);
               break;
-            case Asc.ECfType.beginsWith:
+            case AscCommonExcel.ECfType.beginsWith:
               compareFunction = (function(text){
                 return function(val) {
                   return val.startsWith(text);
@@ -3630,44 +3630,51 @@ Woorksheet.prototype._updateConditionalFormatting = function(range) {
               })(oRule.text);
 
               break;
-            case Asc.ECfType.endsWith:
+            case AscCommonExcel.ECfType.endsWith:
               compareFunction = (function(text){
                 return function(val) {
                   return val.endsWith(text);
                 };
               })(oRule.text);
               break;
-            case Asc.ECfType.containsErrors:
+            case AscCommonExcel.ECfType.containsErrors:
               compareFunction = function(val, c) {
                 return CellValueType.Error === c.getType();
               };
               break;
-            case Asc.ECfType.notContainsErrors:
+            case AscCommonExcel.ECfType.notContainsErrors:
               compareFunction = function(val, c) {
                 return CellValueType.Error !== c.getType();
               };
               break;
-            case Asc.ECfType.containsBlanks:
+            case AscCommonExcel.ECfType.containsBlanks:
               compareFunction = function(val, c) {
                 return c.isEmptyTextString();
               };
               break;
-            case Asc.ECfType.notContainsBlanks:
+            case AscCommonExcel.ECfType.notContainsBlanks:
               compareFunction = function(val, c) {
                 return !c.isEmptyTextString();
               };
               break;
-            case Asc.ECfType.timePeriod:
+            case AscCommonExcel.ECfType.timePeriod:
               if (oRule.timePeriod) {
-                compareFunction = (function(rule, period) {
+                compareFunction = (function(period) {
                   return function(val, c) {
                     var n = parseFloat(val);
                     return period.start <= n && n <= period.end;
                   };
-                })(oRule, oRule.getTimePeriod());
+                })(oRule.getTimePeriod());
               } else {
                 continue;
               }
+              break;
+            case AscCommonExcel.ECfType.cellIs:
+              compareFunction = (function(rule, v1, v2) {
+                return function(val, c) {
+                  return rule.cellIs(val, v1, v2);
+                };
+              })(oRule, oRule.aRuleElements[0] && oRule.aRuleElements[0].getValue(this), oRule.aRuleElements[1] && oRule.aRuleElements[1].getValue(this));
               break;
             default:
               continue;

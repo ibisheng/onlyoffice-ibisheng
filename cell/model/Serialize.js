@@ -8100,7 +8100,8 @@
     window["Asc"].ETableStyleType = ETableStyleType;
     window["Asc"].EFontScheme = EFontScheme;
     window["Asc"].EIconSetType = EIconSetType;
-	window["Asc"].ECfType = ECfType;
+    window["AscCommonExcel"].ECfOperator = ECfOperator;
+	window["AscCommonExcel"].ECfType = ECfType;
     window["AscCommonExcel"].ECfvoType = ECfvoType;
     window["AscCommonExcel"].ST_TimePeriod = ST_TimePeriod;
       window["Asc"].ESparklineType = ESparklineType;
