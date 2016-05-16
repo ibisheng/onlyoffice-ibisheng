@@ -972,6 +972,19 @@
         Percent: 4,
         Percentile: 5
     };
+    var ST_TimePeriod = {
+        last7Days : 'last7Days',
+        lastMonth : 'lastMonth',
+        lastWeek  : 'lastWeek',
+        nextMonth : 'nextMonth',
+        nextWeek  : 'nextWeek',
+        thisMonth : 'thisMonth',
+        thisWeek  : 'thisWeek',
+        today     : 'today',
+        tomorrow  : 'tomorrow',
+        yesterday : 'yesterday'
+    };
+
       var ESparklineType = {
           Line: 0,
           Column: 1,
