@@ -1737,7 +1737,7 @@
 					}
 					else 
 					{	
-						if(this._checkPasteFromBinaryExcel(worksheet, true))
+						if(this._checkPasteFromBinaryExcel(worksheet, true, pasteData))
 						{
 							var newFonts = {};
 							pasteData.generateFontMap(newFonts);
@@ -1832,20 +1832,32 @@
 				return false;
 			},
 			
-			_checkPasteFromBinaryExcel: function(worksheet, isWriteError)
+			_checkPasteFromBinaryExcel: function(worksheet, isWriteError, insertWorksheet)
 			{
 				var activeCellsPasteFragment = AscCommonExcel.g_oRangeCache.getAscRange(this.activeRange);
 				var rMax = (activeCellsPasteFragment.r2 - activeCellsPasteFragment.r1) + worksheet.activeRange.r1;
 				var cMax = (activeCellsPasteFragment.c2 - activeCellsPasteFragment.c1) + worksheet.activeRange.c1;
+				var res = true;
 				
 				//если область вставки выходит за пределы доступной области
 				if(cMax > AscCommon.gc_nMaxCol0 || rMax > AscCommon.gc_nMaxRow0)
 				{
 					if(isWriteError)
+					{
 						worksheet.handlers.trigger ("onErrorEvent", Asc.c_oAscError.ID.PasteMaxRangeError, Asc.c_oAscError.Level.NoCritical);
-					return false;
+					}
+					
+					res = false;
 				}
-				return true;
+				else if(!worksheet.handlers.trigger("getLockDefNameManagerStatus") && insertWorksheet && insertWorksheet.TableParts && insertWorksheet.TableParts.length)
+				{
+					//если пытаемся вставить вторым пользователем форматированную таблицу, когда первый уже добавил другую форматированную таблицу
+					worksheet.handlers.trigger("onErrorEvent", c_oAscError.ID.LockCreateDefName, c_oAscError.Level.NoCritical);
+					
+					res = false;
+				}
+				
+				return res;
 			},
 			
 			_getClassBinaryFromHtml: function(node)
