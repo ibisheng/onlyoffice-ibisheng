@@ -12850,6 +12850,7 @@
     {
 		var tablePart = this.model.autoFilters._getFilterByDisplayName(tableName);
 		var t = this;
+		var ar = this.activeRange;
 		
 		if(!tablePart || (tablePart && !tablePart.TableStyleInfo))
 		{
@@ -12867,7 +12868,17 @@
 				
 				History.Create_NewPoint();
 				History.StartTransaction();
-				t.model.autoFilters.changeFormatTableInfo(tableName, optionType, val);
+				
+				var newTableRef = t.model.autoFilters.changeFormatTableInfo(tableName, optionType, val);
+				if(newTableRef.r1 > ar.r1 || newTableRef.r2 < ar.r2)
+				{
+					var startRow = newTableRef.r1 > ar.r1 ? newTableRef.r1 : ar.r1;
+					var endRow = newTableRef.r2 < ar.r2 ? newTableRef.r2 : ar.r2;
+					var newActiveRange = new Asc.Range(ar.c1, startRow, ar.c2, endRow);
+					
+					t.setSelection(newActiveRange);
+					History.SetSelectionRedo(newActiveRange);
+				}
 				
 				t._onUpdateFormatTable(isChangeTableInfo, false, true);
 				History.EndTransaction();
