@@ -91,6 +91,42 @@
 			res.aColors.push(this.aColors[i].clone());
 		return res;
 	};
+	CColorScale.prototype.getMin = function(min, max, count) {
+		var oCFVO = (0 < this.aCFVOs.length) ? this.aCFVOs[0] : null;
+		return this.getValue(min, max, count, oCFVO);
+	};
+	CColorScale.prototype.getMid = function(min, max, count) {
+		var oCFVO = (2 < this.aCFVOs.length ? this.aCFVOs[1] : null);
+		return this.getValue(min, max, count, oCFVO);
+	};
+	CColorScale.prototype.getMax = function(min, max, count) {
+		var oCFVO = (2 === this.aCFVOs.length) ? this.aCFVOs[1] : (2 < this.aCFVOs.length ? this.aCFVOs[2] : null);
+		return this.getValue(min, max, count, oCFVO);
+	};
+	CColorScale.prototype.getValue = function(min, max, count, oCFVO) {
+		var res = min;
+		if (oCFVO) {
+			// ToDo Formula
+			switch (oCFVO.Type) {
+				case AscCommonExcel.ECfvoType.Minimum:
+					res = min;
+					break;
+				case AscCommonExcel.ECfvoType.Maximum:
+					res = max;
+					break;
+				case AscCommonExcel.ECfvoType.Number:
+					res = parseFloat(oCFVO.Val);
+					break;
+				case AscCommonExcel.ECfvoType.Percent:
+					res = min + Math.floor((max - min) * parseFloat(oCFVO.Val) / 100);
+					break;
+				case AscCommonExcel.ECfvoType.Percentile:
+					res = min + Math.floor(count * parseFloat(oCFVO.Val) / 100);
+					break;
+			}
+		}
+		return res;
+	};
 
 	function CDataBar () {
 		this.MaxLength = 90;
@@ -191,6 +227,11 @@
 		this.b2 = this.c2.getB();
 	};
 	CGradient.prototype.calculateColor = function (indexColor) {
+		if (indexColor < this.min) {
+			indexColor = this.min;
+		} else if (indexColor > this.max) {
+			indexColor = this.max;
+		}
 		indexColor = ((indexColor - this.min) * this.koef) >> 0;
 
 		var r = (this.r1 + ((FT_Common.IntToUInt(this.r2 - this.r1) * indexColor) >> this.base_shift)) & 0xFF;

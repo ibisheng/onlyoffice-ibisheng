@@ -3493,12 +3493,12 @@ Woorksheet.prototype._getValuesForConditionalFormatting = function(sqref, withEm
   return res;
 };
 Woorksheet.prototype._updateConditionalFormatting = function(range) {
-  var oGradient = null;
+  var oGradient1, oGradient2;
   var aCFs = this.aConditionalFormatting;
   var aRules, oRule;
   var oRuleElement = null;
   var o;
-  var i, j, cell, sqref, values, value, tmp, min, max, dxf, compareFunction, nc;
+  var i, j, l, cell, sqref, values, value, v, tmp, min, mid, max, dxf, compareFunction, nc;
   for (i = 0; i < aCFs.length; ++i) {
     sqref = aCFs[i].sqref;
     // ToDo убрать null === sqref когда научимся мультиселект обрабатывать (\\192.168.5.2\source\DOCUMENTS\XLSX\Matematika Quantum Sedekah.xlsx)
@@ -3521,32 +3521,47 @@ Woorksheet.prototype._updateConditionalFormatting = function(range) {
           if (!(oRuleElement instanceof AscCommonExcel.CColorScale)) {
             break;
           }
+          nc = 0;
           min = Number.MAX_VALUE;
           max = -Number.MAX_VALUE;
           values = this._getValuesForConditionalFormatting(sqref, false);
-          for (cell = 0; cell < values.v.length; ++cell) {
+          for (cell = 0; cell < values.length; ++cell) {
             value = values[cell];
             if (CellValueType.Number === value.c.getType() && !isNaN(tmp = parseFloat(value.v))) {
               value.v = tmp;
               min = Math.min(min, tmp);
               max = Math.max(max, tmp);
+              ++nc;
             } else {
               value.v = null;
             }
           }
 
-          // ToDo CFVO Type (formula, max, min, num, percent, percentile) (page 2681)
-          // ToDo support 3 colors in rule
-          if (0 < values.length && 2 === oRuleElement.aColors.length) {
-            oGradient = new AscCommonExcel.CGradient(oRuleElement.aColors[0], oRuleElement.aColors[1]);
-            oGradient.init(min, max);
+          // ToDo CFVO Type formula (page 2681)
+          l = oRuleElement.aColors.length;
+          if (0 < values.length && 2 <= l) {
+            oGradient1 = new AscCommonExcel.CGradient(oRuleElement.aColors[0], oRuleElement.aColors[1]);
+            min = oRuleElement.getMin(min, max, nc);
+            max = oRuleElement.getMax(min, max, nc);
+            oGradient2 = null;
+            if (2 < l) {
+              oGradient2 = new AscCommonExcel.CGradient(oRuleElement.aColors[1], oRuleElement.aColors[2]);
+              mid = oRuleElement.getMid(min, max, nc);
+
+              oGradient1.init(min, mid);
+              oGradient2.init(mid, max);
+            } else {
+              oGradient1.init(min, max);
+            }
 
             for (cell = 0; cell < values.length; ++cell) {
               value = values[cell];
+              v = value.v;
               dxf = null;
-              if (null !== value.v) {
+              if (null !== v) {
                 dxf = new AscCommonExcel.CellXfs();
-                dxf.fill = new AscCommonExcel.Fill({bg: oGradient.calculateColor(value.v)});
+                tmp = (oGradient2 && v > oGradient1.max) ? oGradient2 : oGradient1;
+                dxf.fill = new AscCommonExcel.Fill({bg: tmp.calculateColor(v)});
               }
               value.c.setConditionalFormattingStyle(dxf);
             }
@@ -3567,7 +3582,7 @@ Woorksheet.prototype._updateConditionalFormatting = function(range) {
             }
             values.sort((function(condition) {
               return function(v1, v2) {
-                return condition* (v2.v - v1.v);
+                return condition * (v2.v - v1.v);
               }
             })(oRule.bottom ? -1 : 1));
 
