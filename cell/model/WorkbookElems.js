@@ -4505,10 +4505,6 @@ CellArea.prototype = {
 };
 
 /** @constructor */
-function sparklineGroups() {
-	this.arrSparklineGroup = [];
-}
-/** @constructor */
 function sparklineGroup() {
 	// attributes
 	this.manualMax = undefined;
@@ -4542,6 +4538,41 @@ function sparklineGroup() {
 	this.arrSparklines = [];
 	this.arrCachedSparklines = [];
 }
+sparklineGroup.prototype.clone = function() {
+	var res = new sparklineGroup();
+	res.manualMax = this.manualMax;
+	res.manualMin = this.manualMin;
+	res.lineWeight = this.lineWeight;
+	res.type = this.type;
+	res.dateAxis = this.dateAxis;
+	res.displayEmptyCellsAs = this.displayEmptyCellsAs;
+	res.markers = this.markers;
+	res.high = this.high;
+	res.low = this.low;
+	res.first = this.first;
+	res.last = this.last;
+	res.negative = this.negative;
+	res.displayXAxis = this.displayXAxis;
+	res.displayHidden = this.displayHidden;
+	res.minAxisType = this.minAxisType;
+	res.maxAxisType = this.maxAxisType;
+	res.rightToLeft = this.rightToLeft;
+
+	res.colorSeries = this.colorSeries ? this.colorSeries.clone() : null;
+	res.colorNegative = this.colorNegative ? this.colorNegative.clone() : null;
+	res.colorAxis = this.colorAxis ? this.colorAxis : null;
+	res.colorMarkers = this.colorMarkers ? this.colorMarkers : null;
+	res.colorFirst = this.colorFirst ? this.colorFirst : null;
+	res.colorLast = this.colorLast ? this.colorLast : null;
+	res.colorHigh = this.colorHigh ? this.colorHigh : null;
+	res.colorLow = this.colorLow ? this.colorLow : null;
+	res.f = this.f;
+
+	for (var i = 0; i < this.arrSparklines.length; ++i) {
+		res.arrSparklines.push(this.arrSparklines[i].clone());
+	}
+	return res;
+};
 sparklineGroup.prototype.addView = function(oSparklineView, index) {
 	this.arrCachedSparklines[index] = oSparklineView;
 };
@@ -4572,6 +4603,15 @@ function sparkline() {
 	this.f = null;
 	this._f = null;
 }
+sparkline.prototype.clone = function() {
+	var res = new sparkline();
+	
+	res.sqref = this.sqref ? this.sqref.clone() : null;
+	res.f = this.f;
+	res._f = this._f ? this._f.clone() : null;
+	
+	return res;
+};
 sparkline.prototype.setSqref = function(sqref) {
 	this.sqref = AscCommonExcel.g_oRangeCache.getAscRange(sqref);
 };
@@ -6245,7 +6285,6 @@ function getCurrencyFormat(opt_cultureInfo, opt_fraction, opt_currency, opt_curr
 	window['AscCommonExcel'].RangeDataManagerElem = RangeDataManagerElem;
 	window['AscCommonExcel'].RangeDataManager = RangeDataManager;
 	window['AscCommonExcel'].CellArea = CellArea;
-	window['AscCommonExcel'].sparklineGroups = sparklineGroups;
 	window['AscCommonExcel'].sparklineGroup = sparklineGroup;
 	window['AscCommonExcel'].sparkline = sparkline;
 	window['AscCommonExcel'].TablePart = TablePart;

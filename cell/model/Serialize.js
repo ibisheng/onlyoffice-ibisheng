@@ -1112,7 +1112,7 @@
 		else if(null != color.rgb)
 			output = new AscCommonExcel.RgbColor(0x00ffffff & color.rgb);
 		return output;
-	};
+	}
 
     /** @constructor */
     function BinaryTableWriter(memory, aDxfs, isCopyPaste)
@@ -2442,8 +2442,8 @@
                 oBinaryTableWriter = new BinaryTableWriter(this.memory, this.aDxfs, this.isCopyPaste);
                 this.bs.WriteItem(c_oSerWorksheetsTypes.TableParts, function(){oBinaryTableWriter.Write(ws.TableParts);});
             }
-            if (null != ws.sparklineGroups && ws.sparklineGroups.arrSparklineGroup.length > 0) {
-                this.bs.WriteItem(c_oSerWorksheetsTypes.SparklineGroups, function(){oThis.WriteSparklineGroups(ws.sparklineGroups);});
+            if (ws.aSparklineGroups.length > 0) {
+                this.bs.WriteItem(c_oSerWorksheetsTypes.SparklineGroups, function(){oThis.WriteSparklineGroups(ws.aSparklineGroups);});
             }
         };
         this.WriteWorksheetProp = function(ws, index)
@@ -3623,11 +3623,11 @@
             for(var i = 0, length = aReplies.length; i < length; ++i)
                 this.bs.WriteItem( c_oSer_CommentData.Reply, function(){oThis.WriteCommentData(aReplies[i]);});
         };
-		this.WriteSparklineGroups = function(oSparklineGroups)
+		this.WriteSparklineGroups = function(aSparklineGroups)
         {
             var oThis = this;
-            for(var i = 0, length = oSparklineGroups.arrSparklineGroup.length; i < length; ++i)
-                this.bs.WriteItem( c_oSer_Sparkline.SparklineGroup, function(){oThis.WriteSparklineGroup(oSparklineGroups.arrSparklineGroup[i]);});
+            for(var i = 0, length = aSparklineGroups.length; i < length; ++i)
+                this.bs.WriteItem( c_oSer_Sparkline.SparklineGroup, function(){oThis.WriteSparklineGroup(aSparklineGroups[i]);});
         };
 		this.WriteSparklineGroup = function(oSparklineGroup)
         {
@@ -5601,7 +5601,7 @@
                 });
 			} else if (c_oSerWorksheetsTypes.SparklineGroups === type) {
                 res = this.bcr.Read1(length, function (t, l) {
-                    return oThis.ReadSparklineGroups(t, l, oWorksheet.sparklineGroups);
+                    return oThis.ReadSparklineGroups(t, l, oWorksheet.aSparklineGroups);
                 });
             } else
                 res = c_oSerConstants.ReadUnknown;
@@ -6541,7 +6541,7 @@
 
             return res;
         };
-		this.ReadSparklineGroups = function (type, length, oSparklineGroups) {
+		this.ReadSparklineGroups = function (type, length, aSparklineGroups) {
             var oThis = this;
             var res = c_oSerConstants.ReadOk;
             if (c_oSer_Sparkline.SparklineGroup === type) {
@@ -6549,7 +6549,7 @@
 				res = this.bcr.Read1(length, function (t, l) {
                     return oThis.ReadSparklineGroup(t, l, newSparklineGroup);
                 });
-				oSparklineGroups.arrSparklineGroup.push(newSparklineGroup);
+                aSparklineGroups.push(newSparklineGroup);
 			} else
                 res = c_oSerConstants.ReadUnknown;
             return res;

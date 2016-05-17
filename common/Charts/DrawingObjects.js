@@ -2404,7 +2404,7 @@ function DrawingObjects() {
         }
     };
 
-    _this.drawSparkLineGroups = function(oDrawingContext, oSparklineGroups, range, offsetX, offsetY)
+    _this.drawSparkLineGroups = function(oDrawingContext, aSparklineGroups, range, offsetX, offsetY)
     {
 
         var graphics, i, j;
@@ -2422,8 +2422,8 @@ function DrawingObjects() {
 
         var _offX = offsetX* Asc.getCvtRatio(1, 3, oDrawingContext.getPPIX());
         var _offY = offsetY* Asc.getCvtRatio(1, 3, oDrawingContext.getPPIY());
-        for(i = 0; i < oSparklineGroups.arrSparklineGroup.length; ++i) {
-            var oSparklineGroup = oSparklineGroups.arrSparklineGroup[i];
+        for(i = 0; i < aSparklineGroups.length; ++i) {
+            var oSparklineGroup = aSparklineGroups[i];
 
             if(oSparklineGroup.type !== Asc.ESparklineType.Stacked &&
                 (Asc.SparklineAxisMinMax.Group === oSparklineGroup.minAxisType || Asc.SparklineAxisMinMax.Group === oSparklineGroup.maxAxisType))

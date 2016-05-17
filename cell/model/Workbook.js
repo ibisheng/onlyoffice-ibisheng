@@ -3239,7 +3239,7 @@ function Woorksheet(wb, _index, sId){
   this.oDrawingOjectsManager = new DrawingObjectsManager(this);
     this.contentChanges = new AscCommon.CContentChanges();
 
-    this.sparklineGroups = new AscCommonExcel.sparklineGroups();
+    this.aSparklineGroups = [];
 
   /*handlers*/
   this.handlers = null;
@@ -3359,6 +3359,9 @@ Woorksheet.prototype.clone=function(sNewId, sName){
 	for (i = 0; i < this.aConditionalFormatting.length; ++i) {
 		oNewWs.aConditionalFormatting.push(this.aConditionalFormatting[i].clone());
 	}
+  for (i = 0; i < this.aSparklineGroups.length; ++i) {
+    oNewWs.aSparklineGroups.push(this.aSparklineGroups[i].clone());
+  }
 	if (this.sheetPr)
 		oNewWs.sheetPr = this.sheetPr.clone();
 
@@ -5560,8 +5563,8 @@ Woorksheet.prototype.onUpdateRanges = function(ranges) {
   this._updateConditionalFormatting(new AscCommonExcel.MultiplyRange(ranges));
 };
 Woorksheet.prototype.updateSparklineCache = function(sheet, ranges) {
-  for (var i = 0; i < this.sparklineGroups.arrSparklineGroup.length; ++i) {
-    this.sparklineGroups.arrSparklineGroup[i].updateCache(sheet, ranges);
+  for (var i = 0; i < this.aSparklineGroups.length; ++i) {
+    this.aSparklineGroups[i].updateCache(sheet, ranges);
   }
 };
 //-------------------------------------------------------------------------------------------------
