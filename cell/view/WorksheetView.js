@@ -12014,7 +12014,7 @@
         var ar = t.activeRange.clone( true );
 		
 		var isStartRangeIntoFilterOrTable = t.model.autoFilters.isStartRangeContainIntoTableOrFilter(ar);
-		var isApplyAutoFilter = null, iaAddAutoFilter = null, cellId = null;
+		var isApplyAutoFilter = null, isAddAutoFilter = null, cellId = null;
 		if(null !== isStartRangeIntoFilterOrTable)//into autofilter or format table
 		{
 			var isFromatTable = !(-1 === isStartRangeIntoFilterOrTable);
@@ -12024,12 +12024,12 @@
 			
 			if(isFromatTable && !t.model.TableParts[isStartRangeIntoFilterOrTable].AutoFilter)//add autofilter to tablepart
 			{
-				iaAddAutoFilter = true;
+				isAddAutoFilter = true;
 			}
 		}
 		else//without filter
 		{
-			iaAddAutoFilter = true;
+			isAddAutoFilter = true;
 		}
 		
 		
@@ -12043,7 +12043,7 @@
 			
 			if(null !== isAddAutoFilter)
 			{	
-				t.model.autoFilters.addAutoFilter(null, ar, addFormatTableOptionsObj);
+				t.model.autoFilters.addAutoFilter(null, ar, null);
 				if(null === cellId)
 				{
 					cellId = t.model.autoFilters._rangeToId(Asc.Range(ar.startCol, t.model.AutoFilter.Ref.r1, ar.startCol, t.model.AutoFilter.Ref.r1));
@@ -12053,20 +12053,12 @@
 			if(null !== isApplyAutoFilter)
 			{
 				autoFilterObject.asc_setCellId(cellId);
-				if(c_oAscAutoFilterTypes.Filters === autoFilterObject.filter.type)
+				if(c_oAscAutoFilterTypes.CustomFilters === autoFilterObject.filter.type)
 				{	
-					var autoFiltersOptionsElement = new AutoFiltersOptionsElements();
 					var cell = t.model._getCell( ar.startRow, ar.startCol);
-					var text = cell.getValueWithFormat();
 					var val = cell.getValueWithoutFormat();
-					
-					autoFiltersOptionsElement.visible = true;
-					autoFiltersOptionsElement.val = val;
-					autoFiltersOptionsElement.text = text;
-					autoFiltersOptionsElement.isDateFormat = cell.getNumFormat().isDateTimeFormat();
-					autoFilterObject.values.push(autoFiltersOptionsElement);
+					autoFilterObject.filter.filter.CustomFilters[0].Val = val;
 				}
-				
 				
 				var applyFilterProps = t.model.autoFilters.applyAutoFilter( autoFilterObject, ar );
 				var rowChange = applyFilterProps.rowChange;
@@ -12085,13 +12077,13 @@
 			History.EndTransaction();
 		};
 		
-		if(null !== isAddAutoFilter)//do not add autoFilter
+		if(null === isAddAutoFilter)//do not add autoFilter
 		{
 			this._isLockedAll( onChangeAutoFilterCallback );
 		}
 		else//add autofilter + apply
 		{
-			if ( t._checkAddAutoFilter( ar, styleName, addFormatTableOptionsObj ) === true ) {
+			if ( t._checkAddAutoFilter( ar, null, autoFilterObject ) === true ) {
 				this._isLockedAll( onChangeAutoFilterCallback );
 				this._isLockedDefNames( null, null );
 			}
