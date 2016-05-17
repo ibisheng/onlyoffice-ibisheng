@@ -12009,6 +12009,28 @@
         this._isLockedAll( onChangeAutoFilterCallback );
     };
 	
+	WorksheetView.prototype.reapplyAutoFilter = function ( tableName ) {
+        var t = this;
+        var ar = t.activeRange.clone( true );
+        var onChangeAutoFilterCallback = function ( isSuccess ) {
+            if ( false === isSuccess ) {
+                return;
+            }
+
+            t.model.autoFilters.reapplyAutoFilter( tableName, ar );
+
+            if(null !== rangeOldFilter && !t.model.workbook.bUndoChanges && !t.model.workbook.bRedoChanges)
+            {
+                t._onUpdateFormatTable(rangeOldFilter, false, true);
+            }
+
+            if ( null !== rowChange ) {
+                t.objectRender.updateSizeDrawingObjects( {target: c_oTargetType.RowResize, row: rowChange} );
+            }
+        };
+        this._isLockedAll( onChangeAutoFilterCallback );
+    };
+	
 	WorksheetView.prototype.applyAutoFilterByType = function ( autoFilterObject ) {
         var t = this;
         var ar = t.activeRange.clone( true );

@@ -557,6 +557,11 @@ var editor;
     var ws = this.wb.getWorksheet();
     ws.applyAutoFilterByType(autoFilterObject);
   };
+  
+  spreadsheet_api.prototype.asc_reapplyAutoFilter = function(displayName) {
+    var ws = this.wb.getWorksheet();
+    ws.asc_reapplyAutoFilter(displayName);
+  };
 
   spreadsheet_api.prototype.asc_sortColFilter = function(type, cellId, displayName, color) {
     var ws = this.wb.getWorksheet();
@@ -3337,6 +3342,7 @@ var editor;
   prot["asc_changeAutoFilter"] = prot.asc_changeAutoFilter;
   prot["asc_applyAutoFilter"] = prot.asc_applyAutoFilter;
   prot["asc_applyAutoFilterByType"] = prot.asc_applyAutoFilterByType;
+  prot["asc_reapplyAutoFilter"] = prot.asc_reapplyAutoFilter;
   prot["asc_sortColFilter"] = prot.asc_sortColFilter;
   prot["asc_getAddFormatTableOptions"] = prot.asc_getAddFormatTableOptions;
   prot["asc_clearFilter"] = prot.asc_clearFilter;

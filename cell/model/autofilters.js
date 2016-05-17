@@ -606,6 +606,81 @@
 				return {minChangeRow: minChangeRow, rangeOldFilter: rangeOldFilter};
 			},
 			
+			reapplyAutoFilter: function (tableName, ar) 
+			{
+				var worksheet = this.worksheet;
+				var bUndoChanges = worksheet.workbook.bUndoChanges;
+				var bRedoChanges = worksheet.workbook.bRedoChanges;
+				
+				//**get filter**
+				var filter = this._getFilterByDisplayName(displayName);
+				var autoFilter = filter && filter.getType() === g_nFiltersType.tablePart ? filter.AutoFilter : filter;
+				var colId = this._getColIdColumnByRange(filter, ar);
+				var index = this._getIndexByColId(autoFilter, colId);
+				
+				
+				if(filterObj.filter === null)
+					return;
+				
+				History.Create_NewPoint();
+				History.StartTransaction();
+				
+				//open/close rows
+				if(!bUndoChanges && !bRedoChanges)
+				{
+					var hiddenObj = {start: filter.Ref.r1 + 1, h: null};
+					
+					var startRow = autoFilter && autoFilter.Ref ? autoFilter.Ref.r1 + 1 : filter.Ref.r1 + 1;
+					var endRow = autoFilter && autoFilter.Ref ? autoFilter.Ref.r2 : filter.Ref.r2;
+					for(var i = startRow; i <= endRow; i++)
+					{	
+						var isHidden = false;
+						if(autoFilter.FilterColumns && autoFilter.FilterColumns.length)
+							isHidden = this._hiddenAnotherFilter(autoFilter.FilterColumns, colId, i, autoFilter.Ref.c1);
+						
+						if(!isHidden)
+						{	
+							var cell = worksheet.getCell3(i, colId + autoFilter.Ref.c1);
+							var isDateTimeFormat = cell.getNumFormat().isDateTimeFormat();
+							var currentValue = isDateTimeFormat ? cell.getValueWithoutFormat() : cell.getValueWithFormat();
+							
+							var isSetHidden = newFilterColumn.isHideValue(currentValue, isDateTimeFormat, null, cell);
+							
+							if(isSetHidden !== worksheet.getRowHidden(i) && minChangeRow === null)
+								minChangeRow = i;
+							
+							//скрываем строки
+							if(hiddenObj.h === null)
+							{
+								hiddenObj.h = isSetHidden;
+								hiddenObj.start = i;
+							}
+							else if(hiddenObj.h !== isSetHidden)
+							{
+								worksheet.setRowHidden(hiddenObj.h, hiddenObj.start, i - 1);
+								
+								hiddenObj.h = isSetHidden;
+								hiddenObj.start = i;
+							}
+							
+							if(i === endRow)
+							{
+								worksheet.setRowHidden(hiddenObj.h, hiddenObj.start, i);
+							}
+						}
+						else if(hiddenObj.h !== null)
+						{
+							worksheet.setRowHidden(hiddenObj.h, hiddenObj.start, i - 1);
+							hiddenObj.h = null
+						}
+					}
+				}
+				
+				this._resetTablePartStyle();
+				
+				History.EndTransaction();
+			},
+			
 			checkRemoveTableParts: function(delRange, tableRange)
 			{
 				var result = true, firstRowRange;
@@ -2529,6 +2604,21 @@
 					
 					var rangeCellId = this._idToRange(cellId);
 					var colId = rangeCellId.c1 - autoFilter.Ref.c1;
+					res = this._getTrueColId(filter, colId);
+				}
+				
+				return res;
+			},
+			
+			_getColIdColumnByRange: function(filter, range)
+			{
+				var res = null;
+				
+				var autoFilter = filter && filter.getType() === g_nFiltersType.tablePart ? filter.AutoFilter : filter;
+				
+				if(autoFilter && autoFilter.FilterColumns && autoFilter.FilterColumns.length)
+				{
+					var colId = range.colStart - autoFilter.Ref.c1;
 					res = this._getTrueColId(filter, colId);
 				}
 				
