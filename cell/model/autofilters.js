@@ -655,7 +655,7 @@
 				this._resetTablePartStyle();
 				History.EndTransaction();
 				
-				return {minChangeRow: minChangeRow, updateRange: filter.Ref};
+				return {minChangeRow: minChangeRow, updateRange: filter.Ref, filter: filter};
 			},
 			
 			checkRemoveTableParts: function(delRange, tableRange)
@@ -1703,7 +1703,7 @@
 						}
 						
 						//в данному случае может быть захвачен а/ф, если он присутвует(надо проверить), либо нажата кнопка а/ф
-						if(curFilter && (filterRef.isEqual(activeRange) || cellId !== ''))
+						if(curFilter && (filterRef.isEqual(activeRange) || cellId !== '' || activeRange.isOneCell()))
 						{
 							if(cellId !== '' && !isCellIdString)
 								startCol = filterRef.c1 + cellId;

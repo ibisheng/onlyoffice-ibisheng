@@ -8877,7 +8877,7 @@
         }
     };
 
-    WorksheetView.prototype.setSelectionInfo = function ( prop, val, onlyActive, isLocal ) {
+    WorksheetView.prototype.setSelectionInfo = function ( prop, val, onlyActive, isLocal, sortColor ) {
         // Проверка глобального лока
         if ( this.collaborativeEditing.getGlobalLock() ) {
             return;
@@ -9054,7 +9054,7 @@
                         callTrigger = true;
                         t.handlers.trigger( "slowOperation", true );
                     }
-                    t.cellCommentator.sortComments( range.sort( val, arn.startCol ) );
+                    t.cellCommentator.sortComments( range.sort( val, arn.startCol, sortColor ) );
                     break;
 
                 case "empty":
@@ -12016,8 +12016,52 @@
             if ( false === isSuccess ) {
                 return;
             }
-
-            var applyFilterProps = t.model.autoFilters.reapplyAutoFilter( tableName, ar );
+			
+			//reApply
+			var applyFilterProps = t.model.autoFilters.reapplyAutoFilter( tableName, ar );
+			
+			//reSort
+			var filter = applyFilterProps.filter;
+			if(filter && filter.SortState && filter.SortState.SortConditions && filter.SortState.SortConditions[0])
+			{
+				var sortState = filter.SortState;
+				var sortRange = t.model.getRange3(filter.Ref.r1, filter.Ref.c1, filter.Ref.r2, filter.Ref.c2);
+				var startCol = sortState.SortConditions[0].Ref.c1;
+				var type;
+				var rgbColor = null;
+				switch(sortState.SortConditions[0].ConditionSortBy)
+				{
+					case Asc.ESortBy.sortbyCellColor:
+					{
+						type = Asc.c_oAscSortOptions.ByColorFill;
+						rgbColor = sortState.SortConditions[0].dxf.fill.bg;
+						break;
+					}
+					case Asc.ESortBy.sortbyFontColor:
+					{
+						type = Asc.c_oAscSortOptions.ByColorFont;
+						rgbColor = sortState.SortConditions[0].dxf.font.c;
+						break;
+					}
+					default:
+					{
+						type = Asc.c_oAscSortOptions.ByColorFont;
+						if(sortState.SortConditions[0].ConditionDescending)
+						{
+							type = Asc.c_oAscSortOptions.Ascending;
+						}
+						else
+						{
+							type = Asc.c_oAscSortOptions.Descending;
+						}
+					}
+				}
+				
+				var sort = sortRange.sort(type, startCol, rgbColor);
+				t.cellCommentator.sortComments(sort);
+			}
+			
+			
 			var rowChange = applyFilterProps.rowChange;
             var updateRange = applyFilterProps.updateRange;
 			
@@ -12038,10 +12082,10 @@
         var ar = t.activeRange.clone( true );
 		
 		var isStartRangeIntoFilterOrTable = t.model.autoFilters.isStartRangeContainIntoTableOrFilter(ar);
-		var isApplyAutoFilter = null, isAddAutoFilter = null, cellId = null;
+		var isApplyAutoFilter = null, isAddAutoFilter = null, cellId = null, isFromatTable = null;
 		if(null !== isStartRangeIntoFilterOrTable)//into autofilter or format table
 		{
-			var isFromatTable = !(-1 === isStartRangeIntoFilterOrTable);
+			isFromatTable = !(-1 === isStartRangeIntoFilterOrTable);
 			var filterRef = isFromatTable ? t.model.TableParts[isStartRangeIntoFilterOrTable].Ref : t.model.AutoFilter.Ref;
 			cellId = t.model.autoFilters._rangeToId(Asc.Range(ar.c1, filterRef.r1, ar.c1, filterRef.r1));
 			isApplyAutoFilter = true;
@@ -12054,6 +12098,7 @@
 		else//without filter
 		{
 			isAddAutoFilter = true;
+			isApplyAutoFilter = true;
 		}
 		
 		
@@ -12067,7 +12112,15 @@
 			
 			if(null !== isAddAutoFilter)
 			{	
+				//delete old filter
+				if(!isFromatTable && t.model.AutoFilter && t.model.AutoFilter.Ref)
+				{
+					t.model.autoFilters.isEmptyAutoFilters(t.model.AutoFilter.Ref);
+				}
+				
+				//add new filter
 				t.model.autoFilters.addAutoFilter(null, ar, null);
+				//generate cellId
 				if(null === cellId)
 				{
 					cellId = t.model.autoFilters._rangeToId(Asc.Range(ar.startCol, t.model.AutoFilter.Ref.r1, ar.startCol, t.model.AutoFilter.Ref.r1));
@@ -12141,7 +12194,8 @@
 			
 			if(null === sortProps)
 			{
-				t.setSelectionInfo("sort", type);
+				var rgbColor = color ? new RgbColor((color.asc_getR() << 16) + (color.asc_getG() << 8) + color.asc_getB()) : null;
+				t.setSelectionInfo("sort", type, null, null, rgbColor);
 			}
 			else if(false !== sortProps)
 			{
