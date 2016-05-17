@@ -554,7 +554,7 @@ Complex.prototype = {
     },
     Log2:function () {
 
-        var c = new Complex( Math.ln( 2 ), 0 )
+        var c = new Complex( Math.ln( 2 ), 0 );
         var r = this.Ln();
 
         if( r instanceof cError ){
@@ -587,7 +587,7 @@ Complex.prototype = {
                 phi;
 
             phi = Math.acos( this.real / p );
-            if ( i < 0 ) {
+            if ( this.img < 0 ) {
                 phi = -phi;
             }
 
