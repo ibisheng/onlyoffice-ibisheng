@@ -1494,10 +1494,10 @@ window['Asc']['c_oAscMaxCellOrCommentLength'] = window['Asc'].c_oAscMaxCellOrCom
   
   CPlugin.prototype["get_Visual"] = function() 				{ return this.isVisual; };
   CPlugin.prototype["set_Visual"] = function(value) 		{ this.isVisual = value; };
-  CPlugin.prototype["get_InitDataType"] = function() 		{ return this.icons; };
-  CPlugin.prototype["set_InitDataType"] = function(value) 	{ this.icons = value; };
-  CPlugin.prototype["get_InitData"] = function() 			{ return this.icons; };
-  CPlugin.prototype["set_InitData"] = function(value) 		{ this.icons = value; };
+  CPlugin.prototype["get_InitDataType"] = function() 		{ return this.initDataType; };
+  CPlugin.prototype["set_InitDataType"] = function(value) 	{ this.initDataType = value; };
+  CPlugin.prototype["get_InitData"] = function() 			{ return this.initData; };
+  CPlugin.prototype["set_InitData"] = function(value) 		{ this.initData = value; };
   
   CPlugin.prototype["get_UpdateOleOnResize"] = function() 			{ return this.isUpdateOleOnResize; };
   CPlugin.prototype["set_UpdateOleOnResize"] = function(value) 		{ this.isUpdateOleOnResize = value; };
