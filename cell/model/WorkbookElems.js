@@ -4585,6 +4585,10 @@ sparklineGroup.prototype.draw = function(oDrawingContext) {
 		this.arrCachedSparklines[i].draw(graphics);
 	}
 };
+sparklineGroup.prototype.cleanCache = function() {
+	// ToDo clean only colors (for color scheme)
+	this.arrCachedSparklines = [];
+};
 sparklineGroup.prototype.updateCache = function(sheet, ranges) {
 	var sparklineRange;
 	for (var i = 0; i < this.arrSparklines.length; ++i) {

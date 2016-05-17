@@ -3261,6 +3261,10 @@ Woorksheet.prototype.rebuildColors=function(){
 		cell.cleanCache();
 	});
   this.rebuildTabColor();
+
+  for (var i = 0; i < this.aSparklineGroups.length; ++i) {
+    this.aSparklineGroups[i].cleanCache();
+  }
 };
 Woorksheet.prototype.generateFontMap=function(oFontMap){
 	//пробегаемся по Drawing
