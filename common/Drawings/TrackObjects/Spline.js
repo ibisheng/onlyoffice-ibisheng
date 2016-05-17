@@ -198,7 +198,7 @@ function Spline(drawingObjects, theme, master, layout, slide, pageIndex)
         xMax = max_x;
         yMin = min_y;
         yMax = max_y;
-        var shape = new CShape();
+        var shape = new AscFormat.CShape();
         //if(drawingObjects)
         //{
         //    shape.setWorksheet(drawingObjects.getWorksheetModel());
