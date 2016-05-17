@@ -12017,11 +12017,13 @@
                 return;
             }
 
-            t.model.autoFilters.reapplyAutoFilter( tableName, ar );
-
-            if(null !== rangeOldFilter && !t.model.workbook.bUndoChanges && !t.model.workbook.bRedoChanges)
+            var applyFilterProps = t.model.autoFilters.reapplyAutoFilter( tableName, ar );
+			var rowChange = applyFilterProps.rowChange;
+            var updateRange = applyFilterProps.updateRange;
+			
+            if(updateRange && !t.model.workbook.bUndoChanges && !t.model.workbook.bRedoChanges)
             {
-                t._onUpdateFormatTable(rangeOldFilter, false, true);
+                t._onUpdateFormatTable(updateRange, false, true);
             }
 
             if ( null !== rowChange ) {

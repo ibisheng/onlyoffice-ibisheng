@@ -560,7 +560,7 @@ var editor;
   
   spreadsheet_api.prototype.asc_reapplyAutoFilter = function(displayName) {
     var ws = this.wb.getWorksheet();
-    ws.asc_reapplyAutoFilter(displayName);
+    ws.reapplyAutoFilter(displayName);
   };
 
   spreadsheet_api.prototype.asc_sortColFilter = function(type, cellId, displayName, color) {
