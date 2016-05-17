@@ -281,7 +281,8 @@ var c_oSerProp_secPrType = {
 	hdrftrelem: 5,
 	pageNumType: 6,
 	sectPrChange: 7,
-	cols: 8
+	cols: 8,
+	pgBorders: 9
 };
 var c_oSerProp_secPrSettingsType = {
     titlePg: 0,
@@ -705,6 +706,23 @@ var c_oSerProp_RevisionType = {
     tcPrChange: 12,
     trPrChange: 13,
     ContentRun: 14
+};
+var c_oSerPageBorders = {
+	Display: 0,
+	OffsetFrom: 1,
+	ZOrder: 2,
+	Bottom: 3,
+	Left: 4,
+	Right: 5,
+	Top: 6,
+	Color: 7,
+	Frame: 8,
+	Id: 9,
+	Shadow: 10,
+	Space: 11,
+	Sz: 12,
+	ColorTheme: 13,
+	Val: 16
 };
 var ETblStyleOverrideType = {
 	tblstyleoverridetypeBand1Horz:  0,
@@ -1707,6 +1725,8 @@ function Binary_pPrWriter(memory, oNumIdMap, oBinaryHeaderFooterTableWriter, sav
 			this.bs.WriteItem(c_oSerProp_secPrType.pageNumType, function(){oThis.WritePageNumType(PageNumType);});
 		if(null != sectPr.Columns)
 			this.bs.WriteItem(c_oSerProp_secPrType.cols, function(){oThis.WriteColumns(sectPr.Columns);});
+		if(null != sectPr.Borders)
+			this.bs.WriteItem(c_oSerProp_secPrType.pgBorders, function(){oThis.WritePgBorders(sectPr.Borders);});
     };
     this.WritePageSize = function(sectPr, oDocument)
     {
@@ -1863,6 +1883,72 @@ function Binary_pPrWriter(memory, oNumIdMap, oBinaryHeaderFooterTableWriter, sav
             this.bs.WriteItem(c_oSerProp_Columns.ColumnW, function(){oThis.memory.WriteLong(g_dKoef_mm_to_twips * col.W);});
         }
     }
+	this.WritePgBorders = function(pageBorders)
+	{
+		var oThis = this;
+		if (null != pageBorders.Display) {
+			this.bs.WriteItem(c_oSerPageBorders.Display, function(){oThis.memory.WriteByte(pageBorders.Display);});
+		}
+		if (null != pageBorders.OffsetFrom) {
+			this.bs.WriteItem(c_oSerPageBorders.OffsetFrom, function(){oThis.memory.WriteByte(pageBorders.OffsetFrom);});
+		}
+		if (null != pageBorders.ZOrder) {
+			this.bs.WriteItem(c_oSerPageBorders.ZOrder, function(){oThis.memory.WriteByte(pageBorders.ZOrder);});
+		}
+		if (null != pageBorders.Bottom) {
+			this.bs.WriteItem(c_oSerPageBorders.Bottom, function(){oThis.WritePgBorder(pageBorders.Bottom);});
+		}
+		if (null != pageBorders.Left) {
+			this.bs.WriteItem(c_oSerPageBorders.Left, function(){oThis.WritePgBorder(pageBorders.Left);});
+		}
+		if (null != pageBorders.Right) {
+			this.bs.WriteItem(c_oSerPageBorders.Right, function(){oThis.WritePgBorder(pageBorders.Right);});
+		}
+		if (null != pageBorders.Top) {
+			this.bs.WriteItem(c_oSerPageBorders.Top, function(){oThis.WritePgBorder(pageBorders.Top);});
+		}
+	}
+	this.WritePgBorder = function(border)
+	{
+		var _this = this;
+		if(null != border.Value)
+		{
+			var color = null;
+			if (null != border.Color)
+				color = border.Color;
+			else if (null != border.Unifill) {
+				var doc = editor.WordControl.m_oLogicDocument;
+				border.Unifill.check(doc.Get_Theme(), doc.Get_ColorMap());
+				var RGBA = border.Unifill.getRGBAColor();
+				color = new AscCommonWord.CDocumentColor(RGBA.R, RGBA.G, RGBA.B);
+			}
+			if (null != color && !color.Auto)
+				this.bs.WriteColor(c_oSerPageBorders.Color, color);
+			if (null != border.Space) {
+				this.memory.WriteByte(c_oSerPageBorders.Space);
+				this.memory.WriteByte(c_oSerPropLenType.Long);
+				this.memory.WriteLong(Math.round(g_dKoef_mm_to_pt * border.Space));
+			}
+			if (null != border.Size) {
+				this.memory.WriteByte(c_oSerPageBorders.Sz);
+				this.memory.WriteByte(c_oSerPropLenType.Long);
+				this.memory.WriteLong(Math.round(8 * g_dKoef_mm_to_pt * border.Size));
+			}
+			if (null != border.Unifill || (null != border.Color && border.Color.Auto)) {
+				this.memory.WriteByte(c_oSerPageBorders.ColorTheme);
+				this.memory.WriteByte(c_oSerPropLenType.Variable);
+				this.bs.WriteItemWithLength(function () { _this.bs.WriteColorTheme(border.Unifill, border.Color); });
+			}
+
+			this.memory.WriteByte(c_oSerPageBorders.Val);
+			this.memory.WriteByte(c_oSerPropLenType.Long);
+			if(border_None == border.Value){
+				this.memory.WriteLong(-1);
+			} else {
+				this.memory.WriteLong(1);
+			}
+		}
+	}
 };
 function Binary_rPrWriter(memory, saveParams)
 {
@@ -6663,6 +6749,11 @@ function Binary_pPrReader(doc, oReadResult, stream)
                 return oThis.Read_cols(t, l, oSectPr);
             });
         }
+		else if( c_oSerProp_secPrType.pgBorders === type ) {
+			res = this.bcr.Read1(length, function(t, l){
+				return oThis.Read_pgBorders(t, l, oSectPr.Borders);
+			});
+		}
         else
             res = c_oSerConstants.ReadUnknown;
         return res;
@@ -6827,6 +6918,91 @@ function Binary_pPrReader(doc, oReadResult, stream)
             res = c_oSerConstants.ReadUnknown;
         return res;
     }
+	this.Read_pgBorders = function(type, length, pgBorders)
+	{
+		var res = c_oSerConstants.ReadOk;
+		var oThis = this;
+		if (c_oSerPageBorders.Display === type) {
+			pgBorders.Display = this.stream.GetUChar();
+		} else if (c_oSerPageBorders.OffsetFrom === type) {
+			pgBorders.OffsetFrom = this.stream.GetUChar();
+		} else if (c_oSerPageBorders.ZOrder === type) {
+			pgBorders.ZOrder = this.stream.GetUChar();
+		} else if (c_oSerPageBorders.Bottom === type) {
+			var oNewBorber = new CDocumentBorder();
+			res = this.bcr.Read2(length, function(t, l){
+				return oThis.Read_pgBorder(t, l, oNewBorber);
+			});
+			if(null != oNewBorber.Value)
+				pgBorders.Bottom = this.NormalizeBorder(oNewBorber);
+		} else if (c_oSerPageBorders.Left === type) {
+			var oNewBorber = new CDocumentBorder();
+			res = this.bcr.Read2(length, function(t, l){
+				return oThis.Read_pgBorder(t, l, oNewBorber);
+			});
+			if(null != oNewBorber.Value)
+				pgBorders.Left = this.NormalizeBorder(oNewBorber);
+		} else if (c_oSerPageBorders.Right === type) {
+			var oNewBorber = new CDocumentBorder();
+			res = this.bcr.Read2(length, function(t, l){
+				return oThis.Read_pgBorder(t, l, oNewBorber);
+			});
+			if(null != oNewBorber.Value)
+				pgBorders.Right = this.NormalizeBorder(oNewBorber);
+		} else if (c_oSerPageBorders.Top === type) {
+			var oNewBorber = new CDocumentBorder();
+			res = this.bcr.Read2(length, function(t, l){
+				return oThis.Read_pgBorder(t, l, oNewBorber);
+			});
+			if(null != oNewBorber.Value)
+				pgBorders.Top = this.NormalizeBorder(oNewBorber);
+		} else
+			res = c_oSerConstants.ReadUnknown;
+		return res;
+	}
+	this.Read_pgBorder = function(type, length, Border)
+	{
+		var res = c_oSerConstants.ReadOk;
+		var oThis = this;
+		if( c_oSerPageBorders.Color === type )
+		{
+			Border.Color = this.bcr.ReadColor();
+		}
+		else if( c_oSerPageBorders.Space === type )
+		{
+			Border.Space = this.stream.GetLongLE() * g_dKoef_pt_to_mm;
+		}
+		else if( c_oSerPageBorders.Sz === type )
+		{
+			Border.Size = this.stream.GetLongLE() * g_dKoef_pt_to_mm / 8;
+		}
+		else if( c_oSerPageBorders.Val === type )
+		{
+			var val = this.stream.GetLongLE();
+			if (-1 == val || 0 == val) {
+				Border.Value = border_None;
+			} else {
+				Border.Value = border_Single;
+			}
+		}
+		else if( c_oSerPageBorders.ColorTheme === type )
+		{
+			var themeColor = {Auto: null, Color: null, Tint: null, Shade: null};
+			res = this.bcr.Read2(length, function(t, l){
+				return oThis.bcr.ReadColorTheme(t, l, themeColor);
+			});
+			if(true == themeColor.Auto)
+				Border.Color = new CDocumentColor(0, 0, 0, true);
+			var unifill = CreateThemeUnifill(themeColor.Color, themeColor.Tint, themeColor.Shade);
+			if(null != unifill)
+				Border.Unifill = unifill;
+			else if (null != Border.Color && !Border.Color.Auto)
+				Border.Unifill = AscFormat.CreteSolidFillRGB(Border.Color.r, Border.Color.g, Border.Color.b);
+		}
+		else
+			res = c_oSerConstants.ReadUnknown;
+		return res;
+	};
 };
 function Binary_rPrReader(doc, oReadResult, stream)
 {
