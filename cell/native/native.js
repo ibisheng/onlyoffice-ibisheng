@@ -2893,6 +2893,7 @@ function OfflineEditor () {
 
             if (false === istoplayer) {
                 this._drawCellsAndBorders(drawingCtx, range, offsetXForDraw, offsetYForDraw);
+                this._drawAutoF(range, offsetXForDraw, offsetYForDraw);
             }
 
             var oldrange = this.visibleRange;
@@ -3511,7 +3512,7 @@ function OfflineEditor () {
 
         window.g_file_path = "native_open_file";
         window.NATIVE_DOCUMENT_TYPE = window.native.GetEditorType();
-        _api = new window["Asc"]["spreadsheet_api"]();
+        _api = new window["Asc"]["spreadsheet_api"]({});
 
         var userInfo = new Asc.asc_CUserInfo();
         userInfo.asc_putId('ios');
