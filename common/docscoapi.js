@@ -267,9 +267,9 @@
     }
   };
 
-  CDocsCoApi.prototype.disconnect = function(isRealDisconnect) {
+  CDocsCoApi.prototype.disconnect = function() {
     if (this._CoAuthoringApi && this._onlineWork) {
-      this._CoAuthoringApi.disconnect(isRealDisconnect);
+      this._CoAuthoringApi.disconnect();
     }
   };
 
@@ -695,15 +695,11 @@
     }
   };
 
-  DocsCoApi.prototype.disconnect = function(isRealDisconnect) {
+  DocsCoApi.prototype.disconnect = function() {
     // Отключаемся сами
     this.isCloseCoAuthoring = true;
-    if (isRealDisconnect) {
-      this.sockjs.close();
-    } else {
     this._send({"type": "close"});
     this._state = ConnectionState.ClosedCoAuth;
-    }
   };
 
   DocsCoApi.prototype.openDocument = function(data) {
