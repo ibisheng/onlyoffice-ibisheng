@@ -71,6 +71,26 @@ var DISTANCE_TO_TEXT_LEFTRIGHT = 3.2;
     CURSOR_TYPES_BY_CARD_DIRECTION[CARD_DIRECTION_W]  = "w-resize";
     CURSOR_TYPES_BY_CARD_DIRECTION[CARD_DIRECTION_NW] = "nw-resize";
 
+    function fillImage(image, rasterImageId, x, y, extX, extY)
+    {
+        image.setSpPr(new AscFormat.CSpPr());
+        image.spPr.setParent(image);
+        image.spPr.setGeometry(AscFormat.CreateGeometry("rect"));
+        image.spPr.setXfrm(new AscFormat.CXfrm());
+        image.spPr.xfrm.setParent(image.spPr);
+        image.spPr.xfrm.setOffX(x);
+        image.spPr.xfrm.setOffY(y);
+        image.spPr.xfrm.setExtX(extX);
+        image.spPr.xfrm.setExtY(extY);
+
+        var blip_fill = new AscFormat.CBlipFill();
+        blip_fill.setRasterImageId(rasterImageId);
+        blip_fill.setStretch(true);
+        image.setBlipFill(blip_fill);
+        image.setNvPicPr(new AscFormat.UniNvPr());
+        image.setBDeleted(false);
+    }
+
     function removeDPtsFromSeries(series)
     {
         if(Array.isArray(series.dPt))
@@ -480,6 +500,7 @@ function getObjectsByTypesFromArr(arr, bGrouped)
                 break;
             }
             case AscDFH.historyitem_type_ImageShape:
+            case AscDFH.historyitem_type_OleObject:
             {
                 ret.images.push(drawing);
                 break;
@@ -588,6 +609,10 @@ function CanStartEditText(oController)
 DrawingObjectsController.prototype =
 {
 
+    handleOleDblClick: function(drawing, e, x, y, pageIndex)
+    {
+
+    },
 
     //for mobile spreadsheet editor
     startEditTextCurrentShape: function()
@@ -853,6 +878,9 @@ DrawingObjectsController.prototype =
 
                     if (object.getObjectType() === AscDFH.historyitem_type_ChartSpace && this.handleChartDoubleClick)
                         this.handleChartDoubleClick(drawing, object, e, x, y, pageIndex);
+                    if (object.getObjectType() === AscDFH.historyitem_type_OleObject && this.handleChartDoubleClick){
+                        this.handleOleObjectDoubleClick(drawing, object, e, x, y, pageIndex);
+                    }
                     else if (2 == e.ClickCount && drawing instanceof ParaDrawing && drawing.Is_MathEquation())
                         this.handleMathDrawingDoubleClick(drawing, e, x, y, pageIndex);
                 }
@@ -7047,26 +7075,21 @@ DrawingObjectsController.prototype =
         ascSelectedObjects.push(new AscCommon.asc_CSelectedObject ( Asc.c_oAscTypeSelectElement.Paragraph, new Asc.asc_CParagraphProperty( ParaPr ) ));
     },
 
+
     createImage: function(rasterImageId, x, y, extX, extY)
     {
         var image = new AscFormat.CImageShape();
-        image.setSpPr(new AscFormat.CSpPr());
-        image.spPr.setParent(image);
-        image.spPr.setGeometry(AscFormat.CreateGeometry("rect"));
-        image.spPr.setXfrm(new AscFormat.CXfrm());
-        image.spPr.xfrm.setParent(image.spPr);
-        image.spPr.xfrm.setOffX(x);
-        image.spPr.xfrm.setOffY(y);
-        image.spPr.xfrm.setExtX(extX);
-        image.spPr.xfrm.setExtY(extY);
-
-        var blip_fill = new AscFormat.CBlipFill();
-        blip_fill.setRasterImageId(rasterImageId);
-        blip_fill.setStretch(true);
-        image.setBlipFill(blip_fill);
-        image.setNvPicPr(new AscFormat.UniNvPr());
-        image.setBDeleted(false);
+        AscFormat.fillImage(image, rasterImageId, x, y, extX, extY);
         return image;
+    },
+
+    createOleObject: function(data, sApplicationId, rasterImageId, x, y, extX, extY)
+    {
+        var oleObject = new AscFormat.COleObject();
+        AscFormat.fillImage(oleObject, rasterImageId, x, y, extX, extY);
+        oleObject.setData(data);
+        oleObject.setApplicationId(sApplicationId);
+        return oleObject;
     },
 
     createTextArt: function(nStyle, bWord, wsModel)
@@ -8799,4 +8822,5 @@ function CalcLiterByLength(aAlphaBet, nLength)
     window['AscFormat'].GetMinSnapDistanceXObjectByArrays = GetMinSnapDistanceXObjectByArrays;
     window['AscFormat'].GetMinSnapDistanceYObjectByArrays = GetMinSnapDistanceYObjectByArrays;
     window['AscFormat'].CalcLiterByLength = CalcLiterByLength;
+    window['AscFormat'].fillImage = fillImage;
 })(window);

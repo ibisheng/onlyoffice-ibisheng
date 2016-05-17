@@ -3960,6 +3960,39 @@ CDocument.prototype.Add_InlineImage            = function(W, H, Img, Chart, bFlo
         }
     }
 };
+
+CDocument.prototype.Add_OleObject              = function(W, H, Img, Data, sApplicationId)
+{
+    if (docpostype_HdrFtr === this.CurPos.Type)
+    {
+        return this.HdrFtr.Add_OleObject(W, H, Img, Data, sApplicationId);
+    }
+    else if (docpostype_DrawingObjects === this.CurPos.Type)
+    {
+        return this.DrawingObjects.addOleObject(W, H, Img, Data, sApplicationId);
+    }
+    else //if ( docpostype_Content === this.CurPos.Type )
+    {
+        if (true == this.Selection.Use)
+            this.Remove(1, true);
+
+        var Item = this.Content[this.CurPos.ContentPos];
+        if (type_Paragraph == Item.GetType())
+        {
+            var Drawing   = new ParaDrawing(W, H, null, this.DrawingDocument, this, null);
+            var Image = this.DrawingObjects.createOleObject(Data, sApplicationId, Img, 0, 0, W, H);
+            Image.setParent(Drawing);
+            Drawing.Set_GraphicObject(Image);
+            this.Paragraph_Add(Drawing);
+            this.Select_DrawingObject(Drawing.Get_Id());
+        }
+        else if (type_Table == Item.GetType())
+        {
+            Item.Add_OleObject(W, H, Img, Data, sApplicationId);
+        }
+    }
+};
+
 CDocument.prototype.Add_TextArt                = function(nStyle)
 {
     // Работаем с колонтитулом

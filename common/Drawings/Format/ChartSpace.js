@@ -12498,6 +12498,7 @@ function checkBlipFillRasterImages(sp)
             break;
         }
         case AscDFH.historyitem_type_ImageShape:
+        case AscDFH.historyitem_type_OleObject:
         {
             if(sp.blipFill)
             {

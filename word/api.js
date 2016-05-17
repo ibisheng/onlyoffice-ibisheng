@@ -5545,6 +5545,28 @@ asc_docs_api.prototype.sync_ImgPropCallback = function(imgProp)
 	this.asc_fireCallback("asc_onImgWrapStyleChanged",style);
 };
 
+
+    asc_docs_api.prototype.asc_addOleObjectAction = function(sLocalUrl, sData, sApplicationId)
+    {
+        var _image = this.ImageLoader.LoadImage(AscCommon.getFullImageSrc2(sLocalUrl), 1);
+        if (null != _image)//картинка уже должна быть загружена
+        {
+            if (false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content))
+            {
+                var _w = Math.max(1, AscCommon.Page_Width - (AscCommon.X_Left_Margin + AscCommon.X_Right_Margin));
+                var _h = Math.max(1, AscCommon.Page_Height - (AscCommon.Y_Top_Margin + AscCommon.Y_Bottom_Margin));
+                if (_image.Image != null)
+                {
+                    var __w = Math.max(parseInt(_image.Image.width * AscCommon.g_dKoef_pix_to_mm), 1);
+                    var __h = Math.max(parseInt(_image.Image.height * AscCommon.g_dKoef_pix_to_mm), 1);
+                    _w      = Math.max(5, Math.min(_w, __w));
+                    _h      = Math.max(5, Math.min(parseInt(_w * __h / __w)));
+                }
+                this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_AddOleObject);
+                this.WordControl.m_oLogicDocument.Add_OleObject(_w, _h, sLocalUrl, sData, sApplicationId);
+            }
+        }
+    };
 //-----------------------------------------------------------------
 // События контекстного меню
 //-----------------------------------------------------------------
@@ -6767,6 +6789,10 @@ asc_docs_api.prototype.asyncFontEndLoaded = function(fontinfo)
     }
 	// отжать заморозку меню
 };
+
+    asc_docs_api.prototype.asc_replaceLoadImageCallback = function(fCallback){
+        this.asyncImageEndLoaded2 = fCallback;
+    };
 
 asc_docs_api.prototype.asyncImageEndLoaded = function(_image)
 {

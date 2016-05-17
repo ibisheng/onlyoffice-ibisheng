@@ -889,6 +889,8 @@ window['AscDFH'].historyitem_ImageShapeSetBlipFill    = 2537;
 window['AscDFH'].historyitem_ImageShapeSetParent    = 2538;
 window['AscDFH'].historyitem_ImageShapeSetGroup    = 2539;
 window['AscDFH'].historyitem_ImageShapeSetStyle    = 2540;
+window['AscDFH'].historyitem_ImageShapeSetData    = 2541;
+window['AscDFH'].historyitem_ImageShapeSetApplicationId = 2542;
 window['AscDFH'].historyitem_GeometrySetParent       = 2540;
 window['AscDFH'].historyitem_GeometryAddAdj          = 2541;
 window['AscDFH'].historyitem_GeometryAddGuide        = 2542;
@@ -1192,6 +1194,7 @@ window['AscDFH'].historyitem_type_PropLocker = 1120;
 window['AscDFH'].historyitem_type_Theme = 1121;
 window['AscDFH'].historyitem_type_GraphicFrame = 1122;
 window['AscDFH'].historyitem_type_GrpFill = 1123;
+window['AscDFH'].historyitem_type_OleObject = 1124;
 
 
 
@@ -2000,5 +2003,6 @@ window['AscDFH'].historydescription_Document_AddTabToMath                       
 window['AscDFH'].historydescription_Document_SetMathProps                       = 0x0134;
 window['AscDFH'].historydescription_Document_ApplyPrToMath                      = 0x0135;
 window['AscDFH'].historydescription_Document_ApiBuilder                         = 0x0136;
+window['AscDFH'].historydescription_Document_AddOleObject                       = 0x0137;
 
 })(window);

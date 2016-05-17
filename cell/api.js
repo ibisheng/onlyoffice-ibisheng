@@ -2493,6 +2493,15 @@ var editor;
     ws.objectRender.setDrawImagePlaceParagraph(element_id, props);
   };
 
+    spreadsheet_api.prototype.asc_replaceLoadImageCallback = function(fCallback){
+        if(this.wb){
+            var ws = this.wb.getWorksheet();
+            if(ws.objectRender){
+                ws.objectRender.asyncImageEndLoaded = fCallback;
+            }
+        }
+    };
+
   spreadsheet_api.prototype.asyncImageEndLoaded = function(_image) {
     if (this.wb) {
       var ws = this.wb.getWorksheet();

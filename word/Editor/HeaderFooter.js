@@ -630,6 +630,11 @@ CHeaderFooter.prototype =
         this.Content.Add_InlineImage(W,H,Img, Chart, bFlow);
     },
 
+    Add_OleObject : function(W, H, Img, Data, sApplicationId)
+    {
+        this.Content.Add_OleObject(W, H, Img, Data, sApplicationId);
+    },
+
     Add_TextArt : function(nStyle)
     {
         this.Content.Add_TextArt(nStyle);

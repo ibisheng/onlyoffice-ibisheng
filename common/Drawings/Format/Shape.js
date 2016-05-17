@@ -555,7 +555,6 @@ function CShape()
 
     this.transformText = new CMatrix();
     this.invertTransformText = null;
-    this.selected = false;
 
 
     this.localTransformText = new CMatrix();

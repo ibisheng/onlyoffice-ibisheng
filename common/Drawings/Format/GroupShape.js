@@ -25,7 +25,6 @@ function CGroupShape()
     this.invertTransform = null;
     this.scaleCoefficients = {cx: 1, cy: 1};
 
-    this.selected = false;
     this.arrGraphicObjects = [];
     this.selectedObjects = [];
 

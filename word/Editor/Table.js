@@ -6810,6 +6810,13 @@ CTable.prototype =
         this.CurCell.Content.Add_InlineImage(W,H,Img, Chart, bFlow);
     },
 
+    Add_OleObject : function(W, H, Img, Data)
+    {
+        this.Selection.Use  = true;
+        this.Selection.Type = table_Selection_Text;
+        this.CurCell.Content.Add_OleObject(W, H, Img, Data);
+    },
+
     Add_TextArt : function(nStyle)
     {
         this.Selection.Use  = true;

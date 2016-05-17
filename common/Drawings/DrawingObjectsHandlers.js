@@ -96,6 +96,7 @@ function handleFloatObjects(drawingObjectsController, drawingArr, e, x, y, group
         {
             case AscDFH.historyitem_type_Shape:
             case AscDFH.historyitem_type_ImageShape:
+            case AscDFH.historyitem_type_OleObject:
             {
                 ret = handleShapeImage(drawing, drawingObjectsController, e, x, y, group, pageIndex, bWord);
                 if(ret)
@@ -203,6 +204,7 @@ function handleGroup(drawing, drawingObjectsController, e, x, y, group, pageInde
         {
             case AscDFH.historyitem_type_Shape:
             case AscDFH.historyitem_type_ImageShape:
+            case AscDFH.historyitem_type_OleObject:
             {
                 ret = handleShapeImageInGroup(drawingObjectsController, drawing, cur_grouped_object, e, x, y, pageIndex, bWord);
                 if(ret)
@@ -613,8 +615,12 @@ function handleInlineHitNoText(drawing, drawingObjects, e, x, y, pageIndex, bInS
             {
                 if (drawing.getObjectType() === AscDFH.historyitem_type_ChartSpace && drawingObjects.handleChartDoubleClick)
                     drawingObjects.handleChartDoubleClick(drawing.parent, drawing, e, x, y, pageIndex);
+                else if (drawing.getObjectType() === AscDFH.historyitem_type_OleObject && drawingObjects.handleChartDoubleClick){
+                    drawingObjects.handleOleObjectDoubleClick(drawing.parent, drawing, e, x, y, pageIndex);
+                }
                 else if (2 == e.ClickCount && drawing.parent instanceof ParaDrawing && drawing.parent.Is_MathEquation())
                     drawingObjects.handleMathDrawingDoubleClick(drawing.parent, e, x, y, pageIndex);
+
             }
             drawingObjects.updateOverlay();
             return true;
@@ -642,6 +648,7 @@ function handleInlineObjects(drawingObjectsController, drawingArr, e, x, y, page
         {
             case AscDFH.historyitem_type_Shape:
             case AscDFH.historyitem_type_ImageShape:
+            case AscDFH.historyitem_type_OleObject:
             {
                 ret = handleInlineShapeImage(drawing, drawingObjectsController, e, x, y, pageIndex);
                 if(ret)

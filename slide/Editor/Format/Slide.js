@@ -825,6 +825,7 @@ Slide.prototype =
                     break;
                 }
                 case AscDFH.historyitem_type_ImageShape:
+                case AscDFH.historyitem_type_OleObject:
                 {
                     if(!drawing.nvPicPr)
                     {
@@ -1262,7 +1263,7 @@ Slide.prototype =
         for(var i = 0; i < sp_tree.length; ++i)
         {
             var sp = sp_tree[i];
-            if(sp.getObjectType() === AscDFH.historyitem_type_Shape || sp.getObjectType() === AscDFH.historyitem_type_ImageShape)
+            if(sp.getObjectType() === AscDFH.historyitem_type_Shape || sp.getObjectType() === AscDFH.historyitem_type_ImageShapee || sp.getObjectType() === AscDFH.historyitem_type_OleObject)
             {
                 if(sp.isPlaceholder && sp.isPlaceholder())
                 {

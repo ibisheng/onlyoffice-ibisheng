@@ -75,6 +75,7 @@
         this.snapArrayX = [];
         this.snapArrayY = [];
 
+        this.selected = false;
 
         this.Lock = new AscCommon.CLock();
         this.setRecalculateInfo();

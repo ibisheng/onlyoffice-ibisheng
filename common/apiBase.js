@@ -583,6 +583,39 @@ baseEditorsApi.prototype._uploadCallback = function(error, files) {
     });
   }
 };
+
+    //метод, который подменяет callback загрузки в каждом редакторе, TODO: переделать, сделать одинаково в о всех редакторах
+    baseEditorsApi.prototype.asc_replaceLoadImageCallback = function(fCallback){
+    };
+
+    baseEditorsApi.prototype.asc_loadLocalImageAndAction = function(sLocalImage, fCallback){
+        this.ImageLoader.LoadImage(AscCommon.getFullImageSrc2(sLocalImage), 1);
+        this.asc_replaceLoadImageCallback(fCallback);
+    };
+
+    baseEditorsApi.prototype.asc_checkImageUrlAndAction = function(sImageUrl, fCallback){
+        var sLocalImage = AscCommon.g_oDocumentUrls.getImageLocal(sImageUrl);
+        if(sLocalImage){
+            this.asc_loadLocalImageAndAction(sLocalImage, fCallback);
+            return;
+        }
+        var oThis = this;
+        AscCommon.sendImgUrls(oThis, [sImageUrl], function(data){
+            if(data[0] && data[0].path != null){
+                oThis.asc_loadLocalImageAndAction(AscCommon.g_oDocumentUrls.imagePath2Local(data[0].path), fCallback);
+            }
+        }, this.editorId === c_oEditorId.Spreadsheet);
+    };
+
+    baseEditorsApi.prototype.asc_addOleObject = function(sImageUrl, sData, sApplicationId){
+        var oThis = this;
+        this.asc_checkImageUrlAndAction(sImageUrl, function(oImage){oThis.asc_addOleObjectAction(AscCommon.g_oDocumentUrls.getImageLocal(oImage.src), sData, sApplicationId);});
+    };
+
+    baseEditorsApi.prototype.asc_addOleObjectAction = function(sLocalUrl, sData, sApplicationId)
+    {
+    };
+
 // Version History
 baseEditorsApi.prototype.asc_showRevision = function(newObj) {
 };
