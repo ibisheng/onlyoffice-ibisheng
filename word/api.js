@@ -6692,6 +6692,7 @@ asc_docs_api.prototype.OpenDocumentEndCallback = function()
     if (false === this.isSaveFonts_Images)
     {
         this.bInit_word_control = true;
+            this.pluginsManager = Asc.createPluginsManager(this);
         this.asc_fireCallback("asc_onDocumentContentReady");
     }
 

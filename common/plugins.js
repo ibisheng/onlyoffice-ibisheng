@@ -1,45 +1,20 @@
 (function(window, undefined){
 
-    var EPluginDataType =
-    {
-        none : 0,
-        text : 1,
-        ole : 2
-    };
-
-    function CPlugin()
-    {
-        this.name   = "";
-        this.guid   = "";
-        this.url    = "";
-
-        this.icons  = ["1x", "2x"];
-
-        this.isVisual   = false;
-
-        this.initDataType           = EPluginDataType.none;
-        this.initData               = "";
-
-        this.isUpdateOleOnResize    = false;
-
-        this.buttons            = [{text:"Ok",primary:true},{text:"Cancel",primary:false}];
-    }
-
-    function CPluginsManager()
+    function CPluginsManager(api)
     {
         this.plugins = [];
         this.current = null;
-        this.api = null;
         this.path = "";
-
-        this.iframe = null;
+        this.api = null;
     }
 
     CPluginsManager.prototype =
     {
-        register : function(plugin)
+        register : function(basePath, plugins)
         {
-            this.plugins.push(plugin);
+            this.path = basePath;
+            for (var i = 0; i < plugins.length; i++)
+                this.plugins.push(plugins[i]);
         },
         run      : function(guid, data)
         {
@@ -58,6 +33,9 @@
                 return false;
 
             this.show();
+        },
+        runResize   : function(guid, data, width, height)
+        {
         },
         close    : function()
         {
@@ -86,13 +64,13 @@
                 for (var i = 0; i < this.current.buttons.length; i++)
                 {
                     _div += "<button id='plugin" + (i + 1) + "' class='btn normal dlg-btn";
-                    if (this.current.buttons[i].primary)
+                    if (this.current.buttons[i]["primary"])
                         _div += " primary custom' style='margin-right: 10px;' ";
                     else
                         _div += "' ";
 
                     _div += "onclick='window.g_asc_plugins.buttonClick(" + i + ")'>"
-                    _div += this.current.buttons[i].text;
+                    _div += this.current.buttons[i]["text"];
                     _div += "</button>";
                 }
 
@@ -137,7 +115,7 @@
             var _data = "";
             switch (this.current.initDataType)
             {
-                case EPluginDataType.text:
+                case Asc.EPluginDataType.text:
                 {
                     var text_data = {
                         data : "",
@@ -148,7 +126,7 @@
                     _data = text_data.data;
                     break;
                 }
-                case EPluginDataType.ole:
+                case Asc.EPluginDataType.ole:
                 {
                     _data = ""; // TODO:
                     break;
@@ -160,79 +138,12 @@
             {
                 _iframe.contentWindow.postMessage(this.current.guid + ";init;" + _data, "*");
             }
-        },
-
-        test : function()
-        {
-            this.api  = window.editor;
-            this.path = "../../../../sdkjs-plugins/";
-
-            var plugin1                 = new CPlugin();
-            plugin1.name                = "chess (fen)";
-            plugin1.guid                = "{FFE1F462-1EA2-4391-990D-4CC84940B754}";
-            plugin1.url                 = "chess/index.html";
-            plugin1.icons               = ["chess/icon.png", "chess/icon@2x.png"];
-            plugin1.isVisual            = true;
-            plugin1.initDataType        = EPluginDataType.ole;
-            plugin1.isUpdateOleOnResize = true;
-            plugin1.buttons             = [{text:"Ok",primary:true},{text:"Cancel",primary:false}];
-
-            var plugin2                 = new CPlugin();
-            plugin2.name                = "glavred";
-            plugin2.guid                = "{B631E142-E40B-4B4C-90B9-2D00222A286E}";
-            plugin2.url                 = "glavred/index.html";
-            plugin2.icons               = ["glavred/icon.png", "glavred/icon@2x.png"];
-            plugin2.isVisual            = true;
-            plugin2.initDataType        = EPluginDataType.text;
-            plugin2.isUpdateOleOnResize = false;
-            plugin2.buttons             = [{text:"Ok",primary:true}];
-
-            var plugin3                 = new CPlugin();
-            plugin3.name                = "bold";
-            plugin3.guid                = "{14E46CC2-5E56-429C-9D55-1032B596D928}";
-            plugin3.url                 = "bold/index.html";
-            plugin3.icons               = ["bold/icon.png", "bold/icon@2x.png"];
-            plugin3.isVisual            = false;
-            plugin3.initDataType        = EPluginDataType.none;
-            plugin3.isUpdateOleOnResize = false;
-            plugin3.buttons             = [];
-
-            this.register(plugin1);
-            this.register(plugin2);
-            this.register(plugin3);
-
-            // добавляем кнопки (тест)
-            var _elem = document.getElementById("view-left-menu").childNodes[1];
-
-            for (var i = 0; i < 3; i++)
-            {
-                var _guid = "";
-                switch (i)
-                {
-                    case 0:
-                        _guid = plugin1.guid;
-                        break;
-                    case 1:
-                        _guid = plugin2.guid;
-                        break;
-                    case 2:
-                        _guid = plugin3.guid;
-                        break;
-                    default:
-                        break;
-                }
-
-                var _button = "<button class='btn btn-category' content-target='' data-toggle='tooltip' data-original-title='' title='' " +
-                    "onclick='window.g_asc_plugins.run(\"" + _guid + "\")'><span>" + (i + 1) + "</span></button>";
-
-                _elem.innerHTML += _button;
-            }
         }
     };
 
     function onMessage(event)
     {
-        if (!window.g_asc_plugins.current)
+        if (!window.g_asc_plugins || !window.g_asc_plugins.current)
             return;
 
         if (typeof(event.data) == "string")
@@ -284,8 +195,80 @@
         window.attachEvent("onmessage", onMessage);
     }
 
-    window.asc_EPluginDataType  = EPluginDataType;
-    window.asc_CPlugin          = CPlugin;
-    window.g_asc_plugins        = new CPluginsManager();
+    window.Asc.createPluginsManager = function(api)
+    {
+        if (window.g_asc_plugins)
+            return window.g_asc_plugins;
+
+        window.g_asc_plugins        = new CPluginsManager(api);
+        window["g_asc_plugins"]     = window.g_asc_plugins;
+        window.g_asc_plugins.api    = api;
+        window.g_asc_plugins["api"] = window.g_asc_plugins.api;
+
+        return window.g_asc_plugins;
+    };
 
 })(window, undefined);
+
+// потом удалить!!!
+function TEST_PLUGINS()
+{
+    var plugin1                 = new Asc.CPlugin();
+    plugin1.name                = "chess (fen)";
+    plugin1.guid                = "{FFE1F462-1EA2-4391-990D-4CC84940B754}";
+    plugin1.url                 = "chess/index.html";
+    plugin1.icons               = ["chess/icon.png", "chess/icon@2x.png"];
+    plugin1.isVisual            = true;
+    plugin1.initDataType        = Asc.EPluginDataType.ole;
+    plugin1.isUpdateOleOnResize = true;
+    plugin1.buttons             = [{"text":"Ok","primary":true},{"text":"Cancel","primary":false}];
+
+    var plugin2                 = new Asc.CPlugin();
+    plugin2.name                = "glavred";
+    plugin2.guid                = "{B631E142-E40B-4B4C-90B9-2D00222A286E}";
+    plugin2.url                 = "glavred/index.html";
+    plugin2.icons               = ["glavred/icon.png", "glavred/icon@2x.png"];
+    plugin2.isVisual            = true;
+    plugin2.initDataType        = Asc.EPluginDataType.text;
+    plugin2.isUpdateOleOnResize = false;
+    plugin2.buttons             = [{"text":"Ok","primary":true}];
+
+    var plugin3                 = new Asc.CPlugin();
+    plugin3.name                = "bold";
+    plugin3.guid                = "{14E46CC2-5E56-429C-9D55-1032B596D928}";
+    plugin3.url                 = "bold/index.html";
+    plugin3.icons               = ["bold/icon.png", "bold/icon@2x.png"];
+    plugin3.isVisual            = false;
+    plugin3.initDataType        = Asc.EPluginDataType.none;
+    plugin3.isUpdateOleOnResize = false;
+    plugin3.buttons             = [];
+
+    window.g_asc_plugins.api.asc_pluginsRegister("../../../../sdkjs-plugins/", [plugin1, plugin2, plugin3]);
+
+    // добавляем кнопки (тест)
+    var _elem = document.getElementById("view-left-menu").childNodes[1];
+
+    for (var i = 0; i < 3; i++)
+    {
+        var _guid = "";
+        switch (i)
+        {
+            case 0:
+                _guid = plugin1.guid;
+                break;
+            case 1:
+                _guid = plugin2.guid;
+                break;
+            case 2:
+                _guid = plugin3.guid;
+                break;
+            default:
+                break;
+        }
+
+        var _button = "<button class='btn btn-category' content-target='' data-toggle='tooltip' data-original-title='' title='' " +
+            "onclick='window.g_asc_plugins.run(\"" + _guid + "\")'><span>" + (i + 1) + "</span></button>";
+
+        _elem.innerHTML += _button;
+    }
+}

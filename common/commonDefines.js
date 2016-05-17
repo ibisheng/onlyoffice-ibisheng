@@ -1450,4 +1450,60 @@ window['Asc']['c_oAscMaxCellOrCommentLength'] = window['Asc'].c_oAscMaxCellOrCom
   window["AscCommon"].contentchanges_Remove = contentchanges_Remove;
 
   window["AscCommon"].offlineMode = offlineMode;
+
+  // ----------------------------- plugins ------------------------------- //
+  var EPluginDataType =
+  {
+    none : 0,
+    text : 1,
+    ole : 2
+  };
+
+  window["Asc"]["EPluginDataType"] = EPluginDataType;
+  prot = EPluginDataType;
+  prot['none'] = prot.none;
+  prot['text'] = prot.text;
+  prot['ole'] = prot.ole;
+
+  function CPlugin()
+  {
+	this.name   = "";
+	this.guid   = "";
+	this.url    = "";
+
+	this.icons  = ["1x", "2x"];
+
+	this.isVisual   = false;
+
+	this.initDataType           = EPluginDataType.none;
+	this.initData               = "";
+
+	this.isUpdateOleOnResize    = false;
+
+	this.buttons            	= [{"text":"Ok","primary":true},{"text":"Cancel","primary":false}];
+  }
+  CPlugin.prototype["get_Name"] = function() 		{ return this.name; };
+  CPlugin.prototype["set_Name"] = function(value) 	{ this.name = value; } ;
+  CPlugin.prototype["get_Guid"] = function() 		{ return this.guid; };
+  CPlugin.prototype["set_Guid"] = function(value) 	{ this.guid = value; };
+  CPlugin.prototype["get_Url"] = function() 		{ return this.url; };
+  CPlugin.prototype["set_Url"] = function(value) 	{ this.url = value; };
+  
+  CPlugin.prototype["get_Icons"] = function() 		{ return this.icons; };
+  CPlugin.prototype["set_Icons"] = function(value) 	{ this.icons = value; };
+  
+  CPlugin.prototype["get_Visual"] = function() 				{ return this.isVisual; };
+  CPlugin.prototype["set_Visual"] = function(value) 		{ this.isVisual = value; };
+  CPlugin.prototype["get_InitDataType"] = function() 		{ return this.icons; };
+  CPlugin.prototype["set_InitDataType"] = function(value) 	{ this.icons = value; };
+  CPlugin.prototype["get_InitData"] = function() 			{ return this.icons; };
+  CPlugin.prototype["set_InitData"] = function(value) 		{ this.icons = value; };
+  
+  CPlugin.prototype["get_UpdateOleOnResize"] = function() 			{ return this.isUpdateOleOnResize; };
+  CPlugin.prototype["set_UpdateOleOnResize"] = function(value) 		{ this.isUpdateOleOnResize = value; };
+  CPlugin.prototype["get_Buttons"] = function() 					{ return this.buttons; };
+  CPlugin.prototype["set_Buttons"] = function(value) 				{ this.buttons = value; };
+
+  window["Asc"]["CPlugin"] = CPlugin;
+  // --------------------------------------------------------------------- //
 })(window);

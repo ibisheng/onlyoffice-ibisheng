@@ -113,6 +113,8 @@ function baseEditorsApi(config, editorId) {
 
   this.fCurCallback = null;
 
+  this.pluginsManager = null;
+
   return this;
 }
 baseEditorsApi.prototype._init = function() {
@@ -644,6 +646,23 @@ baseEditorsApi.prototype.asc_getUrlType = function(url) {
 
     this.sendEvent('asc_onInitStandartTextures', arr);
   };
+
+// plugins
+baseEditorsApi.prototype.asc_pluginsRegister = function(basePath, plugins)
+{
+  if (null != this.pluginsManager)
+    this.pluginsManager.register(basePath, plugins);
+};
+baseEditorsApi.prototype.asc_pluginRun = function(guid, data)
+{
+  if (null != this.pluginsManager)
+    this.pluginsManager.run(guid, data);
+};
+baseEditorsApi.prototype.asc_pluginResize = function(guid, data, width, height)
+{
+  if (null != this.pluginsManager)
+    this.pluginsManager.runResize(guid, data, width, height);
+};
 
   //----------------------------------------------------------export----------------------------------------------------
   window['AscCommon'] = window['AscCommon'] || {};
