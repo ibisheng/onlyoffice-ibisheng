@@ -171,7 +171,7 @@
             plugin1.name                = "chess (fen)";
             plugin1.guid                = "{FFE1F462-1EA2-4391-990D-4CC84940B754}";
             plugin1.url                 = "chess/index.html";
-            plugin1.icons               = ["1x", "2x"];
+            plugin1.icons               = ["chess/icon.png", "chess/icon@2x.png"];
             plugin1.isVisual            = true;
             plugin1.initDataType        = EPluginDataType.ole;
             plugin1.isUpdateOleOnResize = true;
@@ -181,7 +181,7 @@
             plugin2.name                = "glavred";
             plugin2.guid                = "{B631E142-E40B-4B4C-90B9-2D00222A286E}";
             plugin2.url                 = "glavred/index.html";
-            plugin2.icons               = ["1x", "2x"];
+            plugin2.icons               = ["glavred/icon.png", "glavred/icon@2x.png"];
             plugin2.isVisual            = true;
             plugin2.initDataType        = EPluginDataType.text;
             plugin2.isUpdateOleOnResize = false;
@@ -191,7 +191,7 @@
             plugin3.name                = "bold";
             plugin3.guid                = "{14E46CC2-5E56-429C-9D55-1032B596D928}";
             plugin3.url                 = "bold/index.html";
-            plugin3.icons               = ["1x", "2x"];
+            plugin3.icons               = ["bold/icon.png", "bold/icon@2x.png"];
             plugin3.isVisual            = false;
             plugin3.initDataType        = EPluginDataType.none;
             plugin3.isUpdateOleOnResize = false;
