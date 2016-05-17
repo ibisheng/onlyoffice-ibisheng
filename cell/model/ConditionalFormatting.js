@@ -180,9 +180,11 @@
 		}
 		return res;
 	};
-	CConditionalFormattingRule.prototype.getAverage = function(val, average) {
+	CConditionalFormattingRule.prototype.getAverage = function(val, average, stdDev) {
 		var res = false;
-		// ToDo stdDev
+		/*if (this.stdDev) {
+			average += (this.aboveAverage ? 1 : -1) * this.stdDev + stdDev;
+		}*/
 		if (this.aboveAverage) {
 			res = val > average;
 		} else {
@@ -190,6 +192,9 @@
 		}
 		res = res || (this.equalAverage && val == average);
 		return res;
+	};
+	CConditionalFormattingRule.prototype.hasStdDev = function() {
+		return null !== this.stdDev;
 	};
 
 	function CColorScale () {

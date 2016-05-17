@@ -3612,9 +3612,20 @@ Woorksheet.prototype._updateConditionalFormatting = function(range) {
           }
 
           tmp = sum / nc;
+          /*if (oRule.hasStdDev()) {
+            sum = 0;
+            for (cell = 0; cell < values.length; ++cell) {
+              value = values[cell];
+              if (null !== value.v) {
+                sum += (value.v - tmp) * (value.v - tmp);
+              }
+            }
+            sum = Math.sqrt(sum / (nc - 1));
+          }*/
+
           for (cell = 0; cell < values.length; ++cell) {
             value = values[cell];
-            value.c.setConditionalFormattingStyle((null !== value.v && oRule.getAverage(value.v, tmp)) ? oRule.dxf : null);
+            value.c.setConditionalFormattingStyle((null !== value.v && oRule.getAverage(value.v, tmp, sum)) ? oRule.dxf : null);
           }
         } else {
           if (!oRule.dxf) {
