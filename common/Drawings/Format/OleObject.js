@@ -14,7 +14,7 @@ function (window, undefined) {
         this.Id = AscCommon.g_oIdCounter.Get_NewId();
         AscCommon.g_oTableId.Add( this, this.Id );
     }
-    AscCommon.extendClass(COleObject, CImageShape);
+    AscCommon.extendClass(COleObject, AscFormat.CImageShape);
 
     COleObject.prototype.getObjectType = function()
     {

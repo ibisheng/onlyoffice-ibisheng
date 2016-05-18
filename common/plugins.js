@@ -6,6 +6,8 @@
         this.current = null;
         this.path = "";
         this.api = null;
+
+        this.startData = "";
     }
 
     CPluginsManager.prototype =
@@ -32,6 +34,7 @@
             if (this.current == null)
                 return false;
 
+            this.startData = data;
             this.show();
         },
         runResize   : function(guid, data, width, height)
@@ -128,7 +131,7 @@
                 }
                 case Asc.EPluginDataType.ole:
                 {
-                    _data = ""; // TODO:
+                    _data = this.startData;
                     break;
                 }
             }
