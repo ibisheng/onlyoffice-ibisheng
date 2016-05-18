@@ -8,6 +8,8 @@
         this.api = null;
 
         this.startData = "";
+
+        this.runAndCloseData = null;
     }
 
     CPluginsManager.prototype =
@@ -21,7 +23,17 @@
         run      : function(guid, data)
         {
             if (null != this.current)
+            {
+                if (this.current.guid != guid)
+                {
+                    this.runAndCloseData = {};
+                    this.runAndCloseData.guid = guid;
+                    this.runAndCloseData.data = data;
+                }
+                // закрываем
+                this.buttonClick(-1);
                 return false;
+            }
 
             for (var i = 0; i < this.plugins.length; i++)
             {
@@ -46,6 +58,12 @@
             if (_div)
                 _div.parentNode.removeChild(_div);
             this.current = null;
+
+            if (this.runAndCloseData)
+            {
+                this.run(this.runAndCloseData.guid, this.runAndCloseData.data);
+                this.runAndCloseData = null;
+            }
         },
 
         show : function()
