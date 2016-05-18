@@ -75,6 +75,7 @@ CFootnotesController.prototype.Recalculate = function(nPageIndex, X, XLimit, Y, 
  */
 CFootnotesController.prototype.Get_Height = function(nPageIndex)
 {
+    return 0;
     var nHeight = 0;
     for (var nIndex = 0; nIndex < this.Pages[nPageIndex].Elements.length; ++nIndex)
     {
