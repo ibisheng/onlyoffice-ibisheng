@@ -54,9 +54,11 @@
         },
         close    : function()
         {
-            var _div = document.getElementById(this.current.isVisual ? "id_plugin_modal" : "plugin_iframe");
-            if (_div)
-                _div.parentNode.removeChild(_div);
+            if (!this.current.isVisual) {
+                var _div = document.getElementById("plugin_iframe");
+                if (_div)
+                    _div.parentNode.removeChild(_div);
+            }
             this.current = null;
 
             if (this.runAndCloseData)
@@ -64,46 +66,14 @@
                 this.run(this.runAndCloseData.guid, this.runAndCloseData.data);
                 this.runAndCloseData = null;
             }
+            this.api.asc_fireCallback("asc_onPluginClose");
         },
 
         show : function()
         {
             if (this.current.isVisual)
             {
-                var _div = "" +
-                    "<div class='header'>" +
-                    "<div class='tool close img-commonctrl' onclick='window.g_asc_plugins.buttonClick(-1);'></div>" +
-                    "<span class='title'>" + this.current.name + "</span>" +
-                    "</div>" +
-                    "<div class='body'>" +
-                    "<div id='id_body_plugin' class='box' style='height:615px;'>" +
-                    "<iframe id ='plugin_iframe' src='" + this.path + this.current.url + "' width='100%' height='100%' align='top' frameborder='0' name='frameEditor' allowfullscreen='' onmousewheel=''></iframe>" +
-                    "</div>" +
-                    "<div class='separator horizontal'></div>" +
-                    "<div class='footer' style='text-align: center;'>";
-
-                for (var i = 0; i < this.current.buttons.length; i++)
-                {
-                    _div += "<button id='plugin" + (i + 1) + "' class='btn normal dlg-btn";
-                    if (this.current.buttons[i]["primary"])
-                        _div += " primary custom' style='margin-right: 10px;' ";
-                    else
-                        _div += "' ";
-
-                    _div += "onclick='window.g_asc_plugins.buttonClick(" + i + ")'>"
-                    _div += this.current.buttons[i]["text"];
-                    _div += "</button>";
-                }
-
-                _div += "</div></div>";
-
-                var _new_div = document.createElement("div");
-                _new_div.setAttribute("id", "id_plugin_modal");
-                _new_div.setAttribute("class", "asc-window modal advanced-settings-dlg notransform");
-                _new_div.setAttribute("style", "width: 910px; height: 700px; left: 385px; top: 112px; transform: scale(1); opacity: 1; transition: opacity 0.2s, -webkit-transform 0.2s;");
-                _new_div.innerHTML = _div;
-
-                document.body.appendChild(_new_div);
+                this.api.asc_fireCallback("asc_onPluginShow", this.current);
             }
             else
             {
