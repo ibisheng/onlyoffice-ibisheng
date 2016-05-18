@@ -213,7 +213,7 @@
     /**
      * Class representing a image.
      * @constructor
-     * */
+     */
     function ApiImage(Image)
     {
         ApiImage.superclass.constructor.call(this, Image.parent);
@@ -235,7 +235,8 @@
     /**
      * Class representing a Chart.
      * @constructor
-     * */
+     *
+     */
     function ApiChart(Chart)
     {
         ApiChart.superclass.constructor.call(this, Chart.parent);
@@ -253,6 +254,7 @@
     }
     /**
      * Class representing RGB color
+     * @constructor
      */
     function ApiRGBColor(r, g, b)
     {

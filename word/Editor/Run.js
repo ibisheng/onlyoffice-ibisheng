@@ -2258,7 +2258,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                     var LetterLen = Item.Width / TEXTWIDTH_DIVIDER;//var LetterLen = Item.Get_Width();
                     
                     if (para_FootnoteReference === ItemType)
-                        PRS.Add_FootnoteReference(Item.Get_Footnote(), Pos);
+                        PRS.Add_FootnoteReference(Item, Pos);
 
                     if (true !== Word)
                     {

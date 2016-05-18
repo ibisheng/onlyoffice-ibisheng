@@ -897,6 +897,12 @@ Paragraph.prototype.private_RecalculateLine            = function(CurLine, CurPa
     //-------------------------------------------------------------------------------------------------------------
     if (false === this.private_RecalculateLineEnd(CurLine, CurPage, PRS, ParaPr))
         return;
+
+    //-------------------------------------------------------------------------------------------------------------
+    // 14. Проверяем Последние проверки
+    //-------------------------------------------------------------------------------------------------------------
+    if (false === this.private_RecalculateLineCheckFootnotes(CurLine, CurPage, PRS))
+        return;
 };
 
 Paragraph.prototype.private_RecalculateLineWidow       = function(CurLine, CurPage, PRS, ParaPr)
@@ -1762,6 +1768,56 @@ Paragraph.prototype.private_RecalculateLineAlign       = function(CurLine, CurPa
     return PRSA.RecalcResult;
 };
 
+Paragraph.prototype.private_RecalculateLineCheckFootnotes = function(CurLine, CurPage, PRS)
+{
+    if (!((PRS.RecalcResult & recalcresult_NextElement) || (PRS.RecalcResult & recalcresult_NextLine)))
+        return false;
+
+    for (var nIndex = 0, nCount = PRS.Footnotes.length; nIndex < nCount; ++nIndex)
+    {
+        var oFootnote = PRS.Footnotes[nIndex].FootnoteReference.Get_Footnote();
+        var oPos      = PRS.Footnotes[nIndex].Pos;
+
+        // Проверим позицию
+        if (true === this.MoveToLBP && PRS.LineBreakPos.Compare(oPos) >= 0)
+            return true;
+
+        // TODO: Здесь надо разобраться с параграфами внутри таблицы.
+        if (this.Parent instanceof CDocument)
+        {
+            var RecalcInfo = this.Parent.RecalcInfo;
+            if (true === RecalcInfo.Can_RecalcObject())
+            {
+                var PageAbs = this.Get_AbsolutePage(CurPage);
+                RecalcInfo.Set_FootnoteReference(oFootnote, PageAbs);
+                this.Parent.Footnotes.Add_FootnoteOnPage(PageAbs, oFootnote);
+                PRS.RecalcResult = recalcresult_CurPage & recalcresultflags_Page;
+                return false;
+            }
+            else if (true === RecalcInfo.Check_FootnoteReference(oFootnote))
+            {
+                var PageAbs = this.Get_AbsolutePage(CurPage);
+                if (PageAbs === RecalcInfo.FlowObjectPage)
+                {
+                    // Все нормально пересчиталось
+                    RecalcInfo.Reset_FootnoteReference();
+                }
+                else
+                {
+                    // TODO: Реализовать
+                    RecalcInfo.FlowObjectPageBreakBefore = true;
+                }
+            }
+            else
+            {
+                // Ничего не делаем, просто пропускаем ссылку на данную сноску
+            }
+        }
+    }
+
+    return true;
+};
+
 Paragraph.prototype.private_RecalculateRange           = function(CurRange, CurLine, CurPage, RangesCount, PRS, ParaPr)
 {
     // Найдем начальную позицию данного отрезка
@@ -2468,6 +2524,8 @@ function CParagraphRecalculateStateWrap(Para)
         Object : null         // Объект, который вызвал пересчет
     };
 
+    this.Footnotes = [];
+
     // for ParaMath
     this.bMath_OneLine       = false;
     this.bMathWordLarge      = false;
@@ -2526,6 +2584,7 @@ CParagraphRecalculateStateWrap.prototype =
         this.bMathWordLarge      = false;
         this.bEndRunToContent    = false;
         this.PosEndRun           = new CParagraphContentPos();
+        this.Footnotes           = [];
 
         this.OperGapRight        = 0;
         this.OperGapLeft         = 0;
@@ -2794,9 +2853,9 @@ CParagraphRecalculateStateWrap.prototype =
         return X;
     },
 
-    Add_FootnoteReference : function(sId, oPos)
+    Add_FootnoteReference : function(FootnoteReference, Pos)
     {
-
+        this.Footnotes.push({FootnoteReference : FootnoteReference, Pos : Pos});
     }
 };
 

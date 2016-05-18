@@ -14375,6 +14375,11 @@ CParagraphContentPos.prototype =
         this.Depth = ContentPos.Depth;
     },
 
+    /**
+     * Сравниваем текущую позицию с заданной.
+     * @param {CParagraphContentPos} Pos
+     * @returns {number} 0 - позиции совпадают, 1 - текущая позиция дальше заданной, -1 - текущая позиция до заданной.
+     */
     Compare : function(Pos)
     {
         var CurDepth = 0;
