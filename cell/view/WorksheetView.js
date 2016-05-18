@@ -12130,11 +12130,36 @@
 			if(null !== isApplyAutoFilter)
 			{
 				autoFilterObject.asc_setCellId(cellId);
-				if(c_oAscAutoFilterTypes.CustomFilters === autoFilterObject.filter.type)
+				
+				var filter = autoFilterObject.filter;
+				if(c_oAscAutoFilterTypes.CustomFilters === filter.type)
 				{	
 					var cell = t.model._getCell( ar.startRow, ar.startCol);
 					var val = cell.getValueWithoutFormat();
-					autoFilterObject.filter.filter.CustomFilters[0].Val = val;
+					filter.filter.CustomFilters[0].Val = val;
+				}
+				else if(c_oAscAutoFilterTypes.ColorFilter === filter.type)
+				{
+					var cell = t.model._getCell( ar.startRow, ar.startCol);
+					if(filter.filter && filter.filter.dxf && filter.filter.dxf.fill)
+					{
+						if(false === filter.filter.CellColor)
+						{
+							var fontColor =  cell.xfs && cell.xfs.font ? cell.xfs.font.c : null;
+							//TODO добавлять дефолтовый цвет шрифта в случае, если цвет шрифта не указан
+							if(null !== fontColor)
+							{
+								filter.filter.dxf.fill.bg = fontColor;
+							}
+						}
+						else
+						{
+							//TODO просмотерть ситуации без заливки
+							var color = cell.getStyle();
+							var cellColor = null !== color && color.fill && color.fill.bg ? color.fill.bg : null;
+							filter.filter.dxf.fill.bg = cellColor;
+						}
+					}	
 				}
 				
 				var applyFilterProps = t.model.autoFilters.applyAutoFilter( autoFilterObject, ar );
