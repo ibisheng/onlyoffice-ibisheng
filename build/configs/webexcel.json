@@ -166,7 +166,11 @@
         "../word/Math/operators.js",
         "../word/Math/accent.js",
         "../word/Math/borderBox.js",
-        "../word/apiCommon.js"
+        "../word/apiCommon.js",
+		
+		"../common/clipboard_base.js",
+		"../common/Drawings/Format/OleObject.js",
+		"../common/plugins.js"
       ],
       "private": [
         "../cell/Private/comments.js"

@@ -155,7 +155,11 @@
         "../slide/Editor/Format/GroupPrototype.js",
         "../slide/Editor/Format/ChartSpacePrototype.js",
         "../slide/apiCommon.js",
-        "../word/apiCommon.js"
+        "../word/apiCommon.js",
+		
+		"../common/clipboard_base.js",
+		"../common/Drawings/Format/OleObject.js",
+		"../common/plugins.js"
       ],
       "private": [
         "../slide/Private/comments.js",

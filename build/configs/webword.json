@@ -151,7 +151,11 @@
         "../word/Math/accent.js",
         "../word/Math/borderBox.js",
 		
-		"../word/apiBuilder.js"
+		"../word/apiBuilder.js",
+		
+		"../common/clipboard_base.js",
+		"../common/Drawings/Format/OleObject.js",
+		"../common/plugins.js"
       ],
       "private": [
         "../common/Private/versionHistory.js",
