@@ -1363,7 +1363,7 @@ function CDocument(DrawingDocument, isMainLogicDocument)
     this.HdrFtr = new CHeaderFooterController(this, this.DrawingDocument);
 
     // Класс для работы со сносками
-    this.Footnotes = new CFootnotesController(this);
+    //this.Footnotes = new CFootnotesController(this);
 
     // Класс для работы с поиском
     this.SearchInfo =
@@ -1601,7 +1601,7 @@ CDocument.prototype.Get_PageContentStartPos2       = function(StartPageIndex, St
 
     var SectPr = this.SectionsInfo.Get_SectPr(ElementIndex).SectPr;
 
-    var FootnotesHeight = this.Footnotes.Get_Height(StartPageIndex);
+    var FootnotesHeight = 0;//this.Footnotes.Get_Height(StartPageIndex);
 
     var Y      = SectPr.Get_PageMargin_Top();
     var YLimit = SectPr.Get_PageHeight() - SectPr.Get_PageMargin_Bottom() - FootnotesHeight;
