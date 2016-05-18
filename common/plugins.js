@@ -243,31 +243,26 @@ function TEST_PLUGINS()
     plugin3.isUpdateOleOnResize = false;
     plugin3.buttons             = [];
 
-    window.g_asc_plugins.api.asc_pluginsRegister("../../../../sdkjs-plugins/", [plugin1, plugin2, plugin3]);
+    var plugin4                 = new Asc.CPlugin();
+    plugin4.name                = "speech";
+    plugin4.guid                = "{D71C2EF0-F15B-47C7-80E9-86D671F9C595}";
+    plugin4.url                 = "speech/index.html";
+    plugin4.icons               = ["speech/icon.png", "speech/icon@2x.png"];
+    plugin4.isVisual            = false;
+    plugin4.initDataType        = Asc.EPluginDataType.text;
+    plugin4.isUpdateOleOnResize = false;
+    plugin4.buttons             = [];
+
+    var _plugins = [plugin1, plugin2, plugin3, plugin4];
+    window.g_asc_plugins.api.asc_pluginsRegister("../../../../sdkjs-plugins/", _plugins);
 
     // добавляем кнопки (тест)
     var _elem = document.getElementById("view-left-menu").childNodes[1];
 
-    for (var i = 0; i < 3; i++)
+    for (var i = 0; i < _plugins.length; i++)
     {
-        var _guid = "";
-        switch (i)
-        {
-            case 0:
-                _guid = plugin1.guid;
-                break;
-            case 1:
-                _guid = plugin2.guid;
-                break;
-            case 2:
-                _guid = plugin3.guid;
-                break;
-            default:
-                break;
-        }
-
         var _button = "<button class='btn btn-category' content-target='' data-toggle='tooltip' data-original-title='' title='' " +
-            "onclick='window.g_asc_plugins.run(\"" + _guid + "\")'><span>" + (i + 1) + "</span></button>";
+            "onclick='window.g_asc_plugins.run(\"" + _plugins[i].guid + "\")'><span>" + (i + 1) + "</span></button>";
 
         _elem.innerHTML += _button;
     }
