@@ -211,12 +211,13 @@
     {
         window.addEventListener("message", onMessage, false);
     }
-    else
+    else if (window.attachEvent)
     {
         window.attachEvent("onmessage", onMessage);
     }
 
-    window.Asc.createPluginsManager = function(api)
+    window["Asc"] = window["Asc"] ? window["Asc"] : {};
+    window["Asc"].createPluginsManager = function(api)
     {
         if (window.g_asc_plugins)
             return window.g_asc_plugins;
