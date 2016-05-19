@@ -4574,17 +4574,28 @@ ParaDrawing.prototype =
             return;
         var dW, dH, bInline = this.Is_Inline();
         this.GraphicObj.recalculate();
-        this.setExtent(this.GraphicObj.spPr.xfrm.extX, this.GraphicObj.spPr.xfrm.extY);
-        if(AscFormat.checkNormalRotate(AscFormat.isRealNumber(this.GraphicObj.rot) ? this.GraphicObj.rot : 0))
+        var extX, extY;
+        if(this.GraphicObj.spPr.xfrm && AscFormat.isRealNumber(this.GraphicObj.spPr.xfrm.extX) && AscFormat.isRealNumber(this.GraphicObj.spPr.xfrm.extY))
         {
-            dW = this.GraphicObj.spPr.xfrm.extX;
-            dH = this.GraphicObj.spPr.xfrm.extY;
+            extX = this.GraphicObj.spPr.xfrm.extX;
+            extY = this.GraphicObj.spPr.xfrm.extY;
         }
         else
         {
-            dH = this.GraphicObj.spPr.xfrm.extX;
-            dW = this.GraphicObj.spPr.xfrm.extY;
+            extX = 5;
+            extY = 5;
         }
+        if(AscFormat.checkNormalRotate(AscFormat.isRealNumber(this.GraphicObj.rot) ? this.GraphicObj.rot : 0))
+        {
+            dW = extX;
+            dH = extY;
+        }
+        else
+        {
+            dH = extX;
+            dW = extY;
+        }
+        this.setExtent(extX, extY);
         var xc = this.GraphicObj.localTransform.TransformPointX(this.GraphicObj.extX/2, this.GraphicObj.extY/2);
         var yc = this.GraphicObj.localTransform.TransformPointY(this.GraphicObj.extX/2, this.GraphicObj.extY/2);
         var oBounds = this.GraphicObj.bounds;
