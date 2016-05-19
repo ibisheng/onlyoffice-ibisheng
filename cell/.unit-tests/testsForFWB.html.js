@@ -1,4 +1,7 @@
 $(function(){
+  // Import
+  var CellFormat = AscCommon.CellFormat;
+
 	var fGetFormatedText = function(aFormated)
 	{
 		var res = "";

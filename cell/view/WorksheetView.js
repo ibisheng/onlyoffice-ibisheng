@@ -5401,14 +5401,14 @@
         }
     };
 
-    WorksheetView.prototype.prepareDepCells = function(se) {
+    WorksheetView.prototype.prepareDepCells = function ( se ) {
         var activeCell = this.activeRange, mc = this.model.getMergedByCell( activeCell.startRow, activeCell.startCol ), c1 = mc ? mc.c1 : activeCell.startCol, r1 = mc ? mc.r1 : activeCell.startRow, c = this._getVisibleCell( c1, r1 ), nodes = (se == AscCommonExcel.c_oAscDrawDepOptions.Master) ? this.model.workbook.dependencyFormulas.getMasterNodes( this.model.getId(), c.getName() ) : this.model.workbook.dependencyFormulas.getSlaveNodes( this.model.getId(), c.getName() );
 
-        if (!nodes) {
+        if ( !nodes ) {
             return;
         }
 
-        if (!this.depDrawCells) {
+        if ( !this.depDrawCells ) {
             this.depDrawCells = {};
         }
 
@@ -5420,9 +5420,9 @@
         else {
             var to = {}, to1, id = AscCommonExcel.getVertexId( this.model.getId(), c.getName() );
             to[AscCommonExcel.getVertexId( this.model.getId(), c.getName() )] = this.model.workbook.dependencyFormulas.getNode( this.model.getId(), c.getName() );
-            to1 = this.model.workbook.dependencyFormulas.getNode(this.model.getId(), c.getName());
-            for (var id2 in nodes) {
-                if (this.depDrawCells[id2]) {
+            to1 = this.model.workbook.dependencyFormulas.getNode( this.model.getId(), c.getName() );
+            for ( var id2 in nodes ) {
+                if ( this.depDrawCells[id2] ) {
                     $.extend( this.depDrawCells[id2].to, to )
                 }
                 else {
@@ -8767,7 +8767,7 @@
             this.handlers.trigger( "onErrorEvent", c_oAscError.ID.CannotMoveRange, c_oAscError.Level.NoCritical );
             this._cleanSelectionMoveRange();
         }
-        else if ( resmove === -1 && this.af_isCheckMoveRange( arnFrom, arnTo ) ) {
+        else if (resmove === -1) {
             var t = this;
             this.model.workbook.handlers.trigger( "asc_onConfirmAction", Asc.c_oAscConfirm.ConfirmReplaceRange, function ( can ) {
                 if ( can ) {
@@ -8821,7 +8821,7 @@
                 t.model._moveRange( arnFrom, arnTo, copyRange );
                 t.cellCommentator.moveRangeComments( arnFrom, arnTo );
                 t.objectRender.moveRangeDrawingObject( arnFrom, arnTo );
-
+				
                 // Вызываем функцию пересчета для заголовков форматированной таблицы
                 t.model.autoFilters.renameTableColumn( arnFrom );
                 t.model.autoFilters.renameTableColumn( arnTo );
@@ -11811,7 +11811,7 @@
 
         var t = this;
         var ar = t.activeRange.clone( true );
-
+			
 		var isChangeAutoFilterToTablePart = function(addFormatTableOptionsObj)
 		{
 			var res = false;
@@ -11870,7 +11870,7 @@
 				if(styleName === null)
 				{
 					addFilterCallBack();
-            }
+				}
 				else
 				{
 					var filterInfo = t.model.autoFilters._getFilterInfoByAddTableProps(ar, addFormatTableOptionsObj);
@@ -11929,7 +11929,7 @@
 
                             t.af_drawButtons(filterRange);
                             t._onUpdateFormatTable(filterRange, false, true);
-                    }
+                        }
 
                         t._isLockedCells(filterRange, /*subType*/null, deleteFilterCallBack);
 
@@ -11940,7 +11940,7 @@
 						{
 							History.Create_NewPoint();
 							History.StartTransaction();
-
+							
 							t.model.autoFilters.addAutoFilter( null, ar);
 							t._onUpdateFormatTable(filterRange, false, true);
 							
@@ -12201,7 +12201,7 @@
                 return;
             }
 			var sortProps = t.model.autoFilters.getPropForSort(cellId, ar, displayName);
-
+			
 			var onSortAutoFilterCallBack = function()
 			{
 				History.Create_NewPoint();
@@ -12215,7 +12215,7 @@
 				
 				t._onUpdateFormatTable(sortProps.sortRange.bbox, false);
 				History.EndTransaction();
-        };
+			};	
 			
 			if(null === sortProps)
 			{
@@ -12387,7 +12387,7 @@
         }
         return arrResult;
     };
-
+	
 	WorksheetView.prototype.af_setStyleAfterOpen = function()
 	{
 		var worksheet = this.model;

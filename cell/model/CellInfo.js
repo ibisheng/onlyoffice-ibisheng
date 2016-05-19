@@ -1,22 +1,22 @@
 "use strict";
 
 (/**
-	 * @param {Window} window
-	 * @param {undefined} undefined
-	 */
+   * @param {Window} window
+   * @param {undefined} undefined
+   */
     function(window, undefined) {
-		// Import
-		var c_oAscBorderStyles = AscCommon.c_oAscBorderStyles;
+    // Import
+    var c_oAscBorderStyles = AscCommon.c_oAscBorderStyles;
 
-		/** @constructor */
-		function asc_CCellFlag(m, s, w, t, l) {
-			this.merge = !!m;
-			this.shrinkToFit = !!s;
-			this.wrapText = !!w;
-			this.selectionType = t;
-			this.lockText = !!l;
-		}
-		asc_CCellFlag.prototype = {
+    /** @constructor */
+    function asc_CCellFlag(m, s, w, t, l) {
+      this.merge = !!m;
+      this.shrinkToFit = !!s;
+      this.wrapText = !!w;
+      this.selectionType = t;
+      this.lockText = !!l;
+    }
+    asc_CCellFlag.prototype = {
       asc_getMerge: function() {
         return this.merge;
       }, asc_getShrinkToFit: function() {
@@ -28,21 +28,21 @@
       }, asc_getLockText: function() {
         return this.lockText;
       }
-		};
+    };
 
-		/** @constructor */
-		function asc_CFont(name, size, color, b, i, u, s, sub, sup) {
-			this.name = name !== undefined ? name : "Arial";
-			this.size = size !== undefined ? size : 10;
-			this.color = color !== undefined ? color : null;
-			this.bold = !!b;
-			this.italic = !!i;
-			this.underline = !!u;
-			this.strikeout = !!s;
-			this.subscript = !!sub;
-			this.superscript = !!sup;
-		}
-		asc_CFont.prototype = {
+    /** @constructor */
+    function asc_CFont(name, size, color, b, i, u, s, sub, sup) {
+      this.name = name !== undefined ? name : "Arial";
+      this.size = size !== undefined ? size : 10;
+      this.color = color !== undefined ? color : null;
+      this.bold = !!b;
+      this.italic = !!i;
+      this.underline = !!u;
+      this.strikeout = !!s;
+      this.subscript = !!sub;
+      this.superscript = !!sup;
+    }
+    asc_CFont.prototype = {
       asc_getName: function() {
         return this.name;
       }, asc_getSize: function() {
@@ -62,23 +62,23 @@
       }, asc_getColor: function() {
         return this.color;
       }
-		};
+    };
 
-		/** @constructor */
-		function asc_CFill(color) {
-			this.color = color !== undefined ? color : null;
-		}
-		asc_CFill.prototype = {
+    /** @constructor */
+    function asc_CFill(color) {
+      this.color = color !== undefined ? color : null;
+    }
+    asc_CFill.prototype = {
       asc_getColor: function() {
         return this.color;
       }
-		};
+    };
 
-		/** @constructor */
-		function asc_CBorder(style, color) {
-			// ToDo заглушка для создания border-а
-			if (typeof style === "string") {
-				switch (style) {
+    /** @constructor */
+    function asc_CBorder(style, color) {
+      // ToDo заглушка для создания border-а
+      if (typeof style === "string") {
+        switch (style) {
           case "thin"    :
             this.style = c_oAscBorderStyles.Thin;
             break;
@@ -91,30 +91,30 @@
           default      :
             this.style = c_oAscBorderStyles.None;
             break;
-				}
-			} else {
-				this.style = style !== undefined ? style : c_oAscBorderStyles.None;
-			}
-			this.color = color !== undefined ? color : null;
-		}
-		asc_CBorder.prototype = {
+        }
+      } else {
+        this.style = style !== undefined ? style : c_oAscBorderStyles.None;
+      }
+      this.color = color !== undefined ? color : null;
+    }
+    asc_CBorder.prototype = {
       asc_getStyle: function() {
         return this.style;
       }, asc_getColor: function() {
         return this.color;
       }
-		};
+    };
 
-		/** @constructor */
-		function asc_CBorders() {
-			this.left = null;
-			this.top = null;
-			this.right = null;
-			this.bottom = null;
-			this.diagDown = null;
-			this.diagUp = null;
-		}
-		asc_CBorders.prototype = {
+    /** @constructor */
+    function asc_CBorders() {
+      this.left = null;
+      this.top = null;
+      this.right = null;
+      this.bottom = null;
+      this.diagDown = null;
+      this.diagUp = null;
+    }
+    asc_CBorders.prototype = {
       asc_getLeft: function() {
         return this.left;
       }, asc_getTop: function() {
@@ -128,16 +128,18 @@
       }, asc_getDiagUp: function() {
         return this.diagUp;
       }
-		};
+    };
 
-		/** @constructor */
-		function asc_CAutoFilterInfo() {
-			this.isApplyAutoFilter = false;   // Кнопка очистить фильтр: false - disable, true - pressed button
-			this.isAutoFilter = false;  // Кнопка автофильтр (также влияет на formatTable и Sort). Возможные состояния:
-										// - null - мы в пересечении с таблицой (но не полностью в ней)
-										// - true/false - когда мы полностью в таблице или вне ее (true/false в зависимости от того применен фильтр или нет)
-		}
-		asc_CAutoFilterInfo.prototype = {
+    /** @constructor */
+    function asc_CAutoFilterInfo() {
+      this.tableStyleName = null;
+      this.tableName = null;
+      this.isApplyAutoFilter = false;   // Кнопка очистить фильтр: false - disable, true - pressed button
+      this.isAutoFilter = false;  // Кнопка автофильтр (также влияет на formatTable и Sort). Возможные состояния:
+      // - null - мы в пересечении с таблицой (но не полностью в ней)
+      // - true/false - когда мы полностью в таблице или вне ее (true/false в зависимости от того применен фильтр или нет)
+    }
+    asc_CAutoFilterInfo.prototype = {
       asc_getTableStyleName: function() {
         return this.tableStyleName;
       }, asc_getTableName: function() {
@@ -147,29 +149,29 @@
       }, asc_getIsApplyAutoFilter: function() {
         return this.isApplyAutoFilter;
       }
-		};
+    };
 
-		/** @constructor */
+    /** @constructor */
     function asc_CFormatTableInfo() {
-			this.tableStyleName = null;
-			this.tableName = null;
-			
+      this.tableStyleName = null;
+      this.tableName = null;
+
       this.isShowColumnStripes = null;
       this.isShowFirstColumn = null;
       this.isShowLastColumn = null;
       this.isShowRowStripes = null;
-			this.isShowTotalRow = null;
-			this.isShowHeaderRow = null;
-			
-			this.tableRange = null;
-			
-			this.isInsertRowAbove = null;
-			this.isInsertRowBelow = null;
-			this.isInsertColumnLeft = null;
-			this.isInsertColumnRight = null;
-			this.isDeleteRow = null;
-			this.isDeleteColumn = null;
-			this.isDeleteTable = null;
+      this.isShowTotalRow = null;
+      this.isShowHeaderRow = null;
+
+      this.tableRange = null;
+
+      this.isInsertRowAbove = null;
+      this.isInsertRowBelow = null;
+      this.isInsertColumnLeft = null;
+      this.isInsertColumnRight = null;
+      this.isDeleteRow = null;
+      this.isDeleteColumn = null;
+      this.isDeleteTable = null;
     }
     asc_CFormatTableInfo.prototype = {
       asc_getTableStyleName: function() {
@@ -177,7 +179,7 @@
       }, asc_getTableName: function() {
         return this.tableName;
       },
-			
+
       asc_getFirstRow: function() {
         return this.firstRow;
       }, asc_getLastRow: function() {
@@ -195,7 +197,7 @@
       }, asc_getTableRange: function() {
         return this.tableRange;
       },
-			
+
       asc_getIsInsertRowAbove: function() {
         return this.isInsertRowAbove;
       }, asc_getIsInsertRowBelow: function() {
@@ -213,29 +215,29 @@
       }
     };
 
-		/** @constructor */
-		function asc_CCellInfo() {
-			this.name = null;
-			this.formula = "";
-			this.text = "";
-			this.halign = "left";
-			this.valign = "top";
-			this.flags = null;
-			this.font = null;
-			this.fill = null;
-			this.border = null;
-			this.innertext = null;
-			this.numFormat = null;
-			this.hyperlink = null;
-			this.comments = [];
-			this.isLocked = false;
-			this.styleName = null;
-			this.numFormatType = null;
-			this.angle = null;
-			this.autoFilterInfo = null;
+    /** @constructor */
+    function asc_CCellInfo() {
+      this.name = null;
+      this.formula = "";
+      this.text = "";
+      this.halign = "left";
+      this.valign = "top";
+      this.flags = null;
+      this.font = null;
+      this.fill = null;
+      this.border = null;
+      this.innertext = null;
+      this.numFormat = null;
+      this.hyperlink = null;
+      this.comments = [];
+      this.isLocked = false;
+      this.styleName = null;
+      this.numFormatType = null;
+      this.angle = null;
+      this.autoFilterInfo = null;
       this.formatTableInfo = null;
-		}
-		asc_CCellInfo.prototype = {
+    }
+    asc_CCellInfo.prototype = {
       asc_getName: function() {
         return this.name;
       }, asc_getFormula: function() {
@@ -286,7 +288,7 @@
       asc_getClearFilter: function() {
         return null
       }//TODO DELETE
-		};
+    };
 
     /** @constructor */
     function asc_CDefName(n, r, s, t, h, l) {
@@ -341,7 +343,7 @@
 
   window["AscCommonExcel"].asc_CFont = asc_CFont;
   prot = asc_CFont.prototype;
-		prot["asc_getName"]				= prot.asc_getName;
+  prot["asc_getName"] = prot.asc_getName;
   prot["asc_getSize"] = prot.asc_getSize;
   prot["asc_getBold"] = prot.asc_getBold;
   prot["asc_getItalic"] = prot.asc_getItalic;
@@ -399,41 +401,41 @@
   window["AscCommonExcel"].asc_CCellInfo = asc_CCellInfo;
   prot = asc_CCellInfo.prototype;
   prot["asc_getName"] = prot.asc_getName;
-		prot["asc_getFormula"]			= prot.asc_getFormula;
-		prot["asc_getText"]				= prot.asc_getText;
-		prot["asc_getHorAlign"]			= prot.asc_getHorAlign;
-		prot["asc_getVertAlign"]		= prot.asc_getVertAlign;
-		prot["asc_getFlags"]			= prot.asc_getFlags;
-		prot["asc_getFont"]				= prot.asc_getFont;
-		prot["asc_getFill"]				= prot.asc_getFill;
-		prot["asc_getBorders"]			= prot.asc_getBorders;
-		prot["asc_getInnerText"]		= prot.asc_getInnerText;
-		prot["asc_getNumFormat"]		= prot.asc_getNumFormat;
-		prot["asc_getHyperlink"]		= prot.asc_getHyperlink;
-		prot["asc_getComments"]			= prot.asc_getComments;
-		prot["asc_getLocked"]			= prot.asc_getLocked;
-		prot["asc_getStyleName"]		= prot.asc_getStyleName;
-		prot["asc_getNumFormatType"]	= prot.asc_getNumFormatType;
-		prot["asc_getAngle"]			= prot.asc_getAngle;
-		prot["asc_getAutoFilterInfo"]	= prot.asc_getAutoFilterInfo;
+  prot["asc_getFormula"] = prot.asc_getFormula;
+  prot["asc_getText"] = prot.asc_getText;
+  prot["asc_getHorAlign"] = prot.asc_getHorAlign;
+  prot["asc_getVertAlign"] = prot.asc_getVertAlign;
+  prot["asc_getFlags"] = prot.asc_getFlags;
+  prot["asc_getFont"] = prot.asc_getFont;
+  prot["asc_getFill"] = prot.asc_getFill;
+  prot["asc_getBorders"] = prot.asc_getBorders;
+  prot["asc_getInnerText"] = prot.asc_getInnerText;
+  prot["asc_getNumFormat"] = prot.asc_getNumFormat;
+  prot["asc_getHyperlink"] = prot.asc_getHyperlink;
+  prot["asc_getComments"] = prot.asc_getComments;
+  prot["asc_getLocked"] = prot.asc_getLocked;
+  prot["asc_getStyleName"] = prot.asc_getStyleName;
+  prot["asc_getNumFormatType"] = prot.asc_getNumFormatType;
+  prot["asc_getAngle"] = prot.asc_getAngle;
+  prot["asc_getAutoFilterInfo"] = prot.asc_getAutoFilterInfo;
   prot["asc_getFormatTableInfo"] = prot.asc_getFormatTableInfo;
-		prot["asc_getIsFormatTable"]	= prot.asc_getIsFormatTable;//TODO DELETE
-		prot["asc_getIsAutoFilter"]  	= prot.asc_getIsAutoFilter;//TODO DELETE
-		prot["asc_getTableStyleName"]  	= prot.asc_getTableStyleName;//TODO DELETE
-		prot["asc_getClearFilter"]  	= prot.asc_getClearFilter;//TODO DELETE
+  prot["asc_getIsFormatTable"] = prot.asc_getIsFormatTable;//TODO DELETE
+  prot["asc_getIsAutoFilter"] = prot.asc_getIsAutoFilter;//TODO DELETE
+  prot["asc_getTableStyleName"] = prot.asc_getTableStyleName;//TODO DELETE
+  prot["asc_getClearFilter"] = prot.asc_getClearFilter;//TODO DELETE
 
-        window["Asc"].asc_CDefName = window["Asc"]["asc_CDefName"] = asc_CDefName;
-        prot = asc_CDefName.prototype;
-        prot["asc_getName"]				= prot.asc_getName;
-        prot["asc_getScope"]			= prot.asc_getScope;
-        prot["asc_getRef"]				= prot.asc_getRef;
-        prot["asc_getIsTable"]		    = prot.asc_getIsTable;
-        prot["asc_getIsHidden"]		    = prot.asc_getIsHidden;
-        prot["asc_getIsLock"]		    = prot.asc_getIsLock;
+  window["Asc"].asc_CDefName = window["Asc"]["asc_CDefName"] = asc_CDefName;
+  prot = asc_CDefName.prototype;
+  prot["asc_getName"] = prot.asc_getName;
+  prot["asc_getScope"] = prot.asc_getScope;
+  prot["asc_getRef"] = prot.asc_getRef;
+  prot["asc_getIsTable"] = prot.asc_getIsTable;
+  prot["asc_getIsHidden"] = prot.asc_getIsHidden;
+  prot["asc_getIsLock"] = prot.asc_getIsLock;
 
-        window["Asc"].asc_CCheckDefName = window["Asc"]["asc_CCheckDefName"] = asc_CCheckDefName;
-        prot = asc_CCheckDefName.prototype;
-        prot["asc_getStatus"]			= prot.asc_getStatus;
-        prot["asc_getReason"]			= prot.asc_getReason;
+  window["Asc"].asc_CCheckDefName = window["Asc"]["asc_CCheckDefName"] = asc_CCheckDefName;
+  prot = asc_CCheckDefName.prototype;
+  prot["asc_getStatus"] = prot.asc_getStatus;
+  prot["asc_getReason"] = prot.asc_getReason;
 
   })(window);

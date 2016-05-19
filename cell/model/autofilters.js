@@ -1,4 +1,4 @@
-"use strict";
+﻿"use strict";
 (
 	/**
 	 * @param {jQuery} $
@@ -455,7 +455,7 @@
 					
 					History.EndTransaction();
 				};
-					
+				
 				addFilterCallBack(true);
 			},
 			
@@ -1600,7 +1600,7 @@
 						{activeCells: cellIdRange, type: type, cellId: cellId, displayName: displayName}, null, curFilter.Ref);
 					History.EndTransaction();
 				};
-						
+				
 				
 				var onSortColorAutoFilterCallback = function(type)
 				{
@@ -1615,9 +1615,9 @@
 						curFilter.SortState = new SortState();
 						curFilter.SortState.Ref = new Asc.Range(startCol, curFilter.Ref.r1, startCol, maxFilterRow);
 						curFilter.SortState.SortConditions = [];
-						curFilter.SortState.SortConditions[0] = new SortCondition();
+						curFilter.SortState.SortConditions[0] = new AscCommonExcel.SortCondition();
 					}
-					curFilter.SortState.SortConditions[0] = new SortCondition();
+					curFilter.SortState.SortConditions[0] = new AscCommonExcel.SortCondition();
 						
 					var cellIdRange = new Asc.Range(startCol, filterRef.r1, startCol, filterRef.r1);
 					
@@ -1663,13 +1663,13 @@
 					}
 				}
 			},
-						
+			
 			getPropForSort: function(cellId, activeRange, displayName)
 			{
 				var worksheet = this.worksheet;
 				var t = this;
 				var curFilter, sortRange, filterRef, startCol, maxFilterRow;
-				
+			
 				var isCellIdString = false;
 				if(cellId !== undefined && cellId != "" && typeof cellId == 'string')
 				{
@@ -1766,7 +1766,7 @@
 								{
 									return this._cleanFilterColumnsAndSortState(tablePart, activeCell);
 								}
-						}
+							}	
 						}
 						else
 						{
@@ -1925,7 +1925,7 @@
 				//проверяем покрывает ли диапазон хотя бы один автофильтр
 				var worksheet = this.worksheet;
 				var isUpdate = null;
-				
+
                 var bUndoChanges = worksheet.workbook.bUndoChanges;
                 var bRedoChanges = worksheet.workbook.bRedoChanges;
 				
@@ -2001,19 +2001,19 @@
 								this._cleanStyleTable(oCurFilter[i].Ref);
 								this._setColorStyleTable(findFilters[i].Ref, findFilters[i]);
 							}
-							
+
                             if(!bUndoChanges && !bRedoChanges )
                             {
-							if(!addRedo && !data)
-							{
+                                if(!addRedo && !data)
+                                {
                                     this._addHistoryObj(oCurFilter, AscCH.historyitem_AutoFilter_Move, {arnTo: arnTo, arnFrom: arnFrom, activeCells: activeRange});
-								addRedo = true;
-							}
-							else if(!data && addRedo)
+                                    addRedo = true;
+                                }
+                                else if(!data && addRedo)
                                     this._addHistoryObj(oCurFilter, AscCH.historyitem_AutoFilter_Move, null, null, null, null, activeRange);
+                            }
 						}
 					}
-				}
 				}
 				
 				var arnToRange = new Asc.Range(arnTo.c1, arnTo.r1, arnTo.c2, arnTo.r2);
@@ -3658,7 +3658,7 @@
 							//filter current button
 							var checkValue = isDateTimeFormat ? val : text;
 							if (!currentFilterColumn.Top10 && !currentFilterColumn.CustomFiltersObj &&
-									!currentFilterColumn.ColorFilter && !currentFilterColumn.isHideValue(checkValue, isDateTimeFormat, null, cell))
+								!currentFilterColumn.ColorFilter && !currentFilterColumn.isHideValue(checkValue, isDateTimeFormat))
 							{
 								if(isOpenHiddenRows)
 									worksheet.setRowHidden(false, i, i);

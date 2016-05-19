@@ -196,19 +196,19 @@ var c_oAscChangeFilterOptions = {
 };
 
 var c_oAscChangeSelectionFormatTable = {
-    all: 1,
-    data: 2,
-    row: 3,
-    column: 4
+	all: 1,
+	data: 2,
+	row: 3,
+	column: 4
 };
 
 var c_oAscChangeTableStyleInfo = {
-    columnFirst: 1,
-    columnLast: 2,
-    columnBanded: 3,
-    rowHeader: 4,
-    rowTotal: 5,
-    rowBanded: 6,
+	columnFirst: 1,
+	columnLast: 2,
+	columnBanded: 3,
+	rowHeader: 4,
+	rowTotal: 5,
+	rowBanded: 6,
 	filterButton: 7
 };
 
@@ -484,6 +484,4 @@ var c_oAscPopUpSelectorType = {
   prot['Func'] = prot.Func;
   prot['Range'] = prot.Range;
   prot['Table'] = prot.Table;
-  window['Asc']['c_oAscChangeSelectionFormatTable'] = c_oAscChangeSelectionFormatTable;
-  window['Asc']['c_oAscChangeTableStyleInfo'] = c_oAscChangeTableStyleInfo;
 })(window);

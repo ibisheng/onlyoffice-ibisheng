@@ -3179,70 +3179,70 @@ function Woorksheet(wb, _index, sId){
 	this.oAllCol = null;
 	this.aComments = [];
 	this.aCommentsCoords = [];
-  var oThis = this;
-  this.mergeManager = new RangeDataManager(function(data, from, to) {
-    if (History.Is_On() && (null != from || null != to)) {
-      if (null != from) {
-        from = from.clone();
-      }
-      if (null != to)
-        to = to.clone();
-      var oHistoryRange = from;
-      if (null == oHistoryRange)
-        oHistoryRange = to;
+	var oThis = this;
+	this.mergeManager = new RangeDataManager(function(data, from, to){
+		if(History.Is_On() && (null != from || null != to))
+		{
+			if(null != from)
+				from = from.clone();
+			if(null != to)
+				to = to.clone();
+			var oHistoryRange = from;
+			if(null == oHistoryRange)
+				oHistoryRange = to;
 			History.Add(AscCommonExcel.g_oUndoRedoWorksheet, AscCH.historyitem_Worksheet_ChangeMerge, oThis.getId(), oHistoryRange, new UndoRedoData_FromTo(new UndoRedoData_BBox(from), new UndoRedoData_BBox(to)));
-    }
-    //расширяем границы
-    if (null != to) {
-      if (to.r2 >= oThis.nRowsCount)
-        oThis.nRowsCount = to.r2 + 1;
-      if (to.c2 >= oThis.nColsCount)
-        oThis.nColsCount = to.c2 + 1;
-    }
-  });
-  this.hyperlinkManager = new RangeDataManager(function(data, from, to, oChangeParam) {
-    if (History.Is_On() && (null != from || null != to)) {
-      if (null != from)
-        from = from.clone();
-      if (null != to)
-        to = to.clone();
-      var oHistoryRange = from;
-      if (null == oHistoryRange)
-        oHistoryRange = to;
-      var oHistoryData = null;
-      if (null == from || null == to)
-        oHistoryData = data.clone();
+		}
+		//расширяем границы
+		if(null != to){
+			if(to.r2 >= oThis.nRowsCount)
+				oThis.nRowsCount = to.r2 + 1;
+			if(to.c2 >= oThis.nColsCount)
+				oThis.nColsCount = to.c2 + 1;
+		}
+	});
+	this.hyperlinkManager = new RangeDataManager(function(data, from, to, oChangeParam){
+		if(History.Is_On() && (null != from || null != to))
+		{
+			if(null != from)
+				from = from.clone();
+			if(null != to)
+				to = to.clone();
+			var oHistoryRange = from;
+			if(null == oHistoryRange)
+				oHistoryRange = to;
+			var oHistoryData = null;
+			if(null == from || null == to)
+				oHistoryData = data.clone();
 			History.Add(AscCommonExcel.g_oUndoRedoWorksheet, AscCH.historyitem_Worksheet_ChangeHyperlink, oThis.getId(), oHistoryRange, new AscCommonExcel.UndoRedoData_FromToHyperlink(from, to, oHistoryData));
-    }
-    if (null != to)
-      data.Ref = oThis.getRange3(to.r1, to.c1, to.r2, to.c2); else if (oChangeParam && oChangeParam.removeStyle &&
-      null != data.Ref)
-      data.Ref.cleanFormat();
-    //расширяем границы
-    if (null != to) {
-      if (to.r2 >= oThis.nRowsCount)
-        oThis.nRowsCount = to.r2 + 1;
-      if (to.c2 >= oThis.nColsCount)
-        oThis.nColsCount = to.c2 + 1;
-    }
-  });
-  this.hyperlinkManager.setDependenceManager(this.mergeManager);
+		}
+		if (null != to)
+		    data.Ref = oThis.getRange3(to.r1, to.c1, to.r2, to.c2);
+		else if (oChangeParam && oChangeParam.removeStyle && null != data.Ref)
+		    data.Ref.cleanFormat();
+		//расширяем границы
+		if(null != to){
+			if(to.r2 >= oThis.nRowsCount)
+				oThis.nRowsCount = to.r2 + 1;
+			if(to.c2 >= oThis.nColsCount)
+				oThis.nColsCount = to.c2 + 1;
+		}
+	});
+	this.hyperlinkManager.setDependenceManager(this.mergeManager);
     this.DrawingDocument = new AscCommon.CDrawingDocument();
-  this.sheetViews = [];
-  this.aConditionalFormatting = [];
-  this.sheetPr = null;
-  this.aFormulaExt = null;
-
+	this.sheetViews = [];
+	this.aConditionalFormatting = [];
+	this.sheetPr = null;
+	this.aFormulaExt = null;
+	
 	this.autoFilters = AscCommonExcel.AutoFilters !== undefined ? new AscCommonExcel.AutoFilters(this) : null;
-  this.sparklineGroups = new sparklineGroups();
 
-  this.oDrawingOjectsManager = new DrawingObjectsManager(this);
+    this.oDrawingOjectsManager = new DrawingObjectsManager(this);
     this.contentChanges = new AscCommon.CContentChanges();
 
     this.aSparklineGroups = [];
 
-  /*handlers*/
-  this.handlers = null;
+	/*handlers*/
+	this.handlers = null;
 }
 
 Woorksheet.prototype.addContentChanges = function(changes)
@@ -4141,7 +4141,7 @@ Woorksheet.prototype._insertColsBefore=function(index, count){
 	}
 	
 	this.autoFilters.insertColumn( "insCells",  new Asc.Range(index, 0, index + count - 1, gc_nMaxRow0), c_oAscInsertOptions.InsertColumns );
-	
+
   this.workbook.unLockDraw();
   this.workbook.buildRecalc();
 	
@@ -8639,10 +8639,10 @@ Range.prototype.sort=function(nOption, nStartCol, sortColor){
 						if(null === colorsTextCell)
 						{
 							colorsTextCell = [];
-					}
+						}
 						
 						colorsTextCell.push(value2[n].format.c);
-				}
+					}
 				}
 				
 				var nNumber = null;
