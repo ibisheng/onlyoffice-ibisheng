@@ -3799,7 +3799,7 @@ CPresentation.prototype =
                     Content.Drawings[i].Drawing.checkExtentsByDocContent && Content.Drawings[i].Drawing.checkExtentsByDocContent();
                     this.Slides[this.CurPage].graphicObjects.selectObject(Content.Drawings[i].Drawing, 0);
                 }
-                if(Content.DocContent)
+                if(Content.DocContent && Content.DocContent.Elements.length > 0)
                 {
                     var shape = this.CreateAndAddShapeFromSelectedContent(Content.DocContent);
                     this.Slides[this.CurPage].graphicObjects.selectObject(shape, 0);
