@@ -653,8 +653,8 @@ CSparklineView.prototype.draw = function(graphics, offX, offY)
 
     var tx, ty, sx, sy, oldExtX, oldExtY;
 
-    var _true_height = this.chartSpace.chartObj.calcProp.chartGutter.trueHeight;
-    var _true_width = this.chartSpace.chartObj.calcProp.chartGutter.trueWidht;
+    var _true_height = this.chartSpace.chartObj.calcProp.trueHeight;
+    var _true_width = this.chartSpace.chartObj.calcProp.trueWidht;
 
 
 	this.chartSpace.chartObj.calcProp.trueWidht = this.chartSpace.extX * this.chartSpace.chartObj.calcProp.pxToMM;
