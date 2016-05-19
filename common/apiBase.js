@@ -686,10 +686,10 @@ baseEditorsApi.prototype.asc_pluginsRegister = function(basePath, plugins)
   if (null != this.pluginsManager)
     this.pluginsManager.register(basePath, plugins);
 };
-baseEditorsApi.prototype.asc_pluginRun = function(guid, data)
+baseEditorsApi.prototype.asc_pluginRun = function(guid, variation, data)
 {
   if (null != this.pluginsManager)
-    this.pluginsManager.run(guid, data);
+    this.pluginsManager.run(guid, variation, data);
 };
 baseEditorsApi.prototype.asc_pluginResize = function(guid, data, width, height)
 {

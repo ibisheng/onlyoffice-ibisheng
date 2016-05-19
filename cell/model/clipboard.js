@@ -181,32 +181,32 @@
 					var fragments = wb.cellEditor.copySelection();
 					_data = wb.cellEditor._getFragmentsText(fragments);
 					
-					_clipboard.pushData(c_oAscClipboardDataFormat.Text, _data)
+					_clipboard.pushData(AscCommon.c_oAscClipboardDataFormat.Text, _data)
 				}
 				else
 				{	
 					//TEXT
-					if (c_oAscClipboardDataFormat.Text & _formats)
+					if (AscCommon.c_oAscClipboardDataFormat.Text & _formats)
 					{
 						//_data = ;
-						//_clipboard.pushData(c_oAscClipboardDataFormat.Text, _data)
+						//_clipboard.pushData(AscCommon.c_oAscClipboardDataFormat.Text, _data)
 					}
 					//HTML
-					if(c_oAscClipboardDataFormat.Html & _formats)
+					if(AscCommon.c_oAscClipboardDataFormat.Html & _formats)
 					{	
 						_data = this._getHtml(activeRange, ws);
 						
-						_clipboard.pushData(c_oAscClipboardDataFormat.Html, _data.html)
+						_clipboard.pushData(AscCommon.c_oAscClipboardDataFormat.Html, _data.html)
 					}
 					//INTERNAL
-					if(c_oAscClipboardDataFormat.Internal & _formats)
+					if(AscCommon.c_oAscClipboardDataFormat.Internal & _formats)
 					{
 						if(_data && _data.base64)
 							_data = _data.base64;
 						else
 							_data = this._getBinaryForCopy(worksheetView);
 						
-						_clipboard.pushData(c_oAscClipboardDataFormat.Internal, _data)
+						_clipboard.pushData(AscCommon.c_oAscClipboardDataFormat.Internal, _data)
 					}
 				}
 			},

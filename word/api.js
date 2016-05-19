@@ -1911,18 +1911,18 @@ asc_docs_api.prototype.asc_CheckCopy = function(_clipboard /* CClipboardData */,
 {
     if (!this.WordControl.m_oLogicDocument)
     {
-        var _text_object = (c_oAscClipboardDataFormat.Text & _formats) ? { Text : "" } : null;
+        var _text_object = (AscCommon.c_oAscClipboardDataFormat.Text & _formats) ? { Text : "" } : null;
         var _html_data = this.WordControl.m_oDrawingDocument.m_oDocumentRenderer.Copy(_text_object);
 
         //TEXT
-        if (c_oAscClipboardDataFormat.Text & _formats)
+        if (AscCommon.c_oAscClipboardDataFormat.Text & _formats)
         {
-            _clipboard.pushData(c_oAscClipboardDataFormat.Text, _text_object.Text);
+            _clipboard.pushData(AscCommon.c_oAscClipboardDataFormat.Text, _text_object.Text);
         }
         //HTML
-        if(c_oAscClipboardDataFormat.Html & _formats)
+        if(AscCommon.c_oAscClipboardDataFormat.Html & _formats)
         {
-            _clipboard.pushData(c_oAscClipboardDataFormat.Html, _html_data);
+            _clipboard.pushData(AscCommon.c_oAscClipboardDataFormat.Html, _html_data);
         }
         return;
     }
@@ -1930,22 +1930,22 @@ asc_docs_api.prototype.asc_CheckCopy = function(_clipboard /* CClipboardData */,
     var sBase64 = null, _data;
 
     //TEXT
-    if (c_oAscClipboardDataFormat.Text & _formats)
+    if (AscCommon.c_oAscClipboardDataFormat.Text & _formats)
     {
         _data = this.WordControl.m_oLogicDocument.Get_SelectedText();
-        _clipboard.pushData(c_oAscClipboardDataFormat.Text, _data)
+        _clipboard.pushData(AscCommon.c_oAscClipboardDataFormat.Text, _data)
     }
     //HTML
-    if(c_oAscClipboardDataFormat.Html & _formats)
+    if(AscCommon.c_oAscClipboardDataFormat.Html & _formats)
     {
         var oCopyProcessor = new AscCommon.CopyProcessor(this);
         sBase64 = oCopyProcessor.Start();
         _data = oCopyProcessor.getInnerHtml();
 
-        _clipboard.pushData(c_oAscClipboardDataFormat.Html, _data)
+        _clipboard.pushData(AscCommon.c_oAscClipboardDataFormat.Html, _data)
     }
     //INTERNAL
-    if(c_oAscClipboardDataFormat.Internal & _formats)
+    if(AscCommon.c_oAscClipboardDataFormat.Internal & _formats)
     {
         if(sBase64 === null)
         {
@@ -1954,7 +1954,7 @@ asc_docs_api.prototype.asc_CheckCopy = function(_clipboard /* CClipboardData */,
         }
 
         _data = sBase64;
-        _clipboard.pushData(c_oAscClipboardDataFormat.Internal, _data)
+        _clipboard.pushData(AscCommon.c_oAscClipboardDataFormat.Internal, _data)
     }
 };
 
@@ -1977,10 +1977,10 @@ asc_docs_api.prototype.asc_PasteData = function(_format, data1, data2)
     this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_PasteHotKey);
     switch (_format)
     {
-        case c_oAscClipboardDataFormat.HtmlElement:
+        case AscCommon.c_oAscClipboardDataFormat.HtmlElement:
           AscCommon.Editor_Paste_Exec(this, data1, data2);
             break;
-        case c_oAscClipboardDataFormat.Internal:
+        case AscCommon.c_oAscClipboardDataFormat.Internal:
           AscCommon.Editor_Paste_Exec(this, null, null, data1);
             break;
         default:

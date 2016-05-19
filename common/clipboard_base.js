@@ -22,6 +22,7 @@ var c_oAscClipboardDataFormat = {
     Internal    : 4,
     HtmlElement : 8
 };
+AscCommon.c_oAscClipboardDataFormat = c_oAscClipboardDataFormat;
 
 function CClipboardBase()
 {
@@ -70,7 +71,7 @@ CClipboardBase.prototype =
         }
         else
         {
-            this.Api.asc_CheckCopy(this, c_oAscClipboardDataFormat.Text | c_oAscClipboardDataFormat.Html | c_oAscClipboardDataFormat.Internal);
+            this.Api.asc_CheckCopy(this, AscCommon.c_oAscClipboardDataFormat.Text | AscCommon.c_oAscClipboardDataFormat.Html | AscCommon.c_oAscClipboardDataFormat.Internal);
             e.preventDefault();
             return false;
         }
@@ -90,7 +91,7 @@ CClipboardBase.prototype =
         }
         else
         {
-            this.Api.asc_CheckCopy(this, c_oAscClipboardDataFormat.Text | c_oAscClipboardDataFormat.Html | c_oAscClipboardDataFormat.Internal);
+            this.Api.asc_CheckCopy(this, AscCommon.c_oAscClipboardDataFormat.Text | AscCommon.c_oAscClipboardDataFormat.Html | AscCommon.c_oAscClipboardDataFormat.Internal);
         }
 
         this.Api.asc_SelectionCut();
@@ -123,7 +124,7 @@ CClipboardBase.prototype =
         {
             window.setTimeout( function()  {
 
-                g_clipboardBase.Api.asc_PasteData(c_oAscClipboardDataFormat.HtmlElement, g_clipboardBase.CommonDiv);
+                g_clipboardBase.Api.asc_PasteData(AscCommon.c_oAscClipboardDataFormat.HtmlElement, g_clipboardBase.CommonDiv);
                 g_clipboardBase.CommonDiv_End();
                 g_clipboardBase.Paste_End();
 
@@ -139,7 +140,7 @@ CClipboardBase.prototype =
             var _internal = this.ClosureParams.getData("text/x-custom");
             if (_internal && _internal != "" && _internal.indexOf("asc_internalData;") == 0)
             {
-                this.Api.asc_PasteData(c_oAscClipboardDataFormat.Internal, _internal.substr("asc_internalData;".length));
+                this.Api.asc_PasteData(AscCommon.c_oAscClipboardDataFormat.Internal, _internal.substr("asc_internalData;".length));
                 g_clipboardBase.Paste_End();
                 return false;
             }
@@ -543,7 +544,7 @@ CClipboardBase.prototype =
         this.CommonDiv_Start();
 
         this.ClosureParams.isDivCopy = true;
-        this.Api.asc_CheckCopy(this, c_oAscClipboardDataFormat.Html);
+        this.Api.asc_CheckCopy(this, AscCommon.c_oAscClipboardDataFormat.Html);
         this.ClosureParams.isDivCopy = false;
 
         this.CommonDiv_Select();
@@ -596,7 +597,7 @@ CClipboardBase.prototype =
             {
                 ifr.style.display  = "block";
 
-                this.Api.asc_PasteData(c_oAscClipboardDataFormat.HtmlElement, frameWindow.document.body, ifr);
+                this.Api.asc_PasteData(AscCommon.c_oAscClipboardDataFormat.HtmlElement, frameWindow.document.body, ifr);
             }
         }
 
@@ -625,7 +626,7 @@ CClipboardBase.prototype =
     {
         if (this.ClosureParams.isDivCopy === true)
         {
-            if (_format == c_oAscClipboardDataFormat.Html)
+            if (_format == AscCommon.c_oAscClipboardDataFormat.Html)
                 this.CommonDiv.innerHTML = _data;
             return;
         }
@@ -633,13 +634,13 @@ CClipboardBase.prototype =
         var _data_format = "";
         switch (_format)
         {
-            case c_oAscClipboardDataFormat.Html:
+            case AscCommon.c_oAscClipboardDataFormat.Html:
                 _data_format = "text/html";
                 break;
-            case c_oAscClipboardDataFormat.Text:
+            case AscCommon.c_oAscClipboardDataFormat.Text:
                 _data_format = "text/plain";
                 break;
-            case c_oAscClipboardDataFormat.Internal:
+            case AscCommon.c_oAscClipboardDataFormat.Internal:
                 _data_format = "text/x-custom";
                 break;
             default:
