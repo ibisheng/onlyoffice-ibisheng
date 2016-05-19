@@ -554,9 +554,23 @@ CDLbl.prototype =
             var style = new CStyle("dataLblStyle", null, null, null);
             var text_pr = new CTextPr();
             text_pr.FontSize = 10;
-            if(this.chart && AscFormat.isRealNumber(this.chart.style) && this.chart.style > 40)
+            if(this.chart && AscFormat.isRealNumber(this.chart.style) )
             {
-                text_pr.Unifill = AscFormat.CreateUnfilFromRGB(255, 255, 255);
+
+                if(this.chart.style > 40)
+                {
+                    text_pr.Unifill = AscFormat.CreateUnfilFromRGB(255, 255, 255);
+                }
+                else
+                {
+                    var default_style = AscFormat.CHART_STYLE_MANAGER.getDefaultLineStyleByIndex(this.chart.style);
+                    var oUnifill = default_style.axisAndMajorGridLines.createDuplicate();
+                    if(oUnifill && oUnifill.fill && oUnifill.fill.color && oUnifill.fill.color.Mods)
+                    {
+                        oUnifill.fill.color.Mods.Mods.length = 0;
+                    }
+                    text_pr.Unifill = oUnifill;
+                }
             }
             else
             {
@@ -624,14 +638,14 @@ CDLbl.prototype =
                 && this.legend.txPr.content
                 && this.legend.txPr.content.Content[0]
                 && this.legend.txPr.content.Content[0].Pr)
-            {
+                {
                     this.legend.txPr.content.Content[0].Set_DocumentIndex(0);
-                style.ParaPr.Merge(this.legend.txPr.content.Content[0].Pr);
-                if(this.legend.txPr.content.Content[0].Pr.DefaultRunPr)
-                    style.TextPr.Merge(this.legend.txPr.content.Content[0].Pr.DefaultRunPr);
-            }
+                    style.ParaPr.Merge(this.legend.txPr.content.Content[0].Pr);
+                    if(this.legend.txPr.content.Content[0].Pr.DefaultRunPr)
+                        style.TextPr.Merge(this.legend.txPr.content.Content[0].Pr.DefaultRunPr);
+                }
 
-                if(isRealNumber(this.idx))
+                if(AscFormat.isRealNumber(this.idx))
                 {
                     var aLegendEntries = this.legend.legendEntryes;
                     for(var i = 0; i < aLegendEntries.length; ++i)
@@ -972,7 +986,7 @@ CDLbl.prototype =
         }
         else
         {
-            this.txBody = CreateTextBodyFromString(this.getDefaultTextForTxBody(), this.chart.getDrawingDocument(), this);
+            this.txBody = AscFormat.CreateTextBodyFromString(this.getDefaultTextForTxBody(), this.chart.getDrawingDocument(), this);
         }
     },
 

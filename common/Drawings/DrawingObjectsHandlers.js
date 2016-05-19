@@ -346,7 +346,7 @@ function handleInternalChart(drawing, drawingObjectsController, e, x, y, group, 
                 }
                 if(drawingObjectsController.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
                 {
-                    if(isRealNumber(drawing.selection.legendEntry))
+                    if(AscFormat.isRealNumber(drawing.selection.legendEntry))
                     {
                         drawing.selection.legendEntry = null;
                         drawingObjectsController.updateSelectionState();
@@ -397,11 +397,11 @@ function handleInternalChart(drawing, drawingObjectsController, e, x, y, group, 
         if(drawing.chart.plotArea.chart && drawing.chart.plotArea.chart.series)
         {
             var series = drawing.chart.plotArea.chart.series;
-            var _len = drawing.chart.plotArea.chart.getObjectType() === historyitem_type_PieChart ? 1 : series.length;
+            var _len = drawing.chart.plotArea.chart.getObjectType() === AscDFH.historyitem_type_PieChart ? 1 : series.length;
             for(var i = _len - 1; i > -1; --i)
             {
                 var ser = series[i];
-                var pts = getPtsFromSeries(ser);
+                var pts = AscFormat.getPtsFromSeries(ser);
                 for(var j = 0; j < pts.length; ++j)
                 {
                     if(pts[j].compiledDlb)
@@ -552,47 +552,6 @@ function handleInlineChart(drawing, drawingObjectsController, e, x, y, pageIndex
     if(ret)
     {
         return ret;
-    }
-                else
-                {
-                    return {objectId: drawing.Get_Id(), cursorType: "move", bMarker: false};
-                }
-            }
-            else if(hit_in_text_rect)
-            {
-                if(drawingObjectsController.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
-                {
-                    drawingObjectsController.checkChartTextSelection();
-                    drawingObjectsController.resetSelection();
-                    drawingObjectsController.selectObject(drawing, pageIndex);
-                    drawingObjectsController.selection.chartSelection = drawing;
-                    drawing.selectTitle(title, pageIndex);
-                    drawing.selection.textSelection = title;
-                    title.selectionSetStart(e, x, y, pageIndex);
-                    drawingObjectsController.changeCurrentState(new AscFormat.TextAddState(drawingObjectsController, title, x, y));
-                    if(e.ClickCount <= 1)
-                    {
-                        drawingObjectsController.updateSelectionState();
-                    }
-                    return true;
-                }
-                else
-                {
-                    if(drawingObjectsController.document)
-                    {
-                        var content = title.getDocContent();
-                        var invert_transform_text = title.invertTransformText, tx, ty;
-                        if(content && invert_transform_text)
-                        {
-                            tx = invert_transform_text.TransformPointX(x, y);
-                            ty = invert_transform_text.TransformPointY(x, y);
-                            content.Update_CursorType(tx, ty, 0);
-                        }
-                    }
-                    return {objectId: drawing.Get_Id(), cursorType: "text", title: title};
-                }
-            }
-        }
     }
     return handleInlineShapeImage(drawing, drawingObjectsController, e, x, y, pageIndex);
 }

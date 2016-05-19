@@ -1171,41 +1171,7 @@ DrawingObjectsController.prototype =
                 }
                 else if(this.selection.groupSelection.selection.chartSelection)
                 {
-                    if(this.selection.groupSelection.selection.chartSelection.selectStartPage === pageIndex)
-                    {
-                        drawingDocument.DrawTrack(AscFormat.TYPE_TRACK.SHAPE, this.selection.groupSelection.selection.chartSelection.getTransformMatrix(), 0, 0, this.selection.groupSelection.selection.chartSelection.extX, this.selection.groupSelection.selection.chartSelection.extY, false, this.selection.groupSelection.selection.chartSelection.canRotate());
-                        if(this.selection.groupSelection.selection.chartSelection.selection.textSelection)
-                        {
-                            drawingDocument.DrawTrack(AscFormat.TYPE_TRACK.TEXT, this.selection.groupSelection.selection.chartSelection.selection.textSelection.transform, 0, 0, this.selection.groupSelection.selection.chartSelection.selection.textSelection.extX, this.selection.groupSelection.selection.chartSelection.selection.textSelection.extY, false, false, true);
-                        }
-                        else if(this.selection.groupSelection.selection.chartSelection.selection.title)
-                        {
-                            drawingDocument.DrawTrack(AscFormat.TYPE_TRACK.SHAPE, this.selection.groupSelection.selection.chartSelection.selection.title.transform, 0, 0, this.selection.groupSelection.selection.chartSelection.selection.title.extX, this.selection.groupSelection.selection.chartSelection.selection.title.extY, false, false, true);
-                        }
-                        else if(this.selection.groupSelection.selection.chartSelection.selection.dataLbls)
-                        {
-                            for(i = 0; i < this.selection.groupSelection.selection.chartSelection.selection.dataLbls.length; ++i)
-                            {
-                                drawingDocument.DrawTrack(AscFormat.TYPE_TRACK.SHAPE, this.selection.groupSelection.selection.chartSelection.selection.dataLbls[i].transform, 0, 0, this.selection.groupSelection.selection.chartSelection.selection.dataLbls[i].extX, this.selection.groupSelection.selection.chartSelection.selection.dataLbls[i].extY, false, false);
-                            }
-                        }
-                        else if(this.selection.groupSelection.selection.chartSelection.selection.dataLbl)
-                        {
-                            drawingDocument.DrawTrack(AscFormat.TYPE_TRACK.SHAPE, this.selection.groupSelection.selection.chartSelection.selection.dataLbl.transform, 0, 0, this.selection.groupSelection.selection.chartSelection.selection.dataLbl.extX, this.selection.groupSelection.selection.chartSelection.selection.dataLbl.extY, false, false);
-                        }
-                        else if(this.selection.groupSelection.selection.chartSelection.selection.legend)
-                        {
-                            drawingDocument.DrawTrack(AscFormat.TYPE_TRACK.SHAPE, this.selection.groupSelection.selection.chartSelection.selection.legend.transform, 0, 0, this.selection.groupSelection.selection.chartSelection.selection.legend.extX, this.selection.groupSelection.selection.chartSelection.selection.legend.extY, false, false);
-                        }
-                        else if(this.selection.groupSelection.selection.chartSelection.selection.legendEntry)
-                        {
-                            drawingDocument.DrawTrack(AscFormat.TYPE_TRACK.SHAPE, this.selection.groupSelection.selection.chartSelection.selection.legendEntry.transform, 0, 0, this.selection.groupSelection.selection.chartSelection.selection.legendEntry.extX, this.selection.groupSelection.selection.chartSelection.selection.legendEntry.extY, false, false);
-                        }
-                        else if(this.selection.groupSelection.selection.chartSelection.selection.axisLbls)
-                        {
-                            drawingDocument.DrawTrack(AscFormat.TYPE_TRACK.SHAPE, this.selection.groupSelection.selection.chartSelection.selection.axisLbls.transform, 0, 0, this.selection.groupSelection.selection.chartSelection.selection.axisLbls.extX, this.selection.groupSelection.selection.chartSelection.selection.axisLbls.extY, false, false);
-                        }
-                    }
+                    this.selection.groupSelection.selection.chartSelection.drawSelect(drawingDocument, pageIndex);
                 }
                 else
                 {
@@ -1223,41 +1189,7 @@ DrawingObjectsController.prototype =
         }
         else if(this.selection.chartSelection)
         {
-            if(this.selection.chartSelection.selectStartPage === pageIndex)
-            {
-                drawingDocument.DrawTrack(AscFormat.TYPE_TRACK.SHAPE, this.selection.chartSelection.getTransformMatrix(), 0, 0, this.selection.chartSelection.extX, this.selection.chartSelection.extY, false, this.selection.chartSelection.canRotate());
-                if(this.selection.chartSelection.selection.textSelection)
-                {
-                    drawingDocument.DrawTrack(AscFormat.TYPE_TRACK.TEXT, this.selection.chartSelection.selection.textSelection.transform, 0, 0, this.selection.chartSelection.selection.textSelection.extX, this.selection.chartSelection.selection.textSelection.extY, false, false, true);
-                }
-                else if(this.selection.chartSelection.selection.title)
-                {
-                    drawingDocument.DrawTrack(AscFormat.TYPE_TRACK.SHAPE, this.selection.chartSelection.selection.title.transform, 0, 0, this.selection.chartSelection.selection.title.extX, this.selection.chartSelection.selection.title.extY, false, false, true);
-                }
-                else if(this.selection.chartSelection.selection.dataLbls)
-                {
-                    for(i = 0; i < this.selection.chartSelection.selection.dataLbls.length; ++i)
-                    {
-                        drawingDocument.DrawTrack(AscFormat.TYPE_TRACK.SHAPE, this.selection.chartSelection.selection.dataLbls[i].transform, 0, 0, this.selection.chartSelection.selection.dataLbls[i].extX, this.selection.chartSelection.selection.dataLbls[i].extY, false, false);
-                    }
-                }
-                else if(this.selection.chartSelection.selection.dataLbl)
-                {
-                    drawingDocument.DrawTrack(AscFormat.TYPE_TRACK.SHAPE, this.selection.chartSelection.selection.dataLbl.transform, 0, 0, this.selection.chartSelection.selection.dataLbl.extX, this.selection.chartSelection.selection.dataLbl.extY, false, false);
-                }
-                else if(this.selection.chartSelection.selection.legend)
-                {
-                    drawingDocument.DrawTrack(AscFormat.TYPE_TRACK.SHAPE, this.selection.chartSelection.selection.legend.transform, 0, 0, this.selection.chartSelection.selection.legend.extX, this.selection.chartSelection.selection.legend.extY, false, false);
-                }
-                else if(this.selection.chartSelection.selection.legendEntry)
-                {
-                    drawingDocument.DrawTrack(AscFormat.TYPE_TRACK.SHAPE, this.selection.chartSelection.selection.legendEntry.transform, 0, 0, this.selection.chartSelection.selection.legendEntry.extX, this.selection.chartSelection.selection.legendEntry.extY, false, false);
-                }
-                else if(this.selection.chartSelection.selection.axisLbls)
-                {
-                    drawingDocument.DrawTrack(AscFormat.TYPE_TRACK.SHAPE, this.selection.chartSelection.selection.axisLbls.transform, 0, 0, this.selection.chartSelection.selection.axisLbls.extX, this.selection.chartSelection.selection.axisLbls.extY, false, false);
-                }
-            }
+            this.selection.chartSelection.drawSelect(drawingDocument, pageIndex);
         }
         else if(this.selection.wrapPolygonSelection)
         {
@@ -1406,7 +1338,7 @@ DrawingObjectsController.prototype =
                     arr[i].graphicObject.Set_ApplyToAll(false);
                     ret = true;
                 }
-                else if(arr[i].getObjectType() === historyitem_type_ChartSpace)
+                else if(arr[i].getObjectType() === AscDFH.historyitem_type_ChartSpace)
                 {
                     if(f === CDocumentContent.prototype.Paragraph_Add && args[0].Type === para_TextPr)
                     {
@@ -2138,7 +2070,7 @@ DrawingObjectsController.prototype =
                     {
                         cur_pr = getPropsFromArr(arr[i].arrGraphicObjects);
                     }
-                    else if(arr[i].getObjectType() === historyitem_type_ChartSpace)
+                    else if(arr[i].getObjectType() === AscDFH.historyitem_type_ChartSpace)
                     {
                         cur_pr = arr[i].getParagraphTextPr();
                     }
@@ -3127,7 +3059,7 @@ DrawingObjectsController.prototype =
                         if(chart.view3D)
                         {
                             chart.setView3D(null);
-                }
+                        }
                         if(chart.floor)
                         {
                             chart.setFloor(null);

@@ -1620,8 +1620,8 @@ parserHelper.prototype.checkDataRange = function (model, wb, dialogType, dataRan
 		} else if (Asc.c_oAscSelectionDialogType.FormatTable === dialogType) {
 			// ToDo убрать эту проверку, заменить на более грамотную после правки функции _searchFilters
 			if (true === wb.getWorksheet().model.autoFilters.isRangeIntersectionTableOrFilter(dataRange))
-				return Asc.c_oAscError.ID.AutoFilterDataRangeError;
-		} else if (c_oAscSelectionDialogType.FormatTableChangeRange === dialogType) {
+				return c_oAscError.ID.AutoFilterDataRangeError;
+		} else if (Asc.c_oAscSelectionDialogType.FormatTableChangeRange === dialogType) {
 			// ToDo убрать эту проверку, заменить на более грамотную после правки функции _searchFilters
 			var checkChangeRange = wb.getWorksheet().af_checkChangeRange(dataRange);
 			if (null !== checkChangeRange)

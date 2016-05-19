@@ -356,6 +356,17 @@ var TYPE_KIND = {
     MASTER : 2
 };
 
+var TYPE_TRACK_SHAPE = 0;
+var TYPE_TRACK_GROUP = TYPE_TRACK_SHAPE;
+var TYPE_TRACK_GROUP_PASSIVE = 1;
+var TYPE_TRACK_TEXT = 2;
+var TYPE_TRACK_EMPTY_PH = 3;
+var TYPE_TRACK_CHART = 4;
+
+var SLIDE_KIND = 0;
+var LAYOUT_KIND = 1;
+var MASTER_KIND = 2;
+
 var map_prst_color = {};
 
 map_prst_color["aliceBlue"] = 		0xF0F8FF;
@@ -2158,8 +2169,8 @@ CBlipFill.prototype =
         {
             if(!this.tile.IsIdentical(fill.tile))
             {
-            return false;
-        }
+                return false;
+            }
         }
         else
         {
@@ -2198,7 +2209,7 @@ CBlipFill.prototype =
             if(fill.tile.IsIdentical(this.tile))
             {
                 _ret.tile = this.tile.createDuplicate();
-        }
+            }
             else
             {
                 _ret.tile = new CBlipFillTile();
