@@ -10384,11 +10384,11 @@ ParaRun.prototype.Get_TextForAutoCorrect = function(AutoCorrectEngine, RunPos)
         var Item = this.Content[nPos];
         if (para_Math_Text === Item.Type || para_Math_BreakOperator === Item.Type)
         {
-            AutoCorrectEngine.Add_Text(String.fromCharCode(Item.value), this, nPos, RunPos);
+            AutoCorrectEngine.Add_Text(String.fromCharCode(Item.value), this, nPos, RunPos, Item.Pos);
         }
 		else if (para_Math_Ampersand === Item.Type)
 		{
-			 AutoCorrectEngine.Add_Text('&', this, nPos, RunPos);
+			 AutoCorrectEngine.Add_Text('&', this, nPos, RunPos, Item.Pos);
 		}
 
         if (Item === ActionElement)
