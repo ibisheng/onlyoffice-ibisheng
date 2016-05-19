@@ -2664,12 +2664,13 @@ CChartSpace.prototype.checkValByNumRef = function(workbook, ser, val, bVertical)
                                 if(!row_hidden && !source_worksheet.getColHidden(j) || (this.displayHidden === true))
                                 {
                                     cell = source_worksheet.getCell3(range.r1, j);
-                                    if(typeof cell.getValueWithFormat() === "string" && cell.getValueWithFormat().length > 0)
+                                    var value = parseFloat(cell.getValue());
+                                    if(AscFormat.isRealNumber(value))
                                     {
                                         hidden = false;
                                         pt = new AscFormat.CNumericPoint();
                                         pt.setIdx(pt_index);
-                                        pt.setVal(parseFloat(cell.getValue()));
+                                        pt.setVal(value);
                                         if(cell.getNumFormatStr() !== lit_format_code)
                                         {
                                             pt.setFormatCode(cell.getNumFormatStr())
@@ -2725,12 +2726,13 @@ CChartSpace.prototype.checkValByNumRef = function(workbook, ser, val, bVertical)
                                 if(!col_hidden && !source_worksheet.getRowHidden(j) || (this.displayHidden === true))
                                 {
                                     cell = source_worksheet.getCell3(j, range.c1);
-                                    if(typeof cell.getValueWithFormat() === "string" && cell.getValueWithFormat().length > 0)
+                                    var value = parseFloat(cell.getValue());
+                                    if(AscFormat.isRealNumber(value))
                                     {
                                         hidden = false;
                                         pt = new AscFormat.CNumericPoint();
                                         pt.setIdx(pt_index);
-                                        pt.setVal(parseFloat(cell.getValue()));
+                                        pt.setVal(value);
                                         if(cell.getNumFormatStr() !== lit_format_code)
                                         {
                                             pt.setFormatCode(cell.getNumFormatStr())
