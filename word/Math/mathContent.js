@@ -5001,6 +5001,9 @@ CMathContent.prototype.private_IsMenuPropsForContent = function(Action)
 };
 CMathContent.prototype.Process_AutoCorrect = function(ActionElement)
 {
+    // TODO: Надо проверить как работает весь код с автозаменой, перед тем как влючать его.
+    return;
+
     var bNeedAutoCorrect = this.private_NeedAutoCorrect(ActionElement);
 
     var AutoCorrectEngine = new CMathAutoCorrectEngine(ActionElement);
