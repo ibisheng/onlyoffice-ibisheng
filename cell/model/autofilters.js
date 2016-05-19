@@ -1,4 +1,4 @@
-﻿"use strict";
+"use strict";
 (
 	/**
 	 * @param {jQuery} $
@@ -615,7 +615,7 @@
 				
 				//**get filter**
 				var filter = this._getFilterByDisplayName(displayName);
-				var autoFilter = filter && filter.getType() === g_nFiltersType.tablePart ? filter.AutoFilter : filter;
+				var autoFilter = filter && false === filter.isAutoFilter() ? filter.AutoFilter : filter;
 				
 				if(filter === null)
 					return false;
@@ -652,7 +652,6 @@
 					}
 				}
 				
-				this._resetTablePartStyle();
 				History.EndTransaction();
 				
 				return {minChangeRow: minChangeRow, updateRange: filter.Ref, filter: filter};
@@ -1585,7 +1584,7 @@
 						curFilter.SortState.SortConditions = [];
 						curFilter.SortState.SortConditions[0] = new AscCommonExcel.SortCondition();
 					}
-						curFilter.SortState.SortConditions[0] = new AscCommonExcel.SortCondition();
+					curFilter.SortState.SortConditions[0] = new AscCommonExcel.SortCondition();
 						
 					var cellIdRange = new Asc.Range(startCol, filterRef.r1, startCol, filterRef.r1);
 					
@@ -1612,7 +1611,7 @@
 					//изменяем содержимое фильтра
 					if(!curFilter.SortState)
 					{
-						curFilter.SortState = new SortState();
+						curFilter.SortState = new AscCommonExcel.SortState();
 						curFilter.SortState.Ref = new Asc.Range(startCol, curFilter.Ref.r1, startCol, maxFilterRow);
 						curFilter.SortState.SortConditions = [];
 						curFilter.SortState.SortConditions[0] = new AscCommonExcel.SortCondition();
@@ -1624,16 +1623,16 @@
 					curFilter.SortState.SortConditions[0].Ref = new Asc.Range(startCol, filterRef.r1, startCol, filterRef.r2);
 					
 					
-					curFilter.SortState.SortConditions[0].dxf = new CellXfs();
+					curFilter.SortState.SortConditions[0].dxf = new AscCommonExcel.CellXfs();
 					if(type === Asc.c_oAscSortOptions.ByColorFill)
 					{
-						curFilter.SortState.SortConditions[0].dxf.fill = new Fill();
+						curFilter.SortState.SortConditions[0].dxf.fill = new AscCommonExcel.Fill();
 						curFilter.SortState.SortConditions[0].dxf.fill.bg = color;
 						curFilter.SortState.SortConditions[0].ConditionSortBy = Asc.ESortBy.sortbyCellColor;
 					}
 					else
 					{
-						curFilter.SortState.SortConditions[0].dxf.font = new Font();
+						curFilter.SortState.SortConditions[0].dxf.font = new AscCommonExcel.Font();
 						curFilter.SortState.SortConditions[0].dxf.font.c = color;
 						curFilter.SortState.SortConditions[0].ConditionSortBy = Asc.ESortBy.sortbyFontColor;
 					}
@@ -1730,8 +1729,8 @@
 					}
 				}
 				
-				
-				maxFilterRow = filterRef.r2;
+				var ascSortRange = curFilter.getRangeWithoutHeaderFooter();
+				maxFilterRow = ascSortRange.r2;
 				if(curFilter.isAutoFilter() && curFilter.isApplyAutoFilter() === false)//нужно подхватить нижние ячейки в случае, если это не применен а/ф
 				{
 					var automaticRange = this._getAdjacentCellsAF(curFilter.Ref, true);
@@ -1741,7 +1740,7 @@
 						maxFilterRow = automaticRowCount;
 				}
 				
-				sortRange = worksheet.getRange3(filterRef.r1 + 1, filterRef.c1, maxFilterRow, filterRef.c2);
+				sortRange = worksheet.getRange3(ascSortRange.r1, ascSortRange.c1, maxFilterRow, ascSortRange.c2);
 				
 				return {sortRange: sortRange, curFilter: curFilter, filterRef: filterRef, startCol: startCol, maxFilterRow: maxFilterRow};
 			},
@@ -2574,7 +2573,7 @@
 			{
 				var res = null;
 				
-				var autoFilter = filter && filter.getType() === g_nFiltersType.tablePart ? filter.AutoFilter : filter;
+				var autoFilter = filter && false === filter.isAutoFilter() ? filter.AutoFilter : filter;
 				
 				if(autoFilter && autoFilter.FilterColumns && autoFilter.FilterColumns.length)
 				{
@@ -2591,7 +2590,7 @@
 			{
 				var res = null;
 				
-				var autoFilter = filter && filter.getType() === g_nFiltersType.tablePart ? filter.AutoFilter : filter;
+				var autoFilter = filter && false === filter.isAutoFilter() ? filter.AutoFilter : filter;
 				
 				if(autoFilter && autoFilter.FilterColumns && autoFilter.FilterColumns.length)
 				{
@@ -4498,7 +4497,7 @@
 			clearFilterColumn: function(cellId, displayName)
 			{
 				var filter = this._getFilterByDisplayName(displayName);
-				var autoFilter = filter && filter.getType() === g_nFiltersType.tablePart ? filter.AutoFilter : filter;
+				var autoFilter = filter && false === filter.isAutoFilter() ? filter.AutoFilter : filter;
 				
 				var oldFilter = filter.clone(null);
 				

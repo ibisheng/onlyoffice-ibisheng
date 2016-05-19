@@ -10417,7 +10417,7 @@
                     case c_oAscInsertOptions.InsertColumns:
                         isCheckChangeAutoFilter = t.model.autoFilters.isRangeIntersectionSeveralTableParts( arn );
                         if ( isCheckChangeAutoFilter === true ) {
-                            this.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterChangeFormatTableError, c_oAscError.Level.NoCritical);
+                            this.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterChangeFormatTableError, c_oAscError.Level.NoCritical);
                             return;
                         }
 
@@ -12025,7 +12025,8 @@
 			if(filter && filter.SortState && filter.SortState.SortConditions && filter.SortState.SortConditions[0])
 			{
 				var sortState = filter.SortState;
-				var sortRange = t.model.getRange3(filter.Ref.r1, filter.Ref.c1, filter.Ref.r2, filter.Ref.c2);
+				var rangeWithoutHeaderFooter = filter.getRangeWithoutHeaderFooter();
+				var sortRange = t.model.getRange3(rangeWithoutHeaderFooter.r1, rangeWithoutHeaderFooter.c1, rangeWithoutHeaderFooter.r2, rangeWithoutHeaderFooter.c2);
 				var startCol = sortState.SortConditions[0].Ref.c1;
 				var type;
 				var rgbColor = null;
@@ -12061,6 +12062,7 @@
 				t.cellCommentator.sortComments(sort);
 			}
 			
+			t.model.autoFilters._resetTablePartStyle();
 			
 			var rowChange = applyFilterProps.rowChange;
             var updateRange = applyFilterProps.updateRange;
@@ -12207,7 +12209,7 @@
 				History.Create_NewPoint();
 				History.StartTransaction();
 				
-				var rgbColor = color ? new RgbColor((color.asc_getR() << 16) + (color.asc_getG() << 8) + color.asc_getB()) : null;
+				var rgbColor = color ? new AscCommonExcel.RgbColor((color.asc_getR() << 16) + (color.asc_getG() << 8) + color.asc_getB()) : null;
 				
 				var sort = sortProps.sortRange.sort(type, sortProps.startCol, rgbColor);
 				t.cellCommentator.sortComments(sort);
@@ -12947,6 +12949,7 @@
         var t = this;
         var ws = this.model;
         var res = {text: true, colors: [], fontColors: []};
+		var alreadyAddColors = {}, alreadyAddFontColors = {};
 		
 		var getAscColor = function(color)
 		{
@@ -12959,28 +12962,65 @@
 			return ascColor;
 		};
 		
+		var addFontColorsToArray = function(fontColor)
+		{
+			var rgb = null === fontColor || fontColor && 0 === fontColor.rgb ? null : fontColor.rgb;
+			var isDefaultFontColor = !!(null === rgb);
+			
+			if(true !== alreadyAddFontColors[rgb])
+			{
+				if(isDefaultFontColor)
+				{
+					res.fontColors.push(null);
+					alreadyAddFontColors[null] = true;
+				}
+				else
+				{
+					var ascFontColor = getAscColor(fontColor);
+					res.fontColors.push(ascFontColor);
+					alreadyAddFontColors[rgb] = true;
+				}
+			}
+		};
+		
+		var addCellColorsToArray = function(color)
+		{
+			var rgb = null !== color && color.fill && color.fill.bg ? color.fill.bg.rgb : null;
+			var isDefaultCellColor = !!(null === rgb);
+			
+			if(true !== alreadyAddColors[rgb])
+			{
+				if(isDefaultCellColor)
+				{
+					res.colors.push(null);
+					alreadyAddColors[null] = true;
+				}
+				else
+				{
+					var ascColor = getAscColor(color.fill.bg);
+					res.colors.push(ascColor);
+					alreadyAddColors[rgb] = true;
+				}
+			}
+		};
+		
         var tempText = 0, tempDigit = 0;
-        var alreadyAddColors = {}, alreadyAddFontColors = {};
         for(var i = columnRange.r1; i <= columnRange.r2; i++)
         {
             var cell = ws._getCellNoEmpty(i, columnRange.c1);
-
-            if(!cell)
+			
+			//добавляем без цвета ячейку
+            if(!cell && true !== alreadyAddColors[null])
             {
-                //добавляем без цвета ячейку
-				if(true !== alreadyAddColors[null])
-				{
-					alreadyAddColors[null] = true;
-					
-					res.colors.push(null);
-				}
-				
+				alreadyAddColors[null] = true;
+				res.colors.push(null);
 				continue;
             }
-
+			
             if(false === cell.isEmptyText())
             {
                 var type = cell.getType();
+				
                 if(type === 0)
                 {
                     tempDigit++;
@@ -12990,61 +13030,24 @@
                     tempText++;
                 }
             }
-
+			
+			//font colors
             if(null !== cell.oValue.multiText)
             {
                 for(var j = 0; j < cell.oValue.multiText.length; j++)
                 {
                     var fontColor = cell.oValue.multiText[j].format ? cell.oValue.multiText[j].format.c : null;
-                    if(null !== fontColor && true !== alreadyAddFontColors[fontColor.rgb] && false === g_oColorManager.isEqual(fontColor, g_oDefaultFont.c))
-                    {
-                        var ascFontColor = getAscColor(fontColor);
-						
-						res.fontColors.push(ascFontColor);
-                        alreadyAddFontColors[fontColor.rgb] = true;
-                    }
-					else if(null === fontColor && true !== alreadyAddFontColors[g_oDefaultFont.c.rgb])
-					{
-						var ascFontColor = getAscColor(g_oDefaultFont.c);
-						
-						res.fontColors.push(ascFontColor);
-						alreadyAddFontColors[g_oDefaultFont.c.rgb] = true;
-					}
+					addFontColorsToArray(fontColor);
                 }
             }
             else
             {
                 var fontColor =  cell.xfs && cell.xfs.font ? cell.xfs.font.c : null;
-                if(null !== fontColor && true !== alreadyAddFontColors[fontColor.rgb] && false === g_oColorManager.isEqual(fontColor, g_oDefaultFont.c))
-                {
-                    var ascFontColor = getAscColor(fontColor);
-					
-					res.fontColors.push(ascFontColor);
-                    alreadyAddFontColors[fontColor.rgb] = true;
-                }
-				else if(null === fontColor && true !== alreadyAddFontColors[g_oDefaultFont.c.rgb])
-				{
-					var ascFontColor = getAscColor(g_oDefaultFont.c);
-					
-					res.fontColors.push(ascFontColor);
-                    alreadyAddFontColors[g_oDefaultFont.c.rgb] = true;
-				}
+                addFontColorsToArray(fontColor);
             }
-
-            var color = cell.getStyle();
-            if(null !== color && color.fill && color.fill.bg && true !== alreadyAddColors[color.fill.bg.rgb])
-            {
-                var ascColor = getAscColor(color.fill.bg);
-				
-				res.colors.push(ascColor);
-                alreadyAddColors[color.fill.bg.rgb] = true;
-            }
-			else if(null === color && true !== alreadyAddColors[null])
-			{
-				alreadyAddColors[null] = true;
-				
-				res.colors.push(null);
-			}
+			
+			//cell colors
+			addCellColorsToArray(cell.getStyle());
         }
 		
 		//если один элемент в массиве, не отправляем его в меню
@@ -13057,10 +13060,7 @@
 			res.fontColors = [];
 		}
 		
-        if(tempDigit > tempText)
-        {
-            res.text = false;
-        }
+		res.text = tempDigit > tempText ? false : true;
 
         return res;
     };
@@ -13547,7 +13547,7 @@
 						{
 							res = false;
 						}
-						else if(!isOneTableIntersection)
+						else if(intersectionTableParts && null !== isOneTableIntersection)
 						{
 							res = false;
 						}
@@ -13575,7 +13575,7 @@
 						{
 							res = false;
 						}
-						else if(!isOneTableIntersection)
+						else if(intersectionTableParts && null !== isOneTableIntersection)
 						{
 							res = false;
 						}
@@ -13619,7 +13619,7 @@
 						{
 							res = false;
 						}
-						else if(!isOneTableIntersection)
+						else if(!isOneTableIntersection && null !== isOneTableIntersection)
 						{
 							res = false;
 						}
@@ -13646,7 +13646,7 @@
 						{
 							res = false;
 						}
-						else if(!isOneTableIntersection)
+						else if(!isOneTableIntersection && null !== isOneTableIntersection)
 						{
 							res = false;
 						}

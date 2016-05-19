@@ -4981,6 +4981,15 @@ TablePart.prototype.changeDisplayName = function(newName)
 	this.DisplayName = newName;
 }; 
 
+TablePart.prototype.getRangeWithoutHeaderFooter = function()
+{
+	var startRow = this.HeaderRowCount === null ? this.Ref.r1 + 1 : this.Ref.r1;
+	var endRow = this.TotalsRowCount > 0 ? this.Ref.r2 - 1 : this.Ref.r2;
+	
+	return Asc.Range(this.Ref.c1, startRow, this.Ref.c2, endRow);
+}; 
+
+
 /** @constructor */
 function AutoFilter() {
 	this.Ref = null;
@@ -5139,6 +5148,11 @@ AutoFilter.prototype.isShowButton = function()
 	
 	return res;
 };
+
+AutoFilter.prototype.getRangeWithoutHeaderFooter = function()
+{
+	return Asc.Range(this.Ref.c1, this.Ref.r1 + 1, this.Ref.c2, this.Ref.r2);
+}; 
 
 
 function FilterColumns() {
@@ -6053,7 +6067,30 @@ ColorFilter.prototype.isHideValue = function(cell) {
 	
 	var res = true;
 	
-	if(this.dxf && this.dxf.fill && this.dxf.fill.bg && cell)
+	var isEqualColors = function(filterColor, cellColor)
+	{
+		var res = false;
+		if(filterColor === cellColor)
+		{
+			res = true;
+		}
+		else if(!filterColor && (!cellColor || null === cellColor.rgb || 0 === cellColor.rgb))
+		{
+			res = true;
+		}
+		else if(!cellColor && (!filterColor || null === filterColor.rgb || 0 === filterColor.rgb))
+		{
+			res = true;
+		}
+		else if(cellColor && filterColor && cellColor.rgb === filterColor.rgb)
+		{
+			res = true;
+		}
+		
+		return res;
+	};
+	
+	if(this.dxf && this.dxf.fill && cell)
 	{
 		var filterColor = this.dxf.fill.bg;
 		cell = cell.getCells()[0];
@@ -6065,7 +6102,7 @@ ColorFilter.prototype.isHideValue = function(cell) {
 				for(var j = 0; j < cell.oValue.multiText.length; j++)
 				{
 					var fontColor = cell.oValue.multiText[j].format ? cell.oValue.multiText[j].format.c : null;
-					if(fontColor !== null && fontColor.rgb === filterColor.rgb)
+					if(isEqualColors(filterColor,fontColor ))
 					{
 						res = false;
 						break;
@@ -6075,11 +6112,7 @@ ColorFilter.prototype.isHideValue = function(cell) {
 			else
 			{
 				var fontColor =  cell.xfs && cell.xfs.font ? cell.xfs.font.c : null;
-				if(fontColor !== null && fontColor.rgb === filterColor.rgb)
-				{
-					res = false;
-				}
-				else if(fontColor === null && (null === filterColor || (null !== filterColor && (0 === filterColor.rgb || null === filterColor.rgb))))
+				if(isEqualColors(filterColor,fontColor))
 				{
 					res = false;
 				}
@@ -6088,11 +6121,9 @@ ColorFilter.prototype.isHideValue = function(cell) {
 		else
 		{
 			var color = cell.getStyle();
-			if(color !== null && color.fill && color.fill.bg && color.fill.bg.rgb === filterColor.rgb)
-			{
-				res = false;
-			}
-			else if(color === null && (null === this.dxf.fill.bg || (null !== this.dxf.fill.bg && null === this.dxf.fill.bg.rgb)))
+			var cellColor =  color !== null && color.fill && color.fill.bg ? color.fill.bg : null;
+			
+			if(isEqualColors(filterColor, cellColor))
 			{
 				res = false;
 			}
