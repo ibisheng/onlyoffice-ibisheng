@@ -609,12 +609,12 @@ baseEditorsApi.prototype._uploadCallback = function(error, files) {
 
     baseEditorsApi.prototype.asc_addOleObject = function(sImageUrl, sData, sApplicationId){
         var oThis = this;
-        this.asc_checkImageUrlAndAction(sImageUrl, function(oImage){oThis.asc_addOleObjectAction(AscCommon.g_oDocumentUrls.getImageLocal(oImage.src), sData, sApplicationId, oImage.width * AscCommon.g_dKoef_pix_to_mm, oImage.height * AscCommon.g_dKoef_pix_to_mm);});
+        this.asc_checkImageUrlAndAction(sImageUrl, function(oImage){oThis.asc_addOleObjectAction(AscCommon.g_oDocumentUrls.getImageLocal(oImage.src), sData, sApplicationId, oImage.Image.width * AscCommon.g_dKoef_pix_to_mm, oImage.Image.height * AscCommon.g_dKoef_pix_to_mm);});
     };
 
     baseEditorsApi.prototype.asc_editOleObject = function(bResize, sImageUrl, sData){
         var oThis = this;
-        this.asc_checkImageUrlAndAction(sImageUrl, function(oImage){oThis.asc_editOleObjectAction(bResize, AscCommon.g_oDocumentUrls.getImageLocal(oImage.src), sData, oImage.width, oImage.height);});
+        this.asc_checkImageUrlAndAction(sImageUrl, function(oImage){oThis.asc_editOleObjectAction(bResize, AscCommon.g_oDocumentUrls.getImageLocal(oImage.src), sData, oImage.Image.width, oImage.Image.height);});
     };
 
     baseEditorsApi.prototype.asc_addOleObjectAction = function(sLocalUrl, sData, sApplicationId, fWidth, fHeight)

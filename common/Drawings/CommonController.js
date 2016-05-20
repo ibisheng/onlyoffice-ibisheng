@@ -7023,6 +7023,7 @@ DrawingObjectsController.prototype =
         AscFormat.fillImage(oleObject, rasterImageId, x, y, extX, extY);
         oleObject.setData(data);
         oleObject.setApplicationId(sApplicationId);
+        oleObject.setPixSizes(extX*AscCommon.g_dKoef_pix_to_mm, extY*AscCommon.g_dKoef_pix_to_mm);
         return oleObject;
     },
 

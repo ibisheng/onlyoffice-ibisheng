@@ -675,8 +675,8 @@ CImageShape.prototype.Undo = function(data)
         }
         case AscDFH.historyitem_ImageShapeSetPixSizes:
         {
-            this.m_nPixWidth = dara.oldPr.w;
-            this.m_nPixHeight = dara.oldPr.h;
+            this.m_nPixWidth = data.oldPr.w;
+            this.m_nPixHeight = data.oldPr.h;
             break;
         }
         case AscDFH.historyitem_AutoShapes_SetBFromSerialize:
@@ -774,8 +774,8 @@ CImageShape.prototype.Redo = function(data)
 
         case AscDFH.historyitem_ImageShapeSetPixSizes:
         {
-            this.m_nPixWidth = dara.newPr.w;
-            this.m_nPixHeight = dara.newPr.h;
+            this.m_nPixWidth = data.newPr.w;
+            this.m_nPixHeight = data.newPr.h;
             break;
         }
         case AscDFH.historyitem_AutoShapes_SetBFromSerialize:
@@ -874,7 +874,7 @@ CImageShape.prototype.Save_Changes = function(data, w)
         case AscDFH.historyitem_ImageShapeSetPixSizes:
         {
             AscFormat.writeLong(w, data.newPr.w);
-            AscFormat.writeLong(w, dara.newPr.h);
+            AscFormat.writeLong(w, data.newPr.h);
             break;
         }
         case AscDFH.historyitem_AutoShapes_SetBFromSerialize:
