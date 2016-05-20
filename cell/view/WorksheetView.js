@@ -13010,10 +13010,13 @@
             var cell = ws._getCellNoEmpty(i, columnRange.c1);
 			
 			//добавляем без цвета ячейку
-            if(!cell && true !== alreadyAddColors[null])
+            if(!cell)
             {
-				alreadyAddColors[null] = true;
-				res.colors.push(null);
+				if(true !== alreadyAddColors[null])
+				{
+					alreadyAddColors[null] = true;
+					res.colors.push(null);
+				}
 				continue;
             }
 			
