@@ -129,8 +129,7 @@
 			this.Properties = g_oAutoFiltersOptionsProperties;
 
 			this.cellId  = null;
-            this.cellPosX  = null;
-            this.cellPosY  = null;
+            this.cellCoord  = null;
 			this.values  = null;
 			this.filter  = null;
 			this.sortVal = null;
@@ -182,8 +181,7 @@
 			},
 			
 			asc_setCellId : function(cellId) { this.cellId = cellId;},
-            asc_setCellPosX : function(val) { this.cellPosX = val; },
-            asc_setCellPosY : function(val) { this.cellPosY = val; },
+            asc_setCellCoord : function(val) { this.cellCoord = val; },
 			asc_setValues : function(values) { this.values = values; },
 			asc_setFilterObj : function(filter) { this.filter = filter; },
 			
@@ -197,8 +195,7 @@
             asc_setSortColor : function(val) { this.sortColor = val; },
 			
 			asc_getCellId : function() { return this.cellId; },
-            asc_getCellPosX : function() { return this.cellPosX; },
-            asc_getCellPosY : function() { return this.cellPosY; },
+            asc_getCellCoord : function() { return this.cellCoord; },
 			asc_getValues : function() { return this.values; },
 			asc_getFilterObj : function() { return this.filter; },
 			
@@ -4892,8 +4889,7 @@
 		prot["asc_getValues"]					= prot.asc_getValues;
 		prot["asc_getFilterObj"]				= prot.asc_getFilterObj;
 		prot["asc_getCellId"]					= prot.asc_getCellId;
-        prot["asc_getCellPosX"]					= prot.asc_getCellPosX;
-        prot["asc_getCellPosY"]					= prot.asc_getCellPosY;
+        prot["asc_getCellCoord"]				= prot.asc_getCellCoord;
 		prot["asc_getDisplayName"]				= prot.asc_getDisplayName;
         prot["asc_getIsTextFilter"]				= prot.asc_getIsTextFilter;
         prot["asc_getColorsFill"]				= prot.asc_getColorsFill;
