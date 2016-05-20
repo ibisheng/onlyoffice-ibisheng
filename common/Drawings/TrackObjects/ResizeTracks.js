@@ -845,6 +845,18 @@ function ResizeTrackShapeImage(originalObject, cardDirection)
                 xfrm.setFlipH(this.resizedflipH);
                 xfrm.setFlipV(this.resizedflipV);
             }
+            if(this.originalObject.getObjectType && this.originalObject.getObjectType() === AscDFH.historyitem_type_OleObject)
+            {
+                var api;
+                if(Asc.editor)
+                {
+                    api = Asc.editor;
+                }
+                if(api)
+                {
+                    api.runResize(this.originalObject.m_sApplicationId, this.originalObject.m_sData, xfrm.extX, xfrm.extY);
+                }
+            }
 
             AscFormat.CheckShapeBodyAutoFitReset(this.originalObject);
             this.originalObject.checkDrawingBaseCoords();
