@@ -1,4 +1,4 @@
-"use strict";
+﻿"use strict";
 
 var editor;
 (/**
@@ -3346,6 +3346,7 @@ var editor;
   prot["asc_sortColFilter"] = prot.asc_sortColFilter;
   prot["asc_getAddFormatTableOptions"] = prot.asc_getAddFormatTableOptions;
   prot["asc_clearFilter"] = prot.asc_clearFilter;
+  prot["asc_clearFilterColumn"] = prot.asc_clearFilterColumn;
   prot["asc_changeSelectionFormatTable"] = prot.asc_changeSelectionFormatTable;
   prot["asc_changeFormatTableInfo"] = prot.asc_changeFormatTableInfo;
   prot["asc_insertCellsInTable"] = prot.asc_insertCellsInTable;
