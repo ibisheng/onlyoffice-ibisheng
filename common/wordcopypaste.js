@@ -1710,6 +1710,29 @@ CopyProcessor.prototype =
 			if(!selectedContent.DocContent && (!selectedContent.Drawings || (selectedContent.Drawings && !selectedContent.Drawings.length)) && (!selectedContent.SlideObjects || (selectedContent.SlideObjects && !selectedContent.SlideObjects.length)))
 				return false;
 			
+			//set size, if oDrawingCopyObject is placeholder
+			for(var i = 0; i < selectedContent.Drawings.length; ++i)
+			{
+				var oDrawingCopyObject = selectedContent.Drawings[i];
+				
+				var sp = oDrawingCopyObject.Drawing;
+				if(!sp.spPr)
+				{
+					sp.setSpPr(new AscFormat.CSpPr());
+				}
+				if(!sp.spPr.xfrm)
+				{
+					sp.spPr.setXfrm(new AscFormat.CXfrm());
+				}
+				if(!sp.spPr.xfrm.isNotNull())
+				{
+					sp.spPr.xfrm.setOffX(oDrawingCopyObject.X);
+					sp.spPr.xfrm.setOffY(oDrawingCopyObject.Y);
+					sp.spPr.xfrm.setExtX(oDrawingCopyObject.ExtX);
+					sp.spPr.xfrm.setExtY(oDrawingCopyObject.ExtY);
+				}
+			}
+			
 			this.CopyDocument2(this.oRoot, oDocument, selectedContent);
 
             var sBase64 = this.oPresentationWriter.GetBase64Memory();
