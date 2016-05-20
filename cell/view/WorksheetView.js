@@ -7544,20 +7544,23 @@
 
     // Получаем координаты активной ячейки
     WorksheetView.prototype.getActiveCellCoord = function () {
+        return this.getCellCoord(this.activeRange.startCol, this.activeRange.startRow);
+    };
+    WorksheetView.prototype.getCellCoord = function (col, row) {
         var offsetX = 0, offsetY = 0;
         var vrCol = this.visibleRange.c1, vrRow = this.visibleRange.r1;
         if ( this.topLeftFrozenCell ) {
             var offsetFrozen = this.getFrozenPaneOffset();
             var cFrozen = this.topLeftFrozenCell.getCol0();
             var rFrozen = this.topLeftFrozenCell.getRow0();
-            if ( this.activeRange.startCol >= cFrozen ) {
+            if ( col >= cFrozen ) {
                 offsetX = offsetFrozen.offsetX;
             }
             else {
                 vrCol = 0;
             }
 
-            if ( this.activeRange.startRow >= rFrozen ) {
+            if ( row >= rFrozen ) {
                 offsetY = offsetFrozen.offsetY;
             }
             else {
@@ -7565,8 +7568,8 @@
             }
         }
 
-        var xL = this.getCellLeft( this.activeRange.startCol, /*pt*/1 );
-        var yL = this.getCellTop( this.activeRange.startRow, /*pt*/1 );
+        var xL = this.getCellLeft( col, /*pt*/1 );
+        var yL = this.getCellTop( row, /*pt*/1 );
         // Пересчитываем X и Y относительно видимой области
         xL -= (this.cols[vrCol].left - this.cellsLeft);
         yL -= (this.rows[vrRow].top - this.cellsTop);
@@ -7578,8 +7581,8 @@
         xL *= asc_getcvt( 1/*pt*/, 0/*px*/, this._getPPIX() );
         yL *= asc_getcvt( 1/*pt*/, 0/*px*/, this._getPPIY() );
 
-        var width = this.getColumnWidth( this.activeRange.startCol, /*px*/0 );
-        var height = this.getRowHeight( this.activeRange.startRow, /*px*/0 );
+        var width = this.getColumnWidth( col, /*px*/0 );
+        var height = this.getRowHeight( row, /*px*/0 );
 
         if ( AscBrowser.isRetina ) {
             xL >>= 1;
