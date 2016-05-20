@@ -1660,8 +1660,17 @@ CGraphics.prototype =
     // smart methods for horizontal / vertical lines
     drawHorLine : function(align, y, x, r, penW)
     {
-        if (!this.m_bIntegerGrid)
+        var _check_transform = global_MatrixTransformer.IsIdentity2(this.m_oTransform);
+        if (!this.m_bIntegerGrid || !_check_transform)
         {
+            if (_check_transform)
+            {
+                this.SetIntegerGrid(true);
+                this.drawHorLine(align, y, x, r, penW);
+                this.SetIntegerGrid(false);
+                return;
+            }
+
             this.p_width(penW * 1000);
             this._s();
             this._m(x, y);
@@ -1670,7 +1679,7 @@ CGraphics.prototype =
             return;
         }
 
-        var pen_w = parseInt((this.m_dDpiX * penW / g_dKoef_in_to_mm) + 0.5);
+        var pen_w = ((this.m_dDpiX * penW / g_dKoef_in_to_mm) + 0.5) >> 0;
         if (0 == pen_w)
             pen_w = 1;
 
