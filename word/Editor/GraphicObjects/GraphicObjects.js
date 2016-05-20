@@ -2625,15 +2625,8 @@ CGraphicObjects.prototype =
             {
                 if(this.selection.groupSelection.selection.chartSelection)
                 {
-                    if(this.selection.groupSelection.selection.chartSelection.selection.title)
-                    {
-                        if(this.selection.groupSelection.selection.chartSelection.selection.title.parent)
-                        {
-                            this.selection.groupSelection.selection.chartSelection.selection.title.parent.setTitle(null);
-                            this.selection.groupSelection.selection.chartSelection.resetSelection();
-                        }
-                        this.document.Recalculate();
-                    }
+                    this.selection.groupSelection.selection.chartSelection.remove();
+                    this.document.Recalculate();
                 }
                 else
                 {
@@ -2740,15 +2733,9 @@ CGraphicObjects.prototype =
             }
             else if(this.selection.chartSelection)
             {
-                if(this.selection.chartSelection.selection.title)
-                {
-                    if(this.selection.chartSelection.selection.title.parent)
-                    {
-                        this.selection.chartSelection.selection.title.parent.setTitle(null);
-                        this.selection.chartSelection.resetSelection();
-                    }
-                    this.document.Recalculate();
-                }
+                this.selection.chartSelection.remove();
+                this.document.Recalculate();
+
             }
             else
             {

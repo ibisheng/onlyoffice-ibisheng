@@ -132,7 +132,9 @@ CDLbl.prototype =
         return this.Id;
     },
     Refresh_RecalcData: function()
-    {},
+    {
+        this.Refresh_RecalcData2();
+    },
 
 
     getObjectType: function()
@@ -1252,6 +1254,7 @@ CDLbl.prototype =
     {
         History.Add(this, {Type: AscDFH.historyitem_DLbl_SetDelete, oldPr: this.bDelete  , newPr: pr});
         this.bDelete = pr;
+        this.Refresh_RecalcData2();
     },
     setDLblPos: function(pr)
     {
@@ -1344,6 +1347,7 @@ CDLbl.prototype =
             case AscDFH.historyitem_DLbl_SetDelete:
             {
                 this.bDelete = data.oldPr;
+                this.Refresh_RecalcData2();
                 break;
             }
             case AscDFH.historyitem_DLbl_SetDLblPos:
@@ -1426,6 +1430,7 @@ CDLbl.prototype =
             case AscDFH.historyitem_DLbl_SetDelete:
             {
                 this.bDelete = data.newPr;
+                this.Refresh_RecalcData2();
                 break;
             }
             case AscDFH.historyitem_DLbl_SetDLblPos:
@@ -1571,6 +1576,7 @@ CDLbl.prototype =
                 {
                     this.bDelete = null;
                 }
+                this.Refresh_RecalcData2();
                 break;
             }
             case AscDFH.historyitem_DLbl_SetDLblPos:
@@ -11113,12 +11119,17 @@ CDLbls.prototype =
         return this.Id;
     },
     Refresh_RecalcData: function()
-    {},
+    {
+        this.Refresh_RecalcData2();
+    },
     Refresh_RecalcData2: function()
     {
-        if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.parent && this.parent.parent.parent.parent.parent.handleUpdateDataLabels)
+        if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.parent )
         {
-            this.parent.parent.parent.parent.parent.handleUpdateDataLabels();
+            if(this.parent.parent.parent.parent.parent.handleUpdateDataLabels)
+            {
+                this.parent.parent.parent.parent.parent.handleUpdateDataLabels();
+            }
         }
     },
 
@@ -11356,6 +11367,7 @@ CDLbls.prototype =
             case AscDFH.historyitem_DLbls_SetDelete:
             {
                 this.bDelete = data.oldPr;
+                this.Refresh_RecalcData2();
                 break;
             }
             case AscDFH.historyitem_DLbls_SetDLbl:
@@ -11454,6 +11466,7 @@ CDLbls.prototype =
             case AscDFH.historyitem_DLbls_SetDelete:
             {
                 this.bDelete = data.newPr;
+                this.Refresh_RecalcData2();
                 break;
             }
             case AscDFH.historyitem_DLbls_SetDLbl:
@@ -13728,7 +13741,9 @@ CLegend.prototype =
         return this.Id;
     },
     Refresh_RecalcData: function()
-    {},
+    {
+        this.Refresh_RecalcData2();
+    },
 
     createDuplicate: function()
     {
@@ -14045,6 +14060,10 @@ CLegend.prototype =
                     if(this.legendEntryes[i] === data.entry)
                     {
                         this.legendEntryes.splice(i, 1);
+                        if(this.parent && this.parent.parent)
+                        {
+                            this.parent.parent.handleUpdateInternalChart();
+                        }
                         break;
                     }
                 }
@@ -14318,7 +14337,9 @@ CLegendEntry.prototype =
         return this.Id;
     },
     Refresh_RecalcData: function()
-    {},
+    {
+        this.Refresh_RecalcData2();
+    },
 
     Write_ToBinary2: function (w)
     {
@@ -14335,6 +14356,7 @@ CLegendEntry.prototype =
     {
         History.Add(this, {Type: AscDFH.historyitem_LegendEntry_SetDelete, oldPr: this.bDelete, newPr:pr});
         this.bDelete = pr;
+        this.Refresh_RecalcData2();
     },
     setIdx: function(pr)
     {
@@ -14367,6 +14389,7 @@ CLegendEntry.prototype =
             case AscDFH.historyitem_LegendEntry_SetDelete:
             {
                 this.bDelete = data.oldPr;
+                this.Refresh_RecalcData2();
                 break;
             }
             case AscDFH.historyitem_LegendEntry_SetIdx:
@@ -14389,6 +14412,7 @@ CLegendEntry.prototype =
             case AscDFH.historyitem_LegendEntry_SetDelete:
             {
                 this.bDelete = data.newPr;
+                this.Refresh_RecalcData2();
                 break;
             }
             case AscDFH.historyitem_LegendEntry_SetIdx:
@@ -14457,6 +14481,7 @@ CLegendEntry.prototype =
                 {
                     this.bDelete = null;
                 }
+                this.Refresh_RecalcData2();
                 break;
             }
             case AscDFH.historyitem_LegendEntry_SetIdx:
@@ -24699,6 +24724,13 @@ CChart.prototype =
         return this.parent && this.parent.getParentObjects();
     },
 
+    handleUpdateDataLabels: function()
+    {
+        if(this.parent && this.parent.handleUpdateDataLabels)
+        {
+            this.parent.handleUpdateDataLabels();
+        }
+    },
 
     setDefaultWalls: function()
     {

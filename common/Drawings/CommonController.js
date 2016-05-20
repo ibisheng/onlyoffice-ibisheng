@@ -4443,7 +4443,7 @@ DrawingObjectsController.prototype =
             {
                 if(this.selection.groupSelection.selection.chartSelection)
                 {
-                    //TODO
+                    this.selection.groupSelection.selection.chartSelection.remove();
                 }
                 else
                 {
@@ -4530,8 +4530,10 @@ DrawingObjectsController.prototype =
                     this.resetInternalSelection();
                 }
             }
-            //else if(this.selection.chartSelection) TODO
-            //{}
+            else if(this.selection.chartSelection)
+            {
+                this.selection.chartSelection.remove();
+            }
             else
             {
                 for(var i = 0; i < this.selectedObjects.length; ++i)
