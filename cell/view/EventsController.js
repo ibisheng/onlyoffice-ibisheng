@@ -1246,7 +1246,7 @@
 						this.isMoveRangeMode = true;
 						t._moveRangeHandle(event);
 						return;
-					} else if (t.targetInfo && t.targetInfo.target === c_oTargetType.FilterObject) {
+					} else if (t.targetInfo && t.targetInfo.target === c_oTargetType.FilterObject && 0 === event.button) {
 						  t._autoFiltersClick(t.targetInfo.idFilter);
 						  return;
 					} else if (t.targetInfo && undefined !== t.targetInfo.commentIndexes && false === this.settings.isViewerMode) {
