@@ -349,7 +349,7 @@ function TEST_PLUGINS()
         _p.name = _plugins[i].name;
         _p.guid = _plugins[i].guid;
 
-        for (var j = 0; j < _p.variations.length; j++)
+        for (var j = 0; j < _plugins[i].variations.length; j++)
         {
             var _pv = new Asc.CPluginVariation();
 
@@ -360,6 +360,8 @@ function TEST_PLUGINS()
 
             _p.variations.push(_pv);
         }
+
+        _pluginsNatural.push(_p);
     }
 
     window.g_asc_plugins.api.asc_pluginsRegister("../../../../sdkjs-plugins/", _pluginsNatural);
