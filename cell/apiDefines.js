@@ -347,6 +347,11 @@ var c_oAscPopUpSelectorType = {
   var prot;
   window['Asc'] = window['Asc'] || {};
   window['Asc']['c_oAscSortOptions'] = window['Asc'].c_oAscSortOptions = c_oAscSortOptions;
+  prot = c_oAscSortOptions;
+  prot['Ascending'] = prot.Ascending;
+  prot['Descending'] = prot.Descending;
+  prot['ByColorFill'] = prot.ByColorFill;
+  prot['ByColorFont'] = prot.ByColorFont;
   window['Asc']['c_oAscConfirm'] = window['Asc'].c_oAscConfirm = c_oAscConfirm;
   prot = c_oAscConfirm;
   prot['ConfirmReplaceRange'] = prot.ConfirmReplaceRange;
