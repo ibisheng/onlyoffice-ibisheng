@@ -1515,6 +1515,7 @@ function CBinaryFileWriter()
 						oThis.WriteShape(spTree[i]);
                         break;
                     }
+                    case AscDFH.historyitem_type_OleObject:
                     case AscDFH.historyitem_type_ImageShape:
                     {
                         oThis.WriteImage(spTree[i]);
@@ -2818,7 +2819,14 @@ function CBinaryFileWriter()
 
     this.WriteImage = function(image)
     {
-        oThis.StartRecord(2);
+        var isOle = AscDFH.historyitem_type_OleObject == image.getObjectType();
+        if(isOle){
+            oThis.StartRecord(6);
+            //важно писать в начале
+            oThis.WriteRecord1(4, image, oThis.WriteOleInfo);
+        } else {
+            oThis.StartRecord(2);
+        }
 
         oThis.WriteRecord1(0, image.nvPicPr, this.WriteUniNvPr);
 
@@ -2840,7 +2848,18 @@ function CBinaryFileWriter()
 
         oThis.EndRecord();
     }
-
+    this.WriteOleInfo = function(ole)
+    {
+		var ratio = 20 * 3 / 4;//px to twips
+        oThis.WriteUChar(g_nodeAttributeStart);
+        oThis._WriteString2(0, ole.m_sApplicationId);
+        oThis._WriteString2(1, ole.m_sData);
+        oThis._WriteInt2(2, ratio * ole.m_nPixWidth);
+        oThis._WriteInt2(3, ratio * ole.m_nPixHeight);
+        oThis._WriteUChar2(4, 0);
+        oThis._WriteUChar2(5, 0);
+        oThis.WriteUChar(g_nodeAttributeEnd);
+    }
     this.WriteTable = function(grObj)
     {
         oThis.StartRecord(5);
@@ -3247,6 +3266,7 @@ function CBinaryFileWriter()
 						oThis.WriteShape(spTree[i]);
                         break;
                     }
+                    case AscDFH.historyitem_type_OleObject:
                     case AscDFH.historyitem_type_ImageShape:
                     {
                         oThis.WriteImage(spTree[i]);
@@ -4275,6 +4295,7 @@ function CBinaryFileWriter()
                     }
                     break;
                 }
+                case AscDFH.historyitem_type_OleObject:
                 case AscDFH.historyitem_type_ImageShape:
                 {
                     this.WriteImage(grObject);
@@ -4376,7 +4397,14 @@ function CBinaryFileWriter()
         {
             var _writer = this.BinaryFileWriter;
 
-            _writer.StartRecord(2);
+            var isOle = AscDFH.historyitem_type_OleObject == image.getObjectType();
+            if(isOle){
+                _writer.StartRecord(6);
+                //важно писать в начале
+                _writer.WriteRecord1(4, image, _writer.WriteOleInfo);
+            } else {
+                _writer.StartRecord(2);
+            }
             //_writer.WriteRecord1(0, image.nvPicPr, _writer.WriteUniNvPr);
 
             image.spPr.WriteXfrm = image.spPr.xfrm;
@@ -4407,6 +4435,19 @@ function CBinaryFileWriter()
             delete image.spPr.Geometry;
 
             _writer.EndRecord();
+        }
+        this.WriteOleInfo = function(ole)
+        {
+			var ratio = 20 * 3 / 4;//px to twips
+            var _writer = this.BinaryFileWriter;
+            _writer.WriteUChar(g_nodeAttributeStart);
+            _writer._WriteString2(0, ole.m_sApplicationId);
+            _writer._WriteString2(1, ole.m_sData);
+			_writer._WriteInt2(2, ratio * ole.m_nPixWidth);
+			_writer._WriteInt2(3, ratio * ole.m_nPixHeight);
+            _writer._WriteUChar2(4, 0);
+            _writer._WriteUChar2(5, 0);
+            _writer.WriteUChar(g_nodeAttributeEnd);
         }
 
         this.WriteImageBySrc = function(memory, src, w, h)
@@ -4495,6 +4536,7 @@ function CBinaryFileWriter()
                             }
                             break;
                         }
+                        case AscDFH.historyitem_type_OleObject:
                         case AscDFH.historyitem_type_ImageShape:
                         {
                             this.WriteImage(elem);

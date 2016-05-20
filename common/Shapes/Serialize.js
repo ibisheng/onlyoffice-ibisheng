@@ -4205,6 +4205,70 @@ function BinaryPPTYLoader()
         return def;
     }
 
+    this.ReadOleInfo = function(ole)
+    {
+        var s = this.stream;
+
+        var _rec_start = s.cur;
+        var _end_rec = _rec_start + s.GetLong() + 4;
+
+        s.Skip2(1); // start attributes
+        var dxaOrig = 0;
+        var dyaOrig = 0;
+        while (true)
+        {
+            var _at = s.GetUChar();
+            if (_at == g_nodeAttributeEnd)
+                break;
+
+            switch (_at)
+            {
+                case 0:
+                {
+                    ole.setApplicationId(s.GetString2());
+                    break;
+                }
+                case 1:
+                {
+                    ole.setData(s.GetString2());
+                    break;
+                }
+                case 2:
+                {
+                    dxaOrig = s.GetULong();
+                    break;
+                }
+                case 3:
+                {
+                    dyaOrig = s.GetULong();
+                    break;
+                }
+                case 4:
+                {
+                    s.GetUChar();
+                    break;
+                }
+                case 5:
+                {
+                    s.GetUChar();
+                    break;
+                }
+                case 6:
+                {
+                    s.GetUChar();
+                    break;
+                }
+                default:
+                    break;
+            }
+        }
+		if (dxaOrig > 0 && dyaOrig > 0) {
+			var ratio = 4 / 3 / 20;//twips to px
+			ole.setPixSizes(ratio * dxaOrig, ratio * dyaOrig);
+		}
+        s.Seek2(_end_rec);
+    }
+
     this.ReadGeometry = function(_xfrm)
     {
         var geom = null;
@@ -4677,9 +4741,10 @@ function BinaryPPTYLoader()
                 _object = this.ReadShape();
                 break;
             }
+            case 6:
             case 2:
             {
-                _object = this.ReadPic();
+                _object = this.ReadPic(6 === _type);
                 break;
             }
             case 3:
@@ -4832,9 +4897,10 @@ function BinaryPPTYLoader()
                                 }
                                 break;
                             }
+                            case 6:
                             case 2:
                             {
-                                _object = this.ReadPic();
+                                _object = this.ReadPic(6 === _type);
                                 if (!IsHiddenObj(_object))
                                 {
                                     shape.addToSpTree(shape.spTree.length,_object);
@@ -4948,9 +5014,10 @@ function BinaryPPTYLoader()
                                 }
                                 break;
                             }
+                            case 6:
                             case 2:
                             {
-                                var _object = this.ReadPic();
+                                var _object = this.ReadPic(6 === _type);
                                 if (!IsHiddenObj(_object))
                                 {
                                     shapes[shapes.length] = _object;
@@ -5006,11 +5073,11 @@ function BinaryPPTYLoader()
     }
 
 
-    this.ReadPic = function()
+    this.ReadPic = function(isOle)
     {
         var s = this.stream;
 
-        var pic = new AscFormat.CImageShape(this.TempMainObject);
+        var pic = isOle ? new AscFormat.COleObject(this.TempMainObject) : new AscFormat.CImageShape(this.TempMainObject);
 
         pic.setBDeleted(false);
 
@@ -5044,6 +5111,15 @@ function BinaryPPTYLoader()
                 case 3:
                 {
                     pic.setStyle(this.ReadShapeStyle());
+                    break;
+                }
+                case 4:
+                {
+                    if(isOle) {
+                        this.ReadOleInfo(pic);
+                    } else {
+                        s.SkipRecord();
+                    }
                     break;
                 }
                 default:
@@ -7986,9 +8062,10 @@ function CPres()
                         GrObject = this.ReadShape();
                         break;
                     }
+                    case 6:
                     case 2:
                     {
-                        GrObject = this.ReadPic();
+                        GrObject = this.ReadPic(6 == _type);
                         break;
                     }
                     case 3:
@@ -8349,11 +8426,11 @@ function CPres()
             s.Seek2(_end_rec);
             return shape;
         }
-        this.ReadPic = function()
+        this.ReadPic = function(isOle)
         {
             var s = this.stream;
 
-            var pic = new AscFormat.CImageShape();
+            var pic = isOle ? new AscFormat.COleObject() : new AscFormat.CImageShape();
             pic.setBDeleted(false);
             pic.setParent(this.TempMainObject == null ? this.ParaDrawing : null);
 
@@ -8394,6 +8471,15 @@ function CPres()
                         pic.setStyle(this.Reader.ReadShapeStyle());
                         break;
                     }
+                    case 4:
+                    {
+                        if(isOle) {
+                            this.ReadOleInfo(pic);
+                        } else {
+                            s.SkipRecord();
+                        }
+                        break;
+                    }
                     default:
                     {
                         break;
@@ -8403,6 +8489,69 @@ function CPres()
 
             s.Seek2(_end_rec);
             return pic;
+        }
+        this.ReadOleInfo = function(ole)
+        {
+            var s = this.stream;
+
+            var _rec_start = s.cur;
+            var _end_rec = _rec_start + s.GetLong() + 4;
+
+            s.Skip2(1); // start attributes
+            var dxaOrig = 0;
+            var dyaOrig = 0;
+            while (true)
+            {
+                var _at = s.GetUChar();
+                if (_at == g_nodeAttributeEnd)
+                    break;
+
+                switch (_at)
+                {
+                    case 0:
+                    {
+                        ole.setApplicationId(s.GetString2());
+                        break;
+                    }
+                    case 1:
+                    {
+                        ole.setData(s.GetString2());
+                        break;
+                    }
+                    case 2:
+                    {
+                        dxaOrig = s.GetULong();
+                        break;
+                    }
+                    case 3:
+                    {
+                        dyaOrig = s.GetULong();
+                        break;
+                    }
+                    case 4:
+                    {
+                        s.GetUChar();
+                        break;
+                    }
+                    case 5:
+                    {
+                        s.GetUChar();
+                        break;
+                    }
+                    case 6:
+                    {
+                        s.GetUChar();
+                        break;
+                    }
+                    default:
+                        break;
+                }
+            }
+			if (dxaOrig > 0 && dyaOrig > 0) {
+				var ratio = 4 / 3 / 20;//twips to px
+				ole.setPixSizes(ratio * dxaOrig, ratio * dyaOrig);
+			}
+            s.Seek2(_end_rec);
         }
         this.ReadGroupShape = function()
         {
@@ -8461,9 +8610,10 @@ function CPres()
                                     shape.addToSpTree(shape.spTree.length, sp);
                                     break;
                                 }
+                                case 6:
                                 case 2:
                                 {
-                                    sp = this.ReadPic();
+                                    sp = this.ReadPic(6 == _type);
                                     sp.setGroup(shape);
                                     shape.addToSpTree(shape.spTree.length, sp);
                                     break;
