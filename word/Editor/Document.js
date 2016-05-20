@@ -4028,6 +4028,13 @@ CDocument.prototype.Add_OleObject              = function(W, H, Img, Data, sAppl
     }
 };
 
+CDocument.prototype.Edit_OleObject = function(oOleObject, sData, sImageUrl, nPixWidth, nPixHeight)
+{
+    oOleObject.setData(sData);
+    oOleObject.setRasterImageId(sImageUrl);
+    oOleObject.setPixSizes(nPixWidth, nPixHeight);
+};
+
 CDocument.prototype.Add_TextArt                = function(nStyle)
 {
     // Работаем с колонтитулом

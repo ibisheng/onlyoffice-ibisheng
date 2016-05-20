@@ -323,7 +323,7 @@ function (window, undefined) {
       case AscDFH.historydescription_Document_ApplyPrToMath						 : sString = "Document_ApplyPrToMath                     "; break;
       case AscDFH.historydescription_Document_SetMathProps                       : sString = "Document_SetMathProps                      "; break;
       case AscDFH.historydescription_Document_SetSectionProps                    : sString = "Document_SetColumnsProps                   "; break;
-      case AscDFH.historydescription_Document_ApiBuilder                         : sString = "Document_ApiBuilder                        "; break
+      case AscDFH.historydescription_Document_ApiBuilder                         : sString = "Document_ApiBuilder                        "; break;
     }
     return sString;
   }
@@ -891,6 +891,7 @@ window['AscDFH'].historyitem_ImageShapeSetGroup    = 2539;
 window['AscDFH'].historyitem_ImageShapeSetStyle    = 2540;
 window['AscDFH'].historyitem_ImageShapeSetData    = 2541;
 window['AscDFH'].historyitem_ImageShapeSetApplicationId = 2542;
+window['AscDFH'].historyitem_ImageShapeSetPixSizes = 2543;
 window['AscDFH'].historyitem_GeometrySetParent       = 2540;
 window['AscDFH'].historyitem_GeometryAddAdj          = 2541;
 window['AscDFH'].historyitem_GeometryAddGuide        = 2542;
@@ -2004,5 +2005,6 @@ window['AscDFH'].historydescription_Document_SetMathProps                       
 window['AscDFH'].historydescription_Document_ApplyPrToMath                      = 0x0135;
 window['AscDFH'].historydescription_Document_ApiBuilder                         = 0x0136;
 window['AscDFH'].historydescription_Document_AddOleObject                       = 0x0137;
+window['AscDFH'].historydescription_Document_EditOleObject                      = 0x0138;
 
 })(window);

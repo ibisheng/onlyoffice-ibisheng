@@ -2103,6 +2103,7 @@ CTableId.prototype.Read_Class_FromBinary = function(Reader)
         case AscDFH.historyitem_type_DateAx                   : Element = new AscFormat.CDateAx(); break;
         case AscDFH.historyitem_type_SerAx                    : Element = new AscFormat.CSerAx(); break;
         case AscDFH.historyitem_type_Title                    : Element = new AscFormat.CTitle(); break;
+        case AscDFH.historyitem_type_OleObject                : Element = new AscFormat.COleObject(); break;
 
         case AscDFH.historyitem_type_Math						: Element = new AscCommonWord.ParaMath(false); break;
         case AscDFH.historyitem_type_MathContent				: Element = new AscCommonWord.CMathContent(); break;

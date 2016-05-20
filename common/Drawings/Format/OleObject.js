@@ -11,6 +11,8 @@ function (window, undefined) {
         COleObject.superclass.constructor.call(this);
         this.m_sData = null;
         this.m_sApplicationId = null;
+        this.m_nPixWidth = null;
+        this.m_nPixHeight = null;
         this.Id = AscCommon.g_oIdCounter.Get_NewId();
         AscCommon.g_oTableId.Add( this, this.Id );
     }
@@ -29,6 +31,12 @@ function (window, undefined) {
     {
         AscCommon.History.Add(this, {Type:AscDFH.historyitem_ImageShapeSetApplicationId, oldId: this.m_sApplicationId,  newId: sApplicationId});
         this.m_sApplicationId = sApplicationId;
+    };
+    COleObject.prototype.setPixSizes = function(nPixWidth, nPixHeight)
+    {
+        AscCommon.History.Add(this, {Type: AscDFH.historyitem_ImageShapeSetPixSizes, oldPr: {w: this.m_nPixWidth, h: this.m_nPixHeight}, newPr: {w: nPixWidth, h: nPixHeight}});
+        this.m_nPixWidth = nPixWidth;
+        this.m_nPixHeight = nPixHeight;
     };
         window['AscFormat'] = window['AscFormat'] || {};
         window['AscFormat'].COleObject = COleObject;

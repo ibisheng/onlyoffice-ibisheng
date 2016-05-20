@@ -609,10 +609,19 @@ baseEditorsApi.prototype._uploadCallback = function(error, files) {
 
     baseEditorsApi.prototype.asc_addOleObject = function(sImageUrl, sData, sApplicationId){
         var oThis = this;
-        this.asc_checkImageUrlAndAction(sImageUrl, function(oImage){oThis.asc_addOleObjectAction(AscCommon.g_oDocumentUrls.getImageLocal(oImage.src), sData, sApplicationId);});
+        this.asc_checkImageUrlAndAction(sImageUrl, function(oImage){oThis.asc_addOleObjectAction(AscCommon.g_oDocumentUrls.getImageLocal(oImage.src), sData, sApplicationId, oImage.width * AscCommon.g_dKoef_pix_to_mm, oImage.height * AscCommon.g_dKoef_pix_to_mm);});
     };
 
-    baseEditorsApi.prototype.asc_addOleObjectAction = function(sLocalUrl, sData, sApplicationId)
+    baseEditorsApi.prototype.asc_editOleObject = function(bResize, sImageUrl, sData){
+        var oThis = this;
+        this.asc_checkImageUrlAndAction(sImageUrl, function(oImage){oThis.asc_editOleObjectAction(bResize, AscCommon.g_oDocumentUrls.getImageLocal(oImage.src), sData, oImage.width, oImage.height);});
+    };
+
+    baseEditorsApi.prototype.asc_addOleObjectAction = function(sLocalUrl, sData, sApplicationId, fWidth, fHeight)
+    {
+    };
+
+    baseEditorsApi.prototype.asc_editOleObjectAction = function(bResize, oOleObject, sImageUrl, sData, nPixWidth, nPixHeight)
     {
     };
 
@@ -696,6 +705,8 @@ baseEditorsApi.prototype.asc_pluginResize = function(guid, data, width, height)
   if (null != this.pluginsManager)
     this.pluginsManager.runResize(guid, data, width, height);
 };
+
+
 
   //----------------------------------------------------------export----------------------------------------------------
   window['AscCommon'] = window['AscCommon'] || {};
