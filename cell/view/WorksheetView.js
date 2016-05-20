@@ -12840,7 +12840,7 @@
         var rangeButton = Asc.Range(autoFilter.Ref.c1 + colId, autoFilter.Ref.r1, autoFilter.Ref.c1 + colId, autoFilter.Ref.r1);
         var cellId = ws.autoFilters._rangeToId(rangeButton);
 		
-		var cellCoord = this.getCellCoord(autoFilter.Ref.c1, autoFilter.Ref.r1);
+		var cellCoord = this.getCellCoord(autoFilter.Ref.c1 + colId, autoFilter.Ref.r1);
 		
         //get filter object
         var filterObj = new Asc.AutoFilterObj();
