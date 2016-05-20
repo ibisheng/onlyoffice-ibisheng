@@ -12836,7 +12836,10 @@
 
         var rangeButton = Asc.Range(autoFilter.Ref.c1 + colId, autoFilter.Ref.r1, autoFilter.Ref.c1 + colId, autoFilter.Ref.r1);
         var cellId = ws.autoFilters._rangeToId(rangeButton);
-
+		
+		var posX = this.cols[autoFilter.Ref.c1 + colId].left + this.cols[autoFilter.Ref.c1 + colId].width;
+		var posY = this.rows[autoFilter.Ref.r1].top + this.rows[autoFilter.Ref.r1].height;
+		
         //get filter object
         var filterObj = new Asc.AutoFilterObj();
         if(filters && filters.ColorFilter)
@@ -12920,7 +12923,9 @@
         var autoFilterObject = new Asc.AutoFiltersOptions();
 
         autoFilterObject.asc_setSortState(sortVal);
-        autoFilterObject.asc_setCellId(cellId);
+        autoFilterObject.asc_setCellPosX(posX);
+		autoFilterObject.asc_setCellPosY(posY);
+		autoFilterObject.asc_setCellId(cellId);
         autoFilterObject.asc_setValues(values);
         autoFilterObject.asc_setFilterObj(filterObj);
         autoFilterObject.asc_setAutomaticRowCount(automaticRowCount);
