@@ -12837,8 +12837,8 @@
         var rangeButton = Asc.Range(autoFilter.Ref.c1 + colId, autoFilter.Ref.r1, autoFilter.Ref.c1 + colId, autoFilter.Ref.r1);
         var cellId = ws.autoFilters._rangeToId(rangeButton);
 		
-		var posX = this.cols[autoFilter.Ref.c1 + colId].left + this.cols[autoFilter.Ref.c1 + colId].width;
-		var posY = this.rows[autoFilter.Ref.r1].top + this.rows[autoFilter.Ref.r1].height;
+		var posX = (this.cols[autoFilter.Ref.c1 + colId].left + this.cols[autoFilter.Ref.c1 + colId].width) / 0.75;
+		var posY = (this.rows[autoFilter.Ref.r1].top + this.rows[autoFilter.Ref.r1].height) / 0.75;
 		
         //get filter object
         var filterObj = new Asc.AutoFilterObj();
