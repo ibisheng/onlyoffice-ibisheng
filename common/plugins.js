@@ -341,7 +341,28 @@ function TEST_PLUGINS()
         }
     ];
 
-    window.g_asc_plugins.api.asc_pluginsRegister("../../../../sdkjs-plugins/", _plugins);
+    var _pluginsNatural = [];
+    for (var i = 0; i < _plugins.length; i++)
+    {
+        var _p = new Asc.CPlugin();
+
+        _p.name = _plugins[i].name;
+        _p.guid = _plugins[i].guid;
+
+        for (var j = 0; j < _p.variations.length; j++)
+        {
+            var _pv = new Asc.CPluginVariation();
+
+            for (var k in _plugins[i].variations[j])
+            {
+                _pv[k] = _plugins[i].variations[j][k];
+            }
+
+            _p.variations.push(_pv);
+        }
+    }
+
+    window.g_asc_plugins.api.asc_pluginsRegister("../../../../sdkjs-plugins/", _pluginsNatural);
 
     // добавляем кнопки (тест)
     var _elem = document.getElementById("view-left-menu").childNodes[1];
