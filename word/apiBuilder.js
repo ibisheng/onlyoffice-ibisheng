@@ -3584,8 +3584,8 @@
 
 
     /**
-     * Set the line width color of shape
-     * @returns {ApiDocumentContent}
+     * Get content of this shape.
+     * @returns {?ApiDocumentContent}
      */
     ApiShape.prototype.GetDocContent = function()
     {
