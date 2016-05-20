@@ -3806,7 +3806,16 @@ PasteProcessor.prototype =
 
                     if(drawings && drawings.length)
                     {
-                        for(var j = 0; j < drawings.length; j++)
+                        //если массив содержит только изображения
+						if(elements && 1 === elements.length && elements[0].Element && type_Paragraph == elements[0].Element.Get_Type())
+						{
+							if(true === this._isParagraphContainsOnlyDrawing(elements[0].Element))
+							{
+								elements = [];
+							}
+						}
+						
+						for(var j = 0; j < drawings.length; j++)
                         {
                             drawingCopyObject = new DrawingCopyObject();
                             drawingCopyObject.Drawing = drawings[j].GraphicObj;
@@ -4088,6 +4097,31 @@ PasteProcessor.prototype =
             });
         }
     },
+	
+	_isParagraphContainsOnlyDrawing: function(par)
+	{
+		var res = true;
+		
+		if(par.Content)
+		{
+			for(var i = 0; i < par.Content.length; i++)
+			{	
+				if(par.Content[i] && par.Content[i].Content && par.Content[i].Content.length)
+				{
+					for(var j = 0; j < par.Content[i].Content.length; j++)
+					{
+						var elem = par.Content[i].Content[j]; 
+						if(!(para_Drawing === elem.Get_Type() || para_End === elem.Get_Type()))
+						{
+							res = false;
+						}
+					}
+				}
+			}
+		}
+		
+		return res;
+	},
 	
 	_convertExcelBinary: function(aContentExcel, pDrawings)
 	{
