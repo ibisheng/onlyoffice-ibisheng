@@ -6049,7 +6049,7 @@ ParaDrawing.prototype =
                     Writer.WriteLong( Data.New.Value );
                 else
                     Writer.WriteDouble( Data.New.Value );
-                Writer.WriteBool(Data.New.Percent);
+                Writer.WriteBool(Data.New.Percent === true);
 
                 break;
             }
