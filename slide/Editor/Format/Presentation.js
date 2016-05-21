@@ -2708,7 +2708,7 @@ CPresentation.prototype =
                 {
                     var oPosition = this.Slides[this.CurPage].graphicObjects.getContextMenuPosition(0);
                     var ConvertedPos = this.DrawingDocument.ConvertCoordsToCursorWR( oPosition.X, oPosition.Y, this.PageNum );
-                    editor.sync_ContextMenuCallback(new AscCommonSlide.CContextMenuData({ Type : c_oAscContextMenuTypes.Main, X_abs : ConvertedPos.X, Y_abs : ConvertedPos.Y }) );
+                    editor.sync_ContextMenuCallback(new AscCommonSlide.CContextMenuData({ Type : Asc.c_oAscContextMenuTypes.Main, X_abs : ConvertedPos.X, Y_abs : ConvertedPos.Y }) );
                 }
             }
 

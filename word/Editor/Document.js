@@ -11496,7 +11496,7 @@ CDocument.prototype.OnKeyDown               = function(e)
         X_abs = ConvertedPos.X;
         Y_abs = ConvertedPos.Y;
 
-        editor.sync_ContextMenuCallback({Type : c_oAscContextMenuTypes.Common, X_abs : X_abs, Y_abs : Y_abs});
+        editor.sync_ContextMenuCallback({Type : Asc.c_oAscContextMenuTypes.Common, X_abs : X_abs, Y_abs : Y_abs});
 
         bUpdateSelection = false;
         bRetValue        = keydownresult_PreventAll;
@@ -11524,7 +11524,7 @@ CDocument.prototype.OnKeyDown               = function(e)
         X_abs = ConvertedPos.X;
         Y_abs = ConvertedPos.Y;
 
-        editor.sync_ContextMenuCallback({Type : c_oAscContextMenuTypes.Common, X_abs : X_abs, Y_abs : Y_abs});
+        editor.sync_ContextMenuCallback({Type : Asc.c_oAscContextMenuTypes.Common, X_abs : X_abs, Y_abs : Y_abs});
 
         bUpdateSelection = false;
         bRetValue        = keydownresult_PreventAll;
@@ -11790,7 +11790,7 @@ CDocument.prototype.OnMouseUp               = function(e, X, Y, PageIndex)
             Table.Document_SetThisElementCurrent(false);
             this.Document_UpdateSelectionState();
             this.Document_UpdateInterfaceState();
-            editor.sync_ContextMenuCallback({Type : c_oAscContextMenuTypes.Common, X_abs : X_abs, Y_abs : Y_abs});
+            editor.sync_ContextMenuCallback({Type : Asc.c_oAscContextMenuTypes.Common, X_abs : X_abs, Y_abs : Y_abs});
             return;
         }
 
@@ -11805,7 +11805,7 @@ CDocument.prototype.OnMouseUp               = function(e, X, Y, PageIndex)
             if (Y <= PageMetrics.Y)
             {
                 editor.sync_ContextMenuCallback({
-                    Type    : c_oAscContextMenuTypes.ChangeHdrFtr,
+                    Type    : Asc.c_oAscContextMenuTypes.ChangeHdrFtr,
                     X_abs   : X_abs,
                     Y_abs   : Y_abs,
                     Header  : true,
@@ -11816,7 +11816,7 @@ CDocument.prototype.OnMouseUp               = function(e, X, Y, PageIndex)
             else if (Y > PageMetrics.YLimit)
             {
                 editor.sync_ContextMenuCallback({
-                    Type    : c_oAscContextMenuTypes.ChangeHdrFtr,
+                    Type    : Asc.c_oAscContextMenuTypes.ChangeHdrFtr,
                     X_abs   : X_abs,
                     Y_abs   : Y_abs,
                     Header  : false,
@@ -11849,7 +11849,7 @@ CDocument.prototype.OnMouseUp               = function(e, X, Y, PageIndex)
             this.Document_UpdateInterfaceState();
         }
 
-        editor.sync_ContextMenuCallback({Type : c_oAscContextMenuTypes.Common, X_abs : X_abs, Y_abs : Y_abs});
+        editor.sync_ContextMenuCallback({Type : Asc.c_oAscContextMenuTypes.Common, X_abs : X_abs, Y_abs : Y_abs});
         this.private_UpdateCursorXY(true, true);
 
         return;

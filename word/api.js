@@ -5587,13 +5587,13 @@ function CContextMenuData( obj )
 {
     if( obj )
     {
-        this.Type  = ( undefined != obj.Type ) ? obj.Type : c_oAscContextMenuTypes.Common;
+        this.Type  = ( undefined != obj.Type ) ? obj.Type : Asc.c_oAscContextMenuTypes.Common;
         this.X_abs = ( undefined != obj.X_abs ) ? obj.X_abs : 0;
         this.Y_abs = ( undefined != obj.Y_abs ) ? obj.Y_abs : 0;
 
         switch ( this.Type )
         {
-            case c_oAscContextMenuTypes.ChangeHdrFtr :
+            case Asc.c_oAscContextMenuTypes.ChangeHdrFtr :
             {
                 this.PageNum = ( undefined != obj.PageNum ) ? obj.PageNum : 0;
                 this.Header  = ( undefined != obj.Header  ) ? obj.Header  : true;
@@ -5604,7 +5604,7 @@ function CContextMenuData( obj )
     }
     else
     {
-        this.Type  = c_oAscContextMenuTypes.Common;
+        this.Type  = Asc.c_oAscContextMenuTypes.Common;
         this.X_abs = 0;
         this.Y_abs = 0;
     }
