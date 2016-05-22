@@ -2772,6 +2772,80 @@ function DrawingObjects() {
         bNeedRedraw && _this.showDrawingObjects(true);
     };
 
+
+    _this.updateSizeDrawingObjects = function(target, bNoChangeCoords) {
+
+        if(!History.Is_On() || true === bNoChangeCoords){
+            if (target.target === AscCommonExcel.c_oTargetType.RowResize) {
+                for (i = 0; i < aObjects.length; i++) {
+                    drawingObject = aObjects[i];
+                    if (drawingObject.from.row >= target.row) {
+                        drawingObject.checkBoundsFromTo();
+                    }
+                }
+            } else {
+                for (i = 0; i < aObjects.length; i++) {
+                    drawingObject = aObjects[i];
+                    if (drawingObject.from.col >= target.col) {
+                        drawingObject.checkBoundsFromTo();
+                    }
+                }
+            }
+            return;
+        }
+
+        var i, bNeedRecalc = false, drawingObject, coords;
+        if (target.target === AscCommonExcel.c_oTargetType.RowResize) {
+            for (i = 0; i < aObjects.length; i++) {
+                drawingObject = aObjects[i];
+
+                if (drawingObject.from.row >= target.row) {
+                    coords = _this.coordsManager.calculateCoords(drawingObject.from);
+                    AscFormat.CheckSpPrXfrm(drawingObject.graphicObject);
+
+                    var rot = AscFormat.isRealNumber(drawingObject.graphicObject.spPr.xfrm.rot) ? drawingObject.graphicObject.spPr.xfrm.rot : 0;
+                    rot = AscFormat.normalizeRotate(rot);
+                    if (AscFormat.checkNormalRotate(rot)) {
+                        drawingObject.graphicObject.spPr.xfrm.setOffX(pxToMm(coords.x));
+                        drawingObject.graphicObject.spPr.xfrm.setOffY(pxToMm(coords.y));
+                    } else {
+                        drawingObject.graphicObject.spPr.xfrm.setOffX(pxToMm(coords.x) - drawingObject.graphicObject.spPr.xfrm.extX / 2 + drawingObject.graphicObject.spPr.xfrm.extY / 2);
+                        drawingObject.graphicObject.spPr.xfrm.setOffY(pxToMm(coords.y) - drawingObject.graphicObject.spPr.xfrm.extY / 2 + drawingObject.graphicObject.spPr.xfrm.extX / 2);
+                    }
+                    drawingObject.graphicObject.checkDrawingBaseCoords();
+                    bNeedRecalc = true;
+                }
+            }
+        } else {
+            for (i = 0; i < aObjects.length; i++) {
+                drawingObject = aObjects[i];
+
+                if (drawingObject.from.col >= target.col) {
+                    coords = _this.coordsManager.calculateCoords(drawingObject.from);
+                    AscFormat.CheckSpPrXfrm(drawingObject.graphicObject);
+
+                    var rot = AscFormat.isRealNumber(drawingObject.graphicObject.spPr.xfrm.rot) ? drawingObject.graphicObject.spPr.xfrm.rot : 0;
+                    rot = AscFormat.normalizeRotate(rot);
+                    if (AscFormat.checkNormalRotate(rot)) {
+                        drawingObject.graphicObject.spPr.xfrm.setOffX(pxToMm(coords.x));
+                        drawingObject.graphicObject.spPr.xfrm.setOffY(pxToMm(coords.y));
+                    } else {
+                        drawingObject.graphicObject.spPr.xfrm.setOffX(pxToMm(coords.x) - drawingObject.graphicObject.spPr.xfrm.extX / 2 + drawingObject.graphicObject.spPr.xfrm.extY / 2);
+                        drawingObject.graphicObject.spPr.xfrm.setOffY(pxToMm(coords.y) - drawingObject.graphicObject.spPr.xfrm.extY / 2 + drawingObject.graphicObject.spPr.xfrm.extX / 2);
+                    }
+
+                    drawingObject.graphicObject.checkDrawingBaseCoords();
+                    bNeedRecalc = true;
+                }
+            }
+        }
+        if (bNeedRecalc) {
+            _this.controller.recalculate2();
+            _this.showDrawingObjects(true);
+        }
+    };
+
+
     _this.moveRangeDrawingObject = function(oBBoxFrom, oBBoxTo) {
 
         if ( oBBoxFrom && oBBoxTo )
@@ -3505,78 +3579,6 @@ function DrawingObjects() {
 
             obj.size.width = obj.getWidthFromTo();
             obj.size.height = obj.getHeightFromTo();
-        }
-    };
-
-    _this.updateSizeDrawingObjects = function(target, bNoChangeCoords) {
-
-		if(!History.Is_On() || true === bNoChangeCoords){
-            if (target.target === AscCommonExcel.c_oTargetType.RowResize) {
-                for (i = 0; i < aObjects.length; i++) {
-                    drawingObject = aObjects[i];
-                    if (drawingObject.from.row >= target.row) {
-                        drawingObject.checkBoundsFromTo();
-                    }
-                }
-            } else {
-                for (i = 0; i < aObjects.length; i++) {
-                    drawingObject = aObjects[i];
-                    if (drawingObject.from.col >= target.col) {
-                        drawingObject.checkBoundsFromTo();
-                    }
-                }
-            }
-            return;
-        }
-
-        var i, bNeedRecalc = false, drawingObject, coords;
-        if (target.target === AscCommonExcel.c_oTargetType.RowResize) {
-            for (i = 0; i < aObjects.length; i++) {
-                drawingObject = aObjects[i];
-
-                if (drawingObject.from.row >= target.row) {
-                    coords = _this.coordsManager.calculateCoords(drawingObject.from);
-                    AscFormat.CheckSpPrXfrm(drawingObject.graphicObject);
-
-                    var rot = AscFormat.isRealNumber(drawingObject.graphicObject.spPr.xfrm.rot) ? drawingObject.graphicObject.spPr.xfrm.rot : 0;
-                    rot = AscFormat.normalizeRotate(rot);
-                    if (AscFormat.checkNormalRotate(rot)) {
-                        drawingObject.graphicObject.spPr.xfrm.setOffX(pxToMm(coords.x));
-                        drawingObject.graphicObject.spPr.xfrm.setOffY(pxToMm(coords.y));
-                    } else {
-                        drawingObject.graphicObject.spPr.xfrm.setOffX(pxToMm(coords.x) - drawingObject.graphicObject.spPr.xfrm.extX / 2 + drawingObject.graphicObject.spPr.xfrm.extY / 2);
-                        drawingObject.graphicObject.spPr.xfrm.setOffY(pxToMm(coords.y) - drawingObject.graphicObject.spPr.xfrm.extY / 2 + drawingObject.graphicObject.spPr.xfrm.extX / 2);
-                    }
-                    drawingObject.graphicObject.checkDrawingBaseCoords();
-                    bNeedRecalc = true;
-                }
-            }
-        } else {
-            for (i = 0; i < aObjects.length; i++) {
-                drawingObject = aObjects[i];
-
-                if (drawingObject.from.col >= target.col) {
-                    coords = _this.coordsManager.calculateCoords(drawingObject.from);
-                    AscFormat.CheckSpPrXfrm(drawingObject.graphicObject);
-
-                    var rot = AscFormat.isRealNumber(drawingObject.graphicObject.spPr.xfrm.rot) ? drawingObject.graphicObject.spPr.xfrm.rot : 0;
-                    rot = AscFormat.normalizeRotate(rot);
-                    if (AscFormat.checkNormalRotate(rot)) {
-                        drawingObject.graphicObject.spPr.xfrm.setOffX(pxToMm(coords.x));
-                        drawingObject.graphicObject.spPr.xfrm.setOffY(pxToMm(coords.y));
-                    } else {
-                        drawingObject.graphicObject.spPr.xfrm.setOffX(pxToMm(coords.x) - drawingObject.graphicObject.spPr.xfrm.extX / 2 + drawingObject.graphicObject.spPr.xfrm.extY / 2);
-                        drawingObject.graphicObject.spPr.xfrm.setOffY(pxToMm(coords.y) - drawingObject.graphicObject.spPr.xfrm.extY / 2 + drawingObject.graphicObject.spPr.xfrm.extX / 2);
-                    }
-
-                    drawingObject.graphicObject.checkDrawingBaseCoords();
-                    bNeedRecalc = true;
-                }
-            }
-        }
-        if (bNeedRecalc) {
-            _this.controller.recalculate2();
-            _this.showDrawingObjects(true);
         }
     };
 

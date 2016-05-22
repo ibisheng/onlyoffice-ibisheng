@@ -10264,6 +10264,7 @@
         var fullRecalc = false;
         var reinitRanges = false;
         var updateDrawingObjectsInfo = null;
+        var updateDrawingObjectsInfo2 = null;//{bInsert: false, operType: c_oAscInsertOptions.InsertColumns, updateRange: arn}
         var cw;
         var isUpdateCols = false, isUpdateRows = false;
         var isCheckChangeAutoFilter;
@@ -10284,13 +10285,19 @@
             }
             t._cleanCellsTextMetricsCache();
             t._prepareCellTextMetricsCache();
-            if ( reinitRanges && t.objectRender && t.objectRender.drawingArea ) {
-                t.objectRender.drawingArea.reinitRanges();
+
+            if(t.objectRender) {
+                if ( reinitRanges  && t.objectRender.drawingArea ) {
+                    t.objectRender.drawingArea.reinitRanges();
+                }
+                if ( null !== updateDrawingObjectsInfo) {
+                    t.objectRender.updateSizeDrawingObjects( updateDrawingObjectsInfo );
+                }
+                if ( null !== updateDrawingObjectsInfo2 ) {
+                    t.objectRender.updateDrawingObject(updateDrawingObjectsInfo2.bInsert, updateDrawingObjectsInfo2.operType, updateDrawingObjectsInfo2.updateRange);
+                }
+                t.objectRender.rebuildChartGraphicObjects( oChangeData );
             }
-            if ( null !== updateDrawingObjectsInfo && t.objectRender ) {
-                t.objectRender.updateSizeDrawingObjects( updateDrawingObjectsInfo );
-            }
-            t.objectRender.rebuildChartGraphicObjects( oChangeData );
             t.draw( lockDraw );
 
             t.handlers.trigger( "reinitializeScroll" );
@@ -10388,7 +10395,7 @@
                                 fullRecalc = true;
                                 reinitRanges = true;
                                 t.cellCommentator.updateCommentsDependencies( true, val, arn );
-                                t.objectRender.updateDrawingObject( true, val, arn );
+                                updateDrawingObjectsInfo2 = {bInsert: true, operType: val, updateRange: arn};
                             }
                             History.EndTransaction();
                         };
@@ -10409,7 +10416,7 @@
                                 fullRecalc = true;
                                 reinitRanges = true;
                                 t.cellCommentator.updateCommentsDependencies( true, val, arn );
-                                t.objectRender.updateDrawingObject( true, val, arn );
+                                updateDrawingObjectsInfo2 = {bInsert: true, operType: val, updateRange: arn};
                             }
                             History.EndTransaction();
                         };
@@ -10430,7 +10437,7 @@
                             fullRecalc = true;
                             reinitRanges = true;
                             t.model.insertColsBefore( arn.c1, arn.c2 - arn.c1 + 1 );
-                            t.objectRender.updateDrawingObject( true, val, arn );
+                            updateDrawingObjectsInfo2 = {bInsert: true, operType: val, updateRange: arn};
                             t.cellCommentator.updateCommentsDependencies( true, val, arn );
                             History.EndTransaction();
                         };
@@ -10443,7 +10450,7 @@
                             fullRecalc = true;
                             reinitRanges = true;
                             t.model.insertRowsBefore( arn.r1, arn.r2 - arn.r1 + 1 );
-                            t.objectRender.updateDrawingObject( true, val, arn );
+                            updateDrawingObjectsInfo2 = {bInsert: true, operType: val, updateRange: arn};
                             t.cellCommentator.updateCommentsDependencies( true, val, arn );
                         };
 
@@ -10471,7 +10478,7 @@
                                 t._cleanCache( oChangeData.changedRange );
                                 t.cellCommentator.updateCommentsDependencies( false, val, checkRange );
                             } ) ) {
-                                t.objectRender.updateDrawingObject( false, val, checkRange );
+                                updateDrawingObjectsInfo2 = {bInsert: false, operType: val, updateRange: arn};
                             }
                             History.EndTransaction();
                             reinitRanges = true;
@@ -10496,7 +10503,7 @@
                                 t._cleanCache( oChangeData.changedRange );
                                 t.cellCommentator.updateCommentsDependencies( false, val, checkRange );
                             } ) ) {
-                                t.objectRender.updateDrawingObject( false, val, checkRange );
+                                updateDrawingObjectsInfo2 = {bInsert: false, operType: val, updateRange: arn};
                             }
                             History.EndTransaction();
 
@@ -10520,7 +10527,7 @@
                             t.cellCommentator.updateCommentsDependencies( false, val, checkRange );
                             t.model.autoFilters.isEmptyAutoFilters( arn, c_oAscDeleteOptions.DeleteColumns );
                             t.model.removeCols( checkRange.c1, checkRange.c2 );
-                            t.objectRender.updateDrawingObject( false, val, checkRange );
+                            updateDrawingObjectsInfo2 = {bInsert: false, operType: val, updateRange: arn};
                             History.EndTransaction();
                         };
 
@@ -10541,7 +10548,7 @@
                             t.cellCommentator.updateCommentsDependencies( false, val, checkRange );
                             t.model.autoFilters.isEmptyAutoFilters( arn, c_oAscDeleteOptions.DeleteRows );
                             t.model.removeRows( checkRange.r1, checkRange.r2 );
-                            t.objectRender.updateDrawingObject( false, val, checkRange );
+                            updateDrawingObjectsInfo2 = {bInsert: false, operType: val, updateRange: arn};
                             History.EndTransaction();
                         };
 
