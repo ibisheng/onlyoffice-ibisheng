@@ -465,6 +465,7 @@ CGraphicObjects.prototype =
                 shape_props.vert = props_by_types.shapeProps.vert;
                 shape_props.Width = props_by_types.shapeProps.w;
                 shape_props.Height = props_by_types.shapeProps.h;
+                shape_props.lockAspect = props_by_types.shapeProps.lockAspect;
             }
             if(props_by_types.imageProps)
             {
@@ -472,6 +473,7 @@ CGraphicObjects.prototype =
                 image_props.ImageUrl = props_by_types.imageProps.ImageUrl;
                 image_props.Width = props_by_types.imageProps.w;
                 image_props.Height = props_by_types.imageProps.h;
+                image_props.lockAspect = props_by_types.imageProps.lockAspect;
             }
             if(props_by_types.chartProps && !(props_by_types.chartProps.severalCharts === true))
             {

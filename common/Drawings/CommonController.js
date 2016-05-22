@@ -2340,7 +2340,22 @@ DrawingObjectsController.prototype =
             }
         }
 
-        if(isRealObject(props.Position) &&AscFormat.isRealNumber(props.Position.X) && AscFormat.isRealNumber(props.Position.Y))
+        if(AscFormat.isRealBool(props.lockAspect))
+        {
+            for(i = 0; i < objects_by_type.shapes.length; ++i)
+            {
+                objects_by_type.shapes[i].setNoChangeAspect(props.lockAspect ? true : undefined);
+            }
+            for(i = 0; i < objects_by_type.images.length; ++i)
+            {
+                objects_by_type.images[i].setNoChangeAspect(props.lockAspect ? true : undefined);
+            }
+            for(i = 0; i < objects_by_type.charts.length; ++i)
+            {
+                objects_by_type.charts[i].setNoChangeAspect(props.lockAspect ? true : undefined);
+            }
+        }
+        if(isRealObject(props.Position) && AscFormat.isRealNumber(props.Position.X) && AscFormat.isRealNumber(props.Position.Y))
         {
             for(i = 0; i < objects_by_type.shapes.length; ++i)
             {
@@ -6429,6 +6444,7 @@ DrawingObjectsController.prototype =
                     }
                 }
             }
+            var lockAspect = drawing.getNoChangeAspect();
             switch(drawing.getObjectType())
             {
                 case AscDFH.historyitem_type_Shape:
@@ -6448,7 +6464,8 @@ DrawingObjectsController.prototype =
                         canChangeArrows: drawing.canChangeArrows(),
                         bFromChart: false,
                         locked: locked,
-                        textArtProperties: drawing.getTextArtProperties()
+                        textArtProperties: drawing.getTextArtProperties(),
+                        lockAspect: lockAspect
                     };
                     if(!shape_props)
                         shape_props = new_shape_props;
@@ -6467,7 +6484,8 @@ DrawingObjectsController.prototype =
                         h: drawing.extY,
                         locked: locked,
                         x: drawing.x,
-                        y: drawing.y
+                        y: drawing.y,
+                        lockAspect: lockAspect
                     };
                     if(!image_props)
                         image_props = new_image_props;
@@ -6486,6 +6504,9 @@ DrawingObjectsController.prototype =
 
                         if(image_props.locked || new_image_props.locked)
                             image_props.locked = true;
+                        if(image_props.lockAspect || new_image_props.lockAspect)
+                            image_props.lockAspect = false;
+                        
                     }
                     break;
                 }
@@ -6499,7 +6520,8 @@ DrawingObjectsController.prototype =
                         styleId: drawing.style,
                         w: drawing.extX,
                         h: drawing.extY,
-                        locked: locked
+                        locked: locked,
+                        lockAspect: lockAspect
                     };
                     if(!chart_props)
                     {
@@ -6529,6 +6551,8 @@ DrawingObjectsController.prototype =
 
                         if(chart_props.locked || new_chart_props.locked)
                             chart_props.locked = true;
+                        if(!chart_props.lockAspect || !new_chart_props.lockAspect)
+                            chart_props.locked = false;
                     }
 
                     new_shape_props =
@@ -6545,7 +6569,8 @@ DrawingObjectsController.prototype =
                         canChangeArrows: false,
                         bFromChart: true,
                         locked: locked,
-                        textArtProperties: null
+                        textArtProperties: null,
+                        lockAspect: lockAspect
                     };
                     if(!shape_props)
                         shape_props = new_shape_props;
@@ -6662,6 +6687,8 @@ DrawingObjectsController.prototype =
 
                             if(image_props.locked || group_drawing_props.imageProps.locked)
                                 image_props.locked = true;
+                            if(!image_props.lockAspect || !group_drawing_props.imageProps.lockAspect)
+                                image_props.lockAspect = false;
                         }
                     }
                     if(group_drawing_props.chartProps)
@@ -6778,6 +6805,7 @@ DrawingObjectsController.prototype =
             shape_props.ShapeProperties.stroke = props.shapeChartProps.stroke;
             shape_props.ShapeProperties.canChangeArrows = props.shapeChartProps.canChangeArrows;
             shape_props.ShapeProperties.bFromChart = props.shapeChartProps.bFromChart;
+            shape_props.ShapeProperties.lockAspect = props.shapeChartProps.lockAspect;
 
             if(props.shapeChartProps.paddings)
             {
@@ -6841,6 +6869,7 @@ DrawingObjectsController.prototype =
             shape_props.ShapeProperties.stroke = props.shapeProps.stroke;
             shape_props.ShapeProperties.canChangeArrows = props.shapeProps.canChangeArrows;
             shape_props.ShapeProperties.bFromChart = props.shapeProps.bFromChart;
+            shape_props.ShapeProperties.lockAspect = props.shapeProps.lockAspect;
             shape_props.ShapeProperties.textArtProperties = AscFormat.CreateAscTextArtProps(props.shapeProps.textArtProperties);
 
             if(props.shapeProps.textArtProperties)

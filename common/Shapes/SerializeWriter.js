@@ -2801,7 +2801,8 @@ function CBinaryFileWriter()
                 }
             }
         }
-
+        shape.nvSpPr.locks = shape.locks;
+        shape.nvSpPr.objectType = shape.getObjectType();
         oThis.WriteRecord2(0, shape.nvSpPr, oThis.WriteUniNvPr);
         oThis.WriteRecord1(1, shape.spPr, oThis.WriteSpPr);
         oThis.WriteRecord2(2, shape.style, oThis.WriteShapeStyle);
@@ -2828,6 +2829,9 @@ function CBinaryFileWriter()
             oThis.StartRecord(2);
         }
 
+
+        image.nvPicPr.locks = image.locks;
+        image.nvPicPr.objectType = image.getObjectType();
         oThis.WriteRecord1(0, image.nvPicPr, this.WriteUniNvPr);
 
         image.spPr.WriteXfrm = image.spPr.xfrm;
@@ -2867,6 +2871,9 @@ function CBinaryFileWriter()
         oThis.WriteUChar(g_nodeAttributeStart);
         oThis.WriteUChar(g_nodeAttributeEnd);
 
+
+        grObj.nvGraphicFramePr.locks = grObj.locks;
+        grObj.nvGraphicFramePr.objectType = grObj.getObjectType();
         oThis.WriteRecord1(0, grObj.nvGraphicFramePr, oThis.WriteUniNvPr);
 
         if (grObj.spPr.xfrm && grObj.spPr.xfrm.isNotNull())
@@ -3241,6 +3248,9 @@ function CBinaryFileWriter()
 
         var _old_ph = group.nvGrpSpPr.nvPr.ph;
         group.nvGrpSpPr.nvPr.ph = null;
+
+        group.nvGrpSpPr.locks = group.locks;
+        group.nvGrpSpPr.objectType = group.getObjectType();
         oThis.WriteRecord1(0, group.nvGrpSpPr, oThis.WriteUniNvPr);
         group.nvGrpSpPr.nvPr.ph = _old_ph;
 
@@ -3422,9 +3432,127 @@ function CBinaryFileWriter()
         oThis.WriteUChar(g_nodeAttributeEnd);
     }
 
+    this.WriteSpCNvPr = function (locks) {
+        oThis.WriteUChar(g_nodeAttributeStart);
+        if(locks & AscFormat.LOCKS_MASKS.noAdjustHandles)
+            oThis._WriteBool2(1, !!(locks & AscFormat.LOCKS_MASKS.noAdjustHandles << 1));
+        if(locks & AscFormat.LOCKS_MASKS.noChangeArrowheads)
+            oThis._WriteBool2(2, !!(locks & (AscFormat.LOCKS_MASKS.noChangeArrowheads << 1)));
+        if(locks & AscFormat.LOCKS_MASKS.noChangeAspect)
+            oThis._WriteBool2(3, !!(locks & (AscFormat.LOCKS_MASKS.noChangeAspect << 1)));
+        if(locks & AscFormat.LOCKS_MASKS.noChangeShapeType)
+            oThis._WriteBool2(4, !!(locks & (AscFormat.LOCKS_MASKS.noChangeShapeType << 1)));
+        if(locks & AscFormat.LOCKS_MASKS.noEditPoints)
+            oThis._WriteBool2(5, !!(locks & (AscFormat.LOCKS_MASKS.noEditPoints << 1)));
+        if(locks & AscFormat.LOCKS_MASKS.noGrp)
+            oThis._WriteBool2(6, !!(locks & (AscFormat.LOCKS_MASKS.noGrp << 1)));
+        if(locks & AscFormat.LOCKS_MASKS.noMov)
+            oThis._WriteBool2(7, !!(locks & (AscFormat.LOCKS_MASKS.noMove << 1)));
+        if(locks & AscFormat.LOCKS_MASKS.noResize)
+            oThis._WriteBool2(8, !!(locks & (AscFormat.LOCKS_MASKS.noResize << 1)));
+        if(locks & AscFormat.LOCKS_MASKS.noRot)
+            oThis._WriteBool2(9, !!(locks & (AscFormat.LOCKS_MASKS.noRot << 1)));
+        if(locks & AscFormat.LOCKS_MASKS.noSelect)
+            oThis._WriteBool2(10, !!(locks & (AscFormat.LOCKS_MASKS.noSelect << 1)));
+        if(locks & AscFormat.LOCKS_MASKS.noTextEdit)
+            oThis._WriteBool2(11, !!(locks & (AscFormat.LOCKS_MASKS.noTextEdit << 1)));
+        oThis.WriteUChar(g_nodeAttributeEnd);
+    };
+
+    this.WritePicCNvPr = function (locks) {
+        oThis.WriteUChar(g_nodeAttributeStart);
+        if(locks & AscFormat.LOCKS_MASKS.noAdjustHandles)
+            oThis._WriteBool2(1,  !!(locks & (AscFormat.LOCKS_MASKS.noAdjustHandles << 1)));
+        if(locks & AscFormat.LOCKS_MASKS.noChangeArrowheads)
+            oThis._WriteBool2(2,  !!(locks & (AscFormat.LOCKS_MASKS.noChangeArrowheads << 1)));
+        if(locks & AscFormat.LOCKS_MASKS.noChangeAspect)
+            oThis._WriteBool2(3,  !!(locks & (AscFormat.LOCKS_MASKS.noChangeAspect << 1)));
+        if(locks & AscFormat.LOCKS_MASKS.noChangeShapeType)
+            oThis._WriteBool2(4,  !!(locks & (AscFormat.LOCKS_MASKS.noChangeShapeType << 1)));
+        if(locks & AscFormat.LOCKS_MASKS.noCrop)
+            oThis._WriteBool2(5,  !!(locks & (AscFormat.LOCKS_MASKS.noCrop << 1)));
+        if(locks & AscFormat.LOCKS_MASKS.noEditPoints)
+            oThis._WriteBool2(6,  !!(locks & (AscFormat.LOCKS_MASKS.noEditPoints << 1)));
+        if(locks & AscFormat.LOCKS_MASKS.noGrp)
+            oThis._WriteBool2(7,  !!(locks & (AscFormat.LOCKS_MASKS.noGrp << 1)));
+        if(locks & AscFormat.LOCKS_MASKS.noMove)
+            oThis._WriteBool2(8,  !!(locks & (AscFormat.LOCKS_MASKS.noMove << 1)));
+        if(locks & AscFormat.LOCKS_MASKS.noResize)
+            oThis._WriteBool2(9,  !!(locks & (AscFormat.LOCKS_MASKS.noResize << 1)));
+        if(locks & AscFormat.LOCKS_MASKS.noRot)
+            oThis._WriteBool2(10, !!(locks & (AscFormat.LOCKS_MASKS.noRot << 1)));
+        if(locks & AscFormat.LOCKS_MASKS.noSelect)
+            oThis._WriteBool2(11, !!(locks & (AscFormat.LOCKS_MASKS.noSelect << 1)));
+        oThis.WriteUChar(g_nodeAttributeEnd);
+    };
+
+    this.WriteGrpCNvPr = function(locks) {
+        oThis.WriteUChar(g_nodeAttributeStart);
+        if(locks & AscFormat.noChangeAspect)
+            oThis._WriteBool2(0, !!(locks & (AscFormat.noChangeAspect << 1)));
+        if(locks & AscFormat.noGrp)
+            oThis._WriteBool2(1, !!(locks & (AscFormat.noGrp << 1)));
+        if(locks & AscFormat.noMove)
+            oThis._WriteBool2(2, !!(locks & (AscFormat.noMove << 1)));
+        if(locks & AscFormat.noResize)
+            oThis._WriteBool2(3, !!(locks & (AscFormat.noResize << 1)));
+        if(locks & AscFormat.noRot)
+            oThis._WriteBool2(4, !!(locks & (AscFormat.noRot << 1)));
+        if(locks & AscFormat.noSelect)
+            oThis._WriteBool2(5, !!(locks & (AscFormat.noSelect << 1)));
+        if(locks & AscFormat.noUngrp)
+            oThis._WriteBool2(6, !!(locks & (AscFormat.noUngrp << 1)));
+        oThis.WriteUChar(g_nodeAttributeEnd);
+    };
+    this.WriteGrFrameCNvPr = function(locks) {
+        oThis.WriteUChar(g_nodeAttributeStart);
+        if(locks & AscFormat.noChangeAspect)
+            oThis._WriteBool2(0, !!(locks & (AscFormat.noChangeAspect << 1)));
+        if(locks & AscFormat.noDrilldown)
+            oThis._WriteBool2(1, !!(locks & (AscFormat.noDrilldown << 1)));
+        if(locks & AscFormat.noGrp)
+            oThis._WriteBool2(2, !!(locks & (AscFormat.noGrp << 1)));
+        if(locks & AscFormat.noMove)
+            oThis._WriteBool2(3, !!(locks & (AscFormat.noMove << 1)));
+        if(locks & AscFormat.noResize)
+            oThis._WriteBool2(4, !!(locks & (AscFormat.noResize << 1)));
+        if(locks & AscFormat.noSelect)
+            oThis._WriteBool2(5, !!(locks & (AscFormat.noSelect << 1)));
+        oThis.WriteUChar(g_nodeAttributeEnd);
+    };
+
     this.WriteUniNvPr = function(nv)
     {
         oThis.WriteRecord1(0, nv.cNvPr, oThis.Write_cNvPr);
+        if(AscFormat.isRealNumber(nv.locks) && nv.locks !== 0 && AscFormat.isRealNumber(nv.objectType))
+        {
+            switch(nv.objectType)
+            {
+                case AscDFH.historyitem_type_Shape:
+                {
+                    oThis.WriteRecord1(0, nv.locks, oThis.WriteSpCNvPr);
+                    break;
+                }
+                case AscDFH.historyitem_type_ImageShape:
+                {
+                    oThis.WriteRecord1(0, nv.locks, oThis.WritePicCNvPr);
+                    break;
+                }
+                case AscDFH.historyitem_type_GroupShape:
+                {
+                    oThis.WriteRecord1(0, nv.locks, oThis.WriteGrpCNvPr);
+                    break;
+                }
+                case AscDFH.historyitem_type_GraphicFrame:
+                case AscDFH.historyitem_type_ChartSpace:
+                {
+                    oThis.WriteRecord1(0, nv.locks, oThis.WriteGrFrameCNvPr);
+                    break;
+                }
+            }
+        }
+        nv.locks     = null;
+        nv.objectType = null;
         oThis.WriteRecord1(2, nv.nvPr, oThis.Write_nvPr);
     }
 

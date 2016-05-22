@@ -4808,7 +4808,12 @@ function BinaryPPTYLoader()
             {
                 case 0:
                 {
-                    shape.setNvSpPr(this.ReadNvUniProp());
+                    var pr = this.ReadNvUniProp(shape.getObjectType());
+                    shape.setNvSpPr(pr);
+                    if(AscFormat.isRealNumber(pr.locks))
+                    {
+                        shape.setLocks(pr.locks);
+                    }
                     break;
                 }
                 case 1:
@@ -4859,7 +4864,12 @@ function BinaryPPTYLoader()
             {
                 case 0:
                 {
-                    shape.setNvSpPr(this.ReadNvUniProp());
+                    var pr = this.ReadNvUniProp(shape.getObjectType());
+                    shape.setNvSpPr(pr);
+                    if(AscFormat.isRealNumber(pr.locks))
+                    {
+                        shape.setLocks(pr.locks);
+                    }
                     break;
                 }
                 case 1:
@@ -5091,7 +5101,11 @@ function BinaryPPTYLoader()
             {
                 case 0:
                 {
-                    pic.setNvSpPr(this.ReadNvUniProp());
+                    var pr = this.ReadNvUniProp(pic.getObjectType());
+                    pic.setNvSpPr(pr);
+                    if(AscFormat.isRealNumber(pr.locks)){
+                        pic.setLocks(pr.locks);
+                    }
                     break;
                 }
                 case 1:
@@ -5149,7 +5163,11 @@ function BinaryPPTYLoader()
             {
                 case 0:
                 {
-                    shape.setNvSpPr(this.ReadNvUniProp());
+                    var pr = this.ReadNvUniProp(shape);
+                    shape.setNvSpPr(pr);
+                    if(AscFormat.isRealNumber(pr.locks)){
+                        shape.setLocks(pr.locks);
+                    }
                     break;
                 }
                 case 1:
@@ -5217,7 +5235,7 @@ function BinaryPPTYLoader()
             {
                 case 0:
                 {
-                    _nvGraphicFramePr = this.ReadNvUniProp();
+                    _nvGraphicFramePr = this.ReadNvUniProp(AscDFH.historyitem_type_GraphicFrame);
                     break;
                 }
                 case 1:
@@ -5246,7 +5264,10 @@ function BinaryPPTYLoader()
                     var oBinaryChartReader = new AscCommon.BinaryChartReader(_stream);
                     oBinaryChartReader.ExternalReadCT_ChartSpace(_length, _chart, this.presentation);
                     _chart.setBDeleted(false);
-
+                    if(AscCommon.isRealObject(_nvGraphicFramePr) && AscFormat.isRealNumber(_nvGraphicFramePr.locks))
+                    {
+                        _chart.setLocks(_nvGraphicFramePr.locks);
+                    }
                     if(_xfrm)
                     {
                         if(!_chart.spPr)
@@ -5321,7 +5342,7 @@ function BinaryPPTYLoader()
             {
                 case 0:
                 {
-                    _nvGraphicFramePr = this.ReadNvUniProp();
+                    _nvGraphicFramePr = this.ReadNvUniProp(AscDFH.historyitem_type_GraphicFrame);
                     break;
                 }
                 case 1:
@@ -5352,6 +5373,10 @@ function BinaryPPTYLoader()
                         AscCommon.pptx_content_loader.Reader.ImageMapChecker = this.ImageMapChecker;
                         var oBinaryChartReader = new AscCommon.BinaryChartReader(_stream);
                         oBinaryChartReader.ExternalReadCT_ChartSpace(_length, _chart, this.presentation);
+                        if(AscCommon.isRealObject(_nvGraphicFramePr) && AscFormat.isRealNumber(_nvGraphicFramePr.locks))
+                        {
+                            _chart.setLocks(_nvGraphicFramePr.locks);
+                        }
                     }
 
                     s.Seek2(_pos + _length);
@@ -5381,6 +5406,10 @@ function BinaryPPTYLoader()
             _xfrm.setParent(_graphic_frame.spPr);
             _graphic_frame.setSpPr(_graphic_frame.spPr);
             _graphic_frame.setNvSpPr(_nvGraphicFramePr);
+            if(AscCommon.isRealObject(_nvGraphicFramePr) && AscFormat.isRealNumber(_nvGraphicFramePr.locks))
+            {
+                _graphic_frame.setLocks(_nvGraphicFramePr.locks);
+            }
             _graphic_frame.setGraphicObject(_table);
             _graphic_frame.setBDeleted(false);
         }
@@ -5399,7 +5428,7 @@ function BinaryPPTYLoader()
         return _graphic_frame;
     }
 
-    this.ReadNvUniProp = function()
+    this.ReadNvUniProp = function(drawingType)
     {
         var prop = new AscFormat.UniNvPr();
 
@@ -5420,9 +5449,270 @@ function BinaryPPTYLoader()
                 }
                 case 1:
                 {
-                    var _len = s.GetULong();
-                    s.Skip2(_len);
-                    // different props
+
+                    var end = s.cur + s.GetULong() + 4;
+                    var locks = 0;
+                    if(AscFormat.isRealNumber(drawingType))
+                    {
+                        switch(drawingType)
+                        {
+                            case AscDFH.historyitem_type_Shape:
+                            {
+                                s.Skip2(1); // attribute start
+                                while (true)
+                                {
+                                    var _at2 = s.GetUChar();
+                                    if (_at2 == g_nodeAttributeEnd)
+                                        break;
+
+                                    var value;
+                                    switch(_at2)
+                                    {
+                                        case 1 :{
+                                            value = s.GetBool();
+                                            locks |= (AscFormat.LOCKS_MASKS.noAdjustHandles | (value ? AscFormat.LOCKS_MASKS.noAdjustHandles << 1 : 0));
+                                            break;
+                                        }
+                                        case 2 :{
+                                            value = s.GetBool();
+                                            locks |= (AscFormat.LOCKS_MASKS.noChangeArrowheads | (value ? AscFormat.LOCKS_MASKS.noChangeArrowheads << 1 : 0));
+                                            break;
+                                        }
+                                        case 3 :{
+                                            value = s.GetBool();
+                                            locks |= (AscFormat.LOCKS_MASKS.noChangeAspect | (value ? AscFormat.LOCKS_MASKS.noChangeAspect << 1 : 0));
+                                            break;
+                                        }
+                                        case 4 :{
+                                            value = s.GetBool();
+                                            locks |= (AscFormat.LOCKS_MASKS.noChangeShapeType | (value ? AscFormat.LOCKS_MASKS.noChangeShapeType << 1 : 0));
+                                            break;
+                                        }
+                                        case 5 :{
+                                            value = s.GetBool();
+                                            locks |= (AscFormat.LOCKS_MASKS.noEditPoints | (value ? AscFormat.LOCKS_MASKS.noEditPoints << 1 : 0));
+                                            break;
+                                        }
+                                        case 6 :{
+                                            value = s.GetBool();
+                                            locks |= (AscFormat.LOCKS_MASKS.noGrp | (value ? AscFormat.LOCKS_MASKS.noGrp << 1 : 0));
+                                            break;
+                                        }
+                                        case 7 :{
+                                            value = s.GetBool();
+                                            locks |= (AscFormat.LOCKS_MASKS.noMove | (value ? AscFormat.LOCKS_MASKS.noMove << 1 : 0));
+                                            break;
+                                        }
+                                        case 8 :{
+                                            value = s.GetBool();
+                                            locks |= (AscFormat.LOCKS_MASKS.noResize | (value ? AscFormat.LOCKS_MASKS.noResize << 1 : 0));
+                                            break;
+                                        }
+                                        case 9 :{
+                                            value = s.GetBool();
+                                            locks |= (AscFormat.LOCKS_MASKS.noRot | (value ? AscFormat.LOCKS_MASKS.noRot << 1 : 0));
+                                            break;
+                                        }
+                                        case 10:{
+                                            value = s.GetBool();
+                                            locks |= (AscFormat.LOCKS_MASKS.noSelect | (value ? AscFormat.LOCKS_MASKS.noSelect << 1 : 0));
+                                            break;
+                                        }
+                                        case 11:{
+                                            value = s.GetBool();
+                                            locks |= (AscFormat.LOCKS_MASKS.noTextEdit | (value ? AscFormat.LOCKS_MASKS.noTextEdit << 1 : 0));
+                                            break;
+                                        }
+                                    }
+                                }
+                                prop.locks = locks;
+                                break;
+                            }
+                            case AscDFH.historyitem_type_GroupShape:
+                            {
+                                s.Skip2(1); // attribute start
+                                while (true)
+                                {
+                                    var _at2 = s.GetUChar();
+                                    if (_at2 == g_nodeAttributeEnd)
+                                        break;
+
+                                    var value;
+                                    switch(_at2)
+                                    {
+                                        case 0:
+                                        {
+                                            value = s.GetBool();
+                                            locks |= (AscFormat.LOCKS_MASKS.noChangeAspect | (value ? AscFormat.LOCKS_MASKS.noChangeAspect << 1 : 0));
+                                            break;
+                                        }
+                                        case 1:
+                                        {
+                                            value = s.GetBool();
+                                            locks |= (AscFormat.LOCKS_MASKS.noGrp | (value ? AscFormat.LOCKS_MASKS.noGrp << 1 : 0));
+                                            break;
+                                        }
+                                        case 2:
+                                        {
+                                            value = s.GetBool();
+                                            locks |= (AscFormat.LOCKS_MASKS.noMove | (value ? AscFormat.LOCKS_MASKS.noMove << 1 : 0));
+                                            break;
+                                        }
+                                        case 3:
+                                        {
+                                            value = s.GetBool();
+                                            locks |= (AscFormat.LOCKS_MASKS.noResize | (value ? AscFormat.LOCKS_MASKS.noResize << 1 : 0));
+                                            break;
+                                        }
+                                        case 4:
+                                        {
+                                            value = s.GetBool();
+                                            locks |= (AscFormat.LOCKS_MASKS.noRot | (value ? AscFormat.LOCKS_MASKS.noRot << 1 : 0));
+                                            break;
+                                        }
+                                        case 5:
+                                        {
+                                            value = s.GetBool();
+                                            locks |= (AscFormat.LOCKS_MASKS.noSelect | (value ? AscFormat.LOCKS_MASKS.noSelect << 1 : 0));
+                                            break;
+                                        }
+                                        case 6:
+                                        {
+                                            value = s.GetBool();
+                                            locks |= (AscFormat.LOCKS_MASKS.noUngrp | (value ? AscFormat.LOCKS_MASKS.noUngrp << 1 : 0));
+                                            break;
+                                        }
+                                    }
+                                }
+                                prop.locks = locks;
+                                break;
+                            }
+                            case AscDFH.historyitem_type_ImageShape:
+                            {
+                                s.Skip2(1); // attribute start
+                                while (true)
+                                {
+                                    var _at2 = s.GetUChar();
+                                    if (_at2 == g_nodeAttributeEnd)
+                                        break;
+
+                                    var value;
+                                    switch(_at2)
+                                    {
+                                        case 0 :{
+                                            break;
+                                        }
+                                        case 1 :{
+                                            value = s.GetBool();
+                                            locks |= (AscFormat.LOCKS_MASKS.noAdjustHandles | (value ? AscFormat.LOCKS_MASKS.noAdjustHandles << 1 : 0));
+                                            break;
+                                            }
+                                        case 2 :{
+                                            value = s.GetBool();
+                                            locks |= (AscFormat.LOCKS_MASKS.noChangeArrowheads | (value ? AscFormat.LOCKS_MASKS.noChangeArrowheads << 1 : 0));
+                                            break;
+                                            }
+                                        case 3 :{
+                                            value = s.GetBool();
+                                            locks |= (AscFormat.LOCKS_MASKS.noChangeAspect | (value ? AscFormat.LOCKS_MASKS.noChangeAspect << 1 : 0));
+                                            break;
+                                            }
+                                        case 4 :{
+                                            value = s.GetBool();
+                                            locks |= (AscFormat.LOCKS_MASKS.noChangeShapeType | (value ? AscFormat.LOCKS_MASKS.noChangeShapeType << 1 : 0));
+                                            break;
+                                            }
+                                        case 5 :{
+                                            value = s.GetBool();
+                                            locks |= (AscFormat.LOCKS_MASKS.noCrop | (value ? AscFormat.LOCKS_MASKS.noCrop << 1 : 0));
+                                            break;
+                                            }
+                                        case 6 :{
+                                            value = s.GetBool();
+                                            locks |= (AscFormat.LOCKS_MASKS.noEditPoints | (value ? AscFormat.LOCKS_MASKS.noEditPoints << 1 : 0));
+                                            break;
+                                            }
+                                        case 7 :{
+                                            value = s.GetBool();
+                                            locks |= (AscFormat.LOCKS_MASKS.noGrp | (value ? AscFormat.LOCKS_MASKS.noGrp << 1 : 0));
+                                            break;
+                                            }
+                                        case 8 :{
+                                            value = s.GetBool();
+                                            locks |= (AscFormat.LOCKS_MASKS.noMove | (value ? AscFormat.LOCKS_MASKS.noMove << 1 : 0));
+                                            break;
+                                            }
+                                        case 9 :{
+                                            value = s.GetBool();
+                                            locks |= (AscFormat.LOCKS_MASKS.noResize | (value ? AscFormat.LOCKS_MASKS.noResize << 1 : 0));
+                                            break;
+                                            }
+                                        case 10:{
+                                            value = s.GetBool();
+                                            locks |= (AscFormat.LOCKS_MASKS.noRot | (value ? AscFormat.LOCKS_MASKS.noRot << 1 : 0));
+                                            break;
+                                            }
+                                        case 11:{
+                                            value = s.GetBool();
+                                            locks |= (AscFormat.LOCKS_MASKS.noSelect | (value ? AscFormat.LOCKS_MASKS.noSelect << 1 : 0));
+                                            break;
+                                            }
+                                    }
+                                }
+                                prop.locks = locks;
+                                break;
+                            }
+                            case AscDFH.historyitem_type_GraphicFrame:
+                            case AscDFH.historyitem_type_ChartSpace:
+                            {
+                                s.Skip2(1); // attribute start
+                                while (true)
+                                {
+                                    var _at2 = s.GetUChar();
+                                    if (_at2 == g_nodeAttributeEnd)
+                                        break;
+
+                                    var value;
+                                    switch(_at2)
+                                    {
+                                        case 0: {
+                                            value = s.GetBool();
+                                            locks |= (AscFormat.LOCKS_MASKS.noChangeAspect | (value ? AscFormat.LOCKS_MASKS.noChangeAspect << 1 : 0));
+                                            break;
+                                        }
+                                        case 1: {
+                                            value = s.GetBool();
+                                            locks |= (AscFormat.LOCKS_MASKS.noDrilldown | (value ? AscFormat.LOCKS_MASKS.noDrilldown << 1 : 0));
+                                            break;
+                                        }
+                                        case 2: {
+                                            value = s.GetBool();
+                                            locks |= (AscFormat.LOCKS_MASKS.noGrp | (value ? AscFormat.LOCKS_MASKS.noGrp << 1 : 0));
+                                            break;
+                                        }
+                                        case 3: {
+                                            value = s.GetBool();
+                                            locks |= (AscFormat.LOCKS_MASKS.noMove | (value ? AscFormat.LOCKS_MASKS.noMove << 1 : 0));
+                                            break;
+                                        }
+                                        case 4: {
+                                            value = s.GetBool();
+                                            locks |= (AscFormat.LOCKS_MASKS.noResize | (value ? AscFormat.LOCKS_MASKS.noResize << 1 : 0));
+                                            break;
+                                        }
+                                        case 5: {
+                                            value = s.GetBool();
+                                            locks |= (AscFormat.LOCKS_MASKS.noSelect | (value ? AscFormat.LOCKS_MASKS.noSelect << 1 : 0));
+                                            break;
+                                        }
+                                    }
+                                }
+                                prop.locks = locks;
+                                break;
+                            }
+                        }
+                    }
+                    s.Seek2(end);
                     break;
                 }
                 case 2:
@@ -8294,7 +8584,12 @@ function CPres()
                 {
                     case 0:
                     {
-                        s.SkipRecord();
+                        var pr = this.Reader.ReadNvUniProp(shape);
+                        shape.setNvSpPr(pr);
+                        if(AscFormat.isRealNumber(pr.locks))
+                        {
+                            shape.setLocks(pr.locks);
+                        }
                         break;
                     }
                     case 1:
@@ -8444,7 +8739,12 @@ function CPres()
                 {
                     case 0:
                     {
-                        s.SkipRecord();
+                        var pr = this.Reader.ReadNvUniProp(pic);
+                        pic.setNvSpPr(pr);
+                        if(AscFormat.isRealNumber(pr.locks))
+                        {
+                            pic.setLocks(pr.locks);
+                        }
                         break;
                     }
                     case 1:

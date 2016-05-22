@@ -663,6 +663,11 @@ CImageShape.prototype.Undo = function(data)
 {
     switch(data.Type)
     {
+        case AscDFH.historyitem_AutoShapes_SetLocks:
+        {
+            this.locks = data.oldPr;
+            break;
+        }
         case AscDFH.historyitem_ImageShapeSetData:
         {
             this.m_sData = data.oldData;
@@ -761,6 +766,11 @@ CImageShape.prototype.Redo = function(data)
     switch(data.Type)
     {
 
+        case AscDFH.historyitem_AutoShapes_SetLocks:
+        {
+            this.locks = data.newPr;
+            break;
+        }
         case AscDFH.historyitem_ImageShapeSetData:
         {
             this.m_sData = data.newData;
@@ -860,6 +870,11 @@ CImageShape.prototype.Save_Changes = function(data, w)
     w.WriteLong(data.Type);
     switch(data.Type)
     {
+        case AscDFH.historyitem_AutoShapes_SetLocks:
+        {
+            w.WriteLong(data.newPr);
+            break;
+        }
         case AscDFH.historyitem_ImageShapeSetData:
         {
             AscFormat.writeString(w, data.newData);
@@ -951,6 +966,11 @@ CImageShape.prototype.Load_Changes = function(r)
     var type = r.GetLong();
     switch(type)
     {
+        case AscDFH.historyitem_AutoShapes_SetLocks:
+        {
+            this.locks = r.GetLong();
+            break;
+        }
         case AscDFH.historyitem_ImageShapeSetData:
         {
             this.m_sData = AscFormat.readString(r);

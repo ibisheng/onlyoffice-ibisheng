@@ -117,7 +117,7 @@ function CAscChartProp( obj )
     this.Position      = new Asc.CPosition({X: obj.x, Y: obj.y});
 
     this.Locked        = (undefined != obj.locked) ? obj.locked : false;
-
+    this.lockAspect    = (undefined != obj.lockAspect) ? obj.lockAspect : false;
     this.ChartProperties = (undefined != obj.chartProps) ? obj.chartProps : null;
 
     this.severalCharts = obj.severalCharts != undefined ? obj.severalCharts : false;
@@ -130,7 +130,7 @@ function CAscChartProp( obj )
     this.Height        = undefined;
     this.Position      = undefined;
     this.Locked   = false;
-
+    this.lockAspect    = false;
     this.ChartProperties = new AscCommon.asc_ChartSettings();
 
     this.severalCharts = false;
@@ -387,6 +387,14 @@ CAscChartProp.prototype.getStyle = function()
 CAscChartProp.prototype.putStyle = function(v)
 {
   return this.ChartProperties && this.ChartProperties.putStyle(v);
+};
+CAscChartProp.prototype.getLockAspect = function()
+{
+  return this.lockAspect;
+};
+CAscChartProp.prototype.putLockAspect = function(v)
+{
+  return this.lockAspect = v;
 };
 
 CAscChartProp.prototype.changeType = function(v)
@@ -5778,7 +5786,7 @@ function CContextMenuData(oData)
     }
     else
     {
-        this.Type  = Asc.c_oAscContextMenuTypes.Main;
+        this.Type  = Asc['c_oAscContextMenuTypes'].Main;
         this.X_abs = 0;
         this.Y_abs = 0;
         this.IsSlideSelect = true;
@@ -6711,6 +6719,8 @@ CAscChartProp.prototype['getType'] = CAscChartProp.prototype.getType;
 CAscChartProp.prototype['putType'] = CAscChartProp.prototype.putType;
 CAscChartProp.prototype['getStyle'] = CAscChartProp.prototype.getStyle;
 CAscChartProp.prototype['putStyle'] = CAscChartProp.prototype.putStyle;
+CAscChartProp.prototype['putLockAspect'] = CAscChartProp.prototype.putLockAspect;
+CAscChartProp.prototype['getLockAspect'] = CAscChartProp.prototype.getLockAspect;
 CAscChartProp.prototype['changeType'] = CAscChartProp.prototype.changeType;
 CDocInfoProp.prototype['get_PageCount'] = CDocInfoProp.prototype.get_PageCount;
 CDocInfoProp.prototype['put_PageCount'] = CDocInfoProp.prototype.put_PageCount;

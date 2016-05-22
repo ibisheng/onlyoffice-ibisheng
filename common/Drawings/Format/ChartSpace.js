@@ -788,7 +788,10 @@ CChartSpace.prototype.getParagraphTextPr = function()
         }
         else
         {
-            return GetTextPrFormArrObjects([this.chart.legend.calcEntryes[this.selection.legendEntry]]);
+            if(this.chart.legend.calcEntryes[this.selection.legendEntry])
+            {
+                return GetTextPrFormArrObjects([this.chart.legend.calcEntryes[this.selection.legendEntry]]);
+            }
         }
     }
     else  if(this.selection.textSelection)
@@ -8952,6 +8955,11 @@ CChartSpace.prototype.Undo = function(data)
 {
     switch (data.Type)
     {
+        case AscDFH.historyitem_AutoShapes_SetLocks:
+        {
+            this.locks = data.oldPr;
+            break;
+        }
         case AscDFH.historyitem_AutoShapes_SetBFromSerialize:
         {
             this.fromSerialize = data.oldPr;
@@ -9083,6 +9091,11 @@ CChartSpace.prototype.Redo = function(data)
 {
     switch (data.Type)
     {
+        case AscDFH.historyitem_AutoShapes_SetLocks:
+        {
+            this.locks = data.newPr;
+            break;
+        }
         case AscDFH.historyitem_AutoShapes_SetBFromSerialize:
         {
             this.fromSerialize = data.newPr;
@@ -9216,6 +9229,11 @@ CChartSpace.prototype.Save_Changes = function(data, w)
     w.WriteLong(data.Type);
     switch (data.Type)
     {
+        case AscDFH.historyitem_AutoShapes_SetLocks:
+        {
+            w.Write_Long(data.newPr);
+            break;
+        }
         case AscDFH.historyitem_AutoShapes_SetBFromSerialize:
         {
             AscFormat.writeBool(w, data.newPr);
@@ -9355,6 +9373,11 @@ CChartSpace.prototype.Load_Changes = function(r)
     var type = r.GetLong();
     switch (type)
     {
+        case AscDFH.historyitem_AutoShapes_SetLocks:
+        {
+            this.locks = r.GetLong();
+            break;
+        }
         case AscDFH.historyitem_AutoShapes_SetBFromSerialize:
         {
             this.fromSerialize = AscFormat.readBool(r);

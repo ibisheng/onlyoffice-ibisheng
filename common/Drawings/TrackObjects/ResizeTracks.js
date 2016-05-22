@@ -305,7 +305,7 @@ function ResizeTrackShapeImage(originalObject, cardDirection)
             var _new_used_half_height;
             var _temp;
 
-            if((ShiftKey === true || window.AscAlwaysSaveAspectOnResizeTrack === true) && this.bAspect === true)
+            if((ShiftKey === true || window.AscAlwaysSaveAspectOnResizeTrack === true || this.originalObject.getNoChangeAspect()) && this.bAspect === true)
             {
                 var _new_aspect = this.aspect*(Math.abs(kd1/ kd2));
 
@@ -655,7 +655,7 @@ function ResizeTrackShapeImage(originalObject, cardDirection)
             var _real_height, _real_width;
             var _abs_height, _abs_width;
 
-            if((ShiftKey === true || window.AscAlwaysSaveAspectOnResizeTrack === true) && this.bAspect === true)
+            if((ShiftKey === true || window.AscAlwaysSaveAspectOnResizeTrack === true || this.originalObject.getNoChangeAspect()) && this.bAspect === true)
             {
                 var _new_aspect = this.aspect*(Math.abs(kd1/ kd2));
 
@@ -1016,7 +1016,7 @@ function ResizeTrackGroup(originalObject, cardDirection, parentTrack)
             var _new_used_half_height;
             var _temp;
 
-            if((ShiftKey === true || window.AscAlwaysSaveAspectOnResizeTrack === true) && this.bAspect === true)
+            if((ShiftKey === true || window.AscAlwaysSaveAspectOnResizeTrack === true || this.originalObject.getNoChangeAspect()) && this.bAspect === true)
             {
                 var _new_aspect = this.aspect*(Math.abs(kd1/ kd2));
 
@@ -1297,7 +1297,7 @@ function ResizeTrackGroup(originalObject, cardDirection, parentTrack)
             var _real_height, _real_width;
             var _abs_height, _abs_width;
 
-            if((ShiftKey === true || window.AscAlwaysSaveAspectOnResizeTrack === true) && this.bAspect === true)
+            if((ShiftKey === true || window.AscAlwaysSaveAspectOnResizeTrack === true || this.originalObject.getNoChangeAspect()) && this.bAspect === true)
             {
                 var _new_aspect = this.aspect*(Math.abs(kd1/ kd2));
 

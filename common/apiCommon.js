@@ -1486,6 +1486,7 @@
           this.vert = null;
           this.verticalTextAlign = null;
           this.textArtProperties = null;
+          this.lockAspect = null;
       }
 
       asc_CShapeProperty.prototype = {
@@ -1515,7 +1516,9 @@
           asc_getVert: function(){return this.vert},
           asc_putVert: function(v){this.vert = v;},
           asc_getTextArtProperties: function(){return this.textArtProperties},
-          asc_putTextArtProperties: function(v){this.textArtProperties = v;}
+          asc_putTextArtProperties: function(v){this.textArtProperties = v;},
+          asc_getLockAspect: function(){return this.lockAspect},
+          asc_putLockAspect: function(v){this.lockAspect = v;}
       };
 
       function asc_TextArtProperties(obj)
@@ -1695,6 +1698,7 @@
 
               this.ImageUrl = (undefined != obj.ImageUrl) ? obj.ImageUrl : null;
               this.Locked   = (undefined != obj.Locked) ? obj.Locked : false;
+              this.lockAspect = (undefined != obj.lockAspect) ? obj.lockAspect : false;
 
 
               this.ChartProperties = (undefined != obj.ChartProperties) ? obj.ChartProperties : null;
@@ -1816,6 +1820,12 @@
           asc_putVert: function(v) { this.vert = v; },
 
           asc_getLocked: function() { return this.Locked; },
+          asc_getLockAspect: function(){
+              return this.lockAspect;
+          },
+          asc_putLockAspect: function(v){
+              this.lockAspect = v;
+          },
           asc_getChartProperties: function() { return this.ChartProperties; },
           asc_putChartProperties: function(v) { this.ChartProperties = v; },
           asc_getShapeProperties: function() { return this.ShapeProperties; },
@@ -2636,6 +2646,8 @@
       prot["put_Vert"] = prot["asc_putVert"] = prot.asc_putVert;
       prot["get_TextArtProperties"] = prot["asc_getTextArtProperties"] = prot.asc_getTextArtProperties;
       prot["put_TextArtProperties"] = prot["asc_putTextArtProperties"] = prot.asc_putTextArtProperties;
+      prot["get_LockAspect"] = prot["asc_getLockAspect"] = prot.asc_getLockAspect;
+      prot["put_LockAspect"] = prot["asc_putLockAspect"] = prot.asc_putLockAspect;
 
       window["Asc"]["asc_TextArtProperties"] = window["Asc"].asc_TextArtProperties = asc_TextArtProperties;
       prot = asc_TextArtProperties.prototype;
@@ -2742,6 +2754,8 @@
       prot["get_Vert"] = prot["asc_getVert"] = prot.asc_getVert;
       prot["put_Vert"] = prot["asc_putVert"] = prot.asc_putVert;
       prot["get_Locked"] = prot["asc_getLocked"] = prot.asc_getLocked;
+      prot["getLockAspect"] = prot["asc_getLockAspect"] = prot.asc_getLockAspect;
+      prot["putLockAspect"] = prot["asc_putLockAspect"] = prot.asc_putLockAspect;
       prot["get_ChartProperties"] = prot["asc_getChartProperties"] = prot.asc_getChartProperties;
       prot["put_ChartProperties"] = prot["asc_putChartProperties"] = prot.asc_putChartProperties;
       prot["get_ShapeProperties"] = prot["asc_getShapeProperties"] = prot.asc_getShapeProperties;

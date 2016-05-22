@@ -4914,6 +4914,11 @@ CShape.prototype.Undo = function (data)
 {
     switch (data.Type)
     {
+        case AscDFH.historyitem_AutoShapes_SetLocks:
+        {
+            this.locks = data.oldPr;
+            break;
+        }
         case AscDFH.historyitem_AutoShapes_SetBFromSerialize:
         {
             this.fromSerialize = data.oldPr;
@@ -5021,6 +5026,11 @@ CShape.prototype.Redo = function (data)
 {
     switch (data.Type)
     {
+        case AscDFH.historyitem_AutoShapes_SetLocks:
+        {
+            this.locks = data.newPr;
+            break;
+        }
         case AscDFH.historyitem_AutoShapes_SetBFromSerialize:
         {
             this.fromSerialize = data.newPr;
@@ -5128,6 +5138,11 @@ CShape.prototype.Save_Changes = function (data, w)
     w.WriteLong(data.Type);
     switch (data.Type)
     {
+        case AscDFH.historyitem_AutoShapes_SetLocks:
+        {
+            w.WriteLong(data.newPr);
+            break;
+        }
         case AscDFH.historyitem_AutoShapes_SetBFromSerialize:
         {
             AscFormat.writeBool(w, data.newPr);
@@ -5207,6 +5222,11 @@ CShape.prototype.Load_Changes = function (r)
         var type = r.GetLong();
         switch (type)
         {
+            case AscDFH.historyitem_AutoShapes_SetLocks:
+            {
+                this.locks = r.GetLong();
+                break;
+            }
             case AscDFH.historyitem_AutoShapes_SetBFromSerialize:
             {
                 this.fromSerialize = AscFormat.readBool(r);
