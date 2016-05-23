@@ -2717,7 +2717,7 @@
 				var cell;
 				var generateName;
 				
-				var checkRepeateColumnName = function(val, tableColumns)
+				var checkRepeateColumnName = function(val, tableColumns, exeptionCol)
 				{
 					var res = false;
 					
@@ -2725,7 +2725,7 @@
 					{
 						for(var i = 0; i < tableColumns.length; i++)
 						{
-							if(tableColumns[i].Name.toLowerCase() === val.toLowerCase())
+							if(tableColumns[i].Name.toLowerCase() === val.toLowerCase() && i !== exeptionCol)
 							{
 								res = true;
 								break;
@@ -2766,7 +2766,7 @@
 								val = cell.getValue();
 								
 								//проверка на повторение уже существующих заголовков
-								if(checkRepeateColumnName(val, filter.TableColumns))
+								if(checkRepeateColumnName(val, filter.TableColumns, j - tableRange.c1))
 								{
 									val = "";
 								}

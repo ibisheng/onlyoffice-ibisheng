@@ -9095,7 +9095,9 @@
                     }
 
                     // Вызываем функцию пересчета для заголовков форматированной таблицы
-                    t.model.autoFilters.renameTableColumn( arn );
+					if(val === c_oAscCleanOptions.All || val === c_oAscCleanOptions.Text){
+						t.model.autoFilters.renameTableColumn( arn );
+					}
 
                     /* возвращаем отрисовку. и перерисовываем ячейки с предварительным пересчетом */
                     t.model.workbook.unLockDraw();
