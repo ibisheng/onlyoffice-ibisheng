@@ -565,7 +565,13 @@
 						{	
 							var cell = worksheet.getCell3(i, filterObj.ColId + autoFilter.Ref.c1);
 							var isDateTimeFormat = cell.getNumFormat().isDateTimeFormat();
-							var currentValue = isDateTimeFormat ? cell.getValueWithoutFormat() : cell.getValueWithFormat();
+							var isNumberFilter = false;
+							if(newFilterColumn.CustomFiltersObj || newFilterColumn.Top10 || newFilterColumn.DynamicFilter)
+							{
+								isNumberFilter = true;
+							}
+							
+							var currentValue = (isDateTimeFormat || isNumberFilter) ? cell.getValueWithoutFormat() : cell.getValueWithFormat();
 							
 							var isSetHidden = newFilterColumn.isHideValue(currentValue, isDateTimeFormat, null, cell);
 							
@@ -2633,8 +2639,15 @@
 					{
 						var cell = worksheet.getCell3(r, colId + c);
 						var isDateTimeFormat = cell.getNumFormat().isDateTimeFormat();
-						var val = isDateTimeFormat ? cell.getValueWithoutFormat() : cell.getValueWithFormat()
-
+						
+						var isNumberFilter = false;
+						if(newFilterColumn.CustomFiltersObj || newFilterColumn.Top10 || newFilterColumn.DynamicFilter)
+						{
+							isNumberFilter = true;
+						}
+						
+						var val = (isDateTimeFormat || isNumberFilter) ? cell.getValueWithoutFormat() : cell.getValueWithFormat()
+			
 						if(filterColumns[j].isHideValue(val, isDateTimeFormat, null, cell))
 						{
 							result = true;
@@ -3660,7 +3673,7 @@
 							//filter current button
 							var checkValue = isDateTimeFormat ? val : text;
 							if (!currentFilterColumn.Top10 && !currentFilterColumn.CustomFiltersObj &&
-								!currentFilterColumn.ColorFilter && !currentFilterColumn.isHideValue(checkValue, isDateTimeFormat))
+								!currentFilterColumn.ColorFilter && !currentFilterColumn.DynamicFilter && !currentFilterColumn.isHideValue(checkValue, isDateTimeFormat))
 							{
 								if(isOpenHiddenRows)
 									worksheet.setRowHidden(false, i, i);

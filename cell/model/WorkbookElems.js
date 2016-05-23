@@ -5994,7 +5994,7 @@ DynamicFilter.prototype.init = function(range) {
 			var counter = 0;
 			
 			range._foreach2(function(cell){
-				var val = parseFloat(cell.getValue());
+				var val = parseFloat(cell.getValueWithoutFormat());
 				
 				if(!isNaN(val))
 				{
@@ -6277,7 +6277,7 @@ Top10.prototype.init = function(range, reWrite){
 			var alreadyAddValues = {};
 			var count = 0;
 			range._foreach2(function(cell){
-				var val = parseFloat(cell.getValue());
+				var val = parseFloat(cell.getValueWithoutFormat());
 				
 				if(!isNaN(val) && !alreadyAddValues[val])
 				{
