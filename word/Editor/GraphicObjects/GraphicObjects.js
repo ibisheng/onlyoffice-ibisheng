@@ -1229,7 +1229,7 @@ CGraphicObjects.prototype =
             pluginData.setAttribute("height", oleObject.extY);
             pluginData.setAttribute("widthPix", oleObject.m_nPixWidth);
             pluginData.setAttribute("heightPix", oleObject.m_nPixHeight);
-            editor.asc_pluginRun(0, pluginData);
+            editor.asc_pluginRun(oleObject.m_sApplicationId, 0, pluginData);
         }
         this.changeCurrentState(new AscFormat.NullState(this));
         this.document.OnMouseUp(e, x, y, pageIndex);

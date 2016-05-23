@@ -2270,7 +2270,7 @@ CDocumentContent.prototype.Add_OleObject                    = function(W, H, nWi
         var Item = this.Content[this.CurPos.ContentPos];
         if (type_Paragraph == Item.GetType())
         {
-            var Drawing   = new ParaDrawing(W, H, nWidthPix, nHeightPix, null, this.DrawingDocument, this, null);
+            var Drawing   = new ParaDrawing(W, H, null, this.DrawingDocument, this, null);
             var Image = this.DrawingObjects.createOleObject(Data, sApplicationId, Img, 0, 0, W, H, nWidthPix, nHeightPix);
             Image.setParent(Drawing);
             Drawing.Set_GraphicObject(Image);

@@ -608,7 +608,8 @@ baseEditorsApi.prototype._uploadCallback = function(error, files) {
     };
 
     baseEditorsApi.prototype.asc_addOleObject = function(oPluginData){
-        var oThis = this;
+      Asc.CPluginData_wrap(oPluginData);
+      var oThis = this;
       var oThis = this;
       var sImgSrc = oPluginData.getAttribute("imgSrc");
       var nWidthPix = oPluginData.getAttribute("widthPix");
@@ -625,8 +626,10 @@ baseEditorsApi.prototype._uploadCallback = function(error, files) {
         this.asc_checkImageUrlAndAction(sImgSrc, function(oImage){oThis.asc_addOleObjectAction(AscCommon.g_oDocumentUrls.getImageLocal(oImage.src), sData, sGuid, fWidth, fHeight, nWidthPix, nHeightPix);});
     };
 
-    baseEditorsApi.prototype.asc_editOleObject = function(bResize, oPluginData){
+    baseEditorsApi.prototype.asc_editOleObject = function(oPluginData){
+        Asc.CPluginData_wrap(oPluginData);
         var oThis = this;
+        var bResize = oPluginData.getAttribute("resize");
         var sImgSrc = oPluginData.getAttribute("imgSrc");
         var oOleObject = AscCommon.g_oTableId.Get_ById(oPluginData.getAttribute("objectId"));
         var nWidthPix = oPluginData.getAttribute("widthPix");
@@ -717,10 +720,10 @@ baseEditorsApi.prototype.asc_pluginsRegister = function(basePath, plugins)
   if (null != this.pluginsManager)
     this.pluginsManager.register(basePath, plugins);
 };
-baseEditorsApi.prototype.asc_pluginRun = function(variation, pluginData)
+baseEditorsApi.prototype.asc_pluginRun = function(guid, variation, pluginData)
 {
   if (null != this.pluginsManager)
-    this.pluginsManager.run(variation, pluginData);
+    this.pluginsManager.run(guid, variation, pluginData);
 };
 baseEditorsApi.prototype.asc_pluginResize = function(pluginData)
 {

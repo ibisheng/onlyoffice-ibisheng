@@ -95,12 +95,15 @@
             this.correctData(this.startData);
             this.show();
         },
-        runResize   : function(guid, data, width, height)
+        runResize   : function(data)
         {
+            data.setAttribute("resize", true);
+            return this.run(data.getAttribute("guid"), 0, data);
         },
         close    : function()
         {
-            if (!this.current.variations[0].isVisual) {
+            if (true)
+            {
                 var _div = document.getElementById("plugin_iframe");
                 if (_div)
                     _div.parentNode.removeChild(_div);
@@ -117,7 +120,7 @@
 
         show : function()
         {
-            if (this.current.variations[0].isVisual)
+            if (this.current.variations[0].isVisual && this.startData.getAttribute("resize") !== true)
             {
                 this.api.asc_fireCallback("asc_onPluginShow", this.current);
             }
@@ -126,7 +129,8 @@
                 var ifr = document.createElement("iframe");
                 ifr.name = "plugin_iframe";
                 ifr.id = "plugin_iframe";
-                ifr.src = this.path + this.current.variations[0].url;
+                var _add = this.current.variations[0].baseUrl == "" ? this.path : this.current.variations[0].baseUrl;
+                ifr.src = _add + this.current.variations[0].url;
                 ifr.style.position = 'absolute';
                 ifr.style.top = '-100px';
                 ifr.style.left = '0px';
@@ -192,6 +196,51 @@
 
             if (undefined == pluginData.getAttribute("data"))
                 pluginData.setAttribute("data", "");
+        },
+        loadExtensionPlugins : function(_plugins)
+        {
+            if (!_plugins || _plugins.length < 1)
+                return;
+
+            var _map = {};
+            for (var i = 0; i < this.plugins.length; i++)
+                _map[this.plugins[i].guid] = true;
+
+            for (var i = 0; i < _plugins.length; i++)
+            {
+                var _p = new Asc.CPlugin();
+
+                _p.name = _plugins[i].name;
+                _p.guid = _plugins[i].guid;
+
+                if (_map[_p.guid] === true)
+                    continue;
+
+                for (var j = 0; j < _plugins[i].variations.length; j++)
+                {
+                    var _pv = new Asc.CPluginVariation();
+
+                    for (var k in _plugins[i].variations[j])
+                    {
+                        _pv[k] = _plugins[i].variations[j][k];
+                    }
+
+                    _p.variations.push(_pv);
+                }
+
+                this.plugins.push(_p);
+            }
+
+            // добавляем кнопки (тест)
+            var _elem = document.getElementById("view-left-menu").childNodes[1];
+
+            for (var i = 0; i < _plugins.length; i++)
+            {
+                var _button = "<button class='btn btn-category' content-target='' data-toggle='tooltip' data-original-title='' title='' " +
+                    "onclick='window.g_asc_plugins.run(\"" + _plugins[i].guid + "\")'><span>" + (i + 1) + "</span></button>";
+
+                _elem.innerHTML += _button;
+            }
         }
     };
 
@@ -256,10 +305,25 @@
         window.g_asc_plugins.api    = api;
         window.g_asc_plugins["api"] = window.g_asc_plugins.api;
 
+        window.g_asc_plugins.api.asc_registerCallback('asc_onDocumentContentReady', function(){
+
+            setTimeout(function(){
+                window.g_asc_plugins.loadExtensionPlugins(window["Asc"]["extensionPlugins"]);
+            }, 10);
+
+        });
+
         return window.g_asc_plugins;
     };
 
     window["Asc"].CPluginData = CPluginData;
+    window["Asc"].CPluginData_wrap = function(obj)
+    {
+        if (!obj.getAttribute)
+            obj.getAttribute = function(name) { return this[name]; }
+        if (!obj.setAttribute)
+            obj.setAttribute = function(name, value) { return this[name] = value; }
+    };
 })(window, undefined);
 
 // потом удалить!!!
@@ -268,7 +332,7 @@ function TEST_PLUGINS()
     var _plugins                = [
         {
             name : "chess (fen)",
-            guid : "{FFE1F462-1EA2-4391-990D-4CC84940B754}",
+            guid : "asc.{FFE1F462-1EA2-4391-990D-4CC84940B754}",
 
             variations : [
                 {
@@ -295,7 +359,7 @@ function TEST_PLUGINS()
         },
         {
             name : "glavred",
-            guid : "{B631E142-E40B-4B4C-90B9-2D00222A286E}",
+            guid : "asc.{B631E142-E40B-4B4C-90B9-2D00222A286E}",
 
             variations : [
                 {
@@ -321,7 +385,7 @@ function TEST_PLUGINS()
         },
         {
             name : "bold",
-            guid : "{14E46CC2-5E56-429C-9D55-1032B596D928}",
+            guid : "asc.{14E46CC2-5E56-429C-9D55-1032B596D928}",
 
             variations : [
                 {
@@ -347,7 +411,7 @@ function TEST_PLUGINS()
         },
         {
             name : "speech",
-            guid : "{D71C2EF0-F15B-47C7-80E9-86D671F9C595}",
+            guid : "asc.{D71C2EF0-F15B-47C7-80E9-86D671F9C595}",
 
             variations : [
                 {
@@ -373,7 +437,7 @@ function TEST_PLUGINS()
         },
         {
             name : "youtube",
-            guid : "{38E022EA-AD92-45FC-B22B-49DF39746DB4}",
+            guid : "asc.{38E022EA-AD92-45FC-B22B-49DF39746DB4}",
 
             variations : [
                 {
@@ -400,39 +464,5 @@ function TEST_PLUGINS()
         }
     ];
 
-    var _pluginsNatural = [];
-    for (var i = 0; i < _plugins.length; i++)
-    {
-        var _p = new Asc.CPlugin();
-
-        _p.name = _plugins[i].name;
-        _p.guid = _plugins[i].guid;
-
-        for (var j = 0; j < _plugins[i].variations.length; j++)
-        {
-            var _pv = new Asc.CPluginVariation();
-
-            for (var k in _plugins[i].variations[j])
-            {
-                _pv[k] = _plugins[i].variations[j][k];
-            }
-
-            _p.variations.push(_pv);
-        }
-
-        _pluginsNatural.push(_p);
-    }
-
-    window.g_asc_plugins.api.asc_pluginsRegister("../../../../sdkjs-plugins/", _pluginsNatural);
-
-    // добавляем кнопки (тест)
-    var _elem = document.getElementById("view-left-menu").childNodes[1];
-
-    for (var i = 0; i < _plugins.length; i++)
-    {
-        var _button = "<button class='btn btn-category' content-target='' data-toggle='tooltip' data-original-title='' title='' " +
-            "onclick='window.g_asc_plugins.run(\"" + _plugins[i].guid + "\")'><span>" + (i + 1) + "</span></button>";
-
-        _elem.innerHTML += _button;
-    }
+    window.g_asc_plugins.loadExtensionPlugins(_plugins);
 }

@@ -4041,7 +4041,7 @@ CDocument.prototype.Add_OleObject              = function(W, H, nWidthPix, nHeig
         var Item = this.Content[this.CurPos.ContentPos];
         if (type_Paragraph == Item.GetType())
         {
-            var Drawing   = new ParaDrawing(W, H, nWidthPix, nHeightPix, null, this.DrawingDocument, this, null);
+            var Drawing   = new ParaDrawing(W, H, null, this.DrawingDocument, this, null);
             var Image = this.DrawingObjects.createOleObject(Data, sApplicationId, Img, 0, 0, W, H, nWidthPix, nHeightPix);
             Image.setParent(Drawing);
             Drawing.Set_GraphicObject(Image);
@@ -4058,7 +4058,9 @@ CDocument.prototype.Add_OleObject              = function(W, H, nWidthPix, nHeig
 CDocument.prototype.Edit_OleObject = function(oOleObject, sData, sImageUrl, nPixWidth, nPixHeight)
 {
     oOleObject.setData(sData);
-    oOleObject.setRasterImageId(sImageUrl);
+    var _blipFill = new AscFormat.CBlipFill();
+     _blipFill.RasterImageId = sImageUrl;
+    oOleObject.setBlipFill(_blipFill);
     oOleObject.setPixSizes(nPixWidth, nPixHeight);
 };
 

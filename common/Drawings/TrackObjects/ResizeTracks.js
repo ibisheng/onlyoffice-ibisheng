@@ -847,19 +847,15 @@ function ResizeTrackShapeImage(originalObject, cardDirection)
             }
             if(this.originalObject.getObjectType && this.originalObject.getObjectType() === AscDFH.historyitem_type_OleObject)
             {
-                var api;
-                if(Asc.editor)
-                {
-                    api = Asc.editor;
-                }
+                var api = window.editor || window.Asc.editor;
                 if(api)
                 {
                     var pluginData = new Asc.CPluginData();
-                    pluginData.setAttribute("data", this.originalObjec.m_sData);
-                    pluginData.setAttribute("guid", this.originalObjec.m_sApplicationId);
-                    pluginData.setAttribute("width", this.originalObjec.extX);
-                    pluginData.setAttribute("height", this.originalObjec.extY);
-                    pluginData.setAttribute("objectId", this.originalObjec.Get_Id());
+                    pluginData.setAttribute("data", this.originalObject.m_sData);
+                    pluginData.setAttribute("guid", this.originalObject.m_sApplicationId);
+                    pluginData.setAttribute("width", xfrm.extX);
+                    pluginData.setAttribute("height", xfrm.extY);
+                    pluginData.setAttribute("objectId", this.originalObject.Get_Id());
                     api.asc_pluginResize(pluginData);
                 }
             }

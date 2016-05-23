@@ -1471,6 +1471,7 @@ window['Asc']['c_oAscMaxCellOrCommentLength'] = window['Asc'].c_oAscMaxCellOrCom
   {
     this.description = "";
     this.url = "";
+    this.baseUrl = "";
     this.index = 0;     // сверху не выставляем. оттуда в каком порядке пришли - в таком порядке и работают
 
     this.icons = ["1x", "2x"];
@@ -1493,6 +1494,8 @@ window['Asc']['c_oAscMaxCellOrCommentLength'] = window['Asc'].c_oAscMaxCellOrCom
   CPluginVariation.prototype["set_Description"] = function(value) 	        { this.description = value; } ;
   CPluginVariation.prototype["get_Url"] = function() 		                { return this.url; };
   CPluginVariation.prototype["set_Url"] = function(value) 	                { this.url = value; };
+  CPluginVariation.prototype["get_BaseUrl"] = function() 		            { return this.baseUrl; };
+  CPluginVariation.prototype["set_BaseUrl"] = function(value) 	            { this.baseUrl = value; };
 
   CPluginVariation.prototype["get_Icons"] = function() 		                { return this.icons; };
   CPluginVariation.prototype["set_Icons"] = function(value) 	            { this.icons = value; };
