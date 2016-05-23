@@ -145,9 +145,12 @@
 		"../word/Editor/DocumentContentBase.js",
         "../word/Editor/Document.js",
         "../word/Editor/DocumentContent.js",
+		"../word/Editor/DocumentControllerBase.js",
         "../word/Editor/HeaderFooter.js",
         "../word/Editor/Math.js",
         "../word/Editor/Spelling.js",
+		"../word/Editor/Footnotes.js",
+		"../word/Editor/FootEndNote.js",								
         "../word/Editor/Search.js",
         "../word/Editor/FontClassification.js",
         
