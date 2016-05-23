@@ -4643,7 +4643,7 @@ function TablePart(handlers) {
 	this.result = null;
 	this.handlers = handlers;
 }
-TablePart.prototype.clone = function(ws) {
+TablePart.prototype.clone = function(ws, tableName) {
 	var i, res = new TablePart(this.handlers);
 	res.Ref = this.Ref ? this.Ref.clone() : null;
 	res.HeaderRowCount = this.HeaderRowCount;
@@ -4666,14 +4666,22 @@ TablePart.prototype.clone = function(ws) {
 			res.result.push(this.result[i].clone());
 	}
 	
-	res.DisplayName = this.DisplayName;
+	if(tableName)
+	{
+		res.DisplayName = tableName;
+	}
+	else
+	{
+		res.DisplayName = this.DisplayName;
+	}
+	
 	if(ws !== null)
-		res.recalc(ws);
+		res.recalc(ws, tableName);
 		
 	return res;
 };
-TablePart.prototype.recalc = function(ws) {
-	this.DisplayName = ws.workbook.dependencyFormulas.getNextTableName(ws, this.Ref);
+TablePart.prototype.recalc = function(ws, tableName) {
+	this.DisplayName = ws.workbook.dependencyFormulas.getNextTableName(ws, this.Ref, tableName);
 };
 TablePart.prototype.moveRef = function(col, row) {
 	var ref = this.Ref.clone();

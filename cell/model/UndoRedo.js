@@ -1492,9 +1492,10 @@ UndoRedoDataParaPr.prototype = {
 var g_oUndoRedoData_SheetAddProperties = {
 		name: 0,
 		sheetidfrom: 1,
-		sheetid: 2
+		sheetid: 2,
+        tableNames: 3
 	};
-function UndoRedoData_SheetAdd(insertBefore, name, sheetidfrom, sheetid){
+function UndoRedoData_SheetAdd(insertBefore, name, sheetidfrom, sheetid, tableNames){
 	this.Properties = g_oUndoRedoData_SheetAddProperties;
 	this.insertBefore= insertBefore;
 	this.name = name;
@@ -1503,6 +1504,8 @@ function UndoRedoData_SheetAdd(insertBefore, name, sheetidfrom, sheetid){
 	//Эти поля заполняются после Undo/Redo
 	this.sheet = null;
 	this.cwf = null;
+
+    this.tableNames = tableNames;
 }
 UndoRedoData_SheetAdd.prototype = {
 	getType : function()
@@ -1520,6 +1523,7 @@ UndoRedoData_SheetAdd.prototype = {
 			case this.Properties.name: return this.name;break;
 			case this.Properties.sheetidfrom: return this.sheetidfrom;break;
 			case this.Properties.sheetid: return this.sheetid;break;
+            case this.Properties.tableNames: return this.tableNames;break;
 		}
 		return null;
 	},
@@ -1530,6 +1534,7 @@ UndoRedoData_SheetAdd.prototype = {
 			case this.Properties.name: this.name = value;break;
 			case this.Properties.sheetidfrom: this.sheetidfrom = value;break;
 			case this.Properties.sheetid: this.sheetid = value;break;
+            case this.Properties.tableNames: this.tableNames = value;break;
 		}
 	}
 };
@@ -2810,7 +2815,7 @@ UndoRedoWorkbook.prototype = {
 					{
 						var oCurWorksheet = this.wb.getWorksheetById(Data.sheetidfrom);
 						var nIndex = oCurWorksheet.getIndex();
-						this.wb.copyWorksheet(nIndex, Data.insertBefore, Data.name, Data.sheetid, true);
+						this.wb.copyWorksheet(nIndex, Data.insertBefore, Data.name, Data.sheetid, true, Data.tableNames);
 					}
 				}
 			}

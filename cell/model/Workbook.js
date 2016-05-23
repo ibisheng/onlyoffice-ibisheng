@@ -1162,7 +1162,7 @@ DependencyGraph.prototype = {
 //        return false;
     },
 
-    getNextTableName:function ( ws, Ref ) {
+    getNextTableName:function ( ws, Ref, tableName ) {
         this.nTableNameMaxIndex++;
         var sNewName = this.sTableNamePattern + this.nTableNameMaxIndex,
             name = getDefNameVertexId( null, sNewName );
@@ -1171,6 +1171,20 @@ DependencyGraph.prototype = {
             sNewName = this.sTableNamePattern + this.nTableNameMaxIndex;
             name = getDefNameVertexId( null, sNewName );
         }
+
+        if(tableName)
+        {
+            sNewName = tableName;
+        }
+		else if(ws.workbook.oApi.collaborativeEditing.getCollaborativeEditing())
+		{
+			var indexUser = ws.workbook.oApi.CoAuthoringApi.get_indexUser();
+			if(null !== indexUser)
+			{
+				sNewName += "_" + indexUser;
+			}
+		}
+		
         this.addTableName( sNewName, ws, Ref );
         return sNewName;
     },
@@ -2055,14 +2069,14 @@ Workbook.prototype.createWorksheet=function(indexBefore, sName, sId){
 	History.SetSheetRedo(oNewWorksheet.getId());
 	return oNewWorksheet.index;
 };
-Workbook.prototype.copyWorksheet=function(index, insertBefore, sName, sId, bFromRedo){
+Workbook.prototype.copyWorksheet=function(index, insertBefore, sName, sId, bFromRedo, tableNames){
 	//insertBefore - optional
 	if(index >= 0 && index < this.aWorksheets.length){
 
 		History.TurnOff();
 		var wsActive = this.getActiveWs();
 		var wsFrom = this.aWorksheets[index];
-		var newSheet = wsFrom.clone(sId, sName);
+		var newSheet = wsFrom.clone(sId, sName, tableNames);
 		newSheet.initPostOpen(this.wsHandlers);
 		if(null != insertBefore && insertBefore >= 0 && insertBefore < this.aWorksheets.length){
 			//помещаем новый sheet перед insertBefore
@@ -2092,7 +2106,17 @@ Workbook.prototype.copyWorksheet=function(index, insertBefore, sName, sId, bFrom
 			}
 			newSheet._BuildDependencies(cwf.cells);
 		}
-		History.Add(AscCommonExcel.g_oUndoRedoWorkbook, AscCH.historyitem_Workbook_SheetAdd, null, null, new UndoRedoData_SheetAdd(insertBefore, newSheet.getName(), wsFrom.getId(), newSheet.getId()));
+		
+		if(!tableNames && newSheet.TableParts && newSheet.TableParts.length)
+		{
+			tableNames = [];
+			for(var i = 0; i < newSheet.TableParts.length; i++)
+			{
+				tableNames.push(newSheet.TableParts[i].DisplayName);
+			}
+		}
+		
+		History.Add(AscCommonExcel.g_oUndoRedoWorkbook, AscCH.historyitem_Workbook_SheetAdd, null, null, new UndoRedoData_SheetAdd(insertBefore, newSheet.getName(), wsFrom.getId(), newSheet.getId(), tableNames));
 		History.SetSheetUndo(wsActive.getId());
 		History.SetSheetRedo(newSheet.getId());
         if(!(bFromRedo === true))
@@ -3313,7 +3337,7 @@ Woorksheet.prototype.generateFontMap=function(oFontMap){
 		}
 	}
 };
-Woorksheet.prototype.clone=function(sNewId, sName){
+Woorksheet.prototype.clone=function(sNewId, sName, tableNames){
 	var i, elem, range;
 	var oNewWs = new Woorksheet(this.workbook, this.workbook.aWorksheets.length, sNewId);
 	oNewWs.sName = this.workbook.checkValidSheetName(sName) ? sName : this.workbook.getUniqueSheetNameFrom(this.sName, true);
@@ -3323,7 +3347,14 @@ Woorksheet.prototype.clone=function(sNewId, sName){
 	oNewWs.nRowsCount = this.nRowsCount;
 	oNewWs.nColsCount = this.nColsCount;
 	for (i = 0; i < this.TableParts.length; ++i)
-		oNewWs.TableParts.push(this.TableParts[i].clone(oNewWs));
+	{
+		var tableName = null;
+		if(tableNames && tableNames.length)
+		{
+			tableName = tableNames[i];
+		}
+		oNewWs.TableParts.push(this.TableParts[i].clone(oNewWs, tableName));
+	}
 	if(this.AutoFilter)
 		oNewWs.AutoFilter = this.AutoFilter.clone();
 	for (i in this.aCols) {
