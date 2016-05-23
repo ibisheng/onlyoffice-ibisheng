@@ -11073,34 +11073,30 @@
     };
 
     WorksheetView.prototype.findCell = function ( reference ) {
-        var range = AscCommonExcel.g_oRangeCache.getAscRange( reference );
+        var range = AscCommonExcel.g_oRangeCache.getRange3D(reference) || AscCommonExcel.g_oRangeCache.getAscRange(reference);
         if ( !range ) {
+            /*TODO: сделать поиск по названиям автофигур, должен искать до того как вызвать поиск по именованным диапазонам*/
 
-            var _C2H50H_ = this.model.workbook.getDefinesNames( reference, this.model.workbook.getActiveWs().getId() ), sheetName, ref;
-
-            if ( !_C2H50H_ ) {
-
-                var actRange = this.getActiveRangeObj(), ascRange, mc = this.model.getMergedByCell( actRange.startRow, actRange.startCol ), c1 = mc ? mc.c1 : actRange.c1, r1 = mc ? mc.r1 : actRange.r1, ar_norm = actRange.normalize(), mc_norm = mc ? mc.normalize() : null, c2 = mc_norm ? ( mc_norm.isEqual( ar_norm ) ? mc_norm.c1 : ar_norm.c2 ) : ar_norm.c2, r2 = mc_norm ? ( mc_norm.isEqual( ar_norm ) ? mc_norm.r1 : ar_norm.r2 ) : ar_norm.r2, defName;
-
-                ascRange = new asc_Range( c1, r1, c2, r2 );
-                /*TODO: сделать поиск по названиям автофигур, должен искать до того как вызвать поиск по именованным диапазонам*/
-                defName = new Asc.asc_CDefName( reference, this.model.getName() + "!" + ascRange.getAbsName() );
-
+            var defName = this.model.workbook.getDefinesNames( reference, this.model.workbook.getActiveWs().getId() ), sheetName, ref;
+            if ( !defName ) {
                 if ( this.collaborativeEditing.getGlobalLock() || !this.handlers.trigger( "getLockDefNameManagerStatus" ) ) {
                     this.handlers.trigger( "onErrorEvent", c_oAscError.ID.LockCreateDefName, c_oAscError.Level.NoCritical );
                     this._updateSelectionNameAndInfo();
                     return true;
                 }
 
-                _C2H50H_ = this.model.workbook.editDefinesNames( null, defName );
+                var actRange = this.getActiveRangeObj(), ascRange, mc = this.model.getMergedByCell( actRange.startRow, actRange.startCol ), c1 = mc ? mc.c1 : actRange.c1, r1 = mc ? mc.r1 : actRange.r1, ar_norm = actRange.normalize(), mc_norm = mc ? mc.normalize() : null, c2 = mc_norm ? ( mc_norm.isEqual( ar_norm ) ? mc_norm.c1 : ar_norm.c2 ) : ar_norm.c2, r2 = mc_norm ? ( mc_norm.isEqual( ar_norm ) ? mc_norm.r1 : ar_norm.r2 ) : ar_norm.r2;
+
+                ascRange = new asc_Range( c1, r1, c2, r2 );
+                defName = this.model.workbook.editDefinesNames( null, new Asc.asc_CDefName( reference, this.model.getName() + "!" + ascRange.getAbsName() ) );
             }
 
-            if ( _C2H50H_ ) {
+            if ( defName ) {
                 range = true;
-                this._isLockedDefNames( null, _C2H50H_.nodeId );
+                this._isLockedDefNames( null, defName.nodeId );
 
-                if ( _C2H50H_.isTable ) {
-                    sheetName = _C2H50H_.Ref.split( "!" );
+                if ( defName.isTable ) {
+                    sheetName = defName.Ref.split( "!" );
                     ref = sheetName[1];
                     sheetName = sheetName[0];
                     if ( sheetName[0] == "'" && sheetName[sheetName.length - 1] == "'" ) {
@@ -11109,8 +11105,8 @@
                     range = AscCommonExcel.g_oRangeCache.getAscRange( ref );
                     sheetName = this.model.workbook.getWorksheetByName( sheetName );
                 }
-                else if ( _C2H50H_.parsedRef.RefPos.length == 1 && _C2H50H_.parsedRef.outStack.length == 1 ) {
-                    ref = _C2H50H_.parsedRef.outStack[0];
+                else if ( defName.parsedRef.RefPos.length == 1 && defName.parsedRef.outStack.length == 1 ) {
+                    ref = defName.parsedRef.outStack[0];
                     if ( ref.type == AscCommonExcel.cElementType.cell3D ) {
                         range = ref.range.getBBox0().clone( true );
                         sheetName = ref.getWS();
@@ -11124,7 +11120,7 @@
 
                 if ( range && sheetName ) {
                     ar_norm = range.normalize();
-                    mc = sheetName.getMergedByCell( ar_norm.r1, ar_norm.c1 )
+                    mc = sheetName.getMergedByCell( ar_norm.r1, ar_norm.c1 );
                     range = {range: mc ? mc : range, sheet: sheetName.getName()};
                 }
             }

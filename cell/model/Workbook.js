@@ -933,20 +933,20 @@ DependencyGraph.prototype = {
         return oRes;
     },
     getDefNameNodeByRef:function ( ref, sheetId ) {
-        var sheetNodeList;
+        var sheetNodeList, id;
 
         if ( null != sheetId ) {
             sheetNodeList = this.defNameSheets[sheetId];
-            for ( var id in sheetNodeList ) {
-                if ( sheetNodeList[id].Ref == ref ) {
+            for ( id in sheetNodeList ) {
+                if ( !sheetNodeList[id].Hidden && sheetNodeList[id].Ref === ref) {
                     return sheetNodeList[id].Name;
                 }
             }
         }
 
         sheetNodeList = this.defNameSheets["WB"];
-        for ( var id in sheetNodeList ) {
-            if ( sheetNodeList[id].Ref === ref ) {
+        for ( id in sheetNodeList ) {
+            if ( !sheetNodeList[id].Hidden && sheetNodeList[id].Ref === ref ) {
                 return sheetNodeList[id].Name;
             }
         }
@@ -955,7 +955,7 @@ DependencyGraph.prototype = {
     },
     addDefinedNameNode:function ( defName, sheetId, defRef, defHidden, bUndo ) {
 
-        var ws = this.wb.getWorksheet( sheetId )
+        var ws = this.wb.getWorksheet( sheetId );
         ws ? sheetId = ws.getId() : null;
 
         var nodeId = getDefNameVertexId( sheetId, defName ),
@@ -2521,7 +2521,7 @@ Workbook.prototype.getDefinedNamesWB = function (defNameListId) {
     function getNames(id,arr){
         var listDN = thas.dependencyFormulas.defNameSheets[id], name;
         for ( var id in listDN ) {
-            name = listDN[id]
+            name = listDN[id];
 
             if ( name.Ref && !name.Hidden && name.Name.indexOf("_xlnm") < 0 ) {
                 if( name.isTable || name.parsedRef && name.parsedRef.isParsed && name.parsedRef.countRef == 1 && name.parsedRef.outStack.length == 1 && name.parsedRef.calculate().errorType !== AscCommonExcel.cErrorType.bad_reference ){

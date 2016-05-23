@@ -1706,15 +1706,15 @@ var editor;
           }
           this.handlers.trigger("asc_onLockDefNameManager",Asc.c_oAscDefinedNameReason.LockDefNameManager);
       }
-  }
+  };
 
   spreadsheet_api.prototype._onUnlockDefName = function() {
     this.wb.unlockDefName();
-  }
+  };
 
   spreadsheet_api.prototype._onCheckDefNameLock = function() {
     return this.wb._onCheckDefNameLock();
-  }
+  };
 
   // Залочена ли работа с листом
   spreadsheet_api.prototype.asc_isWorksheetLockedOrDeleted = function(index) {
