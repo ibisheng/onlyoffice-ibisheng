@@ -4704,7 +4704,7 @@ TablePart.prototype.changeRef = function(col, row, bIsFirst) {
 	this.Ref = ref;
 	
 	//event
-	var endRow = this.TotalsRowCount && this.TotalsRowCount >= 1 ? this.Ref.r2 - 1 : this.Ref.r2;
+	var endRow = this.TotalsRowCount ? this.Ref.r2 - 1 : this.Ref.r2;
 	var refNamedRanges = Asc.Range(this.Ref.c1, this.Ref.r1, this.Ref.c2, endRow);
 	this.handlers.trigger("changeRefTablePart", this.DisplayName, refNamedRanges);
 	
@@ -4867,7 +4867,7 @@ TablePart.prototype.getTableRangeForFormula = function(objectParam)
 		}
 		case FormulaTablePartInfo.totals:
 		{
-			if(this.TotalsRowCount && this.TotalsRowCount >= 1)
+			if(this.TotalsRowCount)
 			{
 				res = new Asc.Range(this.Ref.c1, this.Ref.r2, this.Ref.c2, this.Ref.r2);
 			}
@@ -4892,7 +4892,7 @@ TablePart.prototype.getTableRangeForFormula = function(objectParam)
 				endCol = startCol;
 			
 			var startRow = this.HeaderRowCount === null ? this.Ref.r1 + 1 : this.Ref.r1;
-			var endRow = this.TotalsRowCount > 0 ? this.Ref.r2 - 1 : this.Ref.r2;
+			var endRow = this.TotalsRowCount ? this.Ref.r2 - 1 : this.Ref.r2;
 			
 			res = new Asc.Range(this.Ref.c1 + startCol, startRow, this.Ref.c1 + endCol, endRow);
 			break;
@@ -4993,7 +4993,7 @@ TablePart.prototype.changeDisplayName = function(newName)
 TablePart.prototype.getRangeWithoutHeaderFooter = function()
 {
 	var startRow = this.HeaderRowCount === null ? this.Ref.r1 + 1 : this.Ref.r1;
-	var endRow = this.TotalsRowCount > 0 ? this.Ref.r2 - 1 : this.Ref.r2;
+	var endRow = this.TotalsRowCount ? this.Ref.r2 - 1 : this.Ref.r2;
 	
 	return Asc.Range(this.Ref.c1, startRow, this.Ref.c2, endRow);
 }; 
