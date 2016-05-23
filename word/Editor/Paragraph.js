@@ -3048,6 +3048,7 @@ Paragraph.prototype =
             case para_Drawing:
             case para_NewLine:
             case para_FootnoteReference:
+            case para_FootnoteRef:
             default:
             {
                 // Элементы данного типа добавляем во внутренний элемент

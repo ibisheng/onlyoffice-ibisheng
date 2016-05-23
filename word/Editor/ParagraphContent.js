@@ -7556,17 +7556,34 @@ ParaFootnoteReference.prototype.Write_ToBinary   = function(Writer)
     // Long   : Type
     // String : FootnoteId
     Writer.WriteLong(this.Type);
-    Writer.WriteString2(this.FootnoteId);
+    Writer.WriteString2(this.Footnote.Get_Id());
 };
 ParaFootnoteReference.prototype.Read_FromBinary  = function(Reader)
 {
     // String : FootnoteId
-    this.FootnoteId = Reader.GetString2();
+    this.Footnote = g_oTableId.Get_ById(Reader.GetString2());
 };
 ParaFootnoteReference.prototype.Get_Footnote     = function()
 {
     return this.Footnote;
 };
+
+/**
+ * Класс представляющий номер сноски внутри сноски.
+ * @param {CFootEndnote} Footnote - Ссылка на сноску.
+ * @constructor
+ */
+function ParaFootnoteRef(Footnote)
+{
+    ParaFootnoteRef.superclass.constructor.call(this, Footnote);
+}
+AscCommon.extendClass(ParaFootnoteRef, ParaFootnoteReference);
+ParaFootnoteRef.prototype.Type = para_FootnoteRef;
+ParaFootnoteRef.prototype.Get_Type = function()
+{
+    return para_FootnoteRef;
+};
+
 
 
 function ParagraphContent_Read_FromBinary(Reader)

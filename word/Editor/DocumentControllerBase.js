@@ -142,11 +142,26 @@ CDocumentControllerBase.prototype.Get_Theme = function()
     return this.LogicDocument.Get_Theme();
 };
 /**
+ * Получаем мап цветов.
+ */
+CDocumentControllerBase.prototype.Get_ColorMap = function()
+{
+    return this.LogicDocument.Get_ColorMap();
+};
+/**
  * Запрашиваем информацию о конце пересчета предыдущего элемента.
  * @param CurElement
  * @returns {null}
  */
 CDocumentControllerBase.prototype.Get_PrevElementEndInfo = function(CurElement)
+{
+    return null;
+};
+/**
+ * Получаем текущее преобразование.
+ * @returns {null}
+ */
+CDocumentControllerBase.prototype.Get_ParentTextTransform = function()
 {
     return null;
 };

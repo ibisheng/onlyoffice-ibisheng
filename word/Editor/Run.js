@@ -2250,6 +2250,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                 case para_Sym:
                 case para_Text:
                 case para_FootnoteReference:
+                case para_FootnoteRef:
                 {
                     // Отмечаем, что началось слово
                     StartWord = true;
@@ -3093,6 +3094,7 @@ ParaRun.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine, _Cur
             case para_Text:
             case para_PageNum:
             case para_FootnoteReference:
+            case para_FootnoteRef:
             {
                 UpdateLineMetricsText = true;
                 break;
@@ -3191,6 +3193,7 @@ ParaRun.prototype.Recalculate_Range_Width = function(PRSC, _CurLine, _CurRange)
             case para_Sym:
             case para_Text:
             case para_FootnoteReference:
+            case para_FootnoteRef:
             {
                 PRSC.Letters++;
 
@@ -3342,6 +3345,7 @@ ParaRun.prototype.Recalculate_Range_Spaces = function(PRSA, _CurLine, _CurRange,
             case para_Sym:
             case para_Text:
             case para_FootnoteReference:
+            case para_FootnoteRef:
             {
                 var WidthVisible = 0;
 
@@ -4240,6 +4244,7 @@ ParaRun.prototype.Draw_HighLights = function(PDSH)
             case para_Math_Ampersand:
             case para_Sym:
             case para_FootnoteReference:
+            case para_FootnoteRef:
             {
                 if ( para_Drawing === ItemType && !Item.Is_Inline() )
                     break;
@@ -4401,7 +4406,7 @@ ParaRun.prototype.Draw_Elements = function(PDSE)
 
         var TempY = Y;
 
-        if (ItemType === para_FootnoteReference)
+        if (ItemType === para_FootnoteReference || ItemType === para_FootnoteRef)
         {
             Y -= vertalign_Koef_Super * CurTextPr.FontSize * g_dKoef_pt_to_mm;
         }
@@ -4430,6 +4435,7 @@ ParaRun.prototype.Draw_Elements = function(PDSE)
             case para_Text:
             case para_Sym:
             case para_FootnoteReference:
+            case para_FootnoteRef:
             {
                 if (para_Tab === ItemType)
                 {
@@ -4701,6 +4707,7 @@ ParaRun.prototype.Draw_Lines = function(PDSL)
             case para_Text:
             case para_Sym:
             case para_FootnoteReference:
+            case para_FootnoteRef:
             {
                 if ( para_Drawing != ItemType || Item.Is_Inline() )
                 {

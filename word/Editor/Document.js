@@ -68,6 +68,7 @@ var recalcresultflags_Column            = 0x010000; // Пересчитывае�
 var recalcresultflags_Page              = 0x020000; // Пересчитываем всю страницу
 var recalcresultflags_LastFromNewPage   = 0x040000; // Используется совсместно с recalcresult_NextPage, означает, что начало последнего элемента нужно перенести на новую страницу
 var recalcresultflags_LastFromNewColumn = 0x080000; // Используется совсместно с recalcresult_NextPage, означает, что начало последнего элемента нужно перенести на новую колонку
+var recalcresultflags_Footnotes         = 0x010000; // Сообщаем, что необходимо пересчитать сноски на данной странице
 
 // Типы которые возвращают классы CDocument и CDocumentContent после пересчета страницы
 var recalcresult2_End      = 0x00; // Документ рассчитан до конца
@@ -1363,7 +1364,7 @@ function CDocument(DrawingDocument, isMainLogicDocument)
     this.HdrFtr = new CHeaderFooterController(this, this.DrawingDocument);
 
     // Класс для работы со сносками
-    //this.Footnotes = new CFootnotesController(this);
+    this.Footnotes = new CFootnotesController(this);
 
     // Класс для работы с поиском
     this.SearchInfo =
@@ -1601,7 +1602,7 @@ CDocument.prototype.Get_PageContentStartPos2       = function(StartPageIndex, St
 
     var SectPr = this.SectionsInfo.Get_SectPr(ElementIndex).SectPr;
 
-    var FootnotesHeight = 0;//this.Footnotes.Get_Height(StartPageIndex);
+    var FootnotesHeight = this.Footnotes.Get_Height(StartPageIndex);
 
     var Y      = SectPr.Get_PageMargin_Top();
     var YLimit = SectPr.Get_PageHeight() - SectPr.Get_PageMargin_Bottom() - FootnotesHeight;
@@ -1616,7 +1617,7 @@ CDocument.prototype.Get_PageContentStartPos2       = function(StartPageIndex, St
     if (this.Pages[PageAbs] && this.Pages[PageAbs].Sections[SectionIndex])
     {
         Y      = this.Pages[PageAbs].Sections[SectionIndex].Get_Y();
-        YLimit = this.Pages[PageAbs].Sections[SectionIndex].Get_YLimit();
+        YLimit = this.Pages[PageAbs].Sections[SectionIndex].Get_YLimit() - FootnotesHeight;
     }
 
     var HdrFtrLine = this.HdrFtr.Get_HdrFtrLines(PageAbs);
@@ -2062,7 +2063,10 @@ CDocument.prototype.Recalculate = function(bOneParagraph, bRecalcContentLast, _R
     this.DrawingDocument.OnStartRecalculate(StartPage);
     this.Recalculate_Page();
 };
-CDocument.prototype.Recalculate_Page                         = function()
+/**
+ * Пересчитываем следующую страницу.
+ */
+CDocument.prototype.Recalculate_Page = function()
 {
     var SectionIndex = this.FullRecalc.SectionIndex;
     var PageIndex    = this.FullRecalc.PageIndex;
@@ -2189,7 +2193,8 @@ CDocument.prototype.Recalculate_Page                         = function()
         //console.log( "Regular Recalc " + PageIndex );
 
         var StartPos = this.Get_PageContentStartPos(PageIndex, StartIndex);
-        this.Recalculate_PageFootnotes(PageIndex);
+        this.Footnotes.Reset(PageIndex);
+        this.private_RecalculatePageFootnotes(PageIndex);
 
         this.Pages[PageIndex].ResetStartElement = this.FullRecalc.ResetStartElement;
         this.Pages[PageIndex].X                 = StartPos.X;
@@ -2205,6 +2210,9 @@ CDocument.prototype.Recalculate_Page                         = function()
 
     this.Recalculate_PageColumn();
 };
+/**
+ * Пересчитываем следующую колоноку.
+ */
 CDocument.prototype.Recalculate_PageColumn                   = function()
 {
     var PageIndex          = this.FullRecalc.PageIndex;
@@ -2389,6 +2397,11 @@ CDocument.prototype.Recalculate_PageColumn                   = function()
             {
                 _ColumnIndex = 0;
                 _StartIndex  = this.Pages[_PageIndex].Sections[_SectionIndex].Columns[0].Pos;
+            }
+
+            if (RecalcResult & recalcresultflags_Footnotes)
+            {
+                this.private_RecalculatePageFootnotes(PageIndex);
             }
 
             break;
@@ -2648,6 +2661,11 @@ CDocument.prototype.Recalculate_PageColumn                   = function()
         //console.log("LastRecalc: " + ((new Date().getTime() - this.StartTime) / 1000));
     }
 
+    if (Index >= Count || _PageIndex > PageIndex)
+    {
+        this.private_RecalculateShiftFootnotes(PageIndex);
+    }
+
     if (true === bReDraw)
     {
         this.DrawingDocument.OnRecalculatePage(PageIndex, this.Pages[PageIndex]);
@@ -2707,9 +2725,16 @@ CDocument.prototype.Recalculate_PageColumn                   = function()
         }
     }
 };
-CDocument.prototype.Recalculate_PageFootnotes                = function(PageIndex)
+CDocument.prototype.private_RecalculatePageFootnotes         = function(PageIndex)
 {
-    //this.Footnotes.Recalculate(PageIndex, 0, 0, 0, 10000);
+    var PageMetrics = this.Get_PageContentStartPos(PageIndex);
+    this.Footnotes.Recalculate(PageIndex, PageMetrics.X, PageMetrics.XLimit, 0, 10000);
+};
+CDocument.prototype.private_RecalculateShiftFootnotes        = function(PageIndex)
+{
+    var FootnotesHeight = this.Footnotes.Get_Height(PageIndex);
+    var PageMetrics = this.Get_PageContentStartPos(PageIndex);
+    this.Footnotes.Shift(PageIndex, 0, PageMetrics.YLimit - FootnotesHeight);
 };
 CDocument.prototype.private_RecalculateFlowTable             = function(RecalcInfo)
 {
@@ -3436,6 +3461,8 @@ CDocument.prototype.Draw                                     = function(nPageInd
         pGraphics.End_GlobalAlpha();
 
     this.DrawingObjects.drawBehindDoc(nPageIndex, pGraphics);
+
+    this.Footnotes.Draw(nPageIndex, pGraphics);
 
     var Page = this.Pages[nPageIndex];
     for (var SectionIndex = 0, SectionsCount = Page.Sections.length; SectionIndex < SectionsCount; ++SectionIndex)
@@ -11504,7 +11531,20 @@ CDocument.prototype.OnKeyDown               = function(e)
     // --> TEST
     // else if (113 === e.KeyCode)
     // {
+    //     this.History.Create_NewPoint();
     //     var oFootnote = this.Footnotes.Create_Footnote();
+    //
+    //     oFootnote.Paragraph_Add(new ParaFootnoteRef(oFootnote));
+    //     oFootnote.Paragraph_Add(new ParaSpace());
+    //     oFootnote.Paragraph_Add(new ParaText("F"));
+    //     oFootnote.Paragraph_Add(new ParaText("o"));
+    //     oFootnote.Paragraph_Add(new ParaText("o"));
+    //     oFootnote.Paragraph_Add(new ParaText("t"));
+    //     oFootnote.Paragraph_Add(new ParaText("n"));
+    //     oFootnote.Paragraph_Add(new ParaText("o"));
+    //     oFootnote.Paragraph_Add(new ParaText("t"));
+    //     oFootnote.Paragraph_Add(new ParaText("e"));
+    //
     //     this.Paragraph_Add(new ParaFootnoteReference(oFootnote));
     //     bRetValue = keydownresult_PreventAll;
     // }

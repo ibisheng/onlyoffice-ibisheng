@@ -1791,7 +1791,7 @@ Paragraph.prototype.private_RecalculateLineCheckFootnotes = function(CurLine, Cu
                 var PageAbs = this.Get_AbsolutePage(CurPage);
                 RecalcInfo.Set_FootnoteReference(oFootnote, PageAbs);
                 this.Parent.Footnotes.Add_FootnoteOnPage(PageAbs, oFootnote);
-                PRS.RecalcResult = recalcresult_CurPage & recalcresultflags_Page;
+                PRS.RecalcResult = recalcresult_CurPage | recalcresultflags_Page | recalcresultflags_Footnotes;
                 return false;
             }
             else if (true === RecalcInfo.Check_FootnoteReference(oFootnote))
