@@ -1153,16 +1153,9 @@
 					
 					selectedTableParts = this._searchFiltersInRange(range, true);
 					if(selectedTableParts && selectedTableParts.length)
-						deleteFormatCallBack();
-					else
-					{
-						//TODO сделать так, чтобы табличный стиль без таблицы не переносился. если делаем move из ф/т, копируем стиль таблицы из tableXfs в xfs
-						History.Create_NewPoint();
-						History.StartTransaction();
-						this._cleanStyleTable(range);
-						t._addHistoryObj(null, AscCH.historyitem_AutoFilter_CleanFormat, {activeCells: range});
-						History.EndTransaction();
-					}
+                    {
+                        deleteFormatCallBack();
+                    }
 				}
 			},
 			
