@@ -652,7 +652,7 @@ prot['Through'] = prot.Through;
 prot['TopAndBottom'] = prot.TopAndBottom;
 prot['Behind'] = prot.Behind;
 prot['InFront'] = prot.InFront;
-window['Asc']['c_oAscContextMenuTypes'] = c_oAscContextMenuTypes;
+window['Asc']['c_oAscContextMenuTypes'] = window['Asc'].c_oAscContextMenuTypes = c_oAscContextMenuTypes;
 prot = c_oAscContextMenuTypes;
 prot['Common'] = prot.Common;
 prot['ChangeHdrFtr'] = prot.ChangeHdrFtr;

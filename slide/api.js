@@ -5786,7 +5786,7 @@ function CContextMenuData(oData)
     }
     else
     {
-        this.Type  = Asc['c_oAscContextMenuTypes'].Main;
+        this.Type  = Asc.c_oAscContextMenuTypes.Main;
         this.X_abs = 0;
         this.Y_abs = 0;
         this.IsSlideSelect = true;

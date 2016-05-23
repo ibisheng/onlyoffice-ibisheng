@@ -1,4 +1,4 @@
-"use strict";
+﻿"use strict";
 
 var c_oAscZoomType = {
   Current: 0,
@@ -125,7 +125,7 @@ prot = c_oAscVertAlignJc;
 prot['Top'] = prot.Top;
 prot['Center'] = prot.Center;
 prot['Bottom'] = prot.Bottom;
-window['Asc']['c_oAscContextMenuTypes'] = c_oAscContextMenuTypes;
+window['Asc']['c_oAscContextMenuTypes'] = window['Asc'].c_oAscContextMenuTypes = c_oAscContextMenuTypes;
 prot = c_oAscContextMenuTypes;
 prot['Main'] = prot.Main;
 prot['Thumbnails'] = prot.Thumbnails;
