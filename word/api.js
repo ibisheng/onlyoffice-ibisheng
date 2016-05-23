@@ -5546,7 +5546,7 @@ asc_docs_api.prototype.sync_ImgPropCallback = function(imgProp)
 };
 
 
-    asc_docs_api.prototype.asc_addOleObjectAction = function(sLocalUrl, sData, sApplicationId, fWidth, fHeight)
+    asc_docs_api.prototype.asc_addOleObjectAction = function(sLocalUrl, sData, sApplicationId, fWidth, fHeight, nWidthPix, nHeightPix)
     {
         var _image = this.ImageLoader.LoadImage(AscCommon.getFullImageSrc2(sLocalUrl), 1);
         if (null != _image)//картинка уже должна быть загружена
@@ -5554,7 +5554,7 @@ asc_docs_api.prototype.sync_ImgPropCallback = function(imgProp)
             if (false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content))
             {
                 this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_AddOleObject);
-                this.WordControl.m_oLogicDocument.Add_OleObject(fWidth, fHeight, sLocalUrl, sData, sApplicationId);
+                this.WordControl.m_oLogicDocument.Add_OleObject(fWidth, fHeight, nWidthPix, nHeightPix, sLocalUrl, sData, sApplicationId);
             }
         }
     };

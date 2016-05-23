@@ -854,7 +854,13 @@ function ResizeTrackShapeImage(originalObject, cardDirection)
                 }
                 if(api)
                 {
-                    api.runResize(this.originalObject.m_sApplicationId, this.originalObject.m_sData, xfrm.extX, xfrm.extY);
+                    var pluginData = new Asc.CPluginData();
+                    pluginData.setAttribute("data", this.originalObjec.m_sData);
+                    pluginData.setAttribute("guid", this.originalObjec.m_sApplicationId);
+                    pluginData.setAttribute("width", this.originalObjec.extX);
+                    pluginData.setAttribute("height", this.originalObjec.extY);
+                    pluginData.setAttribute("objectId", this.originalObjec.Get_Id());
+                    api.asc_pluginResize(pluginData);
                 }
             }
 

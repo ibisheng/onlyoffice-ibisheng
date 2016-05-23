@@ -607,14 +607,36 @@ baseEditorsApi.prototype._uploadCallback = function(error, files) {
         }, this.editorId === c_oEditorId.Spreadsheet);
     };
 
-    baseEditorsApi.prototype.asc_addOleObject = function(sImageUrl, sData, sApplicationId){
+    baseEditorsApi.prototype.asc_addOleObject = function(oPluginData){
         var oThis = this;
-        this.asc_checkImageUrlAndAction(sImageUrl, function(oImage){oThis.asc_addOleObjectAction(AscCommon.g_oDocumentUrls.getImageLocal(oImage.src), sData, sApplicationId, oImage.Image.width * AscCommon.g_dKoef_pix_to_mm, oImage.Image.height * AscCommon.g_dKoef_pix_to_mm);});
+      var oThis = this;
+      var sImgSrc = oPluginData.getAttribute("imgSrc");
+      var nWidthPix = oPluginData.getAttribute("widthPix");
+      var nHeightPix = oPluginData.getAttribute("heightPix");
+      var fWidth = oPluginData.getAttribute("width");
+      var fHeight = oPluginData.getAttribute("height");
+      var sData = oPluginData.getAttribute("data");
+      var sGuid = oPluginData.getAttribute("guid");
+      if(typeof sImgSrc === "string" && sImgSrc.length > 0 && typeof sData === "string"
+          && typeof sGuid === "string" && sGuid.length > 0
+          && AscFormat.isRealNumber(nWidthPix) && AscFormat.isRealNumber(nHeightPix)
+          && AscFormat.isRealNumber(fWidth) && AscFormat.isRealNumber(fHeight)
+      )
+        this.asc_checkImageUrlAndAction(sImgSrc, function(oImage){oThis.asc_addOleObjectAction(AscCommon.g_oDocumentUrls.getImageLocal(oImage.src), sData, sGuid, fWidth, fHeight, nWidthPix, nHeightPix);});
     };
 
-    baseEditorsApi.prototype.asc_editOleObject = function(bResize, sImageUrl, sData){
+    baseEditorsApi.prototype.asc_editOleObject = function(bResize, oPluginData){
         var oThis = this;
-        this.asc_checkImageUrlAndAction(sImageUrl, function(oImage){oThis.asc_editOleObjectAction(bResize, AscCommon.g_oDocumentUrls.getImageLocal(oImage.src), sData, oImage.Image.width, oImage.Image.height);});
+        var sImgSrc = oPluginData.getAttribute("imgSrc");
+        var oOleObject = AscCommon.g_oTableId.Get_ById(oPluginData.getAttribute("objectId"));
+        var nWidthPix = oPluginData.getAttribute("widthPix");
+        var nHeightPix = oPluginData.getAttribute("heightPix");
+        var sData = oPluginData.getAttribute("data");
+        var fWidth
+        if(typeof sImgSrc === "string" && sImgSrc.length > 0 && typeof sData === "string"
+            && oOleObject && AscFormat.isRealNumber(nWidthPix) && AscFormat.isRealNumber(nHeightPix)){
+          this.asc_checkImageUrlAndAction(sImgSrc, function(oImage){oThis.asc_editOleObjectAction(bResize, oOleObject, AscCommon.g_oDocumentUrls.getImageLocal(oImage.src), nWidthPix, nHeightPix);});
+        }
     };
 
     baseEditorsApi.prototype.asc_addOleObjectAction = function(sLocalUrl, sData, sApplicationId, fWidth, fHeight)
@@ -695,15 +717,15 @@ baseEditorsApi.prototype.asc_pluginsRegister = function(basePath, plugins)
   if (null != this.pluginsManager)
     this.pluginsManager.register(basePath, plugins);
 };
-baseEditorsApi.prototype.asc_pluginRun = function(guid, variation, data)
+baseEditorsApi.prototype.asc_pluginRun = function(variation, pluginData)
 {
   if (null != this.pluginsManager)
-    this.pluginsManager.run(guid, variation, data);
+    this.pluginsManager.run(variation, pluginData);
 };
-baseEditorsApi.prototype.asc_pluginResize = function(guid, data, width, height)
+baseEditorsApi.prototype.asc_pluginResize = function(pluginData)
 {
   if (null != this.pluginsManager)
-    this.pluginsManager.runResize(guid, data, width, height);
+    this.pluginsManager.runResize(pluginData);
 };
 
 

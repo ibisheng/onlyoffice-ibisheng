@@ -1224,7 +1224,12 @@ CGraphicObjects.prototype =
         {
             var pluginData = new Asc.CPluginData();
             pluginData.setAttribute("data", oleObject.m_sData);
-            editor.asc_pluginRun(oleObject.m_sApplicationId, 0, pluginData);
+            pluginData.setAttribute("guid", oleObject.m_sApplicationId);
+            pluginData.setAttribute("width", oleObject.extX);
+            pluginData.setAttribute("height", oleObject.extY);
+            pluginData.setAttribute("widthPix", oleObject.m_nPixWidth);
+            pluginData.setAttribute("heightPix", oleObject.m_nPixHeight);
+            editor.asc_pluginRun(0, pluginData);
         }
         this.changeCurrentState(new AscFormat.NullState(this));
         this.document.OnMouseUp(e, x, y, pageIndex);
@@ -1272,19 +1277,19 @@ CGraphicObjects.prototype =
         }
     },
 
-    addOleObject: function(W, H, Img, Data, sApplicationId)
+    addOleObject: function(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId)
     {
         var content = this.getTargetDocContent();
         if(content)
         {
             if(!content.bPresentation){
-                content.Add_OleObject(W, H, Img, Data, sApplicationId);
+                content.Add_OleObject(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId);
             }
             else{
                 if(this.selectedObjects.length > 0)
                 {
                     this.resetSelection2();
-                    this.document.Add_OleObject(W, H, Img, Data, sApplicationId);
+                    this.document.Add_OleObject(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId);
                 }
             }
         }
@@ -1294,14 +1299,14 @@ CGraphicObjects.prototype =
             {
                 this.resetInternalSelection();
                 this.document.Remove(1, true);
-                this.document.Add_OleObject(W, H, Img, Data, sApplicationId);
+                this.document.Add_OleObject(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId);
             }
             else
             {
                 if(this.selectedObjects.length > 0)
                 {
                     this.resetSelection2();
-                    this.document.Add_OleObject(W, H, Img, Data, sApplicationId);
+                    this.document.Add_OleObject(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId);
                 }
             }
         }

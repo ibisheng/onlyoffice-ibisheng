@@ -7046,13 +7046,13 @@ DrawingObjectsController.prototype =
         return image;
     },
 
-    createOleObject: function(data, sApplicationId, rasterImageId, x, y, extX, extY)
+    createOleObject: function(data, sApplicationId, rasterImageId, x, y, extX, extY, nWidthPix, nHeightPix)
     {
         var oleObject = new AscFormat.COleObject();
         AscFormat.fillImage(oleObject, rasterImageId, x, y, extX, extY);
         oleObject.setData(data);
         oleObject.setApplicationId(sApplicationId);
-        oleObject.setPixSizes(extX*AscCommon.g_dKoef_pix_to_mm, extY*AscCommon.g_dKoef_pix_to_mm);
+        oleObject.setPixSizes(nWidthPix, nHeightPix);
         return oleObject;
     },
 
