@@ -331,21 +331,17 @@ cString.prototype.tocNumber = function () {
      }*/
 
     if ( g_oFormatParser.isLocaleNumber( this.value ) ) {
-    if ("." != AscCommon.g_oDefaultCultureInfo.NumberDecimalSeparator) {
-            m = this.value.replace( ".", "q" );//заменяем на символ с которым не распознается, как в Excel
-      m = m.replace(AscCommon.g_oDefaultCultureInfo.NumberDecimalSeparator, ".");
+        var numberValue = g_oFormatParser.parseLocaleNumber( this.value );
+        if ( !isNaN( numberValue ) ) {
+            res = new cNumber( numberValue );
         }
-
-        if ( !parseNum( m ) ) {
-            res = new cError( cErrorType.wrong_value_type );
     } else {
-            var numberValue = g_oFormatParser.parseLocaleNumber( this.value );
-            if ( !isNaN( numberValue ) ) {
-                res = new cNumber( numberValue );
-            }
+        var parseRes = AscCommon.g_oFormatParser.parse(this.value);
+        if(null != parseRes) {
+            res = new cNumber( parseRes.value );
+        } else {
+            res = new cError( cErrorType.wrong_value_type );
         }
-  } else {
-        res = new cError( cErrorType.wrong_value_type );
     }
 
     return res;
