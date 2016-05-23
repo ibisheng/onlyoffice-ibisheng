@@ -7411,8 +7411,9 @@ CDocumentContent.prototype.Selection_SetStart = function(X, Y, CurPage, MouseEve
         }
         else
         {
-            Item.Selection_SetStart(X, Y, this.CurPage, MouseEvent);
-            Item.Selection_SetEnd(X, Y, this.CurPage, {Type : AscCommon.g_mouse_event_type_move, ClickCount : 1});
+            var ElementPageIndex = this.private_GetElementPageIndexByXY(ContentPos, X, Y, this.CurPage);
+            Item.Selection_SetStart(X, Y, ElementPageIndex, MouseEvent);
+            Item.Selection_SetEnd(X, Y, ElementPageIndex, {Type : AscCommon.g_mouse_event_type_move, ClickCount : 1});
 
             if (!(type_Table == Item.GetType() && true == bTableBorder))
             {
@@ -7479,8 +7480,9 @@ CDocumentContent.prototype.Selection_SetEnd          = function(X, Y, CurPage, M
     // Обрабатываем движение границы у таблиц
     if (null != this.Selection.Data && true === this.Selection.Data.TableBorder && type_Table == this.Content[this.Selection.Data.Pos].GetType())
     {
-        var Item = this.Content[this.Selection.Data.Pos];
-        Item.Selection_SetEnd(X, Y, this.CurPage, MouseEvent);
+        var Item             = this.Content[this.Selection.Data.Pos];
+        var ElementPageIndex = this.private_GetElementPageIndexByXY(this.Selection.Data.Pos, X, Y, this.CurPage);
+        Item.Selection_SetEnd(X, Y, ElementPageIndex, MouseEvent);
 
         if (AscCommon.g_mouse_event_type_up == MouseEvent.Type)
         {
@@ -7552,9 +7554,9 @@ CDocumentContent.prototype.Selection_SetEnd          = function(X, Y, CurPage, M
     var Start, End;
     if (0 == Direction)
     {
-        var Item     = this.Content[this.Selection.StartPos];
-        var ItemType = Item.GetType();
-        Item.Selection_SetEnd(X, Y, this.CurPage, MouseEvent);
+        var Item             = this.Content[this.Selection.StartPos];
+        var ElementPageIndex = this.private_GetElementPageIndexByXY(this.Selection.StartPos, X, Y, this.CurPage);
+        Item.Selection_SetEnd(X, Y, ElementPageIndex, MouseEvent);
 
         if (false === Item.Selection.Use)
         {
@@ -7605,7 +7607,8 @@ CDocumentContent.prototype.Selection_SetEnd          = function(X, Y, CurPage, M
         this.Content[Start].Selection.EndPos   = this.Content[Start].Content.length - 1;
     }
 
-    this.Content[ContentPos].Selection_SetEnd(X, Y, this.CurPage, MouseEvent);
+    var ElementPageIndex = this.private_GetElementPageIndexByXY(ContentPos, X, Y, this.CurPage);
+    this.Content[ContentPos].Selection_SetEnd(X, Y, ElementPageIndex, MouseEvent);
 
     for (var Index = Start; Index <= End; Index++)
     {
