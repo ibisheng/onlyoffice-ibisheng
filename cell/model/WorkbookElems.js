@@ -4857,7 +4857,10 @@ TablePart.prototype.getTableRangeForFormula = function(objectParam)
 		}
 		case FormulaTablePartInfo.data:
 		{
-			res = new Asc.Range(this.Ref.c1, this.Ref.r1 + 1, this.Ref.c2, this.Ref.r2);
+			var startRow = this.HeaderRowCount === null ? this.Ref.r1 + 1 : this.Ref.r1;
+			var endRow = this.TotalsRowCount ? this.Ref.r2 - 1 : this.Ref.r2;
+			
+			res = new Asc.Range(this.Ref.c1, startRow, this.Ref.c2, endRow);
 			break;
 		}
 		case FormulaTablePartInfo.headers:
