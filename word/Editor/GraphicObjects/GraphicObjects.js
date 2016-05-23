@@ -1222,7 +1222,9 @@ CGraphicObjects.prototype =
     {
         if(false === this.document.Document_Is_SelectionLocked(changestype_Drawing_Props))
         {
-            editor.asc_pluginRun(oleObject.m_sApplicationId, 0, oleObject.m_sData);
+            var pluginData = new Asc.CPluginData();
+            pluginData.setAttribute("data", oleObject.m_sData);
+            editor.asc_pluginRun(oleObject.m_sApplicationId, 0, pluginData);
         }
         this.changeCurrentState(new AscFormat.NullState(this));
         this.document.OnMouseUp(e, x, y, pageIndex);

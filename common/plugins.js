@@ -1,5 +1,48 @@
 (function(window, undefined){
 
+    function CPluginData()
+    {
+        this.privateData = {};
+    }
+    CPluginData.prototype =
+    {
+        setAttribute : function(name, value)
+        {
+            this.privateData[name] = value;
+        },
+
+        getAttribute : function(name)
+        {
+            return this.privateData[name];
+        },
+
+        serialize : function()
+        {
+            var _data = "";
+            try
+            {
+                _data = JSON.stringify(this.privateData);
+            }
+            catch(err)
+            {
+                _data = "{ \"data\" : \"\" }";
+            }
+            return _data;
+        },
+
+        deserialize : function(_data)
+        {
+            try
+            {
+                this.privateData = JSON.parse(_data);
+            }
+            catch(err)
+            {
+                this.privateData = { "data" : "" };
+            }
+        }
+    };
+
     function CPluginsManager(api)
     {
         this.plugins = [];
@@ -7,8 +50,7 @@
         this.path = "";
         this.api = null;
 
-        this.startData = "";
-
+        this.startData = null;
         this.runAndCloseData = null;
     }
 
@@ -41,13 +83,16 @@
                 if (this.plugins[i].guid == guid)
                 {
                     this.current = this.plugins[i];
+                    break;
                 }
             }
 
             if (this.current == null)
                 return false;
 
-            this.startData = (data == null) ? "" : data;
+            this.startData = (data == null || data == "") ? new CPluginData() : data;
+            this.startData.setAttribute("guid", guid)
+            this.correctData(this.startData);
             this.show();
         },
         runResize   : function(guid, data, width, height)
@@ -98,13 +143,16 @@
             var _iframe = document.getElementById("plugin_iframe");
             if (_iframe)
             {
-                _iframe.contentWindow.postMessage(this.current.guid + ";button;" + id, "*");
+                var pluginData = new CPluginData();
+                pluginData.setAttribute("guid", this.current.guid);
+                pluginData.setAttribute("type", "button");
+                pluginData.setAttribute("button", "" + id);
+                _iframe.contentWindow.postMessage(pluginData.serialize(), "*");
             }
         },
 
         init : function()
         {
-            var _data = "";
             switch (this.current.variations[0].initDataType)
             {
                 case Asc.EPluginDataType.text:
@@ -115,12 +163,12 @@
                     };
                     
                     this.api.asc_CheckCopy(text_data, 1);
-                    _data = text_data.data;
+                    this.startData.setAttribute("data", text_data.data);
                     break;
                 }
                 case Asc.EPluginDataType.ole:
                 {
-                    _data = this.startData;
+                    // теперь выше задается
                     break;
                 }
             }
@@ -128,8 +176,22 @@
             var _iframe = document.getElementById("plugin_iframe");
             if (_iframe)
             {
-                _iframe.contentWindow.postMessage(this.current.guid + ";init;" + _data, "*");
+                this.startData.setAttribute("type", "init");
+                _iframe.contentWindow.postMessage(this.startData.serialize(), "*");
             }
+        },
+        correctData : function(pluginData)
+        {
+            pluginData.setAttribute("editorType", this.api._editorNameById());
+
+            var _mmToPx = AscCommon.g_dKoef_mm_to_pix;
+            if (this.api.WordControl && this.api.WordControl.m_nZoomValue)
+                _mmToPx *= this.api.WordControl.m_nZoomValue / 100;
+
+            pluginData.setAttribute("mmToPx", _mmToPx);
+
+            if (undefined == pluginData.getAttribute("data"))
+                pluginData.setAttribute("data", "");
         }
     };
 
@@ -140,20 +202,16 @@
 
         if (typeof(event.data) == "string")
         {
-            var i1 = event.data.indexOf(";");
-            if (-1 == i1)
-                return;
+            var pluginData = new CPluginData();
+            pluginData.deserialize(event.data);
 
-            var guid = event.data.substr(0, i1);
+            var guid = pluginData.getAttribute("guid");
+
             if (guid != window.g_asc_plugins.current.guid)
                 return;
 
-            var i2 = event.data.indexOf(";", i1 + 1);
-            if (-1 == i2)
-                return;
-
-            var name = event.data.substr(i1 + 1, i2 - i1 - 1);
-            var value = event.data.substr(i2 + 1);
+            var name = pluginData.getAttribute("type");
+            var value = pluginData.getAttribute("data");
 
             if ("initialize" == name)
             {
@@ -162,7 +220,7 @@
             }
             else if ("close" == name)
             {
-                if (value != "")
+                if (value && value != "")
                 {
                     try
                     {
@@ -201,6 +259,7 @@
         return window.g_asc_plugins;
     };
 
+    window["Asc"].CPluginData = CPluginData;
 })(window, undefined);
 
 // потом удалить!!!
