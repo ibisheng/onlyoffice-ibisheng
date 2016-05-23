@@ -4967,11 +4967,15 @@ TablePart.prototype.showButton = function(val)
 
 TablePart.prototype.isShowButton = function()
 {
-	var res = true;
+	var res = false;
 	
 	if(this.AutoFilter)
 	{
 		res = this.AutoFilter.isShowButton();
+	}
+	else
+	{
+		res = null;
 	}
 	
 	return res;
