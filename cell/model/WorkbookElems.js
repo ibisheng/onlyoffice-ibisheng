@@ -3309,6 +3309,7 @@ CCellValue.prototype =
 					return cErrorOrigin["ref"];
 					break;
 				case cErrorLocal["name"]:
+				case cErrorLocal["name"].replace('\\', ''): // ToDo это неправильная правка для бага 32463 (нужно переделать parse формул)
 					return cErrorOrigin["name"];
 					break;
 				case cErrorLocal["num"]:
@@ -3646,7 +3647,7 @@ CCellValue.prototype =
 				return cErrorLocal["ref"];
 				break;
 			case cErrorOrigin["name"]:
-				return cErrorLocal["name"];
+				return cErrorLocal["name"].replace('\\', ''); // ToDo это неправильная правка для бага 32463 (нужно переделать parse формул)
 				break;
 			case cErrorOrigin["num"]:
 				return cErrorLocal["num"];
