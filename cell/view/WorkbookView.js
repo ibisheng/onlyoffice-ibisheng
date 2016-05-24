@@ -1818,7 +1818,7 @@
 
   // Вставка формулы в редактор
   WorkbookView.prototype.insertFormulaInEditor = function(name, type, autoComplete) {
-    var t = this, ws = this.getWorksheet(), cursorPos, isNotFunction;
+    var t = this, ws = this.getWorksheet(), cursorPos, isNotFunction, tmp;
 
     if (c_oAscPopUpSelectorType.None === type) {
       this.getWorksheet().setSelectionInfo("value", name, /*onlyActive*/true);
@@ -1838,7 +1838,10 @@
         } else {
           this.skipHelpSelector = true;
         }
+        tmp = this.cellEditor.skipTLUpdate;
+        this.cellEditor.skipTLUpdate = false;
         this.cellEditor.replaceText(this.lastFormulaPos, this.lastFormulaNameLength, name);
+        this.cellEditor.skipTLUpdate = tmp;
       } else if (false === this.cellEditor.insertFormula(name, isNotFunction)) {
         // Не смогли вставить формулу, закроем редактор, с сохранением текста
         this.cellEditor.close(true);
