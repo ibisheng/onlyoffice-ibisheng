@@ -1,4 +1,4 @@
-"use strict";
+﻿"use strict";
 
 (function(window, undefined){
 // Import
@@ -730,6 +730,13 @@ baseEditorsApi.prototype.asc_pluginResize = function(pluginData)
   if (null != this.pluginsManager)
     this.pluginsManager.runResize(pluginData);
 };
+
+  // Builder
+  baseEditorsApi.prototype.asc_nativeInitBuilder = function() {
+    this.asc_setDocInfo(new Asc.asc_CDocInfo());
+  };
+  baseEditorsApi.prototype.asc_SetSilentMode = function() {
+  };
 
 
 

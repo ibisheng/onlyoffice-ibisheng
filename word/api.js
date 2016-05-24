@@ -8003,12 +8003,7 @@ window["asc_docs_api"].prototype["asc_nativeApplyChanges"] = function(changes)
   AscCommon.CollaborativeEditing.Apply_OtherChanges();
 };
 
-window["asc_docs_api"].prototype["asc_nativeInitBuilder"] = function()
-{
-    this.asc_setDocInfo(new window["Asc"]["asc_CDocInfo"]());
-};
-
-window["asc_docs_api"].prototype["asc_SetSilentMode"] = function(bEnabled)
+window["asc_docs_api"].prototype.asc_SetSilentMode = function(bEnabled)
 {
     if (!this.WordControl.m_oLogicDocument)
         return;
@@ -8812,6 +8807,8 @@ asc_docs_api.prototype["asc_setInterfaceDrawImagePlaceShape"] = asc_docs_api.pro
     asc_docs_api.prototype["asc_pluginsRegister"]                       = asc_docs_api.prototype.asc_pluginsRegister;
     asc_docs_api.prototype["asc_pluginRun"]                             = asc_docs_api.prototype.asc_pluginRun;
     asc_docs_api.prototype["asc_pluginResize"]                          = asc_docs_api.prototype.asc_pluginResize;
+  asc_docs_api.prototype["asc_nativeInitBuilder"]                       = asc_docs_api.prototype.asc_nativeInitBuilder;
+  asc_docs_api.prototype["asc_SetSilentMode"]                           = asc_docs_api.prototype.asc_SetSilentMode;
 
 CParagraphPropEx.prototype['get_ContextualSpacing'] = CParagraphPropEx.prototype.get_ContextualSpacing;
 CParagraphPropEx.prototype['get_Ind'] = CParagraphPropEx.prototype.get_Ind;

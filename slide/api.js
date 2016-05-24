@@ -6610,6 +6610,8 @@ asc_docs_api.prototype['asc_SetFastCollaborative'] = asc_docs_api.prototype.asc_
 asc_docs_api.prototype['asc_isOffline'] = asc_docs_api.prototype.asc_isOffline;
 asc_docs_api.prototype['asc_getUrlType'] = asc_docs_api.prototype.asc_getUrlType;
 asc_docs_api.prototype["asc_setInterfaceDrawImagePlaceShape"] = asc_docs_api.prototype.asc_setInterfaceDrawImagePlaceShape;
+asc_docs_api.prototype["asc_nativeInitBuilder"] = asc_docs_api.prototype.asc_nativeInitBuilder;
+asc_docs_api.prototype["asc_SetSilentMode"] = asc_docs_api.prototype.asc_SetSilentMode;
 
 window['Asc']['asc_CCommentData'] = window['Asc'].asc_CCommentData = asc_CCommentData;
 asc_CCommentData.prototype['asc_getText'] = asc_CCommentData.prototype.asc_getText;
