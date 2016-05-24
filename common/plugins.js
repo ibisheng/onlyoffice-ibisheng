@@ -114,6 +114,10 @@
         },
         close    : function()
         {
+            if (this.startData.getAttribute("resize") === true)
+                this.endLongAction();
+            this.startData = null;
+
             if (true)
             {
                 var _div = document.getElementById("plugin_iframe");
@@ -132,6 +136,9 @@
 
         show : function()
         {
+            if (this.startData.getAttribute("resize") === true)
+                this.startLongAction();
+
             if (this.current.variations[0].isVisual && this.startData.getAttribute("resize") !== true)
             {
                 this.api.asc_fireCallback("asc_onPluginShow", this.current);
@@ -247,6 +254,17 @@
             }
 
             this.api.asc_fireCallback("asc_onPluginsInit", _pluginsInstall);
+        },
+
+        startLongAction : function()
+        {
+            console.log("startLongAction");
+            this.api.sync_StartAction(Asc.c_oAscAsyncActionType.BlockInteraction, Asc.c_oAscAsyncAction.SlowOperation);
+        },
+        endLongAction : function()
+        {
+            console.log("endLongAction");
+            this.api.sync_EndAction(Asc.c_oAscAsyncActionType.BlockInteraction, Asc.c_oAscAsyncAction.SlowOperation);
         }
     };
 
