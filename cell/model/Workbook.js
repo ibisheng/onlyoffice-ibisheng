@@ -877,6 +877,9 @@ DependencyGraph.prototype = {
         return oResMapCycle;
     },
     _getNodeDependenceNodeToRange:function ( sheetId, bbox, oSheetRanges ) {
+        if (!bbox) {
+            return;
+        }
         var oSheetRange = oSheetRanges[sheetId];
         if ( null == oSheetRange ) {
             oSheetRange = {range:null, changed:false, prevRange:null};
@@ -2641,9 +2644,11 @@ Workbook.prototype.editDefinesNames = function ( oldName, newName, bUndo ) {
         for ( var id in nSE ) {
             se = nSE[id];
             se.deleteMasterEdge( retRes );
-            this.needRecalc.nodes[se.nodeId] = [se.sheetId, se.cellId ];
-            this.needRecalc.length++;
-            addToArrRecalc(se.sheetId, se.cell);
+            if (!se.isDefinedName) {
+                this.needRecalc.nodes[se.nodeId] = [se.sheetId, se.cellId ];
+                this.needRecalc.length++;
+                addToArrRecalc(se.sheetId, se.cell);
+            }
             se = se.returnCell();
             if ( se ) {
                 se.setFormula( se.formulaParsed.assemble() );
