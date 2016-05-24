@@ -481,6 +481,8 @@ function checkPointInMap(map, worksheet, row, col)
 function CChartSpace()
 {
     CChartSpace.superclass.constructor.call(this);
+
+    this.nvGraphicFramePr = null;
     this.chart = null;
     this.clrMapOvr = null;
     this.date1904 = null;
@@ -1088,6 +1090,12 @@ CChartSpace.prototype.setFill = function (fill) {
 
     this.spPr.setFill(fill);
 };
+
+CChartSpace.prototype.setNvSpPr = function(pr) {
+    History.Add(this, {Type: AscDFH.historyitem_ChartSpace_SetNvGrFrProps, oldPr: this.nvGraphicFramePr, newPr: pr});
+    this.nvGraphicFramePr = pr;
+};
+
 CChartSpace.prototype.changeLine = function (line)
 {
     if(this.recalcInfo.recalculatePenBrush)
@@ -1673,6 +1681,7 @@ CChartSpace.prototype.copy = function(drawingDocument)
     copy.setUserShapes(this.userShapes);
     copy.setThemeOverride(this.themeOverride);
     copy.setBDeleted(this.bDeleted);
+    copy.setLocks(this.locks);
     copy.cachedImage = this.getBase64Img();
     copy.cachedPixH = this.cachedPixH;
     copy.cachedPixW = this.cachedPixW;

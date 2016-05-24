@@ -2899,6 +2899,12 @@ function CBinaryFileWriter()
 
         oThis.WriteUChar(g_nodeAttributeStart);
         oThis.WriteUChar(g_nodeAttributeEnd);
+        if(grObj.nvGraphicFramePr)
+        {
+            grObj.nvGraphicFramePr.locks = grObj.locks;
+            grObj.nvGraphicFramePr.objectType = grObj.getObjectType();
+            oThis.WriteRecord1(0, grObj.nvGraphicFramePr, oThis.WriteUniNvPr);
+        }
 
         if (grObj.spPr.xfrm && grObj.spPr.xfrm.isNotNull())
             oThis.WriteRecord2(1, grObj.spPr.xfrm, oThis.WriteXfrm);
@@ -3456,7 +3462,7 @@ function CBinaryFileWriter()
             oThis._WriteBool2(5, !!(locks & (AscFormat.LOCKS_MASKS.noEditPoints << 1)));
         if(locks & AscFormat.LOCKS_MASKS.noGrp)
             oThis._WriteBool2(6, !!(locks & (AscFormat.LOCKS_MASKS.noGrp << 1)));
-        if(locks & AscFormat.LOCKS_MASKS.noMov)
+        if(locks & AscFormat.LOCKS_MASKS.noMove)
             oThis._WriteBool2(7, !!(locks & (AscFormat.LOCKS_MASKS.noMove << 1)));
         if(locks & AscFormat.LOCKS_MASKS.noResize)
             oThis._WriteBool2(8, !!(locks & (AscFormat.LOCKS_MASKS.noResize << 1)));
@@ -3498,36 +3504,36 @@ function CBinaryFileWriter()
 
     this.WriteGrpCNvPr = function(locks) {
         oThis.WriteUChar(g_nodeAttributeStart);
-        if(locks & AscFormat.noChangeAspect)
-            oThis._WriteBool2(0, !!(locks & (AscFormat.noChangeAspect << 1)));
-        if(locks & AscFormat.noGrp)
-            oThis._WriteBool2(1, !!(locks & (AscFormat.noGrp << 1)));
-        if(locks & AscFormat.noMove)
-            oThis._WriteBool2(2, !!(locks & (AscFormat.noMove << 1)));
-        if(locks & AscFormat.noResize)
-            oThis._WriteBool2(3, !!(locks & (AscFormat.noResize << 1)));
-        if(locks & AscFormat.noRot)
-            oThis._WriteBool2(4, !!(locks & (AscFormat.noRot << 1)));
-        if(locks & AscFormat.noSelect)
-            oThis._WriteBool2(5, !!(locks & (AscFormat.noSelect << 1)));
-        if(locks & AscFormat.noUngrp)
-            oThis._WriteBool2(6, !!(locks & (AscFormat.noUngrp << 1)));
+        if(locks & AscFormat.LOCKS_MASKS.noChangeAspect)
+            oThis._WriteBool2(0, !!(locks & (AscFormat.LOCKS_MASKS.noChangeAspect << 1)));
+        if(locks & AscFormat.LOCKS_MASKS.noGrp)
+            oThis._WriteBool2(1, !!(locks & (AscFormat.LOCKS_MASKS.noGrp << 1)));
+        if(locks & AscFormat.LOCKS_MASKS.noMove)
+            oThis._WriteBool2(2, !!(locks & (AscFormat.LOCKS_MASKS.noMove << 1)));
+        if(locks & AscFormat.LOCKS_MASKS.noResize)
+            oThis._WriteBool2(3, !!(locks & (AscFormat.LOCKS_MASKS.noResize << 1)));
+        if(locks & AscFormat.LOCKS_MASKS.noRot)
+            oThis._WriteBool2(4, !!(locks & (AscFormat.LOCKS_MASKS.noRot << 1)));
+        if(locks & AscFormat.LOCKS_MASKS.noSelect)
+            oThis._WriteBool2(5, !!(locks & (AscFormat.LOCKS_MASKS.noSelect << 1)));
+        if(locks & AscFormat.LOCKS_MASKS.noUngrp)
+            oThis._WriteBool2(6, !!(locks & (AscFormat.LOCKS_MASKS.noUngrp << 1)));
         oThis.WriteUChar(g_nodeAttributeEnd);
     };
     this.WriteGrFrameCNvPr = function(locks) {
         oThis.WriteUChar(g_nodeAttributeStart);
-        if(locks & AscFormat.noChangeAspect)
-            oThis._WriteBool2(0, !!(locks & (AscFormat.noChangeAspect << 1)));
-        if(locks & AscFormat.noDrilldown)
-            oThis._WriteBool2(1, !!(locks & (AscFormat.noDrilldown << 1)));
-        if(locks & AscFormat.noGrp)
-            oThis._WriteBool2(2, !!(locks & (AscFormat.noGrp << 1)));
-        if(locks & AscFormat.noMove)
-            oThis._WriteBool2(3, !!(locks & (AscFormat.noMove << 1)));
-        if(locks & AscFormat.noResize)
-            oThis._WriteBool2(4, !!(locks & (AscFormat.noResize << 1)));
-        if(locks & AscFormat.noSelect)
-            oThis._WriteBool2(5, !!(locks & (AscFormat.noSelect << 1)));
+        if(locks & AscFormat.LOCKS_MASKS.noChangeAspect)
+            oThis._WriteBool2(0, !!(locks & (AscFormat.LOCKS_MASKS.noChangeAspect << 1)));
+        if(locks & AscFormat.LOCKS_MASKS.noDrilldown)
+            oThis._WriteBool2(1, !!(locks & (AscFormat.LOCKS_MASKS.noDrilldown << 1)));
+        if(locks & AscFormat.LOCKS_MASKS.noGrp)
+            oThis._WriteBool2(2, !!(locks & (AscFormat.LOCKS_MASKS.noGrp << 1)));
+        if(locks & AscFormat.LOCKS_MASKS.noMove)
+            oThis._WriteBool2(3, !!(locks & (AscFormat.LOCKS_MASKS.noMove << 1)));
+        if(locks & AscFormat.LOCKS_MASKS.noResize)
+            oThis._WriteBool2(4, !!(locks & (AscFormat.LOCKS_MASKS.noResize << 1)));
+        if(locks & AscFormat.LOCKS_MASKS.noSelect)
+            oThis._WriteBool2(5, !!(locks & (AscFormat.LOCKS_MASKS.noSelect << 1)));
         oThis.WriteUChar(g_nodeAttributeEnd);
     };
 

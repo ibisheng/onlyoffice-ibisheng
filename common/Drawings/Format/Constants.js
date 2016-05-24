@@ -442,6 +442,7 @@ window['AscDFH'].historyitem_ChartSpace_SetUserShapes = 2094;
 window['AscDFH'].historyitem_ChartSpace_SetThemeOverride = 2095;
 window['AscDFH'].historyitem_ChartSpace_SetGroup = 2096;
 window['AscDFH'].historyitem_ChartSpace_SetParent = 2097;
+window['AscDFH'].historyitem_ChartSpace_SetNvGrFrProps = 2098;
 window['AscDFH'].historyitem_Legend_SetLayout = 2095;
 window['AscDFH'].historyitem_Legend_AddLegendEntry = 2096;
 window['AscDFH'].historyitem_Legend_SetLegendPos = 2097;

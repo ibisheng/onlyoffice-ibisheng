@@ -807,7 +807,13 @@ Slide.prototype =
             switch (drawing.getObjectType())
             {
                 case AscDFH.historyitem_type_ChartSpace:
-                {
+                { 
+                    if(!drawing.nvGraphicFramePr)
+                    {
+                        nv_sp_pr = new AscFormat.UniNvPr();
+                        nv_sp_pr.cNvPr.setId(++this.maxId);
+                        drawing.setNvSpPr(nv_sp_pr);
+                    }
                     break;
                 }
                 case AscDFH.historyitem_type_GroupShape:
