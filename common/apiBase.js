@@ -635,7 +635,6 @@ baseEditorsApi.prototype._uploadCallback = function(error, files) {
         var nWidthPix = oPluginData.getAttribute("widthPix");
         var nHeightPix = oPluginData.getAttribute("heightPix");
         var sData = oPluginData.getAttribute("data");
-        var fWidth
         if(typeof sImgSrc === "string" && sImgSrc.length > 0 && typeof sData === "string"
             && oOleObject && AscFormat.isRealNumber(nWidthPix) && AscFormat.isRealNumber(nHeightPix)){
           this.asc_checkImageUrlAndAction(sImgSrc, function(oImage){oThis.asc_editOleObjectAction(bResize, oOleObject, AscCommon.g_oDocumentUrls.getImageLocal(oImage.src), sData, nWidthPix, nHeightPix);});
