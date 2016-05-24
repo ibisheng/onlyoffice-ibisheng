@@ -3497,4 +3497,9 @@ var editor;
   // Builder
   prot['asc_nativeInitBuilder'] = prot.asc_nativeInitBuilder;
   prot['asc_SetSilentMode'] = prot.asc_SetSilentMode;
+
+  // plugins
+  prot["asc_pluginsRegister"]       = prot.asc_pluginsRegister;
+  prot["asc_pluginRun"]             = prot.asc_pluginRun;
+  prot["asc_pluginResize"]          = prot.asc_pluginResize;
 })(window);

@@ -8804,11 +8804,11 @@ asc_docs_api.prototype['asc_SetFastCollaborative'] = asc_docs_api.prototype.asc_
 asc_docs_api.prototype['asc_isOffline'] = asc_docs_api.prototype.asc_isOffline;
 asc_docs_api.prototype['asc_getUrlType'] = asc_docs_api.prototype.asc_getUrlType;
 asc_docs_api.prototype["asc_setInterfaceDrawImagePlaceShape"] = asc_docs_api.prototype.asc_setInterfaceDrawImagePlaceShape;
-    asc_docs_api.prototype["asc_pluginsRegister"]                       = asc_docs_api.prototype.asc_pluginsRegister;
-    asc_docs_api.prototype["asc_pluginRun"]                             = asc_docs_api.prototype.asc_pluginRun;
-    asc_docs_api.prototype["asc_pluginResize"]                          = asc_docs_api.prototype.asc_pluginResize;
-  asc_docs_api.prototype["asc_nativeInitBuilder"]                       = asc_docs_api.prototype.asc_nativeInitBuilder;
-  asc_docs_api.prototype["asc_SetSilentMode"]                           = asc_docs_api.prototype.asc_SetSilentMode;
+asc_docs_api.prototype["asc_pluginsRegister"]       = asc_docs_api.prototype.asc_pluginsRegister;
+asc_docs_api.prototype["asc_pluginRun"]             = asc_docs_api.prototype.asc_pluginRun;
+asc_docs_api.prototype["asc_pluginResize"]          = asc_docs_api.prototype.asc_pluginResize;
+asc_docs_api.prototype["asc_nativeInitBuilder"]     = asc_docs_api.prototype.asc_nativeInitBuilder;
+asc_docs_api.prototype["asc_SetSilentMode"]         = asc_docs_api.prototype.asc_SetSilentMode;
 
 CParagraphPropEx.prototype['get_ContextualSpacing'] = CParagraphPropEx.prototype.get_ContextualSpacing;
 CParagraphPropEx.prototype['get_Ind'] = CParagraphPropEx.prototype.get_Ind;
