@@ -440,6 +440,11 @@ function checkPointInMap(map, worksheet, row, col)
                 {
                     CheckParagraphTextPr(aContent[i], oTextPr);
                 }
+
+                oElement.tx.rich.content.Set_ApplyToAll(true);
+                var oParTextPr = new AscCommonWord.ParaTextPr(oTextPr);
+                oElement.tx.rich.content.Paragraph_Add(oParTextPr);
+                oElement.tx.rich.content.Set_ApplyToAll(false);
             }
             CheckParagraphTextPr(oElement.txPr.content.Content[0], oTextPr);
         }
