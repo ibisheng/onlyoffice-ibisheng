@@ -34,7 +34,7 @@
   };
 
   /**
-   * Remove element by specified position.
+   * Returns an object that represents the range
    * @memberof ApiWorksheet
    * @param {string} sRange
    * @returns {ApiRange}
@@ -44,7 +44,17 @@
   };
 
   /**
-   * Remove element by specified position.
+   * Set column width
+   * @memberof ApiWorksheet
+   * @param {number} column
+   * @param {number} width
+   */
+  ApiWorksheet.prototype.setColumnWidth = function(column, width) {
+    this.worksheet.setColWidth(width, column, column);
+  };
+
+  /**
+   * Set cell value
    * @memberof ApiRange
    * @param {string} val
    */
@@ -58,6 +68,7 @@
   Api.prototype["GetActiveSheet"] = Api.prototype.GetActiveSheet;
 
   ApiWorksheet.prototype["getRange"] = ApiWorksheet.prototype.getRange;
+  ApiWorksheet.prototype["setColumnWidth"] = ApiWorksheet.prototype.setColumnWidth;
 
   ApiRange.prototype["setValue"] = ApiRange.prototype.setValue;
 }(window, null));
