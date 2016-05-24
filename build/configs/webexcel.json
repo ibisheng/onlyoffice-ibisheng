@@ -171,6 +171,8 @@
         "../word/Math/borderBox.js",
         "../word/apiCommon.js",
 		
+		"../cell/apiBuilder.js",
+		
 		"../common/clipboard_base.js",
 		"../common/Drawings/Format/OleObject.js",
 		"../common/plugins.js"
