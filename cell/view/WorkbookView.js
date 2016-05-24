@@ -2287,7 +2287,11 @@
       if (res) {
         t.model.editDefinesNames(oldName, newName);
         t.handlers.trigger("asc_onEditDefName", oldName, newName);
-        t.handlers.trigger("asc_onRefreshDefNameList");
+        //условие исключает второй вызов asc_onRefreshDefNameList(первый в unlockDefName)
+        if(!(t.collaborativeEditing.getCollaborativeEditing() && t.collaborativeEditing.getFast()))
+        {
+          t.handlers.trigger("asc_onRefreshDefNameList");
+        }
       } else {
         t.handlers.trigger("asc_onError", c_oAscError.ID.LockCreateDefName, c_oAscError.Level.NoCritical);
       }
