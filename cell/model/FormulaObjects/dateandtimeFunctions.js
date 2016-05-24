@@ -519,11 +519,7 @@ cDATEVALUE.prototype.Calculate = function ( arg ) {
     if ( arg0 instanceof cError )
         return this.value = arg0;
 
-    if ( arg0.tocNumber() instanceof cNumber && arg0.tocNumber().getValue() > 0 )
-        return this.value = new cNumber( parseInt( arg0.tocNumber().getValue() ) );
-
     var res = g_oFormatParser.parse( arg0.getValue() );
-
     if ( res && res.bDateTime )
         return this.value = new cNumber( parseInt( res.value ) );
     else
@@ -1200,19 +1196,19 @@ function cNOW() {
 
 }
 
-cNOW.prototype = Object.create( cBaseFunction.prototype )
+cNOW.prototype = Object.create( cBaseFunction.prototype );
 cNOW.prototype.Calculate = function () {
     var d = new Date();
     this.value = new cNumber( d.getExcelDate() + (d.getUTCHours() * 60 * 60 + d.getUTCMinutes() * 60 + d.getUTCSeconds()) / c_sPerDay );
     this.value.numFormat = 22;
     return this.setCA( this.value, true );
-}
+};
 cNOW.prototype.getInfo = function () {
     return {
         name:this.name,
         args:"()"
     };
-}
+};
 
 function cSECOND() {
 //    cBaseFunction.call( this, "SECOND", 1, 1 );
@@ -1305,7 +1301,7 @@ function cTIME() {
 
 }
 
-cTIME.prototype = Object.create( cBaseFunction.prototype )
+cTIME.prototype = Object.create( cBaseFunction.prototype );
 cTIME.prototype.Calculate = function ( arg ) {
     var hour = arg[0], minute = arg[1], second = arg[2];
 
@@ -1345,13 +1341,13 @@ cTIME.prototype.Calculate = function ( arg ) {
     if ( arguments[1].getNumFormatStr().toLowerCase() === "general" )
         this.value.numFormat = 18;
     return this.value;
-}
+};
 cTIME.prototype.getInfo = function () {
     return {
         name:this.name,
         args:"( hour, minute, second )"
     };
-}
+};
 
 function cTIMEVALUE() {
 //    cBaseFunction.call( this, "TIMEVALUE", 1, 1 );
@@ -1371,7 +1367,7 @@ function cTIMEVALUE() {
 
 }
 
-cTIMEVALUE.prototype = Object.create( cBaseFunction.prototype )
+cTIMEVALUE.prototype = Object.create( cBaseFunction.prototype );
 cTIMEVALUE.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
 
