@@ -9231,7 +9231,7 @@ CChartSpace.prototype.Save_Changes = function(data, w)
     {
         case AscDFH.historyitem_AutoShapes_SetLocks:
         {
-            w.Write_Long(data.newPr);
+            w.WriteLong(data.newPr);
             break;
         }
         case AscDFH.historyitem_AutoShapes_SetBFromSerialize:

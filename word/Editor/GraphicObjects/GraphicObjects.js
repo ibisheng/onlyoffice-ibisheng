@@ -535,6 +535,10 @@ CGraphicObjects.prototype =
         else
         {
             oApplyProps = oProps.ShapeProperties ? oProps.ShapeProperties : oProps;
+            if(AscFormat.isRealBool(oProps.lockAspect))
+            {
+                oApplyProps.lockAspect = oProps.lockAspect;
+            }
         }
         this.applyDrawingProps(oApplyProps);
         if(AscFormat.isRealNumber(oApplyProps.Width) || AscFormat.isRealNumber(oApplyProps.Height))

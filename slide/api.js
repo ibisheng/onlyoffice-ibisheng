@@ -3756,7 +3756,7 @@ asc_docs_api.prototype.AddImageUrlActionCallback = function(_image)
     asc_docs_api.prototype.ImgApply = function(obj)
     {
     var ImagePr = {};
-	
+        ImagePr.lockAspect = obj.lockAspect;
     ImagePr.Width  = null === obj.Width ? null : parseFloat(obj.Width);
     ImagePr.Height = null === obj.Height ? null : parseFloat(obj.Height);
 
@@ -6719,8 +6719,8 @@ CAscChartProp.prototype['getType'] = CAscChartProp.prototype.getType;
 CAscChartProp.prototype['putType'] = CAscChartProp.prototype.putType;
 CAscChartProp.prototype['getStyle'] = CAscChartProp.prototype.getStyle;
 CAscChartProp.prototype['putStyle'] = CAscChartProp.prototype.putStyle;
-CAscChartProp.prototype['putLockAspect'] = CAscChartProp.prototype.putLockAspect;
-CAscChartProp.prototype['getLockAspect'] = CAscChartProp.prototype.getLockAspect;
+CAscChartProp.prototype['putLockAspect'] = CAscChartProp.prototype['asc_putLockAspect'] = CAscChartProp.prototype.putLockAspect;
+CAscChartProp.prototype['getLockAspect'] = CAscChartProp.prototype['asc_getLockAspect'] = CAscChartProp.prototype.getLockAspect;
 CAscChartProp.prototype['changeType'] = CAscChartProp.prototype.changeType;
 CDocInfoProp.prototype['get_PageCount'] = CDocInfoProp.prototype.get_PageCount;
 CDocInfoProp.prototype['put_PageCount'] = CDocInfoProp.prototype.put_PageCount;
