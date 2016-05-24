@@ -6003,7 +6003,7 @@ PasteProcessor.prototype =
             this.aContent.push(table);
         }
     },
-    _ExecuteBorder : function(computedStyle, node, type, type2, bAddIfNull)
+    _ExecuteBorder : function(computedStyle, node, type, type2, bAddIfNull, setUnifill)
     {
         var res = null;
         var style = computedStyle.getPropertyValue( "border-"+type+"-style" );
@@ -6022,7 +6022,16 @@ PasteProcessor.prototype =
                     res.Size = width;
                 var color = computedStyle.getPropertyValue( "border-"+type+"-color" );
                 if(null != color && (color = this._ParseColor(color)))
-                    res.Color = color;
+                {
+                    if(setUnifill && color)
+                    {
+                        res.Unifill = AscFormat.CreteSolidFillRGB(color.r, color.g, color.b);
+                    }
+                    else
+                    {
+                        res.Color = color;
+                    }
+                }
             }
         }
         if(bAddIfNull && null == res)
@@ -7393,16 +7402,16 @@ PasteProcessor.prototype =
             var background_color = computedStyle.getPropertyValue( "background-color" );
             if(null != background_color && (background_color = this._ParseColor(background_color)))
                 table.Set_TableShd(c_oAscShdClear, background_color.r, background_color.g, background_color.b);
-            var oLeftBorder = this._ExecuteBorder(computedStyle, tableNode, "left", "Left", false);
+            var oLeftBorder = this._ExecuteBorder(computedStyle, tableNode, "left", "Left", false, true);
             if(null != oLeftBorder)
                 table.Set_TableBorder_Left(oLeftBorder);
-            var oTopBorder = this._ExecuteBorder(computedStyle, tableNode, "top", "Top", false);
+            var oTopBorder = this._ExecuteBorder(computedStyle, tableNode, "top", "Top", false, true);
             if(null != oTopBorder)
                 table.Set_TableBorder_Top(oTopBorder);
-            var oRightBorder = this._ExecuteBorder(computedStyle, tableNode, "right", "Right", false);
+            var oRightBorder = this._ExecuteBorder(computedStyle, tableNode, "right", "Right", false, true);
             if(null != oRightBorder)
                 table.Set_TableBorder_Right(oRightBorder);
-            var oBottomBorder = this._ExecuteBorder(computedStyle, tableNode, "bottom", "Bottom", false);
+            var oBottomBorder = this._ExecuteBorder(computedStyle, tableNode, "bottom", "Bottom", false, true);
             if(null != oBottomBorder)
                 table.Set_TableBorder_Bottom(oBottomBorder);
 
@@ -7547,19 +7556,19 @@ PasteProcessor.prototype =
             {
                 var Shd = new CDocumentShd();
                 Shd.Value = c_oAscShdClear;
-                Shd.Color = background_color;
+                Shd.Unifill = AscFormat.CreteSolidFillRGB(background_color.r,background_color.g, background_color.b);
                 cell.Set_Shd(Shd);
             }
-            var border = this._ExecuteBorder(computedStyle, node, "left", "Left", bAddIfNull);
+            var border = this._ExecuteBorder(computedStyle, node, "left", "Left", bAddIfNull, true);
             if(null != border)
                 cell.Set_Border(border, 3);
-            var border = this._ExecuteBorder(computedStyle, node, "top", "Top", bAddIfNull);
+            var border = this._ExecuteBorder(computedStyle, node, "top", "Top", bAddIfNull, true);
             if(null != border)
                 cell.Set_Border(border, 0);
-            var border = this._ExecuteBorder(computedStyle, node, "right", "Right", bAddIfNull);
+            var border = this._ExecuteBorder(computedStyle, node, "right", "Right", bAddIfNull, true);
             if(null != border)
                 cell.Set_Border(border, 1);
-            var border = this._ExecuteBorder(computedStyle, node, "bottom", "Bottom", bAddIfNull);
+            var border = this._ExecuteBorder(computedStyle, node, "bottom", "Bottom", bAddIfNull, true);
             if(null != border)
                 cell.Set_Border(border, 2);
 
