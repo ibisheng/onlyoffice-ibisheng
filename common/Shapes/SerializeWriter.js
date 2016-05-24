@@ -2801,8 +2801,11 @@ function CBinaryFileWriter()
                 }
             }
         }
-        shape.nvSpPr.locks = shape.locks;
-        shape.nvSpPr.objectType = shape.getObjectType();
+        if(shape.nvSpPr)
+        {
+            shape.nvSpPr.locks = shape.locks;
+            shape.nvSpPr.objectType = shape.getObjectType();
+        }
         oThis.WriteRecord2(0, shape.nvSpPr, oThis.WriteUniNvPr);
         oThis.WriteRecord1(1, shape.spPr, oThis.WriteSpPr);
         oThis.WriteRecord2(2, shape.style, oThis.WriteShapeStyle);
@@ -2830,9 +2833,12 @@ function CBinaryFileWriter()
         }
 
 
-        image.nvPicPr.locks = image.locks;
-        image.nvPicPr.objectType = image.getObjectType();
-        oThis.WriteRecord1(0, image.nvPicPr, this.WriteUniNvPr);
+        if(image.nvPicPr)
+        {
+            image.nvPicPr.locks = image.locks;
+            image.nvPicPr.objectType = image.getObjectType();
+            oThis.WriteRecord1(0, image.nvPicPr, this.WriteUniNvPr);
+        }
 
         image.spPr.WriteXfrm = image.spPr.xfrm;
 
@@ -2872,9 +2878,12 @@ function CBinaryFileWriter()
         oThis.WriteUChar(g_nodeAttributeEnd);
 
 
-        grObj.nvGraphicFramePr.locks = grObj.locks;
-        grObj.nvGraphicFramePr.objectType = grObj.getObjectType();
-        oThis.WriteRecord1(0, grObj.nvGraphicFramePr, oThis.WriteUniNvPr);
+        if(grObj.nvGraphicFramePr)
+        {
+            grObj.nvGraphicFramePr.locks = grObj.locks;
+            grObj.nvGraphicFramePr.objectType = grObj.getObjectType();
+            oThis.WriteRecord1(0, grObj.nvGraphicFramePr, oThis.WriteUniNvPr);
+        }
 
         if (grObj.spPr.xfrm && grObj.spPr.xfrm.isNotNull())
             oThis.WriteRecord2(1, grObj.spPr.xfrm, oThis.WriteXfrm);
@@ -3246,14 +3255,15 @@ function CBinaryFileWriter()
 
         group.spPr.WriteXfrm = group.spPr.xfrm;
 
-        var _old_ph = group.nvGrpSpPr.nvPr.ph;
-        group.nvGrpSpPr.nvPr.ph = null;
-
-        group.nvGrpSpPr.locks = group.locks;
-        group.nvGrpSpPr.objectType = group.getObjectType();
-        oThis.WriteRecord1(0, group.nvGrpSpPr, oThis.WriteUniNvPr);
-        group.nvGrpSpPr.nvPr.ph = _old_ph;
-
+        if(group.nvGrpSpPr)
+        {
+            var _old_ph = group.nvGrpSpPr.nvPr.ph;
+            group.nvGrpSpPr.nvPr.ph = null;
+            group.nvGrpSpPr.locks = group.locks;
+            group.nvGrpSpPr.objectType = group.getObjectType();
+            oThis.WriteRecord1(0, group.nvGrpSpPr, oThis.WriteUniNvPr);
+            group.nvGrpSpPr.nvPr.ph = _old_ph;
+        }
         oThis.WriteRecord1(1, group.spPr, oThis.WriteGrpSpPr);
 
         group.spPr.WriteXfrm = null;
