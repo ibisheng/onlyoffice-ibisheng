@@ -1494,8 +1494,6 @@ window['Asc']['c_oAscMaxCellOrCommentLength'] = window['Asc'].c_oAscMaxCellOrCom
   CPluginVariation.prototype["set_Description"] = function(value) 	        { this.description = value; } ;
   CPluginVariation.prototype["get_Url"] = function() 		                { return this.url; };
   CPluginVariation.prototype["set_Url"] = function(value) 	                { this.url = value; };
-  CPluginVariation.prototype["get_BaseUrl"] = function() 		            { return this.baseUrl; };
-  CPluginVariation.prototype["set_BaseUrl"] = function(value) 	            { this.baseUrl = value; };
 
   CPluginVariation.prototype["get_Icons"] = function() 		                { return this.icons; };
   CPluginVariation.prototype["set_Icons"] = function(value) 	            { this.icons = value; };
@@ -1523,10 +1521,56 @@ window['Asc']['c_oAscMaxCellOrCommentLength'] = window['Asc'].c_oAscMaxCellOrCom
   CPluginVariation.prototype["get_Buttons"] = function() 					{ return this.buttons; };
   CPluginVariation.prototype["set_Buttons"] = function(value) 				{ this.buttons = value; };
 
+  CPluginVariation.prototype["serialize"] = function()
+  {
+    var _object = {};
+    _object["description"]          = this.description;
+    _object["url"]                  = this.url;
+    _object["index"]                = this.index;
+
+    _object["icons"]                = this.icons;
+    _object["isViewer"]             = this.isViewer;
+    _object["EditorsSupport"]       = this.EditorsSupport;
+
+    _object["isVisual"]             = this.isVisual;
+    _object["isModal"]              = this.isModal;
+    _object["isInsideMode"]         = this.isInsideMode;
+
+    _object["initDataType"]         = this.initDataType;
+    _object["initData"]             = this.initData;
+
+    _object["isUpdateOleOnResize"]  = this.isUpdateOleOnResize;
+
+    _object["buttons"]              = this.buttons;
+    return _object;
+  }
+  CPluginVariation.prototype["deserialize"] = function(_object)
+  {
+    this.description                = _object["description"];
+    this.url                        = _object["url"];
+    this.index                      = _object["index"];
+
+    this.icons                      = _object["icons"];
+    this.isViewer                   = _object["isViewer"];
+    this.EditorsSupport             = _object["EditorsSupport"];
+
+    this.isVisual                   = _object["isVisual"];
+    this.isModal                    = _object["isModal"];
+    this.isInsideMode               = _object["isInsideMode"];
+
+    this.initDataType               = _object["initDataType"];
+    this.initData                   = _object["initData"];
+
+    this.isUpdateOleOnResize        = _object["isUpdateOleOnResize"];
+
+    this.buttons                    = _object["buttons"];
+  }
+
   function CPlugin()
   {
 	this.name   = "";
 	this.guid   = "";
+	this.baseUrl = "";
 
     this.variations = [];
   }
@@ -1535,9 +1579,38 @@ window['Asc']['c_oAscMaxCellOrCommentLength'] = window['Asc'].c_oAscMaxCellOrCom
   CPlugin.prototype["set_Name"] = function(value) 	    { this.name = value; } ;
   CPlugin.prototype["get_Guid"] = function() 		    { return this.guid; };
   CPlugin.prototype["set_Guid"] = function(value) 	    { this.guid = value; };
+  CPlugin.prototype["get_BaseUrl"] = function() 		{ return this.baseUrl; };
+  CPlugin.prototype["set_BaseUrl"] = function(value) 	{ this.baseUrl = value; };
 
   CPlugin.prototype["get_Variations"] = function() 		{ return this.variations; };
   CPlugin.prototype["set_Variations"] = function(value) { this.variations = value; };
+
+  CPlugin.prototype["serialize"] = function()
+  {
+    var _object = {};
+    _object["name"]         = this.name;
+    _object["guid"]         = this.guid;
+    _object["baseUrl"]      = this.baseUrl;
+    _object["variations"]   = this.variations;
+    for (var i = 0; i < this.variations; i++)
+    {
+        _object["variations"].push(this.variations[i].serialize());
+    }
+    return  _object;
+  }
+  CPlugin.prototype["deserialize"] = function(_object)
+  {
+    this.name = _object["name"];
+    this.guid = _object["guid"];
+    this.baseUrl = _object["baseUrl"];
+    this.variations = [];
+    for (var i = 0; i < _object["variations"].length; i++)
+    {
+      var _variation = new CPluginVariation();
+      _variation["deserialize"](_object["variations"][i]);
+      this.variations.push(_variation);
+    }
+  }
 
   window["Asc"]["CPluginVariation"] = CPluginVariation;
   window["Asc"]["CPlugin"] = CPlugin;

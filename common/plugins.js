@@ -129,7 +129,7 @@
                 var ifr = document.createElement("iframe");
                 ifr.name = "plugin_iframe";
                 ifr.id = "plugin_iframe";
-                var _add = this.current.variations[0].baseUrl == "" ? this.path : this.current.variations[0].baseUrl;
+                var _add = this.current.baseUrl == "" ? this.path : this.current.baseUrl;
                 ifr.src = _add + this.current.variations[0].url;
                 ifr.style.position = 'absolute';
                 ifr.style.top = '-100px';
@@ -209,38 +209,21 @@
             for (var i = 0; i < _plugins.length; i++)
             {
                 var _p = new Asc.CPlugin();
-
-                _p.name = _plugins[i].name;
-                _p.guid = _plugins[i].guid;
+                _p["deserialize"](_plugins[i]);
 
                 if (_map[_p.guid] === true)
                     continue;
 
-                for (var j = 0; j < _plugins[i].variations.length; j++)
-                {
-                    var _pv = new Asc.CPluginVariation();
-
-                    for (var k in _plugins[i].variations[j])
-                    {
-                        _pv[k] = _plugins[i].variations[j][k];
-                    }
-
-                    _p.variations.push(_pv);
-                }
-
                 this.plugins.push(_p);
             }
 
-            // добавляем кнопки (тест)
-            var _elem = document.getElementById("view-left-menu").childNodes[1];
-
-            for (var i = 0; i < _plugins.length; i++)
+            var _pluginsInstall = { "url" : this.path, "pluginsData" : [] };
+            for (var i = 0; i < this.plugins.length; i++)
             {
-                var _button = "<button class='btn btn-category' content-target='' data-toggle='tooltip' data-original-title='' title='' " +
-                    "onclick='window.g_asc_plugins.run(\"" + _plugins[i].guid + "\")'><span>" + (i + 1) + "</span></button>";
-
-                _elem.innerHTML += _button;
+                _pluginsInstall["pluginsData"].push(this.plugins[i].serialize());
             }
+
+            this.api.asc_fireCallback("asc_onPluginsInit", _pluginsInstall);
         }
     };
 
