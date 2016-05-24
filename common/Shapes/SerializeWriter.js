@@ -2801,12 +2801,19 @@ function CBinaryFileWriter()
                 }
             }
         }
+        var nvSpPr;
         if(shape.nvSpPr)
         {
-            shape.nvSpPr.locks = shape.locks;
-            shape.nvSpPr.objectType = shape.getObjectType();
+            nvSpPr = shape.nvSpPr;
         }
-        oThis.WriteRecord2(0, shape.nvSpPr, oThis.WriteUniNvPr);
+        else
+        {
+            nvSpPr = {};
+        }
+        nvSpPr.locks = shape.locks;
+        nvSpPr.objectType = shape.getObjectType();
+        oThis.WriteRecord2(0, nvSpPr, oThis.WriteUniNvPr);
+
         oThis.WriteRecord1(1, shape.spPr, oThis.WriteSpPr);
         oThis.WriteRecord2(2, shape.style, oThis.WriteShapeStyle);
         oThis.WriteRecord2(3, shape.txBody, oThis.WriteTxBody);
@@ -2833,12 +2840,18 @@ function CBinaryFileWriter()
         }
 
 
+        var nvPicPr;
         if(image.nvPicPr)
         {
-            image.nvPicPr.locks = image.locks;
-            image.nvPicPr.objectType = image.getObjectType();
-            oThis.WriteRecord1(0, image.nvPicPr, this.WriteUniNvPr);
+            nvPicPr = image.nvPicPr;
         }
+        else
+        {
+            nvPicPr = {};
+        }
+        nvPicPr.locks = image.locks;
+        nvPicPr.objectType = image.getObjectType();
+        oThis.WriteRecord1(0, nvPicPr, this.WriteUniNvPr);
 
         image.spPr.WriteXfrm = image.spPr.xfrm;
 
@@ -2878,12 +2891,18 @@ function CBinaryFileWriter()
         oThis.WriteUChar(g_nodeAttributeEnd);
 
 
+        var nvGraphicFramePr;
         if(grObj.nvGraphicFramePr)
         {
-            grObj.nvGraphicFramePr.locks = grObj.locks;
-            grObj.nvGraphicFramePr.objectType = grObj.getObjectType();
-            oThis.WriteRecord1(0, grObj.nvGraphicFramePr, oThis.WriteUniNvPr);
+            nvGraphicFramePr = grObj.nvGraphicFramePr;
         }
+        else
+        {
+            nvGraphicFramePr = {};
+        }
+        nvGraphicFramePr.locks = grObj.locks;
+        nvGraphicFramePr.objectType = grObj.getObjectType();
+        oThis.WriteRecord1(0, nvGraphicFramePr, oThis.WriteUniNvPr);
 
         if (grObj.spPr.xfrm && grObj.spPr.xfrm.isNotNull())
             oThis.WriteRecord2(1, grObj.spPr.xfrm, oThis.WriteXfrm);
@@ -2899,12 +2918,19 @@ function CBinaryFileWriter()
 
         oThis.WriteUChar(g_nodeAttributeStart);
         oThis.WriteUChar(g_nodeAttributeEnd);
+        var nvGraphicFramePr  = {};
         if(grObj.nvGraphicFramePr)
         {
-            grObj.nvGraphicFramePr.locks = grObj.locks;
-            grObj.nvGraphicFramePr.objectType = grObj.getObjectType();
-            oThis.WriteRecord1(0, grObj.nvGraphicFramePr, oThis.WriteUniNvPr);
+            nvGraphicFramePr = grObj.nvGraphicFramePr;
         }
+        else
+        {
+            nvGraphicFramePr = {};
+        }
+
+        nvGraphicFramePr.locks = grObj.locks;
+        nvGraphicFramePr.objectType = grObj.getObjectType();
+        oThis.WriteRecord1(0, nvGraphicFramePr, oThis.WriteUniNvPr);
 
         if (grObj.spPr.xfrm && grObj.spPr.xfrm.isNotNull())
             oThis.WriteRecord2(1, grObj.spPr.xfrm, oThis.WriteXfrm);
@@ -3260,7 +3286,6 @@ function CBinaryFileWriter()
         oThis.StartRecord(4);
 
         group.spPr.WriteXfrm = group.spPr.xfrm;
-
         if(group.nvGrpSpPr)
         {
             var _old_ph = group.nvGrpSpPr.nvPr.ph;
@@ -3539,7 +3564,7 @@ function CBinaryFileWriter()
 
     this.WriteUniNvPr = function(nv)
     {
-        oThis.WriteRecord1(0, nv.cNvPr, oThis.Write_cNvPr);
+        oThis.WriteRecord2(0, nv.cNvPr, oThis.Write_cNvPr);
         if(AscFormat.isRealNumber(nv.locks) && nv.locks !== 0 && AscFormat.isRealNumber(nv.objectType))
         {
             switch(nv.objectType)
@@ -3569,8 +3594,8 @@ function CBinaryFileWriter()
         }
         nv.locks     = null;
         nv.objectType = null;
-        oThis.WriteRecord1(2, nv.nvPr, oThis.Write_nvPr);
-    }
+        oThis.WriteRecord2(2, nv.nvPr, oThis.Write_nvPr);
+    };
 
     this.Write_cNvPr = function(cNvPr)
     {
@@ -4497,7 +4522,7 @@ function CBinaryFileWriter()
                 }
             }
 
-            //_writer.WriteRecord1(0, shape.nvSpPr, _writer.WriteUniNvPr);
+            _writer.WriteRecord1(0, {locks: shape.locks, objectType: shape.getObjectType()}, _writer.WriteUniNvPr);
             _writer.WriteRecord1(1, shape.spPr, _writer.WriteSpPr);
             _writer.WriteRecord2(2, shape.style, _writer.WriteShapeStyle);
             //_writer.WriteRecord2(3, shape.txBody, _writer.WriteTxBody);
@@ -4549,7 +4574,7 @@ function CBinaryFileWriter()
             } else {
                 _writer.StartRecord(2);
             }
-            //_writer.WriteRecord1(0, image.nvPicPr, _writer.WriteUniNvPr);
+            _writer.WriteRecord1(0, {locks: image.locks, objectType: image.getObjectType()}, _writer.WriteUniNvPr);
 
             image.spPr.WriteXfrm = image.spPr.xfrm;
 
