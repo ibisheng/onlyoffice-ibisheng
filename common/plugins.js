@@ -47,11 +47,13 @@
     {
         this.plugins = [];
         this.current = null;
-        this.path = "";
+        this.path = "../../../../sdkjs-plugins/";
         this.api = null;
 
         this.startData = null;
         this.runAndCloseData = null;
+
+        this.closeAttackTimer = -1; // защита от плагитнов, которые не закрываются
     }
 
     CPluginsManager.prototype =
@@ -97,8 +99,18 @@
         },
         runResize   : function(data)
         {
+            var guid = data.getAttribute("guid");
+            for (var i = 0; i < this.plugins.length; i++)
+            {
+                if (this.plugins[i].guid == guid)
+                {
+                    if (this.plugins[i].variations[0].isUpdateOleOnResize !== true)
+                        return;
+                }
+            }
+
             data.setAttribute("resize", true);
-            return this.run(data.getAttribute("guid"), 0, data);
+            return this.run(guid, 0, data);
         },
         close    : function()
         {
@@ -144,6 +156,17 @@
 
         buttonClick : function(id)
         {
+            if (this.closeAttackTimer != -1)
+            {
+                clearTimeout(this.closeAttackTimer);
+                this.closeAttackTimer = -1;
+            }
+
+            if (-1 == id)
+            {
+                // защита от плохого плагина
+                this.closeAttackTimer = setTimeout(function(){ window.g_asc_plugins.close(); }, 5000);
+            }
             var _iframe = document.getElementById("plugin_iframe");
             if (_iframe)
             {
@@ -252,6 +275,12 @@
             }
             else if ("close" == name)
             {
+                if (window.g_asc_plugins.closeAttackTimer != -1)
+                {
+                    clearTimeout(window.g_asc_plugins.closeAttackTimer);
+                    window.g_asc_plugins.closeAttackTimer = -1;
+                }
+
                 if (value && value != "")
                 {
                     try
@@ -438,7 +467,7 @@ function TEST_PLUGINS()
                     initDataType    : "ole",
                     initData        : "",
 
-                    isUpdateOleOnResize : true,
+                    isUpdateOleOnResize : false,
 
                     buttons         : [ { text: "Ok", primary: true },
                         { text: "Cancel", primary: false } ]
