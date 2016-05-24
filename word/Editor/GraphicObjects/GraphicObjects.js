@@ -2713,12 +2713,12 @@ CGraphicObjects.prototype =
                                 sp.setParent(para_drawing);
                                 this.resetSelection();
                                 this.selectObject(sp, cur_group.selectStartPage);
+                                new_x = sp.transform.tx;
+                                new_y = sp.transform.ty;
                                 para_drawing.CheckWH();
                                 if(!para_drawing.Is_Inline())
                                 {
-                                    new_x = sp.transform.tx;
-                                    new_y = sp.transform.ty;
-                                    para_drawing.Set_XY(sp.transform.tx, sp.transform.ty, para_drawing.Get_ParentParagraph(), para_drawing.GraphicObj.selectStartPage, true);
+                                    para_drawing.Set_XY(new_x, new_y, para_drawing.Get_ParentParagraph(), para_drawing.GraphicObj.selectStartPage, true);
                                 }
                                 this.document.Recalculate();
                                 return;
