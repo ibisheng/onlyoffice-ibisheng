@@ -1383,22 +1383,19 @@ cTIMEVALUE.prototype.Calculate = function ( arg ) {
     if ( arg0 instanceof cError )
         return this.value = arg0;
 
-    if ( arg0.tocNumber() instanceof cNumber && arg0.tocNumber().getValue() > 0 )
-        return this.value = new cNumber( parseInt( arg0.tocNumber().getValue() ) );
-
     var res = g_oFormatParser.parse( arg0.getValue() );
 
     if ( res && res.bDateTime )
         return this.value = new cNumber( res.value - parseInt( res.value ) );
     else
         return this.value = new cError( cErrorType.wrong_value_type );
-}
+};
 cTIMEVALUE.prototype.getInfo = function () {
     return {
         name:this.name,
         args:"( date-time-string )"
     };
-}
+};
 
 function cTODAY() {
 //    cBaseFunction.call( this, "TODAY", 0, 0 );
