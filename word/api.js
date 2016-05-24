@@ -2093,7 +2093,7 @@ asc_docs_api.prototype.asc_PasteData = function(_format, data1, data2)
     "id": this.documentId,
     "c": 'pathurl',
     "title": this.documentTitle,
-    "data": 'origin'
+    "data": 'origin.' + this.documentFormat
   };
   var t = this;
         t.fCurCallback   = function(input)
@@ -7437,6 +7437,9 @@ window["asc_nativeOnSpellCheck"] = function (response)
     oAdditionalData["outputformat"] = filetype;
     oAdditionalData["title"] = AscCommon.changeFileExtention(this.documentTitle, AscCommon.getExtentionByFormat(filetype));
 	oAdditionalData["savetype"] = AscCommon.c_oAscSaveTypes.CompleteAll;
+    if ('savefromorigin' === command) {
+        oAdditionalData["format"] = this.documentFormat;
+    }
         if (DownloadType.Print === options.downloadType)
         {
       oAdditionalData["inline"] = 1;

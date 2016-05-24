@@ -2704,6 +2704,7 @@ window["SetDoctRendererParams"] = function(_params)
   window["AscCommon"].convertUnicodeToUTF16 = convertUnicodeToUTF16;
   window["AscCommon"].convertUTF16toUnicode = convertUTF16toUnicode;
   window["AscCommon"].build_local_rx = build_local_rx;
+  window["AscCommon"].GetFileExtension = GetFileExtension;
   window["AscCommon"].changeFileExtention = changeFileExtention;
   window["AscCommon"].getExtentionByFormat = getExtentionByFormat;
   window["AscCommon"].InitOnMessage = InitOnMessage;
