@@ -1231,6 +1231,10 @@ function DrawingObjects() {
     // Constructor
     //-----------------------------------------------------------------------------------
 
+    _this.getScrollOffset = function()
+    {
+        return scrollOffset;
+    };
 
     _this.saveStateBeforeLoadChanges = function(){
         if(this.controller){
