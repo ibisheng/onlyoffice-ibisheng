@@ -30,7 +30,6 @@
 		
 		var isTruePaste = false;
 		//activate local buffer
-		var activateLocalStorage = false;
 		var isOnlyLocalBufferSafari = false;
 		var copyPasteUseBinary = true;
 		var copyPasteFromWordUseBinary = true;
@@ -708,14 +707,6 @@
 					
 					return true;
 				}
-				else if(activateLocalStorage)
-				{
-					var t = this;
-					var  table = t._makeTableNode(range, worksheet, isCut);
-					if(table !== false)
-						t.copyText = t._getTextFromTable(table);
-					return true;
-				}
 				return false;
 			},
 			
@@ -769,7 +760,7 @@
 					t._editorPasteExec(worksheet,pastebin)
 					return true;
 				}
-				else if(activateLocalStorage || copyPasteUseBinary)
+				else if(copyPasteUseBinary)
 				{
 					var t = this;
 					
@@ -793,7 +784,7 @@
 			copyCellValue: function (value) {
 				var t = this;
 
-				if(activateLocalStorage || copyPasteUseBinary)
+				if(copyPasteUseBinary)
 					t._addValueToLocalStrg(value);
 				var nodes = t._makeNodesFromCellValue(value);
 				var outer;
@@ -884,7 +875,7 @@
 							0);
 					return true;
 				}
-				else if(activateLocalStorage || copyPasteUseBinary)
+				else if(copyPasteUseBinary)
 				{
 					var t = this;
 					t._addValueToLocalStrg(value);
@@ -994,7 +985,7 @@
 							0);
 					return true;
 				}
-				else if(activateLocalStorage || copyPasteUseBinary)
+				else if(copyPasteUseBinary)
 				{
 					if(t.lStorageText)
 						callback(t.lStorageText, []);
@@ -2317,44 +2308,6 @@
 			    return oRes;
 			},
 			
-			_isEqualText: function(node, table){
-				var t = this;
-				if(undefined == t.copyText || node == undefined)
-					return false;
-				//если приходят картинки, вставляем извне	
-				if(t.copyText.isImage)
-				{
-					return false;
-				}	
-				if(t.copyText.text && AscBrowser.isOpera && node.text.replace(/(\r|\t|\n| |\s)/g, "") == t.copyText.text.replace(/(\r|\t|\n| |\s)/g, ""))
-					return true;
-				if(AscBrowser.isIE && t.copyText.text != undefined && node.text != undefined &&  node.text == "" && t.copyText.isImage)
-					return true;
-				if(t.copyText.text != undefined && node.text != undefined && node.text == t.copyText.text)
-				{
-					if(t.copyText.isImage)
-						return true;
-					else if(node.rows && t.copyText.rows && node.rows == t.copyText.rows && node.cols && t.copyText.cols && node.cols == t.copyText.cols)
-						return true;
-				}
-
-                if(table && table.children[0] && node.text.replace(/(\r|\t|\n| |\s)/g, "") == t.copyText.text.replace(/(\r|\t|\n| |\s)/g, ""))
-                {
-                    if( table.children[0].getAttribute("class") != null ){
-                        var cL = table.children[0].getAttribute("class").split(" ");
-                        for (var i = 0; i < cL.length; i++){
-                            if(cL[i].indexOf("pasteFragment_") > -1){
-                                if(cL[i] == t.copyText.pasteFragment)
-                                    return true;
-                                else
-                                    break;
-                            }
-                        }
-                    }
-                }
-				return false;
-			},
-			
 			_checkMaxTextLength: function(aResult, r, c)
 			{
 				var result = false;
@@ -2681,7 +2634,7 @@
 				}
 				else
 				{
-					if(activateLocalStorage || copyPasteUseBinary)
+					if(copyPasteUseBinary)
 					{
 						var localStText = '';
 						//add local buffer
