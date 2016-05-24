@@ -909,7 +909,7 @@
         {
             return new ApiStroke(AscFormat.CreateNoFillLine());
         }
-        var oLn = new CLn();
+        var oLn = new AscFormat.CLn();
         oLn.w = nWidth;
         oLn.Fill = oFill.UniFill;
         return new ApiStroke(oLn);

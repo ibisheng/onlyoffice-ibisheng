@@ -88,6 +88,7 @@ var DISTANCE_TO_TEXT_LEFTRIGHT = 3.2;
         blip_fill.setStretch(true);
         image.setBlipFill(blip_fill);
         image.setNvPicPr(new AscFormat.UniNvPr());
+        image.setNoChangeAspect(true);
         image.setBDeleted(false);
     }
 
