@@ -1233,6 +1233,7 @@ CGraphicObjects.prototype =
             pluginData.setAttribute("height", oleObject.extY);
             pluginData.setAttribute("widthPix", oleObject.m_nPixWidth);
             pluginData.setAttribute("heightPix", oleObject.m_nPixHeight);
+            pluginData.setAttribute("objectId", oleObject.Id);
             editor.asc_pluginRun(oleObject.m_sApplicationId, 0, pluginData);
         }
         this.changeCurrentState(new AscFormat.NullState(this));
