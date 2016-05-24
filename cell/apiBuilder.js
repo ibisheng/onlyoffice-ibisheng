@@ -91,10 +91,26 @@
 
   /**
    * Set font name
-   * @param {number} name
+   * @param {string} name
    */
   ApiRange.prototype.setFontName = function(name) {
     this.range.setFontname(name);
+  };
+
+  /**
+   * Set align vertical
+   * @param {'center' | 'bottom' | 'top'} value
+   */
+  ApiRange.prototype.setAlignVertical = function(value) {
+    this.range.setAlignVertical(value);
+  };
+
+  /**
+   * Set align horizontal
+   * @param {'left' | 'right' | 'center' | 'justify'} value
+   */
+  ApiRange.prototype.setAlignHorizontal = function(value) {
+    this.range.setAlignHorizontal(value);
   };
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -110,4 +126,6 @@
   ApiRange.prototype["setFontColor"] = ApiRange.prototype.setFontColor;
   ApiRange.prototype["setFontSize"] = ApiRange.prototype.setFontSize;
   ApiRange.prototype["setFontName"] = ApiRange.prototype.setFontName;
+  ApiRange.prototype["setAlignVertical"] = ApiRange.prototype.setAlignVertical;
+  ApiRange.prototype["setAlignHorizontal"] = ApiRange.prototype.setAlignHorizontal;
 }(window, null));
