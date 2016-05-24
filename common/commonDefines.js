@@ -1546,24 +1546,24 @@ window['Asc']['c_oAscMaxCellOrCommentLength'] = window['Asc'].c_oAscMaxCellOrCom
   }
   CPluginVariation.prototype["deserialize"] = function(_object)
   {
-    this.description                = _object["description"];
-    this.url                        = _object["url"];
-    this.index                      = _object["index"];
+    this.description                = (_object["description"] != null) ? _object["description"] : this.description;
+    this.url                        = (_object["url"] != null) ? _object["url"] : this.url;
+    this.index                      = (_object["index"] != null) ? _object["index"] : this.index;
 
-    this.icons                      = _object["icons"];
-    this.isViewer                   = _object["isViewer"];
-    this.EditorsSupport             = _object["EditorsSupport"];
+    this.icons                      = (_object["icons"] != null) ? _object["icons"] : this.icons;
+    this.isViewer                   = (_object["isViewer"] != null) ? _object["isViewer"] : this.isViewer;
+    this.EditorsSupport             = (_object["EditorsSupport"] != null) ? _object["EditorsSupport"] : this.EditorsSupport;
 
-    this.isVisual                   = _object["isVisual"];
-    this.isModal                    = _object["isModal"];
-    this.isInsideMode               = _object["isInsideMode"];
+    this.isVisual                   = (_object["isVisual"] != null) ? _object["isVisual"] : this.isVisual;
+    this.isModal                    = (_object["isModal"] != null) ? _object["isModal"] : this.isModal;
+    this.isInsideMode               = (_object["isInsideMode"] != null) ? _object["isInsideMode"] : this.isInsideMode;
 
-    this.initDataType               = _object["initDataType"];
-    this.initData                   = _object["initData"];
+    this.initDataType               = (_object["initDataType"] != null) ? _object["initDataType"] : this.initDataType;
+    this.initData                   = (_object["initData"] != null) ? _object["initData"] : this.initData;
 
-    this.isUpdateOleOnResize        = _object["isUpdateOleOnResize"];
+    this.isUpdateOleOnResize        = (_object["isUpdateOleOnResize"] != null) ? _object["isUpdateOleOnResize"] : this.isUpdateOleOnResize;
 
-    this.buttons                    = _object["buttons"];
+    this.buttons                    = (_object["buttons"] != null) ? _object["buttons"] : this.buttons;
   }
 
   function CPlugin()
@@ -1600,9 +1600,9 @@ window['Asc']['c_oAscMaxCellOrCommentLength'] = window['Asc'].c_oAscMaxCellOrCom
   }
   CPlugin.prototype["deserialize"] = function(_object)
   {
-    this.name = _object["name"];
-    this.guid = _object["guid"];
-    this.baseUrl = _object["baseUrl"];
+    this.name       = (_object["name"] != null) ? _object["name"] : this.name;
+    this.guid       = (_object["guid"] != null) ? _object["guid"] : this.guid;
+    this.baseUrl    = (_object["baseUrl"] != null) ? _object["baseUrl"] : this.baseUrl;
     this.variations = [];
     for (var i = 0; i < _object["variations"].length; i++)
     {
