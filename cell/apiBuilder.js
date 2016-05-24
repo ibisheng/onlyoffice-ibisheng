@@ -34,6 +34,15 @@
   };
 
   /**
+   * Set sheet name
+   * @memberof ApiWorksheet
+   * @param {string} name
+   */
+  ApiWorksheet.prototype.setName = function(name) {
+    this.worksheet.setName(name);
+  };
+
+  /**
    * Returns an object that represents the range
    * @memberof ApiWorksheet
    * @param {string} sRange
@@ -62,13 +71,43 @@
     this.range.setValue(val);
   };
 
+  /**
+   * Set text color in the rgb format.
+   * @param {byte} r
+   * @param {byte} g
+   * @param {byte} b
+   */
+  ApiRange.prototype.setFontColor = function(r, g, b) {
+    this.range.setFontcolor(new AscCommonExcel.RgbColor((r << 16) +  (g << 8) +  b));
+  };
+
+  /**
+   * Set font size
+   * @param {number} size
+   */
+  ApiRange.prototype.setFontSize = function(size) {
+    this.range.setFontsize(size);
+  };
+
+  /**
+   * Set font name
+   * @param {number} name
+   */
+  ApiRange.prototype.setFontName = function(name) {
+    this.range.setFontname(name);
+  };
+
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   // Export
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   Api.prototype["GetActiveSheet"] = Api.prototype.GetActiveSheet;
 
+  ApiWorksheet.prototype["setName"] = ApiWorksheet.prototype.setName;
   ApiWorksheet.prototype["getRange"] = ApiWorksheet.prototype.getRange;
   ApiWorksheet.prototype["setColumnWidth"] = ApiWorksheet.prototype.setColumnWidth;
 
   ApiRange.prototype["setValue"] = ApiRange.prototype.setValue;
+  ApiRange.prototype["setFontColor"] = ApiRange.prototype.setFontColor;
+  ApiRange.prototype["setFontSize"] = ApiRange.prototype.setFontSize;
+  ApiRange.prototype["setFontName"] = ApiRange.prototype.setFontName;
 }(window, null));
