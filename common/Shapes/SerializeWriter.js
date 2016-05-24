@@ -3530,23 +3530,23 @@ function CBinaryFileWriter()
             {
                 case AscDFH.historyitem_type_Shape:
                 {
-                    oThis.WriteRecord1(0, nv.locks, oThis.WriteSpCNvPr);
+                    oThis.WriteRecord1(1, nv.locks, oThis.WriteSpCNvPr);
                     break;
                 }
                 case AscDFH.historyitem_type_ImageShape:
                 {
-                    oThis.WriteRecord1(0, nv.locks, oThis.WritePicCNvPr);
+                    oThis.WriteRecord1(1, nv.locks, oThis.WritePicCNvPr);
                     break;
                 }
                 case AscDFH.historyitem_type_GroupShape:
                 {
-                    oThis.WriteRecord1(0, nv.locks, oThis.WriteGrpCNvPr);
+                    oThis.WriteRecord1(1, nv.locks, oThis.WriteGrpCNvPr);
                     break;
                 }
                 case AscDFH.historyitem_type_GraphicFrame:
                 case AscDFH.historyitem_type_ChartSpace:
                 {
-                    oThis.WriteRecord1(0, nv.locks, oThis.WriteGrFrameCNvPr);
+                    oThis.WriteRecord1(1, nv.locks, oThis.WriteGrFrameCNvPr);
                     break;
                 }
             }
