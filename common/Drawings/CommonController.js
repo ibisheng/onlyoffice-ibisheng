@@ -6871,7 +6871,7 @@ DrawingObjectsController.prototype =
             shape_props.ShapeProperties.bFromChart = props.shapeProps.bFromChart;
             shape_props.ShapeProperties.lockAspect = props.shapeProps.lockAspect;
             shape_props.ShapeProperties.textArtProperties = AscFormat.CreateAscTextArtProps(props.shapeProps.textArtProperties);
-
+            shape_props.lockAspect = props.shapeProps.lockAspect;
             if(props.shapeProps.textArtProperties)
             {
                 oTextArtProperties = props.shapeProps.textArtProperties;
@@ -6929,7 +6929,7 @@ DrawingObjectsController.prototype =
             image_props.Height = props.imageProps.h;
             image_props.ImageUrl = props.imageProps.ImageUrl;
             image_props.Locked = props.imageProps.locked === true;
-
+            image_props.lockAspect = props.imageProps.lockAspect;
             if(!bParaLocked)
             {
                 bParaLocked = image_props.Locked;
@@ -6943,6 +6943,7 @@ DrawingObjectsController.prototype =
             chart_props.Height = props.chartProps.h;
             chart_props.ChartProperties = props.chartProps.chartProps;
             chart_props.Locked = props.chartProps.locked === true;
+            chart_props.lockAspect = props.chartProps.lockAspect;
             if(!bParaLocked)
             {
                 bParaLocked = chart_props.Locked;
