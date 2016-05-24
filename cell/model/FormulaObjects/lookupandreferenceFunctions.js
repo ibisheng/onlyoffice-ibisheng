@@ -543,13 +543,7 @@ cINDEX.prototype.Calculate = function ( arg ) {
     }
 
     if ( arg0 instanceof cArray ) {
-        var _a_ = arg0.getMatrix();
-        if ( _a_.length == 1 ) {/*одна строка*/
-            res = arg0.getValue2( 0, arg1 - 1 );
-        }
-        else {
-            res = arg0.getValue2( arg1 == 0 ? 0 : arg1 - 1, arg2 == 0 ? 0 : arg2 - 1 );
-        }
+        res = arg0.getValue2( (1 === arg0.rowCount || 0 === arg1) ? 0 : arg1 - 1, 0 === arg2 ? 0 : arg2 - 1 );
     }
     else if ( arg0 instanceof cArea ) {
         var ws = arg0.getWS(),
