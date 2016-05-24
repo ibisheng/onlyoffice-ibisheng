@@ -638,7 +638,7 @@ baseEditorsApi.prototype._uploadCallback = function(error, files) {
         var fWidth
         if(typeof sImgSrc === "string" && sImgSrc.length > 0 && typeof sData === "string"
             && oOleObject && AscFormat.isRealNumber(nWidthPix) && AscFormat.isRealNumber(nHeightPix)){
-          this.asc_checkImageUrlAndAction(sImgSrc, function(oImage){oThis.asc_editOleObjectAction(bResize, oOleObject, AscCommon.g_oDocumentUrls.getImageLocal(oImage.src), nWidthPix, nHeightPix);});
+          this.asc_checkImageUrlAndAction(sImgSrc, function(oImage){oThis.asc_editOleObjectAction(bResize, oOleObject, AscCommon.g_oDocumentUrls.getImageLocal(oImage.src), sData, nWidthPix, nHeightPix);});
         }
     };
 
