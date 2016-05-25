@@ -4720,29 +4720,33 @@ TablePart.prototype.changeRefOnRange = function(range, autoFilters, generateNewT
 	{
 		var newTableColumns = [];
 		var intersectionRanges = this.Ref.intersection(range);
-		for(var i = range.c1; i <= range.c2; i++)
+		
+		if(null !== intersectionRanges)
 		{
-			var tableColumn;
-			if(i >= intersectionRanges.c1 && i <= intersectionRanges.c2)
+			for(var i = range.c1; i <= range.c2; i++)
 			{
-				var tableIndex = i - this.Ref.c1;
-				tableColumn = this.TableColumns[tableIndex];
-			}
-			else
-			{
-				tableColumn = new TableColumn();
+				var tableColumn;
+				if(i >= intersectionRanges.c1 && i <= intersectionRanges.c2)
+				{
+					var tableIndex = i - this.Ref.c1;
+					tableColumn = this.TableColumns[tableIndex];
+				}
+				else
+				{
+					tableColumn = new TableColumn();
+				}
+				
+				newTableColumns.push(tableColumn);
 			}
 			
-			newTableColumns.push(tableColumn);
+			for(var j = 0; j < newTableColumns.length; j++)
+			{
+				if(newTableColumns[j].Name === null)
+					newTableColumns[j].Name = autoFilters._generateColumnName2(newTableColumns);
+			}
+			
+			this.TableColumns = newTableColumns;
 		}
-		
-		for(var j = 0; j < newTableColumns.length; j++)
-		{
-			if(newTableColumns[j].Name === null)
-				newTableColumns[j].Name = autoFilters._generateColumnName2(newTableColumns);
-		}
-		
-		this.TableColumns = newTableColumns;
 	}
 	
 	this.Ref = Asc.Range(range.c1, range.r1, range.c2, range.r2);
