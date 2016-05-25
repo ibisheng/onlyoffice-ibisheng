@@ -8807,6 +8807,7 @@ asc_docs_api.prototype["asc_setInterfaceDrawImagePlaceShape"] = asc_docs_api.pro
 asc_docs_api.prototype["asc_pluginsRegister"]       = asc_docs_api.prototype.asc_pluginsRegister;
 asc_docs_api.prototype["asc_pluginRun"]             = asc_docs_api.prototype.asc_pluginRun;
 asc_docs_api.prototype["asc_pluginResize"]          = asc_docs_api.prototype.asc_pluginResize;
+asc_docs_api.prototype["asc_pluginButtonClick"]     = asc_docs_api.prototype.asc_pluginButtonClick;
 asc_docs_api.prototype["asc_nativeInitBuilder"]     = asc_docs_api.prototype.asc_nativeInitBuilder;
 asc_docs_api.prototype["asc_SetSilentMode"]         = asc_docs_api.prototype.asc_SetSilentMode;
 asc_docs_api.prototype["asc_addOleObject"]          = asc_docs_api.prototype.asc_addOleObject;

@@ -729,6 +729,11 @@ baseEditorsApi.prototype.asc_pluginResize = function(pluginData)
   if (null != this.pluginsManager)
     this.pluginsManager.runResize(pluginData);
 };
+baseEditorsApi.prototype.asc_pluginButtonClick = function(id)
+{
+  if (null != this.pluginsManager)
+    this.pluginsManager.buttonClick(id);
+};
 
   // Builder
   baseEditorsApi.prototype.asc_nativeInitBuilder = function() {
