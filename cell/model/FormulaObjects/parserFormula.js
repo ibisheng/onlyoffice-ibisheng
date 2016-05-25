@@ -1685,18 +1685,18 @@ cStrucTable.prototype.createArea = function ( val, cell ) {
 
             }
 
+          if (range) {
+            var _c1 = range.c1 + (this.hdtcstartIndex ? this.hdtcstartIndex.index : 0);
+            range = new Asc.Range(_c1, range.r1, this.hdtcendIndex ? range.c1 + this.hdtcendIndex.index : _c1, range.r2);
+          } else {
             paramObj.includeColumnHeader = true;
             data = this.wb.getTableRangeForFormula( this.tableName, paramObj );
 
             if ( !data ) {
-				return this.area = new cError( cErrorType.bad_reference );
+              return this.area = new cError( cErrorType.bad_reference );
             }
-
-            if ( range ) {
-                range = range.intersection( data.range );
-      } else {
-                range = data.range;
-            }
+            range = data.range;
+          }
         }
 
         this.tableData = data;
