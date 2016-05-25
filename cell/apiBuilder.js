@@ -53,6 +53,15 @@
   };
 
   /**
+   * Format as table
+   * @memberof ApiWorksheet
+   * @param {string} sRange
+   */
+  ApiWorksheet.prototype.formatAsTable = function(sRange) {
+    this.worksheet.autoFilters.addAutoFilter('TableStyleLight9', AscCommonExcel.g_oRangeCache.getAscRange(sRange));
+  };
+
+  /**
    * Set column width
    * @memberof ApiWorksheet
    * @param {number} column
@@ -120,6 +129,7 @@
 
   ApiWorksheet.prototype["setName"] = ApiWorksheet.prototype.setName;
   ApiWorksheet.prototype["getRange"] = ApiWorksheet.prototype.getRange;
+  ApiWorksheet.prototype["formatAsTable"] = ApiWorksheet.prototype.formatAsTable;
   ApiWorksheet.prototype["setColumnWidth"] = ApiWorksheet.prototype.setColumnWidth;
 
   ApiRange.prototype["setValue"] = ApiRange.prototype.setValue;
