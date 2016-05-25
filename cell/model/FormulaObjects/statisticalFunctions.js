@@ -5199,13 +5199,13 @@ function cTRIMMEAN() {
     cBaseFunction.call( this, "TRIMMEAN" );
 }
 
-cTRIMMEAN.prototype = Object.create( cBaseFunction.prototype )
+cTRIMMEAN.prototype = Object.create( cBaseFunction.prototype );
 
 function cTTEST() {
     cBaseFunction.call( this, "TTEST" );
 }
 
-cTTEST.prototype = Object.create( cBaseFunction.prototype )
+cTTEST.prototype = Object.create( cBaseFunction.prototype );
 
 function cVAR() {
 //    cBaseFunction.call( this, "VAR" );
@@ -5298,13 +5298,13 @@ cVAR.prototype.Calculate = function ( arg ) {
     }
     return this.value = _var( arr0 );
 
-}
+};
 cVAR.prototype.getInfo = function () {
     return {
         name:this.name,
         args:"( argument-list )"
     };
-}
+};
 
 function cVARA() {
 //    cBaseFunction.call( this, "VARA" );
@@ -5323,7 +5323,7 @@ function cVARA() {
 
 }
 
-cVARA.prototype = Object.create( cBaseFunction.prototype )
+cVARA.prototype = Object.create( cBaseFunction.prototype );
 cVARA.prototype.Calculate = function ( arg ) {
 
     function _var( x ) {
@@ -5412,13 +5412,13 @@ cVARA.prototype.Calculate = function ( arg ) {
 
     }
     return this.value = _var( arr0 );
-}
+};
 cVARA.prototype.getInfo = function () {
     return {
         name:this.name,
         args:"( argument-list )"
     };
-}
+};
 
 function cVARP() {
 //    cBaseFunction.call( this, "VARP" );
@@ -5507,13 +5507,13 @@ cVARP.prototype.Calculate = function ( arg ) {
 
     }
     return this.value = _var( arr0 );
-}
+};
 cVARP.prototype.getInfo = function () {
     return {
         name:this.name,
         args:"( argument-list )"
     };
-}
+};
 
 function cVARdotP() {
 //    cBaseFunction.call( this, "VARP" );
@@ -5532,14 +5532,14 @@ function cVARdotP() {
 
 }
 
-cVARdotP.prototype = Object.create( cBaseFunction.prototype )
+cVARdotP.prototype = Object.create( cBaseFunction.prototype );
 cVARdotP.prototype.Calculate = cVARP.prototype.Calculate;
 cVARdotP.prototype.getInfo = function () {
     return {
         name:this.name,
         args:"( argument-list )"
     };
-}
+};
 
 function cVARPA() {
 //    cBaseFunction.call( this, "VARPA" );
@@ -5558,7 +5558,7 @@ function cVARPA() {
 
 }
 
-cVARPA.prototype = Object.create( cBaseFunction.prototype )
+cVARPA.prototype = Object.create( cBaseFunction.prototype );
 cVARPA.prototype.Calculate = function ( arg ) {
 
     function _var( x ) {
@@ -5647,19 +5647,19 @@ cVARPA.prototype.Calculate = function ( arg ) {
 
     }
     return this.value = _var( arr0 );
-}
+};
 cVARPA.prototype.getInfo = function () {
     return {
         name:this.name,
         args:"( argument-list )"
     };
-}
+};
 
 function cWEIBULL() {
     cBaseFunction.call( this, "WEIBULL" );
 }
 
-cWEIBULL.prototype = Object.create( cBaseFunction.prototype )
+cWEIBULL.prototype = Object.create( cBaseFunction.prototype );
 
 function cZTEST() {
     cBaseFunction.call( this, "ZTEST" );
@@ -5681,4 +5681,5 @@ cZTEST.prototype = Object.create( cBaseFunction.prototype );
     window['AscCommonExcel'].cSTDEV = cSTDEV;
     window['AscCommonExcel'].cSTDEVP = cSTDEVP;
     window['AscCommonExcel'].cVAR = cVAR;
+    window['AscCommonExcel'].cVARP = cVARP;
 })(window);

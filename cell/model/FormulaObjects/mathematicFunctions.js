@@ -3810,7 +3810,7 @@ function cSUBTOTAL() {
 
 cSUBTOTAL.prototype = Object.create( cBaseFunction.prototype )
 cSUBTOTAL.prototype.Calculate = function ( arg ) {
-	var arg0 = arg[0];
+	var f, arg0 = arg[0];
 
 	if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
 		arg0 = arg0.cross( arguments[1].first );
@@ -3836,11 +3836,15 @@ cSUBTOTAL.prototype.Calculate = function ( arg ) {
 			break;
 		case cSubTotalFunctionType.includes.MAX:
 		case cSubTotalFunctionType.excludes.MAX:
-			this.value = (new AscCommonExcel.cMAX()).Calculate(arg.slice(1));
+			f = new AscCommonExcel.cMAX();
+			f.setArgumentsCount(arg.length - 1);
+			this.value = f.Calculate(arg.slice(1));
 			break;
 		case cSubTotalFunctionType.includes.MIN:
 		case cSubTotalFunctionType.excludes.MIN:
-			this.value = (new AscCommonExcel.cMIN()).Calculate(arg.slice(1));
+			f = new AscCommonExcel.cMIN();
+      f.setArgumentsCount(arg.length - 1);
+			this.value = f.Calculate(arg.slice(1));
 			break;
 		case cSubTotalFunctionType.includes.PRODUCT:
 		case cSubTotalFunctionType.excludes.PRODUCT:
