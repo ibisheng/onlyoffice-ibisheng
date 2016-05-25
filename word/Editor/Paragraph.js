@@ -12148,7 +12148,7 @@ Paragraph.prototype =
                     this.Pr.Spacing = new CParaSpacing();
 
                 if ( false === Reader.GetBool() )
-                    this.Pr.Spacing.AfterAutoSpacing = Reader.GetBool();
+                    this.Pr.Spacing.BeforeAutoSpacing = Reader.GetBool();
                 else
                     this.Pr.Spacing.BeforeAutoSpacing = undefined;
 
