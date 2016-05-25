@@ -1132,9 +1132,9 @@ CTable.prototype =
             {
                 if (tblwidth_Auto != TablePr.TableW.Type)
                 {
-                this.Set_TableW(tblwidth_Auto, 0);
-                bRecalc_All = true;
-            }
+                    this.Set_TableW(tblwidth_Auto, 0);
+                    bRecalc_All = true;
+                }
             }
             else if (Props.TableWidth > -0.001)
             {
@@ -1952,6 +1952,10 @@ CTable.prototype =
         // CellsWidth
         if (undefined !== Props.CellsWidth)
         {
+            var CellsWidth = Props.CellsWidth;
+            if (null !== CellsWidth && Math.abs(CellsWidth) < 0.001)
+                CellsWidth = null;
+
             if (this.Selection.Use === true && table_Selection_Cell === this.Selection.Type)
             {
                 var Count = this.Selection.Data.length;
@@ -1960,22 +1964,22 @@ CTable.prototype =
                     var Pos  = this.Selection.Data[Index];
                     var Cell = this.Content[Pos.Row].Get_Cell(Pos.Cell);
 
-                    if (null === Props.CellsWidth)
+                    if (null === CellsWidth)
                         Cell.Set_W(new CTableMeasurement(tblwidth_Auto, 0));
-                    else if (Props.CellsWidth > -0.001)
-                        Cell.Set_W(new CTableMeasurement(tblwidth_Mm, Props.CellsWidth));
+                    else if (CellsWidth > -0.001)
+                        Cell.Set_W(new CTableMeasurement(tblwidth_Mm, CellsWidth));
                     else
-                        Cell.Set_W(new CTableMeasurement(tblwidth_Pct, Math.abs(Props.CellsWidth)));
+                        Cell.Set_W(new CTableMeasurement(tblwidth_Pct, Math.abs(CellsWidth)));
                 }
             }
             else
             {
-                if (null === Props.CellsWidth)
+                if (null === CellsWidth)
                     this.CurCell.Set_W(new CTableMeasurement(tblwidth_Auto, 0));
-                else if (Props.CellsWidth > -0.001)
-                    this.CurCell.Set_W(new CTableMeasurement(tblwidth_Mm, Props.CellsWidth));
+                else if (CellsWidth > -0.001)
+                    this.CurCell.Set_W(new CTableMeasurement(tblwidth_Mm, CellsWidth));
                 else
-                    this.CurCell.Set_W(new CTableMeasurement(tblwidth_Pct, Math.abs(Props.CellsWidth)));
+                    this.CurCell.Set_W(new CTableMeasurement(tblwidth_Pct, Math.abs(CellsWidth)));
             }
         }
 
