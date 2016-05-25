@@ -106,9 +106,10 @@
    * @param {bool} bInRows
    * @param {ChartType} sType
    * @param {number} nStyleIndex
-   * @param {string} sFromRange
-   * @param {string} sToRange
-   * @param {}
+   * @param {number} nFromCol
+   * @param {number} nFromRow
+   * @param {number} nToCol
+   * @param {number} nToRow
    */
   ApiWorksheet.prototype.addChart = function(sDataRange, bInRows, sType, nStyleIndex, nFromCol, nFromRow, nToCol, nToRow) {
 
