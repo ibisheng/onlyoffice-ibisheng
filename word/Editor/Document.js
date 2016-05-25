@@ -2221,8 +2221,8 @@ CDocument.prototype.Recalculate_PageColumn                   = function()
     var StartIndex         = this.FullRecalc.StartIndex;
     var bResetStartElement = this.FullRecalc.ResetStartElement;
 
-    //console.log("Page " + PageIndex + " Section " + SectionIndex + " Column " + ColumnIndex + " Element " + StartIndex);
-    //console.log(this.RecalcInfo);
+    // console.log("Page " + PageIndex + " Section " + SectionIndex + " Column " + ColumnIndex + " Element " + StartIndex);
+    // console.log(this.RecalcInfo);
 
     var StartPos = this.Get_PageContentStartPos2(PageIndex, ColumnIndex, 0, StartIndex);
 
@@ -2562,6 +2562,40 @@ CDocument.prototype.Recalculate_PageColumn                   = function()
 
                 for (var TempColumnIndex = ColumnIndex + 1; TempColumnIndex < ColumnsCount; ++TempColumnIndex)
                 {
+                    PageSection.Columns[TempColumnIndex].Empty  = true;
+                    PageSection.Columns[TempColumnIndex].Pos    = Index;
+                    PageSection.Columns[TempColumnIndex].EndPos = Index - 1;
+                }
+
+                break;
+            }
+            else if (RecalcResult & recalcresultflags_Page)
+            {
+                PageColumn.EndPos  = Index;
+                PageSection.EndPos = Index;
+                Page.EndPos        = Index;
+
+                bContinue = true;
+
+                _SectionIndex = 0;
+                _ColumnIndex  = 0;
+                _PageIndex    = PageIndex + 1;
+                _StartIndex   = Index;
+                _bStart       = true;
+
+                if (PageColumn.EndPos === PageColumn.Pos)
+                {
+                    var Element          = this.Content[PageColumn.Pos];
+                    var ElementPageIndex = this.private_GetElementPageIndex(Index, PageIndex, ColumnIndex, ColumnsCount);
+                    if (true === Element.Is_EmptyPage(ElementPageIndex))
+                        PageColumn.Empty = true;
+                }
+
+                for (var TempColumnIndex = ColumnIndex + 1; TempColumnIndex < ColumnsCount; ++TempColumnIndex)
+                {
+                    var ElementPageIndex = this.private_GetElementPageIndex(Index, PageIndex, TempColumnIndex, ColumnsCount);
+                    this.Content[Index].Recalculate_SkipPage(ElementPageIndex);
+
                     PageSection.Columns[TempColumnIndex].Empty  = true;
                     PageSection.Columns[TempColumnIndex].Pos    = Index;
                     PageSection.Columns[TempColumnIndex].EndPos = Index - 1;

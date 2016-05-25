@@ -2732,7 +2732,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                             if (null != Para.Get_DocumentPrev() && true != Para.Parent.Is_TableCellContent() && 0 === CurPage)
                             {
                                 Para.Recalculate_Drawing_AddPageBreak(0, 0, true);
-                                PRS.RecalcResult = recalcresult_NextPage;
+                                PRS.RecalcResult = recalcresult_NextPage | recalcresultflags_Page;
                                 PRS.NewRange = true;
                                 return;
                             }
@@ -2741,7 +2741,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                                 if (ParaLine != Para.Pages[CurPage].FirstLine)
                                 {
                                     Para.Recalculate_Drawing_AddPageBreak(ParaLine, CurPage, false);
-                                    PRS.RecalcResult = recalcresult_NextPage;
+                                    PRS.RecalcResult = recalcresult_NextPage | recalcresultflags_Page;
                                     PRS.NewRange = true;
                                     return;
                                 }

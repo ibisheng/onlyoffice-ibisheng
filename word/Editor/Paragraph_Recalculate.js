@@ -312,8 +312,8 @@ Paragraph.prototype.Recalculate_FastRange = function(SimpleChanges)
 
 /**
  * Функция для пересчета страницы параграфа.
- * @param PageIndex номер страницы, которую нужно пересчитать. Этот номер считается относительно нумерации
- *                  родительского класса.
+ * @param {number} PageIndex - Номер страницы, которую нужно пересчитать (относительный номер страницы для параграфа).
+ * Предыдущая страница ДОЛЖНА быть пересчитана, если задано не нулевое значение.
  * @returns {*} Возвращается результат пересчета
  */
 Paragraph.prototype.Recalculate_Page = function(PageIndex)
@@ -336,6 +336,32 @@ Paragraph.prototype.Recalculate_Page = function(PageIndex)
     this.Parent.RecalcInfo.Reset_WidowControl();
 
     return RecalcResult;
+};
+
+/**
+ * Функция для пересчета страницы параграфа, так чтобы на данной странице ничего не было. Применяется, когда из-за
+ * пересчета плавающей автофигуры нужно сразу перейти на следующую страницу, пропустив несколько колонок.
+ * @param {number} PageIndex - Номер страницы, пересчет которой мы пропускаем. (предыдущая страница ДОЛЖНА быть
+ * пересчитана, если это не нулевое значение)
+ */
+Paragraph.prototype.Recalculate_SkipPage = function(PageIndex)
+{
+    if (0 === PageIndex)
+    {
+        this.Start_FromNewPage();
+    }
+    else
+    {
+        var PrevPage = this.Pages[PageIndex - 1];
+
+        var EndLine       = Math.max(PrevPage.StartLine, PrevPage.EndLine); // На случай, если предыдущая страница тоже пустая
+        var NewPage       = new CParaPage(PrevPage.X, PrevPage.Y, PrevPage.XLimit, PrevPage.YLimit, EndLine);
+        NewPage.StartLine = EndLine;
+        NewPage.EndLine   = EndLine - 1;
+        NewPage.TextPr    = PrevPage.TextPr;
+
+        this.Pages[PageIndex] = NewPage;
+    }
 };
 
 /**

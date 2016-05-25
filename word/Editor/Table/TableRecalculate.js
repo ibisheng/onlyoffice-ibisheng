@@ -33,6 +33,24 @@ CTable.prototype.Recalculate_Page = function(PageIndex)
 
     return Result;
 };
+CTable.prototype.Recalculate_SkipPage = function(PageIndex)
+{
+    if (0 === PageIndex)
+    {
+        this.Start_FromNewPage();
+    }
+    else
+    {
+        var PrevPage = this.Pages[PageIndex - 1];
+
+        var LastRow       = Math.max(PrevPage.FirstRow, PrevPage.LastRow); // На случай, если предыдущая страница тоже пустая
+        var NewPage       = new CTablePage(PrevPage.X, PrevPage.Y, PrevPage.XLimit, PrevPage.YLimit, LastRow, PrevPage.MaxTopBorder);
+        NewPage.FirstRow  = LastRow;
+        NewPage.LastRow   = LastRow - 1;
+
+        this.Pages[PageIndex] = NewPage;
+    }
+};
 CTable.prototype.Recalculate_Grid = function()
 {
     this.private_RecalculateGrid();
