@@ -2634,7 +2634,7 @@
 						var isDateTimeFormat = cell.getNumFormat().isDateTimeFormat();
 						
 						var isNumberFilter = false;
-						if(newFilterColumn.CustomFiltersObj || newFilterColumn.Top10 || newFilterColumn.DynamicFilter)
+						if(filterColumns[j].CustomFiltersObj || filterColumns[j].Top10 || filterColumns[j].DynamicFilter)
 						{
 							isNumberFilter = true;
 						}
