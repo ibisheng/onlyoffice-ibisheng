@@ -574,7 +574,7 @@
     });
 
     this.model.handlers.add("cleanCellCache", function(wsId, oRanges, canChangeColWidth, bLockDraw, updateHeight) {
-      var ws = self.getWorksheetById(wsId);
+      var ws = self.getWorksheetById(wsId, true);
       if (ws) {
         ws.updateRanges(oRanges, canChangeColWidth, bLockDraw || wsId != self.getWorksheet(self.wsActive).model.getId(), updateHeight);
       }
@@ -804,17 +804,16 @@
   };
 
   WorkbookView.prototype._onGetSelection = function() {
-    var ws = this.getWorksheet();
-    return ws.getActiveRangeObj();
+    var ws = this.getWorksheet(null, true);
+    return ws ? ws.getActiveRangeObj() : null;
   };
 
   WorkbookView.prototype._onGetSelectionState = function() {
-    var ws = this.getWorksheet();
     var res = null;
-    if (AscCommon.isRealObject(ws.objectRender) && AscCommon.isRealObject(ws.objectRender.controller)) {
+    var ws = this.getWorksheet(null, true);
+    if (ws && AscCommon.isRealObject(ws.objectRender) && AscCommon.isRealObject(ws.objectRender.controller)) {
       res = ws.objectRender.controller.getSelectionState();
     }
-    // ToDo лучше на getSelectionState возвращать null
     return (res && res[0] && res[0].focus) ? res : null;
   };
 
@@ -1403,23 +1402,24 @@
     return oStylesPainter;
   };
 
-  WorkbookView.prototype.getWorksheetById = function(id) {
+  WorkbookView.prototype.getWorksheetById = function(id, onlyExist) {
     var wsModel = this.model.getWorksheetById(id);
     if (wsModel) {
-      return this.getWorksheet(wsModel.getIndex());
+      return this.getWorksheet(wsModel.getIndex(), onlyExist);
     }
     return null;
   };
 
   /**
    * @param {Number} [index]
+   * @param {Boolean} [onlyExist]
    * @return {AscCommonExcel.WorksheetView}
    */
-  WorkbookView.prototype.getWorksheet = function(index) {
+  WorkbookView.prototype.getWorksheet = function(index, onlyExist) {
     var wb = this.model;
     var i = asc_typeof(index) === "number" && index >= 0 ? index : wb.getActive();
     var ws = this.wsViews[i];
-    if (null == ws) {
+    if (null == ws && !onlyExist) {
       ws = this.wsViews[i] = this._createWorksheetView(wb.getWorksheet(i));
       ws._prepareComments();
       ws._prepareDrawingObjects();
