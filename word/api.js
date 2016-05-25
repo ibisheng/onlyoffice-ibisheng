@@ -8809,6 +8809,8 @@ asc_docs_api.prototype["asc_pluginRun"]             = asc_docs_api.prototype.asc
 asc_docs_api.prototype["asc_pluginResize"]          = asc_docs_api.prototype.asc_pluginResize;
 asc_docs_api.prototype["asc_nativeInitBuilder"]     = asc_docs_api.prototype.asc_nativeInitBuilder;
 asc_docs_api.prototype["asc_SetSilentMode"]         = asc_docs_api.prototype.asc_SetSilentMode;
+asc_docs_api.prototype["asc_addOleObject"]          = asc_docs_api.prototype.asc_addOleObject;
+asc_docs_api.prototype["asc_editOleObject"]         = asc_docs_api.prototype.asc_editOleObject;
 
 CParagraphPropEx.prototype['get_ContextualSpacing'] = CParagraphPropEx.prototype.get_ContextualSpacing;
 CParagraphPropEx.prototype['get_Ind'] = CParagraphPropEx.prototype.get_Ind;

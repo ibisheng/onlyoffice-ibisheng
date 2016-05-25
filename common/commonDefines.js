@@ -1460,7 +1460,7 @@ window['Asc']['c_oAscMaxCellOrCommentLength'] = window['Asc'].c_oAscMaxCellOrCom
     html : "html"
   };
 
-  window["Asc"]["EPluginDataType"] = EPluginDataType;
+  window["Asc"]["EPluginDataType"] = window["Asc"].EPluginDataType = EPluginDataType;
   prot = EPluginDataType;
   prot['none'] = prot.none;
   prot['text'] = prot.text;
@@ -1591,8 +1591,8 @@ window['Asc']['c_oAscMaxCellOrCommentLength'] = window['Asc'].c_oAscMaxCellOrCom
     _object["name"]         = this.name;
     _object["guid"]         = this.guid;
     _object["baseUrl"]      = this.baseUrl;
-    _object["variations"]   = this.variations;
-    for (var i = 0; i < this.variations; i++)
+    _object["variations"]   = [];
+    for (var i = 0; i < this.variations.length; i++)
     {
         _object["variations"].push(this.variations[i].serialize());
     }
@@ -1612,7 +1612,7 @@ window['Asc']['c_oAscMaxCellOrCommentLength'] = window['Asc'].c_oAscMaxCellOrCom
     }
   }
 
-  window["Asc"]["CPluginVariation"] = CPluginVariation;
-  window["Asc"]["CPlugin"] = CPlugin;
+  window["Asc"]["CPluginVariation"] = window["Asc"].CPluginVariation = CPluginVariation;
+  window["Asc"]["CPlugin"] = window["Asc"].CPlugin = CPlugin;
   // --------------------------------------------------------------------- //
 })(window);

@@ -268,6 +268,9 @@
         }
     };
 
+    // export
+    CPluginsManager.prototype["buttonClick"] = CPluginsManager.prototype.buttonClick;
+
     function onMessage(event)
     {
         if (!window.g_asc_plugins || !window.g_asc_plugins.current)

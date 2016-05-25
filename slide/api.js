@@ -6615,6 +6615,8 @@ asc_docs_api.prototype["asc_SetSilentMode"] = asc_docs_api.prototype.asc_SetSile
 asc_docs_api.prototype["asc_pluginsRegister"]       = asc_docs_api.prototype.asc_pluginsRegister;
 asc_docs_api.prototype["asc_pluginRun"]             = asc_docs_api.prototype.asc_pluginRun;
 asc_docs_api.prototype["asc_pluginResize"]          = asc_docs_api.prototype.asc_pluginResize;
+asc_docs_api.prototype["asc_addOleObject"]          = asc_docs_api.prototype.asc_addOleObject;
+asc_docs_api.prototype["asc_editOleObject"]         = asc_docs_api.prototype.asc_editOleObject;
 
 window['Asc']['asc_CCommentData'] = window['Asc'].asc_CCommentData = asc_CCommentData;
 asc_CCommentData.prototype['asc_getText'] = asc_CCommentData.prototype.asc_getText;
