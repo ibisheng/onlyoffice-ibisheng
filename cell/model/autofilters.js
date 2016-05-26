@@ -4942,8 +4942,8 @@
 		 */
 		window['AscCommonExcel'] = window['AscCommonExcel'] || {};
 		window["AscCommonExcel"].AutoFilters				= AutoFilters;
-
-		window["Asc"].AutoFiltersOptions		= AutoFiltersOptions;
+		
+		window["Asc"]["AutoFiltersOptions"]		= window["Asc"].AutoFiltersOptions = AutoFiltersOptions;
 		prot									= AutoFiltersOptions.prototype;
 		prot["asc_setSortState"]				= prot.asc_setSortState;
 		prot["asc_getSortState"]				= prot.asc_getSortState;
@@ -4956,8 +4956,8 @@
         prot["asc_getColorsFill"]				= prot.asc_getColorsFill;
         prot["asc_getColorsFont"]				= prot.asc_getColorsFont;
         prot["asc_getSortColor"]				= prot.asc_getSortColor;
-
-		window["Asc"].AutoFilterObj				= AutoFilterObj;
+		
+		window["Asc"]["AutoFilterObj"]		    = window["Asc"].AutoFilterObj = AutoFilterObj;
 		prot									= AutoFilterObj.prototype;
 		prot["asc_getType"]						= prot.asc_getType;
 		prot["asc_setFilter"]					= prot.asc_setFilter;
