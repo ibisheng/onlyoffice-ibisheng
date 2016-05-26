@@ -2821,6 +2821,10 @@ CPresentation.prototype =
         if ( true === editor.isViewMode )
             return false;
 
+        if(!this.Slides[this.CurPage] || !this.Slides[this.CurPage].graphicObjects || this.Slides[this.CurPage].graphicObjects.selectedObjects.length === 0)
+        {
+            return;
+        }
         var Code;
         if (null != e.Which)
             Code = e.Which;
