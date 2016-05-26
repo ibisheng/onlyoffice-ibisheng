@@ -1008,8 +1008,24 @@ CDocumentContent.prototype.Recalculate_Page               = function(PageIndex, 
                 Element.Reset(X, Y, XLimit, YLimit, PageIndex, 0, 1);
             }
 
-            var ElementPageIndex = this.private_GetElementPageIndex(Index, PageIndex, 0, 1);
-            RecalcResult         = Element.Recalculate_Page(ElementPageIndex);
+            if (Index === Count - 1 && Index > 0 && type_Paragraph === Element.GetType() && type_Table === this.Content[Index - 1].GetType() && true === Element.IsEmpty() && true === this.Is_TableCellContent())
+            {
+                RecalcResult = recalcresult_NextElement;
+
+                this.private_RecalculateEmptySectionParagraph(Element, this.Content[Index - 1], PageIndex, 0, 1);
+
+                // Добавим в список особых параграфов
+                this.Pages[PageIndex].EndSectionParas.push(Element);
+
+                // Выставляем этот флаг, чтобы у нас не менялось значение по Y
+                bFlow = true;
+            }
+            else
+            {
+
+                var ElementPageIndex = this.private_GetElementPageIndex(Index, PageIndex, 0, 1);
+                RecalcResult         = Element.Recalculate_Page(ElementPageIndex);
+            }
         }
 
         Element.TurnOn_RecalcEvent();
@@ -8127,16 +8143,26 @@ CDocumentContent.prototype.Table_CheckSplit  = function()
 //-----------------------------------------------------------------------------------
 CDocumentContent.prototype.Internal_GetContentPosByXY = function(X, Y, PageNum)
 {
-    if (undefined === PageNum)
+    if (undefined === PageNum || null === PageNum)
         PageNum = this.CurPage;
 
-    // TODO: изенить здесь
-    PageNum = Math.min(PageNum, this.Pages.length - 1);
+    PageNum = Math.max(0, Math.min(PageNum, this.Pages.length - 1));
 
     // Сначала проверим Flow-таблицы
     var FlowTable = this.LogicDocument && this.LogicDocument.DrawingObjects.getTableByXY(X, Y, PageNum + this.Get_StartPage_Absolute(), this);
     if (null != FlowTable)
         return FlowTable.Table.Index;
+
+    // Теперь проверим пустые параграфы с окончанием секций (в нашем случае это пустой параграф послей таблицы внутри таблицы)
+    var SectCount = this.Pages[PageNum].EndSectionParas.length;
+    for (var Index = 0; Index < SectCount; ++Index)
+    {
+        var Item   = this.Pages[PageNum].EndSectionParas[Index];
+        var Bounds = Item.Pages[0].Bounds;
+
+        if (Y < Bounds.Bottom && Y > Bounds.Top && X > Bounds.Left && X < Bounds.Right)
+            return Item.Index;
+    }
 
     var StartPos = Math.min(this.Pages[PageNum].Pos, this.Content.length - 1);
     var EndPos   = this.Content.length - 1;
@@ -8149,7 +8175,9 @@ CDocumentContent.prototype.Internal_GetContentPosByXY = function(X, Y, PageNum)
     for (var Index = StartPos; Index <= EndPos; Index++)
     {
         var Item = this.Content[Index];
-        if (type_Table != Item.GetType() || false != Item.Is_Inline())
+        var bEmptySectPara = this.Pages[PageNum].Check_EndSectionPara(Item);
+
+        if (false != Item.Is_Inline() && (type_Table === Item.GetType() || false === bEmptySectPara))
             InlineElements.push(Index);
     }
 
