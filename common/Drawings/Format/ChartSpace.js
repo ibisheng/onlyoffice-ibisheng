@@ -1558,23 +1558,14 @@ CChartSpace.prototype.clearFormatting = function(bNoClearShapeProps)
             }
             else
             {
-                var aCalcEntries = this.selection.legend.calcEntryes;
-                var idx;
-                if(aCalcEntries && aCalcEntries[this.selection.legendEntry])
+                var entry = this.selection.legend.findLegendEntryByIndex(this.selection.legendEntry);
+                if(!entry)
                 {
-                    idx = aCalcEntries[this.selection.legendEntry].idx;
+                    entry = new AscFormat.CLegendEntry();
+                    entry.setIdx(this.selection.legendEntry);
+                    this.selection.legend.addLegendEntry(entry);
                 }
-                if(AscFormat.isRealNumber(idx))
-                {
-                    var entry = this.selection.legend.findLegendEntryByIndex(idx);
-                    if(!entry)
-                    {
-                        entry = new AscFormat.CLegendEntry();
-                        entry.setIdx(idx);
-                        this.selection.legend.addLegendEntry(entry);
-                    }
-                    entry.setDelete(true);
-                }
+                entry.setDelete(true);
             }
         }
         else if(this.selection.axisLbls)
