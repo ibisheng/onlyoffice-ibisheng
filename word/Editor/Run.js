@@ -2858,7 +2858,10 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                             PRS.BadLeftTab = true;
                         }
 
-                        if (NewX > XEnd && ( false === FirstItemOnLine || false === Para.Internal_Check_Ranges(ParaLine, ParaRange) ))
+                        // Так работает Word: он не переносит на новую строку табы, начинающиеся в допустимом отрезке, а
+                        // заканчивающиеся вне его. Поэтому мы проверяем именно, где таб начинается, а не заканчивается.
+                        // (bug 32345)
+                        if (X > XEnd && ( false === FirstItemOnLine || false === Para.Internal_Check_Ranges(ParaLine, ParaRange) ))
                         {
                             WordLen = NewX - X;
                             RangeEndPos = Pos;
