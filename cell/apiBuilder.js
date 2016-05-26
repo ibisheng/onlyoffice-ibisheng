@@ -66,7 +66,7 @@
    * @memberof ApiWorksheet
    * @param {string} name
    */
-  ApiWorksheet.prototype.setName = function(name) {
+  ApiWorksheet.prototype.SetName = function(name) {
     this.worksheet.setName(name);
   };
 
@@ -76,7 +76,7 @@
    * @param {string} sRange
    * @returns {ApiRange}
    */
-  ApiWorksheet.prototype.getRange = function(sRange) {
+  ApiWorksheet.prototype.GetRange = function(sRange) {
     return new ApiRange(this.worksheet.getRange2(sRange));
   };
 
@@ -85,7 +85,7 @@
    * @memberof ApiWorksheet
    * @param {string} sRange
    */
-  ApiWorksheet.prototype.formatAsTable = function(sRange) {
+  ApiWorksheet.prototype.FormatAsTable = function(sRange) {
     this.worksheet.autoFilters.addAutoFilter('TableStyleLight9', AscCommonExcel.g_oRangeCache.getAscRange(sRange));
   };
 
@@ -95,7 +95,7 @@
    * @param {number} column
    * @param {number} width
    */
-  ApiWorksheet.prototype.setColumnWidth = function(column, width) {
+  ApiWorksheet.prototype.SetColumnWidth = function(column, width) {
     this.worksheet.setColWidth(width, column, column);
   };
 
@@ -111,7 +111,7 @@
    * @param {number} nToCol
    * @param {number} nToRow
    */
-  ApiWorksheet.prototype.addChart = function(sDataRange, bInRows, sType, nStyleIndex, nFromCol, nFromRow, nToCol, nToRow) {
+  ApiWorksheet.prototype.AddChart = function(sDataRange, bInRows, sType, nStyleIndex, nFromCol, nFromRow, nToCol, nToRow) {
 
     History.Create_NewPoint();
     var settings = new AscCommon.asc_ChartSettings();
@@ -247,7 +247,7 @@
    * @memberof ApiRange
    * @param {string} val
    */
-  ApiRange.prototype.setValue = function(val) {
+  ApiRange.prototype.SetValue = function(val) {
     this.range.setValue(val);
   };
 
@@ -257,7 +257,7 @@
    * @param {byte} g
    * @param {byte} b
    */
-  ApiRange.prototype.setFontColor = function(r, g, b) {
+  ApiRange.prototype.SetFontColor = function(r, g, b) {
     this.range.setFontcolor(new AscCommonExcel.RgbColor((r << 16) +  (g << 8) +  b));
   };
 
@@ -265,7 +265,7 @@
    * Set font size
    * @param {number} size
    */
-  ApiRange.prototype.setFontSize = function(size) {
+  ApiRange.prototype.SetFontSize = function(size) {
     this.range.setFontsize(size);
   };
 
@@ -273,7 +273,7 @@
    * Set font name
    * @param {string} name
    */
-  ApiRange.prototype.setFontName = function(name) {
+  ApiRange.prototype.SetFontName = function(name) {
     this.range.setFontname(name);
   };
 
@@ -281,7 +281,7 @@
    * Set align vertical
    * @param {'center' | 'bottom' | 'top'} value
    */
-  ApiRange.prototype.setAlignVertical = function(value) {
+  ApiRange.prototype.SetAlignVertical = function(value) {
     this.range.setAlignVertical(value);
   };
 
@@ -289,7 +289,7 @@
    * Set align horizontal
    * @param {'left' | 'right' | 'center' | 'justify'} value
    */
-  ApiRange.prototype.setAlignHorizontal = function(value) {
+  ApiRange.prototype.SetAlignHorizontal = function(value) {
     this.range.setAlignHorizontal(value);
   };
 
@@ -301,16 +301,16 @@
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   Api.prototype["GetActiveSheet"] = Api.prototype.GetActiveSheet;
 
-  ApiWorksheet.prototype["setName"] = ApiWorksheet.prototype.setName;
-  ApiWorksheet.prototype["getRange"] = ApiWorksheet.prototype.getRange;
-  ApiWorksheet.prototype["formatAsTable"] = ApiWorksheet.prototype.formatAsTable;
-  ApiWorksheet.prototype["setColumnWidth"] = ApiWorksheet.prototype.setColumnWidth;
-  ApiWorksheet.prototype["addChart"] = ApiWorksheet.prototype.addChart;
+  ApiWorksheet.prototype["SetName"] = ApiWorksheet.prototype.SetName;
+  ApiWorksheet.prototype["GetRange"] = ApiWorksheet.prototype.GetRange;
+  ApiWorksheet.prototype["FormatAsTable"] = ApiWorksheet.prototype.FormatAsTable;
+  ApiWorksheet.prototype["SetColumnWidth"] = ApiWorksheet.prototype.SetColumnWidth;
+  ApiWorksheet.prototype["AddChart"] = ApiWorksheet.prototype.AddChart;
 
-  ApiRange.prototype["setValue"] = ApiRange.prototype.setValue;
-  ApiRange.prototype["setFontColor"] = ApiRange.prototype.setFontColor;
-  ApiRange.prototype["setFontSize"] = ApiRange.prototype.setFontSize;
-  ApiRange.prototype["setFontName"] = ApiRange.prototype.setFontName;
-  ApiRange.prototype["setAlignVertical"] = ApiRange.prototype.setAlignVertical;
-  ApiRange.prototype["setAlignHorizontal"] = ApiRange.prototype.setAlignHorizontal;
+  ApiRange.prototype["SetValue"] = ApiRange.prototype.SetValue;
+  ApiRange.prototype["SetFontColor"] = ApiRange.prototype.SetFontColor;
+  ApiRange.prototype["SetFontSize"] = ApiRange.prototype.SetFontSize;
+  ApiRange.prototype["SetFontName"] = ApiRange.prototype.SetFontName;
+  ApiRange.prototype["SetAlignVertical"] = ApiRange.prototype.SetAlignVertical;
+  ApiRange.prototype["SetAlignHorizontal"] = ApiRange.prototype.SetAlignHorizontal;
 }(window, null));
