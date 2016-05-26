@@ -2616,7 +2616,12 @@ Workbook.prototype.editDefinesNames = function ( oldName, newName, bUndo ) {
     }
 
     if ( oldName ) {
-		this.buildRecalc(true, true);
+        //при переименовании важно строить зависимости иначе не пересчитаются зависимые формулы
+        //пример foo->bar влечет SUM(foo)->SUM(bar), но если нет зависимостей то останется SUM(foo)(повторяется при принятии изменений)
+        //при сдвиге ячеек пересчитывать не надо, т.к. пересчет может запуститься когда сдвинется часть ячеек и тогда будут неправильные зависимости
+        if(newName.Name != oldName.Name){
+            this.buildRecalc(true, true);
+        }
         retRes = this.dependencyFormulas.changeDefName( oldName, newName );
         rename = true;
     }
