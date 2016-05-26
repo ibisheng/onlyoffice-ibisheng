@@ -547,6 +547,8 @@ CDLbl.prototype =
     },
 
 
+
+
     getStyles: function()
     {
         return AscFormat.ExecuteNoHistory(function(){
@@ -2110,6 +2112,7 @@ CPlotArea.prototype =
             {
                 case AscDFH.historyitem_type_CatAx:
                 case AscDFH.historyitem_type_DateAx:
+                case AscDFH.historyitem_type_SerAx:
                 {
                     ret.catAx.push(axis);
                     break;
@@ -6804,6 +6807,11 @@ CSerAx.prototype =
     {
         this.parent && this.parent.parent && this.parent.parent.Refresh_RecalcData2(pageIndex, object);
     },
+
+
+    getMenuProps: CCatAx.prototype.getMenuProps,
+    setMenuProps: CCatAx.prototype.setMenuProps,
+
 
     getDrawingDocument: function()
     {
@@ -13745,6 +13753,16 @@ CLegend.prototype =
         this.Refresh_RecalcData2();
     },
 
+    findCalcEntryByIdx: function(idx)
+    {
+        for(var i = 0; i < this.calcEntryes.length; ++i){
+            if(this.calcEntryes[i] && this.calcEntryes[i].idx === idx){
+                return this.calcEntryes[i];
+            }
+        }
+        return null;
+    },
+
     createDuplicate: function()
     {
         var c = new CLegend();
@@ -13767,6 +13785,24 @@ CLegend.prototype =
             c.setTxPr(this.txPr.createDuplicate());
         }
         return c;
+    },
+
+    getCalcEntryByIdx: function(idx, drawingDocument)
+    {
+        for(var i = 0; i < this.calcEntryes.length; ++i)
+        {
+            if(this.calcEntryes[i] && this.calcEntryes[i].idx == idx)
+            {
+                return this.calcEntryes[i];
+            }
+        }
+        return AscFormat.ExecuteNoHistory(function(){
+
+            var calcEntry = new AscFormat.CalcLegendEntry(this, this.chart, idx);
+            calcEntry.txBody = AscFormat.CreateTextBodyFromString("" + idx, drawingDocument, calcEntry);
+            calcEntry.txBody.getRectWidth(2000);
+            return calcEntry;
+        }, this, []);
     },
 
     Write_ToBinary2: function (w)

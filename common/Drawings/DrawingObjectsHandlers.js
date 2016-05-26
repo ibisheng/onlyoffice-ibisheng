@@ -333,7 +333,7 @@ function handleInternalChart(drawing, drawingObjectsController, e, x, y, group, 
                             selector.selectObject(drawing, pageIndex);
                             selector.selection.chartSelection = drawing;
                             drawing.selection.legend = legend;
-                            drawing.selection.legendEntry = i;
+                            drawing.selection.legendEntry = aCalcEntries[i].idx;
                             drawingObjectsController.updateSelectionState();
                             drawingObjectsController.updateOverlay();
                             return true;
