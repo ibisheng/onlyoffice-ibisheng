@@ -1679,9 +1679,10 @@
 					isCellIdString = true;
 				}
 				
-				if(displayName !== undefined)
+				
+				var curFilter = this._getFilterByDisplayName(displayName);
+				if(null !== curFilter)
 				{
-					curFilter = this._getFilterByDisplayName(displayName);
 					filterRef = curFilter.Ref;
 					
 					if(cellId !== '')
