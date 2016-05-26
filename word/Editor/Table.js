@@ -6475,7 +6475,10 @@ CTable.prototype =
         else
         {
             if (AscCommon.g_mouse_event_type_up == MouseEvent.Type)
+            {
                 this.Selection.Start = false;
+				this.CurCell = this.Content[Pos.Row].Get_Cell(Pos.Cell);
+            }
 
             this.Selection.Type = table_Selection_Cell;
             this.Internal_Selection_UpdateCells();
