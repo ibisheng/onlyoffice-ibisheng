@@ -765,6 +765,8 @@ CTable.prototype =
             this.DrawingDocument.CheckTableStyles( new Asc.CTablePropLook( this.TableLook ) );
         }
 
+        Pr.PercentFullWidth = this.private_RecalculatePercentWidth();
+
         return Pr;
     },
 

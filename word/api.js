@@ -4260,70 +4260,71 @@ function CTablePropLook(obj)
 
 function CTableProp (tblProp)
 {
-	if (tblProp)
-        {
-            this.CanBeFlow           = (undefined != tblProp.CanBeFlow ? tblProp.CanBeFlow : false );
-            this.CellSelect          = (undefined != tblProp.CellSelect ? tblProp.CellSelect : false );
-            this.CellSelect          = (undefined != tblProp.CellSelect) ? tblProp.CellSelect : false;
-            this.TableWidth          = (undefined != tblProp.TableWidth) ? tblProp.TableWidth : null;
-            this.TableSpacing        = (undefined != tblProp.TableSpacing) ? tblProp.TableSpacing : null;
+    if (tblProp)
+    {
+        this.CanBeFlow           = (undefined != tblProp.CanBeFlow ? tblProp.CanBeFlow : false );
+        this.CellSelect          = (undefined != tblProp.CellSelect ? tblProp.CellSelect : false );
+        this.CellSelect          = (undefined != tblProp.CellSelect) ? tblProp.CellSelect : false;
+        this.TableWidth          = (undefined != tblProp.TableWidth) ? tblProp.TableWidth : null;
+        this.TableSpacing        = (undefined != tblProp.TableSpacing) ? tblProp.TableSpacing : null;
         this.TableDefaultMargins = (undefined != tblProp.TableDefaultMargins && null != tblProp.TableDefaultMargins) ? new Asc.asc_CPaddings(tblProp.TableDefaultMargins) : null;
 
-            this.CellMargins = (undefined != tblProp.CellMargins && null != tblProp.CellMargins) ? new CMargins(tblProp.CellMargins) : null;
+        this.CellMargins = (undefined != tblProp.CellMargins && null != tblProp.CellMargins) ? new CMargins(tblProp.CellMargins) : null;
 
-            this.TableAlignment     = (undefined != tblProp.TableAlignment) ? tblProp.TableAlignment : null;
-            this.TableIndent        = (undefined != tblProp.TableIndent) ? tblProp.TableIndent : null;
-            this.TableWrappingStyle = (undefined != tblProp.TableWrappingStyle) ? tblProp.TableWrappingStyle : null;
+        this.TableAlignment     = (undefined != tblProp.TableAlignment) ? tblProp.TableAlignment : null;
+        this.TableIndent        = (undefined != tblProp.TableIndent) ? tblProp.TableIndent : null;
+        this.TableWrappingStyle = (undefined != tblProp.TableWrappingStyle) ? tblProp.TableWrappingStyle : null;
 
         this.TablePaddings = (undefined != tblProp.TablePaddings && null != tblProp.TablePaddings) ? new Asc.asc_CPaddings(tblProp.TablePaddings) : null;
 
-            this.TableBorders      = (undefined != tblProp.TableBorders && null != tblProp.TableBorders) ? new CBorders(tblProp.TableBorders) : null;
-            this.CellBorders       = (undefined != tblProp.CellBorders && null != tblProp.CellBorders) ? new CBorders(tblProp.CellBorders) : null;
-            this.TableBackground   = (undefined != tblProp.TableBackground && null != tblProp.TableBackground) ? new CBackground(tblProp.TableBackground) : null;
-            this.CellsBackground   = (undefined != tblProp.CellsBackground && null != tblProp.CellsBackground) ? new CBackground(tblProp.CellsBackground) : null;
+        this.TableBorders      = (undefined != tblProp.TableBorders && null != tblProp.TableBorders) ? new CBorders(tblProp.TableBorders) : null;
+        this.CellBorders       = (undefined != tblProp.CellBorders && null != tblProp.CellBorders) ? new CBorders(tblProp.CellBorders) : null;
+        this.TableBackground   = (undefined != tblProp.TableBackground && null != tblProp.TableBackground) ? new CBackground(tblProp.TableBackground) : null;
+        this.CellsBackground   = (undefined != tblProp.CellsBackground && null != tblProp.CellsBackground) ? new CBackground(tblProp.CellsBackground) : null;
         this.Position          = (undefined != tblProp.Position && null != tblProp.Position) ? new Asc.CPosition(tblProp.Position) : null;
-            this.PositionH         = ( undefined != tblProp.PositionH && null != tblProp.PositionH ) ? new CTablePositionH(tblProp.PositionH) : undefined;
-            this.PositionV         = ( undefined != tblProp.PositionV && null != tblProp.PositionV ) ? new CTablePositionV(tblProp.PositionV) : undefined;
+        this.PositionH         = ( undefined != tblProp.PositionH && null != tblProp.PositionH ) ? new CTablePositionH(tblProp.PositionH) : undefined;
+        this.PositionV         = ( undefined != tblProp.PositionV && null != tblProp.PositionV ) ? new CTablePositionV(tblProp.PositionV) : undefined;
         this.Internal_Position = ( undefined != tblProp.Internal_Position ) ? tblProp.Internal_Position : undefined;
 
-            this.ForSelectedCells   = (undefined != tblProp.ForSelectedCells) ? tblProp.ForSelectedCells : true;
-            this.TableStyle         = (undefined != tblProp.TableStyle) ? tblProp.TableStyle : null;
-            this.TableLook          = (undefined != tblProp.TableLook) ? new CTablePropLook(tblProp.TableLook) : null;
-            this.RowsInHeader       = (undefined != tblProp.RowsInHeader) ? tblProp.RowsInHeader : 0;
-            this.CellsVAlign        = (undefined != tblProp.CellsVAlign) ? tblProp.CellsVAlign : c_oAscVertAlignJc.Top;
-            this.AllowOverlap       = (undefined != tblProp.AllowOverlap) ? tblProp.AllowOverlap : undefined;
-            this.TableLayout        = tblProp.TableLayout;
+        this.ForSelectedCells   = (undefined != tblProp.ForSelectedCells) ? tblProp.ForSelectedCells : true;
+        this.TableStyle         = (undefined != tblProp.TableStyle) ? tblProp.TableStyle : null;
+        this.TableLook          = (undefined != tblProp.TableLook) ? new CTablePropLook(tblProp.TableLook) : null;
+        this.RowsInHeader       = (undefined != tblProp.RowsInHeader) ? tblProp.RowsInHeader : 0;
+        this.CellsVAlign        = (undefined != tblProp.CellsVAlign) ? tblProp.CellsVAlign : c_oAscVertAlignJc.Top;
+        this.AllowOverlap       = (undefined != tblProp.AllowOverlap) ? tblProp.AllowOverlap : undefined;
+        this.TableLayout        = tblProp.TableLayout;
         this.CellsTextDirection = tblProp.CellsTextDirection;
         this.CellsNoWrap        = tblProp.CellsNoWrap;
         this.CellsWidth         = tblProp.CellsWidth;
-            this.Locked             = (undefined != tblProp.Locked) ? tblProp.Locked : false;
-        }
-	else
-	{
-		//Все свойства класса CTableProp должны быть undefined если они не изменялись
+        this.Locked             = (undefined != tblProp.Locked) ? tblProp.Locked : false;
+        this.PercentFullWidth   = tblProp.PercentFullWidth;
+    }
+    else
+    {
+        //Все свойства класса CTableProp должны быть undefined если они не изменялись
         //this.CanBeFlow = false;
         this.CellSelect = false; //обязательное свойство
-		/*this.TableWidth = null;
-		this.TableSpacing = null;
-		this.TableDefaultMargins = new Asc.asc_CPaddings ();
+        /*this.TableWidth = null;
+         this.TableSpacing = null;
+         this.TableDefaultMargins = new Asc.asc_CPaddings ();
 
-		this.CellMargins = new CMargins ();
+         this.CellMargins = new CMargins ();
 
-		this.TableAlignment = 0;
-		this.TableIndent = 0;
-		this.TableWrappingStyle = c_oAscWrapStyle.Inline;
+         this.TableAlignment = 0;
+         this.TableIndent = 0;
+         this.TableWrappingStyle = c_oAscWrapStyle.Inline;
 
-		this.TablePaddings = new Asc.asc_CPaddings ();
+         this.TablePaddings = new Asc.asc_CPaddings ();
 
-		this.TableBorders = new CBorders ();
-		this.CellBorders = new CBorders ();
-		this.TableBackground = new CBackground ();
-		this.CellsBackground = new CBackground ();;
-		this.Position = new CPosition ();
-		this.ForSelectedCells = true;*/
+         this.TableBorders = new CBorders ();
+         this.CellBorders = new CBorders ();
+         this.TableBackground = new CBackground ();
+         this.CellsBackground = new CBackground ();;
+         this.Position = new CPosition ();
+         this.ForSelectedCells = true;*/
 
         this.Locked = false;
-	}
+    }
 }
 
     CTableProp.prototype.get_Width              = function()
@@ -4551,6 +4552,10 @@ function CTableProp (tblProp)
     CTableProp.prototype.put_CellsWidth         = function(v)
     {
         this.CellsWidth = v;
+    };
+    CTableProp.prototype.get_PercentFullWidth   = function()
+    {
+        return this.PercentFullWidth;
     };
 
 
@@ -8946,6 +8951,7 @@ CTableProp.prototype['get_CellsNoWrap']        = CTableProp.prototype.get_CellsN
 CTableProp.prototype['put_CellsNoWrap']        = CTableProp.prototype.put_CellsNoWrap;
 CTableProp.prototype['get_CellsWidth']         = CTableProp.prototype.get_CellsWidth;
 CTableProp.prototype['put_CellsWidth']         = CTableProp.prototype.put_CellsWidth;
+CTableProp.prototype['get_PercentFullWidth']   = CTableProp.prototype.get_PercentFullWidth;
 window['Asc']['CBorders'] = window['Asc'].CBorders = CBorders;
 CBorders.prototype['get_Left'] = CBorders.prototype.get_Left;
 CBorders.prototype['put_Left'] = CBorders.prototype.put_Left;

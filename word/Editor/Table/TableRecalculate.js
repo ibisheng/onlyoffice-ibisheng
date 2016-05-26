@@ -223,7 +223,7 @@ CTable.prototype.private_RecalculateGrid = function()
         SumGrid[Index] = TempSum;
     }
 
-    var PctWidth = this.XLimit - this.X - this.Get_TableOffsetCorrection() + this.Get_RightTableOffsetCorrection();
+    var PctWidth = this.private_RecalculatePercentWidth();
     var MinWidth = this.Internal_Get_TableMinWidth();
     var TableW = 0;
     if (tblwidth_Auto === TablePr.TableW.Type)
@@ -2999,6 +2999,10 @@ CTable.prototype.private_RecalculateSkipPage = function(CurPage)
         this.Pages[CurPage].FirstRow = FirstRow;
         this.Pages[CurPage].LastRow  = FirstRow -1;
     }
+};
+CTable.prototype.private_RecalculatePercentWidth = function()
+{
+    return this.XLimit - this.X - this.Get_TableOffsetCorrection() + this.Get_RightTableOffsetCorrection();
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Класс CTablePage
