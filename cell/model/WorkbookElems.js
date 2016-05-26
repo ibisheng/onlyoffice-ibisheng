@@ -5009,6 +5009,31 @@ TablePart.prototype.getRangeWithoutHeaderFooter = function()
 	return Asc.Range(this.Ref.c1, startRow, this.Ref.c2, endRow);
 }; 
 
+TablePart.prototype.getRangeTableColumnByName = function(columnName, bWithoutHeaderTotal)
+{
+	var res = null;
+	for(var i = 0; i < this.TableColumns.length; i++)
+	{
+		if(columnName === this.TableColumns[i].Name)
+		{
+			var startRow = this.Ref.r1;
+			var endRow = this.Ref.r2;
+			
+			var col = this.Ref.c1 + i;
+			
+			if(bWithoutHeaderTotal)
+			{
+				startRow = this.HeaderRowCount === null ? this.Ref.r1 + 1 : this.Ref.r1;
+				endRow = this.TotalsRowCount ? this.Ref.r2 - 1 : this.Ref.r2;
+			}
+			
+			res = Asc.Range(col, startRow, col, endRow);
+			break;
+		}
+	}
+	
+	return res;
+};
 
 /** @constructor */
 function AutoFilter() {

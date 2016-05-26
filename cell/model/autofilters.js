@@ -2290,6 +2290,7 @@
 			{	
 				var worksheet = this.worksheet;
 				var isSetValue = false;
+				var isSetType = false;
 				
 				var tablePart = this._getFilterByDisplayName(tableName);
 				
@@ -2343,6 +2344,7 @@
 							if(this._isEmptyCurrentRange(rangeUpTable) && this.searchRangeInTableParts(rangeUpTable) === -1)
 							{
 								isSetValue = true;
+								isSetType = true;
 								
 								tablePart.TotalsRowCount = tablePart.TotalsRowCount === null ? 1 : null;
 								tablePart.changeRef(null, 1);
@@ -2352,6 +2354,7 @@
 								worksheet.getRange3(tablePart.Ref.r2 + 1, tablePart.Ref.c1, tablePart.Ref.r2 + 1, tablePart.Ref.c2).addCellsShiftBottom();
 									
 								isSetValue = true;
+								isSetType = true;
 								
 								tablePart.TotalsRowCount = tablePart.TotalsRowCount === null ? 1 : null;
 								tablePart.changeRef(null, 1);
@@ -2415,7 +2418,7 @@
 						{activeCells: tablePart.Ref.clone(), type: optionType, val: val, displayName: tableName});
 				
 				this._cleanStyleTable(tablePart.Ref);
-				this._setColorStyleTable(tablePart.Ref, tablePart, null, isSetValue);
+				this._setColorStyleTable(tablePart.Ref, tablePart, null, isSetValue, isSetType);
 				History.EndTransaction();
 				
 				return tablePart.Ref.clone();
@@ -4108,7 +4111,7 @@
 				}
 			},
 			//TODO убрать начеркивание
-			_setColorStyleTable: function(range, options, isOpenFilter, isSetVal)
+			_setColorStyleTable: function(range, options, isOpenFilter, isSetVal, isSetTotalRowType)
 			{
 				var worksheet = this.worksheet;
 				var bRedoChanges = worksheet.workbook.bRedoChanges;
@@ -4161,6 +4164,14 @@
 									if(null !== formula)
 									{
 										range.setValue(formula);
+										if(isSetTotalRowType)
+										{
+											var numFormatType = this._getFormatTableColumnRange(options, tableColumn.Name);
+											if(null !== numFormatType)
+											{
+												range.setNumFormat(numFormatType);
+											}
+										}
 									}
 								}
 							}
@@ -4214,6 +4225,50 @@
 						}
 					}
 				}
+			},
+			
+			_getFormatTableColumnRange: function(table, columnName)
+			{
+				var worksheet = this.worksheet;
+				var arrFormat = [];
+				var res = null;
+				
+				var tableRange = table.getRangeTableColumnByName(columnName, true);
+				if(null !== tableRange)
+				{
+					for(var i = tableRange.r1; i <= tableRange.r2; i++)
+					{
+						var cell = worksheet.getCell3(i, tableRange.c1);
+						var format = cell.getNumFormat();
+						var sFromatString = format.sFormat;
+						var type = format ? format.getType : null;
+						
+						if(null !== type)
+						{	
+							res = true;
+							if(!arrFormat[sFromatString])
+							{
+								arrFormat[sFromatString] = 0;
+							}
+							arrFormat[sFromatString]++;
+						}
+					}
+				}
+				
+				if(res)
+				{
+					var maxCount = 0;
+					for(var i in arrFormat)
+					{
+						if(arrFormat[i] > maxCount)
+						{
+							maxCount = arrFormat[i];
+							res = i;
+						}
+					}
+				}
+				
+				return res;
 			},
 			
 			_cleanStyleTable : function(sRef)
