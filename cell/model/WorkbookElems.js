@@ -6273,7 +6273,7 @@ Top10.prototype.clone = function() {
 Top10.prototype.isHideValue = function(val, top10Length) {
 	var res = false;
 	
-	if(null !== this.filterVal)
+	if(null !== this.FilterVal)
 	{
 		if(this.Top)
 		{
@@ -6335,6 +6335,11 @@ Top10.prototype.init = function(range, reWrite){
 				if(this.Percent)
 				{
 					var num = parseInt(count * (this.Val / 100));
+					if(0 === num)
+					{
+						num = 1;
+					}
+					
 					res = arr[num - 1];
 				}
 				else
