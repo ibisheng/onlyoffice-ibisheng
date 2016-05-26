@@ -12229,7 +12229,7 @@
 			
 			if(null === sortProps)
 			{
-				var rgbColor = color ? new RgbColor((color.asc_getR() << 16) + (color.asc_getG() << 8) + color.asc_getB()) : null;
+				var rgbColor = color ? new AscCommonExcel.RgbColor((color.asc_getR() << 16) + (color.asc_getG() << 8) + color.asc_getB()) : null;
 				t.setSelectionInfo("sort", type, null, null, rgbColor);
 			}
 			else if(false !== sortProps)
