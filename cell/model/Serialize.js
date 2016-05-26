@@ -4259,8 +4259,10 @@
                 var DxfId = this.stream.GetULongLE();
                 oTableColumn.dxf = this.Dxfs[DxfId];
             }
-            else if ( c_oSer_TableColumns.CalculatedColumnFormula == type )
-                oTableColumn.CalculatedColumnFormula = this.stream.GetString2LE(length);
+            /*else if ( c_oSer_TableColumns.CalculatedColumnFormula == type )
+			{
+				oTableColumn.CalculatedColumnFormula = this.stream.GetString2LE(length);
+			}*/
             else
                 res = c_oSerConstants.ReadUnknown;
             return res;
