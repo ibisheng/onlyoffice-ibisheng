@@ -1412,13 +1412,14 @@ CGraphicObjects.prototype =
                     drawing = new ParaDrawing(0, 0, selectedObjects[i].copy(), this.document.DrawingDocument, this.document, null);
 
                     drawing.Set_DrawingType(selectedObjects[i].parent.DrawingType);
-                    drawing.GraphicObj.setParent(drawing);
-                    drawing.CheckWH();
-					drawing.Set_ParaMath(selectedObjects[i].parent.ParaMath);
                     if(selectedObjects[i].parent.Extent)
                     {
                         drawing.setExtent(selectedObjects[i].parent.Extent.W, selectedObjects[i].parent.Extent.H)
                     }
+                    drawing.GraphicObj.setParent(drawing);
+                    drawing.CheckWH();
+					drawing.Set_ParaMath(selectedObjects[i].parent.ParaMath);
+
                     if(selectedObjects[i].parent.DrawingType === drawing_Anchor)
                     {
                         drawing.Set_Distance(selectedObjects[i].parent.Distance.L, selectedObjects[i].parent.Distance.T, selectedObjects[i].parent.Distance.R, selectedObjects[i].parent.Distance.B);
