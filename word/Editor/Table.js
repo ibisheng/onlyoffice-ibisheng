@@ -13340,6 +13340,49 @@ CTable.prototype.private_UpdateCellsGrid = function()
         }
     }
 };
+CTable.prototype.IncDec_Indent = function(bIncrease)
+{
+    if (true === this.ApplyToAll || ( true === this.Selection.Use && table_Selection_Cell === this.Selection.Type && this.Selection.Data.length > 0 ))
+    {
+        var TablePr = this.Get_CompiledPr(false).TablePr;
+
+        var LeftIndOld = TablePr.TableInd;
+        if (undefined === LeftIndOld || null === LeftIndOld)
+        {
+            LeftIndOld = 0;
+        }
+        else if (LeftIndOld < 0)
+        {
+            this.Set_TableInd(0);
+            return;
+        }
+
+        var LeftIndNew = 0;
+        if (true === bIncrease)
+        {
+            if (LeftIndOld >= 0)
+            {
+                LeftIndOld = 12.5 * parseInt(10 * LeftIndOld / 125);
+                LeftIndNew = ( (LeftIndOld - (10 * LeftIndOld) % 125 / 10) / 12.5 + 1) * 12.5;
+            }
+
+            if (LeftIndNew < 0)
+                LeftIndNew = 12.5;
+        }
+        else
+        {
+            var TempValue = (125 - (10 * LeftIndOld) % 125);
+            TempValue     = ( 125 === TempValue ? 0 : TempValue );
+            LeftIndNew    = Math.max(( (LeftIndOld + TempValue / 10) / 12.5 - 1 ) * 12.5, 0);
+        }
+
+        this.Set_TableInd(LeftIndNew);
+    }
+    else
+    {
+        this.CurCell.Content.Paragraph_IncDecIndent(bIncrease);
+    }
+};
 //----------------------------------------------------------------------------------------------------------------------
 // Класс  CTableLook
 //----------------------------------------------------------------------------------------------------------------------

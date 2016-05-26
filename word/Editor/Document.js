@@ -8389,13 +8389,9 @@ CDocument.prototype.Paragraph_IncDecFontSize       = function(bIncrease)
 };
 CDocument.prototype.Paragraph_IncDecIndent         = function(bIncrease)
 {
-    // Работаем с колонтитулом
     if (docpostype_HdrFtr === this.CurPos.Type)
     {
-        var bRetValue = this.HdrFtr.Paragraph_IncDecIndent(bIncrease);
-        this.Document_UpdateSelectionState();
-        this.Document_UpdateInterfaceState();
-        return bRetValue;
+        this.HdrFtr.Paragraph_IncDecIndent(bIncrease);
     }
     else if (docpostype_DrawingObjects === this.CurPos.Type)
     {
@@ -8406,23 +8402,15 @@ CDocument.prototype.Paragraph_IncDecIndent         = function(bIncrease)
             {
                 var Paragraph = ParaDrawing.Parent;
                 Paragraph.IncDec_Indent(bIncrease);
-                this.Recalculate();
             }
         }
         else
         {
             this.DrawingObjects.paragraphIncDecIndent(bIncrease);
         }
-
-        this.Document_UpdateSelectionState();
-        this.Document_UpdateInterfaceState();
-        return;
     }
     else //if ( docpostype_Content === this.CurPos.Type )
     {
-        if (this.CurPos.ContentPos < 0)
-            return false;
-
         if (true === this.Selection.Use)
         {
             switch (this.Selection.Flag)
@@ -8440,53 +8428,19 @@ CDocument.prototype.Paragraph_IncDecIndent         = function(bIncrease)
 
                     for (var Index = StartPos; Index <= EndPos; Index++)
                     {
-                        // При изменении цвета фона параграфа, не надо ничего пересчитывать
-                        var Item = this.Content[Index];
-
-                        if (type_Paragraph == Item.GetType())
-                            Item.IncDec_Indent(bIncrease);
-                        else if (type_Table == Item.GetType())
-                        {
-                            Item.TurnOff_RecalcEvent();
-                            Item.Paragraph_IncDecIndent(bIncrease);
-                            Item.TurnOn_RecalcEvent();
-                        }
+                        this.Content[Index].IncDec_Indent(bIncrease);
                     }
-
-                    // Нам нужно пересчитать все изменения, начиная с первого элемента,
-                    // попавшего в селект.
-                    this.ContentLastChangePos = StartPos;
-
-                    this.Recalculate();
-
-                    this.Document_UpdateSelectionState();
-                    this.Document_UpdateInterfaceState();
-
-                    return;
                 }
                 case  selectionflag_Numbering:
                 {
                     break;
                 }
             }
-
-            return;
         }
-
-        var Item = this.Content[this.CurPos.ContentPos];
-        if (type_Paragraph == Item.GetType())
+        else
         {
-            Item.IncDec_Indent(bIncrease);
-            this.ContentLastChangePos = this.CurPos.ContentPos;
-            this.Recalculate();
+            this.Content[this.CurPos.ContentPos].IncDec_Indent(bIncrease);
         }
-        else if (type_Table == Item.GetType())
-        {
-            Item.Paragraph_IncDecIndent(bIncrease);
-        }
-
-        this.Document_UpdateSelectionState();
-        this.Document_UpdateInterfaceState();
     }
 };
 CDocument.prototype.Paragraph_SetHighlight         = function(IsColor, r, g, b)
@@ -10770,9 +10724,9 @@ CDocument.prototype.OnKeyDown               = function(e)
             if (true === SelectedInfo.Is_MixedSelection())
             {
                 if (true === e.ShiftKey)
-                    editor.DecreaseIndent();
+                    this.DecreaseIndent();
                 else
-                    editor.IncreaseIndent();
+                    this.IncreaseIndent();
             }
             else
             {
@@ -11434,9 +11388,9 @@ CDocument.prototype.OnKeyDown               = function(e)
     else if (e.KeyCode == 77 && false === editor.isViewMode && true === e.CtrlKey) // Ctrl + M + ...
     {
         if (true === e.ShiftKey) // Ctrl + Shift + M - уменьшаем левый отступ
-            editor.DecreaseIndent();
+            this.DecreaseIndent();
         else // Ctrl + M - увеличиваем левый отступ
-            editor.IncreaseIndent();
+            this.IncreaseIndent();
 
         bRetValue = keydownresult_PreventAll;
     }
@@ -16761,6 +16715,35 @@ CDocument.prototype.Get_FirstParagraph = function()
         return this.Content[0].Get_FirstParagraph();
 
     return null;
+};
+
+/**
+ * Обработчик нажатия кнопки IncreaseIndent в меню.
+ */
+CDocument.prototype.IncreaseIndent = function()
+{
+    if (false === this.Document_Is_SelectionLocked(AscCommon.changestype_Paragraph_Properties))
+    {
+        this.Create_NewHistoryPoint(AscDFH.historydescription_Document_IncParagraphIndent);
+        this.Paragraph_IncDecIndent(true);
+        this.Document_UpdateSelectionState();
+        this.Document_UpdateInterfaceState();
+        this.Recalculate();
+    }
+};
+/**
+ * Обработчик нажатия кнопки DecreaseIndent в меню.
+ */
+CDocument.prototype.DecreaseIndent = function()
+{
+    if (false === this.Document_Is_SelectionLocked(AscCommon.changestype_Paragraph_Properties))
+    {
+        this.Create_NewHistoryPoint(AscDFH.historydescription_Document_DecParagraphIndent);
+        this.Paragraph_IncDecIndent(false);
+        this.Document_UpdateSelectionState();
+        this.Document_UpdateInterfaceState();
+        this.Recalculate();
+    }
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Settings

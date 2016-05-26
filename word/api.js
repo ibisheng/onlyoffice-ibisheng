@@ -3425,19 +3425,11 @@ asc_docs_api.prototype.put_PrIndent = function(value,levelValue)
 };
 asc_docs_api.prototype.IncreaseIndent = function()
 {
-    if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Properties) )
-    {
-        this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_IncParagraphIndent);
-        this.WordControl.m_oLogicDocument.Paragraph_IncDecIndent( true );
-    }
+    this.WordControl.m_oLogicDocument.IncreaseIndent();
 };
 asc_docs_api.prototype.DecreaseIndent = function()
 {
-    if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Properties) )
-    {
-        this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_DecParagraphIndent);
-        this.WordControl.m_oLogicDocument.Paragraph_IncDecIndent( false );
-    }
+    this.WordControl.m_oLogicDocument.DecreaseIndent();
 };
 asc_docs_api.prototype.put_PrIndentRight = function(value)
 {
