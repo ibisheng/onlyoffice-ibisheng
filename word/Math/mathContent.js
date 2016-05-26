@@ -1275,6 +1275,14 @@ CMathContent.prototype.Correct_Content = function(bInnerCorrection)
         this.Add_ToContent(0, NewMathRun);
     }
 
+    // Если единственный элемент данного контента ран и он пустой, заполняем его плейсхолдером.
+    if (1 === this.Content.length && para_Math_Run === this.Content[0].Type && true === this.Content[0].Is_Empty())
+    {
+        var oPlaceHolder = new CMathText();
+        oPlaceHolder.fillPlaceholders();
+        this.Content[0].Add_ToContent(0, oPlaceHolder);
+    }
+
     // не корректируем, если в контенте только один плейсхолдер
 
     var bOnlyPlh = this.Content.length == 1 && this.Content[0].OnlyOnePlaceholder();
