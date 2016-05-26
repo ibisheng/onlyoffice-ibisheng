@@ -4567,10 +4567,6 @@ asc_docs_api.prototype.OpenDocumentEndCallback = function()
 
     if (0 == this.DocumentType)
         this.WordControl.m_oLogicDocument.LoadEmptyDocument();
-    else if (1 == this.DocumentType)
-    {
-        this.WordControl.m_oLogicDocument.LoadTestDocument();
-    }
     else
     {
         if(this.LoadedObject)
@@ -4582,38 +4578,16 @@ asc_docs_api.prototype.OpenDocumentEndCallback = function()
                     this.isApplyChangesOnOpenEnabled = false;
                     this.bNoSendComments = true;
                     var OtherChanges = AscCommon.CollaborativeEditing.m_aChanges.length > 0 ;
-                  AscCommon.CollaborativeEditing.Apply_Changes();
-                  AscCommon.CollaborativeEditing.Release_Locks();
+                    AscCommon.CollaborativeEditing.Apply_Changes();
+                    AscCommon.CollaborativeEditing.Release_Locks();
                     this.bNoSendComments = false;
-                        this.isApplyChangesOnOpen        = true;
-
-                    var _slides = this.WordControl.m_oLogicDocument.Slides;
-                    var _slidesCount = _slides.length;
-                    for (var i = 0; i < _slidesCount; i++)
-                    {
-                        var slideComments = _slides[i].slideComments;
-                        if(slideComments)
-                        {
-                            var _comments = slideComments.comments;
-                            var _commentsCount = _comments.length;
-                            for (var j = 0; j < _commentsCount; j++)
-                            {
-                                this.sync_AddComment(_comments[j].Get_Id(), _comments[j].Data );
-                            }
-                        }
-                    }
-                    this.bAddComments = true;
-                    if(OtherChanges)
-                    {
-                        return;
-                    }
-
+                    this.isApplyChangesOnOpen = true;
                   // Применяем все lock-и (ToDo возможно стоит пересмотреть вообще Lock-и)
-                        for (var i = 0; i < this.arrPreOpenLocksObjects.length; ++i)
-                        {
-                    this.arrPreOpenLocksObjects[i]();
-                  }
-                  this.arrPreOpenLocksObjects = [];
+                    for (var i = 0; i < this.arrPreOpenLocksObjects.length; ++i)
+                    {
+                        this.arrPreOpenLocksObjects[i]();
+                    }
+                    this.arrPreOpenLocksObjects = [];
                 }
             }
             this.WordControl.m_oLogicDocument.Recalculate({Drawings: {All:true, Map: {}}});
@@ -4669,9 +4643,8 @@ asc_docs_api.prototype.OpenDocumentEndCallback = function()
     this.WordControl.m_oLogicDocument.Document_UpdateRulersState();
     this.WordControl.m_oLogicDocument.Document_UpdateSelectionState();
     this.LoadedObject = null;
-
     this.bInit_word_control = true;
-    if(!(this.bAddComments === true) && !this.bNoSendComments)
+    if(!this.bNoSendComments)
     {
         var _slides = this.WordControl.m_oLogicDocument.Slides;
         var _slidesCount = _slides.length;
@@ -4691,21 +4664,21 @@ asc_docs_api.prototype.OpenDocumentEndCallback = function()
     }
     this.asc_fireCallback("asc_onDocumentContentReady");
     this.isApplyChangesOnOpen = false;
-    this.bAddComments = false;
+
     this.WordControl.InitControl();
     if (bIsScroll)
     {
         this.WordControl.OnScroll();
     }
 
-        if (!this.isViewMode)
+    if (!this.isViewMode)
+    {
+        this.sendStandartTextures();
+        if (this.shapeElementId)
         {
-    this.sendStandartTextures();
-            if (this.shapeElementId)
-            {
-      this.WordControl.m_oDrawingDocument.InitGuiCanvasShape(this.shapeElementId);
+            this.WordControl.m_oDrawingDocument.InitGuiCanvasShape(this.shapeElementId);
+        }
     }
-  }
 
     if (this.isViewMode)
         this.asc_setViewMode(true);
