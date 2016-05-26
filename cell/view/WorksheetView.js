@@ -13441,9 +13441,23 @@
 					t.model.autoFilters.isEmptyAutoFilters( arn, type );
 				}
 				
-				var deleteCells = type === c_oAscInsertOptions.InsertCellsAndShiftRight ? range.deleteCellsShiftLeft() : range.deleteCellsShiftUp();
-				if ( deleteCells ) {
-					t.cellCommentator.updateCommentsDependencies( true, type, arn );
+				var preDeleteAction = function()
+				{
+					t.cellCommentator.updateCommentsDependencies( false, type, arn );
+				};
+				
+				var res;
+				if(type === c_oAscInsertOptions.InsertCellsAndShiftRight)
+				{
+					res = range.deleteCellsShiftLeft(preDeleteAction);
+				}
+				else
+				{
+					res = range.deleteCellsShiftUp(preDeleteAction);
+				}
+				
+				if(res)
+				{
 					t.objectRender.updateDrawingObject( true, type, arn );
 					t._onUpdateFormatTable(range, false, true);
 				}
@@ -13470,6 +13484,7 @@
 				t.model.autoFilters.isEmptyAutoFilters(ref);
 				var cleanRange = t.model.getRange3( ref.r1, ref.c1, ref.r2, ref.c2 );
 				cleanRange.cleanAll();
+				t.cellCommentator.deleteCommentsRange( cleanRange.bbox );
 				
 				t._onUpdateFormatTable(ref, false, true);
 				
