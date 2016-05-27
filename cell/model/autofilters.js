@@ -4234,7 +4234,7 @@
 				var arrFormat = [];
 				var res = null;
 				
-				var tableRange = table.getRangeTableColumnByName(columnName, true);
+				var tableRange = table.getTableRangeForFormula({param: AscCommon.FormulaTablePartInfo.columns, startCol: columnName, endCol: columnName});
 				if(null !== tableRange)
 				{
 					for(var i = tableRange.r1; i <= tableRange.r2; i++)
