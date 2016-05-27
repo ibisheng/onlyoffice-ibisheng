@@ -2384,9 +2384,6 @@ CTable.prototype.private_RecalculatePage = function(CurPage)
         // В данном значении не учитываются маргины
         RowHValue = RowH.Value + this.MaxBotMargin[CurRow] + MaxTopMargin;
 
-        if (null === CellSpacing)
-            RowHValue -= this.MaxTopBorder[CurRow];
-
         if ((Asc.linerule_AtLeast === RowH.HRule || Asc.linerule_Exact == RowH.HRule) && Y + RowHValue > Y_content_end && ((0 === CurRow && 0 === CurPage && (null !== this.Get_DocumentPrev() || true === this.Parent.Is_TableCellContent())) || CurRow != FirstRow))
         {
             bNextPage = true;
