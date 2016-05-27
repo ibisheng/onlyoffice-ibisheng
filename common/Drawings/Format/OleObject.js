@@ -38,6 +38,40 @@ function (window, undefined) {
         this.m_nPixWidth = nPixWidth;
         this.m_nPixHeight = nPixHeight;
     };
+
+    COleObject.prototype.copy = function()
+    {
+        var copy = new COleObject();
+        if(this.nvPicPr)
+        {
+            copy.setNvPicPr(this.nvPicPr.createDuplicate());
+        }
+        if(this.spPr)
+        {
+            copy.setSpPr(this.spPr.createDuplicate());
+            copy.spPr.setParent(copy);
+        }
+        if(this.blipFill)
+        {
+            copy.setBlipFill(this.blipFill.createDuplicate());
+        }
+        if(this.style)
+        {
+            copy.setStyle(this.style.createDuplicate());
+        }
+        copy.setBDeleted(this.bDeleted);
+        if(this.fromSerialize)
+        {
+            copy.setBFromSerialize(true);
+        }
+        copy.setData(this.m_sData);
+        copy.setApplicationId(this.m_sApplicationId);
+        copy.setPixSizes(this.m_nPixWidth, this.m_nPixHeight);
+        copy.cachedImage = this.getBase64Img();
+        copy.cachedPixH = this.cachedPixH;
+        copy.cachedPixW = this.cachedPixW;
+        return copy;
+    };
         window['AscFormat'] = window['AscFormat'] || {};
         window['AscFormat'].COleObject = COleObject;
 })(window);

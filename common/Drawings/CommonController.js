@@ -879,7 +879,7 @@ DrawingObjectsController.prototype =
 
                     if (object.getObjectType() === AscDFH.historyitem_type_ChartSpace && this.handleChartDoubleClick)
                         this.handleChartDoubleClick(drawing, object, e, x, y, pageIndex);
-                    if (object.getObjectType() === AscDFH.historyitem_type_OleObject && this.handleChartDoubleClick){
+                    if (object.getObjectType() === AscDFH.historyitem_type_OleObject && this.handleOleObjectDoubleClick){
                         this.handleOleObjectDoubleClick(drawing, object, e, x, y, pageIndex);
                     }
                     else if (2 == e.ClickCount && drawing instanceof ParaDrawing && drawing.Is_MathEquation())
