@@ -4515,7 +4515,7 @@ CCatAx.prototype =
                 bChanged = true;
             }
         }
-        if(AscFormat.isRealNumber(labelsAxisDistance) && this.lblOffset !== labelsAxisDistance)
+        if(AscFormat.isRealNumber(labelsAxisDistance) && this.lblOffset !== labelsAxisDistance && this.setLblOffset)
         {
             this.setLblOffset(labelsAxisDistance);
             bChanged = true;
