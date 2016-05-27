@@ -5132,9 +5132,18 @@ AutoFilter.prototype.showButton = function(val) {
 		var columnsLength = this.Ref.c2 - this.Ref.c1 + 1;
 		for(var i = 0; i < columnsLength; i++)
 		{
-			this.FilterColumns[i] = new FilterColumn();
-			this.FilterColumns[i].ColId = i;
-			this.FilterColumns[i].ShowButton = false;
+			var filterColumn = this._getFilterColumnByColId(i);
+			if(filterColumn)
+			{
+				filterColumn.ShowButton = false;
+			}
+			else
+			{
+				filterColumn = new FilterColumn();
+				filterColumn.ColId = i;
+				filterColumn.ShowButton = false;
+				this.FilterColumns.push(filterColumn);
+			}
 		}
 	}
 	else
@@ -5173,6 +5182,24 @@ AutoFilter.prototype.getRangeWithoutHeaderFooter = function()
 	return Asc.Range(this.Ref.c1, this.Ref.r1 + 1, this.Ref.c2, this.Ref.r2);
 }; 
 
+AutoFilter.prototype._getFilterColumnByColId = function(colId)
+{
+	var res = false;
+	
+	if(this.FilterColumns && this.FilterColumns.length)
+	{
+		for(var i = 0; i < this.FilterColumns.length; i++)
+		{
+			if(this.FilterColumns[i].ColId === colId)
+			{
+				res = this.FilterColumns[i];
+				break;
+			}
+		}
+	}
+	
+	return res;
+}; 
 
 function FilterColumns() {
 	this.ColId = null;
