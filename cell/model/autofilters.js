@@ -1459,6 +1459,11 @@
 						{
 							oldFilter = filter.clone(null);
 							
+							if(bTablePart && activeRange.r1 <= ref.r2 && activeRange.r2 >= ref.r2)
+							{
+								filter.TotalsRowCount = null;
+							}
+							
 							filter.changeRef(null, diff);
 						}
 						else if(activeRange.r1 > ref.r1 && activeRange.r2 > ref.r2 && activeRange.r1 < ref.r2)
