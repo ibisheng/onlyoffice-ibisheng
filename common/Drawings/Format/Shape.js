@@ -752,7 +752,12 @@ CShape.prototype.createTextBody = function () {
     var tx_body = new AscFormat.CTextBody();
     tx_body.setParent(this);
     tx_body.setContent(new CDocumentContent(tx_body, this.getDrawingDocument(), 0, 0, 0, 20000, false, false, true));
-    tx_body.setBodyPr(new AscFormat.CBodyPr());
+    var oBodyPr = new AscFormat.CBodyPr();
+    if(this.worksheet){
+        oBodyPr.vertOverflow = AscFormat.nOTClip;
+        oBodyPr.horzOverflow = AscFormat.nOTClip;
+    }
+    tx_body.setBodyPr(oBodyPr);
     tx_body.content.Content[0].Set_DocumentIndex(0);
     this.setTxBody(tx_body);
 };
@@ -1779,7 +1784,7 @@ CShape.prototype.checkTransformTextMatrix = function (oMatrix, oContent, oBodyPr
                 _vertical_shift = 0;
             }
             else {
-                if (!(this.bWordShape || this.worksheet ) || _content_height < _text_rect_height) {
+                if ((!this.bWordShape && oBodyPr.vertOverflow === AscFormat.nOTOwerflow) || _content_height < _text_rect_height) {
                     switch (oBodyPr.anchor) {
                         case 0: //b
                         { // (Text Anchor Enum ( Bottom ))
@@ -1835,7 +1840,7 @@ CShape.prototype.checkTransformTextMatrix = function (oMatrix, oContent, oBodyPr
                 _vertical_shift = 0;
             }
             else {
-                if (!(this.bWordShape || this.worksheet) || _content_height < _text_rect_width) {
+                if ((!this.bWordShape && oBodyPr.vertOverflow === AscFormat.nOTOwerflow) || _content_height < _text_rect_width) {
                     switch (oBodyPr.anchor) {
                         case 0: //b
                         { // (Text Anchor Enum ( Bottom ))
@@ -3855,6 +3860,18 @@ CShape.prototype.clipTextRect = function(graphics)
     {
         var clip_rect = this.clipRect;
         var oBodyPr = this.getBodyPr();
+        if(!this.bWordShape)
+        {
+            if(oBodyPr.vertOverflow === AscFormat.nOTOwerflow && oBodyPr.horzOverflow === AscFormat.nOTOwerflow)
+            {
+                return;
+            }
+            clip_rect = {x: this.clipRect.x, y: this.clipRect.y, w: this.clipRect.w, h: this.clipRect.h};
+            if(oBodyPr.vertOverflow === AscFormat.nOTOwerflow && AscFormat.isRealNumber(this.contentHeight))
+            {
+                clip_rect.h = this.contentHeight;
+            }
+        }
         if(!oBodyPr || !oBodyPr.upright)
         {
             graphics.transform3(this.transform);
@@ -4036,9 +4053,10 @@ CShape.prototype.draw = function (graphics, transform, transformText, pageIndex)
                 transform_text = _transform_text;
             }
 
-            if(this.worksheet && (this instanceof CShape) && !(oController && (AscFormat.getTargetTextObject(oController) === this)))
+            if(this instanceof CShape)
             {
-                this.clipTextRect(graphics);
+                if(!(oController && (AscFormat.getTargetTextObject(oController) === this)))
+                    this.clipTextRect(graphics);
             }
             graphics.transform3(this.transformText, true);
             if (graphics.CheckUseFonts2 !== undefined)

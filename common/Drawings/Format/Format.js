@@ -12130,6 +12130,8 @@ function CorrectUniColor(asc_color, unicolor, flag)
     window['AscFormat']._global_layout_summs_array = _global_layout_summs_array;
 
     window['AscFormat'].nOTOwerflow = nOTOwerflow;
+    window['AscFormat'].nOTClip = nOTClip;
+    window['AscFormat'].nOTEllipsis = nOTEllipsis;
 
     window['AscFormat'].BULLET_TYPE_BULLET_NONE = BULLET_TYPE_BULLET_NONE;
     window['AscFormat'].BULLET_TYPE_BULLET_CHAR = BULLET_TYPE_BULLET_CHAR;

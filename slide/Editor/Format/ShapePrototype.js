@@ -467,7 +467,6 @@ CShape.prototype.recalculate = function ()
         if (this.recalcInfo.recalculateTransformText && check_slide_placeholder) {
             this.recalculateTransformText();
             this.recalcInfo.recalculateTransformText = false;
-            this.clipRect = null;
         }
         if(this.recalcInfo.recalculateBounds)
         {

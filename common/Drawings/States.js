@@ -161,10 +161,27 @@ StartAddNewShape.prototype =
 
 function checkEmptyPlaceholderContent(content)
 {
-    if(!content || content.Parent && content.Parent.parent &&
-        (content.Is_Empty() && content.Parent.parent.isPlaceholder && content.Parent.parent.isPlaceholder() ||
-            content.Parent.parent.txWarpStruct || content.Parent.parent.recalcInfo && content.Parent.parent.recalcInfo.warpGeometry || content.Parent.parent.worksheet)  )
+    if(!content){
         return content;
+    }
+    if(content.Parent && content.Parent.parent){
+        if(content.Is_Empty() && content.Parent.parent.isPlaceholder && content.Parent.parent.isPlaceholder()){
+            return content;
+        }
+        if(content.Parent.parent.txWarpStruct){
+            return content;
+        }
+        if(content.Parent.parent.recalcInfo && content.Parent.parent.recalcInfo.warpGeometry){
+            return content;
+        }
+        var oBodyPr;
+        if(content.Parent.parent.getBodyPr){
+            oBodyPr = content.Parent.parent.getBodyPr;
+            if(oBodyPr.vertOverflow !== AscFormat.nOTOwerflow){
+                return content;
+            }
+        }
+    }
     return null;
 }
 
