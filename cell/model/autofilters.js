@@ -555,6 +555,12 @@
 					
 					var startRow = autoFilter && autoFilter.Ref ? autoFilter.Ref.r1 + 1 : currentFilter.Ref.r1 + 1;
 					var endRow = autoFilter && autoFilter.Ref ? autoFilter.Ref.r2 : currentFilter.Ref.r2;
+					
+					if(currentFilter && !currentFilter.isAutoFilter() && currentFilter.TotalsRowCount)
+					{
+						endRow--;
+					}
+					
 					for(var i = startRow; i <= endRow; i++)
 					{	
 						var isHidden = false;
@@ -3582,13 +3588,17 @@
 			
 			_getOpenAndClosedValues: function(filter, colId, isOpenHiddenRows)
 			{
+				//filter - TablePart or AutoFilter
+				//autoFilter - only autoFilter
+				var isTablePart = !filter.isAutoFilter();
+				var autoFilter = isTablePart ? filter.AutoFilter : filter;
 				var ref = filter.Ref;
-				var filterColumns = filter.FilterColumns;
+				var filterColumns = autoFilter.FilterColumns;
 				var worksheet = this.worksheet, temp = {}, isDateTimeFormat, /*dataValue,*/ values = [];
 				
-				colId = this._getTrueColId(filter, colId);
+				colId = this._getTrueColId(autoFilter, colId);
 
-				var currentFilterColumn = this._getFilterColumn(filter, colId);
+				var currentFilterColumn = this._getFilterColumn(autoFilter, colId);
 				
 				var addValueToMenuObj = function(tempResult, count)
 				{
@@ -3618,7 +3628,8 @@
 				
 				var maxFilterRow = ref.r2;
 				var automaticRowCount = null;
-				if(filter.isAutoFilter() && filter.isApplyAutoFilter() === false)//нужно подхватить нижние ячейки в случае, если это не применен а/ф
+				
+				if(!isTablePart && filter.isApplyAutoFilter() === false)//нужно подхватить нижние ячейки в случае, если это не применен а/ф
 				{
 					var automaticRange = this._getAdjacentCellsAF(filter.Ref, true);
 					automaticRowCount = automaticRange.r2;
@@ -3627,6 +3638,10 @@
 						maxFilterRow = automaticRowCount;
 				}
 				
+				if(isTablePart && filter.TotalsRowCount)
+				{
+					maxFilterRow--;
+				}
 				
 				var individualCount = 0, count = 0, tempResult;
 				for(var i = ref.r1 + 1; i <= maxFilterRow; i++)
