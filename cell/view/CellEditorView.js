@@ -729,7 +729,7 @@
 		if ( !isDefName ) {
 			this._moveCursor( kPosition, this.cursorPos - 1 );
 		}
-		this.cellEditor.skipTLUpdate = tmp;
+		this.skipTLUpdate = tmp;
 	};
 
 	CellEditor.prototype.replaceText = function ( pos, len, newText ) {
