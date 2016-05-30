@@ -822,8 +822,8 @@
         {
             oUniFill.fill.colors.push(aGradientStop[i].Gs);
         }
-        oUniFill.lin = new AscFormat.GradLin();
-        oUniFill.lin.angle = Angle*60000;
+        oUniFill.fill.lin = new AscFormat.GradLin();
+        oUniFill.fill.lin.angle = Angle;
         return new ApiFill(oUniFill);
     };
 
