@@ -1005,20 +1005,8 @@ CTable.prototype.private_RecalculateBorders = function()
 
             Row.Set_CellInfo( CurCell, CurGridCol, 0, 0, 0, 0, 0, 0 );
 
-            // Обсчет такик ячеек произошел ранее
-            if ( vmerge_Continue === Vmerge )
-            {
-                var VMergeCount2 = this.Internal_GetVertMergeCount2( CurRow, CurGridCol, GridSpan );
-                if ( VMergeCount2 > 1 )
-                {
-                    CurGridCol += GridSpan;
-                    continue;
-                }
-                else
-                {
-                    Cell.Set_VMerge( vmerge_Restart );
-                }
-            }
+            // Bug 32418 ячейки, участвующие в вертикальном объединении, все равно участвуют в определении границы
+            // строки, поэтому здесь мы их не пропускаем.
 
             var VMergeCount = this.Internal_GetVertMergeCount( CurRow, CurGridCol, GridSpan );
 
