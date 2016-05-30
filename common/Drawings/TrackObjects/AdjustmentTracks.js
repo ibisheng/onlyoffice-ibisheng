@@ -367,8 +367,8 @@ function PolarAdjustmentTrack(originalShape, adjIndex, bTextWarp)
 
 
 
-        var _pos_x_relative_center = _relative_x - this.shapeHeight*0.5;
-        var _pos_y_relative_center = _relative_y - this.shapeWidth*0.5;
+        var _pos_x_relative_center = _relative_x - this.shapeWidth*0.5;
+        var _pos_y_relative_center = _relative_y - this.shapeHeight*0.5;
         if(this.radiusFlag)
         {
             var _radius = Math.sqrt(_pos_x_relative_center*_pos_x_relative_center + _pos_y_relative_center*_pos_y_relative_center);
