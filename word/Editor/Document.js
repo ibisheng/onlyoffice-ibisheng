@@ -15511,14 +15511,32 @@ CDocument.prototype.private_MoveCursorDown = function(StartX, StartY, AddToSelec
 
                     if (this.CurPage < NewPage)
                     {
-                        this.CurPage = NewPage;
                         StartY += 0.1;
+                        if (StartY > this.Pages[NewPage].Height)
+                        {
+                            NewPage++;
+                            if (this.Pages.length - 1 < NewPage)
+                            {
+                                Result = false;
+                                break;
+                            }
+
+                            StartY = 0;
+                        }
+                        else
+                        {
+                            StartY += 0.1;
+                        }
+                        this.CurPage = NewPage;
                     }
                     else
                     {
                         break;
                     }
                 }
+
+                if (false === Result)
+                    break;
 
                 CurY = StartY;
             }

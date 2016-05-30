@@ -1755,7 +1755,15 @@ CMathContent.prototype.SplitContent = function(NewContent, ContentPos, Depth)
 };
 CMathContent.prototype.Add_ToContent = function(Pos, Item)
 {
-    this.Internal_Content_Add(Pos, Item);
+    if (Item && para_Run === Item.Type)
+    {
+        var MathRun = new ParaRun(Item.Get_Paragraph(), true);
+        this.Internal_Content_Add(Pos, MathRun);
+    }
+    else
+    {
+        this.Internal_Content_Add(Pos, Item);
+    }
 };
 CMathContent.prototype.Concat_ToEnd = function(NewItems)
 {
