@@ -1710,8 +1710,12 @@ Paragraph.prototype.private_RecalculateLineAlign       = function(CurLine, CurPa
                                 if (RangeWidth - Range.W <= 0.05 * RangeWidth && PRSC.Letters > 1)
                                     JustifyWord = (RangeWidth - Range.W) / (PRSC.Letters - 1);
                             }
-                            else if (0 == CurRange || (Line.Info & paralineinfo_End && CurRange == RangesCount - 1))
+                            else if (0 == CurRange || Line.Info & paralineinfo_End)
                             {
+                                // TODO: Здесь нужно улучшить проверку, т.к. отключено выравнивание по центру для всей
+                                //       последней строки, а нужно отключить для последнего отрезка, в котором идет
+                                //       конец параграфа.
+                                
                                 // Ничего не делаем (выравниваем текст по левой границе)
                             }
                             else if (CurRange == RangesCount - 1)
