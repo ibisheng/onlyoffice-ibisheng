@@ -6271,7 +6271,8 @@ Top10.prototype.clone = function() {
 	res.Val = this.Val;
 	return res;
 };
-Top10.prototype.isHideValue = function(val, top10Length) {
+Top10.prototype.isHideValue = function(val) {
+	// ToDo работает не совсем правильно.
 	var res = false;
 	
 	if(null !== this.FilterVal)
@@ -6306,7 +6307,7 @@ Top10.prototype.init = function(range, reWrite){
 			var arr = [];
 			var alreadyAddValues = {};
 			var count = 0;
-			range._foreach2(function(cell){
+			range._setPropertyNoEmpty(null, null, function(cell){
 				var val = parseFloat(cell.getValueWithoutFormat());
 				
 				if(!isNaN(val) && !alreadyAddValues[val])
