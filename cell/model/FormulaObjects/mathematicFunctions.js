@@ -2622,14 +2622,14 @@ function cPRODUCT() {
 
 }
 
-cPRODUCT.prototype = Object.create( cBaseFunction.prototype )
+cPRODUCT.prototype = Object.create( cBaseFunction.prototype );
 cPRODUCT.prototype.Calculate = function ( arg ) {
     var arg0 = new cNumber( 1 );
     for ( var i = 0; i < arg.length; i++ ) {
         if ( arg[i] instanceof cArea || arg[i] instanceof cArea3D ) {
             var _arrVal = arg[i].getValue();
             for ( var j = 0; j < _arrVal.length; j++ ) {
-                arg0 = _func[arg0.type][_arrVal[j].type]( arg0, _arrVal[j], "*" )
+                arg0 = _func[arg0.type][_arrVal[j].type]( arg0, _arrVal[j], "*" );
                 if ( arg0 instanceof cError )
                     return this.value = arg0;
             }
@@ -2655,13 +2655,13 @@ cPRODUCT.prototype.Calculate = function ( arg ) {
 
     }
     return this.value = arg0;
-}
+};
 cPRODUCT.prototype.getInfo = function () {
     return {
         name:this.name,
         args:"( argument-list )"
     };
-}
+};
 
 function cQUOTIENT() {
 //    cBaseFunction.call( this, "QUOTIENT" );
@@ -3808,7 +3808,7 @@ function cSUBTOTAL() {
     this.setArgumentsMax( 255 );
 }
 
-cSUBTOTAL.prototype = Object.create( cBaseFunction.prototype )
+cSUBTOTAL.prototype = Object.create( cBaseFunction.prototype );
 cSUBTOTAL.prototype.Calculate = function ( arg ) {
 	var f, arg0 = arg[0];
 
@@ -3900,7 +3900,7 @@ function cSUM() {
 
 }
 
-cSUM.prototype = Object.create( cBaseFunction.prototype )
+cSUM.prototype = Object.create( cBaseFunction.prototype );
 cSUM.prototype.Calculate = function ( arg ) {
     var arg0 = new cNumber( 0 );
     for ( var i = 0; i < arg.length; i++ ) {
@@ -3908,7 +3908,7 @@ cSUM.prototype.Calculate = function ( arg ) {
             var _arrVal = arg[i].getValue();
             for ( var j = 0; j < _arrVal.length; j++ ) {
                 if ( !(_arrVal[j] instanceof cBool || _arrVal[j] instanceof cString) )
-                    arg0 = _func[arg0.type][_arrVal[j].type]( arg0, _arrVal[j], "+" )
+                    arg0 = _func[arg0.type][_arrVal[j].type]( arg0, _arrVal[j], "+" );
                 if ( arg0 instanceof cError )
                     return this.value = arg0;
             }
@@ -3936,13 +3936,13 @@ cSUM.prototype.Calculate = function ( arg ) {
     }
 
     return this.value = arg0;
-}
+};
 cSUM.prototype.getInfo = function () {
     return {
         name:this.name,
         args:"( argument-list )"
     };
-}
+};
 
 function cSUMIF() {
 //    cBaseFunction.call( this, "SUMIF" );
