@@ -2075,7 +2075,8 @@ Workbook.prototype.createWorksheet=function(indexBefore, sName, sId){
 Workbook.prototype.copyWorksheet=function(index, insertBefore, sName, sId, bFromRedo, tableNames){
 	//insertBefore - optional
 	if(index >= 0 && index < this.aWorksheets.length){
-
+		//buildRecalc вызываем чтобы пересчиталося cwf(может быть пустым если сделать сдвиг формул и скопировать лист)
+		this.buildRecalc(true, true);
 		History.TurnOff();
 		var wsActive = this.getActiveWs();
 		var wsFrom = this.aWorksheets[index];
@@ -2649,6 +2650,11 @@ Workbook.prototype.editDefinesNames = function ( oldName, newName, bUndo ) {
         for ( var id in nSE ) {
             se = nSE[id];
             se.deleteMasterEdge( retRes );
+			//todo Master/Slave взаимно обратные свойства, добавлять и удалять надо вместе
+			//из Vertex удаляем, в DefName остается, на добавлении новой зависимости в DefName ничего не делаем т.к. уже есть такая зависимость
+			//получалось что DefName и Vertex имеют похожи зависимости, но разные обьекты(из-за этого страдали дальнейшие операции)
+			//не уверен в этой правке
+			retRes.deleteSlaveEdge(se);
             if (!se.isDefinedName) {
                 this.needRecalc.nodes[se.nodeId] = [se.sheetId, se.cellId ];
                 this.needRecalc.length++;
