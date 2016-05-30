@@ -615,8 +615,8 @@ var c_oAscFill = {
 	FILL_TYPE_BLIP   : 1,
 	FILL_TYPE_NOFILL : 2,
 	FILL_TYPE_SOLID	 : 3,
-  FILL_TYPE_GRAD   : 4,
-	FILL_TYPE_PATT   : 5,
+    FILL_TYPE_PATT   : 4,
+    FILL_TYPE_GRAD   : 5,
 	FILL_TYPE_GRP   : 6
 };
 
