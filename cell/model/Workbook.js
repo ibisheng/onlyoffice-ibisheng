@@ -2075,7 +2075,8 @@ Workbook.prototype.createWorksheet=function(indexBefore, sName, sId){
 Workbook.prototype.copyWorksheet=function(index, insertBefore, sName, sId, bFromRedo, tableNames){
 	//insertBefore - optional
 	if(index >= 0 && index < this.aWorksheets.length){
-
+		//buildRecalc вызываем чтобы пересчиталося cwf(может быть пустым если сделать сдвиг формул и скопировать лист)
+		this.buildRecalc(true, true);
 		History.TurnOff();
 		var wsActive = this.getActiveWs();
 		var wsFrom = this.aWorksheets[index];
