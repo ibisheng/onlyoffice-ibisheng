@@ -320,21 +320,31 @@ CTable.prototype =
                         CellShd = null;
                 }
 
-                if (0 === Index)
-                {
-                    if (tblwidth_Auto === Cell_w.Type)
-                        CellWidth = null;
-                    else if (tblwidth_Mm === Cell_w.Type)
-                        CellWidth = Cell_w.W;
-                    else// if (tblwidth_Pct === Cell_w.Type)
-                        CellWidth = -Cell_w.W;
-                }
-                else
-                {
-                    if ((tblwidth_Auto === Cell_w.Type && null !== CellWidth)
-                        || (undefined === CellWidth || null === CellWidth || Math.abs(CellWidth - Cell_w.W) > 0.001))
-                        CellWidth = undefined;
-                }
+				if (0 === Index)
+				{
+					if (tblwidth_Auto === Cell_w.Type)
+						CellWidth = null;
+					else if (tblwidth_Mm === Cell_w.Type)
+						CellWidth = Cell_w.W;
+					else// if (tblwidth_Pct === Cell_w.Type)
+						CellWidth = -Cell_w.W;
+				}
+				else
+				{
+					var _CellWidth;
+					if (tblwidth_Auto === Cell_w.Type)
+						_CellWidth = null;
+					else if (tblwidth_Mm === Cell_w.Type)
+						_CellWidth = Cell_w.W;
+					else// if (tblwidth_Pct === Cell_w.Type)
+						_CellWidth = -Cell_w.W;
+
+					if ((tblwidth_Auto === Cell_w.Type && null !== CellWidth)
+						|| (undefined === CellWidth
+						|| null === CellWidth
+						|| Math.abs(CellWidth - _CellWidth) > 0.001))
+						CellWidth = undefined;
+				}
 
                 // Крайняя левая ли данная ячейка в выделении?
                 if ( 0 === Index || this.Selection.Data[Index - 1].Row != Pos.Row )
