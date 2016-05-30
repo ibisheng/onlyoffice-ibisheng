@@ -769,7 +769,7 @@ function asc_menu_WritePaddings(_type, _paddings, _stream){
     _stream["WriteByte"](255);
 }
 function asc_menu_ReadPosition(_params, _cursor){
-    var _position = new CPosition();
+    var _position = new Asc.CPosition();
     var _continue = true;
     while (_continue)
     {
@@ -816,7 +816,7 @@ function asc_menu_WritePosition(_type, _position, _stream){
     _stream["WriteByte"](255);
 }
 function asc_menu_ReadImagePosition(_params, _cursor){
-    var _position = new CPosition();
+    var _position = new Asc.CPosition();
     var _continue = true;
     while (_continue)
     {
