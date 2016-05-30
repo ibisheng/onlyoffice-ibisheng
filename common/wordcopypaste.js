@@ -1716,21 +1716,23 @@ CopyProcessor.prototype =
 				var oDrawingCopyObject = selectedContent.Drawings[i];
 				
 				var sp = oDrawingCopyObject.Drawing;
-				if(!sp.spPr)
-				{
-					sp.setSpPr(new AscFormat.CSpPr());
-				}
-				if(!sp.spPr.xfrm)
-				{
-					sp.spPr.setXfrm(new AscFormat.CXfrm());
-				}
-				if(!sp.spPr.xfrm.isNotNull())
-				{
-					sp.spPr.xfrm.setOffX(oDrawingCopyObject.X);
-					sp.spPr.xfrm.setOffY(oDrawingCopyObject.Y);
-					sp.spPr.xfrm.setExtX(oDrawingCopyObject.ExtX);
-					sp.spPr.xfrm.setExtY(oDrawingCopyObject.ExtY);
-				}
+                AscFormat.ExecuteNoHistory(function(){
+                    if(!sp.spPr)
+                    {
+                        sp.setSpPr(new AscFormat.CSpPr());
+                    }
+                    if(!sp.spPr.xfrm)
+                    {
+                        sp.spPr.setXfrm(new AscFormat.CXfrm());
+                    }
+                    if(!sp.spPr.xfrm.isNotNull())
+                    {
+                        sp.spPr.xfrm.setOffX(oDrawingCopyObject.X);
+                        sp.spPr.xfrm.setOffY(oDrawingCopyObject.Y);
+                        sp.spPr.xfrm.setExtX(oDrawingCopyObject.ExtX);
+                        sp.spPr.xfrm.setExtY(oDrawingCopyObject.ExtY);
+                    }
+                }, this, []);
 			}
 			
 			this.CopyDocument2(this.oRoot, oDocument, selectedContent);
