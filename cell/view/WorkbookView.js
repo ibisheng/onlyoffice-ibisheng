@@ -690,9 +690,9 @@
         }
       }
     });
-    var commentList = this.cellCommentator.prepareComments(this.model.aComments);
-    if (0 < commentList.length) {
-      this.handlers.trigger("asc_onAddComments", commentList);
+    this.cellCommentator.prepareComments(this.model.aComments);
+    if (0 < this.model.aComments.length) {
+      this.handlers.trigger("asc_onAddComments", this.model.aComments);
     }
 
     this.clipboard.Api = this.Api;
