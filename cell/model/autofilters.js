@@ -4855,8 +4855,10 @@
 			
 			_generateColumnName2: function(tableColumns)
 			{
+				// ToDo почему 2 функции generateColumnName?
 				var columnName = "Column";
-				var indexColumn = name[1];
+				//var indexColumn = name[1]; name - не определено!
+				var indexColumn = undefined;
 				var nextIndex;
 				
 				//ищем среди tableColumns, возможно такое имя уже имеется
