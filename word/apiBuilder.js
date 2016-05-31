@@ -269,7 +269,7 @@
     function ApiSchemeColor(sColorId)
     {
         var oUniColor = new AscFormat.CUniColor();
-        oUniColor.setColor(new CSchemeColor());
+        oUniColor.setColor(new AscFormat.CSchemeColor());
         switch(sColorId)
         {
             case "accent1": {  oUniColor.color.id  = 0; break;}
@@ -782,7 +782,7 @@
      */
     Api.prototype.CreateSchemeColor = function(sSchemeColorId)
     {
-        return new ApiSchemeColor(SchemeColorId);
+        return new ApiSchemeColor(sSchemeColorId);
     };
 
     /**
