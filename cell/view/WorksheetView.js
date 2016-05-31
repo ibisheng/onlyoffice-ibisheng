@@ -1160,7 +1160,6 @@
     };
 
     WorksheetView.prototype._prepareComments = function () {
-        // Теперь получение всех комментариев через asc_getWorkbookComments
         var commentList = this.cellCommentator.prepareComments( this.model.aComments );
         if ( 0 < commentList.length ) {
             this.model.workbook.handlers.trigger( "asc_onAddComments", commentList );

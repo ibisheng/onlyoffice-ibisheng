@@ -145,7 +145,6 @@ function asc_CCommentData(obj) {
 		nId: 3,
 		nLevel: 5,
 		sText: 6,
-		sQuoteText: 7,
 		sTime: 8,
 		sUserId: 9,
 		sUserName: 10,
@@ -165,7 +164,6 @@ function asc_CCommentData(obj) {
 
 	// Common
 	this.sText = "";
-	this.sQuoteText = "";
 	this.sTime = "";
 	this.sUserId = "";
 	this.sUserName = "";
@@ -184,7 +182,6 @@ function asc_CCommentData(obj) {
 
 		// Common
 		this.sText = obj.sText;
-		this.sQuoteText = obj.sQuoteText;
 		this.sTime = obj.sTime;
 		this.sUserId = obj.sUserId;
 		this.sUserName = obj.sUserName;
@@ -212,8 +209,10 @@ asc_CCommentData.prototype = {
 			this.nId = "sheet" + this.wsId + "_" + this.guid();
 	},
 
-	asc_putQuoteText: function(val) { this.sQuoteText = val; },
-	asc_getQuoteText: function() { return this.sQuoteText; },
+	asc_putQuoteText: function(val) {},
+	asc_getQuoteText: function() {
+		return AscCommon.g_oCellAddressUtils.getCellId(this.nRow, this.nCol);
+	},
 
 	asc_putRow: function(val) { this.nRow = val; },
 	asc_getRow: function() { return this.nRow; },
@@ -289,7 +288,6 @@ asc_CCommentData.prototype = {
 			case this.Properties.nId: return this.nId; break;
 			case this.Properties.nLevel: return this.nLevel; break;
 			case this.Properties.sText: return this.sText; break;
-			case this.Properties.sQuoteText: return this.sQuoteText; break;
 			case this.Properties.sTime: return this.sTime; break;
 			case this.Properties.sUserId: return this.sUserId; break;
 			case this.Properties.sUserName: return this.sUserName; break;
@@ -309,7 +307,6 @@ asc_CCommentData.prototype = {
 			case this.Properties.nId: this.nId = value; break;
 			case this.Properties.nLevel: this.nLevel = value; break;
 			case this.Properties.sText: this.sText = value; break;
-			case this.Properties.sQuoteText: this.sQuoteText = value; break;
 			case this.Properties.sTime: this.sTime = value; break;
 			case this.Properties.sUserId: this.sUserId = value; break;
 			case this.Properties.sUserName: this.sUserName = value; break;
@@ -442,8 +439,6 @@ CCellCommentator.prototype.moveRangeComments = function(rangeFrom, rangeTo) {
 
 				comment.nCol += colOffset;
 				comment.nRow += rowOffset;
-				var cellAddress = new CellAddress(comment.nRow, comment.nCol, 0);
-				comment.sQuoteText = cellAddress.getID() + " : " + this.worksheet.model.getCell(cellAddress).getValueWithFormat();
 				this.worksheet.model.workbook.handlers.trigger("asc_onChangeCommentData", comment.asc_getId(), comment);
 
 				var commentAfter = new asc_CCommentData(comment);
@@ -488,10 +483,6 @@ CCellCommentator.prototype.prepareComments = function(arrComments) {
 
 CCellCommentator.prototype.addCommentSerialize = function(oComment) {
 	if (oComment) {
-		if ( !oComment.bDocument && (oComment.nCol != null) && (oComment.nRow != null) ) {
-			var cellAddress = new CellAddress(oComment.nRow, oComment.nCol, 0);
-			oComment.sQuoteText = cellAddress.getID() + " : " + this.worksheet.model.getCell(cellAddress).getValueWithFormat();
-		}
 		this.aComments.push(oComment);
 	}
 };
@@ -1106,11 +1097,6 @@ CCellCommentator.prototype.changeComment = function(id, oComment, bChangeCoords,
 			comment.asc_putHiddenFlag(oComment.asc_getHiddenFlag());
 			comment.aReplies = [];
 
-			if ( !comment.bDocument && (comment.nCol != null) && (comment.nRow != null) ) {
-				var cellAddress = new CellAddress(comment.nRow, comment.nCol, 0);
-				comment.sQuoteText = cellAddress.getID() + " : " + t.worksheet.model.getCell(cellAddress).getValueWithFormat();
-			}
-
 			var count = oComment.asc_getRepliesCount();
 			for (var i = 0; i < count; i++) {
 				comment.asc_addReply(oComment.asc_getReply(i));
@@ -1320,9 +1306,6 @@ CCellCommentator.prototype.mergeComments = function (range) {
 		// add Comment
 		mergeComment.nCol = c1;
 		mergeComment.nRow = r1;
-		var cellAddress = new CellAddress(mergeComment.nRow, mergeComment.nCol, 0);
-		mergeComment.sQuoteText = cellAddress.getID() + " : " + this.worksheet.model.getCell(cellAddress).getValueWithFormat();
-
 		this._addComment(mergeComment, false, true);
 	}
 	for (i = 0, length = deleteComments.length; i < length; ++i) {

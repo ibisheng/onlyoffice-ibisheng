@@ -2309,22 +2309,6 @@ var editor;
     return ws.cellCommentator.hideComments();
   };
 
-  spreadsheet_api.prototype.asc_getWorkbookComments = function() {
-    var _this = this, comments = [];
-    if (_this.wb) {
-      for (var key in _this.wb.wsViews) {
-        var ws = _this.wb.wsViews[key];
-        if (ws) {
-          for (var i = 0; i < ws.cellCommentator.aComments.length; i++) {
-            var comment = ws.cellCommentator.aComments[i];
-            comments.push({ "Id": comment.asc_getId(), "Comment": comment });
-          }
-        }
-      }
-    }
-    return comments;
-  };
-
   // Shapes
   spreadsheet_api.prototype.setStartPointHistory = function() {
     this.noCreatePoint = true;
@@ -3393,7 +3377,6 @@ var editor;
 
   prot["asc_getComments"] = prot.asc_getComments;
   prot["asc_getDocumentComments"] = prot.asc_getDocumentComments;
-  prot["asc_getWorkbookComments"] = prot.asc_getWorkbookComments;
 
   // Shapes
   prot["setStartPointHistory"] = prot.setStartPointHistory;

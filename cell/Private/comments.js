@@ -39,11 +39,6 @@
     if (existComments.length) {
       oComment = existComments[0];
       bChange = true;
-    } else {
-      if ((oComment.nCol != null) && (oComment.nRow != null)) {
-          var cellAddress = new AscCommon.CellAddress(oComment.nRow, oComment.nCol, 0);
-        oComment.sQuoteText = cellAddress.getID() + " : " + this.worksheet.model.getCell(cellAddress).getValueWithFormat();
-      }
     }
   }
 
