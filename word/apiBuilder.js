@@ -839,9 +839,9 @@
         oUniFill.fill = new AscFormat.CGradFill();
         for(var i = 0; i < aGradientStop.length; ++i)
         {
-            oUniFill.fill.Gs.push(aGradientStop[i].Gs);
+            oUniFill.fill.colors.push(aGradientStop[i].Gs);
         }
-        oUniFill.path = new AscFormat.GradPath();
+        oUniFill.fill.path = new AscFormat.GradPath();
         return new ApiFill(oUniFill);
     };
 
