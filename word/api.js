@@ -8010,6 +8010,14 @@ window["asc_docs_api"].prototype.asc_SetSilentMode = function(bEnabled)
         this.WordControl.m_oLogicDocument.End_SilentMode();
 };
 
+window["asc_docs_api"].prototype.asc_Recalculate = function(bIsUpdateInterface)
+{
+    if (!this.WordControl.m_oLogicDocument)
+        return;
+
+    return this.WordControl.m_oLogicDocument.Recalculate_FromStart(bIsUpdateInterface);
+};
+
 window["asc_docs_api"].prototype["asc_nativeApplyChanges2"] = function(data, isFull)
 {
     // Чтобы заново созданные параграфы не отображались залоченными
@@ -8809,6 +8817,7 @@ asc_docs_api.prototype["asc_nativeInitBuilder"]     = asc_docs_api.prototype.asc
 asc_docs_api.prototype["asc_SetSilentMode"]         = asc_docs_api.prototype.asc_SetSilentMode;
 asc_docs_api.prototype["asc_addOleObject"]          = asc_docs_api.prototype.asc_addOleObject;
 asc_docs_api.prototype["asc_editOleObject"]         = asc_docs_api.prototype.asc_editOleObject;
+asc_docs_api.prototype["asc_Recalculate"]           = asc_docs_api.prototype.asc_Recalculate;
 
 CParagraphPropEx.prototype['get_ContextualSpacing'] = CParagraphPropEx.prototype.get_ContextualSpacing;
 CParagraphPropEx.prototype['get_Ind'] = CParagraphPropEx.prototype.get_Ind;
