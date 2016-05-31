@@ -1204,21 +1204,6 @@ CDocumentContent.prototype.Draw                           = function(nPageIndex,
         pGraphics.End_Command();
     }
 };
-// Составляем полный массив всех ParaDrawing используемых в данном классе (с учетом всех вложенных DocumentContent)
-CDocumentContent.prototype.Get_AllDrawingObjects          = function(DrawingObjs)
-{
-    if (undefined === DrawingObjs)
-        DrawingObjs = [];
-
-    var Count = this.Content.length;
-    for (var Pos = 0; Pos < Count; Pos++)
-    {
-        var Item = this.Content[Pos];
-        Item.Get_AllDrawingObjects(DrawingObjs);
-    }
-
-    return DrawingObjs;
-};
 CDocumentContent.prototype.Get_AllComments                = function(AllComments)
 {
     if (undefined === AllComments)

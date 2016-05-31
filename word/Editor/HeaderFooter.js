@@ -876,6 +876,11 @@ CHeaderFooter.prototype =
         return this.Content.Get_AllParagraphs(Props, ParaArray);
     },
 
+    Get_AllDrawingObjects  : function(arrDrawings)
+    {
+        return this.Content.Get_AllDrawingObjects(arrDrawings);
+    },
+
     Get_PrevElementEndInfo : function(CurElement)
     {
         return null;
