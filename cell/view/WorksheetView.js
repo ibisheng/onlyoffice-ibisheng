@@ -1160,9 +1160,9 @@
     };
 
     WorksheetView.prototype._prepareComments = function () {
-        this.cellCommentator.prepareComments( this.model.aComments );
-        if ( 0 < this.model.aComments.length ) {
-            this.model.workbook.handlers.trigger( "asc_onAddComments", this.model.aComments );
+        // ToDo возможно не нужно это делать именно тут..
+        if (0 < this.model.aComments.length) {
+            this.model.workbook.handlers.trigger("asc_onAddComments", this.model.aComments);
         }
     };
 

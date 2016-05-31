@@ -39,8 +39,9 @@
   var c_oAscAsyncActionType = asc.c_oAscAsyncActionType;
   
 
-  function WorkbookCommentsModel(handlers) {
+  function WorkbookCommentsModel(handlers, aComments) {
     this.workbook = {handlers: handlers};
+    this.aComments = aComments;
   }
 
   WorkbookCommentsModel.prototype.getId = function() {
@@ -680,7 +681,7 @@
     });
 
     this.cellCommentator = new AscCommonExcel.CCellCommentator({
-      model: new WorkbookCommentsModel(this.handlers),
+      model: new WorkbookCommentsModel(this.handlers, this.model.aComments),
       collaborativeEditing: this.collaborativeEditing,
       draw: function() {
       },
@@ -690,7 +691,6 @@
         }
       }
     });
-    this.cellCommentator.prepareComments(this.model.aComments);
     if (0 < this.model.aComments.length) {
       this.handlers.trigger("asc_onAddComments", this.model.aComments);
     }
@@ -2431,7 +2431,6 @@
       var wsView = this.wsViews[wsKey];
       var wsModel = wsView.model;
       wsView.cellCommentator.prepareCommentsToSave();
-      wsModel.aComments = wsView.cellCommentator.aComments;
       wsModel.aCommentsCoords = wsView.cellCommentator.aCommentCoords;
 
       if (isFirst) {
@@ -2440,7 +2439,7 @@
         this.cellCommentator.overlayCtx = wsView.overlayCtx;
         this.cellCommentator.drawingCtx = wsView.drawingCtx;
         this.cellCommentator.prepareCommentsToSave();
-        wsModel.aComments = wsModel.aComments.concat(this.cellCommentator.aComments);
+        wsModel.aComments = wsModel.aComments.concat(this.wbModel.aComments);
         wsModel.aCommentsCoords = wsModel.aCommentsCoords.concat(this.cellCommentator.aCommentCoords);
       }
     }
