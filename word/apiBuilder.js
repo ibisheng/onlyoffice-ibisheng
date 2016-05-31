@@ -299,7 +299,7 @@
     function ApiPresetColor(sPresetColor)
     {
         var oUniColor = new AscFormat.CUniColor();
-        oUniColor.setColor(new CPrstColor());
+        oUniColor.setColor(new AscFormat.CPrstColor());
         oUniColor.color.id = sPresetColor;
         ApiPresetColor.superclass.constructor.call(this, oUniColor);
     }
