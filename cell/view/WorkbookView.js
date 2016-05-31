@@ -2439,7 +2439,7 @@
         this.cellCommentator.overlayCtx = wsView.overlayCtx;
         this.cellCommentator.drawingCtx = wsView.drawingCtx;
         this.cellCommentator.prepareCommentsToSave();
-        wsModel.aComments = wsModel.aComments.concat(this.wbModel.aComments);
+        wsModel.aComments = wsModel.aComments.concat(this.model.aComments);
         wsModel.aCommentsCoords = wsModel.aCommentsCoords.concat(this.cellCommentator.aCommentCoords);
       }
     }
