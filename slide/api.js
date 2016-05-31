@@ -6591,6 +6591,8 @@ asc_docs_api.prototype["asc_pluginResize"]          = asc_docs_api.prototype.asc
 asc_docs_api.prototype["asc_pluginButtonClick"]     = asc_docs_api.prototype.asc_pluginButtonClick;
 asc_docs_api.prototype["asc_addOleObject"]          = asc_docs_api.prototype.asc_addOleObject;
 asc_docs_api.prototype["asc_editOleObject"]         = asc_docs_api.prototype.asc_editOleObject;
+asc_docs_api.prototype["asc_Recalculate"]           = asc_docs_api.prototype.asc_Recalculate;
+asc_docs_api.prototype["asc_canPaste"]              = asc_docs_api.prototype.asc_canPaste;
 
 window['Asc']['asc_CCommentData'] = window['Asc'].asc_CCommentData = asc_CCommentData;
 asc_CCommentData.prototype['asc_getText'] = asc_CCommentData.prototype.asc_getText;

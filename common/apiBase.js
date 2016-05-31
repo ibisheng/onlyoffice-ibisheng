@@ -20,7 +20,7 @@ function baseEditorsApi(config, editorId) {
   this.HtmlElementName = config['id-view'] || '';
   this.HtmlElement = null;
 
-  this.isMobileVersion = (config['mobile'] === true) ? true : false;
+  this.isMobileVersion = (config['mobile'] === true);
   
   this.isViewMode = false;
 
@@ -740,6 +740,10 @@ baseEditorsApi.prototype.asc_pluginButtonClick = function(id)
     this.asc_setDocInfo(new Asc.asc_CDocInfo());
   };
   baseEditorsApi.prototype.asc_SetSilentMode = function() {
+  };
+  baseEditorsApi.prototype.asc_canPaste = function() {
+  };
+  baseEditorsApi.prototype.asc_Recalculate = function() {
   };
 
 

@@ -3505,4 +3505,6 @@ var editor;
   prot["asc_pluginButtonClick"]     = prot.asc_pluginButtonClick;
   prot["asc_addOleObject"]          = prot.asc_addOleObject;
   prot["asc_editOleObject"]         = prot.asc_editOleObject;
+  prot["asc_Recalculate"]           = prot.asc_Recalculate;
+  prot["asc_canPaste"]              = prot.asc_canPaste;
 })(window);
