@@ -306,7 +306,8 @@
                 {
                     try
                     {
-                        eval(value);
+                        var _script = "(function(){ var Api = window.g_asc_plugins.api;\n" + value + "})();";
+                        eval(_script);
                     }
                     catch (err)
                     {
