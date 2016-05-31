@@ -7817,8 +7817,81 @@ function CreateImageFromBinary(bin, nW, nH)
     return para_drawing;
 }
 
+function Check_LoadingDataBeforePrepaste(_api, _fonts, _images, _callback)
+{
+    var aPrepeareFonts = [];
+    for (var font_family in _fonts)
+    {
+        aPrepeareFonts.push(new CFont(font_family, 0, "", 0));
+    };
+
+    var aImagesToDownload = [];
+    var _mapLocal = {};
+    for (var image in _images)
+    {
+        var src = _images[image];
+        if (undefined !== window["Native"] && undefined !== window["Native"]["GetImageUrl"])
+        {
+            _images[image] = window["Native"]["GetImageUrl"](_images[image]);
+        }
+        else if (0 == src.indexOf("file:"))
+        {
+            if (window["AscDesktopEditor"] !== undefined)
+            {
+                if (window["AscDesktopEditor"]["LocalFileGetImageUrl"] !== undefined)
+                {
+                    aImagesToDownload.push(src);
+                }
+                else
+                {
+                    var _base64 = window["AscDesktopEditor"]["GetImageBase64"](src);
+                    if (_base64 != "")
+                    {
+                        aImagesToDownload.push(_base64);
+                        _mapLocal[_base64] = src;
+                    }
+                    else
+                    {
+                        _images[image] = "local";
+                    }
+                }
+            }
+            else
+                _images[image] = "local";
+        }
+        else if (!g_oDocumentUrls.getImageLocal(src))
+            aImagesToDownload.push(src);
+    }
+    if (aImagesToDownload.length > 0)
+    {
+        AscCommon.sendImgUrls(_api, aImagesToDownload, function (data) {
+            var image_map = {};
+            for (var i = 0, length = Math.min(data.length, aImagesToDownload.length); i < length; ++i)
+            {
+                var elem = data[i];
+                var sFrom = aImagesToDownload[i];
+                if (null != elem.url)
+                {
+                    var name = g_oDocumentUrls.imagePath2Local(elem.path);
+                    _images[sFrom] = name;
+                    image_map[i] = name;
+                }
+                else
+                {
+                    image_map[i] = sFrom;
+                }
+            }
+            _api.pre_Paste(aPrepeareFonts, image_map, _callback);
+        });
+    }
+    else
+        _api.pre_Paste(aPrepeareFonts, _images, _callback);
+}
+
+
   //---------------------------------------------------------export---------------------------------------------------
   window['AscCommon'] = window['AscCommon'] || {};
+  window["AscCommon"].Check_LoadingDataBeforePrepaste = Check_LoadingDataBeforePrepaste;
   window["AscCommon"].CDocumentReaderMode = CDocumentReaderMode;
   window["AscCommon"].GetObjectsForImageDownload = GetObjectsForImageDownload;
   window["AscCommon"].ResetNewUrls = ResetNewUrls;

@@ -306,8 +306,27 @@
                 {
                     try
                     {
-                        var _script = "(function(){ var Api = window.g_asc_plugins.api;\n" + value + "})();";
-                        eval(_script);
+						if (window.g_asc_plugins.api.asc_canPaste())
+						{
+							var _script = "(function(){ var Api = window.g_asc_plugins.api;\n" + value + "})();";
+							eval(_script);
+
+							var oLogicDocument = window.g_asc_plugins.api.WordControl ? window.g_asc_plugins.api.WordControl.m_oLogicDocument : null;
+							if (pluginData.getAttribute("recalculate") == true)
+							{
+								var _fonts = oLogicDocument.Document_Get_AllFontNames();
+								var _imagesArray = oLogicDocument.Get_AllImageUrls();
+								var _images = {};
+								for (var i = 0; i < _imagesArray.length; i++)
+								{
+									_images[_imagesArray[i]] = _imagesArray[i];
+								}
+								AscCommon.Check_LoadingDataBeforePrepaste(window.g_asc_plugins.api, _fonts, _images, function()
+								{
+									window.g_asc_plugins.api.asc_Recalculate();
+								});
+							}
+						}
                     }
                     catch (err)
                     {
@@ -493,6 +512,38 @@ function TEST_PLUGINS()
 
                     buttons         : [ { text: "Ok", primary: true },
                         { text: "Cancel", primary: false } ]
+                }
+            ]
+        },
+        {
+            "name" : "cbr",
+            "guid" : "asc.{5F9D4EB4-AF61-46EF-AE25-46C96E75E1DD}",
+
+            "variations" : [
+                {
+                    "description" : "cbr",
+                    "url"         : "cbr/index.html",
+
+                    "icons"           : ["cbr/icon.png", "cbr/icon@2x.png"],
+        //            "isViewer"        : true,
+                    "isViewer"        : false,
+                    "EditorsSupport"  : ["word", "cell", "slide"],
+
+        //            "isVisual"        : true,
+        //            "isModal"         : true,
+                    "isVisual"        : false,
+                    "isModal"         : false,
+                    "isInsideMode"    : false,
+
+                    "initDataType"    : "none",
+                    "initData"        : "",
+
+        //            "isUpdateOleOnResize" : true,
+        			"isUpdateOleOnResize" : false,
+
+        //            "buttons"         : [ { "text": "Ok", "primary": true },
+        //                                { "text": "Cancel", "primary": false } ]
+        			"buttons"         : []
                 }
             ]
         }
