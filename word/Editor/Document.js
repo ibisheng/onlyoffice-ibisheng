@@ -10425,6 +10425,10 @@ CDocument.prototype.Insert_Content            = function(SelectedContent, NearPo
                 ParaS.Selection.StartPos = ParaS.Content.length - _ParaSContentLen;
                 ParaS.Selection.EndPos   = ParaS.Content.length - 1;
             }
+            else if (true !== Para.Cursor_IsStart())
+            {
+                DstIndex++;
+            }
 
             var EndIndex = ElementsCount - 1;
             if (true === bConcatE && StartIndex < EndIndex)
