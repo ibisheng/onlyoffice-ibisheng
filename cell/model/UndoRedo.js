@@ -3532,7 +3532,7 @@ UndoRedoWoorksheet.prototype = {
 						if(null != oConflictWs)
 							oConflictWs.renameWsToCollaborate(this.wb.getUniqueSheetNameFrom(oConflictWs.getName(), true));
 					}
-					AscCommonExcel.buildDefNameAfterRenameWorksheet();
+					AscCommonExcel.buildDefNameAfterRenameWorksheet(ws);
 				}
 				ws.setName(name, true);
 			}

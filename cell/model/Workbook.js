@@ -1878,7 +1878,7 @@ function addToArrRecalc(sheetId, cell){
 function addToArrDefNameRecalc(name){
     arrDefNameRecalc[name.nodeId] = name;
 }
-function buildDefNameAfterRenameWorksheet() {
+function buildDefNameAfterRenameWorksheet(ws) {
   var dN;
   for(var id in arrDefNameRecalc ){
     dN  = arrDefNameRecalc[id];
