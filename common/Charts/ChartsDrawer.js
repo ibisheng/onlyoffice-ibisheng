@@ -1252,14 +1252,22 @@ CChartsDrawer.prototype =
 	{
 		//chartProp.chart.plotArea.valAx.scaling.logBase
 		var axisMin, axisMax, firstDegree, step, arrayValues;
-		
-		if(chartProp.chart.plotArea.valAx && chartProp.chart.plotArea.valAx.scaling.logBase)
-		{
-			arrayValues = this._getLogArray(yMin, yMax, chartProp.chart.plotArea.valAx.scaling.logBase);
-			return arrayValues;
+
+		if(!('Scatter' == this.calcProp.type && isOx)){
+			if(chartProp.chart.plotArea.valAx && chartProp.chart.plotArea.valAx.scaling.logBase)
+			{
+				arrayValues = this._getLogArray(yMin, yMax, chartProp.chart.plotArea.valAx.scaling.logBase);
+				return arrayValues;
+			}
+		}
+		else{
+			if(chartProp.chart.plotArea.catAx && chartProp.chart.plotArea.catAx.scaling && chartProp.chart.plotArea.catAx.scaling.logBase)
+			{
+				arrayValues = this._getLogArray(yMin, yMax, chartProp.chart.plotArea.catAx.scaling.logBase);
+				return arrayValues;
+			}
 		}
 		
-		chartProp.chart.plotArea.valAx && chartProp.chart.plotArea.valAx.scaling ? chartProp.chart.plotArea.valAx.scaling.max : null;
 		//максимальное и минимальное значение(по документации excel)
 		var trueMinMax = this._getTrueMinMax(isOx, yMin, yMax);
 		
@@ -1309,11 +1317,12 @@ CChartsDrawer.prototype =
 		
 		//приводим к первому порядку
 		firstDegree = this._getFirstDegree((Math.abs(axisMax - axisMin)) / 10);
-		
+
+		var axis = 'Scatter' == this.calcProp.type && isOx ? chartProp.chart.plotArea.catAx : chartProp.chart.plotArea.valAx;
 		//находим шаг
-		if(chartProp.chart.plotArea.valAx && chartProp.chart.plotArea.valAx.majorUnit !== null)
+		if(axis && axis.majorUnit !== null)
 		{
-			step = chartProp.chart.plotArea.valAx.majorUnit;
+			step = axis.majorUnit;
 		}
 		else
 		{
