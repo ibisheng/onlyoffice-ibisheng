@@ -308,21 +308,7 @@ var editor;
     if (cultureInfo) {
       var numFormatDigit = AscCommon.oNumFormatCache.get('#,##0.00');
 
-      var dateElems = [];
-      for (var i = 0; i < cultureInfo.ShortDatePattern.length; ++i) {
-        switch (cultureInfo.ShortDatePattern[i]) {
-          case '0':
-            dateElems.push('d');
-            break;
-          case '1':
-            dateElems.push('m');
-            break;
-          case '2':
-            dateElems.push('yyyy');
-            break;
-        }
-      }
-      var formatDate = dateElems.join('/');
+      var formatDate = AscCommonExcel.getShortDateFormat(cultureInfo);
       formatDate += " h:mm";
       if (cultureInfo.AMDesignator && cultureInfo.PMDesignator) {
         formatDate += " AM/PM";

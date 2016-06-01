@@ -1061,6 +1061,18 @@ Num.prototype =
           case 8:
             res = AscCommonExcel.getCurrencyFormatSimple(null, true, true, true);
             break;
+          case 22:
+            res = AscCommonExcel.getShortDateFormat(null) + " h:mm";
+            break;
+          case 14:
+          case 27:
+          case 28:
+          case 29:
+          case 30:
+          case 31:
+          case 36:
+            res = AscCommonExcel.getShortDateFormat(null);
+            break;
           case 37:
             res = AscCommonExcel.getCurrencyFormatSimple(null, false, false, false);
             break;
@@ -6452,6 +6464,25 @@ AutoFilterDateElem.prototype.convertDateGroupItemToRange = function(oDateGroupIt
 	this.dateTimeGrouping = oDateGroupItem.DateTimeGrouping;
 };
 
+function getShortDateFormat(opt_cultureInfo) {
+	var cultureInfo = opt_cultureInfo ? opt_cultureInfo : AscCommon.g_oDefaultCultureInfo;
+	var dateElems = [];
+	for (var i = 0; i < cultureInfo.ShortDatePattern.length; ++i) {
+		switch (cultureInfo.ShortDatePattern[i]) {
+			case '0':
+				dateElems.push('d');
+				break;
+			case '1':
+				dateElems.push('m');
+				break;
+			case '2':
+				dateElems.push('yyyy');
+				break;
+		}
+	}
+	return dateElems.join('/');
+}
+
 function getCurrencyFormatSimple(opt_cultureInfo, opt_fraction, opt_currency, opt_red) {
   var cultureInfo = opt_cultureInfo ? opt_cultureInfo : AscCommon.g_oDefaultCultureInfo;
   var numberFormat = opt_fraction ? '#,##0.00' : '#,##0';
@@ -6718,6 +6749,7 @@ function getCurrencyFormat(opt_cultureInfo, opt_fraction, opt_currency, opt_curr
 	window['AscCommonExcel'].DateGroupItem = DateGroupItem;
 	window['AscCommonExcel'].SortCondition = SortCondition;
 	window['AscCommonExcel'].AutoFilterDateElem = AutoFilterDateElem;
+	window['AscCommonExcel'].getShortDateFormat = getShortDateFormat;
   window['AscCommonExcel'].getCurrencyFormatSimple = getCurrencyFormatSimple;
   window['AscCommonExcel'].getCurrencyFormat = getCurrencyFormat;
 	

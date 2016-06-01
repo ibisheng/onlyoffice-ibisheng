@@ -4697,7 +4697,7 @@
         if (null != sFormat) {
           oRes = new AscCommonExcel.Num();
           oRes.f = sFormat;
-          if ((5 <= oNum.id && oNum.id <= 8) || (15 <= oNum.id && oNum.id <= 17) || (37 <= oNum.id && oNum.id <= 44)) {
+          if ((5 <= oNum.id && oNum.id <= 8) || (14 <= oNum.id && oNum.id <= 17) || 22 ==  oNum.id || (27 <= oNum.id && oNum.id <= 31) || (36 <= oNum.id && oNum.id <= 44)) {
             oRes.id = oNum.id;
           }
         }
