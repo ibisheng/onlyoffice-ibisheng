@@ -331,21 +331,17 @@ cString.prototype.tocNumber = function () {
      }*/
 
     if ( g_oFormatParser.isLocaleNumber( this.value ) ) {
-    if ("." != AscCommon.g_oDefaultCultureInfo.NumberDecimalSeparator) {
-            m = this.value.replace( ".", "q" );//заменяем на символ с которым не распознается, как в Excel
-      m = m.replace(AscCommon.g_oDefaultCultureInfo.NumberDecimalSeparator, ".");
+        var numberValue = g_oFormatParser.parseLocaleNumber( this.value );
+        if ( !isNaN( numberValue ) ) {
+            res = new cNumber( numberValue );
         }
-
-        if ( !parseNum( m ) ) {
-            res = new cError( cErrorType.wrong_value_type );
     } else {
-            var numberValue = g_oFormatParser.parseLocaleNumber( this.value );
-            if ( !isNaN( numberValue ) ) {
-                res = new cNumber( numberValue );
-            }
+        var parseRes = AscCommon.g_oFormatParser.parse(this.value);
+        if(null != parseRes) {
+            res = new cNumber( parseRes.value );
+        } else {
+            res = new cError( cErrorType.wrong_value_type );
         }
-  } else {
-        res = new cError( cErrorType.wrong_value_type );
     }
 
     return res;
@@ -1689,18 +1685,18 @@ cStrucTable.prototype.createArea = function ( val, cell ) {
 
             }
 
+          if (range) {
+            var _c1 = range.c1 + (this.hdtcstartIndex ? this.hdtcstartIndex.index : 0);
+            range = new Asc.Range(_c1, range.r1, this.hdtcendIndex ? range.c1 + this.hdtcendIndex.index : _c1, range.r2);
+          } else {
             paramObj.includeColumnHeader = true;
             data = this.wb.getTableRangeForFormula( this.tableName, paramObj );
 
             if ( !data ) {
-				return this.area = new cError( cErrorType.bad_reference );
+              return this.area = new cError( cErrorType.bad_reference );
             }
-
-            if ( range ) {
-                range = range.intersection( data.range );
-      } else {
-                range = data.range;
-            }
+            range = data.range;
+          }
         }
 
         this.tableData = data;

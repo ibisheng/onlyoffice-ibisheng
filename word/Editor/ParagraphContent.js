@@ -22,18 +22,18 @@
 // Import
 var g_fontApplication = AscFonts.g_fontApplication;
 
-var g_oTableId = AscCommon.g_oTableId;
+var g_oTableId      = AscCommon.g_oTableId;
 var g_oTextMeasurer = AscCommon.g_oTextMeasurer;
-var isRealObject = AscCommon.isRealObject;
-var History = AscCommon.History;
+var isRealObject    = AscCommon.isRealObject;
+var History         = AscCommon.History;
 
-var HitInLine = AscFormat.HitInLine;
+var HitInLine  = AscFormat.HitInLine;
 var MOVE_DELTA = AscFormat.MOVE_DELTA;
 
 var c_oAscRelativeFromH = Asc.c_oAscRelativeFromH;
 var c_oAscRelativeFromV = Asc.c_oAscRelativeFromV;
 
-var para_Unknown                   =     -1; //
+var para_Unknown                   = -1; //
 var para_Empty                     = 0x0000; // Пустой элемент (таким элементом должен заканчиваться каждый параграф)
 var para_Text                      = 0x0001; // Текст
 var para_Space                     = 0x0002; // Пробелы
@@ -70,7 +70,8 @@ var para_Math_BreakOperator        = 0x0037; // break operator в формуле
 var para_Math_Content              = 0x0038; // math content
 var para_FootnoteReference         = 0x0039; // Ссылка на сноску
 var para_FootnoteRef               = 0x0040; // Номер сноски (должен быть только внутри сноски)
-
+var para_Separator                 = 0x0041; // Разделить, который используется для сносок
+var para_ContinuationSeparator     = 0x0042; // Большой разделитель, который используется для сносок
 
 
 var break_Line   = 0x01;
@@ -79,20 +80,20 @@ var break_Column = 0x03;
 
 var nbsp_charcode = 0x00A0;
 
-var nbsp_string = String.fromCharCode( 0x00A0 );
-var   sp_string = String.fromCharCode( 0x0032 );
+var nbsp_string = String.fromCharCode(0x00A0);
+var sp_string   = String.fromCharCode(0x0032);
 
 var g_aPunctuation =
-    [
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1,
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1,
-        1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1,
-        1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0
-    ];
+[
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1,
+	1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1,
+	1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0
+];
 
 g_aPunctuation[0x002D] = 1; // символ -
 g_aPunctuation[0x00AB] = 1; // символ «
@@ -103,8 +104,7 @@ g_aPunctuation[0x201D] = 1; // символ ”
 g_aPunctuation[0x2026] = 1; // символ ...
 
 
-
-var g_aNumber = [];
+var g_aNumber     = [];
 g_aNumber[0x0030] = 1;
 g_aNumber[0x0031] = 1;
 g_aNumber[0x0032] = 1;
@@ -116,7 +116,8 @@ g_aNumber[0x0037] = 1;
 g_aNumber[0x0038] = 1;
 g_aNumber[0x0039] = 1;
 
-var g_aSpecialSymbols = [];
+
+var g_aSpecialSymbols     = [];
 g_aSpecialSymbols[0x00AE] = 1;
 
 var PARATEXT_FLAGS_MASK               = 0xFFFFFFFF; // 4 байта
@@ -4574,17 +4575,28 @@ ParaDrawing.prototype =
             return;
         var dW, dH, bInline = this.Is_Inline();
         this.GraphicObj.recalculate();
-        this.setExtent(this.GraphicObj.spPr.xfrm.extX, this.GraphicObj.spPr.xfrm.extY);
-        if(AscFormat.checkNormalRotate(AscFormat.isRealNumber(this.GraphicObj.rot) ? this.GraphicObj.rot : 0))
+        var extX, extY;
+        if(this.GraphicObj.spPr.xfrm && AscFormat.isRealNumber(this.GraphicObj.spPr.xfrm.extX) && AscFormat.isRealNumber(this.GraphicObj.spPr.xfrm.extY))
         {
-            dW = this.GraphicObj.spPr.xfrm.extX;
-            dH = this.GraphicObj.spPr.xfrm.extY;
+            extX = this.GraphicObj.spPr.xfrm.extX;
+            extY = this.GraphicObj.spPr.xfrm.extY;
         }
         else
         {
-            dH = this.GraphicObj.spPr.xfrm.extX;
-            dW = this.GraphicObj.spPr.xfrm.extY;
+            extX = 5;
+            extY = 5;
         }
+        if(AscFormat.checkNormalRotate(AscFormat.isRealNumber(this.GraphicObj.rot) ? this.GraphicObj.rot : 0))
+        {
+            dW = extX;
+            dH = extY;
+        }
+        else
+        {
+            dH = extX;
+            dW = extY;
+        }
+        this.setExtent(extX, extY);
         var xc = this.GraphicObj.localTransform.TransformPointX(this.GraphicObj.extX/2, this.GraphicObj.extY/2);
         var yc = this.GraphicObj.localTransform.TransformPointY(this.GraphicObj.extX/2, this.GraphicObj.extY/2);
         var oBounds = this.GraphicObj.bounds;
@@ -6038,7 +6050,7 @@ ParaDrawing.prototype =
                     Writer.WriteLong( Data.New.Value );
                 else
                     Writer.WriteDouble( Data.New.Value );
-                Writer.WriteBool(Data.New.Percent);
+                Writer.WriteBool(Data.New.Percent === true);
 
                 break;
             }
@@ -7545,17 +7557,34 @@ ParaFootnoteReference.prototype.Write_ToBinary   = function(Writer)
     // Long   : Type
     // String : FootnoteId
     Writer.WriteLong(this.Type);
-    Writer.WriteString2(this.FootnoteId);
+    Writer.WriteString2(this.Footnote.Get_Id());
 };
 ParaFootnoteReference.prototype.Read_FromBinary  = function(Reader)
 {
     // String : FootnoteId
-    this.FootnoteId = Reader.GetString2();
+    this.Footnote = g_oTableId.Get_ById(Reader.GetString2());
 };
 ParaFootnoteReference.prototype.Get_Footnote     = function()
 {
     return this.Footnote;
 };
+
+/**
+ * Класс представляющий номер сноски внутри сноски.
+ * @param {CFootEndnote} Footnote - Ссылка на сноску.
+ * @constructor
+ */
+function ParaFootnoteRef(Footnote)
+{
+    ParaFootnoteRef.superclass.constructor.call(this, Footnote);
+}
+AscCommon.extendClass(ParaFootnoteRef, ParaFootnoteReference);
+ParaFootnoteRef.prototype.Type = para_FootnoteRef;
+ParaFootnoteRef.prototype.Get_Type = function()
+{
+    return para_FootnoteRef;
+};
+
 
 
 function ParagraphContent_Read_FromBinary(Reader)

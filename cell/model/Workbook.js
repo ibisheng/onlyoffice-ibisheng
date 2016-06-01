@@ -877,6 +877,9 @@ DependencyGraph.prototype = {
         return oResMapCycle;
     },
     _getNodeDependenceNodeToRange:function ( sheetId, bbox, oSheetRanges ) {
+        if (!bbox) {
+            return;
+        }
         var oSheetRange = oSheetRanges[sheetId];
         if ( null == oSheetRange ) {
             oSheetRange = {range:null, changed:false, prevRange:null};
@@ -933,20 +936,20 @@ DependencyGraph.prototype = {
         return oRes;
     },
     getDefNameNodeByRef:function ( ref, sheetId ) {
-        var sheetNodeList;
+        var sheetNodeList, id;
 
         if ( null != sheetId ) {
             sheetNodeList = this.defNameSheets[sheetId];
-            for ( var id in sheetNodeList ) {
-                if ( sheetNodeList[id].Ref == ref ) {
+            for ( id in sheetNodeList ) {
+                if ( !sheetNodeList[id].Hidden && sheetNodeList[id].Ref === ref) {
                     return sheetNodeList[id].Name;
                 }
             }
         }
 
         sheetNodeList = this.defNameSheets["WB"];
-        for ( var id in sheetNodeList ) {
-            if ( sheetNodeList[id].Ref === ref ) {
+        for ( id in sheetNodeList ) {
+            if ( !sheetNodeList[id].Hidden && sheetNodeList[id].Ref === ref ) {
                 return sheetNodeList[id].Name;
             }
         }
@@ -955,7 +958,7 @@ DependencyGraph.prototype = {
     },
     addDefinedNameNode:function ( defName, sheetId, defRef, defHidden, bUndo ) {
 
-        var ws = this.wb.getWorksheet( sheetId )
+        var ws = this.wb.getWorksheet( sheetId );
         ws ? sheetId = ws.getId() : null;
 
         var nodeId = getDefNameVertexId( sheetId, defName ),
@@ -1162,7 +1165,7 @@ DependencyGraph.prototype = {
 //        return false;
     },
 
-    getNextTableName:function ( ws, Ref ) {
+    getNextTableName:function ( ws, Ref, tableName ) {
         this.nTableNameMaxIndex++;
         var sNewName = this.sTableNamePattern + this.nTableNameMaxIndex,
             name = getDefNameVertexId( null, sNewName );
@@ -1171,6 +1174,20 @@ DependencyGraph.prototype = {
             sNewName = this.sTableNamePattern + this.nTableNameMaxIndex;
             name = getDefNameVertexId( null, sNewName );
         }
+
+        if(tableName)
+        {
+            sNewName = tableName;
+        }
+		else if(ws.workbook.oApi.collaborativeEditing.getCollaborativeEditing())
+		{
+			var indexUser = ws.workbook.oApi.CoAuthoringApi.get_indexUser();
+			if(null !== indexUser)
+			{
+				sNewName += "_" + indexUser;
+			}
+		}
+		
         this.addTableName( sNewName, ws, Ref );
         return sNewName;
     },
@@ -2055,14 +2072,15 @@ Workbook.prototype.createWorksheet=function(indexBefore, sName, sId){
 	History.SetSheetRedo(oNewWorksheet.getId());
 	return oNewWorksheet.index;
 };
-Workbook.prototype.copyWorksheet=function(index, insertBefore, sName, sId, bFromRedo){
+Workbook.prototype.copyWorksheet=function(index, insertBefore, sName, sId, bFromRedo, tableNames){
 	//insertBefore - optional
 	if(index >= 0 && index < this.aWorksheets.length){
-
+		//buildRecalc вызываем чтобы пересчиталося cwf(может быть пустым если сделать сдвиг формул и скопировать лист)
+		this.buildRecalc(true, true);
 		History.TurnOff();
 		var wsActive = this.getActiveWs();
 		var wsFrom = this.aWorksheets[index];
-		var newSheet = wsFrom.clone(sId, sName);
+		var newSheet = wsFrom.clone(sId, sName, tableNames);
 		newSheet.initPostOpen(this.wsHandlers);
 		if(null != insertBefore && insertBefore >= 0 && insertBefore < this.aWorksheets.length){
 			//помещаем новый sheet перед insertBefore
@@ -2092,7 +2110,17 @@ Workbook.prototype.copyWorksheet=function(index, insertBefore, sName, sId, bFrom
 			}
 			newSheet._BuildDependencies(cwf.cells);
 		}
-		History.Add(AscCommonExcel.g_oUndoRedoWorkbook, AscCH.historyitem_Workbook_SheetAdd, null, null, new UndoRedoData_SheetAdd(insertBefore, newSheet.getName(), wsFrom.getId(), newSheet.getId()));
+		
+		if(!tableNames && newSheet.TableParts && newSheet.TableParts.length)
+		{
+			tableNames = [];
+			for(var i = 0; i < newSheet.TableParts.length; i++)
+			{
+				tableNames.push(newSheet.TableParts[i].DisplayName);
+			}
+		}
+		
+		History.Add(AscCommonExcel.g_oUndoRedoWorkbook, AscCH.historyitem_Workbook_SheetAdd, null, null, new UndoRedoData_SheetAdd(insertBefore, newSheet.getName(), wsFrom.getId(), newSheet.getId(), tableNames));
 		History.SetSheetUndo(wsActive.getId());
 		History.SetSheetRedo(newSheet.getId());
         if(!(bFromRedo === true))
@@ -2497,7 +2525,7 @@ Workbook.prototype.getDefinedNamesWB = function (defNameListId) {
     function getNames(id,arr){
         var listDN = thas.dependencyFormulas.defNameSheets[id], name;
         for ( var id in listDN ) {
-            name = listDN[id]
+            name = listDN[id];
 
             if ( name.Ref && !name.Hidden && name.Name.indexOf("_xlnm") < 0 ) {
                 if( name.isTable || name.parsedRef && name.parsedRef.isParsed && name.parsedRef.countRef == 1 && name.parsedRef.outStack.length == 1 && name.parsedRef.calculate().errorType !== AscCommonExcel.cErrorType.bad_reference ){
@@ -2589,7 +2617,12 @@ Workbook.prototype.editDefinesNames = function ( oldName, newName, bUndo ) {
     }
 
     if ( oldName ) {
-		this.buildRecalc(true, true);
+        //при переименовании важно строить зависимости иначе не пересчитаются зависимые формулы
+        //пример foo->bar влечет SUM(foo)->SUM(bar), но если нет зависимостей то останется SUM(foo)(повторяется при принятии изменений)
+        //при сдвиге ячеек пересчитывать не надо, т.к. пересчет может запуститься когда сдвинется часть ячеек и тогда будут неправильные зависимости
+        if(newName.Name != oldName.Name){
+            this.buildRecalc(true, true);
+        }
         retRes = this.dependencyFormulas.changeDefName( oldName, newName );
         rename = true;
     }
@@ -2617,9 +2650,16 @@ Workbook.prototype.editDefinesNames = function ( oldName, newName, bUndo ) {
         for ( var id in nSE ) {
             se = nSE[id];
             se.deleteMasterEdge( retRes );
-            this.needRecalc.nodes[se.nodeId] = [se.sheetId, se.cellId ];
-            this.needRecalc.length++;
-            addToArrRecalc(se.sheetId, se.cell);
+			//todo Master/Slave взаимно обратные свойства, добавлять и удалять надо вместе
+			//из Vertex удаляем, в DefName остается, на добавлении новой зависимости в DefName ничего не делаем т.к. уже есть такая зависимость
+			//получалось что DefName и Vertex имеют похожи зависимости, но разные обьекты(из-за этого страдали дальнейшие операции)
+			//не уверен в этой правке
+			retRes.deleteSlaveEdge(se);
+            if (!se.isDefinedName) {
+                this.needRecalc.nodes[se.nodeId] = [se.sheetId, se.cellId ];
+                this.needRecalc.length++;
+                addToArrRecalc(se.sheetId, se.cell);
+            }
             se = se.returnCell();
             if ( se ) {
                 se.setFormula( se.formulaParsed.assemble() );
@@ -3313,7 +3353,7 @@ Woorksheet.prototype.generateFontMap=function(oFontMap){
 		}
 	}
 };
-Woorksheet.prototype.clone=function(sNewId, sName){
+Woorksheet.prototype.clone=function(sNewId, sName, tableNames){
 	var i, elem, range;
 	var oNewWs = new Woorksheet(this.workbook, this.workbook.aWorksheets.length, sNewId);
 	oNewWs.sName = this.workbook.checkValidSheetName(sName) ? sName : this.workbook.getUniqueSheetNameFrom(this.sName, true);
@@ -3323,7 +3363,14 @@ Woorksheet.prototype.clone=function(sNewId, sName){
 	oNewWs.nRowsCount = this.nRowsCount;
 	oNewWs.nColsCount = this.nColsCount;
 	for (i = 0; i < this.TableParts.length; ++i)
-		oNewWs.TableParts.push(this.TableParts[i].clone(oNewWs));
+	{
+		var tableName = null;
+		if(tableNames && tableNames.length)
+		{
+			tableName = tableNames[i];
+		}
+		oNewWs.TableParts.push(this.TableParts[i].clone(oNewWs, tableName));
+	}
 	if(this.AutoFilter)
 		oNewWs.AutoFilter = this.AutoFilter.clone();
 	for (i in this.aCols) {

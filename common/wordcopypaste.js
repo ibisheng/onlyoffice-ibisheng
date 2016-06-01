@@ -1710,6 +1710,31 @@ CopyProcessor.prototype =
 			if(!selectedContent.DocContent && (!selectedContent.Drawings || (selectedContent.Drawings && !selectedContent.Drawings.length)) && (!selectedContent.SlideObjects || (selectedContent.SlideObjects && !selectedContent.SlideObjects.length)))
 				return false;
 			
+			//set size, if oDrawingCopyObject is placeholder
+			for(var i = 0; i < selectedContent.Drawings.length; ++i)
+			{
+				var oDrawingCopyObject = selectedContent.Drawings[i];
+				
+				var sp = oDrawingCopyObject.Drawing;
+                AscFormat.ExecuteNoHistory(function(){
+                    if(!sp.spPr)
+                    {
+                        sp.setSpPr(new AscFormat.CSpPr());
+                    }
+                    if(!sp.spPr.xfrm)
+                    {
+                        sp.spPr.setXfrm(new AscFormat.CXfrm());
+                    }
+                    if(!sp.spPr.xfrm.isNotNull())
+                    {
+                        sp.spPr.xfrm.setOffX(oDrawingCopyObject.X);
+                        sp.spPr.xfrm.setOffY(oDrawingCopyObject.Y);
+                        sp.spPr.xfrm.setExtX(oDrawingCopyObject.ExtX);
+                        sp.spPr.xfrm.setExtY(oDrawingCopyObject.ExtY);
+                    }
+                }, this, []);
+			}
+			
 			this.CopyDocument2(this.oRoot, oDocument, selectedContent);
 
             var sBase64 = this.oPresentationWriter.GetBase64Memory();
@@ -3806,7 +3831,16 @@ PasteProcessor.prototype =
 
                     if(drawings && drawings.length)
                     {
-                        for(var j = 0; j < drawings.length; j++)
+                        //если массив содержит только изображения
+						if(elements && 1 === elements.length && elements[0].Element && type_Paragraph == elements[0].Element.Get_Type())
+						{
+							if(true === this._isParagraphContainsOnlyDrawing(elements[0].Element))
+							{
+								elements = [];
+							}
+						}
+						
+						for(var j = 0; j < drawings.length; j++)
                         {
                             drawingCopyObject = new DrawingCopyObject();
                             drawingCopyObject.Drawing = drawings[j].GraphicObj;
@@ -3857,14 +3891,16 @@ PasteProcessor.prototype =
                             {
                                 if (!(presentationSelectedContent.Drawings[i].Drawing instanceof CGraphicFrame))
                                 {
-                                    if (presentationSelectedContent.Drawings[i].Drawing.setBDeleted2)
-                                    {
-                                        presentationSelectedContent.Drawings[i].Drawing.setBDeleted2(true);
-                                    }
-                                    else
-                                    {
-                                        presentationSelectedContent.Drawings[i].Drawing.setBDeleted(true);
-                                    }
+                                    AscFormat.ExecuteNoHistory(function(){
+                                        if (presentationSelectedContent.Drawings[i].Drawing.setBDeleted2)
+                                        {
+                                            presentationSelectedContent.Drawings[i].Drawing.setBDeleted2(true);
+                                        }
+                                        else
+                                        {
+                                            presentationSelectedContent.Drawings[i].Drawing.setBDeleted(true);
+                                        }
+                                    }, this, []);
                                     presentationSelectedContent.Drawings[i].Drawing = presentationSelectedContent.Drawings[i].Drawing.convertToPPTX(oThis.oDocument.DrawingDocument);
                                   AscFormat.checkBlipFillRasterImages(presentationSelectedContent.Drawings[i].Drawing);
                                 }
@@ -4086,6 +4122,31 @@ PasteProcessor.prototype =
             });
         }
     },
+	
+	_isParagraphContainsOnlyDrawing: function(par)
+	{
+		var res = true;
+		
+		if(par.Content)
+		{
+			for(var i = 0; i < par.Content.length; i++)
+			{	
+				if(par.Content[i] && par.Content[i].Content && par.Content[i].Content.length)
+				{
+					for(var j = 0; j < par.Content[i].Content.length; j++)
+					{
+						var elem = par.Content[i].Content[j]; 
+						if(!(para_Drawing === elem.Get_Type() || para_End === elem.Get_Type()))
+						{
+							res = false;
+						}
+					}
+				}
+			}
+		}
+		
+		return res;
+	},
 	
 	_convertExcelBinary: function(aContentExcel, pDrawings)
 	{
@@ -5944,7 +6005,7 @@ PasteProcessor.prototype =
             this.aContent.push(table);
         }
     },
-    _ExecuteBorder : function(computedStyle, node, type, type2, bAddIfNull)
+    _ExecuteBorder : function(computedStyle, node, type, type2, bAddIfNull, setUnifill)
     {
         var res = null;
         var style = computedStyle.getPropertyValue( "border-"+type+"-style" );
@@ -5963,7 +6024,16 @@ PasteProcessor.prototype =
                     res.Size = width;
                 var color = computedStyle.getPropertyValue( "border-"+type+"-color" );
                 if(null != color && (color = this._ParseColor(color)))
-                    res.Color = color;
+                {
+                    if(setUnifill && color)
+                    {
+                        res.Unifill = AscFormat.CreteSolidFillRGB(color.r, color.g, color.b);
+                    }
+                    else
+                    {
+                        res.Color = color;
+                    }
+                }
             }
         }
         if(bAddIfNull && null == res)
@@ -7334,16 +7404,16 @@ PasteProcessor.prototype =
             var background_color = computedStyle.getPropertyValue( "background-color" );
             if(null != background_color && (background_color = this._ParseColor(background_color)))
                 table.Set_TableShd(c_oAscShdClear, background_color.r, background_color.g, background_color.b);
-            var oLeftBorder = this._ExecuteBorder(computedStyle, tableNode, "left", "Left", false);
+            var oLeftBorder = this._ExecuteBorder(computedStyle, tableNode, "left", "Left", false, true);
             if(null != oLeftBorder)
                 table.Set_TableBorder_Left(oLeftBorder);
-            var oTopBorder = this._ExecuteBorder(computedStyle, tableNode, "top", "Top", false);
+            var oTopBorder = this._ExecuteBorder(computedStyle, tableNode, "top", "Top", false, true);
             if(null != oTopBorder)
                 table.Set_TableBorder_Top(oTopBorder);
-            var oRightBorder = this._ExecuteBorder(computedStyle, tableNode, "right", "Right", false);
+            var oRightBorder = this._ExecuteBorder(computedStyle, tableNode, "right", "Right", false, true);
             if(null != oRightBorder)
                 table.Set_TableBorder_Right(oRightBorder);
-            var oBottomBorder = this._ExecuteBorder(computedStyle, tableNode, "bottom", "Bottom", false);
+            var oBottomBorder = this._ExecuteBorder(computedStyle, tableNode, "bottom", "Bottom", false, true);
             if(null != oBottomBorder)
                 table.Set_TableBorder_Bottom(oBottomBorder);
 
@@ -7488,19 +7558,19 @@ PasteProcessor.prototype =
             {
                 var Shd = new CDocumentShd();
                 Shd.Value = c_oAscShdClear;
-                Shd.Color = background_color;
+                Shd.Unifill = AscFormat.CreteSolidFillRGB(background_color.r,background_color.g, background_color.b);
                 cell.Set_Shd(Shd);
             }
-            var border = this._ExecuteBorder(computedStyle, node, "left", "Left", bAddIfNull);
+            var border = this._ExecuteBorder(computedStyle, node, "left", "Left", bAddIfNull, true);
             if(null != border)
                 cell.Set_Border(border, 3);
-            var border = this._ExecuteBorder(computedStyle, node, "top", "Top", bAddIfNull);
+            var border = this._ExecuteBorder(computedStyle, node, "top", "Top", bAddIfNull, true);
             if(null != border)
                 cell.Set_Border(border, 0);
-            var border = this._ExecuteBorder(computedStyle, node, "right", "Right", bAddIfNull);
+            var border = this._ExecuteBorder(computedStyle, node, "right", "Right", bAddIfNull, true);
             if(null != border)
                 cell.Set_Border(border, 1);
-            var border = this._ExecuteBorder(computedStyle, node, "bottom", "Bottom", bAddIfNull);
+            var border = this._ExecuteBorder(computedStyle, node, "bottom", "Bottom", bAddIfNull, true);
             if(null != border)
                 cell.Set_Border(border, 2);
 

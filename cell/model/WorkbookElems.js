@@ -3309,6 +3309,7 @@ CCellValue.prototype =
 					return cErrorOrigin["ref"];
 					break;
 				case cErrorLocal["name"]:
+				case cErrorLocal["name"].replace('\\', ''): // ToDo это неправильная правка для бага 32463 (нужно переделать parse формул)
 					return cErrorOrigin["name"];
 					break;
 				case cErrorLocal["num"]:
@@ -3646,7 +3647,7 @@ CCellValue.prototype =
 				return cErrorLocal["ref"];
 				break;
 			case cErrorOrigin["name"]:
-				return cErrorLocal["name"];
+				return cErrorLocal["name"].replace('\\', ''); // ToDo это неправильная правка для бага 32463 (нужно переделать parse формул)
 				break;
 			case cErrorOrigin["num"]:
 				return cErrorLocal["num"];
@@ -4642,7 +4643,7 @@ function TablePart(handlers) {
 	this.result = null;
 	this.handlers = handlers;
 }
-TablePart.prototype.clone = function(ws) {
+TablePart.prototype.clone = function(ws, tableName) {
 	var i, res = new TablePart(this.handlers);
 	res.Ref = this.Ref ? this.Ref.clone() : null;
 	res.HeaderRowCount = this.HeaderRowCount;
@@ -4665,14 +4666,22 @@ TablePart.prototype.clone = function(ws) {
 			res.result.push(this.result[i].clone());
 	}
 	
-	res.DisplayName = this.DisplayName;
+	if(tableName)
+	{
+		res.DisplayName = tableName;
+	}
+	else
+	{
+		res.DisplayName = this.DisplayName;
+	}
+	
 	if(ws !== null)
-		res.recalc(ws);
+		res.recalc(ws, tableName);
 		
 	return res;
 };
-TablePart.prototype.recalc = function(ws) {
-	this.DisplayName = ws.workbook.dependencyFormulas.getNextTableName(ws, this.Ref);
+TablePart.prototype.recalc = function(ws, tableName) {
+	this.DisplayName = ws.workbook.dependencyFormulas.getNextTableName(ws, this.Ref, tableName);
 };
 TablePart.prototype.moveRef = function(col, row) {
 	var ref = this.Ref.clone();
@@ -4695,7 +4704,7 @@ TablePart.prototype.changeRef = function(col, row, bIsFirst) {
 	this.Ref = ref;
 	
 	//event
-	var endRow = this.TotalsRowCount && this.TotalsRowCount >= 1 ? this.Ref.r2 - 1 : this.Ref.r2;
+	var endRow = this.TotalsRowCount ? this.Ref.r2 - 1 : this.Ref.r2;
 	var refNamedRanges = Asc.Range(this.Ref.c1, this.Ref.r1, this.Ref.c2, endRow);
 	this.handlers.trigger("changeRefTablePart", this.DisplayName, refNamedRanges);
 	
@@ -4711,29 +4720,33 @@ TablePart.prototype.changeRefOnRange = function(range, autoFilters, generateNewT
 	{
 		var newTableColumns = [];
 		var intersectionRanges = this.Ref.intersection(range);
-		for(var i = range.c1; i <= range.c2; i++)
+		
+		if(null !== intersectionRanges)
 		{
-			var tableColumn;
-			if(i >= intersectionRanges.c1 && i <= intersectionRanges.c2)
+			for(var i = range.c1; i <= range.c2; i++)
 			{
-				var tableIndex = i - this.Ref.c1;
-				tableColumn = this.TableColumns[tableIndex];
-			}
-			else
-			{
-				tableColumn = new TableColumn();
+				var tableColumn;
+				if(i >= intersectionRanges.c1 && i <= intersectionRanges.c2)
+				{
+					var tableIndex = i - this.Ref.c1;
+					tableColumn = this.TableColumns[tableIndex];
+				}
+				else
+				{
+					tableColumn = new TableColumn();
+				}
+				
+				newTableColumns.push(tableColumn);
 			}
 			
-			newTableColumns.push(tableColumn);
+			for(var j = 0; j < newTableColumns.length; j++)
+			{
+				if(newTableColumns[j].Name === null)
+					newTableColumns[j].Name = autoFilters._generateColumnName2(newTableColumns);
+			}
+			
+			this.TableColumns = newTableColumns;
 		}
-		
-		for(var j = 0; j < newTableColumns.length; j++)
-		{
-			if(newTableColumns[j].Name === null)
-				newTableColumns[j].Name = autoFilters._generateColumnName2(newTableColumns);
-		}
-		
-		this.TableColumns = newTableColumns;
 	}
 	
 	this.Ref = Asc.Range(range.c1, range.r1, range.c2, range.r2);
@@ -4848,7 +4861,10 @@ TablePart.prototype.getTableRangeForFormula = function(objectParam)
 		}
 		case FormulaTablePartInfo.data:
 		{
-			res = new Asc.Range(this.Ref.c1, this.Ref.r1 + 1, this.Ref.c2, this.Ref.r2);
+			var startRow = this.HeaderRowCount === null ? this.Ref.r1 + 1 : this.Ref.r1;
+			var endRow = this.TotalsRowCount ? this.Ref.r2 - 1 : this.Ref.r2;
+			
+			res = new Asc.Range(this.Ref.c1, startRow, this.Ref.c2, endRow);
 			break;
 		}
 		case FormulaTablePartInfo.headers:
@@ -4858,7 +4874,7 @@ TablePart.prototype.getTableRangeForFormula = function(objectParam)
 		}
 		case FormulaTablePartInfo.totals:
 		{
-			if(this.TotalsRowCount && this.TotalsRowCount >= 1)
+			if(this.TotalsRowCount)
 			{
 				res = new Asc.Range(this.Ref.c1, this.Ref.r2, this.Ref.c2, this.Ref.r2);
 			}
@@ -4883,7 +4899,7 @@ TablePart.prototype.getTableRangeForFormula = function(objectParam)
 				endCol = startCol;
 			
 			var startRow = this.HeaderRowCount === null ? this.Ref.r1 + 1 : this.Ref.r1;
-			var endRow = this.TotalsRowCount > 0 ? this.Ref.r2 - 1 : this.Ref.r2;
+			var endRow = this.TotalsRowCount ? this.Ref.r2 - 1 : this.Ref.r2;
 			
 			res = new Asc.Range(this.Ref.c1 + startCol, startRow, this.Ref.c1 + endCol, endRow);
 			break;
@@ -4955,11 +4971,15 @@ TablePart.prototype.showButton = function(val)
 
 TablePart.prototype.isShowButton = function()
 {
-	var res = true;
+	var res = false;
 	
 	if(this.AutoFilter)
 	{
 		res = this.AutoFilter.isShowButton();
+	}
+	else
+	{
+		res = null;
 	}
 	
 	return res;
@@ -4980,6 +5000,14 @@ TablePart.prototype.changeDisplayName = function(newName)
 {
 	this.DisplayName = newName;
 }; 
+
+TablePart.prototype.getRangeWithoutHeaderFooter = function()
+{
+	var startRow = this.HeaderRowCount === null ? this.Ref.r1 + 1 : this.Ref.r1;
+	var endRow = this.TotalsRowCount ? this.Ref.r2 - 1 : this.Ref.r2;
+	
+	return Asc.Range(this.Ref.c1, startRow, this.Ref.c2, endRow);
+};
 
 /** @constructor */
 function AutoFilter() {
@@ -5104,9 +5132,18 @@ AutoFilter.prototype.showButton = function(val) {
 		var columnsLength = this.Ref.c2 - this.Ref.c1 + 1;
 		for(var i = 0; i < columnsLength; i++)
 		{
-			this.FilterColumns[i] = new FilterColumn();
-			this.FilterColumns[i].ColId = i;
-			this.FilterColumns[i].ShowButton = false;
+			var filterColumn = this._getFilterColumnByColId(i);
+			if(filterColumn)
+			{
+				filterColumn.ShowButton = false;
+			}
+			else
+			{
+				filterColumn = new FilterColumn();
+				filterColumn.ColId = i;
+				filterColumn.ShowButton = false;
+				this.FilterColumns.push(filterColumn);
+			}
 		}
 	}
 	else
@@ -5140,6 +5177,29 @@ AutoFilter.prototype.isShowButton = function()
 	return res;
 };
 
+AutoFilter.prototype.getRangeWithoutHeaderFooter = function()
+{
+	return Asc.Range(this.Ref.c1, this.Ref.r1 + 1, this.Ref.c2, this.Ref.r2);
+}; 
+
+AutoFilter.prototype._getFilterColumnByColId = function(colId)
+{
+	var res = false;
+	
+	if(this.FilterColumns && this.FilterColumns.length)
+	{
+		for(var i = 0; i < this.FilterColumns.length; i++)
+		{
+			if(this.FilterColumns[i].ColId === colId)
+			{
+				res = this.FilterColumns[i];
+				break;
+			}
+		}
+	}
+	
+	return res;
+}; 
 
 function FilterColumns() {
 	this.ColId = null;
@@ -5964,7 +6024,7 @@ DynamicFilter.prototype.init = function(range) {
 			var counter = 0;
 			
 			range._foreach2(function(cell){
-				var val = parseFloat(cell.getValue());
+				var val = parseFloat(cell.getValueWithoutFormat());
 				
 				if(!isNaN(val))
 				{
@@ -6053,7 +6113,30 @@ ColorFilter.prototype.isHideValue = function(cell) {
 	
 	var res = true;
 	
-	if(this.dxf && this.dxf.fill && this.dxf.fill.bg && cell)
+	var isEqualColors = function(filterColor, cellColor)
+	{
+		var res = false;
+		if(filterColor === cellColor)
+		{
+			res = true;
+		}
+		else if(!filterColor && (!cellColor || null === cellColor.rgb || 0 === cellColor.rgb))
+		{
+			res = true;
+		}
+		else if(!cellColor && (!filterColor || null === filterColor.rgb || 0 === filterColor.rgb))
+		{
+			res = true;
+		}
+		else if(cellColor && filterColor && cellColor.rgb === filterColor.rgb)
+		{
+			res = true;
+		}
+		
+		return res;
+	};
+	
+	if(this.dxf && this.dxf.fill && cell)
 	{
 		var filterColor = this.dxf.fill.bg;
 		cell = cell.getCells()[0];
@@ -6065,7 +6148,7 @@ ColorFilter.prototype.isHideValue = function(cell) {
 				for(var j = 0; j < cell.oValue.multiText.length; j++)
 				{
 					var fontColor = cell.oValue.multiText[j].format ? cell.oValue.multiText[j].format.c : null;
-					if(fontColor !== null && fontColor.rgb === filterColor.rgb)
+					if(isEqualColors(filterColor,fontColor ))
 					{
 						res = false;
 						break;
@@ -6075,11 +6158,7 @@ ColorFilter.prototype.isHideValue = function(cell) {
 			else
 			{
 				var fontColor =  cell.xfs && cell.xfs.font ? cell.xfs.font.c : null;
-				if(fontColor !== null && fontColor.rgb === filterColor.rgb)
-				{
-					res = false;
-				}
-				else if(fontColor === null && (null === filterColor || (null !== filterColor && (0 === filterColor.rgb || null === filterColor.rgb))))
+				if(isEqualColors(filterColor,fontColor))
 				{
 					res = false;
 				}
@@ -6088,11 +6167,9 @@ ColorFilter.prototype.isHideValue = function(cell) {
 		else
 		{
 			var color = cell.getStyle();
-			if(color !== null && color.fill && color.fill.bg && color.fill.bg.rgb === filterColor.rgb)
-			{
-				res = false;
-			}
-			else if(color === null && (null === this.dxf.fill.bg || (null !== this.dxf.fill.bg && null === this.dxf.fill.bg.rgb)))
+			var cellColor =  color !== null && color.fill && color.fill.bg ? color.fill.bg : null;
+			
+			if(isEqualColors(filterColor, cellColor))
 			{
 				res = false;
 			}
@@ -6194,10 +6271,11 @@ Top10.prototype.clone = function() {
 	res.Val = this.Val;
 	return res;
 };
-Top10.prototype.isHideValue = function(val, top10Length) {
+Top10.prototype.isHideValue = function(val) {
+	// ToDo работает не совсем правильно.
 	var res = false;
 	
-	if(null !== this.filterVal)
+	if(null !== this.FilterVal)
 	{
 		if(this.Top)
 		{
@@ -6229,8 +6307,8 @@ Top10.prototype.init = function(range, reWrite){
 			var arr = [];
 			var alreadyAddValues = {};
 			var count = 0;
-			range._foreach2(function(cell){
-				var val = parseFloat(cell.getValue());
+			range._setPropertyNoEmpty(null, null, function(cell){
+				var val = parseFloat(cell.getValueWithoutFormat());
 				
 				if(!isNaN(val) && !alreadyAddValues[val])
 				{
@@ -6259,6 +6337,11 @@ Top10.prototype.init = function(range, reWrite){
 				if(this.Percent)
 				{
 					var num = parseInt(count * (this.Val / 100));
+					if(0 === num)
+					{
+						num = 1;
+					}
+					
 					res = arr[num - 1];
 				}
 				else

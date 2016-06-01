@@ -509,6 +509,9 @@ function NewShapeTrack(presetGeom, startX, startY, theme, master, layout, slide,
                 shape.txBody.setContent(content);
                 var body_pr = new AscFormat.CBodyPr();
                 body_pr.setDefault();
+                if(drawingObjects && !drawingObjects.cSld){
+                    body_pr.vertOverflow = AscFormat.nOTClip;
+                }
                 shape.txBody.setBodyPr(body_pr);
             }
         }

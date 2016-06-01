@@ -1,15 +1,59 @@
 (function(window, undefined){
 
+    function CPluginData()
+    {
+        this.privateData = {};
+    }
+    CPluginData.prototype =
+    {
+        setAttribute : function(name, value)
+        {
+            this.privateData[name] = value;
+        },
+
+        getAttribute : function(name)
+        {
+            return this.privateData[name];
+        },
+
+        serialize : function()
+        {
+            var _data = "";
+            try
+            {
+                _data = JSON.stringify(this.privateData);
+            }
+            catch(err)
+            {
+                _data = "{ \"data\" : \"\" }";
+            }
+            return _data;
+        },
+
+        deserialize : function(_data)
+        {
+            try
+            {
+                this.privateData = JSON.parse(_data);
+            }
+            catch(err)
+            {
+                this.privateData = { "data" : "" };
+            }
+        }
+    };
+
     function CPluginsManager(api)
     {
         this.plugins = [];
         this.current = null;
-        this.path = "";
+        this.path = "../../../../sdkjs-plugins/";
         this.api = null;
 
-        this.startData = "";
-
+        this.startData = null;
         this.runAndCloseData = null;
+
+        this.closeAttackTimer = -1; // защита от плагитнов, которые не закрываются
     }
 
     CPluginsManager.prototype =
@@ -20,7 +64,7 @@
             for (var i = 0; i < plugins.length; i++)
                 this.plugins.push(plugins[i]);
         },
-        run      : function(guid, data)
+        run      : function(guid, variation, data)
         {
             if (null != this.current)
             {
@@ -28,6 +72,7 @@
                 {
                     this.runAndCloseData = {};
                     this.runAndCloseData.guid = guid;
+                    this.runAndCloseData.variation = variation;
                     this.runAndCloseData.data = data;
                 }
                 // закрываем
@@ -40,21 +85,41 @@
                 if (this.plugins[i].guid == guid)
                 {
                     this.current = this.plugins[i];
+                    break;
                 }
             }
 
             if (this.current == null)
                 return false;
 
-            this.startData = data;
+            this.startData = (data == null || data == "") ? new CPluginData() : data;
+            this.startData.setAttribute("guid", guid)
+            this.correctData(this.startData);
             this.show();
         },
-        runResize   : function(guid, data, width, height)
+        runResize   : function(data)
         {
+            var guid = data.getAttribute("guid");
+            for (var i = 0; i < this.plugins.length; i++)
+            {
+                if (this.plugins[i].guid == guid)
+                {
+                    if (this.plugins[i].variations[0].isUpdateOleOnResize !== true)
+                        return;
+                }
+            }
+
+            data.setAttribute("resize", true);
+            return this.run(guid, 0, data);
         },
         close    : function()
         {
-            if (!this.current.isVisual) {
+            if (this.startData.getAttribute("resize") === true)
+                this.endLongAction();
+            this.startData = null;
+
+            if (true)
+            {
                 var _div = document.getElementById("plugin_iframe");
                 if (_div)
                     _div.parentNode.removeChild(_div);
@@ -63,7 +128,7 @@
 
             if (this.runAndCloseData)
             {
-                this.run(this.runAndCloseData.guid, this.runAndCloseData.data);
+                this.run(this.runAndCloseData.guid, this.runAndCloseData.variation, this.runAndCloseData.data);
                 this.runAndCloseData = null;
             }
             this.api.asc_fireCallback("asc_onPluginClose");
@@ -71,7 +136,10 @@
 
         show : function()
         {
-            if (this.current.isVisual)
+            if (this.startData.getAttribute("resize") === true)
+                this.startLongAction();
+
+            if (this.current.variations[0].isVisual && this.startData.getAttribute("resize") !== true)
             {
                 this.api.asc_fireCallback("asc_onPluginShow", this.current);
             }
@@ -80,7 +148,8 @@
                 var ifr = document.createElement("iframe");
                 ifr.name = "plugin_iframe";
                 ifr.id = "plugin_iframe";
-                ifr.src = this.path + this.current.url;
+                var _add = this.current.baseUrl == "" ? this.path : this.current.baseUrl;
+                ifr.src = _add + this.current.variations[0].url;
                 ifr.style.position = 'absolute';
                 ifr.style.top = '-100px';
                 ifr.style.left = '0px';
@@ -94,17 +163,31 @@
 
         buttonClick : function(id)
         {
+            if (this.closeAttackTimer != -1)
+            {
+                clearTimeout(this.closeAttackTimer);
+                this.closeAttackTimer = -1;
+            }
+
+            if (-1 == id)
+            {
+                // защита от плохого плагина
+                this.closeAttackTimer = setTimeout(function(){ window.g_asc_plugins.close(); }, 5000);
+            }
             var _iframe = document.getElementById("plugin_iframe");
             if (_iframe)
             {
-                _iframe.contentWindow.postMessage(this.current.guid + ";button;" + id, "*");
+                var pluginData = new CPluginData();
+                pluginData.setAttribute("guid", this.current.guid);
+                pluginData.setAttribute("type", "button");
+                pluginData.setAttribute("button", "" + id);
+                _iframe.contentWindow.postMessage(pluginData.serialize(), "*");
             }
         },
 
         init : function()
         {
-            var _data = "";
-            switch (this.current.initDataType)
+            switch (this.current.variations[0].initDataType)
             {
                 case Asc.EPluginDataType.text:
                 {
@@ -114,12 +197,12 @@
                     };
                     
                     this.api.asc_CheckCopy(text_data, 1);
-                    _data = text_data.data;
+                    this.startData.setAttribute("data", text_data.data);
                     break;
                 }
                 case Asc.EPluginDataType.ole:
                 {
-                    _data = this.startData;
+                    // теперь выше задается
                     break;
                 }
             }
@@ -127,10 +210,66 @@
             var _iframe = document.getElementById("plugin_iframe");
             if (_iframe)
             {
-                _iframe.contentWindow.postMessage(this.current.guid + ";init;" + _data, "*");
+                this.startData.setAttribute("type", "init");
+                _iframe.contentWindow.postMessage(this.startData.serialize(), "*");
             }
+        },
+        correctData : function(pluginData)
+        {
+            pluginData.setAttribute("editorType", this.api._editorNameById());
+
+            var _mmToPx = AscCommon.g_dKoef_mm_to_pix;
+            if (this.api.WordControl && this.api.WordControl.m_nZoomValue)
+                _mmToPx *= this.api.WordControl.m_nZoomValue / 100;
+
+            pluginData.setAttribute("mmToPx", _mmToPx);
+
+            if (undefined == pluginData.getAttribute("data"))
+                pluginData.setAttribute("data", "");
+        },
+        loadExtensionPlugins : function(_plugins)
+        {
+            if (!_plugins || _plugins.length < 1)
+                return;
+
+            var _map = {};
+            for (var i = 0; i < this.plugins.length; i++)
+                _map[this.plugins[i].guid] = true;
+
+            for (var i = 0; i < _plugins.length; i++)
+            {
+                var _p = new Asc.CPlugin();
+                _p["deserialize"](_plugins[i]);
+
+                if (_map[_p.guid] === true)
+                    continue;
+
+                this.plugins.push(_p);
+            }
+
+            var _pluginsInstall = { "url" : this.path, "pluginsData" : [] };
+            for (var i = 0; i < this.plugins.length; i++)
+            {
+                _pluginsInstall["pluginsData"].push(this.plugins[i].serialize());
+            }
+
+            this.api.asc_fireCallback("asc_onPluginsInit", _pluginsInstall);
+        },
+
+        startLongAction : function()
+        {
+            console.log("startLongAction");
+            this.api.sync_StartAction(Asc.c_oAscAsyncActionType.BlockInteraction, Asc.c_oAscAsyncAction.SlowOperation);
+        },
+        endLongAction : function()
+        {
+            console.log("endLongAction");
+            this.api.sync_EndAction(Asc.c_oAscAsyncActionType.BlockInteraction, Asc.c_oAscAsyncAction.SlowOperation);
         }
     };
+
+    // export
+    CPluginsManager.prototype["buttonClick"] = CPluginsManager.prototype.buttonClick;
 
     function onMessage(event)
     {
@@ -139,20 +278,16 @@
 
         if (typeof(event.data) == "string")
         {
-            var i1 = event.data.indexOf(";");
-            if (-1 == i1)
-                return;
+            var pluginData = new CPluginData();
+            pluginData.deserialize(event.data);
 
-            var guid = event.data.substr(0, i1);
+            var guid = pluginData.getAttribute("guid");
+
             if (guid != window.g_asc_plugins.current.guid)
                 return;
 
-            var i2 = event.data.indexOf(";", i1 + 1);
-            if (-1 == i2)
-                return;
-
-            var name = event.data.substr(i1 + 1, i2 - i1 - 1);
-            var value = event.data.substr(i2 + 1);
+            var name = pluginData.getAttribute("type");
+            var value = pluginData.getAttribute("data");
 
             if ("initialize" == name)
             {
@@ -161,7 +296,13 @@
             }
             else if ("close" == name)
             {
-                if (value != "")
+                if (window.g_asc_plugins.closeAttackTimer != -1)
+                {
+                    clearTimeout(window.g_asc_plugins.closeAttackTimer);
+                    window.g_asc_plugins.closeAttackTimer = -1;
+                }
+
+                if (value && value != "")
                 {
                     try
                     {
@@ -197,65 +338,164 @@
         window.g_asc_plugins.api    = api;
         window.g_asc_plugins["api"] = window.g_asc_plugins.api;
 
+        window.g_asc_plugins.api.asc_registerCallback('asc_onDocumentContentReady', function(){
+
+            setTimeout(function(){
+                window.g_asc_plugins.loadExtensionPlugins(window["Asc"]["extensionPlugins"]);
+            }, 10);
+
+        });
+
         return window.g_asc_plugins;
     };
 
+    window["Asc"].CPluginData = CPluginData;
+    window["Asc"].CPluginData_wrap = function(obj)
+    {
+        if (!obj.getAttribute)
+            obj.getAttribute = function(name) { return this[name]; }
+        if (!obj.setAttribute)
+            obj.setAttribute = function(name, value) { return this[name] = value; }
+    };
 })(window, undefined);
 
 // потом удалить!!!
 function TEST_PLUGINS()
 {
-    var plugin1                 = new Asc.CPlugin();
-    plugin1.name                = "chess (fen)";
-    plugin1.guid                = "{FFE1F462-1EA2-4391-990D-4CC84940B754}";
-    plugin1.url                 = "chess/index.html";
-    plugin1.icons               = ["chess/icon.png", "chess/icon@2x.png"];
-    plugin1.isVisual            = true;
-    plugin1.initDataType        = Asc.EPluginDataType.ole;
-    plugin1.isUpdateOleOnResize = true;
-    plugin1.buttons             = [{"text":"Ok","primary":true},{"text":"Cancel","primary":false}];
+    var _plugins                = [
+        {
+            name : "chess (fen)",
+            guid : "asc.{FFE1F462-1EA2-4391-990D-4CC84940B754}",
 
-    var plugin2                 = new Asc.CPlugin();
-    plugin2.name                = "glavred";
-    plugin2.guid                = "{B631E142-E40B-4B4C-90B9-2D00222A286E}";
-    plugin2.url                 = "glavred/index.html";
-    plugin2.icons               = ["glavred/icon.png", "glavred/icon@2x.png"];
-    plugin2.isVisual            = true;
-    plugin2.initDataType        = Asc.EPluginDataType.text;
-    plugin2.isUpdateOleOnResize = false;
-    plugin2.buttons             = [{"text":"Ok","primary":true}];
+            variations : [
+                {
+                    description : "chess",
+                    url         : "chess/index.html",
 
-    var plugin3                 = new Asc.CPlugin();
-    plugin3.name                = "bold";
-    plugin3.guid                = "{14E46CC2-5E56-429C-9D55-1032B596D928}";
-    plugin3.url                 = "bold/index.html";
-    plugin3.icons               = ["bold/icon.png", "bold/icon@2x.png"];
-    plugin3.isVisual            = false;
-    plugin3.initDataType        = Asc.EPluginDataType.none;
-    plugin3.isUpdateOleOnResize = false;
-    plugin3.buttons             = [];
+                    icons           : ["chess/icon.png", "chess/icon@2x.png"],
+                    isViewer        : true,
+                    EditorsSupport  : ["word", "cell", "slide"],
 
-    var plugin4                 = new Asc.CPlugin();
-    plugin4.name                = "speech";
-    plugin4.guid                = "{D71C2EF0-F15B-47C7-80E9-86D671F9C595}";
-    plugin4.url                 = "speech/index.html";
-    plugin4.icons               = ["speech/icon.png", "speech/icon@2x.png"];
-    plugin4.isVisual            = false;
-    plugin4.initDataType        = Asc.EPluginDataType.text;
-    plugin4.isUpdateOleOnResize = false;
-    plugin4.buttons             = [];
+                    isVisual        : true,
+                    isModal         : true,
+                    isInsideMode    : false,
 
-    var _plugins = [plugin1, plugin2, plugin3, plugin4];
-    window.g_asc_plugins.api.asc_pluginsRegister("../../../../sdkjs-plugins/", _plugins);
+                    initDataType    : "ole",
+                    initData        : "",
 
-    // добавляем кнопки (тест)
-    var _elem = document.getElementById("view-left-menu").childNodes[1];
+                    isUpdateOleOnResize : true,
 
-    for (var i = 0; i < _plugins.length; i++)
-    {
-        var _button = "<button class='btn btn-category' content-target='' data-toggle='tooltip' data-original-title='' title='' " +
-            "onclick='window.g_asc_plugins.run(\"" + _plugins[i].guid + "\")'><span>" + (i + 1) + "</span></button>";
+                    buttons         : [ { text: "Ok", primary: true },
+                        { text: "Cancel", primary: false } ]
+                }
+            ]
+        },
+        {
+            name : "glavred",
+            guid : "asc.{B631E142-E40B-4B4C-90B9-2D00222A286E}",
 
-        _elem.innerHTML += _button;
-    }
+            variations : [
+                {
+                    description : "glavred",
+                    url         : "glavred/index.html",
+
+                    icons           : ["glavred/icon.png", "glavred/icon@2x.png"],
+                    isViewer        : true,
+                    EditorsSupport  : ["word", "cell", "slide"],
+
+                    isVisual        : true,
+                    isModal         : true,
+                    isInsideMode    : false,
+
+                    initDataType    : "text",
+                    initData        : "",
+
+                    isUpdateOleOnResize : false,
+
+                    buttons         : [ { text: "Ok", primary: true } ]
+                }
+            ]
+        },
+        {
+            name : "bold",
+            guid : "asc.{14E46CC2-5E56-429C-9D55-1032B596D928}",
+
+            variations : [
+                {
+                    description : "bold",
+                    url         : "bold/index.html",
+
+                    icons           : ["bold/icon.png", "bold/icon@2x.png"],
+                    isViewer        : false,
+                    EditorsSupport  : ["word", "cell", "slide"],
+
+                    isVisual        : false,
+                    isModal         : false,
+                    isInsideMode    : false,
+
+                    initDataType    : "none",
+                    initData        : "",
+
+                    isUpdateOleOnResize : false,
+
+                    buttons         : []
+                }
+            ]
+        },
+        {
+            name : "speech",
+            guid : "asc.{D71C2EF0-F15B-47C7-80E9-86D671F9C595}",
+
+            variations : [
+                {
+                    description : "speech",
+                    url         : "speech/index.html",
+
+                    icons           : ["speech/icon.png", "speech/icon@2x.png"],
+                    isViewer        : true,
+                    EditorsSupport  : ["word", "cell", "slide"],
+
+                    isVisual        : false,
+                    isModal         : false,
+                    isInsideMode    : false,
+
+                    initDataType    : "text",
+                    initData        : "",
+
+                    isUpdateOleOnResize : false,
+
+                    buttons         : [ ]
+                }
+            ]
+        },
+        {
+            name : "youtube",
+            guid : "asc.{38E022EA-AD92-45FC-B22B-49DF39746DB4}",
+
+            variations : [
+                {
+                    description : "youtube",
+                    url         : "youtube/index.html",
+
+                    icons           : ["youtube/icon.png", "youtube/icon@2x.png"],
+                    isViewer        : true,
+                    EditorsSupport  : ["word", "cell", "slide"],
+
+                    isVisual        : true,
+                    isModal         : true,
+                    isInsideMode    : false,
+
+                    initDataType    : "ole",
+                    initData        : "",
+
+                    isUpdateOleOnResize : false,
+
+                    buttons         : [ { text: "Ok", primary: true },
+                        { text: "Cancel", primary: false } ]
+                }
+            ]
+        }
+    ];
+
+    window.g_asc_plugins.loadExtensionPlugins(_plugins);
 }

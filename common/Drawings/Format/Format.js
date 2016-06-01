@@ -3787,6 +3787,7 @@ function CompareShapeProperties(shapeProp1, shapeProp2)
     {
         _result_shape_prop.locked = true;
     }
+    _result_shape_prop.lockAspect = !!(shapeProp1.lockAspect && shapeProp2.lockAspect);
     _result_shape_prop.textArtProperties = CompareTextArtProperties(shapeProp1.textArtProperties, shapeProp2.textArtProperties)
     return _result_shape_prop;
 }
@@ -4537,8 +4538,6 @@ function CNvPr()
     this.id = 0;
     this.name = "";
     this.isHidden = false;
-
-
 
     this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id)
@@ -11717,6 +11716,7 @@ function CreateAscShapeProp(shape)
     var ret = new asc_CShapeProperty();
     ret.fill = CreateAscFill(shape.brush);
     ret.stroke = CreateAscStroke(shape.pen);
+    ret.lockAspect = shape.getNoChangeAspect();
     var paddings = null;
     if(shape.textBoxContent)
     {
@@ -11754,7 +11754,7 @@ function CreateAscShapePropFromProp(shapeProp)
     {
         obj.Locked = shapeProp.locked;
     }
-
+    obj.lockAspect = shapeProp.lockAspect;
     if(typeof shapeProp.type === "string")
         obj.type = shapeProp.type;
     if(isRealObject(shapeProp.fill))
@@ -12130,6 +12130,8 @@ function CorrectUniColor(asc_color, unicolor, flag)
     window['AscFormat']._global_layout_summs_array = _global_layout_summs_array;
 
     window['AscFormat'].nOTOwerflow = nOTOwerflow;
+    window['AscFormat'].nOTClip = nOTClip;
+    window['AscFormat'].nOTEllipsis = nOTEllipsis;
 
     window['AscFormat'].BULLET_TYPE_BULLET_NONE = BULLET_TYPE_BULLET_NONE;
     window['AscFormat'].BULLET_TYPE_BULLET_CHAR = BULLET_TYPE_BULLET_CHAR;

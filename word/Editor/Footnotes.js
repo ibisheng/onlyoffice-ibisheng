@@ -44,6 +44,17 @@ CFootnotesController.prototype.Create_Footnote = function()
     return NewFootnote;
 };
 /**
+ * Сбрасываем рассчетные данный для заданной страницы.
+ * @param {number} nPageIndex
+ */
+CFootnotesController.prototype.Reset = function(nPageIndex)
+{
+    if (!this.Pages[nPageIndex])
+        this.Pages[nPageIndex] = new CFootEndnotePage();
+
+    this.Pages[nPageIndex].Reset();
+};
+/**
  * Пересчитываем сноски на заданной странице.
  */
 CFootnotesController.prototype.Recalculate = function(nPageIndex, X, XLimit, Y, YLimit)
@@ -75,7 +86,6 @@ CFootnotesController.prototype.Recalculate = function(nPageIndex, X, XLimit, Y, 
  */
 CFootnotesController.prototype.Get_Height = function(nPageIndex)
 {
-    return 0;
     var nHeight = 0;
     for (var nIndex = 0; nIndex < this.Pages[nPageIndex].Elements.length; ++nIndex)
     {
@@ -83,7 +93,35 @@ CFootnotesController.prototype.Get_Height = function(nPageIndex)
         var Bounds = Footnote.Get_PageBounds(0);
         nHeight += Bounds.Bottom - Bounds.Top;
     }
+
     return nHeight;
+};
+/**
+ * Отрисовываем сноски на заданной странице.
+ * @param {number} nPageIndex
+ * @param {CGraphics} pGraphics
+ */
+CFootnotesController.prototype.Draw = function(nPageIndex, pGraphics)
+{
+    for (var nIndex = 0; nIndex < this.Pages[nPageIndex].Elements.length; ++nIndex)
+    {
+        var Footnote = this.Pages[nPageIndex].Elements[nIndex];
+        Footnote.Draw(0, pGraphics);
+    }
+};
+/**
+ * Сдвигаем все рассчитанные позиции на заданной странице.
+ * @param {number} nPageIndex
+ * @param {number} dX
+ * @param {number} dY
+ */
+CFootnotesController.prototype.Shift = function(nPageIndex, dX, dY)
+{
+    for (var nIndex = 0; nIndex < this.Pages[nPageIndex].Elements.length; ++nIndex)
+    {
+        var Footnote = this.Pages[nPageIndex].Elements[nIndex];
+        Footnote.Shift(0, dX, dY);
+    }
 };
 /**
  * Добавляем заданную сноску на страницу для пересчета.
@@ -122,8 +160,16 @@ function CFootEndnotePage()
     this.YLimit = 0;
 
     this.Elements = [];
-
 }
+CFootEndnotePage.prototype.Reset = function()
+{
+    this.X      = 0;
+    this.Y      = 0;
+    this.XLimit = 0;
+    this.YLimit = 0;
+
+    this.Elements = [];
+};
 
 
 

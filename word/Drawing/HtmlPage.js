@@ -61,7 +61,7 @@ var GlobalSkinFlat = {
     isNeedInvertOnActive: false
 };
 
-var GlobalSkin = GlobalSkinTeamlab;
+var GlobalSkin = GlobalSkinFlat;
 
 function updateGlobalSkin(newSkin) {
     GlobalSkin.Name = newSkin.Name;

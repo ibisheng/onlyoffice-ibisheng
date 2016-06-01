@@ -95,7 +95,9 @@ function ReadWBModel(oDrawing, oReader)
         for(var i = 0; i < aObjects.length; ++i)
         {
             var oContent = aObjects[i];
-            oContent = bLbl ? oContent.compiledDlb.txBody.content : oContent.txBody.content;
+            oContent = bLbl ? oContent.compiledDlb && oContent.compiledDlb.txBody && oContent.compiledDlb.txBody.content : oContent.txBody && oContent.txBody.content;
+            if(!oContent)
+                continue;
             oContent.Set_ApplyToAll(true);
             var oTextPr = oContent.Get_Paragraph_TextPr();
             oContent.Set_ApplyToAll(false);
@@ -438,6 +440,11 @@ function checkPointInMap(map, worksheet, row, col)
                 {
                     CheckParagraphTextPr(aContent[i], oTextPr);
                 }
+
+                oElement.tx.rich.content.Set_ApplyToAll(true);
+                var oParTextPr = new AscCommonWord.ParaTextPr(oTextPr);
+                oElement.tx.rich.content.Paragraph_Add(oParTextPr);
+                oElement.tx.rich.content.Set_ApplyToAll(false);
             }
             CheckParagraphTextPr(oElement.txPr.content.Content[0], oTextPr);
         }
@@ -479,6 +486,8 @@ function checkPointInMap(map, worksheet, row, col)
 function CChartSpace()
 {
     CChartSpace.superclass.constructor.call(this);
+
+    this.nvGraphicFramePr = null;
     this.chart = null;
     this.clrMapOvr = null;
     this.date1904 = null;
@@ -554,7 +563,7 @@ CChartSpace.prototype.drawSelect = function(drawingDocument, nPageIndex)
                     {
                         for(var i = 0; i < pts.length; ++i)
                         {
-                            if(pts[i] && pts[i].compiledDlb)
+                            if(pts[i] && pts[i].compiledDlb && !pts[i].compiledDlb.bDelete)
                             {
                                 drawingDocument.DrawTrack(AscFormat.TYPE_TRACK.CHART_TEXT, pts[i].compiledDlb.transform, 0, 0, pts[i].compiledDlb.extX, pts[i].compiledDlb.extY, false, false);
                             }
@@ -576,10 +585,12 @@ CChartSpace.prototype.drawSelect = function(drawingDocument, nPageIndex)
             }
             else if(this.selection.legend)
             {
-                if(AscFormat.isRealNumber(this.selection.legendEntry) && this.chart.legend.calcEntryes[this.selection.legendEntry])
+                if(AscFormat.isRealNumber(this.selection.legendEntry))
                 {
-                    var oEntry = this.chart.legend.calcEntryes[this.selection.legendEntry];
-                    drawingDocument.DrawTrack(AscFormat.TYPE_TRACK.CHART_TEXT, oEntry.transformText, 0, 0, oEntry.contentWidth, oEntry.contentHeight, false, false);
+                    var oEntry = this.chart.legend.findCalcEntryByIdx(this.selection.legendEntry);
+                    if(oEntry){
+                        drawingDocument.DrawTrack(AscFormat.TYPE_TRACK.CHART_TEXT, oEntry.transformText, 0, 0, oEntry.contentWidth, oEntry.contentHeight, false, false);
+                    }
                 }
                 else
                 {
@@ -651,14 +662,17 @@ CChartSpace.prototype.setSelectionState = function(state)
 };
 CChartSpace.prototype.loadDocumentStateAfterLoadChanges = function(state)
 {
-    this.selection.title          = null;
-    this.selection.legend         = null;
-    this.selection.legendEntry    = null;
-    this.selection.axisLbls       = null;
-    this.selection.dataLbls       = null;
-    this.selection.dataLbl        = null;
-    this.selection.textSelection  = null;
-    this.selection.plotArea       = null;
+     this.selection.title =    null;
+     this.selection.legend =        null;
+     this.selection.legendEntry =   null;
+     this.selection.axisLbls =      null;
+     this.selection.dataLbls =      null;
+     this.selection.dataLbl =       null;
+     this.selection.plotArea =      null;
+     this.selection.gridLine =     null;
+     this.selection.series =        null;
+     this.selection.datPoint =      null;
+     this.selection.textSelection = null;
     return false;
 };
 CChartSpace.prototype.resetInternalSelection = function(noResetContentSelect)
@@ -779,11 +793,24 @@ CChartSpace.prototype.getParagraphTextPr = function()
     {
         if(!AscFormat.isRealNumber(this.selection.legendEntry))
         {
+            if(AscFormat.isRealNumber(this.legendLength))
+            {
+                var arrForProps = [];
+                for(var i = 0; i < this.legendLength; ++i)
+                {
+                    arrForProps.push(this.chart.legend.getCalcEntryByIdx(i, this.getDrawingDocument()))
+                }
+                return GetTextPrFormArrObjects(arrForProps);
+            }
             return GetTextPrFormArrObjects(this.chart.legend.calcEntryes);
         }
         else
         {
-            return GetTextPrFormArrObjects([this.chart.legend.calcEntryes[this.selection.legendEntry]]);
+            var calcLegendEntry = this.chart.legend.getCalcEntryByIdx(this.selection.legendEntry, this.getDrawingDocument());
+            if(calcLegendEntry)
+            {
+                return GetTextPrFormArrObjects([calcLegendEntry]);
+            }
         }
     }
     else  if(this.selection.textSelection)
@@ -1070,6 +1097,12 @@ CChartSpace.prototype.setFill = function (fill) {
 
     this.spPr.setFill(fill);
 };
+
+CChartSpace.prototype.setNvSpPr = function(pr) {
+    History.Add(this, {Type: AscDFH.historyitem_ChartSpace_SetNvGrFrProps, oldPr: this.nvGraphicFramePr, newPr: pr});
+    this.nvGraphicFramePr = pr;
+};
+
 CChartSpace.prototype.changeLine = function (line)
 {
     if(this.recalcInfo.recalculatePenBrush)
@@ -1505,6 +1538,104 @@ CChartSpace.prototype.clearFormatting = function(bNoClearShapeProps)
         }
     }
 };
+    CChartSpace.prototype.remove = function()
+    {
+        if(this.selection.title)
+        {
+            if(this.selection.title.parent)
+            {
+                this.selection.title.parent.setTitle(null);
+            }
+        }
+        else if(this.selection.legend)
+        {
+            if(!AscFormat.isRealNumber(this.selection.legendEntry))
+            {
+                if(this.selection.legend.parent && this.selection.legend.parent.setLegend)
+                {
+                    this.selection.legend.parent.setLegend(null);
+                }
+            }
+            else
+            {
+                var entry = this.selection.legend.findLegendEntryByIndex(this.selection.legendEntry);
+                if(!entry)
+                {
+                    entry = new AscFormat.CLegendEntry();
+                    entry.setIdx(this.selection.legendEntry);
+                    this.selection.legend.addLegendEntry(entry);
+                }
+                entry.setDelete(true);
+            }
+        }
+        else if(this.selection.axisLbls)
+        {
+            if(this.selection.axisLbls && this.selection.axisLbls.setDelete)
+            {
+                this.selection.axisLbls.setDelete(true);
+            }
+        }
+        else if(AscFormat.isRealNumber(this.selection.dataLbls))
+        {
+            var ser = this.chart.plotArea.chart.series[this.selection.dataLbls];
+            if(ser)
+            {
+                var oDlbls = ser.dLbls;
+                if(!ser.dLbls)
+                {
+
+                    if(this.chart.plotArea.chart.dLbls)
+                    {
+                        oDlbls = this.chart.plotArea.chart.dLbls.createDuplicate();
+                    }
+                    else
+                    {
+                        oDlbls = new AscFormat.CDLbls();
+                    }
+
+                    ser.setDLbls(oDlbls);
+                }
+                if(!AscFormat.isRealNumber(this.selection.dataLbl))
+                {
+                    oDlbls.setDelete(true);
+                }
+                else
+                {
+                    var pts = AscFormat.getPtsFromSeries(ser);
+                    var pt = pts[this.selection.dataLbl];
+                    if(pt)
+                    {
+                        var dLbl  = ser.dLbls.findDLblByIdx(pt.idx);
+                        if(!dLbl)
+                        {
+                            dLbl = new AscFormat.CDLbl();
+                            dLbl.setIdx(pt.idx);
+                            if(ser.dLbls.txPr)
+                            {
+                                dLbl.merge(ser.dLbls);
+                            }
+                            ser.dLbls.addDLbl(dLbl);
+
+                        }
+                        dLbl.setDelete(true);
+                    }
+                }
+            }
+        }
+
+        this.selection.title =    null;
+        this.selection.legend =        null;
+        this.selection.legendEntry =   null;
+        this.selection.axisLbls =      null;
+        this.selection.dataLbls =      null;
+        this.selection.dataLbl =       null;
+        this.selection.plotArea =      null;
+        this.selection.gridLine =     null;
+        this.selection.series =        null;
+        this.selection.datPoint =      null;
+        this.selection.textSelection = null;
+    };
+
 CChartSpace.prototype.copy = function(drawingDocument)
 {
     var copy = new CChartSpace();
@@ -1548,6 +1679,7 @@ CChartSpace.prototype.copy = function(drawingDocument)
     copy.setUserShapes(this.userShapes);
     copy.setThemeOverride(this.themeOverride);
     copy.setBDeleted(this.bDeleted);
+    copy.setLocks(this.locks);
     copy.cachedImage = this.getBase64Img();
     copy.cachedPixH = this.cachedPixH;
     copy.cachedPixW = this.cachedPixW;
@@ -2664,12 +2796,13 @@ CChartSpace.prototype.checkValByNumRef = function(workbook, ser, val, bVertical)
                                 if(!row_hidden && !source_worksheet.getColHidden(j) || (this.displayHidden === true))
                                 {
                                     cell = source_worksheet.getCell3(range.r1, j);
-                                    if(typeof cell.getValueWithFormat() === "string" && cell.getValueWithFormat().length > 0)
+                                    var value = parseFloat(cell.getValue());
+                                    if(AscFormat.isRealNumber(value))
                                     {
                                         hidden = false;
                                         pt = new AscFormat.CNumericPoint();
                                         pt.setIdx(pt_index);
-                                        pt.setVal(parseFloat(cell.getValue()));
+                                        pt.setVal(value);
                                         if(cell.getNumFormatStr() !== lit_format_code)
                                         {
                                             pt.setFormatCode(cell.getNumFormatStr())
@@ -2725,12 +2858,13 @@ CChartSpace.prototype.checkValByNumRef = function(workbook, ser, val, bVertical)
                                 if(!col_hidden && !source_worksheet.getRowHidden(j) || (this.displayHidden === true))
                                 {
                                     cell = source_worksheet.getCell3(j, range.c1);
-                                    if(typeof cell.getValueWithFormat() === "string" && cell.getValueWithFormat().length > 0)
+                                    var value = parseFloat(cell.getValue());
+                                    if(AscFormat.isRealNumber(value))
                                     {
                                         hidden = false;
                                         pt = new AscFormat.CNumericPoint();
                                         pt.setIdx(pt_index);
-                                        pt.setVal(parseFloat(cell.getValue()));
+                                        pt.setVal(value);
                                         if(cell.getNumFormatStr() !== lit_format_code)
                                         {
                                             pt.setFormatCode(cell.getNumFormatStr())
@@ -6252,17 +6386,23 @@ CChartSpace.prototype.recalculateLegend = function()
         this.chart.legend.chart = this;
         var b_scatter_no_line = false;/*(this.chart.plotArea.chart.getObjectType() === AscDFH.historyitem_type_ScatterChart &&
             (this.chart.plotArea.chart.scatterStyle === AscFormat.SCATTER_STYLE_MARKER || this.chart.plotArea.chart.scatterStyle === AscFormat.SCATTER_STYLE_NONE));  */
+        this.legendLength = null;
         if( !this.chart.plotArea.chart.varyColors || (this.chart.plotArea.chart.getObjectType() !== AscDFH.historyitem_type_PieChart && this.chart.plotArea.chart.getObjectType() !== AscDFH.historyitem_type_DoughnutChart) && series.length !== 1)
         {
+            this.legendLength = series.length;
             for(i = 0; i < series.length; ++i)
             {
                 ser = series[i];
-                arr_str_labels.push(ser.getSeriesName());
+
                 if(ser.isHiddenForLegend)
                     continue;
-                calc_entry = new AscFormat.CalcLegendEntry(legend, this, i);
-                calc_entry.txBody = AscFormat.CreateTextBodyFromString(arr_str_labels[i], this.getDrawingDocument(), calc_entry);
                 entry = legend.findLegendEntryByIndex(i);
+                if(entry && entry.bDelete)
+                    continue;
+                arr_str_labels.push(ser.getSeriesName());
+                calc_entry = new AscFormat.CalcLegendEntry(legend, this, i);
+                calc_entry.txBody = AscFormat.CreateTextBodyFromString(arr_str_labels[arr_str_labels.length - 1], this.getDrawingDocument(), calc_entry);
+
                 //if(entry)
                 //    calc_entry.txPr = entry.txPr;
 
@@ -6345,8 +6485,12 @@ CChartSpace.prototype.recalculateLegend = function()
             }
             var pts = AscFormat.getPtsFromSeries(ser), pt;
             var cat_str_lit = getCatStringPointsFromSeries(ser);
+            this.legendLength = pts.length;
             for(i = 0; i < pts.length; ++i)
             {
+                entry = legend.findLegendEntryByIndex(i);
+                if(entry && entry.bDelete)
+                    continue;
                 pt = pts[i];
                 var str_pt = cat_str_lit ? cat_str_lit.getPtByIndex(pt.idx) : null;
                 if(str_pt)
@@ -6355,8 +6499,8 @@ CChartSpace.prototype.recalculateLegend = function()
                     arr_str_labels.push((pt.idx + 1) + "");
 
                 calc_entry = new AscFormat.CalcLegendEntry(legend, this, pt.idx);
-                calc_entry.txBody = AscFormat.CreateTextBodyFromString(arr_str_labels[i], this.getDrawingDocument(), calc_entry);
-                entry = legend.findLegendEntryByIndex(i);
+                calc_entry.txBody = AscFormat.CreateTextBodyFromString(arr_str_labels[arr_str_labels.length - 1], this.getDrawingDocument(), calc_entry);
+
                 //if(entry)
                 //    calc_entry.txPr = entry.txPr;
                 //if(calc_entryes[0])
@@ -8822,6 +8966,11 @@ CChartSpace.prototype.Undo = function(data)
 {
     switch (data.Type)
     {
+        case AscDFH.historyitem_AutoShapes_SetLocks:
+        {
+            this.locks = data.oldPr;
+            break;
+        }
         case AscDFH.historyitem_AutoShapes_SetBFromSerialize:
         {
             this.fromSerialize = data.oldPr;
@@ -8953,6 +9102,11 @@ CChartSpace.prototype.Redo = function(data)
 {
     switch (data.Type)
     {
+        case AscDFH.historyitem_AutoShapes_SetLocks:
+        {
+            this.locks = data.newPr;
+            break;
+        }
         case AscDFH.historyitem_AutoShapes_SetBFromSerialize:
         {
             this.fromSerialize = data.newPr;
@@ -9086,6 +9240,11 @@ CChartSpace.prototype.Save_Changes = function(data, w)
     w.WriteLong(data.Type);
     switch (data.Type)
     {
+        case AscDFH.historyitem_AutoShapes_SetLocks:
+        {
+            w.WriteLong(data.newPr);
+            break;
+        }
         case AscDFH.historyitem_AutoShapes_SetBFromSerialize:
         {
             AscFormat.writeBool(w, data.newPr);
@@ -9225,6 +9384,11 @@ CChartSpace.prototype.Load_Changes = function(r)
     var type = r.GetLong();
     switch (type)
     {
+        case AscDFH.historyitem_AutoShapes_SetLocks:
+        {
+            this.locks = r.GetLong();
+            break;
+        }
         case AscDFH.historyitem_AutoShapes_SetBFromSerialize:
         {
             this.fromSerialize = AscFormat.readBool(r);

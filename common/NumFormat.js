@@ -2709,7 +2709,8 @@ FormatParser.prototype =
             val = val.replace(".", "q");//заменяем на символ с которым не распознается, как в Excel
             val = val.replace(cultureInfo.NumberDecimalSeparator, ".");
         }
-        return Asc.isNumberInfinity(val);
+        //parseNum исключаем запись числа в 16-ричной форме из числа.
+        return AscCommonExcel.parseNum(val) && Asc.isNumberInfinity(val);
     },
     parseLocaleNumber: function (val, cultureInfo) {
         if (null == cultureInfo)

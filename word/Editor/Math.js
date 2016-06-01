@@ -2575,7 +2575,7 @@ ParaMath.prototype.MathToImageConverter = function(bCopy, _canvasInput, _widthPx
 
     var g = new AscCommon.CGraphics();
     g.init(_ctx, w_px, h_px, w_mm, h_mm);
-    g.m_oFontManager = g_fontManager;
+    g.m_oFontManager = AscCommon.g_fontManager;
 
     g.m_oCoordTransform.tx = 0;
     g.m_oCoordTransform.ty = 0;

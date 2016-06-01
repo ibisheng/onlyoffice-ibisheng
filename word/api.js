@@ -1911,18 +1911,18 @@ asc_docs_api.prototype.asc_CheckCopy = function(_clipboard /* CClipboardData */,
 {
     if (!this.WordControl.m_oLogicDocument)
     {
-        var _text_object = (c_oAscClipboardDataFormat.Text & _formats) ? { Text : "" } : null;
+        var _text_object = (AscCommon.c_oAscClipboardDataFormat.Text & _formats) ? { Text : "" } : null;
         var _html_data = this.WordControl.m_oDrawingDocument.m_oDocumentRenderer.Copy(_text_object);
 
         //TEXT
-        if (c_oAscClipboardDataFormat.Text & _formats)
+        if (AscCommon.c_oAscClipboardDataFormat.Text & _formats)
         {
-            _clipboard.pushData(c_oAscClipboardDataFormat.Text, _text_object.Text);
+            _clipboard.pushData(AscCommon.c_oAscClipboardDataFormat.Text, _text_object.Text);
         }
         //HTML
-        if(c_oAscClipboardDataFormat.Html & _formats)
+        if(AscCommon.c_oAscClipboardDataFormat.Html & _formats)
         {
-            _clipboard.pushData(c_oAscClipboardDataFormat.Html, _html_data);
+            _clipboard.pushData(AscCommon.c_oAscClipboardDataFormat.Html, _html_data);
         }
         return;
     }
@@ -1930,22 +1930,22 @@ asc_docs_api.prototype.asc_CheckCopy = function(_clipboard /* CClipboardData */,
     var sBase64 = null, _data;
 
     //TEXT
-    if (c_oAscClipboardDataFormat.Text & _formats)
+    if (AscCommon.c_oAscClipboardDataFormat.Text & _formats)
     {
         _data = this.WordControl.m_oLogicDocument.Get_SelectedText();
-        _clipboard.pushData(c_oAscClipboardDataFormat.Text, _data)
+        _clipboard.pushData(AscCommon.c_oAscClipboardDataFormat.Text, _data)
     }
     //HTML
-    if(c_oAscClipboardDataFormat.Html & _formats)
+    if(AscCommon.c_oAscClipboardDataFormat.Html & _formats)
     {
         var oCopyProcessor = new AscCommon.CopyProcessor(this);
         sBase64 = oCopyProcessor.Start();
         _data = oCopyProcessor.getInnerHtml();
 
-        _clipboard.pushData(c_oAscClipboardDataFormat.Html, _data)
+        _clipboard.pushData(AscCommon.c_oAscClipboardDataFormat.Html, _data)
     }
     //INTERNAL
-    if(c_oAscClipboardDataFormat.Internal & _formats)
+    if(AscCommon.c_oAscClipboardDataFormat.Internal & _formats)
     {
         if(sBase64 === null)
         {
@@ -1954,7 +1954,7 @@ asc_docs_api.prototype.asc_CheckCopy = function(_clipboard /* CClipboardData */,
         }
 
         _data = sBase64;
-        _clipboard.pushData(c_oAscClipboardDataFormat.Internal, _data)
+        _clipboard.pushData(AscCommon.c_oAscClipboardDataFormat.Internal, _data)
     }
 };
 
@@ -1977,10 +1977,10 @@ asc_docs_api.prototype.asc_PasteData = function(_format, data1, data2)
     this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_PasteHotKey);
     switch (_format)
     {
-        case c_oAscClipboardDataFormat.HtmlElement:
+        case AscCommon.c_oAscClipboardDataFormat.HtmlElement:
           AscCommon.Editor_Paste_Exec(this, data1, data2);
             break;
-        case c_oAscClipboardDataFormat.Internal:
+        case AscCommon.c_oAscClipboardDataFormat.Internal:
           AscCommon.Editor_Paste_Exec(this, null, null, data1);
             break;
         default:
@@ -2093,7 +2093,7 @@ asc_docs_api.prototype.asc_PasteData = function(_format, data1, data2)
     "id": this.documentId,
     "c": 'pathurl',
     "title": this.documentTitle,
-    "data": 'origin'
+    "data": 'origin.' + this.documentFormat
   };
   var t = this;
         t.fCurCallback   = function(input)
@@ -3425,19 +3425,11 @@ asc_docs_api.prototype.put_PrIndent = function(value,levelValue)
 };
 asc_docs_api.prototype.IncreaseIndent = function()
 {
-    if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Properties) )
-    {
-        this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_IncParagraphIndent);
-        this.WordControl.m_oLogicDocument.Paragraph_IncDecIndent( true );
-    }
+    this.WordControl.m_oLogicDocument.IncreaseIndent();
 };
 asc_docs_api.prototype.DecreaseIndent = function()
 {
-    if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Properties) )
-    {
-        this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_DecParagraphIndent);
-        this.WordControl.m_oLogicDocument.Paragraph_IncDecIndent( false );
-    }
+    this.WordControl.m_oLogicDocument.DecreaseIndent();
 };
 asc_docs_api.prototype.put_PrIndentRight = function(value)
 {
@@ -4260,70 +4252,71 @@ function CTablePropLook(obj)
 
 function CTableProp (tblProp)
 {
-	if (tblProp)
-        {
-            this.CanBeFlow           = (undefined != tblProp.CanBeFlow ? tblProp.CanBeFlow : false );
-            this.CellSelect          = (undefined != tblProp.CellSelect ? tblProp.CellSelect : false );
-            this.CellSelect          = (undefined != tblProp.CellSelect) ? tblProp.CellSelect : false;
-            this.TableWidth          = (undefined != tblProp.TableWidth) ? tblProp.TableWidth : null;
-            this.TableSpacing        = (undefined != tblProp.TableSpacing) ? tblProp.TableSpacing : null;
+    if (tblProp)
+    {
+        this.CanBeFlow           = (undefined != tblProp.CanBeFlow ? tblProp.CanBeFlow : false );
+        this.CellSelect          = (undefined != tblProp.CellSelect ? tblProp.CellSelect : false );
+        this.CellSelect          = (undefined != tblProp.CellSelect) ? tblProp.CellSelect : false;
+        this.TableWidth          = (undefined != tblProp.TableWidth) ? tblProp.TableWidth : null;
+        this.TableSpacing        = (undefined != tblProp.TableSpacing) ? tblProp.TableSpacing : null;
         this.TableDefaultMargins = (undefined != tblProp.TableDefaultMargins && null != tblProp.TableDefaultMargins) ? new Asc.asc_CPaddings(tblProp.TableDefaultMargins) : null;
 
-            this.CellMargins = (undefined != tblProp.CellMargins && null != tblProp.CellMargins) ? new CMargins(tblProp.CellMargins) : null;
+        this.CellMargins = (undefined != tblProp.CellMargins && null != tblProp.CellMargins) ? new CMargins(tblProp.CellMargins) : null;
 
-            this.TableAlignment     = (undefined != tblProp.TableAlignment) ? tblProp.TableAlignment : null;
-            this.TableIndent        = (undefined != tblProp.TableIndent) ? tblProp.TableIndent : null;
-            this.TableWrappingStyle = (undefined != tblProp.TableWrappingStyle) ? tblProp.TableWrappingStyle : null;
+        this.TableAlignment     = (undefined != tblProp.TableAlignment) ? tblProp.TableAlignment : null;
+        this.TableIndent        = (undefined != tblProp.TableIndent) ? tblProp.TableIndent : null;
+        this.TableWrappingStyle = (undefined != tblProp.TableWrappingStyle) ? tblProp.TableWrappingStyle : null;
 
         this.TablePaddings = (undefined != tblProp.TablePaddings && null != tblProp.TablePaddings) ? new Asc.asc_CPaddings(tblProp.TablePaddings) : null;
 
-            this.TableBorders      = (undefined != tblProp.TableBorders && null != tblProp.TableBorders) ? new CBorders(tblProp.TableBorders) : null;
-            this.CellBorders       = (undefined != tblProp.CellBorders && null != tblProp.CellBorders) ? new CBorders(tblProp.CellBorders) : null;
-            this.TableBackground   = (undefined != tblProp.TableBackground && null != tblProp.TableBackground) ? new CBackground(tblProp.TableBackground) : null;
-            this.CellsBackground   = (undefined != tblProp.CellsBackground && null != tblProp.CellsBackground) ? new CBackground(tblProp.CellsBackground) : null;
+        this.TableBorders      = (undefined != tblProp.TableBorders && null != tblProp.TableBorders) ? new CBorders(tblProp.TableBorders) : null;
+        this.CellBorders       = (undefined != tblProp.CellBorders && null != tblProp.CellBorders) ? new CBorders(tblProp.CellBorders) : null;
+        this.TableBackground   = (undefined != tblProp.TableBackground && null != tblProp.TableBackground) ? new CBackground(tblProp.TableBackground) : null;
+        this.CellsBackground   = (undefined != tblProp.CellsBackground && null != tblProp.CellsBackground) ? new CBackground(tblProp.CellsBackground) : null;
         this.Position          = (undefined != tblProp.Position && null != tblProp.Position) ? new Asc.CPosition(tblProp.Position) : null;
-            this.PositionH         = ( undefined != tblProp.PositionH && null != tblProp.PositionH ) ? new CTablePositionH(tblProp.PositionH) : undefined;
-            this.PositionV         = ( undefined != tblProp.PositionV && null != tblProp.PositionV ) ? new CTablePositionV(tblProp.PositionV) : undefined;
+        this.PositionH         = ( undefined != tblProp.PositionH && null != tblProp.PositionH ) ? new CTablePositionH(tblProp.PositionH) : undefined;
+        this.PositionV         = ( undefined != tblProp.PositionV && null != tblProp.PositionV ) ? new CTablePositionV(tblProp.PositionV) : undefined;
         this.Internal_Position = ( undefined != tblProp.Internal_Position ) ? tblProp.Internal_Position : undefined;
 
-            this.ForSelectedCells   = (undefined != tblProp.ForSelectedCells) ? tblProp.ForSelectedCells : true;
-            this.TableStyle         = (undefined != tblProp.TableStyle) ? tblProp.TableStyle : null;
-            this.TableLook          = (undefined != tblProp.TableLook) ? new CTablePropLook(tblProp.TableLook) : null;
-            this.RowsInHeader       = (undefined != tblProp.RowsInHeader) ? tblProp.RowsInHeader : 0;
-            this.CellsVAlign        = (undefined != tblProp.CellsVAlign) ? tblProp.CellsVAlign : c_oAscVertAlignJc.Top;
-            this.AllowOverlap       = (undefined != tblProp.AllowOverlap) ? tblProp.AllowOverlap : undefined;
-            this.TableLayout        = tblProp.TableLayout;
+        this.ForSelectedCells   = (undefined != tblProp.ForSelectedCells) ? tblProp.ForSelectedCells : true;
+        this.TableStyle         = (undefined != tblProp.TableStyle) ? tblProp.TableStyle : null;
+        this.TableLook          = (undefined != tblProp.TableLook) ? new CTablePropLook(tblProp.TableLook) : null;
+        this.RowsInHeader       = (undefined != tblProp.RowsInHeader) ? tblProp.RowsInHeader : 0;
+        this.CellsVAlign        = (undefined != tblProp.CellsVAlign) ? tblProp.CellsVAlign : c_oAscVertAlignJc.Top;
+        this.AllowOverlap       = (undefined != tblProp.AllowOverlap) ? tblProp.AllowOverlap : undefined;
+        this.TableLayout        = tblProp.TableLayout;
         this.CellsTextDirection = tblProp.CellsTextDirection;
         this.CellsNoWrap        = tblProp.CellsNoWrap;
         this.CellsWidth         = tblProp.CellsWidth;
-            this.Locked             = (undefined != tblProp.Locked) ? tblProp.Locked : false;
-        }
-	else
-	{
-		//Все свойства класса CTableProp должны быть undefined если они не изменялись
+        this.Locked             = (undefined != tblProp.Locked) ? tblProp.Locked : false;
+        this.PercentFullWidth   = tblProp.PercentFullWidth;
+    }
+    else
+    {
+        //Все свойства класса CTableProp должны быть undefined если они не изменялись
         //this.CanBeFlow = false;
         this.CellSelect = false; //обязательное свойство
-		/*this.TableWidth = null;
-		this.TableSpacing = null;
-		this.TableDefaultMargins = new Asc.asc_CPaddings ();
+        /*this.TableWidth = null;
+         this.TableSpacing = null;
+         this.TableDefaultMargins = new Asc.asc_CPaddings ();
 
-		this.CellMargins = new CMargins ();
+         this.CellMargins = new CMargins ();
 
-		this.TableAlignment = 0;
-		this.TableIndent = 0;
-		this.TableWrappingStyle = c_oAscWrapStyle.Inline;
+         this.TableAlignment = 0;
+         this.TableIndent = 0;
+         this.TableWrappingStyle = c_oAscWrapStyle.Inline;
 
-		this.TablePaddings = new Asc.asc_CPaddings ();
+         this.TablePaddings = new Asc.asc_CPaddings ();
 
-		this.TableBorders = new CBorders ();
-		this.CellBorders = new CBorders ();
-		this.TableBackground = new CBackground ();
-		this.CellsBackground = new CBackground ();;
-		this.Position = new CPosition ();
-		this.ForSelectedCells = true;*/
+         this.TableBorders = new CBorders ();
+         this.CellBorders = new CBorders ();
+         this.TableBackground = new CBackground ();
+         this.CellsBackground = new CBackground ();;
+         this.Position = new CPosition ();
+         this.ForSelectedCells = true;*/
 
         this.Locked = false;
-	}
+    }
 }
 
     CTableProp.prototype.get_Width              = function()
@@ -4551,6 +4544,10 @@ function CTableProp (tblProp)
     CTableProp.prototype.put_CellsWidth         = function(v)
     {
         this.CellsWidth = v;
+    };
+    CTableProp.prototype.get_PercentFullWidth   = function()
+    {
+        return this.PercentFullWidth;
     };
 
 
@@ -5546,24 +5543,36 @@ asc_docs_api.prototype.sync_ImgPropCallback = function(imgProp)
 };
 
 
-    asc_docs_api.prototype.asc_addOleObjectAction = function(sLocalUrl, sData, sApplicationId)
+    asc_docs_api.prototype.asc_addOleObjectAction = function(sLocalUrl, sData, sApplicationId, fWidth, fHeight, nWidthPix, nHeightPix)
     {
         var _image = this.ImageLoader.LoadImage(AscCommon.getFullImageSrc2(sLocalUrl), 1);
         if (null != _image)//картинка уже должна быть загружена
         {
             if (false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content))
             {
-                var _w = Math.max(1, AscCommon.Page_Width - (AscCommon.X_Left_Margin + AscCommon.X_Right_Margin));
-                var _h = Math.max(1, AscCommon.Page_Height - (AscCommon.Y_Top_Margin + AscCommon.Y_Bottom_Margin));
-                if (_image.Image != null)
-                {
-                    var __w = Math.max(parseInt(_image.Image.width * AscCommon.g_dKoef_pix_to_mm), 1);
-                    var __h = Math.max(parseInt(_image.Image.height * AscCommon.g_dKoef_pix_to_mm), 1);
-                    _w      = Math.max(5, Math.min(_w, __w));
-                    _h      = Math.max(5, Math.min(parseInt(_w * __h / __w)));
-                }
                 this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_AddOleObject);
-                this.WordControl.m_oLogicDocument.Add_OleObject(_w, _h, sLocalUrl, sData, sApplicationId);
+                this.WordControl.m_oLogicDocument.Add_OleObject(fWidth, fHeight, nWidthPix, nHeightPix, sLocalUrl, sData, sApplicationId);
+            }
+        }
+    };
+
+    asc_docs_api.prototype.asc_editOleObjectAction = function(bResize, oOleObject, sImageUrl, sData, nPixWidth, nPixHeight)
+    {
+        if(oOleObject)
+        {
+            if(!bResize)
+            {
+                if (false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content))
+                {
+                    this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_EditOleObject);
+                    this.WordControl.m_oLogicDocument.Edit_OleObject(oOleObject, sData, sImageUrl, nPixWidth, nPixHeight);
+                    this.WordControl.m_oLogicDocument.Recalculate();
+                }
+            }
+            else
+            {
+                this.WordControl.m_oLogicDocument.Edit_OleObject(oOleObject, sData, sImageUrl, nPixWidth, nPixHeight);
+                this.WordControl.m_oLogicDocument.Recalculate();
             }
         }
     };
@@ -5575,13 +5584,13 @@ function CContextMenuData( obj )
 {
     if( obj )
     {
-        this.Type  = ( undefined != obj.Type ) ? obj.Type : c_oAscContextMenuTypes.Common;
+        this.Type  = ( undefined != obj.Type ) ? obj.Type : Asc.c_oAscContextMenuTypes.Common;
         this.X_abs = ( undefined != obj.X_abs ) ? obj.X_abs : 0;
         this.Y_abs = ( undefined != obj.Y_abs ) ? obj.Y_abs : 0;
 
         switch ( this.Type )
         {
-            case c_oAscContextMenuTypes.ChangeHdrFtr :
+            case Asc.c_oAscContextMenuTypes.ChangeHdrFtr :
             {
                 this.PageNum = ( undefined != obj.PageNum ) ? obj.PageNum : 0;
                 this.Header  = ( undefined != obj.Header  ) ? obj.Header  : true;
@@ -5592,7 +5601,7 @@ function CContextMenuData( obj )
     }
     else
     {
-        this.Type  = c_oAscContextMenuTypes.Common;
+        this.Type  = Asc.c_oAscContextMenuTypes.Common;
         this.X_abs = 0;
         this.Y_abs = 0;
     }
@@ -7425,6 +7434,9 @@ window["asc_nativeOnSpellCheck"] = function (response)
     oAdditionalData["outputformat"] = filetype;
     oAdditionalData["title"] = AscCommon.changeFileExtention(this.documentTitle, AscCommon.getExtentionByFormat(filetype));
 	oAdditionalData["savetype"] = AscCommon.c_oAscSaveTypes.CompleteAll;
+    if ('savefromorigin' === command) {
+        oAdditionalData["format"] = this.documentFormat;
+    }
         if (DownloadType.Print === options.downloadType)
         {
       oAdditionalData["inline"] = 1;
@@ -7988,12 +8000,7 @@ window["asc_docs_api"].prototype["asc_nativeApplyChanges"] = function(changes)
   AscCommon.CollaborativeEditing.Apply_OtherChanges();
 };
 
-window["asc_docs_api"].prototype["asc_nativeInitBuilder"] = function()
-{
-    this.asc_setDocInfo(new window["Asc"]["asc_CDocInfo"]());
-};
-
-window["asc_docs_api"].prototype["asc_SetSilentMode"] = function(bEnabled)
+window["asc_docs_api"].prototype.asc_SetSilentMode = function(bEnabled)
 {
     if (!this.WordControl.m_oLogicDocument)
         return;
@@ -8794,9 +8801,14 @@ asc_docs_api.prototype['asc_SetFastCollaborative'] = asc_docs_api.prototype.asc_
 asc_docs_api.prototype['asc_isOffline'] = asc_docs_api.prototype.asc_isOffline;
 asc_docs_api.prototype['asc_getUrlType'] = asc_docs_api.prototype.asc_getUrlType;
 asc_docs_api.prototype["asc_setInterfaceDrawImagePlaceShape"] = asc_docs_api.prototype.asc_setInterfaceDrawImagePlaceShape;
-    asc_docs_api.prototype["asc_pluginsRegister"]                       = asc_docs_api.prototype.asc_pluginsRegister;
-    asc_docs_api.prototype["asc_pluginRun"]                             = asc_docs_api.prototype.asc_pluginRun;
-    asc_docs_api.prototype["asc_pluginResize"]                          = asc_docs_api.prototype.asc_pluginResize;
+asc_docs_api.prototype["asc_pluginsRegister"]       = asc_docs_api.prototype.asc_pluginsRegister;
+asc_docs_api.prototype["asc_pluginRun"]             = asc_docs_api.prototype.asc_pluginRun;
+asc_docs_api.prototype["asc_pluginResize"]          = asc_docs_api.prototype.asc_pluginResize;
+asc_docs_api.prototype["asc_pluginButtonClick"]     = asc_docs_api.prototype.asc_pluginButtonClick;
+asc_docs_api.prototype["asc_nativeInitBuilder"]     = asc_docs_api.prototype.asc_nativeInitBuilder;
+asc_docs_api.prototype["asc_SetSilentMode"]         = asc_docs_api.prototype.asc_SetSilentMode;
+asc_docs_api.prototype["asc_addOleObject"]          = asc_docs_api.prototype.asc_addOleObject;
+asc_docs_api.prototype["asc_editOleObject"]         = asc_docs_api.prototype.asc_editOleObject;
 
 CParagraphPropEx.prototype['get_ContextualSpacing'] = CParagraphPropEx.prototype.get_ContextualSpacing;
 CParagraphPropEx.prototype['get_Ind'] = CParagraphPropEx.prototype.get_Ind;
@@ -8931,6 +8943,7 @@ CTableProp.prototype['get_CellsNoWrap']        = CTableProp.prototype.get_CellsN
 CTableProp.prototype['put_CellsNoWrap']        = CTableProp.prototype.put_CellsNoWrap;
 CTableProp.prototype['get_CellsWidth']         = CTableProp.prototype.get_CellsWidth;
 CTableProp.prototype['put_CellsWidth']         = CTableProp.prototype.put_CellsWidth;
+CTableProp.prototype['get_PercentFullWidth']   = CTableProp.prototype.get_PercentFullWidth;
 window['Asc']['CBorders'] = window['Asc'].CBorders = CBorders;
 CBorders.prototype['get_Left'] = CBorders.prototype.get_Left;
 CBorders.prototype['put_Left'] = CBorders.prototype.put_Left;

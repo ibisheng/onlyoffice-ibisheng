@@ -260,6 +260,13 @@
     }
     return null;
   };
+  
+  CDocsCoApi.prototype.get_indexUser = function() {
+    if (this._CoAuthoringApi && this._onlineWork) {
+      return this._CoAuthoringApi.get_indexUser();
+    }
+    return null;
+  };
 
   CDocsCoApi.prototype.releaseLocks = function(blockId) {
     if (this._CoAuthoringApi && this._onlineWork) {

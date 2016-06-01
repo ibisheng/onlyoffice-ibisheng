@@ -4,6 +4,24 @@
  */
 (function (window, undefined) {
 
+    var LOCKS_MASKS =
+    {
+        noGrp: 1,
+        noUngrp: 4,
+        noSelect: 16,
+        noRot: 64,
+        noChangeAspect: 256,
+        noMove: 1024,
+        noResize: 4096,
+        noEditPoints: 16384,
+        noAdjustHandles: 65536,
+        noChangeArrowheads: 262144,
+        noChangeShapeType: 1048576,
+        noDrilldown: 4194304,
+        noTextEdit: 8388608,
+        noCrop: 16777216
+    };
+
     function checkNormalRotate(rot)
     {
         var _rot = normalizeRotate(rot);
@@ -54,6 +72,7 @@
         this.group = null;
         this.parent = null;
         this.bDeleted = true;
+        this.locks = 0;
         this.Id = '';
 
         /*Calculated fields*/
@@ -243,10 +262,75 @@
         this.snapArrayY.length = 0;
         this.calculateSnapArrays(this.snapArrayX, this.snapArrayY, null);
     };
+
+    CGraphicObjectBase.prototype.setLocks = function(nLocks){
+        AscCommon.History.Add(this, {Type: AscDFH.historyitem_AutoShapes_SetLocks, oldPr: this.locks, newPr: nLocks});
+        this.locks = nLocks;
+    };
+
+    CGraphicObjectBase.prototype.getLockValue = function(nMask) {
+        return  !!((this.locks & nMask) && (this.locks & (nMask << 1)));
+    };
+
+    CGraphicObjectBase.prototype.setLockValue = function(nMask, bValue) {
+        if(!AscFormat.isRealBool(bValue)) {
+            this.setLocks((~nMask) & this.locks);
+        }
+        else{
+            this.setLocks(this.locks | nMask | (bValue ? nMask << 1 : 0));
+        }
+    };
+
+    CGraphicObjectBase.prototype.getNoGrp = function(){
+        return this.getLockValue(LOCKS_MASKS.noGrp);
+    };
+    CGraphicObjectBase.prototype.getNoUngrp = function(){
+        return this.getLockValue(LOCKS_MASKS.noUngrp);
+    };
+    CGraphicObjectBase.prototype.getNoSelect = function(){
+        return this.getLockValue(LOCKS_MASKS.noSelect);
+    };
+    CGraphicObjectBase.prototype.getNoRot = function(){
+        return this.getLockValue(LOCKS_MASKS.noRot);
+    };
+    CGraphicObjectBase.prototype.getNoChangeAspect = function(){
+        return this.getLockValue(LOCKS_MASKS.noChangeAspect);
+    };
+    CGraphicObjectBase.prototype.getNoMove = function(){
+        return this.getLockValue(LOCKS_MASKS.noMove);
+    };
+    CGraphicObjectBase.prototype.getNoResize = function(){
+        return this.getLockValue(LOCKS_MASKS.noResize);
+    };
+    CGraphicObjectBase.prototype.getNoEditPoints = function(){
+        return this.getLockValue(LOCKS_MASKS.noEditPoints);
+    };
+    CGraphicObjectBase.prototype.getNoAdjustHandles = function(){
+        return this.getLockValue(LOCKS_MASKS.noAdjustHandles);
+    };
+    CGraphicObjectBase.prototype.getNoChangeArrowheads = function(){
+        return this.getLockValue(LOCKS_MASKS.noChangeArrowheads);
+    };
+    CGraphicObjectBase.prototype.getNoChangeShapeType = function(){
+        return this.getLockValue(LOCKS_MASKS.noChangeShapeType);
+    };
+    CGraphicObjectBase.prototype.getNoDrilldown = function(){
+        return this.getLockValue(LOCKS_MASKS.noDrilldown);
+    };
+    CGraphicObjectBase.prototype.getNoTextEdit = function(){
+        return this.getLockValue(LOCKS_MASKS.noTextEdit);
+    };
+    CGraphicObjectBase.prototype.getNoCrop = function(){
+        return this.getLockValue(LOCKS_MASKS.noCrop);
+    };
+    CGraphicObjectBase.prototype.setNoChangeAspect = function(bValue){
+        return this.setLockValue(LOCKS_MASKS.noChangeAspect, bValue);
+    };
     
     window['AscFormat'] = window['AscFormat'] || {};
     window['AscFormat'].CGraphicObjectBase = CGraphicObjectBase;
     window['AscFormat'].CGraphicBounds     = CGraphicBounds;
     window['AscFormat'].checkNormalRotate  = checkNormalRotate;
     window['AscFormat'].normalizeRotate    = normalizeRotate;
+    window['AscFormat'].LOCKS_MASKS        = LOCKS_MASKS;
 })(window);

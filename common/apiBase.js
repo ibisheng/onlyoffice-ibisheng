@@ -1,4 +1,4 @@
-"use strict";
+﻿"use strict";
 
 (function(window, undefined){
 // Import
@@ -607,12 +607,45 @@ baseEditorsApi.prototype._uploadCallback = function(error, files) {
         }, this.editorId === c_oEditorId.Spreadsheet);
     };
 
-    baseEditorsApi.prototype.asc_addOleObject = function(sImageUrl, sData, sApplicationId){
-        var oThis = this;
-        this.asc_checkImageUrlAndAction(sImageUrl, function(oImage){oThis.asc_addOleObjectAction(AscCommon.g_oDocumentUrls.getImageLocal(oImage.src), sData, sApplicationId);});
+    baseEditorsApi.prototype.asc_addOleObject = function(oPluginData){
+      Asc.CPluginData_wrap(oPluginData);
+      var oThis = this;
+      var oThis = this;
+      var sImgSrc = oPluginData.getAttribute("imgSrc");
+      var nWidthPix = oPluginData.getAttribute("widthPix");
+      var nHeightPix = oPluginData.getAttribute("heightPix");
+      var fWidth = oPluginData.getAttribute("width");
+      var fHeight = oPluginData.getAttribute("height");
+      var sData = oPluginData.getAttribute("data");
+      var sGuid = oPluginData.getAttribute("guid");
+      if(typeof sImgSrc === "string" && sImgSrc.length > 0 && typeof sData === "string"
+          && typeof sGuid === "string" && sGuid.length > 0
+          && AscFormat.isRealNumber(nWidthPix) && AscFormat.isRealNumber(nHeightPix)
+          && AscFormat.isRealNumber(fWidth) && AscFormat.isRealNumber(fHeight)
+      )
+        this.asc_checkImageUrlAndAction(sImgSrc, function(oImage){oThis.asc_addOleObjectAction(AscCommon.g_oDocumentUrls.getImageLocal(oImage.src), sData, sGuid, fWidth, fHeight, nWidthPix, nHeightPix);});
     };
 
-    baseEditorsApi.prototype.asc_addOleObjectAction = function(sLocalUrl, sData, sApplicationId)
+    baseEditorsApi.prototype.asc_editOleObject = function(oPluginData){
+        Asc.CPluginData_wrap(oPluginData);
+        var oThis = this;
+        var bResize = oPluginData.getAttribute("resize");
+        var sImgSrc = oPluginData.getAttribute("imgSrc");
+        var oOleObject = AscCommon.g_oTableId.Get_ById(oPluginData.getAttribute("objectId"));
+        var nWidthPix = oPluginData.getAttribute("widthPix");
+        var nHeightPix = oPluginData.getAttribute("heightPix");
+        var sData = oPluginData.getAttribute("data");
+        if(typeof sImgSrc === "string" && sImgSrc.length > 0 && typeof sData === "string"
+            && oOleObject && AscFormat.isRealNumber(nWidthPix) && AscFormat.isRealNumber(nHeightPix)){
+          this.asc_checkImageUrlAndAction(sImgSrc, function(oImage){oThis.asc_editOleObjectAction(bResize, oOleObject, AscCommon.g_oDocumentUrls.getImageLocal(oImage.src), sData, nWidthPix, nHeightPix);});
+        }
+    };
+
+    baseEditorsApi.prototype.asc_addOleObjectAction = function(sLocalUrl, sData, sApplicationId, fWidth, fHeight)
+    {
+    };
+
+    baseEditorsApi.prototype.asc_editOleObjectAction = function(bResize, oOleObject, sImageUrl, sData, nPixWidth, nPixHeight)
     {
     };
 
@@ -686,16 +719,30 @@ baseEditorsApi.prototype.asc_pluginsRegister = function(basePath, plugins)
   if (null != this.pluginsManager)
     this.pluginsManager.register(basePath, plugins);
 };
-baseEditorsApi.prototype.asc_pluginRun = function(guid, data)
+baseEditorsApi.prototype.asc_pluginRun = function(guid, variation, pluginData)
 {
   if (null != this.pluginsManager)
-    this.pluginsManager.run(guid, data);
+    this.pluginsManager.run(guid, variation, pluginData);
 };
-baseEditorsApi.prototype.asc_pluginResize = function(guid, data, width, height)
+baseEditorsApi.prototype.asc_pluginResize = function(pluginData)
 {
   if (null != this.pluginsManager)
-    this.pluginsManager.runResize(guid, data, width, height);
+    this.pluginsManager.runResize(pluginData);
 };
+baseEditorsApi.prototype.asc_pluginButtonClick = function(id)
+{
+  if (null != this.pluginsManager)
+    this.pluginsManager.buttonClick(id);
+};
+
+  // Builder
+  baseEditorsApi.prototype.asc_nativeInitBuilder = function() {
+    this.asc_setDocInfo(new Asc.asc_CDocInfo());
+  };
+  baseEditorsApi.prototype.asc_SetSilentMode = function() {
+  };
+
+
 
   //----------------------------------------------------------export----------------------------------------------------
   window['AscCommon'] = window['AscCommon'] || {};

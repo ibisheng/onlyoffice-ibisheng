@@ -822,8 +822,8 @@
         {
             oUniFill.fill.colors.push(aGradientStop[i].Gs);
         }
-        oUniFill.lin = new AscFormat.GradLin();
-        oUniFill.lin.angle = Angle*60000;
+        oUniFill.fill.lin = new AscFormat.GradLin();
+        oUniFill.fill.lin.angle = Angle;
         return new ApiFill(oUniFill);
     };
 
@@ -909,7 +909,7 @@
         {
             return new ApiStroke(AscFormat.CreateNoFillLine());
         }
-        var oLn = new CLn();
+        var oLn = new AscFormat.CLn();
         oLn.w = nWidth;
         oLn.Fill = oFill.UniFill;
         return new ApiStroke(oLn);
@@ -1521,15 +1521,15 @@
     ApiSection.prototype.SetType = function(sType)
     {
         if ("oddPage" === sType)
-            this.Section.Set_Type(Asc.c_oAscSectionBreakType.OddPage);
+            this.Section.Set_Type(c_oAscSectionBreakType.OddPage);
         else if ("evenPage" === sType)
-            this.Section.Set_Type(Asc.c_oAscSectionBreakType.EvenPage);
+            this.Section.Set_Type(c_oAscSectionBreakType.EvenPage);
         else if ("continuous" === sType)
-            this.Section.Set_Type(Asc.c_oAscSectionBreakType.Continuous);
+            this.Section.Set_Type(c_oAscSectionBreakType.Continuous);
         else if ("nextColumn" === sType)
-            this.Section.Set_Type(Asc.c_oAscSectionBreakType.Column);
+            this.Section.Set_Type(c_oAscSectionBreakType.Column);
         else if ("nextPage" === sType)
-            this.Section.Set_Type(Asc.c_oAscSectionBreakType.NextPage);
+            this.Section.Set_Type(c_oAscSectionBreakType.NextPage);
     };
     /**
      * Specify all text columns in the current section are of equal width.
@@ -3584,8 +3584,8 @@
 
 
     /**
-     * Set the line width color of shape
-     * @returns {ApiDocumentContent}
+     * Get content of this shape.
+     * @returns {?ApiDocumentContent}
      */
     ApiShape.prototype.GetDocContent = function()
     {

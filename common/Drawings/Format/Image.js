@@ -663,6 +663,11 @@ CImageShape.prototype.Undo = function(data)
 {
     switch(data.Type)
     {
+        case AscDFH.historyitem_AutoShapes_SetLocks:
+        {
+            this.locks = data.oldPr;
+            break;
+        }
         case AscDFH.historyitem_ImageShapeSetData:
         {
             this.m_sData = data.oldData;
@@ -671,6 +676,12 @@ CImageShape.prototype.Undo = function(data)
         case AscDFH.historyitem_ImageShapeSetApplicationId:
         {
             this.m_sData = data.oldId;
+            break;
+        }
+        case AscDFH.historyitem_ImageShapeSetPixSizes:
+        {
+            this.m_nPixWidth = data.oldPr.w;
+            this.m_nPixHeight = data.oldPr.h;
             break;
         }
         case AscDFH.historyitem_AutoShapes_SetBFromSerialize:
@@ -755,6 +766,11 @@ CImageShape.prototype.Redo = function(data)
     switch(data.Type)
     {
 
+        case AscDFH.historyitem_AutoShapes_SetLocks:
+        {
+            this.locks = data.newPr;
+            break;
+        }
         case AscDFH.historyitem_ImageShapeSetData:
         {
             this.m_sData = data.newData;
@@ -763,6 +779,13 @@ CImageShape.prototype.Redo = function(data)
         case AscDFH.historyitem_ImageShapeSetApplicationId:
         {
             this.m_sData = data.newId;
+            break;
+        }
+
+        case AscDFH.historyitem_ImageShapeSetPixSizes:
+        {
+            this.m_nPixWidth = data.newPr.w;
+            this.m_nPixHeight = data.newPr.h;
             break;
         }
         case AscDFH.historyitem_AutoShapes_SetBFromSerialize:
@@ -847,6 +870,11 @@ CImageShape.prototype.Save_Changes = function(data, w)
     w.WriteLong(data.Type);
     switch(data.Type)
     {
+        case AscDFH.historyitem_AutoShapes_SetLocks:
+        {
+            w.WriteLong(data.newPr);
+            break;
+        }
         case AscDFH.historyitem_ImageShapeSetData:
         {
             AscFormat.writeString(w, data.newData);
@@ -856,6 +884,12 @@ CImageShape.prototype.Save_Changes = function(data, w)
         {
 
             AscFormat.writeString(w, data.newId);
+            break;
+        }
+        case AscDFH.historyitem_ImageShapeSetPixSizes:
+        {
+            AscFormat.writeLong(w, data.newPr.w);
+            AscFormat.writeLong(w, data.newPr.h);
             break;
         }
         case AscDFH.historyitem_AutoShapes_SetBFromSerialize:
@@ -932,6 +966,11 @@ CImageShape.prototype.Load_Changes = function(r)
     var type = r.GetLong();
     switch(type)
     {
+        case AscDFH.historyitem_AutoShapes_SetLocks:
+        {
+            this.locks = r.GetLong();
+            break;
+        }
         case AscDFH.historyitem_ImageShapeSetData:
         {
             this.m_sData = AscFormat.readString(r);
@@ -940,6 +979,12 @@ CImageShape.prototype.Load_Changes = function(r)
         case AscDFH.historyitem_ImageShapeSetApplicationId:
         {
             this.m_sApplicationId = AscFormat.readString(r);
+            break;
+        }
+        case AscDFH.historyitem_ImageShapeSetPixSizes:
+        {
+            this.m_nPixWidth = AscFormat.readLong(r);
+            this.m_nPixHeight = AscFormat.readLong(r);
             break;
         }
         case AscDFH.historyitem_AutoShapes_SetBFromSerialize:

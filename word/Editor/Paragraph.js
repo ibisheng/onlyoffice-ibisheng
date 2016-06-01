@@ -3048,6 +3048,7 @@ Paragraph.prototype =
             case para_Drawing:
             case para_NewLine:
             case para_FootnoteReference:
+            case para_FootnoteRef:
             default:
             {
                 // Элементы данного типа добавляем во внутренний элемент
@@ -12147,7 +12148,7 @@ Paragraph.prototype =
                     this.Pr.Spacing = new CParaSpacing();
 
                 if ( false === Reader.GetBool() )
-                    this.Pr.Spacing.AfterAutoSpacing = Reader.GetBool();
+                    this.Pr.Spacing.BeforeAutoSpacing = Reader.GetBool();
                 else
                     this.Pr.Spacing.BeforeAutoSpacing = undefined;
 

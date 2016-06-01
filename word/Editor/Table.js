@@ -320,21 +320,31 @@ CTable.prototype =
                         CellShd = null;
                 }
 
-                if (0 === Index)
-                {
-                    if (tblwidth_Auto === Cell_w.Type)
-                        CellWidth = null;
-                    else if (tblwidth_Mm === Cell_w.Type)
-                        CellWidth = Cell_w.W;
-                    else// if (tblwidth_Pct === Cell_w.Type)
-                        CellWidth = -Cell_w.W;
-                }
-                else
-                {
-                    if ((tblwidth_Auto === Cell_w.Type && null !== CellWidth)
-                        || (undefined === CellWidth || null === CellWidth || Math.abs(CellWidth - Cell_w.W) > 0.001))
-                        CellWidth = undefined;
-                }
+				if (0 === Index)
+				{
+					if (tblwidth_Auto === Cell_w.Type)
+						CellWidth = null;
+					else if (tblwidth_Mm === Cell_w.Type)
+						CellWidth = Cell_w.W;
+					else// if (tblwidth_Pct === Cell_w.Type)
+						CellWidth = -Cell_w.W;
+				}
+				else
+				{
+					var _CellWidth;
+					if (tblwidth_Auto === Cell_w.Type)
+						_CellWidth = null;
+					else if (tblwidth_Mm === Cell_w.Type)
+						_CellWidth = Cell_w.W;
+					else// if (tblwidth_Pct === Cell_w.Type)
+						_CellWidth = -Cell_w.W;
+
+					if ((tblwidth_Auto === Cell_w.Type && null !== CellWidth)
+						|| (undefined === CellWidth
+						|| null === CellWidth
+						|| Math.abs(CellWidth - _CellWidth) > 0.001))
+						CellWidth = undefined;
+				}
 
                 // Крайняя левая ли данная ячейка в выделении?
                 if ( 0 === Index || this.Selection.Data[Index - 1].Row != Pos.Row )
@@ -528,137 +538,123 @@ CTable.prototype =
                 Pr.CellsWidth = -CellW.W;
 
             var Spacing = this.Content[0].Get_CellSpacing();
-            if ( null === Spacing )
-            {
-                Pr.CellBorders =
-                {
-                    Left    : CellBorders.Left.Copy(),
-                    Right   : CellBorders.Right.Copy(),
-                    Top     : CellBorders.Top.Copy(),
-                    Bottom  : CellBorders.Bottom.Copy(),
-                    InsideH : null,
-                    InsideV : null
-                };
-            }
-            else
-            {
-                var Border_left    = null;
-                var Border_right   = null;
-                var Border_top     = null;
-                var Border_bottom  = null;
-                var Border_insideH = null;
-                var Border_insideV = null;
 
-                var CellShd = null;
+			var Border_left    = null;
+			var Border_right   = null;
+			var Border_top     = null;
+			var Border_bottom  = null;
+			var Border_insideH = null;
+			var Border_insideV = null;
 
-                for ( var CurRow = 0; CurRow < this.Content.length; CurRow++ )
-                {
-                    var Row = this.Content[CurRow];
-                    var Cells_Count = Row.Get_CellsCount();
+			var CellShd = null;
 
-                    for ( var CurCell = 0; CurCell < Cells_Count; CurCell++ )
-                    {
-                        var Cell         = Row.Get_Cell( CurCell );
-                        var Cell_borders = Cell.Get_Borders();
-                        var Cell_shd     = Cell.Get_Shd();
+			for ( var CurRow = 0; CurRow < this.Content.length; CurRow++ )
+			{
+				var Row = this.Content[CurRow];
+				var Cells_Count = Row.Get_CellsCount();
 
-                        if ( 0 === CurCell && Cells_Count )
-                        {
-                            CellShd = Cell_shd;
-                        }
-                        else
-                        {
-                            if ( null != CellShd && ( CellShd.Value != Cell_shd.Value || CellShd.Color.r != Cell_shd.Color.r || CellShd.Color.g != Cell_shd.Color.g || CellShd.Color.b != Cell_shd.Color.b ) )
-                                CellShd = null;
-                        }
+				for ( var CurCell = 0; CurCell < Cells_Count; CurCell++ )
+				{
+					var Cell         = Row.Get_Cell( CurCell );
+					var Cell_borders = Cell.Get_Borders();
+					var Cell_shd     = Cell.Get_Shd();
 
-                        // Крайняя левая ли данная ячейка в выделении?
-                        if ( 0 === CurCell )
-                        {
-                            if ( null === Border_left )
-                                Border_left = Cell_borders.Left;
-                            else
-                                Border_left = this.Internal_CompareBorders2( Border_left, Cell_borders.Left );
-                        }
-                        else
-                        {
-                            if ( null === Border_insideV )
-                                Border_insideV = Cell_borders.Left;
-                            else
-                                Border_insideV = this.Internal_CompareBorders2( Border_insideV, Cell_borders.Left );
-                        }
+					if ( 0 === CurCell && Cells_Count )
+					{
+						CellShd = Cell_shd;
+					}
+					else
+					{
+						if ( null != CellShd && ( CellShd.Value != Cell_shd.Value || CellShd.Color.r != Cell_shd.Color.r || CellShd.Color.g != Cell_shd.Color.g || CellShd.Color.b != Cell_shd.Color.b ) )
+							CellShd = null;
+					}
 
-                        // Крайняя правая ли данная ячейка в выделении?
-                        if ( Cells_Count - 1 === CurCell )
-                        {
-                            if ( null === Border_right )
-                                Border_right = Cell_borders.Right;
-                            else
-                                Border_right = this.Internal_CompareBorders2( Border_right, Cell_borders.Right );
-                        }
-                        else
-                        {
-                            if ( null === Border_insideV )
-                                Border_insideV = Cell_borders.Right;
-                            else
-                                Border_insideV = this.Internal_CompareBorders2( Border_insideV, Cell_borders.Right );
-                        }
+					// Крайняя левая ли данная ячейка в выделении?
+					if ( 0 === CurCell )
+					{
+						if ( null === Border_left )
+							Border_left = Cell_borders.Left;
+						else
+							Border_left = this.Internal_CompareBorders2( Border_left, Cell_borders.Left );
+					}
+					else
+					{
+						if ( null === Border_insideV )
+							Border_insideV = Cell_borders.Left;
+						else
+							Border_insideV = this.Internal_CompareBorders2( Border_insideV, Cell_borders.Left );
+					}
 
-                        if ( 0 === CurCell )
-                        {
-                            if ( 0 != CurRow )
-                            {
-                                if ( null === Border_insideH )
-                                {
-                                    Border_insideH = Border_bottom;
-                                    Border_insideH = this.Internal_CompareBorders2( Border_insideH, Cell_borders.Top );
-                                }
-                                else
-                                {
-                                    Border_insideH = this.Internal_CompareBorders2( Border_insideH, Border_bottom );
-                                    Border_insideH = this.Internal_CompareBorders2( Border_insideH, Cell_borders.Top );
-                                }
-                            }
-                            else
-                            {
-                                if ( null === Border_top )
-                                    Border_top = Cell_borders.Top;
-                            }
+					// Крайняя правая ли данная ячейка в выделении?
+					if ( Cells_Count - 1 === CurCell )
+					{
+						if ( null === Border_right )
+							Border_right = Cell_borders.Right;
+						else
+							Border_right = this.Internal_CompareBorders2( Border_right, Cell_borders.Right );
+					}
+					else
+					{
+						if ( null === Border_insideV )
+							Border_insideV = Cell_borders.Right;
+						else
+							Border_insideV = this.Internal_CompareBorders2( Border_insideV, Cell_borders.Right );
+					}
 
-                            Border_bottom = Cell_borders.Bottom;
-                        }
-                        else
-                        {
-                            if ( 0 != bFirstRow )
-                            {
-                                if ( null === Border_insideH )
-                                    Border_insideH = Cell_borders.Top;
-                                else
-                                    Border_insideH = this.Internal_CompareBorders2( Border_insideH, Cell_borders.Top );
-                            }
-                            else
-                            {
-                                if ( null === Border_top )
-                                    Border_top = Cell_borders.Top;
-                                else
-                                    Border_top = this.Internal_CompareBorders2( Border_top, Cell_borders.Top );
-                            }
+					if ( 0 === CurCell )
+					{
+						if ( 0 != CurRow )
+						{
+							if ( null === Border_insideH )
+							{
+								Border_insideH = Border_bottom;
+								Border_insideH = this.Internal_CompareBorders2( Border_insideH, Cell_borders.Top );
+							}
+							else
+							{
+								Border_insideH = this.Internal_CompareBorders2( Border_insideH, Border_bottom );
+								Border_insideH = this.Internal_CompareBorders2( Border_insideH, Cell_borders.Top );
+							}
+						}
+						else
+						{
+							if ( null === Border_top )
+								Border_top = Cell_borders.Top;
+						}
 
-                            Border_bottom = this.Internal_CompareBorders2( Border_bottom, Cell_borders.Bottom );
-                        }
-                    }
-                }
+						Border_bottom = Cell_borders.Bottom;
+					}
+					else
+					{
+						if ( 0 != CurRow )
+						{
+							if ( null === Border_insideH )
+								Border_insideH = Cell_borders.Top;
+							else
+								Border_insideH = this.Internal_CompareBorders2( Border_insideH, Cell_borders.Top );
+						}
+						else
+						{
+							if ( null === Border_top )
+								Border_top = Cell_borders.Top;
+							else
+								Border_top = this.Internal_CompareBorders2( Border_top, Cell_borders.Top );
+						}
 
-                Pr.CellBorders =
-                {
-                    Left    : Border_left.Copy(),
-                    Right   : Border_right.Copy(),
-                    Top     : Border_top.Copy(),
-                    Bottom  : Border_bottom.Copy(),
-                    InsideH : null === Border_insideH ? null : Border_insideH.Copy(),
-                    InsideV : null === Border_insideV ? null : Border_insideV.Copy()
-                };
-            }
+						Border_bottom = this.Internal_CompareBorders2( Border_bottom, Cell_borders.Bottom );
+					}
+				}
+			}
+
+			Pr.CellBorders =
+			{
+				Left    : Border_left.Copy(),
+				Right   : Border_right.Copy(),
+				Top     : Border_top.Copy(),
+				Bottom  : Border_bottom.Copy(),
+				InsideH : null === Border_insideH ? null : Border_insideH.Copy(),
+				InsideV : null === Border_insideV ? null : Border_insideV.Copy()
+			};
         }
 
         switch(Pr.CellsVAlign)
@@ -764,6 +760,8 @@ CTable.prototype =
         {
             this.DrawingDocument.CheckTableStyles( new Asc.CTablePropLook( this.TableLook ) );
         }
+
+        Pr.PercentFullWidth = this.private_RecalculatePercentWidth();
 
         return Pr;
     },
@@ -1132,9 +1130,9 @@ CTable.prototype =
             {
                 if (tblwidth_Auto != TablePr.TableW.Type)
                 {
-                this.Set_TableW(tblwidth_Auto, 0);
-                bRecalc_All = true;
-            }
+                    this.Set_TableW(tblwidth_Auto, 0);
+                    bRecalc_All = true;
+                }
             }
             else if (Props.TableWidth > -0.001)
             {
@@ -1952,6 +1950,10 @@ CTable.prototype =
         // CellsWidth
         if (undefined !== Props.CellsWidth)
         {
+            var CellsWidth = Props.CellsWidth;
+            if (null !== CellsWidth && Math.abs(CellsWidth) < 0.001)
+                CellsWidth = null;
+
             if (this.Selection.Use === true && table_Selection_Cell === this.Selection.Type)
             {
                 var Count = this.Selection.Data.length;
@@ -1960,22 +1962,22 @@ CTable.prototype =
                     var Pos  = this.Selection.Data[Index];
                     var Cell = this.Content[Pos.Row].Get_Cell(Pos.Cell);
 
-                    if (null === Props.CellsWidth)
+                    if (null === CellsWidth)
                         Cell.Set_W(new CTableMeasurement(tblwidth_Auto, 0));
-                    else if (Props.CellsWidth > -0.001)
-                        Cell.Set_W(new CTableMeasurement(tblwidth_Mm, Props.CellsWidth));
+                    else if (CellsWidth > -0.001)
+                        Cell.Set_W(new CTableMeasurement(tblwidth_Mm, CellsWidth));
                     else
-                        Cell.Set_W(new CTableMeasurement(tblwidth_Pct, Math.abs(Props.CellsWidth)));
+                        Cell.Set_W(new CTableMeasurement(tblwidth_Pct, Math.abs(CellsWidth)));
                 }
             }
             else
             {
-                if (null === Props.CellsWidth)
+                if (null === CellsWidth)
                     this.CurCell.Set_W(new CTableMeasurement(tblwidth_Auto, 0));
-                else if (Props.CellsWidth > -0.001)
-                    this.CurCell.Set_W(new CTableMeasurement(tblwidth_Mm, Props.CellsWidth));
+                else if (CellsWidth > -0.001)
+                    this.CurCell.Set_W(new CTableMeasurement(tblwidth_Mm, CellsWidth));
                 else
-                    this.CurCell.Set_W(new CTableMeasurement(tblwidth_Pct, Math.abs(Props.CellsWidth)));
+                    this.CurCell.Set_W(new CTableMeasurement(tblwidth_Pct, Math.abs(CellsWidth)));
             }
         }
 
@@ -6469,7 +6471,10 @@ CTable.prototype =
         else
         {
             if (AscCommon.g_mouse_event_type_up == MouseEvent.Type)
+            {
                 this.Selection.Start = false;
+				this.CurCell = this.Content[Pos.Row].Get_Cell(Pos.Cell);
+            }
 
             this.Selection.Type = table_Selection_Cell;
             this.Internal_Selection_UpdateCells();
@@ -13332,6 +13337,49 @@ CTable.prototype.private_UpdateCellsGrid = function()
             Row.Update_CellInfo(nCurCell);
             CurGridCol += GridSpan;
         }
+    }
+};
+CTable.prototype.IncDec_Indent = function(bIncrease)
+{
+    if (true === this.ApplyToAll || ( true === this.Selection.Use && table_Selection_Cell === this.Selection.Type && this.Selection.Data.length > 0 ))
+    {
+        var TablePr = this.Get_CompiledPr(false).TablePr;
+
+        var LeftIndOld = TablePr.TableInd;
+        if (undefined === LeftIndOld || null === LeftIndOld)
+        {
+            LeftIndOld = 0;
+        }
+        else if (LeftIndOld < 0)
+        {
+            this.Set_TableInd(0);
+            return;
+        }
+
+        var LeftIndNew = 0;
+        if (true === bIncrease)
+        {
+            if (LeftIndOld >= 0)
+            {
+                LeftIndOld = 12.5 * parseInt(10 * LeftIndOld / 125);
+                LeftIndNew = ( (LeftIndOld - (10 * LeftIndOld) % 125 / 10) / 12.5 + 1) * 12.5;
+            }
+
+            if (LeftIndNew < 0)
+                LeftIndNew = 12.5;
+        }
+        else
+        {
+            var TempValue = (125 - (10 * LeftIndOld) % 125);
+            TempValue     = ( 125 === TempValue ? 0 : TempValue );
+            LeftIndNew    = Math.max(( (LeftIndOld + TempValue / 10) / 12.5 - 1 ) * 12.5, 0);
+        }
+
+        this.Set_TableInd(LeftIndNew);
+    }
+    else
+    {
+        this.CurCell.Content.Paragraph_IncDecIndent(bIncrease);
     }
 };
 //----------------------------------------------------------------------------------------------------------------------

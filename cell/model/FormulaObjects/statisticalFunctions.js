@@ -435,7 +435,7 @@ function cAVERAGE() {
 
 }
 
-cAVERAGE.prototype = Object.create( cBaseFunction.prototype )
+cAVERAGE.prototype = Object.create( cBaseFunction.prototype );
 cAVERAGE.prototype.Calculate = function ( arg ) {
     var count = 0, sum = new cNumber( 0 );
     for ( var i = 0; i < arg.length; i++ ) {
@@ -496,7 +496,7 @@ cAVERAGE.prototype.getInfo = function () {
         name:this.name,
         args:"( argument-list )"
     };
-}
+};
 
 function cAVERAGEA() {
 //    cBaseFunction.call( this, "AVERAGEA" );
@@ -517,7 +517,7 @@ function cAVERAGEA() {
 
 }
 
-cAVERAGEA.prototype = Object.create( cBaseFunction.prototype )
+cAVERAGEA.prototype = Object.create( cBaseFunction.prototype );
 cAVERAGEA.prototype.Calculate = function ( arg ) {
     var count = 0, sum = new cNumber( 0 );
     for ( var i = 0; i < arg.length; i++ ) {
@@ -580,7 +580,7 @@ cAVERAGEA.prototype.getInfo = function () {
         name:this.name,
         args:"( argument-list )"
     };
-}
+};
 
 function cAVERAGEIF() {
 //    cBaseFunction.call( this, "AVERAGEIF", 2, 3 );
@@ -946,7 +946,7 @@ cCORREL.prototype.Calculate = function ( arg ) {
         } );
     }
     else
-        return this.value = cError( cErrorType.wrong_value_type )
+        return this.value = new cError( cErrorType.wrong_value_type );
 
     if ( arg1 instanceof cArea ) {
         arr1 = arg1.getValue();
@@ -957,7 +957,7 @@ cCORREL.prototype.Calculate = function ( arg ) {
         } );
     }
     else
-        return this.value = cError( cErrorType.wrong_value_type )
+        return this.value = new cError( cErrorType.wrong_value_type );
 
     return this.value = correl( arr0, arr1 );
 
@@ -989,7 +989,7 @@ function cCOUNT() {
 
 }
 
-cCOUNT.prototype = Object.create( cBaseFunction.prototype )
+cCOUNT.prototype = Object.create( cBaseFunction.prototype );
 cCOUNT.prototype.Calculate = function ( arg ) {
     var count = 0;
     for ( var i = 0; i < arg.length; i++ ) {
@@ -1031,7 +1031,7 @@ cCOUNT.prototype.getInfo = function () {
         name:this.name,
         args:"( argument-list )"
     };
-}
+};
 
 function cCOUNTA() {
 //    cBaseFunction.call( this, "COUNTA" );
@@ -1053,7 +1053,7 @@ function cCOUNTA() {
 
 }
 
-cCOUNTA.prototype = Object.create( cBaseFunction.prototype )
+cCOUNTA.prototype = Object.create( cBaseFunction.prototype );
 cCOUNTA.prototype.Calculate = function ( arg ) {
     var count = 0;
     for ( var i = 0; i < arg.length; i++ ) {
@@ -1090,7 +1090,7 @@ cCOUNTA.prototype.getInfo = function () {
         name:this.name,
         args:"( argument-list )"
     };
-}
+};
 
 function cCOUNTBLANK() {
 //    cBaseFunction.call( this, "COUNTBLANK" );
@@ -1277,7 +1277,7 @@ cCOVAR.prototype.Calculate = function ( arg ) {
         } );
     }
     else
-        return this.value = cError( cErrorType.wrong_value_type )
+        return this.value = new cError( cErrorType.wrong_value_type );
 
     if ( arg1 instanceof cArea ) {
         arr1 = arg1.getValue();
@@ -1288,7 +1288,7 @@ cCOVAR.prototype.Calculate = function ( arg ) {
         } );
     }
     else
-        return this.value = cError( cErrorType.wrong_value_type )
+        return this.value = new cError( cErrorType.wrong_value_type );
 
     return this.value = covar( arr0, arr1 );
 
@@ -1469,7 +1469,7 @@ cDEVSQ.prototype.Calculate = function ( arg ) {
             continue;
         }
         else
-            return this.value = cError( cErrorType.wrong_value_type )
+            return this.value = new cError( cErrorType.wrong_value_type );
 
     }
     return this.value = devsq( arr0 );
@@ -1761,7 +1761,7 @@ cFORECAST.prototype.Calculate = function ( arg ) {
         } );
     }
     else
-        return this.value = cError( cErrorType.wrong_value_type )
+        return this.value = new cError( cErrorType.wrong_value_type );
 
     if ( arg2 instanceof cArea ) {
         arr1 = arg2.getValue();
@@ -1772,17 +1772,17 @@ cFORECAST.prototype.Calculate = function ( arg ) {
         } );
     }
     else
-        return this.value = cError( cErrorType.wrong_value_type )
+        return this.value = new cError( cErrorType.wrong_value_type );
 
     return this.value = forecast( arg0, arr0, arr1 );
 
-}
+};
 cFORECAST.prototype.getInfo = function () {
     return {
         name:this.name,
         args:"( x , array-1 , array-2 )"
     };
-}
+};
 
 function cFREQUENCY() {
 //    cBaseFunction.call( this, "FREQUENCY" );
@@ -2035,7 +2035,7 @@ cGEOMEAN.prototype.Calculate = function ( arg ) {
             arr0.push( arg[j].tocNumber() );
         }
         else
-            return this.value = cError( cErrorType.wrong_value_type )
+            return this.value = new cError( cErrorType.wrong_value_type );
 
     }
     return this.value = geommean( arr0 );
@@ -2130,18 +2130,18 @@ cHARMEAN.prototype.Calculate = function ( arg ) {
             arr0.push( arg[j].tocNumber() );
         }
         else
-            return this.value = cError( cErrorType.wrong_value_type )
+            return this.value = new cError( cErrorType.wrong_value_type );
 
     }
     return this.value = harmmean( arr0 );
 
-}
+};
 cHARMEAN.prototype.getInfo = function () {
     return {
         name:this.name,
         args:"( argument-list )"
     };
-}
+};
 
 function cHYPGEOMDIST() {
 //    cBaseFunction.call( this, "HYPGEOMDIST" );
@@ -2296,7 +2296,7 @@ cINTERCEPT.prototype.Calculate = function ( arg ) {
         } );
     }
     else
-        return this.value = cError( cErrorType.wrong_value_type )
+        return this.value = new cError( cErrorType.wrong_value_type );
 
     if ( arg1 instanceof cArea ) {
         arr1 = arg1.getValue();
@@ -2307,17 +2307,17 @@ cINTERCEPT.prototype.Calculate = function ( arg ) {
         } );
     }
     else
-        return this.value = cError( cErrorType.wrong_value_type )
+        return this.value = new cError( cErrorType.wrong_value_type );
 
     return this.value = intercept( arr0, arr1 );
 
-}
+};
 cINTERCEPT.prototype.getInfo = function () {
     return {
         name:this.name,
         args:"( array-1 , array-2 )"
     };
-}
+};
 
 function cKURT() {
 //    cBaseFunction.call( this, "KURT" );
@@ -2405,18 +2405,18 @@ cKURT.prototype.Calculate = function ( arg ) {
             continue;
         }
         else
-            return this.value = cError( cErrorType.wrong_value_type )
+            return this.value = new cError( cErrorType.wrong_value_type );
 
     }
     return this.value = kurt( arr0 );
 
-}
+};
 cKURT.prototype.getInfo = function () {
     return {
         name:this.name,
         args:"( argument-list )"
     };
-}
+};
 
 function cLARGE() {
 //    cBaseFunction.call( this, "LARGE" );
@@ -2668,7 +2668,7 @@ function cMAX() {
 
 }
 
-cMAX.prototype = Object.create( cBaseFunction.prototype )
+cMAX.prototype = Object.create( cBaseFunction.prototype );
 cMAX.prototype.Calculate = function ( arg ) {
     var argI, argIVal, max = Number.NEGATIVE_INFINITY;
     for ( var i = 0; i < this.argumentsCurrent; i++ ) {
@@ -2718,7 +2718,7 @@ cMAX.prototype.Calculate = function ( arg ) {
                     max = elem;
                     return true;
                 }
-            } )
+            } );
             if ( max instanceof cError ) {
                 return this.value = max;
             }
@@ -2735,7 +2735,7 @@ cMAX.prototype.getInfo = function () {
         name:this.name,
         args:"(number1, number2, ...)"
     };
-}
+};
 
 function cMAXA() {
 //    cBaseFunction.call( this, "MAXA" );
@@ -2900,18 +2900,18 @@ cMEDIAN.prototype.Calculate = function ( arg ) {
             continue;
         }
         else
-            return this.value = cError( cErrorType.wrong_value_type )
+            return this.value = new cError( cErrorType.wrong_value_type );
 
     }
     return this.value = median( arr0 );
 
-}
+};
 cMEDIAN.prototype.getInfo = function () {
     return {
         name:this.name,
         args:"( argument-list )"
     };
-}
+};
 
 function cMIN() {
 //    cBaseFunction.call( this, "MIN" );
@@ -3187,18 +3187,18 @@ cMODE.prototype.Calculate = function ( arg ) {
             continue;
         }
         else
-            return this.value = cError( cErrorType.wrong_value_type )
+            return this.value = new cError( cErrorType.wrong_value_type );
 
     }
     return this.value = mode( arr0 );
 
-}
+};
 cMODE.prototype.getInfo = function () {
     return {
         name:this.name,
         args:"( argument-list )"
     };
-}
+};
 
 function cNEGBINOMDIST() {
 //    cBaseFunction.call( this, "NEGBINOMDIST" );
@@ -3607,7 +3607,7 @@ cPEARSON.prototype.Calculate = function ( arg ) {
         } );
     }
     else
-        return this.value = cError( cErrorType.wrong_value_type )
+        return this.value = new cError( cErrorType.wrong_value_type );
 
     if ( arg1 instanceof cArea ) {
         arr1 = arg1.getValue();
@@ -3618,17 +3618,17 @@ cPEARSON.prototype.Calculate = function ( arg ) {
         } );
     }
     else
-        return this.value = cError( cErrorType.wrong_value_type )
+        return this.value = new cError( cErrorType.wrong_value_type );
 
     return this.value = pearson( arr0, arr1 );
 
-}
+};
 cPEARSON.prototype.getInfo = function () {
     return {
         name:this.name,
         args:"( array-1 , array-2 )"
     };
-}
+};
 
 function cPERCENTILE() {
 //    cBaseFunction.call( this, "PERCENTILE" );
@@ -4350,7 +4350,7 @@ cRSQ.prototype.Calculate = function ( arg ) {
         } );
     }
     else
-        return this.value = cError( cErrorType.wrong_value_type );
+        return this.value = new cError( cErrorType.wrong_value_type );
 
     if ( arg1 instanceof cArea ) {
         arr1 = arg1.getValue();
@@ -4361,7 +4361,7 @@ cRSQ.prototype.Calculate = function ( arg ) {
         } );
     }
     else
-        return this.value = cError( cErrorType.wrong_value_type );
+        return this.value = new cError( cErrorType.wrong_value_type );
 
     return this.value = rsq( arr0, arr1 );
 
@@ -4463,7 +4463,7 @@ cSKEW.prototype.Calculate = function ( arg ) {
             continue;
         }
         else
-            return this.value = cError( cErrorType.wrong_value_type )
+            return this.value = new cError( cErrorType.wrong_value_type );
 
     }
     return this.value = skew( arr0 );
@@ -4547,7 +4547,7 @@ cSLOPE.prototype.Calculate = function ( arg ) {
         } );
     }
     else
-        return this.value = cError( cErrorType.wrong_value_type )
+        return this.value = new cError( cErrorType.wrong_value_type );
 
     if ( arg1 instanceof cArea ) {
         arr1 = arg1.getValue();
@@ -4558,7 +4558,7 @@ cSLOPE.prototype.Calculate = function ( arg ) {
         } );
     }
     else
-        return this.value = cError( cErrorType.wrong_value_type )
+        return this.value = new cError( cErrorType.wrong_value_type );
 
     return this.value = slope( arr0, arr1 );
 
@@ -4881,7 +4881,7 @@ cSTDEVA.prototype.getInfo = function () {
         name:this.name,
         args:"( argument-list )"
     };
-}
+};
 
 function cSTDEVP() {
 //    cBaseFunction.call( this, "STDEVP" );
@@ -4900,7 +4900,7 @@ function cSTDEVP() {
 
 }
 
-cSTDEVP.prototype = Object.create( cBaseFunction.prototype )
+cSTDEVP.prototype = Object.create( cBaseFunction.prototype );
 cSTDEVP.prototype.Calculate = function ( arg ) {
 
     function _var( x ) {
@@ -4910,7 +4910,7 @@ cSTDEVP.prototype.Calculate = function ( arg ) {
 
             if ( x[i] instanceof cNumber ) {
                 _x += x[i].getValue();
-                tA.push( x[i].getValue() )
+                tA.push( x[i].getValue() );
                 xLength++;
             }
             else if ( x[i] instanceof  cError ) {
@@ -4933,46 +4933,46 @@ cSTDEVP.prototype.Calculate = function ( arg ) {
 
     var arr0 = [];
 
-    for ( var j = 0; j < this.getArguments(); j++ ) {
-
-        if ( arg[j] instanceof cArea || arg[j] instanceof cArea3D ) {
-            arg[j].foreach2( function ( elem ) {
+    for ( var j = 0; j < arg.length; j++ ) {
+        var _arg = arg[j];
+        if ( _arg instanceof cArea || _arg instanceof cArea3D ) {
+            _arg.foreach2( function ( elem ) {
                 if ( elem instanceof  cNumber || elem instanceof  cError ) {
                     arr0.push( elem );
                 }
             } );
         }
-        else if ( arg[j] instanceof cRef || arg[j] instanceof cRef3D ) {
-            var a = arg[j].getValue();
+        else if ( _arg instanceof cRef || _arg instanceof cRef3D ) {
+            var a = _arg.getValue();
             if ( a instanceof  cNumber || a instanceof  cError ) {
                 arr0.push( a );
             }
         }
-        else if ( arg[j] instanceof cArray ) {
-            arg[j].foreach( function ( elem ) {
+        else if ( _arg instanceof cArray ) {
+            _arg.foreach( function ( elem ) {
                 if ( elem instanceof  cNumber || elem instanceof  cError ) {
                     arr0.push( elem );
                 }
             } );
         }
-        else if ( arg[j] instanceof cNumber || arg[j] instanceof cBool ) {
-            arr0.push( arg[j].tocNumber() );
+        else if ( _arg instanceof cNumber || _arg instanceof cBool ) {
+            arr0.push( _arg.tocNumber() );
         }
-        else if ( arg[j] instanceof cString || arg[j] instanceof  cEmpty ) {
+        else if ( _arg instanceof cString || _arg instanceof  cEmpty ) {
             arr0.push( new cNumber( 0 ) );
         }
         else
-            return this.value = cError( cErrorType.wrong_value_type )
+            return this.value = new cError( cErrorType.wrong_value_type );
 
     }
     return this.value = _var( arr0 );
-}
+};
 cSTDEVP.prototype.getInfo = function () {
     return {
         name:this.name,
         args:"( argument-list )"
     };
-}
+};
 
 function cSTDEVPA() {
 //    cBaseFunction.call( this, "STDEVPA" );
@@ -5071,17 +5071,17 @@ cSTDEVPA.prototype.Calculate = function ( arg ) {
             arr0.push( new cNumber( 0 ) );
         }
         else
-            return this.value = cError( cErrorType.wrong_value_type )
+            return this.value = new cError( cErrorType.wrong_value_type );
 
     }
     return this.value = _var( arr0 );
-}
+};
 cSTDEVPA.prototype.getInfo = function () {
     return {
         name:this.name,
         args:"( argument-list )"
     };
-}
+};
 
 function cSTEYX() {
 //    cBaseFunction.call( this, "STEYX" );
@@ -5154,7 +5154,7 @@ cSTEYX.prototype.Calculate = function ( arg ) {
         } );
     }
     else
-        return this.value = cError( cErrorType.wrong_value_type )
+        return this.value = new cError( cErrorType.wrong_value_type );
 
     if ( arg1 instanceof cArea ) {
         arr1 = arg1.getValue();
@@ -5165,17 +5165,17 @@ cSTEYX.prototype.Calculate = function ( arg ) {
         } );
     }
     else
-        return this.value = cError( cErrorType.wrong_value_type )
+        return this.value = new cError( cErrorType.wrong_value_type );
 
     return this.value = steyx( arr0, arr1 );
 
-}
+};
 cSTEYX.prototype.getInfo = function () {
     return {
         name:this.name,
         args:"( known-ys , known-xs )"
     };
-}
+};
 
 function cTDIST() {
     cBaseFunction.call( this, "TDIST" );
@@ -5199,13 +5199,13 @@ function cTRIMMEAN() {
     cBaseFunction.call( this, "TRIMMEAN" );
 }
 
-cTRIMMEAN.prototype = Object.create( cBaseFunction.prototype )
+cTRIMMEAN.prototype = Object.create( cBaseFunction.prototype );
 
 function cTTEST() {
     cBaseFunction.call( this, "TTEST" );
 }
 
-cTTEST.prototype = Object.create( cBaseFunction.prototype )
+cTTEST.prototype = Object.create( cBaseFunction.prototype );
 
 function cVAR() {
 //    cBaseFunction.call( this, "VAR" );
@@ -5226,7 +5226,7 @@ function cVAR() {
 
 }
 
-cVAR.prototype = Object.create( cBaseFunction.prototype )
+cVAR.prototype = Object.create( cBaseFunction.prototype );
 cVAR.prototype.Calculate = function ( arg ) {
 
     function _var( x ) {
@@ -5240,7 +5240,7 @@ cVAR.prototype.Calculate = function ( arg ) {
 
             if ( x[i] instanceof cNumber ) {
                 _x += x[i].getValue();
-                tA.push( x[i].getValue() )
+                tA.push( x[i].getValue() );
                 xLength++;
             }
             else if ( x[i] instanceof  cError ) {
@@ -5263,48 +5263,48 @@ cVAR.prototype.Calculate = function ( arg ) {
 
     var arr0 = [];
 
-    for ( var j = 0; j < this.getArguments(); j++ ) {
-
-        if ( arg[j] instanceof cArea || arg[j] instanceof cArea3D ) {
-            arg[j].foreach2( function ( elem ) {
+    for ( var j = 0; j < arg.length; j++ ) {
+        var _arg = arg[j];
+        if ( _arg instanceof cArea || _arg instanceof cArea3D ) {
+            _arg.foreach2( function ( elem ) {
                 if ( elem instanceof  cNumber || elem instanceof  cError ){
                     arr0.push( elem );
                 }
             } );
         }
-        else if ( arg[j] instanceof cRef || arg[j] instanceof cRef3D ) {
-            var a = arg[j].getValue();
+        else if ( _arg instanceof cRef || _arg instanceof cRef3D ) {
+            var a = _arg.getValue();
             if ( a instanceof  cNumber || a instanceof  cError ){
                 arr0.push( a );
             }
         }
-        else if ( arg[j] instanceof cArray ) {
-            arg[j].foreach( function ( elem ) {
+        else if ( _arg instanceof cArray ) {
+            _arg.foreach( function ( elem ) {
                 if ( elem instanceof  cNumber || elem instanceof  cError ){
                     arr0.push( elem );
                 }
             } );
         }
-        else if ( arg[j] instanceof cNumber || arg[j] instanceof cBool ) {
-            arr0.push( arg[j].tocNumber() );
+        else if ( _arg instanceof cNumber || _arg instanceof cBool ) {
+            arr0.push( _arg.tocNumber() );
         }
-        else if ( arg[j] instanceof cString || arg[j] instanceof  cEmpty ) {
+        else if ( _arg instanceof cString || _arg instanceof  cEmpty ) {
             continue;
         }
         else{
-            return this.value = cError( cErrorType.wrong_value_type );
+            return this.value = new cError( cErrorType.wrong_value_type );
         }
 
     }
     return this.value = _var( arr0 );
 
-}
+};
 cVAR.prototype.getInfo = function () {
     return {
         name:this.name,
         args:"( argument-list )"
     };
-}
+};
 
 function cVARA() {
 //    cBaseFunction.call( this, "VARA" );
@@ -5323,7 +5323,7 @@ function cVARA() {
 
 }
 
-cVARA.prototype = Object.create( cBaseFunction.prototype )
+cVARA.prototype = Object.create( cBaseFunction.prototype );
 cVARA.prototype.Calculate = function ( arg ) {
 
     function _var( x ) {
@@ -5407,18 +5407,18 @@ cVARA.prototype.Calculate = function ( arg ) {
             arr0.push( new cNumber( 0 ) );
         }
         else if ( arg[j] instanceof  cError ){
-            return this.value = cError( cErrorType.wrong_value_type )
+            return this.value = new cError( cErrorType.wrong_value_type );
         }
 
     }
     return this.value = _var( arr0 );
-}
+};
 cVARA.prototype.getInfo = function () {
     return {
         name:this.name,
         args:"( argument-list )"
     };
-}
+};
 
 function cVARP() {
 //    cBaseFunction.call( this, "VARP" );
@@ -5437,7 +5437,7 @@ function cVARP() {
 
 }
 
-cVARP.prototype = Object.create( cBaseFunction.prototype )
+cVARP.prototype = Object.create( cBaseFunction.prototype );
 cVARP.prototype.Calculate = function ( arg ) {
 
     function _var( x ) {
@@ -5474,46 +5474,46 @@ cVARP.prototype.Calculate = function ( arg ) {
 
     var arr0 = [];
 
-    for ( var j = 0; j < this.getArguments(); j++ ) {
-
-        if ( arg[j] instanceof cArea || arg[j] instanceof cArea3D ) {
-            arg[j].foreach2( function ( elem ) {
+    for ( var j = 0; j < arg.length; j++ ) {
+        var _arg = arg[j];
+        if ( _arg instanceof cArea || _arg instanceof cArea3D ) {
+            _arg.foreach2( function ( elem ) {
                 if ( elem instanceof  cNumber || elem instanceof  cError ) {
                     arr0.push( elem );
                 }
             } );
         }
-        else if ( arg[j] instanceof cRef || arg[j] instanceof cRef3D ) {
-            var a = arg[j].getValue();
+        else if ( _arg instanceof cRef || _arg instanceof cRef3D ) {
+            var a = _arg.getValue();
             if ( a instanceof  cNumber || a instanceof  cError ) {
                 arr0.push( a );
             }
         }
-        else if ( arg[j] instanceof cArray ) {
-            arg[j].foreach( function ( elem ) {
+        else if ( _arg instanceof cArray ) {
+            _arg.foreach( function ( elem ) {
                 if ( elem instanceof  cNumber || elem instanceof  cError ) {
                     arr0.push( elem );
                 }
             } );
         }
-        else if ( arg[j] instanceof cNumber || arg[j] instanceof cBool ) {
-            arr0.push( arg[j].tocNumber() );
+        else if ( _arg instanceof cNumber || _arg instanceof cBool ) {
+            arr0.push( _arg.tocNumber() );
         }
-        else if ( arg[j] instanceof cString || arg[j] instanceof  cEmpty ) {
+        else if ( _arg instanceof cString || _arg instanceof  cEmpty ) {
             arr0.push( new cNumber( 0 ) );
         }
         else
-            return this.value = cError( cErrorType.wrong_value_type )
+            return this.value = new cError( cErrorType.wrong_value_type );
 
     }
     return this.value = _var( arr0 );
-}
+};
 cVARP.prototype.getInfo = function () {
     return {
         name:this.name,
         args:"( argument-list )"
     };
-}
+};
 
 function cVARdotP() {
 //    cBaseFunction.call( this, "VARP" );
@@ -5532,14 +5532,14 @@ function cVARdotP() {
 
 }
 
-cVARdotP.prototype = Object.create( cBaseFunction.prototype )
+cVARdotP.prototype = Object.create( cBaseFunction.prototype );
 cVARdotP.prototype.Calculate = cVARP.prototype.Calculate;
 cVARdotP.prototype.getInfo = function () {
     return {
         name:this.name,
         args:"( argument-list )"
     };
-}
+};
 
 function cVARPA() {
 //    cBaseFunction.call( this, "VARPA" );
@@ -5558,7 +5558,7 @@ function cVARPA() {
 
 }
 
-cVARPA.prototype = Object.create( cBaseFunction.prototype )
+cVARPA.prototype = Object.create( cBaseFunction.prototype );
 cVARPA.prototype.Calculate = function ( arg ) {
 
     function _var( x ) {
@@ -5642,24 +5642,24 @@ cVARPA.prototype.Calculate = function ( arg ) {
             arr0.push( new cNumber( 0 ) );
         }
         else if ( elem instanceof  cError ){
-            return this.value = cError( cErrorType.wrong_value_type )
+            return this.value = new cError( cErrorType.wrong_value_type );
         }
 
     }
     return this.value = _var( arr0 );
-}
+};
 cVARPA.prototype.getInfo = function () {
     return {
         name:this.name,
         args:"( argument-list )"
     };
-}
+};
 
 function cWEIBULL() {
     cBaseFunction.call( this, "WEIBULL" );
 }
 
-cWEIBULL.prototype = Object.create( cBaseFunction.prototype )
+cWEIBULL.prototype = Object.create( cBaseFunction.prototype );
 
 function cZTEST() {
     cBaseFunction.call( this, "ZTEST" );
@@ -5681,4 +5681,5 @@ cZTEST.prototype = Object.create( cBaseFunction.prototype );
     window['AscCommonExcel'].cSTDEV = cSTDEV;
     window['AscCommonExcel'].cSTDEVP = cSTDEVP;
     window['AscCommonExcel'].cVAR = cVAR;
+    window['AscCommonExcel'].cVARP = cVARP;
 })(window);

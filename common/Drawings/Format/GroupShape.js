@@ -1732,6 +1732,11 @@ AscCommon.extendClass(CGroupShape, AscFormat.CGraphicObjectBase);
     {
         switch(data.Type)
         {
+            case AscDFH.historyitem_AutoShapes_SetLocks:
+            {
+                this.locks = data.oldPr;
+                break;
+            }
             case AscDFH.historyitem_AutoShapes_SetBFromSerialize:
             {
                 this.fromSerialize = data.oldPr;
@@ -1824,6 +1829,11 @@ AscCommon.extendClass(CGroupShape, AscFormat.CGraphicObjectBase);
     {
         switch(data.Type)
         {
+            case AscDFH.historyitem_AutoShapes_SetLocks:
+            {
+                this.locks = data.newPr;
+                break;
+            }
             case AscDFH.historyitem_AutoShapes_SetBFromSerialize:
             {
                 this.fromSerialize = data.newPr;
@@ -1919,7 +1929,11 @@ AscCommon.extendClass(CGroupShape, AscFormat.CGraphicObjectBase);
         w.WriteLong(data.Type);
         switch(data.Type)
         {
-
+            case AscDFH.historyitem_AutoShapes_SetLocks:
+            {
+                w.WriteLong(data.newPr);
+                break;
+            }
             case AscDFH.historyitem_AutoShapes_SetBFromSerialize:
             {
                 AscFormat.writeBool(w, data.newPr);
@@ -1991,6 +2005,11 @@ AscCommon.extendClass(CGroupShape, AscFormat.CGraphicObjectBase);
         var type  = r.GetLong();
         switch (type)
         {
+            case AscDFH.historyitem_AutoShapes_SetLocks:
+            {
+                this.locks = r.GetLong();
+                break;
+            }
             case AscDFH.historyitem_AutoShapes_SetBFromSerialize:
             {
                 this.fromSerialize = AscFormat.readBool(r);

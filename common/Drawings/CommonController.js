@@ -88,6 +88,7 @@ var DISTANCE_TO_TEXT_LEFTRIGHT = 3.2;
         blip_fill.setStretch(true);
         image.setBlipFill(blip_fill);
         image.setNvPicPr(new AscFormat.UniNvPr());
+        image.setNoChangeAspect(true);
         image.setBDeleted(false);
     }
 
@@ -878,7 +879,7 @@ DrawingObjectsController.prototype =
 
                     if (object.getObjectType() === AscDFH.historyitem_type_ChartSpace && this.handleChartDoubleClick)
                         this.handleChartDoubleClick(drawing, object, e, x, y, pageIndex);
-                    if (object.getObjectType() === AscDFH.historyitem_type_OleObject && this.handleChartDoubleClick){
+                    if (object.getObjectType() === AscDFH.historyitem_type_OleObject && this.handleOleObjectDoubleClick){
                         this.handleOleObjectDoubleClick(drawing, object, e, x, y, pageIndex);
                     }
                     else if (2 == e.ClickCount && drawing instanceof ParaDrawing && drawing.Is_MathEquation())
@@ -2340,7 +2341,22 @@ DrawingObjectsController.prototype =
             }
         }
 
-        if(isRealObject(props.Position) &&AscFormat.isRealNumber(props.Position.X) && AscFormat.isRealNumber(props.Position.Y))
+        if(AscFormat.isRealBool(props.lockAspect))
+        {
+            for(i = 0; i < objects_by_type.shapes.length; ++i)
+            {
+                objects_by_type.shapes[i].setNoChangeAspect(props.lockAspect ? true : undefined);
+            }
+            for(i = 0; i < objects_by_type.images.length; ++i)
+            {
+                objects_by_type.images[i].setNoChangeAspect(props.lockAspect ? true : undefined);
+            }
+            for(i = 0; i < objects_by_type.charts.length; ++i)
+            {
+                objects_by_type.charts[i].setNoChangeAspect(props.lockAspect ? true : undefined);
+            }
+        }
+        if(isRealObject(props.Position) && AscFormat.isRealNumber(props.Position.X) && AscFormat.isRealNumber(props.Position.Y))
         {
             for(i = 0; i < objects_by_type.shapes.length; ++i)
             {
@@ -4443,7 +4459,7 @@ DrawingObjectsController.prototype =
             {
                 if(this.selection.groupSelection.selection.chartSelection)
                 {
-                    //TODO
+                    this.selection.groupSelection.selection.chartSelection.remove();
                 }
                 else
                 {
@@ -4530,8 +4546,10 @@ DrawingObjectsController.prototype =
                     this.resetInternalSelection();
                 }
             }
-            //else if(this.selection.chartSelection) TODO
-            //{}
+            else if(this.selection.chartSelection)
+            {
+                this.selection.chartSelection.remove();
+            }
             else
             {
                 for(var i = 0; i < this.selectedObjects.length; ++i)
@@ -6427,6 +6445,7 @@ DrawingObjectsController.prototype =
                     }
                 }
             }
+            var lockAspect = drawing.getNoChangeAspect();
             switch(drawing.getObjectType())
             {
                 case AscDFH.historyitem_type_Shape:
@@ -6446,7 +6465,8 @@ DrawingObjectsController.prototype =
                         canChangeArrows: drawing.canChangeArrows(),
                         bFromChart: false,
                         locked: locked,
-                        textArtProperties: drawing.getTextArtProperties()
+                        textArtProperties: drawing.getTextArtProperties(),
+                        lockAspect: lockAspect
                     };
                     if(!shape_props)
                         shape_props = new_shape_props;
@@ -6465,7 +6485,8 @@ DrawingObjectsController.prototype =
                         h: drawing.extY,
                         locked: locked,
                         x: drawing.x,
-                        y: drawing.y
+                        y: drawing.y,
+                        lockAspect: lockAspect
                     };
                     if(!image_props)
                         image_props = new_image_props;
@@ -6484,6 +6505,9 @@ DrawingObjectsController.prototype =
 
                         if(image_props.locked || new_image_props.locked)
                             image_props.locked = true;
+                        if(image_props.lockAspect || new_image_props.lockAspect)
+                            image_props.lockAspect = false;
+                        
                     }
                     break;
                 }
@@ -6497,7 +6521,8 @@ DrawingObjectsController.prototype =
                         styleId: drawing.style,
                         w: drawing.extX,
                         h: drawing.extY,
-                        locked: locked
+                        locked: locked,
+                        lockAspect: lockAspect
                     };
                     if(!chart_props)
                     {
@@ -6527,6 +6552,8 @@ DrawingObjectsController.prototype =
 
                         if(chart_props.locked || new_chart_props.locked)
                             chart_props.locked = true;
+                        if(!chart_props.lockAspect || !new_chart_props.lockAspect)
+                            chart_props.locked = false;
                     }
 
                     new_shape_props =
@@ -6543,7 +6570,8 @@ DrawingObjectsController.prototype =
                         canChangeArrows: false,
                         bFromChart: true,
                         locked: locked,
-                        textArtProperties: null
+                        textArtProperties: null,
+                        lockAspect: lockAspect
                     };
                     if(!shape_props)
                         shape_props = new_shape_props;
@@ -6660,6 +6688,8 @@ DrawingObjectsController.prototype =
 
                             if(image_props.locked || group_drawing_props.imageProps.locked)
                                 image_props.locked = true;
+                            if(!image_props.lockAspect || !group_drawing_props.imageProps.lockAspect)
+                                image_props.lockAspect = false;
                         }
                     }
                     if(group_drawing_props.chartProps)
@@ -6776,6 +6806,7 @@ DrawingObjectsController.prototype =
             shape_props.ShapeProperties.stroke = props.shapeChartProps.stroke;
             shape_props.ShapeProperties.canChangeArrows = props.shapeChartProps.canChangeArrows;
             shape_props.ShapeProperties.bFromChart = props.shapeChartProps.bFromChart;
+            shape_props.ShapeProperties.lockAspect = props.shapeChartProps.lockAspect;
 
             if(props.shapeChartProps.paddings)
             {
@@ -6839,8 +6870,9 @@ DrawingObjectsController.prototype =
             shape_props.ShapeProperties.stroke = props.shapeProps.stroke;
             shape_props.ShapeProperties.canChangeArrows = props.shapeProps.canChangeArrows;
             shape_props.ShapeProperties.bFromChart = props.shapeProps.bFromChart;
+            shape_props.ShapeProperties.lockAspect = props.shapeProps.lockAspect;
             shape_props.ShapeProperties.textArtProperties = AscFormat.CreateAscTextArtProps(props.shapeProps.textArtProperties);
-
+            shape_props.lockAspect = props.shapeProps.lockAspect;
             if(props.shapeProps.textArtProperties)
             {
                 oTextArtProperties = props.shapeProps.textArtProperties;
@@ -6898,7 +6930,7 @@ DrawingObjectsController.prototype =
             image_props.Height = props.imageProps.h;
             image_props.ImageUrl = props.imageProps.ImageUrl;
             image_props.Locked = props.imageProps.locked === true;
-
+            image_props.lockAspect = props.imageProps.lockAspect;
             if(!bParaLocked)
             {
                 bParaLocked = image_props.Locked;
@@ -6912,6 +6944,7 @@ DrawingObjectsController.prototype =
             chart_props.Height = props.chartProps.h;
             chart_props.ChartProperties = props.chartProps.chartProps;
             chart_props.Locked = props.chartProps.locked === true;
+            chart_props.lockAspect = props.chartProps.lockAspect;
             if(!bParaLocked)
             {
                 bParaLocked = chart_props.Locked;
@@ -7015,12 +7048,13 @@ DrawingObjectsController.prototype =
         return image;
     },
 
-    createOleObject: function(data, sApplicationId, rasterImageId, x, y, extX, extY)
+    createOleObject: function(data, sApplicationId, rasterImageId, x, y, extX, extY, nWidthPix, nHeightPix)
     {
         var oleObject = new AscFormat.COleObject();
         AscFormat.fillImage(oleObject, rasterImageId, x, y, extX, extY);
         oleObject.setData(data);
         oleObject.setApplicationId(sApplicationId);
+        oleObject.setPixSizes(nWidthPix, nHeightPix);
         return oleObject;
     },
 

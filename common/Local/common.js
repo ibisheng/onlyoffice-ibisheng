@@ -164,6 +164,13 @@ window["NativeCorrectImageUrlOnPaste"] = function(url)
 	return window["AscDesktopEditor"]["LocalFileGetImageUrl"](url);
 };
 
+window["UpdateInstallPlugins"] = function()
+{
+	var _plugins = JSON.parse(window["AscDesktopEditor"]["GetInstallPlugins"]());
+	var _editor = window["Asc"]["editor"] ? window["Asc"]["editor"] : window.editor;
+	_editor.asc_fireCallback("asc_onPluginsInit", _plugins);
+};
+
 AscCommon.InitDragAndDrop = function(oHtmlElement, callback) {
 	if ("undefined" != typeof(FileReader) && null != oHtmlElement) {
 		oHtmlElement["ondragover"] = function (e) {

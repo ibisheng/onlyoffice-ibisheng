@@ -65,7 +65,7 @@ var GlobalSkinFlat = {
     ThumbnailScrollWidthNullIfNoScrolling : false
 };
 
-var GlobalSkin = GlobalSkinTeamlab;
+var GlobalSkin = GlobalSkinFlat;
 
 function updateGlobalSkin(newSkin) {
     GlobalSkin.Name = newSkin.Name;

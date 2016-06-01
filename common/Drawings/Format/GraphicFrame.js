@@ -1040,6 +1040,11 @@ CGraphicFrame.prototype.Undo = function(data)
     {
         switch(data.Type)
         {
+            case AscDFH.historyitem_AutoShapes_SetLocks:
+            {
+                this.locks = data.oldPr;
+                break;
+            }
             case AscDFH.historyitem_ShapeSetBDeleted:
             {
                 this.bDeleted = data.oldPr;
@@ -1081,6 +1086,11 @@ CGraphicFrame.prototype.Redo = function(data)
     {
         switch(data.Type)
         {
+            case AscDFH.historyitem_AutoShapes_SetLocks:
+            {
+                this.locks = data.newPr;
+                break;
+            }
             case AscDFH.historyitem_ShapeSetBDeleted:
             {
                 this.bDeleted = data.newPr;
@@ -1123,6 +1133,11 @@ CGraphicFrame.prototype.Save_Changes = function(data, w)
         w.WriteLong(data.Type);
         switch(data.Type)
         {
+            case AscDFH.historyitem_AutoShapes_SetLocks:
+            {
+                w.WriteLong(data.newPr);
+                break;
+            }
             case AscDFH.historyitem_GraphicFrameSetSpPr          :
             case AscDFH.historyitem_GraphicFrameSetGraphicObject :
             case AscDFH.historyitem_GraphicFrameSetSetNvSpPr     :
@@ -1145,6 +1160,11 @@ CGraphicFrame.prototype.Load_Changes = function(r)
         var  type = r.GetLong();
         switch(type)
         {
+            case AscDFH.historyitem_AutoShapes_SetLocks:
+            {
+                this.locks = r.GetLong();
+                break;
+            }
             case AscDFH.historyitem_ShapeSetBDeleted:
             {
                 this.bDeleted = AscFormat.readBool(r);

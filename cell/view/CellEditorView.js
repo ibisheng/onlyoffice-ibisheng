@@ -721,6 +721,7 @@
 			}
 		}
 
+		var tmp = this.skipTLUpdate;
 		this.skipTLUpdate = false;
 		// Вставим форумулу в текущую позицию
 		this._addChars( functionName );
@@ -728,6 +729,7 @@
 		if ( !isDefName ) {
 			this._moveCursor( kPosition, this.cursorPos - 1 );
 		}
+		this.skipTLUpdate = tmp;
 	};
 
 	CellEditor.prototype.replaceText = function ( pos, len, newText ) {

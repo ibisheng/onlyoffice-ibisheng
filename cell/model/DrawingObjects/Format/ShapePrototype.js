@@ -429,6 +429,7 @@ CShape.prototype.recalculate = function ()
 
     }, this, []);
 };
+    
 CShape.prototype.recalculateBounds = function()
 {
     var boundsChecker = new  AscFormat.CSlideBoundsChecker();

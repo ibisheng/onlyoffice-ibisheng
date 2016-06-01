@@ -1,4 +1,4 @@
-"use strict";
+﻿"use strict";
 
 var editor;
 (/**
@@ -1706,15 +1706,15 @@ var editor;
           }
           this.handlers.trigger("asc_onLockDefNameManager",Asc.c_oAscDefinedNameReason.LockDefNameManager);
       }
-  }
+  };
 
   spreadsheet_api.prototype._onUnlockDefName = function() {
     this.wb.unlockDefName();
-  }
+  };
 
   spreadsheet_api.prototype._onCheckDefNameLock = function() {
     return this.wb._onCheckDefNameLock();
-  }
+  };
 
   // Залочена ли работа с листом
   spreadsheet_api.prototype.asc_isWorksheetLockedOrDeleted = function(index) {
@@ -3346,6 +3346,7 @@ var editor;
   prot["asc_sortColFilter"] = prot.asc_sortColFilter;
   prot["asc_getAddFormatTableOptions"] = prot.asc_getAddFormatTableOptions;
   prot["asc_clearFilter"] = prot.asc_clearFilter;
+  prot["asc_clearFilterColumn"] = prot.asc_clearFilterColumn;
   prot["asc_changeSelectionFormatTable"] = prot.asc_changeSelectionFormatTable;
   prot["asc_changeFormatTableInfo"] = prot.asc_changeFormatTableInfo;
   prot["asc_insertCellsInTable"] = prot.asc_insertCellsInTable;
@@ -3492,4 +3493,16 @@ var editor;
   
   prot['asc_isOffline'] = prot.asc_isOffline;
   prot['asc_getUrlType'] = prot.asc_getUrlType;
+
+  // Builder
+  prot['asc_nativeInitBuilder'] = prot.asc_nativeInitBuilder;
+  prot['asc_SetSilentMode'] = prot.asc_SetSilentMode;
+
+  // plugins
+  prot["asc_pluginsRegister"]       = prot.asc_pluginsRegister;
+  prot["asc_pluginRun"]             = prot.asc_pluginRun;
+  prot["asc_pluginResize"]          = prot.asc_pluginResize;
+  prot["asc_pluginButtonClick"]     = prot.asc_pluginButtonClick;
+  prot["asc_addOleObject"]          = prot.asc_addOleObject;
+  prot["asc_editOleObject"]         = prot.asc_editOleObject;
 })(window);

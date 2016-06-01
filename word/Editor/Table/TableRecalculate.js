@@ -33,6 +33,24 @@ CTable.prototype.Recalculate_Page = function(PageIndex)
 
     return Result;
 };
+CTable.prototype.Recalculate_SkipPage = function(PageIndex)
+{
+    if (0 === PageIndex)
+    {
+        this.Start_FromNewPage();
+    }
+    else
+    {
+        var PrevPage = this.Pages[PageIndex - 1];
+
+        var LastRow       = Math.max(PrevPage.FirstRow, PrevPage.LastRow); // На случай, если предыдущая страница тоже пустая
+        var NewPage       = new CTablePage(PrevPage.X, PrevPage.Y, PrevPage.XLimit, PrevPage.YLimit, LastRow, PrevPage.MaxTopBorder);
+        NewPage.FirstRow  = LastRow;
+        NewPage.LastRow   = LastRow - 1;
+
+        this.Pages[PageIndex] = NewPage;
+    }
+};
 CTable.prototype.Recalculate_Grid = function()
 {
     this.private_RecalculateGrid();
@@ -205,7 +223,7 @@ CTable.prototype.private_RecalculateGrid = function()
         SumGrid[Index] = TempSum;
     }
 
-    var PctWidth = this.XLimit - this.X - this.Get_TableOffsetCorrection() + this.Get_RightTableOffsetCorrection();
+    var PctWidth = this.private_RecalculatePercentWidth();
     var MinWidth = this.Internal_Get_TableMinWidth();
     var TableW = 0;
     if (tblwidth_Auto === TablePr.TableW.Type)
@@ -987,20 +1005,8 @@ CTable.prototype.private_RecalculateBorders = function()
 
             Row.Set_CellInfo( CurCell, CurGridCol, 0, 0, 0, 0, 0, 0 );
 
-            // Обсчет такик ячеек произошел ранее
-            if ( vmerge_Continue === Vmerge )
-            {
-                var VMergeCount2 = this.Internal_GetVertMergeCount2( CurRow, CurGridCol, GridSpan );
-                if ( VMergeCount2 > 1 )
-                {
-                    CurGridCol += GridSpan;
-                    continue;
-                }
-                else
-                {
-                    Cell.Set_VMerge( vmerge_Restart );
-                }
-            }
+            // Bug 32418 ячейки, участвующие в вертикальном объединении, все равно участвуют в определении границы
+            // строки, поэтому здесь мы их не пропускаем.
 
             var VMergeCount = this.Internal_GetVertMergeCount( CurRow, CurGridCol, GridSpan );
 
@@ -2366,9 +2372,6 @@ CTable.prototype.private_RecalculatePage = function(CurPage)
         // В данном значении не учитываются маргины
         RowHValue = RowH.Value + this.MaxBotMargin[CurRow] + MaxTopMargin;
 
-        if (null === CellSpacing)
-            RowHValue -= this.MaxTopBorder[CurRow];
-
         if ((Asc.linerule_AtLeast === RowH.HRule || Asc.linerule_Exact == RowH.HRule) && Y + RowHValue > Y_content_end && ((0 === CurRow && 0 === CurPage && (null !== this.Get_DocumentPrev() || true === this.Parent.Is_TableCellContent())) || CurRow != FirstRow))
         {
             bNextPage = true;
@@ -2981,6 +2984,10 @@ CTable.prototype.private_RecalculateSkipPage = function(CurPage)
         this.Pages[CurPage].FirstRow = FirstRow;
         this.Pages[CurPage].LastRow  = FirstRow -1;
     }
+};
+CTable.prototype.private_RecalculatePercentWidth = function()
+{
+    return this.XLimit - this.X - this.Get_TableOffsetCorrection() + this.Get_RightTableOffsetCorrection();
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Класс CTablePage

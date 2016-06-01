@@ -1008,8 +1008,24 @@ CDocumentContent.prototype.Recalculate_Page               = function(PageIndex, 
                 Element.Reset(X, Y, XLimit, YLimit, PageIndex, 0, 1);
             }
 
-            var ElementPageIndex = this.private_GetElementPageIndex(Index, PageIndex, 0, 1);
-            RecalcResult         = Element.Recalculate_Page(ElementPageIndex);
+            if (Index === Count - 1 && Index > 0 && type_Paragraph === Element.GetType() && type_Table === this.Content[Index - 1].GetType() && true === Element.IsEmpty() && true === this.Is_TableCellContent())
+            {
+                RecalcResult = recalcresult_NextElement;
+
+                this.private_RecalculateEmptySectionParagraph(Element, this.Content[Index - 1], PageIndex, 0, 1);
+
+                // Добавим в список особых параграфов
+                this.Pages[PageIndex].EndSectionParas.push(Element);
+
+                // Выставляем этот флаг, чтобы у нас не менялось значение по Y
+                bFlow = true;
+            }
+            else
+            {
+
+                var ElementPageIndex = this.private_GetElementPageIndex(Index, PageIndex, 0, 1);
+                RecalcResult         = Element.Recalculate_Page(ElementPageIndex);
+            }
         }
 
         Element.TurnOn_RecalcEvent();
@@ -2256,11 +2272,11 @@ CDocumentContent.prototype.Add_InlineImage                    = function(W, H, I
         }
     }
 };
-CDocumentContent.prototype.Add_OleObject                    = function(W, H, Img, Data, sApplicationId)
+CDocumentContent.prototype.Add_OleObject                    = function(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId)
 {
     if (docpostype_DrawingObjects === this.CurPos.Type)
     {
-        return this.DrawingObjects.addOleObject(W, H, Img, Data, sApplicationId);
+        return this.DrawingObjects.addOleObject(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId);
     }
     else //if ( docpostype_Content === this.CurPos.Type )
     {
@@ -2271,7 +2287,7 @@ CDocumentContent.prototype.Add_OleObject                    = function(W, H, Img
         if (type_Paragraph == Item.GetType())
         {
             var Drawing   = new ParaDrawing(W, H, null, this.DrawingDocument, this, null);
-            var Image = this.DrawingObjects.createOleObject(Data, sApplicationId, Img, 0, 0, W, H);
+            var Image = this.DrawingObjects.createOleObject(Data, sApplicationId, Img, 0, 0, W, H, nWidthPix, nHeightPix);
             Image.setParent(Drawing);
             Drawing.Set_GraphicObject(Image);
 
@@ -2280,7 +2296,7 @@ CDocumentContent.prototype.Add_OleObject                    = function(W, H, Img
         }
         else if (type_Table == Item.GetType())
         {
-            Item.Add_OleObject(W, H, Img, Data, sApplicationId);
+            Item.Add_OleObject(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId);
         }
     }
 };
@@ -6512,14 +6528,7 @@ CDocumentContent.prototype.Paragraph_IncDecIndent             = function(bIncrea
         {
             var Item = this.Content[Index];
             Item.Set_ApplyToAll(true);
-            if (type_Paragraph == Item.GetType())
-                Item.IncDec_Indent(bIncrease);
-            else if (type_Table == Item.GetType())
-            {
-                Item.TurnOff_RecalcEvent();
-                Item.Paragraph_IncDecIndent(bIncrease);
-                Item.TurnOn_RecalcEvent();
-            }
+            Item.IncDec_Indent(bIncrease);
             Item.Set_ApplyToAll(false);
         }
 
@@ -6535,20 +6544,15 @@ CDocumentContent.prototype.Paragraph_IncDecIndent             = function(bIncrea
             {
                 var Paragraph = ParaDrawing.Parent;
                 Paragraph.IncDec_Indent(bIncrease);
-                this.Recalculate();
             }
         }
         else
         {
             this.DrawingObjects.paragraphIncDecIndent(bIncrease);
         }
-        return;
     }
     else //if ( docpostype_Content === this.CurPos.Type )
     {
-        if (this.CurPos.ContentPos < 0)
-            return false;
-
         if (true === this.Selection.Use)
         {
             switch (this.Selection.Flag)
@@ -6566,46 +6570,18 @@ CDocumentContent.prototype.Paragraph_IncDecIndent             = function(bIncrea
 
                     for (var Index = StartPos; Index <= EndPos; Index++)
                     {
-                        // При изменении цвета фона параграфа, не надо ничего пересчитывать
-                        var Item = this.Content[Index];
-
-                        if (type_Paragraph == Item.GetType())
-                            Item.IncDec_Indent(bIncrease);
-                        else if (type_Table == Item.GetType())
-                        {
-                            Item.TurnOff_RecalcEvent();
-                            Item.Paragraph_IncDecIndent(bIncrease);
-                            Item.TurnOn_RecalcEvent();
-                        }
+                        this.Content[Index].IncDec_Indent(bIncrease);
                     }
-
-                    // Нам нужно пересчитать все изменения, начиная с первого элемента,
-                    // попавшего в селект.
-                    this.ContentLastChangePos = StartPos;
-
-                    this.Recalculate();
-
-                    return;
                 }
                 case  selectionflag_Numbering:
                 {
                     break;
                 }
             }
-
-            return;
         }
-
-        var Item = this.Content[this.CurPos.ContentPos];
-        if (type_Paragraph == Item.GetType())
+        else
         {
-            Item.IncDec_Indent(bIncrease);
-            this.ContentLastChangePos = this.CurPos.ContentPos;
-            this.Recalculate();
-        }
-        else if (type_Table == Item.GetType())
-        {
-            Item.Paragraph_IncDecIndent(bIncrease);
+            this.Content[this.CurPos.ContentPos].IncDec_Indent(bIncrease);
         }
     }
 };
@@ -7411,8 +7387,9 @@ CDocumentContent.prototype.Selection_SetStart = function(X, Y, CurPage, MouseEve
         }
         else
         {
-            Item.Selection_SetStart(X, Y, this.CurPage, MouseEvent);
-            Item.Selection_SetEnd(X, Y, this.CurPage, {Type : AscCommon.g_mouse_event_type_move, ClickCount : 1});
+            var ElementPageIndex = this.private_GetElementPageIndexByXY(ContentPos, X, Y, this.CurPage);
+            Item.Selection_SetStart(X, Y, ElementPageIndex, MouseEvent);
+            Item.Selection_SetEnd(X, Y, ElementPageIndex, {Type : AscCommon.g_mouse_event_type_move, ClickCount : 1});
 
             if (!(type_Table == Item.GetType() && true == bTableBorder))
             {
@@ -7479,8 +7456,9 @@ CDocumentContent.prototype.Selection_SetEnd          = function(X, Y, CurPage, M
     // Обрабатываем движение границы у таблиц
     if (null != this.Selection.Data && true === this.Selection.Data.TableBorder && type_Table == this.Content[this.Selection.Data.Pos].GetType())
     {
-        var Item = this.Content[this.Selection.Data.Pos];
-        Item.Selection_SetEnd(X, Y, this.CurPage, MouseEvent);
+        var Item             = this.Content[this.Selection.Data.Pos];
+        var ElementPageIndex = this.private_GetElementPageIndexByXY(this.Selection.Data.Pos, X, Y, this.CurPage);
+        Item.Selection_SetEnd(X, Y, ElementPageIndex, MouseEvent);
 
         if (AscCommon.g_mouse_event_type_up == MouseEvent.Type)
         {
@@ -7552,9 +7530,9 @@ CDocumentContent.prototype.Selection_SetEnd          = function(X, Y, CurPage, M
     var Start, End;
     if (0 == Direction)
     {
-        var Item     = this.Content[this.Selection.StartPos];
-        var ItemType = Item.GetType();
-        Item.Selection_SetEnd(X, Y, this.CurPage, MouseEvent);
+        var Item             = this.Content[this.Selection.StartPos];
+        var ElementPageIndex = this.private_GetElementPageIndexByXY(this.Selection.StartPos, X, Y, this.CurPage);
+        Item.Selection_SetEnd(X, Y, ElementPageIndex, MouseEvent);
 
         if (false === Item.Selection.Use)
         {
@@ -7605,7 +7583,8 @@ CDocumentContent.prototype.Selection_SetEnd          = function(X, Y, CurPage, M
         this.Content[Start].Selection.EndPos   = this.Content[Start].Content.length - 1;
     }
 
-    this.Content[ContentPos].Selection_SetEnd(X, Y, this.CurPage, MouseEvent);
+    var ElementPageIndex = this.private_GetElementPageIndexByXY(ContentPos, X, Y, this.CurPage);
+    this.Content[ContentPos].Selection_SetEnd(X, Y, ElementPageIndex, MouseEvent);
 
     for (var Index = Start; Index <= End; Index++)
     {
@@ -8164,16 +8143,26 @@ CDocumentContent.prototype.Table_CheckSplit  = function()
 //-----------------------------------------------------------------------------------
 CDocumentContent.prototype.Internal_GetContentPosByXY = function(X, Y, PageNum)
 {
-    if (undefined === PageNum)
+    if (undefined === PageNum || null === PageNum)
         PageNum = this.CurPage;
 
-    // TODO: изенить здесь
-    PageNum = Math.min(PageNum, this.Pages.length - 1);
+    PageNum = Math.max(0, Math.min(PageNum, this.Pages.length - 1));
 
     // Сначала проверим Flow-таблицы
     var FlowTable = this.LogicDocument && this.LogicDocument.DrawingObjects.getTableByXY(X, Y, PageNum + this.Get_StartPage_Absolute(), this);
     if (null != FlowTable)
         return FlowTable.Table.Index;
+
+    // Теперь проверим пустые параграфы с окончанием секций (в нашем случае это пустой параграф послей таблицы внутри таблицы)
+    var SectCount = this.Pages[PageNum].EndSectionParas.length;
+    for (var Index = 0; Index < SectCount; ++Index)
+    {
+        var Item   = this.Pages[PageNum].EndSectionParas[Index];
+        var Bounds = Item.Pages[0].Bounds;
+
+        if (Y < Bounds.Bottom && Y > Bounds.Top && X > Bounds.Left && X < Bounds.Right)
+            return Item.Index;
+    }
 
     var StartPos = Math.min(this.Pages[PageNum].Pos, this.Content.length - 1);
     var EndPos   = this.Content.length - 1;
@@ -8186,7 +8175,9 @@ CDocumentContent.prototype.Internal_GetContentPosByXY = function(X, Y, PageNum)
     for (var Index = StartPos; Index <= EndPos; Index++)
     {
         var Item = this.Content[Index];
-        if (type_Table != Item.GetType() || false != Item.Is_Inline())
+        var bEmptySectPara = this.Pages[PageNum].Check_EndSectionPara(Item);
+
+        if (false != Item.Is_Inline() && (type_Table === Item.GetType() || false === bEmptySectPara))
             InlineElements.push(Index);
     }
 

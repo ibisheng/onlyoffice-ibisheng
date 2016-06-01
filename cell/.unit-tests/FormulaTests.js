@@ -389,7 +389,7 @@ $( function () {
 
     var oParser, wb, ws, dif = 1e-9,
         data = getTestWorkbook(),
-        sData = data + "";
+        sData = data + "", tmp;
     if ( AscCommon.c_oSerFormat.Signature === sData.substring( 0, AscCommon.c_oSerFormat.Signature.length ) ) {
         var sUrlPath = "offlinedocs/";
         wb = new AscCommonExcel.Workbook( new AscCommonExcel.asc_CHandlersList(), {wb:{getWorksheet:function(){}}} );
@@ -1043,7 +1043,9 @@ $( function () {
         ok( oParser.parse() );
         strictEqual( oParser.calculate().getValue(), 40461 );
 
-        ws.getRange2( "A7" ).setValue( "3-Mar" );
+        tmp = ws.getRange2( "A7" );
+        tmp.setNumFormat('@');
+        tmp.setValue( "3-Mar" );
         oParser = new parserFormula( "DATEVALUE(A7)", "A2", ws );
         ok( oParser.parse() );
         var d = new Date();

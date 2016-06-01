@@ -279,6 +279,7 @@ function GetNativeEngine()
 }
 
 var native_renderer = null;
+var Api = null;
 var _api = null;
 
 function NativeOpenFileData(data, version)
@@ -295,6 +296,7 @@ function NativeOpenFileData(data, version)
         _api = new window["Asc"]["spreadsheet_api"]({});
         _api.asc_nativeOpenFile(data, version);
     }
+    Api = _api;
 }
 
 function NativeOpenFile()
@@ -304,7 +306,7 @@ function NativeOpenFile()
     
     if (window.NATIVE_DOCUMENT_TYPE == "presentation" || window.NATIVE_DOCUMENT_TYPE == "document")
     {
-        _api = new window["Asc"]["asc_docs_api"]("");       
+        _api = new window["Asc"]["asc_docs_api"]("");
         _api.asc_nativeOpenFile(doc_bin);
     }
     else
@@ -312,6 +314,7 @@ function NativeOpenFile()
         _api = new window["Asc"]["spreadsheet_api"]();
         _api.asc_nativeOpenFile(doc_bin);
     }
+    Api = _api;
 }
 
 function NativeOpenFile2(_params)
@@ -338,8 +341,10 @@ function NativeOpenFile2(_params)
     else
     {
         _api = new window["Asc"]["spreadsheet_api"]();
-        _api.asc_nativeOpenFile(doc_bin);        
+        _api.asc_nativeOpenFile(doc_bin);
     }
+
+    Api = _api;
 }
 
 function NativeCalculateFile()
@@ -355,7 +360,7 @@ function NativeApplyChangesData(data, isFull)
     }
     else
     {
-		_api.asc_nativeApplyChanges2(data, isFull);
+        _api.asc_nativeApplyChanges2(data, isFull);
     }
 }
 

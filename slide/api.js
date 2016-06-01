@@ -117,7 +117,7 @@ function CAscChartProp( obj )
     this.Position      = new Asc.CPosition({X: obj.x, Y: obj.y});
 
     this.Locked        = (undefined != obj.locked) ? obj.locked : false;
-
+    this.lockAspect    = (undefined != obj.lockAspect) ? obj.lockAspect : false;
     this.ChartProperties = (undefined != obj.chartProps) ? obj.chartProps : null;
 
     this.severalCharts = obj.severalCharts != undefined ? obj.severalCharts : false;
@@ -130,7 +130,7 @@ function CAscChartProp( obj )
     this.Height        = undefined;
     this.Position      = undefined;
     this.Locked   = false;
-
+    this.lockAspect    = false;
     this.ChartProperties = new AscCommon.asc_ChartSettings();
 
     this.severalCharts = false;
@@ -387,6 +387,14 @@ CAscChartProp.prototype.getStyle = function()
 CAscChartProp.prototype.putStyle = function(v)
 {
   return this.ChartProperties && this.ChartProperties.putStyle(v);
+};
+CAscChartProp.prototype.getLockAspect = function()
+{
+  return this.lockAspect;
+};
+CAscChartProp.prototype.putLockAspect = function(v)
+{
+  return this.lockAspect = v;
 };
 
 CAscChartProp.prototype.changeType = function(v)
@@ -3748,7 +3756,7 @@ asc_docs_api.prototype.AddImageUrlActionCallback = function(_image)
     asc_docs_api.prototype.ImgApply = function(obj)
     {
     var ImagePr = {};
-	
+        ImagePr.lockAspect = obj.lockAspect;
     ImagePr.Width  = null === obj.Width ? null : parseFloat(obj.Width);
     ImagePr.Height = null === obj.Height ? null : parseFloat(obj.Height);
 
@@ -4559,10 +4567,6 @@ asc_docs_api.prototype.OpenDocumentEndCallback = function()
 
     if (0 == this.DocumentType)
         this.WordControl.m_oLogicDocument.LoadEmptyDocument();
-    else if (1 == this.DocumentType)
-    {
-        this.WordControl.m_oLogicDocument.LoadTestDocument();
-    }
     else
     {
         if(this.LoadedObject)
@@ -4574,38 +4578,16 @@ asc_docs_api.prototype.OpenDocumentEndCallback = function()
                     this.isApplyChangesOnOpenEnabled = false;
                     this.bNoSendComments = true;
                     var OtherChanges = AscCommon.CollaborativeEditing.m_aChanges.length > 0 ;
-                  AscCommon.CollaborativeEditing.Apply_Changes();
-                  AscCommon.CollaborativeEditing.Release_Locks();
+                    AscCommon.CollaborativeEditing.Apply_Changes();
+                    AscCommon.CollaborativeEditing.Release_Locks();
                     this.bNoSendComments = false;
-                        this.isApplyChangesOnOpen        = true;
-
-                    var _slides = this.WordControl.m_oLogicDocument.Slides;
-                    var _slidesCount = _slides.length;
-                    for (var i = 0; i < _slidesCount; i++)
-                    {
-                        var slideComments = _slides[i].slideComments;
-                        if(slideComments)
-                        {
-                            var _comments = slideComments.comments;
-                            var _commentsCount = _comments.length;
-                            for (var j = 0; j < _commentsCount; j++)
-                            {
-                                this.sync_AddComment(_comments[j].Get_Id(), _comments[j].Data );
-                            }
-                        }
-                    }
-                    this.bAddComments = true;
-                    if(OtherChanges)
-                    {
-                        return;
-                    }
-
+                    this.isApplyChangesOnOpen = true;
                   // Применяем все lock-и (ToDo возможно стоит пересмотреть вообще Lock-и)
-                        for (var i = 0; i < this.arrPreOpenLocksObjects.length; ++i)
-                        {
-                    this.arrPreOpenLocksObjects[i]();
-                  }
-                  this.arrPreOpenLocksObjects = [];
+                    for (var i = 0; i < this.arrPreOpenLocksObjects.length; ++i)
+                    {
+                        this.arrPreOpenLocksObjects[i]();
+                    }
+                    this.arrPreOpenLocksObjects = [];
                 }
             }
             this.WordControl.m_oLogicDocument.Recalculate({Drawings: {All:true, Map: {}}});
@@ -4661,9 +4643,8 @@ asc_docs_api.prototype.OpenDocumentEndCallback = function()
     this.WordControl.m_oLogicDocument.Document_UpdateRulersState();
     this.WordControl.m_oLogicDocument.Document_UpdateSelectionState();
     this.LoadedObject = null;
-
     this.bInit_word_control = true;
-    if(!(this.bAddComments === true) && !this.bNoSendComments)
+    if(!this.bNoSendComments)
     {
         var _slides = this.WordControl.m_oLogicDocument.Slides;
         var _slidesCount = _slides.length;
@@ -4683,21 +4664,21 @@ asc_docs_api.prototype.OpenDocumentEndCallback = function()
     }
     this.asc_fireCallback("asc_onDocumentContentReady");
     this.isApplyChangesOnOpen = false;
-    this.bAddComments = false;
+
     this.WordControl.InitControl();
     if (bIsScroll)
     {
         this.WordControl.OnScroll();
     }
 
-        if (!this.isViewMode)
+    if (!this.isViewMode)
+    {
+        this.sendStandartTextures();
+        if (this.shapeElementId)
         {
-    this.sendStandartTextures();
-            if (this.shapeElementId)
-            {
-      this.WordControl.m_oDrawingDocument.InitGuiCanvasShape(this.shapeElementId);
+            this.WordControl.m_oDrawingDocument.InitGuiCanvasShape(this.shapeElementId);
+        }
     }
-  }
 
     if (this.isViewMode)
         this.asc_setViewMode(true);
@@ -5778,7 +5759,7 @@ function CContextMenuData(oData)
     }
     else
     {
-        this.Type  = c_oAscContextMenuTypes.Main;
+        this.Type  = Asc.c_oAscContextMenuTypes.Main;
         this.X_abs = 0;
         this.Y_abs = 0;
         this.IsSlideSelect = true;
@@ -6602,6 +6583,14 @@ asc_docs_api.prototype['asc_SetFastCollaborative'] = asc_docs_api.prototype.asc_
 asc_docs_api.prototype['asc_isOffline'] = asc_docs_api.prototype.asc_isOffline;
 asc_docs_api.prototype['asc_getUrlType'] = asc_docs_api.prototype.asc_getUrlType;
 asc_docs_api.prototype["asc_setInterfaceDrawImagePlaceShape"] = asc_docs_api.prototype.asc_setInterfaceDrawImagePlaceShape;
+asc_docs_api.prototype["asc_nativeInitBuilder"] = asc_docs_api.prototype.asc_nativeInitBuilder;
+asc_docs_api.prototype["asc_SetSilentMode"] = asc_docs_api.prototype.asc_SetSilentMode;
+asc_docs_api.prototype["asc_pluginsRegister"]       = asc_docs_api.prototype.asc_pluginsRegister;
+asc_docs_api.prototype["asc_pluginRun"]             = asc_docs_api.prototype.asc_pluginRun;
+asc_docs_api.prototype["asc_pluginResize"]          = asc_docs_api.prototype.asc_pluginResize;
+asc_docs_api.prototype["asc_pluginButtonClick"]     = asc_docs_api.prototype.asc_pluginButtonClick;
+asc_docs_api.prototype["asc_addOleObject"]          = asc_docs_api.prototype.asc_addOleObject;
+asc_docs_api.prototype["asc_editOleObject"]         = asc_docs_api.prototype.asc_editOleObject;
 
 window['Asc']['asc_CCommentData'] = window['Asc'].asc_CCommentData = asc_CCommentData;
 asc_CCommentData.prototype['asc_getText'] = asc_CCommentData.prototype.asc_getText;
@@ -6711,6 +6700,8 @@ CAscChartProp.prototype['getType'] = CAscChartProp.prototype.getType;
 CAscChartProp.prototype['putType'] = CAscChartProp.prototype.putType;
 CAscChartProp.prototype['getStyle'] = CAscChartProp.prototype.getStyle;
 CAscChartProp.prototype['putStyle'] = CAscChartProp.prototype.putStyle;
+CAscChartProp.prototype['putLockAspect'] = CAscChartProp.prototype['asc_putLockAspect'] = CAscChartProp.prototype.putLockAspect;
+CAscChartProp.prototype['getLockAspect'] = CAscChartProp.prototype['asc_getLockAspect'] = CAscChartProp.prototype.getLockAspect;
 CAscChartProp.prototype['changeType'] = CAscChartProp.prototype.changeType;
 CDocInfoProp.prototype['get_PageCount'] = CDocInfoProp.prototype.get_PageCount;
 CDocInfoProp.prototype['put_PageCount'] = CDocInfoProp.prototype.put_PageCount;

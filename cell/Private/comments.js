@@ -1,4 +1,4 @@
-"use strict";
+﻿"use strict";
 
 /* comments.js
  *
@@ -52,6 +52,10 @@
       return;
     t._addComment(oComment, bChange, bIsNotUpdate);
   };
-  this.isLockedComment(oComment, onAddCommentCallback);
+    if (bIsNotUpdate) {
+      onAddCommentCallback(true);
+    } else {
+      this.isLockedComment(oComment, onAddCommentCallback);
+    }
   };
 })(window);

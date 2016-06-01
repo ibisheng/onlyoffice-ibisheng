@@ -2250,6 +2250,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                 case para_Sym:
                 case para_Text:
                 case para_FootnoteReference:
+                case para_FootnoteRef:
                 {
                     // Отмечаем, что началось слово
                     StartWord = true;
@@ -2731,7 +2732,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                             if (null != Para.Get_DocumentPrev() && true != Para.Parent.Is_TableCellContent() && 0 === CurPage)
                             {
                                 Para.Recalculate_Drawing_AddPageBreak(0, 0, true);
-                                PRS.RecalcResult = recalcresult_NextPage;
+                                PRS.RecalcResult = recalcresult_NextPage | recalcresultflags_Page;
                                 PRS.NewRange = true;
                                 return;
                             }
@@ -2740,7 +2741,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                                 if (ParaLine != Para.Pages[CurPage].FirstLine)
                                 {
                                     Para.Recalculate_Drawing_AddPageBreak(ParaLine, CurPage, false);
-                                    PRS.RecalcResult = recalcresult_NextPage;
+                                    PRS.RecalcResult = recalcresult_NextPage | recalcresultflags_Page;
                                     PRS.NewRange = true;
                                     return;
                                 }
@@ -2857,7 +2858,10 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                             PRS.BadLeftTab = true;
                         }
 
-                        if (NewX > XEnd && ( false === FirstItemOnLine || false === Para.Internal_Check_Ranges(ParaLine, ParaRange) ))
+                        // Так работает Word: он не переносит на новую строку табы, начинающиеся в допустимом отрезке, а
+                        // заканчивающиеся вне его. Поэтому мы проверяем именно, где таб начинается, а не заканчивается.
+                        // (bug 32345)
+                        if (X > XEnd && ( false === FirstItemOnLine || false === Para.Internal_Check_Ranges(ParaLine, ParaRange) ))
                         {
                             WordLen = NewX - X;
                             RangeEndPos = Pos;
@@ -3093,6 +3097,7 @@ ParaRun.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine, _Cur
             case para_Text:
             case para_PageNum:
             case para_FootnoteReference:
+            case para_FootnoteRef:
             {
                 UpdateLineMetricsText = true;
                 break;
@@ -3191,6 +3196,7 @@ ParaRun.prototype.Recalculate_Range_Width = function(PRSC, _CurLine, _CurRange)
             case para_Sym:
             case para_Text:
             case para_FootnoteReference:
+            case para_FootnoteRef:
             {
                 PRSC.Letters++;
 
@@ -3342,6 +3348,7 @@ ParaRun.prototype.Recalculate_Range_Spaces = function(PRSA, _CurLine, _CurRange,
             case para_Sym:
             case para_Text:
             case para_FootnoteReference:
+            case para_FootnoteRef:
             {
                 var WidthVisible = 0;
 
@@ -4240,6 +4247,7 @@ ParaRun.prototype.Draw_HighLights = function(PDSH)
             case para_Math_Ampersand:
             case para_Sym:
             case para_FootnoteReference:
+            case para_FootnoteRef:
             {
                 if ( para_Drawing === ItemType && !Item.Is_Inline() )
                     break;
@@ -4401,7 +4409,7 @@ ParaRun.prototype.Draw_Elements = function(PDSE)
 
         var TempY = Y;
 
-        if (ItemType === para_FootnoteReference)
+        if (ItemType === para_FootnoteReference || ItemType === para_FootnoteRef)
         {
             Y -= vertalign_Koef_Super * CurTextPr.FontSize * g_dKoef_pt_to_mm;
         }
@@ -4430,6 +4438,7 @@ ParaRun.prototype.Draw_Elements = function(PDSE)
             case para_Text:
             case para_Sym:
             case para_FootnoteReference:
+            case para_FootnoteRef:
             {
                 if (para_Tab === ItemType)
                 {
@@ -4701,6 +4710,7 @@ ParaRun.prototype.Draw_Lines = function(PDSL)
             case para_Text:
             case para_Sym:
             case para_FootnoteReference:
+            case para_FootnoteRef:
             {
                 if ( para_Drawing != ItemType || Item.Is_Inline() )
                 {
@@ -10384,11 +10394,11 @@ ParaRun.prototype.Get_TextForAutoCorrect = function(AutoCorrectEngine, RunPos)
         var Item = this.Content[nPos];
         if (para_Math_Text === Item.Type || para_Math_BreakOperator === Item.Type)
         {
-            AutoCorrectEngine.Add_Text(String.fromCharCode(Item.value), this, nPos, RunPos);
+            AutoCorrectEngine.Add_Text(String.fromCharCode(Item.value), this, nPos, RunPos, Item.Pos);
         }
 		else if (para_Math_Ampersand === Item.Type)
 		{
-			 AutoCorrectEngine.Add_Text('&', this, nPos, RunPos);
+			 AutoCorrectEngine.Add_Text('&', this, nPos, RunPos, Item.Pos);
 		}
 
         if (Item === ActionElement)
