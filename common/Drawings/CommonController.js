@@ -4420,8 +4420,7 @@ DrawingObjectsController.prototype =
 
     remove: function(dir, bOnlyText, bRemoveOnlySelection)
     {
-        var content = this.getTargetDocContent();
-        if(Asc["editor"] && Asc["editor"].isChartEditor && !content)
+        if(Asc["editor"] && Asc["editor"].isChartEditor && (!this.selection.chartSelection))
         {
             return;
         }
