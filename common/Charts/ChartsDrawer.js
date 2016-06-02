@@ -3132,20 +3132,21 @@ drawBarChart.prototype =
 	_getOptionsForDrawing: function(ser, point, onlyLessNull)
 	{
 		var seria = this.chartProp.series[ser];
-		
-		if(!seria || !this.paths.series[ser] || !this.paths.series[ser][point] || !seria.val.numRef.numCache.pts[point])
+		var pt = seria.val.numRef.numCache.getPtByIndex(point);
+
+		if(!seria || !this.paths.series[ser] || !this.paths.series[ser][point] || !pt)
 			return null;
 		
 		var brush = seria.brush;
 		var pen = seria.pen;
 		
-		if((seria.val.numRef.numCache.pts[point].val > 0 && onlyLessNull === true) || (seria.val.numRef.numCache.pts[point].val < 0 && onlyLessNull === false))
+		if((pt.val > 0 && onlyLessNull === true) || (pt.val < 0 && onlyLessNull === false))
 			return null;
 		
-		if(seria.val.numRef.numCache.pts[point].pen)
-			pen = seria.val.numRef.numCache.pts[point].pen;
-		if(seria.val.numRef.numCache.pts[point].brush)
-			brush = seria.val.numRef.numCache.pts[point].brush;
+		if(pt.pen)
+			pen = pt.pen;
+		if(pt.brush)
+			brush = pt.brush;
 			
 		return {pen: pen, brush: brush}
 	},
@@ -6108,20 +6109,20 @@ drawHBarChart.prototype =
 	_getOptionsForDrawing: function(ser, point, onlyLessNull)
 	{
 		var seria = this.chartProp.series[ser];
-		
-		if(!seria || !this.paths.series[ser] || !this.paths.series[ser][point] || !seria.val.numRef.numCache.pts[point])
+		var pt = seria.val.numRef.numCache.getPtByIndex(point);
+		if(!seria || !this.paths.series[ser] || !this.paths.series[ser][point] || !pt)
 			return null;
 		
 		var brush = seria.brush;
 		var pen = seria.pen;
 		
-		if((seria.val.numRef.numCache.pts[point].val > 0 && onlyLessNull === true) || (seria.val.numRef.numCache.pts[point].val < 0 && onlyLessNull === false))
+		if((pt.val > 0 && onlyLessNull === true) || (pt.val < 0 && onlyLessNull === false))
 			return null;
 		
-		if(seria.val.numRef.numCache.pts[point].pen)
-			pen = seria.val.numRef.numCache.pts[point].pen;
-		if(seria.val.numRef.numCache.pts[point].brush)
-			brush = seria.val.numRef.numCache.pts[point].brush;
+		if(pt.pen)
+			pen = pt.pen;
+		if(pt.brush)
+			brush = pt.brush;
 			
 		return {pen: pen, brush: brush}
 	},
