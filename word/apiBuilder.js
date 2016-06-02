@@ -3479,7 +3479,14 @@
      */
     ApiDrawing.prototype.SetSize = function(nWidth, nHeight)
     {
-        this.Drawing.setExtent(private_EMU2MM(nWidth), private_EMU2MM(nHeight));
+        var fWidth = private_EMU2MM(nWidth);
+        var fHeight = private_EMU2MM(nHeight);
+        this.Drawing.setExtent(fWidth, fHeight);
+        if(this.Drawing.GraphicObj && this.Drawing.GraphicObj.spPr && this.Drawing.GraphicObj.spPr.xfrm)
+        {
+            this.Drawing.GraphicObj.spPr.xfrm.setExtX(fWidth);
+            this.Drawing.GraphicObj.spPr.xfrm.setExtY(fHeight);
+        }
     };
     /**
      * Set the wrapping type of this drawing object.
