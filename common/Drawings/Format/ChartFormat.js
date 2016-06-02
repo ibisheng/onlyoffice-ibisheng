@@ -773,7 +773,15 @@ CDLbl.prototype =
         {
             if(compiled_string.length > 0)
                 compiled_string += separator;
-            var num_format = AscCommon.oNumFormatCache.get(this.series.getFormatCode());
+            var sFormatCode;
+            if(typeof this.pt.formatCode === "string" && this.pt.formatCode.length > 0){
+                sFormatCode =  this.pt.formatCode;
+            }
+            else{
+                sFormatCode = this.series.getFormatCode();
+            }
+
+            var num_format = AscCommon.oNumFormatCache.get(sFormatCode);
             compiled_string += num_format.formatToChart(this.series.getValByIndex(this.pt.idx));
         }
         if(this.showPercent)
