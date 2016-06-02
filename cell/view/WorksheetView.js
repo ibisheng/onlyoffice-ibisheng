@@ -11841,12 +11841,19 @@
 
             if ( addFormatTableOptionsObj && isChangeAutoFilterToTablePart( addFormatTableOptionsObj ) === true )//CHANGE FILTER TO TABLEPART
 			{
-                var addFilterCallBack = function()
+                var filterRange = t.model.AutoFilter.Ref.clone();
+				
+				var addFilterCallBack = function()
 				{
+					History.Create_NewPoint();
+					History.StartTransaction();
+					
 					t.model.autoFilters.changeAutoFilterToTablePart( styleName, ar, addFormatTableOptionsObj );
+					t._onUpdateFormatTable(filterRange, !!(styleName), true);
+					
+					History.EndTransaction();
 				};
 				
-				var filterRange = t.model.AutoFilter.Ref.clone();
 				var addNameColumn = false;
 				if(addFormatTableOptionsObj === false)
 					addNameColumn = true;
