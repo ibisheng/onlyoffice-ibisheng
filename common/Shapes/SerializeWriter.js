@@ -4475,6 +4475,11 @@ function CBinaryFileWriter()
                     this.WriteGroup(grObject, Document, oMapCommentId, oNumIdMap, copyParams, saveParams);
                     break;
                 }
+				case AscDFH.historyitem_type_ChartSpace:
+				{
+					this.BinaryFileWriter.WriteChart(grObject);
+					break;
+				}
             }
             this.BinaryFileWriter.EndRecord();
             this.BinaryFileWriter.EndRecord();
