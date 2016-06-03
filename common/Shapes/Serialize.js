@@ -5600,6 +5600,7 @@ function BinaryPPTYLoader()
                                     switch(_at2)
                                     {
                                         case 0 :{
+                                            value = s.GetBool();
                                             break;
                                         }
                                         case 1 :{

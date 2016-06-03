@@ -4153,7 +4153,7 @@
 					headerRowCount = options.HeaderRowCount;
 				if(null != options.TotalsRowCount)
 					totalsRowCount = options.TotalsRowCount;
-				if(style && style.Name && worksheet.workbook.TableStyles && worksheet.workbook.TableStyles.AllStyles && (styleForCurTable = worksheet.workbook.TableStyles.AllStyles[style.Name]))
+				if(style && worksheet.workbook.TableStyles && worksheet.workbook.TableStyles.AllStyles)
 				{
 					//заполняем названия столбцов
 					if(true != isOpenFilter && isSetVal && !bRedoChanges)
@@ -4197,6 +4197,15 @@
 								}
 							}
 						}
+					}
+					
+					if(!style.Name || (style.Name && !worksheet.workbook.TableStyles.AllStyles[style.Name]))
+					{
+						return;
+					}
+					else
+					{
+						styleForCurTable = worksheet.workbook.TableStyles.AllStyles[style.Name]
 					}
 					
 					//заполняем стили
@@ -4855,8 +4864,10 @@
 			
 			_generateColumnName2: function(tableColumns)
 			{
+				// ToDo почему 2 функции generateColumnName?
 				var columnName = "Column";
-				var indexColumn = name[1];
+				//var indexColumn = name[1]; name - не определено!
+				var indexColumn = undefined;
 				var nextIndex;
 				
 				//ищем среди tableColumns, возможно такое имя уже имеется

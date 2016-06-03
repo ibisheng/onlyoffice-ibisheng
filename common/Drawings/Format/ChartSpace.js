@@ -3104,6 +3104,40 @@ CChartSpace.prototype.getNeedReflect = function()
     return this.chartObj.calculatePositionLabelsCatAxFromAngle(this);
 };
 
+CChartSpace.prototype.getValAxisCrossType = function()
+{
+    if(this.chart && this.chart.plotArea && this.chart.plotArea.chart){
+        var chartType = this.chart.plotArea.chart.getObjectType();
+        var valAx = this.chart.plotArea.valAx;
+        if(chartType === AscDFH.historyitem_type_ScatterChart){
+            return null;
+        }
+        else if(chartType !== AscDFH.historyitem_type_BarChart && (chartType !== AscDFH.historyitem_type_PieChart && chartType !== AscDFH.historyitem_type_DoughnutChart)
+            || (chartType === AscDFH.historyitem_type_BarChart && this.chart.plotArea.chart.barDir !== AscFormat.BAR_DIR_BAR)){
+            if(valAx){
+                if(AscFormat.CChartsDrawer.prototype._isSwitchCurrent3DChart(this)){
+                    if(chartType === AscDFH.historyitem_type_AreaChart ){
+                        return AscFormat.isRealNumber(valAx.crossBetween) ? valAx.crossBetween : AscFormat.CROSS_BETWEEN_MID_CAT;
+                    }
+                    else if(chartType === AscDFH.historyitem_type_LineChart){
+                        return AscFormat.isRealNumber(valAx.crossBetween) ? valAx.crossBetween : AscFormat.CROSS_BETWEEN_BETWEEN;
+                    }
+                    else{
+                        return AscFormat.CROSS_BETWEEN_BETWEEN;
+                    }
+                }
+                else{
+                    return AscFormat.isRealNumber(valAx.crossBetween) ? valAx.crossBetween :  (chartType === AscDFH.historyitem_type_AreaChart ? AscFormat.CROSS_BETWEEN_MID_CAT : AscFormat.CROSS_BETWEEN_BETWEEN);
+                }
+            }
+        }
+        else if(chartType === AscDFH.historyitem_type_BarChart && this.chart.plotArea.chart.barDir === AscFormat.BAR_DIR_BAR){
+            return AscFormat.isRealNumber(valAx.crossBetween) && !AscFormat.CChartsDrawer.prototype._isSwitchCurrent3DChart(this) ? valAx.crossBetween : AscFormat.CROSS_BETWEEN_BETWEEN;
+        }
+    }
+    return null;
+};
+    
 CChartSpace.prototype.recalculateAxis = function()
 {
     if(this.chart && this.chart.plotArea && this.chart.plotArea.chart)
@@ -4134,8 +4168,10 @@ CChartSpace.prototype.recalculateAxis = function()
                 {
                     labels_pos = c_oAscTickLabelsPos.TICK_LABEL_POSITION_NONE;
                 }
-                var cross_between = AscFormat.isRealNumber(val_ax.crossBetween) ? val_ax.crossBetween :  (chart_type === AscDFH.historyitem_type_AreaChart ? AscFormat.CROSS_BETWEEN_MID_CAT : AscFormat.CROSS_BETWEEN_BETWEEN) ;
-
+                var cross_between = this.getValAxisCrossType();
+                if(cross_between === null){
+                    cross_between = AscFormat.CROSS_BETWEEN_BETWEEN;
+                }
                 var left_val_ax_labels_align = true;//приленгание подписей оси значений к левому краю.
 
                 var intervals_count = cross_between === AscFormat.CROSS_BETWEEN_MID_CAT ? string_pts.length - 1 : string_pts.length;
@@ -5314,7 +5350,11 @@ CChartSpace.prototype.recalculateAxis = function()
 
                 var cat_ax_orientation = cat_ax.scaling && AscFormat.isRealNumber(cat_ax.scaling.orientation) ?  cat_ax.scaling.orientation : AscFormat.ORIENTATION_MIN_MAX;
                 var labels_pos = val_ax.tickLblPos;
-                var cross_between = AscFormat.isRealNumber(val_ax.crossBetween) ? val_ax.crossBetween : AscFormat.CROSS_BETWEEN_BETWEEN;
+                var cross_between = this.getValAxisCrossType();
+                if(cross_between === null){
+                    cross_between = AscFormat.CROSS_BETWEEN_BETWEEN;
+                }
+
 
                 var bottom_val_ax_labels_align = true;//приленгание подписей оси значений к левому краю.
 

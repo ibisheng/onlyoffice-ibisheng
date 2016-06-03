@@ -301,7 +301,7 @@
 
 			if(this.targetInfo && (this.targetInfo.target == c_oTargetType.MoveResizeRange ||
 				this.targetInfo.target == c_oTargetType.MoveRange ||
-				this.targetInfo.target == c_oTargetType.FillHandle))
+				this.targetInfo.target == c_oTargetType.FillHandle || this.targetInfo.target == c_oTargetType.FilterObject))
 				return true;
 
 			if (t.handlers.trigger("getCellEditMode")) {if (!t.handlers.trigger("stopCellEditing")) {return true;}}
@@ -1186,7 +1186,7 @@
 				t.clickCounter.mouseDownEvent(coord.x, coord.y, event.button);
 				event.ClickCount = t.clickCounter.clickCount;
 				if (0 === event.ClickCount % 2)
-					t.isDblClickInMouseDown = true;;
+					t.isDblClickInMouseDown = true;
 				
 				t.handlers.trigger("graphicObjectMouseDown", event, coord.x, coord.y);
 				t.handlers.trigger("updateSelectionShape", /*isSelectOnShape*/true);
@@ -1236,26 +1236,26 @@
 						t.isResizeMode = true;
 						t._resizeElement(event);
 						return;
-					} else if (t.targetInfo && t.targetInfo.target === c_oTargetType.FillHandle && false === this.settings.isViewerMode) {
+					} else if (t.targetInfo.target === c_oTargetType.FillHandle && false === this.settings.isViewerMode) {
 						// В режиме автозаполнения
 						this.isFillHandleMode = true;
 						t._changeFillHandle(event);
 						return;
-					} else if (t.targetInfo && t.targetInfo.target === c_oTargetType.MoveRange && false === this.settings.isViewerMode) {
+					} else if (t.targetInfo.target === c_oTargetType.MoveRange && false === this.settings.isViewerMode) {
 						// В режиме перемещения диапазона
 						this.isMoveRangeMode = true;
 						t._moveRangeHandle(event);
 						return;
-					} else if (t.targetInfo && t.targetInfo.target === c_oTargetType.FilterObject && 0 === event.button) {
+					} else if (t.targetInfo.target === c_oTargetType.FilterObject && 0 === event.button) {
 						  t._autoFiltersClick(t.targetInfo.idFilter);
 						  return;
-					} else if (t.targetInfo && undefined !== t.targetInfo.commentIndexes && false === this.settings.isViewerMode) {
+					} else if (undefined !== t.targetInfo.commentIndexes && false === this.settings.isViewerMode) {
 						t._commentCellClick(event);
-					} else if ( t.targetInfo && t.targetInfo.target === c_oTargetType.MoveResizeRange && false === this.settings.isViewerMode ){
+					} else if (t.targetInfo.target === c_oTargetType.MoveResizeRange && false === this.settings.isViewerMode ){
 						this.isMoveResizeRange = true;
 						t._moveResizeRangeHandle(event, t.targetInfo);
 						return;
-					} else if (t.targetInfo && (t.targetInfo.target === c_oTargetType.FrozenAnchorV ||
+					} else if ((t.targetInfo.target === c_oTargetType.FrozenAnchorV ||
 						t.targetInfo.target === c_oTargetType.FrozenAnchorH) && false === this.settings.isViewerMode) {
 						// Режим установки закреплённых областей
 						this.frozenAnchorMode = t.targetInfo.target;

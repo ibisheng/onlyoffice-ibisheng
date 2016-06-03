@@ -323,8 +323,11 @@ CSelectedContent.prototype =
 
         this.DrawingObjects = [];
         this.Comments       = [];
+        this.Maths          = [];
         
-        this.HaveShape = false;
+        this.HaveShape   = false;
+        this.MoveDrawing = false; // Только для переноса автофигур
+        this.HaveMath    = false;
     },
 
     Add : function(Element)
@@ -10422,6 +10425,10 @@ CDocument.prototype.Insert_Content            = function(SelectedContent, NearPo
                 ParaS.Selection.StartPos = ParaS.Content.length - _ParaSContentLen;
                 ParaS.Selection.EndPos   = ParaS.Content.length - 1;
             }
+            else if (true !== Para.Cursor_IsStart())
+            {
+                DstIndex++;
+            }
 
             var EndIndex = ElementsCount - 1;
             if (true === bConcatE && StartIndex < EndIndex)
@@ -16926,6 +16933,32 @@ CDocumentSectionsInfo.prototype =
 
             if ( null != SectPr.FooterEven )
                 SectPr.FooterEven.Get_AllParagraphs(Props, ParaArray);
+        }
+    },
+
+    Get_AllDrawingObjects : function(arrDrawings)
+    {
+        for (var nIndex = 0, nCount = this.Elements.length; nIndex < nCount; ++nIndex)
+        {
+            var SectPr = this.Elements[nIndex].SectPr;
+
+            if (null != SectPr.HeaderFirst)
+                SectPr.HeaderFirst.Get_AllDrawingObjects(arrDrawings);
+
+            if (null != SectPr.HeaderDefault)
+                SectPr.HeaderDefault.Get_AllDrawingObjects(arrDrawings);
+
+            if (null != SectPr.HeaderEven)
+                SectPr.HeaderEven.Get_AllDrawingObjects(arrDrawings);
+
+            if (null != SectPr.FooterFirst)
+                SectPr.FooterFirst.Get_AllDrawingObjects(arrDrawings);
+
+            if (null != SectPr.FooterDefault)
+                SectPr.FooterDefault.Get_AllDrawingObjects(arrDrawings);
+
+            if (null != SectPr.FooterEven)
+                SectPr.FooterEven.Get_AllDrawingObjects(arrDrawings);
         }
     },
 

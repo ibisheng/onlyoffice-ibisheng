@@ -1879,124 +1879,137 @@ CSectionPageNumInfo.prototype =
 
 function CSectionColumn()
 {
-    this.W     = 0;
-    this.Space = 0;
+	this.W     = 0;
+	this.Space = 0;
 }
 
-CSectionColumn.prototype.Write_ToBinary = function(Writer)
+CSectionColumn.prototype.Write_ToBinary  = function(Writer)
 {
-    // Double : W
-    // Double : Space
+	// Double : W
+	// Double : Space
 
-    Writer.WriteDouble( this.W );
-    Writer.WriteDouble( this.Space );
+	Writer.WriteDouble(this.W);
+	Writer.WriteDouble(this.Space);
 };
 CSectionColumn.prototype.Read_FromBinary = function(Reader)
 {
-    // Double : W
-    // Double : Space
+	// Double : W
+	// Double : Space
 
-    this.W     = Reader.GetDouble();
-    this.Space = Reader.GetDouble();
+	this.W     = Reader.GetDouble();
+	this.Space = Reader.GetDouble();
 };
 
 function CSectionColumns(SectPr)
 {
-    this.SectPr     = SectPr;
-    this.EqualWidth = true;
-    this.Num        = 1;
-    this.Sep        = false;
-    this.Space      = 30;
-    
-    this.Cols       = [];
+	this.SectPr     = SectPr;
+	this.EqualWidth = true;
+	this.Num        = 1;
+	this.Sep        = false;
+	this.Space      = 30;
+
+	this.Cols = [];
 }
 
-CSectionColumns.prototype.Write_ToBinary = function(Writer)
+CSectionColumns.prototype.Write_ToBinary  = function(Writer)
 {
-    // Bool   : Equal
-    // Long   : Num
-    // Bool   : Sep
-    // Double : Space
+	// Bool   : Equal
+	// Long   : Num
+	// Bool   : Sep
+	// Double : Space
 
-    // Long   : Количество колонок
-    // Variable : Сами колонки
+	// Long   : Количество колонок
+	// Variable : Сами колонки
 
-    Writer.WriteBool( this.EqualWidth );
-    Writer.WriteLong( this.Num );
-    Writer.WriteBool( this.Sep );
-    Writer.WriteDouble( this.Space );
+	Writer.WriteBool(this.EqualWidth);
+	Writer.WriteLong(this.Num);
+	Writer.WriteBool(this.Sep);
+	Writer.WriteDouble(this.Space);
 
-    var Count = this.Cols.length;
-    Writer.WriteLong( Count );
+	var Count = this.Cols.length;
+	Writer.WriteLong(Count);
 
-    for ( var Pos = 0; Pos < Count; Pos++ )
-    {
-        this.Cols[Pos].Write_ToBinary(Writer);
-    }
+	for (var Pos = 0; Pos < Count; Pos++)
+	{
+		this.Cols[Pos].Write_ToBinary(Writer);
+	}
 };
 CSectionColumns.prototype.Read_FromBinary = function(Reader)
 {
-    // Bool   : Equal
-    // Long   : Num
-    // Bool   : Sep
-    // Double : Space
+	// Bool   : Equal
+	// Long   : Num
+	// Bool   : Sep
+	// Double : Space
 
-    // Long   : Количество колонок
-    // Variable : Сами колонки
+	// Long   : Количество колонок
+	// Variable : Сами колонки
 
-    this.EqualWidth = Reader.GetBool();
-    this.Num        = Reader.GetLong();
-    this.Sep        = Reader.GetBool();
-    this.Space      = Reader.GetDouble();
+	this.EqualWidth = Reader.GetBool();
+	this.Num        = Reader.GetLong();
+	this.Sep        = Reader.GetBool();
+	this.Space      = Reader.GetDouble();
 
-    var Count = Reader.GetLong();
-    this.Cols = [];
+	var Count = Reader.GetLong();
+	this.Cols = [];
 
-    for ( var Pos = 0; Pos < Count; Pos++ )
-    {
-        this.Cols[Pos] = new CSectionColumn();
-        this.Cols[Pos].Read_FromBinary( Reader );
-    }
+	for (var Pos = 0; Pos < Count; Pos++)
+	{
+		this.Cols[Pos] = new CSectionColumn();
+		this.Cols[Pos].Read_FromBinary(Reader);
+	}
 };
-CSectionColumns.prototype.Get_Count = function()
+CSectionColumns.prototype.Get_Count       = function()
 {
-    if (true === this.EqualWidth)
-        return this.Num;
-    else
-        return this.Cols.length;
+	if (true === this.EqualWidth)
+	{
+		return this.Num;
+	}
+	else
+	{
+		if (this.Cols.length <= 0)
+			return 1;
+
+		return this.Cols.length;
+	}
 };
 CSectionColumns.prototype.Get_ColumnWidth = function(ColIndex)
 {
-    if (true === this.EqualWidth)
-    {
-        var PageW   = this.SectPr.Get_PageWidth();
-        var MarginL = this.SectPr.Get_PageMargin_Left();
-        var MarginR = this.SectPr.Get_PageMargin_Right();
-        return this.Num > 0 ? (PageW - MarginL - MarginR - this.Space * (this.Num - 1)) / this.Num : (PageW - MarginL - MarginR);
-    }
-    else
-    {
-        ColIndex = Math.max(0, Math.min(this.Cols.length - 1, ColIndex));
-        if (ColIndex < 0)
-            return 0;
+	if (true === this.EqualWidth)
+	{
+		var PageW   = this.SectPr.Get_PageWidth();
+		var MarginL = this.SectPr.Get_PageMargin_Left();
+		var MarginR = this.SectPr.Get_PageMargin_Right();
+		return this.Num > 0 ? (PageW - MarginL - MarginR - this.Space * (this.Num - 1)) / this.Num : (PageW - MarginL - MarginR);
+	}
+	else
+	{
+		if (this.Cols.length <= 0)
+			return 0;
 
-        return this.Cols[ColIndex].W;
-    }
+		ColIndex = Math.max(0, Math.min(this.Cols.length - 1, ColIndex));
+		if (ColIndex < 0)
+			return 0;
+
+		return this.Cols[ColIndex].W;
+	}
 };
 CSectionColumns.prototype.Get_ColumnSpace = function(ColIndex)
 {
-    if (true === this.EqualWidth)
-    {
-        return this.Space;
-    }
-    else
-    {
-        ColIndex = Math.max(0, Math.min(this.Cols.length - 1, ColIndex));
-        if (ColIndex < 0)
-            return this.Space;
+	if (true === this.EqualWidth)
+	{
+		return this.Space;
+	}
+	else
+	{
+		if (this.Cols.length <= 0)
+			return this.Space;
 
-        return this.Cols[ColIndex].Space;
-    }
+		ColIndex = Math.max(0, Math.min(this.Cols.length - 1, ColIndex));
+		if (ColIndex < 0)
+			return this.Space;
+
+		return this.Cols[ColIndex].Space;
+	}
 };
 
 function CSectionLayoutColumnInfo(X, XLimit)

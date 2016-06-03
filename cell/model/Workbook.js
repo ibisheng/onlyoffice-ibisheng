@@ -1878,7 +1878,7 @@ function addToArrRecalc(sheetId, cell){
 function addToArrDefNameRecalc(name){
     arrDefNameRecalc[name.nodeId] = name;
 }
-function buildDefNameAfterRenameWorksheet() {
+function buildDefNameAfterRenameWorksheet(ws) {
   var dN;
   for(var id in arrDefNameRecalc ){
     dN  = arrDefNameRecalc[id];
@@ -1944,7 +1944,6 @@ function Workbook(eventsHandlers, oApi){
 	this.oStyleManager = new AscCommonExcel.StyleManager();
 	this.calcChain = [];
 	this.aComments = [];	// Комментарии к документу
-	this.aCommentsCoords = [];
 	this.aWorksheets = [];
 	this.aWorksheetsById = {};
 	this.cwf = {};

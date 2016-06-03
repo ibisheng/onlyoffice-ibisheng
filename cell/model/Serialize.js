@@ -2916,18 +2916,10 @@
                     break;
                 }
             }
-            if (oDrawing.isChart())
-            {
-                this.bs.WriteItem(c_oSer_DrawingType.GraphicFrame, function () { oThis.WriteGraphicFrame(oDrawing); });
-            }
-            else if(curDrawing)
+            if(curDrawing)
                 this.bs.WriteItem(c_oSer_DrawingType.pptxDrawing, function(){pptx_content_writer.WriteDrawing(oThis.memory, curDrawing, null, null, null);});
             else
                 this.bs.WriteItem(c_oSer_DrawingType.pptxDrawing, function(){pptx_content_writer.WriteDrawing(oThis.memory, oDrawing.graphicObject, null, null, null);});
-        };
-        this.WriteGraphicFrame = function (oDrawing) {
-            var oBinaryChartWriter = new AscCommon.BinaryChartWriter(this.memory);
-            this.bs.WriteItem(c_oSer_DrawingType.Chart2, function () { oBinaryChartWriter.WriteCT_ChartSpace(oDrawing.graphicObject); });
         };
         this.WriteFromTo = function(oFromTo)
         {
@@ -4697,7 +4689,7 @@
         if (null != sFormat) {
           oRes = new AscCommonExcel.Num();
           oRes.f = sFormat;
-          if ((5 <= oNum.id && oNum.id <= 8) || (15 <= oNum.id && oNum.id <= 17) || (37 <= oNum.id && oNum.id <= 44)) {
+          if ((5 <= oNum.id && oNum.id <= 8) || (14 <= oNum.id && oNum.id <= 17) || 22 ==  oNum.id || (27 <= oNum.id && oNum.id <= 31) || (36 <= oNum.id && oNum.id <= 44)) {
             oRes.id = oNum.id;
           }
         }
@@ -6082,6 +6074,7 @@
             /** proprietary begin **/
             else if ( c_oSer_DrawingType.GraphicFrame == type )
             {
+                //todo удалить
                 res = this.bcr.Read1(length, function (t, l) {
                     return oThis.ReadGraphicFrame(t, l, oDrawing);
                 });

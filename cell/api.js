@@ -308,21 +308,7 @@ var editor;
     if (cultureInfo) {
       var numFormatDigit = AscCommon.oNumFormatCache.get('#,##0.00');
 
-      var dateElems = [];
-      for (var i = 0; i < cultureInfo.ShortDatePattern.length; ++i) {
-        switch (cultureInfo.ShortDatePattern[i]) {
-          case '0':
-            dateElems.push('d');
-            break;
-          case '1':
-            dateElems.push('m');
-            break;
-          case '2':
-            dateElems.push('yyyy');
-            break;
-        }
-      }
-      var formatDate = dateElems.join('/');
+      var formatDate = AscCommonExcel.getShortDateFormat(cultureInfo);
       formatDate += " h:mm";
       if (cultureInfo.AMDesignator && cultureInfo.PMDesignator) {
         formatDate += " AM/PM";
@@ -1920,7 +1906,6 @@ var editor;
     var t = this;
     var copyWorksheet = function(res) {
       if (res) {
-        t.wb._initCommentsToSave();
         // ToDo перейти от wsViews на wsViewsId (сейчас вызываем раньше, чем в модели, т.к. там будет sortDependency
         // и cleanCellCache, который создаст уже скопированный лист(и splice сработает неправильно))
         History.Create_NewPoint();
@@ -2307,22 +2292,6 @@ var editor;
   spreadsheet_api.prototype.asc_hideComments = function() {
     var ws = this.wb.getWorksheet();
     return ws.cellCommentator.hideComments();
-  };
-
-  spreadsheet_api.prototype.asc_getWorkbookComments = function() {
-    var _this = this, comments = [];
-    if (_this.wb) {
-      for (var key in _this.wb.wsViews) {
-        var ws = _this.wb.wsViews[key];
-        if (ws) {
-          for (var i = 0; i < ws.cellCommentator.aComments.length; i++) {
-            var comment = ws.cellCommentator.aComments[i];
-            comments.push({ "Id": comment.asc_getId(), "Comment": comment });
-          }
-        }
-      }
-    }
-    return comments;
   };
 
   // Shapes
@@ -3393,7 +3362,6 @@ var editor;
 
   prot["asc_getComments"] = prot.asc_getComments;
   prot["asc_getDocumentComments"] = prot.asc_getDocumentComments;
-  prot["asc_getWorkbookComments"] = prot.asc_getWorkbookComments;
 
   // Shapes
   prot["setStartPointHistory"] = prot.setStartPointHistory;
@@ -3505,4 +3473,6 @@ var editor;
   prot["asc_pluginButtonClick"]     = prot.asc_pluginButtonClick;
   prot["asc_addOleObject"]          = prot.asc_addOleObject;
   prot["asc_editOleObject"]         = prot.asc_editOleObject;
+  prot["asc_Recalculate"]           = prot.asc_Recalculate;
+  prot["asc_canPaste"]              = prot.asc_canPaste;
 })(window);

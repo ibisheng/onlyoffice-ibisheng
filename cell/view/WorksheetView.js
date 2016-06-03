@@ -1160,10 +1160,9 @@
     };
 
     WorksheetView.prototype._prepareComments = function () {
-        // Теперь получение всех комментариев через asc_getWorkbookComments
-        var commentList = this.cellCommentator.prepareComments( this.model.aComments );
-        if ( 0 < commentList.length ) {
-            this.model.workbook.handlers.trigger( "asc_onAddComments", commentList );
+        // ToDo возможно не нужно это делать именно тут..
+        if (0 < this.model.aComments.length) {
+            this.model.workbook.handlers.trigger("asc_onAddComments", this.model.aComments);
         }
     };
 
@@ -11842,12 +11841,19 @@
 
             if ( addFormatTableOptionsObj && isChangeAutoFilterToTablePart( addFormatTableOptionsObj ) === true )//CHANGE FILTER TO TABLEPART
 			{
-                var addFilterCallBack = function()
+                var filterRange = t.model.AutoFilter.Ref.clone();
+				
+				var addFilterCallBack = function()
 				{
+					History.Create_NewPoint();
+					History.StartTransaction();
+					
 					t.model.autoFilters.changeAutoFilterToTablePart( styleName, ar, addFormatTableOptionsObj );
+					t._onUpdateFormatTable(filterRange, !!(styleName), true);
+					
+					History.EndTransaction();
 				};
 				
-				var filterRange = t.model.AutoFilter.Ref.clone();
 				var addNameColumn = false;
 				if(addFormatTableOptionsObj === false)
 					addNameColumn = true;

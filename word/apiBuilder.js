@@ -1184,6 +1184,51 @@
         return new ApiNumbering(oNumbering);
     };
 
+	/**
+	 * Insert an array of elements in the current position of the document.
+     * @param {DocumentElement[]} arrContent - An array of elements to insert.
+     * @returns {boolean} Success?
+     */
+    ApiDocument.prototype.InsertContent = function(arrContent)
+    {
+        var oParagraph = this.Document.Content[this.Document.CurPos.ContentPos];
+        if (!oParagraph || !(oParagraph instanceof Paragraph))
+            return false;
+
+        var oNearestPos = {
+            Paragraph  : oParagraph,
+            ContentPos : oParagraph.Get_ParaContentPos(false, false)
+        };
+
+        oParagraph.Check_NearestPos(oNearestPos);
+
+        var oSelectedContent = new CSelectedContent();
+        for (var nIndex = 0, nCount = arrContent.length; nIndex < nCount; ++nIndex)
+        {
+            var oElement = arrContent[nIndex];
+            if (oElement instanceof ApiParagraph || oElement instanceof ApiTable)
+            {
+                oSelectedContent.Add(new CSelectedElement(oElement.private_GetImpl(), true));
+            }
+        }
+
+        if (!this.Document.Can_InsertContent(oSelectedContent, oNearestPos))
+            return false;
+
+        if (this.Document.Is_SelectionUse())
+        {
+            this.Document.Start_SilentMode();
+            this.Document.Remove(1, false, false, false);
+            this.Document.End_SilentMode();
+            this.Document.Selection_Remove(true);
+        }
+
+        this.Document.Insert_Content(oSelectedContent, oNearestPos);
+        this.Document.Selection_Remove(true);
+        oParagraph.Clear_NearestPosArray();
+        return true;
+    };
+
     //------------------------------------------------------------------------------------------------------------------
     //
     // ApiParagraph
@@ -3434,7 +3479,14 @@
      */
     ApiDrawing.prototype.SetSize = function(nWidth, nHeight)
     {
-        this.Drawing.setExtent(private_EMU2MM(nWidth), private_EMU2MM(nHeight));
+        var fWidth = private_EMU2MM(nWidth);
+        var fHeight = private_EMU2MM(nHeight);
+        this.Drawing.setExtent(fWidth, fHeight);
+        if(this.Drawing.GraphicObj && this.Drawing.GraphicObj.spPr && this.Drawing.GraphicObj.spPr.xfrm)
+        {
+            this.Drawing.GraphicObj.spPr.xfrm.setExtX(fWidth);
+            this.Drawing.GraphicObj.spPr.xfrm.setExtY(fHeight);
+        }
     };
     /**
      * Set the wrapping type of this drawing object.
@@ -3951,6 +4003,7 @@
     ApiDocument.prototype["CreateSection"]           = ApiDocument.prototype.CreateSection;
     ApiDocument.prototype["SetEvenAndOddHdrFtr"]     = ApiDocument.prototype.SetEvenAndOddHdrFtr;
     ApiDocument.prototype["CreateNumbering"]         = ApiDocument.prototype.CreateNumbering;
+    ApiDocument.prototype["InsertContent"]           = ApiDocument.prototype.InsertContent;
 
     ApiParagraph.prototype["GetClassType"]           = ApiParagraph.prototype.GetClassType;
     ApiParagraph.prototype["AddText"]                = ApiParagraph.prototype.AddText;

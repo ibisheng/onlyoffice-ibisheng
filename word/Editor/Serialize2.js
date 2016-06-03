@@ -393,7 +393,8 @@ var c_oSerImageType2 = {
 	Chart2: 25,
 	CachedImage: 26,
 	SizeRelH: 27,
-	SizeRelV: 28
+	SizeRelV: 28,
+	GraphicFramePr: 30
 };
 var c_oSerEffectExtent = {
 	Left: 0,
@@ -494,7 +495,8 @@ var c_oSer_StyleType = {
 var c_oSer_SettingsType = {
 	ClrSchemeMapping: 0,
 	DefaultTabStop: 1,
-	MathPr: 2
+	MathPr: 2,
+	TrackRevisions: 3
 };
 var c_oSer_MathPrType = {
 	BrkBin: 0,
@@ -723,6 +725,14 @@ var c_oSerPageBorders = {
 	Sz: 12,
 	ColorTheme: 13,
 	Val: 16
+};
+var c_oSerGraphicFramePr = {
+	NoChangeAspect: 0,
+	NoDrilldown: 1,
+	NoGrp: 2,
+	NoMove: 3,
+	NoResize: 4,
+	NoSelect: 5
 };
 var ETblStyleOverrideType = {
 	tblstyleoverridetypeBand1Horz:  0,
@@ -4337,6 +4347,11 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
 				this.memory.WriteByte(c_oSerPropLenType.Variable);
 				this.bs.WriteItemWithLength(function(){oThis.WriteEffectExtent(img.EffectExtent);});
 			}
+			if (null != img.GraphicObj.locks) {
+				this.memory.WriteByte(c_oSerImageType2.GraphicFramePr);
+				this.memory.WriteByte(c_oSerPropLenType.Variable);
+				this.bs.WriteItemWithLength(function(){oThis.WriteGraphicFramePr(img.GraphicObj.locks);});
+			}
 			if(null != img.GraphicObj.chart)
 			{
 				this.memory.WriteByte(c_oSerImageType2.Chart2);
@@ -4473,7 +4488,11 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
 					this.memory.WriteByte(c_oSerPropLenType.Null);
 					break;
 			}
-		
+			if (null != img.GraphicObj.locks) {
+				this.memory.WriteByte(c_oSerImageType2.GraphicFramePr);
+				this.memory.WriteByte(c_oSerPropLenType.Variable);
+				this.bs.WriteItemWithLength(function(){oThis.WriteGraphicFramePr(img.GraphicObj.locks);});
+			}
 			if(null != img.GraphicObj.chart)
 			{
 				this.memory.WriteByte(c_oSerImageType2.Chart2);
@@ -4495,6 +4514,39 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
 			this.memory.WriteString2(img.getBase64Img());
 		}
     };
+	this.WriteGraphicFramePr = function(locks)
+	{
+		if (locks & AscFormat.LOCKS_MASKS.noChangeAspect) {
+			this.memory.WriteByte(c_oSerGraphicFramePr.NoChangeAspect);
+			this.memory.WriteByte(c_oSerPropLenType.Byte);
+			this.memory.WriteBool(!!(locks & AscFormat.LOCKS_MASKS.noChangeAspect << 1));
+		}
+		if (locks & AscFormat.LOCKS_MASKS.noDrilldown) {
+			this.memory.WriteByte(c_oSerGraphicFramePr.NoDrilldown);
+			this.memory.WriteByte(c_oSerPropLenType.Byte);
+			this.memory.WriteBool(!!(locks & AscFormat.LOCKS_MASKS.noDrilldown << 1));
+		}
+		if (locks & AscFormat.LOCKS_MASKS.noGrp) {
+			this.memory.WriteByte(c_oSerGraphicFramePr.NoGrp);
+			this.memory.WriteByte(c_oSerPropLenType.Byte);
+			this.memory.WriteBool(!!(locks & AscFormat.LOCKS_MASKS.noGrp << 1));
+		}
+		if (locks & AscFormat.LOCKS_MASKS.noMove) {
+			this.memory.WriteByte(c_oSerGraphicFramePr.NoMove);
+			this.memory.WriteByte(c_oSerPropLenType.Byte);
+			this.memory.WriteBool(!!(locks & AscFormat.LOCKS_MASKS.noMove << 1));
+		}
+		if (locks & AscFormat.LOCKS_MASKS.noResize) {
+			this.memory.WriteByte(c_oSerGraphicFramePr.NoResize);
+			this.memory.WriteByte(c_oSerPropLenType.Byte);
+			this.memory.WriteBool(!!(locks & AscFormat.LOCKS_MASKS.noResize << 1));
+		}
+		if (locks & AscFormat.LOCKS_MASKS.noSelect) {
+			this.memory.WriteByte(c_oSerGraphicFramePr.NoSelect);
+			this.memory.WriteByte(c_oSerPropLenType.Byte);
+			this.memory.WriteBool(!!(locks & AscFormat.LOCKS_MASKS.noSelect << 1));
+		}
+	}
 	this.WriteEffectExtent = function(EffectExtent)
 	{
 		if(null != EffectExtent.L)
@@ -4888,6 +4940,7 @@ function BinarySettingsTableWriter(memory, doc)
 		this.bs.WriteItem(c_oSer_SettingsType.ClrSchemeMapping, function(){oThis.WriteColorSchemeMapping();});
 		this.bs.WriteItem(c_oSer_SettingsType.DefaultTabStop, function(){oThis.memory.WriteDouble(Default_Tab_Stop);});
 		this.bs.WriteItem(c_oSer_SettingsType.MathPr, function(){oThis.WriteMathPr();});
+		this.bs.WriteItem(c_oSer_SettingsType.TrackRevisions, function(){oThis.memory.WriteBool(oThis.Document.Is_TrackRevisions());});
     }
 	this.WriteMathPr = function()
 	{
@@ -5126,7 +5179,8 @@ function BinaryFileReader(doc, openParams)
 		bLastRun: null,
 		aPostOpenStyleNumCallbacks: null,
 		headers: null,
-		footers: null
+		footers: null,
+		trackRevisions: null
 	};   
     
     this.getbase64DecodedData = function(szSrc)
@@ -5752,7 +5806,9 @@ function BinaryFileReader(doc, openParams)
         }
 		// for(var i = 0, length = this.oReadResult.aPostOpenStyleNumCallbacks.length; i < length; ++i)
 			// this.oReadResult.aPostOpenStyleNumCallbacks[i].call();
-
+		if (null != this.oReadResult.trackRevisions) {
+			this.Document.DrawingDocument.m_oWordControl.m_oApi.asc_SetTrackRevisions(this.oReadResult.trackRevisions);
+		}
         this.Document.On_EndLoad();
 		//чтобы удалялся stream с бинарником
 		pptx_content_loader.Clear(true);
@@ -8664,9 +8720,10 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 	{
 		var oThis = this;
 		var doc = this.Document;
+		var graphicFramePr = {locks: 0};
         var oParaDrawing = new ParaDrawing(null, null, null, doc.DrawingDocument, doc, oParStruct.paragraph);
         res = this.bcr.Read2(length, function(t, l){
-            return oThis.ReadPptxDrawing(t, l, oParaDrawing);
+            return oThis.ReadPptxDrawing(t, l, oParaDrawing, graphicFramePr);
         });
         if(null != oParaDrawing.SimplePos)
             oParaDrawing.setSimplePos(oParaDrawing.SimplePos.Use, oParaDrawing.SimplePos.X, oParaDrawing.SimplePos.Y);
@@ -8679,6 +8736,9 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 
         if(oParaDrawing.GraphicObj)
         {
+			if (oParaDrawing.GraphicObj.setLocks && graphicFramePr.locks > 0) {
+				oParaDrawing.GraphicObj.setLocks(graphicFramePr.locks);
+			}
             if(oParaDrawing.GraphicObj.getObjectType() !== AscDFH.historyitem_type_ChartSpace)//диаграммы могут быть без spPr
             {
                 if(!oParaDrawing.GraphicObj.spPr)
@@ -8855,7 +8915,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
             res = c_oSerConstants.ReadUnknown;
         return res;
     };
-    this.ReadPptxDrawing = function(type, length, oParaDrawing)
+    this.ReadPptxDrawing = function(type, length, oParaDrawing, graphicFramePr)
 	{
 		var res = c_oSerConstants.ReadOk;
         var oThis = this;
@@ -9018,6 +9078,12 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
                     return oThis.ReadWrapThroughTight(t, l,  oParaDrawing.wrappingPolygon);
                 });
 		}
+		else if( c_oSerImageType2.GraphicFramePr === type )
+		{
+			res = this.bcr.Read2(length, function(t, l){
+					return oThis.ReadNvGraphicFramePr(t, l, graphicFramePr);
+				});
+		}
 		else if( c_oSerImageType2.CachedImage === type )
 		{
 			if(null != oParaDrawing.GraphicObj)
@@ -9028,6 +9094,33 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 		else
             res = c_oSerConstants.ReadUnknown;
         return res;
+	}
+	this.ReadNvGraphicFramePr = function(type, length, graphicFramePr) {
+		var res = c_oSerConstants.ReadOk;
+		var oThis = this;
+		var value;
+		if (c_oSerGraphicFramePr.NoChangeAspect === type) {
+			value = this.stream.GetBool();
+			graphicFramePr.locks |= (AscFormat.LOCKS_MASKS.noChangeAspect | (value ? AscFormat.LOCKS_MASKS.noChangeAspect << 1 : 0));
+		} else if (c_oSerGraphicFramePr.NoDrilldown === type) {
+			value = this.stream.GetBool();
+			graphicFramePr.locks |= (AscFormat.LOCKS_MASKS.noDrilldown | (value ? AscFormat.LOCKS_MASKS.noDrilldown << 1 : 0));
+		} else if (c_oSerGraphicFramePr.NoGrp === type) {
+			value = this.stream.GetBool();
+			graphicFramePr.locks |= (AscFormat.LOCKS_MASKS.noGrp | (value ? AscFormat.LOCKS_MASKS.noGrp << 1 : 0));
+		} else if (c_oSerGraphicFramePr.NoMove === type) {
+			value = this.stream.GetBool();
+			graphicFramePr.locks |= (AscFormat.LOCKS_MASKS.noMove | (value ? AscFormat.LOCKS_MASKS.noMove << 1 : 0));
+		} else if (c_oSerGraphicFramePr.NoResize === type) {
+			value = this.stream.GetBool();
+			graphicFramePr.locks |= (AscFormat.LOCKS_MASKS.noResize | (value ? AscFormat.LOCKS_MASKS.noResize << 1 : 0));
+		} else if (c_oSerGraphicFramePr.NoSelect === type) {
+			value = this.stream.GetBool();
+			graphicFramePr.locks |= (AscFormat.LOCKS_MASKS.noSelect | (value ? AscFormat.LOCKS_MASKS.noSelect << 1 : 0));
+		} else {
+			res = c_oSerConstants.ReadUnknown;
+		}
+		return res;
 	}
 	this.ReadEffectExtent = function(type, length, oEffectExtent)
 	{
@@ -12049,6 +12142,7 @@ function Binary_SettingsTableReader(doc, oReadResult, stream)
     this.Document = doc;
 	this.oReadResult = oReadResult;
     this.stream = stream;
+	this.trackRevisions = null;
     this.bcr = new Binary_CommonReader(this.stream);
     this.Read = function()
     {
@@ -12082,6 +12176,10 @@ function Binary_SettingsTableReader(doc, oReadResult, stream)
             });
 			editor.WordControl.m_oLogicDocument.Settings.MathSettings.SetPr(props);
         }
+		else if ( c_oSer_SettingsType.TrackRevisions === type )
+		{
+			this.oReadResult.trackRevisions = this.stream.GetBool();
+		}
         else
             res = c_oSerConstants.ReadUnknown;
         return res;
