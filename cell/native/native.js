@@ -2409,7 +2409,18 @@ function asc_WriteAddFormatTableOptions(c, s) {
     s['WriteByte'](255);
 }
 
-
+function asc_WriteAutoFilterObj(c, s) {
+    if (!c) return;
+    
+    s['WriteByte'](i);
+    
+    if (undefined !== c.asc_getIsDateFormat()) {
+        s['WriteByte'](0);
+        s['WriteLong'](c.asc_getType());
+    }
+    
+    s['WriteByte'](255);
+}
 function asc_WriteAutoFiltersOptionsElements(i, c, s) {
     if (!c) return;
     
@@ -2437,7 +2448,7 @@ function asc_WriteAutoFiltersOptionsElements(i, c, s) {
     
     s['WriteByte'](255);
 }
-function asc_WriteCAscCAutoFiltersOptions(c, s) {
+function asc_WriteAutoFiltersOptions(c, s) {
     if (!c) return;
     
     if (c.asc_getCellId()) {
@@ -2477,7 +2488,16 @@ function asc_WriteCAscCAutoFiltersOptions(c, s) {
             asc_WriteAutoFiltersOptionsElements(1, c.asc_getValues()[i], s);
         }
     }
-     
+    
+    if (undefined !== c.asc_getSortState()) {
+        s['WriteByte'](6);
+        s['WriteLong'](c.asc_getSortState());
+    }
+    
+    if (c.asc_getFilterObj()) {
+        asc_WriteAutoFilterObj(7, c.asc_getFilterObj(), s);
+    }
+    
     s['WriteByte'](255);
 }
 
@@ -3709,7 +3729,7 @@ function OfflineEditor () {
             console.log('asc_onSetAFDialog');
             var stream = global_memory_stream_menu;
             stream["ClearNoAttack"]();
-            asc_WriteCAscCAutoFiltersOptions(state, stream);
+            asc_WriteAutoFiltersOptions(state, stream);
             window["native"]["OnCallMenuEvent"](3060, stream); // ASC_SPREADSHEETS_EVENT_TYPE_FILTER_DIALOG
         });
     };
