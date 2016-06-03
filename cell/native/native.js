@@ -2409,6 +2409,78 @@ function asc_WriteAddFormatTableOptions(c, s) {
     s['WriteByte'](255);
 }
 
+
+function asc_WriteAutoFiltersOptionsElements(i, c, s) {
+    if (!c) return;
+    
+    s['WriteByte'](i);
+    
+    if (undefined !== c.asc_getIsDateFormat()) {
+        s['WriteByte'](0);
+        s['WriteBool'](c.asc_getIsDateFormat());
+    }
+    
+    if (c.asc_getText()) {
+        s['WriteByte'](1);
+        s['WriteString2'](c.asc_getText());
+    }
+  
+    if (c.asc_getVal()) {
+        s['WriteByte'](2);
+        s['WriteString2'](c.asc_getVal());
+    }
+    
+    if (undefined !== c.asc_getVisible()) {
+        s['WriteByte'](3);
+        s['WriteBool'](c.asc_getVisible());
+    }
+    
+    s['WriteByte'](255);
+}
+function asc_WriteCAscCAutoFiltersOptions(c, s) {
+    if (!c) return;
+    
+    if (c.asc_getCellId()) {
+        s['WriteByte'](0);
+        s['WriteString2'](c.asc_getCellId());
+    }
+    
+    if (c.asc_getDisplayName()) {
+        s['WriteByte'](1);
+        s['WriteString2'](c.asc_getDisplayName());
+    }
+    
+    if (c.asc_getIsTextFilter()) {
+        s['WriteByte'](2);
+        s['WriteBool'](c.asc_getIsTextFilter());
+    }
+    
+    if (c.asc_getCellCoord()) {
+        s['WriteByte'](3);
+        s['WriteDouble2'](c.asc_getCellCoord().asc_getX());
+        s['WriteDouble2'](c.asc_getCellCoord().asc_getY());
+        s['WriteDouble2'](c.asc_getCellCoord().asc_getWidth());
+        s['WriteDouble2'](c.asc_getCellCoord().asc_getHeight());
+    }
+    
+    if (c.asc_getSortColor()) {
+        asc_menu_WriteColor(4, c.asc_getSortColor(), s);
+    }
+    
+    if (c.asc_getValues() && c.asc_getValues().length > 0) {
+        var count = c.asc_getValues().length
+       
+        s['WriteByte'](5);
+        s['WriteLong'](count);
+        
+        for (var i = 0; i < count; ++i) {
+            asc_WriteAutoFiltersOptionsElements(1, c.asc_getValues()[i], s);
+        }
+    }
+     
+    s['WriteByte'](255);
+}
+
 //--------------------------------------------------------------------------------
 // defines
 //--------------------------------------------------------------------------------
@@ -3631,6 +3703,14 @@ function OfflineEditor () {
             stream["ClearNoAttack"]();
             stream['WriteLong'](state);
             window["native"]["OnCallMenuEvent"](2600, stream); // ASC_SPREADSHEETS_EVENT_TYPE_ON_EDIT_CELL
+        });
+     
+        _api.asc_registerCallback('asc_onSetAFDialog', function(state) {
+            console.log('asc_onSetAFDialog');
+            var stream = global_memory_stream_menu;
+            stream["ClearNoAttack"]();
+            asc_WriteCAscCAutoFiltersOptions(state, stream);
+            window["native"]["OnCallMenuEvent"](3060, stream); // ASC_SPREADSHEETS_EVENT_TYPE_FILTER_DIALOG
         });
     };
     this.updateFrozen = function () {
@@ -5044,14 +5124,21 @@ function offline_mouse_down(x, y, pin, isViewerMode, isFormulaEditMode, isRangeR
 
     _s.cellPin = pin;
     _s.isFormulaEditMode = isFormulaEditMode;
+    
+    var ct = ws.getCursorTypeFromXY(x, y, isViewerMode);
+    if (ct.target && ct.target === AscCommonExcel.c_oTargetType.FilterObject) {
+        ws.af_setDialogProp(ct.idFilter);
+        //var cell = offline_get_cell_in_coord(x, y);
+        return;
+    }
 
     if (isRangeResize) {
 
         if (!isViewerMode) {
-
+    
             var ct = ws.getCursorTypeFromXY(x, y, isViewerMode);
-
-            //console.log(JSON.stringify(ct));
+           
+             //console.log(JSON.stringify(ct));
 
             ws.startCellMoveResizeRange = null;
 
@@ -6643,6 +6730,11 @@ function offline_apply_event(type,params) {
         case 3010: // ASC_SPREADSHEETS_EVENT_TYPE_FILTER_CHANGE_AUTO
         {
             var changeFilter = asc_ReadAutoFilter(params, _current);
+            
+            if (changeFilter && 'FALSE' === changeFilter.styleName) {
+                changeFilter.styleName = false;
+            }
+            
             _api.asc_changeAutoFilter(changeFilter.tableName, changeFilter.optionType, changeFilter.styleName);
             _api.wb.getWorksheet().handlers.trigger('selectionChanged', _api.wb.getWorksheet().getSelectionInfo());
             break;
