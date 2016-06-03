@@ -200,6 +200,17 @@
                     this.startData.setAttribute("data", text_data.data);
                     break;
                 }
+                case Asc.EPluginDataType.html:
+                {
+                    var text_data = {
+                        data : "",
+                        pushData : function(format, value) { this.data = value; }
+                    };
+
+                    this.api.asc_CheckCopy(text_data, 2);
+                    this.startData.setAttribute("data", text_data.data);
+                    break;
+                }
                 case Asc.EPluginDataType.ole:
                 {
                     // теперь выше задается
