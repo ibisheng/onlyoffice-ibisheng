@@ -9816,7 +9816,7 @@ CTable.prototype =
             if ( 0 != Index )
             {
                 Cell_tl.Content_Merge( Cell.Content );
-                Cell.Content.Selection_Remove();
+				Cell.Content.Clear_Content();
             }
         }
 
