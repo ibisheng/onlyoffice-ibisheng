@@ -495,7 +495,8 @@ var c_oSer_StyleType = {
 var c_oSer_SettingsType = {
 	ClrSchemeMapping: 0,
 	DefaultTabStop: 1,
-	MathPr: 2
+	MathPr: 2,
+	TrackRevisions: 3
 };
 var c_oSer_MathPrType = {
 	BrkBin: 0,
@@ -4939,6 +4940,7 @@ function BinarySettingsTableWriter(memory, doc)
 		this.bs.WriteItem(c_oSer_SettingsType.ClrSchemeMapping, function(){oThis.WriteColorSchemeMapping();});
 		this.bs.WriteItem(c_oSer_SettingsType.DefaultTabStop, function(){oThis.memory.WriteDouble(Default_Tab_Stop);});
 		this.bs.WriteItem(c_oSer_SettingsType.MathPr, function(){oThis.WriteMathPr();});
+		this.bs.WriteItem(c_oSer_SettingsType.TrackRevisions, function(){oThis.memory.WriteBool(oThis.Document.Is_TrackRevisions());});
     }
 	this.WriteMathPr = function()
 	{
@@ -5177,7 +5179,8 @@ function BinaryFileReader(doc, openParams)
 		bLastRun: null,
 		aPostOpenStyleNumCallbacks: null,
 		headers: null,
-		footers: null
+		footers: null,
+		trackRevisions: null
 	};   
     
     this.getbase64DecodedData = function(szSrc)
@@ -5803,7 +5806,9 @@ function BinaryFileReader(doc, openParams)
         }
 		// for(var i = 0, length = this.oReadResult.aPostOpenStyleNumCallbacks.length; i < length; ++i)
 			// this.oReadResult.aPostOpenStyleNumCallbacks[i].call();
-
+		if (null != this.oReadResult.trackRevisions) {
+			this.Document.DrawingDocument.m_oWordControl.m_oApi.asc_SetTrackRevisions(this.oReadResult.trackRevisions);
+		}
         this.Document.On_EndLoad();
 		//чтобы удалялся stream с бинарником
 		pptx_content_loader.Clear(true);
@@ -12137,6 +12142,7 @@ function Binary_SettingsTableReader(doc, oReadResult, stream)
     this.Document = doc;
 	this.oReadResult = oReadResult;
     this.stream = stream;
+	this.trackRevisions = null;
     this.bcr = new Binary_CommonReader(this.stream);
     this.Read = function()
     {
@@ -12170,6 +12176,10 @@ function Binary_SettingsTableReader(doc, oReadResult, stream)
             });
 			editor.WordControl.m_oLogicDocument.Settings.MathSettings.SetPr(props);
         }
+		else if ( c_oSer_SettingsType.TrackRevisions === type )
+		{
+			this.oReadResult.trackRevisions = this.stream.GetBool();
+		}
         else
             res = c_oSerConstants.ReadUnknown;
         return res;
