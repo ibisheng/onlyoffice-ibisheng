@@ -2524,7 +2524,7 @@ function BinaryPPTYLoader()
                 }
                 case 1:
                 {
-                    s.SkipRecord();
+                    ln.setPrstDash(this.ReadLineDash());
                     break;
                 }
                 case 2:
@@ -2592,6 +2592,39 @@ function BinaryPPTYLoader()
 
         s.Seek2(_end_rec);
         return endL;
+    }
+
+    this.ReadLineDash = function()
+    {
+        var s = this.stream;
+
+        var _rec_start = s.cur;
+        var _end_rec = _rec_start + s.GetLong() + 4;
+
+        var _dash = 6; // solid
+
+        s.Skip2(1); // start attributes
+
+        while (true)
+        {
+            var _at = s.GetUChar();
+            if (_at == g_nodeAttributeEnd)
+                break;
+
+            switch (_at)
+            {
+                case 0:
+                {
+                    _dash = s.GetUChar();
+                    break;
+                }
+                default:
+                    break;
+            }
+        }
+
+        s.Seek2(_end_rec);
+        return _dash;
     }
 
     this.ReadLineJoin = function()

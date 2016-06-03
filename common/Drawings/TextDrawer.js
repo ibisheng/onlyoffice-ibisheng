@@ -931,6 +931,9 @@ CTextDrawer.prototype =
         }
         this.Get_PathToDraw(false, true);
     },
+    p_dash : function(w)
+    {
+    },
     // brush methods
     b_color1 : function(r,g,b,a)
     {

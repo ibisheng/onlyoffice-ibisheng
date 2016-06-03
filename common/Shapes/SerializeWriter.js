@@ -2460,6 +2460,7 @@ function CBinaryFileWriter()
         oThis.WriteUChar(g_nodeAttributeEnd);
 
         oThis.WriteRecord2(0, ln.Fill, oThis.WriteUniFill);
+        oThis.WriteRecord2(1, ln.prstDash, oThis.WriteLineDash);
         oThis.WriteRecord1(2, ln.Join, oThis.WriteLineJoin);
         oThis.WriteRecord2(3, ln.headEnd, oThis.WriteLineEnd);
         oThis.WriteRecord2(4, ln.tailEnd, oThis.WriteLineEnd);
@@ -2478,6 +2479,16 @@ function CBinaryFileWriter()
         oThis.WriteUChar(g_nodeAttributeStart);
         oThis._WriteInt1(0, (join.type != null && join.type !== undefined) ? join.type : 0);
         oThis._WriteInt2(1, join.limit);
+        oThis.WriteUChar(g_nodeAttributeEnd);
+    }
+
+    this.WriteLineDash = function(dash)
+    {
+        if (dash == null || dash === undefined)
+            return;
+
+        oThis.WriteUChar(g_nodeAttributeStart);
+        oThis._WriteLimit2(0, dash);
         oThis.WriteUChar(g_nodeAttributeEnd);
     }
 

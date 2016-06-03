@@ -8126,6 +8126,9 @@ CSlideBoundsChecker.prototype =
     p_width : function(w)
     {
     },
+    p_dash : function(params)
+    {
+    },
     // brush methods
     b_color1 : function(r,g,b,a)
     {

@@ -207,6 +207,15 @@ CGraphics.prototype =
             }
         }
     },
+
+    p_dash : function(params)
+    {
+        if (!this.m_oContext.setLineDash)
+            return;
+
+        this.m_oContext.setLineDash(params ? params : []);
+    },
+
     // brush methods
     b_color1 : function(r,g,b,a)
     {

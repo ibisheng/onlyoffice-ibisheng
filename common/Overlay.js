@@ -590,6 +590,10 @@ CAutoshapeTrack.prototype =
         if (_EpsLine > this.MaxEpsLine)
             this.MaxEpsLine = _EpsLine;
     },
+    p_dash : function(params)
+    {
+        this.Graphics.p_dash(params);
+    },
     b_color1 : function(r,g,b,a)
     {
         this.Graphics.b_color1(r,g,b,a);

@@ -424,6 +424,10 @@ CPdfPrinter.prototype =
     {
         return this.DocumentRenderer.p_width(w);
     },
+    p_dash : function(params)
+    {
+        // TODO:
+    },
     // brush methods
     b_color1 : function(r,g,b,a)
     {

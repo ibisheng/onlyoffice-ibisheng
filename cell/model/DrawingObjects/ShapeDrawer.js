@@ -658,6 +658,14 @@ CShapeDrawer.prototype =
 
             this.p_width(1000 * this.StrokeWidth);
 
+            if (this.Ln.prstDash != null && AscCommon.DashPatternPresets[this.Ln.prstDash])
+            {
+                var _arr = AscCommon.DashPatternPresets[this.Ln.prstDash].slice();;
+                for (var indexD = 0; indexD < _arr.length; indexD++)
+                    _arr[indexD] *= this.StrokeWidth;
+                this.Graphics.p_dash(_arr);
+            }
+
             if (graphics.IsSlideBoundsCheckerType && !this.bIsNoStrokeAttack)
                 graphics.LineWidth = this.StrokeWidth;
 
@@ -738,6 +746,8 @@ CShapeDrawer.prototype =
         {
             this.Graphics.m_oContext.globalCompositeOperation = _old_composite;
         }
+
+        this.Graphics.p_dash(null);
     },
 
     p_width : function(w)
