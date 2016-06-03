@@ -1363,7 +1363,7 @@
     ApiParagraph.prototype.GetElement = function(nPos)
     {
         // TODO: ParaEnd
-        if (nPos < 0 || nPos >= this.Paragraph.Content.length - 2)
+        if (nPos < 0 || nPos >= this.Paragraph.Content.length - 1)
             return null;
 
         var oElement = this.Paragraph.Content[nPos];
@@ -1378,7 +1378,7 @@
      */
     ApiParagraph.prototype.RemoveElement = function(nPos)
     {
-        if (nPos < 0 || nPos >= this.Paragraph.Content.length - 2)
+        if (nPos < 0 || nPos >= this.Paragraph.Content.length - 1)
             return;
 
         this.Paragraph.Remove_FromContent(nPos, 1);
