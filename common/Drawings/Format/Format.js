@@ -3895,35 +3895,39 @@ EndArrow.prototype =
         return arrow && arrow.type == this.type &&  arrow.len == this.len && arrow.w  == this.w;
     },
 
-    GetWidth: function(size)
+    GetWidth: function(size, _max)
     {
-        if (null == this.w)
-            return size * 3;
-        switch (this.w)
+        var _ret = 3 * size;
+        if (null != this.w)
         {
-            case LineEndSize.Large:
-                return 5 * size;
-            case LineEndSize.Small:
-                return 2 * size;
-            default:
-                break;
+            switch (this.w)
+            {
+                case LineEndSize.Large:
+                    _ret = 5 * size;
+                case LineEndSize.Small:
+                    _ret = 2 * size;
+                default:
+                    break;
+            }
         }
-        return 3 * size;
+        return Math.max(_ret, _max ? _max : 7);
     },
-    GetLen: function(size)
+    GetLen: function(size, _max)
     {
-        if (null == this.len)
-            return size * 3;
-        switch (this.len)
+        var _ret = 3 * size;
+        if (null != this.w)
         {
-            case LineEndSize.Large:
-                return 5 * size;
-            case LineEndSize.Small:
-                return 2 * size;
-            default:
-                break;
+            switch (this.w)
+            {
+                case LineEndSize.Large:
+                    _ret = 5 * size;
+                case LineEndSize.Small:
+                    _ret = 2 * size;
+                default:
+                    break;
+            }
         }
-        return 3 * size;
+        return Math.max(_ret, _max ? _max : 7);
     },
 
     getObjectType: function()
