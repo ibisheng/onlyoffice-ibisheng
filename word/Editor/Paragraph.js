@@ -3030,6 +3030,8 @@ Paragraph.prototype =
             case para_NewLine:
             case para_FootnoteReference:
             case para_FootnoteRef:
+            case para_Separator:
+            case para_ContinuationSeparator:
             default:
             {
                 // Элементы данного типа добавляем во внутренний элемент
