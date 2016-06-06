@@ -909,6 +909,8 @@
 		this.LastFontOriginInfo = {Name : "", Replace : null};
 
 		this.StartOffset = 0;
+
+		this.m_bIsPenDash = false;
 	}
 
 	CMetafile.prototype =
@@ -945,7 +947,27 @@
 		},
 		p_dash : function(params)
 		{
-			// TODO:
+			var bIsDash = params ? true : false;
+			if (false == this.m_bIsPenDash && bIsDash == this.m_bIsPenDash)
+				return;
+			this.m_bIsPenDash = bIsDash;
+
+			if (!this.m_bIsPenDash)
+			{
+				this.Memory.WriteByte(CommandType.ctPenDashStyle);
+				this.Memory.WriteByte(0);
+			}
+			else
+			{
+				this.Memory.WriteByte(CommandType.ctPenDashStyle);
+				this.Memory.WriteByte(5);
+
+				this.Memory.WriteLong(params.length);
+				for (var i = 0; i < params.length; i++)
+				{
+					this.Memory.WriteDouble(params[i]);
+				}
+			}
 		},
 		// brush methods
 		b_color1 : function(r, g, b, a)

@@ -269,12 +269,12 @@
 
         startLongAction : function()
         {
-            console.log("startLongAction");
+            //console.log("startLongAction");
             this.api.sync_StartAction(Asc.c_oAscAsyncActionType.BlockInteraction, Asc.c_oAscAsyncAction.SlowOperation);
         },
         endLongAction : function()
         {
-            console.log("endLongAction");
+            //console.log("endLongAction");
             this.api.sync_EndAction(Asc.c_oAscAsyncActionType.BlockInteraction, Asc.c_oAscAsyncAction.SlowOperation);
         }
     };
@@ -332,8 +332,17 @@
 								{
 									_images[_imagesArray[i]] = _imagesArray[i];
 								}
+
+                                window.g_asc_plugins.images_rename = _images;
 								AscCommon.Check_LoadingDataBeforePrepaste(window.g_asc_plugins.api, _fonts, _images, function()
 								{
+                                    if (window.g_asc_plugins.api.WordControl &&
+                                        window.g_asc_plugins.api.WordControl.m_oLogicDocument &&
+                                        window.g_asc_plugins.api.WordControl.m_oLogicDocument.Reassign_ImageUrls)
+                                    {
+                                        window.g_asc_plugins.api.WordControl.m_oLogicDocument.Reassign_ImageUrls(window.g_asc_plugins.images_rename);
+                                    }
+                                    delete window.g_asc_plugins.images_rename;
 									window.g_asc_plugins.api.asc_Recalculate();
 								});
 							}
