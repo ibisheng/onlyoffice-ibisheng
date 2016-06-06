@@ -13,7 +13,7 @@
  */
 function CFootEndnote(DocumentController)
 {
-    CFootEndnote.superclass.constructor.call(this, DocumentController, DocumentController.Get_DrawingDocument(), 0, 0, 0, 0, true, false, false);
+	CFootEndnote.superclass.constructor.call(this, DocumentController, DocumentController.Get_DrawingDocument(), 0, 0, 0, 0, true, false, false);
 }
 
 AscCommon.extendClass(CFootEndnote, CDocumentContent);
