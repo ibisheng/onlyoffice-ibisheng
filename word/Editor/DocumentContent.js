@@ -48,7 +48,7 @@ function CDocumentContent(Parent, DrawingDocument, X, Y, XLimit, YLimit, Split, 
     {
         this.DrawingDocument = DrawingDocument;
         
-        if ( undefined !== editor && true === editor.isDocumentEditor && !(bPresentation === true) )
+        if ( undefined !== editor && true === editor.isDocumentEditor && !(bPresentation === true) && DrawingDocument.m_oLogicDocument )
         {
             this.LogicDocument   = DrawingDocument.m_oLogicDocument;
             this.Styles          = DrawingDocument.m_oLogicDocument.Get_Styles();
@@ -9684,6 +9684,13 @@ CDocumentContent.prototype.Set_ParaPropsForVerticalTextInCell = function(isVerti
         if (type_Paragraph === Element.Get_Type())
             Element.Set_ParaPropsForVerticalTextInCell(isVerticalText);
     }
+};
+CDocumentContent.prototype.Set_LogicDocument = function(oLogicDocument)
+{
+    this.LogicDocument   = oLogicDocument;
+    this.Styles          = oLogicDocument.Get_Styles();
+    this.Numbering       = oLogicDocument.Get_Numbering();
+    this.DrawingObjects  = oLogicDocument.DrawingObjects;
 };
 
 function CDocumentContentStartState(DocContent)
