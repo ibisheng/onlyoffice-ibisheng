@@ -34,7 +34,7 @@ var c_oAscRelativeFromH = Asc.c_oAscRelativeFromH;
 var c_oAscRelativeFromV = Asc.c_oAscRelativeFromV;
 
 var para_Unknown                   = -1; //
-var para_Empty                     = 0x0000; // Пустой элемент (таким элементом должен заканчиваться каждый параграф)
+var para_RunBase                   = 0x0000; // Базовый элемент, он не должен использоваться как самостоятельный объект
 var para_Text                      = 0x0001; // Текст
 var para_Space                     = 0x0002; // Пробелы
 var para_TextPr                    = 0x0003; // Свойства текста
@@ -132,6 +132,61 @@ var PARATEXT_FLAGS_NON_SPACEAFTER         = PARATEXT_FLAGS_MASK ^ PARATEXT_FLAGS
 var PARATEXT_FLAGS_NON_CAPITALS           = PARATEXT_FLAGS_MASK ^ PARATEXT_FLAGS_CAPITALS;
 
 var TEXTWIDTH_DIVIDER = 16384;
+
+/**
+ * Базовый класс для элементов, лежащих внутри рана.
+ * @constructor
+ */
+function CRunElementBase()
+{
+	this.Width        = 0x00000000 | 0;
+	this.WidthVisible = 0x00000000 | 0;
+}
+CRunElementBase.prototype.Type             = para_RunBase;
+CRunElementBase.prototype.Get_Type         = function()
+{
+	return para_RunBase;
+};
+CRunElementBase.prototype.Draw             = function(X, Y, Context, PDSE)
+{
+};
+CRunElementBase.prototype.Measure          = function(Context, TextPr)
+{
+	this.Width        = 0x00000000 | 0;
+	this.WidthVisible = 0x00000000 | 0;
+};
+CRunElementBase.prototype.Get_Width        = function()
+{
+	return (this.Width / TEXTWIDTH_DIVIDER);
+};
+CRunElementBase.prototype.Get_WidthVisible = function()
+{
+	return (this.WidthVisible / TEXTWIDTH_DIVIDER);
+};
+CRunElementBase.prototype.Set_WidthVisible = function(WidthVisible)
+{
+	this.WidthVisible = (WidthVisible * TEXTWIDTH_DIVIDER) | 0;
+};
+CRunElementBase.prototype.Is_RealContent   = function()
+{
+	return true;
+};
+CRunElementBase.prototype.Can_AddNumbering = function()
+{
+	return true;
+};
+CRunElementBase.prototype.Copy             = function()
+{
+	return new CRunElementBase();
+};
+CRunElementBase.prototype.Write_ToBinary   = function(Writer)
+{
+	// Long : Type
+	Writer.WriteLong(this.Type);
+};
+CRunElementBase.prototype.Read_FromBinary  = function(Reader)
+{
+};
 
 // Класс ParaText
 function ParaText(value)
@@ -7466,161 +7521,260 @@ ParaPresentationNumbering.prototype =
  * Класс представляющий ссылку на сноску.
  * @param {CFootEndnote} Footnote - Ссылка на сноску.
  * @constructor
+ * @extends {CRunElementBase}
  */
 function ParaFootnoteReference(Footnote)
 {
-    this.Footnote     = Footnote;
+	this.Footnote = Footnote;
 
-    this.Width        = 0;
-    this.WidthVisible = 0;
-    this.Number       = 1;
+	this.Width        = 0;
+	this.WidthVisible = 0;
+	this.Number       = 1;
 }
-ParaFootnoteReference.prototype.Type             = para_FootnoteReference;
-ParaFootnoteReference.prototype.Get_Type         = function()
+AscCommon.extendClass(ParaFootnoteReference, CRunElementBase);
+ParaFootnoteReference.prototype.Type            = para_FootnoteReference;
+ParaFootnoteReference.prototype.Get_Type        = function()
 {
-    return para_FootnoteReference;
+	return para_FootnoteReference;
 };
-ParaFootnoteReference.prototype.Draw             = function(X, Y, Context, PDSE)
+ParaFootnoteReference.prototype.Draw            = function(X, Y, Context, PDSE)
 {
-    Context.SetFontSlot(fontslot_ASCII, vertalign_Koef_Size);
-    g_oTextMeasurer.SetFontSlot(fontslot_ASCII, vertalign_Koef_Size);
+	Context.SetFontSlot(fontslot_ASCII, vertalign_Koef_Size);
+	g_oTextMeasurer.SetFontSlot(fontslot_ASCII, vertalign_Koef_Size);
 
-    // TODO: Пока делаем обычный вариант с типом Decimal
-    var _X = X;
-    var T = Numbering_Number_To_String(this.Number);
-    for (var nPos = 0; nPos < T.length; ++nPos)
-    {
-        var Char = T.charAt(nPos);
-        Context.FillText(_X, Y, Char);
-        _X += g_oTextMeasurer.Measure(Char).Width;
-    }
+	// TODO: Пока делаем обычный вариант с типом Decimal
+	var _X = X;
+	var T  = Numbering_Number_To_String(this.Number);
+	for (var nPos = 0; nPos < T.length; ++nPos)
+	{
+		var Char = T.charAt(nPos);
+		Context.FillText(_X, Y, Char);
+		_X += g_oTextMeasurer.Measure(Char).Width;
+	}
 
-    // TODO: Надо переделать в отдельную функцию отрисовщика
-    if (editor && editor.ShowParaMarks)
-    {
-        if (Context.m_oContext && Context.m_oContext.setLineDash)
-            Context.m_oContext.setLineDash([1, 1]);
+	// TODO: Надо переделать в отдельную функцию отрисовщика
+	if (editor && editor.ShowParaMarks)
+	{
+		if (Context.m_oContext && Context.m_oContext.setLineDash)
+			Context.m_oContext.setLineDash([1, 1]);
 
-        var l = X, t = PDSE.LineTop, r = X + this.Get_Width(), b = PDSE.BaseLine;
-        Context.drawHorLineExt(c_oAscLineDrawingRule.Top, t, l, r, 0, 0, 0);
-        Context.drawVerLine(c_oAscLineDrawingRule.Right, l, t, b, 0);
-        Context.drawVerLine(c_oAscLineDrawingRule.Left, r, t, b, 0);
-        Context.drawHorLineExt(c_oAscLineDrawingRule.Top, b, l, r, 0, 0, 0);
+		var l = X, t = PDSE.LineTop, r = X + this.Get_Width(), b = PDSE.BaseLine;
+		Context.drawHorLineExt(c_oAscLineDrawingRule.Top, t, l, r, 0, 0, 0);
+		Context.drawVerLine(c_oAscLineDrawingRule.Right, l, t, b, 0);
+		Context.drawVerLine(c_oAscLineDrawingRule.Left, r, t, b, 0);
+		Context.drawHorLineExt(c_oAscLineDrawingRule.Top, b, l, r, 0, 0, 0);
 
-        if (Context.m_oContext && Context.m_oContext.setLineDash)
-            Context.m_oContext.setLineDash([]);
-    }
+		if (Context.m_oContext && Context.m_oContext.setLineDash)
+			Context.m_oContext.setLineDash([]);
+	}
 };
-ParaFootnoteReference.prototype.Measure          = function(Context, TextPr)
+ParaFootnoteReference.prototype.Measure         = function(Context, TextPr)
 {
-    Context.SetFontSlot(fontslot_ASCII, vertalign_Koef_Size);
+	Context.SetFontSlot(fontslot_ASCII, vertalign_Koef_Size);
 
-    // TODO: Пока делаем обычный вариант с типом Decimal
-    var X = 0;
-    var T = Numbering_Number_To_String(this.Number);
-    for (var nPos = 0; nPos < T.length; ++nPos)
-    {
-        var Char = T.charAt(nPos);
-        X += Context.Measure(Char).Width;
-    }
+	// TODO: Пока делаем обычный вариант с типом Decimal
+	var X = 0;
+	var T = Numbering_Number_To_String(this.Number);
+	for (var nPos = 0; nPos < T.length; ++nPos)
+	{
+		var Char = T.charAt(nPos);
+		X += Context.Measure(Char).Width;
+	}
 
-    var ResultWidth   = (Math.max((X + TextPr.Spacing), 0) * TEXTWIDTH_DIVIDER) | 0;
-    this.Width        = ResultWidth;
-    this.WidthVisible = ResultWidth;
+	var ResultWidth   = (Math.max((X + TextPr.Spacing), 0) * TEXTWIDTH_DIVIDER) | 0;
+	this.Width        = ResultWidth;
+	this.WidthVisible = ResultWidth;
 };
-ParaFootnoteReference.prototype.Get_Width        = function()
+ParaFootnoteReference.prototype.Copy            = function()
 {
-    return (this.Width / TEXTWIDTH_DIVIDER);
+	return new ParaFootnoteReference(this.Footnote);
 };
-ParaFootnoteReference.prototype.Get_WidthVisible = function()
+ParaFootnoteReference.prototype.Write_ToBinary  = function(Writer)
 {
-    return (this.WidthVisible / TEXTWIDTH_DIVIDER);
+	// Long   : Type
+	// String : FootnoteId
+	Writer.WriteLong(this.Type);
+	Writer.WriteString2(this.Footnote.Get_Id());
 };
-ParaFootnoteReference.prototype.Set_WidthVisible = function(WidthVisible)
+ParaFootnoteReference.prototype.Read_FromBinary = function(Reader)
 {
-    this.WidthVisible = (WidthVisible * TEXTWIDTH_DIVIDER) | 0;
+	// String : FootnoteId
+	this.Footnote = g_oTableId.Get_ById(Reader.GetString2());
 };
-ParaFootnoteReference.prototype.Is_RealContent   = function()
+ParaFootnoteReference.prototype.Get_Footnote    = function()
 {
-    return true;
-};
-ParaFootnoteReference.prototype.Can_AddNumbering = function()
-{
-    return true;
-};
-ParaFootnoteReference.prototype.Copy             = function()
-{
-    return new ParaFootnoteReference(this.Footnote);
-};
-ParaFootnoteReference.prototype.Write_ToBinary   = function(Writer)
-{
-    // Long   : Type
-    // String : FootnoteId
-    Writer.WriteLong(this.Type);
-    Writer.WriteString2(this.Footnote.Get_Id());
-};
-ParaFootnoteReference.prototype.Read_FromBinary  = function(Reader)
-{
-    // String : FootnoteId
-    this.Footnote = g_oTableId.Get_ById(Reader.GetString2());
-};
-ParaFootnoteReference.prototype.Get_Footnote     = function()
-{
-    return this.Footnote;
+	return this.Footnote;
 };
 
 /**
  * Класс представляющий номер сноски внутри сноски.
  * @param {CFootEndnote} Footnote - Ссылка на сноску.
  * @constructor
+ * @extends {ParaFootnoteReference}
  */
 function ParaFootnoteRef(Footnote)
 {
-    ParaFootnoteRef.superclass.constructor.call(this, Footnote);
+	ParaFootnoteRef.superclass.constructor.call(this, Footnote);
 }
 AscCommon.extendClass(ParaFootnoteRef, ParaFootnoteReference);
-ParaFootnoteRef.prototype.Type = para_FootnoteRef;
+ParaFootnoteRef.prototype.Type     = para_FootnoteRef;
 ParaFootnoteRef.prototype.Get_Type = function()
 {
-    return para_FootnoteRef;
+	return para_FootnoteRef;
+};
+ParaFootnoteRef.prototype.Copy     = function()
+{
+	return new ParaFootnoteRef(this.Get_Footnote());
 };
 
+/**
+ * Класс представляющий собой разделитель (который в основном используется для сносок).
+ * @constructor
+ * @extends {CRunElementBase}
+ */
+function ParaSeparator()
+{
+	ParaSeparator.superclass.constructor.call(this);
+	this.LineW = 0;
+}
+AscCommon.extendClass(ParaSeparator, CRunElementBase);
+ParaSeparator.prototype.Type     = para_Separator;
+ParaSeparator.prototype.Get_Type = function()
+{
+	return para_Separator;
+};
+ParaSeparator.prototype.Draw     = function(X, Y, Context, PDSE)
+{
+	var l = X, t = PDSE.LineTop, r = X + this.Get_Width(), b = PDSE.BaseLine;
 
+	Context.drawHorLineExt(c_oAscLineDrawingRule.Center, (t + b) / 2, l, r, this.LineW, 0, 0);
+
+	// TODO: Надо переделать в отдельную функцию отрисовщика
+	if (editor && editor.ShowParaMarks)
+	{
+		if (Context.m_oContext && Context.m_oContext.setLineDash)
+			Context.m_oContext.setLineDash([1, 1]);
+
+		Context.drawHorLineExt(c_oAscLineDrawingRule.Top, t, l, r, 0, 0, 0);
+		Context.drawVerLine(c_oAscLineDrawingRule.Right, l, t, b, 0);
+		Context.drawVerLine(c_oAscLineDrawingRule.Left, r, t, b, 0);
+		Context.drawHorLineExt(c_oAscLineDrawingRule.Top, b, l, r, 0, 0, 0);
+
+		if (Context.m_oContext && Context.m_oContext.setLineDash)
+			Context.m_oContext.setLineDash([]);
+	}
+};
+ParaSeparator.prototype.Measure  = function(Context, TextPr)
+{
+	this.Width        = (50 * TEXTWIDTH_DIVIDER) | 0;
+	this.WidthVisible = (50 * TEXTWIDTH_DIVIDER) | 0;
+
+	this.LineW = (TextPr.FontSize / 18) * g_dKoef_pt_to_mm;
+};
+ParaSeparator.prototype.Copy     = function()
+{
+	return new ParaSeparator();
+};
+
+/**
+ * Класс представляющий собой длинный разделитель (который в основном используется для сносок).
+ * @constructor
+ */
+function ParaContinuationSeparator()
+{
+	ParaContinuationSeparator.superclass.constructor.call(this);
+	this.LineW = 0;
+}
+AscCommon.extendClass(ParaContinuationSeparator, CRunElementBase);
+ParaContinuationSeparator.prototype.Type     = para_ContinuationSeparator;
+ParaContinuationSeparator.prototype.Get_Type = function()
+{
+	return para_ContinuationSeparator;
+};
+ParaContinuationSeparator.prototype.Draw     = function(X, Y, Context, PDSE)
+{
+	var l = X, t = PDSE.LineTop, r = X + this.Get_Width(), b = PDSE.BaseLine;
+
+	Context.drawHorLineExt(c_oAscLineDrawingRule.Center, (t + b) / 2, l, r, this.LineW, 0, 0);
+
+	// TODO: Надо переделать в отдельную функцию отрисовщика
+	if (editor && editor.ShowParaMarks)
+	{
+		if (Context.m_oContext && Context.m_oContext.setLineDash)
+			Context.m_oContext.setLineDash([1, 1]);
+
+		Context.drawHorLineExt(c_oAscLineDrawingRule.Top, t, l, r, 0, 0, 0);
+		Context.drawVerLine(c_oAscLineDrawingRule.Right, l, t, b, 0);
+		Context.drawVerLine(c_oAscLineDrawingRule.Left, r, t, b, 0);
+		Context.drawHorLineExt(c_oAscLineDrawingRule.Top, b, l, r, 0, 0, 0);
+
+		if (Context.m_oContext && Context.m_oContext.setLineDash)
+			Context.m_oContext.setLineDash([]);
+	}
+};
+ParaContinuationSeparator.prototype.Measure  = function(Context, TextPr)
+{
+	this.Width        = (50 * TEXTWIDTH_DIVIDER) | 0;
+	this.WidthVisible = (50 * TEXTWIDTH_DIVIDER) | 0;
+
+	this.LineW = (TextPr.FontSize / 18) * g_dKoef_pt_to_mm;
+};
+ParaContinuationSeparator.prototype.Copy     = function()
+{
+	return new ParaContinuationSeparator();
+};
+ParaContinuationSeparator.prototype.Update_Width = function(PRS)
+{
+	var oPara    = PRS.Paragraph;
+	var nCurPage = PRS.Page;
+
+	oPara.Parent.Update_ContentIndexing();
+	var oLimits = oPara.Parent.Get_PageContentStartPos2(oPara.PageNum, oPara.ColumnNum, nCurPage, oPara.Index);
+
+	var nWidth = ((oLimits.XLimit - oLimits.X) * TEXTWIDTH_DIVIDER) | 0;
+
+	this.Width        = nWidth;
+	this.WidthVisible = nWidth;
+};
 
 function ParagraphContent_Read_FromBinary(Reader)
 {
-    var ElementType = Reader.GetLong();
+	var ElementType = Reader.GetLong();
 
-    var Element = null;
-    switch ( ElementType )
-    {
-        case para_TextPr            :
-        case para_Drawing           :
-        case para_HyperlinkStart    :
-        {
-            var ElementId = Reader.GetString2();
-            Element = g_oTableId.Get_ById( ElementId );
-            return Element;
-        }
-        case para_Text              : Element = new ParaText();              break;
-        case para_Space             : Element = new ParaSpace();             break;
-        case para_End               : Element = new ParaEnd();               break;
-        case para_NewLine           : Element = new ParaNewLine();           break;
-        case para_Numbering         : Element = new ParaNumbering();         break;
-        case para_Tab               : Element = new ParaTab();               break;
-        case para_PageNum           : Element = new ParaPageNum();           break;
-        case para_Math_Placeholder  : Element = new CMathText();             break;
-        case para_Math_Text			: Element = new CMathText();		     break;
-        case para_Math_BreakOperator: Element = new CMathText();		     break;
-        case para_Math_Ampersand	: Element = new CMathAmp();   		   	 break;
-        case para_PresentationNumbering : Element = new ParaPresentationNumbering(); break;
-        case para_FootnoteReference : Element = new ParaFootnoteReference(); break;
-    }
+	var Element = null;
+	switch (ElementType)
+	{
+		case para_TextPr                :
+		case para_Drawing               :
+		case para_HyperlinkStart        :
+		{
+			var ElementId = Reader.GetString2();
+			Element       = g_oTableId.Get_ById(ElementId);
+			return Element;
+		}
+		case para_RunBase               : Element = new CRunElementBase(); break;
+		case para_Text                  : Element = new ParaText(); break;
+		case para_Space                 : Element = new ParaSpace(); break;
+		case para_End                   : Element = new ParaEnd(); break;
+		case para_NewLine               : Element = new ParaNewLine(); break;
+		case para_Numbering             : Element = new ParaNumbering(); break;
+		case para_Tab                   : Element = new ParaTab(); break;
+		case para_PageNum               : Element = new ParaPageNum(); break;
+		case para_Math_Placeholder      : Element = new CMathText(); break;
+		case para_Math_Text             : Element = new CMathText(); break;
+		case para_Math_BreakOperator    : Element = new CMathText(); break;
+		case para_Math_Ampersand        : Element = new CMathAmp(); break;
+		case para_PresentationNumbering : Element = new ParaPresentationNumbering(); break;
+		case para_FootnoteReference     : Element = new ParaFootnoteReference(); break;
+		case para_FootnoteRef           : Element = new ParaFootnoteRef(); break;
+		case para_Separator             : Element = new ParaSeparator(); break;
+		case para_ContinuationSeparator : Element = new ParaContinuationSeparator(); break;
+	}
 
-    if ( null != Element )
-        Element.Read_FromBinary(Reader);
+	if (null != Element)
+		Element.Read_FromBinary(Reader);
 
-    return Element;
+	return Element;
 }
 
 //--------------------------------------------------------export----------------------------------------------------

@@ -4503,6 +4503,9 @@ CDocument.prototype.Paragraph_Add              = function(ParaItem, bRecalculate
                 case para_PageNum:
                 case para_Field:
                 case para_FootnoteReference:
+                case para_FootnoteRef:
+                case para_Separator:
+                case para_ContinuationSeparator:
                 {
                     // Если у нас что-то заселекчено и мы вводим текст или пробел
                     // и т.д., тогда сначала удаляем весь селект.
@@ -11502,7 +11505,7 @@ CDocument.prototype.OnKeyDown               = function(e)
     // {
     //     this.History.Create_NewPoint();
     //     var oFootnote = this.Footnotes.Create_Footnote();
-    //
+	//
     //     oFootnote.Paragraph_Add(new ParaFootnoteRef(oFootnote));
     //     oFootnote.Paragraph_Add(new ParaSpace());
     //     oFootnote.Paragraph_Add(new ParaText("F"));
@@ -11513,8 +11516,20 @@ CDocument.prototype.OnKeyDown               = function(e)
     //     oFootnote.Paragraph_Add(new ParaText("o"));
     //     oFootnote.Paragraph_Add(new ParaText("t"));
     //     oFootnote.Paragraph_Add(new ParaText("e"));
-    //
+	//
     //     this.Paragraph_Add(new ParaFootnoteReference(oFootnote));
+    //     bRetValue = keydownresult_PreventAll;
+    // }
+    // else if (114 === e.KeyCode)
+    // {
+    //     this.History.Create_NewPoint();
+    //     this.Paragraph_Add(new ParaSeparator());
+    //     bRetValue = keydownresult_PreventAll;
+    // }
+    // else if (115 === e.KeyCode)
+    // {
+    //     this.History.Create_NewPoint();
+    //     this.Paragraph_Add(new ParaContinuationSeparator());
     //     bRetValue = keydownresult_PreventAll;
     // }
     // TEST <--

@@ -717,7 +717,7 @@ Paragraph.prototype.private_RecalculatePageXY          = function(CurLine, CurPa
     PRS.YLimit = YLimit;
     PRS.Y      = YStart;
 
-    this.Pages.length   = CurPage + 1
+    this.Pages.length   = CurPage + 1;
     this.Pages[CurPage] = new CParaPage(XStart, YStart, XLimit, YLimit, CurLine);
 };
 

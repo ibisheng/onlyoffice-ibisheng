@@ -2251,9 +2251,14 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                 case para_Text:
                 case para_FootnoteReference:
                 case para_FootnoteRef:
+                case para_Separator:
+                case para_ContinuationSeparator:
                 {
                     // Отмечаем, что началось слово
                     StartWord = true;
+
+                    if (para_ContinuationSeparator === ItemType)
+                        Item.Update_Width(PRS);
 
                     // При проверке, убирается ли слово, мы должны учитывать ширину предшествующих пробелов.
                     var LetterLen = Item.Width / TEXTWIDTH_DIVIDER;//var LetterLen = Item.Get_Width();
@@ -3098,6 +3103,8 @@ ParaRun.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine, _Cur
             case para_PageNum:
             case para_FootnoteReference:
             case para_FootnoteRef:
+            case para_Separator:
+            case para_ContinuationSeparator:
             {
                 UpdateLineMetricsText = true;
                 break;
@@ -3197,6 +3204,8 @@ ParaRun.prototype.Recalculate_Range_Width = function(PRSC, _CurLine, _CurRange)
             case para_Text:
             case para_FootnoteReference:
             case para_FootnoteRef:
+            case para_Separator:
+            case para_ContinuationSeparator:
             {
                 PRSC.Letters++;
 
@@ -3349,6 +3358,8 @@ ParaRun.prototype.Recalculate_Range_Spaces = function(PRSA, _CurLine, _CurRange,
             case para_Text:
             case para_FootnoteReference:
             case para_FootnoteRef:
+            case para_Separator:
+            case para_ContinuationSeparator:
             {
                 var WidthVisible = 0;
 
@@ -4248,6 +4259,8 @@ ParaRun.prototype.Draw_HighLights = function(PDSH)
             case para_Sym:
             case para_FootnoteReference:
             case para_FootnoteRef:
+            case para_Separator:
+            case para_ContinuationSeparator:
             {
                 if ( para_Drawing === ItemType && !Item.Is_Inline() )
                     break;
@@ -4439,6 +4452,8 @@ ParaRun.prototype.Draw_Elements = function(PDSE)
             case para_Sym:
             case para_FootnoteReference:
             case para_FootnoteRef:
+            case para_Separator:
+            case para_ContinuationSeparator:
             {
                 if (para_Tab === ItemType)
                 {
@@ -4711,6 +4726,8 @@ ParaRun.prototype.Draw_Lines = function(PDSL)
             case para_Sym:
             case para_FootnoteReference:
             case para_FootnoteRef:
+            case para_Separator:
+            case para_ContinuationSeparator:
             {
                 if ( para_Drawing != ItemType || Item.Is_Inline() )
                 {
