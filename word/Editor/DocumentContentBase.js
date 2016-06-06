@@ -75,7 +75,19 @@ CDocumentContentBase.prototype.Get_AllImageUrls = function(arrUrls)
 
 	return arrUrls;
 };
-
+/**
+ * Переназначаем ссылки на картинки.
+ * @param {Object} mapUrls - Мап, в котором ключ - это старая ссылка, а значение - новая.
+ */
+CDocumentContentBase.prototype.Reassign_ImageUrls = function(mapUrls)
+{
+	var arrDrawings = this.Get_AllDrawingObjects();
+	for (var nIndex = 0, nCount = arrDrawings.length; nIndex < nCount; ++nIndex)
+	{
+		var oDrawing = arrDrawings[nIndex];
+		oDrawing.Reassign_ImageUrls(mapUrls);
+	}
+};
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Private area
