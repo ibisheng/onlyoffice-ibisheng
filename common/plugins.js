@@ -305,7 +305,7 @@
                 window.g_asc_plugins.init();
                 return;
             }
-            else if ("close" == name)
+            else if ("close" == name || "command" == name)
             {
                 if (window.g_asc_plugins.closeAttackTimer != -1)
                 {
@@ -353,7 +353,8 @@
                     }
                 }
 
-                window.g_asc_plugins.close();
+                if ("close" == name)
+                    window.g_asc_plugins.close();
             }
         }
     }
