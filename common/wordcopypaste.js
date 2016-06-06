@@ -7859,7 +7859,7 @@ function Check_LoadingDataBeforePrepaste(_api, _fonts, _images, _callback)
             else
                 _images[image] = "local";
         }
-        else if (!g_oDocumentUrls.getImageLocal(src))
+        else if (!g_oDocumentUrls.getImageUrl(src) && !g_oDocumentUrls.getImageLocal(src))
             aImagesToDownload.push(src);
     }
     if (aImagesToDownload.length > 0)
