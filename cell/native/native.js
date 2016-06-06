@@ -2414,7 +2414,7 @@ function asc_WriteAutoFilterObj(i, c, s) {
     
     s['WriteByte'](i);
     
-    if (undefined !== c.asc_getIsDateFormat()) {
+    if (undefined !== c.asc_getType()) {
         s['WriteByte'](0);
         s['WriteLong'](c.asc_getType());
     }
