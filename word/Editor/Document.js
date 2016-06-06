@@ -10369,6 +10369,7 @@ CDocument.prototype.Insert_Content            = function(SelectedContent, NearPo
             Para.Selection_Remove();
 
             var bAddEmptyPara = false;
+            var bDoNotIncreaseDstIndex = false;
 
             if (true === Para.Cursor_IsEnd())
             {
@@ -10378,8 +10379,12 @@ CDocument.prototype.Insert_Content            = function(SelectedContent, NearPo
                 {
                     bConcatS = false;
 
+                    // TODO: Возможно флаг bDoNotIncreaseDstIndex не нужен, и здесь не нужно увеличивать индекс DstIndex
                     if (type_Paragraph !== this.Content[DstIndex].Get_Type() || true !== this.Content[DstIndex].Is_Empty())
+                    {
                         DstIndex++;
+                        bDoNotIncreaseDstIndex = true;
+                    }
                 }
                 else if (true === Elements[ElementsCount - 1].SelectedAll && true === bConcatS)
                     bAddEmptyPara = true;
@@ -10428,7 +10433,7 @@ CDocument.prototype.Insert_Content            = function(SelectedContent, NearPo
                 ParaS.Selection.StartPos = ParaS.Content.length - _ParaSContentLen;
                 ParaS.Selection.EndPos   = ParaS.Content.length - 1;
             }
-            else if (true !== Para.Cursor_IsStart())
+            else if (true !== Para.Cursor_IsStart() && true !== bDoNotIncreaseDstIndex)
             {
                 DstIndex++;
             }
