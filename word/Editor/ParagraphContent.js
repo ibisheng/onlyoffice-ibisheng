@@ -4784,6 +4784,12 @@ ParaDrawing.prototype =
         this.GraphicObj.setRecalcObject(RecalcObj.spRecaclcObject);
     },
 
+    Reassign_ImageUrls : function(mapUrls){
+        if(this.GraphicObj){
+            this.GraphicObj.Reassign_ImageUrls(mapUrls);
+        }  
+    },
+
     Prepare_RecalculateObject : function()
     {
     },
