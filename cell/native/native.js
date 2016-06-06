@@ -2409,7 +2409,7 @@ function asc_WriteAddFormatTableOptions(c, s) {
     s['WriteByte'](255);
 }
 
-function asc_WriteAutoFilterObj(c, s) {
+function asc_WriteAutoFilterObj(i, c, s) {
     if (!c) return;
     
     s['WriteByte'](i);
