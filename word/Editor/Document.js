@@ -1425,9 +1425,10 @@ function CDocument(DrawingDocument, isMainLogicDocument)
     this.CheckLanguageOnTextAdd = false; // Проверять ли язык при добавлении текста в ран
 
     // Мап для рассылки
-    this.MailMergeMap = null;
-    this.MailMergePreview = false;
+    this.MailMergeMap             = null;
+    this.MailMergePreview         = false;
     this.MailMergeFieldsHighlight = false; // Подсвечивать ли все поля связанные с рассылкой
+    this.MailMergeFields          = [];
 
     // Класс, управляющий полями
     this.FieldsManager = new CDocumentFieldsManager();
@@ -1486,6 +1487,8 @@ CDocument.prototype.On_EndLoad                     = function()
     {
         this.Set_FastCollaborativeEditing(true);
     }
+
+    //this.Footnotes.Init();
 };
 CDocument.prototype.Add_TestDocument               = function()
 {
