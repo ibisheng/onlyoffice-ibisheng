@@ -3134,8 +3134,7 @@ Workbook.prototype.sortDependency = function(setCellFormat) {
       }
     }
     for (i in oCleanCellCacheArea)
-      this.handlers.trigger("cleanCellCache", i, oCleanCellCacheArea[i],
-        AscCommonExcel.c_oAscCanChangeColWidth.numbers);
+			this.handlers.trigger("cleanCellCache", i, oCleanCellCacheArea[i], AscCommonExcel.c_oAscCanChangeColWidth.none);
 
     AscCommonExcel.g_oVLOOKUPCache.clean();
     AscCommonExcel.g_oHLOOKUPCache.clean();

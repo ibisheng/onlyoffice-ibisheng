@@ -11298,66 +11298,64 @@
         return mergedRange ? mergedRange : new asc_Range( col, row, col, row );
     };
 
-    WorksheetView.prototype._saveCellValueAfterEdit = function ( oCellEdit, c, val, flags, skipNLCheck, isNotHistory, lockDraw ) {
-        var t = this;
-        var oldMode = t.isFormulaEditMode;
-        t.isFormulaEditMode = false;
+    WorksheetView.prototype._saveCellValueAfterEdit = function (oCellEdit, c, val, flags, skipNLCheck, isNotHistory, lockDraw) {
+          var t = this;
+          var oldMode = t.isFormulaEditMode;
+          t.isFormulaEditMode = false;
 
-        if ( !isNotHistory ) {
-            History.Create_NewPoint();
-            History.StartTransaction();
-        }
+          if (!isNotHistory) {
+              History.Create_NewPoint();
+              History.StartTransaction();
+          }
 
-        var isFormula = t._isFormula( val );
+          var isFormula = t._isFormula(val);
 
-        if ( isFormula ) {
-            var ftext = val.reduce( function ( pv, cv ) {
-                return pv + cv.text;
-            }, "" );
-            var ret = true;
-            // ToDo - при вводе формулы в заголовок автофильтра надо писать "0"
-            c.setValue( ftext, function ( r ) {
-                ret = r;
-            } );
-            if ( !ret ) {
-                t.isFormulaEditMode = oldMode;
-                History.EndTransaction();
-                return false;
-            }
-            isFormula = c.isFormula();
-        }
-        else {
-            c.setValue2( val );
-            // Вызываем функцию пересчета для заголовков форматированной таблицы
-            t.model.autoFilters.renameTableColumn( oCellEdit );
-        }
+          if (isFormula) {
+              var ftext = val.reduce(function (pv, cv) {
+                  return pv + cv.text;
+              }, "");
+              var ret = true;
+              // ToDo - при вводе формулы в заголовок автофильтра надо писать "0"
+              c.setValue(ftext, function (r) {
+                  ret = r;
+              });
+              if (!ret) {
+                  t.isFormulaEditMode = oldMode;
+                  History.EndTransaction();
+                  return false;
+              }
+              isFormula = c.isFormula();
+          } else {
+              c.setValue2(val);
+              // Вызываем функцию пересчета для заголовков форматированной таблицы
+              t.model.autoFilters.renameTableColumn(oCellEdit);
+          }
 
-        if ( !isFormula ) {
-            // Нужно ли выставлять WrapText (ищем символ новой строки в тексте)
-            var bIsSetWrap = false;
-            if ( !skipNLCheck ) {
-                for ( var i = 0; i < val.length; ++i ) {
-                    if ( val[i].text.indexOf( kNewLine ) >= 0 ) {
-                        bIsSetWrap = true;
-                        break;
-                    }
-                }
-            }
-            if ( bIsSetWrap ) {
-                c.setWrap( true );
-            }
+          if (!isFormula) {
+              // Нужно ли выставлять WrapText (ищем символ новой строки в тексте)
+              var bIsSetWrap = false;
+              if (!skipNLCheck) {
+                  for (var i = 0; i < val.length; ++i) {
+                      if (val[i].text.indexOf(kNewLine) >= 0) {
+                          bIsSetWrap = true;
+                          break;
+                      }
+                  }
+              }
+              if (bIsSetWrap) {
+                  c.setWrap(true);
+              }
+          }
 
-            // Для формулы обновление будет в коде рассчета формулы
-            t._updateCellsRange( oCellEdit, /*canChangeColWidth*/c_oAscCanChangeColWidth.numbers, lockDraw );
-        }
+          t._updateCellsRange(oCellEdit, isNotHistory ? c_oAscCanChangeColWidth.none : c_oAscCanChangeColWidth.numbers, lockDraw);
 
-        if ( !isNotHistory ) {
-            History.EndTransaction();
-        }
+          if (!isNotHistory) {
+              History.EndTransaction();
+          }
 
-        // если вернуть false, то редактор не закроется
-        return true;
-    };
+          // если вернуть false, то редактор не закроется
+          return true;
+      };
 
     WorksheetView.prototype.openCellEditor = function ( editor, x, y, isCoord, fragments, cursorPos, isFocus, isClearCell, isHideCursor, isQuickInput, activeRange ) {
         var t = this, tc = this.cols, tr = this.rows, col, row, c, fl, mc, bg, isMerged;
