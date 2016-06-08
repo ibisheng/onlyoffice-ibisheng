@@ -3532,17 +3532,8 @@ Woorksheet.prototype.initPostOpen = function(handlers){
 	this._setHandlersTablePart();
 };
 Woorksheet.prototype._getValuesForConditionalFormatting = function(sqref, withEmpty) {
-  var res = [];
   var range = this.getRange3(sqref.r1, sqref.c1, sqref.r2, sqref.c2);
-  var fAction = function(c) {
-    res.push({c: c, v: c.getValueWithoutFormat()});
-  };
-  if (withEmpty) {
-    range._setProperty(null, null, fAction);
-  } else {
-    range._setPropertyNoEmpty(null, null, fAction);
-  }
-  return res;
+	return range._getValues(withEmpty);
 };
 Woorksheet.prototype._updateConditionalFormatting = function(range) {
   var oGradient1, oGradient2;
@@ -6505,6 +6496,32 @@ Range.prototype._getRangeType=function(oBBox){
 	if(null == oBBox)
 		oBBox = this.bbox;
 	return getRangeType(oBBox);
+};
+Range.prototype._getValues = function (withEmpty) {
+	var res = [];
+	var fAction = function(c) {
+		res.push({c: c, v: c.getValueWithoutFormat()});
+	};
+	if (withEmpty) {
+		this._setProperty(null, null, fAction);
+	} else {
+		this._setPropertyNoEmpty(null, null, fAction);
+	}
+	return res;
+};
+Range.prototype._getValuesAndMap = function (withEmpty) {
+	var v, arrRes = [], mapRes = {};
+	var fAction = function(c) {
+		v = c.getValueWithoutFormat();
+		arrRes.push({c: c, v: v});
+		mapRes[v.toLowerCase()] = true;
+	};
+	if (withEmpty) {
+		this._setProperty(null, null, fAction);
+	} else {
+		this._setPropertyNoEmpty(null, null, fAction);
+	}
+	return {values: arrRes, map: mapRes};
 };
 Range.prototype._setProperty=function(actionRow, actionCol, actionCell){
 	var nRangeType = this._getRangeType();

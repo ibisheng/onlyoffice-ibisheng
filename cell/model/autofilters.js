@@ -4044,36 +4044,49 @@
 				return result;
 			},
 			
-			_generateColumnNameWithoutTitle: function(range)
+			_generateColumnNameWithoutTitle: function(ref)
 			{
-				var worksheet = this.worksheet;
-				var newTableColumn;
-				var tableColumns = [];
-				var cell;
-				var val;
-				for(var col1 = range.c1; col1 <= range.c2; col1++)
-				{
-					cell = worksheet.getCell3(range.r1, col1);
-					val = cell.getValue();
-					//если ячейка пустая, то генерируем название
-					if(val == '')
-						val = this._generateColumnName(tableColumns);
-					//проверяем, не повторяется ли значение, которое лежит в данной ячейке
-					var index = 2;
-					var valNew = val;
-					for(var s = 0; s < tableColumns.length; s++)
-					{
-						if(valNew == tableColumns[s].Name)
-						{
-							valNew = val + index;
-							index++;
-							s = -1;
+				var tableColumns = [], newTableColumn;
+				var range = this.worksheet.getRange3(ref.r1, ref.c1, ref.r1, ref.c2);
+				var defaultName = 'Column';
+				var uniqueColumns = {}, val, valTemplate, valLower, index = 1, isDuplicate = false, emptyCells = false;
+				var valuesAndMap = range._getValuesAndMap(true);
+				var values = valuesAndMap.values;
+				var length = values.length;
+				if (0 === length) {
+					// Выделили всю строку без значений
+					length = ref.c2 - ref.c1 + 1;
+					emptyCells = true;
+				}
+				var map = valuesAndMap.map;
+				for (var i = 0; i < length; ++i) {
+					if (emptyCells || '' === (valTemplate = val = values[i].v)) {
+						valTemplate = defaultName;
+						val = valTemplate + index;
+						++index;
+					}
+
+					while(true) {
+						if (isDuplicate) {
+							val = valTemplate + (++index);
+						}
+
+						valLower = val.toLowerCase();
+						if (uniqueColumns[valLower]) {
+							isDuplicate = true;
+						} else {
+							if (isDuplicate && map[valLower]) {
+								continue;
+							}
+							uniqueColumns[valLower] = true;
+
+							newTableColumn = new AscCommonExcel.TableColumn();
+							newTableColumn.Name = val;
+							tableColumns.push(newTableColumn);
+							isDuplicate = false;
+							break;
 						}
 					}
-					newTableColumn = new AscCommonExcel.TableColumn();
-					newTableColumn.Name = valNew;
-					
-					tableColumns[col1 - range.c1] = newTableColumn;
 				}
 				return tableColumns;
 			},
