@@ -131,7 +131,6 @@ function CKeyboardEvent()
 
 var global_mouseEvent    = new CMouseEventHandler();
 var global_keyboardEvent = new CKeyboardEvent();
-AscFormat.AscHitToHandlesEpsilon = undefined;
 
 function check_KeyboardEvent(e)
 {
