@@ -51,6 +51,8 @@ function CMouseEventHandler()
     this.IsLockedEvent  = false;
 
     this.buttonObject   = null;
+    
+    this.AscHitToHandlesEpsilon = 0;
 
     this.LockMouse = function()
     {
@@ -81,7 +83,7 @@ function CMouseEventHandler()
             return true;
         }
         return false;
-    }
+    };
     this.UnLockMouse = function()
     {
         if (this.IsLocked)
@@ -111,7 +113,7 @@ function CMouseEventHandler()
             return true;
         }
         return false;
-    }
+    };
 }
 
 function CKeyboardEvent()
@@ -129,6 +131,7 @@ function CKeyboardEvent()
 
 var global_mouseEvent    = new CMouseEventHandler();
 var global_keyboardEvent = new CKeyboardEvent();
+AscFormat.AscHitToHandlesEpsilon = undefined;
 
 function check_KeyboardEvent(e)
 {

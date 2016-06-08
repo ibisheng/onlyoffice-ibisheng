@@ -54,9 +54,9 @@ function hitToHandles(x, y, object)
         radius *= global_mouseEvent.KoefPixToMM;
     }
 
-    if (undefined !== window.AscHitToHandlesEpsilon)
+    if (global_mouseEvent && global_mouseEvent.AscHitToHandlesEpsilon)
     {
-        radius = window.AscHitToHandlesEpsilon;
+        radius = global_mouseEvent.AscHitToHandlesEpsilon;
     }
 
     // чтобы не считать корни
