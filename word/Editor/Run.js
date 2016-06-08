@@ -79,6 +79,8 @@ function ParaRun(Paragraph, bMathRun)
     }
     this.StartState = null;
 
+    this.CompositeInput = null;
+
     // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
     g_oTableId.Add( this, this.Id );
     if(this.Paragraph && !this.Paragraph.bFromDocument)
@@ -4729,6 +4731,11 @@ ParaRun.prototype.Draw_Lines = function(PDSL)
             case para_Separator:
             case para_ContinuationSeparator:
             {
+                if (para_Text === ItemType && null !== this.CompositeInput && Pos >= this.CompositeInput.Pos && Pos < this.CompositeInput.Pos + this.CompositeInput.Length)
+                {
+                    aUnderline.Add(UnderlineY, UnderlineY, X, X + ItemWidthVisible, LineW, CurColor.r, CurColor.g, CurColor.b, undefined, CurTextPr);
+                }
+
                 if ( para_Drawing != ItemType || Item.Is_Inline() )
                 {
                     if (true === bRemReview)
@@ -10951,6 +10958,10 @@ ParaRun.prototype.Math_UpdateLineMetrics = function(PRS, ParaPr)
             PRS.LineDescent = this.TextDescent - this.YOffset;
     }
 
+};
+ParaRun.prototype.Set_CompositeInput = function(oCompositeInput)
+{
+    this.CompositeInput = oCompositeInput;
 };
 
 function CParaRunStartState(Run)
