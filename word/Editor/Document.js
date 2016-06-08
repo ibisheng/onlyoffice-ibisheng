@@ -16918,7 +16918,7 @@ CDocument.prototype.Remove_CompositeText = function(nCount)
 	var oRun = this.CompositeInput.Run;
 	var nPos = this.CompositeInput.Pos + this.CompositeInput.Length;
 
-	var nDelCount = Math.min(nCount, this.CompositeInput.Length, oRun.Content.length - 1, nPos);
+	var nDelCount = Math.max(0, Math.min(nCount, this.CompositeInput.Length, oRun.Content.length, nPos));
 	oRun.Remove_FromContent(nPos - nDelCount, nDelCount, true);
 	this.CompositeInput.Length -= nDelCount;
 
