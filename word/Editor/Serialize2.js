@@ -353,7 +353,9 @@ var c_oSerRunType = {
     columnbreak: 18,
 	cr: 19,
 	nonBreakHyphen: 20,
-	softHyphen: 21
+	softHyphen: 21,
+	separator: 22,
+	continuationSeparator: 23
 };
 var c_oSerImageType = {
     MediaId:0,
@@ -4308,6 +4310,14 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
                     }
                     oThis.memory.WriteLong(c_oSerPropLenType.Null);
                     break;
+				case para_Separator:
+					oThis.memory.WriteByte(c_oSerRunType.separator);
+					oThis.memory.WriteLong(c_oSerPropLenType.Null);
+					break;
+				case para_ContinuationSeparator:
+					oThis.memory.WriteByte(c_oSerRunType.continuationSeparator);
+					oThis.memory.WriteLong(c_oSerPropLenType.Null);
+					break;
                 case para_Drawing:
                     sCurText = this.WriteText(sCurText, delText);
                     //if (item.Extent && item.GraphicObj && item.GraphicObj.spPr && item.GraphicObj.spPr.xfrm) {
@@ -8716,6 +8726,14 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
         {
             //todo
         }
+		else if (c_oSerRunType.separator === type)
+		{
+			oNewElem = new ParaSeparator();
+		}
+		else if (c_oSerRunType.continuationSeparator === type)
+		{
+			oNewElem = new ParaContinuationSeparator();
+		}
         else
             res = c_oSerConstants.ReadUnknown;
         if (null != oNewElem)
@@ -9569,6 +9587,14 @@ function Binary_oMathReader(stream, oReadResult)
         {
             //todo
         }
+		else if (c_oSerRunType.separator === type)
+		{
+			oNewElem = new ParaSeparator();
+		}
+		else if (c_oSerRunType.continuationSeparator === type)
+		{
+			oNewElem = new ParaContinuationSeparator();
+		}
         else if (c_oSerRunType._LastRun === type)
             this.oReadResult.bLastRun = true;
         else
