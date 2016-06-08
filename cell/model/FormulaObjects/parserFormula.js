@@ -18,7 +18,7 @@ function (window, undefined) {
   var CellAddress = AscCommon.CellAddress;
 
   var c_oAscError = Asc.c_oAscError;
-  
+
 /** @enum */
 var cElementType = {
 		number      : 0,
@@ -1227,7 +1227,7 @@ cRef.prototype.isValid = function () {
 };
 cRef.prototype.getMatrix = function () {
   return [[this.getValue()]];
-}
+};
 cRef.prototype.getBBox0 = function () {
     return this.getRange().getBBox0();
 };
@@ -1942,72 +1942,63 @@ function checkTypeCell( val ) {
     }
 }
 
-/*--------------------------------------------------------------------------*/
-/*Base classes for operators & functions */
-/** @constructor */
-function cBaseOperator( name, priority, argumentCount ) {
-    if ( name ) {
-        this.name = name;
-  } else {
-        this.name = "";
-    }
-    if ( priority !== undefined ) {
-        this.priority = priority;
-  } else {
-        this.priority = 10;
-    }
+  /*--------------------------------------------------------------------------*/
+  /*Base classes for operators & functions */
+  /** @constructor */
+  function cBaseOperator(name, priority, argumentCount) {
+    this.name = name ? name : '';
+    this.priority = (priority !== undefined) ? priority : 10;
     this.type = cElementType.operator;
     this.isRightAssociative = false;
-    if ( argumentCount !== undefined ) {
-        this.argumentsCurrent = argumentCount;
-  } else {
-        this.argumentsCurrent = 2;
-    }
+    this.argumentsCurrent = (argumentCount !== undefined) ? argumentCount : 2;
     this.value = null;
     this.formatType = {
-        def       : -1, //подразумевается формат первой ячейки входящей в формулу.
-        noneFormat: -2
+      def: -1, //подразумевается формат первой ячейки входящей в формулу.
+      noneFormat: -2
     };
     this.numFormat = this.formatType.def;
-}
+  }
 
-cBaseOperator.prototype = {
-  constructor: cBaseOperator, getArguments: function() {
-        return this.argumentsCurrent;
-  }, toString: function() {
-        return this.name;
-  }, Calculate: function() {
-        return null;
-  }, Assemble: function(arg) {
-        var str = "";
-        if ( this.argumentsCurrent === 2 ) {
-            str = arg[0] + "" + this.name + "" + arg[1];
+  cBaseOperator.prototype.getArguments = function () {
+    return this.argumentsCurrent;
+  };
+  cBaseOperator.prototype.toString = function () {
+    return this.name;
+  };
+  cBaseOperator.prototype.Calculate = function () {
+    return null;
+  };
+  cBaseOperator.prototype.Assemble = function (arg) {
+    var str = "";
+    if (this.argumentsCurrent === 2) {
+      str = arg[0] + "" + this.name + "" + arg[1];
     } else {
-            str = this.name + "" + arg[0];
-        }
-        return new cString( str );
-  }, Assemble2: function(arg, start, count) {
-        var str = "";
-        if ( this.argumentsCurrent === 2 ) {
-            str += arg[start + count - 2] + this.name + arg[start + count - 1];
+      str = this.name + "" + arg[0];
+    }
+    return new cString(str);
+  };
+  cBaseOperator.prototype.Assemble2 = function (arg, start, count) {
+    var str = "";
+    if (this.argumentsCurrent === 2) {
+      str += arg[start + count - 2] + this.name + arg[start + count - 1];
     } else {
-            str += this.name + arg[start];
-        }
-        return new cString( str );
-  }, Assemble2Locale: function(arg, start, count, locale, digitDelim) {
-        var str = "";
-        if ( this.argumentsCurrent === 2 ) {
+      str += this.name + arg[start];
+    }
+    return new cString(str);
+  };
+  cBaseOperator.prototype.Assemble2Locale = function (arg, start, count, locale, digitDelim) {
+    var str = "";
+    if (this.argumentsCurrent === 2) {
       str += arg[start + count - 2].toLocaleString(digitDelim) + this.name +
         arg[start + count - 1].toLocaleString(digitDelim);
     } else {
-            str += this.name + arg[start];
-        }
-        return new cString( str );
+      str += this.name + arg[start];
     }
-};
+    return new cString(str);
+  };
 
-/** @constructor */
-function cBaseFunction( name, argMin, argMax ) {
+  /** @constructor */
+  function cBaseFunction(name, argMin, argMax) {
     this.name = name;
     this.type = cElementType.func;
     this.value = null;
@@ -2015,87 +2006,102 @@ function cBaseFunction( name, argMin, argMax ) {
     this.argumentsCurrent = 0;
     this.argumentsMax = argMax ? argMax : 255;
     this.formatType = {
-        def       : -1, //подразумевается формат первой ячейки входящей в формулу.
-        noneFormat: -2
+      def: -1, //подразумевается формат первой ячейки входящей в формулу.
+      noneFormat: -2
     };
     this.numFormat = this.formatType.def;
 //    this.isXLFN = rx_sFuncPref.test(this.name);
-}
+  }
+  cBaseFunction.prototype.Calculate = function () {
+    this.value = new cError(cErrorType.wrong_name);
+    return this.value;
+  };
+  cBaseFunction.prototype.setArgumentsMin = function (count) {
+    this.argumentsMin = count;
+  };
+  cBaseFunction.prototype.setArgumentsMax = function (count) {
+    this.argumentsMax = count;
+  };
+  cBaseFunction.prototype.DecrementArguments = function () {
+    --this.argumentsCurrent;
+  };
+  cBaseFunction.prototype.IncrementArguments = function () {
+    ++this.argumentsCurrent;
+  };
+  cBaseFunction.prototype.setName = function (name) {
+    this.name = name;
+  };
+  cBaseFunction.prototype.setArgumentsCount = function (count) {
+    this.argumentsCurrent = count;
+  };
+  cBaseFunction.prototype.getArguments = function () {
+    return this.argumentsCurrent;
+  };
+  cBaseFunction.prototype.getMaxArguments = function () {
+    return this.argumentsMax;
+  };
+  cBaseFunction.prototype.getMinArguments = function () {
+    return this.argumentsMin;
+  };
+  cBaseFunction.prototype.Assemble = function (arg) {
+    var str = "";
+    for (var i = 0; i < arg.length; i++) {
+      str += arg[i].toString();
+      if (i !== arg.length - 1) {
+        str += ",";
+      }
+    }
+    if (this.isXLFN) {
+      return new cString("_xlfn." + this.name + "(" + str + ")");
+    }
+    return new cString(this.toString() + "(" + str + ")");
+  };
+  cBaseFunction.prototype.Assemble2 = function (arg, start, count) {
 
-cBaseFunction.prototype = {
-  constructor: cBaseFunction, Calculate: function() {
-        this.value = new cError( cErrorType.wrong_name );
-        return this.value;
-  }, setArgumentsMin: function(count) {
-        this.argumentsMin = count;
-  }, setArgumentsMax: function(count) {
-        this.argumentsMax = count;
-  }, DecrementArguments: function() {
-        --this.argumentsCurrent;
-  }, IncrementArguments: function() {
-        ++this.argumentsCurrent;
-  }, setName: function(name) {
-        this.name = name;
-  }, setArgumentsCount: function(count) {
-        this.argumentsCurrent = count;
-  }, getArguments: function() {
-        return this.argumentsCurrent;
-  }, getMaxArguments: function() {
-        return this.argumentsMax;
-  }, getMinArguments: function() {
-        return this.argumentsMin;
-  }, Assemble: function(arg) {
-        var str = "";
-        for ( var i = 0; i < arg.length; i++ ) {
-            str += arg[i].toString();
-            if ( i !== arg.length - 1 ) {
-                str += ",";
-            }
-        }
-        if ( this.isXLFN ) {
-            return new cString( "_xlfn." + this.name + "(" + str + ")" );
-        }
-        return new cString( this.toString() + "(" + str + ")" );
-  }, Assemble2: function(arg, start, count) {
-
-        var str = "", c = start + count - 1;
-        for ( var i = start; i <= c; i++ ) {
-            str += arg[i].toString();
-            if ( i !== c ) {
-                str += ",";
-            }
-        }
-        if ( this.isXLFN ) {
-            return new cString( "_xlfn." + this.name + "(" + str + ")" );
-        }
-        return new cString( this.toString() + "(" + str + ")" );
-  }, Assemble2Locale: function(arg, start, count, locale, digitDelim) {
+    var str = "", c = start + count - 1;
+    for (var i = start; i <= c; i++) {
+      str += arg[i].toString();
+      if (i !== c) {
+        str += ",";
+      }
+    }
+    if (this.isXLFN) {
+      return new cString("_xlfn." + this.name + "(" + str + ")");
+    }
+    return new cString(this.toString() + "(" + str + ")");
+  };
+  cBaseFunction.prototype.Assemble2Locale = function (arg, start, count, locale, digitDelim) {
 
     var name = this.toString(), str = "", c = start + count - 1, localeName = locale ? locale[name] : name;
 
-        localeName = localeName || this.toString();
-        for ( var i = start; i <= c; i++ ) {
-            str += arg[i].toLocaleString( digitDelim );
-            if ( i !== c ) {
+    localeName = localeName || this.toString();
+    for (var i = start; i <= c; i++) {
+      str += arg[i].toLocaleString(digitDelim);
+      if (i !== c) {
         str += FormulaSeparators.functionArgumentSeparator;
-            }
-        }
-        return new cString( localeName + "(" + str + ")" );
-  }, toString: function() {
-        return this.name.replace( rx_sFuncPref, "_xlfn." );
-  }, setCA: function(arg, ca, numFormat) {
-        this.value = arg;
-        if ( ca ) {
-            this.value.ca = true;
-        }
-        if ( numFormat !== null && numFormat !== undefined ) {
-            this.value.numFormat = numFormat;
-        }
-        return this.value;
-  }, setFormat: function(f) {
-        this.numFormat = f;
+      }
     }
-};
+    return new cString(localeName + "(" + str + ")");
+  };
+  cBaseFunction.prototype.toString = function () {
+    return this.name.replace(rx_sFuncPref, "_xlfn.");
+  };
+  cBaseFunction.prototype.setCA = function (arg, ca, numFormat) {
+    this.value = arg;
+    if (ca) {
+      this.value.ca = true;
+    }
+    if (numFormat !== null && numFormat !== undefined) {
+      this.value.numFormat = numFormat;
+    }
+    return this.value;
+  };
+  cBaseFunction.prototype.setFormat = function (f) {
+    this.numFormat = f;
+  };
+  cBaseFunction.prototype.checkArguments = function () {
+    return this.argumentsMin <= this.argumentsCurrent && this.argumentsCurrent <= this.argumentsMax;
+  };
 
 /** @constructor */
 function parentLeft() {
@@ -4226,7 +4232,7 @@ parserFormula.prototype.parse = function(local, digitDelim) {
 
   if (this.outStack.length != 0) {
     return this.isParsed = true;
-    } else {
+  } else {
     return this.isParsed = false;
   }
 };
@@ -4734,8 +4740,9 @@ parserFormula.prototype.buildDependencies = function(nameReParse, defName) {
     ref = this.outStack[i];
 
     if (ref.type == cElementType.table) {
-      nTo = ref.addDefinedNameNode(/*nameReParse*/);
-      this.wb.dependencyFormulas.addEdge2(node, nTo);
+      //nTo = ref.addDefinedNameNode(/*nameReParse*/);
+      //this.wb.dependencyFormulas.addEdge2(node, nTo);
+      // ToDo нет зависимости от имени таблицы. Проблемы будут, если сменить диапазон у таблицы. На ссылку в зависимостях это не повлияет..
       ref = ref.toRef();
     }
 

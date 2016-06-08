@@ -20,6 +20,10 @@ function CFootnotesController(LogicDocument)
 	this.Footnote = {}; // Список всех сносок с ключом - Id.
 	this.Pages    = [];
 
+	// Специальные сноски
+	this.ContinuationNoticeFootnote    = null;
+	this.ContinuationSeparatorFootnote = null;
+	this.SeparatorFootnote             = null;
 
 	// Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
 	LogicDocument.Get_TableId().Add(this, this.Id);
@@ -33,6 +37,16 @@ AscCommon.extendClass(CFootnotesController, CDocumentControllerBase);
 CFootnotesController.prototype.Get_Id = function()
 {
 	return this.Id;
+};
+/**
+ * Начальная инициализация после загрузки всех файлов.
+ */
+CFootnotesController.prototype.Init = function()
+{
+	this.SeparatorFootnote = new CFootEndnote(this);
+	this.SeparatorFootnote.Paragraph_Add(new ParaSeparator(), false);
+	var oParagraph = this.SeparatorFootnote.Get_ElementByIndex(0);
+	oParagraph.Set_Spacing({After : 0, Line : 1, LineRule : Asc.linerule_Auto}, false);
 };
 /**
  * Создаем новую сноску.
@@ -63,9 +77,23 @@ CFootnotesController.prototype.Recalculate = function(nPageIndex, X, XLimit, Y, 
 	if (!this.Pages[nPageIndex])
 		this.Pages[nPageIndex] = new CFootEndnotePage();
 
+	if (true === this.Is_EmptyPage(nPageIndex))
+		return;
+
 	// Мы пересчет начинаем с 0, потом просто делаем сдвиг, через функцию Shift.
 
 	var CurY = Y;
+
+	if (null !== this.SeparatorFootnote)
+	{
+		this.SeparatorFootnote.Reset(X, CurY, XLimit, 10000);
+		this.SeparatorFootnote.Recalculate_Page(0, true);
+		this.Pages[nPageIndex].SeparatorRecalculateObject = this.SeparatorFootnote.Save_RecalculateObject();
+
+		var Bounds = this.SeparatorFootnote.Get_PageBounds(0);
+		CurY += Bounds.Bottom - Bounds.Top;
+	}
+
 	for (var nIndex = 0; nIndex < this.Pages[nPageIndex].Elements.length; ++nIndex)
 	{
 		var Footnote = this.Pages[nPageIndex].Elements[nIndex];
@@ -83,10 +111,21 @@ CFootnotesController.prototype.Recalculate = function(nPageIndex, X, XLimit, Y, 
 /**
  * Получаем суммарную высоту, занимаемую сносками на заданной странице.
  * @param {number} nPageIndex
+ * @returns {number}
  */
 CFootnotesController.prototype.Get_Height = function(nPageIndex)
 {
+	if (true === this.Is_EmptyPage(nPageIndex))
+		return 0;
+
 	var nHeight = 0;
+
+	if (null !== this.SeparatorFootnote)
+	{
+		var Bounds = this.SeparatorFootnote.Get_PageBounds(0);
+		nHeight += Bounds.Bottom - Bounds.Top;
+	}
+
 	for (var nIndex = 0; nIndex < this.Pages[nPageIndex].Elements.length; ++nIndex)
 	{
 		var Footnote = this.Pages[nPageIndex].Elements[nIndex];
@@ -103,6 +142,15 @@ CFootnotesController.prototype.Get_Height = function(nPageIndex)
  */
 CFootnotesController.prototype.Draw = function(nPageIndex, pGraphics)
 {
+	if (true === this.Is_EmptyPage(nPageIndex))
+		return;
+
+	if (null !== this.SeparatorFootnote && null !== this.Pages[nPageIndex].SeparatorRecalculateObject)
+	{
+		this.SeparatorFootnote.Load_RecalculateObject(this.Pages[nPageIndex].SeparatorRecalculateObject);
+		this.SeparatorFootnote.Draw(0, pGraphics);
+	}
+
 	for (var nIndex = 0; nIndex < this.Pages[nPageIndex].Elements.length; ++nIndex)
 	{
 		var Footnote = this.Pages[nPageIndex].Elements[nIndex];
@@ -117,6 +165,16 @@ CFootnotesController.prototype.Draw = function(nPageIndex, pGraphics)
  */
 CFootnotesController.prototype.Shift = function(nPageIndex, dX, dY)
 {
+	if (true === this.Is_EmptyPage(nPageIndex))
+		return;
+
+	if (null !== this.SeparatorFootnote && null !== this.Pages[nPageIndex].SeparatorRecalculateObject)
+	{
+		this.SeparatorFootnote.Load_RecalculateObject(this.Pages[nPageIndex].SeparatorRecalculateObject);
+		this.SeparatorFootnote.Shift(0, dX, dY);
+		this.Pages[nPageIndex].SeparatorRecalculateObject = this.SeparatorFootnote.Save_RecalculateObject();
+	}
+
 	for (var nIndex = 0; nIndex < this.Pages[nPageIndex].Elements.length; ++nIndex)
 	{
 		var Footnote = this.Pages[nPageIndex].Elements[nIndex];
@@ -138,7 +196,7 @@ CFootnotesController.prototype.Add_FootnoteOnPage = function(nPageIndex, oFootno
 /**
  * Проверяем, используется заданная сноска в документе.
  * @param {string} sFootnoteId
- * @returns  {boolean}
+ * @returns {boolean}
  */
 CFootnotesController.prototype.Is_UseInDocument = function(sFootnoteId)
 {
@@ -151,6 +209,18 @@ CFootnotesController.prototype.Is_UseInDocument = function(sFootnoteId)
 
 	return false;
 };
+/**
+ * Проверяем пустая ли страница.
+ * @param {number} nPageIndex
+ * @returns {boolean}
+ */
+CFootnotesController.prototype.Is_EmptyPage = function(nPageIndex)
+{
+	if (!this.Pages[nPageIndex] || this.Pages[nPageIndex].Elements.length <= 0)
+		return true;
+
+	return false;
+};
 
 function CFootEndnotePage()
 {
@@ -160,6 +230,10 @@ function CFootEndnotePage()
 	this.YLimit = 0;
 
 	this.Elements = [];
+
+	this.SeparatorRecalcObject             = null;
+	this.ContinuationSeparatorRecalcObject = null;
+	this.ContinuationNoticeRecalcObject    = null;
 }
 CFootEndnotePage.prototype.Reset = function()
 {
@@ -169,6 +243,10 @@ CFootEndnotePage.prototype.Reset = function()
 	this.YLimit = 0;
 
 	this.Elements = [];
+
+	this.SeparatorRecalcObject             = null;
+	this.ContinuationSeparatorRecalcObject = null;
+	this.ContinuationNoticeRecalcObject    = null;
 };
 
 

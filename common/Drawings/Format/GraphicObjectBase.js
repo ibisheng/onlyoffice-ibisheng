@@ -326,7 +326,36 @@
     CGraphicObjectBase.prototype.setNoChangeAspect = function(bValue){
         return this.setLockValue(LOCKS_MASKS.noChangeAspect, bValue);
     };
-    
+    CGraphicObjectBase.prototype.Reassign_ImageUrls = function(mapUrl){
+        if(this.blipFill){
+            if(mapUrl[this.blipFill.RasterImageId]){
+                if(this.setBlipFill){
+                    var blip_fill = new AscFormat.CBlipFill();
+                    blip_fill.setRasterImageId(mapUrl[this.blipFill.RasterImageId]);
+                    blip_fill.setStretch(true);
+                    this.setBlipFill(blip_fill);
+                }
+            }
+        }
+        if(this.spPr && this.spPr.Fill && this.spPr.Fill.fill && this.spPr.Fill.fill.RasterImageId){
+            if(mapUrl[this.spPr.Fill.fill.RasterImageId]){
+                var blip_fill = new AscFormat.CBlipFill();
+                blip_fill.setRasterImageId(mapUrl[this.blipFill.RasterImageId]);
+                blip_fill.setStretch(true);
+                var oUniFill = new AscFormat.CUniFill();
+                oUniFill.setFill(blip_fill);
+                this.spPr.setFill(oUniFill);
+            }
+        }
+        if(Array.isArray(this.spTree)){
+            for(var i = 0; i < this.spTree.length; ++i){
+                if(this.spTree[i].Reassign_ImageUrls){
+                    this.spTree[i].Reassign_ImageUrls(mapUrl);
+                }
+            }
+        }
+    };
+
     window['AscFormat'] = window['AscFormat'] || {};
     window['AscFormat'].CGraphicObjectBase = CGraphicObjectBase;
     window['AscFormat'].CGraphicBounds     = CGraphicBounds;

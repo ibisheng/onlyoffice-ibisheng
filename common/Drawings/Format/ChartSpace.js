@@ -6162,6 +6162,7 @@ CChartSpace.prototype.checkAxisLabelsTransform = function()
                         dPosY = (oAxisLabels.y + oAxisLabels.extY)*this.chartObj.calcProp.pxToMM;
                         dPosY2 = oAxisLabels.y + oAxisLabels.extY;
                     }
+                    var fBottomLabels = -100;
                     if(!oAxisLabels.bRotated)
                     {
                         for(i = 0; i < oAxisLabels.arrLabels.length; ++i)
@@ -6169,19 +6170,15 @@ CChartSpace.prototype.checkAxisLabelsTransform = function()
                             oLabel = oAxisLabels.arrLabels[i];
                             if(oLabel)
                             {
-                                var oCPosLabelX, oCPosLabelY;
-                                if(!oAxisLabels.bRotated)
-                                {
-                                    oCPosLabelX = oLabel.localTransformText.TransformPointX(oLabel.txBody.content.XLimit/2, 0);
-                                    oNewPos = oProcessor3D.convertAndTurnPoint(oCPosLabelX*this.chartObj.calcProp.pxToMM, dPosY, dZPositionCatAxis);
-                                    oLabel.setPosition2(oNewPos.x/this.chartObj.calcProp.pxToMM + oLabel.localTransformText.tx - oCPosLabelX, oLabel.localTransformText.ty - dPosY2 + oNewPos.y/this.chartObj.calcProp.pxToMM );
+                                var oCPosLabelX;
+                                oCPosLabelX = oLabel.localTransformText.TransformPointX(oLabel.txBody.content.XLimit/2, 0);
+                                oNewPos = oProcessor3D.convertAndTurnPoint(oCPosLabelX*this.chartObj.calcProp.pxToMM, dPosY, dZPositionCatAxis);
+                                oLabel.setPosition2(oNewPos.x/this.chartObj.calcProp.pxToMM + oLabel.localTransformText.tx - oCPosLabelX, oLabel.localTransformText.ty - dPosY2 + oNewPos.y/this.chartObj.calcProp.pxToMM );
+                                var fBottomContent = oLabel.y + oLabel.tx.rich.content.Get_SummaryHeight();
+                                if(fBottomContent > fBottomLabels){
+                                    fBottomLabels = fBottomContent;
                                 }
-                                else
-                                {
-                                    oCPosLabelX = oLabel.localTransformText.TransformPointX(oLabel.widthForTransform, 0);
-                                    oNewPos = oProcessor3D.convertAndTurnPoint(oCPosLabelX*this.chartObj.calcProp.pxToMM, dPosY, dZPositionCatAxis);
-                                    oLabel.setPosition2(oNewPos.x/this.chartObj.calcProp.pxToMM + oLabel.x - oCPosLabelX, oLabel.y - dPosY2 + oNewPos.y/this.chartObj.calcProp.pxToMM);
-                                }
+
                             }
                         }
                     }
@@ -6212,6 +6209,11 @@ CChartSpace.prototype.checkAxisLabelsTransform = function()
                                     global_MatrixTransformer.TranslateAppend(local_text_transform, -wh.w/2, -wh.h/2);
                                     global_MatrixTransformer.RotateRadAppend(local_text_transform, Math.PI/4);
                                     global_MatrixTransformer.TranslateAppend(local_text_transform, xc, yc);
+
+                                    var fBottomContent = y0t + h2;
+                                    if(fBottomContent > fBottomLabels){
+                                        fBottomLabels = fBottomContent;
+                                    }
                                 }
                             }
                         }
@@ -6260,7 +6262,7 @@ CChartSpace.prototype.checkAxisLabelsTransform = function()
                     oAxisLabels.x = Math.min.apply(Math, aXPoints);
                     oAxisLabels.y = Math.min.apply(Math, aYPoints);
                     oAxisLabels.extX = Math.max.apply(Math, aXPoints) - oAxisLabels.x;
-                    oAxisLabels.extY = Math.max.apply(Math, aYPoints) - oAxisLabels.y;
+                    oAxisLabels.extY = Math.max(Math.max.apply(Math, aYPoints), fBottomLabels) - oAxisLabels.y;
                 }
                 oAxisLabels = oValAx.labels;
                 if(oAxisLabels)

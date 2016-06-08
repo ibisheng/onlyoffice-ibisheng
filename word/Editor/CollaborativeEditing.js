@@ -64,6 +64,7 @@ CWordCollaborativeEditing.prototype.Send_Changes = function(IsUserSave, Addition
         }
     }
 
+    var UnlockCount = this.m_aNeedUnlock.length;
     this.Release_Locks();
 
     var UnlockCount2 = this.m_aNeedUnlock2.length;
@@ -113,9 +114,13 @@ CWordCollaborativeEditing.prototype.Send_Changes = function(IsUserSave, Addition
     // TODO: Пока у нас обнуляется история на сохранении нужно обновлять Undo/Redo
     editor.WordControl.m_oLogicDocument.Document_UpdateUndoRedoState();
 
-    // Перерисовываем документ (для обновления локов)
-    editor.WordControl.m_oLogicDocument.DrawingDocument.ClearCachePages();
-    editor.WordControl.m_oLogicDocument.DrawingDocument.FirePaint();
+    // Свои локи не проверяем. Когда все пользователи выходят, происходит перерисовка и свои локи уже не рисуются.
+    if (0 !== UnlockCount || 1 !== this.m_nUseType)
+    {
+        // Перерисовываем документ (для обновления локов)
+        editor.WordControl.m_oLogicDocument.DrawingDocument.ClearCachePages();
+        editor.WordControl.m_oLogicDocument.DrawingDocument.FirePaint();
+    }
 };
 CWordCollaborativeEditing.prototype.Release_Locks = function()
 {

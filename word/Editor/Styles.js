@@ -6961,6 +6961,24 @@ CTableCellPr.prototype =
             this.NoWrap = Reader.GetBool();
     }
 };
+CTableCellPr.prototype.Is_Empty = function()
+{
+	if (undefined !== this.GridSpan
+		|| undefined !== this.Shd
+		|| undefined !== this.TableCellMar
+		|| undefined !== this.TableCellBorders.Bottom
+		|| undefined !== this.TableCellBorders.Left
+		|| undefined !== this.TableCellBorders.Right
+		|| undefined !== this.TableCellBorders.Top
+		|| undefined !== this.TableCellW
+		|| undefined !== this.VAlign
+		|| undefined !== this.VMerge
+		|| undefined !== this.TextDirection
+		|| undefined !== this.NoWrap)
+		return false;
+
+	return true;
+};
 
 function CRFonts()
 {
@@ -7232,6 +7250,17 @@ CRFonts.prototype =
         return true;
     }
 };
+CRFonts.prototype.Is_Empty = function()
+{
+	if (undefined !== this.Ascii
+		|| undefined !== this.EastAsia
+		|| undefined !== this.HAnsi
+		|| undefined !== this.CS
+		|| undefined !== this.Hint)
+		return false;
+
+	return true;
+};
 
 function CLang()
 {
@@ -7348,6 +7377,15 @@ CLang.prototype =
 
         return true;
     }
+};
+CLang.prototype.Is_Empty = function()
+{
+	if (undefined !== this.Bidi
+		|| undefined !== this.EastAsia
+		|| undefined !== this.Val)
+		return false;
+
+	return true;
 };
 
 function CTextPr()
@@ -8747,6 +8785,40 @@ CTextPr.prototype =
         return Description;
     }
 };
+CTextPr.prototype.Is_Empty = function()
+{
+	if (undefined !== this.Bold
+		|| undefined !== this.Italic
+		|| undefined !== this.Strikeout
+		|| undefined !== this.Underline
+		|| undefined !== this.FontFamily
+		|| undefined !== this.FontSize
+		|| undefined !== this.Color
+		|| undefined !== this.VertAlign
+		|| undefined !== this.HighLight
+		|| undefined !== this.RStyle
+		|| undefined !== this.Spacing
+		|| undefined !== this.DStrikeout
+		|| undefined !== this.Caps
+		|| undefined !== this.SmallCaps
+		|| undefined !== this.Position
+		|| true !== this.RFonts.Is_Empty()
+		|| undefined !== this.BoldCS
+		|| undefined !== this.ItalicCS
+		|| undefined !== this.FontSizeCS
+		|| undefined !== this.CS
+		|| undefined !== this.RTL
+		|| true !== this.Lang.Is_Empty()
+		|| undefined !== this.Unifill
+		|| undefined !== this.FontRef
+		|| undefined !== this.Shd
+		|| undefined !== this.Vanish
+		|| undefined !== this.TextOutline
+		|| undefined !== this.TextFill)
+		return false;
+
+	return true;
+};
 CTextPr.prototype.Get_Bold = function()
 {
     return this.Bold;
@@ -9120,6 +9192,15 @@ CParaInd.prototype =
             this.FirstLine = Reader.GetDouble();
     }
 };
+CParaInd.prototype.Is_Empty = function()
+{
+	if (undefined !== this.Left
+		|| undefined !== this.Right
+		|| undefined !== this.FirstLine)
+		return false;
+
+	return true;
+};
 CParaInd.prototype.Get_Diff = function(Ind)
 {
     var DiffInd = new CParaInd();
@@ -9298,6 +9379,18 @@ CParaSpacing.prototype.Get_Diff = function(Spacing)
         DiffSpacing.AfterAutoSpacing = this.AfterAutoSpacing;
 
     return DiffSpacing;
+};
+CParaSpacing.prototype.Is_Empty = function()
+{
+	if (undefined !== this.Line
+		|| undefined !== this.LineRule
+		|| undefined !== this.Before
+		|| undefined !== this.BeforeAutoSpacing
+		|| undefined !== this.After
+		|| undefined !== this.AfterAutoSpacing)
+		return false;
+
+	return true;
 };
 
 function CNumPr()
@@ -10496,6 +10589,31 @@ CParaPr.prototype =
         delete this.PrChange;
         delete this.ReviewInfo;
     }
+};
+CParaPr.prototype.Is_Empty         = function()
+{
+	if (undefined !== this.ContextualSpacing
+		|| true !== this.Ind.Is_Empty()
+		|| undefined !== this.Jc
+		|| undefined !== this.KeepLines
+		|| undefined !== this.KeepNext
+		|| undefined !== this.PageBreakBefore
+		|| true !== this.Spacing.Is_Empty()
+		|| undefined !== this.Shd
+		|| undefined !== this.Brd.First
+		|| undefined !== this.Brd.Last
+		|| undefined !== this.Brd.Between
+		|| undefined !== this.Brd.Bottom
+		|| undefined !== this.Brd.Left
+		|| undefined !== this.Brd.Right
+		|| undefined !== this.Brd.Top
+		|| undefined !== this.WidowControl
+		|| undefined !== this.Tabs
+		|| undefined !== this.NumPr
+		|| undefined !== this.PStyle)
+		return false;
+
+	return true;
 };
 CParaPr.prototype.Get_DiffPrChange = function()
 {

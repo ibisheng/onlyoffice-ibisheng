@@ -1425,9 +1425,10 @@ function CDocument(DrawingDocument, isMainLogicDocument)
     this.CheckLanguageOnTextAdd = false; // Проверять ли язык при добавлении текста в ран
 
     // Мап для рассылки
-    this.MailMergeMap = null;
-    this.MailMergePreview = false;
+    this.MailMergeMap             = null;
+    this.MailMergePreview         = false;
     this.MailMergeFieldsHighlight = false; // Подсвечивать ли все поля связанные с рассылкой
+    this.MailMergeFields          = [];
 
     // Класс, управляющий полями
     this.FieldsManager = new CDocumentFieldsManager();
@@ -1441,6 +1442,9 @@ function CDocument(DrawingDocument, isMainLogicDocument)
 
     // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
     this.TableId.Add(this, this.Id);
+
+	// Объект для составного ввода текста
+	this.CompositeInput = null;
 
     this.StartTime = 0;
 }
@@ -1486,6 +1490,8 @@ CDocument.prototype.On_EndLoad                     = function()
     {
         this.Set_FastCollaborativeEditing(true);
     }
+
+    //this.Footnotes.Init();
 };
 CDocument.prototype.Add_TestDocument               = function()
 {
@@ -10369,6 +10375,7 @@ CDocument.prototype.Insert_Content            = function(SelectedContent, NearPo
             Para.Selection_Remove();
 
             var bAddEmptyPara = false;
+            var bDoNotIncreaseDstIndex = false;
 
             if (true === Para.Cursor_IsEnd())
             {
@@ -10378,8 +10385,12 @@ CDocument.prototype.Insert_Content            = function(SelectedContent, NearPo
                 {
                     bConcatS = false;
 
+                    // TODO: Возможно флаг bDoNotIncreaseDstIndex не нужен, и здесь не нужно увеличивать индекс DstIndex
                     if (type_Paragraph !== this.Content[DstIndex].Get_Type() || true !== this.Content[DstIndex].Is_Empty())
+                    {
                         DstIndex++;
+                        bDoNotIncreaseDstIndex = true;
+                    }
                 }
                 else if (true === Elements[ElementsCount - 1].SelectedAll && true === bConcatS)
                     bAddEmptyPara = true;
@@ -10428,7 +10439,7 @@ CDocument.prototype.Insert_Content            = function(SelectedContent, NearPo
                 ParaS.Selection.StartPos = ParaS.Content.length - _ParaSContentLen;
                 ParaS.Selection.EndPos   = ParaS.Content.length - 1;
             }
-            else if (true !== Para.Cursor_IsStart())
+            else if (true !== Para.Cursor_IsStart() && true !== bDoNotIncreaseDstIndex)
             {
                 DstIndex++;
             }
@@ -16836,6 +16847,135 @@ CDocument.prototype.Statistics_Stop = function()
 CDocument.prototype.EndPreview_MailMergeResult = function(){};
 CDocument.prototype.Continue_TrackRevisions = function(){};
 CDocument.prototype.Set_TrackRevisions = function(bTrack){};
+//----------------------------------------------------------------------------------------------------------------------
+// Функции для работы с составным вводом
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Сообщаем о начале составного ввода текста.
+ * @returns {boolean} Начался или нет составной ввод.
+ */
+CDocument.prototype.Begin_CompositeInput = function()
+{
+	if (false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content, null, true))
+	{
+		this.Create_NewHistoryPoint(AscDFH.historydescription_Document_CompositeInput);
+
+		this.DrawingDocument.TargetStart();
+		this.DrawingDocument.TargetShow();
+
+		if (true === this.Is_SelectionUse())
+			this.Remove(1, true, false, true);
+
+		var oPara = this.Get_CurrentParagraph();
+		if (!oPara)
+		{
+			this.History.Remove_LastPoint();
+			return false;
+		}
+
+		var oRun = oPara.Get_ElementByPos(oPara.Get_ParaContentPos(false, false));
+		if (!oRun || !(oRun instanceof ParaRun))
+		{
+			this.History.Remove_LastPoint();
+			return false;
+		}
+
+		this.CompositeInput = {
+			Run    : oRun,
+			Pos    : oRun.State.ContentPos,
+			Length : 0
+		};
+
+		oRun.Set_CompositeInput(this.CompositeInput);
+
+		return true;
+	}
+
+	return false;
+};
+CDocument.prototype.Add_CompositeText = function(nCharCode)
+{
+	// TODO: При таком вводе не меняется язык в зависимости от раскладки, не учитывается режим рецензирования.
+
+	if (null === this.CompositeInput)
+		return;
+
+	var oRun = this.CompositeInput.Run;
+	var nPos = this.CompositeInput.Pos + this.CompositeInput.Length;
+	var oChar = new ParaText();
+	oChar.Set_CharCode(nCharCode);
+	oRun.Add_ToContent(nPos, oChar, true);
+	this.CompositeInput.Length++;
+
+	this.Recalculate();
+	this.Document_UpdateSelectionState();
+};
+CDocument.prototype.Remove_CompositeText = function(nCount)
+{
+	if (null === this.CompositeInput)
+		return;
+
+	var oRun = this.CompositeInput.Run;
+	var nPos = this.CompositeInput.Pos + this.CompositeInput.Length;
+
+	var nDelCount = Math.max(0, Math.min(nCount, this.CompositeInput.Length, oRun.Content.length, nPos));
+	oRun.Remove_FromContent(nPos - nDelCount, nDelCount, true);
+	this.CompositeInput.Length -= nDelCount;
+
+	this.Recalculate();
+	this.Document_UpdateSelectionState();
+};
+CDocument.prototype.Replace_CompositeText = function(arrCharCodes)
+{
+	if (null === this.CompositeInput)
+		return;
+
+	this.Start_SilentMode();
+	this.Remove_CompositeText(this.CompositeInput.Length);
+	for (var nIndex = 0, nCount = arrCharCodes.length; nIndex < nCount; ++nIndex)
+	{
+		this.Add_CompositeText(arrCharCodes[nIndex]);
+	}
+	this.End_SilentMode(false);
+
+	this.Recalculate();
+	this.Document_UpdateSelectionState();
+};
+CDocument.prototype.Set_CursorPosInCompositeText = function(nPos)
+{
+	if (null === this.CompositeInput)
+		return;
+	
+	var oRun = this.CompositeInput.Run;
+
+	var nInRunPos = Math.max(Math.min(this.CompositeInput.Pos + nPos, this.CompositeInput.Pos + this.CompositeInput.Length, oRun.Content.length), this.CompositeInput.Pos);
+	oRun.State.ContentPos = nInRunPos;
+	this.Document_UpdateSelectionState();
+};
+CDocument.prototype.Get_CursorPosInCompositeText = function()
+{
+	if (null === this.CompositeInput)
+		return 0;
+
+	var oRun = this.CompositeInput.Run;
+	var nInRunPos = oRun.State.ContentPos;
+	var nPos = Math.min(this.CompositeInput.Length, Math.max(0, nInRunPos - this.CompositeInput.Pos));
+	return nPos;
+};
+CDocument.prototype.End_CompositeInput = function()
+{
+	if (null === this.CompositeInput)
+		return;
+
+	var oRun = this.CompositeInput.Run;
+	oRun.Set_CompositeInput(null);
+	this.CompositeInput = null;
+
+	this.Document_UpdateInterfaceState();
+
+	this.DrawingDocument.ClearCachePages();
+	this.DrawingDocument.FirePaint();
+};
 //----------------------------------------------------------------------------------------------------------------------
 //
 //----------------------------------------------------------------------------------------------------------------------

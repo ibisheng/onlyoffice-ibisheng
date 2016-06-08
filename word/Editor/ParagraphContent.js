@@ -4784,6 +4784,12 @@ ParaDrawing.prototype =
         this.GraphicObj.setRecalcObject(RecalcObj.spRecaclcObject);
     },
 
+    Reassign_ImageUrls : function(mapUrls){
+        if(this.GraphicObj){
+            this.GraphicObj.Reassign_ImageUrls(mapUrls);
+        }  
+    },
+
     Prepare_RecalculateObject : function()
     {
     },
@@ -7679,6 +7685,7 @@ ParaSeparator.prototype.Copy     = function()
 /**
  * Класс представляющий собой длинный разделитель (который в основном используется для сносок).
  * @constructor
+ * @extends {CRunElementBase}
  */
 function ParaContinuationSeparator()
 {
@@ -7686,12 +7693,12 @@ function ParaContinuationSeparator()
 	this.LineW = 0;
 }
 AscCommon.extendClass(ParaContinuationSeparator, CRunElementBase);
-ParaContinuationSeparator.prototype.Type     = para_ContinuationSeparator;
-ParaContinuationSeparator.prototype.Get_Type = function()
+ParaContinuationSeparator.prototype.Type         = para_ContinuationSeparator;
+ParaContinuationSeparator.prototype.Get_Type     = function()
 {
 	return para_ContinuationSeparator;
 };
-ParaContinuationSeparator.prototype.Draw     = function(X, Y, Context, PDSE)
+ParaContinuationSeparator.prototype.Draw         = function(X, Y, Context, PDSE)
 {
 	var l = X, t = PDSE.LineTop, r = X + this.Get_Width(), b = PDSE.BaseLine;
 
@@ -7712,14 +7719,14 @@ ParaContinuationSeparator.prototype.Draw     = function(X, Y, Context, PDSE)
 			Context.m_oContext.setLineDash([]);
 	}
 };
-ParaContinuationSeparator.prototype.Measure  = function(Context, TextPr)
+ParaContinuationSeparator.prototype.Measure      = function(Context, TextPr)
 {
 	this.Width        = (50 * TEXTWIDTH_DIVIDER) | 0;
 	this.WidthVisible = (50 * TEXTWIDTH_DIVIDER) | 0;
 
 	this.LineW = (TextPr.FontSize / 18) * g_dKoef_pt_to_mm;
 };
-ParaContinuationSeparator.prototype.Copy     = function()
+ParaContinuationSeparator.prototype.Copy         = function()
 {
 	return new ParaContinuationSeparator();
 };

@@ -277,7 +277,7 @@ CTableCell.prototype =
         if ( true === TableLook.Is_BandHor() )
         {
             var RowBandSize = TablePr.TablePr.TableStyleRowBandSize;
-            var __RowIndex  = ( true != TableLook.Is_FirstRow() ? RowIndex : RowIndex - 1 )
+            var __RowIndex  = ( true != TableLook.Is_FirstRow() ? RowIndex : RowIndex - 1 );
             var _RowIndex = ( 1 != RowBandSize ? Math.floor( __RowIndex / RowBandSize ) : __RowIndex );
             var TableBandStyle = null;
             if ( 0 === _RowIndex % 2 )
@@ -290,24 +290,40 @@ CTableCell.prototype =
             ParaPr.Merge( TableBandStyle.ParaPr );
         }
 
-        // Совместим с настройками для групп колонок
-        // Согласно спецификации DOCX, совмещать надо всегда, но для первой и последней колонок Word
-        // не совмещает, поэтому делаем также.
-        if ( true === TableLook.Is_BandVer() && !( (true === TableLook.Is_LastCol() && this.Row.Get_CellsCount() - 1 === CellIndex) || (true === TableLook.Is_FirstCol() && 0 === CellIndex) ) )
-        {
-            var ColBandSize = TablePr.TablePr.TableStyleColBandSize;
-            var _ColIndex   = ( true != TableLook.Is_FirstCol() ? CellIndex : CellIndex - 1 )
-            var ColIndex = ( 1 != ColBandSize ? Math.floor( _ColIndex / ColBandSize ) : _ColIndex );
-            var TableBandStyle = null;
-            if ( 0 === ColIndex % 2 )
-                TableBandStyle = TablePr.TableBand1Vert;
-            else
-                TableBandStyle = TablePr.TableBand2Vert;
+		// Совместим с настройками для групп колонок
+		// Согласно спецификации DOCX, совмещать надо всегда. Word проверяет наличие первой колонки не только
+		// через флаг TableLook.Is_FirstCol(), но и самим наличием непустого стиля для первой колонки.
+		if (true === TableLook.Is_BandVer())
+		{
+			var bFirstCol = false;
+			if (true === TableLook.Is_FirstCol())
+			{
+				var oTableStyle = this.Get_Styles().Get(this.Row.Table.Get_TableStyle());
+				if (oTableStyle && styletype_Table === oTableStyle.Get_Type() && oTableStyle.TableFirstCol)
+				{
+					var oCondStyle = oTableStyle.TableFirstCol;
+					if (true !== oCondStyle.TableCellPr.Is_Empty()
+						|| true !== oCondStyle.ParaPr.Is_Empty()
+						|| true !== oCondStyle.TextPr.Is_Empty())
+					{
+						bFirstCol = true;
+					}
+				}
+			}
 
-            CellPr.Merge( TableBandStyle.TableCellPr );
-            TextPr.Merge( TableBandStyle.TextPr );
-            ParaPr.Merge( TableBandStyle.ParaPr );
-        }
+			var ColBandSize    = TablePr.TablePr.TableStyleColBandSize;
+			var _ColIndex      = ( true != bFirstCol ? CellIndex : CellIndex - 1 );
+			var ColIndex       = ( 1 != ColBandSize ? Math.floor(_ColIndex / ColBandSize) : _ColIndex );
+			var TableBandStyle = null;
+			if (0 === ColIndex % 2)
+				TableBandStyle = TablePr.TableBand1Vert;
+			else
+				TableBandStyle = TablePr.TableBand2Vert;
+
+			CellPr.Merge(TableBandStyle.TableCellPr);
+			TextPr.Merge(TableBandStyle.TextPr);
+			ParaPr.Merge(TableBandStyle.ParaPr);
+		}
 
 
         // Совместим настройки с настройками для последней колонки

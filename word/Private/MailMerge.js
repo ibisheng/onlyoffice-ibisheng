@@ -18,7 +18,7 @@ Asc['asc_docs_api'].prototype.asc_StartMailMerge = function(oData)
 };
 Asc['asc_docs_api'].prototype.asc_StartMailMergeByList = function(aList)
 {
-    if (!aList || !aList.length || aList.length <= 1)
+    if (!aList || !aList.length || aList.length <= 0)
         aList = [[]];
 
     var aFields = aList[0];
@@ -65,7 +65,7 @@ Asc['asc_docs_api'].prototype.asc_StartMailMergeByList = function(aList)
         DstList.push(oDstElement);
     }
 
-    this.WordControl.m_oLogicDocument.Start_MailMerge(DstList);
+    this.WordControl.m_oLogicDocument.Start_MailMerge(DstList, aFields);
 };
 Asc['asc_docs_api'].prototype.asc_GetReceptionsCount = function()
 {
@@ -181,13 +181,14 @@ Asc['asc_docs_api'].prototype['asc_DownloadAsMailMerge']         = Asc['asc_docs
 //----------------------------------------------------------------------------------------------------------------------
 // Функции для работы с MailMerge
 //----------------------------------------------------------------------------------------------------------------------
-CDocument.prototype.Start_MailMerge = function(MailMergeMap)
+CDocument.prototype.Start_MailMerge = function(MailMergeMap, arrFields)
 {
-    this.EndPreview_MailMergeResult();
+	this.EndPreview_MailMergeResult();
 
-    this.MailMergeMap = MailMergeMap;
-    editor.sync_HighlightMailMergeFields(this.MailMergeFieldsHighlight);
-    editor.sync_StartMailMerge();
+	this.MailMergeMap    = MailMergeMap;
+	this.MailMergeFields = arrFields;
+	editor.sync_HighlightMailMergeFields(this.MailMergeFieldsHighlight);
+	editor.sync_StartMailMerge();
 };
 CDocument.prototype.Get_MailMergeReceptionsCount = function()
 {
@@ -199,7 +200,7 @@ CDocument.prototype.Get_MailMergeReceptionsCount = function()
 CDocument.prototype.Get_MailMergeFieldsNameList = function()
 {
     if (this.Get_MailMergeReceptionsCount() <= 0)
-        return [];
+        return this.MailMergeFields;
 
     // Предполагаем, что в первом элементе перечислены все поля
     var Element = this.MailMergeMap[0];
@@ -280,9 +281,9 @@ CDocument.prototype.Get_MailMergeReceptionsList = function()
     var aList = [];
 
     var aHeaders = [];
-    var nCount = this.MailMergeMap.length
+    var nCount = this.MailMergeMap.length;
     if (nCount <= 0)
-        return [];
+        return [this.MailMergeFields];
 
     for (var sId in this.MailMergeMap[0])
         aHeaders.push(sId);
