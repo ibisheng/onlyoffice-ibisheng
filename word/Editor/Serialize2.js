@@ -146,7 +146,8 @@ var c_oSerProp_tblPrType = {
 	Style: 10,
 	tblpPr2: 11,
 	Layout: 12,
-	tblPrChange: 13
+	tblPrChange: 13,
+	TableCellSpacing: 14
 };
 var c_oSer_tblpPrType = {
     Page:0,
@@ -3367,6 +3368,10 @@ Binary_tblPrWriter.prototype =
         {
             this.bs.WriteItem(c_oSerProp_tblPrType.tblpPr2, function(){oThis.Write_tblpPr2(table);});
         }
+		if(null != tblPr.TableCellSpacing)
+		{
+			this.bs.WriteItem(c_oSerProp_tblPrType.TableCellSpacing, function(){oThis.memory.WriteDouble(tblPr.TableCellSpacing);});
+		}
     },
     WriteCellMar: function(cellMar)
     {
@@ -7361,6 +7366,10 @@ Binary_tblPrReader.prototype =
 				case ETblLayoutType.tbllayouttypeAutofit: Pr.TableLayout = tbllayout_AutoFit;break;
 				case ETblLayoutType.tbllayouttypeFixed: Pr.TableLayout = tbllayout_Fixed;break;
 			}
+		}
+		else if( c_oSerProp_tblPrType.TableCellSpacing === type )
+		{
+			Pr.TableCellSpacing = this.bcr.ReadDouble();
 		}
 		else if(null != table)
 		{
