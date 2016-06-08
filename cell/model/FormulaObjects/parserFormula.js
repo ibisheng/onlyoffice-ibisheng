@@ -4734,8 +4734,9 @@ parserFormula.prototype.buildDependencies = function(nameReParse, defName) {
     ref = this.outStack[i];
 
     if (ref.type == cElementType.table) {
-      nTo = ref.addDefinedNameNode(/*nameReParse*/);
-      this.wb.dependencyFormulas.addEdge2(node, nTo);
+      //nTo = ref.addDefinedNameNode(/*nameReParse*/);
+      //this.wb.dependencyFormulas.addEdge2(node, nTo);
+      // ToDo нет зависимости от имени таблицы. Проблемы будут, если сменить диапазон у таблицы. На ссылку в зависимостях это не повлияет..
       ref = ref.toRef();
     }
 
