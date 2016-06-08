@@ -2186,6 +2186,137 @@ function asc_ReadAutoFilter(s, p) {
 
     return filter;
 }
+function asc_ReadAutoFilterObj(s, p) {
+    var filter = new Asc.AutoFilterObj();
+    
+    var next = true;
+    while (next)
+    {
+        var _attr = s[p.pos++];
+        switch (_attr)
+        {
+            case 0:
+            {
+                filter.asc_setType(s[p.pos++]);
+                break;
+            }
+                
+            // TODO: color, top10,
+
+            case 255:
+            default:
+            {
+                next = false;
+                break;
+            }
+        }
+    }
+    
+    return filter;
+}
+function asc_ReadAutoFiltersOptionsElements(s, p) {
+    var filter = new AscCommonExcel.AutoFiltersOptionsElements();
+    
+    var next = true;
+    while (next)
+    {
+        var _attr = s[p.pos++];
+        switch (_attr)
+        {
+            case 0:
+            {
+                filter.asc_setIsDateFormat(s[p.pos++]);
+                break;
+            }
+            case 1:
+            {
+                filter.asc_setText(s[p.pos++]);
+                break;
+            }
+            case 2:
+            {
+                filter.asc_setVal(s[p.pos++]);
+                break;
+            }
+            case 3:
+            {
+                filter.asc_setVisible(s[p.pos++]);
+                break;
+            }
+            case 255:
+            default:
+            {
+                next = false;
+                break;
+            }
+        }
+    }
+    
+    return filter;
+}
+
+function asc_ReadAutoFiltersOptions(s, p) {
+    var filter = new Asc.AutoFiltersOptions();
+    
+    var next = true;
+    while (next)
+    {
+        var _attr = s[p.pos++];
+        switch (_attr)
+        {
+            case 0:
+            {
+                filter.asc_setCellId(s[p.pos++]);
+                break;
+            }
+            case 1:
+            {
+                filter.asc_setDiplayName(s[p.pos++]);
+                break;
+            }
+            case 2:
+            {
+                filter.asc_setIsTextFilter(s[p.pos++]);
+                break;
+            }
+            case 3:
+            {
+                filter.asc_setSortState(s[p.pos++]);
+                break;
+            }
+            case 4:
+            {
+                filter.asc_setSortColor(asc_menu_ReadColor(s, p));
+                break;
+            }
+            case 5:
+            {
+                filter.asc_setFilterObj(asc_ReadAutoFilterObj(s, p));
+                break;
+            }
+            case 6:
+            {
+                var values = [];
+                var count = s[p.pos++];
+                
+                for (var i = 0; i < count; ++i) {
+                    p.pos++;
+                    values.push(asc_ReadAutoFiltersOptionsElements(s,p));
+                }
+                
+                filter.asc_setValues(values);
+            }
+            case 255:
+            default:
+            {
+                next = false;
+                break;
+            }
+        }
+    }
+    
+    return filter;
+}
 
 function asc_WriteCBorder(i, c, s) {
     if (!c) return;
@@ -3726,7 +3857,6 @@ function OfflineEditor () {
         });
      
         _api.asc_registerCallback('asc_onSetAFDialog', function(state) {
-            console.log('asc_onSetAFDialog');
             var stream = global_memory_stream_menu;
             stream["ClearNoAttack"]();
             asc_WriteAutoFiltersOptions(state, stream);
@@ -6757,6 +6887,13 @@ function offline_apply_event(type,params) {
             
             _api.asc_changeAutoFilter(changeFilter.tableName, changeFilter.optionType, changeFilter.styleName);
             _api.wb.getWorksheet().handlers.trigger('selectionChanged', _api.wb.getWorksheet().getSelectionInfo());
+            break;
+        }
+        
+        case 3020: // ASC_SPREADSHEETS_EVENT_TYPE_AUTO_FILTER_APPLY
+        {
+            var autoFilter = asc_ReadAutoFiltersOptions(params, _current);
+            _api.asc_applyAutoFilter(autoFilter);
             break;
         }
 
