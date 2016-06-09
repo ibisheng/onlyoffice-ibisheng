@@ -240,7 +240,10 @@
 
 		onCompositionEnd : function(e)
 		{
-			this.onCompositionUpdate(e, false);
+			// chrome, linux: всегда приходит пустая дата
+			if (e.data !== undefined && (e.data !== "" || (this.compositionValue.length == 0)))
+				this.onCompositionUpdate(e, false);
+
 			this.Listener.Set_CursorPosInCompositeText(1000); // max
 
 			this.clear();
