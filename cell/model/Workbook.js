@@ -438,12 +438,12 @@ DependencyGraph.prototype = {
 			if(cwf)
 			{
 				if(!toAdd)
-					delete cwf.cells[sOldCellId];
+					delete cwf[sOldCellId];
 				if(!toDelete)
 				{
 					var cell = node.returnCell();
 					if ( cell && cell.formulaParsed )
-						cwf.cells[node.cellId] = node.cellId;
+						cwf[node.cellId] = node.cellId;
 				}
             }
         }
@@ -2098,16 +2098,16 @@ Workbook.prototype.copyWorksheet=function(index, insertBefore, sName, sId, bFrom
 
 		//для формул. создаем копию this.cwf[this.Id] для нового листа.
 		if ( this.cwf[wsFrom.getId()] ){
-			var cwf = { cells:{} };
+			var cwf = {};
 			var newSheetId = newSheet.getId();
 			var cwfFrom = this.cwf[wsFrom.getId()];
 			this.cwf[newSheetId] = cwf;
-			for( var id in cwfFrom.cells ){
-				cwf.cells[id] = cwfFrom.cells[id];
+			for( var id in cwfFrom ){
+				cwf[id] = cwfFrom[id];
 				this.needRecalc.nodes[getVertexId(newSheetId, id)] = [newSheetId, id];
 				this.needRecalc.length++;
 			}
-			newSheet._BuildDependencies(cwf.cells);
+			newSheet._BuildDependencies(cwf);
 		}
 		
 		if(!tableNames && newSheet.TableParts && newSheet.TableParts.length)
@@ -2145,7 +2145,7 @@ Workbook.prototype.insertWorksheet = function (index, sheet, cwf) {
 	this._insertTablePartsName(sheet);
 	//восстанавливаем список ячеек с формулами для sheet
 	this.cwf[sheet.getId()] = cwf;
-	sheet._BuildDependencies(cwf.cells);
+	sheet._BuildDependencies(cwf);
   this.sortDependency();
 };
 Workbook.prototype._insertTablePartsName = function (sheet) {
@@ -2737,7 +2737,7 @@ Workbook.prototype.buildDependency = function(){
 //	this.dependencyFormulas = null;
 //	this.dependencyFormulas = new DependencyGraph(this);
 	for(var i in this.cwf){
-		this.getWorksheetById(i)._BuildDependencies(this.cwf[i].cells);
+		this.getWorksheetById(i)._BuildDependencies(this.cwf[i]);
 	}
 };
 Workbook.prototype.recalcDependency = function(f,bad,notRecalc){
@@ -3443,7 +3443,7 @@ Woorksheet.prototype.copyDrawingObjects=function(oNewWs, wsFrom)
     }
 };
 Woorksheet.prototype.initPostOpen = function(handlers){
-	this.workbook.cwf[this.Id]={ cells:{} };
+	var cwf = this.workbook.cwf[this.Id]={};
 	if(this.aFormulaExt){
 		var formulaShared = {};
 		for(var i = 0; i < this.aFormulaExt.length; ++i){
@@ -3478,7 +3478,7 @@ Woorksheet.prototype.initPostOpen = function(handlers){
 									off.offsetRow *=-1;
 									formulaShared[oFormulaExt.si].fVal.changeOffset(off);
 								}
-								this.workbook.cwf[this.Id].cells[sCellId] = sCellId;
+								cwf[sCellId] = sCellId;
 							}
 						}
 					}
@@ -3499,7 +3499,7 @@ Woorksheet.prototype.initPostOpen = function(handlers){
 				Если ячейка содержит в себе формулу, то добавляем ее в список ячеек с формулами.
 			*/
 			if(oCell.sFormula){
-				this.workbook.cwf[this.Id].cells[sCellId] = sCellId;
+				cwf[sCellId] = sCellId;
 			}
 			/*
 				Строится список ячеек, которые необходимо пересчитать при открытии. Это ячейки имеющие атрибут f.ca или значение в которых неопределено.
@@ -3804,7 +3804,7 @@ Woorksheet.prototype.setName=function(name, bFromUndoRedo){
 
 		//перестраиваем формулы, если у них были ссылки на лист со старым именем.
 		for(var id in this.workbook.cwf) {
-			this.workbook.getWorksheetById(id)._ReBuildFormulas(this.workbook.cwf[id].cells,lastName,this.sName);
+			this.workbook.getWorksheetById(id)._ReBuildFormulas(this.workbook.cwf[id],lastName,this.sName);
 		}
 
         this.workbook.dependencyFormulas.relinkDefNameByWorksheet(lastName, name);
