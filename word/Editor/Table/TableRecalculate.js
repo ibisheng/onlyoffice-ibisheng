@@ -2160,7 +2160,7 @@ CTable.prototype.private_RecalculatePage = function(CurPage)
             this.RowsInfo[CurRow].Pages++;
         }
 
-        this.TableRowsBottom[CurRow][CurPage] = 0;
+        this.TableRowsBottom[CurRow][CurPage] = Y;
 
         var Row         = this.Content[CurRow];
         var CellsCount  = Row.Get_CellsCount();
@@ -2239,6 +2239,7 @@ CTable.prototype.private_RecalculatePage = function(CurPage)
         var MaxTopMargin = 0;
         var Merged_Cell  = [];
         var VerticallCells = [];
+        var bAllCellsVertical = true;
 
         for ( var CurCell = 0; CurCell < CellsCount; CurCell++ )
         {
@@ -2305,6 +2306,8 @@ CTable.prototype.private_RecalculatePage = function(CurPage)
                 continue;
             }
 
+            bAllCellsVertical = false;
+
             var bCanShift = false;
             var ShiftDy   = 0;
             var ShiftDx   = 0;
@@ -2368,9 +2371,14 @@ CTable.prototype.private_RecalculatePage = function(CurPage)
         if (undefined === this.TableRowsBottom[CurRow][CurPage])
             this.TableRowsBottom[CurRow][CurPage] = Y;
 
+
         var RowHValue = RowH.Value;
         // В данном значении не учитываются маргины
         RowHValue = RowH.Value + this.MaxBotMargin[CurRow] + MaxTopMargin;
+
+        // Если в строке все ячейки с вертикальным выравниванием
+        if (true === bAllCellsVertical && Asc.linerule_Auto === RowH.HRule)
+            this.TableRowsBottom[CurRow][CurPage] = Y + 4.5 + this.MaxBotMargin[CurRow] + MaxTopMargin;
 
         if ((Asc.linerule_AtLeast === RowH.HRule || Asc.linerule_Exact == RowH.HRule) && Y + RowHValue > Y_content_end && ((0 === CurRow && 0 === CurPage && (null !== this.Get_DocumentPrev() || true === this.Parent.Is_TableCellContent())) || CurRow != FirstRow))
         {
