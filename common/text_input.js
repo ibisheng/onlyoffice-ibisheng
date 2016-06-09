@@ -21,6 +21,7 @@
 		this.HtmlAreaOffset = 60;
 
 		this.Listener 	= null;
+		this.LockerTargetTimer = -1;
 
 		this.KeyDownFlag = false;
 	}
@@ -67,11 +68,8 @@
 			var oThis = this;
 			this.HtmlArea["onkeydown"] 	= function(e) { return oThis.onKeyDown(e); };
 			this.HtmlArea["onkeypress"] = function(e) { return oThis.onKeyPress(e); };
+			this.HtmlArea["onkeyup"] 	= function(e) { return oThis.onKeyUp(e); };
 			this.HtmlArea["oninput"] 	= function(e) { return oThis.onInput(e); };
-
-			//this.HtmlArea["oncompositionstart"] 	= function(e) { return oThis.onCompositionStart(e); };
-			//this.HtmlArea["oncompositionupdate"] 	= function(e) { return oThis.onCompositionUpdate(e); };
-			//this.HtmlArea["oncompositionend"] 	= function(e) { return oThis.onCompositionEnd(e); };
 
 			this.HtmlArea.addEventListener("compositionstart", function(e) { return oThis.onCompositionStart(e); }, false);
 			this.HtmlArea.addEventListener("compositionupdate", function(e) { return oThis.onCompositionUpdate(e); }, false);
@@ -79,9 +77,20 @@
 
 			this.Listener = this.Api.WordControl.m_oLogicDocument;
 
+			if (false)
+			{
+				// DEBUG_MODE
+				this.HtmlAreaOffset = 0;
+				this.HtmlArea.style.top = "0px";
+				this.HtmlArea.style.color = "black";
+				this.HtmlDiv.style.zIndex = 5;
+				this.HtmlDiv.style.width = "200px";
+			}
+
 			// TODO:
 			setInterval(function(){
-				oThis.HtmlArea.focus();
+				if (oThis.Api.asc_IsFocus())
+					oThis.HtmlArea.focus();
 			}, 10);
 		},
 
@@ -97,14 +106,20 @@
 
 		clear : function()
 		{
-			this.compositionValue = "";
+			this.compositionValue = [];
 			this.compositionState = c_oCompositionState.end;
 			this.HtmlArea.value = "";
 		},
 
 		onInput : function(e)
 		{
-			// none
+			if (AscCommon.AscBrowser.isMozilla)
+			{
+				if (c_oCompositionState.process == this.compositionState)
+				{
+					this.checkTargetPosition();
+				}
+			}
 		},
 
 		onKeyDown : function(e)
@@ -120,6 +135,48 @@
 			return this.Api.WordControl.onKeyPress(e);
 		},
 
+		onKeyUp : function(e)
+		{
+			if (c_oCompositionState.end == this.compositionState)
+				return this.Api.WordControl.onKeyUp(e);
+
+			if (AscCommon.AscBrowser.isChrome ||
+				AscCommon.AscBrowser.isSafari ||
+				AscCommon.AscBrowser.isIE)
+			{
+				this.checkTargetPosition();
+			}
+		},
+
+		checkTargetPosition : function()
+		{
+			var _offset = this.HtmlArea.selectionEnd;
+			_offset -= (this.HtmlArea.value.length - this.compositionValue.length);
+			this.Listener.Set_CursorPosInCompositeText(_offset);
+
+			this.unlockTarget();
+		},
+
+		lockTarget : function()
+		{
+			if (-1 != this.LockerTargetTimer)
+				clearTimeout(this.LockerTargetTimer);
+
+			this.Api.asc_LockTargetUpdate(true);
+
+			var oThis = this;
+			this.LockerTargetTimer = setTimeout(function(){ oThis.unlockTarget(); }, 1000);
+		},
+
+		unlockTarget : function()
+		{
+			if (-1 != this.LockerTargetTimer)
+				clearTimeout(this.LockerTargetTimer);
+			this.LockerTargetTimer = -1;
+
+			this.Api.asc_LockTargetUpdate(false);
+		},
+
 		onCompositionStart : function(e)
 		{
 			if (!this.Listener)
@@ -131,13 +188,34 @@
 
 		onCompositionUpdate : function(e)
 		{
+			var _old = this.compositionValue.splice(0);
 			this.checkCompositionData(e.data);
-			this.Listener.Replace_CompositeText(this.compositionValue);
+
+			var _isEqual = (_old.length == this.compositionValue.length);
+			if (_isEqual)
+			{
+				var _len = this.compositionValue.length;
+				for (var i = 0; i < _len; i++)
+				{
+					if (_old[i] != this.compositionValue[i])
+					{
+						_isEqual = false;
+						break;
+					}
+				}
+			}
+
+			this.lockTarget();
+			if (!_isEqual)
+				this.Listener.Replace_CompositeText(this.compositionValue);
+
 			this.compositionState = c_oCompositionState.process;
 		},
 
 		onCompositionEnd : function(e)
 		{
+			this.Listener.Set_CursorPosInCompositeText(1000); // max
+
 			this.clear();
 			this.Listener.End_CompositeInput();
 		},

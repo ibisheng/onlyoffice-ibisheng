@@ -117,6 +117,8 @@
 
 		this.pluginsManager = null;
 
+		this.isLockTargetUpdate = false;
+
 		return this;
 	}
 
@@ -226,6 +228,11 @@
 	// Copy/Past/Cut
 	baseEditorsApi.prototype.asc_IsFocus                     = function(bIsNaturalFocus)
 	{
+	};
+	// target pos
+	baseEditorsApi.prototype.asc_LockTargetUpdate		     = function(isLock)
+	{
+		this.isLockTargetUpdate = isLock;
 	};
 	// Просмотр PDF
 	baseEditorsApi.prototype.isPdfViewer                     = function()
