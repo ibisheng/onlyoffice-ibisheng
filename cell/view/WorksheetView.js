@@ -12449,6 +12449,7 @@
 
             ws.drawingCtx
                 .beginPath()
+                .moveTo(x + halfSize, y1)
                 .lineTo(x + halfSize, y1)
                 .lineTo(x, y1 + meanLine)
                 .lineTo(x  - halfSize, y1)
