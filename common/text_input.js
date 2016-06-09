@@ -24,6 +24,7 @@
 		this.LockerTargetTimer = -1;
 
 		this.KeyDownFlag = false;
+		this.TextInputAfterComposition = false;
 	}
 
 	CTextInput.prototype =
@@ -69,7 +70,8 @@
 			this.HtmlArea["onkeydown"] 	= function(e) { return oThis.onKeyDown(e); };
 			this.HtmlArea["onkeypress"] = function(e) { return oThis.onKeyPress(e); };
 			this.HtmlArea["onkeyup"] 	= function(e) { return oThis.onKeyUp(e); };
-			this.HtmlArea["oninput"] 	= function(e) { return oThis.onInput(e); };
+
+			this.HtmlArea.addEventListener("input", function(e) { return oThis.onInput(e); }, false);
 
 			this.HtmlArea.addEventListener("compositionstart", function(e) { return oThis.onCompositionStart(e); }, false);
 			this.HtmlArea.addEventListener("compositionupdate", function(e) { return oThis.onCompositionUpdate(e); }, false);
@@ -113,6 +115,9 @@
 
 		onInput : function(e)
 		{
+			if (!this.checkListener())
+				return;
+
 			if (AscCommon.AscBrowser.isMozilla)
 			{
 				if (c_oCompositionState.process == this.compositionState)
@@ -120,10 +125,27 @@
 					this.checkTargetPosition();
 				}
 			}
+
+			if (!this.KeyDownFlag && c_oCompositionState.end == this.compositionState && !this.TextInputAfterComposition && this.HtmlArea.value != "")
+			{
+				this.Listener.Begin_CompositeInput();
+				this.checkCompositionData(this.HtmlArea.value);
+				this.Listener.Replace_CompositeText(this.compositionValue);
+				this.Listener.End_CompositeInput();
+			}
+
+			this.TextInputAfterComposition = false;
+			if (c_oCompositionState.end == this.compositionState)
+				this.clear();
 		},
 
 		onKeyDown : function(e)
 		{
+			// некоторые рукописные вводы не присылают keyUp
+			var _code = e.keyCode;
+			if (_code != 8 && _code != 46)
+				this.KeyDownFlag = true;
+
 			return this.Api.WordControl.onKeyDown(e);
 		},
 
@@ -137,6 +159,8 @@
 
 		onKeyUp : function(e)
 		{
+			this.KeyDownFlag = false;
+
 			if (c_oCompositionState.end == this.compositionState)
 				return this.Api.WordControl.onKeyUp(e);
 
@@ -179,8 +203,8 @@
 
 		onCompositionStart : function(e)
 		{
-			if (!this.Listener)
-				this.Listener = this.Api.WordControl.m_oLogicDocument;
+			if (!this.checkListener())
+				return;
 
 			this.compositionState = c_oCompositionState.start;
 			this.Listener.Begin_CompositeInput();
@@ -221,6 +245,8 @@
 
 			this.clear();
 			this.Listener.End_CompositeInput();
+
+			this.TextInputAfterComposition = true;
 		},
 
 		checkCompositionData : function(data)
@@ -247,6 +273,13 @@
 					}
 				}
 			}
+		},
+
+		checkListener : function()
+		{
+			if (!this.Listener)
+				this.Listener = this.Api.WordControl.m_oLogicDocument;
+			return !!this.Listener;
 		}
 	};
 
