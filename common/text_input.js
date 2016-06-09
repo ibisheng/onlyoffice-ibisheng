@@ -94,11 +94,11 @@
 			}, 10);
 		},
 
-		move : function()
+		move : function(x, y)
 		{
 			var oTarget = document.getElementById(this.TargetId);
-			var xPos = parseInt(oTarget.style.left);
-			var yPos = parseInt(oTarget.style.top) + parseInt(oTarget.style.height);
+			var xPos = x ? x : parseInt(oTarget.style.left);
+			var yPos = (y ? y : parseInt(oTarget.style.top)) + parseInt(oTarget.style.height);
 
 			this.HtmlDiv.style.left = xPos + "px";
 			this.HtmlDiv.style.top = yPos + this.HtmlAreaOffset + "px"; // еще бы сдвинуться на высоту строки
@@ -186,7 +186,7 @@
 			this.Listener.Begin_CompositeInput();
 		},
 
-		onCompositionUpdate : function(e)
+		onCompositionUpdate : function(e, isLockTarget)
 		{
 			var _old = this.compositionValue.splice(0);
 			this.checkCompositionData(e.data);
@@ -205,7 +205,9 @@
 				}
 			}
 
-			this.lockTarget();
+			if (isLockTarget !== false)
+				this.lockTarget();
+
 			if (!_isEqual)
 				this.Listener.Replace_CompositeText(this.compositionValue);
 
@@ -214,6 +216,7 @@
 
 		onCompositionEnd : function(e)
 		{
+			this.onCompositionUpdate(e, false);
 			this.Listener.Set_CursorPosInCompositeText(1000); // max
 
 			this.clear();
