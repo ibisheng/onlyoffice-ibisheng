@@ -3057,144 +3057,148 @@ Workbook.prototype.getTableNameColumnByIndex = function(tableName, columnIndex){
     }
 	return res;
 };
-Workbook.prototype.updateSparklineCache = function(sheet, ranges) {
-  for (var i = 0; i < this.aWorksheets.length; ++i) {
-    this.aWorksheets[i].updateSparklineCache(sheet, ranges);
-  }
-};
-Workbook.prototype.lockDraw = function() {
-  ++this.lockCounter;
-};
-Workbook.prototype.unLockDraw = function() {
-  if (0 < this.lockCounter) {
-    --this.lockCounter;
-  }
-};
-Workbook.prototype.buildRecalc = function(notrec, bForce) {
-  var ws;
-  if (this.lockCounter > 0 && !bForce) {
-    return;
-  }
-  if (!bForce) {
-    for (var id in arrDefNameRecalc) {
-      arrDefNameRecalc[id].rebuild();
-    }
-    arrDefNameRecalc = {};
-  }
-  for (var id in arrRecalc) {
-    ws = this.getWorksheetById(id);
-    if (ws) {
-      var temp = arrRecalc[id];
-      var _rec = {};
-      for (var i = 0, length = temp.length; i < length; ++i) {
-        var cell = temp[i];
-        var cellId = g_oCellAddressUtils.getCellId(cell.nRow, cell.nCol);
-        _rec[cellId] = cellId;
-        this.needRecalc.nodes[getVertexId(id, cellId)] = [id, cellId];
-        this.needRecalc.length++;
-      }
-      ws._BuildDependencies(_rec);
-    }
-  }
-  arrRecalc = {};
-  if (!notrec) {
-    this.sortDependency();
-  }
-};
-Workbook.prototype.sortDependency = function(setCellFormat) {
-  this.buildRecalc(true);
+	Workbook.prototype.updateSparklineCache = function (sheet, ranges) {
+		for (var i = 0; i < this.aWorksheets.length; ++i) {
+			this.aWorksheets[i].updateSparklineCache(sheet, ranges);
+		}
+	};
+	Workbook.prototype.lockDraw = function () {
+		++this.lockCounter;
+	};
+	Workbook.prototype.unLockDraw = function () {
+		if (0 < this.lockCounter) {
+			--this.lockCounter;
+		}
+	};
+	Workbook.prototype.buildRecalc = function (notrec, bForce) {
+		var ws;
+		if (this.lockCounter > 0 && !bForce) {
+			return;
+		}
+		if (!bForce) {
+			for (var id in arrDefNameRecalc) {
+				arrDefNameRecalc[id].rebuild();
+			}
+			arrDefNameRecalc = {};
+		}
+		for (var id in arrRecalc) {
+			ws = this.getWorksheetById(id);
+			if (ws) {
+				var temp = arrRecalc[id];
+				var _rec = {};
+				for (var i = 0, length = temp.length; i < length; ++i) {
+					var cell = temp[i];
+					var cellId = g_oCellAddressUtils.getCellId(cell.nRow, cell.nCol);
+					_rec[cellId] = cellId;
+					this.needRecalc.nodes[getVertexId(id, cellId)] = [id, cellId];
+					this.needRecalc.length++;
+				}
+				ws._BuildDependencies(_rec);
+			}
+		}
+		arrRecalc = {};
+		if (!notrec) {
+			this.sortDependency();
+		}
+	};
+	Workbook.prototype.sortDependency = function (setCellFormat) {
+		this.buildRecalc(true);
 
-  var i;
-  var nR = this.needRecalc;
-  if (nR && (nR.length > 0)) {
-    var oCleanCellCacheArea = {};
-    var oNodeDependence = this.dependencyFormulas.getNodeDependence(nR.nodes);
-    for (i in oNodeDependence.oMasterNodes)
-      this._sortDependency(oNodeDependence.oMasterNodes[i], oNodeDependence, oNodeDependence.oMasterAreaNodes, false,
-        oCleanCellCacheArea, setCellFormat);
-    //те AreaNodes
-    var oCurMasterAreaNodes = oNodeDependence.oMasterAreaNodes;
-    while (true) {
-      var bEmpty = true;
-      var oNewMasterAreaNodes = {};
-      for (i in oCurMasterAreaNodes) {
-        bEmpty = false;
-        this._sortDependency(oCurMasterAreaNodes[i], oNodeDependence, oNewMasterAreaNodes, false, oCleanCellCacheArea,
-          setCellFormat);
-      }
-      oCurMasterAreaNodes = oNewMasterAreaNodes;
-      if (bEmpty) {
-        //все оставшиеся считаем как bad
-        //todo сделать как в Excel, которой определяет циклические ссылки на момент подсчета(пример A1=VLOOKUP(1,B1:D2,2),B2 = 1, D1=A1 - это не циклическая ссылка)
-        for (i in oNodeDependence.oMasterAreaNodesRestricted) {
-          this._sortDependency(oNodeDependence.oMasterAreaNodesRestricted[i].node, oNodeDependence, null, true,
-            oCleanCellCacheArea, setCellFormat);
-        }
-        break;
-      }
-    }
-    for (i in oCleanCellCacheArea)
-			this.handlers.trigger("cleanCellCache", i, oCleanCellCacheArea[i], AscCommonExcel.c_oAscCanChangeColWidth.none);
+		var i;
+		var nR = this.needRecalc;
+		if (nR && (nR.length > 0)) {
+			var oCleanCellCacheArea = {};
+			var oNodeDependence = this.dependencyFormulas.getNodeDependence(nR.nodes);
+			for (i in oNodeDependence.oMasterNodes) {
+				this._sortDependency(oNodeDependence.oMasterNodes[i], oNodeDependence, oNodeDependence.oMasterAreaNodes, false,
+					oCleanCellCacheArea, setCellFormat);
+			}
+			//те AreaNodes
+			var oCurMasterAreaNodes = oNodeDependence.oMasterAreaNodes;
+			while (true) {
+				var bEmpty = true;
+				var oNewMasterAreaNodes = {};
+				for (i in oCurMasterAreaNodes) {
+					bEmpty = false;
+					this._sortDependency(oCurMasterAreaNodes[i], oNodeDependence, oNewMasterAreaNodes, false, oCleanCellCacheArea,
+						setCellFormat);
+				}
+				oCurMasterAreaNodes = oNewMasterAreaNodes;
+				if (bEmpty) {
+					//все оставшиеся считаем как bad
+					//todo сделать как в Excel, которой определяет циклические ссылки на момент подсчета(пример A1=VLOOKUP(1,B1:D2,2),B2 = 1, D1=A1 - это не циклическая ссылка)
+					for (i in oNodeDependence.oMasterAreaNodesRestricted) {
+						this._sortDependency(oNodeDependence.oMasterAreaNodesRestricted[i].node, oNodeDependence, null, true,
+							oCleanCellCacheArea, setCellFormat);
+					}
+					break;
+				}
+			}
+			for (i in oCleanCellCacheArea) {
+				this.handlers.trigger("cleanCellCache", i, oCleanCellCacheArea[i], AscCommonExcel.c_oAscCanChangeColWidth.none);
+			}
 
-    AscCommonExcel.g_oVLOOKUPCache.clean();
-    AscCommonExcel.g_oHLOOKUPCache.clean();
-  }
-  this.needRecalc = {nodes: {}, length: 0};
-};
-Workbook.prototype._sortDependency = function(node, oNodeDependence, oNewMasterAreaNodes, bBad, oCleanCellCacheArea, setCellFormat) {
-  if (node) {
-    var oWeightMapElem = oNodeDependence.oWeightMap[node.nodeId];
-    if (oWeightMapElem) {
-      oWeightMapElem.cur++;
-      if (oWeightMapElem.cur == oWeightMapElem.max && !oWeightMapElem.gray) {
-        if (null != oNewMasterAreaNodes) {
-          var oNodeToAreaElement = oNodeDependence.oNodeToArea[node.nodeId];
-          if (oNodeToAreaElement) {
-            for (var i = 0, length = oNodeToAreaElement.length; i < length; ++i) {
-              var elem = oNodeToAreaElement[i];
-              elem.cur++;
-              if (elem.cur == elem.max) {
-                oNewMasterAreaNodes[elem.node.nodeId] = elem.node;
-                delete oNodeDependence.oMasterAreaNodesRestricted[elem.node.nodeId];
-              }
-            }
-          }
-        }
-        var bCurBad = oWeightMapElem.bad || bBad;
-        if (node.isDefinedName) {
-          //todo
-          //Обрабатываем тут все, что было сделано с именованной ссылкой: переименована;
-          //перемещен диапазон; сдвиг/удаление ячеек, приведшие к сдвигу ячеек; удаление именованного диапазона.
-          //
-          //        var ws = this.getWorksheetById( node.sheetId );
-          //        ws._ReBuildFormulas
-          //        ws._RecalculatedFunctions(node.cellId, bCurBad, setCellFormat);
-        } else {
-          //пересчитываем функцию
-          var ws = this.getWorksheetById(node.sheetId);
-          ws._RecalculatedFunctions(node.cellId, bCurBad, setCellFormat);
-          //запоминаем области для удаления cache
-          var sheetArea = oCleanCellCacheArea[node.sheetId];
-          if (null == sheetArea) {
-            sheetArea = {};
-            oCleanCellCacheArea[node.sheetId] = sheetArea;
-          }
-          if (!node.isArea) {
-            sheetArea[node.cellId] = node.getBBox();
-          }
-        }
-        //обрабатываем child
-        oWeightMapElem.gray = true;
-        var oSlaveNodes = node.getSlaveEdges();
-        if (oSlaveNodes) {
-          for (var i in oSlaveNodes)
-            this._sortDependency(oSlaveNodes[i], oNodeDependence, oNewMasterAreaNodes, bBad, oCleanCellCacheArea);
-        }
-        oWeightMapElem.gray = false;
-      }
-    }
-  }
-};
+			AscCommonExcel.g_oVLOOKUPCache.clean();
+			AscCommonExcel.g_oHLOOKUPCache.clean();
+		}
+		this.needRecalc = {nodes: {}, length: 0};
+	};
+	Workbook.prototype._sortDependency =
+		function (node, oNodeDependence, oNewMasterAreaNodes, bBad, oCleanCellCacheArea, setCellFormat) {
+			if (node) {
+				var oWeightMapElem = oNodeDependence.oWeightMap[node.nodeId];
+				if (oWeightMapElem) {
+					oWeightMapElem.cur++;
+					if (oWeightMapElem.cur == oWeightMapElem.max && !oWeightMapElem.gray) {
+						if (null != oNewMasterAreaNodes) {
+							var oNodeToAreaElement = oNodeDependence.oNodeToArea[node.nodeId];
+							if (oNodeToAreaElement) {
+								for (var i = 0, length = oNodeToAreaElement.length; i < length; ++i) {
+									var elem = oNodeToAreaElement[i];
+									elem.cur++;
+									if (elem.cur == elem.max) {
+										oNewMasterAreaNodes[elem.node.nodeId] = elem.node;
+										delete oNodeDependence.oMasterAreaNodesRestricted[elem.node.nodeId];
+									}
+								}
+							}
+						}
+						var bCurBad = oWeightMapElem.bad || bBad;
+						if (node.isDefinedName) {
+							//todo
+							//Обрабатываем тут все, что было сделано с именованной ссылкой: переименована;
+							//перемещен диапазон; сдвиг/удаление ячеек, приведшие к сдвигу ячеек; удаление именованного диапазона.
+							//
+							//        var ws = this.getWorksheetById( node.sheetId );
+							//        ws._ReBuildFormulas
+							//        ws._RecalculatedFunctions(node.cellId, bCurBad, setCellFormat);
+						} else {
+							//пересчитываем функцию
+							var ws = this.getWorksheetById(node.sheetId);
+							ws._RecalculatedFunctions(node.cellId, bCurBad, setCellFormat);
+							//запоминаем области для удаления cache
+							var sheetArea = oCleanCellCacheArea[node.sheetId];
+							if (null == sheetArea) {
+								sheetArea = {};
+								oCleanCellCacheArea[node.sheetId] = sheetArea;
+							}
+							if (!node.isArea) {
+								sheetArea[node.cellId] = node.getBBox();
+							}
+						}
+						//обрабатываем child
+						oWeightMapElem.gray = true;
+						var oSlaveNodes = node.getSlaveEdges();
+						if (oSlaveNodes) {
+							for (var i in oSlaveNodes) {
+								this._sortDependency(oSlaveNodes[i], oNodeDependence, oNewMasterAreaNodes, bBad, oCleanCellCacheArea);
+							}
+						}
+						oWeightMapElem.gray = false;
+					}
+				}
+			}
+		};
 //-------------------------------------------------------------------------------------------------
 /**
  * @constructor
