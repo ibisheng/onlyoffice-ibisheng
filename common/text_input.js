@@ -25,6 +25,8 @@
 
 		this.KeyDownFlag = false;
 		this.TextInputAfterComposition = false;
+
+		this.IsLockTargetMode = false;
 	}
 
 	CTextInput.prototype =
@@ -79,15 +81,7 @@
 
 			this.Listener = this.Api.WordControl.m_oLogicDocument;
 
-			if (false)
-			{
-				// DEBUG_MODE
-				this.HtmlAreaOffset = 0;
-				this.HtmlArea.style.top = "0px";
-				this.HtmlArea.style.color = "black";
-				this.HtmlDiv.style.zIndex = 5;
-				this.HtmlDiv.style.width = "200px";
-			}
+			this.show(false);
 
 			// TODO:
 			setInterval(function(){
@@ -111,6 +105,19 @@
 			this.compositionValue = [];
 			this.compositionState = c_oCompositionState.end;
 			this.HtmlArea.value = "";
+		},
+
+		show : function(isShow)
+		{
+			if (isShow)
+			{
+				// DEBUG_MODE
+				this.HtmlAreaOffset = 0;
+				this.HtmlArea.style.top = "0px";
+				this.HtmlArea.style.color = "black";
+				this.HtmlDiv.style.zIndex = 5;
+				this.HtmlDiv.style.width = "200px";
+			}
 		},
 
 		onInput : function(e)
@@ -183,6 +190,9 @@
 
 		lockTarget : function()
 		{
+			if (!this.IsLockTargetMode)
+				return;
+
 			if (-1 != this.LockerTargetTimer)
 				clearTimeout(this.LockerTargetTimer);
 
@@ -194,6 +204,9 @@
 
 		unlockTarget : function()
 		{
+			if (!this.IsLockTargetMode)
+				return;
+
 			if (-1 != this.LockerTargetTimer)
 				clearTimeout(this.LockerTargetTimer);
 			this.LockerTargetTimer = -1;
@@ -215,7 +228,8 @@
 			var _old = this.compositionValue.splice(0);
 			this.checkCompositionData(e.data);
 
-			var _isEqual = (_old.length == this.compositionValue.length);
+			var _isEqualLen = (_old.length == this.compositionValue.length);
+			var _isEqual = _isEqualLen;
 			if (_isEqual)
 			{
 				var _len = this.compositionValue.length;
@@ -232,8 +246,23 @@
 			if (isLockTarget !== false)
 				this.lockTarget();
 
+			var _isNeedSavePos = !this.IsLockTargetMode;
 			if (!_isEqual)
+			{
+				var _old = 0;
+				var _max = 0;
+				if (_isNeedSavePos)
+				{
+					_old = this.Listener.Get_CursorPosInCompositeText();
+					_max = this.Listener.Get_MaxCursorPosInCompositeText();
+				}
 				this.Listener.Replace_CompositeText(this.compositionValue);
+				if (_isNeedSavePos)
+				{
+					if (_old != _max)
+						this.Listener.Set_CursorPosInCompositeText(_old);
+				}
+			}
 
 			this.compositionState = c_oCompositionState.process;
 		},
@@ -249,6 +278,7 @@
 			this.clear();
 			this.Listener.End_CompositeInput();
 
+			this.unlockTarget();
 			this.TextInputAfterComposition = true;
 		},
 
