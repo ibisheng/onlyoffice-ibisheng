@@ -3463,7 +3463,7 @@ Woorksheet.prototype.initPostOpen = function(handlers){
 				} else {
 					var fs = formulaShared[oFormulaExt.si];
 					if (fs && fs.fRef.contains(oCell.nCol, oCell.nRow)) {
-						if (false && fs.fVal.isParsed) {
+						if (fs.fVal.isParsed) {
 							var off = oCell.getOffset3(fs.fRef.c1, fs.fRef.r1);
 							fs.fVal.changeOffset(off);
 							oFormulaExt.v = fs.fVal.assemble();
