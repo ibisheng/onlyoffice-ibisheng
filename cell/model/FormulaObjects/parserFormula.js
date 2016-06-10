@@ -4301,70 +4301,71 @@ parserFormula.prototype.getRef = function() {
   return aOutRef;
 };
 
-/* Для обратной сборки функции иногда необходимо поменять ссылки на ячейки */
-parserFormula.prototype.changeOffset = function(offset) {//offset = {offsetCol:intNumber, offsetRow:intNumber}
-  for (var i = 0; i < this.outStack.length; i++) {
-    if (this.outStack[i] instanceof cRef || this.outStack[i] instanceof cRef3D || this.outStack[i] instanceof cArea) {
+	/* Для обратной сборки функции иногда необходимо поменять ссылки на ячейки */
+	parserFormula.prototype.changeOffset = function (offset) {//offset = AscCommonExcel.CRangeOffset
+		var elem, r, a, b;
+		for (var i = 0; i < this.outStack.length; i++) {
+			elem = this.outStack[i];
+			if (cElementType.cell === elem.type || cElementType.cell3D === elem.type ||
+				cElementType.cellsRange === elem.type) {
 
-      var r = this.outStack[i].getRange();
-        if (!r) {
-          break;
-        }
+				r = elem.getRange();
+				if (!r) {
+					break;
+				}
 
-      if (this.outStack[i].isAbsolute) {
-        this._changeOffsetHelper(this.outStack[i], offset);
-        } else {
-        var a, b;
-          if (this.outStack[i] instanceof cArea &&
-            (r.isColumn() && offset.offsetRow != 0 || r.isRow() && offset.offsetCol != 0)) {
-          continue;
-        }
-        r.setOffset(offset);
-        if (r.isColumn()) {
-          a = r.first.getColLetter();
-          b = r.last.getColLetter();
-        } else if (r.isRow()) {
-          a = r.first.getRow();
-          b = r.last.getRow();
-        } else {
-          a = r.first.getID();
-          b = r.last.getID();
-        }
+				if (elem.isAbsolute) {
+					this._changeOffsetHelper(elem, offset);
+				} else {
+					if (cElementType.cellsRange === elem.type && (r.isColumn() && offset.offsetRow != 0 || r.isRow() && offset.offsetCol != 0)) {
+						continue;
+					}
+					r.setOffset(offset);
+					if (r.isColumn()) {
+						a = r.first.getColLetter();
+						b = r.last.getColLetter();
+					} else if (r.isRow()) {
+						a = r.first.getRow();
+						b = r.last.getRow();
+					} else {
+						a = r.first.getID();
+						b = r.last.getID();
+					}
 
 
-        if (a != b || this.outStack[i] instanceof cArea) {
-          this.outStack[i].value = this.outStack[i]._cells = a + ":" + b;
-          } else {
-            this.outStack[i].value = this.outStack[i]._cells = a;
-        }
-      }
-      continue;
-    }
-    if (this.outStack[i] instanceof cArea3D) {
-      var r = this.outStack[i]._cells.indexOf(":") > -1 ? (new cArea(this.outStack[i]._cells, this.ws)) :
-        (new cRef(this.outStack[i]._cells, this.ws));
-      var _r = r.getRange();
+					if (a != b || cElementType.cellsRange === elem.type) {
+						elem.value = elem._cells = a + ":" + b;
+					} else {
+						elem.value = elem._cells = a;
+					}
+				}
+				continue;
+			}
+			if (cElementType.cellsRange3D === elem.type) {
+				r = elem._cells.indexOf(":") > -1 ? (new cArea(elem._cells, this.ws)) : (new cRef(elem._cells, this.ws));
+				var _r = r.getRange();
 
-      if (!_r) {
-        break;
-      }
+				if (!_r) {
+					break;
+				}
 
-      if (this.outStack[i].isAbsolute) {
-        this._changeOffsetHelper(r, offset);
-      } else {
-        _r.setOffset(offset);
-          var a = _r.first.getID(), b = _r.last.getID();
-          if (a != b) {
-          r.value = r._cells = a + ":" + b;
-        } else {
-          r.value = r._cells = a;
-        }
-      }
-      this.outStack[i]._cells = r._cells;
-    }
-  }
-  return this;
-};
+				if (elem.isAbsolute) {
+					this._changeOffsetHelper(r, offset);
+				} else {
+					_r.setOffset(offset);
+					a = _r.first.getID();
+					b = _r.last.getID();
+					if (a != b) {
+						r.value = r._cells = a + ":" + b;
+					} else {
+						r.value = r._cells = a;
+					}
+				}
+				elem._cells = r._cells;
+			}
+		}
+		return this;
+	};
 
 parserFormula.prototype.setRefError = function(node) {
   //когда выставляется setRefError node не сдвигаются, поэтому node.cellId совпадает с elem._cells
@@ -4469,33 +4470,34 @@ parserFormula.prototype.changeSheet = function(lastName, newName) {
   return this;
 };
 
-/* Сборка функции в инфиксную форму */
-parserFormula.prototype.assemble = function(rFormula) {
-  if (!rFormula && this.outStack.length == 1 && this.outStack[this.outStack.length - 1] instanceof cError) {
-    return this.Formula;
-  }
-    var currentElement = null, _count = this.outStack.length, elemArr = new Array(_count), res = undefined, _count_arg;
-  for (var i = 0, j = 0; i < _count; i++, j++) {
-    currentElement = this.outStack[i];
-    if (currentElement.type == cElementType.operator || currentElement.type == cElementType.func) {
-      _count_arg = currentElement.getArguments();
-      res = currentElement.Assemble2(elemArr, j - _count_arg, _count_arg);
-      j -= _count_arg;
-      elemArr[j] = res;
-      } else {
-      if (currentElement instanceof cString) {
-        currentElement = new cString("\"" + currentElement.toString() + "\"");
-      }
-      res = currentElement;
-      elemArr[j] = res;
-    }
-  }
-  if (res != undefined && res != null) {
-    return res.toString();
-    } else {
-    return this.Formula;
-  }
-};
+	/* Сборка функции в инфиксную форму */
+	parserFormula.prototype.assemble = function (rFormula) {
+		if (!rFormula && this.outStack.length == 1 && this.outStack[this.outStack.length - 1] instanceof cError) {
+			return this.Formula;
+		}
+		var currentElement = null, _count = this.outStack.length, elemArr = new Array(_count), res = undefined, _count_arg;
+		for (var i = 0, j = 0; i < _count; i++, j++) {
+			currentElement = this.outStack[i];
+			if (cElementType.operator === currentElement.type || cElementType.func === currentElement.type) {
+				_count_arg = currentElement.getArguments();
+				res = currentElement.Assemble2(elemArr, j - _count_arg, _count_arg);
+				j -= _count_arg;
+				elemArr[j] = res;
+			} else {
+				if (cElementType.string === currentElement.type) {
+					currentElement = new cString("\"" + currentElement.toString() + "\"");
+				}
+				res = currentElement;
+				elemArr[j] = res;
+			}
+		}
+
+		if (res != undefined && res != null) {
+			return res.toString();
+		} else {
+			return this.Formula;
+		}
+	};
 
 /* Сборка функции в инфиксную форму */
 parserFormula.prototype.assembleLocale = function(locale, digitDelim) {
