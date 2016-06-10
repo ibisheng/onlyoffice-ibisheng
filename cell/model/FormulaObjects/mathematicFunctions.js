@@ -3900,7 +3900,7 @@ cSQRTPI.prototype.getInfo = function () {
         var element, _arg, arg0 = new cNumber(0);
         for (var i = 0; i < arg.length; i++) {
             element = arg[i];
-            if (cElementType.cellsRange === element.type || cElementType.cellsRange3D === element) {
+            if (cElementType.cellsRange === element.type || cElementType.cellsRange3D === element.type) {
                 var _arrVal = element.getValue();
                 for (var j = 0; j < _arrVal.length; j++) {
                     if (cElementType.bool !== _arrVal[j].type && cElementType.string !== _arrVal[j].type) {
