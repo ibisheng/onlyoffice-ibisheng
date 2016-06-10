@@ -1527,12 +1527,12 @@ parserHelper.prototype.parse3DRef = function ( formula ) {
 		var indexStartRange = formula.indexOf( "!" ) + 1;
 		if ( this.isArea( formula, indexStartRange ) ) {
 			if ( this.operand_str.length == formula.substring( indexStartRange ).length )
-				return {sheet:sheetName, range:this.operand_str};
+				return {sheet:sheetName, sheet2:is3DRefResult[2], range:this.operand_str};
 			else
 				return null;
 		} else if ( this.isRef( formula, indexStartRange ) ) {
 			if ( this.operand_str.length == formula.substring( indexStartRange ).length )
-				return {sheet:sheetName, range:this.operand_str};
+				return {sheet:sheetName, sheet2:is3DRefResult[2], range:this.operand_str};
 			else
 				return null;
 		}
