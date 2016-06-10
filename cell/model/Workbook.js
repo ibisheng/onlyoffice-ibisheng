@@ -6166,7 +6166,7 @@ Cell.prototype.moveVer=function(val){
 	this.nRow += val;
 };
 Cell.prototype.getOffset=function(cell){
-	return this.getOffset3(cell.nCol - 1, cell.nRow - 1);
+	return this.getOffset3(cell.nCol + 1, cell.nRow + 1);
 };
 Cell.prototype.getOffset2=function(cellId){
 	var cAddr2 = new CellAddress(cellId);
