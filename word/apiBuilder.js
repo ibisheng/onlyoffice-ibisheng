@@ -4173,7 +4173,7 @@
     ApiTableCellPr.prototype["SetNoWrap"]            = ApiTableCellPr.prototype.SetNoWrap;
 
     ApiTableStylePr.prototype["GetClassType"]        = ApiTableStylePr.prototype.GetClassType;
-    ApiTableStylePr.prototype["GetType "]            = ApiTableStylePr.prototype.GetType;
+    ApiTableStylePr.prototype["GetType"]             = ApiTableStylePr.prototype.GetType;
     ApiTableStylePr.prototype["GetTextPr"]           = ApiTableStylePr.prototype.GetTextPr;
     ApiTableStylePr.prototype["GetParaPr"]           = ApiTableStylePr.prototype.GetParaPr;
     ApiTableStylePr.prototype["GetTablePr"]          = ApiTableStylePr.prototype.GetTablePr;
