@@ -25,6 +25,13 @@ function CFootnotesController(LogicDocument)
 	this.ContinuationSeparatorFootnote = null;
 	this.SeparatorFootnote             = null;
 
+	this.Selection = {
+		Use      : false,
+		Footnotes : []
+	};
+
+	this.CurFootnote = null;
+
 	// Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
 	LogicDocument.Get_TableId().Add(this, this.Id);
 }
@@ -45,6 +52,10 @@ CFootnotesController.prototype.Init = function()
 {
 	this.SeparatorFootnote = new CFootEndnote(this);
 	this.SeparatorFootnote.Paragraph_Add(new ParaSeparator(), false);
+	this.SeparatorFootnote.Paragraph_Add(new ParaText("1"), false);
+	this.SeparatorFootnote.Paragraph_Add(new ParaText("2"), false);
+	this.SeparatorFootnote.Paragraph_Add(new ParaText("3"), false);
+
 	var oParagraph = this.SeparatorFootnote.Get_ElementByIndex(0);
 	oParagraph.Set_Spacing({After : 0, Line : 1, LineRule : Asc.linerule_Auto}, false);
 };
@@ -220,6 +231,12 @@ CFootnotesController.prototype.Is_EmptyPage = function(nPageIndex)
 		return true;
 
 	return false;
+};
+
+CFootnotesController.prototype.RecalculateCurPos = function()
+{
+	if (null !== this.CurFootnote)
+		this.CurFootnote.RecalculateCurPos();
 };
 
 function CFootEndnotePage()

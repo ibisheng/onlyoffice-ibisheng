@@ -11,10 +11,17 @@
  * @constructor
  * @extends {CDocumentControllerBase}
  */
-function CDrawingsController(LogicDocument)
+function CDrawingsController(LogicDocument, DrawingsObjects)
 {
 	CDrawingsController.superclass.constructor.call(this, LogicDocument);
+
+	this.DrawingObjects = DrawingsObjects;
 }
 AscCommon.extendClass(CDrawingsController, CDocumentControllerBase);
+
+CDrawingsController.prototype.RecalculateCurPos = function()
+{
+	this.DrawingObjects.recalculateCurPos();
+};
 
 

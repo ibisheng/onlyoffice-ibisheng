@@ -212,7 +212,7 @@ CHeaderFooter.prototype =
         {
             this.RecalcInfo.CurPage = Page_abs;
             
-            if ( docpostype_HdrFtr === this.LogicDocument.CurPos.Type )
+            if ( docpostype_HdrFtr === this.LogicDocument.Get_DocPosType() )
             {
                 // Обновляем интерфейс, чтобы обновить настройки колонтитула, т.к. мы могли попасть в новую секцию
                 this.LogicDocument.Document_UpdateSelectionState();
@@ -289,8 +289,8 @@ CHeaderFooter.prototype =
         if (-1 === PageIndex)
             this.RecalcInfo.CurPage = -1;
 
-        var OldDocPosType = this.LogicDocument.CurPos.Type;
-        this.LogicDocument.CurPos.Type = docpostype_HdrFtr;
+        var OldDocPosType = this.LogicDocument.Get_DocPosType();
+        this.LogicDocument.Set_DocPosType(docpostype_HdrFtr);
 
         if (true === bUpdateStates && -1 !== PageIndex)
         {
@@ -310,7 +310,7 @@ CHeaderFooter.prototype =
 
     Is_ThisElementCurrent : function()
     {
-        if ( this === this.Parent.CurHdrFtr && docpostype_HdrFtr === this.LogicDocument.CurPos.Type )
+        if (this === this.Parent.CurHdrFtr && docpostype_HdrFtr === this.LogicDocument.Get_DocPosType())
             return true;
 
         return false;
@@ -903,7 +903,7 @@ CHeaderFooter.prototype =
 
         if ( true === editor.isStartAddShape )
         {
-            this.Content.CurPos.Type = docpostype_DrawingObjects;
+            this.Content.Set_DocPosType(docpostype_DrawingObjects);
             this.Content.Selection.Use   = true;
             this.Content.Selection.Start = true;
 
@@ -2090,9 +2090,9 @@ CHeaderFooterController.prototype =
                 if ( false === editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_HdrFtr) )
                 {
                     // Меняем старый режим редактирования, чтобы при Undo/Redo возвращаться в режим редактирования документа
-                    this.LogicDocument.CurPos.Type = docpostype_Content;
+                    this.LogicDocument.Set_DocPosType(docpostype_Content);
                     History.Create_NewPoint(AscDFH.historydescription_Document_AddHeader);
-                    this.LogicDocument.CurPos.Type = docpostype_HdrFtr;
+                    this.LogicDocument.Set_DocPosType(docpostype_HdrFtr);
                     HdrFtr = this.LogicDocument.Create_SectionHdrFtr( hdrftr_Header, PageIndex );
                     this.LogicDocument.Recalculate();
                 }
@@ -2109,9 +2109,9 @@ CHeaderFooterController.prototype =
                 if ( false === editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_HdrFtr) )
                 {
                     // Меняем старый режим редактирования, чтобы при Undo/Redo возвращаться в режим редактирования документа
-                    this.LogicDocument.CurPos.Type = docpostype_Content;
+                    this.LogicDocument.Set_DocPosType(docpostype_Content);
                     History.Create_NewPoint(AscDFH.historydescription_Document_AddFooter);
-                    this.LogicDocument.CurPos.Type = docpostype_HdrFtr;
+                    this.LogicDocument.Set_DocPosType(docpostype_HdrFtr);
                     HdrFtr = this.LogicDocument.Create_SectionHdrFtr( hdrftr_Footer, PageIndex );
                     this.LogicDocument.Recalculate();
                 }
@@ -2173,7 +2173,7 @@ CHeaderFooterController.prototype =
             // не может быть разбит на несколько страниц
             var ResY = Y;
 
-            if ( docpostype_DrawingObjects != this.CurHdrFtr.Content.CurPos.Type )
+            if (docpostype_DrawingObjects != this.CurHdrFtr.Content.Get_DocPosType())
             {
                 if ( PageIndex > this.CurPage )
                     ResY = this.LogicDocument.Get_PageLimits(this.CurPage).YLimit + 10;

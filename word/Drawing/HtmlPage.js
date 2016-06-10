@@ -3989,7 +3989,7 @@ function CEditorPage(api)
         {
             if (false === drDoc.IsFreezePage(drDoc.m_lCurrentPage))
             {
-                this.m_oLogicDocument.CurPos.Type = docpostype_Content;
+                this.m_oLogicDocument.Set_DocPosType(docpostype_Content);
                 this.m_oLogicDocument.Set_CurPage( drDoc.m_lCurrentPage );
                 this.m_oLogicDocument.Cursor_MoveAt(0, 0, false);
                 this.m_oLogicDocument.RecalculateCurPos();

@@ -12,13 +12,18 @@
 /**
  * Специальный класс-обработчик команд в колонтитулах
  * @param {CDocument} LogicDocument - Ссылка на главный документ.
+ * @param {CHeaderFooterController} HdrFtr - ССылка на объект, управляющий колонтитулами
  * @constructor
  * @extends {CDocumentControllerBase}
  */
-function CHdrFtrController(LogicDocument)
+function CHdrFtrController(LogicDocument, HdrFtr)
 {
 	CHdrFtrController.superclass.constructor.call(this, LogicDocument);
-
-
+	this.HdrFtr = HdrFtr;
 }
 AscCommon.extendClass(CHdrFtrController, CDocumentControllerBase);
+
+CHdrFtrController.prototype.RecalculateCurPos = function()
+{
+	this.HdrFtr.RecalculateCurPos();
+};

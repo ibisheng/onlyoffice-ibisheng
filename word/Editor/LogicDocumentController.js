@@ -17,4 +17,9 @@ function CLogicDocumentController(LogicDocument)
 }
 AscCommon.extendClass(CLogicDocumentController, CDocumentControllerBase);
 
+CLogicDocumentController.prototype.RecalculateCurPos = function()
+{
+	this.LogicDocument.controller_RecalculateCurPos();
+};
+
 
