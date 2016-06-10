@@ -37,6 +37,7 @@ var Y_Bottom_Field = Page_Height - Y_Bottom_Margin;
 var docpostype_Content        = 0x00;
 var docpostype_HdrFtr         = 0x02;
 var docpostype_DrawingObjects = 0x03;
+var docpostype_Footnotes      = 0x04;
 
 var selectionflag_Common        = 0x000;
 var selectionflag_Numbering     = 0x001;
@@ -1319,7 +1320,10 @@ function CDocument(DrawingDocument, isMainLogicDocument)
         Type       : docpostype_Content
     };
 
-    this.Selection =
+	// HdrFtr, Footnotes, Drawings, CDocument
+	this.Controller = null;
+
+	this.Selection =
     {
         Start    : false,
         Use      : false,
@@ -16976,6 +16980,33 @@ CDocument.prototype.End_CompositeInput = function()
 	this.DrawingDocument.ClearCachePages();
 	this.DrawingDocument.FirePaint();
 };
+CDocument.prototype.Get_MaxCursorPosInCompositeText = function()
+{
+	if (null === this.CompositeInput)
+		return 0;
+
+	return this.CompositeInput.Length;
+};
+//----------------------------------------------------------------------------------------------------------------------
+// Функции для работы со сносками
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Переходим к редактированию сносок на заданной странице. Если сносок на заданной странице нет, тогда ничего не делаем.
+ * @param {number} nPageIndex
+ * @returns {boolean}
+ */
+CDocument.prototype.Goto_FootnotesOnPage = function(nPageIndex)
+{
+	if (!this.Footnotes.Is_EmptyPage(nPageIndex))
+		return false;
+
+	this.CurPos.Type = docpostype_Footnotes;
+	this.Controller  = this.Footnotes;
+
+
+	return true;
+};
+
 //----------------------------------------------------------------------------------------------------------------------
 //
 //----------------------------------------------------------------------------------------------------------------------
