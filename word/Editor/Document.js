@@ -11502,37 +11502,37 @@ CDocument.prototype.OnKeyDown               = function(e)
         bRetValue        = keydownresult_PreventAll;
     }
     // --> TEST
-    else if (113 === e.KeyCode)
-    {
-        this.History.Create_NewPoint();
-        var oFootnote = this.Footnotes.Create_Footnote();
-
-        oFootnote.Paragraph_Add(new ParaFootnoteRef(oFootnote));
-        oFootnote.Paragraph_Add(new ParaSpace());
-        oFootnote.Paragraph_Add(new ParaText("F"));
-        oFootnote.Paragraph_Add(new ParaText("o"));
-        oFootnote.Paragraph_Add(new ParaText("o"));
-        oFootnote.Paragraph_Add(new ParaText("t"));
-        oFootnote.Paragraph_Add(new ParaText("n"));
-        oFootnote.Paragraph_Add(new ParaText("o"));
-        oFootnote.Paragraph_Add(new ParaText("t"));
-        oFootnote.Paragraph_Add(new ParaText("e"));
-
-        this.Paragraph_Add(new ParaFootnoteReference(oFootnote));
-        bRetValue = keydownresult_PreventAll;
-    }
-    else if (114 === e.KeyCode)
-    {
-        this.History.Create_NewPoint();
-        this.Paragraph_Add(new ParaSeparator());
-        bRetValue = keydownresult_PreventAll;
-    }
-    else if (115 === e.KeyCode)
-    {
-        this.History.Create_NewPoint();
-        this.Paragraph_Add(new ParaContinuationSeparator());
-        bRetValue = keydownresult_PreventAll;
-    }
+    // else if (113 === e.KeyCode)
+    // {
+    //     this.History.Create_NewPoint();
+    //     var oFootnote = this.Footnotes.Create_Footnote();
+	//
+    //     oFootnote.Paragraph_Add(new ParaFootnoteRef(oFootnote));
+    //     oFootnote.Paragraph_Add(new ParaSpace());
+    //     oFootnote.Paragraph_Add(new ParaText("F"));
+    //     oFootnote.Paragraph_Add(new ParaText("o"));
+    //     oFootnote.Paragraph_Add(new ParaText("o"));
+    //     oFootnote.Paragraph_Add(new ParaText("t"));
+    //     oFootnote.Paragraph_Add(new ParaText("n"));
+    //     oFootnote.Paragraph_Add(new ParaText("o"));
+    //     oFootnote.Paragraph_Add(new ParaText("t"));
+    //     oFootnote.Paragraph_Add(new ParaText("e"));
+	//
+    //     this.Paragraph_Add(new ParaFootnoteReference(oFootnote));
+    //     bRetValue = keydownresult_PreventAll;
+    // }
+    // else if (114 === e.KeyCode)
+    // {
+    //     this.History.Create_NewPoint();
+    //     this.Paragraph_Add(new ParaSeparator());
+    //     bRetValue = keydownresult_PreventAll;
+    // }
+    // else if (115 === e.KeyCode)
+    // {
+    //     this.History.Create_NewPoint();
+    //     this.Paragraph_Add(new ParaContinuationSeparator());
+    //     bRetValue = keydownresult_PreventAll;
+    // }
     // TEST <--
     else if (e.KeyCode == 121 && true === e.ShiftKey) // Shift + F10 - контекстное меню
     {
