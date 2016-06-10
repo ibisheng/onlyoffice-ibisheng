@@ -3451,36 +3451,27 @@ Woorksheet.prototype.initPostOpen = function(handlers){
 			var oCell = elem.cell;
 			var sCellId = g_oCellAddressUtils.getCellId(oCell.nRow, oCell.nCol);
 			var oFormulaExt = elem.ext;
-			if (oFormulaExt.t == Asc.ECellFormulaType.cellformulatypeShared) {
-				if(null != oFormulaExt.si){
-					if(null != oFormulaExt.ref){
-            if (oFormulaExt.v.length <= AscCommon.c_oAscMaxFormulaLength) {
-              formulaShared[oFormulaExt.si] = {
-                fVal: new parserFormula(oFormulaExt.v, "", this), fRef: function(t) {
-                  var r = t.getRange2(oFormulaExt.ref);
-                  return {
-                    c: r, first: r.first
-                  };
-                }(this)
-              };
-              formulaShared[oFormulaExt.si].fVal.parse();
-            }
+			if (oFormulaExt.t === Asc.ECellFormulaType.cellformulatypeShared && null !== oFormulaExt.si) {
+				if (null !== oFormulaExt.ref) {
+					if (oFormulaExt.v.length <= AscCommon.c_oAscMaxFormulaLength) {
+						formulaShared[oFormulaExt.si] = {
+							fVal: new parserFormula(oFormulaExt.v, "", this),
+							fRef: AscCommonExcel.g_oRangeCache.getAscRange(oFormulaExt.ref)
+						};
+						formulaShared[oFormulaExt.si].fVal.parse();
 					}
-					else{
-						if( formulaShared[oFormulaExt.si] ){
-							var fr = formulaShared[oFormulaExt.si].fRef;
-							if( fr.c.containCell2(oCell) ){
-								if( formulaShared[oFormulaExt.si].fVal.isParsed ){
-									var off = oCell.getOffset3(fr.first);
-									formulaShared[oFormulaExt.si].fVal.changeOffset(off);
-									oFormulaExt.v = formulaShared[oFormulaExt.si].fVal.assemble();
-									off.offsetCol *=-1;
-									off.offsetRow *=-1;
-									formulaShared[oFormulaExt.si].fVal.changeOffset(off);
-								}
-								cwf[sCellId] = sCellId;
-							}
+				} else {
+					var fs = formulaShared[oFormulaExt.si];
+					if (fs && fs.fRef.contains(oCell.nCol, oCell.nRow)) {
+						if (false && fs.fVal.isParsed) {
+							var off = oCell.getOffset3(fs.fRef.c1, fs.fRef.r1);
+							fs.fVal.changeOffset(off);
+							oFormulaExt.v = fs.fVal.assemble();
+							off.offsetCol *= -1;
+							off.offsetRow *= -1;
+							fs.fVal.changeOffset(off);
 						}
+						cwf[sCellId] = sCellId;
 					}
 				}
 			}
@@ -3804,7 +3795,7 @@ Woorksheet.prototype.setName=function(name, bFromUndoRedo){
 
 		//перестраиваем формулы, если у них были ссылки на лист со старым именем.
 		for(var id in this.workbook.cwf) {
-			this.workbook.getWorksheetById(id)._ReBuildFormulas(this.workbook.cwf[id],lastName,this.sName);
+			this.workbook.getWorksheetById(id)._ReBuildFormulas(this.workbook.cwf[id]);
 		}
 
         this.workbook.dependencyFormulas.relinkDefNameByWorksheet(lastName, name);
@@ -6175,15 +6166,14 @@ Cell.prototype.moveVer=function(val){
 	this.nRow += val;
 };
 Cell.prototype.getOffset=function(cell){
-	return {offsetCol:(this.nCol - cell.nCol), offsetRow:(this.nRow - cell.nRow)};
+	return this.getOffset3(cell.nCol - 1, cell.nRow - 1);
 };
 Cell.prototype.getOffset2=function(cellId){
 	var cAddr2 = new CellAddress(cellId);
-	return {offsetCol:(this.nCol - cAddr2.col + 1), offsetRow:(this.nRow - cAddr2.row + 1)};
+	return this.getOffset3(cAddr2.col, cAddr2.row);
 };
-Cell.prototype.getOffset3=function(cellAddr){
-	var cAddr2 = cellAddr;
-	return {offsetCol:(this.nCol - cAddr2.col + 1), offsetRow:(this.nRow - cAddr2.row + 1)};
+Cell.prototype.getOffset3=function(col, row){
+	return new AscCommonExcel.CRangeOffset((this.nCol - col + 1), (this.nRow - row + 1));
 };
 Cell.prototype.getValueData = function(){
 	return new UndoRedoData_CellValueData(this.sFormula, this.oValue.clone());
@@ -8517,7 +8507,7 @@ Range.prototype._shiftUpDown = function (bUp, preDeleteAction, displayNameFormat
   this.worksheet.workbook.buildRecalc();
 	return true;
 };
-Range.prototype.setOffset=function(offset){//offset = {offsetCol:intNumber, offsetRow:intNumber}
+Range.prototype.setOffset=function(offset){//offset = AscCommonExcel.CRangeOffset
 	this.bbox.c1 += offset.offsetCol;
 	if( this.bbox.c1 < 0 )
 		this.bbox.c1 = 0;
