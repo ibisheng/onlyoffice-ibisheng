@@ -2733,9 +2733,6 @@ Workbook.prototype.getUniqueDefinedNameFrom=function(name, bCopy){
     return dnNewName;
 };
 Workbook.prototype.buildDependency = function(){
-	this.dependencyFormulas.clear();
-//	this.dependencyFormulas = null;
-//	this.dependencyFormulas = new DependencyGraph(this);
 	for(var i in this.cwf){
 		this.getWorksheetById(i)._BuildDependencies(this.cwf[i]);
 	}
@@ -3442,90 +3439,93 @@ Woorksheet.prototype.copyDrawingObjects=function(oNewWs, wsFrom)
         drawingObjects.updateChartReferences2(parserHelp.getEscapeSheetName(wsFrom.sName), parserHelp.getEscapeSheetName(oNewWs.sName));
     }
 };
-Woorksheet.prototype.initPostOpen = function(handlers){
-	var cwf = this.workbook.cwf[this.Id]={};
-	if(this.aFormulaExt){
-		var formulaShared = {};
-		for(var i = 0; i < this.aFormulaExt.length; ++i){
-			var elem = this.aFormulaExt[i];
-			var oCell = elem.cell;
-			var sCellId = g_oCellAddressUtils.getCellId(oCell.nRow, oCell.nCol);
-			var oFormulaExt = elem.ext;
-			if (oFormulaExt.t === Asc.ECellFormulaType.cellformulatypeShared && null !== oFormulaExt.si) {
-				if (null !== oFormulaExt.ref) {
-					if (oFormulaExt.v.length <= AscCommon.c_oAscMaxFormulaLength) {
-						formulaShared[oFormulaExt.si] = {
-							fVal: new parserFormula(oFormulaExt.v, "", this),
-							fRef: AscCommonExcel.g_oRangeCache.getAscRange(oFormulaExt.ref)
-						};
-						formulaShared[oFormulaExt.si].fVal.parse();
-					}
-				} else {
-					var fs = formulaShared[oFormulaExt.si];
-					if (fs && fs.fRef.contains(oCell.nCol, oCell.nRow)) {
-						if (fs.fVal.isParsed) {
-							var off = oCell.getOffset3(fs.fRef.c1 + 1, fs.fRef.r1 + 1);
-							fs.fVal.changeOffset(off);
-							oFormulaExt.v = fs.fVal.assemble();
-							off.offsetCol *= -1;
-							off.offsetRow *= -1;
-							fs.fVal.changeOffset(off);
+	Woorksheet.prototype.initPostOpen = function (handlers) {
+		var cwf = this.workbook.cwf[this.Id] = {};
+		if (this.aFormulaExt) {
+			var formulaShared = {};
+			for (var i = 0; i < this.aFormulaExt.length; ++i) {
+				var elem = this.aFormulaExt[i];
+				var oCell = elem.cell;
+				var sCellId = g_oCellAddressUtils.getCellId(oCell.nRow, oCell.nCol);
+				var oFormulaExt = elem.ext;
+				var isShared = oFormulaExt.t === Asc.ECellFormulaType.cellformulatypeShared && null !== oFormulaExt.si;
+				if (isShared) {
+					if (null !== oFormulaExt.ref) {
+						if (oFormulaExt.v.length <= AscCommon.c_oAscMaxFormulaLength) {
+							oCell.formulaParsed = new parserFormula(oFormulaExt.v, sCellId, this);
+							oCell.formulaParsed.parse();
+							oCell.formulaParsed.buildDependencies();
+							formulaShared[oFormulaExt.si] = {
+								fVal: oCell.formulaParsed,
+								fRef: AscCommonExcel.g_oRangeCache.getAscRange(oFormulaExt.ref)
+							};
 						}
+					} else {
+						var fs = formulaShared[oFormulaExt.si];
+						if (fs && fs.fRef.contains(oCell.nCol, oCell.nRow)) {
+							if (fs.fVal.isParsed) {
+								var off = oCell.getOffset3(fs.fRef.c1 + 1, fs.fRef.r1 + 1);
+
+								oCell.formulaParsed = fs.fVal.clone(null, sCellId, this);
+								oCell.formulaParsed.changeOffset(off);
+								oCell.formulaParsed.buildDependencies();
+								oFormulaExt.v = oCell.formulaParsed.assemble();
+							}
+						}
+					}
+				}
+				if (oFormulaExt.v) {
+					if (oFormulaExt.v.length <= AscCommon.c_oAscMaxFormulaLength) {
+						oCell.setFormula(oFormulaExt.v);
+						if (oFormulaExt.ca) {
+							oCell.sFormulaCA = true;
+						}
+					} else {
+						this.workbook.openErrors.push(oCell.getName());
+					}
+				}
+
+				// Если ячейка содержит в себе формулу, то добавляем ее в список ячеек с формулами. (Shared-формулу мы уже распарсили)
+				if (isShared) {
+					cwf[sCellId] = null;
+				} else {
+					if (oCell.sFormula) {
 						cwf[sCellId] = sCellId;
 					}
 				}
+
+				// Строится список ячеек, которые необходимо пересчитать при открытии. Это ячейки имеющие атрибут f.ca или значение в которых неопределено.
+				if (oCell.sFormula && (oFormulaExt.ca || !oCell.oValue.getValueWithoutFormat())) {
+					this.workbook.needRecalc.nodes[getVertexId(this.Id, sCellId)] = [this.Id, sCellId];
+					this.workbook.needRecalc.length++;
+				}
 			}
-			if(oFormulaExt.v) {
-        if (oFormulaExt.v.length <= AscCommon.c_oAscMaxFormulaLength) {
-          oCell.setFormula(oFormulaExt.v);
-          if(oFormulaExt.ca) {
-            oCell.sFormulaCA = true;
-          }
-        } else {
-          this.workbook.openErrors.push(oCell.getName());
-        }
-      }
-			
-			/*
-				Если ячейка содержит в себе формулу, то добавляем ее в список ячеек с формулами.
-			*/
-			if(oCell.sFormula){
-				cwf[sCellId] = sCellId;
-			}
-			/*
-				Строится список ячеек, которые необходимо пересчитать при открытии. Это ячейки имеющие атрибут f.ca или значение в которых неопределено.
-			*/
-			if(oCell.sFormula && (oFormulaExt.ca || !oCell.oValue.getValueWithoutFormat()) ){
-				this.workbook.needRecalc.nodes[ getVertexId( this.Id, sCellId ) ] = [this.Id, sCellId];
-				this.workbook.needRecalc.length++;
+			this.aFormulaExt = null;
+		}
+
+		if (!this.PagePrintOptions) {
+			// Даже если не было, создадим
+			this.PagePrintOptions = new Asc.asc_CPageOptions();
+		}
+		this.PagePrintOptions.init();
+
+		// Sheet Views
+		if (0 === this.sheetViews.length) {
+			// Даже если не было, создадим
+			this.sheetViews.push(new AscCommonExcel.asc_CSheetViewSettings());
+		}
+
+		if (window['IS_NATIVE_EDITOR']) {
+			for (var j = this.sheetViews.length - 1; j >= 0; --j) {
+				this.sheetViews[j].pane = null;
 			}
 		}
-		this.aFormulaExt = null;
-	}
-	
-	if (!this.PagePrintOptions) {
-		// Даже если не было, создадим
-		this.PagePrintOptions = new Asc.asc_CPageOptions();
-	}
-	this.PagePrintOptions.init();
 
-	// Sheet Views
-	if (0 === this.sheetViews.length) {
-		// Даже если не было, создадим
-		this.sheetViews.push(new AscCommonExcel.asc_CSheetViewSettings());
-	}
+		this._updateConditionalFormatting(null);
 
-    if (window['IS_NATIVE_EDITOR']) {
-        for (var j = this.sheetViews.length - 1; j >= 0; --j) {
-            this.sheetViews[j].pane = null;
-        }
-    }
-
-  this._updateConditionalFormatting(null);
-	
-	this.handlers = handlers;
-	this._setHandlersTablePart();
-};
+		this.handlers = handlers;
+		this._setHandlersTablePart();
+	};
 Woorksheet.prototype._getValuesForConditionalFormatting = function(sqref, withEmpty) {
   var range = this.getRange3(sqref.r1, sqref.c1, sqref.r2, sqref.c2);
 	return range._getValues(withEmpty);
@@ -5205,6 +5205,11 @@ Woorksheet.prototype._BuildDependencies=function(cellRange){
 	*/
 	var c, ca, oLengthCache = {};
 	for(var i in cellRange){
+		if (null === cellRange[i]) {
+			cellRange[i] = i;
+			continue;
+		}
+
 		ca = g_oCellAddressUtils.getCellAddress(i);
 		c = this._getCellNoEmpty(ca.getRow0(),ca.getCol0());
 
