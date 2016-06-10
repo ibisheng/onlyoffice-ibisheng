@@ -173,4 +173,18 @@ CDocumentControllerBase.prototype.Get_ParentTextTransform = function()
  * Пересчитываем текущую позицию.
  */
 CDocumentControllerBase.prototype.RecalculateCurPos = function(){};
-
+/**
+ * Смещаем курсор влево
+ * @param {boolean} AddToSelect Добавлять ли к селекту смещение
+ * @param {boolean} Word Осуществлять ли переход по целому слову
+ * @returns {boolean} Получилось ли перемещение, или мы достигли предела.
+ */
+CDocumentControllerBase.prototype.Cursor_MoveLeft = function(AddToSelect, Word){return false;};
+/**
+ * Смещаем курсор вправо
+ * @param {boolean} AddToSelect Добавлять ли к селекту смещение
+ * @param {boolean} Word Осуществлять ли переход по целому слову
+ * @param {boolean} FromPaste Пришла ли данная комнда после "вставки"
+ * @returns {boolean} Получилось ли перемещение, или мы достигли предела.
+ */
+CDocumentControllerBase.prototype.Cursor_MoveRight = function(AddToSelect, Word, FromPaste){return false;};

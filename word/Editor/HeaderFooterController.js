@@ -27,3 +27,11 @@ CHdrFtrController.prototype.RecalculateCurPos = function()
 {
 	this.HdrFtr.RecalculateCurPos();
 };
+CHdrFtrController.prototype.Cursor_MoveLeft = function(AddToSelect, Word)
+{
+	return this.HdrFtr.Cursor_MoveLeft(AddToSelect, Word);
+};
+CHdrFtrController.prototype.Cursor_MoveRight = function(AddToSelect, Word, FromPaste)
+{
+	return this.HdrFtr.Cursor_MoveRight(AddToSelect, Word, FromPaste);
+};

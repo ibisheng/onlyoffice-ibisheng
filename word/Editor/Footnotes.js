@@ -27,7 +27,8 @@ function CFootnotesController(LogicDocument)
 
 	this.Selection = {
 		Use      : false,
-		Footnotes : []
+		Footnotes : [],
+		Direction : 0
 	};
 
 	this.CurFootnote = null;
@@ -237,6 +238,40 @@ CFootnotesController.prototype.RecalculateCurPos = function()
 {
 	if (null !== this.CurFootnote)
 		this.CurFootnote.RecalculateCurPos();
+};
+CFootnotesController.prototype.Cursor_MoveLeft = function(AddToSelect, Word)
+{
+	var bRetValue = false;
+
+	// TODO: Доделать селект и курсор
+
+	if (true === this.Selection.Use)
+	{
+	}
+	else
+	{
+		if (null !== this.CurFootnote)
+			bRetValue = this.CurFootnote.Cursor_MoveLeft(AddToSelect, Word);
+	}
+
+	return bRetValue;
+};
+CFootnotesController.prototype.Cursor_MoveRight = function(AddToSelect, Word, FromPaste)
+{
+	var bRetValue = false;
+
+	// TODO: Доделать селект и курсор
+
+	if (true === this.Selection.Use)
+	{
+	}
+	else
+	{
+		if (null !== this.CurFootnote)
+			bRetValue = this.CurFootnote.Cursor_MoveRight(AddToSelect, Word, FromPaste);
+	}
+
+	return bRetValue;
 };
 
 function CFootEndnotePage()

@@ -21,5 +21,13 @@ CLogicDocumentController.prototype.RecalculateCurPos = function()
 {
 	this.LogicDocument.controller_RecalculateCurPos();
 };
+CLogicDocumentController.prototype.Cursor_MoveLeft = function(AddToSelect, Word)
+{
+	return this.LogicDocument.controller_CursorMoveLeft(AddToSelect, Word);
+};
+CLogicDocumentController.prototype.Cursor_MoveRight = function(AddToSelect, Word, FromPaste)
+{
+	return this.LogicDocument.controller_CursorMoveRight(AddToSelect, Word, FromPaste);
+};
 
 
