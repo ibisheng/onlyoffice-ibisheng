@@ -1840,7 +1840,7 @@ background-repeat: no-repeat;\
 
 			return;
 		}
-		return AscCommon.Editor_Copy_Button(this);
+		return AscCommon.g_clipboardBase.Button_Copy();
 	};
 	asc_docs_api.prototype.Update_ParaTab = function(Default_Tab, ParaTabs)
 	{
@@ -1860,7 +1860,7 @@ background-repeat: no-repeat;\
 
 			return;
 		}
-		return AscCommon.Editor_Copy_Button(this, true);
+		return AscCommon.g_clipboardBase.Button_Cut();
 	};
 	asc_docs_api.prototype.Paste          = function()
 	{

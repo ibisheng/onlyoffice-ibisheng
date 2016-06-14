@@ -294,6 +294,10 @@
 					this.IsUseFirstTextInputAfterComposition = true;
 					return;
 				}
+				else
+				{
+					this.onCompositionUpdate(e, false);
+				}
 			}
 			else
 			{
