@@ -3064,6 +3064,9 @@ function CDrawingDocument()
 
             this.m_oWordControl.CheckTextBoxInputPos();
         }
+
+        if (AscCommon.g_inputContext)
+            AscCommon.g_inputContext.move(this.TargetHtmlElementLeft, this.TargetHtmlElementTop);
     }
 
     this.UpdateTargetTransform = function(matrix)

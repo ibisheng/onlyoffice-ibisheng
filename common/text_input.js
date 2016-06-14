@@ -85,7 +85,7 @@
 
 			// TODO:
 			setInterval(function(){
-				if (oThis.Api.asc_IsFocus())
+				if (oThis.Api.asc_IsFocus() && !AscCommon.g_clipboardBase.IsFocus() && !AscCommon.g_clipboardBase.IsWorking())
 					oThis.HtmlArea.focus();
 			}, 10);
 		},
@@ -318,4 +318,11 @@
 
 	window['AscCommon'] = window['AscCommon'] || {};
 	window['AscCommon'].CTextInput = CTextInput;
+
+	window['AscCommon'].InitBrowserInputContext = function(api, target_id)
+	{
+		window['AscCommon'].g_inputContext = new CTextInput(api);
+		window['AscCommon'].g_inputContext.init(target_id);
+		window['AscCommon'].g_clipboardBase.Init(api);
+	};
 })(window);

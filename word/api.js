@@ -814,9 +814,6 @@ background-repeat: no-repeat;\
 			PasteElementsId.PASTE_ELEMENT_ID     = "wrd_pastebin";
 			PasteElementsId.ELEMENT_DISPAY_STYLE = "none";
 		}
-
-		if (AscCommon.AscBrowser.isSafariMacOs)
-			setInterval(AscCommon.SafariIntervalFocus, 10);
 	};
 	// Callbacks
 	/* все имена callback'оф начинаются с On. Пока сделаны:
@@ -1882,23 +1879,10 @@ background-repeat: no-repeat;\
 
 		if (false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content))
 		{
-			if (!window.GlobalPasteFlag)
-			{
-				if (!AscCommon.AscBrowser.isSafariMacOs)
-				{
-					window.GlobalPasteFlag = true;
-					return AscCommon.Editor_Paste_Button(this);
-				}
-				else
-				{
-					if (0 === window.GlobalPasteFlagCounter)
-					{
-						AscCommon.SafariIntervalFocus();
-						window.GlobalPasteFlag = true;
-						return AscCommon.Editor_Paste_Button(this);
-					}
-				}
-			}
+			if (AscCommon.g_clipboardBase.IsWorking())
+				return false;
+
+			return AscCommon.g_clipboardBase.Button_Paste();
 		}
 	};
 
@@ -6864,28 +6848,7 @@ background-repeat: no-repeat;\
 			// там при LongActions теряется фокус и вставляются пробелы
 			this.decrementCounterLongAction();
 			this.pasteCallback();
-			window.GlobalPasteFlag        = false;
-			window.GlobalPasteFlagCounter = 0;
 			this.pasteCallback            = null;
-
-			if (-1 != window.PasteEndTimerId)
-			{
-				clearTimeout(window.PasteEndTimerId);
-				window.PasteEndTimerId = -1;
-
-				document.body.style.MozUserSelect          = "none";
-				document.body.style["-khtml-user-select"]  = "none";
-				document.body.style["-o-user-select"]      = "none";
-				document.body.style["user-select"]         = "none";
-				document.body.style["-webkit-user-select"] = "none";
-
-				var pastebin = AscCommon.Editor_Paste_GetElem(this, true);
-
-				if (!AscCommon.AscBrowser.isSafariMacOs)
-					pastebin.onpaste = null;
-
-				pastebin.style.display = PasteElementsId.ELEMENT_DISPAY_STYLE;
-			}
 
 			return;
 		}
