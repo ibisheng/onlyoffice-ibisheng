@@ -27,6 +27,8 @@
 		this.TextInputAfterComposition = false;
 
 		this.IsLockTargetMode = false;
+
+		this.IsUseFirstTextInputAfterComposition = false;
 	}
 
 	CTextInput.prototype =
@@ -74,6 +76,7 @@
 			this.HtmlArea["onkeyup"] 	= function(e) { return oThis.onKeyUp(e); };
 
 			this.HtmlArea.addEventListener("input", function(e) { return oThis.onInput(e); }, false);
+			this.HtmlArea.addEventListener("textInput", function(e) { return oThis.onTextInput(e); }, false);
 
 			this.HtmlArea.addEventListener("compositionstart", function(e) { return oThis.onCompositionStart(e); }, false);
 			this.HtmlArea.addEventListener("compositionupdate", function(e) { return oThis.onCompositionUpdate(e); }, false);
@@ -144,6 +147,15 @@
 			this.TextInputAfterComposition = false;
 			if (c_oCompositionState.end == this.compositionState)
 				this.clear();
+		},
+
+		onTextInput : function(e)
+		{
+			if (this.IsUseFirstTextInputAfterComposition)
+			{
+				this.onCompositionEnd(e);
+				this.IsUseFirstTextInputAfterComposition = false;
+			}
 		},
 
 		onKeyDown : function(e)
@@ -270,8 +282,18 @@
 		onCompositionEnd : function(e)
 		{
 			// chrome, linux: всегда приходит пустая дата
-			if (e.data !== undefined && (e.data !== "" || (this.compositionValue.length == 0)))
+			if (!this.IsUseFirstTextInputAfterComposition)
+			{
+				if (e.data === undefined || (e.data == "" && (this.compositionValue.length != 0)))
+				{
+					this.IsUseFirstTextInputAfterComposition = true;
+					return;
+				}
+			}
+			else
+			{
 				this.onCompositionUpdate(e, false);
+			}
 
 			this.Listener.Set_CursorPosInCompositeText(1000); // max
 
