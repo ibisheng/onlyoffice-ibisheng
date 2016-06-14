@@ -2407,86 +2407,80 @@ cKURT.prototype.getInfo = function () {
     };
 };
 
-function cLARGE() {
-//    cBaseFunction.call( this, "LARGE" );
-//    this.setArgumentsMin( 2 );
-//    this.setArgumentsMax( 2 );
-//    this.setFormat( this.formatType.noneFormat );
+    function cLARGE() {
+        this.name = "LARGE";
+        this.type = cElementType.func;
+        this.value = null;
+        this.argumentsMin = 2;
+        this.argumentsCurrent = 0;
+        this.argumentsMax = 2;
+        this.formatType = {
+            def: -1, //подразумевается формат первой ячейки входящей в формулу.
+            noneFormat: -2
+        };
+        this.numFormat = this.formatType.noneFormat;
+    }
 
-    this.name = "LARGE";
-    this.type = cElementType.func;
-    this.value = null;
-    this.argumentsMin = 2;
-    this.argumentsCurrent = 0;
-    this.argumentsMax = 2;
-    this.formatType = {
-        def:-1, //подразумевается формат первой ячейки входящей в формулу.
-        noneFormat:-2
-    };
-    this.numFormat = this.formatType.noneFormat;
+    cLARGE.prototype = Object.create(cBaseFunction.prototype);
+    cLARGE.prototype._getValue = function (arg0, arg1) {
+        if (cElementType.error === arg1.type) {
+            return arg1;
+        }
 
-}
+        arg1 = arg1.getValue();
+        if (arg1 <= 0) {
+            return new cError(cErrorType.not_available);
+        }
 
-cLARGE.prototype = Object.create( cBaseFunction.prototype );
-cLARGE.prototype.Calculate = function ( arg ) {
-
-    function frequency( A, k ) {
-
-        var tA = [];
-
-        for ( var i = 0; i < A.length; i++ ) {
-            for ( var j = 0; j < A[i].length; j++ ) {
-                if ( A[i][j] instanceof  cError ) {
-                    return A[i][j];
-                }
-                else if ( A[i][j] instanceof cNumber ) {
-                    tA.push( A[i][j].getValue() );
-                }
-                else if ( A[i][j] instanceof cBool ) {
-                    tA.push( A[i][j].tocNumber().getValue() );
+        var v, tA = [];
+        for (var i = 0; i < arg0.length; i++) {
+            for (var j = 0; j < arg0[i].length; j++) {
+                v = arg0[i][j];
+                if (cElementType.error === v.type) {
+                    return v;
+                } else if (cElementType.number === v.type) {
+                    tA.push(v.getValue());
+                } else if (cElementType.bool === v.type) {
+                    tA.push(v.tocNumber().getValue());
                 }
             }
         }
 
         tA.sort(AscCommon.fSortDescending);
 
-        if ( k.getValue() > tA.length || k.getValue() <= 0 )
-            return new cError( cErrorType.not_available );
-        else
-            return new cNumber( tA[k.getValue() - 1] );
-    }
-
-    var arg0 = arg[0], arg1 = arg[1];
-    if ( arg0 instanceof cArea || arg0 instanceof cArray ) {
-        arg0 = arg0.getMatrix();
-    }
-    else if ( arg0 instanceof cArea3D ) {
-        arg0 = arg0.getMatrix()[0];
-    }
-    else
-        return this.value = new cError( cErrorType.not_available );
-
-
-    if ( arg1 instanceof cArea || arg1 instanceof cArea3D ) {
-        arg1 = arg1.cross( arguments[1].first );
-    }
-    else if ( arg1 instanceof cArray ) {
-        arg1 = arg1.getElement( 0 );
-    }
-
-    arg1 = arg1.tocNumber();
-
-    if ( arg1 instanceof cError ) return this.value = arg1;
-
-    return this.value = frequency( arg0, arg1 );
-
-};
-cLARGE.prototype.getInfo = function () {
-    return {
-        name:this.name,
-        args:"(  array , k )"
+        if (arg1 > tA.length) {
+            return new cError(cErrorType.not_available);
+        } else {
+            return new cNumber(tA[arg1 - 1]);
+        }
     };
-};
+    cLARGE.prototype.Calculate = function (arg) {
+        var arg0 = arg[0], arg1 = arg[1];
+        if (cElementType.cellsRange === arg0.type) {
+            arg0 = arg0.getValuesNoEmpty();
+        } else if (cElementType.array === arg0.type) {
+            arg0 = arg0.getMatrix();
+        } else if (cElementType.cellsRange3D === arg0.type) {
+            arg0 = arg0.getMatrix()[0];
+        } else {
+            return this.value = new cError(cErrorType.not_available);
+        }
+
+
+        if (cElementType.cellsRange === arg1.type || cElementType.cellsRange3D === arg1.type) {
+            arg1 = arg1.cross(arguments[1].first);
+        } else if (cElementType.array === arg1.type) {
+            arg1 = arg1.getElement(0);
+        }
+
+        arg1 = arg1.tocNumber();
+        return this.value = this._getValue(arg0, arg1);
+    };
+    cLARGE.prototype.getInfo = function () {
+        return {
+            name: this.name, args: "(  array , k )"
+        };
+    };
 
 function cLINEST() {
     cBaseFunction.call( this, "LINEST" );
