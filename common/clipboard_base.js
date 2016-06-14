@@ -36,7 +36,7 @@
 		this.IsNeedDivOnCopy  = AscBrowser.isIE;
 		this.IsNeedDivOnPaste = AscBrowser.isIE || AscBrowser.isMozilla;
 
-		this.IsCopyCutOnlyInEditable = AscBrowser.isIE || (AscBrowser.isMozilla && AscBrowser.isMacOs);
+		this.IsCopyCutOnlyInEditable = AscBrowser.isIE || AscBrowser.isMozilla;
 		this.IsPasteOnlyInEditable   = AscBrowser.isIE || AscBrowser.isMozilla || AscBrowser.isSafari;
 
 		this.CommonDivClassName = "sdk-element";
