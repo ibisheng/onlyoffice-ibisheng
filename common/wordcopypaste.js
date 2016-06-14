@@ -2201,7 +2201,7 @@ function CanPaste(oDocument)
     var oTargetDoc = oDocument;
     if(PasteElementsId.g_bIsDocumentCopyPaste)
     {
-        if ( docpostype_HdrFtr === oTargetDoc.CurPos.Type )
+        if (docpostype_HdrFtr === oTargetDoc.Get_DocPosType())
         {
             if(null != oTargetDoc.HdrFtr.CurHdrFtr)
                 oTargetDoc = oTargetDoc.HdrFtr.CurHdrFtr.Content;
@@ -2645,7 +2645,8 @@ PasteProcessor.prototype =
     {
         if(PasteElementsId.g_bIsDocumentCopyPaste)
         {
-            if(docpostype_HdrFtr === oDocument.CurPos.Type)
+			var nDocPosType = oDocument.Get_DocPosType();
+            if(docpostype_HdrFtr === nDocPosType)
             {
                 if(null != oDocument.HdrFtr && null != oDocument.HdrFtr.CurHdrFtr && null != oDocument.HdrFtr.CurHdrFtr.Content)
                 {
@@ -2654,7 +2655,7 @@ PasteProcessor.prototype =
                 }
             }
 
-            if(oDocument.CurPos.Type === docpostype_DrawingObjects)
+            if(nDocPosType === docpostype_DrawingObjects)
             {
                 var content = oDocument.DrawingObjects.getTargetDocContent(true);
                 if(content)
@@ -2741,7 +2742,7 @@ PasteProcessor.prototype =
             var bNeedMoveCursor = History.Is_LastPointNeedRecalc();
             this.oRecalcDocument.Recalculate();
             
-            if ((oDocument.CurPos.Type !== docpostype_DrawingObjects || true === this.oLogicDocument.DrawingObjects.isSelectedText()) && true === bNeedMoveCursor)
+            if ((oDocument.Get_DocPosType() !== docpostype_DrawingObjects || true === this.oLogicDocument.DrawingObjects.isSelectedText()) && true === bNeedMoveCursor)
             {
                 this.oLogicDocument.Cursor_MoveRight(false, false, true);
             }

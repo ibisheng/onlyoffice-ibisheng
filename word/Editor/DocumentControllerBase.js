@@ -12,8 +12,8 @@
  */
 function CDocumentControllerBase(LogicDocument)
 {
-    this.LogicDocument   = LogicDocument;
-    this.DrawingDocument = LogicDocument.Get_DrawingDocument();
+	this.LogicDocument   = LogicDocument;
+	this.DrawingDocument = LogicDocument.Get_DrawingDocument();
 }
 
 /**
@@ -22,7 +22,7 @@ function CDocumentControllerBase(LogicDocument)
  */
 CDocumentControllerBase.prototype.Get_LogicDocument = function()
 {
-    return this.LogicDocument;
+	return this.LogicDocument;
 };
 /**
  * Получаем ссылку на CDrawingDocument.
@@ -30,7 +30,7 @@ CDocumentControllerBase.prototype.Get_LogicDocument = function()
  */
 CDocumentControllerBase.prototype.Get_DrawingDocument = function()
 {
-    return this.DrawingDocument;
+	return this.DrawingDocument;
 };
 /**
  * Является ли данный класс контроллером для колонтитулов.
@@ -39,10 +39,10 @@ CDocumentControllerBase.prototype.Get_DrawingDocument = function()
  */
 CDocumentControllerBase.prototype.Is_HdrFtr = function(bReturnHdrFtr)
 {
-    if (bReturnHdrFtr)
-        return null;
+	if (bReturnHdrFtr)
+		return null;
 
-    return false;
+	return false;
 };
 /**
  * Является ли данный класс контроллером для автофигур.
@@ -51,10 +51,10 @@ CDocumentControllerBase.prototype.Is_HdrFtr = function(bReturnHdrFtr)
  */
 CDocumentControllerBase.prototype.Is_HdrFtr = function(bReturnShape)
 {
-    if (bReturnShape)
-        return null;
+	if (bReturnShape)
+		return null;
 
-    return false;
+	return false;
 };
 /**
  * Получаем абосолютный номер страницы по относительному.
@@ -63,7 +63,7 @@ CDocumentControllerBase.prototype.Is_HdrFtr = function(bReturnShape)
  */
 CDocumentControllerBase.prototype.Get_AbsolutePage = function(CurPage)
 {
-    return CurPage;
+	return CurPage;
 };
 /**
  * Получаем абосолютный номер колноки по относительному номеру страницы.
@@ -72,7 +72,7 @@ CDocumentControllerBase.prototype.Get_AbsolutePage = function(CurPage)
  */
 CDocumentControllerBase.prototype.Get_AbsoluteColumn = function(CurPage)
 {
-    return 0;
+	return 0;
 };
 /**
  * Проверяем, является ли данный класс верхним, по отношению к другим классам DocumentContent, Document
@@ -81,10 +81,10 @@ CDocumentControllerBase.prototype.Get_AbsoluteColumn = function(CurPage)
  */
 CDocumentControllerBase.prototype.Is_TopDocument = function(bReturnTopDocument)
 {
-    if (bReturnTopDocument)
-        return null;
+	if (bReturnTopDocument)
+		return null;
 
-    return false;
+	return false;
 };
 /**
  * Получаем ссылку на объект, работающий с нумерацией.
@@ -92,7 +92,7 @@ CDocumentControllerBase.prototype.Is_TopDocument = function(bReturnTopDocument)
  */
 CDocumentControllerBase.prototype.Get_Numbering = function()
 {
-    return this.LogicDocument.Get_Numbering();
+	return this.LogicDocument.Get_Numbering();
 };
 /**
  * Получаем ссылку на объект, работающий со стилями.
@@ -100,7 +100,7 @@ CDocumentControllerBase.prototype.Get_Numbering = function()
  */
 CDocumentControllerBase.prototype.Get_Styles = function()
 {
-    return this.LogicDocument.Get_Styles();
+	return this.LogicDocument.Get_Styles();
 };
 /**
  * Получаем ссылку на табличный стиль для параграфа.
@@ -108,7 +108,7 @@ CDocumentControllerBase.prototype.Get_Styles = function()
  */
 CDocumentControllerBase.prototype.Get_TableStyleForPara = function()
 {
-    return null;
+	return null;
 };
 /**
  * Получаем ссылку на стиль автофигур для параграфа.
@@ -116,7 +116,7 @@ CDocumentControllerBase.prototype.Get_TableStyleForPara = function()
  */
 CDocumentControllerBase.prototype.Get_ShapeStyleForPara = function()
 {
-    return null;
+	return null;
 };
 /**
  * Запрашиваем цвет заливки.
@@ -124,7 +124,7 @@ CDocumentControllerBase.prototype.Get_ShapeStyleForPara = function()
  */
 CDocumentControllerBase.prototype.Get_TextBackGroundColor = function()
 {
-    return undefined;
+	return undefined;
 };
 /**
  * Является ли данный класс ячейкой.
@@ -132,21 +132,21 @@ CDocumentControllerBase.prototype.Get_TextBackGroundColor = function()
  */
 CDocumentControllerBase.prototype.Is_Cell = function()
 {
-    return false;
+	return false;
 };
 /**
  * Получаем настройки темы для документа.
  */
 CDocumentControllerBase.prototype.Get_Theme = function()
 {
-    return this.LogicDocument.Get_Theme();
+	return this.LogicDocument.Get_Theme();
 };
 /**
  * Получаем мап цветов.
  */
 CDocumentControllerBase.prototype.Get_ColorMap = function()
 {
-    return this.LogicDocument.Get_ColorMap();
+	return this.LogicDocument.Get_ColorMap();
 };
 /**
  * Запрашиваем информацию о конце пересчета предыдущего элемента.
@@ -155,7 +155,7 @@ CDocumentControllerBase.prototype.Get_ColorMap = function()
  */
 CDocumentControllerBase.prototype.Get_PrevElementEndInfo = function(CurElement)
 {
-    return null;
+	return null;
 };
 /**
  * Получаем текущее преобразование.
@@ -163,5 +163,28 @@ CDocumentControllerBase.prototype.Get_PrevElementEndInfo = function(CurElement)
  */
 CDocumentControllerBase.prototype.Get_ParentTextTransform = function()
 {
-    return null;
+	return null;
 };
+
+//----------------------------------------------------------------------------------------------------------------------
+// Чисто виртуальные функции
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Пересчитываем текущую позицию.
+ */
+CDocumentControllerBase.prototype.RecalculateCurPos = function(){};
+/**
+ * Смещаем курсор влево
+ * @param {boolean} AddToSelect Добавлять ли к селекту смещение
+ * @param {boolean} Word Осуществлять ли переход по целому слову
+ * @returns {boolean} Получилось ли перемещение, или мы достигли предела.
+ */
+CDocumentControllerBase.prototype.Cursor_MoveLeft = function(AddToSelect, Word){return false;};
+/**
+ * Смещаем курсор вправо
+ * @param {boolean} AddToSelect Добавлять ли к селекту смещение
+ * @param {boolean} Word Осуществлять ли переход по целому слову
+ * @param {boolean} FromPaste Пришла ли данная комнда после "вставки"
+ * @returns {boolean} Получилось ли перемещение, или мы достигли предела.
+ */
+CDocumentControllerBase.prototype.Cursor_MoveRight = function(AddToSelect, Word, FromPaste){return false;};

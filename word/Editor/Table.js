@@ -8426,7 +8426,7 @@ CTable.prototype =
         else
         {
             var CellContent = this.CurCell.Content;
-            if (this.LogicDocument && true === this.LogicDocument.UseTextShd && docpostype_Content === CellContent.CurPos.Type && true !== CellContent.Selection.Use && type_Paragraph === CellContent.Content[CellContent.CurPos.ContentPos].GetType())
+            if (this.LogicDocument && true === this.LogicDocument.UseTextShd && docpostype_Content === CellContent.Get_DocPosType() && true !== CellContent.Selection.Use && type_Paragraph === CellContent.Content[CellContent.CurPos.ContentPos].GetType())
             {
                 this.CurCell.Set_Shd( Shd );
                 this.CurCell.Content.ReDraw();                

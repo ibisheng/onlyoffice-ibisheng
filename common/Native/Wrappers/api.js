@@ -4454,19 +4454,6 @@ Asc['asc_docs_api'].prototype.ImgApply = function(obj)
             }
         }
     }
-    /*
-     if ( docpostype_FlowObjects == LogicDocument.CurPos.Type && "undefined" != typeof( ImagePr.WrappingStyle ) && null != ImagePr.WrappingStyle && c_oAscWrapStyle.Flow != ImagePr.WrappingStyle )
-     {
-     var FlowObject = LogicDocument.Pages[LogicDocument.Selection.Data.PageNum].FlowObjects.Get_ByIndex( LogicDocument.CurPos.ContentPos );
-     AdditionalData =
-     {
-     Type    : 1,
-     X       : FlowObject.X,
-     Y       : FlowObject.Y,
-     PageNum : LogicDocument.Selection.Data.PageNum
-     }
-     }
-     */
 
     if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Image_Properties, AdditionalData) )
     {

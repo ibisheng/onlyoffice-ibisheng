@@ -25,6 +25,14 @@ function CFootnotesController(LogicDocument)
 	this.ContinuationSeparatorFootnote = null;
 	this.SeparatorFootnote             = null;
 
+	this.Selection = {
+		Use      : false,
+		Footnotes : [],
+		Direction : 0
+	};
+
+	this.CurFootnote = null;
+
 	// Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
 	LogicDocument.Get_TableId().Add(this, this.Id);
 }
@@ -45,6 +53,10 @@ CFootnotesController.prototype.Init = function()
 {
 	this.SeparatorFootnote = new CFootEndnote(this);
 	this.SeparatorFootnote.Paragraph_Add(new ParaSeparator(), false);
+	this.SeparatorFootnote.Paragraph_Add(new ParaText("1"), false);
+	this.SeparatorFootnote.Paragraph_Add(new ParaText("2"), false);
+	this.SeparatorFootnote.Paragraph_Add(new ParaText("3"), false);
+
 	var oParagraph = this.SeparatorFootnote.Get_ElementByIndex(0);
 	oParagraph.Set_Spacing({After : 0, Line : 1, LineRule : Asc.linerule_Auto}, false);
 };
@@ -220,6 +232,46 @@ CFootnotesController.prototype.Is_EmptyPage = function(nPageIndex)
 		return true;
 
 	return false;
+};
+
+CFootnotesController.prototype.RecalculateCurPos = function()
+{
+	if (null !== this.CurFootnote)
+		this.CurFootnote.RecalculateCurPos();
+};
+CFootnotesController.prototype.Cursor_MoveLeft = function(AddToSelect, Word)
+{
+	var bRetValue = false;
+
+	// TODO: Доделать селект и курсор
+
+	if (true === this.Selection.Use)
+	{
+	}
+	else
+	{
+		if (null !== this.CurFootnote)
+			bRetValue = this.CurFootnote.Cursor_MoveLeft(AddToSelect, Word);
+	}
+
+	return bRetValue;
+};
+CFootnotesController.prototype.Cursor_MoveRight = function(AddToSelect, Word, FromPaste)
+{
+	var bRetValue = false;
+
+	// TODO: Доделать селект и курсор
+
+	if (true === this.Selection.Use)
+	{
+	}
+	else
+	{
+		if (null !== this.CurFootnote)
+			bRetValue = this.CurFootnote.Cursor_MoveRight(AddToSelect, Word, FromPaste);
+	}
+
+	return bRetValue;
 };
 
 function CFootEndnotePage()

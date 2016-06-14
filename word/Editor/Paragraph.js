@@ -9536,7 +9536,7 @@ Paragraph.prototype =
         var Parent = this.Parent;
 
         Parent.Update_ContentIndexing();
-        if ( docpostype_Content === Parent.CurPos.Type && false === Parent.Selection.Use && this.Index === Parent.CurPos.ContentPos && Parent.Content[this.Index] === this )
+        if ( docpostype_Content === Parent.Get_DocPosType() && false === Parent.Selection.Use && this.Index === Parent.CurPos.ContentPos && Parent.Content[this.Index] === this )
             return this.Parent.Is_ThisElementCurrent();
 
         return false;
