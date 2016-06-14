@@ -549,9 +549,12 @@ function CEditorPage(api)
         this.m_oLeftRuler_vertRuler.HtmlElement.onmouseup   = this.verRulerMouseUp;//new Function("event", "verRulerMouseUp(event);");
         this.m_oLeftRuler_vertRuler.HtmlElement.onmousemove = this.verRulerMouseMove;//new Function("event", "verRulerMouseMove(event);");
 
+        /*
+        // теперь все делает AscCommon.InitBrowserSystemContext
         window.onkeydown = this.onKeyDown;//Editor_OnKeyDown;
         window.onkeypress = this.onKeyPress;//Editor_OnKeyPress;
         window.onkeyup = this.onKeyUp;
+        */
 
         this.m_oBody.HtmlElement.oncontextmenu = function() { return false; };
         //window.oncontextmenu = function() { return false; };
@@ -2559,7 +2562,7 @@ function CEditorPage(api)
     }
     this.onKeyPress = function(e)
     {	
-		if (window.GlobalPasteFlag || window.GlobalCopyFlag)
+		if (AscCommon.g_clipboardBase.IsWorking())
 			return;
 			
         if (oThis.m_oApi.isLongAction())
@@ -3688,6 +3691,8 @@ function CEditorPage(api)
             window["AutoTester"]["RunTest"]();
         }
 
+        AscCommon.InitBrowserInputContext(this.m_oApi, "id_target_cursor");
+
         //this.m_oDrawingDocument.CheckFontCache();
     }
 
@@ -3761,7 +3766,7 @@ function CEditorPage(api)
 
         if (oWordControl.IsFocus && oWordControl.TextBoxInputMode && oWordControl.TextBoxInput && !AscCommon.AscBrowser.isSafariMacOs)
         {
-            if (!oWordControl.m_oApi.isLongAction() && !window.GlobalCopyFlag)
+            if (!oWordControl.m_oApi.isLongAction() && !AscCommon.g_clipboardBase.IsWorking())
                 oWordControl.TextBoxInput.focus();
         }
         
@@ -3775,7 +3780,7 @@ function CEditorPage(api)
             if (null != oWordControl.m_oLogicDocument && oWordControl.m_oApi.bInit_word_control)
                 oWordControl.m_oLogicDocument.Viewer_OnChangePosition();
         }
-        if (null != oWordControl.m_oLogicDocument)
+        if (null != oWordControl.m_oLogicDocument && !oWordControl.m_oApi.isLockTargetUpdate)
         {
             oWordControl.m_oDrawingDocument.UpdateTargetFromPaint = true;
             oWordControl.m_oLogicDocument.CheckTargetUpdate();

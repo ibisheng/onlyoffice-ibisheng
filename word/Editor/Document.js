@@ -10800,45 +10800,6 @@ CDocument.prototype.OnKeyDown               = function(e)
         this.Cursor_MoveDown(true === e.ShiftKey);
         bRetValue = keydownresult_PreventAll;
     }
-    else if (e.KeyCode == 45) // Insert
-    {
-        if (true === e.CtrlKey) // Ctrl + Insert (аналогично Ctrl + C)
-        {
-            Editor_Copy(this.Api);
-            bRetValue = keydownresult_PreventKeyPress;
-        }
-        else if (true === e.ShiftKey && false === editor.isViewMode) // Shift + Insert (аналогично Ctrl + V)
-        {
-            if (false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content))
-            {
-                if (!window.GlobalPasteFlag)
-                {
-                    if (!AscCommon.AscBrowser.isSafariMacOs)
-                    {
-                        this.Create_NewHistoryPoint(AscDFH.historydescription_Document_ShiftInsert);
-
-                        window.GlobalPasteFlag = true;
-                        editor.incrementCounterLongAction();
-                        Editor_Paste(this.DrawingDocument.m_oWordControl.m_oApi, true);
-                        bRetValue = keydownresult_PreventKeyPress;
-                    }
-                    else
-                    {
-                        if (0 === window.GlobalPasteFlagCounter)
-                        {
-                            this.Create_NewHistoryPoint(AscDFH.historydescription_Document_ShiftInsertSafari);
-
-                            AscCommon.SafariIntervalFocus();
-                            window.GlobalPasteFlag = true;
-                            editor.incrementCounterLongAction();
-                            Editor_Paste(this.DrawingDocument.m_oWordControl.m_oApi, true);
-                            bRetValue = keydownresult_PreventKeyPress;
-                        }
-                    }
-                }
-            }
-        }
-    }
     else if (e.KeyCode == 46 && false === editor.isViewMode) // Delete
     {
         if (true != e.ShiftKey)
@@ -10849,14 +10810,6 @@ CDocument.prototype.OnKeyDown               = function(e)
                 this.Remove(1, true);
             }
             bRetValue = keydownresult_PreventAll;
-        }
-        else // Shift + Delete (аналогично Ctrl + X)
-        {
-            if (false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content))
-            {
-                Editor_Copy(this.Api, true);
-            }
-            bRetValue = keydownresult_PreventKeyPress;
         }
     }
     else if (e.KeyCode == 49 && false === editor.isViewMode && true === e.AltKey && !e.AltGr) // Alt + Ctrl + Num1 - применяем стиль Heading1
@@ -10929,11 +10882,6 @@ CDocument.prototype.OnKeyDown               = function(e)
         {
             this.Document_Format_Copy();
             bRetValue = keydownresult_PreventAll;
-        }
-        else // Ctrl + C - copy
-        {
-            Editor_Copy(this.Api);
-            bRetValue = keydownresult_PreventKeyPress;
         }
     }
     else if (e.KeyCode == 69 && false === editor.isViewMode && true === e.CtrlKey) // Ctrl + E + ...
@@ -11052,59 +11000,6 @@ CDocument.prototype.OnKeyDown               = function(e)
             }
             bRetValue = keydownresult_PreventAll;
         }
-    }
-    else if (e.KeyCode == 86 && false === editor.isViewMode && true === e.CtrlKey) // Ctrl + V - paste
-    {
-        if (false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content))
-        {
-            if (true === e.ShiftKey) // Ctrl + Shift + V - вставляем по образцу
-            {
-                this.Create_NewHistoryPoint(AscDFH.historydescription_Document_FormatPasteHotKey);
-                this.Document_Format_Paste();
-                bRetValue = keydownresult_PreventAll;
-            }
-            else // Ctrl + V - paste
-            {
-                if (!window.GlobalPasteFlag)
-                {
-                    if (!AscCommon.AscBrowser.isSafariMacOs)
-                    {
-                        this.Create_NewHistoryPoint(AscDFH.historydescription_Document_PasteHotKey);
-
-                        window.GlobalPasteFlag = true;
-                        editor.incrementCounterLongAction();
-                        Editor_Paste(this.DrawingDocument.m_oWordControl.m_oApi, true);
-                        bRetValue = keydownresult_PreventKeyPress;
-                    }
-                    else
-                    {
-                        if (0 === window.GlobalPasteFlagCounter)
-                        {
-                            this.Create_NewHistoryPoint(AscDFH.historydescription_Document_PasteSafariHotKey);
-
-                            AscCommon.SafariIntervalFocus();
-                            window.GlobalPasteFlag = true;
-                            editor.incrementCounterLongAction();
-                            Editor_Paste(this.DrawingDocument.m_oWordControl.m_oApi, true);
-                            bRetValue = keydownresult_PreventKeyPress;
-                        }
-                    }
-                }
-                else
-                {
-                    if (!AscCommon.AscBrowser.isSafariMacOs)
-                        bRetValue = keydownresult_PreventAll;
-                }
-            }
-        }
-    }
-    else if (e.KeyCode == 88 && false === editor.isViewMode && true === e.CtrlKey) // Ctrl + X - cut
-    {
-        if (false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content))
-        {
-            Editor_Copy(this.Api, true);
-        }
-        bRetValue = keydownresult_PreventKeyPress;
     }
     else if (e.KeyCode == 89 && false === editor.isViewMode && true === e.CtrlKey) // Ctrl + Y - Redo
     {

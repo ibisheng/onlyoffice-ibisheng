@@ -2866,16 +2866,21 @@ function CBinaryFileWriter()
 
         image.spPr.WriteXfrm = image.spPr.xfrm;
 
+        var bSetGeometry = false;
         if (image.spPr.geometry === undefined || image.spPr.geometry == null)
         {
             // powerpoint!
-            image.spPr.geometry = AscFormat.CreateGeometry("rect");
+            bSetGeometry = true;
+            image.spPr.geometry = AscFormat.ExecuteNoHistory(function(){return AscFormat.CreateGeometry("rect");}, this, []);
         }
 
         var unifill = new AscFormat.CUniFill();
         unifill.fill = image.blipFill
         oThis.WriteRecord1(1, unifill, oThis.WriteUniFill);
         oThis.WriteRecord1(2, image.spPr, oThis.WriteSpPr);
+        if(bSetGeometry){
+            image.spPr.geometry = null;
+        }
         oThis.WriteRecord2(3, image.style, oThis.WriteShapeStyle);
 
         image.spPr.WriteXfrm = null;
@@ -4521,8 +4526,6 @@ function CBinaryFileWriter()
 
             shape.spPr.WriteXfrm = shape.spPr.xfrm;
 
-            shape.spPr.Geometry = shape.spPr.geometry;
-
             var tmpFill = shape.spPr.Fill;
             var isUseTmpFill = false;
             if (tmpFill !== undefined && tmpFill != null)
@@ -4567,7 +4570,6 @@ function CBinaryFileWriter()
                 _writer.EndRecord();
             }
 
-            delete shape.spPr.Geometry;
             if (isUseTmpFill)
             {
                 shape.spPr.Fill = tmpFill;
@@ -4594,12 +4596,6 @@ function CBinaryFileWriter()
 
             image.spPr.WriteXfrm = image.spPr.xfrm;
 
-            image.spPr.Geometry = image.spPr.geometry;
-            if (image.spPr.Geometry === undefined || image.spPr.Geometry == null)
-            {
-                // powerpoint!
-                image.spPr.Geometry = AscFormat.CreateGeometry("rect");
-            }
 
             var _unifill = null;
             if (image.blipFill instanceof AscFormat.CUniFill)
@@ -4617,7 +4613,6 @@ function CBinaryFileWriter()
             _writer.WriteRecord2(3, image.style, _writer.WriteShapeStyle);
 
             delete image.spPr.WriteXfrm;
-            delete image.spPr.Geometry;
 
             _writer.EndRecord();
         }
@@ -4633,46 +4628,6 @@ function CBinaryFileWriter()
             _writer._WriteUChar2(4, 0);
             _writer._WriteUChar2(5, 0);
             _writer.WriteUChar(g_nodeAttributeEnd);
-        }
-
-        this.WriteImageBySrc = function(memory, src, w, h)
-        {
-            this.arrayStackStarts.push(this.BinaryFileWriter.pos);
-
-            var _writer = this.BinaryFileWriter;
-
-            _writer.StartRecord(0);
-            _writer.StartRecord(1);
-
-            _writer.StartRecord(2);
-            //_writer.WriteRecord1(0, image.nvPicPr, _writer.WriteUniNvPr);
-
-            var spPr = new AscFormat.CSpPr();
-            spPr.WriteXfrm = new AscFormat.CXfrm();
-            spPr.WriteXfrm.offX = 0;
-            spPr.WriteXfrm.offY = 0;
-            spPr.WriteXfrm.extX = w;
-            spPr.WriteXfrm.extY = h;
-
-            spPr.Geometry = AscFormat.CreateGeometry("rect");
-
-            var _unifill = new AscFormat.CUniFill();
-            _unifill.fill = new AscFormat.CBlipFill();
-            _unifill.fill.RasterImageId = src;
-
-            _writer.WriteRecord1(1, _unifill, _writer.WriteUniFill);
-            _writer.WriteRecord1(2, spPr, _writer.WriteSpPr);
-
-            _writer.EndRecord();
-
-            _writer.EndRecord();
-            _writer.EndRecord();
-
-            var oldPos = this.arrayStackStarts[this.arrayStackStarts.length - 1];
-            memory.WriteBuffer(this.BinaryFileWriter.data, oldPos, this.BinaryFileWriter.pos - oldPos);
-            this.BinaryFileWriter.pos = oldPos;
-
-            this.arrayStackStarts.splice(this.arrayStackStarts.length - 1, 1);
         }
 
         this.WriteGroup = function(group, Document, oMapCommentId, oNumIdMap, copyParams, saveParams)

@@ -715,27 +715,23 @@ cArea.prototype.foreach = function ( action ) {
         r._foreach2( action );
     }
 };
-cArea.prototype._parseCellValue = function ( cell ) {
-    var result, cellType, cellValue;
-    if ( cell ) {
-        cellType = cell.getType();
-        cellValue = cell.getValueWithoutFormat();
-        if ( cellType === CellValueType.Number ) {
-            result = cell.isEmptyTextString() ? new cEmpty() : new cNumber( cellValue );
-    } else if (cellType === CellValueType.Bool) {
-            result = new cBool( cellValue );
-    } else if (cellType === CellValueType.Error) {
-            result = new cError( cellValue );
-    } else if (cellType === CellValueType.String) {
-            result = new cString( cellValue );
-    } else {
-            result = cell.isEmptyTextString() ? checkTypeCell( "" + cellValue ) : new cNumber( cellValue );
-        }
-  } else {
-        result = new cEmpty();
-    }
-    return result;
-};
+	cArea.prototype._parseCellValue = function (cell) {
+		var result = null, cellType, cellValue;
+		if (cell) {
+			cellType = cell.getType();
+			cellValue = cell.getValueWithoutFormat();
+			if (cellType === CellValueType.Number) {
+				result = cell.isEmptyTextString() ? new cEmpty() : new cNumber(cellValue);
+			} else if (cellType === CellValueType.Bool) {
+				result = new cBool(cellValue);
+			} else if (cellType === CellValueType.Error) {
+				result = new cError(cellValue);
+			} else if (cellType === CellValueType.String) {
+				result = new cString(cellValue);
+			}
+		}
+		return result || new cEmpty();
+	};
 cArea.prototype.foreach2 = function ( action ) {
     var t = this, r = this.getRange();
     if ( r ) {
@@ -744,16 +740,23 @@ cArea.prototype.foreach2 = function ( action ) {
         } );
     }
 };
-cArea.prototype.getMatrix = function () {
-    var t = this, arr = [], r = this.getRange();
-    r._foreach2( function ( cell, i, j, r1, c1 ) {
-    if (!arr[i - r1]) {
-            arr[i - r1] = [];
-    }
-        arr[i - r1][j - c1] = t._parseCellValue( cell );
-    } );
-    return arr;
-};
+	cArea.prototype.getMatrix = function () {
+		var t = this, arr = [], r = this.getRange();
+		r._foreach2(function (cell, i, j, r1, c1) {
+			if (!arr[i - r1]) {
+				arr[i - r1] = [];
+			}
+			arr[i - r1][j - c1] = t._parseCellValue(cell);
+		});
+		return arr;
+	};
+	cArea.prototype.getValuesNoEmpty = function () {
+		var t = this, arr = [], r = this.getRange();
+		r._foreachNoEmpty(function (cell) {
+			arr.push(t._parseCellValue(cell));
+		});
+		return [arr];
+	};
 cArea.prototype.getRefMatrix = function () {
     var t = this, arr = [], r = this.getRange();
     r._foreach2( function ( cell, i, j, r1, c1 ) {
