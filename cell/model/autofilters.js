@@ -2755,14 +2755,10 @@
 						var ref = filter.Ref;
 						var tableRange = new Asc.Range(ref.c1, ref.r1, ref.c2, ref.r1);
 						
-						if(filter.HeaderRowCount === 0)
-						{
-							continue;
-						}
 						
 						//в этом случае нашли ячейки(ячейку), которая входит в состав заголовка фильтра
 						var intersection = range.intersection(tableRange);
-						if(intersection != null)
+						if(null !== intersection && 0 !== filter.HeaderRowCount)
 						{
 							//проходимся по всем заголовкам
 							for(var j = tableRange.c1; j <= tableRange.c2; j++)
@@ -2800,6 +2796,44 @@
 							}
 							
 							worksheet.handlers.trigger("changeColumnTablePart", filter.DisplayName);
+						}
+						else
+						{
+							this._changeTotalsRowData(filter, range);
+						}
+					}
+				}
+			},
+			
+			_changeTotalsRowData: function(tablePart, range)
+			{
+				if(!tablePart || !range || !tablePart.TotalsRowCount)
+				{
+					return false;
+				}
+				
+				var worksheet = this.worksheet;
+				
+				var tableRange = tablePart.Ref;
+				var totalRange = new Asc.Range(tableRange.c1, tableRange.r2, tableRange.c2, tableRange.r2);
+				var isIntersection = totalRange.intersection(range);
+				
+				if(isIntersection)
+				{
+					for(var j = isIntersection.c1; j <= isIntersection.c2; j++)
+					{
+						var cell = worksheet.getCell3(tableRange.r2, j);
+						var tableColumn = tablePart.TableColumns[j - tableRange.c1];
+						
+						if(cell.isFormula())
+						{
+							var val = cell.getFormula();
+							tableColumn.setTotalsRowFormula(val);
+						}
+						else
+						{
+							var val = cell.getValue();
+							tableColumn.setTotalsRowLabel(val);
 						}
 					}
 				}

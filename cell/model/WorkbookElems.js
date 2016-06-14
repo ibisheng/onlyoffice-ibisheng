@@ -5336,6 +5336,26 @@ TableColumn.prototype.getTotalRowFormula = function(tablePart){
 	return res;
 };
 
+TableColumn.prototype.cleanTotalsData = function(){
+	this.CalculatedColumnFormula = null;
+	this.TotalsRowFormula = null;
+	this.TotalsRowFunction = null;
+	this.TotalsRowLabel = null;
+};
+
+TableColumn.prototype.setTotalsRowFormula = function(val){
+	this.cleanTotalsData();
+	
+	this.TotalsRowFormula = val.substring(1);
+	this.TotalsRowFunction = Asc.ETotalsRowFunction.totalrowfunctionCustom;
+};
+
+TableColumn.prototype.setTotalsRowLabel = function(val){
+	this.cleanTotalsData();
+	
+	this.TotalsRowLabel = val;
+};
+
 /** @constructor */
 function TableStyleInfo() {
 	this.Name = null;
