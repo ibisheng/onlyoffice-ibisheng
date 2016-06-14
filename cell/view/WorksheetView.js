@@ -11325,6 +11325,7 @@
                   return false;
               }
               isFormula = c.isFormula();
+			  t.model.autoFilters.renameTableColumn(oCellEdit);
           } else {
               c.setValue2(val);
               // Вызываем функцию пересчета для заголовков форматированной таблицы
