@@ -7856,6 +7856,69 @@ background-repeat: no-repeat;\
 		return true;
 	};
 
+	// input
+	asc_docs_api.prototype.Begin_CompositeInput = function()
+	{
+		if (this.WordControl.m_oLogicDocument)
+			return this.WordControl.m_oLogicDocument.Begin_CompositeInput();
+		return null;
+	};
+	asc_docs_api.prototype.Add_CompositeText = function(nCharCode)
+	{
+		if (this.WordControl.m_oLogicDocument)
+			return this.WordControl.m_oLogicDocument.Add_CompositeText(nCharCode);
+		return null;
+	};
+	asc_docs_api.prototype.Remove_CompositeText = function(nCount)
+	{
+		if (this.WordControl.m_oLogicDocument)
+			return this.WordControl.m_oLogicDocument.Remove_CompositeText(nCount);
+		return null;
+	};
+	asc_docs_api.prototype.Replace_CompositeText = function(arrCharCodes)
+	{
+		if (this.WordControl.m_oLogicDocument)
+			return this.WordControl.m_oLogicDocument.Replace_CompositeText(arrCharCodes);
+		return null;
+	};
+	asc_docs_api.prototype.Set_CursorPosInCompositeText = function(nPos)
+	{
+		if (this.WordControl.m_oLogicDocument)
+			return this.WordControl.m_oLogicDocument.Set_CursorPosInCompositeText(nPos);
+		return null;
+	};
+	asc_docs_api.prototype.Get_CursorPosInCompositeText = function()
+	{
+		if (this.WordControl.m_oLogicDocument)
+			return this.WordControl.m_oLogicDocument.Get_CursorPosInCompositeText();
+		return 0;
+	};
+	asc_docs_api.prototype.End_CompositeInput = function()
+	{
+		if (this.WordControl.m_oLogicDocument)
+			return this.WordControl.m_oLogicDocument.End_CompositeInput();
+		return null;
+	};
+	asc_docs_api.prototype.Get_MaxCursorPosInCompositeText = function()
+	{
+		if (this.WordControl.m_oLogicDocument)
+			return this.WordControl.m_oLogicDocument.Get_MaxCursorPosInCompositeText();
+		return 0;
+	};
+
+	asc_docs_api.prototype.onKeyDown = function(e)
+	{
+		return this.WordControl.onKeyDown(e);
+	};
+	asc_docs_api.prototype.onKeyPress = function(e)
+	{
+		return this.WordControl.onKeyPress(e);
+	};
+	asc_docs_api.prototype.onKeyUp = function(e)
+	{
+		return this.WordControl.onKeyUp(e);
+	};
+
 	window["asc_docs_api"]                                      = asc_docs_api;
 	window["asc_docs_api"].prototype["asc_nativeOpenFile"]      = function(base64File, version)
 	{

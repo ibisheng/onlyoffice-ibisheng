@@ -2,6 +2,20 @@
 
 (function(window, undefined)
 {
+	///
+	// такие методы нужны в апи
+	// baseEditorsApi.prototype.Begin_CompositeInput = function()
+	// baseEditorsApi.prototype.Replace_CompositeText = function(arrCharCodes)
+	// baseEditorsApi.prototype.Set_CursorPosInCompositeText = function(nPos)
+	// baseEditorsApi.prototype.Get_CursorPosInCompositeText = function()
+	// baseEditorsApi.prototype.End_CompositeInput = function()
+	// baseEditorsApi.prototype.Get_MaxCursorPosInCompositeText = function()
+
+	// baseEditorsApi.prototype.onKeyDown = function(e)
+	// baseEditorsApi.prototype.onKeyPress = function(e)
+	// baseEditorsApi.prototype.onKeyUp = function(e)
+	///
+
 	var c_oCompositionState = {
 		start 	: 0,
 		process : 1,
@@ -20,7 +34,6 @@
 
 		this.HtmlAreaOffset = 60;
 
-		this.Listener 	= null;
 		this.LockerTargetTimer = -1;
 
 		this.KeyDownFlag = false;
@@ -82,8 +95,6 @@
 			this.HtmlArea.addEventListener("compositionupdate", function(e) { return oThis.onCompositionUpdate(e); }, false);
 			this.HtmlArea.addEventListener("compositionend", function(e) { return oThis.onCompositionEnd(e); }, false);
 
-			this.Listener = this.Api.WordControl.m_oLogicDocument;
-
 			this.show(false);
 
 			// TODO:
@@ -125,9 +136,6 @@
 
 		onInput : function(e)
 		{
-			if (!this.checkListener())
-				return;
-
 			if (AscCommon.AscBrowser.isMozilla)
 			{
 				if (c_oCompositionState.process == this.compositionState)
@@ -138,10 +146,10 @@
 
 			if (!this.KeyDownFlag && c_oCompositionState.end == this.compositionState && !this.TextInputAfterComposition && this.HtmlArea.value != "")
 			{
-				this.Listener.Begin_CompositeInput();
+				this.Api.Begin_CompositeInput();
 				this.checkCompositionData(this.HtmlArea.value);
-				this.Listener.Replace_CompositeText(this.compositionValue);
-				this.Listener.End_CompositeInput();
+				this.Api.Replace_CompositeText(this.compositionValue);
+				this.Api.End_CompositeInput();
 			}
 
 			this.TextInputAfterComposition = false;
@@ -165,7 +173,7 @@
 			if (_code != 8 && _code != 46)
 				this.KeyDownFlag = true;
 
-			return this.Api.WordControl.onKeyDown(e);
+			return this.Api.onKeyDown(e);
 		},
 
 		onKeyPress : function(e)
@@ -173,7 +181,7 @@
 			if (c_oCompositionState.end != this.compositionState)
 				return;
 
-			return this.Api.WordControl.onKeyPress(e);
+			return this.Api.onKeyPress(e);
 		},
 
 		onKeyUp : function(e)
@@ -181,7 +189,7 @@
 			this.KeyDownFlag = false;
 
 			if (c_oCompositionState.end == this.compositionState)
-				return this.Api.WordControl.onKeyUp(e);
+				return this.Api.onKeyUp(e);
 
 			if (AscCommon.AscBrowser.isChrome ||
 				AscCommon.AscBrowser.isSafari ||
@@ -195,7 +203,7 @@
 		{
 			var _offset = this.HtmlArea.selectionEnd;
 			_offset -= (this.HtmlArea.value.length - this.compositionValue.length);
-			this.Listener.Set_CursorPosInCompositeText(_offset);
+			this.Api.Set_CursorPosInCompositeText(_offset);
 
 			this.unlockTarget();
 		},
@@ -228,11 +236,8 @@
 
 		onCompositionStart : function(e)
 		{
-			if (!this.checkListener())
-				return;
-
 			this.compositionState = c_oCompositionState.start;
-			this.Listener.Begin_CompositeInput();
+			this.Api.Begin_CompositeInput();
 		},
 
 		onCompositionUpdate : function(e, isLockTarget)
@@ -265,14 +270,14 @@
 				var _max = 0;
 				if (_isNeedSavePos)
 				{
-					_old = this.Listener.Get_CursorPosInCompositeText();
-					_max = this.Listener.Get_MaxCursorPosInCompositeText();
+					_old = this.Api.Get_CursorPosInCompositeText();
+					_max = this.Api.Get_MaxCursorPosInCompositeText();
 				}
-				this.Listener.Replace_CompositeText(this.compositionValue);
+				this.Api.Replace_CompositeText(this.compositionValue);
 				if (_isNeedSavePos)
 				{
 					if (_old != _max)
-						this.Listener.Set_CursorPosInCompositeText(_old);
+						this.Api.Set_CursorPosInCompositeText(_old);
 				}
 			}
 
@@ -295,10 +300,10 @@
 				this.onCompositionUpdate(e, false);
 			}
 
-			this.Listener.Set_CursorPosInCompositeText(1000); // max
+			this.Api.Set_CursorPosInCompositeText(1000); // max
 
 			this.clear();
-			this.Listener.End_CompositeInput();
+			this.Api.End_CompositeInput();
 
 			this.unlockTarget();
 			this.TextInputAfterComposition = true;
@@ -328,13 +333,6 @@
 					}
 				}
 			}
-		},
-
-		checkListener : function()
-		{
-			if (!this.Listener)
-				this.Listener = this.Api.WordControl.m_oLogicDocument;
-			return !!this.Listener;
 		}
 	};
 
