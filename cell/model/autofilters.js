@@ -2389,6 +2389,12 @@
 							
 							tablePart.HeaderRowCount = tablePart.HeaderRowCount === null ? 0 : null;
 							tablePart.changeRef(null, 1, true);
+							
+							if(tablePart.AutoFilter)
+							{
+								tablePart.AutoFilter = null;
+								this._openHiddenRows(tablePart);
+							}
 						}
 						else
 						{
@@ -2410,6 +2416,12 @@
 								
 								tablePart.HeaderRowCount = tablePart.HeaderRowCount === null ? 0 : null;
 								tablePart.changeRef(null, -1, true);
+							}
+							
+							if(null === tablePart.AutoFilter)
+							{
+								tablePart.AutoFilter = new AscCommonExcel.AutoFilter();
+								tablePart.AutoFilter.Ref = tablePart.Ref.clone();
 							}
 						}
 						
