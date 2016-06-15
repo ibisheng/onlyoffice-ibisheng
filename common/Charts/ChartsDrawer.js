@@ -2400,6 +2400,10 @@ CChartsDrawer.prototype =
 				//TODO возможно нужно будет проверку добавить на isHidden
 				counter++;
 			}
+			else if(3 === this.nDimensionCount)
+			{
+				counter++;
+			}
 		}
 		
 		return counter;
