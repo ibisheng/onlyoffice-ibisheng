@@ -496,6 +496,19 @@
 				if(filterObj.filter === null)
 					return;
 				
+				//if apply a/f from context menu
+				if(autoFiltersObject && null === autoFiltersObject.automaticRowCount && currentFilter.isAutoFilter() && currentFilter.isApplyAutoFilter() === false)
+				{
+					var automaticRange = this._getAdjacentCellsAF(currentFilter.Ref, true);
+					var automaticRowCount = automaticRange.r2;
+					
+					var maxFilterRow = currentFilter.Ref.r2;
+					if(automaticRowCount > currentFilter.Ref.r2)
+						maxFilterRow = automaticRowCount;
+					
+					autoFiltersObject.automaticRowCount = maxFilterRow;
+				}
+				
 				//for history				
 				var oldFilter = filterObj.filter.clone(null);
 				History.Create_NewPoint();
