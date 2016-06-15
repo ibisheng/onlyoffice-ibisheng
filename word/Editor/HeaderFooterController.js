@@ -39,6 +39,10 @@ CHdrFtrController.prototype.GetCurPage = function()
 
 	return -1;
 };
+CHdrFtrController.prototype.AddNewParagraph = function(bRecalculate, bForceAdd)
+{
+	return this.HdrFtr.Add_NewParagraph(bRecalculate, bForceAdd);
+};
 CHdrFtrController.prototype.Cursor_MoveLeft = function(AddToSelect, Word)
 {
 	return this.HdrFtr.Cursor_MoveLeft(AddToSelect, Word);

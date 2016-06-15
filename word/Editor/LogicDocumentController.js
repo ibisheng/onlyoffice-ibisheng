@@ -29,6 +29,10 @@ CLogicDocumentController.prototype.GetCurPage = function()
 {
 	return this.LogicDocument.controller_GetCurPage();
 };
+CLogicDocumentController.prototype.AddNewParagraph = function(bRecalculate, bForceAdd)
+{
+	return this.LogicDocument.controller_AddNewParagraph(bRecalculate, bForceAdd);
+};
 CLogicDocumentController.prototype.Cursor_MoveLeft = function(AddToSelect, Word)
 {
 	return this.LogicDocument.controller_CursorMoveLeft(AddToSelect, Word);

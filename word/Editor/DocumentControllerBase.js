@@ -198,6 +198,13 @@ CDocumentControllerBase.prototype.RecalculateCurPos = function(){};
  */
 CDocumentControllerBase.prototype.GetCurPage = function(){return -1;};
 /**
+ * Добавляем новый параграф.
+ * @param {boolean} bRecalculate - Пересчитывать или нет.
+ * @param {boolean} bForceAdd    - Добавляем параграф, пропуская всякие проверки типа пустого параграфа с нумерацией.
+ * @constructor
+ */
+CDocumentControllerBase.prototype.AddNewParagraph = function(bRecalculate, bForceAdd){return false;};
+/**
  * Смещаем курсор влево
  * @param {boolean} AddToSelect Добавлять ли к селекту смещение
  * @param {boolean} Word Осуществлять ли переход по целому слову

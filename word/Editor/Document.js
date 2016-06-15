@@ -3666,154 +3666,8 @@ CDocument.prototype.Draw_Borders                             = function(Graphics
  */
 CDocument.prototype.Add_NewParagraph = function(bRecalculate, bForceAdd)
 {
-    // Работаем с колонтитулом
-    if (docpostype_HdrFtr === this.CurPos.Type)
-    {
-        return this.HdrFtr.Add_NewParagraph(bRecalculate);
-    }
-    else if (docpostype_DrawingObjects === this.CurPos.Type)
-    {
-        return this.DrawingObjects.addNewParagraph(bRecalculate);
-    }
-    else // if ( docpostype_Content === this.CurPos.Type )
-    {
-        if (this.CurPos.ContentPos < 0)
-            return false;
-
-        // Сначала удаляем заселекченую часть
-        if (true === this.Selection.Use)
-        {
-            this.Remove(1, true);
-        }
-
-        // Добавляем новый параграф
-        var Item = this.Content[this.CurPos.ContentPos];
-
-        // Если мы внутри параграфа, тогда:
-        // 1. Если мы в середине параграфа, разделяем данный параграф на 2.
-        //    При этом полностью копируем все настройки из исходного параграфа.
-        // 2. Если мы в конце данного параграфа, тогда добавляем новый пустой параграф.
-        //    Стиль у него проставляем такой какой указан у текущего в Style.Next.
-        //    Если при этом у нового параграфа стиль будет такой же как и у старого,
-        //    в том числе если стиля нет у обоих, тогда копируем еще все прямые настройки.
-        //    (Т.е. если стили разные, а у исходный параграф был параграфом со списком, тогда
-        //    новый параграф будет без списка).
-        if (type_Paragraph == Item.GetType())
-        {
-            // Если текущий параграф пустой и с нумерацией, тогда удаляем нумерацию и отступы левый и первой строки
-            if (true !== bForceAdd && undefined != Item.Numbering_Get() && true === Item.IsEmpty({SkipNewLine : true}) && true === Item.Cursor_IsStart())
-            {
-                Item.Numbering_Remove();
-                Item.Set_Ind({FirstLine : undefined, Left : undefined, Right : Item.Pr.Ind.Right}, true);
-            }
-            else
-            {
-                var ItemReviewType = Item.Get_ReviewType();
-                // Создаем новый параграф
-                var NewParagraph   = new Paragraph(this.DrawingDocument, this, 0, 0, 0, 0, 0);
-
-                // Проверим позицию в текущем параграфе
-                if (true === Item.Cursor_IsEnd())
-                {
-                    var StyleId = Item.Style_Get();
-                    var NextId  = undefined;
-
-                    if (undefined != StyleId)
-                    {
-                        NextId = this.Styles.Get_Next(StyleId);
-
-                        if (null === NextId)
-                            NextId = StyleId;
-                    }
-
-
-                    if (StyleId === NextId)
-                    {
-                        // Продолжаем (в плане настроек) новый параграф
-                        Item.Continue(NewParagraph);
-                    }
-                    else
-                    {
-                        // Простое добавление стиля, без дополнительных действий
-                        if (NextId === this.Styles.Get_Default_Paragraph())
-                            NewParagraph.Style_Remove();
-                        else
-                            NewParagraph.Style_Add(NextId, true);
-                    }
-
-                    var SectPr = Item.Get_SectionPr();
-                    if (undefined !== SectPr)
-                    {
-                        Item.Set_SectionPr(undefined);
-                        NewParagraph.Set_SectionPr(SectPr);
-                    }
-                }
-                else
-                {
-                    Item.Split(NewParagraph);
-                }
-
-                this.Internal_Content_Add(this.CurPos.ContentPos + 1, NewParagraph);
-
-                this.CurPos.ContentPos++;
-
-                // Отмечаем, что последний измененный элемент - предыдущий параграф
-                this.ContentLastChangePos = this.CurPos.ContentPos - 1;
-
-                if (true === this.Is_TrackRevisions())
-                {
-                    NewParagraph.Remove_PrChange();
-                    NewParagraph.Set_ReviewType(ItemReviewType);
-                    Item.Set_ReviewType(reviewtype_Add);
-                }
-                else if (reviewtype_Common !== ItemReviewType)
-                {
-                    NewParagraph.Set_ReviewType(ItemReviewType);
-                    Item.Set_ReviewType(reviewtype_Common);
-                }
-            }
-
-            if (false != bRecalculate)
-            {
-                this.Recalculate();
-
-                this.Document_UpdateInterfaceState();
-                //this.Document_UpdateRulersState()
-                this.Document_UpdateSelectionState();
-            }
-        }
-        else if (type_Table == Item.GetType())
-        {
-            // Если мы находимся в начале первого параграфа первой ячейки, и
-            // данная таблица - первый элемент, тогда добавляем параграф до таблицы.
-
-            if (0 === this.CurPos.ContentPos && Item.Cursor_IsStart(true))
-            {
-                // Создаем новый параграф
-                var NewParagraph = new Paragraph(this.DrawingDocument, this, 0, 0, 0, 0, 0);
-                this.Internal_Content_Add(0, NewParagraph);
-
-                this.ContentLastChangePos = 0;
-                this.CurPos.ContentPos    = 0;
-
-                if (false != bRecalculate)
-                {
-                    this.Recalculate();
-                    this.Document_UpdateInterfaceState();
-                    //this.Document_UpdateRulersState()
-                    this.Document_UpdateSelectionState();
-                }
-
-                if (true === this.Is_TrackRevisions())
-                {
-                    NewParagraph.Remove_PrChange();
-                    NewParagraph.Set_ReviewType(reviewtype_Add);
-                }
-            }
-            else
-                Item.Add_NewParagraph(bRecalculate);
-        }
-    }
+	// TODO: Пересчит нужно перенести сюда, и убрать из контроллеров
+	this.Controller.AddNewParagraph(bRecalculate, bForceAdd);
 };
 /**
  * Расширяем документ до точки (X,Y) с помощью новых параграфов.
@@ -16315,6 +16169,145 @@ CDocument.prototype.controller_GetCurPage = function()
 		return this.Content[Pos].Get_CurrentPage_Absolute();
 
 	return -1;
+};
+CDocument.prototype.controller_AddNewParagraph = function(bRecalculate, bForceAdd)
+{
+	if (this.CurPos.ContentPos < 0)
+		return false;
+
+	// Сначала удаляем заселекченую часть
+	if (true === this.Selection.Use)
+	{
+		this.Remove(1, true);
+	}
+
+	// Добавляем новый параграф
+	var Item = this.Content[this.CurPos.ContentPos];
+
+	// Если мы внутри параграфа, тогда:
+	// 1. Если мы в середине параграфа, разделяем данный параграф на 2.
+	//    При этом полностью копируем все настройки из исходного параграфа.
+	// 2. Если мы в конце данного параграфа, тогда добавляем новый пустой параграф.
+	//    Стиль у него проставляем такой какой указан у текущего в Style.Next.
+	//    Если при этом у нового параграфа стиль будет такой же как и у старого,
+	//    в том числе если стиля нет у обоих, тогда копируем еще все прямые настройки.
+	//    (Т.е. если стили разные, а у исходный параграф был параграфом со списком, тогда
+	//    новый параграф будет без списка).
+	if (type_Paragraph == Item.GetType())
+	{
+		// Если текущий параграф пустой и с нумерацией, тогда удаляем нумерацию и отступы левый и первой строки
+		if (true !== bForceAdd && undefined != Item.Numbering_Get() && true === Item.IsEmpty({SkipNewLine : true}) && true === Item.Cursor_IsStart())
+		{
+			Item.Numbering_Remove();
+			Item.Set_Ind({FirstLine : undefined, Left : undefined, Right : Item.Pr.Ind.Right}, true);
+		}
+		else
+		{
+			var ItemReviewType = Item.Get_ReviewType();
+			// Создаем новый параграф
+			var NewParagraph   = new Paragraph(this.DrawingDocument, this, 0, 0, 0, 0, 0);
+
+			// Проверим позицию в текущем параграфе
+			if (true === Item.Cursor_IsEnd())
+			{
+				var StyleId = Item.Style_Get();
+				var NextId  = undefined;
+
+				if (undefined != StyleId)
+				{
+					NextId = this.Styles.Get_Next(StyleId);
+
+					if (null === NextId)
+						NextId = StyleId;
+				}
+
+
+				if (StyleId === NextId)
+				{
+					// Продолжаем (в плане настроек) новый параграф
+					Item.Continue(NewParagraph);
+				}
+				else
+				{
+					// Простое добавление стиля, без дополнительных действий
+					if (NextId === this.Styles.Get_Default_Paragraph())
+						NewParagraph.Style_Remove();
+					else
+						NewParagraph.Style_Add(NextId, true);
+				}
+
+				var SectPr = Item.Get_SectionPr();
+				if (undefined !== SectPr)
+				{
+					Item.Set_SectionPr(undefined);
+					NewParagraph.Set_SectionPr(SectPr);
+				}
+			}
+			else
+			{
+				Item.Split(NewParagraph);
+			}
+
+			this.Internal_Content_Add(this.CurPos.ContentPos + 1, NewParagraph);
+
+			this.CurPos.ContentPos++;
+
+			// Отмечаем, что последний измененный элемент - предыдущий параграф
+			this.ContentLastChangePos = this.CurPos.ContentPos - 1;
+
+			if (true === this.Is_TrackRevisions())
+			{
+				NewParagraph.Remove_PrChange();
+				NewParagraph.Set_ReviewType(ItemReviewType);
+				Item.Set_ReviewType(reviewtype_Add);
+			}
+			else if (reviewtype_Common !== ItemReviewType)
+			{
+				NewParagraph.Set_ReviewType(ItemReviewType);
+				Item.Set_ReviewType(reviewtype_Common);
+			}
+		}
+
+		if (false != bRecalculate)
+		{
+			this.Recalculate();
+
+			this.Document_UpdateInterfaceState();
+			//this.Document_UpdateRulersState()
+			this.Document_UpdateSelectionState();
+		}
+	}
+	else if (type_Table == Item.GetType())
+	{
+		// Если мы находимся в начале первого параграфа первой ячейки, и
+		// данная таблица - первый элемент, тогда добавляем параграф до таблицы.
+
+		if (0 === this.CurPos.ContentPos && Item.Cursor_IsStart(true))
+		{
+			// Создаем новый параграф
+			var NewParagraph = new Paragraph(this.DrawingDocument, this, 0, 0, 0, 0, 0);
+			this.Internal_Content_Add(0, NewParagraph);
+
+			this.ContentLastChangePos = 0;
+			this.CurPos.ContentPos    = 0;
+
+			if (false != bRecalculate)
+			{
+				this.Recalculate();
+				this.Document_UpdateInterfaceState();
+				//this.Document_UpdateRulersState()
+				this.Document_UpdateSelectionState();
+			}
+
+			if (true === this.Is_TrackRevisions())
+			{
+				NewParagraph.Remove_PrChange();
+				NewParagraph.Set_ReviewType(reviewtype_Add);
+			}
+		}
+		else
+			Item.Add_NewParagraph(bRecalculate);
+	}
 };
 CDocument.prototype.controller_CursorMoveLeft = function(AddToSelect, Word)
 {

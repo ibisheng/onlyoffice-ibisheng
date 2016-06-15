@@ -36,6 +36,10 @@ CDrawingsController.prototype.GetCurPage = function()
 
 	return -1;
 };
+CDrawingsController.prototype.AddNewParagraph = function(bRecalculate, bForceAdd)
+{
+	return this.DrawingObjects.addNewParagraph(bRecalculate, bForceAdd);
+};
 CDrawingsController.prototype.Cursor_MoveLeft = function(AddToSelect, Word)
 {
 	return this.DrawingObjects.cursorMoveLeft(AddToSelect, Word);
@@ -50,9 +54,9 @@ CDrawingsController.prototype.AddToParagraph = function(oItem, bRecalculate)
 		return;
 
 	this.DrawingObjects.paragraphAdd(oItem, bRecalculate);
-	this.Logicdocument.Document_UpdateSelectionState();
-	this.Logicdocument.Document_UpdateUndoRedoState();
-	this.Logicdocument.Document_UpdateInterfaceState();
+	this.LogicDocument.Document_UpdateSelectionState();
+	this.LogicDocument.Document_UpdateUndoRedoState();
+	this.LogicDocument.Document_UpdateInterfaceState();
 };
 
 

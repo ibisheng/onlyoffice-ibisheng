@@ -272,6 +272,24 @@ CFootnotesController.prototype.GetCurPage = function()
 
 	return -1;
 };
+CFootnotesController.prototype.AddNewParagraph = function(bRecalculate, bForceAdd)
+{
+	var bRetValue = false;
+
+	// TODO: Доделать селект и курсор
+
+	if (true === this.Selection.Use)
+	{
+	}
+	else
+	{
+		if (null !== this.CurFootnote)
+			bRetValue = this.CurFootnote.Add_NewParagraph(bRecalculate, bForceAdd);
+	}
+
+	return bRetValue;
+
+};
 CFootnotesController.prototype.Cursor_MoveLeft = function(AddToSelect, Word)
 {
 	var bRetValue = false;
