@@ -8633,10 +8633,49 @@ Range.prototype.cleanHyperlinks=function(){
 		this.removeHyperlink(aHyperlinks.inner[i].data);
 	History.EndTransaction();
 };
-Range.prototype.sort=function(nOption, nStartCol, sortColor){
+Range.prototype.sort=function(nOption, nStartCol, sortColor, opt_guessHeader){
+	var bbox = this.bbox;
+	if (opt_guessHeader && bbox.r1 < bbox.r2) {
+		//если тип ячеек первого и второго row попарно совпадает, то считаем первую строку заголовком
+		//todo рассмотреть замерженые ячейки. стили тоже влияют, но непонятно как сравнивать border
+		var rowFirst = this.worksheet.getRange3(bbox.r1, bbox.c1, bbox.r1, bbox.c2);
+		var rowSecond = this.worksheet.getRange3(bbox.r1 + 1, bbox.c1, bbox.r1 + 1, bbox.c2);
+		var typesFirst = [];
+		var typesSecond = [];
+		rowFirst._setPropertyNoEmpty(null, null, function(cell, row, col) {
+			if (cell && !cell.isEmptyTextString()) {
+				typesFirst.push({col: col, type: cell.getType()});
+			}
+		});
+		rowSecond._setPropertyNoEmpty(null, null, function(cell, row, col) {
+			if (cell && !cell.isEmptyTextString()) {
+				typesSecond.push({col: col, type: cell.getType()});
+			}
+		});
+		var indexFirst = 0;
+		var indexSecond = 0;
+		while (indexFirst < typesFirst.length && indexSecond < typesSecond.length) {
+			var curFirst = typesFirst[indexFirst];
+			var curSecond = typesSecond[indexSecond];
+			if (curFirst.col < curSecond.col) {
+				indexFirst++;
+			} else if (curFirst.col > curSecond.col) {
+				indexSecond++;
+			} else {
+				if (curFirst.type != curSecond.type) {
+					//has head
+					bbox = bbox.clone();
+					bbox.r1++;
+					break;
+				}
+				indexFirst++;
+				indexSecond++;
+			}
+		}
+	}
 	//todo горизонтальная сортировка
-	var aMerged = this.worksheet.mergeManager.get(this.bbox);
-	if(aMerged.outer.length > 0 || (aMerged.inner.length > 0 && null == _isSameSizeMerged(this.bbox, aMerged.inner)))
+	var aMerged = this.worksheet.mergeManager.get(bbox);
+	if(aMerged.outer.length > 0 || (aMerged.inner.length > 0 && null == _isSameSizeMerged(bbox, aMerged.inner)))
 		return null;
 	var nMergedHeight = 1;
 	if(aMerged.inner.length > 0)
@@ -8656,10 +8695,10 @@ Range.prototype.sort=function(nOption, nStartCol, sortColor){
 	var bAscent = false;
 	if(nOption == Asc.c_oAscSortOptions.Ascending)
 		bAscent = true;
-	var nRowFirst0 = this.bbox.r1;
-	var nRowLast0 = this.bbox.r2;
-	var nColFirst0 = this.bbox.c1;
-	var nColLast0 = this.bbox.c2;
+	var nRowFirst0 = bbox.r1;
+	var nRowLast0 = bbox.r2;
+	var nColFirst0 = bbox.c1;
+	var nColLast0 = bbox.c2;
 	var bWholeCol = false;
 	var bWholeRow = false;
 	if(0 == nRowFirst0 && gc_nMaxRow0 == nRowLast0)

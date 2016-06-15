@@ -9057,7 +9057,7 @@
                         callTrigger = true;
                         t.handlers.trigger( "slowOperation", true );
                     }
-                    t.cellCommentator.sortComments( range.sort( val, arn.startCol, sortColor ) );
+                    t.cellCommentator.sortComments( range.sort( val, arn.startCol, sortColor, true ) );
                     break;
 
                 case "empty":
