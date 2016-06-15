@@ -3791,285 +3791,48 @@ CDocument.prototype.CanUnGroup                 = function()
 {
     return this.DrawingObjects.canUnGroup();
 };
-CDocument.prototype.Add_InlineImage            = function(W, H, Img, Chart, bFlow)
+CDocument.prototype.Add_InlineImage = function(W, H, Img, Chart, bFlow)
 {
-    if (undefined === bFlow)
-        bFlow = false;
+	if (undefined === bFlow)
+		bFlow = false;
 
-    // Работаем с колонтитулом
-    if (docpostype_HdrFtr === this.CurPos.Type)
-    {
-        return this.HdrFtr.Add_InlineImage(W, H, Img, Chart, bFlow);
-    }
-    else if (docpostype_DrawingObjects === this.CurPos.Type)
-    {
-        return this.DrawingObjects.addInlineImage(W, H, Img, Chart, bFlow);
-    }
-    else //if ( docpostype_Content === this.CurPos.Type )
-    {
-        if (true == this.Selection.Use)
-            this.Remove(1, true);
-
-        var Item = this.Content[this.CurPos.ContentPos];
-        if (type_Paragraph == Item.GetType())
-        {
-            var Drawing;
-            if (!AscCommon.isRealObject(Chart))
-            {
-                Drawing   = new ParaDrawing(W, H, null, this.DrawingDocument, this, null);
-                var Image = this.DrawingObjects.createImage(Img, 0, 0, W, H);
-                Image.setParent(Drawing);
-                Drawing.Set_GraphicObject(Image);
-            }
-            else
-            {
-                Drawing   = new ParaDrawing(W, H, null, this.DrawingDocument, this, null);
-                var Image = this.DrawingObjects.getChartSpace2(Chart, null);
-                Image.setParent(Drawing);
-                Drawing.Set_GraphicObject(Image);
-                Drawing.setExtent(Image.spPr.xfrm.extX, Image.spPr.xfrm.extY);
-            }
-            if (true === bFlow)
-            {
-                Drawing.Set_DrawingType(drawing_Anchor);
-                Drawing.Set_WrappingType(WRAPPING_TYPE_SQUARE);
-                Drawing.Set_BehindDoc(false);
-                Drawing.Set_Distance(3.2, 0, 3.2, 0);
-                Drawing.Set_PositionH(Asc.c_oAscRelativeFromH.Column, false, 0, false);
-                Drawing.Set_PositionV(Asc.c_oAscRelativeFromV.Paragraph, false, 0, false);
-            }
-            this.Paragraph_Add(Drawing);
-            this.Select_DrawingObject(Drawing.Get_Id());
-        }
-        else if (type_Table == Item.GetType())
-        {
-            Item.Add_InlineImage(W, H, Img, Chart, bFlow);
-        }
-    }
+	this.Controller.AddInlineImage(W, H, Img, Chart, bFlow);
 };
-
-CDocument.prototype.Add_OleObject              = function(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId)
+CDocument.prototype.Add_OleObject  = function(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId)
 {
-    if (docpostype_HdrFtr === this.CurPos.Type)
-    {
-        return this.HdrFtr.Add_OleObject(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId);
-    }
-    else if (docpostype_DrawingObjects === this.CurPos.Type)
-    {
-        return this.DrawingObjects.addOleObject(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId);
-    }
-    else //if ( docpostype_Content === this.CurPos.Type )
-    {
-        if (true == this.Selection.Use)
-            this.Remove(1, true);
-
-        var Item = this.Content[this.CurPos.ContentPos];
-        if (type_Paragraph == Item.GetType())
-        {
-            var Drawing   = new ParaDrawing(W, H, null, this.DrawingDocument, this, null);
-            var Image = this.DrawingObjects.createOleObject(Data, sApplicationId, Img, 0, 0, W, H, nWidthPix, nHeightPix);
-            Image.setParent(Drawing);
-            Drawing.Set_GraphicObject(Image);
-            this.Paragraph_Add(Drawing);
-            this.Select_DrawingObject(Drawing.Get_Id());
-        }
-        else if (type_Table == Item.GetType())
-        {
-            Item.Add_OleObject(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId);
-        }
-    }
+	this.Controller.AddOleObject(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId);
 };
-
 CDocument.prototype.Edit_OleObject = function(oOleObject, sData, sImageUrl, nPixWidth, nPixHeight)
 {
-    oOleObject.setData(sData);
-    var _blipFill = new AscFormat.CBlipFill();
-     _blipFill.RasterImageId = sImageUrl;
-    oOleObject.setBlipFill(_blipFill);
-    oOleObject.setPixSizes(nPixWidth, nPixHeight);
+	oOleObject.setData(sData);
+	var _blipFill           = new AscFormat.CBlipFill();
+	_blipFill.RasterImageId = sImageUrl;
+	oOleObject.setBlipFill(_blipFill);
+	oOleObject.setPixSizes(nPixWidth, nPixHeight);
 };
-
-CDocument.prototype.Add_TextArt                = function(nStyle)
+CDocument.prototype.Add_TextArt = function(nStyle)
 {
-    // Работаем с колонтитулом
-    if (docpostype_HdrFtr === this.CurPos.Type)
-    {
-        return this.HdrFtr.Add_TextArt(nStyle);
-    }
-    else if (docpostype_DrawingObjects !== this.CurPos.Type)
-    {
-
-        var Item = this.Content[this.CurPos.ContentPos];
-        if (type_Paragraph == Item.GetType())
-        {
-            var Drawing = new ParaDrawing(1828800 / 36000, 1828800 / 36000, null, this.DrawingDocument, this, null);
-            var TextArt = this.DrawingObjects.createTextArt(nStyle, true);
-            TextArt.setParent(Drawing);
-            Drawing.Set_GraphicObject(TextArt);
-            Drawing.Set_DrawingType(drawing_Anchor);
-            Drawing.Set_WrappingType(WRAPPING_TYPE_NONE);
-            Drawing.Set_BehindDoc(false);
-            Drawing.Set_Distance(3.2, 0, 3.2, 0);
-            Drawing.Set_PositionH(Asc.c_oAscRelativeFromH.Column, false, 0, false);
-            Drawing.Set_PositionV(Asc.c_oAscRelativeFromV.Paragraph, false, 0, false);
-
-            if (true == this.Selection.Use)
-                this.Remove(1, true);
-
-            this.Paragraph_Add(Drawing);
-            if (TextArt.bSelectedText)
-            {
-                this.Select_DrawingObject(Drawing.Get_Id());
-            }
-            else
-            {
-                var oContent = Drawing.GraphicObj.getDocContent();
-                oContent.Content[0].Document_SetThisElementCurrent(false);
-                this.Select_All();
-            }
-        }
-        else if (type_Table == Item.GetType())
-        {
-            Item.Add_TextArt(nStyle);
-        }
-    }
+	this.Controller.AddTextArt(nStyle);
 };
-CDocument.prototype.Edit_Chart                 = function(Chart)
+CDocument.prototype.Edit_Chart = function(Chart)
 {
-    if (docpostype_HdrFtr === this.CurPos.Type)
-    {
-        return this.HdrFtr.Edit_Chart(Chart);
-    }
-    else if (docpostype_DrawingObjects === this.CurPos.Type)
-    {
-        return this.DrawingObjects.editChart(Chart);
-    }
+	this.Controller.EditChart(Chart);
 };
-CDocument.prototype.Get_ChartObject            = function(type)
+CDocument.prototype.Get_ChartObject = function(type)
 {
-    return this.DrawingObjects.getChartObject(type);
+	return this.DrawingObjects.getChartObject(type);
 };
-CDocument.prototype.Add_InlineTable            = function(Cols, Rows)
+CDocument.prototype.Add_InlineTable = function(Cols, Rows)
 {
-    if (Cols <= 0 || Rows <= 0)
-        return;
+	// TODO: Пересчит нужно перенести сюда, и убрать из контроллеров
+	if (Cols <= 0 || Rows <= 0)
+		return;
 
-    // Добавляем таблицу в колонтитул
-    if (docpostype_HdrFtr === this.CurPos.Type)
-    {
-        this.HdrFtr.Add_InlineTable(Cols, Rows);
-    }
-    else if (docpostype_DrawingObjects === this.CurPos.Type)
-    {
-        this.DrawingObjects.addInlineTable(Cols, Rows);
-    }
-    else //if ( docpostype_Content === this.CurPos.Type )
-    {
-        if (this.CurPos.ContentPos < 0)
-            return false;
+	this.Controller.AddInlineTable(Cols, Rows);
 
-        // Сначала удаляем заселекченую часть
-        if (true === this.Selection.Use)
-        {
-            this.Remove(1, true);
-        }
-
-        // Добавляем таблицу
-        var Item = this.Content[this.CurPos.ContentPos];
-
-        // Если мы внутри параграфа, тогда разрываем его и на месте разрыва добавляем таблицу.
-        // А если мы внутри таблицы, тогда добавляем таблицу внутрь текущей таблицы.
-        switch (Item.GetType())
-        {
-            case type_Paragraph:
-            {
-                // Ширину таблицы делаем по минимальной ширине колонки.
-                var Page   = this.Pages[this.CurPage];
-                var SectPr = this.SectionsInfo.Get_SectPr(this.CurPos.ContentPos).SectPr;
-
-                var PageFields = this.Get_PageFields(this.CurPage);
-
-                // Создаем новую таблицу
-                var W    = (PageFields.XLimit - PageFields.X + 2 * 1.9);
-                var Grid = [];
-
-                if (SectPr.Get_ColumnsCount() > 1)
-                {
-                    for (var CurCol = 0, ColsCount = SectPr.Get_ColumnsCount(); CurCol < ColsCount; ++CurCol)
-                    {
-                        var ColumnWidth = SectPr.Get_ColumnWidth(CurCol);
-                        if (W > ColumnWidth)
-                            W = ColumnWidth;
-                    }
-
-                    W += 2 * 1.9;
-                }
-
-                W = Math.max(W, Cols * 2 * 1.9);
-
-                for (var Index = 0; Index < Cols; Index++)
-                    Grid[Index] = W / Cols;
-
-                var NewTable = new CTable(this.DrawingDocument, this, true, 0, 0, 0, 0, 0, Rows, Cols, Grid);
-                NewTable.Set_ParagraphPrOnAdd(Item);
-
-                // Проверим позицию в текущем параграфе
-                if (true === Item.Cursor_IsEnd() && undefined === Item.Get_SectionPr())
-                {
-                    // Выставляем курсор в начало таблицы
-                    NewTable.Cursor_MoveToStartPos();
-                    this.Internal_Content_Add(this.CurPos.ContentPos + 1, NewTable);
-
-                    this.CurPos.ContentPos++;
-
-                    // Отмечаем, что последний измененный элемент - предыдущий параграф
-                    this.ContentLastChangePos = this.CurPos.ContentPos - 1;
-
-                    this.Recalculate();
-
-                    this.Interface_Update_ParaPr();
-                    this.Interface_Update_TextPr();
-                    this.Interface_Update_TablePr();
-                }
-                else
-                {
-                    // Создаем новый параграф
-                    var NewParagraph = new Paragraph(this.DrawingDocument, this, 0, 0, 0, 0, 0);
-                    Item.Split(NewParagraph);
-
-                    // Добавляем новый параграф
-                    this.Internal_Content_Add(this.CurPos.ContentPos + 1, NewParagraph);
-
-                    // Выставляем курсор в начало таблицы
-                    NewTable.Cursor_MoveToStartPos();
-                    this.Internal_Content_Add(this.CurPos.ContentPos + 1, NewTable);
-
-                    this.CurPos.ContentPos++;
-
-                    // Отмечаем, что последний измененный элемент - предыдущий параграф
-                    this.ContentLastChangePos = this.CurPos.ContentPos - 1;
-
-                    this.Recalculate();
-
-                    this.Interface_Update_ParaPr();
-                    this.Interface_Update_TextPr();
-                    this.Interface_Update_TablePr();
-                }
-
-                break;
-            }
-
-            case type_Table:
-            {
-                Item.Add_InlineTable(Cols, Rows);
-                break;
-            }
-        }
-    }
-
-    this.Document_UpdateSelectionState();
-    this.Document_UpdateInterfaceState();
-    this.Document_UpdateRulersState();
+	this.Document_UpdateSelectionState();
+	this.Document_UpdateInterfaceState();
+	this.Document_UpdateRulersState();
 };
 CDocument.prototype.Add_DropCap                = function(bInText)
 {
@@ -16307,6 +16070,190 @@ CDocument.prototype.controller_AddNewParagraph = function(bRecalculate, bForceAd
 		}
 		else
 			Item.Add_NewParagraph(bRecalculate);
+	}
+};
+CDocument.prototype.controller_AddInlineImage = function(W, H, Img, Chart, bFlow)
+{
+	if (true == this.Selection.Use)
+		this.Remove(1, true);
+
+	var Item = this.Content[this.CurPos.ContentPos];
+	if (type_Paragraph == Item.GetType())
+	{
+		var Drawing;
+		if (!AscCommon.isRealObject(Chart))
+		{
+			Drawing   = new ParaDrawing(W, H, null, this.DrawingDocument, this, null);
+			var Image = this.DrawingObjects.createImage(Img, 0, 0, W, H);
+			Image.setParent(Drawing);
+			Drawing.Set_GraphicObject(Image);
+		}
+		else
+		{
+			Drawing   = new ParaDrawing(W, H, null, this.DrawingDocument, this, null);
+			var Image = this.DrawingObjects.getChartSpace2(Chart, null);
+			Image.setParent(Drawing);
+			Drawing.Set_GraphicObject(Image);
+			Drawing.setExtent(Image.spPr.xfrm.extX, Image.spPr.xfrm.extY);
+		}
+		if (true === bFlow)
+		{
+			Drawing.Set_DrawingType(drawing_Anchor);
+			Drawing.Set_WrappingType(WRAPPING_TYPE_SQUARE);
+			Drawing.Set_BehindDoc(false);
+			Drawing.Set_Distance(3.2, 0, 3.2, 0);
+			Drawing.Set_PositionH(Asc.c_oAscRelativeFromH.Column, false, 0, false);
+			Drawing.Set_PositionV(Asc.c_oAscRelativeFromV.Paragraph, false, 0, false);
+		}
+		this.Paragraph_Add(Drawing);
+		this.Select_DrawingObject(Drawing.Get_Id());
+	}
+	else if (type_Table == Item.GetType())
+	{
+		Item.Add_InlineImage(W, H, Img, Chart, bFlow);
+	}
+};
+CDocument.prototype.controller_AddOleObject = function(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId)
+{
+	if (true == this.Selection.Use)
+		this.Remove(1, true);
+
+	var Item = this.Content[this.CurPos.ContentPos];
+	if (type_Paragraph == Item.GetType())
+	{
+		var Drawing   = new ParaDrawing(W, H, null, this.DrawingDocument, this, null);
+		var Image = this.DrawingObjects.createOleObject(Data, sApplicationId, Img, 0, 0, W, H, nWidthPix, nHeightPix);
+		Image.setParent(Drawing);
+		Drawing.Set_GraphicObject(Image);
+		this.Paragraph_Add(Drawing);
+		this.Select_DrawingObject(Drawing.Get_Id());
+	}
+	else if (type_Table == Item.GetType())
+	{
+		Item.Add_OleObject(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId);
+	}
+};
+CDocument.prototype.controller_AddTextArt = function(nStyle)
+{
+	var Item = this.Content[this.CurPos.ContentPos];
+	if (type_Paragraph == Item.GetType())
+	{
+		var Drawing = new ParaDrawing(1828800 / 36000, 1828800 / 36000, null, this.DrawingDocument, this, null);
+		var TextArt = this.DrawingObjects.createTextArt(nStyle, true);
+		TextArt.setParent(Drawing);
+		Drawing.Set_GraphicObject(TextArt);
+		Drawing.Set_DrawingType(drawing_Anchor);
+		Drawing.Set_WrappingType(WRAPPING_TYPE_NONE);
+		Drawing.Set_BehindDoc(false);
+		Drawing.Set_Distance(3.2, 0, 3.2, 0);
+		Drawing.Set_PositionH(Asc.c_oAscRelativeFromH.Column, false, 0, false);
+		Drawing.Set_PositionV(Asc.c_oAscRelativeFromV.Paragraph, false, 0, false);
+
+		if (true == this.Selection.Use)
+			this.Remove(1, true);
+
+		this.Paragraph_Add(Drawing);
+		if (TextArt.bSelectedText)
+		{
+			this.Select_DrawingObject(Drawing.Get_Id());
+		}
+		else
+		{
+			var oContent = Drawing.GraphicObj.getDocContent();
+			oContent.Content[0].Document_SetThisElementCurrent(false);
+			this.Select_All();
+		}
+	}
+	else if (type_Table == Item.GetType())
+	{
+		Item.Add_TextArt(nStyle);
+	}
+};
+CDocument.prototype.controller_AddInlineTable = function(Cols, Rows)
+{
+	if (this.CurPos.ContentPos < 0)
+		return false;
+
+	// Сначала удаляем заселекченую часть
+	if (true === this.Selection.Use)
+	{
+		this.Remove(1, true);
+	}
+
+	// Добавляем таблицу
+	var Item = this.Content[this.CurPos.ContentPos];
+
+	// Если мы внутри параграфа, тогда разрываем его и на месте разрыва добавляем таблицу.
+	// А если мы внутри таблицы, тогда добавляем таблицу внутрь текущей таблицы.
+	switch (Item.GetType())
+	{
+		case type_Paragraph:
+		{
+			// Ширину таблицы делаем по минимальной ширине колонки.
+			var Page   = this.Pages[this.CurPage];
+			var SectPr = this.SectionsInfo.Get_SectPr(this.CurPos.ContentPos).SectPr;
+
+			var PageFields = this.Get_PageFields(this.CurPage);
+
+			// Создаем новую таблицу
+			var W    = (PageFields.XLimit - PageFields.X + 2 * 1.9);
+			var Grid = [];
+
+			if (SectPr.Get_ColumnsCount() > 1)
+			{
+				for (var CurCol = 0, ColsCount = SectPr.Get_ColumnsCount(); CurCol < ColsCount; ++CurCol)
+				{
+					var ColumnWidth = SectPr.Get_ColumnWidth(CurCol);
+					if (W > ColumnWidth)
+						W = ColumnWidth;
+				}
+
+				W += 2 * 1.9;
+			}
+
+			W = Math.max(W, Cols * 2 * 1.9);
+
+			for (var Index = 0; Index < Cols; Index++)
+				Grid[Index] = W / Cols;
+
+			var NewTable = new CTable(this.DrawingDocument, this, true, 0, 0, 0, 0, 0, Rows, Cols, Grid);
+			NewTable.Set_ParagraphPrOnAdd(Item);
+
+			// Проверим позицию в текущем параграфе
+			if (true === Item.Cursor_IsEnd() && undefined === Item.Get_SectionPr())
+			{
+				// Выставляем курсор в начало таблицы
+				NewTable.Cursor_MoveToStartPos();
+				this.Internal_Content_Add(this.CurPos.ContentPos + 1, NewTable);
+
+				this.CurPos.ContentPos++;
+				this.Recalculate();
+			}
+			else
+			{
+				// Создаем новый параграф
+				var NewParagraph = new Paragraph(this.DrawingDocument, this, 0, 0, 0, 0, 0);
+				Item.Split(NewParagraph);
+
+				// Добавляем новый параграф
+				this.Internal_Content_Add(this.CurPos.ContentPos + 1, NewParagraph);
+
+				// Выставляем курсор в начало таблицы
+				NewTable.Cursor_MoveToStartPos();
+				this.Internal_Content_Add(this.CurPos.ContentPos + 1, NewTable);
+
+				this.CurPos.ContentPos++;
+				this.Recalculate();
+			}
+
+			break;
+		}
+
+		case type_Table:
+		{
+			Item.Add_InlineTable(Cols, Rows);
+			break;
+		}
 	}
 };
 CDocument.prototype.controller_CursorMoveLeft = function(AddToSelect, Word)

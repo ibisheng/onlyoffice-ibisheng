@@ -40,6 +40,26 @@ CDrawingsController.prototype.AddNewParagraph = function(bRecalculate, bForceAdd
 {
 	return this.DrawingObjects.addNewParagraph(bRecalculate, bForceAdd);
 };
+CDrawingsController.prototype.AddInlineImage = function(nW, nH, oImage, oChart, bFlow)
+{
+	return this.DrawingObjects.addInlineImage(nW, nH, oImage, oChart, bFlow);
+};
+CDrawingsController.prototype.AddOleObject = function(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId)
+{
+	this.DrawingObjects.addOleObject(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId);
+};
+CDrawingsController.prototype.AddTextArt = function(nStyle)
+{
+	// ничего не делаем
+};
+CDrawingsController.prototype.EditChart = function(Chart)
+{
+	this.DrawingObjects.editChart(Chart);
+};
+CDrawingsController.prototype.AddInlineTable = function(Cols, Rows)
+{
+	this.DrawingObjects.addInlineTable(Cols, Rows);
+};
 CDrawingsController.prototype.Cursor_MoveLeft = function(AddToSelect, Word)
 {
 	return this.DrawingObjects.cursorMoveLeft(AddToSelect, Word);

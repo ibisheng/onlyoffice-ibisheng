@@ -179,7 +179,31 @@ CDocumentControllerBase.prototype.Check_AutoFit = function()
 CDocumentControllerBase.prototype.Refresh_RecalcData2 = function()
 {
 };
+/**
+ * Проверяем находимся ли мы в таблице.
+ * @param {boolean} bReturnTopTable - Возвращается объект или true/false
+ * @returns {boolean | CTable}
+ */
+CDocumentControllerBase.prototype.Is_InTable = function(bReturnTopTable)
+{
+	if (true === bReturnTopTable)
+		return null;
 
+	return false;
+};
+/**
+ * Проверяем находимся ли мы в автофигуре.
+ * @param {boolean} bRetShape - возвращается объект или true/false
+ * @returns {boolean | ParaDrawing}
+ */
+CDocumentControllerBase.prototype.Is_DrawingShape = function(bRetShape)
+{
+	if (bRetShape === true)
+	{
+		return null;
+	}
+	return false;
+};
 //----------------------------------------------------------------------------------------------------------------------
 // Чисто виртуальные функции
 //----------------------------------------------------------------------------------------------------------------------
@@ -201,9 +225,44 @@ CDocumentControllerBase.prototype.GetCurPage = function(){return -1;};
  * Добавляем новый параграф.
  * @param {boolean} bRecalculate - Пересчитывать или нет.
  * @param {boolean} bForceAdd    - Добавляем параграф, пропуская всякие проверки типа пустого параграфа с нумерацией.
- * @constructor
  */
 CDocumentControllerBase.prototype.AddNewParagraph = function(bRecalculate, bForceAdd){return false;};
+/**
+ * Добавляем встроенное изображение
+ * @param {number} nW - ширина
+ * @param {number} nH - высота
+ * @param oImage - ссылка на объект изображения
+ * @param oChart - ссылка на объект диаграммы
+ * @param {boolean} bFlow - инлайн объект или "плавающий"
+ */
+CDocumentControllerBase.prototype.AddInlineImage = function(nW, nH, oImage, oChart, bFlow){};
+/**
+ * Добавляем OLE-объект.
+ * @param nW
+ * @param nH
+ * @param nWidthPix
+ * @param nHeightPix
+ * @param oImage
+ * @param oData
+ * @param sApplicationId
+ */
+CDocumentControllerBase.prototype.AddOleObject = function(nW, nH, nWidthPix, nHeightPix, oImage, oData, sApplicationId){};
+/**
+ * Добавляем графический объект TextArt.
+ * @param nStyle
+ */
+CDocumentControllerBase.prototype.AddTextArt = function(nStyle){};
+/**
+ * Редактируем диаграмму.
+ * @param Chart
+ */
+CDocumentControllerBase.prototype.EditChart = function(Chart){};
+/**
+ * Добавляем инлайн таблицу.
+ * @param nCols
+ * @param nRows
+ */
+CDocumentControllerBase.prototype.AddInlineTable = function(nCols, nRows){};
 /**
  * Смещаем курсор влево
  * @param {boolean} AddToSelect Добавлять ли к селекту смещение

@@ -288,7 +288,73 @@ CFootnotesController.prototype.AddNewParagraph = function(bRecalculate, bForceAd
 	}
 
 	return bRetValue;
+};
+CFootnotesController.prototype.AddInlineImage = function(nW, nH, oImage, oChart, bFlow)
+{
+	var bRetValue = false;
 
+	// TODO: Доделать селект и курсор
+
+	if (true === this.Selection.Use)
+	{
+	}
+	else
+	{
+		if (null !== this.CurFootnote)
+			bRetValue = this.CurFootnote.Add_InlineImage(nW, nH, oImage, oChart, bFlow);
+	}
+
+	return bRetValue;
+};
+CFootnotesController.prototype.AddOleObject = function(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId)
+{
+	var bRetValue = false;
+
+	// TODO: Доделать селект и курсор
+
+	if (true === this.Selection.Use)
+	{
+	}
+	else
+	{
+		if (null !== this.CurFootnote)
+			bRetValue = this.CurFootnote.Add_OleObject(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId);
+	}
+
+	return bRetValue;
+};
+CFootnotesController.prototype.AddTextArt = function(nStyle)
+{
+	var bRetValue = false;
+
+	// TODO: Доделать селект и курсор
+
+	if (true === this.Selection.Use)
+	{
+	}
+	else
+	{
+		if (null !== this.CurFootnote)
+			bRetValue = this.CurFootnote.Add_TextArt(nStyle);
+	}
+
+	return bRetValue;
+};
+CFootnotesController.prototype.EditChart = function(Chart)
+{
+	// TODO: Реализовать
+};
+CFootnotesController.prototype.AddInlineTable = function(Cols, Rows)
+{
+	// TODO: Доделать селект и курсор
+	if (true === this.Selection.Use)
+	{
+	}
+	else
+	{
+		if (null !== this.CurFootnote)
+			this.CurFootnote.Add_InlineTable(Cols, Rows);
+	}
 };
 CFootnotesController.prototype.Cursor_MoveLeft = function(AddToSelect, Word)
 {

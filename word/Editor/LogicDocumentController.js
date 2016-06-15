@@ -33,6 +33,26 @@ CLogicDocumentController.prototype.AddNewParagraph = function(bRecalculate, bFor
 {
 	return this.LogicDocument.controller_AddNewParagraph(bRecalculate, bForceAdd);
 };
+CLogicDocumentController.prototype.AddInlineImage = function(nW, nH, oImage, oChart, bFlow)
+{
+	this.LogicDocument.controller_AddInlineImage(nW, nH, oImage, oChart, bFlow);
+};
+CLogicDocumentController.prototype.AddOleObject = function(nW, nH, nWidthPix, nHeightPix, oImage, oData, sApplicationId)
+{
+	this.LogicDocument.controller_AddOleObject(nW, nH, nWidthPix, nHeightPix, oImage, oData, sApplicationId);
+};
+CLogicDocumentController.prototype.AddTextArt = function(nStyle)
+{
+	this.LogicDocument.controller_AddTextArt(nStyle);
+};
+CLogicDocumentController.prototype.EditChart = function(Chart)
+{
+	// Ничего не делаем
+};
+CLogicDocumentController.prototype.AddInlineTable = function(nCols, nRows)
+{
+	this.LogicDocument.controller_AddInlineTable(nCols, nRows);
+};
 CLogicDocumentController.prototype.Cursor_MoveLeft = function(AddToSelect, Word)
 {
 	return this.LogicDocument.controller_CursorMoveLeft(AddToSelect, Word);

@@ -43,6 +43,26 @@ CHdrFtrController.prototype.AddNewParagraph = function(bRecalculate, bForceAdd)
 {
 	return this.HdrFtr.Add_NewParagraph(bRecalculate, bForceAdd);
 };
+CHdrFtrController.prototype.AddInlineImage = function(nW, nH, oImage, oChart, bFlow)
+{
+	this.HdrFtr.Add_InlineImage(nW, nH, oImage, oChart, bFlow);
+};
+CHdrFtrController.prototype.AddOleObject = function(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId)
+{
+	this.HdrFtr.Add_OleObject(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId);
+};
+CHdrFtrController.prototype.AddTextArt = function(nStyle)
+{
+	this.HdrFtr.Add_TextArt(nStyle);
+};
+CHdrFtrController.prototype.EditChart = function(Chart)
+{
+	this.HdrFtr.Edit_Chart(Chart);
+};
+CHdrFtrController.prototype.AddInlineTable = function(Cols, Rows)
+{
+	this.HdrFtr.Add_InlineTable(Cols, Rows);
+};
 CHdrFtrController.prototype.Cursor_MoveLeft = function(AddToSelect, Word)
 {
 	return this.HdrFtr.Cursor_MoveLeft(AddToSelect, Word);
