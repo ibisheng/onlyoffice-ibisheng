@@ -1597,7 +1597,11 @@
 						curFilter.SortState.SortConditions = [];
 						curFilter.SortState.SortConditions[0] = new AscCommonExcel.SortCondition();
 					}
-					curFilter.SortState.SortConditions[0] = new AscCommonExcel.SortCondition();
+					else
+					{
+						curFilter.SortState.Ref = new Asc.Range(startCol, filterRef.r1, startCol, filterRef.r2);
+						curFilter.SortState.SortConditions[0] = new AscCommonExcel.SortCondition();
+					}
 						
 					var cellIdRange = new Asc.Range(startCol, filterRef.r1, startCol, filterRef.r1);
 					
@@ -1608,6 +1612,7 @@
 					{
 						t._setColorStyleTable(curFilter.Ref, curFilter);
 					}
+					
 					t._addHistoryObj({oldFilter: oldFilter}, AscCH.historyitem_AutoFilter_Sort,
 						{activeCells: cellIdRange, type: type, cellId: cellId, displayName: displayName}, null, curFilter.Ref);
 					History.EndTransaction();
@@ -1629,14 +1634,17 @@
 						curFilter.SortState.SortConditions = [];
 						curFilter.SortState.SortConditions[0] = new AscCommonExcel.SortCondition();
 					}
-					curFilter.SortState.SortConditions[0] = new AscCommonExcel.SortCondition();
+					else
+					{
+						curFilter.SortState.Ref = new Asc.Range(startCol, curFilter.Ref.r1, startCol, maxFilterRow);
+						curFilter.SortState.SortConditions[0] = new AscCommonExcel.SortCondition();
+					}
 						
 					var cellIdRange = new Asc.Range(startCol, filterRef.r1, startCol, filterRef.r1);
 					
 					curFilter.SortState.SortConditions[0].Ref = new Asc.Range(startCol, filterRef.r1, startCol, filterRef.r2);
-					
-					
 					curFilter.SortState.SortConditions[0].dxf = new AscCommonExcel.CellXfs();
+					
 					if(type === Asc.c_oAscSortOptions.ByColorFill)
 					{
 						curFilter.SortState.SortConditions[0].dxf.fill = new AscCommonExcel.Fill();
@@ -1654,6 +1662,7 @@
 					{
 						t._setColorStyleTable(curFilter.Ref, curFilter);
 					}
+					
 					t._addHistoryObj({oldFilter: oldFilter}, AscCH.historyitem_AutoFilter_Sort,
 						{activeCells: cellIdRange, type: type, cellId: cellId, color: color, displayName: displayName}, null, curFilter.Ref);
 					History.EndTransaction();
