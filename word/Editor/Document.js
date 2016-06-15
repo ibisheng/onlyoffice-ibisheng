@@ -1497,7 +1497,7 @@ CDocument.prototype.On_EndLoad                     = function()
         this.Set_FastCollaborativeEditing(true);
     }
 
-    this.Footnotes.Init();
+    //this.Footnotes.Init();
 };
 CDocument.prototype.Add_TestDocument               = function()
 {
@@ -3329,87 +3329,56 @@ CDocument.prototype.OnContentReDraw                          = function(StartPag
 };
 CDocument.prototype.CheckTargetUpdate                        = function()
 {
-    // Проверим можно ли вообще пересчитывать текущее положение.
-    var bFlag = true;
+	// Проверим можно ли вообще пересчитывать текущее положение.
+	if (this.DrawingDocument.UpdateTargetFromPaint === true)
+	{
+		if (true === this.DrawingDocument.UpdateTargetCheck)
+			this.NeedUpdateTarget = this.DrawingDocument.UpdateTargetCheck;
+		this.DrawingDocument.UpdateTargetCheck = false;
+	}
 
-    if (this.DrawingDocument.UpdateTargetFromPaint === true)
-    {
-        if (true === this.DrawingDocument.UpdateTargetCheck)
-            this.NeedUpdateTarget = this.DrawingDocument.UpdateTargetCheck;
-        this.DrawingDocument.UpdateTargetCheck = false;
-    }
+	var bFlag = this.Controller.CanTargetUpdate();
 
-    if (docpostype_Content === this.CurPos.Type)
-    {
-        if (null != this.FullRecalc.Id && this.FullRecalc.StartIndex <= this.CurPos.ContentPos)
-            bFlag = false;
-    }
-    else if (docpostype_DrawingObjects === this.CurPos.Type)
-    {
-        // в автофигурах всегда можно проверять текущую позицию
-    }
-    else if (docpostype_HdrFtr === this.CurPos.Type)
-    {
-        // в колонтитуле всегда можно проверять текущую позицию
-    }
-
-    if (true === this.NeedUpdateTarget && true === bFlag && false === this.Selection_Is_TableBorderMove())
-    {
-        // Обновляем курсор сначала, чтобы обновить текущую страницу
-        this.RecalculateCurPos();
-        this.NeedUpdateTarget = false;
-    }
+	if (true === this.NeedUpdateTarget && true === bFlag && false === this.Selection_Is_TableBorderMove())
+	{
+		// Обновляем курсор сначала, чтобы обновить текущую страницу
+		this.RecalculateCurPos();
+		this.NeedUpdateTarget = false;
+	}
 };
-CDocument.prototype.RecalculateCurPos                        = function()
+CDocument.prototype.RecalculateCurPos = function()
 {
-    if (true === this.TurnOffRecalcCurPos)
-        return;
+	if (true === this.TurnOffRecalcCurPos)
+		return;
 
-    if (true === AscCommon.CollaborativeEditing.m_bGlobalLockSelection)
-        return;
+	if (true === AscCommon.CollaborativeEditing.m_bGlobalLockSelection)
+		return;
 
-    this.DrawingDocument.UpdateTargetTransform(null);
+	this.DrawingDocument.UpdateTargetTransform(null);
 
 	this.Controller.RecalculateCurPos();
 
-    // TODO: Здесь добавлено обновление линейки, чтобы обновлялись границы рамки при наборе текста, а также чтобы
-    //       обновлялись поля колонтитулов при наборе текста.
-    this.Document_UpdateRulersState();
+	// TODO: Здесь добавлено обновление линейки, чтобы обновлялись границы рамки при наборе текста, а также чтобы
+	//       обновлялись поля колонтитулов при наборе текста.
+	this.Document_UpdateRulersState();
 };
-CDocument.prototype.Internal_CheckCurPage                    = function()
+CDocument.prototype.Internal_CheckCurPage = function()
 {
-    if (true === this.TurnOffRecalcCurPos)
-        return;
+	if (true === this.TurnOffRecalcCurPos)
+		return;
 
-    if (true === AscCommon.CollaborativeEditing.m_bGlobalLockSelection)
-        return;
+	if (true === AscCommon.CollaborativeEditing.m_bGlobalLockSelection)
+		return;
 
-    if (docpostype_HdrFtr === this.CurPos.Type)
-    {
-        var CurHdrFtr = this.HdrFtr.CurHdrFtr;
-        if (null !== CurHdrFtr && -1 !== CurHdrFtr.RecalcInfo.CurPage)
-            this.CurPage = CurHdrFtr.RecalcInfo.CurPage;
-    }
-    else if (docpostype_DrawingObjects === this.CurPos.Type)
-    {
-        var ParaDrawing = this.DrawingObjects.getMajorParaDrawing();
-        if (null != ParaDrawing)
-            this.CurPage = ParaDrawing.PageNum;
-    }
-    else
-    {
-        var Pos = ( true === this.Selection.Use && selectionflag_Numbering !== this.Selection.Flag ? this.Selection.EndPos : this.CurPos.ContentPos );
-        if (Pos >= 0 && ( null === this.FullRecalc.Id || this.FullRecalc.StartIndex > Pos ))
-        {
-            this.CurPage = this.Content[Pos].Get_CurrentPage_Absolute();
-        }
-    }
+	var nCurPage = this.Controller.GetCurPage();
+	if (-1 !== nCurPage)
+		this.CurPage = nCurPage;
 };
-CDocument.prototype.Set_TargetPos                            = function(X, Y, PageNum)
+CDocument.prototype.Set_TargetPos = function(X, Y, PageNum)
 {
-    this.TargetPos.X       = X;
-    this.TargetPos.Y       = Y;
-    this.TargetPos.PageNum = PageNum;
+	this.TargetPos.X       = X;
+	this.TargetPos.Y       = Y;
+	this.TargetPos.PageNum = PageNum;
 };
 /**
  * Запрос на перерисовку заданного отрезка страниц.
@@ -4455,218 +4424,14 @@ CDocument.prototype.Check_FramePrLastParagraph = function()
         Element.Set_FramePr(undefined, true);
     }
 };
-CDocument.prototype.CheckRange                 = function(X0, Y0, X1, Y1, _Y0, _Y1, X_lf, X_rf, PageNum, Inner, bMathWrap)
+CDocument.prototype.CheckRange = function(X0, Y0, X1, Y1, _Y0, _Y1, X_lf, X_rf, PageNum, Inner, bMathWrap)
 {
-    var HdrFtrRanges = this.HdrFtr.CheckRange(X0, Y0, X1, Y1, _Y0, _Y1, X_lf, X_rf, PageNum, bMathWrap);
-    return this.DrawingObjects.CheckRange(X0, Y0, X1, Y1, _Y0, _Y1, X_lf, X_rf, PageNum, HdrFtrRanges, null, bMathWrap);
+	var HdrFtrRanges = this.HdrFtr.CheckRange(X0, Y0, X1, Y1, _Y0, _Y1, X_lf, X_rf, PageNum, bMathWrap);
+	return this.DrawingObjects.CheckRange(X0, Y0, X1, Y1, _Y0, _Y1, X_lf, X_rf, PageNum, HdrFtrRanges, null, bMathWrap);
 };
-CDocument.prototype.Paragraph_Add              = function(ParaItem, bRecalculate)
+CDocument.prototype.Paragraph_Add = function(ParaItem, bRecalculate)
 {
-    // Работаем с колонтитулом
-    if (docpostype_HdrFtr === this.CurPos.Type)
-    {
-        if (para_NewLine === ParaItem.Type && true === ParaItem.Is_PageOrColumnBreak())
-            return;
-
-        var bRetValue = this.HdrFtr.Paragraph_Add(ParaItem, bRecalculate);
-        this.Document_UpdateSelectionState();
-        this.Document_UpdateUndoRedoState();
-        return bRetValue;
-    }
-    else if (docpostype_DrawingObjects === this.CurPos.Type)
-    {
-        if (para_NewLine === ParaItem.Type && true === ParaItem.Is_PageOrColumnBreak())
-            return;
-
-        var bRetValue = this.DrawingObjects.paragraphAdd(ParaItem, bRecalculate);
-        this.Document_UpdateSelectionState();
-        this.Document_UpdateUndoRedoState();
-        this.Document_UpdateInterfaceState();
-        return bRetValue;
-    }
-    else //if ( docpostype === this.CurPos.Type )
-    {
-        if (true === this.Selection.Use)
-        {
-            var Type = ParaItem.Get_Type();
-            switch (Type)
-            {
-                case para_Math:
-                case para_NewLine:
-                case para_Text:
-                case para_Space:
-                case para_Tab:
-                case para_PageNum:
-                case para_Field:
-                case para_FootnoteReference:
-                case para_FootnoteRef:
-                case para_Separator:
-                case para_ContinuationSeparator:
-                {
-                    // Если у нас что-то заселекчено и мы вводим текст или пробел
-                    // и т.д., тогда сначала удаляем весь селект.
-                    this.Remove(1, true, false, true);
-                    break;
-                }
-                case para_TextPr:
-                {
-                    switch (this.Selection.Flag)
-                    {
-                        case selectionflag_Common:
-                        {
-                            // Текстовые настройки применяем ко всем параграфам, попавшим
-                            // в селект.
-                            var StartPos = this.Selection.StartPos;
-                            var EndPos   = this.Selection.EndPos;
-                            if (EndPos < StartPos)
-                            {
-                                var Temp = StartPos;
-                                StartPos = EndPos;
-                                EndPos   = Temp;
-                            }
-
-                            for (var Index = StartPos; Index <= EndPos; Index++)
-                            {
-                                this.Content[Index].Add(ParaItem.Copy());
-                            }
-
-                            if (false != bRecalculate)
-                            {
-                                // Если в TextPr только HighLight, тогда не надо ничего пересчитывать, только перерисовываем
-                                if (true === ParaItem.Value.Check_NeedRecalc())
-                                {
-                                    // Нам нужно пересчитать все изменения, начиная с первого элемента,
-                                    // попавшего в селект.
-                                    this.ContentLastChangePos = StartPos;
-                                    this.Recalculate();
-                                }
-                                else
-                                {
-                                    // Просто перерисовываем нужные страницы
-                                    var StartPage = this.Content[StartPos].Get_StartPage_Absolute();
-                                    var EndPage   = this.Content[EndPos].Get_StartPage_Absolute() + this.Content[EndPos].Pages.length - 1;
-                                    this.ReDraw(StartPage, EndPage);
-                                }
-                            }
-
-                            break;
-                        }
-                        case selectionflag_Numbering:
-                        {
-                            // Текстовые настройки применяем к конкретной нумерации
-                            if (null == this.Selection.Data || this.Selection.Data.length <= 0)
-                                break;
-
-                            if (undefined != ParaItem.Value.FontFamily)
-                            {
-                                var FName  = ParaItem.Value.FontFamily.Name;
-                                var FIndex = ParaItem.Value.FontFamily.Index;
-
-                                ParaItem.Value.RFonts          = new CRFonts();
-                                ParaItem.Value.RFonts.Ascii    = {Name : FName, Index : FIndex};
-                                ParaItem.Value.RFonts.EastAsia = {Name : FName, Index : FIndex};
-                                ParaItem.Value.RFonts.HAnsi    = {Name : FName, Index : FIndex};
-                                ParaItem.Value.RFonts.CS       = {Name : FName, Index : FIndex};
-                            }
-
-                            var NumPr    = this.Content[this.Selection.Data[0]].Numbering_Get();
-                            var AbstrNum = this.Numbering.Get_AbstractNum(NumPr.NumId);
-                            AbstrNum.Apply_TextPr(NumPr.Lvl, ParaItem.Value);
-
-                            if (false != bRecalculate)
-                            {
-                                // Нам нужно пересчитать все изменения, начиная с первого элемента,
-                                // попавшего в селект.
-                                this.ContentLastChangePos = this.Selection.Data[0];
-                                this.Recalculate();
-                            }
-
-                            break;
-                        }
-                    }
-
-                    this.Document_UpdateSelectionState();
-                    this.Document_UpdateUndoRedoState();
-
-                    return;
-                }
-            }
-        }
-
-        var Item     = this.Content[this.CurPos.ContentPos];
-        var ItemType = Item.GetType();
-
-        if (para_NewLine === ParaItem.Type && true === ParaItem.Is_PageOrColumnBreak())
-        {
-            if (type_Paragraph === ItemType)
-            {
-                if (true === Item.Cursor_IsStart())
-                {
-                    this.Add_NewParagraph(undefined, true);
-                    var CurPos = this.CurPos.ContentPos - 1;
-                    this.Content[CurPos].Cursor_MoveToStartPos();
-                    this.Content[CurPos].Add(ParaItem);
-                    this.Content[CurPos].Clear_Formatting();
-                }
-                else
-                {
-                    this.Add_NewParagraph(undefined, true);
-                    this.Add_NewParagraph(undefined, true);
-                    var CurPos = this.CurPos.ContentPos - 1;
-                    this.Content[CurPos].Cursor_MoveToStartPos();
-                    this.Content[CurPos].Add(ParaItem);
-                    this.Content[CurPos].Clear_Formatting();
-                }
-
-                if (false != bRecalculate)
-                {
-                    this.Recalculate();
-
-                    Item.CurPos.RealX = Item.CurPos.X;
-                    Item.CurPos.RealY = Item.CurPos.Y;
-                }
-            }
-            else
-            {
-                // TODO: PageBreak в таблице не ставим
-                return;
-            }
-        }
-        else
-        {
-            Item.Add(ParaItem);
-
-            if (false != bRecalculate && type_Paragraph == Item.GetType())
-            {
-                if (para_TextPr === ParaItem.Type && false === ParaItem.Value.Check_NeedRecalc())
-                {
-                    // Просто перерисовываем нужные страницы
-                    var StartPage = Item.Get_StartPage_Absolute();
-                    var EndPage   = StartPage + Item.Pages.length - 1;
-                    this.ReDraw(StartPage, EndPage);
-                }
-                else
-                {
-                    // Нам нужно пересчитать все изменения, начиная с текущего элемента
-                    this.Recalculate(true);
-                }
-
-                if (false === this.TurnOffRecalcCurPos)
-                {
-                    Item.RecalculateCurPos();
-                    Item.CurPos.RealX = Item.CurPos.X;
-                    Item.CurPos.RealY = Item.CurPos.Y;
-                }
-            }
-
-            this.Document_UpdateSelectionState();
-            this.Document_UpdateInterfaceState();
-        }
-
-        // Специальная заглушка для функции TextBox_Put
-        if (true === this.Is_OnRecalculate())
-            this.Document_UpdateUndoRedoState();
-    }
+	this.Controller.AddToParagraph(ParaItem, bRecalculate);
 };
 CDocument.prototype.Paragraph_ClearFormatting  = function()
 {
@@ -16525,6 +16290,13 @@ CDocument.prototype.Goto_FootnotesOnPage = function(nPageIndex)
 //----------------------------------------------------------------------------------------------------------------------
 // Функции, которые вызываются из CLogicDocumentController
 //----------------------------------------------------------------------------------------------------------------------
+CDocument.prototype.controller_CanTargetUpdate = function()
+{
+	if (null != this.FullRecalc.Id && this.FullRecalc.StartIndex <= this.CurPos.ContentPos)
+		return false;
+
+	return true;
+};
 CDocument.prototype.controller_RecalculateCurPos = function()
 {
 	// TODO: Если пересчет идет в большой таблице, разбитой на несколько страниц, то в ней обновление курсора не
@@ -16535,6 +16307,14 @@ CDocument.prototype.controller_RecalculateCurPos = function()
 		this.Internal_CheckCurPage();
 		this.Content[nPos].RecalculateCurPos();
 	}
+};
+CDocument.prototype.controller_GetCurPage = function()
+{
+	var Pos = ( true === this.Selection.Use && selectionflag_Numbering !== this.Selection.Flag ? this.Selection.EndPos : this.CurPos.ContentPos );
+	if (Pos >= 0 && ( null === this.FullRecalc.Id || this.FullRecalc.StartIndex > Pos ))
+		return this.Content[Pos].Get_CurrentPage_Absolute();
+
+	return -1;
 };
 CDocument.prototype.controller_CursorMoveLeft = function(AddToSelect, Word)
 {
@@ -16868,6 +16648,189 @@ CDocument.prototype.controller_CursorMoveRight = function(AddToSelect, Word, Fro
 			}
 		}
 	}
+};
+CDocument.prototype.controller_AddToParagraph = function(ParaItem, bRecalculate)
+{
+	if (true === this.Selection.Use)
+	{
+		var Type = ParaItem.Get_Type();
+		switch (Type)
+		{
+			case para_Math:
+			case para_NewLine:
+			case para_Text:
+			case para_Space:
+			case para_Tab:
+			case para_PageNum:
+			case para_Field:
+			case para_FootnoteReference:
+			case para_FootnoteRef:
+			case para_Separator:
+			case para_ContinuationSeparator:
+			{
+				// Если у нас что-то заселекчено и мы вводим текст или пробел
+				// и т.д., тогда сначала удаляем весь селект.
+				this.Remove(1, true, false, true);
+				break;
+			}
+			case para_TextPr:
+			{
+				switch (this.Selection.Flag)
+				{
+					case selectionflag_Common:
+					{
+						// Текстовые настройки применяем ко всем параграфам, попавшим
+						// в селект.
+						var StartPos = this.Selection.StartPos;
+						var EndPos   = this.Selection.EndPos;
+						if (EndPos < StartPos)
+						{
+							var Temp = StartPos;
+							StartPos = EndPos;
+							EndPos   = Temp;
+						}
+
+						for (var Index = StartPos; Index <= EndPos; Index++)
+						{
+							this.Content[Index].Add(ParaItem.Copy());
+						}
+
+						if (false != bRecalculate)
+						{
+							// Если в TextPr только HighLight, тогда не надо ничего пересчитывать, только перерисовываем
+							if (true === ParaItem.Value.Check_NeedRecalc())
+							{
+								// Нам нужно пересчитать все изменения, начиная с первого элемента,
+								// попавшего в селект.
+								this.ContentLastChangePos = StartPos;
+								this.Recalculate();
+							}
+							else
+							{
+								// Просто перерисовываем нужные страницы
+								var StartPage = this.Content[StartPos].Get_StartPage_Absolute();
+								var EndPage   = this.Content[EndPos].Get_StartPage_Absolute() + this.Content[EndPos].Pages.length - 1;
+								this.ReDraw(StartPage, EndPage);
+							}
+						}
+
+						break;
+					}
+					case selectionflag_Numbering:
+					{
+						// Текстовые настройки применяем к конкретной нумерации
+						if (null == this.Selection.Data || this.Selection.Data.length <= 0)
+							break;
+
+						if (undefined != ParaItem.Value.FontFamily)
+						{
+							var FName  = ParaItem.Value.FontFamily.Name;
+							var FIndex = ParaItem.Value.FontFamily.Index;
+
+							ParaItem.Value.RFonts          = new CRFonts();
+							ParaItem.Value.RFonts.Ascii    = {Name : FName, Index : FIndex};
+							ParaItem.Value.RFonts.EastAsia = {Name : FName, Index : FIndex};
+							ParaItem.Value.RFonts.HAnsi    = {Name : FName, Index : FIndex};
+							ParaItem.Value.RFonts.CS       = {Name : FName, Index : FIndex};
+						}
+
+						var NumPr    = this.Content[this.Selection.Data[0]].Numbering_Get();
+						var AbstrNum = this.Numbering.Get_AbstractNum(NumPr.NumId);
+						AbstrNum.Apply_TextPr(NumPr.Lvl, ParaItem.Value);
+
+						if (false != bRecalculate)
+						{
+							// Нам нужно пересчитать все изменения, начиная с первого элемента,
+							// попавшего в селект.
+							this.ContentLastChangePos = this.Selection.Data[0];
+							this.Recalculate();
+						}
+
+						break;
+					}
+				}
+
+				this.Document_UpdateSelectionState();
+				this.Document_UpdateUndoRedoState();
+
+				return;
+			}
+		}
+	}
+
+	var Item     = this.Content[this.CurPos.ContentPos];
+	var ItemType = Item.GetType();
+
+	if (para_NewLine === ParaItem.Type && true === ParaItem.Is_PageOrColumnBreak())
+	{
+		if (type_Paragraph === ItemType)
+		{
+			if (true === Item.Cursor_IsStart())
+			{
+				this.Add_NewParagraph(undefined, true);
+				var CurPos = this.CurPos.ContentPos - 1;
+				this.Content[CurPos].Cursor_MoveToStartPos();
+				this.Content[CurPos].Add(ParaItem);
+				this.Content[CurPos].Clear_Formatting();
+			}
+			else
+			{
+				this.Add_NewParagraph(undefined, true);
+				this.Add_NewParagraph(undefined, true);
+				var CurPos = this.CurPos.ContentPos - 1;
+				this.Content[CurPos].Cursor_MoveToStartPos();
+				this.Content[CurPos].Add(ParaItem);
+				this.Content[CurPos].Clear_Formatting();
+			}
+
+			if (false != bRecalculate)
+			{
+				this.Recalculate();
+
+				Item.CurPos.RealX = Item.CurPos.X;
+				Item.CurPos.RealY = Item.CurPos.Y;
+			}
+		}
+		else
+		{
+			// TODO: PageBreak в таблице не ставим
+			return;
+		}
+	}
+	else
+	{
+		Item.Add(ParaItem);
+
+		if (false != bRecalculate && type_Paragraph == Item.GetType())
+		{
+			if (para_TextPr === ParaItem.Type && false === ParaItem.Value.Check_NeedRecalc())
+			{
+				// Просто перерисовываем нужные страницы
+				var StartPage = Item.Get_StartPage_Absolute();
+				var EndPage   = StartPage + Item.Pages.length - 1;
+				this.ReDraw(StartPage, EndPage);
+			}
+			else
+			{
+				// Нам нужно пересчитать все изменения, начиная с текущего элемента
+				this.Recalculate(true);
+			}
+
+			if (false === this.TurnOffRecalcCurPos)
+			{
+				Item.RecalculateCurPos();
+				Item.CurPos.RealX = Item.CurPos.X;
+				Item.CurPos.RealY = Item.CurPos.Y;
+			}
+		}
+
+		this.Document_UpdateSelectionState();
+		this.Document_UpdateInterfaceState();
+	}
+
+	// Специальная заглушка для функции TextBox_Put
+	if (true === this.Is_OnRecalculate())
+		this.Document_UpdateUndoRedoState();
 };
 //----------------------------------------------------------------------------------------------------------------------
 //

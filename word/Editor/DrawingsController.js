@@ -20,9 +20,21 @@ function CDrawingsController(LogicDocument, DrawingsObjects)
 }
 AscCommon.extendClass(CDrawingsController, CDocumentControllerBase);
 
+CDrawingsController.prototype.CanTargetUpdate = function()
+{
+	return true;
+};
 CDrawingsController.prototype.RecalculateCurPos = function()
 {
 	this.DrawingObjects.recalculateCurPos();
+};
+CDrawingsController.prototype.GetCurPage = function()
+{
+	var ParaDrawing = this.DrawingObjects.getMajorParaDrawing();
+	if (null !== ParaDrawing)
+		return ParaDrawing.PageNum;
+
+	return -1;
 };
 CDrawingsController.prototype.Cursor_MoveLeft = function(AddToSelect, Word)
 {
@@ -31,6 +43,16 @@ CDrawingsController.prototype.Cursor_MoveLeft = function(AddToSelect, Word)
 CDrawingsController.prototype.Cursor_MoveRight = function(AddToSelect, Word, FromPaste)
 {
 	return this.DrawingObjects.cursorMoveRight(AddToSelect, Word, FromPaste);
+};
+CDrawingsController.prototype.AddToParagraph = function(oItem, bRecalculate)
+{
+	if (para_NewLine === oItem.Type && true === oItem.Is_PageOrColumnBreak())
+		return;
+
+	this.DrawingObjects.paragraphAdd(oItem, bRecalculate);
+	this.Logicdocument.Document_UpdateSelectionState();
+	this.Logicdocument.Document_UpdateUndoRedoState();
+	this.Logicdocument.Document_UpdateInterfaceState();
 };
 
 

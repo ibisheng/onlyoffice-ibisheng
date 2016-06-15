@@ -234,10 +234,43 @@ CFootnotesController.prototype.Is_EmptyPage = function(nPageIndex)
 	return false;
 };
 
+CFootnotesController.prototype.Refresh_RecalcData2 = function(nRelPageIndex)
+{
+	var nAbsPageIndex = nRelPageIndex;
+	if (this.LogicDocument.Pages[nAbsPageIndex])
+	{
+		var nIndex = this.LogicDocument.Pages[nAbsPageIndex].Pos;
+		this.LogicDocument.Refresh_RecalcData2(nIndex, nAbsPageIndex);
+	}
+};
+
+//----------------------------------------------------------------------------------------------------------------------
+// Интерфейс CDocumentControllerBase
+//----------------------------------------------------------------------------------------------------------------------
+CFootnotesController.prototype.CanTargetUpdate = function()
+{
+	return true;
+};
 CFootnotesController.prototype.RecalculateCurPos = function()
 {
 	if (null !== this.CurFootnote)
 		this.CurFootnote.RecalculateCurPos();
+};
+CFootnotesController.prototype.GetCurPage = function()
+{
+	// TODO: Доделать селект и курсор
+
+	if (true === this.Selection.Use)
+	{
+
+	}
+	else
+	{
+		if (null !== this.CurFootnote)
+			return this.CurFootnote.Get_StartPage_Absolute();
+	}
+
+	return -1;
 };
 CFootnotesController.prototype.Cursor_MoveLeft = function(AddToSelect, Word)
 {
@@ -272,6 +305,18 @@ CFootnotesController.prototype.Cursor_MoveRight = function(AddToSelect, Word, Fr
 	}
 
 	return bRetValue;
+};
+CFootnotesController.prototype.AddToParagraph = function(oItem, bRecalculate)
+{
+	// TODO: Доделать селект и курсор
+	if (true === this.Selection.Use)
+	{
+	}
+	else
+	{
+		if (null !== this.CurFootnote)
+			this.CurFootnote.Paragraph_Add(oItem, bRecalculate);
+	}
 };
 
 function CFootEndnotePage()

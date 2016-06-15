@@ -23,9 +23,21 @@ function CHdrFtrController(LogicDocument, HdrFtr)
 }
 AscCommon.extendClass(CHdrFtrController, CDocumentControllerBase);
 
+CHdrFtrController.prototype.CanTargetUpdate = function()
+{
+	return true;
+};
 CHdrFtrController.prototype.RecalculateCurPos = function()
 {
 	this.HdrFtr.RecalculateCurPos();
+};
+CHdrFtrController.prototype.GetCurPage = function()
+{
+	var CurHdrFtr = this.HdrFtr.CurHdrFtr;
+	if (null !== CurHdrFtr && -1 !== CurHdrFtr.RecalcInfo.CurPage)
+		return CurHdrFtr.RecalcInfo.CurPage;
+
+	return -1;
 };
 CHdrFtrController.prototype.Cursor_MoveLeft = function(AddToSelect, Word)
 {
@@ -34,4 +46,13 @@ CHdrFtrController.prototype.Cursor_MoveLeft = function(AddToSelect, Word)
 CHdrFtrController.prototype.Cursor_MoveRight = function(AddToSelect, Word, FromPaste)
 {
 	return this.HdrFtr.Cursor_MoveRight(AddToSelect, Word, FromPaste);
+};
+CHdrFtrController.prototype.AddToParagraph = function(oItem, bRecalculate)
+{
+	if (para_NewLine === oItem.Type && true === oItem.Is_PageOrColumnBreak())
+		return;
+
+	this.HdrFtr.Paragraph_Add(oItem, bRecalculate);
+	this.LogicDocument.Document_UpdateSelectionState();
+	this.LogicDocument.Document_UpdateUndoRedoState();
 };

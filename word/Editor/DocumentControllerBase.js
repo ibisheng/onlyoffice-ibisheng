@@ -165,14 +165,38 @@ CDocumentControllerBase.prototype.Get_ParentTextTransform = function()
 {
 	return null;
 };
+/**
+ * Данная функция приходит из таблицы. Проверяет рассчитывается ли таблица по содержимому.
+ * @returns {boolean}
+ */
+CDocumentControllerBase.prototype.Check_AutoFit = function()
+{
+	return false;
+};
+/**
+ * Данная функция нужна для обновления информации о предстоящем пересчете.
+ */
+CDocumentControllerBase.prototype.Refresh_RecalcData2 = function()
+{
+};
 
 //----------------------------------------------------------------------------------------------------------------------
 // Чисто виртуальные функции
 //----------------------------------------------------------------------------------------------------------------------
 /**
+ * Можно ли обновлять позицию курсора.
+ * @returns {boolean}
+ */
+CDocumentControllerBase.prototype.CanTargetUpdate = function(){return true;};
+/**
  * Пересчитываем текущую позицию.
  */
 CDocumentControllerBase.prototype.RecalculateCurPos = function(){};
+/**
+ * Получаем текущий номер страницы.
+ * @returns {number} -1 - значит, номер страницы определеить невозможно
+ */
+CDocumentControllerBase.prototype.GetCurPage = function(){return -1;};
 /**
  * Смещаем курсор влево
  * @param {boolean} AddToSelect Добавлять ли к селекту смещение
@@ -188,3 +212,9 @@ CDocumentControllerBase.prototype.Cursor_MoveLeft = function(AddToSelect, Word){
  * @returns {boolean} Получилось ли перемещение, или мы достигли предела.
  */
 CDocumentControllerBase.prototype.Cursor_MoveRight = function(AddToSelect, Word, FromPaste){return false;};
+/**
+ * Добавляем элемент в параграф.
+ * @param oItem
+ * @param {boolean} bRecalculate - Пересчитывать ли после выполнения данной функции.
+ */
+CDocumentControllerBase.prototype.AddToParagraph = function(oItem, bRecalculate){};

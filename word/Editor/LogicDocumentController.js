@@ -17,9 +17,17 @@ function CLogicDocumentController(LogicDocument)
 }
 AscCommon.extendClass(CLogicDocumentController, CDocumentControllerBase);
 
+CLogicDocumentController.prototype.CanTargetUpdate = function()
+{
+	return this.LogicDocument.controller_CanTargetUpdate();
+};
 CLogicDocumentController.prototype.RecalculateCurPos = function()
 {
 	this.LogicDocument.controller_RecalculateCurPos();
+};
+CLogicDocumentController.prototype.GetCurPage = function()
+{
+	return this.LogicDocument.controller_GetCurPage();
 };
 CLogicDocumentController.prototype.Cursor_MoveLeft = function(AddToSelect, Word)
 {
@@ -29,5 +37,8 @@ CLogicDocumentController.prototype.Cursor_MoveRight = function(AddToSelect, Word
 {
 	return this.LogicDocument.controller_CursorMoveRight(AddToSelect, Word, FromPaste);
 };
-
+CLogicDocumentController.prototype.AddToParagraph = function(oItem)
+{
+	this.LogicDocument.controller_AddToParagraph(oItem);
+};
 
