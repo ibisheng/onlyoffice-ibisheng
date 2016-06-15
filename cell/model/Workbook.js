@@ -1191,13 +1191,22 @@ DependencyGraph.prototype = {
         this.addTableName( sNewName, ws, Ref );
         return sNewName;
     },
-    addTableName:function ( sName, ws, Ref ) {
+    addTableName:function ( sName, ws, Ref, table ) {
         var refClone, defNameSheetsList, dfv, nSE, se;
 		if(this.defNameSheets["WB"]){
 			dfv = this.defNameSheets["WB"][getDefNameVertexId( null, sName )]
 		}
-		refClone = Ref.clone(true )
-		refClone.r1++;
+		
+		if(table)
+		{
+			refClone = table.getRangeWithoutHeaderFooter().clone();
+		}
+		else
+		{
+			refClone = Ref.clone( true );
+			refClone.r1++;
+		}
+		
 		if(!dfv){
 			dfv = new DefNameVertex( null, sName, parserHelp.get3DRef( ws.getName(), refClone.getAbsName() ), null, this.wb, true );
 			defNameSheetsList = this.defNameSheets[dfv.sheetId];
