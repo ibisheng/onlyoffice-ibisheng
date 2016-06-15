@@ -63,11 +63,39 @@ CHdrFtrController.prototype.AddInlineTable = function(Cols, Rows)
 {
 	this.HdrFtr.Add_InlineTable(Cols, Rows);
 };
-CHdrFtrController.prototype.Cursor_MoveLeft = function(AddToSelect, Word)
+CHdrFtrController.prototype.ClearParagraphFormatting = function()
+{
+	this.HdrFtr.Paragraph_ClearFormatting();
+};
+CHdrFtrController.prototype.Remove = function(Count, bOnlyText, bRemoveOnlySelection, bOnTextAdd)
+{
+	var nResult = this.HdrFtr.Remove(Count, bOnlyText, bRemoveOnlySelection, bOnTextAdd);
+
+	if (null !== this.HdrFtr.CurHdtr && docpostype_DrawingObjects !== this.HdrFtr.CurHdrFtr.Content.CurPos.Type)
+	{
+		this.Selection_Remove();
+		this.Selection.Use = false;
+	}
+
+	return nResult;
+};
+CHdrFtrController.prototype.GetCursorPosXY = function()
+{
+	return this.HdrFtr.Cursor_GetPos();
+};
+CHdrFtrController.prototype.MoveCursorToStartPos = function(AddToSelect)
+{
+	this.HdrFtr.Cursor_MoveToStartPos(AddToSelect);
+};
+CHdrFtrController.prototype.MoveCursorToEndPos = function(AddToSelect)
+{
+	this.HdrFtr.Cursor_MoveToEndPos(AddToSelect);
+};
+CHdrFtrController.prototype.MoveCursorLeft = function(AddToSelect, Word)
 {
 	return this.HdrFtr.Cursor_MoveLeft(AddToSelect, Word);
 };
-CHdrFtrController.prototype.Cursor_MoveRight = function(AddToSelect, Word, FromPaste)
+CHdrFtrController.prototype.MoveCursorRight = function(AddToSelect, Word, FromPaste)
 {
 	return this.HdrFtr.Cursor_MoveRight(AddToSelect, Word, FromPaste);
 };

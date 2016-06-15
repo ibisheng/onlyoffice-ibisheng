@@ -264,12 +264,39 @@ CDocumentControllerBase.prototype.EditChart = function(Chart){};
  */
 CDocumentControllerBase.prototype.AddInlineTable = function(nCols, nRows){};
 /**
+ * Очищаем настройки параграфа.
+ */
+CDocumentControllerBase.prototype.ClearParagraphFormatting = function(){};
+/**
+ * Производим удаление выделенной части документа или исходя из позиции курсора.
+ * @param {number} nDirection направление удаления
+ * @param {boolean} bOnlyText - удаляем только текст
+ * @param {boolean} bRemoveOnlySelection - удаляем только по селекту
+ * @param {boolean} bOnAddText - удаление происходит во время добавления текста (особый тип удаления)
+ * @returns {boolean} Выполнилось ли удаление.
+ */
+CDocumentControllerBase.prototype.Remove = function(nDirection, bOnlyText, bRemoveOnlySelection, bOnAddText){return true;};
+/**
+ * Получаем физическую позицию курсора на странице.
+ */
+CDocumentControllerBase.prototype.GetCursorPosXY = function(){return {X : 0, Y : 0};};
+/**
+ * Перемещаем курсор в начало.
+ * @param {boolean} AddToSelect - добавляем ли все промежуточное к селекту
+ */
+CDocumentControllerBase.prototype.MoveCursorToStartPos = function(AddToSelect){};
+/**
+ * Перемещаем курсор в конец.
+ * @param {boolean} AddToSelect - добавляем ли все промежуточное к селекту
+ */
+CDocumentControllerBase.prototype.MoveCursorToEndPos = function(AddToSelect){};
+/**
  * Смещаем курсор влево
  * @param {boolean} AddToSelect Добавлять ли к селекту смещение
  * @param {boolean} Word Осуществлять ли переход по целому слову
  * @returns {boolean} Получилось ли перемещение, или мы достигли предела.
  */
-CDocumentControllerBase.prototype.Cursor_MoveLeft = function(AddToSelect, Word){return false;};
+CDocumentControllerBase.prototype.MoveCursorLeft = function(AddToSelect, Word){return false;};
 /**
  * Смещаем курсор вправо
  * @param {boolean} AddToSelect Добавлять ли к селекту смещение
@@ -277,7 +304,7 @@ CDocumentControllerBase.prototype.Cursor_MoveLeft = function(AddToSelect, Word){
  * @param {boolean} FromPaste Пришла ли данная комнда после "вставки"
  * @returns {boolean} Получилось ли перемещение, или мы достигли предела.
  */
-CDocumentControllerBase.prototype.Cursor_MoveRight = function(AddToSelect, Word, FromPaste){return false;};
+CDocumentControllerBase.prototype.MoveCursorRight = function(AddToSelect, Word, FromPaste){return false;};
 /**
  * Добавляем элемент в параграф.
  * @param oItem

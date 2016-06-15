@@ -60,11 +60,49 @@ CDrawingsController.prototype.AddInlineTable = function(Cols, Rows)
 {
 	this.DrawingObjects.addInlineTable(Cols, Rows);
 };
-CDrawingsController.prototype.Cursor_MoveLeft = function(AddToSelect, Word)
+CDrawingsController.prototype.ClearParagraphFormatting = function()
+{
+	this.DrawingObjects.paragraphClearFormatting();
+};
+CDrawingsController.prototype.Remove = function(Count, bOnlyText, bRemoveOnlySelection, bOnTextAdd)
+{
+	return this.DrawingObjects.remove(Count, bOnlyText, bRemoveOnlySelection, bOnTextAdd);
+};
+CDrawingsController.prototype.GetCursorPosXY = function()
+{
+	return this.DrawingObjects.cursorGetPos();
+};
+CDrawingsController.prototype.MoveCursorToStartPos = function(AddToSelect)
+{
+	if (true === AddToSelect)
+	{
+		// TODO: Пока ничего не делаем, в дальнейшем надо будет делать в зависимости от селекта внутри
+		//       автофигуры: если селект текста внутри, то делать для текста внутри, а если выделена
+		//       сама автофигура, тогда мы перемещаем курсор влево от нее в контенте параграфа и выделяем все до конца
+	}
+	else
+	{
+		this.LogicDocument.controller_MoveCursorToStartPos(false);
+	}
+};
+CDrawingsController.prototype.MoveCursorToEndPos = function(AddToSelect)
+{
+	if (true === AddToSelect)
+	{
+		// TODO: Пока ничего не делаем, в дальнейшем надо будет делать в зависимости от селекта внутри
+		//       автофигуры: если селект текста внутри, то делать для текста внутри, а если выделена
+		//       сама автофигура, тогда мы перемещаем курсор влево от нее в контенте параграфа и выделяем все до конца
+	}
+	else
+	{
+		this.LogicDocument.controller_MoveCursorToEndPos(false);
+	}
+};
+CDrawingsController.prototype.MoveCursorLeft = function(AddToSelect, Word)
 {
 	return this.DrawingObjects.cursorMoveLeft(AddToSelect, Word);
 };
-CDrawingsController.prototype.Cursor_MoveRight = function(AddToSelect, Word, FromPaste)
+CDrawingsController.prototype.MoveCursorRight = function(AddToSelect, Word, FromPaste)
 {
 	return this.DrawingObjects.cursorMoveRight(AddToSelect, Word, FromPaste);
 };
