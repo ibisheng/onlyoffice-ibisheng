@@ -3122,18 +3122,19 @@ var editor;
   spreadsheet_api.prototype.asc_nativeCalculate = function() {
   };
 
-  spreadsheet_api.prototype.asc_nativePrint = function(_printer, _page, _param) {
-    var _adjustPrint = window.AscDesktopEditor_PrintData ? window.AscDesktopEditor_PrintData : new Asc.asc_CAdjustPrint();
+  spreadsheet_api.prototype.asc_nativePrint = function (_printer, _page, _param) {
+    var _adjustPrint = window.AscDesktopEditor_PrintData || new Asc.asc_CAdjustPrint();
     window.AscDesktopEditor_PrintData = undefined;
 
     if (1 == _param) {
-      var countWorksheets = _adjustPrint.asc_setPrintType(Asc.c_oAscPrintType.EntireWorkbook), printOptions;
-      this.wbModel.getWorksheetCount();
+      _adjustPrint.asc_setPrintType(Asc.c_oAscPrintType.EntireWorkbook);
+      var printOptions;
+      var countWorksheets = this.wbModel.getWorksheetCount();
       for (var j = 0; j < countWorksheets; ++j) {
         printOptions = this.wbModel.getWorksheet(j).PagePrintOptions;
         printOptions.asc_setFitToWidth(true);
         printOptions.asc_setFitToHeight(true);
-    }
+      }
     }
 
     var _printPagesData = this.wb.calcPagesPrint(_adjustPrint);
@@ -3154,12 +3155,14 @@ var editor;
             _end = pdf_writer.DocumentRenderer.m_arrayPages[i + 1].StartOffset;
           }
 
-          window["AscDesktopEditor"]["Print_Page"](pdf_writer.DocumentRenderer.Memory.GetBase64Memory2(_start, _end - _start), pdf_writer.DocumentRenderer.m_arrayPages[i].Width, pdf_writer.DocumentRenderer.m_arrayPages[i].Height);
+          window["AscDesktopEditor"]["Print_Page"](
+            pdf_writer.DocumentRenderer.Memory.GetBase64Memory2(_start, _end - _start),
+            pdf_writer.DocumentRenderer.m_arrayPages[i].Width, pdf_writer.DocumentRenderer.m_arrayPages[i].Height);
         }
 
         window["AscDesktopEditor"]["Print_End"]();
       }
-	  return pdf_writer.DocumentRenderer.Memory;      
+      return pdf_writer.DocumentRenderer.Memory;
     }
 
     var isEndPrint = this.wb.printSheet(_printer, _printPagesData);
