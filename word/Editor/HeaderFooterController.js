@@ -129,6 +129,62 @@ CHdrFtrController.prototype.MoveCursorToCell = function(bNext)
 {
 	return this.HdrFtr.Cursor_MoveToCell(bNext);
 };
+CHdrFtrController.prototype.SetParagraphAlign = function(Align)
+{
+	this.HdrFtr.Set_ParagraphAlign(Align);
+};
+CHdrFtrController.prototype.SetParagraphSpacing = function (Spacing)
+{
+	this.HdrFtr.Set_ParagraphSpacing(Spacing);
+};
+CHdrFtrController.prototype.SetParagraphTabs = function(Tabs)
+{
+	this.HdrFtr.Set_ParagraphTabs(Tabs);
+};
+CHdrFtrController.prototype.SetParagraphIndent = function(Ind)
+{
+	this.HdrFtr.Set_ParagraphIndent(Ind);
+};
+CHdrFtrController.prototype.SetParagraphNumbering = function(NumInfo)
+{
+	this.HdrFtr.Set_ParagraphNumbering(NumInfo);
+};
+CHdrFtrController.prototype.SetParagraphShd = function(Shd)
+{
+	this.HdrFtr.Set_ParagraphShd(Shd);
+};
+CHdrFtrController.prototype.SetParagraphStyle = function(Name)
+{
+	this.HdrFtr.Set_ParagraphStyle(Name);
+};
+CHdrFtrController.prototype.SetParagraphContextualSpacing = function(Value)
+{
+	this.HdrFtr.Set_ParagraphContextualSpacing(Value);
+};
+CHdrFtrController.prototype.SetParagraphPageBreakBefore = function(Value)
+{
+	this.HdrFtr.Set_ParagraphPageBreakBefore(Value);
+};
+CHdrFtrController.prototype.SetParagraphKeepLines = function(Value)
+{
+	this.HdrFtr.Set_ParagraphKeepLines(Value);
+};
+CHdrFtrController.prototype.SetParagraphKeepNext = function(Value)
+{
+	this.HdrFtr.Set_ParagraphKeepNext(Value);
+};
+CHdrFtrController.prototype.SetParagraphWidowControl = function(Value)
+{
+	this.HdrFtr.Set_ParagraphWidowControl(Value);
+};
+CHdrFtrController.prototype.SetParagraphBorders = function(Borders)
+{
+	this.HdrFtr.Set_ParagraphBorders(Borders);
+};
+CHdrFtrController.prototype.SetParagraphFramePr = function(FramePr, bDelete)
+{
+	this.HdrFtr.Set_ParagraphFramePr(FramePr, bDelete);
+};
 
 CHdrFtrController.prototype.AddToParagraph = function(oItem, bRecalculate)
 {

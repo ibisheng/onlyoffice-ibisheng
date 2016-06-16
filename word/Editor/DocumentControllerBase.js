@@ -204,6 +204,24 @@ CDocumentControllerBase.prototype.Is_DrawingShape = function(bRetShape)
 	}
 	return false;
 };
+/**
+ * Событие о том, что контент изменился и пересчитался.
+ * @param bChange
+ * @param bForceRecalc
+ * @constructor
+ */
+CDocumentControllerBase.prototype.OnContentRecalculate = function(bChange, bForceRecalc)
+{
+	return;
+};
+/**
+ * Получаем стартовую позицию для заданной страницы.
+ * @returns {{X: number, Y: number, XLimit: number, YLimit: number}}
+ */
+CDocumentControllerBase.prototype.Get_PageContentStartPos = function(PageAbs)
+{
+	return {X : 0, Y : 0, XLimit : 0, YLimit : 0};
+};
 //----------------------------------------------------------------------------------------------------------------------
 // Чисто виртуальные функции
 //----------------------------------------------------------------------------------------------------------------------
@@ -342,6 +360,78 @@ CDocumentControllerBase.prototype.MoveCursorToXY = function(X, Y, PageAbs, AddTo
  * @param {boolean} bNext
  */
 CDocumentControllerBase.prototype.MoveCursorToCell = function(bNext){};
+/**
+ * Устанавливаем прилегание параграфа.
+ * @param Align - тип прилегания
+ */
+CDocumentControllerBase.prototype.SetParagraphAlign = function(Align){};
+/**
+ * Установить межстрочные расстояния для параграфа.
+ * @param Spacing
+ */
+CDocumentControllerBase.prototype.SetParagraphSpacing = function (Spacing){};
+/**
+ * Установить табы параграфа.
+ * @param Tabs
+ */
+CDocumentControllerBase.prototype.SetParagraphTabs = function(Tabs){};
+/**
+ * Установить отступы параграфа.
+ * @param Ind
+ */
+CDocumentControllerBase.prototype.SetParagraphIndent = function(Ind){};
+/**
+ * Установить тип нумерации параграфа.
+ * @param NumInfo
+ */
+CDocumentControllerBase.prototype.SetParagraphNumbering = function(NumInfo){};
+/**
+ * Установить заливку параграфа.
+ * @param Shd
+ */
+CDocumentControllerBase.prototype.SetParagraphShd = function(Shd){};
+/**
+ * Установить стиль параграфа.
+ * @param Name - название стиля
+ */
+CDocumentControllerBase.prototype.SetParagraphStyle = function(Name){};
+/**
+ * Устанавливаем применять или нет расстояние между парграфами одного стиля.
+ * @param {boolean} Value
+ */
+CDocumentControllerBase.prototype.SetParagraphContextualSpacing = function(Value){};
+/**
+ * Устанавливаем разрыв пере параграфом.
+ * @param {boolean} Value
+ */
+CDocumentControllerBase.prototype.SetParagraphPageBreakBefore = function(Value){};
+/**
+ * Устанавливаем является ли параграф неразрывным.
+ * @param {boolean} Value
+ */
+CDocumentControllerBase.prototype.SetParagraphKeepLines = function(Value){};
+/**
+ * Устанавливаем отрывать ли данный параграф от следующего.
+ * @param {boolean} Value
+ */
+CDocumentControllerBase.prototype.SetParagraphKeepNext = function(Value){};
+/**
+ * Устанавливаем обработку висячих строк в парагрфе.
+ * @param {boolean} Value
+ */
+CDocumentControllerBase.prototype.SetParagraphWidowControl = function(Value){};
+/**
+ * Устанавливаем границы параграфа
+ * @param Borders
+ */
+CDocumentControllerBase.prototype.SetParagraphBorders = function(Borders){};
+/**
+ * Превращаем параграф в рамку (плавающий параграф).
+ * @param FramePr
+ * @param bDelete
+ */
+CDocumentControllerBase.prototype.SetParagraphFramePr = function(FramePr, bDelete){};
+
 /**
  * Добавляем элемент в параграф.
  * @param oItem

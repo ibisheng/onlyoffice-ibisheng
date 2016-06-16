@@ -243,6 +243,11 @@ CFootnotesController.prototype.Refresh_RecalcData2 = function(nRelPageIndex)
 		this.LogicDocument.Refresh_RecalcData2(nIndex, nAbsPageIndex);
 	}
 };
+CFootnotesController.prototype.Get_PageContentStartPos = function(PageAbs)
+{
+	//TODO: Реализовать
+	return {X : 0, Y : 0, XLimit : 0, YLimit : 0};
+};
 
 //----------------------------------------------------------------------------------------------------------------------
 // Интерфейс CDocumentControllerBase
@@ -524,6 +529,167 @@ CFootnotesController.prototype.MoveCursorToCell = function(bNext)
 	}
 
 	return bRetValue;
+};
+CFootnotesController.prototype.SetParagraphAlign = function(Align)
+{
+	// TODO: Доделать селект и курсор
+	if (true === this.Selection.Use)
+	{
+	}
+	else
+	{
+		if (null !== this.CurFootnote)
+			this.CurFootnote.Set_ParagraphAlign(Align);
+	}
+};
+CFootnotesController.prototype.SetParagraphSpacing = function(Spacing)
+{
+	// TODO: Доделать селект и курсор
+	if (true === this.Selection.Use)
+	{
+	}
+	else
+	{
+		if (null !== this.CurFootnote)
+			this.CurFootnote.Set_ParagraphSpacing(Spacing);
+	}
+};
+CFootnotesController.prototype.SetParagraphTabs = function(Tabs)
+{
+	// TODO: Доделать селект и курсор
+	if (true === this.Selection.Use)
+	{
+	}
+	else
+	{
+		if (null !== this.CurFootnote)
+			this.CurFootnote.Set_ParagraphTabs(Tabs);
+	}
+};
+CFootnotesController.prototype.SetParagraphIndent = function(Ind)
+{
+	// TODO: Доделать селект и курсор
+	if (true === this.Selection.Use)
+	{
+	}
+	else
+	{
+		if (null !== this.CurFootnote)
+			this.CurFootnote.Set_ParagraphIndent(Ind);
+	}
+};
+CFootnotesController.prototype.SetParagraphNumbering = function(NumInfo)
+{
+	// TODO: Доделать селект и курсор
+	if (true === this.Selection.Use)
+	{
+	}
+	else
+	{
+		if (null !== this.CurFootnote)
+			this.CurFootnote.Set_ParagraphNumbering(NumInfo);
+	}
+};
+CFootnotesController.prototype.SetParagraphShd = function(Shd)
+{
+	// TODO: Доделать селект и курсор
+	if (true === this.Selection.Use)
+	{
+	}
+	else
+	{
+		if (null !== this.CurFootnote)
+			this.CurFootnote.Set_ParagraphShd(Shd);
+	}
+
+};
+CFootnotesController.prototype.SetParagraphStyle = function(Name)
+{
+	// TODO: Доделать селект и курсор
+	if (true === this.Selection.Use)
+	{
+	}
+	else
+	{
+		if (null !== this.CurFootnote)
+			this.CurFootnote.Set_ParagraphStyle(Name);
+	}
+};
+CFootnotesController.prototype.SetParagraphContextualSpacing = function(Value)
+{
+	// TODO: Доделать селект и курсор
+	if (true === this.Selection.Use)
+	{
+	}
+	else
+	{
+		if (null !== this.CurFootnote)
+			this.CurFootnote.Set_ParagraphContextualSpacing(Value);
+	}
+};
+CFootnotesController.prototype.SetParagraphPageBreakBefore = function(Value)
+{
+	// TODO: Доделать селект и курсор
+	if (true === this.Selection.Use)
+	{
+	}
+	else
+	{
+		if (null !== this.CurFootnote)
+			this.CurFootnote.Set_ParagraphPageBreakBefore(Value);
+	}
+};
+CFootnotesController.prototype.SetParagraphKeepLines = function(Value)
+{
+	// TODO: Доделать селект и курсор
+	if (true === this.Selection.Use)
+	{
+	}
+	else
+	{
+		if (null !== this.CurFootnote)
+			this.CurFootnote.Set_ParagraphKeepLines(Value);
+	}
+};
+CFootnotesController.prototype.SetParagraphKeepNext = function(Value)
+{
+	// TODO: Доделать селект и курсор
+	if (true === this.Selection.Use)
+	{
+	}
+	else
+	{
+		if (null !== this.CurFootnote)
+			this.CurFootnote.Set_ParagraphKeepNext(Value);
+	}
+};
+CFootnotesController.prototype.SetParagraphWidowControl = function(Value)
+{
+	// TODO: Доделать селект и курсор
+	if (true === this.Selection.Use)
+	{
+	}
+	else
+	{
+		if (null !== this.CurFootnote)
+			this.CurFootnote.Set_ParagraphWidowControl(Value);
+	}
+};
+CFootnotesController.prototype.SetParagraphBorders = function(Borders)
+{
+	// TODO: Доделать селект и курсор
+	if (true === this.Selection.Use)
+	{
+	}
+	else
+	{
+		if (null !== this.CurFootnote)
+			this.CurFootnote.Set_ParagraphBorders(Borders);
+	}
+};
+CFootnotesController.prototype.SetParagraphFramePr = function(FramePr, bDelete)
+{
+	// TODO: Реализовать, скорее всего ничего тут не надо делать
 };
 
 CFootnotesController.prototype.AddToParagraph = function(oItem, bRecalculate)

@@ -136,6 +136,87 @@ CDrawingsController.prototype.MoveCursorToCell = function(bNext)
 {
 	return this.DrawingObjects.cursorMoveToCell(bNext);
 };
+CDrawingsController.prototype.SetParagraphAlign = function(Align)
+{
+	if (true != this.DrawingObjects.isSelectedText())
+	{
+		var ParaDrawing = this.DrawingObjects.getMajorParaDrawing();
+		if (null != ParaDrawing)
+		{
+			var Paragraph = ParaDrawing.Parent;
+			Paragraph.Set_Align(Align);
+		}
+	}
+	else
+	{
+		this.DrawingObjects.setParagraphAlign(Align);
+	}
+};
+CDrawingsController.prototype.SetParagraphSpacing = function (Spacing)
+{
+	if (true != this.DrawingObjects.isSelectedText())
+	{
+		var ParaDrawing = this.DrawingObjects.getMajorParaDrawing();
+		if (null != ParaDrawing)
+		{
+			var Paragraph = ParaDrawing.Parent;
+			Paragraph.Set_Spacing(Spacing, false);
+			this.Recalculate();
+		}
+	}
+	else
+	{
+		this.DrawingObjects.setParagraphSpacing(Spacing);
+	}
+};
+CDrawingsController.prototype.SetParagraphTabs = function(Tabs)
+{
+	this.DrawingObjects.setParagraphTabs(Tabs);
+};
+CDrawingsController.prototype.SetParagraphIndent = function(Ind)
+{
+	this.DrawingObjects.setParagraphIndent(Ind);
+};
+CDrawingsController.prototype.SetParagraphNumbering = function(NumInfo)
+{
+	this.DrawingObjects.setParagraphNumbering(NumInfo);
+};
+CDrawingsController.prototype.SetParagraphShd = function(Shd)
+{
+	this.DrawingObjects.setParagraphShd(Shd);
+};
+CDrawingsController.prototype.SetParagraphStyle = function(Name)
+{
+	this.DrawingObjects.setParagraphStyle(Name);
+};
+CDrawingsController.prototype.SetParagraphContextualSpacing = function(Value)
+{
+	this.DrawingObjects.setParagraphContextualSpacing(Value);
+};
+CDrawingsController.prototype.SetParagraphPageBreakBefore = function(Value)
+{
+	this.DrawingObjects.setParagraphPageBreakBefore(Value);
+};
+CDrawingsController.prototype.SetParagraphKeepLines = function(Value)
+{
+	this.DrawingObjects.setParagraphKeepLines(Value);
+};
+CDrawingsController.prototype.SetParagraphKeepNext = function(Value)
+{
+	this.DrawingObjects.setParagraphKeepNext(Value);
+};
+CDrawingsController.prototype.SetParagraphWidowControl = function(Value)
+{
+	this.DrawingObjects.setParagraphWidowControl(Value);
+};
+CDrawingsController.prototype.SetParagraphBorders = function(Borders)
+{
+	this.DrawingObjects.setParagraphBorders(Borders);
+};
+CDrawingsController.prototype.SetParagraphFramePr = function(FramePr, bDelete)
+{
+	// Не добавляем и не работаем с рамками в автофигурах
+};
 
 CDrawingsController.prototype.AddToParagraph = function(oItem, bRecalculate)
 {

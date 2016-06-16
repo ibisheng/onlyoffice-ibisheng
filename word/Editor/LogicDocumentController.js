@@ -105,6 +105,62 @@ CLogicDocumentController.prototype.MoveCursorToCell = function(bNext)
 {
 	return this.LogicDocument.controller_MoveCursorToCell(bNext);
 };
+CLogicDocumentController.prototype.SetParagraphAlign = function(Align)
+{
+	this.LogicDocument.controller_SetParagraphAlign(Align);
+};
+CLogicDocumentController.prototype.SetParagraphSpacing = function (Spacing)
+{
+	this.LogicDocument.controller_SetParagraphSpacing(Spacing);
+};
+CLogicDocumentController.prototype.SetParagraphTabs = function(Tabs)
+{
+	this.LogicDocument.controller_SetParagraphTabs(Tabs);
+};
+CLogicDocumentController.prototype.SetParagraphIndent = function(Ind)
+{
+	this.LogicDocument.controller_SetParagraphIndent(Ind);
+};
+CLogicDocumentController.prototype.SetParagraphNumbering = function(NumInfo)
+{
+	this.LogicDocument.controller_SetParagraphNumbering(NumInfo);
+};
+CLogicDocumentController.prototype.SetParagraphShd = function(Shd)
+{
+	this.LogicDocument.controller_SetParagraphShd(Shd);
+};
+CLogicDocumentController.prototype.SetParagraphStyle = function(Name)
+{
+	this.LogicDocument.controller_SetParagraphStyle(Name);
+};
+CLogicDocumentController.prototype.SetParagraphContextualSpacing = function(Value)
+{
+	this.LogicDocument.controller_SetParagraphContextualSpacing(Value);
+};
+CLogicDocumentController.prototype.SetParagraphPageBreakBefore = function(Value)
+{
+	this.LogicDocument.controller_SetParagraphPageBreakBefore(Value);
+};
+CLogicDocumentController.prototype.SetParagraphKeepLines = function(Value)
+{
+	this.LogicDocument.controller_SetParagraphKeepLines(Value);
+};
+CLogicDocumentController.prototype.SetParagraphKeepNext = function(Value)
+{
+	this.LogicDocument.controller_SetParagraphKeepNext(Value);
+};
+CLogicDocumentController.prototype.SetParagraphWidowControl = function(Value)
+{
+	this.LogicDocument.controller_SetParagraphWidowControl(Value);
+};
+CLogicDocumentController.prototype.SetParagraphBorders = function(Borders)
+{
+	this.LogicDocument.controller_SetParagraphBorders(Borders);
+};
+CLogicDocumentController.prototype.SetParagraphFramePr = function(FramePr, bDelete)
+{
+	this.LogicDocument.controller_SetParagraphFramePr(FramePr, bDelete);
+};
 
 
 CLogicDocumentController.prototype.AddToParagraph = function(oItem)
