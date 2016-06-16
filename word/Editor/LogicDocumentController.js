@@ -103,7 +103,7 @@ CLogicDocumentController.prototype.MoveCursorToXY = function(X, Y, PageAbs, AddT
 };
 CLogicDocumentController.prototype.MoveCursorToCell = function(bNext)
 {
-	return this.LogicDocument.controller_CursorMoveToCell(bNext);
+	return this.LogicDocument.controller_MoveCursorToCell(bNext);
 };
 
 

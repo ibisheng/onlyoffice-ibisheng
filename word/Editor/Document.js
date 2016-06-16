@@ -15902,7 +15902,7 @@ CDocument.prototype.controller_MoveCursorToEndPos = function(AddToSelect)
 		this.Content[this.CurPos.ContentPos].Cursor_MoveToEndPos(false);
 	}
 };
-CDocument.prototype.controller_MoveCursorRight = function(AddToSelect, Word)
+CDocument.prototype.controller_MoveCursorLeft = function(AddToSelect, Word)
 {
 	if (this.CurPos.ContentPos < 0)
 		return false;
