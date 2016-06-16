@@ -315,18 +315,17 @@
       }
     };
 
-    /** @constructor */
-    function asc_CCheckDefName(s, r) {
-      this.status = s;
-      this.reason = r;
-    }
-    asc_CCheckDefName.prototype = {
-      asc_getStatus: function() {
-        return this.status;
-      }, asc_getReason: function() {
-        return this.reason;
-      }
-    };
+  /** @constructor */
+  function asc_CCheckDefName(s, r) {
+    this.status = s;
+    this.reason = r;
+  }
+  asc_CCheckDefName.prototype.asc_getStatus = function () {
+    return this.status;
+  };
+  asc_CCheckDefName.prototype.asc_getReason = function () {
+    return this.reason;
+  };
 
   //----------------------------------------------------------export----------------------------------------------------
   var prot;

@@ -2482,42 +2482,38 @@ Workbook.prototype.recalcWB = function(isRecalcWB){
       this.sortDependency();
     }
 };
-Workbook.prototype.checkDefName = function ( checkName, scope ) {
+	Workbook.prototype.checkDefName = function (checkName, scope) {
+		var res = new Asc.asc_CCheckDefName();
+		var range = AscCommonExcel.g_oRangeCache.getRange3D(checkName) ||
+			AscCommonExcel.g_oRangeCache.getAscRange(checkName);
+		if (range || !AscCommon.rx_defName.test(checkName.toLowerCase())) {
+			res.status = false;
+			res.reason = c_oAscDefinedNameReason.WrongName;
+			return res;
+		}
 
-    var rxTest = AscCommon.rx_defName.test( checkName ), res = new Asc.asc_CCheckDefName();
-    if ( !rxTest ) {
-        res.status = false;
-        res.reason = c_oAscDefinedNameReason.WrongName;
-        return res;
-    }
+		if (scope !== null) {
+			scope = this.getWorksheet(scope).getId();
+		}
 
-    if( scope !== null ){
-        scope = this.getWorksheet(scope).getId();
-    }
+		var defName = this.dependencyFormulas.getDefNameNode(getDefNameVertexId(scope, checkName));
+		if (defName) {
+			defName = defName.getAscCDefName();
+			res.status = false;
+			if (defName.isLock) {
+				res.reason = c_oAscDefinedNameReason.IsLocked;
+			} else if (defName.Ref == null) {
+				res.reason = c_oAscDefinedNameReason.NameReserved;
+			} else {
+				res.reason = c_oAscDefinedNameReason.Existed;
+			}
+		} else {
+			res.status = true;
+			res.reason = c_oAscDefinedNameReason.OK;
+		}
 
-    var defName = this.dependencyFormulas.getDefNameNode(getDefNameVertexId(scope, checkName));
-
-    if(defName){
-        defName = defName.getAscCDefName();
-        res.status = false;
-        if(defName.isLock){
-            res.reason = c_oAscDefinedNameReason.IsLocked;
-        }
-        else if( defName.Ref == null ){
-            res.reason = c_oAscDefinedNameReason.NameReserved;
-        }
-        else{
-            res.reason = c_oAscDefinedNameReason.Existed;
-        }
-    }
-    else{
-        res.status = true;
-        res.reason = c_oAscDefinedNameReason.OK;
-    }
-
-    return res;
-
-};
+		return res;
+	};
 Workbook.prototype.isDefinedNamesExists = function ( name, sheetId ) {
     var n = name.toLowerCase();
     return !!this.dependencyFormulas.defNameList[getDefNameVertexId(sheetId, n)];
