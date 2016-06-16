@@ -36,7 +36,7 @@ var cElementType = {
 		cell3D      : 12,
 		cellsRange3D: 13,
 		table       : 14,
-		name3D       : 15
+		name3D      : 15
   };
 /** @enum */
 var cErrorType = {
@@ -1944,6 +1944,25 @@ function checkTypeCell( val ) {
         return new cString( val );
     }
 }
+	
+	// ToDo перевести на эту функцию все формулы...
+	function checkTypeCell2(cell) {
+		if (cell) {
+			var val = cell.getValueWithoutFormat();
+			var type = cell.getType();
+			if (CellValueType.Number === type) {
+				return new cNumber(val - 0);
+			} else if (CellValueType.Bool === type) {
+				return new cBool(val);
+			} else if (CellValueType.Error === type) {
+				return new cError(val);
+			} else {
+				return new cString(val);
+			}
+		} else {
+			return new cEmpty();
+		}
+	}
 
   /*--------------------------------------------------------------------------*/
   /*Base classes for operators & functions */
@@ -5104,6 +5123,7 @@ function rtl_math_erfc( x ) {
   window['AscCommonExcel'].cBaseFunction = cBaseFunction;
 
   window['AscCommonExcel'].checkTypeCell = checkTypeCell;
+	window['AscCommonExcel'].checkTypeCell2 = checkTypeCell2;
   window['AscCommonExcel'].cFormulaFunctionGroup = cFormulaFunctionGroup;
   window['AscCommonExcel'].cFormulaFunction = cFormulaFunction;
 
