@@ -383,7 +383,6 @@ $( function () {
     var c_msPerDay = AscCommonExcel.c_msPerDay;
     var parserFormula = AscCommonExcel.parserFormula;
     var GetDiffDate360 = AscCommonExcel.GetDiffDate360;
-    var bDate1904 = AscCommon.bDate1904;
     var fSortAscending = AscCommon.fSortAscending;
     var g_oIdCounter = AscCommon.g_oIdCounter;
 
@@ -391,7 +390,6 @@ $( function () {
         data = getTestWorkbook(),
         sData = data + "", tmp;
     if ( AscCommon.c_oSerFormat.Signature === sData.substring( 0, AscCommon.c_oSerFormat.Signature.length ) ) {
-        var sUrlPath = "offlinedocs/";
         wb = new AscCommonExcel.Workbook( new AscCommonExcel.asc_CHandlersList(), {wb:{getWorksheet:function(){}}} );
         AscCommon.History.init(wb);
 
@@ -702,7 +700,7 @@ $( function () {
     test( "Test: YEAR", function () {
         oParser = new parserFormula( "YEAR(2013)", "A1", ws );
         ok( oParser.parse() );
-        if ( bDate1904 )
+        if ( AscCommon.bDate1904 )
             strictEqual( oParser.calculate().getValue(), 1909 );
         else
             strictEqual( oParser.calculate().getValue(), 1905 );
@@ -711,7 +709,7 @@ $( function () {
     test( "Test: DAY", function () {
         oParser = new parserFormula( "DAY(2013)", "A1", ws );
         ok( oParser.parse() );
-        if ( bDate1904 )
+        if ( AscCommon.bDate1904 )
             strictEqual( oParser.calculate().getValue(), 6 );
         else
             strictEqual( oParser.calculate().getValue(), 5 );
@@ -1022,7 +1020,7 @@ $( function () {
         oParser = new parserFormula( "VALUE(\"03-26-2006\")", "A2", ws );
         ok( oParser.parse() );
 
-        if ( bDate1904 )
+        if ( AscCommon.bDate1904 )
             strictEqual( oParser.calculate().getValue(), 37340 );
         else
             strictEqual( oParser.calculate().getValue(), 38802 );
@@ -1064,7 +1062,7 @@ $( function () {
         oParser = new parserFormula( "DATEVALUE(\"03-26-2006\")", "A2", ws );
         ok( oParser.parse() );
 
-        if ( bDate1904 )
+        if ( AscCommon.bDate1904 )
             strictEqual( oParser.calculate().getValue(), 37340 );
         else
             strictEqual( oParser.calculate().getValue(), 38802 );
@@ -1072,7 +1070,7 @@ $( function () {
 
     test( "Test: \"EDATE\"", function () {
 
-        if ( !bDate1904 ) {
+        if ( !AscCommon.bDate1904 ) {
             oParser = new parserFormula( "EDATE(DATE(2006,1,31),5)", "A2", ws );
             ok( oParser.parse() );
             strictEqual( oParser.calculate().getValue(), 38898 );
@@ -1112,7 +1110,7 @@ $( function () {
 
     test( "Test: \"EOMONTH\"", function () {
 
-        if ( !bDate1904 ) {
+        if ( !AscCommon.bDate1904 ) {
             oParser = new parserFormula( "EOMONTH(DATE(2006,1,31),5)", "A2", ws );
             ok( oParser.parse() );
             strictEqual( oParser.calculate().getValue(), 38898 );

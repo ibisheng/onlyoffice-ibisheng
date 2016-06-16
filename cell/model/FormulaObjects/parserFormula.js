@@ -55,7 +55,6 @@ var cExcelMaxExponent = 308;
 var cExcelMinExponent = -308;
 var c_Date1904Const = 24107; //разница в днях между 01.01.1970 и 01.01.1904 годами
 var c_Date1900Const = 25568; //разница в днях между 01.01.1970 и 01.01.1900 годами
-var c_DateCorrectConst = c_Date1900Const;
 var c_sPerDay = 86400;
 var c_msPerDay = c_sPerDay * 1000;
   var rx_sFuncPref = /_xlfn\./i;
@@ -92,7 +91,7 @@ Date.prototype.getExcelDate = function () {
 };
 
 Date.prototype.getExcelDateWithTime = function () {
-//    return Math.floor( ( this.getTime() / 1000 - this.getTimezoneOffset() * 60 ) / c_sPerDay + ( c_DateCorrectConst + (bDate1904 ? 0 : 1) ) );
+//    return Math.floor( ( this.getTime() / 1000 - this.getTimezoneOffset() * 60 ) / c_sPerDay + ( AscCommonExcel.c_DateCorrectConst + (bDate1904 ? 0 : 1) ) );
     var year = this.getUTCFullYear(), month = this.getUTCMonth(), date = this.getUTCDate(), res;
 
   if (1900 < year || (1900 == year && 1 < month)) {
@@ -5104,7 +5103,7 @@ function rtl_math_erfc( x ) {
   window['AscCommonExcel'].cExcelMinExponent = cExcelMinExponent;
   window['AscCommonExcel'].c_Date1904Const = c_Date1904Const;
   window['AscCommonExcel'].c_Date1900Const = c_Date1900Const;
-  window['AscCommonExcel'].c_DateCorrectConst = c_DateCorrectConst;
+  window['AscCommonExcel'].c_DateCorrectConst = c_Date1900Const;
   window['AscCommonExcel'].c_sPerDay = c_sPerDay;
   window['AscCommonExcel'].c_msPerDay = c_msPerDay;
 
