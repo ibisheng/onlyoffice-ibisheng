@@ -4,7 +4,8 @@ var g_oLicenseResult = {
   Error       : 1,
   Expired     : 2,
   Success     : 3,
-  UnknownUser : 4
+  UnknownUser : 4,
+  Connections : 5
 };
 
 var g_sLicenseDefaultUrl = "/license";

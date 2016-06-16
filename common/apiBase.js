@@ -347,7 +347,7 @@
 		this.sendEvent("asc_onPrint");
 	};
 	// Open
-	baseEditorsApi.prototype.asc_LoadDocument                    = function(isVersionHistory)
+	baseEditorsApi.prototype.asc_LoadDocument                    = function(isVersionHistory, isRepeat)
 	{
 		// Меняем тип состояния (на открытие)
 		this.advancedOptionsAction = AscCommon.c_oAscAdvancedOptionsAction.Open;
@@ -373,7 +373,9 @@
 		}
 		this.CoAuthoringApi.auth(this.getViewMode(), rData);
 
-		this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Open);
+		if (!isRepeat) {
+			this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Open);
+		}
 
 		if (offlineMode === this.documentUrl)
 		{
@@ -513,7 +515,12 @@
 		{
 			if (t.isOnFirstConnectEnd)
 			{
-				t.CoAuthoringApi.auth(t.getViewMode());
+				if (t.CoAuthoringApi.get_isAuth()) {
+					t.CoAuthoringApi.auth(t.getViewMode());
+				} else {
+					//первый запрос или ответ не дошел надо повторить открытие
+					t.asc_LoadDocument(false, true);
+				}
 			}
 			else
 			{

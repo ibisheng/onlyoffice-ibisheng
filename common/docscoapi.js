@@ -268,6 +268,13 @@
     return null;
   };
 
+  CDocsCoApi.prototype.get_isAuth = function() {
+    if (this._CoAuthoringApi && this._onlineWork) {
+      return this._CoAuthoringApi.get_isAuth();
+    }
+    return null;
+  };
+
   CDocsCoApi.prototype.releaseLocks = function(blockId) {
     if (this._CoAuthoringApi && this._onlineWork) {
       this._CoAuthoringApi.releaseLocks(blockId);
@@ -512,6 +519,10 @@
 
   DocsCoApi.prototype.get_indexUser = function() {
     return this._indexUser;
+  };
+
+  DocsCoApi.prototype.get_isAuth = function() {
+    return this._isAuth
   };
 
   DocsCoApi.prototype.getSessionId = function() {
