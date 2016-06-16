@@ -81,6 +81,32 @@ CLogicDocumentController.prototype.MoveCursorRight = function(AddToSelect, Word,
 {
 	return this.LogicDocument.controller_MoveCursorRight(AddToSelect, Word, FromPaste);
 };
+CLogicDocumentController.prototype.MoveCursorUp = function(AddToSelect)
+{
+	return this.LogicDocument.controller_MoveCursorUp(AddToSelect);
+};
+CLogicDocumentController.prototype.MoveCursorDown = function(AddToSelect)
+{
+	return this.LogicDocument.controller_MoveCursorDown(AddToSelect);
+};
+CLogicDocumentController.prototype.MoveCursorToEndOfLine = function(AddToSelect)
+{
+	return this.LogicDocument.controller_MoveCursorToEndOfLine(AddToSelect);
+};
+CLogicDocumentController.prototype.MoveCursorToStartOfLine = function(AddToSelect)
+{
+	return this.LogicDocument.controller_MoveCursorToStartOfLine(AddToSelect);
+};
+CLogicDocumentController.prototype.MoveCursorToXY = function(X, Y, PageAbs, AddToSelect)
+{
+	return this.LogicDocument.controller_MoveCursorToXY(X, Y, PageAbs, AddToSelect);
+};
+CLogicDocumentController.prototype.MoveCursorToCell = function(bNext)
+{
+	return this.LogicDocument.controller_CursorMoveToCell(bNext);
+};
+
+
 CLogicDocumentController.prototype.AddToParagraph = function(oItem)
 {
 	this.LogicDocument.controller_AddToParagraph(oItem);

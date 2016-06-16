@@ -99,6 +99,37 @@ CHdrFtrController.prototype.MoveCursorRight = function(AddToSelect, Word, FromPa
 {
 	return this.HdrFtr.Cursor_MoveRight(AddToSelect, Word, FromPaste);
 };
+CHdrFtrController.prototype.MoveCursorUp = function(AddToSelect)
+{
+	var RetValue = this.HdrFtr.Cursor_MoveUp(AddToSelect);
+	this.LogicDocument.Document_UpdateInterfaceState();
+	this.LogicDocument.Document_UpdateSelectionState();
+	return RetValue;
+};
+CHdrFtrController.prototype.MoveCursorDown = function(AddToSelect)
+{
+	var RetValue = this.HdrFtr.Cursor_MoveDown(AddToSelect);
+	this.LogicDocument.Document_UpdateInterfaceState();
+	this.LogicDocument.Document_UpdateSelectionState();
+	return RetValue;
+};
+CHdrFtrController.prototype.MoveCursorToEndOfLine = function(AddToSelect)
+{
+	return this.HdrFtr.Cursor_MoveEndOfLine(AddToSelect);
+};
+CHdrFtrController.prototype.MoveCursorToStartOfLine = function(AddToSelect)
+{
+	return this.HdrFtr.Cursor_MoveStartOfLine(AddToSelect);
+};
+CHdrFtrController.prototype.MoveCursorToXY = function(X, Y, PageAbs, AddToSelect)
+{
+	return this.HdrFtr.Cursor_MoveAt(X, Y, PageAbs, AddToSelect);
+};
+CHdrFtrController.prototype.MoveCursorToCell = function(bNext)
+{
+	return this.HdrFtr.Cursor_MoveToCell(bNext);
+};
+
 CHdrFtrController.prototype.AddToParagraph = function(oItem, bRecalculate)
 {
 	if (para_NewLine === oItem.Type && true === oItem.Is_PageOrColumnBreak())

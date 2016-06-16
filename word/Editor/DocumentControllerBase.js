@@ -306,6 +306,43 @@ CDocumentControllerBase.prototype.MoveCursorLeft = function(AddToSelect, Word){r
  */
 CDocumentControllerBase.prototype.MoveCursorRight = function(AddToSelect, Word, FromPaste){return false;};
 /**
+ * Смещаем курсор вверх.
+ * @param AddToSelect Добавлять ли к селекту смещение
+ * @returns {boolean} Получилось ли перемещение, или мы достигли предела.
+ */
+CDocumentControllerBase.prototype.MoveCursorUp = function(AddToSelect){return false;};
+/**
+ * Смещаем курсор вниз.
+ * @param AddToSelect Добавлять ли к селекту смещение
+ * @returns {boolean} Получилось ли перемещение, или мы достигли предела.
+ */
+CDocumentControllerBase.prototype.MoveCursorDown = function(AddToSelect){return false;};
+/**
+ * Смещаем курсор в конец строки.
+ * @param AddToSelect Добавлять ли к селекту смещение
+ * @returns {boolean} Получилось ли перемещение, или мы достигли предела.
+ */
+CDocumentControllerBase.prototype.MoveCursorToEndOfLine = function(AddToSelect){return false;};
+/**
+ * Смещаем курсор в начало строки.
+ * @param AddToSelect Добавлять ли к селекту смещение
+ * @returns {boolean} Получилось ли перемещение, или мы достигли предела.
+ */
+CDocumentControllerBase.prototype.MoveCursorToStartOfLine = function(AddToSelect){return false;};
+/**
+ * Перемещаем курсор в заданную позицию на странице.
+ * @param X
+ * @param Y
+ * @param PageAbs - абсолютный номер страницы
+ * @param AddToSelect Добавлять ли к селекту смещение
+ */
+CDocumentControllerBase.prototype.MoveCursorToXY = function(X, Y, PageAbs, AddToSelect){};
+/**
+ * Перемещаем курсор в следующую или предыдущую ячейку.
+ * @param {boolean} bNext
+ */
+CDocumentControllerBase.prototype.MoveCursorToCell = function(bNext){};
+/**
  * Добавляем элемент в параграф.
  * @param oItem
  * @param {boolean} bRecalculate - Пересчитывать ли после выполнения данной функции.

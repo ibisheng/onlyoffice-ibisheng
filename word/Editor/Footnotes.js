@@ -436,6 +436,96 @@ CFootnotesController.prototype.MoveCursorRight = function(AddToSelect, Word, Fro
 
 	return bRetValue;
 };
+CFootnotesController.prototype.MoveCursorUp = function(AddToSelect)
+{
+	var bRetValue = false;
+
+	// TODO: Доделать селект и курсор
+
+	if (true === this.Selection.Use)
+	{
+	}
+	else
+	{
+		if (null !== this.CurFootnote)
+			bRetValue = this.CurFootnote.Cursor_MoveUp(AddToSelect);
+	}
+
+	return bRetValue;
+};
+CFootnotesController.prototype.MoveCursorDown = function(AddToSelect)
+{
+	var bRetValue = false;
+
+	// TODO: Доделать селект и курсор
+
+	if (true === this.Selection.Use)
+	{
+	}
+	else
+	{
+		if (null !== this.CurFootnote)
+			bRetValue = this.CurFootnote.Cursor_MoveDown(AddToSelect);
+	}
+
+	return bRetValue;
+};
+CFootnotesController.prototype.MoveCursorToEndOfLine = function(AddToSelect)
+{
+	var bRetValue = false;
+
+	// TODO: Доделать селект и курсор
+
+	if (true === this.Selection.Use)
+	{
+	}
+	else
+	{
+		if (null !== this.CurFootnote)
+			bRetValue = this.CurFootnote.Cursor_MoveEndOfLine(AddToSelect);
+	}
+
+	return bRetValue;
+};
+CFootnotesController.prototype.MoveCursorToStartOfLine = function(AddToSelect)
+{
+	var bRetValue = false;
+
+	// TODO: Доделать селект и курсор
+
+	if (true === this.Selection.Use)
+	{
+	}
+	else
+	{
+		if (null !== this.CurFootnote)
+			bRetValue = this.CurFootnote.Cursor_MoveStartOfLine(AddToSelect);
+	}
+
+	return bRetValue;
+};
+CFootnotesController.prototype.MoveCursorToXY = function(X, Y, PageAbs, AddToSelect)
+{
+	// TODO: Реализовать
+};
+CFootnotesController.prototype.MoveCursorToCell = function(bNext)
+{
+	var bRetValue = false;
+
+	// TODO: Доделать селект и курсор
+
+	if (true === this.Selection.Use)
+	{
+	}
+	else
+	{
+		if (null !== this.CurFootnote)
+			bRetValue = this.CurFootnote.Cursor_MoveToCell(bNext);
+	}
+
+	return bRetValue;
+};
+
 CFootnotesController.prototype.AddToParagraph = function(oItem, bRecalculate)
 {
 	// TODO: Доделать селект и курсор

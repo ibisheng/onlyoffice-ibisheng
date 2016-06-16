@@ -106,6 +106,37 @@ CDrawingsController.prototype.MoveCursorRight = function(AddToSelect, Word, From
 {
 	return this.DrawingObjects.cursorMoveRight(AddToSelect, Word, FromPaste);
 };
+CDrawingsController.prototype.MoveCursorUp = function(AddToSelect)
+{
+	var RetValue = this.DrawingObjects.cursorMoveUp(AddToSelect);
+	this.LogicDocument.Document_UpdateInterfaceState();
+	this.LogicDocument.Document_UpdateSelectionState();
+	return RetValue;
+};
+CDrawingsController.prototype.MoveCursorDown = function(AddToSelect)
+{
+	var RetValue = this.DrawingObjects.cursorMoveDown(AddToSelect);
+	this.LogicDocument.Document_UpdateInterfaceState();
+	this.LogicDocument.Document_UpdateSelectionState();
+	return RetValue;
+};
+CDrawingsController.prototype.MoveCursorToEndOfLine = function(AddToSelect)
+{
+	return this.DrawingObjects.cursorMoveEndOfLine(AddToSelect);
+};
+CDrawingsController.prototype.MoveCursorToStartOfLine = function(AddToSelect)
+{
+	return this.DrawingObjects.cursorMoveStartOfLine(AddToSelect);
+};
+CDrawingsController.prototype.MoveCursorToXY = function(X, Y, PageAbs, AddToSelect)
+{
+	return this.DrawingObjects.cursorMoveAt(X, Y, AddToSelect);
+};
+CDrawingsController.prototype.MoveCursorToCell = function(bNext)
+{
+	return this.DrawingObjects.cursorMoveToCell(bNext);
+};
+
 CDrawingsController.prototype.AddToParagraph = function(oItem, bRecalculate)
 {
 	if (para_NewLine === oItem.Type && true === oItem.Is_PageOrColumnBreak())
