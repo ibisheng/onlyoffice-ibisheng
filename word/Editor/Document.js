@@ -4082,8 +4082,6 @@ CDocument.prototype.Cursor_MoveToStartPos = function(AddToSelect)
 
 	this.Controller.MoveCursorToStartPos(AddToSelect);
 
-	this.Document_UpdateInterfaceState();
-	this.Document_UpdateRulersState();
 	this.private_UpdateCursorXY(true, true);
 };
 CDocument.prototype.Cursor_MoveToEndPos = function(AddToSelect)
@@ -4092,8 +4090,6 @@ CDocument.prototype.Cursor_MoveToEndPos = function(AddToSelect)
 
 	this.Controller.MoveCursorToEndPos(AddToSelect);
 
-	this.Document_UpdateInterfaceState();
-	this.Document_UpdateRulersState();
 	this.private_UpdateCursorXY(true, true);
 };
 CDocument.prototype.Cursor_MoveLeft = function(AddToSelect, Word)
