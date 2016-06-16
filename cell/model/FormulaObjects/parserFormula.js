@@ -595,32 +595,7 @@ cArea.prototype.getValue = function () {
         val.push( new cError( cErrorType.bad_reference ) );
   } else {
         r._foreachNoEmpty( function ( cell ) {
-            var cellType = cell.getType();
-            switch ( cellType ) {
-                case CellValueType.Number:
-          cell.getValueWithoutFormat() === "" ? val.push(new cEmpty()) :
-            val.push(new cNumber(cell.getValueWithoutFormat()));
-                    break;
-
-                case CellValueType.Bool:
-                    val.push( new cBool( cell.getValueWithoutFormat() ) );
-                    break;
-
-                case CellValueType.Error:
-                    val.push( new cError( cell.getValueWithoutFormat() ) );
-                    break;
-
-                case CellValueType.String:
-                    val.push( new cString( cell.getValueWithoutFormat() ) );
-                    break;
-
-                default:
-                    if ( cell.getValueWithoutFormat() && cell.getValueWithoutFormat() !== "" ) {
-                        val.push( new cNumber( cell.getValueWithoutFormat() ) );
-          } else {
-                        val.push( checkTypeCell( "" + cell.getValueWithoutFormat() ) );
-                    }
-            }
+					val.push(checkTypeCell2(cell));
         } );
     }
     return val;

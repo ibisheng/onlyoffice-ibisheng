@@ -959,11 +959,6 @@ cCORREL.prototype.getInfo = function () {
 };
 
 function cCOUNT() {
-//    cBaseFunction.call( this, "COUNT" );
-//    this.setArgumentsMin( 1 );
-//    this.setArgumentsMax( 255 );
-//    this.setFormat( this.formatType.noneFormat );
-
     this.name = "COUNT";
     this.type = cElementType.func;
     this.value = null;
@@ -975,7 +970,6 @@ function cCOUNT() {
         noneFormat:-2
     };
     this.numFormat = this.formatType.noneFormat;
-
 }
 
 cCOUNT.prototype = Object.create( cBaseFunction.prototype );
