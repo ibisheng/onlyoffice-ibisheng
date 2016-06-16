@@ -5345,8 +5345,12 @@ TableColumn.prototype.cleanTotalsData = function(){
 
 TableColumn.prototype.setTotalsRowFormula = function(val){
 	this.cleanTotalsData();
+	if("=" === val[0])
+	{
+		val = val.substring(1);
+	}
 	
-	this.TotalsRowFormula = val.substring(1);
+	this.TotalsRowFormula = val;
 	this.TotalsRowFunction = Asc.ETotalsRowFunction.totalrowfunctionCustom;
 };
 
