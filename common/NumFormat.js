@@ -6,7 +6,6 @@
 */
 function(window, undefined) {
 // Import
-var bDate1904 = AscCommon.bDate1904;
 var CellValueType = AscCommon.CellValueType;
 
 var c_oAscNumFormatType = Asc.c_oAscNumFormatType;
@@ -1047,7 +1046,7 @@ NumFormat.prototype =
             ttimes[i-1].val++;
         }
         var stDate, day, month, year, dayWeek;
-		if(bDate1904)
+		if(AscCommon.bDate1904)
 		{
 			stDate = new Date(Date.UTC(1904,0,1,0,0,0));
 			if(d.val)
@@ -1377,7 +1376,7 @@ NumFormat.prototype =
     },
     isInvalidDateValue : function(number)
     {
-        return (number == number - 0) && ((number < 0 && false == bDate1904) || number > 2958465.9999884);
+        return (number == number - 0) && ((number < 0 && !AscCommon.bDate1904) || number > 2958465.9999884);
     },
     format: function (number, nValType, dDigitsCount, oAdditionalResult, cultureInfo, bChart)
     {
@@ -3415,7 +3414,7 @@ FormatParser.prototype =
 				var nDay;
 				var nMounth;
 				var nYear;
-				if(bDate1904)
+				if(AscCommon.bDate1904)
 				{
 					nDay = 1;
 					nMounth = 0;
@@ -3483,7 +3482,7 @@ FormatParser.prototype =
 				}
 				if(true == bValidDate && (true == bDate || true == bTime))
 				{
-					if(bDate1904)
+					if(AscCommon.bDate1904)
 						dValue = (Date.UTC(nYear,nMounth,nDay,nHour,nMinute,nSecond) - Date.UTC(1904,0,1,0,0,0)) / (86400 * 1000);
 					else
 					{
