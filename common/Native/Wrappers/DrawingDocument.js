@@ -1,7 +1,90 @@
 
 // Import
-var global_mouseEvent = AscCommon.global_mouseEvent;
+var FontStyle = AscFonts.FontStyle;
+var g_fontApplication = AscFonts.g_fontApplication;
 
+var CColor = AscCommon.CColor;
+var CAscMathCategory = AscCommon.CAscMathCategory;
+var g_oTableId = AscCommon.g_oTableId;
+var g_oTextMeasurer = AscCommon.g_oTextMeasurer;
+var global_mouseEvent = AscCommon.global_mouseEvent;
+var History = AscCommon.History;
+var global_MatrixTransformer = AscCommon.global_MatrixTransformer;
+var g_dKoef_pix_to_mm = AscCommon.g_dKoef_pix_to_mm;
+var g_dKoef_mm_to_pix = AscCommon.g_dKoef_mm_to_pix;
+
+var _canvas_tables = null;
+var _table_styles = null;
+
+function CColumnsMarkupColumn()
+{
+    this.W     = 0;
+    this.Space = 0;
+}
+
+function CColumnsMarkup()
+{
+    this.CurCol = 0;
+    this.X      = 0; // левое поле
+    this.R      = 0; // правое поле
+
+    this.EqualWidth = true;
+    this.Num        = 1;
+    this.Space      = 30;
+    this.Cols       = [];
+
+    this.SectPr     = null;
+}
+CColumnsMarkup.prototype.Update_FromSectPr = function(SectPr)
+{
+    if (!SectPr)
+        return;
+
+    this.SectPr = SectPr;
+
+    var Columns = SectPr.Columns;
+
+    this.X          = SectPr.Get_PageMargin_Left();
+    this.R          = SectPr.Get_PageWidth() - SectPr.Get_PageMargin_Right();
+    this.EqualWidth = Columns.EqualWidth;
+    this.Num        = Columns.Num;
+    this.Space      = Columns.Space;
+
+    this.Cols = [];
+    for (var Index = 0, Count = Columns.Cols.length; Index < Count; ++Index)
+    {
+        this.Cols[Index]       = new CColumnsMarkupColumn();
+        this.Cols[Index].W     = Columns.Cols[Index].W;
+        this.Cols[Index].Space = Columns.Cols[Index].Space;
+    }
+};
+CColumnsMarkup.prototype.Set_CurCol = function(CurCol)
+{
+    this.CurCol = CurCol;
+};
+CColumnsMarkup.prototype.CreateDuplicate = function()
+{
+    var _ret = new CColumnsMarkup();
+    _ret.SectPr = this.SectPr;
+    _ret.CurCol = this.CurCol;
+    _ret.X      = this.X;
+    _ret.R      = this.R;
+
+    _ret.EqualWidth = this.EqualWidth;
+    _ret.Num        = this.Num;
+    _ret.Space      = this.Space;
+
+    _ret.Cols = [];
+
+    for (var i = 0; i < this.Cols.length; i++)
+    {
+        var _col = new CColumnsMarkupColumn();
+        _col.W = this.Cols[i].W;
+        _col.Space = this.Cols[i].Space;
+        _ret.Cols.push(_col);
+    }
+    return _ret;
+};
 function CTableOutlineDr()
 {
     this.image = {};
@@ -1122,12 +1205,16 @@ CDrawingDocument.prototype =
 	
 	BeginDrawTracking: function()
     {
-        this.AutoShapesTrack.BeginDrawTracking();
+        if (this.AutoShapesTrack.BeginDrawTracking) {
+            this.AutoShapesTrack.BeginDrawTracking();
+        }
     },
 
     EndDrawTracking: function()
     {
-        this.AutoShapesTrack.EndDrawTracking();
+        if (this.AutoShapesTrack.EndDrawTracking) {
+            this.AutoShapesTrack.EndDrawTracking();
+        }
     },
 
     // треки
@@ -2836,4 +2923,6 @@ function check_MouseUpEvent(e)
 
 //--------------------------------------------------------export----------------------------------------------------
 window['AscCommon'] = window['AscCommon'] || {};
+window['AscCommonWord'] = window['AscCommonWord'] || {};
+//window['AscCommon'].CPage = CPage;
 window['AscCommon'].CDrawingDocument = CDrawingDocument;

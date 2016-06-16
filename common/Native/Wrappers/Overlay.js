@@ -1,3 +1,522 @@
+
+var TRACK_CIRCLE_RADIUS     = 5;
+var TRACK_RECT_SIZE2        = 4;
+var TRACK_RECT_SIZE         = 8;
+var TRACK_RECT_SIZE_CT      = 6;
+var TRACK_DISTANCE_ROTATE   = 25;
+var TRACK_DISTANCE_ROTATE2  = 25;
+var TRACK_ADJUSTMENT_SIZE   = 10;
+var TRACK_WRAPPOINTS_SIZE   = 6;
+var IMAGE_ROTATE_TRACK_W    = 21;
+
+if (AscBrowser.isRetina && AscBrowser.isMobile) {
+    TRACK_DISTANCE_ROTATE <<= 1;
+}
+
+var bIsUseImageRotateTrack  = true;
+if (bIsUseImageRotateTrack)
+{
+    window.g_track_rotate_marker = new Image();
+    window.g_track_rotate_marker;
+    window.g_track_rotate_marker.asc_complete = false;
+    window.g_track_rotate_marker.onload = function(){
+        window.g_track_rotate_marker.asc_complete = true;
+    };
+    window.g_track_rotate_marker.src = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABUAAAAVCAMAAACeyVWkAAAAVFBMVEUAAAD///////////////////////////////////////////////////////98fHy2trb09PTT09OysrKqqqqJiYng4ODr6+uamprGxsbi4uKGhoYjgM0eAAAADnRSTlMAy00k7/z0jbeuMzDljsugwZgAAACpSURBVBjTdZHbEoMgDESDAl6bgIqX9v//s67UYpm6D0xyYMImoaiuUr3pVdVRUtnwqaY8YaE5SRcfaPgqc+DSIh7WIGGaEVoUqRGN4oZlcDIiqYlaPjQz5CNu6cFJwLiuSO3nlLBDrKhn3l4rcnH4NcAdGd5EZMfCsoMFBxM6CD57G+u6vC48PMVnHtrYhP/x+7+3cw7zdJnD3cyA7QXa4nYXaW+a9Xdvb6zqE5Jb7LmzAAAAAElFTkSuQmCC";
+
+    window.g_track_rotate_marker2 = new Image();
+    window.g_track_rotate_marker2;
+    window.g_track_rotate_marker2.asc_complete = false;
+    window.g_track_rotate_marker2.onload = function(){
+        window.g_track_rotate_marker2.asc_complete = true;
+    };
+    window.g_track_rotate_marker2.src = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACgAAAAoCAMAAAC7IEhfAAAAeFBMVEUAAAD///////////////////////////////////////////////////////////////////////////+Tk5Obm5v8/PzAwMD5+fmWlpbt7e3k5OSfn5/z8/PLy8vn5+fExMSsrKyqqqrf39+vr6+9vb2urq7c3NxSmuRpAAAAE3RSTlMA+u2XA+PTrId4WBwTN7EKtLY4iqQP6AAAAWhJREFUOMudVe2SgjAMLN+goN51CxTLp3r3/m943BAqIJTR/RU6O02yTRY2g5tEgW9blu0HUeKyLRxDj0/ghcdVWuxYfAHLiV95B5uvwD4saK7DN+DMSj1f+CYu58l9J27A6XnnJG9R3ZWU6l4Vk+y6D310baHRXvUxdRSP/aYZILJbmebFLRNAlo69x7PEeQdZ5Xz8qiS6fJr8aOnEquATFApdSsr/v1HINUo+Q6nwoDDspfH4JmoJ6shzWcINaNBSlLCI6uvLfyXmAlR2xIKBB/A1ZKiGIGA+8QCtphBawRt+hsBnNvE0M0OPZmwcijRnFvE0U6CuIcbrIUlJRnJL9L0YifTQCgU3p/aH4I7fnWaCIajwMMszCl5A7Aj+TWctGuMT6qG4QtbGodBj9oAyjpke3LSDYXCXq9A8V6GZrsLGcqXlcrneW9elAQgpxdwA3rcUdv4ymdQHtrdvpPvW/LHZ7/8+/gBTWGFPbAkGiAAAAABJRU5ErkJggg==";
+
+
+    TRACK_DISTANCE_ROTATE2 = 18;
+}
+
+
+function COverlay()
+{
+    this.m_oControl = null;
+    this.m_oContext = null;
+
+    this.min_x = 0xFFFF;
+    this.min_y = 0xFFFF;
+    this.max_x = -0xFFFF;
+    this.max_y = -0xFFFF;
+
+    this.m_bIsShow = false;
+    this.m_bIsAlwaysUpdateOverlay = false;
+
+    this.m_oHtmlPage = null;
+
+    this.DashLineColor = "#000000";
+    this.ClearAll = false;
+
+    this.IsRetina = false;
+}
+
+COverlay.prototype =
+{
+    init : function(context, controlName, x, y, w_pix, h_pix, w_mm, h_mm)
+    {
+        this.m_oContext = context;
+        //this.m_oControl = AscCommon.CreateControl(controlName);
+
+        //this.m_oHtmlPage = new AscCommon.CHtmlPage();
+        //this.m_oHtmlPage.init(x, y, w_pix, h_pix, w_mm, h_mm);
+    },
+
+    Clear : function()
+    {
+//        if (null == this.m_oContext)
+//        {
+//            this.m_oContext = this.m_oControl.HtmlElement.getContext('2d');
+//
+//            this.m_oContext.imageSmoothingEnabled = false;
+//            this.m_oContext.mozImageSmoothingEnabled = false;
+//            this.m_oContext.oImageSmoothingEnabled = false;
+//            this.m_oContext.webkitImageSmoothingEnabled = false;
+//        }
+//
+//        this.SetBaseTransform();
+//
+//        this.m_oContext.beginPath();
+//        if (this.max_x != -0xFFFF && this.max_y != -0xFFFF)
+//        {
+//            if (this.ClearAll === true)
+//            {
+//                this.m_oContext.clearRect(0, 0, this.m_oControl.HtmlElement.width, this.m_oControl.HtmlElement.height);
+//                this.ClearAll = false;
+//            }
+//            else
+//            {
+//                var _eps = 5;
+//                this.m_oContext.clearRect(this.min_x - _eps, this.min_y - _eps, this.max_x - this.min_x + 2*_eps, this.max_y - this.min_y + 2*_eps);
+//            }
+//        }
+        this.min_x = 0xFFFF;
+        this.min_y = 0xFFFF;
+        this.max_x = -0xFFFF;
+        this.max_y = -0xFFFF;
+    },
+
+    GetImageTrackRotationImage : function()
+    {
+        return this.IsRetina ? window.g_track_rotate_marker2 : window.g_track_rotate_marker;
+    },
+
+    SetTransform : function(sx, shy, shx, sy, tx, ty)
+    {
+        this.SetBaseTransform();
+        this.m_oContext.setTransform(sx, shy, shx, sy, tx, ty);
+
+    },
+
+    SetBaseTransform : function()
+    {
+        if (this.IsRetina)
+            this.m_oContext.setTransform(2, 0, 0, 2, 0, 0);
+        else
+            this.m_oContext.setTransform(1, 0, 0, 1, 0, 0);
+    },
+
+    Show : function()
+    {
+        if (this.m_bIsShow)
+            return;
+
+        this.m_bIsShow = true;
+        //this.m_oControl.HtmlElement.style.display = "block";
+    },
+    UnShow : function()
+    {
+        if (!this.m_bIsShow)
+            return;
+
+        this.m_bIsShow = false;
+        //this.m_oControl.HtmlElement.style.display = "none";
+    },
+
+    VertLine : function(position, bIsSimpleAdd)
+    {
+        if (bIsSimpleAdd !== true)
+        {
+            this.Clear();
+            if (this.m_bIsAlwaysUpdateOverlay || true/*мало ли что есть на оверлее*/)
+            {
+                //if (!editor.WordControl.OnUpdateOverlay())
+                {
+                //    editor.WordControl.EndUpdateOverlay();
+                }
+            }
+        }
+
+        if (this.min_x > position)
+            this.min_x = position;
+        if (this.max_x < position)
+            this.max_x = position;
+
+        //this.min_x = position;
+        //this.max_x = position;
+        this.min_y = 0;
+        this.max_y = this.m_oControl.HtmlElement.height;
+
+        this.m_oContext.lineWidth = 1;
+
+        var x = ((position + 0.5) >> 0) + 0.5;
+        var y = 0;
+
+        this.m_oContext.strokeStyle = this.DashLineColor;
+        this.m_oContext.beginPath();
+
+        while (y < this.max_y)
+        {
+            this.m_oContext.moveTo(x, y); y++;
+            this.m_oContext.lineTo(x, y); y+=1;
+            this.m_oContext.moveTo(x, y); y++;
+            this.m_oContext.lineTo(x, y); y+=1;
+            this.m_oContext.moveTo(x, y); y++;
+            this.m_oContext.lineTo(x, y); y++;
+
+            y += 5;
+        }
+
+        this.m_oContext.stroke();
+
+        y = 1;
+        this.m_oContext.strokeStyle = "#FFFFFF";
+        this.m_oContext.beginPath();
+
+        while (y < this.max_y)
+        {
+            this.m_oContext.moveTo(x, y); y++;
+            this.m_oContext.lineTo(x, y); y+=1;
+            this.m_oContext.moveTo(x, y); y++;
+            this.m_oContext.lineTo(x, y); y+=1;
+            this.m_oContext.moveTo(x, y); y++;
+            this.m_oContext.lineTo(x, y); y++;
+
+            y += 5;
+        }
+
+        this.m_oContext.stroke();
+        this.Show();
+    },
+
+    VertLine2 : function(position)
+    {
+        if (this.min_x > position)
+            this.min_x = position;
+        if (this.max_x < position)
+            this.max_x = position;
+
+        var _old_global = this.m_oContext.globalAlpha;
+        this.m_oContext.globalAlpha = 1;
+
+        this.min_y = 0;
+        this.max_y = this.m_oControl.HtmlElement.height;
+
+        this.m_oContext.lineWidth = 1;
+
+        var x = ((position + 0.5) >> 0) + 0.5;
+        var y = 0;
+
+        /*
+         this.m_oContext.strokeStyle = "#FFFFFF";
+         this.m_oContext.beginPath();
+         this.m_oContext.moveTo(x, y);
+         this.m_oContext.lineTo(x, this.max_y);
+         this.m_oContext.stroke();
+         */
+
+        this.m_oContext.strokeStyle = this.DashLineColor;
+        this.m_oContext.beginPath();
+
+        var dist = 1;
+
+        while (y < this.max_y)
+        {
+            this.m_oContext.moveTo(x, y);
+            y += dist;
+            this.m_oContext.lineTo(x, y);
+            y += dist;
+        }
+
+        this.m_oContext.stroke();
+        this.m_oContext.beginPath();
+        this.Show();
+
+        this.m_oContext.globalAlpha = _old_global;
+    },
+
+    HorLine : function(position, bIsSimpleAdd)
+    {
+        if (bIsSimpleAdd !== true)
+        {
+            this.Clear();
+            if (this.m_bIsAlwaysUpdateOverlay || true/*мало ли что есть на оверлее*/)
+            {
+            //    if (!editor.WordControl.OnUpdateOverlay())
+                {
+            //        editor.WordControl.EndUpdateOverlay();
+                }
+            }
+        }
+
+        this.min_x = 0;
+        this.max_x = this.m_oControl.HtmlElement.width;
+
+        if (this.min_y > position)
+            this.min_y = position;
+        if (this.max_y < position)
+            this.max_y = position;
+
+        this.m_oContext.lineWidth = 1;
+
+        var y = ((position + 0.5) >> 0) + 0.5;
+        var x = 0;
+
+        this.m_oContext.strokeStyle = this.DashLineColor;
+        this.m_oContext.beginPath();
+
+        while (x < this.max_x)
+        {
+            this.m_oContext.moveTo(x, y); x++;
+            this.m_oContext.lineTo(x, y); x+=1;
+            this.m_oContext.moveTo(x, y); x++;
+            this.m_oContext.lineTo(x, y); x+=1;
+            this.m_oContext.moveTo(x, y); x++;
+            this.m_oContext.lineTo(x, y); x++;
+
+            x += 5;
+        }
+
+        this.m_oContext.stroke();
+
+        x = 1;
+        this.m_oContext.strokeStyle = "#FFFFFF";
+        this.m_oContext.beginPath();
+
+        while (x < this.max_x)
+        {
+            this.m_oContext.moveTo(x, y); x++;
+            this.m_oContext.lineTo(x, y); x+=1;
+            this.m_oContext.moveTo(x, y); x++;
+            this.m_oContext.lineTo(x, y); x+=1;
+            this.m_oContext.moveTo(x, y); x++;
+            this.m_oContext.lineTo(x, y); x++;
+
+            x += 5;
+        }
+
+        this.m_oContext.stroke();
+        this.Show();
+    },
+
+    HorLine2 : function(position)
+    {
+        if (this.min_y > position)
+            this.min_y = position;
+        if (this.max_y < position)
+            this.max_y = position;
+
+        var _old_global = this.m_oContext.globalAlpha;
+        this.m_oContext.globalAlpha = 1;
+
+        this.min_x = 0;
+        this.max_x = this.m_oControl.HtmlElement.width;
+
+        this.m_oContext.lineWidth = 1;
+
+        var y = ((position + 0.5) >> 0) + 0.5;
+        var x = 0;
+
+        /*
+         this.m_oContext.strokeStyle = "#FFFFFF";
+         this.m_oContext.beginPath();
+         this.m_oContext.moveTo(x, y);
+         this.m_oContext.lineTo(this.max_x, y);
+         this.m_oContext.stroke();
+         */
+
+        this.m_oContext.strokeStyle = this.DashLineColor;
+        this.m_oContext.beginPath();
+
+        var dist = 1;
+
+        while (x < this.max_x)
+        {
+            this.m_oContext.moveTo(x, y);
+            x += dist;
+            this.m_oContext.lineTo(x, y);
+            x += dist;
+        }
+
+        this.m_oContext.stroke();
+        this.m_oContext.beginPath();
+        this.Show();
+
+        this.m_oContext.globalAlpha = _old_global;
+    },
+
+    CheckPoint1 : function(x,y)
+    {
+        if (x < this.min_x)
+            this.min_x = x;
+        if (y < this.min_y)
+            this.min_y = y;
+    },
+    CheckPoint2 : function(x,y)
+    {
+        if (x > this.max_x)
+            this.max_x = x;
+        if (y > this.max_y)
+            this.max_y = y;
+    },
+    CheckPoint : function(x,y)
+    {
+        if (x < this.min_x)
+            this.min_x = x;
+        if (y < this.min_y)
+            this.min_y = y;
+        if (x > this.max_x)
+            this.max_x = x;
+        if (y > this.max_y)
+            this.max_y = y;
+    },
+
+    AddRect2 : function(x,y,r)
+    {
+        var _x = x - ((r / 2) >> 0);
+        var _y = y - ((r / 2) >> 0);
+        this.CheckPoint1(_x,_y);
+        this.CheckPoint2(_x+r,_y+r);
+
+        this.m_oContext.moveTo(_x,_y);
+        this.m_oContext.rect(_x,_y,r,r);
+    },
+
+    AddRect3 : function(x,y,r, ex1, ey1, ex2, ey2)
+    {
+        var _r = r / 2;
+
+        var x1 = x + _r * (ex2 - ex1);
+        var y1 = y + _r * (ey2 - ey1);
+
+        var x2 = x + _r * (ex2 + ex1);
+        var y2 = y + _r * (ey2 + ey1);
+
+        var x3 = x + _r * (-ex2 + ex1);
+        var y3 = y + _r * (-ey2 + ey1);
+
+        var x4 = x + _r * (-ex2 - ex1);
+        var y4 = y + _r * (-ey2 - ey1);
+
+        this.CheckPoint(x1,y1);
+        this.CheckPoint(x2,y2);
+        this.CheckPoint(x3,y3);
+        this.CheckPoint(x4,y4);
+
+        var ctx = this.m_oContext;
+        ctx.moveTo(x1,y1);
+        ctx.lineTo(x2,y2);
+        ctx.lineTo(x3,y3);
+        ctx.lineTo(x4,y4);
+        ctx.closePath();
+    },
+
+    AddRect : function(x,y,w,h)
+    {
+        this.CheckPoint1(x,y);
+        this.CheckPoint2(x + w,y + h);
+
+        this.m_oContext.moveTo(x,y);
+        this.m_oContext.rect(x,y,w,h);
+        //this.m_oContext.closePath();
+    },
+    CheckRectT : function(x,y,w,h,trans,eps)
+    {
+        var x1 = trans.TransformPointX(x, y);
+        var y1 = trans.TransformPointY(x, y);
+
+        var x2 = trans.TransformPointX(x+w, y);
+        var y2 = trans.TransformPointY(x+w, y);
+
+        var x3 = trans.TransformPointX(x+w, y+h);
+        var y3 = trans.TransformPointY(x+w, y+h);
+
+        var x4 = trans.TransformPointX(x, y+h);
+        var y4 = trans.TransformPointY(x, y+h);
+
+        this.CheckPoint(x1, y1);
+        this.CheckPoint(x2, y2);
+        this.CheckPoint(x3, y3);
+        this.CheckPoint(x4, y4);
+
+        if (eps !== undefined)
+        {
+            this.min_x -= eps;
+            this.min_y -= eps;
+            this.max_x += eps;
+            this.max_y += eps;
+        }
+    },
+    CheckRect : function(x,y,w,h)
+    {
+        this.CheckPoint1(x,y);
+        this.CheckPoint2(x + w,y + h);
+    },
+    AddEllipse : function(x,y,r)
+    {
+        this.CheckPoint1(x-r,y-r);
+        this.CheckPoint2(x+r,y+r);
+
+        this.m_oContext.moveTo(x+r,y);
+        this.m_oContext.arc(x,y,r,0,Math.PI*2,false);
+        //this.m_oContext.closePath();
+    },
+
+    AddRoundRect : function(x, y, w, h, r)
+    {
+        if (w < (2 * r) || h < (2 * r))
+            return this.AddRect(x, y, w, h);
+
+        this.CheckPoint1(x,y);
+        this.CheckPoint2(x + w,y + h);
+
+        var _ctx = this.m_oContext;
+//        _ctx.moveTo(x + r, y);
+//        _ctx.lineTo(x + w - r, y);
+//        _ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+//        _ctx.lineTo(x + w, y + h - r);
+//        _ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+//        _ctx.lineTo(x + r, y + h);
+//        _ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+//        _ctx.lineTo(x, y + r);
+//        _ctx.quadraticCurveTo(x, y, x + r, y);
+    },
+
+    AddRoundRectCtx : function(ctx, x, y, w, h, r)
+    {
+        if (w < (2 * r) || h < (2 * r))
+            return ctx.rect(x, y, w, h);
+
+        var _ctx = this.m_oContext;
+//        _ctx.moveTo(x + r, y);
+//        _ctx.lineTo(x + w - r, y);
+//        _ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+//        _ctx.lineTo(x + w, y + h - r);
+//        _ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+//        _ctx.lineTo(x + r, y + h);
+//        _ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+//        _ctx.lineTo(x, y + r);
+//        _ctx.quadraticCurveTo(x, y, x + r, y);
+    }
+};
+
 function CAutoshapeTrack()
 {
     this.IsTrack            = true;
@@ -450,4 +969,7 @@ CAutoshapeTrack.prototype =
 
 //--------------------------------------------------------export----------------------------------------------------
 window['AscCommon'] = window['AscCommon'] || {};
+window['AscCommon'].COverlay = COverlay;
+window['AscCommon'].TRACK_CIRCLE_RADIUS = TRACK_CIRCLE_RADIUS;
+window['AscCommon'].TRACK_DISTANCE_ROTATE = TRACK_DISTANCE_ROTATE;
 window['AscCommon'].CAutoshapeTrack = CAutoshapeTrack;
