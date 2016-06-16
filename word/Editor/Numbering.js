@@ -1842,9 +1842,9 @@ CAbstractNum.prototype =
 		var lvlNew = abstractNum.Lvl;
 		for(var lvl = 0; lvl < lvlUsuallyAdd.length; lvl++)
 		{
-			var LvlTextEqual;
-			var ParaPrEqual;
-			var TextPrEqual;
+			var LvlTextEqual = null;
+			var ParaPrEqual = null;
+			var TextPrEqual = null;
 			if(lvlUsuallyAdd[lvl].Format == lvlNew[lvl].Format && lvlUsuallyAdd[lvl].Jc == lvlNew[lvl].Jc && lvlUsuallyAdd[lvl].PStyle == lvlNew[lvl].PStyle && lvlUsuallyAdd[lvl].Restart == lvlNew[lvl].Restart && lvlUsuallyAdd[lvl].Start == lvlNew[lvl].Start && lvlUsuallyAdd[lvl].Suff == lvlNew[lvl].Suff)
 			{
 				LvlTextEqual = this._isEqualLvlText(lvlUsuallyAdd[lvl].LvlText, lvlNew[lvl].LvlText);
