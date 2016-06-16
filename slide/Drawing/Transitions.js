@@ -3329,6 +3329,6 @@ function CDemonstrationManager(htmlpage)
         }
 
         if (this.SlideNum < this.SlidesCount)
-            this.StartSlide(false, false);
+            this.StartSlide(true, false);
     }
 }
