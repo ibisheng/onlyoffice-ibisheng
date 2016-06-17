@@ -237,6 +237,30 @@ CDrawingsController.prototype.IncreaseOrDecreaseParagraphIndent = function(bIncr
 		this.DrawingObjects.paragraphIncDecIndent(bIncrease);
 	}
 };
+CDrawingsController.prototype.SetImageProps = function(Props)
+{
+	this.DrawingObjects.setProps(Props);
+};
+CDrawingsController.prototype.SetTableProps = function(Props)
+{
+	this.DrawingObjects.setTableProps(Props);
+};
+CDrawingsController.prototype.GetCurrentParaPr = function()
+{
+	return this.DrawingObjects.getParagraphParaPr();
+};
+CDrawingsController.prototype.GetCurrentTextPr = function()
+{
+	return this.DrawingObjects.getParagraphTextPr();
+};
+CDrawingsController.prototype.GetDirectParaPr = function()
+{
+	return this.DrawingObjects.getParagraphParaPrCopy();
+};
+CDrawingsController.prototype.GetDirectTextPr = function()
+{
+	return this.DrawingObjects.getParagraphTextPrCopy();
+};
 
 CDrawingsController.prototype.AddToParagraph = function(oItem, bRecalculate)
 {

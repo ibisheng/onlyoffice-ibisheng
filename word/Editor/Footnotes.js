@@ -715,6 +715,86 @@ CFootnotesController.prototype.IncreaseOrDecreaseParagraphIndent = function(bInc
 			this.CurFootnote.Paragraph_IncDecIndent(bIncrease);
 	}
 };
+CFootnotesController.prototype.SetImageProps = function(Props)
+{
+	// TODO: Доделать селект и курсор
+	if (true === this.Selection.Use)
+	{
+	}
+	else
+	{
+		if (null !== this.CurFootnote)
+			this.CurFootnote.Set_ImageProps(Props);
+	}
+};
+CFootnotesController.prototype.SetTableProps = function(Props)
+{
+	// TODO: Доделать селект и курсор
+	if (true === this.Selection.Use)
+	{
+	}
+	else
+	{
+		if (null !== this.CurFootnote)
+			this.CurFootnote.Set_TableProps(Props);
+	}
+};
+CFootnotesController.prototype.GetCurrentParaPr = function()
+{
+	// TODO: Доделать селект и курсор
+	if (true === this.Selection.Use)
+	{
+	}
+	else
+	{
+		if (null !== this.CurFootnote)
+			return this.CurFootnote.Get_Paragraph_ParaPr();
+	}
+
+	return null;
+};
+CFootnotesController.prototype.GetCurrentTextPr = function()
+{
+	// TODO: Доделать селект и курсор
+	if (true === this.Selection.Use)
+	{
+	}
+	else
+	{
+		if (null !== this.CurFootnote)
+			return this.CurFootnote.Get_Paragraph_ParaPr();
+	}
+
+	return null;
+};
+CFootnotesController.prototype.GetDirectParaPr = function()
+{
+	// TODO: Доделать селект и курсор
+	if (true === this.Selection.Use)
+	{
+	}
+	else
+	{
+		if (null !== this.CurFootnote)
+			return this.CurFootnote.Get_Paragraph_ParaPr_Copy();
+	}
+
+	return null;
+};
+CFootnotesController.prototype.GetDirectTextPr = function()
+{
+	// TODO: Доделать селект и курсор
+	if (true === this.Selection.Use)
+	{
+	}
+	else
+	{
+		if (null !== this.CurFootnote)
+			return this.CurFootnote.Get_Paragraph_TextPr_Copy();
+	}
+
+	return null;
+};
 
 CFootnotesController.prototype.AddToParagraph = function(oItem, bRecalculate)
 {
@@ -728,6 +808,7 @@ CFootnotesController.prototype.AddToParagraph = function(oItem, bRecalculate)
 			this.CurFootnote.Paragraph_Add(oItem, bRecalculate);
 	}
 };
+
 
 function CFootEndnotePage()
 {

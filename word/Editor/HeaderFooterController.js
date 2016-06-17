@@ -193,6 +193,30 @@ CHdrFtrController.prototype.IncreaseOrDecreaseParagraphIndent = function(bIncrea
 {
 	this.HdrFtr.Paragraph_IncDecIndent(bIncrease);
 };
+CHdrFtrController.prototype.SetImageProps = function(Props)
+{
+	this.HdrFtr.Set_ImageProps(Props);
+};
+CHdrFtrController.prototype.SetTableProps = function(Props)
+{
+	this.HdrFtr.Set_TableProps(Props);
+};
+CHdrFtrController.prototype.GetCurrentParaPr = function()
+{
+	return this.HdrFtr.Get_Paragraph_ParaPr();
+};
+CHdrFtrController.prototype.GetCurrentTextPr = function()
+{
+	return this.HdrFtr.Get_Paragraph_TextPr();
+};
+CHdrFtrController.prototype.GetDirectParaPr = function()
+{
+	return this.HdrFtr.Get_Paragraph_ParaPr_Copy();
+};
+CHdrFtrController.prototype.GetDirectTextPr = function()
+{
+	return this.HdrFtr.Get_Paragraph_TextPr_Copy();
+};
 
 
 CHdrFtrController.prototype.AddToParagraph = function(oItem, bRecalculate)

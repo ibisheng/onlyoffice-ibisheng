@@ -4302,570 +4302,265 @@ CDocument.prototype.Paragraph_SetHighlight = function(IsColor, r, g, b)
 			this.HighlightColor = new CDocumentColor(r, g, b);
 	}
 };
-CDocument.prototype.Set_ImageProps                 = function(Props)
+CDocument.prototype.Set_ImageProps = function(Props)
 {
-    // Работаем с колонтитулом
-    if (docpostype_HdrFtr === this.CurPos.Type)
-    {
-        this.HdrFtr.Set_ImageProps(Props);
-    }
-    else if (docpostype_DrawingObjects === this.CurPos.Type)
-    {
-        this.DrawingObjects.setProps(Props);
-    }
-    else if (docpostype_Content == this.CurPos.Type && ( ( true === this.Selection.Use && this.Selection.StartPos == this.Selection.EndPos && type_Table == this.Content[this.Selection.StartPos].GetType() ) || ( false == this.Selection.Use && type_Table == this.Content[this.CurPos.ContentPos].GetType() ) ))
-    {
-        this.Interface_Update_TablePr();
-        if (true == this.Selection.Use)
-            this.Content[this.Selection.StartPos].Set_ImageProps(Props);
-        else
-            this.Content[this.CurPos.ContentPos].Set_ImageProps(Props);
-    }
-
-    this.Recalculate();
-    this.Document_UpdateInterfaceState();
+	this.Controller.SetImageProps(Props);
+	this.Recalculate();
+	this.Document_UpdateInterfaceState();
 };
-CDocument.prototype.ShapeApply                     = function(shapeProps)
+CDocument.prototype.ShapeApply = function(shapeProps)
 {
-    this.DrawingObjects.shapeApply(shapeProps);
+	this.DrawingObjects.shapeApply(shapeProps);
 };
-CDocument.prototype.Select_Drawings                = function(DrawingArray, TargetContent)
+CDocument.prototype.Select_Drawings = function(DrawingArray, TargetContent)
 {
-    this.private_UpdateTargetForCollaboration();
+	this.private_UpdateTargetForCollaboration();
 
-    if (DrawingArray.length === 1 && DrawingArray[0].Is_Inline())
-        return;
-    this.DrawingObjects.resetSelection();
-    var hdr_ftr = TargetContent.Is_HdrFtr(true);
-    if (hdr_ftr)
-    {
-        hdr_ftr.Content.Set_DocPosType(docpostype_DrawingObjects);
-        hdr_ftr.Set_CurrentElement(false);
-    }
-    else
-    {
-        this.Set_DocPosType(docpostype_DrawingObjects);
-    }
-    for (var i = 0; i < DrawingArray.length; ++i)
-    {
-        this.DrawingObjects.selectObject(DrawingArray[i].GraphicObj, 0);
-    }
+	if (DrawingArray.length === 1 && DrawingArray[0].Is_Inline())
+		return;
+	this.DrawingObjects.resetSelection();
+	var hdr_ftr = TargetContent.Is_HdrFtr(true);
+	if (hdr_ftr)
+	{
+		hdr_ftr.Content.Set_DocPosType(docpostype_DrawingObjects);
+		hdr_ftr.Set_CurrentElement(false);
+	}
+	else
+	{
+		this.Set_DocPosType(docpostype_DrawingObjects);
+	}
+	for (var i = 0; i < DrawingArray.length; ++i)
+	{
+		this.DrawingObjects.selectObject(DrawingArray[i].GraphicObj, 0);
+	}
 };
-CDocument.prototype.Set_TableProps                 = function(Props)
+CDocument.prototype.Set_TableProps = function(Props)
 {
-    // Работаем с колонтитулом
-    if (docpostype_HdrFtr === this.CurPos.Type)
-    {
-        this.HdrFtr.Set_TableProps(Props);
-    }
-    else if (docpostype_DrawingObjects === this.CurPos.Type)
-    {
-        this.DrawingObjects.setTableProps(Props);
-    }
-    else //if ( docpostype_Content === this.CurPos.Type )
-    {
-        var Pos = -1;
-        if (true === this.Selection.Use && this.Selection.StartPos == this.Selection.EndPos && type_Table == this.Content[this.Selection.StartPos].GetType())
-            Pos = this.Selection.StartPos;
-        else if (false === this.Selection.Use && type_Table === this.Content[this.CurPos.ContentPos].GetType())
-            Pos = this.CurPos.ContentPos;
-
-        if (-1 != Pos)
-        {
-            var Table = this.Content[Pos];
-            Table.Set_Props(Props);
-        }
-    }
-
-    this.Recalculate();
-
-    this.Document_UpdateInterfaceState();
-    this.Document_UpdateRulersState();
-    this.Document_UpdateSelectionState();
+	this.Controller.SetTableProps(Props);
+	this.Recalculate();
+	this.Document_UpdateInterfaceState();
+	this.Document_UpdateRulersState();
+	this.Document_UpdateSelectionState();
 };
-CDocument.prototype.Get_Paragraph_ParaPr           = function()
+CDocument.prototype.Get_Paragraph_ParaPr = function()
 {
-    // Работаем с колонтитулом
-    if (docpostype_HdrFtr === this.CurPos.Type)
-        return this.HdrFtr.Get_Paragraph_ParaPr();
-    else if (docpostype_DrawingObjects === this.CurPos.Type)
-        return this.DrawingObjects.getParagraphParaPr();
-    else //if ( docpostype_Content === this.CurPos.Type )
-    {
-        var Result_ParaPr = new CParaPr();
-        if (true === this.Selection.Use && selectionflag_Common === this.Selection.Flag)
-        {
-            var StartPos = this.Selection.StartPos;
-            var EndPos   = this.Selection.EndPos;
-            if (EndPos < StartPos)
-            {
-                var Temp = StartPos;
-                StartPos = EndPos;
-                EndPos   = Temp;
-            }
-
-            var StartPr, Pr;
-            if (type_Paragraph == this.Content[StartPos].GetType())
-            {
-                StartPr   = this.Content[StartPos].Get_CompiledPr2(false).ParaPr;
-                Pr        = StartPr.Copy();
-                Pr.Locked = this.Content[StartPos].Lock.Is_Locked();
-            }
-            else if (type_Table == this.Content[StartPos].GetType())
-            {
-                StartPr   = this.Content[StartPos].Get_Paragraph_ParaPr();
-                Pr        = StartPr.Copy();
-                Pr.Locked = StartPr.Locked;
-            }
-
-            for (var Index = StartPos + 1; Index <= EndPos; Index++)
-            {
-                var Item = this.Content[Index];
-
-                var TempPr;
-                if (type_Paragraph == Item.GetType())
-                {
-                    TempPr        = Item.Get_CompiledPr2(false).ParaPr;
-                    TempPr.Locked = Item.Lock.Is_Locked();
-                }
-                else if (type_Table == Item.GetType())
-                {
-                    TempPr = Item.Get_Paragraph_ParaPr();
-                }
-
-                Pr = Pr.Compare(TempPr);
-            }
-
-            if (undefined === Pr.Ind.Left)
-                Pr.Ind.Left = StartPr.Ind.Left;
-
-            if (undefined === Pr.Ind.Right)
-                Pr.Ind.Right = StartPr.Ind.Right;
-
-            if (undefined === Pr.Ind.FirstLine)
-                Pr.Ind.FirstLine = StartPr.Ind.FirstLine;
-
-            Result_ParaPr             = Pr;
-            Result_ParaPr.CanAddTable = ( true === Pr.Locked ? false : true );
-
-            // Если мы находимся в рамке, тогда дополняем ее свойства настройками границы и настройкой текста (если это буквица)
-            if (undefined != Result_ParaPr.FramePr && type_Paragraph === this.Content[StartPos].GetType())
-                this.Content[StartPos].Supplement_FramePr(Result_ParaPr.FramePr);
-            else if (StartPos === EndPos && StartPos > 0 && type_Paragraph === this.Content[StartPos - 1].GetType())
-            {
-                var PrevFrame = this.Content[StartPos - 1].Get_FramePr();
-                if (undefined != PrevFrame && undefined != PrevFrame.DropCap)
-                {
-                    Result_ParaPr.FramePr = PrevFrame.Copy();
-                    this.Content[StartPos - 1].Supplement_FramePr(Result_ParaPr.FramePr);
-                }
-            }
-
-        }
-        else
-        {
-            var Item = this.Content[this.CurPos.ContentPos];
-            if (type_Paragraph == Item.GetType())
-            {
-                var ParaPr = Item.Get_CompiledPr2(false).ParaPr;
-                var Locked = Item.Lock.Is_Locked();
-
-                Result_ParaPr             = ParaPr.Copy();
-                Result_ParaPr.Locked      = Locked;
-                Result_ParaPr.CanAddTable = ( ( true === Locked ) ? ( ( true === Item.Cursor_IsEnd() ) ? true : false ) : true );
-
-                // Если мы находимся в рамке, тогда дополняем ее свойства настройками границы и настройкой текста (если это буквица)
-                if (undefined != Result_ParaPr.FramePr)
-                    Item.Supplement_FramePr(Result_ParaPr.FramePr);
-                else if (this.CurPos.ContentPos > 0 && type_Paragraph === this.Content[this.CurPos.ContentPos - 1].GetType())
-                {
-                    var PrevFrame = this.Content[this.CurPos.ContentPos - 1].Get_FramePr();
-                    if (undefined != PrevFrame && undefined != PrevFrame.DropCap)
-                    {
-                        Result_ParaPr.FramePr = PrevFrame.Copy();
-                        this.Content[this.CurPos.ContentPos - 1].Supplement_FramePr(Result_ParaPr.FramePr);
-                    }
-                }
-
-            }
-            else if (type_Table == Item.GetType())
-            {
-                Result_ParaPr = Item.Get_Paragraph_ParaPr();
-            }
-        }
-        if (Result_ParaPr.Shd && Result_ParaPr.Shd.Unifill)
-        {
-            Result_ParaPr.Shd.Unifill.check(this.theme, this.Get_ColorMap());
-        }
-        return Result_ParaPr;
-    }
+	return this.Controller.GetCurrentParaPr();
 };
-CDocument.prototype.Get_Paragraph_TextPr           = function()
+CDocument.prototype.Get_Paragraph_TextPr = function()
 {
-    // Работаем с колонтитулом
-    if (docpostype_HdrFtr === this.CurPos.Type)
-        return this.HdrFtr.Get_Paragraph_TextPr();
-    else if (docpostype_DrawingObjects === this.CurPos.Type)
-        return this.DrawingObjects.getParagraphTextPr();
-    else //if ( docpostype_Content === this.CurPos.Type )
-    {
-        var Result_TextPr = null;
-        if (true === this.Selection.Use)
-        {
-            var VisTextPr;
-            switch (this.Selection.Flag)
-            {
-                case selectionflag_Common:
-                {
-                    var StartPos = this.Selection.StartPos;
-                    var EndPos   = this.Selection.EndPos;
-                    if (EndPos < StartPos)
-                    {
-                        var Temp = StartPos;
-                        StartPos = EndPos;
-                        EndPos   = Temp;
-                    }
-
-                    VisTextPr = this.Content[StartPos].Get_Paragraph_TextPr();
-
-                    for (var Index = StartPos + 1; Index <= EndPos; Index++)
-                    {
-                        var CurPr = this.Content[Index].Get_Paragraph_TextPr();
-                        VisTextPr = VisTextPr.Compare(CurPr);
-                    }
-
-                    break;
-                }
-                case selectionflag_Numbering:
-                {
-                    // Текстовые настройки применяем к конкретной нумерации
-                    if (null == this.Selection.Data || this.Selection.Data.length <= 0)
-                        break;
-
-                    var CurPara = this.Content[this.Selection.Data[0]];
-                    for (var Index = 0; Index < this.Selection.Data.length; Index++)
-                    {
-                        if (this.CurPos.ContentPos === this.Selection.Data[Index])
-                            CurPara = this.Content[this.Selection.Data[Index]];
-                    }
-
-                    VisTextPr = CurPara.Internal_Get_NumberingTextPr();
-
-                    break;
-                }
-            }
-
-            Result_TextPr = VisTextPr;
-        }
-        else
-        {
-            Result_TextPr = this.Content[this.CurPos.ContentPos].Get_Paragraph_TextPr();
-        }
-
-        return Result_TextPr;
-    }
+	return this.Controller.GetCurrentTextPr();
 };
-CDocument.prototype.Get_Paragraph_TextPr_Copy      = function()
+CDocument.prototype.Get_Paragraph_TextPr_Copy = function()
 {
-    // Работаем с колонтитулом
-    if (docpostype_HdrFtr === this.CurPos.Type)
-        return this.HdrFtr.Get_Paragraph_TextPr_Copy();
-    else if (docpostype_DrawingObjects === this.CurPos.Type)
-        return this.DrawingObjects.getParagraphTextPrCopy();
-    else //if ( docpostype_Content === this.CurPos.Type )
-    {
-        var Result_TextPr = null;
-
-        if (true === this.Selection.Use)
-        {
-            var VisTextPr;
-            switch (this.Selection.Flag)
-            {
-                case selectionflag_Common:
-                {
-                    var StartPos = this.Selection.StartPos;
-                    if (this.Selection.EndPos < StartPos)
-                        StartPos = this.Selection.EndPos;
-
-                    var Item  = this.Content[StartPos];
-                    VisTextPr = Item.Get_Paragraph_TextPr_Copy();
-
-                    break;
-                }
-                case selectionflag_Numbering:
-                {
-                    // Текстовые настройки применяем к конкретной нумерации
-                    if (null == this.Selection.Data || this.Selection.Data.length <= 0)
-                        break;
-
-                    var NumPr = this.Content[this.Selection.Data[0]].Numbering_Get();
-                    VisTextPr = this.Numbering.Get_AbstractNum(NumPr.NumId).Lvl[NumPr.Lvl].TextPr;
-
-                    break;
-                }
-            }
-
-            Result_TextPr = VisTextPr;
-        }
-        else
-        {
-            var Item      = this.Content[this.CurPos.ContentPos];
-            Result_TextPr = Item.Get_Paragraph_TextPr_Copy();
-        }
-
-        return Result_TextPr;
-    }
+	return this.Controller.GetDirectTextPr();
 };
-CDocument.prototype.Get_Paragraph_ParaPr_Copy      = function()
+CDocument.prototype.Get_Paragraph_ParaPr_Copy = function()
 {
-    // Работаем с колонтитулом
-    if (docpostype_HdrFtr === this.CurPos.Type)
-        return this.HdrFtr.Get_Paragraph_ParaPr_Copy();
-    else if (docpostype_DrawingObjects === this.CurPos.Type)
-        return this.DrawingObjects.getParagraphParaPrCopy();
-    else //if ( docpostype_Content === this.CurPos.Type )
-    {
-        var Result_ParaPr = null;
-
-        if (true === this.Selection.Use)
-        {
-            switch (this.Selection.Flag)
-            {
-                case selectionflag_Common:
-                {
-                    var StartPos = this.Selection.StartPos;
-                    if (this.Selection.EndPos < StartPos)
-                        StartPos = this.Selection.EndPos;
-
-                    var Item      = this.Content[StartPos];
-                    Result_ParaPr = Item.Get_Paragraph_ParaPr_Copy();
-
-                    break;
-                }
-                case selectionflag_Numbering:
-                {
-                    // Текстовые настройки применяем к конкретной нумерации
-                    if (null == this.Selection.Data || this.Selection.Data.length <= 0)
-                        break;
-
-                    var NumPr     = this.Content[this.Selection.Data[0]].Numbering_Get();
-                    Result_ParaPr = this.Numbering.Get_AbstractNum(NumPr.NumId).Lvl[NumPr.Lvl].ParaPr;
-
-                    break;
-                }
-            }
-        }
-        else
-        {
-            var Item      = this.Content[this.CurPos.ContentPos];
-            Result_ParaPr = Item.Get_Paragraph_ParaPr_Copy();
-        }
-
-        return Result_ParaPr;
-    }
+	return this.Controller.GetDirectParaPr();
 };
-CDocument.prototype.Get_PageSizesByDrawingObjects  = function()
+CDocument.prototype.Get_PageSizesByDrawingObjects = function()
 {
-    return this.DrawingObjects.getPageSizesByDrawingObjects();
+	return this.DrawingObjects.getPageSizesByDrawingObjects();
 };
-CDocument.prototype.Set_DocumentMargin             = function(MarPr)
+CDocument.prototype.Set_DocumentMargin = function(MarPr)
 {
-    // TODO: Document.Set_DocumentOrientation Сделать в зависимости от выделения
+	// TODO: Document.Set_DocumentOrientation Сделать в зависимости от выделения
 
-    var CurPos = this.CurPos.ContentPos;
-    var SectPr = this.SectionsInfo.Get_SectPr(CurPos).SectPr;
+	var CurPos = this.CurPos.ContentPos;
+	var SectPr = this.SectionsInfo.Get_SectPr(CurPos).SectPr;
 
-    var L = MarPr.Left;
-    var T = MarPr.Top;
-    var R = ( undefined === MarPr.Right ? undefined : SectPr.Get_PageWidth() - MarPr.Right );
-    var B = ( undefined === MarPr.Bottom ? undefined : SectPr.Get_PageHeight() - MarPr.Bottom );
+	var L = MarPr.Left;
+	var T = MarPr.Top;
+	var R = ( undefined === MarPr.Right ? undefined : SectPr.Get_PageWidth() - MarPr.Right );
+	var B = ( undefined === MarPr.Bottom ? undefined : SectPr.Get_PageHeight() - MarPr.Bottom );
 
-    SectPr.Set_PageMargins(L, T, R, B);
-    this.DrawingObjects.CheckAutoFit();
+	SectPr.Set_PageMargins(L, T, R, B);
+	this.DrawingObjects.CheckAutoFit();
 
-    this.ContentLastChangePos = 0;
-    this.Recalculate();
-
-    this.Document_UpdateSelectionState();
-    this.Document_UpdateInterfaceState();
-    this.Document_UpdateRulersState();
+	this.Recalculate();
+	this.Document_UpdateSelectionState();
+	this.Document_UpdateInterfaceState();
+	this.Document_UpdateRulersState();
 };
-CDocument.prototype.Set_DocumentPageSize           = function(W, H, bNoRecalc)
+CDocument.prototype.Set_DocumentPageSize = function(W, H, bNoRecalc)
 {
-    // TODO: Document.Set_DocumentOrientation Сделать в зависимости от выделения
+	// TODO: Document.Set_DocumentOrientation Сделать в зависимости от выделения
 
-    var CurPos = this.CurPos.ContentPos;
-    var SectPr = this.SectionsInfo.Get_SectPr(CurPos).SectPr;
+	var CurPos = this.CurPos.ContentPos;
+	var SectPr = this.SectionsInfo.Get_SectPr(CurPos).SectPr;
 
-    SectPr.Set_PageSize(W, H);
+	SectPr.Set_PageSize(W, H);
 
-    this.DrawingObjects.CheckAutoFit();
-    if (true != bNoRecalc)
-    {
-        this.ContentLastChangePos = 0;
-        this.Recalculate();
-
-        this.Document_UpdateSelectionState();
-        this.Document_UpdateInterfaceState();
-        this.Document_UpdateRulersState();
-    }
+	this.DrawingObjects.CheckAutoFit();
+	if (true != bNoRecalc)
+	{
+		this.Recalculate();
+		this.Document_UpdateSelectionState();
+		this.Document_UpdateInterfaceState();
+		this.Document_UpdateRulersState();
+	}
 };
-CDocument.prototype.Get_DocumentPageSize           = function()
+CDocument.prototype.Get_DocumentPageSize = function()
 {
-    // TODO: Document.Get_DocumentOrientation Сделать в зависимости от выделения
+	// TODO: Document.Get_DocumentOrientation Сделать в зависимости от выделения
 
-    var CurPos             = this.CurPos.ContentPos;
-    var SectionInfoElement = this.SectionsInfo.Get_SectPr(CurPos);
+	var CurPos             = this.CurPos.ContentPos;
+	var SectionInfoElement = this.SectionsInfo.Get_SectPr(CurPos);
 
-    if (undefined === SectionInfoElement)
-        return true;
+	if (undefined === SectionInfoElement)
+		return true;
 
-    var SectPr = SectionInfoElement.SectPr;
+	var SectPr = SectionInfoElement.SectPr;
 
-    return {W : SectPr.Get_PageWidth(), H : SectPr.Get_PageHeight()};
+	return {W : SectPr.Get_PageWidth(), H : SectPr.Get_PageHeight()};
 };
-CDocument.prototype.Set_DocumentOrientation        = function(Orientation, bNoRecalc)
+CDocument.prototype.Set_DocumentOrientation = function(Orientation, bNoRecalc)
 {
-    // TODO: Document.Set_DocumentOrientation Сделать в зависимости от выделения
+	// TODO: Document.Set_DocumentOrientation Сделать в зависимости от выделения
 
-    var CurPos = this.CurPos.ContentPos;
-    var SectPr = this.SectionsInfo.Get_SectPr(CurPos).SectPr;
+	var CurPos = this.CurPos.ContentPos;
+	var SectPr = this.SectionsInfo.Get_SectPr(CurPos).SectPr;
 
-    SectPr.Set_Orientation(Orientation, true);
+	SectPr.Set_Orientation(Orientation, true);
 
-    this.DrawingObjects.CheckAutoFit();
-    if (true != bNoRecalc)
-    {
-        this.Recalculate();
-
-        this.Document_UpdateSelectionState();
-        this.Document_UpdateInterfaceState();
-        this.Document_UpdateRulersState();
-    }
+	this.DrawingObjects.CheckAutoFit();
+	if (true != bNoRecalc)
+	{
+		this.Recalculate();
+		this.Document_UpdateSelectionState();
+		this.Document_UpdateInterfaceState();
+		this.Document_UpdateRulersState();
+	}
 };
-CDocument.prototype.Get_DocumentOrientation        = function()
+CDocument.prototype.Get_DocumentOrientation = function()
 {
-    // TODO: Document.Get_DocumentOrientation Сделать в зависимости от выделения
+	// TODO: Document.Get_DocumentOrientation Сделать в зависимости от выделения
 
-    var CurPos             = this.CurPos.ContentPos;
-    var SectionInfoElement = this.SectionsInfo.Get_SectPr(CurPos);
+	var CurPos             = this.CurPos.ContentPos;
+	var SectionInfoElement = this.SectionsInfo.Get_SectPr(CurPos);
 
-    if (undefined === SectionInfoElement)
-        return true;
+	if (undefined === SectionInfoElement)
+		return true;
 
-    var SectPr = SectionInfoElement.SectPr;
+	var SectPr = SectionInfoElement.SectPr;
 
-    return ( SectPr.Get_Orientation() === Asc.c_oAscPageOrientation.PagePortrait ? true : false );
+	return ( SectPr.Get_Orientation() === Asc.c_oAscPageOrientation.PagePortrait ? true : false );
 };
-CDocument.prototype.Set_DocumentDefaultTab         = function(DTab)
+CDocument.prototype.Set_DocumentDefaultTab = function(DTab)
 {
-    this.History.Add(this, {Type : AscDFH.historyitem_Document_DefaultTab, Old : Default_Tab_Stop, New : DTab});
-    Default_Tab_Stop = DTab;
+	this.History.Add(this, {Type : AscDFH.historyitem_Document_DefaultTab, Old : Default_Tab_Stop, New : DTab});
+	Default_Tab_Stop = DTab;
 };
-CDocument.prototype.Set_DocumentEvenAndOddHeaders  = function(Value)
+CDocument.prototype.Set_DocumentEvenAndOddHeaders = function(Value)
 {
-    if (Value !== EvenAndOddHeaders)
-    {
-        this.History.Add(this, {
-            Type : AscDFH.historyitem_Document_EvenAndOddHeaders,
-            Old  : EvenAndOddHeaders,
-            New  : Value
-        });
-        EvenAndOddHeaders = Value;
-    }
+	if (Value !== EvenAndOddHeaders)
+	{
+		this.History.Add(this, {
+			Type : AscDFH.historyitem_Document_EvenAndOddHeaders,
+			Old  : EvenAndOddHeaders,
+			New  : Value
+		});
+		EvenAndOddHeaders = Value;
+	}
 };
 /**
  * Обновляем данные в интерфейсе о свойствах параграфа.
  */
 CDocument.prototype.Interface_Update_ParaPr = function()
 {
-    var ParaPr = this.Get_Paragraph_ParaPr();
+	if (!this.Api)
+		return;
 
-    if (null != ParaPr)
-    {
-        // Проверим, можно ли добавить буквицу
-        ParaPr.CanAddDropCap = false;
+	var ParaPr = this.Get_Paragraph_ParaPr();
 
-        if (docpostype_Content === this.CurPos.Type)
-        {
-            var Para = null;
-            if (false === this.Selection.Use && type_Paragraph === this.Content[this.CurPos.ContentPos].GetType())
-                Para = this.Content[this.CurPos.ContentPos];
-            else if (true === this.Selection.Use && this.Selection.StartPos <= this.Selection.EndPos && type_Paragraph === this.Content[this.Selection.StartPos].GetType())
-                Para = this.Content[this.Selection.StartPos];
-            else if (true === this.Selection.Use && this.Selection.StartPos > this.Selection.EndPos && type_Paragraph === this.Content[this.Selection.EndPos].GetType())
-                Para = this.Content[this.Selection.EndPos];
+	if (null != ParaPr)
+	{
+		// Проверим, можно ли добавить буквицу
+		ParaPr.CanAddDropCap = false;
 
-            if (null != Para && undefined === Para.Get_FramePr())
-            {
-                var Prev = Para.Get_DocumentPrev();
-                if ((null === Prev || type_Paragraph != Prev.GetType() || undefined === Prev.Get_FramePr() || undefined === Prev.Get_FramePr().DropCap) && true === Para.Can_AddDropCap())
-                    ParaPr.CanAddDropCap = true;
-            }
-        }
+		if (docpostype_Content === this.Get_DocPosType())
+		{
+			var Para = null;
+			if (false === this.Selection.Use && type_Paragraph === this.Content[this.CurPos.ContentPos].GetType())
+				Para = this.Content[this.CurPos.ContentPos];
+			else if (true === this.Selection.Use && this.Selection.StartPos <= this.Selection.EndPos && type_Paragraph === this.Content[this.Selection.StartPos].GetType())
+				Para = this.Content[this.Selection.StartPos];
+			else if (true === this.Selection.Use && this.Selection.StartPos > this.Selection.EndPos && type_Paragraph === this.Content[this.Selection.EndPos].GetType())
+				Para = this.Content[this.Selection.EndPos];
 
-        var oSelectedInfo = this.Get_SelectedElementsInfo();
-        var Math          = oSelectedInfo.Get_Math();
-        if (null !== Math)
-            ParaPr.CanAddImage = false;
-        else
-            ParaPr.CanAddImage = true;
+			if (null != Para && undefined === Para.Get_FramePr())
+			{
+				var Prev = Para.Get_DocumentPrev();
+				if ((null === Prev || type_Paragraph != Prev.GetType() || undefined === Prev.Get_FramePr() || undefined === Prev.Get_FramePr().DropCap) && true === Para.Can_AddDropCap())
+					ParaPr.CanAddDropCap = true;
+			}
+		}
 
-        if (undefined != ParaPr.Tabs)
-            editor.Update_ParaTab(Default_Tab_Stop, ParaPr.Tabs);
+		var oSelectedInfo = this.Get_SelectedElementsInfo();
+		var Math          = oSelectedInfo.Get_Math();
+		if (null !== Math)
+			ParaPr.CanAddImage = false;
+		else
+			ParaPr.CanAddImage = true;
 
-        if (ParaPr.Shd && ParaPr.Shd.Unifill)
-        {
-            ParaPr.Shd.Unifill.check(this.theme, this.Get_ColorMap());
-        }
+		if (undefined != ParaPr.Tabs)
+			this.Api.Update_ParaTab(Default_Tab_Stop, ParaPr.Tabs);
 
-        var SelectedInfo = this.Get_SelectedElementsInfo();
-        var Math         = SelectedInfo.Get_Math();
-        if (null !== Math && true !== Math.Is_Inline())
-            ParaPr.Jc = Math.Get_Align();
+		if (ParaPr.Shd && ParaPr.Shd.Unifill)
+		{
+			ParaPr.Shd.Unifill.check(this.theme, this.Get_ColorMap());
+		}
 
-        editor.UpdateParagraphProp(ParaPr);
-    }
+		var SelectedInfo = this.Get_SelectedElementsInfo();
+		var Math         = SelectedInfo.Get_Math();
+		if (null !== Math && true !== Math.Is_Inline())
+			ParaPr.Jc = Math.Get_Align();
+
+		this.Api.UpdateParagraphProp(ParaPr);
+	}
 };
 /**
  * Обновляем данные в интерфейсе о свойствах текста.
  */
 CDocument.prototype.Interface_Update_TextPr = function()
 {
-    var TextPr = this.Get_Paragraph_TextPr();
+	if (!this.Api)
+		return;
 
-    if (null != TextPr)
-    {
-        var theme = this.Get_Theme();
-        if (theme && theme.themeElements && theme.themeElements.fontScheme)
-        {
-            if (TextPr.FontFamily)
-            {
-                TextPr.FontFamily.Name = theme.themeElements.fontScheme.checkFont(TextPr.FontFamily.Name);
-            }
-            if (TextPr.RFonts)
-            {
-                if (TextPr.RFonts.Ascii)
-                    TextPr.RFonts.Ascii.Name = theme.themeElements.fontScheme.checkFont(TextPr.RFonts.Ascii.Name);
-                if (TextPr.RFonts.EastAsia)
-                    TextPr.RFonts.EastAsia.Name = theme.themeElements.fontScheme.checkFont(TextPr.RFonts.EastAsia.Name);
-                if (TextPr.RFonts.HAnsi)
-                    TextPr.RFonts.HAnsi.Name = theme.themeElements.fontScheme.checkFont(TextPr.RFonts.HAnsi.Name);
-                if (TextPr.RFonts.CS)
-                    TextPr.RFonts.CS.Name = theme.themeElements.fontScheme.checkFont(TextPr.RFonts.CS.Name);
-            }
-        }
-        if (TextPr.Unifill)
-        {
-            var RGBAColor = TextPr.Unifill.getRGBAColor();
-            TextPr.Color  = new CDocumentColor(RGBAColor.R, RGBAColor.G, RGBAColor.B, false);
-        }
-        if (TextPr.Shd && TextPr.Shd.Unifill)
-        {
-            TextPr.Shd.Unifill.check(this.theme, this.Get_ColorMap());
-        }
-        editor.UpdateTextPr(TextPr);
-    }
+	var TextPr = this.Get_Paragraph_TextPr();
+
+	if (null != TextPr)
+	{
+		var theme = this.Get_Theme();
+		if (theme && theme.themeElements && theme.themeElements.fontScheme)
+		{
+			if (TextPr.FontFamily)
+			{
+				TextPr.FontFamily.Name = theme.themeElements.fontScheme.checkFont(TextPr.FontFamily.Name);
+			}
+			if (TextPr.RFonts)
+			{
+				if (TextPr.RFonts.Ascii)
+					TextPr.RFonts.Ascii.Name = theme.themeElements.fontScheme.checkFont(TextPr.RFonts.Ascii.Name);
+				if (TextPr.RFonts.EastAsia)
+					TextPr.RFonts.EastAsia.Name = theme.themeElements.fontScheme.checkFont(TextPr.RFonts.EastAsia.Name);
+				if (TextPr.RFonts.HAnsi)
+					TextPr.RFonts.HAnsi.Name = theme.themeElements.fontScheme.checkFont(TextPr.RFonts.HAnsi.Name);
+				if (TextPr.RFonts.CS)
+					TextPr.RFonts.CS.Name = theme.themeElements.fontScheme.checkFont(TextPr.RFonts.CS.Name);
+			}
+		}
+		if (TextPr.Unifill)
+		{
+			var RGBAColor = TextPr.Unifill.getRGBAColor();
+			TextPr.Color  = new CDocumentColor(RGBAColor.R, RGBAColor.G, RGBAColor.B, false);
+		}
+		if (TextPr.Shd && TextPr.Shd.Unifill)
+		{
+			TextPr.Shd.Unifill.check(this.theme, this.Get_ColorMap());
+		}
+		this.Api.UpdateTextPr(TextPr);
+	}
 };
 /**
  * Обновляем данные в интерфейсе о свойствах графики (картинки, автофигуры).
@@ -15983,7 +15678,280 @@ CDocument.prototype.controller_IncreaseOrDecreaseParagraphIndent = function(bInc
 		this.Content[this.CurPos.ContentPos].IncDec_Indent(bIncrease);
 	}
 };
+CDocument.prototype.controller_SetImageProps = function(Props)
+{
+	if ((true === this.Selection.Use && this.Selection.StartPos == this.Selection.EndPos && type_Table == this.Content[this.Selection.StartPos].GetType())
+		|| (false == this.Selection.Use && type_Table == this.Content[this.CurPos.ContentPos].GetType()))
+	{
+		if (true == this.Selection.Use)
+			this.Content[this.Selection.StartPos].Set_ImageProps(Props);
+		else
+			this.Content[this.CurPos.ContentPos].Set_ImageProps(Props);
+	}
+};
+CDocument.prototype.controller_SetTableProps = function(Props)
+{
+	var Pos = -1;
+	if (true === this.Selection.Use && this.Selection.StartPos == this.Selection.EndPos && type_Table == this.Content[this.Selection.StartPos].GetType())
+		Pos = this.Selection.StartPos;
+	else if (false === this.Selection.Use && type_Table === this.Content[this.CurPos.ContentPos].GetType())
+		Pos = this.CurPos.ContentPos;
 
+	if (-1 != Pos)
+	{
+		var Table = this.Content[Pos];
+		Table.Set_Props(Props);
+	}
+};
+CDocument.prototype.controller_GetCurrentParaPr = function()
+{
+	var Result_ParaPr = new CParaPr();
+	if (true === this.Selection.Use && selectionflag_Common === this.Selection.Flag)
+	{
+		var StartPos = this.Selection.StartPos;
+		var EndPos   = this.Selection.EndPos;
+		if (EndPos < StartPos)
+		{
+			var Temp = StartPos;
+			StartPos = EndPos;
+			EndPos   = Temp;
+		}
+
+		var StartPr, Pr;
+		if (type_Paragraph == this.Content[StartPos].GetType())
+		{
+			StartPr   = this.Content[StartPos].Get_CompiledPr2(false).ParaPr;
+			Pr        = StartPr.Copy();
+			Pr.Locked = this.Content[StartPos].Lock.Is_Locked();
+		}
+		else if (type_Table == this.Content[StartPos].GetType())
+		{
+			StartPr   = this.Content[StartPos].Get_Paragraph_ParaPr();
+			Pr        = StartPr.Copy();
+			Pr.Locked = StartPr.Locked;
+		}
+
+		for (var Index = StartPos + 1; Index <= EndPos; Index++)
+		{
+			var Item = this.Content[Index];
+
+			var TempPr;
+			if (type_Paragraph == Item.GetType())
+			{
+				TempPr        = Item.Get_CompiledPr2(false).ParaPr;
+				TempPr.Locked = Item.Lock.Is_Locked();
+			}
+			else if (type_Table == Item.GetType())
+			{
+				TempPr = Item.Get_Paragraph_ParaPr();
+			}
+
+			Pr = Pr.Compare(TempPr);
+		}
+
+		if (undefined === Pr.Ind.Left)
+			Pr.Ind.Left = StartPr.Ind.Left;
+
+		if (undefined === Pr.Ind.Right)
+			Pr.Ind.Right = StartPr.Ind.Right;
+
+		if (undefined === Pr.Ind.FirstLine)
+			Pr.Ind.FirstLine = StartPr.Ind.FirstLine;
+
+		Result_ParaPr             = Pr;
+		Result_ParaPr.CanAddTable = ( true === Pr.Locked ? false : true );
+
+		// Если мы находимся в рамке, тогда дополняем ее свойства настройками границы и настройкой текста (если это буквица)
+		if (undefined != Result_ParaPr.FramePr && type_Paragraph === this.Content[StartPos].GetType())
+			this.Content[StartPos].Supplement_FramePr(Result_ParaPr.FramePr);
+		else if (StartPos === EndPos && StartPos > 0 && type_Paragraph === this.Content[StartPos - 1].GetType())
+		{
+			var PrevFrame = this.Content[StartPos - 1].Get_FramePr();
+			if (undefined != PrevFrame && undefined != PrevFrame.DropCap)
+			{
+				Result_ParaPr.FramePr = PrevFrame.Copy();
+				this.Content[StartPos - 1].Supplement_FramePr(Result_ParaPr.FramePr);
+			}
+		}
+
+	}
+	else
+	{
+		var Item = this.Content[this.CurPos.ContentPos];
+		if (type_Paragraph == Item.GetType())
+		{
+			var ParaPr = Item.Get_CompiledPr2(false).ParaPr;
+			var Locked = Item.Lock.Is_Locked();
+
+			Result_ParaPr             = ParaPr.Copy();
+			Result_ParaPr.Locked      = Locked;
+			Result_ParaPr.CanAddTable = ( ( true === Locked ) ? ( ( true === Item.Cursor_IsEnd() ) ? true : false ) : true );
+
+			// Если мы находимся в рамке, тогда дополняем ее свойства настройками границы и настройкой текста (если это буквица)
+			if (undefined != Result_ParaPr.FramePr)
+				Item.Supplement_FramePr(Result_ParaPr.FramePr);
+			else if (this.CurPos.ContentPos > 0 && type_Paragraph === this.Content[this.CurPos.ContentPos - 1].GetType())
+			{
+				var PrevFrame = this.Content[this.CurPos.ContentPos - 1].Get_FramePr();
+				if (undefined != PrevFrame && undefined != PrevFrame.DropCap)
+				{
+					Result_ParaPr.FramePr = PrevFrame.Copy();
+					this.Content[this.CurPos.ContentPos - 1].Supplement_FramePr(Result_ParaPr.FramePr);
+				}
+			}
+
+		}
+		else if (type_Table == Item.GetType())
+		{
+			Result_ParaPr = Item.Get_Paragraph_ParaPr();
+		}
+	}
+	if (Result_ParaPr.Shd && Result_ParaPr.Shd.Unifill)
+	{
+		Result_ParaPr.Shd.Unifill.check(this.theme, this.Get_ColorMap());
+	}
+	return Result_ParaPr;
+};
+CDocument.prototype.controller_GetCurrentTextPr = function()
+{
+	var Result_TextPr = null;
+	if (true === this.Selection.Use)
+	{
+		var VisTextPr;
+		switch (this.Selection.Flag)
+		{
+			case selectionflag_Common:
+			{
+				var StartPos = this.Selection.StartPos;
+				var EndPos   = this.Selection.EndPos;
+				if (EndPos < StartPos)
+				{
+					var Temp = StartPos;
+					StartPos = EndPos;
+					EndPos   = Temp;
+				}
+
+				VisTextPr = this.Content[StartPos].Get_Paragraph_TextPr();
+
+				for (var Index = StartPos + 1; Index <= EndPos; Index++)
+				{
+					var CurPr = this.Content[Index].Get_Paragraph_TextPr();
+					VisTextPr = VisTextPr.Compare(CurPr);
+				}
+
+				break;
+			}
+			case selectionflag_Numbering:
+			{
+				// Текстовые настройки применяем к конкретной нумерации
+				if (null == this.Selection.Data || this.Selection.Data.length <= 0)
+					break;
+
+				var CurPara = this.Content[this.Selection.Data[0]];
+				for (var Index = 0; Index < this.Selection.Data.length; Index++)
+				{
+					if (this.CurPos.ContentPos === this.Selection.Data[Index])
+						CurPara = this.Content[this.Selection.Data[Index]];
+				}
+
+				VisTextPr = CurPara.Internal_Get_NumberingTextPr();
+
+				break;
+			}
+		}
+
+		Result_TextPr = VisTextPr;
+	}
+	else
+	{
+		Result_TextPr = this.Content[this.CurPos.ContentPos].Get_Paragraph_TextPr();
+	}
+
+	return Result_TextPr;
+};
+CDocument.prototype.controller_GetDirectParaPr = function()
+{
+	var Result_ParaPr = null;
+
+	if (true === this.Selection.Use)
+	{
+		switch (this.Selection.Flag)
+		{
+			case selectionflag_Common:
+			{
+				var StartPos = this.Selection.StartPos;
+				if (this.Selection.EndPos < StartPos)
+					StartPos = this.Selection.EndPos;
+
+				var Item      = this.Content[StartPos];
+				Result_ParaPr = Item.Get_Paragraph_ParaPr_Copy();
+
+				break;
+			}
+			case selectionflag_Numbering:
+			{
+				// Текстовые настройки применяем к конкретной нумерации
+				if (null == this.Selection.Data || this.Selection.Data.length <= 0)
+					break;
+
+				var NumPr     = this.Content[this.Selection.Data[0]].Numbering_Get();
+				Result_ParaPr = this.Numbering.Get_AbstractNum(NumPr.NumId).Lvl[NumPr.Lvl].ParaPr;
+
+				break;
+			}
+		}
+	}
+	else
+	{
+		var Item      = this.Content[this.CurPos.ContentPos];
+		Result_ParaPr = Item.Get_Paragraph_ParaPr_Copy();
+	}
+
+	return Result_ParaPr;
+};
+CDocument.prototype.controller_GetDirectTextPr = function()
+{
+	var Result_TextPr = null;
+
+	if (true === this.Selection.Use)
+	{
+		var VisTextPr;
+		switch (this.Selection.Flag)
+		{
+			case selectionflag_Common:
+			{
+				var StartPos = this.Selection.StartPos;
+				if (this.Selection.EndPos < StartPos)
+					StartPos = this.Selection.EndPos;
+
+				var Item  = this.Content[StartPos];
+				VisTextPr = Item.Get_Paragraph_TextPr_Copy();
+
+				break;
+			}
+			case selectionflag_Numbering:
+			{
+				// Текстовые настройки применяем к конкретной нумерации
+				if (null == this.Selection.Data || this.Selection.Data.length <= 0)
+					break;
+
+				var NumPr = this.Content[this.Selection.Data[0]].Numbering_Get();
+				VisTextPr = this.Numbering.Get_AbstractNum(NumPr.NumId).Lvl[NumPr.Lvl].TextPr;
+
+				break;
+			}
+		}
+
+		Result_TextPr = VisTextPr;
+	}
+	else
+	{
+		var Item      = this.Content[this.CurPos.ContentPos];
+		Result_TextPr = Item.Get_Paragraph_TextPr_Copy();
+	}
+
+	return Result_TextPr;
+};
 
 CDocument.prototype.controller_AddToParagraph = function(ParaItem, bRecalculate)
 {

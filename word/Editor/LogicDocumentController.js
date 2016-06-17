@@ -169,6 +169,30 @@ CLogicDocumentController.prototype.IncreaseOrDecreaseParagraphIndent = function(
 {
 	this.LogicDocument.controller_IncreaseOrDecreaseParagraphIndent(bIncrease);
 };
+CLogicDocumentController.prototype.SetImageProps = function(Props)
+{
+	this.LogicDocument.controller_SetImageProps(Props);
+};
+CLogicDocumentController.prototype.SetTableProps = function(Props)
+{
+	this.LogicDocument.controller_SetTableProps(Props);
+};
+CLogicDocumentController.prototype.GetCurrentParaPr = function()
+{
+	return this.LogicDocument.controller_GetCurrentParaPr();
+};
+CLogicDocumentController.prototype.GetCurrentTextPr = function()
+{
+	return this.LogicDocument.controller_GetCurrentTextPr();
+};
+CLogicDocumentController.prototype.GetDirectParaPr = function()
+{
+	return this.LogicDocument.controller_GetDirectParaPr();
+};
+CLogicDocumentController.prototype.GetDirectTextPr = function()
+{
+	return this.LogicDocument.controller_GetDirectTextPr();
+};
 
 
 CLogicDocumentController.prototype.AddToParagraph = function(oItem)

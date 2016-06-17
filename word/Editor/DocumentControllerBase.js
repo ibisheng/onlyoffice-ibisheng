@@ -441,7 +441,36 @@ CDocumentControllerBase.prototype.IncreaseOrDecreaseParagraphFontSize = function
  * @param {boolean} bIncrease
  */
 CDocumentControllerBase.prototype.IncreaseOrDecreaseParagraphIndent = function(bIncrease){};
-
+/**
+ * Устанавливаем настройки для изображений.
+ * @param Props
+ */
+CDocumentControllerBase.prototype.SetImageProps = function(Props){};
+/**
+ * Устанавливаем настройки для таблиц.
+ * @param Props
+ */
+CDocumentControllerBase.prototype.SetTableProps = function(Props){};
+/**
+ * Получаем текущие настройки параграфа.
+ * @returns {CParaPr}
+ */
+CDocumentControllerBase.prototype.GetCurrentParaPr = function(){var oParaPr = new CParaPr(); oParaPr.Init_Default(); return oParaPr};
+/**
+ * Получаем текущие настройки текста.
+ * @returns {CTextPr}
+ */
+CDocumentControllerBase.prototype.GetCurrentTextPr = function(){var oTextPr = new CTextPr(); oTextPr.Init_Default(); return oTextPr};
+/**
+ * Получаем прямые настройки параграфа.
+ * @returns {CParaPr}
+ */
+CDocumentControllerBase.prototype.GetDirectParaPr = function(){var oParaPr = new CParaPr(); oParaPr.Init_Default(); return oParaPr};
+/**
+ * Получаем прямые настройки текста.
+ * @returns {CTextPr}
+ */
+CDocumentControllerBase.prototype.GetDirectTextPr = function(){var oTextPr = new CTextPr(); oTextPr.Init_Default(); return oTextPr};
 /**
  * Добавляем элемент в параграф.
  * @param oItem
