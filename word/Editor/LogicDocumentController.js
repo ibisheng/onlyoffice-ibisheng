@@ -193,6 +193,24 @@ CLogicDocumentController.prototype.GetDirectTextPr = function()
 {
 	return this.LogicDocument.controller_GetDirectTextPr();
 };
+CLogicDocumentController.prototype.RemoveSelection = function(bNoCheckDrawing)
+{
+	this.LogicDocument.controller_RemoveSelection(bNoCheckDrawing);
+};
+CLogicDocumentController.prototype.IsEmptySelection = function(bCheckHidden)
+{
+	return this.LogicDocument.controller_IsEmptySelection(bCheckHidden);
+};
+CLogicDocumentController.prototype.DrawSelectionOnPage = function(PageAbs)
+{
+	this.LogicDocument.controller_DrawSelectionOnPage(PageAbs);
+};
+CLogicDocumentController.prototype.GetSelectionBounds = function()
+{
+	return this.LogicDocument.controller_GetSelectionBounds();
+};
+
+
 
 
 CLogicDocumentController.prototype.AddToParagraph = function(oItem)

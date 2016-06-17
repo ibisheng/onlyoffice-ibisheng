@@ -2760,7 +2760,6 @@ CDocumentContent.prototype.Remove                             = function(Count, 
             else
             {
                 // Убираем селект
-                this.Selection_Clear();
                 this.Selection.Use = false;
 
                 if (StartPos != EndPos)
@@ -7236,55 +7235,6 @@ CDocumentContent.prototype.Selection_Draw_Page = function(PageIndex)
         }
     }
 };
-CDocumentContent.prototype.Selection_Clear     = function()
-{
-    if (docpostype_DrawingObjects === this.CurPos.Type)
-    {
-        return this.LogicDocument.DrawingObjects.resetSelection();
-    }
-    else //if ( docpostype_Content === this.CurPos.Type )
-    {
-        if (true === this.Selection.Use)
-        {
-
-            switch (this.Selection.Flag)
-            {
-                case selectionflag_Common:
-                {
-
-                    var Start = this.Selection.StartPos;
-                    var End   = this.Selection.EndPos;
-
-                    if (Start > End)
-                    {
-                        var Temp = Start;
-                        Start    = End;
-                        End      = Temp;
-                    }
-
-                    for (var Index = Start; Index <= End; Index++)
-                    {
-                        this.Content[Index].Selection_Clear();
-                    }
-
-                    break;
-                }
-                case selectionflag_Numbering:
-                {
-                    if (null == this.Selection.Data)
-                        break;
-
-                    for (var Index = 0; Index < this.Selection.Data.length; Index++)
-                    {
-                        this.Content[this.Selection.Data[Index]].Selection_Clear();
-                    }
-
-                    break;
-                }
-            }
-        }
-    }
-};
 CDocumentContent.prototype.Selection_SetStart = function(X, Y, CurPage, MouseEvent)
 {
     if (CurPage < 0 || CurPage >= this.Pages.length)
@@ -7463,8 +7413,6 @@ CDocumentContent.prototype.Selection_SetEnd          = function(X, Y, CurPage, M
         return;
 
     var ContentPos = this.Internal_GetContentPosByXY(X, Y);
-
-    this.Selection_Clear();
 
     var OldPos      = this.CurPos.ContentPos;
     var OldInnerPos = null;

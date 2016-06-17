@@ -892,11 +892,6 @@ CHeaderFooter.prototype =
         return this.Content.Selection_Draw_Page(0, true, true);
     },
 
-    Selection_Clear : function()
-    {
-        return this.Content.Selection_Clear();
-    },
-
     Selection_SetStart : function(X,Y, PageIndex, MouseEvent)
     {
         this.Set_Page( PageIndex );
@@ -2029,12 +2024,6 @@ CHeaderFooterController.prototype =
     {
         if ( null != this.CurHdrFtr )
             return this.CurHdrFtr.Selection_Draw_Page(Page_abs);
-    },
-
-    Selection_Clear : function()
-    {
-        if ( null != this.CurHdrFtr )
-            return this.CurHdrFtr.Selection_Clear();
     },
 
     Selection_SetStart : function(X,Y, PageIndex, MouseEvent, bActivate)

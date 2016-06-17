@@ -217,7 +217,22 @@ CHdrFtrController.prototype.GetDirectTextPr = function()
 {
 	return this.HdrFtr.Get_Paragraph_TextPr_Copy();
 };
-
+CHdrFtrController.prototype.RemoveSelection = function(bNoCheckDrawing)
+{
+	this.HdrFtr.Selection_Remove(bNoCheckDrawing);
+};
+CHdrFtrController.prototype.IsEmptySelection = function(bCheckHidden)
+{
+	return this.HdrFtr.Selection_IsEmpty(bCheckHidden);
+};
+CHdrFtrController.prototype.DrawSelectionOnPage = function(PageAbs)
+{
+	this.HdrFtr.Selection_Draw_Page(PageAbs);
+};
+CHdrFtrController.prototype.GetSelectionBounds = function()
+{
+	return this.HdrFtr.Get_SelectionBounds();
+};
 
 CHdrFtrController.prototype.AddToParagraph = function(oItem, bRecalculate)
 {

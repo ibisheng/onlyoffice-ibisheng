@@ -261,6 +261,28 @@ CDrawingsController.prototype.GetDirectTextPr = function()
 {
 	return this.DrawingObjects.getParagraphTextPrCopy();
 };
+CDrawingsController.prototype.RemoveSelection = function(bNoCheckDrawing)
+{
+	var ParaDrawing = this.DrawingObjects.getMajorParaDrawing();
+	if (ParaDrawing)
+	{
+		ParaDrawing.GoTo_Text(undefined, false);
+	}
+	return this.DrawingObjects.resetSelection(undefined, bNoCheckDrawing);
+};
+CDrawingsController.prototype.IsEmptySelection = function(bCheckHidden)
+{
+	return false;
+};
+CDrawingsController.prototype.DrawSelectionOnPage = function(PageAbs)
+{
+	this.DrawingDocument.SetTextSelectionOutline(true);
+	this.DrawingObjects.drawSelectionPage(PageAbs);
+};
+CDrawingsController.prototype.GetSelectionBounds = function()
+{
+	return this.DrawingObjects.Get_SelectionBounds();
+};
 
 CDrawingsController.prototype.AddToParagraph = function(oItem, bRecalculate)
 {

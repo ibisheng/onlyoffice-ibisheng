@@ -472,6 +472,26 @@ CDocumentControllerBase.prototype.GetDirectParaPr = function(){var oParaPr = new
  */
 CDocumentControllerBase.prototype.GetDirectTextPr = function(){var oTextPr = new CTextPr(); oTextPr.Init_Default(); return oTextPr};
 /**
+ * Убираем селект.
+ * @param bNoCheckDrawing
+ */
+CDocumentControllerBase.prototype.RemoveSelection = function(bNoCheckDrawing){};
+/**
+ * Проверяем пустой ли селект.
+ * @returns {boolean}
+ */
+CDocumentControllerBase.prototype.IsEmptySelection = function(bCheckHidden){return true;};
+/**
+ * Рисуем селект на заданно странице.
+ * @param PageAbs
+ */
+CDocumentControllerBase.prototype.DrawSelectionOnPage = function(PageAbs){};
+/**
+ * Получаем границы селекта.
+ * @returns {*}
+ */
+CDocumentControllerBase.prototype.GetSelectionBounds = function(){return null;};
+/**
  * Добавляем элемент в параграф.
  * @param oItem
  * @param {boolean} bRecalculate - Пересчитывать ли после выполнения данной функции.

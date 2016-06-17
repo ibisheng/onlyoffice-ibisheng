@@ -6610,11 +6610,6 @@ CTable.prototype =
         this.Markup.Internal.PageNum   = 0;
     },
 
-    Selection_Clear : function()
-    {
-
-    },
-
     Selection_Check : function(X, Y, CurPage, NearPos)
     {
         if (undefined != NearPos)

@@ -6246,11 +6246,6 @@ Paragraph.prototype =
         this.Selection.Flag     = selectionflag_Common;
         this.Selection.StartPos = 0;
         this.Selection.EndPos   = 0;
-        this.Selection_Clear();
-    },
-
-    Selection_Clear : function()
-    {
     },
 
     Selection_Draw_Page : function(CurPage)

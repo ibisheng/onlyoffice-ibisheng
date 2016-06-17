@@ -795,6 +795,24 @@ CFootnotesController.prototype.GetDirectTextPr = function()
 
 	return null;
 };
+CFootnotesController.prototype.RemoveSelection = function(bNoCheckDrawing)
+{
+	// TODO: Доделать селект и курсор
+};
+CFootnotesController.prototype.IsEmptySelection = function(bCheckHidden)
+{
+	// TODO: Доделать селект и курсор
+	return true;
+};
+CFootnotesController.prototype.DrawSelectionOnPage = function(PageAbs)
+{
+	// TODO: Доделать селект и курсор
+};
+CFootnotesController.prototype.GetSelectionBounds = function()
+{
+	// TODO: Доделать селект и курсор
+	return null;
+};
 
 CFootnotesController.prototype.AddToParagraph = function(oItem, bRecalculate)
 {
@@ -808,6 +826,7 @@ CFootnotesController.prototype.AddToParagraph = function(oItem, bRecalculate)
 			this.CurFootnote.Paragraph_Add(oItem, bRecalculate);
 	}
 };
+
 
 
 function CFootEndnotePage()
