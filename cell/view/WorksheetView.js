@@ -7175,44 +7175,49 @@
 
     WorksheetView.prototype.getSelectionMathInfo = function () {
         var ar = this.activeRange;
-        var range = this.model.getRange3( ar.r1, ar.c1, ar.r2, ar.c2 );
+        var range = this.model.getRange3(ar.r1, ar.c1, ar.r2, ar.c2);
         var tmp;
         var oSelectionMathInfo = new asc_CSelectionMathInfo();
         var sum = 0;
-        range._setPropertyNoEmpty( null, null, function ( c ) {
-            if ( false === c.isEmptyTextString() ) {
+        var t = this;
+        range._setPropertyNoEmpty(null, null, function (cell, r) {
+            if (!cell.isEmptyTextString() && t.height_1px <= t.rows[r].height) {
                 ++oSelectionMathInfo.count;
-                if ( CellValueType.Number === c.getType() ) {
-                    tmp = parseFloat( c.getValueWithoutFormat() );
-                    if ( isNaN( tmp ) ) {
+                if (CellValueType.Number === cell.getType()) {
+                    tmp = parseFloat(cell.getValueWithoutFormat());
+                    if (isNaN(tmp)) {
                         return;
                     }
-                    if ( 0 === oSelectionMathInfo.countNumbers ) {
+                    if (0 === oSelectionMathInfo.countNumbers) {
                         oSelectionMathInfo.min = oSelectionMathInfo.max = tmp;
-                    }
-                    else {
-                        oSelectionMathInfo.min = Math.min( oSelectionMathInfo.min, tmp );
-                        oSelectionMathInfo.max = Math.max( oSelectionMathInfo.max, tmp );
+                    } else {
+                        oSelectionMathInfo.min = Math.min(oSelectionMathInfo.min, tmp);
+                        oSelectionMathInfo.max = Math.max(oSelectionMathInfo.max, tmp);
                     }
                     ++oSelectionMathInfo.countNumbers;
                     sum += tmp;
                 }
             }
-        } );
+        });
         // Показываем только данные для 2-х или более ячеек (http://bugzserver/show_bug.cgi?id=24115)
-        if ( 1 < oSelectionMathInfo.countNumbers ) {
+        if (1 < oSelectionMathInfo.countNumbers) {
             // Мы должны отдавать в формате активной ячейки
             var numFormat = range.getNumFormat();
-            if ( Asc.c_oAscNumFormatType.Time === numFormat.getType() ) {
+            if (Asc.c_oAscNumFormatType.Time === numFormat.getType()) {
                 // Для времени нужно отдавать в формате [h]:mm:ss (http://bugzserver/show_bug.cgi?id=26271)
-                numFormat = AscCommon.oNumFormatCache.get( '[h]:mm:ss' );
+                numFormat = AscCommon.oNumFormatCache.get('[h]:mm:ss');
             }
 
-            oSelectionMathInfo.sum = numFormat.formatToMathInfo( sum, CellValueType.Number, this.settings.mathMaxDigCount );
-            oSelectionMathInfo.average = numFormat.formatToMathInfo( sum / oSelectionMathInfo.countNumbers, CellValueType.Number, this.settings.mathMaxDigCount );
+            oSelectionMathInfo.sum =
+              numFormat.formatToMathInfo(sum, CellValueType.Number, this.settings.mathMaxDigCount);
+            oSelectionMathInfo.average =
+              numFormat.formatToMathInfo(sum / oSelectionMathInfo.countNumbers, CellValueType.Number,
+                this.settings.mathMaxDigCount);
 
-            oSelectionMathInfo.min = numFormat.formatToMathInfo( oSelectionMathInfo.min, CellValueType.Number, this.settings.mathMaxDigCount );
-            oSelectionMathInfo.max = numFormat.formatToMathInfo( oSelectionMathInfo.max, CellValueType.Number, this.settings.mathMaxDigCount );
+            oSelectionMathInfo.min =
+              numFormat.formatToMathInfo(oSelectionMathInfo.min, CellValueType.Number, this.settings.mathMaxDigCount);
+            oSelectionMathInfo.max =
+              numFormat.formatToMathInfo(oSelectionMathInfo.max, CellValueType.Number, this.settings.mathMaxDigCount);
         }
         return oSelectionMathInfo;
     };
