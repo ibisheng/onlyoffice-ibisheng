@@ -801,7 +801,7 @@ CShapeDrawer.prototype =
         if (mode == "none" || this.bIsNoFillAttack)
             return;
 			
-        if (this.Graphics.IsTrack)
+        if (this.Graphics.IsTrack && this.Graphics.m_oOverlay)
             this.Graphics.m_oOverlay.ClearAll = true;
 
 		if (this.Graphics.IsSlideBoundsCheckerType)
@@ -984,8 +984,8 @@ CShapeDrawer.prototype =
             this.Graphics.m_oContext.lineJoin = this.OldLineJoin;
         }
 
-        var arr = (this.Graphics.IsTrack === true) ? this.Graphics.Graphics.ArrayPoints : this.Graphics.ArrayPoints;
-        if (arr != null && arr.length > 1 && this.IsCurrentPathCanArrows === true)
+        var arr = (this.Graphics.IsTrack === true) ? (this.Graphics.Graphics ? this.Graphics.Graphics.ArrayPoints : null) : this.Graphics.ArrayPoints;
+        if (arr != undefined && arr != null && arr.length > 1 && this.IsCurrentPathCanArrows === true)
         {
             this.IsArrowsDrawing = true;
             // значит стрелки есть. теперь:
