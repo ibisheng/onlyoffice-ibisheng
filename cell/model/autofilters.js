@@ -2414,8 +2414,8 @@
 							
 							if(tablePart.AutoFilter)
 							{
-								tablePart.AutoFilter = null;
 								this._openHiddenRows(tablePart);
+								tablePart.AutoFilter = null;
 							}
 						}
 						else
