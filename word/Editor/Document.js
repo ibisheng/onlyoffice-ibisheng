@@ -4186,7 +4186,7 @@ CDocument.prototype.Set_ParagraphTabs = function(Tabs)
 	this.Recalculate();
 	this.Document_UpdateSelectionState();
 	this.Document_UpdateInterfaceState();
-	editor.Update_ParaTab(Default_Tab_Stop, Tabs);
+	this.Api.Update_ParaTab(Default_Tab_Stop, Tabs);
 };
 CDocument.prototype.Set_ParagraphIndent = function(Ind)
 {
@@ -4569,21 +4569,20 @@ CDocument.prototype.Interface_Update_TextPr = function()
  */
 CDocument.prototype.Interface_Update_DrawingPr = function(Flag)
 {
-    // if(!(this.DrawingObjects.curState.id === STATES_ID_TEXT_ADD || this.DrawingObjects.curState.id === STATES_ID_TEXT_ADD_IN_GROUP))
-    {
-        var DrawingPr = this.DrawingObjects.Get_Props();
+	var DrawingPr = this.DrawingObjects.Get_Props();
 
-        if (true === Flag)
-            return DrawingPr;
-        else
-        {
-
-            for (var i = 0; i < DrawingPr.length; ++i)
-                editor.sync_ImgPropCallback(DrawingPr[i]);
-        }
-    }
-    if (Flag)
-        return null;
+	if (true === Flag)
+		return DrawingPr;
+	else
+	{
+		if (this.Api)
+		{
+			for (var i = 0; i < DrawingPr.length; ++i)
+				this.Api.sync_ImgPropCallback(DrawingPr[i]);
+		}
+	}
+	if (Flag)
+		return null;
 };
 /**
  * Обновляем данные в интерфейсе о свойствах таблицы.
@@ -4592,30 +4591,32 @@ CDocument.prototype.Interface_Update_DrawingPr = function(Flag)
  */
 CDocument.prototype.Interface_Update_TablePr = function(Flag)
 {
-    var TablePr = null;
-    if (docpostype_Content == this.CurPos.Type && ( ( true === this.Selection.Use && this.Selection.StartPos == this.Selection.EndPos && type_Table == this.Content[this.Selection.StartPos].GetType() ) || ( false == this.Selection.Use && type_Table == this.Content[this.CurPos.ContentPos].GetType() ) ))
-    {
-        if (true == this.Selection.Use)
-            TablePr = this.Content[this.Selection.StartPos].Get_Props();
-        else
-            TablePr = this.Content[this.CurPos.ContentPos].Get_Props();
-    }
-    TablePr.CanBeFlow = true;
+	var TablePr = null;
+	if (docpostype_Content == this.Get_DocPosType()
+		&& ((true === this.Selection.Use && this.Selection.StartPos == this.Selection.EndPos && type_Table == this.Content[this.Selection.StartPos].GetType())
+		|| (false == this.Selection.Use && type_Table == this.Content[this.CurPos.ContentPos].GetType())))
+	{
+		if (true == this.Selection.Use)
+			TablePr = this.Content[this.Selection.StartPos].Get_Props();
+		else
+			TablePr = this.Content[this.CurPos.ContentPos].Get_Props();
+	}
+	TablePr.CanBeFlow = true;
 
-    if (true === Flag)
-        return TablePr;
-    else if (null != TablePr)
-        editor.sync_TblPropCallback(TablePr);
+	if (true === Flag)
+		return TablePr;
+	else if (null != TablePr)
+		this.Api.sync_TblPropCallback(TablePr);
 };
 /**
  * Обновляем данные в интерфейсе о свойствах колонотитулов.
  */
 CDocument.prototype.Interface_Update_HdrFtrPr = function()
 {
-    if (docpostype_HdrFtr === this.CurPos.Type)
-    {
-        editor.sync_HeadersAndFootersPropCallback(this.HdrFtr.Get_Props());
-    }
+	if (docpostype_HdrFtr === this.Get_DocPosType())
+	{
+		this.Api.sync_HeadersAndFootersPropCallback(this.HdrFtr.Get_Props());
+	}
 };
 CDocument.prototype.Internal_GetContentPosByXY = function(X, Y, PageNum, ColumnsInfo)
 {

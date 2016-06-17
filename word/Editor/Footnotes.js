@@ -762,7 +762,7 @@ CFootnotesController.prototype.GetCurrentTextPr = function()
 	else
 	{
 		if (null !== this.CurFootnote)
-			return this.CurFootnote.Get_Paragraph_ParaPr();
+			return this.CurFootnote.Get_Paragraph_TextPr();
 	}
 
 	return null;
