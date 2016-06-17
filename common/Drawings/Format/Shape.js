@@ -3862,9 +3862,14 @@ CShape.prototype.clipTextRect = function(graphics)
         var oBodyPr = this.getBodyPr();
         if(!this.bWordShape)
         {
-            if(oBodyPr.vertOverflow === AscFormat.nOTOwerflow)
+            if(oBodyPr.vertOverflow === AscFormat.nOTOwerflow && oBodyPr.horzOverflow === AscFormat.nOTOwerflow)
             {
                 return;
+            }
+            clip_rect = {x: this.clipRect.x, y: this.clipRect.y, w: this.clipRect.w, h: this.clipRect.h};
+            if(oBodyPr.vertOverflow === AscFormat.nOTOwerflow && AscFormat.isRealNumber(this.contentHeight))
+            {
+                clip_rect.h = this.contentHeight;
             }
         }
         if(!oBodyPr || !oBodyPr.upright)
