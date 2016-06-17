@@ -185,6 +185,15 @@ CHdrFtrController.prototype.SetParagraphFramePr = function(FramePr, bDelete)
 {
 	this.HdrFtr.Set_ParagraphFramePr(FramePr, bDelete);
 };
+CHdrFtrController.prototype.IncreaseOrDecreaseParagraphFontSize = function(bIncrease)
+{
+	this.HdrFtr.Paragraph_IncDecFontSize(bIncrease);
+};
+CHdrFtrController.prototype.IncreaseOrDecreaseParagraphIndent = function(bIncrease)
+{
+	this.HdrFtr.Paragraph_IncDecIndent(bIncrease);
+};
+
 
 CHdrFtrController.prototype.AddToParagraph = function(oItem, bRecalculate)
 {

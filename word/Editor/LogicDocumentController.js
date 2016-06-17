@@ -161,6 +161,14 @@ CLogicDocumentController.prototype.SetParagraphFramePr = function(FramePr, bDele
 {
 	this.LogicDocument.controller_SetParagraphFramePr(FramePr, bDelete);
 };
+CLogicDocumentController.prototype.IncreaseOrDecreaseParagraphFontSize = function(bIncrease)
+{
+	this.LogicDocument.controller_IncreaseOrDecreaseParagraphFontSize(bIncrease);
+};
+CLogicDocumentController.prototype.IncreaseOrDecreaseParagraphIndent = function(bIncrease)
+{
+	this.LogicDocument.controller_IncreaseOrDecreaseParagraphIndent(bIncrease);
+};
 
 
 CLogicDocumentController.prototype.AddToParagraph = function(oItem)

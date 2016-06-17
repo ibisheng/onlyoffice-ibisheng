@@ -691,6 +691,30 @@ CFootnotesController.prototype.SetParagraphFramePr = function(FramePr, bDelete)
 {
 	// TODO: Реализовать, скорее всего ничего тут не надо делать
 };
+CFootnotesController.prototype.IncreaseOrDecreaseParagraphFontSize = function(bIncrease)
+{
+	// TODO: Доделать селект и курсор
+	if (true === this.Selection.Use)
+	{
+	}
+	else
+	{
+		if (null !== this.CurFootnote)
+			this.CurFootnote.Paragraph_IncDecFontSize(bIncrease);
+	}
+};
+CFootnotesController.prototype.IncreaseOrDecreaseParagraphIndent = function(bIncrease)
+{
+	// TODO: Доделать селект и курсор
+	if (true === this.Selection.Use)
+	{
+	}
+	else
+	{
+		if (null !== this.CurFootnote)
+			this.CurFootnote.Paragraph_IncDecIndent(bIncrease);
+	}
+};
 
 CFootnotesController.prototype.AddToParagraph = function(oItem, bRecalculate)
 {

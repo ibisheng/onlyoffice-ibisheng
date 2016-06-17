@@ -11074,65 +11074,74 @@
         return oneUser ? onReplaceCallback( true ) : this._isLockedCells( aReplaceCells[options.indexInArray], /*subType*/null, onReplaceCallback );
     };
 
-    WorksheetView.prototype.findCell = function ( reference ) {
-        var range = AscCommonExcel.g_oRangeCache.getRange3D(reference) || AscCommonExcel.g_oRangeCache.getAscRange(reference);
-        if ( !range ) {
-            /*TODO: сделать поиск по названиям автофигур, должен искать до того как вызвать поиск по именованным диапазонам*/
+    WorksheetView.prototype.findCell = function (reference, isViewerMode) {
+        var range = AscCommonExcel.g_oRangeCache.getRange3D(reference) ||
+          AscCommonExcel.g_oRangeCache.getAscRange(reference);
+        if (!range) {
+            if (isViewerMode) {
+                return range;
+            }
 
-            var defName = this.model.workbook.getDefinesNames( reference, this.model.workbook.getActiveWs().getId() ), sheetName, ref;
-            if ( !defName ) {
-                if ( this.collaborativeEditing.getGlobalLock() || !this.handlers.trigger( "getLockDefNameManagerStatus" ) ) {
-                    this.handlers.trigger( "onErrorEvent", c_oAscError.ID.LockCreateDefName, c_oAscError.Level.NoCritical );
+            /*TODO: сделать поиск по названиям автофигур, должен искать до того как вызвать поиск по именованным диапазонам*/
+            var defName = this.model.workbook.getDefinesNames(reference,
+              this.model.workbook.getActiveWs().getId()), sheetName, ref;
+            if (!defName) {
+                if (this.collaborativeEditing.getGlobalLock() ||
+                  !this.handlers.trigger("getLockDefNameManagerStatus")) {
+                    this.handlers.trigger("onErrorEvent", c_oAscError.ID.LockCreateDefName,
+                      c_oAscError.Level.NoCritical);
                     this._updateSelectionNameAndInfo();
                     return true;
                 }
 
-                var actRange = this.getActiveRangeObj(), ascRange, mc = this.model.getMergedByCell( actRange.startRow, actRange.startCol ), c1 = mc ? mc.c1 : actRange.c1, r1 = mc ? mc.r1 : actRange.r1, ar_norm = actRange.normalize(), mc_norm = mc ? mc.normalize() : null, c2 = mc_norm ? ( mc_norm.isEqual( ar_norm ) ? mc_norm.c1 : ar_norm.c2 ) : ar_norm.c2, r2 = mc_norm ? ( mc_norm.isEqual( ar_norm ) ? mc_norm.r1 : ar_norm.r2 ) : ar_norm.r2;
+                var actRange = this.getActiveRangeObj(), ascRange, mc = this.model.getMergedByCell(actRange.startRow,
+                  actRange.startCol), c1 = mc ? mc.c1 : actRange.c1, r1 = mc ? mc.r1 :
+                  actRange.r1, ar_norm = actRange.normalize(), mc_norm = mc ? mc.normalize() : null, c2 = mc_norm ?
+                  ( mc_norm.isEqual(ar_norm) ? mc_norm.c1 : ar_norm.c2 ) : ar_norm.c2, r2 = mc_norm ?
+                  ( mc_norm.isEqual(ar_norm) ? mc_norm.r1 : ar_norm.r2 ) : ar_norm.r2;
 
-                ascRange = new asc_Range( c1, r1, c2, r2 );
-                defName = this.model.workbook.editDefinesNames( null, new Asc.asc_CDefName( reference, this.model.getName() + "!" + ascRange.getAbsName() ) );
+                ascRange = new asc_Range(c1, r1, c2, r2);
+                defName = this.model.workbook.editDefinesNames(null,
+                  new Asc.asc_CDefName(reference, this.model.getName() + "!" + ascRange.getAbsName()));
             }
 
-            if ( defName ) {
+            if (defName) {
                 range = true;
-                this._isLockedDefNames( null, defName.nodeId );
+                this._isLockedDefNames(null, defName.nodeId);
 
-                if ( defName.isTable ) {
-                    sheetName = defName.Ref.split( "!" );
+                if (defName.isTable) {
+                    sheetName = defName.Ref.split("!");
                     ref = sheetName[1];
                     sheetName = sheetName[0];
-                    if ( sheetName[0] == "'" && sheetName[sheetName.length - 1] == "'" ) {
-                        sheetName = sheetName.substring( 1, sheetName.length - 1 );
+                    if (sheetName[0] == "'" && sheetName[sheetName.length - 1] == "'") {
+                        sheetName = sheetName.substring(1, sheetName.length - 1);
                     }
-                    range = AscCommonExcel.g_oRangeCache.getAscRange( ref );
-                    sheetName = this.model.workbook.getWorksheetByName( sheetName );
-                }
-                else if ( defName.parsedRef.RefPos.length == 1 && defName.parsedRef.outStack.length == 1 ) {
+                    range = AscCommonExcel.g_oRangeCache.getAscRange(ref);
+                    sheetName = this.model.workbook.getWorksheetByName(sheetName);
+                } else if (defName.parsedRef.RefPos.length == 1 && defName.parsedRef.outStack.length == 1) {
                     ref = defName.parsedRef.outStack[0];
-                    if ( ref.type == AscCommonExcel.cElementType.cell3D ) {
-                        range = ref.range.getBBox0().clone( true );
+                    if (ref.type == AscCommonExcel.cElementType.cell3D) {
+                        range = ref.range.getBBox0().clone(true);
                         sheetName = ref.getWS();
-                    }
-                    else if ( ref.type == AscCommonExcel.cElementType.cellsRange3D && ref.wsFrom == ref.wsTo ) {
-                        range = ref.getRange()[0].getBBox0().clone( true );
-                        sheetName = this.model.workbook.getWorksheetById( ref.wsFrom );
+                    } else if (ref.type == AscCommonExcel.cElementType.cellsRange3D && ref.wsFrom == ref.wsTo) {
+                        range = ref.getRange()[0].getBBox0().clone(true);
+                        sheetName = this.model.workbook.getWorksheetById(ref.wsFrom);
                     }
 
                 }
 
-                if ( range && sheetName ) {
+                if (range && sheetName) {
                     ar_norm = range.normalize();
-                    mc = sheetName.getMergedByCell( ar_norm.r1, ar_norm.c1 );
+                    mc = sheetName.getMergedByCell(ar_norm.r1, ar_norm.c1);
                     range = {range: mc ? mc : range, sheet: sheetName.getName()};
                 }
             }
-        }
-        else {
-            var ar_norm = range.normalize(), mc = this.model.getMergedByCell( ar_norm.r1, ar_norm.c1 );
+        } else {
+            var ar_norm = range.normalize(), mc = this.model.getMergedByCell(ar_norm.r1, ar_norm.c1);
 
             range = {range: mc ? mc : range, sheet: this.model.getName()};
         }
-        return range;// ? this.setSelection(range, true) : null;
+        return range;
     };
 
     /* Ищет дополнение для ячейки */
@@ -13288,7 +13297,15 @@
 				History.EndTransaction();
 			};
 			
-			t._isLockedCells( tablePart.Ref, null, callback );
+			var lockRange = t.af_getRangeForChangeTableInfo(tablePart, optionType, val);
+			if(lockRange)
+			{
+				t._isLockedCells( lockRange, null, callback );
+			}
+			else
+			{
+				callback();
+			}
 		}
 	};
 	
@@ -13321,6 +13338,50 @@
 		return res;
 	};
     
+	WorksheetView.prototype.af_getRangeForChangeTableInfo = function(tablePart, optionType, val)
+    {
+		var res = null;
+		
+		switch(optionType)
+		{
+			case c_oAscChangeTableStyleInfo.columnBanded:
+			case c_oAscChangeTableStyleInfo.columnFirst:
+			case c_oAscChangeTableStyleInfo.columnLast:
+			case c_oAscChangeTableStyleInfo.rowBanded:
+			case c_oAscChangeTableStyleInfo.filterButton:
+			{
+				res = tablePart.Ref;
+				break;
+			}
+			case c_oAscChangeTableStyleInfo.rowTotal:
+			{	
+				if(val === false)
+				{
+					res = tablePart.Ref;
+				}
+				else
+				{
+					res = new Asc.Range(tablePart.Ref.c1, tablePart.Ref.r1, tablePart.Ref.c2, tablePart.Ref.r2 + 1);
+				}
+				break;
+			}
+			case c_oAscChangeTableStyleInfo.rowHeader:
+			{
+				if(val === false)
+				{
+					res = tablePart.Ref; 
+				}
+				else
+				{
+					res = new Asc.Range(tablePart.Ref.c1, tablePart.Ref.r1 - 1, tablePart.Ref.c2, tablePart.Ref.r2); 
+				}
+				break;
+			}
+		}
+		
+		return res;
+	};
+	
 	WorksheetView.prototype.af_insertCellsInTable = function(tableName, optionType)
     {
 		var t = this;
@@ -13769,7 +13830,22 @@
 			History.EndTransaction();
 		};
 		
-		t._isLockedCells( range, null, callback );
+		//TODO возможно не стоит лочить весь диапазон. проверить: когда один ползователь меняет диапазон, другой снимает а/ф с ф/т. в этом случае в deleteAutoFilter передавать не range а имя ф/т
+		var table = t.model.autoFilters._getFilterByDisplayName(tableName);
+		var tableRange = null !== table ? table.Ref : null;
+		
+		var lockRange = range;
+		if(null !== tableRange)
+		{
+			var r1 = tableRange.r1 < range.r1 ? tableRange.r1 : range.r1;
+			var r2 = tableRange.r2 > range.r2 ? tableRange.r2 : range.r2;
+			var c1 = tableRange.c1 < range.c1 ? tableRange.c1 : range.c1;
+			var c2 = tableRange.c2 > range.c2 ? tableRange.c2 : range.c2;
+			
+			lockRange = new Asc.Range(c1, r1, c2, r2);
+		}
+		
+		t._isLockedCells( lockRange, null, callback );
 	};
 
     WorksheetView.prototype.af_checkChangeRange = function(range) {

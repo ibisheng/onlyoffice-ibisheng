@@ -431,6 +431,16 @@ CDocumentControllerBase.prototype.SetParagraphBorders = function(Borders){};
  * @param bDelete
  */
 CDocumentControllerBase.prototype.SetParagraphFramePr = function(FramePr, bDelete){};
+/**
+ * Уменьшаем или увеличиваем (по специальной таблице) размер шрифта в параграфе.
+ * @param {boolean} bIncrease
+ */
+CDocumentControllerBase.prototype.IncreaseOrDecreaseParagraphFontSize = function(bIncrease){};
+/**
+ * Уменьшаем или увеличиваем (по специальной таблице) отступы в параграфе.
+ * @param {boolean} bIncrease
+ */
+CDocumentControllerBase.prototype.IncreaseOrDecreaseParagraphIndent = function(bIncrease){};
 
 /**
  * Добавляем элемент в параграф.

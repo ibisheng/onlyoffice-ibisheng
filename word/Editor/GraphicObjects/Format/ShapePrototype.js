@@ -497,12 +497,14 @@ CShape.prototype.applyParentTransform = function(transform)
 CShape.prototype.recalculateShapeStyleForParagraph = function()
 {
     var styles = editor.WordControl.m_oLogicDocument.Styles;
-    this.textStyleForParagraph = {TextPr: styles.Default.TextPr.Copy(), ParaPr: styles.Default.ParaPr.Copy()};
+
+
+    this.textStyleForParagraph = {TextPr: g_oDocumentDefaultTextPr.Copy(), ParaPr: g_oDocumentDefaultParaPr.Copy()};
+    this.textStyleForParagraph.ParaPr.Merge( styles.Default.ParaPr.Copy() );
+    this.textStyleForParagraph.TextPr.Merge( styles.Default.TextPr.Copy() );
     var DefId = styles.Default.Paragraph;
     var DefaultStyle = styles.Style[DefId];
 
-    this.textStyleForParagraph.ParaPr.Merge( g_oDocumentDefaultParaPr );
-    this.textStyleForParagraph.TextPr.Merge( g_oDocumentDefaultTextPr );
     if(DefaultStyle)
     {
         this.textStyleForParagraph.ParaPr.Merge( DefaultStyle.ParaPr );

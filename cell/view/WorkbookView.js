@@ -2247,14 +2247,13 @@
 
   // Поиск ячейки по ссылке
   WorkbookView.prototype.findCell = function(reference) {
-    var ws = this.getWorksheet(), retRange;
+    var ws = this.getWorksheet();
     // Останавливаем ввод данных в редакторе ввода
     if (ws.getCellEditMode()) {
       this._onStopCellEditing();
     }
 
-
-    return ws.findCell(reference);
+    return ws.findCell(reference, this.controller.settings.isViewerMode);
   };
 
   WorkbookView.prototype.getDefinedNames = function(defNameListId) {
@@ -2297,8 +2296,27 @@
       defNameId = defNameId ? defNameId.nodeId : null;
     }
 
-    ws._isLockedDefNames(editDefinedNamesCallback, defNameId);
+    var callback = function() {
+      ws._isLockedDefNames(editDefinedNamesCallback, defNameId);
+    };
 
+    var tableRange;
+    if(oldName && true === oldName.isTable)
+    {
+      var table = ws.model.autoFilters._getFilterByDisplayName(oldName.Name);
+      if(table)
+      {
+        tableRange = table.Ref;
+      }
+    }
+    if(tableRange)
+    {
+      ws._isLockedCells( tableRange, null, callback );
+    }
+    else
+    {
+      callback();
+    }
   };
 
   WorkbookView.prototype.delDefinedNames = function(oldName) {
