@@ -4266,183 +4266,41 @@ CDocument.prototype.Set_ParagraphFramePr = function(FramePr, bDelete)
 	this.Document_UpdateRulersState();
 	this.Document_UpdateInterfaceState();
 };
-CDocument.prototype.Paragraph_IncDecFontSize       = function(bIncrease)
+CDocument.prototype.Paragraph_IncDecFontSize = function(bIncrease)
 {
-    // Работаем с колонтитулом
-    if (docpostype_HdrFtr === this.CurPos.Type)
-    {
-        var bRetValue = this.HdrFtr.Paragraph_IncDecFontSize(bIncrease);
-        this.Document_UpdateSelectionState();
-        this.Document_UpdateInterfaceState();
-        return bRetValue;
-    }
-    else if (docpostype_DrawingObjects === this.CurPos.Type)
-    {
-        var bRetValue = this.DrawingObjects.paragraphIncDecFontSize(bIncrease);
-        this.Document_UpdateSelectionState();
-        this.Document_UpdateInterfaceState();
-        return bRetValue;
-    }
-    else //if ( docpostype_Content === this.CurPos.Type )
-    {
-        if (this.CurPos.ContentPos < 0)
-            return false;
-
-        if (true === this.Selection.Use)
-        {
-            switch (this.Selection.Flag)
-            {
-                case selectionflag_Common:
-                {
-                    var StartPos = this.Selection.StartPos;
-                    var EndPos   = this.Selection.EndPos;
-                    if (EndPos < StartPos)
-                    {
-                        var Temp = StartPos;
-                        StartPos = EndPos;
-                        EndPos   = Temp;
-                    }
-
-                    for (var Index = StartPos; Index <= EndPos; Index++)
-                    {
-                        // При изменении цвета фона параграфа, не надо ничего пересчитывать
-                        var Item = this.Content[Index];
-
-                        if (type_Paragraph == Item.GetType())
-                            Item.IncDec_FontSize(bIncrease);
-                        else if (type_Table == Item.GetType())
-                        {
-                            Item.TurnOff_RecalcEvent();
-                            Item.Paragraph_IncDecFontSize(bIncrease);
-                            Item.TurnOn_RecalcEvent();
-                        }
-                    }
-
-                    // Нам нужно пересчитать все изменения, начиная с первого элемента,
-                    // попавшего в селект.
-                    this.ContentLastChangePos = StartPos;
-
-                    this.Recalculate();
-                    this.Document_UpdateSelectionState();
-                    this.Document_UpdateInterfaceState();
-                    break;
-                }
-                case  selectionflag_Numbering:
-                {
-                    var OldFontSize = this.Get_Paragraph_TextPr().FontSize;
-                    var NewFontSize = FontSize_IncreaseDecreaseValue(bIncrease, OldFontSize);
-                    var TextPr      = new CTextPr();
-                    TextPr.FontSize = NewFontSize;
-                    this.Paragraph_Add(new ParaTextPr(TextPr), true);
-
-                    this.Recalculate();
-                    this.Document_UpdateSelectionState();
-                    this.Document_UpdateInterfaceState();
-                    break;
-                }
-            }
-
-            return;
-        }
-
-        var Item = this.Content[this.CurPos.ContentPos];
-        if (type_Paragraph == Item.GetType())
-        {
-            if (true === Item.IncDec_FontSize(bIncrease))
-            {
-                this.ContentLastChangePos = this.CurPos.ContentPos;
-                this.Recalculate();
-            }
-        }
-        else if (type_Table == Item.GetType())
-        {
-            Item.Paragraph_IncDecFontSize(bIncrease);
-        }
-
-        this.Document_UpdateSelectionState();
-        this.Document_UpdateInterfaceState();
-    }
+	this.Controller.IncreaseOrDecreaseParagraphFontSize(bIncrease);
+	this.Recalculate();
+	this.Document_UpdateSelectionState();
+	this.Document_UpdateInterfaceState();
 };
-CDocument.prototype.Paragraph_IncDecIndent         = function(bIncrease)
+CDocument.prototype.Paragraph_IncDecIndent = function(bIncrease)
 {
-    if (docpostype_HdrFtr === this.CurPos.Type)
-    {
-        this.HdrFtr.Paragraph_IncDecIndent(bIncrease);
-    }
-    else if (docpostype_DrawingObjects === this.CurPos.Type)
-    {
-        if (true != this.DrawingObjects.isSelectedText())
-        {
-            var ParaDrawing = this.DrawingObjects.getMajorParaDrawing();
-            if (null != ParaDrawing)
-            {
-                var Paragraph = ParaDrawing.Parent;
-                Paragraph.IncDec_Indent(bIncrease);
-            }
-        }
-        else
-        {
-            this.DrawingObjects.paragraphIncDecIndent(bIncrease);
-        }
-    }
-    else //if ( docpostype_Content === this.CurPos.Type )
-    {
-        if (true === this.Selection.Use)
-        {
-            switch (this.Selection.Flag)
-            {
-                case selectionflag_Common:
-                {
-                    var StartPos = this.Selection.StartPos;
-                    var EndPos   = this.Selection.EndPos;
-                    if (EndPos < StartPos)
-                    {
-                        var Temp = StartPos;
-                        StartPos = EndPos;
-                        EndPos   = Temp;
-                    }
-
-                    for (var Index = StartPos; Index <= EndPos; Index++)
-                    {
-                        this.Content[Index].IncDec_Indent(bIncrease);
-                    }
-                }
-                case  selectionflag_Numbering:
-                {
-                    break;
-                }
-            }
-        }
-        else
-        {
-            this.Content[this.CurPos.ContentPos].IncDec_Indent(bIncrease);
-        }
-    }
+	this.Controller.IncreaseOrDecreaseParagraphIndent(bIncrease);
 };
-CDocument.prototype.Paragraph_SetHighlight         = function(IsColor, r, g, b)
+CDocument.prototype.Paragraph_SetHighlight = function(IsColor, r, g, b)
 {
-    if (true === this.Is_TextSelectionUse())
-    {
-        if (false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content))
-        {
-            this.Create_NewHistoryPoint(AscDFH.historydescription_Document_SetTextHighlight);
+	if (true === this.Is_TextSelectionUse())
+	{
+		if (false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content))
+		{
+			this.Create_NewHistoryPoint(AscDFH.historydescription_Document_SetTextHighlight);
 
-            if (false === IsColor)
-                this.Paragraph_Add(new ParaTextPr({HighLight : highlight_None}));
-            else
-                this.Paragraph_Add(new ParaTextPr({HighLight : new CDocumentColor(r, g, b)}));
+			if (false === IsColor)
+				this.Paragraph_Add(new ParaTextPr({HighLight : highlight_None}));
+			else
+				this.Paragraph_Add(new ParaTextPr({HighLight : new CDocumentColor(r, g, b)}));
 
-            this.Document_UpdateInterfaceState();
-            editor.sync_MarkerFormatCallback(false);
-        }
-    }
-    else
-    {
-        if (false === IsColor)
-            this.HighlightColor = highlight_None;
-        else
-            this.HighlightColor = new CDocumentColor(r, g, b);
-    }
+			this.Document_UpdateInterfaceState();
+			editor.sync_MarkerFormatCallback(false);
+		}
+	}
+	else
+	{
+		if (false === IsColor)
+			this.HighlightColor = highlight_None;
+		else
+			this.HighlightColor = new CDocumentColor(r, g, b);
+	}
 };
 CDocument.prototype.Set_ImageProps                 = function(Props)
 {
@@ -16032,6 +15890,100 @@ CDocument.prototype.controller_SetParagraphFramePr = function(FramePr, bDelete)
 		}
 	}
 };
+CDocument.prototype.controller_IncreaseOrDecreaseParagraphFontSize = function(bIncrease)
+{
+	if (this.CurPos.ContentPos < 0)
+		return false;
+
+	if (true === this.Selection.Use)
+	{
+		switch (this.Selection.Flag)
+		{
+			case selectionflag_Common:
+			{
+				var StartPos = this.Selection.StartPos;
+				var EndPos   = this.Selection.EndPos;
+				if (EndPos < StartPos)
+				{
+					var Temp = StartPos;
+					StartPos = EndPos;
+					EndPos   = Temp;
+				}
+
+				for (var Index = StartPos; Index <= EndPos; Index++)
+				{
+					// При изменении цвета фона параграфа, не надо ничего пересчитывать
+					var Item = this.Content[Index];
+
+					if (type_Paragraph == Item.GetType())
+						Item.IncDec_FontSize(bIncrease);
+					else if (type_Table == Item.GetType())
+					{
+						Item.TurnOff_RecalcEvent();
+						Item.Paragraph_IncDecFontSize(bIncrease);
+						Item.TurnOn_RecalcEvent();
+					}
+				}
+				break;
+			}
+			case  selectionflag_Numbering:
+			{
+				var OldFontSize = this.Get_Paragraph_TextPr().FontSize;
+				var NewFontSize = FontSize_IncreaseDecreaseValue(bIncrease, OldFontSize);
+				var TextPr      = new CTextPr();
+				TextPr.FontSize = NewFontSize;
+				this.Paragraph_Add(new ParaTextPr(TextPr), true);
+				break;
+			}
+		}
+	}
+	else
+	{
+		var Item = this.Content[this.CurPos.ContentPos];
+		if (type_Paragraph == Item.GetType())
+		{
+			Item.IncDec_FontSize(bIncrease);
+		}
+		else if (type_Table == Item.GetType())
+		{
+			Item.Paragraph_IncDecFontSize(bIncrease);
+		}
+	}
+};
+CDocument.prototype.controller_IncreaseOrDecreaseParagraphIndent = function(bIncrease)
+{
+	if (true === this.Selection.Use)
+	{
+		switch (this.Selection.Flag)
+		{
+			case selectionflag_Common:
+			{
+				var StartPos = this.Selection.StartPos;
+				var EndPos   = this.Selection.EndPos;
+				if (EndPos < StartPos)
+				{
+					var Temp = StartPos;
+					StartPos = EndPos;
+					EndPos   = Temp;
+				}
+
+				for (var Index = StartPos; Index <= EndPos; Index++)
+				{
+					this.Content[Index].IncDec_Indent(bIncrease);
+				}
+			}
+			case  selectionflag_Numbering:
+			{
+				break;
+			}
+		}
+	}
+	else
+	{
+		this.Content[this.CurPos.ContentPos].IncDec_Indent(bIncrease);
+	}
+};
+
 
 CDocument.prototype.controller_AddToParagraph = function(ParaItem, bRecalculate)
 {
