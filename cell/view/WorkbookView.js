@@ -2247,14 +2247,13 @@
 
   // Поиск ячейки по ссылке
   WorkbookView.prototype.findCell = function(reference) {
-    var ws = this.getWorksheet(), retRange;
+    var ws = this.getWorksheet();
     // Останавливаем ввод данных в редакторе ввода
     if (ws.getCellEditMode()) {
       this._onStopCellEditing();
     }
 
-
-    return ws.findCell(reference);
+    return ws.findCell(reference, this.controller.settings.isViewerMode);
   };
 
   WorkbookView.prototype.getDefinedNames = function(defNameListId) {

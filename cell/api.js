@@ -1994,12 +1994,15 @@ var editor;
    * Делает активной указанную ячейку
    * @param {String} reference  Ссылка на ячейку вида A1 или R1C1
    */
-  spreadsheet_api.prototype.asc_findCell = function(reference) {
-    if(this.wb.cellEditor.isOpened) return;
+  spreadsheet_api.prototype.asc_findCell = function (reference) {
+    if (this.wb.cellEditor.isOpened) {
+      return;
+    }
     var d = this.wb.findCell(reference);
-
     if (!d) {
-      this.handlers.trigger("asc_onError", c_oAscError.ID.InvalidReferenceOrName, c_oAscError.Level.NoCritical);
+      if (!this.isViewMode) {
+        this.handlers.trigger("asc_onError", c_oAscError.ID.InvalidReferenceOrName, c_oAscError.Level.NoCritical);
+      }
       return;
     }
 
