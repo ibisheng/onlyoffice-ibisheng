@@ -4877,7 +4877,10 @@ Woorksheet.prototype._moveRange=function(oBBoxFrom, oBBoxTo, copyRange){
                     if(copyRange)
 					    oTempRow[j + offset.offsetCol] = cell.clone();
                     else
-					    oTempRow[j + offset.offsetCol] = cell;
+					{
+						cell.setTableStyle(null);
+						oTempRow[j + offset.offsetCol] = cell;
+					}
                 }
 			}
 		}
