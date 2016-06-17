@@ -13297,7 +13297,15 @@
 				History.EndTransaction();
 			};
 			
-			t._isLockedCells( tablePart.Ref, null, callback );
+			var lockRange = t.af_getRangeForChangeTableInfo(tablePart, optionType, val);
+			if(lockRange)
+			{
+				t._isLockedCells( lockRange, null, callback );
+			}
+			else
+			{
+				callback();
+			}
 		}
 	};
 	
@@ -13330,6 +13338,50 @@
 		return res;
 	};
     
+	WorksheetView.prototype.af_getRangeForChangeTableInfo = function(tablePart, optionType, val)
+    {
+		var res = null;
+		
+		switch(optionType)
+		{
+			case c_oAscChangeTableStyleInfo.columnBanded:
+			case c_oAscChangeTableStyleInfo.columnFirst:
+			case c_oAscChangeTableStyleInfo.columnLast:
+			case c_oAscChangeTableStyleInfo.rowBanded:
+			case c_oAscChangeTableStyleInfo.filterButton:
+			{
+				res = tablePart.Ref;
+				break;
+			}
+			case c_oAscChangeTableStyleInfo.rowTotal:
+			{	
+				if(val === false)
+				{
+					res = tablePart.Ref;
+				}
+				else
+				{
+					res = new Asc.Range(tablePart.Ref.c1, tablePart.Ref.r1, tablePart.Ref.c2, tablePart.Ref.r2 + 1);
+				}
+				break;
+			}
+			case c_oAscChangeTableStyleInfo.rowHeader:
+			{
+				if(val === false)
+				{
+					res = tablePart.Ref; 
+				}
+				else
+				{
+					res = new Asc.Range(tablePart.Ref.c1, tablePart.Ref.r1 - 1, tablePart.Ref.c2, tablePart.Ref.r2); 
+				}
+				break;
+			}
+		}
+		
+		return res;
+	};
+	
 	WorksheetView.prototype.af_insertCellsInTable = function(tableName, optionType)
     {
 		var t = this;
@@ -13778,7 +13830,22 @@
 			History.EndTransaction();
 		};
 		
-		t._isLockedCells( range, null, callback );
+		//TODO возможно не стоит лочить весь диапазон. проверить: когда один ползователь меняет диапазон, другой снимает а/ф с ф/т. в этом случае в deleteAutoFilter передавать не range а имя ф/т
+		var table = t.model.autoFilters._getFilterByDisplayName(tableName);
+		var tableRange = null !== table ? table.Ref : null;
+		
+		var lockRange = range;
+		if(null !== tableRange)
+		{
+			var r1 = tableRange.r1 < range.r1 ? tableRange.r1 : range.r1;
+			var r2 = tableRange.r2 > range.r2 ? tableRange.r2 : range.r2;
+			var c1 = tableRange.c1 < range.c1 ? tableRange.c1 : range.c1;
+			var c2 = tableRange.c2 > range.c2 ? tableRange.c2 : range.c2;
+			
+			lockRange = new Asc.Range(c1, r1, c2, r2);
+		}
+		
+		t._isLockedCells( lockRange, null, callback );
 	};
 
     WorksheetView.prototype.af_checkChangeRange = function(range) {
