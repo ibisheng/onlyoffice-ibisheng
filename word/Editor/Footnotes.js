@@ -813,6 +813,47 @@ CFootnotesController.prototype.GetSelectionBounds = function()
 	// TODO: Доделать селект и курсор
 	return null;
 };
+CFootnotesController.prototype.IsMovingTableBorder = function()
+{
+	// TODO: Доделать селект и курсор
+	if (true === this.Selection.Use)
+	{
+	}
+	else
+	{
+		if (null !== this.CurFootnote)
+			return this.CurFootnote.Selection_Is_TableBorderMove();
+	}
+
+	return false;
+};
+CFootnotesController.prototype.CheckPosInSelection = function(X, Y, PageAbs, NearPos)
+{
+	// TODO: Доделать селект и курсор
+	if (true === this.Selection.Use)
+	{
+	}
+	else
+	{
+		if (null !== this.CurFootnote)
+			return this.CurFootnote.Selection_Check(X, Y, PageAbs, NearPos);
+	}
+
+	return false;
+};
+CFootnotesController.prototype.SelectAll = function()
+{
+	// TODO: Доделать селект и курсор
+	if (true === this.Selection.Use)
+	{
+	}
+	else
+	{
+		if (null !== this.CurFootnote)
+			this.CurFootnote.Select_All();
+	}
+};
+
 
 CFootnotesController.prototype.AddToParagraph = function(oItem, bRecalculate)
 {

@@ -233,6 +233,18 @@ CHdrFtrController.prototype.GetSelectionBounds = function()
 {
 	return this.HdrFtr.Get_SelectionBounds();
 };
+CHdrFtrController.prototype.IsMovingTableBorder = function()
+{
+	return this.HdrFtr.Selection_Is_TableBorderMove();
+};
+CHdrFtrController.prototype.CheckPosInSelection = function(X, Y, PageAbs, NearPos)
+{
+	return this.HdrFtr.Selection_Check(X, Y, PageAbs, NearPos);
+};
+CHdrFtrController.prototype.SelectAll = function()
+{
+	this.HdrFtr.Select_All();
+};
 
 CHdrFtrController.prototype.AddToParagraph = function(oItem, bRecalculate)
 {

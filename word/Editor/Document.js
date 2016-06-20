@@ -5211,24 +5211,14 @@ CDocument.prototype.Selection_SetEnd = function(X, Y, MouseEvent)
  */
 CDocument.prototype.Selection_Is_OneElement = function()
 {
-    if (true === this.Selection.Use && this.CurPos.Type === docpostype_Content && this.Selection.Flag === selectionflag_Common && this.Selection.StartPos === this.Selection.EndPos)
-        return 0;
+	if (true === this.Selection.Use && docpostype_Content === this.Get_DocPosType() && this.Selection.Flag === selectionflag_Common && this.Selection.StartPos === this.Selection.EndPos)
+		return 0;
 
-    return (this.Selection.StartPos < this.Selection.EndPos ? 1 : -1);
+	return (this.Selection.StartPos < this.Selection.EndPos ? 1 : -1);
 };
 CDocument.prototype.Selection_Is_TableBorderMove = function()
 {
-    if (docpostype_HdrFtr === this.CurPos.Type)
-        return this.HdrFtr.Selection_Is_TableBorderMove();
-    else if (docpostype_DrawingObjects === this.CurPos.Type)
-        return this.DrawingObjects.selectionIsTableBorder();
-    else //if ( docpostype_Content === this.CurPos.Type )
-    {
-        if (null != this.Selection.Data && true === this.Selection.Data.TableBorder && type_Table == this.Content[this.Selection.Data.Pos].GetType())
-            return true;
-    }
-
-    return false;
+	return this.Controller.IsMovingTableBorder();
 };
 /**
  * Проверяем попали ли мы в селект.
@@ -5238,119 +5228,29 @@ CDocument.prototype.Selection_Is_TableBorderMove = function()
  * @param NearPos
  * @returns {boolean}
  */
-CDocument.prototype.Selection_Check = function(X, Y, Page_Abs, NearPos)
+CDocument.prototype.Selection_Check = function(X, Y, PageAbs, NearPos)
 {
-    // Работаем с колонтитулом
-    if (docpostype_HdrFtr === this.CurPos.Type)
-        return this.HdrFtr.Selection_Check(X, Y, Page_Abs, NearPos);
-    else if (docpostype_DrawingObjects === this.CurPos.Type)
-        return this.DrawingObjects.selectionCheck(X, Y, Page_Abs, NearPos);
-    else //if ( docpostype_Content === this.CurPos.Type )
-    {
-        if (true === this.Selection.Use)
-        {
-            switch (this.Selection.Flag)
-            {
-                case selectionflag_Common:
-                {
-                    var Start = this.Selection.StartPos;
-                    var End   = this.Selection.EndPos;
-
-                    if (Start > End)
-                    {
-                        Start = this.Selection.EndPos;
-                        End   = this.Selection.StartPos;
-                    }
-
-                    if (undefined !== NearPos)
-                    {
-                        for (var Index = Start; Index <= End; Index++)
-                        {
-                            if (true === this.Content[Index].Selection_Check(0, 0, 0, NearPos))
-                                return true;
-                        }
-
-                        return false;
-                    }
-                    else
-                    {
-                        var ContentPos = this.Internal_GetContentPosByXY(X, Y, Page_Abs, NearPos);
-                        if (ContentPos > Start && ContentPos < End)
-                        {
-                            return true;
-                        }
-                        else if (ContentPos < Start || ContentPos > End)
-                        {
-                            return false;
-                        }
-                        else
-                        {
-                            var ElementPageIndex = this.private_GetElementPageIndexByXY(ContentPos, X, Y, Page_Abs);
-                            return this.Content[ContentPos].Selection_Check(X, Y, ElementPageIndex, undefined);
-                        }
-                    }
-                }
-                case selectionflag_Numbering:
-                {
-                    return false;
-                }
-            }
-
-            return false;
-        }
-
-        return false;
-    }
+	return this.Controller.CheckPosInSelection(X, Y, PageAbs, NearPos);
 };
 /**
  * Выделяем все содержимое, в зависимости от текущего положения курсора.
  */
-CDocument.prototype.Select_All     = function()
+CDocument.prototype.Select_All = function()
 {
-    this.private_UpdateTargetForCollaboration();
+	this.private_UpdateTargetForCollaboration();
 
-    // Работаем с колонтитулом
-    if (docpostype_HdrFtr === this.CurPos.Type)
-    {
-        this.HdrFtr.Select_All();
-    }
-    else if (docpostype_DrawingObjects === this.CurPos.Type && true === this.DrawingObjects.isSelectedText())
-    {
-        this.DrawingObjects.selectAll();
-    }
-    else
-    {
-        if (true === this.Selection.Use)
-            this.Selection_Remove();
+	this.Controller.SelectAll();
 
-        this.DrawingDocument.SelectEnabled(true);
-        this.DrawingDocument.TargetEnd();
+	// TODO: Пока делаем Start = true, чтобы при Ctrl+A не происходил переход к концу селекта, надо будет
+	//       сделать по нормальному
+	this.Selection.Start = true;
+	this.Document_UpdateSelectionState();
+	this.Document_UpdateInterfaceState();
+	this.Document_UpdateRulersState();
+	this.Selection.Start = false;
 
-        this.Set_DocPosType(docpostype_Content);
-
-        this.Selection.Use   = true;
-        this.Selection.Start = false;
-        this.Selection.Flag  = selectionflag_Common;
-
-        this.Selection.StartPos = 0;
-        this.Selection.EndPos   = this.Content.length - 1;
-
-        for (var Index = 0; Index < this.Content.length; Index++)
-        {
-            this.Content[Index].Select_All();
-        }
-    }
-
-    // TODO: Пока делаем Start = true, чтобы при Ctrl+A не происходил переход к концу селекта, надо будет
-    //       сделать по нормальному
-    this.Selection.Start = true;
-    this.Document_UpdateSelectionState();
-    this.Document_UpdateInterfaceState();
-    this.Document_UpdateRulersState();
-    this.Selection.Start = false;
-
-    // Отдельно обрабатываем это событие, потому что внутри него идет проверка на this.Selection.Start !== true
-    this.Document_UpdateCopyCutState();
+	// Отдельно обрабатываем это событие, потому что внутри него идет проверка на this.Selection.Start !== true
+	this.Document_UpdateCopyCutState();
 };
 CDocument.prototype.On_DragTextEnd = function(NearPos, bCopy)
 {
@@ -15876,6 +15776,93 @@ CDocument.prototype.controller_GetSelectionBounds = function()
 
 	return null;
 };
+CDocument.prototype.controller_IsMovingTableBorder = function()
+{
+	if (null != this.Selection.Data && true === this.Selection.Data.TableBorder && type_Table == this.Content[this.Selection.Data.Pos].GetType())
+		return true;
+
+	return false;
+};
+CDocument.prototype.controller_CheckPosInSelection = function(X, Y, PageAbs, NearPos)
+{
+	if (true === this.Selection.Use)
+	{
+		switch (this.Selection.Flag)
+		{
+			case selectionflag_Common:
+			{
+				var Start = this.Selection.StartPos;
+				var End   = this.Selection.EndPos;
+
+				if (Start > End)
+				{
+					Start = this.Selection.EndPos;
+					End   = this.Selection.StartPos;
+				}
+
+				if (undefined !== NearPos)
+				{
+					for (var Index = Start; Index <= End; Index++)
+					{
+						if (true === this.Content[Index].Selection_Check(0, 0, 0, NearPos))
+							return true;
+					}
+
+					return false;
+				}
+				else
+				{
+					var ContentPos = this.Internal_GetContentPosByXY(X, Y, PageAbs, NearPos);
+					if (ContentPos > Start && ContentPos < End)
+					{
+						return true;
+					}
+					else if (ContentPos < Start || ContentPos > End)
+					{
+						return false;
+					}
+					else
+					{
+						var ElementPageIndex = this.private_GetElementPageIndexByXY(ContentPos, X, Y, PageAbs);
+						return this.Content[ContentPos].Selection_Check(X, Y, ElementPageIndex, undefined);
+					}
+				}
+			}
+			case selectionflag_Numbering:
+			{
+				return false;
+			}
+		}
+
+		return false;
+	}
+
+	return false;
+};
+CDocument.prototype.controller_SelectAll = function()
+{
+	if (true === this.Selection.Use)
+		this.Selection_Remove();
+
+	this.DrawingDocument.SelectEnabled(true);
+	this.DrawingDocument.TargetEnd();
+
+	this.Set_DocPosType(docpostype_Content);
+
+	this.Selection.Use   = true;
+	this.Selection.Start = false;
+	this.Selection.Flag  = selectionflag_Common;
+
+	this.Selection.StartPos = 0;
+	this.Selection.EndPos   = this.Content.length - 1;
+
+	for (var Index = 0; Index < this.Content.length; Index++)
+	{
+		this.Content[Index].Select_All();
+	}
+};
+
+
 
 CDocument.prototype.controller_AddToParagraph = function(ParaItem, bRecalculate)
 {

@@ -209,6 +209,18 @@ CLogicDocumentController.prototype.GetSelectionBounds = function()
 {
 	return this.LogicDocument.controller_GetSelectionBounds();
 };
+CLogicDocumentController.prototype.IsMovingTableBorder = function()
+{
+	return this.LogicDocument.controller_IsMovingTableBorder();
+};
+CLogicDocumentController.prototype.CheckPosInSelection = function(X, Y, PageAbs, NearPos)
+{
+	return this.LogicDocument.controller_CheckPosInSelection(X, Y, PageAbs, NearPos);
+};
+CLogicDocumentController.prototype.SelectAll = function()
+{
+	this.LogicDocument.controller_SelectAll();
+};
 
 
 

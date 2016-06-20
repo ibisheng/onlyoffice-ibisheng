@@ -283,6 +283,18 @@ CDrawingsController.prototype.GetSelectionBounds = function()
 {
 	return this.DrawingObjects.Get_SelectionBounds();
 };
+CDrawingsController.prototype.IsMovingTableBorder = function()
+{
+	return this.DrawingObjects.selectionIsTableBorder();
+};
+CDrawingsController.prototype.CheckPosInSelection = function(X, Y, PageAbs, NearPos)
+{
+	return this.DrawingObjects.selectionCheck(X, Y, PageAbs, NearPos);
+};
+CDrawingsController.prototype.SelectAll = function()
+{
+	this.DrawingObjects.selectAll();
+};
 
 CDrawingsController.prototype.AddToParagraph = function(oItem, bRecalculate)
 {

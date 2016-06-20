@@ -492,6 +492,24 @@ CDocumentControllerBase.prototype.DrawSelectionOnPage = function(PageAbs){};
  */
 CDocumentControllerBase.prototype.GetSelectionBounds = function(){return null;};
 /**
+ * Проверяем осуществляется ли сейчас движение таблицы.
+ * @returns {boolean}
+ */
+CDocumentControllerBase.prototype.IsMovingTableBorder = function(){return false;};
+/**
+ * Проверяем попадает ли заданная позиция в селект.
+ * @param X
+ * @param Y
+ * @param PageAbs
+ * @param NearPos
+ * @returns {boolean}
+ */
+CDocumentControllerBase.prototype.CheckPosInSelection = function(X, Y, PageAbs, NearPos){return false;};
+/**
+ * Выделяем все содержимое.
+ */
+CDocumentControllerBase.prototype.SelectAll = function(){};
+/**
  * Добавляем элемент в параграф.
  * @param oItem
  * @param {boolean} bRecalculate - Пересчитывать ли после выполнения данной функции.
