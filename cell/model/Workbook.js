@@ -1167,24 +1167,22 @@ DependencyGraph.prototype = {
 
     getNextTableName:function ( ws, Ref, tableName ) {
         this.nTableNameMaxIndex++;
-        var sNewName = this.sTableNamePattern + this.nTableNameMaxIndex,
-            name = getDefNameVertexId( null, sNewName );
-        while ( this.defNameList[name] ) {
-            this.nTableNameMaxIndex++;
-            sNewName = this.sTableNamePattern + this.nTableNameMaxIndex;
-            name = getDefNameVertexId( null, sNewName );
-        }
-
-        if(tableName)
-        {
-            sNewName = tableName;
-        }
-		else if(ws.workbook.oApi.collaborativeEditing.getCollaborativeEditing())
-		{
-			var indexUser = ws.workbook.oApi.CoAuthoringApi.get_indexUser();
-			if(null !== indexUser)
+		
+		if(tableName){
+			 sNewName = tableName;
+		}
+		else{
+			var collaborativeIndexUser = "";
+			if(ws.workbook.oApi.collaborativeEditing.getCollaborativeEditing())
 			{
-				sNewName += "_" + indexUser;
+				collaborativeIndexUser = "_" + ws.workbook.oApi.CoAuthoringApi.get_indexUser();
+			}
+			var sNewName = this.sTableNamePattern + this.nTableNameMaxIndex + collaborativeIndexUser,
+				name = getDefNameVertexId( null, sNewName );
+			while ( this.defNameList[name] ) {
+				this.nTableNameMaxIndex++;
+				sNewName = this.sTableNamePattern + this.nTableNameMaxIndex + collaborativeIndexUser;
+				name = getDefNameVertexId( null, sNewName );
 			}
 		}
 		
