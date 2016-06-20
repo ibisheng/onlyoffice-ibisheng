@@ -5223,8 +5223,15 @@ background-repeat: no-repeat;\
 			}
 		}
 
-		obj.Timing         = slide.timing;
-		obj.lockDelete     = !(slide.deleteLock.Lock.Type === locktype_Mine || slide.deleteLock.Lock.Type === locktype_None);
+        if(slide.timing){
+            obj.Timing = slide.timing.createDuplicate();
+        }
+        else{
+            obj.Timing = Asc.CAscSlideTiming();
+        }
+        obj.Timing.ShowLoop = this.WordControl.m_oLogicDocument.isLoopShowMode();
+
+        obj.lockDelete     = !(slide.deleteLock.Lock.Type === locktype_Mine || slide.deleteLock.Lock.Type === locktype_None);
 		obj.lockLayout     = !(slide.layoutLock.Lock.Type === locktype_Mine || slide.layoutLock.Lock.Type === locktype_None);
 		obj.lockTiming     = !(slide.timingLock.Lock.Type === locktype_Mine || slide.timingLock.Lock.Type === locktype_None);
 		obj.lockTranzition = !(slide.transitionLock.Lock.Type === locktype_Mine || slide.transitionLock.Lock.Type === locktype_None);
@@ -5646,6 +5653,11 @@ background-repeat: no-repeat;\
 				return;
 			var _curSlide = this.WordControl.m_oLogicDocument.Slides[_cur];
 			_curSlide.applyTiming(oTiming);
+            if(oTiming){
+                if(AscFormat.isRealBool(oTiming.get_ShowLoop()) && oTiming.get_ShowLoop() !== this.WordControl.m_oLogicDocument.isLoopShowMode()){
+                    this.WordControl.m_oLogicDocument.setShowLoop(oTiming.get_ShowLoop());
+                }
+            }
 		}
 		this.WordControl.m_oLogicDocument.Document_UpdateInterfaceState();
 	};
