@@ -286,7 +286,7 @@ CShowPr.prototype.Read_FromBinary = function(r){
         this.penClr = new AscFormat.CUniColor();
         this.penClr.Read_FromBinary(r);
     }
-    this.present = r.GetBool();
+    this.present = r.Read_FromBinary(r);
     if(Flags & 16){
         this.show = {};
         this.show.showAll = r.GetBool();
