@@ -5005,7 +5005,7 @@ TablePart.prototype.generateTotalsRowLabel = function()
 	}
 	
 	this.TableColumns[0].generateTotalsRowLabel();
-	this.TableColumns[this.TableColumns.length - 1].generateTotalsRowFunction();
+	this.TableColumns[this.TableColumns.length - 1].generateTotalsRowFunction(this);
 };
 
 TablePart.prototype.changeDisplayName = function(newName)
@@ -5019,6 +5019,17 @@ TablePart.prototype.getRangeWithoutHeaderFooter = function()
 	var endRow = this.TotalsRowCount ? this.Ref.r2 - 1 : this.Ref.r2;
 	
 	return Asc.Range(this.Ref.c1, startRow, this.Ref.c2, endRow);
+};
+
+TablePart.prototype.checkTotalRowFormula = function()
+{
+	if(this.TotalsRowCount)
+	{
+		for(var i = 0; i < this.TableColumns.length; i++)
+		{
+			this.TableColumns[i].checkTotalRowFormula(this);
+		}
+	}
 };
 
 /** @constructor */
@@ -5270,11 +5281,12 @@ TableColumn.prototype.generateTotalsRowLabel = function(){
 		this.TotalsRowLabel = "Summary";
 	}
 };
-TableColumn.prototype.generateTotalsRowFunction = function(){
+TableColumn.prototype.generateTotalsRowFunction = function(tablePart){
 	//TODO добавить в перевод
 	if(this.TotalsRowFunction === null)
 	{	
-		this.TotalsRowFunction = Asc.ETotalsRowFunction.totalrowfunctionSum;
+		this.TotalsRowFunction = Asc.ETotalsRowFunction.totalrowfunctionCustom;
+		this.TotalsRowFormula = "SUBTOTAL(109," + tablePart.DisplayName + "[" + this.Name + "])";
 	}
 };
 
@@ -5287,10 +5299,12 @@ TableColumn.prototype.getTotalRowFormula = function(tablePart){
 		{
 			case Asc.ETotalsRowFunction.totalrowfunctionAverage:
 			{
+				res = "SUBTOTAL(101," + tablePart.DisplayName + "[" + this.Name + "])";
 				break;
 			}
 			case Asc.ETotalsRowFunction.totalrowfunctionCount:
 			{
+				res = "SUBTOTAL(103," + tablePart.DisplayName + "[" + this.Name + "])";
 				break;
 			}
 			case Asc.ETotalsRowFunction.totalrowfunctionCountNums:
@@ -5299,14 +5313,17 @@ TableColumn.prototype.getTotalRowFormula = function(tablePart){
 			}
 			case Asc.ETotalsRowFunction.totalrowfunctionCustom:
 			{
+				res = this.TotalsRowFormula;
 				break;
 			}
 			case Asc.ETotalsRowFunction.totalrowfunctionMax:
 			{
+				res = "SUBTOTAL(104," + tablePart.DisplayName + "[" + this.Name + "])";
 				break;
 			}
 			case Asc.ETotalsRowFunction.totalrowfunctionMin:
 			{
+				res = "SUBTOTAL(105," + tablePart.DisplayName + "[" + this.Name + "])";
 				break;
 			}
 			case Asc.ETotalsRowFunction.totalrowfunctionNone:
@@ -5315,22 +5332,20 @@ TableColumn.prototype.getTotalRowFormula = function(tablePart){
 			}
 			case Asc.ETotalsRowFunction.totalrowfunctionStdDev:
 			{
+				res = "SUBTOTAL(107," + tablePart.DisplayName + "[" + this.Name + "])";
 				break;
 			}
 			case Asc.ETotalsRowFunction.totalrowfunctionSum:
 			{
-				res = "=SUBTOTAL(109;" + tablePart.DisplayName + "[" + this.Name + "]";
+				res = "SUBTOTAL(109," + tablePart.DisplayName + "[" + this.Name + "])";
 				break;
 			}
 			case Asc.ETotalsRowFunction.totalrowfunctionVar:
 			{
+				res = "SUBTOTAL(110," + tablePart.DisplayName + "[" + this.Name + "])";
 				break;
 			}
 		}
-	}
-	else if(null !== this.TotalsRowFormula)
-	{
-		res = this.TotalsRowFormula;
 	}
 	
 	return res;
@@ -5358,6 +5373,19 @@ TableColumn.prototype.setTotalsRowLabel = function(val){
 	this.cleanTotalsData();
 	
 	this.TotalsRowLabel = val;
+};
+
+TableColumn.prototype.checkTotalRowFormula = function(tablePart){
+	if(null !== this.TotalsRowFunction && Asc.ETotalsRowFunction.totalrowfunctionCustom !== this.TotalsRowFunction)
+	{
+		var totalRowFormula = this.getTotalRowFormula(tablePart);
+		
+		if(null !== totalRowFormula)
+		{
+			this.TotalsRowFormula = totalRowFormula;
+			this.TotalsRowFunction = Asc.ETotalsRowFunction.totalrowfunctionCustom;
+		}
+	}
 };
 
 /** @constructor */

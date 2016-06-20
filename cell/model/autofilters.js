@@ -4265,7 +4265,7 @@
 									var formula = tableColumn.getTotalRowFormula(options);
 									if(null !== formula)
 									{
-										range.setValue(formula);
+										range.setValue("=" + formula, null, true);
 										if(isSetTotalRowType)
 										{
 											var numFormatType = this._getFormatTableColumnRange(options, tableColumn.Name);
