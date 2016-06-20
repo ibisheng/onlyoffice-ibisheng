@@ -177,6 +177,7 @@
 		"../cell/apiBuilder.js",
 		
 		"../common/clipboard_base.js",
+		"../common/text_input.js",
 		"../common/Drawings/Format/OleObject.js",
 		"../common/plugins.js"
       ],
