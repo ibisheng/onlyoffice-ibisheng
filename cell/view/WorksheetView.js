@@ -13283,6 +13283,7 @@
 			var callback = function(isSuccess)
 			{
 				if ( false === isSuccess ) {
+					t.handlers.trigger( "selectionChanged", t.getSelectionInfo() );
 					return;
 				}
 				
