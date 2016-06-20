@@ -448,7 +448,7 @@
           self.controller.setStrictClose(true);
           self.cellEditor.callTopLineMouseup = true;
           if (!self.getCellEditMode() && !self.controller.isFillHandleMode) {
-            self._onEditCell(0, 0, /*isCoord*/false, /*isFocus*/true);
+            self._onEditCell(/*isFocus*/true);
           }
         }, false);
       }
@@ -1203,11 +1203,11 @@
       }
 
       // При dbl клике фокус выставляем в зависимости от наличия текста в ячейке
-      this._onEditCell(x, y, /*isCoord*/true, /*isFocus*/undefined, /*isClearCell*/undefined, /*isHideCursor*/isHideCursor, /*isQuickInput*/false);
+      this._onEditCell(/*isFocus*/undefined, /*isClearCell*/undefined, /*isHideCursor*/isHideCursor, /*isQuickInput*/false);
     }
   };
 
-  WorkbookView.prototype._onEditCell = function(x, y, isCoord, isFocus, isClearCell, isHideCursor, isQuickInput, callback, event) {
+  WorkbookView.prototype._onEditCell = function(isFocus, isClearCell, isHideCursor, isQuickInput, callback, event) {
     var t = this;
 
     // Проверка глобального лока
@@ -1216,13 +1216,13 @@
     }
 
     var ws = t.getWorksheet();
-    var activeCellRange = ws.getActiveCell(x, y, isCoord);
+    var activeCellRange = ws.getActiveCell(0, 0, false);
     var arn = ws.activeRange.clone(true);
 
     var editFunction = function() {
       t.setCellEditMode(true);
       ws.setCellEditMode(true);
-      if (!ws.openCellEditor(t.cellEditor, x, y, isCoord, /*fragments*/undefined, /*cursorPos*/undefined, isFocus, isClearCell, /*isHideCursor*/isHideCursor, /*isQuickInput*/isQuickInput, /*activeRange*/arn)) {
+      if (!ws.openCellEditor(t.cellEditor, /*fragments*/undefined, /*cursorPos*/undefined, isFocus, isClearCell, /*isHideCursor*/isHideCursor, /*isQuickInput*/isQuickInput, /*activeRange*/arn)) {
         t.setCellEditMode(false);
         t.controller.setStrictClose(false);
         t.controller.setFormulaEditMode(false);
@@ -1920,8 +1920,7 @@
         }
       };
 
-      var activeCellRange = ws.getActiveCell(0, 0, /*isCoord*/false);
-
+      var activeCellRange = ws.getActiveCell(0, 0, false);
       ws._isLockedCells(activeCellRange, /*subType*/null, openEditor);
     }
   };

@@ -11372,15 +11372,11 @@
           return true;
       };
 
-    WorksheetView.prototype.openCellEditor = function ( editor, x, y, isCoord, fragments, cursorPos, isFocus, isClearCell, isHideCursor, isQuickInput, activeRange ) {
+    WorksheetView.prototype.openCellEditor = function ( editor, fragments, cursorPos, isFocus, isClearCell, isHideCursor, isQuickInput, activeRange ) {
         var t = this, tc = this.cols, tr = this.rows, col, row, c, fl, mc, bg, isMerged;
         var ar = this.activeRange;
         if ( activeRange ) {
             this.activeRange = activeRange.clone();
-        }
-
-        if ( this.objectRender.checkCursorDrawingObject( x, y ) ) {
-            return false;
         }
 
         function getVisibleRangeObject() {
@@ -11410,21 +11406,8 @@
             return {vr: vr, offsetX: offsetX, offsetY: offsetY};
         }
 
-        if ( isCoord ) {
-            x *= asc_getcvt( 0/*px*/, 1/*pt*/, this._getPPIX() );
-            y *= asc_getcvt( 0/*px*/, 1/*pt*/, this._getPPIY() );
-            col = this._findColUnderCursor( x, true );
-            row = this._findRowUnderCursor( y, true );
-            if ( !col || !row ) {
-                return false;
-            }
-            col = col.col;
-            row = row.row;
-        }
-        else {
-            col = ar.startCol;
-            row = ar.startRow;
-        }
+        col = ar.startCol;
+        row = ar.startRow;
 
         // Возможно стоит заменить на ячейку из кеша
         c = this._getVisibleCell( col, row );
@@ -11556,7 +11539,7 @@
         copyValue = [];
         copyValue[0] = new AscCommonExcel.Fragment( {text: text, format: v[0].format.clone()} );
 
-        var bSuccess = t.openCellEditor( editor, 0, 0, /*isCoord*/false, /*fragments*/undefined, /*cursorPos*/undefined, isFocus, /*isClearCell*/true, /*isHideCursor*/false, /*isQuickInput*/false, activeRange );
+        var bSuccess = t.openCellEditor( editor, /*fragments*/undefined, /*cursorPos*/undefined, isFocus, /*isClearCell*/true, /*isHideCursor*/false, /*isQuickInput*/false, activeRange );
         if ( bSuccess ) {
             editor.paste( copyValue, cursorPos );
         }

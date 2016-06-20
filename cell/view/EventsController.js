@@ -704,7 +704,7 @@
 					// Выставляем блокировку на выход из редактора по клавишам-стрелкам
 					t.strictClose = true;
 					// При F2 выставляем фокус в редакторе
-					t.handlers.trigger("editCell", 0, 0, /*isCoord*/false, /*isFocus*/true, /*isClearCell*/false,
+					t.handlers.trigger("editCell", /*isFocus*/true, /*isClearCell*/false,
 						/*isHideCursor*/undefined, /*isQuickInput*/false);
 					return result;
 
@@ -713,7 +713,7 @@
 					stop();
 
 					// При backspace фокус не в редакторе (стираем содержимое)
-					t.handlers.trigger("editCell", 0, 0, /*isCoord*/false, /*isFocus*/false, /*isClearCell*/true,
+					t.handlers.trigger("editCell", /*isFocus*/false, /*isClearCell*/true,
 						/*isHideCursor*/undefined, /*isQuickInput*/false, /*callback*/undefined, event);
 					return true;
 
@@ -1007,7 +1007,7 @@
 			if (!this.handlers.trigger("getCellEditMode")) {
 				// При нажатии символа, фокус не ставим
 				// Очищаем содержимое ячейки
-				this.handlers.trigger("editCell", 0, 0, /*isCoord*/false, /*isFocus*/false, /*isClearCell*/true,
+				this.handlers.trigger("editCell", /*isFocus*/false, /*isClearCell*/true,
 					/*isHideCursor*/undefined, /*isQuickInput*/true, /*callback*/undefined, event);
 			}
 			return true;
