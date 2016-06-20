@@ -270,14 +270,11 @@
     this._canResize();
 
     // Shapes
-
-
     var canvasWidth = this.drawingGraphicCtx.canvas.width;
     var canvasHeight = this.drawingGraphicCtx.canvas.height;
     this.buffers.shapeCtx = new AscCommon.CGraphics();
     this.buffers.shapeCtx.init(this.drawingGraphicCtx.ctx, canvasWidth, canvasHeight, (canvasWidth * 25.4 / this.drawingGraphicCtx.ppiX), (canvasHeight * 25.4 / this.drawingGraphicCtx.ppiY));
     this.buffers.shapeCtx.m_oFontManager = this.fmgrGraphics[2];
-
 
     var overlayWidth = this.overlayGraphicCtx.canvas.width;
     var overlayHeight = this.overlayGraphicCtx.canvas.height;
@@ -527,7 +524,20 @@
       }, /*settings*/{
         font: this.defaultFont, padding: this.defaults.worksheetView.cells.padding
       });
-
+    this.Api.onKeyDown = function (event) {
+      var listener = self.isCellEditMode ? self.cellEditor : self.controller;
+      listener._onWindowKeyDown(event);
+    };
+    this.Api.onKeyPress = function (event) {
+      var listener = self.isCellEditMode ? self.cellEditor : self.controller;
+      listener._onWindowKeyPress(event);
+    };
+    this.Api.onKeyUp = function (event) {
+      var listener = self.isCellEditMode ? self.cellEditor : self.controller;
+      listener._onWindowKeyUp(event);
+    };
+    
+    AscCommon.InitBrowserInputContext(this.Api, "id_target_cursor");
 
     this.wsViewHandlers = new AscCommonExcel.asc_CHandlersList(/*handlers*/{
       "getViewerMode": function() {

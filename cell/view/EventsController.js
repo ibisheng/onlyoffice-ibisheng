@@ -132,9 +132,6 @@
 			// initialize events
 			if (window.addEventListener) {
 				window.addEventListener("resize"	, function () {self._onWindowResize.apply(self, arguments);}				, false);
-				window.addEventListener("keydown"	, function () {return self._onWindowKeyDown.apply(self, arguments);}		, false);
-				window.addEventListener("keypress"	, function () {return self._onWindowKeyPress.apply(self, arguments);}		, false);
-				window.addEventListener("keyup"		, function () {return self._onWindowKeyUp.apply(self, arguments);}			, false);
 				window.addEventListener("mousemove"	, function () {return self._onWindowMouseMove.apply(self, arguments);}		, false);
 				window.addEventListener("mouseup"	, function () {return self._onWindowMouseUp.apply(self, arguments);}		, false);
 				window.addEventListener("mouseleave", function () {return self._onWindowMouseLeaveOut.apply(self, arguments);}	, false);
