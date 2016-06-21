@@ -257,6 +257,46 @@ CLogicDocumentController.prototype.GetSelectedElementsInfo = function(oInfo)
 {
 	this.LogicDocument.controller_GetSelectedElementsInfo(oInfo);
 };
+CLogicDocumentController.prototype.AddTableRow = function(bBefore)
+{
+	this.LogicDocument.controller_AddTableRow(bBefore);
+};
+CLogicDocumentController.prototype.AddTableCol = function(bBefore)
+{
+	this.LogicDocument.controller_AddTableCol(bBefore);
+};
+CLogicDocumentController.prototype.RemoveTableRow = function()
+{
+	this.LogicDocument.controller_RemoveTableRow();
+};
+CLogicDocumentController.prototype.RemoveTableCol = function()
+{
+	this.LogicDocument.controller_RemoveTableCol();
+};
+CLogicDocumentController.prototype.MergeTableCells = function()
+{
+	this.LogicDocument.controller_MergeTableCells();
+};
+CLogicDocumentController.prototype.SplitTableCells = function(Cols, Rows)
+{
+	this.LogicDocument.controller_SplitTableCells(Cols, Rows);
+};
+CLogicDocumentController.prototype.RemoveTable = function()
+{
+	this.LogicDocument.controller_RemoveTable();
+};
+CLogicDocumentController.prototype.SelectTable = function(Type)
+{
+	this.LogicDocument.controller_SelectTable(Type);
+};
+CLogicDocumentController.prototype.CanMergeTableCells = function()
+{
+	return this.LogicDocument.controller_CanMergeTableCells();
+};
+CLogicDocumentController.prototype.CanSplitTableCells = function()
+{
+	return this.LogicDocument.controller_CanSplitTableCells();
+};
 
 
 CLogicDocumentController.prototype.AddToParagraph = function(oItem)

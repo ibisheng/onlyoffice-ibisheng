@@ -332,6 +332,46 @@ CDrawingsController.prototype.GetSelectedElementsInfo = function(oInfo)
 {
 	this.DrawingObjects.getSelectedElementsInfo(oInfo);
 };
+CDrawingsController.prototype.AddTableRow = function(bBefore)
+{
+	this.DrawingObjects.tableAddRow(bBefore);
+};
+CDrawingsController.prototype.AddTableCol = function(bBefore)
+{
+	this.DrawingObjects.tableAddCol(bBefore);
+};
+CDrawingsController.prototype.RemoveTableRow = function()
+{
+	this.DrawingObjects.tableRemoveRow();
+};
+CDrawingsController.prototype.RemoveTableCol = function()
+{
+	this.DrawingObjects.tableRemoveCol();
+};
+CDrawingsController.prototype.MergeTableCells = function()
+{
+	this.DrawingObjects.tableMergeCells();
+};
+CDrawingsController.prototype.SplitTableCells = function(Cols, Rows)
+{
+	this.DrawingObjects.tableSplitCell(Cols, Rows);
+};
+CDrawingsController.prototype.RemoveTable = function()
+{
+	this.DrawingObjects.tableRemoveTable();
+};
+CDrawingsController.prototype.SelectTable = function(Type)
+{
+	this.DrawingObjects.tableSelect(Type);
+};
+CDrawingsController.prototype.CanMergeTableCells = function()
+{
+	return this.DrawingObjects.tableCheckMerge();
+};
+CDrawingsController.prototype.CanSplitTableCells = function()
+{
+	return this.DrawingObjects.tableCheckSplit();
+};
 
 CDrawingsController.prototype.AddToParagraph = function(oItem, bRecalculate)
 {

@@ -581,7 +581,51 @@ CDocumentControllerBase.prototype.GetCurrentParagraph = function(){return null};
  * @param oInfo
  */
 CDocumentControllerBase.prototype.GetSelectedElementsInfo = function(oInfo){};
-
+/**
+ * Добавляем строку таблицы.
+ * @param bBefore
+ */
+CDocumentControllerBase.prototype.AddTableRow = function(bBefore){};
+/**
+ * Добавляем столбец таблицы.
+ * @param bBefore
+ */
+CDocumentControllerBase.prototype.AddTableCol = function(bBefore){};
+/**
+ * Удаляем строку таблицы.
+ */
+CDocumentControllerBase.prototype.RemoveTableRow = function(){};
+/**
+ * Удаляем колонку таблицы.
+ */
+CDocumentControllerBase.prototype.RemoveTableCol = function(){};
+/**
+ * Объединяем ячейки таблицы.
+ */
+CDocumentControllerBase.prototype.MergeTableCells = function(){};
+/**
+ * Разбить ячейки таблицы.
+ */
+CDocumentControllerBase.prototype.SplitTableCells = function(Cols, Rows){};
+/**
+ * Удаляем таблицу.
+ */
+CDocumentControllerBase.prototype.RemoveTable = function(){};
+/**
+ * Выделяем таблицу или ее часть.
+ * @param Type тип выделения
+ */
+CDocumentControllerBase.prototype.SelectTable = function(Type){};
+/**
+ * Проверяем можем ли мы произвести объединение ячеек таблицы.
+ * @returns {boolean}
+ */
+CDocumentControllerBase.prototype.CanMergeTableCells = function(){return false;};
+/**
+ * Проверяем можем ли мы произвести разделение ячеек таблицы.
+ * @returns {boolean}
+ */
+CDocumentControllerBase.prototype.CanSplitTableCells = function(){return false;};
 /**
  * Добавляем элемент в параграф.
  * @param oItem

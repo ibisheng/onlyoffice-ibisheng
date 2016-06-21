@@ -281,6 +281,48 @@ CHdrFtrController.prototype.GetSelectedElementsInfo = function(oInfo)
 {
 	this.HdrFtr.Get_SelectedElementsInfo(oInfo);
 };
+CHdrFtrController.prototype.AddTableRow = function(bBefore)
+{
+	this.HdrFtr.Table_AddRow(bBefore);
+};
+CHdrFtrController.prototype.AddTableCol = function(bBefore)
+{
+	this.HdrFtr.Table_AddCol(bBefore);
+};
+CHdrFtrController.prototype.RemoveTableRow = function()
+{
+	this.HdrFtr.Table_RemoveRow();
+};
+CHdrFtrController.prototype.RemoveTableCol = function()
+{
+	this.HdrFtr.Table_RemoveCol();
+};
+CHdrFtrController.prototype.MergeTableCells = function()
+{
+	this.HdrFtr.Table_MergeCells();
+};
+CHdrFtrController.prototype.SplitTableCells = function(Cols, Rows)
+{
+	this.HdrFtr.Table_SplitCell(Cols, Rows);
+};
+CHdrFtrController.prototype.RemoveTable = function()
+{
+	this.HdrFtr.Table_RemoveTable();
+};
+CHdrFtrController.prototype.SelectTable = function(Type)
+{
+	this.HdrFtr.Table_Select(Type);
+};
+CHdrFtrController.prototype.CanMergeTableCells = function()
+{
+	return this.HdrFtr.Table_CheckMerge();
+};
+CHdrFtrController.prototype.CanSplitTableCells = function()
+{
+	return this.HdrFtr.Table_CheckSplit();
+};
+
+
 
 
 CHdrFtrController.prototype.AddToParagraph = function(oItem, bRecalculate)

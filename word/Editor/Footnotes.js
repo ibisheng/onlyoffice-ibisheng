@@ -944,7 +944,48 @@ CFootnotesController.prototype.GetCurrentParagraph = function()
 CFootnotesController.prototype.GetSelectedElementsInfo = function(oInfo)
 {
 	// TODO: Реализовать
-	
+};
+CFootnotesController.prototype.AddTableRow = function(bBefore)
+{
+	// TODO: Реализовать
+};
+CFootnotesController.prototype.AddTableCol = function(bBefore)
+{
+	// TODO: Реализовать
+};
+CFootnotesController.prototype.RemoveTableRow = function()
+{
+	// TODO: Реализовать
+};
+CFootnotesController.prototype.RemoveTableCol = function()
+{
+	// TODO: Реализовать
+};
+CFootnotesController.prototype.MergeTableCells = function()
+{
+	// TODO: Реализовать
+};
+CFootnotesController.prototype.SplitTableCells = function(Cols, Rows)
+{
+	// TODO: Реализовать
+};
+CFootnotesController.prototype.RemoveTable = function()
+{
+	// TODO: Реализовать
+};
+CFootnotesController.prototype.SelectTable = function(Type)
+{
+	// TODO: Реализовать
+};
+CFootnotesController.prototype.CanMergeTableCells = function()
+{
+	// TODO: Реализовать
+	return false;
+};
+CFootnotesController.prototype.CanSplitTableCells = function()
+{
+	// TODO: Реализовать
+	return false;
 };
 
 CFootnotesController.prototype.AddToParagraph = function(oItem, bRecalculate)
