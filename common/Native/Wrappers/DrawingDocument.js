@@ -1927,7 +1927,7 @@ CDrawingDocument.prototype =
 
             var _x1 = _rect1.X;
             var _y1 = _rect1.Y;
-            var _y11 = _rect1.Y + _rect.H;
+            var _y11 = _rect1.Y + _rect2.H;
             var _x2 = _rect2.X + _rect2.W;
             var _y2 = _rect2.Y;
             var _y22 = _rect2.Y + _rect2.Y;
