@@ -952,6 +952,11 @@ CDrawingDocument.prototype =
     {
         this.Native["DD_EndSearch"](bIsChange);
     },
+    
+    SetTextSelectionOutline : function(isSelectionOutline)
+    {
+        
+    },
 
     // ruler states
     Set_RulerState_Start : function()
