@@ -378,7 +378,7 @@ CDocumentContent.prototype.Recalc_AllParagraphs_CompiledPr = function()
 CDocumentContent.prototype.Set_CurrentElement              = function(Index, bUpdateStates)
 {
     var ContentPos   = Math.max(0, Math.min(this.Content.length - 1, Index));
-    this.CurPos.Type = docpostype_Content;
+    this.Set_DocPosType(docpostype_Content);
 
     var CurPos = Math.max(0, Math.min(this.Content.length - 1, Index));
 
@@ -1848,7 +1848,7 @@ CDocumentContent.prototype.Cursor_MoveToStartPos         = function(AddToSelect)
             this.Selection.Flag     = selectionflag_Common;
 
             this.CurPos.ContentPos = 0;
-            this.CurPos.Type       = docpostype_Content;
+            this.Set_DocPosType(docpostype_Content);
 
             for (var Index = StartPos - 1; Index >= EndPos; Index--)
             {
@@ -1888,7 +1888,7 @@ CDocumentContent.prototype.Cursor_MoveToStartPos         = function(AddToSelect)
         this.Selection.Flag     = selectionflag_Common;
 
         this.CurPos.ContentPos = 0;
-        this.CurPos.Type       = docpostype_Content;
+        this.Set_DocPosType(docpostype_Content);
         this.Content[0].Cursor_MoveToStartPos(false);
     }
 };
@@ -1914,7 +1914,7 @@ CDocumentContent.prototype.Cursor_MoveToEndPos           = function(AddToSelect)
             this.Selection.Flag     = selectionflag_Common;
 
             this.CurPos.ContentPos = this.Content.length - 1;
-            this.CurPos.Type       = docpostype_Content;
+            this.Set_DocPosType(docpostype_Content);
 
             for (var Index = StartPos + 1; Index <= EndPos; Index++)
             {
@@ -1954,7 +1954,7 @@ CDocumentContent.prototype.Cursor_MoveToEndPos           = function(AddToSelect)
         this.Selection.Flag     = selectionflag_Common;
 
         this.CurPos.ContentPos = this.Content.length - 1;
-        this.CurPos.Type       = docpostype_Content;
+        this.Set_DocPosType(docpostype_Content);
         this.Content[this.CurPos.ContentPos].Cursor_MoveToEndPos(false);
     }
 };
@@ -2792,7 +2792,6 @@ CDocumentContent.prototype.Remove                             = function(Count, 
             else
             {
                 // Убираем селект
-                this.Selection_Clear();
                 this.Selection.Use = false;
 
                 if (StartPos != EndPos)
@@ -4369,7 +4368,7 @@ CDocumentContent.prototype.Insert_Content                     = function(Selecte
             if (null !== HdrFtr)
                 DocContent = HdrFtr.Content;
 
-            DocContent.CurPos.Type     = docpostype_DrawingObjects;
+            DocContent.Set_DocPosType(docpostype_DrawingObjects);
             DocContent.Selection.Use   = true;
             DocContent.Selection.Start = false;
         }
@@ -7268,55 +7267,6 @@ CDocumentContent.prototype.Selection_Draw_Page = function(PageIndex)
         }
     }
 };
-CDocumentContent.prototype.Selection_Clear     = function()
-{
-    if (docpostype_DrawingObjects === this.CurPos.Type)
-    {
-        return this.LogicDocument.DrawingObjects.resetSelection();
-    }
-    else //if ( docpostype_Content === this.CurPos.Type )
-    {
-        if (true === this.Selection.Use)
-        {
-
-            switch (this.Selection.Flag)
-            {
-                case selectionflag_Common:
-                {
-
-                    var Start = this.Selection.StartPos;
-                    var End   = this.Selection.EndPos;
-
-                    if (Start > End)
-                    {
-                        var Temp = Start;
-                        Start    = End;
-                        End      = Temp;
-                    }
-
-                    for (var Index = Start; Index <= End; Index++)
-                    {
-                        this.Content[Index].Selection_Clear();
-                    }
-
-                    break;
-                }
-                case selectionflag_Numbering:
-                {
-                    if (null == this.Selection.Data)
-                        break;
-
-                    for (var Index = 0; Index < this.Selection.Data.length; Index++)
-                    {
-                        this.Content[this.Selection.Data[Index]].Selection_Clear();
-                    }
-
-                    break;
-                }
-            }
-        }
-    }
-};
 CDocumentContent.prototype.Selection_SetStart = function(X, Y, CurPage, MouseEvent)
 {
     if (CurPage < 0 || CurPage >= this.Pages.length)
@@ -7345,14 +7295,14 @@ CDocumentContent.prototype.Selection_SetStart = function(X, Y, CurPage, MouseEve
             this.LogicDocument.Selection.Use   = true;
             this.LogicDocument.Selection.Start = true;
             this.LogicDocument.Selection.Flag  = selectionflag_Common;
-            this.LogicDocument.CurPos.Type     = docpostype_DrawingObjects;
+            this.LogicDocument.Set_DocPosType(docpostype_DrawingObjects);
         }
         else
         {
             HdrFtr.Content.Selection.Use   = true;
             HdrFtr.Content.Selection.Start = true;
             HdrFtr.Content.Selection.Flag  = selectionflag_Common;
-            HdrFtr.Content.CurPos.Type     = docpostype_DrawingObjects;
+            HdrFtr.Content.Set_DocPosType(docpostype_DrawingObjects);
         }
 
         this.LogicDocument.DrawingObjects.OnMouseDown(MouseEvent, X, Y, AbsPage);
@@ -7371,7 +7321,7 @@ CDocumentContent.prototype.Selection_SetStart = function(X, Y, CurPage, MouseEve
 
         if (docpostype_Content != this.CurPos.Type)
         {
-            this.CurPos.Type       = docpostype_Content;
+            this.Set_DocPosType(docpostype_Content);
             this.CurPos.ContentPos = ContentPos;
             bOldSelectionIsCommon  = false;
         }
@@ -7495,8 +7445,6 @@ CDocumentContent.prototype.Selection_SetEnd          = function(X, Y, CurPage, M
         return;
 
     var ContentPos = this.Internal_GetContentPosByXY(X, Y);
-
-    this.Selection_Clear();
 
     var OldPos      = this.CurPos.ContentPos;
     var OldInnerPos = null;
@@ -7830,7 +7778,7 @@ CDocumentContent.prototype.Select_All                = function()
         if (true === this.Selection.Use)
             this.Selection_Remove();
 
-        this.CurPos.Type     = docpostype_Content;
+        this.Set_DocPosType(docpostype_Content);
         this.Selection.Use   = true;
         this.Selection.Start = false;
         this.Selection.Flag  = selectionflag_Common;
@@ -7857,7 +7805,7 @@ CDocumentContent.prototype.Select_DrawingObject      = function(Id)
     var HdrFtr = this.Is_HdrFtr(true);
     if (null != HdrFtr)
     {
-        HdrFtr.Content.CurPos.Type     = docpostype_DrawingObjects;
+        HdrFtr.Content.Set_DocPosType(docpostype_DrawingObjects);
         HdrFtr.Content.Selection.Use   = true;
         HdrFtr.Content.Selection.Start = false;
 
@@ -7866,7 +7814,7 @@ CDocumentContent.prototype.Select_DrawingObject      = function(Id)
     }
     else
     {
-        this.LogicDocument.CurPos.Type     = docpostype_DrawingObjects;
+        this.LogicDocument.Set_DocPosType(docpostype_DrawingObjects);
         this.LogicDocument.Selection.Use   = true;
         this.LogicDocument.Selection.Start = false;
     }
@@ -8081,7 +8029,7 @@ CDocumentContent.prototype.Table_RemoveTable = function()
             if (Pos < 0)
                 Pos = 0;
 
-            this.CurPos.Type       = docpostype_Content;
+            this.Set_DocPosType(docpostype_Content);
             this.CurPos.ContentPos = Pos;
             this.Content[Pos].Cursor_MoveToStartPos();
             this.Recalculate();
@@ -8535,6 +8483,8 @@ CDocumentContent.prototype.Set_SelectionState              = function(State, Sta
         RealY      : DocState.CurPos.RealY,
         Type       : DocState.CurPos.Type
     };
+
+    this.Set_DocPosType(DocState.CurPos.Type);
 
     this.Selection =
     {
@@ -9117,7 +9067,7 @@ CDocumentContent.prototype.Set_SelectionState2 = function(State)
     this.Selection.EndPos   = Pos;
     this.Selection.Flag     = selectionflag_Common;
 
-    this.CurPos.Type       = docpostype_Content;
+    this.Set_DocPosType(docpostype_Content);
     this.CurPos.ContentPos = Pos;
 
     if (true !== bFlag)

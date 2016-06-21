@@ -173,6 +173,10 @@
 			return undefined;
 		}
 
+		function CRangeOffset(offsetCol, offsetRow) {
+			this.offsetCol = offsetCol;
+			this.offsetRow = offsetRow;
+		}
 
 		/**
 		 * Rectangle region of cells
@@ -487,7 +491,7 @@
 		function Range3D() {
 			this.sheet = '';
 
-			if (2 == arguments.length) {
+			if (3 == arguments.length) {
 				var range = arguments[0];
 				Range3D.superclass.constructor.call(this, range.c1, range.r1, range.c2, range.r2);
 				// ToDo стоит пересмотреть конструкторы.
@@ -497,6 +501,7 @@
 				this.c2Abs = range.c2Abs;
 
 				this.sheet = arguments[1];
+				this.sheet2 = arguments[2];
 			} else if (arguments.length > 1) {
 				ActiveRange.superclass.constructor.apply(this, arguments);
 			} else {
@@ -513,8 +518,7 @@
 			return oRes && Range3D.superclass.isIntersect.apply(this, arguments);
 		};
 		Range3D.prototype.clone = function(){
-			var oRes = new Range3D(ActiveRange.superclass.clone.apply(this, arguments), this.sheet);
-			return oRes;
+			return new Range3D(ActiveRange.superclass.clone.apply(this, arguments), this.sheet, this.sheet2);
 		};
 
     /**
@@ -768,8 +772,8 @@
 				if (!res) {
 					return null;
 				}
-				var range = this._getRange(res.range, 1);
-				return range ? new Range3D(range, res.sheet) : null;
+				var range = this._getRange(res.range.toUpperCase(), 1);
+				return range ? new Range3D(range, res.sheet, res.sheet2) : null;
 			},
 			getActiveRange : function(sRange)
 			{
@@ -1651,6 +1655,7 @@
 		window["Asc"].truncFracPart = truncFracPart;
 		window["Asc"].getEndValueRange = getEndValueRange;
 
+		window["AscCommonExcel"].CRangeOffset = CRangeOffset;
 		window["Asc"].Range = Range;
 		window["AscCommonExcel"].Range3D = Range3D;
 		window["AscCommonExcel"].ActiveRange = ActiveRange;

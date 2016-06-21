@@ -614,128 +614,117 @@ cAVERAGEA.prototype.getInfo = function () {
     };
 };
 
-function cAVERAGEIF() {
-//    cBaseFunction.call( this, "AVERAGEIF", 2, 3 );
-
-    this.name = "AVERAGEIF";
-    this.type = cElementType.func;
-    this.value = null;
-    this.argumentsMin = 2;
-    this.argumentsCurrent = 0;
-    this.argumentsMax = 3;
-    this.formatType = {
-        def:-1, //подразумевается формат первой ячейки входящей в формулу.
-        noneFormat:-2
-    };
-    this.numFormat = this.formatType.def;
-
-}
-
-cAVERAGEIF.prototype = Object.create( cBaseFunction.prototype )
-cAVERAGEIF.prototype.Calculate = function ( arg ) {
-    var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2] ? arg[2] : arg[0], _sum = 0, _count = 0, valueForSearching;
-    if ( !(arg0 instanceof cRef || arg0 instanceof cRef3D || arg0 instanceof cArea) ) {
-        return this.value = new cError( cErrorType.wrong_value_type );
+    function cAVERAGEIF() {
+        this.name = "AVERAGEIF";
+        this.type = cElementType.func;
+        this.value = null;
+        this.argumentsMin = 2;
+        this.argumentsCurrent = 0;
+        this.argumentsMax = 3;
+        this.formatType = {
+            def: -1, //подразумевается формат первой ячейки входящей в формулу.
+            noneFormat: -2
+        };
+        this.numFormat = this.formatType.def;
     }
 
-    if ( !(arg2 instanceof cRef || arg2 instanceof cRef3D || arg2 instanceof cArea) ) {
-        return this.value = new cError( cErrorType.wrong_value_type );
-    }
+    cAVERAGEIF.prototype = Object.create(cBaseFunction.prototype);
+    cAVERAGEIF.prototype.Calculate = function (arg) {
+        var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2] ? arg[2] : arg[0], _sum = 0, _count = 0, valueForSearching;
+        if ((cElementType.cell !== arg0.type && cElementType.cell3D !== arg0.type &&
+          cElementType.cellsRange !== arg0.type) ||
+          (cElementType.cell !== arg2.type && cElementType.cell3D !== arg2.type &&
+          cElementType.cellsRange !== arg2.type)) {
+            return this.value = new cError(cErrorType.wrong_value_type);
+        }
 
-    if ( arg1 instanceof cArea || arg1 instanceof cArea3D ) {
-        arg1 = arg1.cross( arguments[1].first );
-    }
-    else if ( arg1 instanceof cArray ) {
-        arg1 = arg1.getElementRowCol( 0, 0 );
-    }
+        if (cElementType.cellsRange === arg1.type || cElementType.cellsRange3D === arg1.type) {
+            arg1 = arg1.cross(arguments[1].first);
+        } else if (arg1 instanceof cArray) {
+            arg1 = arg1.getElementRowCol(0, 0);
+        }
 
-    arg1 = arg1.tocString();
+        arg1 = arg1.tocString();
 
-    if ( !(arg1 instanceof cString) ) {
-        return this.value = new cError( cErrorType.wrong_value_type );
-    }
+        if (cElementType.string !== arg1.type) {
+            return this.value = new cError(cErrorType.wrong_value_type);
+        }
 
-    arg1 = arg1.toString();
-    var operators = new RegExp( "^ *[<=> ]+ *" ), match = arg1.match( operators ),
-        search, oper, val;
-    if ( match ) {
-        search = arg1.substr( match[0].length );
-        oper = match[0].replace( /\s/g, "" );
-    }
-    else {
-        search = arg1;
-    }
-    valueForSearching = parseNum( search ) ? new cNumber( search ) : new cString( search );
-    if ( arg0 instanceof cArea ) {
-        var r = arg0.getRange().first.getRow0(), ws = arg0.getWS(), c/*c1*/ = arg2.getRange().first.getCol0(), i = 0,
-            tmpCellArg0 = arg0.getRange().getCells()[0],
-            tmpCellArg2 = arg2.getRange(),
-            offset, bbox, r2;
-        arg0.foreach2( function ( v, cell ) {
-            if ( matching( v, valueForSearching, oper ) ) {
-                offset = cell.getOffset(tmpCellArg0);
-                tmpCellArg2 = arg2.getRange();
-                tmpCellArg2.setOffset(offset);
-                bbox = tmpCellArg2.getBBox0();
-                offset.offsetCol *= -1;
-                offset.offsetRow *= -1;
+        arg1 = arg1.toString();
+        var operators = new RegExp("^ *[<=> ]+ *"), match = arg1.match(operators), search, oper, val;
+        if (match) {
+            search = arg1.substr(match[0].length);
+            oper = match[0].replace(/\s/g, "");
+        } else {
+            search = arg1;
+        }
+        valueForSearching = parseNum(search) ? new cNumber(search) : new cString(search);
+        if (arg0 instanceof cArea) {
+            var r = arg0.getRange().first.getRow0(), ws = arg0.getWS(), c/*c1*/ = arg2.getRange().first
+              .getCol0(), i = 0, tmpCellArg0 = arg0.getRange()
+              .getCells()[0], tmpCellArg2 = arg2.getRange(), offset, bbox, r2;
+            arg0.foreach2(function (v, cell) {
+                if (matching(v, valueForSearching, oper)) {
+                    offset = cell.getOffset(tmpCellArg0);
+                    tmpCellArg2 = arg2.getRange();
+                    tmpCellArg2.setOffset(offset);
+                    bbox = tmpCellArg2.getBBox0();
+                    offset.offsetCol *= -1;
+                    offset.offsetRow *= -1;
 
-                r2 = new cRef( ws.getRange3( bbox.r1, bbox.c1, bbox.r1, bbox.c1 ).getName(), ws );
+                    r2 = new cRef(ws.getRange3(bbox.r1, bbox.c1, bbox.r1, bbox.c1).getName(), ws);
 
-                tmpCellArg2.setOffset(offset);
+                    tmpCellArg2.setOffset(offset);
 
-                if ( r2.getValue() instanceof cNumber ) {
-                    _sum += r2.getValue().getValue();
+                    if (cElementType.number === r2.getValue().type) {
+                        _sum += r2.getValue().getValue();
+                        _count++;
+                    }
+                }
+                i++;
+            })
+        } else {
+            val = arg0.getValue();
+            if (matching(val, valueForSearching, oper)) {
+                var r = arg0.getRange(), ws = arg0.getWS(), r1 = r.first.getRow0() + 0, c1 = arg2.getRange().first
+                  .getCol0();
+                r = new cRef(ws.getRange3(r1, c1, r1, c1).getName(), ws);
+                if (cElementType.number === r.getValue().type) {
+                    _sum += r.getValue().getValue();
                     _count++;
                 }
             }
-            i++;
-        } )
-    }
-    else {
-        val = arg0.getValue();
-        if ( matching( val, valueForSearching, oper ) ) {
-            var r = arg0.getRange(), ws = arg0.getWS(),
-                r1 = r.first.getRow0() + 0, c1 = arg2.getRange().first.getCol0();
-            r = new cRef( ws.getRange3( r1, c1, r1, c1 ).getName(), ws );
-            if ( r.getValue() instanceof cNumber ) {
-                _sum += r.getValue().getValue();
-                _count++;
-            }
         }
-    }
 
-    if ( _count == 0 ) {
-        return new cError( cErrorType.division_by_zero );
-    }
-    else {
-        return this.value = new cNumber( _sum / _count );
-    }
-}
-cAVERAGEIF.prototype.getInfo = function () {
-    return {
-        name:this.name,
-        args:"( cell-range, selection-criteria [ , average-range ] )"
+        if (_count == 0) {
+            return new cError(cErrorType.division_by_zero);
+        } else {
+            return this.value = new cNumber(_sum / _count);
+        }
     };
-}
+    cAVERAGEIF.prototype.getInfo = function () {
+        return {
+            name: this.name, args: "( cell-range, selection-criteria [ , average-range ] )"
+        };
+    };
 
-function cAVERAGEIFS() {
-    cBaseFunction.call( this, "AVERAGEIFS" );
-}
+    function cAVERAGEIFS() {
+        cBaseFunction.call(this, "AVERAGEIFS");
+    }
 
-cAVERAGEIFS.prototype = Object.create( cBaseFunction.prototype )
+    cAVERAGEIFS.prototype = Object.create(cBaseFunction.prototype);
 
-function cBETADIST() {/*Нет реализации в Google Docs*/
-    cBaseFunction.call( this, "BETADIST" );
-}
+    function cBETADIST() {/*Нет реализации в Google Docs*/
+        cBaseFunction.call(this, "BETADIST");
+    }
 
-cBETADIST.prototype = Object.create( cBaseFunction.prototype )
+    cBETADIST.prototype = Object.create(cBaseFunction.prototype);
 
-function cBETAINV() {/*Нет реализации в Google Docs*/
-    cBaseFunction.call( this, "BETAINV" );
-}
+    function cBETAINV() {/*Нет реализации в Google Docs*/
+        cBaseFunction.call(this, "BETAINV");
+    }
 
-cBETAINV.prototype = Object.create( cBaseFunction.prototype )
+    cBETAINV.prototype = Object.create(cBaseFunction.prototype);
 
 function cBINOMDIST() {
 //    cBaseFunction.call( this, "BINOMDIST" );
@@ -756,7 +745,7 @@ function cBINOMDIST() {
 
 }
 
-cBINOMDIST.prototype = Object.create( cBaseFunction.prototype )
+cBINOMDIST.prototype = Object.create( cBaseFunction.prototype );
 cBINOMDIST.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2], arg3 = arg[3];
 
@@ -817,31 +806,31 @@ cBINOMDIST.prototype.Calculate = function ( arg ) {
     }
     else
         return this.value = new cNumber( binomdist( arg0.getValue(), arg1.getValue(), arg2.getValue() ) );
-}
+};
 cBINOMDIST.prototype.getInfo = function () {
     return {
         name:this.name,
         args:"( number-successes , number-trials , success-probability , cumulative-flag )"
     };
-}
+};
 
 function cCHIDIST() {
     cBaseFunction.call( this, "CHIDIST" );
 }
 
-cCHIDIST.prototype = Object.create( cBaseFunction.prototype )
+cCHIDIST.prototype = Object.create( cBaseFunction.prototype );
 
 function cCHIINV() {
     cBaseFunction.call( this, "CHIINV" );
 }
 
-cCHIINV.prototype = Object.create( cBaseFunction.prototype )
+cCHIINV.prototype = Object.create( cBaseFunction.prototype );
 
 function cCHITEST() {
     cBaseFunction.call( this, "CHITEST" );
 }
 
-cCHITEST.prototype = Object.create( cBaseFunction.prototype )
+cCHITEST.prototype = Object.create( cBaseFunction.prototype );
 
 function cCONFIDENCE() {
 //    cBaseFunction.call( this, "CONFIDENCE" );
@@ -862,7 +851,7 @@ function cCONFIDENCE() {
 
 }
 
-cCONFIDENCE.prototype = Object.create( cBaseFunction.prototype )
+cCONFIDENCE.prototype = Object.create( cBaseFunction.prototype );
 cCONFIDENCE.prototype.Calculate = function ( arg ) {
 
     var alpha = arg[0], stdev_sigma = arg[1], size = arg[2];
@@ -900,13 +889,13 @@ cCONFIDENCE.prototype.Calculate = function ( arg ) {
 
     return this.value = new cNumber( gaussinv( 1.0 - alpha.getValue() / 2.0 ) * stdev_sigma.getValue() / Math.sqrt( size.getValue() ) );
 
-}
+};
 cCONFIDENCE.prototype.getInfo = function () {
     return {
         name:this.name,
         args:"( alpha , standard-dev , size )"
     };
-}
+};
 
 function cCORREL() {
 //    cBaseFunction.call( this, "CORREL" );
@@ -927,7 +916,7 @@ function cCORREL() {
 
 }
 
-cCORREL.prototype = Object.create( cBaseFunction.prototype )
+cCORREL.prototype = Object.create( cBaseFunction.prototype );
 cCORREL.prototype.Calculate = function ( arg ) {
 
     function correl( x, y ) {
@@ -993,20 +982,15 @@ cCORREL.prototype.Calculate = function ( arg ) {
 
     return this.value = correl( arr0, arr1 );
 
-}
+};
 cCORREL.prototype.getInfo = function () {
     return {
         name:this.name,
         args:"( array-1 , array-2 )"
     };
-}
+};
 
 function cCOUNT() {
-//    cBaseFunction.call( this, "COUNT" );
-//    this.setArgumentsMin( 1 );
-//    this.setArgumentsMax( 255 );
-//    this.setFormat( this.formatType.noneFormat );
-
     this.name = "COUNT";
     this.type = cElementType.func;
     this.value = null;
@@ -1018,7 +1002,6 @@ function cCOUNT() {
         noneFormat:-2
     };
     this.numFormat = this.formatType.noneFormat;
-
 }
 
 cCOUNT.prototype = Object.create( cBaseFunction.prototype );
@@ -1144,7 +1127,7 @@ function cCOUNTBLANK() {
 
 }
 
-cCOUNTBLANK.prototype = Object.create( cBaseFunction.prototype )
+cCOUNTBLANK.prototype = Object.create( cBaseFunction.prototype );
 cCOUNTBLANK.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
     if ( arg0 instanceof cArea || arg0 instanceof cArea3D )
@@ -1154,13 +1137,13 @@ cCOUNTBLANK.prototype.Calculate = function ( arg ) {
     }
     else
         return this.value = new cError( cErrorType.bad_reference );
-}
+};
 cCOUNTBLANK.prototype.getInfo = function () {
     return {
         name:this.name,
         args:"( argument-list )"
     };
-}
+};
 
 function cCOUNTIF() {
 //    cBaseFunction.call( this, "COUNTIF" );
@@ -1181,7 +1164,7 @@ function cCOUNTIF() {
 
 }
 
-cCOUNTIF.prototype = Object.create( cBaseFunction.prototype )
+cCOUNTIF.prototype = Object.create( cBaseFunction.prototype );
 cCOUNTIF.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], arg1 = arg[1], _count = 0, valueForSearching;
     if ( !(arg0 instanceof cRef || arg0 instanceof cRef3D || arg0 instanceof cArea || arg0 instanceof cArea3D) ) {
@@ -1230,19 +1213,19 @@ cCOUNTIF.prototype.Calculate = function ( arg ) {
     }
 
     return this.value = new cNumber( _count );
-}
+};
 cCOUNTIF.prototype.getInfo = function () {
     return {
         name:this.name,
         args:"( cell-range, selection-criteria )"
     };
-}
+};
 
 function cCOUNTIFS() {
     cBaseFunction.call( this, "COUNTIFS" );
 }
 
-cCOUNTIFS.prototype = Object.create( cBaseFunction.prototype )
+cCOUNTIFS.prototype = Object.create( cBaseFunction.prototype );
 
 function cCOVAR() {
 //    cBaseFunction.call( this, "COVAR" );
@@ -1263,7 +1246,7 @@ function cCOVAR() {
 
 }
 
-cCOVAR.prototype = Object.create( cBaseFunction.prototype )
+cCOVAR.prototype = Object.create( cBaseFunction.prototype );
 cCOVAR.prototype.Calculate = function ( arg ) {
 
     function covar( x, y ) {
@@ -1324,13 +1307,13 @@ cCOVAR.prototype.Calculate = function ( arg ) {
 
     return this.value = covar( arr0, arr1 );
 
-}
+};
 cCOVAR.prototype.getInfo = function () {
     return {
         name:this.name,
         args:"( array-1 , array-2 )"
     };
-}
+};
 
 function cCRITBINOM() {
 //    cBaseFunction.call( this, "CRITBINOM" );
@@ -1351,7 +1334,7 @@ function cCRITBINOM() {
 
 }
 
-cCRITBINOM.prototype = Object.create( cBaseFunction.prototype )
+cCRITBINOM.prototype = Object.create( cBaseFunction.prototype );
 cCRITBINOM.prototype.Calculate = function ( arg ) {
     var n = arg[0], p = arg[1], alpha = arg[2];                    // alpha
 
@@ -1418,13 +1401,13 @@ cCRITBINOM.prototype.Calculate = function ( arg ) {
 
     return this.value = critbinom( n, p, alpha );
 
-}
+};
 cCRITBINOM.prototype.getInfo = function () {
     return {
         name:this.name,
         args:"( number-trials , success-probability , alpha )"
     };
-}
+};
 
 function cDEVSQ() {
 //    cBaseFunction.call( this, "DEVSQ" );
@@ -1445,7 +1428,7 @@ function cDEVSQ() {
 
 }
 
-cDEVSQ.prototype = Object.create( cBaseFunction.prototype )
+cDEVSQ.prototype = Object.create( cBaseFunction.prototype );
 cDEVSQ.prototype.Calculate = function ( arg ) {
 
     function devsq( x ) {
@@ -1506,13 +1489,13 @@ cDEVSQ.prototype.Calculate = function ( arg ) {
     }
     return this.value = devsq( arr0 );
 
-}
+};
 cDEVSQ.prototype.getInfo = function () {
     return {
         name:this.name,
         args:"( argument-list )"
     };
-}
+};
 
 function cEXPONDIST() {
 //    cBaseFunction.call( this, "EXPONDIST" );
@@ -1533,7 +1516,7 @@ function cEXPONDIST() {
 
 }
 
-cEXPONDIST.prototype = Object.create( cBaseFunction.prototype )
+cEXPONDIST.prototype = Object.create( cBaseFunction.prototype );
 cEXPONDIST.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2], arg3 = arg[3];
 
@@ -1574,25 +1557,25 @@ cEXPONDIST.prototype.Calculate = function ( arg ) {
     }
     else
         return this.value = new cNumber( arg1.getValue() * Math.exp( -arg1.getValue() * arg0.getValue() ) );
-}
+};
 cEXPONDIST.prototype.getInfo = function () {
     return {
         name:this.name,
         args:"( x , lambda , cumulative-flag )"
     };
-}
+};
 
 function cFDIST() {
     cBaseFunction.call( this, "FDIST" );
 }
 
-cFDIST.prototype = Object.create( cBaseFunction.prototype )
+cFDIST.prototype = Object.create( cBaseFunction.prototype );
 
 function cFINV() {
     cBaseFunction.call( this, "FINV" );
 }
 
-cFINV.prototype = Object.create( cBaseFunction.prototype )
+cFINV.prototype = Object.create( cBaseFunction.prototype );
 
 function cFISHER() {
 //    cBaseFunction.call( this, "FISHER" );
@@ -1613,7 +1596,7 @@ function cFISHER() {
 
 }
 
-cFISHER.prototype = Object.create( cBaseFunction.prototype )
+cFISHER.prototype = Object.create( cBaseFunction.prototype );
 cFISHER.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
 
@@ -1644,13 +1627,13 @@ cFISHER.prototype.Calculate = function ( arg ) {
     }
     return this.value = arg0;
 
-}
+};
 cFISHER.prototype.getInfo = function () {
     return {
         name:this.name,
         args:"( number )"
     };
-}
+};
 
 function cFISHERINV() {
 //    cBaseFunction.call( this, "FISHERINV" );
@@ -1671,7 +1654,7 @@ function cFISHERINV() {
 
 }
 
-cFISHERINV.prototype = Object.create( cBaseFunction.prototype )
+cFISHERINV.prototype = Object.create( cBaseFunction.prototype );
 cFISHERINV.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
 
@@ -1702,13 +1685,13 @@ cFISHERINV.prototype.Calculate = function ( arg ) {
     }
     return this.value = arg0;
 
-}
+};
 cFISHERINV.prototype.getInfo = function () {
     return {
         name:this.name,
         args:"( number )"
     };
-}
+};
 
 function cFORECAST() {
 //    cBaseFunction.call( this, "FORECAST" );
@@ -1836,7 +1819,7 @@ function cFREQUENCY() {
 
 }
 
-cFREQUENCY.prototype = Object.create( cBaseFunction.prototype )
+cFREQUENCY.prototype = Object.create( cBaseFunction.prototype );
 cFREQUENCY.prototype.Calculate = function ( arg ) {
 
     function frequency( A, B ) {
@@ -2105,7 +2088,7 @@ function cHARMEAN() {
 
 }
 
-cHARMEAN.prototype = Object.create( cBaseFunction.prototype )
+cHARMEAN.prototype = Object.create( cBaseFunction.prototype );
 cHARMEAN.prototype.Calculate = function ( arg ) {
 
     function harmmean( x ) {
@@ -2194,7 +2177,7 @@ function cHYPGEOMDIST() {
 
 }
 
-cHYPGEOMDIST.prototype = Object.create( cBaseFunction.prototype )
+cHYPGEOMDIST.prototype = Object.create( cBaseFunction.prototype );
 cHYPGEOMDIST.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2], arg3 = arg[3];
 
@@ -2248,13 +2231,13 @@ cHYPGEOMDIST.prototype.Calculate = function ( arg ) {
     return this.value = new cNumber( Math.binomCoeff( arg2.getValue(), arg0.getValue() ) * Math.binomCoeff( arg3.getValue() - arg2.getValue(), arg1.getValue() - arg0.getValue() ) /
         Math.binomCoeff( arg3.getValue(), arg1.getValue() ) );
 
-}
+};
 cHYPGEOMDIST.prototype.getInfo = function () {
     return {
         name:this.name,
         args:"( sample-successes , number-sample , population-successes , number-population )"
     };
-}
+};
 
 function cINTERCEPT() {
 //    cBaseFunction.call( this, "INTERCEPT" );
@@ -2275,7 +2258,7 @@ function cINTERCEPT() {
 
 }
 
-cINTERCEPT.prototype = Object.create( cBaseFunction.prototype )
+cINTERCEPT.prototype = Object.create( cBaseFunction.prototype );
 cINTERCEPT.prototype.Calculate = function ( arg ) {
 
     function intercept( y, x ) {
@@ -2370,7 +2353,7 @@ function cKURT() {
 
 }
 
-cKURT.prototype = Object.create( cBaseFunction.prototype )
+cKURT.prototype = Object.create( cBaseFunction.prototype );
 cKURT.prototype.Calculate = function ( arg ) {
 
     function kurt( x ) {
@@ -2450,98 +2433,92 @@ cKURT.prototype.getInfo = function () {
     };
 };
 
-function cLARGE() {
-//    cBaseFunction.call( this, "LARGE" );
-//    this.setArgumentsMin( 2 );
-//    this.setArgumentsMax( 2 );
-//    this.setFormat( this.formatType.noneFormat );
+    function cLARGE() {
+        this.name = "LARGE";
+        this.type = cElementType.func;
+        this.value = null;
+        this.argumentsMin = 2;
+        this.argumentsCurrent = 0;
+        this.argumentsMax = 2;
+        this.formatType = {
+            def: -1, //подразумевается формат первой ячейки входящей в формулу.
+            noneFormat: -2
+        };
+        this.numFormat = this.formatType.noneFormat;
+    }
 
-    this.name = "LARGE";
-    this.type = cElementType.func;
-    this.value = null;
-    this.argumentsMin = 2;
-    this.argumentsCurrent = 0;
-    this.argumentsMax = 2;
-    this.formatType = {
-        def:-1, //подразумевается формат первой ячейки входящей в формулу.
-        noneFormat:-2
-    };
-    this.numFormat = this.formatType.noneFormat;
+    cLARGE.prototype = Object.create(cBaseFunction.prototype);
+    cLARGE.prototype._getValue = function (arg0, arg1) {
+        if (cElementType.error === arg1.type) {
+            return arg1;
+        }
 
-}
+        arg1 = arg1.getValue();
+        if (arg1 <= 0) {
+            return new cError(cErrorType.not_available);
+        }
 
-cLARGE.prototype = Object.create( cBaseFunction.prototype )
-cLARGE.prototype.Calculate = function ( arg ) {
-
-    function frequency( A, k ) {
-
-        var tA = [];
-
-        for ( var i = 0; i < A.length; i++ ) {
-            for ( var j = 0; j < A[i].length; j++ ) {
-                if ( A[i][j] instanceof  cError ) {
-                    return A[i][j];
-                }
-                else if ( A[i][j] instanceof cNumber ) {
-                    tA.push( A[i][j].getValue() );
-                }
-                else if ( A[i][j] instanceof cBool ) {
-                    tA.push( A[i][j].tocNumber().getValue() );
+        var v, tA = [];
+        for (var i = 0; i < arg0.length; i++) {
+            for (var j = 0; j < arg0[i].length; j++) {
+                v = arg0[i][j];
+                if (cElementType.error === v.type) {
+                    return v;
+                } else if (cElementType.number === v.type) {
+                    tA.push(v.getValue());
+                } else if (cElementType.bool === v.type) {
+                    tA.push(v.tocNumber().getValue());
                 }
             }
         }
 
         tA.sort(AscCommon.fSortDescending);
 
-        if ( k.getValue() > tA.length || k.getValue() <= 0 )
-            return new cError( cErrorType.not_available );
-        else
-            return new cNumber( tA[k.getValue() - 1] );
-    }
-
-    var arg0 = arg[0], arg1 = arg[1];
-    if ( arg0 instanceof cArea || arg0 instanceof cArray ) {
-        arg0 = arg0.getMatrix();
-    }
-    else if ( arg0 instanceof cArea3D ) {
-        arg0 = arg0.getMatrix()[0];
-    }
-    else
-        return this.value = new cError( cErrorType.not_available );
-
-
-    if ( arg1 instanceof cArea || arg1 instanceof cArea3D ) {
-        arg1 = arg1.cross( arguments[1].first );
-    }
-    else if ( arg1 instanceof cArray ) {
-        arg1 = arg1.getElement( 0 );
-    }
-
-    arg1 = arg1.tocNumber();
-
-    if ( arg1 instanceof cError ) return this.value = arg1;
-
-    return this.value = frequency( arg0, arg1 );
-
-};
-cLARGE.prototype.getInfo = function () {
-    return {
-        name:this.name,
-        args:"(  array , k )"
+        if (arg1 > tA.length) {
+            return new cError(cErrorType.not_available);
+        } else {
+            return new cNumber(tA[arg1 - 1]);
+        }
     };
-};
+    cLARGE.prototype.Calculate = function (arg) {
+        var arg0 = arg[0], arg1 = arg[1];
+        if (cElementType.cellsRange === arg0.type) {
+            arg0 = arg0.getValuesNoEmpty();
+        } else if (cElementType.array === arg0.type) {
+            arg0 = arg0.getMatrix();
+        } else if (cElementType.cellsRange3D === arg0.type) {
+            arg0 = arg0.getMatrix()[0];
+        } else {
+            return this.value = new cError(cErrorType.not_available);
+        }
+
+
+        if (cElementType.cellsRange === arg1.type || cElementType.cellsRange3D === arg1.type) {
+            arg1 = arg1.cross(arguments[1].first);
+        } else if (cElementType.array === arg1.type) {
+            arg1 = arg1.getElement(0);
+        }
+
+        arg1 = arg1.tocNumber();
+        return this.value = this._getValue(arg0, arg1);
+    };
+    cLARGE.prototype.getInfo = function () {
+        return {
+            name: this.name, args: "(  array , k )"
+        };
+    };
 
 function cLINEST() {
     cBaseFunction.call( this, "LINEST" );
 }
 
-cLINEST.prototype = Object.create( cBaseFunction.prototype )
+cLINEST.prototype = Object.create( cBaseFunction.prototype );
 
 function cLOGEST() {
     cBaseFunction.call( this, "LOGEST" );
 }
 
-cLOGEST.prototype = Object.create( cBaseFunction.prototype )
+cLOGEST.prototype = Object.create( cBaseFunction.prototype );
 
 function cLOGINV() {
 //    cBaseFunction.call( this, "LOGINV" );
@@ -2562,7 +2539,7 @@ function cLOGINV() {
 
 }
 
-cLOGINV.prototype = Object.create( cBaseFunction.prototype )
+cLOGINV.prototype = Object.create( cBaseFunction.prototype );
 cLOGINV.prototype.Calculate = function ( arg ) {
 
     var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2];
@@ -2604,13 +2581,13 @@ cLOGINV.prototype.Calculate = function ( arg ) {
     if ( arg2 instanceof cError ) return this.value = arg2;
 
     return this.value = loginv( arg0.getValue(), arg1.getValue(), arg2.getValue() );
-}
+};
 cLOGINV.prototype.getInfo = function () {
     return {
         name:this.name,
         args:"( x , mean , standard-deviation )"
     };
-}
+};
 
 function cLOGNORMDIST() {
 //    cBaseFunction.call( this, "LOGNORMDIST" );
@@ -2631,7 +2608,7 @@ function cLOGNORMDIST() {
 
 }
 
-cLOGNORMDIST.prototype = Object.create( cBaseFunction.prototype )
+cLOGNORMDIST.prototype = Object.create( cBaseFunction.prototype );
 cLOGNORMDIST.prototype.Calculate = function ( arg ) {
 
     var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2];
@@ -2673,13 +2650,13 @@ cLOGNORMDIST.prototype.Calculate = function ( arg ) {
     if ( arg2 instanceof cError ) return this.value = arg2;
 
     return this.value = normdist( arg0.getValue(), arg1.getValue(), arg2.getValue() );
-}
+};
 cLOGNORMDIST.prototype.getInfo = function () {
     return {
         name:this.name,
         args:"( x , mean , standard-deviation )"
     };
-}
+};
 
 function cMAX() {
 //    cBaseFunction.call( this, "MAX" );
@@ -2788,7 +2765,7 @@ function cMAXA() {
 
 }
 
-cMAXA.prototype = Object.create( cBaseFunction.prototype )
+cMAXA.prototype = Object.create( cBaseFunction.prototype );
 cMAXA.prototype.Calculate = function ( arg ) {
     var argI, argIVal, max = Number.NEGATIVE_INFINITY;
     for ( var i = 0; i < this.argumentsCurrent; i++ ) {
@@ -2857,7 +2834,7 @@ cMAXA.prototype.getInfo = function () {
         name:this.name,
         args:"(number1, number2, ...)"
     };
-}
+};
 
 function cMEDIAN() {
 //    cBaseFunction.call( this, "MEDIAN" );
@@ -2878,7 +2855,7 @@ function cMEDIAN() {
 
 }
 
-cMEDIAN.prototype = Object.create( cBaseFunction.prototype )
+cMEDIAN.prototype = Object.create( cBaseFunction.prototype );
 cMEDIAN.prototype.Calculate = function ( arg ) {
 
     function median( x ) {
@@ -2964,7 +2941,7 @@ function cMIN() {
 
 }
 
-cMIN.prototype = Object.create( cBaseFunction.prototype )
+cMIN.prototype = Object.create( cBaseFunction.prototype );
 cMIN.prototype.Calculate = function ( arg ) {
     var argI, argIVal, min = Number.POSITIVE_INFINITY;
     for ( var i = 0; i < this.argumentsCurrent; i++ ) {
@@ -3032,7 +3009,7 @@ cMIN.prototype.getInfo = function () {
         name:this.name,
         args:"(number1, number2, ...)"
     };
-}
+};
 
 function cMINA() {
 //    cBaseFunction.call( this, "MINA" );
@@ -3053,7 +3030,7 @@ function cMINA() {
 
 }
 
-cMINA.prototype = Object.create( cBaseFunction.prototype )
+cMINA.prototype = Object.create( cBaseFunction.prototype );
 cMINA.prototype.Calculate = function ( arg ) {
     var argI, argIVal, min = Number.POSITIVE_INFINITY;
     for ( var i = 0; i < this.argumentsCurrent; i++ ) {
@@ -3124,7 +3101,7 @@ cMINA.prototype.getInfo = function () {
         name:this.name,
         args:"(number1, number2, ...)"
     };
-}
+};
 
 function cMODE() {
 //    cBaseFunction.call( this, "MODE" );
@@ -3145,7 +3122,7 @@ function cMODE() {
 
 }
 
-cMODE.prototype = Object.create( cBaseFunction.prototype )
+cMODE.prototype = Object.create( cBaseFunction.prototype );
 cMODE.prototype.Calculate = function ( arg ) {
 
     function mode( x ) {
@@ -3251,7 +3228,7 @@ function cNEGBINOMDIST() {
 
 }
 
-cNEGBINOMDIST.prototype = Object.create( cBaseFunction.prototype )
+cNEGBINOMDIST.prototype = Object.create( cBaseFunction.prototype );
 cNEGBINOMDIST.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2];
 
@@ -3296,13 +3273,13 @@ cNEGBINOMDIST.prototype.Calculate = function ( arg ) {
 
     return this.value = negbinomdist( arg0, arg1, arg2 );
 
-}
+};
 cNEGBINOMDIST.prototype.getInfo = function () {
     return {
         name:this.name,
         args:"( number-failures , number-successes , success-probability )"
     };
-}
+};
 
 function cNORMDIST() {
 //    cBaseFunction.call( this, "NORMDIST" );
@@ -3323,7 +3300,7 @@ function cNORMDIST() {
 
 }
 
-cNORMDIST.prototype = Object.create( cBaseFunction.prototype )
+cNORMDIST.prototype = Object.create( cBaseFunction.prototype );
 cNORMDIST.prototype.Calculate = function ( arg ) {
 
     var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2], arg3 = arg[3];
@@ -3379,13 +3356,13 @@ cNORMDIST.prototype.Calculate = function ( arg ) {
 
 
     return this.value = normdist( arg0.getValue(), arg1.getValue(), arg2.getValue(), arg3.toBool() );
-}
+};
 cNORMDIST.prototype.getInfo = function () {
     return {
         name:this.name,
         args:"( x , mean , standard-deviation , cumulative-flag )"
     };
-}
+};
 
 function cNORMINV() {
 //    cBaseFunction.call( this, "NORMINV" );
@@ -3406,7 +3383,7 @@ function cNORMINV() {
 
 }
 
-cNORMINV.prototype = Object.create( cBaseFunction.prototype )
+cNORMINV.prototype = Object.create( cBaseFunction.prototype );
 cNORMINV.prototype.Calculate = function ( arg ) {
 
     var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2];
@@ -3448,13 +3425,13 @@ cNORMINV.prototype.Calculate = function ( arg ) {
     if ( arg2 instanceof cError ) return this.value = arg2;
 
     return this.value = norminv( arg0.getValue(), arg1.getValue(), arg2.getValue() );
-}
+};
 cNORMINV.prototype.getInfo = function () {
     return {
         name:this.name,
         args:"( x , mean , standard-deviation )"
     };
-}
+};
 
 function cNORMSDIST() {
 //    cBaseFunction.call( this, "NORMSDIST" );
@@ -3475,7 +3452,7 @@ function cNORMSDIST() {
 
 }
 
-cNORMSDIST.prototype = Object.create( cBaseFunction.prototype )
+cNORMSDIST.prototype = Object.create( cBaseFunction.prototype );
 cNORMSDIST.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
     if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
@@ -3500,13 +3477,13 @@ cNORMSDIST.prototype.Calculate = function ( arg ) {
         return this.value = isNaN( a ) ? new cError( cErrorType.not_numeric ) : new cNumber( a );
     }
     return this.value = arg0;
-}
+};
 cNORMSDIST.prototype.getInfo = function () {
     return {
         name:this.name,
         args:"(number)"
     };
-}
+};
 
 function cNORMSINV() {
 //    cBaseFunction.call( this, "NORMSINV" );
@@ -3527,7 +3504,7 @@ function cNORMSINV() {
 
 }
 
-cNORMSINV.prototype = Object.create( cBaseFunction.prototype )
+cNORMSINV.prototype = Object.create( cBaseFunction.prototype );
 cNORMSINV.prototype.Calculate = function ( arg ) {
 
     function normsinv( x ) {
@@ -3560,13 +3537,13 @@ cNORMSINV.prototype.Calculate = function ( arg ) {
         return this.value = isNaN( a ) ? new cError( cErrorType.not_available ) : new cNumber( a );
     }
     return this.value = arg0;
-}
+};
 cNORMSINV.prototype.getInfo = function () {
     return {
         name:this.name,
         args:"( probability )"
     };
-}
+};
 
 function cPEARSON() {
 //    cBaseFunction.call( this, "PEARSON" );
@@ -3587,7 +3564,7 @@ function cPEARSON() {
 
 }
 
-cPEARSON.prototype = Object.create( cBaseFunction.prototype )
+cPEARSON.prototype = Object.create( cBaseFunction.prototype );
 cPEARSON.prototype.Calculate = function ( arg ) {
 
     function pearson( x, y ) {
@@ -3682,7 +3659,7 @@ function cPERCENTILE() {
 
 }
 
-cPERCENTILE.prototype = Object.create( cBaseFunction.prototype )
+cPERCENTILE.prototype = Object.create( cBaseFunction.prototype );
 cPERCENTILE.prototype.Calculate = function ( arg ) {
 
     function percentile( A, k ) {
@@ -3755,7 +3732,7 @@ cPERCENTILE.prototype.getInfo = function () {
         name:this.name,
         args:"(  array , k )"
     };
-}
+};
 
 function cPERCENTRANK() {
 //    cBaseFunction.call( this, "PERCENTRANK" );
@@ -3776,7 +3753,7 @@ function cPERCENTRANK() {
 
 }
 
-cPERCENTRANK.prototype = Object.create( cBaseFunction.prototype )
+cPERCENTRANK.prototype = Object.create( cBaseFunction.prototype );
 cPERCENTRANK.prototype.Calculate = function ( arg ) {
 
     function percentrank( A, x, k ) {
@@ -3872,13 +3849,13 @@ cPERCENTRANK.prototype.Calculate = function ( arg ) {
 
     return this.value = percentrank( arr0, arg1, arg2 );
 
-}
+};
 cPERCENTRANK.prototype.getInfo = function () {
     return {
         name:this.name,
         args:"( array , x [ , significance ]  )"
     };
-}
+};
 
 function cPERMUT() {
 //    cBaseFunction.call( this, "PERMUT" );
@@ -3899,7 +3876,7 @@ function cPERMUT() {
 
 }
 
-cPERMUT.prototype = Object.create( cBaseFunction.prototype )
+cPERMUT.prototype = Object.create( cBaseFunction.prototype );
 cPERMUT.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], arg1 = arg[1];
     if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
@@ -3969,13 +3946,13 @@ cPERMUT.prototype.Calculate = function ( arg ) {
         return this.value = new cError( cErrorType.not_numeric );
 
     return this.value = new cNumber( Math.permut( arg0.getValue(), arg1.getValue() ) );
-}
+};
 cPERMUT.prototype.getInfo = function () {
     return {
         name:this.name,
         args:"( number , number-chosen )"
     };
-}
+};
 
 function cPOISSON() {
 //    cBaseFunction.call( this, "POISSON" );
@@ -3996,7 +3973,7 @@ function cPOISSON() {
 
 }
 
-cPOISSON.prototype = Object.create( cBaseFunction.prototype )
+cPOISSON.prototype = Object.create( cBaseFunction.prototype );
 cPOISSON.prototype.Calculate = function ( arg ) {
 
     function poisson( x, l, cumulativeFlag ) {
@@ -4052,13 +4029,13 @@ cPOISSON.prototype.Calculate = function ( arg ) {
 
     return this.value = new cNumber( poisson( arg0, arg1, arg2 ) );
 
-}
+};
 cPOISSON.prototype.getInfo = function () {
     return {
         name:this.name,
         args:"( x , mean , cumulative-flag )"
     };
-}
+};
 
 function cPROB() {
 //    cBaseFunction.call( this, "PROB" );
@@ -4080,7 +4057,7 @@ function cPROB() {
 
 }
 
-cPROB.prototype = Object.create( cBaseFunction.prototype )
+cPROB.prototype = Object.create( cBaseFunction.prototype );
 cPROB.prototype.Calculate = function ( arg ) {
 
     function prob( x, p, l, u ) {
@@ -4201,7 +4178,7 @@ function cQUARTILE() {
 
 }
 
-cQUARTILE.prototype = Object.create( cBaseFunction.prototype )
+cQUARTILE.prototype = Object.create( cBaseFunction.prototype );
 cQUARTILE.prototype.Calculate = function ( arg ) {
 
     function quartile( A, k ) {
@@ -4858,7 +4835,7 @@ function cSTDEVA() {
 
 }
 
-cSTDEVA.prototype = Object.create( cBaseFunction.prototype )
+cSTDEVA.prototype = Object.create( cBaseFunction.prototype );
 cSTDEVA.prototype.Calculate = function ( arg ) {
     var count = 0, sum = new cNumber( 0 ), member = [];
     for ( var i = 0; i < arg.length; i++ ) {
@@ -5023,7 +5000,7 @@ function cSTDEVPA() {
 
 }
 
-cSTDEVPA.prototype = Object.create( cBaseFunction.prototype )
+cSTDEVPA.prototype = Object.create( cBaseFunction.prototype );
 cSTDEVPA.prototype.Calculate = function ( arg ) {
 
     function _var( x ) {
@@ -5132,7 +5109,7 @@ function cSTEYX() {
 
 }
 
-cSTEYX.prototype = Object.create( cBaseFunction.prototype )
+cSTEYX.prototype = Object.create( cBaseFunction.prototype );
 cSTEYX.prototype.Calculate = function ( arg ) {
 
     function steyx( y, x ) {
@@ -5213,19 +5190,19 @@ function cTDIST() {
     cBaseFunction.call( this, "TDIST" );
 }
 
-cTDIST.prototype = Object.create( cBaseFunction.prototype )
+cTDIST.prototype = Object.create( cBaseFunction.prototype );
 
 function cTINV() {
     cBaseFunction.call( this, "TINV" );
 }
 
-cTINV.prototype = Object.create( cBaseFunction.prototype )
+cTINV.prototype = Object.create( cBaseFunction.prototype );
 
 function cTREND() {
     cBaseFunction.call( this, "TREND" );
 }
 
-cTREND.prototype = Object.create( cBaseFunction.prototype )
+cTREND.prototype = Object.create( cBaseFunction.prototype );
 
 function cTRIMMEAN() {
     cBaseFunction.call( this, "TRIMMEAN" );

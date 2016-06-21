@@ -4923,14 +4923,15 @@
 				{
 					if(!this.api.DocumentReaderMode)
 					{
+						var nDocPosType = oDocument.Get_DocPosType();
 						var Def_pPr = oDocument.Styles.Default.ParaPr;
-						if(docpostype_HdrFtr === oDocument.CurPos.Type)
+						if(docpostype_HdrFtr === nDocPosType)
 						{
 							if(null != oDocument.HdrFtr && null != oDocument.HdrFtr.CurHdrFtr && null != oDocument.HdrFtr.CurHdrFtr.Content)
 								oDocument = oDocument.HdrFtr.CurHdrFtr.Content;
 						}
 
-						if(oDocument.CurPos.Type === docpostype_DrawingObjects)
+						if(nDocPosType === docpostype_DrawingObjects)
 						{
 							var content = oDocument.DrawingObjects.getTargetDocContent();
 							if(content)

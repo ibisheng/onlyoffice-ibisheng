@@ -156,9 +156,6 @@
 		this.isUpdateValue = true;							// Обновлять ли состояние строки при вводе в TextArea
 
 		// Функции, которые будем отключать
-		this.fKeyDown = null;
-		this.fKeyPress = null;
-		this.fKeyUp = null;
 		this.fKeyMouseUp = null;
 		this.fKeyMouseMove = null;
 		//-----------------
@@ -264,15 +261,6 @@
 			}, false );
 		}
 
-		this.fKeyDown = function ( event ) {
-			return t._onWindowKeyDown( event );
-		};
-		this.fKeyPress = function () {
-			return t._onWindowKeyPress.apply( t, arguments );
-		};
-		this.fKeyUp = function () {
-			return t._onWindowKeyUp.apply( t, arguments );
-		};
 		this.fKeyMouseUp = function () {
 			return t._onWindowMouseUp.apply( t, arguments );
 		};
@@ -298,9 +286,6 @@
 
 		this.isOpened = true;
 		if ( window.addEventListener ) {
-			window.addEventListener( "keydown", this.fKeyDown, false );
-			window.addEventListener( "keypress", this.fKeyPress, false );
-			window.addEventListener( "keyup", this.fKeyUp, false );
 			window.addEventListener( "mouseup", this.fKeyMouseUp, false );
 			window.addEventListener( "mousemove", this.fKeyMouseMove, false );
 		}
@@ -377,9 +362,6 @@
 
 		if ( !window['IS_NATIVE_EDITOR'] ) {
 			if ( window.removeEventListener ) {
-				window.removeEventListener( "keydown", this.fKeyDown, false );
-				window.removeEventListener( "keypress", this.fKeyPress, false );
-				window.removeEventListener( "keyup", this.fKeyUp, false );
 				window.removeEventListener( "mouseup", this.fKeyMouseUp, false );
 				window.removeEventListener( "mousemove", this.fKeyMouseMove, false );
 			}

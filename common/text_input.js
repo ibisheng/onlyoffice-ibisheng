@@ -34,6 +34,20 @@
 
 (function(window, undefined)
 {
+	///
+	// такие методы нужны в апи
+	// baseEditorsApi.prototype.Begin_CompositeInput = function()
+	// baseEditorsApi.prototype.Replace_CompositeText = function(arrCharCodes)
+	// baseEditorsApi.prototype.Set_CursorPosInCompositeText = function(nPos)
+	// baseEditorsApi.prototype.Get_CursorPosInCompositeText = function()
+	// baseEditorsApi.prototype.End_CompositeInput = function()
+	// baseEditorsApi.prototype.Get_MaxCursorPosInCompositeText = function()
+
+	// baseEditorsApi.prototype.onKeyDown = function(e)
+	// baseEditorsApi.prototype.onKeyPress = function(e)
+	// baseEditorsApi.prototype.onKeyUp = function(e)
+	///
+
 	var c_oCompositionState = {
 		start 	: 0,
 		process : 1,
@@ -52,10 +66,14 @@
 
 		this.HtmlAreaOffset = 60;
 
-		this.Listener 	= null;
 		this.LockerTargetTimer = -1;
 
 		this.KeyDownFlag = false;
+		this.TextInputAfterComposition = false;
+
+		this.IsLockTargetMode = false;
+
+		this.IsUseFirstTextInputAfterComposition = false;
 	}
 
 	CTextInput.prototype =
@@ -101,36 +119,28 @@
 			this.HtmlArea["onkeydown"] 	= function(e) { return oThis.onKeyDown(e); };
 			this.HtmlArea["onkeypress"] = function(e) { return oThis.onKeyPress(e); };
 			this.HtmlArea["onkeyup"] 	= function(e) { return oThis.onKeyUp(e); };
-			this.HtmlArea["oninput"] 	= function(e) { return oThis.onInput(e); };
+
+			this.HtmlArea.addEventListener("input", function(e) { return oThis.onInput(e); }, false);
+			this.HtmlArea.addEventListener("textInput", function(e) { return oThis.onTextInput(e); }, false);
 
 			this.HtmlArea.addEventListener("compositionstart", function(e) { return oThis.onCompositionStart(e); }, false);
 			this.HtmlArea.addEventListener("compositionupdate", function(e) { return oThis.onCompositionUpdate(e); }, false);
 			this.HtmlArea.addEventListener("compositionend", function(e) { return oThis.onCompositionEnd(e); }, false);
 
-			this.Listener = this.Api.WordControl.m_oLogicDocument;
-
-			if (false)
-			{
-				// DEBUG_MODE
-				this.HtmlAreaOffset = 0;
-				this.HtmlArea.style.top = "0px";
-				this.HtmlArea.style.color = "black";
-				this.HtmlDiv.style.zIndex = 5;
-				this.HtmlDiv.style.width = "200px";
-			}
+			this.show(false);
 
 			// TODO:
 			setInterval(function(){
-				if (oThis.Api.asc_IsFocus())
+				if (oThis.Api.asc_IsFocus() && !AscCommon.g_clipboardBase.IsFocus() && !AscCommon.g_clipboardBase.IsWorking())
 					oThis.HtmlArea.focus();
 			}, 10);
 		},
 
-		move : function()
+		move : function(x, y)
 		{
 			var oTarget = document.getElementById(this.TargetId);
-			var xPos = parseInt(oTarget.style.left);
-			var yPos = parseInt(oTarget.style.top) + parseInt(oTarget.style.height);
+			var xPos = x ? x : parseInt(oTarget.style.left);
+			var yPos = (y ? y : parseInt(oTarget.style.top)) + parseInt(oTarget.style.height);
 
 			this.HtmlDiv.style.left = xPos + "px";
 			this.HtmlDiv.style.top = yPos + this.HtmlAreaOffset + "px"; // еще бы сдвинуться на высоту строки
@@ -143,6 +153,19 @@
 			this.HtmlArea.value = "";
 		},
 
+		show : function(isShow)
+		{
+			if (isShow)
+			{
+				// DEBUG_MODE
+				this.HtmlAreaOffset = 0;
+				this.HtmlArea.style.top = "0px";
+				this.HtmlArea.style.color = "black";
+				this.HtmlDiv.style.zIndex = 5;
+				this.HtmlDiv.style.width = "200px";
+			}
+		},
+
 		onInput : function(e)
 		{
 			if (AscCommon.AscBrowser.isMozilla)
@@ -152,11 +175,37 @@
 					this.checkTargetPosition();
 				}
 			}
+
+			if (!this.KeyDownFlag && c_oCompositionState.end == this.compositionState && !this.TextInputAfterComposition && this.HtmlArea.value != "")
+			{
+				this.Api.Begin_CompositeInput();
+				this.checkCompositionData(this.HtmlArea.value);
+				this.Api.Replace_CompositeText(this.compositionValue);
+				this.Api.End_CompositeInput();
+			}
+
+			this.TextInputAfterComposition = false;
+			if (c_oCompositionState.end == this.compositionState)
+				this.clear();
+		},
+
+		onTextInput : function(e)
+		{
+			if (this.IsUseFirstTextInputAfterComposition)
+			{
+				this.onCompositionEnd(e);
+				this.IsUseFirstTextInputAfterComposition = false;
+			}
 		},
 
 		onKeyDown : function(e)
 		{
-			return this.Api.WordControl.onKeyDown(e);
+			// некоторые рукописные вводы не присылают keyUp
+			var _code = e.keyCode;
+			if (_code != 8 && _code != 46)
+				this.KeyDownFlag = true;
+
+			return this.Api.onKeyDown(e);
 		},
 
 		onKeyPress : function(e)
@@ -164,13 +213,15 @@
 			if (c_oCompositionState.end != this.compositionState)
 				return;
 
-			return this.Api.WordControl.onKeyPress(e);
+			return this.Api.onKeyPress(e);
 		},
 
 		onKeyUp : function(e)
 		{
+			this.KeyDownFlag = false;
+
 			if (c_oCompositionState.end == this.compositionState)
-				return this.Api.WordControl.onKeyUp(e);
+				return this.Api.onKeyUp(e);
 
 			if (AscCommon.AscBrowser.isChrome ||
 				AscCommon.AscBrowser.isSafari ||
@@ -184,13 +235,16 @@
 		{
 			var _offset = this.HtmlArea.selectionEnd;
 			_offset -= (this.HtmlArea.value.length - this.compositionValue.length);
-			this.Listener.Set_CursorPosInCompositeText(_offset);
+			this.Api.Set_CursorPosInCompositeText(_offset);
 
 			this.unlockTarget();
 		},
 
 		lockTarget : function()
 		{
+			if (!this.IsLockTargetMode)
+				return;
+
 			if (-1 != this.LockerTargetTimer)
 				clearTimeout(this.LockerTargetTimer);
 
@@ -202,6 +256,9 @@
 
 		unlockTarget : function()
 		{
+			if (!this.IsLockTargetMode)
+				return;
+
 			if (-1 != this.LockerTargetTimer)
 				clearTimeout(this.LockerTargetTimer);
 			this.LockerTargetTimer = -1;
@@ -211,19 +268,17 @@
 
 		onCompositionStart : function(e)
 		{
-			if (!this.Listener)
-				this.Listener = this.Api.WordControl.m_oLogicDocument;
-
 			this.compositionState = c_oCompositionState.start;
-			this.Listener.Begin_CompositeInput();
+			this.Api.Begin_CompositeInput();
 		},
 
-		onCompositionUpdate : function(e)
+		onCompositionUpdate : function(e, isLockTarget)
 		{
 			var _old = this.compositionValue.splice(0);
 			this.checkCompositionData(e.data);
 
-			var _isEqual = (_old.length == this.compositionValue.length);
+			var _isEqualLen = (_old.length == this.compositionValue.length);
+			var _isEqual = _isEqualLen;
 			if (_isEqual)
 			{
 				var _len = this.compositionValue.length;
@@ -237,19 +292,57 @@
 				}
 			}
 
-			this.lockTarget();
+			if (isLockTarget !== false)
+				this.lockTarget();
+
+			var _isNeedSavePos = !this.IsLockTargetMode;
 			if (!_isEqual)
-				this.Listener.Replace_CompositeText(this.compositionValue);
+			{
+				var _old = 0;
+				var _max = 0;
+				if (_isNeedSavePos)
+				{
+					_old = this.Api.Get_CursorPosInCompositeText();
+					_max = this.Api.Get_MaxCursorPosInCompositeText();
+				}
+				this.Api.Replace_CompositeText(this.compositionValue);
+				if (_isNeedSavePos)
+				{
+					if (_old != _max)
+						this.Api.Set_CursorPosInCompositeText(_old);
+				}
+			}
 
 			this.compositionState = c_oCompositionState.process;
 		},
 
 		onCompositionEnd : function(e)
 		{
-			this.Listener.Set_CursorPosInCompositeText(1000); // max
+			// chrome, linux: всегда приходит пустая дата
+			if (!this.IsUseFirstTextInputAfterComposition)
+			{
+				if (e.data === undefined || (e.data == "" && (this.compositionValue.length != 0)))
+				{
+					this.IsUseFirstTextInputAfterComposition = true;
+					return;
+				}
+				else
+				{
+					this.onCompositionUpdate(e, false);
+				}
+			}
+			else
+			{
+				this.onCompositionUpdate(e, false);
+			}
+
+			this.Api.Set_CursorPosInCompositeText(1000); // max
 
 			this.clear();
-			this.Listener.End_CompositeInput();
+			this.Api.End_CompositeInput();
+
+			this.unlockTarget();
+			this.TextInputAfterComposition = true;
 		},
 
 		checkCompositionData : function(data)
@@ -281,4 +374,11 @@
 
 	window['AscCommon'] = window['AscCommon'] || {};
 	window['AscCommon'].CTextInput = CTextInput;
+
+	window['AscCommon'].InitBrowserInputContext = function(api, target_id)
+	{
+		window['AscCommon'].g_inputContext = new CTextInput(api);
+		window['AscCommon'].g_inputContext.init(target_id);
+		window['AscCommon'].g_clipboardBase.Init(api);
+	};
 })(window);

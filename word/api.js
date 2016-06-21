@@ -846,9 +846,6 @@ background-repeat: no-repeat;\
 			PasteElementsId.PASTE_ELEMENT_ID     = "wrd_pastebin";
 			PasteElementsId.ELEMENT_DISPAY_STYLE = "none";
 		}
-
-		if (AscCommon.AscBrowser.isSafariMacOs)
-			setInterval(AscCommon.SafariIntervalFocus, 10);
 	};
 	// Callbacks
 	/* все имена callback'оф начинаются с On. Пока сделаны:
@@ -1875,7 +1872,7 @@ background-repeat: no-repeat;\
 
 			return;
 		}
-		return AscCommon.Editor_Copy_Button(this);
+		return AscCommon.g_clipboardBase.Button_Copy();
 	};
 	asc_docs_api.prototype.Update_ParaTab = function(Default_Tab, ParaTabs)
 	{
@@ -1895,7 +1892,7 @@ background-repeat: no-repeat;\
 
 			return;
 		}
-		return AscCommon.Editor_Copy_Button(this, true);
+		return AscCommon.g_clipboardBase.Button_Cut();
 	};
 	asc_docs_api.prototype.Paste          = function()
 	{
@@ -1914,23 +1911,10 @@ background-repeat: no-repeat;\
 
 		if (false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content))
 		{
-			if (!window.GlobalPasteFlag)
-			{
-				if (!AscCommon.AscBrowser.isSafariMacOs)
-				{
-					window.GlobalPasteFlag = true;
-					return AscCommon.Editor_Paste_Button(this);
-				}
-				else
-				{
-					if (0 === window.GlobalPasteFlagCounter)
-					{
-						AscCommon.SafariIntervalFocus();
-						window.GlobalPasteFlag = true;
-						return AscCommon.Editor_Paste_Button(this);
-					}
-				}
-			}
+			if (AscCommon.g_clipboardBase.IsWorking())
+				return false;
+
+			return AscCommon.g_clipboardBase.Button_Paste();
 		}
 	};
 
@@ -6896,28 +6880,7 @@ background-repeat: no-repeat;\
 			// там при LongActions теряется фокус и вставляются пробелы
 			this.decrementCounterLongAction();
 			this.pasteCallback();
-			window.GlobalPasteFlag        = false;
-			window.GlobalPasteFlagCounter = 0;
 			this.pasteCallback            = null;
-
-			if (-1 != window.PasteEndTimerId)
-			{
-				clearTimeout(window.PasteEndTimerId);
-				window.PasteEndTimerId = -1;
-
-				document.body.style.MozUserSelect          = "none";
-				document.body.style["-khtml-user-select"]  = "none";
-				document.body.style["-o-user-select"]      = "none";
-				document.body.style["user-select"]         = "none";
-				document.body.style["-webkit-user-select"] = "none";
-
-				var pastebin = AscCommon.Editor_Paste_GetElem(this, true);
-
-				if (!AscCommon.AscBrowser.isSafariMacOs)
-					pastebin.onpaste = null;
-
-				pastebin.style.display = PasteElementsId.ELEMENT_DISPAY_STYLE;
-			}
 
 			return;
 		}
@@ -7094,10 +7057,10 @@ background-repeat: no-repeat;\
 
 		var bForceRedraw  = false;
 		var LogicDocument = this.WordControl.m_oLogicDocument;
-		if (AscCommonWord.docpostype_HdrFtr !== LogicDocument.CurPos.Type)
+		if (AscCommonWord.docpostype_HdrFtr !== LogicDocument.Get_DocPosType())
 		{
-			LogicDocument.CurPos.Type = AscCommonWord.docpostype_HdrFtr;
-			bForceRedraw              = true;
+			LogicDocument.Set_DocPosType(AscCommonWord.docpostype_HdrFtr);
+			bForceRedraw = true;
 		}
 
 		var oldClickCount            = global_mouseEvent.ClickCount;
@@ -7126,10 +7089,10 @@ background-repeat: no-repeat;\
 
 		var bForceRedraw  = false;
 		var LogicDocument = this.WordControl.m_oLogicDocument;
-		if (AscCommonWord.docpostype_HdrFtr !== LogicDocument.CurPos.Type)
+		if (AscCommonWord.docpostype_HdrFtr !== LogicDocument.Get_DocPosType())
 		{
-			LogicDocument.CurPos.Type = AscCommonWord.docpostype_HdrFtr;
-			bForceRedraw              = true;
+			LogicDocument.Set_DocPosType(AscCommonWord.docpostype_HdrFtr);
+			bForceRedraw = true;
 		}
 
 		var oldClickCount            = global_mouseEvent.ClickCount;
@@ -7923,6 +7886,69 @@ background-repeat: no-repeat;\
 
 		this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_AddSectionBreak);
 		return true;
+	};
+
+	// input
+	asc_docs_api.prototype.Begin_CompositeInput = function()
+	{
+		if (this.WordControl.m_oLogicDocument)
+			return this.WordControl.m_oLogicDocument.Begin_CompositeInput();
+		return null;
+	};
+	asc_docs_api.prototype.Add_CompositeText = function(nCharCode)
+	{
+		if (this.WordControl.m_oLogicDocument)
+			return this.WordControl.m_oLogicDocument.Add_CompositeText(nCharCode);
+		return null;
+	};
+	asc_docs_api.prototype.Remove_CompositeText = function(nCount)
+	{
+		if (this.WordControl.m_oLogicDocument)
+			return this.WordControl.m_oLogicDocument.Remove_CompositeText(nCount);
+		return null;
+	};
+	asc_docs_api.prototype.Replace_CompositeText = function(arrCharCodes)
+	{
+		if (this.WordControl.m_oLogicDocument)
+			return this.WordControl.m_oLogicDocument.Replace_CompositeText(arrCharCodes);
+		return null;
+	};
+	asc_docs_api.prototype.Set_CursorPosInCompositeText = function(nPos)
+	{
+		if (this.WordControl.m_oLogicDocument)
+			return this.WordControl.m_oLogicDocument.Set_CursorPosInCompositeText(nPos);
+		return null;
+	};
+	asc_docs_api.prototype.Get_CursorPosInCompositeText = function()
+	{
+		if (this.WordControl.m_oLogicDocument)
+			return this.WordControl.m_oLogicDocument.Get_CursorPosInCompositeText();
+		return 0;
+	};
+	asc_docs_api.prototype.End_CompositeInput = function()
+	{
+		if (this.WordControl.m_oLogicDocument)
+			return this.WordControl.m_oLogicDocument.End_CompositeInput();
+		return null;
+	};
+	asc_docs_api.prototype.Get_MaxCursorPosInCompositeText = function()
+	{
+		if (this.WordControl.m_oLogicDocument)
+			return this.WordControl.m_oLogicDocument.Get_MaxCursorPosInCompositeText();
+		return 0;
+	};
+
+	asc_docs_api.prototype.onKeyDown = function(e)
+	{
+		return this.WordControl.onKeyDown(e);
+	};
+	asc_docs_api.prototype.onKeyPress = function(e)
+	{
+		return this.WordControl.onKeyPress(e);
+	};
+	asc_docs_api.prototype.onKeyUp = function(e)
+	{
+		return this.WordControl.onKeyUp(e);
 	};
 
 	window["asc_docs_api"]                                      = asc_docs_api;

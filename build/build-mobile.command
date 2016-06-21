@@ -9,4 +9,5 @@ cd $BASEDIR
 
 npm install
 grunt --level=WHITESPACE_ONLY --mobile=true --formatting=PRETTY_PRINT --noclosure=true
+cat "../word/sdk-all-min.js" "../word/sdk-all.js" > "../../mobile-apps/ios/Vendor/ONLYOFFICE/SDKData/documents/script.bin"
 cat "../cell/sdk-all-min.js" "../cell/sdk-all.js" > "../../mobile-apps/ios/Vendor/ONLYOFFICE/SDKData/spreadsheets/script.bin"

@@ -6642,11 +6642,6 @@ CTable.prototype =
         this.Markup.Internal.PageNum   = 0;
     },
 
-    Selection_Clear : function()
-    {
-
-    },
-
     Selection_Check : function(X, Y, CurPage, NearPos)
     {
         if (undefined != NearPos)
@@ -6847,11 +6842,11 @@ CTable.prototype =
         this.CurCell.Content.Add_InlineImage(W,H,Img, Chart, bFlow);
     },
 
-    Add_OleObject : function(W, H, Img, Data)
+    Add_OleObject : function(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId)
     {
         this.Selection.Use  = true;
         this.Selection.Type = table_Selection_Text;
-        this.CurCell.Content.Add_OleObject(W, H, Img, Data);
+        this.CurCell.Content.Add_OleObject(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId);
     },
 
     Add_TextArt : function(nStyle)
@@ -8458,7 +8453,7 @@ CTable.prototype =
         else
         {
             var CellContent = this.CurCell.Content;
-            if (this.LogicDocument && true === this.LogicDocument.UseTextShd && docpostype_Content === CellContent.CurPos.Type && true !== CellContent.Selection.Use && type_Paragraph === CellContent.Content[CellContent.CurPos.ContentPos].GetType())
+            if (this.LogicDocument && true === this.LogicDocument.UseTextShd && docpostype_Content === CellContent.Get_DocPosType() && true !== CellContent.Selection.Use && type_Paragraph === CellContent.Content[CellContent.CurPos.ContentPos].GetType())
             {
                 this.CurCell.Set_Shd( Shd );
                 this.CurCell.Content.ReDraw();                

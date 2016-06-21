@@ -5622,7 +5622,7 @@ function offline_cell_editor_open(x, y, width, height, ratio, isSelectAll, isFor
 
     wb.cellEditor.isSelectAll = isSelectAll;
     if (!isFormulaInsertMode) {
-        wb._onEditCell(x, y, true, undefined, undefined, true, false);
+        wb._onEditCell(undefined, undefined, true, false);
     }
     ws.visibleRange = range;
 }

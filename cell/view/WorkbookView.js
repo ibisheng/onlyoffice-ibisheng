@@ -302,14 +302,11 @@
     this._canResize();
 
     // Shapes
-
-
     var canvasWidth = this.drawingGraphicCtx.canvas.width;
     var canvasHeight = this.drawingGraphicCtx.canvas.height;
     this.buffers.shapeCtx = new AscCommon.CGraphics();
     this.buffers.shapeCtx.init(this.drawingGraphicCtx.ctx, canvasWidth, canvasHeight, (canvasWidth * 25.4 / this.drawingGraphicCtx.ppiX), (canvasHeight * 25.4 / this.drawingGraphicCtx.ppiY));
     this.buffers.shapeCtx.m_oFontManager = this.fmgrGraphics[2];
-
 
     var overlayWidth = this.overlayGraphicCtx.canvas.width;
     var overlayHeight = this.overlayGraphicCtx.canvas.height;
@@ -483,7 +480,7 @@
           self.controller.setStrictClose(true);
           self.cellEditor.callTopLineMouseup = true;
           if (!self.getCellEditMode() && !self.controller.isFillHandleMode) {
-            self._onEditCell(0, 0, /*isCoord*/false, /*isFocus*/true);
+            self._onEditCell(/*isFocus*/true);
           }
         }, false);
       }
@@ -559,7 +556,20 @@
       }, /*settings*/{
         font: this.defaultFont, padding: this.defaults.worksheetView.cells.padding
       });
-
+    this.Api.onKeyDown = function (event) {
+      var listener = self.isCellEditMode ? self.cellEditor : self.controller;
+      listener._onWindowKeyDown(event);
+    };
+    this.Api.onKeyPress = function (event) {
+      var listener = self.isCellEditMode ? self.cellEditor : self.controller;
+      listener._onWindowKeyPress(event);
+    };
+    this.Api.onKeyUp = function (event) {
+      var listener = self.isCellEditMode ? self.cellEditor : self.controller;
+      listener._onWindowKeyUp(event);
+    };
+    
+    AscCommon.InitBrowserInputContext(this.Api, "id_target_cursor");
 
     this.wsViewHandlers = new AscCommonExcel.asc_CHandlersList(/*handlers*/{
       "getViewerMode": function() {
@@ -1225,11 +1235,11 @@
       }
 
       // При dbl клике фокус выставляем в зависимости от наличия текста в ячейке
-      this._onEditCell(x, y, /*isCoord*/true, /*isFocus*/undefined, /*isClearCell*/undefined, /*isHideCursor*/isHideCursor, /*isQuickInput*/false);
+      this._onEditCell(/*isFocus*/undefined, /*isClearCell*/undefined, /*isHideCursor*/isHideCursor, /*isQuickInput*/false);
     }
   };
 
-  WorkbookView.prototype._onEditCell = function(x, y, isCoord, isFocus, isClearCell, isHideCursor, isQuickInput, callback, event) {
+  WorkbookView.prototype._onEditCell = function(isFocus, isClearCell, isHideCursor, isQuickInput, callback, event) {
     var t = this;
 
     // Проверка глобального лока
@@ -1238,13 +1248,13 @@
     }
 
     var ws = t.getWorksheet();
-    var activeCellRange = ws.getActiveCell(x, y, isCoord);
+    var activeCellRange = ws.getActiveCell(0, 0, false);
     var arn = ws.activeRange.clone(true);
 
     var editFunction = function() {
       t.setCellEditMode(true);
       ws.setCellEditMode(true);
-      if (!ws.openCellEditor(t.cellEditor, x, y, isCoord, /*fragments*/undefined, /*cursorPos*/undefined, isFocus, isClearCell, /*isHideCursor*/isHideCursor, /*isQuickInput*/isQuickInput, /*activeRange*/arn)) {
+      if (!ws.openCellEditor(t.cellEditor, /*fragments*/undefined, /*cursorPos*/undefined, isFocus, isClearCell, /*isHideCursor*/isHideCursor, /*isQuickInput*/isQuickInput, /*activeRange*/arn)) {
         t.setCellEditMode(false);
         t.controller.setStrictClose(false);
         t.controller.setFormulaEditMode(false);
@@ -1942,8 +1952,7 @@
         }
       };
 
-      var activeCellRange = ws.getActiveCell(0, 0, /*isCoord*/false);
-
+      var activeCellRange = ws.getActiveCell(0, 0, false);
       ws._isLockedCells(activeCellRange, /*subType*/null, openEditor);
     }
   };
@@ -2297,12 +2306,6 @@
 
     this.model.setDefinesNames(defName.Name, defName.Ref, defName.Scope);
     this.handlers.trigger("asc_onDefName");
-
-  };
-
-  WorkbookView.prototype.checkDefName = function(checkName, scope) {
-
-    return this.model.checkDefName(checkName, scope);
 
   };
 

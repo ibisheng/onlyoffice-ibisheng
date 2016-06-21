@@ -3122,11 +3122,13 @@
             var styles = this.wb.CellStyles.CustomStyles;
             var xfs = null;
             for(var i = 0, length = styles.length; i < length; ++i) {
-                xfs = styles[i].xfs;
+				var style = styles[i];
+				xfs = style.xfs;
                 if (xfs) {
                     var sStyle = this.prepareXfsStyle(xfs);
+					//XfId в CustomStyles писать не нужно, поэтому null
                     var oXfs = {borderid: sStyle.borderid, fontid: sStyle.fontid, fillid: sStyle.fillid,
-                        numid: sStyle.numid, align: null, QuotePrefix: null, XfId: xfs.XfId};
+                        numid: sStyle.numid, align: null, QuotePrefix: null, XfId: null, index: style.XfId};
                     if("0" != sStyle.align)
                         oXfs.align = xfs.align;
                     if(null != xfs.QuotePrefix)
@@ -3135,6 +3137,10 @@
                     this.oXfsStylesMap.push(oXfs);
                 }
             }
+			//XfId это порядковый номер, поэтому сортируем
+			this.oXfsStylesMap.sort(function (a, b) {
+				return a.index - b.index;
+			});
         };
         this.prepareXfsStyle = function(xfs) {
             var sStyle = {val: "", borderid: 0, fontid: 0, fillid: 0, numid: 0, align: "0"};

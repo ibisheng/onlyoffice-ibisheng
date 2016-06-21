@@ -1707,7 +1707,7 @@ var editor;
   };
 
   spreadsheet_api.prototype.asc_checkDefinedName = function(checkName, scope) {
-    return this.wb.checkDefName(checkName, scope);
+    return this.wbModel.checkDefName(checkName, scope);
   };
 
   spreadsheet_api.prototype.asc_getDefaultDefinedName = function() {

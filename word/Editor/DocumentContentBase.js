@@ -47,6 +47,42 @@ function CDocumentContentBase()
 }
 
 /**
+ * Получаем тип активной части документа.
+ * @returns {(docpostype_Content | docpostype_HdrFtr | docpostype_DrawingObjects | docpostype_Footnotes)}
+ */
+CDocumentContentBase.prototype.Get_DocPosType = function()
+{
+	return this.CurPos.Type;
+};
+/**
+ * Выставляем тип активной части документа.
+ * @param {(docpostype_Content | docpostype_HdrFtr | docpostype_DrawingObjects | docpostype_Footnotes)} nType
+ */
+CDocumentContentBase.prototype.Set_DocPosType = function(nType)
+{
+	this.CurPos.Type = nType;
+
+	if (this.Controller)
+	{
+		if (docpostype_HdrFtr === nType)
+		{
+			this.Controller = this.HeaderFooterController;
+		}
+		else if (docpostype_DrawingObjects === nType)
+		{
+			this.Controller = this.DrawingsController;
+		}
+		else if (docpostype_Footnotes === nType)
+		{
+			this.Controller = this.Footnotes;
+		}
+		else //if (docpostype_Content === nType)
+		{
+			this.Controller = this.LogicDocumentController;
+		}
+	}
+};
+/**
  * Обновляем индексы элементов.
  */
 CDocumentContentBase.prototype.Update_ContentIndexing = function()

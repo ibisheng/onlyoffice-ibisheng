@@ -244,7 +244,7 @@ CHeaderFooter.prototype =
         {
             this.RecalcInfo.CurPage = Page_abs;
             
-            if ( docpostype_HdrFtr === this.LogicDocument.CurPos.Type )
+            if ( docpostype_HdrFtr === this.LogicDocument.Get_DocPosType() )
             {
                 // Обновляем интерфейс, чтобы обновить настройки колонтитула, т.к. мы могли попасть в новую секцию
                 this.LogicDocument.Document_UpdateSelectionState();
@@ -321,8 +321,8 @@ CHeaderFooter.prototype =
         if (-1 === PageIndex)
             this.RecalcInfo.CurPage = -1;
 
-        var OldDocPosType = this.LogicDocument.CurPos.Type;
-        this.LogicDocument.CurPos.Type = docpostype_HdrFtr;
+        var OldDocPosType = this.LogicDocument.Get_DocPosType();
+        this.LogicDocument.Set_DocPosType(docpostype_HdrFtr);
 
         if (true === bUpdateStates && -1 !== PageIndex)
         {
@@ -342,7 +342,7 @@ CHeaderFooter.prototype =
 
     Is_ThisElementCurrent : function()
     {
-        if ( this === this.Parent.CurHdrFtr && docpostype_HdrFtr === this.LogicDocument.CurPos.Type )
+        if (this === this.Parent.CurHdrFtr && docpostype_HdrFtr === this.LogicDocument.Get_DocPosType())
             return true;
 
         return false;
@@ -924,18 +924,13 @@ CHeaderFooter.prototype =
         return this.Content.Selection_Draw_Page(0, true, true);
     },
 
-    Selection_Clear : function()
-    {
-        return this.Content.Selection_Clear();
-    },
-
     Selection_SetStart : function(X,Y, PageIndex, MouseEvent)
     {
         this.Set_Page( PageIndex );
 
         if ( true === editor.isStartAddShape )
         {
-            this.Content.CurPos.Type = docpostype_DrawingObjects;
+            this.Content.Set_DocPosType(docpostype_DrawingObjects);
             this.Content.Selection.Use   = true;
             this.Content.Selection.Start = true;
 
@@ -1808,6 +1803,12 @@ CHeaderFooterController.prototype =
             return this.CurHdrFtr.Add_InlineImage(W,H,Img, Chart, bFlow);
     },
 
+    Add_OleObject: function(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId)
+    {
+        if ( null != this.CurHdrFtr )
+            return this.CurHdrFtr.Add_OleObject(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId);
+    },
+
     Add_TextArt : function(nStyle)
     {
         if ( null != this.CurHdrFtr )
@@ -2063,12 +2064,6 @@ CHeaderFooterController.prototype =
             return this.CurHdrFtr.Selection_Draw_Page(Page_abs);
     },
 
-    Selection_Clear : function()
-    {
-        if ( null != this.CurHdrFtr )
-            return this.CurHdrFtr.Selection_Clear();
-    },
-
     Selection_SetStart : function(X,Y, PageIndex, MouseEvent, bActivate)
     {
         // Если мы попадаем в заселекченную автофигуру, пусть она даже выходит за пределы
@@ -2122,9 +2117,9 @@ CHeaderFooterController.prototype =
                 if ( false === editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_HdrFtr) )
                 {
                     // Меняем старый режим редактирования, чтобы при Undo/Redo возвращаться в режим редактирования документа
-                    this.LogicDocument.CurPos.Type = docpostype_Content;
+                    this.LogicDocument.Set_DocPosType(docpostype_Content);
                     History.Create_NewPoint(AscDFH.historydescription_Document_AddHeader);
-                    this.LogicDocument.CurPos.Type = docpostype_HdrFtr;
+                    this.LogicDocument.Set_DocPosType(docpostype_HdrFtr);
                     HdrFtr = this.LogicDocument.Create_SectionHdrFtr( hdrftr_Header, PageIndex );
                     this.LogicDocument.Recalculate();
                 }
@@ -2141,9 +2136,9 @@ CHeaderFooterController.prototype =
                 if ( false === editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_HdrFtr) )
                 {
                     // Меняем старый режим редактирования, чтобы при Undo/Redo возвращаться в режим редактирования документа
-                    this.LogicDocument.CurPos.Type = docpostype_Content;
+                    this.LogicDocument.Set_DocPosType(docpostype_Content);
                     History.Create_NewPoint(AscDFH.historydescription_Document_AddFooter);
-                    this.LogicDocument.CurPos.Type = docpostype_HdrFtr;
+                    this.LogicDocument.Set_DocPosType(docpostype_HdrFtr);
                     HdrFtr = this.LogicDocument.Create_SectionHdrFtr( hdrftr_Footer, PageIndex );
                     this.LogicDocument.Recalculate();
                 }
@@ -2205,7 +2200,7 @@ CHeaderFooterController.prototype =
             // не может быть разбит на несколько страниц
             var ResY = Y;
 
-            if ( docpostype_DrawingObjects != this.CurHdrFtr.Content.CurPos.Type )
+            if (docpostype_DrawingObjects != this.CurHdrFtr.Content.Get_DocPosType())
             {
                 if ( PageIndex > this.CurPage )
                     ResY = this.LogicDocument.Get_PageLimits(this.CurPage).YLimit + 10;

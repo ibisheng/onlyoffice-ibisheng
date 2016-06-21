@@ -796,7 +796,6 @@
 	{
 		Asc.CPluginData_wrap(oPluginData);
 		var oThis      = this;
-		var oThis      = this;
 		var sImgSrc    = oPluginData.getAttribute("imgSrc");
 		var nWidthPix  = oPluginData.getAttribute("widthPix");
 		var nHeightPix = oPluginData.getAttribute("heightPix");
@@ -958,6 +957,41 @@
 	{
 	};
 
+	// input
+	baseEditorsApi.prototype.Begin_CompositeInput = function()
+	{
+	};
+	baseEditorsApi.prototype.Add_CompositeText = function(nCharCode)
+	{
+	};
+	baseEditorsApi.prototype.Remove_CompositeText = function(nCount)
+	{
+	};
+	baseEditorsApi.prototype.Replace_CompositeText = function(arrCharCodes)
+	{
+	};
+	baseEditorsApi.prototype.Set_CursorPosInCompositeText = function(nPos)
+	{
+	};
+	baseEditorsApi.prototype.Get_CursorPosInCompositeText = function()
+	{
+	};
+	baseEditorsApi.prototype.End_CompositeInput = function()
+	{
+	};
+	baseEditorsApi.prototype.Get_MaxCursorPosInCompositeText = function()
+	{
+	};
+
+	baseEditorsApi.prototype.onKeyDown = function(e)
+	{
+	};
+	baseEditorsApi.prototype.onKeyPress = function(e)
+	{
+	};
+	baseEditorsApi.prototype.onKeyUp = function(e)
+	{
+	};
 
 	//----------------------------------------------------------export----------------------------------------------------
 	window['AscCommon']                = window['AscCommon'] || {};

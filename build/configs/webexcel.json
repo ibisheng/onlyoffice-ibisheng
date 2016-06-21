@@ -144,6 +144,9 @@
         "../word/Editor/Document.js",
         "../word/Editor/DocumentContent.js",
 		"../word/Editor/DocumentControllerBase.js",
+		"../word/Editor/LogicDocumentController.js",
+		"../word/Editor/DrawingsController.js",
+		"../word/Editor/HeaderFooterController.js",
         "../word/Editor/Table.js",
         "../word/Editor/Table/TableRecalculate.js",
         "../word/Editor/Table/TableDraw.js",
@@ -174,6 +177,7 @@
 		"../cell/apiBuilder.js",
 		
 		"../common/clipboard_base.js",
+		"../common/text_input.js",
 		"../common/Drawings/Format/OleObject.js",
 		"../common/plugins.js"
       ],

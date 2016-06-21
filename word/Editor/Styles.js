@@ -6757,7 +6757,7 @@ CTableCellPr.prototype =
             this.TableCellBorders.Top    = undefined;
         }
 
-        if ( undefined != this.TableCellW )
+        if ( undefined != CellPr.TableCellW )
             this.TableCellW = new CTableMeasurement( CellPr.TableCellW.Type, CellPr.TableCellW.W );
         else
             this.TableCellW = undefined;

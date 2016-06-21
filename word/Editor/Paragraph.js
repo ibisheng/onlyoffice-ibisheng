@@ -6278,11 +6278,6 @@ Paragraph.prototype =
         this.Selection.Flag     = selectionflag_Common;
         this.Selection.StartPos = 0;
         this.Selection.EndPos   = 0;
-        this.Selection_Clear();
-    },
-
-    Selection_Clear : function()
-    {
     },
 
     Selection_Draw_Page : function(CurPage)
@@ -9568,7 +9563,7 @@ Paragraph.prototype =
         var Parent = this.Parent;
 
         Parent.Update_ContentIndexing();
-        if ( docpostype_Content === Parent.CurPos.Type && false === Parent.Selection.Use && this.Index === Parent.CurPos.ContentPos && Parent.Content[this.Index] === this )
+        if ( docpostype_Content === Parent.Get_DocPosType() && false === Parent.Selection.Use && this.Index === Parent.CurPos.ContentPos && Parent.Content[this.Index] === this )
             return this.Parent.Is_ThisElementCurrent();
 
         return false;

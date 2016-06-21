@@ -1617,7 +1617,7 @@ DrawingObjectsController.prototype =
             {
                 this.parent.GoTo_Text();
                 this.resetSelection();
-                if(this.document && (docpostype_DrawingObjects !== this.document.CurPos.Type || isRealObject(getTargetTextObject(this.document.DrawingObjects))) && CDocumentContent.prototype.Add_NewParagraph === docContentFunction)
+                if(this.document && (docpostype_DrawingObjects !== this.document.Get_DocPosType() || isRealObject(getTargetTextObject(this.document.DrawingObjects))) && CDocumentContent.prototype.Add_NewParagraph === docContentFunction)
                 {
                     this.document.Add_NewParagraph(args[0]);
                 }
@@ -1626,7 +1626,7 @@ DrawingObjectsController.prototype =
             {
                 this.selectedObjects[0].parent.GoTo_Text();
                 this.resetSelection();
-                if(this.document && (docpostype_DrawingObjects !== this.document.CurPos.Type || isRealObject(getTargetTextObject(this))) && CDocumentContent.prototype.Add_NewParagraph === docContentFunction)
+                if(this.document && (docpostype_DrawingObjects !== this.document.Get_DocPosType() || isRealObject(getTargetTextObject(this))) && CDocumentContent.prototype.Add_NewParagraph === docContentFunction)
                 {
                     this.document.Add_NewParagraph(args[0]);
                 }
@@ -7146,7 +7146,7 @@ DrawingObjectsController.prototype =
                 oContent.Selection.EndPos   = 0;
                 oContent.Selection.Flag     = selectionflag_Common;
 
-                oContent.CurPos.Type       = docpostype_Content;
+                oContent.Set_DocPosType(docpostype_Content);
                 oContent.CurPos.ContentPos = 0;
                 oShape.bSelectedText = true;
             }
