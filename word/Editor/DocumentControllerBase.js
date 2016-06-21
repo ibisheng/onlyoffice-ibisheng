@@ -235,7 +235,6 @@ CDocumentControllerBase.prototype.Is_DrawingShape = function(bRetShape)
  * Событие о том, что контент изменился и пересчитался.
  * @param bChange
  * @param bForceRecalc
- * @constructor
  */
 CDocumentControllerBase.prototype.OnContentRecalculate = function(bChange, bForceRecalc)
 {
@@ -545,6 +544,43 @@ CDocumentControllerBase.prototype.GetSelectedContent = function(SelectedContent)
  * Обновляем вид курсора.
  */
 CDocumentControllerBase.prototype.UpdateCursorType = function(X, Y, PageAbs, MouseEvent){};
+/**
+ * Вставляем форматирование.
+ * @param TextPr
+ * @param ParaPr
+ */
+CDocumentControllerBase.prototype.PasteFormatting = function(TextPr, ParaPr){};
+/**
+ * Проверяем используется ли в данный момент селект.
+ * @returns {boolean}
+ */
+CDocumentControllerBase.prototype.IsSelectionUse = function(){return false;};
+/**
+ * Проверяем выделен ли именно текст сейчас.
+ * @returns {boolean}
+ */
+CDocumentControllerBase.prototype.IsTextSelectionUse = function(){return false;};
+/**
+ * Получаем XY текущей позиции.
+ * @returns {{X: number, Y: number}}
+ */
+CDocumentControllerBase.prototype.GetCurPosXY = function(){return {X : 0, Y : 0};};
+/**
+ * Получаем выделенный текст.
+ * @param {boolean} bClearText
+ * @returns {String}
+ */
+CDocumentControllerBase.prototype.GetSelectedText = function(bClearText){return "";};
+/**
+ * Получаем текущий параграф.
+ * @returns {?Paragraph}
+ */
+CDocumentControllerBase.prototype.GetCurrentParagraph = function(){return null};
+/**
+ * Собираем информацию о выделенной части документа.
+ * @param oInfo
+ */
+CDocumentControllerBase.prototype.GetSelectedElementsInfo = function(oInfo){};
 
 /**
  * Добавляем элемент в параграф.

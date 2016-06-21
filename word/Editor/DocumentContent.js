@@ -6647,9 +6647,6 @@ CDocumentContent.prototype.Paragraph_Format_Paste             = function(TextPr,
                     {
                         this.Content[Pos].Paragraph_Format_Paste(TextPr, ParaPr, ( Start === End ? false : true ));
                     }
-
-                    this.Recalculate();
-
                     break;
                 }
             }
@@ -6657,7 +6654,6 @@ CDocumentContent.prototype.Paragraph_Format_Paste             = function(TextPr,
         else
         {
             this.Content[this.CurPos.ContentPos].Paragraph_Format_Paste(TextPr, ParaPr, true);
-            this.Recalculate();
         }
     }
 };

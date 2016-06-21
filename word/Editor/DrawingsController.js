@@ -304,6 +304,34 @@ CDrawingsController.prototype.UpdateCursorType = function(X, Y, PageAbs, MouseEv
 	// TODO: Надо вызывать не у LogicDocument, а у DocumentContent заданного
 	this.LogicDocument.controller_UpdateCursorType(X, Y, PageAbs, MouseEvent);
 };
+CDrawingsController.prototype.PasteFormatting = function(TextPr, ParaPr)
+{
+	this.DrawingObjects.paragraphFormatPaste(TextPr, ParaPr, false);
+};
+CDrawingsController.prototype.IsSelectionUse = function()
+{
+	return this.DrawingObjects.isSelectionUse();
+};
+CDrawingsController.prototype.IsTextSelectionUse = function()
+{
+	return this.DrawingObjects.isTextSelectionUse();
+};
+CDrawingsController.prototype.GetCurPosXY = function()
+{
+	return this.DrawingObjects.getCurPosXY();
+};
+CDrawingsController.prototype.GetSelectedText = function(bClearText)
+{
+	return this.DrawingObjects.getSelectedText(bClearText);
+};
+CDrawingsController.prototype.GetCurrentParagraph = function()
+{
+	return this.DrawingObjects.getCurrentParagraph();
+};
+CDrawingsController.prototype.GetSelectedElementsInfo = function(oInfo)
+{
+	this.DrawingObjects.getSelectedElementsInfo(oInfo);
+};
 
 CDrawingsController.prototype.AddToParagraph = function(oItem, bRecalculate)
 {
