@@ -13879,7 +13879,20 @@
 			lockRange = new Asc.Range(c1, r1, c2, r2);
 		}
 		
-		t._isLockedCells( lockRange, null, callback );
+		var callBackLockedDefNames = function(isSuccess)
+		{
+			if ( false === isSuccess ) {
+				return;
+			}
+			
+			t._isLockedCells( lockRange, null, callback );
+		};
+		
+		//лочим данный именованный диапазон при смене размера ф/т
+		var defNameId = t.model.workbook.dependencyFormulas.getDefNameNodeByName(tableName, t.model.getId());
+		defNameId = defNameId ? defNameId.nodeId : null;
+		
+		t._isLockedDefNames( callBackLockedDefNames, defNameId );
 	};
 
     WorksheetView.prototype.af_checkChangeRange = function(range) {
