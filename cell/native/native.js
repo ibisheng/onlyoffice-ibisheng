@@ -6723,8 +6723,8 @@ function offline_apply_event(type,params) {
         case 2040: // ASC_SPREADSHEETS_EVENT_TYPE_COLUMN_SORT_FILTER
         {
             if (params.length) {
-                var typeF = params[0], cellId ='';
-                if (2===params.length)
+                var typeF = parseInt(params[0]), cellId = '';
+                if (2 === params.length)
                     cellId = params[1];
                 _api.asc_sortColFilter(typeF, cellId);
             }
