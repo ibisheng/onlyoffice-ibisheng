@@ -639,6 +639,41 @@ CDocumentControllerBase.prototype.UpdateRulersState = function(){};
  */
 CDocumentControllerBase.prototype.UpdateSelectionState = function(){};
 /**
+ * Получаем текущее состоянии селекта и курсора.
+ */
+CDocumentControllerBase.prototype.GetSelectionState = function(){return [];};
+/**
+ * Выставляем текущее состояние селекта и курсора.
+ * @param State
+ * @param StateIndex
+ */
+CDocumentControllerBase.prototype.SetSelectionState = function(State, StateIndex){};
+/**
+ * Добавляем гиперссылку.
+ * @param Props
+ */
+CDocumentControllerBase.prototype.AddHyperlink = function(Props){};
+/**
+ * Изменяем гиперссылку.
+ * @param Props
+ */
+CDocumentControllerBase.prototype.ModifyHyperlink = function(Props){};
+/**
+ * Удаляем гиперссылку.
+ */
+CDocumentControllerBase.prototype.RemoveHyperlink = function(){};
+/**
+ * Проверяем можно ли добавить гиперссылку.
+ * @returns {boolean}
+ */
+CDocumentControllerBase.prototype.CanAddHyperlink = function(bCheckInHyperlink){return false;};
+/**
+ * Проверяем находится ли курсор сейчас в гиперссылке.
+ * @returns {?ParaHyperlink}
+ */
+CDocumentControllerBase.prototype.IsCursorInHyperlink = function(bCheckEnd){return false;};
+
+/**
  * Добавляем элемент в параграф.
  * @param oItem
  * @param {boolean} bRecalculate - Пересчитывать ли после выполнения данной функции.

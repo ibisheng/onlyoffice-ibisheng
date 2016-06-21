@@ -336,7 +336,34 @@ CHdrFtrController.prototype.UpdateSelectionState = function()
 	this.HdrFtr.Document_UpdateSelectionState();
 	this.LogicDocument.Document_UpdateTracks();
 };
-
+CHdrFtrController.prototype.GetSelectionState = function()
+{
+	return this.HdrFtr.Get_SelectionState();
+};
+CHdrFtrController.prototype.SetSelectionState = function(State, StateIndex)
+{
+	this.HdrFtr.Set_SelectionState(State, StateIndex);	
+};
+CHdrFtrController.prototype.AddHyperlink = function(Props)
+{
+	this.HdrFtr.Hyperlink_Add(Props);
+};
+CHdrFtrController.prototype.ModifyHyperlink = function(Props)
+{
+	this.HdrFtr.Hyperlink_Modify(Props);
+};
+CHdrFtrController.prototype.RemoveHyperlink = function()
+{
+	this.HdrFtr.Hyperlink_Remove();
+};
+CHdrFtrController.prototype.CanAddHyperlink = function(bCheckInHyperlink)
+{
+	return this.HdrFtr.Hyperlink_CanAdd(bCheckInHyperlink);
+};
+CHdrFtrController.prototype.IsCursorInHyperlink = function(bCheckEnd)
+{
+	return this.HdrFtr.Hyperlink_Check(bCheckEnd);
+};
 
 
 

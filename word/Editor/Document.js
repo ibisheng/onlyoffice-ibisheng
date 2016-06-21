@@ -8116,515 +8116,336 @@ CDocument.prototype.Get_CurPage = function()
 //----------------------------------------------------------------------------------------------------------------------
 // Undo/Redo функции
 //----------------------------------------------------------------------------------------------------------------------
-CDocument.prototype.Create_NewHistoryPoint          = function(Description)
+CDocument.prototype.Create_NewHistoryPoint = function(Description)
 {
-    this.History.Create_NewPoint(Description);
+	this.History.Create_NewPoint(Description);
 };
-CDocument.prototype.Document_Undo                   = function(Options)
+CDocument.prototype.Document_Undo = function(Options)
 {
-    if (true === AscCommon.CollaborativeEditing.Get_GlobalLock())
-        return;
+	if (true === AscCommon.CollaborativeEditing.Get_GlobalLock())
+		return;
 
-    this.DrawingDocument.EndTrackTable(null, true);
-    this.DrawingObjects.TurnOffCheckChartSelection();
+	this.DrawingDocument.EndTrackTable(null, true);
+	this.DrawingObjects.TurnOffCheckChartSelection();
 
-    this.History.Undo(Options);
-    this.DrawingObjects.TurnOnCheckChartSelection();
-    this.Recalculate(false, false, this.History.RecalculateData);
+	this.History.Undo(Options);
+	this.DrawingObjects.TurnOnCheckChartSelection();
+	this.Recalculate(false, false, this.History.RecalculateData);
 
-    this.Document_UpdateSelectionState();
-    this.Document_UpdateInterfaceState();
-    this.Document_UpdateRulersState();
+	this.Document_UpdateSelectionState();
+	this.Document_UpdateInterfaceState();
+	this.Document_UpdateRulersState();
 };
-CDocument.prototype.Document_Redo                   = function()
+CDocument.prototype.Document_Redo = function()
 {
-    if (true === AscCommon.CollaborativeEditing.Get_GlobalLock())
-        return;
+	if (true === AscCommon.CollaborativeEditing.Get_GlobalLock())
+		return;
 
-    this.DrawingDocument.EndTrackTable(null, true);
-    this.DrawingObjects.TurnOffCheckChartSelection();
+	this.DrawingDocument.EndTrackTable(null, true);
+	this.DrawingObjects.TurnOffCheckChartSelection();
 
-    this.History.Redo();
-    this.DrawingObjects.TurnOnCheckChartSelection();
-    this.Recalculate(false, false, this.History.RecalculateData);
+	this.History.Redo();
+	this.DrawingObjects.TurnOnCheckChartSelection();
+	this.Recalculate(false, false, this.History.RecalculateData);
 
-    this.Document_UpdateSelectionState();
-    this.Document_UpdateInterfaceState();
-    this.Document_UpdateRulersState();
+	this.Document_UpdateSelectionState();
+	this.Document_UpdateInterfaceState();
+	this.Document_UpdateRulersState();
 };
-CDocument.prototype.Get_SelectionState              = function()
+CDocument.prototype.Get_SelectionState = function()
 {
-    var DocState    = {};
-    DocState.CurPos =
-    {
-        X          : this.CurPos.X,
-        Y          : this.CurPos.Y,
-        ContentPos : this.CurPos.ContentPos,
-        RealX      : this.CurPos.RealX,
-        RealY      : this.CurPos.RealY,
-        Type       : this.CurPos.Type
-    };
+	var DocState    = {};
+	DocState.CurPos =
+	{
+		X          : this.CurPos.X,
+		Y          : this.CurPos.Y,
+		ContentPos : this.CurPos.ContentPos,
+		RealX      : this.CurPos.RealX,
+		RealY      : this.CurPos.RealY,
+		Type       : this.CurPos.Type
+	};
 
-    DocState.Selection =
-    {
+	DocState.Selection =
+	{
 
-        Start    : this.Selection.Start,
-        Use      : this.Selection.Use,
-        StartPos : this.Selection.StartPos,
-        EndPos   : this.Selection.EndPos,
-        Flag     : this.Selection.Flag,
-        Data     : this.Selection.Data
-    };
+		Start    : this.Selection.Start,
+		Use      : this.Selection.Use,
+		StartPos : this.Selection.StartPos,
+		EndPos   : this.Selection.EndPos,
+		Flag     : this.Selection.Flag,
+		Data     : this.Selection.Data
+	};
 
-    DocState.CurPage    = this.CurPage;
-    DocState.CurComment = this.Comments.Get_CurrentId();
+	DocState.CurPage    = this.CurPage;
+	DocState.CurComment = this.Comments.Get_CurrentId();
 
-    var State = null;
-    if (true === editor.isStartAddShape && docpostype_DrawingObjects === this.CurPos.Type)
-    {
-        DocState.CurPos.Type     = docpostype_Content;
-        DocState.Selection.Start = false;
-        DocState.Selection.Use   = false;
+	var State = null;
+	if (true === editor.isStartAddShape && docpostype_DrawingObjects === this.Get_DocPosType())
+	{
+		DocState.CurPos.Type     = docpostype_Content;
+		DocState.Selection.Start = false;
+		DocState.Selection.Use   = false;
 
-        this.Content[DocState.CurPos.ContentPos].Selection_Remove();
-        State = this.Content[this.CurPos.ContentPos].Get_SelectionState();
-    }
-    else
-    {
-        // Работаем с колонтитулом
-        if (docpostype_HdrFtr === this.CurPos.Type)
-            State = this.HdrFtr.Get_SelectionState();
-        else if (docpostype_DrawingObjects == this.CurPos.Type)
-            State = this.DrawingObjects.getSelectionState();
-        else //if ( docpostype_Content === this.CurPos.Type )
-        {
-            if (true === this.Selection.Use)
-            {
-                // Выделение нумерации
-                if (selectionflag_Numbering == this.Selection.Flag)
-                    State = [];
-                else
-                {
-                    var StartPos = this.Selection.StartPos;
-                    var EndPos   = this.Selection.EndPos;
-                    if (StartPos > EndPos)
-                    {
-                        var Temp = StartPos;
-                        StartPos = EndPos;
-                        EndPos   = Temp;
-                    }
+		this.Content[DocState.CurPos.ContentPos].Selection_Remove();
+		State = this.Content[this.CurPos.ContentPos].Get_SelectionState();
+	}
+	else
+	{
+		State = this.Controller.GetSelectionState();
+	}
 
-                    State = [];
+	State.push(DocState);
 
-                    var TempState = [];
-                    for (var Index = StartPos; Index <= EndPos; Index++)
-                    {
-                        TempState.push(this.Content[Index].Get_SelectionState());
-                    }
-
-                    State.push(TempState);
-                }
-            }
-            else
-                State = this.Content[this.CurPos.ContentPos].Get_SelectionState();
-        }
-    }
-
-    State.push(DocState);
-
-    return State;
+	return State;
 };
-CDocument.prototype.Set_SelectionState              = function(State)
+CDocument.prototype.Set_SelectionState = function(State)
 {
-    if (docpostype_DrawingObjects === this.CurPos.Type)
-        this.DrawingObjects.resetSelection();
+	if (docpostype_DrawingObjects === this.Get_DocPosType())
+		this.DrawingObjects.resetSelection();
 
-    if (State.length <= 0)
-        return;
+	if (State.length <= 0)
+		return;
 
-    var DocState = State[State.length - 1];
+	var DocState = State[State.length - 1];
 
-    this.CurPos.X          = DocState.CurPos.X;
-    this.CurPos.Y          = DocState.CurPos.Y;
-    this.CurPos.ContentPos = DocState.CurPos.ContentPos;
-    this.CurPos.RealX      = DocState.CurPos.RealX;
-    this.CurPos.RealY      = DocState.CurPos.RealY;
-    this.Set_DocPosType(DocState.CurPos.Type);
+	this.CurPos.X          = DocState.CurPos.X;
+	this.CurPos.Y          = DocState.CurPos.Y;
+	this.CurPos.ContentPos = DocState.CurPos.ContentPos;
+	this.CurPos.RealX      = DocState.CurPos.RealX;
+	this.CurPos.RealY      = DocState.CurPos.RealY;
+	this.Set_DocPosType(DocState.CurPos.Type);
 
-    this.Selection.Start    = DocState.Selection.Start;
-    this.Selection.Use      = DocState.Selection.Use;
-    this.Selection.StartPos = DocState.Selection.StartPos;
-    this.Selection.EndPos   = DocState.Selection.EndPos;
-    this.Selection.Flag     = DocState.Selection.Flag;
-    this.Selection.Data     = DocState.Selection.Data;
+	this.Selection.Start    = DocState.Selection.Start;
+	this.Selection.Use      = DocState.Selection.Use;
+	this.Selection.StartPos = DocState.Selection.StartPos;
+	this.Selection.EndPos   = DocState.Selection.EndPos;
+	this.Selection.Flag     = DocState.Selection.Flag;
+	this.Selection.Data     = DocState.Selection.Data;
 
-    this.Selection.DragDrop.Flag = 0;
-    this.Selection.DragDrop.Data = null;
+	this.Selection.DragDrop.Flag = 0;
+	this.Selection.DragDrop.Data = null;
 
-    this.CurPage = DocState.CurPage;
-    this.Comments.Set_Current(DocState.CurComment);
+	this.CurPage = DocState.CurPage;
+	this.Comments.Set_Current(DocState.CurComment);
 
-    var StateIndex = State.length - 2;
+	var StateIndex = State.length - 2;
 
-    // Работаем с колонтитулом
-    if (docpostype_HdrFtr === this.CurPos.Type)
-        this.HdrFtr.Set_SelectionState(State, StateIndex);
-    else if (docpostype_DrawingObjects === this.CurPos.Type)
-        this.DrawingObjects.setSelectionState(State, StateIndex);
-    else //if ( docpostype_Content === this.CurPos.Type )
-    {
-        if (true === this.Selection.Use)
-        {
-            // Выделение нумерации
-            if (selectionflag_Numbering == this.Selection.Flag)
-            {
-                if (type_Paragraph === this.Content[this.Selection.StartPos].Get_Type())
-                {
-                    var NumPr = this.Content[this.Selection.StartPos].Numbering_Get();
-                    if (undefined !== NumPr)
-                        this.Document_SelectNumbering(NumPr, this.Selection.StartPos);
-                    else
-                        this.Selection_Remove();
-                }
-                else
-                    this.Selection_Remove();
-            }
-            else
-            {
-                var StartPos = this.Selection.StartPos;
-                var EndPos   = this.Selection.EndPos;
-                if (StartPos > EndPos)
-                {
-                    var Temp = StartPos;
-                    StartPos = EndPos;
-                    EndPos   = Temp;
-                }
-
-                var CurState = State[StateIndex];
-                for (var Index = StartPos; Index <= EndPos; Index++)
-                {
-                    this.Content[Index].Set_SelectionState(CurState[Index - StartPos], CurState[Index - StartPos].length - 1);
-                }
-            }
-        }
-        else
-            this.Content[this.CurPos.ContentPos].Set_SelectionState(State, StateIndex);
-    }
+	this.Controller.SetSelectionState(State, State.length - 2);
 };
-CDocument.prototype.Undo                            = function(Data)
+CDocument.prototype.Undo = function(Data)
 {
-    var Type = Data.Type;
+	var Type = Data.Type;
 
-    switch (Type)
-    {
-        case  AscDFH.historyitem_Document_AddItem:
-        {
-            var Pos      = Data.Pos;
-            var Elements = this.Content.splice(Pos, 1);
-            this.private_RecalculateNumbering(Elements);
+	switch (Type)
+	{
+		case  AscDFH.historyitem_Document_AddItem:
+		{
+			var Pos      = Data.Pos;
+			var Elements = this.Content.splice(Pos, 1);
+			this.private_RecalculateNumbering(Elements);
 
-            // Обновим информацию о секциях
-            this.SectionsInfo.Update_OnRemove(Pos, 1);
+			// Обновим информацию о секциях
+			this.SectionsInfo.Update_OnRemove(Pos, 1);
 
-            break;
-        }
+			break;
+		}
 
-        case AscDFH.historyitem_Document_RemoveItem:
-        {
-            var Pos = Data.Pos;
+		case AscDFH.historyitem_Document_RemoveItem:
+		{
+			var Pos = Data.Pos;
 
-            var Array_start = this.Content.slice(0, Pos);
-            var Array_end   = this.Content.slice(Pos);
+			var Array_start = this.Content.slice(0, Pos);
+			var Array_end   = this.Content.slice(Pos);
 
-            this.private_RecalculateNumbering(Data.Items);
-            this.Content = Array_start.concat(Data.Items, Array_end);
+			this.private_RecalculateNumbering(Data.Items);
+			this.Content = Array_start.concat(Data.Items, Array_end);
 
-            // Обновим информацию о секциях
-            this.SectionsInfo.Update_OnAdd(Data.Pos, Data.Items);
+			// Обновим информацию о секциях
+			this.SectionsInfo.Update_OnAdd(Data.Pos, Data.Items);
 
-            break;
-        }
+			break;
+		}
 
-        case AscDFH.historyitem_Document_DefaultTab:
-        {
-            Default_Tab_Stop = Data.Old;
+		case AscDFH.historyitem_Document_DefaultTab:
+		{
+			Default_Tab_Stop = Data.Old;
 
-            break;
-        }
+			break;
+		}
 
-        case AscDFH.historyitem_Document_EvenAndOddHeaders:
-        {
-            EvenAndOddHeaders = Data.Old;
-            break;
-        }
+		case AscDFH.historyitem_Document_EvenAndOddHeaders:
+		{
+			EvenAndOddHeaders = Data.Old;
+			break;
+		}
 
-        case AscDFH.historyitem_Document_DefaultLanguage:
-        {
-            this.Styles.Default.TextPr.Lang.Val = Data.Old;
-            this.Restart_CheckSpelling();
-            break;
-        }
-        case AscDFH.historyitem_Document_MathSettings:
-        {
-            this.Settings.MathSettings.SetPr(Data.OldPr);
-            break;
-        }
+		case AscDFH.historyitem_Document_DefaultLanguage:
+		{
+			this.Styles.Default.TextPr.Lang.Val = Data.Old;
+			this.Restart_CheckSpelling();
+			break;
+		}
+		case AscDFH.historyitem_Document_MathSettings:
+		{
+			this.Settings.MathSettings.SetPr(Data.OldPr);
+			break;
+		}
 
-    }
+	}
 };
-CDocument.prototype.Redo                            = function(Data)
+CDocument.prototype.Redo = function(Data)
 {
-    var Type = Data.Type;
+	var Type = Data.Type;
 
-    switch (Type)
-    {
-        case  AscDFH.historyitem_Document_AddItem:
-        {
-            var Pos = Data.Pos;
-            this.Content.splice(Pos, 0, Data.Item);
+	switch (Type)
+	{
+		case  AscDFH.historyitem_Document_AddItem:
+		{
+			var Pos = Data.Pos;
+			this.Content.splice(Pos, 0, Data.Item);
 
-            this.private_RecalculateNumbering([Data.Item]);
+			this.private_RecalculateNumbering([Data.Item]);
 
-            // Обновим информацию о секциях
-            this.SectionsInfo.Update_OnAdd(Data.Pos, [Data.Item]);
+			// Обновим информацию о секциях
+			this.SectionsInfo.Update_OnAdd(Data.Pos, [Data.Item]);
 
-            break;
-        }
+			break;
+		}
 
-        case AscDFH.historyitem_Document_RemoveItem:
-        {
-            var Elements = this.Content.splice(Data.Pos, Data.Items.length);
-            this.private_RecalculateNumbering(Elements);
+		case AscDFH.historyitem_Document_RemoveItem:
+		{
+			var Elements = this.Content.splice(Data.Pos, Data.Items.length);
+			this.private_RecalculateNumbering(Elements);
 
-            // Обновим информацию о секциях
-            this.SectionsInfo.Update_OnRemove(Data.Pos, Data.Items.length);
+			// Обновим информацию о секциях
+			this.SectionsInfo.Update_OnRemove(Data.Pos, Data.Items.length);
 
-            break;
-        }
+			break;
+		}
 
-        case AscDFH.historyitem_Document_DefaultTab:
-        {
-            Default_Tab_Stop = Data.New;
+		case AscDFH.historyitem_Document_DefaultTab:
+		{
+			Default_Tab_Stop = Data.New;
 
-            break;
-        }
+			break;
+		}
 
-        case AscDFH.historyitem_Document_EvenAndOddHeaders:
-        {
-            EvenAndOddHeaders = Data.New;
-            break;
-        }
+		case AscDFH.historyitem_Document_EvenAndOddHeaders:
+		{
+			EvenAndOddHeaders = Data.New;
+			break;
+		}
 
-        case AscDFH.historyitem_Document_DefaultLanguage:
-        {
-            this.Styles.Default.TextPr.Lang.Val = Data.New;
-            this.Restart_CheckSpelling();
-            break;
-        }
+		case AscDFH.historyitem_Document_DefaultLanguage:
+		{
+			this.Styles.Default.TextPr.Lang.Val = Data.New;
+			this.Restart_CheckSpelling();
+			break;
+		}
 
-        case AscDFH.historyitem_Document_MathSettings:
-        {
-            this.Settings.MathSettings.SetPr(Data.NewPr);
-            break;
-        }
+		case AscDFH.historyitem_Document_MathSettings:
+		{
+			this.Settings.MathSettings.SetPr(Data.NewPr);
+			break;
+		}
 
-    }
+	}
 };
 CDocument.prototype.Get_ParentObject_or_DocumentPos = function(Index)
 {
-    return {Type : AscDFH.historyitem_recalctype_Inline, Data : Index};
+	return {Type : AscDFH.historyitem_recalctype_Inline, Data : Index};
 };
-CDocument.prototype.Refresh_RecalcData              = function(Data)
+CDocument.prototype.Refresh_RecalcData = function(Data)
 {
-    var ChangePos         = -1;
-    var bNeedRecalcHdrFtr = false;
+	var ChangePos         = -1;
+	var bNeedRecalcHdrFtr = false;
 
-    var Type = Data.Type;
+	var Type = Data.Type;
 
-    switch (Type)
-    {
-        case AscDFH.historyitem_Document_AddItem:
-        case AscDFH.historyitem_Document_RemoveItem:
-        {
-            ChangePos = Data.Pos;
-            break;
-        }
+	switch (Type)
+	{
+		case AscDFH.historyitem_Document_AddItem:
+		case AscDFH.historyitem_Document_RemoveItem:
+		{
+			ChangePos = Data.Pos;
+			break;
+		}
 
-        case AscDFH.historyitem_Document_DefaultTab:
-        case AscDFH.historyitem_Document_EvenAndOddHeaders:
-        case AscDFH.historyitem_Document_MathSettings:
-        {
-            ChangePos = 0;
-            break;
-        }
-    }
+		case AscDFH.historyitem_Document_DefaultTab:
+		case AscDFH.historyitem_Document_EvenAndOddHeaders:
+		case AscDFH.historyitem_Document_MathSettings:
+		{
+			ChangePos = 0;
+			break;
+		}
+	}
 
-    if (-1 != ChangePos)
-        this.History.RecalcData_Add({
-            Type : AscDFH.historyitem_recalctype_Inline,
-            Data : {Pos : ChangePos, PageNum : 0}
-        });
+	if (-1 != ChangePos)
+	{
+		this.History.RecalcData_Add({
+			Type : AscDFH.historyitem_recalctype_Inline,
+			Data : {Pos : ChangePos, PageNum : 0}
+		});
+	}
 };
-CDocument.prototype.Refresh_RecalcData2             = function(Index, Page_rel)
+CDocument.prototype.Refresh_RecalcData2 = function(Index, Page_rel)
 {
-    this.History.RecalcData_Add({
-        Type : AscDFH.historyitem_recalctype_Inline,
-        Data : {Pos : Index, PageNum : Page_rel}
-    });
+	this.History.RecalcData_Add({
+		Type : AscDFH.historyitem_recalctype_Inline,
+		Data : {Pos : Index, PageNum : Page_rel}
+	});
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Функции для работы с гиперссылками
 //----------------------------------------------------------------------------------------------------------------------
-CDocument.prototype.Hyperlink_Add    = function(HyperProps)
+CDocument.prototype.Hyperlink_Add = function(HyperProps)
 {
-    // Проверку, возможно ли добавить гиперссылку, должны были вызвать до этой функции
-    if (null != HyperProps.Text && "" != HyperProps.Text && true === this.Is_SelectionUse())
-    {
-        // Корректировка в данном случае пройдет при добавлении гиперссылки.
-        var SelectionInfo = this.Get_SelectedElementsInfo();
-        var Para          = SelectionInfo.Get_Paragraph();
-        if (null !== Para)
-            HyperProps.TextPr = Para.Get_TextPr(Para.Get_ParaContentPos(true, true));
+	// Проверку, возможно ли добавить гиперссылку, должны были вызвать до этой функции
+	if (null != HyperProps.Text && "" != HyperProps.Text && true === this.Is_SelectionUse())
+	{
+		// Корректировка в данном случае пройдет при добавлении гиперссылки.
+		var SelectionInfo = this.Get_SelectedElementsInfo();
+		var Para          = SelectionInfo.Get_Paragraph();
+		if (null !== Para)
+			HyperProps.TextPr = Para.Get_TextPr(Para.Get_ParaContentPos(true, true));
 
-        this.Remove(1, false, false, true);
-        this.Selection_Remove();
-    }
+		this.Remove(1, false, false, true);
+		this.Selection_Remove();
+	}
 
-    // Работаем с колонтитулом
-    if (docpostype_HdrFtr === this.CurPos.Type)
-    {
-        this.HdrFtr.Hyperlink_Add(HyperProps);
-    }
-    else if (docpostype_DrawingObjects === this.CurPos.Type)
-    {
-        this.DrawingObjects.hyperlinkAdd(HyperProps);
-    }
-    // Либо у нас нет выделения, либо выделение внутри одного элемента
-    else if (docpostype_Content == this.CurPos.Type && ( ( true === this.Selection.Use && this.Selection.StartPos == this.Selection.EndPos ) || ( false == this.Selection.Use ) ))
-    {
-        var Pos = ( true == this.Selection.Use ? this.Selection.StartPos : this.CurPos.ContentPos );
-        this.Content[Pos].Hyperlink_Add(HyperProps);
-
-        this.ContentLastChangePos = Pos;
-        this.Recalculate(true);
-    }
-
-    this.Document_UpdateInterfaceState();
-    this.Document_UpdateSelectionState();
+	this.Controller.AddHyperlink(HyperProps);
+	this.Recalculate();
+	this.Document_UpdateInterfaceState();
+	this.Document_UpdateSelectionState();
 };
 CDocument.prototype.Hyperlink_Modify = function(HyperProps)
 {
-    // Работаем с колонтитулом
-    if (docpostype_HdrFtr === this.CurPos.Type)
-    {
-        this.HdrFtr.Hyperlink_Modify(HyperProps);
-    }
-    else if (docpostype_DrawingObjects === this.CurPos.Type)
-    {
-        this.DrawingObjects.hyperlinkModify(HyperProps);
-    }
-    // Либо у нас нет выделения, либо выделение внутри одного элемента
-    else if (docpostype_Content == this.CurPos.Type && ( ( true === this.Selection.Use && this.Selection.StartPos == this.Selection.EndPos ) || ( false == this.Selection.Use ) ))
-    {
-        var Pos = ( true == this.Selection.Use ? this.Selection.StartPos : this.CurPos.ContentPos );
-        if (true === this.Content[Pos].Hyperlink_Modify(HyperProps))
-        {
-            this.ContentLastChangePos = Pos;
-            this.Recalculate(true);
-        }
-    }
-
+	this.Controller.ModifyHyperlink(HyperProps);
+	this.Recalculate();
     this.Document_UpdateSelectionState();
     this.Document_UpdateInterfaceState();
 };
 CDocument.prototype.Hyperlink_Remove = function()
 {
-    // Работаем с колонтитулом
-    if (docpostype_HdrFtr === this.CurPos.Type)
-    {
-        this.HdrFtr.Hyperlink_Remove();
-    }
-    else if (docpostype_DrawingObjects === this.CurPos.Type)
-    {
-        this.DrawingObjects.hyperlinkRemove();
-    }
-    // Либо у нас нет выделения, либо выделение внутри одного элемента
-    else if (docpostype_Content == this.CurPos.Type && ( ( true === this.Selection.Use && this.Selection.StartPos == this.Selection.EndPos ) || ( false == this.Selection.Use ) ))
-    {
-        var Pos = ( true == this.Selection.Use ? this.Selection.StartPos : this.CurPos.ContentPos );
-        this.Content[Pos].Hyperlink_Remove();
-    }
-
-    this.Recalculate();
-    this.Document_UpdateInterfaceState();
+	this.Controller.RemoveHyperlink();
+	this.Recalculate();
+	this.Document_UpdateInterfaceState();
 };
 CDocument.prototype.Hyperlink_CanAdd = function(bCheckInHyperlink)
 {
-    // Проверим можно ли добавлять гиперссылку
-    if (docpostype_HdrFtr === this.CurPos.Type)
-        return this.HdrFtr.Hyperlink_CanAdd(bCheckInHyperlink);
-    else if (docpostype_DrawingObjects === this.CurPos.Type)
-        return this.DrawingObjects.hyperlinkCanAdd(bCheckInHyperlink);
-    else //if ( docpostype_Content === this.CurPos.Type )
-    {
-        if (true === this.Selection.Use)
-        {
-            switch (this.Selection.Flag)
-            {
-                case selectionflag_Numbering:
-                    return false;
-                case selectionflag_Common:
-                {
-                    if (this.Selection.StartPos != this.Selection.EndPos)
-                        return false;
-
-                    return this.Content[this.Selection.StartPos].Hyperlink_CanAdd(bCheckInHyperlink);
-                }
-            }
-        }
-        else
-            return this.Content[this.CurPos.ContentPos].Hyperlink_CanAdd(bCheckInHyperlink);
-    }
-
-    return false;
+	return this.Controller.CanAddHyperlink(bCheckInHyperlink);
 };
 /**
  * Проверяем, находимся ли мы в гиперссылке сейчас.
  * @param bCheckEnd
  * @returns {*}
  */
-CDocument.prototype.Hyperlink_Check  = function(bCheckEnd)
+CDocument.prototype.Hyperlink_Check = function(bCheckEnd)
 {
-    if ("undefined" === typeof(bCheckEnd))
-        bCheckEnd = true;
+	if (undefined === bCheckEnd)
+		bCheckEnd = true;
 
-    // Работаем с колонтитулом
-    if (docpostype_HdrFtr === this.CurPos.Type)
-        return this.HdrFtr.Hyperlink_Check(bCheckEnd);
-    else if (docpostype_DrawingObjects === this.CurPos.Type)
-        return this.DrawingObjects.hyperlinkCheck(bCheckEnd);
-    else //if ( docpostype_Content == this.CurPos.Type )
-    {
-        if (true === this.Selection.Use)
-        {
-            switch (this.Selection.Flag)
-            {
-                case selectionflag_Numbering:
-                    return null;
-                case selectionflag_Common:
-                {
-                    if (this.Selection.StartPos != this.Selection.EndPos)
-                        return null;
-
-                    return this.Content[this.Selection.StartPos].Hyperlink_Check(bCheckEnd);
-                }
-            }
-        }
-        else
-            return this.Content[this.CurPos.ContentPos].Hyperlink_Check(bCheckEnd);
-    }
-
-    return null;
+	return this.Controller.IsCursorInHyperlink(bCheckEnd);
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Функции для работы с совместным редактирования
@@ -15733,6 +15554,142 @@ CDocument.prototype.controller_UpdateSelectionState = function()
 		this.DrawingDocument.SelectEnabled(false);
 		this.DrawingDocument.TargetShow();
 	}
+};
+CDocument.prototype.controller_GetSelectionState = function()
+{
+	var State;
+	if (true === this.Selection.Use)
+	{
+		// Выделение нумерации
+		if (selectionflag_Numbering == this.Selection.Flag)
+			State = [];
+		else
+		{
+			var StartPos = this.Selection.StartPos;
+			var EndPos   = this.Selection.EndPos;
+			if (StartPos > EndPos)
+			{
+				var Temp = StartPos;
+				StartPos = EndPos;
+				EndPos   = Temp;
+			}
+
+			State = [];
+
+			var TempState = [];
+			for (var Index = StartPos; Index <= EndPos; Index++)
+			{
+				TempState.push(this.Content[Index].Get_SelectionState());
+			}
+
+			State.push(TempState);
+		}
+	}
+	else
+		State = this.Content[this.CurPos.ContentPos].Get_SelectionState();
+
+	return State;
+};
+CDocument.prototype.controller_SetSelectionState = function(State, StateIndex)
+{
+	if (true === this.Selection.Use)
+	{
+		// Выделение нумерации
+		if (selectionflag_Numbering == this.Selection.Flag)
+		{
+			if (type_Paragraph === this.Content[this.Selection.StartPos].Get_Type())
+			{
+				var NumPr = this.Content[this.Selection.StartPos].Numbering_Get();
+				if (undefined !== NumPr)
+					this.Document_SelectNumbering(NumPr, this.Selection.StartPos);
+				else
+					this.Selection_Remove();
+			}
+			else
+				this.Selection_Remove();
+		}
+		else
+		{
+			var StartPos = this.Selection.StartPos;
+			var EndPos   = this.Selection.EndPos;
+			if (StartPos > EndPos)
+			{
+				var Temp = StartPos;
+				StartPos = EndPos;
+				EndPos   = Temp;
+			}
+
+			var CurState = State[StateIndex];
+			for (var Index = StartPos; Index <= EndPos; Index++)
+			{
+				this.Content[Index].Set_SelectionState(CurState[Index - StartPos], CurState[Index - StartPos].length - 1);
+			}
+		}
+	}
+	else
+		this.Content[this.CurPos.ContentPos].Set_SelectionState(State, StateIndex);
+};
+CDocument.prototype.controller_AddHyperlink = function(Props)
+{
+	if (false == this.Selection.Use || this.Selection.StartPos == this.Selection.EndPos)
+	{
+		var Pos = ( true == this.Selection.Use ? this.Selection.StartPos : this.CurPos.ContentPos );
+		this.Content[Pos].Hyperlink_Add(Props);
+	}
+};
+CDocument.prototype.controller_ModifyHyperlink = function(Props)
+{
+	if (false == this.Selection.Use || this.Selection.StartPos == this.Selection.EndPos)
+	{
+		var Pos = ( true == this.Selection.Use ? this.Selection.StartPos : this.CurPos.ContentPos );
+		this.Content[Pos].Hyperlink_Modify(Props);
+	}
+};
+CDocument.prototype.controller_RemoveHyperlink = function()
+{
+	if (false == this.Selection.Use || this.Selection.StartPos == this.Selection.EndPos)
+	{
+		var Pos = ( true == this.Selection.Use ? this.Selection.StartPos : this.CurPos.ContentPos );
+		this.Content[Pos].Hyperlink_Remove();
+	}
+};
+CDocument.prototype.controller_CanAddHyperlink = function(bCheckInHyperlink)
+{
+	if (true === this.Selection.Use)
+	{
+		if (selectionflag_Common === this.Selection.Flag)
+		{
+			if (this.Selection.StartPos != this.Selection.EndPos)
+				return false;
+
+			return this.Content[this.Selection.StartPos].Hyperlink_CanAdd(bCheckInHyperlink);
+		}
+	}
+	else
+	{
+		return this.Content[this.CurPos.ContentPos].Hyperlink_CanAdd(bCheckInHyperlink);
+	}
+
+	return false;
+};
+CDocument.prototype.controller_IsCursorInHyperlink = function(bCheckEnd)
+{
+	if (true === this.Selection.Use)
+	{
+		if (selectionflag_Common === this.Selection.Flag)
+		{
+			if (this.Selection.StartPos != this.Selection.EndPos)
+				return null;
+
+			return this.Content[this.Selection.StartPos].Hyperlink_Check(bCheckEnd);
+		}
+	}
+	else
+	{
+		return this.Content[this.CurPos.ContentPos].Hyperlink_Check(bCheckEnd);
+	}
+
+	return null;
 };
 
 CDocument.prototype.controller_AddToParagraph = function(ParaItem, bRecalculate)

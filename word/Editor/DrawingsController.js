@@ -400,6 +400,35 @@ CDrawingsController.prototype.UpdateSelectionState = function()
 	this.DrawingObjects.documentUpdateSelectionState();
 	this.LogicDocument.Document_UpdateTracks();
 };
+CDrawingsController.prototype.GetSelectionState = function()
+{
+	return this.DrawingObjects.getSelectionState();
+};
+CDrawingsController.prototype.SetSelectionState = function(State, StateIndex)
+{
+	this.DrawingObjects.setSelectionState(State, StateIndex);
+};
+CDrawingsController.prototype.AddHyperlink = function(Props)
+{
+	this.DrawingObjects.hyperlinkAdd(Props);
+};
+CDrawingsController.prototype.ModifyHyperlink = function(Props)
+{
+	this.DrawingObjects.hyperlinkModify(Props);
+};
+CDrawingsController.prototype.RemoveHyperlink = function()
+{
+	this.DrawingObjects.hyperlinkRemove();
+};
+CDrawingsController.prototype.CanAddHyperlink = function(bCheckInHyperlink)
+{
+	return this.DrawingObjects.hyperlinkCanAdd(bCheckInHyperlink);
+};
+CDrawingsController.prototype.IsCursorInHyperlink = function(bCheckEnd)
+{
+	return this.DrawingObjects.hyperlinkCheck(bCheckEnd);
+};
+
 
 CDrawingsController.prototype.AddToParagraph = function(oItem, bRecalculate)
 {

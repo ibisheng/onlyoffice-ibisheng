@@ -999,6 +999,37 @@ CFootnotesController.prototype.UpdateSelectionState = function()
 {
 	// TODO: Реализовать
 };
+CFootnotesController.prototype.GetSelectionState = function()
+{
+	// TODO: Реализовать
+	return [];
+};
+CFootnotesController.prototype.SetSelectionState = function(State, StateIndex)
+{
+	// TODO: Реализовать
+};
+CFootnotesController.prototype.AddHyperlink = function(Props)
+{
+	// TODO: Реализовать
+};
+CFootnotesController.prototype.ModifyHyperlink = function(Props)
+{
+	// TODO: Реализовать
+};
+CFootnotesController.prototype.RemoveHyperlink = function()
+{
+	// TODO: Реализовать
+};
+CFootnotesController.prototype.CanAddHyperlink = function(bCheckInHyperlink)
+{
+	// TODO: Реализовать
+	return false;
+};
+CFootnotesController.prototype.IsCursorInHyperlink = function(bCheckEnd)
+{
+	// TODO: Реализовать
+	return false;
+};
 
 CFootnotesController.prototype.AddToParagraph = function(oItem, bRecalculate)
 {

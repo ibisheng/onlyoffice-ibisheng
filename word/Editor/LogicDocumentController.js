@@ -309,6 +309,35 @@ CLogicDocumentController.prototype.UpdateSelectionState = function()
 {
 	this.LogicDocument.controller_UpdateSelectionState();
 };
+CLogicDocumentController.prototype.GetSelectionState = function()
+{
+	return this.LogicDocument.controller_GetSelectionState();
+};
+CLogicDocumentController.prototype.SetSelectionState = function(State, StateIndex)
+{
+	this.LogicDocument.controller_SetSelectionState(State, StateIndex);
+};
+CLogicDocumentController.prototype.AddHyperlink = function(Props)
+{
+	this.LogicDocument.controller_AddHyperlink(Props);
+};
+CLogicDocumentController.prototype.ModifyHyperlink = function(Props)
+{
+	this.LogicDocument.controller_ModifyHyperlink(Props);
+};
+CLogicDocumentController.prototype.RemoveHyperlink = function()
+{
+	this.LogicDocument.controller_RemoveHyperlink();
+};
+CLogicDocumentController.prototype.CanAddHyperlink = function(bCheckInHyperlink)
+{
+	return this.LogicDocument.controller_CanAddHyperlink(bCheckInHyperlink);
+};
+CLogicDocumentController.prototype.IsCursorInHyperlink = function(bCheckEnd)
+{
+	return this.LogicDocument.controller_IsCursorInHyperlink(bCheckEnd);
+};
+
 
 CLogicDocumentController.prototype.AddToParagraph = function(oItem)
 {
