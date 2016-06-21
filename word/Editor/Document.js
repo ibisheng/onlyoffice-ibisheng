@@ -8452,580 +8452,501 @@ CDocument.prototype.Hyperlink_Check = function(bCheckEnd)
 //----------------------------------------------------------------------------------------------------------------------
 CDocument.prototype.Document_Is_SelectionLocked = function(CheckType, AdditionalData)
 {
-    return false;
+	return false;
 };
-CDocument.prototype.Save_Changes                = function(Data, Writer)
+CDocument.prototype.Save_Changes = function(Data, Writer)
 {
-    // Сохраняем изменения из тех, которые используются для Undo/Redo в бинарный файл.
-    // Long : тип класса
-    // Long : тип изменений
+	// Сохраняем изменения из тех, которые используются для Undo/Redo в бинарный файл.
+	// Long : тип класса
+	// Long : тип изменений
 
-    Writer.WriteLong(AscDFH.historyitem_type_Document);
+	Writer.WriteLong(AscDFH.historyitem_type_Document);
 
-    var Type = Data.Type;
+	var Type = Data.Type;
 
-    // Пишем тип
-    Writer.WriteLong(Type);
+	// Пишем тип
+	Writer.WriteLong(Type);
 
-    switch (Type)
-    {
-        case  AscDFH.historyitem_Document_AddItem:
-        {
-            // Long     : Количество элементов
-            // Array of :
-            //  {
-            //    Long   : Позиция
-            //    String : Id элемента
-            //  }
+	switch (Type)
+	{
+		case  AscDFH.historyitem_Document_AddItem:
+		{
+			// Long     : Количество элементов
+			// Array of :
+			//  {
+			//    Long   : Позиция
+			//    String : Id элемента
+			//  }
 
-            var bArray = Data.UseArray;
-            var Count  = 1;
+			var bArray = Data.UseArray;
+			var Count  = 1;
 
-            Writer.WriteLong(Count);
+			Writer.WriteLong(Count);
 
-            for (var Index = 0; Index < Count; Index++)
-            {
-                if (true === bArray)
-                    Writer.WriteLong(Data.PosArray[Index]);
-                else
-                    Writer.WriteLong(Data.Pos + Index);
+			for (var Index = 0; Index < Count; Index++)
+			{
+				if (true === bArray)
+					Writer.WriteLong(Data.PosArray[Index]);
+				else
+					Writer.WriteLong(Data.Pos + Index);
 
-                Writer.WriteString2(Data.Item.Get_Id());
-            }
+				Writer.WriteString2(Data.Item.Get_Id());
+			}
 
-            break;
-        }
+			break;
+		}
 
-        case AscDFH.historyitem_Document_RemoveItem:
-        {
-            // Long          : Количество удаляемых элементов
-            // Array of Long : позиции удаляемых элементов
+		case AscDFH.historyitem_Document_RemoveItem:
+		{
+			// Long          : Количество удаляемых элементов
+			// Array of Long : позиции удаляемых элементов
 
-            var bArray = Data.UseArray;
-            var Count  = Data.Items.length;
+			var bArray = Data.UseArray;
+			var Count  = Data.Items.length;
 
-            var StartPos = Writer.GetCurPosition();
-            Writer.Skip(4);
-            var RealCount = Count;
+			var StartPos = Writer.GetCurPosition();
+			Writer.Skip(4);
+			var RealCount = Count;
 
-            for (var Index = 0; Index < Count; Index++)
-            {
-                if (true === bArray)
-                {
-                    if (false === Data.PosArray[Index])
-                        RealCount--;
-                    else
-                        Writer.WriteLong(Data.PosArray[Index]);
-                }
-                else
-                    Writer.WriteLong(Data.Pos);
-            }
+			for (var Index = 0; Index < Count; Index++)
+			{
+				if (true === bArray)
+				{
+					if (false === Data.PosArray[Index])
+						RealCount--;
+					else
+						Writer.WriteLong(Data.PosArray[Index]);
+				}
+				else
+					Writer.WriteLong(Data.Pos);
+			}
 
-            var EndPos = Writer.GetCurPosition();
-            Writer.Seek(StartPos);
-            Writer.WriteLong(RealCount);
-            Writer.Seek(EndPos);
+			var EndPos = Writer.GetCurPosition();
+			Writer.Seek(StartPos);
+			Writer.WriteLong(RealCount);
+			Writer.Seek(EndPos);
 
-            break;
-        }
+			break;
+		}
 
-        case AscDFH.historyitem_Document_DefaultTab:
-        {
-            // Double : Default Tab
+		case AscDFH.historyitem_Document_DefaultTab:
+		{
+			// Double : Default Tab
 
-            Writer.WriteDouble(Data.New);
+			Writer.WriteDouble(Data.New);
 
-            break;
-        }
+			break;
+		}
 
-        case AscDFH.historyitem_Document_EvenAndOddHeaders:
-        {
-            // Bool : EvenAndOddHeaders
-            Writer.WriteBool(Data.New);
-            break;
-        }
+		case AscDFH.historyitem_Document_EvenAndOddHeaders:
+		{
+			// Bool : EvenAndOddHeaders
+			Writer.WriteBool(Data.New);
+			break;
+		}
 
-        case AscDFH.historyitem_Document_DefaultLanguage:
-        {
-            // Long : LanguageId
-            Writer.WriteLong(Data.New);
-            break;
-        }
-        case AscDFH.historyitem_Document_MathSettings:
-        {
-            this.Settings.MathSettings.Write_ToBinary(Writer);
-            break;
-        }
-    }
+		case AscDFH.historyitem_Document_DefaultLanguage:
+		{
+			// Long : LanguageId
+			Writer.WriteLong(Data.New);
+			break;
+		}
+		case AscDFH.historyitem_Document_MathSettings:
+		{
+			this.Settings.MathSettings.Write_ToBinary(Writer);
+			break;
+		}
+	}
 
-    return Writer;
+	return Writer;
 };
-CDocument.prototype.Save_Changes2               = function(Data, Writer)
+CDocument.prototype.Save_Changes2 = function(Data, Writer)
 {
-    var bRetValue = false;
-    var Type      = Data.Type;
-    switch (Type)
-    {
-        case  AscDFH.historyitem_Document_AddItem:
-        {
-            break;
-        }
+	var bRetValue = false;
+	var Type      = Data.Type;
+	switch (Type)
+	{
+		case AscDFH.historyitem_Document_AddItem:
+		{
+			break;
+		}
 
-        case AscDFH.historyitem_Document_RemoveItem:
-        {
-            break;
-        }
-    }
+		case AscDFH.historyitem_Document_RemoveItem:
+		{
+			break;
+		}
+	}
 
-    return bRetValue;
+	return bRetValue;
 };
-CDocument.prototype.Load_Changes                = function(Reader, Reader2)
+CDocument.prototype.Load_Changes = function(Reader, Reader2)
 {
-    // Сохраняем изменения из тех, которые используются для Undo/Redo в бинарный файл.
-    // Long : тип класса
-    // Long : тип изменений
+	// Сохраняем изменения из тех, которые используются для Undo/Redo в бинарный файл.
+	// Long : тип класса
+	// Long : тип изменений
 
-    var ClassType = Reader.GetLong();
-    if (AscDFH.historyitem_type_Document != ClassType)
-        return;
+	var ClassType = Reader.GetLong();
+	if (AscDFH.historyitem_type_Document != ClassType)
+		return;
 
-    var Type = Reader.GetLong();
+	var Type = Reader.GetLong();
 
-    switch (Type)
-    {
-        case  AscDFH.historyitem_Document_AddItem:
-        {
-            // Long     : Количество элементов
-            // Array of :
-            //  {
-            //    Long   : Позиция
-            //    String : Id элемента
-            //  }
+	switch (Type)
+	{
+		case  AscDFH.historyitem_Document_AddItem:
+		{
+			// Long     : Количество элементов
+			// Array of :
+			//  {
+			//    Long   : Позиция
+			//    String : Id элемента
+			//  }
 
-            var Count = Reader.GetLong();
+			var Count = Reader.GetLong();
 
-            for (var Index = 0; Index < Count; Index++)
-            {
-                var Pos     = this.m_oContentChanges.Check(AscCommon.contentchanges_Add, Reader.GetLong());
-                var Element = g_oTableId.Get_ById(Reader.GetString2());
+			for (var Index = 0; Index < Count; Index++)
+			{
+				var Pos     = this.m_oContentChanges.Check(AscCommon.contentchanges_Add, Reader.GetLong());
+				var Element = g_oTableId.Get_ById(Reader.GetString2());
 
-                Pos = Math.min(Pos, this.Content.length);
+				Pos = Math.min(Pos, this.Content.length);
 
-                if (null != Element)
-                {
-                    if (Pos > 0)
-                    {
-                        this.Content[Pos - 1].Next = Element;
-                        Element.Prev               = this.Content[Pos - 1];
-                    }
-                    else
-                        Element.Prev = null;
+				if (null != Element)
+				{
+					if (Pos > 0)
+					{
+						this.Content[Pos - 1].Next = Element;
+						Element.Prev               = this.Content[Pos - 1];
+					}
+					else
+						Element.Prev = null;
 
-                    if (Pos <= this.Content.length - 1)
-                    {
-                        this.Content[Pos].Prev = Element;
-                        Element.Next           = this.Content[Pos];
-                    }
-                    else
-                        Element.Next = null;
+					if (Pos <= this.Content.length - 1)
+					{
+						this.Content[Pos].Prev = Element;
+						Element.Next           = this.Content[Pos];
+					}
+					else
+						Element.Next = null;
 
-                    Element.Parent = this;
+					Element.Parent = this;
 
-                    this.Content.splice(Pos, 0, Element);
-                    this.private_RecalculateNumbering([Element]);
+					this.Content.splice(Pos, 0, Element);
+					this.private_RecalculateNumbering([Element]);
 
-                    AscCommon.CollaborativeEditing.Update_DocumentPositionsOnAdd(this, Pos);
+					AscCommon.CollaborativeEditing.Update_DocumentPositionsOnAdd(this, Pos);
 
-                    // Обновим информацию о секциях
-                    this.SectionsInfo.Update_OnAdd(Pos, [Element]);
-                    this.private_ReindexContent(Pos);
-                }
-            }
+					// Обновим информацию о секциях
+					this.SectionsInfo.Update_OnAdd(Pos, [Element]);
+					this.private_ReindexContent(Pos);
+				}
+			}
 
-            break;
-        }
+			break;
+		}
 
-        case AscDFH.historyitem_Document_RemoveItem:
-        {
-            // Long          : Количество удаляемых элементов
-            // Array of Long : позиции удаляемых элементов
+		case AscDFH.historyitem_Document_RemoveItem:
+		{
+			// Long          : Количество удаляемых элементов
+			// Array of Long : позиции удаляемых элементов
 
-            var Count = Reader.GetLong();
+			var Count = Reader.GetLong();
 
-            for (var Index = 0; Index < Count; Index++)
-            {
-                var Pos = this.m_oContentChanges.Check(AscCommon.contentchanges_Remove, Reader.GetLong());
+			for (var Index = 0; Index < Count; Index++)
+			{
+				var Pos = this.m_oContentChanges.Check(AscCommon.contentchanges_Remove, Reader.GetLong());
 
-                // действие совпало, не делаем его
-                if (false === Pos)
-                    continue;
+				// действие совпало, не делаем его
+				if (false === Pos)
+					continue;
 
-                //Pos = Math.min(Pos, this.Content.length - 1);
+				//Pos = Math.min(Pos, this.Content.length - 1);
 
-                var Elements = this.Content.splice(Pos, 1);
-                this.private_RecalculateNumbering(Elements);
-                AscCommon.CollaborativeEditing.Update_DocumentPositionsOnRemove(this, Pos, 1);
+				var Elements = this.Content.splice(Pos, 1);
+				this.private_RecalculateNumbering(Elements);
+				AscCommon.CollaborativeEditing.Update_DocumentPositionsOnRemove(this, Pos, 1);
 
-                if (Pos > 0)
-                {
-                    if (Pos <= this.Content.length - 1)
-                    {
-                        this.Content[Pos - 1].Next = this.Content[Pos];
-                        this.Content[Pos].Prev     = this.Content[Pos - 1];
-                    }
-                    else
-                    {
-                        this.Content[Pos - 1].Next = null;
-                    }
-                }
-                else if (Pos <= this.Content.length - 1)
-                {
-                    this.Content[Pos].Prev = null;
-                }
+				if (Pos > 0)
+				{
+					if (Pos <= this.Content.length - 1)
+					{
+						this.Content[Pos - 1].Next = this.Content[Pos];
+						this.Content[Pos].Prev     = this.Content[Pos - 1];
+					}
+					else
+					{
+						this.Content[Pos - 1].Next = null;
+					}
+				}
+				else if (Pos <= this.Content.length - 1)
+				{
+					this.Content[Pos].Prev = null;
+				}
 
-                // Обновим информацию о секциях
-                this.SectionsInfo.Update_OnRemove(Pos, 1);
-                this.private_ReindexContent(Pos);
-            }
+				// Обновим информацию о секциях
+				this.SectionsInfo.Update_OnRemove(Pos, 1);
+				this.private_ReindexContent(Pos);
+			}
 
-            break;
-        }
+			break;
+		}
 
-        case AscDFH.historyitem_Document_DefaultTab:
-        {
-            // Double : Default Tab
+		case AscDFH.historyitem_Document_DefaultTab:
+		{
+			// Double : Default Tab
 
-            Default_Tab_Stop = Reader.GetDouble();
+			Default_Tab_Stop = Reader.GetDouble();
 
-            break;
-        }
+			break;
+		}
 
-        case AscDFH.historyitem_Document_EvenAndOddHeaders:
-        {
-            // Bool : EvenAndOddHeaders
+		case AscDFH.historyitem_Document_EvenAndOddHeaders:
+		{
+			// Bool : EvenAndOddHeaders
 
-            EvenAndOddHeaders = Reader.GetBool();
+			EvenAndOddHeaders = Reader.GetBool();
 
-            break;
-        }
+			break;
+		}
 
-        case AscDFH.historyitem_Document_DefaultLanguage:
-        {
-            // Long : LanguageId
-            this.Styles.Default.TextPr.Lang.Val = Reader.GetLong();
+		case AscDFH.historyitem_Document_DefaultLanguage:
+		{
+			// Long : LanguageId
+			this.Styles.Default.TextPr.Lang.Val = Reader.GetLong();
 
-            // Нужно заново запустить проверку орфографии
-            this.Restart_CheckSpelling();
+			// Нужно заново запустить проверку орфографии
+			this.Restart_CheckSpelling();
 
-            break;
-        }
-        case AscDFH.historyitem_Document_MathSettings:
-        {
-            this.Settings.MathSettings.Read_FromBinary(Reader);
-            break;
-        }
-    }
+			break;
+		}
+		case AscDFH.historyitem_Document_MathSettings:
+		{
+			this.Settings.MathSettings.Read_FromBinary(Reader);
+			break;
+		}
+	}
 
-    return true;
+	return true;
 };
-CDocument.prototype.Get_SelectionState2         = function()
+CDocument.prototype.Get_SelectionState2 = function()
 {
-    this.Selection_Remove()
+	this.Selection_Remove();
 
-    // Сохраняем Id ближайшего элемента в текущем классе
+	// Сохраняем Id ближайшего элемента в текущем классе
 
-    var State = new CDocumentSelectionState();
-    if (docpostype_HdrFtr === this.CurPos.Type)
-    {
-        State.Type = docpostype_HdrFtr;
+	var State       = new CDocumentSelectionState();
+	var nDocPosType = this.Get_DocPosType();
+	if (docpostype_HdrFtr === nDocPosType)
+	{
+		State.Type = docpostype_HdrFtr;
 
-        if (null != this.HdrFtr.CurHdrFtr)
-            State.Id = this.HdrFtr.CurHdrFtr.Get_Id();
-        else
-            State.Id = null;
-    }
-    else if (docpostype_DrawingObjects === this.CurPos.Type)
-    {
-        // TODO: запрашиваем параграф текущего выделенного элемента
-        var X       = 0;
-        var Y       = 0;
-        var PageNum = this.CurPage;
+		if (null != this.HdrFtr.CurHdrFtr)
+			State.Id = this.HdrFtr.CurHdrFtr.Get_Id();
+		else
+			State.Id = null;
+	}
+	else if (docpostype_DrawingObjects === nDocPosType)
+	{
+		// TODO: запрашиваем параграф текущего выделенного элемента
+		var X       = 0;
+		var Y       = 0;
+		var PageNum = this.CurPage;
 
-        var ContentPos = this.Internal_GetContentPosByXY(X, Y, PageNum);
+		var ContentPos = this.Internal_GetContentPosByXY(X, Y, PageNum);
 
-        State.Type = docpostype_Content;
-        State.Id   = this.Content[ContentPos].Get_Id();
-    }
-    else // if ( docpostype_Content === this.CurPos.Type )
-    {
-        State.Id   = this.Get_Id();
-        State.Type = docpostype_Content;
+		State.Type = docpostype_Content;
+		State.Id   = this.Content[ContentPos].Get_Id();
+	}
+	else if (docpostype_Footnotes === nDocPosType)
+	{
+		// TODO: Реализовать для сносок
+	}
+	else // if (docpostype_Content === nDocPosType)
+	{
+		State.Id   = this.Get_Id();
+		State.Type = docpostype_Content;
 
-        var Element = this.Content[this.CurPos.ContentPos]
-        State.Data  = Element.Get_SelectionState2();
-    }
+		var Element = this.Content[this.CurPos.ContentPos];
+		State.Data  = Element.Get_SelectionState2();
+	}
 
-    return State;
+	return State;
 };
-CDocument.prototype.Set_SelectionState2         = function(State)
+CDocument.prototype.Set_SelectionState2 = function(State)
 {
-    this.Selection_Remove();
+	this.Selection_Remove();
 
-    var Id = State.Id;
-    if (docpostype_HdrFtr === State.Type)
-    {
-        this.Set_DocPosType(docpostype_HdrFtr);
+	var Id = State.Id;
+	if (docpostype_HdrFtr === State.Type)
+	{
+		this.Set_DocPosType(docpostype_HdrFtr);
 
-        if (null === Id || true != this.HdrFtr.Set_CurHdrFtr_ById(Id))
-        {
-            this.Set_DocPosType(docpostype_Content);
-            this.CurPos.ContentPos = 0;
+		if (null === Id || true != this.HdrFtr.Set_CurHdrFtr_ById(Id))
+		{
+			this.Set_DocPosType(docpostype_Content);
+			this.CurPos.ContentPos = 0;
 
-            this.Content[this.CurPos.ContentPos].Cursor_MoveToStartPos();
-        }
-    }
-    else // if ( docpostype_Content === State.Type )
-    {
-        var ElementId = State.Data.Id;
+			this.Content[this.CurPos.ContentPos].Cursor_MoveToStartPos();
+		}
+	}
+	else // if ( docpostype_Content === State.Type )
+	{
+		var ElementId = State.Data.Id;
 
-        var CurId = ElementId;
+		var CurId = ElementId;
 
-        var bFlag = false;
+		var bFlag = false;
 
-        var Pos = 0;
+		var Pos = 0;
 
-        // Найдем элемент с Id = CurId
-        var Count = this.Content.length;
-        for (Pos = 0; Pos < Count; Pos++)
-        {
-            if (this.Content[Pos].Get_Id() == CurId)
-            {
-                bFlag = true;
-                break;
-            }
-        }
+		// Найдем элемент с Id = CurId
+		var Count = this.Content.length;
+		for (Pos = 0; Pos < Count; Pos++)
+		{
+			if (this.Content[Pos].Get_Id() == CurId)
+			{
+				bFlag = true;
+				break;
+			}
+		}
 
-        if (true !== bFlag)
-        {
-            var TempElement = g_oTableId.Get_ById(CurId);
-            Pos             = ( null != TempElement ? TempElement.Index : 0 );
-            Pos             = Math.max(0, Math.min(Pos, this.Content.length - 1));
-        }
+		if (true !== bFlag)
+		{
+			var TempElement = g_oTableId.Get_ById(CurId);
+			Pos             = ( null != TempElement ? TempElement.Index : 0 );
+			Pos             = Math.max(0, Math.min(Pos, this.Content.length - 1));
+		}
 
-        this.Selection.Start    = false;
-        this.Selection.Use      = false;
-        this.Selection.StartPos = Pos;
-        this.Selection.EndPos   = Pos;
-        this.Selection.Flag     = selectionflag_Common;
+		this.Selection.Start    = false;
+		this.Selection.Use      = false;
+		this.Selection.StartPos = Pos;
+		this.Selection.EndPos   = Pos;
+		this.Selection.Flag     = selectionflag_Common;
 
-        this.Set_DocPosType(docpostype_Content);
-        this.CurPos.ContentPos = Pos;
+		this.Set_DocPosType(docpostype_Content);
+		this.CurPos.ContentPos = Pos;
 
-        if (true !== bFlag)
-            this.Content[this.CurPos.ContentPos].Cursor_MoveToStartPos();
-        else
-        {
-            this.Content[this.CurPos.ContentPos].Set_SelectionState2(State.Data);
-        }
-    }
+		if (true !== bFlag)
+			this.Content[this.CurPos.ContentPos].Cursor_MoveToStartPos();
+		else
+		{
+			this.Content[this.CurPos.ContentPos].Set_SelectionState2(State.Data);
+		}
+	}
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Функции для работы с комментариями
 //----------------------------------------------------------------------------------------------------------------------
-CDocument.prototype.Add_Comment            = function(CommentData)
+CDocument.prototype.Add_Comment = function(CommentData)
 {
-    if (true != this.CanAdd_Comment())
-    {
-        CommentData.Set_QuoteText(null);
-        var Comment = new CComment(this.Comments, CommentData);
-        this.Comments.Add(Comment);
+	if (true != this.CanAdd_Comment())
+	{
+		CommentData.Set_QuoteText(null);
+		var Comment = new CComment(this.Comments, CommentData);
+		this.Comments.Add(Comment);
 
-        // Обновляем информацию для Undo/Redo
-        this.Document_UpdateInterfaceState();
-    }
-    else
-    {
-        var QuotedText = this.Get_SelectedText(false);
-        if (null === QuotedText)
-            QuotedText = "";
-        CommentData.Set_QuoteText(QuotedText);
+		// Обновляем информацию для Undo/Redo
+		this.Document_UpdateInterfaceState();
+	}
+	else
+	{
+		var QuotedText = this.Get_SelectedText(false);
+		if (null === QuotedText)
+			QuotedText = "";
+		CommentData.Set_QuoteText(QuotedText);
 
-        var Comment = new CComment(this.Comments, CommentData);
-        this.Comments.Add(Comment);
+		var Comment = new CComment(this.Comments, CommentData);
+		this.Comments.Add(Comment);
+		this.Controller.AddComment(Comment);
 
-        if (docpostype_HdrFtr === this.CurPos.Type)
-        {
-            this.HdrFtr.Add_Comment(Comment);
-        }
-        else if (docpostype_DrawingObjects === this.CurPos.Type)
-        {
-            if (true != this.DrawingObjects.isSelectedText())
-            {
-                var ParaDrawing = this.DrawingObjects.getMajorParaDrawing();
-                if (null != ParaDrawing)
-                {
-                    var Paragraph = ParaDrawing.Parent;
-                    Paragraph.Add_Comment2(Comment, ParaDrawing.Get_Id());
-                }
-            }
-            else
-            {
-                this.DrawingObjects.addComment(Comment);
-            }
-        }
-        else // if ( docpostype_Content === this.CurPos.Type )
-        {
-            if (selectionflag_Numbering === this.Selection.Flag)
-                return;
+		// TODO: Продумать, как избавиться от пересчета
+		this.Recalculate();
+		this.Document_UpdateInterfaceState();
+	}
 
-            if (true === this.Selection.Use)
-            {
-                var StartPos, EndPos;
-                if (this.Selection.StartPos < this.Selection.EndPos)
-                {
-                    StartPos = this.Selection.StartPos;
-                    EndPos   = this.Selection.EndPos;
-                }
-                else
-                {
-                    StartPos = this.Selection.EndPos;
-                    EndPos   = this.Selection.StartPos;
-                }
-
-                if (StartPos === EndPos)
-                {
-                    this.Content[StartPos].Add_Comment(Comment, true, true);
-                }
-                else
-                {
-                    this.Content[StartPos].Add_Comment(Comment, true, false);
-                    this.Content[EndPos].Add_Comment(Comment, false, true);
-                }
-            }
-            else
-            {
-                this.Content[this.CurPos.ContentPos].Add_Comment(Comment, true, true);
-            }
-        }
-
-        // TODO: Продумать, как избавиться от пересчета
-        this.Recalculate();
-        this.Document_UpdateInterfaceState();
-    }
-
-    return Comment;
+	return Comment;
 };
-CDocument.prototype.Change_Comment         = function(Id, CommentData)
+CDocument.prototype.Change_Comment = function(Id, CommentData)
 {
-    this.Comments.Set_CommentData(Id, CommentData);
-    this.Document_UpdateInterfaceState();
+	this.Comments.Set_CommentData(Id, CommentData);
+	this.Document_UpdateInterfaceState();
 };
-CDocument.prototype.Remove_Comment         = function(Id, bSendEvent, bRecalculate)
+CDocument.prototype.Remove_Comment = function(Id, bSendEvent, bRecalculate)
 {
-    if (null === Id)
-        return;
+	if (null === Id)
+		return;
 
-    if (true === this.Comments.Remove_ById(Id))
-    {
-        if (true === bRecalculate)
-        {
-            // TODO: Продумать как избавиться от пересчета при удалении комментария
-            this.Recalculate();
-            this.Document_UpdateInterfaceState();
-        }
+	if (true === this.Comments.Remove_ById(Id))
+	{
+		if (true === bRecalculate)
+		{
+			// TODO: Продумать как избавиться от пересчета при удалении комментария
+			this.Recalculate();
+			this.Document_UpdateInterfaceState();
+		}
 
-        if (true === bSendEvent)
-            editor.sync_RemoveComment(Id);
-    }
+		if (true === bSendEvent)
+			this.Api.sync_RemoveComment(Id);
+	}
 };
-CDocument.prototype.CanAdd_Comment         = function()
+CDocument.prototype.CanAdd_Comment = function()
 {
-    if (true !== this.Comments.Is_Use())
-        return false;
+	if (true !== this.Comments.Is_Use())
+		return false;
 
-    // Проверим можно ли добавлять гиперссылку
-    if (docpostype_HdrFtr === this.CurPos.Type)
-        return this.HdrFtr.CanAdd_Comment();
-    else if (docpostype_DrawingObjects == this.CurPos.Type)
-    {
-        if (true != this.DrawingObjects.isSelectedText())
-            return true;
-        else
-            return this.DrawingObjects.canAddComment();
-    }
-    else //if ( docpostype_Content === this.CurPos.Type )
-    {
-        switch (this.Selection.Flag)
-        {
-            case selectionflag_Numbering:
-                return false;
-            case selectionflag_Common:
-            {
-                if (true === this.Selection.Use && this.Selection.StartPos != this.Selection.EndPos)
-                    return true;
-                else
-                {
-                    var Pos     = ( this.Selection.Use === true ? this.Selection.StartPos : this.CurPos.ContentPos );
-                    var Element = this.Content[Pos];
-                    return Element.CanAdd_Comment();
-                }
-            }
-        }
-    }
-
-    return false;
+	return this.Controller.CanAddComment();
 };
-CDocument.prototype.Select_Comment         = function(Id, ScrollToComment)
+CDocument.prototype.Select_Comment = function(Id, ScrollToComment)
 {
-    var OldId = this.Comments.Get_CurrentId();
-    this.Comments.Set_Current(Id);
+	var OldId = this.Comments.Get_CurrentId();
+	this.Comments.Set_Current(Id);
 
-    var Comment = this.Comments.Get_ById(Id);
-    if (null != Comment)
-    {
-        var Comment_PageNum = Comment.m_oStartInfo.PageNum;
-        var Comment_Y       = Comment.m_oStartInfo.Y;
-        var Comment_X       = Comment.m_oStartInfo.X;
+	var Comment = this.Comments.Get_ById(Id);
+	if (null != Comment)
+	{
+		var Comment_PageNum = Comment.m_oStartInfo.PageNum;
+		var Comment_Y       = Comment.m_oStartInfo.Y;
+		var Comment_X       = Comment.m_oStartInfo.X;
 
-        if (true === ScrollToComment)
-            this.DrawingDocument.m_oWordControl.ScrollToPosition(Comment_X, Comment_Y, Comment_PageNum);
-    }
+		if (true === ScrollToComment)
+			this.DrawingDocument.m_oWordControl.ScrollToPosition(Comment_X, Comment_Y, Comment_PageNum);
+	}
 
-    if (OldId != Id)
-    {
-        this.DrawingDocument.ClearCachePages();
-        this.DrawingDocument.FirePaint();
-    }
+	if (OldId != Id)
+	{
+		this.DrawingDocument.ClearCachePages();
+		this.DrawingDocument.FirePaint();
+	}
 };
-CDocument.prototype.Show_Comment           = function(Id)
+CDocument.prototype.Show_Comment = function(Id)
 {
-    var Comment = this.Comments.Get_ById(Id);
-    if (null != Comment && null != Comment.StartId && null != Comment.EndId)
-    {
-        var Comment_PageNum = Comment.m_oStartInfo.PageNum;
-        var Comment_Y       = Comment.m_oStartInfo.Y;
-        var Comment_X       = this.Get_PageLimits(Comment_PageNum).XLimit;
+	var Comment = this.Comments.Get_ById(Id);
+	if (null != Comment && null != Comment.StartId && null != Comment.EndId)
+	{
+		var Comment_PageNum = Comment.m_oStartInfo.PageNum;
+		var Comment_Y       = Comment.m_oStartInfo.Y;
+		var Comment_X       = this.Get_PageLimits(Comment_PageNum).XLimit;
 
-        var Coords = this.DrawingDocument.ConvertCoordsToCursorWR(Comment_X, Comment_Y, Comment_PageNum);
-        editor.sync_ShowComment(Comment.Get_Id(), Coords.X, Coords.Y);
-    }
-    else
-    {
-        editor.sync_HideComment();
-    }
+		var Coords = this.DrawingDocument.ConvertCoordsToCursorWR(Comment_X, Comment_Y, Comment_PageNum);
+		this.Api.sync_ShowComment(Comment.Get_Id(), Coords.X, Coords.Y);
+	}
+	else
+	{
+		this.Api.sync_HideComment();
+	}
 };
-CDocument.prototype.Show_Comments          = function()
+CDocument.prototype.Show_Comments = function()
 {
-    this.Comments.Set_Use(true);
-    this.DrawingDocument.ClearCachePages();
-    this.DrawingDocument.FirePaint();
+	this.Comments.Set_Use(true);
+	this.DrawingDocument.ClearCachePages();
+	this.DrawingDocument.FirePaint();
 };
-CDocument.prototype.Hide_Comments          = function()
+CDocument.prototype.Hide_Comments = function()
 {
-    this.Comments.Set_Use(false);
-    this.Comments.Set_Current(null);
-    this.DrawingDocument.ClearCachePages();
-    this.DrawingDocument.FirePaint();
+	this.Comments.Set_Use(false);
+	this.Comments.Set_Current(null);
+	this.DrawingDocument.ClearCachePages();
+	this.DrawingDocument.FirePaint();
 };
 CDocument.prototype.Get_PrevElementEndInfo = function(CurElement)
 {
@@ -9040,36 +8961,16 @@ CDocument.prototype.Get_PrevElementEndInfo = function(CurElement)
 };
 CDocument.prototype.Get_SelectionAnchorPos = function()
 {
-    var Result;
-    if (docpostype_HdrFtr === this.CurPos.Type)
-    {
-        Result = this.HdrFtr.Get_SelectionAnchorPos();
-    }
-    else if (docpostype_DrawingObjects === this.CurPos.Type)
-    {
-        var ParaDrawing = this.DrawingObjects.getMajorParaDrawing();
-        Result          =
-        {
-            X0   : ParaDrawing.GraphicObj.x,
-            Y    : ParaDrawing.GraphicObj.y,
-            X1   : ParaDrawing.GraphicObj.x + ParaDrawing.GraphicObj.extX,
-            Page : ParaDrawing.PageNum
-        };
-    }
-    else
-    {
-        var Pos = ( true === this.Selection.Use ? ( this.Selection.StartPos < this.Selection.EndPos ? this.Selection.StartPos : this.Selection.EndPos ) : this.CurPos.ContentPos );
-        Result  = this.Content[Pos].Get_SelectionAnchorPos();
-    }
+	var Result = this.Controller.GetSelectionAnchorPos();
 
-    var PageLimit = this.Get_PageLimits(Result.Page);
-    Result.X0     = PageLimit.X;
-    Result.X1     = PageLimit.XLimit;
+	var PageLimit = this.Get_PageLimits(Result.Page);
+	Result.X0     = PageLimit.X;
+	Result.X1     = PageLimit.XLimit;
 
-    var Coords0 = this.DrawingDocument.ConvertCoordsToCursorWR(Result.X0, Result.Y, Result.Page);
-    var Coords1 = this.DrawingDocument.ConvertCoordsToCursorWR(Result.X1, Result.Y, Result.Page);
+	var Coords0 = this.DrawingDocument.ConvertCoordsToCursorWR(Result.X0, Result.Y, Result.Page);
+	var Coords1 = this.DrawingDocument.ConvertCoordsToCursorWR(Result.X1, Result.Y, Result.Page);
 
-    return {X0 : Coords0.X, X1 : Coords1.X, Y : Coords0.Y};
+	return {X0 : Coords0.X, X1 : Coords1.X, Y : Coords0.Y};
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Функции для работы с textbox
@@ -15691,6 +15592,61 @@ CDocument.prototype.controller_IsCursorInHyperlink = function(bCheckEnd)
 
 	return null;
 };
+CDocument.prototype.controller_AddComment = function(Comment)
+{
+	if (selectionflag_Numbering === this.Selection.Flag)
+		return;
+
+	if (true === this.Selection.Use)
+	{
+		var StartPos, EndPos;
+		if (this.Selection.StartPos < this.Selection.EndPos)
+		{
+			StartPos = this.Selection.StartPos;
+			EndPos   = this.Selection.EndPos;
+		}
+		else
+		{
+			StartPos = this.Selection.EndPos;
+			EndPos   = this.Selection.StartPos;
+		}
+
+		if (StartPos === EndPos)
+		{
+			this.Content[StartPos].Add_Comment(Comment, true, true);
+		}
+		else
+		{
+			this.Content[StartPos].Add_Comment(Comment, true, false);
+			this.Content[EndPos].Add_Comment(Comment, false, true);
+		}
+	}
+	else
+	{
+		this.Content[this.CurPos.ContentPos].Add_Comment(Comment, true, true);
+	}
+};
+CDocument.prototype.controller_CanAddComment = function()
+{
+	if (selectionflag_Common === this.Selection.Flag)
+	{
+		if (true === this.Selection.Use && this.Selection.StartPos != this.Selection.EndPos)
+			return true;
+		else
+		{
+			var Pos     = ( this.Selection.Use === true ? this.Selection.StartPos : this.CurPos.ContentPos );
+			var Element = this.Content[Pos];
+			return Element.CanAdd_Comment();
+		}
+	}
+
+	return false;
+};
+CDocument.prototype.controller_GetSelectionAnchorPos = function()
+{
+	var Pos = ( true === this.Selection.Use ? ( this.Selection.StartPos < this.Selection.EndPos ? this.Selection.StartPos : this.Selection.EndPos ) : this.CurPos.ContentPos );
+	return this.Content[Pos].Get_SelectionAnchorPos();
+}
 
 CDocument.prototype.controller_AddToParagraph = function(ParaItem, bRecalculate)
 {

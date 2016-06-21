@@ -672,6 +672,21 @@ CDocumentControllerBase.prototype.CanAddHyperlink = function(bCheckInHyperlink){
  * @returns {?ParaHyperlink}
  */
 CDocumentControllerBase.prototype.IsCursorInHyperlink = function(bCheckEnd){return false;};
+/**
+ * Добавляем комментарий.
+ * @param Comment
+ */
+CDocumentControllerBase.prototype.AddComment = function(Comment){};
+/**
+ * Проверяем, можно ли добавить комментарий.
+ * @returns {boolean}
+ */
+CDocumentControllerBase.prototype.CanAddComment = function(){return false;};
+/**
+ * Получаем физическую позицию на странице для якоря по селекту.
+ * @returns {{X0: number, X1: number, Y: number, Page: number}}
+ */
+CDocumentControllerBase.prototype.GetSelectionAnchorPos = function(){return {X0 : 0, X1 : 0, Y : 0, Page : 0};};
 
 /**
  * Добавляем элемент в параграф.

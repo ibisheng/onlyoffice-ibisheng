@@ -364,7 +364,18 @@ CHdrFtrController.prototype.IsCursorInHyperlink = function(bCheckEnd)
 {
 	return this.HdrFtr.Hyperlink_Check(bCheckEnd);
 };
-
+CHdrFtrController.prototype.AddComment = function(Comment)
+{
+	this.HdrFtr.Add_Comment(Comment);
+};
+CHdrFtrController.prototype.CanAddComment = function()
+{
+	return this.HdrFtr.CanAdd_Comment();
+};
+CHdrFtrController.prototype.GetSelectionAnchorPos = function()
+{
+	return this.HdrFtr.Get_SelectionAnchorPos();
+};
 
 
 CHdrFtrController.prototype.AddToParagraph = function(oItem, bRecalculate)

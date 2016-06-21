@@ -428,6 +428,39 @@ CDrawingsController.prototype.IsCursorInHyperlink = function(bCheckEnd)
 {
 	return this.DrawingObjects.hyperlinkCheck(bCheckEnd);
 };
+CDrawingsController.prototype.AddComment = function(Comment)
+{
+	if (true != this.DrawingObjects.isSelectedText())
+	{
+		var ParaDrawing = this.DrawingObjects.getMajorParaDrawing();
+		if (null != ParaDrawing)
+		{
+			var Paragraph = ParaDrawing.Parent;
+			Paragraph.Add_Comment2(Comment, ParaDrawing.Get_Id());
+		}
+	}
+	else
+	{
+		this.DrawingObjects.addComment(Comment);
+	}
+};
+CDrawingsController.prototype.CanAddComment = function()
+{
+	if (true != this.DrawingObjects.isSelectedText())
+		return true;
+	else
+		return this.DrawingObjects.canAddComment();
+};
+CDrawingsController.prototype.GetSelectionAnchorPos = function()
+{
+	var ParaDrawing = this.DrawingObjects.getMajorParaDrawing();
+	return {
+		X0   : ParaDrawing.GraphicObj.x,
+		Y    : ParaDrawing.GraphicObj.y,
+		X1   : ParaDrawing.GraphicObj.x + ParaDrawing.GraphicObj.extX,
+		Page : ParaDrawing.PageNum
+	};
+};
 
 
 CDrawingsController.prototype.AddToParagraph = function(oItem, bRecalculate)

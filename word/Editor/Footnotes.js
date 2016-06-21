@@ -1030,6 +1030,24 @@ CFootnotesController.prototype.IsCursorInHyperlink = function(bCheckEnd)
 	// TODO: Реализовать
 	return false;
 };
+CFootnotesController.prototype.AddComment = function(Comment)
+{
+	// TODO: Реализовать
+};
+CFootnotesController.prototype.CanAddComment = function()
+{
+	// TODO: Реализовать
+};
+CFootnotesController.prototype.GetSelectionAnchorPos = function()
+{
+	// TODO: Реализовать
+	return {
+		X0   : 0,
+		Y    : 0,
+		X1   : 0,
+		Page : 0
+	};
+};
 
 CFootnotesController.prototype.AddToParagraph = function(oItem, bRecalculate)
 {

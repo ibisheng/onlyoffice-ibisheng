@@ -337,6 +337,18 @@ CLogicDocumentController.prototype.IsCursorInHyperlink = function(bCheckEnd)
 {
 	return this.LogicDocument.controller_IsCursorInHyperlink(bCheckEnd);
 };
+CLogicDocumentController.prototype.AddComment = function(Comment)
+{
+	this.LogicDocument.controller_AddComment(Comment);
+};
+CLogicDocumentController.prototype.CanAddComment = function()
+{
+	return this.LogicDocument.controller_CanAddComment();
+};
+CLogicDocumentController.prototype.GetSelectionAnchorPos = function()
+{
+	return this.LogicDocument.controller_GetSelectionAnchorPos();
+};
 
 
 CLogicDocumentController.prototype.AddToParagraph = function(oItem)
