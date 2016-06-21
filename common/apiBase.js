@@ -764,7 +764,6 @@
 	{
 		Asc.CPluginData_wrap(oPluginData);
 		var oThis      = this;
-		var oThis      = this;
 		var sImgSrc    = oPluginData.getAttribute("imgSrc");
 		var nWidthPix  = oPluginData.getAttribute("widthPix");
 		var nHeightPix = oPluginData.getAttribute("heightPix");
