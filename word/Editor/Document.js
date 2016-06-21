@@ -7596,140 +7596,63 @@ CDocument.prototype.Document_End_HdrFtrEditing = function()
 		this.Document_UpdateSelectionState();
 	}
 };
-CDocument.prototype.Document_Format_Paste               = function()
+CDocument.prototype.Document_Format_Paste = function()
 {
-    // Работаем с колонтитулом
-    if (docpostype_HdrFtr === this.CurPos.Type)
-        this.HdrFtr.Paragraph_Format_Paste(this.CopyTextPr, this.CopyParaPr, false);
-    else if (docpostype_DrawingObjects == this.CurPos.Type)
-        this.DrawingObjects.paragraphFormatPaste(this.CopyTextPr, this.CopyParaPr, false);
-    else //if ( docpostype_Content == this.CurPos.Type )
-    {
-        if (true === this.Selection.Use)
-        {
-            switch (this.Selection.Flag)
-            {
-                case selectionflag_Numbering    :
-                    return;
-                case selectionflag_Common:
-                {
-                    var Start = this.Selection.StartPos;
-                    var End   = this.Selection.EndPos;
-                    if (Start > End)
-                    {
-                        Start = this.Selection.EndPos;
-                        End   = this.Selection.StartPos;
-                    }
-
-                    for (var Pos = Start; Pos <= End; Pos++)
-                    {
-                        this.Content[Pos].Paragraph_Format_Paste(this.CopyTextPr, this.CopyParaPr, ( Start === End ? false : true ));
-                    }
-
-                    this.ContentLastChangePos = Math.max(Start - 1, 0);
-                    this.Recalculate();
-
-                    break;
-                }
-            }
-        }
-        else
-        {
-            this.Content[this.CurPos.ContentPos].Paragraph_Format_Paste(this.CopyTextPr, this.CopyParaPr, true);
-            this.ContentLastChangePos = this.CurPos.ContentPos - 1;
-            this.Recalculate();
-        }
-    }
-
-    this.Document_UpdateInterfaceState();
-    this.Document_UpdateSelectionState();
+	this.Controller.PasteFormatting(this.CopyTextPr, this.CopyParaPr);
+	this.Recalculate();
+	this.Document_UpdateInterfaceState();
+	this.Document_UpdateSelectionState();
 };
-CDocument.prototype.Is_TableCellContent                 = function()
+CDocument.prototype.Is_TableCellContent = function()
 {
-    return false;
+	return false;
 };
-CDocument.prototype.Check_AutoFit                       = function()
+CDocument.prototype.Check_AutoFit = function()
 {
-    return false;
+	return false;
 };
-CDocument.prototype.Is_TopDocument                      = function(bReturnTopDocument)
+CDocument.prototype.Is_TopDocument = function(bReturnTopDocument)
 {
-    if (true === bReturnTopDocument)
-        return this;
+	if (true === bReturnTopDocument)
+		return this;
 
-    return true;
+	return true;
 };
-CDocument.prototype.Is_InTable                          = function(bReturnTopTable)
+CDocument.prototype.Is_InTable = function(bReturnTopTable)
 {
-    if (true === bReturnTopTable)
-        return null;
+	if (true === bReturnTopTable)
+		return null;
 
-    return false;
+	return false;
 };
-CDocument.prototype.Is_DrawingShape                     = function(bRetShape)
+CDocument.prototype.Is_DrawingShape = function(bRetShape)
 {
-    if (bRetShape === true)
-    {
-        return null;
-    }
-    return false;
+	if (bRetShape === true)
+	{
+		return null;
+	}
+	return false;
 };
-CDocument.prototype.Is_HdrFtr                           = function(bReturnHdrFtr)
+CDocument.prototype.Is_HdrFtr = function(bReturnHdrFtr)
 {
-    if (true === bReturnHdrFtr)
-        return null;
+	if (true === bReturnHdrFtr)
+		return null;
 
-    return false;
+	return false;
 };
-CDocument.prototype.Is_SelectionUse                     = function()
+CDocument.prototype.Is_SelectionUse = function()
 {
-    // Работаем с колонтитулом
-    if (docpostype_HdrFtr === this.CurPos.Type)
-        return this.HdrFtr.Is_SelectionUse();
-    else if (docpostype_DrawingObjects === this.CurPos.Type)
-        return this.DrawingObjects.isSelectionUse();
-    else //if ( docpostype_Content === this.CurPos.Type )
-    {
-        if (true === this.Selection.Use)
-            return true;
-
-        return false;
-    }
+	return this.Controller.IsSelectionUse();
 };
-CDocument.prototype.Is_TextSelectionUse                 = function()
+CDocument.prototype.Is_TextSelectionUse = function()
 {
-    // Работаем с колонтитулом
-    if (docpostype_HdrFtr === this.CurPos.Type)
-        return this.HdrFtr.Is_TextSelectionUse();
-    else if (docpostype_DrawingObjects === this.CurPos.Type)
-        return this.DrawingObjects.isTextSelectionUse();
-    else //if ( docpostype_Content === this.CurPos.Type )
-        return this.Selection.Use;
+	return this.Controller.IsTextSelectionUse();
 };
-CDocument.prototype.Get_CurPosXY                        = function()
+CDocument.prototype.Get_CurPosXY = function()
 {
-    var TempXY;
-    // Работаем с колонтитулом
-    if (docpostype_HdrFtr === this.CurPos.Type)
-        TempXY = this.HdrFtr.Get_CurPosXY();
-    else if (docpostype_DrawingObjects === this.CurPos.Type)
-        TempXY = this.DrawingObjects.getCurPosXY();
-    else // if ( docpostype_Content == this.CurPos.Type )
-    {
-        if (true === this.Selection.Use)
-        {
-            if (selectionflag_Numbering === this.Selection.Flag)
-                TempXY = {X : 0, Y : 0};
-            else // if ( selectionflag_Common === this.Selection.Flag )
-                TempXY = this.Content[this.Selection.EndPos].Get_CurPosXY();
-        }
-        else
-            TempXY = this.Content[this.CurPos.ContentPos].Get_CurPosXY();
-    }
-
-    this.Internal_CheckCurPage();
-
-    return {X : TempXY.X, Y : TempXY.Y, PageNum : this.CurPage};
+	var TempXY = this.Controller.GetCurPosXY();
+	this.Internal_CheckCurPage();
+	return {X : TempXY.X, Y : TempXY.Y, PageNum : this.CurPage};
 };
 /**
  * Возвращаем выделенный текст, если в выделении не более 1 параграфа, и там нет картинок, нумерации страниц и т.д.
@@ -7738,112 +7661,20 @@ CDocument.prototype.Get_CurPosXY                        = function()
  */
 CDocument.prototype.Get_SelectedText = function(bClearText)
 {
-    if ("undefined" === typeof(bClearText))
-        bClearText = false;
+	if (undefined === bClearText)
+		bClearText = false;
 
-    // Работаем с колонтитулом
-    if (docpostype_HdrFtr === this.CurPos.Type)
-        return this.HdrFtr.Get_SelectedText(bClearText);
-    else if (docpostype_DrawingObjects === this.CurPos.Type)
-        return this.DrawingObjects.getSelectedText(bClearText);
-    // Либо у нас нет выделения, либо выделение внутри одного элемента
-    else if (docpostype_Content == this.CurPos.Type && ( ( true === this.Selection.Use && selectionflag_Common === this.Selection.Flag ) || false === this.Selection.Use ))
-    {
-        if (true === bClearText && this.Selection.StartPos === this.Selection.EndPos)
-        {
-            var Pos = ( true == this.Selection.Use ? this.Selection.StartPos : this.CurPos.ContentPos );
-            return this.Content[Pos].Get_SelectedText(true);
-        }
-        else if (false === bClearText)
-        {
-            var StartPos = ( true == this.Selection.Use ? Math.min(this.Selection.StartPos, this.Selection.EndPos) : this.CurPos.ContentPos );
-            var EndPos   = ( true == this.Selection.Use ? Math.max(this.Selection.StartPos, this.Selection.EndPos) : this.CurPos.ContentPos );
-
-            var ResultText = "";
-
-            for (var Index = StartPos; Index <= EndPos; Index++)
-            {
-                ResultText += this.Content[Index].Get_SelectedText(false);
-            }
-
-            return ResultText;
-        }
-    }
-
-    return null;
+	return this.Controller.GetSelectedText(bClearText);
 };
-CDocument.prototype.Get_CurrentParagraph     = function()
+CDocument.prototype.Get_CurrentParagraph = function()
 {
-    // Работаем с колонтитулом
-    if (docpostype_HdrFtr === this.CurPos.Type)
-    {
-        return this.HdrFtr.Get_CurrentParagraph();
-    }
-    else if (docpostype_DrawingObjects === this.CurPos.Type)
-    {
-        return this.DrawingObjects.getCurrentParagraph();
-    }
-    else //if ( docpostype_Content === this.CurPos.Type )
-    {
-        var Pos = true === this.Selection.Use ? this.Selection.StartPos : this.CurPos.ContentPos;
-        if (Pos < 0 || Pos >= this.Content.length)
-            return null;
-
-        if (type_Paragraph === this.Content[Pos].Get_Type())
-            return this.Content[Pos];
-        else if (type_Table === this.Content[Pos].Get_Type())
-            return this.Content[Pos].Get_CurrentParagraph();
-
-        return null;
-    }
+	return this.Controller.GetCurrentParagraph();
 };
 CDocument.prototype.Get_SelectedElementsInfo = function()
 {
-    var Info = new CSelectedElementsInfo();
-
-    // Работаем с колонтитулом
-    if (docpostype_HdrFtr === this.CurPos.Type)
-    {
-        this.HdrFtr.Get_SelectedElementsInfo(Info);
-    }
-    else if (docpostype_DrawingObjects == this.CurPos.Type)
-    {
-        this.DrawingObjects.getSelectedElementsInfo(Info);
-    }
-    else if (docpostype_Content == this.CurPos.Type)
-    {
-        if (true === this.Selection.Use)
-        {
-            if (selectionflag_Numbering === this.Selection.Flag)
-            {
-                // Текстовые настройки применяем к конкретной нумерации
-                if (!(null == this.Selection.Data || this.Selection.Data.length <= 0))
-                {
-                    var CurPara = this.Content[this.Selection.Data[0]];
-                    for (var Index = 0; Index < this.Selection.Data.length; Index++)
-                    {
-                        if (this.CurPos.ContentPos === this.Selection.Data[Index])
-                            CurPara = this.Content[this.Selection.Data[Index]];
-                    }
-
-                    CurPara.Get_SelectedElementsInfo(Info);
-                }
-            }
-            else
-            {
-                if (this.Selection.StartPos != this.Selection.EndPos)
-                    Info.Set_MixedSelection();
-                else
-                    this.Content[this.Selection.StartPos].Get_SelectedElementsInfo(Info);
-            }
-        }
-        else
-        {
-            this.Content[this.CurPos.ContentPos].Get_SelectedElementsInfo(Info);
-        }
-    }
-
-    return Info;
+    var oInfo = new CSelectedElementsInfo();
+	this.Controller.GetSelectedElementsInfo(oInfo);
+    return oInfo;
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Функции для работы с таблицами
@@ -15878,7 +15709,128 @@ CDocument.prototype.controller_UpdateCursorType = function(X, Y, PageAbs, MouseE
 	var ElementPageIndex = this.private_GetElementPageIndexByXY(ContentPos, X, Y, PageAbs);
 	Item.Update_CursorType(X, Y, ElementPageIndex);
 };
+CDocument.prototype.controller_PasteFormatting = function(TextPr, ParaPr)
+{
+	if (true === this.Selection.Use)
+	{
+		if (selectionflag_Common === this.Selection.Flag)
+		{
+			var Start = this.Selection.StartPos;
+			var End   = this.Selection.EndPos;
+			if (Start > End)
+			{
+				Start = this.Selection.EndPos;
+				End   = this.Selection.StartPos;
+			}
 
+			for (var Pos = Start; Pos <= End; Pos++)
+			{
+				this.Content[Pos].Paragraph_Format_Paste(TextPr, ParaPr, Start === End ? false : true);
+			}
+		}
+	}
+	else
+	{
+		this.Content[this.CurPos.ContentPos].Paragraph_Format_Paste(TextPr, ParaPr, true);
+	}
+};
+CDocument.prototype.controller_IsSelectionUse = function()
+{
+	if (true === this.Selection.Use)
+		return true;
+
+	return false;
+};
+CDocument.prototype.controller_IsTextSelectionUse = function()
+{
+	return this.Selection.Use;
+};
+CDocument.prototype.controller_GetCurPosXY = function()
+{
+	if (true === this.Selection.Use)
+	{
+		if (selectionflag_Numbering === this.Selection.Flag)
+			return {X : 0, Y : 0};
+		else
+			return this.Content[this.Selection.EndPos].Get_CurPosXY();
+	}
+	else
+	{
+		return this.Content[this.CurPos.ContentPos].Get_CurPosXY();
+	}
+};
+CDocument.prototype.controller_GetSelectedText = function(bClearText)
+{
+	if ((true === this.Selection.Use && selectionflag_Common === this.Selection.Flag) || false === this.Selection.Use)
+	{
+		if (true === bClearText && this.Selection.StartPos === this.Selection.EndPos)
+		{
+			var Pos = ( true == this.Selection.Use ? this.Selection.StartPos : this.CurPos.ContentPos );
+			return this.Content[Pos].Get_SelectedText(true);
+		}
+		else if (false === bClearText)
+		{
+			var StartPos = ( true == this.Selection.Use ? Math.min(this.Selection.StartPos, this.Selection.EndPos) : this.CurPos.ContentPos );
+			var EndPos   = ( true == this.Selection.Use ? Math.max(this.Selection.StartPos, this.Selection.EndPos) : this.CurPos.ContentPos );
+
+			var ResultText = "";
+
+			for (var Index = StartPos; Index <= EndPos; Index++)
+			{
+				ResultText += this.Content[Index].Get_SelectedText(false);
+			}
+
+			return ResultText;
+		}
+	}
+
+	return null;
+};
+CDocument.prototype.controller_GetCurrentParagraph = function()
+{
+	var Pos = true === this.Selection.Use ? this.Selection.StartPos : this.CurPos.ContentPos;
+	if (Pos < 0 || Pos >= this.Content.length)
+		return null;
+
+	if (type_Paragraph === this.Content[Pos].Get_Type())
+		return this.Content[Pos];
+	else if (type_Table === this.Content[Pos].Get_Type())
+		return this.Content[Pos].Get_CurrentParagraph();
+
+	return null;
+};
+CDocument.prototype.controller_GetSelectedElementsInfo = function(Info)
+{
+	if (true === this.Selection.Use)
+	{
+		if (selectionflag_Numbering === this.Selection.Flag)
+		{
+			// Текстовые настройки применяем к конкретной нумерации
+			if (!(null == this.Selection.Data || this.Selection.Data.length <= 0))
+			{
+				var CurPara = this.Content[this.Selection.Data[0]];
+				for (var Index = 0; Index < this.Selection.Data.length; Index++)
+				{
+					if (this.CurPos.ContentPos === this.Selection.Data[Index])
+						CurPara = this.Content[this.Selection.Data[Index]];
+				}
+
+				CurPara.Get_SelectedElementsInfo(Info);
+			}
+		}
+		else
+		{
+			if (this.Selection.StartPos != this.Selection.EndPos)
+				Info.Set_MixedSelection();
+			else
+				this.Content[this.Selection.StartPos].Get_SelectedElementsInfo(Info);
+		}
+	}
+	else
+	{
+		this.Content[this.CurPos.ContentPos].Get_SelectedElementsInfo(Info);
+	}
+};
 
 CDocument.prototype.controller_AddToParagraph = function(ParaItem, bRecalculate)
 {

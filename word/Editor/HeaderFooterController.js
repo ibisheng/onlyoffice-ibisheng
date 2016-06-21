@@ -253,6 +253,35 @@ CHdrFtrController.prototype.UpdateCursorType = function(X, Y, PageAbs, MouseEven
 {
 	this.HdrFtr.Update_CursorType(X, Y, PageAbs, MouseEvent);
 };
+CHdrFtrController.prototype.PasteFormatting = function(TextPr, ParaPr)
+{
+	this.HdrFtr.Paragraph_Format_Paste(TextPr, ParaPr, false);
+};
+CHdrFtrController.prototype.IsSelectionUse = function()
+{
+	return this.HdrFtr.Is_SelectionUse();
+};
+CHdrFtrController.prototype.IsTextSelectionUse = function()
+{
+	return this.HdrFtr.Is_TextSelectionUse();
+};
+CHdrFtrController.prototype.GetCurPosXY = function()
+{
+	return this.HdrFtr.Get_CurPosXY();
+};
+CHdrFtrController.prototype.GetSelectedText = function(bClearText)
+{
+	return this.HdrFtr.Get_SelectedText(bClearText);
+};
+CHdrFtrController.prototype.GetCurrentParagraph = function()
+{
+	return this.HdrFtr.Get_CurrentParagraph();
+};
+CHdrFtrController.prototype.GetSelectedElementsInfo = function(oInfo)
+{
+	this.HdrFtr.Get_SelectedElementsInfo(oInfo);
+};
+
 
 CHdrFtrController.prototype.AddToParagraph = function(oItem, bRecalculate)
 {

@@ -904,6 +904,48 @@ CFootnotesController.prototype.UpdateCursorType = function(X, Y, PageAbs, MouseE
 			this.CurFootnote.Update_CursorType(X, Y, PageAbs, MouseEvent);
 	}
 };
+CFootnotesController.prototype.PasteFormatting = function(TextPr, ParaPr)
+{
+	// TODO: Доделать селект и курсор
+	if (true === this.Selection.Use)
+	{
+	}
+	else
+	{
+		if (null !== this.CurFootnote)
+			this.CurFootnote.Paragraph_Format_Paste(TextPr, ParaPr, true);
+	}
+};
+CFootnotesController.prototype.IsSelectionUse = function()
+{
+	// TODO: Добавить селект
+	return false;
+};
+CFootnotesController.prototype.IsTextSelectionUse = function()
+{
+	// TODO: Реализовать
+	return false;
+};
+CFootnotesController.prototype.GetCurPosXY = function()
+{
+	// TODO: Реализовать
+	return {X : 0, Y : 0};
+};
+CFootnotesController.prototype.GetSelectedText = function(bClearText)
+{
+	// TODO: Реализовать
+	return "";
+};
+CFootnotesController.prototype.GetCurrentParagraph = function()
+{
+	// TODO: Реализовать
+	return null;
+};
+CFootnotesController.prototype.GetSelectedElementsInfo = function(oInfo)
+{
+	// TODO: Реализовать
+	
+};
 
 CFootnotesController.prototype.AddToParagraph = function(oItem, bRecalculate)
 {

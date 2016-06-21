@@ -229,8 +229,34 @@ CLogicDocumentController.prototype.UpdateCursorType = function(X, Y, PageAbs, Mo
 {
 	this.LogicDocument.controller_UpdateCursorType(X, Y, PageAbs, MouseEvent);
 };
-
-
+CLogicDocumentController.prototype.PasteFormatting = function(TextPr, ParaPr)
+{
+	this.LogicDocument.controller_PasteFormatting(TextPr, ParaPr);
+};
+CLogicDocumentController.prototype.IsSelectionUse = function()
+{
+	return this.LogicDocument.controller_IsSelectionUse();
+};
+CLogicDocumentController.prototype.IsTextSelectionUse = function()
+{
+	return this.LogicDocument.controller_IsTextSelectionUse();
+};
+CLogicDocumentController.prototype.GetCurPosXY = function()
+{
+	return this.LogicDocument.controller_GetCurPosXY();
+};
+CLogicDocumentController.prototype.GetSelectedText = function(bClearText)
+{
+	return this.LogicDocument.controller_GetSelectedText(bClearText);
+};
+CLogicDocumentController.prototype.GetCurrentParagraph = function()
+{
+	return this.LogicDocument.controller_GetCurrentParagraph();
+};
+CLogicDocumentController.prototype.GetSelectedElementsInfo = function(oInfo)
+{
+	this.LogicDocument.controller_GetSelectedElementsInfo(oInfo);
+};
 
 
 CLogicDocumentController.prototype.AddToParagraph = function(oItem)
