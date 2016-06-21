@@ -372,6 +372,34 @@ CDrawingsController.prototype.CanSplitTableCells = function()
 {
 	return this.DrawingObjects.tableCheckSplit();
 };
+CDrawingsController.prototype.UpdateInterfaceState = function()
+{
+	var oTargetTextObject = AscFormat.getTargetTextObject(this.DrawingObjects);
+	if (oTargetTextObject)
+	{
+		this.LogicDocument.Interface_Update_DrawingPr();
+		this.DrawingObjects.documentUpdateInterfaceState();
+	}
+	else
+	{
+		this.DrawingObjects.resetInterfaceTextPr();
+		this.DrawingObjects.updateTextPr();
+		this.LogicDocument.Interface_Update_DrawingPr();
+		this.DrawingObjects.updateParentParagraphParaPr();
+	}
+};
+CDrawingsController.prototype.UpdateRulersState = function()
+{
+	// Вызываем данную функцию, чтобы убрать рамку буквицы
+	this.DrawingDocument.Set_RulerState_Paragraph(null);
+	this.LogicDocument.Document_UpdateRulersStateBySection(this.LogicDocument.CurPos.ContentPos);
+	this.DrawingObjects.documentUpdateRulersState();
+};
+CDrawingsController.prototype.UpdateSelectionState = function()
+{
+	this.DrawingObjects.documentUpdateSelectionState();
+	this.LogicDocument.Document_UpdateTracks();
+};
 
 CDrawingsController.prototype.AddToParagraph = function(oItem, bRecalculate)
 {

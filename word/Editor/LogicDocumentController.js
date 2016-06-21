@@ -297,7 +297,18 @@ CLogicDocumentController.prototype.CanSplitTableCells = function()
 {
 	return this.LogicDocument.controller_CanSplitTableCells();
 };
-
+CLogicDocumentController.prototype.UpdateInterfaceState = function()
+{
+	this.LogicDocument.controller_UpdateInterfaceState();
+};
+CLogicDocumentController.prototype.UpdateRulersState = function()
+{
+	this.LogicDocument.controller_UpdateRulersState();
+};
+CLogicDocumentController.prototype.UpdateSelectionState = function()
+{
+	this.LogicDocument.controller_UpdateSelectionState();
+};
 
 CLogicDocumentController.prototype.AddToParagraph = function(oItem)
 {

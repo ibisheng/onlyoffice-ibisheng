@@ -627,6 +627,18 @@ CDocumentControllerBase.prototype.CanMergeTableCells = function(){return false;}
  */
 CDocumentControllerBase.prototype.CanSplitTableCells = function(){return false;};
 /**
+ * Обновляем состояние интерфейса.
+ */
+CDocumentControllerBase.prototype.UpdateInterfaceState = function(){};
+/**
+ * Обновляем состояние линеек.
+ */
+CDocumentControllerBase.prototype.UpdateRulersState = function(){};
+/**
+ * Обновляем состояние селекта и курсора.
+ */
+CDocumentControllerBase.prototype.UpdateSelectionState = function(){};
+/**
  * Добавляем элемент в параграф.
  * @param oItem
  * @param {boolean} bRecalculate - Пересчитывать ли после выполнения данной функции.

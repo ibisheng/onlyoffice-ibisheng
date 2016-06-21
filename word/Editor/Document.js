@@ -7751,461 +7751,262 @@ CDocument.prototype.Check_TableCoincidence = function(Table)
 //----------------------------------------------------------------------------------------------------------------------
 // Дополнительные функции
 //----------------------------------------------------------------------------------------------------------------------
-CDocument.prototype.Document_CreateFontMap              = function()
+CDocument.prototype.Document_CreateFontMap = function()
 {
-    var StartTime = new Date().getTime();
+	var StartTime = new Date().getTime();
 
-    var FontMap = {};
-    this.SectionsInfo.Document_CreateFontMap(FontMap);
+	var FontMap = {};
+	this.SectionsInfo.Document_CreateFontMap(FontMap);
 
-    var CurPage = 0;
-    this.DrawingObjects.documentCreateFontMap(CurPage, FontMap);
+	var CurPage = 0;
+	this.DrawingObjects.documentCreateFontMap(CurPage, FontMap);
 
-    var Count = this.Content.length;
-    for (var Index = 0; Index < Count; Index++)
-    {
-        var Element = this.Content[Index];
-        Element.Document_CreateFontMap(FontMap);
+	var Count = this.Content.length;
+	for (var Index = 0; Index < Count; Index++)
+	{
+		var Element = this.Content[Index];
+		Element.Document_CreateFontMap(FontMap);
 
-        if (Element.Pages.length > 1)
-        {
-            for (var TempIndex = 1; TempIndex < Element.Pages.length - 1; TempIndex++)
-                this.DrawingObjects.documentCreateFontMap(++CurPage, FontMap);
-        }
-    }
-    AscFormat.checkThemeFonts(FontMap, this.theme.themeElements.fontScheme);
-    return FontMap;
+		if (Element.Pages.length > 1)
+		{
+			for (var TempIndex = 1; TempIndex < Element.Pages.length - 1; TempIndex++)
+				this.DrawingObjects.documentCreateFontMap(++CurPage, FontMap);
+		}
+	}
+	AscFormat.checkThemeFonts(FontMap, this.theme.themeElements.fontScheme);
+	return FontMap;
 };
-CDocument.prototype.Document_CreateFontCharMap          = function(FontCharMap)
+CDocument.prototype.Document_CreateFontCharMap = function(FontCharMap)
 {
-    this.SectionsInfo.Document_CreateFontCharMap(FontCharMap);
-    this.DrawingObjects.documentCreateFontCharMap(FontCharMap);
+	this.SectionsInfo.Document_CreateFontCharMap(FontCharMap);
+	this.DrawingObjects.documentCreateFontCharMap(FontCharMap);
 
-    var Count = this.Content.length;
-    for (var Index = 0; Index < Count; Index++)
-    {
-        var Element = this.Content[Index];
-        Element.Document_CreateFontCharMap(FontCharMap);
-    }
+	var Count = this.Content.length;
+	for (var Index = 0; Index < Count; Index++)
+	{
+		var Element = this.Content[Index];
+		Element.Document_CreateFontCharMap(FontCharMap);
+	}
 };
-CDocument.prototype.Document_Get_AllFontNames           = function()
+CDocument.prototype.Document_Get_AllFontNames = function()
 {
-    var AllFonts = {};
+	var AllFonts = {};
 
-    this.SectionsInfo.Document_Get_AllFontNames(AllFonts);
-    this.Numbering.Document_Get_AllFontNames(AllFonts);
-    this.Styles.Document_Get_AllFontNames(AllFonts);
-    this.theme.Document_Get_AllFontNames(AllFonts);
+	this.SectionsInfo.Document_Get_AllFontNames(AllFonts);
+	this.Numbering.Document_Get_AllFontNames(AllFonts);
+	this.Styles.Document_Get_AllFontNames(AllFonts);
+	this.theme.Document_Get_AllFontNames(AllFonts);
 
-    var Count = this.Content.length;
-    for (var Index = 0; Index < Count; Index++)
-    {
-        var Element = this.Content[Index];
-        Element.Document_Get_AllFontNames(AllFonts);
-    }
-    AscFormat.checkThemeFonts(AllFonts, this.theme.themeElements.fontScheme);
-    return AllFonts;
+	var Count = this.Content.length;
+	for (var Index = 0; Index < Count; Index++)
+	{
+		var Element = this.Content[Index];
+		Element.Document_Get_AllFontNames(AllFonts);
+	}
+	AscFormat.checkThemeFonts(AllFonts, this.theme.themeElements.fontScheme);
+	return AllFonts;
 };
 /**
  * Обновляем текущее состояние (определяем где мы находимся, картинка/параграф/таблица/колонтитул)
  * @param bSaveCurRevisionChange
  */
-CDocument.prototype.Document_UpdateInterfaceState       = function(bSaveCurRevisionChange)
+CDocument.prototype.Document_UpdateInterfaceState = function(bSaveCurRevisionChange)
 {
-    if (true === this.TurnOffInterfaceEvents)
-        return;
+	if (true === this.TurnOffInterfaceEvents)
+		return;
 
-    if (true === AscCommon.CollaborativeEditing.m_bGlobalLockSelection)
-        return;
+	if (true === AscCommon.CollaborativeEditing.m_bGlobalLockSelection)
+		return;
 
-    // Удаляем весь список
-    editor.sync_BeginCatchSelectedElements();
+	// Удаляем весь список
+	this.Api.sync_BeginCatchSelectedElements();
 
-    this.TrackRevisionsManager.Begin_CollectChanges(bSaveCurRevisionChange);
+	this.TrackRevisionsManager.Begin_CollectChanges(bSaveCurRevisionChange);
 
-    // Уберем из интерфейса записи о том где мы находимся (параграф, таблица, картинка или колонтитул)
-    editor.ClearPropObjCallback();
+	// Уберем из интерфейса записи о том где мы находимся (параграф, таблица, картинка или колонтитул)
+	this.Api.ClearPropObjCallback();
 
-    // Работаем с колонтитулом
-    if (docpostype_HdrFtr === this.CurPos.Type)
-    {
-        this.Interface_Update_HdrFtrPr();
-        this.HdrFtr.Document_UpdateInterfaceState();
-    }
-    else if (docpostype_DrawingObjects === this.CurPos.Type)
-    {
-        var drawin_objects    = this.DrawingObjects;
-        var oTargetTextObject = AscFormat.getTargetTextObject(this.DrawingObjects);
-        if (oTargetTextObject)
-        {
-            this.Interface_Update_DrawingPr();
-            this.DrawingObjects.documentUpdateInterfaceState();
-        }
-        else
-        {
-            this.DrawingObjects.resetInterfaceTextPr();
-            this.DrawingObjects.updateTextPr();
-            this.Interface_Update_DrawingPr();
-            this.DrawingObjects.updateParentParagraphParaPr();
-        }
-    }
-    else if (docpostype_Content == this.CurPos.Type && ( ( true === this.Selection.Use && this.Selection.StartPos == this.Selection.EndPos && type_Table == this.Content[this.Selection.StartPos].GetType() ) || ( false == this.Selection.Use && type_Table == this.Content[this.CurPos.ContentPos].GetType() ) ))
-    {
-        this.Interface_Update_TablePr();
-        if (true == this.Selection.Use)
-            this.Content[this.Selection.StartPos].Document_UpdateInterfaceState();
-        else
-            this.Content[this.CurPos.ContentPos].Document_UpdateInterfaceState();
-    }
-    else
-    {
-        this.Interface_Update_ParaPr();
-        this.Interface_Update_TextPr();
+	this.Controller.UpdateInterfaceState();
+	this.TrackRevisionsManager.End_CollectChanges(editor);
 
-        // Если у нас в выделении находится 1 параграф, или курсор находится в параграфе
-        if (docpostype_Content == this.CurPos.Type && ( ( true === this.Selection.Use && this.Selection.StartPos == this.Selection.EndPos && type_Paragraph == this.Content[this.Selection.StartPos].GetType() ) || ( false == this.Selection.Use && type_Paragraph == this.Content[this.CurPos.ContentPos].GetType() ) ))
-        {
-            if (true == this.Selection.Use)
-                this.Content[this.Selection.StartPos].Document_UpdateInterfaceState();
-            else
-                this.Content[this.CurPos.ContentPos].Document_UpdateInterfaceState();
-        }
-    }
+	// Сообщаем, что список составлен
+	this.Api.sync_EndCatchSelectedElements();
 
-    this.TrackRevisionsManager.End_CollectChanges(editor);
-    // Сообщаем, что список составлен
-    editor.sync_EndCatchSelectedElements();
-
-    this.Document_UpdateUndoRedoState();
-    this.Document_UpdateCanAddHyperlinkState();
-    this.Document_UpdateSectionPr();
-    this.Document_UpdateStylesPanel();
+	this.Document_UpdateUndoRedoState();
+	this.Document_UpdateCanAddHyperlinkState();
+	this.Document_UpdateSectionPr();
+	this.Document_UpdateStylesPanel();
 };
-CDocument.prototype.Document_UpdateRulersState          = function()
+CDocument.prototype.Document_UpdateRulersState = function()
 {
-    if (true === this.TurnOffInterfaceEvents)
-        return;
+	if (true === this.TurnOffInterfaceEvents)
+		return;
 
-    if (true === AscCommon.CollaborativeEditing.m_bGlobalLockSelection)
-        return;
+	if (true === AscCommon.CollaborativeEditing.m_bGlobalLockSelection)
+		return;
 
-    this.DrawingDocument.Set_RulerState_Start();
-
-    // Работаем с колонтитулом
-    if (docpostype_HdrFtr === this.CurPos.Type)
-    {
-        this.DrawingDocument.Set_RulerState_Paragraph(null);
-        this.HdrFtr.Document_UpdateRulersState(this.CurPage);
-    }
-    else if (docpostype_DrawingObjects === this.CurPos.Type)
-    {
-        // Вызываем данную функцию, чтобы убрать рамку буквицы
-        this.DrawingDocument.Set_RulerState_Paragraph(null);
-        this.Document_UpdateRulersStateBySection(this.CurPos.ContentPos);
-        this.DrawingObjects.documentUpdateRulersState();
-    }
-    else //if ( docpostype_Content === this.CurPos.Type )
-    {
-        if (true === this.Selection.Use)
-        {
-            if (this.Selection.StartPos == this.Selection.EndPos && type_Table === this.Content[this.Selection.StartPos].GetType())
-            {
-                var PagePos = this.Get_DocumentPagePositionByContentPosition(this.Get_ContentPosition(true, true));
-
-                var Page   = PagePos ? PagePos.Page : this.CurPage;
-                var Column = PagePos ? PagePos.Column : 0;
-
-                var ElementPos       = this.Selection.StartPos;
-                var Element          = this.Content[ElementPos];
-                var ElementPageIndex = this.private_GetElementPageIndex(ElementPos, Page, Column, Element.Get_ColumnsCount());
-                Element.Document_UpdateRulersState(ElementPageIndex);
-            }
-            else
-            {
-                var StartPos = ( this.Selection.EndPos <= this.Selection.StartPos ? this.Selection.EndPos : this.Selection.StartPos );
-                var EndPos   = ( this.Selection.EndPos <= this.Selection.StartPos ? this.Selection.StartPos : this.Selection.EndPos );
-
-                var FramePr = undefined;
-
-                for (var Pos = StartPos; Pos <= EndPos; Pos++)
-                {
-                    var Element = this.Content[Pos];
-                    if (type_Paragraph != Element.GetType())
-                    {
-                        FramePr = undefined;
-                        break;
-                    }
-                    else
-                    {
-                        var TempFramePr = Element.Get_FramePr();
-                        if (undefined === FramePr)
-                        {
-                            if (undefined === TempFramePr)
-                                break;
-
-                            FramePr = TempFramePr;
-                        }
-                        else if (undefined === TempFramePr || false === FramePr.Compare(TempFramePr))
-                        {
-                            FramePr = undefined;
-                            break;
-                        }
-                    }
-                }
-
-                if (undefined === FramePr)
-                    this.Document_UpdateRulersStateBySection();
-                else
-                    this.Content[StartPos].Document_UpdateRulersState();
-            }
-        }
-        else
-        {
-            this.Internal_CheckCurPage();
-
-            if (this.CurPos.ContentPos >= 0 && (null === this.FullRecalc.Id || this.FullRecalc.StartIndex > this.CurPos.ContentPos))
-            {
-                var PagePos = this.Get_DocumentPagePositionByContentPosition(this.Get_ContentPosition(false));
-
-                var Page   = PagePos ? PagePos.Page : this.CurPage;
-                var Column = PagePos ? PagePos.Column : 0;
-
-                var ElementPos       = this.CurPos.ContentPos;
-                var Element          = this.Content[ElementPos];
-                var ElementPageIndex = this.private_GetElementPageIndex(ElementPos, Page, Column, Element.Get_ColumnsCount());
-                Element.Document_UpdateRulersState(ElementPageIndex);
-            }
-        }
-    }
-
-    this.DrawingDocument.Set_RulerState_End();
+	this.DrawingDocument.Set_RulerState_Start();
+	this.Controller.UpdateRulersState();
+	this.DrawingDocument.Set_RulerState_End();
 };
 CDocument.prototype.Document_UpdateRulersStateBySection = function(Pos)
 {
-    // В данной функции мы уже точно знаем, что нам секцию нужно выбирать исходя из текущего параграфа
-    var CurPos = undefined === Pos ? ( this.Selection.Use === true ? this.Selection.EndPos : this.CurPos.ContentPos ) : Pos;
+	// В данной функции мы уже точно знаем, что нам секцию нужно выбирать исходя из текущего параграфа
+	var CurPos = undefined === Pos ? ( this.Selection.Use === true ? this.Selection.EndPos : this.CurPos.ContentPos ) : Pos;
 
-    var SectPr = this.SectionsInfo.Get_SectPr(CurPos).SectPr;
+	var SectPr = this.SectionsInfo.Get_SectPr(CurPos).SectPr;
 
-    var L = SectPr.Get_PageMargin_Left();
-    var T = SectPr.Get_PageMargin_Top();
-    var R = SectPr.Get_PageWidth() - SectPr.Get_PageMargin_Right();
-    var B = SectPr.Get_PageHeight() - SectPr.Get_PageMargin_Bottom();
+	var L = SectPr.Get_PageMargin_Left();
+	var T = SectPr.Get_PageMargin_Top();
+	var R = SectPr.Get_PageWidth() - SectPr.Get_PageMargin_Right();
+	var B = SectPr.Get_PageHeight() - SectPr.Get_PageMargin_Bottom();
 
-    var ColumnsCount = SectPr.Get_ColumnsCount();
+	var ColumnsCount = SectPr.Get_ColumnsCount();
 
-    if (ColumnsCount > 1)
-    {
-        this.ColumnsMarkup.Update_FromSectPr(SectPr);
+	if (ColumnsCount > 1)
+	{
+		this.ColumnsMarkup.Update_FromSectPr(SectPr);
 
-        var Element = this.Content[CurPos];
-        if (type_Paragraph === Element.Get_Type())
-            this.ColumnsMarkup.Set_CurCol(Element.Get_CurrentColumn());
+		var Element = this.Content[CurPos];
+		if (type_Paragraph === Element.Get_Type())
+			this.ColumnsMarkup.Set_CurCol(Element.Get_CurrentColumn());
 
-        this.DrawingDocument.Set_RulerState_Columns(this.ColumnsMarkup);
-    }
-    else
-    {
-        this.DrawingDocument.Set_RulerState_Paragraph({L : L, T : T, R : R, B : B}, true);
-    }
+		this.DrawingDocument.Set_RulerState_Columns(this.ColumnsMarkup);
+	}
+	else
+	{
+		this.DrawingDocument.Set_RulerState_Paragraph({L : L, T : T, R : R, B : B}, true);
+	}
 };
-CDocument.prototype.Document_UpdateSelectionState       = function()
+CDocument.prototype.Document_UpdateSelectionState = function()
 {
-    if (true === this.TurnOffInterfaceEvents)
-        return;
+	if (true === this.TurnOffInterfaceEvents)
+		return;
 
-    if (true === AscCommon.CollaborativeEditing.m_bGlobalLockSelection)
-        return;
+	if (true === AscCommon.CollaborativeEditing.m_bGlobalLockSelection)
+		return;
 
-    this.DrawingDocument.UpdateTargetTransform(null);
+	this.DrawingDocument.UpdateTargetTransform(null);
+	this.Controller.UpdateSelectionState();
 
-    // Работаем с колонтитулом
-    if (docpostype_HdrFtr === this.CurPos.Type)
-    {
-        this.HdrFtr.Document_UpdateSelectionState();
-        this.private_UpdateTracks(this.Is_SelectionUse(), this.Selection_IsEmpty());
-    }
-    else if (docpostype_DrawingObjects === this.CurPos.Type)
-    {
-        this.DrawingObjects.documentUpdateSelectionState();
-        this.private_UpdateTracks(this.Is_SelectionUse(), this.Selection_IsEmpty());
-    }
-    else //if ( docpostype_Content === this.CurPos.Type )
-    {
-        if (true === this.Selection.Use)
-        {
-            // Выделение нумерации
-            if (selectionflag_Numbering == this.Selection.Flag)
-            {
-                this.DrawingDocument.TargetEnd();
-                this.DrawingDocument.SelectEnabled(true);
-                this.DrawingDocument.SelectShow();
-            }
-            // Обрабатываем движение границы у таблиц
-            else if (true === this.Selection_Is_TableBorderMove())
-            {
-                // Убираем курсор, если он был
-                this.DrawingDocument.TargetEnd();
-                this.DrawingDocument.SetCurrentPage(this.CurPage);
-            }
-            else
-            {
-                if (false === this.Selection_IsEmpty())
-                {
-                    if (true !== this.Selection.Start)
-                    {
-                        this.Internal_CheckCurPage();
-                        this.RecalculateCurPos();
-                    }
-                    this.private_UpdateTracks(true, false);
-
-                    this.DrawingDocument.TargetEnd();
-                    this.DrawingDocument.SelectEnabled(true);
-                    this.DrawingDocument.SelectShow();
-                }
-                else
-                {
-                    if (true !== this.Selection.Start)
-                    {
-                        this.Selection_Remove();
-                    }
-
-                    this.Internal_CheckCurPage();
-                    this.RecalculateCurPos();
-                    this.private_UpdateTracks(true, true);
-
-                    this.DrawingDocument.SelectEnabled(false);
-                    this.DrawingDocument.TargetStart();
-                    this.DrawingDocument.TargetShow();
-                }
-            }
-        }
-        else
-        {
-            this.Selection_Remove();
-            this.Internal_CheckCurPage();
-            this.RecalculateCurPos();
-            this.private_UpdateTracks(false, false);
-
-            this.DrawingDocument.SelectEnabled(false);
-            this.DrawingDocument.TargetShow();
-        }
-    }
-
-    // Обновим состояние кнопок Copy/Cut
-    this.Document_UpdateCopyCutState();
+	// Обновим состояние кнопок Copy/Cut
+	this.Document_UpdateCopyCutState();
 };
-CDocument.prototype.private_UpdateTracks                = function(bSelection, bEmptySelection)
+CDocument.prototype.Document_UpdateTracks = function()
 {
-    var Pos = (true === this.Selection.Use && selectionflag_Numbering !== this.Selection.Flag ? this.Selection.EndPos : this.CurPos.ContentPos);
-    if (docpostype_Content === this.CurPos.Type && !(Pos >= 0 && (null === this.FullRecalc.Id || this.FullRecalc.StartIndex > Pos)))
-        return;
-
-    // Обновляем трэк формул
-    var oSelectedInfo = this.Get_SelectedElementsInfo();
-    var Math          = oSelectedInfo.Get_Math();
-    if (null !== Math)
-        this.DrawingDocument.Update_MathTrack(true, (false === bSelection || true === bEmptySelection ? true : false), Math);
-    else
-        this.DrawingDocument.Update_MathTrack(false);
-
-    var oField = oSelectedInfo.Get_Field();
-    if (null !== oField && (fieldtype_MERGEFIELD !== oField.Get_FieldType() || true !== this.MailMergeFieldsHighlight))
-    {
-        var aBounds = oField.Get_Bounds();
-        this.DrawingDocument.Update_FieldTrack(true, aBounds);
-    }
-    else
-        this.DrawingDocument.Update_FieldTrack(false);
+	this.private_UpdateTracks(this.Is_SelectionUse(), this.Selection_IsEmpty());
 };
-CDocument.prototype.Document_UpdateUndoRedoState        = function()
+CDocument.prototype.private_UpdateTracks = function(bSelection, bEmptySelection)
 {
-    if (true === this.TurnOffInterfaceEvents)
-        return;
+	var Pos = (true === this.Selection.Use && selectionflag_Numbering !== this.Selection.Flag ? this.Selection.EndPos : this.CurPos.ContentPos);
+	if (docpostype_Content === this.Get_DocPosType() && !(Pos >= 0 && (null === this.FullRecalc.Id || this.FullRecalc.StartIndex > Pos)))
+		return;
 
-    if (true === AscCommon.CollaborativeEditing.m_bGlobalLockSelection)
-        return;
+	// Обновляем трэк формул
+	var oSelectedInfo = this.Get_SelectedElementsInfo();
+	var Math          = oSelectedInfo.Get_Math();
+	if (null !== Math)
+		this.DrawingDocument.Update_MathTrack(true, (false === bSelection || true === bEmptySelection ? true : false), Math);
+	else
+		this.DrawingDocument.Update_MathTrack(false);
 
-    // TODO: Возможно стоит перенсти эту проверку в класс CHistory и присылать
-    //       данные события при изменении значения History.Index
-
-    // Проверяем состояние Undo/Redo
-    editor.sync_CanUndoCallback(this.History.Can_Undo());
-    editor.sync_CanRedoCallback(this.History.Can_Redo());
-    editor.CheckChangedDocument();
+	var oField = oSelectedInfo.Get_Field();
+	if (null !== oField && (fieldtype_MERGEFIELD !== oField.Get_FieldType() || true !== this.MailMergeFieldsHighlight))
+	{
+		var aBounds = oField.Get_Bounds();
+		this.DrawingDocument.Update_FieldTrack(true, aBounds);
+	}
+	else
+		this.DrawingDocument.Update_FieldTrack(false);
 };
-CDocument.prototype.Document_UpdateCopyCutState         = function()
+CDocument.prototype.Document_UpdateUndoRedoState = function()
 {
-    if (true === this.TurnOffInterfaceEvents)
-        return;
+	if (true === this.TurnOffInterfaceEvents)
+		return;
 
-    if (true === AscCommon.CollaborativeEditing.m_bGlobalLockSelection)
-        return;
+	if (true === AscCommon.CollaborativeEditing.m_bGlobalLockSelection)
+		return;
 
-    // Во время работы селекта не обновляем состояние
-    if (true === this.Selection.Start)
-        return;
+	// TODO: Возможно стоит перенсти эту проверку в класс CHistory и присылать
+	//       данные события при изменении значения History.Index
 
-    editor.sync_CanCopyCutCallback(this.Can_CopyCut());
+	// Проверяем состояние Undo/Redo
+	this.Api.sync_CanUndoCallback(this.History.Can_Undo());
+	this.Api.sync_CanRedoCallback(this.History.Can_Redo());
+	this.Api.CheckChangedDocument();
+};
+CDocument.prototype.Document_UpdateCopyCutState = function()
+{
+	if (true === this.TurnOffInterfaceEvents)
+		return;
+
+	if (true === AscCommon.CollaborativeEditing.m_bGlobalLockSelection)
+		return;
+
+	// Во время работы селекта не обновляем состояние
+	if (true === this.Selection.Start)
+		return;
+
+	this.Api.sync_CanCopyCutCallback(this.Can_CopyCut());
 };
 CDocument.prototype.Document_UpdateCanAddHyperlinkState = function()
 {
-    if (true === this.TurnOffInterfaceEvents)
-        return;
+	if (true === this.TurnOffInterfaceEvents)
+		return;
 
-    if (true === AscCommon.CollaborativeEditing.m_bGlobalLockSelection)
-        return;
+	if (true === AscCommon.CollaborativeEditing.m_bGlobalLockSelection)
+		return;
 
-    // Проверяем можно ли добавить гиперссылку
-    editor.sync_CanAddHyperlinkCallback(this.Hyperlink_CanAdd(false));
+	// Проверяем можно ли добавить гиперссылку
+	this.Api.sync_CanAddHyperlinkCallback(this.Hyperlink_CanAdd(false));
 };
-CDocument.prototype.Document_UpdateSectionPr            = function()
+CDocument.prototype.Document_UpdateSectionPr = function()
 {
-    if (true === this.TurnOffInterfaceEvents)
-        return;
+	if (true === this.TurnOffInterfaceEvents)
+		return;
 
-    if (true === this.CollaborativeEditing.m_bGlobalLockSelection)
-        return;
+	if (true === this.CollaborativeEditing.m_bGlobalLockSelection)
+		return;
 
-    // Обновляем ориентацию страницы
-    this.Api.sync_PageOrientCallback(this.Get_DocumentOrientation());
+	// Обновляем ориентацию страницы
+	this.Api.sync_PageOrientCallback(this.Get_DocumentOrientation());
 
-    // Обновляем размер страницы
-    var PageSize = this.Get_DocumentPageSize();
-    this.Api.sync_DocSizeCallback(PageSize.W, PageSize.H);
+	// Обновляем размер страницы
+	var PageSize = this.Get_DocumentPageSize();
+	this.Api.sync_DocSizeCallback(PageSize.W, PageSize.H);
 
-    // Обновляем настройки колонок
-    var CurPos = this.CurPos.ContentPos;
-    var SectPr = this.SectionsInfo.Get_SectPr(CurPos).SectPr;
+	// Обновляем настройки колонок
+	var CurPos = this.CurPos.ContentPos;
+	var SectPr = this.SectionsInfo.Get_SectPr(CurPos).SectPr;
 
-    if (SectPr)
-    {
-        var ColumnsPr = new CDocumentColumnsProps();
-        ColumnsPr.From_SectPr(SectPr);
-        this.Api.sync_ColumnsPropsCallback(ColumnsPr);
-        this.Api.sync_SectionPropsCallback(new CDocumentSectionProps(SectPr));
-    }
+	if (SectPr)
+	{
+		var ColumnsPr = new CDocumentColumnsProps();
+		ColumnsPr.From_SectPr(SectPr);
+		this.Api.sync_ColumnsPropsCallback(ColumnsPr);
+		this.Api.sync_SectionPropsCallback(new CDocumentSectionProps(SectPr));
+	}
 };
-CDocument.prototype.Get_ColumnsProps                    = function()
+CDocument.prototype.Get_ColumnsProps = function()
 {
-    // Обновляем настройки колонок
-    var CurPos = this.CurPos.ContentPos;
-    var SectPr = this.SectionsInfo.Get_SectPr(CurPos).SectPr;
+	// Обновляем настройки колонок
+	var CurPos = this.CurPos.ContentPos;
+	var SectPr = this.SectionsInfo.Get_SectPr(CurPos).SectPr;
 
-    var ColumnsPr = new CDocumentColumnsProps();
-    if (SectPr)
-    {
-        ColumnsPr.From_SectPr(SectPr);
-    }
+	var ColumnsPr = new CDocumentColumnsProps();
+	if (SectPr)
+	{
+		ColumnsPr.From_SectPr(SectPr);
+	}
 
-    return ColumnsPr;
+	return ColumnsPr;
 };
 /**
  * Отключаем отсылку сообщений в интерфейс.
  */
 CDocument.prototype.TurnOff_InterfaceEvents = function()
 {
-    this.TurnOffInterfaceEvents = true;
+	this.TurnOffInterfaceEvents = true;
 };
 /**
  * Включаем отсылку сообщений в интерфейс.
@@ -8214,103 +8015,103 @@ CDocument.prototype.TurnOff_InterfaceEvents = function()
  */
 CDocument.prototype.TurnOn_InterfaceEvents = function(bUpdate)
 {
-    this.TurnOffInterfaceEvents = false;
+	this.TurnOffInterfaceEvents = false;
 
-    if (true === bUpdate)
-    {
-        this.Document_UpdateInterfaceState();
-        this.Document_UpdateSelectionState();
-        this.Document_UpdateRulersState();
-    }
+	if (true === bUpdate)
+	{
+		this.Document_UpdateInterfaceState();
+		this.Document_UpdateSelectionState();
+		this.Document_UpdateRulersState();
+	}
 };
 CDocument.prototype.TurnOff_RecalculateCurPos = function()
 {
-    this.TurnOffRecalcCurPos = true;
+	this.TurnOffRecalcCurPos = true;
 };
-CDocument.prototype.TurnOn_RecalculateCurPos  = function(bUpdate)
+CDocument.prototype.TurnOn_RecalculateCurPos = function(bUpdate)
 {
-    this.TurnOffRecalcCurPos = false;
+	this.TurnOffRecalcCurPos = false;
 
-    if (true === bUpdate)
-        this.Document_UpdateSelectionState();
+	if (true === bUpdate)
+		this.Document_UpdateSelectionState();
 };
-CDocument.prototype.Can_CopyCut               = function()
+CDocument.prototype.Can_CopyCut = function()
 {
-    var bCanCopyCut = false;
+	var bCanCopyCut = false;
 
-    var LogicDocument  = null;
-    var DrawingObjects = null;
+	var LogicDocument  = null;
+	var DrawingObjects = null;
 
-    // Работаем с колонтитулом
-    if (docpostype_HdrFtr === this.CurPos.Type)
-    {
-        var CurHdrFtr = this.HdrFtr.CurHdrFtr;
-        if (null !== CurHdrFtr)
-        {
-            if (docpostype_DrawingObjects === CurHdrFtr.Content.CurPos.Type)
-                DrawingObjects = this.DrawingObjects;
-            else
-                LogicDocument = CurHdrFtr.Content;
-        }
-    }
-    else if (docpostype_DrawingObjects === this.CurPos.Type)
-    {
-        DrawingObjects = this.DrawingObjects;
-    }
-    else //if ( docpostype_Content === this.CurPos.Type )
-    {
-        LogicDocument = this;
-    }
+	var nDocPosType = this.Get_DocPosType();
+	if (docpostype_HdrFtr === nDocPosType)
+	{
+		var CurHdrFtr = this.HdrFtr.CurHdrFtr;
+		if (null !== CurHdrFtr)
+		{
+			if (docpostype_DrawingObjects === CurHdrFtr.Content.Get_DocPosType())
+				DrawingObjects = this.DrawingObjects;
+			else
+				LogicDocument = CurHdrFtr.Content;
+		}
+	}
+	else if (docpostype_DrawingObjects === nDocPosType)
+	{
+		DrawingObjects = this.DrawingObjects;
+	}
+	else //if (docpostype_Content === nDocPosType)
+	{
+		LogicDocument = this;
+	}
 
-    if (null !== DrawingObjects)
-    {
-        if (true === DrawingObjects.isSelectedText())
-            LogicDocument = DrawingObjects.getTargetDocContent();
-        else
-            bCanCopyCut = true;
-    }
+	if (null !== DrawingObjects)
+	{
+		if (true === DrawingObjects.isSelectedText())
+			LogicDocument = DrawingObjects.getTargetDocContent();
+		else
+			bCanCopyCut = true;
+	}
 
-    if (null !== LogicDocument)
-    {
-        if (true === LogicDocument.Is_SelectionUse() && true !== LogicDocument.Selection_IsEmpty(true))
-        {
-            if (selectionflag_Numbering === LogicDocument.Selection.Flag)
-                bCanCopyCut = false;
-            else if (LogicDocument.Selection.StartPos !== LogicDocument.Selection.EndPos || type_Paragraph === LogicDocument.Content[LogicDocument.Selection.StartPos].Get_Type())
-                bCanCopyCut = true;
-            else
-                bCanCopyCut = LogicDocument.Content[LogicDocument.Selection.StartPos].Can_CopyCut();
-        }
-    }
+	if (null !== LogicDocument)
+	{
+		if (true === LogicDocument.Is_SelectionUse() && true !== LogicDocument.Selection_IsEmpty(true))
+		{
+			if (selectionflag_Numbering === LogicDocument.Selection.Flag)
+				bCanCopyCut = false;
+			else if (LogicDocument.Selection.StartPos !== LogicDocument.Selection.EndPos || type_Paragraph === LogicDocument.Content[LogicDocument.Selection.StartPos].Get_Type())
+				bCanCopyCut = true;
+			else
+				bCanCopyCut = LogicDocument.Content[LogicDocument.Selection.StartPos].Can_CopyCut();
+		}
+	}
 
-    return bCanCopyCut;
+	return bCanCopyCut;
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Функции для работы с номерами страниц
 //----------------------------------------------------------------------------------------------------------------------
 CDocument.prototype.Get_StartPage_Absolute = function()
 {
-    return 0;
+	return 0;
 };
 CDocument.prototype.Get_StartPage_Relative = function()
 {
-    return 0;
+	return 0;
 };
-CDocument.prototype.Get_AbsolutePage       = function(CurPage)
+CDocument.prototype.Get_AbsolutePage = function(CurPage)
 {
-    return CurPage;
+	return CurPage;
 };
-CDocument.prototype.Set_CurPage            = function(PageNum)
+CDocument.prototype.Set_CurPage = function(PageNum)
 {
-    this.CurPage = Math.min(this.Pages.length - 1, Math.max(0, PageNum));
+	this.CurPage = Math.min(this.Pages.length - 1, Math.max(0, PageNum));
 };
-CDocument.prototype.Get_CurPage            = function()
+CDocument.prototype.Get_CurPage = function()
 {
-    // Работаем с колонтитулом
-    if (docpostype_HdrFtr === this.CurPos.Type)
-        return this.HdrFtr.Get_CurPage();
+	// Работаем с колонтитулом
+	if (docpostype_HdrFtr === this.Get_DocPosType())
+		return this.HdrFtr.Get_CurPage();
 
-    return this.CurPage;
+	return this.CurPage;
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Undo/Redo функции
@@ -15771,6 +15572,167 @@ CDocument.prototype.controller_CanSplitTableCells = function()
 	}
 
 	return false;
+};
+CDocument.prototype.controller_UpdateInterfaceState = function()
+{
+	if ((true === this.Selection.Use && this.Selection.StartPos == this.Selection.EndPos && type_Table == this.Content[this.Selection.StartPos].GetType())
+		|| (false == this.Selection.Use && type_Table == this.Content[this.CurPos.ContentPos].GetType()))
+	{
+		this.Interface_Update_TablePr();
+
+		if (true == this.Selection.Use)
+			this.Content[this.Selection.StartPos].Document_UpdateInterfaceState();
+		else
+			this.Content[this.CurPos.ContentPos].Document_UpdateInterfaceState();
+	}
+	else
+	{
+		this.Interface_Update_ParaPr();
+		this.Interface_Update_TextPr();
+
+		// Если у нас в выделении находится 1 параграф, или курсор находится в параграфе
+		if (docpostype_Content == this.CurPos.Type && ( ( true === this.Selection.Use && this.Selection.StartPos == this.Selection.EndPos && type_Paragraph == this.Content[this.Selection.StartPos].GetType() ) || ( false == this.Selection.Use && type_Paragraph == this.Content[this.CurPos.ContentPos].GetType() ) ))
+		{
+			if (true == this.Selection.Use)
+				this.Content[this.Selection.StartPos].Document_UpdateInterfaceState();
+			else
+				this.Content[this.CurPos.ContentPos].Document_UpdateInterfaceState();
+		}
+	}
+};
+CDocument.prototype.controller_UpdateRulersState = function()
+{
+	if (true === this.Selection.Use)
+	{
+		if (this.Selection.StartPos == this.Selection.EndPos && type_Table === this.Content[this.Selection.StartPos].GetType())
+		{
+			var PagePos = this.Get_DocumentPagePositionByContentPosition(this.Get_ContentPosition(true, true));
+
+			var Page   = PagePos ? PagePos.Page : this.CurPage;
+			var Column = PagePos ? PagePos.Column : 0;
+
+			var ElementPos       = this.Selection.StartPos;
+			var Element          = this.Content[ElementPos];
+			var ElementPageIndex = this.private_GetElementPageIndex(ElementPos, Page, Column, Element.Get_ColumnsCount());
+			Element.Document_UpdateRulersState(ElementPageIndex);
+		}
+		else
+		{
+			var StartPos = ( this.Selection.EndPos <= this.Selection.StartPos ? this.Selection.EndPos : this.Selection.StartPos );
+			var EndPos   = ( this.Selection.EndPos <= this.Selection.StartPos ? this.Selection.StartPos : this.Selection.EndPos );
+
+			var FramePr = undefined;
+
+			for (var Pos = StartPos; Pos <= EndPos; Pos++)
+			{
+				var Element = this.Content[Pos];
+				if (type_Paragraph != Element.GetType())
+				{
+					FramePr = undefined;
+					break;
+				}
+				else
+				{
+					var TempFramePr = Element.Get_FramePr();
+					if (undefined === FramePr)
+					{
+						if (undefined === TempFramePr)
+							break;
+
+						FramePr = TempFramePr;
+					}
+					else if (undefined === TempFramePr || false === FramePr.Compare(TempFramePr))
+					{
+						FramePr = undefined;
+						break;
+					}
+				}
+			}
+
+			if (undefined === FramePr)
+				this.Document_UpdateRulersStateBySection();
+			else
+				this.Content[StartPos].Document_UpdateRulersState();
+		}
+	}
+	else
+	{
+		this.Internal_CheckCurPage();
+
+		if (this.CurPos.ContentPos >= 0 && (null === this.FullRecalc.Id || this.FullRecalc.StartIndex > this.CurPos.ContentPos))
+		{
+			var PagePos = this.Get_DocumentPagePositionByContentPosition(this.Get_ContentPosition(false));
+
+			var Page   = PagePos ? PagePos.Page : this.CurPage;
+			var Column = PagePos ? PagePos.Column : 0;
+
+			var ElementPos       = this.CurPos.ContentPos;
+			var Element          = this.Content[ElementPos];
+			var ElementPageIndex = this.private_GetElementPageIndex(ElementPos, Page, Column, Element.Get_ColumnsCount());
+			Element.Document_UpdateRulersState(ElementPageIndex);
+		}
+	}
+};
+CDocument.prototype.controller_UpdateSelectionState = function()
+{
+	if (true === this.Selection.Use)
+	{
+		// Выделение нумерации
+		if (selectionflag_Numbering == this.Selection.Flag)
+		{
+			this.DrawingDocument.TargetEnd();
+			this.DrawingDocument.SelectEnabled(true);
+			this.DrawingDocument.SelectShow();
+		}
+		// Обрабатываем движение границы у таблиц
+		else if (true === this.Selection_Is_TableBorderMove())
+		{
+			// Убираем курсор, если он был
+			this.DrawingDocument.TargetEnd();
+			this.DrawingDocument.SetCurrentPage(this.CurPage);
+		}
+		else
+		{
+			if (false === this.Selection_IsEmpty())
+			{
+				if (true !== this.Selection.Start)
+				{
+					this.Internal_CheckCurPage();
+					this.RecalculateCurPos();
+				}
+				this.private_UpdateTracks(true, false);
+
+				this.DrawingDocument.TargetEnd();
+				this.DrawingDocument.SelectEnabled(true);
+				this.DrawingDocument.SelectShow();
+			}
+			else
+			{
+				if (true !== this.Selection.Start)
+				{
+					this.Selection_Remove();
+				}
+
+				this.Internal_CheckCurPage();
+				this.RecalculateCurPos();
+				this.private_UpdateTracks(true, true);
+
+				this.DrawingDocument.SelectEnabled(false);
+				this.DrawingDocument.TargetStart();
+				this.DrawingDocument.TargetShow();
+			}
+		}
+	}
+	else
+	{
+		this.Selection_Remove();
+		this.Internal_CheckCurPage();
+		this.RecalculateCurPos();
+		this.private_UpdateTracks(false, false);
+
+		this.DrawingDocument.SelectEnabled(false);
+		this.DrawingDocument.TargetShow();
+	}
 };
 
 CDocument.prototype.controller_AddToParagraph = function(ParaItem, bRecalculate)

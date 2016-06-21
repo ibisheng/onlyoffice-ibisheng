@@ -987,6 +987,18 @@ CFootnotesController.prototype.CanSplitTableCells = function()
 	// TODO: Реализовать
 	return false;
 };
+CFootnotesController.prototype.UpdateInterfaceState = function()
+{
+	// TODO: Реализовать
+};
+CFootnotesController.prototype.UpdateRulersState = function()
+{
+	// TODO: Реализовать
+};
+CFootnotesController.prototype.UpdateSelectionState = function()
+{
+	// TODO: Реализовать
+};
 
 CFootnotesController.prototype.AddToParagraph = function(oItem, bRecalculate)
 {

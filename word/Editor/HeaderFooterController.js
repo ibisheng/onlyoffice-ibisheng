@@ -321,6 +321,21 @@ CHdrFtrController.prototype.CanSplitTableCells = function()
 {
 	return this.HdrFtr.Table_CheckSplit();
 };
+CHdrFtrController.prototype.UpdateInterfaceState = function()
+{
+	this.LogicDocument.Interface_Update_HdrFtrPr();
+	this.HdrFtr.Document_UpdateInterfaceState();
+};
+CHdrFtrController.prototype.UpdateRulersState = function()
+{
+	this.DrawingDocument.Set_RulerState_Paragraph(null);
+	this.HdrFtr.Document_UpdateRulersState(this.LogicDocument.CurPage);
+};
+CHdrFtrController.prototype.UpdateSelectionState = function()
+{
+	this.HdrFtr.Document_UpdateSelectionState();
+	this.LogicDocument.Document_UpdateTracks();
+};
 
 
 
