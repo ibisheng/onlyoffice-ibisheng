@@ -537,6 +537,16 @@ CDocumentControllerBase.prototype.CheckPosInSelection = function(X, Y, PageAbs, 
  */
 CDocumentControllerBase.prototype.SelectAll = function(){};
 /**
+ * Получаем выделенный контент.
+ * @param SelectedContent
+ */
+CDocumentControllerBase.prototype.GetSelectedContent = function(SelectedContent){};
+/**
+ * Обновляем вид курсора.
+ */
+CDocumentControllerBase.prototype.UpdateCursorType = function(X, Y, PageAbs, MouseEvent){};
+
+/**
  * Добавляем элемент в параграф.
  * @param oItem
  * @param {boolean} bRecalculate - Пересчитывать ли после выполнения данной функции.

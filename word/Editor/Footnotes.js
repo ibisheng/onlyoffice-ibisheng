@@ -880,7 +880,30 @@ CFootnotesController.prototype.SelectAll = function()
 			this.CurFootnote.Select_All();
 	}
 };
-
+CFootnotesController.prototype.GetSelectedContent = function(SelectedContent)
+{
+	// TODO: Доделать селект и курсор
+	if (true === this.Selection.Use)
+	{
+	}
+	else
+	{
+		if (null !== this.CurFootnote)
+			this.CurFootnote.Get_SelectedContent(SelectedContent);
+	}
+};
+CFootnotesController.prototype.UpdateCursorType = function(X, Y, PageAbs, MouseEvent)
+{
+	// TODO: Доделать селект и курсор
+	if (true === this.Selection.Use)
+	{
+	}
+	else
+	{
+		if (null !== this.CurFootnote)
+			this.CurFootnote.Update_CursorType(X, Y, PageAbs, MouseEvent);
+	}
+};
 
 CFootnotesController.prototype.AddToParagraph = function(oItem, bRecalculate)
 {

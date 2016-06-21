@@ -295,6 +295,15 @@ CDrawingsController.prototype.SelectAll = function()
 {
 	this.DrawingObjects.selectAll();
 };
+CDrawingsController.prototype.GetSelectedContent = function(SelectedContent)
+{
+	this.DrawingObjects.Get_SelectedContent(SelectedContent);
+};
+CDrawingsController.prototype.UpdateCursorType = function(X, Y, PageAbs, MouseEvent)
+{
+	// TODO: Надо вызывать не у LogicDocument, а у DocumentContent заданного
+	this.LogicDocument.controller_UpdateCursorType(X, Y, PageAbs, MouseEvent);
+};
 
 CDrawingsController.prototype.AddToParagraph = function(oItem, bRecalculate)
 {

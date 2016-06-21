@@ -221,6 +221,14 @@ CLogicDocumentController.prototype.SelectAll = function()
 {
 	this.LogicDocument.controller_SelectAll();
 };
+CLogicDocumentController.prototype.GetSelectedContent = function(SelectedContent)
+{
+	this.LogicDocument.controller_GetSelectedContent(SelectedContent);
+};
+CLogicDocumentController.prototype.UpdateCursorType = function(X, Y, PageAbs, MouseEvent)
+{
+	this.LogicDocument.controller_UpdateCursorType(X, Y, PageAbs, MouseEvent);
+};
 
 
 

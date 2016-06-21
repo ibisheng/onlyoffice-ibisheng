@@ -245,6 +245,14 @@ CHdrFtrController.prototype.SelectAll = function()
 {
 	this.HdrFtr.Select_All();
 };
+CHdrFtrController.prototype.GetSelectedContent = function(SelectedContent)
+{
+	this.HdrFtr.Get_SelectedContent(SelectedContent);
+};
+CHdrFtrController.prototype.UpdateCursorType = function(X, Y, PageAbs, MouseEvent)
+{
+	this.HdrFtr.Update_CursorType(X, Y, PageAbs, MouseEvent);
+};
 
 CHdrFtrController.prototype.AddToParagraph = function(oItem, bRecalculate)
 {
