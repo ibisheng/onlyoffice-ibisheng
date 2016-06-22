@@ -179,7 +179,9 @@ var c_oSerProp_tblPrType = {
 	tblpPr2: 11,
 	Layout: 12,
 	tblPrChange: 13,
-	TableCellSpacing: 14
+	TableCellSpacing: 14,
+	RowBandSize: 15,
+	ColBandSize: 16
 };
 var c_oSer_tblpPrType = {
     Page:0,
@@ -3357,6 +3359,12 @@ Binary_tblPrWriter.prototype =
     WriteTblPr: function(tblPr, table)
     {
         var oThis = this;
+		if (null != tblPr.TableStyleRowBandSize) {
+			this.bs.WriteItem(c_oSerProp_tblPrType.RowBandSize, function(){oThis.memory.WriteLong(tblPr.TableStyleRowBandSize);});
+		}
+		if (null != tblPr.TableStyleColBandSize) {
+			this.bs.WriteItem(c_oSerProp_tblPrType.ColBandSize, function(){oThis.memory.WriteLong(tblPr.TableStyleColBandSize);});
+		}
         //Jc
         if(null != tblPr.Jc)
         {
@@ -7342,7 +7350,11 @@ Binary_tblPrReader.prototype =
     {
         var res = c_oSerConstants.ReadOk;
         var oThis = this;
-        if( c_oSerProp_tblPrType.Jc === type )
+		if ( c_oSerProp_tblPrType.RowBandSize === type ) {
+			Pr.TableStyleRowBandSize = this.stream.GetLongLE();
+		} else if ( c_oSerProp_tblPrType.ColBandSize === type ) {
+			Pr.TableStyleColBandSize = this.stream.GetLongLE();
+		} else if ( c_oSerProp_tblPrType.Jc === type )
         {
             Pr.Jc = this.stream.GetUChar();
         }
