@@ -23,7 +23,7 @@ CLogicDocumentController.prototype.CanTargetUpdate = function()
 };
 CLogicDocumentController.prototype.RecalculateCurPos = function()
 {
-	this.LogicDocument.controller_RecalculateCurPos();
+	return this.LogicDocument.controller_RecalculateCurPos();
 };
 CLogicDocumentController.prototype.GetCurPage = function()
 {
@@ -348,6 +348,18 @@ CLogicDocumentController.prototype.CanAddComment = function()
 CLogicDocumentController.prototype.GetSelectionAnchorPos = function()
 {
 	return this.LogicDocument.controller_GetSelectionAnchorPos();
+};
+CLogicDocumentController.prototype.StartSelectionFromCurPos = function()
+{
+	this.LogicDocument.controller_StartSelectionFromCurPos();
+};
+CLogicDocumentController.prototype.SaveDocumentStateBeforeLoadChanges = function(State)
+{
+	this.LogicDocument.controller_SaveDocumentStateBeforeLoadChanges(State);
+};
+CLogicDocumentController.prototype.RestoreDocumentStateAfterLoadChanges = function(State)
+{
+	this.LogicDocument.controller_RestoreDocumentStateAfterLoadChanges(State);
 };
 
 

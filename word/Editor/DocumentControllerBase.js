@@ -258,8 +258,9 @@ CDocumentControllerBase.prototype.Get_PageContentStartPos = function(PageAbs)
 CDocumentControllerBase.prototype.CanTargetUpdate = function(){return true;};
 /**
  * Пересчитываем текущую позицию.
+ * @returns {{X: number, Y: number, Height: number, PageNum: number, Internal: {Line: number, Page: number, Range: number}, Transform: null}}
  */
-CDocumentControllerBase.prototype.RecalculateCurPos = function(){};
+CDocumentControllerBase.prototype.RecalculateCurPos = function(){return {X : 0, Y : 0, Height : 0, PageNum : 0, Internal : {Line : 0, Page : 0, Range : 0}, Transform : null};};
 /**
  * Получаем текущий номер страницы.
  * @returns {number} -1 - значит, номер страницы определеить невозможно
@@ -687,6 +688,20 @@ CDocumentControllerBase.prototype.CanAddComment = function(){return false;};
  * @returns {{X0: number, X1: number, Y: number, Page: number}}
  */
 CDocumentControllerBase.prototype.GetSelectionAnchorPos = function(){return {X0 : 0, X1 : 0, Y : 0, Page : 0};};
+/**
+ * Начинаем селект с текущей позиции.
+ */
+CDocumentControllerBase.prototype.StartSelectionFromCurPos = function(){};
+/**
+ * Сохраняем состояние документа изменения перед принятием чужих изменений.
+ * @param State
+ */
+CDocumentControllerBase.prototype.SaveDocumentStateBeforeLoadChanges = function(State){};
+/**
+ * Восстанавливаем состояние документа после загрузки изменений.
+ * @param State
+ */
+CDocumentControllerBase.prototype.RestoreDocumentStateAfterLoadChanges = function(State){};
 
 /**
  * Добавляем элемент в параграф.

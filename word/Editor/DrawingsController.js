@@ -26,7 +26,7 @@ CDrawingsController.prototype.CanTargetUpdate = function()
 };
 CDrawingsController.prototype.RecalculateCurPos = function()
 {
-	this.DrawingObjects.recalculateCurPos();
+	return this.DrawingObjects.recalculateCurPos();
 };
 CDrawingsController.prototype.GetCurPage = function()
 {
@@ -460,6 +460,32 @@ CDrawingsController.prototype.GetSelectionAnchorPos = function()
 		X1   : ParaDrawing.GraphicObj.x + ParaDrawing.GraphicObj.extX,
 		Page : ParaDrawing.PageNum
 	};
+};
+CDrawingsController.prototype.StartSelectionFromCurPos = function()
+{
+	this.DrawingObjects.startSelectionFromCurPos();
+};
+CDrawingsController.prototype.SaveDocumentStateBeforeLoadChanges = function(State)
+{
+	this.DrawingObjects.Save_DocumentStateBeforeLoadChanges(State);
+};
+CDrawingsController.prototype.RestoreDocumentStateAfterLoadChanges = function(State)
+{
+	if (true !== this.DrawingObjects.Load_DocumentStateAfterLoadChanges(State))
+	{
+		this.Set_DocPosType(docpostype_Content);
+
+		var LogicDocument = this.LogicDocument;
+		var ContentPos = 0;
+		if (LogicDocument.Pages[LogicDocument.CurPage])
+			ContentPos = LogicDocument.Pages[LogicDocument.CurPage].Pos + 1;
+		else
+			ContentPos = 0;
+
+		ContentPos = Math.max(0, Math.min(LogicDocument.Content.length - 1, ContentPos));
+		LogicDocument.CurPos.ContentPos = ContentPos;
+		LogicDocument.Content[ContentPos].Cursor_MoveToStartPos(false);
+	}
 };
 
 

@@ -285,8 +285,11 @@ CFootnotesController.prototype.CanTargetUpdate = function()
 };
 CFootnotesController.prototype.RecalculateCurPos = function()
 {
+	// TODO: Доделать селект и курсор
 	if (null !== this.CurFootnote)
-		this.CurFootnote.RecalculateCurPos();
+		return this.CurFootnote.RecalculateCurPos();
+
+	return {X : 0, Y : 0, Height : 0, PageNum : 0, Internal : {Line : 0, Page : 0, Range : 0}, Transform : null};
 };
 CFootnotesController.prototype.GetCurPage = function()
 {
@@ -1047,6 +1050,18 @@ CFootnotesController.prototype.GetSelectionAnchorPos = function()
 		X1   : 0,
 		Page : 0
 	};
+};
+CFootnotesController.prototype.StartSelectionFromCurPos = function()
+{
+	// TODO: Реализовать
+};
+CFootnotesController.prototype.SaveDocumentStateBeforeLoadChanges = function(State)
+{
+	// TODO: Реализовать
+};
+CFootnotesController.prototype.RestoreDocumentStateAfterLoadChanges = function(State)
+{
+	// TODO: Реализовать
 };
 
 CFootnotesController.prototype.AddToParagraph = function(oItem, bRecalculate)

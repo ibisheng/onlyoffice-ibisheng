@@ -29,7 +29,7 @@ CHdrFtrController.prototype.CanTargetUpdate = function()
 };
 CHdrFtrController.prototype.RecalculateCurPos = function()
 {
-	this.HdrFtr.RecalculateCurPos();
+	return this.HdrFtr.RecalculateCurPos();
 };
 CHdrFtrController.prototype.GetCurPage = function()
 {
@@ -375,6 +375,71 @@ CHdrFtrController.prototype.CanAddComment = function()
 CHdrFtrController.prototype.GetSelectionAnchorPos = function()
 {
 	return this.HdrFtr.Get_SelectionAnchorPos();
+};
+CHdrFtrController.prototype.StartSelectionFromCurPos = function()
+{
+	this.HdrFtr.Start_SelectionFromCurPos();
+};
+CHdrFtrController.prototype.SaveDocumentStateBeforeLoadChanges = function(State)
+{
+	var HdrFtr = this.HdrFtr.Get_CurHdrFtr();
+	if (null !== HdrFtr)
+	{
+		var HdrFtrContent = HdrFtr.Get_DocumentContent();
+		State.HdrFtr      = HdrFtr;
+
+		State.HdrFtrDocPosType = HdrFtrContent.CurPos.Type;
+		State.HdrFtrSelection  = HdrFtrContent.Selection.Use;
+
+		if (docpostype_Content === HdrFtrContent.Get_DocPosType())
+		{
+			State.Pos      = HdrFtrContent.Get_ContentPosition(false, false, undefined);
+			State.StartPos = HdrFtrContent.Get_ContentPosition(true, true, undefined);
+			State.EndPos   = HdrFtrContent.Get_ContentPosition(true, false, undefined);
+		}
+		else if (docpostype_DrawingObjects === HdrFtrContent.Get_DocPosType())
+		{
+			this.LogicDocument.DrawingObjects.Save_DocumentStateBeforeLoadChanges(State);
+		}
+	}
+};
+CHdrFtrController.prototype.RestoreDocumentStateAfterLoadChanges = function(State)
+{
+	var HdrFtr = State.HdrFtr;
+	if (null !== HdrFtr && undefined !== HdrFtr && true === HdrFtr.Is_UseInDocument())
+	{
+		this.HdrFtr.Set_CurHdrFtr(HdrFtr);
+		var HdrFtrContent = HdrFtr.Get_DocumentContent();
+		if (docpostype_Content === State.HdrFtrDocPosType)
+		{
+			HdrFtrContent.Set_DocPosType(docpostype_Content);
+			HdrFtrContent.Selection.Use = State.HdrFtrSelection;
+			if (true === HdrFtrContent.Selection.Use)
+			{
+				HdrFtrContent.Set_ContentPosition(State.StartPos, 0, 0);
+				HdrFtrContent.Set_ContentSelection(State.StartPos, State.EndPos, 0, 0, 0);
+			}
+			else
+			{
+				HdrFtrContent.Set_ContentPosition(State.Pos, 0, 0);
+				this.LogicDocument.NeedUpdateTarget = true;
+			}
+		}
+		else if (docpostype_DrawingObjects === State.HdrFtrDocPosType)
+		{
+			HdrFtrContent.Set_DocPosType(docpostype_DrawingObjects);
+
+			if (true !== this.LogicDocument.DrawingObjects.Load_DocumentStateAfterLoadChanges(State))
+			{
+				HdrFtrContent.Set_DocPosType(docpostype_Content);
+				this.LogicDocument.Cursor_MoveAt(State.X ? State.X : 0, State.Y ? State.Y : 0, false);
+			}
+		}
+	}
+	else
+	{
+		this.LogicDocument.Document_End_HdrFtrEditing();
+	}
 };
 
 
