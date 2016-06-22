@@ -746,7 +746,7 @@
 
 					// При backspace фокус не в редакторе (стираем содержимое)
 					t.handlers.trigger("editCell", /*isFocus*/false, /*isClearCell*/true,
-						/*isHideCursor*/undefined, /*isQuickInput*/false, /*callback*/undefined, event);
+						/*isHideCursor*/undefined, /*isQuickInput*/false, /*callback*/undefined);
 					return true;
 
 				case 46: // Del
@@ -1040,7 +1040,7 @@
 				// При нажатии символа, фокус не ставим
 				// Очищаем содержимое ячейки
 				this.handlers.trigger("editCell", /*isFocus*/false, /*isClearCell*/true,
-					/*isHideCursor*/undefined, /*isQuickInput*/true, /*callback*/undefined, event);
+					/*isHideCursor*/undefined, /*isQuickInput*/true, /*callback*/undefined);
 			}
 			return true;
 		};

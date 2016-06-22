@@ -557,16 +557,22 @@
         font: this.defaultFont, padding: this.defaults.worksheetView.cells.padding
       });
     this.Api.onKeyDown = function (event) {
-      var listener = self.isCellEditMode ? self.cellEditor : self.controller;
-      listener._onWindowKeyDown(event);
+      self.controller._onWindowKeyDown(event);
+      if (self.isCellEditMode) {
+        self.cellEditor._onWindowKeyDown(event);
+      }
     };
     this.Api.onKeyPress = function (event) {
-      var listener = self.isCellEditMode ? self.cellEditor : self.controller;
-      listener._onWindowKeyPress(event);
+      self.controller._onWindowKeyPress(event);
+      if (self.isCellEditMode) {
+        self.cellEditor._onWindowKeyPress(event);
+      }
     };
     this.Api.onKeyUp = function (event) {
-      var listener = self.isCellEditMode ? self.cellEditor : self.controller;
-      listener._onWindowKeyUp(event);
+      self.controller._onWindowKeyUp(event);
+      if (self.isCellEditMode) {
+        self.cellEditor._onWindowKeyUp(event);
+      }
     };
     
     AscCommon.InitBrowserInputContext(this.Api, "id_target_cursor");
@@ -1239,7 +1245,7 @@
     }
   };
 
-  WorkbookView.prototype._onEditCell = function(isFocus, isClearCell, isHideCursor, isQuickInput, callback, event) {
+  WorkbookView.prototype._onEditCell = function(isFocus, isClearCell, isHideCursor, isQuickInput, callback) {
     var t = this;
 
     // Проверка глобального лока
@@ -1267,14 +1273,6 @@
 
       t.input.disabled = false;
       t.handlers.trigger("asc_onEditCell", c_oAscCellEditorState.editStart);
-      // Эвент от предыдущего нажатия на символ или на backspace
-      if (event) {
-        if ("keydown" === event.type) {
-          t.cellEditor._onWindowKeyDown(event);
-        } else if ("keypress" === event.type) {
-          t.cellEditor._onWindowKeyPress(event);
-        }
-      }
 
       // Эвент на обновление состояния редактора
       t.cellEditor._updateEditorState();
