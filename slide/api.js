@@ -2355,11 +2355,15 @@ background-repeat: no-repeat;\
 	{
 		this._gui_editor_themes   = gui_editor_themes;
 		this._gui_document_themes = gui_document_themes;
-		this.asc_fireCallback("asc_onInitEditorStyles", [gui_editor_themes, gui_document_themes]);
+		if (!this.isViewMode) {
+			this.asc_fireCallback("asc_onInitEditorStyles", [gui_editor_themes, gui_document_themes]);
+		}
 	};
 	asc_docs_api.prototype.sync_InitEditorTableStyles = function(styles)
 	{
-		this.asc_fireCallback("asc_onInitTableTemplates", styles);
+		if (!this.isViewMode) {
+			this.asc_fireCallback("asc_onInitTableTemplates", styles);
+		}
 	};
 
 	/*----------------------------------------------------------------*/
