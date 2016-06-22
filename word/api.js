@@ -2954,11 +2954,15 @@ background-repeat: no-repeat;\
 	};
 	asc_docs_api.prototype.sync_InitEditorStyles         = function(styles_painter)
 	{
-		this.asc_fireCallback("asc_onInitEditorStyles", styles_painter);
+		if (!this.isViewMode) {
+			this.asc_fireCallback("asc_onInitEditorStyles", styles_painter);
+		}
 	};
 	asc_docs_api.prototype.sync_InitEditorTableStyles    = function(styles, is_retina_enabled)
 	{
-		this.asc_fireCallback("asc_onInitTableTemplates", styles, is_retina_enabled);
+		if (!this.isViewMode) {
+			this.asc_fireCallback("asc_onInitTableTemplates", styles, is_retina_enabled);
+		}
 	};
 
 

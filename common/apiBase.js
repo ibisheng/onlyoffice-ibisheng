@@ -281,7 +281,9 @@
 	};
 	baseEditorsApi.prototype.sync_InitEditorFonts            = function(gui_fonts)
 	{
-		this.sendEvent("asc_onInitEditorFonts", gui_fonts);
+		if (!this.isViewMode) {
+			this.sendEvent("asc_onInitEditorFonts", gui_fonts);
+		}
 	};
 	baseEditorsApi.prototype.sync_StartAction                = function(type, id)
 	{

@@ -3163,12 +3163,12 @@ var editor;
 
     if (1 == _param) {
       _adjustPrint.asc_setPrintType(Asc.c_oAscPrintType.EntireWorkbook);
-      var printOptions;
+      var pageSetup;
       var countWorksheets = this.wbModel.getWorksheetCount();
       for (var j = 0; j < countWorksheets; ++j) {
-        printOptions = this.wbModel.getWorksheet(j).PagePrintOptions;
-        printOptions.asc_setFitToWidth(true);
-        printOptions.asc_setFitToHeight(true);
+        pageSetup = this.wbModel.getWorksheet(j).PagePrintOptions.asc_getPageSetup();
+        pageSetup.asc_setFitToWidth(true);
+        pageSetup.asc_setFitToHeight(true);
       }
     }
 
