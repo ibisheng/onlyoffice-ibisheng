@@ -64,6 +64,16 @@ CDrawingsController.prototype.ClearParagraphFormatting = function()
 {
 	this.DrawingObjects.paragraphClearFormatting();
 };
+CDrawingsController.prototype.AddToParagraph = function(oItem, bRecalculate)
+{
+	if (para_NewLine === oItem.Type && true === oItem.Is_PageOrColumnBreak())
+		return;
+
+	this.DrawingObjects.paragraphAdd(oItem, bRecalculate);
+	this.LogicDocument.Document_UpdateSelectionState();
+	this.LogicDocument.Document_UpdateUndoRedoState();
+	this.LogicDocument.Document_UpdateInterfaceState();
+};
 CDrawingsController.prototype.Remove = function(Count, bOnlyText, bRemoveOnlySelection, bOnTextAdd)
 {
 	return this.DrawingObjects.remove(Count, bOnlyText, bRemoveOnlySelection, bOnTextAdd);
@@ -486,18 +496,6 @@ CDrawingsController.prototype.RestoreDocumentStateAfterLoadChanges = function(St
 		LogicDocument.CurPos.ContentPos = ContentPos;
 		LogicDocument.Content[ContentPos].Cursor_MoveToStartPos(false);
 	}
-};
-
-
-CDrawingsController.prototype.AddToParagraph = function(oItem, bRecalculate)
-{
-	if (para_NewLine === oItem.Type && true === oItem.Is_PageOrColumnBreak())
-		return;
-
-	this.DrawingObjects.paragraphAdd(oItem, bRecalculate);
-	this.LogicDocument.Document_UpdateSelectionState();
-	this.LogicDocument.Document_UpdateUndoRedoState();
-	this.LogicDocument.Document_UpdateInterfaceState();
 };
 
 

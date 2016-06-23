@@ -67,6 +67,15 @@ CHdrFtrController.prototype.ClearParagraphFormatting = function()
 {
 	this.HdrFtr.Paragraph_ClearFormatting();
 };
+CHdrFtrController.prototype.AddToParagraph = function(oItem, bRecalculate)
+{
+	if (para_NewLine === oItem.Type && true === oItem.Is_PageOrColumnBreak())
+		return;
+
+	this.HdrFtr.Paragraph_Add(oItem, bRecalculate);
+	this.LogicDocument.Document_UpdateSelectionState();
+	this.LogicDocument.Document_UpdateUndoRedoState();
+};
 CHdrFtrController.prototype.Remove = function(Count, bOnlyText, bRemoveOnlySelection, bOnTextAdd)
 {
 	var nResult = this.HdrFtr.Remove(Count, bOnlyText, bRemoveOnlySelection, bOnTextAdd);
@@ -440,15 +449,4 @@ CHdrFtrController.prototype.RestoreDocumentStateAfterLoadChanges = function(Stat
 	{
 		this.LogicDocument.Document_End_HdrFtrEditing();
 	}
-};
-
-
-CHdrFtrController.prototype.AddToParagraph = function(oItem, bRecalculate)
-{
-	if (para_NewLine === oItem.Type && true === oItem.Is_PageOrColumnBreak())
-		return;
-
-	this.HdrFtr.Paragraph_Add(oItem, bRecalculate);
-	this.LogicDocument.Document_UpdateSelectionState();
-	this.LogicDocument.Document_UpdateUndoRedoState();
 };

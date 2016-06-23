@@ -57,6 +57,10 @@ CLogicDocumentController.prototype.ClearParagraphFormatting = function()
 {
 	this.LogicDocument.controller_ClearParagraphFormatting();
 };
+CLogicDocumentController.prototype.AddToParagraph = function(oItem)
+{
+	this.LogicDocument.controller_AddToParagraph(oItem);
+};
 CLogicDocumentController.prototype.Remove = function(nDirection, bOnlyText, bRemoveOnlySelection, bOnAddText)
 {
 	return this.LogicDocument.controller_Remove(nDirection, bOnlyText, bRemoveOnlySelection, bOnAddText);
@@ -361,10 +365,3 @@ CLogicDocumentController.prototype.RestoreDocumentStateAfterLoadChanges = functi
 {
 	this.LogicDocument.controller_RestoreDocumentStateAfterLoadChanges(State);
 };
-
-
-CLogicDocumentController.prototype.AddToParagraph = function(oItem)
-{
-	this.LogicDocument.controller_AddToParagraph(oItem);
-};
-

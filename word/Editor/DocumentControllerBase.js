@@ -313,6 +313,12 @@ CDocumentControllerBase.prototype.AddInlineTable = function(nCols, nRows){};
  */
 CDocumentControllerBase.prototype.ClearParagraphFormatting = function(){};
 /**
+ * Добавляем элемент в параграф.
+ * @param oItem
+ * @param {boolean} bRecalculate - Пересчитывать ли после выполнения данной функции.
+ */
+CDocumentControllerBase.prototype.AddToParagraph = function(oItem, bRecalculate){};
+/**
  * Производим удаление выделенной части документа или исходя из позиции курсора.
  * @param {number} nDirection направление удаления
  * @param {boolean} bOnlyText - удаляем только текст
@@ -702,10 +708,3 @@ CDocumentControllerBase.prototype.SaveDocumentStateBeforeLoadChanges = function(
  * @param State
  */
 CDocumentControllerBase.prototype.RestoreDocumentStateAfterLoadChanges = function(State){};
-
-/**
- * Добавляем элемент в параграф.
- * @param oItem
- * @param {boolean} bRecalculate - Пересчитывать ли после выполнения данной функции.
- */
-CDocumentControllerBase.prototype.AddToParagraph = function(oItem, bRecalculate){};

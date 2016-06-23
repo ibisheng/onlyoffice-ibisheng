@@ -403,6 +403,18 @@ CFootnotesController.prototype.ClearParagraphFormatting = function()
 			this.CurFootnote.Paragraph_ClearFormatting();
 	}
 };
+CFootnotesController.prototype.AddToParagraph = function(oItem, bRecalculate)
+{
+	// TODO: Доделать селект и курсор
+	if (true === this.Selection.Use)
+	{
+	}
+	else
+	{
+		if (null !== this.CurFootnote)
+			this.CurFootnote.Paragraph_Add(oItem, bRecalculate);
+	}
+};
 CFootnotesController.prototype.Remove = function(Count, bOnlyText, bRemoveOnlySelection, bOnTextAdd)
 {
 	// TODO: Доделать селект и курсор
@@ -1062,19 +1074,6 @@ CFootnotesController.prototype.SaveDocumentStateBeforeLoadChanges = function(Sta
 CFootnotesController.prototype.RestoreDocumentStateAfterLoadChanges = function(State)
 {
 	// TODO: Реализовать
-};
-
-CFootnotesController.prototype.AddToParagraph = function(oItem, bRecalculate)
-{
-	// TODO: Доделать селект и курсор
-	if (true === this.Selection.Use)
-	{
-	}
-	else
-	{
-		if (null !== this.CurFootnote)
-			this.CurFootnote.Paragraph_Add(oItem, bRecalculate);
-	}
 };
 
 
