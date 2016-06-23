@@ -6034,9 +6034,9 @@ function BinaryFileReader(doc, openParams)
 		if(m_oLogicDocument && m_oLogicDocument.slideMasters && m_oLogicDocument.slideMasters[0] && m_oLogicDocument.slideMasters[0].Theme && m_oLogicDocument.slideMasters[0].Theme.themeElements)
 			fontScheme = m_oLogicDocument.slideMasters[0].Theme.themeElements.fontScheme;
 		else
-			fontScheme = oDocument.theme.themeElements.fontScheme;
+			fontScheme = m_oLogicDocument.theme.themeElements.fontScheme;
 
-      AscFormat.checkThemeFonts(AllFonts, fontScheme);
+		AscFormat.checkThemeFonts(AllFonts, fontScheme);
 		
         for (var i in AllFonts)
             aPrepeareFonts.push(new AscFonts.CFont(i, 0, "", 0));
