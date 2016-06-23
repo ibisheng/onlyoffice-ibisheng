@@ -528,6 +528,11 @@ var editor;
     return result;
   };
 
+  spreadsheet_api.prototype.asc_PasteData = function(_format, data1, data2)
+  {
+    this.wb.pasteData(_format, data1, data2);
+  };
+
   spreadsheet_api.prototype.asc_CheckCopy = function(_clipboard /* CClipboardData */, _formats)
   {
 	var result = this.wb.checkCopyToClipboard(_clipboard, _formats);
@@ -1045,10 +1050,6 @@ var editor;
       AscCommon.AscBrowser.isSafariMacOs = false;
       AscCommon.PasteElementsId.PASTE_ELEMENT_ID = "wrd_pastebin";
       AscCommon.PasteElementsId.ELEMENT_DISPAY_STYLE = "none";
-    }
-
-    if (AscCommon.AscBrowser.isSafariMacOs) {
-      setInterval(AscCommonExcel.SafariIntervalFocus2, 10);
     }
   };
 

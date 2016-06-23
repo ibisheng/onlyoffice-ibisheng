@@ -1829,7 +1829,6 @@ background-repeat: no-repeat;\
 
 			return;
 		}
-		return AscCommon.Editor_Copy_Button(this);
 	};
 	asc_docs_api.prototype.Update_ParaTab = function(Default_Tab, ParaTabs)
 	{
@@ -1849,7 +1848,6 @@ background-repeat: no-repeat;\
 
 			return;
 		}
-		return AscCommon.Editor_Copy_Button(this, true);
 	};
 	asc_docs_api.prototype.Paste          = function()
 	{
@@ -1865,30 +1863,77 @@ background-repeat: no-repeat;\
 
 			return;
 		}
-		if (false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props))
-		{
-			if (!window.GlobalPasteFlag)
-			{
-				if (!AscCommon.AscBrowser.isSafariMacOs)
-				{
-					window.GlobalPasteFlag = true;
-					return AscCommon.Editor_Paste_Button(this);
-				}
-				else
-				{
-					if (0 === window.GlobalPasteFlagCounter)
-					{
-						AscCommon.SafariIntervalFocus();
-						window.GlobalPasteFlag = true;
-						return AscCommon.Editor_Paste_Button(this);
-					}
-				}
-			}
-		}
 	};
 	asc_docs_api.prototype.Share          = function()
 	{
 
+	};
+
+	asc_docs_api.prototype.asc_CheckCopy = function(_clipboard /* CClipboardData */, _formats)
+	{
+		if (!this.WordControl.m_oLogicDocument)
+		{
+			var _text_object = (AscCommon.c_oAscClipboardDataFormat.Text & _formats) ? {Text : ""} : null;
+			var _html_data   = this.WordControl.m_oDrawingDocument.m_oDocumentRenderer.Copy(_text_object);
+
+			//TEXT
+			if (AscCommon.c_oAscClipboardDataFormat.Text & _formats)
+			{
+				_clipboard.pushData(AscCommon.c_oAscClipboardDataFormat.Text, _text_object.Text);
+			}
+			//HTML
+			if (AscCommon.c_oAscClipboardDataFormat.Html & _formats)
+			{
+				_clipboard.pushData(AscCommon.c_oAscClipboardDataFormat.Html, _html_data);
+			}
+			return;
+		}
+
+		var sBase64 = null, _data;
+
+		//TEXT
+		if (AscCommon.c_oAscClipboardDataFormat.Text & _formats)
+		{
+			_data = this.WordControl.m_oLogicDocument.Get_SelectedText();
+			_clipboard.pushData(AscCommon.c_oAscClipboardDataFormat.Text, _data)
+		}
+		//HTML
+		if (AscCommon.c_oAscClipboardDataFormat.Html & _formats)
+		{
+			var oCopyProcessor = new AscCommon.CopyProcessor(this);
+			sBase64            = oCopyProcessor.Start();
+			_data              = oCopyProcessor.getInnerHtml();
+
+			_clipboard.pushData(AscCommon.c_oAscClipboardDataFormat.Html, _data)
+		}
+		//INTERNAL
+		if (AscCommon.c_oAscClipboardDataFormat.Internal & _formats)
+		{
+			if (sBase64 === null)
+			{
+				var oCopyProcessor = new AscCommon.CopyProcessor(this);
+				sBase64            = oCopyProcessor.Start();
+			}
+
+			_data = sBase64;
+			_clipboard.pushData(AscCommon.c_oAscClipboardDataFormat.Internal, _data)
+		}
+	};
+
+	asc_docs_api.prototype.asc_PasteData = function(_format, data1, data2)
+	{
+		this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_PasteHotKey);
+		switch (_format)
+		{
+			case AscCommon.c_oAscClipboardDataFormat.HtmlElement:
+				AscCommon.Editor_Paste_Exec(this, data1, data2);
+				break;
+			case AscCommon.c_oAscClipboardDataFormat.Internal:
+				AscCommon.Editor_Paste_Exec(this, null, null, data1);
+				break;
+			default:
+				break;
+		}
 	};
 
 	asc_docs_api.prototype.onSaveCallback = function(e)
@@ -4555,8 +4600,6 @@ background-repeat: no-repeat;\
 			this.pasteImageMap       = null;
 			this.decrementCounterLongAction();
 			this.pasteCallback();
-			window.GlobalPasteFlag        = false;
-			window.GlobalPasteFlagCounter = 0;
 			this.pasteCallback            = null;
 		}
 		else if (this.isSaveFonts_Images)
@@ -4789,8 +4832,6 @@ background-repeat: no-repeat;\
 			// там при LongActions теряется фокус и вставляются пробелы
 			this.decrementCounterLongAction();
 			this.pasteCallback();
-			window.GlobalPasteFlag        = false;
-			window.GlobalPasteFlagCounter = 0;
 			this.pasteCallback            = null;
 			return;
 		}

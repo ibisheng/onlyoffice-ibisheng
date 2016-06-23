@@ -2466,40 +2466,6 @@
 					return false;
 				}
 				break;
-
-			case 67: // copy  Ctrl + c
-			case 86: // paste Ctrl + v
-			case 88: // redo  Ctrl + x
-				if ( ctrlKey ) {
-					if ( !t.hasFocus ) {
-						t.setFocus( true );
-					}
-					// возвращение фокуса в top line
-					if ( t.isTopLineActive ) {
-						// чтобы поставить выполнение в очередь после вставки из клипборда используется двойной setTimeout
-						setTimeout( function () {
-							setTimeout( function () {
-								t._updateTopLineCurPos();
-								t.input.focus();
-								t._topLineMouseUp();
-							}, 0 );
-						}, 0 );
-					}
-					switch ( event.which ) {
-						case 67:
-							t.handlers.trigger( "copy" );
-							break;
-						case 86:
-							t.handlers.trigger( "paste" );
-							break;
-						case 88:
-							t.handlers.trigger( "cut" );
-							break;
-					}
-					return true;
-				}
-				break;
-
 			case 89:  // ctrl + y
 			case 90:  // ctrl + z
 				if ( ctrlKey ) {

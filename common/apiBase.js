@@ -260,6 +260,12 @@
 	// Copy/Past/Cut
 	baseEditorsApi.prototype.asc_IsFocus                     = function(bIsNaturalFocus)
 	{
+		var _ret = false;
+		if (this.WordControl.IsFocus)
+			_ret = true;
+		if (_ret && bIsNaturalFocus && this.WordControl.TextBoxInputFocus)
+			_ret = false;
+		return _ret;
 	};
 	// target pos
 	baseEditorsApi.prototype.asc_LockTargetUpdate		     = function(isLock)

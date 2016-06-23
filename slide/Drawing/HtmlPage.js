@@ -3092,6 +3092,8 @@ function CEditorPage(api)
         this.UpdateVerRuler();
 
         this.m_oApi.syncOnThumbnailsShow();
+
+        AscCommon.InitBrowserInputContext(this.m_oApi, "id_target_cursor");
     }
 
     this.StartMainTimer = function()
