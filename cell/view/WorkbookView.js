@@ -1968,6 +1968,16 @@
     t.clipboard.pasteData(ws, _format, data1, data2);
   };
 
+  WorkbookView.prototype.selectionCut = function() {
+    var t = this, ws;
+    if (!t.getCellEditMode()) {
+      ws = t.getWorksheet();
+      ws.emptySelection(c_oAscCleanOptions.All);
+    } else {
+      t.cellEditor.cutSelection();
+    }
+  };
+
   WorkbookView.prototype.undo = function() {
     var oFormulaLocaleInfo = AscCommonExcel.oFormulaLocaleInfo;
     oFormulaLocaleInfo.Parse = false;

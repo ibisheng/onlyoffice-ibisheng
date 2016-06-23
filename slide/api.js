@@ -1936,6 +1936,30 @@ background-repeat: no-repeat;\
 		}
 	};
 
+	asc_docs_api.prototype.asc_IsFocus = function(bIsNaturalFocus)
+	{
+		var _ret = false;
+		if (this.WordControl.IsFocus)
+			_ret = true;
+		if (_ret && bIsNaturalFocus && this.WordControl.TextBoxInputFocus)
+			_ret = false;
+		return _ret;
+	};
+
+	asc_docs_api.prototype.asc_SelectionCut = function()
+	{
+		var _logicDoc = this.WordControl.m_oLogicDocument;
+		if (!_logicDoc)
+			return;
+
+		if (false === _logicDoc.Document_Is_SelectionLocked(changestype_Paragraph_Content))
+		{
+			History.Create_NewPoint(AscDFH.historydescription_Cut);
+			_logicDoc.Remove(1, true, true);
+			_logicDoc.Document_UpdateSelectionState();
+		}
+	};
+
 	asc_docs_api.prototype.onSaveCallback = function(e)
 	{
 		var t = this;

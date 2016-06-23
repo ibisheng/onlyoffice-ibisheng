@@ -538,7 +538,13 @@ var editor;
 	var result = this.wb.checkCopyToClipboard(_clipboard, _formats);
 	return result;
   };
-  
+
+  spreadsheet_api.prototype.asc_SelectionCut = function()
+  {
+    var result = this.wb.selectionCut();
+    return result;
+  };
+
   spreadsheet_api.prototype.asc_bIsEmptyClipboard = function() {
     var result = this.wb.bIsEmptyClipboard();
     this.wb.restoreFocus();
