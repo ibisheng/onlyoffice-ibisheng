@@ -85,6 +85,7 @@
 			var oHtmlParent = oHtmlTarget.parentNode;
 
 			this.HtmlDiv = document.createElement("div");
+			this.HtmlDiv.id = "area_id_parent";
 			this.HtmlDiv.style.background = "transparent";
 			this.HtmlDiv.style.border = "none";
 			this.HtmlDiv.style.position = "absolute";
@@ -112,7 +113,37 @@
 
 			this.HtmlDiv.appendChild(this.HtmlArea);
 
-			oHtmlParent.appendChild(this.HtmlDiv);
+			if (true)
+			{
+				// нужен еще один родитель. чтобы скроллился он, а не oHtmlParent
+				var oHtmlDivScrollable = document.createElement("div");
+				oHtmlDivScrollable.style.background = "transparent";
+				oHtmlDivScrollable.style.border = "none";
+				oHtmlDivScrollable.style.position = "absolute";
+				oHtmlDivScrollable.style.padding = "0";
+				oHtmlDivScrollable.style.margin = "0";
+				oHtmlDivScrollable.style.zIndex = 0;
+				oHtmlDivScrollable.style.left 	= oHtmlParent.style.left;
+				oHtmlDivScrollable.style.top 	= oHtmlParent.style.top;
+				oHtmlDivScrollable.style.width 	= oHtmlParent.style.width;
+				oHtmlDivScrollable.style.height = oHtmlParent.style.height;
+				oHtmlDivScrollable.style.overflow = "hidden";
+
+				oHtmlDivScrollable.appendChild(this.HtmlDiv);
+				oHtmlParent.parentNode.appendChild(oHtmlDivScrollable);
+
+				oHtmlParent.onresize = function(e) {
+					var _elem = document.getElementById("area_id_parent");
+					_elem.style.left 	= this.style.left;
+					_elem.style.top 	= this.style.top;
+					_elem.style.width 	= this.style.width;
+					_elem.style.height 	= this.style.height;
+				};
+			}
+			else
+			{
+				oHtmlParent.appendChild(this.HtmlDiv);
+			}
 
 			// events:
 			var oThis = this;
@@ -132,8 +163,37 @@
 			// TODO:
 			setInterval(function(){
 				if (oThis.Api.asc_IsFocus() && !AscCommon.g_clipboardBase.IsFocus() && !AscCommon.g_clipboardBase.IsWorking())
-					oThis.HtmlArea.focus();
+				{
+					if (document.activeElement != oThis.HtmlArea)
+						oThis.HtmlArea.focus();
+				}
 			}, 10);
+
+			this.Api.Input_UpdatePos();
+		},
+
+		checkFocus : function()
+		{
+			if (oThis.Api.asc_IsFocus() && !AscCommon.g_clipboardBase.IsFocus() && !AscCommon.g_clipboardBase.IsWorking())
+			{
+				if (document.activeElement != oThis.HtmlArea)
+					oThis.HtmlArea.focus();
+			}
+		},
+
+		initTimer : function()
+		{
+			/*
+			setInterval(function(){
+				oThis.checkFocus();
+			}, 10);
+			*/
+
+			var oThis = this;
+			setTimeout(function(){
+				oThis.checkFocus();
+				oThis.initTimer();
+			}, 40);
 		},
 
 		move : function(x, y)
@@ -158,11 +218,13 @@
 			if (isShow)
 			{
 				// DEBUG_MODE
-				this.HtmlAreaOffset = 0;
-				this.HtmlArea.style.top = "0px";
+				this.HtmlAreaOffset       = 0;
+				this.HtmlArea.style.top   = "0px";
 				this.HtmlArea.style.color = "black";
 				this.HtmlDiv.style.zIndex = 5;
-				this.HtmlDiv.style.width = "200px";
+				//this.HtmlDiv.style.width = "200px";
+
+				document.getElementById("area_id_parent").parentNode.style.zIndex = 5;
 			}
 		},
 
@@ -200,6 +262,9 @@
 
 		onKeyDown : function(e)
 		{
+			if (c_oCompositionState.end != this.compositionState)
+				return;
+
 			// некоторые рукописные вводы не присылают keyUp
 			var _code = e.keyCode;
 			if (_code != 8 && _code != 46)

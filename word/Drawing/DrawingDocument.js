@@ -1995,6 +1995,7 @@ function CDrawingDocument()
     this.NeedScrollToTargetFlag = false;
 
     this.TargetHtmlElement = null;
+    this.TargetHtmlElementBlock = false; // true - block, false - visibility
     this.TargetHtmlElementLeft = 0;
     this.TargetHtmlElementTop = 0;
 
@@ -2086,6 +2087,21 @@ function CDrawingDocument()
     this._search_HdrFtr_Even         = []; // Поиск в колонтитуле, который находится только на нечетных страницах
     this._search_HdrFtr_Odd          = []; // Поиск в колонтитуле, который находится только на четных страницах, включая первую
     this._search_HdrFtr_Odd_no_First = []; // Поиск в колонтитуле, который находится только на нечетных страницах, кроме первой
+
+    this.showTarget = function(isShow)
+    {
+        if (this.TargetHtmlElementBlock)
+            this.TargetHtmlElement.style.display = isShow ? "display" : "none";
+        else
+            this.TargetHtmlElement.style.visibility = isShow ? "visible" : "hidden";
+    };
+    this.isShowTarget = function()
+    {
+        if (this.TargetHtmlElementBlock)
+            return (this.TargetHtmlElement.style.display == "display") ? true : false;
+        else
+            return (this.TargetHtmlElement.style.visibility == "visible") ? true : false;
+    };
 
     this.Start_CollaborationEditing = function()
     {
@@ -2942,7 +2958,8 @@ function CDrawingDocument()
             clearInterval( this.m_lTimerTargetId );
             this.m_lTimerTargetId = -1;
         }
-        this.TargetHtmlElement.style.display = "none";
+
+        this.showTarget(false);
 
         this.m_oWordControl.DisableTextEATextboxAttack();
     }
@@ -3097,6 +3114,11 @@ function CDrawingDocument()
             this.m_oWordControl.CheckTextBoxInputPos();
         }
 
+        this.MoveTargetInInputContext();
+    };
+
+    this.MoveTargetInInputContext = function()
+    {
         if (AscCommon.g_inputContext)
             AscCommon.g_inputContext.move(this.TargetHtmlElementLeft, this.TargetHtmlElementTop);
     }
@@ -3461,11 +3483,11 @@ function CDrawingDocument()
     }
     this.DrawTarget = function()
     {
-        if ( "block" != oThis.TargetHtmlElement.style.display && oThis.NeedTarget && oThis.m_oWordControl.IsFocus )
-            oThis.TargetHtmlElement.style.display = "block";
-        else
-            oThis.TargetHtmlElement.style.display = "none";
-    }
+        if (oThis.NeedTarget && oThis.m_oWordControl.IsFocus)
+        {
+            oThis.showTarget(!oThis.isShowTarget());
+        }
+    };
 
     this.TargetShow = function()
     {
@@ -3475,7 +3497,7 @@ function CDrawingDocument()
     {
         if (this.TargetShowFlag && this.TargetShowNeedFlag)
         {
-            this.TargetHtmlElement.style.display = "block";
+            this.showTarget(true);
             this.TargetShowNeedFlag = false;
             return;
         }
@@ -3489,7 +3511,7 @@ function CDrawingDocument()
             this.TargetStart();
 
         if (oThis.NeedTarget)
-            this.TargetHtmlElement.style.display = "block";
+            this.showTarget(true);
 
         this.TargetShowFlag = true;
     }

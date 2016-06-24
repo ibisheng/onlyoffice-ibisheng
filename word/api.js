@@ -725,7 +725,7 @@ background-repeat: no-repeat;\
                                     <div id=\"id_main_view\" class=\"block_elem\" style=\"overflow:hidden\">\
                                         <canvas id=\"id_viewer\" class=\"block_elem\" style=\"-webkit-user-select: none; background-color:" + AscCommonWord.GlobalSkin.BackgroundColor + ";z-index:1\"></canvas>\
 									    <canvas id=\"id_viewer_overlay\" class=\"block_elem\" style=\"-webkit-user-select: none; z-index:2\"></canvas>\
-									    <canvas id=\"id_target_cursor\" class=\"block_elem\" width=\"1\" height=\"1\" style=\"-webkit-user-select: none;width:2px;height:13px;display:none;z-index:4;\"></canvas>\
+									    <canvas id=\"id_target_cursor\" class=\"block_elem\" width=\"1\" height=\"1\" style=\"-webkit-user-select: none;width:2px;height:13px;z-index:4;\"></canvas>\
                                     </div>\
 								</div>\
 									<div id=\"id_panel_right\" class=\"block_elem\" style=\"margin-right:1px;background-color:" + AscCommonWord.GlobalSkin.BackgroundScroll + ";\">\
@@ -7940,6 +7940,11 @@ background-repeat: no-repeat;\
 		if (this.WordControl.m_oLogicDocument)
 			return this.WordControl.m_oLogicDocument.Get_MaxCursorPosInCompositeText();
 		return 0;
+	};
+	asc_docs_api.prototype.Input_UpdatePos = function()
+	{
+		if (this.WordControl.m_oLogicDocument)
+			this.WordControl.m_oDrawingDocument.MoveTargetInInputContext();
 	};
 
 	asc_docs_api.prototype.onKeyDown = function(e)

@@ -984,6 +984,9 @@
 	baseEditorsApi.prototype.Get_MaxCursorPosInCompositeText = function()
 	{
 	};
+	baseEditorsApi.prototype.Input_UpdatePos = function()
+	{
+	};
 
 	baseEditorsApi.prototype.onKeyDown = function(e)
 	{
