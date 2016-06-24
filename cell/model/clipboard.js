@@ -938,7 +938,7 @@
 				if(copyPasteUseBinary)
 				{
 					this.activeRange = worksheet.activeRange.clone(true);
-					binaryResult = this._pasteFromBinary(worksheet, node, onlyFromLocalStorage, isIntoShape);
+					binaryResult = this._pasteFromBinaryClassHtml(worksheet, node, onlyFromLocalStorage, isIntoShape);
 					
 					if(binaryResult === true)
 						return;
@@ -1013,7 +1013,7 @@
             },
 			
 			//TODO rename
-			_pasteFromBinary: function(worksheet, node, onlyFromLocalStorage, isIntoShape)
+			_pasteFromBinaryClassHtml: function(worksheet, node, onlyFromLocalStorage, isIntoShape)
 			{
 				var base64 = null, base64FromWord = null, base64FromPresentation = null, t = this;
 				
