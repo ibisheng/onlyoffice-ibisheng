@@ -327,6 +327,11 @@ CFootnotesController.prototype.StartSelection = function(X, Y, PageAbs, MouseEve
 		PageAbs    : PageAbs,
 		MouseEvent : MouseEvent
 	};
+
+	this.CurFootnote = this.Selection.Start.Footnote;
+
+	this.Selection.Footnotes = {};
+	this.Selection.Footnotes[this.Selection.Start.Footnote.Get_Id()] = this.Selection.Start.Footnote;
 };
 CFootnotesController.prototype.EndSelection = function(X, Y, PageAbs, MouseEvent)
 {
@@ -345,6 +350,7 @@ CFootnotesController.prototype.EndSelection = function(X, Y, PageAbs, MouseEvent
 		PageAbs    : PageAbs,
 		MouseEvent : MouseEvent
 	};
+	this.CurFootnote = this.Selection.End.Footnote;
 
 	var sStartId = this.Selection.Start.Footnote.Get_Id();
 	var sEndId   = this.Selection.End.Footnote.Get_Id();
@@ -359,11 +365,17 @@ CFootnotesController.prototype.EndSelection = function(X, Y, PageAbs, MouseEvent
 	// Новый селект
 	if (this.Selection.Start.Footnote !== this.Selection.End.Footnote)
 	{
-		this.Selection.Start.Footnote.Selection_SetEnd(X, Y, 0, MouseEvent);
-		this.Selection.End.Footnote.Selection_SetStart(this.Selection.Start.Pos.X, this.Selection.Start.Pos.Y, 0, this.Selection.Start.Pos.MouseEvent);
+		if (this.Selection.Start.Page > this.Selection.EndPage || this.Selection.Start.Index > this.Selection.End.Index)
+		{
+			this.Selection.Start.Footnote.Selection_SetEnd(-MEASUREMENT_MAX_MM_VALUE, -MEASUREMENT_MAX_MM_VALUE, 0, MouseEvent);
+			this.Selection.End.Footnote.Selection_SetStart(MEASUREMENT_MAX_MM_VALUE, MEASUREMENT_MAX_MM_VALUE, 0, this.Selection.Start.Pos.MouseEvent);
+		}
+		else
+		{
+			this.Selection.Start.Footnote.Selection_SetEnd(MEASUREMENT_MAX_MM_VALUE, MEASUREMENT_MAX_MM_VALUE, 0, MouseEvent);
+			this.Selection.End.Footnote.Selection_SetStart(-MEASUREMENT_MAX_MM_VALUE, -MEASUREMENT_MAX_MM_VALUE, 0, this.Selection.Start.Pos.MouseEvent);
+		}
 		this.Selection.End.Footnote.Selection_SetEnd(X, Y, 0, MouseEvent);
-
-		this.CurFootnote = this.Selection.End.Footnote;
 
 		var oRange = this.private_GetFootnotesRange(this.Selection.Start, this.Selection.End);
 		for (var sFootnoteId in oRange)
@@ -392,18 +404,20 @@ CFootnotesController.prototype.private_GetFootnoteOnPageByXY = function(X, Y, Pa
 		return null;
 
 	var Page = this.Pages[PageAbs];
-	for (var nIndex = 0; nIndex < Page.Elements.length; ++nIndex)
+	for (var nIndex = Page.Elements.length - 1; nIndex >= 0; --nIndex)
 	{
 		var Footnote = Page.Elements[nIndex];
 		var Bounds   = Footnote.Get_PageBounds(0);
 
-		if (Bounds.Top <= Y)
+		if (Bounds.Top <= Y || 0 === nIndex)
 			return {
 				Footnote : Footnote,
 				Index    : nIndex,
 				Page     : PageAbs
 			};
 	}
+
+
 
 	return null;
 };
@@ -463,6 +477,8 @@ CFootnotesController.prototype.private_GetFootnotesRange = function(Start, End)
 
 		this.private_GetFootnotesOnPage(End.Page, -1, End.Index, oResult);
 	}
+
+	return oResult;
 };
 CFootnotesController.prototype.private_GetFootnotesOnPage = function(PageAbs, StartIndex, EndIndex, oFootnotes)
 {
