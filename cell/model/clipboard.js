@@ -48,6 +48,7 @@
 		var c_oAscMaxCellOrCommentLength = AscCommon.c_oAscMaxCellOrCommentLength;
 		var doc = window.document;
 		var copyPasteUseBinary = true;
+		var CopyPasteCorrectString = AscCommon.CopyPasteCorrectString;
 		
 
 		function number2color(n) {
@@ -104,15 +105,19 @@
 					{
 						if(_data && _data.base64)
 						{
-							_data = _data.base64;
-						}
-						else
-						{
-							_data = this.copyProcessor.getBinaryForCopy(worksheetView);
-						}
+							if(_data && _data.base64)
+							{
+								_data = _data.base64;
+							}
+							else
+							{
+								_data = this.copyProcessor.getBinaryForCopy(ws);
+							}
 
-						_data = "xslData;" + _data;
-						_clipboard.pushData(AscCommon.c_oAscClipboardDataFormat.Internal, _data)
+							_data = "xslData;" + _data;
+							_clipboard.pushData(AscCommon.c_oAscClipboardDataFormat.Internal, _data);
+						}
+						
 					}
 				}
 			},
@@ -311,7 +316,7 @@
 				//если выделены графические объекты внутри группы
 				if(isIntoShape)//если курсор находится внутри шейпа
 				{
-					var oCopyProcessor = new CopyProcessor();
+					var oCopyProcessor = new CopyShapeContent();
 					var divContent = document.createElement('div');
 					oCopyProcessor.CopyDocument(divContent, isIntoShape, true);
 					
@@ -1496,6 +1501,97 @@
 				}
 				
 				return res;
+			},
+			
+			_pasteInShape: function(worksheet, node, onlyFromLocalStorage, targetDocContent)
+			{
+				targetDocContent.DrawingDocument.m_oLogicDocument = null;
+				
+				var oPasteProcessor = new AscCommon.PasteProcessor({WordControl:{m_oLogicDocument: targetDocContent}, FontLoader: {}}, false, false, true, true);
+				oPasteProcessor.map_font_index = this.Api.FontLoader.map_font_index;
+				oPasteProcessor.bIsDoublePx = false;
+				
+				var newFonts;
+				
+				if(onlyFromLocalStorage)
+					node = this.element;//this.lStorage.htmlInShape ? this.lStorage.htmlInShape : this.lStorage;
+				
+				//если находимся внутри диаграммы убираем ссылки
+				if(targetDocContent && targetDocContent.Parent && targetDocContent.Parent.parent && targetDocContent.Parent.parent.chart)
+				{
+					var changeTag = $(node).find("a");
+					this._changeHtmlTag(changeTag);
+				}
+				
+				oPasteProcessor._Prepeare_recursive(node, true, true);
+				
+				oPasteProcessor.aContent = [];
+                 
+				newFonts = this._convertFonts(oPasteProcessor.oFonts);
+
+
+				History.StartTransaction();
+				oPasteProcessor._Execute(node, {}, true, true, false);
+				if(!oPasteProcessor.aContent || !oPasteProcessor.aContent.length) {
+					window.GlobalPasteFlag = false;
+					window.GlobalPasteFlagCounter = 0;
+					History.EndTransaction();
+					return false;
+				}
+
+                var targetContent = worksheet.objectRender.controller.getTargetDocContent(true);//нужно для заголовков диаграмм
+                targetContent.Remove(1, true, true);
+					
+				worksheet._loadFonts(newFonts, function () {
+					oPasteProcessor.InsertInPlace(targetContent , oPasteProcessor.aContent);
+                    var oTargetTextObject = AscFormat.getTargetTextObject(worksheet.objectRender.controller);
+                    oTargetTextObject && oTargetTextObject.checkExtentsByDocContent && oTargetTextObject.checkExtentsByDocContent();
+					worksheet.objectRender.controller.startRecalculate();
+                    worksheet.objectRender.controller.cursorMoveRight(false, false);
+					window.GlobalPasteFlag = false;
+					window.GlobalPasteFlagCounter = 0;
+					History.EndTransaction();
+				});
+				
+ 				return true;
+			},
+			
+			_convertFonts: function(oFonts)
+			{
+				var newFonts = {};
+				var fontName;
+				for(var i in oFonts)
+				{
+					fontName = oFonts[i].Name;
+					newFonts[fontName] = 1;
+				};
+				return newFonts;
+			},
+			
+			//TODO сделать при получаении структуры. игнорировать размер шрифта и тп
+			_changeHtmlTag: function(arr)
+			{
+				var oldElem, value, style, bold, underline, italic;
+				for(var i = 0; i < arr.length; i++)
+				{
+					oldElem = arr[i];
+					value = oldElem.innerText;
+					
+					underline = "none";
+					if(oldElem.style.textDecoration && oldElem.style.textDecoration != "")
+						underline = oldElem.style.textDecoration;
+						
+					italic = "normal";
+					if(oldElem.style.textDecoration && oldElem.style.textDecoration != "")
+						italic = oldElem.style.fontStyle;
+						
+					bold = "normal";
+					if(oldElem.style.fontWeight && oldElem.style.fontWeight != "")
+						bold = oldElem.style.fontWeight;
+					
+					style = ' style = "text-decoration:' + underline + ";" + "font-style:" + italic + ";" + "font-weight:" + bold + ";" + '"';
+					$(oldElem).replaceWith("<span" + style +  ">" + value + "</span>");
+				};
 			}
 			
 		};
@@ -1514,6 +1610,8 @@
 		}
 
 		pasteFromBinaryWord.prototype = {
+			
+			constructor: pasteFromBinaryWord,
 			
 			_paste : function(worksheet, pasteData)
 			{
@@ -2350,6 +2448,9 @@
 		function DocumentContentBounds(){
 		};
 		DocumentContentBounds.prototype = {
+			
+			constructor: DocumentContentBounds,
+			
 			getBounds: function(nLeft, nTop, aDocumentContent){
 				//в первный проход заполняем размеры
 				//и могут заноситься относительные сдвиги при небходимости
@@ -2490,14 +2591,8 @@
 
 		
 		//пользуется класс из word, для копирования внутреннего контента автофигуры
-		//TODO просмотреть, все ли функции необходимы
-		function CopyProcessor(api, ElemToSelect)
+		function CopyShapeContent(api, ElemToSelect)
 		{
-			//this.api = api;
-			//this.oDocument = api.WordControl.m_oLogicDocument;
-			//this.oBinaryFileWriter = new BinaryFileWriter(this.oDocument);
-			//this.fontsArray = api.FontLoader.fontInfos;
-			//this.ElemToSelect = ElemToSelect;
 			this.Ul = document.createElement( "ul" );
 			this.Ol = document.createElement( "ol" );
 			this.Para = null;
@@ -2506,8 +2601,10 @@
 			this.oCurHyperlinkElem = null;
 			this.oPresentationWriter = new AscCommon.CBinaryFileWriter();
 		}
-		CopyProcessor.prototype =
+		CopyShapeContent.prototype =
 		{
+			constructor: CopyShapeContent,
+			
 			RGBToCSS : function(rgb)
 			{
 				var sResult = "#";
@@ -2522,6 +2619,7 @@
 					sB = "0" + sB;
 				return "#" + sR + sG + sB;
 			},
+			
 			CommitList : function(oDomTarget)
 			{
 				if(this.Ul.childNodes.length > 0)
@@ -2537,6 +2635,7 @@
 					this.Ol = document.createElement( "ol" );
 				}
 			},
+			
 			Commit_pPr : function(Item)
 			{
 				//pPr
@@ -2634,6 +2733,7 @@
 				if(apPr.length > 0)
 					this.Para.setAttribute("style", apPr.join(';'));
 			},
+			
 			parse_para_TextPr : function(Value)
 			{
 				var aProp = [];
@@ -2704,6 +2804,7 @@
 
 				return { style: aProp.join(';'), tagstart: aTagStart.join(''), tagend: aTagEnd.join('') };
 			},
+			
 			ParseItem : function(ParaItem)
 			{
 				var sRes = "";
@@ -2754,6 +2855,7 @@
 				}
 				return sRes;
 			},
+			
 			CopyRun: function (Item, bUseSelection) {
 				var sRes = "";
 				var ParaStart = 0;
@@ -2771,6 +2873,7 @@
 					sRes += this.ParseItem(Item.Content[i]);
 				return sRes;
 			},
+			
 			CopyRunContent: function (Container, bUseSelection) {
 				var sRes = "";
 				var ParaStart = 0;
@@ -2819,6 +2922,7 @@
 				}
 				return sRes;
 			},
+			
 			CopyParagraph : function(oDomTarget, Item, bLast, bUseSelection, aDocumentContent, nDocumentContentIndex)
 			{
 				var oDocument = this.oDocument;
@@ -2911,88 +3015,7 @@
 						oDomTarget.appendChild( this.Para );
 				}
 			},
-			_BorderToStyle : function(border, name)
-			{
-				var res = "";
-				if(border_None == border.Value)
-					res += name + ":none;";
-				else
-				{
-					var size = 0.5;
-					var color = { r : 0, g : 0, b : 0 };
-					if(null != border.Size)
-						size = border.Size * g_dKoef_mm_to_pt;
-					if(null != border.Color)
-						color = border.Color;
-					res += name + ":"+size+"pt solid "+this.RGBToCSS(color)+";";
-				}
-				return res;
-			},
-			_MarginToStyle : function(margins, styleName)
-			{
-				var res = "";
-				var nMarginLeft = 1.9;
-				var nMarginTop = 0;
-				var nMarginRight = 1.9;
-				var nMarginBottom = 0;
-				if(null != margins.Left && tblwidth_Mm == margins.Left.Type && null != margins.Left.W)
-					nMarginLeft = margins.Left.W;
-				if(null != margins.Top && tblwidth_Mm == margins.Top.Type && null != margins.Top.W)
-					nMarginTop = margins.Top.W;
-				if(null != margins.Right && tblwidth_Mm == margins.Right.Type && null != margins.Right.W)
-					nMarginRight = margins.Right.W;
-				if(null != margins.Bottom && tblwidth_Mm == margins.Bottom.Type && null != margins.Bottom.W)
-					nMarginBottom = margins.Bottom.W;
-				res = styleName + ":"+(nMarginTop * g_dKoef_mm_to_pt)+"pt "+(nMarginRight * g_dKoef_mm_to_pt)+"pt "+(nMarginBottom * g_dKoef_mm_to_pt)+"pt "+(nMarginLeft * g_dKoef_mm_to_pt)+"pt;";
-				return res;
-			},
-			_BordersToStyle : function(borders, bUseInner, bUseBetween, mso, alt)
-			{
-				var res = "";
-				if(null == mso)
-					mso = "";
-				if(null == alt)
-					alt = "";
-				if(null != borders.Left)
-					res += this._BorderToStyle(borders.Left, mso + "border-left" + alt);
-				if(null != borders.Top)
-					res += this._BorderToStyle(borders.Top, mso + "border-top" + alt);
-				if(null != borders.Right)
-					res += this._BorderToStyle(borders.Right, mso + "border-right" + alt);
-				if(null != borders.Bottom)
-					res += this._BorderToStyle(borders.Bottom, mso + "border-bottom" + alt);
-				if(bUseInner)
-				{
-					if(null != borders.InsideV)
-						res += this._BorderToStyle(borders.InsideV, "mso-border-insidev");
-					if(null != borders.InsideH)
-						res += this._BorderToStyle(borders.InsideH, "mso-border-insideh");
-				}
-				if(bUseBetween)
-				{
-					if(null != borders.Between)
-						res += this._BorderToStyle(borders.Between, "mso-border-between");
-				}
-				return res;
-			},
-			_MergeProp : function(elem1, elem2)
-			{
-				if( !elem1 || !elem2 )
-				{
-					return;
-				}
-
-				var p, v;
-				for(p in elem2)
-				{
-					if(elem2.hasOwnProperty(p) && false == elem1.hasOwnProperty(p))
-					{
-						v = elem2[p];
-						if(null != v)
-							elem1[p] = v;
-					}
-				}
-			},
+			
 			CopyDocument : function(oDomTarget, oDocument, bUseSelection)
 			{
 				var Start = 0;
@@ -3040,229 +3063,6 @@
 					}
 				}
 				this.CommitList(oDomTarget);
-			},
-			Start : function(node)
-			{
-				this.oBinaryFileWriter.CopyStart();
-				var oDocument = this.oDocument;
-				if(PasteElementsId.g_bIsDocumentCopyPaste)
-				{
-					if(!this.api.DocumentReaderMode)
-					{
-						var nDocPosType = oDocument.Get_DocPosType();
-						var Def_pPr = oDocument.Styles.Default.ParaPr;
-						if(docpostype_HdrFtr === nDocPosType)
-						{
-							if(null != oDocument.HdrFtr && null != oDocument.HdrFtr.CurHdrFtr && null != oDocument.HdrFtr.CurHdrFtr.Content)
-								oDocument = oDocument.HdrFtr.CurHdrFtr.Content;
-						}
-
-						if(nDocPosType === docpostype_DrawingObjects)
-						{
-							var content = oDocument.DrawingObjects.getTargetDocContent();
-							if(content)
-							{
-								oDocument = content;
-							}
-							else if(oDocument.DrawingObjects.selection.groupSelection && oDocument.DrawingObjects.selection.groupSelection.selectedObjects && oDocument.DrawingObjects.selection.groupSelection.selectedObjects.length)
-							{
-
-									var s_arr = oDocument.DrawingObjects.selection.groupSelection.selectedObjects;
-
-									this.Para = document.createElement( "p" );
-
-									if(copyPasteUseBinary)
-									{
-										var newArr = null;
-										var tempAr = null;
-										if(s_arr)
-										{
-											tempAr = [];
-											for(var k = 0; k < s_arr.length; k++)
-											{
-												tempAr[k] = s_arr[k].y;
-											}
-										}
-										tempAr.sort(AscCommon.fSortAscending);
-										newArr = [];
-										for(var k = 0; k < tempAr.length; k++)
-										{
-											var absOffsetY = tempAr[k];
-											for(var i = 0; i < s_arr.length; i++)
-											{
-												if(absOffsetY == s_arr[i].y)
-												{
-													newArr[k] = s_arr[i];
-												}
-											}
-										}
-										if(newArr != null)
-											s_arr = newArr;
-									}
-
-									for(var i = 0; i < s_arr.length; ++i)
-									{
-										var paraDrawing = s_arr[i].parent ? s_arr[i].parent : s_arr[i].group.parent;
-										var graphicObj = s_arr[i];
-										
-										if(AscCommon.isRealObject(paraDrawing.Parent))
-										{
-											var base64_img = paraDrawing.getBase64Img();
-
-											if(copyPasteUseBinary)
-											{
-												var wrappingType = oDocument.DrawingObjects.selection.groupSelection.parent.wrappingType;
-												var DrawingType = oDocument.DrawingObjects.selection.groupSelection.parent.DrawingType;
-												var tempParagraph = new Paragraph(oDocument, oDocument, 0, 0, 0, 0, 0);
-												var index = 0;
-												
-												tempParagraph.Content.unshift(new ParaRun());
-												
-												var paraRun = tempParagraph.Content[index];
-												paraRun.Content.unshift(new ParaDrawing());
-												paraRun.Content[index].wrappingType = wrappingType;
-												paraRun.Content[index].DrawingType = DrawingType;
-												paraRun.Content[index].GraphicObj = graphicObj;
-												
-												paraRun.Selection.EndPos = index + 1;
-												paraRun.Selection.StartPos = index;
-												paraRun.Selection.Use = true;
-												
-												tempParagraph.Selection.EndPos = index + 1;
-												tempParagraph.Selection.StartPos = index;
-												tempParagraph.Selection.Use = true;
-												tempParagraph.bFromDocument = true;
-
-												this.oBinaryFileWriter.CopyParagraph(tempParagraph);
-											};
-
-											var src = base64_img;
-											this.Para.innerHTML += "<img style=\"max-width:100%;\" width=\""+Math.round(paraDrawing.Extent.W * g_dKoef_mm_to_pix)+"\" height=\""+Math.round(paraDrawing.Extent.H * g_dKoef_mm_to_pix)+"\" src=\""+src+"\" />";
-
-											this.ElemToSelect.appendChild( this.Para );
-										}
-
-									}
-
-									if(copyPasteUseBinary)
-									{
-										this.oBinaryFileWriter.CopyEnd();
-										var sBase64 = this.oBinaryFileWriter.GetResult();
-										if(this.ElemToSelect.children && this.ElemToSelect.children.length == 1 && AscBrowser.isSafariMacOs)
-										{
-											$(this.ElemToSelect.children[0]).css("font-weight", "normal");
-											$(this.ElemToSelect.children[0]).wrap(document.createElement("b"));
-										}
-										if(this.ElemToSelect.children[0])
-											$(this.ElemToSelect.children[0]).addClass("docData;" + sBase64);
-									}
-							}
-							else
-							{
-								var gr_objects = oDocument.DrawingObjects;
-								var selection_array = gr_objects.selectedObjects;
-
-								this.Para = document.createElement( "span" );
-								var selectionTrue;
-								var selectIndex;
-								for(var i = 0; i < selection_array.length; ++i)
-								{
-									var cur_element = selection_array[i].parent;
-									var base64_img = cur_element.getBase64Img();
-									var src = base64_img;
-
-									this.Para.innerHTML = "<img style=\"max-width:100%;\" width=\""+Math.round(cur_element.Extent.W * g_dKoef_mm_to_pix)+"\" height=\""+Math.round(cur_element.Extent.H * g_dKoef_mm_to_pix)+"\" src=\""+src+"\" />";
-
-									this.ElemToSelect.appendChild( this.Para );
-
-									if(copyPasteUseBinary)
-									{
-										var paragraph = cur_element.Parent;
-										
-										var inIndex;
-										var paragraphIndex;
-										var content;
-										var curParaRun;
-										for(var k = 0; k < paragraph.Content.length;k++)
-										{
-											content = paragraph.Content[k].Content;
-											for(var n = 0; n < content.length; n++)
-											{
-												if(content[n] == cur_element)
-												{
-													curParaRun = paragraph.Content[k];
-													inIndex = n;
-													paragraphIndex = k;
-													break;
-												};
-											};
-										};
-										
-										selectionTrue =
-										{
-											EndPos : curParaRun.Selection.EndPos,
-											StartPos: curParaRun.Selection.StartPos,
-											EndPosParagraph : paragraph.Selection.EndPos,
-											StartPosParagraph: paragraph.Selection.StartPos
-										};
-										
-										//меняем Selection
-										curParaRun.Selection.EndPos = inIndex + 1;
-										curParaRun.Selection.StartPos = inIndex;
-										curParaRun.Selection.Use = true;
-										
-										paragraph.Selection.EndPos = paragraphIndex;
-										paragraph.Selection.StartPos = paragraphIndex;
-										paragraph.Selection.Use = true;
-
-										this.oBinaryFileWriter.CopyParagraph(paragraph);
-
-										//возвращаем Selection
-										curParaRun.Selection.StartPos = selectionTrue.StartPos;
-										curParaRun.Selection.EndPos = selectionTrue.EndPos;
-										
-										paragraph.Selection.StartPos = selectionTrue.StartPosParagraph;
-										paragraph.Selection.EndPos = selectionTrue.EndPosParagraph;
-									}
-								}
-								
-								if(copyPasteUseBinary)
-								{
-									this.oBinaryFileWriter.CopyEnd();
-									var sBase64 = this.oBinaryFileWriter.GetResult();
-									if(this.ElemToSelect.children && this.ElemToSelect.children.length == 1 && AscBrowser.isSafariMacOs)
-									{
-										$(this.ElemToSelect.children[0]).css("font-weight", "normal");
-										$(this.ElemToSelect.children[0]).wrap(document.createElement("b"));
-									}
-									if(this.ElemToSelect.children[0])
-										$(this.ElemToSelect.children[0]).addClass("docData;" + sBase64);
-								}
-								return;
-							}
-						}
-						if ( true === oDocument.Selection.Use )
-						{
-							this.CopyDocument(this.ElemToSelect, oDocument, true);
-						}
-					}
-					else
-						this.CopyDocument(this.ElemToSelect, oDocument, false);
-				}
-				
-				
-				this.oBinaryFileWriter.CopyEnd();
-				if(copyPasteUseBinary && this.oBinaryFileWriter.copyParams.itemCount > 0)
-				{
-					var sBase64 = this.oBinaryFileWriter.GetResult();
-					if(this.ElemToSelect.children && this.ElemToSelect.children.length == 1 && AscBrowser.isSafariMacOs)
-					{
-						$(this.ElemToSelect.children[0]).css("font-weight", "normal");;
-						$(this.ElemToSelect.children[0]).wrap(document.createElement("b"));
-					}
-					if(this.ElemToSelect.children[0])
-						$(this.ElemToSelect.children[0]).addClass("docData;" + sBase64);
-				}
 			}
 
 		};
