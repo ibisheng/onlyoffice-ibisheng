@@ -1,3 +1,34 @@
+/*
+ * (c) Copyright Ascensio System SIA 2010-2016
+ *
+ * This program is a free software product. You can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License (AGPL)
+ * version 3 as published by the Free Software Foundation. In accordance with
+ * Section 7(a) of the GNU AGPL its Section 15 shall be amended to the effect
+ * that Ascensio System SIA expressly excludes the warranty of non-infringement
+ * of any third-party rights.
+ *
+ * This program is distributed WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR  PURPOSE. For
+ * details, see the GNU AGPL at: http://www.gnu.org/licenses/agpl-3.0.html
+ *
+ * You can contact Ascensio System SIA at Lubanas st. 125a-25, Riga, Latvia,
+ * EU, LV-1021.
+ *
+ * The  interactive user interfaces in modified source and object code versions
+ * of the Program must display Appropriate Legal Notices, as required under
+ * Section 5 of the GNU AGPL version 3.
+ *
+ * Pursuant to Section 7(b) of the License you must retain the original Product
+ * logo when distributing the program. Pursuant to Section 7(e) we decline to
+ * grant you any rights under trademark law for use of our trademarks.
+ *
+ * All the Product's GUI elements, including illustrations and icon sets, as
+ * well as technical writing content are licensed under the terms of the
+ * Creative Commons Attribution-ShareAlike 4.0 International. See the License
+ * terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
+ *
+ */
 
 function asc_menu_ReadColor(_params, _cursor) {
     var _color = new Asc.asc_CColor();
@@ -2186,6 +2217,137 @@ function asc_ReadAutoFilter(s, p) {
 
     return filter;
 }
+function asc_ReadAutoFilterObj(s, p) {
+    var filter = new Asc.AutoFilterObj();
+    
+    var next = true;
+    while (next)
+    {
+        var _attr = s[p.pos++];
+        switch (_attr)
+        {
+            case 0:
+            {
+                filter.asc_setType(s[p.pos++]);
+                break;
+            }
+                
+            // TODO: color, top10,
+
+            case 255:
+            default:
+            {
+                next = false;
+                break;
+            }
+        }
+    }
+    
+    return filter;
+}
+function asc_ReadAutoFiltersOptionsElements(s, p) {
+    var filter = new AscCommonExcel.AutoFiltersOptionsElements();
+    
+    var next = true;
+    while (next)
+    {
+        var _attr = s[p.pos++];
+        switch (_attr)
+        {
+            case 0:
+            {
+                filter.asc_setIsDateFormat(s[p.pos++]);
+                break;
+            }
+            case 1:
+            {
+                filter.asc_setText(s[p.pos++]);
+                break;
+            }
+            case 2:
+            {
+                filter.asc_setVal(s[p.pos++]);
+                break;
+            }
+            case 3:
+            {
+                filter.asc_setVisible(s[p.pos++]);
+                break;
+            }
+            case 255:
+            default:
+            {
+                next = false;
+                break;
+            }
+        }
+    }
+    
+    return filter;
+}
+
+function asc_ReadAutoFiltersOptions(s, p) {
+    var filter = new Asc.AutoFiltersOptions();
+    
+    var next = true;
+    while (next)
+    {
+        var _attr = s[p.pos++];
+        switch (_attr)
+        {
+            case 0:
+            {
+                filter.asc_setCellId(s[p.pos++]);
+                break;
+            }
+            case 1:
+            {
+                filter.asc_setDiplayName(s[p.pos++]);
+                break;
+            }
+            case 2:
+            {
+                filter.asc_setIsTextFilter(s[p.pos++]);
+                break;
+            }
+            case 3:
+            {
+                filter.asc_setSortState(s[p.pos++]);
+                break;
+            }
+            case 4:
+            {
+                filter.asc_setSortColor(asc_menu_ReadColor(s, p));
+                break;
+            }
+            case 5:
+            {
+                filter.asc_setFilterObj(asc_ReadAutoFilterObj(s, p));
+                break;
+            }
+            case 6:
+            {
+                var values = [];
+                var count = s[p.pos++];
+                
+                for (var i = 0; i < count; ++i) {
+                    p.pos++;
+                    values.push(asc_ReadAutoFiltersOptionsElements(s,p));
+                }
+                
+                filter.asc_setValues(values);
+            }
+            case 255:
+            default:
+            {
+                next = false;
+                break;
+            }
+        }
+    }
+    
+    return filter;
+}
 
 function asc_WriteCBorder(i, c, s) {
     if (!c) return;
@@ -2406,6 +2568,98 @@ function asc_WriteAddFormatTableOptions(c, s) {
         s['WriteBool'](c.asc_getIsTitle());
     }
 
+    s['WriteByte'](255);
+}
+
+function asc_WriteAutoFilterObj(i, c, s) {
+    if (!c) return;
+    
+    s['WriteByte'](i);
+    
+    if (undefined !== c.asc_getType()) {
+        s['WriteByte'](0);
+        s['WriteLong'](c.asc_getType());
+    }
+    
+    s['WriteByte'](255);
+}
+function asc_WriteAutoFiltersOptionsElements(i, c, s) {
+    if (!c) return;
+    
+    s['WriteByte'](i);
+    
+    if (undefined !== c.asc_getIsDateFormat()) {
+        s['WriteByte'](0);
+        s['WriteBool'](c.asc_getIsDateFormat());
+    }
+    
+    if (c.asc_getText()) {
+        s['WriteByte'](1);
+        s['WriteString2'](c.asc_getText());
+    }
+  
+    if (c.asc_getVal()) {
+        s['WriteByte'](2);
+        s['WriteString2'](c.asc_getVal());
+    }
+    
+    if (undefined !== c.asc_getVisible()) {
+        s['WriteByte'](3);
+        s['WriteBool'](c.asc_getVisible());
+    }
+    
+    s['WriteByte'](255);
+}
+function asc_WriteAutoFiltersOptions(c, s) {
+    if (!c) return;
+    
+    if (c.asc_getCellId()) {
+        s['WriteByte'](0);
+        s['WriteString2'](c.asc_getCellId());
+    }
+    
+    if (c.asc_getDisplayName()) {
+        s['WriteByte'](1);
+        s['WriteString2'](c.asc_getDisplayName());
+    }
+    
+    if (c.asc_getIsTextFilter()) {
+        s['WriteByte'](2);
+        s['WriteBool'](c.asc_getIsTextFilter());
+    }
+    
+    if (c.asc_getCellCoord()) {
+        s['WriteByte'](3);
+        s['WriteDouble2'](c.asc_getCellCoord().asc_getX());
+        s['WriteDouble2'](c.asc_getCellCoord().asc_getY());
+        s['WriteDouble2'](c.asc_getCellCoord().asc_getWidth());
+        s['WriteDouble2'](c.asc_getCellCoord().asc_getHeight());
+    }
+    
+    if (c.asc_getSortColor()) {
+        asc_menu_WriteColor(4, c.asc_getSortColor(), s);
+    }
+    
+    if (c.asc_getValues() && c.asc_getValues().length > 0) {
+        var count = c.asc_getValues().length
+       
+        s['WriteByte'](5);
+        s['WriteLong'](count);
+        
+        for (var i = 0; i < count; ++i) {
+            asc_WriteAutoFiltersOptionsElements(1, c.asc_getValues()[i], s);
+        }
+    }
+    
+    if (undefined !== c.asc_getSortState()) {
+        s['WriteByte'](6);
+        s['WriteLong'](c.asc_getSortState());
+    }
+    
+    if (c.asc_getFilterObj()) {
+        asc_WriteAutoFilterObj(7, c.asc_getFilterObj(), s);
+    }
+    
     s['WriteByte'](255);
 }
 
@@ -3631,6 +3885,13 @@ function OfflineEditor () {
             stream["ClearNoAttack"]();
             stream['WriteLong'](state);
             window["native"]["OnCallMenuEvent"](2600, stream); // ASC_SPREADSHEETS_EVENT_TYPE_ON_EDIT_CELL
+        });
+     
+        _api.asc_registerCallback('asc_onSetAFDialog', function(state) {
+            var stream = global_memory_stream_menu;
+            stream["ClearNoAttack"]();
+            asc_WriteAutoFiltersOptions(state, stream);
+            window["native"]["OnCallMenuEvent"](3060, stream); // ASC_SPREADSHEETS_EVENT_TYPE_FILTER_DIALOG
         });
     };
     this.updateFrozen = function () {
@@ -5044,14 +5305,21 @@ function offline_mouse_down(x, y, pin, isViewerMode, isFormulaEditMode, isRangeR
 
     _s.cellPin = pin;
     _s.isFormulaEditMode = isFormulaEditMode;
+    
+    var ct = ws.getCursorTypeFromXY(x, y, isViewerMode);
+    if (ct.target && ct.target === AscCommonExcel.c_oTargetType.FilterObject) {
+        ws.af_setDialogProp(ct.idFilter);
+        //var cell = offline_get_cell_in_coord(x, y);
+        return;
+    }
 
     if (isRangeResize) {
 
         if (!isViewerMode) {
-
+    
             var ct = ws.getCursorTypeFromXY(x, y, isViewerMode);
-
-            //console.log(JSON.stringify(ct));
+           
+             //console.log(JSON.stringify(ct));
 
             ws.startCellMoveResizeRange = null;
 
@@ -6643,8 +6911,20 @@ function offline_apply_event(type,params) {
         case 3010: // ASC_SPREADSHEETS_EVENT_TYPE_FILTER_CHANGE_AUTO
         {
             var changeFilter = asc_ReadAutoFilter(params, _current);
+            
+            if (changeFilter && 'FALSE' === changeFilter.styleName) {
+                changeFilter.styleName = false;
+            }
+            
             _api.asc_changeAutoFilter(changeFilter.tableName, changeFilter.optionType, changeFilter.styleName);
             _api.wb.getWorksheet().handlers.trigger('selectionChanged', _api.wb.getWorksheet().getSelectionInfo());
+            break;
+        }
+        
+        case 3020: // ASC_SPREADSHEETS_EVENT_TYPE_AUTO_FILTER_APPLY
+        {
+            var autoFilter = asc_ReadAutoFiltersOptions(params, _current);
+            _api.asc_applyAutoFilter(autoFilter);
             break;
         }
 

@@ -1,3 +1,35 @@
+/*
+ * (c) Copyright Ascensio System SIA 2010-2016
+ *
+ * This program is a free software product. You can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License (AGPL)
+ * version 3 as published by the Free Software Foundation. In accordance with
+ * Section 7(a) of the GNU AGPL its Section 15 shall be amended to the effect
+ * that Ascensio System SIA expressly excludes the warranty of non-infringement
+ * of any third-party rights.
+ *
+ * This program is distributed WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR  PURPOSE. For
+ * details, see the GNU AGPL at: http://www.gnu.org/licenses/agpl-3.0.html
+ *
+ * You can contact Ascensio System SIA at Lubanas st. 125a-25, Riga, Latvia,
+ * EU, LV-1021.
+ *
+ * The  interactive user interfaces in modified source and object code versions
+ * of the Program must display Appropriate Legal Notices, as required under
+ * Section 5 of the GNU AGPL version 3.
+ *
+ * Pursuant to Section 7(b) of the License you must retain the original Product
+ * logo when distributing the program. Pursuant to Section 7(e) we decline to
+ * grant you any rights under trademark law for use of our trademarks.
+ *
+ * All the Product's GUI elements, including illustrations and icon sets, as
+ * well as technical writing content are licensed under the terms of the
+ * Creative Commons Attribution-ShareAlike 4.0 International. See the License
+ * terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
+ *
+ */
+
 "use strict";
 
 // TODO: Сейчас Paragraph.Recalculate_FastWholeParagraph работает только на добавлении текста, надо переделать
@@ -323,8 +355,11 @@ CSelectedContent.prototype =
 
         this.DrawingObjects = [];
         this.Comments       = [];
+        this.Maths          = [];
         
-        this.HaveShape = false;
+        this.HaveShape   = false;
+        this.MoveDrawing = false; // Только для переноса автофигур
+        this.HaveMath    = false;
     },
 
     Add : function(Element)
@@ -1422,9 +1457,10 @@ function CDocument(DrawingDocument, isMainLogicDocument)
     this.CheckLanguageOnTextAdd = false; // Проверять ли язык при добавлении текста в ран
 
     // Мап для рассылки
-    this.MailMergeMap = null;
-    this.MailMergePreview = false;
+    this.MailMergeMap             = null;
+    this.MailMergePreview         = false;
     this.MailMergeFieldsHighlight = false; // Подсвечивать ли все поля связанные с рассылкой
+    this.MailMergeFields          = [];
 
     // Класс, управляющий полями
     this.FieldsManager = new CDocumentFieldsManager();
@@ -1438,6 +1474,9 @@ function CDocument(DrawingDocument, isMainLogicDocument)
 
     // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
     this.TableId.Add(this, this.Id);
+
+	// Объект для составного ввода текста
+	this.CompositeInput = null;
 
     this.StartTime = 0;
 }
@@ -1483,6 +1522,8 @@ CDocument.prototype.On_EndLoad                     = function()
     {
         this.Set_FastCollaborativeEditing(true);
     }
+
+    //this.Footnotes.Init();
 };
 CDocument.prototype.Add_TestDocument               = function()
 {
@@ -4500,6 +4541,9 @@ CDocument.prototype.Paragraph_Add              = function(ParaItem, bRecalculate
                 case para_PageNum:
                 case para_Field:
                 case para_FootnoteReference:
+                case para_FootnoteRef:
+                case para_Separator:
+                case para_ContinuationSeparator:
                 {
                     // Если у нас что-то заселекчено и мы вводим текст или пробел
                     // и т.д., тогда сначала удаляем весь селект.
@@ -10363,6 +10407,7 @@ CDocument.prototype.Insert_Content            = function(SelectedContent, NearPo
             Para.Selection_Remove();
 
             var bAddEmptyPara = false;
+            var bDoNotIncreaseDstIndex = false;
 
             if (true === Para.Cursor_IsEnd())
             {
@@ -10372,8 +10417,12 @@ CDocument.prototype.Insert_Content            = function(SelectedContent, NearPo
                 {
                     bConcatS = false;
 
+                    // TODO: Возможно флаг bDoNotIncreaseDstIndex не нужен, и здесь не нужно увеличивать индекс DstIndex
                     if (type_Paragraph !== this.Content[DstIndex].Get_Type() || true !== this.Content[DstIndex].Is_Empty())
+                    {
                         DstIndex++;
+                        bDoNotIncreaseDstIndex = true;
+                    }
                 }
                 else if (true === Elements[ElementsCount - 1].SelectedAll && true === bConcatS)
                     bAddEmptyPara = true;
@@ -10421,6 +10470,10 @@ CDocument.prototype.Insert_Content            = function(SelectedContent, NearPo
                 ParaS.Selection.Use      = true;
                 ParaS.Selection.StartPos = ParaS.Content.length - _ParaSContentLen;
                 ParaS.Selection.EndPos   = ParaS.Content.length - 1;
+            }
+            else if (true !== Para.Cursor_IsStart() && true !== bDoNotIncreaseDstIndex)
+            {
+                DstIndex++;
             }
 
             var EndIndex = ElementsCount - 1;
@@ -11495,7 +11548,7 @@ CDocument.prototype.OnKeyDown               = function(e)
     // {
     //     this.History.Create_NewPoint();
     //     var oFootnote = this.Footnotes.Create_Footnote();
-    //
+	//
     //     oFootnote.Paragraph_Add(new ParaFootnoteRef(oFootnote));
     //     oFootnote.Paragraph_Add(new ParaSpace());
     //     oFootnote.Paragraph_Add(new ParaText("F"));
@@ -11506,8 +11559,20 @@ CDocument.prototype.OnKeyDown               = function(e)
     //     oFootnote.Paragraph_Add(new ParaText("o"));
     //     oFootnote.Paragraph_Add(new ParaText("t"));
     //     oFootnote.Paragraph_Add(new ParaText("e"));
-    //
+	//
     //     this.Paragraph_Add(new ParaFootnoteReference(oFootnote));
+    //     bRetValue = keydownresult_PreventAll;
+    // }
+    // else if (114 === e.KeyCode)
+    // {
+    //     this.History.Create_NewPoint();
+    //     this.Paragraph_Add(new ParaSeparator());
+    //     bRetValue = keydownresult_PreventAll;
+    // }
+    // else if (115 === e.KeyCode)
+    // {
+    //     this.History.Create_NewPoint();
+    //     this.Paragraph_Add(new ParaContinuationSeparator());
     //     bRetValue = keydownresult_PreventAll;
     // }
     // TEST <--
@@ -16815,6 +16880,135 @@ CDocument.prototype.EndPreview_MailMergeResult = function(){};
 CDocument.prototype.Continue_TrackRevisions = function(){};
 CDocument.prototype.Set_TrackRevisions = function(bTrack){};
 //----------------------------------------------------------------------------------------------------------------------
+// Функции для работы с составным вводом
+//----------------------------------------------------------------------------------------------------------------------
+/**
+ * Сообщаем о начале составного ввода текста.
+ * @returns {boolean} Начался или нет составной ввод.
+ */
+CDocument.prototype.Begin_CompositeInput = function()
+{
+	if (false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content, null, true))
+	{
+		this.Create_NewHistoryPoint(AscDFH.historydescription_Document_CompositeInput);
+
+		this.DrawingDocument.TargetStart();
+		this.DrawingDocument.TargetShow();
+
+		if (true === this.Is_SelectionUse())
+			this.Remove(1, true, false, true);
+
+		var oPara = this.Get_CurrentParagraph();
+		if (!oPara)
+		{
+			this.History.Remove_LastPoint();
+			return false;
+		}
+
+		var oRun = oPara.Get_ElementByPos(oPara.Get_ParaContentPos(false, false));
+		if (!oRun || !(oRun instanceof ParaRun))
+		{
+			this.History.Remove_LastPoint();
+			return false;
+		}
+
+		this.CompositeInput = {
+			Run    : oRun,
+			Pos    : oRun.State.ContentPos,
+			Length : 0
+		};
+
+		oRun.Set_CompositeInput(this.CompositeInput);
+
+		return true;
+	}
+
+	return false;
+};
+CDocument.prototype.Add_CompositeText = function(nCharCode)
+{
+	// TODO: При таком вводе не меняется язык в зависимости от раскладки, не учитывается режим рецензирования.
+
+	if (null === this.CompositeInput)
+		return;
+
+	var oRun = this.CompositeInput.Run;
+	var nPos = this.CompositeInput.Pos + this.CompositeInput.Length;
+	var oChar = new ParaText();
+	oChar.Set_CharCode(nCharCode);
+	oRun.Add_ToContent(nPos, oChar, true);
+	this.CompositeInput.Length++;
+
+	this.Recalculate();
+	this.Document_UpdateSelectionState();
+};
+CDocument.prototype.Remove_CompositeText = function(nCount)
+{
+	if (null === this.CompositeInput)
+		return;
+
+	var oRun = this.CompositeInput.Run;
+	var nPos = this.CompositeInput.Pos + this.CompositeInput.Length;
+
+	var nDelCount = Math.max(0, Math.min(nCount, this.CompositeInput.Length, oRun.Content.length, nPos));
+	oRun.Remove_FromContent(nPos - nDelCount, nDelCount, true);
+	this.CompositeInput.Length -= nDelCount;
+
+	this.Recalculate();
+	this.Document_UpdateSelectionState();
+};
+CDocument.prototype.Replace_CompositeText = function(arrCharCodes)
+{
+	if (null === this.CompositeInput)
+		return;
+
+	this.Start_SilentMode();
+	this.Remove_CompositeText(this.CompositeInput.Length);
+	for (var nIndex = 0, nCount = arrCharCodes.length; nIndex < nCount; ++nIndex)
+	{
+		this.Add_CompositeText(arrCharCodes[nIndex]);
+	}
+	this.End_SilentMode(false);
+
+	this.Recalculate();
+	this.Document_UpdateSelectionState();
+};
+CDocument.prototype.Set_CursorPosInCompositeText = function(nPos)
+{
+	if (null === this.CompositeInput)
+		return;
+	
+	var oRun = this.CompositeInput.Run;
+
+	var nInRunPos = Math.max(Math.min(this.CompositeInput.Pos + nPos, this.CompositeInput.Pos + this.CompositeInput.Length, oRun.Content.length), this.CompositeInput.Pos);
+	oRun.State.ContentPos = nInRunPos;
+	this.Document_UpdateSelectionState();
+};
+CDocument.prototype.Get_CursorPosInCompositeText = function()
+{
+	if (null === this.CompositeInput)
+		return 0;
+
+	var oRun = this.CompositeInput.Run;
+	var nInRunPos = oRun.State.ContentPos;
+	var nPos = Math.min(this.CompositeInput.Length, Math.max(0, nInRunPos - this.CompositeInput.Pos));
+	return nPos;
+};
+CDocument.prototype.End_CompositeInput = function()
+{
+	if (null === this.CompositeInput)
+		return;
+
+	var oRun = this.CompositeInput.Run;
+	oRun.Set_CompositeInput(null);
+	this.CompositeInput = null;
+
+	this.Document_UpdateInterfaceState();
+
+	this.DrawingDocument.ClearCachePages();
+	this.DrawingDocument.FirePaint();
+};
+//----------------------------------------------------------------------------------------------------------------------
 //
 //----------------------------------------------------------------------------------------------------------------------
 function CDocumentSelectionState()
@@ -16926,6 +17120,32 @@ CDocumentSectionsInfo.prototype =
 
             if ( null != SectPr.FooterEven )
                 SectPr.FooterEven.Get_AllParagraphs(Props, ParaArray);
+        }
+    },
+
+    Get_AllDrawingObjects : function(arrDrawings)
+    {
+        for (var nIndex = 0, nCount = this.Elements.length; nIndex < nCount; ++nIndex)
+        {
+            var SectPr = this.Elements[nIndex].SectPr;
+
+            if (null != SectPr.HeaderFirst)
+                SectPr.HeaderFirst.Get_AllDrawingObjects(arrDrawings);
+
+            if (null != SectPr.HeaderDefault)
+                SectPr.HeaderDefault.Get_AllDrawingObjects(arrDrawings);
+
+            if (null != SectPr.HeaderEven)
+                SectPr.HeaderEven.Get_AllDrawingObjects(arrDrawings);
+
+            if (null != SectPr.FooterFirst)
+                SectPr.FooterFirst.Get_AllDrawingObjects(arrDrawings);
+
+            if (null != SectPr.FooterDefault)
+                SectPr.FooterDefault.Get_AllDrawingObjects(arrDrawings);
+
+            if (null != SectPr.FooterEven)
+                SectPr.FooterEven.Get_AllDrawingObjects(arrDrawings);
         }
     },
 

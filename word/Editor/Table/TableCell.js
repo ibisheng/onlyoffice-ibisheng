@@ -1,3 +1,35 @@
+/*
+ * (c) Copyright Ascensio System SIA 2010-2016
+ *
+ * This program is a free software product. You can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License (AGPL)
+ * version 3 as published by the Free Software Foundation. In accordance with
+ * Section 7(a) of the GNU AGPL its Section 15 shall be amended to the effect
+ * that Ascensio System SIA expressly excludes the warranty of non-infringement
+ * of any third-party rights.
+ *
+ * This program is distributed WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR  PURPOSE. For
+ * details, see the GNU AGPL at: http://www.gnu.org/licenses/agpl-3.0.html
+ *
+ * You can contact Ascensio System SIA at Lubanas st. 125a-25, Riga, Latvia,
+ * EU, LV-1021.
+ *
+ * The  interactive user interfaces in modified source and object code versions
+ * of the Program must display Appropriate Legal Notices, as required under
+ * Section 5 of the GNU AGPL version 3.
+ *
+ * Pursuant to Section 7(b) of the License you must retain the original Product
+ * logo when distributing the program. Pursuant to Section 7(e) we decline to
+ * grant you any rights under trademark law for use of our trademarks.
+ *
+ * All the Product's GUI elements, including illustrations and icon sets, as
+ * well as technical writing content are licensed under the terms of the
+ * Creative Commons Attribution-ShareAlike 4.0 International. See the License
+ * terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
+ *
+ */
+
 "use strict";
 
 // Import
@@ -277,7 +309,7 @@ CTableCell.prototype =
         if ( true === TableLook.Is_BandHor() )
         {
             var RowBandSize = TablePr.TablePr.TableStyleRowBandSize;
-            var __RowIndex  = ( true != TableLook.Is_FirstRow() ? RowIndex : RowIndex - 1 )
+            var __RowIndex  = ( true != TableLook.Is_FirstRow() ? RowIndex : RowIndex - 1 );
             var _RowIndex = ( 1 != RowBandSize ? Math.floor( __RowIndex / RowBandSize ) : __RowIndex );
             var TableBandStyle = null;
             if ( 0 === _RowIndex % 2 )
@@ -290,24 +322,40 @@ CTableCell.prototype =
             ParaPr.Merge( TableBandStyle.ParaPr );
         }
 
-        // Совместим с настройками для групп колонок
-        // Согласно спецификации DOCX, совмещать надо всегда, но для первой и последней колонок Word
-        // не совмещает, поэтому делаем также.
-        if ( true === TableLook.Is_BandVer() && !( (true === TableLook.Is_LastCol() && this.Row.Get_CellsCount() - 1 === CellIndex) || (true === TableLook.Is_FirstCol() && 0 === CellIndex) ) )
-        {
-            var ColBandSize = TablePr.TablePr.TableStyleColBandSize;
-            var _ColIndex   = ( true != TableLook.Is_FirstCol() ? CellIndex : CellIndex - 1 )
-            var ColIndex = ( 1 != ColBandSize ? Math.floor( _ColIndex / ColBandSize ) : _ColIndex );
-            var TableBandStyle = null;
-            if ( 0 === ColIndex % 2 )
-                TableBandStyle = TablePr.TableBand1Vert;
-            else
-                TableBandStyle = TablePr.TableBand2Vert;
+		// Совместим с настройками для групп колонок
+		// Согласно спецификации DOCX, совмещать надо всегда. Word проверяет наличие первой колонки не только
+		// через флаг TableLook.Is_FirstCol(), но и самим наличием непустого стиля для первой колонки.
+		if (true === TableLook.Is_BandVer())
+		{
+			var bFirstCol = false;
+			if (true === TableLook.Is_FirstCol())
+			{
+				var oTableStyle = this.Get_Styles().Get(this.Row.Table.Get_TableStyle());
+				if (oTableStyle && styletype_Table === oTableStyle.Get_Type() && oTableStyle.TableFirstCol)
+				{
+					var oCondStyle = oTableStyle.TableFirstCol;
+					if (true !== oCondStyle.TableCellPr.Is_Empty()
+						|| true !== oCondStyle.ParaPr.Is_Empty()
+						|| true !== oCondStyle.TextPr.Is_Empty())
+					{
+						bFirstCol = true;
+					}
+				}
+			}
 
-            CellPr.Merge( TableBandStyle.TableCellPr );
-            TextPr.Merge( TableBandStyle.TextPr );
-            ParaPr.Merge( TableBandStyle.ParaPr );
-        }
+			var ColBandSize    = TablePr.TablePr.TableStyleColBandSize;
+			var _ColIndex      = ( true != bFirstCol ? CellIndex : CellIndex - 1 );
+			var ColIndex       = ( 1 != ColBandSize ? Math.floor(_ColIndex / ColBandSize) : _ColIndex );
+			var TableBandStyle = null;
+			if (0 === ColIndex % 2)
+				TableBandStyle = TablePr.TableBand1Vert;
+			else
+				TableBandStyle = TablePr.TableBand2Vert;
+
+			CellPr.Merge(TableBandStyle.TableCellPr);
+			TextPr.Merge(TableBandStyle.TextPr);
+			ParaPr.Merge(TableBandStyle.ParaPr);
+		}
 
 
         // Совместим настройки с настройками для последней колонки

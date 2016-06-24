@@ -1,3 +1,35 @@
+/*
+ * (c) Copyright Ascensio System SIA 2010-2016
+ *
+ * This program is a free software product. You can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License (AGPL)
+ * version 3 as published by the Free Software Foundation. In accordance with
+ * Section 7(a) of the GNU AGPL its Section 15 shall be amended to the effect
+ * that Ascensio System SIA expressly excludes the warranty of non-infringement
+ * of any third-party rights.
+ *
+ * This program is distributed WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR  PURPOSE. For
+ * details, see the GNU AGPL at: http://www.gnu.org/licenses/agpl-3.0.html
+ *
+ * You can contact Ascensio System SIA at Lubanas st. 125a-25, Riga, Latvia,
+ * EU, LV-1021.
+ *
+ * The  interactive user interfaces in modified source and object code versions
+ * of the Program must display Appropriate Legal Notices, as required under
+ * Section 5 of the GNU AGPL version 3.
+ *
+ * Pursuant to Section 7(b) of the License you must retain the original Product
+ * logo when distributing the program. Pursuant to Section 7(e) we decline to
+ * grant you any rights under trademark law for use of our trademarks.
+ *
+ * All the Product's GUI elements, including illustrations and icon sets, as
+ * well as technical writing content are licensed under the terms of the
+ * Creative Commons Attribution-ShareAlike 4.0 International. See the License
+ * terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
+ *
+ */
+
 "use strict";
 
 // Import
@@ -6961,6 +6993,24 @@ CTableCellPr.prototype =
             this.NoWrap = Reader.GetBool();
     }
 };
+CTableCellPr.prototype.Is_Empty = function()
+{
+	if (undefined !== this.GridSpan
+		|| undefined !== this.Shd
+		|| undefined !== this.TableCellMar
+		|| undefined !== this.TableCellBorders.Bottom
+		|| undefined !== this.TableCellBorders.Left
+		|| undefined !== this.TableCellBorders.Right
+		|| undefined !== this.TableCellBorders.Top
+		|| undefined !== this.TableCellW
+		|| undefined !== this.VAlign
+		|| undefined !== this.VMerge
+		|| undefined !== this.TextDirection
+		|| undefined !== this.NoWrap)
+		return false;
+
+	return true;
+};
 
 function CRFonts()
 {
@@ -7232,6 +7282,17 @@ CRFonts.prototype =
         return true;
     }
 };
+CRFonts.prototype.Is_Empty = function()
+{
+	if (undefined !== this.Ascii
+		|| undefined !== this.EastAsia
+		|| undefined !== this.HAnsi
+		|| undefined !== this.CS
+		|| undefined !== this.Hint)
+		return false;
+
+	return true;
+};
 
 function CLang()
 {
@@ -7348,6 +7409,15 @@ CLang.prototype =
 
         return true;
     }
+};
+CLang.prototype.Is_Empty = function()
+{
+	if (undefined !== this.Bidi
+		|| undefined !== this.EastAsia
+		|| undefined !== this.Val)
+		return false;
+
+	return true;
 };
 
 function CTextPr()
@@ -8747,6 +8817,40 @@ CTextPr.prototype =
         return Description;
     }
 };
+CTextPr.prototype.Is_Empty = function()
+{
+	if (undefined !== this.Bold
+		|| undefined !== this.Italic
+		|| undefined !== this.Strikeout
+		|| undefined !== this.Underline
+		|| undefined !== this.FontFamily
+		|| undefined !== this.FontSize
+		|| undefined !== this.Color
+		|| undefined !== this.VertAlign
+		|| undefined !== this.HighLight
+		|| undefined !== this.RStyle
+		|| undefined !== this.Spacing
+		|| undefined !== this.DStrikeout
+		|| undefined !== this.Caps
+		|| undefined !== this.SmallCaps
+		|| undefined !== this.Position
+		|| true !== this.RFonts.Is_Empty()
+		|| undefined !== this.BoldCS
+		|| undefined !== this.ItalicCS
+		|| undefined !== this.FontSizeCS
+		|| undefined !== this.CS
+		|| undefined !== this.RTL
+		|| true !== this.Lang.Is_Empty()
+		|| undefined !== this.Unifill
+		|| undefined !== this.FontRef
+		|| undefined !== this.Shd
+		|| undefined !== this.Vanish
+		|| undefined !== this.TextOutline
+		|| undefined !== this.TextFill)
+		return false;
+
+	return true;
+};
 CTextPr.prototype.Get_Bold = function()
 {
     return this.Bold;
@@ -9120,6 +9224,15 @@ CParaInd.prototype =
             this.FirstLine = Reader.GetDouble();
     }
 };
+CParaInd.prototype.Is_Empty = function()
+{
+	if (undefined !== this.Left
+		|| undefined !== this.Right
+		|| undefined !== this.FirstLine)
+		return false;
+
+	return true;
+};
 CParaInd.prototype.Get_Diff = function(Ind)
 {
     var DiffInd = new CParaInd();
@@ -9298,6 +9411,18 @@ CParaSpacing.prototype.Get_Diff = function(Spacing)
         DiffSpacing.AfterAutoSpacing = this.AfterAutoSpacing;
 
     return DiffSpacing;
+};
+CParaSpacing.prototype.Is_Empty = function()
+{
+	if (undefined !== this.Line
+		|| undefined !== this.LineRule
+		|| undefined !== this.Before
+		|| undefined !== this.BeforeAutoSpacing
+		|| undefined !== this.After
+		|| undefined !== this.AfterAutoSpacing)
+		return false;
+
+	return true;
 };
 
 function CNumPr()
@@ -10496,6 +10621,31 @@ CParaPr.prototype =
         delete this.PrChange;
         delete this.ReviewInfo;
     }
+};
+CParaPr.prototype.Is_Empty         = function()
+{
+	if (undefined !== this.ContextualSpacing
+		|| true !== this.Ind.Is_Empty()
+		|| undefined !== this.Jc
+		|| undefined !== this.KeepLines
+		|| undefined !== this.KeepNext
+		|| undefined !== this.PageBreakBefore
+		|| true !== this.Spacing.Is_Empty()
+		|| undefined !== this.Shd
+		|| undefined !== this.Brd.First
+		|| undefined !== this.Brd.Last
+		|| undefined !== this.Brd.Between
+		|| undefined !== this.Brd.Bottom
+		|| undefined !== this.Brd.Left
+		|| undefined !== this.Brd.Right
+		|| undefined !== this.Brd.Top
+		|| undefined !== this.WidowControl
+		|| undefined !== this.Tabs
+		|| undefined !== this.NumPr
+		|| undefined !== this.PStyle)
+		return false;
+
+	return true;
 };
 CParaPr.prototype.Get_DiffPrChange = function()
 {

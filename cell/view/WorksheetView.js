@@ -1,10 +1,36 @@
-"use strict";
-
-/* WorksheetView.js
+/*
+ * (c) Copyright Ascensio System SIA 2010-2016
  *
- * Author: Dmitry.Sokolov@avsmedia.net
- * Date:   Nov 21, 2011
+ * This program is a free software product. You can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License (AGPL)
+ * version 3 as published by the Free Software Foundation. In accordance with
+ * Section 7(a) of the GNU AGPL its Section 15 shall be amended to the effect
+ * that Ascensio System SIA expressly excludes the warranty of non-infringement
+ * of any third-party rights.
+ *
+ * This program is distributed WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR  PURPOSE. For
+ * details, see the GNU AGPL at: http://www.gnu.org/licenses/agpl-3.0.html
+ *
+ * You can contact Ascensio System SIA at Lubanas st. 125a-25, Riga, Latvia,
+ * EU, LV-1021.
+ *
+ * The  interactive user interfaces in modified source and object code versions
+ * of the Program must display Appropriate Legal Notices, as required under
+ * Section 5 of the GNU AGPL version 3.
+ *
+ * Pursuant to Section 7(b) of the License you must retain the original Product
+ * logo when distributing the program. Pursuant to Section 7(e) we decline to
+ * grant you any rights under trademark law for use of our trademarks.
+ *
+ * All the Product's GUI elements, including illustrations and icon sets, as
+ * well as technical writing content are licensed under the terms of the
+ * Creative Commons Attribution-ShareAlike 4.0 International. See the License
+ * terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
+ *
  */
+
+"use strict";
 (/**
  * @param {jQuery} $
  * @param {Window} window
@@ -1160,10 +1186,9 @@
     };
 
     WorksheetView.prototype._prepareComments = function () {
-        // Теперь получение всех комментариев через asc_getWorkbookComments
-        var commentList = this.cellCommentator.prepareComments( this.model.aComments );
-        if ( 0 < commentList.length ) {
-            this.model.workbook.handlers.trigger( "asc_onAddComments", commentList );
+        // ToDo возможно не нужно это делать именно тут..
+        if (0 < this.model.aComments.length) {
+            this.model.workbook.handlers.trigger("asc_onAddComments", this.model.aComments);
         }
     };
 
@@ -7176,44 +7201,49 @@
 
     WorksheetView.prototype.getSelectionMathInfo = function () {
         var ar = this.activeRange;
-        var range = this.model.getRange3( ar.r1, ar.c1, ar.r2, ar.c2 );
+        var range = this.model.getRange3(ar.r1, ar.c1, ar.r2, ar.c2);
         var tmp;
         var oSelectionMathInfo = new asc_CSelectionMathInfo();
         var sum = 0;
-        range._setPropertyNoEmpty( null, null, function ( c ) {
-            if ( false === c.isEmptyTextString() ) {
+        var t = this;
+        range._setPropertyNoEmpty(null, null, function (cell, r) {
+            if (!cell.isEmptyTextString() && t.height_1px <= t.rows[r].height) {
                 ++oSelectionMathInfo.count;
-                if ( CellValueType.Number === c.getType() ) {
-                    tmp = parseFloat( c.getValueWithoutFormat() );
-                    if ( isNaN( tmp ) ) {
+                if (CellValueType.Number === cell.getType()) {
+                    tmp = parseFloat(cell.getValueWithoutFormat());
+                    if (isNaN(tmp)) {
                         return;
                     }
-                    if ( 0 === oSelectionMathInfo.countNumbers ) {
+                    if (0 === oSelectionMathInfo.countNumbers) {
                         oSelectionMathInfo.min = oSelectionMathInfo.max = tmp;
-                    }
-                    else {
-                        oSelectionMathInfo.min = Math.min( oSelectionMathInfo.min, tmp );
-                        oSelectionMathInfo.max = Math.max( oSelectionMathInfo.max, tmp );
+                    } else {
+                        oSelectionMathInfo.min = Math.min(oSelectionMathInfo.min, tmp);
+                        oSelectionMathInfo.max = Math.max(oSelectionMathInfo.max, tmp);
                     }
                     ++oSelectionMathInfo.countNumbers;
                     sum += tmp;
                 }
             }
-        } );
+        });
         // Показываем только данные для 2-х или более ячеек (http://bugzserver/show_bug.cgi?id=24115)
-        if ( 1 < oSelectionMathInfo.countNumbers ) {
+        if (1 < oSelectionMathInfo.countNumbers) {
             // Мы должны отдавать в формате активной ячейки
             var numFormat = range.getNumFormat();
-            if ( Asc.c_oAscNumFormatType.Time === numFormat.getType() ) {
+            if (Asc.c_oAscNumFormatType.Time === numFormat.getType()) {
                 // Для времени нужно отдавать в формате [h]:mm:ss (http://bugzserver/show_bug.cgi?id=26271)
-                numFormat = AscCommon.oNumFormatCache.get( '[h]:mm:ss' );
+                numFormat = AscCommon.oNumFormatCache.get('[h]:mm:ss');
             }
 
-            oSelectionMathInfo.sum = numFormat.formatToMathInfo( sum, CellValueType.Number, this.settings.mathMaxDigCount );
-            oSelectionMathInfo.average = numFormat.formatToMathInfo( sum / oSelectionMathInfo.countNumbers, CellValueType.Number, this.settings.mathMaxDigCount );
+            oSelectionMathInfo.sum =
+              numFormat.formatToMathInfo(sum, CellValueType.Number, this.settings.mathMaxDigCount);
+            oSelectionMathInfo.average =
+              numFormat.formatToMathInfo(sum / oSelectionMathInfo.countNumbers, CellValueType.Number,
+                this.settings.mathMaxDigCount);
 
-            oSelectionMathInfo.min = numFormat.formatToMathInfo( oSelectionMathInfo.min, CellValueType.Number, this.settings.mathMaxDigCount );
-            oSelectionMathInfo.max = numFormat.formatToMathInfo( oSelectionMathInfo.max, CellValueType.Number, this.settings.mathMaxDigCount );
+            oSelectionMathInfo.min =
+              numFormat.formatToMathInfo(oSelectionMathInfo.min, CellValueType.Number, this.settings.mathMaxDigCount);
+            oSelectionMathInfo.max =
+              numFormat.formatToMathInfo(oSelectionMathInfo.max, CellValueType.Number, this.settings.mathMaxDigCount);
         }
         return oSelectionMathInfo;
     };
@@ -11075,65 +11105,74 @@
         return oneUser ? onReplaceCallback( true ) : this._isLockedCells( aReplaceCells[options.indexInArray], /*subType*/null, onReplaceCallback );
     };
 
-    WorksheetView.prototype.findCell = function ( reference ) {
-        var range = AscCommonExcel.g_oRangeCache.getRange3D(reference) || AscCommonExcel.g_oRangeCache.getAscRange(reference);
-        if ( !range ) {
-            /*TODO: сделать поиск по названиям автофигур, должен искать до того как вызвать поиск по именованным диапазонам*/
+    WorksheetView.prototype.findCell = function (reference, isViewerMode) {
+        var range = AscCommonExcel.g_oRangeCache.getRange3D(reference) ||
+          AscCommonExcel.g_oRangeCache.getAscRange(reference);
+        if (!range) {
+            if (isViewerMode) {
+                return range;
+            }
 
-            var defName = this.model.workbook.getDefinesNames( reference, this.model.workbook.getActiveWs().getId() ), sheetName, ref;
-            if ( !defName ) {
-                if ( this.collaborativeEditing.getGlobalLock() || !this.handlers.trigger( "getLockDefNameManagerStatus" ) ) {
-                    this.handlers.trigger( "onErrorEvent", c_oAscError.ID.LockCreateDefName, c_oAscError.Level.NoCritical );
+            /*TODO: сделать поиск по названиям автофигур, должен искать до того как вызвать поиск по именованным диапазонам*/
+            var defName = this.model.workbook.getDefinesNames(reference,
+              this.model.workbook.getActiveWs().getId()), sheetName, ref;
+            if (!defName) {
+                if (this.collaborativeEditing.getGlobalLock() ||
+                  !this.handlers.trigger("getLockDefNameManagerStatus")) {
+                    this.handlers.trigger("onErrorEvent", c_oAscError.ID.LockCreateDefName,
+                      c_oAscError.Level.NoCritical);
                     this._updateSelectionNameAndInfo();
                     return true;
                 }
 
-                var actRange = this.getActiveRangeObj(), ascRange, mc = this.model.getMergedByCell( actRange.startRow, actRange.startCol ), c1 = mc ? mc.c1 : actRange.c1, r1 = mc ? mc.r1 : actRange.r1, ar_norm = actRange.normalize(), mc_norm = mc ? mc.normalize() : null, c2 = mc_norm ? ( mc_norm.isEqual( ar_norm ) ? mc_norm.c1 : ar_norm.c2 ) : ar_norm.c2, r2 = mc_norm ? ( mc_norm.isEqual( ar_norm ) ? mc_norm.r1 : ar_norm.r2 ) : ar_norm.r2;
+                var actRange = this.getActiveRangeObj(), ascRange, mc = this.model.getMergedByCell(actRange.startRow,
+                  actRange.startCol), c1 = mc ? mc.c1 : actRange.c1, r1 = mc ? mc.r1 :
+                  actRange.r1, ar_norm = actRange.normalize(), mc_norm = mc ? mc.normalize() : null, c2 = mc_norm ?
+                  ( mc_norm.isEqual(ar_norm) ? mc_norm.c1 : ar_norm.c2 ) : ar_norm.c2, r2 = mc_norm ?
+                  ( mc_norm.isEqual(ar_norm) ? mc_norm.r1 : ar_norm.r2 ) : ar_norm.r2;
 
-                ascRange = new asc_Range( c1, r1, c2, r2 );
-                defName = this.model.workbook.editDefinesNames( null, new Asc.asc_CDefName( reference, this.model.getName() + "!" + ascRange.getAbsName() ) );
+                ascRange = new asc_Range(c1, r1, c2, r2);
+                defName = this.model.workbook.editDefinesNames(null,
+                  new Asc.asc_CDefName(reference, this.model.getName() + "!" + ascRange.getAbsName()));
             }
 
-            if ( defName ) {
+            if (defName) {
                 range = true;
-                this._isLockedDefNames( null, defName.nodeId );
+                this._isLockedDefNames(null, defName.nodeId);
 
-                if ( defName.isTable ) {
-                    sheetName = defName.Ref.split( "!" );
+                if (defName.isTable) {
+                    sheetName = defName.Ref.split("!");
                     ref = sheetName[1];
                     sheetName = sheetName[0];
-                    if ( sheetName[0] == "'" && sheetName[sheetName.length - 1] == "'" ) {
-                        sheetName = sheetName.substring( 1, sheetName.length - 1 );
+                    if (sheetName[0] == "'" && sheetName[sheetName.length - 1] == "'") {
+                        sheetName = sheetName.substring(1, sheetName.length - 1);
                     }
-                    range = AscCommonExcel.g_oRangeCache.getAscRange( ref );
-                    sheetName = this.model.workbook.getWorksheetByName( sheetName );
-                }
-                else if ( defName.parsedRef.RefPos.length == 1 && defName.parsedRef.outStack.length == 1 ) {
+                    range = AscCommonExcel.g_oRangeCache.getAscRange(ref);
+                    sheetName = this.model.workbook.getWorksheetByName(sheetName);
+                } else if (defName.parsedRef.RefPos.length == 1 && defName.parsedRef.outStack.length == 1) {
                     ref = defName.parsedRef.outStack[0];
-                    if ( ref.type == AscCommonExcel.cElementType.cell3D ) {
-                        range = ref.range.getBBox0().clone( true );
+                    if (ref.type == AscCommonExcel.cElementType.cell3D) {
+                        range = ref.range.getBBox0().clone(true);
                         sheetName = ref.getWS();
-                    }
-                    else if ( ref.type == AscCommonExcel.cElementType.cellsRange3D && ref.wsFrom == ref.wsTo ) {
-                        range = ref.getRange()[0].getBBox0().clone( true );
-                        sheetName = this.model.workbook.getWorksheetById( ref.wsFrom );
+                    } else if (ref.type == AscCommonExcel.cElementType.cellsRange3D && ref.wsFrom == ref.wsTo) {
+                        range = ref.getRange()[0].getBBox0().clone(true);
+                        sheetName = this.model.workbook.getWorksheetById(ref.wsFrom);
                     }
 
                 }
 
-                if ( range && sheetName ) {
+                if (range && sheetName) {
                     ar_norm = range.normalize();
-                    mc = sheetName.getMergedByCell( ar_norm.r1, ar_norm.c1 );
+                    mc = sheetName.getMergedByCell(ar_norm.r1, ar_norm.c1);
                     range = {range: mc ? mc : range, sheet: sheetName.getName()};
                 }
             }
-        }
-        else {
-            var ar_norm = range.normalize(), mc = this.model.getMergedByCell( ar_norm.r1, ar_norm.c1 );
+        } else {
+            var ar_norm = range.normalize(), mc = this.model.getMergedByCell(ar_norm.r1, ar_norm.c1);
 
             range = {range: mc ? mc : range, sheet: this.model.getName()};
         }
-        return range;// ? this.setSelection(range, true) : null;
+        return range;
     };
 
     /* Ищет дополнение для ячейки */
@@ -11299,66 +11338,65 @@
         return mergedRange ? mergedRange : new asc_Range( col, row, col, row );
     };
 
-    WorksheetView.prototype._saveCellValueAfterEdit = function ( oCellEdit, c, val, flags, skipNLCheck, isNotHistory, lockDraw ) {
-        var t = this;
-        var oldMode = t.isFormulaEditMode;
-        t.isFormulaEditMode = false;
+    WorksheetView.prototype._saveCellValueAfterEdit = function (oCellEdit, c, val, flags, skipNLCheck, isNotHistory, lockDraw) {
+          var t = this;
+          var oldMode = t.isFormulaEditMode;
+          t.isFormulaEditMode = false;
 
-        if ( !isNotHistory ) {
-            History.Create_NewPoint();
-            History.StartTransaction();
-        }
+          if (!isNotHistory) {
+              History.Create_NewPoint();
+              History.StartTransaction();
+          }
 
-        var isFormula = t._isFormula( val );
+          var isFormula = t._isFormula(val);
 
-        if ( isFormula ) {
-            var ftext = val.reduce( function ( pv, cv ) {
-                return pv + cv.text;
-            }, "" );
-            var ret = true;
-            // ToDo - при вводе формулы в заголовок автофильтра надо писать "0"
-            c.setValue( ftext, function ( r ) {
-                ret = r;
-            } );
-            if ( !ret ) {
-                t.isFormulaEditMode = oldMode;
-                History.EndTransaction();
-                return false;
-            }
-            isFormula = c.isFormula();
-        }
-        else {
-            c.setValue2( val );
-            // Вызываем функцию пересчета для заголовков форматированной таблицы
-            t.model.autoFilters.renameTableColumn( oCellEdit );
-        }
+          if (isFormula) {
+              var ftext = val.reduce(function (pv, cv) {
+                  return pv + cv.text;
+              }, "");
+              var ret = true;
+              // ToDo - при вводе формулы в заголовок автофильтра надо писать "0"
+              c.setValue(ftext, function (r) {
+                  ret = r;
+              });
+              if (!ret) {
+                  t.isFormulaEditMode = oldMode;
+                  History.EndTransaction();
+                  return false;
+              }
+              isFormula = c.isFormula();
+			  t.model.autoFilters.renameTableColumn(oCellEdit);
+          } else {
+              c.setValue2(val);
+              // Вызываем функцию пересчета для заголовков форматированной таблицы
+              t.model.autoFilters.renameTableColumn(oCellEdit);
+          }
 
-        if ( !isFormula ) {
-            // Нужно ли выставлять WrapText (ищем символ новой строки в тексте)
-            var bIsSetWrap = false;
-            if ( !skipNLCheck ) {
-                for ( var i = 0; i < val.length; ++i ) {
-                    if ( val[i].text.indexOf( kNewLine ) >= 0 ) {
-                        bIsSetWrap = true;
-                        break;
-                    }
-                }
-            }
-            if ( bIsSetWrap ) {
-                c.setWrap( true );
-            }
+          if (!isFormula) {
+              // Нужно ли выставлять WrapText (ищем символ новой строки в тексте)
+              var bIsSetWrap = false;
+              if (!skipNLCheck) {
+                  for (var i = 0; i < val.length; ++i) {
+                      if (val[i].text.indexOf(kNewLine) >= 0) {
+                          bIsSetWrap = true;
+                          break;
+                      }
+                  }
+              }
+              if (bIsSetWrap) {
+                  c.setWrap(true);
+              }
+          }
 
-            // Для формулы обновление будет в коде рассчета формулы
-            t._updateCellsRange( oCellEdit, /*canChangeColWidth*/c_oAscCanChangeColWidth.numbers, lockDraw );
-        }
+          t._updateCellsRange(oCellEdit, isNotHistory ? c_oAscCanChangeColWidth.none : c_oAscCanChangeColWidth.numbers, lockDraw);
 
-        if ( !isNotHistory ) {
-            History.EndTransaction();
-        }
+          if (!isNotHistory) {
+              History.EndTransaction();
+          }
 
-        // если вернуть false, то редактор не закроется
-        return true;
-    };
+          // если вернуть false, то редактор не закроется
+          return true;
+      };
 
     WorksheetView.prototype.openCellEditor = function ( editor, x, y, isCoord, fragments, cursorPos, isFocus, isClearCell, isHideCursor, isQuickInput, activeRange ) {
         var t = this, tc = this.cols, tr = this.rows, col, row, c, fl, mc, bg, isMerged;
@@ -11842,12 +11880,19 @@
 
             if ( addFormatTableOptionsObj && isChangeAutoFilterToTablePart( addFormatTableOptionsObj ) === true )//CHANGE FILTER TO TABLEPART
 			{
-                var addFilterCallBack = function()
+                var filterRange = t.model.AutoFilter.Ref.clone();
+				
+				var addFilterCallBack = function()
 				{
+					History.Create_NewPoint();
+					History.StartTransaction();
+					
 					t.model.autoFilters.changeAutoFilterToTablePart( styleName, ar, addFormatTableOptionsObj );
+					t._onUpdateFormatTable(filterRange, !!(styleName), true);
+					
+					History.EndTransaction();
 				};
 				
-				var filterRange = t.model.AutoFilter.Ref.clone();
 				var addNameColumn = false;
 				if(addFormatTableOptionsObj === false)
 					addNameColumn = true;
@@ -12409,7 +12454,9 @@
 			{
 				for(var i = 0; i < tableParts.length; i++)
 				{
-					this.model.autoFilters._setColorStyleTable(worksheet.TableParts[i].Ref, worksheet.TableParts[i]);
+					this.model.autoFilters._setColorStyleTable(tableParts[i].Ref, tableParts[i]);
+					//TODO пока заменяем при открытии на TotalsRowFormula
+					tableParts[i].checkTotalRowFormula();
 				}
 			}
 			
@@ -12445,6 +12492,7 @@
 
             ws.drawingCtx
                 .beginPath()
+                .moveTo(x + halfSize, y1)
                 .lineTo(x + halfSize, y1)
                 .lineTo(x, y1 + meanLine)
                 .lineTo(x  - halfSize, y1)
@@ -13261,6 +13309,7 @@
 			var callback = function(isSuccess)
 			{
 				if ( false === isSuccess ) {
+					t.handlers.trigger( "selectionChanged", t.getSelectionInfo() );
 					return;
 				}
 				
@@ -13282,7 +13331,15 @@
 				History.EndTransaction();
 			};
 			
-			t._isLockedCells( tablePart.Ref, null, callback );
+			var lockRange = t.af_getRangeForChangeTableInfo(tablePart, optionType, val);
+			if(lockRange)
+			{
+				t._isLockedCells( lockRange, null, callback );
+			}
+			else
+			{
+				callback();
+			}
 		}
 	};
 	
@@ -13315,6 +13372,50 @@
 		return res;
 	};
     
+	WorksheetView.prototype.af_getRangeForChangeTableInfo = function(tablePart, optionType, val)
+    {
+		var res = null;
+		
+		switch(optionType)
+		{
+			case c_oAscChangeTableStyleInfo.columnBanded:
+			case c_oAscChangeTableStyleInfo.columnFirst:
+			case c_oAscChangeTableStyleInfo.columnLast:
+			case c_oAscChangeTableStyleInfo.rowBanded:
+			case c_oAscChangeTableStyleInfo.filterButton:
+			{
+				res = tablePart.Ref;
+				break;
+			}
+			case c_oAscChangeTableStyleInfo.rowTotal:
+			{	
+				if(val === false)
+				{
+					res = tablePart.Ref;
+				}
+				else
+				{
+					res = new Asc.Range(tablePart.Ref.c1, tablePart.Ref.r1, tablePart.Ref.c2, tablePart.Ref.r2 + 1);
+				}
+				break;
+			}
+			case c_oAscChangeTableStyleInfo.rowHeader:
+			{
+				if(val === false)
+				{
+					res = tablePart.Ref; 
+				}
+				else
+				{
+					res = new Asc.Range(tablePart.Ref.c1, tablePart.Ref.r1 - 1, tablePart.Ref.c2, tablePart.Ref.r2); 
+				}
+				break;
+			}
+		}
+		
+		return res;
+	};
+	
 	WorksheetView.prototype.af_insertCellsInTable = function(tableName, optionType)
     {
 		var t = this;
@@ -13763,7 +13864,35 @@
 			History.EndTransaction();
 		};
 		
-		t._isLockedCells( range, null, callback );
+		//TODO возможно не стоит лочить весь диапазон. проверить: когда один ползователь меняет диапазон, другой снимает а/ф с ф/т. в этом случае в deleteAutoFilter передавать не range а имя ф/т
+		var table = t.model.autoFilters._getFilterByDisplayName(tableName);
+		var tableRange = null !== table ? table.Ref : null;
+		
+		var lockRange = range;
+		if(null !== tableRange)
+		{
+			var r1 = tableRange.r1 < range.r1 ? tableRange.r1 : range.r1;
+			var r2 = tableRange.r2 > range.r2 ? tableRange.r2 : range.r2;
+			var c1 = tableRange.c1 < range.c1 ? tableRange.c1 : range.c1;
+			var c2 = tableRange.c2 > range.c2 ? tableRange.c2 : range.c2;
+			
+			lockRange = new Asc.Range(c1, r1, c2, r2);
+		}
+		
+		var callBackLockedDefNames = function(isSuccess)
+		{
+			if ( false === isSuccess ) {
+				return;
+			}
+			
+			t._isLockedCells( lockRange, null, callback );
+		};
+		
+		//лочим данный именованный диапазон при смене размера ф/т
+		var defNameId = t.model.workbook.dependencyFormulas.getDefNameNodeByName(tableName, t.model.getId());
+		defNameId = defNameId ? defNameId.nodeId : null;
+		
+		t._isLockedDefNames( callBackLockedDefNames, defNameId );
 	};
 
     WorksheetView.prototype.af_checkChangeRange = function(range) {

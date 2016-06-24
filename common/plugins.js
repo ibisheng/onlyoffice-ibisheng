@@ -1,3 +1,35 @@
+/*
+ * (c) Copyright Ascensio System SIA 2010-2016
+ *
+ * This program is a free software product. You can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License (AGPL)
+ * version 3 as published by the Free Software Foundation. In accordance with
+ * Section 7(a) of the GNU AGPL its Section 15 shall be amended to the effect
+ * that Ascensio System SIA expressly excludes the warranty of non-infringement
+ * of any third-party rights.
+ *
+ * This program is distributed WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR  PURPOSE. For
+ * details, see the GNU AGPL at: http://www.gnu.org/licenses/agpl-3.0.html
+ *
+ * You can contact Ascensio System SIA at Lubanas st. 125a-25, Riga, Latvia,
+ * EU, LV-1021.
+ *
+ * The  interactive user interfaces in modified source and object code versions
+ * of the Program must display Appropriate Legal Notices, as required under
+ * Section 5 of the GNU AGPL version 3.
+ *
+ * Pursuant to Section 7(b) of the License you must retain the original Product
+ * logo when distributing the program. Pursuant to Section 7(e) we decline to
+ * grant you any rights under trademark law for use of our trademarks.
+ *
+ * All the Product's GUI elements, including illustrations and icon sets, as
+ * well as technical writing content are licensed under the terms of the
+ * Creative Commons Attribution-ShareAlike 4.0 International. See the License
+ * terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
+ *
+ */
+
 (function(window, undefined){
 
     function CPluginData()
@@ -200,6 +232,17 @@
                     this.startData.setAttribute("data", text_data.data);
                     break;
                 }
+                case Asc.EPluginDataType.html:
+                {
+                    var text_data = {
+                        data : "",
+                        pushData : function(format, value) { this.data = value; }
+                    };
+
+                    this.api.asc_CheckCopy(text_data, 2);
+                    this.startData.setAttribute("data", text_data.data);
+                    break;
+                }
                 case Asc.EPluginDataType.ole:
                 {
                     // теперь выше задается
@@ -258,12 +301,12 @@
 
         startLongAction : function()
         {
-            console.log("startLongAction");
+            //console.log("startLongAction");
             this.api.sync_StartAction(Asc.c_oAscAsyncActionType.BlockInteraction, Asc.c_oAscAsyncAction.SlowOperation);
         },
         endLongAction : function()
         {
-            console.log("endLongAction");
+            //console.log("endLongAction");
             this.api.sync_EndAction(Asc.c_oAscAsyncActionType.BlockInteraction, Asc.c_oAscAsyncAction.SlowOperation);
         }
     };
@@ -294,7 +337,7 @@
                 window.g_asc_plugins.init();
                 return;
             }
-            else if ("close" == name)
+            else if ("close" == name || "command" == name)
             {
                 if (window.g_asc_plugins.closeAttackTimer != -1)
                 {
@@ -306,14 +349,44 @@
                 {
                     try
                     {
-                        eval(value);
+						if (window.g_asc_plugins.api.asc_canPaste())
+						{
+							var _script = "(function(){ var Api = window.g_asc_plugins.api;\n" + value + "})();";
+							eval(_script);
+
+							var oLogicDocument = window.g_asc_plugins.api.WordControl ? window.g_asc_plugins.api.WordControl.m_oLogicDocument : null;
+							if (pluginData.getAttribute("recalculate") == true)
+							{
+								var _fonts = oLogicDocument.Document_Get_AllFontNames();
+								var _imagesArray = oLogicDocument.Get_AllImageUrls();
+								var _images = {};
+								for (var i = 0; i < _imagesArray.length; i++)
+								{
+									_images[_imagesArray[i]] = _imagesArray[i];
+								}
+
+                                window.g_asc_plugins.images_rename = _images;
+								AscCommon.Check_LoadingDataBeforePrepaste(window.g_asc_plugins.api, _fonts, _images, function()
+								{
+                                    if (window.g_asc_plugins.api.WordControl &&
+                                        window.g_asc_plugins.api.WordControl.m_oLogicDocument &&
+                                        window.g_asc_plugins.api.WordControl.m_oLogicDocument.Reassign_ImageUrls)
+                                    {
+                                        window.g_asc_plugins.api.WordControl.m_oLogicDocument.Reassign_ImageUrls(window.g_asc_plugins.images_rename);
+                                    }
+                                    delete window.g_asc_plugins.images_rename;
+									window.g_asc_plugins.api.asc_Recalculate();
+								});
+							}
+						}
                     }
                     catch (err)
                     {
                     }
                 }
 
-                window.g_asc_plugins.close();
+                if ("close" == name)
+                    window.g_asc_plugins.close();
             }
         }
     }
@@ -492,6 +565,118 @@ function TEST_PLUGINS()
 
                     buttons         : [ { text: "Ok", primary: true },
                         { text: "Cancel", primary: false } ]
+                }
+            ]
+        },
+        {
+            "name" : "cbr",
+            "guid" : "asc.{5F9D4EB4-AF61-46EF-AE25-46C96E75E1DD}",
+
+            "variations" : [
+                {
+                    "description" : "cbr",
+                    "url"         : "cbr/index.html",
+
+                    "icons"           : ["cbr/icon.png", "cbr/icon@2x.png"],
+        //            "isViewer"        : true,
+                    "isViewer"        : false,
+                    "EditorsSupport"  : ["word", "cell", "slide"],
+
+        //            "isVisual"        : true,
+        //            "isModal"         : true,
+                    "isVisual"        : false,
+                    "isModal"         : false,
+                    "isInsideMode"    : false,
+
+                    "initDataType"    : "none",
+                    "initData"        : "",
+
+        //            "isUpdateOleOnResize" : true,
+        			"isUpdateOleOnResize" : false,
+
+        //            "buttons"         : [ { "text": "Ok", "primary": true },
+        //                                { "text": "Cancel", "primary": false } ]
+        			"buttons"         : []
+                }
+            ]
+        },
+        {
+            "name" : "ocr(Tesseract.js)",
+            "guid" : "asc.{440EBF13-9B19-4BD8-8621-05200E58140B}",
+            "baseUrl" : "",
+
+            "variations" : [
+                {
+                    "description" : "ocr",
+                    "url"         : "ocr/index.html",
+
+                    "icons"           : ["ocr/icon.png", "ocr/icon@2x.png"],
+                    "isViewer"        : false,
+                    "EditorsSupport"  : ["word"],
+
+                    "isVisual"        : true,
+                    "isModal"         : false,
+                    "isInsideMode"    : false,
+
+                    "initDataType"    : "html",
+                    "initData"        : "",
+
+                    "isUpdateOleOnResize" : false,
+
+                    "buttons"         : [ { "text": "Insert In Document", "primary": true},
+                        { "text": "Cancel", "primary": false } ]
+                }
+            ]
+        },
+		{
+			"name" : "yandextranslate",
+			"guid" : "asc.{D3E759F7-3947-4BD6-B066-E184BBEDC675}",
+
+			"variations" : [
+				{
+					"description" : "yandextranslate",
+					"url"         : "yandextranslate/index.html",
+
+					"icons"           : ["yandextranslate/icon.png", "yandextranslate/icon@2x.png"],
+					"isViewer"        : false,
+					"EditorsSupport"  : ["word", "cell", "slide"],
+
+					"isVisual"        : false,
+					"isModal"         : false,
+					"isInsideMode"    : false,
+
+					"initDataType"    : "text",
+					"initData"        : "",
+
+					"isUpdateOleOnResize" : false,
+
+					"buttons"         : []
+				}
+			]
+		},
+        {
+            "name" : "clipart",
+            "guid" : "asc.{F5BACB61-64C5-4711-AC8A-D01EC3B2B6F1}",
+
+            "variations" : [
+                {
+                    "description" : "clipart",
+                    "url"         : "clipart/index.html",
+
+                    "icons"           : ["clipart/icon.png", "clipart/icon@2x.png"],
+                    "isViewer"        : true,
+                    "EditorsSupport"  : ["word"],
+
+                    "isVisual"        : true,
+                    "isModal"         : false,
+                    "isInsideMode"    : false,
+
+                    "initDataType"    : "none",
+                    "initData"        : "",
+
+                    "isUpdateOleOnResize" : false,
+
+                    "buttons"         : [ { "text": "Ok", "primary": true } ]
                 }
             ]
         }

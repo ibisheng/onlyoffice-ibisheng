@@ -1,3 +1,35 @@
+/*
+ * (c) Copyright Ascensio System SIA 2010-2016
+ *
+ * This program is a free software product. You can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License (AGPL)
+ * version 3 as published by the Free Software Foundation. In accordance with
+ * Section 7(a) of the GNU AGPL its Section 15 shall be amended to the effect
+ * that Ascensio System SIA expressly excludes the warranty of non-infringement
+ * of any third-party rights.
+ *
+ * This program is distributed WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR  PURPOSE. For
+ * details, see the GNU AGPL at: http://www.gnu.org/licenses/agpl-3.0.html
+ *
+ * You can contact Ascensio System SIA at Lubanas st. 125a-25, Riga, Latvia,
+ * EU, LV-1021.
+ *
+ * The  interactive user interfaces in modified source and object code versions
+ * of the Program must display Appropriate Legal Notices, as required under
+ * Section 5 of the GNU AGPL version 3.
+ *
+ * Pursuant to Section 7(b) of the License you must retain the original Product
+ * logo when distributing the program. Pursuant to Section 7(e) we decline to
+ * grant you any rights under trademark law for use of our trademarks.
+ *
+ * All the Product's GUI elements, including illustrations and icon sets, as
+ * well as technical writing content are licensed under the terms of the
+ * Creative Commons Attribution-ShareAlike 4.0 International. See the License
+ * terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
+ *
+ */
+
 "use strict";
 
 (function(window, undefined){
@@ -438,12 +470,12 @@ DependencyGraph.prototype = {
 			if(cwf)
 			{
 				if(!toAdd)
-					delete cwf.cells[sOldCellId];
+					delete cwf[sOldCellId];
 				if(!toDelete)
 				{
 					var cell = node.returnCell();
 					if ( cell && cell.formulaParsed )
-						cwf.cells[node.cellId] = node.cellId;
+						cwf[node.cellId] = node.cellId;
 				}
             }
         }
@@ -1167,37 +1199,44 @@ DependencyGraph.prototype = {
 
     getNextTableName:function ( ws, Ref, tableName ) {
         this.nTableNameMaxIndex++;
-        var sNewName = this.sTableNamePattern + this.nTableNameMaxIndex,
-            name = getDefNameVertexId( null, sNewName );
-        while ( this.defNameList[name] ) {
-            this.nTableNameMaxIndex++;
-            sNewName = this.sTableNamePattern + this.nTableNameMaxIndex;
-            name = getDefNameVertexId( null, sNewName );
-        }
-
-        if(tableName)
-        {
-            sNewName = tableName;
-        }
-		else if(ws.workbook.oApi.collaborativeEditing.getCollaborativeEditing())
-		{
-			var indexUser = ws.workbook.oApi.CoAuthoringApi.get_indexUser();
-			if(null !== indexUser)
+		
+		if(tableName){
+			 sNewName = tableName;
+		}
+		else{
+			var collaborativeIndexUser = "";
+			if(ws.workbook.oApi.collaborativeEditing.getCollaborativeEditing())
 			{
-				sNewName += "_" + indexUser;
+				collaborativeIndexUser = "_" + ws.workbook.oApi.CoAuthoringApi.get_indexUser();
+			}
+			var sNewName = this.sTableNamePattern + this.nTableNameMaxIndex + collaborativeIndexUser,
+				name = getDefNameVertexId( null, sNewName );
+			while ( this.defNameList[name] ) {
+				this.nTableNameMaxIndex++;
+				sNewName = this.sTableNamePattern + this.nTableNameMaxIndex + collaborativeIndexUser;
+				name = getDefNameVertexId( null, sNewName );
 			}
 		}
 		
         this.addTableName( sNewName, ws, Ref );
         return sNewName;
     },
-    addTableName:function ( sName, ws, Ref ) {
+    addTableName:function ( sName, ws, Ref, table ) {
         var refClone, defNameSheetsList, dfv, nSE, se;
 		if(this.defNameSheets["WB"]){
 			dfv = this.defNameSheets["WB"][getDefNameVertexId( null, sName )]
 		}
-		refClone = Ref.clone(true )
-		refClone.r1++;
+		
+		if(table)
+		{
+			refClone = table.getRangeWithoutHeaderFooter().clone();
+		}
+		else
+		{
+			refClone = Ref.clone( true );
+			refClone.r1++;
+		}
+		
 		if(!dfv){
 			dfv = new DefNameVertex( null, sName, parserHelp.get3DRef( ws.getName(), refClone.getAbsName() ), null, this.wb, true );
 			defNameSheetsList = this.defNameSheets[dfv.sheetId];
@@ -1878,7 +1917,7 @@ function addToArrRecalc(sheetId, cell){
 function addToArrDefNameRecalc(name){
     arrDefNameRecalc[name.nodeId] = name;
 }
-function buildDefNameAfterRenameWorksheet() {
+function buildDefNameAfterRenameWorksheet(ws) {
   var dN;
   for(var id in arrDefNameRecalc ){
     dN  = arrDefNameRecalc[id];
@@ -1944,7 +1983,6 @@ function Workbook(eventsHandlers, oApi){
 	this.oStyleManager = new AscCommonExcel.StyleManager();
 	this.calcChain = [];
 	this.aComments = [];	// Комментарии к документу
-	this.aCommentsCoords = [];
 	this.aWorksheets = [];
 	this.aWorksheetsById = {};
 	this.cwf = {};
@@ -2099,16 +2137,16 @@ Workbook.prototype.copyWorksheet=function(index, insertBefore, sName, sId, bFrom
 
 		//для формул. создаем копию this.cwf[this.Id] для нового листа.
 		if ( this.cwf[wsFrom.getId()] ){
-			var cwf = { cells:{} };
+			var cwf = {};
 			var newSheetId = newSheet.getId();
 			var cwfFrom = this.cwf[wsFrom.getId()];
 			this.cwf[newSheetId] = cwf;
-			for( var id in cwfFrom.cells ){
-				cwf.cells[id] = cwfFrom.cells[id];
+			for( var id in cwfFrom ){
+				cwf[id] = cwfFrom[id];
 				this.needRecalc.nodes[getVertexId(newSheetId, id)] = [newSheetId, id];
 				this.needRecalc.length++;
 			}
-			newSheet._BuildDependencies(cwf.cells);
+			newSheet._BuildDependencies(cwf);
 		}
 		
 		if(!tableNames && newSheet.TableParts && newSheet.TableParts.length)
@@ -2146,7 +2184,7 @@ Workbook.prototype.insertWorksheet = function (index, sheet, cwf) {
 	this._insertTablePartsName(sheet);
 	//восстанавливаем список ячеек с формулами для sheet
 	this.cwf[sheet.getId()] = cwf;
-	sheet._BuildDependencies(cwf.cells);
+	sheet._BuildDependencies(cwf);
   this.sortDependency();
 };
 Workbook.prototype._insertTablePartsName = function (sheet) {
@@ -2738,7 +2776,7 @@ Workbook.prototype.buildDependency = function(){
 //	this.dependencyFormulas = null;
 //	this.dependencyFormulas = new DependencyGraph(this);
 	for(var i in this.cwf){
-		this.getWorksheetById(i)._BuildDependencies(this.cwf[i].cells);
+		this.getWorksheetById(i)._BuildDependencies(this.cwf[i]);
 	}
 };
 Workbook.prototype.recalcDependency = function(f,bad,notRecalc){
@@ -3058,145 +3096,148 @@ Workbook.prototype.getTableNameColumnByIndex = function(tableName, columnIndex){
     }
 	return res;
 };
-Workbook.prototype.updateSparklineCache = function(sheet, ranges) {
-  for (var i = 0; i < this.aWorksheets.length; ++i) {
-    this.aWorksheets[i].updateSparklineCache(sheet, ranges);
-  }
-};
-Workbook.prototype.lockDraw = function() {
-  ++this.lockCounter;
-};
-Workbook.prototype.unLockDraw = function() {
-  if (0 < this.lockCounter) {
-    --this.lockCounter;
-  }
-};
-Workbook.prototype.buildRecalc = function(notrec, bForce) {
-  var ws;
-  if (this.lockCounter > 0 && !bForce) {
-    return;
-  }
-  if (!bForce) {
-    for (var id in arrDefNameRecalc) {
-      arrDefNameRecalc[id].rebuild();
-    }
-    arrDefNameRecalc = {};
-  }
-  for (var id in arrRecalc) {
-    ws = this.getWorksheetById(id);
-    if (ws) {
-      var temp = arrRecalc[id];
-      var _rec = {};
-      for (var i = 0, length = temp.length; i < length; ++i) {
-        var cell = temp[i];
-        var cellId = g_oCellAddressUtils.getCellId(cell.nRow, cell.nCol);
-        _rec[cellId] = cellId;
-        this.needRecalc.nodes[getVertexId(id, cellId)] = [id, cellId];
-        this.needRecalc.length++;
-      }
-      ws._BuildDependencies(_rec);
-    }
-  }
-  arrRecalc = {};
-  if (!notrec) {
-    this.sortDependency();
-  }
-};
-Workbook.prototype.sortDependency = function(setCellFormat) {
-  this.buildRecalc(true);
+	Workbook.prototype.updateSparklineCache = function (sheet, ranges) {
+		for (var i = 0; i < this.aWorksheets.length; ++i) {
+			this.aWorksheets[i].updateSparklineCache(sheet, ranges);
+		}
+	};
+	Workbook.prototype.lockDraw = function () {
+		++this.lockCounter;
+	};
+	Workbook.prototype.unLockDraw = function () {
+		if (0 < this.lockCounter) {
+			--this.lockCounter;
+		}
+	};
+	Workbook.prototype.buildRecalc = function (notrec, bForce) {
+		var ws;
+		if (this.lockCounter > 0 && !bForce) {
+			return;
+		}
+		if (!bForce) {
+			for (var id in arrDefNameRecalc) {
+				arrDefNameRecalc[id].rebuild();
+			}
+			arrDefNameRecalc = {};
+		}
+		for (var id in arrRecalc) {
+			ws = this.getWorksheetById(id);
+			if (ws) {
+				var temp = arrRecalc[id];
+				var _rec = {};
+				for (var i = 0, length = temp.length; i < length; ++i) {
+					var cell = temp[i];
+					var cellId = g_oCellAddressUtils.getCellId(cell.nRow, cell.nCol);
+					_rec[cellId] = cellId;
+					this.needRecalc.nodes[getVertexId(id, cellId)] = [id, cellId];
+					this.needRecalc.length++;
+				}
+				ws._BuildDependencies(_rec);
+			}
+		}
+		arrRecalc = {};
+		if (!notrec) {
+			this.sortDependency();
+		}
+	};
+	Workbook.prototype.sortDependency = function (setCellFormat) {
+		this.buildRecalc(true);
 
-  var i;
-  var nR = this.needRecalc;
-  if (nR && (nR.length > 0)) {
-    var oCleanCellCacheArea = {};
-    var oNodeDependence = this.dependencyFormulas.getNodeDependence(nR.nodes);
-    for (i in oNodeDependence.oMasterNodes)
-      this._sortDependency(oNodeDependence.oMasterNodes[i], oNodeDependence, oNodeDependence.oMasterAreaNodes, false,
-        oCleanCellCacheArea, setCellFormat);
-    //те AreaNodes
-    var oCurMasterAreaNodes = oNodeDependence.oMasterAreaNodes;
-    while (true) {
-      var bEmpty = true;
-      var oNewMasterAreaNodes = {};
-      for (i in oCurMasterAreaNodes) {
-        bEmpty = false;
-        this._sortDependency(oCurMasterAreaNodes[i], oNodeDependence, oNewMasterAreaNodes, false, oCleanCellCacheArea,
-          setCellFormat);
-      }
-      oCurMasterAreaNodes = oNewMasterAreaNodes;
-      if (bEmpty) {
-        //все оставшиеся считаем как bad
-        //todo сделать как в Excel, которой определяет циклические ссылки на момент подсчета(пример A1=VLOOKUP(1,B1:D2,2),B2 = 1, D1=A1 - это не циклическая ссылка)
-        for (i in oNodeDependence.oMasterAreaNodesRestricted) {
-          this._sortDependency(oNodeDependence.oMasterAreaNodesRestricted[i].node, oNodeDependence, null, true,
-            oCleanCellCacheArea, setCellFormat);
-        }
-        break;
-      }
-    }
-    for (i in oCleanCellCacheArea)
-      this.handlers.trigger("cleanCellCache", i, oCleanCellCacheArea[i],
-        AscCommonExcel.c_oAscCanChangeColWidth.numbers);
+		var i;
+		var nR = this.needRecalc;
+		if (nR && (nR.length > 0)) {
+			var oCleanCellCacheArea = {};
+			var oNodeDependence = this.dependencyFormulas.getNodeDependence(nR.nodes);
+			for (i in oNodeDependence.oMasterNodes) {
+				this._sortDependency(oNodeDependence.oMasterNodes[i], oNodeDependence, oNodeDependence.oMasterAreaNodes, false,
+					oCleanCellCacheArea, setCellFormat);
+			}
+			//те AreaNodes
+			var oCurMasterAreaNodes = oNodeDependence.oMasterAreaNodes;
+			while (true) {
+				var bEmpty = true;
+				var oNewMasterAreaNodes = {};
+				for (i in oCurMasterAreaNodes) {
+					bEmpty = false;
+					this._sortDependency(oCurMasterAreaNodes[i], oNodeDependence, oNewMasterAreaNodes, false, oCleanCellCacheArea,
+						setCellFormat);
+				}
+				oCurMasterAreaNodes = oNewMasterAreaNodes;
+				if (bEmpty) {
+					//все оставшиеся считаем как bad
+					//todo сделать как в Excel, которой определяет циклические ссылки на момент подсчета(пример A1=VLOOKUP(1,B1:D2,2),B2 = 1, D1=A1 - это не циклическая ссылка)
+					for (i in oNodeDependence.oMasterAreaNodesRestricted) {
+						this._sortDependency(oNodeDependence.oMasterAreaNodesRestricted[i].node, oNodeDependence, null, true,
+							oCleanCellCacheArea, setCellFormat);
+					}
+					break;
+				}
+			}
+			for (i in oCleanCellCacheArea) {
+				this.handlers.trigger("cleanCellCache", i, oCleanCellCacheArea[i], AscCommonExcel.c_oAscCanChangeColWidth.none);
+			}
 
-    AscCommonExcel.g_oVLOOKUPCache.clean();
-    AscCommonExcel.g_oHLOOKUPCache.clean();
-  }
-  this.needRecalc = {nodes: {}, length: 0};
-};
-Workbook.prototype._sortDependency = function(node, oNodeDependence, oNewMasterAreaNodes, bBad, oCleanCellCacheArea, setCellFormat) {
-  if (node) {
-    var oWeightMapElem = oNodeDependence.oWeightMap[node.nodeId];
-    if (oWeightMapElem) {
-      oWeightMapElem.cur++;
-      if (oWeightMapElem.cur == oWeightMapElem.max && !oWeightMapElem.gray) {
-        if (null != oNewMasterAreaNodes) {
-          var oNodeToAreaElement = oNodeDependence.oNodeToArea[node.nodeId];
-          if (oNodeToAreaElement) {
-            for (var i = 0, length = oNodeToAreaElement.length; i < length; ++i) {
-              var elem = oNodeToAreaElement[i];
-              elem.cur++;
-              if (elem.cur == elem.max) {
-                oNewMasterAreaNodes[elem.node.nodeId] = elem.node;
-                delete oNodeDependence.oMasterAreaNodesRestricted[elem.node.nodeId];
-              }
-            }
-          }
-        }
-        var bCurBad = oWeightMapElem.bad || bBad;
-        if (node.isDefinedName) {
-          //todo
-          //Обрабатываем тут все, что было сделано с именованной ссылкой: переименована;
-          //перемещен диапазон; сдвиг/удаление ячеек, приведшие к сдвигу ячеек; удаление именованного диапазона.
-          //
-          //        var ws = this.getWorksheetById( node.sheetId );
-          //        ws._ReBuildFormulas
-          //        ws._RecalculatedFunctions(node.cellId, bCurBad, setCellFormat);
-        } else {
-          //пересчитываем функцию
-          var ws = this.getWorksheetById(node.sheetId);
-          ws._RecalculatedFunctions(node.cellId, bCurBad, setCellFormat);
-          //запоминаем области для удаления cache
-          var sheetArea = oCleanCellCacheArea[node.sheetId];
-          if (null == sheetArea) {
-            sheetArea = {};
-            oCleanCellCacheArea[node.sheetId] = sheetArea;
-          }
-          if (!node.isArea) {
-            sheetArea[node.cellId] = node.getBBox();
-          }
-        }
-        //обрабатываем child
-        oWeightMapElem.gray = true;
-        var oSlaveNodes = node.getSlaveEdges();
-        if (oSlaveNodes) {
-          for (var i in oSlaveNodes)
-            this._sortDependency(oSlaveNodes[i], oNodeDependence, oNewMasterAreaNodes, bBad, oCleanCellCacheArea);
-        }
-        oWeightMapElem.gray = false;
-      }
-    }
-  }
-};
+			AscCommonExcel.g_oVLOOKUPCache.clean();
+			AscCommonExcel.g_oHLOOKUPCache.clean();
+		}
+		this.needRecalc = {nodes: {}, length: 0};
+	};
+	Workbook.prototype._sortDependency =
+		function (node, oNodeDependence, oNewMasterAreaNodes, bBad, oCleanCellCacheArea, setCellFormat) {
+			if (node) {
+				var oWeightMapElem = oNodeDependence.oWeightMap[node.nodeId];
+				if (oWeightMapElem) {
+					oWeightMapElem.cur++;
+					if (oWeightMapElem.cur == oWeightMapElem.max && !oWeightMapElem.gray) {
+						if (null != oNewMasterAreaNodes) {
+							var oNodeToAreaElement = oNodeDependence.oNodeToArea[node.nodeId];
+							if (oNodeToAreaElement) {
+								for (var i = 0, length = oNodeToAreaElement.length; i < length; ++i) {
+									var elem = oNodeToAreaElement[i];
+									elem.cur++;
+									if (elem.cur == elem.max) {
+										oNewMasterAreaNodes[elem.node.nodeId] = elem.node;
+										delete oNodeDependence.oMasterAreaNodesRestricted[elem.node.nodeId];
+									}
+								}
+							}
+						}
+						var bCurBad = oWeightMapElem.bad || bBad;
+						if (node.isDefinedName) {
+							//todo
+							//Обрабатываем тут все, что было сделано с именованной ссылкой: переименована;
+							//перемещен диапазон; сдвиг/удаление ячеек, приведшие к сдвигу ячеек; удаление именованного диапазона.
+							//
+							//        var ws = this.getWorksheetById( node.sheetId );
+							//        ws._ReBuildFormulas
+							//        ws._RecalculatedFunctions(node.cellId, bCurBad, setCellFormat);
+						} else {
+							//пересчитываем функцию
+							var ws = this.getWorksheetById(node.sheetId);
+							ws._RecalculatedFunctions(node.cellId, bCurBad, setCellFormat);
+							//запоминаем области для удаления cache
+							var sheetArea = oCleanCellCacheArea[node.sheetId];
+							if (null == sheetArea) {
+								sheetArea = {};
+								oCleanCellCacheArea[node.sheetId] = sheetArea;
+							}
+							if (!node.isArea) {
+								sheetArea[node.cellId] = node.getBBox();
+							}
+						}
+						//обрабатываем child
+						oWeightMapElem.gray = true;
+						var oSlaveNodes = node.getSlaveEdges();
+						if (oSlaveNodes) {
+							for (var i in oSlaveNodes) {
+								this._sortDependency(oSlaveNodes[i], oNodeDependence, oNewMasterAreaNodes, bBad, oCleanCellCacheArea);
+							}
+						}
+						oWeightMapElem.gray = false;
+					}
+				}
+			}
+		};
 //-------------------------------------------------------------------------------------------------
 /**
  * @constructor
@@ -3441,7 +3482,7 @@ Woorksheet.prototype.copyDrawingObjects=function(oNewWs, wsFrom)
     }
 };
 Woorksheet.prototype.initPostOpen = function(handlers){
-	this.workbook.cwf[this.Id]={ cells:{} };
+	var cwf = this.workbook.cwf[this.Id]={};
 	if(this.aFormulaExt){
 		var formulaShared = {};
 		for(var i = 0; i < this.aFormulaExt.length; ++i){
@@ -3476,7 +3517,7 @@ Woorksheet.prototype.initPostOpen = function(handlers){
 									off.offsetRow *=-1;
 									formulaShared[oFormulaExt.si].fVal.changeOffset(off);
 								}
-								this.workbook.cwf[this.Id].cells[sCellId] = sCellId;
+								cwf[sCellId] = sCellId;
 							}
 						}
 					}
@@ -3497,7 +3538,7 @@ Woorksheet.prototype.initPostOpen = function(handlers){
 				Если ячейка содержит в себе формулу, то добавляем ее в список ячеек с формулами.
 			*/
 			if(oCell.sFormula){
-				this.workbook.cwf[this.Id].cells[sCellId] = sCellId;
+				cwf[sCellId] = sCellId;
 			}
 			/*
 				Строится список ячеек, которые необходимо пересчитать при открытии. Это ячейки имеющие атрибут f.ca или значение в которых неопределено.
@@ -3534,17 +3575,8 @@ Woorksheet.prototype.initPostOpen = function(handlers){
 	this._setHandlersTablePart();
 };
 Woorksheet.prototype._getValuesForConditionalFormatting = function(sqref, withEmpty) {
-  var res = [];
   var range = this.getRange3(sqref.r1, sqref.c1, sqref.r2, sqref.c2);
-  var fAction = function(c) {
-    res.push({c: c, v: c.getValueWithoutFormat()});
-  };
-  if (withEmpty) {
-    range._setProperty(null, null, fAction);
-  } else {
-    range._setPropertyNoEmpty(null, null, fAction);
-  }
-  return res;
+	return range._getValues(withEmpty);
 };
 Woorksheet.prototype._updateConditionalFormatting = function(range) {
   var oGradient1, oGradient2;
@@ -3811,7 +3843,7 @@ Woorksheet.prototype.setName=function(name, bFromUndoRedo){
 
 		//перестраиваем формулы, если у них были ссылки на лист со старым именем.
 		for(var id in this.workbook.cwf) {
-			this.workbook.getWorksheetById(id)._ReBuildFormulas(this.workbook.cwf[id].cells,lastName,this.sName);
+			this.workbook.getWorksheetById(id)._ReBuildFormulas(this.workbook.cwf[id],lastName,this.sName);
 		}
 
         this.workbook.dependencyFormulas.relinkDefNameByWorksheet(lastName, name);
@@ -4875,7 +4907,10 @@ Woorksheet.prototype._moveRange=function(oBBoxFrom, oBBoxTo, copyRange){
                     if(copyRange)
 					    oTempRow[j + offset.offsetCol] = cell.clone();
                     else
-					    oTempRow[j + offset.offsetCol] = cell;
+					{
+						cell.setTableStyle(null);
+						oTempRow[j + offset.offsetCol] = cell;
+					}
                 }
 			}
 		}
@@ -6507,6 +6542,32 @@ Range.prototype._getRangeType=function(oBBox){
 	if(null == oBBox)
 		oBBox = this.bbox;
 	return getRangeType(oBBox);
+};
+Range.prototype._getValues = function (withEmpty) {
+	var res = [];
+	var fAction = function(c) {
+		res.push({c: c, v: c.getValueWithoutFormat()});
+	};
+	if (withEmpty) {
+		this._setProperty(null, null, fAction);
+	} else {
+		this._setPropertyNoEmpty(null, null, fAction);
+	}
+	return res;
+};
+Range.prototype._getValuesAndMap = function (withEmpty) {
+	var v, arrRes = [], mapRes = {};
+	var fAction = function(c) {
+		v = c.getValueWithoutFormat();
+		arrRes.push({c: c, v: v});
+		mapRes[v.toLowerCase()] = true;
+	};
+	if (withEmpty) {
+		this._setProperty(null, null, fAction);
+	} else {
+		this._setPropertyNoEmpty(null, null, fAction);
+	}
+	return {values: arrRes, map: mapRes};
 };
 Range.prototype._setProperty=function(actionRow, actionCol, actionCell){
 	var nRangeType = this._getRangeType();

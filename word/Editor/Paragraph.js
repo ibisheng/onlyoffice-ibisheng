@@ -1,3 +1,35 @@
+/*
+ * (c) Copyright Ascensio System SIA 2010-2016
+ *
+ * This program is a free software product. You can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License (AGPL)
+ * version 3 as published by the Free Software Foundation. In accordance with
+ * Section 7(a) of the GNU AGPL its Section 15 shall be amended to the effect
+ * that Ascensio System SIA expressly excludes the warranty of non-infringement
+ * of any third-party rights.
+ *
+ * This program is distributed WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR  PURPOSE. For
+ * details, see the GNU AGPL at: http://www.gnu.org/licenses/agpl-3.0.html
+ *
+ * You can contact Ascensio System SIA at Lubanas st. 125a-25, Riga, Latvia,
+ * EU, LV-1021.
+ *
+ * The  interactive user interfaces in modified source and object code versions
+ * of the Program must display Appropriate Legal Notices, as required under
+ * Section 5 of the GNU AGPL version 3.
+ *
+ * Pursuant to Section 7(b) of the License you must retain the original Product
+ * logo when distributing the program. Pursuant to Section 7(e) we decline to
+ * grant you any rights under trademark law for use of our trademarks.
+ *
+ * All the Product's GUI elements, including illustrations and icon sets, as
+ * well as technical writing content are licensed under the terms of the
+ * Creative Commons Attribution-ShareAlike 4.0 International. See the License
+ * terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
+ *
+ */
+
 "use strict";
 
 // При добавлении нового элемента ParagraphContent, добавить его обработку в
@@ -1211,26 +1243,6 @@ Paragraph.prototype =
         return { X : X, Y : Y, PageNum : this.Get_AbsolutePage(CurPage), Internal : { Line : CurLine, Page : CurPage, Range : CurRange }, Transform : Transform };
     },
 
-    // Можно ли объединить границы двух параграфов с заданными настройками Pr1, Pr2
-    Internal_CompareBrd : function(Pr1, Pr2)
-    {
-        // Сначала сравним правую и левую границы параграфов
-        var Left_1  = Math.min( Pr1.Ind.Left, Pr1.Ind.Left + Pr1.Ind.FirstLine );
-        var Right_1 = Pr1.Ind.Right;
-        var Left_2  = Math.min( Pr2.Ind.Left, Pr2.Ind.Left + Pr2.Ind.FirstLine );
-        var Right_2 = Pr2.Ind.Right;
-
-        if ( Math.abs( Left_1 - Left_2 ) > 0.001 || Math.abs( Right_1 - Right_2 ) > 0.001 )
-            return false;
-
-        if ( false === Pr1.Brd.Top.Compare( Pr2.Brd.Top )   || false === Pr1.Brd.Bottom.Compare( Pr2.Brd.Bottom ) ||
-            false === Pr1.Brd.Left.Compare( Pr2.Brd.Left ) || false === Pr1.Brd.Right.Compare( Pr2.Brd.Right )   ||
-            false === Pr1.Brd.Between.Compare( Pr2.Brd.Between ) )
-            return false;
-
-        return true;
-    },
-
     // Проверяем не пустые ли границы
     Internal_Is_NullBorders : function (Borders)
     {
@@ -2366,7 +2378,8 @@ Paragraph.prototype =
         if (border_Single === Pr.ParaPr.Brd.Between.Value
             && false === bDrawTop
             && false === bEmptyPageCurrent
-            && true === bEmptyPagesBefore)
+            && true === bEmptyPagesBefore
+			&& false === Pr.ParaPr.Brd.First)
         {
             bDrawBetween = true;
         }
@@ -3049,6 +3062,8 @@ Paragraph.prototype =
             case para_NewLine:
             case para_FootnoteReference:
             case para_FootnoteRef:
+            case para_Separator:
+            case para_ContinuationSeparator:
             default:
             {
                 // Элементы данного типа добавляем во внутренний элемент
@@ -7676,7 +7691,7 @@ Paragraph.prototype =
         if ( undefined !== FramePr )
         {
             if ( null === PrevEl || type_Paragraph !== PrevEl.GetType() )
-                PrevEl = null
+                PrevEl = null;
             else
             {
                 var PrevFramePr = PrevEl.Get_FramePr();
@@ -7738,10 +7753,15 @@ Paragraph.prototype =
                 }
             }
 
-            if (false === this.Internal_Is_NullBorders(Pr.ParaPr.Brd) && true === this.Internal_CompareBrd(Prev_Pr, Pr.ParaPr) && undefined === PrevEl.Get_SectionPr() && true !== Pr.ParaPr.PageBreakBefore)
-                Pr.ParaPr.Brd.First = false;
+            if (true === this.private_CompareBorderSettings(Prev_Pr, Pr.ParaPr) && undefined === PrevEl.Get_SectionPr() && true !== Pr.ParaPr.PageBreakBefore)
+			{
+				Pr.ParaPr.Brd.First   = false;
+				Pr.ParaPr.Brd.Between = Prev_Pr.Brd.Between.Copy();
+			}
             else
-                Pr.ParaPr.Brd.First = true;
+			{
+				Pr.ParaPr.Brd.First = true;
+			}
         }
         else if ( null === PrevEl )
         {
@@ -7794,7 +7814,7 @@ Paragraph.prototype =
                     }
                 }
 
-                if (false === this.Internal_Is_NullBorders(Pr.ParaPr.Brd) && true === this.Internal_CompareBrd(Next_Pr, Pr.ParaPr) && undefined === this.Get_SectionPr() && (undefined === NextEl.Get_SectionPr() || true !== NextEl.IsEmpty()) && true !== Next_Pr.PageBreakBefore)
+                if (true === this.private_CompareBorderSettings(Next_Pr, Pr.ParaPr) && undefined === this.Get_SectionPr() && (undefined === NextEl.Get_SectionPr() || true !== NextEl.IsEmpty()) && true !== Next_Pr.PageBreakBefore)
                     Pr.ParaPr.Brd.Last = false;
                 else
                     Pr.ParaPr.Brd.Last = true;
@@ -13951,6 +13971,30 @@ Paragraph.prototype.Set_ParaPropsForVerticalTextInCell = function(isVerticalText
         this.Set_Ind({Left : Left, Right : Right, FirstLine : First}, true);
     }
 };
+/**
+ * Проверяем можно ли объединить границы двух параграфов с заданными настройками Pr1, Pr2.
+ */
+Paragraph.prototype.private_CompareBorderSettings = function(Pr1, Pr2)
+{
+	// Сначала сравним правую и левую границы параграфов
+	var Left_1  = Math.min(Pr1.Ind.Left, Pr1.Ind.Left + Pr1.Ind.FirstLine);
+	var Right_1 = Pr1.Ind.Right;
+	var Left_2  = Math.min(Pr2.Ind.Left, Pr2.Ind.Left + Pr2.Ind.FirstLine);
+	var Right_2 = Pr2.Ind.Right;
+
+	if (Math.abs(Left_1 - Left_2) > 0.001 || Math.abs(Right_1 - Right_2) > 0.001)
+		return false;
+
+	// Почему то Word не сравнивает границы между параграфами.
+	if (false === Pr1.Brd.Top.Compare(Pr2.Brd.Top)
+		|| false === Pr1.Brd.Bottom.Compare(Pr2.Brd.Bottom)
+		|| false === Pr1.Brd.Left.Compare(Pr2.Brd.Left)
+		|| false === Pr1.Brd.Right.Compare(Pr2.Brd.Right))
+		return false;
+
+	return true;
+};
+
 
 var pararecalc_0_All  = 0;
 var pararecalc_0_None = 1;

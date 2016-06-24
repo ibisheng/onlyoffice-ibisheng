@@ -1,4 +1,36 @@
-﻿"use strict";
+﻿/*
+ * (c) Copyright Ascensio System SIA 2010-2016
+ *
+ * This program is a free software product. You can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License (AGPL)
+ * version 3 as published by the Free Software Foundation. In accordance with
+ * Section 7(a) of the GNU AGPL its Section 15 shall be amended to the effect
+ * that Ascensio System SIA expressly excludes the warranty of non-infringement
+ * of any third-party rights.
+ *
+ * This program is distributed WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR  PURPOSE. For
+ * details, see the GNU AGPL at: http://www.gnu.org/licenses/agpl-3.0.html
+ *
+ * You can contact Ascensio System SIA at Lubanas st. 125a-25, Riga, Latvia,
+ * EU, LV-1021.
+ *
+ * The  interactive user interfaces in modified source and object code versions
+ * of the Program must display Appropriate Legal Notices, as required under
+ * Section 5 of the GNU AGPL version 3.
+ *
+ * Pursuant to Section 7(b) of the License you must retain the original Product
+ * logo when distributing the program. Pursuant to Section 7(e) we decline to
+ * grant you any rights under trademark law for use of our trademarks.
+ *
+ * All the Product's GUI elements, including illustrations and icon sets, as
+ * well as technical writing content are licensed under the terms of the
+ * Creative Commons Attribution-ShareAlike 4.0 International. See the License
+ * terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
+ *
+ */
+
+"use strict";
 
 var editor;
 (/**
@@ -308,21 +340,7 @@ var editor;
     if (cultureInfo) {
       var numFormatDigit = AscCommon.oNumFormatCache.get('#,##0.00');
 
-      var dateElems = [];
-      for (var i = 0; i < cultureInfo.ShortDatePattern.length; ++i) {
-        switch (cultureInfo.ShortDatePattern[i]) {
-          case '0':
-            dateElems.push('d');
-            break;
-          case '1':
-            dateElems.push('m');
-            break;
-          case '2':
-            dateElems.push('yyyy');
-            break;
-        }
-      }
-      var formatDate = dateElems.join('/');
+      var formatDate = AscCommonExcel.getShortDateFormat(cultureInfo);
       formatDate += " h:mm";
       if (cultureInfo.AMDesignator && cultureInfo.PMDesignator) {
         formatDate += " AM/PM";
@@ -1920,7 +1938,6 @@ var editor;
     var t = this;
     var copyWorksheet = function(res) {
       if (res) {
-        t.wb._initCommentsToSave();
         // ToDo перейти от wsViews на wsViewsId (сейчас вызываем раньше, чем в модели, т.к. там будет sortDependency
         // и cleanCellCache, который создаст уже скопированный лист(и splice сработает неправильно))
         History.Create_NewPoint();
@@ -2009,12 +2026,15 @@ var editor;
    * Делает активной указанную ячейку
    * @param {String} reference  Ссылка на ячейку вида A1 или R1C1
    */
-  spreadsheet_api.prototype.asc_findCell = function(reference) {
-    if(this.wb.cellEditor.isOpened) return;
+  spreadsheet_api.prototype.asc_findCell = function (reference) {
+    if (this.wb.cellEditor.isOpened) {
+      return;
+    }
     var d = this.wb.findCell(reference);
-
     if (!d) {
-      this.handlers.trigger("asc_onError", c_oAscError.ID.InvalidReferenceOrName, c_oAscError.Level.NoCritical);
+      if (!this.isViewMode) {
+        this.handlers.trigger("asc_onError", c_oAscError.ID.InvalidReferenceOrName, c_oAscError.Level.NoCritical);
+      }
       return;
     }
 
@@ -2307,22 +2327,6 @@ var editor;
   spreadsheet_api.prototype.asc_hideComments = function() {
     var ws = this.wb.getWorksheet();
     return ws.cellCommentator.hideComments();
-  };
-
-  spreadsheet_api.prototype.asc_getWorkbookComments = function() {
-    var _this = this, comments = [];
-    if (_this.wb) {
-      for (var key in _this.wb.wsViews) {
-        var ws = _this.wb.wsViews[key];
-        if (ws) {
-          for (var i = 0; i < ws.cellCommentator.aComments.length; i++) {
-            var comment = ws.cellCommentator.aComments[i];
-            comments.push({ "Id": comment.asc_getId(), "Comment": comment });
-          }
-        }
-      }
-    }
-    return comments;
   };
 
   // Shapes
@@ -3153,18 +3157,19 @@ var editor;
   spreadsheet_api.prototype.asc_nativeCalculate = function() {
   };
 
-  spreadsheet_api.prototype.asc_nativePrint = function(_printer, _page, _param) {
-    var _adjustPrint = window.AscDesktopEditor_PrintData ? window.AscDesktopEditor_PrintData : new Asc.asc_CAdjustPrint();
+  spreadsheet_api.prototype.asc_nativePrint = function (_printer, _page, _param) {
+    var _adjustPrint = window.AscDesktopEditor_PrintData || new Asc.asc_CAdjustPrint();
     window.AscDesktopEditor_PrintData = undefined;
 
     if (1 == _param) {
-      var countWorksheets = _adjustPrint.asc_setPrintType(Asc.c_oAscPrintType.EntireWorkbook), printOptions;
-      this.wbModel.getWorksheetCount();
+      _adjustPrint.asc_setPrintType(Asc.c_oAscPrintType.EntireWorkbook);
+      var pageSetup;
+      var countWorksheets = this.wbModel.getWorksheetCount();
       for (var j = 0; j < countWorksheets; ++j) {
-        printOptions = this.wbModel.getWorksheet(j).PagePrintOptions;
-        printOptions.asc_setFitToWidth(true);
-        printOptions.asc_setFitToHeight(true);
-    }
+        pageSetup = this.wbModel.getWorksheet(j).PagePrintOptions.asc_getPageSetup();
+        pageSetup.asc_setFitToWidth(true);
+        pageSetup.asc_setFitToHeight(true);
+      }
     }
 
     var _printPagesData = this.wb.calcPagesPrint(_adjustPrint);
@@ -3185,12 +3190,14 @@ var editor;
             _end = pdf_writer.DocumentRenderer.m_arrayPages[i + 1].StartOffset;
           }
 
-          window["AscDesktopEditor"]["Print_Page"](pdf_writer.DocumentRenderer.Memory.GetBase64Memory2(_start, _end - _start), pdf_writer.DocumentRenderer.m_arrayPages[i].Width, pdf_writer.DocumentRenderer.m_arrayPages[i].Height);
+          window["AscDesktopEditor"]["Print_Page"](
+            pdf_writer.DocumentRenderer.Memory.GetBase64Memory2(_start, _end - _start),
+            pdf_writer.DocumentRenderer.m_arrayPages[i].Width, pdf_writer.DocumentRenderer.m_arrayPages[i].Height);
         }
 
         window["AscDesktopEditor"]["Print_End"]();
       }
-	  return pdf_writer.DocumentRenderer.Memory;      
+      return pdf_writer.DocumentRenderer.Memory;
     }
 
     var isEndPrint = this.wb.printSheet(_printer, _printPagesData);
@@ -3393,7 +3400,6 @@ var editor;
 
   prot["asc_getComments"] = prot.asc_getComments;
   prot["asc_getDocumentComments"] = prot.asc_getDocumentComments;
-  prot["asc_getWorkbookComments"] = prot.asc_getWorkbookComments;
 
   // Shapes
   prot["setStartPointHistory"] = prot.setStartPointHistory;
@@ -3505,4 +3511,6 @@ var editor;
   prot["asc_pluginButtonClick"]     = prot.asc_pluginButtonClick;
   prot["asc_addOleObject"]          = prot.asc_addOleObject;
   prot["asc_editOleObject"]         = prot.asc_editOleObject;
+  prot["asc_Recalculate"]           = prot.asc_Recalculate;
+  prot["asc_canPaste"]              = prot.asc_canPaste;
 })(window);

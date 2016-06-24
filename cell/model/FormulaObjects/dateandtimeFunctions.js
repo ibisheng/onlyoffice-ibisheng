@@ -1,3 +1,35 @@
+/*
+ * (c) Copyright Ascensio System SIA 2010-2016
+ *
+ * This program is a free software product. You can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License (AGPL)
+ * version 3 as published by the Free Software Foundation. In accordance with
+ * Section 7(a) of the GNU AGPL its Section 15 shall be amended to the effect
+ * that Ascensio System SIA expressly excludes the warranty of non-infringement
+ * of any third-party rights.
+ *
+ * This program is distributed WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR  PURPOSE. For
+ * details, see the GNU AGPL at: http://www.gnu.org/licenses/agpl-3.0.html
+ *
+ * You can contact Ascensio System SIA at Lubanas st. 125a-25, Riga, Latvia,
+ * EU, LV-1021.
+ *
+ * The  interactive user interfaces in modified source and object code versions
+ * of the Program must display Appropriate Legal Notices, as required under
+ * Section 5 of the GNU AGPL version 3.
+ *
+ * Pursuant to Section 7(b) of the License you must retain the original Product
+ * logo when distributing the program. Pursuant to Section 7(e) we decline to
+ * grant you any rights under trademark law for use of our trademarks.
+ *
+ * All the Product's GUI elements, including illustrations and icon sets, as
+ * well as technical writing content are licensed under the terms of the
+ * Creative Commons Attribution-ShareAlike 4.0 International. See the License
+ * terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
+ *
+ */
+
 "use strict";
 (
 /**
@@ -5,12 +37,10 @@
 * @param {undefined} undefined
 */
 function (window, undefined) {
-    var bDate1904 = AscCommon.bDate1904;
     var g_oFormatParser = AscCommon.g_oFormatParser;
     
     var cElementType = AscCommonExcel.cElementType;
     var cErrorType = AscCommonExcel.cErrorType;
-    var c_DateCorrectConst = AscCommonExcel.c_DateCorrectConst;
     var c_sPerDay = AscCommonExcel.c_sPerDay;
     var c_msPerDay = AscCommonExcel.c_msPerDay;
     var cNumber = AscCommonExcel.cNumber;
@@ -581,7 +611,7 @@ cDAY.prototype.Calculate = function ( arg ) {
                 return this.setCA( new cError( cErrorType.wrong_value_type ), true );
             }
             else
-                val = Math.floor( ( d.getTime() / 1000 - d.getTimezoneOffset() * 60 ) / c_sPerDay + ( c_DateCorrectConst + (bDate1904 ? 0 : 1) ) );
+                val = Math.floor( ( d.getTime() / 1000 - d.getTimezoneOffset() * 60 ) / c_sPerDay + ( AscCommonExcel.c_DateCorrectConst + (AscCommon.bDate1904 ? 0 : 1) ) );
         }
         else {
             val = arg0.tocNumber().getValue();
@@ -589,16 +619,16 @@ cDAY.prototype.Calculate = function ( arg ) {
     }
     if ( val < 0 )
         return this.setCA( new cError( cErrorType.not_numeric ), true );
-    else if ( !bDate1904 ) {
+    else if ( !AscCommon.bDate1904 ) {
         if ( val < 60 )
-            return this.setCA( new cNumber( ( new Date( (val - c_DateCorrectConst) * c_msPerDay ) ).getUTCDate() ), true, 0 );
+            return this.setCA( new cNumber( ( new Date( (val - AscCommonExcel.c_DateCorrectConst) * c_msPerDay ) ).getUTCDate() ), true, 0 );
         else if ( val == 60 )
-            return this.setCA( new cNumber( ( new Date( (val - c_DateCorrectConst - 1) * c_msPerDay ) ).getUTCDate() + 1 ), true, 0 );
+            return this.setCA( new cNumber( ( new Date( (val - AscCommonExcel.c_DateCorrectConst - 1) * c_msPerDay ) ).getUTCDate() + 1 ), true, 0 );
         else
-            return this.setCA( new cNumber( ( new Date( (val - c_DateCorrectConst - 1) * c_msPerDay ) ).getUTCDate() ), true, 0 );
+            return this.setCA( new cNumber( ( new Date( (val - AscCommonExcel.c_DateCorrectConst - 1) * c_msPerDay ) ).getUTCDate() ), true, 0 );
     }
     else
-        return this.setCA( new cNumber( ( new Date( (val - c_DateCorrectConst) * c_msPerDay ) ).getUTCDate() ), true, 0 );
+        return this.setCA( new cNumber( ( new Date( (val - AscCommonExcel.c_DateCorrectConst) * c_msPerDay ) ).getUTCDate() ), true, 0 );
 };
 cDAY.prototype.getInfo = function () {
     return {
@@ -719,16 +749,16 @@ cEDATE.prototype.Calculate = function ( arg ) {
 
     if ( val < 0 )
         return this.setCA( new cError( cErrorType.not_numeric ), true );
-    else if ( !bDate1904 ) {
+    else if ( !AscCommon.bDate1904 ) {
         if ( val < 60 )
-            val = new Date( (val - c_DateCorrectConst) * c_msPerDay );
+            val = new Date( (val - AscCommonExcel.c_DateCorrectConst) * c_msPerDay );
         else if ( val == 60 )
-            val = new Date( (val - c_DateCorrectConst - 1) * c_msPerDay );
+            val = new Date( (val - AscCommonExcel.c_DateCorrectConst - 1) * c_msPerDay );
         else
-            val = new Date( (val - c_DateCorrectConst - 1) * c_msPerDay );
+            val = new Date( (val - AscCommonExcel.c_DateCorrectConst - 1) * c_msPerDay );
     }
     else
-        val = new Date( (val - c_DateCorrectConst) * c_msPerDay );
+        val = new Date( (val - AscCommonExcel.c_DateCorrectConst) * c_msPerDay );
 
     date = new Date( val );
 
@@ -744,7 +774,7 @@ cEDATE.prototype.Calculate = function ( arg ) {
         val = new Date( val.setUTCMonth( val.getUTCMonth() + arg1.getValue() ) );
     }
 
-    return this.value = new cNumber( Math.floor( ( val.getTime() / 1000 - val.getTimezoneOffset() * 60 ) / c_sPerDay + (c_DateCorrectConst + 1) ) )
+    return this.value = new cNumber( Math.floor( ( val.getTime() / 1000 - val.getTimezoneOffset() * 60 ) / c_sPerDay + (AscCommonExcel.c_DateCorrectConst + 1) ) )
 };
 cEDATE.prototype.getInfo = function () {
     return {
@@ -799,22 +829,22 @@ cEOMONTH.prototype.Calculate = function ( arg ) {
 
     if ( val < 0 )
         return this.setCA( new cError( cErrorType.not_numeric ), true );
-    else if ( !bDate1904 ) {
+    else if ( !AscCommon.bDate1904 ) {
         if ( val < 60 )
-            val = new Date( (val - c_DateCorrectConst) * c_msPerDay );
+            val = new Date( (val - AscCommonExcel.c_DateCorrectConst) * c_msPerDay );
         else if ( val == 60 )
-            val = new Date( (val - c_DateCorrectConst - 1) * c_msPerDay );
+            val = new Date( (val - AscCommonExcel.c_DateCorrectConst - 1) * c_msPerDay );
         else
-            val = new Date( (val - c_DateCorrectConst - 1) * c_msPerDay );
+            val = new Date( (val - AscCommonExcel.c_DateCorrectConst - 1) * c_msPerDay );
     }
     else
-        val = new Date( (val - c_DateCorrectConst) * c_msPerDay );
+        val = new Date( (val - AscCommonExcel.c_DateCorrectConst) * c_msPerDay );
 
     val.setUTCDate( 1 );
     val.setUTCMonth( val.getUTCMonth() + arg1.getValue() );
     val.setUTCDate( val.getDaysInMonth() );
 
-    return this.value = new cNumber( Math.floor( ( val.getTime() / 1000 - val.getTimezoneOffset() * 60 ) / c_sPerDay + (c_DateCorrectConst + 1) ) );
+    return this.value = new cNumber( Math.floor( ( val.getTime() / 1000 - val.getTimezoneOffset() * 60 ) / c_sPerDay + (AscCommonExcel.c_DateCorrectConst + 1) ) );
 };
 cEOMONTH.prototype.getInfo = function () {
     return {
@@ -877,7 +907,7 @@ cHOUR.prototype.Calculate = function ( arg ) {
                 val = d.value;
             }
             else
-                val = ( d.getTime() / 1000 - d.getTimezoneOffset() * 60 ) / c_sPerDay + ( c_DateCorrectConst + (bDate1904 ? 0 : 1) );
+                val = ( d.getTime() / 1000 - d.getTimezoneOffset() * 60 ) / c_sPerDay + ( AscCommonExcel.c_DateCorrectConst + (AscCommon.bDate1904 ? 0 : 1) );
         }
         else {
             val = arg0.tocNumber().getValue();
@@ -949,7 +979,7 @@ cMINUTE.prototype.Calculate = function ( arg ) {
                 val = d.value;
             }
             else
-                val = ( d.getTime() / 1000 - d.getTimezoneOffset() * 60 ) / c_sPerDay + ( c_DateCorrectConst + (bDate1904 ? 0 : 1) );
+                val = ( d.getTime() / 1000 - d.getTimezoneOffset() * 60 ) / c_sPerDay + ( AscCommonExcel.c_DateCorrectConst + (AscCommon.bDate1904 ? 0 : 1) );
         }
         else {
             val = arg0.tocNumber().getValue();
@@ -1019,7 +1049,7 @@ cMONTH.prototype.Calculate = function ( arg ) {
                 return this.setCA( new cError( cErrorType.wrong_value_type ), true );
             }
             else
-                val = Math.floor( ( d.getTime() / 1000 - d.getTimezoneOffset() * 60 ) / c_sPerDay + ( c_DateCorrectConst + (bDate1904 ? 0 : 1) ) );
+                val = Math.floor( ( d.getTime() / 1000 - d.getTimezoneOffset() * 60 ) / c_sPerDay + ( AscCommonExcel.c_DateCorrectConst + (AscCommon.bDate1904 ? 0 : 1) ) );
         }
         else {
             val = arg0.tocNumber().getValue();
@@ -1027,14 +1057,14 @@ cMONTH.prototype.Calculate = function ( arg ) {
     }
     if ( val < 0 )
         return this.setCA( new cError( cErrorType.not_numeric ), true );
-    if ( !bDate1904 ) {
+    if ( !AscCommon.bDate1904 ) {
         if ( val == 60 )
             return this.setCA( new cNumber( 2 ), true, 0 );
         else
-            return this.setCA( new cNumber( ( new Date( ( (val == 0 ? 1 : val) - c_DateCorrectConst - 1 ) * c_msPerDay ) ).getUTCMonth() + 1 ), true, 0 );
+            return this.setCA( new cNumber( ( new Date( ( (val == 0 ? 1 : val) - AscCommonExcel.c_DateCorrectConst - 1 ) * c_msPerDay ) ).getUTCMonth() + 1 ), true, 0 );
     }
     else
-        return this.setCA( new cNumber( ( new Date( ( (val == 0 ? 1 : val) - c_DateCorrectConst ) * c_msPerDay ) ).getUTCMonth() + 1 ), true, 0 );
+        return this.setCA( new cNumber( ( new Date( ( (val == 0 ? 1 : val) - AscCommonExcel.c_DateCorrectConst ) * c_msPerDay ) ).getUTCMonth() + 1 ), true, 0 );
 };
 cMONTH.prototype.getInfo = function () {
     return {
@@ -1089,29 +1119,29 @@ cNETWORKDAYS.prototype.Calculate = function ( arg ) {
 
     if ( val0 < 0 )
         return this.setCA( new cError( cErrorType.not_numeric ), true );
-    else if ( !bDate1904 ) {
+    else if ( !AscCommon.bDate1904 ) {
         if ( val0 < 60 )
-            val0 = new Date( (val0 - c_DateCorrectConst) * c_msPerDay );
+            val0 = new Date( (val0 - AscCommonExcel.c_DateCorrectConst) * c_msPerDay );
         else if ( val0 == 60 )
-            val0 = new Date( (val0 - c_DateCorrectConst - 1) * c_msPerDay );
+            val0 = new Date( (val0 - AscCommonExcel.c_DateCorrectConst - 1) * c_msPerDay );
         else
-            val0 = new Date( (val0 - c_DateCorrectConst - 1) * c_msPerDay );
+            val0 = new Date( (val0 - AscCommonExcel.c_DateCorrectConst - 1) * c_msPerDay );
     }
     else
-        val0 = new Date( (val0 - c_DateCorrectConst) * c_msPerDay );
+        val0 = new Date( (val0 - AscCommonExcel.c_DateCorrectConst) * c_msPerDay );
 
     if ( val1 < 0 )
         return this.setCA( new cError( cErrorType.not_numeric ), true );
-    else if ( !bDate1904 ) {
+    else if ( !AscCommon.bDate1904 ) {
         if ( val1 < 60 )
-            val1 = new Date( (val1 - c_DateCorrectConst) * c_msPerDay );
+            val1 = new Date( (val1 - AscCommonExcel.c_DateCorrectConst) * c_msPerDay );
         else if ( val1 == 60 )
-            val1 = new Date( (val1 - c_DateCorrectConst - 1) * c_msPerDay );
+            val1 = new Date( (val1 - AscCommonExcel.c_DateCorrectConst - 1) * c_msPerDay );
         else
-            val1 = new Date( (val1 - c_DateCorrectConst - 1) * c_msPerDay );
+            val1 = new Date( (val1 - AscCommonExcel.c_DateCorrectConst - 1) * c_msPerDay );
     }
     else
-        val1 = new Date( (val1 - c_DateCorrectConst) * c_msPerDay );
+        val1 = new Date( (val1 - AscCommonExcel.c_DateCorrectConst) * c_msPerDay );
 
     var holidays = [];
 
@@ -1264,7 +1294,7 @@ cSECOND.prototype.Calculate = function ( arg ) {
                 val = d.value;
             }
             else
-                val = ( d.getTime() / 1000 - d.getTimezoneOffset() * 60 ) / c_sPerDay + ( c_DateCorrectConst + (bDate1904 ? 0 : 1) );
+                val = ( d.getTime() / 1000 - d.getTimezoneOffset() * 60 ) / c_sPerDay + ( AscCommonExcel.c_DateCorrectConst + (AscCommon.bDate1904 ? 0 : 1) );
         }
         else {
             val = arg0.tocNumber().getValue();
@@ -1508,7 +1538,7 @@ cWEEKDAY.prototype.Calculate = function ( arg ) {
     if ( arg0.getValue() < 0 )
         return this.value = new cError( cErrorType.wrong_value_type );
 
-    return this.value = new cNumber( weekday[new Date( (arg0.getValue() - (c_DateCorrectConst + 1)) * c_msPerDay ).getUTCDay()] );
+    return this.value = new cNumber( weekday[new Date( (arg0.getValue() - (AscCommonExcel.c_DateCorrectConst + 1)) * c_msPerDay ).getUTCDay()] );
 }
 cWEEKDAY.prototype.getInfo = function () {
     return {
@@ -1684,16 +1714,16 @@ cWORKDAY.prototype.Calculate = function ( arg ) {
 
     if ( val0 < 0 )
         return this.setCA( new cError( cErrorType.not_numeric ), true );
-    else if ( !bDate1904 ) {
+    else if ( !AscCommon.bDate1904 ) {
         if ( val0 < 60 )
-            val0 = new Date( (val0 - c_DateCorrectConst) * c_msPerDay );
+            val0 = new Date( (val0 - AscCommonExcel.c_DateCorrectConst) * c_msPerDay );
         else if ( val0 == 60 )
-            val0 = new Date( (val0 - c_DateCorrectConst - 1) * c_msPerDay );
+            val0 = new Date( (val0 - AscCommonExcel.c_DateCorrectConst - 1) * c_msPerDay );
         else
-            val0 = new Date( (val0 - c_DateCorrectConst - 1) * c_msPerDay );
+            val0 = new Date( (val0 - AscCommonExcel.c_DateCorrectConst - 1) * c_msPerDay );
     }
     else
-        val0 = new Date( (val0 - c_DateCorrectConst) * c_msPerDay );
+        val0 = new Date( (val0 - AscCommonExcel.c_DateCorrectConst) * c_msPerDay );
 
     if ( arg2 ) {
         if ( arg2 instanceof cArea || arg2 instanceof cArea3D ) {
@@ -1719,16 +1749,16 @@ cWORKDAY.prototype.Calculate = function ( arg ) {
     }
 
     for ( var i = 0; i < holidays.length; i++ ) {
-        if ( !bDate1904 ) {
+        if ( !AscCommon.bDate1904 ) {
             if ( holidays[i].getValue() < 60 )
-                holidays[i] = new Date( (holidays[i].getValue() - c_DateCorrectConst) * c_msPerDay );
+                holidays[i] = new Date( (holidays[i].getValue() - AscCommonExcel.c_DateCorrectConst) * c_msPerDay );
             else if ( holidays[i] == 60 )
-                holidays[i] = new Date( (holidays[i].getValue() - c_DateCorrectConst - 1) * c_msPerDay );
+                holidays[i] = new Date( (holidays[i].getValue() - AscCommonExcel.c_DateCorrectConst - 1) * c_msPerDay );
             else
-                holidays[i] = new Date( (holidays[i].getValue() - c_DateCorrectConst - 1) * c_msPerDay );
+                holidays[i] = new Date( (holidays[i].getValue() - AscCommonExcel.c_DateCorrectConst - 1) * c_msPerDay );
         }
         else
-            holidays[i] = new Date( (holidays[i].getValue() - c_DateCorrectConst) * c_msPerDay );
+            holidays[i] = new Date( (holidays[i].getValue() - AscCommonExcel.c_DateCorrectConst) * c_msPerDay );
     }
 
     function notAHolidays( date ) {
@@ -1823,7 +1853,7 @@ cYEAR.prototype.Calculate = function ( arg ) {
                 return this.setCA( new cError( cErrorType.wrong_value_type ), true );
             }
             else
-                val = Math.floor( ( d.getTime() / 1000 - d.getTimezoneOffset() * 60 ) / c_sPerDay + ( c_DateCorrectConst + (bDate1904 ? 0 : 1) ) );
+                val = Math.floor( ( d.getTime() / 1000 - d.getTimezoneOffset() * 60 ) / c_sPerDay + ( AscCommonExcel.c_DateCorrectConst + (AscCommon.bDate1904 ? 0 : 1) ) );
         }
         else {
             val = arg0.tocNumber().getValue();
@@ -1832,7 +1862,7 @@ cYEAR.prototype.Calculate = function ( arg ) {
     if ( val < 0 )
         return this.setCA( new cError( cErrorType.not_numeric ), true, 0 );
     else
-        return this.setCA( new cNumber( (new Date( (val - (c_DateCorrectConst + 1)) * c_msPerDay )).getUTCFullYear() ), true, 0 );
+        return this.setCA( new cNumber( (new Date( (val - (AscCommonExcel.c_DateCorrectConst + 1)) * c_msPerDay )).getUTCFullYear() ), true, 0 );
 }
 cYEAR.prototype.getInfo = function () {
     return {

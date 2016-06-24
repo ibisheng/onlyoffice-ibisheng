@@ -1,3 +1,35 @@
+/*
+ * (c) Copyright Ascensio System SIA 2010-2016
+ *
+ * This program is a free software product. You can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License (AGPL)
+ * version 3 as published by the Free Software Foundation. In accordance with
+ * Section 7(a) of the GNU AGPL its Section 15 shall be amended to the effect
+ * that Ascensio System SIA expressly excludes the warranty of non-infringement
+ * of any third-party rights.
+ *
+ * This program is distributed WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR  PURPOSE. For
+ * details, see the GNU AGPL at: http://www.gnu.org/licenses/agpl-3.0.html
+ *
+ * You can contact Ascensio System SIA at Lubanas st. 125a-25, Riga, Latvia,
+ * EU, LV-1021.
+ *
+ * The  interactive user interfaces in modified source and object code versions
+ * of the Program must display Appropriate Legal Notices, as required under
+ * Section 5 of the GNU AGPL version 3.
+ *
+ * Pursuant to Section 7(b) of the License you must retain the original Product
+ * logo when distributing the program. Pursuant to Section 7(e) we decline to
+ * grant you any rights under trademark law for use of our trademarks.
+ *
+ * All the Product's GUI elements, including illustrations and icon sets, as
+ * well as technical writing content are licensed under the terms of the
+ * Creative Commons Attribution-ShareAlike 4.0 International. See the License
+ * terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
+ *
+ */
+
 "use strict";
 (
 	/**
@@ -495,6 +527,19 @@
 				
 				if(filterObj.filter === null)
 					return;
+				
+				//if apply a/f from context menu
+				if(autoFiltersObject && null === autoFiltersObject.automaticRowCount && currentFilter.isAutoFilter() && currentFilter.isApplyAutoFilter() === false)
+				{
+					var automaticRange = this._getAdjacentCellsAF(currentFilter.Ref, true);
+					var automaticRowCount = automaticRange.r2;
+					
+					var maxFilterRow = currentFilter.Ref.r2;
+					if(automaticRowCount > currentFilter.Ref.r2)
+						maxFilterRow = automaticRowCount;
+					
+					autoFiltersObject.automaticRowCount = maxFilterRow;
+				}
 				
 				//for history				
 				var oldFilter = filterObj.filter.clone(null);
@@ -1597,7 +1642,11 @@
 						curFilter.SortState.SortConditions = [];
 						curFilter.SortState.SortConditions[0] = new AscCommonExcel.SortCondition();
 					}
-					curFilter.SortState.SortConditions[0] = new AscCommonExcel.SortCondition();
+					else
+					{
+						curFilter.SortState.Ref = new Asc.Range(startCol, filterRef.r1, startCol, filterRef.r2);
+						curFilter.SortState.SortConditions[0] = new AscCommonExcel.SortCondition();
+					}
 						
 					var cellIdRange = new Asc.Range(startCol, filterRef.r1, startCol, filterRef.r1);
 					
@@ -1608,6 +1657,7 @@
 					{
 						t._setColorStyleTable(curFilter.Ref, curFilter);
 					}
+					
 					t._addHistoryObj({oldFilter: oldFilter}, AscCH.historyitem_AutoFilter_Sort,
 						{activeCells: cellIdRange, type: type, cellId: cellId, displayName: displayName}, null, curFilter.Ref);
 					History.EndTransaction();
@@ -1629,14 +1679,17 @@
 						curFilter.SortState.SortConditions = [];
 						curFilter.SortState.SortConditions[0] = new AscCommonExcel.SortCondition();
 					}
-					curFilter.SortState.SortConditions[0] = new AscCommonExcel.SortCondition();
+					else
+					{
+						curFilter.SortState.Ref = new Asc.Range(startCol, curFilter.Ref.r1, startCol, maxFilterRow);
+						curFilter.SortState.SortConditions[0] = new AscCommonExcel.SortCondition();
+					}
 						
 					var cellIdRange = new Asc.Range(startCol, filterRef.r1, startCol, filterRef.r1);
 					
 					curFilter.SortState.SortConditions[0].Ref = new Asc.Range(startCol, filterRef.r1, startCol, filterRef.r2);
-					
-					
 					curFilter.SortState.SortConditions[0].dxf = new AscCommonExcel.CellXfs();
+					
 					if(type === Asc.c_oAscSortOptions.ByColorFill)
 					{
 						curFilter.SortState.SortConditions[0].dxf.fill = new AscCommonExcel.Fill();
@@ -1654,6 +1707,7 @@
 					{
 						t._setColorStyleTable(curFilter.Ref, curFilter);
 					}
+					
 					t._addHistoryObj({oldFilter: oldFilter}, AscCH.historyitem_AutoFilter_Sort,
 						{activeCells: cellIdRange, type: type, cellId: cellId, color: color, displayName: displayName}, null, curFilter.Ref);
 					History.EndTransaction();
@@ -2389,6 +2443,12 @@
 							
 							tablePart.HeaderRowCount = tablePart.HeaderRowCount === null ? 0 : null;
 							tablePart.changeRef(null, 1, true);
+							
+							if(tablePart.AutoFilter)
+							{
+								this._openHiddenRows(tablePart);
+								tablePart.AutoFilter = null;
+							}
 						}
 						else
 						{
@@ -2410,6 +2470,12 @@
 								
 								tablePart.HeaderRowCount = tablePart.HeaderRowCount === null ? 0 : null;
 								tablePart.changeRef(null, -1, true);
+							}
+							
+							if(null === tablePart.AutoFilter)
+							{
+								tablePart.AutoFilter = new AscCommonExcel.AutoFilter();
+								tablePart.AutoFilter.Ref = tablePart.Ref.clone();
 							}
 						}
 						
@@ -2755,14 +2821,10 @@
 						var ref = filter.Ref;
 						var tableRange = new Asc.Range(ref.c1, ref.r1, ref.c2, ref.r1);
 						
-						if(filter.HeaderRowCount === 0)
-						{
-							continue;
-						}
 						
 						//в этом случае нашли ячейки(ячейку), которая входит в состав заголовка фильтра
 						var intersection = range.intersection(tableRange);
-						if(intersection != null)
+						if(null !== intersection && 0 !== filter.HeaderRowCount)
 						{
 							//проходимся по всем заголовкам
 							for(var j = tableRange.c1; j <= tableRange.c2; j++)
@@ -2800,6 +2862,44 @@
 							}
 							
 							worksheet.handlers.trigger("changeColumnTablePart", filter.DisplayName);
+						}
+						else
+						{
+							this._changeTotalsRowData(filter, range);
+						}
+					}
+				}
+			},
+			
+			_changeTotalsRowData: function(tablePart, range)
+			{
+				if(!tablePart || !range || !tablePart.TotalsRowCount)
+				{
+					return false;
+				}
+				
+				var worksheet = this.worksheet;
+				
+				var tableRange = tablePart.Ref;
+				var totalRange = new Asc.Range(tableRange.c1, tableRange.r2, tableRange.c2, tableRange.r2);
+				var isIntersection = totalRange.intersection(range);
+				
+				if(isIntersection)
+				{
+					for(var j = isIntersection.c1; j <= isIntersection.c2; j++)
+					{
+						var cell = worksheet.getCell3(tableRange.r2, j);
+						var tableColumn = tablePart.TableColumns[j - tableRange.c1];
+						
+						if(cell.isFormula())
+						{
+							var val = cell.getFormula();
+							tableColumn.setTotalsRowFormula(val);
+						}
+						else
+						{
+							var val = cell.getValue();
+							tableColumn.setTotalsRowLabel(val);
 						}
 					}
 				}
@@ -4044,36 +4144,49 @@
 				return result;
 			},
 			
-			_generateColumnNameWithoutTitle: function(range)
+			_generateColumnNameWithoutTitle: function(ref)
 			{
-				var worksheet = this.worksheet;
-				var newTableColumn;
-				var tableColumns = [];
-				var cell;
-				var val;
-				for(var col1 = range.c1; col1 <= range.c2; col1++)
-				{
-					cell = worksheet.getCell3(range.r1, col1);
-					val = cell.getValue();
-					//если ячейка пустая, то генерируем название
-					if(val == '')
-						val = this._generateColumnName(tableColumns);
-					//проверяем, не повторяется ли значение, которое лежит в данной ячейке
-					var index = 2;
-					var valNew = val;
-					for(var s = 0; s < tableColumns.length; s++)
-					{
-						if(valNew == tableColumns[s].Name)
-						{
-							valNew = val + index;
-							index++;
-							s = -1;
+				var tableColumns = [], newTableColumn;
+				var range = this.worksheet.getRange3(ref.r1, ref.c1, ref.r1, ref.c2);
+				var defaultName = 'Column';
+				var uniqueColumns = {}, val, valTemplate, valLower, index = 1, isDuplicate = false, emptyCells = false;
+				var valuesAndMap = range._getValuesAndMap(true);
+				var values = valuesAndMap.values;
+				var length = values.length;
+				if (0 === length) {
+					// Выделили всю строку без значений
+					length = ref.c2 - ref.c1 + 1;
+					emptyCells = true;
+				}
+				var map = valuesAndMap.map;
+				for (var i = 0; i < length; ++i) {
+					if (emptyCells || '' === (valTemplate = val = values[i].v)) {
+						valTemplate = defaultName;
+						val = valTemplate + index;
+						++index;
+					}
+
+					while(true) {
+						if (isDuplicate) {
+							val = valTemplate + (++index);
+						}
+
+						valLower = val.toLowerCase();
+						if (uniqueColumns[valLower]) {
+							isDuplicate = true;
+						} else {
+							if (isDuplicate && map[valLower]) {
+								continue;
+							}
+							uniqueColumns[valLower] = true;
+
+							newTableColumn = new AscCommonExcel.TableColumn();
+							newTableColumn.Name = val;
+							tableColumns.push(newTableColumn);
+							isDuplicate = false;
+							break;
 						}
 					}
-					newTableColumn = new AscCommonExcel.TableColumn();
-					newTableColumn.Name = valNew;
-					
-					tableColumns[col1 - range.c1] = newTableColumn;
 				}
 				return tableColumns;
 			},
@@ -4153,7 +4266,7 @@
 					headerRowCount = options.HeaderRowCount;
 				if(null != options.TotalsRowCount)
 					totalsRowCount = options.TotalsRowCount;
-				if(style && style.Name && worksheet.workbook.TableStyles && worksheet.workbook.TableStyles.AllStyles && (styleForCurTable = worksheet.workbook.TableStyles.AllStyles[style.Name]))
+				if(style && worksheet.workbook.TableStyles && worksheet.workbook.TableStyles.AllStyles)
 				{
 					//заполняем названия столбцов
 					if(true != isOpenFilter && isSetVal && !bRedoChanges)
@@ -4184,7 +4297,7 @@
 									var formula = tableColumn.getTotalRowFormula(options);
 									if(null !== formula)
 									{
-										range.setValue(formula);
+										range.setValue("=" + formula, null, true);
 										if(isSetTotalRowType)
 										{
 											var numFormatType = this._getFormatTableColumnRange(options, tableColumn.Name);
@@ -4197,6 +4310,15 @@
 								}
 							}
 						}
+					}
+					
+					if(!style.Name || (style.Name && !worksheet.workbook.TableStyles.AllStyles[style.Name]))
+					{
+						return;
+					}
+					else
+					{
+						styleForCurTable = worksheet.workbook.TableStyles.AllStyles[style.Name]
 					}
 					
 					//заполняем стили
@@ -4855,8 +4977,10 @@
 			
 			_generateColumnName2: function(tableColumns)
 			{
+				// ToDo почему 2 функции generateColumnName?
 				var columnName = "Column";
-				var indexColumn = name[1];
+				//var indexColumn = name[1]; name - не определено!
+				var indexColumn = undefined;
 				var nextIndex;
 				
 				//ищем среди tableColumns, возможно такое имя уже имеется

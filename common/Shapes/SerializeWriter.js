@@ -1,3 +1,35 @@
+/*
+ * (c) Copyright Ascensio System SIA 2010-2016
+ *
+ * This program is a free software product. You can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License (AGPL)
+ * version 3 as published by the Free Software Foundation. In accordance with
+ * Section 7(a) of the GNU AGPL its Section 15 shall be amended to the effect
+ * that Ascensio System SIA expressly excludes the warranty of non-infringement
+ * of any third-party rights.
+ *
+ * This program is distributed WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR  PURPOSE. For
+ * details, see the GNU AGPL at: http://www.gnu.org/licenses/agpl-3.0.html
+ *
+ * You can contact Ascensio System SIA at Lubanas st. 125a-25, Riga, Latvia,
+ * EU, LV-1021.
+ *
+ * The  interactive user interfaces in modified source and object code versions
+ * of the Program must display Appropriate Legal Notices, as required under
+ * Section 5 of the GNU AGPL version 3.
+ *
+ * Pursuant to Section 7(b) of the License you must retain the original Product
+ * logo when distributing the program. Pursuant to Section 7(e) we decline to
+ * grant you any rights under trademark law for use of our trademarks.
+ *
+ * All the Product's GUI elements, including illustrations and icon sets, as
+ * well as technical writing content are licensed under the terms of the
+ * Creative Commons Attribution-ShareAlike 4.0 International. See the License
+ * terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
+ *
+ */
+
 "use strict";
 
 (function(window, undefined){
@@ -2460,6 +2492,7 @@ function CBinaryFileWriter()
         oThis.WriteUChar(g_nodeAttributeEnd);
 
         oThis.WriteRecord2(0, ln.Fill, oThis.WriteUniFill);
+        oThis.WriteRecord2(1, ln.prstDash, oThis.WriteLineDash);
         oThis.WriteRecord1(2, ln.Join, oThis.WriteLineJoin);
         oThis.WriteRecord2(3, ln.headEnd, oThis.WriteLineEnd);
         oThis.WriteRecord2(4, ln.tailEnd, oThis.WriteLineEnd);
@@ -2478,6 +2511,16 @@ function CBinaryFileWriter()
         oThis.WriteUChar(g_nodeAttributeStart);
         oThis._WriteInt1(0, (join.type != null && join.type !== undefined) ? join.type : 0);
         oThis._WriteInt2(1, join.limit);
+        oThis.WriteUChar(g_nodeAttributeEnd);
+    }
+
+    this.WriteLineDash = function(dash)
+    {
+        if (dash == null || dash === undefined)
+            return;
+
+        oThis.WriteUChar(g_nodeAttributeStart);
+        oThis._WriteLimit2(0, dash);
         oThis.WriteUChar(g_nodeAttributeEnd);
     }
 
@@ -2855,16 +2898,21 @@ function CBinaryFileWriter()
 
         image.spPr.WriteXfrm = image.spPr.xfrm;
 
+        var bSetGeometry = false;
         if (image.spPr.geometry === undefined || image.spPr.geometry == null)
         {
             // powerpoint!
-            image.spPr.geometry = AscFormat.CreateGeometry("rect");
+            bSetGeometry = true;
+            image.spPr.geometry = AscFormat.ExecuteNoHistory(function(){return AscFormat.CreateGeometry("rect");}, this, []);
         }
 
         var unifill = new AscFormat.CUniFill();
         unifill.fill = image.blipFill
         oThis.WriteRecord1(1, unifill, oThis.WriteUniFill);
         oThis.WriteRecord1(2, image.spPr, oThis.WriteSpPr);
+        if(bSetGeometry){
+            image.spPr.geometry = null;
+        }
         oThis.WriteRecord2(3, image.style, oThis.WriteShapeStyle);
 
         image.spPr.WriteXfrm = null;
@@ -4475,6 +4523,11 @@ function CBinaryFileWriter()
                     this.WriteGroup(grObject, Document, oMapCommentId, oNumIdMap, copyParams, saveParams);
                     break;
                 }
+				case AscDFH.historyitem_type_ChartSpace:
+				{
+					this.BinaryFileWriter.WriteChart(grObject);
+					break;
+				}
             }
             this.BinaryFileWriter.EndRecord();
             this.BinaryFileWriter.EndRecord();
@@ -4504,8 +4557,6 @@ function CBinaryFileWriter()
             _writer.WriteUChar(AscCommon.g_nodeAttributeEnd);
 
             shape.spPr.WriteXfrm = shape.spPr.xfrm;
-
-            shape.spPr.Geometry = shape.spPr.geometry;
 
             var tmpFill = shape.spPr.Fill;
             var isUseTmpFill = false;
@@ -4551,7 +4602,6 @@ function CBinaryFileWriter()
                 _writer.EndRecord();
             }
 
-            delete shape.spPr.Geometry;
             if (isUseTmpFill)
             {
                 shape.spPr.Fill = tmpFill;
@@ -4578,12 +4628,6 @@ function CBinaryFileWriter()
 
             image.spPr.WriteXfrm = image.spPr.xfrm;
 
-            image.spPr.Geometry = image.spPr.geometry;
-            if (image.spPr.Geometry === undefined || image.spPr.Geometry == null)
-            {
-                // powerpoint!
-                image.spPr.Geometry = AscFormat.CreateGeometry("rect");
-            }
 
             var _unifill = null;
             if (image.blipFill instanceof AscFormat.CUniFill)
@@ -4601,7 +4645,6 @@ function CBinaryFileWriter()
             _writer.WriteRecord2(3, image.style, _writer.WriteShapeStyle);
 
             delete image.spPr.WriteXfrm;
-            delete image.spPr.Geometry;
 
             _writer.EndRecord();
         }
@@ -4617,46 +4660,6 @@ function CBinaryFileWriter()
             _writer._WriteUChar2(4, 0);
             _writer._WriteUChar2(5, 0);
             _writer.WriteUChar(g_nodeAttributeEnd);
-        }
-
-        this.WriteImageBySrc = function(memory, src, w, h)
-        {
-            this.arrayStackStarts.push(this.BinaryFileWriter.pos);
-
-            var _writer = this.BinaryFileWriter;
-
-            _writer.StartRecord(0);
-            _writer.StartRecord(1);
-
-            _writer.StartRecord(2);
-            //_writer.WriteRecord1(0, image.nvPicPr, _writer.WriteUniNvPr);
-
-            var spPr = new AscFormat.CSpPr();
-            spPr.WriteXfrm = new AscFormat.CXfrm();
-            spPr.WriteXfrm.offX = 0;
-            spPr.WriteXfrm.offY = 0;
-            spPr.WriteXfrm.extX = w;
-            spPr.WriteXfrm.extY = h;
-
-            spPr.Geometry = AscFormat.CreateGeometry("rect");
-
-            var _unifill = new AscFormat.CUniFill();
-            _unifill.fill = new AscFormat.CBlipFill();
-            _unifill.fill.RasterImageId = src;
-
-            _writer.WriteRecord1(1, _unifill, _writer.WriteUniFill);
-            _writer.WriteRecord1(2, spPr, _writer.WriteSpPr);
-
-            _writer.EndRecord();
-
-            _writer.EndRecord();
-            _writer.EndRecord();
-
-            var oldPos = this.arrayStackStarts[this.arrayStackStarts.length - 1];
-            memory.WriteBuffer(this.BinaryFileWriter.data, oldPos, this.BinaryFileWriter.pos - oldPos);
-            this.BinaryFileWriter.pos = oldPos;
-
-            this.arrayStackStarts.splice(this.arrayStackStarts.length - 1, 1);
         }
 
         this.WriteGroup = function(group, Document, oMapCommentId, oNumIdMap, copyParams, saveParams)

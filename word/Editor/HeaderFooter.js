@@ -1,3 +1,35 @@
+/*
+ * (c) Copyright Ascensio System SIA 2010-2016
+ *
+ * This program is a free software product. You can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License (AGPL)
+ * version 3 as published by the Free Software Foundation. In accordance with
+ * Section 7(a) of the GNU AGPL its Section 15 shall be amended to the effect
+ * that Ascensio System SIA expressly excludes the warranty of non-infringement
+ * of any third-party rights.
+ *
+ * This program is distributed WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR  PURPOSE. For
+ * details, see the GNU AGPL at: http://www.gnu.org/licenses/agpl-3.0.html
+ *
+ * You can contact Ascensio System SIA at Lubanas st. 125a-25, Riga, Latvia,
+ * EU, LV-1021.
+ *
+ * The  interactive user interfaces in modified source and object code versions
+ * of the Program must display Appropriate Legal Notices, as required under
+ * Section 5 of the GNU AGPL version 3.
+ *
+ * Pursuant to Section 7(b) of the License you must retain the original Product
+ * logo when distributing the program. Pursuant to Section 7(e) we decline to
+ * grant you any rights under trademark law for use of our trademarks.
+ *
+ * All the Product's GUI elements, including illustrations and icon sets, as
+ * well as technical writing content are licensed under the terms of the
+ * Creative Commons Attribution-ShareAlike 4.0 International. See the License
+ * terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
+ *
+ */
+
 "use strict";
 
 // Import
@@ -323,13 +355,7 @@ CHeaderFooter.prototype =
 
     Draw : function(nPageIndex, pGraphics)
     {
-        //var OldPage = this.RecalcInfo.CurPage;
-        //
-        //this.Set_Page( nPageIndex );
         this.Content.Draw( nPageIndex, pGraphics );
-        
-        //if ( -1 !== OldPage )
-        //    this.Set_Page( OldPage );
     },
 
     // Пришло сообщение о том, что контент изменился и пересчитался
@@ -874,6 +900,11 @@ CHeaderFooter.prototype =
     Get_AllParagraphs : function(Props, ParaArray)
     {
         return this.Content.Get_AllParagraphs(Props, ParaArray);
+    },
+
+    Get_AllDrawingObjects  : function(arrDrawings)
+    {
+        return this.Content.Get_AllDrawingObjects(arrDrawings);
     },
 
     Get_PrevElementEndInfo : function(CurElement)
@@ -1479,7 +1510,8 @@ CHeaderFooterController.prototype =
         this.private_UpdateDrawingVerticalPositions(HeaderDrawings, PageLimits.Y, PageLimits.YLimit);
         this.private_UpdateDrawingVerticalPositions(FooterDrawings, PageLimits.Y, PageLimits.YLimit);
 
-        this.LogicDocument.DrawingObjects.mergeDrawings(PageIndex, HeaderDrawings, HeaderTables, FooterDrawings, FooterTables);
+        this.private_MergeFlowObjectsFromHeaderAndFooter(PageIndex, HeaderDrawings, HeaderTables, FooterDrawings, FooterTables);
+
         if ( true === bRecalcHeader || true === bRecalcFooter )
             return true;
         
@@ -1498,31 +1530,72 @@ CHeaderFooterController.prototype =
         }
     },
 
+    private_MergeFlowObjectsFromHeaderAndFooter : function(nPageIndex, arrHeaderDrawings, arrHeaderTables, arrFooterDrawings, arrFooterTables)
+    {
+        var oHeader = this.Pages[nPageIndex].Header;
+        var oFooter = this.Pages[nPageIndex].Footer;
+
+        var nOldHeaderCurPage = null;
+        var nOldFooterCurPage = null;
+
+        if (oHeader)
+        {
+            oHeader.Set_Page(nPageIndex);
+            nOldHeaderCurPage = oHeader.RecalcInfo.CurPage;
+        }
+
+        if (oFooter)
+        {
+            oFooter.Set_Page(nPageIndex);
+            nOldFooterCurPage = oFooter.RecalcInfo.CurPage;
+        }
+
+        this.LogicDocument.DrawingObjects.mergeDrawings(nPageIndex, arrHeaderDrawings, arrHeaderTables, arrFooterDrawings, arrFooterTables);
+
+        if (null !== nOldHeaderCurPage)
+            oHeader.Set_Page(nOldHeaderCurPage);
+
+        if (null !== nOldFooterCurPage)
+            oFooter.Set_Page(nOldFooterCurPage);
+    },
+
     // Отрисовка колонтитулов на данной странице
     Draw : function(nPageIndex, pGraphics)
     {
+        var oHeader = this.Pages[nPageIndex].Header;
+        var oFooter = this.Pages[nPageIndex].Footer;
 
-        var Header = this.Pages[nPageIndex].Header;
-        var Footer = this.Pages[nPageIndex].Footer;
+        var nOldHeaderCurPage = null;
+        var nOldFooterCurPage = null;
 
-        var OldPageHdr = Header && Header.RecalcInfo.CurPage;
-        var OldPageFtr = Footer && Footer.RecalcInfo.CurPage;
+        if (oHeader)
+        {
+            oHeader.Set_Page(nPageIndex);
+            nOldHeaderCurPage = oHeader.RecalcInfo.CurPage;
+        }
 
-        Header &&  Header.Set_Page(nPageIndex);
-        Footer && Footer.Set_Page(nPageIndex);
-        this.LogicDocument.DrawingObjects.drawBehindDocHdrFtr( nPageIndex, pGraphics );
-        this.LogicDocument.DrawingObjects.drawWrappingObjectsHdrFtr( nPageIndex, pGraphics );
+        if (oFooter)
+        {
+            oFooter.Set_Page(nPageIndex);
+            nOldFooterCurPage = oFooter.RecalcInfo.CurPage;
+        }
 
-        if ( null !== Header )
-            Header.Draw( nPageIndex, pGraphics );
+        this.LogicDocument.DrawingObjects.drawBehindDocHdrFtr(nPageIndex, pGraphics);
+        this.LogicDocument.DrawingObjects.drawWrappingObjectsHdrFtr(nPageIndex, pGraphics);
 
-        if ( null !== Footer )
-            Footer.Draw( nPageIndex, pGraphics );
+        if (oHeader)
+            oHeader.Draw(nPageIndex, pGraphics);
 
-        this.LogicDocument.DrawingObjects.drawBeforeObjectsHdrFtr( nPageIndex, pGraphics );
+        if (oFooter)
+            oFooter.Draw(nPageIndex, pGraphics);
 
-        Header &&  Header.Set_Page(OldPageHdr);
-        Footer && Footer.Set_Page(OldPageFtr);
+        this.LogicDocument.DrawingObjects.drawBeforeObjectsHdrFtr(nPageIndex, pGraphics);
+
+        if (null !== nOldHeaderCurPage)
+            oHeader.Set_Page(nOldHeaderCurPage);
+
+        if (null !== nOldFooterCurPage)
+            oFooter.Set_Page(nOldFooterCurPage);
     },
 
     CheckRange : function(X0, Y0, X1, Y1, _Y0, _Y1, X_lf, X_rf, PageIndex, bMathWrap)

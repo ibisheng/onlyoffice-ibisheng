@@ -1,10 +1,36 @@
-"use strict";
-/**
- * User: Ilja.Kirillov
- * Date: 06.04.2016
- * Time: 14:15
+/*
+ * (c) Copyright Ascensio System SIA 2010-2016
+ *
+ * This program is a free software product. You can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License (AGPL)
+ * version 3 as published by the Free Software Foundation. In accordance with
+ * Section 7(a) of the GNU AGPL its Section 15 shall be amended to the effect
+ * that Ascensio System SIA expressly excludes the warranty of non-infringement
+ * of any third-party rights.
+ *
+ * This program is distributed WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR  PURPOSE. For
+ * details, see the GNU AGPL at: http://www.gnu.org/licenses/agpl-3.0.html
+ *
+ * You can contact Ascensio System SIA at Lubanas st. 125a-25, Riga, Latvia,
+ * EU, LV-1021.
+ *
+ * The  interactive user interfaces in modified source and object code versions
+ * of the Program must display Appropriate Legal Notices, as required under
+ * Section 5 of the GNU AGPL version 3.
+ *
+ * Pursuant to Section 7(b) of the License you must retain the original Product
+ * logo when distributing the program. Pursuant to Section 7(e) we decline to
+ * grant you any rights under trademark law for use of our trademarks.
+ *
+ * All the Product's GUI elements, including illustrations and icon sets, as
+ * well as technical writing content are licensed under the terms of the
+ * Creative Commons Attribution-ShareAlike 4.0 International. See the License
+ * terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
+ *
  */
 
+"use strict";
 (function(window, builder)
 {
     /**
@@ -269,7 +295,7 @@
     function ApiSchemeColor(sColorId)
     {
         var oUniColor = new AscFormat.CUniColor();
-        oUniColor.setColor(new CSchemeColor());
+        oUniColor.setColor(new AscFormat.CSchemeColor());
         switch(sColorId)
         {
             case "accent1": {  oUniColor.color.id  = 0; break;}
@@ -299,7 +325,7 @@
     function ApiPresetColor(sPresetColor)
     {
         var oUniColor = new AscFormat.CUniColor();
-        oUniColor.setColor(new CPrstColor());
+        oUniColor.setColor(new AscFormat.CPrstColor());
         oUniColor.color.id = sPresetColor;
         ApiPresetColor.superclass.constructor.call(this, oUniColor);
     }
@@ -782,7 +808,7 @@
      */
     Api.prototype.CreateSchemeColor = function(sSchemeColorId)
     {
-        return new ApiSchemeColor(SchemeColorId);
+        return new ApiSchemeColor(sSchemeColorId);
     };
 
     /**
@@ -839,9 +865,9 @@
         oUniFill.fill = new AscFormat.CGradFill();
         for(var i = 0; i < aGradientStop.length; ++i)
         {
-            oUniFill.fill.Gs.push(aGradientStop[i].Gs);
+            oUniFill.fill.colors.push(aGradientStop[i].Gs);
         }
-        oUniFill.path = new AscFormat.GradPath();
+        oUniFill.fill.path = new AscFormat.GradPath();
         return new ApiFill(oUniFill);
     };
 
@@ -1184,6 +1210,51 @@
         return new ApiNumbering(oNumbering);
     };
 
+	/**
+	 * Insert an array of elements in the current position of the document.
+     * @param {DocumentElement[]} arrContent - An array of elements to insert.
+     * @returns {boolean} Success?
+     */
+    ApiDocument.prototype.InsertContent = function(arrContent)
+    {
+        var oSelectedContent = new CSelectedContent();
+        for (var nIndex = 0, nCount = arrContent.length; nIndex < nCount; ++nIndex)
+        {
+            var oElement = arrContent[nIndex];
+            if (oElement instanceof ApiParagraph || oElement instanceof ApiTable)
+            {
+                oSelectedContent.Add(new CSelectedElement(oElement.private_GetImpl(), true));
+            }
+        }
+
+        if (this.Document.Is_SelectionUse())
+        {
+            this.Document.Start_SilentMode();
+            this.Document.Remove(1, false, false, false);
+            this.Document.End_SilentMode();
+            this.Document.Selection_Remove(true);
+        }
+
+        var oParagraph = this.Document.Content[this.Document.CurPos.ContentPos];
+        if (!oParagraph || !(oParagraph instanceof Paragraph))
+            return false;
+
+        var oNearestPos = {
+            Paragraph  : oParagraph,
+            ContentPos : oParagraph.Get_ParaContentPos(false, false)
+        };
+
+        oParagraph.Check_NearestPos(oNearestPos);
+
+        if (!this.Document.Can_InsertContent(oSelectedContent, oNearestPos))
+            return false;
+
+        this.Document.Insert_Content(oSelectedContent, oNearestPos);
+        this.Document.Selection_Remove(true);
+        oParagraph.Clear_NearestPosArray();
+        return true;
+    };
+
     //------------------------------------------------------------------------------------------------------------------
     //
     // ApiParagraph
@@ -1318,7 +1389,7 @@
     ApiParagraph.prototype.GetElement = function(nPos)
     {
         // TODO: ParaEnd
-        if (nPos < 0 || nPos >= this.Paragraph.Content.length - 2)
+        if (nPos < 0 || nPos >= this.Paragraph.Content.length - 1)
             return null;
 
         var oElement = this.Paragraph.Content[nPos];
@@ -1333,7 +1404,7 @@
      */
     ApiParagraph.prototype.RemoveElement = function(nPos)
     {
-        if (nPos < 0 || nPos >= this.Paragraph.Content.length - 2)
+        if (nPos < 0 || nPos >= this.Paragraph.Content.length - 1)
             return;
 
         this.Paragraph.Remove_FromContent(nPos, 1);
@@ -3434,7 +3505,14 @@
      */
     ApiDrawing.prototype.SetSize = function(nWidth, nHeight)
     {
-        this.Drawing.setExtent(private_EMU2MM(nWidth), private_EMU2MM(nHeight));
+        var fWidth = private_EMU2MM(nWidth);
+        var fHeight = private_EMU2MM(nHeight);
+        this.Drawing.setExtent(fWidth, fHeight);
+        if(this.Drawing.GraphicObj && this.Drawing.GraphicObj.spPr && this.Drawing.GraphicObj.spPr.xfrm)
+        {
+            this.Drawing.GraphicObj.spPr.xfrm.setExtX(fWidth);
+            this.Drawing.GraphicObj.spPr.xfrm.setExtY(fHeight);
+        }
     };
     /**
      * Set the wrapping type of this drawing object.
@@ -3951,6 +4029,7 @@
     ApiDocument.prototype["CreateSection"]           = ApiDocument.prototype.CreateSection;
     ApiDocument.prototype["SetEvenAndOddHdrFtr"]     = ApiDocument.prototype.SetEvenAndOddHdrFtr;
     ApiDocument.prototype["CreateNumbering"]         = ApiDocument.prototype.CreateNumbering;
+    ApiDocument.prototype["InsertContent"]           = ApiDocument.prototype.InsertContent;
 
     ApiParagraph.prototype["GetClassType"]           = ApiParagraph.prototype.GetClassType;
     ApiParagraph.prototype["AddText"]                = ApiParagraph.prototype.AddText;

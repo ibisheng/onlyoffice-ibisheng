@@ -1,9 +1,36 @@
-"use strict";
-/**
- * User: Ilja.Kirillov
- * Date: 03.12.13
- * Time: 18:28
+/*
+ * (c) Copyright Ascensio System SIA 2010-2016
+ *
+ * This program is a free software product. You can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License (AGPL)
+ * version 3 as published by the Free Software Foundation. In accordance with
+ * Section 7(a) of the GNU AGPL its Section 15 shall be amended to the effect
+ * that Ascensio System SIA expressly excludes the warranty of non-infringement
+ * of any third-party rights.
+ *
+ * This program is distributed WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR  PURPOSE. For
+ * details, see the GNU AGPL at: http://www.gnu.org/licenses/agpl-3.0.html
+ *
+ * You can contact Ascensio System SIA at Lubanas st. 125a-25, Riga, Latvia,
+ * EU, LV-1021.
+ *
+ * The  interactive user interfaces in modified source and object code versions
+ * of the Program must display Appropriate Legal Notices, as required under
+ * Section 5 of the GNU AGPL version 3.
+ *
+ * Pursuant to Section 7(b) of the License you must retain the original Product
+ * logo when distributing the program. Pursuant to Section 7(e) we decline to
+ * grant you any rights under trademark law for use of our trademarks.
+ *
+ * All the Product's GUI elements, including illustrations and icon sets, as
+ * well as technical writing content are licensed under the terms of the
+ * Creative Commons Attribution-ShareAlike 4.0 International. See the License
+ * terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
+ *
  */
+
+"use strict";
   
 // Import
 var g_oTableId = AscCommon.g_oTableId;
@@ -78,6 +105,8 @@ function ParaRun(Paragraph, bMathRun)
         this.bEqArray     = false;
     }
     this.StartState = null;
+
+    this.CompositeInput = null;
 
     // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
     g_oTableId.Add( this, this.Id );
@@ -2251,9 +2280,14 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                 case para_Text:
                 case para_FootnoteReference:
                 case para_FootnoteRef:
+                case para_Separator:
+                case para_ContinuationSeparator:
                 {
                     // Отмечаем, что началось слово
                     StartWord = true;
+
+                    if (para_ContinuationSeparator === ItemType)
+                        Item.Update_Width(PRS);
 
                     // При проверке, убирается ли слово, мы должны учитывать ширину предшествующих пробелов.
                     var LetterLen = Item.Width / TEXTWIDTH_DIVIDER;//var LetterLen = Item.Get_Width();
@@ -3098,6 +3132,8 @@ ParaRun.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine, _Cur
             case para_PageNum:
             case para_FootnoteReference:
             case para_FootnoteRef:
+            case para_Separator:
+            case para_ContinuationSeparator:
             {
                 UpdateLineMetricsText = true;
                 break;
@@ -3197,6 +3233,8 @@ ParaRun.prototype.Recalculate_Range_Width = function(PRSC, _CurLine, _CurRange)
             case para_Text:
             case para_FootnoteReference:
             case para_FootnoteRef:
+            case para_Separator:
+            case para_ContinuationSeparator:
             {
                 PRSC.Letters++;
 
@@ -3349,6 +3387,8 @@ ParaRun.prototype.Recalculate_Range_Spaces = function(PRSA, _CurLine, _CurRange,
             case para_Text:
             case para_FootnoteReference:
             case para_FootnoteRef:
+            case para_Separator:
+            case para_ContinuationSeparator:
             {
                 var WidthVisible = 0;
 
@@ -4248,6 +4288,8 @@ ParaRun.prototype.Draw_HighLights = function(PDSH)
             case para_Sym:
             case para_FootnoteReference:
             case para_FootnoteRef:
+            case para_Separator:
+            case para_ContinuationSeparator:
             {
                 if ( para_Drawing === ItemType && !Item.Is_Inline() )
                     break;
@@ -4439,6 +4481,8 @@ ParaRun.prototype.Draw_Elements = function(PDSE)
             case para_Sym:
             case para_FootnoteReference:
             case para_FootnoteRef:
+            case para_Separator:
+            case para_ContinuationSeparator:
             {
                 if (para_Tab === ItemType)
                 {
@@ -4711,7 +4755,14 @@ ParaRun.prototype.Draw_Lines = function(PDSL)
             case para_Sym:
             case para_FootnoteReference:
             case para_FootnoteRef:
+            case para_Separator:
+            case para_ContinuationSeparator:
             {
+                if (para_Text === ItemType && null !== this.CompositeInput && Pos >= this.CompositeInput.Pos && Pos < this.CompositeInput.Pos + this.CompositeInput.Length)
+                {
+                    aUnderline.Add(UnderlineY, UnderlineY, X, X + ItemWidthVisible, LineW, CurColor.r, CurColor.g, CurColor.b, undefined, CurTextPr);
+                }
+
                 if ( para_Drawing != ItemType || Item.Is_Inline() )
                 {
                     if (true === bRemReview)
@@ -10934,6 +10985,10 @@ ParaRun.prototype.Math_UpdateLineMetrics = function(PRS, ParaPr)
             PRS.LineDescent = this.TextDescent - this.YOffset;
     }
 
+};
+ParaRun.prototype.Set_CompositeInput = function(oCompositeInput)
+{
+    this.CompositeInput = oCompositeInput;
 };
 
 function CParaRunStartState(Run)

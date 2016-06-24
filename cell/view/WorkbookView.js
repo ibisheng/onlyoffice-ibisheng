@@ -1,4 +1,36 @@
-﻿"use strict";
+﻿/*
+ * (c) Copyright Ascensio System SIA 2010-2016
+ *
+ * This program is a free software product. You can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License (AGPL)
+ * version 3 as published by the Free Software Foundation. In accordance with
+ * Section 7(a) of the GNU AGPL its Section 15 shall be amended to the effect
+ * that Ascensio System SIA expressly excludes the warranty of non-infringement
+ * of any third-party rights.
+ *
+ * This program is distributed WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR  PURPOSE. For
+ * details, see the GNU AGPL at: http://www.gnu.org/licenses/agpl-3.0.html
+ *
+ * You can contact Ascensio System SIA at Lubanas st. 125a-25, Riga, Latvia,
+ * EU, LV-1021.
+ *
+ * The  interactive user interfaces in modified source and object code versions
+ * of the Program must display Appropriate Legal Notices, as required under
+ * Section 5 of the GNU AGPL version 3.
+ *
+ * Pursuant to Section 7(b) of the License you must retain the original Product
+ * logo when distributing the program. Pursuant to Section 7(e) we decline to
+ * grant you any rights under trademark law for use of our trademarks.
+ *
+ * All the Product's GUI elements, including illustrations and icon sets, as
+ * well as technical writing content are licensed under the terms of the
+ * Creative Commons Attribution-ShareAlike 4.0 International. See the License
+ * terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
+ *
+ */
+
+"use strict";
 
 (/**
  * @param {jQuery} $
@@ -39,8 +71,9 @@
   var c_oAscAsyncActionType = asc.c_oAscAsyncActionType;
   
 
-  function WorkbookCommentsModel(handlers) {
+  function WorkbookCommentsModel(handlers, aComments) {
     this.workbook = {handlers: handlers};
+    this.aComments = aComments;
   }
 
   WorkbookCommentsModel.prototype.getId = function() {
@@ -680,7 +713,7 @@
     });
 
     this.cellCommentator = new AscCommonExcel.CCellCommentator({
-      model: new WorkbookCommentsModel(this.handlers),
+      model: new WorkbookCommentsModel(this.handlers, this.model.aComments),
       collaborativeEditing: this.collaborativeEditing,
       draw: function() {
       },
@@ -690,9 +723,8 @@
         }
       }
     });
-    var commentList = this.cellCommentator.prepareComments(this.model.aComments);
-    if (0 < commentList.length) {
-      this.handlers.trigger("asc_onAddComments", commentList);
+    if (0 < this.model.aComments.length) {
+      this.handlers.trigger("asc_onAddComments", this.model.aComments);
     }
 
     this.clipboard.Api = this.Api;
@@ -2247,14 +2279,13 @@
 
   // Поиск ячейки по ссылке
   WorkbookView.prototype.findCell = function(reference) {
-    var ws = this.getWorksheet(), retRange;
+    var ws = this.getWorksheet();
     // Останавливаем ввод данных в редакторе ввода
     if (ws.getCellEditMode()) {
       this._onStopCellEditing();
     }
 
-
-    return ws.findCell(reference);
+    return ws.findCell(reference, this.controller.settings.isViewerMode);
   };
 
   WorkbookView.prototype.getDefinedNames = function(defNameListId) {
@@ -2303,8 +2334,27 @@
       defNameId = defNameId ? defNameId.nodeId : null;
     }
 
-    ws._isLockedDefNames(editDefinedNamesCallback, defNameId);
+    var callback = function() {
+      ws._isLockedDefNames(editDefinedNamesCallback, defNameId);
+    };
 
+    var tableRange;
+    if(oldName && true === oldName.isTable)
+    {
+      var table = ws.model.autoFilters._getFilterByDisplayName(oldName.Name);
+      if(table)
+      {
+        tableRange = table.Ref;
+      }
+    }
+    if(tableRange)
+    {
+      ws._isLockedCells( tableRange, null, callback );
+    }
+    else
+    {
+      callback();
+    }
   };
 
   WorkbookView.prototype.delDefinedNames = function(oldName) {
@@ -2431,7 +2481,6 @@
       var wsView = this.wsViews[wsKey];
       var wsModel = wsView.model;
       wsView.cellCommentator.prepareCommentsToSave();
-      wsModel.aComments = wsView.cellCommentator.aComments;
       wsModel.aCommentsCoords = wsView.cellCommentator.aCommentCoords;
 
       if (isFirst) {
@@ -2440,7 +2489,7 @@
         this.cellCommentator.overlayCtx = wsView.overlayCtx;
         this.cellCommentator.drawingCtx = wsView.drawingCtx;
         this.cellCommentator.prepareCommentsToSave();
-        wsModel.aComments = wsModel.aComments.concat(this.cellCommentator.aComments);
+        wsModel.aComments = wsModel.aComments.concat(this.model.aComments);
         wsModel.aCommentsCoords = wsModel.aCommentsCoords.concat(this.cellCommentator.aCommentCoords);
       }
     }

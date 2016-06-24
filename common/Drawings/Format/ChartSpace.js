@@ -1,3 +1,35 @@
+/*
+ * (c) Copyright Ascensio System SIA 2010-2016
+ *
+ * This program is a free software product. You can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License (AGPL)
+ * version 3 as published by the Free Software Foundation. In accordance with
+ * Section 7(a) of the GNU AGPL its Section 15 shall be amended to the effect
+ * that Ascensio System SIA expressly excludes the warranty of non-infringement
+ * of any third-party rights.
+ *
+ * This program is distributed WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR  PURPOSE. For
+ * details, see the GNU AGPL at: http://www.gnu.org/licenses/agpl-3.0.html
+ *
+ * You can contact Ascensio System SIA at Lubanas st. 125a-25, Riga, Latvia,
+ * EU, LV-1021.
+ *
+ * The  interactive user interfaces in modified source and object code versions
+ * of the Program must display Appropriate Legal Notices, as required under
+ * Section 5 of the GNU AGPL version 3.
+ *
+ * Pursuant to Section 7(b) of the License you must retain the original Product
+ * logo when distributing the program. Pursuant to Section 7(e) we decline to
+ * grant you any rights under trademark law for use of our trademarks.
+ *
+ * All the Product's GUI elements, including illustrations and icon sets, as
+ * well as technical writing content are licensed under the terms of the
+ * Creative Commons Attribution-ShareAlike 4.0 International. See the License
+ * terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
+ *
+ */
+
 "use strict";
 
 (
@@ -3104,6 +3136,40 @@ CChartSpace.prototype.getNeedReflect = function()
     return this.chartObj.calculatePositionLabelsCatAxFromAngle(this);
 };
 
+CChartSpace.prototype.getValAxisCrossType = function()
+{
+    if(this.chart && this.chart.plotArea && this.chart.plotArea.chart){
+        var chartType = this.chart.plotArea.chart.getObjectType();
+        var valAx = this.chart.plotArea.valAx;
+        if(chartType === AscDFH.historyitem_type_ScatterChart){
+            return null;
+        }
+        else if(chartType !== AscDFH.historyitem_type_BarChart && (chartType !== AscDFH.historyitem_type_PieChart && chartType !== AscDFH.historyitem_type_DoughnutChart)
+            || (chartType === AscDFH.historyitem_type_BarChart && this.chart.plotArea.chart.barDir !== AscFormat.BAR_DIR_BAR)){
+            if(valAx){
+                if(AscFormat.CChartsDrawer.prototype._isSwitchCurrent3DChart(this)){
+                    if(chartType === AscDFH.historyitem_type_AreaChart ){
+                        return AscFormat.isRealNumber(valAx.crossBetween) ? valAx.crossBetween : AscFormat.CROSS_BETWEEN_MID_CAT;
+                    }
+                    else if(chartType === AscDFH.historyitem_type_LineChart){
+                        return AscFormat.isRealNumber(valAx.crossBetween) ? valAx.crossBetween : AscFormat.CROSS_BETWEEN_BETWEEN;
+                    }
+                    else{
+                        return AscFormat.CROSS_BETWEEN_BETWEEN;
+                    }
+                }
+                else{
+                    return AscFormat.isRealNumber(valAx.crossBetween) ? valAx.crossBetween :  (chartType === AscDFH.historyitem_type_AreaChart ? AscFormat.CROSS_BETWEEN_MID_CAT : AscFormat.CROSS_BETWEEN_BETWEEN);
+                }
+            }
+        }
+        else if(chartType === AscDFH.historyitem_type_BarChart && this.chart.plotArea.chart.barDir === AscFormat.BAR_DIR_BAR){
+            return AscFormat.isRealNumber(valAx.crossBetween) && !AscFormat.CChartsDrawer.prototype._isSwitchCurrent3DChart(this) ? valAx.crossBetween : AscFormat.CROSS_BETWEEN_BETWEEN;
+        }
+    }
+    return null;
+};
+    
 CChartSpace.prototype.recalculateAxis = function()
 {
     if(this.chart && this.chart.plotArea && this.chart.plotArea.chart)
@@ -4134,8 +4200,10 @@ CChartSpace.prototype.recalculateAxis = function()
                 {
                     labels_pos = c_oAscTickLabelsPos.TICK_LABEL_POSITION_NONE;
                 }
-                var cross_between = AscFormat.isRealNumber(val_ax.crossBetween) ? val_ax.crossBetween :  (chart_type === AscDFH.historyitem_type_AreaChart ? AscFormat.CROSS_BETWEEN_MID_CAT : AscFormat.CROSS_BETWEEN_BETWEEN) ;
-
+                var cross_between = this.getValAxisCrossType();
+                if(cross_between === null){
+                    cross_between = AscFormat.CROSS_BETWEEN_BETWEEN;
+                }
                 var left_val_ax_labels_align = true;//приленгание подписей оси значений к левому краю.
 
                 var intervals_count = cross_between === AscFormat.CROSS_BETWEEN_MID_CAT ? string_pts.length - 1 : string_pts.length;
@@ -5314,7 +5382,11 @@ CChartSpace.prototype.recalculateAxis = function()
 
                 var cat_ax_orientation = cat_ax.scaling && AscFormat.isRealNumber(cat_ax.scaling.orientation) ?  cat_ax.scaling.orientation : AscFormat.ORIENTATION_MIN_MAX;
                 var labels_pos = val_ax.tickLblPos;
-                var cross_between = AscFormat.isRealNumber(val_ax.crossBetween) ? val_ax.crossBetween : AscFormat.CROSS_BETWEEN_BETWEEN;
+                var cross_between = this.getValAxisCrossType();
+                if(cross_between === null){
+                    cross_between = AscFormat.CROSS_BETWEEN_BETWEEN;
+                }
+
 
                 var bottom_val_ax_labels_align = true;//приленгание подписей оси значений к левому краю.
 
@@ -6122,6 +6194,7 @@ CChartSpace.prototype.checkAxisLabelsTransform = function()
                         dPosY = (oAxisLabels.y + oAxisLabels.extY)*this.chartObj.calcProp.pxToMM;
                         dPosY2 = oAxisLabels.y + oAxisLabels.extY;
                     }
+                    var fBottomLabels = -100;
                     if(!oAxisLabels.bRotated)
                     {
                         for(i = 0; i < oAxisLabels.arrLabels.length; ++i)
@@ -6129,19 +6202,15 @@ CChartSpace.prototype.checkAxisLabelsTransform = function()
                             oLabel = oAxisLabels.arrLabels[i];
                             if(oLabel)
                             {
-                                var oCPosLabelX, oCPosLabelY;
-                                if(!oAxisLabels.bRotated)
-                                {
-                                    oCPosLabelX = oLabel.localTransformText.TransformPointX(oLabel.txBody.content.XLimit/2, 0);
-                                    oNewPos = oProcessor3D.convertAndTurnPoint(oCPosLabelX*this.chartObj.calcProp.pxToMM, dPosY, dZPositionCatAxis);
-                                    oLabel.setPosition2(oNewPos.x/this.chartObj.calcProp.pxToMM + oLabel.localTransformText.tx - oCPosLabelX, oLabel.localTransformText.ty - dPosY2 + oNewPos.y/this.chartObj.calcProp.pxToMM );
+                                var oCPosLabelX;
+                                oCPosLabelX = oLabel.localTransformText.TransformPointX(oLabel.txBody.content.XLimit/2, 0);
+                                oNewPos = oProcessor3D.convertAndTurnPoint(oCPosLabelX*this.chartObj.calcProp.pxToMM, dPosY, dZPositionCatAxis);
+                                oLabel.setPosition2(oNewPos.x/this.chartObj.calcProp.pxToMM + oLabel.localTransformText.tx - oCPosLabelX, oLabel.localTransformText.ty - dPosY2 + oNewPos.y/this.chartObj.calcProp.pxToMM );
+                                var fBottomContent = oLabel.y + oLabel.tx.rich.content.Get_SummaryHeight();
+                                if(fBottomContent > fBottomLabels){
+                                    fBottomLabels = fBottomContent;
                                 }
-                                else
-                                {
-                                    oCPosLabelX = oLabel.localTransformText.TransformPointX(oLabel.widthForTransform, 0);
-                                    oNewPos = oProcessor3D.convertAndTurnPoint(oCPosLabelX*this.chartObj.calcProp.pxToMM, dPosY, dZPositionCatAxis);
-                                    oLabel.setPosition2(oNewPos.x/this.chartObj.calcProp.pxToMM + oLabel.x - oCPosLabelX, oLabel.y - dPosY2 + oNewPos.y/this.chartObj.calcProp.pxToMM);
-                                }
+
                             }
                         }
                     }
@@ -6172,6 +6241,11 @@ CChartSpace.prototype.checkAxisLabelsTransform = function()
                                     global_MatrixTransformer.TranslateAppend(local_text_transform, -wh.w/2, -wh.h/2);
                                     global_MatrixTransformer.RotateRadAppend(local_text_transform, Math.PI/4);
                                     global_MatrixTransformer.TranslateAppend(local_text_transform, xc, yc);
+
+                                    var fBottomContent = y0t + h2;
+                                    if(fBottomContent > fBottomLabels){
+                                        fBottomLabels = fBottomContent;
+                                    }
                                 }
                             }
                         }
@@ -6220,7 +6294,7 @@ CChartSpace.prototype.checkAxisLabelsTransform = function()
                     oAxisLabels.x = Math.min.apply(Math, aXPoints);
                     oAxisLabels.y = Math.min.apply(Math, aYPoints);
                     oAxisLabels.extX = Math.max.apply(Math, aXPoints) - oAxisLabels.x;
-                    oAxisLabels.extY = Math.max.apply(Math, aYPoints) - oAxisLabels.y;
+                    oAxisLabels.extY = Math.max(Math.max.apply(Math, aYPoints), fBottomLabels) - oAxisLabels.y;
                 }
                 oAxisLabels = oValAx.labels;
                 if(oAxisLabels)

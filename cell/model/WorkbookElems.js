@@ -1,4 +1,36 @@
-﻿"use strict";
+﻿/*
+ * (c) Copyright Ascensio System SIA 2010-2016
+ *
+ * This program is a free software product. You can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License (AGPL)
+ * version 3 as published by the Free Software Foundation. In accordance with
+ * Section 7(a) of the GNU AGPL its Section 15 shall be amended to the effect
+ * that Ascensio System SIA expressly excludes the warranty of non-infringement
+ * of any third-party rights.
+ *
+ * This program is distributed WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR  PURPOSE. For
+ * details, see the GNU AGPL at: http://www.gnu.org/licenses/agpl-3.0.html
+ *
+ * You can contact Ascensio System SIA at Lubanas st. 125a-25, Riga, Latvia,
+ * EU, LV-1021.
+ *
+ * The  interactive user interfaces in modified source and object code versions
+ * of the Program must display Appropriate Legal Notices, as required under
+ * Section 5 of the GNU AGPL version 3.
+ *
+ * Pursuant to Section 7(b) of the License you must retain the original Product
+ * logo when distributing the program. Pursuant to Section 7(e) we decline to
+ * grant you any rights under trademark law for use of our trademarks.
+ *
+ * All the Product's GUI elements, including illustrations and icon sets, as
+ * well as technical writing content are licensed under the terms of the
+ * Creative Commons Attribution-ShareAlike 4.0 International. See the License
+ * terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
+ *
+ */
+
+"use strict";
 
 (function(window, undefined){
 
@@ -1060,6 +1092,18 @@ Num.prototype =
             break;
           case 8:
             res = AscCommonExcel.getCurrencyFormatSimple(null, true, true, true);
+            break;
+          case 22:
+            res = AscCommonExcel.getShortDateFormat(null) + " h:mm";
+            break;
+          case 14:
+          case 27:
+          case 28:
+          case 29:
+          case 30:
+          case 31:
+          case 36:
+            res = AscCommonExcel.getShortDateFormat(null);
             break;
           case 37:
             res = AscCommonExcel.getCurrencyFormatSimple(null, false, false, false);
@@ -4993,7 +5037,7 @@ TablePart.prototype.generateTotalsRowLabel = function()
 	}
 	
 	this.TableColumns[0].generateTotalsRowLabel();
-	this.TableColumns[this.TableColumns.length - 1].generateTotalsRowFunction();
+	this.TableColumns[this.TableColumns.length - 1].generateTotalsRowFunction(this);
 };
 
 TablePart.prototype.changeDisplayName = function(newName)
@@ -5007,6 +5051,17 @@ TablePart.prototype.getRangeWithoutHeaderFooter = function()
 	var endRow = this.TotalsRowCount ? this.Ref.r2 - 1 : this.Ref.r2;
 	
 	return Asc.Range(this.Ref.c1, startRow, this.Ref.c2, endRow);
+};
+
+TablePart.prototype.checkTotalRowFormula = function()
+{
+	if(this.TotalsRowCount)
+	{
+		for(var i = 0; i < this.TableColumns.length; i++)
+		{
+			this.TableColumns[i].checkTotalRowFormula(this);
+		}
+	}
 };
 
 /** @constructor */
@@ -5258,11 +5313,12 @@ TableColumn.prototype.generateTotalsRowLabel = function(){
 		this.TotalsRowLabel = "Summary";
 	}
 };
-TableColumn.prototype.generateTotalsRowFunction = function(){
+TableColumn.prototype.generateTotalsRowFunction = function(tablePart){
 	//TODO добавить в перевод
 	if(this.TotalsRowFunction === null)
 	{	
-		this.TotalsRowFunction = Asc.ETotalsRowFunction.totalrowfunctionSum;
+		this.TotalsRowFunction = Asc.ETotalsRowFunction.totalrowfunctionCustom;
+		this.TotalsRowFormula = "SUBTOTAL(109," + tablePart.DisplayName + "[" + this.Name + "])";
 	}
 };
 
@@ -5275,10 +5331,12 @@ TableColumn.prototype.getTotalRowFormula = function(tablePart){
 		{
 			case Asc.ETotalsRowFunction.totalrowfunctionAverage:
 			{
+				res = "SUBTOTAL(101," + tablePart.DisplayName + "[" + this.Name + "])";
 				break;
 			}
 			case Asc.ETotalsRowFunction.totalrowfunctionCount:
 			{
+				res = "SUBTOTAL(103," + tablePart.DisplayName + "[" + this.Name + "])";
 				break;
 			}
 			case Asc.ETotalsRowFunction.totalrowfunctionCountNums:
@@ -5287,14 +5345,17 @@ TableColumn.prototype.getTotalRowFormula = function(tablePart){
 			}
 			case Asc.ETotalsRowFunction.totalrowfunctionCustom:
 			{
+				res = this.TotalsRowFormula;
 				break;
 			}
 			case Asc.ETotalsRowFunction.totalrowfunctionMax:
 			{
+				res = "SUBTOTAL(104," + tablePart.DisplayName + "[" + this.Name + "])";
 				break;
 			}
 			case Asc.ETotalsRowFunction.totalrowfunctionMin:
 			{
+				res = "SUBTOTAL(105," + tablePart.DisplayName + "[" + this.Name + "])";
 				break;
 			}
 			case Asc.ETotalsRowFunction.totalrowfunctionNone:
@@ -5303,25 +5364,60 @@ TableColumn.prototype.getTotalRowFormula = function(tablePart){
 			}
 			case Asc.ETotalsRowFunction.totalrowfunctionStdDev:
 			{
+				res = "SUBTOTAL(107," + tablePart.DisplayName + "[" + this.Name + "])";
 				break;
 			}
 			case Asc.ETotalsRowFunction.totalrowfunctionSum:
 			{
-				res = "=SUBTOTAL(109;" + tablePart.DisplayName + "[" + this.Name + "]";
+				res = "SUBTOTAL(109," + tablePart.DisplayName + "[" + this.Name + "])";
 				break;
 			}
 			case Asc.ETotalsRowFunction.totalrowfunctionVar:
 			{
+				res = "SUBTOTAL(110," + tablePart.DisplayName + "[" + this.Name + "])";
 				break;
 			}
 		}
 	}
-	else if(null !== this.TotalsRowFormula)
-	{
-		res = this.TotalsRowFormula;
-	}
 	
 	return res;
+};
+
+TableColumn.prototype.cleanTotalsData = function(){
+	this.CalculatedColumnFormula = null;
+	this.TotalsRowFormula = null;
+	this.TotalsRowFunction = null;
+	this.TotalsRowLabel = null;
+};
+
+TableColumn.prototype.setTotalsRowFormula = function(val){
+	this.cleanTotalsData();
+	if("=" === val[0])
+	{
+		val = val.substring(1);
+	}
+	
+	this.TotalsRowFormula = val;
+	this.TotalsRowFunction = Asc.ETotalsRowFunction.totalrowfunctionCustom;
+};
+
+TableColumn.prototype.setTotalsRowLabel = function(val){
+	this.cleanTotalsData();
+	
+	this.TotalsRowLabel = val;
+};
+
+TableColumn.prototype.checkTotalRowFormula = function(tablePart){
+	if(null !== this.TotalsRowFunction && Asc.ETotalsRowFunction.totalrowfunctionCustom !== this.TotalsRowFunction)
+	{
+		var totalRowFormula = this.getTotalRowFormula(tablePart);
+		
+		if(null !== totalRowFormula)
+		{
+			this.TotalsRowFormula = totalRowFormula;
+			this.TotalsRowFunction = Asc.ETotalsRowFunction.totalrowfunctionCustom;
+		}
+	}
 };
 
 /** @constructor */
@@ -6452,6 +6548,25 @@ AutoFilterDateElem.prototype.convertDateGroupItemToRange = function(oDateGroupIt
 	this.dateTimeGrouping = oDateGroupItem.DateTimeGrouping;
 };
 
+function getShortDateFormat(opt_cultureInfo) {
+	var cultureInfo = opt_cultureInfo ? opt_cultureInfo : AscCommon.g_oDefaultCultureInfo;
+	var dateElems = [];
+	for (var i = 0; i < cultureInfo.ShortDatePattern.length; ++i) {
+		switch (cultureInfo.ShortDatePattern[i]) {
+			case '0':
+				dateElems.push('d');
+				break;
+			case '1':
+				dateElems.push('m');
+				break;
+			case '2':
+				dateElems.push('yyyy');
+				break;
+		}
+	}
+	return dateElems.join('/');
+}
+
 function getCurrencyFormatSimple(opt_cultureInfo, opt_fraction, opt_currency, opt_red) {
   var cultureInfo = opt_cultureInfo ? opt_cultureInfo : AscCommon.g_oDefaultCultureInfo;
   var numberFormat = opt_fraction ? '#,##0.00' : '#,##0';
@@ -6718,6 +6833,7 @@ function getCurrencyFormat(opt_cultureInfo, opt_fraction, opt_currency, opt_curr
 	window['AscCommonExcel'].DateGroupItem = DateGroupItem;
 	window['AscCommonExcel'].SortCondition = SortCondition;
 	window['AscCommonExcel'].AutoFilterDateElem = AutoFilterDateElem;
+	window['AscCommonExcel'].getShortDateFormat = getShortDateFormat;
   window['AscCommonExcel'].getCurrencyFormatSimple = getCurrencyFormatSimple;
   window['AscCommonExcel'].getCurrencyFormat = getCurrencyFormat;
 	

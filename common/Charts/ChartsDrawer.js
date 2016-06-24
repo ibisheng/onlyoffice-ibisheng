@@ -1,3 +1,35 @@
+/*
+ * (c) Copyright Ascensio System SIA 2010-2016
+ *
+ * This program is a free software product. You can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License (AGPL)
+ * version 3 as published by the Free Software Foundation. In accordance with
+ * Section 7(a) of the GNU AGPL its Section 15 shall be amended to the effect
+ * that Ascensio System SIA expressly excludes the warranty of non-infringement
+ * of any third-party rights.
+ *
+ * This program is distributed WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR  PURPOSE. For
+ * details, see the GNU AGPL at: http://www.gnu.org/licenses/agpl-3.0.html
+ *
+ * You can contact Ascensio System SIA at Lubanas st. 125a-25, Riga, Latvia,
+ * EU, LV-1021.
+ *
+ * The  interactive user interfaces in modified source and object code versions
+ * of the Program must display Appropriate Legal Notices, as required under
+ * Section 5 of the GNU AGPL version 3.
+ *
+ * Pursuant to Section 7(b) of the License you must retain the original Product
+ * logo when distributing the program. Pursuant to Section 7(e) we decline to
+ * grant you any rights under trademark law for use of our trademarks.
+ *
+ * All the Product's GUI elements, including illustrations and icon sets, as
+ * well as technical writing content are licensed under the terms of the
+ * Creative Commons Attribution-ShareAlike 4.0 International. See the License
+ * terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
+ *
+ */
+
 "use strict";
 
 (
@@ -630,6 +662,7 @@ CChartsDrawer.prototype =
 		
 		
 		//catAx
+		var crossBetween = chartSpace.getValAxisCrossType();
 		if(chartSpace.chart.plotArea.catAx /*&& chartSpace.chart.plotArea.catAx.labels*/)
 		{
 			var catAx = chartSpace.chart.plotArea.catAx;
@@ -654,7 +687,7 @@ CChartsDrawer.prototype =
 				
 				if(catAx.scaling.orientation == ORIENTATION_MIN_MAX)
 				{
-					if(valAx.crossBetween == AscFormat.CROSS_BETWEEN_BETWEEN)
+					if(crossBetween == AscFormat.CROSS_BETWEEN_BETWEEN)
 						curBetween = diffPoints / 2;
 					
 					calculateTop  = catAx.yPoints[catAx.yPoints.length - 1].pos - curBetween;
@@ -662,7 +695,7 @@ CChartsDrawer.prototype =
 				}
 				else
 				{
-					if(valAx.crossBetween == AscFormat.CROSS_BETWEEN_BETWEEN)
+					if(crossBetween == AscFormat.CROSS_BETWEEN_BETWEEN)
 						curBetween = diffPoints / 2;
 					
 					calculateTop  = catAx.yPoints[0].pos - curBetween;
@@ -675,7 +708,7 @@ CChartsDrawer.prototype =
 				
 				if(catAx.scaling.orientation == ORIENTATION_MIN_MAX)
 				{
-					if(valAx.crossBetween == AscFormat.CROSS_BETWEEN_BETWEEN)
+					if(crossBetween == AscFormat.CROSS_BETWEEN_BETWEEN)
 						curBetween = diffPoints / 2;
 					
 					calculateLeft  = catAx.xPoints[0].pos - curBetween;
@@ -683,7 +716,7 @@ CChartsDrawer.prototype =
 				}
 				else
 				{
-					if(valAx.crossBetween == AscFormat.CROSS_BETWEEN_BETWEEN)
+					if(crossBetween == AscFormat.CROSS_BETWEEN_BETWEEN)
 						curBetween = diffPoints / 2;
 					
 					calculateLeft  = catAx.xPoints[catAx.xPoints.length - 1].pos - curBetween;
@@ -742,19 +775,20 @@ CChartsDrawer.prototype =
 		
 		var orientationValAx = valAx && valAx.scaling.orientation === ORIENTATION_MIN_MAX ? true : false;
 		var orientationCatAx = catAx && catAx.scaling.orientation === ORIENTATION_MIN_MAX ? true : false;
-
+		
+		var crossBetween = chartSpace.getValAxisCrossType();
 		if(isHBar === 'HBar' && catAx && valAx && catAx.yPoints && valAx.xPoints)
 		{
 			if(orientationCatAx)
 			{
-				if(valAx.crossBetween == AscFormat.CROSS_BETWEEN_BETWEEN)
+				if(crossBetween == AscFormat.CROSS_BETWEEN_BETWEEN)
 					leftDownPointY = catAx.yPoints[0].pos + Math.abs((catAx.interval) / 2);
 				else
 					leftDownPointY = catAx.yPoints[0].pos;
 			}
 			else
 			{
-				if(valAx.crossBetween == AscFormat.CROSS_BETWEEN_BETWEEN)
+				if(crossBetween == AscFormat.CROSS_BETWEEN_BETWEEN)
 					leftDownPointY = catAx.yPoints[catAx.yPoints.length - 1].pos + Math.abs((catAx.interval) / 2);
 				else
 					leftDownPointY = catAx.yPoints[catAx.yPoints.length - 1].pos;
@@ -770,14 +804,14 @@ CChartsDrawer.prototype =
 			
 			if(orientationCatAx)
 			{
-				if(valAx.crossBetween == AscFormat.CROSS_BETWEEN_BETWEEN)
+				if(crossBetween == AscFormat.CROSS_BETWEEN_BETWEEN)
 					rightUpPointY = catAx.yPoints[catAx.yPoints.length - 1].pos - Math.abs((catAx.interval) / 2);
 				else
 					rightUpPointY = catAx.yPoints[catAx.yPoints.length - 1].pos;
 			}
 			else
 			{
-				if(valAx.crossBetween == AscFormat.CROSS_BETWEEN_BETWEEN)
+				if(crossBetween == AscFormat.CROSS_BETWEEN_BETWEEN)
 					rightUpPointY = catAx.yPoints[0].pos - Math.abs((catAx.interval) / 2);
 				else
 					rightUpPointY = catAx.yPoints[0].pos;
@@ -860,7 +894,7 @@ CChartsDrawer.prototype =
 			}
 			else
 			{
-				if(valAx.crossBetween == AscFormat.CROSS_BETWEEN_BETWEEN)
+				if(crossBetween == AscFormat.CROSS_BETWEEN_BETWEEN)
 					leftDownPointX = catAx.xPoints[0].pos - (catAx.interval) / 2;
 				else
 					leftDownPointX = catAx.xPoints[0].pos;
@@ -878,7 +912,7 @@ CChartsDrawer.prototype =
 			}
 			else
 			{
-				if(valAx.crossBetween == AscFormat.CROSS_BETWEEN_BETWEEN)
+				if(crossBetween == AscFormat.CROSS_BETWEEN_BETWEEN)
 					rightUpPointX = catAx.xPoints[catAx.xPoints.length - 1].pos + (catAx.interval) / 2;
 				else
 					rightUpPointX = catAx.xPoints[catAx.xPoints.length - 1].pos;
@@ -1252,14 +1286,22 @@ CChartsDrawer.prototype =
 	{
 		//chartProp.chart.plotArea.valAx.scaling.logBase
 		var axisMin, axisMax, firstDegree, step, arrayValues;
-		
-		if(chartProp.chart.plotArea.valAx && chartProp.chart.plotArea.valAx.scaling.logBase)
-		{
-			arrayValues = this._getLogArray(yMin, yMax, chartProp.chart.plotArea.valAx.scaling.logBase);
-			return arrayValues;
+
+		if(!('Scatter' == this.calcProp.type && isOx)){
+			if(chartProp.chart.plotArea.valAx && chartProp.chart.plotArea.valAx.scaling.logBase)
+			{
+				arrayValues = this._getLogArray(yMin, yMax, chartProp.chart.plotArea.valAx.scaling.logBase);
+				return arrayValues;
+			}
+		}
+		else{
+			if(chartProp.chart.plotArea.catAx && chartProp.chart.plotArea.catAx.scaling && chartProp.chart.plotArea.catAx.scaling.logBase)
+			{
+				arrayValues = this._getLogArray(yMin, yMax, chartProp.chart.plotArea.catAx.scaling.logBase);
+				return arrayValues;
+			}
 		}
 		
-		chartProp.chart.plotArea.valAx && chartProp.chart.plotArea.valAx.scaling ? chartProp.chart.plotArea.valAx.scaling.max : null;
 		//максимальное и минимальное значение(по документации excel)
 		var trueMinMax = this._getTrueMinMax(isOx, yMin, yMax);
 		
@@ -1309,11 +1351,12 @@ CChartsDrawer.prototype =
 		
 		//приводим к первому порядку
 		firstDegree = this._getFirstDegree((Math.abs(axisMax - axisMin)) / 10);
-		
+
+		var axis = 'Scatter' == this.calcProp.type && isOx ? chartProp.chart.plotArea.catAx : chartProp.chart.plotArea.valAx;
 		//находим шаг
-		if(chartProp.chart.plotArea.valAx && chartProp.chart.plotArea.valAx.majorUnit !== null)
+		if(axis && axis.majorUnit !== null)
 		{
-			step = chartProp.chart.plotArea.valAx.majorUnit;
+			step = axis.majorUnit;
 		}
 		else
 		{
@@ -2389,6 +2432,10 @@ CChartsDrawer.prototype =
 				//TODO возможно нужно будет проверку добавить на isHidden
 				counter++;
 			}
+			else if(3 === this.nDimensionCount)
+			{
+				counter++;
+			}
 		}
 		
 		return counter;
@@ -2703,7 +2750,7 @@ drawBarChart.prototype =
 		var overlap        = this.cChartSpace.chart.plotArea.chart.overlap ? this.cChartSpace.chart.plotArea.chart.overlap : defaultOverlap;
 		var numCache       = this.chartProp.series[0].val.numRef ? this.chartProp.series[0].val.numRef.numCache : this.chartProp.series[0].val.numLit;
 		var width          = widthGraph / this.chartProp.ptCount;
-		if(this.cChartSpace.chart.plotArea.catAx.crossAx.crossBetween)
+		if(this.cChartSpace.getValAxisCrossType())
 			width = widthGraph / (numCache.ptCount - 1);
 		
 		var gapWidth = this.cChartSpace.chart.plotArea.chart.gapWidth ? this.cChartSpace.chart.plotArea.chart.gapWidth : 150;
@@ -3121,20 +3168,21 @@ drawBarChart.prototype =
 	_getOptionsForDrawing: function(ser, point, onlyLessNull)
 	{
 		var seria = this.chartProp.series[ser];
-		
-		if(!seria || !this.paths.series[ser] || !this.paths.series[ser][point] || !seria.val.numRef.numCache.pts[point])
+		var pt = seria.val.numRef.numCache.getPtByIndex(point);
+
+		if(!seria || !this.paths.series[ser] || !this.paths.series[ser][point] || !pt)
 			return null;
 		
 		var brush = seria.brush;
 		var pen = seria.pen;
 		
-		if((seria.val.numRef.numCache.pts[point].val > 0 && onlyLessNull === true) || (seria.val.numRef.numCache.pts[point].val < 0 && onlyLessNull === false))
+		if((pt.val > 0 && onlyLessNull === true) || (pt.val < 0 && onlyLessNull === false))
 			return null;
 		
-		if(seria.val.numRef.numCache.pts[point].pen)
-			pen = seria.val.numRef.numCache.pts[point].pen;
-		if(seria.val.numRef.numCache.pts[point].brush)
-			brush = seria.val.numRef.numCache.pts[point].brush;
+		if(pt.pen)
+			pen = pt.pen;
+		if(pt.brush)
+			brush = pt.brush;
 			
 		return {pen: pen, brush: brush}
 	},
@@ -6097,20 +6145,20 @@ drawHBarChart.prototype =
 	_getOptionsForDrawing: function(ser, point, onlyLessNull)
 	{
 		var seria = this.chartProp.series[ser];
-		
-		if(!seria || !this.paths.series[ser] || !this.paths.series[ser][point] || !seria.val.numRef.numCache.pts[point])
+		var pt = seria.val.numRef.numCache.getPtByIndex(point);
+		if(!seria || !this.paths.series[ser] || !this.paths.series[ser][point] || !pt)
 			return null;
 		
 		var brush = seria.brush;
 		var pen = seria.pen;
 		
-		if((seria.val.numRef.numCache.pts[point].val > 0 && onlyLessNull === true) || (seria.val.numRef.numCache.pts[point].val < 0 && onlyLessNull === false))
+		if((pt.val > 0 && onlyLessNull === true) || (pt.val < 0 && onlyLessNull === false))
 			return null;
 		
-		if(seria.val.numRef.numCache.pts[point].pen)
-			pen = seria.val.numRef.numCache.pts[point].pen;
-		if(seria.val.numRef.numCache.pts[point].brush)
-			brush = seria.val.numRef.numCache.pts[point].brush;
+		if(pt.pen)
+			pen = pt.pen;
+		if(pt.brush)
+			brush = pt.brush;
 			
 		return {pen: pen, brush: brush}
 	},
@@ -9184,7 +9232,7 @@ gridChart.prototype =
 		var yCenter = (this.chartProp.chartGutter._top + trueHeight/2) / this.chartProp.pxToMM;
 		var yPoints = this.cChartSpace.chart.plotArea.valAx.yPoints ? this.cChartSpace.chart.plotArea.valAx.yPoints : this.cChartSpace.chart.plotArea.catAx.yPoints;
 		
-		var crossBetween = this.cChartSpace.chart.plotArea.valAx.crossBetween;
+		var crossBetween = this.cChartSpace.getValAxisCrossType();
 		var crossDiff;
 		if(crossBetween == AscFormat.CROSS_BETWEEN_BETWEEN && this.cChartSpace.chart.plotArea.valAx.posY)
 			crossDiff = yPoints[1] ? Math.abs((yPoints[1].pos - yPoints[0].pos) / 2) : Math.abs(yPoints[0].pos - this.cChartSpace.chart.plotArea.valAx.posY);
@@ -9320,7 +9368,7 @@ gridChart.prototype =
 		if(!xPoints)
 			return;
 		
-		var crossBetween = this.cChartSpace.chart.plotArea.valAx.crossBetween;
+		var crossBetween = this.cChartSpace.getValAxisCrossType();
 		var crossDiff;
 		if(crossBetween == AscFormat.CROSS_BETWEEN_BETWEEN && this.cChartSpace.chart.plotArea.valAx.posX && this.chartProp.type != "HBar")
 			crossDiff = xPoints[1] ? Math.abs((xPoints[1].pos - xPoints[0].pos) / 2) : Math.abs(xPoints[0].pos - this.cChartSpace.chart.plotArea.valAx.posX);
@@ -9779,7 +9827,7 @@ catAxisChart.prototype =
 		
 		//сдвиг, если положение оси - между делениями
 		var firstDiff = 0, posYtemp;
-		if(this.cChartSpace.chart.plotArea.valAx.crossBetween == AscFormat.CROSS_BETWEEN_BETWEEN)
+		if(this.cChartSpace.getValAxisCrossType() == AscFormat.CROSS_BETWEEN_BETWEEN)
 			firstDiff = yPoints[1] ? Math.abs(yPoints[1].pos - yPoints[0].pos) : Math.abs(yPoints[0].pos - this.cChartSpace.chart.plotArea.valAx.posY) * 2;
 			
 		var tickMarkSkip = this.cChartSpace.chart.plotArea.catAx.tickMarkSkip ? this.cChartSpace.chart.plotArea.catAx.tickMarkSkip : 1;
@@ -9843,7 +9891,7 @@ catAxisChart.prototype =
 		var posX, posMinorX, k;
 		
 		var firstDiff = 0, posXtemp;
-		if(this.cChartSpace.chart.plotArea.valAx.crossBetween == AscFormat.CROSS_BETWEEN_BETWEEN && this.chartProp.type != "Scatter")
+		if(this.cChartSpace.getValAxisCrossType() == AscFormat.CROSS_BETWEEN_BETWEEN && this.chartProp.type != "Scatter")
 		{
 			if(xPoints[1])
 				firstDiff = Math.abs(xPoints[1].pos - xPoints[0].pos);
