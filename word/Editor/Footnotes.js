@@ -54,7 +54,9 @@ function CFootnotesController(LogicDocument)
 
 	this.Selection = {
 		Use      : false,
-		Footnotes : [],
+		Start    : null,
+		End      : null,
+		Footnotes : {},
 		Direction : 0
 	};
 
@@ -80,10 +82,6 @@ CFootnotesController.prototype.Init = function()
 {
 	this.SeparatorFootnote = new CFootEndnote(this);
 	this.SeparatorFootnote.Paragraph_Add(new ParaSeparator(), false);
-	this.SeparatorFootnote.Paragraph_Add(new ParaText("1"), false);
-	this.SeparatorFootnote.Paragraph_Add(new ParaText("2"), false);
-	this.SeparatorFootnote.Paragraph_Add(new ParaText("3"), false);
-
 	var oParagraph = this.SeparatorFootnote.Get_ElementByIndex(0);
 	oParagraph.Set_Spacing({After : 0, Line : 1, LineRule : Asc.linerule_Auto}, false);
 };
@@ -275,10 +273,211 @@ CFootnotesController.prototype.Get_PageContentStartPos = function(PageAbs)
 	//TODO: Реализовать
 	return {X : 0, Y : 0, XLimit : 0, YLimit : 0};
 };
+/**
+ * Проверяем попадание в сноски на заданной странице.
+ * @param X
+ * @param Y
+ * @param PageAbs
+ * @returns {boolean}
+ */
+CFootnotesController.prototype.CheckHitInFootnote = function(X, Y, PageAbs)
+{
+	if (true === this.Is_EmptyPage(PageAbs))
+		return false;
 
-//----------------------------------------------------------------------------------------------------------------------
-// Интерфейс CDocumentControllerBase
-//----------------------------------------------------------------------------------------------------------------------
+	var Page = this.Pages[PageAbs];
+	for (var nIndex = 0; nIndex < Page.Elements.length; ++nIndex)
+	{
+		var Footnote = Page.Elements[nIndex];
+		var Bounds   = Footnote.Get_PageBounds(0);
+
+		if (Bounds.Top <= Y)
+			return true;
+	}
+
+
+	return false;
+};
+CFootnotesController.prototype.StartSelection = function(X, Y, PageAbs, MouseEvent)
+{
+	var oResult = this.private_GetFootnoteByXY(X, Y, PageAbs);
+	if (null === oResult)
+	{
+		// BAD
+		this.Selection.Use = false;
+		return;
+	}
+
+	this.Selection.Use   = true;
+	this.Selection.Start = oResult;
+	this.Selection.End   = oResult;
+
+	this.Selection.Start.Footnote.Selection_SetStart(X, Y, 0, MouseEvent);
+
+	this.Selection.Start.Pos = {
+		X          : X,
+		Y          : Y,
+		PageAbs    : PageAbs,
+		MouseEvent : MouseEvent
+	};
+
+	this.Selection.End.Pos = {
+		X          : X,
+		Y          : Y,
+		PageAbs    : PageAbs,
+		MouseEvent : MouseEvent
+	};
+};
+CFootnotesController.prototype.EndSelection = function(X, Y, PageAbs, MouseEvent)
+{
+	var oResult = this.private_GetFootnoteByXY(X, Y, PageAbs);
+	if (null === oResult)
+	{
+		// BAD
+		this.Selection.Use = false;
+		return;
+	}
+
+	this.Selection.End = oResult;
+	this.Selection.End.Pos = {
+		X          : X,
+		Y          : Y,
+		PageAbs    : PageAbs,
+		MouseEvent : MouseEvent
+	};
+
+	var sStartId = this.Selection.Start.Footnote.Get_Id();
+	var sEndId   = this.Selection.End.Footnote.Get_Id();
+
+	// Очищаем старый селект везде кроме начальной сноски
+	for (var sFootnoteId in this.Selection.Footnotes)
+	{
+		if (sFootnoteId !== sStartId)
+			this.Selection.Footnotes[sFootnoteId].Selection_Remove();
+	}
+
+	// Новый селект
+	if (this.Selection.Start.Footnote !== this.Selection.End.Footnote)
+	{
+		this.Selection.Start.Footnote.Selection_SetEnd(X, Y, 0, MouseEvent);
+		this.Selection.End.Footnote.Selection_SetStart(this.Selection.Start.Pos.X, this.Selection.Start.Pos.Y, 0, this.Selection.Start.Pos.MouseEvent);
+		this.Selection.End.Footnote.Selection_SetEnd(X, Y, 0, MouseEvent);
+
+		this.CurFootnote = this.Selection.End.Footnote;
+
+		var oRange = this.private_GetFootnotesRange(this.Selection.Start, this.Selection.End);
+		for (var sFootnoteId in oRange)
+		{
+			if (sFootnoteId !== sStartId && sFootnoteId !== sEndId)
+			{
+				var oFootnote = oRange[sFootnoteId];
+				oFootnote.Select_All();
+			}
+		}
+		this.Selection.Footnotes = oRange;
+	}
+	else
+	{
+		this.Selection.End.Footnote.Selection_SetEnd(X, Y, 0, MouseEvent);
+		this.Selection.Footnotes = {};
+		this.Selection.Footnotes[this.Selection.Start.Footnote.Get_Id()] = this.Selection.Start.Footnote;
+	}
+};
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Private area
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+CFootnotesController.prototype.private_GetFootnoteOnPageByXY = function(X, Y, PageAbs)
+{
+	if (true === this.Is_EmptyPage(PageAbs))
+		return null;
+
+	var Page = this.Pages[PageAbs];
+	for (var nIndex = 0; nIndex < Page.Elements.length; ++nIndex)
+	{
+		var Footnote = Page.Elements[nIndex];
+		var Bounds   = Footnote.Get_PageBounds(0);
+
+		if (Bounds.Top <= Y)
+			return {
+				Footnote : Footnote,
+				Index    : nIndex,
+				Page     : PageAbs
+			};
+	}
+
+	return null;
+};
+CFootnotesController.prototype.private_GetFootnoteByXY = function(X, Y, PageAbs)
+{
+	var oResult = this.private_GetFootnoteOnPageByXY(X, Y, PageAbs);
+	if (null !== oResult)
+		return oResult;
+
+	var nCurPage = PageAbs - 1;
+	while (nCurPage >= 0)
+	{
+		oResult = this.private_GetFootnoteOnPageByXY(MEASUREMENT_MAX_MM_VALUE, MEASUREMENT_MAX_MM_VALUE, nCurPage);
+		if (null !== oResult)
+			return oResult;
+
+		nCurPage--;
+	}
+
+	nCurPage = PageAbs + 1;
+	while (nCurPage < this.Pages.length)
+	{
+		oResult = this.private_GetFootnoteOnPageByXY(-MEASUREMENT_MAX_MM_VALUE, -MEASUREMENT_MAX_MM_VALUE, nCurPage);
+		if (null !== oResult)
+			return oResult;
+
+		nCurPage++;
+	}
+
+	return null;
+};
+CFootnotesController.prototype.private_GetFootnotesRange = function(Start, End)
+{
+	var oResult = [];
+	if (Start.Page > End.Page)
+	{
+		var Temp = Start;
+		Start    = End;
+		End      = Temp;
+	}
+
+	if (Start.Page === End.Page)
+	{
+		if (Start.Index <= End.Index)
+			this.private_GetFootnotesOnPage(Start.Page, Start.Index, End.Index, oResult);
+		else
+			this.private_GetFootnotesOnPage(Start.Page, End.Index, Start.Index, oResult);
+	}
+	else
+	{
+		this.private_GetFootnotesOnPage(Start.Page, Start.Index, -1, oResult);
+
+		for (var CurPage = Start.Page + 1; CurPage <= End.Page - 1; ++CurPage)
+		{
+			this.private_GetFootnotesOnPage(CurPage, -1, -1, oResult);
+		}
+
+		this.private_GetFootnotesOnPage(End.Page, -1, End.Index, oResult);
+	}
+};
+CFootnotesController.prototype.private_GetFootnotesOnPage = function(PageAbs, StartIndex, EndIndex, oFootnotes)
+{
+	var Page = this.Pages[PageAbs];
+	var _StartIndex = -1 === StartIndex ? 0 : StartIndex;
+	var _EndIndex   = -1 === EndIndex ? Page.Elements.length - 1 : EndIndex;
+	for (var nIndex = _StartIndex; nIndex <= _EndIndex; ++nIndex)
+	{
+		var oFootnote = Page.Elements[nIndex];
+		oFootnotes[oFootnote.Get_Id()] = oFootnote;
+	}
+};
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Controller area
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CFootnotesController.prototype.CanTargetUpdate = function()
 {
 	return true;
@@ -839,16 +1038,54 @@ CFootnotesController.prototype.GetDirectTextPr = function()
 };
 CFootnotesController.prototype.RemoveSelection = function(bNoCheckDrawing)
 {
-	// TODO: Доделать селект и курсор
+	if (true === this.Selection.Use)
+	{
+		for (var sId in this.Selection.Footnotes)
+		{
+			this.Selection.Footnotes[sId].Selection_Remove(bNoCheckDrawing);
+		}
+
+		this.Selection.Use = false;
+	}
+
+	this.Selection.Footnotes = {};
+	if (this.CurFootnote)
+		this.Selection.Footnotes[this.CurFootnote.Get_Id()] = this.CurFootnote;
 };
 CFootnotesController.prototype.IsEmptySelection = function(bCheckHidden)
 {
-	// TODO: Доделать селект и курсор
-	return true;
+	if (true !== this.IsSelectionUse())
+		return true;
+
+	var oFootnote = null;
+	for (var sId in this.Selection.Footnotes)
+	{
+		if (null === oFootnote)
+			oFootnote = this.Selection.Footnotes[sId];
+		else if (oFootnote !== this.Selection.Footnotes[sId])
+			return false;
+	}
+
+	if (null === oFootnote)
+		return true;
+
+	return oFootnote.Selection_IsEmpty(bCheckHidden);
 };
 CFootnotesController.prototype.DrawSelectionOnPage = function(PageAbs)
 {
-	// TODO: Доделать селект и курсор
+	if (true !== this.Selection.Use || true === this.Is_EmptyPage(PageAbs))
+		return;
+
+	var Page = this.Pages[PageAbs];
+	for (var nIndex = 0, nCount = Page.Elements.length; nIndex < nCount; ++nIndex)
+	{
+		var oFootnote = Page.Elements[nIndex];
+		if (oFootnote === this.Selection.Footnotes[oFootnote.Get_Id()])
+		{
+			var PageRel = oFootnote.GetRelaitivePageIndex(PageAbs);
+			oFootnote.Selection_Draw_Page(PageRel);
+		}
+	}
 };
 CFootnotesController.prototype.GetSelectionBounds = function()
 {
@@ -933,8 +1170,7 @@ CFootnotesController.prototype.PasteFormatting = function(TextPr, ParaPr)
 };
 CFootnotesController.prototype.IsSelectionUse = function()
 {
-	// TODO: Добавить селект
-	return false;
+	return this.Selection.Use;
 };
 CFootnotesController.prototype.IsTextSelectionUse = function()
 {
@@ -1012,7 +1248,49 @@ CFootnotesController.prototype.UpdateRulersState = function()
 };
 CFootnotesController.prototype.UpdateSelectionState = function()
 {
-	// TODO: Реализовать
+	// TODO: Надо подумать как это вынести в верхнюю функцию
+	if (true === this.Selection.Use)
+	{
+		// TODO: Обработать движения границ таблицы
+		if (false === this.IsEmptySelection())
+		{
+			if (true !== this.LogicDocument.Selection.Start)
+			{
+				this.LogicDocument.Internal_CheckCurPage();
+				this.RecalculateCurPos();
+			}
+
+			this.LogicDocument.private_UpdateTracks(true, false);
+
+			this.DrawingDocument.TargetEnd();
+			this.DrawingDocument.SelectEnabled(true);
+			this.DrawingDocument.SelectShow();
+		}
+		else
+		{
+			if (true !== this.LogicDocument.Selection.Start)
+				this.LogicDocument.Selection_Remove();
+
+			this.LogicDocument.Internal_CheckCurPage();
+			this.RecalculateCurPos();
+			this.LogicDocument.private_UpdateTracks(true, true);
+
+			this.DrawingDocument.SelectEnabled(false);
+			this.DrawingDocument.TargetStart();
+			this.DrawingDocument.TargetShow();
+		}
+	}
+	else
+	{
+		this.LogicDocument.Selection_Remove();
+		this.LogicDocument.Internal_CheckCurPage();
+		this.RecalculateCurPos();
+		this.LogicDocument.private_UpdateTracks(false, false);
+
+		this.DrawingDocument.SelectEnabled(false);
+		this.DrawingDocument.TargetShow();
+	}
+
 };
 CFootnotesController.prototype.GetSelectionState = function()
 {
@@ -1043,7 +1321,7 @@ CFootnotesController.prototype.CanAddHyperlink = function(bCheckInHyperlink)
 CFootnotesController.prototype.IsCursorInHyperlink = function(bCheckEnd)
 {
 	// TODO: Реализовать
-	return false;
+	return null;
 };
 CFootnotesController.prototype.AddComment = function(Comment)
 {

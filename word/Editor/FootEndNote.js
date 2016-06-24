@@ -44,3 +44,10 @@ function CFootEndnote(DocumentController)
 }
 
 AscCommon.extendClass(CFootEndnote, CDocumentContent);
+
+CFootEndnote.prototype.GetRelaitivePageIndex = function(PageAbs)
+{
+	var StartPageAbs = this.Get_StartPage_Absolute();
+	var PagesCount   = this.Get_PagesCount();
+	return Math.max(0, Math.min(PagesCount - 1, PageAbs - StartPageAbs));
+};

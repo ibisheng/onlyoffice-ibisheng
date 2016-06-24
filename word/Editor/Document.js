@@ -118,6 +118,8 @@ var keydownresult_PreventDefault  = 0x0001;
 var keydownresult_PreventKeyPress = 0x0002;
 var keydownresult_PreventAll      = 0xFFFF;
 
+var MEASUREMENT_MAX_MM_VALUE = 1000; // Маскимальное значение в мм, используемое в документе (MS Word) - 55,87 см, или 558,7 мм.
+
 function CDocumentColumnProps()
 {
     this.W     = 0;
@@ -4821,8 +4823,10 @@ CDocument.prototype.Selection_SetStart         = function(X, Y, MouseEvent)
     }
 
     var bCheckHdrFtr = true;
+	var bFootnotes = false;
 
-    if (docpostype_HdrFtr === this.CurPos.Type)
+	var nDocPosType = this.Get_DocPosType();
+    if (docpostype_HdrFtr === nDocPosType)
     {
         bCheckHdrFtr         = false;
         this.Selection.Start = true;
@@ -4836,6 +4840,10 @@ CDocument.prototype.Selection_SetStart         = function(X, Y, MouseEvent)
         this.DrawingDocument.FirePaint();
         this.DrawingDocument.EndTrackTable(null, true);
     }
+	else
+	{
+		bFootnotes = this.Footnotes.CheckHitInFootnote(X, Y, this.CurPage);
+	}
 
     var PageMetrics = this.Get_PageContentStartPos(this.CurPage, this.Pages[this.CurPage].Pos);
 
@@ -4857,6 +4865,17 @@ CDocument.prototype.Selection_SetStart         = function(X, Y, MouseEvent)
         this.DrawingDocument.FirePaint();
         this.DrawingDocument.EndTrackTable(null, true);
     }
+	else if (true !== bFlowTable && nInDrawing < 0 && true === bFootnotes)
+	{
+        if (docpostype_Footnotes !== this.Get_DocPosType())
+            this.Selection_Remove();
+
+        this.Selection.Start = true;
+        this.Selection.Use   = true;
+
+		this.Set_DocPosType(docpostype_Footnotes);
+		this.Footnotes.StartSelection(X, Y, this.CurPage, MouseEvent);
+	}
     else if (nInDrawing === DRAWING_ARRAY_TYPE_BEFORE || nInDrawing === DRAWING_ARRAY_TYPE_INLINE || ( false === bTableBorder && false === bInText && nInDrawing >= 0 ))
     {
         if (docpostype_DrawingObjects != this.CurPos.Type)
@@ -5009,6 +5028,15 @@ CDocument.prototype.Selection_SetEnd = function(X, Y, MouseEvent)
         }
         return;
     }
+	else if (docpostype_Footnotes === this.CurPos.Type)
+	{
+		this.Footnotes.EndSelection(X, Y, this.CurPage, MouseEvent);
+
+		if (AscCommon.g_mouse_event_type_up == MouseEvent.Type)
+			this.Selection.Start = false;
+
+		return;
+	}
 
     // Обрабатываем движение границы у таблиц
     if (true === this.Selection_Is_TableBorderMove())
@@ -6611,6 +6639,11 @@ CDocument.prototype.OnKeyDown = function(e)
     //     this.Paragraph_Add(new ParaContinuationSeparator());
     //     bRetValue = keydownresult_PreventAll;
     // }
+    // else if (116 === e.KeyCode)
+	// {
+		// this.Goto_FootnotesOnPage(0);
+		// bRetValue = keydownresult_PreventAll;
+	// }
     // TEST <--
     else if (e.KeyCode == 121 && true === e.ShiftKey) // Shift + F10 - контекстное меню
     {
