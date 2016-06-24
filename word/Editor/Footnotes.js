@@ -123,7 +123,9 @@ CFootnotesController.prototype.Recalculate = function(nPageIndex, X, XLimit, Y, 
 
 	if (null !== this.SeparatorFootnote)
 	{
+		this.SeparatorFootnote.Prepare_RecalculateObject();
 		this.SeparatorFootnote.Reset(X, CurY, XLimit, 10000);
+		this.SeparatorFootnote.Set_StartPage(nPageIndex);
 		this.SeparatorFootnote.Recalculate_Page(0, true);
 		this.Pages[nPageIndex].SeparatorRecalculateObject = this.SeparatorFootnote.Save_RecalculateObject();
 
@@ -135,6 +137,7 @@ CFootnotesController.prototype.Recalculate = function(nPageIndex, X, XLimit, Y, 
 	{
 		var Footnote = this.Pages[nPageIndex].Elements[nIndex];
 		Footnote.Reset(X, CurY, XLimit, 10000);
+		Footnote.Set_StartPage(nPageIndex);
 
 		var CurPage      = 0;
 		var RecalcResult = recalcresult2_NextPage;
@@ -185,13 +188,13 @@ CFootnotesController.prototype.Draw = function(nPageIndex, pGraphics)
 	if (null !== this.SeparatorFootnote && null !== this.Pages[nPageIndex].SeparatorRecalculateObject)
 	{
 		this.SeparatorFootnote.Load_RecalculateObject(this.Pages[nPageIndex].SeparatorRecalculateObject);
-		this.SeparatorFootnote.Draw(0, pGraphics);
+		this.SeparatorFootnote.Draw(nPageIndex, pGraphics);
 	}
 
 	for (var nIndex = 0; nIndex < this.Pages[nPageIndex].Elements.length; ++nIndex)
 	{
 		var Footnote = this.Pages[nPageIndex].Elements[nIndex];
-		Footnote.Draw(0, pGraphics);
+		Footnote.Draw(nPageIndex, pGraphics);
 	}
 };
 /**
@@ -1381,9 +1384,9 @@ function CFootEndnotePage()
 
 	this.Elements = [];
 
-	this.SeparatorRecalcObject             = null;
-	this.ContinuationSeparatorRecalcObject = null;
-	this.ContinuationNoticeRecalcObject    = null;
+	this.SeparatorRecalculateObject             = null;
+	this.ContinuationSeparatorRecalculateObject = null;
+	this.ContinuationNoticeRecalculateObject    = null;
 }
 CFootEndnotePage.prototype.Reset = function()
 {
@@ -1394,9 +1397,9 @@ CFootEndnotePage.prototype.Reset = function()
 
 	this.Elements = [];
 
-	this.SeparatorRecalcObject             = null;
-	this.ContinuationSeparatorRecalcObject = null;
-	this.ContinuationNoticeRecalcObject    = null;
+	this.SeparatorRecalculateObject             = null;
+	this.ContinuationSeparatorRecalculateObject = null;
+	this.ContinuationNoticeRecalculateObject    = null;
 };
 
 
