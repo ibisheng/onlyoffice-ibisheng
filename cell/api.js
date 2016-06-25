@@ -472,10 +472,6 @@ var editor;
 
       return;
     }
-
-    var result = this.wb.copyToClipboardButton();
-    this.wb.restoreFocus();
-    return result;
   };
 
   spreadsheet_api.prototype.asc_Paste = function() {
@@ -497,10 +493,6 @@ var editor;
 
       return;
     }
-
-    var result = this.wb.pasteFromClipboardButton();
-    this.wb.restoreFocus();
-    return result;
   };
 
   spreadsheet_api.prototype.asc_Cut = function() {
@@ -522,10 +514,6 @@ var editor;
 
       return;
     }
-
-    var result = this.wb.cutToClipboardButton();
-    this.wb.restoreFocus();
-    return result;
   };
 
   spreadsheet_api.prototype.asc_PasteData = function(_format, data1, data2)
@@ -1988,9 +1976,15 @@ var editor;
 
   spreadsheet_api.prototype.asc_IsFocus = function(bIsNaturalFocus) {
     var res = true;
-    if (this.wb) {
+	if(this.wb.cellEditor.isTopLineActive)
+	{
+		res = false;
+	}
+    else if (this.wb) 
+	{
       res = this.wb.getEnableKeyEventsHandler(bIsNaturalFocus);
     }
+	
     return res;
   };
 

@@ -265,7 +265,11 @@
 		_private_onbeforepaste : function(e, isAttackEmulate)
 		{
 			this._console_log("onbeforepaste");
-
+			
+			//TODO условие добавил, чтобы не терялся фокус со строки формул при copy/paste. проверить!
+			if (!this.Api.asc_IsFocus(true))
+				return;
+			
 			//if (isAttackEmulate === true)
 			{
 				this.CommonDiv = this.CommonDiv_Check();
@@ -299,7 +303,11 @@
 		_private_onbeforecopy : function(e, isAttackEmulate)
 		{
 			this._console_log("onbeforecopy");
-
+			
+			//TODO условие добавил, чтобы не терялся фокус со строки формул при copy/paste. проверить!
+			if (!this.Api.asc_IsFocus(true))
+				return;
+			
 			//if (isAttackEmulate === true)
 			{
 				this.CommonDiv = this.CommonDiv_Check();
