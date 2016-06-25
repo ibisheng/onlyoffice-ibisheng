@@ -13436,7 +13436,7 @@
 				History.EndTransaction();
 			};
 
-			var changedRange = new asc_Range( arn.c1, arn.r1, arn.c2, gc_nMaxRow0 );
+			var changedRange = new asc_Range( tablePart.Ref.c1, tablePart.Ref.r1, tablePart.Ref.c2, tablePart.Ref.r2 );
 			t._isLockedCells( changedRange, null, callback );
 		};
 		
@@ -13550,7 +13550,7 @@
 				History.EndTransaction();
 			};
 
-			var changedRange = new asc_Range( arn.c1, arn.r1, gc_nMaxCol0, arn.r2 );
+			var changedRange = new asc_Range( tablePart.Ref.c1, tablePart.Ref.r1, tablePart.Ref.c2, tablePart.Ref.r2 );
 			t._isLockedCells( changedRange, null, callback );
 		};
 		
