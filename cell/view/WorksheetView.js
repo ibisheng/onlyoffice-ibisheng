@@ -13840,6 +13840,7 @@
 		//если внутри находится вся активная область(кроме строки заголовков) или если выходит активная область за границу снизу
 		insertRowAbove = !!(((acitveRange.r1 > refTable.r1 && tablePart.HeaderRowCount === null) || (acitveRange.r1 >= refTable.r1 && tablePart.HeaderRowCount !== null)) && (refTableContainsActiveRange || (acitveRange.r2 > refTable.r2 && acitveRange.c1 >= refTable.c1 && acitveRange.c2 <= refTable.c2 && acitveRange.r1 >= refTable.r1)));
 		
+		deleteRow = acitveRange.r1 <= refTable.r1 && acitveRange.r2 >= refTable.r1 && null === tablePart.HeaderRowCount ? false : true;
 		
 		return {insertRowAbove: insertRowAbove, insertRowBelow: insertRowBelow, insertColumnLeft: insertColumnLeft, insertColumnRight: insertColumnRight, deleteRow: deleteRow, deleteColumn: deleteColumn, deleteTable: deleteTable};
 	};
