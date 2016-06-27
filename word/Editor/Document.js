@@ -4867,9 +4867,6 @@ CDocument.prototype.Selection_SetStart         = function(X, Y, MouseEvent)
     }
 	else if (true !== bFlowTable && nInDrawing < 0 && true === bFootnotes)
 	{
-        if (docpostype_Footnotes !== this.Get_DocPosType())
-            this.Selection_Remove();
-
         this.Selection.Start = true;
         this.Selection.Use   = true;
 
@@ -10408,6 +10405,10 @@ CDocument.prototype.Get_IdCounter = function()
 CDocument.prototype.Get_TableId = function()
 {
 	return this.TableId;
+};
+CDocument.prototype.Get_History = function()
+{
+	return this.History;
 };
 CDocument.prototype.Get_CollaborativeEditing = function()
 {

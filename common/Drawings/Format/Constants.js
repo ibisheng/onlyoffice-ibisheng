@@ -2291,6 +2291,8 @@
 	window['AscDFH'].historyitem_type_deg              = 53;
 	window['AscDFH'].historyitem_type_ParaComment      = 54;
 	window['AscDFH'].historyitem_type_Field            = 55;
+	window['AscDFH'].historyitem_type_Footnotes        = 56;
+	window['AscDFH'].historyitem_type_FootEndNote      = 57;
 
 	window['AscDFH'].historyitem_Math_AddItem               = 1; // Добавляем элемент
 	window['AscDFH'].historyitem_Math_RemoveItem            = 2; // Удаляем элемент
@@ -2349,6 +2351,8 @@
 	window['AscDFH'].historyitem_Math_BarLinePos            = 55;
 	window['AscDFH'].historyitem_Math_BoxForcedBreak        = 56;
 	window['AscDFH'].historyitem_Math_DegreeSubSupType      = 57;
+
+	window['AscDFH'].historyitem_Footnotes_AddFootnote = 1;
 
 	window['AscDFH'].historydescription_Cut                                         = 0x0001;
 	window['AscDFH'].historydescription_PasteButtonIE                               = 0x0002;

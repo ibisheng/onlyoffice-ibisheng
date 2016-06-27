@@ -93,6 +93,11 @@ CFootnotesController.prototype.Create_Footnote = function()
 {
 	var NewFootnote                     = new CFootEndnote(this);
 	this.Footnote[NewFootnote.Get_Id()] = NewFootnote;
+
+
+	var oHistory = this.LogicDocument.Get_History();
+	oHistory.Add(this, {Type : AscDFH.historyitem_Footnotes_AddFootnote, Id : NewFootnote.Get_Id()});
+
 	return NewFootnote;
 };
 /**
@@ -261,7 +266,9 @@ CFootnotesController.prototype.Is_EmptyPage = function(nPageIndex)
 
 	return false;
 };
-
+CFootnotesController.prototype.Refresh_RecalcData = function(Data)
+{
+};
 CFootnotesController.prototype.Refresh_RecalcData2 = function(nRelPageIndex)
 {
 	var nAbsPageIndex = nRelPageIndex;
@@ -398,6 +405,85 @@ CFootnotesController.prototype.EndSelection = function(X, Y, PageAbs, MouseEvent
 		this.Selection.Footnotes[this.Selection.Start.Footnote.Get_Id()] = this.Selection.Start.Footnote;
 	}
 };
+CFootnotesController.prototype.Undo = function()
+{
+	var Type = Data.Type;
+
+	switch (Type)
+	{
+		case AscDFH.historyitem_Footnotes_AddFootnote:
+		{
+			this.Footnote[Data.Id] = g_oTableId.Get_ById(Data.Id);
+			break;
+		}
+	}
+};
+CFootnotesController.prototype.Redo = function()
+{
+	var Type = Data.Type;
+
+	switch (Type)
+	{
+		case AscDFH.historyitem_Footnotes_AddFootnote:
+		{
+			delete this.Footnote[Data.Id];
+			break;
+		}
+	}
+};
+CFootnotesController.prototype.Save_Changes = function(Data, Writer)
+{
+	// Сохраняем изменения из тех, которые используются для Undo/Redo в бинарный файл.
+	// Long : тип класса
+	// Long : тип изменений
+
+	Writer.WriteLong(AscDFH.historyitem_type_Footnotes);
+
+	var Type = Data.Type;
+
+	// Пишем тип
+	Writer.WriteLong(Type);
+
+	switch (Type)
+	{
+		case  AscDFH.historyitem_Footnotes_AddFootnote:
+		{
+			// String : Id
+			Writer.WriteString2(Data.Id);
+			break;
+		}
+	}
+
+	return Writer;
+};
+CFootnotesController.prototype.Save_Changes2 = function(Data, Writer)
+{
+};
+CFootnotesController.prototype.Load_Changes = function(Reader, Reader2)
+{
+	// Сохраняем изменения из тех, которые используются для Undo/Redo в бинарный файл.
+	// Long : тип класса
+	// Long : тип изменений
+
+	var ClassType = Reader.GetLong();
+	if (AscDFH.historyitem_type_Footnotes != ClassType)
+		return;
+
+	var Type = Reader.GetLong();
+
+	switch (Type)
+	{
+		case  AscDFH.historyitem_Footnotes_AddFootnote:
+		{
+			// String : Id
+			var Id = Reader.GetString2();
+			this.Footnote[Id] = g_oTableId.Get_ById(Id);
+			break;
+		}
+	}
+
+	return true;
+};
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Private area
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -503,7 +589,6 @@ CFootnotesController.prototype.CanTargetUpdate = function()
 };
 CFootnotesController.prototype.RecalculateCurPos = function()
 {
-	// TODO: Доделать селект и курсор
 	if (null !== this.CurFootnote)
 		return this.CurFootnote.RecalculateCurPos();
 
@@ -511,17 +596,8 @@ CFootnotesController.prototype.RecalculateCurPos = function()
 };
 CFootnotesController.prototype.GetCurPage = function()
 {
-	// TODO: Доделать селект и курсор
-
-	if (true === this.Selection.Use)
-	{
-
-	}
-	else
-	{
-		if (null !== this.CurFootnote)
-			return this.CurFootnote.Get_StartPage_Absolute();
-	}
+	if (null !== this.CurFootnote)
+		return this.CurFootnote.Get_StartPage_Absolute();
 
 	return -1;
 };

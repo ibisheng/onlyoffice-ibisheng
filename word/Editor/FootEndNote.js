@@ -40,7 +40,7 @@
  */
 function CFootEndnote(DocumentController)
 {
-	CFootEndnote.superclass.constructor.call(this, DocumentController, DocumentController.Get_DrawingDocument(), 0, 0, 0, 0, true, false, false);
+	CFootEndnote.superclass.constructor.call(this, DocumentController, DocumentController ? DocumentController.Get_DrawingDocument() : undefined, 0, 0, 0, 0, true, false, false);
 }
 
 AscCommon.extendClass(CFootEndnote, CDocumentContent);
@@ -51,3 +51,17 @@ CFootEndnote.prototype.GetRelaitivePageIndex = function(PageAbs)
 	var PagesCount   = this.Get_PagesCount();
 	return Math.max(0, Math.min(PagesCount - 1, PageAbs - StartPageAbs));
 };
+CFootEndnote.prototype.Write_ToBinary2 = function(Writer)
+{
+	Writer.WriteLong(AscDFH.historyitem_type_FootEndNote);
+	CFootEndnote.superclass.Write_ToBinary2.call(this, Writer);
+};
+CFootEndnote.prototype.Read_FromBinary2 = function(Reader)
+{
+	Reader.GetLong(); // Должен вернуть historyitem_type_DocumentContent
+	CFootEndnote.superclass.Read_FromBinary2.call(this, Reader);
+};
+
+//--------------------------------------------------------export----------------------------------------------------
+window['AscCommonWord'] = window['AscCommonWord'] || {};
+window['AscCommonWord'].CFootEndnote = CFootEndnote;
