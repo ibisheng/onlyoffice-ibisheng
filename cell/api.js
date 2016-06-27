@@ -472,10 +472,6 @@ var editor;
 
       return;
     }
-
-    var result = this.wb.copyToClipboardButton();
-    this.wb.restoreFocus();
-    return result;
   };
 
   spreadsheet_api.prototype.asc_Paste = function() {
@@ -497,10 +493,6 @@ var editor;
 
       return;
     }
-
-    var result = this.wb.pasteFromClipboardButton();
-    this.wb.restoreFocus();
-    return result;
   };
 
   spreadsheet_api.prototype.asc_Cut = function() {
@@ -522,10 +514,11 @@ var editor;
 
       return;
     }
+  };
 
-    var result = this.wb.cutToClipboardButton();
-    this.wb.restoreFocus();
-    return result;
+  spreadsheet_api.prototype.asc_PasteData = function(_format, data1, data2)
+  {
+    this.wb.pasteData(_format, data1, data2);
   };
 
   spreadsheet_api.prototype.asc_CheckCopy = function(_clipboard /* CClipboardData */, _formats)
@@ -533,7 +526,13 @@ var editor;
 	var result = this.wb.checkCopyToClipboard(_clipboard, _formats);
 	return result;
   };
-  
+
+  spreadsheet_api.prototype.asc_SelectionCut = function()
+  {
+    var result = this.wb.selectionCut();
+    return result;
+  };
+
   spreadsheet_api.prototype.asc_bIsEmptyClipboard = function() {
     var result = this.wb.bIsEmptyClipboard();
     this.wb.restoreFocus();
@@ -1045,10 +1044,6 @@ var editor;
       AscCommon.AscBrowser.isSafariMacOs = false;
       AscCommon.PasteElementsId.PASTE_ELEMENT_ID = "wrd_pastebin";
       AscCommon.PasteElementsId.ELEMENT_DISPAY_STYLE = "none";
-    }
-
-    if (AscCommon.AscBrowser.isSafariMacOs) {
-      setInterval(AscCommonExcel.SafariIntervalFocus2, 10);
     }
   };
 
@@ -1981,9 +1976,15 @@ var editor;
 
   spreadsheet_api.prototype.asc_IsFocus = function(bIsNaturalFocus) {
     var res = true;
-    if (this.wb) {
+	if(this.wb.cellEditor.isTopLineActive)
+	{
+		res = false;
+	}
+    else if (this.wb) 
+	{
       res = this.wb.getEnableKeyEventsHandler(bIsNaturalFocus);
     }
+	
     return res;
   };
 

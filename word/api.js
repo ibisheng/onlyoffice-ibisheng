@@ -6632,8 +6632,6 @@ background-repeat: no-repeat;\
 				this.pasteImageMap       = null;
 				this.decrementCounterLongAction();
 				this.pasteCallback();
-				window.GlobalPasteFlag        = false;
-				window.GlobalPasteFlagCounter = 0;
 				this.pasteCallback            = null;
 			}
 			else if (this.isSaveFonts_Images)
@@ -6867,8 +6865,6 @@ background-repeat: no-repeat;\
 		if (undefined !== window["Native"] && undefined !== window["Native"]["GetImageUrl"])
 		{
 			callback();
-			window.GlobalPasteFlag        = false;
-			window.GlobalPasteFlagCounter = 0;
 			return;
 		}
 

@@ -492,8 +492,6 @@
           self._onUpdateCellEditor.apply(self, arguments);
         }, "gotFocus": function(hasFocus) {
           self.controller.setFocus(!hasFocus);
-        }, "copy": function() {
-          self.copyToClipboard.apply(self, arguments);
         }, "paste": function() {
           self.pasteFromClipboard.apply(self, arguments);
         }, "cut": function() {
@@ -744,8 +742,7 @@
     }
 
     this.clipboard.Api = this.Api;
-    this.clipboard.init();
-
+    
     this.initFormulasList();
 
     this.fReplaceCallback = function() {
@@ -1955,104 +1952,30 @@
     }
   };
 
-  WorkbookView.prototype.copyToClipboard = function() {
-    var t = this, ws, v;
-    if (!t.getCellEditMode()) {
-      ws = t.getWorksheet();
-      t.clipboard.copyRange(ws.getSelectedRange(), ws);
-    } else {
-      v = t.cellEditor.copySelection();
-      if (v) {
-        t.clipboard.copyCellValue(v);
-      }
-    }
-  };
-
-  WorkbookView.prototype.copyToClipboardButton = function() {
-    var t = this, ws, v;
-    if (!t.getCellEditMode()) {
-      ws = t.getWorksheet();
-      return t.clipboard.copyRangeButton(ws.getSelectedRange(), ws);
-    } else {
-      v = t.cellEditor.copySelection();
-      if (v) {
-        return t.clipboard.copyCellValueButton(v);
-      } else {
-        return true;
-      }
-    }
-  };
-
-  WorkbookView.prototype.pasteFromClipboard = function() {
-    var t = this;
-    if (!t.getCellEditMode()) {
-      var ws = t.getWorksheet();
-      t.clipboard.pasteRange(ws);
-    } else {
-      t.clipboard.pasteAsText(function(text) {
-        t.cellEditor.pasteText(text);
-      });
-    }
-  };
-
-  WorkbookView.prototype.pasteFromClipboardButton = function() {
-    var t = this;
-    if (!t.getCellEditMode()) {
-      var ws = t.getWorksheet();
-      return t.clipboard.pasteRangeButton(ws);
-    } else {
-      return t.clipboard.pasteAsTextButton(function(text) {
-        t.cellEditor.pasteText(text);
-      });
-    }
-  };
-
-  WorkbookView.prototype.cutToClipboard = function() {
-    var t = this, ws, v;
-    if (!t.getCellEditMode() && !AscBrowser.isSafariMacOs) {
-      ws = t.getWorksheet();
-
-      // Запрещаем копирование диаграмм в iframe
-      //if ( t.Api.isChartEditor && ws.objectRender.selectedGraphicObjectsExists() )
-      //	return;
-
-      t.clipboard.copyRange(ws.getSelectedRange(), ws, true);
-      ws.emptySelection(c_oAscCleanOptions.All);
-    } else if (!AscBrowser.isSafariMacOs) {
-      v = t.cellEditor.cutSelection();
-      if (v) {
-        t.clipboard.copyCellValue(v);
-      }
-    }
-  };
-
   WorkbookView.prototype.bIsEmptyClipboard = function() {
     return this.clipboard.bIsEmptyClipboard(this.getCellEditMode());
-  };
-
-  WorkbookView.prototype.cutToClipboardButton = function() {
-    var t = this, ws, v;
-    if (!t.getCellEditMode()) {
-      ws = t.getWorksheet();
-      var result = t.clipboard.copyRangeButton(ws.getSelectedRange(), ws, true);
-      if (result) {
-        ws.emptySelection(c_oAscCleanOptions.All);
-      }
-      return result;
-    } else {
-      v = t.cellEditor.cutSelection();
-      if (v) {
-        return t.clipboard.copyCellValueButton(v);
-      } else {
-        return true;
-      }
-    }
   };
   
    WorkbookView.prototype.checkCopyToClipboard = function(_clipboard, _formats) {
     var t = this, ws, v;
     ws = t.getWorksheet();
     t.clipboard.checkCopyToClipboard(ws, _clipboard, _formats);
+  };
+
+  WorkbookView.prototype.pasteData = function(_format, data1, data2) {
+    var t = this, ws, v;
+    ws = t.getWorksheet();
+    t.clipboard.pasteData(ws, _format, data1, data2);
+  };
+
+  WorkbookView.prototype.selectionCut = function() {
+    var t = this, ws;
+    if (!t.getCellEditMode()) {
+      ws = t.getWorksheet();
+      ws.emptySelection(c_oAscCleanOptions.All);
+    } else {
+      t.cellEditor.cutSelection();
+    }
   };
 
   WorkbookView.prototype.undo = function() {

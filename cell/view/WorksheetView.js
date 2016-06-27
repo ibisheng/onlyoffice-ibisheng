@@ -9303,7 +9303,7 @@
             var aFilters = val.TableParts;
             var range;
             var tablePartRange;
-            var activeRange = window["Asc"]["editor"].wb.clipboard.activeRange;
+            var activeRange = window["Asc"]["editor"].wb.clipboard.pasteProcessor.activeRange;
             var refInsertBinary = AscCommonExcel.g_oRangeCache.getAscRange( activeRange );
             var diffRow;
             var diffCol;
@@ -9382,20 +9382,20 @@
                 if ( val.onlyImages !== true ) {
                     t._pasteFromLocalBuff( isLargeRange, isLocal, val, bIsUpdate, canChangeColWidth );
                 }
-                api.wb.clipboard._insertImagesFromHTML( t, val );
+                api.wb.clipboard.pasteProcessor._insertImagesFromHTML( t, val );
                 isEndTransaction = true;
             }
             else if ( val.addImagesFromWord && val.addImagesFromWord.length != 0 && !(window["Asc"]["editor"] && window["Asc"]["editor"].isChartEditor) ) {
                 var oObjectsForDownload = AscCommon.GetObjectsForImageDownload( val._aPastedImages );
 
                 //if already load images on server
-                if ( api.wb.clipboard.alreadyLoadImagesOnServer === true ) {
+                if ( api.wb.clipboard.pasteProcessor.alreadyLoadImagesOnServer === true ) {
                     var oImageMap = {};
                     for ( var i = 0, length = oObjectsForDownload.aBuilderImagesByUrl.length; i < length; ++i ) {
                         var url = oObjectsForDownload.aUrls[i];
 
                         //get name from array already load on server urls
-                        var name = api.wb.clipboard.oImages[url];
+                        var name = api.wb.clipboard.pasteProcessor.oImages[url];
                         var aImageElem = oObjectsForDownload.aBuilderImagesByUrl[i];
                         if ( name ) {
                             if ( Array.isArray( aImageElem ) ) {
@@ -9416,7 +9416,7 @@
                     if ( val.onlyImages !== true ) {
                         t._pasteFromLocalBuff( isLargeRange, isLocal, val, bIsUpdate, canChangeColWidth );
                     }
-                    api.wb.clipboard._insertImagesFromBinaryWord( t, val, oImageMap );
+                    api.wb.clipboard.pasteProcessor._insertImagesFromBinaryWord( t, val, oImageMap );
                     isEndTransaction = true;
                 }
                 else {
@@ -9427,7 +9427,7 @@
                         if ( val.onlyImages !== true ) {
                             t._pasteFromLocalBuff( isLargeRange, isLocal, val, bIsUpdate, canChangeColWidth );
                         }
-                        api.wb.clipboard._insertImagesFromBinaryWord( t, val, oImageMap );
+                        api.wb.clipboard.pasteProcessor._insertImagesFromBinaryWord( t, val, oImageMap );
                         //закрываем транзакцию, поскольку в setSelectionInfo она не закроется
                         History.EndTransaction();
                     }, true );
@@ -9449,7 +9449,7 @@
     WorksheetView.prototype._setInfoAfterPaste = function ( values, isCheckSelection ) {
         var t = this;
         var wb = window["Asc"]["editor"].wb;
-        var arn = wb && wb.clipboard && wb.clipboard.activeRange ? wb.clipboard.activeRange : t.activeRange.clone( true );
+        var arn = wb && wb.clipboard && wb.clipboard.pasteProcessor && wb.clipboard.pasteProcessor.activeRange ? wb.clipboard.pasteProcessor.activeRange : t.activeRange.clone( true );
 
         var arrFormula = [];
         var numFor = 0;
@@ -9682,7 +9682,7 @@
         var arrFormula = [];
         var numFor = 0;
 
-        var pasteRange = window["Asc"]["editor"].wb.clipboard.activeRange;
+        var pasteRange = window["Asc"]["editor"].wb.clipboard.pasteProcessor.activeRange;
         var activeCellsPasteFragment = AscCommonExcel.g_oRangeCache.getAscRange( pasteRange );
         var rMax = (activeCellsPasteFragment.r2 - activeCellsPasteFragment.r1) + arn.r1 + 1;
         var cMax = (activeCellsPasteFragment.c2 - activeCellsPasteFragment.c1) + arn.c1 + 1;

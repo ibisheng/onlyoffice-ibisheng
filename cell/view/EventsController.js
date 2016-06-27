@@ -889,15 +889,15 @@
 				case 73: // make italic			Ctrl + i
 				//case 83: // save				Ctrl + s
 				case 85: // make underline		Ctrl + u
-				case 86: // paste				Ctrl + v
-				case 88: // cut					Ctrl + x
+				//case 86: // paste				Ctrl + v
+				//case 88: // cut					Ctrl + x
 				case 89: // redo				Ctrl + y
 				case 90: // undo				Ctrl + z
 					if (isViewerMode || t.isSelectionDialogMode) {stop(); return result;}
 
 				case 65: // select all      Ctrl + a
-				case 67: // copy            Ctrl + c
-					if (t.handlers.trigger("getCellEditMode")) { return true; }
+				//case 67: // copy            Ctrl + c
+					//if (t.handlers.trigger("getCellEditMode")) { return true; }
 
 				case 80: // print           Ctrl + p
 					if (t.handlers.trigger("getCellEditMode")) { stop(); return result; }
@@ -918,8 +918,8 @@
 							85: function () {t.handlers.trigger("setFontAttributes", "u");},
 							80: function () {t.handlers.trigger("print");},
 							//83: function () {t.handlers.trigger("save");},
-							67: function () {t.handlers.trigger("copy");},
-							86: function () {
+							//67: function () {t.handlers.trigger("copy");},
+							/*86: function () {
 								if (!window.GlobalPasteFlag)
 								{
 									if (!AscBrowser.isSafariMacOs)
@@ -942,8 +942,8 @@
 									if (!AscBrowser.isSafariMacOs)
 										stop();
 								}
-							},
-							88: function () {t.handlers.trigger("cut");},
+							},*/
+							//88: function () {t.handlers.trigger("cut");},
 							89: function () {t.handlers.trigger("redo");},
 							90: function () {t.handlers.trigger("undo");}
 						};
