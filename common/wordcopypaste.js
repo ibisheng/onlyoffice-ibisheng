@@ -1277,7 +1277,7 @@ CopyProcessor.prototype =
             if (oDocument.Get_SelectedText)
                 text = oDocument.Get_SelectedText();
 			
-			return {sBase64: sBase64, text: text, drawingUrls: drawingUrls};
+			return {sBase64: "docData;" + sBase64, text: text, drawingUrls: drawingUrls};
 		}
 	},
 	

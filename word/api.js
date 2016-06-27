@@ -1966,7 +1966,14 @@ background-repeat: no-repeat;\
 			if (sBase64 === null)
 			{
 				var oCopyProcessor = new AscCommon.CopyProcessor(this);
-				sBase64            = oCopyProcessor.Start();
+				if(window["NATIVE_EDITOR_ENJINE"])
+				{
+					sBase64 = oCopyProcessor.getSelectedBinary();
+				}
+				else
+				{
+					sBase64 = oCopyProcessor.Start();
+				}
 			}
 
 			_data = sBase64;
