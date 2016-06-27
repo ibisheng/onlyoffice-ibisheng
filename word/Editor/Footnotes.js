@@ -368,7 +368,7 @@ CFootnotesController.prototype.EndSelection = function(X, Y, PageAbs, MouseEvent
 	// Новый селект
 	if (this.Selection.Start.Footnote !== this.Selection.End.Footnote)
 	{
-		if (this.Selection.Start.Page > this.Selection.EndPage || this.Selection.Start.Index > this.Selection.End.Index)
+		if (this.Selection.Start.Page > this.Selection.End.Page || this.Selection.Start.Index > this.Selection.End.Index)
 		{
 			this.Selection.Start.Footnote.Selection_SetEnd(-MEASUREMENT_MAX_MM_VALUE, -MEASUREMENT_MAX_MM_VALUE, 0, MouseEvent);
 			this.Selection.End.Footnote.Selection_SetStart(MEASUREMENT_MAX_MM_VALUE, MEASUREMENT_MAX_MM_VALUE, 0, this.Selection.Start.Pos.MouseEvent);
