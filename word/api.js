@@ -1965,13 +1965,14 @@ background-repeat: no-repeat;\
 		{
 			if (sBase64 === null)
 			{
-				var oCopyProcessor = new AscCommon.CopyProcessor(this);
 				if(window["NATIVE_EDITOR_ENJINE"])
 				{
+					var oCopyProcessor = new AscCommon.CopyProcessor(this, true);
 					sBase64 = oCopyProcessor.getSelectedBinary();
 				}
 				else
 				{
+					var oCopyProcessor = new AscCommon.CopyProcessor(this);
 					sBase64 = oCopyProcessor.Start();
 				}
 			}
