@@ -536,19 +536,75 @@ function CDrawingStream(_writer)
 {
     this.Native = (undefined === _writer) ? window["native"] : _writer;
 
+    this.m_oContext     = null;
+    this.m_dWidthMM     = 0;
+    this.m_dHeightMM    = 0;
+    this.m_lWidthPix    = 0;
+    this.m_lHeightPix   = 0;
+    this.m_dDpiX        = 96.0;
+    this.m_dDpiY        = 96.0;
+    this.m_bIsBreak 	= false;
+
+    this.textBB_l       = 10000;
+    this.textBB_t       = 10000;
+    this.textBB_r       = -10000;
+    this.textBB_b       = -10000;
+
+    this.m_oPen     = new AscCommon.CPen();
+    this.m_oBrush   = new AscCommon.CBrush();
+    this.m_oAutoShapesTrack = null;
+
+    this.m_oFontManager = null;
+    this.m_bIsFillTextCanvasColor = 0;
+
+    this.m_oCoordTransform  = new AscCommon.CMatrixL();
+    this.m_oBaseTransform   = new AscCommon.CMatrixL();
+    this.m_oTransform       = new AscCommon.CMatrixL();
+    this.m_oFullTransform   = new AscCommon.CMatrixL();
+    this.m_oInvertFullTransform = new AscCommon.CMatrixL();
+
+    this.ArrayPoints = null;
+
+    this.m_oCurFont =
+    {
+        Name        : "",
+        FontSize    : 10,
+        Bold        : false,
+        Italic      : false
+    };
+
+    // RFonts
     this.m_oTextPr      = null;
     this.m_oGrFonts     = new AscCommon.CGrRFonts();
     this.m_oLastFont    = new AscCommon.CFontSetup();
 
     this.LastFontOriginInfo = { Name : "", Replace : null };
 
-    this.IsUseFonts2    = false;
-    this.m_oLastFont2   = null;
-
     this.m_bIntegerGrid = true;
 
-    this.m_oPen     = new AscCommon.CPen();
-    this.m_oBrush   = new AscCommon.CBrush();
+    this.ClipManager = new AscCommon.CClipManager();
+    this.ClipManager.BaseObject = this;
+
+    this.TextureFillTransformScaleX = 1;
+    this.TextureFillTransformScaleY = 1;
+    this.IsThumbnail = false;
+
+    this.GrState = new AscCommon.CGrState();
+    this.GrState.Parent = this;
+
+    this.globalAlpha = 1;
+
+    this.TextClipRect = null;
+    this.IsClipContext = false;
+
+    this.ClearMode = false;
+
+    this.IsUseFonts2        = false;
+    this.m_oFontManager2    = null;
+    this.m_oLastFont2       = null;
+
+    this.ClearMode          = false;
+    this.IsRetina           = false;
 }
 
 CDrawingStream.prototype =
@@ -572,6 +628,15 @@ CDrawingStream.prototype =
 
     put_GlobalAlpha : function(enable, alpha)
     {
+        if (false === enable)
+        {
+            this.globalAlpha = 1;
+        }
+        else
+        {
+            this.globalAlpha = alpha;
+        }
+
         this.Native["PD_put_GlobalAlpha"](enable, alpha);
     },
     Start_GlobalAlpha : function()
@@ -613,7 +678,50 @@ CDrawingStream.prototype =
 
     transform : function(sx,shy,shx,sy,tx,ty)
     {
-        this.Native["PD_transform"](sx,shy,shx,sy,tx,ty);
+        var _t = this.m_oTransform;
+        _t.sx    = sx;
+        _t.shx   = shx;
+        _t.shy   = shy;
+        _t.sy    = sy;
+        _t.tx    = tx;
+        _t.ty    = ty;
+
+        this.CalculateFullTransform();
+        if (false === this.m_bIntegerGrid)
+        {
+            var _ft = this.m_oFullTransform;
+            this.Native["PD_transform"](_ft.sx,_ft.shy,_ft.shx,_ft.sy,_ft.tx,_ft.ty);
+        }
+
+        //if (null != this.m_oFontManager)
+        //{
+        //    this.m_oFontManager.SetTextMatrix(_t.sx,_t.shy,_t.shx,_t.sy,_t.tx,_t.ty);
+        //}
+    },
+    CalculateFullTransform : function(isInvertNeed)
+    {
+        var _ft = this.m_oFullTransform;
+        var _t = this.m_oTransform;
+        _ft.sx = _t.sx;
+        _ft.shx = _t.shx;
+        _ft.shy = _t.shy;
+        _ft.sy = _t.sy;
+        _ft.tx = _t.tx;
+        _ft.ty = _t.ty;
+        AscCommon.global_MatrixTransformer.MultiplyAppend(_ft, this.m_oCoordTransform);
+
+        var _it = this.m_oInvertFullTransform;
+        _it.sx = _ft.sx;
+        _it.shx = _ft.shx;
+        _it.shy = _ft.shy;
+        _it.sy = _ft.sy;
+        _it.tx = _ft.tx;
+        _it.ty = _ft.ty;
+
+        if (false !== isInvertNeed)
+        {
+            AscCommon.global_MatrixTransformer.MultiplyAppendInvert(_it, _t);
+        }
     },
     // path commands
     _s : function()
@@ -630,19 +738,86 @@ CDrawingStream.prototype =
     },
     _m : function(x,y)
     {
-        this.Native["PD_PathMoveTo"](x,y);
+        if (false === this.m_bIntegerGrid)
+        {
+            this.Native["PD_PathMoveTo"](x,y);
+
+            if (this.ArrayPoints != null)
+                this.ArrayPoints[this.ArrayPoints.length] = {x: x, y: y};
+        }
+        else
+        {
+            var _x = (this.m_oFullTransform.TransformPointX(x,y)) >> 0;
+            var _y = (this.m_oFullTransform.TransformPointY(x,y)) >> 0;
+            this.Native["PD_PathMoveTo"](_x + 0.5,_y + 0.5);
+        }
     },
     _l : function(x,y)
     {
-        this.Native["PD_PathLineTo"](x,y);
+        if (false === this.m_bIntegerGrid)
+        {
+            this.Native["PD_PathLineTo"](x,y);
+
+            if (this.ArrayPoints != null)
+                this.ArrayPoints[this.ArrayPoints.length] = {x: x, y: y};
+        }
+        else
+        {
+            var _x = (this.m_oFullTransform.TransformPointX(x,y)) >> 0;
+            var _y = (this.m_oFullTransform.TransformPointY(x,y)) >> 0;
+            this.Native["PD_PathLineTo"](_x + 0.5,_y + 0.5);
+        }
+
     },
     _c : function(x1,y1,x2,y2,x3,y3)
     {
-        this.Native["PD_PathCurveTo"](x1,y1,x2,y2,x3,y3);
+        if (false === this.m_bIntegerGrid)
+        {
+            this.Native["PD_PathCurveTo"](x1,y1,x2,y2,x3,y3);
+
+            if (this.ArrayPoints != null)
+            {
+                this.ArrayPoints[this.ArrayPoints.length] = {x: x1, y: y1};
+                this.ArrayPoints[this.ArrayPoints.length] = {x: x2, y: y2};
+                this.ArrayPoints[this.ArrayPoints.length] = {x: x3, y: y3};
+            }
+        }
+        else
+        {
+            var _x1 = (this.m_oFullTransform.TransformPointX(x1,y1)) >> 0;
+            var _y1 = (this.m_oFullTransform.TransformPointY(x1,y1)) >> 0;
+
+            var _x2 = (this.m_oFullTransform.TransformPointX(x2,y2)) >> 0;
+            var _y2 = (this.m_oFullTransform.TransformPointY(x2,y2)) >> 0;
+
+            var _x3 = (this.m_oFullTransform.TransformPointX(x3,y3)) >> 0;
+            var _y3 = (this.m_oFullTransform.TransformPointY(x3,y3)) >> 0;
+
+            this.Native["PD_PathCurveTo"](_x1 + 0.5,_y1 + 0.5,_x2 + 0.5,_y2 + 0.5,_x3 + 0.5,_y3 + 0.5);
+        }
     },
     _c2 : function(x1,y1,x2,y2)
     {
-        this.Native["PD_PathCurveTo2"](x1,y1,x2,y2);
+        if (false === this.m_bIntegerGrid)
+        {
+            this.Native["PD_PathCurveTo2"](x1,y1,x2,y2);
+
+            if (this.ArrayPoints != null)
+            {
+                this.ArrayPoints[this.ArrayPoints.length] = {x: x1, y: y1};
+                this.ArrayPoints[this.ArrayPoints.length] = {x: x2, y: y2};
+            }
+        }
+        else
+        {
+            var _x1 = (this.m_oFullTransform.TransformPointX(x1,y1)) >> 0;
+            var _y1 = (this.m_oFullTransform.TransformPointY(x1,y1)) >> 0;
+
+            var _x2 = (this.m_oFullTransform.TransformPointX(x2,y2)) >> 0;
+            var _y2 = (this.m_oFullTransform.TransformPointY(x2,y2)) >> 0;
+
+            this.Native["PD_PathCurveTo2"](_x1 + 0.5,_y1 + 0.5,_x2 + 0.5,_y2 + 0.5);
+        }
     },
     ds : function()
     {
@@ -669,12 +844,46 @@ CDrawingStream.prototype =
 
     reset : function()
     {
+        this.m_oTransform.Reset();
+        this.CalculateFullTransform(false);
+
+        if (!this.m_bIntegerGrid)
+            this.Native["PD_transform"](this.m_oCoordTransform.sx,0,0,this.m_oCoordTransform.sy,0, 0);
+
+        //this.ClearParams();
+
         this.Native["PD_reset"]();
     },
 
     transform3 : function(m, isNeedInvert)
     {
-        this.Native["PD_transform3"](m.sx,m.shy,m.shx,m.sy,m.tx,m.ty,isNeedInvert);
+        var _t = this.m_oTransform;
+        _t.sx = m.sx;
+        _t.shx = m.shx;
+        _t.shy = m.shy;
+        _t.sy = m.sy;
+        _t.tx = m.tx;
+        _t.ty = m.ty;
+        this.CalculateFullTransform(isNeedInvert);
+
+        if (!this.m_bIntegerGrid)
+        {
+            var _ft = this.m_oFullTransform;
+            this.Native["PD_transform"](_ft.sx,_ft.shy,_ft.shx,_ft.sy,_ft.tx,_ft.ty);
+        }
+        else
+        {
+            this.SetIntegerGrid(false);
+        }
+
+        // теперь трансформ выставляется ТОЛЬКО при загрузке шрифта. Здесь другого быть и не может
+        /*
+         if (null != this.m_oFontManager && false !== isNeedInvert)
+         {
+         this.m_oFontManager.SetTextMatrix(this.m_oTransform.sx,this.m_oTransform.shy,this.m_oTransform.shx,
+         this.m_oTransform.sy,this.m_oTransform.tx,this.m_oTransform.ty);
+         }
+         */
     },
 
     FreeFont : function()

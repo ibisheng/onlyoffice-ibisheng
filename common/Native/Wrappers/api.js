@@ -238,6 +238,148 @@ Asc['asc_docs_api'].prototype.GenerateNativeStyles = function()
     StylesPainter.GenerateStyles(this, this.LoadedObjectDS);
 };
 
+window['AscFormat'].Path.prototype.drawSmart = function(shape_drawer) {
+
+    var _graphics   = shape_drawer.Graphics;
+    var _full_trans = _graphics.m_oFullTransform;
+
+    if (!_graphics || !_full_trans || undefined == _graphics.m_bIntegerGrid || true === shape_drawer.bIsNoSmartAttack)
+        return this.draw(shape_drawer);
+
+    var bIsTransformed = (_full_trans.shx == 0 && _full_trans.shy == 0) ? false : true;
+
+    if (bIsTransformed)
+        return this.draw(shape_drawer);
+
+    var isLine = this.isSmartLine();
+    var isRect = false;
+    if (!isLine)
+        isRect = this.isSmartRect();
+
+    //if (!isLine && !isRect)   // IOS убрать
+    return this.draw(shape_drawer);
+
+    var _old_int = _graphics.m_bIntegerGrid;
+
+    if (false == _old_int)
+        _graphics.SetIntegerGrid(true);
+
+    var dKoefMMToPx = Math.max(_graphics.m_oCoordTransform.sx, 0.001);
+
+    var _ctx = _graphics.m_oContext;
+    var bIsStroke = (shape_drawer.bIsNoStrokeAttack || (this.stroke !== true)) ? false : true;
+    var bIsEven = false;
+    if (bIsStroke)
+    {
+        var _lineWidth = Math.max((shape_drawer.StrokeWidth * dKoefMMToPx + 0.5) >> 0, 1);
+        _ctx.lineWidth = _lineWidth;
+
+        if (_lineWidth & 0x01 == 0x01)
+            bIsEven = true;
+    }
+
+    var bIsDrawLast = false;
+    var path = this.ArrPathCommand;
+    shape_drawer._s();
+
+    if (!isRect)
+    {
+        for(var j = 0, l = path.length; j < l; ++j)
+        {
+            var cmd=path[j];
+            switch(cmd.id)
+            {
+                case AscFormat.moveTo:
+                {
+                    bIsDrawLast = true;
+
+                    var _x = (_full_trans.TransformPointX(cmd.X, cmd.Y)) >> 0;
+                    var _y = (_full_trans.TransformPointY(cmd.X, cmd.Y)) >> 0;
+                    if (bIsEven)
+                    {
+                        _x -= 0.5;
+                        _y -= 0.5;
+                    }
+                    _ctx.moveTo(_x, _y);
+                    break;
+                }
+                case AscFormat.lineTo:
+                {
+                    bIsDrawLast = true;
+
+                    var _x = (_full_trans.TransformPointX(cmd.X, cmd.Y)) >> 0;
+                    var _y = (_full_trans.TransformPointY(cmd.X, cmd.Y)) >> 0;
+                    if (bIsEven)
+                    {
+                        _x -= 0.5;
+                        _y -= 0.5;
+                    }
+                    _ctx.lineTo(_x, _y);
+                    break;
+                }
+                case AscFormat.close:
+                {
+                    _ctx.closePath();
+                    break;
+                }
+            }
+        }
+    }
+    else
+    {
+        var minX = 100000;
+        var minY = 100000;
+        var maxX = -100000;
+        var maxY = -100000;
+        bIsDrawLast = true;
+        for(var j = 0, l = path.length; j < l; ++j)
+        {
+            var cmd=path[j];
+            switch(cmd.id)
+            {
+                case AscFormat.moveTo:
+                case AscFormat.lineTo:
+                {
+                    if (minX > cmd.X)
+                        minX = cmd.X;
+                    if (minY > cmd.Y)
+                        minY = cmd.Y;
+
+                    if (maxX < cmd.X)
+                        maxX = cmd.X;
+                    if (maxY < cmd.Y)
+                        maxY = cmd.Y;
+
+                    break;
+                }
+                default:
+                    break;
+            }
+        }
+
+        var _x1 = (_full_trans.TransformPointX(minX, minY)) >> 0;
+        var _y1 = (_full_trans.TransformPointY(minX, minY)) >> 0;
+        var _x2 = (_full_trans.TransformPointX(maxX, maxY)) >> 0;
+        var _y2 = (_full_trans.TransformPointY(maxX, maxY)) >> 0;
+
+        if (bIsEven)
+            _ctx.rect(_x1 + 0.5, _y1 + 0.5, _x2 - _x1, _y2 - _y1);
+        else
+            _ctx.rect(_x1, _y1, _x2 - _x1, _y2 - _y1);
+    }
+
+    if (bIsDrawLast)
+    {
+        shape_drawer.drawFillStroke(true, this.fill, bIsStroke);
+    }
+
+    shape_drawer._e();
+
+    if (false == _old_int)
+        _graphics.SetIntegerGrid(false);
+};
+
+
 // TEXTFONTFAMILY
 function asc_menu_ReadFontFamily(_params, _cursor)
 {
@@ -5345,79 +5487,104 @@ Asc['asc_docs_api'].prototype["Native_Editor_Initialize_Settings"] = function(_p
 };
 
 /***************************** COPY|PASTE *******************************/
+
 Asc['asc_docs_api'].prototype.Call_Menu_Context_Copy = function()
 {
-    var oCopyProcessor = new AscCommon.CopyProcessor(this, true);
-    var _binary_data = oCopyProcessor.getSelectedBinary();
-
+    var dataBuffer = {};
+    
+    var clipboard = {};
+    clipboard.pushData = function(type, data) {
+        
+        if (AscCommon.c_oAscClipboardDataFormat.Text === type) {
+            
+            dataBuffer.text = data;
+            
+        } else if (AscCommon.c_oAscClipboardDataFormat.Internal === type) {
+            
+            if (null != data.drawingUrls && data.drawingUrls.length > 0) {
+                dataBuffer.drawingUrls = data.drawingUrls[0];
+            }
+            
+            dataBuffer.sBase64 = data.sBase64;
+        }
+    }
+    
+    this.asc_CheckCopy(clipboard, AscCommon.c_oAscClipboardDataFormat.Internal|AscCommon.c_oAscClipboardDataFormat.Text);
+    
     var _stream = global_memory_stream_menu;
     _stream["ClearNoAttack"]();
-
-    if (!_binary_data)
-    {
-        _stream["WriteByte"](255);
-        return _stream;
+    
+    if (dataBuffer.text) {
+        _stream["WriteByte"](0);
+        _stream["WriteString2"](dataBuffer.text);
     }
-
-    // text format
-    _stream["WriteByte"](0);
-    _stream["WriteString2"](_binary_data.text);
-
-    // image
-    if (null != _binary_data.drawingUrls && _binary_data.drawingUrls.length > 0)
-    {
+    
+    if (dataBuffer.drawingUrls) {
         _stream["WriteByte"](1);
-        _stream["WriteStringA"](_binary_data.drawingUrls[0]);
+        _stream["WriteStringA"](dataBuffer.drawingUrls);
     }
-
-    // owner format
-    _stream["WriteByte"](2);
-    _stream["WriteStringA"](_binary_data.sBase64);
-
+    
+    if (dataBuffer.sBase64) {
+        _stream["WriteByte"](2);
+        _stream["WriteStringA"](dataBuffer.sBase64);
+    }
+    
     _stream["WriteByte"](255);
+    
     return _stream;
 };
 Asc['asc_docs_api'].prototype.Call_Menu_Context_Cut = function()
 {
-    var oCopyProcessor = new AscCommon.CopyProcessor(this, true);
-    var _binary_data = oCopyProcessor.getSelectedBinary();
+    var dataBuffer = {};
+    
+    var clipboard = {};
+    clipboard.pushData = function(type, data) {
+        
+        if (AscCommon.c_oAscClipboardDataFormat.Text === type) {
+            
+            dataBuffer.text = data;
+            
+        } else if (AscCommon.c_oAscClipboardDataFormat.Internal === type) {
+            
+            if (null != data.drawingUrls && data.drawingUrls.length > 0) {
+                 dataBuffer.drawingUrls = data.drawingUrls[0];
+            }
 
-    this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
-    this.WordControl.m_oLogicDocument.Remove(1, true, true);
-    this.WordControl.m_oLogicDocument.Document_UpdateSelectionState();
-
+            dataBuffer.sBase64 = data.sBase64;
+        }
+    }
+    
+    this.asc_CheckCopy(clipboard, AscCommon.c_oAscClipboardDataFormat.Internal|AscCommon.c_oAscClipboardDataFormat.Text);
+    
+    this.asc_SelectionCut();
+    
     var _stream = global_memory_stream_menu;
     _stream["ClearNoAttack"]();
-
-    if (!_binary_data)
-    {
-        _stream["WriteByte"](255);
-        return _stream;
+    
+    if (dataBuffer.text) {
+        _stream["WriteByte"](0);
+        _stream["WriteString2"](dataBuffer.text);
     }
-
-    // text format
-    _stream["WriteByte"](0);
-    _stream["WriteString2"](_binary_data.text);
-
-    // image
-    if (null != _binary_data.drawingUrls && _binary_data.drawingUrls.length > 0)
-    {
+   
+    if (dataBuffer.drawingUrls) {
         _stream["WriteByte"](1);
-        _stream["WriteStringA"](_binary_data.drawingUrls[0]);
+        _stream["WriteStringA"](dataBuffer.drawingUrls);
     }
-
-    // owner format
-    _stream["WriteByte"](2);
-    _stream["WriteStringA"](_binary_data.sBase64);
-
+   
+    if (dataBuffer.sBase64) {
+        _stream["WriteByte"](2);
+        _stream["WriteStringA"](dataBuffer.sBase64);
+    }
+    
     _stream["WriteByte"](255);
+    
     return _stream;
 };
 Asc['asc_docs_api'].prototype.Call_Menu_Context_Paste = function(type, param)
 {
     if (0 == type)
     {
-        this.WordControl.m_oLogicDocument.TextBox_Put(param, undefined);
+        this.asc_PasteData(AscCommon.c_oAscClipboardDataFormat.Text, param);
     }
     else if (1 == type)
     {
@@ -5425,8 +5592,7 @@ Asc['asc_docs_api'].prototype.Call_Menu_Context_Paste = function(type, param)
     }
     else if (2 == type)
     {
-        var oPasteProcessor = new AscCommon.PasteProcessor(this, true, true, false);
-        oPasteProcessor.Start(null, null, false, param);
+        this.asc_PasteData(AscCommon.c_oAscClipboardDataFormat.Internal, param);
     }
 };
 Asc['asc_docs_api'].prototype.Call_Menu_Context_Delete = function()
