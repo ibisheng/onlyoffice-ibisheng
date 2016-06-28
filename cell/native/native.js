@@ -7104,7 +7104,7 @@ function offline_apply_event(type,params) {
 
             _stream = global_memory_stream_menu;
             _stream["ClearNoAttack"]();
-            _stream["WriteLong"](isValid);
+            _stream["WriteBool"](isValid);
             _return = _stream;
             break;
         }
