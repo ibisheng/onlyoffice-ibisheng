@@ -867,7 +867,7 @@
 	// Offline mode
 	baseEditorsApi.prototype.asc_isOffline  = function()
 	{
-		return false;
+		return (window.location.protocol.indexOf("file") == 0) ? true : false;
 	};
 	baseEditorsApi.prototype.asc_getUrlType = function(url)
 	{
