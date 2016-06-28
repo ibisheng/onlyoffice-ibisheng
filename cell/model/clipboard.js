@@ -105,19 +105,15 @@
 					{
 						if(_data && _data.base64)
 						{
-							if(_data && _data.base64)
-							{
-								_data = _data.base64;
-							}
-							else
-							{
-								_data = this.copyProcessor.getBinaryForCopy(ws);
-							}
-
-							_data = "xslData;" + _data;
-							_clipboard.pushData(AscCommon.c_oAscClipboardDataFormat.Internal, _data);
+							_data = _data.base64;
 						}
-						
+						else
+						{
+							_data = this.copyProcessor.getBinaryForCopy(ws);
+						}
+
+						_data = "xslData;" + _data;
+						_clipboard.pushData(AscCommon.c_oAscClipboardDataFormat.Internal, _data);
 					}
 				}
 			},
