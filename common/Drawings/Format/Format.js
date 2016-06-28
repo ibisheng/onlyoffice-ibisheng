@@ -11611,6 +11611,7 @@ function CreateAscStroke(ln, _canChangeArrows)
                 break;
             }
         }
+
     }
 
 
@@ -11650,7 +11651,12 @@ function CreateAscStroke(ln, _canChangeArrows)
     {
         ret.asc_putLineendstyle(LineEndType.None);
     }
-
+    if(AscFormat.isRealNumber(ln.prstDash)){
+        ret.prstDash = ln.prstDash;
+    }
+    else{
+        ret.prstDash = Asc.c_oDashType.solid;
+    }
     if (true === _canChangeArrows)
         ret.canChangeArrows = true;
 
@@ -11739,7 +11745,12 @@ function CorrectUniStroke(asc_stroke, unistroke, flag)
         ret.tailEnd.w = 2 - ((_end_size/3) >> 0);
         ret.tailEnd.len = 2 - (_end_size % 3);
     }
-
+    if(AscFormat.isRealNumber(asc_stroke.prstDash)){
+        ret.prstDash = asc_stroke.prstDash;
+    }
+    else{
+        ret.prstDash = Asc.c_oDashType.solid;
+    }
     return ret;
 }
 

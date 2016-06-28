@@ -812,6 +812,20 @@ var c_oAscPrintDefaultSettings = {
     CustomMode  : 3
   };
 
+    var c_oDashType = {
+        dash: 0,
+        dashDot: 1,
+        dot: 2,
+        lgDash: 3,
+        lgDashDot: 4,
+        lgDashDotDot: 5,
+        solid: 6,
+        sysDash: 7,
+        sysDashDot: 8,
+        sysDashDotDot: 9,
+        sysDot: 10
+    };
+
 var c_oAscEncodings = [
     [ 0,    28596, "ISO-8859-6",       "Arabic (ISO 8859-6)" ],
     [ 1,    720,   "DOS-720",          "Arabic (OEM 720)" ],
@@ -1399,7 +1413,21 @@ window['Asc']['c_oAscMaxCellOrCommentLength'] = window['Asc'].c_oAscMaxCellOrCom
   prot['DeleteRows'] = prot.DeleteRows;
   prot['DeleteTable'] = prot.DeleteTable;
 
-  window['AscCommon'] = window['AscCommon'] || {};
+    window['Asc']['c_oDashType'] = window['Asc'].c_oDashType = c_oDashType;
+    prot = c_oDashType;
+    prot['dash'] = prot.dash;
+    prot['dashDot'] = prot.dashDot;
+    prot['dot'] = prot.dot;
+    prot['lgDash'] = prot.lgDash;
+    prot['lgDashDot'] = prot.lgDashDot;
+    prot['lgDashDotDot'] = prot.lgDashDotDot;
+    prot['solid'] = prot.solid;
+    prot['sysDash'] = prot.sysDash;
+    prot['sysDashDot'] = prot.sysDashDot;
+    prot['sysDashDotDot'] = prot.sysDashDotDot;
+    prot['sysDot'] = prot.sysDot;
+
+    window['AscCommon'] = window['AscCommon'] || {};
   window["AscCommon"].g_cCharDelimiter = g_cCharDelimiter;
   window["AscCommon"].bDate1904 = false;
   window["AscCommon"].c_oAscAdvancedOptionsAction = c_oAscAdvancedOptionsAction;

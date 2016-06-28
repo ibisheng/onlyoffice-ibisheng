@@ -655,7 +655,8 @@
 	asc_docs_api.prototype.SetReaderModeOnly = function()
 	{
 		this.isOnlyReaderMode                       = true;
-		this.ImageLoader.bIsAsyncLoadDocumentImages = false;
+		if (this.ImageLoader)
+			this.ImageLoader.bIsAsyncLoadDocumentImages = false;
 	};
 
 	asc_docs_api.prototype.IncreaseReaderFontSize = function()
@@ -7875,6 +7876,9 @@ background-repeat: no-repeat;\
 		this.asc_setDrawCollaborationMarks(this.tmpCoMarksDraw);
 
 		asc_docs_api.superclass._onEndLoadSdk.call(this);
+
+		if (this.isOnlyReaderMode)
+			this.ImageLoader.bIsAsyncLoadDocumentImages = false;
 	};
 
 	asc_docs_api.prototype.asc_Recalculate = function(bIsUpdateInterface)

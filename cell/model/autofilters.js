@@ -553,7 +553,13 @@
 				if(filterObj.filter.TableStyleInfo !== undefined)
 					autoFilter = filterObj.filter.AutoFilter;	
 				if(!autoFilter)
+				{
 					autoFilter = new AscCommonExcel.AutoFilter();
+					autoFilter.Ref = currentFilter.Ref.clone();
+					
+					filterObj.filter.AutoFilter = autoFilter;
+				}
+				
 				var newFilterColumn;
 				if(filterObj.index !== null)
 				{
