@@ -103,16 +103,22 @@
 					//INTERNAL
 					if(AscCommon.c_oAscClipboardDataFormat.Internal & _formats)
 					{
-						if(_data && _data.base64)
+						if(window["NATIVE_EDITOR_ENJINE"])
 						{
-							_data = _data.base64;
+							_data = this.copyProcessor.getBinaryForMobile();
 						}
 						else
 						{
-							_data = this.copyProcessor.getBinaryForCopy(ws);
+							if(_data && _data.base64)
+							{
+								_data = _data.base64;
+							}
+							else
+							{
+								_data = this.copyProcessor.getBinaryForCopy(ws);
+							}
 						}
 
-						_data = "xslData;" + _data;
 						_clipboard.pushData(AscCommon.c_oAscClipboardDataFormat.Internal, _data);
 					}
 				}
@@ -199,7 +205,7 @@
 					else
 					{
 						sBase64 = this.getBinaryForCopy(worksheet);
-						$(container.children[0]).addClass("xslData;" + sBase64);
+						$(container.children[0]).addClass(sBase64);
 					}
 				}	
 				History.TurnOn();
@@ -233,7 +239,50 @@
 				
 				pptx_content_writer.End_UseFullUrl();
 				
-				return sBase64;
+				return "xslData;" + sBase64;
+			},
+			
+			getBinaryForMobile: function () 
+			{
+				var api = window["Asc"]["editor"];
+				if(!api || !api.wb)
+					return false;
+				
+				var worksheetView = api.wb.getWorksheet();
+				var activeRange = worksheetView.getSelectedRange();
+				
+				var objectRender = worksheetView.objectRender;
+				var isIntoShape = objectRender.controller.getTargetDocContent();
+			
+				History.TurnOff();
+				var sBase64 = null;
+				if(!isIntoShape)
+					sBase64 = this.getBinaryForCopy(worksheetView);
+				History.TurnOn();
+				
+				var objectRender = worksheetView.objectRender;
+				var selectedImages = objectRender.getSelectedGraphicObjects();
+
+                var drawingUrls = [];
+                if(selectedImages && selectedImages.length)
+                {
+                    var correctUrl, graphicObj;
+                    for(var i = 0; i < selectedImages.length; i++)
+                    {
+                        graphicObj = selectedImages[i];
+                        if(graphicObj.isImage())  {
+                            if(window["NativeCorrectImageUrlOnCopy"]) {
+                                correctUrl = window["NativeCorrectImageUrlOnCopy"](graphicObj.getImageUrl());
+                                drawingUrls[i] = correctUrl;
+                            }
+                            else {
+                                drawingUrls[i] = graphicObj.getBase64Img();
+                            }
+                        }
+                    }
+                }
+				
+				return {sBase64: sBase64, text: this.lStorageText, drawingUrls: drawingUrls};
 			},
 			
 			//TODO пересмотреть функцию
@@ -521,7 +570,7 @@
 					res.push(span);
 				}
 				return res;
-			},
+			}
 		};
 		
 		function PasteProcessorExcel()
