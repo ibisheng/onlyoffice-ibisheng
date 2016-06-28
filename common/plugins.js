@@ -79,6 +79,7 @@
     {
         this.plugins = [];
         this.current = null;
+        this.currentVariation = 0;
         this.path = "../../../../sdkjs-plugins/";
         this.api = null;
 
@@ -123,6 +124,8 @@
 
             if (this.current == null)
                 return false;
+
+            this.currentVariation = Math.min(variation, this.current.variations.length - 1);
 
             this.startData = (data == null || data == "") ? new CPluginData() : data;
             this.startData.setAttribute("guid", guid)
@@ -171,9 +174,9 @@
             if (this.startData.getAttribute("resize") === true)
                 this.startLongAction();
 
-            if (this.current.variations[0].isVisual && this.startData.getAttribute("resize") !== true)
+            if (this.current.variations[this.currentVariation].isVisual && this.startData.getAttribute("resize") !== true)
             {
-                this.api.asc_fireCallback("asc_onPluginShow", this.current);
+                this.api.asc_fireCallback("asc_onPluginShow", this.current, this.currentVariation);
             }
             else
             {
@@ -181,7 +184,7 @@
                 ifr.name = "plugin_iframe";
                 ifr.id = "plugin_iframe";
                 var _add = this.current.baseUrl == "" ? this.path : this.current.baseUrl;
-                ifr.src = _add + this.current.variations[0].url;
+                ifr.src = _add + this.current.variations[this.currentVariation].url;
                 ifr.style.position = 'absolute';
                 ifr.style.top = '-100px';
                 ifr.style.left = '0px';
@@ -219,7 +222,7 @@
 
         init : function()
         {
-            switch (this.current.variations[0].initDataType)
+            switch (this.current.variations[this.currentVariation].initDataType)
             {
                 case Asc.EPluginDataType.text:
                 {
@@ -460,6 +463,25 @@ function TEST_PLUGINS()
 
                     buttons         : [ { text: "Ok", primary: true },
                         { text: "Cancel", primary: false } ]
+                },
+                {
+                    description : "about",
+                    url         : "chess/index_about.html",
+
+                    icons           : ["chess/icon.png", "chess/icon@2x.png"],
+                    isViewer        : true,
+                    EditorsSupport  : ["word", "cell", "slide"],
+
+                    isVisual        : true,
+                    isModal         : true,
+                    isInsideMode    : false,
+
+                    initDataType    : "none",
+                    initData        : "",
+
+                    isUpdateOleOnResize : false,
+
+                    buttons        : [ { "text": "Ok", "primary": true } ]
                 }
             ]
         },
@@ -669,7 +691,7 @@ function TEST_PLUGINS()
 
                     "isVisual"        : true,
                     "isModal"         : false,
-                    "isInsideMode"    : false,
+                    "isInsideMode"    : true,
 
                     "initDataType"    : "none",
                     "initData"        : "",
