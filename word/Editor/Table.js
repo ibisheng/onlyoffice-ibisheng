@@ -6709,7 +6709,7 @@ CTable.prototype =
         return true;
     },
 
-    Select_All : function()
+    Select_All : function(nDirection)
     {
         this.Selection.Use      = true;
         this.Selection.Start    = false;
@@ -6718,11 +6718,34 @@ CTable.prototype =
 
         this.Selection.Data2 = null;
 
-        this.Selection.StartPos.Pos        = { Row : 0, Cell : 0 };
-        this.Selection.StartPos.PageIndex  = 0;
+        if (nDirection && nDirection < 0)
+        {
+            this.Selection.EndPos.Pos       = {
+                Row  : 0,
+                Cell : 0
+            };
+            this.Selection.EndPos.PageIndex = 0;
 
-        this.Selection.EndPos.Pos          = { Row : this.Content.length - 1, Cell : this.Content[this.Content.length - 1].Get_CellsCount() - 1 };
-        this.Selection.EndPos.PageIndex    = this.Pages.length - 1;
+            this.Selection.StartPos.Pos       = {
+                Row  : this.Content.length - 1,
+                Cell : this.Content[this.Content.length - 1].Get_CellsCount() - 1
+            };
+            this.Selection.StartPos.PageIndex = this.Pages.length - 1;
+        }
+        else
+        {
+            this.Selection.StartPos.Pos       = {
+                Row  : 0,
+                Cell : 0
+            };
+            this.Selection.StartPos.PageIndex = 0;
+
+            this.Selection.EndPos.Pos       = {
+                Row  : this.Content.length - 1,
+                Cell : this.Content[this.Content.length - 1].Get_CellsCount() - 1
+            };
+            this.Selection.EndPos.PageIndex = this.Pages.length - 1;
+        }
 
         this.Internal_Selection_UpdateCells();
     },

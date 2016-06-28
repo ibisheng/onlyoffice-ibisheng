@@ -9911,16 +9911,28 @@ CDocument.prototype.Get_AllParagraphs = function(Props)
 {
 	var ParaArray = [];
 
-	this.SectionsInfo.Get_AllParagraphs(Props, ParaArray);
-
-	var Count = this.Content.length;
-	for (var Index = 0; Index < Count; Index++)
+	if (true === Props.OnlyMainDocument)
 	{
-		var Element = this.Content[Index];
-		Element.Get_AllParagraphs(Props, ParaArray);
+		var Count = this.Content.length;
+		for (var Index = 0; Index < Count; Index++)
+		{
+			var Element = this.Content[Index];
+			Element.Get_AllParagraphs(Props, ParaArray);
+		}
 	}
+	else
+	{
+		this.SectionsInfo.Get_AllParagraphs(Props, ParaArray);
 
-	// TODO: Добавить обработку сносок
+		var Count = this.Content.length;
+		for (var Index = 0; Index < Count; Index++)
+		{
+			var Element = this.Content[Index];
+			Element.Get_AllParagraphs(Props, ParaArray);
+		}
+
+		// TODO: Добавить обработку сносок
+	}
 
 	return ParaArray;
 };
@@ -11088,6 +11100,29 @@ CDocument.prototype.Goto_FootnotesOnPage = function(nPageIndex)
 
 	return true;
 };
+/**
+ * Находим отрезок сносок, заданный между сносками.
+ * @param {?CFootEndnote} oFirstFootnote - если null, то иещм с начала документа
+ * @param {?CFootEndnote} oLastFootnote - если null, то ищем до конца документа
+ */
+CDocument.prototype.Get_FootnotesList = function(oFirstFootnote, oLastFootnote)
+{
+	var oEngine = new CDocumentFootnotesRangeEngine();
+	oEngine.Init(oFirstFootnote, oLastFootnote);
+
+	var arrFootnotes = [];
+
+	var arrParagraphs = this.Get_AllParagraphs({OnlyMainDocument : true, All : true});
+	for (var nIndex = 0, nCount = arrParagraphs.length; nIndex < nCount; ++nIndex)
+	{
+		var oParagraph = arrParagraphs[nIndex];
+
+		if (true === oParagraph.Get_FootnotesList(oEngine))
+			return arrFootnotes;
+	}
+
+	return oEngine.GetRange();
+};
 //----------------------------------------------------------------------------------------------------------------------
 // Функции, которые вызываются из CLogicDocumentController
 //----------------------------------------------------------------------------------------------------------------------
@@ -12109,25 +12144,7 @@ CDocument.prototype.controller_MoveCursorToStartPos = function(AddToSelect)
 
 		for (var Index = StartPos - 1; Index >= EndPos; Index--)
 		{
-			var Item           = this.Content[Index];
-			Item.Selection.Use = true;
-			var ItemType       = Item.GetType();
-
-			if (type_Paragraph === ItemType)
-			{
-				Item.Select_All(-1);
-			}
-			else //if ( type_Table === ItemType )
-			{
-				var Row  = Item.Content.length - 1;
-				var Cell = Item.Content[Row].Get_CellsCount() - 1;
-				var Pos0 = {Row : 0, Cell : 0};
-				var Pos1 = {Row : Row, Cell : Cell};
-
-				Item.Selection.EndPos.Pos   = Pos0;
-				Item.Selection.StartPos.Pos = Pos1;
-				Item.Internal_Selection_UpdateCells();
-			}
+			this.Content[Index].Select_All(-1);
 		}
 
 		this.Content[StartPos].Cursor_MoveToStartPos(true);
@@ -16664,6 +16681,51 @@ CDocumentNumberingInfoEngine.prototype.Get_NumInfo = function()
 {
     return this.NumInfo;
 };
+
+function CDocumentFootnotesRangeEngine()
+{
+	this.m_oFirstFootnote = null; // Если не задана ищем с начала
+	this.m_oLastFootnote  = null; // Если не задана ищем до конца
+
+	this.m_arrFootnotes = [];
+}
+CDocumentFootnotesRangeEngine.prototype.Init = function(oFirstFootnote, oLastFootnote)
+{
+	this.m_oFirstFootnote = oFirstFootnote ? oFirstFootnote : null;
+	this.m_oLastFootnote  = oLastFootnote ? oLastFootnote : null;
+};
+CDocumentFootnotesRangeEngine.prototype.Add = function(oFootnote)
+{
+	if (!oFootnote)
+		return;
+
+	if (this.m_arrFootnotes.length <= 0 && null !== this.m_oFirstFootnote)
+	{
+		if (this.m_oFirstFootnote === oFootnote)
+			this.m_arrFootnotes.push(oFootnote);
+	}
+	else if (this.m_arrFootnotes.length >= 1 && null !== this.m_oLastFootnote)
+	{
+		if (this.m_oLastFootnote !== this.m_arrFootnotes[this.m_arrFootnotes.length - 1])
+			this.m_arrFootnotes.push(oFootnote);
+	}
+	else
+	{
+		this.m_arrFootnotes.push(oFootnote);
+	}
+};
+CDocumentFootnotesRangeEngine.prototype.IsRangeFull = function()
+{
+	if (null !== this.m_oLastFootnote && this.m_arrFootnotes.length >= 1 && this.m_oLastFootnote === this.m_arrFootnotes[this.m_arrFootnotes.length - 1])
+		return true;
+
+	return false;
+};
+CDocumentFootnotesRangeEngine.prototype.GetRange = function()
+{
+	return this.m_arrFootnotes;
+};
+
 
 //-------------------------------------------------------------export---------------------------------------------------
 window['Asc'] = window['Asc'] || {};

@@ -13989,7 +13989,17 @@ Paragraph.prototype.private_CompareBorderSettings = function(Pr1, Pr2)
 
 	return true;
 };
+Paragraph.prototype.Get_FootnotesList = function(oEngine)
+{
+	for (var nIndex = 0, nCount = this.Content.length; nIndex < nCount; ++nIndex)
+	{
+		if (this.Content[nIndex].Get_FootnotesList)
+			this.Content[nIndex].Get_FootnotesList(oEngine);
 
+		if (oEngine.IsRangeFull())
+			return;
+	}
+};
 
 var pararecalc_0_All  = 0;
 var pararecalc_0_None = 1;

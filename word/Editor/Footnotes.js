@@ -53,9 +53,21 @@ function CFootnotesController(LogicDocument)
 	this.SeparatorFootnote             = null;
 
 	this.Selection = {
-		Use      : false,
-		Start    : null,
-		End      : null,
+		Use       : false,
+		Start     : {
+			Footnote   : null,
+			X          : 0,
+			Y          : 0,
+			PageAbs    : 0,
+			MouseEvent : global_mouseEvent
+		},
+		End       : {
+			Footnote   : null,
+			X          : 0,
+			Y          : 0,
+			PageAbs    : 0,
+			MouseEvent : global_mouseEvent
+		},
 		Footnotes : {},
 		Direction : 0
 	};
@@ -705,33 +717,54 @@ CFootnotesController.prototype.AddToParagraph = function(oItem, bRecalculate)
 };
 CFootnotesController.prototype.Remove = function(Count, bOnlyText, bRemoveOnlySelection, bOnTextAdd)
 {
-	// TODO: Доделать селект и курсор
-	if (true === this.Selection.Use)
-	{
-	}
-	else
-	{
-		if (null !== this.CurFootnote)
-			this.CurFootnote.Remove(Count, bOnlyText, bRemoveOnlySelection, bOnTextAdd);
-	}
+	if (false === this.private_CheckFootnotesSelectionBeforeAction())
+		return;
+
+	this.CurFootnote.Remove(Count, bOnlyText, bRemoveOnlySelection, bOnTextAdd);
 };
 CFootnotesController.prototype.GetCursorPosXY = function()
 {
-	// TODO: Доделать селект и курсор
-	if (true === this.Selection.Use)
-	{
-	}
-	else
-	{
-		if (null !== this.CurFootnote)
-			return this.CurFootnote.Cursor_GetPos();
-	}
+	// Если есть селект, тогда конец селекта совпадает с CurFootnote
+	if (null !== this.CurFootnote)
+		return this.CurFootnote.Cursor_GetPos();
 
 	return {X : 0, Y : 0}
 };
 CFootnotesController.prototype.MoveCursorToStartPos = function(AddToSelect)
 {
-	// TODO: Реализовать
+	if (true !== AddToSelect)
+	{
+		this.LogicDocument.controller_MoveCursorToStartPos(false);
+	}
+	else
+	{
+		var oFootnote = this.CurFootnote;
+		if (true === this.Selection.Use)
+			oFootnote = this.Selection.Start.Footnote;
+
+		var arrRange = this.LogicDocument.Get_FootnotesList(null, oFootnote);
+		if (arrRange.length <= 0)
+			return;
+
+		this.LogicDocument.Start_SelectionFromCurPos();
+
+		this.Selection.End.Footnote   = arrRange[0];
+		this.Selection.Start.Footnote = oFootnote;
+		this.Selection.Footnotes      = {};
+
+		oFootnote.Cursor_MoveToStartPos(true);
+		this.Selection.Footnotes = {};
+		this.Selection.Footnotes[oFootnote.Get_Id()]  = oFootnote;
+		for (var nIndex = 0, nCount = arrRange.length; nIndex < nCount; ++nIndex)
+		{
+			var oTempFootnote = arrRange[nIndex];
+			if (oTempFootnote !== oFootnote)
+			{
+				oTempFootnote.Select_All(-1);
+				this.Selection.Footnotes[oTempFootnote.Get_Id()] = oTempFootnote;
+			}
+		}
+	}
 };
 CFootnotesController.prototype.MoveCursorToEndPos = function(AddToSelect)
 {
@@ -1432,7 +1465,15 @@ CFootnotesController.prototype.GetSelectionAnchorPos = function()
 };
 CFootnotesController.prototype.StartSelectionFromCurPos = function()
 {
-	// TODO: Реализовать
+	if (true === this.Selection.Use)
+		return;
+
+	this.Selection.Use = true;
+	this.Selection.Start.Footnote = this.CurFootnote;
+	this.Selection.End.Footnote   = this.CurFootnote;
+	this.Selection.Footnotes = {};
+	this.Selection.Footnotes[this.CurFootnote.Get_Id()] = this.CurFootnote;
+	this.CurFootnote.Start_SelectionFromCurPos();
 };
 CFootnotesController.prototype.SaveDocumentStateBeforeLoadChanges = function(State)
 {

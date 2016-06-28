@@ -2569,6 +2569,17 @@ CParagraphContentWithParagraphLikeContent.prototype.private_UpdateTrackRevisions
         RevisionsManager.Check_Paragraph(this.Paragraph);
     }
 };
+CParagraphContentWithParagraphLikeContent.prototype.Get_FootnotesList = function(oEngine)
+{
+	for (var nIndex = 0, nCount = this.Content.length; nIndex < nCount; ++nIndex)
+	{
+		if (this.Content[nIndex].Get_FootnotesList)
+			this.Content[nIndex].Get_FootnotesList(oEngine);
+
+		if (oEngine.IsRangeFull())
+			return;
+	}
+};
 //----------------------------------------------------------------------------------------------------------------------
 // Функции, которые должны быть реализованы в классах наследниках
 //----------------------------------------------------------------------------------------------------------------------

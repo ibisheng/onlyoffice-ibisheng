@@ -1838,7 +1838,7 @@ CDocumentContent.prototype.Cursor_MoveToStartPos         = function(AddToSelect)
         }
         else if (docpostype_Content === this.CurPos.Type)
         {
-            var StartPos = ( true === this.Selection.Use ? this.Selection.StartPos : this.CurPos.ContentPos )
+            var StartPos = ( true === this.Selection.Use ? this.Selection.StartPos : this.CurPos.ContentPos );
             var EndPos   = 0;
 
             this.Selection.Start    = false;
@@ -1852,26 +1852,7 @@ CDocumentContent.prototype.Cursor_MoveToStartPos         = function(AddToSelect)
 
             for (var Index = StartPos - 1; Index >= EndPos; Index--)
             {
-                var Item           = this.Content[Index];
-                Item.Selection.Use = true;
-                var ItemType       = Item.GetType();
-
-                if (type_Paragraph === ItemType)
-                {
-                    Item.Selection.Set_EndPos(Item.Internal_GetStartPos(), -1);
-                    Item.Selection.Set_StartPos(Item.Content.length - 1, -1);
-                }
-                else //if ( type_Table === ItemType )
-                {
-                    var Row  = Item.Content.length - 1;
-                    var Cell = Item.Content[Row].Get_CellsCount() - 1;
-                    var Pos0 = {Row : 0, Cell : 0};
-                    var Pos1 = {Row : Row, Cell : Cell};
-
-                    Item.Selection.EndPos.Pos   = Pos0;
-                    Item.Selection.StartPos.Pos = Pos1;
-                    Item.Internal_Selection_UpdateCells();
-                }
+                this.Content[Index].Select_All(-1);
             }
 
             this.Content[StartPos].Cursor_MoveToStartPos(true);
