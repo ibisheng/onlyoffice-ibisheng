@@ -580,6 +580,33 @@ CFootnotesController.prototype.private_GetFootnotesOnPage = function(PageAbs, St
 		oFootnotes[oFootnote.Get_Id()] = oFootnote;
 	}
 };
+CFootnotesController.prototype.private_OnNotValidActionForFootnotes = function()
+{
+	// Пока ничего не делаем, если надо будет выдавать сообщение, то обработать нужно будет здесь.
+};
+CFootnotesController.prototype.private_IsOnFootnoteSelected = function()
+{
+	var nCounter = 0;
+	for (var sId in this.Selection.Footnotes)
+	{
+		nCounter++;
+
+		if (nCounter > 1)
+			return false;
+	}
+
+	return true;
+};
+CFootnotesController.prototype.private_CheckFootnotesSelectionBeforeAction = function()
+{
+	if (true !== this.private_IsOnFootnoteSelected() || null === this.CurFootnote)
+	{
+		this.private_OnNotValidActionForFootnotes();
+		return false;
+	}
+
+	return true;
+};
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Controller area
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -603,108 +630,75 @@ CFootnotesController.prototype.GetCurPage = function()
 };
 CFootnotesController.prototype.AddNewParagraph = function(bRecalculate, bForceAdd)
 {
-	var bRetValue = false;
+	if (false === this.private_CheckFootnotesSelectionBeforeAction())
+		return false;
 
-	// TODO: Доделать селект и курсор
-
-	if (true === this.Selection.Use)
-	{
-	}
-	else
-	{
-		if (null !== this.CurFootnote)
-			bRetValue = this.CurFootnote.Add_NewParagraph(bRecalculate, bForceAdd);
-	}
-
-	return bRetValue;
+	return this.CurFootnote.Add_NewParagraph(bRecalculate, bForceAdd);
 };
 CFootnotesController.prototype.AddInlineImage = function(nW, nH, oImage, oChart, bFlow)
 {
-	var bRetValue = false;
+	if (false === this.private_CheckFootnotesSelectionBeforeAction())
+		return false;
 
-	// TODO: Доделать селект и курсор
-
-	if (true === this.Selection.Use)
-	{
-	}
-	else
-	{
-		if (null !== this.CurFootnote)
-			bRetValue = this.CurFootnote.Add_InlineImage(nW, nH, oImage, oChart, bFlow);
-	}
-
-	return bRetValue;
+	return this.CurFootnote.Add_InlineImage(nW, nH, oImage, oChart, bFlow);
 };
 CFootnotesController.prototype.AddOleObject = function(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId)
 {
-	var bRetValue = false;
+	if (false === this.private_CheckFootnotesSelectionBeforeAction())
+		return false;
 
-	// TODO: Доделать селект и курсор
-
-	if (true === this.Selection.Use)
-	{
-	}
-	else
-	{
-		if (null !== this.CurFootnote)
-			bRetValue = this.CurFootnote.Add_OleObject(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId);
-	}
-
-	return bRetValue;
+	return this.CurFootnote.Add_OleObject(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId);
 };
 CFootnotesController.prototype.AddTextArt = function(nStyle)
 {
-	var bRetValue = false;
+	if (false === this.private_CheckFootnotesSelectionBeforeAction())
+		return false;
 
-	// TODO: Доделать селект и курсор
-
-	if (true === this.Selection.Use)
-	{
-	}
-	else
-	{
-		if (null !== this.CurFootnote)
-			bRetValue = this.CurFootnote.Add_TextArt(nStyle);
-	}
-
-	return bRetValue;
+	return this.CurFootnote.Add_TextArt(nStyle);
 };
 CFootnotesController.prototype.EditChart = function(Chart)
 {
-	// TODO: Реализовать
+	if (false === this.private_CheckFootnotesSelectionBeforeAction())
+		return;
+
+	this.CurFootnote.Edit_Chart(Chart);
 };
 CFootnotesController.prototype.AddInlineTable = function(Cols, Rows)
 {
-	// TODO: Доделать селект и курсор
-	if (true === this.Selection.Use)
-	{
-	}
-	else
-	{
-		if (null !== this.CurFootnote)
-			this.CurFootnote.Add_InlineTable(Cols, Rows);
-	}
+	if (false === this.private_CheckFootnotesSelectionBeforeAction())
+		return;
+
+	if (null !== this.CurFootnote)
+		this.CurFootnote.Add_InlineTable(Cols, Rows);
 };
 CFootnotesController.prototype.ClearParagraphFormatting = function()
 {
-	// TODO: Доделать селект и курсор
-	if (true === this.Selection.Use)
+	for (var sId in this.Selection.Footnotes)
 	{
-	}
-	else
-	{
-		if (null !== this.CurFootnote)
-			this.CurFootnote.Paragraph_ClearFormatting();
+		var oFootnote = this.Selection.Footnotes[sId];
+		oFootnote.Paragraph_ClearFormatting();
 	}
 };
 CFootnotesController.prototype.AddToParagraph = function(oItem, bRecalculate)
 {
-	// TODO: Доделать селект и курсор
-	if (true === this.Selection.Use)
+	if (oItem instanceof ParaTextPr)
 	{
+		for (var sId in this.Selection.Footnotes)
+		{
+			var oFootnote = this.Selection.Footnotes[sId];
+			oFootnote.Paragraph_Add(oItem, false);
+		}
+
+		if (false !== bRecalculate)
+		{
+			this.LogicDocument.Recalculate();
+		}
 	}
 	else
 	{
+		if (false === this.private_CheckFootnotesSelectionBeforeAction())
+			return;
+
 		if (null !== this.CurFootnote)
 			this.CurFootnote.Paragraph_Add(oItem, bRecalculate);
 	}
