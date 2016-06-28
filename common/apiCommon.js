@@ -2022,6 +2022,7 @@
           this.type = null;
           this.width = null;
           this.color = null;
+          this.prstDash = null;
 
           this.LineJoin = null;
           this.LineCap = null;
@@ -2057,7 +2058,10 @@
           asc_getLineendsize: function(){return this.LineEndSize;},
           asc_putLineendsize: function(v){this.LineEndSize = v;},
 
-          asc_getCanChangeArrows: function(){return this.canChangeArrows;}
+          asc_getCanChangeArrows: function(){return this.canChangeArrows;},
+
+          asc_putPrstDash: function(v){this.prstDash = v;},
+          asc_getPrstDash: function(){ return this.prstDash;}
       };
 
       // цвет. может быть трех типов:
@@ -2868,6 +2872,8 @@
       prot["get_lineendsize"] = prot["asc_getLineendsize"] = prot.asc_getLineendsize;
       prot["put_lineendsize"] = prot["asc_putLineendsize"] = prot.asc_putLineendsize;
       prot["get_canChangeArrows"] = prot["asc_getCanChangeArrows"] = prot.asc_getCanChangeArrows;
+      prot["put_prstDash"] = prot["asc_putPrstDash"] = prot.asc_putPrstDash;
+      prot["get_prstDash"] = prot["asc_getPrstDash"] = prot.asc_getPrstDash;
 
       window["AscCommon"].CAscColorScheme = CAscColorScheme;
       prot = CAscColorScheme.prototype;
