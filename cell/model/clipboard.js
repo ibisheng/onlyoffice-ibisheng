@@ -90,8 +90,9 @@
 					//TEXT
 					if (AscCommon.c_oAscClipboardDataFormat.Text & _formats)
 					{
-						//_data = ;
-						//_clipboard.pushData(AscCommon.c_oAscClipboardDataFormat.Text, _data)
+						_data = this.copyProcessor.getText(activeRange, ws);
+						
+						_clipboard.pushData(AscCommon.c_oAscClipboardDataFormat.Text, _data)
 					}
 					//HTML
 					if(AscCommon.c_oAscClipboardDataFormat.Html & _formats)
@@ -242,6 +243,26 @@
 				return "xslData;" + sBase64;
 			},
 			
+			getText: function(range, worksheet)
+			{
+				var t = this;
+				var res = null;
+				
+				var objectRender = worksheet.objectRender;
+				var isIntoShape = objectRender.controller.getTargetDocContent();
+				
+				if(isIntoShape)
+				{
+					res = t._getTextFromShape(isIntoShape);
+				}
+				else
+				{
+					res = t._getTextFromSheet(range, worksheet);
+				}
+				
+				return res;
+			},
+			
 			getBinaryForMobile: function () 
 			{
 				var api = window["Asc"]["editor"];
@@ -282,7 +303,7 @@
                     }
                 }
 				
-				return {sBase64: sBase64, text: this.lStorageText, drawingUrls: drawingUrls};
+				return {sBase64: sBase64, drawingUrls: drawingUrls};
 			},
 			
 			//TODO пересмотреть функцию
@@ -569,6 +590,71 @@
 					span.innerHTML = span.innerHTML.replace(/\n/g,'<br>');
 					res.push(span);
 				}
+				return res;
+			},
+			
+			_getTextFromShape: function(documentContent)
+			{
+				var res = "";
+				
+				if(documentContent && documentContent.Content && documentContent.Content.length)
+				{
+					for(var i = 0; i < documentContent.Content.length; i++)
+					{
+						if(documentContent.Content[i])
+						{
+							var paraText = documentContent.Content[i].Get_SelectedText();
+							if(paraText)
+							{
+								if(i !== 0)
+								{
+									res += '\n';
+								}
+								res += paraText;
+							}
+						}
+					}
+				}
+				
+				return res;
+			},
+			
+			_getTextFromSheet: function(range, worksheet)
+			{
+				var res = null;
+				var t = this;
+				
+				if(range)
+				{
+					var bbox = range.bbox;
+					
+					var res = '';	
+					for (var row = bbox.r1; row <= bbox.r2; ++row) 
+					{
+						if(row != bbox.r1)
+							res += '\n';
+						
+						for (var col = bbox.c1; col <= bbox.c2; ++col) 
+						{
+							if(col != bbox.c1)
+							{
+								res += '\t';
+							}
+							
+							var currentRange = worksheet.model.getCell3(row, col);
+							var textRange = currentRange.getValue();
+							if(textRange == '')
+							{
+								res += '\t';
+							}
+							else
+							{
+								res += textRange;
+							}
+						}
+					}
+				}
+				
 				return res;
 			}
 		};
