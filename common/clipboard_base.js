@@ -767,7 +767,7 @@
 					break;
 			}
 
-			if (_data_format != "")
+			if (_data_format != "" && _data !== null)
 			{
 				if (_data_format == "text/x-custom")
 					this.ClosureParams.setData(_data_format, "asc_internalData;" + _data);

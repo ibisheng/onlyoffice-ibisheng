@@ -198,12 +198,7 @@
 				//use binary strings
 				if(copyPasteUseBinary)
 				{	
-					if(isIntoShape)
-					{
-						this.lStorage = {};
-						this.lStorage.htmlInShape = text;
-					}	
-					else
+					if(!isIntoShape)
 					{
 						sBase64 = this.getBinaryForCopy(worksheet);
 						$(container.children[0]).addClass(sBase64);
@@ -216,6 +211,14 @@
 			
 			getBinaryForCopy: function(worksheet)
 			{
+				var objectRender = worksheet.objectRender;
+				var isIntoShape = objectRender.controller.getTargetDocContent();
+				
+				if(isIntoShape)
+				{
+					return null;
+				}
+				
 				pptx_content_writer.Start_UseFullUrl();
 				
 				//TODO стоит убрать заглушку при правке бага с activeRange
