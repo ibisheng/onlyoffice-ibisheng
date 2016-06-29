@@ -113,12 +113,15 @@ AscCommon.baseEditorsApi.prototype._onCheckLicenseEnd = function(err, res) {
   this.licenseResult = {err: err, res: res};
   this._onEndPermissions();
 };
-AscCommon.baseEditorsApi.prototype._onEndPermissions = function() {
+AscCommon.baseEditorsApi.prototype._onEndPermissions = function () {
   if (this.isOnFirstConnectEnd && this.isOnLoadLicense) {
     var oResult = new AscCommon.asc_CAscEditorPermissions();
     if (null !== this.licenseResult) {
-      oResult.asc_setCanLicense(g_oLicenseResult.Success === this.licenseResult);
-      oResult.asc_setCanBranding(g_oLicenseResult.Error !== this.licenseResult); // Для тех, у кого есть лицензия, branding доступен
+      var type = this.licenseResult['type'];
+      oResult.asc_setCanLicense(g_oLicenseResult.Success === type);
+      oResult.asc_setCanBranding(g_oLicenseResult.Error !== type); // Для тех, у кого есть лицензия, branding доступен
+      oResult.asc_setCanBranding(g_oLicenseResult.Error !== type); // Для тех, у кого есть лицензия, branding доступен
+      oResult.asc_setIsLight(this.licenseResult['light']);
     }
     this.sendEvent('asc_onGetEditorPermissions', oResult);
   }

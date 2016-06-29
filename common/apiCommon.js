@@ -106,36 +106,36 @@
           return ret;
       }
 
-		/**
-		 * Класс asc_CAscEditorPermissions для прав редакторов
-		 * -----------------------------------------------------------------------------
-		 *
-		 * @constructor
-		 * @memberOf Asc
-		 */
-		function asc_CAscEditorPermissions (settings) {
-			this.canCoAuthoring = true;
-			this.canReaderMode = true;
-			this.canBranding = false;
-			this.isAutosaveEnable = true;
-			this.AutosaveMinInterval = 300;
-			this.isAnalyticsEnable = false;
-			return this;
-		}
-		asc_CAscEditorPermissions.prototype = {
-			constructor: asc_CAscEditorPermissions,
-			asc_getCanLicense: function(){ return this.canLicense; },
+    /**
+     * Класс asc_CAscEditorPermissions для прав редакторов
+     * -----------------------------------------------------------------------------
+     *
+     * @constructor
+     * @memberOf Asc
+     */
+    function asc_CAscEditorPermissions(settings) {
+        this.canLicense = false;
+        this.isLight = false;
+        this.canCoAuthoring = true;
+        this.canReaderMode = true;
+        this.canBranding = false;
+        this.isAutosaveEnable = true;
+        this.AutosaveMinInterval = 300;
+        this.isAnalyticsEnable = false;
+        return this;
+    }
+    asc_CAscEditorPermissions.prototype.asc_getCanLicense = function(){ return this.canLicense; };
+    asc_CAscEditorPermissions.prototype.asc_getCanCoAuthoring = function(){ return this.canCoAuthoring; };
+    asc_CAscEditorPermissions.prototype.asc_getCanReaderMode = function(){ return this.canReaderMode; };
+    asc_CAscEditorPermissions.prototype.asc_getCanBranding = function(){ return this.canBranding; };
+    asc_CAscEditorPermissions.prototype.asc_getIsAutosaveEnable = function(){ return this.isAutosaveEnable; };
+    asc_CAscEditorPermissions.prototype.asc_getAutosaveMinInterval = function(){ return this.AutosaveMinInterval; };
+    asc_CAscEditorPermissions.prototype.asc_getIsAnalyticsEnable = function(){ return this.isAnalyticsEnable; };
+    asc_CAscEditorPermissions.prototype.asc_getIsLight = function(){ return this.isLight; };
 
-			asc_getCanCoAuthoring: function(){ return this.canCoAuthoring; },
-			asc_getCanReaderMode: function(){ return this.canReaderMode; },
-			asc_getCanBranding: function(){ return this.canBranding; },
-			asc_getIsAutosaveEnable: function(){ return this.isAutosaveEnable; },
-			asc_getAutosaveMinInterval: function(){ return this.AutosaveMinInterval; },
-			asc_getIsAnalyticsEnable: function(){ return this.isAnalyticsEnable; },
-
-			asc_setCanLicense: function(v){ this.canLicense = v; },
-      asc_setCanBranding: function(v){ this.canBranding = v; }
-		};
+    asc_CAscEditorPermissions.prototype.asc_setCanLicense = function(v){ this.canLicense = v; };
+    asc_CAscEditorPermissions.prototype.asc_setCanBranding = function(v){ this.canBranding = v; };
+    asc_CAscEditorPermissions.prototype.asc_setIsLight = function(v){ this.isLight = v; };
 
       /** @constructor */
       function asc_ValAxisSettings()
@@ -2297,15 +2297,16 @@
       window["AscCommon"].CreateAscColorCustom = CreateAscColorCustom;
       window["AscCommon"].CreateAscColor = CreateAscColor;
 
-      window["AscCommon"].asc_CAscEditorPermissions = asc_CAscEditorPermissions;
-      prot = asc_CAscEditorPermissions.prototype;
-      prot["asc_getCanLicense"]			= prot.asc_getCanLicense;
-      prot["asc_getCanCoAuthoring"]		= prot.asc_getCanCoAuthoring;
-      prot["asc_getCanReaderMode"]		= prot.asc_getCanReaderMode;
-      prot["asc_getCanBranding"]			= prot.asc_getCanBranding;
-      prot["asc_getIsAutosaveEnable"]		= prot.asc_getIsAutosaveEnable;
-      prot["asc_getAutosaveMinInterval"]	= prot.asc_getAutosaveMinInterval;
-      prot["asc_getIsAnalyticsEnable"]	= prot.asc_getIsAnalyticsEnable;
+    window["AscCommon"].asc_CAscEditorPermissions = asc_CAscEditorPermissions;
+    prot = asc_CAscEditorPermissions.prototype;
+    prot["asc_getCanLicense"] = prot.asc_getCanLicense;
+    prot["asc_getCanCoAuthoring"] = prot.asc_getCanCoAuthoring;
+    prot["asc_getCanReaderMode"] = prot.asc_getCanReaderMode;
+    prot["asc_getCanBranding"] = prot.asc_getCanBranding;
+    prot["asc_getIsAutosaveEnable"] = prot.asc_getIsAutosaveEnable;
+    prot["asc_getAutosaveMinInterval"] = prot.asc_getAutosaveMinInterval;
+    prot["asc_getIsAnalyticsEnable"] = prot.asc_getIsAnalyticsEnable;
+    prot["asc_getIsLight"] = prot.asc_getIsLight;
 
       window["AscCommon"].asc_ValAxisSettings = asc_ValAxisSettings;
       prot = asc_ValAxisSettings.prototype;
