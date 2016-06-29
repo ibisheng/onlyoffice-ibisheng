@@ -158,7 +158,7 @@
 						}
 						else
 						{
-							t.pasteProcessor.editorPasteExec(ws, data1, true);
+							t.pasteProcessor.pasteTextOnSheet(ws, data1);
 						}
 						
 						break;
@@ -1038,7 +1038,7 @@
 				}, true);
 			},
 			
-			editorPasteExec: function (worksheet, node, isText,onlyFromLocalStorage)
+			editorPasteExec: function (worksheet, node, isText, onlyFromLocalStorage)
             {
 				if(node == undefined)
 					return;
@@ -1726,6 +1726,57 @@
 					style = ' style = "text-decoration:' + underline + ";" + "font-style:" + italic + ";" + "font-weight:" + bold + ";" + '"';
 					$(oldElem).replaceWith("<span" + style +  ">" + value + "</span>");
 				};
+			},
+			
+			pasteTextOnSheet: function(worksheet, text)
+			{
+				//TODO сделать вставку текста всегда через эту функцию
+				this.activeRange = worksheet.activeRange.clone(true);
+				
+				//если находимся внутри шейпа
+				var isIntoShape = worksheet.objectRender.controller.getTargetDocContent();
+				if(isIntoShape)
+				{
+					var callback = function(isSuccess)
+					{
+						if(isSuccess === false)
+						{
+							return false;
+						}
+						
+						var Count = text.length;
+						for ( var Index = 0; Index < Count; Index++ )
+						{
+							var _char = text.charAt(Index);
+							if (" " == _char)
+								isIntoShape.Paragraph_Add(new ParaSpace());
+							else
+								isIntoShape.Paragraph_Add(new ParaText(_char));
+						}
+					};
+					
+					worksheet.objectRender.controller.checkSelectedObjectsAndCallback2(callback);
+					return;
+				}
+				
+				var aResult = [];
+				aResult[this.activeRange.r1] = [];
+				
+				var oNewItem = [];
+				oNewItem[0] = this._getDefaultCell(worksheet);
+				aResult[this.activeRange.r1][this.activeRange.c1] = oNewItem;
+				oNewItem[0][0].text = text;
+				
+				aResult.fontsNew = [];
+				aResult.rowSpanSpCount = 0;
+				aResult.cellCount = 1;
+				aResult._images = undefined;
+				aResult._aPastedImages = undefined;
+				
+				if(aResult && !(aResult.onlyImages && window["Asc"]["editor"] && window["Asc"]["editor"].isChartEditor))
+				{
+					worksheet.setSelectionInfo('paste', aResult, this);
+				}
 			}
 			
 		};

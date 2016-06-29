@@ -1298,18 +1298,18 @@ CopyProcessor.prototype =
 				
 			//TODO заглушка для презентационных параграфов(выделен текст внутри диаграммы) - пока не пишем в бинарник
 			if(selectedContent.Elements[0].Element && selectedContent.Elements[0].Element.bFromDocument === false)
-				bFromPresentation = true;
-			
-			//подменяем Document для копирования(если не подменить, то commentId будет не соответствовать)
-			this.oBinaryFileWriter.Document = elementsContent[0].Element.LogicDocument;
-			
-			if(!bFromPresentation)
-				this.oBinaryFileWriter.CopyStart();
+			{
+				this.oBinaryFileWriter.Document = this.oDocument;
+			}
+			else
+			{
+				//подменяем Document для копирования(если не подменить, то commentId будет не соответствовать)
+				this.oBinaryFileWriter.Document = elementsContent[0].Element.LogicDocument;
+			}
 				
+			this.oBinaryFileWriter.CopyStart();	
 			this.CopyDocument2(this.oRoot, oDocument, elementsContent, bFromPresentation);
-			
-			if(!bFromPresentation)
-				this.oBinaryFileWriter.CopyEnd();			
+			this.oBinaryFileWriter.CopyEnd();
 		}
         else
         {
@@ -2129,7 +2129,7 @@ PasteProcessor.prototype =
     ReadFromBinary : function(sBase64)
 	{
         var openParams = { checkFileSize: false, charCount: 0, parCount: 0 };
-        var oBinaryFileReader = new AscCommonWord.BinaryFileReader(this.oDocument, openParams);
+        var oBinaryFileReader = new AscCommonWord.BinaryFileReader(this.oLogicDocument, openParams);
         var oRes = oBinaryFileReader.ReadFromString(sBase64, true);
         this.bInBlock = oRes.bInBlock;
         return oRes;
@@ -2226,15 +2226,28 @@ PasteProcessor.prototype =
 				}
 				else if(this.oDocument.bPresentation)
 				{
-					base64 = null;
-					base64FromExcel = null;
 					this.pasteInPresentationShape = true;
 				}
 				
 				var isImageInNode = node && node.getElementsByTagName('img') && node.getElementsByTagName('img').length ? true : false;
 				if(base64 != null)
 					aContent = this.ReadFromBinary(base64);
+				
+				//вставляем в заголовок диаграммы, предварительно конвертируем все параграфы в презентационный формат
+				if(aContent && aContent.content && this.oDocument.bPresentation && oThis.oDocument && oThis.oDocument.Parent && oThis.oDocument.Parent.parent && oThis.oDocument.Parent.parent.parent && oThis.oDocument.Parent.parent.parent.getObjectType && oThis.oDocument.Parent.parent.parent.getObjectType() == AscDFH.historyitem_type_Chart)
+				{
+					var newContent = [];
+					for(var i = 0; i < aContent.content.length; i++)
+					{
+						if(type_Paragraph === aContent.content[i].Get_Type())
+						{
+							newContent.push(AscFormat.ConvertParagraphToPPTX(aContent.content[i], this.oDocument.DrawingDocument, this.oDocument));
+						}
+					}
 					
+					aContent.content = newContent;
+				}
+				
 				if(base64 != null && aContent)
 					pasteFromBinary = true;
 				else if(aContentExcel != null && aContent && aContent.content)
