@@ -1899,28 +1899,9 @@ CDocumentContent.prototype.Cursor_MoveToEndPos           = function(AddToSelect)
 
             for (var Index = StartPos + 1; Index <= EndPos; Index++)
             {
-                var Item           = this.Content[Index];
-                Item.Selection.Use = true;
-                var ItemType       = Item.GetType();
-
-                if (type_Paragraph === ItemType)
-                {
-                    Item.Selection.Set_StartPos(Item.Internal_GetStartPos(), -1);
-                    Item.Selection.Set_EndPos(Item.Content.length - 1, -1);
-                }
-                else //if ( type_Table === ItemType )
-                {
-                    var Row  = Item.Content.length - 1;
-                    var Cell = Item.Content[Row].Get_CellsCount() - 1;
-                    var Pos0 = {Row : 0, Cell : 0};
-                    var Pos1 = {Row : Row, Cell : Cell};
-
-                    Item.Selection.StartPos.Pos = Pos0;
-                    Item.Selection.EndPos.Pos   = Pos1;
-                    Item.Internal_Selection_UpdateCells();
-                }
+                this.Content[Index].Select_All(1);
             }
-
+            
             this.Content[StartPos].Cursor_MoveToEndPos(true);
         }
     }
