@@ -3,7 +3,7 @@
 
 ## Sdkjs
 
-Java Script libs for [ONLYOFFICE Document Server][2].
+JavaScript SDK used for [ONLYOFFICE Document Server][2].
 
 ## Project Information
 
