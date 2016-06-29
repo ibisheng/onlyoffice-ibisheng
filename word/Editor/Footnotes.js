@@ -59,14 +59,14 @@ function CFootnotesController(LogicDocument)
 			X          : 0,
 			Y          : 0,
 			PageAbs    : 0,
-			MouseEvent : global_mouseEvent
+			MouseEvent : AscCommon.global_mouseEvent
 		},
 		End       : {
 			Footnote   : null,
 			X          : 0,
 			Y          : 0,
 			PageAbs    : 0,
-			MouseEvent : global_mouseEvent
+			MouseEvent : AscCommon.global_mouseEvent
 		},
 		Footnotes : {},
 		Direction : 0
