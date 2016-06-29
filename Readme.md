@@ -3,7 +3,7 @@
 
 ## Sdkjs
 
-Java Script libs for ONLYOFFICE DocumentServer.
+Java Script libs for [ONLYOFFICE Document Server][2].
 
 ## Project Information
 
@@ -18,6 +18,7 @@ SaaS version: [http://www.onlyoffice.com](http://www.onlyoffice.com "http://www.
 If you have any problems with or questions about this image, please contact us through a [dev.onlyoffice.org][1].
 
   [1]: http://dev.onlyoffice.org
+  [2]: https://github.com/ONLYOFFICE/DocumentServer
   
 ## License
 
