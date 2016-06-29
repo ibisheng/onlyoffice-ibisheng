@@ -113,7 +113,7 @@
      * @constructor
      * @memberOf Asc
      */
-    function asc_CAscEditorPermissions(settings) {
+    function asc_CAscEditorPermissions() {
         this.canLicense = false;
         this.isLight = false;
         this.canCoAuthoring = true;
