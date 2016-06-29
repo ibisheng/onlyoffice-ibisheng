@@ -7098,7 +7098,7 @@ function offline_apply_event(type,params) {
             break;
         }
 
-        case 7000: // ASC_SPREADSHEETS_EVENT_TYPE_CHECK_DATA_RANGE
+        case 7001: // ASC_SPREADSHEETS_EVENT_TYPE_CHECK_DATA_RANGE
         {
             var isValid = _api.asc_checkDataRange(Asc.c_oAscSelectionDialogType.Chart, params, false);
 
