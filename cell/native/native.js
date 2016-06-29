@@ -7104,8 +7104,21 @@ function offline_apply_event(type,params) {
 
             _stream = global_memory_stream_menu;
             _stream["ClearNoAttack"]();
-            _stream["WriteBool"](isValid);
+            _stream["WriteLong"](isValid);
             _return = _stream;
+            break;
+        }
+            
+        case 7005: // ASC_SPREADSHEETS_EVENT_TYPE_GET_CHART_SETTINGS
+        {
+            var chartSettings = _api.asc_getChartObject();
+            if (chartSettings) {
+                _stream = global_memory_stream_menu;
+                _stream["ClearNoAttack"]();
+                
+                asc_menu_WriteChartPr(12, chartSettings, _stream);
+                _return = _stream;
+            }
             break;
         }
 
