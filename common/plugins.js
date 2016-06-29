@@ -155,6 +155,7 @@
 
             if (true)
             {
+                this.api.asc_fireCallback("asc_onPluginClose");
                 var _div = document.getElementById("plugin_iframe");
                 if (_div)
                     _div.parentNode.removeChild(_div);
@@ -166,7 +167,6 @@
                 this.run(this.runAndCloseData.guid, this.runAndCloseData.variation, this.runAndCloseData.data);
                 this.runAndCloseData = null;
             }
-            this.api.asc_fireCallback("asc_onPluginClose");
         },
 
         show : function()
