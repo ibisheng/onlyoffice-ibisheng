@@ -695,18 +695,19 @@
 				}
 				
 				var result = false;
+				var isIntoShape = worksheet.objectRender.controller.getTargetDocContent();
 				if(base64 != null)//from excel
 				{
-					result = this._pasteFromBinaryExcel(worksheet, base64);
+					result = this._pasteFromBinaryExcel(worksheet, base64, isIntoShape);
 				} 
 				else if (base64FromWord)//from word
 				{
 					this.activeRange = worksheet.activeRange.clone(true);
-					result = this._pasteFromBinaryWord(worksheet, base64FromWord);
+					result = this._pasteFromBinaryWord(worksheet, base64FromWord, isIntoShape);
 				}
 				else if(base64FromPresentation)
 				{
-					result = this._pasteFromBinaryPresentation(worksheet, base64FromPresentation);
+					result = this._pasteFromBinaryPresentation(worksheet, base64FromPresentation, isIntoShape);
 				}
 				
 				return result;
@@ -781,8 +782,48 @@
 			{
 				var pasteData = this.ReadFromBinaryWord(base64, worksheet);
 				var oPasteFromBinaryWord = new pasteFromBinaryWord(this, worksheet);
+				
+				//insert binary from word into SHAPE
+				if(isIntoShape)
+				{
+					var insertContent = new CSelectedContent();
+					var target_doc_content = isIntoShape;
+					
+					var elements = [], selectedElement, element, drawings = [], pDrawings = [], drawingCopyObject;
+					for(var i = 0; i < pasteData.content.length; ++i)
+					{
+						selectedElement = new CSelectedElement();
+						element = pasteData.content[i];
+						
+						if(type_Paragraph == element.GetType())//paragraph
+						{
+							selectedElement.Element = AscFormat.ConvertParagraphToPPTX(element);
+							elements.push(selectedElement);
+						}
+						else if(type_Table == element.GetType())//table
+						{
+							//TODO вырезать из таблицы параграфы
+						}
+					}
 
-				oPasteFromBinaryWord._paste(worksheet, pasteData);
+					insertContent.Elements = elements;
+
+					var paragraph = target_doc_content.Content[target_doc_content.CurPos.ContentPos];
+					if (null != paragraph && type_Paragraph == paragraph.GetType())
+					{
+						var NearPos = {Paragraph: paragraph, ContentPos: paragraph.Get_ParaContentPos(false, false)};
+						paragraph.Check_NearestPos(NearPos);
+						target_doc_content.Insert_Content(insertContent, NearPos);
+						
+						var oTargetTextObject = AscFormat.getTargetTextObject(worksheet.objectRender.controller);
+						oTargetTextObject && oTargetTextObject.checkExtentsByDocContent && oTargetTextObject.checkExtentsByDocContent();
+						worksheet.objectRender.controller.startRecalculate();
+					}
+				}
+				else
+				{
+					oPasteFromBinaryWord._paste(worksheet, pasteData);
+				}
 				
 				return true;
 			},
