@@ -1818,6 +1818,28 @@
 				{
 					worksheet.setSelectionInfo('paste', aResult, this);
 				}
+			},
+			
+			_getDefaultCell: function (worksheet)
+			{
+				var res = [];
+				
+				var fn = worksheet.model.workbook.getDefaultFont();
+				var fs = worksheet.model.workbook.getDefaultSize();
+				
+				res.push({
+					format: {
+						fn: fn,
+						fs: fs,
+						b: false,
+						i: false,
+						u: Asc.EUnderline.underlineNone,
+						s: false,
+						va: 'none'
+					},
+					text: ''});
+				
+				return res; 
 			}
 			
 		};
