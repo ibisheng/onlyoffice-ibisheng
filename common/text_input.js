@@ -123,10 +123,12 @@
 				oHtmlDivScrollable.style.padding = "0";
 				oHtmlDivScrollable.style.margin = "0";
 				oHtmlDivScrollable.style.zIndex = 0;
-				oHtmlDivScrollable.style.left 	= oHtmlParent.style.left;
-				oHtmlDivScrollable.style.top 	= oHtmlParent.style.top;
-				oHtmlDivScrollable.style.width 	= oHtmlParent.style.width;
-				oHtmlDivScrollable.style.height = oHtmlParent.style.height;
+
+				var parentStyle = getComputedStyle(oHtmlParent);
+				oHtmlDivScrollable.style.left 	= parentStyle.left;
+				oHtmlDivScrollable.style.top 	= parentStyle.top;
+				oHtmlDivScrollable.style.width 	= parentStyle.width;
+				oHtmlDivScrollable.style.height = parentStyle.height;
 				oHtmlDivScrollable.style.overflow = "hidden";
 
 				oHtmlDivScrollable.appendChild(this.HtmlDiv);
@@ -134,10 +136,11 @@
 
 				oHtmlParent.onresize = function(e) {
 					var _elem = document.getElementById("area_id_parent");
-					_elem.style.left 	= this.style.left;
-					_elem.style.top 	= this.style.top;
-					_elem.style.width 	= this.style.width;
-					_elem.style.height 	= this.style.height;
+					var style = getComputedStyle(oHtmlParent);
+					_elem.style.left 	= style.left;
+					_elem.style.top 	= style.top;
+					_elem.style.width 	= style.width;
+					_elem.style.height 	= style.height;
 				};
 			}
 			else
