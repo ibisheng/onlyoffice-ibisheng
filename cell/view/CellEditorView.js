@@ -1512,6 +1512,10 @@
 			this.cursorStyle.height = curHeight + "px";
 		}
 
+		if (AscCommon.g_inputContext) {
+			AscCommon.g_inputContext.move(this.left * this.kx + curLeft, this.top * this.ky + curTop);
+		}
+
 		if ( cur ) {
 			this.input.scrollTop = this.input.clientHeight * cur.lineIndex;
 		}
