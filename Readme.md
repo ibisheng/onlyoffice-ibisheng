@@ -3,7 +3,7 @@
 
 ## Sdkjs
 
-JavaScript SDK which is a part of [ONLYOFFICE Document Server][2]. Contains API for all the included components interaction.
+JavaScript SDK which is a part of [ONLYOFFICE Document Server][2]. Contains API for all the included components client-side interaction.
 
 ## Project Information
 
