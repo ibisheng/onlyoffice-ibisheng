@@ -11437,18 +11437,11 @@
 
         // Возможно стоит заменить на ячейку из кеша
         c = this._getVisibleCell( col, row );
-        if ( !c ) {
-            throw "Can not get cell data (col=" + col + ", row=" + row + ")";
-        }
-
         fl = this._getCellFlags( c );
         isMerged = fl.isMerged();
         if ( isMerged ) {
             mc = fl.merged;
             c = this._getVisibleCell( mc.c1, mc.r1 );
-            if ( !c ) {
-                throw "Can not get merged cell data (col=" + mc.c1 + ", row=" + mc.r1 + ")";
-            }
             fl = this._getCellFlags( c );
         }
 

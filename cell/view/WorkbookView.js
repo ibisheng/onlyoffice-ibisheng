@@ -1257,17 +1257,8 @@
     var editFunction = function() {
       t.setCellEditMode(true);
       ws.setCellEditMode(true);
-      if (!ws.openCellEditor(t.cellEditor, /*fragments*/undefined, /*cursorPos*/undefined, isFocus, isClearCell, /*isHideCursor*/isHideCursor, /*isQuickInput*/isQuickInput, /*activeRange*/arn)) {
-        t.setCellEditMode(false);
-        t.controller.setStrictClose(false);
-        t.controller.setFormulaEditMode(false);
-        ws.setCellEditMode(false);
-        ws.setFormulaEditMode(false);
-        t.input.disabled = true;
-        asc_applyFunction(callback, false);
-        return;
-      }
-
+      ws.openCellEditor(t.cellEditor, /*fragments*/undefined, /*cursorPos*/undefined, isFocus, isClearCell,
+        /*isHideCursor*/isHideCursor, /*isQuickInput*/isQuickInput, /*activeRange*/arn);
       t.input.disabled = false;
       t.handlers.trigger("asc_onEditCell", c_oAscCellEditorState.editStart);
 
