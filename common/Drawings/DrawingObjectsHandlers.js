@@ -326,9 +326,8 @@ function handleGroup(drawing, drawingObjectsController, e, x, y, group, pageInde
 function handleInternalChart(drawing, drawingObjectsController, e, x, y, group, pageIndex, bWord)
 {
     var ret = false, i, title;
-    if(drawing.hit(x, y))
+    if(drawing.hit(x, y) && !window["NATIVE_EDITOR_ENJINE"])
     {
-
         var selector = group ? group : drawingObjectsController;
         var legend = drawing.getLegend();
         if(legend && legend.hit(x, y))
