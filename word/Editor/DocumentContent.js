@@ -1873,7 +1873,7 @@ CDocumentContent.prototype.Cursor_MoveToStartPos         = function(AddToSelect)
         this.Content[0].Cursor_MoveToStartPos(false);
     }
 };
-CDocumentContent.prototype.Cursor_MoveToEndPos           = function(AddToSelect)
+CDocumentContent.prototype.Cursor_MoveToEndPos           = function(AddToSelect, StartSelectFromEnd)
 {
     if (true === AddToSelect)
     {
@@ -1901,23 +1901,37 @@ CDocumentContent.prototype.Cursor_MoveToEndPos           = function(AddToSelect)
             {
                 this.Content[Index].Select_All(1);
             }
-            
+
             this.Content[StartPos].Cursor_MoveToEndPos(true);
         }
     }
     else
     {
-        this.Selection_Remove();
+        if (true === StartSelectFromEnd)
+        {
+            this.Selection.Start    = false;
+            this.Selection.Use      = true;
+            this.Selection.StartPos = this.Content.length - 1;
+            this.Selection.EndPos   = this.Content.length - 1;
+            this.Selection.Flag     = selectionflag_Common;
+            this.CurPos.ContentPos  = this.Content.length - 1;
+            this.Set_DocPosType(docpostype_Content);
+            this.Content[this.Content.length - 1].Cursor_MoveToEndPos(false, true);
+        }
+        else
+        {
+            this.Selection_Remove();
 
-        this.Selection.Start    = false;
-        this.Selection.Use      = false;
-        this.Selection.StartPos = 0;
-        this.Selection.EndPos   = 0;
-        this.Selection.Flag     = selectionflag_Common;
+            this.Selection.Start    = false;
+            this.Selection.Use      = false;
+            this.Selection.StartPos = 0;
+            this.Selection.EndPos   = 0;
+            this.Selection.Flag     = selectionflag_Common;
 
-        this.CurPos.ContentPos = this.Content.length - 1;
-        this.Set_DocPosType(docpostype_Content);
-        this.Content[this.CurPos.ContentPos].Cursor_MoveToEndPos(false);
+            this.CurPos.ContentPos = this.Content.length - 1;
+            this.Set_DocPosType(docpostype_Content);
+            this.Content[this.CurPos.ContentPos].Cursor_MoveToEndPos(false);
+        }
     }
 };
 CDocumentContent.prototype.Cursor_MoveUp_To_LastRow      = function(X, Y, AddToSelect)

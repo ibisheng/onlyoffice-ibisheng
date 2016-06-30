@@ -56,17 +56,13 @@ function CFootnotesController(LogicDocument)
 		Use       : false,
 		Start     : {
 			Footnote   : null,
-			X          : 0,
-			Y          : 0,
-			PageAbs    : 0,
-			MouseEvent : AscCommon.global_mouseEvent
+			Page       : 0,
+			Index      : 0
 		},
 		End       : {
 			Footnote   : null,
-			X          : 0,
-			Y          : 0,
-			PageAbs    : 0,
-			MouseEvent : AscCommon.global_mouseEvent
+			Page       : 0,
+			Index      : 0
 		},
 		Footnotes : {},
 		Direction : 0
@@ -322,6 +318,9 @@ CFootnotesController.prototype.CheckHitInFootnote = function(X, Y, PageAbs)
 };
 CFootnotesController.prototype.StartSelection = function(X, Y, PageAbs, MouseEvent)
 {
+	if (true === this.Selection.Use)
+		this.RemoveSelection();
+
 	var oResult = this.private_GetFootnoteByXY(X, Y, PageAbs);
 	if (null === oResult)
 	{
@@ -614,7 +613,28 @@ CFootnotesController.prototype.private_SetCurrentFootnoteNoSelection = function(
 	this.Selection.Footnotes                     = {};
 	this.Selection.Footnotes[oFootnote.Get_Id()] = oFootnote;
 };
-//CF
+CFootnotesController.prototype.private_GetPrevFootnote = function(oFootnote)
+{
+	if (!oFootnote)
+		return null;
+
+	var arrList = this.LogicDocument.Get_FootnotesList(null, oFootnote);
+	if (!arrList || arrList.length <= 1 || arrList[arrList.length - 1] !== oFootnote)
+		return null;
+
+	return arrList[arrList.length - 2];
+};
+CFootnotesController.prototype.private_GetNextFootnote = function(oFootnote)
+{
+	if (!oFootnote)
+		return null;
+
+	var arrList = this.LogicDocument.Get_FootnotesList(oFootnote, null);
+	if (!arrList || arrList.length <= 1 || arrList[0] !== oFootnote)
+		return null;
+
+	return arrList[1];
+};
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Controller area
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -812,8 +832,6 @@ CFootnotesController.prototype.MoveCursorToEndPos = function(AddToSelect)
 };
 CFootnotesController.prototype.MoveCursorLeft = function(AddToSelect, Word)
 {
-	// TODO: Доделать селект и курсор
-
 	if (true === this.Selection.Use)
 	{
 		if (true !== AddToSelect)
@@ -841,7 +859,34 @@ CFootnotesController.prototype.MoveCursorLeft = function(AddToSelect, Word)
 			var oFootnote = this.Selection.End.Footnote;
 			if (false === oFootnote.Cursor_MoveLeft(true, Word))
 			{
+				var oPrevFootnote = this.private_GetPrevFootnote(oFootnote);
+				if (null === oPrevFootnote)
+					return false;
 
+				if (1 !== this.Selection.Direction)
+				{
+					this.Selection.End.Footnote = oPrevFootnote;
+					this.Selection.Direction    = -1;
+					this.CurFootnote            = oPrevFootnote;
+
+					this.Selection.Footnotes[oPrevFootnote.Get_Id()] = oPrevFootnote;
+
+					oPrevFootnote.Cursor_MoveToEndPos(false, true);
+					oPrevFootnote.Cursor_MoveLeft(true, Word);
+				}
+				else
+				{
+					this.Selection.End.Footnote = oPrevFootnote;
+					this.CurFootnote            = oPrevFootnote;
+
+					if (oPrevFootnote === this.Selection.Start.Footnote)
+						this.Selection.Direction = 0;
+
+					oFootnote.Selection_Remove();
+					delete this.Selection.Footnotes[oFootnote.Get_Id()];
+
+					oPrevFootnote.Cursor_MoveLeft(true, Word);
+				}
 			}
 		}
 	}
@@ -849,14 +894,49 @@ CFootnotesController.prototype.MoveCursorLeft = function(AddToSelect, Word)
 	{
 		if (true === AddToSelect)
 		{
+			var oFootnote = this.CurFootnote;
 
+			this.Selection.Use            = true;
+			this.Selection.Start.Footnote = oFootnote;
+			this.Selection.End.Footnote   = oFootnote;
+			this.Selection.Footnotes      = {};
+			this.Selection.Direction      = 0;
+
+			this.Selection.Footnotes[oFootnote.Get_Id()] = oFootnote;
+			if (false === oFootnote.Cursor_MoveLeft(true, Word))
+			{
+				var oPrevFootnote = this.private_GetPrevFootnote(oFootnote);
+				if (null === oPrevFootnote)
+					return false;
+
+				this.Selection.End.Footnote = oPrevFootnote;
+				this.Selection.Direction    = -1;
+				this.CurFootnote            = oPrevFootnote;
+
+				this.Selection.Footnotes[oPrevFootnote.Get_Id()] = oPrevFootnote;
+
+				oPrevFootnote.Cursor_MoveToEndPos(false, true);
+				oPrevFootnote.Cursor_MoveLeft(true, Word);
+			}
 		}
 		else
 		{
 			var oFootnote = this.CurFootnote;
 			if (false === oFootnote.Cursor_MoveLeft(false, Word))
 			{
+				var oPrevFootnote = this.private_GetPrevFootnote(oFootnote);
+				if (null === oPrevFootnote)
+					return false;
 
+				this.Selection.Start.Footnote = oPrevFootnote;
+				this.Selection.End.Footnote   = oPrevFootnote;
+				this.Selection.Direction      = 0;
+				this.CurFootnote              = oPrevFootnote;
+				this.Selection.Footnotes      = {};
+
+				this.Selection.Footnotes[oPrevFootnote.Get_Id()] = oPrevFootnote;
+
+				oPrevFootnote.Cursor_MoveToEndPos(false);
 			}
 		}
 	}
@@ -865,20 +945,116 @@ CFootnotesController.prototype.MoveCursorLeft = function(AddToSelect, Word)
 };
 CFootnotesController.prototype.MoveCursorRight = function(AddToSelect, Word, FromPaste)
 {
-	var bRetValue = false;
-
-	// TODO: Доделать селект и курсор
-
 	if (true === this.Selection.Use)
 	{
+		if (true !== AddToSelect)
+		{
+			var oFootnote = this.CurFootnote;
+			if (0 === this.Selection.Direction)
+				oFootnote = this.CurFootnote;
+			else if (1 === this.Selection.Direction)
+				oFootnote = this.Selection.End.Footnote;
+			else
+				oFootnote = this.Selection.Start.Footnote;
+
+			for (var sId in this.Selection.Footnotes)
+			{
+				if (oFootnote !== this.Selection.Footnotes[sId])
+					this.Selection.Footnotes[sId].Selection_Remove();
+			}
+
+			oFootnote.Cursor_MoveRight(false, Word, FromPaste);
+			oFootnote.Selection_Remove();
+			this.private_SetCurrentFootnoteNoSelection(oFootnote);
+		}
+		else
+		{
+			var oFootnote = this.Selection.End.Footnote;
+			if (false === oFootnote.Cursor_MoveRight(true, Word, FromPaste))
+			{
+				var oNextFootnote = this.private_GetNextFootnote(oFootnote);
+				if (null === oNextFootnote)
+					return false;
+
+				if (-1 !== this.Selection.Direction)
+				{
+					this.Selection.End.Footnote = oNextFootnote;
+					this.Selection.Direction    = 1;
+					this.CurFootnote            = oNextFootnote;
+
+					this.Selection.Footnotes[oNextFootnote.Get_Id()] = oNextFootnote;
+
+					oNextFootnote.Cursor_MoveToStartPos(false);
+					oNextFootnote.Cursor_MoveRight(true, Word, FromPaste);
+				}
+				else
+				{
+					this.Selection.End.Footnote = oNextFootnote;
+					this.CurFootnote            = oNextFootnote;
+
+					if (oNextFootnote === this.Selection.Start.Footnote)
+						this.Selection.Direction = 0;
+
+					oFootnote.Selection_Remove();
+					delete this.Selection.Footnotes[oFootnote.Get_Id()];
+
+					oNextFootnote.Cursor_MoveRight(true, Word, FromPaste);
+				}
+			}
+		}
 	}
 	else
 	{
-		if (null !== this.CurFootnote)
-			bRetValue = this.CurFootnote.Cursor_MoveRight(AddToSelect, Word, FromPaste);
+		if (true === AddToSelect)
+		{
+			var oFootnote = this.CurFootnote;
+
+			this.Selection.Use            = true;
+			this.Selection.Start.Footnote = oFootnote;
+			this.Selection.End.Footnote   = oFootnote;
+			this.Selection.Footnotes      = {};
+			this.Selection.Direction      = 0;
+
+			this.Selection.Footnotes[oFootnote.Get_Id()] = oFootnote;
+			if (false === oFootnote.Cursor_MoveRight(true, Word, FromPaste))
+			{
+				var oNextFootnote = this.private_GetNextFootnote(oFootnote);
+				if (null === oNextFootnote)
+					return false;
+
+				this.Selection.End.Footnote = oNextFootnote;
+				this.Selection.Direction    = 1;
+				this.CurFootnote            = oNextFootnote;
+
+				this.Selection.Footnotes[oNextFootnote.Get_Id()] = oNextFootnote;
+
+				oNextFootnote.Cursor_MoveToStartPos(false);
+				oNextFootnote.Cursor_MoveRight(true, Word, FromPaste);
+			}
+		}
+		else
+		{
+			var oFootnote = this.CurFootnote;
+			if (false === oFootnote.Cursor_MoveRight(false, Word ,FromPaste))
+			{
+				var oNextFootnote = this.private_GetNextFootnote(oFootnote);
+				if (null === oNextFootnote)
+					return false;
+
+				this.Selection.Start.Footnote = oNextFootnote;
+				this.Selection.End.Footnote   = oNextFootnote;
+				this.Selection.Direction      = 0;
+				this.CurFootnote              = oNextFootnote;
+				this.Selection.Footnotes      = {};
+
+				this.Selection.Footnotes[oNextFootnote.Get_Id()] = oNextFootnote;
+
+				oNextFootnote.Cursor_MoveToStartPos(false);
+			}
+		}
 	}
 
-	return bRetValue;
+	return true;
 };
 CFootnotesController.prototype.MoveCursorUp = function(AddToSelect)
 {
@@ -916,37 +1092,109 @@ CFootnotesController.prototype.MoveCursorDown = function(AddToSelect)
 };
 CFootnotesController.prototype.MoveCursorToEndOfLine = function(AddToSelect)
 {
-	var bRetValue = false;
-
-	// TODO: Доделать селект и курсор
-
 	if (true === this.Selection.Use)
 	{
+		if (true === AddToSelect)
+		{
+			var oFootnote = this.Selection.End.Footnote;
+			oFootnote.Cursor_MoveEndOfLine(true);
+		}
+		else
+		{
+			var oFootonote = null;
+			if (0 === this.Selection.Direction)
+				oFootnote = this.CurFootnote;
+			else if (1 === this.Selection.Direction)
+				oFootnote = this.Selection.End.Footnote;
+			else
+				oFootnote = this.Selection.Start.Footnote;
+
+			for (var sId in this.Selection.Footnotes)
+			{
+				if (oFootnote !== this.Selection.Footnotes[sId])
+					this.Selection.Footnotes[sId].Selection_Remove();
+			}
+
+			oFootnote.Cursor_MoveEndOfLine(false);
+			oFootnote.Selection_Remove();
+			this.private_SetCurrentFootnoteNoSelection(oFootnote);
+		}
 	}
 	else
 	{
-		if (null !== this.CurFootnote)
-			bRetValue = this.CurFootnote.Cursor_MoveEndOfLine(AddToSelect);
+		if (true === AddToSelect)
+		{
+			var oFootnote = this.CurFootnote;
+
+			this.Selection.Use            = true;
+			this.Selection.Start.Footnote = oFootnote;
+			this.Selection.End.Footnote   = oFootnote;
+			this.Selection.Footnotes      = {};
+			this.Selection.Direction      = 0;
+
+			this.Selection.Footnotes[oFootnote.Get_Id()] = oFootnote;
+			oFootnote.Cursor_MoveEndOfLine(true);
+		}
+		else
+		{
+			this.CurFootnote.Cursor_MoveEndOfLine(false);
+		}
 	}
 
-	return bRetValue;
+	return true;
 };
 CFootnotesController.prototype.MoveCursorToStartOfLine = function(AddToSelect)
 {
-	var bRetValue = false;
-
-	// TODO: Доделать селект и курсор
-
 	if (true === this.Selection.Use)
 	{
+		if (true === AddToSelect)
+		{
+			var oFootnote = this.Selection.End.Footnote;
+			oFootnote.Cursor_MoveStartOfLine(true);
+		}
+		else
+		{
+			var oFootonote = null;
+			if (0 === this.Selection.Direction)
+				oFootnote = this.CurFootnote;
+			else if (1 === this.Selection.Direction)
+				oFootnote = this.Selection.Start.Footnote;
+			else
+				oFootnote = this.Selection.End.Footnote;
+
+			for (var sId in this.Selection.Footnotes)
+			{
+				if (oFootnote !== this.Selection.Footnotes[sId])
+					this.Selection.Footnotes[sId].Selection_Remove();
+			}
+
+			oFootnote.Cursor_MoveStartOfLine(false);
+			oFootnote.Selection_Remove();
+			this.private_SetCurrentFootnoteNoSelection(oFootnote);
+		}
 	}
 	else
 	{
-		if (null !== this.CurFootnote)
-			bRetValue = this.CurFootnote.Cursor_MoveStartOfLine(AddToSelect);
+		if (true === AddToSelect)
+		{
+			var oFootnote = this.CurFootnote;
+
+			this.Selection.Use            = true;
+			this.Selection.Start.Footnote = oFootnote;
+			this.Selection.End.Footnote   = oFootnote;
+			this.Selection.Footnotes      = {};
+			this.Selection.Direction      = 0;
+
+			this.Selection.Footnotes[oFootnote.Get_Id()] = oFootnote;
+			oFootnote.Cursor_MoveStartOfLine(true);
+		}
+		else
+		{
+			this.CurFootnote.Cursor_MoveStartOfLine(false);
+		}
 	}
 
-	return bRetValue;
+	return true;
 };
 CFootnotesController.prototype.MoveCursorToXY = function(X, Y, PageAbs, AddToSelect)
 {
