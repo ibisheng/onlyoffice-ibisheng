@@ -176,7 +176,7 @@
     this.fontRenderingMode = null;
     this.lockDraw = false;		// Lock отрисовки на некоторое время
 
-	this.isCellEditMode = false;
+    this.isCellEditMode = false;
 
     this.formulasList = [];		// Список всех формул
     this.lastFormulaPos = -1; 		// Последняя позиция формулы
@@ -572,7 +572,22 @@
         self.cellEditor._onWindowKeyUp(event);
       }
     };
-    
+    this.Api.Begin_CompositeInput = function () {
+      self.cellEditor.Begin_CompositeInput();
+      if (!self.isCellEditMode) {
+        self._onEditCell(false, true, undefined, true, function() {
+          self.cellEditor.Begin_CompositeInput();
+        });
+      }
+    };
+    this.Api.Replace_CompositeText = function (arrCharCodes) {
+      if (self.isCellEditMode) {
+        self.cellEditor.Replace_CompositeText(arrCharCodes);
+      }
+    };
+    this.Api.End_CompositeInput = function() {
+      self.cellEditor.End_CompositeInput();
+    };
     AscCommon.InitBrowserInputContext(this.Api, "id_target_cursor");
 
     this.wsViewHandlers = new AscCommonExcel.asc_CHandlersList(/*handlers*/{
