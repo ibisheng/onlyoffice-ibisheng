@@ -7100,7 +7100,7 @@ function offline_apply_event(type,params) {
 
         case 7001: // ASC_SPREADSHEETS_EVENT_TYPE_CHECK_DATA_RANGE
         {
-            var isValid = _api.asc_checkDataRange(Asc.c_oAscSelectionDialogType.Chart, params, false);
+            var isValid = _api.asc_checkDataRange(parseInt(params[0]), params[1], params[2], params[3], parseInt(params[4]));
 
             _stream = global_memory_stream_menu;
             _stream["ClearNoAttack"]();
