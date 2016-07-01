@@ -6010,7 +6010,7 @@ function offline_paste(params) {
     }
     else if (1 == type)
     {
-        _s.offline_addImageDrawingObject(params[1], {width: params[2], height: params[3]});
+        _s.offline_addImageDrawingObject([params[1], params[2],params[3]]);
     }
     else if (2 == type)
     {
