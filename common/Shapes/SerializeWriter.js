@@ -2980,7 +2980,7 @@ function CBinaryFileWriter()
         nvGraphicFramePr.objectType = grObj.getObjectType();
         oThis.WriteRecord1(0, nvGraphicFramePr, oThis.WriteUniNvPr);
 
-        if (grObj.spPr.xfrm && grObj.spPr.xfrm.isNotNull())
+        if (grObj.spPr && grObj.spPr.xfrm && grObj.spPr.xfrm.isNotNull())
             oThis.WriteRecord2(1, grObj.spPr.xfrm, oThis.WriteXfrm);
 
         oThis.WriteRecord2(3, grObj, oThis.WriteChart2);
