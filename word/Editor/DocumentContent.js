@@ -1934,25 +1934,121 @@ CDocumentContent.prototype.Cursor_MoveToEndPos           = function(AddToSelect,
         }
     }
 };
-CDocumentContent.prototype.Cursor_MoveUp_To_LastRow      = function(X, Y, AddToSelect)
+CDocumentContent.prototype.Cursor_MoveUp_To_LastRow = function(X, Y, AddToSelect)
 {
-    // Такого не должно быть
-    if (true === AddToSelect)
-        return;
-
     this.Set_CurPosXY(X, Y);
-    this.CurPos.ContentPos = this.Content.length - 1;
-    this.Content[this.CurPos.ContentPos].Cursor_MoveUp_To_LastRow(X, Y, false);
+    if (true === AddToSelect)
+    {
+        if (true !== this.Selection.Use)
+        {
+            this.CurPos.ContentPos = this.Content.length - 1;
+            this.Set_DocPosType(docpostype_Content);
+            this.Selection.Use      = true;
+            this.Selection.Start    = false;
+            this.Selection.StartPos = this.CurPos.ContentPos;
+            this.Selection.EndPos   = this.CurPos.ContentPos;
+            this.Selection.Flag     = selectionflag_Common;
+
+            this.Content[this.CurPos.ContentPos].Cursor_MoveToEndPos(false, true);
+            this.Content[this.CurPos.ContentPos].Cursor_MoveUp_To_LastRow(X, Y, true);
+        }
+        else
+        {
+            var StartPos = this.Selection.StartPos;
+            var EndPos   = this.Content.length - 1;
+
+            this.CurPos.ContentPos = EndPos;
+
+            // Очистим старый селект кроме начального элемента
+            var _S = this.Selection.StartPos <= this.Selection.EndPos ? this.Selection.StartPos : this.Selection.EndPos;
+            var _E = this.Selection.StartPos <= this.Selection.EndPos ? this.Selection.EndPos : this.Selection.StartPos;
+            for (var nPos = _S; nPos <= _E; ++nPos)
+            {
+                if (nPos !== StartPos)
+                    this.Content[nPos].Selection_Remove();
+            }
+
+            if (StartPos === EndPos)
+            {
+                this.Selection.StartPos = StartPos;
+                this.Selection.EndPos   = StartPos;
+                this.Content[StartPos].Cursor_MoveUp_To_LastRow(X, Y, true);
+            }
+            else
+            {
+                this.Content[StartPos].Cursor_MoveToEndPos(true);
+                for (var nPos = StartPos + 1; nPos <= EndPos; ++nPos)
+                {
+                    this.Content[nPos].Select_All(1);
+                }
+
+                this.Content[EndPos].Cursor_MoveUp_To_LastRow(X, Y, true);
+            }
+        }
+    }
+    else
+    {
+        this.CurPos.ContentPos = this.Content.length - 1;
+        this.Content[this.CurPos.ContentPos].Cursor_MoveUp_To_LastRow(X, Y, false);
+    }
 };
-CDocumentContent.prototype.Cursor_MoveDown_To_FirstRow   = function(X, Y, AddToSelect)
+CDocumentContent.prototype.Cursor_MoveDown_To_FirstRow = function(X, Y, AddToSelect)
 {
-    // Такого не должно быть
-    if (true === AddToSelect)
-        return;
-
     this.Set_CurPosXY(X, Y);
-    this.CurPos.ContentPos = 0;
-    this.Content[this.CurPos.ContentPos].Cursor_MoveDown_To_FirstRow(X, Y, false);
+    if (true === AddToSelect)
+    {
+        if (true !== this.Selection.Use)
+        {
+            this.CurPos.ContentPos = 0;
+            this.Set_DocPosType(docpostype_Content);
+            this.Selection.Use      = true;
+            this.Selection.Start    = false;
+            this.Selection.StartPos = 0;
+            this.Selection.EndPos   = 0;
+            this.Selection.Flag     = selectionflag_Common;
+
+            this.Content[0].Cursor_MoveToStartPos(false);
+            this.Content[0].Cursor_MoveDown_To_FirstRow(X, Y, true);
+        }
+        else
+        {
+            var StartPos = this.Selection.StartPos;
+            var EndPos   = 0;
+
+            this.CurPos.ContentPos = EndPos;
+
+            // Очистим старый селект кроме начального элемента
+            var _S = this.Selection.StartPos <= this.Selection.EndPos ? this.Selection.StartPos : this.Selection.EndPos;
+            var _E = this.Selection.StartPos <= this.Selection.EndPos ? this.Selection.EndPos : this.Selection.StartPos;
+            for (var nPos = _S; nPos <= _E; ++nPos)
+            {
+                if (nPos !== StartPos)
+                    this.Content[nPos].Selection_Remove();
+            }
+
+            if (StartPos === EndPos)
+            {
+                this.Selection.StartPos = StartPos;
+                this.Selection.EndPos   = StartPos;
+                this.Content[StartPos].Cursor_MoveDown_To_FirstRow(X, Y, true);
+            }
+            else
+            {
+                this.Content[StartPos].Cursor_MoveToStartPos(true);
+                for (var nPos = EndPos; nPos < StartPos; ++nPos)
+                {
+                    this.Content[nPos].Select_All(-1);
+                }
+
+                this.Content[EndPos].Cursor_MoveDown_To_FirstRow(X, Y, true);
+            }
+        }
+    }
+    else
+    {
+        this.CurPos.ContentPos = 0;
+        this.Content[this.CurPos.ContentPos].Cursor_MoveDown_To_FirstRow(X, Y, false);
+    }
 };
 CDocumentContent.prototype.Cursor_MoveToCell             = function(bNext)
 {
@@ -3519,7 +3615,8 @@ CDocumentContent.prototype.Cursor_MoveUp                      = function(AddToSe
         {
             if (true === AddToSelect)
             {
-                // Добавляем к селекту
+                var SelectDirection = this.Selection.StartPos === this.Selection.EndPos ? 0 : this.Selection.StartPos < this.Selection.EndPos ? 1 : -1;
+
                 var Item = this.Content[this.Selection.EndPos];
                 if (false === Item.Cursor_MoveUp(1, true))
                 {
@@ -3528,6 +3625,9 @@ CDocumentContent.prototype.Cursor_MoveUp                      = function(AddToSe
                         var TempXY        = Item.Get_CurPosXY();
                         this.CurPos.RealX = TempXY.X;
                         this.CurPos.RealY = TempXY.Y;
+
+                        if (1 === SelectDirection)
+                            Item.Selection_Remove();
 
                         this.Selection.EndPos--;
                         Item = this.Content[this.Selection.EndPos];
@@ -3656,7 +3756,8 @@ CDocumentContent.prototype.Cursor_MoveDown                    = function(AddToSe
         {
             if (true === AddToSelect)
             {
-                // Добавляем к селекту
+                var SelectDirection = this.Selection.StartPos === this.Selection.EndPos ? 0 : this.Selection.StartPos < this.Selection.EndPos ? 1 : -1;
+
                 var Item = this.Content[this.Selection.EndPos];
                 if (false === Item.Cursor_MoveDown(1, true))
                 {
@@ -3665,6 +3766,9 @@ CDocumentContent.prototype.Cursor_MoveDown                    = function(AddToSe
                         var TempXY        = Item.Get_CurPosXY();
                         this.CurPos.RealX = TempXY.X;
                         this.CurPos.RealY = TempXY.Y;
+
+                        if (-1 === SelectDirection)
+                            Item.Selection_Remove();
 
                         this.Selection.EndPos++;
                         Item = this.Content[this.Selection.EndPos];
