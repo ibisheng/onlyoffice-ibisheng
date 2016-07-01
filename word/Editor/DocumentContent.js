@@ -4004,7 +4004,7 @@ CDocumentContent.prototype.Cursor_MoveStartOfLine             = function(AddToSe
         }
     }
 };
-CDocumentContent.prototype.Cursor_MoveAt                      = function(X, Y, AddToSelect, bRemoveOldSelection, CurPage)
+CDocumentContent.prototype.Cursor_MoveAt = function(X, Y, AddToSelect, bRemoveOldSelection, CurPage)
 {
     if (undefined != CurPage)
         this.CurPage = CurPage;
@@ -4018,7 +4018,9 @@ CDocumentContent.prototype.Cursor_MoveAt                      = function(X, Y, A
     {
         if (true === AddToSelect)
         {
-            this.Selection_SetEnd(X, Y, this.CurPage, true);
+            var oMouseEvent  = new AscCommon.CMouseEventHandler();
+            oMouseEvent.Type = AscCommon.g_mouse_event_type_up;
+            this.Selection_SetEnd(X, Y, this.CurPage, oMouseEvent);
         }
         else
         {
@@ -4037,12 +4039,10 @@ CDocumentContent.prototype.Cursor_MoveAt                      = function(X, Y, A
     {
         if (true === AddToSelect)
         {
-            this.Selection.Use                                      = true;
-            this.Selection.StartPos                                 = this.CurPos.ContentPos;
-            this.Content[this.CurPos.ContentPos].Selection.Use      = true;
-            this.Content[this.CurPos.ContentPos].Selection.StartPos = this.Content[this.CurPos.ContentPos].CurPos.ContentPos;
-
-            this.Selection_SetEnd(X, Y, this.CurPage);
+            this.Start_SelectionFromCurPos();
+            var oMouseEvent  = new AscCommon.CMouseEventHandler();
+            oMouseEvent.Type = AscCommon.g_mouse_event_type_up;
+            this.Selection_SetEnd(X, Y, this.CurPage, oMouseEvent);
         }
         else
         {

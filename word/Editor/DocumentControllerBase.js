@@ -248,6 +248,15 @@ CDocumentControllerBase.prototype.Get_PageContentStartPos = function(PageAbs)
 {
 	return {X : 0, Y : 0, XLimit : 0, YLimit : 0};
 };
+/**
+ * Выставляем текущий элемент в данном классе.
+ * @param bUpdateStates
+ * @param PageAbs
+ * @param oClass - ссылка на дочерний класс, из которого вызывалась данная функция
+ */
+CDocumentControllerBase.prototype.Set_CurrentElement = function(bUpdateStates, PageAbs, oClass)
+{
+};
 //----------------------------------------------------------------------------------------------------------------------
 // Чисто виртуальные функции
 //----------------------------------------------------------------------------------------------------------------------
