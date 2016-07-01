@@ -197,13 +197,10 @@
 				History.TurnOff();
 				//use binary strings
 				if(copyPasteUseBinary)
-				{	
-					if(!isIntoShape)
-					{
-						sBase64 = this.getBinaryForCopy(worksheet);
-						$(container.children[0]).addClass(sBase64);
-					}
-				}	
+				{
+					sBase64 = this.getBinaryForCopy(worksheet);
+					$(container.children[0]).addClass(sBase64);
+				}
 				History.TurnOn();
 				
 				return {base64: sBase64, html: container.innerHTML};
@@ -214,36 +211,95 @@
 				var objectRender = worksheet.objectRender;
 				var isIntoShape = objectRender.controller.getTargetDocContent();
 				
+				var sBase64 = null;
 				if(isIntoShape)
 				{
-					return null;
+					//в данному случае пишем бинарник с меткой pptData - с префиксом xlsData отдельно параграфы записать не получится
+					sBase64 = this._getBinaryShapeContent(worksheet, isIntoShape);
+				}
+				else
+				{
+					pptx_content_writer.Start_UseFullUrl();
+				
+					//TODO стоит убрать заглушку при правке бага с activeRange
+					var cloneActiveRange = worksheet.activeRange.clone();
+					var temp;
+					if(cloneActiveRange.c1 > cloneActiveRange.c2)
+					{
+						temp = cloneActiveRange.c1;
+						cloneActiveRange.c1 = cloneActiveRange.c2;
+						cloneActiveRange.c2 = temp;
+					};
+					
+					if(cloneActiveRange.r1 > cloneActiveRange.r2)
+					{
+						temp = cloneActiveRange.r1;
+						cloneActiveRange.r1 = cloneActiveRange.r2;
+						cloneActiveRange.r2 = temp;
+					};
+					
+					var oBinaryFileWriter = new AscCommonExcel.BinaryFileWriter(worksheet.model.workbook, cloneActiveRange);
+					var sBase64 = "xslData;" + oBinaryFileWriter.Write();
+					
+					pptx_content_writer.End_UseFullUrl();
 				}
 				
-				pptx_content_writer.Start_UseFullUrl();
+				return sBase64;
+			},
+			
+			_getBinaryShapeContent : function(worksheet, isIntoShape)
+			{	
+				var sBase64;
 				
-				//TODO стоит убрать заглушку при правке бага с activeRange
-				var cloneActiveRange = worksheet.activeRange.clone();
-				var temp;
-				if(cloneActiveRange.c1 > cloneActiveRange.c2)
+				var selectedContent = new CSelectedContent();
+				isIntoShape.Get_SelectedContent(selectedContent)
+				
+				var oPresentationWriter = new AscCommon.CBinaryFileWriter();
+				
+				//начало записи
+				oPresentationWriter.WriteString2("");
+				oPresentationWriter.WriteDouble(1);
+				oPresentationWriter.WriteDouble(1);
+				
+				if(selectedContent)//пишем контент
 				{
-					temp = cloneActiveRange.c1;
-					cloneActiveRange.c1 = cloneActiveRange.c2;
-					cloneActiveRange.c2 = temp;
-				};
+					var docContent = selectedContent;
+					
+					if(docContent.Elements)
+					{
+						var elements = docContent.Elements;
+						
+						//пишем метку и длины
+						oPresentationWriter.WriteString2("Content");
+						oPresentationWriter.WriteDouble(elements.length);
+						
+						//пишем контент
+						for ( var Index = 0; Index < elements.length; Index++ )
+						{
+							var Item;
+							if(elements[Index].Element)
+								Item = elements[Index].Element;
+							else
+								Item = elements[Index];
+							
+							if ( type_Paragraph === Item.GetType() )
+							{
+								oPresentationWriter.StartRecord(0);
+								oPresentationWriter.WriteParagraph(Item);
+								oPresentationWriter.EndRecord();
+							}
+						}
+						
+						sBase64 = oPresentationWriter.GetBase64Memory();
+					}
+					
+					if(null !== sBase64)
+					{
+						sBase64 = "pptData;" + oPresentationWriter.pos + ";" + sBase64;
+					}
+				}
 				
-				if(cloneActiveRange.r1 > cloneActiveRange.r2)
-				{
-					temp = cloneActiveRange.r1;
-					cloneActiveRange.r1 = cloneActiveRange.r2;
-					cloneActiveRange.r2 = temp;
-				};
-				
-				var oBinaryFileWriter = new AscCommonExcel.BinaryFileWriter(worksheet.model.workbook, cloneActiveRange);
-				var sBase64 = oBinaryFileWriter.Write();
-				
-				pptx_content_writer.End_UseFullUrl();
-				
-				return "xslData;" + sBase64;
+				return sBase64;
 			},
 			
 			getText: function(range, worksheet)
@@ -846,14 +902,73 @@
 				{
 					case "Content":
 					{
-						//пока вставляем через html
-						return false;
-						
-						//TODO вставка через бинарник требует переконвертировать контент в вордовский, либо сделать парсинг из презентационных параграфов
-						var docContent = this.ReadPresentationText(stream, worksheet);
-						var oPasteFromBinaryWord = new pasteFromBinaryWord(this, worksheet);
+						if(isIntoShape)
+						{
+							var pasteData = this.ReadPresentationText(stream, worksheet);
+							var insertContent = new CSelectedContent();
+							var target_doc_content = isIntoShape;
+							
+							var elements = [], selectedElement, element;
+							for(var i = 0; i < pasteData.length; ++i)
+							{
+								selectedElement = new CSelectedElement();
+								element = pasteData[i];
+								
+								if(type_Paragraph == element.GetType())//paragraph
+								{
+									selectedElement.Element = element;
+									elements.push(selectedElement);
+								}
+								else if(type_Table == element.GetType())//table
+								{
+									//TODO вырезать из таблицы параграфы
+								}
+							}
 
-						oPasteFromBinaryWord._paste(worksheet, {DocumentContent: docContent});
+							insertContent.Elements = elements;
+
+							var paragraph = target_doc_content.Content[target_doc_content.CurPos.ContentPos];
+							if (null != paragraph && type_Paragraph == paragraph.GetType())
+							{
+								var NearPos = {Paragraph: paragraph, ContentPos: paragraph.Get_ParaContentPos(false, false)};
+								paragraph.Check_NearestPos(NearPos);
+								target_doc_content.Insert_Content(insertContent, NearPos);
+								
+								var oTargetTextObject = AscFormat.getTargetTextObject(worksheet.objectRender.controller);
+								oTargetTextObject && oTargetTextObject.checkExtentsByDocContent && oTargetTextObject.checkExtentsByDocContent();
+								worksheet.objectRender.controller.startRecalculate();
+							}
+							
+							return true;
+						}
+						else
+						{
+							var docContent = this.ReadPresentationText(stream, worksheet);
+							var oPasteFromBinaryWord = new pasteFromBinaryWord(this, worksheet);
+							
+							var oTempDrawingDocument = worksheet.model.DrawingDocument;
+							var newCDocument = new CDocument(oTempDrawingDocument, false);
+							newCDocument.bFromDocument = true;
+							newCDocument.theme = this.Api.wbModel.theme;
+							
+							var newContent = [];
+							for(var i = 0; i < docContent.length; i++)
+							{
+								if(type_Paragraph == docContent[i].GetType())//paragraph
+								{
+									docContent[i] = AscFormat.ConvertParagraphToWord(docContent[i], newCDocument);
+									docContent[i].bFromDocument = true;
+									newContent.push(docContent[i]);
+								}
+								else if(type_Table == docContent[i].GetType())//table
+								{
+									//TODO вырезать из таблицы параграфы
+								}
+							}
+							docContent = newContent;
+							
+							oPasteFromBinaryWord._paste(worksheet, {content: docContent});
+						}
 						
 						return true;
 					}
@@ -2847,7 +2962,7 @@
 			this.bOccurEndPar = null;
 			this.oCurHyperlink = null;
 			this.oCurHyperlinkElem = null;
-			this.oPresentationWriter = new AscCommon.CBinaryFileWriter();
+			this.oBinaryFileWriter = new AscCommon.CBinaryFileWriter();
 		}
 		CopyShapeContent.prototype =
 		{
@@ -3306,7 +3421,7 @@
 					if ( type_Paragraph === Item.GetType() )
 					{
 						//todo ����� ������ ��� �������� ������ ���� Index == End
-						//this.oBinaryFileWriter.CopyParagraph(Item);
+						this.oBinaryFileWriter.WriteParagraph(Item);
 						this.CopyParagraph(oDomTarget, Item, Index == End, bUseSelection, oDocument.Content, Index);
 					}
 				}
