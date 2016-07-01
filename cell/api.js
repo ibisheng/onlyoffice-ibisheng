@@ -1712,7 +1712,7 @@ var editor;
   spreadsheet_api.prototype._onUpdateDefinedNames = function(lockElem) {
 //      if( lockElem.Element["subType"] == AscCommonExcel.c_oAscLockTypeElemSubType.DefinedNames ){
       if( lockElem.Element["sheetId"] == -1 && lockElem.Element["rangeOrObjectId"] != -1 && !this.collaborativeEditing.getFast() ){
-          var dN = this.wbModel.dependencyFormulas.defNameList[lockElem.Element["rangeOrObjectId"]];
+          var dN = this.wbModel.dependencyFormulas.getDefNameNodeByNodeId(lockElem.Element["rangeOrObjectId"]);
           if (dN) {
               dN.isLock = lockElem.UserId;
               this.handlers.trigger("asc_onRefreshDefNameList",dN.getAscCDefName());

@@ -811,6 +811,12 @@ var c_oAscPrintDefaultSettings = {
     FitToWidth  : 2,
     CustomMode  : 3
   };
+	var c_oNotifyType = {
+		Dirty: 0,
+		Shift: 1,
+		Move: 2,
+		Delete: 3
+	};
 
     var c_oDashType = {
         dash: 0,
@@ -1462,6 +1468,7 @@ window['Asc']['c_oAscMaxCellOrCommentLength'] = window['Asc'].c_oAscMaxCellOrCom
   window["AscCommon"].c_oAscMouseMoveDataTypes = c_oAscMouseMoveDataTypes;
   window["AscCommon"].c_oAscPrintDefaultSettings = c_oAscPrintDefaultSettings;
   window["AscCommon"].c_oZoomType = c_oZoomType;
+  window["AscCommon"].c_oNotifyType = c_oNotifyType;
   window["AscCommon"].c_oAscEncodings = c_oAscEncodings;
   window["AscCommon"].c_oAscEncodingsMap = c_oAscEncodingsMap;
   window["AscCommon"].c_oAscCodePageUtf8 = c_oAscCodePageUtf8;

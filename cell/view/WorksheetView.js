@@ -9097,7 +9097,7 @@
                         t.handlers.trigger( "slowOperation", true );
                     }
                     /* отключаем отрисовку на случай необходимости пересчета ячеек, заносим ячейку, при необходимости в список перерисовываемых */
-                    t.model.workbook.lockDraw();
+                    t.model.workbook.dependencyFormulas.lockRecal();
 
                     // Если нужно удалить автофильтры - удаляем
                     if ( val === c_oAscCleanOptions.All || val === c_oAscCleanOptions.Text ) {
@@ -9131,8 +9131,7 @@
 					}
 
                     /* возвращаем отрисовку. и перерисовываем ячейки с предварительным пересчетом */
-                    t.model.workbook.unLockDraw();
-                    t.model.workbook.buildRecalc();
+                    t.model.workbook.dependencyFormulas.unlockRecal();
                     break;
 
                 case "changeDigNum":
@@ -9237,7 +9236,7 @@
             t.handlers.trigger( "slowOperation", true );
         }
 
-        t.model.workbook.lockDraw();
+        t.model.workbook.dependencyFormulas.lockRecal();
         var selectData;
         if ( isLocal === 'binary' ) {
             selectData = t._pasteFromBinary( val );
@@ -9250,8 +9249,7 @@
 
         if ( !selectData ) {
             bIsUpdate = false;
-            t.model.workbook.unLockDraw();
-            t.model.workbook.buildRecalc();
+            t.model.workbook.dependencyFormulas.unlockRecal();
 			if ( callTrigger ) {
                 t.handlers.trigger( "slowOperation", false );
             }
@@ -9273,8 +9271,7 @@
             }
         }
 
-        t.model.workbook.unLockDraw();
-        t.model.workbook.buildRecalc();
+        t.model.workbook.dependencyFormulas.unlockRecal();
         var arn = selectData[0];
         var selectionRange = arn.clone( true );
 
@@ -13867,7 +13864,7 @@
 		
 		//лочим данный именованный диапазон при смене размера ф/т
 		var defNameId = t.model.workbook.dependencyFormulas.getDefNameNodeByName(tableName, t.model.getId());
-		defNameId = defNameId ? defNameId.nodeId : null;
+		defNameId = defNameId ? defNameId.getNodeId() : null;
 		
 		t._isLockedDefNames( callBackLockedDefNames, defNameId );
 	};

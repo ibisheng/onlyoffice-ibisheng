@@ -2818,8 +2818,7 @@
 				
 				if(worksheet.TableParts)
 				{
-					//TODO: buildRecalc вызывать из модели!!!
-					worksheet.workbook.buildRecalc(true, false);
+					worksheet.workbook.dependencyFormulas.buildDependency();
 					for(var i = 0; i < worksheet.TableParts.length; i++)
 					{
 						var filter = worksheet.TableParts[i];

@@ -2971,11 +2971,10 @@ UndoRedoWorkbook.prototype = {
                 if(this.wb.bCollaborativeChanges){
                     var name = Data.newName.Name, lsID = this.wb.getWorksheet(Data.newName.LocalSheetId);
                     lsID === null || lsID === undefined ? null : lsID = this.wb.getWorksheet(Data.newName.LocalSheetId).getId();
-                    if( this.wb.isDefinedNamesExists(name,lsID) ){
-                        var oConflictDefName = this.wb.getDefinesNames(name,lsID);
-                        if(oConflictDefName)
-                            oConflictDefName.renameDefNameToCollaborate(this.wb.getUniqueDefinedNameFrom(oConflictDefName, true));
-                    }
+
+					var oConflictDefName = this.wb.getDefinesNames(name, lsID);
+					if (oConflictDefName)
+						oConflictDefName.renameDefNameToCollaborate(this.wb.getUniqueDefinedNameFrom(oConflictDefName, true));
                     this.wb.handlers.trigger("asc_onLockDefNameManager",Asc.c_oAscDefinedNameReason.OK);
                 }
                 this.wb.editDefinesNames( null, Data.newName, true );

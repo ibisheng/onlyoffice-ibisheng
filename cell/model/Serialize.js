@@ -3283,8 +3283,8 @@
 					if(ECellTypeType.celltypeNumber != nType)
 						this.bs.WriteItem(c_oSerCellTypes.Type, function(){oThis.memory.WriteByte(nType);});
 				}
-				if(null != cell.sFormula)
-					this.bs.WriteItem(c_oSerCellTypes.Formula, function(){oThis.WriteFormula(cell.sFormula, cell.sFormulaCA);});
+				if(null != cell.formulaParsed)
+					this.bs.WriteItem(c_oSerCellTypes.Formula, function(){oThis.WriteFormula(cell.formulaParsed);});
 				if(null != cell.oValue && false == cell.oValue.isEmpty())
 				{
 					var dValue = 0;
@@ -3360,7 +3360,7 @@
 				}
 			}
         };
-        this.WriteFormula = function(sFormula, sFormulaCA)
+        this.WriteFormula = function(formulaParsed)
         {
             // if(null != oFormula.aca)
             // {
@@ -3374,11 +3374,11 @@
             // this.memory.WriteByte(c_oSerPropLenType.Byte);
             // this.memory.WriteBool(oFormula.bx);
             // }
-            if(null != sFormulaCA)
+            if(null != formulaParsed.ca)
             {
                 this.memory.WriteByte(c_oSerFormulaTypes.Ca);
                 this.memory.WriteByte(c_oSerPropLenType.Byte);
-                this.memory.WriteBool(sFormulaCA);
+                this.memory.WriteBool(formulaParsed.ca);
             }
             // if(null != oFormula.del1)
             // {
@@ -3442,7 +3442,7 @@
             // }
             this.memory.WriteByte(c_oSerFormulaTypes.Text);
             this.memory.WriteByte(c_oSerPropLenType.Variable);
-            this.memory.WriteString2(sFormula);
+            this.memory.WriteString2(formulaParsed.Formula);
         };
         this.WriteComments = function(aComments, aCommentsCoords)
         {
@@ -5365,14 +5365,13 @@
             var oThis = this;
             if ( c_oSerWorkbookTypes.DefinedName == type )
             {
-                var oNewDefinedName = new AscCommonExcel.DefinedName();
+                var oNewDefinedName = new Asc.asc_CDefName();
                 res = this.bcr.Read1(length, function(t,l){
                     return oThis.ReadDefinedName(t,l,oNewDefinedName);
                 });
                 if(null != oNewDefinedName.Name && null != oNewDefinedName.Ref)
                 {
-
-                    this.oWorkbook.dependencyFormulas.addDefinedNameNode(oNewDefinedName.Name, oNewDefinedName.LocalSheetId, oNewDefinedName.Ref, oNewDefinedName.Hidden);
+                    this.oWorkbook.dependencyFormulas.addDefinedNameNode(oNewDefinedName.Name, oNewDefinedName.Ref, oNewDefinedName.LocalSheetId, oNewDefinedName.Hidden);
 
                 }
             }

@@ -305,6 +305,71 @@
 				return bRes;
 			},
 
+			isIntersectForShift: function(range, isHor) {
+				if (isHor) {
+					return this.r1 <= range.r1 && range.r2 <= this.r2 && this.c1 <= range.c2;
+				} else {
+					return this.c1 <= range.c1 && range.c2 <= this.c2 && this.r1 <= range.r2;
+				}
+			},
+
+			forShift: function(bbox, offset) {
+				var isNoDelete = true;
+				var isHor = 0 != offset.offsetCol;
+				var toDelete = offset.offsetCol < 0 || offset.offsetRow < 0;
+
+				if (isHor) {
+					if (toDelete) {
+						if (this.c1 < bbox.c1) {
+							if (this.c2 <= bbox.c2) {
+								this.setOffsetLast({offsetCol: -(this.c2 - bbox.c1 + 1), offsetRow: 0});
+							} else {
+								this.setOffsetLast(offset);
+							}
+						} else if (this.c1 <= bbox.c2) {
+							if (this.c2 <= bbox.c2) {
+								isNoDelete = false;
+							} else {
+								this.setOffsetFirst({offsetCol: bbox.c2 - this.c1 + 1, offsetRow: 0});
+							}
+						} else {
+							this.setOffset(offset);
+						}
+					} else {
+						if (this.c1 > bbox.c1) {
+							this.setOffset(offset);
+						} else {
+							this.setOffsetLast(offset);
+						}
+					}
+				} else {
+					if (toDelete) {
+						if (this.r1 < bbox.r1) {
+							if (this.r2 <= bbox.r2) {
+								this.setOffsetLast({offsetCol: 0, offsetRow: -(this.r2 - bbox.r1 + 1)});
+							} else {
+								this.setOffsetLast(offset);
+							}
+						} else if (this.r1 <= bbox.r2) {
+							if (this.r2 <= bbox.r2) {
+								isNoDelete = false;
+							} else {
+								this.setOffsetFirst({offsetCol: 0, offsetRow: bbox.r2 - this.r1 + 1});
+							}
+						} else {
+							this.setOffset(offset);
+						}
+					} else {
+						if (this.r1 > bbox.r1) {
+							this.setOffset(offset);
+						} else {
+							this.setOffsetLast(offset);
+						}
+					}
+				}
+				return isNoDelete;
+			},
+
 			isOneCell : function(){
 				return this.r1 == this.r2 && this.c1 == this.c2;
 			},
@@ -324,6 +389,13 @@
 				this.c2 = Math.max(this.c2, range.c2);
 				this.r1 = Math.min(this.r1, range.r1);
 				this.r2 = Math.max(this.r2, range.r2);
+			},
+
+			union3: function (c, r) {
+				this.c1 = Math.min(this.c1, c);
+				this.c2 = Math.max(this.c2, c);
+				this.r1 = Math.min(this.r1, r);
+				this.r2 = Math.max(this.r2, r);
 			},
 			
 			setOffset : function(offset){
@@ -613,6 +685,11 @@
 		};
 		ActiveRange.prototype.union2 = function () {
 			ActiveRange.superclass.union2.apply(this, arguments);
+			this._updateAdditionalData();
+			return this;
+		};
+		ActiveRange.prototype.union3 = function () {
+			ActiveRange.superclass.union3.apply(this, arguments);
 			this._updateAdditionalData();
 			return this;
 		};

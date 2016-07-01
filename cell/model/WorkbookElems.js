@@ -3176,7 +3176,7 @@ CCellValue.prototype =
 			var oValueText = null;
 			var oValueArray = null;
 			var xfs = cell.getCompiledStyle();
-			if(cell.sFormula)
+			if(cell.formulaParsed)
 				oValueText = "="+cell.formulaParsed.assembleLocale(AscCommonExcel.cFormulaFunctionToLocale,true);	// ToDo если будет притормаживать, то завести переменную и не рассчитывать каждый раз!
 			else
 			{
@@ -6879,4 +6879,14 @@ prot["asc_setFilterVal"]				= prot.asc_setFilterVal;
 prot["asc_setPercent"]					= prot.asc_setPercent;
 prot["asc_setTop"]						= prot.asc_setTop;
 prot["asc_setVal"]						= prot.asc_setVal;
+
+window["Asc"]["TreeRBNode"]			= window["Asc"].TreeRBNode = TreeRBNode;
+window["Asc"]["TreeRB"]			= window["Asc"].TreeRB = TreeRB;
+prot									= TreeRB.prototype;
+prot["insertOrGet"]						= prot.insertOrGet;
+prot["deleteNode"]			= prot.deleteNode;
+prot["enumerate"]						= prot.enumerate;
+prot["getElem"]			= prot.getElem;
+prot["getNodeAll"]			= prot.getNodeAll;
+prot["isEmpty"]			= prot.getNodeAll;
 })(window);
