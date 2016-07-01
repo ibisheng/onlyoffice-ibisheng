@@ -7959,8 +7959,16 @@ CTextPr.prototype =
         }
 
 
-        if(undefined !== this.TextOutline &&  !this.TextOutline.IsIdentical(TextPr.TextOutline))
-            this.TextOutline = undefined;
+        if(undefined !== this.TextOutline &&  !this.TextOutline.IsIdentical(TextPr.TextOutline)){
+            if(TextPr.TextOutline !== undefined){
+                this.TextOutline = this.TextOutline.compare(TextPr.TextOutline);
+            }
+            else{
+                this.TextOutline = undefined;
+            }
+
+        }
+
 
 
 

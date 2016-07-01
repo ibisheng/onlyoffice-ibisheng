@@ -4120,6 +4120,9 @@ CLn.prototype =
         {
             _ret.prstDash = this.prstDash;
         }
+        else{
+            _ret.prstDash = undefined;
+        }
         if(this.Join === line.Join)
         {
             _ret.Join = this.Join;
@@ -4245,7 +4248,7 @@ CLn.prototype =
         return ln && (this.Fill == null ? ln.Fill == null : this.Fill.IsIdentical(ln.Fill) )&& (this.Join == null ? ln.Join == null : this.Join.IsIdentical(ln.Join) )
             && (this.headEnd == null ? ln.headEnd == null : this.headEnd.IsIdentical(ln.headEnd) )
             && (this.tailEnd == null ? ln.tailEnd == null : this.tailEnd.IsIdentical(ln.headEnd)) &&
-            this.algn == ln.algn && this.cap == ln.cap && this.cmpd == ln.cmpd && this.w== ln.w;
+            this.algn == ln.algn && this.cap == ln.cap && this.cmpd == ln.cmpd && this.w== ln.w && this.prstDash === ln.prstDash;
     },
 
     setFill: function(fill)
@@ -11654,7 +11657,7 @@ function CreateAscStroke(ln, _canChangeArrows)
     if(AscFormat.isRealNumber(ln.prstDash)){
         ret.prstDash = ln.prstDash;
     }
-    else{
+    else if(ln.prstDash === null){
         ret.prstDash = Asc.c_oDashType.solid;
     }
     if (true === _canChangeArrows)
@@ -11747,9 +11750,6 @@ function CorrectUniStroke(asc_stroke, unistroke, flag)
     }
     if(AscFormat.isRealNumber(asc_stroke.prstDash)){
         ret.prstDash = asc_stroke.prstDash;
-    }
-    else{
-        ret.prstDash = Asc.c_oDashType.solid;
     }
     return ret;
 }
