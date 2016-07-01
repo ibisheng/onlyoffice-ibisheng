@@ -845,36 +845,8 @@
 					var insertContent = new CSelectedContent();
 					var target_doc_content = isIntoShape;
 					
-					var elements = [], selectedElement, element, drawings = [], pDrawings = [], drawingCopyObject;
-					for(var i = 0; i < pasteData.content.length; ++i)
-					{
-						selectedElement = new CSelectedElement();
-						element = pasteData.content[i];
-						
-						if(type_Paragraph == element.GetType())//paragraph
-						{
-							selectedElement.Element = AscFormat.ConvertParagraphToPPTX(element);
-							elements.push(selectedElement);
-						}
-						else if(type_Table == element.GetType())//table
-						{
-							//TODO вырезать из таблицы параграфы
-						}
-					}
-
-					insertContent.Elements = elements;
-
-					var paragraph = target_doc_content.Content[target_doc_content.CurPos.ContentPos];
-					if (null != paragraph && type_Paragraph == paragraph.GetType())
-					{
-						var NearPos = {Paragraph: paragraph, ContentPos: paragraph.Get_ParaContentPos(false, false)};
-						paragraph.Check_NearestPos(NearPos);
-						target_doc_content.Insert_Content(insertContent, NearPos);
-						
-						var oTargetTextObject = AscFormat.getTargetTextObject(worksheet.objectRender.controller);
-						oTargetTextObject && oTargetTextObject.checkExtentsByDocContent && oTargetTextObject.checkExtentsByDocContent();
-						worksheet.objectRender.controller.startRecalculate();
-					}
+					insertContent.Elements = this._convertBeforeInsertIntoShapeContent(pasteData.content, true);
+					this._insertSelectedContentIntoShapeContent(worksheet, insertContent, target_doc_content);
 				}
 				else
 				{
@@ -907,37 +879,9 @@
 							var pasteData = this.ReadPresentationText(stream, worksheet);
 							var insertContent = new CSelectedContent();
 							var target_doc_content = isIntoShape;
-							
-							var elements = [], selectedElement, element;
-							for(var i = 0; i < pasteData.length; ++i)
-							{
-								selectedElement = new CSelectedElement();
-								element = pasteData[i];
-								
-								if(type_Paragraph == element.GetType())//paragraph
-								{
-									selectedElement.Element = element;
-									elements.push(selectedElement);
-								}
-								else if(type_Table == element.GetType())//table
-								{
-									//TODO вырезать из таблицы параграфы
-								}
-							}
 
-							insertContent.Elements = elements;
-
-							var paragraph = target_doc_content.Content[target_doc_content.CurPos.ContentPos];
-							if (null != paragraph && type_Paragraph == paragraph.GetType())
-							{
-								var NearPos = {Paragraph: paragraph, ContentPos: paragraph.Get_ParaContentPos(false, false)};
-								paragraph.Check_NearestPos(NearPos);
-								target_doc_content.Insert_Content(insertContent, NearPos);
-								
-								var oTargetTextObject = AscFormat.getTargetTextObject(worksheet.objectRender.controller);
-								oTargetTextObject && oTargetTextObject.checkExtentsByDocContent && oTargetTextObject.checkExtentsByDocContent();
-								worksheet.objectRender.controller.startRecalculate();
-							}
+							insertContent.Elements = this._convertBeforeInsertIntoShapeContent(pasteData);
+							this._insertSelectedContentIntoShapeContent(worksheet, insertContent, target_doc_content);
 							
 							return true;
 						}
@@ -1010,6 +954,52 @@
 				}
 				
 				return false;
+			},
+			
+			_convertBeforeInsertIntoShapeContent: function(content, isConvertToPPTX)
+			{
+				var elements = [], selectedElement, element;
+				
+				for(var i = 0; i < content.length; i++)
+				{
+					selectedElement = new CSelectedElement();
+					element = content[i];
+					
+					if(type_Paragraph == element.GetType())//paragraph
+					{
+						if(isConvertToPPTX)
+						{
+							selectedElement.Element = AscFormat.ConvertParagraphToPPTX(element);
+						}
+						else
+						{
+							selectedElement.Element = element;
+						}
+						
+						elements.push(selectedElement);
+					}
+					else if(type_Table == element.GetType())//table
+					{
+						//TODO вырезать из таблицы параграфы
+					}
+				}
+				
+				return  elements;
+			},
+			
+			_insertSelectedContentIntoShapeContent: function(worksheet, selectedContent, target_doc_content)
+			{
+				var paragraph = target_doc_content.Content[target_doc_content.CurPos.ContentPos];
+				if (null != paragraph && type_Paragraph == paragraph.GetType() && selectedContent.Elements && selectedContent.Elements.length)
+				{
+					var NearPos = {Paragraph: paragraph, ContentPos: paragraph.Get_ParaContentPos(false, false)};
+					paragraph.Check_NearestPos(NearPos);
+					target_doc_content.Insert_Content(selectedContent, NearPos);
+					
+					var oTargetTextObject = AscFormat.getTargetTextObject(worksheet.objectRender.controller);
+					oTargetTextObject && oTargetTextObject.checkExtentsByDocContent && oTargetTextObject.checkExtentsByDocContent();
+					worksheet.objectRender.controller.startRecalculate();
+				}
 			},
 			
 			_insertImagesFromBinary: function(ws, data, isIntoShape)
