@@ -23404,6 +23404,10 @@ CTitle.prototype =
 
     getDocContent: function()
     {
+        if(this.recalcInfo.recalculateTxBody){
+            AscFormat.ExecuteNoHistory(this.recalculateTxBody, this, []);
+            this.recalcInfo.recalculateTxBody = false;
+        }
         if(this.txBody && this.txBody.content)
         {
             return this.txBody.content;
