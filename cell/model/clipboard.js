@@ -147,7 +147,16 @@
 					}
 					case AscCommon.c_oAscClipboardDataFormat.Internal:
 					{
-						t.pasteProcessor.pasteFromBinary(ws, data1);
+						if(ws.getCellEditMode() === true)
+						{
+							var text = t.pasteProcessor.pasteFromBinary(ws, data1, true);
+							window["Asc"]["editor"].wb.cellEditor.pasteText(text);
+						}
+						else
+						{
+							t.pasteProcessor.pasteFromBinary(ws, data1);
+						}
+						
 						break;
 					}
 					case AscCommon.c_oAscClipboardDataFormat.Text:
@@ -733,7 +742,7 @@
 			
 			constructor: PasteProcessorExcel,
 			
-			pasteFromBinary: function(worksheet, binary)
+			pasteFromBinary: function(worksheet, binary, isCellEditMode)
 			{
 				var base64 = null, base64FromWord = null, base64FromPresentation = null, t = this;
 				
@@ -754,12 +763,12 @@
 				var isIntoShape = worksheet.objectRender.controller.getTargetDocContent();
 				if(base64 != null)//from excel
 				{
-					result = this._pasteFromBinaryExcel(worksheet, base64, isIntoShape);
+					result = this._pasteFromBinaryExcel(worksheet, base64, isIntoShape, isCellEditMode);
 				} 
 				else if (base64FromWord)//from word
 				{
 					this.activeRange = worksheet.activeRange.clone(true);
-					result = this._pasteFromBinaryWord(worksheet, base64FromWord, isIntoShape);
+					result = this._pasteFromBinaryWord(worksheet, base64FromWord, isIntoShape, isCellEditMode);
 				}
 				else if(base64FromPresentation)
 				{
@@ -769,7 +778,7 @@
 				return result;
 			},
 			
-			_pasteFromBinaryExcel: function(worksheet, base64, isIntoShape)
+			_pasteFromBinaryExcel: function(worksheet, base64, isIntoShape, isCellEditMode)
 			{
 				var oBinaryFileReader = new AscCommonExcel.BinaryFileReader(true);
 				var tempWorkbook = new AscCommonExcel.Workbook();
@@ -783,10 +792,18 @@
 				var pasteData = null;
 				if (tempWorkbook)
 					pasteData = tempWorkbook.aWorksheets[0];
-				if (pasteData) {
+				
+				var res = false;
+				if(isCellEditMode)
+				{
+					res = this._getTextFromWorksheet(pasteData);
+				}
+				else if (pasteData) 
+				{
 					if(pasteData.Drawings && pasteData.Drawings.length)
 					{
-                        if (window["NativeCorrectImageUrlOnPaste"]) {
+                        if (window["NativeCorrectImageUrlOnPaste"]) 
+						{
                             var url;
                             for(var i = 0, length = aPastedImages.length; i < length; ++i)
                             {
@@ -828,18 +845,23 @@
 						}
 					}
 					
-					return true;
+					res = true;
 				}
 				
-				return false;
+				return res;
 			},
 			
-			_pasteFromBinaryWord: function(worksheet, base64, isIntoShape)
+			_pasteFromBinaryWord: function(worksheet, base64, isIntoShape, isCellEditMode)
 			{
+				var res = true;
 				var pasteData = this.ReadFromBinaryWord(base64, worksheet);
 				
+				if(isCellEditMode)
+				{
+					res = this._getTextFromWord(pasteData);
+				}
 				//insert binary from word into SHAPE
-				if(isIntoShape)
+				else if(isIntoShape)
 				{
 					this._insertBinaryIntoShapeContent(worksheet, pasteData.content, true);
 				}
@@ -849,7 +871,7 @@
 					oPasteFromBinaryWord._paste(worksheet, pasteData);
 				}
 				
-				return true;
+				return res;
 			},
 			
 			_pasteFromBinaryPresentation: function(worksheet, base64, isIntoShape)
@@ -880,6 +902,7 @@
 						}
 						else
 						{
+							History.TurnOff();
 							var oPasteFromBinaryWord = new pasteFromBinaryWord(this, worksheet);
 							
 							var oTempDrawingDocument = worksheet.model.DrawingDocument;
@@ -902,6 +925,8 @@
 								}
 							}
 							docContent = newContent;
+							
+							History.TurnOn();
 							
 							oPasteFromBinaryWord._paste(worksheet, {content: docContent});
 						}
@@ -955,6 +980,7 @@
 				
 				//ещё раз вызваем getTargetDocContent с флагом true после создания точки в истории(getTargetDocContent добавляет данные в историю)
 				var isIntoShape = worksheet.objectRender.controller.getTargetDocContent(true);
+				isIntoShape.Remove(1, true, true);
 				
 				var insertContent = new CSelectedContent();
 				var target_doc_content = isIntoShape;
@@ -1721,6 +1747,12 @@
 				//читаем контент, здесь только параграфы
 				//var newDocContent = new CDocumentContent(shape.txBody, editor.WordControl.m_oDrawingDocument, 0 , 0, 0, 0, false, false);
 				var elements = [], paragraph, selectedElement;
+				
+				if(!cDocumentContent)
+				{
+					cDocumentContent = worksheet;
+				}
+				
 				for(var i = 0; i < count; ++i)
 				{
 					loader.stream.Skip2(1); // must be 0
@@ -1824,9 +1856,8 @@
 
 				History.StartTransaction();
 				oPasteProcessor._Execute(node, {}, true, true, false);
-				if(!oPasteProcessor.aContent || !oPasteProcessor.aContent.length) {
-					window.GlobalPasteFlag = false;
-					window.GlobalPasteFlagCounter = 0;
+				if(!oPasteProcessor.aContent || !oPasteProcessor.aContent.length) 
+				{
 					History.EndTransaction();
 					return false;
 				}
@@ -1840,8 +1871,6 @@
                     oTargetTextObject && oTargetTextObject.checkExtentsByDocContent && oTargetTextObject.checkExtentsByDocContent();
 					worksheet.objectRender.controller.startRecalculate();
                     worksheet.objectRender.controller.cursorMoveRight(false, false);
-					window.GlobalPasteFlag = false;
-					window.GlobalPasteFlagCounter = 0;
 					History.EndTransaction();
 				});
 				
@@ -1957,6 +1986,94 @@
 					text: ''});
 				
 				return res; 
+			},
+			
+			_getTextFromWorksheet: function(worksheet)
+			{
+				var res = "";
+				
+				for(var i in worksheet.aGCells)
+				{
+					var row = worksheet.aGCells[i];
+					
+					for(var j in row.c)
+					{
+						var cell = row.c[j];
+						if(null != cell)
+						{
+							res += cell.getValue();
+						}
+						
+						res += " ";
+					}
+					
+					res += "\n";
+				}
+				
+				return res;
+			},
+			
+			_getTextFromWord: function(data)
+			{
+				var res = "";
+				
+				var getTextFromCell = function(cell)
+				{
+					if(cell.Content && cell.Content.Content)
+					{
+						getTextFromDocumentContent(cell.Content.Content, true);
+					}
+				};
+				
+				var getTextFromTable = function(table)
+				{
+					for(var i = 0; i < table.Content.length; i++)
+					{
+						var row = table.Content[i];
+						for(var j = 0; j < row.Content.length; j++)
+						{
+							res += " ";
+							
+							var cell = row.Content[j];
+							getTextFromCell(cell);
+						}
+						
+						res += "\n";
+					}
+				};
+				
+				var getTextFromDocumentContent = function(documentContent, test)
+				{
+					for(var i = 0; i < documentContent.length; i++)
+					{
+						var item = documentContent[i];
+						if(type_Paragraph === item.GetType())
+						{
+							if(test)
+							{
+								res += "\n";
+							}
+							
+							getTextFromParagraph(item);
+						}
+						else if(type_Table === item.GetType())
+						{
+							getTextFromTable(item);
+						}
+					}
+				};
+				
+				var getTextFromParagraph = function(paragraph)
+				{
+					for(var j = 0; j < paragraph.Content.length; j++)
+					{
+						res += paragraph.Content[j].Get_SelectedText(true)
+					}
+				};
+				
+				getTextFromDocumentContent(data.content);
+				
+				return res;
 			}
 			
 		};
