@@ -481,77 +481,6 @@
         }, false);
       }
 
-      this.cellEditor =
-        new AscCommonExcel.CellEditor(this.element, this.input, this.fmgrGraphics, this.m_oFont, /*handlers*/{
-          "closed": function () {
-            self._onCloseCellEditor.apply(self, arguments);
-          }, "updated": function () {
-            self._onUpdateCellEditor.apply(self, arguments);
-          }, "gotFocus": function (hasFocus) {
-            self.controller.setFocus(!hasFocus);
-          }, "paste": function () {
-            self.pasteFromClipboard.apply(self, arguments);
-          }, "cut": function () {
-            self.cutToClipboard.apply(self, arguments);
-          }, "updateFormulaEditMod": function () {
-            self.controller.setFormulaEditMode.apply(self.controller, arguments);
-            var ws = self.getWorksheet();
-            if (ws) {
-              if (!self.lockDraw) {
-                ws.cleanSelection();
-              }
-              for (var i in self.wsViews) {
-                self.wsViews[i].cleanFormulaRanges();
-              }
-//            ws.cleanFormulaRanges();
-              ws.setFormulaEditMode.apply(ws, arguments);
-            }
-          }, "updateEditorState": function (state) {
-            self.handlers.trigger("asc_onEditCell", state);
-          }, "isGlobalLockEditCell": function () {
-            return self.collaborativeEditing.getGlobalLockEditCell();
-          }, "updateFormulaEditModEnd": function () {
-            if (!self.lockDraw) {
-              self.getWorksheet().updateSelection();
-            }
-          }, "newRange": function (range, ws) {
-            if (!ws) {
-              self.getWorksheet().addFormulaRange(range);
-            } else {
-              self.getWorksheet(self.model.getWorksheetIndexByName(ws)).addFormulaRange(range);
-            }
-          }, "existedRange": function (range, ws) {
-            var editRangeSheet = ws ? self.model.getWorksheetIndexByName(ws) : self.copyActiveSheet;
-            if (-1 === editRangeSheet || editRangeSheet === self.wsActive) {
-              self.getWorksheet().activeFormulaRange(range);
-            } else {
-              self.getWorksheet(editRangeSheet).removeFormulaRange(range);
-              self.getWorksheet().addFormulaRange(range);
-            }
-          }, "updateUndoRedoChanged": function (bCanUndo, bCanRedo) {
-            self.handlers.trigger("asc_onCanUndoChanged", bCanUndo);
-            self.handlers.trigger("asc_onCanRedoChanged", bCanRedo);
-          }, "applyCloseEvent": function () {
-            self.controller._onWindowKeyDown.apply(self.controller, arguments);
-          }, "isViewerMode": function () {
-            return self.controller.settings.isViewerMode;
-          }, "getFormulaRanges": function () {
-            return self.cellFormulaEnterWSOpen ? self.cellFormulaEnterWSOpen.getFormulaRanges() :
-              self.getWorksheet().getFormulaRanges();
-          }, "getCellFormulaEnterWSOpen": function () {
-            return self.cellFormulaEnterWSOpen;
-          }, "getActiveWS": function () {
-            return self.getWorksheet().model;
-          }, "setStrictClose": function (val) {
-            self.controller.setStrictClose(val);
-          }, "updateEditorSelectionInfo": function (info) {
-            self.handlers.trigger("asc_onEditorSelectionChanged", info);
-          }, "onContextMenu": function (event) {
-            self.handlers.trigger("asc_onContextMenu", event);
-          }
-        }, /*settings*/{
-          font: this.defaultFont, padding: this.defaults.worksheetView.cells.padding
-        });
       this.Api.onKeyDown = function (event) {
         self.controller._onWindowKeyDown(event);
         if (self.isCellEditMode) {
@@ -588,6 +517,78 @@
       };
       AscCommon.InitBrowserInputContext(this.Api, "id_target_cursor");
     }
+
+    this.cellEditor =
+      new AscCommonExcel.CellEditor(this.element, this.input, this.fmgrGraphics, this.m_oFont, /*handlers*/{
+        "closed": function () {
+          self._onCloseCellEditor.apply(self, arguments);
+        }, "updated": function () {
+          self._onUpdateCellEditor.apply(self, arguments);
+        }, "gotFocus": function (hasFocus) {
+          self.controller.setFocus(!hasFocus);
+        }, "paste": function () {
+          self.pasteFromClipboard.apply(self, arguments);
+        }, "cut": function () {
+          self.cutToClipboard.apply(self, arguments);
+        }, "updateFormulaEditMod": function () {
+          self.controller.setFormulaEditMode.apply(self.controller, arguments);
+          var ws = self.getWorksheet();
+          if (ws) {
+            if (!self.lockDraw) {
+              ws.cleanSelection();
+            }
+            for (var i in self.wsViews) {
+              self.wsViews[i].cleanFormulaRanges();
+            }
+//            ws.cleanFormulaRanges();
+            ws.setFormulaEditMode.apply(ws, arguments);
+          }
+        }, "updateEditorState": function (state) {
+          self.handlers.trigger("asc_onEditCell", state);
+        }, "isGlobalLockEditCell": function () {
+          return self.collaborativeEditing.getGlobalLockEditCell();
+        }, "updateFormulaEditModEnd": function () {
+          if (!self.lockDraw) {
+            self.getWorksheet().updateSelection();
+          }
+        }, "newRange": function (range, ws) {
+          if (!ws) {
+            self.getWorksheet().addFormulaRange(range);
+          } else {
+            self.getWorksheet(self.model.getWorksheetIndexByName(ws)).addFormulaRange(range);
+          }
+        }, "existedRange": function (range, ws) {
+          var editRangeSheet = ws ? self.model.getWorksheetIndexByName(ws) : self.copyActiveSheet;
+          if (-1 === editRangeSheet || editRangeSheet === self.wsActive) {
+            self.getWorksheet().activeFormulaRange(range);
+          } else {
+            self.getWorksheet(editRangeSheet).removeFormulaRange(range);
+            self.getWorksheet().addFormulaRange(range);
+          }
+        }, "updateUndoRedoChanged": function (bCanUndo, bCanRedo) {
+          self.handlers.trigger("asc_onCanUndoChanged", bCanUndo);
+          self.handlers.trigger("asc_onCanRedoChanged", bCanRedo);
+        }, "applyCloseEvent": function () {
+          self.controller._onWindowKeyDown.apply(self.controller, arguments);
+        }, "isViewerMode": function () {
+          return self.controller.settings.isViewerMode;
+        }, "getFormulaRanges": function () {
+          return self.cellFormulaEnterWSOpen ? self.cellFormulaEnterWSOpen.getFormulaRanges() :
+            self.getWorksheet().getFormulaRanges();
+        }, "getCellFormulaEnterWSOpen": function () {
+          return self.cellFormulaEnterWSOpen;
+        }, "getActiveWS": function () {
+          return self.getWorksheet().model;
+        }, "setStrictClose": function (val) {
+          self.controller.setStrictClose(val);
+        }, "updateEditorSelectionInfo": function (info) {
+          self.handlers.trigger("asc_onEditorSelectionChanged", info);
+        }, "onContextMenu": function (event) {
+          self.handlers.trigger("asc_onContextMenu", event);
+        }
+      }, /*settings*/{
+        font: this.defaultFont, padding: this.defaults.worksheetView.cells.padding
+      });
 
     this.wsViewHandlers = new AscCommonExcel.asc_CHandlersList(/*handlers*/{
       "getViewerMode": function() {
