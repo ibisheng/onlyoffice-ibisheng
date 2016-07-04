@@ -174,11 +174,6 @@
 
 			t.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
 		});
-		// init drag&drop
-		AscCommon.InitDragAndDrop(this.HtmlElement, function(error, files)
-		{
-			t._uploadCallback(error, files);
-		});
 
 		AscCommon.loadSdk(this._editorNameById(), function()
 		{
@@ -891,6 +886,12 @@
 	};
 	baseEditorsApi.prototype._onEndLoadSdk = function()
 	{
+		// init drag&drop
+		AscCommon.InitDragAndDrop(this.HtmlElement, function(error, files)
+		{
+			t._uploadCallback(error, files);
+		});
+
 		AscFonts.g_fontApplication.Init();
 
 		this.FontLoader  = AscCommon.g_font_loader;
