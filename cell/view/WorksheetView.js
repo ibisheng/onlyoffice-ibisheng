@@ -6852,8 +6852,8 @@
         ar.type = c_oAscSelectionType.RangeCells;
         ar.startCol = p.col;
         ar.startRow = p.row;
-        this._fixSelectionOfMergedCells();
         this._fixSelectionOfHiddenCells( dc >= 0 ? +1 : -1, dr >= 0 ? +1 : -1 );
+        this._fixSelectionOfMergedCells();
     };
 
     // Движение активной ячейки в выделенной области
