@@ -1558,50 +1558,34 @@ CFootnotesController.prototype.MoveCursorToCell = function(bNext)
 };
 CFootnotesController.prototype.SetParagraphAlign = function(Align)
 {
-	// TODO: Доделать селект и курсор
-	if (true === this.Selection.Use)
+	for (var sId in this.Selection.Footnotes)
 	{
-	}
-	else
-	{
-		if (null !== this.CurFootnote)
-			this.CurFootnote.Set_ParagraphAlign(Align);
+		var oFootnote = this.Selection.Footnotes[sId];
+		oFootnote.Set_ParagraphAlign(Align);
 	}
 };
 CFootnotesController.prototype.SetParagraphSpacing = function(Spacing)
 {
-	// TODO: Доделать селект и курсор
-	if (true === this.Selection.Use)
+	for (var sId in this.Selection.Footnotes)
 	{
-	}
-	else
-	{
-		if (null !== this.CurFootnote)
-			this.CurFootnote.Set_ParagraphSpacing(Spacing);
+		var oFootnote = this.Selection.Footnotes[sId];
+		oFootnote.Set_ParagraphSpacing(Spacing);
 	}
 };
 CFootnotesController.prototype.SetParagraphTabs = function(Tabs)
 {
-	// TODO: Доделать селект и курсор
-	if (true === this.Selection.Use)
+	for (var sId in this.Selection.Footnotes)
 	{
-	}
-	else
-	{
-		if (null !== this.CurFootnote)
-			this.CurFootnote.Set_ParagraphTabs(Tabs);
+		var oFootnote = this.Selection.Footnotes[sId];
+		oFootnote.Set_ParagraphTabs(Tabs);
 	}
 };
 CFootnotesController.prototype.SetParagraphIndent = function(Ind)
 {
-	// TODO: Доделать селект и курсор
-	if (true === this.Selection.Use)
+	for (var sId in this.Selection.Footnotes)
 	{
-	}
-	else
-	{
-		if (null !== this.CurFootnote)
-			this.CurFootnote.Set_ParagraphIndent(Ind);
+		var oFootnote = this.Selection.Footnotes[sId];
+		oFootnote.Set_ParagraphIndent(Ind);
 	}
 };
 CFootnotesController.prototype.SetParagraphNumbering = function(NumInfo)
@@ -1618,127 +1602,86 @@ CFootnotesController.prototype.SetParagraphNumbering = function(NumInfo)
 };
 CFootnotesController.prototype.SetParagraphShd = function(Shd)
 {
-	// TODO: Доделать селект и курсор
-	if (true === this.Selection.Use)
+	for (var sId in this.Selection.Footnotes)
 	{
+		var oFootnote = this.Selection.Footnotes[sId];
+		oFootnote.Set_ParagraphShd(Shd);
 	}
-	else
-	{
-		if (null !== this.CurFootnote)
-			this.CurFootnote.Set_ParagraphShd(Shd);
-	}
-
 };
 CFootnotesController.prototype.SetParagraphStyle = function(Name)
 {
-	// TODO: Доделать селект и курсор
-	if (true === this.Selection.Use)
+	for (var sId in this.Selection.Footnotes)
 	{
-	}
-	else
-	{
-		if (null !== this.CurFootnote)
-			this.CurFootnote.Set_ParagraphStyle(Name);
+		var oFootnote = this.Selection.Footnotes[sId];
+		oFootnote.Set_ParagraphStyle(Name);
 	}
 };
 CFootnotesController.prototype.SetParagraphContextualSpacing = function(Value)
 {
-	// TODO: Доделать селект и курсор
-	if (true === this.Selection.Use)
+	for (var sId in this.Selection.Footnotes)
 	{
-	}
-	else
-	{
-		if (null !== this.CurFootnote)
-			this.CurFootnote.Set_ParagraphContextualSpacing(Value);
+		var oFootnote = this.Selection.Footnotes[sId];
+		oFootnote.Set_ParagraphContextualSpacing(Value);
 	}
 };
 CFootnotesController.prototype.SetParagraphPageBreakBefore = function(Value)
 {
-	// TODO: Доделать селект и курсор
-	if (true === this.Selection.Use)
+	for (var sId in this.Selection.Footnotes)
 	{
-	}
-	else
-	{
-		if (null !== this.CurFootnote)
-			this.CurFootnote.Set_ParagraphPageBreakBefore(Value);
+		var oFootnote = this.Selection.Footnotes[sId];
+		oFootnote.Set_ParagraphPageBreakBefore(Value);
 	}
 };
 CFootnotesController.prototype.SetParagraphKeepLines = function(Value)
 {
-	// TODO: Доделать селект и курсор
-	if (true === this.Selection.Use)
+	for (var sId in this.Selection.Footnotes)
 	{
-	}
-	else
-	{
-		if (null !== this.CurFootnote)
-			this.CurFootnote.Set_ParagraphKeepLines(Value);
+		var oFootnote = this.Selection.Footnotes[sId];
+		oFootnote.Set_ParagraphKeepLines(Value);
 	}
 };
 CFootnotesController.prototype.SetParagraphKeepNext = function(Value)
 {
-	// TODO: Доделать селект и курсор
-	if (true === this.Selection.Use)
+	for (var sId in this.Selection.Footnotes)
 	{
-	}
-	else
-	{
-		if (null !== this.CurFootnote)
-			this.CurFootnote.Set_ParagraphKeepNext(Value);
+		var oFootnote = this.Selection.Footnotes[sId];
+		oFootnote.Set_ParagraphKeepNext(Value);
 	}
 };
 CFootnotesController.prototype.SetParagraphWidowControl = function(Value)
 {
-	// TODO: Доделать селект и курсор
-	if (true === this.Selection.Use)
+	for (var sId in this.Selection.Footnotes)
 	{
-	}
-	else
-	{
-		if (null !== this.CurFootnote)
-			this.CurFootnote.Set_ParagraphWidowControl(Value);
+		var oFootnote = this.Selection.Footnotes[sId];
+		oFootnote.Set_ParagraphWidowControl(Value);
 	}
 };
 CFootnotesController.prototype.SetParagraphBorders = function(Borders)
 {
-	// TODO: Доделать селект и курсор
-	if (true === this.Selection.Use)
+	for (var sId in this.Selection.Footnotes)
 	{
-	}
-	else
-	{
-		if (null !== this.CurFootnote)
-			this.CurFootnote.Set_ParagraphBorders(Borders);
+		var oFootnote = this.Selection.Footnotes[sId];
+		oFootnote.Set_ParagraphBorders(Borders);
 	}
 };
 CFootnotesController.prototype.SetParagraphFramePr = function(FramePr, bDelete)
 {
-	// TODO: Реализовать, скорее всего ничего тут не надо делать
+	// Не позволяем делать рамки внутри сносок
 };
 CFootnotesController.prototype.IncreaseOrDecreaseParagraphFontSize = function(bIncrease)
 {
-	// TODO: Доделать селект и курсор
-	if (true === this.Selection.Use)
+	for (var sId in this.Selection.Footnotes)
 	{
-	}
-	else
-	{
-		if (null !== this.CurFootnote)
-			this.CurFootnote.Paragraph_IncDecFontSize(bIncrease);
+		var oFootnote = this.Selection.Footnotes[sId];
+		oFootnote.Paragraph_IncDecFontSize(bIncrease);
 	}
 };
 CFootnotesController.prototype.IncreaseOrDecreaseParagraphIndent = function(bIncrease)
 {
-	// TODO: Доделать селект и курсор
-	if (true === this.Selection.Use)
+	for (var sId in this.Selection.Footnotes)
 	{
-	}
-	else
-	{
-		if (null !== this.CurFootnote)
-			this.CurFootnote.Paragraph_IncDecIndent(bIncrease);
+		var oFootnote = this.Selection.Footnotes[sId];
+		oFootnote.Paragraph_IncDecIndent(bIncrease);
 	}
 };
 CFootnotesController.prototype.SetImageProps = function(Props)
@@ -2183,13 +2126,3 @@ CFootEndnotePage.prototype.Reset = function()
 	this.ContinuationSeparatorRecalculateObject = null;
 	this.ContinuationNoticeRecalculateObject    = null;
 };
-
-
-
-
-
-function TestMoveCursor(X, Y, PageAbs, AddToSelect)
-{
-	editor.WordControl.m_oLogicDocument.Footnotes.MoveCursorToXY(X, Y, PageAbs, AddToSelect);
-	editor.WordControl.m_oLogicDocument.Document_UpdateSelectionState();
-}
