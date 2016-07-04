@@ -1590,14 +1590,10 @@ CFootnotesController.prototype.SetParagraphIndent = function(Ind)
 };
 CFootnotesController.prototype.SetParagraphNumbering = function(NumInfo)
 {
-	// TODO: Доделать селект и курсор
-	if (true === this.Selection.Use)
+	for (var sId in this.Selection.Footnotes)
 	{
-	}
-	else
-	{
-		if (null !== this.CurFootnote)
-			this.CurFootnote.Set_ParagraphNumbering(NumInfo);
+		var oFootnote = this.Selection.Footnotes[sId];
+		oFootnote.Set_ParagraphNumbering(NumInfo);
 	}
 };
 CFootnotesController.prototype.SetParagraphShd = function(Shd)
@@ -1686,88 +1682,71 @@ CFootnotesController.prototype.IncreaseOrDecreaseParagraphIndent = function(bInc
 };
 CFootnotesController.prototype.SetImageProps = function(Props)
 {
-	// TODO: Доделать селект и курсор
-	if (true === this.Selection.Use)
-	{
-	}
-	else
-	{
-		if (null !== this.CurFootnote)
-			this.CurFootnote.Set_ImageProps(Props);
-	}
+	if (false === this.private_CheckFootnotesSelectionBeforeAction())
+		return;
+
+	return this.CurFootnote.Set_ImageProps(Props);
 };
 CFootnotesController.prototype.SetTableProps = function(Props)
 {
-	// TODO: Доделать селект и курсор
-	if (true === this.Selection.Use)
-	{
-	}
-	else
-	{
-		if (null !== this.CurFootnote)
-			this.CurFootnote.Set_TableProps(Props);
-	}
+	if (false === this.private_CheckFootnotesSelectionBeforeAction())
+		return;
+
+	return this.CurFootnote.Set_TableProps(Props);
 };
 CFootnotesController.prototype.GetCurrentParaPr = function()
 {
-	// TODO: Доделать селект и курсор
-	if (true === this.Selection.Use)
+	var StartPr = this.CurFootnote.Get_Paragraph_ParaPr();
+	var Pr = StartPr.Copy();
+
+	for (var sId in this.Selection.Footnotes)
 	{
-	}
-	else
-	{
-		if (null !== this.CurFootnote)
-			return this.CurFootnote.Get_Paragraph_ParaPr();
+		var oFootnote = this.Selection.Footnotes[sId];
+		var TempPr = oFootnote.Get_Paragraph_ParaPr();
+		Pr = Pr.Compare(TempPr);
 	}
 
-	var ParaPr = new CParaPr();
-	ParaPr.Init_Default();
-	return ParaPr;
+	if (undefined === Pr.Ind.Left)
+		Pr.Ind.Left = StartPr.Ind.Left;
+
+	if (undefined === Pr.Ind.Right)
+		Pr.Ind.Right = StartPr.Ind.Right;
+
+	if (undefined === Pr.Ind.FirstLine)
+		Pr.Ind.FirstLine = StartPr.Ind.FirstLine;
+
+	if (true !== this.private_IsOnFootnoteSelected())
+		Pr.CanAddTable = false;
+
+	return Pr;
 };
 CFootnotesController.prototype.GetCurrentTextPr = function()
 {
+	var StartPr = this.CurFootnote.Get_Paragraph_TextPr();
+	var Pr = StartPr.Copy();
 
-	// TODO: Доделать селект и курсор
-	if (true === this.Selection.Use)
+	for (var sId in this.Selection.Footnotes)
 	{
-	}
-	else
-	{
-		if (null !== this.CurFootnote)
-			return this.CurFootnote.Get_Paragraph_TextPr();
+		var oFootnote = this.Selection.Footnotes[sId];
+		var TempPr = oFootnote.Get_Paragraph_TextPr();
+		Pr = Pr.Compare(TempPr);
 	}
 
-	var TextPr = new CTextPr();
-	TextPr.Init_Default();
-	return TextPr;
+	return Pr;
 };
 CFootnotesController.prototype.GetDirectParaPr = function()
 {
-	// TODO: Доделать селект и курсор
-	if (true === this.Selection.Use)
-	{
-	}
-	else
-	{
-		if (null !== this.CurFootnote)
-			return this.CurFootnote.Get_Paragraph_ParaPr_Copy();
-	}
+	if (null !== this.CurFootnote)
+		return this.CurFootnote.Get_Paragraph_ParaPr_Copy();
 
-	return null;
+	return new CParaPr();
 };
 CFootnotesController.prototype.GetDirectTextPr = function()
 {
-	// TODO: Доделать селект и курсор
-	if (true === this.Selection.Use)
-	{
-	}
-	else
-	{
-		if (null !== this.CurFootnote)
-			return this.CurFootnote.Get_Paragraph_TextPr_Copy();
-	}
+	if (null !== this.CurFootnote)
+		return this.CurFootnote.Get_Paragraph_TextPr_Copy();
 
-	return null;
+	return new CTextPr();
 };
 CFootnotesController.prototype.RemoveSelection = function(bNoCheckDrawing)
 {
@@ -1976,11 +1955,42 @@ CFootnotesController.prototype.CanSplitTableCells = function()
 };
 CFootnotesController.prototype.UpdateInterfaceState = function()
 {
-	// TODO: Реализовать
+	if (true === this.private_IsOnFootnoteSelected())
+	{
+		this.CurFootnote.Document_UpdateInterfaceState();
+	}
+	else
+	{
+		var Api = this.LogicDocument.Get_Api();
+		if (!Api)
+			return;
+
+		var ParaPr = this.GetCurrentParaPr();
+
+		if (undefined != ParaPr.Tabs)
+			Api.Update_ParaTab(AscCommonWord.Default_Tab_Stop, ParaPr.Tabs);
+
+		Api.UpdateParagraphProp(ParaPr);
+		Api.UpdateTextPr(this.GetCurrentTextPr());
+	}
 };
 CFootnotesController.prototype.UpdateRulersState = function()
 {
-	// TODO: Реализовать
+	var PageAbs = this.CurFootnote.Get_StartPage_Absolute();
+	if (this.LogicDocument.Pages[PageAbs])
+	{
+		var Pos    = this.LogicDocument.Pages[PageAbs].Pos;
+		var SectPr = this.LogicDocument.SectionsInfo.Get_SectPr(Pos).SectPr;
+
+		var L = SectPr.Get_PageMargin_Left();
+		var T = SectPr.Get_PageMargin_Top();
+		var R = SectPr.Get_PageWidth() - SectPr.Get_PageMargin_Right();
+		var B = SectPr.Get_PageHeight() - SectPr.Get_PageMargin_Bottom();
+		this.DrawingDocument.Set_RulerState_Paragraph({L : L, T : T, R : R, B : B}, true);
+	}
+
+	if (true === this.private_IsOnFootnoteSelected())
+		this.CurFootnote.Document_UpdateRulersState();
 };
 CFootnotesController.prototype.UpdateSelectionState = function()
 {
@@ -2026,7 +2036,6 @@ CFootnotesController.prototype.UpdateSelectionState = function()
 		this.DrawingDocument.SelectEnabled(false);
 		this.DrawingDocument.TargetShow();
 	}
-
 };
 CFootnotesController.prototype.GetSelectionState = function()
 {
