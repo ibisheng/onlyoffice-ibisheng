@@ -772,7 +772,7 @@
 				}
 				else if(base64FromPresentation)
 				{
-					result = this._pasteFromBinaryPresentation(worksheet, base64FromPresentation, isIntoShape);
+					result = this._pasteFromBinaryPresentation(worksheet, base64FromPresentation, isIntoShape, isCellEditMode);
 				}
 				
 				return result;
@@ -858,7 +858,7 @@
 				
 				if(isCellEditMode)
 				{
-					res = this._getTextFromWord(pasteData);
+					res = this._getTextFromWord(pasteData.content);
 				}
 				//insert binary from word into SHAPE
 				else if(isIntoShape)
@@ -874,7 +874,7 @@
 				return res;
 			},
 			
-			_pasteFromBinaryPresentation: function(worksheet, base64, isIntoShape)
+			_pasteFromBinaryPresentation: function(worksheet, base64, isIntoShape, isCellEditMode)
 			{
 				pptx_content_loader.Clear();
 
@@ -894,7 +894,12 @@
 					{
 						var docContent = this.ReadPresentationText(stream, worksheet, isIntoShape);
 						
-						if(isIntoShape)
+						if(isCellEditMode)
+						{
+							var text = this._getTextFromWord(docContent);
+							return text;
+						}
+						else if(isIntoShape)
 						{
 							this._insertBinaryIntoShapeContent(worksheet, docContent)
 							
@@ -935,6 +940,11 @@
 					}
 					case "Drawings":
 					{
+						if(isCellEditMode)
+						{
+							return "";
+						}
+						
 						var objects = this.ReadPresentationShapes(stream, worksheet);
 						
 						//****если записана одна табличка, то вставляем html и поддерживаем все цвета и стили****
@@ -966,6 +976,11 @@
 					}
 					case "SlideObjects":
 					{
+						if(isCellEditMode)
+						{
+							return "";
+						}
+						
 						break;
 					}
 				}
@@ -2042,14 +2057,14 @@
 					}
 				};
 				
-				var getTextFromDocumentContent = function(documentContent, test)
+				var getTextFromDocumentContent = function(documentContent, isNAddNewLine)
 				{
 					for(var i = 0; i < documentContent.length; i++)
 					{
 						var item = documentContent[i];
 						if(type_Paragraph === item.GetType())
 						{
-							if(test)
+							if(!isNAddNewLine)
 							{
 								res += "\n";
 							}
@@ -2058,6 +2073,8 @@
 						}
 						else if(type_Table === item.GetType())
 						{
+							res += "\n";
+							
 							getTextFromTable(item);
 						}
 					}
@@ -2071,7 +2088,7 @@
 					}
 				};
 				
-				getTextFromDocumentContent(data.content);
+				getTextFromDocumentContent(data);
 				
 				return res;
 			}
