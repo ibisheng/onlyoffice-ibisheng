@@ -577,6 +577,9 @@ CChartSpace.prototype.drawSelect = function(drawingDocument, nPageIndex)
         if(this.selectStartPage === nPageIndex)
         {
             drawingDocument.DrawTrack(AscFormat.TYPE_TRACK.SHAPE, this.getTransformMatrix(), 0, 0, this.extX, this.extY, false, this.canRotate());
+			if(window["NATIVE_EDITOR_ENJINE"]){
+				return;
+			}
             if(this.selection.textSelection)
             {
                 drawingDocument.DrawTrack(AscFormat.TYPE_TRACK.CHART_TEXT, this.selection.textSelection.transform, 0, 0, this.selection.textSelection.extX, this.selection.textSelection.extY, false, false, false);
