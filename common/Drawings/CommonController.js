@@ -134,6 +134,73 @@ var DISTANCE_TO_TEXT_LEFTRIGHT = 3.2;
             }
         }
     }
+
+    function fApproxEqual(a, b, fDelta){
+        if ( a === b ) {
+            return true;
+        }
+        if(AscFormat.isRealNumber(fDelta)){
+            return Math.abs( a - b ) < fDelta;
+        }
+        return Math.abs( a - b ) < 1e-15;
+    };
+
+
+	function fSolveQuadraticEquation(a, b, c){
+		var oResult = {x1: null, x2: null, bError: true}
+		var D = b*b - 4*a*c;
+        if(D < 0){
+            return oResult;
+        }
+		oResult.bError = false;
+        oResult.x1 = (-b + Math.sqrt(D))/(2*a), oResult.x2 = (-b - Math.sqrt(D))/(2*a);
+		return oResult;
+	}
+
+    function fCheckBoxIntersectionSegment(fX, fY, fWidth, fHeight, x1, y1, x2, y2){
+        return fCheckSegementIntersection(fX, fY, fX + fWidth, fY, x1, y1, x2, y2) ||
+            fCheckSegementIntersection(fX + fWidth, fY, fX + fWidth, fY + fHeight, x1, y1, x2, y2) ||
+            fCheckSegementIntersection(fX + fWidth, fY + fHeight, fX, fY + fHeight, x1, y1, x2, y2) ||
+            fCheckSegementIntersection(fX, fY + fHeight, fX, fY, x1, y1, x2, y2);
+
+    }
+
+    function fCheckSegementIntersection(x11, y11, x12, y12, x21, y21, x22, y22){
+        //check bounding boxes intersection
+        if(Math.max(x11, x12) < Math.min(x21, x22)){
+            return false;
+        }
+        if(Math.min(x11, x12) > Math.max(x21, x22)){
+            return false;
+        }
+        if(Math.max(y11, y12) < Math.min(y21, y22)){
+            return false;
+        }
+        if(Math.min(y11, y12) > Math.max(y21, y22)){
+            return false;
+        }
+
+        var oCoeffs = fResolve2LinearSystem(x12-x11, -(x22-x21), y12-y11, -(y22-y21), x21-x11, y21-y11);
+        if(oCoeffs.bError){
+            return false;
+        }
+        return (oCoeffs.x1 >= 0 && oCoeffs.x1 <= 1
+            && oCoeffs.x2 >= 0 && oCoeffs.x2 <= 1);
+    }
+
+
+    function fResolve2LinearSystem(a11, a12, a21, a22, t1, t2){
+        var oResult = {bError: true};
+        var D = a11*a22 - a12*a21;
+        if(fApproxEqual(D,  0)){
+            return oResult;
+        }
+        oResult.bError = false;
+        oResult.x1 = (t1*a22 - a12*t2)/D;
+        oResult.x2 = (a11*t2 - t1*a21)/D;
+        return oResult;
+    }
+
     function checkParagraphDefFonts(map, par)
     {
         par && par.Pr && par.Pr.DefaultRunPr && checkRFonts(map, par.Pr.DefaultRunPr.RFonts);
@@ -8823,4 +8890,7 @@ function CalcLiterByLength(aAlphaBet, nLength)
     window['AscFormat'].GetMinSnapDistanceYObjectByArrays = GetMinSnapDistanceYObjectByArrays;
     window['AscFormat'].CalcLiterByLength = CalcLiterByLength;
     window['AscFormat'].fillImage = fillImage;
+	window['AscFormat'].fSolveQuadraticEquation = fSolveQuadraticEquation;
+	window['AscFormat'].fApproxEqual = fApproxEqual;
+	window['AscFormat'].fCheckBoxIntersectionSegment = fCheckBoxIntersectionSegment;
 })(window);

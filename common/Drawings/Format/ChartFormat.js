@@ -964,7 +964,7 @@ CDLbl.prototype =
                     }
                 }
             }
-            max_width += 2;
+            max_width += 1;
             content.Reset(0, 0, max_width, 20000);
             content.Recalculate_Page(0, true);
 
@@ -1064,6 +1064,11 @@ CDLbl.prototype =
 
         if(dLbl.idx != null)
             this.setIdx(dLbl.idx);
+        
+        if(dLbl.layout != null)
+        {
+            this.setLayout(dLbl.layout.createDuplicate());
+        }
 
         if(dLbl.numFmt != null)
             this.setNumFmt(dLbl.numFmt);
@@ -1148,31 +1153,9 @@ CDLbl.prototype =
         this.x = x;
         this.y = y;
 
-        if(this.layout && this.layout.manualLayout)
-        {
-            if(typeof this.layout.manualLayout.x === "number")
-            {
-                this.calcX = this.chart.extX*this.layout.x + this.x;
-            }
-            else
-            {
-                this.calcX = this.x;
-            }
-            if(typeof this.layout.manualLayout.y === "number")
-            {
-                this.calcY = this.chart.extY*this.layout.y + this.y;
-            }
-            else
-            {
-                this.calcY = this.y;
-            }
-        }
-        else
-        {
+    
             this.calcX = this.x;
             this.calcY = this.y;
-        }
-
 
         this.localTransform.Reset();
         global_MatrixTransformer.TranslateAppend(this.localTransform, this.calcX, this.calcY);
@@ -1202,30 +1185,8 @@ CDLbl.prototype =
         this.x = x;
         this.y = y;
 
-        if(this.layout && this.layout.manualLayout)
-        {
-            if(typeof this.layout.manualLayout.x === "number")
-            {
-                this.calcX = this.chart.extX*this.layout.x + this.x;
-            }
-            else
-            {
-                this.calcX = this.x;
-            }
-            if(typeof this.layout.manualLayout.y === "number")
-            {
-                this.calcY = this.chart.extY*this.layout.y + this.y;
-            }
-            else
-            {
-                this.calcY = this.y;
-            }
-        }
-        else
-        {
-            this.calcX = this.x;
-            this.calcY = this.y;
-        }
+        this.calcX = this.x;
+        this.calcY = this.y;
 
 
 

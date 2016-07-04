@@ -286,7 +286,7 @@ CChartsDrawer.prototype =
 	
 	
 	//****positions text labels****
-	reCalculatePositionText : function(type, chartSpace, ser, val)
+	reCalculatePositionText : function(type, chartSpace, ser, val, bLayout)
 	{
 		var pos;
 		
@@ -296,7 +296,7 @@ CChartsDrawer.prototype =
 			{
 				case "dlbl":
 				{
-					pos = this._calculatePositionDlbl(chartSpace, ser, val);
+					pos = this._calculatePositionDlbl(chartSpace, ser, val, bLayout);
 					break;
 				}
 				case "title":
@@ -330,9 +330,9 @@ CChartsDrawer.prototype =
 		return {x: pos ? pos.x : undefined, y : pos ? pos.y : undefined};
 	},
 	
-	_calculatePositionDlbl: function(chartSpace, ser, val)
+	_calculatePositionDlbl: function(chartSpace, ser, val, bLayout)
 	{	
-		return this.chart._calculateDLbl(chartSpace, ser, val);
+		return this.chart._calculateDLbl(chartSpace, ser, val, bLayout);
 	},
 	
 	_calculatePositionTitle: function(chartSpace)
@@ -554,33 +554,41 @@ CChartsDrawer.prototype =
 		//KEY
 		if(chartSpace.chart.legend && !chartSpace.chart.legend.overlay)
 		{
+			var fLegendExtX = chartSpace.chart.legend.extX;
+			var fLegendExtY = chartSpace.chart.legend.extY;
+			if(chartSpace.chart.legend.layout){
+				if(AscFormat.isRealNumber(chartSpace.chart.legend.naturalWidth) && AscFormat.isRealNumber(chartSpace.chart.legend.naturalHeight)){
+					fLegendExtX = chartSpace.chart.legend.naturalWidth;
+					fLegendExtY = chartSpace.chart.legend.naturalHeight;
+				}
+			}
 			switch ( chartSpace.chart.legend.legendPos )
 			{
 				case c_oAscChartLegendShowSettings.left:
 				case c_oAscChartLegendShowSettings.leftOverlay:
 				{
-					leftKey += chartSpace.chart.legend.extX;
+					leftKey += fLegendExtX;
 					break;
 				}
 				case c_oAscChartLegendShowSettings.top:
 				{
-					topKey += chartSpace.chart.legend.extY;
+					topKey += fLegendExtY
 					break;
 				}
 				case c_oAscChartLegendShowSettings.right:
 				case c_oAscChartLegendShowSettings.rightOverlay:
 				{
-					rightKey += chartSpace.chart.legend.extX;
+					rightKey += fLegendExtX;
 					break;
 				}
 				case c_oAscChartLegendShowSettings.bottom:
 				{
-					bottomKey += chartSpace.chart.legend.extY;
+					bottomKey += fLegendExtY;
 					break;
 				}
 				case c_oAscChartLegendShowSettings.topRight:
 				{
-					rightKey += chartSpace.chart.legend.extX;
+					rightKey += fLegendExtX;
 					break;
 				}
 			}
@@ -597,7 +605,25 @@ CChartsDrawer.prototype =
 		this.calcProp.chartGutter._right = calculateRight ? calculateRight * pxToMM : right * pxToMM;
 		this.calcProp.chartGutter._top = calculateTop ? calculateTop * pxToMM : top * pxToMM;
 		this.calcProp.chartGutter._bottom = calculateBottom ? calculateBottom * pxToMM : bottom * pxToMM;
-		
+
+        if(chartSpace.chart.plotArea.chart.getObjectType() == AscDFH.historyitem_type_PieChart){
+            if(chartSpace.chart.plotArea.layout){
+                var oLayout = chartSpace.chart.plotArea.layout;
+                this.calcProp.chartGutter._left = chartSpace.calculatePosByLayout(this.calcProp.chartGutter._left/pxToMM, oLayout.xMode, oLayout.x,
+                    (this.calcProp.chartGutter._right - this.calcProp.chartGutter._left)/pxToMM, chartSpace.extX)*pxToMM;
+                this.calcProp.chartGutter._top = chartSpace.calculatePosByLayout(this.calcProp.chartGutter._top/pxToMM, oLayout.yMode, oLayout.y,
+                    (this.calcProp.chartGutter._bottom - this.calcProp.chartGutter._top)/pxToMM, chartSpace.extY)*pxToMM;
+                var fWidthPlotArea = chartSpace.calculateSizeByLayout(this.calcProp.chartGutter._left/pxToMM, chartSpace.extX, oLayout.w, oLayout.wMode );
+                if(fWidthPlotArea > 0){
+                    this.calcProp.chartGutter._right = chartSpace.extX*pxToMM - (this.calcProp.chartGutter._left + fWidthPlotArea*pxToMM);
+                }
+                var fHeightPlotArea = chartSpace.calculateSizeByLayout(this.calcProp.chartGutter._top/pxToMM, chartSpace.extY, oLayout.h, oLayout.hMode );
+                if(fHeightPlotArea > 0){
+                    this.calcProp.chartGutter._bottom = chartSpace.extY*pxToMM - (this.calcProp.chartGutter._top + fHeightPlotArea*pxToMM);
+                }
+            }
+        }
+
 		this._checkMargins();
 	},
 	
@@ -724,7 +750,8 @@ CChartsDrawer.prototype =
 				}
 			}
 		}
-		
+
+
 		return {calculateLeft: calculateLeft, calculateRight : calculateRight, calculateTop: calculateTop, calculateBottom: calculateBottom};
 	},
 	
@@ -7165,8 +7192,314 @@ drawPieChart.prototype =
 		
 		return {frontPath: null, upPath: upPath};	
 	},
-	
-	_calculateDLbl: function(chartSpace, ser, val)
+
+	_calculateBestFitPosition: function(fStartAngle, fSweepAngle, fRadius, fWidth, fHeight, fCenterX, fCenterY, bLayout){
+		var fStartAngle_ = fStartAngle;
+		var fEndAngle = fStartAngle + fSweepAngle;
+        if(bLayout){
+            return this._calculateBestFitPositionOuter(fStartAngle_, fEndAngle, fRadius, fWidth, fHeight, fCenterX, fCenterY);
+        }
+		var oRet = this._calculateBestFitPositionInner(fStartAngle_, fEndAngle, fRadius, fWidth, fHeight, fCenterX, fCenterY);
+        if(!oRet.bError){
+            if(AscFormat.fCheckBoxIntersectionSegment(oRet.fX, oRet.fY, fWidth, fHeight, fCenterX, fCenterY, fCenterX + fRadius*Math.cos(fStartAngle_), fCenterY + fRadius*Math.sin(fStartAngle_))
+                || AscFormat.fCheckBoxIntersectionSegment(oRet.fX, oRet.fY, fWidth, fHeight, fCenterX, fCenterY, fCenterX + fRadius*Math.cos(fEndAngle), fCenterY + fRadius*Math.sin(fEndAngle))){
+                oRet.bError = true;
+            }
+        }
+		if(oRet.bError){
+			return this._calculateBestFitPositionOuter(fStartAngle_, fEndAngle, fRadius, fWidth, fHeight, fCenterX, fCenterY);
+		}
+		return oRet;
+	},
+
+	_calculateBestFitPositionInner: function(fStartAngle, fEndAngle, fPieRadius, fLabelWidth, fLabelHeight, fCenterX, fCenterY){
+		var oResult = {bError: true};
+		var fBisectAngle = AscFormat.normalizeRotate((fStartAngle + fEndAngle)/2.0);
+		
+		if(AscFormat.fApproxEqual(fBisectAngle, 0) || AscFormat.fApproxEqual(fBisectAngle, Math.PI/2) || AscFormat.fApproxEqual(fBisectAngle, Math.PI) || AscFormat.fApproxEqual(fBisectAngle, 3*Math.PI/2)){
+			return this._calculateInEndDLblPosition(fStartAngle, fStartAngle + fEndAngle, fPieRadius, fLabelWidth, fLabelHeight, fCenterX, fCenterY);
+		}
+		var fBisectAngle2 = AscFormat.normalizeRotate(fBisectAngle + Math.PI/4) - Math.PI/4; 
+		var nIndexArea = ((fBisectAngle2 + Math.PI/4)/(Math.PI/2)) >> 0;
+				
+		
+		var fLengthCoeff =  ((fBisectAngle2 + Math.PI/4) - (Math.PI/2)*nIndexArea)/(Math.PI/2);		
+				
+		var fXs = fCenterX + fPieRadius*Math.cos(fBisectAngle);
+		var fYs = fCenterY + fPieRadius*Math.sin(fBisectAngle);
+		var fDeltaX, fDeltaY, oSolvation;
+
+        switch(nIndexArea){
+            case 0:{
+                if(fBisectAngle2 < 0){
+                    fDeltaX = fLabelWidth;
+                    fDeltaY = -(1 - fLengthCoeff)*fLabelHeight;
+                }
+                else{
+                    fDeltaX = fLabelWidth;
+                    fDeltaY = fLabelHeight*fLengthCoeff;
+                }
+                oSolvation = AscFormat.fSolveQuadraticEquation(fPieRadius*fPieRadius, 2*(fDeltaX*(fXs - fCenterX) + fDeltaY*(fYs - fCenterY)), fDeltaX*fDeltaX + fDeltaY*fDeltaY - fPieRadius*fPieRadius);
+                if(!oSolvation.bError){
+                    if(oSolvation.x1 > 0 && oSolvation.x1 < 1){
+                        oResult.bError = false;
+                        oResult.fX = fCenterX + oSolvation.x1*(fXs - fCenterX);
+                        oResult.fY = fCenterY + oSolvation.x1*(fYs - fCenterY) - (1 - fLengthCoeff)*fLabelHeight;
+                    }
+                    else if(oSolvation.x2 > 0 && oSolvation.x2 < 1){
+                        oResult.bError = false;
+                        oResult.fX = fCenterX + oSolvation.x2*(fXs - fCenterX);
+                        oResult.fY = fCenterY + oSolvation.x2*(fYs - fCenterY) - (1 - fLengthCoeff)*fLabelHeight;
+                    }
+                }
+                break;
+            }
+            case 1:{
+                if(fBisectAngle < Math.PI/2){
+                    fDeltaX = (1 - fLengthCoeff)*fLabelWidth;
+                    fDeltaY = fLabelHeight;
+                }
+                else{
+                    fDeltaX = - fLengthCoeff*fLabelWidth;
+                    fDeltaY = fLabelHeight;
+                }
+                oSolvation = AscFormat.fSolveQuadraticEquation(fPieRadius*fPieRadius, 2*(fDeltaX*(fXs - fCenterX) + fDeltaY*(fYs - fCenterY)), fDeltaX*fDeltaX + fDeltaY*fDeltaY - fPieRadius*fPieRadius);
+                if(!oSolvation.bError){
+                    if(oSolvation.x1 > 0 && oSolvation.x1 < 1){
+                        oResult.bError = false;
+                        oResult.fX = fCenterX + oSolvation.x1*(fXs - fCenterX) - fLabelWidth*fLengthCoeff;
+                        oResult.fY = fCenterY + oSolvation.x1*(fYs - fCenterY);
+                    }
+                    else if(oSolvation.x2 > 0 && oSolvation.x2 < 1){
+                        oResult.bError = false;
+                        oResult.fX = fCenterX + oSolvation.x2*(fXs - fCenterX) - fLabelWidth*fLengthCoeff;
+                        oResult.fY = fCenterY + oSolvation.x2*(fYs - fCenterY);
+                    }
+                }
+                break;
+            }
+            case 2:{
+                if(fBisectAngle < Math.PI){
+                    fDeltaX = -fLabelWidth;
+                    fDeltaY = (1 - fLengthCoeff)*fLabelHeight;
+                }
+                else{
+                    fDeltaX = -fLabelWidth;
+                    fDeltaY = - fLengthCoeff*fLabelHeight;
+                }
+                oSolvation = AscFormat.fSolveQuadraticEquation(fPieRadius*fPieRadius, 2*(fDeltaX*(fXs - fCenterX) + fDeltaY*(fYs - fCenterY)), fDeltaX*fDeltaX + fDeltaY*fDeltaY - fPieRadius*fPieRadius);
+                if(!oSolvation.bError){
+                    if(oSolvation.x1 > 0 && oSolvation.x1 < 1){
+                        oResult.bError = false;
+                        oResult.fX = fCenterX + oSolvation.x1*(fXs - fCenterX) - fLabelWidth;
+                        oResult.fY = fCenterY + oSolvation.x1*(fYs - fCenterY) - fLabelHeight*fLengthCoeff;
+
+                    }
+                    else if(oSolvation.x2 > 0 && oSolvation.x2 < 1){
+                        oResult.bError = false;
+                        oResult.fX = fCenterX + oSolvation.x2*(fXs - fCenterX) - fLabelWidth;
+                        oResult.fY = fCenterY + oSolvation.x2*(fYs - fCenterY) - fLabelHeight*fLengthCoeff;
+                    }
+                }
+                break;
+            }
+            case 3:{
+                fLengthCoeff = 1 - fLengthCoeff;
+                if(fBisectAngle < 3*Math.PI/2){
+                    fDeltaX = -fLabelWidth*fLengthCoeff;
+                    fDeltaY = -fLabelHeight;
+                }
+                else{
+                    fDeltaX = (1 - fLengthCoeff)*fLabelWidth;
+                    fDeltaY = -fLabelHeight;
+                }
+                oSolvation = AscFormat.fSolveQuadraticEquation(fPieRadius*fPieRadius, 2*(fDeltaX*(fXs - fCenterX) + fDeltaY*(fYs - fCenterY)), fDeltaX*fDeltaX + fDeltaY*fDeltaY - fPieRadius*fPieRadius);
+                if(!oSolvation.bError){
+                    if(oSolvation.x1 > 0 && oSolvation.x1 < 1){
+                        oResult.bError = false;
+                        oResult.fX = fCenterX + oSolvation.x1*(fXs - fCenterX) - fLabelWidth*fLengthCoeff;
+                        oResult.fY = fCenterY + oSolvation.x1*(fYs - fCenterY) - fLabelHeight;
+                    }
+                    else if(oSolvation.x2 > 0 && oSolvation.x2 < 1){
+                        oResult.bError = false;
+                        oResult.fX = fCenterX + oSolvation.x2*(fXs - fCenterX) - fLabelWidth*fLengthCoeff;
+                        oResult.fY = fCenterY + oSolvation.x2*(fYs - fCenterY) - fLabelHeight;
+                    }
+                }
+                break;
+            }
+        }
+		return oResult;
+	},
+
+	_calculateBestFitPositionOuter: function(fStartAngle, fEndAngle, fPieRadius, fLabelWidth, fLabelHeight, fCenterX, fCenterY){
+        var oResult = {bError: true};
+        var fBisectAngle = AscFormat.normalizeRotate((fStartAngle + fEndAngle)/2.0);
+        var fBisectAngle2 = AscFormat.normalizeRotate(fBisectAngle + Math.PI/4) - Math.PI/4;
+        var nIndexArea = ((fBisectAngle2 + Math.PI/4)/(Math.PI/2)) >> 0;
+
+
+        var fLengthCoeff =  ((fBisectAngle2 + Math.PI/4) - (Math.PI/2)*nIndexArea)/(Math.PI/2);
+
+        var fXs = fCenterX + fPieRadius*Math.cos(fBisectAngle);
+        var fYs = fCenterY + fPieRadius*Math.sin(fBisectAngle);
+        var fDeltaX, fDeltaY, oSolvation;
+
+        var fAngleApproxDelta = 1e-4;
+        switch(nIndexArea){
+            case 0:{
+                if(AscFormat.fApproxEqual(fBisectAngle2, 0, fAngleApproxDelta)){
+                    fDeltaX = 0;
+                    fDeltaY = 0;
+                }
+                else if(fBisectAngle2 < 0){
+                    fDeltaX = 0;
+                    fDeltaY = fLengthCoeff*fLabelHeight;
+                }
+                else{
+                    fDeltaX = 0;
+                    fDeltaY = -(1 - fLengthCoeff)*fLabelHeight;
+                }
+                oSolvation = AscFormat.fSolveQuadraticEquation(fPieRadius*fPieRadius, 2*(fDeltaX*(fXs - fCenterX) + fDeltaY*(fYs - fCenterY)), fDeltaX*fDeltaX + fDeltaY*fDeltaY - fPieRadius*fPieRadius);
+                if(!oSolvation.bError){
+                    if(oSolvation.x1 >= 1){
+                        oResult.bError = false;
+                        oResult.fX = fCenterX + oSolvation.x1*(fXs - fCenterX);
+                        oResult.fY = fCenterY + oSolvation.x1*(fYs - fCenterY) - (1 - fLengthCoeff)*fLabelHeight;
+                    }
+                    else if(oSolvation.x2 >= 1){
+                        oResult.bError = false;
+                        oResult.fX = fCenterX + oSolvation.x2*(fXs - fCenterX);
+                        oResult.fY = fCenterY + oSolvation.x2*(fYs - fCenterY) - (1 - fLengthCoeff)*fLabelHeight;
+                    }
+                }
+                break;
+            }
+            case 1:{
+                if(AscFormat.fApproxEqual(fBisectAngle, Math.PI/2, fAngleApproxDelta)){
+                    fDeltaX = 0;
+                    fDeltaY = 0;
+                }
+                else if(fBisectAngle < Math.PI/2){
+                    fDeltaX = -fLengthCoeff*fLabelWidth;
+                    fDeltaY = 0;
+                }
+                else{
+                    fDeltaX = (1 - fLengthCoeff)*fLabelWidth;
+                    fDeltaY = 0;
+                }
+                oSolvation = AscFormat.fSolveQuadraticEquation(fPieRadius*fPieRadius, 2*(fDeltaX*(fXs - fCenterX) + fDeltaY*(fYs - fCenterY)), fDeltaX*fDeltaX + fDeltaY*fDeltaY - fPieRadius*fPieRadius);
+                if(!oSolvation.bError){
+                    if(oSolvation.x1 >= 1){
+                        oResult.bError = false;
+                        oResult.fX = fCenterX + oSolvation.x1*(fXs - fCenterX) - fLabelWidth*fLengthCoeff;
+                        oResult.fY = fCenterY + oSolvation.x1*(fYs - fCenterY);
+                    }
+                    else if(oSolvation.x2 >= 1){
+                        oResult.bError = false;
+                        oResult.fX = fCenterX + oSolvation.x2*(fXs - fCenterX) - fLabelWidth*fLengthCoeff;
+                        oResult.fY = fCenterY + oSolvation.x2*(fYs - fCenterY);
+                    }
+                }
+                break;
+            }
+            case 2:{
+                if(AscFormat.fApproxEqual(fBisectAngle, Math.PI, fAngleApproxDelta)){
+                    fDeltaX = 0;
+                    fDeltaY = 0;
+                }
+                else if(fBisectAngle < Math.PI){
+                    fDeltaX = 0;
+                    fDeltaY = -fLengthCoeff*fLabelHeight;
+                }
+                else{
+                    fDeltaX = 0;
+                    fDeltaY = (1 - fLengthCoeff)*fLabelHeight;
+                }
+                oSolvation = AscFormat.fSolveQuadraticEquation(fPieRadius*fPieRadius, 2*(fDeltaX*(fXs - fCenterX) + fDeltaY*(fYs - fCenterY)), fDeltaX*fDeltaX + fDeltaY*fDeltaY - fPieRadius*fPieRadius);
+                if(!oSolvation.bError){
+                    if(oSolvation.x1 >= 1){
+                        oResult.bError = false;
+                        oResult.fX = fCenterX + oSolvation.x1*(fXs - fCenterX) - fLabelWidth;
+                        oResult.fY = fCenterY + oSolvation.x1*(fYs - fCenterY) - fLabelHeight*fLengthCoeff;
+
+                    }
+                    else if(oSolvation.x2 >= 1){
+                        oResult.bError = false;
+                        oResult.fX = fCenterX + oSolvation.x2*(fXs - fCenterX) - fLabelWidth;
+                        oResult.fY = fCenterY + oSolvation.x2*(fYs - fCenterY) - fLabelHeight*fLengthCoeff;
+                    }
+                }
+                break;
+            }
+            case 3:{
+                if(fBisectAngle < 3*Math.PI/2){
+                    fDeltaX = fLabelWidth*fLengthCoeff;
+                    fDeltaY = 0;
+                }
+                else{
+                    fDeltaX = -(1 - fLengthCoeff)*fLabelWidth;
+                    fDeltaY = 0;
+                }
+                oSolvation = AscFormat.fSolveQuadraticEquation(fPieRadius*fPieRadius, 2*(fDeltaX*(fXs - fCenterX) + fDeltaY*(fYs - fCenterY)), fDeltaX*fDeltaX + fDeltaY*fDeltaY - fPieRadius*fPieRadius);
+                if(!oSolvation.bError){
+                    if(oSolvation.x1 >= 1){
+                        oResult.bError = false;
+                        oResult.fX = fCenterX + oSolvation.x1*(fXs - fCenterX) - (1 - fLengthCoeff)*fLabelWidth;
+                        oResult.fY = fCenterY + oSolvation.x1*(fYs - fCenterY) - fLabelHeight;
+                    }
+                    else if(oSolvation.x2 >= 1){
+                        oResult.bError = false;
+                        oResult.fX = fCenterX + oSolvation.x2*(fXs - fCenterX) - (1 - fLengthCoeff)*fLabelWidth;
+                        oResult.fY = fCenterY + oSolvation.x2*(fYs - fCenterY) - fLabelHeight;
+                    }
+                }
+                break;
+            }
+        }
+        return oResult;
+	},
+
+    _calculateInEndDLblPosition: function(fStartAngle, fSweepAngle, fPieRadius, fLabelWidth, fLabelHeight, fCenterX, fCenterY){
+        var fEndAngle = fStartAngle + fSweepAngle;
+        var oResult = {bError: true, fX: 0.0, fY: 0.0};
+        var fBisectAngle = AscFormat.normalizeRotate((fStartAngle + fEndAngle)/2);
+        var nQuadrantIndex = (2.0*fBisectAngle/Math.PI) >> 0;
+        var fHalfRectWidthVector = fLabelWidth/ 2, fHalfRectHeightVector = fLabelHeight/2;
+        if(nQuadrantIndex === 1 || nQuadrantIndex == 2){
+            fHalfRectWidthVector = -fHalfRectWidthVector;
+        }
+        if(nQuadrantIndex === 2 || nQuadrantIndex == 3){
+            fHalfRectHeightVector = -fHalfRectHeightVector;
+        }
+
+        var fXs = fCenterX + fPieRadius*Math.cos(fBisectAngle), fYs = fCenterY + fPieRadius*Math.sin(fBisectAngle);
+        var a = fPieRadius*fPieRadius, b = 2*( (fXs - fCenterX)*fHalfRectWidthVector + (fYs - fCenterY)*fHalfRectHeightVector), c = fHalfRectWidthVector*fHalfRectWidthVector + fHalfRectHeightVector*fHalfRectHeightVector - fPieRadius*fPieRadius;
+        var oSolution = AscFormat.fSolveQuadraticEquation(a, b, c);
+		if(oSolution.bError){
+			return oResult;
+		}
+		var D = b*b - 4*a*c;
+        if(D < 0){
+            return oResult;
+        }
+        var t1 = oSolution.x1, t2 = oSolution.x2;
+        if(t1 > 0 && t1 < 1){
+            oResult.bError = false;
+            oResult.fX = fCenterX + t1*(fXs - fCenterX) - fLabelWidth/2;
+            oResult.fY = fCenterY + t1*(fYs - fCenterY) - fLabelHeight/2;
+            return oResult
+        }
+        if(t2 > 0 && t2 < 1){
+            oResult.bError = false;
+            oResult.fX = fCenterX + t2*(fXs - fCenterX) - fLabelWidth/2;
+            oResult.fY = fCenterY + t2*(fYs - fCenterY) - fLabelHeight/2;
+            return oResult
+        }
+        return oResult;
+    },
+
+	_calculateDLbl: function(chartSpace, ser, val, bLayout)
 	{
 		var pxToMm = this.chartProp.pxToMM;
 		
@@ -7174,7 +7507,7 @@ drawPieChart.prototype =
 		if(!this.paths.series[val])
 			return;
 		
-		var path
+		var path;
 		if(this.cChartDrawer.nDimensionCount === 3)
 			path = this.paths.series[this.paths.series.length - 1][val].ArrPathCommand;
 		else
@@ -7218,8 +7551,15 @@ drawPieChart.prototype =
 		{
 			case c_oAscChartDataLabelsPos.bestFit:
 			{
-				centerX = centerX + (radius / 2) * Math.cos(-1 * stAng - swAng / 2) - width / 2;
-				centerY = centerY - (radius / 2) * Math.sin(-1 * stAng - swAng / 2) - height / 2;
+				var oPos = this._calculateBestFitPosition(stAng, swAng, radius, width, height, centerX, centerY, bLayout);
+				if(!oPos.bError){
+					centerX = oPos.fX;
+					centerY = oPos.fY;
+				}
+				else{
+					centerX = centerX + (radius / 2) * Math.cos(-1 * stAng - swAng / 2) - width / 2;
+					centerY = centerY - (radius / 2) * Math.sin(-1 * stAng - swAng / 2) - height / 2;
+				}
 				break;
 			}
 			case c_oAscChartDataLabelsPos.ctr:
@@ -7236,6 +7576,12 @@ drawPieChart.prototype =
 			}
 			case c_oAscChartDataLabelsPos.inEnd:
 			{
+                var oPos = this._calculateInEndDLblPosition(stAng, swAng, radius, width, height, centerX, centerY);
+                if(!oPos.bError){
+                    centerX = oPos.fX;
+                    centerY = oPos.fY;
+                    break;
+                }
 				tempCenterX = centerX + (radius) * Math.cos(-1 * stAng - swAng / 2);
 				tempCenterY = centerY - (radius) * Math.sin(-1 * stAng - swAng / 2);
 				
