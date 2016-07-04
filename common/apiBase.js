@@ -882,6 +882,7 @@
 	baseEditorsApi.prototype._onEndLoadSdk = function()
 	{
 		// init drag&drop
+		var t = this;
 		AscCommon.InitDragAndDrop(this.HtmlElement, function(error, files)
 		{
 			t._uploadCallback(error, files);
