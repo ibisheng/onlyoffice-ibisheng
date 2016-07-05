@@ -3161,8 +3161,27 @@ function CBinaryFileWriter()
     {
         oThis.WriteUChar(g_nodeAttributeStart);
 
-        if (row.Pr.Height !== undefined && row.Pr.Height != null)
-            oThis._WriteInt1(0, (row.Pr.Height.Value * 36000) >> 0);
+        if (row.Pr.Height !== undefined && row.Pr.Height != null){
+			var fMaxTopMargin = 0, fMaxBottomMargin = 0, fMaxTopBorder = 0, fMaxBottomBorder = 0;
+			for(i = 0;  i < row.Content.length; ++i){
+				var oCell = row.Content[i];
+				var oMargins = oCell.Get_Margins();
+				if(oMargins.Bottom.W > fMaxBottomMargin){
+					fMaxBottomMargin = oMargins.Bottom.W;
+				}
+				if(oMargins.Top.W > fMaxTopMargin){
+					fMaxTopMargin = oMargins.Top.W;
+				}
+				var oBorders = oCell.Get_Borders();
+				if(oBorders.Top.Size > fMaxTopBorder){
+					fMaxTopBorder = oBorders.Top.Size;
+				}
+				if(oBorders.Bottom.Size > fMaxBottomBorder){
+					fMaxBottomBorder = oBorders.Bottom.Size;
+				}
+			}
+		}
+            oThis._WriteInt1(0, ( (row.Pr.Height.Value + fMaxBottomMargin + fMaxTopMargin + fMaxTopBorder + fMaxBottomBorder) * 36000) >> 0);
         
         oThis.WriteUChar(g_nodeAttributeEnd);
 

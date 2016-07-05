@@ -155,7 +155,7 @@
 
             if (true)
             {
-                this.api.asc_fireCallback("asc_onPluginClose");
+                this.api.sendEvent("asc_onPluginClose");
                 var _div = document.getElementById("plugin_iframe");
                 if (_div)
                     _div.parentNode.removeChild(_div);
@@ -176,7 +176,7 @@
 
             if (this.current.variations[this.currentVariation].isVisual && this.startData.getAttribute("resize") !== true)
             {
-                this.api.asc_fireCallback("asc_onPluginShow", this.current, this.currentVariation);
+                this.api.sendEvent("asc_onPluginShow", this.current, this.currentVariation);
             }
             else
             {
@@ -299,7 +299,7 @@
                 _pluginsInstall["pluginsData"].push(this.plugins[i].serialize());
             }
 
-            this.api.asc_fireCallback("asc_onPluginsInit", _pluginsInstall);
+            this.api.sendEvent("asc_onPluginsInit", _pluginsInstall);
         },
 
         startLongAction : function()

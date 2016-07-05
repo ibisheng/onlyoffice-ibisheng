@@ -6652,7 +6652,6 @@ background-repeat: no-repeat;\
 				if (this.bInit_word_control === false)
 				{
 					this.bInit_word_control = true;
-					this.pluginsManager     = Asc.createPluginsManager(this);
 					this.asc_fireCallback("asc_onDocumentContentReady");
 				}
 			}
@@ -6751,7 +6750,6 @@ background-repeat: no-repeat;\
 		if (false === this.isSaveFonts_Images)
 		{
 			this.bInit_word_control = true;
-			this.pluginsManager     = Asc.createPluginsManager(this);
 			this.asc_fireCallback("asc_onDocumentContentReady");
 		}
 
