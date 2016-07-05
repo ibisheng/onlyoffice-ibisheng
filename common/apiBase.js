@@ -907,6 +907,8 @@
 		{
 			this.asc_enableKeyEvents(this.tmpFocus);
 		}
+
+		this.pluginsManager     = Asc.createPluginsManager(this);
 	};
 
 	baseEditorsApi.prototype.sendStandartTextures = function()
