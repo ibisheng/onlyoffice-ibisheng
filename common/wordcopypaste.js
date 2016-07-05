@@ -3108,9 +3108,7 @@ PasteProcessor.prototype =
 				}
 				else if(base64FromExcel)//вставляем в презентации из таблиц
 				{	
-					History.TurnOff();
-					var excelContent = this._readFromBinaryExcel(base64FromExcel);
-					History.TurnOn();
+					var excelContent = AscFormat.ExecuteNoHistory(this._readFromBinaryExcel, this, [base64FromExcel]);
 					
 					var aContentExcel = excelContent.workbook;
 					var aPastedImages = excelContent.arrImages;
@@ -3118,22 +3116,6 @@ PasteProcessor.prototype =
 					//если есть шейпы, то вставляем их из excel
 					if(aContentExcel && aContentExcel.aWorksheets && aContentExcel.aWorksheets[0] && aContentExcel.aWorksheets[0].Drawings && aContentExcel.aWorksheets[0].Drawings.length)
 					{
-						var arr_shapes = aContentExcel.aWorksheets[0].Drawings;
-						var shape;
-						
-						var aImagesToDownload = [];
-						for(var i = 0; i < aPastedImages.length; i++)
-						{
-							aImagesToDownload.push(aPastedImages[i].Url);
-						}
-						
-                        var aContent = {aPastedImages: aPastedImages, images: aImagesToDownload};
-						
-						//var arrTransforms = objects.arrTransforms;
-						var presentation = editor.WordControl.m_oLogicDocument;
-						oThis = this;
-						var font_map = {};
-
 						var paste_callback = function()
 						{
 							if(false == oThis.bNested)
@@ -3154,20 +3136,42 @@ PasteProcessor.prototype =
 								presentation.Insert_Content(presentationSelectedContent);
 								presentation.Recalculate();
 
-                                presentation.Check_CursorMoveRight();
+								presentation.Check_CursorMoveRight();
 								presentation.Document_UpdateInterfaceState();
 							}
+						};
+						
+						
+						var arr_shapes = aContentExcel.aWorksheets[0].Drawings;
+						
+						var aImagesToDownload = [];
+						for(var i = 0; i < aPastedImages.length; i++)
+						{
+							aImagesToDownload.push(aPastedImages[i].Url);
 						}
-
+						
+                        var aContent = {aPastedImages: aPastedImages, images: aImagesToDownload};
+						
+						//var arrTransforms = objects.arrTransforms;
+						var presentation = editor.WordControl.m_oLogicDocument;
+						oThis = this;
+						
+						//fonts
+						var font_map = {};
+						for(var i = 0; i < arr_shapes.length; ++i)
+						{
+							var shape = arr_shapes[i].graphicObject;
+							shape.getAllFonts(font_map);
+						}
+						
 						var fonts = [];
 						//грузим картинки и фонты
 						for(var i in font_map)
 							fonts.push(new CFont(i, 0, "", 0));
 
-
+						//images
                         var images = aContent.images;
                         var arrImages = aContent.aPastedImages;
-
                         var oObjectsForDownload = GetObjectsForImageDownload(arrImages);
 						if(oObjectsForDownload.aUrls.length > 0)
 						{
@@ -3192,8 +3196,68 @@ PasteProcessor.prototype =
 						
 						return;
 					}
+					else
+					{
+						var presentationSelectedContent = new PresentationSelectedContent();
+						presentationSelectedContent.DocContent = new CSelectedContent();
+						
+						var aContent = AscFormat.ExecuteNoHistory(this._convertExcelBinary, this, [excelContent]);
+						
+						var elements = [], selectedElement, element, drawings = [], pDrawings = [], drawingCopyObject;
+						var defaultTableStyleId = presentation.DefaultTableStyleId;
+						for(var i = 0; i < aContent.content.length; ++i)
+						{
+							selectedElement = new CSelectedElement();
+							element = aContent.content[i];
+							
+							if(type_Table == element.GetType())//table
+							{
+								//TODO переделать количество строк и ширину
+								var W = 100;
+								var Rows = 3;
+								var graphic_frame = new CGraphicFrame();
+								graphic_frame.setSpPr(new AscFormat.CSpPr());
+								graphic_frame.spPr.setParent(graphic_frame);
+								graphic_frame.spPr.setXfrm(new AscFormat.CXfrm());
+								graphic_frame.spPr.xfrm.setParent(graphic_frame.spPr);
+								graphic_frame.spPr.xfrm.setOffX((this.oDocument.Width - W)/2);
+								graphic_frame.spPr.xfrm.setOffY(this.oDocument.Height/5);
+								graphic_frame.spPr.xfrm.setExtX(W);
+								graphic_frame.spPr.xfrm.setExtY(7.478268771701388 * Rows);
+								graphic_frame.setNvSpPr(new AscFormat.UniNvPr());
+								
+								element = this._convertTableToPPTX(element);
+								graphic_frame.setGraphicObject(element.Copy(graphic_frame));
+								graphic_frame.graphicObject.Set_TableStyle(defaultTableStyleId);
+
+								drawingCopyObject = new DrawingCopyObject();
+								drawingCopyObject.Drawing = graphic_frame;
+								pDrawings.push(drawingCopyObject);	
+							}
+						}
+						presentationSelectedContent.Drawings = pDrawings;
+						
+						var presentation = editor.WordControl.m_oLogicDocument;
+						
+						//вставка
+						var paste_callback = function()
+						{
+							if(false == oThis.bNested)
+							{
+								presentation.Insert_Content(presentationSelectedContent);
+								presentation.Recalculate();
+								presentation.Check_CursorMoveRight();
+								presentation.Document_UpdateInterfaceState();
+							}
+						}
+						
+						oThis.api.pre_Paste(aContent.content.fonts, null, paste_callback);
+		
+						return;
+					}
 				}
             }
+
             this.oRootNode = node;
             this._Prepeare(node,
                 function(){
