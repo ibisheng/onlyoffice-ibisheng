@@ -2177,33 +2177,52 @@ CFootnotesController.prototype.SetSelectionState = function(State, StateIndex)
 };
 CFootnotesController.prototype.AddHyperlink = function(Props)
 {
-	// TODO: Реализовать
+	if (true !== this.IsSelectionUse() || true === this.private_IsOnFootnoteSelected())
+	{
+		this.CurFootnote.Hyperlink_Add(Props);
+	}
 };
 CFootnotesController.prototype.ModifyHyperlink = function(Props)
 {
-	// TODO: Реализовать
+	if (true !== this.IsSelectionUse() || true === this.private_IsOnFootnoteSelected())
+	{
+		this.CurFootnote.Hyperlink_Modify(Props);
+	}
 };
 CFootnotesController.prototype.RemoveHyperlink = function()
 {
-	// TODO: Реализовать
+	if (true !== this.IsSelectionUse() || true === this.private_IsOnFootnoteSelected())
+	{
+		this.CurFootnote.Hyperlink_Remove();
+	}
 };
 CFootnotesController.prototype.CanAddHyperlink = function(bCheckInHyperlink)
 {
-	// TODO: Реализовать
+	if (true !== this.IsSelectionUse() || true === this.private_IsOnFootnoteSelected())
+		return this.CurFootnote.Hyperlink_CanAdd(bCheckInHyperlink);
+
 	return false;
 };
 CFootnotesController.prototype.IsCursorInHyperlink = function(bCheckEnd)
 {
-	// TODO: Реализовать
+	if (true !== this.IsSelectionUse() || true === this.private_IsOnFootnoteSelected())
+		return this.CurFootnote.Hyperlink_Check(bCheckEnd);
+
 	return null;
 };
 CFootnotesController.prototype.AddComment = function(Comment)
 {
-	// TODO: Реализовать
+	if (true !== this.IsSelectionUse() || true === this.private_IsOnFootnoteSelected())
+	{
+		this.CurFootnote.Add_Comment(Comment, true, true);
+	}
 };
 CFootnotesController.prototype.CanAddComment = function()
 {
-	// TODO: Реализовать
+	if (true !== this.IsSelectionUse() || true === this.private_IsOnFootnoteSelected())
+		return this.CurFootnote.CanAdd_Comment();
+
+	return false;
 };
 CFootnotesController.prototype.GetSelectionAnchorPos = function()
 {
@@ -2235,7 +2254,6 @@ CFootnotesController.prototype.RestoreDocumentStateAfterLoadChanges = function(S
 {
 	// TODO: Реализовать
 };
-
 
 
 function CFootEndnotePage()
