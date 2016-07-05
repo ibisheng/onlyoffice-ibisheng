@@ -598,7 +598,6 @@ window['AscFonts'].CFontManager = function CFontManager() {
     this.Initialize = function(){};
     this.ClearFontsRasterCache = function(){};
 };
-window["use_native_fonts_only"] = true;
 
 // FT_Common
 function _FT_Common() {
