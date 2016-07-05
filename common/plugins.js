@@ -348,48 +348,48 @@
                     window.g_asc_plugins.closeAttackTimer = -1;
                 }
 
-                if (value && value != "")
-                {
-                    try
-                    {
-						if (window.g_asc_plugins.api.asc_canPaste())
-						{
-							var _script = "(function(){ var Api = window.g_asc_plugins.api;\n" + value + "})();";
-							eval(_script);
+                if (value && value != "") {
+                    try {
+                        if (window.g_asc_plugins.api.asc_canPaste()) {
+                            var _script = "(function(){ var Api = window.g_asc_plugins.api;\n" + value + "})();";
+                            eval(_script);
 
-							var oLogicDocument = window.g_asc_plugins.api.WordControl ? window.g_asc_plugins.api.WordControl.m_oLogicDocument : null;
-							if (pluginData.getAttribute("recalculate") == true)
-							{
-								var _fonts = oLogicDocument.Document_Get_AllFontNames();
-								var _imagesArray = oLogicDocument.Get_AllImageUrls();
-								var _images = {};
-								for (var i = 0; i < _imagesArray.length; i++)
-								{
-									_images[_imagesArray[i]] = _imagesArray[i];
-								}
-
-                                window.g_asc_plugins.images_rename = _images;
-								AscCommon.Check_LoadingDataBeforePrepaste(window.g_asc_plugins.api, _fonts, _images, function()
-								{
-                                    if (window.g_asc_plugins.api.WordControl &&
-                                        window.g_asc_plugins.api.WordControl.m_oLogicDocument &&
-                                        window.g_asc_plugins.api.WordControl.m_oLogicDocument.Reassign_ImageUrls)
-                                    {
-                                        window.g_asc_plugins.api.WordControl.m_oLogicDocument.Reassign_ImageUrls(window.g_asc_plugins.images_rename);
+                            if (pluginData.getAttribute("recalculate") == true) {
+                                var editorId = window.g_asc_plugins.api.getEditorId();
+                                if (AscCommon.c_oEditorId.Word === editorId) {
+                                    var oLogicDocument = window.g_asc_plugins.api.WordControl ?
+                                      window.g_asc_plugins.api.WordControl.m_oLogicDocument : null;
+                                    var _fonts = oLogicDocument.Document_Get_AllFontNames();
+                                    var _imagesArray = oLogicDocument.Get_AllImageUrls();
+                                    var _images = {};
+                                    for (var i = 0; i < _imagesArray.length; i++) {
+                                        _images[_imagesArray[i]] = _imagesArray[i];
                                     }
-                                    delete window.g_asc_plugins.images_rename;
-									window.g_asc_plugins.api.asc_Recalculate();
-								});
-							}
-						}
-                    }
-                    catch (err)
-                    {
+
+                                    window.g_asc_plugins.images_rename = _images;
+                                    AscCommon.Check_LoadingDataBeforePrepaste(window.g_asc_plugins.api, _fonts, _images,
+                                      function () {
+                                          if (window.g_asc_plugins.api.WordControl &&
+                                            window.g_asc_plugins.api.WordControl.m_oLogicDocument &&
+                                            window.g_asc_plugins.api.WordControl.m_oLogicDocument.Reassign_ImageUrls) {
+                                              window.g_asc_plugins.api.WordControl.m_oLogicDocument.Reassign_ImageUrls(
+                                                window.g_asc_plugins.images_rename);
+                                          }
+                                          delete window.g_asc_plugins.images_rename;
+                                          window.g_asc_plugins.api.asc_Recalculate();
+                                      });
+                                } else if (AscCommon.c_oEditorId.Spreadsheet === editorId) {
+                                    window.g_asc_plugins.api.asc_Recalculate();
+                                }
+                            }
+                        }
+                    } catch (err) {
                     }
                 }
 
-                if ("close" == name)
-                    window.g_asc_plugins.close();
+							if ("close" == name) {
+                  window.g_asc_plugins.close();
+              }
             }
         }
     }
