@@ -124,6 +124,17 @@
 	};
 
 	/**
+	 * Returns an object that represents the range
+	 * @memberof ApiWorksheet
+	 * @param {Number} row
+	 * @param {Number} col
+	 * @returns {ApiRange}
+	 */
+	ApiWorksheet.prototype.GetRangeByNumber = function (row, col) {
+		return new ApiRange(this.worksheet.getCell3(row, col));
+	};
+
+	/**
 	 * Format as table
 	 * @memberof ApiWorksheet
 	 * @param {string} sRange
@@ -285,6 +296,23 @@
 		};
 
 	/**
+	 * Get cell row
+	 * @memberof ApiRange
+	 * @returns {Number}
+	 */
+	ApiRange.prototype.GetRow = function () {
+		return this.range.bbox.r1;
+	};
+	/**
+	 * Get cell column
+	 * @memberof ApiRange
+	 * @returns {Number}
+	 */
+	ApiRange.prototype.GetCol = function () {
+		return this.range.bbox.c1;
+	};
+
+	/**
 	 * Set cell value
 	 * @memberof ApiRange
 	 * @param {string} val
@@ -344,10 +372,13 @@
 	ApiWorksheet.prototype["GetActiveCell"] = ApiWorksheet.prototype.GetActiveCell;
 	ApiWorksheet.prototype["SetName"] = ApiWorksheet.prototype.SetName;
 	ApiWorksheet.prototype["GetRange"] = ApiWorksheet.prototype.GetRange;
+	ApiWorksheet.prototype["GetRangeByNumber"] = ApiWorksheet.prototype.GetRangeByNumber;
 	ApiWorksheet.prototype["FormatAsTable"] = ApiWorksheet.prototype.FormatAsTable;
 	ApiWorksheet.prototype["SetColumnWidth"] = ApiWorksheet.prototype.SetColumnWidth;
 	ApiWorksheet.prototype["AddChart"] = ApiWorksheet.prototype.AddChart;
 
+	ApiRange.prototype["GetRow"] = ApiRange.prototype.GetRow;
+	ApiRange.prototype["GetCol"] = ApiRange.prototype.GetCol;
 	ApiRange.prototype["SetValue"] = ApiRange.prototype.SetValue;
 	ApiRange.prototype["SetFontColor"] = ApiRange.prototype.SetFontColor;
 	ApiRange.prototype["SetFontSize"] = ApiRange.prototype.SetFontSize;
