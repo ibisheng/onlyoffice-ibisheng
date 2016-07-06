@@ -483,9 +483,9 @@ CDrawingsController.prototype.RestoreDocumentStateAfterLoadChanges = function(St
 {
 	if (true !== this.DrawingObjects.Load_DocumentStateAfterLoadChanges(State))
 	{
-		this.Set_DocPosType(docpostype_Content);
-
 		var LogicDocument = this.LogicDocument;
+		LogicDocument.Set_DocPosType(docpostype_Content);
+
 		var ContentPos = 0;
 		if (LogicDocument.Pages[LogicDocument.CurPage])
 			ContentPos = LogicDocument.Pages[LogicDocument.CurPage].Pos + 1;

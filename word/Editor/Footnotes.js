@@ -251,16 +251,42 @@ CFootnotesController.prototype.Add_FootnoteOnPage = function(nPageIndex, oFootno
  * @param {string} sFootnoteId
  * @returns {boolean}
  */
-CFootnotesController.prototype.Is_UseInDocument = function(sFootnoteId)
+CFootnotesController.prototype.Is_UseInDocument = function(sFootnoteId, arrFootnotesList)
 {
-	// TODO: Надо бы еще проверить, если ли в документе ссылка на данную сноску.
-	for (var sId in this.Footnote)
+	if (!arrFootnotesList)
+		arrFootnotesList = this.private_GetFootnotesLogicRange(null, null);
+
+	var oFootnote = null;
+	for (var nIndex = 0, nCount = arrFootnotesList.length; nIndex < nCount; ++nIndex)
 	{
-		if (sId === sFootnoteId)
-			return true;
+		var oTempFootnote = arrFootnotesList[nIndex];
+		if (oTempFootnote.Get_Id() === sFootnoteId)
+		{
+			oFootnote = oTempFootnote;
+			break;
+		}
 	}
 
+	if (this.Footnote[sFootnoteId] === oFootnote)
+		return true;
+
 	return false;
+};
+/**
+ * Проверяем является ли данная сноска текущей.
+ * @param oFootnote
+ * return {boolean}
+ */
+CFootnotesController.prototype.Is_ThisElementCurrent = function(oFootnote)
+{
+	if (oFootnote === this.CurFootnote && docpostype_Footnotes === this.LogicDocument.Get_DocPosType())
+		return true;
+
+	return false;
+};
+CFootnotesController.prototype.OnContentReDraw = function(StartPageAbs, EndPageAbs)
+{
+	this.LogicDocument.OnContentReDraw(StartPageAbs, EndPageAbs);
 };
 /**
  * Проверяем пустая ли страница.
@@ -2226,13 +2252,12 @@ CFootnotesController.prototype.CanAddComment = function()
 };
 CFootnotesController.prototype.GetSelectionAnchorPos = function()
 {
-	// TODO: Реализовать
-	return {
-		X0   : 0,
-		Y    : 0,
-		X1   : 0,
-		Page : 0
-	};
+	if (true !== this.Selection.Use || 0 === this.Selection.Direction)
+		return this.CurFootnote.Get_SelectionAnchorPos();
+	else if (1 === this.Selection.Direction)
+		return this.Selection.Start.Footnote.Get_SelectionAnchorPos();
+	else
+		return this.Selection.End.Footnote.Get_SelectionAnchorPos();
 };
 CFootnotesController.prototype.StartSelectionFromCurPos = function()
 {
@@ -2246,13 +2271,209 @@ CFootnotesController.prototype.StartSelectionFromCurPos = function()
 	this.Selection.Footnotes[this.CurFootnote.Get_Id()] = this.CurFootnote;
 	this.CurFootnote.Start_SelectionFromCurPos();
 };
-CFootnotesController.prototype.SaveDocumentStateBeforeLoadChanges = function(State)
+CFootnotesController.prototype.SaveDocumentStateBeforeLoadChanges   = function(State)
 {
-	// TODO: Реализовать
+	State.FootnotesSelectDirection = this.Selection.Direction;
+	State.FootnotesSelectionUse    = this.Selection.Use;
+
+	if (0 === this.Selection.Direction || false === this.Selection.Use)
+	{
+		var oFootnote               = this.CurFootnote;
+		State.CurFootnote           = oFootnote;
+		State.CurFootnoteSelection  = oFootnote.Selection.Use;
+		State.CurFootnoteDocPosType = oFootnote.Get_DocPosType();
+
+		if (docpostype_Content === oFootnote.Get_DocPosType())
+		{
+			State.Pos      = oFootnote.Get_ContentPosition(false, false, undefined);
+			State.StartPos = oFootnote.Get_ContentPosition(true, true, undefined);
+			State.EndPos   = oFootnote.Get_ContentPosition(true, false, undefined);
+		}
+		else if (docpostype_DrawingObjects === oFootnote.Get_DocPosType())
+		{
+			this.LogicDocument.DrawingObjects.Save_DocumentStateBeforeLoadChanges(State);
+		}
+	}
+	else
+	{
+		State.FootnotesList  = this.private_GetSelectionArray();
+		var oFootnote        = State.FootnotesList[0];
+		State.FootnotesStart = {
+			Pos      : oFootnote.Get_ContentPosition(false, false, undefined),
+			StartPos : oFootnote.Get_ContentPosition(true, true, undefined),
+			EndPos   : oFootnote.Get_ContentPosition(true, false, undefined)
+		};
+
+		oFootnote          = State.FootnotesList[State.FootnotesList.length - 1];
+		State.FootnotesEnd = {
+			Pos      : oFootnote.Get_ContentPosition(false, false, undefined),
+			StartPos : oFootnote.Get_ContentPosition(true, true, undefined),
+			EndPos   : oFootnote.Get_ContentPosition(true, false, undefined)
+		};
+	}
 };
 CFootnotesController.prototype.RestoreDocumentStateAfterLoadChanges = function(State)
 {
-	// TODO: Реализовать
+	this.RemoveSelection();
+	if (0 === State.FootnotesSelectDirection)
+	{
+		var oFootnote = State.CurFootnote;
+		if (oFootnote && true === this.Is_UseInDocument(oFootnote.Get_Id()))
+		{
+			this.Selection.Start.Footnote = oFootnote;
+			this.Selection.End.Footnote   = oFootnote;
+			this.Selection.Direction      = 0;
+			this.CurFootnote              = oFootnote;
+			this.Selection.Footnotes      = {};
+			this.Selection.Use            = State.FootnotesSelectionUse;
+
+			this.Selection.Footnotes[oFootnote.Get_Id()] = oFootnote;
+
+			if (docpostype_Content === State.CurFootnoteDocPosType)
+			{
+				oFootnote.Set_DocPosType(docpostype_Content);
+				oFootnote.Selection.Use = State.CurFootnoteSelection;
+				if (true === oFootnote.Selection.Use)
+				{
+					oFootnote.Set_ContentPosition(State.StartPos, 0, 0);
+					oFootnote.Set_ContentSelection(State.StartPos, State.EndPos, 0, 0, 0);
+				}
+				else
+				{
+					oFootnote.Set_ContentPosition(State.Pos, 0, 0);
+					this.LogicDocument.NeedUpdateTarget = true;
+				}
+			}
+			else if (docpostype_DrawingObjects === State.CurFootnoteDocPosType)
+			{
+				oFootnote.Set_DocPosType(docpostype_DrawingObjects);
+				if (true !== this.LogicDocument.DrawingObjects.Load_DocumentStateAfterLoadChanges(State))
+				{
+					oFootnote.Set_DocPosType(docpostype_Content);
+					this.LogicDocument.Cursor_MoveAt(State.X ? State.X : 0, State.Y ? State.Y : 0, false);
+				}
+			}
+		}
+		else
+		{
+			this.LogicDocument.EndFootnotesEditing();
+		}
+	}
+	else
+	{
+		var arrFootnotesList = State.FootnotesList;
+
+		var StartFootnote = null;
+		var EndFootnote   = null;
+
+		var arrAllFootnotes = this.private_GetFootnotesLogicRange(null, null);
+
+		for (var nIndex = 0, nCount = arrFootnotesList.length; nIndex < nCount; ++nIndex)
+		{
+			var oFootnote = arrFootnotesList[nIndex];
+			if (true === this.Is_UseInDocument(oFootnote.Get_Id(), arrAllFootnotes))
+			{
+				if (null === StartFootnote)
+					StartFootnote = oFootnote;
+
+				EndFootnote = oFootnote;
+			}
+		}
+
+		if (null === StartFootnote || null === EndFootnote)
+		{
+			this.LogicDocument.EndFootnotesEditing();
+			return;
+		}
+
+		var arrNewFootnotesList = this.private_GetFootnotesLogicRange(StartFootnote, EndFootnote);
+		if (arrNewFootnotesList.length < 1)
+		{
+			this.LogicDocument.EndFootnotesEditing();
+			return;
+		}
+		else if (arrNewFootnotesList.length === 1)
+		{
+			this.Selection.Use       = true;
+			this.Selection.Direction = 0;
+			this.Selection.Footnotes = {};
+
+			this.Selection.Footnotes[StartFootnote.Get_Id()] = StartFootnote;
+
+			if (arrFootnotesList[0] === StartFootnote)
+			{
+				StartFootnote.Set_DocPosType(docpostype_Content);
+				StartFootnote.Selection.Use = true;
+				StartFootnote.Set_ContentPosition(State.FootnotesStart.Pos, 0, 0);
+				StartFootnote.Set_ContentSelection(State.FootnotesStart.StartPos, State.FootnotesStart.EndPos, 0, 0, 0);
+			}
+			else if (arrFootnotesList[arrAllFootnotes.length - 1] === StartFootnote)
+			{
+				StartFootnote.Set_DocPosType(docpostype_Content);
+				StartFootnote.Selection.Use = true;
+				StartFootnote.Set_ContentPosition(State.FootnotesEnd.Pos, 0, 0);
+				StartFootnote.Set_ContentSelection(State.FootnotesEnd.StartPos, State.FootnotesEnd.EndPos, 0, 0, 0);
+			}
+			else
+			{
+				StartFootnote.Set_DocPosType(docpostype_Content);
+				StartFootnote.Select_All(1);
+			}
+		}
+		else
+		{
+			this.Selection.Use       = true;
+			this.Selection.Direction = State.FootnotesSelectDirection;
+			this.Selection.Footnotes = {};
+
+			for (var nIndex = 1, nCount = arrNewFootnotesList.length; nIndex < nCount - 1; ++nIndex)
+			{
+				var oFootnote = arrNewFootnotesList[nIndex];
+				oFootnote.Select_All(this.Selection.Direction);
+				this.Selection.Footnotes[oFootnote.Get_Id()] = oFootnote;
+			}
+
+			this.Selection.Footnotes[StartFootnote.Get_Id()] = StartFootnote;
+			this.Selection.Footnotes[EndFootnote.Get_Id()]   = EndFootnote;
+
+
+			if (1 !== this.Selection.Direction)
+			{
+				var Temp      = StartFootnote;
+				StartFootnote = EndFootnote;
+				EndFootnote   = Temp;
+			}
+
+			this.Selection.Start.Footnote = StartFootnote;
+			this.Selection.End.Footnote   = EndFootnote;
+
+			if (arrFootnotesList[0] === StartFootnote)
+			{
+				StartFootnote.Set_DocPosType(docpostype_Content);
+				StartFootnote.Selection.Use = true;
+				StartFootnote.Set_ContentPosition(State.FootnotesStart.Pos, 0, 0);
+				StartFootnote.Set_ContentSelection(State.FootnotesStart.StartPos, State.FootnotesStart.EndPos, 0, 0, 0);
+			}
+			else
+			{
+				StartFootnote.Set_DocPosType(docpostype_Content);
+				StartFootnote.Select_All(1);
+			}
+
+			if (arrFootnotesList[arrFootnotesList.length - 1] === EndFootnote)
+			{
+				EndFootnote.Set_DocPosType(docpostype_Content);
+				EndFootnote.Selection.Use = true;
+				EndFootnote.Set_ContentPosition(State.FootnotesEnd.Pos, 0, 0);
+				EndFootnote.Set_ContentSelection(State.FootnotesEnd.StartPos, State.FootnotesEnd.EndPos, 0, 0, 0);
+			}
+			else
+			{
+				EndFootnote.Set_DocPosType(docpostype_Content);
+				EndFootnote.Select_All(1);
+			}
+		}
+	}
 };
 
 

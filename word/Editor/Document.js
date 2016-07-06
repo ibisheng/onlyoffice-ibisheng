@@ -7623,6 +7623,21 @@ CDocument.prototype.Document_End_HdrFtrEditing = function()
 		this.Document_UpdateSelectionState();
 	}
 };
+CDocument.prototype.EndFootnotesEditing = function()
+{
+	if (docpostype_Footnotes === this.Get_DocPosType())
+	{
+		this.Set_DocPosType(docpostype_Content);
+		this.Cursor_MoveAt(0, 0, false);
+
+		this.DrawingDocument.ClearCachePages();
+		this.DrawingDocument.FirePaint();
+
+		this.Document_UpdateRulersState();
+		this.Document_UpdateInterfaceState();
+		this.Document_UpdateSelectionState();
+	}
+};
 CDocument.prototype.Document_Format_Paste = function()
 {
 	this.Controller.PasteFormatting(this.CopyTextPr, this.CopyParaPr);
@@ -10069,8 +10084,9 @@ CDocument.prototype.Save_DocumentStateBeforeLoadChanges = function()
 		Use            : this.Selection.Use,
 		Flag           : this.Selection.Flag,
 		UpdateOnRecalc : this.Selection.UpdateOnRecalc,
-		DragDrop       : {Flag : this.Selection.DragDrop.Flag,
-			Data               : null === this.Selection.DragDrop.Data ? null : {
+		DragDrop       : {
+			Flag : this.Selection.DragDrop.Flag,
+			Data : null === this.Selection.DragDrop.Data ? null : {
 				X       : this.Selection.DragDrop.Data.X,
 				Y       : this.Selection.DragDrop.Data.Y,
 				PageNum : this.Selection.DragDrop.Data.PageNum
@@ -10093,7 +10109,7 @@ CDocument.prototype.Load_DocumentStateAfterLoadChanges = function(State)
 	this.CurPos.Y     = State.CurPos.Y;
 	this.CurPos.RealX = State.CurPos.RealX;
 	this.CurPos.RealY = State.CurPos.RealY;
-	this.CurPos.Type  = State.CurPos.Type;
+	this.Set_DocPosType(State.CurPos.Type);
 
 	this.Selection.Start          = State.Selection.Start;
 	this.Selection.Use            = State.Selection.Use;

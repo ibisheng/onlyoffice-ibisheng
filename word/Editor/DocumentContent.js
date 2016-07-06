@@ -400,7 +400,7 @@ CDocumentContent.prototype.Set_CurrentElement              = function(Index, bUp
 };
 CDocumentContent.prototype.Is_ThisElementCurrent           = function()
 {
-    return this.Parent.Is_ThisElementCurrent();
+    return this.Parent.Is_ThisElementCurrent(this);
 };
 CDocumentContent.prototype.Content_GetPrev                 = function(Id)
 {
