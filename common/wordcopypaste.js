@@ -2467,6 +2467,10 @@ PasteProcessor.prototype =
 				}
             }
 			
+			if(onlyBinary)
+			{
+				return;
+			}
 			
 			//***вставляем извне в редактор документов***
             var presentation = editor.WordControl.m_oLogicDocument;
@@ -3257,7 +3261,12 @@ PasteProcessor.prototype =
 					}
 				}
             }
-
+			
+			if(onlyBinary)
+			{
+				return;
+			}
+			
             this.oRootNode = node;
             this._Prepeare(node,
                 function(){
