@@ -85,6 +85,8 @@
 
 		this.CopyPasteFocus = false;
 		this.CopyPasteFocusTimer = -1;
+
+		this.inputContext = null;
 	}
 
 	CClipboardBase.prototype =
@@ -109,6 +111,11 @@
 			else
 			{
 				this.Api.asc_CheckCopy(this, AscCommon.c_oAscClipboardDataFormat.Text | AscCommon.c_oAscClipboardDataFormat.Html | AscCommon.c_oAscClipboardDataFormat.Internal);
+
+				setTimeout(function(){
+					g_clipboardBase.EndFocus();
+				}, 0);
+
 				e.preventDefault();
 				return false;
 			}
@@ -135,6 +142,10 @@
 
 			if (!this.IsNeedDivOnCopy)
 			{
+				setTimeout(function(){
+					g_clipboardBase.EndFocus();
+				}, 0);
+
 				e.preventDefault();
 				return false;
 			}
@@ -510,7 +521,7 @@
 		StartFocus : function()
 		{
 			// не плодим таймеры
-			this.EndFocus();
+			this.EndFocus(false);
 
 			this.CopyPasteFocus = true;
 
@@ -523,13 +534,20 @@
 
 		},
 
-		EndFocus : function()
+		EndFocus : function(isFocusToEditor)
 		{
 			this.CopyPasteFocus = false;
 			if (-1 != this.CopyPasteFocusTimer)
 			{
 				clearTimeout(this.CopyPasteFocusTimer);
 				this.CopyPasteFocusTimer = -1;
+
+
+				if (false !== isFocusToEditor && null != this.inputContext)
+				{
+					if (this.inputContext.HtmlArea)
+						this.inputContext.HtmlArea.focus();
+				}
 			}
 		},
 

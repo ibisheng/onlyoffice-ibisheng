@@ -555,6 +555,22 @@
 		}
 		return null;
 	}
+	function _getDefaultKeyboardInput(_elem, _depth)
+	{
+		var _elemTest = _elem;
+		for (var _level = 0; _elemTest && (_level < _depth); ++_level, _elemTest = _elemTest.parentNode)
+		{
+			var _name = " " + _elemTest.className + " ";
+			if (_name.indexOf(" dropdown-menu" ) > -1 ||
+				_name.indexOf(" dropdown-toggle ") > -1 ||
+				_name.indexOf(" dropdown-submenu ") > -1 ||
+				_name.indexOf(" canfocused ") > -1)
+			{
+				return "true";
+			}
+		}
+		return null;
+	}
 
 	window['AscCommon']            = window['AscCommon'] || {};
 	window['AscCommon'].CTextInput = CTextInput;
@@ -564,6 +580,7 @@
 		window['AscCommon'].g_inputContext = new CTextInput(api);
 		window['AscCommon'].g_inputContext.init(target_id);
 		window['AscCommon'].g_clipboardBase.Init(api);
+		window['AscCommon'].g_clipboardBase.inputContext = window['AscCommon'].g_inputContext;
 
 		document.addEventListener("focus", function(e)
 		{
@@ -612,6 +629,9 @@
 			var _oo_editor_input    = _getAttirbute(t.nativeFocusElement, "oo_editor_input", 3);
 			// нужно ли прокидывать нажатие клавиш элементу (ТОЛЬКО keyDown)
 			var _oo_editor_keyboard = _getAttirbute(t.nativeFocusElement, "oo_editor_keyboard", 3);
+
+			if (!_oo_editor_input && !_oo_editor_keyboard)
+				_oo_editor_input = _getDefaultKeyboardInput(t.nativeFocusElement, 3);
 
 			if (_oo_editor_keyboard == "true")
 				_oo_editor_input = undefined;
