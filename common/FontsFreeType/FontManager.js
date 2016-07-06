@@ -393,7 +393,7 @@ function LoadFontFile(library, stream_index, name, faceindex, fontManager)
     font.m_lLineHeight = face.height;
 
     // flag for use always typo (os2 spec)
-    var bIsUseTypeAttack = ((face.os2.fsSelection & 128) == 128) ? true : false;
+    var bIsUseTypeAttack = (face.os2 && ((face.os2.fsSelection & 128) == 128)) ? true : false;
     if (fontManager.IsCellMode)
         bIsUseTypeAttack = false;
 
