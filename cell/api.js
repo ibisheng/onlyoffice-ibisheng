@@ -3216,6 +3216,16 @@ var editor;
     return _ret.data;
   };
 
+  spreadsheet_api.prototype.asc_canPaste = function () {
+    History.Create_NewPoint();
+    History.StartTransaction();
+    return true;
+  };
+  spreadsheet_api.prototype.asc_Recalculate = function () {
+    History.EndTransaction();
+    this._onUpdateAfterApplyChanges();
+  };
+
   spreadsheet_api.prototype._onEndLoadSdk = function() {
     History = AscCommon.History;
 
@@ -3512,6 +3522,4 @@ var editor;
   prot["asc_pluginButtonClick"]     = prot.asc_pluginButtonClick;
   prot["asc_addOleObject"]          = prot.asc_addOleObject;
   prot["asc_editOleObject"]         = prot.asc_editOleObject;
-  prot["asc_Recalculate"]           = prot.asc_Recalculate;
-  prot["asc_canPaste"]              = prot.asc_canPaste;
 })(window);

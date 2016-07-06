@@ -3180,8 +3180,8 @@ function CBinaryFileWriter()
 					fMaxBottomBorder = oBorders.Bottom.Size;
 				}
 			}
-		}
             oThis._WriteInt1(0, ( (row.Pr.Height.Value + fMaxBottomMargin + fMaxTopMargin + fMaxTopBorder + fMaxBottomBorder) * 36000) >> 0);
+		}
         
         oThis.WriteUChar(g_nodeAttributeEnd);
 

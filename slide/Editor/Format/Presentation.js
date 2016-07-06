@@ -1393,7 +1393,7 @@ CPresentation.prototype =
                 var oMargins = FirstCell.Get_Margins();
                 if(oMargins)
                 {
-                    ResultHeight -= (oMargins.Top + oMargins.Bottom);
+                    ResultHeight -= (oMargins.Top.W + oMargins.Bottom.W);
         }
             }
             content[i].Set_Height(ResultHeight, Asc.linerule_AtLeast );
