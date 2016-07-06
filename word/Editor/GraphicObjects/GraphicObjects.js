@@ -1256,7 +1256,10 @@ CGraphicObjects.prototype =
 
     handleOleObjectDoubleClick: function(drawing, oleObject, e, x, y, pageIndex)
     {
-        if(false === this.document.Document_Is_SelectionLocked(changestype_Drawing_Props))
+		if(drawing && drawing.ParaMath){
+			drawing.Convert_ToMathObject();
+		}
+        else if(false === this.document.Document_Is_SelectionLocked(changestype_Drawing_Props))
         {
             var pluginData = new Asc.CPluginData();
             pluginData.setAttribute("data", oleObject.m_sData);
