@@ -5090,6 +5090,11 @@ DrawingObjectsController.prototype =
                 }
             }
         }
+        else{
+            this.resetSelection();
+            this.document.Set_DocPosType(docpostype_Content);
+            this.document.Select_All();
+        }
         this.updateSelectionState();
     },
 
