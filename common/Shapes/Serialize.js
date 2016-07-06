@@ -6008,6 +6008,11 @@ function BinaryPPTYLoader()
 			}
 		}
 
+		var bLoadVal = AscCommon.g_oIdCounter.m_bLoad;
+		var bRead = AscCommon.g_oIdCounter.m_bRead;
+		AscCommon.g_oIdCounter.m_bLoad = false;
+		AscCommon.g_oIdCounter.m_bRead = false;
+		
         for(i = 0;  i < row.Content.length; ++i){
 			var oCell = row.Content[i];
 			var oMargins = oCell.Get_Margins();
@@ -6025,7 +6030,9 @@ function BinaryPPTYLoader()
 				fMaxBottomBorder = oBorders.Bottom.Size;
 			}
 		}
-		 row.Set_Height(Math.max(1, fRowHeight - fMaxTopMargin - fMaxBottomMargin - fMaxTopBorder - fMaxBottomBorder), Asc.linerule_AtLeast);
+		AscCommon.g_oIdCounter.m_bLoad = bLoadVal;
+		AscCommon.g_oIdCounter.m_bRead = bRead;
+		 row.Set_Height(Math.max(1, fRowHeight - fMaxTopMargin - fMaxBottomMargin - fMaxTopBorder/2 - fMaxBottomBorder/2), Asc.linerule_AtLeast);
 		/*
         if (row.Content.length == _count)
         {
