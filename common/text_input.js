@@ -49,10 +49,11 @@
 	///
 
 	var c_oCompositionState = {
-		start 	: 0,
+		start   : 0,
 		process : 1,
-		end		: 2
+		end     : 2
 	};
+
 	function CTextInput(api)
 	{
 		this.Api = api;
@@ -60,54 +61,56 @@
 		this.compositionValue = [];		// коды символов
 		this.compositionState = c_oCompositionState.end;
 
-		this.TargetId 	= null;			// id caret
-		this.HtmlDiv 	= null;			// для незаметной реализации одной textarea недостаточно
-		this.HtmlArea	= null;
+		this.TargetId = null;			// id caret
+		this.HtmlDiv  = null;			// для незаметной реализации одной textarea недостаточно
+		this.HtmlArea = null;
 
 		this.HtmlAreaOffset = 60;
 
 		this.LockerTargetTimer = -1;
 
-		this.KeyDownFlag = false;
+		this.KeyDownFlag               = false;
 		this.TextInputAfterComposition = false;
 
 		this.IsLockTargetMode = false;
 
 		this.IsUseFirstTextInputAfterComposition = false;
+
+		this.nativeFocusElement = null;
 	}
 
 	CTextInput.prototype =
 	{
 		init : function(target_id)
 		{
-			this.TargetId = target_id;
+			this.TargetId   = target_id;
 			var oHtmlTarget = document.getElementById(this.TargetId);
 			var oHtmlParent = oHtmlTarget.parentNode;
 
-			this.HtmlDiv = document.createElement("div");
-			this.HtmlDiv.id = "area_id_parent";
+			this.HtmlDiv                  = document.createElement("div");
+			this.HtmlDiv.id               = "area_id_parent";
 			this.HtmlDiv.style.background = "transparent";
-			this.HtmlDiv.style.border = "none";
-			this.HtmlDiv.style.position = "absolute";
-			this.HtmlDiv.style.zIndex = 0;
-			this.HtmlDiv.style.width = "20px";
-			this.HtmlDiv.style.height = "50px";
-			this.HtmlDiv.style.overflow = "hidden";
+			this.HtmlDiv.style.border     = "none";
+			this.HtmlDiv.style.position   = "absolute";
+			this.HtmlDiv.style.zIndex     = 0;
+			this.HtmlDiv.style.width      = "20px";
+			this.HtmlDiv.style.height     = "50px";
+			this.HtmlDiv.style.overflow   = "hidden";
 
-			this.HtmlArea = document.createElement("textarea");
-			this.HtmlArea.id = "area_id";
-			this.HtmlArea.style.background = "transparent";
-			this.HtmlArea.style.border = "none";
-			this.HtmlArea.style.position = "absolute";
+			this.HtmlArea                      = document.createElement("textarea");
+			this.HtmlArea.id                   = "area_id";
+			this.HtmlArea.style.background     = "transparent";
+			this.HtmlArea.style.border         = "none";
+			this.HtmlArea.style.position       = "absolute";
 			this.HtmlArea.style["text-shadow"] = "0 0 0 #000";
-			this.HtmlArea.style.outline = "none";
-			this.HtmlArea.style.color = "transparent";
-			this.HtmlArea.style.width = "1000px";
-			this.HtmlArea.style.height = "50px";
-			this.HtmlArea.style.overflow = "hidden";
+			this.HtmlArea.style.outline        = "none";
+			this.HtmlArea.style.color          = "transparent";
+			this.HtmlArea.style.width          = "1000px";
+			this.HtmlArea.style.height         = "50px";
+			this.HtmlArea.style.overflow       = "hidden";
 
 			this.HtmlArea.style.left = "0px;";
-			this.HtmlArea.style.top = (-this.HtmlAreaOffset) + "px";
+			this.HtmlArea.style.top  = (-this.HtmlAreaOffset) + "px";
 
 			this.HtmlArea.setAttribute("spellcheck", false);
 
@@ -116,31 +119,32 @@
 			if (true)
 			{
 				// нужен еще один родитель. чтобы скроллился он, а не oHtmlParent
-				var oHtmlDivScrollable = document.createElement("div");
+				var oHtmlDivScrollable              = document.createElement("div");
 				oHtmlDivScrollable.style.background = "transparent";
-				oHtmlDivScrollable.style.border = "none";
-				oHtmlDivScrollable.style.position = "absolute";
-				oHtmlDivScrollable.style.padding = "0";
-				oHtmlDivScrollable.style.margin = "0";
-				oHtmlDivScrollable.style.zIndex = 0;
+				oHtmlDivScrollable.style.border     = "none";
+				oHtmlDivScrollable.style.position   = "absolute";
+				oHtmlDivScrollable.style.padding    = "0";
+				oHtmlDivScrollable.style.margin     = "0";
+				oHtmlDivScrollable.style.zIndex     = 0;
 
-				var parentStyle = getComputedStyle(oHtmlParent);
-				oHtmlDivScrollable.style.left 	= parentStyle.left;
-				oHtmlDivScrollable.style.top 	= parentStyle.top;
-				oHtmlDivScrollable.style.width 	= parentStyle.width;
-				oHtmlDivScrollable.style.height = parentStyle.height;
+				var parentStyle                   = getComputedStyle(oHtmlParent);
+				oHtmlDivScrollable.style.left     = parentStyle.left;
+				oHtmlDivScrollable.style.top      = parentStyle.top;
+				oHtmlDivScrollable.style.width    = parentStyle.width;
+				oHtmlDivScrollable.style.height   = parentStyle.height;
 				oHtmlDivScrollable.style.overflow = "hidden";
 
 				oHtmlDivScrollable.appendChild(this.HtmlDiv);
 				oHtmlParent.parentNode.appendChild(oHtmlDivScrollable);
 
-				oHtmlParent.onresize = function(e) {
-					var _elem = document.getElementById("area_id_parent");
-					var style = getComputedStyle(oHtmlParent);
-					_elem.style.left 	= style.left;
-					_elem.style.top 	= style.top;
-					_elem.style.width 	= style.width;
-					_elem.style.height 	= style.height;
+				oHtmlParent.onresize = function(e)
+				{
+					var _elem          = document.getElementById("area_id_parent");
+					var style          = getComputedStyle(oHtmlParent);
+					_elem.style.left   = style.left;
+					_elem.style.top    = style.top;
+					_elem.style.width  = style.width;
+					_elem.style.height = style.height;
 				};
 			}
 			else
@@ -149,28 +153,53 @@
 			}
 
 			// events:
-			var oThis = this;
-			this.HtmlArea["onkeydown"] 	= function(e) { return oThis.onKeyDown(e); };
-			this.HtmlArea["onkeypress"] = function(e) { return oThis.onKeyPress(e); };
-			this.HtmlArea["onkeyup"] 	= function(e) { return oThis.onKeyUp(e); };
+			var oThis                   = this;
+			this.HtmlArea["onkeydown"]  = function(e)
+			{
+				return oThis.onKeyDown(e);
+			};
+			this.HtmlArea["onkeypress"] = function(e)
+			{
+				return oThis.onKeyPress(e);
+			};
+			this.HtmlArea["onkeyup"]    = function(e)
+			{
+				return oThis.onKeyUp(e);
+			};
 
-			this.HtmlArea.addEventListener("input", function(e) { return oThis.onInput(e); }, false);
-			this.HtmlArea.addEventListener("textInput", function(e) { return oThis.onTextInput(e); }, false);
+			this.HtmlArea.addEventListener("input", function(e)
+			{
+				return oThis.onInput(e);
+			}, false);
+			this.HtmlArea.addEventListener("textInput", function(e)
+			{
+				return oThis.onTextInput(e);
+			}, false);
 
-			this.HtmlArea.addEventListener("compositionstart", function(e) { return oThis.onCompositionStart(e); }, false);
-			this.HtmlArea.addEventListener("compositionupdate", function(e) { return oThis.onCompositionUpdate(e); }, false);
-			this.HtmlArea.addEventListener("compositionend", function(e) { return oThis.onCompositionEnd(e); }, false);
+			this.HtmlArea.addEventListener("compositionstart", function(e)
+			{
+				return oThis.onCompositionStart(e);
+			}, false);
+			this.HtmlArea.addEventListener("compositionupdate", function(e)
+			{
+				return oThis.onCompositionUpdate(e);
+			}, false);
+			this.HtmlArea.addEventListener("compositionend", function(e)
+			{
+				return oThis.onCompositionEnd(e);
+			}, false);
 
 			this.show(false);
 
-			// TODO:
-			setInterval(function(){
-				if (oThis.Api.asc_IsFocus() && !AscCommon.g_clipboardBase.IsFocus() && !AscCommon.g_clipboardBase.IsWorking())
-				{
-					if (document.activeElement != oThis.HtmlArea)
-						oThis.HtmlArea.focus();
-				}
-			}, 10);
+			/*
+			 setInterval(function(){
+			 if (oThis.Api.asc_IsFocus() && !AscCommon.g_clipboardBase.IsFocus() && !AscCommon.g_clipboardBase.IsWorking())
+			 {
+			 if (document.activeElement != oThis.HtmlArea)
+			 oThis.HtmlArea.focus();
+			 }
+			 }, 10);
+			 */
 
 			this.Api.Input_UpdatePos();
 		},
@@ -187,13 +216,14 @@
 		initTimer : function()
 		{
 			/*
-			setInterval(function(){
-				oThis.checkFocus();
-			}, 10);
-			*/
+			 setInterval(function(){
+			 oThis.checkFocus();
+			 }, 10);
+			 */
 
 			var oThis = this;
-			setTimeout(function(){
+			setTimeout(function()
+			{
 				oThis.checkFocus();
 				oThis.initTimer();
 			}, 40);
@@ -202,18 +232,18 @@
 		move : function(x, y)
 		{
 			var oTarget = document.getElementById(this.TargetId);
-			var xPos = x ? x : parseInt(oTarget.style.left);
-			var yPos = (y ? y : parseInt(oTarget.style.top)) + parseInt(oTarget.style.height);
+			var xPos    = x ? x : parseInt(oTarget.style.left);
+			var yPos    = (y ? y : parseInt(oTarget.style.top)) + parseInt(oTarget.style.height);
 
 			this.HtmlDiv.style.left = xPos + "px";
-			this.HtmlDiv.style.top = yPos + this.HtmlAreaOffset + "px"; // еще бы сдвинуться на высоту строки
+			this.HtmlDiv.style.top  = yPos + this.HtmlAreaOffset + "px"; // еще бы сдвинуться на высоту строки
 		},
 
 		clear : function()
 		{
 			this.compositionValue = [];
 			this.compositionState = c_oCompositionState.end;
-			this.HtmlArea.value = "";
+			this.HtmlArea.value   = "";
 		},
 
 		show : function(isShow)
@@ -263,10 +293,70 @@
 			}
 		},
 
+		emulateNativeKeyDown : function(e)
+		{
+			var oEvent = document.createEvent('KeyboardEvent');
+
+			/*
+			 var _event = new KeyboardEvent("keydown", {
+			 bubbles : true,
+			 cancelable : true,
+			 char : e.charCode,
+			 shiftKey : e.shiftKey,
+			 ctrlKey : e.ctrlKey,
+			 metaKey : e.metaKey,
+			 altKey : e.altKey,
+			 keyCode : e.keyCode,
+			 which : e.which,
+			 key : e.key
+			 });
+			 */
+
+			// Chromium Hack
+			Object.defineProperty(oEvent, 'keyCode', {
+				get : function()
+				{
+					return this.keyCodeVal;
+				}
+			});
+			Object.defineProperty(oEvent, 'which', {
+				get : function()
+				{
+					return this.keyCodeVal;
+				}
+			});
+
+			var k = e.keyCode;
+			if (oEvent.initKeyboardEvent)
+			{
+				oEvent.initKeyboardEvent("keydown", true, true, window, false, false, false, false, k, k);
+			}
+			else
+			{
+				oEvent.initKeyEvent("keydown", true, true, window, false, false, false, false, k, 0);
+			}
+
+			oEvent.keyCodeVal = k;
+
+			var _elem = _getElementKeyboardDown(this.nativeFocusElement, 3);
+			_elem.dispatchEvent(oEvent);
+
+			return oEvent.defaultPrevented;
+		},
+
 		onKeyDown : function(e)
 		{
 			if (c_oCompositionState.end != this.compositionState)
 				return;
+
+			if (null != this.nativeFocusElement)
+			{
+				if (this.emulateNativeKeyDown(e))
+				{
+					e.preventDefault();
+					return false;
+				}
+			}
 
 			// некоторые рукописные вводы не присылают keyUp
 			var _code = e.keyCode;
@@ -318,8 +408,11 @@
 
 			this.Api.asc_LockTargetUpdate(true);
 
-			var oThis = this;
-			this.LockerTargetTimer = setTimeout(function(){ oThis.unlockTarget(); }, 1000);
+			var oThis              = this;
+			this.LockerTargetTimer = setTimeout(function()
+			{
+				oThis.unlockTarget();
+			}, 1000);
 		},
 
 		unlockTarget : function()
@@ -346,7 +439,7 @@
 			this.checkCompositionData(e.data);
 
 			var _isEqualLen = (_old.length == this.compositionValue.length);
-			var _isEqual = _isEqualLen;
+			var _isEqual    = _isEqualLen;
 			if (_isEqual)
 			{
 				var _len = this.compositionValue.length;
@@ -416,7 +509,7 @@
 		checkCompositionData : function(data)
 		{
 			this.compositionValue = [];
-			var _length = data.length;
+			var _length           = data.length;
 			for (var i = 0; i < _length; i++)
 			{
 				var _code = data.charCodeAt(i);
@@ -440,7 +533,30 @@
 		}
 	};
 
-	window['AscCommon'] = window['AscCommon'] || {};
+	function _getAttirbute(_elem, _attr, _depth)
+	{
+		var _elemTest = _elem;
+		for (var _level = 0; _elemTest && (_level < _depth); ++_level, _elemTest = _elemTest.parentNode)
+		{
+			var _res = _elemTest.getAttribute(_attr);
+			if (null != _res)
+				return _res;
+		}
+		return null;
+	}
+	function _getElementKeyboardDown(_elem, _depth)
+	{
+		var _elemTest = _elem;
+		for (var _level = 0; _elemTest && (_level < _depth); ++_level, _elemTest = _elemTest.parentNode)
+		{
+			var _res = _elemTest.getAttribute("oo_editor_keyboard");
+			if (null != _res)
+				return _elemTest;
+		}
+		return null;
+	}
+
+	window['AscCommon']            = window['AscCommon'] || {};
 	window['AscCommon'].CTextInput = CTextInput;
 
 	window['AscCommon'].InitBrowserInputContext = function(api, target_id)
@@ -448,5 +564,86 @@
 		window['AscCommon'].g_inputContext = new CTextInput(api);
 		window['AscCommon'].g_inputContext.init(target_id);
 		window['AscCommon'].g_clipboardBase.Init(api);
+
+		document.addEventListener("focus", function(e)
+		{
+			var t                = window['AscCommon'].g_inputContext;
+			t.nativeFocusElement = e.target;
+
+			//console.log(t.nativeFocusElement);
+
+			if (t.nativeFocusElement.id == t.HtmlArea.id)
+			{
+				t.Api.asc_enableKeyEvents(true);
+				t.nativeFocusElement = null;
+				return;
+			}
+			if (t.nativeFocusElement.id == window['AscCommon'].g_clipboardBase.CommonDivId)
+			{
+				t.nativeFocusElement = null;
+				return;
+			}
+
+			var _isElementEditable = false;
+			if (true)
+			{
+				// detect _isElementEditable
+				var _name = t.nativeFocusElement.nodeName;
+				if (_name)
+					_name = _name.toUpperCase();
+
+				if ("INPUT" == _name || "TEXTAREA" == _name)
+					_isElementEditable = true;
+				else if ("DIV" == _name)
+				{
+					if (t.nativeFocusElement.getAttribute("contenteditable") == "true")
+						_isElementEditable = true;
+				}
+			}
+			if ("IFRAME" == _name)
+			{
+				// перехват клавиатуры
+				t.Api.asc_enableKeyEvents(false);
+				t.nativeFocusElement = null;
+				return;
+			}
+
+			// перехватывает ли элемент ввод
+			var _oo_editor_input    = _getAttirbute(t.nativeFocusElement, "oo_editor_input", 3);
+			// нужно ли прокидывать нажатие клавиш элементу (ТОЛЬКО keyDown)
+			var _oo_editor_keyboard = _getAttirbute(t.nativeFocusElement, "oo_editor_keyboard", 3);
+
+			if (_oo_editor_keyboard == "true")
+				_oo_editor_input = undefined;
+
+			if (_oo_editor_input == "true")
+			{
+				// перехват клавиатуры
+				t.Api.asc_enableKeyEvents(false);
+				t.nativeFocusElement = null;
+				return;
+			}
+
+			if (_isElementEditable && (_oo_editor_input != "false"))
+			{
+				// перехват клавиатуры
+				t.Api.asc_enableKeyEvents(false);
+				t.nativeFocusElement = null;
+				return;
+			}
+
+			// итак, ввод у нас. теперь определяем, нужна ли клавиатура элементу
+			if (_oo_editor_keyboard != "true")
+				t.nativeFocusElement = null;
+
+			var _elem = t.nativeFocusElement;
+			t.HtmlArea.focus();
+			t.nativeFocusElement = _elem;
+			t.Api.asc_enableKeyEvents(true);
+
+		}, true);
+
+		// send focus
+		window['AscCommon'].g_inputContext.HtmlArea.focus();
 	};
 })(window);
