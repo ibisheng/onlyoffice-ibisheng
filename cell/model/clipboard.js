@@ -128,6 +128,7 @@
 			pasteData: function(ws, _format, data1, data2)
 			{
 				var t = this;
+				t.pasteProcessor.clean();
 				
 				switch (_format)
 				{
@@ -741,6 +742,15 @@
 		PasteProcessorExcel.prototype = {
 			
 			constructor: PasteProcessorExcel,
+			
+			clean: function()
+			{
+				this.activeRange = null;
+				this.alreadyLoadImagesOnServer = false;
+				
+				this.fontsNew = {};
+				this.oImages = {};
+			},
 			
 			pasteFromBinary: function(worksheet, binary, isCellEditMode)
 			{
