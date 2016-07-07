@@ -321,6 +321,54 @@ CFootnotesController.prototype.GetCurFootnote = function()
 {
 	return this.CurFootnote;
 };
+CFootnotesController.prototype.IsInDrawing = function(X, Y, PageAbs)
+{
+	var oResult = this.private_GetFootnoteByXY(X, Y, PageAbs);
+	if (oResult)
+	{
+		var oFootnote = oResult.Footnote;
+		var PageRel = oFootnote.GetRelaitivePageIndex(PageAbs);
+		return oFootnote.Is_InDrawing(X, Y, PageRel);
+	}
+
+	return false;
+};
+CFootnotesController.prototype.IsTableBorder = function(X, Y, PageAbs)
+{
+	var oResult = this.private_GetFootnoteByXY(X, Y, PageAbs);
+	if (oResult)
+	{
+		var oFootnote = oResult.Footnote;
+		var PageRel = oFootnote.GetRelaitivePageIndex(PageAbs);
+		return oFootnote.Is_TableBorder(X, Y, PageRel);
+	}
+
+	return null;
+};
+CFootnotesController.prototype.IsInText = function(X, Y, PageAbs)
+{
+	var oResult = this.private_GetFootnoteByXY(X, Y, PageAbs);
+	if (oResult)
+	{
+		var oFootnote = oResult.Footnote;
+		var PageRel = oFootnote.GetRelaitivePageIndex(PageAbs);
+		return oFootnote.Is_InText(X, Y, PageRel);
+	}
+
+	return null;
+};
+CFootnotesController.prototype.GetNearestPos = function(X, Y, PageAbs, bAnchor, Drawing)
+{
+	var oResult = this.private_GetFootnoteByXY(X, Y, PageAbs);
+	if (oResult)
+	{
+		var oFootnote = oResult.Footnote;
+		var PageRel = oFootnote.GetRelaitivePageIndex(PageAbs);
+		return oFootnote.Get_NearestPos(PageRel, X, Y, bAnchor, Drawing);
+	}
+
+	return null;
+};
 /**
  * Проверяем попадание в сноски на заданной странице.
  * @param X
@@ -527,7 +575,26 @@ CFootnotesController.prototype.Set_CurrentElement = function(bUpdateStates, Page
 {
 	if (oFootnote instanceof CFootEndnote)
 	{
-		this.private_SetCurrentFootnoteNoSelection(oFootnote);
+		if (oFootnote.Is_SelectionUse())
+		{
+			this.CurFootnote              = oFootnote;
+			this.Selection.Use            = true;
+			this.Selection.Direction      = 0;
+			this.Selection.Start.Footnote = oFootnote;
+			this.Selection.End.Footnote   = oFootnote;
+			this.Selection.Footnotes      = {};
+
+			this.Selection.Footnotes[oFootnote.Get_Id()] = oFootnote;
+			this.LogicDocument.Selection.Use   = true;
+			this.LogicDocument.Selection.Start = false;
+		}
+		else
+		{
+			this.private_SetCurrentFootnoteNoSelection(oFootnote);
+			this.LogicDocument.Selection.Use   = false;
+			this.LogicDocument.Selection.Start = false;
+		}
+
 		this.LogicDocument.Set_DocPosType(docpostype_Footnotes);
 
 		if (false != bUpdateStates)
@@ -1880,8 +1947,6 @@ CFootnotesController.prototype.IsMovingTableBorder = function()
 };
 CFootnotesController.prototype.CheckPosInSelection = function(X, Y, PageAbs, NearPos)
 {
-	// TODO: Доделать с NearPos
-
 	var oResult = this.private_GetFootnoteByXY(X, Y, PageAbs);
 	if (oResult)
 	{

@@ -396,7 +396,7 @@ CDocumentContent.prototype.Set_CurrentElement              = function(Index, bUp
         this.Selection.EndPos   = ContentPos;
     }
 
-    this.Parent.Set_CurrentElement(bUpdateStates, this.Get_StartPage_Absolute());
+    this.Parent.Set_CurrentElement(bUpdateStates, this.Get_StartPage_Absolute(), this);
 };
 CDocumentContent.prototype.Is_ThisElementCurrent           = function()
 {
@@ -4439,10 +4439,10 @@ CDocumentContent.prototype.Insert_Content                     = function(Selecte
         }
 
         if (true === bNeedSelect)
-            this.Parent.Set_CurrentElement(false, this.Get_StartPage_Absolute());
+            this.Parent.Set_CurrentElement(false, this.Get_StartPage_Absolute(), this);
         else if (null !== this.LogicDocument && docpostype_HdrFtr === this.LogicDocument.CurPos.Type)
         {
-            this.Parent.Set_CurrentElement(false, this.Get_StartPage_Absolute());
+            this.Parent.Set_CurrentElement(false, this.Get_StartPage_Absolute(), this);
             var DocContent = this;
             var HdrFtr     = this.Is_HdrFtr(true);
             if (null !== HdrFtr)
@@ -7872,7 +7872,7 @@ CDocumentContent.prototype.Select_DrawingObject      = function(Id)
 {
     this.Selection_Remove();
 
-    this.Parent.Set_CurrentElement(true, this.Get_StartPage_Absolute() + this.CurPage);
+    this.Parent.Set_CurrentElement(true, this.Get_StartPage_Absolute() + this.CurPage, this);
 
     // Прячем курсор
     this.DrawingDocument.TargetEnd();

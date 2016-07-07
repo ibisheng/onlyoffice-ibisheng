@@ -5777,10 +5777,13 @@ CDocument.prototype.Is_TableBorder = function(X, Y, PageIndex)
 	}
 	else
 	{
-		// TODO: Добавить обработку сносок
 		if (-1 != this.DrawingObjects.isPointInDrawingObjects(X, Y, PageIndex, this))
 		{
 			return null;
+		}
+		else if (true === this.Footnotes.CheckHitInFootnote(X, Y, PageIndex))
+		{
+			return this.Footnotes.IsTableBorder(X, Y, PageIndex);
 		}
 		else
 		{
@@ -5795,8 +5798,6 @@ CDocument.prototype.Is_TableBorder = function(X, Y, PageIndex)
 				return null;
 		}
 	}
-
-	return null;
 };
 /**
  * Проверяем, попали ли мы четко в текст (не лежащий в автофигуре)
@@ -5816,12 +5817,17 @@ CDocument.prototype.Is_InText = function(X, Y, PageIndex)
 	}
 	else
 	{
-		// TODO: Добавить обработку сносок
-
-		var ContentPos       = this.Internal_GetContentPosByXY(X, Y, PageIndex);
-		var ElementPageIndex = this.private_GetElementPageIndexByXY(ContentPos, X, Y, PageIndex);
-		var Item             = this.Content[ContentPos];
-		return Item.Is_InText(X, Y, ElementPageIndex);
+		if (true === this.Footnotes.CheckHitInFootnote(X, Y, PageIndex))
+		{
+			return this.Footnotes.IsInText(X, Y, PageIndex);
+		}
+		else
+		{
+			var ContentPos       = this.Internal_GetContentPosByXY(X, Y, PageIndex);
+			var ElementPageIndex = this.private_GetElementPageIndexByXY(ContentPos, X, Y, PageIndex);
+			var Item             = this.Content[ContentPos];
+			return Item.Is_InText(X, Y, ElementPageIndex);
+		}
 	}
 };
 CDocument.prototype.Get_ParentTextTransform = function()
@@ -5843,10 +5849,13 @@ CDocument.prototype.Is_InDrawing = function(X, Y, PageIndex)
 	}
 	else
 	{
-		// TODO: Добавить обработку сносок
 		if (-1 != this.DrawingObjects.isPointInDrawingObjects(X, Y, this.CurPage, this))
 		{
 			return true;
+		}
+		else if (true === this.Footnotes.CheckHitInFootnote(X, Y, PageIndex))
+		{
+			return this.Footnotes.IsInDrawing(X, Y, PageIndex);
 		}
 		else
 		{
@@ -7212,7 +7221,6 @@ CDocument.prototype.Get_NearestPos = function(PageNum, X, Y, bAnchor, Drawing)
 	if (undefined === bAnchor)
 		bAnchor = false;
 
-	// TODO: Доработать сноски
 	if (docpostype_HdrFtr === this.Get_DocPosType())
 		return this.HdrFtr.Get_NearestPos(PageNum, X, Y, bAnchor, Drawing);
 
@@ -7224,6 +7232,10 @@ CDocument.prototype.Get_NearestPos = function(PageNum, X, Y, bAnchor, Drawing)
 		// Проверяем попадание в графические объекты
 		var NearestPos = this.DrawingObjects.getNearestPos(X, Y, PageNum, Drawing);
 		if (( nInDrawing === DRAWING_ARRAY_TYPE_BEFORE || nInDrawing === DRAWING_ARRAY_TYPE_INLINE || ( false === bInText && nInDrawing >= 0 ) ) && null != NearestPos)
+			return NearestPos;
+
+		NearestPos = true === this.Footnotes.CheckHitInFootnote(X, Y, PageNum) ? this.Footnotes.GetNearestPos(X, Y, PageNum, false, Drawing) : null;
+		if (null !== NearestPos)
 			return NearestPos;
 	}
 
