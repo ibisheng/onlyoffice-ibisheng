@@ -373,6 +373,12 @@ CFootnotesController.prototype.StartSelection = function(X, Y, PageAbs, MouseEve
 };
 CFootnotesController.prototype.EndSelection = function(X, Y, PageAbs, MouseEvent)
 {
+	if (true === this.IsMovingTableBorder())
+	{
+		this.CurFootnote.Selection_SetEnd(X, Y, PageAbs, MouseEvent);
+		return;
+	}
+
 	var oResult = this.private_GetFootnoteByXY(X, Y, PageAbs);
 	if (null === oResult)
 	{
@@ -626,17 +632,7 @@ CFootnotesController.prototype.private_OnNotValidActionForFootnotes = function()
 };
 CFootnotesController.prototype.private_IsOnFootnoteSelected = function()
 {
-	// TODO: Заменить на this.Selection.Direction и проверить
-	var nCounter = 0;
-	for (var sId in this.Selection.Footnotes)
-	{
-		nCounter++;
-
-		if (nCounter > 1)
-			return false;
-	}
-
-	return true;
+	return (0 !== this.Selection.Direction ? false : true);
 };
 CFootnotesController.prototype.private_CheckFootnotesSelectionBeforeAction = function()
 {
@@ -2153,11 +2149,14 @@ CFootnotesController.prototype.UpdateRulersState = function()
 };
 CFootnotesController.prototype.UpdateSelectionState = function()
 {
-	// TODO: Надо подумать как это вынести в верхнюю функцию
 	if (true === this.Selection.Use)
 	{
-		// TODO: Обработать движения границ таблицы
-		if (false === this.IsEmptySelection())
+		if (true === this.IsMovingTableBorder())
+		{
+			this.DrawingDocument.TargetEnd();
+			this.DrawingDocument.SetCurrentPage(this.LogicDocument.CurPage);
+		}
+		else if (false === this.IsEmptySelection())
 		{
 			if (true !== this.LogicDocument.Selection.Start)
 			{
