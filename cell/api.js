@@ -2096,6 +2096,10 @@ var editor;
     this.wb.getWorksheet().changeWorksheet("hideCols");
   };
 
+  spreadsheet_api.prototype.asc_autoFitColumnWidth = function() {
+    this.wb.getWorksheet().autoFitColumnWidth();
+  };
+
   spreadsheet_api.prototype.asc_getRowHeight = function() {
     var ws = this.wb.getWorksheet();
     return ws.getSelectedRowHeight();
@@ -3337,6 +3341,7 @@ var editor;
   prot["asc_setColumnWidth"] = prot.asc_setColumnWidth;
   prot["asc_showColumns"] = prot.asc_showColumns;
   prot["asc_hideColumns"] = prot.asc_hideColumns;
+  prot["asc_autoFitColumnWidth"] = prot.asc_autoFitColumnWidth;
   prot["asc_getRowHeight"] = prot.asc_getRowHeight;
   prot["asc_setRowHeight"] = prot.asc_setRowHeight;
   prot["asc_showRows"] = prot.asc_showRows;

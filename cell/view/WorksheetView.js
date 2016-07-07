@@ -725,22 +725,21 @@
 
 
     // mouseX - это разница стартовых координат от мыши при нажатии и границы
-    WorksheetView.prototype.changeColumnWidth = function ( col, x2, mouseX ) {
+    WorksheetView.prototype.changeColumnWidth = function (col, x2, mouseX) {
         var t = this;
 
-        x2 *= asc_getcvt( 0/*px*/, 1/*pt*/, t._getPPIX() );
+        x2 *= asc_getcvt(0/*px*/, 1/*pt*/, t._getPPIX());
         // Учитываем координаты точки, где мы начали изменение размера
         x2 += mouseX;
 
         var offsetFrozenX = 0;
         var c1 = t.visibleRange.c1;
-        if ( this.topLeftFrozenCell ) {
+        if (this.topLeftFrozenCell) {
             var cFrozen = this.topLeftFrozenCell.getCol0() - 1;
-            if ( 0 <= cFrozen ) {
-                if ( col < c1 ) {
+            if (0 <= cFrozen) {
+                if (col < c1) {
                     c1 = 0;
-                }
-                else {
+                } else {
                     offsetFrozenX = t.cols[cFrozen].left + t.cols[cFrozen].width - t.cols[0].left;
                 }
             }
@@ -749,46 +748,45 @@
         offsetX -= offsetFrozenX;
 
         var x1 = t.cols[col].left - offsetX - this.width_1px;
-        var w = Math.max( x2 - x1, 0 );
-        if ( w === t.cols[col].width ) {
+        var w = Math.max(x2 - x1, 0);
+        if (w === t.cols[col].width) {
             return;
         }
-        var cc = Math.min( t._colWidthToCharCount( w ), Asc.c_oAscMaxColumnWidth );
-        var cw = t._charCountToModelColWidth( cc );
+        var cc = Math.min(t._colWidthToCharCount(w), Asc.c_oAscMaxColumnWidth);
+        var cw = t._charCountToModelColWidth(cc);
 
-        var onChangeWidthCallback = function ( isSuccess ) {
-            if ( false === isSuccess ) {
+        var onChangeWidthCallback = function (isSuccess) {
+            if (false === isSuccess) {
                 return;
             }
 
-            t.model.setColWidth( cw, col, col );
-            t._cleanCache( new asc_Range( 0, 0, t.cols.length - 1, t.rows.length - 1 ) );
-            t.changeWorksheet( "update", {reinitRanges: true} );
+            t.model.setColWidth(cw, col, col);
+            t._cleanCache(new asc_Range(0, 0, t.cols.length - 1, t.rows.length - 1));
+            t.changeWorksheet("update", {reinitRanges: true});
             t._updateVisibleColsCount();
-            if ( t.objectRender ) {
-                t.objectRender.updateSizeDrawingObjects( {target: c_oTargetType.ColumnResize, col: col} );
+            if (t.objectRender) {
+                t.objectRender.updateSizeDrawingObjects({target: c_oTargetType.ColumnResize, col: col});
             }
         };
-        this._isLockedAll( onChangeWidthCallback );
+        this._isLockedAll(onChangeWidthCallback);
     };
 
     // mouseY - это разница стартовых координат от мыши при нажатии и границы
-    WorksheetView.prototype.changeRowHeight = function ( row, y2, mouseY ) {
+    WorksheetView.prototype.changeRowHeight = function (row, y2, mouseY) {
         var t = this;
 
-        y2 *= asc_getcvt( 0/*px*/, 1/*pt*/, t._getPPIY() );
+        y2 *= asc_getcvt(0/*px*/, 1/*pt*/, t._getPPIY());
         // Учитываем координаты точки, где мы начали изменение размера
         y2 += mouseY;
 
         var offsetFrozenY = 0;
         var r1 = t.visibleRange.r1;
-        if ( this.topLeftFrozenCell ) {
+        if (this.topLeftFrozenCell) {
             var rFrozen = this.topLeftFrozenCell.getRow0() - 1;
-            if ( 0 <= rFrozen ) {
-                if ( row < r1 ) {
+            if (0 <= rFrozen) {
+                if (row < r1) {
                     r1 = 0;
-                }
-                else {
+                } else {
                     offsetFrozenY = t.rows[rFrozen].top + t.rows[rFrozen].height - t.rows[0].top;
                 }
             }
@@ -797,27 +795,27 @@
         offsetY -= offsetFrozenY;
 
         var y1 = t.rows[row].top - offsetY - this.height_1px;
-        var newHeight = Math.min( t.maxRowHeight, Math.max( y2 - y1, 0 ) );
-        if ( newHeight === t.rows[row].height ) {
+        var newHeight = Math.min(t.maxRowHeight, Math.max(y2 - y1, 0));
+        if (newHeight === t.rows[row].height) {
             return;
         }
 
-        var onChangeHeightCallback = function ( isSuccess ) {
-            if ( false === isSuccess ) {
+        var onChangeHeightCallback = function (isSuccess) {
+            if (false === isSuccess) {
                 return;
             }
 
-            t.model.setRowHeight( newHeight, row, row, true );
-            t.model.autoFilters.reDrawFilter( null, row );
-            t._cleanCache( new asc_Range( 0, row, t.cols.length - 1, row ) );
-            t.changeWorksheet( "update", {reinitRanges: true} );
+            t.model.setRowHeight(newHeight, row, row, true);
+            t.model.autoFilters.reDrawFilter(null, row);
+            t._cleanCache(new asc_Range(0, row, t.cols.length - 1, row));
+            t.changeWorksheet("update", {reinitRanges: true});
             t._updateVisibleRowsCount();
-            if ( t.objectRender ) {
-                t.objectRender.updateSizeDrawingObjects( {target: c_oTargetType.RowResize, row: row} );
+            if (t.objectRender) {
+                t.objectRender.updateSizeDrawingObjects({target: c_oTargetType.RowResize, row: row});
             }
         };
 
-        this._isLockedAll( onChangeHeightCallback );
+        this._isLockedAll(onChangeHeightCallback);
     };
 
 
@@ -10720,55 +10718,55 @@
         return nLastRows !== this.nRowsCount;
     };
 
-    WorksheetView.prototype.onChangeWidthCallback = function ( col, r1, r2, onlyIfMore ) {
+    WorksheetView.prototype.onChangeWidthCallback = function (col, r1, r2, onlyIfMore) {
         var width = null;
         var row, ct, c, fl, str, maxW, tm, mc, isMerged, oldWidth, oldColWidth;
         var lastHeight = null;
         var filterButton = null;
-        if ( null == r1 ) {
+        if (null == r1) {
             r1 = 0;
         }
-        if ( null == r2 ) {
+        if (null == r2) {
             r2 = this.rows.length - 1;
         }
 
         oldColWidth = this.cols[col].charCount;
 
         this.cols[col].isCustomWidth = false;
-        for ( row = r1; row <= r2; ++row ) {
+        for (row = r1; row <= r2; ++row) {
             // пересчет метрик текста
-            this._addCellTextToCache( col, row, /*canChangeColWidth*/c_oAscCanChangeColWidth.all );
-            ct = this._getCellTextCache( col, row );
-            if ( ct === undefined ) {
+            this._addCellTextToCache(col, row, /*canChangeColWidth*/c_oAscCanChangeColWidth.all);
+            ct = this._getCellTextCache(col, row);
+            if (ct === undefined) {
                 continue;
             }
             fl = ct.flags;
             isMerged = fl.isMerged();
-            if ( isMerged ) {
+            if (isMerged) {
                 mc = fl.merged;
                 // Для замерженных ячеек (с 2-мя или более колонками) оптимизировать не нужно
-                if ( mc.c1 !== mc.c2 ) {
+                if (mc.c1 !== mc.c2) {
                     continue;
                 }
             }
 
-            if ( ct.metrics.height > this.maxRowHeight ) {
-                if ( isMerged ) {
+            if (ct.metrics.height > this.maxRowHeight) {
+                if (isMerged) {
                     continue;
                 }
                 // Запоминаем старую ширину (в случае, если у нас по высоте не уберется)
                 oldWidth = ct.metrics.width;
                 lastHeight = null;
                 // вычисление новой ширины столбца, чтобы высота текста была меньше maxRowHeight
-                c = this._getCell( col, row );
+                c = this._getCell(col, row);
                 str = c.getValue2();
                 maxW = ct.metrics.width + this.maxDigitWidth;
-                while ( 1 ) {
-                    tm = this._roundTextMetrics( this.stringRender.measureString( str, fl, maxW ) );
-                    if ( tm.height <= this.maxRowHeight ) {
+                while (1) {
+                    tm = this._roundTextMetrics(this.stringRender.measureString(str, fl, maxW));
+                    if (tm.height <= this.maxRowHeight) {
                         break;
                     }
-                    if ( lastHeight === tm.height ) {
+                    if (lastHeight === tm.height) {
                         // Ситуация, когда у нас текст не уберется по высоте (http://bugzserver/show_bug.cgi?id=19974)
                         tm.width = oldWidth;
                         break;
@@ -10776,118 +10774,129 @@
                     lastHeight = tm.height;
                     maxW += this.maxDigitWidth;
                 }
-                width = Math.max( width, tm.width );
-            }
-            else {
-                filterButton = this.af_getSizeButton( col, row );
-                if ( null !== filterButton && CellValueType.String === ct.cellType ) {
-                    width = Math.max( width, ct.metrics.width + filterButton.width );
-                }
-                else {
-                    width = Math.max( width, ct.metrics.width );
+                width = Math.max(width, tm.width);
+            } else {
+                filterButton = this.af_getSizeButton(col, row);
+                if (null !== filterButton && CellValueType.String === ct.cellType) {
+                    width = Math.max(width, ct.metrics.width + filterButton.width);
+                } else {
+                    width = Math.max(width, ct.metrics.width);
                 }
             }
         }
 
         var pad, cc, cw;
-        if ( width > 0 ) {
+        if (width > 0) {
             pad = this.width_padding * 2 + this.width_1px;
-            cc = Math.min( this._colWidthToCharCount( width + pad ), Asc.c_oAscMaxColumnWidth );
-            cw = this._charCountToModelColWidth( cc );
+            cc = Math.min(this._colWidthToCharCount(width + pad), Asc.c_oAscMaxColumnWidth);
+            cw = this._charCountToModelColWidth(cc);
         } else {
             cw = AscCommonExcel.oDefaultMetrics.ColWidthChars;
             cc = this.defaultColWidthChars;
         }
 
-        if ( onlyIfMore && cc < oldColWidth ) {
+        if (cc === oldColWidth || (onlyIfMore && cc < oldColWidth)) {
             return -1;
         }
 
         History.Create_NewPoint();
-        if ( !onlyIfMore ) {
+        if (!onlyIfMore) {
             var oSelection = History.GetSelection();
-            if ( null != oSelection ) {
+            if (null != oSelection) {
                 oSelection = oSelection.clone();
-                oSelection.assign( col, 0, col, gc_nMaxRow0 );
+                oSelection.assign(col, 0, col, gc_nMaxRow0);
                 oSelection.type = c_oAscSelectionType.RangeCol;
-                History.SetSelection( oSelection );
-                History.SetSelectionRedo( oSelection );
+                History.SetSelection(oSelection);
+                History.SetSelectionRedo(oSelection);
             }
         }
         History.StartTransaction();
         // Выставляем, что это bestFit
-        this.model.setColBestFit( true, cw, col, col );
+        this.model.setColBestFit(true, cw, col, col);
         History.EndTransaction();
         return oldColWidth !== cc ? cw : -1;
     };
 
-    WorksheetView.prototype.optimizeColWidth = function ( col ) {
+    WorksheetView.prototype.autoFitColumnWidth = function (col1, col2) {
         var t = this;
-        return this._isLockedAll( function ( isSuccess ) {
-            if ( false === isSuccess ) {
+        return this._isLockedAll(function (isSuccess) {
+            if (false === isSuccess) {
                 return;
             }
-            var w = t.onChangeWidthCallback( col, null, null );
-            if ( -1 !== w ) {
-                t.cols[col] = t._calcColWidth( w );
-                t.cols[col].isCustomWidth = false;
+            if (null == col1) {
+                col1 = t.activeRange.c1;
+                col2 = t.activeRange.c2;
+            }
 
+            var w, bUpdate = false;
+            History.Create_NewPoint();
+            History.StartTransaction();
+            for (var c = col1; c <= col2; ++c) {
+                w = t.onChangeWidthCallback(c, null, null);
+                if (-1 !== w) {
+                    t.cols[c] = t._calcColWidth(w);
+                    t.cols[c].isCustomWidth = false;
+                    bUpdate = true;
+
+                    t._cleanCache(new asc_Range(c, 0, c, t.rows.length - 1));
+                }
+            }
+            History.EndTransaction();
+            if (bUpdate) {
                 t._updateColumnPositions();
                 t._updateVisibleColsCount();
-                t._cleanCache( new asc_Range( col, 0, col, t.rows.length - 1 ) );
-                t.changeWorksheet( "update" );
+                t.changeWorksheet("update");
             }
-        } );
+        });
     };
 
-    WorksheetView.prototype.optimizeRowHeight = function ( row ) {
+    WorksheetView.prototype.autoFitRowHeight = function (row1, row2) {
         var t = this;
-
-        var onChangeHeightCallback = function ( isSuccess ) {
-            if ( false === isSuccess ) {
+        var onChangeHeightCallback = function (isSuccess) {
+            if (false === isSuccess) {
                 return;
             }
 
             var height = t.defaultRowHeight;
             var col, ct, mc;
 
-            for ( col = 0; col < t.rows.length; ++col ) {
-                ct = t._getCellTextCache( col, row );
-                if ( ct === undefined ) {
+            for (col = 0; col < t.cols.length; ++col) {
+                ct = t._getCellTextCache(col, row1);
+                if (ct === undefined) {
                     continue;
                 }
-                if ( ct.flags.isMerged() ) {
+                if (ct.flags.isMerged()) {
                     mc = ct.flags.merged;
                     // Для замерженных ячеек (с 2-мя или более строками) оптимизировать не нужно
-                    if ( mc.r1 !== mc.r2 ) {
+                    if (mc.r1 !== mc.r2) {
                         continue;
                     }
                 }
 
-                height = Math.max( height, ct.metrics.height );
+                height = Math.max(height, ct.metrics.height);
             }
 
             History.Create_NewPoint();
             var oSelection = History.GetSelection();
-            if ( null != oSelection ) {
+            if (null != oSelection) {
                 oSelection = oSelection.clone();
-                oSelection.assign( 0, row, gc_nMaxCol0, row );
+                oSelection.assign(0, row1, gc_nMaxCol0, row1);
                 oSelection.type = c_oAscSelectionType.RangeRow;
-                History.SetSelection( oSelection );
-                History.SetSelectionRedo( oSelection );
+                History.SetSelection(oSelection);
+                History.SetSelectionRedo(oSelection);
             }
             History.StartTransaction();
             // Выставляем, что это bestFit
-            t.model.setRowBestFit( true, Math.min( height + t.height_1px, t.maxRowHeight ), row, row );
+            t.model.setRowBestFit(true, Math.min(height + t.height_1px, t.maxRowHeight), row1, row1);
             History.EndTransaction();
 
             t.nRowsCount = 0;
-            t._calcHeightRows( /*fullRecalc*/0 );
+            t._calcHeightRows(/*fullRecalc*/0);
             t._updateVisibleRowsCount();
-            t._cleanCache( new asc_Range( 0, row, t.cols.length - 1, row ) );
-            t.changeWorksheet( "update" );
+            t._cleanCache(new asc_Range(0, row1, t.cols.length - 1, row1));
+            t.changeWorksheet("update");
         };
-        return this._isLockedAll( onChangeHeightCallback );
+        return this._isLockedAll(onChangeHeightCallback);
     };
 
 

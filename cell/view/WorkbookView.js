@@ -1234,7 +1234,7 @@
     var ct = ws.getCursorTypeFromXY(x, y, this.controller.settings.isViewerMode);
 
     if (ct.target === c_oTargetType.ColumnResize || ct.target === c_oTargetType.RowResize) {
-      ct.target === c_oTargetType.ColumnResize ? ws.optimizeColWidth(ct.col) : ws.optimizeRowHeight(ct.row);
+      ct.target === c_oTargetType.ColumnResize ? ws.autoFitColumnWidth(ct.col, ct.col) : ws.autoFitRowHeight(ct.row, ct.row);
       asc_applyFunction(callback);
     } else {
       if (ct.col >= 0 && ct.row >= 0) {
