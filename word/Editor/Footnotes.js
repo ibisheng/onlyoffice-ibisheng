@@ -317,6 +317,10 @@ CFootnotesController.prototype.Get_PageContentStartPos = function(PageAbs)
 	//TODO: Реализовать
 	return {X : 0, Y : 0, XLimit : 0, YLimit : 0};
 };
+CFootnotesController.prototype.GetCurFootnote = function()
+{
+	return this.CurFootnote;
+};
 /**
  * Проверяем попадание в сноски на заданной странице.
  * @param X
@@ -2389,14 +2393,29 @@ CFootnotesController.prototype.RestoreDocumentStateAfterLoadChanges = function(S
 		var arrNewFootnotesList = this.private_GetFootnotesLogicRange(StartFootnote, EndFootnote);
 		if (arrNewFootnotesList.length < 1)
 		{
-			this.LogicDocument.EndFootnotesEditing();
-			return;
+			if (null !== EndFootnote)
+			{
+				EndFootnote.Selection_Remove();
+				this.private_SetCurrentFootnoteNoSelection(EndFootnote);
+			}
+			else if (null !== StartFootnote)
+			{
+				StartFootnote.Selection_Remove();
+				this.private_SetCurrentFootnoteNoSelection(StartFootnote);
+			}
+			else
+			{
+				this.LogicDocument.EndFootnotesEditing();
+			}
 		}
 		else if (arrNewFootnotesList.length === 1)
 		{
-			this.Selection.Use       = true;
-			this.Selection.Direction = 0;
-			this.Selection.Footnotes = {};
+			this.Selection.Use            = true;
+			this.Selection.Direction      = 0;
+			this.Selection.Footnotes      = {};
+			this.Selection.Start.Footnote = StartFootnote;
+			this.Selection.End.Footnote   = StartFootnote;
+			this.CurFootnote              = StartFootnote;
 
 			this.Selection.Footnotes[StartFootnote.Get_Id()] = StartFootnote;
 
@@ -2437,16 +2456,6 @@ CFootnotesController.prototype.RestoreDocumentStateAfterLoadChanges = function(S
 			this.Selection.Footnotes[EndFootnote.Get_Id()]   = EndFootnote;
 
 
-			if (1 !== this.Selection.Direction)
-			{
-				var Temp      = StartFootnote;
-				StartFootnote = EndFootnote;
-				EndFootnote   = Temp;
-			}
-
-			this.Selection.Start.Footnote = StartFootnote;
-			this.Selection.End.Footnote   = EndFootnote;
-
 			if (arrFootnotesList[0] === StartFootnote)
 			{
 				StartFootnote.Set_DocPosType(docpostype_Content);
@@ -2472,6 +2481,16 @@ CFootnotesController.prototype.RestoreDocumentStateAfterLoadChanges = function(S
 				EndFootnote.Set_DocPosType(docpostype_Content);
 				EndFootnote.Select_All(1);
 			}
+
+			if (1 !== this.Selection.Direction)
+			{
+				var Temp      = StartFootnote;
+				StartFootnote = EndFootnote;
+				EndFootnote   = Temp;
+			}
+
+			this.Selection.Start.Footnote = StartFootnote;
+			this.Selection.End.Footnote   = EndFootnote;
 		}
 	}
 };

@@ -10306,8 +10306,6 @@ CDocument.prototype.Get_DocumentPositionFromObject = function(PosArray)
 };
 CDocument.prototype.Get_CursorLogicPosition = function()
 {
-	// TODO: Обработка сносок
-
 	var nDocPosType = this.Get_DocPosType();
 	if (docpostype_HdrFtr === nDocPosType)
 	{
@@ -10316,6 +10314,12 @@ CDocument.prototype.Get_CursorLogicPosition = function()
 		{
 			return this.private_GetLogicDocumentPosition(HdrFtr.Get_DocumentContent());
 		}
+	}
+	else if (docpostype_Footnotes === nDocPosType)
+	{
+		var oFootnote = this.Footnotes.GetCurFootnote();
+		if (oFootnote)
+			return this.private_GetLogicDocumentPosition(oFootnote);
 	}
 	else
 	{
@@ -10382,7 +10386,7 @@ CDocument.prototype.Update_ForeignCursor = function(CursorInfo, UserId, Show, Us
 
 	if (!CursorInfo)
 	{
-		this.Remove_ForeignCursor(UserId)
+		this.Remove_ForeignCursor(UserId);
 		return;
 	}
 
@@ -10395,7 +10399,7 @@ CDocument.prototype.Update_ForeignCursor = function(CursorInfo, UserId, Show, Us
 	var Run = this.TableId.Get_ById(RunId);
 	if (!Run)
 	{
-		this.Remove_ForeignCursor(UserId)
+		this.Remove_ForeignCursor(UserId);
 		return;
 	}
 
@@ -16704,6 +16708,7 @@ function CDocumentFootnotesRangeEngine()
 	this.m_oLastFootnote  = null; // Если не задана ищем до конца
 
 	this.m_arrFootnotes = [];
+	this.m_bForceStop     = false;
 }
 CDocumentFootnotesRangeEngine.prototype.Init = function(oFirstFootnote, oLastFootnote)
 {
@@ -16712,13 +16717,15 @@ CDocumentFootnotesRangeEngine.prototype.Init = function(oFirstFootnote, oLastFoo
 };
 CDocumentFootnotesRangeEngine.prototype.Add = function(oFootnote)
 {
-	if (!oFootnote)
+	if (!oFootnote || true === this.m_bForceStop)
 		return;
 
 	if (this.m_arrFootnotes.length <= 0 && null !== this.m_oFirstFootnote)
 	{
 		if (this.m_oFirstFootnote === oFootnote)
 			this.m_arrFootnotes.push(oFootnote);
+		else if (this.m_oLastFootnote === oFootnote)
+			this.m_bForceStop = true;
 	}
 	else if (this.m_arrFootnotes.length >= 1 && null !== this.m_oLastFootnote)
 	{
@@ -16732,6 +16739,9 @@ CDocumentFootnotesRangeEngine.prototype.Add = function(oFootnote)
 };
 CDocumentFootnotesRangeEngine.prototype.IsRangeFull = function()
 {
+	if (true === this.m_bForceStop)
+		return true;
+
 	if (null !== this.m_oLastFootnote && this.m_arrFootnotes.length >= 1 && this.m_oLastFootnote === this.m_arrFootnotes[this.m_arrFootnotes.length - 1])
 		return true;
 
