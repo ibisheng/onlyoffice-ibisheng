@@ -1974,7 +1974,7 @@ var editor;
     this.IsFocus = isEnabled;
 
     if (isFromInput !== true && AscCommon.g_inputContext)
-      AscCommon.g_inputContext.InterfaceEnableKeyEvents = isEnabled;
+      AscCommon.g_inputContext.setInterfaceEnableKeyEvents(isEnabled);
   };
 
   spreadsheet_api.prototype.asc_IsFocus = function(bIsNaturalFocus) {

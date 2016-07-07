@@ -531,6 +531,15 @@
 					}
 				}
 			}
+		},
+
+		setInterfaceEnableKeyEvents : function(value)
+		{
+			this.InterfaceEnableKeyEvents = value;
+			if (true == this.InterfaceEnableKeyEvents)
+			{
+				this.HtmlArea.focus();
+			}
 		}
 	};
 

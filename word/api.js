@@ -6275,7 +6275,7 @@ background-repeat: no-repeat;\
 		}
 
 		if (isFromInput !== true && AscCommon.g_inputContext)
-			AscCommon.g_inputContext.InterfaceEnableKeyEvents = value;
+			AscCommon.g_inputContext.setInterfaceEnableKeyEvents(value);
 	};
 	asc_docs_api.prototype.asc_IsFocus         = function(bIsNaturalFocus)
 	{
