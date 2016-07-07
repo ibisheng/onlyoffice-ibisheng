@@ -539,7 +539,7 @@
 		var _elemTest = _elem;
 		for (var _level = 0; _elemTest && (_level < _depth); ++_level, _elemTest = _elemTest.parentNode)
 		{
-			var _res = _elemTest.getAttribute(_attr);
+			var _res = _elemTest.getAttribute ? _elemTest.getAttribute(_attr) : null;
 			if (null != _res)
 				return _res;
 		}
@@ -550,7 +550,7 @@
 		var _elemTest = _elem;
 		for (var _level = 0; _elemTest && (_level < _depth); ++_level, _elemTest = _elemTest.parentNode)
 		{
-			var _res = _elemTest.getAttribute("oo_editor_keyboard");
+			var _res = _elemTest.getAttribute ? _elemTest.getAttribute("oo_editor_keyboard") : null;
 			if (null != _res)
 				return _elemTest;
 		}
