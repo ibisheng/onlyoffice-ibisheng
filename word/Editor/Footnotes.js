@@ -346,6 +346,14 @@ CFootnotesController.prototype.CheckHitInFootnote = function(X, Y, PageAbs)
 
 	return false;
 };
+CFootnotesController.prototype.GetAllParagraphs = function(Props, ParaArray)
+{
+	for (var sId in  this.Footnote)
+	{
+		var oFootnote = this.Footnote[sId];
+		oFootnote.Get_AllParagraphs(Props, ParaArray);
+	}
+};
 CFootnotesController.prototype.StartSelection = function(X, Y, PageAbs, MouseEvent)
 {
 	if (true === this.Selection.Use)

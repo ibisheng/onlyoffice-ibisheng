@@ -4867,6 +4867,7 @@ CDocument.prototype.Selection_SetStart         = function(X, Y, MouseEvent)
     }
 	else if (true !== bFlowTable && nInDrawing < 0 && true === bFootnotes)
 	{
+		this.Selection_Remove();
         this.Selection.Start = true;
         this.Selection.Use   = true;
 
@@ -5739,7 +5740,23 @@ CDocument.prototype.Update_CursorType = function(X, Y, PageAbs, MouseEvent)
 		return;
 	}
 
-	this.Controller.UpdateCursorType(X, Y, PageAbs, MouseEvent);
+	var nDocPosType = this.Get_DocPosType();
+	if (docpostype_HdrFtr === nDocPosType)
+	{
+		this.HeaderFooterController.UpdateCursorType(X, Y, PageAbs, MouseEvent);
+	}
+	else if (docpostype_DrawingObjects === nDocPosType)
+	{
+		this.DrawingsController.UpdateCursorType(X, Y, PageAbs, MouseEvent);
+	}
+	else
+	{
+		if (true === this.Footnotes.CheckHitInFootnote(X, Y, PageAbs))
+			this.Footnotes.UpdateCursorType(X, Y, PageAbs, MouseEvent);
+		else
+			this.LogicDocumentController.UpdateCursorType(X, Y, PageAbs, MouseEvent);
+	}
+
 	this.Api.sync_MouseMoveEndCallback();
 };
 /**
@@ -7929,6 +7946,10 @@ CDocument.prototype.Document_UpdateSelectionState = function()
 		return;
 
 	this.DrawingDocument.UpdateTargetTransform(null);
+
+	// TODO: Надо подумать как это вынести в верхнюю функцию внутренние реализации типа controller_UpdateSelectionState
+	//       потому что они все очень похожие.
+
 	this.Controller.UpdateSelectionState();
 
 	// Обновим состояние кнопок Copy/Cut
@@ -8099,6 +8120,28 @@ CDocument.prototype.Can_CopyCut = function()
 	else if (docpostype_DrawingObjects === nDocPosType)
 	{
 		DrawingObjects = this.DrawingObjects;
+	}
+	else if (docpostype_Footnotes === nDocPosType)
+	{
+		if (0 === this.Footnotes.Selection.Direction)
+		{
+			var oFootnote = this.Footnotes.GetCurFootnote();
+			if (oFootnote)
+			{
+				if (docpostype_DrawingObjects === oFootnote.Get_DocPosType())
+				{
+					DrawingObjects = this.DrawingObjects;
+				}
+				else
+				{
+					LogicDocument = oFootnote;
+				}
+			}
+		}
+		else
+		{
+			return true;
+		}
 	}
 	else //if (docpostype_Content === nDocPosType)
 	{
@@ -8775,7 +8818,6 @@ CDocument.prototype.Get_SelectionState2 = function()
 	this.Selection_Remove();
 
 	// Сохраняем Id ближайшего элемента в текущем классе
-
 	var State       = new CDocumentSelectionState();
 	var nDocPosType = this.Get_DocPosType();
 	if (docpostype_HdrFtr === nDocPosType)
@@ -8801,7 +8843,8 @@ CDocument.prototype.Get_SelectionState2 = function()
 	}
 	else if (docpostype_Footnotes === nDocPosType)
 	{
-		// TODO: Реализовать для сносок
+		State.Type = docpostype_Footnotes;
+		State.Id   = this.Footnotes.GetCurFootnote().Get_Id();
 	}
 	else // if (docpostype_Content === nDocPosType)
 	{
@@ -8831,11 +8874,23 @@ CDocument.prototype.Set_SelectionState2 = function(State)
 			this.Content[this.CurPos.ContentPos].Cursor_MoveToStartPos();
 		}
 	}
+	else if (docpostype_Footnotes === State.Type)
+	{
+		this.Set_DocPosType(docpostype_Footnotes);
+		var oFootnote = g_oTableId.Get_ById(State.Id);
+		if (oFootnote && true === this.Footnotes.Is_UseInDocument(State.Id))
+		{
+			this.Footnotes.private_SetCurrentFootnoteNoSelection(oFootnote);
+			oFootnote.Cursor_MoveToStartPos(false);
+		}
+		else
+		{
+			this.EndFootnotesEditing();
+		}
+	}
 	else // if ( docpostype_Content === State.Type )
 	{
-		var ElementId = State.Data.Id;
-
-		var CurId = ElementId;
+		var CurId = State.Data.Id;
 
 		var bFlag = false;
 
@@ -9946,7 +10001,7 @@ CDocument.prototype.Get_AllParagraphs = function(Props)
 			Element.Get_AllParagraphs(Props, ParaArray);
 		}
 
-		// TODO: Добавить обработку сносок
+		this.Footnotes.GetAllParagraphs(Props, ParaArray);
 	}
 
 	return ParaArray;
