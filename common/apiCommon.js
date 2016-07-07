@@ -1745,6 +1745,10 @@
               this.severalChartStyles = obj.severalChartStyles != undefined ? obj.severalChartStyles : undefined;
               this.verticalTextAlign = obj.verticalTextAlign != undefined ? obj.verticalTextAlign : undefined;
               this.vert = obj.vert != undefined ? obj.vert : undefined;
+
+              //oleObjects
+              this.pluginGuid = obj.pluginGuid != undefined ? obj.pluginGuid : undefined;
+              this.pluginData = obj.pluginData != undefined ? obj.pluginData : undefined;
           }
           else {
               this.CanBeFlow = true;
@@ -1775,6 +1779,10 @@
               this.severalChartStyles = undefined;
               this.verticalTextAlign = undefined;
               this.vert = undefined;
+
+              //oleObjects
+              this.pluginGuid = undefined;
+              this.pluginData = undefined;
           }
       }
 
@@ -1912,6 +1920,23 @@
                   return new asc_CImageSize( parseInt(_w), parseInt(_h), bIsCorrect);
               }
               return new asc_CImageSize( 50, 50, false );
+          },
+
+          //oleObjects
+          asc_getPluginGuid: function(){
+              return this.pluginGuid;
+          },
+
+          asc_putPluginGuid: function(v){
+              this.pluginGuid = v;
+          },
+
+          asc_getPluginData: function(){
+              return this.pluginData;
+          },
+
+          asc_putPluginData: function(v){
+              this.pluginData = v;
           }
       };
 
