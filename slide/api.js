@@ -4238,7 +4238,7 @@ background-repeat: no-repeat;\
 	};
 
 	/*----------------------------------------------------------------*/
-	asc_docs_api.prototype.asc_enableKeyEvents = function(value)
+	asc_docs_api.prototype.asc_enableKeyEvents = function(value, isFromInput)
 	{
 		if (!this.isLoadFullApi)
 		{
@@ -4251,6 +4251,9 @@ background-repeat: no-repeat;\
 			this.WordControl.IsFocus = value;
 			this.asc_fireCallback("asc_onEnableKeyEventsChanged", value);
 		}
+
+		if (isFromInput !== true && AscCommon.g_inputContext)
+			AscCommon.g_inputContext.InterfaceEnableKeyEvents = value;
 	};
 
 

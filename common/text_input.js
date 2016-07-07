@@ -77,6 +77,7 @@
 		this.IsUseFirstTextInputAfterComposition = false;
 
 		this.nativeFocusElement = null;
+		this.InterfaceEnableKeyEvents = true;
 	}
 
 	CTextInput.prototype =
@@ -589,9 +590,15 @@
 
 			//console.log(t.nativeFocusElement);
 
+			if (t.InterfaceEnableKeyEvents == false)
+			{
+				t.nativeFocusElement = null;
+				return;
+			}
+
 			if (t.nativeFocusElement.id == t.HtmlArea.id)
 			{
-				t.Api.asc_enableKeyEvents(true);
+				t.Api.asc_enableKeyEvents(true, true);
 				t.nativeFocusElement = null;
 				return;
 			}
@@ -620,7 +627,7 @@
 			if ("IFRAME" == _name)
 			{
 				// перехват клавиатуры
-				t.Api.asc_enableKeyEvents(false);
+				t.Api.asc_enableKeyEvents(false, true);
 				t.nativeFocusElement = null;
 				return;
 			}
@@ -639,7 +646,7 @@
 			if (_oo_editor_input == "true")
 			{
 				// перехват клавиатуры
-				t.Api.asc_enableKeyEvents(false);
+				t.Api.asc_enableKeyEvents(false, true);
 				t.nativeFocusElement = null;
 				return;
 			}
@@ -647,7 +654,7 @@
 			if (_isElementEditable && (_oo_editor_input != "false"))
 			{
 				// перехват клавиатуры
-				t.Api.asc_enableKeyEvents(false);
+				t.Api.asc_enableKeyEvents(false, true);
 				t.nativeFocusElement = null;
 				return;
 			}
@@ -659,7 +666,7 @@
 			var _elem = t.nativeFocusElement;
 			t.HtmlArea.focus();
 			t.nativeFocusElement = _elem;
-			t.Api.asc_enableKeyEvents(true);
+			t.Api.asc_enableKeyEvents(true, true);
 
 		}, true);
 

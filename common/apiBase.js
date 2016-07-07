@@ -249,7 +249,7 @@
 			window["AscDesktopEditor"]["SetDocumentName"](this.documentTitle);
 		}
 	};
-	baseEditorsApi.prototype.asc_enableKeyEvents             = function(isEnabled)
+	baseEditorsApi.prototype.asc_enableKeyEvents             = function(isEnabled, isFromInput)
 	{
 	};
 	// Copy/Past/Cut
@@ -309,9 +309,6 @@
 	baseEditorsApi.prototype.sync_TryUndoInFastCollaborative = function()
 	{
 		this.sendEvent("asc_OnTryUndoInFastCollaborative");
-	};
-	baseEditorsApi.prototype.asc_enableKeyEvents             = function(val)
-	{
 	};
 	baseEditorsApi.prototype.asc_setViewMode                 = function()
 	{

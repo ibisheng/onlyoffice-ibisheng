@@ -1961,7 +1961,7 @@ var editor;
     this.wb.changeZoom(scale);
   };
 
-  spreadsheet_api.prototype.asc_enableKeyEvents = function(isEnabled) {
+  spreadsheet_api.prototype.asc_enableKeyEvents = function(isEnabled, isFromInput) {
     if (!this.isLoadFullApi) {
       this.tmpFocus = isEnabled;
       return;
@@ -1972,6 +1972,9 @@ var editor;
     }
     //наличие фокуса в рабочей области редактора(используется для copy/paste в MAC)
     this.IsFocus = isEnabled;
+
+    if (isFromInput !== true && AscCommon.g_inputContext)
+      AscCommon.g_inputContext.InterfaceEnableKeyEvents = isEnabled;
   };
 
   spreadsheet_api.prototype.asc_IsFocus = function(bIsNaturalFocus) {
