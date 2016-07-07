@@ -2198,12 +2198,46 @@ CFootnotesController.prototype.UpdateSelectionState = function()
 };
 CFootnotesController.prototype.GetSelectionState = function()
 {
-	// TODO: Реализовать
-	return [];
+	var arrResult = [];
+
+	var oState = {
+		Footnotes   : {},
+		Use         : this.Selection.Use,
+		Start       : this.Selection.Start.Footnote,
+		End         : this.Selection.End.Footnote,
+		Direction   : this.Selection.Direction,
+		CurFootnote : this.CurFootnote
+	};
+
+	for (var sId in this.Selection.Footnotes)
+	{
+		var oFootnote = this.Selection.Footnotes[sId];
+		oState.Footnotes[sId] =
+		{
+			Footnote : oFootnote,
+			State    : oFootnote.Get_SelectionState()
+		};
+	}
+
+	arrResult.push(oState);
+	return arrResult;
 };
 CFootnotesController.prototype.SetSelectionState = function(State, StateIndex)
 {
-	// TODO: Реализовать
+	var oState = State[StateIndex];
+
+	this.Selection.Use            = oState.Use;
+	this.Selection.Start.Footnote = oState.Start;
+	this.Selection.End.Footnote   = oState.End;
+	this.Selection.Direction      = oState.Direction;
+	this.CurFootnote              = oState.CurFootnote;
+	this.Selection.Footnotes      = {};
+	
+	for (var sId in oState.Footnotes)
+	{
+		this.Selection.Footnotes[sId] = oState.Footnotes[sId].Footnote;
+		this.Selection.Footnotes[sId].Set_SelectionState(oState.Footnotes[sId].State, oState.Footnotes[sId].State.length - 1);
+	}
 };
 CFootnotesController.prototype.AddHyperlink = function(Props)
 {
