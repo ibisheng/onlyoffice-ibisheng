@@ -10823,7 +10823,7 @@
             if (false === isSuccess) {
                 return;
             }
-            if (null == col1) {
+            if (null === col1) {
                 col1 = t.activeRange.c1;
                 col2 = t.activeRange.c2;
             }
@@ -10856,44 +10856,50 @@
             if (false === isSuccess) {
                 return;
             }
-
-            var height = t.defaultRowHeight;
-            var col, ct, mc;
-
-            for (col = 0; col < t.cols.length; ++col) {
-                ct = t._getCellTextCache(col, row1);
-                if (ct === undefined) {
-                    continue;
-                }
-                if (ct.flags.isMerged()) {
-                    mc = ct.flags.merged;
-                    // Для замерженных ячеек (с 2-мя или более строками) оптимизировать не нужно
-                    if (mc.r1 !== mc.r2) {
-                        continue;
-                    }
-                }
-
-                height = Math.max(height, ct.metrics.height);
+            if (null === row1) {
+                row1 = t.activeRange.r1;
+                row2 = t.activeRange.r2;
             }
 
             History.Create_NewPoint();
             var oSelection = History.GetSelection();
             if (null != oSelection) {
                 oSelection = oSelection.clone();
-                oSelection.assign(0, row1, gc_nMaxCol0, row1);
+                oSelection.assign(0, row1, gc_nMaxCol0, row2);
                 oSelection.type = c_oAscSelectionType.RangeRow;
                 History.SetSelection(oSelection);
                 History.SetSelectionRedo(oSelection);
             }
             History.StartTransaction();
-            // Выставляем, что это bestFit
-            t.model.setRowBestFit(true, Math.min(height + t.height_1px, t.maxRowHeight), row1, row1);
+
+            var height, col, ct, mc;
+            for (var r = row1; r <= row2; ++r) {
+                height = t.defaultRowHeight;
+
+                for (col = 0; col < t.cols.length; ++col) {
+                    ct = t._getCellTextCache(col, r);
+                    if (ct === undefined) {
+                        continue;
+                    }
+                    if (ct.flags.isMerged()) {
+                        mc = ct.flags.merged;
+                        // Для замерженных ячеек (с 2-мя или более строками) оптимизировать не нужно
+                        if (mc.r1 !== mc.r2) {
+                            continue;
+                        }
+                    }
+
+                    height = Math.max(height, ct.metrics.height);
+                }
+
+                t.model.setRowBestFit(true, Math.min(height + t.height_1px, t.maxRowHeight), r, r);
+            }
             History.EndTransaction();
 
             t.nRowsCount = 0;
             t._calcHeightRows(/*fullRecalc*/0);
             t._updateVisibleRowsCount();
-            t._cleanCache(new asc_Range(0, row1, t.cols.length - 1, row1));
+            t._cleanCache(new asc_Range(0, row1, t.cols.length - 1, row2));
             t.changeWorksheet("update");
         };
         return this._isLockedAll(onChangeHeightCallback);

@@ -2097,7 +2097,7 @@ var editor;
   };
 
   spreadsheet_api.prototype.asc_autoFitColumnWidth = function() {
-    this.wb.getWorksheet().autoFitColumnWidth();
+    this.wb.getWorksheet().autoFitColumnWidth(null);
   };
 
   spreadsheet_api.prototype.asc_getRowHeight = function() {
@@ -2107,6 +2107,9 @@ var editor;
 
   spreadsheet_api.prototype.asc_setRowHeight = function(height) {
     this.wb.getWorksheet().changeWorksheet("rowHeight", height);
+  };
+  spreadsheet_api.prototype.asc_autoFitRowHeight = function() {
+    this.wb.getWorksheet().autoFitRowHeight(null);
   };
 
   spreadsheet_api.prototype.asc_showRows = function() {
@@ -3344,6 +3347,7 @@ var editor;
   prot["asc_autoFitColumnWidth"] = prot.asc_autoFitColumnWidth;
   prot["asc_getRowHeight"] = prot.asc_getRowHeight;
   prot["asc_setRowHeight"] = prot.asc_setRowHeight;
+  prot["asc_autoFitRowHeight"] = prot.asc_autoFitRowHeight;
   prot["asc_showRows"] = prot.asc_showRows;
   prot["asc_hideRows"] = prot.asc_hideRows;
   prot["asc_insertCells"] = prot.asc_insertCells;
