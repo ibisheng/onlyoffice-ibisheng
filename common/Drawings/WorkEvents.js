@@ -191,7 +191,7 @@
 		global_keyboardEvent.KeyCode  = e.keyCode;
 		global_keyboardEvent.Which    = e.which;
 
-		if ((global_keyboardEvent.KeyCode == 229) && (e.code == "space") || (e.code == "Space"))
+		if ((global_keyboardEvent.KeyCode == 229) && ((e.code == "space") || (e.code == "Space") || (e.key == "Spacebar")))
 		{
 			global_keyboardEvent.KeyCode = 12288;
 		}
