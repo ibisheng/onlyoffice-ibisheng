@@ -2451,6 +2451,18 @@ DrawingObjectsController.prototype =
                     {
                         checkObjectInArray(aGroups, objects_by_type.oleObjects[i].group.getMainGroup());
                     }
+
+                    var api = window.editor || window.Asc.editor;
+                    if(api)
+                    {
+                        var pluginData = new Asc.CPluginData();
+                        pluginData.setAttribute("data", objects_by_type.oleObjects[i].m_sData);
+                        pluginData.setAttribute("guid", objects_by_type.oleObjects[i].m_sApplicationId);
+                        pluginData.setAttribute("width", objects_by_type.oleObjects[i].spPr.xfrm.extX);
+                        pluginData.setAttribute("height", objects_by_type.oleObjects[i].spPr.xfrm.extY);
+                        pluginData.setAttribute("objectId", objects_by_type.oleObjects[i].Get_Id());
+                        api.asc_pluginResize(pluginData);
+                    }
                     objects_by_type.oleObjects[i].checkDrawingBaseCoords();
                 }
             }
@@ -6642,7 +6654,7 @@ DrawingObjectsController.prototype =
                     pluginData.setAttribute("objectId", drawing.Id);
                     new_image_props =
                     {
-                        ImageUrl: null,
+                        ImageUrl: drawing.getImageUrl(),
                         w: drawing.extX,
                         h: drawing.extY,
                         locked: locked,
@@ -6650,7 +6662,9 @@ DrawingObjectsController.prototype =
                         y: drawing.y,
                         lockAspect: lockAspect,
                         pluginGuid: drawing.m_sApplicationId,
-                        pluginData: pluginData
+                        pluginData: pluginData,
+                        oleWidth: drawing.m_fDefaultSizeX,
+                        oleHeight: drawing.m_fDefaultSizeY
                     };
                     if(!image_props)
                         image_props = new_image_props;
@@ -6670,8 +6684,10 @@ DrawingObjectsController.prototype =
                             image_props.locked = true;
                         if(image_props.lockAspect || new_image_props.lockAspect)
                             image_props.lockAspect = false;
-                        new_image_props.pluginGuid = null;
-                        new_image_props.pluginData = undefined;
+                        image_props.pluginGuid = null;
+                        image_props.pluginData = undefined;
+                        image_props.oleWidth = undefined;
+                        image_props.oleHeight = undefined;
                     }
                     break;
                 }
@@ -7095,6 +7111,14 @@ DrawingObjectsController.prototype =
             image_props.ImageUrl = props.imageProps.ImageUrl;
             image_props.Locked = props.imageProps.locked === true;
             image_props.lockAspect = props.imageProps.lockAspect;
+
+
+            image_props.pluginGuid = props.imageProps.pluginGuid;
+            image_props.pluginData = props.imageProps.pluginData;
+
+            image_props.oleWidth = props.imageProps.oleWidth;
+            image_props.oleHeight = props.imageProps.oleHeight;
+
             if(!bParaLocked)
             {
                 bParaLocked = image_props.Locked;

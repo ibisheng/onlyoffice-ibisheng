@@ -3247,23 +3247,28 @@ function DrawingObjects() {
     _this.getOriginalImageSize = function() {
 
         var selectedObjects = _this.controller.selectedObjects;
-        if ( (selectedObjects.length == 1) && selectedObjects[0].isImage() ) {
+        if ( (selectedObjects.length == 1) ) {
 
-            var imageUrl = selectedObjects[0].getImageUrl();
+            if(AscFormat.isRealNumber(selectedObjects[0].m_fDefaultSizeX) && AscFormat.isRealNumber(selectedObjects[0].m_fDefaultSizeY)){
+                return new AscCommon.asc_CImageSize( selectedObjects[0].m_fDefaultSizeX, selectedObjects[0].m_fDefaultSizeY, true);
+            }
+            if(selectedObjects[0].isImage()){
+                var imageUrl = selectedObjects[0].getImageUrl();
 
-            var _image = api.ImageLoader.map_image_index[AscCommon.getFullImageSrc2(imageUrl)];
-            if (_image != undefined && _image.Image != null && _image.Status == AscFonts.ImageLoadStatus.Complete) {
+                var _image = api.ImageLoader.map_image_index[AscCommon.getFullImageSrc2(imageUrl)];
+                if (_image != undefined && _image.Image != null && _image.Status == AscFonts.ImageLoadStatus.Complete) {
 
-                var _w = 1, _h = 1;
-                var bIsCorrect = false;
-                if (_image.Image != null) {
+                    var _w = 1, _h = 1;
+                    var bIsCorrect = false;
+                    if (_image.Image != null) {
 
-                    bIsCorrect = true;
-                    _w = Math.max( pxToMm(_image.Image.width), 1 );
-                    _h = Math.max( pxToMm(_image.Image.height), 1 );
+                        bIsCorrect = true;
+                        _w = Math.max( pxToMm(_image.Image.width), 1 );
+                        _h = Math.max( pxToMm(_image.Image.height), 1 );
+                    }
+
+                    return new AscCommon.asc_CImageSize( _w, _h, bIsCorrect);
                 }
-
-                return new AscCommon.asc_CImageSize( _w, _h, bIsCorrect);
             }
         }
         return new AscCommon.asc_CImageSize( 50, 50, false );
