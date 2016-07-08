@@ -164,6 +164,7 @@
 	 * @param {number} nFromRow
 	 * @param {number} nToCol
 	 * @param {number} nToRow
+     * @returns {ApiCahrt}
 	 */
 	ApiWorksheet.prototype.AddChart =
 		function (sDataRange, bInRows, sType, nStyleIndex, nFromCol, nFromRow, nToCol, nToRow) {
@@ -293,6 +294,7 @@
 			if (AscFormat.isRealNumber(nStyleIndex)) {
 				oChart.setStyle(nStyleIndex);
 			}
+            return new ApiChart(oChart);
 		};
 
 	/**
@@ -364,6 +366,185 @@
 	};
 
 
+
+
+    ApiChart.prototype.CreateTitle = function(sTitle, nFontSize){
+        if(!this.Chart)
+        {
+            return null;
+        }
+        if(typeof sTitle === "string" && sTitle.length > 0){
+            var oTitle = new AscFormat.CTitle();
+            oTitle.setTx(new AscFormat.CChartText());
+            oTitle.setOverlay(false);
+            var oTextBody = AscFormat.CreateTextBodyFromString(sTitle, this.Chart.getDrawingDocument(), oTitle.tx);
+            if(AscFormat.isRealNumber(nFontSize)){
+                oTextBody.content.Set_ApplyToAll(true);
+                oTextBody.content.Paragraph_Add(new ParaTextPr({ FontSize : nFontSize}));
+                oTextBody.content.Set_ApplyToAll(false);
+            }
+            oTitle.tx.setRich(oTextBody);
+            return oTitle;
+        }
+        return null;
+    };
+
+
+    /**
+     *  Specifies a chart title
+     *  @param {string} sTitle
+     *  @param {number} nFontSize
+     */
+    ApiChart.prototype.SetTitle = function (sTitle, nFontSize)
+    {
+        if(this.Chart)
+        {
+            this.Chart.chart.setTitle(this.CreateTitle(sTitle, nFontSize));
+        }
+    };
+
+    /**
+     *  Specifies a horizontal axis title
+     *  @param {string} sTitle
+     *  @param {number} nFontSize
+     * */
+    ApiChart.prototype.SetHorAxisTitle = function (sTitle, nFontSize)
+    {
+        if(this.Chart)
+        {
+            var horAxis = this.Chart.chart.plotArea.getHorizontalAxis();
+            if(horAxis)
+            {
+                horAxis.setTitle(this.CreateTitle(sTitle, nFontSize));
+            }
+        }
+    };
+
+    /**
+     *  Specifies a vertical axis title
+     *  @param {string} sTitle
+     *  @param {number} nFontSize
+     * */
+    ApiChart.prototype.SetVerAxisTitle = function (sTitle, nFontSize)
+    {
+        if(this.Chart)
+        {
+            var verAxis = this.Chart.chart.plotArea.getVerticalAxis();
+            if(verAxis)
+            {
+                if(typeof sTitle === "string" && sTitle.length > 0)
+                {
+                    verAxis.setTitle(this.CreateTitle(sTitle, nFontSize));
+                    if(verAxis.title){
+                        var _body_pr = new AscFormat.CBodyPr();
+                        _body_pr.reset();
+                        if(!verAxis.title.txPr)
+                        {
+                            verAxis.title.setTxPr(AscFormat.CreateTextBodyFromString("", this.Chart.getDrawingDocument(), verAxis.title));
+                        }
+                        var _text_body =  verAxis.title.txPr;
+                        _text_body.setBodyPr(_body_pr);
+                        verAxis.title.setOverlay(false);
+                    }
+                }
+                else
+                {
+                    verAxis.setTitle(null);
+                }
+            }
+        }
+    };
+
+
+    /**
+     * Specifies a legend position
+     * @param {"left" | "top" | "right" | "bottom" | "none"} sLegendPos
+     * */
+    ApiChart.prototype.SetLegendPos = function(sLegendPos)
+    {
+        if(this.Chart && this.Chart.chart)
+        {
+            if(sLegendPos === "none")
+            {
+                if(this.Chart.chart.legend)
+                {
+                    this.Chart.chart.setLegend(null);
+                }
+            }
+            else
+            {
+                var nLegendPos = null;
+                switch(sLegendPos)
+                {
+                    case "left":
+                    {
+                        nLegendPos = Asc.c_oAscChartLegendShowSettings.left;
+                        break;
+                    }
+                    case "top":
+                    {
+                        nLegendPos = Asc.c_oAscChartLegendShowSettings.top;
+                        break;
+                    }
+                    case "right":
+                    {
+                        nLegendPos = Asc.c_oAscChartLegendShowSettings.right;
+                        break;
+                    }
+                    case "bottom":
+                    {
+                        nLegendPos = Asc.c_oAscChartLegendShowSettings.bottom;
+                        break;
+                    }
+                }
+                if(null !== nLegendPos)
+                {
+                    if(!this.Chart.chart.legend)
+                    {
+                        this.Chart.chart.setLegend(new AscFormat.CLegend());
+                    }
+                    if(this.Chart.chart.legend.legendPos !== nLegendPos)
+                        this.Chart.chart.legend.setLegendPos(nLegendPos);
+                    if(this.Chart.chart.legend.overlay !== false)
+                    {
+                        this.Chart.chart.legend.setOverlay(false);
+                    }
+                }
+            }
+        }
+    };
+
+    /**
+     * Spicifies a show options for data labels
+     * @param {boolean} bShowSerName
+     * @param {boolean} bShowCatName
+     * @param {boolean} bShowVal
+     * */
+    ApiChart.prototype.SetShowDataLabels = function(bShowSerName, bShowCatName, bShowVal)
+    {
+        if(this.Chart && this.Chart.chart && this.Chart.chart.plotArea && this.Chart.chart.plotArea.charts[0])
+        {
+            var oChart = this.Chart.chart.plotArea.charts[0];
+            if(false == bShowSerName && false == bShowCatName && false == bShowVal)
+            {
+                if(oChart.dLbls)
+                {
+                    oChart.setDLbls(null);
+                }
+            }
+            if(!oChart.dLbls)
+            {
+                oChart.setDLbls(new AscFormat.CDLbls());
+            }
+            oChart.dLbls.setSeparator(",");
+            oChart.dLbls.setShowSerName(true == bShowSerName);
+            oChart.dLbls.setShowCatName(true == bShowCatName);
+            oChart.dLbls.setShowVal(true == bShowVal);
+            oChart.dLbls.setShowLegendKey(false);
+            //oChart.dLbls.setShowPercent(false);
+            oChart.dLbls.setShowBubbleSize(false);
+        }
+    };
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Export
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -385,4 +566,10 @@
 	ApiRange.prototype["SetFontName"] = ApiRange.prototype.SetFontName;
 	ApiRange.prototype["SetAlignVertical"] = ApiRange.prototype.SetAlignVertical;
 	ApiRange.prototype["SetAlignHorizontal"] = ApiRange.prototype.SetAlignHorizontal;
+
+    ApiChart.prototype["SetTitle"] = ApiChart.prototype.SetTitle;
+    ApiChart.prototype["SetHorAxisTitle"] = ApiChart.prototype.SetHorAxisTitle;
+    ApiChart.prototype["SetVerAxisTitle"] = ApiChart.prototype.SetVerAxisTitle;
+    ApiChart.prototype["SetLegendPos"] = ApiChart.prototype.SetLegendPos;
+    ApiChart.prototype["SetShowDataLabels"] = ApiChart.prototype.SetShowDataLabels;
 }(window, null));
