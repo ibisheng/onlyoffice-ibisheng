@@ -6790,6 +6790,22 @@ CDocument.prototype.OnKeyDown = function(e)
         this.Document_UpdateInterfaceState();
         bRetValue = keydownresult_PreventAll;
     }
+    else if (e.KeyCode == 12288 && false === editor.isViewMode) // Space
+    {
+        if (false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content, null, true))
+        {
+            this.Create_NewHistoryPoint(AscDFH.historydescription_Document_SpaceButton);
+
+            this.DrawingDocument.TargetStart();
+            this.DrawingDocument.TargetShow();
+
+            this.CheckLanguageOnTextAdd = true;
+            this.Paragraph_Add(new ParaSpace());
+            this.CheckLanguageOnTextAdd = false;
+        }
+
+        bRetValue = keydownresult_PreventAll;
+    }
 
     // Если был пересчет, значит были изменения, а вместе с ними пересылается и новая позиция курсора
     if (bRetValue & keydownresult_PreventKeyPress && OldRecalcId === this.RecalcId)
@@ -11086,8 +11102,16 @@ CDocument.prototype.Add_CompositeText = function(nCharCode)
 
 	var oRun = this.CompositeInput.Run;
 	var nPos = this.CompositeInput.Pos + this.CompositeInput.Length;
-	var oChar = new ParaText();
-	oChar.Set_CharCode(nCharCode);
+	var oChar;
+    if (32 == nCharCode || 12288 == nCharCode)
+    {
+        oChar = new ParaSpace();
+    }
+    else
+    {
+        oChar = new ParaText();
+        oChar.Set_CharCode(nCharCode);
+    }
 	oRun.Add_ToContent(nPos, oChar, true);
 	this.CompositeInput.Length++;
 
