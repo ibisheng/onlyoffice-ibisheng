@@ -613,9 +613,11 @@
      * @param {Array} aCatNames
      * @param {EMU} nWidth
      * @param {EMU} nHeight
+     * @param {EMU} nHeight
+     * @param {number} nStyleIndex
      * @returns {ApiChart}
      * */
-    Api.prototype.CreateChart = function(sType, aSeries, aSeriesNames, aCatNames, nWidth, nHeight)
+    Api.prototype.CreateChart = function(sType, aSeries, aSeriesNames, aCatNames, nWidth, nHeight, nStyleIndex)
     {
         var oDrawingDocument = private_GetDrawingDocument();
         var oLogicDocument = private_GetLogicDocument();
@@ -782,6 +784,9 @@
         oChartSpace.setBDeleted(false);
         oChartSpace.extX = nW;
         oChartSpace.extY = nH;
+        if(AscFormat.isRealNumber(nStyleIndex)){
+            oChartSpace.setStyle(nStyleIndex);
+        }
         AscFormat.CheckSpPrXfrm(oChartSpace);
         oDrawing.setExtent( oChartSpace.spPr.xfrm.extX, oChartSpace.spPr.xfrm.extY );
         return new ApiChart(oChartSpace);
@@ -3719,49 +3724,54 @@
     };
 
 
+    ApiChart.prototype.CreateTitle = function(sTitle, nFontSize){
+        if(!this.Chart)
+        {
+            return null;
+        }
+        if(typeof sTitle === "string" && sTitle.length > 0){
+            var oTitle = new AscFormat.CTitle();
+            oTitle.setOverlay(false);
+            oTitle.setTx(new AscFormat.CChartText());
+            var oTextBody = AscFormat.CreateTextBodyFromString(sTitle, this.Chart.getDrawingDocument(), oTitle.tx);
+            if(AscFormat.isRealNumber(nFontSize)){
+                oTextBody.content.Set_ApplyToAll(true);
+                oTextBody.content.Paragraph_Add(new ParaTextPr({ FontSize : nFontSize}));
+                oTextBody.content.Set_ApplyToAll(false);
+            }
+            oTitle.tx.setRich(oTextBody);
+            return oTitle;
+        }
+        return null;
+    };
+
+
     /**
      *  Specifies a chart title
      *  @param {string} sTitle
-     * */
-    ApiChart.prototype.SetTitle = function (sTitle)
+     *  @param {hps} nFontSize
+     */
+    ApiChart.prototype.SetTitle = function (sTitle, nFontSize)
     {
         if(this.Chart)
         {
-            if(typeof sTitle === "string" && sTitle.length > 0)
-            {
-                this.Chart.chart.setTitle(new AscFormat.CTitle());
-                this.Chart.chart.title.setTx(new AscFormat.CChartText());
-                this.Chart.chart.title.tx.setRich(AscFormat.CreateTextBodyFromString(sTitle, this.Chart.getDrawingDocument(), this.Chart.chart.title.tx))
-            }
-            else
-            {
-                this.Chart.chart.setTitle(null);
-            }
+            this.Chart.chart.setTitle(this.CreateTitle(sTitle, nFontSize));
         }
     };
 
     /**
      *  Specifies a horizontal axis title
      *  @param {string} sTitle
+     *  @param {hps} nFontSize
      * */
-    ApiChart.prototype.SetHorAxisTitle = function (sTitle)
+    ApiChart.prototype.SetHorAxisTitle = function (sTitle, nFontSize)
     {
         if(this.Chart)
         {
             var horAxis = this.Chart.chart.plotArea.getHorizontalAxis();
             if(horAxis)
             {
-                if(typeof sTitle === "string" && sTitle.length > 0)
-                {
-                    horAxis.setTitle(new AscFormat.CTitle());
-                    horAxis.title.setTx(new AscFormat.CChartText());
-                    horAxis.title.tx.setRich(AscFormat.CreateTextBodyFromString(sTitle, this.Chart.getDrawingDocument(), horAxis.title.tx));
-                    horAxis.title.setOverlay(false);
-                }
-                else
-                {
-                    horAxis.setTitle(null);
-                }
+                horAxis.setTitle(this.CreateTitle(sTitle, nFontSize));
             }
         }
     };
@@ -3769,8 +3779,9 @@
     /**
      *  Specifies a vertical axis title
      *  @param {string} sTitle
+     *  @param {hps} nFontSize
      * */
-    ApiChart.prototype.SetVerAxisTitle = function (sTitle)
+    ApiChart.prototype.SetVerAxisTitle = function (sTitle, nFontSize)
     {
         if(this.Chart)
         {
@@ -3779,19 +3790,18 @@
             {
                 if(typeof sTitle === "string" && sTitle.length > 0)
                 {
-                    verAxis.setTitle(new AscFormat.CTitle());
-                    verAxis.title.setTx(new AscFormat.CChartText());
-                    verAxis.title.tx.setRich(AscFormat.CreateTextBodyFromString(sTitle, this.Chart.getDrawingDocument(), verAxis.title.tx));
-
-                    var _body_pr = new AscFormat.CBodyPr();
-                    _body_pr.reset();
-                    if(!verAxis.title.txPr)
-                    {
-                        verAxis.title.setTxPr(AscFormat.CreateTextBodyFromString("", this.Chart.getDrawingDocument(), verAxis.title));
+                    verAxis.setTitle(this.CreateTitle(sTitle, nFontSize));
+                    if(verAxis.title){
+                        var _body_pr = new AscFormat.CBodyPr();
+                        _body_pr.reset();
+                        if(!verAxis.title.txPr)
+                        {
+                            verAxis.title.setTxPr(AscFormat.CreateTextBodyFromString("", this.Chart.getDrawingDocument(), verAxis.title));
+                        }
+                        var _text_body =  verAxis.title.txPr;
+                        _text_body.setBodyPr(_body_pr);
+                        verAxis.title.setOverlay(false);
                     }
-                    var _text_body =  verAxis.title.txPr;
-                    _text_body.setBodyPr(_body_pr);
-                    verAxis.title.setOverlay(false);
                 }
                 else
                 {
@@ -3885,6 +3895,9 @@
             oChart.dLbls.setShowSerName(true == bShowSerName);
             oChart.dLbls.setShowCatName(true == bShowCatName);
             oChart.dLbls.setShowVal(true == bShowVal);
+            oChart.dLbls.setShowLegendKey(false);
+            //oChart.dLbls.setShowPercent(false);
+            oChart.dLbls.setShowBubbleSize(false);
         }
     };
 
