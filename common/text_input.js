@@ -530,7 +530,6 @@
 				(e.data == null || e.data == ""))
 			{
 				// always data == ""
-				console.log("chrome_linux_end");
 				this.IsUseFirstTextInputAfterComposition = true;
 				return;
 			}
