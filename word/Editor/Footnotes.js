@@ -605,6 +605,20 @@ CFootnotesController.prototype.Set_CurrentElement = function(bUpdateStates, Page
 		}
 	}
 };
+CFootnotesController.prototype.AddFootnoteRef = function()
+{
+	if (true !== this.private_IsOnFootnoteSelected() || null === this.CurFootnote)
+		return;
+
+	var oFootnote  = this.CurFootnote;
+	var oParagraph = oFootnote.Get_FirstParagraph();
+	if (!oParagraph)
+		return;
+
+	var oRun = new ParaRun(oParagraph, false);
+	oRun.Add_ToContent(0, new ParaFootnoteRef(oFootnote), false);
+	oParagraph.Add_ToContent(0, oRun);
+};
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Private area
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
