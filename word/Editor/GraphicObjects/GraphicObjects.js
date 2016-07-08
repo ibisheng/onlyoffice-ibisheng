@@ -506,6 +506,12 @@ CGraphicObjects.prototype =
                 image_props.Width = props_by_types.imageProps.w;
                 image_props.Height = props_by_types.imageProps.h;
                 image_props.lockAspect = props_by_types.imageProps.lockAspect;
+
+                image_props.pluginGuid = props_by_types.imageProps.pluginGuid;
+                image_props.pluginData = props_by_types.imageProps.pluginData;
+
+                image_props.oleWidth = props_by_types.imageProps.oleWidth;
+                image_props.oleHeight = props_by_types.imageProps.oleHeight;
             }
             if(props_by_types.chartProps && !(props_by_types.chartProps.severalCharts === true))
             {

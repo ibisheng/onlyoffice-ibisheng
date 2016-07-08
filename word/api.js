@@ -5604,12 +5604,14 @@ background-repeat: no-repeat;\
 					this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_EditOleObject);
 					this.WordControl.m_oLogicDocument.Edit_OleObject(oOleObject, sData, sImageUrl, nPixWidth, nPixHeight);
 					this.WordControl.m_oLogicDocument.Recalculate();
+                    this.WordControl.m_oLogicDocument.Document_UpdateInterfaceState();
 				}
 			}
 			else
 			{
 				this.WordControl.m_oLogicDocument.Edit_OleObject(oOleObject, sData, sImageUrl, nPixWidth, nPixHeight);
 				this.WordControl.m_oLogicDocument.Recalculate();
+                this.WordControl.m_oLogicDocument.Document_UpdateInterfaceState();
 			}
 		}
 	};
