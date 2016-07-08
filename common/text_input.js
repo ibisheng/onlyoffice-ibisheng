@@ -272,7 +272,8 @@
 				}
 			}
 
-			if (!this.KeyDownFlag && c_oCompositionState.end == this.compositionState && !this.TextInputAfterComposition && this.HtmlArea.value != "")
+			var _value = this.HtmlArea.value;
+			if (!this.KeyDownFlag && c_oCompositionState.end == this.compositionState && !this.TextInputAfterComposition && _value != "")
 			{
 				this.Api.Begin_CompositeInput();
 				this.checkCompositionData(this.HtmlArea.value);
@@ -281,8 +282,32 @@
 			}
 
 			this.TextInputAfterComposition = false;
+
 			if (c_oCompositionState.end == this.compositionState)
+			{
+				if (AscCommon.AscBrowser.isChrome && AscCommon.AscBrowser.isLinuxOS)
+				{
+					// space!!!
+					var _code = (_value.length == 1) ? _value.charCodeAt(0) : 0;
+					if (_code == 12288 || _code == 32)
+					{
+						var _e = {
+							altKey : false,
+							ctrlKey : false,
+							shiftKey : false,
+							target : null,
+							charCode : 0,
+							which : 0,
+							keyCode : 12288,
+							code : "space"
+						};
+						this.Api.onKeyDown(_e);
+						this.Api.onKeyUp(_e);
+					}
+				}
+
 				this.clear();
+			}
 		},
 
 		onTextInput : function(e)
@@ -348,7 +373,15 @@
 		onKeyDown : function(e)
 		{
 			if (c_oCompositionState.end != this.compositionState)
+			{
+				if (this.IsUseFirstTextInputAfterComposition && e.keyCode == 8 || e.keyCode == 46) // del, backspace
+				{
+					this.onCompositionEnd(e, this.HtmlArea.value);
+					this.IsUseFirstTextInputAfterComposition = false;
+				}
+
 				return;
+			}
 
 			if (null != this.nativeFocusElement)
 			{
@@ -378,6 +411,17 @@
 		onKeyUp : function(e)
 		{
 			this.KeyDownFlag = false;
+
+			if (c_oCompositionState.end != this.compositionState)
+			{
+				if (this.IsUseFirstTextInputAfterComposition && e.keyCode == 8 || e.keyCode == 46) // del, backspace
+				{
+					this.onCompositionEnd(e, this.HtmlArea.value);
+					this.IsUseFirstTextInputAfterComposition = false;
+				}
+
+				return;
+			}
 
 			if (c_oCompositionState.end == this.compositionState)
 				return this.Api.onKeyUp(e);
@@ -434,10 +478,10 @@
 			this.Api.Begin_CompositeInput();
 		},
 
-		onCompositionUpdate : function(e, isLockTarget)
+		onCompositionUpdate : function(e, isLockTarget, _data)
 		{
 			var _old = this.compositionValue.splice(0);
-			this.checkCompositionData(e.data);
+			this.checkCompositionData((_data != null) ? _data : e.data);
 
 			var _isEqualLen = (_old.length == this.compositionValue.length);
 			var _isEqual    = _isEqualLen;
@@ -478,26 +522,20 @@
 			this.compositionState = c_oCompositionState.process;
 		},
 
-		onCompositionEnd : function(e)
+		onCompositionEnd : function(e, _data)
 		{
-			// chrome, linux: всегда приходит пустая дата
-			if (!this.IsUseFirstTextInputAfterComposition)
+			if (!this.IsUseFirstTextInputAfterComposition &&
+				AscCommon.AscBrowser.isChrome &&
+				AscCommon.AscBrowser.isLinuxOS &&
+				(e.data == null || e.data == ""))
 			{
-				if (e.data === undefined || (e.data == "" && (this.compositionValue.length != 0)))
-				{
-					this.IsUseFirstTextInputAfterComposition = true;
-					return;
-				}
-				else
-				{
-					this.onCompositionUpdate(e, false);
-				}
-			}
-			else
-			{
-				this.onCompositionUpdate(e, false);
+				// always data == ""
+				console.log("chrome_linux_end");
+				this.IsUseFirstTextInputAfterComposition = true;
+				return;
 			}
 
+			this.onCompositionUpdate(e, false, _data);
 			this.Api.Set_CursorPosInCompositeText(1000); // max
 
 			this.clear();
@@ -510,7 +548,7 @@
 		checkCompositionData : function(data)
 		{
 			this.compositionValue = [];
-			var _length           = data.length;
+			var _length           = (data != null) ? data.length : 0;
 			for (var i = 0; i < _length; i++)
 			{
 				var _code = data.charCodeAt(i);

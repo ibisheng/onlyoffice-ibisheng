@@ -53,7 +53,8 @@ var AscBrowser = {
     isSafari : false,
     isArm : false,
     isMozilla : false,
-	isRetina : false
+	isRetina : false,
+    isLinuxOS : false
 };
 
 // user agent lower case
