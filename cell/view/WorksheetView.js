@@ -11028,38 +11028,37 @@
         return this._replaceCellsText( aReplaceCells, options, lockDraw, callback );
     };
 
-    WorksheetView.prototype._replaceCellsText = function ( aReplaceCells, options, lockDraw, callback ) {
+    WorksheetView.prototype._replaceCellsText = function (aReplaceCells, options, lockDraw, callback) {
         var t = this;
         var findFlags = "g"; // Заменяем все вхождения
-        if ( true !== options.isMatchCase ) {
+        if (true !== options.isMatchCase) {
             findFlags += "i";
         } // Не чувствителен к регистру
 
         var valueForSearching = options.findWhat
-            .replace( /(\\)/g, "\\\\" ).replace( /(\^)/g, "\\^" )
-            .replace( /(\()/g, "\\(" ).replace( /(\))/g, "\\)" )
-            .replace( /(\+)/g, "\\+" ).replace( /(\[)/g, "\\[" )
-            .replace( /(\])/g, "\\]" ).replace( /(\{)/g, "\\{" )
-            .replace( /(\})/g, "\\}" ).replace( /(\$)/g, "\\$" )
-            .replace( /(~)?\*/g, function ( $0, $1 ) {
-                return $1 ? $0 : '(.*)';
-            } )
-            .replace( /(~)?\?/g, function ( $0, $1 ) {
-                return $1 ? $0 : '.';
-            } )
-            .replace( /(~\*)/g, "\\*" ).replace( /(~\?)/g, "\\?" );
-        valueForSearching = new RegExp( valueForSearching, findFlags );
+          .replace(/(\\)/g, "\\\\").replace(/(\^)/g, "\\^")
+          .replace(/(\()/g, "\\(").replace(/(\))/g, "\\)")
+          .replace(/(\+)/g, "\\+").replace(/(\[)/g, "\\[")
+          .replace(/(\])/g, "\\]").replace(/(\{)/g, "\\{")
+          .replace(/(\})/g, "\\}").replace(/(\$)/g, "\\$")
+          .replace(/(~)?\*/g, function ($0, $1) {
+              return $1 ? $0 : '(.*)';
+          })
+          .replace(/(~)?\?/g, function ($0, $1) {
+              return $1 ? $0 : '.';
+          })
+          .replace(/(~\*)/g, "\\*").replace(/(~\?)/g, "\\?").replace(/(\.)/g, "\\.");
+        valueForSearching = new RegExp(valueForSearching, findFlags);
 
         options.indexInArray = 0;
         options.countFind = aReplaceCells.length;
         options.countReplace = 0;
-        if ( options.isReplaceAll && false === this.collaborativeEditing.getCollaborativeEditing() ) {
-            this._isLockedCells( aReplaceCells, /*subType*/null, function () {
-                t._replaceCellText( aReplaceCells, valueForSearching, options, lockDraw, callback, true );
-            } );
-        }
-        else {
-            this._replaceCellText( aReplaceCells, valueForSearching, options, lockDraw, callback, false );
+        if (options.isReplaceAll && false === this.collaborativeEditing.getCollaborativeEditing()) {
+            this._isLockedCells(aReplaceCells, /*subType*/null, function () {
+                t._replaceCellText(aReplaceCells, valueForSearching, options, lockDraw, callback, true);
+            });
+        } else {
+            this._replaceCellText(aReplaceCells, valueForSearching, options, lockDraw, callback, false);
         }
     };
 
