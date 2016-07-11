@@ -2680,7 +2680,7 @@ CChartsDrawer.prototype =
 			{
 				res = true;
 			}
-			else if(isPerspective && (isBar || isLine))
+			else if(isPerspective && (isBar || isLine || isHBar))
 			{
 				res = true;
 			}
@@ -6011,11 +6011,14 @@ drawHBarChart.prototype =
 			DiffGapDepth = perspectiveDepth * (gapDepth / 2) / 100;
 		}		
 		
-		for (var i = 0; i < this.chartProp.series.length; i++) {
+		for (var i = 0; i < this.chartProp.series.length; i++) 
+		{
 			numCache = this.chartProp.series[i].val.numRef ? this.chartProp.series[i].val.numRef.numCache : this.chartProp.series[i].val.numLit;
 			
 			if(!numCache || this.chartProp.series[i].isHidden)
+			{
 				continue;
+			}
 			
 			seria = this.chartProp.series[i].val.numRef.numCache.pts;
 			seriesHeight[i] = [];
@@ -6023,8 +6026,8 @@ drawHBarChart.prototype =
 			
 			var isValMoreZero = false;
 			var isValLessZero = 0;
-			for (var j = 0; j < seria.length; j++) {
-				
+			for (var j = 0; j < seria.length; j++) 
+			{			
 				//стартовая позиция колонки Y(+ высота с учётом поправок на накопительные диаграммы)
 				val = parseFloat(seria[j].val);
 				
@@ -6044,8 +6047,6 @@ drawHBarChart.prototype =
 
 				seriesHeight[i][idx] = startXColumnPosition.width;
 				
-				
-
 				
 				//стартовая позиция колонки Y
 				if(this.cChartSpace.chart.plotArea.catAx.scaling.orientation == ORIENTATION_MIN_MAX)
@@ -6078,17 +6079,18 @@ drawHBarChart.prototype =
 					else
 						startY = startYPosition * this.chartProp.pxToMM + hmargin + (seriesCounter * individualBarHeight - seriesCounter * widthOverLap);
 				}
-				
-				
 
 				newStartY = startY;
 				if(this.cChartSpace.chart.plotArea.catAx.scaling.orientation != ORIENTATION_MIN_MAX)
-						newStartY = startY + individualBarHeight;
-				
+				{
+					newStartY = startY + individualBarHeight;
+				}
 				
 				newStartX = startX;
 				if(this.cChartSpace.chart.plotArea.valAx.scaling.orientation != ORIENTATION_MIN_MAX && (this.chartProp.subType == "stackedPer" || this.chartProp.subType == "stacked"))
+				{
 					newStartX = startX - width;
+				}
 				
 				if(this.cChartDrawer.nDimensionCount === 3)
 				{
@@ -6123,19 +6125,93 @@ drawHBarChart.prototype =
 					//this.sortZIndexPaths.push({seria: i, point: idx, paths: paths, x: point1.x, y: point1.y, zIndex: point1.z});
 					
 					//width = this.chartProp.widthCanvas - this.chartProp.chartGutter._left - this.chartProp.chartGutter._right;
-					var controlPoint1 = this.cChartDrawer._convertAndTurnPoint(x5 + width / 2, y5 - individualBarHeight / 2, z5);
-					var controlPoint2 = this.cChartDrawer._convertAndTurnPoint(x5 + width / 2, y5, z5 + perspectiveDepth / 2);
+					
+					
+					//TODO delete after unused code
+					var calculateDistance = function(point1, point2)
+					{
+						var res = Math.sqrt(Math.pow(point2.x - point1.x , 2) + Math.pow(point2.y - point1.y , 2) + Math.pow(point2.z - point1.z , 2));
+						return res;
+					};
+					
+					var getMinPoint = function(point1, point2, point3, point4)
+					{
+						var arrPoints = [point1, point2, point3, point4];
+						
+						var minPoint = null;
+						for(var i = 0; i < arrPoints.length; i++)
+						{
+							if(null === minPoint)
+							{
+								minPoint = arrPoints[i];
+							}
+							else
+							{
+								if(arrPoints[i].z > minPoint.z)
+								{
+									minPoint = arrPoints[i];
+								}
+							}
+						}
+						
+						return minPoint;
+					};
+					
+					
+					var getMidPoint = function(point1, point2, point3, point4)
+					{
+						var res = (point1.z + point2.z + point3.z ) / 3;
+						
+						return res;
+					};
+					
+					var widthScreen = this.chartProp.widthCanvas - this.chartProp.chartGutter._right;
+					var centralViewPoint = {x: widthScreen / 2, y: heightGraph + this.chartProp.chartGutter._bottom, z: 0};
+					
+					var tempWidth = width /*< 0 ? -50 : 50*/;
+					var controlPoint1 = this.cChartDrawer._convertAndTurnPoint(x5 + tempWidth / 2, y5 - individualBarHeight / 2, z5);
+					var controlPoint2 = this.cChartDrawer._convertAndTurnPoint(x5 + tempWidth / 2, y5, z5 + perspectiveDepth / 2);
 					var controlPoint3 = this.cChartDrawer._convertAndTurnPoint(x5, y5 - individualBarHeight / 2, z5 + perspectiveDepth / 2);
 					var controlPoint4 = this.cChartDrawer._convertAndTurnPoint(x8, y8 - individualBarHeight / 2, z8 + perspectiveDepth / 2);
-					var controlPoint5 = this.cChartDrawer._convertAndTurnPoint(x1 + width / 2 , y1, z1 + perspectiveDepth / 2);
-					var controlPoint6 = this.cChartDrawer._convertAndTurnPoint(x6 + width / 2 , y6 - individualBarHeight / 2, z6);
+					var controlPoint5 = this.cChartDrawer._convertAndTurnPoint(x1 + tempWidth / 2 , y1, z1 + perspectiveDepth / 2);
+					var controlPoint6 = this.cChartDrawer._convertAndTurnPoint(x6 + tempWidth / 2 , y6 - individualBarHeight / 2, z6);
 					
+					var distance0 = calculateDistance(centralViewPoint, controlPoint1);
+					var distance1 = calculateDistance(centralViewPoint, controlPoint2);
+					var distance2 = calculateDistance(centralViewPoint, controlPoint3);
+					var distance3 = calculateDistance(centralViewPoint, controlPoint4);
+					var distance4 = calculateDistance(centralViewPoint, controlPoint5);
+					var distance5 = calculateDistance(centralViewPoint, controlPoint6);
+					
+					
+					var midPoint0 = getMidPoint(point1, point4, point8, point5);
+					var midPoint1 = getMidPoint(point1, point2, point3, point4);
+					var midPoint2 = getMidPoint(point1, point2, point6, point5);
+					var midPoint3 = getMidPoint(point4, point8, point7, point3);
+					var midPoint4 = getMidPoint(point5, point6, point7, point8);
+					var midPoint5 = getMidPoint(point6, point2, point3, point7);
+					var midPaths = [midPoint0, midPoint1, midPoint2, midPoint3, midPoint4, midPoint5];
+						
+					
+					var testPoint0 = getMinPoint(point1, point4, point8, point5);
+					var testPoint1 = getMinPoint(point1, point2, point3, point4);
+					var testPoint2 = getMinPoint(point1, point2, point6, point5);
+					var testPoint3 = getMinPoint(point4, point8, point7, point3);
+					var testPoint4 = getMinPoint(point5, point6, point7, point8);
+					var testPoint5 = getMinPoint(point6, point2, point3, point7);
+					var testPaths = [testPoint0, testPoint1, testPoint2, testPoint3, testPoint4, testPoint5];
+
 					
 					var sortPaths = [controlPoint1, controlPoint2, controlPoint3, controlPoint4, controlPoint5, controlPoint6];
 					
+					var distancePaths = [distance0, distance1, distance2, distance3, distance4, distance5];
+					
 					for(var k = 0; k < paths.length; k++)
 					{
-						this.sortZIndexPaths.push({seria: i, point: idx, verge: k, paths: paths[k], x: sortPaths[k].x, y: sortPaths[k].y, zIndex: sortPaths[k].z});
+						if(null === paths[k])
+							continue;
+						var zIndex = midPaths[k];
+						this.sortZIndexPaths.push({seria: i, point: idx, verge: k, paths: paths[k], x: sortPaths[k].x, y: sortPaths[k].y, zIndex: zIndex});
 					}
 				}
 				else
