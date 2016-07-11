@@ -301,201 +301,182 @@
 	};
 
 
-	var c_oAscChartTitleShowSettings =
-		{
-			none      : 0,
-			overlay   : 1,
-			noOverlay : 2
-		};
+	var c_oAscChartTitleShowSettings = {
+		none      : 0,
+		overlay   : 1,
+		noOverlay : 2
+	};
 
-	var c_oAscChartHorAxisLabelShowSettings =
-		{
-			none      : 0,
-			noOverlay : 1
-		};
+	var c_oAscChartHorAxisLabelShowSettings = {
+		none      : 0,
+		noOverlay : 1
+	};
 
-	var c_oAscChartVertAxisLabelShowSettings =
-		{
-			none       : 0,
-			rotated    : 1,
-			vertical   : 2,
-			horizontal : 3
-		};
+	var c_oAscChartVertAxisLabelShowSettings = {
+		none       : 0,
+		rotated    : 1,
+		vertical   : 2,
+		horizontal : 3
+	};
 
-	var c_oAscChartLegendShowSettings =
-		{
-			none         : 0,
-			left         : 1,
-			top          : 2,
-			right        : 3,
-			bottom       : 4,
-			leftOverlay  : 5,
-			rightOverlay : 6,
-			layout       : 7,
-			topRight     : 8 // ToDo добавить в меню
-		};
+	var c_oAscChartLegendShowSettings = {
+		none         : 0,
+		left         : 1,
+		top          : 2,
+		right        : 3,
+		bottom       : 4,
+		leftOverlay  : 5,
+		rightOverlay : 6,
+		layout       : 7,
+		topRight     : 8 // ToDo добавить в меню
+	};
 
-	var c_oAscChartDataLabelsPos =
-		{
-			none    : 0,
-			b       : 1,
-			bestFit : 2,
-			ctr     : 3,
-			inBase  : 4,
-			inEnd   : 5,
-			l       : 6,
-			outEnd  : 7,
-			r       : 8,
-			t       : 9
-		};
+	var c_oAscChartDataLabelsPos = {
+		none    : 0,
+		b       : 1,
+		bestFit : 2,
+		ctr     : 3,
+		inBase  : 4,
+		inEnd   : 5,
+		l       : 6,
+		outEnd  : 7,
+		r       : 8,
+		t       : 9
+	};
 
-	var c_oAscChartCatAxisSettings =
-		{
-			none        : 0,
-			leftToRight : 1,
-			rightToLeft : 2,
-			noLabels    : 3
-		};
+	var c_oAscChartCatAxisSettings = {
+		none        : 0,
+		leftToRight : 1,
+		rightToLeft : 2,
+		noLabels    : 3
+	};
 
-	var c_oAscChartValAxisSettings =
-		{
-			none      : 0,
-			byDefault : 1,
-			thousands : 2,
-			millions  : 3,
-			billions  : 4,
-			log       : 5
-		};
+	var c_oAscChartValAxisSettings = {
+		none      : 0,
+		byDefault : 1,
+		thousands : 2,
+		millions  : 3,
+		billions  : 4,
+		log       : 5
+	};
 
-	var c_oAscAxisTypeSettings =
-		{
-			vert : 0,
-			hor  : 1
-		};
+	var c_oAscAxisTypeSettings = {
+		vert : 0,
+		hor  : 1
+	};
 
-	var c_oAscGridLinesSettings =
-		{
-			none       : 0,
-			major      : 1,
-			minor      : 2,
-			majorMinor : 3
-		};
+	var c_oAscGridLinesSettings = {
+		none       : 0,
+		major      : 1,
+		minor      : 2,
+		majorMinor : 3
+	};
 
 
-	var c_oAscChartTypeSettings =
-		{
-			barNormal              : 0,
-			barStacked             : 1,
-			barStackedPer          : 2,
-			barNormal3d            : 3,
-			barStacked3d           : 4,
-			barStackedPer3d        : 5,
-			barNormal3dPerspective : 6,
-			lineNormal             : 7,
-			lineStacked            : 8,
-			lineStackedPer         : 9,
-			lineNormalMarker       : 10,
-			lineStackedMarker      : 11,
-			lineStackedPerMarker   : 12,
-			line3d                 : 13,
-			pie                    : 14,
-			pie3d                  : 15,
-			hBarNormal             : 16,
-			hBarStacked            : 17,
-			hBarStackedPer         : 18,
-			hBarNormal3d           : 19,
-			hBarStacked3d          : 20,
-			hBarStackedPer3d       : 21,
-			areaNormal             : 22,
-			areaStacked            : 23,
-			areaStackedPer         : 24,
-			doughnut               : 25,
-			stock                  : 26,
-			scatter                : 27,
-			scatterLine            : 28,
-			scatterLineMarker      : 29,
-			scatterMarker          : 30,
-			scatterNone            : 31,
-			scatterSmooth          : 32,
-			scatterSmoothMarker    : 33,
-			unknown                : 34
-		};
+	var c_oAscChartTypeSettings = {
+		barNormal              : 0,
+		barStacked             : 1,
+		barStackedPer          : 2,
+		barNormal3d            : 3,
+		barStacked3d           : 4,
+		barStackedPer3d        : 5,
+		barNormal3dPerspective : 6,
+		lineNormal             : 7,
+		lineStacked            : 8,
+		lineStackedPer         : 9,
+		lineNormalMarker       : 10,
+		lineStackedMarker      : 11,
+		lineStackedPerMarker   : 12,
+		line3d                 : 13,
+		pie                    : 14,
+		pie3d                  : 15,
+		hBarNormal             : 16,
+		hBarStacked            : 17,
+		hBarStackedPer         : 18,
+		hBarNormal3d           : 19,
+		hBarStacked3d          : 20,
+		hBarStackedPer3d       : 21,
+		areaNormal             : 22,
+		areaStacked            : 23,
+		areaStackedPer         : 24,
+		doughnut               : 25,
+		stock                  : 26,
+		scatter                : 27,
+		scatterLine            : 28,
+		scatterLineMarker      : 29,
+		scatterMarker          : 30,
+		scatterNone            : 31,
+		scatterSmooth          : 32,
+		scatterSmoothMarker    : 33,
+		unknown                : 34
+	};
 
 
-	var c_oAscValAxisRule =
-		{
-			auto  : 0,
-			fixed : 1
-		};
+	var c_oAscValAxisRule = {
+		auto  : 0,
+		fixed : 1
+	};
 
-	var c_oAscValAxUnits =
-		{
-			none              : 0,
-			BILLIONS          : 1,
-			HUNDRED_MILLIONS  : 2,
-			HUNDREDS          : 3,
-			HUNDRED_THOUSANDS : 4,
-			MILLIONS          : 5,
-			TEN_MILLIONS      : 6,
-			TEN_THOUSANDS     : 7,
-			TRILLIONS         : 8,
-			CUSTOM            : 9,
-			THOUSANDS         : 10
+	var c_oAscValAxUnits = {
+		none              : 0,
+		BILLIONS          : 1,
+		HUNDRED_MILLIONS  : 2,
+		HUNDREDS          : 3,
+		HUNDRED_THOUSANDS : 4,
+		MILLIONS          : 5,
+		TEN_MILLIONS      : 6,
+		TEN_THOUSANDS     : 7,
+		TRILLIONS         : 8,
+		CUSTOM            : 9,
+		THOUSANDS         : 10
 
-		};
+	};
 
-	var c_oAscTickMark =
-		{
-			TICK_MARK_CROSS : 0,
-			TICK_MARK_IN    : 1,
-			TICK_MARK_NONE  : 2,
-			TICK_MARK_OUT   : 3
-		};
+	var c_oAscTickMark = {
+		TICK_MARK_CROSS : 0,
+		TICK_MARK_IN    : 1,
+		TICK_MARK_NONE  : 2,
+		TICK_MARK_OUT   : 3
+	};
 
-	var c_oAscTickLabelsPos =
-		{
-			TICK_LABEL_POSITION_HIGH    : 0,
-			TICK_LABEL_POSITION_LOW     : 1,
-			TICK_LABEL_POSITION_NEXT_TO : 2,
-			TICK_LABEL_POSITION_NONE    : 3
-		};
+	var c_oAscTickLabelsPos = {
+		TICK_LABEL_POSITION_HIGH    : 0,
+		TICK_LABEL_POSITION_LOW     : 1,
+		TICK_LABEL_POSITION_NEXT_TO : 2,
+		TICK_LABEL_POSITION_NONE    : 3
+	};
 
-	var c_oAscCrossesRule =
-		{
-			auto     : 0,
-			maxValue : 1,
-			value    : 2,
-			minValue : 3
-		};
+	var c_oAscCrossesRule = {
+		auto     : 0,
+		maxValue : 1,
+		value    : 2,
+		minValue : 3
+	};
 
-	var c_oAscHorAxisType =
-		{
-			auto : 0,
-			date : 1,
-			text : 2
-		};
+	var c_oAscHorAxisType = {
+		auto : 0,
+		date : 1,
+		text : 2
+	};
 
-	var c_oAscBetweenLabelsRule =
-		{
-			auto   : 0,
-			manual : 1
-		};
+	var c_oAscBetweenLabelsRule = {
+		auto   : 0,
+		manual : 1
+	};
 
-	var c_oAscLabelsPosition =
-		{
-			byDivisions      : 0,
-			betweenDivisions : 1
-		};
+	var c_oAscLabelsPosition = {
+		byDivisions      : 0,
+		betweenDivisions : 1
+	};
 
 
-	var c_oAscAxisType =
-		{
-			auto : 0,
-			date : 1,
-			text : 2,
-			cat  : 3,
-			val  : 4
-		};
+	var c_oAscAxisType = {
+		auto : 0,
+		date : 1,
+		text : 2,
+		cat  : 3,
+		val  : 4
+	};
 
 	var c_oAscHAnchor = {
 		Margin : 0x00,
@@ -538,25 +519,23 @@
 		RightMargin   : 0x07
 	};
 
-	var c_oAscSizeRelFromH =
-		{
-			sizerelfromhMargin        : 0,
-			sizerelfromhPage          : 1,
-			sizerelfromhLeftMargin    : 2,
-			sizerelfromhRightMargin   : 3,
-			sizerelfromhInsideMargin  : 4,
-			sizerelfromhOutsideMargin : 5
-		};
+	var c_oAscSizeRelFromH = {
+		sizerelfromhMargin        : 0,
+		sizerelfromhPage          : 1,
+		sizerelfromhLeftMargin    : 2,
+		sizerelfromhRightMargin   : 3,
+		sizerelfromhInsideMargin  : 4,
+		sizerelfromhOutsideMargin : 5
+	};
 
-	var c_oAscSizeRelFromV =
-		{
-			sizerelfromvMargin        : 0,
-			sizerelfromvPage          : 1,
-			sizerelfromvTopMargin     : 2,
-			sizerelfromvBottomMargin  : 3,
-			sizerelfromvInsideMargin  : 4,
-			sizerelfromvOutsideMargin : 5
-		};
+	var c_oAscSizeRelFromV = {
+		sizerelfromvMargin        : 0,
+		sizerelfromvPage          : 1,
+		sizerelfromvTopMargin     : 2,
+		sizerelfromvBottomMargin  : 3,
+		sizerelfromvInsideMargin  : 4,
+		sizerelfromvOutsideMargin : 5
+	};
 
 	var c_oAscRelativeFromV = {
 		BottomMargin  : 0x00,
@@ -690,12 +669,11 @@
 		TEXT_ALIGN_TOP    : 4  // Top
 	};
 
-	var c_oAscVertDrawingText =
-		{
-			normal  : 1,
-			vert    : 3,
-			vert270 : 4
-		};
+	var c_oAscVertDrawingText = {
+		normal  : 1,
+		vert    : 3,
+		vert270 : 4
+	};
 	var c_oAscLineJoinType    = {
 		Round : 1,
 		Bevel : 2,
@@ -888,7 +866,7 @@
 	var c_oAscEncodingsMap = {
 		"437"   : 43, "720" : 1, "737" : 21, "775" : 5, "850" : 39, "852" : 15, "855" : 12, "857" : 35, "858" : 40, "860" : 41, "861" : 30, "862" : 25, "863" : 42, "865" : 31, "866" : 13, "869" : 22, "874" : 32, "932" : 27, "936" : 18, "949" : 28, "950" : 17, "1200" : 48, "1201" : 49, "1250" : 16, "1251" : 14, "1252" : 44, "1253" : 23, "1254" : 36, "1255" : 26, "1256" : 2, "1257" : 6, "1258" : 45, "10007" : 11, "12000" : 50, "12001" : 51, "20866" : 9, "21866" : 10, "28591" : 37, "28592" : 19,
 		"28593" : 33, "28594" : 3, "28595" : 8, "28596" : 0, "28597" : 20, "28598" : 24, "28599" : 34, "28603" : 4, "28604" : 7, "28605" : 38, "51949" : 29, "65000" : 47, "65001" : 46
-	}
+	};
 	var c_oAscCodePageUtf8 = 46;//65001
 
 	// https://support.office.com/en-us/article/Excel-specifications-and-limits-16c69c74-3d6a-4aaf-ba35-e6eb276e8eaa?ui=en-US&rs=en-US&ad=US&fromAR=1
