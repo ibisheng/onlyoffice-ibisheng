@@ -121,6 +121,7 @@
 			{
 				// нужен еще один родитель. чтобы скроллился он, а не oHtmlParent
 				var oHtmlDivScrollable              = document.createElement("div");
+				oHtmlDivScrollable.id 				= "area_id_main";
 				oHtmlDivScrollable.style.background = "transparent";
 				oHtmlDivScrollable.style.border     = "none";
 				oHtmlDivScrollable.style.position   = "absolute";
@@ -137,16 +138,6 @@
 
 				oHtmlDivScrollable.appendChild(this.HtmlDiv);
 				oHtmlParent.parentNode.appendChild(oHtmlDivScrollable);
-
-				oHtmlParent.onresize = function(e)
-				{
-					var _elem          = document.getElementById("area_id_parent");
-					var style          = getComputedStyle(oHtmlParent);
-					_elem.style.left   = style.left;
-					_elem.style.top    = style.top;
-					_elem.style.width  = style.width;
-					_elem.style.height = style.height;
-				};
 			}
 			else
 			{
@@ -203,6 +194,16 @@
 			 */
 
 			this.Api.Input_UpdatePos();
+		},
+
+		onResize : function(_editorContainerId)
+		{
+			var _elem          = document.getElementById("area_id_main");
+			var _elemSrc       = document.getElementById(_editorContainerId);
+			_elem.style.left   = _elemSrc.style.left;
+			_elem.style.top    = _elemSrc.style.top;
+			_elem.style.width  = _elemSrc.style.width;
+			_elem.style.height = _elemSrc.style.height;
 		},
 
 		checkFocus : function()
@@ -634,7 +635,7 @@
 			var t                = window['AscCommon'].g_inputContext;
 			t.nativeFocusElement = e.target;
 
-			//console.log(t.nativeFocusElement);
+			console.log(t.nativeFocusElement);
 
 			if (t.InterfaceEnableKeyEvents == false)
 			{
