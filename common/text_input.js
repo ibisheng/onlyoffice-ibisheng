@@ -635,7 +635,7 @@
 			var t                = window['AscCommon'].g_inputContext;
 			t.nativeFocusElement = e.target;
 
-			console.log(t.nativeFocusElement);
+			//console.log(t.nativeFocusElement);
 
 			if (t.InterfaceEnableKeyEvents == false)
 			{
