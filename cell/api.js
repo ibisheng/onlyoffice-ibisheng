@@ -552,6 +552,9 @@ var editor;
   spreadsheet_api.prototype.asc_Resize = function() {
     if (this.wb) {
       this.wb.resize();
+
+      if (AscCommon.g_inputContext)
+        AscCommon.g_inputContext.onResize("ws-canvas-outer");
     }
   };
 

@@ -200,10 +200,23 @@
 		{
 			var _elem          = document.getElementById("area_id_main");
 			var _elemSrc       = document.getElementById(_editorContainerId);
-			_elem.style.left   = _elemSrc.style.left;
-			_elem.style.top    = _elemSrc.style.top;
-			_elem.style.width  = _elemSrc.style.width;
-			_elem.style.height = _elemSrc.style.height;
+
+			var _width = _elemSrc.style.width;
+			if ((null == _width || "" == _width) && window.getComputedStyle)
+			{
+				var _s = window.getComputedStyle(_elemSrc);
+				_elem.style.left   = _s.left;
+				_elem.style.top    = _s.top;
+				_elem.style.width  = _s.width;
+				_elem.style.height = _s.height;
+			}
+			else
+			{
+				_elem.style.left   = _elemSrc.style.left;
+				_elem.style.top    = _elemSrc.style.top;
+				_elem.style.width  = _width;
+				_elem.style.height = _elemSrc.style.height;
+			}
 		},
 
 		checkFocus : function()
