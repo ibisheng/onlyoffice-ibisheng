@@ -2281,7 +2281,11 @@ CDrawingDocument.prototype =
 
         this.Native["DD_EndNativeDraw"](_stream);
     },
-
+    
+    CheckGuiControlColors : function ()
+    {
+        
+    },
     SendControlColors : function()
     {
     },
