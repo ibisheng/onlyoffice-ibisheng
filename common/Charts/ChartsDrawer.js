@@ -2195,9 +2195,9 @@ CChartsDrawer.prototype =
 		this.processor3D.correctPointsPosition(chartSpace);
 	},
 	
-	_convertAndTurnPoint: function(x, y, z)
+	_convertAndTurnPoint: function(x, y, z, isNProject)
 	{
-		return this.processor3D.convertAndTurnPoint(x, y, z);
+		return this.processor3D.convertAndTurnPoint(x, y, z, isNProject);
 	},
 
 	//position of catAx labels(left or right) - returns false(left of axis)/true(right of axis) or null(standard position)
@@ -6119,6 +6119,16 @@ drawHBarChart.prototype =
 					point7 = this.cChartDrawer._convertAndTurnPoint(x7, y7, z7);
 					point8 = this.cChartDrawer._convertAndTurnPoint(x8, y8, z8);
 					
+					//не проецируем на плоскость
+					var point11 = this.cChartDrawer._convertAndTurnPoint(x1, y1, z1, true);
+					var point22 = this.cChartDrawer._convertAndTurnPoint(x2, y2, z2, true);
+					var point33 = this.cChartDrawer._convertAndTurnPoint(x3, y3, z3, true);
+					var point44 = this.cChartDrawer._convertAndTurnPoint(x4, y4, z4, true);
+					var point55 = this.cChartDrawer._convertAndTurnPoint(x5, y5, z5, true);
+					var point66 = this.cChartDrawer._convertAndTurnPoint(x6, y6, z6, true);
+					var point77 = this.cChartDrawer._convertAndTurnPoint(x7, y7, z7, true);
+					var point88 = this.cChartDrawer._convertAndTurnPoint(x8, y8, z8, true);
+					
 					paths = this.cChartDrawer.calculateRect3D(point1, point2, point3, point4, point5, point6, point7, point8, val);
 					
 					//расскомментируем, чтобы включить старую схему отрисовки(+ переименовать функции _DrawBars3D -> _DrawBars3D2)
@@ -6244,12 +6254,12 @@ drawHBarChart.prototype =
 						
 						
 					
-					var plainEquation1 = getPlainEquation(point1, point4, point8, point5);
-					var plainEquation2 = getPlainEquation(point1, point2, point3, point4);
-					var plainEquation3 = getPlainEquation(point1, point2, point6, point5);
-					var plainEquation4 = getPlainEquation(point4, point8, point7, point3);
-					var plainEquation5 = getPlainEquation(point5, point6, point7, point8);
-					var plainEquation6 = getPlainEquation(point6, point2, point3, point7);
+					var plainEquation1 = getPlainEquation(point11, point44, point88, point55);
+					var plainEquation2 = getPlainEquation(point11, point22, point33, point44);
+					var plainEquation3 = getPlainEquation(point11, point22, point66, point55);
+					var plainEquation4 = getPlainEquation(point44, point88, point77, point33);
+					var plainEquation5 = getPlainEquation(point55, point66, point77, point88);
+					var plainEquation6 = getPlainEquation(point66, point22, point33, point77);
 					var plainEquations = [plainEquation1, plainEquation2, plainEquation3, plainEquation4, plainEquation5, plainEquation6];
 					
 					
@@ -6290,6 +6300,8 @@ drawHBarChart.prototype =
 					
 					var arrPoints = [[point1, point4, point8, point5], [point1, point2, point3, point4], [point1, point2, point6, point5], [point4, point8, point7, point3], [point5, point6, point7, point8], [point6, point2, point3, point7]];
 					
+					var arrPoints2 = [[point11, point44, point88, point55], [point11, point22, point33, point44], [point11, point22, point66, point55], [point44, point88, point77, point33], [point55, point66, point77, point88], [point66, point22, point33, point77]];
+					
 					var sortPaths = [controlPoint1, controlPoint2, controlPoint3, controlPoint4, controlPoint5, controlPoint6];
 					
 					var distancePaths = [distance0, distance1, distance2, distance3, distance4, distance5];
@@ -6302,7 +6314,7 @@ drawHBarChart.prototype =
 						
 						
 						
-						this.sortZIndexPaths.push({seria: i, point: idx, verge: k, paths: paths[k], x: sortPaths[k].x, y: sortPaths[k].y, zIndex: zIndex, points: arrPoints[k], plainEquation: plainEquations[k]});
+						this.sortZIndexPaths.push({seria: i, point: idx, verge: k, paths: paths[k], x: sortPaths[k].x, y: sortPaths[k].y, zIndex: zIndex, points: arrPoints2[k], points2: arrPoints[k], plainEquation: plainEquations[k]});
 					}
 				}
 				else
@@ -6326,280 +6338,357 @@ drawHBarChart.prototype =
 		
 		if(this.cChartDrawer.nDimensionCount === 3)
 		{
+			console.time("asd");
+			this._sort3DVerges();
+			console.timeEnd("asd");
+		}
+    },
+	
+	_sort3DVerges: function()
+	{
+		var heightGraph    = this.chartProp.heightCanvas - this.chartProp.chartGutter._top - this.chartProp.chartGutter._bottom;
+		var widthScreen = this.chartProp.widthCanvas - this.chartProp.chartGutter._right;
+		var centralViewPoint = {x: widthScreen / 2 - this.cChartDrawer.processor3D.cameraDiffX, y: heightGraph / 2 + this.chartProp.chartGutter._bottom, z: -this.cChartDrawer.processor3D.cameraDiffZ};
+		
+		var firstVerges = [];
+		var lastVerges = [];
+		
+		
+		//уравнение плоскости
+		var getLineEquation = function(point1, point2)
+		{
+			var x0 = point1.x, y0 = point1.y, z0 = point1.z;
+			var x1 = point2.x, y1 = point2.y, z1 = point2.z;
 			
-			//уравнение плоскости
-			var getLineEquation = function(point1, point2)
-			{
-				var x0 = point1.x, y0 = point1.y, z0 = point1.z;
-				var x1 = point2.x, y1 = point2.y, z1 = point2.z;
-				
-				
-				/*x - x0 	 =  	y - y0 	 =  	z - z0
-				x1 - x0 			y1 - y0 		z1 - z0
-				
-					l 					m 				n
-				*/
-				
-				var l = x1 - x0;
-				var m = y1 - y0;
-				var n = z1 - z0;
-				
-				//check line
-				var x123 = (point1.x - x0) / (x1 - x0);
-				var y123 = (point1.y - y0) / (y1 - y0);
-				var z123 = (point1.z - z0) / (z1 - z0);
-				
-				var x321 = (point2.x - x0) / (x1 - x0);
-				var y321 = (point2.y - y0) / (y1 - y0);
-				var z321 = (point2.z - z0) / (z1 - z0);
-				
-				
-				
-				return {l: l, m: m, n: n, x1: x0, y1: y0, z1: z0};
-			};
 			
-			//уравнение плоскости
-			var isIntersectionPlainAndLine1 = function(plainEquation, lineEquation)
+			/*x - x0 	 =  	y - y0 	 =  	z - z0
+			x1 - x0 			y1 - y0 		z1 - z0
+			
+				l 					m 				n
+			*/
+			
+			var l = x1 - x0;
+			var m = y1 - y0;
+			var n = z1 - z0;
+			
+			//check line
+			var x123 = (point1.x - x0) / (x1 - x0);
+			var y123 = (point1.y - y0) / (y1 - y0);
+			var z123 = (point1.z - z0) / (z1 - z0);
+			
+			var x321 = (point2.x - x0) / (x1 - x0);
+			var y321 = (point2.y - y0) / (y1 - y0);
+			var z321 = (point2.z - z0) / (z1 - z0);
+			
+			
+			
+			return {l: l, m: m, n: n, x1: x0, y1: y0, z1: z0};
+		};
+		
+		//уравнение плоскости
+		var isIntersectionPlainAndLine = function(plainEquation, lineEquation)
+		{
+			var A = plainEquation.a;
+			var B = plainEquation.b;
+			var C = plainEquation.c;
+			var D = plainEquation.d;
+			
+			var l = lineEquation.l;
+			var m = lineEquation.m;
+			var n = lineEquation.n;
+			var x1 = lineEquation.x1;
+			var y1 = lineEquation.y1;
+			var z1 = lineEquation.z1;
+			
+			
+			//x - x1		y - y1		z - z1
+			//			=			=			t
+			//  l			  m		 	  n
+			
+			/*x = t * l + x1
+			y = t * m + y1
+			z = t * n + z1*/
+			
+			
+			/*A * x + B * y + C * z + D = 0
+			
+			A * (t * l + x1) + B * (t * m + y1) + C * (t * n + z1) + D = 0;
+			
+			A * t * l + A * x1 + B * t * m + B * y1 + C * t * n + C * z1 + D
+			
+			A * t * l + B * t * m + C * t * n       + A * x1 + B * y1 + C * z1 + D*/
+			
+			var t = -(A * x1 + B * y1 + C * z1 + D) / (A * l + B * m + C * n); 
+			
+			var x = t * l + x1;
+			var y = t * m + y1;
+			var z = t * n + z1;
+			
+			return {x: x, y: y, z: z};
+		};
+		
+		
+		var getEquationLineOnPlane =  function(point1, point2)
+		{
+			var x1 = point1.x;
+			var y1 = point1.y;
+			
+			var x2 = point2.x;
+			var y2 = point2.y;
+			
+			/*
+			
+			(x-xa) * (yb - ya) = (y - ya) * (xb - xa)
+			
+			x * yb - x * ya - xa * yb + xa * ya = y * xb - y * xa - ya * xb + ya * xa
+			
+			y * xb - y * xa = x * yb - x * ya - xa * yb + xa * ya - ya * xa + ya * xb
+			
+			var tempKY = xb - xa;
+			var tempKX = yb - ya;
+			var tempC = - xa * yb + xa * ya - ya * xa + ya * xb;
+			
+			y * tempKY = tempKX * x + tempC
+			
+			var a = tempKX / tempKY;
+			var b = tempC / tempKY;
+			
+			var a = (y1 - y2) / (x1 - x2);
+			var b = y2 - a * x2;
+			*/
+			
+			
+			var tempKY = x2 - x1;
+			var tempKX = y2 - y1;
+			var tempC = - x1 * y2 + x1 * y1 - y1 * x1 + y1 * x2;
+			
+			if(tempKY === 0)
 			{
-				var A = plainEquation.a;
-				var B = plainEquation.b;
-				var C = plainEquation.c;
-				var D = plainEquation.d;
-				
-				var l = lineEquation.l;
-				var m = lineEquation.m;
-				var n = lineEquation.n;
-				var x1 = lineEquation.x1;
-				var y1 = lineEquation.y1;
-				var z1 = lineEquation.z1;
-				
-				var res = A * l + B * m + C * n;
-				
-				var z = null;
-				if(res !== 0)
+				var a = 0;
+				var b = x1;
+			}
+			else
+			{
+				var a = tempKX / tempKY;
+				var b = tempC / tempKY;
+			}
+			
+
+			/*var a = (y1 - y2) / (x1 - x2);
+			
+			if(x1 - x2 === 0)
+			{
+				a = 0;
+			}
+			
+			var b = y2 - a * x2;*/
+			
+			return {a: a, b: b};
+		};
+		
+		var getMinMaxPoints = function(points)
+		{
+			var minX, maxX, minY, maxY, minZ, maxZ;
+			
+			for(var n = 0; n < points.length; n++)
+			{
+				if(0 === n)
 				{
-					/*
-					x - x1 	 =  	y - y1 	 =  	z - z1
-					   l 			  m 			  n
-					
-					x = l * t - x1
-					y = m * t - y1
-					z = n * t - z1
-					==>
-					(l * t - x1; m * t - y1; n * t - z1)
-					
-					A * x + B * y + C * z + D = 0
-					==>
-					A * (l * t - x1) + B * (m * t - y1) + C * (n * t - z1) + D = 0
-					
-					==>
-					
-					A * l * t - A * x1 + B * m * t - B * y1 + C * n * t - C * z1 + D = 0
-					A * l * t + B * m * t + C * n * t = A * x1 + B * y1 + C * z1 - D
-					
-					==>
-					
-					t = (A * x1 + B * y1 + C * z1 - D) / (A * l + B * m + C * n)
-					z = n * t - z1;
-					*/
-					
-					var t = (B * y1 + C * z1 - D + A * x1) / (A * l + B * m + C * n);
-					
-					var x = l * t - x1;
-					var y = m * t - y1;
-					z = n * t - z1;
+					minX = points[0].x;
+					maxX = points[0].x;
+					minY = points[0].y;
+					maxY = points[0].y;
+					minZ = points[0].z;
+					maxZ = points[0].z;
 				}
-				
-				return z;
-			};
-			
-			
-			//уравнение плоскости
-			var isIntersectionPlainAndLine = function(plainEquation, lineEquation)
-			{
-				var A = plainEquation.a;
-				var B = plainEquation.b;
-				var C = plainEquation.c;
-				var D = plainEquation.d;
-				
-				var l = lineEquation.l;
-				var m = lineEquation.m;
-				var n = lineEquation.n;
-				var x1 = lineEquation.x1;
-				var y1 = lineEquation.y1;
-				var z1 = lineEquation.z1;
-				
-				
-				//x - x1		y - y1		z - z1
-				//			=			=			t
-				//  l			  m		 	  n
-				
-				/*x = t * l + x1
-				y = t * m + y1
-				z = t * n + z1*/
-				
-				
-				/*A * x + B * y + C * z + D = 0
-				
-				A * (t * l + x1) + B * (t * m + y1) + C * (t * n + z1) + D = 0;
-				
-				A * t * l + A * x1 + B * t * m + B * y1 + C * t * n + C * z1 + D
-				
-				A * t * l + B * t * m + C * t * n       + A * x1 + B * y1 + C * z1 + D*/
-				
-				var t = -(A * x1 + B * y1 + C * z1 + D) / (A * l + B * m + C * n); 
-				
-				var x = t * l + x1;
-				var y = t * m + y1;
-				var z = t * n + z1;
-				
-				return {x: x, y: y, z: z};
-			};
-			
-			var widthScreen = this.chartProp.widthCanvas - this.chartProp.chartGutter._right;
-			var centralViewPoint = {x: widthScreen / 2 - this.cChartDrawer.processor3D.cameraDiffX, y: heightGraph / 2 + this.chartProp.chartGutter._bottom, z: -this.cChartDrawer.processor3D.cameraDiffZ};
-			
-			
-			var firstVerges = [];
-			var lastVerges = [];
-			
-			
-			var getMinMaxPoints = function(points)
-			{
-				var minX, maxX, minY, maxY, minZ, maxZ;
-				
-				for(var n = 0; n < points.length; n++)
+				else
 				{
-					if(0 === n)
+					if(points[n].x < minX)
 					{
-						minX = points[0].x;
-						maxX = points[0].x;
-						minY = points[0].y;
-						maxY = points[0].y;
-						minZ = points[0].z;
-						maxZ = points[0].z;
+						minX = points[n].x;
 					}
-					else
+					
+					if(points[n].x > maxX)
 					{
-						if(points[n].x < minX)
-						{
-							minX = points[n].x;
-						}
-						
-						if(points[n].x > maxX)
-						{
-							maxX = points[n].x;
-						}
-						
-						if(points[n].y < minY)
-						{
-							minY = points[n].y;
-						}
-						
-						if(points[n].y > maxY)
-						{
-							maxY = points[n].y;
-						}
-						
-						if(points[n].z < minZ)
-						{
-							minZ = points[n].z;
-						}
-						
-						if(points[n].z > maxZ)
-						{
-							maxZ = points[n].z;
-						}
+						maxX = points[n].x;
+					}
+					
+					if(points[n].y < minY)
+					{
+						minY = points[n].y;
+					}
+					
+					if(points[n].y > maxY)
+					{
+						maxY = points[n].y;
+					}
+					
+					if(points[n].z < minZ)
+					{
+						minZ = points[n].z;
+					}
+					
+					if(points[n].z > maxZ)
+					{
+						maxZ = points[n].z;
 					}
 				}
-				
-				return {minX: minX, maxX: maxX, minY : minY, maxY: maxY, minZ: minZ, maxZ: maxZ};
-			};
+			}
 			
-			var t = this;
-			var isNotIntersectionVergesAndLine = function(lineEqucation, pointFromVerge)
+			return {minX: minX, maxX: maxX, minY : minY, maxY: maxY, minZ: minZ, maxZ: maxZ};
+		};
+		
+		var getAreaQuadrilateral = function(point0, point1, point2, point3)
+		{
+			//длины сторон
+			var a = Math.sqrt(Math.pow(point3.x - point0.x, 2) + Math.pow(point3.y - point0.y, 2));
+			var b = Math.sqrt(Math.pow(point1.x - point0.x, 2) + Math.pow(point1.x - point0.x, 2));
+			var c = Math.sqrt(Math.pow(point2.x - point1.x, 2) + Math.pow(point2.x - point1.x, 2));
+			var d = Math.sqrt(Math.pow(point3.x - point2.x, 2) + Math.pow(point3.x - point2.x, 2));
+			
+			//длины диагоналей
+			var e = Math.sqrt(Math.pow(point3.x - point1.x, 2) + Math.pow(point3.y - point1.y, 2));
+			var f = Math.sqrt(Math.pow(point0.x - point2.x, 2) + Math.pow(point0.y - point2.y, 2));
+			
+			//полупериметр
+			var p = (a + b + c + d) / 2;
+			
+			
+			var res = Math.sqrt((p - a) * (p - b) * (p - c) * (p - d) + (1/4) * ((e * f + a * c + b * d) * (e * f - a * c - b * d)));
+			
+			return res;
+		};
+		
+		var getAreaTriangle = function(point0, point1, point2)
+		{
+			//длины сторон
+			var a = Math.sqrt(Math.pow(point1.x - point0.x, 2) + Math.pow(point1.y - point0.y, 2));
+			var b = Math.sqrt(Math.pow(point2.x - point1.x, 2) + Math.pow(point2.x - point1.x, 2));
+			var c = Math.sqrt(Math.pow(point2.x - point0.x, 2) + Math.pow(point2.x - point0.x, 2));
+			
+			//полупериметр
+			var p = (a + b + c ) / 2;
+
+			var res = Math.sqrt(p * (p - a) * (p - b) * (p - c));
+			
+			return res;
+		};
+		
+		var t = this;
+		var isNotIntersectionVergesAndLine = function(lineEqucation, pointFromVerge)
+		{
+			var res = true;
+			
+			for(var k = 0; k < t.sortZIndexPaths.length; k++)
 			{
-				var res = true;
+				var plainEqucation = t.sortZIndexPaths[k].plainEquation;
 				
-				for(var k = 0; k < t.sortZIndexPaths.length; k++)
+				var nIntersectionPlainAndLine = isIntersectionPlainAndLine(plainEqucation ,lineEqucation);
+				if(null !== nIntersectionPlainAndLine && nIntersectionPlainAndLine.z < pointFromVerge.z)
 				{
-					var plainEqucation = t.sortZIndexPaths[k].plainEquation;
+					var minMaxpoints = getMinMaxPoints(t.sortZIndexPaths[k].points2);
+					var minX = minMaxpoints.minX, maxX = minMaxpoints.maxX, minY = minMaxpoints.minY, maxY = minMaxpoints.maxY, minZ = minMaxpoints.minZ, maxZ = minMaxpoints.maxZ;
 					
-					var nIntersectionPlainAndLine = isIntersectionPlainAndLine(plainEqucation ,lineEqucation);
-					if(null !== nIntersectionPlainAndLine && nIntersectionPlainAndLine.z < pointFromVerge.z)
+					
+					
+					//уравнения прямых, отсекающих плоскость
+					/*var line1 = getEquationLineOnPlane(t.sortZIndexPaths[k].points[0], t.sortZIndexPaths[k].points[1]);//left
+					var line2 = getEquationLineOnPlane(t.sortZIndexPaths[k].points[1], t.sortZIndexPaths[k].points[2]);//bottom
+					var line3 = getEquationLineOnPlane(t.sortZIndexPaths[k].points[2], t.sortZIndexPaths[k].points[3]);//right
+					var line4 = getEquationLineOnPlane(t.sortZIndexPaths[k].points[3], t.sortZIndexPaths[k].points[0]);//top*/
+					var convertnIntersectionPlainAndLine = t.cChartDrawer._convertAndTurnPoint(nIntersectionPlainAndLine.x, nIntersectionPlainAndLine.y, nIntersectionPlainAndLine.z, true);
+					var x = convertnIntersectionPlainAndLine.x;
+					var y = convertnIntersectionPlainAndLine.y;
+					
+					
+					if(x > minX && x < maxX && y > minY && y < maxY /*&& z > minZ && z < maxZ*/)
 					{
-						var minMaxpoints = getMinMaxPoints(t.sortZIndexPaths[k].points);
-						var minX = minMaxpoints.minX, maxX = minMaxpoints.maxX, minY = minMaxpoints.minY, maxY = minMaxpoints.maxY, minZ = minMaxpoints.minZ, maxZ = minMaxpoints.maxZ;
+						console.log("x: " + x + " ;y: " + y);
+						res = false;
+						break;
 						
 						
-						if(nIntersectionPlainAndLine.x > minX && nIntersectionPlainAndLine.x < maxX && nIntersectionPlainAndLine.y > minY && nIntersectionPlainAndLine.y < maxY && nIntersectionPlainAndLine.z > minZ && nIntersectionPlainAndLine.z < maxZ)
+						/*if(y < line2.a * x + line2.b && y > line4.a * x + line4.b && x > (y - line1.b) / line1.a && x < (y - line3.b) / line3.a)
 						{
+							console.log("x: " + x + " ;y: " + y);
 							res = false;
 							break;
-						}
-						
+						}*/
 					}
-				}
-				
-				return res;
-			};
-			
-			var isIntersectionVergePointsLinesWithAnotherVerges = function(plainVerge, centralViewPoint)
-			{
-				var res = true;
-				
-				for(var j = 0; j < plainVerge.points.length; j++)
-				{
-					var pointFromVerge = plainVerge.points[j];
 					
-					centralViewPoint.y = pointFromVerge.y;
-					centralViewPoint.x = pointFromVerge.x;
-					var lineEqucation = getLineEquation(pointFromVerge, centralViewPoint);
 					
-					//пересечение грани и прямой
-					var isFirstVerge = isNotIntersectionVergesAndLine(lineEqucation, pointFromVerge)
 					
-					if(false === isFirstVerge)
+					/*if(nIntersectionPlainAndLine.x > minX && nIntersectionPlainAndLine.x < maxX && nIntersectionPlainAndLine.y > minY && nIntersectionPlainAndLine.y < maxY && nIntersectionPlainAndLine.z > minZ && nIntersectionPlainAndLine.z < maxZ)
 					{
 						res = false;
 						break;
-					}
-				}
-				
-				return res;
-			};
-			
-			
-			
-			//перебираем все грани
-			for(var i = 0; i < this.sortZIndexPaths.length; i++)
-			{
-				var plainVerge = this.sortZIndexPaths[i];
-				var isFirstVerge = isIntersectionVergePointsLinesWithAnotherVerges(plainVerge, centralViewPoint);
-				
-				//push into array
-				if(isFirstVerge)
-				{
-					firstVerges.push(this.sortZIndexPaths[i]);
-				}
-				else
-				{
-					lastVerges.push(this.sortZIndexPaths[i]);
+					}*/
+					
 				}
 			}
-
-			this.sortZIndexPaths = lastVerges.concat(firstVerges);
-			this.sortZIndexPaths = firstVerges;
 			
-			/*this.sortZIndexPaths.sort(function sortArr(a, b)
+			return res;
+		};
+		
+		var isIntersectionVergePointsLinesWithAnotherVerges = function(plainVerge, centralViewPoint)
+		{
+			var res = true;
+			
+			for(var j = 0; j < plainVerge.points.length; j++)
 			{
-				if(b.zIndex == a.zIndex)
-					return  a.x - b.x;
-				else
-					return  b.zIndex - a.zIndex;
-			});*/
+				var pointFromVerge = plainVerge.points[j];
+				
+				//centralViewPoint.y = pointFromVerge.y;
+				centralViewPoint.x = pointFromVerge.x;
+				var lineEqucation = getLineEquation(pointFromVerge, centralViewPoint);
+				
+				//пересечение грани и прямой
+				var isFirstVerge = isNotIntersectionVergesAndLine(lineEqucation, pointFromVerge);
+				
+				if(false === isFirstVerge)
+				{
+					res = false;
+					break;
+				}
+			}
+			
+			return res;
+		};
+		
+		
+		
+		//перебираем все грани
+		for(var i = 0; i < this.sortZIndexPaths.length; i++)
+		{
+			var plainVerge = this.sortZIndexPaths[i];
+			var isFirstVerge = isIntersectionVergePointsLinesWithAnotherVerges(plainVerge, centralViewPoint);
+			
+			//push into array
+			if(isFirstVerge)
+			{
+				firstVerges.push(this.sortZIndexPaths[i]);
+			}
+			else
+			{
+				lastVerges.push(this.sortZIndexPaths[i]);
+			}
 		}
-    },
+
+		this.sortZIndexPaths = lastVerges.concat(firstVerges);
+		
+		
+		
+		
+		
+		
+		/*this.sortZIndexPaths.sort(function sortArr(a, b)
+		{
+			if(b.zIndex == a.zIndex)
+				return  a.x - b.x;
+			else
+				return  b.zIndex - a.zIndex;
+		});*/
+	},
 	
 	_getOptionsForDrawing: function(ser, point, onlyLessNull)
 	{
@@ -10205,16 +10294,16 @@ gridChart.prototype =
 			var rAngAx = this.cChartDrawer.processor3D.view3D.rAngAx;
 			var isVertLine = x === x1 ? true : false;
 			
-			var convertResult = this.cChartDrawer._convertAndTurnPoint(x, y, 0, angleOx, angleOy, angleOz);
+			var convertResult = this.cChartDrawer._convertAndTurnPoint(x, y, 0);
 			var x1n = convertResult.x;
 			var y1n = convertResult.y;
-			convertResult = this.cChartDrawer._convertAndTurnPoint(x, y, perspectiveDepth, angleOx, angleOy, angleOz);
+			convertResult = this.cChartDrawer._convertAndTurnPoint(x, y, perspectiveDepth);
 			var x2n = convertResult.x;
 			var y2n = convertResult.y;
-			convertResult = this.cChartDrawer._convertAndTurnPoint(x1, y1, perspectiveDepth, angleOx, angleOy, angleOz);
+			convertResult = this.cChartDrawer._convertAndTurnPoint(x1, y1, perspectiveDepth);
 			var x3n = convertResult.x;
 			var y3n = convertResult.y;
-			convertResult = this.cChartDrawer._convertAndTurnPoint(x1, y1, 0, angleOx, angleOy, angleOz);
+			convertResult = this.cChartDrawer._convertAndTurnPoint(x1, y1, 0);
 			var x4n = convertResult.x;
 			var y4n = convertResult.y;
 			
@@ -11699,19 +11788,19 @@ areaChart.prototype =
 		var angleOz = 0;
 		
 		
-		var convertResult = this.cChartDrawer._convertAndTurnPoint(leftMargin, heightGraph - bottomMargin, perspectiveDepth, angleOx, angleOy, angleOz);
+		var convertResult = this.cChartDrawer._convertAndTurnPoint(leftMargin, heightGraph - bottomMargin, perspectiveDepth);
 		var x1n = convertResult.x;
 		var y1n = convertResult.y;
-		convertResult = this.cChartDrawer._convertAndTurnPoint(widthGraph - rightMargin, heightGraph - bottomMargin, perspectiveDepth, angleOx, angleOy, angleOz);
+		convertResult = this.cChartDrawer._convertAndTurnPoint(widthGraph - rightMargin, heightGraph - bottomMargin, perspectiveDepth);
 		var x2n = convertResult.x;
 		var y2n = convertResult.y;
-		convertResult = this.cChartDrawer._convertAndTurnPoint(widthGraph - rightMargin, topMargin, perspectiveDepth, angleOx, angleOy, angleOz);
+		convertResult = this.cChartDrawer._convertAndTurnPoint(widthGraph - rightMargin, topMargin, perspectiveDepth);
 		var x3n = convertResult.x;
 		var y3n = convertResult.y;
-		convertResult = this.cChartDrawer._convertAndTurnPoint(leftMargin, topMargin, perspectiveDepth, angleOx, angleOy, angleOz);
+		convertResult = this.cChartDrawer._convertAndTurnPoint(leftMargin, topMargin, perspectiveDepth);
 		var x4n = convertResult.x;
 		var y4n = convertResult.y;
-		convertResult = this.cChartDrawer._convertAndTurnPoint(leftMargin, heightGraph - bottomMargin, perspectiveDepth, angleOx, angleOy, angleOz);
+		convertResult = this.cChartDrawer._convertAndTurnPoint(leftMargin, heightGraph - bottomMargin, perspectiveDepth);
 		var x5n = convertResult.x;
 		var y5n = convertResult.y;
 
