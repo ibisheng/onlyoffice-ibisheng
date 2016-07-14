@@ -54,6 +54,35 @@
 		end     : 2
 	};
 
+	function CKeyboardEventWrapper(e)
+	{
+		// emulate
+		this.altKey 	= e.altKey;
+		this.ctrlKey 	= e.ctrlKey;
+		this.metaKey 	= e.metaKey;
+		this.shiftKey 	= e.shiftKey;
+
+		this.charCode 	= e.charCode;
+		this.keyCode 	= e.keyCode;
+		this.which 		= e.which;
+
+		this.code 		= e.code;
+		this.key 		= e.key;
+
+		this.srcElement = e.srcElement;
+		this.target		= e.target;
+
+		// work
+		this._isDefaultPrevented = false;
+	}
+	CKeyboardEventWrapper.prototype =
+	{
+		preventDefault : function()
+		{
+			this._isDefaultPrevented = true;
+		}
+	};
+
 	function CTextInput(api)
 	{
 		this.Api = api;
@@ -78,6 +107,9 @@
 
 		this.nativeFocusElement = null;
 		this.InterfaceEnableKeyEvents = true;
+
+		this.ieNonCompositionPrefix = "";
+		this.ieNonCompositionPrefixConfirm = "";
 	}
 
 	CTextInput.prototype =
@@ -164,6 +196,10 @@
 				return oThis.onInput(e);
 			}, false);
 			this.HtmlArea.addEventListener("textInput", function(e)
+			{
+				return oThis.onTextInput(e);
+			}, false);
+			this.HtmlArea.addEventListener("text", function(e)
 			{
 				return oThis.onTextInput(e);
 			}, false);
@@ -254,11 +290,18 @@
 			this.HtmlDiv.style.top  = yPos + this.HtmlAreaOffset + "px"; // еще бы сдвинуться на высоту строки
 		},
 
-		clear : function()
+		clear : function(isFromCompositionEnd)
 		{
 			this.compositionValue = [];
 			this.compositionState = c_oCompositionState.end;
-			this.HtmlArea.value   = "";
+
+			if (isFromCompositionEnd !== true)
+			{
+				this.HtmlArea.value	= "";
+
+				this.ieNonCompositionPrefix = "";
+				this.ieNonCompositionPrefixConfirm = "";
+			}
 		},
 
 		show : function(isShow)
@@ -282,7 +325,7 @@
 			{
 				if (c_oCompositionState.process == this.compositionState)
 				{
-					this.checkTargetPosition();
+					this.checkTargetPosition(false);
 				}
 			}
 
@@ -320,7 +363,16 @@
 					}
 				}
 
-				this.clear();
+				if (!AscCommon.AscBrowser.isMozilla)
+				{
+					// у мозиллы есть проблемы, если делать тут clear
+					// например на корейском языке - слетает композиция в некоторых случаях
+					// (просто набор одного символа несколько раз подряд)
+					// поэтому очистку вставляем в текстовый евент.
+					// но для хрома есть мега заглушки на IsUseFirstTextInputAfterComposition
+					// поэтому разделяем
+					this.clear();
+				}
 			}
 		},
 
@@ -330,6 +382,12 @@
 			{
 				this.onCompositionEnd(e);
 				this.IsUseFirstTextInputAfterComposition = false;
+			}
+
+			if (AscCommon.AscBrowser.isMozilla)
+			{
+				if (c_oCompositionState.end == this.compositionState)
+					this.clear();
 			}
 		},
 
@@ -384,6 +442,17 @@
 			return oEvent.defaultPrevented;
 		},
 
+		isSpaceSymbol : function(e)
+		{
+			if (e.keyCode == 32)
+				return true;
+
+			if ((e.keyCode == 229) && ((e.code == "space") || (e.code == "Space") || (e.key == "Spacebar")))
+				return true;
+
+			return false;
+		},
+
 		onKeyDown : function(e)
 		{
 			if (c_oCompositionState.end != this.compositionState)
@@ -411,6 +480,17 @@
 			if (_code != 8 && _code != 46)
 				this.KeyDownFlag = true;
 
+			if (AscCommon.AscBrowser.isIE)
+			{
+				if (_code == 13 || this.isSpaceSymbol(e))
+				{
+					// не даем редактору превентить ничего
+					var _e = new CKeyboardEventWrapper(e);
+					this.Api.onKeyDown(_e);
+					return;
+				}
+			}
+
 			return this.Api.onKeyDown(e);
 		},
 
@@ -432,9 +512,9 @@
 				{
 					this.onCompositionEnd(e, this.HtmlArea.value);
 					this.IsUseFirstTextInputAfterComposition = false;
-				}
 
-				return;
+					return;
+				}
 			}
 
 			if (c_oCompositionState.end == this.compositionState)
@@ -448,10 +528,20 @@
 			}
 		},
 
-		checkTargetPosition : function()
+		checkTargetPosition : function(isCorrect)
 		{
 			var _offset = this.HtmlArea.selectionEnd;
-			_offset -= (this.HtmlArea.value.length - this.compositionValue.length);
+
+			if (false !== isCorrect)
+				_offset -= (this.HtmlArea.value.length - this.compositionValue.length);
+
+			if (!this.IsLockTargetMode)
+			{
+				// никакого смысла прыгать курсором туда-сюда
+				if (_offset == 0 && this.compositionValue.length == 1)
+					_offset = 1;
+			}
+
 			this.Api.Set_CursorPosInCompositeText(_offset);
 
 			this.unlockTarget();
@@ -492,10 +582,60 @@
 			this.Api.Begin_CompositeInput();
 		},
 
-		onCompositionUpdate : function(e, isLockTarget, _data)
+		onCompositionUpdate : function(e, isLockTarget, _data, isFromEnd)
 		{
 			var _old = this.compositionValue.splice(0);
-			this.checkCompositionData((_data != null) ? _data : e.data);
+
+			if (_data != null)
+			{
+				this.checkCompositionData(_data);
+			}
+			else
+			{
+				if (!e.target.msGetInputContext)
+				{
+					this.checkCompositionData(e.data);
+				}
+				else
+				{
+					var ctx = e.target.msGetInputContext();
+
+					/*
+					1) 	ie может не присылать onCompositionEnd (например при длительном наборе текста на японском)
+						в этом случае некоторая дата просто просто перестает быть частью композиции. Ее нужно ввести, а композицию продолжить
+					2) 	но, если пришел onCompositionEnd, то нужно запомнить эту дату (которая не в композиции) - но ее не вводить,
+						так как она дублируется (проверить можно на корейском вводе).
+
+					Поэтому действуем так: применяем дату на onCompositionUpdate, действуем аналогично при onCompositionEnd,
+					только не добавляем дату в редактор. А очищаем только на onInput, когда нет композиции
+					 */
+
+					if (undefined !== ctx.compositionStartOffset)
+					{
+						this.ieNonCompositionPrefix = "";
+						if (0 < ctx.compositionStartOffset)
+							this.ieNonCompositionPrefix = this.HtmlArea.value.substr(0, ctx.compositionStartOffset);
+
+						if (this.ieNonCompositionPrefix != this.ieNonCompositionPrefixConfirm)
+						{
+							var _newConfirm = this.ieNonCompositionPrefix.substr(this.ieNonCompositionPrefixConfirm.length);
+
+							this.ieNonCompositionPrefixConfirm = this.ieNonCompositionPrefix;
+
+							if (true !== isFromEnd)
+							{
+								this.checkCompositionData(_newConfirm);
+								this.Api.Replace_CompositeText(this.compositionValue);
+								this.Api.End_CompositeInput();
+
+								this.Api.Begin_CompositeInput();
+							}
+						}
+					}
+
+					this.checkCompositionData(e.data);
+				}
+			}
 
 			var _isEqualLen = (_old.length == this.compositionValue.length);
 			var _isEqual    = _isEqualLen;
@@ -536,22 +676,30 @@
 			this.compositionState = c_oCompositionState.process;
 		},
 
+		isWaitFirstTextInputEvent : function(e)
+		{
+			if (e.data === undefined || e.data === null)
+				return true;
+
+			if (AscCommon.AscBrowser.isChrome/* && AscCommon.AscBrowser.isLinuxOS*/ && e.data == "")
+				return true;
+
+			return false;
+		},
+
 		onCompositionEnd : function(e, _data)
 		{
-			if (!this.IsUseFirstTextInputAfterComposition &&
-				AscCommon.AscBrowser.isChrome &&
-				AscCommon.AscBrowser.isLinuxOS &&
-				(e.data == null || e.data == ""))
+			if (!this.IsUseFirstTextInputAfterComposition && this.isWaitFirstTextInputEvent(e))
 			{
 				// always data == ""
 				this.IsUseFirstTextInputAfterComposition = true;
 				return;
 			}
 
-			this.onCompositionUpdate(e, false, _data);
+			this.onCompositionUpdate(e, false, _data, true);
 			this.Api.Set_CursorPosInCompositeText(1000); // max
 
-			this.clear();
+			this.clear(true);
 			this.Api.End_CompositeInput();
 
 			this.unlockTarget();
@@ -638,6 +786,9 @@
 
 	window['AscCommon'].InitBrowserInputContext = function(api, target_id)
 	{
+		if (window['AscCommon'].g_inputContext)
+			return;
+
 		window['AscCommon'].g_inputContext = new CTextInput(api);
 		window['AscCommon'].g_inputContext.init(target_id);
 		window['AscCommon'].g_clipboardBase.Init(api);
