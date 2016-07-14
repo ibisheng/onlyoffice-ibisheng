@@ -613,7 +613,6 @@
      * @param {Array} aCatNames
      * @param {EMU} nWidth
      * @param {EMU} nHeight
-     * @param {EMU} nHeight
      * @param {number} nStyleIndex
      * @returns {ApiChart}
      * */
