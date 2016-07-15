@@ -4708,23 +4708,6 @@ Asc['asc_docs_api'].prototype.ImgApply = function(obj)
     }
 };
 
-Asc['asc_docs_api'].prototype.IncreaseIndent = function()
-{
-    if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Paragraph_Properties) )
-    {
-        this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
-        this.WordControl.m_oLogicDocument.Paragraph_IncDecIndent( true );
-    }
-};
-Asc['asc_docs_api'].prototype.DecreaseIndent = function()
-{
-    if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Paragraph_Properties) )
-    {
-        this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
-        this.WordControl.m_oLogicDocument.Paragraph_IncDecIndent( false );
-    }
-};
-
 Asc['asc_docs_api'].prototype.MergeCells = function()
 {
     if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Table_Properties) )
