@@ -1382,21 +1382,29 @@ CPresentation.prototype =
     Check_GraphicFrameRowHeight: function(grFrame)
     {
         grFrame.recalculate();
-        var content = grFrame.graphicObject.Content, i;
+        var content = grFrame.graphicObject.Content, i, j;
         for(i = 0; i < content.length; ++i)
         {
-            var ResultHeight;
-            ResultHeight = content[i].Height;
-            var FirstCell = content[i].Content[0];
-            if(FirstCell)
-            {
-                var oMargins = FirstCell.Get_Margins();
-                if(oMargins)
-                {
-                    ResultHeight -= (oMargins.Top + oMargins.Bottom);
-        }
-            }
-            content[i].Set_Height(ResultHeight, Asc.linerule_AtLeast );
+			var row = content[i];
+			var fMaxTopMargin = 0, fMaxBottomMargin = 0, fMaxTopBorder = 0, fMaxBottomBorder = 0;
+			for(j = 0;  j < row.Content.length; ++j){
+				var oCell = row.Content[j];
+				var oMargins = oCell.Get_Margins();
+				if(oMargins.Bottom.W > fMaxBottomMargin){
+					fMaxBottomMargin = oMargins.Bottom.W;
+				}
+				if(oMargins.Top.W > fMaxTopMargin){
+					fMaxTopMargin = oMargins.Top.W;
+				}
+				var oBorders = oCell.Get_Borders();
+				if(oBorders.Top.Size > fMaxTopBorder){
+					fMaxTopBorder = oBorders.Top.Size;
+				}
+				if(oBorders.Bottom.Size > fMaxBottomBorder){
+					fMaxBottomBorder = oBorders.Bottom.Size;
+				}
+			}
+            row.Set_Height(row.Height - fMaxTopMargin - fMaxBottomMargin - fMaxTopBorder/2 - fMaxBottomBorder/2, Asc.linerule_AtLeast );
         }
     },
 

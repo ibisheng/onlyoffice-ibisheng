@@ -519,7 +519,7 @@ function CheckSpPrXfrm2(object)
 
 function getObjectsByTypesFromArr(arr, bGrouped)
 {
-    var ret = {shapes: [], images: [], groups: [], charts: [], tables: []};
+    var ret = {shapes: [], images: [], groups: [], charts: [], tables: [], oleObjects: []};
     var selected_objects = arr;
     for(var i = 0;  i < selected_objects.length; ++i)
     {
@@ -533,9 +533,13 @@ function getObjectsByTypesFromArr(arr, bGrouped)
                 break;
             }
             case AscDFH.historyitem_type_ImageShape:
-            case AscDFH.historyitem_type_OleObject:
             {
                 ret.images.push(drawing);
+                break;
+            }
+            case AscDFH.historyitem_type_OleObject:
+            {
+                ret.oleObjects.push(drawing);
                 break;
             }
             case AscDFH.historyitem_type_GroupShape:
@@ -547,7 +551,8 @@ function getObjectsByTypesFromArr(arr, bGrouped)
                     ret.shapes = ret.shapes.concat(by_types.shapes);
                     ret.images = ret.images.concat(by_types.images);
                     ret.charts = ret.charts.concat(by_types.charts);
-                    ret.tables = ret.tables.concat(by_types.charts);
+                    ret.tables = ret.tables.concat(by_types.tables);
+                    ret.oleObjects = ret.oleObjects.concat(by_types.oleObjects);
                 }
                 break;
             }
@@ -2369,6 +2374,29 @@ DrawingObjectsController.prototype =
                         checkObjectInArray(aGroups, objects_by_type.charts[i].group.getMainGroup());
                     }
                     objects_by_type.charts[i].checkDrawingBaseCoords();
+                }
+                for(i = 0; i < objects_by_type.oleObjects.length; ++i)
+                {
+                    CheckSpPrXfrm(objects_by_type.oleObjects[i]);
+                    objects_by_type.oleObjects[i].spPr.xfrm.setExtX(props.Width);
+                    objects_by_type.oleObjects[i].spPr.xfrm.setExtY(props.Height);
+                    if(objects_by_type.oleObjects[i].group)
+                    {
+                        checkObjectInArray(aGroups, objects_by_type.oleObjects[i].group.getMainGroup());
+                    }
+
+                    var api = window.editor || window.Asc.editor;
+                    if(api)
+                    {
+                        var pluginData = new Asc.CPluginData();
+                        pluginData.setAttribute("data", objects_by_type.oleObjects[i].m_sData);
+                        pluginData.setAttribute("guid", objects_by_type.oleObjects[i].m_sApplicationId);
+                        pluginData.setAttribute("width", objects_by_type.oleObjects[i].spPr.xfrm.extX);
+                        pluginData.setAttribute("height", objects_by_type.oleObjects[i].spPr.xfrm.extY);
+                        pluginData.setAttribute("objectId", objects_by_type.oleObjects[i].Get_Id());
+                        api.asc_pluginResize(pluginData);
+                    }
+                    objects_by_type.oleObjects[i].checkDrawingBaseCoords();
                 }
             }
         }
@@ -6542,6 +6570,55 @@ DrawingObjectsController.prototype =
                     }
                     break;
                 }
+                case AscDFH.historyitem_type_OleObject:
+                {
+                    var pluginData = new Asc.CPluginData();
+                    pluginData.setAttribute("data", drawing.m_sData);
+                    pluginData.setAttribute("guid", drawing.m_sApplicationId);
+                    pluginData.setAttribute("width", drawing.extX);
+                    pluginData.setAttribute("height", drawing.extY);
+                    pluginData.setAttribute("widthPix", drawing.m_nPixWidth);
+                    pluginData.setAttribute("heightPix", drawing.m_nPixHeight);
+                    pluginData.setAttribute("objectId", drawing.Id);
+                    new_image_props =
+                    {
+                        ImageUrl: drawing.getImageUrl(),
+                        w: drawing.extX,
+                        h: drawing.extY,
+                        locked: locked,
+                        x: drawing.x,
+                        y: drawing.y,
+                        lockAspect: lockAspect,
+                        pluginGuid: drawing.m_sApplicationId,
+                        pluginData: pluginData,
+                        oleWidth: drawing.m_fDefaultSizeX,
+                        oleHeight: drawing.m_fDefaultSizeY
+                    };
+                    if(!image_props)
+                        image_props = new_image_props;
+                    else
+                    {
+                        image_props.ImageUrl = null;
+                        if(image_props.w != null && image_props.w !== new_image_props.w)
+                            image_props.w = null;
+                        if(image_props.h != null && image_props.h !== new_image_props.h)
+                            image_props.h = null;
+                        if(image_props.x != null && image_props.x !== new_image_props.x)
+                            image_props.x = null;
+                        if(image_props.y != null && image_props.y !== new_image_props.y)
+                            image_props.y = null;
+
+                        if(image_props.locked || new_image_props.locked)
+                            image_props.locked = true;
+                        if(image_props.lockAspect || new_image_props.lockAspect)
+                            image_props.lockAspect = false;
+                        image_props.pluginGuid = null;
+                        image_props.pluginData = undefined;
+                        image_props.oleWidth = undefined;
+                        image_props.oleHeight = undefined;
+                    }
+                    break;
+                }
                 case AscDFH.historyitem_type_ChartSpace:
                 {
                     var type_subtype = drawing.getTypeSubType();
@@ -6962,6 +7039,14 @@ DrawingObjectsController.prototype =
             image_props.ImageUrl = props.imageProps.ImageUrl;
             image_props.Locked = props.imageProps.locked === true;
             image_props.lockAspect = props.imageProps.lockAspect;
+
+
+            image_props.pluginGuid = props.imageProps.pluginGuid;
+            image_props.pluginData = props.imageProps.pluginData;
+
+            image_props.oleWidth = props.imageProps.oleWidth;
+            image_props.oleHeight = props.imageProps.oleHeight;
+
             if(!bParaLocked)
             {
                 bParaLocked = image_props.Locked;

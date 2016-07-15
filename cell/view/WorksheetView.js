@@ -11028,38 +11028,37 @@
         return this._replaceCellsText( aReplaceCells, options, lockDraw, callback );
     };
 
-    WorksheetView.prototype._replaceCellsText = function ( aReplaceCells, options, lockDraw, callback ) {
+    WorksheetView.prototype._replaceCellsText = function (aReplaceCells, options, lockDraw, callback) {
         var t = this;
         var findFlags = "g"; // Заменяем все вхождения
-        if ( true !== options.isMatchCase ) {
+        if (true !== options.isMatchCase) {
             findFlags += "i";
         } // Не чувствителен к регистру
 
         var valueForSearching = options.findWhat
-            .replace( /(\\)/g, "\\\\" ).replace( /(\^)/g, "\\^" )
-            .replace( /(\()/g, "\\(" ).replace( /(\))/g, "\\)" )
-            .replace( /(\+)/g, "\\+" ).replace( /(\[)/g, "\\[" )
-            .replace( /(\])/g, "\\]" ).replace( /(\{)/g, "\\{" )
-            .replace( /(\})/g, "\\}" ).replace( /(\$)/g, "\\$" )
-            .replace( /(~)?\*/g, function ( $0, $1 ) {
-                return $1 ? $0 : '(.*)';
-            } )
-            .replace( /(~)?\?/g, function ( $0, $1 ) {
-                return $1 ? $0 : '.';
-            } )
-            .replace( /(~\*)/g, "\\*" ).replace( /(~\?)/g, "\\?" );
-        valueForSearching = new RegExp( valueForSearching, findFlags );
+          .replace(/(\\)/g, "\\\\").replace(/(\^)/g, "\\^")
+          .replace(/(\()/g, "\\(").replace(/(\))/g, "\\)")
+          .replace(/(\+)/g, "\\+").replace(/(\[)/g, "\\[")
+          .replace(/(\])/g, "\\]").replace(/(\{)/g, "\\{")
+          .replace(/(\})/g, "\\}").replace(/(\$)/g, "\\$")
+          .replace(/(~)?\*/g, function ($0, $1) {
+              return $1 ? $0 : '(.*)';
+          })
+          .replace(/(~)?\?/g, function ($0, $1) {
+              return $1 ? $0 : '.';
+          })
+          .replace(/(~\*)/g, "\\*").replace(/(~\?)/g, "\\?").replace(/(\.)/g, "\\.");
+        valueForSearching = new RegExp(valueForSearching, findFlags);
 
         options.indexInArray = 0;
         options.countFind = aReplaceCells.length;
         options.countReplace = 0;
-        if ( options.isReplaceAll && false === this.collaborativeEditing.getCollaborativeEditing() ) {
-            this._isLockedCells( aReplaceCells, /*subType*/null, function () {
-                t._replaceCellText( aReplaceCells, valueForSearching, options, lockDraw, callback, true );
-            } );
-        }
-        else {
-            this._replaceCellText( aReplaceCells, valueForSearching, options, lockDraw, callback, false );
+        if (options.isReplaceAll && false === this.collaborativeEditing.getCollaborativeEditing()) {
+            this._isLockedCells(aReplaceCells, /*subType*/null, function () {
+                t._replaceCellText(aReplaceCells, valueForSearching, options, lockDraw, callback, true);
+            });
+        } else {
+            this._replaceCellText(aReplaceCells, valueForSearching, options, lockDraw, callback, false);
         }
     };
 
@@ -13453,7 +13452,7 @@
 				History.EndTransaction();
 			};
 
-			var changedRange = new asc_Range( arn.c1, arn.r1, arn.c2, gc_nMaxRow0 );
+			var changedRange = new asc_Range( tablePart.Ref.c1, tablePart.Ref.r1, tablePart.Ref.c2, tablePart.Ref.r2 );
 			t._isLockedCells( changedRange, null, callback );
 		};
 		
@@ -13567,7 +13566,7 @@
 				History.EndTransaction();
 			};
 
-			var changedRange = new asc_Range( arn.c1, arn.r1, gc_nMaxCol0, arn.r2 );
+			var changedRange = new asc_Range( tablePart.Ref.c1, tablePart.Ref.r1, tablePart.Ref.c2, tablePart.Ref.r2 );
 			t._isLockedCells( changedRange, null, callback );
 		};
 		
@@ -13840,6 +13839,7 @@
 		//если внутри находится вся активная область(кроме строки заголовков) или если выходит активная область за границу снизу
 		insertRowAbove = !!(((acitveRange.r1 > refTable.r1 && tablePart.HeaderRowCount === null) || (acitveRange.r1 >= refTable.r1 && tablePart.HeaderRowCount !== null)) && (refTableContainsActiveRange || (acitveRange.r2 > refTable.r2 && acitveRange.c1 >= refTable.c1 && acitveRange.c2 <= refTable.c2 && acitveRange.r1 >= refTable.r1)));
 		
+		deleteRow = acitveRange.r1 <= refTable.r1 && acitveRange.r2 >= refTable.r1 && null === tablePart.HeaderRowCount ? false : true;
 		
 		return {insertRowAbove: insertRowAbove, insertRowBelow: insertRowBelow, insertColumnLeft: insertColumnLeft, insertColumnRight: insertColumnRight, deleteRow: deleteRow, deleteColumn: deleteColumn, deleteTable: deleteTable};
 	};

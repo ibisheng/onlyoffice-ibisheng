@@ -553,7 +553,13 @@
 				if(filterObj.filter.TableStyleInfo !== undefined)
 					autoFilter = filterObj.filter.AutoFilter;	
 				if(!autoFilter)
+				{
 					autoFilter = new AscCommonExcel.AutoFilter();
+					autoFilter.Ref = currentFilter.Ref.clone();
+					
+					filterObj.filter.AutoFilter = autoFilter;
+				}
+				
 				var newFilterColumn;
 				if(filterObj.index !== null)
 				{
@@ -1126,7 +1132,7 @@
 					var bbox = oRange.getBBox0();
 
 					//смотрим находится ли фильтр(первая его строчка) внутри выделенного фрагмента
-					if (activeCells.containsFirstLineRange(bbox)) {
+					if ((activeCells.containsFirstLineRange(bbox) && !isTablePart) || (isTablePart && activeCells.containsRange(bbox))) {
 						if(isTablePart)
 							oRange.setTableStyle(null);
 						else
@@ -1494,13 +1500,13 @@
 					var oldFilter = null;
 					if(activeRange.c1 <= ref.c1 && activeRange.c2 >= ref.c2)
 					{
-						if(activeRange.r1 <= ref.r1)//until
+						if(activeRange.r1 < ref.r1)//until
 						{
 							oldFilter = filter.clone(null);
 							
 							filter.moveRef(null, diff, t.worksheet);
 						}
-						else if(activeRange.r1 > ref.r1 && activeRange.r2 <= ref.r2)//inside
+						else if(activeRange.r1 >= ref.r1 && activeRange.r2 <= ref.r2)//inside
 						{
 							oldFilter = filter.clone(null);
 							

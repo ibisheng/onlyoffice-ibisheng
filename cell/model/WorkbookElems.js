@@ -5591,12 +5591,19 @@ Filters.prototype.init = function(obj) {
 		{
 			if(obj.values[i].isDateFormat)
 			{
-				var dateGroupItem = new DateGroupItem();
-				var autoFilterDateElem = new AutoFilterDateElem(obj.values[i].val, obj.values[i].val, 1);
-				dateGroupItem.convertRangeToDateGroupItem(autoFilterDateElem);
-				autoFilterDateElem.convertDateGroupItemToRange(dateGroupItem);
-				
-				this.Dates.push(autoFilterDateElem);
+				if(obj.values[i].text === "")
+				{
+					this.Blank = true;
+				}
+				else
+				{
+					var dateGroupItem = new DateGroupItem();
+					var autoFilterDateElem = new AutoFilterDateElem(obj.values[i].val, obj.values[i].val, 1);
+					dateGroupItem.convertRangeToDateGroupItem(autoFilterDateElem);
+					autoFilterDateElem.convertDateGroupItemToRange(dateGroupItem);
+					
+					this.Dates.push(autoFilterDateElem);
+				}
 			}
 			else
 			{
@@ -5618,15 +5625,26 @@ Filters.prototype.isHideValue = function(val, isDateTimeFormat) {
 	var res = false;
 	
 	if(isDateTimeFormat && this.Dates)
-		res = this.binarySearch(val, this.Dates) !== -1 ? false : true;
+	{
+		if(val === "")
+		{
+			res = !this.Blank ? true : false;
+		}
+		else
+		{
+			res = this.binarySearch(val, this.Dates) !== -1 ? false : true;
+		}
+	}
 	else if(this.Values)
 	{
 		if(val === "")
 		{
 			res = !this.Blank ? true : false;
 		}
-		else		
+		else
+		{
 			res = !this.lowerCaseValues[val] ? true : false;
+		}
 	}
 	
 	return res;

@@ -5940,6 +5940,9 @@ function BinaryPPTYLoader()
 
         s.Skip2(1); // start attributes
 
+		var fMaxTopMargin = 0, fMaxBottomMargin = 0, fMaxTopBorder = 0, fMaxBottomBorder = 0;
+		
+		var fRowHeight = 5;
         while (true)
         {
             var _at = s.GetUChar();
@@ -5950,7 +5953,8 @@ function BinaryPPTYLoader()
             {
                 case 0:
                 {
-                    row.Set_Height(s.GetULong() / 36000, Asc.linerule_AtLeast);
+					fRowHeight = s.GetULong() / 36000;
+                   
                     break;
                 }
                 default:
@@ -5961,53 +5965,75 @@ function BinaryPPTYLoader()
         s.Skip2(5); // type + len
         var _count = s.GetULong();
 
-        if (true)
-        {
-            for (var i = 0; i < _count; i++)
-            {
-                s.Skip2(1);
-                var bIsNoHMerge = this.ReadCell(row.Content[i]);
-                if (bIsNoHMerge === false)
-                {
-                    row.Remove_Cell(i);
-                    i--;
-                    _count--;
-                }
-                var _gridCol = 1;
-                if ("number" == typeof (row.Content[i].Pr.GridSpan))
-                {
-                    _gridCol = row.Content[i].Pr.GridSpan;
-                }
+		for (var i = 0; i < _count; i++)
+		{
+			s.Skip2(1);
+			var bIsNoHMerge = this.ReadCell(row.Content[i]);
+			if (bIsNoHMerge === false)
+			{
+				row.Remove_Cell(i);
+				i--;
+				_count--;
+			}
+			var _gridCol = 1;
+			if ("number" == typeof (row.Content[i].Pr.GridSpan))
+			{
+				_gridCol = row.Content[i].Pr.GridSpan;
+			}
 
-                if (_gridCol > (_count - i))
-                {
-                    _gridCol = _count - i;
-                    row.Content[i].Pr.GridSpan = _gridCol;
-                    if (1 == row.Content[i].Pr.GridSpan)
-                        row.Content[i].Pr.GridSpan = undefined;
-                }
+			if (_gridCol > (_count - i))
+			{
+				_gridCol = _count - i;
+				row.Content[i].Pr.GridSpan = _gridCol;
+				if (1 == row.Content[i].Pr.GridSpan)
+					row.Content[i].Pr.GridSpan = undefined;
+			}
 
-                _gridCol--;
-                while (_gridCol > 0)
-                {
-                    i++;
-                    if (i >= _count)
-                        break;
+			_gridCol--;
+			while (_gridCol > 0)
+			{
+				i++;
+				if (i >= _count)
+					break;
 
-                    s.Skip2(1);
-                    this.ReadCell(row.Content[i]);
+				s.Skip2(1);
+				this.ReadCell(row.Content[i]);
 
-                    // удаляем
-                    row.Remove_Cell(i);
-                    i--;
-                    _count--;
+				// удаляем
+				row.Remove_Cell(i);
+				i--;
+				_count--;
 
-                    --_gridCol;
-                }
-            }
-        }
+				--_gridCol;
+			}
+		}
 
-        /*
+		var bLoadVal = AscCommon.g_oIdCounter.m_bLoad;
+		var bRead = AscCommon.g_oIdCounter.m_bRead;
+		AscCommon.g_oIdCounter.m_bLoad = false;
+		AscCommon.g_oIdCounter.m_bRead = false;
+		
+        for(i = 0;  i < row.Content.length; ++i){
+			var oCell = row.Content[i];
+			var oMargins = oCell.Get_Margins();
+			if(oMargins.Bottom.W > fMaxBottomMargin){
+				fMaxBottomMargin = oMargins.Bottom.W;
+			}
+			if(oMargins.Top.W > fMaxTopMargin){
+				fMaxTopMargin = oMargins.Top.W;
+			}
+			var oBorders = oCell.Get_Borders();
+			if(oBorders.Top.Size > fMaxTopBorder){
+				fMaxTopBorder = oBorders.Top.Size;
+			}
+			if(oBorders.Bottom.Size > fMaxBottomBorder){
+				fMaxBottomBorder = oBorders.Bottom.Size;
+			}
+		}
+		AscCommon.g_oIdCounter.m_bLoad = bLoadVal;
+		AscCommon.g_oIdCounter.m_bRead = bRead;
+		 row.Set_Height(Math.max(1, fRowHeight - fMaxTopMargin - fMaxBottomMargin - fMaxTopBorder/2 - fMaxBottomBorder/2), Asc.linerule_AtLeast);
+		/*
         if (row.Content.length == _count)
         {
             for (var i = 0; i < _count; i++)

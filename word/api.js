@@ -655,7 +655,8 @@
 	asc_docs_api.prototype.SetReaderModeOnly = function()
 	{
 		this.isOnlyReaderMode                       = true;
-		this.ImageLoader.bIsAsyncLoadDocumentImages = false;
+		if (this.ImageLoader)
+			this.ImageLoader.bIsAsyncLoadDocumentImages = false;
 	};
 
 	asc_docs_api.prototype.IncreaseReaderFontSize = function()
@@ -5603,12 +5604,14 @@ background-repeat: no-repeat;\
 					this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_EditOleObject);
 					this.WordControl.m_oLogicDocument.Edit_OleObject(oOleObject, sData, sImageUrl, nPixWidth, nPixHeight);
 					this.WordControl.m_oLogicDocument.Recalculate();
+                    this.WordControl.m_oLogicDocument.Document_UpdateInterfaceState();
 				}
 			}
 			else
 			{
 				this.WordControl.m_oLogicDocument.Edit_OleObject(oOleObject, sData, sImageUrl, nPixWidth, nPixHeight);
 				this.WordControl.m_oLogicDocument.Recalculate();
+                this.WordControl.m_oLogicDocument.Document_UpdateInterfaceState();
 			}
 		}
 	};
@@ -6661,7 +6664,6 @@ background-repeat: no-repeat;\
 				if (this.bInit_word_control === false)
 				{
 					this.bInit_word_control = true;
-					this.pluginsManager     = Asc.createPluginsManager(this);
 					this.asc_fireCallback("asc_onDocumentContentReady");
 				}
 			}
@@ -6760,7 +6762,6 @@ background-repeat: no-repeat;\
 		if (false === this.isSaveFonts_Images)
 		{
 			this.bInit_word_control = true;
-			this.pluginsManager     = Asc.createPluginsManager(this);
 			this.asc_fireCallback("asc_onDocumentContentReady");
 		}
 
@@ -7908,6 +7909,9 @@ background-repeat: no-repeat;\
 		this.asc_setDrawCollaborationMarks(this.tmpCoMarksDraw);
 
 		asc_docs_api.superclass._onEndLoadSdk.call(this);
+
+		if (this.isOnlyReaderMode)
+			this.ImageLoader.bIsAsyncLoadDocumentImages = false;
 	};
 
 	asc_docs_api.prototype.asc_Recalculate = function(bIsUpdateInterface)

@@ -174,11 +174,6 @@
 
 			t.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
 		});
-		// init drag&drop
-		AscCommon.InitDragAndDrop(this.HtmlElement, function(error, files)
-		{
-			t._uploadCallback(error, files);
-		});
 
 		AscCommon.loadSdk(this._editorNameById(), function()
 		{
@@ -862,7 +857,7 @@
 	// Offline mode
 	baseEditorsApi.prototype.asc_isOffline  = function()
 	{
-		return false;
+		return (window.location.protocol.indexOf("file") == 0) ? true : false;
 	};
 	baseEditorsApi.prototype.asc_getUrlType = function(url)
 	{
@@ -886,6 +881,13 @@
 	};
 	baseEditorsApi.prototype._onEndLoadSdk = function()
 	{
+		// init drag&drop
+		var t = this;
+		AscCommon.InitDragAndDrop(this.HtmlElement, function(error, files)
+		{
+			t._uploadCallback(error, files);
+		});
+
 		AscFonts.g_fontApplication.Init();
 
 		this.FontLoader  = AscCommon.g_font_loader;
@@ -905,6 +907,8 @@
 		{
 			this.asc_enableKeyEvents(this.tmpFocus);
 		}
+
+		this.pluginsManager     = Asc.createPluginsManager(this);
 	};
 
 	baseEditorsApi.prototype.sendStandartTextures = function()
