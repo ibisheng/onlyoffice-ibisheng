@@ -9412,17 +9412,34 @@
                 }
                 else 
 				{
-                    AscCommon.sendImgUrls( api, oObjectsForDownload.aUrls, function ( data ) {
-                        var oImageMap = {};
-                        AscCommon.ResetNewUrls( data, oObjectsForDownload.aUrls, oObjectsForDownload.aBuilderImagesByUrl, oImageMap );
+					if(window["NATIVE_EDITOR_ENJINE"])
+					{
+						var oImageMap = {};
+						AscCommon.ResetNewUrls( data, oObjectsForDownload.aUrls, oObjectsForDownload.aBuilderImagesByUrl, oImageMap );
 
-                        if ( pasteContent.props.onlyImages !== true ) {
-                            t._pasteData( isLargeRange, isLocal, pasteContent, bIsUpdate, canChangeColWidth );
-                        }
-                        api.wb.clipboard.pasteProcessor._insertImagesFromBinaryWord( t, pasteContent, oImageMap );
-                        //закрываем транзакцию, поскольку в setSelectionInfo она не закроется
-                        History.EndTransaction();
-                    }, true );
+						if ( pasteContent.props.onlyImages !== true ) 
+						{
+							t._pasteData( isLargeRange, isLocal, pasteContent, bIsUpdate, canChangeColWidth );
+						}
+						api.wb.clipboard.pasteProcessor._insertImagesFromBinaryWord( t, pasteContent, oImageMap );
+						
+						isEndTransaction = true;
+					}
+					else
+					{
+						AscCommon.sendImgUrls( api, oObjectsForDownload.aUrls, function ( data ) {
+							var oImageMap = {};
+							AscCommon.ResetNewUrls( data, oObjectsForDownload.aUrls, oObjectsForDownload.aBuilderImagesByUrl, oImageMap );
+
+							if ( pasteContent.props.onlyImages !== true ) {
+								t._pasteData( isLargeRange, isLocal, pasteContent, bIsUpdate, canChangeColWidth );
+							}
+							api.wb.clipboard.pasteProcessor._insertImagesFromBinaryWord( t, pasteContent, oImageMap );
+							//закрываем транзакцию, поскольку в setSelectionInfo она не закроется
+							History.EndTransaction();
+						}, true );
+					}
+					
                 }
             }
             else if ( pasteContent.props.onlyImages !== true ) 
