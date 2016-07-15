@@ -1897,44 +1897,49 @@ Asc['asc_docs_api'].prototype["Call_Menu_Event"] = function(type, _params)
                     case 21:
                     {
                         var bIsNeed = _params[_current.pos++];
-
+                        
                         if (bIsNeed)
                         {
-                            var _originSize = this.WordControl.m_oDrawingDocument.Native["DD_GetOriginalImageSize"](_imagePr.ImageUrl);
-                            var _w = _originSize[0];
-                            var _h = _originSize[1];
-
-                            // сбрасываем урл
-                            _imagePr.ImageUrl = undefined;
-
-                            var _section_select = this.WordControl.m_oLogicDocument.Get_PageSizesByDrawingObjects();
-                            var _page_width = AscCommon.Page_Width;
-                            var _page_height = AscCommon.Page_Height;
-                            var _page_x_left_margin = AscCommon.X_Left_Margin;
-                            var _page_y_top_margin = AscCommon.Y_Top_Margin;
-                            var _page_x_right_margin = AscCommon.X_Right_Margin;
-                            var _page_y_bottom_margin = AscCommon.Y_Bottom_Margin;
-
-                            if (_section_select)
-                            {
-                                if (_section_select.W)
-                                    _page_width = _section_select.W;
-
-                                if (_section_select.H)
-                                    _page_height = _section_select.H;
+                            var currImage = this.WordControl.m_oLogicDocument.DrawingObjects.Get_Props();
+                            if (currImage && currImage.length) {
+                               
+                                var _originSize = this.WordControl.m_oDrawingDocument.Native["DD_GetOriginalImageSize"](currImage[0].ImageUrl);
+                                
+                                var _w = _originSize[0];
+                                var _h = _originSize[1];
+                                
+                                // сбрасываем урл
+                                _imagePr.ImageUrl = undefined;
+                                
+                                var _section_select = this.WordControl.m_oLogicDocument.Get_PageSizesByDrawingObjects();
+                                var _page_width = AscCommon.Page_Width;
+                                var _page_height = AscCommon.Page_Height;
+                                var _page_x_left_margin = AscCommon.X_Left_Margin;
+                                var _page_y_top_margin = AscCommon.Y_Top_Margin;
+                                var _page_x_right_margin = AscCommon.X_Right_Margin;
+                                var _page_y_bottom_margin = AscCommon.Y_Bottom_Margin;
+                                
+                                if (_section_select)
+                                {
+                                    if (_section_select.W)
+                                        _page_width = _section_select.W;
+                                    
+                                    if (_section_select.H)
+                                        _page_height = _section_select.H;
+                                }
+                                
+                                var __w = Math.max(1, _page_width - (_page_x_left_margin + _page_x_right_margin));
+                                var __h = Math.max(1, _page_height - (_page_y_top_margin + _page_y_bottom_margin));
+                                
+                                var wI = (undefined !== _w) ? Math.max(_w * AscCommon.g_dKoef_pix_to_mm, 1) : 1;
+                                var hI = (undefined !== _h) ? Math.max(_h * AscCommon.g_dKoef_pix_to_mm, 1) : 1;
+                                
+                                wI = Math.max(5, Math.min(wI, __w));
+                                hI = Math.max(5, Math.min(hI, __h));
+                                
+                                _imagePr.Width = wI;
+                                _imagePr.Height = hI;
                             }
-
-                            var __w = Math.max(1, _page_width - (_page_x_left_margin + _page_x_right_margin));
-                            var __h = Math.max(1, _page_height - (_page_y_top_margin + _page_y_bottom_margin));
-
-                            var wI = (undefined !== _w) ? Math.max(_w * AscCommon.g_dKoef_pix_to_mm, 1) : 1;
-                            var hI = (undefined !== _h) ? Math.max(_h * AscCommon.g_dKoef_pix_to_mm, 1) : 1;
-
-                            wI = Math.max(5, Math.min(wI, __w));
-                            hI = Math.max(5, Math.min(hI, __h));
-
-                            _imagePr.Width = wI;
-                            _imagePr.Height = hI;
                         }
 
                         break;
