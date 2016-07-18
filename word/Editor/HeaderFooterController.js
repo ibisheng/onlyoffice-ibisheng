@@ -82,8 +82,8 @@ CHdrFtrController.prototype.Remove = function(Count, bOnlyText, bRemoveOnlySelec
 
 	if (null !== this.HdrFtr.CurHdtr && docpostype_DrawingObjects !== this.HdrFtr.CurHdrFtr.Content.CurPos.Type)
 	{
-		this.Selection_Remove();
-		this.Selection.Use = false;
+		this.LogicDocument.Selection_Remove();
+		this.LogicDocument.Selection.Use = false;
 	}
 
 	return nResult;
