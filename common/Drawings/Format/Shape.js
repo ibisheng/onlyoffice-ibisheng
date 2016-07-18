@@ -68,7 +68,7 @@ function CheckObjectLine(obj)
 function CheckWordArtTextPr(oRun)
 {
     var oTextPr = oRun.Get_CompiledPr();
-    if(oTextPr.TextFill || oTextPr.TextOutline || (oTextPr.Unifill && oTextPr.Unifill.fill && (oTextPr.Unifill.fill.type !== c_oAscFill.FILL_TYPE_SOLID || oTextPr.Unifill.transparent != null && oTextPr.Unifill.transparent < 254.5)))
+    if(oTextPr.TextFill || (oTextPr.TextOutline && oTextPr.TextOutline.Fill && oTextPr.TextOutline.Fill.fill && oTextPr.TextOutline.Fill.fill.type !==  Asc.c_oAscFill.FILL_TYPE_NOFILL) || (oTextPr.Unifill && oTextPr.Unifill.fill && (oTextPr.Unifill.fill.type !== c_oAscFill.FILL_TYPE_SOLID || oTextPr.Unifill.transparent != null && oTextPr.Unifill.transparent < 254.5)))
         return true;
     return false;
 }
@@ -697,7 +697,7 @@ CShape.prototype.convertToPPTX = function (drawingDocument, worksheet) {
         if (this.bodyPr) {
             tx_body.setBodyPr(this.bodyPr.createDuplicate());
         }
-        var new_content = new CDocumentContent(tx_body, drawingDocument, 0, 0, 0, 0, false, false, true);
+        var new_content = new AscFormat.CDrawingDocContent(tx_body, drawingDocument, 0, 0, 0, 0, false, false, true);
         new_content.Internal_Content_RemoveAll();
         var paragraphs = this.textBoxContent.Content;
 
@@ -783,7 +783,7 @@ CShape.prototype.setBodyPr = function (pr) {
 CShape.prototype.createTextBody = function () {
     var tx_body = new AscFormat.CTextBody();
     tx_body.setParent(this);
-    tx_body.setContent(new CDocumentContent(tx_body, this.getDrawingDocument(), 0, 0, 0, 20000, false, false, true));
+    tx_body.setContent(new AscFormat.CDrawingDocContent(tx_body, this.getDrawingDocument(), 0, 0, 0, 20000, false, false, true));
     var oBodyPr = new AscFormat.CBodyPr();
     if(this.worksheet){
         oBodyPr.vertOverflow = AscFormat.nOTClip;
@@ -3149,18 +3149,14 @@ CShape.prototype.recalculateDocContent = function(oDocContent, oBodyPr)
         {
             if(dMaxWidthRec < w && (!this.bWordShape && !this.bCheckAutoFitFlag))
             {
-                oDocContent.Set_StartPage(0);
-                oDocContent.Reset(0, 0, w, 20000);
-                oDocContent.Recalculate_Page(oDocContent.StartPage, true);
+                oDocContent.RecalculateContent(w, h, 0);
                 oRet.w = w + 0.001;
                 oRet.contentH = oDocContent.Get_SummaryHeight();
                 oRet.h = oRet.contentH;
             }
             else
             {
-                oDocContent.Set_StartPage(0);
-                oDocContent.Reset(0, 0, dMaxWidthRec, 20000);
-                oDocContent.Recalculate_Page(oDocContent.StartPage, true);
+                oDocContent.RecalculateContent(dMaxWidthRec, h, 0);
                 oRet.w = dMaxWidthRec + 0.001;
                 oRet.contentH = oDocContent.Get_SummaryHeight();
                 oRet.h = oRet.contentH;
@@ -3174,18 +3170,14 @@ CShape.prototype.recalculateDocContent = function(oDocContent, oBodyPr)
         {
             if(dMaxWidthRec < h && !this.bWordShape)
             {
-                oDocContent.Set_StartPage(0);
-                oDocContent.Reset(0, 0, h, 20000);
-                oDocContent.Recalculate_Page(oDocContent.StartPage, true);
+                oDocContent.RecalculateContent( h, h, 0);
                 oRet.w = h + 0.001;
                 oRet.contentH = oDocContent.Get_SummaryHeight();
                 oRet.h = oRet.contentH;
             }
             else
             {
-                oDocContent.Set_StartPage(0);
-                oDocContent.Reset(0, 0, dMaxWidthRec, 20000);
-                oDocContent.Recalculate_Page(oDocContent.StartPage, true);
+                oDocContent.RecalculateContent(dMaxWidthRec, h, 0);
                 oRet.w = dMaxWidthRec + 0.001;
                 oRet.contentH = oDocContent.Get_SummaryHeight();
                 oRet.h = oRet.contentH;
@@ -3198,7 +3190,6 @@ CShape.prototype.recalculateDocContent = function(oDocContent, oBodyPr)
     }
     else//AscFormat.nTWTSquare
     {
-
         if(!oBodyPr.upright)
         {
             if(!(oBodyPr.vert === AscFormat.nVertTTvert || oBodyPr.vert === AscFormat.nVertTTvert270))
@@ -3258,11 +3249,14 @@ CShape.prototype.recalculateDocContent = function(oDocContent, oBodyPr)
         oRet.textRectH = oRet.h;
 
         //oDocContent.Set_StartPage(0);
-        oDocContent.Reset(0, 0, oRet.w, 20000);
+        /*oDocContent.Reset(0, 0, oRet.w, 20000);
         var CurPage = 0;
         var RecalcResult = recalcresult2_NextPage;
         while ( recalcresult2_End !== RecalcResult  )
-            RecalcResult = oDocContent.Recalculate_Page( CurPage++, true );
+            RecalcResult = oDocContent.Recalculate_Page( CurPage++, true );*/
+
+        oDocContent.RecalculateContent(oRet.w, oRet.h, 0);
+
         oRet.contentH = oDocContent.Get_SummaryHeight();
 
         if(this.bWordShape)
@@ -4539,7 +4533,7 @@ CShape.prototype.changePresetGeom = function (sPreset) {
             if(!this.txBody)
             {
                 this.setTxBody(new AscFormat.CTextBody());
-                var content = new CDocumentContent(this.txBody, this.getDrawingDocument(), 0, 0, 0, 0, false, false, true);
+                var content = new AscFormat.CDrawingDocContent(this.txBody, this.getDrawingDocument(), 0, 0, 0, 0, false, false, true);
                 this.txBody.setParent(this);
                 this.txBody.setContent(content);
                 var body_pr = new AscFormat.CBodyPr();
@@ -5508,6 +5502,7 @@ CShape.prototype.checkTextWarp = function(oContent, oBodyPr, dWidth, dHeight, bN
     warpGeometry && warpGeometry.Recalculate(dWidth, dHeight);
     this.recalcInfo.warpGeometry = warpGeometry;
     var bCheckWordArtContent = this.checkContentWordArt(oContent);
+    var bColumns = oContent.Get_ColumnsCount() > 1;
     var bContentRecalculated = false;
     if(bTransform || bCheckWordArtContent)
     {
@@ -5546,6 +5541,11 @@ CShape.prototype.checkTextWarp = function(oContent, oBodyPr, dWidth, dHeight, bN
             {
                 oContentToDraw.Reset(0, 0, dMinPolygonLength, 20000);
             }
+            oContentToDraw.Recalculate_Page(0, true);
+        }
+        else if(bTransform && bColumns){
+            oContentToDraw = oContent.Copy(oContent.Parent, oContent.DrawingDocument);
+            oContentToDraw.Reset(0, 0, oContent.XLimit, 20000);
             oContentToDraw.Recalculate_Page(0, true);
         }
         var dContentHeight = oContentToDraw.Get_SummaryHeight();

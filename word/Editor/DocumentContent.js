@@ -1102,6 +1102,16 @@ CDocumentContent.prototype.Recalculate_Page               = function(PageIndex, 
     }
     return Result;
 };
+
+CDocumentContent.prototype.RecalculateContent = function(fWidth, fHeight, nStartPage)
+{
+    this.Set_StartPage(nStartPage);
+    this.Reset(0, 0, fWidth, 20000);
+    var nRecalcResult = recalcresult2_NextPage;
+    var nCurPage = 0;
+    while ( recalcresult2_End !== nRecalcResult  )
+        nRecalcResult = this.Recalculate_Page( nCurPage++, true );
+};
 CDocumentContent.prototype.Recalculate_MinMaxContentWidth = function(isRotated)
 {
     var Min   = 0;
@@ -8405,6 +8415,10 @@ CDocumentContent.prototype.Set_StartPage          = function(StartPage)
 CDocumentContent.prototype.Get_Page_Relative      = function(AbsPage)
 {
     return Math.min(this.Pages.length - 1, Math.max(AbsPage - this.StartPage, 0));
+};
+CDocumentContent.prototype.Get_ColumnsCount      = function()
+{
+    return 1;
 };
 //-----------------------------------------------------------------------------------
 // Undo/Redo функции

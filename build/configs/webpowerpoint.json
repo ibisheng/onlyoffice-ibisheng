@@ -166,6 +166,7 @@
 		"../common/clipboard_base.js",
 		"../common/text_input.js",
 		"../common/Drawings/Format/OleObject.js",
+		"../common/Drawings/Format/DrawingContent.js",
 		"../common/plugins.js"
       ],
       "private": [

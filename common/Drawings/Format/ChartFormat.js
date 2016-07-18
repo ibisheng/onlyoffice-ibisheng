@@ -334,7 +334,8 @@ CDLbl.prototype =
             _r = _rect.r - _body_pr.rIns;
             _b = _rect.b - _body_pr.bIns;
         }
-        else {
+        else
+        {
             _l = _body_pr.lIns;
             _t = _body_pr.tIns;
             _r = this.extX - _body_pr.rIns;
@@ -25685,7 +25686,7 @@ function CreateTextBodyFromString(str, drawingDocument, parent)
 
 function CreateDocContentFromString(str, drawingDocument, parent)
 {
-    var content = new CDocumentContent(parent, drawingDocument, 0, 0, 0, 0, false, false, true);
+    var content = new AscFormat.CDrawingDocContent(parent, drawingDocument, 0, 0, 0, 0, false, false, true);
     AddToContentFromString(content, str);
     return content;
 }

@@ -6965,7 +6965,7 @@ function BinaryPPTYLoader()
                 }
                 case 13:
                 {
-                    bodyPr.spcCol = s.GetLong();
+                    bodyPr.spcCol = s.GetLong()/36000;
                     break;
                 }
                 case 14:
@@ -7609,7 +7609,7 @@ function BinaryPPTYLoader()
                 {
                     s.Skip2(4);
                     var _c = s.GetULong();
-                    txbody.setContent(new CDocumentContent(txbody, this.presentation ? this.presentation.DrawingDocument : null, 0, 0, 0, 0, 0, 0, true));
+                    txbody.setContent(new AscFormat.CDrawingDocContent(txbody, this.presentation ? this.presentation.DrawingDocument : null, 0, 0, 0, 0, 0, 0, true));
                     if(_c>0)
                     {
                         txbody.content.Internal_Content_RemoveAll();
@@ -7712,7 +7712,7 @@ function BinaryPPTYLoader()
                      History.TurnOff();
                      }*/
                     if(!txbody.content)
-                        txbody.content = new CDocumentContent(shape, this.presentation ? this.presentation.DrawingDocument : null, 0, 0, 0, 0, 0, 0, true);
+                        txbody.content = new AscFormat.CDrawingDocContent(shape, this.presentation ? this.presentation.DrawingDocument : null, 0, 0, 0, 0, 0, 0, true);
                     if(_c>0)
                     {
                         txbody.content.Internal_Content_RemoveAll();

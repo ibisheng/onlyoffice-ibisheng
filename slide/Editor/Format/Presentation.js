@@ -38,8 +38,6 @@ var align_Justify = AscCommon.align_Justify;
 var vertalign_Baseline = AscCommon.vertalign_Baseline;
 var changestype_Drawing_Props = AscCommon.changestype_Drawing_Props;
 var g_oTableId = AscCommon.g_oTableId;
-var Editor_Copy = AscCommon.Editor_Copy;
-var Editor_Paste = AscCommon.Editor_Paste;
 var isRealObject = AscCommon.isRealObject;
 var History = AscCommon.History;
 
@@ -2414,14 +2412,6 @@ CPresentation.prototype =
                     this.Remove( 1, true );
                 }
                 bRetValue = keydownresult_PreventAll;
-            }
-            else // Shift + Delete (аналогично Ctrl + X)
-            {
-                if ( false === this.Document_Is_SelectionLocked(changestype_Drawing_Props) )
-                {
-                    Editor_Copy(this.DrawingDocument.m_oWordControl.m_oApi, true);
-                }
-                bRetValue = keydownresult_PreventKeyPress;
             }
         }
         else if ( e.KeyCode == 49 && false === editor.isViewMode && true === e.AltKey && !e.AltGr ) // Alt + Ctrl + Num1 - применяем стиль Heading1

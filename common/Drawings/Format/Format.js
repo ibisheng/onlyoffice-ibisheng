@@ -10053,6 +10053,7 @@ CBodyPr.prototype =
         duplicate.fromWordArt    = this.fromWordArt;
         duplicate.horzOverflow   = this.horzOverflow;
         duplicate.lIns           = this.lIns;
+        duplicate.numCol         = this.numCol;
         duplicate.rIns           = this.rIns;
         duplicate.rot            = this.rot;
         duplicate.rtlCol         = this.rtlCol;
@@ -10117,6 +10118,9 @@ CBodyPr.prototype =
             this.lIns = bodyPr.lIns;
         }
 
+        if(bodyPr.numCol != null){
+            this.numCol = bodyPr.numCol;
+        }
         if(bodyPr.rIns!=null)
         {
             this.rIns = bodyPr.rIns;
@@ -10169,6 +10173,9 @@ CBodyPr.prototype =
         if(bodyPr.textFit)
         {
             this.textFit = bodyPr.textFit.CreateDublicate();
+        }
+        if(bodyPr.numCol != null){
+            this.numCol = bodyPr.numCol;
         }
         return this;
     },

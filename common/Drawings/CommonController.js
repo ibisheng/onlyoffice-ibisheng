@@ -3417,7 +3417,7 @@ DrawingObjectsController.prototype =
                             }
                             if(!hor_axis.title.txPr.content)
                             {
-                                hor_axis.title.txPr.setContent(new CDocumentContent(hor_axis.title.txPr, chart_space.getDrawingDocument(), 0, 0, 100, 500, false, false, true));
+                                hor_axis.title.txPr.setContent(new AscFormat.CDrawingDocContent(hor_axis.title.txPr, chart_space.getDrawingDocument(), 0, 0, 100, 500, false, false, true));
                             }
                             _text_body = hor_axis.title.txPr;
                         }
@@ -3490,7 +3490,7 @@ DrawingObjectsController.prototype =
                             var _body_pr = _text_body.bodyPr.createDuplicate();
                             if(!_text_body.content)
                             {
-                                _text_body.setContent(new CDocumentContent(_text_body, chart_space.getDrawingDocument(), 0, 0, 100, 500, false, false, true));
+                                _text_body.setContent(new AscFormat.CDrawingDocContent(_text_body, chart_space.getDrawingDocument(), 0, 0, 100, 500, false, false, true));
                             }
                             if(vert_axis_labels_settings === c_oAscChartVertAxisLabelShowSettings.rotated)
                             {
@@ -8932,6 +8932,8 @@ function CalcLiterByLength(aAlphaBet, nLength)
     }
     return sResultLiter;
 }
+
+
 
     //--------------------------------------------------------export----------------------------------------------------
     window['AscFormat'] = window['AscFormat'] || {};
