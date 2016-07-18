@@ -738,6 +738,12 @@ function CDrawingDocument()
     this.AutoShapesTrack = null;
     this.TransitionSlide = new CTransitionAnimation(null);
 
+
+    this.MoveTargetInInputContext = function()
+    {
+        if (AscCommon.g_inputContext)
+            AscCommon.g_inputContext.move(this.TargetHtmlElementLeft, this.TargetHtmlElementTop);
+    }
     this.GetTargetStyle = function()
     {
         return "rgb(" + this.TargetCursorColor.R + "," + this.TargetCursorColor.G + "," + this.TargetCursorColor.B + ")";
@@ -4330,6 +4336,7 @@ function CThumbnailsManager()
         this.OnPaint();
         this.m_bIsUpdate = false;
     }
+
 
     this.SetFocusElement = function(type)
     {

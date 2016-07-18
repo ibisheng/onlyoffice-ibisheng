@@ -474,6 +474,7 @@ function CPresentation(DrawingDocument)
     this.LastUpdateTargetTime             = 0;
     this.NeedUpdateTargetForCollaboration = false;
     this.oLastCheckContent = null;
+    this.CompositeInput    = null;
     // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
     g_oTableId.Add( this, this.Id );
    //
@@ -493,6 +494,168 @@ function CPresentation(DrawingDocument)
 
 CPresentation.prototype =
 {
+    //----------------------------------------------------------------------------------------------------------------------
+// Функции для работы с составным вводом
+//----------------------------------------------------------------------------------------------------------------------
+    /**
+     * Сообщаем о начале составного ввода текста.
+     * @returns {boolean} Начался или нет составной ввод.
+     */
+
+    Get_TargetDocContent: function(){
+        if(this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects){
+            return this.Slides[this.CurPage].graphicObjects.getTargetDocContent();
+        }
+        return null;
+    },
+
+    Begin_CompositeInput: function()
+    {
+        if (false === this.Document_Is_SelectionLocked(changestype_Drawing_Props, null, true))
+        {
+            this.Create_NewHistoryPoint(AscDFH.historydescription_Document_CompositeInput);
+
+            this.DrawingDocument.TargetStart();
+            this.DrawingDocument.TargetShow();
+
+
+            var oContent = this.Get_TargetDocContent();
+            if (!oContent)
+            {
+                this.History.Remove_LastPoint();
+                return false;
+            }
+            var oPara = oContent.Get_CurrentParagraph();
+            if (!oPara)
+            {
+                this.History.Remove_LastPoint();
+                return false;
+            }
+            if (true === oContent.Is_SelectionUse())
+                oContent.Remove(1, true, false, true);
+            var oRun = oPara.Get_ElementByPos(oPara.Get_ParaContentPos(false, false));
+            if (!oRun || !(oRun instanceof ParaRun))
+            {
+                this.History.Remove_LastPoint();
+                return false;
+            }
+
+            this.CompositeInput = {
+                Run    : oRun,
+                Pos    : oRun.State.ContentPos,
+                Length : 0
+            };
+
+            oRun.Set_CompositeInput(this.CompositeInput);
+
+            return true;
+        }
+
+        return false;
+    },
+
+
+    addCompositeText: function(nCharCode){
+        // TODO: При таком вводе не меняется язык в зависимости от раскладки, не учитывается режим рецензирования.
+
+        if (null === this.CompositeInput)
+            return;
+
+        var oRun = this.CompositeInput.Run;
+        var nPos = this.CompositeInput.Pos + this.CompositeInput.Length;
+        var oChar;
+        if (32 == nCharCode || 12288 == nCharCode)
+        {
+            oChar = new ParaSpace();
+        }
+        else
+        {
+            oChar = new ParaText();
+            oChar.Set_CharCode(nCharCode);
+        }
+        oRun.Add_ToContent(nPos, oChar, true);
+        this.CompositeInput.Length++;
+    },
+    Add_CompositeText: function(nCharCode)
+    {
+        this.addCompositeText(nCharCode);
+        this.Recalculate();
+        this.Document_UpdateSelectionState();
+    },
+
+    removeCompositeText: function(nCount){
+        if (null === this.CompositeInput)
+            return;
+
+        var oRun = this.CompositeInput.Run;
+        var nPos = this.CompositeInput.Pos + this.CompositeInput.Length;
+
+        var nDelCount = Math.max(0, Math.min(nCount, this.CompositeInput.Length, oRun.Content.length, nPos));
+        oRun.Remove_FromContent(nPos - nDelCount, nDelCount, true);
+        this.CompositeInput.Length -= nDelCount;
+    },
+
+    Remove_CompositeText: function(nCount){
+        this.removeCompositeText(nCount);
+        this.Recalculate();
+        this.Document_UpdateSelectionState();
+    },
+    Replace_CompositeText: function(arrCharCodes)
+    {
+        if (null === this.CompositeInput)
+            return;
+        this.removeCompositeText(this.CompositeInput.Length);
+        for (var nIndex = 0, nCount = arrCharCodes.length; nIndex < nCount; ++nIndex)
+        {
+            this.addCompositeText(arrCharCodes[nIndex]);
+        }
+        this.Recalculate();
+        this.Document_UpdateSelectionState();
+    },
+    Set_CursorPosInCompositeText: function(nPos)
+    {
+        if (null === this.CompositeInput)
+            return;
+
+        var oRun = this.CompositeInput.Run;
+
+        var nInRunPos = Math.max(Math.min(this.CompositeInput.Pos + nPos, this.CompositeInput.Pos + this.CompositeInput.Length, oRun.Content.length), this.CompositeInput.Pos);
+        oRun.State.ContentPos = nInRunPos;
+        this.Document_UpdateSelectionState();
+    },
+    Get_CursorPosInCompositeText: function()
+    {
+        if (null === this.CompositeInput)
+            return 0;
+
+        var oRun = this.CompositeInput.Run;
+        var nInRunPos = oRun.State.ContentPos;
+        var nPos = Math.min(this.CompositeInput.Length, Math.max(0, nInRunPos - this.CompositeInput.Pos));
+        return nPos;
+    },
+    End_CompositeInput: function()
+    {
+        if (null === this.CompositeInput)
+            return;
+
+        var oRun = this.CompositeInput.Run;
+        oRun.Set_CompositeInput(null);
+        this.CompositeInput = null;
+
+        this.Document_UpdateInterfaceState();
+
+        this.DrawingDocument.ClearCachePages();
+        this.DrawingDocument.FirePaint();
+    },
+    Get_MaxCursorPosInCompositeText: function()
+    {
+        if (null === this.CompositeInput)
+            return 0;
+
+        return this.CompositeInput.Length;
+    },
+
+
     setShowLoop: function(value){
         if(value === false){
             if(!this.showPr){

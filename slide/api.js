@@ -6049,6 +6049,74 @@ background-repeat: no-repeat;\
 		}, fCallback, null, oAdditionalData, dataContainer);
 	};
 
+
+	// input
+	asc_docs_api.prototype.Begin_CompositeInput = function()
+	{
+		if (this.WordControl.m_oLogicDocument)
+			return this.WordControl.m_oLogicDocument.Begin_CompositeInput();
+		return null;
+	};
+	asc_docs_api.prototype.Add_CompositeText = function(nCharCode)
+	{
+		if (this.WordControl.m_oLogicDocument)
+			return this.WordControl.m_oLogicDocument.Add_CompositeText(nCharCode);
+		return null;
+	};
+	asc_docs_api.prototype.Remove_CompositeText = function(nCount)
+	{
+		if (this.WordControl.m_oLogicDocument)
+			return this.WordControl.m_oLogicDocument.Remove_CompositeText(nCount);
+		return null;
+	};
+	asc_docs_api.prototype.Replace_CompositeText = function(arrCharCodes)
+	{
+		if (this.WordControl.m_oLogicDocument)
+			return this.WordControl.m_oLogicDocument.Replace_CompositeText(arrCharCodes);
+		return null;
+	};
+	asc_docs_api.prototype.Set_CursorPosInCompositeText = function(nPos)
+	{
+		if (this.WordControl.m_oLogicDocument)
+			return this.WordControl.m_oLogicDocument.Set_CursorPosInCompositeText(nPos);
+		return null;
+	};
+	asc_docs_api.prototype.Get_CursorPosInCompositeText = function()
+	{
+		if (this.WordControl.m_oLogicDocument)
+			return this.WordControl.m_oLogicDocument.Get_CursorPosInCompositeText();
+		return 0;
+	};
+	asc_docs_api.prototype.End_CompositeInput = function()
+	{
+		if (this.WordControl.m_oLogicDocument)
+			return this.WordControl.m_oLogicDocument.End_CompositeInput();
+		return null;
+	};
+	asc_docs_api.prototype.Get_MaxCursorPosInCompositeText = function()
+	{
+		if (this.WordControl.m_oLogicDocument)
+			return this.WordControl.m_oLogicDocument.Get_MaxCursorPosInCompositeText();
+		return 0;
+	};
+	asc_docs_api.prototype.Input_UpdatePos = function()
+	{
+		if (this.WordControl.m_oLogicDocument)
+			this.WordControl.m_oDrawingDocument.MoveTargetInInputContext();
+	};
+
+	asc_docs_api.prototype.onKeyDown = function(e)
+	{
+		return this.WordControl.onKeyDown(e);
+	};
+	asc_docs_api.prototype.onKeyPress = function(e)
+	{
+		return this.WordControl.onKeyPress(e);
+	};
+	asc_docs_api.prototype.onKeyUp = function(e)
+	{
+		return this.WordControl.onKeyUp(e);
+	};
 	//test
 	window["asc_docs_api"]                                 = asc_docs_api;
 	window["asc_docs_api"].prototype["asc_nativeOpenFile"] = function(base64File, version)
@@ -6708,6 +6776,20 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype["asc_pluginButtonClick"]               = asc_docs_api.prototype.asc_pluginButtonClick;
 	asc_docs_api.prototype["asc_addOleObject"]                    = asc_docs_api.prototype.asc_addOleObject;
 	asc_docs_api.prototype["asc_editOleObject"]                   = asc_docs_api.prototype.asc_editOleObject;
+	asc_docs_api.prototype["Begin_CompositeInput"]                = asc_docs_api.prototype.Begin_CompositeInput;
+	asc_docs_api.prototype["Add_CompositeText"]                   = asc_docs_api.prototype.Add_CompositeText;
+	asc_docs_api.prototype["Remove_CompositeText"]                = asc_docs_api.prototype.Remove_CompositeText;
+	asc_docs_api.prototype["Replace_CompositeText"]               = asc_docs_api.prototype.Replace_CompositeText;
+	asc_docs_api.prototype["Set_CursorPosInCompositeText"]        = asc_docs_api.prototype.Set_CursorPosInCompositeText;
+	asc_docs_api.prototype["Get_CursorPosInCompositeText"]        = asc_docs_api.prototype.Get_CursorPosInCompositeText;
+	asc_docs_api.prototype["End_CompositeInput"]                  = asc_docs_api.prototype.End_CompositeInput;
+	asc_docs_api.prototype["Get_MaxCursorPosInCompositeText"]     = asc_docs_api.prototype.Get_MaxCursorPosInCompositeText;
+	asc_docs_api.prototype["Input_UpdatePos"]                     = asc_docs_api.prototype.Input_UpdatePos;
+	asc_docs_api.prototype["onKeyDown"]                           = asc_docs_api.prototype.onKeyDown;
+	asc_docs_api.prototype["onKeyPress"]                          = asc_docs_api.prototype.onKeyPress;
+	asc_docs_api.prototype["onKeyUp"]                             = asc_docs_api.prototype.onKeyUp;
+
+
 
 	window['Asc']['asc_CCommentData'] = window['Asc'].asc_CCommentData = asc_CCommentData;
 	asc_CCommentData.prototype['asc_getText']         = asc_CCommentData.prototype.asc_getText;
