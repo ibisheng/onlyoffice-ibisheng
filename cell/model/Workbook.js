@@ -5232,7 +5232,12 @@ Woorksheet.prototype._shiftCellsBottom=function(oBBox, displayNameFormatTable){
 	}
 
 	History.Add(AscCommonExcel.g_oUndoRedoWorksheet, AscCH.historyitem_Worksheet_ShiftCellsBottom, this.getId(), new Asc.Range(oBBox.c1, oBBox.r1, oBBox.c2, gc_nMaxRow0), new UndoRedoData_BBox(oBBox));
-    this.autoFilters.insertRows( "insCell", oBBox, c_oAscInsertOptions.InsertCellsAndShiftDown, displayNameFormatTable );
+	
+	if(!this.workbook.bUndoChanges)
+	{
+		this.autoFilters.insertRows( "insCell", oBBox, c_oAscInsertOptions.InsertCellsAndShiftDown, displayNameFormatTable );
+	}
+    
 };
 Woorksheet.prototype._setIndex=function(ind){
 	this.index = ind;
