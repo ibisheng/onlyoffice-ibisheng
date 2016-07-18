@@ -1055,7 +1055,7 @@ CShape.prototype.getHierarchy = function () {
     {
         this.compiledHierarchy = [];
         var hierarchy = this.compiledHierarchy;
-        if (this.isPlaceholder()) {
+        if (this.parent && this.isPlaceholder()) {
             var ph_type = this.getPlaceholderType();
             var ph_index = this.getPlaceholderIndex();
             switch (this.parent.kind) {
