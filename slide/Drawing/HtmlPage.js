@@ -662,9 +662,12 @@ function CEditorPage(api)
 		this.m_oLeftRuler_vertRuler.HtmlElement.onmouseup   = this.verRulerMouseUp;
 		this.m_oLeftRuler_vertRuler.HtmlElement.onmousemove = this.verRulerMouseMove;
 
+		/*
+		 // теперь все делает AscCommon.InitBrowserSystemContext
 		window.onkeydown  = this.onKeyDown;
 		window.onkeypress = this.onKeyPress;
 		window.onkeyup    = this.onKeyUp;
+		*/
 
 		this.m_oBody.HtmlElement.onmousemove = this.onBodyMouseMove;
 		this.m_oBody.HtmlElement.onmousedown = this.onBodyMouseDown;
