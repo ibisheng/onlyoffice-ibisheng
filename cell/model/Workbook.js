@@ -2024,6 +2024,12 @@ Workbook.prototype.init=function(bNoBuildDep){
         var ws = this.aWorksheets[i];
         ws.initPostOpen(this.wsHandlers);
     }
+	//show active if it hidden
+	var wsActive = this.getActiveWs();
+	if (wsActive && wsActive.getHidden()) {
+		wsActive.setHidden(false);
+	}
+
 	if(!bNoBuildDep){
 		/*
 			buildDependency необходимо запускать для построения графа зависимостей между ячейками.
