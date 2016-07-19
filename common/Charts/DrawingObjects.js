@@ -1608,8 +1608,6 @@ function DrawingObjects() {
 			printPagesData
 		}
          *****************************************/
-        if (!worksheet || !worksheet.model)
-            return;
 
         // Undo/Redo
         if ( (worksheet.model.index != api.wb.model.getActive()) && !printOptions )

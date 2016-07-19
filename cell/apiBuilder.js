@@ -91,7 +91,7 @@
 	 */
 	Api.prototype.GetActiveSheet = function () {
 		var index = this.wbModel.getActive();
-		return new ApiWorksheet(this.wbModel.getWorksheet(index), this.wb.getWorksheet(index));
+		return new ApiWorksheet(this.wbModel.getWorksheet(index), this.wb.getWorksheet(index, true));
 	};
 
 	/**
