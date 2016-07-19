@@ -287,6 +287,7 @@
 			settings.inColumns = !bInRows;
 			settings.range = sDataRange;
 			var oChart = AscFormat.DrawingObjectsController.prototype.getChartSpace(this.worksheet, settings);
+			oChart.setBDeleted(false);
 			oChart.setWorksheet(this.worksheet);
 			oChart.setBFromSerialize(true);
 			oChart.addToDrawingObjects();
