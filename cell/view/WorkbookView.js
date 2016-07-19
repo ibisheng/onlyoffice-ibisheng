@@ -2333,15 +2333,12 @@
   };
 
   // Печать
-  WorkbookView.prototype.printSheet = function(pdf_writer, printPagesData) {
+  WorkbookView.prototype.printSheets = function(pdf_writer, printPagesData) {
     var ws;
-    // Закончили печать или нет
-    var isEndPrint = false;
     if (null === printPagesData.arrPages || 0 === printPagesData.arrPages.length) {
       // Печать пустой страницы
       ws = this.getWorksheet();
       ws.drawForPrint(pdf_writer, null);
-      isEndPrint = true;
     } else {
       var indexWorksheet = -1;
       var indexWorksheetTmp = -1;
@@ -2353,10 +2350,7 @@
         }
         ws.drawForPrint(pdf_writer, printPagesData.arrPages[i]);
       }
-      isEndPrint = (i === printPagesData.arrPages.length);
     }
-
-    return isEndPrint;
   };
 
   WorkbookView.prototype.calcPagesPrint = function(adjustPrint) {

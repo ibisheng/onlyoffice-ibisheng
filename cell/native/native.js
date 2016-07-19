@@ -4282,7 +4282,7 @@ function OfflineEditor () {
         var adjustPrint = asc_ReadAdjustPrint(s, p);
         var pagesData   = _api.wb.calcPagesPrint(adjustPrint);
         var pdfWriter   = new AscCommonExcel.CPdfPrinter();
-        var isEndPrint  = _api.wb.printSheet(pdfWriter, pagesData);
+        _api.wb.printSheets(pdfWriter, pagesData);
         return pdfWriter.DocumentRenderer.Memory.GetBase64Memory();
     };
 

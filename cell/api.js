@@ -836,7 +836,7 @@ var editor;
     if (c_oAscFileType.PDF === sFormat) {
       var printPagesData = this.wb.calcPagesPrint(this.adjustPrint);
       var pdf_writer = new AscCommonExcel.CPdfPrinter();
-      var isEndPrint = this.wb.printSheet(pdf_writer, printPagesData);
+      this.wb.printSheets(pdf_writer, printPagesData);
 
       dataContainer.data = pdf_writer.DocumentRenderer.Memory.GetBase64Memory();
     } else if (c_oAscFileType.CSV === sFormat && !options.CSVOptions) {
@@ -3190,7 +3190,7 @@ var editor;
 
     if (undefined === _printer && _page === undefined) {
       var pdf_writer = new AscCommonExcel.CPdfPrinter();
-      var isEndPrint = this.wb.printSheet(pdf_writer, _printPagesData);
+      this.wb.printSheets(pdf_writer, _printPagesData);
 
       if (undefined !== window["AscDesktopEditor"]) {
         var pagescount = pdf_writer.DocumentRenderer.m_lPagesCount;
@@ -3214,7 +3214,7 @@ var editor;
       return pdf_writer.DocumentRenderer.Memory;
     }
 
-    var isEndPrint = this.wb.printSheet(_printer, _printPagesData);
+    this.wb.printSheets(_printer, _printPagesData);
     return _printer.DocumentRenderer.Memory;
   };
 
