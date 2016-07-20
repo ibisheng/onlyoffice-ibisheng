@@ -5285,11 +5285,7 @@ CStylesPainter.prototype =
         var dKoefToMM = AscCommon.g_dKoef_pix_to_mm;
 
         if (AscCommon.AscBrowser.isRetina)
-        {
-            _w_px *= 2;
-            _h_px *= 2;
             dKoefToMM /= 2;
-        }
 
         _api.WordControl.m_oDrawingDocument.Native["DD_StartNativeDraw"](_w_px, _h_px, _w_px * dKoefToMM, _h_px * dKoefToMM);
 

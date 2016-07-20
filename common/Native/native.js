@@ -594,7 +594,9 @@ window.clearInterval    = clearInterval;
 window.setInterval      = setInterval;
 
 var console = {
-	log : function(param) { window.native.ConsoleLog(param); }
+	log : function(param) { window.native.ConsoleLog(param); },
+    time : function(param) {},
+    timeEnd : function(param) {}
 };
 
 window["NativeCorrectImageUrlOnPaste"] = function(url) {
