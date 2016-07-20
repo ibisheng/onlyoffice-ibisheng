@@ -479,12 +479,18 @@
             self._onEditCell(/*isFocus*/true);
           }
         }, false);
+
+        this.input.addEventListener('keydown', function () {
+          if (self.isCellEditMode) {
+            self.cellEditor._onWindowKeyDown(event, true);
+          }
+        }, false);
       }
 
       this.Api.onKeyDown = function (event) {
         self.controller._onWindowKeyDown(event);
         if (self.isCellEditMode) {
-          self.cellEditor._onWindowKeyDown(event);
+          self.cellEditor._onWindowKeyDown(event, false);
         }
       };
       this.Api.onKeyPress = function (event) {

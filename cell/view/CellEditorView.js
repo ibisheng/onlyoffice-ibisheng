@@ -325,7 +325,7 @@
 		this._updateUndoRedoChanged();
 	};
 
-	CellEditor.prototype.close = function ( saveValue ) {
+	CellEditor.prototype.close = function (saveValue) {
 		var opt = this.options, ret;
 
 		if (saveValue && "function" === typeof opt.saveValueCallback) {
@@ -362,10 +362,10 @@
 
 		this._formula = null;
 
-		if ( !window['IS_NATIVE_EDITOR'] ) {
-			if ( window.removeEventListener ) {
-				window.removeEventListener( "mouseup", this.fKeyMouseUp, false );
-				window.removeEventListener( "mousemove", this.fKeyMouseMove, false );
+		if (!window['IS_NATIVE_EDITOR']) {
+			if (window.removeEventListener) {
+				window.removeEventListener("mouseup", this.fKeyMouseUp, false);
+				window.removeEventListener("mousemove", this.fKeyMouseMove, false);
 			}
 			this.input.blur();
 			this.isTopLineActive = false;
@@ -380,7 +380,7 @@
 
 		// Сброс состояния редактора
 		this.m_nEditorState = c_oAscCellEditorState.editEnd;
-		this.handlers.trigger( "closed" );
+		this.handlers.trigger("closed");
 		return true;
 	};
 
@@ -2131,9 +2131,9 @@
 		t.undoMode = false;
 	};
 
-	CellEditor.prototype._tryCloseEditor = function ( event ) {
-		if ( this.close( true ) ) {
-			this.handlers.trigger( "applyCloseEvent", event );
+	CellEditor.prototype._tryCloseEditor = function (event) {
+		if (this.close(true)) {
+			this.handlers.trigger("applyCloseEvent", event);
 		}
 	};
 
@@ -2196,17 +2196,22 @@
 
 	// Event handlers
 
-	/** @param event {KeyboardEvent} */
-	CellEditor.prototype._onWindowKeyDown = function ( event ) {
+	/**
+	 *
+	 * @param event {KeyboardEvent}
+	 * @param isInput {boolean}
+	 * @returns {boolean}
+	 */
+	CellEditor.prototype._onWindowKeyDown = function (event, isInput) {
 		var t = this, kind = undefined, hieroglyph = false;
 		var ctrlKey = event.metaKey || event.ctrlKey;
 
-		if ( !t.isOpened || !t.enableKeyEvents ) {
+		if (!t.isOpened || (!isInput && !t.enableKeyEvents)) {
 			return true;
 		}
 
 		// для исправления Bug 15902 - Alt забирает фокус из приложения
-		if ( event.which === 18 ) {
+		if (event.which === 18) {
 			t.lastKeyCode = event.which;
 		}
 
@@ -2214,34 +2219,32 @@
 		t.skipTLUpdate = false;
 
 		// определение ввода иероглифов
-		if ( t.isTopLineActive && t._getFragmentsLength( t.options.fragments ) !== t.input.value.length ) {
+		if (t.isTopLineActive && t._getFragmentsLength(t.options.fragments) !== t.input.value.length) {
 			hieroglyph = true;
 		}
 
-		switch ( event.which ) {
+		switch (event.which) {
 
 			case 27:  // "esc"
-				if ( t.handlers.trigger( "isGlobalLockEditCell" ) ) {
+				if (t.handlers.trigger("isGlobalLockEditCell")) {
 					return false;
 				}
 				t.close();
 				return false;
 
 			case 13:  // "enter"
-				if ( window['IS_NATIVE_EDITOR'] ) {
+				if (window['IS_NATIVE_EDITOR']) {
 					t._addNewLine();
-				}
-				else {
-					if ( !t.hasFocus ) {
-						t.setFocus( true );
+				} else {
+					if (!t.hasFocus) {
+						t.setFocus(true);
 					}
-					if ( !(event.altKey && event.shiftKey) ) {
-						if ( event.altKey ) {
+					if (!(event.altKey && event.shiftKey)) {
+						if (event.altKey) {
 							t._addNewLine();
-						}
-						else {
-							if ( false === t.handlers.trigger( "isGlobalLockEditCell" ) ) {
-								t._tryCloseEditor( event );
+						} else {
+							if (false === t.handlers.trigger("isGlobalLockEditCell")) {
+								t._tryCloseEditor(event);
 							}
 						}
 					}
@@ -2249,183 +2252,182 @@
 				return false;
 
 			case 9: // tab
-				if ( !t.hasFocus ) {
-					t.setFocus( true );
+				if (!t.hasFocus) {
+					t.setFocus(true);
 				}
-				if ( hieroglyph ) {
+				if (hieroglyph) {
 					t._syncEditors();
 				}
 
-				if ( false === t.handlers.trigger( "isGlobalLockEditCell" ) ) {
-					t._tryCloseEditor( event );
+				if (false === t.handlers.trigger("isGlobalLockEditCell")) {
+					t._tryCloseEditor(event);
 				}
 				return false;
 
 			case 8:   // "backspace"
-				if ( window['IS_NATIVE_EDITOR'] ) {
-					t._removeChars( ctrlKey ? kPrevWord : kPrevChar );
-				}
-				else {
+				if (window['IS_NATIVE_EDITOR']) {
+					t._removeChars(ctrlKey ? kPrevWord : kPrevChar);
+				} else {
 					// Отключим стандартную обработку браузера нажатия backspace
 					event.stopPropagation();
 					event.preventDefault();
-					if ( hieroglyph ) {
+					if (hieroglyph) {
 						t._syncEditors();
 					}
-					t._removeChars( ctrlKey ? kPrevWord : kPrevChar );
+					t._removeChars(ctrlKey ? kPrevWord : kPrevChar);
 				}
 				return false;
 
 			case 46:  // "del"
-				if ( !t.hasFocus ) {
-					t.setFocus( true );
+				if (!t.hasFocus) {
+					t.setFocus(true);
 				}
-				if ( hieroglyph ) {
+				if (hieroglyph) {
 					t._syncEditors();
 				}
 				event.stopPropagation();
 				event.preventDefault();
-				t._removeChars( ctrlKey ? kNextWord : kNextChar );
+				t._removeChars(ctrlKey ? kNextWord : kNextChar);
 				return true;
 
 			case 37:  // "left"
 				event.stopPropagation();
 				event.preventDefault();
-				if ( !t.hasFocus ) {
+				if (!t.hasFocus) {
 					break;
 				}
-				if ( hieroglyph ) {
+				if (hieroglyph) {
 					t._syncEditors();
 				}
 				kind = ctrlKey ? kPrevWord : kPrevChar;
-				event.shiftKey ? t._selectChars( kind ) : t._moveCursor( kind );
+				event.shiftKey ? t._selectChars(kind) : t._moveCursor(kind);
 				return false;
 
 			case 39:  // "right"
 				event.stopPropagation();
 				event.preventDefault();
-				if ( !t.hasFocus ) {
+				if (!t.hasFocus) {
 					break;
 				}
-				if ( hieroglyph ) {
+				if (hieroglyph) {
 					t._syncEditors();
 				}
 				kind = ctrlKey ? kNextWord : kNextChar;
-				event.shiftKey ? t._selectChars( kind ) : t._moveCursor( kind );
+				event.shiftKey ? t._selectChars(kind) : t._moveCursor(kind);
 				return false;
 
 			case 38:  // "up"
 				event.stopPropagation();
 				event.preventDefault();
-				if ( !t.hasFocus ) {
+				if (!t.hasFocus) {
 					break;
 				}
-				if ( hieroglyph ) {
+				if (hieroglyph) {
 					t._syncEditors();
 				}
-				event.shiftKey ? t._selectChars( kPrevLine ) : t._moveCursor( kPrevLine );
+				event.shiftKey ? t._selectChars(kPrevLine) : t._moveCursor(kPrevLine);
 				return false;
 
 			case 40:  // "down"
 				event.stopPropagation();
 				event.preventDefault();
-				if ( !t.hasFocus ) {
+				if (!t.hasFocus) {
 					break;
 				}
-				if ( hieroglyph ) {
+				if (hieroglyph) {
 					t._syncEditors();
 				}
-				event.shiftKey ? t._selectChars( kNextLine ) : t._moveCursor( kNextLine );
+				event.shiftKey ? t._selectChars(kNextLine) : t._moveCursor(kNextLine);
 				return false;
 
 			case 35:  // "end"
 				// Отключим стандартную обработку браузера нажатия end
 				event.stopPropagation();
 				event.preventDefault();
-				if ( !t.hasFocus ) {
+				if (!t.hasFocus) {
 					break;
 				}
-				if ( hieroglyph ) {
+				if (hieroglyph) {
 					t._syncEditors();
 				}
 				kind = ctrlKey ? kEndOfText : kEndOfLine;
-				event.shiftKey ? t._selectChars( kind ) : t._moveCursor( kind );
+				event.shiftKey ? t._selectChars(kind) : t._moveCursor(kind);
 				return false;
 
 			case 36:  // "home"
 				// Отключим стандартную обработку браузера нажатия home
 				event.stopPropagation();
 				event.preventDefault();
-				if ( !t.hasFocus ) {
+				if (!t.hasFocus) {
 					break;
 				}
-				if ( hieroglyph ) {
+				if (hieroglyph) {
 					t._syncEditors();
 				}
 				kind = ctrlKey ? kBeginOfText : kBeginOfLine;
-				event.shiftKey ? t._selectChars( kind ) : t._moveCursor( kind );
+				event.shiftKey ? t._selectChars(kind) : t._moveCursor(kind);
 				return false;
 
 			case 53: // 5
-				if ( ctrlKey ) {
-					if ( !t.hasFocus ) {
-						t.setFocus( true );
+				if (ctrlKey) {
+					if (!t.hasFocus) {
+						t.setFocus(true);
 					}
 					// Отключим стандартную обработку браузера нажатия ctrl + 5
 					event.stopPropagation();
 					event.preventDefault();
-					if ( hieroglyph ) {
+					if (hieroglyph) {
 						t._syncEditors();
 					}
-					t.setTextStyle( "s", null );
+					t.setTextStyle("s", null);
 					return true;
 				}
 				break;
 
 			case 65: // A
-				if ( ctrlKey ) {
-					if ( !t.hasFocus ) {
-						t.setFocus( true );
+				if (ctrlKey) {
+					if (!t.hasFocus) {
+						t.setFocus(true);
 					}
 					// Отключим стандартную обработку браузера нажатия ctrl + a
-					if ( !t.isTopLineActive ) {
+					if (!t.isTopLineActive) {
 						event.stopPropagation();
 						event.preventDefault();
 					}
-					t._moveCursor( kBeginOfText );
-					t._selectChars( kEndOfText );
+					t._moveCursor(kBeginOfText);
+					t._selectChars(kEndOfText);
 					return true;
 				}
 				break;
 
 			case 66: // B
-				if ( ctrlKey ) {
-					if ( !t.hasFocus ) {
-						t.setFocus( true );
+				if (ctrlKey) {
+					if (!t.hasFocus) {
+						t.setFocus(true);
 					}
 					// Отключим стандартную обработку браузера нажатия ctrl + b
 					event.stopPropagation();
 					event.preventDefault();
-					if ( hieroglyph ) {
+					if (hieroglyph) {
 						t._syncEditors();
 					}
-					t.setTextStyle( "b", null );
+					t.setTextStyle("b", null);
 					return true;
 				}
 				break;
 
 			case 73: // I
-				if ( ctrlKey ) {
-					if ( !t.hasFocus ) {
-						t.setFocus( true );
+				if (ctrlKey) {
+					if (!t.hasFocus) {
+						t.setFocus(true);
 					}
 					// Отключим стандартную обработку браузера нажатия ctrl + i
 					event.stopPropagation();
 					event.preventDefault();
-					if ( hieroglyph ) {
+					if (hieroglyph) {
 						t._syncEditors();
 					}
-					t.setTextStyle( "i", null );
+					t.setTextStyle("i", null);
 					return true;
 				}
 				break;
@@ -2442,31 +2444,31 @@
 			 break;*/
 
 			case 85: // U
-				if ( ctrlKey ) {
-					if ( !t.hasFocus ) {
-						t.setFocus( true );
+				if (ctrlKey) {
+					if (!t.hasFocus) {
+						t.setFocus(true);
 					}
 					// Отключим стандартную обработку браузера нажатия ctrl + u
 					event.stopPropagation();
 					event.preventDefault();
-					if ( hieroglyph ) {
+					if (hieroglyph) {
 						t._syncEditors();
 					}
-					t.setTextStyle( "u", null );
+					t.setTextStyle("u", null);
 					return true;
 				}
 				break;
 
 			case 144://Num Lock
 			case 145://Scroll Lock
-				if ( AscBrowser.isOpera ) {
+				if (AscBrowser.isOpera) {
 					event.stopPropagation();
 					event.preventDefault();
 				}
 				return false;
 
 			case 80: // print           Ctrl + p
-				if ( ctrlKey ) {
+				if (ctrlKey) {
 					event.stopPropagation();
 					event.preventDefault();
 					return false;
@@ -2474,11 +2476,11 @@
 				break;
 			case 89:  // ctrl + y
 			case 90:  // ctrl + z
-				if ( ctrlKey ) {
+				if (ctrlKey) {
 					event.stopPropagation();
 					event.preventDefault();
-					if ( !t.hasFocus ) {
-						t.setFocus( true );
+					if (!t.hasFocus) {
+						t.setFocus(true);
 					}
 					event.which === 90 ? t.undo() : t.redo();
 					return false;
@@ -2486,7 +2488,7 @@
 				break;
 
 			case 113: // F2
-				if ( AscBrowser.isOpera ) {
+				if (AscBrowser.isOpera) {
 					event.stopPropagation();
 					event.preventDefault();
 				}
