@@ -480,7 +480,7 @@
 
     /**
      * This type specifies the types, create charts
-     * @typedef {("bar" | "barStacked" | "barStackedPercent" | "bar3D" | "barStacked3D" | "barStackedPercent3D" | "barStackedPercent3DPerspective" | "horizontalBar" | "horizontalBarStacked" | "horizontalBarStackedPercent" | "horizontalBar3D" | "horizontalBarStacked3D" | "horizontalBarStackedPercent3D" | "lineNormal" | "lineStacked" | "lineStackedPercent" | "line3D" | "pie" | "pie3D" | "doughnut" | "scatter" | "stock")} ChartType
+     * @typedef {("bar" | "barStacked" | "barStackedPercent" | "bar3D" | "barStacked3D" | "barStackedPercent3D" | "barStackedPercent3DPerspective" | "horizontalBar" | "horizontalBarStacked" | "horizontalBarStackedPercent" | "horizontalBar3D" | "horizontalBarStacked3D" | "horizontalBarStackedPercent3D" | "lineNormal" | "lineStacked" | "lineStackedPercent" | "line3D" | "pie" | "pie3D" | "doughnut" | "scatter" | "stock" | "area" | "areaStacked" | "areaStackedPercent")} ChartType
      */
 
     /**
@@ -735,6 +735,21 @@
                 settings.type = Asc.c_oAscChartTypeSettings.stock;
                 break;
             }
+            case "area":
+            {
+                settings.type = Asc.c_oAscChartTypeSettings.areaNormal;
+                break;
+            }
+            case "areaStacked":
+            {
+                settings.type = Asc.c_oAscChartTypeSettings.areaStacked;
+                break;
+            }
+            case "areaStackedPercent":
+            {
+                settings.type = Asc.c_oAscChartTypeSettings.areaStackedPer;
+                break;
+            }
         }
         var aAscSeries = [];
         var aAlphaBet = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
@@ -921,7 +936,7 @@
      * @memberof Api
      * @returns {ApiFill}
      * */
-    Api.prototype.CreateNoFill= function(sImageUrl, sBlipFillType)
+    Api.prototype.CreateNoFill = function()
     {
         return new ApiFill(AscFormat.CreateNoFillUniFill());
     };
