@@ -1997,6 +1997,9 @@ function Workbook(eventsHandlers, oApi){
   this.openErrors = [];
 
   this.lockCounter = 0;
+
+	this.maxDigitWidth = 0;
+	this.paddingPlusBorder = 0;
 }
 Workbook.prototype.init=function(bNoBuildDep){
 	if(this.nActive < 0)
@@ -3237,6 +3240,17 @@ Workbook.prototype.getTableNameColumnByIndex = function(tableName, columnIndex){
 				}
 			}
 		};
+	/**
+	 * Вычисляет ширину столбца для заданного количества символов
+	 * @param {Number} count  Количество символов
+	 * @returns {Number}      Ширина столбца в символах
+	 */
+	Workbook.prototype.charCountToModelColWidth = function (count) {
+		if (count <= 0) {
+			return 0;
+		}
+		return Asc.floor((count * this.maxDigitWidth + this.paddingPlusBorder) / this.maxDigitWidth * 256) / 256;
+	};
 //-------------------------------------------------------------------------------------------------
 /**
  * @constructor
@@ -4259,6 +4273,9 @@ Woorksheet.prototype.getDefaultFontName=function(){
 Woorksheet.prototype.getDefaultFontSize=function(){
 	return this.workbook.getDefaultSize();
 };
+Woorksheet.prototype.charCountToModelColWidth = function (count) {
+	return this.workbook.charCountToModelColWidth(count);
+};
 Woorksheet.prototype.getColWidth=function(index){
 	//index 0 based
 	//Результат в пунктах
@@ -4272,8 +4289,10 @@ Woorksheet.prototype.getColWidth=function(index){
 	return dResult;
 };
 Woorksheet.prototype.setColWidth=function(width, start, stop){
+	width = this.charCountToModelColWidth(width);
 	if(0 == width)
 		return this.setColHidden(true, start, stop);
+
 	//start, stop 0 based
 	if(null == start)
 		return;

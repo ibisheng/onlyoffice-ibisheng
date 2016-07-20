@@ -753,14 +753,13 @@
             return;
         }
         var cc = Math.min(t._colWidthToCharCount(w), Asc.c_oAscMaxColumnWidth);
-        var cw = t._charCountToModelColWidth(cc);
 
         var onChangeWidthCallback = function (isSuccess) {
             if (false === isSuccess) {
                 return;
             }
 
-            t.model.setColWidth(cw, col, col);
+            t.model.setColWidth(cc, col, col);
             t._cleanCache(new asc_Range(0, 0, t.cols.length - 1, t.rows.length - 1));
             t.changeWorksheet("update", {reinitRanges: true});
             t._updateVisibleColsCount();
@@ -1200,13 +1199,13 @@
     WorksheetView.prototype._initWorksheetDefaultWidth = function () {
         this.nBaseColWidth = this.model.oSheetFormatPr.nBaseColWidth || this.nBaseColWidth;
         // Теперь рассчитываем число px
-        var defaultColWidthChars = this._charCountToModelColWidth( this.nBaseColWidth );
+        var defaultColWidthChars = this.model.charCountToModelColWidth( this.nBaseColWidth );
         this.defaultColWidthPx = this._modelColWidthToColWidth( defaultColWidthChars ) * asc_getcvt( 1/*pt*/, 0/*px*/, 96 );
         // Делаем кратным 8 (http://support.microsoft.com/kb/214123)
         this.defaultColWidthPx = asc_ceil( this.defaultColWidthPx / 8 ) * 8;
         this.defaultColWidthChars = this._colWidthToCharCount( this.defaultColWidthPx * asc_getcvt( 0/*px*/, 1/*pt*/, 96 ) );
 
-        AscCommonExcel.oDefaultMetrics.ColWidthChars = this._charCountToModelColWidth(this.defaultColWidthChars);
+        AscCommonExcel.oDefaultMetrics.ColWidthChars = this.model.charCountToModelColWidth(this.defaultColWidthChars);
         this.defaultColWidth = this._modelColWidthToColWidth(AscCommonExcel.oDefaultMetrics.ColWidthChars);
 
         var defaultFontSize = this.model.getDefaultFontSize();
@@ -1294,18 +1293,6 @@
     };
 
     /**
-     * Вычисляет ширину столбца для заданного количества символов
-     * @param {Number} count  Количество символов
-     * @returns {Number}      Ширина столбца в символах
-     */
-    WorksheetView.prototype._charCountToModelColWidth = function ( count ) {
-        if ( count <= 0 ) {
-            return 0;
-        }
-        return asc_floor( (count * this.maxDigitWidth + this.settings.cells.paddingPlusBorder) / this.maxDigitWidth * 256 ) / 256;
-    };
-
-    /**
      * Вычисляет ширину столбца в пунктах
      * @param {Number} mcw  Количество символов
      * @returns {Number}    Ширина столбца в пунктах (pt)
@@ -1354,14 +1341,13 @@
 
     /** Вычисляет ширину колонки заголовков (в pt) */
     WorksheetView.prototype._calcHeaderColumnWidth = function () {
-        if ( false === this.model.sheetViews[0].asc_getShowRowColHeaders() ) {
+        if (false === this.model.sheetViews[0].asc_getShowRowColHeaders()) {
             this.headersWidth = 0;
-        }
-        else {
+        } else {
             // Ширина колонки заголовков считается  - max число знаков в строке - перевести в символы - перевести в пикселы
-            var numDigit = Math.max( calcDecades( this.visibleRange.r2 + 1 ), 3 );
-            var nCharCount = this._charCountToModelColWidth( numDigit );
-            this.headersWidth = this._modelColWidthToColWidth( nCharCount );
+            var numDigit = Math.max(calcDecades(this.visibleRange.r2 + 1), 3);
+            var nCharCount = this.model.charCountToModelColWidth(numDigit);
+            this.headersWidth = this._modelColWidthToColWidth(nCharCount);
         }
 
         //var w = this.emSize * Math.max( calcDecades(this.visibleRange.r2 + 1), 3) * 1.25;
@@ -4675,7 +4661,7 @@
 
     WorksheetView.prototype._changeColWidth = function ( col, width, pad ) {
         var cc = Math.min( this._colWidthToCharCount( width + pad ), Asc.c_oAscMaxColumnWidth );
-        var modelw = this._charCountToModelColWidth( cc );
+        var modelw = this.model.charCountToModelColWidth( cc );
         var colw = this._calcColWidth( modelw );
 
         if ( colw.width > this.cols[col].width ) {
@@ -10343,14 +10329,14 @@
         return true;
     };
 
-    WorksheetView.prototype.changeWorksheet = function ( prop, val ) {
+    WorksheetView.prototype.changeWorksheet = function (prop, val) {
         // Проверка глобального лока
-        if ( this.collaborativeEditing.getGlobalLock() ) {
+        if (this.collaborativeEditing.getGlobalLock()) {
             return;
         }
 
         var t = this;
-        var arn = t.activeRange.clone( true );
+        var arn = t.activeRange.clone(true);
         var checkRange = arn.getAllRange();
 
         var range;
@@ -10358,169 +10344,171 @@
         var reinitRanges = false;
         var updateDrawingObjectsInfo = null;
         var updateDrawingObjectsInfo2 = null;//{bInsert: false, operType: c_oAscInsertOptions.InsertColumns, updateRange: arn}
-        var cw;
         var isUpdateCols = false, isUpdateRows = false;
         var isCheckChangeAutoFilter;
         var functionModelAction = null;
         var lockDraw = false;	// Параметр, при котором не будет отрисовки (т.к. мы просто обновляем информацию на неактивном листе)
-        var oChangeData = new AscFormat.CChangeTableData( null, null, null, null ); // Обновление для диаграмм
+        var oChangeData = new AscFormat.CChangeTableData(null, null, null, null); // Обновление для диаграмм
 
-        var onChangeWorksheetCallback = function ( isSuccess ) {
-            if ( false === isSuccess ) {
+        var onChangeWorksheetCallback = function (isSuccess) {
+            if (false === isSuccess) {
                 return;
             }
 
-            asc_applyFunction( functionModelAction );
+            asc_applyFunction(functionModelAction);
 
-            t._initCellsArea( fullRecalc );
-            if ( fullRecalc ) {
+            t._initCellsArea(fullRecalc);
+            if (fullRecalc) {
                 t.cache.reset();
             }
             t._cleanCellsTextMetricsCache();
             t._prepareCellTextMetricsCache();
 
-            if(t.objectRender) {
-                if ( reinitRanges  && t.objectRender.drawingArea ) {
+            if (t.objectRender) {
+                if (reinitRanges && t.objectRender.drawingArea) {
                     t.objectRender.drawingArea.reinitRanges();
                 }
-                if ( null !== updateDrawingObjectsInfo) {
-                    t.objectRender.updateSizeDrawingObjects( updateDrawingObjectsInfo );
+                if (null !== updateDrawingObjectsInfo) {
+                    t.objectRender.updateSizeDrawingObjects(updateDrawingObjectsInfo);
                 }
-                if ( null !== updateDrawingObjectsInfo2 ) {
-                    t.objectRender.updateDrawingObject(updateDrawingObjectsInfo2.bInsert, updateDrawingObjectsInfo2.operType, updateDrawingObjectsInfo2.updateRange);
+                if (null !== updateDrawingObjectsInfo2) {
+                    t.objectRender.updateDrawingObject(updateDrawingObjectsInfo2.bInsert,
+                      updateDrawingObjectsInfo2.operType, updateDrawingObjectsInfo2.updateRange);
                 }
-                t.objectRender.rebuildChartGraphicObjects( oChangeData );
+                t.objectRender.rebuildChartGraphicObjects(oChangeData);
             }
-            t.draw( lockDraw );
+            t.draw(lockDraw);
 
-            t.handlers.trigger( "reinitializeScroll" );
+            t.handlers.trigger("reinitializeScroll");
 
-            if ( isUpdateCols ) {
+            if (isUpdateCols) {
                 t._updateVisibleColsCount();
             }
-            if ( isUpdateRows ) {
+            if (isUpdateRows) {
                 t._updateVisibleRowsCount();
             }
 
-            t.handlers.trigger( "selectionChanged", t.getSelectionInfo() );
-            t.handlers.trigger( "selectionMathInfoChanged", t.getSelectionMathInfo() );
+            t.handlers.trigger("selectionChanged", t.getSelectionInfo());
+            t.handlers.trigger("selectionMathInfoChanged", t.getSelectionMathInfo());
         };
 
-        switch ( prop ) {
+        switch (prop) {
             case "colWidth":
                 functionModelAction = function () {
-                    cw = t._charCountToModelColWidth( val );
-                    t.model.setColWidth( cw, checkRange.c1, checkRange.c2 );
+                    t.model.setColWidth(val, checkRange.c1, checkRange.c2);
                     isUpdateCols = true;
                     fullRecalc = true;
                     reinitRanges = true;
                     updateDrawingObjectsInfo = {target: c_oTargetType.ColumnResize, col: checkRange.c1};
                 };
-                this._isLockedAll( onChangeWorksheetCallback );
+                this._isLockedAll(onChangeWorksheetCallback);
                 break;
             case "showCols":
                 functionModelAction = function () {
-                    t.model.setColHidden( /*bHidden*/false, arn.c1, arn.c2 );
+                    t.model.setColHidden(/*bHidden*/false, arn.c1, arn.c2);
                     fullRecalc = true;
                     reinitRanges = true;
                     updateDrawingObjectsInfo = {target: c_oTargetType.ColumnResize, col: arn.c1};
                 };
-                oChangeData.hided = new asc_Range( arn.c1, 0, arn.c2, gc_nMaxRow0 );
-                this._isLockedAll( onChangeWorksheetCallback );
+                oChangeData.hided = new asc_Range(arn.c1, 0, arn.c2, gc_nMaxRow0);
+                this._isLockedAll(onChangeWorksheetCallback);
                 break;
             case "hideCols":
                 functionModelAction = function () {
-                    t.model.setColHidden( /*bHidden*/true, arn.c1, arn.c2 );
+                    t.model.setColHidden(/*bHidden*/true, arn.c1, arn.c2);
                     fullRecalc = true;
                     reinitRanges = true;
                     updateDrawingObjectsInfo = {target: c_oTargetType.ColumnResize, col: arn.c1};
                 };
-                oChangeData.hided = new asc_Range( arn.c1, 0, arn.c2, gc_nMaxRow0 );
-                this._isLockedAll( onChangeWorksheetCallback );
+                oChangeData.hided = new asc_Range(arn.c1, 0, arn.c2, gc_nMaxRow0);
+                this._isLockedAll(onChangeWorksheetCallback);
                 break;
             case "rowHeight":
                 functionModelAction = function () {
                     // Приводим к px (чтобы было ровно)
                     val = val / 0.75;
                     val = (val | val) * 0.75;		// 0.75 - это размер 1px в pt (можно было 96/72)
-                    t.model.setRowHeight( Math.min( val, t.maxRowHeight ), checkRange.r1, checkRange.r2, true );
+                    t.model.setRowHeight(Math.min(val, t.maxRowHeight), checkRange.r1, checkRange.r2, true);
                     isUpdateRows = true;
                     fullRecalc = true;
                     reinitRanges = true;
                     updateDrawingObjectsInfo = {target: c_oTargetType.RowResize, row: checkRange.r1};
                 };
-                return this._isLockedAll( onChangeWorksheetCallback );
+                return this._isLockedAll(onChangeWorksheetCallback);
             case "showRows":
                 functionModelAction = function () {
-                    t.model.setRowHidden( /*bHidden*/false, arn.r1, arn.r2 );
-                    t.model.autoFilters.reDrawFilter( arn );
+                    t.model.setRowHidden(/*bHidden*/false, arn.r1, arn.r2);
+                    t.model.autoFilters.reDrawFilter(arn);
                     fullRecalc = true;
                     reinitRanges = true;
                     updateDrawingObjectsInfo = {target: c_oTargetType.RowResize, row: arn.r1};
                 };
-                oChangeData.hided = new asc_Range( 0, arn.r1, gc_nMaxCol0, arn.r2 );
-                this._isLockedAll( onChangeWorksheetCallback );
+                oChangeData.hided = new asc_Range(0, arn.r1, gc_nMaxCol0, arn.r2);
+                this._isLockedAll(onChangeWorksheetCallback);
                 break;
             case "hideRows":
                 functionModelAction = function () {
-                    t.model.setRowHidden( /*bHidden*/true, arn.r1, arn.r2 );
-                    t.model.autoFilters.reDrawFilter( arn );
+                    t.model.setRowHidden(/*bHidden*/true, arn.r1, arn.r2);
+                    t.model.autoFilters.reDrawFilter(arn);
                     fullRecalc = true;
                     reinitRanges = true;
                     updateDrawingObjectsInfo = {target: c_oTargetType.RowResize, row: arn.r1};
                 };
-                oChangeData.hided = new asc_Range( 0, arn.r1, gc_nMaxCol0, arn.r2 );
-                this._isLockedAll( onChangeWorksheetCallback );
+                oChangeData.hided = new asc_Range(0, arn.r1, gc_nMaxCol0, arn.r2);
+                this._isLockedAll(onChangeWorksheetCallback);
                 break;
             case "insCell":
-                range = t.model.getRange3( arn.r1, arn.c1, arn.r2, arn.c2 );
-                switch ( val ) {
+                range = t.model.getRange3(arn.r1, arn.c1, arn.r2, arn.c2);
+                switch (val) {
                     case c_oAscInsertOptions.InsertCellsAndShiftRight:
-                        isCheckChangeAutoFilter = t.af_checkInsDelCells( arn, c_oAscInsertOptions.InsertCellsAndShiftRight, prop );
-                        if ( isCheckChangeAutoFilter === false ) {
+                        isCheckChangeAutoFilter =
+                          t.af_checkInsDelCells(arn, c_oAscInsertOptions.InsertCellsAndShiftRight, prop);
+                        if (isCheckChangeAutoFilter === false) {
                             return;
                         }
 
                         functionModelAction = function () {
                             History.Create_NewPoint();
                             History.StartTransaction();
-                            if ( range.addCellsShiftRight() ) {
+                            if (range.addCellsShiftRight()) {
                                 fullRecalc = true;
                                 reinitRanges = true;
-                                t.cellCommentator.updateCommentsDependencies( true, val, arn );
+                                t.cellCommentator.updateCommentsDependencies(true, val, arn);
                                 updateDrawingObjectsInfo2 = {bInsert: true, operType: val, updateRange: arn};
                             }
                             History.EndTransaction();
                         };
 
-                        oChangeData.changedRange = new asc_Range( arn.c1, arn.r1, gc_nMaxCol0, arn.r2 );
-                        this._isLockedCells( oChangeData.changedRange, null, onChangeWorksheetCallback );
+                        oChangeData.changedRange = new asc_Range(arn.c1, arn.r1, gc_nMaxCol0, arn.r2);
+                        this._isLockedCells(oChangeData.changedRange, null, onChangeWorksheetCallback);
                         break;
                     case c_oAscInsertOptions.InsertCellsAndShiftDown:
-                        isCheckChangeAutoFilter = t.af_checkInsDelCells( arn, c_oAscInsertOptions.InsertCellsAndShiftDown, prop );
-                        if ( isCheckChangeAutoFilter === false ) {
+                        isCheckChangeAutoFilter =
+                          t.af_checkInsDelCells(arn, c_oAscInsertOptions.InsertCellsAndShiftDown, prop);
+                        if (isCheckChangeAutoFilter === false) {
                             return;
                         }
 
                         functionModelAction = function () {
                             History.Create_NewPoint();
                             History.StartTransaction();
-                            if ( range.addCellsShiftBottom() ) {
+                            if (range.addCellsShiftBottom()) {
                                 fullRecalc = true;
                                 reinitRanges = true;
-                                t.cellCommentator.updateCommentsDependencies( true, val, arn );
+                                t.cellCommentator.updateCommentsDependencies(true, val, arn);
                                 updateDrawingObjectsInfo2 = {bInsert: true, operType: val, updateRange: arn};
                             }
                             History.EndTransaction();
                         };
 
-                        oChangeData.changedRange = new asc_Range( arn.c1, arn.r1, arn.c2, gc_nMaxRow0 );
-                        this._isLockedCells( oChangeData.changedRange, null, onChangeWorksheetCallback );
+                        oChangeData.changedRange = new asc_Range(arn.c1, arn.r1, arn.c2, gc_nMaxRow0);
+                        this._isLockedCells(oChangeData.changedRange, null, onChangeWorksheetCallback);
                         break;
                     case c_oAscInsertOptions.InsertColumns:
-                        isCheckChangeAutoFilter = t.model.autoFilters.isRangeIntersectionSeveralTableParts( arn );
-                        if ( isCheckChangeAutoFilter === true ) {
-                            this.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterChangeFormatTableError, c_oAscError.Level.NoCritical);
+                        isCheckChangeAutoFilter = t.model.autoFilters.isRangeIntersectionSeveralTableParts(arn);
+                        if (isCheckChangeAutoFilter === true) {
+                            this.model.workbook.handlers.trigger("asc_onError",
+                              c_oAscError.ID.AutoFilterChangeFormatTableError, c_oAscError.Level.NoCritical);
                             return;
                         }
 
@@ -10529,73 +10517,79 @@
                             History.StartTransaction();
                             fullRecalc = true;
                             reinitRanges = true;
-                            t.model.insertColsBefore( arn.c1, arn.c2 - arn.c1 + 1 );
+                            t.model.insertColsBefore(arn.c1, arn.c2 - arn.c1 + 1);
                             updateDrawingObjectsInfo2 = {bInsert: true, operType: val, updateRange: arn};
-                            t.cellCommentator.updateCommentsDependencies( true, val, arn );
+                            t.cellCommentator.updateCommentsDependencies(true, val, arn);
                             History.EndTransaction();
                         };
 
-                        oChangeData.added = new asc_Range( arn.c1, 0, arn.c2, gc_nMaxRow0 );
-                        this._isLockedCells( oChangeData.added, c_oAscLockTypeElemSubType.InsertColumns, onChangeWorksheetCallback );
+                        oChangeData.added = new asc_Range(arn.c1, 0, arn.c2, gc_nMaxRow0);
+                        this._isLockedCells(oChangeData.added, c_oAscLockTypeElemSubType.InsertColumns,
+                          onChangeWorksheetCallback);
                         break;
                     case c_oAscInsertOptions.InsertRows:
                         functionModelAction = function () {
                             fullRecalc = true;
                             reinitRanges = true;
-                            t.model.insertRowsBefore( arn.r1, arn.r2 - arn.r1 + 1 );
+                            t.model.insertRowsBefore(arn.r1, arn.r2 - arn.r1 + 1);
                             updateDrawingObjectsInfo2 = {bInsert: true, operType: val, updateRange: arn};
-                            t.cellCommentator.updateCommentsDependencies( true, val, arn );
+                            t.cellCommentator.updateCommentsDependencies(true, val, arn);
                         };
 
-                        oChangeData.added = new asc_Range( 0, arn.r1, gc_nMaxCol0, arn.r2 );
-                        this._isLockedCells( oChangeData.added, c_oAscLockTypeElemSubType.InsertRows, onChangeWorksheetCallback );
+                        oChangeData.added = new asc_Range(0, arn.r1, gc_nMaxCol0, arn.r2);
+                        this._isLockedCells(oChangeData.added, c_oAscLockTypeElemSubType.InsertRows,
+                          onChangeWorksheetCallback);
                         break;
                 }
                 break;
             case "delCell":
-                range = t.model.getRange3( checkRange.r1, checkRange.c1, checkRange.r2, checkRange.c2 );
-                switch ( val ) {
+                range = t.model.getRange3(checkRange.r1, checkRange.c1, checkRange.r2, checkRange.c2);
+                switch (val) {
                     case c_oAscDeleteOptions.DeleteCellsAndShiftLeft:
-                        isCheckChangeAutoFilter = t.af_checkInsDelCells( arn, c_oAscDeleteOptions.DeleteCellsAndShiftLeft, prop );
-                        if ( isCheckChangeAutoFilter === false ) {
+                        isCheckChangeAutoFilter =
+                          t.af_checkInsDelCells(arn, c_oAscDeleteOptions.DeleteCellsAndShiftLeft, prop);
+                        if (isCheckChangeAutoFilter === false) {
                             return;
                         }
 
                         functionModelAction = function () {
                             History.Create_NewPoint();
                             History.StartTransaction();
-                            if ( isCheckChangeAutoFilter === true ) {
-                                t.model.autoFilters.isEmptyAutoFilters( arn, c_oAscDeleteOptions.DeleteCellsAndShiftLeft );
+                            if (isCheckChangeAutoFilter === true) {
+                                t.model.autoFilters.isEmptyAutoFilters(arn,
+                                  c_oAscDeleteOptions.DeleteCellsAndShiftLeft);
                             }
-                            if ( range.deleteCellsShiftLeft( function () {
-                                t._cleanCache( oChangeData.changedRange );
-                                t.cellCommentator.updateCommentsDependencies( false, val, checkRange );
-                            } ) ) {
+                            if (range.deleteCellsShiftLeft(function () {
+                                  t._cleanCache(oChangeData.changedRange);
+                                  t.cellCommentator.updateCommentsDependencies(false, val, checkRange);
+                              })) {
                                 updateDrawingObjectsInfo2 = {bInsert: false, operType: val, updateRange: arn};
                             }
                             History.EndTransaction();
                             reinitRanges = true;
                         };
 
-                        oChangeData.changedRange = new asc_Range( checkRange.c1, checkRange.r1, gc_nMaxCol0, checkRange.r2 );
-                        this._isLockedCells( oChangeData.changedRange, null, onChangeWorksheetCallback );
+                        oChangeData.changedRange =
+                          new asc_Range(checkRange.c1, checkRange.r1, gc_nMaxCol0, checkRange.r2);
+                        this._isLockedCells(oChangeData.changedRange, null, onChangeWorksheetCallback);
                         break;
                     case c_oAscDeleteOptions.DeleteCellsAndShiftTop:
-                        isCheckChangeAutoFilter = t.af_checkInsDelCells( arn, c_oAscDeleteOptions.DeleteCellsAndShiftTop, prop );
-                        if ( isCheckChangeAutoFilter === false ) {
+                        isCheckChangeAutoFilter =
+                          t.af_checkInsDelCells(arn, c_oAscDeleteOptions.DeleteCellsAndShiftTop, prop);
+                        if (isCheckChangeAutoFilter === false) {
                             return;
                         }
 
                         functionModelAction = function () {
                             History.Create_NewPoint();
                             History.StartTransaction();
-                            if ( isCheckChangeAutoFilter === true ) {
-                                t.model.autoFilters.isEmptyAutoFilters( arn, c_oAscDeleteOptions.DeleteCellsAndShiftTop );
+                            if (isCheckChangeAutoFilter === true) {
+                                t.model.autoFilters.isEmptyAutoFilters(arn, c_oAscDeleteOptions.DeleteCellsAndShiftTop);
                             }
-                            if ( range.deleteCellsShiftUp( function () {
-                                t._cleanCache( oChangeData.changedRange );
-                                t.cellCommentator.updateCommentsDependencies( false, val, checkRange );
-                            } ) ) {
+                            if (range.deleteCellsShiftUp(function () {
+                                  t._cleanCache(oChangeData.changedRange);
+                                  t.cellCommentator.updateCommentsDependencies(false, val, checkRange);
+                              })) {
                                 updateDrawingObjectsInfo2 = {bInsert: false, operType: val, updateRange: arn};
                             }
                             History.EndTransaction();
@@ -10603,12 +10597,14 @@
                             reinitRanges = true;
                         };
 
-                        oChangeData.changedRange = new asc_Range( checkRange.c1, checkRange.r1, checkRange.c2, gc_nMaxRow0 );
-                        this._isLockedCells( oChangeData.changedRange, null, onChangeWorksheetCallback );
+                        oChangeData.changedRange =
+                          new asc_Range(checkRange.c1, checkRange.r1, checkRange.c2, gc_nMaxRow0);
+                        this._isLockedCells(oChangeData.changedRange, null, onChangeWorksheetCallback);
                         break;
                     case c_oAscDeleteOptions.DeleteColumns:
-                        isCheckChangeAutoFilter = t.model.autoFilters.isActiveCellsCrossHalfFTable( checkRange, c_oAscDeleteOptions.DeleteColumns, prop );
-                        if ( isCheckChangeAutoFilter === false ) {
+                        isCheckChangeAutoFilter = t.model.autoFilters.isActiveCellsCrossHalfFTable(checkRange,
+                          c_oAscDeleteOptions.DeleteColumns, prop);
+                        if (isCheckChangeAutoFilter === false) {
                             return;
                         }
 
@@ -10617,19 +10613,22 @@
                             reinitRanges = true;
                             History.Create_NewPoint();
                             History.StartTransaction();
-                            t.cellCommentator.updateCommentsDependencies( false, val, checkRange );
-                            t.model.autoFilters.isEmptyAutoFilters( arn, c_oAscDeleteOptions.DeleteColumns );
-                            t.model.removeCols( checkRange.c1, checkRange.c2 );
+                            t.cellCommentator.updateCommentsDependencies(false, val, checkRange);
+                            t.model.autoFilters.isEmptyAutoFilters(arn, c_oAscDeleteOptions.DeleteColumns);
+                            t.model.removeCols(checkRange.c1, checkRange.c2);
                             updateDrawingObjectsInfo2 = {bInsert: false, operType: val, updateRange: arn};
                             History.EndTransaction();
                         };
 
-                        oChangeData.removed = new asc_Range( checkRange.c1, 0, checkRange.c2, gc_nMaxRow0 );
-                        this._isLockedCells( oChangeData.removed, c_oAscLockTypeElemSubType.DeleteColumns, onChangeWorksheetCallback );
+                        oChangeData.removed = new asc_Range(checkRange.c1, 0, checkRange.c2, gc_nMaxRow0);
+                        this._isLockedCells(oChangeData.removed, c_oAscLockTypeElemSubType.DeleteColumns,
+                          onChangeWorksheetCallback);
                         break;
                     case c_oAscDeleteOptions.DeleteRows:
-                        isCheckChangeAutoFilter = t.model.autoFilters.isActiveCellsCrossHalfFTable( checkRange, c_oAscDeleteOptions.DeleteRows, prop );
-                        if ( isCheckChangeAutoFilter === false ) {
+                        isCheckChangeAutoFilter =
+                          t.model.autoFilters.isActiveCellsCrossHalfFTable(checkRange, c_oAscDeleteOptions.DeleteRows,
+                            prop);
+                        if (isCheckChangeAutoFilter === false) {
                             return;
                         }
 
@@ -10638,22 +10637,23 @@
                             reinitRanges = true;
                             History.Create_NewPoint();
                             History.StartTransaction();
-                            t.cellCommentator.updateCommentsDependencies( false, val, checkRange );
-                            t.model.autoFilters.isEmptyAutoFilters( arn, c_oAscDeleteOptions.DeleteRows );
-                            t.model.removeRows( checkRange.r1, checkRange.r2 );
+                            t.cellCommentator.updateCommentsDependencies(false, val, checkRange);
+                            t.model.autoFilters.isEmptyAutoFilters(arn, c_oAscDeleteOptions.DeleteRows);
+                            t.model.removeRows(checkRange.r1, checkRange.r2);
                             updateDrawingObjectsInfo2 = {bInsert: false, operType: val, updateRange: arn};
                             History.EndTransaction();
                         };
 
-                        oChangeData.removed = new asc_Range( 0, checkRange.r1, gc_nMaxCol0, checkRange.r2 );
-                        this._isLockedCells( oChangeData.removed, c_oAscLockTypeElemSubType.DeleteRows, onChangeWorksheetCallback );
+                        oChangeData.removed = new asc_Range(0, checkRange.r1, gc_nMaxCol0, checkRange.r2);
+                        this._isLockedCells(oChangeData.removed, c_oAscLockTypeElemSubType.DeleteRows,
+                          onChangeWorksheetCallback);
                         break;
                 }
-                this.handlers.trigger( "selectionNameChanged", t.getSelectionName( /*bRangeText*/false ) );
+                this.handlers.trigger("selectionNameChanged", t.getSelectionName(/*bRangeText*/false));
                 break;
             case "sheetViewSettings":
                 functionModelAction = function () {
-                    t.model.setSheetViewSettings( val );
+                    t.model.setSheetViewSettings(val);
 
                     isUpdateCols = true;
                     isUpdateRows = true;
@@ -10661,15 +10661,15 @@
                     reinitRanges = true;
                 };
 
-                this._isLockedAll( onChangeWorksheetCallback );
+                this._isLockedAll(onChangeWorksheetCallback);
                 break;
             case "update":
-                if ( val !== undefined ) {
+                if (val !== undefined) {
                     fullRecalc = !!val.fullRecalc;
                     lockDraw = true === val.lockDraw;
                     reinitRanges = !!val.reinitRanges;
                 }
-                onChangeWorksheetCallback( true );
+                onChangeWorksheetCallback(true);
                 break;
         }
     };
@@ -10806,7 +10806,7 @@
         if (width > 0) {
             pad = this.width_padding * 2 + this.width_1px;
             cc = Math.min(this._colWidthToCharCount(width + pad), Asc.c_oAscMaxColumnWidth);
-            cw = this._charCountToModelColWidth(cc);
+            cw = this.model.charCountToModelColWidth(cc);
         } else {
             cw = AscCommonExcel.oDefaultMetrics.ColWidthChars;
             cc = this.defaultColWidthChars;
