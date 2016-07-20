@@ -7219,20 +7219,24 @@ ParaDrawing.prototype =
         this.ParaMath = ParaMath;
     },
 
-    Convert_ToMathObject : function()
+    Convert_ToMathObject : function(isOpen)
     {
-        // TODO: Вообще здесь нужно запрашивать шрифты, которые использовались в старой формуле,
-        //      но пока это только 1 шрифт "Cambria Math".
-        var loader = AscCommon.g_font_loader;
-        var fontinfo = g_fontApplication.GetFontInfo("Cambria Math");
-        var isasync = loader.LoadFont(fontinfo, ConvertEquationToMathCallback, this);
-        if (false === isasync)
-        {
-            this.private_ConvertToMathObject();
+        if(isOpen){
+            this.private_ConvertToMathObject(isOpen);
+        } else {
+            // TODO: Вообще здесь нужно запрашивать шрифты, которые использовались в старой формуле,
+            //      но пока это только 1 шрифт "Cambria Math".
+            var loader = AscCommon.g_font_loader;
+            var fontinfo = g_fontApplication.GetFontInfo("Cambria Math");
+            var isasync = loader.LoadFont(fontinfo, ConvertEquationToMathCallback, this);
+            if (false === isasync)
+            {
+                this.private_ConvertToMathObject();
+            }
         }
     },
 
-    private_ConvertToMathObject : function()
+    private_ConvertToMathObject : function(isOpen)
     {
         var Para = this.Get_Paragraph();
         if (undefined === Para || null === Para || !(Para instanceof Paragraph))
@@ -7257,9 +7261,11 @@ ParaDrawing.prototype =
             return;
 
         var LogicDocument = editor.WordControl.m_oLogicDocument;
-        if (false === LogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_None, {Type : AscCommon.changestype_2_Element_and_Type, Element : Para, CheckType : AscCommon.changestype_Paragraph_Content}))
+        if (isOpen || false === LogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_None, {Type : AscCommon.changestype_2_Element_and_Type, Element : Para, CheckType : AscCommon.changestype_Paragraph_Content}))
         {
-            LogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_ConvertOldEquation);
+            if (!isOpen) {
+                LogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_ConvertOldEquation);
+            }
 
             // Коректируем формулу после конвертации
             this.ParaMath.Correct_AfterConvertFromEquation();
@@ -7277,15 +7283,17 @@ ParaDrawing.prototype =
             Para.Add_ToContent(TopElementPos + 1, this.ParaMath);
             Para.Correct_Content(TopElementPos, TopElementPos + 2);
 
-            // Устанавливаем курсор в начало правого элемента, полученного после Split
-            LogicDocument.Selection_Remove();
-            RightElement.Cursor_MoveToStartPos();
-            Para.CurPos.ContentPos = TopElementPos + 2;
-            Para.Document_SetThisElementCurrent(false);
+            if (!isOpen) {
+                // Устанавливаем курсор в начало правого элемента, полученного после Split
+                LogicDocument.Selection_Remove();
+                RightElement.Cursor_MoveToStartPos();
+                Para.CurPos.ContentPos = TopElementPos + 2;
+                Para.Document_SetThisElementCurrent(false);
 
-            LogicDocument.Recalculate();
-            LogicDocument.Document_UpdateSelectionState();
-            LogicDocument.Document_UpdateInterfaceState();
+                LogicDocument.Recalculate();
+                LogicDocument.Document_UpdateSelectionState();
+                LogicDocument.Document_UpdateInterfaceState();
+            }
         }
     },
 

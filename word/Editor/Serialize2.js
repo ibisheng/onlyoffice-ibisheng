@@ -5235,7 +5235,8 @@ function BinaryFileReader(doc, openParams)
 		aPostOpenStyleNumCallbacks: null,
 		headers: null,
 		footers: null,
-		trackRevisions: null
+		trackRevisions: null,
+		drawingToMath: null
 	};   
     
     this.getbase64DecodedData = function(szSrc)
@@ -5414,6 +5415,7 @@ function BinaryFileReader(doc, openParams)
 		this.oReadResult.aPostOpenStyleNumCallbacks = [];
 		this.oReadResult.headers = [];
 		this.oReadResult.footers = [];
+		this.oReadResult.drawingToMath = [];
 		
         var res = c_oSerConstants.ReadOk;
         //mtLen
@@ -5863,6 +5865,9 @@ function BinaryFileReader(doc, openParams)
 			// this.oReadResult.aPostOpenStyleNumCallbacks[i].call();
 		if (null != this.oReadResult.trackRevisions) {
 			this.Document.DrawingDocument.m_oWordControl.m_oApi.asc_SetTrackRevisions(this.oReadResult.trackRevisions);
+		}
+		for (var i = 0; i < this.oReadResult.drawingToMath.length; ++i) {
+			this.oReadResult.drawingToMath[i].Convert_ToMathObject(true);
 		}
         this.Document.On_EndLoad();
 		//чтобы удалялся stream с бинарником
@@ -8754,8 +8759,14 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 			res = this.bcr.Read1(length, function(t, l){
                 return oThis.ReadObject(t,l,oParStruct,oDrawing);
 			});
-			if(null != oDrawing.content.GraphicObj)
+			if (null != oDrawing.content.GraphicObj) {
 				oNewElem = oDrawing.content;
+				//todo do another check
+				if (oDrawing.ParaMath && oNewElem.GraphicObj.getImageUrl && 'image-1.jpg' === oNewElem.GraphicObj.getImageUrl()) {
+					//word 95 ole without image
+					this.oReadResult.drawingToMath.push(oNewElem);
+				}
+			}
 		}
         else if (c_oSerRunType.cr === type)
         {
