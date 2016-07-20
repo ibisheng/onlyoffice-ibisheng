@@ -1951,13 +1951,7 @@ background-repeat: no-repeat;\
 		var _logicDoc = this.WordControl.m_oLogicDocument;
 		if (!_logicDoc)
 			return;
-
-		if (false === _logicDoc.Document_Is_SelectionLocked(changestype_Paragraph_Content))
-		{
-			History.Create_NewPoint(AscDFH.historydescription_Cut);
-			_logicDoc.Remove(1, true, true);
-			_logicDoc.Document_UpdateSelectionState();
-		}
+		_logicDoc.Remove(1, true, true);
 	};
 
 	asc_docs_api.prototype.onSaveCallback = function(e)
