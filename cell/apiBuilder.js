@@ -69,7 +69,7 @@
 
 	/**
 	 * This type specifies the types, create charts
-	 * @typedef {("bar" | "barStacked" | "barStackedPercent" | "bar3D" | "barStacked3D" | "barStackedPercent3D" | "barStackedPercent3DPerspective" | "horizontalBar" | "horizontalBarStacked" | "horizontalBarStackedPercent" | "horizontalBar3D" | "horizontalBarStacked3D" | "horizontalBarStackedPercent3D" | "lineNormal" | "lineStacked" | "lineStackedPercent" | "line3D" | "pie" | "pie3D" | "doughnut" | "scatter" | "stock")} ChartType
+	 * @typedef {("bar" | "barStacked" | "barStackedPercent" | "bar3D" | "barStacked3D" | "barStackedPercent3D" | "barStackedPercent3DPerspective" | "horizontalBar" | "horizontalBarStacked" | "horizontalBarStackedPercent" | "horizontalBar3D" | "horizontalBarStacked3D" | "horizontalBarStackedPercent3D" | "lineNormal" | "lineStacked" | "lineStackedPercent" | "line3D" | "pie" | "pie3D" | "doughnut" | "scatter" | "stock"  | "area" | "areaStacked" | "areaStackedPercent")} ChartType
 	 */
 
 	/**
@@ -280,6 +280,21 @@
 				case "stock":
 				{
 					settings.type = Asc.c_oAscChartTypeSettings.stock;
+					break;
+				}
+				case "area":
+				{
+					settings.type = Asc.c_oAscChartTypeSettings.areaNormal;
+					break;
+				}
+				case "areaStacked":
+				{
+					settings.type = Asc.c_oAscChartTypeSettings.areaStacked;
+					break;
+				}
+				case "areaStackedPercent":
+				{
+					settings.type = Asc.c_oAscChartTypeSettings.areaStackedPer;
 					break;
 				}
 			}
