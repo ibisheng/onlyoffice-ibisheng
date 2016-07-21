@@ -3192,11 +3192,6 @@ CDocMeta.prototype =
                 this.selectAll();
             }
         }
-        else if ( e.KeyCode == 67 && true === e.CtrlKey ) // Ctrl + C + ...
-        {
-            AscCommon.Editor_Copy(editor);
-            //íå âîçâðàùàåì true ÷òîáû íå áûëî preventDefault
-        }
 		else if ( e.KeyCode == 80 && true === e.CtrlKey ) // Ctrl + P + ...
         {
             editor.onPrint();

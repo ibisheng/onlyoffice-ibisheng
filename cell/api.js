@@ -472,6 +472,7 @@ var editor;
 
       return;
     }
+    return AscCommon.g_clipboardBase.Button_Copy();
   };
 
   spreadsheet_api.prototype.asc_Paste = function() {
@@ -492,6 +493,12 @@ var editor;
 	  window["AscDesktopEditorButtonMode"] = false;
 
       return;
+    }
+    else if (true/*can paste?*/) {
+      if (AscCommon.g_clipboardBase.IsWorking())
+        return false;
+
+      return AscCommon.g_clipboardBase.Button_Paste();
     }
   };
 
@@ -514,6 +521,7 @@ var editor;
 
       return;
     }
+    return AscCommon.g_clipboardBase.Button_Cut();
   };
 
   spreadsheet_api.prototype.asc_PasteData = function(_format, data1, data2)
