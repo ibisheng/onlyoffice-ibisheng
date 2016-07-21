@@ -2493,7 +2493,6 @@
 					event.preventDefault();
 				}
 				return false;
-
 		}
 
 		t.skipKeyPress = false;

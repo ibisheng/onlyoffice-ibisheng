@@ -375,12 +375,6 @@
           self.cellEditor.setFocus(false);
           self.getWorksheet().enterCellRange(self.cellEditor);
           self.lockDraw = false;
-        }, "copy": function () {
-          self.copyToClipboard.apply(self, arguments);
-        }, "paste": function () {
-          self.pasteFromClipboard.apply(self, arguments);
-        }, "cut": function () {
-          self.cutToClipboard.apply(self, arguments);
         }, "undo": function () {
           self.undo.apply(self, arguments);
         }, "redo": function () {
@@ -532,10 +526,6 @@
           self._onUpdateCellEditor.apply(self, arguments);
         }, "gotFocus": function (hasFocus) {
           self.controller.setFocus(!hasFocus);
-        }, "paste": function () {
-          self.pasteFromClipboard.apply(self, arguments);
-        }, "cut": function () {
-          self.cutToClipboard.apply(self, arguments);
         }, "updateFormulaEditMod": function () {
           self.controller.setFormulaEditMode.apply(self.controller, arguments);
           var ws = self.getWorksheet();
@@ -1969,13 +1959,13 @@
   };
   
    WorkbookView.prototype.checkCopyToClipboard = function(_clipboard, _formats) {
-    var t = this, ws, v;
+    var t = this, ws;
     ws = t.getWorksheet();
     t.clipboard.checkCopyToClipboard(ws, _clipboard, _formats);
   };
 
   WorkbookView.prototype.pasteData = function(_format, data1, data2) {
-    var t = this, ws, v;
+    var t = this, ws;
     ws = t.getWorksheet();
     t.clipboard.pasteData(ws, _format, data1, data2);
   };
