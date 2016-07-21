@@ -8761,26 +8761,6 @@ function CPres()
             var _rec_start = s.cur;
             var _end_rec = _rec_start + s.GetULong() + 4;
 
-            s.Skip2(1); // start attributes
-
-            while (true)
-            {
-                var _at = s.GetUChar();
-                if (_at == AscCommon.g_nodeAttributeEnd)
-                    break;
-
-                switch (_at)
-                {
-                    case 0:
-                    {
-                        shape.attrUseBgFill = s.GetBool();
-                        break;
-                    }
-                    default:
-                        break;
-                }
-            }
-
             while (s.cur < _end_rec)
             {
                 var _at = s.GetUChar();
