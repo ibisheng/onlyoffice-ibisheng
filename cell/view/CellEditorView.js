@@ -2249,6 +2249,8 @@
 						}
 					}
 				}
+				event.stopPropagation();
+				event.preventDefault();
 				return false;
 
 			case 9: // tab
