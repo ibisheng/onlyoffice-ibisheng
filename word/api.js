@@ -1863,15 +1863,8 @@ background-repeat: no-repeat;\
 	{
 		if (window["AscDesktopEditor"])
 		{
-			var _e     = new AscCommon.CKeyboardEvent();
-			_e.CtrlKey = true;
-			_e.KeyCode = 67;
-
-			window["AscDesktopEditorButtonMode"] = true;
-			this.WordControl.m_oLogicDocument.OnKeyDown(_e);
-			window["AscDesktopEditorButtonMode"] = false;
-
-			return;
+			window["AscDesktopEditor"]["Copy"]();
+			return true;
 		}
 		return AscCommon.g_clipboardBase.Button_Copy();
 	};
@@ -1883,15 +1876,8 @@ background-repeat: no-repeat;\
 	{
 		if (window["AscDesktopEditor"])
 		{
-			var _e     = new AscCommon.CKeyboardEvent();
-			_e.CtrlKey = true;
-			_e.KeyCode = 88;
-
-			window["AscDesktopEditorButtonMode"] = true;
-			this.WordControl.m_oLogicDocument.OnKeyDown(_e);
-			window["AscDesktopEditorButtonMode"] = false;
-
-			return;
+			window["AscDesktopEditor"]["Cut"]();
+			return true;
 		}
 		return AscCommon.g_clipboardBase.Button_Cut();
 	};
@@ -1899,16 +1885,11 @@ background-repeat: no-repeat;\
 	{
 		if (window["AscDesktopEditor"])
 		{
-			var _e     = new AscCommon.CKeyboardEvent();
-			_e.CtrlKey = true;
-			_e.KeyCode = 86;
-
-			window["AscDesktopEditorButtonMode"] = true;
-			this.WordControl.m_oLogicDocument.OnKeyDown(_e);
-			window["AscDesktopEditorButtonMode"] = false;
-
-			return;
+			window["AscDesktopEditor"]["Paste"]();
+			return true;
 		}
+		if (!this.WordControl.m_oLogicDocument)
+			return false;
 
 		if (false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content))
 		{

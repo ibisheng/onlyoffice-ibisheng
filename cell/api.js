@@ -454,70 +454,31 @@ var editor;
   };
 
   spreadsheet_api.prototype.asc_Copy = function() {
-    if (window["AscDesktopEditor"]) {
-
-      var _e = {};
-      _e.ctrlKey = true;
-      _e.shiftKey = false;
-      _e.which = 67;
-
-	  window["AscDesktopEditorButtonMode"] = true;
-	  
-	  if (!this.asc_getCellEditMode())
-		this.controller._onWindowKeyDown(_e);
-	  else
-		this.wb.cellEditor._onWindowKeyDown(_e);
-	  
-	  window["AscDesktopEditorButtonMode"] = false;
-
-      return;
+    if (window["AscDesktopEditor"])
+    {
+      window["AscDesktopEditor"]["Copy"]();
+      return true;
     }
     return AscCommon.g_clipboardBase.Button_Copy();
   };
 
   spreadsheet_api.prototype.asc_Paste = function() {
-    if (window["AscDesktopEditor"]) {
-
-      var _e = {};
-      _e.ctrlKey = true;
-      _e.shiftKey = false;
-      _e.which = 86;
-
-	  window["AscDesktopEditorButtonMode"] = true;
-      
-	  if (!this.asc_getCellEditMode())
-		this.controller._onWindowKeyDown(_e);
-	  else
-		this.wb.cellEditor._onWindowKeyDown(_e);
-	
-	  window["AscDesktopEditorButtonMode"] = false;
-
-      return;
+    if (window["AscDesktopEditor"])
+    {
+      window["AscDesktopEditor"]["Paste"]();
+      return true;
     }
-    else if (!AscCommon.g_clipboardBase.IsWorking()) {
+    if (!AscCommon.g_clipboardBase.IsWorking()) {
       return AscCommon.g_clipboardBase.Button_Paste();
     }
     return false;
   };
 
   spreadsheet_api.prototype.asc_Cut = function() {
-    if (window["AscDesktopEditor"]) {
-
-      var _e = {};
-      _e.ctrlKey = true;
-      _e.shiftKey = false;
-      _e.which = 88;
-
-	  window["AscDesktopEditorButtonMode"] = true;
-      
-	  if (!this.asc_getCellEditMode())
-		this.controller._onWindowKeyDown(_e);
-	  else
-		this.wb.cellEditor._onWindowKeyDown(_e);	  
-	  
-	  window["AscDesktopEditorButtonMode"] = false;
-
-      return;
+    if (window["AscDesktopEditor"])
+    {
+      window["AscDesktopEditor"]["Cut"]();
+      return true;
     }
     return AscCommon.g_clipboardBase.Button_Cut();
   };
