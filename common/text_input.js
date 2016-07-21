@@ -110,6 +110,7 @@
 
 		this.ieNonCompositionPrefix = "";
 		this.ieNonCompositionPrefixConfirm = "";
+		this.isFirstCompositionUpdateAfterStart = true;
 	}
 
 	CTextInput.prototype =
@@ -580,6 +581,7 @@
 		{
 			this.compositionState = c_oCompositionState.start;
 			this.Api.Begin_CompositeInput();
+			this.isFirstCompositionUpdateAfterStart = true;
 		},
 
 		onCompositionUpdate : function(e, isLockTarget, _data, isFromEnd)
@@ -592,13 +594,13 @@
 			}
 			else
 			{
-				if (!e.target.msGetInputContext)
+				if (!e.target["msGetInputContext"])
 				{
 					this.checkCompositionData(e.data);
 				}
 				else
 				{
-					var ctx = e.target.msGetInputContext();
+					var ctx = e.target["msGetInputContext"]();
 
 					/*
 					1) 	ie может не присылать onCompositionEnd (например при длительном наборе текста на японском)
@@ -610,11 +612,19 @@
 					только не добавляем дату в редактор. А очищаем только на onInput, когда нет композиции
 					 */
 
-					if (undefined !== ctx.compositionStartOffset)
+					if (undefined !== ctx["compositionStartOffset"])
 					{
 						this.ieNonCompositionPrefix = "";
-						if (0 < ctx.compositionStartOffset)
-							this.ieNonCompositionPrefix = this.HtmlArea.value.substr(0, ctx.compositionStartOffset);
+						if (0 < ctx["compositionStartOffset"])
+							this.ieNonCompositionPrefix = this.HtmlArea.value.substr(0, ctx["compositionStartOffset"]);
+
+						if (this.isFirstCompositionUpdateAfterStart)
+						{
+							// нельзя очищать текст HtmlArea на onCompositeEnd, так как может блокироваться следующая композиция
+							// но тогда может возникать ситуация, когда не сбросилась дата (не пришел onInput не в композиции)
+							// поэтому первый текст this.ieNonCompositionPrefix после старта копозиции - считаем введенным
+							this.ieNonCompositionPrefixConfirm = this.ieNonCompositionPrefix;
+						}
 
 						if (this.ieNonCompositionPrefix != this.ieNonCompositionPrefixConfirm)
 						{
@@ -674,6 +684,7 @@
 			}
 
 			this.compositionState = c_oCompositionState.process;
+			this.isFirstCompositionUpdateAfterStart = false;
 		},
 
 		isWaitFirstTextInputEvent : function(e)
