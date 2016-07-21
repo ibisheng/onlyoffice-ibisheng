@@ -494,12 +494,10 @@ var editor;
 
       return;
     }
-    else if (true/*can paste?*/) {
-      if (AscCommon.g_clipboardBase.IsWorking())
-        return false;
-
+    else if (!AscCommon.g_clipboardBase.IsWorking()) {
       return AscCommon.g_clipboardBase.Button_Paste();
     }
+    return false;
   };
 
   spreadsheet_api.prototype.asc_Cut = function() {
