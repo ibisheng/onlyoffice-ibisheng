@@ -6769,19 +6769,7 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype["asc_pluginButtonClick"]               = asc_docs_api.prototype.asc_pluginButtonClick;
 	asc_docs_api.prototype["asc_addOleObject"]                    = asc_docs_api.prototype.asc_addOleObject;
 	asc_docs_api.prototype["asc_editOleObject"]                   = asc_docs_api.prototype.asc_editOleObject;
-	asc_docs_api.prototype["Begin_CompositeInput"]                = asc_docs_api.prototype.Begin_CompositeInput;
-	asc_docs_api.prototype["Add_CompositeText"]                   = asc_docs_api.prototype.Add_CompositeText;
-	asc_docs_api.prototype["Remove_CompositeText"]                = asc_docs_api.prototype.Remove_CompositeText;
-	asc_docs_api.prototype["Replace_CompositeText"]               = asc_docs_api.prototype.Replace_CompositeText;
-	asc_docs_api.prototype["Set_CursorPosInCompositeText"]        = asc_docs_api.prototype.Set_CursorPosInCompositeText;
-	asc_docs_api.prototype["Get_CursorPosInCompositeText"]        = asc_docs_api.prototype.Get_CursorPosInCompositeText;
-	asc_docs_api.prototype["End_CompositeInput"]                  = asc_docs_api.prototype.End_CompositeInput;
-	asc_docs_api.prototype["Get_MaxCursorPosInCompositeText"]     = asc_docs_api.prototype.Get_MaxCursorPosInCompositeText;
-	asc_docs_api.prototype["Input_UpdatePos"]                     = asc_docs_api.prototype.Input_UpdatePos;
-	asc_docs_api.prototype["onKeyDown"]                           = asc_docs_api.prototype.onKeyDown;
-	asc_docs_api.prototype["onKeyPress"]                          = asc_docs_api.prototype.onKeyPress;
-	asc_docs_api.prototype["onKeyUp"]                             = asc_docs_api.prototype.onKeyUp;
-
+	asc_docs_api.prototype["asc_InputClearKeyboardElement"]       = asc_docs_api.prototype.asc_InputClearKeyboardElement;
 
 
 	window['Asc']['asc_CCommentData'] = window['Asc'].asc_CCommentData = asc_CCommentData;

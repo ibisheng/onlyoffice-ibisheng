@@ -3504,4 +3504,6 @@ var editor;
   prot["asc_pluginButtonClick"]     = prot.asc_pluginButtonClick;
   prot["asc_addOleObject"]          = prot.asc_addOleObject;
   prot["asc_editOleObject"]         = prot.asc_editOleObject;
+
+  prot["asc_InputClearKeyboardElement"] = prot.asc_InputClearKeyboardElement;
 })(window);

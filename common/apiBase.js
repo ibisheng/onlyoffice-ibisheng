@@ -994,6 +994,11 @@
 	baseEditorsApi.prototype.Input_UpdatePos = function()
 	{
 	};
+	baseEditorsApi.prototype.asc_InputClearKeyboardElement = function()
+	{
+		if (AscCommon.g_inputContext)
+			AscCommon.g_inputContext.nativeFocusElement = null;
+	};
 
 	baseEditorsApi.prototype.onKeyDown = function(e)
 	{
