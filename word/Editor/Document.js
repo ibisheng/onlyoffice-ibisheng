@@ -46,8 +46,6 @@ var changestype_Paragraph_Content = AscCommon.changestype_Paragraph_Content;
 var changestype_2_Element_and_Type = AscCommon.changestype_2_Element_and_Type;
 var changestype_2_ElementsArray_and_Type = AscCommon.changestype_2_ElementsArray_and_Type;
 var g_oTableId = AscCommon.g_oTableId;
-var Editor_Copy = AscCommon.Editor_Copy;
-var Editor_Paste = AscCommon.Editor_Paste;
 var History = AscCommon.History;
 
 var c_oAscHAnchor = Asc.c_oAscHAnchor;

@@ -753,14 +753,17 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype.ContentToHTML = function(bIsRet)
 	{
 		this.DocumentReaderMode            = new AscCommon.CDocumentReaderMode();
-		var _old                           = PasteElementsId.copyPasteUseBinary;
-		PasteElementsId.copyPasteUseBinary = false;
+
 		this.WordControl.m_oLogicDocument.Select_All();
-		AscCommon.Editor_Copy(this);
+		var text_data = {
+			data : "",
+			pushData : function(format, value) { this.data = value; }
+		};
+
+		this.asc_CheckCopy(text_data, 2);
 		this.WordControl.m_oLogicDocument.Selection_Remove();
-		PasteElementsId.copyPasteUseBinary = _old;
-		this.DocumentReaderMode            = null;
-		return document.getElementById("SelectId").innerHTML;
+
+		return text_data.data;
 	};
 
 	asc_docs_api.prototype.InitEditor = function()
