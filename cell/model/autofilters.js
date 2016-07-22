@@ -949,6 +949,7 @@
 								this._setStyleTables(cloneData.newFilterRef);
 								
 								//event
+								//todo
 								worksheet.handlers.trigger("changeRefTablePart", cloneData.oldFilter.DisplayName, cloneData.oldFilter.Ref);
 								
 								break;
@@ -1064,7 +1065,7 @@
 							if(cloneData.Ref.isEqual(worksheet.TableParts[l].Ref))
 							{
 								this._cleanStyleTable(cloneData.Ref);
-                                worksheet.workbook.dependencyFormulas.delTableName(worksheet.TableParts[l].DisplayName, worksheet.getName());
+                                worksheet.workbook.dependencyFormulas.delTableName(worksheet.TableParts[l].DisplayName);
                                 worksheet.TableParts.splice(l,1);
 							}	
 						}
@@ -1150,7 +1151,7 @@
 							t._addHistoryObj(oldFilter, AscCH.historyitem_AutoFilter_Empty, {activeCells: activeCells}, null, oldFilter.Ref);
 						
 						if(isTablePart)
-							worksheet.workbook.dependencyFormulas.delTableName(oldFilter.DisplayName, worksheet.getName())
+							worksheet.workbook.dependencyFormulas.delTableName(oldFilter.DisplayName)
 					} else
 						return oldFilter;
 				};
@@ -2543,7 +2544,7 @@
 				History.StartTransaction();
 				
 				//TODO добавлять в историю смену именного диапазона
-				worksheet.workbook.dependencyFormulas.changeTableRef(tableName, worksheet, newName);
+				worksheet.workbook.dependencyFormulas.changeTableName(tableName, newName);
 				
 				tablePart.changeDisplayName(newName);
 				

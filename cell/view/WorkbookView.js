@@ -2298,7 +2298,7 @@
 
       var delDefinedNamesCallback = function(res) {
         if (res) {
-          t.handlers.trigger("asc_onDelDefName", t.model.delDefinesNames(oldName));
+          t.model.delDefinesNames(oldName);
           t.handlers.trigger("asc_onRefreshDefNameList");
         } else {
           t.handlers.trigger("asc_onError", c_oAscError.ID.LockCreateDefName, c_oAscError.Level.NoCritical);

@@ -321,7 +321,8 @@
 	};
 	CFormulaCF.prototype.getValue = function(ws) {
 		this.init(ws);
-		return this._f.calculate().getValue();
+		//todo bbox
+		return this._f.calculate(null, null).getValue();
 	};
 
 	function CIconSet () {

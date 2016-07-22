@@ -4733,7 +4733,7 @@ TablePart.prototype.moveRef = function(col, row) {
 
 	this.Ref = ref;
 	//event
-	this.handlers.trigger("changeRefTablePart", this.DisplayName, this.Ref);
+	this.handlers.trigger("changeRefTablePart", this.DisplayName, this.getRangeWithoutHeaderFooter());
 
 	if(this.AutoFilter)
 		this.AutoFilter.moveRef(col, row);
@@ -4748,9 +4748,7 @@ TablePart.prototype.changeRef = function(col, row, bIsFirst) {
 	this.Ref = ref;
 	
 	//event
-	var endRow = this.TotalsRowCount ? this.Ref.r2 - 1 : this.Ref.r2;
-	var refNamedRanges = Asc.Range(this.Ref.c1, this.Ref.r1, this.Ref.c2, endRow);
-	this.handlers.trigger("changeRefTablePart", this.DisplayName, refNamedRanges);
+	this.handlers.trigger("changeRefTablePart", this.DisplayName, this.getRangeWithoutHeaderFooter());
 	
 	if(this.AutoFilter)
 		this.AutoFilter.changeRef(col, row, bIsFirst);
@@ -4793,9 +4791,8 @@ TablePart.prototype.changeRefOnRange = function(range, autoFilters, generateNewT
 		}
 	}
 	
-	this.Ref = Asc.Range(range.c1, range.r1, range.c2, range.r2);
 	//event
-	this.handlers.trigger("changeRefTablePart", this.DisplayName, this.Ref);
+	this.handlers.trigger("changeRefTablePart", this.DisplayName, this.getRangeWithoutHeaderFooter());
 	
 	if(this.AutoFilter)
 		this.AutoFilter.changeRefOnRange(range);
@@ -4927,9 +4924,15 @@ TablePart.prototype.getTableRangeForFormula = function(objectParam)
 		}
 		case FormulaTablePartInfo.thisRow:
 		{
-//            if( this.Ref.containsRange( objectParam.cell ) ){
-                res = new Asc.Range( this.Ref.c1, objectParam.cell.r1, this.Ref.c2, objectParam.cell.r1 );
-//            }
+			if (objectParam.cell) {
+				res = new Asc.Range(this.Ref.c1, objectParam.cell.r1, this.Ref.c2, objectParam.cell.r1);
+			} else {
+				//like FormulaTablePartInfo.data
+				var startRow = this.HeaderRowCount === null ? this.Ref.r1 + 1 : this.Ref.r1;
+				var endRow = this.TotalsRowCount ? this.Ref.r2 - 1 : this.Ref.r2;
+
+				res = new Asc.Range(this.Ref.c1, startRow, this.Ref.c2, endRow);
+			}
 			break;
 		}
 		case FormulaTablePartInfo.columns:
@@ -5234,6 +5237,7 @@ AutoFilter.prototype.isShowButton = function()
 
 AutoFilter.prototype.getRangeWithoutHeaderFooter = function()
 {
+	//todo
 	return Asc.Range(this.Ref.c1, this.Ref.r1 + 1, this.Ref.c2, this.Ref.r2);
 }; 
 

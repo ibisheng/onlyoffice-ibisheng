@@ -815,7 +815,9 @@ var c_oAscPrintDefaultSettings = {
 		Dirty: 0,
 		Shift: 1,
 		Move: 2,
-		Delete: 3
+		Delete: 3,
+		ChangeDefName: 4,
+		ChangeDefNameTable: 5
 	};
 
     var c_oDashType = {

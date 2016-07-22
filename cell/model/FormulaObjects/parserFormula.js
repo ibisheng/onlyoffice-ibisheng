@@ -1366,11 +1366,6 @@ function cName( val, wb, ws ) {
 }
 
 cName.prototype = Object.create( cBaseType.prototype );
-cName.prototype.reInit = function () {
-    this.defName = this.wb.getDefinesNames( this.value, this.ws.getId() );
-    this.defName.parsedRef = new parserFormula( this.defName.ref, "", this.ws );
-    this.defName.parsedRef.parse();
-};
 cName.prototype.toRef = function () {
 
     if ( !this.defName || !this.defName.ref ) {
@@ -1402,26 +1397,12 @@ cName.prototype.toString = function () {
     }
 };
 cName.prototype.getValue = function () {
-
-    if ( !this.defName ) {
-        return new cError( cErrorType.wrong_name );
-    }
-
-    return this.defName.parsedRef.calculate( this );
+    return this.Calculate();
 };
 cName.prototype.getRef = function () {
 
 };
-cName.prototype.reParse = function () {
-    var dN = this.wb.getDefinesNames( this.defName.name, this.ws.getId() );
-    if ( dN ) {
-        this.defName.parsedRef = new parserFormula( dN.Ref, "", this.ws );
-        this.defName.parsedRef.parse();
-  } else {
-        this.defName.parsedRef = null;
-    }
-};
-cName.prototype.addDefinedNameNode = function ( nameReParse ) {
+cName.prototype.addDefinedNameNode = function () {
     if ( !this.defName || !this.defName.ref ) {
         return this.wb.dependencyFormulas.addDefinedNameNode( this.value, null );
     }
@@ -1435,45 +1416,49 @@ cName.prototype.Calculate = function () {
     if ( !this.defName.parsedRef ) {
         return new cError( cErrorType.wrong_name );
     }
-
-    return this.defName.parsedRef.calculate( this );
+	//defName not linked to cell, use inherit range
+	var r1 = arguments[1];
+    return this.defName.parsedRef.calculate( this , r1);
 
 };
 
 /** @constructor */
-function cStrucTable( val, wb, ws, cell ) {
+function cStrucTable( val, wb, ws ) {
     this.constructor.call( this, val[0].replace("[]",""), cElementType.table );
     this.wb = wb;
     this.ws = ws;
     this.tableName = val['tableName'];
 	this.table = this.wb.getDefinesNames( this.tableName, this.ws ? this.ws.getId() : null );
     this.reservedColumn = null;
-    this.tableData = null;
-
-    var ret = this.createArea( val, cell );
-	return (ret && ret.type != cElementType.error) ? this : ret;
-
+    this.isDynamic = false;//#This row
+    this.area = null;
+    this.val = val;
 }
 
 cStrucTable.prototype = Object.create( cBaseType.prototype );
-cStrucTable.prototype.addDefinedNameNode = function ( nameReParse ) {
-	if ( !this.table || !this.table.Ref ) {
+cStrucTable.prototype.addDefinedNameNode = function () {
+	if ( !this.table || !this.table.ref ) {
 		return this.wb.dependencyFormulas.addDefinedNameNode( this.value, null );
 	}
-	return this.wb.getDefinesNames( this.table.Name, this.ws.getId() );
+	return this.wb.getDefinesNames( this.table.name, this.ws.getId() );
 };
-cStrucTable.prototype.toRef = function () {
-	if ( !this.table || !this.table.Ref ) {
+cStrucTable.prototype.toRef = function (opt_bbox) {
+	//opt_bbox usefull only for #This row
+	//case null == opt_bbox works like FormulaTablePartInfo.data
+	if ( !this.table || !this.table.ref ) {
 		return new cError( cErrorType.wrong_name );
 	}
-    return this.area ? this.area : new cError( cErrorType.bad_reference );
+    if(!this.area || this.isDynamic){
+        this._createArea( this.val, opt_bbox );
+    }
+    return this.area;
 };
 cStrucTable.prototype.toString = function () {
 	var tblStr, columns_1, columns_2;
 	if( !this.table ){
 		return this.value;
 	}
-	tblStr = this.table.Name;
+	tblStr = this.table.name;
 	this.columnName ? tblStr += "[%1]" : null;
 	if ( this.oneColumn ) {
 
@@ -1497,13 +1482,13 @@ cStrucTable.prototype.toString = function () {
       "[" + this.colStart.replace(/#/g, "'#") + "]:[" + this.colEnd.replace(/#/g, "'#") + "]");
 	}
 	if ( this.reservedColumn ) {
-		return tblStr.replace( "%1", this.buildLocalTableString(this.reservedColumnIndex,false) );
+		return tblStr.replace( "%1", this._buildLocalTableString(this.reservedColumnIndex,false) );
 	}
 	if ( this.hdt ) {
 		var re = /\[(.*?)\]/ig, m, data = "",i=0;
 		while ( null !== (m = re.exec( this.hdt )) ) {
 
-      data += "[" + this.buildLocalTableString(this.hdtIndexes[i], false) + "]" + FormulaSeparators.functionArgumentSeparatorDef;
+      data += "[" + this._buildLocalTableString(this.hdtIndexes[i], false) + "]" + FormulaSeparators.functionArgumentSeparatorDef;
 		}
 		data = data.substr( 0, data.length - 1 );
 		if ( this.hdtcstart ) {
@@ -1533,7 +1518,7 @@ cStrucTable.prototype.toLocaleString = function () {
 	if( !this.table ){
 		return this.value;
 	}
-	tblStr = this.table.Name;
+	tblStr = this.table.name;
 	this.columnName ? tblStr += "[%1]" : null;
 	if ( this.oneColumn ) {
 
@@ -1557,13 +1542,13 @@ cStrucTable.prototype.toLocaleString = function () {
       "[" + this.colStart.replace(/#/g, "'#") + "]:[" + this.colEnd.replace(/#/g, "'#") + "]");
 	}
 	if ( this.reservedColumn ) {
-		return tblStr.replace( "%1", this.buildLocalTableString(this.reservedColumnIndex,true) );
+		return tblStr.replace( "%1", this._buildLocalTableString(this.reservedColumnIndex,true) );
 	}
 	if ( this.hdt ) {
 		var re = /\[(.*?)\]/ig, m, data = "",i=0;
 		while ( null !== (m = re.exec( this.hdt )) ) {
 
-      data += "[" + this.buildLocalTableString(this.hdtIndexes[i], true) + "]" + FormulaSeparators.functionArgumentSeparatorDef;
+      data += "[" + this._buildLocalTableString(this.hdtIndexes[i], true) + "]" + FormulaSeparators.functionArgumentSeparatorDef;
 		}
 		data = data.substr( 0, data.length - 1 );
 		if ( this.hdtcstart ) {
@@ -1588,13 +1573,10 @@ cStrucTable.prototype.toLocaleString = function () {
 	}
 	return tblStr.replace( "%1", "" ).replace("[]","");
 };
-cStrucTable.prototype.changeArea = function ( offset ) {
-    return this.area;
-};
-cStrucTable.prototype.createArea = function ( val, cell ) {
+cStrucTable.prototype._createArea = function ( val, opt_bbox ) {
     this.columnName  = val['columnName'];
 
-    var paramObj = {param: null, startCol: null, endCol: null, cell: cell.bbox, includeColumnHeader:false};
+    var paramObj = {param: null, startCol: null, endCol: null, cell: opt_bbox, includeColumnHeader:false};
 
     if ( val['oneColumn'] || val['columnRange'] ) {
 
@@ -1623,32 +1605,35 @@ cStrucTable.prototype.createArea = function ( val, cell ) {
 			}
         }
 
-        this.tableData = this.wb.getTableRangeForFormula( this.tableName, paramObj );
+        var tableData = this.wb.getTableRangeForFormula( this.tableName, paramObj );
 
-        if ( !this.tableData ) {
+        if ( !tableData ) {
             return this.area = new cError( cErrorType.bad_reference );
         }
-		if( this.tableData.range ){
-			this.area = this.tableData.range.isOneCell() ?
-        new cRef3D(this.tableData.range.getAbsName(), this.wb.getWorksheetById(this.tableData.wsID)
+		if( tableData.range ){
+			this.area = tableData.range.isOneCell() ?
+        new cRef3D(tableData.range.getAbsName(), this.wb.getWorksheetById(tableData.wsID)
           .getName(), this.wb) :
-        new cArea3D(this.tableData.range.getAbsName(), this.wb.getWorksheetById(this.tableData.wsID)
-          .getName(), this.wb.getWorksheetById(this.tableData.wsID).getName(), this.wb);
+        new cArea3D(tableData.range.getAbsName(), this.wb.getWorksheetById(tableData.wsID)
+          .getName(), this.wb.getWorksheetById(tableData.wsID).getName(), this.wb);
 		}
   } else if (val['reservedColumn'] || !val['columnName']) {
 		this.reservedColumn = val['reservedColumn'] || "";
     this.reservedColumnIndex = paramObj.param = parserHelp.getColumnTypeByName(this.reservedColumn);
+        if(AscCommon.FormulaTablePartInfo.thisRow == paramObj.param){
+            this.isDynamic = true;
+        }
 
-        this.tableData = this.wb.getTableRangeForFormula( this.tableName, paramObj );
-        if ( !this.tableData ) {
+        tableData = this.wb.getTableRangeForFormula( this.tableName, paramObj );
+        if ( !tableData ) {
 			return this.area = new cError( cErrorType.bad_reference );
         }
-		if( this.tableData.range ){
-			this.area = this.tableData.range.isOneCell() ?
-        new cRef3D(this.tableData.range.getAbsName(), this.wb.getWorksheetById(this.tableData.wsID)
+		if( tableData.range ){
+			this.area = tableData.range.isOneCell() ?
+        new cRef3D(tableData.range.getAbsName(), this.wb.getWorksheetById(tableData.wsID)
           .getName(), this.wb) :
-        new cArea3D(this.tableData.range.getAbsName(), this.wb.getWorksheetById(this.tableData.wsID)
-          .getName(), this.wb.getWorksheetById(this.tableData.wsID).getName(), this.wb);
+        new cArea3D(tableData.range.getAbsName(), this.wb.getWorksheetById(tableData.wsID)
+          .getName(), this.wb.getWorksheetById(tableData.wsID).getName(), this.wb);
 		}
   } else if (val['hdtcc']) {
         this.hdt = val['hdt'];
@@ -1658,6 +1643,9 @@ cStrucTable.prototype.createArea = function ( val, cell ) {
         var re = /\[(.*?)\]/ig, m, data, range;
         while ( null !== (m = re.exec( this.hdt )) ) {
       paramObj.param = parserHelp.getColumnTypeByName(m[1]);
+            if(AscCommon.FormulaTablePartInfo.thisRow == paramObj.param){
+                this.isDynamic = true;
+            }
 			this.hdtIndexes.push(paramObj.param);
             data = this.wb.getTableRangeForFormula( this.tableName, paramObj );
 
@@ -1708,20 +1696,20 @@ cStrucTable.prototype.createArea = function ( val, cell ) {
           }
         }
 
-        this.tableData = data;
-        this.tableData.range = range;
+        tableData = data;
+        tableData.range = range;
 		if( range ){
 			this.area = range.isOneCell() ?
-				new cRef3D( range.getAbsName(), this.wb.getWorksheetById( this.tableData.wsID ).getName(), this.wb ):
-        new cArea3D(range.getAbsName(), this.wb.getWorksheetById(this.tableData.wsID)
-          .getName(), this.wb.getWorksheetById(this.tableData.wsID).getName(), this.wb);
+				new cRef3D( range.getAbsName(), this.wb.getWorksheetById( tableData.wsID ).getName(), this.wb ):
+        new cArea3D(range.getAbsName(), this.wb.getWorksheetById(tableData.wsID)
+          .getName(), this.wb.getWorksheetById(tableData.wsID).getName(), this.wb);
 		}
     }
 
     !this.area ? this.area = new cError( cErrorType.bad_reference ) : null;
 	return this.area;
 };
-cStrucTable.prototype.buildLocalTableString = function (reservedColumn,local) {
+cStrucTable.prototype._buildLocalTableString = function (reservedColumn,local) {
   return parserHelp.getColumnNameByType(reservedColumn, local);
 };
 
@@ -3680,13 +3668,19 @@ function parserFormula( formula, parent, _ws ) {
     }
     this.isDirty = isDirty;
   };
-  parserFormula.prototype.notify = function(data) {
-	  if(AscCommon.c_oNotifyType.Dirty != data.type){
-		  this.shiftCells2(data.type, data.sheetId, data.bbox, data.offset);
-	  }
-
-	  this.setIsDirty(true);
-  };
+	parserFormula.prototype.notify = function(data) {
+		if (AscCommon.c_oNotifyType.Dirty === data.type) {
+			this.setIsDirty(true);
+		} else if (AscCommon.c_oNotifyType.ChangeDefName === data.type) {
+			this.setFormula(this.assemble());
+		} else {
+			this.shiftCells2(data.type, data.sheetId, data.bbox, data.offset);
+			this.wb.dependencyFormulas.addToChangedElem(this.parent);
+		}
+		if (this.parent) {
+			this.parent.notify(data);
+		}
+	};
 parserFormula.prototype.clone = function(formula, parent, ws) {
     if (null == formula) {
     formula = this.Formula;
@@ -4141,8 +4135,7 @@ parserFormula.prototype.parse = function(local, digitDelim) {
       }
 
       else if (_tableTMP = parserHelp.isTable.call(this, this.Formula, this.pCurrPos, local)) {
-		  //todo Range
-        found_operand = new cStrucTable(_tableTMP, this.wb, this.ws, this.parent);
+        found_operand = new cStrucTable(_tableTMP, this.wb, this.ws);
 
         if (found_operand.type != cElementType.error) {
           this.RefPos.push({
@@ -4170,9 +4163,8 @@ parserFormula.prototype.parse = function(local, digitDelim) {
           this.ws)[0]) {
         found_operand = new cName(this.operand_str, this.wb, this.ws);
         if (found_operand.defName && found_operand.defName.isTable) {
-			//todo Range
           found_operand =
-            new cStrucTable(parserHelp.isTable(this.operand_str + "[]", 0), this.wb, this.ws, this.parent);
+            new cStrucTable(parserHelp.isTable(this.operand_str + "[]", 0), this.wb, this.ws);
         }
         this.RefPos.push({
             start: this.pCurrPos - this.operand_str.length,
@@ -4290,7 +4282,7 @@ parserFormula.prototype.parse = function(local, digitDelim) {
   }
 };
 
-parserFormula.prototype.calculate = function(isDefName) {
+parserFormula.prototype.calculate = function(opt_defName, opt_range) {
     this.isDirty = false;
 	if (this.isCalculate) {
 		this.value = new cError(cErrorType.bad_reference);
@@ -4306,7 +4298,18 @@ parserFormula.prototype.calculate = function(isDefName) {
 	this.isCalculate = false;
     return this.value;
   }
-  
+	var rangeCell = null;
+  if(opt_range){
+	  rangeCell = opt_range;
+  } else{
+	  if(this.parent instanceof AscCommonExcel.Cell){
+		  rangeCell = this.ws.getCell3(this.parent.nRow,this.parent.nCol);
+	  } else {
+		  //we should not be here
+		  rangeCell = this.ws.getCell3(0,0);
+	  }
+  }
+
   var elemArr = [], _tmp, numFormat = -1, currentElement = null;
   for (var i = 0; i < this.outStack.length; i++) {
     currentElement = this.outStack[i];
@@ -4325,9 +4328,7 @@ parserFormula.prototype.calculate = function(isDefName) {
         for (var ind = 0; ind < currentElement.getArguments(); ind++) {
           arg.unshift(elemArr.pop());
         }
-        //todo Range
-          _tmp = currentElement.Calculate(arg, this.parent, isDefName,
-            this.ws ? this.ws.getId() : undefined);
+          _tmp = currentElement.Calculate(arg, rangeCell, opt_defName, this.ws.getId());
         if (_tmp.numFormat !== undefined && _tmp.numFormat !== null) {
           numFormat = _tmp.numFormat; //> numFormat ? _tmp.numFormat : numFormat;
           } else if (numFormat < 0 || currentElement.numFormat < currentElement.formatType.def) {
@@ -4336,9 +4337,9 @@ parserFormula.prototype.calculate = function(isDefName) {
         elemArr.push(_tmp);
       }
       } else if (currentElement.type == cElementType.name || currentElement.type == cElementType.name3D) {
-      elemArr.push(currentElement.Calculate());
+      elemArr.push(currentElement.Calculate(arg, rangeCell));
       } else if (currentElement.type == cElementType.table) {
-      elemArr.push(currentElement.toRef());
+      elemArr.push(currentElement.toRef(rangeCell.getBBox0()));
       } else {
       elemArr.push(currentElement);
     }
@@ -4929,26 +4930,20 @@ parserFormula.prototype.removeSheet = function(sheetId) {
   return bRes;
 };
 
-parserFormula.prototype.buildDependencies = function(nameReParse, defName) {
+parserFormula.prototype.buildDependencies = function() {
 
-  var node, ref, nTo, wsR;
+  var ref, nTo, wsR;
 
-  if(this.ca){
+  if(this.ca) {
 	  this.wb.dependencyFormulas.startListeningVolatile(this);
-  }
-  if (!defName) {
-    //node = this.wb.dependencyFormulas.addNode(this.ws.Id, this.cellId, true)
-  } else {
-    node = defName;
   }
 
   for (var i = 0; i < this.outStack.length; i++) {
     ref = this.outStack[i];
 
     if (ref.type == cElementType.table) {
-      //nTo = ref.addDefinedNameNode(/*nameReParse*/);
-      //this.wb.dependencyFormulas.addEdge2(node, nTo);
-      // ToDo нет зависимости от имени таблицы. Проблемы будут, если сменить диапазон у таблицы. На ссылку в зависимостях это не повлияет..
+      nTo = ref.addDefinedNameNode();
+		nTo.startListening(this);
       ref = ref.toRef();
     }
 
@@ -4960,7 +4955,7 @@ parserFormula.prototype.buildDependencies = function(nameReParse, defName) {
     }
 
     if (ref.type == cElementType.name || ref.type == cElementType.name3D) {
-      nTo = ref.addDefinedNameNode(/*nameReParse*/);
+      nTo = ref.addDefinedNameNode();
 		nTo.startListening(this);
       //this.wb.dependencyFormulas.addEdge2(node, nTo);
     } else if ((ref instanceof cRef || ref instanceof cRef3D || ref instanceof cArea) && ref.isValid()) {
@@ -4987,9 +4982,8 @@ parserFormula.prototype.buildDependencies = function(nameReParse, defName) {
       ref = this.outStack[i];
 
       if (ref.type == cElementType.table) {
-        //nTo = ref.addDefinedNameNode(/*nameReParse*/);
-        //this.wb.dependencyFormulas.addEdge2(node, nTo);
-        // ToDo нет зависимости от имени таблицы. Проблемы будут, если сменить диапазон у таблицы. На ссылку в зависимостях это не повлияет..
+        nTo = ref.addDefinedNameNode();
+		  nTo.endListening(this);
         ref = ref.toRef();
       }
 
@@ -5002,7 +4996,7 @@ parserFormula.prototype.buildDependencies = function(nameReParse, defName) {
 
       if (ref.type == cElementType.name || ref.type == cElementType.name3D) {
 		  //todo
-		  nTo = ref.addDefinedNameNode(/*nameReParse*/);
+		  nTo = ref.addDefinedNameNode();
 		  nTo.endListening(this);
       } else if ((ref instanceof cRef || ref instanceof cRef3D || ref instanceof cArea) && ref.isValid()) {
         var bbox = AscCommonExcel.g_oRangeCache.getActiveRange(ref._cells.replace(this.regSpace, ""));

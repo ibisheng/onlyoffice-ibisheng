@@ -836,7 +836,8 @@
 //             var __e__ = new Date().getTime();
 //             console.log("e-s "+ (__e__ - __s__));
 
-		this._formula = new AscCommonExcel.parserFormula( s.substr( 1 ), this.options.cellName, ws );
+		var bbox = AscCommonExcel.g_oRangeCache.getActiveRange(this.options.cellName);
+		this._formula = new AscCommonExcel.parserFormula( s.substr( 1 ), null, ws );
 		this._formula.parse();
 
 		var r, offset, _e, _s, wsName = null, refStr, isName = false,
@@ -896,7 +897,7 @@
 					case cElementType.table          :
 					case cElementType.name          :
 					{
-						var nameRef = r.oper.toRef();
+						var nameRef = r.oper.toRef(bbox);
 						if( nameRef instanceof AscCommonExcel.cError ) continue;
 						switch ( nameRef.type ) {
 
@@ -961,7 +962,8 @@
 			wsOPEN = this.handlers.trigger( "getCellFormulaEnterWSOpen" ),
 			ws = wsOPEN ? wsOPEN.model : this.handlers.trigger( "getActiveWS" );
 
-		this._formula = new AscCommonExcel.parserFormula( s.substr( 1 ), this.options.cellName, ws );
+		var bbox = AscCommonExcel.g_oRangeCache.getActiveRange(this.options.cellName);
+		this._formula = new AscCommonExcel.parserFormula( s.substr( 1 ), null, ws );
 		this._formula.parse();
 
 		if ( this._formula.RefPos && this._formula.RefPos.length > 0 ) {
@@ -1015,7 +1017,7 @@
 					case cElementType.table          :
 					case cElementType.name          :
 					{
-						var nameRef = r.oper.toRef();
+						var nameRef = r.oper.toRef(bbox);
 						if ( nameRef instanceof AscCommonExcel.cError ) continue;
 						switch ( nameRef.type ) {
 
