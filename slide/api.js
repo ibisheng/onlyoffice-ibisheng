@@ -746,6 +746,8 @@
 		this._gui_editor_themes   = null;
 		this._gui_document_themes = null;
 
+		this.EndShowMessage = undefined;
+
 		if (window.editor == undefined)
 		{
 			window.editor = this;
@@ -5701,6 +5703,11 @@ background-repeat: no-repeat;\
 
 	asc_docs_api.prototype.DemonstrationPlay = function()
 	{
+		if (undefined !== this.EndShowMessage)
+		{
+			this.WordControl.DemonstrationManager.EndShowMessage = this.EndShowMessage;
+			this.EndShowMessage = undefined;
+		}
 		this.WordControl.DemonstrationManager.Play();
 	};
 
@@ -5711,7 +5718,10 @@ background-repeat: no-repeat;\
 
 	asc_docs_api.prototype.DemonstrationEndShowMessage = function(message)
 	{
-		this.WordControl.DemonstrationManager.EndShowMessage = message;
+		if (!this.WordControl)
+			this.EndShowMessage = message;
+		else
+			this.WordControl.DemonstrationManager.EndShowMessage = message;
 	};
 
 	asc_docs_api.prototype.DemonstrationNextSlide = function()
