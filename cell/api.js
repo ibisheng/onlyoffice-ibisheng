@@ -614,17 +614,17 @@ var editor;
     return this.isViewMode;
   };
 
-  spreadsheet_api.prototype.asc_setViewMode = function(isViewerMode) {
+  spreadsheet_api.prototype.asc_setViewMode = function (isViewMode) {
+    this.isViewMode = !!isViewMode;
     if (!this.isLoadFullApi) {
-      this.isViewMode = isViewerMode;
       return;
     }
-    this.controller.setViewerMode(isViewerMode);
+    this.controller.setViewerMode(isViewMode);
     if (this.collaborativeEditing) {
-      this.collaborativeEditing.setViewerMode(isViewerMode);
+      this.collaborativeEditing.setViewerMode(isViewMode);
     }
 
-    if (false === isViewerMode) {
+    if (false === isViewMode) {
       // Загружаем не обрезанные шрифты для полной версии (при редактировании)
       if (this.FontLoader.embedded_cut_manager.bIsCutFontsUse) {
         this.FontLoader.embedded_cut_manager.bIsCutFontsUse = false;

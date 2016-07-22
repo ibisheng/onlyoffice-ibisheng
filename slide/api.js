@@ -708,7 +708,6 @@
 		this.bAlignBySelected     = false;
 
 		this.isPaintFormat              = false;
-		this.isViewMode                 = false;
 		this.isShowTableEmptyLine       = false;//true;
 		this.isShowTableEmptyLineAttack = false;//true;
 
@@ -5419,15 +5418,14 @@ background-repeat: no-repeat;\
 	};
 	asc_docs_api.prototype.asc_setViewMode        = function(isViewMode)
 	{
+		this.isViewMode = !!isViewMode;
 		if (!this.isLoadFullApi)
 		{
-			this.isViewMode = isViewMode;
 			return;
 		}
 
 		if (isViewMode)
 		{
-			this.isViewMode             = true;
 			this.ShowParaMarks          = false;
 			this.WordControl.m_bIsRuler = false;
 			this.WordControl.m_oDrawingDocument.ClearCachePages();
@@ -5456,7 +5454,6 @@ background-repeat: no-repeat;\
 
 			this.isUseEmbeddedCutFonts = false;
 
-			this.isViewMode = false;
 			this.WordControl.checkNeedRules();
 			this.WordControl.m_oDrawingDocument.ClearCachePages();
 			this.WordControl.OnResize(true);
