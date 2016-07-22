@@ -111,6 +111,10 @@
 		this.ieNonCompositionPrefix = "";
 		this.ieNonCompositionPrefixConfirm = "";
 		this.isFirstCompositionUpdateAfterStart = true;
+
+		this.debugTexBoxMaxW = 100;
+		this.debugTexBoxMaxH = 20;
+		this.isDebug = false;
 	}
 
 	CTextInput.prototype =
@@ -218,7 +222,7 @@
 				return oThis.onCompositionEnd(e);
 			}, false);
 
-			this.show(false);
+			this.show();
 
 			/*
 			 setInterval(function(){
@@ -265,30 +269,21 @@
 			}
 		},
 
-		initTimer : function()
-		{
-			/*
-			 setInterval(function(){
-			 oThis.checkFocus();
-			 }, 10);
-			 */
-
-			var oThis = this;
-			setTimeout(function()
-			{
-				oThis.checkFocus();
-				oThis.initTimer();
-			}, 40);
-		},
-
 		move : function(x, y)
 		{
 			var oTarget = document.getElementById(this.TargetId);
 			var xPos    = x ? x : parseInt(oTarget.style.left);
 			var yPos    = (y ? y : parseInt(oTarget.style.top)) + parseInt(oTarget.style.height);
 
-			this.HtmlDiv.style.left = xPos + "px";
-			this.HtmlDiv.style.top  = yPos + this.HtmlAreaOffset + "px"; // еще бы сдвинуться на высоту строки
+			if (!this.isDebug)
+			{
+				this.HtmlDiv.style.left = xPos + "px";
+				this.HtmlDiv.style.top  = yPos + this.HtmlAreaOffset + "px"; // еще бы сдвинуться на высоту строки
+			}
+			else
+			{
+				this.debugCalculatePlace(xPos, yPos + this.HtmlAreaOffset);
+			}
 		},
 
 		clear : function(isFromCompositionEnd)
@@ -305,19 +300,104 @@
 			}
 		},
 
-		show : function(isShow)
+		show : function()
 		{
-			if (isShow)
+			if (this.isDebug)
 			{
-				// DEBUG_MODE
-				this.HtmlAreaOffset       = 0;
+				document.getElementById("area_id_main").style.zIndex = 10;
+
 				this.HtmlArea.style.top   = "0px";
 				this.HtmlArea.style.color = "black";
-				this.HtmlDiv.style.zIndex = 5;
-				//this.HtmlDiv.style.width = "200px";
+				this.HtmlDiv.style.zIndex = 90;
 
-				document.getElementById("area_id_parent").parentNode.style.zIndex = 5;
+				this.HtmlArea.setAttribute("style", "left:0px;top:0px;width:100%;height:100%;font-family:arial;font-size:12pt;position:absolute;resize:none;padding:0px;margin:0px;font-weight:normal;box-sizing:content-box;-moz-box-sizing:content-box;-webkit-box-sizing:content-box;");
+				this.HtmlDiv.style.border = "2px solid #4363A4";
+
+				this.HtmlArea.rows        = 1;
 			}
+		},
+
+		debugCalculatePlace : function(x, y)
+		{
+			var _left = x;
+			var _top = y;
+
+			var _editorSdk = document.getElementById("editor_sdk");
+			var _r_max = parseInt(_editorSdk.clientWidth);
+			var _b_max = parseInt(_editorSdk.clientHeight);
+
+			_r_max -= 60;
+			if ((_r_max - _left) > 50)
+			{
+				this.debugTexBoxMaxW = _r_max - _left;
+			}
+			else
+			{
+				_left                = _r_max - 50;
+				this.debugTexBoxMaxW	 = 50;
+			}
+			_b_max -= 40;
+			if ((_b_max - _top) > 50)
+			{
+				this.debugTexBoxMaxH = _b_max - _top;
+			}
+			else
+			{
+				_top				= _b_max - 50;
+				this.debugTexBoxMaxH = 50;
+			}
+
+			this.HtmlDiv.style.left = _left + "px";
+			this.HtmlDiv.style.top  = _top + "px";
+
+			// теперь нужно расчитать ширину/высоту текстбокса
+			var _p              = document.createElement('p');
+			_p.style.zIndex     = "-1";
+			_p.style.position   = "absolute";
+			_p.style.fontFamily = "arial";
+			_p.style.fontSize   = "12pt";
+			_p.style.left       = "0px";
+			_p.style.width      = this.debugTexBoxMaxW + "px";
+
+			_editorSdk.appendChild(_p);
+
+			var _t       = this.HtmlArea.value;
+			_t           = _t.replace(/ /g, "&nbsp;");
+			_p.innerHTML = "<span>" + _t + "</span>";
+			var _width   = _p.firstChild.offsetWidth;
+			_width       = Math.min(_width + 20, this.debugTexBoxMaxW);
+
+			if (AscBrowser.isIE)
+				_width += 10;
+
+			var area          = document.createElement('textarea');
+			area.style.zIndex = "-1";
+			area.id           = "area2_id";
+			area.rows         = 1;
+			area.setAttribute("style", "font-family:arial;font-size:12pt;position:absolute;resize:none;padding:0px;margin:0px;font-weight:normal;box-sizing:content-box;-moz-box-sizing:content-box;-webkit-box-sizing:content-box;");
+			area.style.overflow = "hidden";
+			area.style.width    = _width + "px";
+			_editorSdk.appendChild(area);
+
+			area.value = this.HtmlArea.value;
+
+			var _height = area.clientHeight;
+			if (area.scrollHeight > _height)
+				_height = area.scrollHeight;
+
+			if (_height > this.debugTexBoxMaxH)
+				_height = this.debugTexBoxMaxH;
+
+			_editorSdk.removeChild(_p);
+			_editorSdk.removeChild(area);
+
+			this.HtmlDiv.style.width  = _width + "px";
+			this.HtmlDiv.style.height = _height + "px";
+
+			// вот такая заглушка под firefox если этого не делать, то будет плохо перерисовываться border)
+			var oldZindex                  = parseInt(this.HtmlDiv.style.zIndex);
+			var newZindex                  = (oldZindex == 90) ? "89" : "90";
+			this.HtmlDiv.style.zIndex = newZindex;
 		},
 
 		onInput : function(e)
