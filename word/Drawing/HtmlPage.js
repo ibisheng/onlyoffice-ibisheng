@@ -3410,7 +3410,7 @@ function CEditorPage(api)
 		}
 
 		// отправляем евент о текущей странице. только в мобильной версии
-		if (this.m_oApi.isMobileVersion || this.m_oApi.isViewMode)
+		if ((this.m_oApi.isMobileVersion || this.m_oApi.isViewMode) && (!window["NATIVE_EDITOR_ENJINE"]))
 		{
 			var lPage = this.m_oApi.GetCurrentVisiblePage();
 			this.m_oApi.asc_fireCallback("asc_onCurrentVisiblePage", this.m_oApi.GetCurrentVisiblePage());
