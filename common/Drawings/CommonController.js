@@ -1214,6 +1214,32 @@ DrawingObjectsController.prototype =
         return {X: 0, Y: 0, PageIndex: pageIndex};
     },
 
+
+    CreateDocContent: function(){
+        var oController = this;
+        if(this.selection.groupSelection){
+            oController = this.selection.groupSelection;
+        }
+        if(oController.selection.textSelection){
+            return;
+        }
+        if(oController.selectedObjects.length === 1 && oController.selectedObjects[0].getObjectType() === AscDFH.historyitem_type_Shape){
+            var oShape = oController.selectedObjects[0];
+            if(oShape.bWordShape){
+                if(!oShape.textBoxContent){
+                    oShape.createTextBoxContent();
+                }
+            }
+            else{
+                if(!oShape.txBody){
+                    oShape.createTextBody();
+                }
+            }
+            oController.selection.textSelection = oShape;
+        }
+    },
+
+
     getContextMenuPosition: function(pageIndex)
     {
         var i, aDrawings, dX, dY, oTargetTextObject;
@@ -8932,6 +8958,7 @@ function CalcLiterByLength(aAlphaBet, nLength)
     }
     return sResultLiter;
 }
+
 
 
 

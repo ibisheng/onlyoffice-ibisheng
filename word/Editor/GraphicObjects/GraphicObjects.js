@@ -292,7 +292,7 @@ CGraphicObjects.prototype =
     createTextArt: DrawingObjectsController.prototype.createTextArt,
     getChartObject: DrawingObjectsController.prototype.getChartObject,
     getChartSpace2: DrawingObjectsController.prototype.getChartSpace2,
-
+    CreateDocContent: DrawingObjectsController.prototype.CreateDocContent,
 
     getAllBoundsRectOnPageForMath: function(nPageIndex)
     {

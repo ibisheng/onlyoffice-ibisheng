@@ -514,7 +514,9 @@ CPresentation.prototype =
         if (false === this.Document_Is_SelectionLocked(changestype_Drawing_Props, null, true))
         {
             this.Create_NewHistoryPoint(AscDFH.historydescription_Document_CompositeInput);
-
+            if(this.Slides[this.CurPage]){
+                this.Slides[this.CurPage].graphicObjects.CreateDocContent();
+            }
             this.DrawingDocument.TargetStart();
             this.DrawingDocument.TargetShow();
 
