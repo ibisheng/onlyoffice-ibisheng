@@ -474,9 +474,12 @@
           }
         }, false);
 
-        this.input.addEventListener('keydown', function () {
+        this.input.addEventListener('keydown', function (event) {
           if (self.isCellEditMode) {
-            self.cellEditor._onWindowKeyDown(event, true);
+            self.handlers.trigger('asc_onInputKeyDown', event);
+            if (!event.defaultPrevented) {
+              self.cellEditor._onWindowKeyDown(event, true);
+            }
           }
         }, false);
       }
