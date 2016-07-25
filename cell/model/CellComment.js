@@ -243,7 +243,7 @@ asc_CCommentData.prototype = {
 
 	asc_putQuoteText: function(val) {},
 	asc_getQuoteText: function() {
-		return AscCommon.g_oCellAddressUtils.getCellId(this.nRow, this.nCol);
+		return this.bDocument ? null : AscCommon.g_oCellAddressUtils.getCellId(this.nRow, this.nCol);
 	},
 
 	asc_putRow: function(val) { this.nRow = val; },
