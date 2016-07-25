@@ -2460,8 +2460,14 @@
             if(oThis.isCopyPaste)
                 window["Asc"]["editor"].wb._initCommentsToSave();
 
-            if(ws.aComments.length > 0 && ws.aCommentsCoords.length > 0)
-                this.bs.WriteItem(c_oSerWorksheetsTypes.Comments, function(){oThis.WriteComments(ws.aComments, ws.aCommentsCoords);});
+            var aComments = (0 === index) ? this.wb.aComments.concat(ws.aComments) : ws.aComments;
+            var aCommentsCoords = (0 === index) ? this.wb.aCommentsCoords.concat(ws.aCommentsCoords) :
+              ws.aCommentsCoords;
+            if (aComments.length > 0 && aCommentsCoords.length > 0) {
+                this.bs.WriteItem(c_oSerWorksheetsTypes.Comments, function () {
+                    oThis.WriteComments(aComments, aCommentsCoords);
+                });
+            }
 
             var oBinaryTableWriter;
             if(null != ws.AutoFilter && !this.isCopyPaste)

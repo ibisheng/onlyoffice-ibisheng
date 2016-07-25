@@ -1983,6 +1983,7 @@ function Workbook(eventsHandlers, oApi){
 	this.oStyleManager = new AscCommonExcel.StyleManager();
 	this.calcChain = [];
 	this.aComments = [];	// Комментарии к документу
+	this.aCommentsCoords = [];
 	this.aWorksheets = [];
 	this.aWorksheetsById = {};
 	this.cwf = {};

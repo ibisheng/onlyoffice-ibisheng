@@ -2397,21 +2397,20 @@
   };
 
   WorkbookView.prototype._initCommentsToSave = function() {
-    var isFirst = true;
+    var isFirst = true, wsView, wsModel, tmpWs;
     for (var wsKey in this.wsViews) {
-      var wsView = this.wsViews[wsKey];
-      var wsModel = wsView.model;
-      wsView.cellCommentator.prepareCommentsToSave();
-      wsModel.aCommentsCoords = wsView.cellCommentator.aCommentCoords;
+      wsView = this.wsViews[wsKey];
+      wsModel = wsView.model;
+      wsModel.aCommentsCoords = wsView.cellCommentator.getCoordsToSave();
 
       if (isFirst) {
         isFirst = false;
+        tmpWs = this.cellCommentator.worksheet;
         this.cellCommentator.worksheet = wsView;
         this.cellCommentator.overlayCtx = wsView.overlayCtx;
         this.cellCommentator.drawingCtx = wsView.drawingCtx;
-        this.cellCommentator.prepareCommentsToSave();
-        wsModel.aComments = wsModel.aComments.concat(this.model.aComments);
-        wsModel.aCommentsCoords = wsModel.aCommentsCoords.concat(this.cellCommentator.aCommentCoords);
+        this.model.aCommentsCoords = this.cellCommentator.getCoordsToSave();
+        this.cellCommentator.worksheet = tmpWs;
       }
     }
   };
