@@ -135,17 +135,24 @@
 			this.HtmlDiv.style.height     = "50px";
 			this.HtmlDiv.style.overflow   = "hidden";
 
-			this.HtmlArea                      = document.createElement("textarea");
-			this.HtmlArea.id                   = "area_id";
-			this.HtmlArea.style.background     = "transparent";
-			this.HtmlArea.style.border         = "none";
-			this.HtmlArea.style.position       = "absolute";
-			this.HtmlArea.style["text-shadow"] = "0 0 0 #000";
-			this.HtmlArea.style.outline        = "none";
-			this.HtmlArea.style.color          = "transparent";
-			this.HtmlArea.style.width          = "1000px";
-			this.HtmlArea.style.height         = "50px";
-			this.HtmlArea.style.overflow       = "hidden";
+			this.HtmlDiv.style.boxSizing 		= "content-box";
+			this.HtmlDiv.style.webkitBoxSizing 	= "content-box";
+			this.HtmlDiv.style.MozBoxSizing 	= "content-box";
+
+			this.HtmlArea                      	= document.createElement("textarea");
+			this.HtmlArea.id                   	= "area_id";
+			this.HtmlArea.style.background     	= "transparent";
+			this.HtmlArea.style.border         	= "none";
+			this.HtmlArea.style.position       	= "absolute";
+			this.HtmlArea.style["text-shadow"] 	= "0 0 0 #000";
+			this.HtmlArea.style.outline        	= "none";
+			this.HtmlArea.style.color          	= "transparent";
+			this.HtmlArea.style.width          	= "1000px";
+			this.HtmlArea.style.height         	= "50px";
+			this.HtmlArea.style.overflow       	= "hidden";
+			this.HtmlArea.style.border		   	= "none";
+			this.HtmlArea.style.padding    		= "0";
+			this.HtmlArea.style.margin     		= "0";
 
 			this.HtmlArea.style.left = "0px;";
 			this.HtmlArea.style.top  = (-this.HtmlAreaOffset) + "px";
@@ -159,12 +166,7 @@
 				// нужен еще один родитель. чтобы скроллился он, а не oHtmlParent
 				var oHtmlDivScrollable              = document.createElement("div");
 				oHtmlDivScrollable.id 				= "area_id_main";
-				oHtmlDivScrollable.style.background = "transparent";
-				oHtmlDivScrollable.style.border     = "none";
-				oHtmlDivScrollable.style.position   = "absolute";
-				oHtmlDivScrollable.style.padding    = "0";
-				oHtmlDivScrollable.style.margin     = "0";
-				oHtmlDivScrollable.style.zIndex     = 0;
+				oHtmlDivScrollable.setAttribute("style", "background:transparent;border:none;position:absolute;padding:0px;margin:0px;z-index:0;pointer-events:none;");
 
 				var parentStyle                   = getComputedStyle(oHtmlParent);
 				oHtmlDivScrollable.style.left     = parentStyle.left;
@@ -278,11 +280,12 @@
 			if (!this.isDebug)
 			{
 				this.HtmlDiv.style.left = xPos + "px";
-				this.HtmlDiv.style.top  = yPos + this.HtmlAreaOffset + "px"; // еще бы сдвинуться на высоту строки
+				this.HtmlDiv.style.top  = yPos + this.HtmlAreaOffset + "px";
 			}
 			else
 			{
-				this.debugCalculatePlace(xPos, yPos + this.HtmlAreaOffset);
+				// this.HtmlAreaOffset - не сдвигаем, курсор должен быть виден
+				this.debugCalculatePlace(xPos, yPos);
 			}
 		},
 
@@ -310,7 +313,7 @@
 				this.HtmlArea.style.color = "black";
 				this.HtmlDiv.style.zIndex = 90;
 
-				this.HtmlArea.setAttribute("style", "left:0px;top:0px;width:100%;height:100%;font-family:arial;font-size:12pt;position:absolute;resize:none;padding:0px;margin:0px;font-weight:normal;box-sizing:content-box;-moz-box-sizing:content-box;-webkit-box-sizing:content-box;");
+				this.HtmlArea.setAttribute("style", "left:0px;top:0px;width:100%;height:100%;border:none;font-family:arial;font-size:12pt;position:absolute;resize:none;padding:0px;margin:0px;font-weight:normal;box-sizing:content-box;-moz-box-sizing:content-box;-webkit-box-sizing:content-box;");
 				this.HtmlDiv.style.border = "2px solid #4363A4";
 
 				this.HtmlArea.rows        = 1;
@@ -974,5 +977,14 @@
 
 		// send focus
 		window['AscCommon'].g_inputContext.HtmlArea.focus();
+	};
+
+	window["SetInputDebugMode"] = function()
+	{
+		if (!window['AscCommon'].g_inputContext)
+			return;
+
+		window['AscCommon'].g_inputContext.isDebug = true;
+		window['AscCommon'].g_inputContext.show();
 	};
 })(window);
