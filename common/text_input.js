@@ -114,7 +114,9 @@
 
 		this.debugTexBoxMaxW = 100;
 		this.debugTexBoxMaxH = 20;
-		this.isDebug = false;
+		this.isDebug 	= false;
+		this.isSystem 	= false;
+		this.isShow		= false;
 	}
 
 	CTextInput.prototype =
@@ -141,22 +143,11 @@
 
 			this.HtmlArea                      	= document.createElement("textarea");
 			this.HtmlArea.id                   	= "area_id";
-			this.HtmlArea.style.background     	= "transparent";
-			this.HtmlArea.style.border         	= "none";
-			this.HtmlArea.style.position       	= "absolute";
-			this.HtmlArea.style["text-shadow"] 	= "0 0 0 #000";
-			this.HtmlArea.style.outline        	= "none";
-			this.HtmlArea.style.color          	= "transparent";
-			this.HtmlArea.style.width          	= "1000px";
-			this.HtmlArea.style.height         	= "50px";
-			this.HtmlArea.style.overflow       	= "hidden";
-			this.HtmlArea.style.border		   	= "none";
-			this.HtmlArea.style.padding    		= "0";
-			this.HtmlArea.style.margin     		= "0";
 
-			this.HtmlArea.style.left = "0px;";
-			this.HtmlArea.style.top  = (-this.HtmlAreaOffset) + "px";
-
+			var _style = "left:0px;top:" + (-this.HtmlAreaOffset) + "px;";
+			_style += "background:transparent;border:none;position:absolute;text-shadow:0 0 0 #000;outline:none;color:transparent;width:1000px;height:50px;";
+			_style += "overflow:hidden;padding:0px;margin:0px;font-family:arial;font-size:12pt;resize:none;font-weight:normal;box-sizing:content-box;-moz-box-sizing:content-box;-webkit-box-sizing:content-box;";
+			this.HtmlArea.setAttribute("style", _style);
 			this.HtmlArea.setAttribute("spellcheck", false);
 
 			this.HtmlDiv.appendChild(this.HtmlArea);
@@ -277,7 +268,7 @@
 			var xPos    = x ? x : parseInt(oTarget.style.left);
 			var yPos    = (y ? y : parseInt(oTarget.style.top)) + parseInt(oTarget.style.height);
 
-			if (!this.isDebug)
+			if (!this.isDebug && !this.isSystem)
 			{
 				this.HtmlDiv.style.left = xPos + "px";
 				this.HtmlDiv.style.top  = yPos + this.HtmlAreaOffset + "px";
@@ -305,18 +296,41 @@
 
 		show : function()
 		{
-			if (this.isDebug)
+			if (this.isDebug || this.isSystem)
 			{
 				document.getElementById("area_id_main").style.zIndex = 10;
 
-				this.HtmlArea.style.top   = "0px";
+				this.HtmlArea.style.top   	= "0px";
+				this.HtmlArea.style.width 	= "100%";
+				this.HtmlArea.style.height 	= "100%";
+
+				this.HtmlArea.style.background = "#FFFFFF";
 				this.HtmlArea.style.color = "black";
 				this.HtmlDiv.style.zIndex = 90;
 
-				this.HtmlArea.setAttribute("style", "left:0px;top:0px;width:100%;height:100%;border:none;font-family:arial;font-size:12pt;position:absolute;resize:none;padding:0px;margin:0px;font-weight:normal;box-sizing:content-box;-moz-box-sizing:content-box;-webkit-box-sizing:content-box;");
 				this.HtmlDiv.style.border = "2px solid #4363A4";
 
-				this.HtmlArea.rows        = 1;
+				this.isShow = true;
+			}
+		},
+
+		unshow : function()
+		{
+			if (this.isDebug || this.isSystem)
+			{
+				document.getElementById("area_id_main").style.zIndex = 0;
+
+				this.HtmlArea.style.top   	= ((-this.HtmlAreaOffset) + "px");
+				this.HtmlArea.style.width 	= "1000px";
+				this.HtmlArea.style.height 	= "50px";
+
+				this.HtmlArea.style.background = "transparent";
+				this.HtmlArea.style.color = "transparent";
+				this.HtmlDiv.style.zIndex = 0;
+
+				this.HtmlDiv.style.border = "none";
+
+				this.isShow = false;
 			}
 		},
 
@@ -324,6 +338,11 @@
 		{
 			var _left = x;
 			var _top = y;
+
+			if (undefined == _left)
+				_left = parseInt(this.HtmlDiv.style.left);
+			if (undefined == _top)
+				_top = parseInt(this.HtmlDiv.style.top);
 
 			var _editorSdk = document.getElementById("editor_sdk");
 			var _r_max = parseInt(_editorSdk.clientWidth);
@@ -405,6 +424,15 @@
 
 		onInput : function(e)
 		{
+			if (this.isSystem)
+			{
+				if (!this.isShow)
+					this.show();
+
+				this.debugCalculatePlace(undefined, undefined);
+				return;
+			}
+
 			if (AscCommon.AscBrowser.isMozilla)
 			{
 				if (c_oCompositionState.process == this.compositionState)
@@ -537,8 +565,124 @@
 			return false;
 		},
 
+		systemConfirmText : function()
+		{
+			var _fontSelections = g_fontApplication.g_fontSelections;
+			var _language       = _fontSelections.checkText(this.HtmlArea.value);
+
+			/*
+			 switch (_language)
+			 {
+			 case LanguagesFontSelectTypes.Arabic:
+			 {
+			 console.log("arabic");
+			 break;
+			 }
+			 case LanguagesFontSelectTypes.Korean:
+			 {
+			 console.log("korean");
+			 break;
+			 }
+			 case LanguagesFontSelectTypes.Japan:
+			 {
+			 console.log("japan");
+			 break;
+			 }
+			 case LanguagesFontSelectTypes.Chinese:
+			 {
+			 console.log("chinese");
+			 break;
+			 }
+			 case LanguagesFontSelectTypes.Unknown:
+			 {
+			 console.log("unknown");
+			 break;
+			 }
+			 default:
+			 {
+			 console.log("error");
+			 break;
+			 }
+			 }*/
+
+			if (_language == AscFonts.LanguagesFontSelectTypes.Unknown || undefined === this.Api.WordControl)
+			{
+				this.Api.Begin_CompositeInput();
+				this.checkCompositionData(this.HtmlArea.value);
+				this.Api.Replace_CompositeText(this.compositionValue);
+				this.Api.End_CompositeInput();
+			}
+			else
+			{
+				var _textPr = this.Api.WordControl.m_oLogicDocument.Get_Paragraph_TextPr();
+
+				var _check_obj = _fontSelections.checkPasteText(_textPr, _language);
+				if (_check_obj.is_async)
+				{
+					var loader   = AscCommon.g_font_loader;
+					var fontinfo = g_fontApplication.GetFontInfo(_check_obj.name);
+					var isasync  = loader.LoadFont(fontinfo);
+					if (false === isasync)
+					{
+						var _rfonts = _fontSelections.getSetupRFonts(_check_obj);
+						this.Api.WordControl.m_oLogicDocument.TextBox_Put(this.HtmlArea.value, _rfonts);
+					}
+					else
+					{
+						_check_obj.text = this.HtmlArea.value;
+						this.Api.asyncMethodCallback = function() {
+
+							var _fontSelections = g_fontApplication.g_fontSelections;
+							var _rfonts = _fontSelections.getSetupRFonts(_check_obj);
+
+							var _api = window['AscCommon'].g_inputContext.Api;
+							_api.WordControl.m_oLogicDocument.TextBox_Put(_check_obj.text, _rfonts);
+							_api.sync_EndAction(Asc.c_oAscAsyncActionType.BlockInteraction, Asc.c_oAscAsyncAction.LoadFont);
+						};
+
+						this.Api.sync_StartAction(Asc.c_oAscAsyncActionType.BlockInteraction, Asc.c_oAscAsyncAction.LoadFont);
+					}
+				}
+				else
+				{
+					this.Api.Begin_CompositeInput();
+					this.checkCompositionData(this.HtmlArea.value);
+					this.Api.Replace_CompositeText(this.compositionValue);
+					this.Api.End_CompositeInput();
+				}
+			}
+		},
+
 		onKeyDown : function(e)
 		{
+			if (this.isSystem && this.isShow)
+			{
+				// нужно проверить на enter
+				// вся остальная обработка - в текстбоксе
+
+				if (e.keyCode == 13)
+				{
+					this.systemConfirmText();
+
+					this.HtmlArea.value = "";
+					this.unshow();
+
+					e.preventDefault();
+					return false;
+				}
+				else if (e.keyCode == 27)
+				{
+					this.HtmlArea.value = "";
+					this.unshow();
+
+					e.preventDefault();
+					return false;
+				}
+
+				// вся обработка - в текстбоксе
+				return;
+			}
+
 			if (c_oCompositionState.end != this.compositionState)
 			{
 				if (this.IsUseFirstTextInputAfterComposition && e.keyCode == 8 || e.keyCode == 46) // del, backspace
@@ -580,6 +724,9 @@
 
 		onKeyPress : function(e)
 		{
+			if (this.isSystem)
+				return;
+
 			if (c_oCompositionState.end != this.compositionState)
 				return;
 
@@ -588,6 +735,9 @@
 
 		onKeyUp : function(e)
 		{
+			if (this.isSystem && this.isShow)
+				return;
+
 			this.KeyDownFlag = false;
 
 			if (c_oCompositionState.end != this.compositionState)
@@ -662,6 +812,9 @@
 
 		onCompositionStart : function(e)
 		{
+			if (this.isSystem)
+				return;
+
 			this.compositionState = c_oCompositionState.start;
 			this.Api.Begin_CompositeInput();
 			this.isFirstCompositionUpdateAfterStart = true;
@@ -669,6 +822,9 @@
 
 		onCompositionUpdate : function(e, isLockTarget, _data, isFromEnd)
 		{
+			if (this.isSystem)
+				return;
+
 			var _old = this.compositionValue.splice(0);
 
 			if (_data != null)
@@ -783,6 +939,9 @@
 
 		onCompositionEnd : function(e, _data)
 		{
+			if (this.isSystem)
+				return;
+
 			if (!this.IsUseFirstTextInputAfterComposition && this.isWaitFirstTextInputEvent(e))
 			{
 				// always data == ""
