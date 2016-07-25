@@ -3042,11 +3042,10 @@ FormatParser.prototype =
                     bThouthand = true;
                 }
             }
-            if (AscCommon.isNumber(val)) {
-                var dNumber = parseFloat(val);
-                if (!isNaN(dNumber))
-                    oRes = { number: dNumber, thouthand: bThouthand };
-            }
+			if (g_oFormatParser.isLocaleNumber(val, cultureInfo)) {
+				var dNumber = g_oFormatParser.parseLocaleNumber(val, cultureInfo);
+				oRes = { number: dNumber, thouthand: bThouthand };
+			}
         }
 		return oRes;
 	},
