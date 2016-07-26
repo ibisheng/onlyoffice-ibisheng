@@ -5114,7 +5114,7 @@ CPresentation.prototype =
 //-----------------------------------------------------------------------------------
 // Функции для работы с textbox
 //-----------------------------------------------------------------------------------
-    TextBox_Put : function(sText)
+    TextBox_Put : function(sText, rFonts)
     {
         // Отключаем пересчет, включим перед последним добавлением. Поскольку,
         // у нас все добавляется в 1 параграф, так можно делать.
@@ -5122,19 +5122,55 @@ CPresentation.prototype =
 
         if(AscCommon.CollaborativeEditing.Is_Fast() || editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false) {
             History.Create_NewPoint(AscDFH.historydescription_Presentation_ParagraphAdd);
-            var Count = sText.length;
-            for (var Index = 0; Index < Count; Index++) {
-                if (Index === Count - 1)
+            if(!rFonts){
+                var Count = sText.length;
+                for (var Index = 0; Index < Count; Index++) {
+                    if (Index === Count - 1)
+                        this.TurnOffRecalc = false;
+
+                    var _char = sText.charAt(Index);
+                    if (" " == _char)
+                        this.Paragraph_Add(new ParaSpace(1));
+                    else
+                        this.Paragraph_Add(new ParaText(_char));
+
+                    // На случай, если Count = 0
                     this.TurnOffRecalc = false;
+                }
+            }
+            else{
+                if(this.Slides[this.CurPage]){
+                    this.Slides[this.CurPage].graphicObjects.CreateDocContent();
 
-                var _char = sText.charAt(Index);
-                if (" " == _char)
-                    this.Paragraph_Add(new ParaSpace(1));
-                else
-                    this.Paragraph_Add(new ParaText(_char));
+                    var oTargetContent = this.Slides[this.CurPage].graphicObjects.getTargetDocContent(true);
+                    if(oTargetContent){
+                        var Para = oTargetContent.Get_CurrentParagraph();
+                        if (null === Para)
+                            return;
 
-                // На случай, если Count = 0
-                this.TurnOffRecalc = false;
+                        var RunPr = Para.Get_TextPr();
+                        if (null === RunPr || undefined === RunPr)
+                            RunPr = new CTextPr();
+
+                        RunPr.RFonts = rFonts;
+
+                        var Run = new ParaRun(Para);
+                        Run.Set_Pr(RunPr);
+
+                        var Count = sText.length;
+                        for (var Index = 0; Index < Count; Index++)
+                        {
+                            var _char = sText.charAt(Index);
+                            if (" " == _char)
+                                Run.Add_ToContent(Index, new ParaSpace(), false);
+                            else
+                                Run.Add_ToContent(Index, new ParaText(_char), false);
+                        }
+
+                        Para.Add(Run);
+                    }
+                    this.Slides[this.CurPage].graphicObjects.startRecalculate();
+                }
             }
         }
         this.Document_UpdateUndoRedoState();
