@@ -1953,7 +1953,7 @@ function checkTypeCell( val ) {
 	
 	// ToDo перевести на эту функцию все формулы...
 	function checkTypeCell2(cell) {
-		if (cell) {
+		if (cell && !cell.isEmptyText()) {
 			var val = cell.getValueWithoutFormat();
 			var type = cell.getType();
 			if (CellValueType.Number === type) {
