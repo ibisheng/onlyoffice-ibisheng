@@ -2361,14 +2361,16 @@
     if (printType === Asc.c_oAscPrintType.ActiveSheets) {
       activeWs = wb.getActive();
       ws = this.getWorksheet(activeWs);
-      printPagesData.arrPages = ws.calcPagesPrint(ws.PagePrintOptions, /*printOnlySelection*/false, /*indexWorksheet*/
-        activeWs);
+      printPagesData.arrPages =
+        ws.calcPagesPrint(wb.getWorksheet(activeWs).PagePrintOptions, /*printOnlySelection*/false, /*indexWorksheet*/
+          activeWs);
     } else if (printType === Asc.c_oAscPrintType.EntireWorkbook) {
       // Колличество листов
       var countWorksheets = this.model.getWorksheetCount();
       for (var i = 0; i < countWorksheets; ++i) {
         ws = this.getWorksheet(i);
-        var arrPages = ws.calcPagesPrint(ws.PagePrintOptions, /*printOnlySelection*/false, /*indexWorksheet*/i);
+        var arrPages = ws.calcPagesPrint(wb.getWorksheet(i).PagePrintOptions, /*printOnlySelection*/false,
+          /*indexWorksheet*/i);
         if (null !== arrPages) {
           if (null === printPagesData.arrPages) {
             printPagesData.arrPages = [];
@@ -2379,8 +2381,9 @@
     } else if (printType === Asc.c_oAscPrintType.Selection) {
       activeWs = wb.getActive();
       ws = this.getWorksheet(activeWs);
-      printPagesData.arrPages = ws.calcPagesPrint(ws.PagePrintOptions, /*printOnlySelection*/true, /*indexWorksheet*/
-        activeWs);
+      printPagesData.arrPages =
+        ws.calcPagesPrint(wb.getWorksheet(activeWs).PagePrintOptions, /*printOnlySelection*/true, /*indexWorksheet*/
+          activeWs);
     }
 
     return printPagesData;
