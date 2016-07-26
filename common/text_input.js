@@ -80,8 +80,21 @@
 		preventDefault : function()
 		{
 			this._isDefaultPrevented = true;
+		},
+		stopPropagation : function()
+		{
+			// nothing
 		}
 	};
+
+	function ti_console_log(_log)
+	{
+		//console.log(_log);
+	}
+	function ti_console_log2(_log)
+	{
+		//console.log(_log);
+	}
 
 	function CTextInput(api)
 	{
@@ -114,7 +127,7 @@
 
 		this.debugTexBoxMaxW = 100;
 		this.debugTexBoxMaxH = 20;
-		this.isDebug 	= false;
+		this.isDebug 	= true;
 		this.isSystem 	= false;
 		this.isShow		= false;
 	}
@@ -298,6 +311,8 @@
 		{
 			if (this.isDebug || this.isSystem)
 			{
+				ti_console_log("ti: show");
+
 				document.getElementById("area_id_main").style.zIndex = 10;
 
 				this.HtmlArea.style.top   	= "0px";
@@ -318,6 +333,8 @@
 		{
 			if (this.isDebug || this.isSystem)
 			{
+				ti_console_log("ti: unshow");
+
 				document.getElementById("area_id_main").style.zIndex = 0;
 
 				this.HtmlArea.style.top   	= ((-this.HtmlAreaOffset) + "px");
@@ -444,6 +461,8 @@
 			var _value = this.HtmlArea.value;
 			if (!this.KeyDownFlag && c_oCompositionState.end == this.compositionState && !this.TextInputAfterComposition && _value != "")
 			{
+				ti_console_log("ti: external input");
+
 				this.Api.Begin_CompositeInput();
 				this.checkCompositionData(this.HtmlArea.value);
 				this.Api.Replace_CompositeText(this.compositionValue);
@@ -473,6 +492,8 @@
 						this.Api.onKeyDown(_e);
 						this.Api.onKeyUp(_e);
 					}
+
+					ti_console_log("ti: ea space");
 				}
 
 				if (!AscCommon.AscBrowser.isMozilla)
@@ -492,6 +513,7 @@
 		{
 			if (this.IsUseFirstTextInputAfterComposition)
 			{
+				ti_console_log("ti: first textinput after composition");
 				this.onCompositionEnd(e);
 				this.IsUseFirstTextInputAfterComposition = false;
 			}
@@ -581,6 +603,8 @@
 		{
 			var _fontSelections = g_fontApplication.g_fontSelections;
 			var _language       = _fontSelections.checkText(this.HtmlArea.value);
+
+			ti_console_log("ti: detect language - " + _language);
 
 			/*
 			 switch (_language)
@@ -699,6 +723,7 @@
 			{
 				if (this.IsUseFirstTextInputAfterComposition && e.keyCode == 8 || e.keyCode == 46) // del, backspace
 				{
+					ti_console_log("ti: keydown emulate composition end (del/backspace)");
 					this.onCompositionEnd(e, this.HtmlArea.value);
 					this.IsUseFirstTextInputAfterComposition = false;
 				}
@@ -756,6 +781,7 @@
 			{
 				if (this.IsUseFirstTextInputAfterComposition && e.keyCode == 8 || e.keyCode == 46) // del, backspace
 				{
+					ti_console_log("ti: keyup emulate composition end (del/backspace)");
 					this.onCompositionEnd(e, this.HtmlArea.value);
 					this.IsUseFirstTextInputAfterComposition = false;
 
@@ -827,15 +853,36 @@
 			if (this.isSystem)
 				return;
 
+			ti_console_log2("begin");
+			if (this.compositionState == c_oCompositionState.end)
+				this.Api.Begin_CompositeInput();
+
 			this.compositionState = c_oCompositionState.start;
-			this.Api.Begin_CompositeInput();
+
 			this.isFirstCompositionUpdateAfterStart = true;
+
+			ti_console_log("ti: onCompositionStart");
+
+			if (AscCommon.AscBrowser.isIE && e.target["msGetInputContext"])
+			{
+				var ctx = e.target["msGetInputContext"]();
+
+				if (undefined != ctx["compositionStartOffset"] && undefined != ctx["compositionEndOffset"] &&
+					ctx["compositionEndOffset"] > ctx["compositionStartOffset"])
+				{
+					// edge: sometimes send start but not sent update
+					ti_console_log("ti: onCompositionStart->onCompositionUpdate");
+					this.onCompositionUpdate(e);
+				}
+			}
 		},
 
 		onCompositionUpdate : function(e, isLockTarget, _data, isFromEnd)
 		{
 			if (this.isSystem)
 				return;
+
+			ti_console_log("ti: onCompositionUpdate: " + e.data);
 
 			var _old = this.compositionValue.splice(0);
 
@@ -854,20 +901,23 @@
 					var ctx = e.target["msGetInputContext"]();
 
 					/*
-					1) 	ie может не присылать onCompositionEnd (например при длительном наборе текста на японском)
-						в этом случае некоторая дата просто просто перестает быть частью композиции. Ее нужно ввести, а композицию продолжить
-					2) 	но, если пришел onCompositionEnd, то нужно запомнить эту дату (которая не в композиции) - но ее не вводить,
-						так как она дублируется (проверить можно на корейском вводе).
+					 1) 	ie может не присылать onCompositionEnd (например при длительном наборе текста на японском)
+					 в этом случае некоторая дата просто просто перестает быть частью композиции. Ее нужно ввести, а композицию продолжить
+					 2) 	но, если пришел onCompositionEnd, то нужно запомнить эту дату (которая не в композиции) - но ее не вводить,
+					 так как она дублируется (проверить можно на корейском вводе).
 
-					Поэтому действуем так: применяем дату на onCompositionUpdate, действуем аналогично при onCompositionEnd,
-					только не добавляем дату в редактор. А очищаем только на onInput, когда нет композиции
+					 Поэтому действуем так: применяем дату на onCompositionUpdate, действуем аналогично при onCompositionEnd,
+					 только не добавляем дату в редактор. А очищаем только на onInput, когда нет композиции
 					 */
 
+					var _offsetData = "";
 					if (undefined !== ctx["compositionStartOffset"])
 					{
 						this.ieNonCompositionPrefix = "";
 						if (0 < ctx["compositionStartOffset"])
 							this.ieNonCompositionPrefix = this.HtmlArea.value.substr(0, ctx["compositionStartOffset"]);
+
+						ti_console_log("ti: ieNonCompositionPrefix: " + this.ieNonCompositionPrefix);
 
 						if (this.isFirstCompositionUpdateAfterStart)
 						{
@@ -875,6 +925,13 @@
 							// но тогда может возникать ситуация, когда не сбросилась дата (не пришел onInput не в композиции)
 							// поэтому первый текст this.ieNonCompositionPrefix после старта копозиции - считаем введенным
 							this.ieNonCompositionPrefixConfirm = this.ieNonCompositionPrefix;
+							ti_console_log("ti: ieNonCompositionPrefixConfirm1: " + this.ieNonCompositionPrefixConfirm);
+						}
+
+						if (ctx["compositionEndOffset"] > ctx["compositionStartOffset"])
+						{
+							_offsetData = this.HtmlArea.value.substr(ctx["compositionStartOffset"], ctx["compositionEndOffset"] - ctx["compositionStartOffset"]);
+							ti_console_log("ti: msContext offsetData: " + _offsetData);
 						}
 
 						if (this.ieNonCompositionPrefix != this.ieNonCompositionPrefixConfirm)
@@ -882,19 +939,28 @@
 							var _newConfirm = this.ieNonCompositionPrefix.substr(this.ieNonCompositionPrefixConfirm.length);
 
 							this.ieNonCompositionPrefixConfirm = this.ieNonCompositionPrefix;
+							ti_console_log("ti: ieNonCompositionPrefixConfirm2: " + this.ieNonCompositionPrefixConfirm);
 
-							if (true !== isFromEnd)
+							if (true !== isFromEnd || _offsetData != "")
 							{
+								ti_console_log("ti: emulateCompositeConfirm: " + _newConfirm);
+
 								this.checkCompositionData(_newConfirm);
+								ti_console_log2("replace: " + this.compositionValue);
 								this.Api.Replace_CompositeText(this.compositionValue);
+								ti_console_log2("end");
 								this.Api.End_CompositeInput();
 
+								ti_console_log2("begin");
 								this.Api.Begin_CompositeInput();
 							}
 						}
 					}
 
-					this.checkCompositionData(e.data);
+					if (AscCommon.AscBrowser.isIE && e.data == "")
+						this.checkCompositionData(_offsetData);
+					else
+						this.checkCompositionData(e.data);
 				}
 			}
 
@@ -926,6 +992,7 @@
 					_old = this.Api.Get_CursorPosInCompositeText();
 					_max = this.Api.Get_MaxCursorPosInCompositeText();
 				}
+				ti_console_log2("replace: " + this.compositionValue);
 				this.Api.Replace_CompositeText(this.compositionValue);
 				if (_isNeedSavePos)
 				{
@@ -954,6 +1021,8 @@
 			if (this.isSystem)
 				return;
 
+			ti_console_log("ti: onCompositionEnd");
+
 			if (!this.IsUseFirstTextInputAfterComposition && this.isWaitFirstTextInputEvent(e))
 			{
 				// always data == ""
@@ -961,11 +1030,33 @@
 				return;
 			}
 
+			ti_console_log("ti: onCompositionEnd -> onCompositionUpdate");
 			this.onCompositionUpdate(e, false, _data, true);
 			this.Api.Set_CursorPosInCompositeText(1000); // max
 
 			this.clear(true);
-			this.Api.End_CompositeInput();
+			ti_console_log2("end");
+
+			if (AscCommon.AscBrowser.isIE && e.target["msGetInputContext"])
+			{
+				var ctx = e.target["msGetInputContext"]();
+
+				if (undefined != ctx["compositionStartOffset"] && undefined != ctx["compositionEndOffset"] &&
+					ctx["compositionEndOffset"] > ctx["compositionStartOffset"])
+				{
+					// edge: не натуральный end!!!
+					this.compositionState = c_oCompositionState.process;
+					return;
+				}
+				else
+				{
+					this.Api.End_CompositeInput();
+				}
+			}
+			else
+			{
+				this.Api.End_CompositeInput();
+			}
 
 			this.unlockTarget();
 			this.TextInputAfterComposition = true;
