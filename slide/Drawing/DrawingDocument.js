@@ -738,7 +738,6 @@ function CDrawingDocument()
 	this.AutoShapesTrack = null;
 	this.TransitionSlide = new CTransitionAnimation(null);
 
-
 	this.MoveTargetInInputContext = function()
 	{
 		if (AscCommon.g_inputContext)
@@ -1488,8 +1487,6 @@ function CDrawingDocument()
 		clearInterval(this.m_lTimerTargetId);
 		this.m_lTimerTargetId                = -1;
 		this.TargetHtmlElement.style.display = "none";
-
-		this.m_oWordControl.DisableTextEATextboxAttack();
 	}
 	this.UpdateTargetNoAttack = function()
 	{
@@ -1607,9 +1604,9 @@ function CDrawingDocument()
 			this.TargetHtmlElementTop         = pos.Y >> 0;
 			this.TargetHtmlElement.style.left = this.TargetHtmlElementLeft + "px";
 			this.TargetHtmlElement.style.top  = this.TargetHtmlElementTop + "px";
-
-			this.m_oWordControl.CheckTextBoxInputPos();
 		}
+
+		this.MoveTargetInInputContext();
 	}
 
 	this.UpdateTarget = function(x, y, pageIndex)

@@ -3505,5 +3505,9 @@ var editor;
   prot["asc_addOleObject"]          = prot.asc_addOleObject;
   prot["asc_editOleObject"]         = prot.asc_editOleObject;
 
+  // system input
+  prot["SetTextBoxInputMode"]       = prot.SetTextBoxInputMode;
+  prot["GetTextBoxInputMode"]       = prot.GetTextBoxInputMode;
+
   prot["asc_InputClearKeyboardElement"] = prot.asc_InputClearKeyboardElement;
 })(window);

@@ -4783,6 +4783,14 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype.asyncFontEndLoaded = function(fontinfo)
 	{
 		this.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.LoadFont);
+
+		if (undefined !== this.asyncMethodCallback)
+		{
+			this.asyncMethodCallback();
+			this.asyncMethodCallback = undefined;
+			return;
+		}
+
 		if (editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
 		{
 			History.Create_NewPoint(AscDFH.historydescription_Presentation_ParagraphAdd);
@@ -5797,15 +5805,6 @@ background-repeat: no-repeat;\
 		_tr.Duration = _timing.TransitionDuration;
 
 		_tr.Start(true);
-	};
-
-	asc_docs_api.prototype.SetTextBoxInputMode = function(bIsEA)
-	{
-		this.WordControl.SetTextBoxMode(bIsEA);
-	};
-	asc_docs_api.prototype.GetTextBoxInputMode = function()
-	{
-		return this.WordControl.TextBoxInputMode;
 	};
 
 	asc_docs_api.prototype.sync_EndAddShape = function()

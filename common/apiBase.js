@@ -1010,6 +1010,18 @@
 	{
 	};
 
+	// System input
+	baseEditorsApi.prototype.SetTextBoxInputMode = function(bIsEnable)
+	{
+		AscCommon.TextBoxInputMode = bIsEnable;
+		if (AscCommon.g_inputContext)
+			AscCommon.g_inputContext.systemInputEnable(AscCommon.TextBoxInputMode);
+	};
+	baseEditorsApi.prototype.GetTextBoxInputMode = function()
+	{
+		return AscCommon.TextBoxInputMode;
+	};
+
 	//----------------------------------------------------------export----------------------------------------------------
 	window['AscCommon']                = window['AscCommon'] || {};
 	window['AscCommon'].baseEditorsApi = baseEditorsApi;

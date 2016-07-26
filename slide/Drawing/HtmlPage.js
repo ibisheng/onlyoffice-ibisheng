@@ -319,14 +319,6 @@ function CEditorPage(api)
 	// demonstrationMode
 	this.DemonstrationManager = new CDemonstrationManager(this);
 
-	// ввод текста через дивку (привет китайцам)
-	this.TextBoxInputMode         = false;
-	this.TextBoxInput             = null;
-	this.TextBoxInputFocus        = false;
-	this.TextBoxChangedValueEvent = true;
-	this.TextBoxMaxWidth          = 20;
-	this.TextBoxMaxHeight         = 20;
-
 	this.IsEnabledRulerMarkers = false;
 
 	this.IsUpdateOverlayOnlyEnd    = false;
@@ -1968,12 +1960,6 @@ function CEditorPage(api)
 		if (oWordControl.m_oDrawingDocument.TransitionSlide.IsPlaying())
 			oWordControl.m_oDrawingDocument.TransitionSlide.End(true);
 
-		if (oThis.TextBoxInputMode)
-		{
-			oThis.onKeyDownTBIM(e);
-			return;
-		}
-
 		var oWordControl = oThis;
 		if (false === oWordControl.m_oApi.bInit_word_control || oWordControl.IsFocus === false || oWordControl.m_oApi.isLongAction() || oWordControl.m_bIsMouseLock === true)
 			return;
@@ -2026,41 +2012,6 @@ function CEditorPage(api)
 
 		oWordControl.IsKeyDownButNoPress = true;
 
-		if (oWordControl.TextBoxInputFocus)
-		{
-			// нужно проверить на enter
-			// вся остальная обработка - в текстбоксе
-
-			if (global_keyboardEvent.KeyCode == 13)
-			{
-				oWordControl.TextBoxInputFocus = false;
-				oWordControl.onChangeTB();
-
-				oWordControl.bIsUseKeyPress = false;
-
-				e.preventDefault();
-				return false;
-			}
-			else if (global_keyboardEvent.KeyCode == 27)
-			{
-				oWordControl.TextBoxInputFocus = false;
-
-				AscCommon.CollaborativeEditing.m_bGlobalLock = false;
-				this.TextBoxInput.style.zIndex               = -1;
-				this.TextBoxInput.style.top                  = "-1000px";
-				this.TextBoxInputFocus                       = false;
-				this.ReinitTB();
-
-				oWordControl.bIsUseKeyPress = false;
-
-				e.preventDefault();
-				return false;
-			}
-
-			// вся обработка - в текстбоксе
-			return;
-		}
-
 		oWordControl.StartUpdateOverlay();
 
 		var _ret_mouseDown          = oWordControl.m_oLogicDocument.OnKeyDown(global_keyboardEvent);
@@ -2076,24 +2027,6 @@ function CEditorPage(api)
 		}
 	};
 
-	this.DisableTextEATextboxAttack = function()
-	{
-		var oWordControl = oThis;
-		if (false === oWordControl.m_oApi.bInit_word_control)
-			return;
-
-		if (oWordControl.TextBoxInputFocus)
-		{
-			oWordControl.TextBoxInputFocus = false;
-
-			AscCommon.CollaborativeEditing.m_bGlobalLock = false;
-			this.TextBoxInput.style.zIndex               = -1;
-			this.TextBoxInput.style.top                  = "-1000px";
-			this.TextBoxInputFocus                       = false;
-			this.ReinitTB();
-		}
-	};
-
 	this.onKeyPress = function(e)
 	{
 		if (window.GlobalPasteFlag || window.GlobalCopyFlag)
@@ -2101,32 +2034,6 @@ function CEditorPage(api)
 
 		if (oThis.Thumbnails.FocusObjType == FOCUS_OBJECT_THUMBNAILS)
 		{
-			return;
-		}
-
-		if (oThis.TextBoxInputMode)
-		{
-			if (oThis.bIsUseKeyPress === false)
-				return;
-
-			AscCommon.check_KeyboardEvent(e);
-
-			var Code;
-			if (null != global_keyboardEvent.Which)
-				Code = global_keyboardEvent.Which;
-			else if (global_keyboardEvent.KeyCode)
-				Code = global_keyboardEvent.KeyCode;
-			else
-				Code = 0;//special char
-
-			var bRetValue = false;
-			if (Code <= 0x20)
-			{
-				// это всякие клавиши типа f1-12
-				return;
-			}
-
-			oThis.TextBoxFocus();
 			return;
 		}
 
@@ -3139,12 +3046,6 @@ function CEditorPage(api)
 		var oWordControl                = oThis;
 		oWordControl.m_nTimeDrawingLast = new Date().getTime();
 
-		if (oWordControl.IsFocus && oWordControl.TextBoxInputMode && oWordControl.TextBoxInput && !AscCommon.AscBrowser.isSafariMacOs)
-		{
-			if (!oWordControl.m_oApi.isLongAction() && !window.GlobalCopyFlag)
-				oWordControl.TextBoxInput.focus();
-		}
-
 		var isRepaint = oWordControl.m_bIsScroll;
 		if (oWordControl.m_bIsScroll)
 		{
@@ -3172,7 +3073,7 @@ function CEditorPage(api)
 
 		oWordControl.m_oDrawingDocument.Collaborative_TargetsUpdate(isRepaint);
 
-		if (oWordControl.m_oApi.autoSaveGap != 0 && !oWordControl.m_oApi.isViewMode && !oWordControl.TextBoxInputFocus)
+		if (oWordControl.m_oApi.autoSaveGap != 0 && !oWordControl.m_oApi.isViewMode)
 		{
 			var _curTime = new Date().getTime();
 			if (-1 == oWordControl.m_nLastAutosaveTime)
@@ -3518,205 +3419,6 @@ function CEditorPage(api)
 	{
 		var dKoef = g_dKoef_mm_to_pix * this.m_nZoomValue / 100;
 		return 5 + dKoef * x;
-	};
-
-	// -------------------------------------------------------- //
-	// -------------------- east asian fonts ------------------ //
-	// -------------------------------------------------------- //
-
-	this.ReinitTB = function()
-	{
-		this.TextBoxChangedValueEvent = false;
-		this.TextBoxInput.value       = "";
-		this.TextBoxChangedValueEvent = true;
-	};
-
-	this.SetTextBoxMode = function(isEA)
-	{
-		if (!this.m_oApi.bInit_word_control)
-			return;
-
-		this.TextBoxInputMode = isEA;
-		if (isEA)
-		{
-			if (null == this.TextBoxInput)
-			{
-				this.TextBoxInput    = document.createElement('textarea');
-				this.TextBoxInput.id = "area_id";
-
-				this.TextBoxInput.setAttribute("style", "font-family:arial;font-size:12pt;position:absolute;resize:none;padding:2px;margin:0px;font-weight:normal;box-sizing:content-box;-moz-box-sizing:content-box;-webkit-box-sizing:content-box;");
-				this.TextBoxInput.style.border = "2px solid #4363A4";
-
-				this.TextBoxInput.style.width = "100px";
-				//this.TextBoxInput.style.height = "40px";
-				this.TextBoxInput.rows        = 1;
-
-				this.m_oMainView.HtmlElement.appendChild(this.TextBoxInput);
-
-				this.TextBoxInput["oninput"] = this.OnTextBoxInput;
-				this.TextBoxInput.onkeydown  = this.TextBoxOnKeyDown;
-			}
-
-			if (this.TextBoxInputFocus)
-			{
-				this.onChangeTB();
-			}
-			else
-			{
-				this.TextBoxInputFocus = false;
-				this.ReinitTB();
-				this.TextBoxInput.style.overflow = 'hidden';
-				this.TextBoxInput.style.zIndex   = -1;
-				this.TextBoxInput.style.top      = "-1000px";
-
-			}
-
-			this.TextBoxInput.focus();
-		}
-		else
-		{
-			if (this.TextBoxInputFocus)
-				this.onChangeTB();
-
-			// удаляем текстбокс
-			if (null != this.TextBoxInput)
-			{
-				this.m_oMainView.HtmlElement.removeChild(this.TextBoxInput);
-				this.TextBoxInput = null;
-			}
-		}
-	};
-
-	this.TextBoxFocus = function()
-	{
-		if (null == oThis.TextBoxInput || oThis.TextBoxInputFocus === true || oThis.TextBoxChangedValueEvent == false || oThis.m_oApi.isViewMode)
-			return;
-
-		oThis.TextBoxInputFocus                      = true;
-		AscCommon.CollaborativeEditing.m_bGlobalLock = true;
-		oThis.CheckTextBoxInputPos();
-		oThis.TextBoxInput.style.zIndex = 90;
-	};
-
-	this.OnTextBoxInput = function()
-	{
-		if (oThis.m_oApi.isViewMode)
-			oThis.ReinitTB();
-
-		oThis.TextBoxFocus();
-		oThis.CheckTextBoxSize();
-	};
-
-	this.CheckTextBoxSize = function()
-	{
-		if (null == this.TextBoxInput || !this.TextBoxInputFocus)
-			return;
-
-		// теперь нужно расчитать ширину/высоту текстбокса
-		var _p              = document.createElement('p');
-		_p.style.zIndex     = "-1";
-		_p.style.position   = "absolute";
-		_p.style.fontFamily = "arial";
-		_p.style.fontSize   = "12pt";
-		_p.style.left       = "0px";
-		_p.style.width      = oThis.TextBoxMaxWidth + "px";
-
-		this.m_oMainView.HtmlElement.appendChild(_p);
-
-		var _t       = this.TextBoxInput.value;
-		_t           = _t.replace(/ /g, "&nbsp;");
-		_p.innerHTML = "<span>" + _t + "</span>";
-		var _width   = _p.firstChild.offsetWidth;
-		_width       = Math.min(_width + 10, this.TextBoxMaxWidth);
-
-		var area          = document.createElement('textarea');
-		area.style.zIndex = "-1";
-		area.id           = "area2_id";
-		area.rows         = 1;
-		area.setAttribute("style", "font-family:arial;font-size:12pt;position:absolute;resize:none;padding:2px;margin:0px;font-weight:normal;box-sizing:content-box;-moz-box-sizing:content-box;-webkit-box-sizing:content-box;");
-		area.style.overflow = "hidden";
-		area.style.width    = _width + "px";
-		this.m_oMainView.HtmlElement.appendChild(area);
-
-		area.value = this.TextBoxInput.value;
-
-		var _height = area.clientHeight;
-		if (area.scrollHeight > _height)
-			_height = area.scrollHeight;
-
-		if (_height > oThis.TextBoxMaxHeight)
-			_height = oThis.TextBoxMaxHeight;
-
-		this.m_oMainView.HtmlElement.removeChild(_p);
-		this.m_oMainView.HtmlElement.removeChild(area);
-
-		this.TextBoxInput.style.width  = _width + "px";
-		this.TextBoxInput.style.height = _height + "px";
-
-		// вот такая заглушка под firefox если этого не делать, то будет плохо перерисовываться border)
-		var oldZindex                  = parseInt(this.TextBoxInput.style.zIndex);
-		var newZindex                  = (oldZindex == 90) ? "89" : "90";
-		this.TextBoxInput.style.zIndex = newZindex;
-	};
-
-	this.TextBoxOnKeyDown = function(e)
-	{
-		AscCommon.check_KeyboardEvent(e);
-		if (global_keyboardEvent.KeyCode == 9)
-		{
-			e.preventDefault();
-			return false;
-		}
-	};
-
-	this.onChangeTB           = function()
-	{
-		AscCommon.CollaborativeEditing.m_bGlobalLock = false;
-		this.TextBoxInput.style.zIndex               = -1;
-		this.TextBoxInput.style.top                  = "-1000px";
-		this.TextBoxInputFocus                       = false;
-		oThis.m_oLogicDocument.TextBox_Put(oThis.TextBoxInput.value);
-		this.ReinitTB();
-	};
-	this.CheckTextBoxInputPos = function()
-	{
-		if (this.TextBoxInput == null || !this.TextBoxInputFocus)
-			return;
-
-		var _left = this.m_oDrawingDocument.TargetHtmlElementLeft;
-		var _top  = this.m_oDrawingDocument.TargetHtmlElementTop;
-
-		var _h = (this.m_oDrawingDocument.m_dTargetSize * this.m_nZoomValue * g_dKoef_mm_to_pix / 100) >> 0;
-
-		var _r_max = (this.m_oEditor.AbsolutePosition.R * g_dKoef_mm_to_pix) >> 0;
-		_r_max -= 20;
-		if ((_r_max - _left) > 50)
-		{
-			this.TextBoxMaxWidth = _r_max - _left;
-		}
-		else
-		{
-			_left                = _r_max - 50;
-			this.TextBoxMaxWidth = 50;
-		}
-		var _b_max = (this.m_oEditor.AbsolutePosition.B * g_dKoef_mm_to_pix) >> 0;
-		_b_max -= 40;
-		if ((_b_max - _top) > 50)
-		{
-			this.TextBoxMaxHeight = _b_max - _top;
-		}
-		else
-		{
-			_top                  = _b_max - 50;
-			this.TextBoxMaxHeight = 50;
-		}
-
-		this.TextBoxInput.style.left = _left + "px";
-		this.TextBoxInput.style.top  = (_top + _h) + "px";
-
-		this.CheckTextBoxSize();
-
-		this.TextBoxInput.focus();
 	};
 
 	this.SaveDocument = function()

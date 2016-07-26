@@ -389,7 +389,7 @@
 			var _width   = _p.firstChild.offsetWidth;
 			_width       = Math.min(_width + 20, this.debugTexBoxMaxW);
 
-			if (AscBrowser.isIE)
+			if (AscCommon.AscBrowser.isIE)
 				_width += 10;
 
 			var area          = document.createElement('textarea');
@@ -563,6 +563,18 @@
 				return true;
 
 			return false;
+		},
+
+		systemInputEnable : function(isEnabled)
+		{
+			if (this.isSystem == isEnabled)
+				return;
+
+			this.isSystem = isEnabled;
+
+			this.HtmlArea.value = "";
+			if (this.isShow)
+				this.unshow();
 		},
 
 		systemConfirmText : function()
@@ -1046,6 +1058,11 @@
 		window['AscCommon'].g_inputContext.init(target_id);
 		window['AscCommon'].g_clipboardBase.Init(api);
 		window['AscCommon'].g_clipboardBase.inputContext = window['AscCommon'].g_inputContext;
+
+		if (window['AscCommon'].TextBoxInputMode === true)
+		{
+			window['AscCommon'].g_inputContext.systemInputEnable(true);
+		}
 
 		document.addEventListener("focus", function(e)
 		{
