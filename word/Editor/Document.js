@@ -11130,15 +11130,25 @@ CDocument.prototype.private_AddCompositeText = function(nCharCode)
 	var oRun = this.CompositeInput.Run;
 	var nPos = this.CompositeInput.Pos + this.CompositeInput.Length;
 	var oChar;
-	if (32 == nCharCode || 12288 == nCharCode)
+
+	if (para_Math_Run === oRun.Type)
 	{
-		oChar = new ParaSpace();
+		oChar = new CMathText();
+		oChar.add(nCharCode);
 	}
 	else
 	{
-		oChar = new ParaText();
-		oChar.Set_CharCode(nCharCode);
+		if (32 == nCharCode || 12288 == nCharCode)
+		{
+			oChar = new ParaSpace();
+		}
+		else
+		{
+			oChar = new ParaText();
+			oChar.Set_CharCode(nCharCode);
+		}
 	}
+
 	oRun.Add_ToContent(nPos, oChar, true);
 	this.CompositeInput.Length++;
 
