@@ -62,7 +62,6 @@
 	var cArray = AscCommonExcel.cArray;
 	var cBaseFunction = AscCommonExcel.cBaseFunction;
 
-	var checkTypeCell = AscCommonExcel.checkTypeCell;
 	var checkTypeCell2 = AscCommonExcel.checkTypeCell2;
 	var cFormulaFunctionGroup = AscCommonExcel.cFormulaFunctionGroup;
 
@@ -760,8 +759,7 @@
 			}
 
 			var c = new CellAddress(BBox.r1 + resR, BBox.c1 + resC);
-			return this.value =
-				checkTypeCell(_arg2.getWS()._getCellNoEmpty(c.getRow0(), c.getCol0()).getValueWithoutFormat());
+			return this.value = checkTypeCell2(_arg2.getWS()._getCellNoEmpty(c.getRow0(), c.getCol0()));
 		} else {
 			var arg1Range = arg1.getRange(), arg2Range = arg2.getRange();
 

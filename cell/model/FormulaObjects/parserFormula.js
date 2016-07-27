@@ -983,97 +983,37 @@ cArea3D.prototype.countCells = function () {
     }
     return new cNumber( count );
 };
-cArea3D.prototype.getMatrix = function () {
-  var arr = [], r = this.getRange(), res;
-    for ( var k = 0; k < r.length; k++ ) {
-        arr[k] = [];
-        r[k]._foreach2( function ( cell, i, j, r1, c1 ) {
-            if ( !arr[k][i - r1] ) {
-                arr[k][i - r1] = [];
-            }
-            if ( cell ) {
-                var cellType = cell.getType();
-                if ( cellType === CellValueType.Number ) {
-                    res = cell.isEmptyTextString() ? new cEmpty() : new cNumber( cell.getValueWithoutFormat() );
-        } else if (cellType === CellValueType.Bool) {
-                    res = new cBool( cell.getValueWithoutFormat() );
-        } else if (cellType === CellValueType.Error) {
-                    res = new cError( cell.getValueWithoutFormat() );
-        } else if (cellType === CellValueType.String) {
-                    res = new cString( cell.getValueWithoutFormat() );
-        } else {
-                    if ( cell.isEmptyTextString() ) {
-                        res = new cNumber( cell.getValueWithoutFormat() );
-          } else {
-                        res = checkTypeCell( "" + cell.getValueWithoutFormat() );
-                    }
-                }
-      } else {
-                res = new cEmpty();
-            }
+	cArea3D.prototype.getMatrix = function () {
+		var arr = [], r = this.getRange(), res;
+		for (var k = 0; k < r.length; k++) {
+			arr[k] = [];
+			r[k]._foreach2(function (cell, i, j, r1, c1) {
+				if (!arr[k][i - r1]) {
+					arr[k][i - r1] = [];
+				}
+				res = checkTypeCell2(cell);
 
-            arr[k][i - r1][j - c1] = res;
-        } );
-    }
-    return arr;
-};
-cArea3D.prototype.foreach2 = function ( action ) {
-    var _wsA = this.wsRange();
-    if ( _wsA.length >= 1 ) {
-        var _r = this.range( _wsA );
-        for ( var i = 0; i < _r.length; i++ ) {
-            if ( _r[i] ) {
-                _r[i]._foreach2( function ( _cell ) {
-                    var val;
-                    if ( _cell ) {
-                        var cellType = _cell.getType();
-                        switch ( cellType ) {
-                            case CellValueType.Number:
-                            {
-                                if ( _cell.getValueWithoutFormat() === "" ) {
-                                    val = new cEmpty();
-                } else {
-                                    val = new cNumber( _cell.getValueWithoutFormat() );
-                                }
-                                break;
-                            }
-                            case CellValueType.Bool:
-                            {
-                                val = new cBool( _cell.getValueWithoutFormat() );
-                                break;
-                            }
-                            case CellValueType.Error:
-                            {
-                                val = new cError( _cell.getValueWithoutFormat() );
-                                break;
-                            }
-                            case CellValueType.String:
-                            {
-                                val = new cString( _cell.getValueWithoutFormat() );
-                                break;
-                            }
-                            default:
-                            {
-                                if ( _cell.getValueWithoutFormat() && _cell.getValueWithoutFormat() !== "" ) {
-                                    val = new cNumber( _cell.getValueWithoutFormat() );
-                } else {
-                                    val = checkTypeCell( "" + _cell.getValueWithoutFormat() );
-                                }
-                                break;
-                            }
-                        }
-          } else {
-                        val = new cEmpty();
-                    }
-                    action( val );
-                } );
-            }
-        }
-    }
-};
-cArea3D.prototype.isSingleSheet = function() {
-  return this.wsFrom == this.wsTo;
-};
+				arr[k][i - r1][j - c1] = res;
+			});
+		}
+		return arr;
+	};
+	cArea3D.prototype.foreach2 = function (action) {
+		var _wsA = this.wsRange();
+		if (_wsA.length >= 1) {
+			var _r = this.range(_wsA);
+			for (var i = 0; i < _r.length; i++) {
+				if (_r[i]) {
+					_r[i]._foreach2(function (cell) {
+						action(checkTypeCell2(cell));
+					});
+				}
+			}
+		}
+	};
+	cArea3D.prototype.isSingleSheet = function () {
+		return this.wsFrom == this.wsTo;
+	};
 
 /** @constructor */
 function cRef( val, ws ) {/*Ref means A1 for example*/
@@ -1108,31 +1048,12 @@ cRef.prototype.clone = function () {
 cRef.prototype.getWsId = function () {
     return this.ws.Id;
 };
-cRef.prototype.getValue = function () {
-    if ( !this._valid ) {
-        return new cError( cErrorType.bad_reference );
-    }
-    var cellType = this.range.getType(), v, res;
-
-    if ( cellType === CellValueType.Number ) {
-        v = this.range.getValueWithoutFormat();
-        if ( v === "" ) {
-            res = new cEmpty();
-    } else {
-            res = new cNumber( "" + v );
-        }
-  } else if (cellType === CellValueType.Bool) {
-        res = new cBool( "" + this.range.getValueWithoutFormat() );
-  } else if (cellType === CellValueType.Error) {
-        res = new cError( "" + this.range.getValueWithoutFormat() );
-  } else if (cellType === CellValueType.String) {
-        res = new cString( this.range.getValueWithoutFormat() );
-  } else {
-        res = checkTypeCell( "" + this.range.getValueWithoutFormat() );
-    }
-
-    return res;
-};
+	cRef.prototype.getValue = function () {
+		if (!this._valid) {
+			return new cError(cErrorType.bad_reference);
+		}
+		return checkTypeCell2(this.range);
+	};
 cRef.prototype.tocNumber = function () {
     return this.getValue().tocNumber();
 };
@@ -1203,29 +1124,13 @@ cRef3D.prototype.getRange = function () {
 cRef3D.prototype.isValid = function () {
     return !!this.getRange();
 };
-cRef3D.prototype.getValue = function () {
-    var _r = this.getRange();
-    if ( !_r ) {
-        return new cError( cErrorType.bad_reference );
-    }
-    var cellType = _r.getType();
-    if ( cellType === CellValueType.Number ) {
-        var v = _r.getValueWithoutFormat();
-        if ( v === "" ) {
-            return new cEmpty();
-    } else {
-            return new cNumber( "" + v );
-        }
-  } else if (cellType === CellValueType.String) {
-        return new cString( "" + _r.getValueWithoutFormat() );
-  } else if (cellType === CellValueType.Bool) {
-        return new cBool( "" + _r.getValueWithoutFormat() );
-  } else if (cellType === CellValueType.Error) {
-        return new cError( "" + _r.getValueWithoutFormat() );
-  } else {
-        return checkTypeCell( "" + _r.getValueWithoutFormat() );
-    }
-};
+	cRef3D.prototype.getValue = function () {
+		var _r = this.getRange();
+		if (!_r) {
+			return new cError(cErrorType.bad_reference);
+		}
+		return checkTypeCell2(_r);
+	};
 cRef3D.prototype.tocBool = function () {
     return this.getValue().tocBool();
 };
@@ -2345,8 +2250,6 @@ function cAddOperator() {
 
 cAddOperator.prototype = Object.create( cBaseOperator.prototype );
 cAddOperator.prototype.Calculate = function ( arg ) {
-//    var arg0 = arg[0].tryConvert(), arg1 = arg[1].tryConvert();
-//    var arg0 = arg[0].tocNumber(), arg1 = arg[1].tocNumber();
     var arg0 = arg[0], arg1 = arg[1];
     if ( arg0 instanceof cArea ) {
         arg0 = arg0.cross( arguments[1].first );
@@ -2369,7 +2272,6 @@ function cMinusOperator() {
 
 cMinusOperator.prototype = Object.create( cBaseOperator.prototype );
 cMinusOperator.prototype.Calculate = function ( arg ) {
-//    var arg0 = arg[0].tryConvert(), arg1 = arg[1].tryConvert();
     var arg0 = arg[0], arg1 = arg[1];
     if ( arg0 instanceof cArea ) {
         arg0 = arg0.cross( arguments[1].first );
@@ -2459,7 +2361,6 @@ function cMultOperator() {
 
 cMultOperator.prototype = Object.create( cBaseOperator.prototype );
 cMultOperator.prototype.Calculate = function ( arg ) {
-//    var arg0 = arg[0].tryConvert(), arg1 = arg[1].tryConvert();
     var arg0 = arg[0], arg1 = arg[1];
     if ( arg0 instanceof cArea ) {
         arg0 = arg0.cross( arguments[1].first );
@@ -2482,7 +2383,6 @@ function cDivOperator() {
 
 cDivOperator.prototype = Object.create( cBaseOperator.prototype );
 cDivOperator.prototype.Calculate = function ( arg ) {
-//    var arg0 = arg[0].tryConvert(), arg1 = arg[1].tryConvert();
     var arg0 = arg[0], arg1 = arg[1];
     if ( arg0 instanceof cArea ) {
         arg0 = arg0.cross( arguments[1].first );
@@ -2530,7 +2430,6 @@ function cEqualsOperator() {
 
 cEqualsOperator.prototype = Object.create( cBaseOperator.prototype );
 cEqualsOperator.prototype.Calculate = function ( arg ) {
-//    var arg0 = arg[0].tryConvert(), arg1 = arg[1].tryConvert();
     var arg0 = arg[0], arg1 = arg[1];
     if ( arg0 instanceof cArea ) {
         arg0 = arg0.cross( arguments[1].first );
@@ -2553,7 +2452,6 @@ function cNotEqualsOperator() {
 
 cNotEqualsOperator.prototype = Object.create( cBaseOperator.prototype );
 cNotEqualsOperator.prototype.Calculate = function ( arg ) {
-//    var arg0 = arg[0].tryConvert(), arg1 = arg[1].tryConvert();
     var arg0 = arg[0], arg1 = arg[1];
     if ( arg0 instanceof cArea ) {
         arg0 = arg0.cross( arguments[1].first );
@@ -2577,7 +2475,6 @@ function cLessOperator() {
 
 cLessOperator.prototype = Object.create( cBaseOperator.prototype );
 cLessOperator.prototype.Calculate = function ( arg ) {
-//    var arg0 = arg[0].tryConvert(), arg1 = arg[1].tryConvert();
     var arg0 = arg[0], arg1 = arg[1];
     if ( arg0 instanceof cArea ) {
         arg0 = arg0.cross( arguments[1].first );
@@ -2601,7 +2498,6 @@ function cLessOrEqualOperator() {
 
 cLessOrEqualOperator.prototype = Object.create( cBaseOperator.prototype );
 cLessOrEqualOperator.prototype.Calculate = function ( arg ) {
-//    var arg0 = arg[0].tryConvert(), arg1 = arg[1].tryConvert();
     var arg0 = arg[0], arg1 = arg[1];
     if ( arg0 instanceof cArea ) {
         arg0 = arg0.cross( arguments[1].first );
@@ -2624,7 +2520,6 @@ function cGreaterOperator() {
 
 cGreaterOperator.prototype = Object.create( cBaseOperator.prototype );
 cGreaterOperator.prototype.Calculate = function ( arg ) {
-//    var arg0 = arg[0].tryConvert(), arg1 = arg[1].tryConvert();
     var arg0 = arg[0], arg1 = arg[1];
     if ( arg0 instanceof cArea ) {
         arg0 = arg0.cross( arguments[1].first );
@@ -2640,28 +2535,28 @@ cGreaterOperator.prototype.Calculate = function ( arg ) {
     return this.value = _func[arg0.type][arg1.type]( arg0, arg1, ">", arguments[1].first );
 };
 
-/** @constructor */
-function cGreaterOrEqualOperator() {
-    cBaseOperator.apply( this, ['>=', 10] );
-}
+	/** @constructor */
+	function cGreaterOrEqualOperator() {
+		cBaseOperator.apply(this, ['>=', 10]);
+	}
 
-cGreaterOrEqualOperator.prototype = Object.create( cBaseOperator.prototype );
-cGreaterOrEqualOperator.prototype.Calculate = function ( arg ) {
-//    var arg0 = arg[0].tryConvert(), arg1 = arg[1].tryConvert();
-    var arg0 = arg[0], arg1 = arg[1];
-    if ( arg0 instanceof cArea ) {
-        arg0 = arg0.cross( arguments[1].first );
-  } else if (arg0 instanceof cArea3D) {
-        arg0 = arg0.cross( arguments[1].first, arguments[3] );
-    }
-    if ( arg1 instanceof cArea ) {
-        arg1 = arg1.cross( arguments[1].first );
-  } else if (arg1 instanceof cArea3D) {
-        arg1 = arg1.cross( arguments[1].first, arguments[3] );
-    }
-    arg0 = arg0.tryConvert(), arg1 = arg1.tryConvert();
-    return this.value = _func[arg0.type][arg1.type]( arg0, arg1, ">=", arguments[1].first );
-};
+	cGreaterOrEqualOperator.prototype = Object.create(cBaseOperator.prototype);
+	cGreaterOrEqualOperator.prototype.Calculate = function (arg) {
+		var arg0 = arg[0], arg1 = arg[1];
+		if (arg0 instanceof cArea) {
+			arg0 = arg0.cross(arguments[1].first);
+		} else if (arg0 instanceof cArea3D) {
+			arg0 = arg0.cross(arguments[1].first, arguments[3]);
+		}
+		if (arg1 instanceof cArea) {
+			arg1 = arg1.cross(arguments[1].first);
+		} else if (arg1 instanceof cArea3D) {
+			arg1 = arg1.cross(arguments[1].first, arguments[3]);
+		}
+		arg0 = arg0.tryConvert();
+		arg1 = arg1.tryConvert();
+		return this.value = _func[arg0.type][arg1.type](arg0, arg1, ">=", arguments[1].first);
+	};
 
 /* cFormulaOperators is container for holding all ECMA-376 operators, see chapter $18.17.2.2 in "ECMA-376, Second Edition, Part 1 - Fundamentals And Markup Language Reference" */
 var cFormulaOperators = {
