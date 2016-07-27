@@ -1393,7 +1393,7 @@
 				{
 					result = this._pasteFromBinaryExcel(worksheet, base64, isIntoShape);
 				} 
-				else if (base64FromWord && copyPasteFromWordUseBinary)//from word
+				else if (base64FromWord)//from word
 				{
 					result = this._pasteFromBinaryWord(worksheet, base64FromWord, isIntoShape);
 				}
