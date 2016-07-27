@@ -2413,7 +2413,7 @@
 						{
 							//если сверху пустая строка, то просто увеличиваем диапазон и меняем флаг
 							var rangeUpTable = new Asc.Range(tablePart.Ref.c1, tablePart.Ref.r2 + 1, tablePart.Ref.c2, tablePart.Ref.r2 + 1); 
-							if(this._isEmptyCurrentRange(rangeUpTable) && this.searchRangeInTableParts(rangeUpTable) === -1)
+							if(this._isEmptyRange(rangeUpTable, 0) && this.searchRangeInTableParts(rangeUpTable) === -1)
 							{
 								isSetValue = true;
 								isSetType = true;
@@ -2460,7 +2460,7 @@
 						{
 							//если сверху пустая строка, то просто увеличиваем диапазон и меняем флаг
 							var rangeUpTable = new Asc.Range(tablePart.Ref.c1, tablePart.Ref.r1 - 1, tablePart.Ref.c2, tablePart.Ref.r1 - 1); 
-							if(this._isEmptyCurrentRange(rangeUpTable) && this.searchRangeInTableParts(rangeUpTable) === -1)
+							if(this._isEmptyRange(rangeUpTable, 0) && this.searchRangeInTableParts(rangeUpTable) === -1)
 							{
 								isSetValue = true;
 								
@@ -2562,21 +2562,6 @@
 					range.cleanText();
 					History.TurnOn();
 				}
-			},
-			
-			_isEmptyCurrentRange: function(range)
-			{
-				var worksheet = this.worksheet;
-				for(var n = range.r1; n <= range.r2; n++)
-				{
-					for(var k = range.c1; k <= range.c2; k++)
-					{
-						var cell = worksheet.getCell3(n, k, n, k);
-						if(cell.getValueWithoutFormat() != '')
-							return false;
-					}
-				}
-				return true;
 			},
 			
 			//TODO избавиться от split, передавать cellId и tableName
@@ -4928,9 +4913,9 @@
 				return result;
 			},
 			
-			_isEmptyRange: function(ar)
+			_isEmptyRange: function(ar, addDelta)
 			{
-				var range = this.worksheet.getRange3(Math.max(0, ar.r1 - 1), Math.max(0, ar.c1 - 1), ar.r2 + 1, ar.c2 + 1);
+				var range = this.worksheet.getRange3(Math.max(0, ar.r1 - addDelta), Math.max(0, ar.c1 - addDelta), ar.r2 + addDelta, ar.c2 + addDelta);
 				var res = true;
 				range._foreachNoEmpty(function (cell) {
 					if (!cell.isEmptyText()) {
