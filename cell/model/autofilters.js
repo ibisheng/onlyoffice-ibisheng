@@ -4928,26 +4928,17 @@
 				return result;
 			},
 			
-			_isEmptyRange: function(activeCells)
+			_isEmptyRange: function(ar)
 			{
-				var worksheet = this.worksheet;
-				var cell;
-				for(var n = activeCells.r1 - 1; n <= activeCells.r2 + 1; n++)
-				{
-					if(n < 0)
-						n = 0;
-					
-					for(var k = activeCells.c1 - 1; k <= activeCells.c2 + 1; k++)
-					{
-						if(k < 0)
-							k = 0;
-						cell = worksheet.getCell3(n, k, n, k);
-						
-						if(cell.getValueWithoutFormat() != '')
-							return false;
+				var range = this.worksheet.getRange3(Math.max(0, ar.r1 - 1), Math.max(0, ar.c1 - 1), ar.r2 + 1, ar.c2 + 1);
+				var res = true;
+				range._foreachNoEmpty(function (cell) {
+					if (!cell.isEmptyText()) {
+						res = false;
+						return true;
 					}
-				}
-				return true;
+				});
+				return res;
 			},
 			
 			_setStyleTables: function(range)
