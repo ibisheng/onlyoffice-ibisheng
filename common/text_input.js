@@ -127,7 +127,7 @@
 
 		this.debugTexBoxMaxW = 100;
 		this.debugTexBoxMaxH = 20;
-		this.isDebug 	= true;
+		this.isDebug 	= false;
 		this.isSystem 	= false;
 		this.isShow		= false;
 	}
