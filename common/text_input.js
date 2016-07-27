@@ -105,6 +105,8 @@
 
 		this.TargetId = null;			// id caret
 		this.HtmlDiv  = null;			// для незаметной реализации одной textarea недостаточно
+
+		this.TextArea_Not_ContentEditableDiv = AscCommon.AscBrowser.isIE ? false : true;
 		this.HtmlArea = null;
 
 		this.HtmlAreaOffset = 60;
@@ -154,7 +156,15 @@
 			this.HtmlDiv.style.webkitBoxSizing 	= "content-box";
 			this.HtmlDiv.style.MozBoxSizing 	= "content-box";
 
-			this.HtmlArea                      	= document.createElement("textarea");
+			if (this.TextArea_Not_ContentEditableDiv)
+			{
+				this.HtmlArea               	= document.createElement("textarea");
+			}
+			else
+			{
+				this.HtmlArea					= document.createElement("div");
+				this.HtmlArea.setAttribute("contentEditable", true);
+			}
 			this.HtmlArea.id                   	= "area_id";
 
 			var _style = "left:0px;top:" + (-this.HtmlAreaOffset) + "px;";
@@ -293,6 +303,19 @@
 			}
 		},
 
+		putAreaValue : function(val)
+		{
+			if (this.TextArea_Not_ContentEditableDiv)
+				this.HtmlArea.value = val;
+			else
+				this.HtmlArea.innerHTML = val;
+		},
+
+		getAreaValue : function()
+		{
+			return this.TextArea_Not_ContentEditableDiv ? this.HtmlArea.value : this.HtmlArea.innerHTML;
+		},
+
 		clear : function(isFromCompositionEnd)
 		{
 			this.compositionValue = [];
@@ -300,7 +323,7 @@
 
 			if (isFromCompositionEnd !== true)
 			{
-				this.HtmlArea.value	= "";
+				this.putAreaValue("");
 
 				this.ieNonCompositionPrefix = "";
 				this.ieNonCompositionPrefixConfirm = "";
@@ -400,7 +423,7 @@
 
 			_editorSdk.appendChild(_p);
 
-			var _t       = this.HtmlArea.value;
+			var _t       = this.getAreaValue();
 			_t           = _t.replace(/ /g, "&nbsp;");
 			_p.innerHTML = "<span>" + _t + "</span>";
 			var _width   = _p.firstChild.offsetWidth;
@@ -418,7 +441,7 @@
 			area.style.width    = _width + "px";
 			_editorSdk.appendChild(area);
 
-			area.value = this.HtmlArea.value;
+			area.value = this.getAreaValue();
 
 			var _height = area.clientHeight;
 			if (area.scrollHeight > _height)
@@ -458,13 +481,13 @@
 				}
 			}
 
-			var _value = this.HtmlArea.value;
+			var _value = this.getAreaValue();
 			if (!this.KeyDownFlag && c_oCompositionState.end == this.compositionState && !this.TextInputAfterComposition && _value != "")
 			{
 				ti_console_log("ti: external input");
 
 				this.Api.Begin_CompositeInput();
-				this.checkCompositionData(this.HtmlArea.value);
+				this.checkCompositionData(_value);
 				this.Api.Replace_CompositeText(this.compositionValue);
 				this.Api.End_CompositeInput();
 			}
@@ -594,15 +617,16 @@
 
 			this.isSystem = isEnabled;
 
-			this.HtmlArea.value = "";
+			this.putAreaValue("");
 			if (this.isShow)
 				this.unshow();
 		},
 
 		systemConfirmText : function()
 		{
+			var _value 			= this.getAreaValue();
 			var _fontSelections = g_fontApplication.g_fontSelections;
-			var _language       = _fontSelections.checkText(this.HtmlArea.value);
+			var _language       = _fontSelections.checkText(_value);
 
 			ti_console_log("ti: detect language - " + _language);
 
@@ -644,7 +668,7 @@
 			if (_language == AscFonts.LanguagesFontSelectTypes.Unknown || undefined === this.Api.WordControl)
 			{
 				this.Api.Begin_CompositeInput();
-				this.checkCompositionData(this.HtmlArea.value);
+				this.checkCompositionData(_value);
 				this.Api.Replace_CompositeText(this.compositionValue);
 				this.Api.End_CompositeInput();
 			}
@@ -661,11 +685,11 @@
 					if (false === isasync)
 					{
 						var _rfonts = _fontSelections.getSetupRFonts(_check_obj);
-						this.Api.WordControl.m_oLogicDocument.TextBox_Put(this.HtmlArea.value, _rfonts);
+						this.Api.WordControl.m_oLogicDocument.TextBox_Put(_value, _rfonts);
 					}
 					else
 					{
-						_check_obj.text = this.HtmlArea.value;
+						_check_obj.text = _value;
 						this.Api.asyncMethodCallback = function() {
 
 							var _fontSelections = g_fontApplication.g_fontSelections;
@@ -682,7 +706,7 @@
 				else
 				{
 					this.Api.Begin_CompositeInput();
-					this.checkCompositionData(this.HtmlArea.value);
+					this.checkCompositionData(_value);
 					this.Api.Replace_CompositeText(this.compositionValue);
 					this.Api.End_CompositeInput();
 				}
@@ -700,7 +724,7 @@
 				{
 					this.systemConfirmText();
 
-					this.HtmlArea.value = "";
+					this.putAreaValue("");
 					this.unshow();
 
 					e.preventDefault();
@@ -708,7 +732,7 @@
 				}
 				else if (e.keyCode == 27)
 				{
-					this.HtmlArea.value = "";
+					this.putAreaValue("");
 					this.unshow();
 
 					e.preventDefault();
@@ -724,7 +748,7 @@
 				if (this.IsUseFirstTextInputAfterComposition && e.keyCode == 8 || e.keyCode == 46) // del, backspace
 				{
 					ti_console_log("ti: keydown emulate composition end (del/backspace)");
-					this.onCompositionEnd(e, this.HtmlArea.value);
+					this.onCompositionEnd(e, this.getAreaValue());
 					this.IsUseFirstTextInputAfterComposition = false;
 				}
 
@@ -782,7 +806,7 @@
 				if (this.IsUseFirstTextInputAfterComposition && e.keyCode == 8 || e.keyCode == 46) // del, backspace
 				{
 					ti_console_log("ti: keyup emulate composition end (del/backspace)");
-					this.onCompositionEnd(e, this.HtmlArea.value);
+					this.onCompositionEnd(e, this.getAreaValue());
 					this.IsUseFirstTextInputAfterComposition = false;
 
 					return;
@@ -802,10 +826,26 @@
 
 		checkTargetPosition : function(isCorrect)
 		{
-			var _offset = this.HtmlArea.selectionEnd;
+			var _offset = 0;
+			if (this.TextArea_Not_ContentEditableDiv)
+			{
+				_offset = this.HtmlArea.selectionEnd;
+			}
+			else
+			{
+				var sel = window.getSelection();
+				if (sel.rangeCount > 0)
+				{
+					var range = sel.getRangeAt(0);
+					_offset = range.endOffset;
+				}
+			}
 
 			if (false !== isCorrect)
-				_offset -= (this.HtmlArea.value.length - this.compositionValue.length);
+			{
+				var _value = this.getAreaValue();
+				_offset -= (_value.length - this.compositionValue.length);
+			}
 
 			if (!this.IsLockTargetMode)
 			{
@@ -900,6 +940,8 @@
 				{
 					var ctx = e.target["msGetInputContext"]();
 
+					var _value = this.getAreaValue();
+
 					/*
 					 1) 	ie может не присылать onCompositionEnd (например при длительном наборе текста на японском)
 					 в этом случае некоторая дата просто просто перестает быть частью композиции. Ее нужно ввести, а композицию продолжить
@@ -915,7 +957,7 @@
 					{
 						this.ieNonCompositionPrefix = "";
 						if (0 < ctx["compositionStartOffset"])
-							this.ieNonCompositionPrefix = this.HtmlArea.value.substr(0, ctx["compositionStartOffset"]);
+							this.ieNonCompositionPrefix = _value.substr(0, ctx["compositionStartOffset"]);
 
 						ti_console_log("ti: ieNonCompositionPrefix: " + this.ieNonCompositionPrefix);
 
@@ -930,7 +972,7 @@
 
 						if (ctx["compositionEndOffset"] > ctx["compositionStartOffset"])
 						{
-							_offsetData = this.HtmlArea.value.substr(ctx["compositionStartOffset"], ctx["compositionEndOffset"] - ctx["compositionStartOffset"]);
+							_offsetData = _value.substr(ctx["compositionStartOffset"], ctx["compositionEndOffset"] - ctx["compositionStartOffset"]);
 							ti_console_log("ti: msContext offsetData: " + _offsetData);
 						}
 

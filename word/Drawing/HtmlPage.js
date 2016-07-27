@@ -259,7 +259,7 @@ function CEditorPage(api)
 	var oThis   = this;
 
 	//this.UseRequestAnimationFrame = false;
-	this.UseRequestAnimationFrame = (undefined !== window["AscDesktopEditor"]) ? true : false;
+	this.UseRequestAnimationFrame = AscCommon.AscBrowser.isChrome;
 	this.RequestAnimationFrame    = (function()
 	{
 		return window.requestAnimationFrame ||
