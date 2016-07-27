@@ -621,26 +621,26 @@ cArea.prototype.clone = function () {
 cArea.prototype.getWsId = function () {
     return this.ws.Id;
 };
-cArea.prototype.getValue = function () {
-    var val = [], r = this.getRange();
-    if ( !r ) {
-        val.push( new cError( cErrorType.bad_reference ) );
-  } else {
-        r._foreachNoEmpty( function ( cell ) {
-					val.push(checkTypeCell2(cell));
-        } );
-    }
-    return val;
-};
-cArea.prototype.getValue2 = function ( i, j ) {
-    var res = this.index( i + 1, j + 1 ), r, cell;
-    if ( !res ) {
-        r = this.getRange();
-        cell = r.worksheet._getCellNoEmpty( r.bbox.r1 + i, r.bbox.c1 + j );
-        res = this._parseCellValue( cell );
-    }
-    return res;
-};
+	cArea.prototype.getValue = function () {
+		var val = [], r = this.getRange();
+		if (!r) {
+			val.push(new cError(cErrorType.bad_reference));
+		} else {
+			r._foreachNoEmpty(function (cell) {
+				val.push(checkTypeCell2(cell));
+			});
+		}
+		return val;
+	};
+	cArea.prototype.getValue2 = function (i, j) {
+		var res = this.index(i + 1, j + 1), r, cell;
+		if (!res) {
+			r = this.getRange();
+			cell = r.worksheet._getCellNoEmpty(r.bbox.r1 + i, r.bbox.c1 + j);
+			res = checkTypeCell2(cell);
+		}
+		return res;
+	};
 cArea.prototype.getRange = function () {
     if ( !this.range ) {
         this.range = this.ws.getRange2( this._cells )
@@ -721,45 +721,28 @@ cArea.prototype.foreach = function ( action ) {
         r._foreach2( action );
     }
 };
-	cArea.prototype._parseCellValue = function (cell) {
-		var result = null, cellType, cellValue;
-		if (cell) {
-			cellType = cell.getType();
-			cellValue = cell.getValueWithoutFormat();
-			if (cellType === CellValueType.Number) {
-				result = cell.isEmptyTextString() ? new cEmpty() : new cNumber(cellValue);
-			} else if (cellType === CellValueType.Bool) {
-				result = new cBool(cellValue);
-			} else if (cellType === CellValueType.Error) {
-				result = new cError(cellValue);
-			} else if (cellType === CellValueType.String) {
-				result = new cString(cellValue);
-			}
+	cArea.prototype.foreach2 = function (action) {
+		var t = this, r = this.getRange();
+		if (r) {
+			r._foreach2(function (cell) {
+				action(checkTypeCell2(cell), cell);
+			});
 		}
-		return result || new cEmpty();
 	};
-cArea.prototype.foreach2 = function ( action ) {
-    var t = this, r = this.getRange();
-    if ( r ) {
-        r._foreach2( function ( cell ) {
-            action( t._parseCellValue( cell ), cell );
-        } );
-    }
-};
 	cArea.prototype.getMatrix = function () {
 		var t = this, arr = [], r = this.getRange();
 		r._foreach2(function (cell, i, j, r1, c1) {
 			if (!arr[i - r1]) {
 				arr[i - r1] = [];
 			}
-			arr[i - r1][j - c1] = t._parseCellValue(cell);
+			arr[i - r1][j - c1] = checkTypeCell2(cell);
 		});
 		return arr;
 	};
 	cArea.prototype.getValuesNoEmpty = function () {
 		var t = this, arr = [], r = this.getRange();
 		r._foreachNoEmpty(function (cell) {
-			arr.push(t._parseCellValue(cell));
+			arr.push(checkTypeCell2(cell));
 		});
 		return [arr];
 	};
@@ -826,144 +809,85 @@ cArea3D.prototype.wsRange = function () {
     }
     return r;
 };
-cArea3D.prototype.range = function ( wsRange ) {
-    if ( !wsRange ) {
-        return [null];
-    }
-    var r = [];
-    for ( var i = 0; i < wsRange.length; i++ ) {
-        if ( !wsRange[i] ) {
-            r.push( null );
-    } else {
-            r.push( wsRange[i].getRange2( this._cells ) );
-        }
-    }
-    return r;
-};
+	cArea3D.prototype.range = function (wsRange) {
+		if (!wsRange) {
+			return [null];
+		}
+		var r = [];
+		for (var i = 0; i < wsRange.length; i++) {
+			if (!wsRange[i]) {
+				r.push(null);
+			} else {
+				r.push(wsRange[i].getRange2(this._cells));
+			}
+		}
+		return r;
+	};
 cArea3D.prototype.getRange = function () {
     return this.range( this.wsRange() );
 };
-cArea3D.prototype.getValue = function () {
-    var _wsA = this.wsRange();
-    var _val = [];
-    if ( _wsA.length < 1 ) {
-        _val.push( new cError( cErrorType.bad_reference ) );
-        return _val;
-    }
-    for ( var i = 0; i < _wsA.length; i++ ) {
-        if ( !_wsA[i] ) {
-            _val.push( new cError( cErrorType.bad_reference ) );
-            return _val;
-        }
+	cArea3D.prototype.getValue = function () {
+		var i, _wsA = this.wsRange();
+		var _val = [];
+		if (_wsA.length < 1) {
+			_val.push(new cError(cErrorType.bad_reference));
+			return _val;
+		}
+		for (i = 0; i < _wsA.length; i++) {
+			if (!_wsA[i]) {
+				_val.push(new cError(cErrorType.bad_reference));
+				return _val;
+			}
 
-    }
-    var _r = this.range( _wsA );
-    for ( var i = 0; i < _r.length; i++ ) {
-        if ( !_r[i] ) {
-            _val.push( new cError( cErrorType.bad_reference ) );
-            return _val;
-        }
-        _r[i]._foreachNoEmpty( function ( _cell ) {
-            var cellType = _cell.getType();
-            switch ( cellType ) {
-                case CellValueType.Number:
-          _cell.getValueWithoutFormat() === "" ? _val.push(new cEmpty()) :
-            _val.push(new cNumber(_cell.getValueWithoutFormat()));
-                    break;
-                case CellValueType.Bool:
-                    _val.push( new cBool( _cell.getValueWithoutFormat() ) );
-                    break;
-                case CellValueType.Error:
-                    _val.push( new cError( _cell.getValueWithoutFormat() ) );
-                    break;
-                case CellValueType.String:
-                    _val.push( new cString( _cell.getValueWithoutFormat() ) );
-                    break;
-                default:
-                {
-                    if ( _cell.getValueWithoutFormat() && _cell.getValueWithoutFormat() !== "" ) {
-                        _val.push( new cNumber( _cell.getValueWithoutFormat() ) );
-          } else {
-                        _val.push( checkTypeCell( "" + _cell.getValueWithoutFormat() ) );
-                    }
-                }
-            }
+		}
+		var _r = this.range(_wsA);
+		for (i = 0; i < _r.length; i++) {
+			if (!_r[i]) {
+				_val.push(new cError(cErrorType.bad_reference));
+				return _val;
+			}
+			_r[i]._foreachNoEmpty(function (cell) {
+				val.push(checkTypeCell2(cell));
+			});
+		}
+		return _val;
+	};
+	cArea3D.prototype.getValue2 = function (cell) {
+		var _wsA = this.wsRange(), _val = [], _r;
+		if (_wsA.length < 1) {
+			_val.push(new cError(cErrorType.bad_reference));
+			return _val;
+		}
+		for (var i = 0; i < _wsA.length; i++) {
+			if (!_wsA[i]) {
+				_val.push(new cError(cErrorType.bad_reference));
+				return _val;
+			}
 
-        } );
-    }
-    return _val;
-};
-cArea3D.prototype.getValue2 = function ( cell ) {
-    var _wsA = this.wsRange(), _val = [], cellType, _r;
-    if ( _wsA.length < 1 ) {
-        _val.push( new cError( cErrorType.bad_reference ) );
-        return _val;
-    }
-    for ( var i = 0; i < _wsA.length; i++ ) {
-        if ( !_wsA[i] ) {
-            _val.push( new cError( cErrorType.bad_reference ) );
-            return _val;
-        }
+		}
+		_r = this.range(_wsA);
+		if (!_r[0]) {
+			_val.push(new cError(cErrorType.bad_reference));
+			return _val;
+		}
+		_r[0]._foreachNoEmpty(function (_cell) {
+			if (cell.getID() === _cell.getName()) {
+				val.push(checkTypeCell2(cell));
+			}
+		});
 
-    }
-    _r = this.range( _wsA );
-    if ( !_r[0] ) {
-        _val.push( new cError( cErrorType.bad_reference ) );
-        return _val;
-    }
-    _r[0]._foreachNoEmpty( function ( _cell ) {
-        if ( cell.getID() === _cell.getName() ) {
-            var cellType = _cell.getType();
-            switch ( cellType ) {
-                case CellValueType.Number:
-                {
-          _cell.getValueWithoutFormat() === "" ? _val.push(new cEmpty()) :
-            _val.push(new cNumber(_cell.getValueWithoutFormat()));
-                    break;
-                }
-                case CellValueType.Bool:
-                {
-                    _val.push( new cBool( _cell.getValueWithoutFormat() ) );
-                    break;
-                }
-                case CellValueType.Error:
-                {
-                    _val.push( new cError( _cell.getValueWithoutFormat() ) );
-                    break;
-                }
-                case CellValueType.String:
-                {
-                    _val.push( new cString( _cell.getValueWithoutFormat() ) );
-                    break
-                }
-                default:
-                {
-                    if ( _cell.getValueWithoutFormat() && _cell.getValueWithoutFormat() !== "" ) {
-                        _val.push( new cNumber( _cell.getValueWithoutFormat() ) );
-          } else {
-                        _val.push( checkTypeCell( "" + _cell.getValueWithoutFormat() ) );
-                    }
-                }
-            }
-        }
-    } );
-
-    if ( _val[0] === undefined || _val[0] === null ) {
-        return new cEmpty();
-  } else {
-        return _val[0];
-    }
-};
-cArea3D.prototype.changeSheet = function ( lastName, newName ) {
-  if (this.wsFrom === this._wb.getWorksheetByName(lastName).getId() &&
-    this.wsTo === this._wb.getWorksheetByName(lastName).getId()) {
-        this.wsFrom = this.wsTo = this._wb.getWorksheetByName( newName ).getId();
-  } else if (this.wsFrom === this._wb.getWorksheetByName(lastName).getId()) {
-        this.wsFrom = this._wb.getWorksheetByName( newName ).getId();
-  } else if (this.wsTo === this._wb.getWorksheetByName(lastName).getId()) {
-        this.wsTo = this._wb.getWorksheetByName( newName ).getId();
-    }
-};
+		return (null == _val[0]) ? new cEmpty() : _val[0];
+	};
+	cArea3D.prototype.changeSheet = function (lastName, newName) {
+		if (this.wsFrom === this._wb.getWorksheetByName(lastName).getId() &&
+			this.wsTo === this._wb.getWorksheetByName(lastName).getId()) {
+			this.wsFrom = this.wsTo = this._wb.getWorksheetByName(newName).getId();
+		} else if (this.wsFrom === this._wb.getWorksheetByName(lastName).getId()) {
+			this.wsFrom = this._wb.getWorksheetByName(newName).getId();
+		} else if (this.wsTo === this._wb.getWorksheetByName(lastName).getId()) {
+			this.wsTo = this._wb.getWorksheetByName(newName).getId();
+		}
+	};
 cArea3D.prototype.toString = function () {
   var wsFrom = this._wb.getWorksheetById(this.wsFrom).getName(), wsTo = this._wb.getWorksheetById(this.wsTo)
     .getName(), name = AscCommonExcel.g_oRangeCache.getActiveRange(this._cells);
