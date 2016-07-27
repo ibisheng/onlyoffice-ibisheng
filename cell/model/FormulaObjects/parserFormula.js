@@ -2177,363 +2177,372 @@ cRangeIntersectionOperator.prototype.Calculate = function ( arg ) {
 };
 
 
-/** @constructor */
-function cUnarMinusOperator() {
-    cBaseOperator.apply( this, ['un_minus'/**name operator*/, 49/**priority of operator*/, 1/**count arguments*/] );
-    this.isRightAssociative = true;
-}
+	/** @constructor */
+	function cUnarMinusOperator() {
+		cBaseOperator.apply(this, ['un_minus'/**name operator*/, 49/**priority of operator*/, 1/**count arguments*/]);
+		this.isRightAssociative = true;
+	}
 
-cUnarMinusOperator.prototype = Object.create( cBaseOperator.prototype );
-cUnarMinusOperator.prototype.Calculate = function ( arg ) {
-    var arg0 = arg[0];
-    if ( arg0 instanceof cArea ) {
-        arg0 = arg0.cross( arguments[1].first );
-  } else if (arg0 instanceof cArea3D) {
-        arg0 = arg0.cross( arguments[1].first, arguments[3] );
-  } else if (arg0 instanceof cArray) {
-    arg0.foreach(function(arrElem, r, c) {
-                arrElem = arrElem.tocNumber();
-                arg0.array[r][c] = arrElem instanceof cError ? arrElem : new cNumber( -arrElem.getValue() );
-    });
-        return this.value = arg0;
-    }
-    arg0 = arg0.tocNumber();
-    return this.value = arg0 instanceof cError ? arg0 : new cNumber( -arg0.getValue() );
-};
-cUnarMinusOperator.prototype.toString = function () {        // toString function
-    return '-';
-};
-cUnarMinusOperator.prototype.Assemble = function ( arg ) {
-    return new cString( "-" + arg[0] );
-};
-cUnarMinusOperator.prototype.Assemble2 = function ( arg, start, count ) {
-    return new cString( "-" + arg[start + count - 1] );
-};
-cUnarMinusOperator.prototype.Assemble2Locale = function ( arg, start, count ) {
-    return new cString( "-" + arg[start + count - 1] );
-};
+	cUnarMinusOperator.prototype = Object.create(cBaseOperator.prototype);
+	cUnarMinusOperator.prototype.Calculate = function (arg) {
+		var arg0 = arg[0];
+		if (arg0 instanceof cArea) {
+			arg0 = arg0.cross(arguments[1].first);
+		} else if (arg0 instanceof cArea3D) {
+			arg0 = arg0.cross(arguments[1].first, arguments[3]);
+		} else if (arg0 instanceof cArray) {
+			arg0.foreach(function (arrElem, r, c) {
+				arrElem = arrElem.tocNumber();
+				arg0.array[r][c] = arrElem instanceof cError ? arrElem : new cNumber(-arrElem.getValue());
+			});
+			return this.value = arg0;
+		}
+		arg0 = arg0.tocNumber();
+		return this.value = arg0 instanceof cError ? arg0 : new cNumber(-arg0.getValue());
+	};
+	cUnarMinusOperator.prototype.toString = function () {        // toString function
+		return '-';
+	};
+	cUnarMinusOperator.prototype.Assemble = function (arg) {
+		return new cString("-" + arg[0]);
+	};
+	cUnarMinusOperator.prototype.Assemble2 = function (arg, start, count) {
+		return new cString("-" + arg[start + count - 1]);
+	};
+	cUnarMinusOperator.prototype.Assemble2Locale = function (arg, start, count) {
+		return new cString("-" + arg[start + count - 1]);
+	};
 
-/** @constructor */
-function cUnarPlusOperator() {
-    cBaseOperator.apply( this, ['un_plus', 49, 1] );
-    this.isRightAssociative = true;
-}
+	/** @constructor */
+	function cUnarPlusOperator() {
+		cBaseOperator.apply(this, ['un_plus', 49, 1]);
+		this.isRightAssociative = true;
+	}
 
-cUnarPlusOperator.prototype = Object.create( cBaseOperator.prototype );
-cUnarPlusOperator.prototype.Calculate = function ( arg ) {
-    var arg0 = arg[0];
-    if ( arg0 instanceof cArea ) {
-        arg0 = arg0.cross( arguments[1].first );
-  } else if (arg0 instanceof cArea3D) {
-        arg0 = arg0.cross( arguments[1].first, arguments[3] );
-    }
-    arg0 = arg0.tryConvert();
-    return this.value = arg0;
-};
-cUnarPlusOperator.prototype.toString = function () {
-    return '+';
-};
-cUnarPlusOperator.prototype.Assemble = function ( arg ) {
-    return new cString( "+" + arg[0] );
-};
-cUnarPlusOperator.prototype.Assemble2 = function ( arg, start, count ) {
-    return new cString( "+" + arg[start + count - 1] );
-};
-cUnarPlusOperator.prototype.Assemble2Locale = function ( arg, start, count ) {
-    return new cString( "+" + arg[start + count - 1] );
-};
+	cUnarPlusOperator.prototype = Object.create(cBaseOperator.prototype);
+	cUnarPlusOperator.prototype.Calculate = function (arg) {
+		var arg0 = arg[0];
+		if (arg0 instanceof cArea) {
+			arg0 = arg0.cross(arguments[1].first);
+		} else if (arg0 instanceof cArea3D) {
+			arg0 = arg0.cross(arguments[1].first, arguments[3]);
+		}
+		arg0 = arg0.tryConvert();
+		return this.value = arg0;
+	};
+	cUnarPlusOperator.prototype.toString = function () {
+		return '+';
+	};
+	cUnarPlusOperator.prototype.Assemble = function (arg) {
+		return new cString("+" + arg[0]);
+	};
+	cUnarPlusOperator.prototype.Assemble2 = function (arg, start, count) {
+		return new cString("+" + arg[start + count - 1]);
+	};
+	cUnarPlusOperator.prototype.Assemble2Locale = function (arg, start, count) {
+		return new cString("+" + arg[start + count - 1]);
+	};
 
-/** @constructor */
-function cAddOperator() {
-    cBaseOperator.apply( this, ['+', 20] );
-}
+	/** @constructor */
+	function cAddOperator() {
+		cBaseOperator.apply(this, ['+', 20]);
+	}
 
-cAddOperator.prototype = Object.create( cBaseOperator.prototype );
-cAddOperator.prototype.Calculate = function ( arg ) {
-    var arg0 = arg[0], arg1 = arg[1];
-    if ( arg0 instanceof cArea ) {
-        arg0 = arg0.cross( arguments[1].first );
-  } else if (arg0 instanceof cArea3D) {
-        arg0 = arg0.cross( arguments[1].first, arguments[3] );
-    }
-    if ( arg1 instanceof cArea ) {
-        arg1 = arg1.cross( arguments[1].first );
-  } else if (arg1 instanceof cArea3D) {
-        arg1 = arg1.cross( arguments[1].first, arguments[3] );
-    }
-    arg0 = arg0.tocNumber(), arg1 = arg1.tocNumber();
-    return this.value = _func[arg0.type][arg1.type]( arg0, arg1, "+", arguments[1].first );
-};
+	cAddOperator.prototype = Object.create(cBaseOperator.prototype);
+	cAddOperator.prototype.Calculate = function (arg) {
+		var arg0 = arg[0], arg1 = arg[1];
+		if (arg0 instanceof cArea) {
+			arg0 = arg0.cross(arguments[1].first);
+		} else if (arg0 instanceof cArea3D) {
+			arg0 = arg0.cross(arguments[1].first, arguments[3]);
+		}
+		if (arg1 instanceof cArea) {
+			arg1 = arg1.cross(arguments[1].first);
+		} else if (arg1 instanceof cArea3D) {
+			arg1 = arg1.cross(arguments[1].first, arguments[3]);
+		}
+		arg0 = arg0.tocNumber();
+		arg1 = arg1.tocNumber();
+		return this.value = _func[arg0.type][arg1.type](arg0, arg1, "+", arguments[1].first);
+	};
 
-/** @constructor */
-function cMinusOperator() {
-    cBaseOperator.apply( this, ['-', 20] );
-}
+	/** @constructor */
+	function cMinusOperator() {
+		cBaseOperator.apply(this, ['-', 20]);
+	}
 
-cMinusOperator.prototype = Object.create( cBaseOperator.prototype );
-cMinusOperator.prototype.Calculate = function ( arg ) {
-    var arg0 = arg[0], arg1 = arg[1];
-    if ( arg0 instanceof cArea ) {
-        arg0 = arg0.cross( arguments[1].first );
-    }
-    if ( arg1 instanceof cArea ) {
-        arg1 = arg1.cross( arguments[1].first );
-    }
-    arg0 = arg0.tocNumber(), arg1 = arg1.tocNumber();
-    return this.value = _func[arg0.type][arg1.type]( arg0, arg1, "-", arguments[1].first );
-};
+	cMinusOperator.prototype = Object.create(cBaseOperator.prototype);
+	cMinusOperator.prototype.Calculate = function (arg) {
+		var arg0 = arg[0], arg1 = arg[1];
+		if (arg0 instanceof cArea) {
+			arg0 = arg0.cross(arguments[1].first);
+		}
+		if (arg1 instanceof cArea) {
+			arg1 = arg1.cross(arguments[1].first);
+		}
+		arg0 = arg0.tocNumber();
+		arg1 = arg1.tocNumber();
+		return this.value = _func[arg0.type][arg1.type](arg0, arg1, "-", arguments[1].first);
+	};
 
-/** @constructor */
-function cPercentOperator() {
-    cBaseOperator.apply( this, ['%', 45, 1] );
-    this.isRightAssociative = true;
-}
+	/** @constructor */
+	function cPercentOperator() {
+		cBaseOperator.apply(this, ['%', 45, 1]);
+		this.isRightAssociative = true;
+	}
 
-cPercentOperator.prototype = Object.create( cBaseOperator.prototype );
-cPercentOperator.prototype.Calculate = function ( arg ) {
-    var arg0 = arg[0];
-    if ( arg0 instanceof cArea ) {
-        arg0 = arg0.cross( arguments[1].first );
-  } else if (arg0 instanceof cArea3D) {
-        arg0 = arg0.cross( arguments[1].first, arguments[3] );
-  } else if (arg0 instanceof cArray) {
-    arg0.foreach(function(arrElem, r, c) {
-                arrElem = arrElem.tocNumber();
-                arg0.array[r][c] = arrElem instanceof cError ? arrElem : new cNumber( arrElem.getValue() / 100 );
-    });
-        return this.value = arg0;
-    }
-    arg0 = arg0.tocNumber();
-    this.value = arg0 instanceof cError ? arg0 : new cNumber( arg0.getValue() / 100 );
-    this.value.numFormat = 9;
-    return this.value;
-};
-cPercentOperator.prototype.Assemble = function ( arg ) {
-    return new cString( arg[0] + this.name );
-};
-cPercentOperator.prototype.Assemble2 = function ( arg, start, count ) {
-    return new cString( arg[start + count - 1] + this.name );
-};
-cPercentOperator.prototype.Assemble2Locale = function ( arg, start, count ) {
-    return new cString( arg[start + count - 1] + this.name );
-};
+	cPercentOperator.prototype = Object.create(cBaseOperator.prototype);
+	cPercentOperator.prototype.Calculate = function (arg) {
+		var arg0 = arg[0];
+		if (arg0 instanceof cArea) {
+			arg0 = arg0.cross(arguments[1].first);
+		} else if (arg0 instanceof cArea3D) {
+			arg0 = arg0.cross(arguments[1].first, arguments[3]);
+		} else if (arg0 instanceof cArray) {
+			arg0.foreach(function (arrElem, r, c) {
+				arrElem = arrElem.tocNumber();
+				arg0.array[r][c] = arrElem instanceof cError ? arrElem : new cNumber(arrElem.getValue() / 100);
+			});
+			return this.value = arg0;
+		}
+		arg0 = arg0.tocNumber();
+		this.value = arg0 instanceof cError ? arg0 : new cNumber(arg0.getValue() / 100);
+		this.value.numFormat = 9;
+		return this.value;
+	};
+	cPercentOperator.prototype.Assemble = function (arg) {
+		return new cString(arg[0] + this.name);
+	};
+	cPercentOperator.prototype.Assemble2 = function (arg, start, count) {
+		return new cString(arg[start + count - 1] + this.name);
+	};
+	cPercentOperator.prototype.Assemble2Locale = function (arg, start, count) {
+		return new cString(arg[start + count - 1] + this.name);
+	};
 
-/** @constructor */
-function cPowOperator() {
-    cBaseOperator.apply( this, ['^', 40] );
-}
+	/** @constructor */
+	function cPowOperator() {
+		cBaseOperator.apply(this, ['^', 40]);
+	}
 
-cPowOperator.prototype = Object.create( cBaseOperator.prototype );
-cPowOperator.prototype.Calculate = function ( arg ) {
-    var arg0 = arg[0], arg1 = arg[1];
-    if ( arg0 instanceof cArea ) {
-        arg0 = arg0.cross( arguments[1].first );
-  } else if (arg0 instanceof cArea3D) {
-        arg0 = arg0.cross( arguments[1].first, arguments[3] );
-    }
-    arg0 = arg0.tocNumber();
-    if ( arg1 instanceof cArea ) {
-        arg1 = arg1.cross( arguments[1].first );
-  } else if (arg1 instanceof cArea3D) {
-        arg1 = arg1.cross( arguments[1].first, arguments[3] );
-    }
-    arg1 = arg1.tocNumber();
-    if ( arg0 instanceof cError ) {
-        return this.value = arg0;
-    }
-    if ( arg1 instanceof cError ) {
-        return this.value = arg1;
-    }
+	cPowOperator.prototype = Object.create(cBaseOperator.prototype);
+	cPowOperator.prototype.Calculate = function (arg) {
+		var arg0 = arg[0], arg1 = arg[1];
+		if (arg0 instanceof cArea) {
+			arg0 = arg0.cross(arguments[1].first);
+		} else if (arg0 instanceof cArea3D) {
+			arg0 = arg0.cross(arguments[1].first, arguments[3]);
+		}
+		arg0 = arg0.tocNumber();
+		if (arg1 instanceof cArea) {
+			arg1 = arg1.cross(arguments[1].first);
+		} else if (arg1 instanceof cArea3D) {
+			arg1 = arg1.cross(arguments[1].first, arguments[3]);
+		}
+		arg1 = arg1.tocNumber();
+		if (arg0 instanceof cError) {
+			return this.value = arg0;
+		}
+		if (arg1 instanceof cError) {
+			return this.value = arg1;
+		}
 
-    var _v = Math.pow( arg0.getValue(), arg1.getValue() );
-    if ( isNaN( _v ) ) {
-        return this.value = new cError( cErrorType.not_numeric );
-  } else if (_v === Number.POSITIVE_INFINITY) {
-        return this.value = new cError( cErrorType.division_by_zero );
-    }
-    return this.value = new cNumber( _v );
-};
+		var _v = Math.pow(arg0.getValue(), arg1.getValue());
+		if (isNaN(_v)) {
+			return this.value = new cError(cErrorType.not_numeric);
+		} else if (_v === Number.POSITIVE_INFINITY) {
+			return this.value = new cError(cErrorType.division_by_zero);
+		}
+		return this.value = new cNumber(_v);
+	};
 
-/** @constructor */
-function cMultOperator() {
-    cBaseOperator.apply( this, ['*', 30] );
-}
+	/** @constructor */
+	function cMultOperator() {
+		cBaseOperator.apply(this, ['*', 30]);
+	}
 
-cMultOperator.prototype = Object.create( cBaseOperator.prototype );
-cMultOperator.prototype.Calculate = function ( arg ) {
-    var arg0 = arg[0], arg1 = arg[1];
-    if ( arg0 instanceof cArea ) {
-        arg0 = arg0.cross( arguments[1].first );
-  } else if (arg0 instanceof cArea3D) {
-        arg0 = arg0.cross( arguments[1].first, arguments[3] );
-    }
-    if ( arg1 instanceof cArea ) {
-        arg1 = arg1.cross( arguments[1].first );
-  } else if (arg1 instanceof cArea3D) {
-        arg1 = arg1.cross( arguments[1].first, arguments[3] );
-    }
-    arg0 = arg0.tocNumber(), arg1 = arg1.tocNumber();
-    return this.value = _func[arg0.type][arg1.type]( arg0, arg1, "*", arguments[1].first );
-};
+	cMultOperator.prototype = Object.create(cBaseOperator.prototype);
+	cMultOperator.prototype.Calculate = function (arg) {
+		var arg0 = arg[0], arg1 = arg[1];
+		if (arg0 instanceof cArea) {
+			arg0 = arg0.cross(arguments[1].first);
+		} else if (arg0 instanceof cArea3D) {
+			arg0 = arg0.cross(arguments[1].first, arguments[3]);
+		}
+		if (arg1 instanceof cArea) {
+			arg1 = arg1.cross(arguments[1].first);
+		} else if (arg1 instanceof cArea3D) {
+			arg1 = arg1.cross(arguments[1].first, arguments[3]);
+		}
+		arg0 = arg0.tocNumber();
+		arg1 = arg1.tocNumber();
+		return this.value = _func[arg0.type][arg1.type](arg0, arg1, "*", arguments[1].first);
+	};
 
-/** @constructor */
-function cDivOperator() {
-    cBaseOperator.apply( this, ['/', 30] );
-}
+	/** @constructor */
+	function cDivOperator() {
+		cBaseOperator.apply(this, ['/', 30]);
+	}
 
-cDivOperator.prototype = Object.create( cBaseOperator.prototype );
-cDivOperator.prototype.Calculate = function ( arg ) {
-    var arg0 = arg[0], arg1 = arg[1];
-    if ( arg0 instanceof cArea ) {
-        arg0 = arg0.cross( arguments[1].first );
-  } else if (arg0 instanceof cArea3D) {
-        arg0 = arg0.cross( arguments[1].first, arguments[3] );
-    }
-    if ( arg1 instanceof cArea ) {
-        arg1 = arg1.cross( arguments[1].first );
-  } else if (arg1 instanceof cArea3D) {
-        arg1 = arg1.cross( arguments[1].first, arguments[3] );
-    }
-    arg0 = arg0.tocNumber(), arg1 = arg1.tocNumber();
-    return this.value = _func[arg0.type][arg1.type]( arg0, arg1, "/", arguments[1].first );
-};
+	cDivOperator.prototype = Object.create(cBaseOperator.prototype);
+	cDivOperator.prototype.Calculate = function (arg) {
+		var arg0 = arg[0], arg1 = arg[1];
+		if (arg0 instanceof cArea) {
+			arg0 = arg0.cross(arguments[1].first);
+		} else if (arg0 instanceof cArea3D) {
+			arg0 = arg0.cross(arguments[1].first, arguments[3]);
+		}
+		if (arg1 instanceof cArea) {
+			arg1 = arg1.cross(arguments[1].first);
+		} else if (arg1 instanceof cArea3D) {
+			arg1 = arg1.cross(arguments[1].first, arguments[3]);
+		}
+		arg0 = arg0.tocNumber();
+		arg1 = arg1.tocNumber();
+		return this.value = _func[arg0.type][arg1.type](arg0, arg1, "/", arguments[1].first);
+	};
 
-/** @constructor */
-function cConcatSTROperator() {
-    cBaseOperator.apply( this, ['&', 15] );
-}
+	/** @constructor */
+	function cConcatSTROperator() {
+		cBaseOperator.apply(this, ['&', 15]);
+	}
 
-cConcatSTROperator.prototype = Object.create( cBaseOperator.prototype );
-cConcatSTROperator.prototype.Calculate = function ( arg ) {
-    var arg0 = arg[0], arg1 = arg[1];
-    if ( arg0 instanceof cArea ) {
-        arg0 = arg0.cross( arguments[1].first );
-  } else if (arg0 instanceof cArea3D) {
-        arg0 = arg0.cross( arguments[1].first, arguments[3] );
-    }
-    arg0 = arg0.tocString();
-    if ( arg1 instanceof cArea ) {
-        arg1 = arg1.cross( arguments[1].first );
-  } else if (arg1 instanceof cArea3D) {
-        arg1 = arg1.cross( arguments[1].first, arguments[3] );
-    }
-    arg1 = arg1.tocString();
+	cConcatSTROperator.prototype = Object.create(cBaseOperator.prototype);
+	cConcatSTROperator.prototype.Calculate = function (arg) {
+		var arg0 = arg[0], arg1 = arg[1];
+		if (arg0 instanceof cArea) {
+			arg0 = arg0.cross(arguments[1].first);
+		} else if (arg0 instanceof cArea3D) {
+			arg0 = arg0.cross(arguments[1].first, arguments[3]);
+		}
+		arg0 = arg0.tocString();
+		if (arg1 instanceof cArea) {
+			arg1 = arg1.cross(arguments[1].first);
+		} else if (arg1 instanceof cArea3D) {
+			arg1 = arg1.cross(arguments[1].first, arguments[3]);
+		}
+		arg1 = arg1.tocString();
 
-    return this.value = arg0 instanceof cError ? arg0 :
-    arg1 instanceof cError ? arg1 : new cString(arg0.toString().concat(arg1.toString()));
-};
+		return this.value = arg0 instanceof cError ? arg0 :
+			arg1 instanceof cError ? arg1 : new cString(arg0.toString().concat(arg1.toString()));
+	};
 
-/** @constructor */
-function cEqualsOperator() {
-    cBaseOperator.apply( this, ['=', 10] );
-}
+	/** @constructor */
+	function cEqualsOperator() {
+		cBaseOperator.apply(this, ['=', 10]);
+	}
 
-cEqualsOperator.prototype = Object.create( cBaseOperator.prototype );
-cEqualsOperator.prototype.Calculate = function ( arg ) {
-    var arg0 = arg[0], arg1 = arg[1];
-    if ( arg0 instanceof cArea ) {
-        arg0 = arg0.cross( arguments[1].first );
-  } else if (arg0 instanceof cArea3D) {
-        arg0 = arg0.cross( arguments[1].first, arguments[3] );
-    }
-    if ( arg1 instanceof cArea ) {
-        arg1 = arg1.cross( arguments[1].first );
-  } else if (arg1 instanceof cArea3D) {
-        arg1 = arg1.cross( arguments[1].first, arguments[3] );
-    }
-    arg0 = arg0.tryConvert(), arg1 = arg1.tryConvert();
-    return this.value = _func[arg0.type][arg1.type]( arg0, arg1, "=", arguments[1].first );
-};
+	cEqualsOperator.prototype = Object.create(cBaseOperator.prototype);
+	cEqualsOperator.prototype.Calculate = function (arg) {
+		var arg0 = arg[0], arg1 = arg[1];
+		if (arg0 instanceof cArea) {
+			arg0 = arg0.cross(arguments[1].first);
+		} else if (arg0 instanceof cArea3D) {
+			arg0 = arg0.cross(arguments[1].first, arguments[3]);
+		}
+		if (arg1 instanceof cArea) {
+			arg1 = arg1.cross(arguments[1].first);
+		} else if (arg1 instanceof cArea3D) {
+			arg1 = arg1.cross(arguments[1].first, arguments[3]);
+		}
+		arg0 = arg0.tryConvert();
+		arg1 = arg1.tryConvert();
+		return this.value = _func[arg0.type][arg1.type](arg0, arg1, "=", arguments[1].first);
+	};
 
-/** @constructor */
-function cNotEqualsOperator() {
-    cBaseOperator.apply( this, ['<>', 10] );
-}
+	/** @constructor */
+	function cNotEqualsOperator() {
+		cBaseOperator.apply(this, ['<>', 10]);
+	}
 
-cNotEqualsOperator.prototype = Object.create( cBaseOperator.prototype );
-cNotEqualsOperator.prototype.Calculate = function ( arg ) {
-    var arg0 = arg[0], arg1 = arg[1];
-    if ( arg0 instanceof cArea ) {
-        arg0 = arg0.cross( arguments[1].first );
-  } else if (arg0 instanceof cArea3D) {
-        arg0 = arg0.cross( arguments[1].first, arguments[3] );
-    }
+	cNotEqualsOperator.prototype = Object.create(cBaseOperator.prototype);
+	cNotEqualsOperator.prototype.Calculate = function (arg) {
+		var arg0 = arg[0], arg1 = arg[1];
+		if (arg0 instanceof cArea) {
+			arg0 = arg0.cross(arguments[1].first);
+		} else if (arg0 instanceof cArea3D) {
+			arg0 = arg0.cross(arguments[1].first, arguments[3]);
+		}
 
-    if ( arg1.type == cElementType.cellsRange ) {
-        arg1 = arg1.cross( arguments[1].first );
-  } else if (arg1 instanceof cArea3D) {
-        arg1 = arg1.cross( arguments[1].first, arguments[3] );
-    }
-    arg0 = arg0.tryConvert(), arg1 = arg1.tryConvert();
-    return this.value = _func[arg0.type][arg1.type]( arg0, arg1, "<>", arguments[1].first );
-};
+		if (arg1.type == cElementType.cellsRange) {
+			arg1 = arg1.cross(arguments[1].first);
+		} else if (arg1 instanceof cArea3D) {
+			arg1 = arg1.cross(arguments[1].first, arguments[3]);
+		}
+		arg0 = arg0.tryConvert();
+		arg1 = arg1.tryConvert();
+		return this.value = _func[arg0.type][arg1.type](arg0, arg1, "<>", arguments[1].first);
+	};
 
-/** @constructor */
-function cLessOperator() {
-    cBaseOperator.apply( this, ['<', 10] );
-}
+	/** @constructor */
+	function cLessOperator() {
+		cBaseOperator.apply(this, ['<', 10]);
+	}
 
-cLessOperator.prototype = Object.create( cBaseOperator.prototype );
-cLessOperator.prototype.Calculate = function ( arg ) {
-    var arg0 = arg[0], arg1 = arg[1];
-    if ( arg0 instanceof cArea ) {
-        arg0 = arg0.cross( arguments[1].first );
-  } else if (arg0 instanceof cArea3D) {
-        arg0 = arg0.cross( arguments[1].first, arguments[3] );
-    }
+	cLessOperator.prototype = Object.create(cBaseOperator.prototype);
+	cLessOperator.prototype.Calculate = function (arg) {
+		var arg0 = arg[0], arg1 = arg[1];
+		if (arg0 instanceof cArea) {
+			arg0 = arg0.cross(arguments[1].first);
+		} else if (arg0 instanceof cArea3D) {
+			arg0 = arg0.cross(arguments[1].first, arguments[3]);
+		}
 
-    if ( arg1 instanceof cArea ) {
-        arg1 = arg1.cross( arguments[1].first );
-  } else if (arg1 instanceof cArea3D) {
-        arg1 = arg1.cross( arguments[1].first, arguments[3] );
-    }
-    arg0 = arg0.tryConvert(), arg1 = arg1.tryConvert();
-    return this.value = _func[arg0.type][arg1.type]( arg0, arg1, "<", arguments[1].first );
-};
+		if (arg1 instanceof cArea) {
+			arg1 = arg1.cross(arguments[1].first);
+		} else if (arg1 instanceof cArea3D) {
+			arg1 = arg1.cross(arguments[1].first, arguments[3]);
+		}
+		arg0 = arg0.tryConvert();
+		arg1 = arg1.tryConvert();
+		return this.value = _func[arg0.type][arg1.type](arg0, arg1, "<", arguments[1].first);
+	};
 
-/** @constructor */
-function cLessOrEqualOperator() {
-    cBaseOperator.apply( this, ['<=', 10] );
-}
+	/** @constructor */
+	function cLessOrEqualOperator() {
+		cBaseOperator.apply(this, ['<=', 10]);
+	}
 
-cLessOrEqualOperator.prototype = Object.create( cBaseOperator.prototype );
-cLessOrEqualOperator.prototype.Calculate = function ( arg ) {
-    var arg0 = arg[0], arg1 = arg[1];
-    if ( arg0 instanceof cArea ) {
-        arg0 = arg0.cross( arguments[1].first );
-  } else if (arg0 instanceof cArea3D) {
-        arg0 = arg0.cross( arguments[1].first, arguments[3] );
-    }
-    if ( arg1 instanceof cArea ) {
-        arg1 = arg1.cross( arguments[1].first );
-  } else if (arg1 instanceof cArea3D) {
-        arg1 = arg1.cross( arguments[1].first, arguments[3] );
-    }
-    arg0 = arg0.tryConvert(), arg1 = arg1.tryConvert();
-    return this.value = _func[arg0.type][arg1.type]( arg0, arg1, "<=", arguments[1].first );
-};
+	cLessOrEqualOperator.prototype = Object.create(cBaseOperator.prototype);
+	cLessOrEqualOperator.prototype.Calculate = function (arg) {
+		var arg0 = arg[0], arg1 = arg[1];
+		if (arg0 instanceof cArea) {
+			arg0 = arg0.cross(arguments[1].first);
+		} else if (arg0 instanceof cArea3D) {
+			arg0 = arg0.cross(arguments[1].first, arguments[3]);
+		}
+		if (arg1 instanceof cArea) {
+			arg1 = arg1.cross(arguments[1].first);
+		} else if (arg1 instanceof cArea3D) {
+			arg1 = arg1.cross(arguments[1].first, arguments[3]);
+		}
+		arg0 = arg0.tryConvert();
+		arg1 = arg1.tryConvert();
+		return this.value = _func[arg0.type][arg1.type](arg0, arg1, "<=", arguments[1].first);
+	};
 
-/** @constructor */
-function cGreaterOperator() {
-    cBaseOperator.apply( this, ['>', 10] );
-}
+	/** @constructor */
+	function cGreaterOperator() {
+		cBaseOperator.apply(this, ['>', 10]);
+	}
 
-cGreaterOperator.prototype = Object.create( cBaseOperator.prototype );
-cGreaterOperator.prototype.Calculate = function ( arg ) {
-    var arg0 = arg[0], arg1 = arg[1];
-    if ( arg0 instanceof cArea ) {
-        arg0 = arg0.cross( arguments[1].first );
-  } else if (arg0 instanceof cArea3D) {
-        arg0 = arg0.cross( arguments[1].first, arguments[3] );
-    }
-    if ( arg1 instanceof cArea ) {
-        arg1 = arg1.cross( arguments[1].first );
-  } else if (arg1 instanceof cArea3D) {
-        arg1 = arg1.cross( arguments[1].first, arguments[3] );
-    }
-    arg0 = arg0.tryConvert(), arg1 = arg1.tryConvert();
-    return this.value = _func[arg0.type][arg1.type]( arg0, arg1, ">", arguments[1].first );
-};
+	cGreaterOperator.prototype = Object.create(cBaseOperator.prototype);
+	cGreaterOperator.prototype.Calculate = function (arg) {
+		var arg0 = arg[0], arg1 = arg[1];
+		if (arg0 instanceof cArea) {
+			arg0 = arg0.cross(arguments[1].first);
+		} else if (arg0 instanceof cArea3D) {
+			arg0 = arg0.cross(arguments[1].first, arguments[3]);
+		}
+		if (arg1 instanceof cArea) {
+			arg1 = arg1.cross(arguments[1].first);
+		} else if (arg1 instanceof cArea3D) {
+			arg1 = arg1.cross(arguments[1].first, arguments[3]);
+		}
+		arg0 = arg0.tryConvert();
+		arg1 = arg1.tryConvert();
+		return this.value = _func[arg0.type][arg1.type](arg0, arg1, ">", arguments[1].first);
+	};
 
 	/** @constructor */
 	function cGreaterOrEqualOperator() {
