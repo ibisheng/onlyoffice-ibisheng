@@ -989,6 +989,9 @@
 			case AscDFH.historydescription_Document_CompositeInput:
 				sString = "Document_CompositeInput                    ";
 				break;
+			case AscDFH.historydescription_Document_CompositeInputReplace:
+				sString = "Document_CompositeInputReplace             ";
+				break;
 		}
 		return sString;
 	}
@@ -2672,4 +2675,5 @@
 	window['AscDFH'].historydescription_Document_AddOleObject                       = 0x0137;
 	window['AscDFH'].historydescription_Document_EditOleObject                      = 0x0138;
 	window['AscDFH'].historydescription_Document_CompositeInput                     = 0x0139;
+	window['AscDFH'].historydescription_Document_CompositeInputReplace              = 0x013a;
 })(window);

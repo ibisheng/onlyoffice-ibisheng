@@ -670,28 +670,40 @@ CHistory.prototype =
         if (Point2.Items.length > 0 && Point2.Items[0].Data && AscDFH.historyitem_TableId_Description === Point2.Items[0].Data.Type)
             StartIndex2 = 1;
 
-        var PrevItem = null;
-        var Class = null;
-        for ( var Index = StartIndex1; Index < Point1.Items.length; Index++ )
+        var NewDescription;
+        if ((AscDFH.historydescription_Document_CompositeInput === Point1.Description || AscDFH.historydescription_Document_CompositeInputReplace === Point1.Description)
+            && AscDFH.historydescription_Document_CompositeInputReplace === Point2.Description)
         {
-            var Item = Point1.Items[Index];
-
-            if ( null === Class )
-                Class = Item.Class;
-            else if ( Class != Item.Class || "undefined" === typeof(Class.Check_HistoryUninon) || false === Class.Check_HistoryUninon(PrevItem.Data, Item.Data) )
-                return;
-
-            PrevItem = Item;
+            // Ничего не делаем. Эта ветка означает, что эти две точки можно объединить
+            NewDescription = AscDFH.historydescription_Document_CompositeInput;
         }
-
-        for ( var Index = StartIndex2; Index < Point2.Items.length; Index++ )
+        else
         {
-            var Item = Point2.Items[Index];
+            var PrevItem = null;
+            var Class    = null;
+            for (var Index = StartIndex1; Index < Point1.Items.length; Index++)
+            {
+                var Item = Point1.Items[Index];
 
-            if ( Class != Item.Class || "undefined" === typeof(Class.Check_HistoryUninon) || false === Class.Check_HistoryUninon(PrevItem.Data, Item.Data) )
-                return;
+                if (null === Class)
+                    Class = Item.Class;
+                else if (Class != Item.Class || "undefined" === typeof(Class.Check_HistoryUninon) || false === Class.Check_HistoryUninon(PrevItem.Data, Item.Data))
+                    return;
 
-            PrevItem = Item;
+                PrevItem = Item;
+            }
+
+            for (var Index = StartIndex2; Index < Point2.Items.length; Index++)
+            {
+                var Item = Point2.Items[Index];
+
+                if (Class != Item.Class || "undefined" === typeof(Class.Check_HistoryUninon) || false === Class.Check_HistoryUninon(PrevItem.Data, Item.Data))
+                    return;
+
+                PrevItem = Item;
+            }
+
+            NewDescription = AscDFH.historydescription_Document_AddLetterUnion;
         }
 
         if (0 !== StartIndex1)
@@ -706,7 +718,7 @@ CHistory.prototype =
             Items      : Point1.Items.concat(Point2.Items),
             Time       : Point1.Time,
             Additional : {},
-            Description: AscDFH.historydescription_Document_AddLetterUnion
+            Description: NewDescription
         };
 
 		if (null !== this.SavedIndex && this.SavedIndex >= this.Points.length - 2)

@@ -898,6 +898,42 @@ ParaRun.prototype.private_UpdatePositionsOnRemove = function(Pos, Count)
     }
 };
 
+ParaRun.prototype.private_UpdateCompositeInputPositionsOnAdd = function(Pos)
+{
+	if (null !== this.CompositeInput)
+	{
+		if (Pos <= this.CompositeInput.Pos)
+			this.CompositeInput.Pos++;
+		else if (Pos < this.CompositeInput.Pos + this.CompositeInput.Length)
+			this.CompositeInput.Length++;
+	}
+};
+
+ParaRun.prototype.private_UpdateCompositeInputPositionsOnRemove = function(Pos, Count)
+{
+	if (null !== this.CompositeInput)
+	{
+		if (Pos + Count <= this.CompositeInput.Pos)
+		{
+			this.CompositeInput.Pos -= Count;
+		}
+		else if (Pos < this.CompositeInput.Pos)
+		{
+			this.CompositeInput.Pos    = Pos;
+			this.CompositeInput.Length = Math.max(0, this.CompositeInput.Length - (Count - (this.CompositeInput.Pos - Pos)));
+		}
+		else if (Pos + Count < this.CompositeInput.Pos + this.CompositeInput.Length)
+		{
+			this.CompositeInput.Length = Math.max(0, this.CompositeInput.Length - Count);
+		}
+		else if (Pos < this.CompositeInput.Pos + this.CompositeInput.Length)
+		{
+			this.CompositeInput.Length = Math.max(0, Pos - this.CompositeInput.Pos);
+		}
+	}
+};
+
+
 // Добавляем элемент в позицию с сохранием в историю
 ParaRun.prototype.Add_ToContent = function(Pos, Item, UpdatePosition)
 {
@@ -8669,6 +8705,7 @@ ParaRun.prototype.Load_Changes = function(Reader, Reader2, Color)
 
                     this.Content.splice(Pos, 0, Element);
                     this.private_UpdatePositionsOnAdd(Pos);
+					this.private_UpdateCompositeInputPositionsOnAdd(Pos);
                     AscCommon.CollaborativeEditing.Update_DocumentPositionsOnAdd(this, Pos);
                 }
             }
@@ -8696,6 +8733,7 @@ ParaRun.prototype.Load_Changes = function(Reader, Reader2, Color)
                 this.CollaborativeMarks.Update_OnRemove(ChangesPos, 1);
                 this.Content.splice(ChangesPos, 1);
                 this.private_UpdatePositionsOnRemove(ChangesPos, 1);
+				this.private_UpdateCompositeInputPositionsOnRemove(ChangesPos, 1);
                 AscCommon.CollaborativeEditing.Update_DocumentPositionsOnRemove(this, ChangesPos, 1);
             }
 
@@ -10577,7 +10615,7 @@ ParaRun.prototype.private_GetPosInParent = function(_Parent)
 };
 ParaRun.prototype.Make_ThisElementCurrent = function()
 {
-    if (this.Paragraph && true === this.Paragraph.Is_UseInDocument() && true === this.Is_UseInParagraph())
+    if (this.Is_UseInDocument())
     {
         var ContentPos = this.Paragraph.Get_PosByElement(this);
         ContentPos.Add(this.State.ContentPos);
@@ -11000,6 +11038,10 @@ ParaRun.prototype.Get_FootnotesList = function(oEngine)
 			oEngine.Add(oItem.Get_Footnote());
 		}
 	}
+};
+ParaRun.prototype.Is_UseInDocument = function()
+{
+	return (this.Paragraph && true === this.Paragraph.Is_UseInDocument() && true === this.Is_UseInParagraph() ? true : false);
 };
 
 function CParaRunStartState(Run)

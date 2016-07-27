@@ -11056,67 +11056,30 @@ CDocument.prototype.Begin_CompositeInput = function()
 		};
 
 		oRun.Set_CompositeInput(this.CompositeInput);
-
 		return true;
 	}
 
 	return false;
-};
-CDocument.prototype.Add_CompositeText = function(nCharCode)
-{
-	// TODO: При таком вводе не меняется язык в зависимости от раскладки, не учитывается режим рецензирования.
-
-	if (null === this.CompositeInput)
-		return;
-
-	var oRun = this.CompositeInput.Run;
-	var nPos = this.CompositeInput.Pos + this.CompositeInput.Length;
-	var oChar;
-    if (32 == nCharCode || 12288 == nCharCode)
-    {
-        oChar = new ParaSpace();
-    }
-    else
-    {
-        oChar = new ParaText();
-        oChar.Set_CharCode(nCharCode);
-    }
-	oRun.Add_ToContent(nPos, oChar, true);
-	this.CompositeInput.Length++;
-
-	this.Recalculate();
-	this.Document_UpdateSelectionState();
-};
-CDocument.prototype.Remove_CompositeText = function(nCount)
-{
-	if (null === this.CompositeInput)
-		return;
-
-	var oRun = this.CompositeInput.Run;
-	var nPos = this.CompositeInput.Pos + this.CompositeInput.Length;
-
-	var nDelCount = Math.max(0, Math.min(nCount, this.CompositeInput.Length, oRun.Content.length, nPos));
-	oRun.Remove_FromContent(nPos - nDelCount, nDelCount, true);
-	this.CompositeInput.Length -= nDelCount;
-
-	this.Recalculate();
-	this.Document_UpdateSelectionState();
 };
 CDocument.prototype.Replace_CompositeText = function(arrCharCodes)
 {
 	if (null === this.CompositeInput)
 		return;
 
+	this.Create_NewHistoryPoint(AscDFH.historydescription_Document_CompositeInputReplace);
 	this.Start_SilentMode();
-	this.Remove_CompositeText(this.CompositeInput.Length);
+	this.private_RemoveCompositeText(this.CompositeInput.Length);
 	for (var nIndex = 0, nCount = arrCharCodes.length; nIndex < nCount; ++nIndex)
 	{
-		this.Add_CompositeText(arrCharCodes[nIndex]);
+		this.private_AddCompositeText(arrCharCodes[nIndex]);
 	}
 	this.End_SilentMode(false);
 
 	this.Recalculate();
 	this.Document_UpdateSelectionState();
+	this.Document_UpdateUndoRedoState();
+
+	this.History.Check_UninonLastPoints();
 };
 CDocument.prototype.Set_CursorPosInCompositeText = function(nPos)
 {
@@ -11148,6 +11111,8 @@ CDocument.prototype.End_CompositeInput = function()
 	oRun.Set_CompositeInput(null);
 	this.CompositeInput = null;
 
+	this.History.Check_UninonLastPoints();
+
 	this.Document_UpdateInterfaceState();
 
 	this.DrawingDocument.ClearCachePages();
@@ -11159,6 +11124,47 @@ CDocument.prototype.Get_MaxCursorPosInCompositeText = function()
 		return 0;
 
 	return this.CompositeInput.Length;
+};
+CDocument.prototype.private_AddCompositeText = function(nCharCode)
+{
+	var oRun = this.CompositeInput.Run;
+	var nPos = this.CompositeInput.Pos + this.CompositeInput.Length;
+	var oChar;
+	if (32 == nCharCode || 12288 == nCharCode)
+	{
+		oChar = new ParaSpace();
+	}
+	else
+	{
+		oChar = new ParaText();
+		oChar.Set_CharCode(nCharCode);
+	}
+	oRun.Add_ToContent(nPos, oChar, true);
+	this.CompositeInput.Length++;
+
+	this.Recalculate();
+	this.Document_UpdateSelectionState();
+};
+CDocument.prototype.private_RemoveCompositeText = function(nCount)
+{
+	var oRun = this.CompositeInput.Run;
+	var nPos = this.CompositeInput.Pos + this.CompositeInput.Length;
+
+	var nDelCount = Math.max(0, Math.min(nCount, this.CompositeInput.Length, oRun.Content.length, nPos));
+	oRun.Remove_FromContent(nPos - nDelCount, nDelCount, true);
+	this.CompositeInput.Length -= nDelCount;
+
+	this.Recalculate();
+	this.Document_UpdateSelectionState();
+};
+CDocument.prototype.Check_CompositeInputRun = function()
+{
+	if (null === this.CompositeInput)
+		return;
+
+	var oRun = this.CompositeInput.Run;
+	if (true !== oRun.Is_UseInDocument())
+		AscCommon.g_inputContext.externalEndCompositeInput();
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Функции для работы со сносками
