@@ -5369,10 +5369,8 @@
                 res = this.bcr.Read1(length, function(t,l){
                     return oThis.ReadDefinedName(t,l,oNewDefinedName);
                 });
-                if(null != oNewDefinedName.Name && null != oNewDefinedName.Ref)
-                {
-                    this.oWorkbook.dependencyFormulas.addDefinedNameNode(oNewDefinedName.Name, oNewDefinedName.Ref, oNewDefinedName.LocalSheetId, oNewDefinedName.Hidden);
-
+                if (null != oNewDefinedName.Name && null != oNewDefinedName.Ref) {
+                    this.oWorkbook.dependencyFormulas.addDefNameOpen(oNewDefinedName.Name, oNewDefinedName.Ref, oNewDefinedName.LocalSheetId, oNewDefinedName.Hidden, false);
                 }
             }
             else

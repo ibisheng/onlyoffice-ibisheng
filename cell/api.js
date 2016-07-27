@@ -1690,7 +1690,17 @@ var editor;
       return;
     }
 
-    return this.wb.editDefinedNames(oldName, newName);
+    if (oldName.asc_getIsTable()) {
+      var dataRange = parserHelp.parse3DRef(oldName.asc_getRef());
+      if (dataRange) {
+        var ws = this.wb.getWorksheetByName(dataRange.sheet);
+        if (ws) {
+          return ws.af_changeDisplayNameTable(oldName.asc_getName(), newName.asc_getName());
+        }
+      }
+    } else {
+      return this.wb.editDefinedNames(oldName, newName);
+    }
   };
 
   spreadsheet_api.prototype.asc_delDefinedNames = function(oldName) {
@@ -1712,7 +1722,7 @@ var editor;
   spreadsheet_api.prototype._onUpdateDefinedNames = function(lockElem) {
 //      if( lockElem.Element["subType"] == AscCommonExcel.c_oAscLockTypeElemSubType.DefinedNames ){
       if( lockElem.Element["sheetId"] == -1 && lockElem.Element["rangeOrObjectId"] != -1 && !this.collaborativeEditing.getFast() ){
-          var dN = this.wbModel.dependencyFormulas.getDefNameNodeByNodeId(lockElem.Element["rangeOrObjectId"]);
+          var dN = this.wbModel.dependencyFormulas.getDefNameByNodeId(lockElem.Element["rangeOrObjectId"]);
           if (dN) {
               dN.isLock = lockElem.UserId;
               this.handlers.trigger("asc_onRefreshDefNameList",dN.getAscCDefName());

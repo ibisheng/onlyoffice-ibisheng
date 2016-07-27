@@ -51,6 +51,7 @@ function (window, undefined) {
 	window['AscCH'].historyitem_Workbook_DefinedNamesAdd = 7;
 	window['AscCH'].historyitem_Workbook_DefinedNamesChange = 8;
 	window['AscCH'].historyitem_Workbook_DefinedNamesDelete = 9;
+	window['AscCH'].historyitem_Workbook_DefinedNamesChangeRef = 10;
 
 	window['AscCH'].historyitem_Worksheet_RemoveCell = 1;
 	window['AscCH'].historyitem_Worksheet_RemoveRows = 2;

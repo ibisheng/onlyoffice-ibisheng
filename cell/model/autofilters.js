@@ -921,7 +921,7 @@
 						if(!worksheet.TableParts)
 							worksheet.TableParts = [];
 						worksheet.TableParts[worksheet.TableParts.length] = cloneData;
-						worksheet.workbook.dependencyFormulas.addTableName(cloneData.DisplayName, worksheet, cloneData.Ref);
+						worksheet.workbook.dependencyFormulas.addTableName(cloneData.DisplayName, worksheet, cloneData.Ref, cloneData);
 						this._setColorStyleTable(cloneData.Ref, cloneData, null, true);
 					}
 					else
@@ -1044,7 +1044,7 @@
 								if(!worksheet.TableParts)
 									worksheet.TableParts = [];
 								worksheet.TableParts[worksheet.TableParts.length] = cloneData;
-                                worksheet.workbook.dependencyFormulas.addTableName(cloneData.DisplayName, worksheet, cloneData.Ref);
+                                worksheet.workbook.dependencyFormulas.addTableName(cloneData.DisplayName, worksheet, cloneData.Ref, cloneData);
 								this._setColorStyleTable(cloneData.Ref, cloneData, null, true);
 							}
 							else
@@ -3451,15 +3451,6 @@
 						newFilter.AutoFilter = new AscCommonExcel.AutoFilter();
 						newFilter.AutoFilter.Ref = ref;
 					}
-
-					if(tablePartDisplayName)
-					{
-						newFilter.DisplayName = tablePartDisplayName;
-						worksheet.workbook.dependencyFormulas.addTableName(tablePartDisplayName, worksheet, ref);
-					}
-					else
-						newFilter.DisplayName = worksheet.workbook.dependencyFormulas.getNextTableName(worksheet, ref);
-					
 					
 					newFilter.TableStyleInfo = new AscCommonExcel.TableStyleInfo();
 					newFilter.TableStyleInfo.Name = style;
@@ -3484,6 +3475,14 @@
 					
 					
 					newFilter.TableColumns = tableColumns;
+
+					if(tablePartDisplayName)
+					{
+						newFilter.DisplayName = tablePartDisplayName;
+						worksheet.workbook.dependencyFormulas.addTableName(tablePartDisplayName, worksheet, ref, newFilter);
+					}
+					else
+						newFilter.DisplayName = worksheet.workbook.dependencyFormulas.getNextTableName(worksheet, ref, null, newFilter);
 					
 					worksheet.TableParts[worksheet.TableParts.length] = newFilter;
 

@@ -11126,11 +11126,12 @@
                   actRange.startCol), c1 = mc ? mc.c1 : actRange.c1, r1 = mc ? mc.r1 :
                   actRange.r1, ar_norm = actRange.normalize(), mc_norm = mc ? mc.normalize() : null, c2 = mc_norm ?
                   ( mc_norm.isEqual(ar_norm) ? mc_norm.c1 : ar_norm.c2 ) : ar_norm.c2, r2 = mc_norm ?
-                  ( mc_norm.isEqual(ar_norm) ? mc_norm.r1 : ar_norm.r2 ) : ar_norm.r2;
+                  ( mc_norm.isEqual(ar_norm) ? mc_norm.r1 : ar_norm.r2 ) : ar_norm.r2, ref3d;
 
                 ascRange = new asc_Range(c1, r1, c2, r2);
-                defName = this.model.workbook.editDefinesNames(null,
-                  new Asc.asc_CDefName(reference, this.model.getName() + "!" + ascRange.getAbsName()));
+                //todo check lock
+                ref3d = parserHelp.get3DRef(this.model.getName(), ascRange.getAbsName());
+                defName = this.model.workbook.editDefinesNames(null, new Asc.asc_CDefName(reference, ref3d));
             }
 
             if (defName) {
@@ -13863,7 +13864,7 @@
 		};
 		
 		//лочим данный именованный диапазон при смене размера ф/т
-		var defNameId = t.model.workbook.dependencyFormulas.getDefNameNodeByName(tableName, t.model.getId());
+		var defNameId = t.model.workbook.dependencyFormulas.getDefNameByName(tableName, t.model.getId());
 		defNameId = defNameId ? defNameId.getNodeId() : null;
 		
 		t._isLockedDefNames( callBackLockedDefNames, defNameId );

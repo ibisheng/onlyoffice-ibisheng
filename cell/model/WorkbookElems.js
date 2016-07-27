@@ -4725,7 +4725,7 @@ TablePart.prototype.clone = function(ws, tableName) {
 	return res;
 };
 TablePart.prototype.recalc = function(ws, tableName) {
-	this.DisplayName = ws.workbook.dependencyFormulas.getNextTableName(ws, this.Ref, tableName);
+	this.DisplayName = ws.workbook.dependencyFormulas.getNextTableName(ws, this.Ref, tableName, this);
 };
 TablePart.prototype.moveRef = function(col, row) {
 	var ref = this.Ref.clone();
@@ -5237,8 +5237,10 @@ AutoFilter.prototype.isShowButton = function()
 
 AutoFilter.prototype.getRangeWithoutHeaderFooter = function()
 {
-	//todo
-	return Asc.Range(this.Ref.c1, this.Ref.r1 + 1, this.Ref.c2, this.Ref.r2);
+	var startRow = this.HeaderRowCount === null ? this.Ref.r1 + 1 : this.Ref.r1;
+	var endRow = this.TotalsRowCount ? this.Ref.r2 - 1 : this.Ref.r2;
+
+	return Asc.Range(this.Ref.c1, startRow, this.Ref.c2, endRow);
 }; 
 
 AutoFilter.prototype._getFilterColumnByColId = function(colId)

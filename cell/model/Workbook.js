@@ -177,7 +177,7 @@ function getRangeType(oBBox){
 		}
 	}
 var lastListenerId = 0;
-	function DefName2(wb, name, ref, sheetId, hidden, isTable) {
+	function DefName(wb, name, ref, sheetId, hidden, isTable) {
 		this.wb = wb;
 		this.name = name;
 		this.ref = ref;
@@ -185,14 +185,12 @@ var lastListenerId = 0;
 		this.hidden = hidden;
 		this.isTable = isTable;
 
-		this.listeners = {};
-		this.listenersCount = 0;
 		this.isLock = null;
 		this.parsedRef = null;
 		this.setRef(this.ref);
 	}
 
-	DefName2.prototype = {
+	DefName.prototype = {
 		dispose: function() {
 			if (this.parsedRef) {
 				this.parsedRef.removeDependencies();
@@ -209,14 +207,7 @@ var lastListenerId = 0;
 			}
 			return new Asc.asc_CDefName(this.name, this.ref, index, this.isTable, this.hidden, this.isLock);
 		},
-		changeAscDefName: function(newAscDefName){
-			this.dispose();
-			this.name = newAscDefName.Name;
-			if(this.ref != newAscDefName.Ref){
-				this.setRef(newAscDefName.Ref);
-			}
-		},
-		setRef:function(ref){
+		setRef: function(ref) {
 			this.ref = ref;
 			if (this.ref) {
 				//все ссылки должны быть 3d поэтому без разницы какой sheet предавать
@@ -225,45 +216,10 @@ var lastListenerId = 0;
 				this.wb.dependencyFormulas.addToBuildDependencyDefName(this);
 			}
 		},
-		startListening: function(listener) {
-			var listenerId = listener.getListenerId();
-			if (!listenerId) {
-				listenerId = lastListenerId++;
-				listener.setListenerId(listenerId);
-			}
-			if(!this.listeners[listenerId]){
-				this.listeners[listenerId] = listener;
-				this.listenersCount++;
-			}
-		},
-		endListening: function(listener) {
-			var listenerId = listener.getListenerId();
-			if(this.listeners[listenerId]){
-				delete this.listeners[listenerId];
-				this.listenersCount--;
-				if(this.listenersCount <= 0){
-					//todo delete
-				}
-			}
-
-		},
-		isEmptyBroadcast: function(){
-			var res = true;
-			for (var listenerId in this.listeners) {
-				res = false;
-				break;
-			}
-			return res;
-		},
-		broadcast: function(notifyData){
-			for (var listenerId in this.listeners) {
-				this.listeners[listenerId].notify(notifyData);
-			}
-		},
-		notify: function(notifyData){
-			if(AscCommon.c_oNotifyType.Dirty !== notifyData.type) {
-				this.ref = this.parsedRef.Formula;
-			}
+		changeFormula: function(oldFormula, newFormula) {
+			this.ref = newFormula;
+			History.Add(AscCommonExcel.g_oUndoRedoWorkbook, AscCH.historyitem_Workbook_DefinedNamesChangeRef, null,
+						null, new UndoRedoData_FromTo(oldFormula, newFormula));
 		}
 	};
 
@@ -282,11 +238,12 @@ var lastListenerId = 0;
 		return bbox.getName();
 	}
 
-	function DependencyGraph3(wb) {
+	function DependencyGraph(wb) {
 		this.wb = wb;
 		//listening
 		this.sheetListeners = {};
 		this.volatileListeners = {};
+		this.defNameListeners = {};
 		this.tempGetByCells = [];
 		//set dirty
 		this.changedCell = {};
@@ -303,7 +260,7 @@ var lastListenerId = 0;
 		this.tableNameIndex = 0;
 	}
 
-	DependencyGraph3.prototype = {
+	DependencyGraph.prototype = {
 		//listening
 		startListeningRange: function(sheetId, bbox, listener) {
 			//todo bbox clone or bbox immutable
@@ -324,7 +281,7 @@ var lastListenerId = 0;
 					cellMapElem = {count: 0, listeners: {}};
 					sheetContainer.cellMap[cellIndex] = cellMapElem;
 				}
-				if (!cellMapElem[listenerId]) {
+				if (!cellMapElem.listeners[listenerId]) {
 					cellMapElem.listeners[listenerId] = listener;
 					cellMapElem.count++;
 				}
@@ -336,7 +293,7 @@ var lastListenerId = 0;
 					sheetContainer.areaMap[vertexIndex] = areaSheetElem;
 					sheetContainer.areaTree.add(bbox, areaSheetElem);
 				}
-				if (!areaSheetElem[listenerId]) {
+				if (!areaSheetElem.listeners[listenerId]) {
 					areaSheetElem.listeners[listenerId] = listener;
 					areaSheetElem.count++;
 				}
@@ -382,11 +339,40 @@ var lastListenerId = 0;
 			var listenerId = listener.getListenerId();
 			delete this.volatileListeners[listenerId];
 		},
+		startListeningDefName: function(name, listener) {
+			var listenerId = listener.getListenerId();
+			if (!listenerId) {
+				listenerId = lastListenerId++;
+				listener.setListenerId(listenerId);
+			}
+			var nameIndex = getDefNameIndex(name);
+			var container = this.defNameListeners[nameIndex];
+			if (!container) {
+				container = {count: 0, listeners: {}};
+				this.defNameListeners[nameIndex] = container;
+			}
+			if (!container.listeners[listenerId]) {
+				container.listeners[listenerId] = listener;
+				container.count++;
+			}
+		},
+		endListeningDefName: function(name, listener) {
+			var listenerId = listener.getListenerId();
+			var nameIndex = getDefNameIndex(name);
+			var container = this.defNameListeners[nameIndex];
+			if (container) {
+				delete container.listeners[listenerId];
+				container.count--;
+				if (container.count <= 0) {
+					delete this.defNameListeners[nameIndex];
+				}
+			}
+		},
 		//shift, move
 		deleteNodes: function(sheetId, bbox) {
 			//обязательно, формула не в зависимостях не сдвинутся
 			this.buildDependency();
-			this._shiftMoveDelete(AscCommon.c_oNotifyType.Delete, sheetId, bbox, offset);
+			this._shiftMoveDelete(AscCommon.c_oNotifyType.Delete, sheetId, bbox, null);
 		},
 		shift: function(sheetId, bbox, offset) {
 			//обязательно, формула не в зависимостях не сдвинутся
@@ -411,7 +397,7 @@ var lastListenerId = 0;
 			}
 		},
 		//defined name
-		getDefNameNodeByName: function(name, sheetId) {
+		getDefNameByName: function(name, sheetId) {
 			var res = null;
 			var nameIndex = getDefNameIndex(name);
 			if(sheetId){
@@ -425,19 +411,11 @@ var lastListenerId = 0;
 			}
 			return res;
 		},
-		getDefNameNodeByNameIndex: function(name, sheetIndex) {
-			var sheetId = null;
-			if (sheetIndex) {
-				var ws = this.wb.getWorksheet(sheetIndex);
-				sheetId = ws ? ws.getId() : null;
-			}
-			return this.getDefNameNodeByName(name, sheetId);
-		},
-		getDefNameNodeByNodeId: function(nodeId) {
+		getDefNameByNodeId: function(nodeId) {
 			getFromDefNameId(nodeId);
-			return this.getDefNameNodeByName(g_FDNI.name, g_FDNI.sheetId);
+			return this.getDefNameByName(g_FDNI.name, g_FDNI.sheetId);
 		},
-		getDefNameNodeByRef: function(ref, sheetId) {
+		getDefNameByRef: function(ref, sheetId) {
 			var getByRef = function(defName) {
 				if (!defName.hidden && defName.ref == ref) {
 					return defName.name;
@@ -493,14 +471,10 @@ var lastListenerId = 0;
 			}
 			return names.sort(sort);
 		},
-		addDefinedNameNode: function(name, ref, sheetIndex, hidden, bUndo) {
+		addDefNameOpen: function(name, ref, sheetIndex, hidden, isTable) {
 			var nameIndex = getDefNameIndex(name);
 			var container;
-			var sheetId = null;
-			if (sheetIndex) {
-				var ws = this.wb.getWorksheet(sheetIndex);
-				sheetId = ws ? ws.getId() : null;
-			}
+			var sheetId = this.wb.getSheetIdByIndex(sheetIndex);
 			if (sheetId) {
 				container = this.defNames.sheet[sheetId];
 				if (!container) {
@@ -512,76 +486,59 @@ var lastListenerId = 0;
 			}
 			var res = container[nameIndex];
 			if (!res) {
-				res = new DefName2(this.wb, name, ref, sheetId, hidden, false);
+				res = new DefName(this.wb, name, ref, sheetId, hidden, isTable);
 				container[nameIndex] = res;
-			} else if (!res.ref && ref) {
-				res.setRef(ref);
-
-			}
-			if (bUndo) {
-				res.ref = defRef;
 			}
 			return res;
 		},
 		removeDefName: function(sheetIndex, name) {
-			var sheetId = null;
-			if (sheetIndex) {
-				var ws = this.wb.getWorksheet(sheetIndex);
-				sheetId = ws ? ws.getId() : null;
-			}
-			var defName = this.getDefNameNodeByName(name, sheetId);
+			var sheetId = this.wb.getSheetIdByIndex(sheetIndex);
+			this.buildDependency();
+			var defName = this._delDefName(name, sheetId);
 			if (defName) {
 				History.Create_NewPoint();
-				this.buildDependency();
-				if (defName.isEmptyBroadcast()) {
-					this._delDefName(name, sheetId);
-				} else {
-					defName.setRef(null);
-				}
-				History.Add( AscCommonExcel.g_oUndoRedoWorkbook, AscCH.historyitem_Workbook_DefinedNamesDelete, null, null, new UndoRedoData_DefinedNames( defName.Name, defName.Ref, defName.LocalSheetId, defName.isTable) );
+				//todo
+				History.Add( AscCommonExcel.g_oUndoRedoWorkbook, AscCH.historyitem_Workbook_DefinedNamesDelete, null, null, new UndoRedoData_DefinedNames( defName.name, defName.ref, defName.LocalSheetId, defName.isTable) );
+
+				defName.dispose();
+				this.addToChangedDefName(defName);
+				this.calcTree();
 			}
 		},
-		removeDefNameBySheet: function(sheetId) {
-		},
-		editDefinesNames: function(oldAscName, newAscName, bUndo) {
+		editDefinesNames: function(oldAscName, newAscName) {
 			var res = null;
 			if (!AscCommon.rx_defName.test(getDefNameIndex(newAscName.Name)) || !newAscName.Ref || newAscName.Ref.length == 0) {
 				return res;
 			}
 			if (oldAscName) {
-				//при переименовании важно строить зависимости иначе не пересчитаются зависимые формулы
-				//пример foo->bar влечет SUM(foo)->SUM(bar), но если нет зависимостей то останется SUM(foo)(повторяется при принятии изменений)
-				//при сдвиге ячеек пересчитывать не надо, т.к. пересчет может запуститься когда сдвинется часть ячеек и тогда будут неправильные зависимости
-				if (newAscName.Name != oldAscName.Name) {
-					this.buildDependency();
-				}
-				res = this.getDefNameNodeByNameIndex(newAscName.Name, newAscName.LocalSheetId);
-				res.changeAscDefName(newAscName);
-			}
-			else {
-				res = this.addDefinedNameNode(newAscName.Name, newAscName.Ref, newAscName.LocalSheetId, newAscName.Hidden, bUndo);
+				res = this.getDefNameByName(oldAscName.Name, this.wb.getSheetIdByIndex(oldAscName.LocalSheetId));
+			} else {
+				res = this.addDefNameOpen(newAscName.Name, newAscName.Ref, newAscName.LocalSheetId, newAscName.Hidden, false);
 			}
 
 			if (res) {
 				History.Create_NewPoint();
 
-				/*  #1. поменяли название - перестроили формулу. нужно вызвать пересборку формул в ячейках, в которыйх есть эта именованная ссылка.
-				 для этого пробегаемся по всем slave, и вызываем пересборку. в результате должна получиться новая формула, где используется новый диапазон.
-				 #2. поменяли диапазон. нужно перестроить граф зависимосте и пересчитать формулу. находим диапазон; меняем в нем ссылку; разбираем ссылку;
-				 удаляем старые master и добавляем новые, которые получились в результате разбора новой ссылки; пересчитываем формулу.*/
+				this._delDefName(res.name, res.sheetId);
+				res = this.addDefNameOpen(newAscName.Name, newAscName.Ref, newAscName.LocalSheetId, newAscName.Hidden, false);
 
-				if (oldAscName) {
+				if (oldAscName && oldAscName.Name != newAscName.Name) {
+					this.buildDependency();
+
 					var notifyData = {type: AscCommon.c_oNotifyType.ChangeDefName, from: oldAscName, to: newAscName};
-					res.broadcast(notifyData);
+					this._broadcastDefName(oldAscName.Name, notifyData);
 				}
 
 				History.Add(AscCommonExcel.g_oUndoRedoWorkbook, AscCH.historyitem_Workbook_DefinedNamesChange, null,
 							null, new UndoRedoData_DefinedNamesChange(oldAscName, newAscName));
+
+				this.addToChangedDefName(res);
 			}
 
-			this.wb.dependencyFormulas.calcTree();
+			this.calcTree();
 			return res;
-
+		},
+		removeDefNameBySheet: function(sheetId) {
 		},
 		copyDefNameByWorksheet: function(oldSheetId, newSheetId) {
 		},
@@ -607,7 +564,7 @@ var lastListenerId = 0;
 			});
 		},
 		//defined name table
-		getNextTableName: function(ws, Ref, opt_tableName) {
+		getNextTableName: function(ws, Ref, opt_tableName, opt_table) {
 			var sNewName;
 			if (opt_tableName) {
 				sNewName = opt_tableName;
@@ -622,7 +579,7 @@ var lastListenerId = 0;
 				} while (this.defNames.wb[getDefNameIndex(sNewName)]);
 			}
 
-			this.addTableName(sNewName, ws, Ref);
+			this.addTableName(sNewName, ws, Ref, opt_table);
 			return sNewName;
 		},
 		addTableName: function(sName, ws, Ref, table) {
@@ -634,63 +591,43 @@ var lastListenerId = 0;
 				refClone = Ref.clone(true);
 				refClone.r1++;
 			}
-			var defName = this.defNames.wb[getDefNameIndex(sName)];
+
+			var defName = this.getDefNameByName(sName, null);
+			var defNameRef = parserHelp.get3DRef(ws.getName(), refClone.getAbsName());
 			if (!defName) {
-				defName = new DefName2(this.wb, sName, parserHelp.get3DRef(ws.getName(),
-																		   refClone.getAbsName()), null, null, true);
-				this.defNames.wb[getDefNameIndex(sName)] = defName;
+				this.addDefNameOpen(sName, defNameRef, null, null, true);
 			} else {
-				defName.Ref = parserHelp.get3DRef(ws.getName(), refClone.getAbsName());
+				defName.Ref = defNameRef;
 			}
 		},
 		changeTableRef: function (tableName, newRef) {
-			var defName = this.getDefNameNodeByName(tableName, null);
+			var defName = this.getDefNameByName(tableName, null);
 			if (defName) {
-				var notifyData = {type: AscCommon.c_oNotifyType.ChangeDefNameTable, tableName: tableName, newRef: newRef};
-				defName.broadcast(notifyData);
-				if (defName.parsedRef) {
-					defName.parsedRef.notify(notifyData);
-				}
+				var oldAscName = defName.getAscCDefName();
+				var newAscName = new Asc.asc_CDefName(oldAscName.asc_getName(), newRef, oldAscName.asc_getScope(), oldAscName.asc_getIsTable(), oldAscName.asc_getIsHidden(), oldAscName.asc_getIsLock());
+				this.editDefinesNames(oldAscName, newAscName);
 			}
 		},
 		changeTableName: function (tableName, newName) {
-			var defName = this.getDefNameNodeByName(tableName, null);
+			var defName = this.getDefNameByName(tableName, null);
 			if (defName) {
-				var notifyData = {
-					type: AscCommon.c_oNotifyType.ChangeDefNameTable,
-					tableName: tableName,
-					newName: newName
-				};
-				defName.broadcast(notifyData);
-				if (defName.parsedRef) {
-					defName.parsedRef.notify(notifyData);
-				}
-				defName.name = newName;
-				this._delDefName(tableName);
-				this.defNames.wb[getDefNameIndex(defName.name)] = defName;
+				var oldAscName = defName.getAscCDefName();
+				var newAscName = new Asc.asc_CDefName(newName, oldAscName.asc_getRef, oldAscName.asc_getScope(), oldAscName.asc_getIsTable(), oldAscName.asc_getIsHidden(), oldAscName.asc_getIsLock());
+				this.editDefinesNames(oldAscName, newAscName);
 			}
 		},
 		delTableName:function(tableName){
-			var defName = this.getDefNameNodeByName( tableName, null );
-			if (defName) {
-				var notifyData = {type: AscCommon.c_oNotifyType.ChangeDefNameTable, tableName: tableName};
-				defName.broadcast(notifyData);
-				delete this.defNames.wb[getDefNameIndex(tableName)];
-			}
+			this.removeDefName(null, tableName);
 		},
 		rebuildTable:function(tableName){
-			var defName = this.getDefNameNodeByName( tableName, null );
-			if(defName){
-				var notifyData = {type: AscCommon.c_oNotifyType.ChangeDefNameTable, tableName: tableName};
-				defName.broadcast(notifyData);
-			}
+			//todo
 		},
 		//set dirty
 		addToChangedElem: function(elem) {
 			if (elem instanceof AscCommonExcel.Cell) {
-				this.wb.dependencyFormulas.addToChangedCell(cell.ws.getId(), elem.nRow, elem.nCol);
-			} else if (elem instanceof DefName2) {
-				this.wb.dependencyFormulas.addToChangedDefName(elem);
+				this.addToChangedCell(elem.ws.getId(), elem.nRow, elem.nCol);
+			} else if (elem instanceof DefName) {
+				this.addToChangedDefName(elem);
 			}
 		},
 		addToChangedCell: function(sheetId, row, col) {
@@ -760,7 +697,7 @@ var lastListenerId = 0;
 			}
 			for (var defNameId in this.buildDefName) {
 				getFromDefNameId(defNameId);
-				var defName = this.getDefNameNodeByName(g_FDNI.name, g_FDNI.sheetId);
+				var defName = this.getDefNameByName(g_FDNI.name, g_FDNI.sheetId);
 				if (defName.parsedRef) {
 					defName.parsedRef.parse();
 					defName.parsedRef.buildDependencies();
@@ -809,17 +746,20 @@ var lastListenerId = 0;
 		},
 		//internal
 		_delDefName: function (name, sheetId) {
-			var nameIndex = getDefNameIndex(defName.name);
+			var res = null;
+			var nameIndex = getDefNameIndex(name);
 			var sheetContainer;
-			if (defName.sheetId) {
+			if (sheetId) {
 				sheetContainer = this.defNames.sheet[sheetId];
 			}
 			else {
 				sheetContainer = this.defNames.wb;
 			}
 			if (sheetContainer) {
+				res = sheetContainer[nameIndex];
 				delete sheetContainer[nameIndex];
 			}
+			return res;
 		},
 		_foreachDefName: function(action) {
 			var containerSheet;
@@ -871,12 +811,19 @@ var lastListenerId = 0;
 				this.volatileListeners[i].notify(notifyData);
 			}
 		},
+		_broadcastDefName: function(name, notifyData) {
+			var nameIndex = getDefNameIndex(name);
+			var container = this.defNameListeners[nameIndex];
+			if(container) {
+				for (var listenerId in container.listeners) {
+					container.listeners[listenerId].notify(notifyData);
+				}
+			}
+		},
 		_broadcastDefNames: function(notifyData) {
 			for (var nodeId in this.changedDefName) {
-				var defName = this.getDefNameNodeByNodeId(nodeId);
-				if(defName){
-					defName.broadcast(notifyData);
-				}
+				getFromDefNameId(nodeId);
+				this._broadcastDefName(g_FDNI.name, notifyData);
 			}
 			this.changedDefName = {};
 		},
@@ -913,7 +860,7 @@ var lastListenerId = 0;
 			this.tempGetByCells = [];
 		},
 		_shiftMoveDelete: function(notifyType, sheetId, bbox, offset) {
-			var isHor = 0 != offset.offsetCol;
+			var isHor = offset && 0 != offset.offsetCol;
 			var toDelete;
 			var oShiftGetBBox;
 			if (AscCommon.c_oNotifyType.Shift == notifyType) {
@@ -1007,7 +954,7 @@ var lastListenerId = 0;
 						this._mergeListeners(changeAreaMapElem, areaMapElem);
 					} else {
 						sheetContainer.areaMap[areaIndex] = changeAreaMapElem;
-						sheetContainer.areaTree.add(bbox, changeAreaMapElem);
+						sheetContainer.areaTree.add(changeAreaMapElem.bbox, changeAreaMapElem);
 					}
 				}
 
@@ -1033,7 +980,7 @@ var lastListenerId = 0;
 					var cell = container;
 					this.addToChangedCell(cell.ws.getId(), cell.nRow, cell.nCol);
 					calcTrack.push(container.formulaParsed);
-				} else if (container instanceof DefName2) {
+				} else if (container instanceof DefName) {
 					var defName = container;
 					this.addToChangedDefName(defName);
 					// if (defName.parsedRef) {
@@ -1163,1760 +1110,8 @@ var lastListenerId = 0;
 		}
 	};
 
-/** @constructor */
-function DependencyGraph( wb ) {
-    this.wb = wb;
-    this.nodesId = null;
-    this.nodesCell = null;
-    this.nodesArea = null;
-    this.defNameList = {};
-    this.defNameSheets = {};
-    this.nodeslength = null;
-    this.bSetRefError = false;
-    this.oChangeNodeSlave = null;
-    this.sTableNamePattern = "Table";
-    this.nTableNameMaxIndex = 0;
-    this.clear();
-}
-DependencyGraph.prototype = {
-    clear:function () {
-        this.nodesId = {};
-        this.nodesCell = {};
-        this.nodesArea = {};
-        this.nodeslength = 0;
-		this.bSetRefError = false;
-    },
-    nodeExist:function ( node ) {
-        return this.nodeExist2( node.sheetId, node.cellId );
-    },
-    nodeExist2:function ( sheetId, cellId ) {
-        return null != this.getNode( sheetId, cellId );
-    },
-    nodeExistWithArea:function ( sheetId, cellId ) {
-        var bRes = this.nodeExist2( sheetId, cellId );
-        if ( !bRes ) {
-            var nodesSheetArea = this.nodesArea[sheetId];
-            if ( null != nodesSheetArea ) {
-                var bbox = AscCommonExcel.g_oRangeCache.getAscRange( cellId );
-                bRes = nodesSheetArea.get( bbox ).all.length > 0;
-            }
-        }
-        return bRes;
-    },
-    getNode3:function ( nodeId ) {
-        return this.nodesId[nodeId];
-    },
-    getNode2:function ( node ) {
-        return this.nodesId[node.nodeId];
-    },
-    getNode:function ( sheetId, cellId ) {
-        return this.nodesId[getVertexId( sheetId, cellId )];
-    },
-
-    addNode2:function ( node ) {
-        return this.addNode( node.sheetId, node.cellId );
-    },
-    addNode:function ( sheetId, cellId ) {
-		var _this = this;
-        var nodeId = getVertexId( sheetId, cellId );
-        var oRes = this.nodesId[nodeId];
-        if ( null == oRes ) {
-            var node = new Vertex( sheetId, cellId, this.wb );
-            var oBBoxNode = node.getBBox();
-            if ( node.isArea ) {
-                var nodesSheetArea = this.nodesArea[node.sheetId];
-                if ( null == nodesSheetArea ) {
-					nodesSheetArea = new RangeDataManager(function(data, from, to){_this._changeNode(data, from, to);});
-                    this.nodesArea[node.sheetId] = nodesSheetArea;
-                }
-                nodesSheetArea.add( oBBoxNode, node );
-            }
-            else {
-                var nodesSheetCell = this.nodesCell[node.sheetId];
-                if ( null == nodesSheetCell ) {
-					nodesSheetCell = new AscCommonExcel.CellArea(function(data, from, to){_this._changeNode(data, from, to);});
-                    this.nodesCell[node.sheetId] = nodesSheetCell;
-                }
-                nodesSheetCell.add( oBBoxNode.r1, oBBoxNode.c1, node );
-            }
-            oRes = node;
-        }
-        return oRes;
-    },
-    addEdge2:function ( nodeFrom, nodeTo ) {
-        nodeFrom.addMasterEdge( nodeTo );
-        nodeTo.addSlaveEdge( nodeFrom );
-    },
-    addEdge:function ( sheetIdFrom, cellIdFrom, sheetIdTo, cellIdTo ) {
-        var n1 = this.addNode( sheetIdFrom, cellIdFrom ),
-            n2 = this.addNode( sheetIdTo, cellIdTo );
-        this.addEdge2( n1, n2 );
-    },
-    getNodeBySheetId:function ( sheetId ) {
-        var arr = [];
-        var nodesSheetCell = this.nodesCell[sheetId];
-        if ( nodesSheetCell ) {
-            var aNodes = nodesSheetCell.getAll();
-            for ( var i = 0, length = aNodes.length; i < length; i++ ) {
-                var node = aNodes[i].data;
-                var n = node.getSlaveEdges();
-                if ( n ) {
-                    arr.push( node );
-                }
-            }
-        }
-		var nodesSheetArea = this.nodesArea[sheetId];
-        if ( nodesSheetArea ) {
-            var aNodes = nodesSheetArea.getAll();
-            for ( var i = 0, length = aNodes.length; i < length; i++ ) {
-                var node = aNodes[i].data;
-                var n = node.getSlaveEdges();
-                if ( n ) {
-                    arr.push( node );
-                }
-            }
-        }
-        return arr;
-    },
-    getNodeBySheetIdAll:function ( sheetId ) {
-        var arr = [];
-        var nodesSheetCell = this.nodesCell[sheetId];
-        if ( nodesSheetCell ) {
-            var aNodes = nodesSheetCell.getAll();
-            for ( var i = 0, length = aNodes.length; i < length; i++ ) {
-                arr.push( aNodes[i].data );
-            }
-        }
-		var nodesSheetArea = this.nodesArea[sheetId];
-        if ( nodesSheetArea ) {
-            var aNodes = nodesSheetArea.getAll();
-            for ( var i = 0, length = aNodes.length; i < length; i++ ) {
-                arr.push( aNodes[i].data );
-            }
-        }
-        return arr;
-    },
-    deleteNode:function ( node ) {
-        if(node.isDefinedName) return;
-        if ( node.isArea ) {
-            var nodesSheetArea = this.nodesArea[node.sheetId];
-            if ( nodesSheetArea )
-                nodesSheetArea.removeElement( new RangeDataManagerElem( node.getBBox(), node ) );
-        }
-        else {
-            var nodesSheetCell = this.nodesCell[node.sheetId];
-            if ( nodesSheetCell )
-                nodesSheetCell.removeElement( new RangeDataManagerElem( node.getBBox(), node ) );
-        }
-    },
-	deleteNodes : function(sheetId, bbox){
-		var bSetRefErrorOld = this.bSetRefError;
-		this.bSetRefError = true;
-		this.oChangeNodeSlave = { toDelete: {}, toMove: {} };
-		var nodesSheetArea = this.nodesArea[sheetId];
-		var oGetRes;
-		if(nodesSheetArea)
-		{
-			oGetRes = nodesSheetArea.get(bbox);
-			for(var i = 0, length = oGetRes.inner.length; i < length; ++i)
-				nodesSheetArea.removeElement(oGetRes.inner[i]);
-        }
-		var nodesSheetCell = this.nodesCell[sheetId];
-		if(nodesSheetCell)
-		{
-			oGetRes = nodesSheetCell.get(bbox);
-			for(var i = 0, length = oGetRes.length; i < length; ++i)
-				nodesSheetCell.removeElement(oGetRes[i]);
-		}
-		this.changeNodeEnd();
-		this.bSetRefError = bSetRefErrorOld;
-    },
-    deleteMasterNodes:function ( sheetId, cellId ) {
-        var node = this.getNode( sheetId, cellId );
-        if ( node ) {
-            var arr = node.deleteAllMasterEdges();
-            for ( var i in arr ) {
-                var nodeMaster = arr[i];
-                if ( nodeMaster.refCount <= 0 )
-                    this.deleteNode( nodeMaster );
-            }
-        }
-		return node;
-    },
-	deleteMasterNodes2 : function(sheetId, cellId){
-		var node = this.deleteMasterNodes(sheetId, cellId);
-		if(node && node.refCount <= 0)
-			this.deleteNode(node);
-		return node;
-	},
-	deleteMasterNodes3:function ( node ) {
-	    var arr = node.deleteAllMasterEdges();
-	    for (var i in arr) {
-	        var nodeMaster = arr[i];
-	        if (nodeMaster.refCount <= 0)
-	            this.deleteNode(nodeMaster);
-	    }
-	},
-    getSlaveNodes:function ( sheetId, cellId ) {
-        //todo
-        return null;
-    },
-    getMasterNodes:function ( sheetId, cellId ) {
-        //todo
-        return null;
-    },
-    getNodesLength:function () {
-        return this.nodeslength;
-    },
-    checkOffset:function ( BBox, offset, wsId, noDelete ) {
-        var _this = this,
-            bHor = 0 != offset.offsetCol,
-            toDelete = offset.offsetCol < 0 || offset.offsetRow < 0,
-            bSetRefErrorOld = this.bSetRefError;
-		this.bSetRefError = true;
-		var oShiftGetBBox = AscCommonExcel.shiftGetBBox(BBox, bHor);
-		var sShiftGetBBoxName = oShiftGetBBox.getName();
-		this.wb.needRecalc.nodes[getVertexId(wsId, sShiftGetBBoxName)] = [wsId, sShiftGetBBoxName];
-		this.wb.needRecalc.length++;
-		this.oChangeNodeSlave = { toDelete: {}, toMove: {}};
-        var nodesSheetArea = this.nodesArea[wsId];
-		if(nodesSheetArea)
-			nodesSheetArea.shift(BBox, !toDelete, bHor);
-        var nodesSheetCell = this.nodesCell[wsId];
-		if(nodesSheetCell)
-            nodesSheetCell.shift( BBox, !toDelete, bHor );
-		this.changeNodeEnd();
-		this.bSetRefError = bSetRefErrorOld;
-    },
-    changeNodeProcessDelete: function (node, oFormulas, toDelete) {
-        //todo deleteAllSlaveEdges deleteMasterNodes
-        var oSlaves = node.deleteAllSlaveEdges(), slave, formula;
-        if (this.bSetRefError) {
-            //выставляем #REF!
-            for (var i in oSlaves) {
-                slave = oSlaves[i];
-                if( slave instanceof DefNameVertex ){
-					if(!slave.isTable)
-                    	this.wb.delDefinesNames(slave.getAscCDefName());
-                    continue;
-                }
-                if (null == toDelete || slave != toDelete[slave.nodeId]) {
-                    formula = slave.setRefError(node);
-                    if (null != formula) {
-                        if (oFormulas)
-                            oFormulas[slave.nodeId] = { node: slave, formula: formula };
-                        else
-                            slave.setFormula(formula, true, false);
-                    }
-                }
-            }
-        }
-        this.deleteMasterNodes3(node);
-    },
-    changeNodeProcessMove: function (node, from, to, oFormulas, toDelete) {
-        if (null == toDelete || node != toDelete[node.nodeId])
-            node.moveOuter(from, to, oFormulas);
-    },
-    changeNodeEnd : function(){
-        var oChangeNodeSlave = this.oChangeNodeSlave;
-        //обнуляем, потому что в цикле можем опять попасть в _changeNode со старым this.oChangeNodeSlave
-        this.oChangeNodeSlave = null;
-        //накапливаем формулы, потому что когда мы меняем формулу мы удаляем masterNodes, а эти node могут быть необработаными и влиять на формулу(C2=A2+B2 -> C1=A1+B2)
-        var oFormulas = {};
-        for (var i in oChangeNodeSlave.toDelete) {
-            var elem = oChangeNodeSlave.toDelete[i];
-            this.changeNodeProcessDelete(elem.node, oFormulas, oChangeNodeSlave.toDelete);
-        }
-        for (var i in oChangeNodeSlave.toMove) {
-            var elem = oChangeNodeSlave.toMove[i];
-            this.changeNodeProcessMove(elem.node, elem.from, elem.to, oFormulas, oChangeNodeSlave.toDelete);
-        }
-        for (var i in oFormulas) {
-            var elem = oFormulas[i];
-            if (null == elem.formula) {
-                var node = elem.node;
-                var cell = node.returnCell();
-                if (cell && cell.formulaParsed) {
-                    this.wb.dependencyFormulas.deleteMasterNodes2(node.sheetId, node.cellId);
-                    addToArrRecalc(node.sheetId, cell);
-                }
-            }
-            else
-                elem.node.setFormula(elem.formula, true, false);
-        }
-    },
-	_changeNode : function(node, from, to){
-        var toDelete = null == to;
-		var toAdd = null == from;
-		var wsId = node.sheetId;
-		var sOldCellId = node.cellId;
-		if(toAdd)
-		{
-			this.nodesId[node.nodeId] = node;
-			this.nodeslength++;
-		}
-		else if(toDelete)
-		{
-			if (this.oChangeNodeSlave)
-			    this.oChangeNodeSlave.toDelete[node.nodeId] = { node: node, from: from, to: to };
-			else {
-			    this.changeNodeProcessDelete(node, null);
-			}
-			delete this.nodesId[node.nodeId];
-			this.nodeslength--;
-		}
-		else {
-		    var sOldnodeId = node.nodeId;
-		    node.moveInner(to);
-		    if (this.oChangeNodeSlave)
-		        this.oChangeNodeSlave.toMove[node.nodeId] = { node: node, from: from, to: to };
-		    else
-		        this.changeNodeProcessMove(node, from, to, null);
-            delete this.nodesId[sOldnodeId];
-            this.nodesId[node.nodeId] = node;
-		}
-		//важно что ячейки уже сдвинулись, поэтому до вызова returnCell нужно сделать node.move и сдвинуть ячейки в aGCells
-		if(!node.isArea)
-		{
-            var cwf = this.wb.cwf[wsId];
-			if(cwf)
-			{
-				if(!toAdd)
-					delete cwf[sOldCellId];
-				if(!toDelete)
-				{
-					var cell = node.returnCell();
-					if ( cell && cell.formulaParsed )
-						cwf[node.cellId] = node.cellId;
-				}
-            }
-        }
-    },
-	getCellInRange : function(sheetId, bbox){
-		var res = [], oGetRes, nodesSheetCell = this.nodesCell[sheetId];
-        if ( nodesSheetCell ) {
-			oGetRes = nodesSheetCell.get(bbox);
-            for ( var i = 0, length = oGetRes.length; i < length; i++ ) {
-				res.push(oGetRes[i].data);
-            }
-        }
-		return res;
-	},
-	getAreaInRange : function(sheetId, bbox){
-		var res = [], oGetRes, nodesSheetArea = this.nodesArea[sheetId];
-		if(nodesSheetArea)
-		{
-			oGetRes = nodesSheetArea.get(bbox);
-			for(var i = 0, length = oGetRes.all.length; i < length; i++)
-			{
-				res.push(oGetRes.all[i].data);
-            }
-		}
-		return res;
-    },
-	getInRange : function(sheetId, bbox){
-		return this.getCellInRange(sheetId, bbox).concat(this.getAreaInRange(sheetId, bbox));
-	},
-	helper : function(BBoxFrom, oBBoxTo, wsId){
-		var oGetRes, node, nodesSheetCell = this.nodesCell[wsId], nodesSheetArea = this.nodesArea[wsId];
-		var offset = { offsetCol: oBBoxTo.c1 - BBoxFrom.c1, offsetRow: oBBoxTo.r1 - BBoxFrom.r1 };
-		this.oChangeNodeSlave = { toDelete: {}, toMove: {} };
-		var elem, bbox;
-		if(nodesSheetCell)
-			oGetRes = nodesSheetCell.move(BBoxFrom, oBBoxTo);
-		if(nodesSheetArea)
-		    oGetRes = nodesSheetArea.move(BBoxFrom, oBBoxTo);
-		this.changeNodeEnd();
-	},
-    drawDep:function ( cellId, se ) {
-        // ToDo неиспользуемая функция, реализовать после выпуска
-        if ( !cellId )
-            return;
-        var _wsV = this.wb.oApi.wb.getWorksheet(),
-            _cc = _wsV.cellCommentator,
-            ctx = _wsV.overlayCtx,
-            _wsVM = _wsV.model,
-            nodeId = getVertexId( _wsVM.getId(), cellId ),
-            node = this.getNode( _wsVM.getId(), cellId ),
-            cell;
-
-        function gCM( _this, col, row ) {
-            var metrics = { top:0, left:0, width:0, height:0, result:false }; 	// px
-
-            var fvr = _this.getFirstVisibleRow();
-            var fvc = _this.getFirstVisibleCol();
-            var mergedRange = _wsVM.getMergedByCell( row, col );
-
-            if ( mergedRange && (fvc < mergedRange.c2) && (fvr < mergedRange.r2) ) {
-
-                var startCol = (mergedRange.c1 > fvc) ? mergedRange.c1 : fvc;
-                var startRow = (mergedRange.r1 > fvr) ? mergedRange.r1 : fvr;
-
-                metrics.top = _this.getCellTop( startRow, 0 ) - _this.getCellTop( fvr, 0 ) + _this.getCellTop( 0, 0 );
-                metrics.left = _this.getCellLeft( startCol, 0 ) - _this.getCellLeft( fvc, 0 ) + _this.getCellLeft( 0, 0 );
-
-                for ( var i = startCol; i <= mergedRange.c2; i++ ) {
-                    metrics.width += _this.getColumnWidth( i, 0 )
-                }
-                for ( var i = startRow; i <= mergedRange.r2; i++ ) {
-                    metrics.height += _this.getRowHeight( i, 0 )
-                }
-                metrics.result = true;
-            }
-            else {
-
-                metrics.top = _this.getCellTop( row, 0 ) - _this.getCellTop( fvr, 0 ) + _this.getCellTop( 0, 0 );
-                metrics.left = _this.getCellLeft( col, 0 ) - _this.getCellLeft( fvc, 0 ) + _this.getCellLeft( 0, 0 );
-                metrics.width = _this.getColumnWidth( col, 0 );
-                metrics.height = _this.getRowHeight( row, 0 );
-                metrics.result = true;
-            }
-
-            return metrics;
-        }
-
-        if ( !node )
-            return;
-
-        cell = node.returnCell();
-
-        if ( !cell )
-            return;
-
-        var m = [cell.nRow, cell.nCol],
-            rc = [], me = se ? node.getSlaveEdges() : node.getMasterEdges();
-
-        for ( var id in me ) {
-            if ( me[id].sheetId != node.sheetId )
-                return;
-
-            if ( !me[id].isArea ) {
-                var _t1 = gCM( _wsV, me[id].returnCell().nCol, me[id].returnCell().nRow )
-
-                rc.push( { t:_t1.top, l:_t1.left, w:_t1.width, h:_t1.height, apt:_t1.top + _t1.height / 2, apl:_t1.left + _t1.width / 4} );
-            }
-            else {
-                var _t1 = gCM( _wsV, me[id].getBBox().c1, me[id].getBBox().r1 ),
-                    _t2 = gCM( _wsV, me[id].getBBox().c2, me[id].getBBox().r2 );
-
-                rc.push( { t:_t1.top, l:_t1.left, w:_t2.left + _t2.width - _t1.left, h:_t2.top + _t2.height - _t1.top, apt:_t1.top + _t1.height / 2, apl:_t1.left + _t1.width / 4  } );
-            }
-        }
-
-        if ( rc.length == 0 )
-            return;
-
-        var color = new AscCommon.CColor( 0, 0, 255 );
-
-        function draw_arrow( context, fromx, fromy, tox, toy ) {
-            var headlen = 9;
-            var dx = tox - fromx;
-            var dy = toy - fromy;
-            var angle = Math.atan2( dy, dx ), _a = Math.PI / 18;
-            // ToDo посмотреть на четкость moveTo, lineTo
-            context.save()
-                .setLineWidth( 1 )
-                .beginPath()
-                .moveTo( _cc.pxToPt( fromx ), _cc.pxToPt( fromy ) )
-                .lineTo( _cc.pxToPt( tox ), _cc.pxToPt( toy ) );
-            // .dashLine(_cc.pxToPt(fromx-.5), _cc.pxToPt(fromy-.5), _cc.pxToPt(tox-.5), _cc.pxToPt(toy-.5), 15, 5)
-            context
-                .moveTo(
-                _cc.pxToPt( tox - headlen * Math.cos( angle - _a ) ),
-                _cc.pxToPt( toy - headlen * Math.sin( angle - _a ) ) )
-                .lineTo( _cc.pxToPt( tox ), _cc.pxToPt( toy ) )
-                .lineTo(
-                _cc.pxToPt( tox - headlen * Math.cos( angle + _a ) ),
-                _cc.pxToPt( toy - headlen * Math.sin( angle + _a ) ) )
-                .lineTo(
-                _cc.pxToPt( tox - headlen * Math.cos( angle - _a ) ),
-                _cc.pxToPt( toy - headlen * Math.sin( angle - _a ) ) )
-                .setStrokeStyle( color )
-                .setFillStyle( color )
-                .stroke()
-                .fill()
-                .closePath()
-                .restore();
-        }
-
-        function h( m, rc ) {
-            var m = gCM( _wsV, m[1], m[0] );
-            var arrowPointTop = 10, arrowPointLeft = 10;
-            for ( var i = 0; i < rc.length; i++ ) {
-                var m2 = rc[i],
-                    x1 = Math.floor( m2.apl ),
-                    y1 = Math.floor( m2.apt ),
-                    x2 = Math.floor( m.left + m.width / 4 ),
-                    y2 = Math.floor( m.top + m.height / 2 );
-
-                if ( x1 < 0 && x2 < 0 || y1 < 0 && y2 < 0 )
-                    continue;
-
-                // ToDo посмотреть на четкость rect
-                if ( m2.apl > 0 && m2.apt > 0 )
-                    ctx.save()
-                        .setLineWidth( 1 )
-                        .setStrokeStyle( color )
-                        .rect( _cc.pxToPt( m2.l ), _cc.pxToPt( m2.t ), _cc.pxToPt( m2.w - 1 ), _cc.pxToPt( m2.h - 1 ) )
-                        .stroke()
-                        .restore();
-                if ( y1 < 0 && x1 != x2 )
-                    x1 = x1 - Math.floor( Math.sqrt( ((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2)) * y1 * y1 / ((y2 - y1) * (y2 - y1)) ) / 2 )
-                if ( x1 < 0 && y1 != y2 )
-                    y1 = y1 - Math.floor( Math.sqrt( ((y1 - y2) * (y1 - y2) + (x1 - x2) * (x1 - x2)) * x1 * x1 / ((x2 - x1) * (x2 - x1)) ) / 2 )
-
-                draw_arrow( ctx, x1 < 0 ? _wsV.getCellLeft( 0, 0 ) : x1, y1 < 0 ? _wsV.getCellTop( 0, 0 ) : y1, x2, y2 );
-
-                if ( m2.apl > 0 && m2.apt > 0 )
-                    ctx.save()
-                        .beginPath()
-                        .arc( _cc.pxToPt( Math.floor( m2.apl ) ),
-                        _cc.pxToPt( Math.floor( m2.apt ) ),
-                        3, 0, 2 * Math.PI, false, -0.5, -0.5 )
-                        .setFillStyle( color )
-                        .fill()
-                        .closePath()
-                        .restore();
-            }
-        }
-
-        ctx.clear();
-        _wsV._drawSelection();
-
-        if ( se ) {
-            for ( var i = 0; i < rc.length; i++ )
-                h( rc[i], [m] );
-        }
-        else
-            h( m, rc );
-    },
-    removeNodeBySheetId: function (sheetId) {
-        this.oChangeNodeSlave = { toDelete: {}, toMove: {} };
-		var nodesSheetArea = this.nodesArea[sheetId];
-		if(nodesSheetArea)
-			nodesSheetArea.removeAll();
-        var nodesSheetCell = this.nodesCell[sheetId];
-		if(nodesSheetCell)
-		    nodesSheetCell.removeAll();
-		this.changeNodeEnd();
-    },
-    getNodeDependence:function ( aElems, aDefinedNames ) {
-        var oRes = { oMasterNodes: {}, oMasterAreaNodes: {}, oMasterAreaNodesRestricted: {}, oWeightMap: {}, oNodeToArea: {}, nCounter: 0 },
-            aWeightMapMasters = [],
-            aWeightMapMastersNodes = [],
-            node,
-            elem,
-            oSheetRanges = {},
-            oSheetWithArea = {};//все sheet на которых есть area для пересчета
-        while ( null != aElems || null != aDefinedNames ) {
-            if(null != aElems){
-				for ( var i in aElems ) {
-					elem = aElems[i];
-					var sheetId = elem[0];
-					var cellId = elem[1];
-					//нужно обавлять в oSheetRanges даже несушествующие node, чтобы поддержать именении ячеек в SUM(A1:B2)
-					this._getNodeDependenceNodeToRange(sheetId, AscCommonExcel.g_oRangeCache.getAscRange(cellId), oSheetRanges);
-					node = this.getNode(sheetId, cellId);
-					if ( node && null == oRes.oWeightMap[node.nodeId] ) {
-						//все node из aElems записываем в master
-						var oWeightMapElem = { id: oRes.nCounter++, cur: 0, max: 0, gray: false, bad: false, master: true, area: node.isArea };
-						if (node.isArea)
-							oSheetWithArea[node.sheetId] = 1;
-						aWeightMapMasters.push( oWeightMapElem );
-						aWeightMapMastersNodes.push( node );
-						oRes.oWeightMap[node.nodeId] = oWeightMapElem;
-						this._getNodeDependence( oRes, oSheetRanges, node );
-					}
-				}
-			}
-			if(null != aDefinedNames){
-				for(var i = 0; i < aDefinedNames.length; ++i){
-					var node = aDefinedNames[i];
-					if ( node && null == oRes.oWeightMap[node.nodeId] ) {
-						//все node из aDefinedNames записываем в master
-						var oWeightMapElem = { id: oRes.nCounter++, cur: 0, max: 0, gray: false, bad: false, master: true, area: false };
-						aWeightMapMasters.push( oWeightMapElem );
-						aWeightMapMastersNodes.push( node );
-						oRes.oWeightMap[node.nodeId] = oWeightMapElem;
-						this._getNodeDependence( oRes, oSheetRanges, node );
-					}
-				}
-			}
-            aElems = null;
-			aDefinedNames = null;
-            //расширяем за счет area nodes
-            for ( var i in oSheetRanges ) {
-                var oSheetRange = oSheetRanges[i];
-                if ( oSheetRange.changed ) {
-                    oSheetRange.changed = false;
-                    var nodesSheetArea = this.nodesArea[i];
-                    if ( null != nodesSheetArea ) {
-                        var aAllOuter = null;
-                        if ( null == oSheetRange.prevRange ) {
-                            var oGetRes = nodesSheetArea.get( oSheetRange.range );
-                            if ( oGetRes.all.length > 0 )
-                                aAllOuter = oGetRes.all;
-                        }
-                        else {
-                            var aEdgeBBox = [];
-							var bLeft = oSheetRange.range.c1 < oSheetRange.prevRange.c1;
-							var bRight = oSheetRange.range.c2 > oSheetRange.prevRange.c2;
-							var bTop = oSheetRange.range.r1 < oSheetRange.prevRange.r1;
-							var bBottom = oSheetRange.range.r2 > oSheetRange.prevRange.r2;
-                            if (bLeft)
-                                aEdgeBBox.push(new Asc.Range(oSheetRange.range.c1, oSheetRange.range.r1, oSheetRange.prevRange.c1 - 1, oSheetRange.range.r2));
-                            if (bRight)
-                                aEdgeBBox.push(new Asc.Range(oSheetRange.prevRange.c2 + 1, oSheetRange.range.r1, oSheetRange.range.c2, oSheetRange.range.r2));
-                            if (bTop || bBottom){
-								var nNewC1, nNewC2;
-								if(bLeft)
-									nNewC1 = oSheetRange.range.c1 + 1;
-								else
-									nNewC1 = oSheetRange.range.c1;
-								if(bRight)
-									nNewC2 = oSheetRange.range.c2 - 1;
-								else
-									nNewC2 = oSheetRange.range.c2;
-								if(bTop)
-									aEdgeBBox.push(new Asc.Range(nNewC1, oSheetRange.range.r1, nNewC2, oSheetRange.prevRange.r1 - 1));
-								if(bBottom)
-									aEdgeBBox.push(new Asc.Range(nNewC1, oSheetRange.prevRange.r2 + 1, nNewC2, oSheetRange.range.r2));
-							}
-                            aAllOuter = [];
-                            for ( var j = 0, length = aEdgeBBox.length; j < length; j++ ) {
-                                var bbox = aEdgeBBox[j];
-                                var oGetRes = nodesSheetArea.get( bbox );
-                                if ( oGetRes.all.length > 0 )
-                                    aAllOuter = aAllOuter.concat( oGetRes.all );
-                            }
-                        }
-                        if ( aAllOuter && aAllOuter.length > 0 ) {
-                            if ( null == aElems )
-                                aElems = [];
-                            for ( var j in aAllOuter ) {
-                                var node = aAllOuter[j].data;
-								aElems[node.nodeId] = [node.sheetId, node.cellId];
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        var bMasterAreaNodesExist = false;
-        var oAllMasterAreaNodes = {};
-        for ( var i = 0, length = aWeightMapMasters.length; i < length; i++ ) {
-            var oWeightMapElem = aWeightMapMasters[i];
-            //возвращаем только настощие master
-            if ( oWeightMapElem.master ) {
-                node = aWeightMapMastersNodes[i];
-                if (oWeightMapElem.area) {
-                    bMasterAreaNodesExist = true;
-                    oAllMasterAreaNodes[node.nodeId] = node;
-                }
-                else
-                    oRes.oMasterNodes[node.nodeId] = node;
-            }
-        }
-        if (bMasterAreaNodesExist) {
-            //заносим все одинарные ячейки для пересчета в CellArea, чтобы определить какие из них лежат внутри area
-            var oCellsForCalculation = {};
-            for (var i in oRes.oWeightMap) {
-                var elem = oRes.oWeightMap[i];
-                if (!elem.area && !elem.isDefinedName) {
-                    var node = this.wb.dependencyFormulas.nodesId[i];
-                    //если ячейка из oMasterNodes, даже если в ней формула, то она не может иметь master из oWeightMap(иначе она бы перестала быть master) - такие ячейки не добавляем
-                    //остальные ячейки имеют master из oWeightMap их надо проверять
-                    if (node && oSheetWithArea[node.sheetId] && !oRes.oMasterNodes[node.nodeId]) {
-                        var oCellsForCalculationSheet = oCellsForCalculation[node.sheetId];
-                        if (null == oCellsForCalculationSheet) {
-                            oCellsForCalculationSheet = new AscCommonExcel.CellArea(null);
-                            oCellsForCalculation[node.sheetId] = oCellsForCalculationSheet;
-                        }
-                        var bbox = node.getBBox();
-                        oCellsForCalculationSheet.add(bbox.r1, bbox.c1, node);
-                    }
-                }
-            }
-            //делим oAllMasterAreaNodes на те что можно посчитать сразу и те что имеют внутри себя непосчитанные ячейки.
-            //заполняем oNodeToArea ячейками и ссылками на AreaNode в которых ини лежат
-            for (var i in oAllMasterAreaNodes) {
-                var nodeMaster = oAllMasterAreaNodes[i];
-                //элемент запоминает сколько node надо посечить прежде чем считать nodeMaster
-                var nodeMasterElement = { node: nodeMaster, cur: 0, max: 0 };
-                var bRestricted = false;
-                var oCellsForCalculationSheet = oCellsForCalculation[nodeMaster.sheetId];
-                if (oCellsForCalculationSheet) {
-                    var oGetRes = oCellsForCalculationSheet.get(nodeMaster.getBBox());
-                    if (oGetRes.length > 0) {
-                        bRestricted = true;
-                        for (var j = 0; j < oGetRes.length; ++j) {
-                            var node = oGetRes[j].data;
-                            var oNodeToAreaElement = oRes.oNodeToArea[node.nodeId];
-                            if (null == oNodeToAreaElement) {
-                                oNodeToAreaElement = [];
-                                oRes.oNodeToArea[node.nodeId] = oNodeToAreaElement;
-                            }
-                            nodeMasterElement.max++;
-                            oNodeToAreaElement.push(nodeMasterElement);
-                        }
-                    }
-                }
-                if (bRestricted)
-                    oRes.oMasterAreaNodesRestricted[nodeMaster.nodeId] = nodeMasterElement;
-                else
-                    oRes.oMasterAreaNodes[nodeMaster.nodeId] = nodeMaster;
-            }
-        }
-        return oRes;
-    },
-    _getNodeDependence:function ( oRes, oSheetRanges, node ) {
-        var oResMapCycle = null;
-        var bStop = false;
-        var oWeightMapElem = oRes.oWeightMap[node.nodeId];
-        if ( null == oWeightMapElem ) {
-			if(node.isDefinedName)
-				oWeightMapElem = { id: oRes.nCounter++, cur: 0, max: 1, gray: false, bad: false, master: false, area: false };
-			else
-				oWeightMapElem = { id: oRes.nCounter++, cur: 0, max: 1, gray: false, bad: false, master: false, area: node.isArea };
-            oRes.oWeightMap[node.nodeId] = oWeightMapElem;
-        }
-        else {
-            oWeightMapElem.max++;
-            //если пришли в gray node, то это цикл
-            if (oWeightMapElem.gray) {
-                bStop = true;
-                oResMapCycle = {};
-                oResMapCycle[oWeightMapElem.id] = oWeightMapElem;
-                oWeightMapElem.bad = true;
-                oWeightMapElem.max--;
-            }
-            else if (oWeightMapElem.master && oWeightMapElem.max > 1) {
-                bStop = true;
-                //если повторно пришли в master node, то не считаем ее master
-                oWeightMapElem.master = false;
-                oWeightMapElem.max--;
-            }
-		}
-        if (!bStop && 1 == oWeightMapElem.max && !node.isDefinedName )
-            this._getNodeDependenceNodeToRange( node.sheetId, node.getBBox(), oSheetRanges );
-        if (!bStop && oWeightMapElem.max <= 1) {
-            oWeightMapElem.gray = true;
-            var aNext = node.getSlaveEdges();
-            for (var i in aNext) {
-                var oCurMapCycle = this._getNodeDependence(oRes, oSheetRanges, aNext[i], oWeightMapElem);
-                if (null != oCurMapCycle) {
-                    oWeightMapElem.bad = true;
-                    for (var i in oCurMapCycle) {
-                        var oCurElem = oCurMapCycle[i];
-                        if (oWeightMapElem != oCurElem) {
-                            if (null == oResMapCycle)
-                                oResMapCycle = {};
-                            oResMapCycle[oCurElem.id] = oCurElem;
-                        }
-                    }
-                }
-            }
-            oWeightMapElem.gray = false;
-        }
-        return oResMapCycle;
-    },
-    _getNodeDependenceNodeToRange:function ( sheetId, bbox, oSheetRanges ) {
-        if (!bbox) {
-            return;
-        }
-        var oSheetRange = oSheetRanges[sheetId];
-        if ( null == oSheetRange ) {
-            oSheetRange = {range:null, changed:false, prevRange:null};
-            oSheetRanges[sheetId] = oSheetRange;
-        }
-        if ( null == oSheetRange.range || !oSheetRange.range.containsRange( bbox ) ) {
-            if ( null == oSheetRange.range )
-                oSheetRange.range = bbox.clone();
-            else {
-                if ( !oSheetRange.changed )
-                    oSheetRange.prevRange = oSheetRange.range.clone();
-                oSheetRange.range.union2( bbox );
-            }
-            oSheetRange.changed = true;
-        }
-    },
-    getAll:function () {
-        return this.nodesId;
-    },
-
-    /*Defined Names section*/
-    getDefNameNode:function ( node ) {
-        var ret = this.defNameList[node];
-        return ret ? ret : null;
-    },
-    getDefNameNodeByName:function ( name, sheetId ) {
-
-        name = name.toLowerCase();
-
-        var sheetNodeList,
-            nodeId,
-            oRes = false;
-
-        if ( !AscCommon.rx_defName.test( name ) ) {
-            return oRes ;
-        }
-
-        if ( null != sheetId ) {
-            sheetNodeList = this.defNameSheets[sheetId];
-            if ( sheetNodeList ) {
-                nodeId = getDefNameVertexId( sheetId, name );
-                oRes = sheetNodeList[nodeId];
-                if ( oRes && oRes.Ref ) return oRes;
-            }
-        }
-
-        sheetNodeList = this.defNameSheets["WB"];
-        if( sheetNodeList ){
-            nodeId = getDefNameVertexId( null, name );
-            oRes = sheetNodeList[nodeId];
-        }
-        if ( oRes && !oRes.Ref ) oRes = false;
-
-        return oRes;
-    },
-    getDefNameNodeByRef:function ( ref, sheetId ) {
-        var sheetNodeList, id;
-
-        if ( null != sheetId ) {
-            sheetNodeList = this.defNameSheets[sheetId];
-            for ( id in sheetNodeList ) {
-                if ( !sheetNodeList[id].Hidden && sheetNodeList[id].Ref === ref) {
-                    return sheetNodeList[id].Name;
-                }
-            }
-        }
-
-        sheetNodeList = this.defNameSheets["WB"];
-        for ( id in sheetNodeList ) {
-            if ( !sheetNodeList[id].Hidden && sheetNodeList[id].Ref === ref ) {
-                return sheetNodeList[id].Name;
-            }
-        }
-
-        return false;
-    },
-    addDefinedNameNode:function ( defName, sheetId, defRef, defHidden, bUndo ) {
-
-        var ws = this.wb.getWorksheet( sheetId );
-        ws ? sheetId = ws.getId() : null;
-
-        var nodeId = getDefNameVertexId( sheetId, defName ),
-            oRes = this.defNameList[nodeId], dfv, defNameSheetsList;
-
-        if ( null == oRes || ( null == oRes.Ref && null == defRef ) ) {
-            dfv = new DefNameVertex( sheetId, defName, defRef, defHidden, this.wb );
-            oRes = (this.defNameList[dfv.nodeId] = dfv);
-            defNameSheetsList = this.defNameSheets[dfv.sheetId];
-            if ( defNameSheetsList == null ) {
-                defNameSheetsList = {};
-                this.defNameSheets[dfv.sheetId] = defNameSheetsList;
-            }
-            defNameSheetsList[dfv.nodeId] = dfv;
-        }
-        else if( null == oRes.Ref && null != defRef ){
-            oRes.Ref = defRef;
-            oRes.isTable = undefined;
-            addToArrDefNameRecalc(oRes);
-        }
-
-        /*поставить зависимость между ячейками и текущим ИД*/
-
-        if ( bUndo ) {
-            oRes.Ref = defRef;
-        }
-
-        if( !oRes.isTable && oRes.Ref != undefined && oRes.Ref != null ){
-            addToArrDefNameRecalc(oRes);
-        }
-
-        return oRes;
-
-    },
-    removeDefName:function ( sheetId, name ) {
-
-        var ws = this.wb.getWorksheet( sheetId );
-        ws ? sheetId = ws.getId() : null;
-
-        var nodeId = getDefNameVertexId( sheetId, name ),
-            oRes = this.defNameList[nodeId], ret = null;
-
-        if ( oRes ) {
-            this.defNameList[nodeId].Ref = null;
-            ret = oRes;
-            addToArrDefNameRecalc(oRes);
-        }
-
-        return ret;
-
-    },
-    removeDefNameBySheet:function ( sheetId ) {
-
-        var nodesList = this.defNameList, retRes = {}, defN, seUndoRedo = [], nSE, wsIndex, ws = this.wb.getWorksheetById(sheetId ), wsName = ws.getName();
-
-        for ( var id in nodesList ) {
-            defN = nodesList[id];
-            if ( defN.isTable && defN.Ref ){
-                var a = defN.Ref.split("!")[0];
-                if( a.localeCompare(parserHelp.getEscapeSheetName(wsName)) == 0 ){
-                    History.Add( AscCommonExcel.g_oUndoRedoWorkbook, AscCH.historyitem_Workbook_DefinedNamesDelete, null, null, new UndoRedoData_DefinedNames( defN.Name, defN.Ref, undefined, defN.isTable ) );
-                    defN.Ref = null;
-                }
-                continue;
-            }
-            if ( !defN.isTable && defN.parsedRef && defN.parsedRef.removeSheet( sheetId ) ) {
-                seUndoRedo = [];
-
-                nSE = defN.getSlaveEdges();
-                for ( var nseID in nSE ) {
-                    seUndoRedo.push( nseID );
-                }
-
-                wsIndex = this.wb.getWorksheetById( defN.sheetId );
-
-                History.Add( AscCommonExcel.g_oUndoRedoWorkbook, AscCH.historyitem_Workbook_DefinedNamesDelete, null, null,
-                    new UndoRedoData_DefinedNames( defN.Name, defN.Ref, wsIndex ? wsIndex.getIndex() : undefined, defN.isTable, seUndoRedo ) );
-
-                if ( defN.sheetId == sheetId ) {
-                    defN.Ref = null;
-                    defN.parsedRef = null;
-                    retRes[id] = defN;
-                }
-                else if( defN.Ref ){
-                    defN.Ref = defN.parsedRef.Formula = defN.parsedRef.assemble( true );
-                    retRes[id] = defN;
-                }
-                addToArrDefNameRecalc(defN);
-            }
-        }
-        return retRes;
-    },
-    changeDefName:function ( oldDefName, newDefName ) {
-
-        var ws = this.wb.getWorksheet( oldDefName.LocalSheetId );
-      var sheetId = ws ? ws.getId() : null;
-
-        var oldN = this.getDefNameNodeByName( oldDefName.Name, sheetId ),
-            sheetNodeList, nodeId,
-            name = oldDefName.Name;
-
-        sheetNodeList = this.defNameSheets[sheetId || "WB"];
-        nodeId = getDefNameVertexId( sheetId || "WB", name );
-
-        sheetNodeList ? delete sheetNodeList[nodeId] : null;
-
-        delete this.defNameList[nodeId];
-
-        if(!oldN){
-            return false;
-        }
-
-        oldN.changeDefName( newDefName );
-
-        this.defNameList[oldN.nodeId] = oldN;
-        sheetNodeList[oldN.nodeId] = oldN;
-
-        if (oldDefName.isTable) {
-          var dataRange = parserHelp.parse3DRef(oldDefName.Ref);
-          if (dataRange) {
-            var sheetDefName = this.wb.getWorksheetByName(dataRange.sheet);
-            if (sheetDefName) {
-              var tableParts = sheetDefName.TableParts;
-              for (var i = 0; i < tableParts.length; i++) {
-                if (tableParts[i].DisplayName == name) {
-                  tableParts[i].DisplayName = oldN.Name;
-                }
-              }
-            }
-          }
-        } else {
-          oldN.deleteAllMasterEdges();
-          addToArrDefNameRecalc(oldN);
-        }
-
-        return oldN;
-    },
-    copyDefNameByWorksheet:function( oldSheetId, newSheetId ){
-
-        var obj = {}, oldS = this.defNameSheets[oldSheetId], defNamNode,
-            oldWS = this.wb.getWorksheetById(oldSheetId ),
-            newWS = this.wb.getWorksheetById(newSheetId);
-
-        for( var id in oldS ){
-            defNamNode = oldS[id].clone();
-            defNamNode.changeScope(newSheetId);
-            defNamNode.changeRefToNewSheet(oldWS.getName(),newWS.getName());
-            obj[defNamNode.nodeId] = defNamNode;
-            this.defNameList[defNamNode.nodeId] = defNamNode;
-        }
-
-        this.defNameSheets[newSheetId] = obj;
-
-    },
-    relinkDefNameByWorksheet:function (oName, nName){
-
-        var oldS = this.defNameList, dN;
-        for( var id in oldS ){
-            dN = oldS[id];
-            if(dN.isTable ){
-                if(dN.Ref)
-                    dN.Ref = dN.Ref.replace(oName,nName);
-            }
-            else{
-				if( dN.Ref ){
-                	dN.relinkRef(oName, nName);
-				}
-            }
-        }
-
-    },
-    saveDefName:function () {
-        var list = [], defN;
-        for ( var id in this.defNameList ) {
-            defN = this.defNameList[id];
-            if ( defN.isTable ) {
-                continue;
-            }
-            if ( defN.Ref != null ) {
-                list.push( defN.getAscCDefName() );
-            }
-        }
-        return list;
-    },
-    unlockDefName:function(){
-        var nodesList = this.defNameList;
-
-        for ( var id in nodesList ) {
-            if ( nodesList[id].isLock ) {
-                delete nodesList[id].isLock;
-            }
-        }
-    },
-    checkDefNameLock:function(){
-        var nodesList = this.defNameList, countNodes = 0;
-
-        for ( var id in nodesList ) {
-            countNodes++;
-            if ( nodesList[id].isLock ) {
-                return true;
-            }
-        }
-        return !countNodes;
-//        return false;
-    },
-
-    getNextTableName:function ( ws, Ref, tableName ) {
-        this.nTableNameMaxIndex++;
-		
-		if(tableName){
-			 sNewName = tableName;
-		}
-		else{
-			var collaborativeIndexUser = "";
-			if(ws.workbook.oApi.collaborativeEditing.getCollaborativeEditing())
-			{
-				collaborativeIndexUser = "_" + ws.workbook.oApi.CoAuthoringApi.get_indexUser();
-			}
-			var sNewName = this.sTableNamePattern + this.nTableNameMaxIndex + collaborativeIndexUser,
-				name = getDefNameVertexId( null, sNewName );
-			while ( this.defNameList[name] ) {
-				this.nTableNameMaxIndex++;
-				sNewName = this.sTableNamePattern + this.nTableNameMaxIndex + collaborativeIndexUser;
-				name = getDefNameVertexId( null, sNewName );
-			}
-		}
-		
-        this.addTableName( sNewName, ws, Ref );
-        return sNewName;
-    },
-    addTableName:function ( sName, ws, Ref, table ) {
-        var refClone, defNameSheetsList, dfv, nSE, se;
-		if(this.defNameSheets["WB"]){
-			dfv = this.defNameSheets["WB"][getDefNameVertexId( null, sName )]
-		}
-		
-		if(table)
-		{
-			refClone = table.getRangeWithoutHeaderFooter().clone();
-		}
-		else
-		{
-			refClone = Ref.clone( true );
-			refClone.r1++;
-		}
-		
-		if(!dfv){
-			dfv = new DefNameVertex( null, sName, parserHelp.get3DRef( ws.getName(), refClone.getAbsName() ), null, this.wb, true );
-			defNameSheetsList = this.defNameSheets[dfv.sheetId];
-			this.defNameList[dfv.nodeId] = dfv;
-			if ( defNameSheetsList == null ) {
-				defNameSheetsList = {};
-				this.defNameSheets[dfv.sheetId] = defNameSheetsList;
-			}
-			defNameSheetsList[dfv.nodeId] = dfv;
-		}
-		else{
-			dfv.Ref = parserHelp.get3DRef( ws.getName(), refClone.getAbsName() );
-			nSE = dfv.getSlaveEdges();
-			for ( var id in nSE ) {
-				se = nSE[id];
-				addToArrRecalc(se.sheetId, se.cell);
-				this.wb.needRecalc.nodes[se.nodeId] = [se.sheetId, se.cellId ];
-				this.wb.needRecalc.length++;
-			}
-		}
-
-		addToArrDefNameRecalc(dfv);
-    },
-    changeTableName:function(tableName, ws, newRef){
-        var table = this.getDefNameNodeByName( tableName, ws ),
-            newRefClone = newRef.clone(true);
-        newRefClone.r1++;
-        table.Ref = table.Ref.split("!")[0]+"!"+newRefClone.getAbsName();
-		table.rebuild();
-//        table.Ref = parserHelp.getEscapeSheetName(ws.getName())+"!"+newRef.getAbsName();
-    },
-	changeTableRef:function(tableName, ws, newName){
-        var table = this.getDefNameNodeByName( tableName, ws );
-        
-		var newTable = table.clone();
-		
-		if(table)
-		{
-			//изменяем имя именнованного диапазона
-			newTable.Name = newName;
-			newTable.cellId = newName.toLowerCase();
-			newTable.nodeId = table.sheetId + table.cellId;
-			
-			this.changeDefName(table, newTable);
-			
-			//изменяем все ссылки на данную таблицу
-			var nameRef = tableName + "[]";
-			for(var i in this.defNameList)
-			{
-				if(this.defNameList[i] && this.defNameList[i].Ref && this.defNameList[i].Ref === nameRef)
-				{
-					this.defNameList[i].Ref = newName + "[]";
-				}
-			}
-		}
-		
-		
-		table.rebuild();
-    },
-    delTableName:function(name,ws){
-        var table = this.getDefNameNodeByName( name, ws );
-        table.Ref = null;
-
-		var nSE, se;
-		nSE = table.getSlaveEdges();
-
-		table.deleteAllMasterEdges();
-
-		for ( var id in nSE ) {
-			se = nSE[id];
-			addToArrRecalc(se.sheetId, se.cell);
-			this.wb.needRecalc.nodes[se.nodeId] = [se.sheetId, se.cellId ];
-			this.wb.needRecalc.length++;
-		}
-		addToArrDefNameRecalc(table);
-    },
-	rebuildTable:function(tableName){
-		var defName = this.getDefNameNodeByName( tableName, null );
-		if(defName){
-			var notifyData = {type: AscCommon.c_oNotifyType.ChangeDefNameTable};
-			defName.broadcast(notifyData);
-		}
-	}
-};
-
-/** @constructor */
-function Vertex(sheetId, cellId, wb){
-	
-	this.sheetId = sheetId;
-	this.cellId = cellId;
-	this.bbox = AscCommonExcel.g_oRangeCache.getAscRange(this.cellId);
-	this.isArea = !this.bbox.isOneCell();
-	this.valid = true;
-	this.nodeId = getVertexId(this.sheetId, this.cellId);
-    this.wb = wb;
-	this.cell = null;
-	
-	//вершина которую мы прошли и поставили в очередь обхода
-	this.isBlack = false;
-	
-	//вершина которую мы прошли, но не поставили в очередь обхода. нужно для определения петель в графе.
-	this.isGray = false;
-	
-	//если вершина входит в цикличный путь, то она помечается плохой и запоминается в списке плохих вершин.
-	this.isBad = false;
-	
-	//masterEdges содержит ячейки, от которых зависит текущая ячейка
-	this.masterEdges = {};
-	
-	//slaveEdges содержит ячейки, которые зависят от данной ячейки
-	this.slaveEdges = {};
-	
-	this.refCount = 0;
-	
-	this.isDefinedName = false;
-}
-Vertex.prototype = {	
-	
-	constructor: Vertex,
-	
-	getBBox : function()
-	{
-		return this.bbox;
-	},
-	setFormula : function(sFormula, bAddToHistory, bAddNeedRecalc)
-	{
-	    this.wb.dependencyFormulas.deleteMasterNodes2(this.sheetId, this.cellId);
-	    var cell = this.returnCell();
-	    if (null != sFormula)
-	        cell.setFormula(sFormula, bAddToHistory);
-		addToArrRecalc(this.sheetId, cell);
-		if(bAddNeedRecalc)
-		{
-			this.wb.needRecalc.nodes[this.nodeId] = [this.sheetId, this.cellId ];
-			this.wb.needRecalc.length++;
-		}
-	},
-	setRefError : function(wsId, cellId)
-	{
-	    var sRes = null;
-		var cell = this.returnCell();
-		if( cell && cell.formulaParsed )
-		{
-		    cell.formulaParsed.setRefError(wsId, cellId);
-		    sRes = cell.formulaParsed.assemble(true);
-		}
-		return sRes;
-	},
-	moveInner: function (bboxTo) {
-	    //удаляем старые ссылки slave и master
-        var slave, master;
-        for (var i in this.slaveEdges) {
-	        slave = this.slaveEdges[i];
-	        slave.deleteMasterEdge(this);
-	    }
-	    for (var i in this.masterEdges) {
-	        master = this.masterEdges[i];
-	        master.deleteSlaveEdge(this);
-	    }
-	    this.bbox = bboxTo;
-	    this.cellId = bboxTo.getName();
-	    this.nodeId = getVertexId(this.sheetId, this.cellId);
-	    this.wb.needRecalc.nodes[this.nodeId] = [this.sheetId, this.cellId];
-	    this.wb.needRecalc.length++;
-	    //добавляем новые slave и master
-	    for (var i in this.slaveEdges) {
-	        slave = this.slaveEdges[i];
-	        slave.addMasterEdge(this);
-	    }
-	    for (var i in this.masterEdges) {
-	        master = this.masterEdges[i];
-	        master.addSlaveEdge(this);
-	    }
-	},
-	moveOuter: function (from, to, oFormulas) {
-	    if ((from.r1 == to.r1 && from.c1 == to.c1) || (from.r2 == to.r2 && from.c2 == to.c2)) {
-	        /*вставляем/удаляем по вертикали/горизонтали внутри диапазона*/
-	        var _sn = this.getSlaveEdges(), slave, cell;
-	        for (var _id in _sn) {
-	            slave = _sn[_id];
-                if( slave instanceof DefNameVertex ){
-                    if ( false == this.wb.bUndoChanges && (false == this.wb.bRedoChanges || true == this.wb.bCollaborativeChanges )){
-                        History.LocalChange = true;
-                        var oN = slave.getAscCDefName(), nN;
-                        slave.parsedRef.stretchArea(this, from, to);
-                        nN = slave.getAscCDefName();
-                        nN.Ref = slave.parsedRef.assemble();
-                        this.wb.editDefinesNames( oN, nN );
-                        History.LocalChange = false;
-                    }
-                    continue;
-                }
-	            cell = slave.returnCell();
-	            if (cell && cell.formulaParsed) {
-	                cell.formulaParsed.stretchArea(this, from, to);
-	                var formula = cell.formulaParsed.assemble();
-	                if (null != formula) {
-	                    if (oFormulas)
-	                        oFormulas[slave.nodeId] = { node: slave, formula: formula };
-	                    else
-	                        slave.setFormula(formula, true, false);
-	                }
-	            }
-	        }
-	    }
-	    else {
-	        /*вставляем.удаляем левее/выше вне диапазона*/
-	        if (oFormulas) {
-	            if (null == oFormulas[this.nodeId])
-	                oFormulas[this.nodeId] = { node: this, formula: null };
-	        }
-	        else {
-	            var cell = this.returnCell();
-	            if (cell && cell.formulaParsed) {
-	                this.wb.dependencyFormulas.deleteMasterNodes2(this.sheetId, this.cellId);
-	                addToArrRecalc(this.sheetId, cell);
-	            }
-	        }
-	        var _sn = this.getSlaveEdges(), slave, cell;
-	        for (var _id in _sn) {
-	            slave = _sn[_id]
-                if( slave instanceof DefNameVertex ){
-                    /*slave.parsedRef.shiftCells(this, from, to);
-                    slave.relinkRef();*/
-
-                    if ( false == this.wb.bUndoChanges && (false == this.wb.bRedoChanges || true == this.wb.bCollaborativeChanges )){
-                        History.LocalChange = true;
-                        var oN = slave.getAscCDefName(), nN;
-                        slave.parsedRef.shiftCells(this, from, to);
-                        nN = slave.getAscCDefName();
-                        nN.Ref = slave.parsedRef.assemble();
-                        this.wb.editDefinesNames( oN, nN );
-                        History.LocalChange = false;
-                    }
-
-                    continue;
-                }
-                cell = slave.returnCell();
-	            if (cell && cell.formulaParsed) {
-	                cell.formulaParsed.shiftCells(this, from, to);
-	                var formula = cell.formulaParsed.assemble();
-	                if (null != formula) {
-	                    if (oFormulas)
-	                        oFormulas[slave.nodeId] = { node: slave, formula: formula };
-	                    else
-	                        slave.setFormula(formula, true, false);
-	                }
-	            }
-	        }
-	    }
-	},
-	//добавляем ведущую ячейку.
-	addMasterEdge : function(node){
-		if( !this.masterEdges ){
-			this.masterEdges = {};
-        }
-        if( !this.masterEdges[node.nodeId] ){
-		    this.masterEdges[node.nodeId] = node;
-    		this.refCount ++;
-        }
-	},
-
-	//добавляем зависимую(ведомую) ячейку.
-	addSlaveEdge : function(node){
-		if( !this.slaveEdges ){
-			this.slaveEdges = {};
-        }
-        if( !this.slaveEdges[node.nodeId] ){
-            this.slaveEdges[node.nodeId] = node;
-            this.refCount ++;
-        }
-	},
-	
-	getMasterEdges : function(){
-		return this.masterEdges;
-	},
-
-	getSlaveEdges : function(){
-		return this.slaveEdges;
-	},
-
-	getSlaveEdges2 : function(){
-		var ret = {}, count = 0;
-		for(var id in this.slaveEdges){
-			ret[id] = this.slaveEdges[id];
-			count++;
-		}
-		if ( count > 0 ) 
-			return ret; 
-		else
-			return null;
-	},
-	
-	//удаляем ребро между конкретной ведущей ячейки.
-	deleteMasterEdge: function (node) {
-	    if (this.masterEdges) {
-            delete this.masterEdges[node.nodeId];
-            this.refCount--;
-	    }
-	},
-
-	//удаляем ребро между конкретной зависимой(ведомой) ячейки.
-	deleteSlaveEdge: function (node) {
-	    if (this.slaveEdges) {
-            delete this.slaveEdges[node.nodeId];
-            this.refCount--;
-	    }
-	},
-
-	//очищаем все ребра по ведущим ячейкам.
-	deleteAllMasterEdges : function(){
-		var ret = {};
-		for( var id in this.masterEdges ){
-			var masterEdge = this.masterEdges[id];
-			masterEdge.deleteSlaveEdge(this);
-			delete this.masterEdges[id];
-			this.refCount--;
-			ret[id] = masterEdge;
-		}
-		this.masterEdges = {};
-		return ret;
-	},
-	
-	//очищаем все ребра по ведомым ячейкам.
-	deleteAllSlaveEdges : function(){
-		var ret = {};
-		for( var id in this.slaveEdges ){
-			var slaveEdge = this.slaveEdges[id];
-			slaveEdge.deleteMasterEdge(this);
-			delete this.slaveEdges[id];
-			this.refCount--;
-			ret[id] = slaveEdge;
-		}
-		this.slaveEdges = {};
-		return ret;
-	},
-
-	returnCell : function(){
-		//todo
-		if(null == this.cell && this.wb && !this.isArea)
-		{
-			var ws = this.wb.getWorksheetById(this.sheetId);
-			if(ws)
-				this.cell = ws._getCell(this.bbox.r1, this.bbox.c1);
-//				this.cell = ws._getCellNoEmpty(this.bbox.r1, this.bbox.c1);
-		}
-		return this.cell;
-	}
-	
-};
-
-function DefNameVertex( scope, defName, defRef, defHidden, wb, isTable ) {
-
-    this.sheetId = scope === null || scope === undefined ? "WB" : scope;
-    this.cellId = defName.toLowerCase();
-    this.Ref = defRef;
-    this.Name = defName;
-    this.Hidden = defHidden;
-    this.isTable = isTable;
-    this.nodeId = getDefNameVertexId( this.sheetId, defName );
-    this.wb = wb;
-
-    //вершина которую мы прошли и поставили в очередь обхода
-    this.isBlack = false;
-
-    //вершина которую мы прошли, но не поставили в очередь обхода. нужно для определения петель в графе.
-    this.isGray = false;
-
-    //если вершина входит в цикличный путь, то она помечается плохой и запоминается в списке плохих вершин.
-    this.isBad = false;
-
-    //masterEdges содержит ячейки, от которых зависит текущая ячейка
-    this.masterEdges = {};
-
-    //slaveEdges содержит ячейки, которые зависят от данной ячейки
-    this.slaveEdges = {};
-
-    this.refCount = 0;
-
-    this.isDefinedName = true;
-}
-DefNameVertex.prototype = {
-
-    constructor:Vertex,
-
-    clone:function(){
-        var dN = new DefNameVertex( this.sheetId, this.cellId, this.Ref, this.Hidden, this.wb, this.isTable );
-        dN.parsedRef = new parserFormula( dN.Ref, "", this.wb.getWorksheet(0) );
-        if( dN.Ref ){
-            dN.parsedRef.parse();
-//            dN.parsedRef.buildDependencies();
-        }
-        return dN;
-    },
-
-    changeScope:function( newScope ){
-        this.sheetId = newScope === null || newScope === undefined ? "WB" : newScope;
-        this.nodeId = getDefNameVertexId( this.sheetId, this.Name );
-    },
-
-    changeRefToNewSheet:function( lastName, newName ){
-        if( !this.isTable && this.parsedRef.isParsed ){
-            this.parsedRef = this.parsedRef.changeSheet( lastName, newName );
-            this.Ref = this.parsedRef.assemble();
-        }
-    },
-
-    moveInner:function ( bboxTo ) {
-        //удаляем старые ссылки slave и master
-        for ( var i in this.slaveEdges ) {
-            var slave = this.slaveEdges[i];
-            slave.deleteMasterEdge( this );
-        }
-        for ( var i in this.masterEdges ) {
-            var master = this.masterEdges[i];
-            master.deleteSlaveEdge( this );
-        }
-        var sOldNodeId = this.nodeId;
-        this.bbox = bboxTo;
-        this.cellId = bboxTo.getName();
-        this.nodeId = getVertexId( this.sheetId, this.cellId );
-        this.wb.needRecalc.nodes[this.nodeId] = [this.sheetId, this.cellId ];
-        this.wb.needRecalc.length++;
-        //добавляем новые slave и master
-        for ( var i in this.slaveEdges ) {
-            var slave = this.slaveEdges[i];
-            slave.addMasterEdge( this );
-        }
-        for ( var i in this.masterEdges ) {
-            var master = this.masterEdges[i];
-            master.addSlaveEdge( this );
-        }
-    },
-    moveOuter:function ( from, to, oFormulas ) {
-        if ( (from.r1 == to.r1 && from.c1 == to.c1) || (from.r2 == to.r2 && from.c2 == to.c2) ) {
-            var _sn = this.getSlaveEdges();
-            for ( var _id in _sn ) {
-                var slave = _sn[_id];
-                var cell = slave.returnCell();
-                if ( cell && cell.formulaParsed ) {
-                    cell.formulaParsed.stretchArea( this, from, to );
-                    var formula = cell.formulaParsed.assemble();
-                    if ( null != formula ) {
-                        if ( oFormulas )
-                            oFormulas[slave.nodeId] = { node:slave, formula:formula };
-                        else
-                            slave.setFormula( formula, true, false );
-                    }
-                }
-            }
-        }
-        else {
-            if ( oFormulas ) {
-                if ( null == oFormulas[this.nodeId] )
-                    oFormulas[this.nodeId] = { node:this, formula:null };
-            }
-            else {
-                var cell = this.returnCell();
-                if ( cell && cell.formulaParsed ) {
-                    this.wb.dependencyFormulas.deleteMasterNodes2( this.sheetId, this.cellId );
-                    addToArrRecalc( this.sheetId, cell );
-                }
-            }
-            var _sn = this.getSlaveEdges();
-            for ( var _id in _sn ) {
-                var slave = _sn[_id]
-                var cell = slave.returnCell();
-                if ( cell && cell.formulaParsed ) {
-                    cell.formulaParsed.shiftCells( this, from, to );
-                    var formula = cell.formulaParsed.assemble();
-                    if ( null != formula ) {
-                        if ( oFormulas )
-                            oFormulas[slave.nodeId] = { node:slave, formula:formula };
-                        else
-                            slave.setFormula( formula, true, false );
-                    }
-                }
-            }
-        }
-    },
-    //добавляем ведущую ячейку.
-    addMasterEdge:function ( node ) {
-        if ( !this.masterEdges ) {
-            this.masterEdges = {};
-        }
-        if ( !this.masterEdges[node.nodeId] ) {
-            this.masterEdges[node.nodeId] = node;
-            this.refCount++;
-        }
-    },
-
-    //добавляем зависимую(ведомую) ячейку.
-    addSlaveEdge:function ( node ) {
-        if ( !this.slaveEdges ) {
-            this.slaveEdges = {};
-        }
-        if ( !this.slaveEdges[node.nodeId] ) {
-            this.slaveEdges[node.nodeId] = node;
-            this.refCount++;
-        }
-    },
-
-    getMasterEdges:function () {
-        return this.masterEdges;
-    },
-
-    getSlaveEdges:function () {
-        return this.slaveEdges;
-    },
-
-    getSlaveEdges2:function () {
-        var ret = {}, count = 0;
-        for ( var id in this.slaveEdges ) {
-            ret[id] = this.slaveEdges[id];
-            count++;
-        }
-        if ( count > 0 )
-            return ret;
-        else
-            return null;
-    },
-
-    //удаляем ребро между конкретной ведущей ячейки.
-    deleteMasterEdge:function ( node ) {
-        if ( this.masterEdges ) {
-            delete this.masterEdges[node.nodeId];
-            this.refCount--;
-        }
-    },
-
-    //удаляем ребро между конкретной зависимой(ведомой) ячейки.
-    deleteSlaveEdge:function ( node ) {
-        if ( this.slaveEdges ) {
-            delete this.slaveEdges[node.nodeId];
-            this.refCount--;
-        }
-    },
-
-    //очищаем все ребра по ведущим ячейкам.
-    deleteAllMasterEdges:function () {
-        var ret = {};
-        for ( var id in this.masterEdges ) {
-            var masterEdge = this.masterEdges[id];
-            masterEdge.deleteSlaveEdge( this );
-            this.masterEdges[id] = null;
-            delete this.masterEdges[id];
-            this.refCount--;
-            ret[id] = masterEdge;
-        }
-        this.masterEdges = {};
-        return ret;
-    },
-
-    //очищаем все ребра по ведомым ячейкам.
-    deleteAllSlaveEdges:function () {
-        var ret = {};
-        for ( var id in this.slaveEdges ) {
-            var slaveEdge = this.slaveEdges[id];
-            slaveEdge.deleteMasterEdge( this );
-            this.slaveEdges[id] = null;
-            delete this.slaveEdges[id];
-            this.refCount--;
-            ret[id] = slaveEdge;
-        }
-        this.slaveEdges = {};
-        return ret;
-    },
-
-    returnCell:function () {
-        //todo
-        return false;
-//        if ( null == this.cell && this.wb && !this.isArea && this.Ref !== null && this.Ref !== undefined ) {
-//            var ws = this.wb.getWorksheetById( this.sheetId );
-//            if ( ws )
-//                this.cell = ws._getCellNoEmpty( this.bbox.r1, this.bbox.c1 );
-//        }
-//        return this.cell;
-    },
-
-    getAscCDefName:function () {
-        var a = this.wb.getWorksheetById( this.sheetId );
-        return new Asc.asc_CDefName( this.Name,
-            this.Ref,
-            this.sheetId == "WB" ? null : a ? a.getIndex() : null,
-            this.isTable, this.Hidden, this.isLock );
-    },
-
-    changeDefName:function ( newName ) {
-        this.cellId = newName.Name.toLowerCase();
-        this.Ref = newName.Ref;
-        this.Name = newName.Name;
-        this.nodeId = getDefNameVertexId( this.sheetId, newName.Name );
-    },
-
-    relinkRef:function(oName, nName){
-        if( this.parsedRef && this.parsedRef.isParsed ){
-            this.Ref = this.parsedRef.assemble();
-        }
-    },
-
-    renameDefNameToCollaborate:function(name){
-        var lastname = this.Name;
-        //из-за особенностей реализации формул, сначала делаем parse со старым именем, потом преименовываем, потом assemble
-        var aFormulas = [];
-        //переименование для отправки изменений
-        for(var i = 0, length = this.wb.aCollaborativeActions.length; i < length; ++i)
-        {
-            var aPointActions = this.wb.aCollaborativeActions[i];
-            for (var j = 0, length2 = aPointActions.length; j < length2; ++j) {
-                var action = aPointActions[j];
-                if (AscCommonExcel.g_oUndoRedoWorkbook == action.oClass) {
-                    if (AscCH.historyitem_Workbook_DefinedNamesAdd == action.nActionType) {
-                        if (lastname == action.oData.newName.Name)
-                            action.oData.newName.Name = name;
-                    }
-                }
-                else if (AscCommonExcel.g_oUndoRedoCell == action.oClass) {
-                    if (action.oData instanceof UndoRedoData_CellSimpleData) {
-                        if (action.oData.oNewVal instanceof UndoRedoData_CellValueData) {
-                            var oNewVal = action.oData.oNewVal;
-                            if (null != oNewVal.formula && -1 != oNewVal.formula.indexOf(lastname)) {
-                                var oParser = new parserFormula(oNewVal.formula, "A1", this.wb.getWorksheet(0));
-                                oParser.parse();
-                                aFormulas.push({ formula: oParser, value: oNewVal });
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        var clone = this.clone();
-        clone.Name = name;
-        this.wb.editDefinesNames( this.getAscCDefName(), clone.getAscCDefName() );
-        for(var i = 0, length = aFormulas.length; i < length; ++i)
-        {
-            var item = aFormulas[i];
-            item.value.formula = item.formula.assemble();
-        }
-    },
-
-    rebuild:function(){
-        if(this.Ref){
-			this.deleteAllMasterEdges();
-            this.parsedRef = new parserFormula(this.Ref, "", this.wb.getWorksheet(0));
-            this.parsedRef.parse();
-            this.parsedRef.buildDependencies(null,this);
-        }
-    }
-
-};
-
 function getVertexId(sheetId, cellId){
 	return sheetId + AscCommon.g_cCharDelimiter + cellId;
-}
-function getDefNameVertexId(scope, name){
-	return ( scope === null || scope === undefined ? "WB" : scope ) + AscCommon.g_cCharDelimiter + name.toLowerCase();
-}
-function addToArrRecalc(sheetId, cell){
-    var temp = arrRecalc[sheetId];
-    if( !temp )
-    {
-        temp = [];
-        arrRecalc[sheetId] = temp;
-    }
-    temp.push(cell);
-}
-function addToArrDefNameRecalc(name){
-    arrDefNameRecalc[name.nodeId] = name;
 }
 function buildDefNameAfterRenameWorksheet(ws) {
   var dN;
@@ -2970,7 +1165,7 @@ function Workbook(eventsHandlers, oApi){
 	this.oApi = oApi;
 	this.handlers = eventsHandlers;
 	this.needRecalc = {nodes: {}, length:0};
-	this.dependencyFormulas = new DependencyGraph3(this);
+	this.dependencyFormulas = new DependencyGraph(this);
 	this.nActive = 0;
 	
 	this.theme = null;
@@ -3058,6 +1253,10 @@ Workbook.prototype.setActive=function(index){
 	}
 	return false;
 };
+	Workbook.prototype.getSheetIdByIndex = function(index) {
+		var ws = this.getWorksheet(index);
+		return ws ? ws.getId() : null;
+	};
 Workbook.prototype.getWorksheet=function(index){
 	//index 0-based
 	if(index >= 0 && index < this.aWorksheets.length){
@@ -3192,7 +1391,7 @@ Workbook.prototype._insertTablePartsName = function (sheet) {
 		for(var i = 0; i < sheet.TableParts.length; i++)
 		{	
 			var oNewTable = sheet.TableParts[i];
-			this.dependencyFormulas.addTableName(oNewTable.DisplayName, sheet, oNewTable.Ref);
+			this.dependencyFormulas.addTableName(oNewTable.DisplayName, sheet, oNewTable.Ref, oNewTable);
 		}
 	}
 };
@@ -3523,7 +1722,7 @@ Workbook.prototype.recalcWB = function(isRecalcWB){
 			scope = this.getWorksheet(scope).getId();
 		}
 
-		var defName = this.dependencyFormulas.getDefNameNodeByName(checkName, scope);
+		var defName = this.dependencyFormulas.getDefNameByName(checkName, scope);
 		if (defName) {
 			defName = defName.getAscCDefName();
 			res.status = false;
@@ -3545,21 +1744,20 @@ Workbook.prototype.getDefinedNamesWB = function (defNameListId) {
    return this.dependencyFormulas.getDefinedNamesWB(defNameListId);
 };
 Workbook.prototype.getDefinesNames = function ( name, sheetId ) {
-    return this.dependencyFormulas.getDefNameNodeByName( name, sheetId );
+    return this.dependencyFormulas.getDefNameByName( name, sheetId );
 };
-Workbook.prototype.getDefinedName = function ( name ) {
-    var ws = this.getWorksheet( name.LocalSheetId ), sheetId = null;
-    ws ? sheetId = ws.getId() : null;
-    return this.dependencyFormulas.getDefNameNodeByName( name.Name, sheetId );
-};
-Workbook.prototype.delDefinesNames = function ( defName, bUndo ) {
+	Workbook.prototype.getDefinedName = function(name) {
+		var sheetId = this.getSheetIdByIndex(name.LocalSheetId);
+		return this.dependencyFormulas.getDefNameByName(name.Name, sheetId);
+	};
+Workbook.prototype.delDefinesNames = function ( defName ) {
     this.dependencyFormulas.removeDefName( defName.LocalSheetId, defName.Name );
 };
 Workbook.prototype.editDefinesNames = function ( oldName, newName, bUndo ) {
 	return this.dependencyFormulas.editDefinesNames( oldName, newName, bUndo );
 };
 Workbook.prototype.findDefinesNames = function ( ref, sheetId ) {
-  return this.dependencyFormulas.getDefNameNodeByRef( ref, sheetId );
+  return this.dependencyFormulas.getDefNameByRef( ref, sheetId );
 };
 Workbook.prototype.unlockDefName = function(){
     this.dependencyFormulas.unlockDefName();
@@ -3597,7 +1795,7 @@ Workbook.prototype.getUniqueDefinedNameFrom=function(name, bCopy){
         var sPosfix = fGetPostfix(nIndex);
         dnNewName = name + sPosfix;
         var bUniqueName = false;
-        if(!this.getDefNameNodeByName( dnNewName, sheetId )){
+        if(!this.getDefNameByName( dnNewName, sheetId )){
             bUniqueName = true;
             break;
         }
@@ -6963,8 +5161,9 @@ Cell.prototype.setValueData = function(Val){
 			this.formulaParsed.calculate();
     }
   };
-	Cell.prototype.notify = function (notifyData) {
-	}
+	Cell.prototype.changeFormula = function (oldFormula, newFormula) {
+		//todo history
+	};
 //-------------------------------------------------------------------------------------------------
 
 /**
@@ -10805,7 +9004,6 @@ DrawingObjectsManager.prototype.rebuildCharts = function(data)
   window['AscCommonExcel'].aStandartNumFormats = aStandartNumFormats;
   window['AscCommonExcel'].aStandartNumFormatsId = aStandartNumFormatsId;
   window['AscCommonExcel'].oFormulaLocaleInfo = oFormulaLocaleInfo;
-  window['AscCommonExcel'].DependencyGraph = DependencyGraph;
   window['AscCommonExcel'].getVertexId = getVertexId;
   window['AscCommonExcel'].buildDefNameAfterRenameWorksheet = buildDefNameAfterRenameWorksheet;
   window['AscCommonExcel'].angleFormatToInterface2 = angleFormatToInterface2;
