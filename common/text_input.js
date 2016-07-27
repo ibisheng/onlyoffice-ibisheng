@@ -1095,6 +1095,11 @@
 			{
 				this.HtmlArea.focus();
 			}
+		},
+
+		externalEndCompositeInput : function()
+		{
+
 		}
 	};
 
