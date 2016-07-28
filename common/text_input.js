@@ -169,7 +169,7 @@
 			this.HtmlArea.id                   	= "area_id";
 
 			var _style = "left:0px;top:" + (-this.HtmlAreaOffset) + "px;";
-			_style += "background:transparent;border:none;position:absolute;text-shadow:0 0 0 #000;outline:none;color:transparent;width:1000px;height:50px;";
+			_style += "background:transparent;border:none;position:absolute;text-shadow:0 0 0 #000;outline:none;color:transparent;width:100%;height:100%;";
 			_style += "overflow:hidden;padding:0px;margin:0px;font-family:arial;font-size:12pt;resize:none;font-weight:normal;box-sizing:content-box;-moz-box-sizing:content-box;-webkit-box-sizing:content-box;";
 			this.HtmlArea.setAttribute("style", _style);
 			this.HtmlArea.setAttribute("spellcheck", false);
