@@ -590,6 +590,13 @@
 				}
 			});
 
+			if (AscCommon.AscBrowser.isIE)
+			{
+				oEvent.preventDefault = function () {
+					Object.defineProperty(this, "defaultPrevented", {get: function () {return true;}});
+				};
+			}
+
 			var k = e.keyCode;
 			if (oEvent.initKeyboardEvent)
 			{
