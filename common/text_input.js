@@ -473,6 +473,8 @@
 				return;
 			}
 
+			ti_console_log("ti: onInput");
+
 			if (AscCommon.AscBrowser.isMozilla)
 			{
 				if (c_oCompositionState.process == this.compositionState)
@@ -545,6 +547,12 @@
 			{
 				if (c_oCompositionState.end == this.compositionState)
 					this.clear();
+			}
+
+			if (AscCommon.AscBrowser.isIeEdge && this.TextInputAfterComposition)
+			{
+				this.TextInputAfterComposition = false;
+				this.clear();
 			}
 		},
 
@@ -769,7 +777,7 @@
 			if (_code != 8 && _code != 46)
 				this.KeyDownFlag = true;
 
-			if (AscCommon.AscBrowser.isIE)
+			if (AscCommon.AscBrowser.isIE && !AscCommon.AscBrowser.isIeEdge)
 			{
 				if (_code == 13 || this.isSpaceSymbol(e))
 				{
@@ -1099,6 +1107,8 @@
 			{
 				this.Api.End_CompositeInput();
 			}
+
+			this.Api.End_CompositeInput();
 
 			this.unlockTarget();
 			this.TextInputAfterComposition = true;
