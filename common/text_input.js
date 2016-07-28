@@ -292,6 +292,7 @@
 			var xPos    = x ? x : parseInt(oTarget.style.left);
 			var yPos    = (y ? y : parseInt(oTarget.style.top)) + parseInt(oTarget.style.height);
 
+			/*
 			if (!this.isDebug && !this.isSystem)
 			{
 				this.HtmlDiv.style.left = xPos + "px";
@@ -302,6 +303,10 @@
 				// this.HtmlAreaOffset - не сдвигаем, курсор должен быть виден
 				this.debugCalculatePlace(xPos, yPos);
 			}
+			*/
+			if (!this.isDebug && !this.isSystem)
+				yPos += this.HtmlAreaOffset;
+			this.debugCalculatePlace(xPos, yPos);
 		},
 
 		putAreaValue : function(val)
