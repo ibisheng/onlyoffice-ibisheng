@@ -121,6 +121,7 @@
 		this.IsUseFirstTextInputAfterComposition = false;
 
 		this.nativeFocusElement = null;
+		this.nativeFocusElementNoRemoveOnElementFocus = false;
 		this.InterfaceEnableKeyEvents = true;
 
 		this.ieNonCompositionPrefix = "";
@@ -1215,9 +1216,13 @@
 		document.addEventListener("focus", function(e)
 		{
 			var t                = window['AscCommon'].g_inputContext;
+			var _oldNativeFE	 = t.nativeFocusElement;
 			t.nativeFocusElement = e.target;
 
 			//console.log(t.nativeFocusElement);
+
+			var _nativeFocusElementNoRemoveOnElementFocus = t.nativeFocusElementNoRemoveOnElementFocus;
+			t.nativeFocusElementNoRemoveOnElementFocus = false;
 
 			if (t.InterfaceEnableKeyEvents == false)
 			{
@@ -1228,7 +1233,12 @@
 			if (t.nativeFocusElement.id == t.HtmlArea.id)
 			{
 				t.Api.asc_enableKeyEvents(true, true);
-				t.nativeFocusElement = null;
+
+				if (_nativeFocusElementNoRemoveOnElementFocus)
+					t.nativeFocusElement = _oldNativeFE;
+				else
+					t.nativeFocusElement = null;
+
 				return;
 			}
 			if (t.nativeFocusElement.id == window['AscCommon'].g_clipboardBase.CommonDivId)
@@ -1236,6 +1246,8 @@
 				t.nativeFocusElement = null;
 				return;
 			}
+
+			t.nativeFocusElementNoRemoveOnElementFocus = false;
 
 			var _isElementEditable = false;
 			if (true)
@@ -1293,6 +1305,7 @@
 				t.nativeFocusElement = null;
 
 			var _elem = t.nativeFocusElement;
+			t.nativeFocusElementNoRemoveOnElementFocus = true; // ie focus async
 			t.HtmlArea.focus();
 			t.nativeFocusElement = _elem;
 			t.Api.asc_enableKeyEvents(true, true);
