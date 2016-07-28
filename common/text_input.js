@@ -106,7 +106,7 @@
 		this.TargetId = null;			// id caret
 		this.HtmlDiv  = null;			// для незаметной реализации одной textarea недостаточно
 
-		this.TextArea_Not_ContentEditableDiv = AscCommon.AscBrowser.isIE ? false : true;
+		this.TextArea_Not_ContentEditableDiv = AscCommon.AscBrowser.isIeEdge ? false : true;
 		this.HtmlArea = null;
 
 		this.HtmlAreaOffset = 60;

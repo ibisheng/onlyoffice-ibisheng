@@ -65,6 +65,8 @@ AscBrowser.isIE =  (AscBrowser.userAgent.indexOf("msie") > -1 ||
                     AscBrowser.userAgent.indexOf("trident") > -1 ||
 					AscBrowser.userAgent.indexOf("edge") > -1);
 
+AscBrowser.isIeEdge = (AscBrowser.userAgent.indexOf("edge/") > -1);
+
 AscBrowser.isIE9 =  (AscBrowser.userAgent.indexOf("msie9") > -1 || AscBrowser.userAgent.indexOf("msie 9") > -1);
 AscBrowser.isIE10 =  (AscBrowser.userAgent.indexOf("msie10") > -1 || AscBrowser.userAgent.indexOf("msie 10") > -1);
 
