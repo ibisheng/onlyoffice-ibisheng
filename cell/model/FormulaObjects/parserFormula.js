@@ -51,6 +51,356 @@ function (window, undefined) {
 
   var c_oAscError = Asc.c_oAscError;
 
+	var TOK_TYPE_OPERAND = 1;
+	var TOK_TYPE_FUNCTION = 2;
+	var TOK_TYPE_SUBEXPR = 3;
+	var TOK_TYPE_ARGUMENT = 4;
+	var TOK_TYPE_OP_IN = 5;
+	var TOK_TYPE_OP_POST = 6;
+	var TOK_TYPE_WSPACE = 7;
+	var TOK_TYPE_UNKNOWN = 8;
+
+	var TOK_SUBTYPE_START = 9;
+	var TOK_SUBTYPE_STOP = 10;
+
+	var TOK_SUBTYPE_TEXT = 11;
+	var TOK_SUBTYPE_LOGICAL = 12;
+	var TOK_SUBTYPE_ERROR = 14;
+
+	var TOK_SUBTYPE_UNION = 15;
+
+	function ParsedThing(value, type, subtype) {
+		this.value = value;
+		this.type = type;
+		this.subtype = subtype;
+	}
+
+	ParsedThing.prototype.getStop = function () {
+		return new ParsedThing(this.value, this.type, TOK_SUBTYPE_STOP);
+	};
+
+	var g_oCodeSpace = 32; // Code of space
+	var g_oCodeNumberSign = 35; // Code of #
+	var g_oCodeDQuote = 34; // Code of "
+	var g_oCodePercent = 37; // Code of %
+	var g_oCodeAmpersand = 38; // Code of &
+	var g_oCodeQuote = 39; // Code of '
+	var g_oCodeLeftParenthesis = 40; // Code of (
+	var g_oCodeRightParenthesis = 41; // Code of )
+	var g_oCodeMultiply = 42; // Code of *
+	var g_oCodePlus = 43; // Code of +
+	var g_oCodeComma = 44; // Code of ,
+	var g_oCodeMinus = 45; // Code of -
+	var g_oCodeDivision = 47; // Code of /
+	var g_oCodeSemicolon = 59; // Code of ;
+	var g_oCodeLessSign = 60; // Code of <
+	var g_oCodeEqualSign = 61; // Code of =
+	var g_oCodeGreaterSign = 62; // Code of >
+	var g_oCodeLeftSquareBracked = 91; // Code of [
+	var g_oCodeRightSquareBracked = 93; // Code of ]
+	var g_oCodeAccent = 94; // Code of ^
+	var g_oCodeLeftCurlyBracked = 123; // Code of {
+	var g_oCodeRightCurlyBracked = 125; // Code of }
+
+	function getTokens(formula) {
+
+		var tokens = [];
+		var tokenStack = [];
+
+		var offset = 0;
+		var length = formula.length;
+		var currentChar, currentCharCode, nextCharCode, tmp;
+
+		var token = "";
+
+		var inString = false;
+		var inPath = false;
+		var inRange = false;
+		var inError = false;
+
+		var regexSN = /^[1-9]{1}(\.[0-9]+)?E{1}$/;
+
+		nextCharCode = formula.charCodeAt(offset);
+		while (offset < length) {
+
+			// state-dependent character evaluation (order is important)
+
+			// double-quoted strings
+			// embeds are doubled
+			// end marks token
+
+			currentChar = formula[offset];
+			currentCharCode = nextCharCode;
+			nextCharCode = formula.charCodeAt(offset + 1);
+
+			if (inString) {
+				if (currentCharCode === g_oCodeDQuote) {
+					if (nextCharCode === g_oCodeDQuote) {
+						token += currentChar;
+						offset += 1;
+					} else {
+						inString = false;
+						tokens.push(new ParsedThing(token, TOK_TYPE_OPERAND, TOK_SUBTYPE_TEXT));
+						token = "";
+					}
+				} else {
+					token += currentChar;
+				}
+				offset += 1;
+				continue;
+			} else if (inPath) {
+				// single-quoted strings (links)
+				// embeds are double
+				// end does not mark a token
+				if (currentCharCode === g_oCodeQuote) {
+					if (nextCharCode === g_oCodeQuote) {
+						token += currentChar;
+						offset += 1;
+					} else {
+						inPath = false;
+					}
+				} else {
+					token += currentChar;
+				}
+				offset += 1;
+				continue;
+			} else if (inRange) {
+				// bracked strings (range offset or linked workbook name)
+				// no embeds (changed to "()" by Excel)
+				// end does not mark a token
+				if (currentCharCode === g_oCodeRightSquareBracked) {
+					inRange = false;
+				}
+				token += currentChar;
+				offset += 1;
+				continue;
+			} else if (inError) {
+				// error values
+				// end marks a token, determined from absolute list of values
+				token += currentChar;
+				offset += 1;
+				if ((",#NULL!,#DIV/0!,#VALUE!,#REF!,#NAME?,#NUM!,#N/A,").indexOf("," + token + ",") != -1) {
+					inError = false;
+					tokens.push(new ParsedThing(token, TOK_TYPE_OPERAND, TOK_SUBTYPE_ERROR));
+					token = "";
+				}
+				continue;
+			}
+
+			// trim white-space
+			if (currentCharCode === g_oCodeSpace) {
+				if (token.length > 0) {
+					tokens.push(new ParsedThing(token, TOK_TYPE_OPERAND));
+					token = "";
+				}
+				tokens.push(new ParsedThing("", TOK_TYPE_WSPACE));
+				offset += 1;
+
+				while ((currentCharCode = formula.charCodeAt(offset)) === g_oCodeSpace) {
+					offset += 1;
+				}
+				if (offset >= length) {
+					break;
+				}
+
+				currentChar = formula[offset];
+				nextCharCode = formula.charCodeAt(offset + 1);
+			}
+
+			// multi-character comparators (>= || <= || <>)
+			if ((currentCharCode === g_oCodeLessSign &&
+				(nextCharCode === g_oCodeEqualSign || nextCharCode === g_oCodeGreaterSign)) ||
+				(currentCharCode === g_oCodeGreaterSign && nextCharCode === g_oCodeEqualSign)) {
+				if (token.length > 0) {
+					tokens.push(new ParsedThing(token, TOK_TYPE_OPERAND));
+					token = "";
+				}
+				tokens.push(new ParsedThing(formula.substr(offset, 2), TOK_TYPE_OP_IN, TOK_SUBTYPE_LOGICAL));
+				offset += 2;
+				nextCharCode = formula.charCodeAt(offset);
+				continue;
+			}
+
+			// scientific notation check
+			if (currentCharCode === g_oCodePlus || currentCharCode === g_oCodeMinus) {
+				if (token.length > 1) {
+					if (token.match(regexSN)) {
+						token += currentChar;
+						offset += 1;
+						continue;
+					}
+				}
+			}
+
+			// independent character evaulation (order not important)
+
+			// establish state-dependent character evaluations
+			switch (currentCharCode) {
+				case g_oCodeDQuote:
+				{
+					if (token.length > 0) {
+						// not expected
+						tokens.push(new ParsedThing(token, TOK_TYPE_UNKNOWN));
+						token = "";
+					}
+					inString = true;
+					break;
+				}
+				case g_oCodeQuote:
+				{
+					if (token.length > 0) {
+						// not expected
+						tokens.push(new ParsedThing(token, TOK_TYPE_UNKNOWN));
+						token = "";
+					}
+					inPath = true;
+					break;
+				}
+				case g_oCodeLeftSquareBracked:
+				{
+					inRange = true;
+					token += currentChar;
+					break;
+				}
+				case g_oCodeNumberSign:
+				{
+					if (token.length > 0) {
+						// not expected
+						tokens.push(new ParsedThing(token, TOK_TYPE_UNKNOWN));
+						token = "";
+					}
+					inError = true;
+					token += currentChar;
+					break;
+				}
+				case g_oCodeLeftCurlyBracked:
+				{
+					// mark start and end of arrays and array rows
+					if (token.length > 0) {
+						// not expected
+						tokens.push(new ParsedThing(token, TOK_TYPE_UNKNOWN));
+						token = "";
+					}
+					tmp = new ParsedThing('ARRAY', TOK_TYPE_FUNCTION, TOK_SUBTYPE_START);
+					tokens.push(tmp);
+					tokenStack.push(tmp.getStop());
+					tmp = new ParsedThing('ARRAYROW', TOK_TYPE_FUNCTION, TOK_SUBTYPE_START);
+					tokens.push(tmp);
+					tokenStack.push(tmp.getStop());
+					break;
+				}
+				case g_oCodeSemicolon:
+				{
+					if (token.length > 0) {
+						tokens.push(new ParsedThing(token, TOK_TYPE_OPERAND));
+						token = "";
+					}
+					tmp = tokenStack.pop();
+					if (tmp && 'ARRAYROW' !== tmp.value) {
+						return null;
+					}
+					tokens.push(tmp);
+					tokens.push(new ParsedThing(';', TOK_TYPE_ARGUMENT));
+					tmp = new ParsedThing('ARRAYROW', TOK_TYPE_FUNCTION, TOK_SUBTYPE_START);
+					tokens.push(tmp);
+					tokenStack.push(tmp.getStop());
+					break;
+				}
+				case g_oCodeRightCurlyBracked:
+				{
+					if (token.length > 0) {
+						tokens.push(new ParsedThing(token, TOK_TYPE_OPERAND));
+						token = "";
+					}
+					tokens.push(tokenStack.pop());
+					tokens.push(tokenStack.pop());
+					break;
+				}
+				case g_oCodePlus:
+				case g_oCodeMinus:
+				case g_oCodeMultiply:
+				case g_oCodeDivision:
+				case g_oCodeAccent:
+				case g_oCodeAmpersand:
+				case g_oCodeEqualSign:
+				case g_oCodeGreaterSign:
+				case g_oCodeLessSign:
+				{
+					// standard infix operators
+					if (token.length > 0) {
+						tokens.push(new ParsedThing(token, TOK_TYPE_OPERAND));
+						token = "";
+					}
+					tokens.push(new ParsedThing(currentChar, TOK_TYPE_OP_IN));
+					break;
+				}
+				case g_oCodePercent:
+				{
+					// standard postfix operators
+					if (token.length > 0) {
+						tokens.push(new ParsedThing(token, TOK_TYPE_OPERAND));
+						token = "";
+					}
+					tokens.push(new ParsedThing(currentChar, TOK_TYPE_OP_POST));
+					break;
+				}
+				case g_oCodeLeftParenthesis:
+				{
+					// start subexpression or function
+					if (token.length > 0) {
+						tmp = new ParsedThing(token, TOK_TYPE_FUNCTION, TOK_SUBTYPE_START);
+						tokens.push(tmp);
+						tokenStack.push(tmp.getStop());
+						token = "";
+					} else {
+						tmp = new ParsedThing("", TOK_TYPE_SUBEXPR, TOK_SUBTYPE_START);
+						tokens.push(tmp);
+						tokenStack.push(tmp.getStop());
+					}
+					break;
+				}
+				case g_oCodeComma:
+				{
+					// function, subexpression, array parameters
+					if (token.length > 0) {
+						tokens.push(new ParsedThing(token, TOK_TYPE_OPERAND));
+						token = "";
+					}
+					tmp = (0 !== tokenStack.length) ? (TOK_TYPE_FUNCTION === tokenStack[tokenStack.length - 1].type) : false;
+					tokens.push(tmp ? new ParsedThing(currentChar, TOK_TYPE_ARGUMENT) :
+						new ParsedThing(currentChar, TOK_TYPE_OP_IN, TOK_SUBTYPE_UNION));
+					break;
+				}
+				case g_oCodeRightParenthesis:
+				{
+					// stop subexpression
+					if (token.length > 0) {
+						tokens.push(new ParsedThing(token, TOK_TYPE_OPERAND));
+						token = "";
+					}
+					tokens.push(tokenStack.pop());
+					break;
+				}
+				default:
+				{
+					// token accumulation
+					token += currentChar;
+					break;
+				}
+			}
+
+			++offset;
+		}
+
+		// dump remaining accumulation
+		if (token.length > 0) {
+			tokens.push(new ParsedThing(token, TOK_TYPE_OPERAND));
+		}
+
+		return tokens;
+	}
+
+  
 /** @enum */
 var cElementType = {
 		number      : 0,
@@ -3586,6 +3936,277 @@ parserFormula.prototype.parse = function(local, digitDelim) {
    Что упрощает вычисление результата формулы.
    При разборе формулы важен порядок проверки очередной части выражения на принадлежность тому или иному типу.
    */
+
+	if (false) {
+		//console.log(this.Formula);
+		var cFormulaList = (local && AscCommonExcel.cFormulaFunctionLocalized) ? AscCommonExcel.cFormulaFunctionLocalized :
+			cFormulaFunction;
+		var aTokens = getTokens(this.Formula);
+		if (null === aTokens) {
+			this.outStack = [];
+			this.error.push(c_oAscError.ID.FrmlWrongOperator);
+			return false;
+		}
+
+		var stack = [], val, valUp, tmp, elem, len, indentCount = -1, args = [], prev, next, arr = null, bArrElemSign = false;
+		for (var i = 0, nLength = aTokens.length; i < nLength; ++i) {
+			found_operand = null;
+			val = aTokens[i].value;
+			switch (aTokens[i].type) {
+				case TOK_TYPE_OPERAND:
+				{
+					if (TOK_SUBTYPE_TEXT === aTokens[i].subtype) {
+						elem = new cString(val);
+					} else {
+						tmp = parseFloat(val);
+						if (isNaN(tmp)) {
+							valUp = val.toUpperCase();
+							if ('TRUE' === valUp || 'FALSE' === valUp) {
+								elem = new cBool(valUp);
+							} else {
+								if (-1 !== val.indexOf('!')) {
+									tmp = AscCommonExcel.g_oRangeCache.getRange3D(val);
+									if (tmp) {
+										this.is3D = true;
+										elem = (tmp.isOneCell() && (null === tmp.sheet2 || tmp.sheet === tmp.sheet2)) ?
+											new cRef3D(tmp.getName(), tmp.sheet, this.wb) :
+											new cArea3D(tmp.getName(), tmp.sheet, null !== tmp.sheet2 ? tmp.sheet2 : tmp.sheet, this.wb);
+									} else {
+										this.error.push(c_oAscError.ID.FrmlWrongOperator);
+										this.outStack = [];
+										return false;
+									}
+								} else {
+									tmp = AscCommonExcel.g_oRangeCache.getAscRange(valUp);
+									if (tmp) {
+										elem = tmp.isOneCell() ? new cRef(valUp, this.ws) : new cArea(valUp, this.ws);
+									} else {
+										elem = new cName(aTokens[i].value, this.wb, this.ws);
+									}
+								}
+							}
+						} else {
+							elem = new cNumber(tmp);
+						}
+					}
+					if (arr) {
+						if (cElementType.number !== elem.type && cElementType.bool !== elem.type &&
+							cElementType.string !== elem.type) {
+							this.outStack = [];
+							this.error.push(c_oAscError.ID.FrmlAnotherParsingError);
+							return false;
+						} else {
+							if (bArrElemSign) {
+								if (cElementType.number !== elem.type) {
+									this.outStack = [];
+									this.error.push(c_oAscError.ID.FrmlAnotherParsingError);
+									return false;
+								}
+								elem.value *= -1;
+								bArrElemSign = false;
+							}
+							arr.addElement(elem);
+						}
+					} else {
+						this.outStack.push(elem);
+						this.f.push(elem);
+					}
+					break;
+				}
+				case TOK_TYPE_OP_POST:
+				case TOK_TYPE_OP_IN:
+				{
+					if (TOK_SUBTYPE_UNION === aTokens[i].subtype) {
+						this.outStack = [];
+						this.error.push(c_oAscError.ID.FrmlWrongOperator);
+						return false;
+					}
+
+					prev = aTokens[i - 1];
+					if ('-' === val && (0 === i || (TOK_TYPE_OPERAND !== prev.type && TOK_TYPE_OP_POST !== prev.type &&
+						(TOK_SUBTYPE_STOP !== prev.subtype ||
+						(TOK_TYPE_FUNCTION !== prev.type && TOK_TYPE_SUBEXPR !== prev.type))))) {
+						elem = new cFormulaOperators['un_minus']();
+					} else {
+						elem = new cFormulaOperators[val]();
+					}
+					if (arr) {
+						if (bArrElemSign || 'un_minus' !== elem.name) {
+							this.outStack = [];
+							this.error.push(c_oAscError.ID.FrmlWrongOperator);
+							return false;
+						} else {
+							bArrElemSign = true;
+							break;
+						}
+					}
+
+					this.f.push(elem);
+
+					len = stack.length;
+					while (0 !== len) {
+						tmp = stack[len - 1];
+						if (elem.isRightAssociative ? (elem.priority < tmp.priority) : ((elem.priority <= tmp.priority))) {
+							this.outStack.push(tmp);
+							--len;
+						} else {
+							break;
+						}
+					}
+					stack.length = len;
+
+					stack.push(elem);
+					break;
+				}
+				case TOK_TYPE_FUNCTION:
+				{
+					if (TOK_SUBTYPE_START === aTokens[i].subtype) {
+						val = val.toUpperCase();
+						if ('ARRAY' === val) {
+							if (arr) {
+								this.outStack = [];
+								this.error.push(c_oAscError.ID.FrmlWrongOperator);
+								return false;
+							}
+							arr = new cArray();
+							break;
+						} else if ('ARRAYROW' === val) {
+							if (!arr) {
+								this.outStack = [];
+								this.error.push(c_oAscError.ID.FrmlWrongOperator);
+								return false;
+							}
+							arr.addRow();
+							break;
+						} else if (val in cFormulaList) {
+							elem = new cFormulaList[val]();
+						} else if (val in cAllFormulaFunction) {
+							elem = new cAllFormulaFunction[val]();
+						} else {
+							elem = new cBaseFunction(val);
+							elem.isXLFN = (0 === val.indexOf("_xlfn."));
+						}
+						stack.push(elem);
+						args[++indentCount] = 1;
+					} else {
+						if (arr) {
+							if ('ARRAY' === val) {
+								if (!arr.isValidArray()) {
+									this.outStack = [];
+									// размер массива не согласован
+									this.error.push(c_oAscError.ID.FrmlAnotherParsingError);
+									return false;
+								}
+								this.outStack.push(arr);
+								arr = null;
+							} else if ('ARRAYROW' !== val) {
+								this.outStack = [];
+								this.error.push(c_oAscError.ID.FrmlAnotherParsingError);
+								return false;
+							}
+							break;
+						}
+						len = stack.length;
+						while (0 !== len) {
+							tmp = stack[len - 1];
+							--len;
+							this.outStack.push(tmp);
+							if (cElementType.func === tmp.type) {
+								prev = aTokens[i - 1];
+								tmp.setArgumentsCount(args[indentCount] -
+									((prev && TOK_TYPE_FUNCTION === prev.type && TOK_SUBTYPE_START === prev.subtype) ? 1 : 0));
+								if (!tmp.checkArguments()) {
+									this.outStack = [];
+									this.error.push(c_oAscError.ID.FrmlWrongMaxArgument);
+									return false;
+								}
+								break;
+							}
+						}
+						stack.length = len;
+						--indentCount;
+					}
+					break;
+				}
+				case TOK_TYPE_ARGUMENT:
+				{
+					if (arr) {
+						break;
+					}
+					if (-1 === indentCount) {
+						throw 'error!!!!!!!!!!!';
+					}
+					args[indentCount] += 1;
+					len = stack.length;
+					while (0 !== len) {
+						tmp = stack[len - 1];
+						if (cElementType.func === tmp.type) {
+							break;
+						}
+						this.outStack.push(tmp);
+						--len;
+					}
+					stack.length = len;
+
+					next = aTokens[i + 1];
+					if (next && (TOK_TYPE_ARGUMENT === next.type ||
+						(TOK_TYPE_FUNCTION === next.type && TOK_SUBTYPE_START !== next.subtype))) {
+						this.outStack.push(new cEmpty());
+						break;
+					}
+					break;
+				}
+				case TOK_TYPE_SUBEXPR:
+				{
+					if (TOK_SUBTYPE_START === aTokens[i].subtype) {
+						elem = new parentLeft();
+						stack.push(elem);
+					} else {
+						elem = new parentRight();
+						len = stack.length;
+						while (0 !== len) {
+							tmp = stack[len - 1];
+							--len;
+							this.outStack.push(tmp);
+							if (tmp instanceof parentLeft) {
+								break;
+							}
+						}
+						stack.length = len;
+					}
+					this.f.push(elem);
+					break;
+				}
+				case TOK_TYPE_WSPACE:
+				{
+					if (0 !== i && i !== nLength - 1) {
+						prev = aTokens[i - 1];
+						next = aTokens[i + 1];
+						if ((TOK_TYPE_OPERAND === prev.type ||
+							((TOK_TYPE_FUNCTION === prev.type || TOK_TYPE_SUBEXPR === prev.type) &&
+							TOK_SUBTYPE_STOP === prev.subtype)) && ((TOK_TYPE_OPERAND === next.type) ||
+							((TOK_TYPE_FUNCTION === next.type || TOK_TYPE_SUBEXPR === next.type) &&
+							TOK_SUBTYPE_START === next.subtype))) {
+							aTokens[i].type = TOK_TYPE_OP_IN;
+							aTokens[i].value = ' ';
+							--i;
+						}
+					}
+					break;
+				}
+			}
+		}
+		while (stack.length !== 0) {
+			this.outStack.push(stack.pop());
+		}
+
+		if (this.outStack.length != 0) {
+			return this.isParsed = true;
+		} else {
+			return this.isParsed = false;
+		}
+	}
+
   this.operand_expected = true;
   var wasLeftParentheses = false, wasRigthParentheses = false, found_operand = null, _3DRefTmp = null, _tableTMP = null;
   var cFormulaList = (local && AscCommonExcel.cFormulaFunctionLocalized) ? AscCommonExcel.cFormulaFunctionLocalized : cFormulaFunction;

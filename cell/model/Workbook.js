@@ -5302,6 +5302,7 @@ Woorksheet.prototype._BuildDependencies=function(cellRange){
 			    cellId = g_oCellAddressUtils.getCellId(c.nRow, c.nCol ),
                 aRefs = [],
                 cache = inCache(aCache, c.sFormula, aRefs ),
+                //cache = false,
                 bInCache = false;
 			if(cache)
 			{
