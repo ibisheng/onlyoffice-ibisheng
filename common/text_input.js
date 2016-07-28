@@ -538,6 +538,14 @@
 					this.clear();
 				}
 			}
+
+			if (this.IsUseFirstTextInputAfterComposition && c_oCompositionState.process == this.compositionState)
+			{
+				// chrome escape input. empty data and textInput not called
+
+				this.onCompositionEnd(e, "");
+				this.IsUseFirstTextInputAfterComposition = false;
+			}
 		},
 
 		onTextInput : function(e)
