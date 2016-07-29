@@ -3585,6 +3585,8 @@ function CEditorPage(api)
 		}
 
 		AscCommon.InitBrowserInputContext(this.m_oApi, "id_target_cursor");
+		if (AscCommon.g_inputContext)
+			AscCommon.g_inputContext.onResize("id_main_view");
 
 		//this.m_oDrawingDocument.CheckFontCache();
 	};

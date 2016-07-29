@@ -144,6 +144,10 @@
 		// поэтому учитываем только update, заодно запоминаем дату на старте (только для ие)
 		this.isChromeKeysNoKeyPressPresent = false;
 		this.isChromeKeysNoKeyPressPresentStartValue = "";
+
+		// chrome element for left/top
+		this.FixedPosCheckElementX = 0;
+		this.FixedPosCheckElementY = 0;
 	}
 
 	CTextInput.prototype =
@@ -158,8 +162,13 @@
 			this.HtmlDiv.id               = "area_id_parent";
 			this.HtmlDiv.style.background = "transparent";
 			this.HtmlDiv.style.border     = "none";
-			this.HtmlDiv.style.position   = "absolute";
-			this.HtmlDiv.style.zIndex     = 0;
+
+			// в хроме скроллируется редактор, когда курсор текстового поля выходит за пределы окна
+			if (AscCommon.AscBrowser.isChrome)
+				this.HtmlDiv.style.position = "fixed";
+			else
+				this.HtmlDiv.style.position   = "absolute";
+			this.HtmlDiv.style.zIndex     = 10;
 			this.HtmlDiv.style.width      = "20px";
 			this.HtmlDiv.style.height     = "50px";
 			this.HtmlDiv.style.overflow   = "hidden";
@@ -180,7 +189,7 @@
 			this.HtmlArea.id                   	= "area_id";
 
 			var _style = "left:0px;top:" + (-this.HtmlAreaOffset) + "px;";
-			_style += "background:transparent;border:none;position:absolute;text-shadow:0 0 0 #000;outline:none;color:transparent;width:100%;height:100%;";
+			_style += "background:transparent;border:none;position:absolute;text-shadow:0 0 0 #000;outline:none;color:transparent;width:1000px;height:50px;";
 			_style += "overflow:hidden;padding:0px;margin:0px;font-family:arial;font-size:12pt;resize:none;font-weight:normal;box-sizing:content-box;-moz-box-sizing:content-box;-webkit-box-sizing:content-box;";
 			this.HtmlArea.setAttribute("style", _style);
 			this.HtmlArea.setAttribute("spellcheck", false);
@@ -270,6 +279,13 @@
 			var _elem          = document.getElementById("area_id_main");
 			var _elemSrc       = document.getElementById(_editorContainerId);
 
+			if (AscCommon.AscBrowser.isChrome)
+			{
+				var rectObject = _elemSrc.getBoundingClientRect();
+				this.FixedPosCheckElementX = rectObject.left;
+				this.FixedPosCheckElementY = rectObject.top;
+			}
+
 			var _width = _elemSrc.style.width;
 			if ((null == _width || "" == _width) && window.getComputedStyle)
 			{
@@ -303,21 +319,16 @@
 			var xPos    = x ? x : parseInt(oTarget.style.left);
 			var yPos    = (y ? y : parseInt(oTarget.style.top)) + parseInt(oTarget.style.height);
 
-			/*
 			if (!this.isDebug && !this.isSystem)
 			{
-				this.HtmlDiv.style.left = xPos + "px";
-				this.HtmlDiv.style.top  = yPos + this.HtmlAreaOffset + "px";
+				this.HtmlDiv.style.left = xPos + this.FixedPosCheckElementX + "px";
+				this.HtmlDiv.style.top  = yPos + this.FixedPosCheckElementY + this.HtmlAreaOffset + "px";
 			}
 			else
 			{
 				// this.HtmlAreaOffset - не сдвигаем, курсор должен быть виден
-				this.debugCalculatePlace(xPos, yPos);
+				this.debugCalculatePlace(xPos + this.FixedPosCheckElementX, yPos + this.FixedPosCheckElementY);
 			}
-			*/
-			if (!this.isDebug && !this.isSystem)
-				yPos += this.HtmlAreaOffset;
-			this.debugCalculatePlace(xPos, yPos);
 		},
 
 		putAreaValue : function(val)
