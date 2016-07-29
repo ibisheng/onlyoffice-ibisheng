@@ -1849,7 +1849,7 @@ background-repeat: no-repeat;\
 		if (!this.WordControl.m_oLogicDocument)
 			return false;
 
-		if (false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content))
+		if (false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Drawing_Props))
 		{
 			if (AscCommon.g_clipboardBase.IsWorking())
 				return false;
