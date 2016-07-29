@@ -133,6 +133,17 @@
 		this.isDebug 	= false;
 		this.isSystem 	= false;
 		this.isShow		= false;
+
+		// в хроме бывают случаи, когда приходит keyDown, но не приходит keyPress
+		// и это без композитного ввода (например китайский язык, набирать кнопки 0 -- 9)
+		// следим так: на onInput - если
+		// 1) был keyDown, и на нем "ждем" keyPress
+		// 2) не было keyPress, composition events
+		// 3) тогда вставляем
+		// в ie такие же проблемы. приходят только пустые start и end
+		// поэтому учитываем только update, заодно запоминаем дату на старте (только для ие)
+		this.isChromeKeysNoKeyPressPresent = false;
+		this.isChromeKeysNoKeyPressPresentStartValue = "";
 	}
 
 	CTextInput.prototype =
@@ -502,6 +513,21 @@
 
 			this.TextInputAfterComposition = false;
 
+			if (this.isChromeKeysNoKeyPressPresent && c_oCompositionState.end == this.compositionState)
+			{
+				this.Api.Begin_CompositeInput();
+
+				if (this.isChromeKeysNoKeyPressPresentStartValue != "")
+				{
+					if (0 == _value.indexOf(this.isChromeKeysNoKeyPressPresentStartValue))
+						_value = _value.substr(this.isChromeKeysNoKeyPressPresentStartValue.length);
+				}
+
+				this.checkCompositionData(_value);
+				this.Api.Replace_CompositeText(this.compositionValue);
+				this.Api.End_CompositeInput();
+			}
+
 			if (c_oCompositionState.end == this.compositionState)
 			{
 				if (AscCommon.AscBrowser.isChrome && AscCommon.AscBrowser.isLinuxOS)
@@ -518,7 +544,10 @@
 							charCode : 0,
 							which : 0,
 							keyCode : 12288,
-							code : "space"
+							code : "space",
+
+							preventDefault : function() {},
+							stopPropagation : function() {}
 						};
 						this.Api.onKeyDown(_e);
 						this.Api.onKeyUp(_e);
@@ -537,14 +566,6 @@
 					// поэтому разделяем
 					this.clear();
 				}
-			}
-
-			if (this.IsUseFirstTextInputAfterComposition && c_oCompositionState.process == this.compositionState)
-			{
-				// chrome escape input. empty data and textInput not called
-
-				this.onCompositionEnd(e, "");
-				this.IsUseFirstTextInputAfterComposition = false;
 			}
 		},
 
@@ -744,6 +765,7 @@
 
 		onKeyDown : function(e)
 		{
+			this.isChromeKeysNoKeyPressPresent = false;
 			if (this.isSystem && this.isShow)
 			{
 				// нужно проверить на enter
@@ -809,11 +831,14 @@
 				}
 			}
 
-			return this.Api.onKeyDown(e);
+			var _ret = this.Api.onKeyDown(e);
+			if (!e.defaultPrevented && (AscCommon.AscBrowser.isIE || AscCommon.AscBrowser.isChrome))
+				this.isChromeKeysNoKeyPressPresent = true;
 		},
 
 		onKeyPress : function(e)
 		{
+			this.isChromeKeysNoKeyPressPresent = false;
 			if (this.isSystem)
 				return;
 
@@ -825,6 +850,7 @@
 
 		onKeyUp : function(e)
 		{
+			this.isChromeKeysNoKeyPressPresent = false;
 			if (this.isSystem && this.isShow)
 				return;
 
@@ -850,6 +876,14 @@
 				AscCommon.AscBrowser.isIE)
 			{
 				this.checkTargetPosition();
+			}
+
+			if (this.IsUseFirstTextInputAfterComposition && c_oCompositionState.process == this.compositionState)
+			{
+				// chrome escape input. empty data and textInput not called
+
+				this.onCompositionEnd(e, "");
+				this.IsUseFirstTextInputAfterComposition = false;
 			}
 		},
 
@@ -919,8 +953,14 @@
 
 		onCompositionStart : function(e)
 		{
+			if (!AscCommon.AscBrowser.isIE)
+				this.isChromeKeysNoKeyPressPresent = false;
+
 			if (this.isSystem)
+			{
+				this.isChromeKeysNoKeyPressPresent = false;
 				return;
+			}
 
 			ti_console_log2("begin");
 			if (this.compositionState == c_oCompositionState.end)
@@ -929,6 +969,11 @@
 			this.compositionState = c_oCompositionState.start;
 
 			this.isFirstCompositionUpdateAfterStart = true;
+
+			if (AscCommon.AscBrowser.isIE)
+			{
+				this.isChromeKeysNoKeyPressPresentStartValue = this.getAreaValue();
+			}
 
 			ti_console_log("ti: onCompositionStart");
 
@@ -948,8 +993,19 @@
 
 		onCompositionUpdate : function(e, isLockTarget, _data, isFromEnd)
 		{
+			if (!AscCommon.AscBrowser.isIE)
+				this.isChromeKeysNoKeyPressPresent = false;
+			else if (undefined == isFromEnd)
+				this.isChromeKeysNoKeyPressPresent = false;
+
+			if (!this.isChromeKeysNoKeyPressPresent)
+				this.isChromeKeysNoKeyPressPresentStartValue = "";
+
 			if (this.isSystem)
+			{
+				this.isChromeKeysNoKeyPressPresent = false;
 				return;
+			}
 
 			ti_console_log("ti: onCompositionUpdate: " + e.data);
 
@@ -1089,8 +1145,14 @@
 
 		onCompositionEnd : function(e, _data)
 		{
+			if (!AscCommon.AscBrowser.isIE)
+				this.isChromeKeysNoKeyPressPresent = false;
+
 			if (this.isSystem)
+			{
+				this.isChromeKeysNoKeyPressPresent = false;
 				return;
+			}
 
 			ti_console_log("ti: onCompositionEnd");
 
@@ -1117,6 +1179,7 @@
 				{
 					// edge: не натуральный end!!!
 					this.compositionState = c_oCompositionState.process;
+					this.isChromeKeysNoKeyPressPresent = false;
 					return;
 				}
 				else
