@@ -9800,6 +9800,7 @@ CDocument.prototype.private_MoveCursorDown = function(StartX, StartY, AddToSelec
 				StartY = 0;
 
 				var NewPage = this.CurPage;
+				var bBreak = false;
 				while (true)
 				{
 					this.Cursor_MoveAt(StartX, StartY, AddToSelect);
@@ -9827,11 +9828,13 @@ CDocument.prototype.private_MoveCursorDown = function(StartX, StartY, AddToSelec
 					}
 					else
 					{
+						Result = true;
+						bBreak = true;
 						break;
 					}
 				}
 
-				if (false === Result)
+				if (false === Result || true === bBreak)
 					break;
 
 				CurY = StartY;
