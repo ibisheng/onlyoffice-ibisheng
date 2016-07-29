@@ -1186,7 +1186,7 @@ cArea3D.prototype.getRange = function () {
 				return _val;
 			}
 			_r[i]._foreachNoEmpty(function (cell) {
-				val.push(checkTypeCell(cell));
+				_val.push(checkTypeCell(cell));
 			});
 		}
 		return _val;
@@ -1211,7 +1211,7 @@ cArea3D.prototype.getRange = function () {
 		}
 		_r[0]._foreachNoEmpty(function (_cell) {
 			if (cell.getID() === _cell.getName()) {
-				val.push(checkTypeCell(cell));
+				_val.push(checkTypeCell(cell));
 			}
 		});
 
