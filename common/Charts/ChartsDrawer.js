@@ -2680,7 +2680,7 @@ CChartsDrawer.prototype =
 			{
 				res = true;
 			}
-			else if(isPerspective && (isBar || isLine || isHBar))
+			else if(isPerspective && (isBar || isLine))
 			{
 				res = true;
 			}
