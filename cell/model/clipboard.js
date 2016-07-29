@@ -99,7 +99,10 @@
 					{	
 						_data = this.copyProcessor.getHtml(activeRange, ws);
 						
-						_clipboard.pushData(AscCommon.c_oAscClipboardDataFormat.Html, _data.html)
+						if(_data !== null)
+						{
+							_clipboard.pushData(AscCommon.c_oAscClipboardDataFormat.Html, _data.html)
+						}
 					}
 					//INTERNAL
 					if(AscCommon.c_oAscClipboardDataFormat.Internal & _formats)

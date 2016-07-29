@@ -2546,6 +2546,7 @@ CDocumentContent.prototype.Paragraph_Add                      = function(ParaIte
     {
         if (true === this.Selection.Use)
         {
+            var bAddSpace = this.LogicDocument ? this.LogicDocument.Is_WordSelection() : false;
             var Type = ParaItem.Get_Type();
             switch (Type)
             {
@@ -2555,10 +2556,22 @@ CDocumentContent.prototype.Paragraph_Add                      = function(ParaIte
                 case para_Space:
                 case para_Tab:
                 case para_PageNum:
+                case para_Field:
+                case para_FootnoteReference:
+                case para_FootnoteRef:
+                case para_Separator:
+                case para_ContinuationSeparator:
                 {
                     // Если у нас что-то заселекчено и мы вводим текст или пробел
                     // и т.д., тогда сначала удаляем весь селект.
                     this.Remove(1, true, false, true);
+
+                    if (true === bAddSpace)
+                    {
+                        this.Paragraph_Add(new ParaSpace());
+                        this.Cursor_MoveLeft(false, false);
+                    }
+
                     break;
                 }
                 case para_TextPr:

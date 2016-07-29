@@ -1359,6 +1359,7 @@ function CDocument(DrawingDocument, isMainLogicDocument)
         Flag     : selectionflag_Common,
         Data     : null,
         UpdateOnRecalc : false,
+		WordSelected : false,
         DragDrop : { Flag : 0, Data : null }  // 0 - не drag-n-drop, и мы его проверяем, 1 - drag-n-drop, -1 - не проверять drag-n-drop
     };
 
@@ -1580,37 +1581,38 @@ CDocument.prototype.LoadEmptyDocument              = function()
     this.Interface_Update_ParaPr();
     this.Interface_Update_TextPr();
 };
-CDocument.prototype.Set_CurrentElement             = function(Index, bUpdateStates)
+CDocument.prototype.Set_CurrentElement = function(Index, bUpdateStates)
 {
-    var OldDocPosType = this.CurPos.Type;
+	var OldDocPosType = this.CurPos.Type;
 
-    var ContentPos = Math.max(0, Math.min(this.Content.length - 1, Index));
+	var ContentPos = Math.max(0, Math.min(this.Content.length - 1, Index));
 
-    this.Set_DocPosType(docpostype_Content);
-    this.CurPos.ContentPos = Math.max(0, Math.min(this.Content.length - 1, Index));
+	this.Set_DocPosType(docpostype_Content);
+	this.CurPos.ContentPos = Math.max(0, Math.min(this.Content.length - 1, Index));
 
-    if (true === this.Content[ContentPos].Is_SelectionUse())
-    {
-        this.Selection.Flag     = selectionflag_Common;
-        this.Selection.Use      = true;
-        this.Selection.StartPos = ContentPos;
-        this.Selection.EndPos   = ContentPos;
-    }
-    else
-        this.Selection_Remove();
+	this.Reset_WordSelection();
+	if (true === this.Content[ContentPos].Is_SelectionUse())
+	{
+		this.Selection.Flag     = selectionflag_Common;
+		this.Selection.Use      = true;
+		this.Selection.StartPos = ContentPos;
+		this.Selection.EndPos   = ContentPos;
+	}
+	else
+		this.Selection_Remove();
 
-    if (false != bUpdateStates)
-    {
-        this.Document_UpdateInterfaceState();
-        this.Document_UpdateRulersState();
-        this.Document_UpdateSelectionState();
-    }
+	if (false != bUpdateStates)
+	{
+		this.Document_UpdateInterfaceState();
+		this.Document_UpdateRulersState();
+		this.Document_UpdateSelectionState();
+	}
 
-    if (docpostype_HdrFtr === OldDocPosType)
-    {
-        this.DrawingDocument.ClearCachePages();
-        this.DrawingDocument.FirePaint();
-    }
+	if (docpostype_HdrFtr === OldDocPosType)
+	{
+		this.DrawingDocument.ClearCachePages();
+		this.DrawingDocument.FirePaint();
+	}
 };
 CDocument.prototype.Is_ThisElementCurrent          = function()
 {
@@ -4107,6 +4109,7 @@ CDocument.prototype.Cursor_GetPos = function()
 };
 CDocument.prototype.Cursor_MoveToStartPos = function(AddToSelect)
 {
+	this.Reset_WordSelection();
 	this.private_UpdateTargetForCollaboration();
 
 	this.Controller.MoveCursorToStartPos(AddToSelect);
@@ -4115,6 +4118,7 @@ CDocument.prototype.Cursor_MoveToStartPos = function(AddToSelect)
 };
 CDocument.prototype.Cursor_MoveToEndPos = function(AddToSelect)
 {
+	this.Reset_WordSelection();
 	this.private_UpdateTargetForCollaboration();
 
 	this.Controller.MoveCursorToEndPos(AddToSelect);
@@ -4123,6 +4127,7 @@ CDocument.prototype.Cursor_MoveToEndPos = function(AddToSelect)
 };
 CDocument.prototype.Cursor_MoveLeft = function(AddToSelect, Word)
 {
+	this.Reset_WordSelection();
 	this.private_UpdateTargetForCollaboration();
 
 	if (undefined === Word || null === Word)
@@ -4136,6 +4141,7 @@ CDocument.prototype.Cursor_MoveLeft = function(AddToSelect, Word)
 };
 CDocument.prototype.Cursor_MoveRight = function(AddToSelect, Word, FromPaste)
 {
+	this.Reset_WordSelection();
 	this.private_UpdateTargetForCollaboration();
 
 	if (undefined === Word || null === Word)
@@ -4149,16 +4155,19 @@ CDocument.prototype.Cursor_MoveRight = function(AddToSelect, Word, FromPaste)
 };
 CDocument.prototype.Cursor_MoveUp = function(AddToSelect)
 {
+	this.Reset_WordSelection();
 	this.private_UpdateTargetForCollaboration();
 	this.Controller.MoveCursorUp(AddToSelect);
 };
 CDocument.prototype.Cursor_MoveDown = function(AddToSelect)
 {
+	this.Reset_WordSelection();
 	this.private_UpdateTargetForCollaboration();
 	this.Controller.MoveCursorDown(AddToSelect);
 };
 CDocument.prototype.Cursor_MoveEndOfLine = function(AddToSelect)
 {
+	this.Reset_WordSelection();
 	this.private_UpdateTargetForCollaboration();
 
 	this.Controller.MoveCursorToEndOfLine(AddToSelect);
@@ -4168,6 +4177,7 @@ CDocument.prototype.Cursor_MoveEndOfLine = function(AddToSelect)
 };
 CDocument.prototype.Cursor_MoveStartOfLine = function(AddToSelect)
 {
+	this.Reset_WordSelection();
 	this.private_UpdateTargetForCollaboration();
 
 	this.Controller.MoveCursorToStartOfLine(AddToSelect);
@@ -4177,11 +4187,13 @@ CDocument.prototype.Cursor_MoveStartOfLine = function(AddToSelect)
 };
 CDocument.prototype.Cursor_MoveAt = function(X, Y, AddToSelect)
 {
+	this.Reset_WordSelection();
 	this.private_UpdateTargetForCollaboration();
 	this.Controller.MoveCursorToXY(X, Y, this.CurPage, AddToSelect);
 };
 CDocument.prototype.Cursor_MoveToCell = function(bNext)
 {
+	this.Reset_WordSelection();
 	this.private_UpdateTargetForCollaboration();
 	this.Controller.MoveCursorToCell(bNext);
 };
@@ -4778,6 +4790,7 @@ CDocument.prototype.Internal_GetContentPosByXY = function(X, Y, PageNum, Columns
 };
 CDocument.prototype.Selection_Remove = function(bNoCheckDrawing)
 {
+	this.Reset_WordSelection();
 	this.Controller.RemoveSelection(bNoCheckDrawing);
 };
 CDocument.prototype.Selection_IsEmpty = function(bCheckHidden)
@@ -4800,6 +4813,8 @@ CDocument.prototype.Selection_Clear = function()
 };
 CDocument.prototype.Selection_SetStart         = function(X, Y, MouseEvent)
 {
+	this.Reset_WordSelection();
+
     var bInText      = (null === this.Is_InText(X, Y, this.CurPage) ? false : true);
     var bTableBorder = (null === this.Is_TableBorder(X, Y, this.CurPage) ? false : true);
     var nInDrawing   = this.DrawingObjects.isPointInDrawingObjects(X, Y, this.CurPage, this);
@@ -4987,8 +5002,10 @@ CDocument.prototype.Selection_SetStart         = function(X, Y, MouseEvent)
  */
 CDocument.prototype.Selection_SetEnd = function(X, Y, MouseEvent)
 {
-    // Работаем с колонтитулом
-    if (docpostype_HdrFtr === this.CurPos.Type)
+	this.Reset_WordSelection();
+
+	// Работаем с колонтитулом
+	if (docpostype_HdrFtr === this.CurPos.Type)
     {
         this.HdrFtr.Selection_SetEnd(X, Y, this.CurPage, MouseEvent);
         if (AscCommon.g_mouse_event_type_up == MouseEvent.Type)
@@ -5292,6 +5309,7 @@ CDocument.prototype.Select_All = function()
 {
 	this.private_UpdateTargetForCollaboration();
 
+	this.Reset_WordSelection();
 	this.Controller.SelectAll();
 
 	// TODO: Пока делаем Start = true, чтобы при Ctrl+A не происходил переход к концу селекта, надо будет
@@ -9906,6 +9924,18 @@ CDocument.prototype.private_ProcessTemplateReplacement = function(TemplateReplac
 		this.SearchEngine.Replace_All(TemplateReplacementData[Id], false);
 	}
 };
+CDocument.prototype.Reset_WordSelection = function()
+{
+	this.Selection.WordSelected = false;
+};
+CDocument.prototype.Set_WordSelection = function()
+{
+	this.Selection.WordSelected = true;
+};
+CDocument.prototype.Is_WordSelection = function()
+{
+	return this.Selection.WordSelected;
+};
 CDocument.prototype.Get_EditingType = function()
 {
 	return this.EditingType;
@@ -11640,6 +11670,8 @@ CDocument.prototype.controller_AddToParagraph = function(ParaItem, bRecalculate)
 {
 	if (true === this.Selection.Use)
 	{
+		var bAddSpace = this.Is_WordSelection();
+
 		var Type = ParaItem.Get_Type();
 		switch (Type)
 		{
@@ -11658,6 +11690,12 @@ CDocument.prototype.controller_AddToParagraph = function(ParaItem, bRecalculate)
 				// Если у нас что-то заселекчено и мы вводим текст или пробел
 				// и т.д., тогда сначала удаляем весь селект.
 				this.Remove(1, true, false, true);
+
+				if (true === bAddSpace)
+				{
+					this.Paragraph_Add(new ParaSpace());
+					this.Cursor_MoveLeft(false, false);
+				}
 				break;
 			}
 			case para_TextPr:

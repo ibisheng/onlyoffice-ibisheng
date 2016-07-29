@@ -12626,7 +12626,7 @@ CTable.prototype =
             TableGrid_min[Index] = SumGrid_min[Index] - SumGrid_min[Index - 1];
 
         var CurrentW = SumGrid[SumGrid.length - 1];
-        while ( Grids_to_scale_count > 0 )
+        while ( Grids_to_scale_count > 0 && CurrentW > 0.001 )
         {
             // Пробуем ужать колонки таблицы
             var Koef = TableW / CurrentW;

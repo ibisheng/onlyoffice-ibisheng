@@ -121,6 +121,7 @@
 		this.IsUseFirstTextInputAfterComposition = false;
 
 		this.nativeFocusElement = null;
+		this.nativeFocusElementNoRemoveOnElementFocus = false;
 		this.InterfaceEnableKeyEvents = true;
 
 		this.ieNonCompositionPrefix = "";
@@ -132,6 +133,17 @@
 		this.isDebug 	= false;
 		this.isSystem 	= false;
 		this.isShow		= false;
+
+		// в хроме бывают случаи, когда приходит keyDown, но не приходит keyPress
+		// и это без композитного ввода (например китайский язык, набирать кнопки 0 -- 9)
+		// следим так: на onInput - если
+		// 1) был keyDown, и на нем "ждем" keyPress
+		// 2) не было keyPress, composition events
+		// 3) тогда вставляем
+		// в ie такие же проблемы. приходят только пустые start и end
+		// поэтому учитываем только update, заодно запоминаем дату на старте (только для ие)
+		this.isChromeKeysNoKeyPressPresent = false;
+		this.isChromeKeysNoKeyPressPresentStartValue = "";
 	}
 
 	CTextInput.prototype =
@@ -168,7 +180,7 @@
 			this.HtmlArea.id                   	= "area_id";
 
 			var _style = "left:0px;top:" + (-this.HtmlAreaOffset) + "px;";
-			_style += "background:transparent;border:none;position:absolute;text-shadow:0 0 0 #000;outline:none;color:transparent;width:1000px;height:50px;";
+			_style += "background:transparent;border:none;position:absolute;text-shadow:0 0 0 #000;outline:none;color:transparent;width:100%;height:100%;";
 			_style += "overflow:hidden;padding:0px;margin:0px;font-family:arial;font-size:12pt;resize:none;font-weight:normal;box-sizing:content-box;-moz-box-sizing:content-box;-webkit-box-sizing:content-box;";
 			this.HtmlArea.setAttribute("style", _style);
 			this.HtmlArea.setAttribute("spellcheck", false);
@@ -291,6 +303,7 @@
 			var xPos    = x ? x : parseInt(oTarget.style.left);
 			var yPos    = (y ? y : parseInt(oTarget.style.top)) + parseInt(oTarget.style.height);
 
+			/*
 			if (!this.isDebug && !this.isSystem)
 			{
 				this.HtmlDiv.style.left = xPos + "px";
@@ -301,6 +314,10 @@
 				// this.HtmlAreaOffset - не сдвигаем, курсор должен быть виден
 				this.debugCalculatePlace(xPos, yPos);
 			}
+			*/
+			if (!this.isDebug && !this.isSystem)
+				yPos += this.HtmlAreaOffset;
+			this.debugCalculatePlace(xPos, yPos);
 		},
 
 		putAreaValue : function(val)
@@ -473,6 +490,8 @@
 				return;
 			}
 
+			ti_console_log("ti: onInput");
+
 			if (AscCommon.AscBrowser.isMozilla)
 			{
 				if (c_oCompositionState.process == this.compositionState)
@@ -494,6 +513,21 @@
 
 			this.TextInputAfterComposition = false;
 
+			if (this.isChromeKeysNoKeyPressPresent && c_oCompositionState.end == this.compositionState)
+			{
+				this.Api.Begin_CompositeInput();
+
+				if (this.isChromeKeysNoKeyPressPresentStartValue != "")
+				{
+					if (0 == _value.indexOf(this.isChromeKeysNoKeyPressPresentStartValue))
+						_value = _value.substr(this.isChromeKeysNoKeyPressPresentStartValue.length);
+				}
+
+				this.checkCompositionData(_value);
+				this.Api.Replace_CompositeText(this.compositionValue);
+				this.Api.End_CompositeInput();
+			}
+
 			if (c_oCompositionState.end == this.compositionState)
 			{
 				if (AscCommon.AscBrowser.isChrome && AscCommon.AscBrowser.isLinuxOS)
@@ -510,7 +544,10 @@
 							charCode : 0,
 							which : 0,
 							keyCode : 12288,
-							code : "space"
+							code : "space",
+
+							preventDefault : function() {},
+							stopPropagation : function() {}
 						};
 						this.Api.onKeyDown(_e);
 						this.Api.onKeyUp(_e);
@@ -546,6 +583,12 @@
 				if (c_oCompositionState.end == this.compositionState)
 					this.clear();
 			}
+
+			if (AscCommon.AscBrowser.isIeEdge && this.TextInputAfterComposition)
+			{
+				this.TextInputAfterComposition = false;
+				this.clear();
+			}
 		},
 
 		emulateNativeKeyDown : function(e)
@@ -580,6 +623,13 @@
 					return this.keyCodeVal;
 				}
 			});
+
+			if (AscCommon.AscBrowser.isIE)
+			{
+				oEvent.preventDefault = function () {
+					Object.defineProperty(this, "defaultPrevented", {get: function () {return true;}});
+				};
+			}
 
 			var k = e.keyCode;
 			if (oEvent.initKeyboardEvent)
@@ -715,6 +765,7 @@
 
 		onKeyDown : function(e)
 		{
+			this.isChromeKeysNoKeyPressPresent = false;
 			if (this.isSystem && this.isShow)
 			{
 				// нужно проверить на enter
@@ -769,7 +820,7 @@
 			if (_code != 8 && _code != 46)
 				this.KeyDownFlag = true;
 
-			if (AscCommon.AscBrowser.isIE)
+			if (AscCommon.AscBrowser.isIE && !AscCommon.AscBrowser.isIeEdge)
 			{
 				if (_code == 13 || this.isSpaceSymbol(e))
 				{
@@ -780,11 +831,14 @@
 				}
 			}
 
-			return this.Api.onKeyDown(e);
+			var _ret = this.Api.onKeyDown(e);
+			if (!e.defaultPrevented && (AscCommon.AscBrowser.isIE || AscCommon.AscBrowser.isChrome))
+				this.isChromeKeysNoKeyPressPresent = true;
 		},
 
 		onKeyPress : function(e)
 		{
+			this.isChromeKeysNoKeyPressPresent = false;
 			if (this.isSystem)
 				return;
 
@@ -796,6 +850,7 @@
 
 		onKeyUp : function(e)
 		{
+			this.isChromeKeysNoKeyPressPresent = false;
 			if (this.isSystem && this.isShow)
 				return;
 
@@ -821,6 +876,14 @@
 				AscCommon.AscBrowser.isIE)
 			{
 				this.checkTargetPosition();
+			}
+
+			if (this.IsUseFirstTextInputAfterComposition && c_oCompositionState.process == this.compositionState)
+			{
+				// chrome escape input. empty data and textInput not called
+
+				this.onCompositionEnd(e, "");
+				this.IsUseFirstTextInputAfterComposition = false;
 			}
 		},
 
@@ -890,8 +953,14 @@
 
 		onCompositionStart : function(e)
 		{
+			if (!AscCommon.AscBrowser.isIE)
+				this.isChromeKeysNoKeyPressPresent = false;
+
 			if (this.isSystem)
+			{
+				this.isChromeKeysNoKeyPressPresent = false;
 				return;
+			}
 
 			ti_console_log2("begin");
 			if (this.compositionState == c_oCompositionState.end)
@@ -900,6 +969,11 @@
 			this.compositionState = c_oCompositionState.start;
 
 			this.isFirstCompositionUpdateAfterStart = true;
+
+			if (AscCommon.AscBrowser.isIE)
+			{
+				this.isChromeKeysNoKeyPressPresentStartValue = this.getAreaValue();
+			}
 
 			ti_console_log("ti: onCompositionStart");
 
@@ -919,8 +993,19 @@
 
 		onCompositionUpdate : function(e, isLockTarget, _data, isFromEnd)
 		{
+			if (!AscCommon.AscBrowser.isIE)
+				this.isChromeKeysNoKeyPressPresent = false;
+			else if (undefined == isFromEnd)
+				this.isChromeKeysNoKeyPressPresent = false;
+
+			if (!this.isChromeKeysNoKeyPressPresent)
+				this.isChromeKeysNoKeyPressPresentStartValue = "";
+
 			if (this.isSystem)
+			{
+				this.isChromeKeysNoKeyPressPresent = false;
 				return;
+			}
 
 			ti_console_log("ti: onCompositionUpdate: " + e.data);
 
@@ -1060,8 +1145,14 @@
 
 		onCompositionEnd : function(e, _data)
 		{
+			if (!AscCommon.AscBrowser.isIE)
+				this.isChromeKeysNoKeyPressPresent = false;
+
 			if (this.isSystem)
+			{
+				this.isChromeKeysNoKeyPressPresent = false;
 				return;
+			}
 
 			ti_console_log("ti: onCompositionEnd");
 
@@ -1088,6 +1179,7 @@
 				{
 					// edge: не натуральный end!!!
 					this.compositionState = c_oCompositionState.process;
+					this.isChromeKeysNoKeyPressPresent = false;
 					return;
 				}
 				else
@@ -1099,6 +1191,8 @@
 			{
 				this.Api.End_CompositeInput();
 			}
+
+			this.Api.End_CompositeInput();
 
 			this.unlockTarget();
 			this.TextInputAfterComposition = true;
@@ -1205,9 +1299,13 @@
 		document.addEventListener("focus", function(e)
 		{
 			var t                = window['AscCommon'].g_inputContext;
+			var _oldNativeFE	 = t.nativeFocusElement;
 			t.nativeFocusElement = e.target;
 
 			//console.log(t.nativeFocusElement);
+
+			var _nativeFocusElementNoRemoveOnElementFocus = t.nativeFocusElementNoRemoveOnElementFocus;
+			t.nativeFocusElementNoRemoveOnElementFocus = false;
 
 			if (t.InterfaceEnableKeyEvents == false)
 			{
@@ -1218,7 +1316,12 @@
 			if (t.nativeFocusElement.id == t.HtmlArea.id)
 			{
 				t.Api.asc_enableKeyEvents(true, true);
-				t.nativeFocusElement = null;
+
+				if (_nativeFocusElementNoRemoveOnElementFocus)
+					t.nativeFocusElement = _oldNativeFE;
+				else
+					t.nativeFocusElement = null;
+
 				return;
 			}
 			if (t.nativeFocusElement.id == window['AscCommon'].g_clipboardBase.CommonDivId)
@@ -1226,6 +1329,8 @@
 				t.nativeFocusElement = null;
 				return;
 			}
+
+			t.nativeFocusElementNoRemoveOnElementFocus = false;
 
 			var _isElementEditable = false;
 			if (true)
@@ -1283,6 +1388,7 @@
 				t.nativeFocusElement = null;
 
 			var _elem = t.nativeFocusElement;
+			t.nativeFocusElementNoRemoveOnElementFocus = true; // ie focus async
 			t.HtmlArea.focus();
 			t.nativeFocusElement = _elem;
 			t.Api.asc_enableKeyEvents(true, true);

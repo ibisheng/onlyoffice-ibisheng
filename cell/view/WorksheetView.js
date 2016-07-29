@@ -12273,7 +12273,7 @@
             this._isLockedAll(onChangeAutoFilterCallback);
         } else//add autofilter + apply
         {
-            if (t._checkAddAutoFilter(ar, null, autoFilterObject) === true) {
+            if (t._checkAddAutoFilter(ar, null, autoFilterObject, true) === true) {
                 this._isLockedAll(onChangeAutoFilterCallback);
                 this._isLockedDefNames(null, null);
             }
@@ -12792,7 +12792,7 @@
         return result;
     };
 
-    WorksheetView.prototype._checkAddAutoFilter = function (activeRange, styleName, addFormatTableOptionsObj) {
+    WorksheetView.prototype._checkAddAutoFilter = function (activeRange, styleName, addFormatTableOptionsObj, filterByCellContextMenu) {
         //write error, if not add autoFilter and return false
         var result = true;
         var worksheet = this.model;
@@ -12809,7 +12809,13 @@
             worksheet.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterDataRangeError,
               c_oAscError.Level.NoCritical);
             result = false;
-        } else if (styleName && addFormatTableOptionsObj && addFormatTableOptionsObj.isTitle === false &&
+        }
+        else if (!styleName && filterByCellContextMenu && false === worksheet.autoFilters._getAdjacentCellsAF(activeRange, this).isIntersect(activeRange))//add filter to empty range
+        {
+            worksheet.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterDataRangeError,
+                c_oAscError.Level.NoCritical);
+            result = false;
+        }else if (styleName && addFormatTableOptionsObj && addFormatTableOptionsObj.isTitle === false &&
           worksheet.autoFilters._isEmptyCellsUnderRange(activeRange) == false &&
           worksheet.autoFilters._isPartTablePartsUnderRange(activeRange))//add format table without title if down another format table
         {

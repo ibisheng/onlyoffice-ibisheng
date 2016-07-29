@@ -155,7 +155,6 @@
 		this.callTopLineMouseup = false;
 		this.lastKeyCode = undefined;
 		this.m_nEditorState = c_oAscCellEditorState.editEnd; // Состояние редактора
-		this.isUpdateValue = true;							// Обновлять ли состояние строки при вводе в TextArea
 
 		// Функции, которые будем отключать
 		this.fKeyMouseUp = null;
@@ -2503,17 +2502,17 @@
 	};
 
 	/** @param event {KeyboardEvent} */
-	CellEditor.prototype._onWindowKeyPress = function ( event ) {
+	CellEditor.prototype._onWindowKeyPress = function (event) {
 		var t = this;
 		var ctrlKey = event.metaKey || event.ctrlKey;
 
-		if ( !window['IS_NATIVE_EDITOR'] ) {
+		if (!window['IS_NATIVE_EDITOR']) {
 
-			if ( !t.isOpened || !t.enableKeyEvents ) {
+			if (!t.isOpened || !t.enableKeyEvents) {
 				return true;
 			}
 
-			if ( t.skipKeyPress || event.which < 32 || event.altKey || ctrlKey ) {
+			if (t.skipKeyPress || event.which < 32 || event.altKey || ctrlKey) {
 				t.skipKeyPress = true;
 				return true;
 			}
@@ -2522,44 +2521,42 @@
 			//if (t.handlers.trigger("isGlobalLockEditCell"))
 			//	return true;
 
-			if ( !t.hasFocus ) {
-				t.setFocus( true );
+			if (!t.hasFocus) {
+				t.setFocus(true);
 			}
 
 			// определение ввода иероглифов
-			if ( t.isTopLineActive && t._getFragmentsLength( t.options.fragments ) !== t.input.value.length ) {
+			if (t.isTopLineActive && t._getFragmentsLength(t.options.fragments) !== t.input.value.length) {
 				t._syncEditors();
 			}
 
 			//t.setFocus(true);
 		}
 
-		t.isUpdateValue = false;
-
 		var tmpCursorPos;
-		var newChar = String.fromCharCode( event.which );
-		t._addChars( newChar );
+		var newChar = String.fromCharCode(event.which);
+		t._addChars(newChar);
 		// При первом быстром вводе стоит добавить в конце проценты (для процентного формата и только для числа)
-		if ( t.options.isAddPersentFormat && AscCommon.isNumber( newChar ) ) {
+		if (t.options.isAddPersentFormat && AscCommon.isNumber(newChar)) {
 			t.options.isAddPersentFormat = false;
 			tmpCursorPos = t.cursorPos;
 			t.undoMode = true;
-			t._addChars( "%" );
+			t._addChars("%");
 			t.cursorPos = tmpCursorPos;
 			t.undoMode = false;
 			t._updateCursorPosition();
 		}
-		if ( t.textRender.getEndOfText() === t.cursorPos && !t.isFormula() ) {
-			var s = t._getFragmentsText( t.options.fragments );
-			if ( !AscCommon.isNumber( s ) ) {
-				var arrAutoComplete = t._getAutoComplete( s.toLowerCase() );
+		if (t.textRender.getEndOfText() === t.cursorPos && !t.isFormula()) {
+			var s = t._getFragmentsText(t.options.fragments);
+			if (!AscCommon.isNumber(s)) {
+				var arrAutoComplete = t._getAutoComplete(s.toLowerCase());
 				var lengthInput = s.length;
-				if ( 1 === arrAutoComplete.length ) {
+				if (1 === arrAutoComplete.length) {
 					var newValue = arrAutoComplete[0];
 					tmpCursorPos = t.cursorPos;
-					t._addChars( newValue.substring( lengthInput ) );
+					t._addChars(newValue.substring(lengthInput));
 					t.selectionBegin = tmpCursorPos;
-					t._selectChars( kEndOfText );
+					t._selectChars(kEndOfText);
 				}
 			}
 		}
@@ -2664,17 +2661,12 @@
 	};
 
 	/** @param event {jQuery.Event} */
-	CellEditor.prototype._onInputTextArea = function ( event ) {
-		if ( this.handlers.trigger( "isViewerMode" ) ) {
+	CellEditor.prototype._onInputTextArea = function (event) {
+		if (this.handlers.trigger("isViewerMode")) {
 			return true;
 		}
-
-		if ( this.isUpdateValue ) {
-			// Для языков с иероглифами не приходят эвенты с клавиатуры, поэтому обработаем здесь
-			this.skipTLUpdate = true;
-			this.replaceText( 0, this.textRender.getEndOfLine( this.cursorPos ), this.input.value );
-		}
-		this.isUpdateValue = true;
+		this.skipTLUpdate = true;
+		this.replaceText(0, this.textRender.getEndOfLine(this.cursorPos), this.input.value);
 		return true;
 	};
 

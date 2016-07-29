@@ -783,12 +783,8 @@
 					break;
 
 				case 27: // Esc
-					// (https://bugzilla.mozilla.org/show_bug.cgi?id=614304) - баг в Mozilla: Esc abort XMLHttpRequest and WebSocket
-					// http://bugzserver/show_bug.cgi?id=14631 - наш баг на редактор
-					// Перехватим Esc и отключим дефалтовую обработку
-					stop();
 					t.handlers.trigger("stopFormatPainter");
-                    t.handlers.trigger("stopAddShape");
+					t.handlers.trigger("stopAddShape");
 					return result;
 
 				case 144: //Num Lock
