@@ -9596,15 +9596,17 @@
                         if ( undefined !== pasteContent.content[r][c] ) {
                             var range = t.model.getRange3( r + autoR * plRow, c + autoC * plCol, r + autoR * plRow, c + autoC * plCol );
 
-                            var currentObj = pasteContent.content[r][c].content;
-                            if ( currentObj.length === 1 ) 
+                            var currentObj = pasteContent.content[r][c];
+							var contentCurrentObj = currentObj.content;
+                            if ( contentCurrentObj.length === 1 ) 
 							{
-                                var valFormat = currentObj[0].text;
+                                var onlyChild = contentCurrentObj[0];
+								var valFormat = onlyChild.text;
                                 var nameFormat = false;
 
-                                if ( currentObj[0].cellFrom ) 
+                                if ( onlyChild.cellFrom ) 
 								{
-                                    var offset = range.getCells()[0].getOffset2( currentObj[0].cellFrom ), assemb, _p_ = new AscCommonExcel.parserFormula( currentObj[0].text.substring( 1 ), "", range.worksheet );
+                                    var offset = range.getCells()[0].getOffset2( onlyChild.cellFrom ), assemb, _p_ = new AscCommonExcel.parserFormula( onlyChild.text.substring( 1 ), "", range.worksheet );
 
                                     if ( _p_.parse() ) 
 									{
@@ -9625,27 +9627,27 @@
 								{
                                     range.setNumFormat( nameFormat );
                                 }
-                                range.setBold( currentObj[0].format.b );
-                                range.setItalic( currentObj[0].format.i );
-                                range.setStrikeout( currentObj[0].format.s );
-                                if ( !isOneMerge && currentObj[0].format && currentObj[0].format.c != null && currentObj[0].format.c != undefined ) 
+                                range.setBold( onlyChild.format.b );
+                                range.setItalic( onlyChild.format.i );
+                                range.setStrikeout( onlyChild.format.s );
+                                if ( !isOneMerge && onlyChild.format && onlyChild.format.c != null && onlyChild.format.c != undefined ) 
 								{
-                                    range.setFontcolor( currentObj[0].format.c );
+                                    range.setFontcolor( onlyChild.format.c );
                                 }
-                                range.setUnderline( currentObj[0].format.u );
-                                range.setAlignVertical( currentObj.va );
-                                range.setFontname( currentObj[0].format.fn );
-                                range.setFontsize( currentObj[0].format.fs );
+                                range.setUnderline( onlyChild.format.u );
+                                range.setAlignVertical( contentCurrentObj.va );
+                                range.setFontname( onlyChild.format.fn );
+                                range.setFontsize( onlyChild.format.fs );
                             }
                             else 
 							{
-                                range.setValue2( currentObj );
+                                range.setValue2( contentCurrentObj );
                                 range.setAlignVertical( currentObj.va );
                             }
 
-                            if ( currentObj.length === 1 && currentObj[0].format.fs !== '' && currentObj[0].format.fs !== null && currentObj[0].format.fs !== undefined ) 
+                            if ( contentCurrentObj.length === 1 && contentCurrentObj[0].format.fs !== '' && contentCurrentObj[0].format.fs !== null && contentCurrentObj[0].format.fs !== undefined ) 
 							{
-                                range.setFontsize( currentObj[0].format.fs );
+                                range.setFontsize( contentCurrentObj[0].format.fs );
                             }
                             if ( !isOneMerge ) 
 							{

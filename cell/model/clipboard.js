@@ -2324,7 +2324,7 @@
 				}
 				
 				var cell = this.aResult.getCell(row + this.maxLengthRowCount, col);
-				if(cell && cell.length === 0 && (cell.borders || cell.rowSpan != null))
+				if(cell && cell.content && cell.content.length === 0 && (cell.borders || cell.rowSpan != null))
 				{
 					if(cell.borders)
 					{
