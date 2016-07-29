@@ -6221,6 +6221,9 @@ Paragraph.prototype =
 
                     this.Selection.Use = true;
                     this.Set_SelectionContentPos( StartPos, EndPos );
+
+                    if (this.LogicDocument)
+                        this.LogicDocument.Set_WordSelection();
                 }
                 else // ( 1 == ClickCounter % 2 )
                 {
