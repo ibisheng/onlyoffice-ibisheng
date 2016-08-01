@@ -2511,7 +2511,8 @@ CDocument.prototype.Recalculate_PageColumn                   = function()
                             var NewPageSection           = new CDocumentPageSection();
                             NewPageSection.Pos           = Index;
                             NewPageSection.EndPos        = Index;
-                            NewPageSection.Y             = true === PageSection.Is_CalculatingSectionBottomLine() ? PageSection.CurrentY : SectionY + 0.001;
+                            NewPageSection.Y             = SectionY + 0.001; // bug fix 32748 проверить здесь
+                            //NewPageSection.Y             = true === PageSection.Is_CalculatingSectionBottomLine() ? PageSection.CurrentY : SectionY + 0.001;
                             NewPageSection.YLimit        = true === PageSection.Is_CalculatingSectionBottomLine() ? PageSection.YLimit2 : RealYLimit;
                             Page.Sections[_SectionIndex] = NewPageSection;
 
