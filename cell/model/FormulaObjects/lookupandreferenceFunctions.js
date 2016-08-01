@@ -169,30 +169,41 @@
 		rowNumber = rowNumber.getValue();
 		colNumber = colNumber.getValue();
 		refType = refType.getValue();
-		A1RefType = A1RefType.getValue();
+		A1RefType = A1RefType.toBool();
 
 		if (refType > 4 || refType < 1 || rowNumber < 1 || rowNumber > AscCommon.gc_nMaxRow || colNumber < 1 ||
 			colNumber > AscCommon.gc_nMaxCol) {
 			return this.value = new cError(cErrorType.wrong_value_type);
 		}
 		var strRef;
+		var strColumn = A1RefType ? g_oCellAddressUtils.colnumToColstrFromWsView(colNumber) : colNumber;
+		var strRow;
 		switch (refType) {
 			case 1:
-				strRef = "$" + g_oCellAddressUtils.colnumToColstrFromWsView(colNumber) + "$" + rowNumber;
+				strRow = this._absolute(rowNumber, A1RefType);
+				strColumn = this._absolute(strColumn, A1RefType);
 				break;
 			case 2:
-				strRef = g_oCellAddressUtils.colnumToColstrFromWsView(colNumber) + "$" + rowNumber;
+				strRow = this._absolute(rowNumber, A1RefType);
 				break;
 			case 3:
-				strRef = "$" + g_oCellAddressUtils.colnumToColstrFromWsView(colNumber) + rowNumber;
+				strColumn = this._absolute(strColumn, A1RefType);
+				strRow = rowNumber;
 				break;
 			case 4:
-				strRef = g_oCellAddressUtils.colnumToColstrFromWsView(colNumber) + rowNumber;
+				strRow = rowNumber;
 				break;
 		}
+		strRef = this._getRef(strRow, strColumn, A1RefType);
 
 		return this.value =
 			new cString((cElementType.empty === sheetName.type) ? strRef : parserHelp.get3DRef(sheetName.toString(), strRef));
+	};
+	cADDRESS.prototype._getRef = function (row, col, A1RefType) {
+		return A1RefType ? col + row : 'R' + row + 'C' + col;
+	};
+	cADDRESS.prototype._absolute = function (val, A1RefType) {
+		return A1RefType ? '$' + val : '[' + val + ']';
 	};
 	cADDRESS.prototype.getInfo = function () {
 		return {
