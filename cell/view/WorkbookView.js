@@ -503,11 +503,12 @@
         }
       };
       this.Api.Begin_CompositeInput = function () {
-        self.cellEditor.Begin_CompositeInput();
         if (!self.isCellEditMode) {
           self._onEditCell(false, true, undefined, true, function () {
             self.cellEditor.Begin_CompositeInput();
           });
+        } else {
+          self.cellEditor.Begin_CompositeInput();
         }
       };
       this.Api.Replace_CompositeText = function (arrCharCodes) {

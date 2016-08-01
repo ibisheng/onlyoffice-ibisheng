@@ -383,31 +383,30 @@
 		return true;
 	};
 
-	CellEditor.prototype.setTextStyle = function ( prop, val ) {
+	CellEditor.prototype.setTextStyle = function (prop, val) {
 		var t = this, opt = t.options, begin, end, i, first, last;
 
-		if ( t.selectionBegin !== t.selectionEnd ) {
-			begin = Math.min( t.selectionBegin, t.selectionEnd );
-			end = Math.max( t.selectionBegin, t.selectionEnd );
+		if (t.selectionBegin !== t.selectionEnd) {
+			begin = Math.min(t.selectionBegin, t.selectionEnd);
+			end = Math.max(t.selectionBegin, t.selectionEnd);
 
 			// save info to undo/redo
-			if ( end - begin < 2 ) {
-				t.undoList.push( {fn: t._addChars, args: [t.textRender.getChars( begin, 1 ), begin]} );
+			if (end - begin < 2) {
+				t.undoList.push({fn: t._addChars, args: [t.textRender.getChars(begin, 1), begin]});
+			} else {
+				t.undoList.push({fn: t._addFragments, args: [t._getFragments(begin, end - begin), begin]});
 			}
-			else {
-				t.undoList.push( {fn: t._addFragments, args: [t._getFragments( begin, end - begin ), begin]} );
-			}
 
-			t._extractFragments( begin, end - begin );
+			t._extractFragments(begin, end - begin);
 
-			first = t._findFragment( begin );
-			last = t._findFragment( end - 1 );
+			first = t._findFragment(begin);
+			last = t._findFragment(end - 1);
 
-			if ( first && last ) {
-				for ( i = first.index; i <= last.index; ++i ) {
-					var valTmp = t._setFormatProperty( opt.fragments[i].format, prop, val );
+			if (first && last) {
+				for (i = first.index; i <= last.index; ++i) {
+					var valTmp = t._setFormatProperty(opt.fragments[i].format, prop, val);
 					// Только для горячих клавиш
-					if ( null === val ) {
+					if (null === val) {
 						val = valTmp;
 					}
 				}
@@ -420,18 +419,17 @@
 				t._drawSelection();
 
 				// save info to undo/redo
-				t.undoList.push( {fn: t._removeChars, args: [begin, end - begin]} );
+				t.undoList.push({fn: t._removeChars, args: [begin, end - begin]});
 				t.redoList = [];
 			}
 
-		}
-		else {
-			first = t._findFragmentToInsertInto( t.cursorPos );
-			if ( first ) {
-				if ( !t.newTextFormat ) {
+		} else {
+			first = t._findFragmentToInsertInto(t.cursorPos);
+			if (first) {
+				if (!t.newTextFormat) {
 					t.newTextFormat = opt.fragments[first.index].format.clone();
 				}
-				t._setFormatProperty( t.newTextFormat, prop, val );
+				t._setFormatProperty(t.newTextFormat, prop, val);
 			}
 
 		}
@@ -741,10 +739,10 @@
 		this.skipTLUpdate = tmp;
 	};
 
-	CellEditor.prototype.replaceText = function ( pos, len, newText ) {
-		this._moveCursor( kPosition, pos );
-		this._selectChars( kPosition, pos + len );
-		this._addChars( newText );
+	CellEditor.prototype.replaceText = function (pos, len, newText) {
+		this._moveCursor(kPosition, pos);
+		this._selectChars(kPosition, pos + len);
+		this._addChars(newText);
 	};
 
 	CellEditor.prototype.setFontRenderingMode = function () {
@@ -1703,47 +1701,51 @@
 		t._wrapFragments( t.options.fragments );
 	};
 
-	CellEditor.prototype._addChars = function ( str, pos, isRange ) {
+	CellEditor.prototype._addChars = function (str, pos, isRange) {
 		var opt = this.options, f, l, s, length = str.length;
 
-		if ( !this._checkMaxCellLength( length ) ) {
+		if (!this._checkMaxCellLength(length)) {
 			return false;
 		}
 
 		this.dontUpdateText = true;
 
-		if ( this.selectionBegin !== this.selectionEnd ) {
-			this._removeChars( undefined, undefined, isRange );
+		if (this.selectionBegin !== this.selectionEnd) {
+			var copyFragment = this._findFragmentToInsertInto(Math.min(this.selectionBegin, this.selectionEnd) + 1);
+			if (copyFragment && !this.newTextFormat) {
+				this.newTextFormat = opt.fragments[copyFragment.index].format.clone();
+			}
+
+			this._removeChars(undefined, undefined, isRange);
 		}
 
 		this.dontUpdateText = false;
 
-		if ( pos === undefined ) {
+		if (pos === undefined) {
 			pos = this.cursorPos;
 		}
 
-		if ( !this.undoMode ) {
+		if (!this.undoMode) {
 			// save info to undo/redo
-			this.undoList.push( {fn: this._removeChars, args: [pos, length], isRange: isRange} );
+			this.undoList.push({fn: this._removeChars, args: [pos, length], isRange: isRange});
 			this.redoList = [];
 		}
 
-		if ( this.newTextFormat ) {
-			var oNewObj = new Fragment( {format: this.newTextFormat, text: str} );
-			this._addFragments( [oNewObj], pos );
+		if (this.newTextFormat) {
+			var oNewObj = new Fragment({format: this.newTextFormat, text: str});
+			this._addFragments([oNewObj], pos);
 			delete this.newTextFormat;
-		}
-		else {
-			f = this._findFragmentToInsertInto( pos );
-			if ( f ) {
+		} else {
+			f = this._findFragmentToInsertInto(pos);
+			if (f) {
 				l = pos - f.begin;
 				s = opt.fragments[f.index].text;
-				opt.fragments[f.index].text = s.slice( 0, l ) + str + s.slice( l );
+				opt.fragments[f.index].text = s.slice(0, l) + str + s.slice(l);
 			}
 		}
 
 		this.cursorPos = pos + str.length;
-		if ( !this.noUpdateMode ) {
+		if (!this.noUpdateMode) {
 			this._update();
 		}
 	};
@@ -1753,73 +1755,69 @@
 		this._addChars( kNewLine );
 	};
 
-	CellEditor.prototype._removeChars = function ( pos, length, isRange ) {
+	CellEditor.prototype._removeChars = function (pos, length, isRange) {
 		var t = this, opt = t.options, b, e, l, first, last;
 
-		if ( t.selectionBegin !== t.selectionEnd ) {
-			b = Math.min( t.selectionBegin, t.selectionEnd );
-			e = Math.max( t.selectionBegin, t.selectionEnd );
+		if (t.selectionBegin !== t.selectionEnd) {
+			b = Math.min(t.selectionBegin, t.selectionEnd);
+			e = Math.max(t.selectionBegin, t.selectionEnd);
 			t.selectionBegin = t.selectionEnd = -1;
 			t._cleanSelection();
-		}
-		else if ( length === undefined ) {
-			switch ( pos ) {
+		} else if (length === undefined) {
+			switch (pos) {
 				case kPrevChar:
-					b = t.textRender.getPrevChar( t.cursorPos );
+					b = t.textRender.getPrevChar(t.cursorPos);
 					e = t.cursorPos;
 					break;
 				case kNextChar:
 					b = t.cursorPos;
-					e = t.textRender.getNextChar( t.cursorPos );
+					e = t.textRender.getNextChar(t.cursorPos);
 					break;
 				case kPrevWord:
-					b = t.textRender.getPrevWord( t.cursorPos );
+					b = t.textRender.getPrevWord(t.cursorPos);
 					e = t.cursorPos;
 					break;
 				case kNextWord:
 					b = t.cursorPos;
-					e = t.textRender.getNextWord( t.cursorPos );
+					e = t.textRender.getNextWord(t.cursorPos);
 					break;
 				default:
 					return;
 			}
-		}
-		else {
+		} else {
 			b = pos;
 			e = pos + length;
 		}
 
-		if ( b === e ) {
+		if (b === e) {
 			return;
 		}
 
 		// search for begin and end positions
-		first = t._findFragment( b );
-		last = t._findFragment( e - 1 );
+		first = t._findFragment(b);
+		last = t._findFragment(e - 1);
 
-		if ( !t.undoMode ) {
+		if (!t.undoMode) {
 			// save info to undo/redo
-			if ( e - b < 2 && opt.fragments[first.index].text.length > 1 ) {
-				t.undoList.push( {fn: t._addChars, args: [t.textRender.getChars( b, 1 ), b], isRange: isRange} );
-			}
-			else {
-				t.undoList.push( {fn: t._addFragments, args: [t._getFragments( b, e - b ), b], isRange: isRange} );
+			if (e - b < 2 && opt.fragments[first.index].text.length > 1) {
+				t.undoList.push({fn: t._addChars, args: [t.textRender.getChars(b, 1), b], isRange: isRange});
+			} else {
+				t.undoList.push({fn: t._addFragments, args: [t._getFragments(b, e - b), b], isRange: isRange});
 			}
 			t.redoList = [];
 		}
 
-		if ( first && last ) {
+		if (first && last) {
 			// remove chars
-			if ( first.index === last.index ) {
+			if (first.index === last.index) {
 				l = opt.fragments[first.index].text;
-				opt.fragments[first.index].text = l.slice( 0, b - first.begin ) + l.slice( e - first.begin );
-			}
-			else {
-				opt.fragments[first.index].text = opt.fragments[first.index].text.slice( 0, b - first.begin );
-				opt.fragments[last.index].text = opt.fragments[last.index].text.slice( e - last.begin );
+				opt.fragments[first.index].text = l.slice(0, b - first.begin) + l.slice(e - first.begin);
+			} else {
+				opt.fragments[first.index].text = opt.fragments[first.index].text.slice(0, b - first.begin);
+				opt.fragments[last.index].text = opt.fragments[last.index].text.slice(e - last.begin);
 				l = last.index - first.index;
-				if ( l > 1 ) {
-					opt.fragments.splice( first.index + 1, l - 1 );
+				if (l > 1) {
+					opt.fragments.splice(first.index + 1, l - 1);
 				}
 			}
 			// merge fragments with equal formats
@@ -1827,7 +1825,7 @@
 		}
 
 		t.cursorPos = b;
-		if ( !t.noUpdateMode ) {
+		if (!t.noUpdateMode) {
 			t._update();
 		}
 	};
@@ -1996,16 +1994,16 @@
 	CellEditor.prototype._mergeFragments = function () {
 		var t = this, opt = t.options, i;
 
-		for ( i = 0; i < opt.fragments.length; ) {
-			if ( opt.fragments[i].text.length < 1 && opt.fragments.length > 1 ) {
-				opt.fragments.splice( i, 1 );
+		for (i = 0; i < opt.fragments.length;) {
+			if (opt.fragments[i].text.length < 1 && opt.fragments.length > 1) {
+				opt.fragments.splice(i, 1);
 				continue;
 			}
-			if ( i < opt.fragments.length - 1 ) {
+			if (i < opt.fragments.length - 1) {
 				var fr = opt.fragments[i];
 				var nextFr = opt.fragments[i + 1];
-				if ( fr.format.isEqual( nextFr.format ) ) {
-					opt.fragments.splice( i, 2, new Fragment( {format: fr.format, text: fr.text + nextFr.text} ) );
+				if (fr.format.isEqual(nextFr.format)) {
+					opt.fragments.splice(i, 2, new Fragment({format: fr.format, text: fr.text + nextFr.text}));
 					continue;
 				}
 			}
@@ -2047,8 +2045,8 @@
 		}, "" ) : "";
 	};
 
-	CellEditor.prototype._setFormatProperty = function ( format, prop, val ) {
-		switch ( prop ) {
+	CellEditor.prototype._setFormatProperty = function (format, prop, val) {
+		switch (prop) {
 			case "fn":
 				format.fn = val;
 				format.scheme = Asc.EFontScheme.fontschemeNone;
@@ -2065,7 +2063,8 @@
 				format.i = val;
 				break;
 			case "u":
-				val = (null === val) ? ((Asc.EUnderline.underlineSingle !== format.u) ? Asc.EUnderline.underlineSingle : Asc.EUnderline.underlineNone) : val;
+				val = (null === val) ? ((Asc.EUnderline.underlineSingle !== format.u) ? Asc.EUnderline.underlineSingle :
+					Asc.EUnderline.underlineNone) : val;
 				format.u = val;
 				break;
 			case "s":
@@ -2079,8 +2078,8 @@
 				format.c = val;
 				break;
 			case "changeFontSize":
-				var newFontSize = asc_incDecFonSize( val, format.fs );
-				if ( null !== newFontSize ) {
+				var newFontSize = asc_incDecFonSize(val, format.fs);
+				if (null !== newFontSize) {
 					format.fs = newFontSize;
 				}
 				break;
@@ -2690,6 +2689,7 @@
 	};
 
 	CellEditor.prototype.Begin_CompositeInput = function () {
+		console.log('Begin_CompositeInput');
 		if (this.selectionBegin === this.selectionEnd) {
 			this.beginCompositePos = this.cursorPos;
 			this.compositeLength = 0;
@@ -2697,8 +2697,10 @@
 			this.beginCompositePos = this.selectionBegin;
 			this.compositeLength = this.selectionEnd - this.selectionBegin;
 		}
+		this.setTextStyle('u', Asc.EUnderline.underlineSingle);
 	};
 	CellEditor.prototype.Replace_CompositeText = function (arrCharCodes) {
+		console.log('Replace_CompositeText');
 		if (!this.isOpened) {
 			return;
 		}
@@ -2717,8 +2719,21 @@
 		this.compositeLength = newText.length;
 	};
 	CellEditor.prototype.End_CompositeInput = function () {
+		console.log('End_CompositeInput');
+		var tmpBegin = this.selectionBegin, tmpEnd = this.selectionEnd;
+
+		this.selectionBegin = this.beginCompositePos;
+		this.selectionEnd = this.beginCompositePos + this.compositeLength;
+		this.setTextStyle('u', Asc.EUnderline.underlineNone);
+
 		this.beginCompositePos = -1;
 		this.compositeLength = 0;
+		this.selectionBegin = tmpBegin;
+		this.selectionEnd = tmpEnd;
+
+		// Обновляем выделение
+		this._cleanSelection();
+		this._drawSelection();
 	};
 
 
