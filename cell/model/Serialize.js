@@ -7191,9 +7191,9 @@
                         case c_oSerTableTypes.Worksheets:
                             res = (new Binary_WorksheetTableReader(this.stream, wb, aSharedStrings, aCellXfs, aDxfs, oMediaArray, this.copyPasteObj)).Read();
                             break;
-                        case c_oSerTableTypes.CalcChain:
-                            res = (new Binary_CalcChainTableReader(this.stream, wb.calcChain)).Read();
-                            break;
+                        // case c_oSerTableTypes.CalcChain:
+                        //     res = (new Binary_CalcChainTableReader(this.stream, wb.calcChain)).Read();
+                        //     break;
                         // case c_oSerTableTypes.Other:
                         // res = (new Binary_OtherTableReader(this.stream, oMediaArray)).Read();
                         // break;

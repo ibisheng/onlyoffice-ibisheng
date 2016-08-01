@@ -2962,77 +2962,26 @@ UndoRedoWorkbook.prototype = {
 				this.wb.theme.themeElements.clrScheme = Data.newVal;
 			this.wb.oApi.asc_AfterChangeColorScheme();
 		}
-        else if(AscCH.historyitem_Workbook_DefinedNamesAdd === Type ){
-            if(bUndo){
-                this.wb.delDefinesNames( Data.newName, true );
-                this.wb.handlers.trigger("asc_onDelDefName")
-            }
-            else{
-                if(this.wb.bCollaborativeChanges){
-                    var name = Data.newName.Name, lsID = this.wb.getWorksheet(Data.newName.LocalSheetId);
-                    lsID === null || lsID === undefined ? null : lsID = this.wb.getWorksheet(Data.newName.LocalSheetId).getId();
-
-					var oConflictDefName = this.wb.getDefinesNames(name, lsID);
-					if (oConflictDefName)
-						oConflictDefName.renameDefNameToCollaborate(this.wb.getUniqueDefinedNameFrom(oConflictDefName, true));
-                    this.wb.handlers.trigger("asc_onLockDefNameManager",Asc.c_oAscDefinedNameReason.OK);
-                }
-                this.wb.editDefinesNames( null, Data.newName, true );
-                this.wb.handlers.trigger("asc_onEditDefName", null, Data.newName);
-            }
-            /*TODO
-            * Ввели формулу в которой есть именованный диапазон, но ИД нет в списке ИД. Результат формулы #NAME!.
-            * Создаем ИД с таким же именем, что и в функции. Необходимо пересчитать функцию. Предварительно перестроив
-            * граф зависимостей.
-            * */
-        }
-        else if(AscCH.historyitem_Workbook_DefinedNamesChange === Type ){
-            var oldName, newName;
-            if(bUndo){
-                oldName = Data.newName;
-                newName= Data.oldName;
-            }
-            else{
-                if(this.wb.bCollaborativeChanges){
-                    var name = Data.newName.Name, lsID = this.wb.getWorksheet(Data.newName.LocalSheetId);
-                    lsID === null || lsID === undefined ? null : lsID = this.wb.getWorksheet(Data.newName.LocalSheetId).getId();
-//                    if( this.wb.isDefinedNamesExists(name,lsID) ){
-//                        var oConflictDefName = this.wb.getDefinesNames(name,lsID);
-//                        if(oConflictDefName)
-//                            oConflictDefName.renameDefNameToCollaborate(this.wb.getUniqueDefinedNameFrom(oConflictDefName, true));
-//                    }
-                    this.wb.handlers.trigger("asc_onLockDefNameManager",Asc.c_oAscDefinedNameReason.OK);
-                }
-                oldName = Data.oldName;
-                newName = Data.newName;
-            }
-            this.wb.editDefinesNames( oldName, newName, true );
-            this.wb.handlers.trigger("asc_onEditDefName", oldName, newName);
-        }
-        else if(AscCH.historyitem_Workbook_DefinedNamesDelete === Type ){
-            if(bUndo){
-                this.wb.editDefinesNames( null, Data, true );
-                if( Data.slaveEdge ){
-                    var n;
-                    for(var i = 0; i < Data.slaveEdge.length; i++){
-                        n = this.wb.dependencyFormulas.getNode3(Data.slaveEdge[i]);
-                        if( n ){
-                            this.wb.needRecalc.nodes[n.nodeId] = [n.sheetId, n.cellId ];
-                            this.wb.needRecalc.length++;
-
-                            n = n.returnCell();
-                            if(n){
-                                n.formulaParsed = new AscCommonExcel.parserFormula( n.formulaParsed.Formula, n.formulaParsed.cellId, n.formulaParsed.ws )
-                            }
-                        }
-                    }
-                }
-                this.wb.handlers.trigger("asc_onEditDefName", null, Data);
-            }
-            else{
-                this.wb.delDefinesNames( Data, true );
-            }
-        }
+		else if (AscCH.historyitem_Workbook_DefinedNamesChange === Type) {
+			var oldName, newName;
+			if (bUndo) {
+				oldName = Data.newName;
+				newName = Data.oldName;
+			} else {
+				if (this.wb.bCollaborativeChanges) {
+					this.wb.handlers.trigger("asc_onLockDefNameManager", Asc.c_oAscDefinedNameReason.OK);
+				}
+				oldName = Data.oldName;
+				newName = Data.newName;
+			}
+			if (null == newName) {
+				this.wb.delDefinesNames(oldName);
+				this.wb.handlers.trigger("asc_onDelDefName")
+			} else {
+				this.wb.editDefinesNames(oldName, newName);
+				this.wb.handlers.trigger("asc_onEditDefName", oldName, newName);
+			}
+		}
 	}
 };
 
