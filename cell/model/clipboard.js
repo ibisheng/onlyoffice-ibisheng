@@ -1151,7 +1151,7 @@
 					
 					
 					//отдельная обработка для вставки таблички из презентаций
-					if(data.Drawings.length === 1 && typeof CGraphicFrame !== "undefined" && drawingObject.graphicObject instanceof CGraphicFrame)
+					if(data.Drawings.length === 1 && typeof AscFormat.CGraphicFrame !== "undefined" && drawingObject.graphicObject instanceof AscFormat.CGraphicFrame)
 					{
 						//вставляем табличку из презентаций
 						var oPasteFromBinaryWord = new pasteFromBinaryWord(this, ws);
