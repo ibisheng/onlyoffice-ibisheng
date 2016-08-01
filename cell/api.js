@@ -3504,6 +3504,7 @@ var editor;
   prot["asc_pluginButtonClick"]     = prot.asc_pluginButtonClick;
   prot["asc_addOleObject"]          = prot.asc_addOleObject;
   prot["asc_editOleObject"]         = prot.asc_editOleObject;
+  prot["asc_pluginEnableMouseEvents"] = prot.asc_pluginEnableMouseEvents;
 
   // system input
   prot["SetTextBoxInputMode"]       = prot.SetTextBoxInputMode;

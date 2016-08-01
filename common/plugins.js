@@ -30,626 +30,688 @@
  *
  */
 
-(function(window, undefined){
+(function(window, undefined)
+{
 
-    function CPluginData()
-    {
-        this.privateData = {};
-    }
-    CPluginData.prototype =
-    {
-        setAttribute : function(name, value)
-        {
-            this.privateData[name] = value;
-        },
+	function CPluginData()
+	{
+		this.privateData = {};
+	}
 
-        getAttribute : function(name)
-        {
-            return this.privateData[name];
-        },
+	CPluginData.prototype =
+	{
+		setAttribute : function(name, value)
+		{
+			this.privateData[name] = value;
+		},
 
-        serialize : function()
-        {
-            var _data = "";
-            try
-            {
-                _data = JSON.stringify(this.privateData);
-            }
-            catch(err)
-            {
-                _data = "{ \"data\" : \"\" }";
-            }
-            return _data;
-        },
+		getAttribute : function(name)
+		{
+			return this.privateData[name];
+		},
 
-        deserialize : function(_data)
-        {
-            try
-            {
-                this.privateData = JSON.parse(_data);
-            }
-            catch(err)
-            {
-                this.privateData = { "data" : "" };
-            }
-        }
-    };
+		serialize : function()
+		{
+			var _data = "";
+			try
+			{
+				_data = JSON.stringify(this.privateData);
+			}
+			catch (err)
+			{
+				_data = "{ \"data\" : \"\" }";
+			}
+			return _data;
+		},
 
-    function CPluginsManager(api)
-    {
-        this.plugins = [];
-        this.current = null;
-        this.currentVariation = 0;
-        this.path = "../../../../sdkjs-plugins/";
-        this.api = null;
+		deserialize : function(_data)
+		{
+			try
+			{
+				this.privateData = JSON.parse(_data);
+			}
+			catch (err)
+			{
+				this.privateData = {"data" : ""};
+			}
+		}
+	};
 
-        this.startData = null;
-        this.runAndCloseData = null;
+	function CPluginsManager(api)
+	{
+		this.plugins          = [];
+		this.current          = null;
+		this.currentVariation = 0;
+		this.path             = "../../../../sdkjs-plugins/";
+		this.api              = null;
 
-        this.closeAttackTimer = -1; // защита от плагитнов, которые не закрываются
-    }
+		this.startData       = null;
+		this.runAndCloseData = null;
 
-    CPluginsManager.prototype =
-    {
-        register : function(basePath, plugins)
-        {
-            this.path = basePath;
-            for (var i = 0; i < plugins.length; i++)
-                this.plugins.push(plugins[i]);
-        },
-        run      : function(guid, variation, data)
-        {
-            if (null != this.current)
-            {
-                if (this.current.guid != guid)
-                {
-                    this.runAndCloseData = {};
-                    this.runAndCloseData.guid = guid;
-                    this.runAndCloseData.variation = variation;
-                    this.runAndCloseData.data = data;
-                }
-                // закрываем
-                this.buttonClick(-1);
-                return false;
-            }
+		this.closeAttackTimer = -1; // защита от плагитнов, которые не закрываются
+	}
 
-            for (var i = 0; i < this.plugins.length; i++)
-            {
-                if (this.plugins[i].guid == guid)
-                {
-                    this.current = this.plugins[i];
-                    break;
-                }
-            }
+	CPluginsManager.prototype =
+	{
+		register  : function(basePath, plugins)
+		{
+			this.path = basePath;
+			for (var i = 0; i < plugins.length; i++)
+				this.plugins.push(plugins[i]);
+		},
+		run       : function(guid, variation, data)
+		{
+			if (null != this.current)
+			{
+				if (this.current.guid != guid)
+				{
+					this.runAndCloseData           = {};
+					this.runAndCloseData.guid      = guid;
+					this.runAndCloseData.variation = variation;
+					this.runAndCloseData.data      = data;
+				}
+				// закрываем
+				this.buttonClick(-1);
+				return false;
+			}
 
-            if (this.current == null)
-                return false;
+			for (var i = 0; i < this.plugins.length; i++)
+			{
+				if (this.plugins[i].guid == guid)
+				{
+					this.current = this.plugins[i];
+					break;
+				}
+			}
 
-            this.currentVariation = Math.min(variation, this.current.variations.length - 1);
+			if (this.current == null)
+				return false;
 
-            this.startData = (data == null || data == "") ? new CPluginData() : data;
-            this.startData.setAttribute("guid", guid)
-            this.correctData(this.startData);
-            this.show();
-        },
-        runResize   : function(data)
-        {
-            var guid = data.getAttribute("guid");
-            for (var i = 0; i < this.plugins.length; i++)
-            {
-                if (this.plugins[i].guid == guid)
-                {
-                    if (this.plugins[i].variations[0].isUpdateOleOnResize !== true)
-                        return;
-                }
-            }
+			this.currentVariation = Math.min(variation, this.current.variations.length - 1);
 
-            data.setAttribute("resize", true);
-            return this.run(guid, 0, data);
-        },
-        close    : function()
-        {
-            if (this.startData.getAttribute("resize") === true)
-                this.endLongAction();
-            this.startData = null;
+			this.startData = (data == null || data == "") ? new CPluginData() : data;
+			this.startData.setAttribute("guid", guid)
+			this.correctData(this.startData);
+			this.show();
+		},
+		runResize : function(data)
+		{
+			var guid = data.getAttribute("guid");
+			for (var i = 0; i < this.plugins.length; i++)
+			{
+				if (this.plugins[i].guid == guid)
+				{
+					if (this.plugins[i].variations[0].isUpdateOleOnResize !== true)
+						return;
+				}
+			}
 
-            if (true)
-            {
-                this.api.sendEvent("asc_onPluginClose");
-                var _div = document.getElementById("plugin_iframe");
-                if (_div)
-                    _div.parentNode.removeChild(_div);
-            }
-            this.current = null;
+			data.setAttribute("resize", true);
+			return this.run(guid, 0, data);
+		},
+		close     : function()
+		{
+			if (this.startData.getAttribute("resize") === true)
+				this.endLongAction();
+			this.startData = null;
 
-            if (this.runAndCloseData)
-            {
-                this.run(this.runAndCloseData.guid, this.runAndCloseData.variation, this.runAndCloseData.data);
-                this.runAndCloseData = null;
-            }
-        },
+			if (true)
+			{
+				this.api.sendEvent("asc_onPluginClose");
+				var _div = document.getElementById("plugin_iframe");
+				if (_div)
+					_div.parentNode.removeChild(_div);
+			}
+			this.current = null;
 
-        show : function()
-        {
-            if (this.startData.getAttribute("resize") === true)
-                this.startLongAction();
+			if (this.runAndCloseData)
+			{
+				this.run(this.runAndCloseData.guid, this.runAndCloseData.variation, this.runAndCloseData.data);
+				this.runAndCloseData = null;
+			}
+		},
 
-            if (this.current.variations[this.currentVariation].isVisual && this.startData.getAttribute("resize") !== true)
-            {
-                this.api.sendEvent("asc_onPluginShow", this.current, this.currentVariation);
-            }
-            else
-            {
-                var ifr = document.createElement("iframe");
-                ifr.name = "plugin_iframe";
-                ifr.id = "plugin_iframe";
-                var _add = this.current.baseUrl == "" ? this.path : this.current.baseUrl;
-                ifr.src = _add + this.current.variations[this.currentVariation].url;
-                ifr.style.position = 'absolute';
-                ifr.style.top = '-100px';
-                ifr.style.left = '0px';
-                ifr.style.width = '10000px';
-                ifr.style.height = '100px';
-                ifr.style.overflow = 'hidden';
-                ifr.style.zIndex = -1000;
-                document.body.appendChild(ifr);
-            }
-        },
+		show : function()
+		{
+			if (this.startData.getAttribute("resize") === true)
+				this.startLongAction();
 
-        buttonClick : function(id)
-        {
-            if (this.closeAttackTimer != -1)
-            {
-                clearTimeout(this.closeAttackTimer);
-                this.closeAttackTimer = -1;
-            }
+			if (this.current.variations[this.currentVariation].isVisual && this.startData.getAttribute("resize") !== true)
+			{
+				this.api.sendEvent("asc_onPluginShow", this.current, this.currentVariation);
+			}
+			else
+			{
+				var ifr            = document.createElement("iframe");
+				ifr.name           = "plugin_iframe";
+				ifr.id             = "plugin_iframe";
+				var _add           = this.current.baseUrl == "" ? this.path : this.current.baseUrl;
+				ifr.src            = _add + this.current.variations[this.currentVariation].url;
+				ifr.style.position = 'absolute';
+				ifr.style.top      = '-100px';
+				ifr.style.left     = '0px';
+				ifr.style.width    = '10000px';
+				ifr.style.height   = '100px';
+				ifr.style.overflow = 'hidden';
+				ifr.style.zIndex   = -1000;
+				document.body.appendChild(ifr);
+			}
+		},
 
-            if (-1 == id)
-            {
-                // защита от плохого плагина
-                this.closeAttackTimer = setTimeout(function(){ window.g_asc_plugins.close(); }, 5000);
-            }
-            var _iframe = document.getElementById("plugin_iframe");
-            if (_iframe)
-            {
-                var pluginData = new CPluginData();
-                pluginData.setAttribute("guid", this.current.guid);
-                pluginData.setAttribute("type", "button");
-                pluginData.setAttribute("button", "" + id);
-                _iframe.contentWindow.postMessage(pluginData.serialize(), "*");
-            }
-        },
+		buttonClick : function(id)
+		{
+			if (this.closeAttackTimer != -1)
+			{
+				clearTimeout(this.closeAttackTimer);
+				this.closeAttackTimer = -1;
+			}
 
-        init : function()
-        {
-            switch (this.current.variations[this.currentVariation].initDataType)
-            {
-                case Asc.EPluginDataType.text:
-                {
-                    var text_data = {
-                        data : "",
-                        pushData : function(format, value) { this.data = value; }
-                    };
-                    
-                    this.api.asc_CheckCopy(text_data, 1);
-                    this.startData.setAttribute("data", text_data.data);
-                    break;
-                }
-                case Asc.EPluginDataType.html:
-                {
-                    var text_data = {
-                        data : "",
-                        pushData : function(format, value) { this.data = value; }
-                    };
+			if (-1 == id)
+			{
+				// защита от плохого плагина
+				this.closeAttackTimer = setTimeout(function()
+				{
+					window.g_asc_plugins.close();
+				}, 5000);
+			}
+			var _iframe = document.getElementById("plugin_iframe");
+			if (_iframe)
+			{
+				var pluginData = new CPluginData();
+				pluginData.setAttribute("guid", this.current.guid);
+				pluginData.setAttribute("type", "button");
+				pluginData.setAttribute("button", "" + id);
+				_iframe.contentWindow.postMessage(pluginData.serialize(), "*");
+			}
+		},
 
-                    this.api.asc_CheckCopy(text_data, 2);
-                    this.startData.setAttribute("data", text_data.data);
-                    break;
-                }
-                case Asc.EPluginDataType.ole:
-                {
-                    // теперь выше задается
-                    break;
-                }
-            }
-            
-            var _iframe = document.getElementById("plugin_iframe");
-            if (_iframe)
-            {
-                this.startData.setAttribute("type", "init");
-                _iframe.contentWindow.postMessage(this.startData.serialize(), "*");
-            }
-        },
-        correctData : function(pluginData)
-        {
-            pluginData.setAttribute("editorType", this.api._editorNameById());
+		init                 : function()
+		{
+			switch (this.current.variations[this.currentVariation].initDataType)
+			{
+				case Asc.EPluginDataType.text:
+				{
+					var text_data = {
+						data     : "",
+						pushData : function(format, value)
+						{
+							this.data = value;
+						}
+					};
 
-            var _mmToPx = AscCommon.g_dKoef_mm_to_pix;
-            if (this.api.WordControl && this.api.WordControl.m_nZoomValue)
-                _mmToPx *= this.api.WordControl.m_nZoomValue / 100;
+					this.api.asc_CheckCopy(text_data, 1);
+					this.startData.setAttribute("data", text_data.data);
+					break;
+				}
+				case Asc.EPluginDataType.html:
+				{
+					var text_data = {
+						data     : "",
+						pushData : function(format, value)
+						{
+							this.data = value;
+						}
+					};
 
-            pluginData.setAttribute("mmToPx", _mmToPx);
+					this.api.asc_CheckCopy(text_data, 2);
+					this.startData.setAttribute("data", text_data.data);
+					break;
+				}
+				case Asc.EPluginDataType.ole:
+				{
+					// теперь выше задается
+					break;
+				}
+			}
 
-            if (undefined == pluginData.getAttribute("data"))
-                pluginData.setAttribute("data", "");
-        },
-        loadExtensionPlugins : function(_plugins)
-        {
-            if (!_plugins || _plugins.length < 1)
-                return;
+			var _iframe = document.getElementById("plugin_iframe");
+			if (_iframe)
+			{
+				this.startData.setAttribute("type", "init");
+				_iframe.contentWindow.postMessage(this.startData.serialize(), "*");
+			}
+		},
+		correctData          : function(pluginData)
+		{
+			pluginData.setAttribute("editorType", this.api._editorNameById());
 
-            var _map = {};
-            for (var i = 0; i < this.plugins.length; i++)
-                _map[this.plugins[i].guid] = true;
+			var _mmToPx = AscCommon.g_dKoef_mm_to_pix;
+			if (this.api.WordControl && this.api.WordControl.m_nZoomValue)
+				_mmToPx *= this.api.WordControl.m_nZoomValue / 100;
 
-            for (var i = 0; i < _plugins.length; i++)
-            {
-                var _p = new Asc.CPlugin();
-                _p["deserialize"](_plugins[i]);
+			pluginData.setAttribute("mmToPx", _mmToPx);
 
-                if (_map[_p.guid] === true)
-                    continue;
+			if (undefined == pluginData.getAttribute("data"))
+				pluginData.setAttribute("data", "");
+		},
+		loadExtensionPlugins : function(_plugins)
+		{
+			if (!_plugins || _plugins.length < 1)
+				return;
 
-                this.plugins.push(_p);
-            }
+			var _map = {};
+			for (var i = 0; i < this.plugins.length; i++)
+				_map[this.plugins[i].guid] = true;
 
-            var _pluginsInstall = { "url" : this.path, "pluginsData" : [] };
-            for (var i = 0; i < this.plugins.length; i++)
-            {
-                _pluginsInstall["pluginsData"].push(this.plugins[i].serialize());
-            }
+			for (var i = 0; i < _plugins.length; i++)
+			{
+				var _p = new Asc.CPlugin();
+				_p["deserialize"](_plugins[i]);
 
-            this.api.sendEvent("asc_onPluginsInit", _pluginsInstall);
-        },
+				if (_map[_p.guid] === true)
+					continue;
 
-        startLongAction : function()
-        {
-            //console.log("startLongAction");
-            this.api.sync_StartAction(Asc.c_oAscAsyncActionType.BlockInteraction, Asc.c_oAscAsyncAction.SlowOperation);
-        },
-        endLongAction : function()
-        {
-            //console.log("endLongAction");
-            this.api.sync_EndAction(Asc.c_oAscAsyncActionType.BlockInteraction, Asc.c_oAscAsyncAction.SlowOperation);
-        }
-    };
+				this.plugins.push(_p);
+			}
 
-    // export
-    CPluginsManager.prototype["buttonClick"] = CPluginsManager.prototype.buttonClick;
+			var _pluginsInstall = {"url" : this.path, "pluginsData" : []};
+			for (var i = 0; i < this.plugins.length; i++)
+			{
+				_pluginsInstall["pluginsData"].push(this.plugins[i].serialize());
+			}
 
-    function onMessage(event)
-    {
-        if (!window.g_asc_plugins || !window.g_asc_plugins.current)
-            return;
+			this.api.sendEvent("asc_onPluginsInit", _pluginsInstall);
+		},
 
-        if (typeof(event.data) == "string")
-        {
-            var pluginData = new CPluginData();
-            pluginData.deserialize(event.data);
+		startLongAction : function()
+		{
+			//console.log("startLongAction");
+			this.api.sync_StartAction(Asc.c_oAscAsyncActionType.BlockInteraction, Asc.c_oAscAsyncAction.SlowOperation);
+		},
+		endLongAction   : function()
+		{
+			//console.log("endLongAction");
+			this.api.sync_EndAction(Asc.c_oAscAsyncActionType.BlockInteraction, Asc.c_oAscAsyncAction.SlowOperation);
+		},
 
-            var guid = pluginData.getAttribute("guid");
+		sendMessage : function(pluginData)
+		{
+			if (!this.current)
+				return;
 
-            if (guid != window.g_asc_plugins.current.guid)
-                return;
+			var _iframe = document.getElementById("plugin_iframe");
+			if (_iframe)
+			{
+				pluginData.setAttribute("guid", this.current.guid);
+				_iframe.contentWindow.postMessage(pluginData.serialize(), "*");
+			}
+		}
+	};
 
-            var name = pluginData.getAttribute("type");
-            var value = pluginData.getAttribute("data");
+	// export
+	CPluginsManager.prototype["buttonClick"] = CPluginsManager.prototype.buttonClick;
 
-            if ("initialize" == name)
-            {
-                window.g_asc_plugins.init();
-                return;
-            }
-            else if ("close" == name || "command" == name)
-            {
-                if (window.g_asc_plugins.closeAttackTimer != -1)
-                {
-                    clearTimeout(window.g_asc_plugins.closeAttackTimer);
-                    window.g_asc_plugins.closeAttackTimer = -1;
-                }
+	function onMessage(event)
+	{
+		if (!window.g_asc_plugins || !window.g_asc_plugins.current)
+			return;
 
-                if (value && value != "") {
-                    try {
-                        if (window.g_asc_plugins.api.asc_canPaste()) {
-                            var _script = "(function(){ var Api = window.g_asc_plugins.api;\n" + value + "})();";
-                            eval(_script);
+		if (typeof(event.data) == "string")
+		{
+			var pluginData = new CPluginData();
+			pluginData.deserialize(event.data);
 
-                            if (pluginData.getAttribute("recalculate") == true) {
-                                var editorId = window.g_asc_plugins.api.getEditorId();
-                                if (AscCommon.c_oEditorId.Word === editorId) {
-                                    var oLogicDocument = window.g_asc_plugins.api.WordControl ?
-                                      window.g_asc_plugins.api.WordControl.m_oLogicDocument : null;
-                                    var _fonts = oLogicDocument.Document_Get_AllFontNames();
-                                    var _imagesArray = oLogicDocument.Get_AllImageUrls();
-                                    var _images = {};
-                                    for (var i = 0; i < _imagesArray.length; i++) {
-                                        _images[_imagesArray[i]] = _imagesArray[i];
-                                    }
+			var guid = pluginData.getAttribute("guid");
 
-                                    window.g_asc_plugins.images_rename = _images;
-                                    AscCommon.Check_LoadingDataBeforePrepaste(window.g_asc_plugins.api, _fonts, _images,
-                                      function () {
-                                          if (window.g_asc_plugins.api.WordControl &&
-                                            window.g_asc_plugins.api.WordControl.m_oLogicDocument &&
-                                            window.g_asc_plugins.api.WordControl.m_oLogicDocument.Reassign_ImageUrls) {
-                                              window.g_asc_plugins.api.WordControl.m_oLogicDocument.Reassign_ImageUrls(
-                                                window.g_asc_plugins.images_rename);
-                                          }
-                                          delete window.g_asc_plugins.images_rename;
-                                          window.g_asc_plugins.api.asc_Recalculate();
-                                      });
-                                } else if (AscCommon.c_oEditorId.Spreadsheet === editorId) {
-                                    window.g_asc_plugins.api.asc_Recalculate();
-                                }
-                            }
-                        }
-                    } catch (err) {
-                    }
-                }
+			if (guid != window.g_asc_plugins.current.guid)
+				return;
 
-							if ("close" == name) {
-                  window.g_asc_plugins.close();
-              }
-            }
-        }
-    }
+			var name  = pluginData.getAttribute("type");
+			var value = pluginData.getAttribute("data");
 
-    if (window.addEventListener)
-    {
-        window.addEventListener("message", onMessage, false);
-    }
-    else if (window.attachEvent)
-    {
-        window.attachEvent("onmessage", onMessage);
-    }
+			if ("initialize" == name)
+			{
+				window.g_asc_plugins.init();
+				return;
+			}
+			else if ("close" == name || "command" == name)
+			{
+				if (window.g_asc_plugins.closeAttackTimer != -1)
+				{
+					clearTimeout(window.g_asc_plugins.closeAttackTimer);
+					window.g_asc_plugins.closeAttackTimer = -1;
+				}
 
-    window["Asc"] = window["Asc"] ? window["Asc"] : {};
-    window["Asc"].createPluginsManager = function(api)
-    {
-        if (window.g_asc_plugins)
-            return window.g_asc_plugins;
+				if (value && value != "")
+				{
+					try
+					{
+						if (window.g_asc_plugins.api.asc_canPaste())
+						{
+							var _script = "(function(){ var Api = window.g_asc_plugins.api;\n" + value + "})();";
+							eval(_script);
 
-        window.g_asc_plugins        = new CPluginsManager(api);
-        window["g_asc_plugins"]     = window.g_asc_plugins;
-        window.g_asc_plugins.api    = api;
-        window.g_asc_plugins["api"] = window.g_asc_plugins.api;
+							if (pluginData.getAttribute("recalculate") == true)
+							{
+								var editorId = window.g_asc_plugins.api.getEditorId();
+								if (AscCommon.c_oEditorId.Word === editorId)
+								{
+									var oLogicDocument = window.g_asc_plugins.api.WordControl ?
+										window.g_asc_plugins.api.WordControl.m_oLogicDocument : null;
+									var _fonts         = oLogicDocument.Document_Get_AllFontNames();
+									var _imagesArray   = oLogicDocument.Get_AllImageUrls();
+									var _images        = {};
+									for (var i = 0; i < _imagesArray.length; i++)
+									{
+										_images[_imagesArray[i]] = _imagesArray[i];
+									}
 
-        window.g_asc_plugins.api.asc_registerCallback('asc_onDocumentContentReady', function(){
+									window.g_asc_plugins.images_rename = _images;
+									AscCommon.Check_LoadingDataBeforePrepaste(window.g_asc_plugins.api, _fonts, _images,
+										function()
+										{
+											if (window.g_asc_plugins.api.WordControl &&
+												window.g_asc_plugins.api.WordControl.m_oLogicDocument &&
+												window.g_asc_plugins.api.WordControl.m_oLogicDocument.Reassign_ImageUrls)
+											{
+												window.g_asc_plugins.api.WordControl.m_oLogicDocument.Reassign_ImageUrls(
+													window.g_asc_plugins.images_rename);
+											}
+											delete window.g_asc_plugins.images_rename;
+											window.g_asc_plugins.api.asc_Recalculate();
+										});
+								}
+								else if (AscCommon.c_oEditorId.Spreadsheet === editorId)
+								{
+									window.g_asc_plugins.api.asc_Recalculate();
+								}
+							}
+						}
+					} catch (err)
+					{
+					}
+				}
 
-            setTimeout(function(){
-                window.g_asc_plugins.loadExtensionPlugins(window["Asc"]["extensionPlugins"]);
-            }, 10);
+				if ("close" == name)
+				{
+					window.g_asc_plugins.close();
+				}
+			}
+			else if ("resize" == name)
+			{
+				var _sizes = JSON.parse(value);
 
-        });
+				window.g_asc_plugins.api.asc_fireCallback("asc_onPluginResize", _sizes["width"], _sizes["height"], function() {
+					// TODO: send resize end event
+				});
+			}
+			else if ("onmousemove" == name)
+			{
+				var _pos = JSON.parse(value);
+				window.g_asc_plugins.api.asc_fireCallback("asc_onPluginMouseMove", _pos["x"], _pos["y"]);
+			}
+			else if ("onmouseup" == name)
+			{
+				var _pos = JSON.parse(value);
+				window.g_asc_plugins.api.asc_fireCallback("asc_onPluginMouseUp", _pos["x"], _pos["y"]);
+			}
+		}
+	}
 
-        return window.g_asc_plugins;
-    };
+	if (window.addEventListener)
+	{
+		window.addEventListener("message", onMessage, false);
+	}
+	else if (window.attachEvent)
+	{
+		window.attachEvent("onmessage", onMessage);
+	}
 
-    window["Asc"].CPluginData = CPluginData;
-    window["Asc"].CPluginData_wrap = function(obj)
-    {
-        if (!obj.getAttribute)
-            obj.getAttribute = function(name) { return this[name]; }
-        if (!obj.setAttribute)
-            obj.setAttribute = function(name, value) { return this[name] = value; }
-    };
+	window["Asc"]                      = window["Asc"] ? window["Asc"] : {};
+	window["Asc"].createPluginsManager = function(api)
+	{
+		if (window.g_asc_plugins)
+			return window.g_asc_plugins;
+
+		window.g_asc_plugins        = new CPluginsManager(api);
+		window["g_asc_plugins"]     = window.g_asc_plugins;
+		window.g_asc_plugins.api    = api;
+		window.g_asc_plugins["api"] = window.g_asc_plugins.api;
+
+		window.g_asc_plugins.api.asc_registerCallback('asc_onDocumentContentReady', function()
+		{
+
+			setTimeout(function()
+			{
+				window.g_asc_plugins.loadExtensionPlugins(window["Asc"]["extensionPlugins"]);
+			}, 10);
+
+		});
+
+		return window.g_asc_plugins;
+	};
+
+	window["Asc"].CPluginData      = CPluginData;
+	window["Asc"].CPluginData_wrap = function(obj)
+	{
+		if (!obj.getAttribute)
+			obj.getAttribute = function(name)
+			{
+				return this[name];
+			};
+		if (!obj.setAttribute)
+			obj.setAttribute = function(name, value)
+			{
+				return this[name] = value;
+			};
+	};
 })(window, undefined);
 
 // потом удалить!!!
 function TEST_PLUGINS()
 {
-    var _plugins                = [
-        {
-            name : "chess (fen)",
-            guid : "asc.{FFE1F462-1EA2-4391-990D-4CC84940B754}",
+	var _plugins = [
+		{
+			name : "chess (fen)",
+			guid : "asc.{FFE1F462-1EA2-4391-990D-4CC84940B754}",
 
-            variations : [
-                {
-                    description : "chess",
-                    url         : "chess/index.html",
+			variations : [
+				{
+					description : "chess",
+					url         : "chess/index.html",
 
-                    icons           : ["chess/icon.png", "chess/icon@2x.png"],
-                    isViewer        : true,
-                    EditorsSupport  : ["word", "cell", "slide"],
+					icons          : ["chess/icon.png", "chess/icon@2x.png"],
+					isViewer       : true,
+					EditorsSupport : ["word", "cell", "slide"],
 
-                    isVisual        : true,
-                    isModal         : true,
-                    isInsideMode    : false,
+					isVisual     : true,
+					isModal      : true,
+					isInsideMode : false,
 
-                    initDataType    : "ole",
-                    initData        : "",
+					initDataType : "ole",
+					initData     : "",
 
-                    isUpdateOleOnResize : true,
+					isUpdateOleOnResize : true,
 
-                    buttons         : [ { text: "Ok", primary: true },
-                        { text: "Cancel", primary: false } ]
-                },
-                {
-                    description : "about",
-                    url         : "chess/index_about.html",
+					buttons : [{text : "Ok", primary : true},
+						{text : "Cancel", primary : false}]
+				},
+				{
+					description : "about",
+					url         : "chess/index_about.html",
 
-                    icons           : ["chess/icon.png", "chess/icon@2x.png"],
-                    isViewer        : true,
-                    EditorsSupport  : ["word", "cell", "slide"],
+					icons          : ["chess/icon.png", "chess/icon@2x.png"],
+					isViewer       : true,
+					EditorsSupport : ["word", "cell", "slide"],
 
-                    isVisual        : true,
-                    isModal         : true,
-                    isInsideMode    : false,
+					isVisual     : true,
+					isModal      : true,
+					isInsideMode : false,
 
-                    initDataType    : "none",
-                    initData        : "",
+					initDataType : "none",
+					initData     : "",
 
-                    isUpdateOleOnResize : false,
+					isUpdateOleOnResize : false,
 
-                    buttons        : [ { "text": "Ok", "primary": true } ]
-                }
-            ]
-        },
-        {
-            name : "glavred",
-            guid : "asc.{B631E142-E40B-4B4C-90B9-2D00222A286E}",
+					buttons : [{"text" : "Ok", "primary" : true}]
+				}
+			]
+		},
+		{
+			name : "glavred",
+			guid : "asc.{B631E142-E40B-4B4C-90B9-2D00222A286E}",
 
-            variations : [
-                {
-                    description : "glavred",
-                    url         : "glavred/index.html",
+			variations : [
+				{
+					description : "glavred",
+					url         : "glavred/index.html",
 
-                    icons           : ["glavred/icon.png", "glavred/icon@2x.png"],
-                    isViewer        : true,
-                    EditorsSupport  : ["word", "cell", "slide"],
+					icons          : ["glavred/icon.png", "glavred/icon@2x.png"],
+					isViewer       : true,
+					EditorsSupport : ["word", "cell", "slide"],
 
-                    isVisual        : true,
-                    isModal         : true,
-                    isInsideMode    : false,
+					isVisual     : true,
+					isModal      : true,
+					isInsideMode : false,
 
-                    initDataType    : "text",
-                    initData        : "",
+					initDataType : "text",
+					initData     : "",
 
-                    isUpdateOleOnResize : false,
+					isUpdateOleOnResize : false,
 
-                    buttons         : [ { text: "Ok", primary: true } ]
-                }
-            ]
-        },
-        {
-            name : "bold",
-            guid : "asc.{14E46CC2-5E56-429C-9D55-1032B596D928}",
+					buttons : [{text : "Ok", primary : true}]
+				}
+			]
+		},
+		{
+			name : "bold",
+			guid : "asc.{14E46CC2-5E56-429C-9D55-1032B596D928}",
 
-            variations : [
-                {
-                    description : "bold",
-                    url         : "bold/index.html",
+			variations : [
+				{
+					description : "bold",
+					url         : "bold/index.html",
 
-                    icons           : ["bold/icon.png", "bold/icon@2x.png"],
-                    isViewer        : false,
-                    EditorsSupport  : ["word", "cell", "slide"],
+					icons          : ["bold/icon.png", "bold/icon@2x.png"],
+					isViewer       : false,
+					EditorsSupport : ["word", "cell", "slide"],
 
-                    isVisual        : false,
-                    isModal         : false,
-                    isInsideMode    : false,
+					isVisual     : false,
+					isModal      : false,
+					isInsideMode : false,
 
-                    initDataType    : "none",
-                    initData        : "",
+					initDataType : "none",
+					initData     : "",
 
-                    isUpdateOleOnResize : false,
+					isUpdateOleOnResize : false,
 
-                    buttons         : []
-                }
-            ]
-        },
-        {
-            name : "speech",
-            guid : "asc.{D71C2EF0-F15B-47C7-80E9-86D671F9C595}",
+					buttons : []
+				}
+			]
+		},
+		{
+			name : "speech",
+			guid : "asc.{D71C2EF0-F15B-47C7-80E9-86D671F9C595}",
 
-            variations : [
-                {
-                    description : "speech",
-                    url         : "speech/index.html",
+			variations : [
+				{
+					description : "speech",
+					url         : "speech/index.html",
 
-                    icons           : ["speech/icon.png", "speech/icon@2x.png"],
-                    isViewer        : true,
-                    EditorsSupport  : ["word", "cell", "slide"],
+					icons          : ["speech/icon.png", "speech/icon@2x.png"],
+					isViewer       : true,
+					EditorsSupport : ["word", "cell", "slide"],
 
-                    isVisual        : false,
-                    isModal         : false,
-                    isInsideMode    : false,
+					isVisual     : false,
+					isModal      : false,
+					isInsideMode : false,
 
-                    initDataType    : "text",
-                    initData        : "",
+					initDataType : "text",
+					initData     : "",
 
-                    isUpdateOleOnResize : false,
+					isUpdateOleOnResize : false,
 
-                    buttons         : [ ]
-                }
-            ]
-        },
-        {
-            name : "youtube",
-            guid : "asc.{38E022EA-AD92-45FC-B22B-49DF39746DB4}",
+					buttons : []
+				}
+			]
+		},
+		{
+			name : "youtube",
+			guid : "asc.{38E022EA-AD92-45FC-B22B-49DF39746DB4}",
 
-            variations : [
-                {
-                    description : "youtube",
-                    url         : "youtube/index.html",
+			variations : [
+				{
+					description : "youtube",
+					url         : "youtube/index.html",
 
-                    icons           : ["youtube/icon.png", "youtube/icon@2x.png"],
-                    isViewer        : true,
-                    EditorsSupport  : ["word", "cell", "slide"],
+					icons          : ["youtube/icon.png", "youtube/icon@2x.png"],
+					isViewer       : true,
+					EditorsSupport : ["word", "cell", "slide"],
 
-                    isVisual        : true,
-                    isModal         : true,
-                    isInsideMode    : false,
+					isVisual     : true,
+					isModal      : true,
+					isInsideMode : false,
 
-                    initDataType    : "ole",
-                    initData        : "",
+					initDataType : "ole",
+					initData     : "",
 
-                    isUpdateOleOnResize : false,
+					isUpdateOleOnResize : false,
 
-                    buttons         : [ { text: "Ok", primary: true },
-                        { text: "Cancel", primary: false } ]
-                }
-            ]
-        },
-        {
-            "name" : "cbr",
-            "guid" : "asc.{5F9D4EB4-AF61-46EF-AE25-46C96E75E1DD}",
+					buttons : [{text : "Ok", primary : true},
+						{text : "Cancel", primary : false}]
+				}
+			]
+		},
+		{
+			"name" : "cbr",
+			"guid" : "asc.{5F9D4EB4-AF61-46EF-AE25-46C96E75E1DD}",
 
-            "variations" : [
-                {
-                    "description" : "cbr",
-                    "url"         : "cbr/index.html",
+			"variations" : [
+				{
+					"description" : "cbr",
+					"url"         : "cbr/index.html",
 
-                    "icons"           : ["cbr/icon.png", "cbr/icon@2x.png"],
-        //            "isViewer"        : true,
-                    "isViewer"        : false,
-                    "EditorsSupport"  : ["word", "cell", "slide"],
+					"icons"          : ["cbr/icon.png", "cbr/icon@2x.png"],
+					//            "isViewer"        : true,
+					"isViewer"       : false,
+					"EditorsSupport" : ["word", "cell", "slide"],
 
-        //            "isVisual"        : true,
-        //            "isModal"         : true,
-                    "isVisual"        : false,
-                    "isModal"         : false,
-                    "isInsideMode"    : false,
+					//            "isVisual"        : true,
+					//            "isModal"         : true,
+					"isVisual"     : false,
+					"isModal"      : false,
+					"isInsideMode" : false,
 
-                    "initDataType"    : "none",
-                    "initData"        : "",
+					"initDataType" : "none",
+					"initData"     : "",
 
-        //            "isUpdateOleOnResize" : true,
-        			"isUpdateOleOnResize" : false,
+					//            "isUpdateOleOnResize" : true,
+					"isUpdateOleOnResize" : false,
 
-        //            "buttons"         : [ { "text": "Ok", "primary": true },
-        //                                { "text": "Cancel", "primary": false } ]
-        			"buttons"         : []
-                }
-            ]
-        },
-        {
-            "name" : "ocr(Tesseract.js)",
-            "guid" : "asc.{440EBF13-9B19-4BD8-8621-05200E58140B}",
-            "baseUrl" : "",
+					//            "buttons"         : [ { "text": "Ok", "primary": true },
+					//                                { "text": "Cancel", "primary": false } ]
+					"buttons" : []
+				}
+			]
+		},
+		{
+			"name"    : "ocr(Tesseract.js)",
+			"guid"    : "asc.{440EBF13-9B19-4BD8-8621-05200E58140B}",
+			"baseUrl" : "",
 
-            "variations" : [
-                {
-                    "description" : "ocr",
-                    "url"         : "ocr/index.html",
+			"variations" : [
+				{
+					"description" : "ocr",
+					"url"         : "ocr/index.html",
 
-                    "icons"           : ["ocr/icon.png", "ocr/icon@2x.png"],
-                    "isViewer"        : false,
-                    "EditorsSupport"  : ["word"],
+					"icons"          : ["ocr/icon.png", "ocr/icon@2x.png"],
+					"isViewer"       : false,
+					"EditorsSupport" : ["word"],
 
-                    "isVisual"        : true,
-                    "isModal"         : false,
-                    "isInsideMode"    : false,
+					"isVisual"     : true,
+					"isModal"      : false,
+					"isInsideMode" : false,
 
-                    "initDataType"    : "html",
-                    "initData"        : "",
+					"initDataType" : "html",
+					"initData"     : "",
 
-                    "isUpdateOleOnResize" : false,
+					"isUpdateOleOnResize" : false,
 
-                    "buttons"         : [ { "text": "Insert In Document", "primary": true},
-                        { "text": "Cancel", "primary": false } ]
-                }
-            ]
-        },
+					"buttons" : [{"text" : "Insert In Document", "primary" : true},
+						{"text" : "Cancel", "primary" : false}]
+				}
+			]
+		},
 		{
 			"name" : "yandextranslate",
 			"guid" : "asc.{D3E759F7-3947-4BD6-B066-E184BBEDC675}",
@@ -659,50 +721,50 @@ function TEST_PLUGINS()
 					"description" : "yandextranslate",
 					"url"         : "yandextranslate/index.html",
 
-					"icons"           : ["yandextranslate/icon.png", "yandextranslate/icon@2x.png"],
-					"isViewer"        : false,
-					"EditorsSupport"  : ["word", "cell", "slide"],
+					"icons"          : ["yandextranslate/icon.png", "yandextranslate/icon@2x.png"],
+					"isViewer"       : false,
+					"EditorsSupport" : ["word", "cell", "slide"],
 
-					"isVisual"        : false,
-					"isModal"         : false,
-					"isInsideMode"    : false,
+					"isVisual"     : false,
+					"isModal"      : false,
+					"isInsideMode" : false,
 
-					"initDataType"    : "text",
-					"initData"        : "",
+					"initDataType" : "text",
+					"initData"     : "",
 
 					"isUpdateOleOnResize" : false,
 
-					"buttons"         : []
+					"buttons" : []
 				}
 			]
 		},
-        {
-            "name" : "ClipArt",
-            "guid" : "asc.{F5BACB61-64C5-4711-AC8A-D01EC3B2B6F1}",
+		{
+			"name" : "ClipArt",
+			"guid" : "asc.{F5BACB61-64C5-4711-AC8A-D01EC3B2B6F1}",
 
-            "variations" : [
-                {
-                    "description" : "ClipArt",
-                    "url"         : "clipart/index.html",
+			"variations" : [
+				{
+					"description" : "ClipArt",
+					"url"         : "clipart/index.html",
 
-                    "icons"           : ["clipart/icon.png", "clipart/icon@2x.png"],
-                    "isViewer"        : true,
-                    "EditorsSupport"  : ["word"],
+					"icons"          : ["clipart/icon.png", "clipart/icon@2x.png"],
+					"isViewer"       : true,
+					"EditorsSupport" : ["word"],
 
-                    "isVisual"        : true,
-                    "isModal"         : false,
-                    "isInsideMode"    : true,
+					"isVisual"     : true,
+					"isModal"      : false,
+					"isInsideMode" : true,
 
-                    "initDataType"    : "none",
-                    "initData"        : "",
+					"initDataType" : "none",
+					"initData"     : "",
 
-                    "isUpdateOleOnResize" : false,
+					"isUpdateOleOnResize" : false,
 
-                    "buttons"         : [ { "text": "Ok", "primary": true } ]
-                }
-            ]
-        }
-    ];
+					"buttons" : [{"text" : "Ok", "primary" : true}]
+				}
+			]
+		}
+	];
 
-    window.g_asc_plugins.loadExtensionPlugins(_plugins);
+	window.g_asc_plugins.loadExtensionPlugins(_plugins);
 }

@@ -950,6 +950,18 @@
 			this.pluginsManager.buttonClick(id);
 	};
 
+	baseEditorsApi.prototype.asc_pluginEnableMouseEvents = function(isEnable)
+	{
+		if (!this.pluginsManager)
+			return;
+
+		var _pluginData = new Asc.CPluginData();
+		_pluginData.setAttribute("type", "enableMouseEvent");
+		_pluginData.setAttribute("isEnabled", isEnable);
+
+		this.pluginsManager.sendMessage(_pluginData);
+	};
+
 	// Builder
 	baseEditorsApi.prototype.asc_nativeInitBuilder = function()
 	{
