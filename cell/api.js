@@ -483,21 +483,16 @@ var editor;
     return AscCommon.g_clipboardBase.Button_Cut();
   };
 
-  spreadsheet_api.prototype.asc_PasteData = function(_format, data1, data2)
-  {
+  spreadsheet_api.prototype.asc_PasteData = function (_format, data1, data2) {
     this.wb.pasteData(_format, data1, data2);
   };
 
-  spreadsheet_api.prototype.asc_CheckCopy = function(_clipboard /* CClipboardData */, _formats)
-  {
-	var result = this.wb.checkCopyToClipboard(_clipboard, _formats);
-	return result;
+  spreadsheet_api.prototype.asc_CheckCopy = function (_clipboard /* CClipboardData */, _formats) {
+    return this.wb.checkCopyToClipboard(_clipboard, _formats);
   };
 
-  spreadsheet_api.prototype.asc_SelectionCut = function()
-  {
-    var result = this.wb.selectionCut();
-    return result;
+  spreadsheet_api.prototype.asc_SelectionCut = function () {
+    return this.wb.selectionCut();
   };
 
   spreadsheet_api.prototype.asc_bIsEmptyClipboard = function() {
