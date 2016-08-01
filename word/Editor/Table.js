@@ -2198,7 +2198,7 @@ CTable.prototype =
             }
         }
 
-        Pos.X += this.Get_TableOffsetCorrection();
+		Pos.X = this.Pages[CurPage].X;
 
         Y += MaxTopBorder;
         
