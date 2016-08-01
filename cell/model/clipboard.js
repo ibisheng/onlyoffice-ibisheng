@@ -1805,7 +1805,9 @@
 				newCDocument.bFromDocument = true;
 				newCDocument.theme = this.Api.wbModel.theme;
 				
+				var old_m_oLogicDocument = oTempDrawingDocument.m_oLogicDocument;
 			    oTempDrawingDocument.m_oLogicDocument = newCDocument;
+				
 			    var oOldEditor = undefined;
 			    if ("undefined" != typeof editor)
 			        oOldEditor = editor;
@@ -1820,6 +1822,8 @@
 			    var oRes = oBinaryFileReader.ReadFromString(sBase64);
 				
 				pptx_content_loader.End_UseFullUrl();
+				
+				oTempDrawingDocument.m_oLogicDocument = old_m_oLogicDocument;
 				History.TurnOn();
 				AscCommon.g_oIdCounter.m_bRead = false;
 			    editor = oOldEditor;
