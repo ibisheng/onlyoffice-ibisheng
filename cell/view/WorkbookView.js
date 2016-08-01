@@ -2401,19 +2401,24 @@
 
   WorkbookView.prototype._initCommentsToSave = function() {
     var isFirst = true, wsView, wsModel, tmpWs;
-    for (var wsKey in this.wsViews) {
-      wsView = this.wsViews[wsKey];
-      wsModel = wsView.model;
-      wsModel.aCommentsCoords = wsView.cellCommentator.getCoordsToSave();
+    // Колличество листов
+    var countWorksheets = this.model.getWorksheetCount();
+    for (var i = 0; i < countWorksheets; ++i) {
+      tmpWs = this.model.getWorksheet(i);
+      if (tmpWs && 0 < tmpWs.aComments.length) {
+        wsView = this.getWorksheet(i);
+        wsModel = wsView.model;
+        wsModel.aCommentsCoords = wsView.cellCommentator.getCoordsToSave();
 
-      if (isFirst) {
-        isFirst = false;
-        tmpWs = this.cellCommentator.worksheet;
-        this.cellCommentator.worksheet = wsView;
-        this.cellCommentator.overlayCtx = wsView.overlayCtx;
-        this.cellCommentator.drawingCtx = wsView.drawingCtx;
-        this.model.aCommentsCoords = this.cellCommentator.getCoordsToSave();
-        this.cellCommentator.worksheet = tmpWs;
+        if (isFirst) {
+          isFirst = false;
+          tmpWs = this.cellCommentator.worksheet;
+          this.cellCommentator.worksheet = wsView;
+          this.cellCommentator.overlayCtx = wsView.overlayCtx;
+          this.cellCommentator.drawingCtx = wsView.drawingCtx;
+          this.model.aCommentsCoords = this.cellCommentator.getCoordsToSave();
+          this.cellCommentator.worksheet = tmpWs;
+        }
       }
     }
   };
