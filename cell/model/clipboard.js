@@ -1030,16 +1030,7 @@
 					
 					if(type_Paragraph == element.GetType())//paragraph
 					{
-						if(isConvertToPPTX)
-						{
-							
-							selectedElement.Element = AscFormat.ConvertParagraphToPPTX(element, worksheet.model.DrawingDocument, target_doc_content);
-						}
-						else
-						{
-							selectedElement.Element = element;
-						}
-						
+						selectedElement.Element = AscFormat.ConvertParagraphToPPTX(element, worksheet.model.DrawingDocument, target_doc_content);
 						elements.push(selectedElement);
 					}
 					else if(type_Table == element.GetType())//table
