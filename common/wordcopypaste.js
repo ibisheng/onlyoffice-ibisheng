@@ -2400,9 +2400,22 @@ PasteProcessor.prototype =
 							if(!objects.arrImages.length && objects.arrShapes.length === 1 && objects.arrShapes[0] && objects.arrShapes[0].Drawing && objects.arrShapes[0].Drawing.graphicObject)
 							{
 								var drawing = objects.arrShapes[0].Drawing;
-								//TODO в данном вставляется как html
+								
 								if(typeof CGraphicFrame !== "undefined" && drawing instanceof CGraphicFrame)
-									break;
+								{
+									var aContent = [];
+									var table = AscFormat.ConvertGraphicFrameToWordTable(drawing);
+									aContent.push(table);
+									
+									this.aContent = aContent;
+									
+									oThis.api.pre_Paste(aContent.fonts, aContent.images, fPrepasteCallback);
+									if(bTurnOffTrackRevisions){
+										oThis.api.WordControl.m_oLogicDocument.TrackRevisions = true;
+									}
+									
+									return;
+								}
 							}
 							
 								
