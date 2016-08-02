@@ -848,7 +848,19 @@
 					}
 					else 
 					{	
-						if(this._checkPasteFromBinaryExcel(worksheet, true, pasteData))
+						if(isIntoShape)
+						{
+							var tempHtml = this._getHtmlFromWorksheet(pasteData);
+							
+							var callback = function(isSuccess)
+							{
+								if(isSuccess)
+									t._pasteInShape(worksheet, tempHtml, null, isIntoShape);
+							};
+							
+							worksheet.objectRender.controller.checkSelectedObjectsAndCallback2(callback);
+						}
+						else if(this._checkPasteFromBinaryExcel(worksheet, true, pasteData))
 						{
 							var newFonts = {};
 							pasteData.generateFontMap(newFonts);
@@ -2066,8 +2078,103 @@
 				getTextFromDocumentContent(data);
 				
 				return res;
-			}
+			},
 			
+			_getHtmlFromWorksheet: function(worksheet)
+			{
+				var res = document.createElement("body");
+				
+				var getTextDecoration = function(format) 
+				{
+					var res = [];
+					if (Asc.EUnderline.underlineNone !== format.u) 
+					{
+						res.push("underline"); 
+					}
+					if (format.s) 
+					{
+						res.push("line-through");
+					}
+					
+					return res.length > 0 ? res.join(",") : "";
+				}
+				
+				var getSpan = function(text, format, isAddSpace)
+				{
+					var value = "";
+					
+					if(null != cell)
+					{
+						value += text;
+					}
+					
+					if("" === value)
+					{
+						return null;
+					}
+					
+					if(isAddSpace)
+					{
+						value += " ";
+					}
+					
+					var elem = document.createElement("span");
+					elem.innerText = value;
+					
+					if(format)
+					{
+						if (format.b) 
+						{
+							elem.style.fontWeight = 'bold';
+						}
+						
+						if (format.i) 
+						{
+							elem.style.fontStyle = 'italic';
+						}
+						
+						elem.style.textDecoration = getTextDecoration(format);
+					}
+					
+					return elem;
+				};
+				
+				for(var i in worksheet.aGCells)
+				{
+					var row = worksheet.aGCells[i];
+					
+					for(var j in row.c)
+					{
+						var cell = row.c[j];
+						
+						if(cell.oValue && cell.oValue.multiText)
+						{
+							for(var n = 0; n < cell.oValue.multiText.length; n++)
+							{
+								var curMultiText = cell.oValue.multiText[n];
+								var format = curMultiText.format;
+								var elem = getSpan(curMultiText.text, format);
+								if(null !== elem)
+								{	
+									res.appendChild(elem);
+								}
+							}
+						}
+						else
+						{
+							var format = cell.xfs && cell.xfs.font ? cell.xfs.font : null;
+							var elem = getSpan(cell.getValue(), format, true);
+							if(null !== elem)
+							{	
+								res.appendChild(elem);
+							}
+						}
+						
+					}
+				}
+				
+				return res;
+			}
 		};
 		
 		/** @constructor */
