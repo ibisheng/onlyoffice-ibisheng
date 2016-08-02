@@ -676,20 +676,10 @@ CStyle.prototype =
             this.TextPr.Document_Get_AllFontNames(AllFonts);
     },
 
-    Create_Default_Paragraph : function()
-    {
-
-        var TextPr =
-        {
-            FontFamily: { Name : "Arial", Index : -1 },
-            Color     : { r : 0, g : 0, b : 0 },
-            Unifill   : AscFormat.CreateUnfilFromRGB(0,0,0)
-
-        };
-
-        this.Set_QFormat( true );
-        this.Set_TextPr( TextPr );
-    },
+	Create_Default_Paragraph : function()
+	{
+		this.Set_QFormat(true);
+	},
 
     Create_Default_Character : function()
     {
@@ -705,34 +695,47 @@ CStyle.prototype =
         this.Set_UnhideWhenUsed( true );
     },
 
-    Create_Heading1 : function()
-    {
-        var ParaPr =
-        {
-            KeepNext : true,
-            KeepLines: true,
+	private_CreateDefaultUnifillColor : function()
+	{
+		var Unifill        = new AscFormat.CUniFill();
+		Unifill.fill       = new AscFormat.CSolidFill();
+		Unifill.fill.color = AscFormat.builder_CreateSchemeColor('tx1');
+		return Unifill;
+	},
 
-            Spacing :
-            {
-                Before : 24 * g_dKoef_pt_to_mm,
-                After  : 0
-            },
+	Create_Heading1 : function()
+	{
+		var ParaPr = {
+			KeepNext  : true,
+			KeepLines : true,
 
-            OutlineLvl : 0
-        };
+			Spacing : {
+				Before : 24 * g_dKoef_pt_to_mm,
+				After  : 0
+			},
 
-        var TextPr =
-        {
-            FontSize   : 24,
-            FontFamily : { Name : Default_Heading_Font, Index : -1 },
-            Bold       : true,
-            Color      :
-            {
-                r : 0,
-                g : 0,
-                b : 0
-            }
-        };
+			OutlineLvl : 0
+		};
+
+		var TextPr = {
+			FontSize   : 24,
+			FontSizeCS : 24,
+			RFonts     : {
+				Ascii    : {Name : Default_Heading_Font, Index : -1},
+				EastAsia : {Name : Default_Heading_Font, Index : -1},
+				HAnsi    : {Name : Default_Heading_Font, Index : -1},
+				CS       : {Name : Default_Heading_Font, Index : -1}
+			},
+
+			Bold   : true,
+			BoldCS : true,
+			Color  : {
+				r : 0,
+				g : 0,
+				b : 0
+			},
+			Unifill : this.private_CreateDefaultUnifillColor()
+		};
 
         this.Set_QFormat( true );
         this.Set_UiPriority( 9 );
@@ -740,309 +743,325 @@ CStyle.prototype =
         this.Set_TextPr( TextPr );
     },
 
-    Create_Heading2 : function()
-    {
-        var ParaPr =
-        {
-            KeepNext : true,
-            KeepLines: true,
+	Create_Heading2 : function()
+	{
+		var ParaPr = {
+			KeepNext  : true,
+			KeepLines : true,
 
-            Spacing :
-            {
-                Before : 10 * g_dKoef_pt_to_mm,
-                After  : 0
-            },
+			Spacing : {
+				Before : 10 * g_dKoef_pt_to_mm,
+				After  : 0
+			},
 
-            OutlineLvl : 1
-        };
+			OutlineLvl : 1
+		};
 
-        var TextPr =
-        {
-            FontSize   : 20,
-            FontFamily : { Name : Default_Heading_Font, Index : -1 },
-            Bold       : true,
-            Color      :
-            {
-                r : 0,
-                g : 0,
-                b : 0
-            }
-        };
+		var TextPr = {
+			FontSize   : 20,
+			RFonts     : {
+				Ascii    : {Name : Default_Heading_Font, Index : -1},
+				EastAsia : {Name : Default_Heading_Font, Index : -1},
+				HAnsi    : {Name : Default_Heading_Font, Index : -1},
+				CS       : {Name : Default_Heading_Font, Index : -1}
+			},
+			Bold       : true,
+			BoldCS     : true,
+			Color      : {
+				r : 0,
+				g : 0,
+				b : 0
+			},
+			Unifill    : this.private_CreateDefaultUnifillColor()
+		};
 
-        this.Set_QFormat( true );
-        this.Set_UiPriority( 9 );
-        this.Set_UnhideWhenUsed( true );
-        this.Set_TextPr( TextPr );
-        this.Set_ParaPr( ParaPr );
-    },
+		this.Set_QFormat(true);
+		this.Set_UiPriority(9);
+		this.Set_UnhideWhenUsed(true);
+		this.Set_TextPr(TextPr);
+		this.Set_ParaPr(ParaPr);
+	},
 
-    Create_Heading3 : function()
-    {
-        var ParaPr =
-        {
-            KeepNext : true,
-            KeepLines: true,
+	Create_Heading3 : function()
+	{
+		var ParaPr = {
+			KeepNext  : true,
+			KeepLines : true,
 
-            Spacing :
-            {
-                Before : 10 * g_dKoef_pt_to_mm,
-                After  : 0
-            },
+			Spacing : {
+				Before : 10 * g_dKoef_pt_to_mm,
+				After  : 0
+			},
 
-            OutlineLvl : 2
-        };
+			OutlineLvl : 2
+		};
 
-        var TextPr =
-        {
-            FontSize   : 18,
-            FontFamily : { Name : Default_Heading_Font, Index : -1 },
-            Bold       : true,
-            Italic     : true,
-            Color      :
-            {
-                r : 0,
-                g : 0,
-                b : 0
-            }
-        };
+		var TextPr = {
+			FontSize   : 18,
+			FontSizeCS : 18,
+			RFonts     : {
+				Ascii    : {Name : Default_Heading_Font, Index : -1},
+				EastAsia : {Name : Default_Heading_Font, Index : -1},
+				HAnsi    : {Name : Default_Heading_Font, Index : -1},
+				CS       : {Name : Default_Heading_Font, Index : -1}
+			},
+			Bold       : true,
+			BoldCS     : true,
+			Italic     : true,
+			ItalicCS   : true,
+			Color      : {
+				r : 0,
+				g : 0,
+				b : 0
+			},
+			Unifill    : this.private_CreateDefaultUnifillColor()
+		};
 
-        this.Set_QFormat( true );
-        this.Set_UiPriority( 9 );
-        this.Set_UnhideWhenUsed( true );
-        this.Set_TextPr( TextPr );
-        this.Set_ParaPr( ParaPr );
-    },
+		this.Set_QFormat(true);
+		this.Set_UiPriority(9);
+		this.Set_UnhideWhenUsed(true);
+		this.Set_TextPr(TextPr);
+		this.Set_ParaPr(ParaPr);
+	},
 
-    Create_Heading4 : function()
-    {
-        var ParaPr =
-        {
-            KeepNext : true,
-            KeepLines: true,
+	Create_Heading4 : function()
+	{
+		var ParaPr = {
+			KeepNext  : true,
+			KeepLines : true,
 
-            Spacing :
-            {
-                Before : 10 * g_dKoef_pt_to_mm,
-                After  : 0
-            },
+			Spacing : {
+				Before : 10 * g_dKoef_pt_to_mm,
+				After  : 0
+			},
 
-            OutlineLvl : 3
-        };
+			OutlineLvl : 3
+		};
 
-        var TextPr =
-        {
-            FontSize   : 16,
-            FontFamily : { Name : Default_Heading_Font, Index : -1 },
-            Color      :
-            {
-                r : 0x23,
-                g : 0x23,
-                b : 0x23
-            }
-        };
+		var TextPr = {
+			FontSize   : 16,
+			FontSizeCS : 16,
+			RFonts     : {
+				Ascii    : {Name : Default_Heading_Font, Index : -1},
+				EastAsia : {Name : Default_Heading_Font, Index : -1},
+				HAnsi    : {Name : Default_Heading_Font, Index : -1},
+				CS       : {Name : Default_Heading_Font, Index : -1}
+			},
 
-        this.Set_QFormat( true );
-        this.Set_UiPriority( 9 );
-        this.Set_UnhideWhenUsed( true );
-        this.Set_TextPr( TextPr );
-        this.Set_ParaPr( ParaPr );
-    },
+			Color   : {
+				r : 0x23,
+				g : 0x23,
+				b : 0x23
+			}
+		};
 
-    Create_Heading5 : function()
-    {
-        var ParaPr =
-        {
-            KeepNext : true,
-            KeepLines: true,
+		this.Set_QFormat(true);
+		this.Set_UiPriority(9);
+		this.Set_UnhideWhenUsed(true);
+		this.Set_TextPr(TextPr);
+		this.Set_ParaPr(ParaPr);
+	},
 
-            Spacing :
-            {
-                Before : 10 * g_dKoef_pt_to_mm,
-                After  : 0
-            },
+	Create_Heading5 : function()
+	{
+		var ParaPr = {
+			KeepNext  : true,
+			KeepLines : true,
 
-            OutlineLvl : 4
-        };
+			Spacing : {
+				Before : 10 * g_dKoef_pt_to_mm,
+				After  : 0
+			},
 
-        var TextPr =
-        {
-            FontSize   : 14,
-            FontFamily : { Name : Default_Heading_Font, Index : -1 },
-            Bold       : true,
-            Color      :
-            {
-                r : 0x44,
-                g : 0x44,
-                b : 0x44
-            }
-        };
+			OutlineLvl : 4
+		};
 
-        this.Set_QFormat( true );
-        this.Set_UiPriority( 9 );
-        this.Set_UnhideWhenUsed( true );
-        this.Set_TextPr( TextPr );
-        this.Set_ParaPr( ParaPr );
-    },
+		var TextPr =
+			{
+				FontSize   : 14,
+				FontSizeCS : 14,
+				RFonts     : {
+					Ascii    : {Name : Default_Heading_Font, Index : -1},
+					EastAsia : {Name : Default_Heading_Font, Index : -1},
+					HAnsi    : {Name : Default_Heading_Font, Index : -1},
+					CS       : {Name : Default_Heading_Font, Index : -1}
+				},
+				Bold       : true,
+				BoldCS     : true,
+				Color      : {
+					r : 0x44,
+					g : 0x44,
+					b : 0x44
+				}
+			};
 
-    Create_Heading6 : function()
-    {
-        var ParaPr =
-        {
-            KeepNext : true,
-            KeepLines: true,
+		this.Set_QFormat(true);
+		this.Set_UiPriority(9);
+		this.Set_UnhideWhenUsed(true);
+		this.Set_TextPr(TextPr);
+		this.Set_ParaPr(ParaPr);
+	},
 
-            Spacing :
-            {
-                Before : 10 * g_dKoef_pt_to_mm,
-                After  : 0
-            },
+	Create_Heading6 : function()
+	{
+		var ParaPr = {
+			KeepNext   : true,
+			KeepLines  : true,
+			Spacing    : {
+				Before : 10 * g_dKoef_pt_to_mm,
+				After  : 0
+			},
+			OutlineLvl : 5
+		};
 
-            OutlineLvl : 5
-        };
+		var TextPr = {
+			FontSize   : 14,
+			FontSizeCS : 14,
+			Italic     : true,
+			ItalicCS   : true,
+			RFonts     : {
+				Ascii    : {Name : Default_Heading_Font, Index : -1},
+				EastAsia : {Name : Default_Heading_Font, Index : -1},
+				HAnsi    : {Name : Default_Heading_Font, Index : -1},
+				CS       : {Name : Default_Heading_Font, Index : -1}
+			},
+			Color      : {
+				r : 0x23,
+				g : 0x23,
+				b : 0x23
+			}
+		};
 
-        var TextPr =
-        {
-            FontSize   : 14,
-            Italic     : true,
-            FontFamily : { Name : Default_Heading_Font, Index : -1 },
-            Color      :
-            {
-                r : 0x23,
-                g : 0x23,
-                b : 0x23
-            }
-        };
+		this.Set_QFormat(true);
+		this.Set_UiPriority(9);
+		this.Set_UnhideWhenUsed(true);
+		this.Set_TextPr(TextPr);
+		this.Set_ParaPr(ParaPr);
+	},
 
-        this.Set_QFormat( true );
-        this.Set_UiPriority( 9 );
-        this.Set_UnhideWhenUsed( true );
-        this.Set_TextPr( TextPr );
-        this.Set_ParaPr( ParaPr );
-    },
+	Create_Heading7 : function()
+	{
+		var ParaPr = {
+			KeepNext   : true,
+			KeepLines  : true,
+			Spacing    : {
+				Before : 10 * g_dKoef_pt_to_mm,
+				After  : 0
+			},
+			OutlineLvl : 6
+		};
 
-    Create_Heading7 : function()
-    {
-        var ParaPr =
-        {
-            KeepNext : true,
-            KeepLines: true,
+		var TextPr = {
+			FontSize   : 12,
+			FontSizeCS : 12,
+			RFonts     : {
+				Ascii    : {Name : Default_Heading_Font, Index : -1},
+				EastAsia : {Name : Default_Heading_Font, Index : -1},
+				HAnsi    : {Name : Default_Heading_Font, Index : -1},
+				CS       : {Name : Default_Heading_Font, Index : -1}
+			},
+			Bold       : true,
+			BoldCS     : true,
+			Color      : {
+				r : 0x60,
+				g : 0x60,
+				b : 0x60
+			}
+		};
 
-            Spacing :
-            {
-                Before : 10 * g_dKoef_pt_to_mm,
-                After  : 0
-            },
+		this.Set_QFormat(true);
+		this.Set_UiPriority(9);
+		this.Set_UnhideWhenUsed(true);
+		this.Set_TextPr(TextPr);
+		this.Set_ParaPr(ParaPr);
+	},
 
-            OutlineLvl : 6
-        };
+	Create_Heading8 : function()
+	{
+		var ParaPr = {
+			KeepNext   : true,
+			KeepLines  : true,
+			Spacing    : {
+				Before : 10 * g_dKoef_pt_to_mm,
+				After  : 0
+			},
+			OutlineLvl : 7
+		};
 
-        var TextPr =
-        {
-            FontSize   : 12,
-            FontFamily : { Name : Default_Heading_Font, Index : -1 },
-            Bold       : true,
-            Color      :
-            {
-                r : 0x60,
-                g : 0x60,
-                b : 0x60
-            }
-        };
+		var TextPr = {
+			FontSize   : 12,
+			FontSizeCS : 12,
+			RFonts     : {
+				Ascii    : {Name : Default_Heading_Font, Index : -1},
+				EastAsia : {Name : Default_Heading_Font, Index : -1},
+				HAnsi    : {Name : Default_Heading_Font, Index : -1},
+				CS       : {Name : Default_Heading_Font, Index : -1}
+			},
+			Color      : {
+				r : 0x44,
+				g : 0x44,
+				b : 0x44
+			}
+		};
 
-        this.Set_QFormat( true );
-        this.Set_UiPriority( 9 );
-        this.Set_UnhideWhenUsed( true );
-        this.Set_TextPr( TextPr );
-        this.Set_ParaPr( ParaPr );
-    },
+		this.Set_QFormat(true);
+		this.Set_UiPriority(9);
+		this.Set_UnhideWhenUsed(true);
+		this.Set_TextPr(TextPr);
+		this.Set_ParaPr(ParaPr);
+	},
 
-    Create_Heading8 : function()
-    {
-        var ParaPr =
-        {
-            KeepNext : true,
-            KeepLines: true,
+	Create_Heading9 : function()
+	{
+		var ParaPr = {
+			KeepNext   : true,
+			KeepLines  : true,
+			Spacing    : {
+				Before : 10 * g_dKoef_pt_to_mm,
+				After  : 0
+			},
+			OutlineLvl : 8
+		};
 
-            Spacing :
-            {
-                Before : 10 * g_dKoef_pt_to_mm,
-                After  : 0
-            },
+		var TextPr = {
+			FontSize   : 11.5,
+			FontSizeCS : 11.5,
+			RFonts     : {
+				Ascii    : {Name : Default_Heading_Font, Index : -1},
+				EastAsia : {Name : Default_Heading_Font, Index : -1},
+				HAnsi    : {Name : Default_Heading_Font, Index : -1},
+				CS       : {Name : Default_Heading_Font, Index : -1}
+			},
+			Italic     : true,
+			ItalicCS   : true,
+			Color      : {
+				r : 0x44,
+				g : 0x44,
+				b : 0x44
+			}
+		};
 
-            OutlineLvl : 7
-        };
+		this.Set_QFormat(true);
+		this.Set_UiPriority(9);
+		this.Set_UnhideWhenUsed(true);
+		this.Set_TextPr(TextPr);
+		this.Set_ParaPr(ParaPr);
+	},
 
-        var TextPr =
-        {
-            FontSize   : 12,
-            FontFamily : { Name : Default_Heading_Font, Index : -1 },
-            Color      :
-            {
-                r : 0x44,
-                g : 0x44,
-                b : 0x44
-            }
-        };
+	Create_ListParagraph : function()
+	{
+		var ParaPr = {
+			Ind : {
+				Left : 36 * g_dKoef_pt_to_mm
+			},
 
-        this.Set_QFormat( true );
-        this.Set_UiPriority( 9 );
-        this.Set_UnhideWhenUsed( true );
-        this.Set_TextPr( TextPr );
-        this.Set_ParaPr( ParaPr );
-    },
+			ContextualSpacing : true
+		};
 
-    Create_Heading9 : function()
-    {
-        var ParaPr =
-        {
-            KeepNext : true,
-            KeepLines: true,
-
-            Spacing :
-            {
-                Before : 10 * g_dKoef_pt_to_mm,
-                After  : 0
-            },
-
-            OutlineLvl : 8
-        };
-
-        var TextPr =
-        {
-            FontSize   : 11.5,
-            FontFamily : { Name : Default_Heading_Font, Index : -1 },
-            Italic     : true,
-            Color      :
-            {
-                r : 0x44,
-                g : 0x44,
-                b : 0x44
-            }
-        };
-
-        this.Set_QFormat( true );
-        this.Set_UiPriority( 9 );
-        this.Set_UnhideWhenUsed( true );
-        this.Set_TextPr( TextPr );
-        this.Set_ParaPr( ParaPr );
-    },
-
-    Create_ListParagraph : function()
-    {
-        var ParaPr =
-        {
-            Ind :
-            {
-                Left : 36 * g_dKoef_pt_to_mm
-            },
-
-            ContextualSpacing : true
-        };
-
-        this.Set_QFormat( true );
-        this.Set_UiPriority( 34 );
-        this.Set_ParaPr( ParaPr );
-    },
+		this.Set_QFormat(true);
+		this.Set_UiPriority(34);
+		this.Set_ParaPr(ParaPr);
+	},
 
     Create_NoSpacing : function()
     {
@@ -8532,9 +8551,6 @@ CTextPr.prototype =
         if (this.Underline !== TextPr.Underline)
             return false;
 
-        if ((undefined === this.FontFamily && undefined !== TextPr.FontFamily) || (undefined !== this.FontFamily && (undefined === TextPr.FontFamily || this.FontFamily.Name !== TextPr.FontFamily.Name)))
-            return false;
-
         if (false
             || (undefined === this.FontSize
                 && undefined !== TextPr.FontSize)
@@ -8598,7 +8614,6 @@ CTextPr.prototype =
 
         if ((undefined === this.Unifill && undefined !== TextPr.Unifill) || (undefined !== this.Unifill && (undefined === TextPr.Unifill || true !== this.Unifill.IsIdentical(TextPr.Unifill))))
             return false;
-
 
         if ((undefined === this.TextOutline && undefined !== TextPr.TextOutline) || (undefined !== this.TextOutline && (undefined === TextPr.TextOutline || true !== this.TextOutline.IsIdentical(TextPr.TextOutline))))
             return false;
@@ -9302,18 +9317,22 @@ CParaSpacing.prototype =
             this.AfterAutoSpacing = Spacing.AfterAutoSpacing;
     },
 
-    Is_Equal : function(Spacing)
-    {
-        if (this.Line !== Spacing.Line
-            || this.LineRule !== Spacing.LineRule
-            || this.Before !== Spacing.Before
-            || this.BeforeAutoSpacing !== Spacing.BeforeAutoSpacing
-            || this.After !== Spacing.After
-            || this.AfterAutoSpacing !== Spacing.AfterAutoSpacing)
-            return false;
+	Is_Equal : function(Spacing)
+	{
+		if (this.Line !== Spacing.Line
+			|| this.LineRule !== Spacing.LineRule
+			|| (this.Before === undefined && Spacing.Before !== undefined)
+			|| (this.Before !== undefined && Spacing.Before === undefined)
+			|| ((this.Before !== undefined && Spacing.Before !== undefined) && (this.Before - Spacing.Before) > 0.001)
+			|| this.BeforeAutoSpacing !== Spacing.BeforeAutoSpacing
+			|| (this.After === undefined && Spacing.After !== undefined)
+			|| (this.After !== undefined && Spacing.After === undefined)
+			|| ((this.After !== undefined && Spacing.After !== undefined) && (this.After - Spacing.After) > 0.001)
+			|| this.AfterAutoSpacing !== Spacing.AfterAutoSpacing)
+			return false;
 
-        return true;
-    },
+		return true;
+	},
 
     Set_FromObject : function(Spacing)
     {
@@ -10020,26 +10039,18 @@ CParaPr.prototype =
     {
         this.ContextualSpacing = ParaPr.ContextualSpacing;
 
-        if ( undefined != ParaPr.Ind )
-        {
-            this.Ind = new CParaInd();
-            this.Ind.Set_FromObject( ParaPr.Ind );
-        }
-        else
-            this.Ind = undefined;
+		this.Ind = new CParaInd();
+		if (undefined != ParaPr.Ind)
+			this.Ind.Set_FromObject(ParaPr.Ind);
 
         this.Jc              = ParaPr.Jc;
         this.KeepLines       = ParaPr.KeepLines;
         this.KeepNext        = ParaPr.KeepNext;
         this.PageBreakBefore = ParaPr.PageBreakBefore;
 
-        if ( undefined != ParaPr.Spacing )
-        {
-            this.Spacing = new CParaSpacing();
-            this.Spacing.Set_FromObject( ParaPr.Spacing );
-        }
-        else
-            this.Spacing = undefined;
+		this.Spacing = new CParaSpacing();
+		if (undefined != ParaPr.Spacing)
+			this.Spacing.Set_FromObject(ParaPr.Spacing);
 
         if ( undefined != ParaPr.Shd )
         {
