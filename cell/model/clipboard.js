@@ -1158,7 +1158,7 @@
 						oTempDrawingDocument.m_oLogicDocument = newCDocument;
 						
 						drawingObject.graphicObject.graphicObject.Set_Parent(newCDocument);
-						oPasteFromBinaryWord._paste(ws, {DocumentContent: [drawingObject.graphicObject.graphicObject]});
+						oPasteFromBinaryWord._paste(ws, {content: [drawingObject.graphicObject.graphicObject]});
 						
 						return;
 					}
