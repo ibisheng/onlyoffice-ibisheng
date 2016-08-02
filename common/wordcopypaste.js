@@ -2404,7 +2404,7 @@ PasteProcessor.prototype =
 								if(typeof CGraphicFrame !== "undefined" && drawing instanceof CGraphicFrame)
 								{
 									var aContent = [];
-									var table = AscFormat.ConvertGraphicFrameToWordTable(drawing);
+									var table = AscFormat.ConvertGraphicFrameToWordTable(drawing, this.oLogicDocument);
 									aContent.push(table);
 									
 									this.aContent = aContent;
