@@ -9578,7 +9578,7 @@
                                 var nameFormat = false;
                                 //}
                                 if ( currentObj[0].cellFrom ) {
-                                    var offset = range.getCells()[0].getOffset2( currentObj[0].cellFrom ), assemb, _p_ = new AscCommonExcel.parserFormula( currentObj[0].text.substring( 1 ), "", range.worksheet );
+                                    var offset = range.getCells()[0].getOffset2( currentObj[0].cellFrom ), assemb, _p_ = new AscCommonExcel.parserFormula( currentObj[0].text.substring( 1 ), null, range.worksheet );
 
                                     if ( _p_.parse() ) {
                                         assemb = _p_.changeOffset( offset ).assemble();
@@ -9952,7 +9952,7 @@
                                 //formula
                                 if ( newVal.getFormula() && !isOneMerge ) {
                                     var offset = range.getCells()[numFormula].getOffset2( value2[numFormula].sId ), assemb,
-										_p_ = new AscCommonExcel.parserFormula( value2[numFormula].sFormula, firstRange.getName() ? firstRange.getName() : "", range.worksheet );
+										_p_ = new AscCommonExcel.parserFormula( value2[numFormula].sFormula, null, range.worksheet );
 
                                     if ( _p_.parse() ) {
                                         assemb = _p_.changeOffset( offset ).assemble();

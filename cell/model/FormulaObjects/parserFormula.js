@@ -3584,23 +3584,28 @@ function parserFormula( formula, parent, _ws ) {
     return this.isDirty;
   };
   parserFormula.prototype.setIsDirty = function(isDirty) {
-    if(isDirty && !this.isDirty){
-      this.wb.dependencyFormulas.addToFormulaTrack(this.parent);
-    }
     this.isDirty = isDirty;
   };
 	parserFormula.prototype.notify = function(data) {
 		if (AscCommon.c_oNotifyType.Dirty === data.type) {
-			this.setIsDirty(true);
-			if (this.parent && this.parent.onDirty) {
-				this.parent.onDirty();
+			if (!this.isDirty) {
+				this.isDirty = true;
+				if (this.parent && this.parent.onFormulaEvent) {
+					this.parent.onFormulaEvent(AscCommon.c_oNotifyParentType.Change);
+				}
+			}
+		} else if (AscCommon.c_oNotifyType.Changed === data.type) {
+			if (this.parent && this.parent.onFormulaEvent) {
+				this.parent.onFormulaEvent(AscCommon.c_oNotifyParentType.Change);
 			}
 		} else {
 			var oldFormula = this.Formula;
 			if (AscCommon.c_oNotifyType.Shift === data.type || AscCommon.c_oNotifyType.Move === data.type ||
 				AscCommon.c_oNotifyType.Delete === data.type) {
 				this.shiftCells2(data.type, data.sheetId, data.bbox, data.offset);
-				this.wb.dependencyFormulas.addToChangedElem(this.parent);
+				if (this.parent && this.parent.onFormulaEvent) {
+					this.parent.onFormulaEvent(AscCommon.c_oNotifyParentType.Change);
+				}
 			} else if (AscCommon.c_oNotifyType.ChangeDefName === data.type) {
 				this.changeDefName(data.from, data.to);
 			} else if (AscCommon.c_oNotifyType.Rebuild === data.type) {
@@ -3618,8 +3623,8 @@ function parserFormula( formula, parent, _ws ) {
 					}
 				}
 			}
-			if (this.parent && this.parent.onChangeFormula && oldFormula !== this.Formula) {
-				this.parent.onChangeFormula(oldFormula, this.Formula);
+			if (this.parent && this.parent.onFormulaEvent && oldFormula !== this.Formula) {
+				this.parent.onFormulaEvent(AscCommon.c_oNotifyParentType.ChangeFormula, {from: oldFormula, to: this.Formula});
 			}
 		}
 	};
@@ -4225,19 +4230,15 @@ parserFormula.prototype.parse = function(local, digitDelim) {
 };
 
 parserFormula.prototype.calculate = function(opt_defName, opt_range) {
-    this.isDirty = false;
 	if (this.isCalculate) {
 		this.value = new cError(cErrorType.bad_reference);
-		this._updateCellValue();
-	
-	this.isCalculate = false;
+		this._endCalculate();
     return this.value;
   }
   this.isCalculate = true;
   if (this.outStack.length < 1) {
 	  this.value = new cError(cErrorType.wrong_name);
-	  this._updateCellValue();
-	this.isCalculate = false;
+	  this._endCalculate();
     return this.value;
   }
 	var rangeCell = null;
@@ -4262,8 +4263,7 @@ parserFormula.prototype.calculate = function(opt_defName, opt_range) {
       if (elemArr.length < currentElement.getArguments()) {
         elemArr = [];
 		this.value = new cError(cErrorType.unsupported_function);
-		this._updateCellValue();
-		this.isCalculate = false;
+		this._endCalculate();
         return this.value;
         } else {
         var arg = [];
@@ -4289,67 +4289,16 @@ parserFormula.prototype.calculate = function(opt_defName, opt_range) {
   this.value = elemArr.pop();
   this.value.numFormat = numFormat;
 
-    this._updateCellValue();
-  this.isCalculate = false;
+    this._endCalculate();
   return this.value;
 };
-	parserFormula.prototype._calculateRefType = function(cell) {
-		var val = this.value;
-		if (val.type == cElementType.cell || val.type == cElementType.cell3D) {
-			var nF = val.numFormat;
-			val = val.getValue();
-			val.numFormat = nF;
+	parserFormula.prototype._endCalculate = function() {
+		if (this.parent && this.parent.onFormulaEvent) {
+			this.parent.onFormulaEvent(AscCommon.c_oNotifyParentType.EndCalculate);
 		}
-		else if (val.type == cElementType.array) {
-			var nF = val.numFormat;
-			val = val.getElement(0);
-			val.numFormat = nF;
-		}
-		else if (val.type == cElementType.cellsRange || val.type == cElementType.cellsRange3D) {
-			var nF = val.numFormat;
-			val = val.cross(new CellAddress(cell.nRow, cell.nCol), cell.ws.getId());
-//		val = val.getElementByCell(new CellAddress(cell));
-			val.numFormat = nF;
-		}
-		this.value = val;
-	}
-	parserFormula.prototype._updateCellValue = function() {
-		var __cell = this.parent;
-		if (!(__cell instanceof AscCommonExcel.Cell)) {
-			return;
-		}
-		this._calculateRefType(__cell);
-		var res = this.value;
-		if (__cell && res) {
-			__cell.oValue.clean();
-			switch (res.type) {
-				case cElementType.number:
-					__cell.oValue.type = CellValueType.Number;
-					__cell.oValue.number = res.getValue();
-					break;
-				case cElementType.bool:
-					__cell.oValue.type = CellValueType.Bool;
-					__cell.oValue.number = res.value ? 1 : 0;
-					break;
-				case cElementType.error:
-					__cell.oValue.type = CellValueType.Error;
-					__cell.oValue.text = res.getValue().toString();
-					break;
-				case cElementType.name:
-					__cell.oValue.type = CellValueType.Error;
-					__cell.oValue.text = res.getValue().toString();
-					break;
-				default:
-					__cell.oValue.type = CellValueType.String;
-					__cell.oValue.text = res.getValue().toString();
-			}
-			this.wb.dependencyFormulas.addToCleanCellCache(__cell.ws.getId(), __cell.nRow, __cell.nCol);
-			AscCommonExcel.g_oVLOOKUPCache.remove(__cell);
-			AscCommonExcel.g_oHLOOKUPCache.remove(__cell);
-			//todo
-			this.ca = res.ca;
-		}
-	}
+		this.isCalculate = false;
+		this.isDirty = false;
+	};
 
 /* Метод возвращает все ссылки на ячейки которые участвуют в формуле*/
 parserFormula.prototype.getRef = function() {
@@ -4495,6 +4444,7 @@ parserFormula.prototype.getRef = function() {
 				if (isIntersect) {
 					var isNoDelete;
 					if (AscCommon.c_oNotifyType.Shift == notifyType) {
+						_cellsBbox = _cellsBbox.clone();
 						isNoDelete = _cellsBbox.forShift(bbox, offset);
 					} else if (AscCommon.c_oNotifyType.Move == notifyType) {
 						isNoDelete = true;
@@ -4503,7 +4453,7 @@ parserFormula.prototype.getRef = function() {
 					}
 					if (isNoDelete) {
 						elem.value = elem._cells =
-							_cellsBbox.getAbsName2(elem.isAbsoluteCol1, elem.sisAbsoluteRow1, elem.isAbsoluteCol2,
+							_cellsBbox.getAbsName2(elem.isAbsoluteCol1, elem.isAbsoluteRow1, elem.isAbsoluteCol2,
 								elem.isAbsoluteRow2);
 						if (elem instanceof cRef || elem instanceof cArea) {
 							elem.range = elem.ws.getRange3(_cellsBbox.r1, _cellsBbox.c1, _cellsBbox.r2, _cellsBbox.c2);

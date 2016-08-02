@@ -336,10 +336,10 @@
 							this.setOffset(offset);
 						}
 					} else {
-						if (this.c1 > bbox.c1) {
-							this.setOffset(offset);
-						} else {
+						if (this.c1 < bbox.c1) {
 							this.setOffsetLast(offset);
+						} else {
+							this.setOffset(offset);
 						}
 					}
 				} else {
@@ -360,10 +360,10 @@
 							this.setOffset(offset);
 						}
 					} else {
-						if (this.r1 > bbox.r1) {
-							this.setOffset(offset);
-						} else {
+						if (this.r1 < bbox.r1) {
 							this.setOffsetLast(offset);
+						} else {
+							this.setOffset(offset);
 						}
 					}
 				}

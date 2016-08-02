@@ -1535,7 +1535,6 @@ function UndoRedoData_SheetAdd(insertBefore, name, sheetidfrom, sheetid, tableNa
 	this.sheetid = sheetid;
 	//Эти поля заполняются после Undo/Redo
 	this.sheet = null;
-	this.cwf = null;
 
     this.tableNames = tableNames;
 }
@@ -1574,12 +1573,11 @@ var g_oUndoRedoData_SheetRemoveProperties = {
 		sheetId: 0,
 		sheet: 1
 	};
-function UndoRedoData_SheetRemove(index, sheetId, sheet, cwf){
+function UndoRedoData_SheetRemove(index, sheetId, sheet){
 	this.Properties = g_oUndoRedoData_SheetRemoveProperties;
 	this.index = index;
 	this.sheetId = sheetId;
 	this.sheet = sheet;
-	this.cwf = cwf;
 }
 UndoRedoData_SheetRemove.prototype = {
 	getType : function()
@@ -2813,19 +2811,18 @@ UndoRedoWorkbook.prototype = {
 				Data.insertBefore = 0;
 			if(bUndo)
 			{
-				var outputParams = {sheet: null, cwf: null};
+				var outputParams = {sheet: null};
 				this.wb.removeWorksheet(Data.insertBefore, outputParams);
 				//сохраняем тот sheet который удалили, иначе может возникнуть ошибка, если какой-то обьект запоминал ссылку на sheet(например):
 				//Добавляем лист  -> Добавляем ссылку -> undo -> undo -> redo -> redo
 				Data.sheet = outputParams.sheet;
-				Data.cwf = outputParams.cwf;
 			}
 			else
 			{
 				if(null != Data.sheet)
 				{
 					//сюда заходим только если до этого было сделано Undo
-					this.wb.insertWorksheet(Data.insertBefore, Data.sheet, Data.cwf);
+					this.wb.insertWorksheet(Data.insertBefore, Data.sheet);
 				}
 				else
 				{
@@ -2857,7 +2854,7 @@ UndoRedoWorkbook.prototype = {
 		{
 			if(bUndo)
 			{
-				this.wb.insertWorksheet(Data.index, Data.sheet, Data.cwf);
+				this.wb.insertWorksheet(Data.index, Data.sheet);
 			}
 			else
 			{
@@ -3157,6 +3154,7 @@ UndoRedoWoorksheet.prototype = {
             nCol = Data.nCol;
             if(bUndo)
             {
+				//todo
                 var oCellAddres = new CellAddress(nRow, nCol, 0);
                 var node = ws.workbook.dependencyFormulas.addNode(ws.getId(), oCellAddres.getID());
                 if (node)
@@ -3512,7 +3510,6 @@ UndoRedoWoorksheet.prototype = {
 						if(null != oConflictWs)
 							oConflictWs.renameWsToCollaborate(this.wb.getUniqueSheetNameFrom(oConflictWs.getName(), true));
 					}
-					AscCommonExcel.buildDefNameAfterRenameWorksheet(ws);
 				}
 				ws.setName(name, true);
 			}

@@ -315,7 +315,7 @@
 	};
 	CFormulaCF.prototype.init = function(ws) {
 		if (!this._f) {
-			this._f = new AscCommonExcel.parserFormula(this.Text, '', ws);
+			this._f = new AscCommonExcel.parserFormula(this.Text, null, ws);
 			this._f.parse();
 		}
 	};

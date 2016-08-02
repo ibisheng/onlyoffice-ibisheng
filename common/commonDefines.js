@@ -816,9 +816,16 @@ var c_oAscPrintDefaultSettings = {
 		Shift: 1,
 		Move: 2,
 		Delete: 3,
-		ChangeDefName: 4,
-		Rebuild: 5,
-		ChangeSheet: 6
+		Rebuild: 4,
+		Changed: 5,
+		ChangeDefName: 6,
+		ChangeSheet: 7
+	};
+
+	var c_oNotifyParentType = {
+		Change: 0,
+		ChangeFormula: 1,
+		EndCalculate: 2
 	};
 
     var c_oDashType = {
@@ -1472,6 +1479,7 @@ window['Asc']['c_oAscMaxCellOrCommentLength'] = window['Asc'].c_oAscMaxCellOrCom
   window["AscCommon"].c_oAscPrintDefaultSettings = c_oAscPrintDefaultSettings;
   window["AscCommon"].c_oZoomType = c_oZoomType;
   window["AscCommon"].c_oNotifyType = c_oNotifyType;
+  window["AscCommon"].c_oNotifyParentType = c_oNotifyParentType;
   window["AscCommon"].c_oAscEncodings = c_oAscEncodings;
   window["AscCommon"].c_oAscEncodingsMap = c_oAscEncodingsMap;
   window["AscCommon"].c_oAscCodePageUtf8 = c_oAscCodePageUtf8;
