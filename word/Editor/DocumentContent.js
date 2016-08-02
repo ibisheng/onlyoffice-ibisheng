@@ -7468,7 +7468,7 @@ CDocumentContent.prototype.Selection_SetStart = function(X, Y, CurPage, MouseEve
 
                 if (type_Paragraph === Item.GetType() && true === MouseEvent.CtrlKey)
                 {
-                    var Hyperlink = Item.Check_Hyperlink(X, Y, this.CurPage);
+                    var Hyperlink = Item.Check_Hyperlink(X, Y, ElementPageIndex);
                     if (null != Hyperlink)
                     {
                         this.Selection.Data =
