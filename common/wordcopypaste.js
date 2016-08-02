@@ -2285,7 +2285,6 @@ PasteProcessor.prototype =
 					else
 					{
 						var aContent = oThis._convertExcelBinary(aContentExcel);
-						this.aContent = aContent.content;
 						oThis.api.pre_Paste(aContent.fonts, aContent.images, fPrepasteCallback);
 					}
 					if(bTurnOffTrackRevisions){
@@ -3417,6 +3416,7 @@ PasteProcessor.prototype =
 		//пока только распознаём только графические объекты
 		var aContent = null, tempParagraph = null;
 		var imageUrl, isGraphicFrame, extX, extY;
+		var fonts = null;
 		
 		var drawings = pDrawings ? pDrawings : aContentExcel.workbook.aWorksheets[0].Drawings;
 		if(drawings && drawings.length)
@@ -3495,11 +3495,11 @@ PasteProcessor.prototype =
 		}
 		else
 		{
-			this._convertTableFromExcel(aContentExcel);
+			fonts = this._convertTableFromExcel(aContentExcel);
 			aContent = this.aContent;
 		}
 		
-		return {content: aContent};
+		return {content: aContent, fonts: fonts};
 	},
 	
 	_convertTableFromExcel: function(aContentExcel)
@@ -3510,6 +3510,7 @@ PasteProcessor.prototype =
 		var tempActiveRef = aContentExcel.activeRange;
 		var activeRange = AscCommonExcel.g_oRangeCache.getAscRange(tempActiveRef);
 		var t = this;
+		var fonts = [];
 		
 		var convertBorder = function(border)
 		{
@@ -3533,7 +3534,7 @@ PasteProcessor.prototype =
 				t.oFonts = [];
 
 			t.oFonts[fontFamily] = {Name: fontFamily, Index: -1};
-            t.aContent.fonts.push(new CFont(fontFamily, 0, "", 0));
+			fonts.push(new CFont(fontFamily, 0, "", 0));
 		}
 		
 		//grid
@@ -3703,6 +3704,8 @@ PasteProcessor.prototype =
 			//if((i + vMerge - 1) == diffRow)
 				//i = i + vMerge - 1;	
 		}
+		
+		return fonts;
 	},
 	
 	_convertTableToPPTX: function(table)
