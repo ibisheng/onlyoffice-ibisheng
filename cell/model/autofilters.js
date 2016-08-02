@@ -824,7 +824,7 @@
 				var isTitle = this._isAddNameColumn(mainAdjacentCells);
 				objOptions.asc_setIsTitle(isTitle);
 				var tmpRange = mainAdjacentCells.clone();
-				tmpRange.r1Abs = tmpRange.c1Abs = tmpRange.r2Abs = tmpRange.c2Abs = true;
+				tmpRange.setAbs(true, true, true, true);
 				objOptions.asc_setRange(tmpRange.getName());
 				return objOptions;
 			},

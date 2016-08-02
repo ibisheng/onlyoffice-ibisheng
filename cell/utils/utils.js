@@ -197,7 +197,9 @@
 		 * @return {Range}
 		 */
 		function Range(c1, r1, c2, r2, normalize) {
-			if ( !(this instanceof Range) ) {return new Range(c1, r1, c2, r2, normalize);}
+			if (!(this instanceof Range)) {
+				return new Range(c1, r1, c2, r2, normalize);
+			}
 
 			/** @type Number */
 			this.c1 = c1;
@@ -207,287 +209,316 @@
 			this.c2 = c2;
 			/** @type Number */
 			this.r2 = r2;
-			this.r1Abs = false;
-			this.c1Abs = false;
-			this.r2Abs = false;
-			this.c2Abs = false;
+			this.refType1 = referenceType.R;
+			this.refType2 = referenceType.R;
 
 			return normalize ? this.normalize() : this;
 		}
 
-		Range.prototype = {
-
-			constructor: Range,
-
-			assign: function (c1, r1, c2, r2, normalize) {
-				if (typeOf(c1) !== kNumberL || typeOf(c2) !== kNumberL ||
-				    typeOf(r1) !== kNumberL || typeOf(r2) !== kNumberL) {
-					throw "Error: range.assign("+c1+","+r1+","+c2+","+r2+") - numerical args are expected";
-				}
-				this.c1 = c1;
-				this.r1 = r1;
-				this.c2 = c2;
-				this.r2 = r2;
-				return normalize ? this.normalize() : this;
-			},
-			assign2: function (range) {
-				return this.assign(range.c1, range.r1, range.c2, range.r2);
-			},
-
-			clone: function (normalize) {
-			    var oRes = new Range(this.c1, this.r1, this.c2, this.r2, normalize);
-			    oRes.r1Abs = this.r1Abs;
-			    oRes.c1Abs = this.c1Abs;
-			    oRes.r2Abs = this.r2Abs;
-			    oRes.c2Abs = this.c2Abs;
-			    return oRes;
-			},
-
-			normalize: function () {
-				var tmp;
-				if (this.c1 > this.c2){
-					tmp = this.c1;
-					this.c1 = this.c2;
-					this.c2 = tmp;
-				}
-				if (this.r1 > this.r2){
-					tmp = this.r1;
-					this.r1 = this.r2;
-					this.r2 = tmp;
-				}
-				return this;
-			},
-
-			isEqual: function (range) {
-				return range && this.c1 === range.c1 && this.r1 === range.r1 && this.c2 === range.c2 && this.r2 === range.r2;
-			},
-
-			isEqualAll: function (range) {
-			    return this.isEqual(range) && this.r1Abs === range.r1Abs && this.r2Abs === range.r2Abs && this.c1Abs === range.c1Abs && this.c2Abs === range.c2Abs;
-			},
-
-			contains: function (c, r) {
-				return this.c1 <= c && c <= this.c2 && this.r1 <= r && r <= this.r2;
-			},
-			
-			containsRange: function (range) {
-				return this.contains(range.c1, range.r1) && this.contains(range.c2, range.r2);
-			},
-
-			containsFirstLineRange: function (range) {
-				return this.contains(range.c1, range.r1) && this.contains(range.c2, range.r1);
-			},
-
-			intersection: function (range) {
-				var s1 = this.clone(true),
-				    s2 = range instanceof Range ? range.clone(true) :
-				                                  new Range(range.c1, range.r1, range.c2, range.r2, true);
-
-				if (s2.c1 > s1.c2 || s2.c2 < s1.c1 || s2.r1 > s1.r2 || s2.r2 < s1.r1) {return null;}
-
-				return new Range(
-						s2.c1 >= s1.c1 && s2.c1 <= s1.c2 ? s2.c1 : s1.c1,
-						s2.r1 >= s1.r1 && s2.r1 <= s1.r2 ? s2.r1 : s1.r1,
-						Math.min(s1.c2, s2.c2),
-						Math.min(s1.r2, s2.r2));
-			},
-			
-			intersectionSimple: function (range) {
-				var oRes = null;
-				var r1 = Math.max(this.r1, range.r1);
-				var c1 = Math.max(this.c1, range.c1);
-				var r2 = Math.min(this.r2, range.r2);
-				var c2 = Math.min(this.c2, range.c2);
-				if(r1 <= r2 && c1 <= c2)
-					oRes = new Range(c1, r1, c2, r2);
-				return oRes;
-			},
-			
-			isIntersect: function (range) {
-				var bRes = true;
-				if(range.r2 < this.r1 || this.r2 < range.r1)
-					bRes = false;
-				else if(range.c2 < this.c1 || this.c2 < range.c1)
-					bRes = false;
-				return bRes;
-			},
-
-			isOneCell : function(){
-				return this.r1 == this.r2 && this.c1 == this.c2;
-			},
-
-			union: function (range) {
-				var s1 = this.clone(true),
-				    s2 = range instanceof Range ? range.clone(true) :
-				                                  new Range(range.c1, range.r1, range.c2, range.r2, true);
-
-				return new Range(
-						Math.min(s1.c1, s2.c1), Math.min(s1.r1, s2.r1),
-						Math.max(s1.c2, s2.c2), Math.max(s1.r2, s2.r2));
-			},
-			
-			union2: function (range) {
-				this.c1 = Math.min(this.c1, range.c1);
-				this.c2 = Math.max(this.c2, range.c2);
-				this.r1 = Math.min(this.r1, range.r1);
-				this.r2 = Math.max(this.r2, range.r2);
-			},
-			
-			setOffset : function(offset){
-                if ( this.r1 == 0 && this.r2 == gc_nMaxRow0 && offset.offsetRow != 0 || this.c1 == 0 && this.c2 == gc_nMaxCol0 && offset.offsetCol != 0 ) {
-                    return;
-                }
-				this.setOffsetFirst(offset);
-				this.setOffsetLast(offset);
-			},
-
-			setOffsetFirst : function(offset){
-                this.c1 += offset.offsetCol;
-                if( this.c1 < 0 ) {
-                    this.c1 = 0;
-                }
-                if( this.c1 > gc_nMaxCol0 ) {
-                    this.c1 = gc_nMaxCol0;
-                }
-                this.r1 += offset.offsetRow;
-				if( this.r1 < 0 )
-					this.r1 = 0;
-                if( this.r1 > gc_nMaxRow0 )
-                    this.r1 = gc_nMaxRow0;
-			},
-
-			setOffsetLast : function(offset){
-				this.c2 += offset.offsetCol;
-				if( this.c2 < 0 )
-					this.c2 = 0;
-                if( this.c2 > gc_nMaxCol0 )
-					this.c2 = gc_nMaxCol0;
-				this.r2 += offset.offsetRow;
-				if( this.r2 < 0 )
-					this.r2 = 0;
-                if( this.r2 > gc_nMaxRow0 )
-                    this.r2 = gc_nMaxRow0;
-			},
-			
-			getName : function() {
-			    var sRes = "";
-			    if (0 == this.c1 && gc_nMaxCol0 == this.c2 && false == this.c1Abs && false == this.c2Abs) {
-			        if (this.r1Abs)
-			            sRes += "$";
-			        sRes += (this.r1 + 1) + ":";
-			        if (this.r2Abs)
-			            sRes += "$";
-			        sRes += (this.r2 + 1);
-			    }
-			    else if (0 == this.r1 && gc_nMaxRow0 == this.r2 && false == this.r1Abs && false == this.r2Abs) {
-			        if (this.c1Abs)
-			            sRes += "$";
-			        sRes += g_oCellAddressUtils.colnumToColstr(this.c1 + 1) + ":";
-			        if (this.c2Abs)
-			            sRes += "$";
-			        sRes += g_oCellAddressUtils.colnumToColstr(this.c2 + 1);
-			    }
-			    else {
-			        if (this.c1Abs)
-			            sRes += "$";
-			        sRes += g_oCellAddressUtils.colnumToColstr(this.c1 + 1);
-			        if (this.r1Abs)
-			            sRes += "$";
-			        sRes += (this.r1 + 1);
-			        if (!this.isOneCell()) {
-			            sRes += ":";
-			            if (this.c2Abs)
-			                sRes += "$";
-			            sRes += g_oCellAddressUtils.colnumToColstr(this.c2 + 1);
-			            if (this.r2Abs)
-			                sRes += "$";
-			            sRes += (this.r2 + 1);
-			        }
-			    }
-			    return sRes;
-			},
-
-            getAbsName : function() {
-			    var sRes = "";
-			    if (0 == this.c1 && gc_nMaxCol0 == this.c2 && false == this.c1Abs && false == this.c2Abs) {
-                    sRes += "$";
-			        sRes += (this.r1 + 1) + ":";
-                    sRes += "$";
-			        sRes += (this.r2 + 1);
-			    }
-			    else if (0 == this.r1 && gc_nMaxRow0 == this.r2 && false == this.r1Abs && false == this.r2Abs) {
-                    sRes += "$";
-			        sRes += g_oCellAddressUtils.colnumToColstr(this.c1 + 1) + ":";
-                    sRes += "$";
-			        sRes += g_oCellAddressUtils.colnumToColstr(this.c2 + 1);
-			    }
-			    else {
-                    sRes += "$";
-			        sRes += g_oCellAddressUtils.colnumToColstr(this.c1 + 1);
-                    sRes += "$";
-			        sRes += (this.r1 + 1);
-			        if (!this.isOneCell()) {
-			            sRes += ":";
-		                sRes += "$";
-			            sRes += g_oCellAddressUtils.colnumToColstr(this.c2 + 1);
-		                sRes += "$";
-			            sRes += (this.r2 + 1);
-			        }
-			    }
-			    return sRes;
-			},
-
-            getAbsName2 : function(absCol1,absRow1,absCol2,absRow2) {
-                var sRes = "";
-                if (0 == this.c1 && gc_nMaxCol0 == this.c2 && false == this.c1Abs && false == this.c2Abs) {
-                    if (absRow1)
-                        sRes += "$";
-                    sRes += (this.r1 + 1) + ":";
-                    if (absRow2)
-                        sRes += "$";
-                    sRes += (this.r2 + 1);
-                }
-                else if (0 == this.r1 && gc_nMaxRow0 == this.r2 && false == this.r1Abs && false == this.r2Abs) {
-                    if (absCol1)
-                        sRes += "$";
-                    sRes += g_oCellAddressUtils.colnumToColstr(this.c1 + 1) + ":";
-                    if (absCol2)
-                        sRes += "$";
-                    sRes += g_oCellAddressUtils.colnumToColstr(this.c2 + 1);
-                }
-                else {
-                    if (absCol1)
-                        sRes += "$";
-                    sRes += g_oCellAddressUtils.colnumToColstr(this.c1 + 1);
-                    if (absRow1)
-                        sRes += "$";
-                    sRes += (this.r1 + 1);
-                    if (!this.isOneCell()) {
-                        sRes += ":";
-                        if (absCol2)
-                            sRes += "$";
-                        sRes += g_oCellAddressUtils.colnumToColstr(this.c2 + 1);
-                        if (absRow2)
-                            sRes += "$";
-                        sRes += (this.r2 + 1);
-                    }
-                }
-                return sRes;
-            },
-
-			getAllRange: function () {
-				var result;
-				if (c_oAscSelectionType.RangeMax === this.type)
-					result = new Range(0, 0, gc_nMaxCol0, gc_nMaxRow0);
-				else if (c_oAscSelectionType.RangeCol === this.type)
-					result = new Range(this.c1, 0, this.c2, gc_nMaxRow0);
-				else if (c_oAscSelectionType.RangeRow === this.type)
-					result = new Range(0, this.r1, gc_nMaxCol0, this.r2);
-				else
-					result = this.clone();
-
-				return result;
+		Range.prototype.assign = function (c1, r1, c2, r2, normalize) {
+			if (typeOf(c1) !== kNumberL || typeOf(c2) !== kNumberL || typeOf(r1) !== kNumberL || typeOf(r2) !== kNumberL) {
+				throw "Error: range.assign(" + c1 + "," + r1 + "," + c2 + "," + r2 + ") - numerical args are expected";
 			}
+			this.c1 = c1;
+			this.r1 = r1;
+			this.c2 = c2;
+			this.r2 = r2;
+			return normalize ? this.normalize() : this;
+		};
+		Range.prototype.assign2 = function (range) {
+			return this.assign(range.c1, range.r1, range.c2, range.r2);
+		};
+
+		Range.prototype.clone = function (normalize) {
+			var oRes = new Range(this.c1, this.r1, this.c2, this.r2, normalize);
+			oRes.refType1 = this.refType1;
+			oRes.refType2 = this.refType2;
+			return oRes;
+		};
+
+		Range.prototype.normalize = function () {
+			var tmp;
+			if (this.c1 > this.c2) {
+				tmp = this.c1;
+				this.c1 = this.c2;
+				this.c2 = tmp;
+			}
+			if (this.r1 > this.r2) {
+				tmp = this.r1;
+				this.r1 = this.r2;
+				this.r2 = tmp;
+			}
+			return this;
+		};
+
+		Range.prototype.isEqual = function (range) {
+			return range && this.c1 === range.c1 && this.r1 === range.r1 && this.c2 === range.c2 && this.r2 === range.r2;
+		};
+
+		Range.prototype.isEqualAll = function (range) {
+			return this.isEqual(range) && this.refType1 === range.refType1 && this.refType2 === range.refType2;
+		};
+
+		Range.prototype.contains = function (c, r) {
+			return this.c1 <= c && c <= this.c2 && this.r1 <= r && r <= this.r2;
+		};
+
+		Range.prototype.containsRange = function (range) {
+			return this.contains(range.c1, range.r1) && this.contains(range.c2, range.r2);
+		};
+
+		Range.prototype.containsFirstLineRange = function (range) {
+			return this.contains(range.c1, range.r1) && this.contains(range.c2, range.r1);
+		};
+
+		Range.prototype.intersection = function (range) {
+			var s1 = this.clone(true), s2 = range instanceof Range ? range.clone(true) :
+				new Range(range.c1, range.r1, range.c2, range.r2, true);
+
+			if (s2.c1 > s1.c2 || s2.c2 < s1.c1 || s2.r1 > s1.r2 || s2.r2 < s1.r1) {
+				return null;
+			}
+
+			return new Range(s2.c1 >= s1.c1 && s2.c1 <= s1.c2 ? s2.c1 : s1.c1, s2.r1 >= s1.r1 && s2.r1 <= s1.r2 ? s2.r1 :
+				s1.r1, Math.min(s1.c2, s2.c2), Math.min(s1.r2, s2.r2));
+		};
+
+		Range.prototype.intersectionSimple = function (range) {
+			var oRes = null;
+			var r1 = Math.max(this.r1, range.r1);
+			var c1 = Math.max(this.c1, range.c1);
+			var r2 = Math.min(this.r2, range.r2);
+			var c2 = Math.min(this.c2, range.c2);
+			if (r1 <= r2 && c1 <= c2) {
+				oRes = new Range(c1, r1, c2, r2);
+			}
+			return oRes;
+		};
+
+		Range.prototype.isIntersect = function (range) {
+			var bRes = true;
+			if (range.r2 < this.r1 || this.r2 < range.r1) {
+				bRes = false;
+			} else if (range.c2 < this.c1 || this.c2 < range.c1) {
+				bRes = false;
+			}
+			return bRes;
+		};
+
+		Range.prototype.isOneCell = function () {
+			return this.r1 == this.r2 && this.c1 == this.c2;
+		};
+
+		Range.prototype.union = function (range) {
+			var s1 = this.clone(true), s2 = range instanceof Range ? range.clone(true) :
+				new Range(range.c1, range.r1, range.c2, range.r2, true);
+
+			return new Range(Math.min(s1.c1, s2.c1), Math.min(s1.r1, s2.r1), Math.max(s1.c2, s2.c2), Math.max(s1.r2, s2.r2));
+		};
+
+		Range.prototype.union2 = function (range) {
+			this.c1 = Math.min(this.c1, range.c1);
+			this.c2 = Math.max(this.c2, range.c2);
+			this.r1 = Math.min(this.r1, range.r1);
+			this.r2 = Math.max(this.r2, range.r2);
+		};
+
+		Range.prototype.setOffset = function (offset) {
+			if (this.r1 == 0 && this.r2 == gc_nMaxRow0 && offset.offsetRow != 0 ||
+				this.c1 == 0 && this.c2 == gc_nMaxCol0 && offset.offsetCol != 0) {
+				return;
+			}
+			this.setOffsetFirst(offset);
+			this.setOffsetLast(offset);
+		};
+
+		Range.prototype.setOffsetFirst = function (offset) {
+			this.c1 += offset.offsetCol;
+			if (this.c1 < 0) {
+				this.c1 = 0;
+			}
+			if (this.c1 > gc_nMaxCol0) {
+				this.c1 = gc_nMaxCol0;
+			}
+			this.r1 += offset.offsetRow;
+			if (this.r1 < 0) {
+				this.r1 = 0;
+			}
+			if (this.r1 > gc_nMaxRow0) {
+				this.r1 = gc_nMaxRow0;
+			}
+		};
+
+		Range.prototype.setOffsetLast = function (offset) {
+			this.c2 += offset.offsetCol;
+			if (this.c2 < 0) {
+				this.c2 = 0;
+			}
+			if (this.c2 > gc_nMaxCol0) {
+				this.c2 = gc_nMaxCol0;
+			}
+			this.r2 += offset.offsetRow;
+			if (this.r2 < 0) {
+				this.r2 = 0;
+			}
+			if (this.r2 > gc_nMaxRow0) {
+				this.r2 = gc_nMaxRow0;
+			}
+		};
+
+		Range.prototype.getName = function () {
+			var sRes = "";
+			var c1Abs = this.isAbsCol(this.refType1), c2Abs = this.isAbsCol(this.refType2);
+			var r1Abs = this.isAbsRow(this.refType1), r2Abs = this.isAbsRow(this.refType2);
+
+			if (0 == this.c1 && gc_nMaxCol0 == this.c2 && false == c1Abs && false == c2Abs) {
+				if (r1Abs) {
+					sRes += "$";
+				}
+				sRes += (this.r1 + 1) + ":";
+				if (r2Abs) {
+					sRes += "$";
+				}
+				sRes += (this.r2 + 1);
+			} else if (0 == this.r1 && gc_nMaxRow0 == this.r2 && false == r1Abs && false == r2Abs) {
+				if (c1Abs) {
+					sRes += "$";
+				}
+				sRes += g_oCellAddressUtils.colnumToColstr(this.c1 + 1) + ":";
+				if (c2Abs) {
+					sRes += "$";
+				}
+				sRes += g_oCellAddressUtils.colnumToColstr(this.c2 + 1);
+			} else {
+				if (c1Abs) {
+					sRes += "$";
+				}
+				sRes += g_oCellAddressUtils.colnumToColstr(this.c1 + 1);
+				if (r1Abs) {
+					sRes += "$";
+				}
+				sRes += (this.r1 + 1);
+				if (!this.isOneCell()) {
+					sRes += ":";
+					if (c2Abs) {
+						sRes += "$";
+					}
+					sRes += g_oCellAddressUtils.colnumToColstr(this.c2 + 1);
+					if (r2Abs) {
+						sRes += "$";
+					}
+					sRes += (this.r2 + 1);
+				}
+			}
+			return sRes;
+		};
+
+		Range.prototype.getAbsName = function () {
+			var sRes = "";
+			var c1Abs = this.isAbsCol(this.refType1), c2Abs = this.isAbsCol(this.refType2);
+			var r1Abs = this.isAbsRow(this.refType1), r2Abs = this.isAbsRow(this.refType2);
+
+			if (0 == this.c1 && gc_nMaxCol0 == this.c2 && false == c1Abs && false == c2Abs) {
+				sRes += "$";
+				sRes += (this.r1 + 1) + ":";
+				sRes += "$";
+				sRes += (this.r2 + 1);
+			} else if (0 == this.r1 && gc_nMaxRow0 == this.r2 && false == r1Abs && false == r2Abs) {
+				sRes += "$";
+				sRes += g_oCellAddressUtils.colnumToColstr(this.c1 + 1) + ":";
+				sRes += "$";
+				sRes += g_oCellAddressUtils.colnumToColstr(this.c2 + 1);
+			} else {
+				sRes += "$";
+				sRes += g_oCellAddressUtils.colnumToColstr(this.c1 + 1);
+				sRes += "$";
+				sRes += (this.r1 + 1);
+				if (!this.isOneCell()) {
+					sRes += ":";
+					sRes += "$";
+					sRes += g_oCellAddressUtils.colnumToColstr(this.c2 + 1);
+					sRes += "$";
+					sRes += (this.r2 + 1);
+				}
+			}
+			return sRes;
+		};
+
+		Range.prototype.getAbsName2 = function (absCol1, absRow1, absCol2, absRow2) {
+			var sRes = "";
+			var c1Abs = this.isAbsCol(this.refType1), c2Abs = this.isAbsCol(this.refType2);
+			var r1Abs = this.isAbsRow(this.refType1), r2Abs = this.isAbsRow(this.refType2);
+
+			if (0 == this.c1 && gc_nMaxCol0 == this.c2 && false == c1Abs && false == c2Abs) {
+				if (absRow1) {
+					sRes += "$";
+				}
+				sRes += (this.r1 + 1) + ":";
+				if (absRow2) {
+					sRes += "$";
+				}
+				sRes += (this.r2 + 1);
+			} else if (0 == this.r1 && gc_nMaxRow0 == this.r2 && false == r1Abs && false == r2Abs) {
+				if (absCol1) {
+					sRes += "$";
+				}
+				sRes += g_oCellAddressUtils.colnumToColstr(this.c1 + 1) + ":";
+				if (absCol2) {
+					sRes += "$";
+				}
+				sRes += g_oCellAddressUtils.colnumToColstr(this.c2 + 1);
+			} else {
+				if (absCol1) {
+					sRes += "$";
+				}
+				sRes += g_oCellAddressUtils.colnumToColstr(this.c1 + 1);
+				if (absRow1) {
+					sRes += "$";
+				}
+				sRes += (this.r1 + 1);
+				if (!this.isOneCell()) {
+					sRes += ":";
+					if (absCol2) {
+						sRes += "$";
+					}
+					sRes += g_oCellAddressUtils.colnumToColstr(this.c2 + 1);
+					if (absRow2) {
+						sRes += "$";
+					}
+					sRes += (this.r2 + 1);
+				}
+			}
+			return sRes;
+		};
+
+		Range.prototype.getAllRange = function () {
+			var result;
+			if (c_oAscSelectionType.RangeMax === this.type) {
+				result = new Range(0, 0, gc_nMaxCol0, gc_nMaxRow0);
+			} else if (c_oAscSelectionType.RangeCol === this.type) {
+				result = new Range(this.c1, 0, this.c2, gc_nMaxRow0);
+			} else if (c_oAscSelectionType.RangeRow === this.type) {
+				result = new Range(0, this.r1, gc_nMaxCol0, this.r2);
+			} else {
+				result = this.clone();
+			}
+
+			return result;
+		};
+
+		Range.prototype.setAbs = function (absRow1, absCol1, absRow2, absCol2) {
+			this.refType1 = (absRow1 ? 0 : 2) + (absCol1 ? 0 : 1);
+			this.refType2 = (absRow2 ? 0 : 2) + (absCol2 ? 0 : 1);
+		};
+		Range.prototype.isAbsCol = function (refType) {
+			return (refType === referenceType.A || refType === referenceType.RRAC);
+		};
+		Range.prototype.isAbsRow = function (refType) {
+			return (refType === referenceType.A || refType === referenceType.ARRC);
+		};
+		Range.prototype.switchReference = function () {
+			this.refType1 = (this.refType1 + 1) % 4;
+			this.refType2 = (this.refType2 + 1) % 4;
 		};
 
 		/**
@@ -502,10 +533,8 @@
 				var range = arguments[0];
 				Range3D.superclass.constructor.call(this, range.c1, range.r1, range.c2, range.r2);
 				// ToDo стоит пересмотреть конструкторы.
-				this.r1Abs = range.r1Abs;
-				this.c1Abs = range.c1Abs;
-				this.r2Abs = range.r2Abs;
-				this.c2Abs = range.c2Abs;
+				this.refType1 = range.refType1;
+				this.refType2 = range.refType2;
 
 				this.sheet = arguments[1];
 				this.sheet2 = arguments[2];
@@ -539,10 +568,8 @@
 				var range = arguments[0];
 				ActiveRange.superclass.constructor.call(this, range.c1, range.r1, range.c2, range.r2);
 				// ToDo стоит пересмотреть конструкторы.
-				this.r1Abs = range.r1Abs;
-				this.c1Abs = range.c1Abs;
-				this.r2Abs = range.r2Abs;
-				this.c2Abs = range.c2Abs;
+				this.refType1 = range.refType1;
+				this.refType2 = range.refType2;
 			}
 			else if(arguments.length > 1)
 				ActiveRange.superclass.constructor.apply(this, arguments);
@@ -675,18 +702,15 @@
 				FormulaRange.superclass.constructor.apply(this, arguments);
 			else
 				FormulaRange.superclass.constructor.call(this, 0, 0, 0, 0);
-			this.r1Abs = false;
-			this.c1Abs = false;
-			this.r2Abs = false;
-			this.c2Abs = false;
+
+			this.refType1 = referenceType.R;
+			this.refType2 = referenceType.R;
 		}
 		AscCommon.extendClass(FormulaRange, Range);
-		FormulaRange.prototype.clone = function(){
+		FormulaRange.prototype.clone = function () {
 			var oRes = new FormulaRange(FormulaRange.superclass.clone.apply(this, arguments));
-			oRes.r1Abs = this.r1Abs;
-			oRes.c1Abs = this.c1Abs;
-			oRes.r2Abs = this.r2Abs;
-			oRes.c2Abs = this.c2Abs;
+			oRes.refType1 = this.refType1;
+			oRes.refType2 = this.refType2;
 			return oRes;
 		};
 		FormulaRange.prototype.intersection = function () {
@@ -706,39 +730,42 @@
 		};
 		FormulaRange.prototype.getName = function () {
 			var sRes = "";
+			var c1Abs = this.isAbsCol(this.refType1), c2Abs = this.isAbsCol(this.refType2);
+			var r1Abs = this.isAbsRow(this.refType1), r2Abs = this.isAbsRow(this.refType2);
+
 			if(0 == this.c1 && gc_nMaxCol0 == this.c2)
 			{
-				if(this.r1Abs)
+				if(r1Abs)
 					sRes += "$";
 				sRes += (this.r1 + 1) + ":";
-				if(this.r2Abs)
+				if(r2Abs)
 					sRes += "$";
 				sRes += (this.r2 + 1);
 			}
 			else if(0 == this.r1 && gc_nMaxRow0 == this.r2)
 			{
-				if(this.c1Abs)
+				if(c1Abs)
 					sRes += "$";
 				sRes += g_oCellAddressUtils.colnumToColstr(this.c1 + 1) + ":";
-				if(this.c2Abs)
+				if(c2Abs)
 					sRes += "$";
 				sRes += g_oCellAddressUtils.colnumToColstr(this.c2 + 1);
 			}
 			else
 			{
-				if(this.c1Abs)
+				if(c1Abs)
 					sRes += "$";
 				sRes += g_oCellAddressUtils.colnumToColstr(this.c1 + 1);
-				if(this.r1Abs)
+				if(r1Abs)
 					sRes += "$";
 				sRes += (this.r1 + 1);
 				if(!this.isOneCell())
 				{
 					sRes += ":";
-					if(this.c2Abs)
+					if(c2Abs)
 						sRes += "$";
 					sRes += g_oCellAddressUtils.colnumToColstr(this.c2 + 1);
-					if(this.r2Abs)
+					if(r2Abs)
 						sRes += "$";
 					sRes += (this.r2 + 1);
 				}
@@ -764,134 +791,123 @@
 			this.offsetY = offsetY;
 		}
 
-		function RangeCache()
-		{
+		function RangeCache() {
 			this.oCache = {};
 		}
-		RangeCache.prototype = {
-			getAscRange : function(sRange)
-			{
-				return this._getRange(sRange, 1);
-			},
-			getRange3D : function(sRange)
-			{
-				var res = AscCommon.parserHelp.parse3DRef(sRange);
-				if (!res) {
-					return null;
-				}
-				var range = this._getRange(res.range.toUpperCase(), 1);
-				return range ? new Range3D(range, res.sheet, res.sheet2) : null;
-			},
-			getActiveRange : function(sRange)
-			{
-				return this._getRange(sRange, 2);
-			},
-			getFormulaRange : function(sRange)
-			{
-				return this._getRange(sRange, 3);
-			},
-			_getRange : function(sRange, type)
-			{
-				var oRes = null;
-				var oCacheVal = this.oCache[sRange];
-				if(null == oCacheVal)
-				{
-				    var oFirstAddr, oLastAddr;
-				    var bIsSingle = true;
-					var nIndex = sRange.indexOf(":");
-					if(-1 != nIndex)
-					{
-					    bIsSingle = false;
-						oFirstAddr = g_oCellAddressUtils.getCellAddress(sRange.substring(0, nIndex));
-						oLastAddr = g_oCellAddressUtils.getCellAddress(sRange.substring(nIndex + 1));
-					}
-					else
-						oFirstAddr = oLastAddr = g_oCellAddressUtils.getCellAddress(sRange);
-					oCacheVal = { first: null, last: null, ascRange: null, formulaRange: null, activeRange: null };
-                    //последнее условие, чтобы не распознавалось "A", "1"(должно быть "A:A", "1:1")
-					if (oFirstAddr.isValid() && oLastAddr.isValid() && (!bIsSingle || (!oFirstAddr.getIsRow() && !oFirstAddr.getIsCol())))
-					{
-					    oCacheVal.first = oFirstAddr;
-					    oCacheVal.last = oLastAddr;
-					}
-					this.oCache[sRange] = oCacheVal;
-				}
-				if (1 == type)
-				    oRes = oCacheVal.ascRange;
-				else if (2 == type)
-				    oRes = oCacheVal.activeRange;
-				else
-				    oRes = oCacheVal.formulaRange;
-				if (null == oRes && null != oCacheVal.first && null != oCacheVal.last) {
-				    var r1 = oCacheVal.first.getRow0(), r2 = oCacheVal.last.getRow0(), c1 = oCacheVal.first.getCol0(), c2 = oCacheVal.last.getCol0();
-				    if (oCacheVal.first.getIsRow() && oCacheVal.last.getIsRow()) {
-				        c1 = 0;
-				        c2 = gc_nMaxCol0;
-				    }
-				    if (oCacheVal.first.getIsCol() && oCacheVal.last.getIsCol()) {
-				        r1 = 0;
-				        r2 = gc_nMaxRow0;
-				    }
-				    if (r1 > r2) {
-				        var temp = r1;
-				        r1 = r2;
-				        r2 = temp;
-				    }
-				    if (c1 > c2) {
-				        var temp = c1;
-				        c1 = c2;
-				        c2 = temp;
-				    }
 
-				    if (1 == type) {
-				        if (null == oCacheVal.ascRange) {
-				            var oAscRange = new Range(c1, r1, c2, r2);
-				            oAscRange.r1Abs = oCacheVal.first.getRowAbs();
-				            oAscRange.c1Abs = oCacheVal.first.getColAbs();
-				            oAscRange.r2Abs = oCacheVal.last.getRowAbs();
-				            oAscRange.c2Abs = oCacheVal.last.getColAbs();
-				            oCacheVal.ascRange = oAscRange;
-				        }
-				        oRes = oCacheVal.ascRange;
-				    }
-				    else if (2 == type) {
-				        if (null == oCacheVal.activeRange) {
-				            var oActiveRange = new ActiveRange(c1, r1, c2, r2);
-				            oActiveRange.r1Abs = oCacheVal.first.getRowAbs();
-				            oActiveRange.c1Abs = oCacheVal.first.getColAbs();
-				            oActiveRange.r2Abs = oCacheVal.last.getRowAbs();
-				            oActiveRange.c2Abs = oCacheVal.last.getColAbs();
-				            var bCol = 0 == r1 && gc_nMaxRow0 == r2;
-				            var bRow = 0 == c1 && gc_nMaxCol0 == c2;
-				            if (bCol && bRow)
-				                oActiveRange.type = c_oAscSelectionType.RangeMax;
-				            else if (bCol)
-				                oActiveRange.type = c_oAscSelectionType.RangeCol;
-				            else if (bRow)
-				                oActiveRange.type = c_oAscSelectionType.RangeRow;
-				            else
-				                oActiveRange.type = c_oAscSelectionType.RangeCells;
-				            oActiveRange.startCol = oActiveRange.c1;
-				            oActiveRange.startRow = oActiveRange.r1;
-				            oCacheVal.activeRange = oActiveRange;
-				        }
-				        oRes = oCacheVal.activeRange;
-				    }
-				    else {
-				        if (null == oCacheVal.formulaRange) {
-				            var oFormulaRange = new FormulaRange(c1, r1, c2, r2);
-				            oFormulaRange.r1Abs = oCacheVal.first.getRowAbs();
-				            oFormulaRange.c1Abs = oCacheVal.first.getColAbs();
-				            oFormulaRange.r2Abs = oCacheVal.last.getRowAbs();
-				            oFormulaRange.c2Abs = oCacheVal.last.getColAbs();
-				            oCacheVal.formulaRange = oFormulaRange;
-				        }
-				        oRes = oCacheVal.formulaRange;
-				    }
-				}
-				return oRes;
-			}
+		RangeCache.prototype.getAscRange = function (sRange) {
+			return this._getRange(sRange, 1);
 		};
+		RangeCache.prototype.getRange3D = function (sRange) {
+			var res = AscCommon.parserHelp.parse3DRef(sRange);
+			if (!res) {
+				return null;
+			}
+			var range = this._getRange(res.range.toUpperCase(), 1);
+			return range ? new Range3D(range, res.sheet, res.sheet2) : null;
+		};
+		RangeCache.prototype.getActiveRange = function (sRange) {
+			return this._getRange(sRange, 2);
+		};
+		RangeCache.prototype.getFormulaRange = function (sRange) {
+			return this._getRange(sRange, 3);
+		};
+		RangeCache.prototype._getRange = function (sRange, type) {
+			var oRes = null;
+			var oCacheVal = this.oCache[sRange];
+			if (null == oCacheVal) {
+				var oFirstAddr, oLastAddr;
+				var bIsSingle = true;
+				var nIndex = sRange.indexOf(":");
+				if (-1 != nIndex) {
+					bIsSingle = false;
+					oFirstAddr = g_oCellAddressUtils.getCellAddress(sRange.substring(0, nIndex));
+					oLastAddr = g_oCellAddressUtils.getCellAddress(sRange.substring(nIndex + 1));
+				} else {
+					oFirstAddr = oLastAddr = g_oCellAddressUtils.getCellAddress(sRange);
+				}
+				oCacheVal = {first: null, last: null, ascRange: null, formulaRange: null, activeRange: null};
+				//последнее условие, чтобы не распознавалось "A", "1"(должно быть "A:A", "1:1")
+				if (oFirstAddr.isValid() && oLastAddr.isValid() &&
+					(!bIsSingle || (!oFirstAddr.getIsRow() && !oFirstAddr.getIsCol()))) {
+					oCacheVal.first = oFirstAddr;
+					oCacheVal.last = oLastAddr;
+				}
+				this.oCache[sRange] = oCacheVal;
+			}
+			if (1 == type) {
+				oRes = oCacheVal.ascRange;
+			} else if (2 == type) {
+				oRes = oCacheVal.activeRange;
+			} else {
+				oRes = oCacheVal.formulaRange;
+			}
+			if (null == oRes && null != oCacheVal.first && null != oCacheVal.last) {
+				var r1 = oCacheVal.first.getRow0(), r2 = oCacheVal.last.getRow0(), c1 = oCacheVal.first.getCol0(), c2 = oCacheVal.last.getCol0();
+				if (oCacheVal.first.getIsRow() && oCacheVal.last.getIsRow()) {
+					c1 = 0;
+					c2 = gc_nMaxCol0;
+				}
+				if (oCacheVal.first.getIsCol() && oCacheVal.last.getIsCol()) {
+					r1 = 0;
+					r2 = gc_nMaxRow0;
+				}
+				if (r1 > r2) {
+					var temp = r1;
+					r1 = r2;
+					r2 = temp;
+				}
+				if (c1 > c2) {
+					var temp = c1;
+					c1 = c2;
+					c2 = temp;
+				}
+
+				if (1 == type) {
+					if (null == oCacheVal.ascRange) {
+						var oAscRange = new Range(c1, r1, c2, r2);
+						oAscRange.setAbs(oCacheVal.first.getRowAbs(), oCacheVal.first.getColAbs(), oCacheVal.last.getRowAbs(),
+							oCacheVal.last.getColAbs());
+
+						oCacheVal.ascRange = oAscRange;
+					}
+					oRes = oCacheVal.ascRange;
+				} else if (2 == type) {
+					if (null == oCacheVal.activeRange) {
+						var oActiveRange = new ActiveRange(c1, r1, c2, r2);
+						oActiveRange.setAbs(oCacheVal.first.getRowAbs(), oCacheVal.first.getColAbs(), oCacheVal.last.getRowAbs(),
+							oCacheVal.last.getColAbs());
+
+						var bCol = 0 == r1 && gc_nMaxRow0 == r2;
+						var bRow = 0 == c1 && gc_nMaxCol0 == c2;
+						if (bCol && bRow) {
+							oActiveRange.type = c_oAscSelectionType.RangeMax;
+						} else if (bCol) {
+							oActiveRange.type = c_oAscSelectionType.RangeCol;
+						} else if (bRow) {
+							oActiveRange.type = c_oAscSelectionType.RangeRow;
+						} else {
+							oActiveRange.type = c_oAscSelectionType.RangeCells;
+						}
+						oActiveRange.startCol = oActiveRange.c1;
+						oActiveRange.startRow = oActiveRange.r1;
+						oCacheVal.activeRange = oActiveRange;
+					}
+					oRes = oCacheVal.activeRange;
+				} else {
+					if (null == oCacheVal.formulaRange) {
+						var oFormulaRange = new FormulaRange(c1, r1, c2, r2);
+						oFormulaRange.setAbs(oCacheVal.first.getRowAbs(), oCacheVal.first.getColAbs(), oCacheVal.last.getRowAbs(),
+							oCacheVal.last.getColAbs());
+
+						oCacheVal.formulaRange = oFormulaRange;
+					}
+					oRes = oCacheVal.formulaRange;
+				}
+			}
+			return oRes;
+		};
+
 		var g_oRangeCache = new RangeCache();
 		/**
 		 * @constructor

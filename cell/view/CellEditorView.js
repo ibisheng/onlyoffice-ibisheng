@@ -465,43 +465,43 @@
 	CellEditor.prototype.canEnterCellRange = function () {
 		var fR = this._findRangeUnderCursor();
 		var isRange = (fR.range !== null && !fR.range.isName);
-		var prevChar = this.textRender.getChars( this.cursorPos - 1, 1 );
-		return isRange || this.rangeChars.indexOf( prevChar ) >= 0;
+		var prevChar = this.textRender.getChars(this.cursorPos - 1, 1);
+		return isRange || this.rangeChars.indexOf(prevChar) >= 0;
 	};
 
 	CellEditor.prototype.activateCellRange = function () {
 		var res = this._findRangeUnderCursor();
 
-		res.range ? this.handlers.trigger( "existedRange", res.range, res.wsName ) : this.handlers.trigger( "newRange" );
+		res.range ? this.handlers.trigger("existedRange", res.range, res.wsName) : this.handlers.trigger("newRange");
 	};
 
-	CellEditor.prototype.enterCellRange = function ( rangeStr ) {
+	CellEditor.prototype.enterCellRange = function (rangeStr) {
 		var res = this._findRangeUnderCursor();
 
-		if ( res.range ) {
-			this._moveCursor( kPosition, res.index );
-			this._selectChars( kPosition, res.index + res.length );
+		if (res.range) {
+			this._moveCursor(kPosition, res.index);
+			this._selectChars(kPosition, res.index + res.length);
 		}
 
 		var lastAction = this.undoList.length > 0 ? this.undoList[this.undoList.length - 1] : null;
 
-		while ( lastAction && lastAction.isRange ) {
+		while (lastAction && lastAction.isRange) {
 			this.undoList.pop();
 			lastAction = this.undoList.length > 0 ? this.undoList[this.undoList.length - 1] : null;
 		}
 
 		var tmp = this.skipTLUpdate;
 		this.skipTLUpdate = false;
-		this._addChars( rangeStr, undefined, /*isRange*/true );
+		this._addChars(rangeStr, undefined, /*isRange*/true);
 		this.skipTLUpdate = tmp;
 	};
 
-	CellEditor.prototype.changeCellRange = function ( range ) {
+	CellEditor.prototype.changeCellRange = function (range) {
 		var t = this;
-		t._moveCursor( kPosition, range.cursorePos/* -length */ );
-		t._selectChars( kPositionLength, range.formulaRangeLength );
-		t._addChars( range.getName(), undefined, /*isRange*/true );
-		t._moveCursor( kEndOfText );
+		t._moveCursor(kPosition, range.cursorePos/* -length */);
+		t._selectChars(kPositionLength, range.formulaRangeLength);
+		t._addChars(range.getName(), undefined, /*isRange*/true);
+		t._moveCursor(kEndOfText);
 	};
 
 	CellEditor.prototype.move = function ( l, t, r, b ) {
@@ -799,8 +799,8 @@
 		this.skipKeyPress = false;
 	};
 
-	CellEditor.prototype._parseRangeStr = function ( s ) {
-		var range = AscCommonExcel.g_oRangeCache.getActiveRange( s );
+	CellEditor.prototype._parseRangeStr = function (s) {
+		var range = AscCommonExcel.g_oRangeCache.getActiveRange(s);
 		return range ? range.clone() : null;
 	};
 
@@ -935,34 +935,31 @@
 	};
 
 	CellEditor.prototype._findRangeUnderCursor = function () {
-		var t = this,
-			s = t.textRender.getChars( 0, t.textRender.getCharsCount() ),
-			range,
-			arrFR = this.handlers.trigger( "getFormulaRanges" ),a;
+		var t = this, s = t.textRender.getChars(0, t.textRender.getCharsCount()), range, arrFR = this.handlers.trigger(
+			"getFormulaRanges"), a;
 
-		for ( var id = 0; id < arrFR.length; id++ ) {
+		for (var id = 0; id < arrFR.length; id++) {
 			/*так как у нас уже есть некий массив с рейнджами, которые в формуле, то пробегаемся по ним и смотрим,
 			 * находится ли курсор в позиции над этим диапазоном, дабы не парсить всю формулу заново
 			 * необходимо чтобы парсить случаи когда используется что-то такое sumnas2:K2 - sumnas2 невалидная ссылка.
 			 * */
 			a = arrFR[id];
-			if ( t.cursorPos >= a.cursorePos && t.cursorPos <= a.cursorePos + a.formulaRangeLength ) {
+			if (t.cursorPos >= a.cursorePos && t.cursorPos <= a.cursorePos + a.formulaRangeLength) {
 				range = a.clone(true);
 				range.isName = a.isName;
-				return {index: a.cursorePos, length: a.formulaRangeLength, range: range };
+				return {index: a.cursorePos, length: a.formulaRangeLength, range: range};
 			}
 		}
 
 		/*не нашли диапазонов под курсором, парсим формулу*/
-		var r, offset, _e, _s, wsName = null, ret = false, refStr, isName = false, _sColorPos,
-			wsOPEN = this.handlers.trigger( "getCellFormulaEnterWSOpen" ),
-			ws = wsOPEN ? wsOPEN.model : this.handlers.trigger( "getActiveWS" );
+		var r, offset, _e, _s, wsName = null, ret = false, refStr, isName = false, _sColorPos, wsOPEN = this.handlers.trigger(
+			"getCellFormulaEnterWSOpen"), ws = wsOPEN ? wsOPEN.model : this.handlers.trigger("getActiveWS");
 
-		this._formula = new AscCommonExcel.parserFormula( s.substr( 1 ), this.options.cellName, ws );
+		this._formula = new AscCommonExcel.parserFormula(s.substr(1), this.options.cellName, ws);
 		this._formula.parse();
 
-		if ( this._formula.RefPos && this._formula.RefPos.length > 0 ) {
-			for ( var index = 0; index < this._formula.RefPos.length; index++ ) {
+		if (this._formula.RefPos && this._formula.RefPos.length > 0) {
+			for (var index = 0; index < this._formula.RefPos.length; index++) {
 				wsName = null;
 				r = this._formula.RefPos[index];
 
@@ -970,18 +967,16 @@
 				_e = r.end;
 				_sColorPos = _s = r.start;
 
-				switch ( r.oper.type ) {
-					case cElementType.cell          :
-					{
-						if ( wsOPEN ) {
+				switch (r.oper.type) {
+					case cElementType.cell          : {
+						if (wsOPEN) {
 							wsName = wsOPEN.model.getName();
 						}
 						refStr = r.oper.value;
 						ret = true;
 						break;
 					}
-					case cElementType.cell3D        :
-					{
+					case cElementType.cell3D        : {
 						refStr = r.oper.value;
 						ret = true;
 						wsName = r.oper.ws.getName();
@@ -989,18 +984,16 @@
 						_sColorPos = _e - r.oper.toString().length;
 						break;
 					}
-					case cElementType.cellsRange    :
-					{
-						if ( wsOPEN ) {
+					case cElementType.cellsRange    : {
+						if (wsOPEN) {
 							wsName = wsOPEN.model.getName();
 						}
 						refStr = r.oper.value;
 						ret = true;
 						break;
 					}
-					case cElementType.cellsRange3D  :
-					{
-						if ( !r.oper.isSingleSheet() ) {
+					case cElementType.cellsRange3D  : {
+						if (!r.oper.isSingleSheet()) {
 							continue;
 						}
 						ret = true;
@@ -1010,21 +1003,20 @@
 						break;
 					}
 					case cElementType.table          :
-					case cElementType.name          :
-					{
+					case cElementType.name          : {
 						var nameRef = r.oper.toRef();
-						if ( nameRef instanceof AscCommonExcel.cError ) continue;
-						switch ( nameRef.type ) {
+						if (nameRef instanceof AscCommonExcel.cError) {
+							continue;
+						}
+						switch (nameRef.type) {
 
-							case cElementType.cellsRange3D          :
-							{
-								if ( !nameRef.isSingleSheet() ) {
+							case cElementType.cellsRange3D          : {
+								if (!nameRef.isSingleSheet()) {
 									continue;
 								}
 							}
 							case cElementType.cellsRange          :
-							case cElementType.cell3D        :
-							{
+							case cElementType.cell3D        : {
 								ret = true;
 								refStr = nameRef.value;
 								wsName = nameRef.getWS().getName();
@@ -1039,10 +1031,10 @@
 						continue;
 				}
 
-				if ( ret && t.cursorPos > _s && t.cursorPos <= _s + r.oper.value.length ) {
-					range = t._parseRangeStr( r.oper.value );
-					if ( range ) {
-						if ( this.handlers.trigger( "getActiveWS" ) && this.handlers.trigger( "getActiveWS" ).getName() != wsName ) {
+				if (ret && t.cursorPos > _s && t.cursorPos <= _s + r.oper.value.length) {
+					range = t._parseRangeStr(r.oper.value);
+					if (range) {
+						if (this.handlers.trigger("getActiveWS") && this.handlers.trigger("getActiveWS").getName() != wsName) {
 							return {index: -1, length: 0, range: null};
 						}
 						range.isName = isName
@@ -1052,10 +1044,8 @@
 			}
 		}
 		range ? range.isName = isName : null;
-		return !range ?
-		{index: -1, length: 0, range: null} :
+		return !range ? {index: -1, length: 0, range: null} :
 		{index: _s, length: r.oper.value.length, range: range, wsName: wsName};
-
 	};
 
 	CellEditor.prototype._updateFormulaEditMod = function ( bIsOpen ) {
@@ -2492,6 +2482,17 @@
 					event.stopPropagation();
 					event.preventDefault();
 				}
+				return false;
+
+			case 115: // F4
+				var res = this._findRangeUnderCursor();
+				if (res.range) {
+					res.range.switchReference();
+					this.enterCellRange(res.range.getName());
+				}
+
+				event.stopPropagation();
+				event.preventDefault();
 				return false;
 		}
 
