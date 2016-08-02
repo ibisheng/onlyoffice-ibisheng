@@ -2405,6 +2405,8 @@ PasteProcessor.prototype =
 								{
 									var aContent = [];
 									var table = AscFormat.ConvertGraphicFrameToWordTable(drawing, this.oLogicDocument);
+									//TODO стиль не прокидывается. в будущем нужно реализовать
+									table.TableStyle = null;
 									aContent.push(table);
 									
 									this.aContent = aContent;
