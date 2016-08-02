@@ -448,6 +448,51 @@ function CheckWordParagraphContent(aContent)
 
     }
 }
+
+function ConvertGraphicFrameToWordTable(oGraphicFrame, oDocument){
+    oGraphicFrame.setWordFlag(false, oDocument);
+    return oGraphicFrame.graphicObject.Copy(oDocument);
+}
+function ConvertTableToGraphicFrame(oTable, oPresentation){
+    var oGraphicFrame = new AscFormat.CGraphicFrame();
+    var oTable2 = new CTable(oPresentation.DrawingDocument, oGraphicFrame, true, 0, 0, 0, 50, 100000, 0, [].concat(oTable.TableGrid), oTable.TableGrid.length, true);
+    oTable2.Set_TableLayout(tbllayout_Fixed);
+    oTable2.Set_Pr(oTable.Pr.Copy());
+    oTable2.Set_TableLook(oTable.TableLook.Copy());
+    for(var i = 0; i < oTable.Content.length; ++i){
+        var oRow = oTable.Content[i];
+        var oNewRow = new CTableRow(oTable2, oRow.Content.length, oTable2.TableGrid);
+        for(var j = 0;  j < oRow.Content.length; ++j){
+            var oContent = oRow.Content[j].Content;
+            var oNewContent = oNewRow.Content[j].Content;
+            for(var t = 0; t < oContent.Content.length; ++t){
+                if(oContent.Content[t].Get_Type() === type_Paragraph){
+                    oNewContent.Internal_Content_Add(oNewContent.Content.length, AscFormat.ConvertParagraphToPPTX(oContent.Content[t], oPresentation.DrawingDocument, oNewContent));
+                }
+            }
+        }
+        var nIndex = oTable2.Content.length;
+        oTable2.Content[nIndex] = oNewRow;
+        History.Add( oTable2, { Type : AscDFH.historyitem_Table_AddRow, Pos : Index, Item : { Row : oTable2.Content[nIndex], TableRowsBottom : {}, RowsInfo : {} } } );
+    }
+
+    if(!oGraphicFrame.spPr){
+        oGraphicFrame.setSpPr(new AscFormat.CSpPr());
+        oGraphicFrame.spPr.setParent(oGraphicFrame);
+    }
+    oGraphicFrame.spPr.setXfrm(new  AscFormat.CXfrm());
+    oGraphicFrame.spPr.xfrm.setExtX(50);
+    oGraphicFrame.spPr.xfrm.setExtY(50);
+    oGraphicFrame.spPr.xfrm.setParent(oGraphicFrame.spPr);
+    var _nvGraphicFramePr =  new AscFormat.UniNvPr();
+    oGraphicFrame.setNvSpPr(_nvGraphicFramePr);
+    if(AscCommon.isRealObject(_nvGraphicFramePr) && AscFormat.isRealNumber(_nvGraphicFramePr.locks)){
+        oGraphicFrame.setLocks(_nvGraphicFramePr.locks);
+    }
+    oGraphicFrame.setGraphicObject(oTable2);
+    oGraphicFrame.setBDeleted(false);
+}
+
 function RecalculateDocContentByMaxLine(oDocContent, dMaxWidth, bNeedRecalcAllDrawings)
 {
 
@@ -5756,8 +5801,6 @@ function getParaDrawing(oDrawing)
     return null;
 }
 
-  
-
     //--------------------------------------------------------export----------------------------------------------------
     window['AscFormat'] = window['AscFormat'] || {};
     window['AscFormat'].CheckObjectLine = CheckObjectLine;
@@ -5769,4 +5812,6 @@ function getParaDrawing(oDrawing)
     window['AscFormat'].CShape = CShape;
     window['AscFormat'].CreateBinaryReader = CreateBinaryReader;
     window['AscFormat'].getParaDrawing = getParaDrawing;
+    window['AscFormat'].ConvertGraphicFrameToWordTable = ConvertGraphicFrameToWordTable;
+    window['AscFormat'].ConvertTableToGraphicFrame = ConvertTableToGraphicFrame;
 })(window);
