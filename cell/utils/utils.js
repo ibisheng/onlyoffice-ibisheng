@@ -173,6 +173,13 @@
 			return undefined;
 		}
 
+		var referenceType = {
+			A: 0,			// Absolute
+			ARRC: 1,	// Absolute row; relative column
+			RRAC: 2,	// Relative row; absolute column
+			R: 3			// Relative
+		};
+
 		function CRangeOffset(offsetCol, offsetRow) {
 			this.offsetCol = offsetCol;
 			this.offsetRow = offsetRow;
@@ -1655,6 +1662,7 @@
 		window["Asc"].truncFracPart = truncFracPart;
 		window["Asc"].getEndValueRange = getEndValueRange;
 
+		window["AscCommonExcel"].referenceType = referenceType;
 		window["AscCommonExcel"].CRangeOffset = CRangeOffset;
 		window["Asc"].Range = Range;
 		window["AscCommonExcel"].Range3D = Range3D;

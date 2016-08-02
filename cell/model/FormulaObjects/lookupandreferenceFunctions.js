@@ -178,19 +178,19 @@
 		var strRef;
 		var strColumn = A1RefType ? g_oCellAddressUtils.colnumToColstrFromWsView(colNumber) : colNumber;
 		var strRow;
-		switch (refType) {
-			case 1:
+		switch (refType - 1) {
+			case AscCommonExcel.referenceType.A:
 				strRow = this._absolute(rowNumber, A1RefType);
 				strColumn = this._absolute(strColumn, A1RefType);
 				break;
-			case 2:
+			case AscCommonExcel.referenceType.ARRC:
 				strRow = this._absolute(rowNumber, A1RefType);
 				break;
-			case 3:
+			case AscCommonExcel.referenceType.RRAC:
 				strColumn = this._absolute(strColumn, A1RefType);
 				strRow = rowNumber;
 				break;
-			case 4:
+			case AscCommonExcel.referenceType.R:
 				strRow = rowNumber;
 				break;
 		}
