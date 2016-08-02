@@ -450,3 +450,24 @@ CHdrFtrController.prototype.RestoreDocumentStateAfterLoadChanges = function(Stat
 		this.LogicDocument.Document_End_HdrFtrEditing();
 	}
 };
+CHdrFtrController.prototype.GetColumnSize = function()
+{
+	var CurHdrFtr = this.HdrFtr.CurHdrFtr;
+	if (null !== CurHdrFtr && -1 !== CurHdrFtr.RecalcInfo.CurPage)
+	{
+		var Page   = this.LogicDocument.Pages[CurHdrFtr.RecalcInfo.CurPage];
+		var SectPr = this.LogicDocument.Get_SectPr(Page.Pos);
+
+		var Y      = SectPr.Get_PageMargin_Top();
+		var YLimit = SectPr.Get_PageHeight() - SectPr.Get_PageMargin_Bottom();
+		var X      = SectPr.Get_PageMargin_Left();
+		var XLimit = SectPr.Get_PageWidth() - SectPr.Get_PageMargin_Right();
+
+		return {
+			W : XLimit - X,
+			H : YLimit - Y
+		};
+	}
+
+	return {W : 0, H : 0};
+};

@@ -10968,6 +10968,13 @@ CDocument.prototype.DecreaseIndent = function()
 		this.Recalculate();
 	}
 };
+/**
+ * Получаем размеры текущей колонки (используется при вставке изображения).
+ */
+CDocument.prototype.GetColumnSize = function()
+{
+	return this.Controller.GetColumnSize();
+};
 //----------------------------------------------------------------------------------------------------------------------
 // Settings
 //----------------------------------------------------------------------------------------------------------------------
@@ -15919,6 +15926,34 @@ CDocument.prototype.controller_RestoreDocumentStateAfterLoadChanges = function(S
 		this.Set_ContentPosition(State.Pos, 0, 0);
 		this.NeedUpdateTarget = true;
 	}
+};
+CDocument.prototype.controller_GetColumnSize = function()
+{
+	var ContentPos = true === this.Selection.Use ? ( this.Selection.StartPos < this.Selection.EndPos ? this.Selection.StartPos : this.Selection.EndPos ) : this.CurPos.ContentPos;
+
+	var PagePos   = this.Get_DocumentPagePositionByContentPosition(this.Get_ContentPosition(this.Selection.Use, false));
+	var ColumnAbs = PagePos ? PagePos.Column : 0;
+
+	var SectPr = this.Get_SectPr(ContentPos);
+	var Y      = SectPr.Get_PageMargin_Top();
+	var YLimit = SectPr.Get_PageHeight() - SectPr.Get_PageMargin_Bottom();
+	var X      = SectPr.Get_PageMargin_Left();
+	var XLimit = SectPr.Get_PageWidth() - SectPr.Get_PageMargin_Right();
+
+	var ColumnsCount = SectPr.Get_ColumnsCount();
+	for (var ColumnIndex = 0; ColumnIndex < ColumnAbs; ++ColumnIndex)
+	{
+		X += SectPr.Get_ColumnWidth(ColumnIndex);
+		X += SectPr.Get_ColumnSpace(ColumnIndex);
+	}
+
+	if (ColumnsCount - 1 !== ColumnAbs)
+		XLimit = X + SectPr.Get_ColumnWidth(ColumnAbs);
+
+	return {
+		W : XLimit - X,
+		H : YLimit - Y
+	};
 };
 //----------------------------------------------------------------------------------------------------------------------
 //

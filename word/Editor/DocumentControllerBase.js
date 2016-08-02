@@ -717,3 +717,8 @@ CDocumentControllerBase.prototype.SaveDocumentStateBeforeLoadChanges = function(
  * @param State
  */
 CDocumentControllerBase.prototype.RestoreDocumentStateAfterLoadChanges = function(State){};
+/**
+ * Получаем размеры текущей колонки.
+ * @returns {{W: number, H: number}}
+ */
+CDocumentControllerBase.prototype.GetColumnSize = function(){return {W : 0, H : 0};};

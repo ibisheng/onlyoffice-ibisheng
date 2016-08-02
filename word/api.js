@@ -5017,8 +5017,10 @@ background-repeat: no-repeat;\
 		var _image = this.ImageLoader.LoadImage(url, 1);
 		if (null != _image)
 		{
-			var _w = Math.max(1, AscCommon.Page_Width - (AscCommon.X_Left_Margin + AscCommon.X_Right_Margin));
-			var _h = Math.max(1, AscCommon.Page_Height - (AscCommon.Y_Top_Margin + AscCommon.Y_Bottom_Margin));
+			var ColumnSize = this.WordControl.m_oLogicDocument.GetColumnSize();
+
+			var _w = Math.max(1, ColumnSize.W);
+			var _h = Math.max(1, ColumnSize.H);
 			if (_image.Image != null)
 			{
 				var __w = Math.max(parseInt(_image.Image.width * AscCommon.g_dKoef_pix_to_mm), 1);
@@ -5068,8 +5070,10 @@ background-repeat: no-repeat;\
 			this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
 			this.asyncImageEndLoaded2 = function(_image)
 			{
-				var _w = Math.max(1, AscCommon.Page_Width - (AscCommon.X_Left_Margin + AscCommon.X_Right_Margin));
-				var _h = Math.max(1, AscCommon.Page_Height - (AscCommon.Y_Top_Margin + AscCommon.Y_Bottom_Margin));
+				var ColumnSize = this.WordControl.m_oLogicDocument.GetColumnSize();
+
+				var _w = Math.max(1, ColumnSize.W);
+				var _h = Math.max(1, ColumnSize.H);
 				if (_image.Image != null)
 				{
 					var __w = Math.max(parseInt(_image.Image.width * AscCommon.g_dKoef_pix_to_mm), 1);

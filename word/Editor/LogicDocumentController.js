@@ -365,3 +365,7 @@ CLogicDocumentController.prototype.RestoreDocumentStateAfterLoadChanges = functi
 {
 	this.LogicDocument.controller_RestoreDocumentStateAfterLoadChanges(State);
 };
+CLogicDocumentController.prototype.GetColumnSize = function()
+{
+	return this.LogicDocument.controller_GetColumnSize();
+};
