@@ -6626,6 +6626,14 @@ CDocument.prototype.OnKeyDown = function(e)
             bRetValue = keydownresult_PreventAll;
         }
     }
+	else if (e.KeyCode == 86 && false === editor.isViewMode && true === e.CtrlKey) // Ctrl + V
+	{
+		if (true === e.ShiftKey) // Ctrl + Shift + V - вставка форматирования текста
+		{
+			this.Document_Format_Paste();
+			bRetValue = keydownresult_PreventAll;
+		}
+	}
     else if (e.KeyCode == 89 && false === editor.isViewMode && true === e.CtrlKey) // Ctrl + Y - Redo
     {
         this.Document_Redo();
