@@ -7853,12 +7853,18 @@ Paragraph.prototype =
                     Pr.ParaPr.Spacing.After = 0;
                 }
             }
+			else if (true === this.Parent.Is_TableCellContent() && true === Pr.ParaPr.Spacing.AfterAutoSpacing)
+			{
+				Pr.ParaPr.Spacing.After = 0;
+			}
             else if(!(this.bFromDocument === true))
             {
                 Pr.ParaPr.Spacing.After = 0;
             }
             else
-                Pr.ParaPr.Spacing.After = this.Internal_CalculateAutoSpacing( Pr.ParaPr.Spacing.After, Pr.ParaPr.Spacing.AfterAutoSpacing, this );
+			{
+				Pr.ParaPr.Spacing.After = this.Internal_CalculateAutoSpacing(Pr.ParaPr.Spacing.After, Pr.ParaPr.Spacing.AfterAutoSpacing, this);
+			}
         }
 
         return Pr;
