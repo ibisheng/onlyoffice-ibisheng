@@ -6630,7 +6630,11 @@ CDocument.prototype.OnKeyDown = function(e)
 	{
 		if (true === e.ShiftKey) // Ctrl + Shift + V - вставка форматирования текста
 		{
-			this.Document_Format_Paste();
+			if (false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content))
+			{
+				this.Create_NewHistoryPoint(AscDFH.historydescription_Document_FormatPasteHotKey);
+				this.Document_Format_Paste();
+			}
 			bRetValue = keydownresult_PreventAll;
 		}
 	}
@@ -7075,8 +7079,7 @@ CDocument.prototype.OnMouseUp = function(e, X, Y, PageIndex)
 			if (c_oAscFormatPainterState.kOn === editor.isPaintFormat)
 				editor.sync_PaintFormatCallback(c_oAscFormatPainterState.kOff);
 		}
-
-		if (true === editor.isMarkerFormat && true === this.Is_TextSelectionUse())
+		else if (true === editor.isMarkerFormat && true === this.Is_TextSelectionUse())
 		{
 			if (false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content))
 			{
@@ -7101,6 +7104,10 @@ CDocument.prototype.OnMouseUp = function(e, X, Y, PageIndex)
 				editor.sync_MarkerFormatCallback(true);
 			}
 		}
+        else
+        {
+
+        }
 	}
 
 	this.private_UpdateCursorXY(true, true);
