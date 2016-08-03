@@ -7104,10 +7104,6 @@ CDocument.prototype.OnMouseUp = function(e, X, Y, PageIndex)
 				editor.sync_MarkerFormatCallback(true);
 			}
 		}
-        else
-        {
-
-        }
 	}
 
 	this.private_UpdateCursorXY(true, true);
@@ -9786,6 +9782,9 @@ CDocument.prototype.private_UpdateCursorXY = function(bUpdateX, bUpdateY)
 		if (null !== CurPara)
 			CurPara.CurPos.RealY = RealY;
 	}
+
+	if (true === this.Selection.Use && true !== this.Selection.Start)
+		this.private_OnSelectionEnd();
 };
 CDocument.prototype.private_MoveCursorDown = function(StartX, StartY, AddToSelect)
 {
@@ -10989,6 +10988,10 @@ CDocument.prototype.DecreaseIndent = function()
 CDocument.prototype.GetColumnSize = function()
 {
 	return this.Controller.GetColumnSize();
+};
+CDocument.prototype.private_OnSelectionEnd = function()
+{
+	this.Api.asc_fireCallback("asc_onSelectionEnd");
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Settings
