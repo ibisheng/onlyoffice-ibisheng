@@ -2476,21 +2476,27 @@
   };
 
   WorkbookView.prototype._initCommentsToSave = function() {
-    var isFirst = true;
-    for (var wsKey in this.wsViews) {
-      var wsView = this.wsViews[wsKey];
-      var wsModel = wsView.model;
-      wsView.cellCommentator.prepareCommentsToSave();
-      wsModel.aCommentsCoords = wsView.cellCommentator.aCommentCoords;
+    var isFirst = true, ws;
+    // Колличество листов
+    var countWorksheets = this.model.getWorksheetCount();
+    for (var i = 0; i < countWorksheets; ++i) {
+      ws = this.model.getWorksheet(i);
 
-      if (isFirst) {
-        isFirst = false;
-        this.cellCommentator.worksheet = wsView;
-        this.cellCommentator.overlayCtx = wsView.overlayCtx;
-        this.cellCommentator.drawingCtx = wsView.drawingCtx;
-        this.cellCommentator.prepareCommentsToSave();
-        wsModel.aComments = wsModel.aComments.concat(this.model.aComments);
-        wsModel.aCommentsCoords = wsModel.aCommentsCoords.concat(this.cellCommentator.aCommentCoords);
+      if (ws && 0 < ws.aComments.length) {
+        var wsView = this.getWorksheet(i);
+        var wsModel = wsView.model;
+        wsView.cellCommentator.prepareCommentsToSave();
+        wsModel.aCommentsCoords = wsView.cellCommentator.aCommentCoords;
+
+        if (isFirst) {
+          isFirst = false;
+          this.cellCommentator.worksheet = wsView;
+          this.cellCommentator.overlayCtx = wsView.overlayCtx;
+          this.cellCommentator.drawingCtx = wsView.drawingCtx;
+          this.cellCommentator.prepareCommentsToSave();
+          wsModel.aComments = wsModel.aComments.concat(this.model.aComments);
+          wsModel.aCommentsCoords = wsModel.aCommentsCoords.concat(this.cellCommentator.aCommentCoords);
+        }
       }
     }
   };
