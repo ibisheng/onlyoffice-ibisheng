@@ -2174,7 +2174,7 @@ ParaRun.prototype.Recalculate_MeasureContent = function()
             continue;
         }
 
-        Item.Measure( g_oTextMeasurer, Pr, InfoMathText );
+        Item.Measure( g_oTextMeasurer, Pr, InfoMathText, this);
 
 
         if (para_Drawing === Item.Type)
@@ -2325,11 +2325,18 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                     if (para_ContinuationSeparator === ItemType)
                         Item.Update_Width(PRS);
 
+					if (para_FootnoteReference === ItemType)
+					{
+						Item.UpdateNumber(Para.Get_AbsolutePage(PRS.Page));
+						PRS.Add_FootnoteReference(Item, Pos);
+					}
+					else if (para_FootnoteRef === ItemType)
+					{
+						Item.UpdateNumber(Para.Get_AbsolutePage(PRS.Page));
+					}
+
                     // При проверке, убирается ли слово, мы должны учитывать ширину предшествующих пробелов.
                     var LetterLen = Item.Width / TEXTWIDTH_DIVIDER;//var LetterLen = Item.Get_Width();
-                    
-                    if (para_FootnoteReference === ItemType)
-                        PRS.Add_FootnoteReference(Item, Pos);
 
                     if (true !== Word)
                     {
