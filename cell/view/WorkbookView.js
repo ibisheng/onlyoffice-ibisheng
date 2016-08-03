@@ -463,7 +463,17 @@
         // FormatPainter
         'isFormatPainter': function () {
           return self.stateFormatPainter;
-        }
+        },
+
+        //calcAll
+        'calcAll': function (shiftKey) {
+          if(shiftKey){
+            var ws = self.model.getActiveWs();
+            self.model.dependencyFormulas.calcAll(ws.getId());
+          } else {
+            self.model.dependencyFormulas.calcAll();
+          }
+        },
       });
 
       if (this.input && this.input.addEventListener) {

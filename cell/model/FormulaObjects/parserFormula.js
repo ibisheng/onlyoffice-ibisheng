@@ -3540,7 +3540,7 @@ _func[cElementType.cell][cElementType.cell] = function ( arg0, arg1, what, cellA
 _func[cElementType.cellsRange3D] = _func[cElementType.cellsRange];
 _func[cElementType.cell3D] = _func[cElementType.cell];
 
-
+	var lastListenerId = 0;
 /** класс отвечающий за парсинг строки с формулой, подсчета формулы, перестройки формулы при манипуляции с ячейкой*/
 /** @constructor */
 function parserFormula( formula, parent, _ws ) {
@@ -3566,7 +3566,7 @@ function parserFormula( formula, parent, _ws ) {
     this.regSpace = /\$/g;
     this.countRef = 0;
 
-  this.listenerId = null;
+  this.listenerId = lastListenerId++;
   this.isDirty = false;
   this.isCalculate = false;
   this.parent = parent;
@@ -3576,9 +3576,6 @@ function parserFormula( formula, parent, _ws ) {
   };
   parserFormula.prototype.getListenerId = function() {
     return this.listenerId;
-  };
-  parserFormula.prototype.setListenerId = function(listenerId) {
-    this.listenerId = listenerId;
   };
   parserFormula.prototype.getIsDirty = function() {
     return this.isDirty;
@@ -3612,14 +3609,15 @@ function parserFormula( formula, parent, _ws ) {
 				this.Formula = this.assemble();
 			} else if (AscCommon.c_oNotifyType.ChangeSheet === data.type) {
 				if (this.is3D) {
-					if (data.insert) {
-						this.insertSheet(data.insert);
-					} else if (data.replace) {
-						this.moveSheet(data.replace);
-					} else if (data.rename) {
-						this.renameSheet(data.rename.from, data.rename.to);
-					} else if (data.remove) {
-						this.removeSheet(data.remove);
+					var changeData = data.data;
+					if (changeData.insert) {
+						this.insertSheet(changeData.insert);
+					} else if (changeData.replace) {
+						this.moveSheet(changeData.replace);
+					} else if (changeData.rename) {
+						this.renameSheet(changeData.rename.from, changeData.rename.to);
+					} else if (changeData.remove) {
+						this.removeSheet(changeData.remove);
 					}
 				}
 			}
@@ -4409,6 +4407,7 @@ parserFormula.prototype.getRef = function() {
 		this.Formula = this.assemble();
 	};
 	parserFormula.prototype.shiftCells2 = function(notifyType, sheetId, bbox, offset) {
+		this.removeDependencies();
 		var isHor = 0 != offset.offsetCol;
 		var oShiftGetBBox;
 		if (AscCommon.c_oNotifyType.Shift == notifyType) {
@@ -4464,6 +4463,7 @@ parserFormula.prototype.getRef = function() {
 				}
 			}
 		}
+		this.buildDependencies();
 		this.Formula = this.assemble();
 	};
 	parserFormula.prototype.renameSheet = function(lastName, newName) {
@@ -4476,6 +4476,7 @@ parserFormula.prototype.getRef = function() {
 			}
 		}
 		this.Formula = this.assemble();
+		return this;
 	};
 	parserFormula.prototype.removeSheet = function(sheetId) {
 		var ws = this.wb.getWorksheetById(sheetId);

@@ -177,8 +177,6 @@ function getRangeType(oBBox){
 		}
 	}
 
-	var lastListenerId = 0;
-
 	function DefName(wb, name, ref, sheetId, hidden, isTable) {
 		this.wb = wb;
 		this.name = name;
@@ -268,10 +266,6 @@ function getRangeType(oBBox){
 		startListeningRange: function(sheetId, bbox, listener) {
 			//todo bbox clone or bbox immutable
 			var listenerId = listener.getListenerId();
-			if (!listenerId) {
-				listenerId = lastListenerId++;
-				listener.setListenerId(listenerId);
-			}
 			var sheetContainer = this.sheetListeners[sheetId];
 			if (!sheetContainer) {
 				sheetContainer = {cellMap: {}, areaMap: {}, areaTree: new RangeTree()};
@@ -334,10 +328,6 @@ function getRangeType(oBBox){
 		},
 		startListeningVolatile: function(listener) {
 			var listenerId = listener.getListenerId();
-			if (!listenerId) {
-				listenerId = lastListenerId++;
-				listener.setListenerId(listenerId);
-			}
 			this.volatileListeners[listenerId] = listener;
 		},
 		endListeningVolatile: function(listener) {
@@ -348,10 +338,6 @@ function getRangeType(oBBox){
 		},
 		startListeningDefName: function(name, listener) {
 			var listenerId = listener.getListenerId();
-			if (!listenerId) {
-				listenerId = lastListenerId++;
-				listener.setListenerId(listenerId);
-			}
 			var nameIndex = getDefNameIndex(name);
 			var container = this.defNameListeners[nameIndex];
 			if (!container) {
@@ -847,6 +833,29 @@ function getRangeType(oBBox){
 			console.timeEnd('cleanCellCache');
 			console.timeEnd('all');
 		},
+		calcAll: function(sheetId){
+			var worksheets = [];
+			if (sheetId) {
+				worksheets.push(this.wb.getWorksheetById(sheetId));
+			} else {
+				var wsCount = this.wb.getWorksheetCount();
+				for (var i = 0; i < wsCount; ++i) {
+					worksheets.push(this.wb.getWorksheet(i));
+				}
+			}
+			for (var i = 0; i < worksheets.length; ++i) {
+				var ws = worksheets[i];
+				if (ws) {
+					var cwf = ws.getCWF();
+					for (var i in cwf) {
+						var ca = g_oCellAddressUtils.getCellAddress(i);
+						var c = ws._getCellNoEmpty(ca.getRow0(), ca.getCol0());
+						this.addToChangedCell(c);
+					}
+				}
+			}
+			this.calcTree();
+		},
 		//internal
 		_delDefName: function(name, sheetId) {
 			var res = null;
@@ -988,38 +997,24 @@ function getRangeType(oBBox){
 		},
 		_shiftMoveDelete: function(notifyType, sheetId, bbox, offset) {
 			var isHor = offset && 0 != offset.offsetCol;
-			var toDelete;
 			var oShiftGetBBox;
 			if (AscCommon.c_oNotifyType.Shift == notifyType) {
-				toDelete = (offset.offsetCol < 0 || offset.offsetRow < 0);
 				oShiftGetBBox = AscCommonExcel.shiftGetBBox(bbox, isHor);
-			} else if (AscCommon.c_oNotifyType.Move == notifyType) {
-				toDelete = false;
-				oShiftGetBBox = bbox;
-			} else if (AscCommon.c_oNotifyType.Delete == notifyType) {
-				toDelete = true;
+			} else if (AscCommon.c_oNotifyType.Move == notifyType || AscCommon.c_oNotifyType.Delete == notifyType) {
 				oShiftGetBBox = bbox;
 			}
 			var sheetContainer = this.sheetListeners[sheetId];
 			if (sheetContainer) {
 				var listeners = {};
-				var changeCellMap = {};
 				for (var cellIndex in sheetContainer.cellMap) {
 					getFromCellIndex(cellIndex);
 					if (oShiftGetBBox.contains(g_FCI.col, g_FCI.row)) {
 						var cellMapElem = sheetContainer.cellMap[cellIndex];
-						delete sheetContainer.cellMap[cellIndex];
-						if (AscCommon.c_oNotifyType.Delete != notifyType &&
-							!(toDelete && bbox.contains(g_FCI.col, g_FCI.row))) {
-							changeCellMap[getCellIndex(g_FCI.row + offset.offsetRow, g_FCI.col + offset.offsetCol)] =
-								cellMapElem;
-						}
 						for (var listenerId in cellMapElem.listeners) {
 							listeners[listenerId] = cellMapElem.listeners[listenerId];
 						}
 					}
 				}
-				var changeAreaMap = {};
 				for (var areaIndex in sheetContainer.areaMap) {
 					var areaMapElem = sheetContainer.areaMap[areaIndex];
 					var isIntersect;
@@ -1029,74 +1024,14 @@ function getRangeType(oBBox){
 						isIntersect = oShiftGetBBox.containsRange(areaMapElem.bbox);
 					}
 					if (isIntersect) {
-						sheetContainer.areaTree.remove(areaMapElem.bbox, areaMapElem);
-						delete sheetContainer.areaMap[areaIndex];
-						var isNoDelete;
-						if (AscCommon.c_oNotifyType.Shift == notifyType) {
-							isNoDelete = areaMapElem.bbox.forShift(bbox, offset);
-						} else if (AscCommon.c_oNotifyType.Move == notifyType) {
-							isNoDelete = true;
-							areaMapElem.bbox.setOffset(offset);
-						} else if (AscCommon.c_oNotifyType.Delete == notifyType) {
-							isNoDelete = false;
-						}
-						if (isNoDelete) {
-							if (areaMapElem.bbox.isOneCell()) {
-								var cellIndex = getCellIndex(areaMapElem.bbox.r1, areaMapElem.bbox.c1);
-								var changeCellMapElem = changeCellMap[cellIndex];
-								if (changeCellMapElem) {
-									this._mergeListeners(areaMapElem, changeCellMapElem);
-								} else {
-									changeCellMap[cellIndex] =
-									{count: areaMapElem.count, listeners: areaMapElem.listeners};
-								}
-							} else {
-								var newAreaIndex = getVertexIndex(areaMapElem.bbox);
-								var changeAreaMapElem = changeAreaMap[newAreaIndex];
-								if (changeAreaMapElem) {
-									this._mergeListeners(areaMapElem, changeAreaMapElem);
-								} else {
-									changeAreaMap[newAreaIndex] = areaMapElem;
-								}
-							}
-						}
 						for (var listenerId in areaMapElem.listeners) {
 							listeners[listenerId] = areaMapElem.listeners[listenerId];
 						}
 					}
 				}
-				for (var cellIndex in changeCellMap) {
-					var changeCellMapElem = changeCellMap[cellIndex];
-					var cellMapElem = sheetContainer.cellMap[cellIndex];
-					if (cellMapElem) {
-						this._mergeListeners(changeCellMapElem, cellMapElem);
-					} else {
-						sheetContainer.cellMap[cellIndex] = changeCellMapElem;
-					}
-				}
-				for (var areaIndex in changeAreaMap) {
-					var changeAreaMapElem = changeAreaMap[areaIndex];
-					var areaMapElem = sheetContainer.areaMap[areaIndex];
-					if (areaMapElem) {
-						this._mergeListeners(changeAreaMapElem, areaMapElem);
-					} else {
-						sheetContainer.areaMap[areaIndex] = changeAreaMapElem;
-						sheetContainer.areaTree.add(changeAreaMapElem.bbox, changeAreaMapElem);
-					}
-				}
-
 				var notifyData = {type: notifyType, sheetId: sheetId, bbox: bbox, offset: offset};
 				for (var listenerId in listeners) {
 					listeners[listenerId].notify(notifyData);
-				}
-			}
-		},
-		_mergeListeners: function(from, to) {
-			//обьединяем listener
-			for (var listenerId in from.listeners) {
-				if (!to.listeners[listenerId]) {
-					to.listeners[listenerId] = from.listeners[listenerId];
-					to.count++;
 				}
 			}
 		}
@@ -8182,7 +8117,7 @@ function _promoteFromTo(from, wsFrom, to, wsTo, bIsPromote, oCanPromote, bCtrl, 
 								oCopyCell.formulaParsed = oFromCell.formulaParsed.clone(null, oCopyCell, this);
 								oCopyCell.formulaParsed.changeOffset(oCopyCell.getOffset2(oFromCell.getName()));
 								oCopyCell.formulaParsed.Formula = oCopyCell.formulaParsed.assemble();
-								this.worksheet.workbook.dependencyFormulas.addToChangedCell(oCopyCell);
+								wb.dependencyFormulas.addToChangedCell(oCopyCell);
 							}
 						}
 					}

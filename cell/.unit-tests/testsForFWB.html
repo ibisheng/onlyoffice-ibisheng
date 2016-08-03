@@ -12,16 +12,12 @@
 
         <script type="text/javascript" src="../../../web-apps/vendor/xregexp/xregexp-all-min.js"></script>
 
-		<script type="text/javascript" src="../utils/utils.js"></script>
-		<script type="text/javascript" src="../model/Workbook.js"></script>
-		<script type="text/javascript" src="../model/WorkbookElems.js"></script>
-		<script type="text/javascript" src="../model/Serialize.js"></script>
-		<script type="text/javascript" >
-            AscCommonExcel.g_oDefaultFormat.FontAbs = {};
-		</script>		
-		<script type="text/javascript" src="../model/FormulaObjects/parserFormula.js"></script>
-		<script type="text/javascript" src="../../Common/commonDefines.js"></script>
-        <script type="text/javascript" src="../../Common/NumFormat.js"></script>
+		<script type="text/javascript" src="../../../web-apps/apps/spreadsheeteditor/sdk_dev_scripts.js"></script>
+		<script>
+			window.sdk_dev_scrpipts.forEach(function(item){
+				document.write('<script type="text/javascript" src="' + item.substring('../'.length) + '"><\/script>');
+			});
+    	</script>
 
         <script type="text/javascript" src="testsForFWB.html.js"></script>
 

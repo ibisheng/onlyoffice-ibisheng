@@ -10,9 +10,14 @@
 		<link rel="stylesheet" href="qunit/qunit.css" type="text/css" media="screen" />
 		<script type="text/javascript" src="qunit/qunit.js"></script>
 
-
-		<script type="text/javascript" src="../utils/utils.js"></script>
-
+        <script type="text/javascript" src="../../../web-apps/vendor/xregexp/xregexp-all-min.js"></script>
+        
+		<script type="text/javascript" src="../../../web-apps/apps/spreadsheeteditor/sdk_dev_scripts.js"></script>
+		<script>
+			window.sdk_dev_scrpipts.forEach(function(item){
+				document.write('<script type="text/javascript" src="' + item.substring('../'.length) + '"><\/script>');
+			});
+    	</script>
 		<script type="text/javascript" src="tests.js"></script>
 
 	</head>
