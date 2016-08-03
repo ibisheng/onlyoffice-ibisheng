@@ -5982,13 +5982,19 @@ drawHBarChart.prototype =
 		//соответствует подписям оси значений(OY)
 		var yPoints = this.cChartSpace.chart.plotArea.catAx.yPoints;
 		
-		var xaxispos      = this.chartProp.xaxispos;
+		var xaxispos       = this.chartProp.xaxispos;
 		var heightGraph    = this.chartProp.heightCanvas - this.chartProp.chartGutter._top - this.chartProp.chartGutter._bottom;
 		
 		var defaultOverlap = (this.chartProp.subType == "stacked" || this.chartProp.subType == "stackedPer") ? 100 : 0;
 		var overlap        = this.cChartSpace.chart.plotArea.chart.overlap ? this.cChartSpace.chart.plotArea.chart.overlap : defaultOverlap;
 		var ptCount        = this.cChartDrawer.getPtCount(this.chartProp.series);
         var height         = heightGraph / ptCount;
+		var crossBetween   = this.cChartSpace.getValAxisCrossType();
+		
+		if(crossBetween)
+		{
+			height = heightGraph / (ptCount - 1);
+		}
 		
 		var gapWidth = this.cChartSpace.chart.plotArea.chart.gapWidth ? this.cChartSpace.chart.plotArea.chart.gapWidth : 150;
 		
