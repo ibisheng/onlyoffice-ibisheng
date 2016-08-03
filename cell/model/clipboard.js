@@ -1002,6 +1002,8 @@
 							//для слайда читаем только запись бинарника, где хранится base64
 							History.TurnOff();
 							
+							var arrBase64Img = [];
+							
 							var loader = new AscCommon.BinaryPPTYLoader();
 							loader.presentation = worksheet.model;
 							loader.Start_UseFullUrl();
@@ -1012,6 +1014,7 @@
 							loader.End_UseFullUrl()
 							
 							var drawing = AscFormat.DrawingObjectsController.prototype.createImage(imageUrl, 0, 0, p_width, p_height);
+							arrBase64Img.push(new AscCommon.CBuilderImages(drawing.blipFill, imageUrl, drawing, drawing.spPr, null));
 
 							var arr_shapes = [];
 							arr_shapes[0] = worksheet.objectRender.createDrawingObject();
@@ -1021,7 +1024,13 @@
 							
 							if(!(window["Asc"]["editor"] && window["Asc"]["editor"].isChartEditor))
 							{	
-								t._insertImagesFromBinary(worksheet, {Drawings: arr_shapes}, isIntoShape);
+								var aPastedImages = arrBase64Img;
+								if(aPastedImages && aPastedImages.length)
+								{
+									t._loadImagesOnServer(aPastedImages, function() {
+										t._insertImagesFromBinary(worksheet, {Drawings: arr_shapes}, isIntoShape);
+									});
+								}
 							}
 						}
 						
@@ -1783,6 +1792,7 @@
 					if(count !== 1 && typeof AscFormat.CGraphicFrame !== "undefined" && drawing instanceof AscFormat.CGraphicFrame)
 					{
 						drawing = AscFormat.DrawingObjectsController.prototype.createImage(base64, x, y, extX, extY);
+						arrBase64Img.push(new AscCommon.CBuilderImages(drawing.blipFill, base64, drawing, drawing.spPr, null));
 					}
 					
 					arr_shapes[i] = worksheet.objectRender.createDrawingObject();
@@ -1791,7 +1801,8 @@
 				
 				History.TurnOn();
 				
-				return {arrShapes: arr_shapes, arrImages: loader.End_UseFullUrl(), arrTransforms: arr_transforms};
+				var arrImages = arrBase64Img.concat(loader.End_UseFullUrl());
+				return {arrShapes: arr_shapes, arrImages: arrImages, arrTransforms: arr_transforms};
 			},
 			
 			ReadPresentationText: function(stream, worksheet, cDocumentContent)
