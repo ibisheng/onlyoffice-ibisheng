@@ -788,14 +788,14 @@ function getRangeType(oBBox){
 			for (var sheetId in this.buildCell) {
 				var ws = this.wb.getWorksheetById(sheetId);
 				if (ws) {
-					var _rec = {};
 					var unparsedSheet = this.buildCell[sheetId];
 					for (var cellIndex in unparsedSheet) {
 						getFromCellIndex(cellIndex);
-						var cellId = g_oCellAddressUtils.getCellId(g_FCI.row, g_FCI.col);
-						_rec[cellId] = cellId;
+						var cell = ws._getCellNoEmpty(g_FCI.row, g_FCI.col);
+						if (cell) {
+							cell._BuildDependencies(true, true);
+						}
 					}
-					ws._BuildDependencies(_rec, true);
 				}
 			}
 			for (var defNameId in this.buildDefName) {
@@ -839,7 +839,7 @@ function getRangeType(oBBox){
 			}
 			console.timeEnd('calculate');
 			console.time('cleanCellCache');
-			for (i in this.cleanCellCache) {
+			for (var i in this.cleanCellCache) {
 				this.wb.handlers.trigger("cleanCellCache", i, {0: this.cleanCellCache[i]},
 										 AscCommonExcel.c_oAscCanChangeColWidth.none);
 			}
@@ -1306,23 +1306,15 @@ Workbook.prototype.init=function(bNoBuildDep){
 			self.dependencyFormulas.delTableName( name );
 		}
 	} );
-	
-	var cwf = {};
+
     for(var i = 0, length = this.aWorksheets.length; i < length; ++i)
     {
         var ws = this.aWorksheets[i];
-        ws.initPostOpen(this.wsHandlers, cwf);
+        ws.initPostOpen(this.wsHandlers, bNoBuildDep);
     }
 	if(!bNoBuildDep){
-		/*
-			buildDependency необходимо запускать для построения графа зависимостей между ячейками.
-			Сортировка графа производится при необходимости пересчета формул: 
-				при открытии документа если есть ячейки помеченные как пересчитываемые или есть ячейки без значения.
-		*/
-		this.buildDependency(cwf);
 		this.dependencyFormulas.calcTree();
 	}
-
 };
 Workbook.prototype.rebuildColors=function(){
   AscCommonExcel.g_oColorManager.rebuildColors();
@@ -1755,11 +1747,6 @@ Workbook.prototype.getUniqueDefinedNameFrom=function(name, bCopy){
         nIndex++;
     }
     return dnNewName;
-};
-Workbook.prototype.buildDependency = function(cwf){
-	for(var i in cwf){
-		this.getWorksheetById(i)._BuildDependencies(cwf[i]);
-	}
 };
 Workbook.prototype._SerializeHistoryBase64 = function (oMemory, item, aPointChangesBase64) {
     if (!item.LocalChange) {
@@ -2291,82 +2278,62 @@ Woorksheet.prototype.copyDrawingObjects=function(oNewWs, wsFrom)
         drawingObjects.updateChartReferences2(parserHelp.getEscapeSheetName(wsFrom.sName), parserHelp.getEscapeSheetName(oNewWs.sName));
     }
 };
-	Woorksheet.prototype.initPostOpen = function (handlers, opt_cwfWb) {
-		var cwf = {};
-		if(opt_cwfWb){
-			opt_cwfWb[this.getId()] = cwf;
-		}
+	Woorksheet.prototype.initPostOpen = function (handlers, bNoBuildDep) {
 		if (this.aFormulaExt) {
 			var formulaShared = {};
 			for (var i = 0; i < this.aFormulaExt.length; ++i) {
 				var elem = this.aFormulaExt[i];
-		var notifyData = {type: AscCommon.c_oNotifyType.Dirty};
-        var oCell = elem.cell;
-        var sCellId = g_oCellAddressUtils.getCellId(oCell.nRow, oCell.nCol);
-        var oFormulaExt = elem.ext;
-        var isShared = oFormulaExt.t === Asc.ECellFormulaType.cellformulatypeShared && null !== oFormulaExt.si;
-        if (isShared) {
-          if (null !== oFormulaExt.ref) {
-            if (oFormulaExt.v.length <= AscCommon.c_oAscMaxFormulaLength) {
-              oCell.formulaParsed = new parserFormula(oFormulaExt.v, oCell, this);
-              oCell.formulaParsed.ca = oFormulaExt.ca;
-              oCell.formulaParsed.parse();
-              oCell.formulaParsed.buildDependencies();
-              formulaShared[oFormulaExt.si] = {
-                fVal: oCell.formulaParsed, fRef: AscCommonExcel.g_oRangeCache.getAscRange(oFormulaExt.ref)
-              };
-              if (oCell.formulaParsed && (oFormulaExt.ca || !oCell.oValue.getValueWithoutFormat())) {
-				  this.workbook.dependencyFormulas.addToChangedCell(oCell);
-              }
-            }
-          } else {
-            var fs = formulaShared[oFormulaExt.si];
-            if (fs && fs.fRef.contains(oCell.nCol, oCell.nRow)) {
-              if (fs.fVal.isParsed) {
-                var off = oCell.getOffset3(fs.fRef.c1 + 1, fs.fRef.r1 + 1);
+				var oCell = elem.cell;
+				var oFormulaExt = elem.ext;
+				var isShared = oFormulaExt.t === Asc.ECellFormulaType.cellformulatypeShared && null !== oFormulaExt.si;
+				if (isShared) {
+					if (null !== oFormulaExt.ref) {
+						if (oFormulaExt.v.length <= AscCommon.c_oAscMaxFormulaLength) {
+							oCell.formulaParsed = new parserFormula(oFormulaExt.v, oCell, this);
+							oCell.formulaParsed.ca = oFormulaExt.ca;
+							oCell.formulaParsed.parse();
+							formulaShared[oFormulaExt.si] = {
+								fVal: oCell.formulaParsed,
+								fRef: AscCommonExcel.g_oRangeCache.getAscRange(oFormulaExt.ref)
+							};
+							if (!bNoBuildDep) {
+								oCell._BuildDependencies(false);
+							}
+						}
+					} else {
+						var fs = formulaShared[oFormulaExt.si];
+						if (fs && fs.fRef.contains(oCell.nCol, oCell.nRow)) {
+							if (fs.fVal.isParsed) {
+								var off = oCell.getOffset3(fs.fRef.c1 + 1, fs.fRef.r1 + 1);
 
-                oCell.formulaParsed = fs.fVal.clone(null, oCell, this);
-                oCell.formulaParsed.ca = oFormulaExt.ca;
-                oCell.formulaParsed.changeOffset(off);
-                oCell.formulaParsed.buildDependencies();
-				  oCell.formulaParsed.Formula = oCell.formulaParsed.assemble();
-                oFormulaExt.v = oCell.formulaParsed.Formula;
-                if (oCell.formulaParsed && (oFormulaExt.ca || !oCell.oValue.getValueWithoutFormat())) {
-					this.workbook.dependencyFormulas.addToChangedCell(oCell);
-                }
-              }
-            }
-          }
-        }
-        if (oFormulaExt.v) {
-          if (oFormulaExt.v.length <= AscCommon.c_oAscMaxFormulaLength) {
-			  if (!oCell.formulaParsed) {
-				  oCell.formulaParsed = new parserFormula(oFormulaExt.v, oCell, this);
-				  oCell.formulaParsed.ca = oFormulaExt.ca;
-			  }
-
-          } else {
-            this.workbook.openErrors.push(oCell.getName());
-          }
-        }
-
-        // Если ячейка содержит в себе формулу, то добавляем ее в список ячеек с формулами. (Shared-формулу мы уже распарсили)
-        if (isShared) {
-          ;//cwf[sCellId] = null;
-        } else {
-          if (oCell.formulaParsed) {
-            cwf[sCellId] = sCellId;
-          }
-        }
-
-        // Строится список ячеек, которые необходимо пересчитать при открытии. Это ячейки имеющие атрибут f.ca или значение в которых неопределено.
-        // if (oCell.sFormula && (oFormulaExt.ca || !oCell.oValue.getValueWithoutFormat())) {
-        // this.workbook.needRecalc.nodes[getVertexId(this.Id, sCellId)] = [this.Id, sCellId];
-        // this.workbook.needRecalc.length++;
-        // }
-      }
-      this.aFormulaExt = null;
-    }
+								oCell.formulaParsed = fs.fVal.clone(null, oCell, this);
+								oCell.formulaParsed.ca = oFormulaExt.ca;
+								oCell.formulaParsed.changeOffset(off);
+								oCell.formulaParsed.Formula = oCell.formulaParsed.assemble();
+								oFormulaExt.v = oCell.formulaParsed.Formula;
+								if (!bNoBuildDep) {
+									oCell._BuildDependencies(false);
+								}
+							}
+						}
+					}
+				}
+				if (oFormulaExt.v) {
+					if (oFormulaExt.v.length <= AscCommon.c_oAscMaxFormulaLength) {
+						if (!oCell.formulaParsed) {
+							oCell.formulaParsed = new parserFormula(oFormulaExt.v, oCell, this);
+							oCell.formulaParsed.ca = oFormulaExt.ca;
+							if (!bNoBuildDep) {
+								oCell._BuildDependencies(true);
+							}
+						}
+					} else {
+						this.workbook.openErrors.push(oCell.getName());
+					}
+				}
+			}
+			this.aFormulaExt = null;
+		}
 
 		if (!this.PagePrintOptions) {
 			// Даже если не было, создадим
@@ -4016,111 +3983,22 @@ Woorksheet.prototype._shiftCellsBottom=function(oBBox, displayNameFormatTable){
 Woorksheet.prototype._setIndex=function(ind){
 	this.index = ind;
 };
-Woorksheet.prototype._BuildDependencies=function(cellRange, dirty){
+Woorksheet.prototype._BuildDependencies=function(cellRange){
 	/*
 		Построение графа зависимостей.
 	*/
-	var c, ca, oLengthCache = {};
-	for(var i in cellRange){
+	var c, ca;
+	for (var i in cellRange) {
 		if (null === cellRange[i]) {
 			cellRange[i] = i;
 			continue;
 		}
 
 		ca = g_oCellAddressUtils.getCellAddress(i);
-		c = this._getCellNoEmpty(ca.getRow0(),ca.getCol0());
+		c = this._getCellNoEmpty(ca.getRow0(), ca.getCol0());
 
-		if( c && c.formulaParsed ){
-			var elem = oLengthCache[c.formulaParsed.Formula.length];
-			if(null == elem)
-			{
-				elem = [];
-				oLengthCache[c.formulaParsed.Formula.length] = elem;
-			}
-			elem.push(c);
-		}
-	}
-	for(var i in oLengthCache)
-	{
-		var temp = oLengthCache[i];
-		var aCache = [];
-		for(var j = 0, length2 = temp.length; j < length2; j++)
-		{
-			var c = temp[j],
-			    cellId = g_oCellAddressUtils.getCellId(c.nRow, c.nCol ),
-                aRefs = [],
-                cache = inCache(aCache, c.formulaParsed.Formula, aRefs ),
-                bInCache = false;
-			if(cache)
-			{
-				bInCache = true;
-				var oNewFormula = cache.formulaParsed.clone(c.formulaParsed.Formula, c, this);
-				var RefPos = cache.formulaParsed.RefPos;
-				for(var k = 0, length3 = RefPos.length; k < length3; k++)
-				{
-					var pos = RefPos[k];
-					var elem = oNewFormula.outStack[pos.index];
-					if(elem)
-					{
-						//todo случай ,если ref число или именованный диапазон
-						var ref = aRefs[k];
-						var range = AscCommonExcel.g_oRangeCache.getAscRange(ref);
-						if(null != range)
-						{
-							var oNewElem;
-							if(range.isOneCell())
-							{
-								if(elem instanceof cRef3D)
-									oNewElem = new cRef3D(ref, elem.ws.getName(), elem._wb);
-								else if(elem instanceof cArea3D)
-								{
-									var wsFrom = elem._wb.getWorksheetById( elem.wsFrom ).getName();
-									var wsTo = elem._wb.getWorksheetById( elem.wsTo ).getName();
-									oNewElem = new cArea3D(ref, wsFrom, wsTo, elem._wb);
-								}
-								else if(-1 != ref.indexOf(":"))//случай "A1:A1"
-									oNewElem = new AscCommonExcel.cArea(ref, elem.ws);
-								else
-									oNewElem = new AscCommonExcel.cRef(ref, elem.ws);
-							}
-							else
-							{
-								if(elem instanceof cRef3D)
-									oNewElem = new cArea3D(ref, elem.ws.getName(), elem.ws.getName(), elem._wb);
-								else if(elem instanceof cArea3D)
-								{
-									var wsFrom = elem._wb.getWorksheetById( elem.wsFrom ).getName();
-									var wsTo = elem._wb.getWorksheetById( elem.wsTo ).getName();
-									oNewElem = new cArea3D(ref, wsFrom, wsTo, elem._wb);
-								}
-								else
-									oNewElem = new AscCommonExcel.cArea(ref, elem.ws);
-							}
-							if ( ref.indexOf( "$" ) > -1 )
-								oNewElem.isAbsolute = true; // ToDo - пересмотреть этот параметр (есть в Range информация о абсолютной ссылке)
-							oNewFormula.outStack[pos.index] = oNewElem;
-						}
-						else
-							bInCache = false;
-					}
-				}
-				if(bInCache)
-				{
-					c.formulaParsed = oNewFormula;
-					c.formulaParsed.buildDependencies();
-				}
-			}
-			if(!bInCache)
-			{
-				c.formulaParsed.parse();
-				c.formulaParsed.buildDependencies();
-				//error не добавляем в кеш у них не распознались RefPos, их бессмысленно сравнивать.Это только добавит торозов
-				if(0 == c.formulaParsed.error.length)
-					aCache.push(c);
-			}
-			if (c.formulaParsed && (dirty || c.formulaParsed.ca || !c.oValue.getValueWithoutFormat())) {
-				this.workbook.dependencyFormulas.addToChangedCell(c);
-			}
+		if (c) {
+			c._BuildDependencies(true);
 		}
 	}
 };
@@ -4178,63 +4056,6 @@ Woorksheet.prototype.getTableNameColumnByIndex = function(tableName, columnIndex
 	}
 	return res;
 };
-
-function inCache(aCache, sFormula, aRefs)
-{
-	var oRes = null;
-	for(var i = 0, length = aCache.length; i < length; i++)
-	{
-		var cache = aCache[i];
-		if(null != cache.formulaParsed){
-      var sCurFormula = cache.formulaParsed.Formula;
-			var RefPos = cache.formulaParsed.RefPos;
-			//todo свое сравнение для error
-			if(0 == cache.formulaParsed.error.length && inCacheStrcmp(sCurFormula, sFormula, RefPos, aRefs)){
-				oRes = cache;
-				break;
-			}
-		}
-	}
-	return oRes;
-}
-function inCacheStrcmp(str1, str2, RefPos, aRefs)
-{
-	var bRes = true;
-	var nStartIndex = 0;
-	for(var i = 0, length = RefPos.length; i < length; i++)
-	{
-		var mask = RefPos[i];
-		for(var j = nStartIndex; j < mask.start; j++)
-		{
-			if(str1[j] != str2[j])
-			{
-				bRes = false;
-				break;
-			}
-		}
-		nStartIndex = mask.end;
-	}
-	if(bRes)
-	{
-		for(var i = nStartIndex; i < str1.length; i++)
-		{
-			if(str1[i] != str2[i])
-			{
-				bRes = false;
-				break;
-			}
-		}
-	}
-	if(bRes)
-	{
-		for(var i = 0, length = RefPos.length; i < length; i++)
-		{
-			var mask = RefPos[i];
-			aRefs.push(str2.substring(mask.start, mask.end));
-		}
-	}
-	return bRes;
-}
 Woorksheet.prototype.renameDependencyNodes = function(offset, oBBox, rec, noDelete){
 	this.workbook.dependencyFormulas.shift(this.Id, oBBox, offset);
 };
@@ -5012,6 +4833,17 @@ Cell.prototype.setValueData = function(Val){
 			AscCommonExcel.g_oHLOOKUPCache.remove(this);
 			//todo
 			this.formulaParsed.ca = res.ca;
+		}
+	};
+	Cell.prototype._BuildDependencies = function(parse, opt_dirty) {
+		if (this.formulaParsed) {
+			if (parse) {
+				this.formulaParsed.parse();
+			}
+			this.formulaParsed.buildDependencies();
+			if (opt_dirty || this.formulaParsed.ca || !this.oValue.getValueWithoutFormat()) {
+				this.ws.workbook.dependencyFormulas.addToChangedCell(this);
+			}
 		}
 	};
 //-------------------------------------------------------------------------------------------------

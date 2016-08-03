@@ -3562,7 +3562,7 @@ function parserFormula( formula, parent, _ws ) {
     this.operand_str = null;
     this.parenthesesNotEnough = false;
     this.f = [];
-    this.reRowCol = new RegExp( "^(ROW|ROWS|COLUMN|COLUMNS)$", "gi" );
+    this.reRowCol = /^(ROW|ROWS|COLUMN|COLUMNS)$/gi
     this.regSpace = /\$/g;
     this.countRef = 0;
 
@@ -4758,7 +4758,7 @@ parserFormula.prototype.buildDependencies = function() {
 		continue;
     }
 
-    if ((ref instanceof cRef || ref instanceof cRef3D || ref instanceof cArea || ref instanceof cArea3D) &&
+    if ((cElementType.cell === ref.type || cElementType.cell3D === ref.type || cElementType.cellsRange === ref.type || cElementType.cellsRange3D === ref.type) &&
       ref.isValid() && this.outStack[i + 1] && this.outStack[i + 1] instanceof cBaseFunction &&
       this.reRowCol.test(this.outStack[i + 1].name)) {
       this.reRowCol.lastIndex = 0;
@@ -4767,10 +4767,10 @@ parserFormula.prototype.buildDependencies = function() {
 
     if (ref.type == cElementType.name || ref.type == cElementType.name3D) {
 		this.wb.dependencyFormulas.startListeningDefName(ref.value, this);
-    } else if ((ref instanceof cRef || ref instanceof cRef3D || ref instanceof cArea) && ref.isValid()) {
+    } else if ((cElementType.cell === ref.type || cElementType.cell3D === ref.type || cElementType.cellsRange === ref.type) && ref.isValid()) {
       var bbox = AscCommonExcel.g_oRangeCache.getActiveRange(ref._cells.replace(this.regSpace, ""));
       this.wb.dependencyFormulas.startListeningRange(ref.getWsId(), bbox, this);
-    } else if (ref instanceof cArea3D && ref.isValid()) {
+    } else if (cElementType.cellsRange3D === ref.type && ref.isValid()) {
       wsR = ref.wsRange();
       for (var j = 0; j < wsR.length; j++) {
         var bbox = AscCommonExcel.g_oRangeCache.getActiveRange(ref._cells.replace(this.regSpace, ""));
@@ -4795,7 +4795,7 @@ parserFormula.prototype.buildDependencies = function() {
 		  continue;
       }
 
-      if ((ref instanceof cRef || ref instanceof cRef3D || ref instanceof cArea || ref instanceof cArea3D) &&
+      if ((cElementType.cell === ref.type || cElementType.cell3D === ref.type || cElementType.cellsRange === ref.type || cElementType.cellsRange3D === ref.type) &&
         ref.isValid() && this.outStack[i + 1] && this.outStack[i + 1] instanceof cBaseFunction &&
         this.reRowCol.test(this.outStack[i + 1].name)) {
         this.reRowCol.lastIndex = 0;
@@ -4804,10 +4804,10 @@ parserFormula.prototype.buildDependencies = function() {
 
       if (ref.type == cElementType.name || ref.type == cElementType.name3D) {
 		  this.wb.dependencyFormulas.endListeningDefName(ref.value, this);
-      } else if ((ref instanceof cRef || ref instanceof cRef3D || ref instanceof cArea) && ref.isValid()) {
+      } else if ((cElementType.cell === ref.type || cElementType.cell3D === ref.type || cElementType.cellsRange === ref.type) && ref.isValid()) {
         var bbox = AscCommonExcel.g_oRangeCache.getActiveRange(ref._cells.replace(this.regSpace, ""));
         this.wb.dependencyFormulas.endListeningRange(ref.getWsId(), bbox, this);
-      } else if (ref instanceof cArea3D && ref.isValid()) {
+      } else if (cElementType.cellsRange3D === ref.type && ref.isValid()) {
         wsR = ref.wsRange();
         for (var j = 0; j < wsR.length; j++) {
           var bbox = AscCommonExcel.g_oRangeCache.getActiveRange(ref._cells.replace(this.regSpace, ""));

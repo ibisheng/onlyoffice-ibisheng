@@ -3156,8 +3156,9 @@ CCellValue.prototype =
 			}
 			if(null == aRes)
 				aRes = this._getValue2Result(cell, sText, aText);
-			if( cell.sFormula ){
-				aRes[0].sFormula = cell.sFormula;
+			var formula = cell.getFormula();
+			if( formula ){
+				aRes[0].sFormula = formula;
 				aRes[0].sId = cell.getName();
 			}
 			
