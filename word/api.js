@@ -4291,6 +4291,7 @@ background-repeat: no-repeat;\
 			this.CellsTextDirection = tblProp.CellsTextDirection;
 			this.CellsNoWrap        = tblProp.CellsNoWrap;
 			this.CellsWidth         = tblProp.CellsWidth;
+			this.CellsWidthNotEqual = tblProp.CellsWidthNotEqual;
 			this.Locked             = (undefined != tblProp.Locked) ? tblProp.Locked : false;
 			this.PercentFullWidth   = tblProp.PercentFullWidth;
 		}
@@ -4551,6 +4552,10 @@ background-repeat: no-repeat;\
 	CTableProp.prototype.get_PercentFullWidth   = function()
 	{
 		return this.PercentFullWidth;
+	};
+	CTableProp.prototype.get_CellsWidthNotEqual = function()
+	{
+		return this.CellsWidthNotEqual;
 	};
 
 
@@ -9029,6 +9034,8 @@ background-repeat: no-repeat;\
 	CTableProp.prototype['get_CellsWidth']         = CTableProp.prototype.get_CellsWidth;
 	CTableProp.prototype['put_CellsWidth']         = CTableProp.prototype.put_CellsWidth;
 	CTableProp.prototype['get_PercentFullWidth']   = CTableProp.prototype.get_PercentFullWidth;
+	CTableProp.prototype['get_CellsWidthNotEqual'] = CTableProp.prototype.get_CellsWidthNotEqual;
+	
 	window['Asc']['CBorders']                      = window['Asc'].CBorders = CBorders;
 	CBorders.prototype['get_Left']    = CBorders.prototype.get_Left;
 	CBorders.prototype['put_Left']    = CBorders.prototype.put_Left;

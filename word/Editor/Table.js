@@ -304,8 +304,9 @@ CTable.prototype =
             var Border_insideH = null;
             var Border_insideV = null;
 
-            var CellShd   = null;
-            var CellWidth = undefined;
+			var CellShd        = null;
+			var CellWidth      = undefined;
+			var CellWidthStart = undefined;
 
             var Prev_row = -1;
             var bFirstRow = true;
@@ -360,6 +361,8 @@ CTable.prototype =
 						CellWidth = Cell_w.W;
 					else// if (tblwidth_Pct === Cell_w.Type)
 						CellWidth = -Cell_w.W;
+
+					CellWidthStart = CellWidth;
 				}
 				else
 				{
@@ -487,7 +490,18 @@ CTable.prototype =
             Pr.CellsVAlign = VAlign;
             Pr.CellsTextDirection = TextDirection;
             Pr.CellsNoWrap        = NoWrap;
-            Pr.CellsWidth         = CellWidth;
+
+			if (undefined === CellWidth)
+			{
+				Pr.CellsWidth         = CellWidthStart;
+				Pr.CellsWidthNotEqual = true;
+			}
+			else
+			{
+				Pr.CellsWidth         = CellWidthStart;
+				Pr.CellsWidthNotEqual = false;
+			}
+
 
             Pr.CellBorders =
             {
@@ -568,6 +582,8 @@ CTable.prototype =
                 Pr.CellsWidth = CellW.W;
             else// if (tblwidth_Pct === CellW.Type)
                 Pr.CellsWidth = -CellW.W;
+
+			Pr.CellsWidthNotEqual = false;
 
             var Spacing = this.Content[0].Get_CellSpacing();
 
