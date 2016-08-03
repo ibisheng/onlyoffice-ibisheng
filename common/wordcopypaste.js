@@ -1151,6 +1151,8 @@ CopyProcessor.prototype =
 
 				this.oPresentationWriter.WriteString2("SlideObjects");
 				
+				this.oPresentationWriter.WriteString2(selected_slides[0].ImageUrl);
+				
 				this.oPresentationWriter.WriteULong(selected_slides.length);
 				var layouts_map = {};
 				var layout_count = 0;
@@ -2442,39 +2444,108 @@ PasteProcessor.prototype =
 							for(var i = 0; i < objects.arrImages.length; ++i)
 							{
 								var oBuilderImage = objects.arrImages[i];
-								if (oBuilderImage.AdditionalUrls) {
-									for(var j = 0; j < oBuilderImage.AdditionalUrls.length; ++j) {
+								if (oBuilderImage.AdditionalUrls) 
+								{
+									for(var j = 0; j < oBuilderImage.AdditionalUrls.length; ++j) 
+									{
 										aImagesToDownload.push(oBuilderImage.AdditionalUrls[j]);
 									}
 								}
 							}
-                          AscCommon.sendImgUrls(oThis.api, aImagesToDownload, function (data) {
-                            var image_map = {};
-                            for (var i = 0, length = Math.min(data.length, objects.arrImages.length); i < length; ++i) {
-                              var elem = data[i];
-                              if (null != elem.url) {
-                                var name = g_oDocumentUrls.imagePath2Local(elem.path);
-                                var imageElem = objects.arrImages[i];
-                                if (null != imageElem) {
-                                  //для вставки graphicFrame в виде картинки(если было при копировании выделено несколько графических объектов)
-                                  if (imageElem.base64) {
-                                    imageElem.base64 = name;
-                                  } else {
-                                    imageElem.SetUrl(name);
-                                  }
-                                }
-                                image_map[i] = name;
-                              } else {
-                                image_map[i] = aImagesToDownload[i];
-                              }
-                            }
-                            aContent = oThis._convertExcelBinary(null, arr_shapes);
-                            oThis.aContent = aContent.content;
-                            oThis.api.pre_Paste(aContent.fonts, image_map, fPrepasteCallback);
-                          });
-                            if(bTurnOffTrackRevisions){
-                                oThis.api.WordControl.m_oLogicDocument.TrackRevisions = true;
-                            }
+							
+							AscCommon.sendImgUrls(oThis.api, aImagesToDownload, function (data) {
+								var image_map = {};
+								for (var i = 0, length = Math.min(data.length, objects.arrImages.length); i < length; ++i) 
+								{
+									var elem = data[i];
+									if (null != elem.url) 
+									{
+										var name = g_oDocumentUrls.imagePath2Local(elem.path);
+										var imageElem = objects.arrImages[i];
+										if (null != imageElem) 
+										{
+											//для вставки graphicFrame в виде картинки(если было при копировании выделено несколько графических объектов)
+											if (imageElem.base64) 
+											{
+												imageElem.base64 = name;
+											} 
+											else 
+											{
+												imageElem.SetUrl(name);
+											}
+										}
+										image_map[i] = name;
+									} 
+									else 
+									{
+										image_map[i] = aImagesToDownload[i];
+									}
+								}
+								
+								aContent = oThis._convertExcelBinary(null, arr_shapes);
+								oThis.aContent = aContent.content;
+								oThis.api.pre_Paste(aContent.fonts, image_map, fPrepasteCallback);
+							});
+							
+							if(bTurnOffTrackRevisions)
+							{
+								oThis.api.WordControl.m_oLogicDocument.TrackRevisions = true;
+							}
+							return;
+						}
+						case "SlideObjects":
+						{
+							History.TurnOff();
+							
+							var loader = new AscCommon.BinaryPPTYLoader();
+							loader.Start_UseFullUrl();
+							
+							pptx_content_loader.Reader.Start_UseFullUrl();
+							
+							loader.stream = stream;
+							loader.presentation = editor.WordControl.m_oLogicDocument;
+							var imageUrl = stream.GetString2();
+							
+							History.TurnOn();
+							
+							var aImagesToDownload = [];
+							aImagesToDownload.push(imageUrl);
+							
+							//load image(slide base64)
+							AscCommon.sendImgUrls(oThis.api, aImagesToDownload, function (data) {
+								var image_map = {};
+								var elem = data[0];
+								if (null != elem.url) 
+								{
+									imageUrl = g_oDocumentUrls.imagePath2Local(elem.path);
+									image_map[0] = imageUrl;
+								} 
+								
+								//create paragraph, pararun and paradrawing
+								var tempParagraph = new Paragraph(oThis.oDocument.DrawingDocument, oThis.oDocument, 0, 0, 0, 0, 0);
+								var graphicObj = AscFormat.DrawingObjectsController.prototype.createImage(imageUrl, 0, 0, p_width, p_height);	
+								
+								var tempParaRun = new ParaRun();
+								tempParaRun.Paragraph = null;
+								tempParaRun.Add_ToContent( 0, new ParaDrawing(), false );
+
+								tempParaRun.Content[0].Set_GraphicObject(graphicObj);
+								tempParaRun.Content[0].GraphicObj.setParent(tempParaRun.Content[0]);
+								tempParaRun.Content[0].CheckWH();
+								
+								tempParagraph.Content.splice(tempParagraph.Content.length - 1, 0, tempParaRun);
+								
+								aContent = [];
+								aContent.push(tempParagraph);
+								oThis.aContent = aContent;
+								
+								oThis.api.pre_Paste(null, image_map, fPrepasteCallback);
+							});
+							
+							if(bTurnOffTrackRevisions)
+							{
+								oThis.api.WordControl.m_oLogicDocument.TrackRevisions = true;
+							}
 							return;
 						}
 					}
@@ -2718,6 +2789,7 @@ PasteProcessor.prototype =
                             loader.presentation = editor.WordControl.m_oLogicDocument;
 							
 							//read slides
+							var imageUrl = stream.GetString2();
                             var slide_count = stream.GetULong();
                             var arr_arrTransforms = [];
                             for(var i = 0; i < slide_count; ++i)

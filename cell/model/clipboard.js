@@ -1005,8 +1005,35 @@
 						{
 							return "";
 						}
+						else
+						{
+							//для слайда читаем только запись бинарника, где хранится base64
+							History.TurnOff();
+							
+							var loader = new AscCommon.BinaryPPTYLoader();
+							loader.presentation = worksheet.model;
+							loader.Start_UseFullUrl();
+							loader.stream = stream;
+							
+							//read base64(first slide)
+							var imageUrl = stream.GetString2();
+							loader.End_UseFullUrl()
+							
+							var drawing = AscFormat.DrawingObjectsController.prototype.createImage(imageUrl, 0, 0, p_width, p_height);
+
+							var arr_shapes = [];
+							arr_shapes[0] = worksheet.objectRender.createDrawingObject();
+							arr_shapes[0].graphicObject = drawing;
+							
+							History.TurnOn();
+							
+							if(!(window["Asc"]["editor"] && window["Asc"]["editor"].isChartEditor))
+							{	
+								t._insertImagesFromBinary(worksheet, {Drawings: arr_shapes}, isIntoShape);
+							}
+						}
 						
-						break;
+						return true;
 					}
 				}
 				
