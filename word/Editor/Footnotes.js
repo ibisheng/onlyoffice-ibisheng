@@ -246,6 +246,22 @@ CFootnotesController.prototype.Add_FootnoteOnPage = function(nPageIndex, oFootno
 
 	this.Pages[nPageIndex].Elements.push(oFootnote);
 };
+CFootnotesController.prototype.GetFootnoteNumberOnPage = function(nPageAbs, oFootnote)
+{
+	if (!this.Pages[nPageAbs])
+		return 1;
+
+	if (oFootnote)
+	{
+		for (var nIndex = 0, nCount = this.Pages[nPageAbs].Elements.length; nIndex < nCount; ++nIndex)
+		{
+			if (oFootnote === this.Pages[nPageAbs].Elements[nIndex])
+				return nIndex + 1;
+		}
+	}
+
+	return  this.Pages[nPageAbs].Elements.length;
+};
 /**
  * Проверяем, используется заданная сноска в документе.
  * @param {string} sFootnoteId

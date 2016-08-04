@@ -275,57 +275,70 @@ CTable.prototype.private_RecalculateGrid = function()
             TableW = MinWidth;
     }
 
-    var CurGridCol = 0;
-    for ( var Index = 0; Index < this.Content.length; Index++ )
-    {
-        var Row = this.Content[Index];
-        Row.Set_Index( Index );
+	var CurGridCol = 0;
+	for (var Index = 0; Index < this.Content.length; Index++)
+	{
+		var Row = this.Content[Index];
+		Row.Set_Index(Index);
 
-        // Смотрим на ширину пропущенных колонок сетки в начале строки
-        var BeforeInfo = Row.Get_Before();
-        CurGridCol = BeforeInfo.GridBefore;
-        if ( CurGridCol > 0 && SumGrid[CurGridCol - 1] < BeforeInfo.WBefore.W )
-            SumGrid[CurGridCol - 1] = BeforeInfo.WBefore.W;
+		// Смотрим на ширину пропущенных колонок сетки в начале строки
+		var BeforeInfo = Row.Get_Before();
+		CurGridCol     = BeforeInfo.GridBefore;
+		if (CurGridCol > 0 && SumGrid[CurGridCol - 1] < BeforeInfo.WBefore.W)
+		{
+			var nTempDiff = BeforeInfo.WBefore.W - SumGrid[CurGridCol - 1];
+			for (var nTempIndex = CurGridCol - 1; nTempIndex < SumGrid.length; ++nTempIndex)
+				SumGrid[nTempIndex] += nTempDiff;
+		}
 
-        var CellsCount = Row.Get_CellsCount();
-        for ( var CellIndex = 0; CellIndex < CellsCount; CellIndex++ )
-        {
-            var Cell = Row.Get_Cell( CellIndex );
-            Cell.Set_Index( CellIndex );
-            var CellW = Cell.Get_W();
-            var GridSpan = Cell.Get_GridSpan();
+		var CellsCount = Row.Get_CellsCount();
+		for (var CellIndex = 0; CellIndex < CellsCount; CellIndex++)
+		{
+			var Cell = Row.Get_Cell(CellIndex);
+			Cell.Set_Index(CellIndex);
+			var CellW    = Cell.Get_W();
+			var GridSpan = Cell.Get_GridSpan();
 
-            if ( CurGridCol + GridSpan - 1 > SumGrid.length )
-            {
-                for ( var AddIndex = SumGrid.length; AddIndex <= CurGridCol + GridSpan - 1; AddIndex++ )
-                    SumGrid[AddIndex] = SumGrid[AddIndex - 1] + 20; // Добавляем столбик шириной в 2 см
-            }
+			if (CurGridCol + GridSpan - 1 > SumGrid.length)
+			{
+				for (var AddIndex = SumGrid.length; AddIndex <= CurGridCol + GridSpan - 1; AddIndex++)
+					SumGrid[AddIndex] = SumGrid[AddIndex - 1] + 20; // Добавляем столбик шириной в 2 см
+			}
 
-            if (tblwidth_Auto !== CellW.Type && tblwidth_Nil !== CellW.Type)
-            {
-                var CellWidth = 0;
-                if (tblwidth_Pct === CellW.Type)
-                    CellWidth = PctWidth * CellW.W / 100;
-                else
-                    CellWidth = CellW.W;
+			if (tblwidth_Auto !== CellW.Type && tblwidth_Nil !== CellW.Type)
+			{
+				var CellWidth = 0;
+				if (tblwidth_Pct === CellW.Type)
+					CellWidth = PctWidth * CellW.W / 100;
+				else
+					CellWidth = CellW.W;
 
-                if (CellWidth + SumGrid[CurGridCol - 1] > SumGrid[CurGridCol + GridSpan - 1])
-                    SumGrid[CurGridCol + GridSpan - 1] = CellWidth + SumGrid[CurGridCol - 1];
-            }
+				if (CellWidth + SumGrid[CurGridCol - 1] > SumGrid[CurGridCol + GridSpan - 1])
+				{
+					var nTempDiff = CellWidth + SumGrid[CurGridCol - 1] - SumGrid[CurGridCol + GridSpan - 1];
+					for (var nTempIndex = CurGridCol + GridSpan - 1; nTempIndex < SumGrid.length; ++nTempIndex)
+						SumGrid[nTempIndex] += nTempDiff;
+				}
+			}
 
-            CurGridCol += GridSpan;
-        }
+			CurGridCol += GridSpan;
+		}
 
-        // Смотрим на ширину пропущенных колонок сетки в конце строки
-        var AfterInfo = Row.Get_After();
-        if ( CurGridCol + AfterInfo.GridAfter - 1 > SumGrid.length )
-        {
-            for ( var AddIndex = SumGrid.length; AddIndex <= CurGridCol + AfterInfo.GridAfter - 1; AddIndex++ )
-                SumGrid[AddIndex] = SumGrid[AddIndex - 1] + 20; // Добавляем столбик шириной в 2 см
-        }
-        if ( SumGrid[CurGridCol + AfterInfo.GridAfter - 1] < AfterInfo.WAfter + SumGrid[CurGridCol - 1] )
-            SumGrid[CurGridCol + AfterInfo.GridAfter - 1] = AfterInfo.WAfter + SumGrid[CurGridCol - 1];
-    }
+		// Смотрим на ширину пропущенных колонок сетки в конце строки
+		var AfterInfo = Row.Get_After();
+		if (CurGridCol + AfterInfo.GridAfter - 1 > SumGrid.length)
+		{
+			for (var AddIndex = SumGrid.length; AddIndex <= CurGridCol + AfterInfo.GridAfter - 1; AddIndex++)
+				SumGrid[AddIndex] = SumGrid[AddIndex - 1] + 20; // Добавляем столбик шириной в 2 см
+		}
+
+		if (SumGrid[CurGridCol + AfterInfo.GridAfter - 1] < AfterInfo.WAfter + SumGrid[CurGridCol - 1])
+		{
+			var nTempDiff = AfterInfo.WAfter + SumGrid[CurGridCol - 1] - SumGrid[CurGridCol + AfterInfo.GridAfter - 1];
+			for (var nTempIndex = CurGridCol + AfterInfo.GridAfter - 1; nTempIndex < SumGrid.length; ++nTempIndex)
+				SumGrid[nTempIndex] += nTempDiff;
+		}
+	}
 
     // TODO: разобраться с минимальной шириной таблицы и ячеек
 

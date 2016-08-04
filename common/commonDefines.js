@@ -1531,8 +1531,6 @@
 		this.buttons = [{"text" : "Ok", "primary" : true}, {"text" : "Cancel", "primary" : false}];
 
 		this.size = undefined;
-		this.maximumSize = undefined;
-		this.minimumSize = undefined;
 	}
 
 	CPluginVariation.prototype["get_Description"] = function()
@@ -1645,22 +1643,6 @@
 	{
 		this.size = value;
 	};
-	CPluginVariation.prototype["get_MinimumSize"]           = function()
-	{
-		return this.minimumSize;
-	};
-	CPluginVariation.prototype["set_MinimumSize"]           = function(value)
-	{
-		this.minimumSize = value;
-	};
-	CPluginVariation.prototype["get_MaximumSize"]           = function()
-	{
-		return this.maximumSize;
-	};
-	CPluginVariation.prototype["set_MaximumSize"]           = function(value)
-	{
-		this.maximumSize = value;
-	};
 
 	CPluginVariation.prototype["serialize"]   = function()
 	{
@@ -1685,8 +1667,6 @@
 		_object["buttons"] = this.buttons;
 
 		_object["size"] = this.size;
-		_object["minimumSize"] = this.minimumSize;
-		_object["maximumSize"] = this.maximumSize;
 
 		return _object;
 	};
@@ -1712,8 +1692,6 @@
 		this.buttons = (_object["buttons"] != null) ? _object["buttons"] : this.buttons;
 
 		this.size = (_object["size"] != null) ? _object["size"] : this.size;
-		this.minimumSize = (_object["minimumSize"] != null) ? _object["minimumSize"] : this.minimumSize;
-		this.maximumSize = (_object["maximumSize"] != null) ? _object["maximumSize"] : this.maximumSize;
 	};
 
 	function CPlugin()

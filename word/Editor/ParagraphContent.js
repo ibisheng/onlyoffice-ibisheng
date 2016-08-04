@@ -7576,6 +7576,8 @@ function ParaFootnoteReference(Footnote)
 	this.Width        = 0;
 	this.WidthVisible = 0;
 	this.Number       = 1;
+
+	this.Run          = null;
 }
 AscCommon.extendClass(ParaFootnoteReference, CRunElementBase);
 ParaFootnoteReference.prototype.Type            = para_FootnoteReference;
@@ -7614,22 +7616,10 @@ ParaFootnoteReference.prototype.Draw            = function(X, Y, Context, PDSE)
 			Context.m_oContext.setLineDash([]);
 	}
 };
-ParaFootnoteReference.prototype.Measure         = function(Context, TextPr)
+ParaFootnoteReference.prototype.Measure         = function(Context, TextPr, MathInfo, Run)
 {
-	Context.SetFontSlot(fontslot_ASCII, vertalign_Koef_Size);
-
-	// TODO: Пока делаем обычный вариант с типом Decimal
-	var X = 0;
-	var T = Numbering_Number_To_String(this.Number);
-	for (var nPos = 0; nPos < T.length; ++nPos)
-	{
-		var Char = T.charAt(nPos);
-		X += Context.Measure(Char).Width;
-	}
-
-	var ResultWidth   = (Math.max((X + TextPr.Spacing), 0) * TEXTWIDTH_DIVIDER) | 0;
-	this.Width        = ResultWidth;
-	this.WidthVisible = ResultWidth;
+	this.Run = Run;
+	this.private_Measure();
 };
 ParaFootnoteReference.prototype.Copy            = function()
 {
@@ -7650,6 +7640,42 @@ ParaFootnoteReference.prototype.Read_FromBinary = function(Reader)
 ParaFootnoteReference.prototype.Get_Footnote    = function()
 {
 	return this.Footnote;
+};
+ParaFootnoteReference.prototype.UpdateNumber = function(PageAbs)
+{
+	if (this.Footnote)
+	{
+		var oLogicDocument = this.Footnote.Get_LogicDocument();
+		var oFootnotesController = oLogicDocument.GetFootnotesController();
+		this.Number = oFootnotesController.GetFootnoteNumberOnPage(PageAbs, this.Footnote);
+		this.private_Measure();
+	}
+};
+ParaFootnoteReference.prototype.private_Measure = function()
+{
+	if (!this.Run)
+		return;
+
+	var oMeasurer = g_oTextMeasurer;
+
+	var TextPr = this.Run.Get_CompiledPr(false);
+	var Theme  = this.Run.Get_Paragraph().Get_Theme();
+
+	oMeasurer.SetTextPr(TextPr, Theme);
+	oMeasurer.SetFontSlot(fontslot_ASCII, vertalign_Koef_Size);
+
+	// TODO: Пока делаем обычный вариант с типом Decimal
+	var X = 0;
+	var T = Numbering_Number_To_String(this.Number);
+	for (var nPos = 0; nPos < T.length; ++nPos)
+	{
+		var Char = T.charAt(nPos);
+		X += oMeasurer.Measure(Char).Width;
+	}
+
+	var ResultWidth   = (Math.max((X + TextPr.Spacing), 0) * TEXTWIDTH_DIVIDER) | 0;
+	this.Width        = ResultWidth;
+	this.WidthVisible = ResultWidth;
 };
 
 /**

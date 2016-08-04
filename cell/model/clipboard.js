@@ -971,16 +971,8 @@
 						}
 						
 						var objects = this.ReadPresentationShapes(stream, worksheet);
-						
-						//****если записана одна табличка, то вставляем html и поддерживаем все цвета и стили****
-						if(!objects.arrImages.length && objects.arrShapes.length === 1)
-						{
-							var drawing = objects.arrShapes[0].graphicObject;
-							if(typeof CGraphicFrame !== "undefined" && drawing instanceof CGraphicFrame)
-								return false;
-						}
-						
 						var arr_shapes = objects.arrShapes;
+						
 						if(arr_shapes && arr_shapes.length)
 						{
 							var aPastedImages = objects.arrImages;
@@ -1010,6 +1002,8 @@
 							//для слайда читаем только запись бинарника, где хранится base64
 							History.TurnOff();
 							
+							var arrBase64Img = [];
+							
 							var loader = new AscCommon.BinaryPPTYLoader();
 							loader.presentation = worksheet.model;
 							loader.Start_UseFullUrl();
@@ -1020,6 +1014,7 @@
 							loader.End_UseFullUrl()
 							
 							var drawing = AscFormat.DrawingObjectsController.prototype.createImage(imageUrl, 0, 0, p_width, p_height);
+							arrBase64Img.push(new AscCommon.CBuilderImages(drawing.blipFill, imageUrl, drawing, drawing.spPr, null));
 
 							var arr_shapes = [];
 							arr_shapes[0] = worksheet.objectRender.createDrawingObject();
@@ -1029,7 +1024,13 @@
 							
 							if(!(window["Asc"]["editor"] && window["Asc"]["editor"].isChartEditor))
 							{	
-								t._insertImagesFromBinary(worksheet, {Drawings: arr_shapes}, isIntoShape);
+								var aPastedImages = arrBase64Img;
+								if(aPastedImages && aPastedImages.length)
+								{
+									t._loadImagesOnServer(aPastedImages, function() {
+										t._insertImagesFromBinary(worksheet, {Drawings: arr_shapes}, isIntoShape);
+									});
+								}
 							}
 						}
 						
@@ -1103,6 +1104,14 @@
 				var activeRange = ws.activeRange;
 				var curCol, drawingObject, curRow, startCol, startRow, xfrm, aImagesSync = [], activeRow, activeCol, tempArr, offX, offY, rot;
 
+				//отдельная обработка для вставки одной таблички из презентаций
+				drawingObject = data.Drawings[0];
+				if(data.Drawings.length === 1 && typeof AscFormat.CGraphicFrame !== "undefined" && drawingObject.graphicObject instanceof AscFormat.CGraphicFrame)
+				{
+					this._insertTableFromPresentation(ws, data.Drawings[0]);
+					return;
+				}
+				
 				History.Create_NewPoint();
 				History.StartTransaction();
 				
@@ -1171,37 +1180,13 @@
 							}	
 						}
 					}
-				};
-
-
+				}
+				
 				for(var i = 0; i < data.Drawings.length; i++)
 				{	
 					data.Drawings[i].graphicObject = data.Drawings[i].graphicObject.copy();
 					drawingObject = data.Drawings[i];
 					
-					
-					//отдельная обработка для вставки таблички из презентаций
-					if(data.Drawings.length === 1 && typeof AscFormat.CGraphicFrame !== "undefined" && drawingObject.graphicObject instanceof AscFormat.CGraphicFrame)
-					{
-						//вставляем табличку из презентаций
-						var oPasteFromBinaryWord = new pasteFromBinaryWord(this, ws);
-						
-						var newCDocument = new CDocument(oTempDrawingDocument, false);
-						newCDocument.bFromDocument = true;
-						newCDocument.theme = this.Api.wbModel.theme;
-						
-						drawingObject.graphicObject.setBDeleted(true);
-						drawingObject.graphicObject.setWordFlag(false, newCDocument);
-						
-						var oTempDrawingDocument = ws.model.DrawingDocument;
-						oTempDrawingDocument.m_oLogicDocument = newCDocument;
-						
-						drawingObject.graphicObject.graphicObject.Set_Parent(newCDocument);
-						oPasteFromBinaryWord._paste(ws, {content: [drawingObject.graphicObject.graphicObject]});
-						
-						return;
-					}
-
                     if(drawingObject.graphicObject.fromSerialize && drawingObject.graphicObject.setBFromSerialize)
                     {
                         drawingObject.graphicObject.setBFromSerialize(false);
@@ -1256,6 +1241,7 @@
                 ws.objectRender.controller.updateOverlay();
                 ws.setSelectionShape(true);
                 History.EndTransaction();
+				
                 if(aImagesSync.length > 0)
                 {
                     window["Asc"]["editor"].ImageLoader.LoadDocumentImages(aImagesSync, null,
@@ -1278,6 +1264,32 @@
 
 					callback();
 				}, true);
+			},
+			
+			_insertTableFromPresentation: function(ws, graphicFrame)
+			{
+				History.TurnOff();
+				graphicFrame.graphicObject = graphicFrame.graphicObject.copy();
+				var drawingObject = graphicFrame;
+				
+				//вставляем табличку из презентаций
+				var oPasteFromBinaryWord = new pasteFromBinaryWord(this, ws);
+				
+				var newCDocument = new CDocument(oTempDrawingDocument, false);
+				newCDocument.bFromDocument = true;
+				newCDocument.theme = this.Api.wbModel.theme;
+				
+				drawingObject.graphicObject.setBDeleted(true);
+				drawingObject.graphicObject.setWordFlag(false, newCDocument);
+				
+				var oTempDrawingDocument = ws.model.DrawingDocument;
+				oTempDrawingDocument.m_oLogicDocument = newCDocument;
+				
+				drawingObject.graphicObject.graphicObject.Set_Parent(newCDocument);
+				
+				History.TurnOn();
+				
+				oPasteFromBinaryWord._paste(ws, {content: [drawingObject.graphicObject.graphicObject]});
 			},
 			
 			editorPasteExec: function (worksheet, node, isText, onlyFromLocalStorage)
@@ -1777,9 +1789,10 @@
 					var extY = stream.GetULong() / 100000;
 					var base64 = stream.GetString2();
 					
-					if(count !== 1 && typeof CGraphicFrame !== "undefined" && drawing instanceof CGraphicFrame)
+					if(count !== 1 && typeof AscFormat.CGraphicFrame !== "undefined" && drawing instanceof AscFormat.CGraphicFrame)
 					{
 						drawing = AscFormat.DrawingObjectsController.prototype.createImage(base64, x, y, extX, extY);
+						arrBase64Img.push(new AscCommon.CBuilderImages(drawing.blipFill, base64, drawing, drawing.spPr, null));
 					}
 					
 					arr_shapes[i] = worksheet.objectRender.createDrawingObject();
@@ -1788,7 +1801,8 @@
 				
 				History.TurnOn();
 				
-				return {arrShapes: arr_shapes, arrImages: loader.End_UseFullUrl(), arrTransforms: arr_transforms};
+				var arrImages = arrBase64Img.concat(loader.End_UseFullUrl());
+				return {arrShapes: arr_shapes, arrImages: arrImages, arrTransforms: arr_transforms};
 			},
 			
 			ReadPresentationText: function(stream, worksheet, cDocumentContent)

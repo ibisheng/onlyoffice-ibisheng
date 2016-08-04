@@ -9777,6 +9777,10 @@ CDocumentContent.prototype.Set_LogicDocument = function(oLogicDocument)
     this.Numbering       = oLogicDocument.Get_Numbering();
     this.DrawingObjects  = oLogicDocument.DrawingObjects;
 };
+CDocumentContent.prototype.Get_LogicDocument = function()
+{
+	return this.LogicDocument;
+};
 
 function CDocumentContentStartState(DocContent)
 {

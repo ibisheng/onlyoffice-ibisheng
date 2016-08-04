@@ -1240,7 +1240,7 @@ CChartsDrawer.prototype =
 				numSeries++;
 			}
 		}
-		else
+		else //point(scatter) chart
 		{
 			var yVal;
 			var xVal;
@@ -1253,39 +1253,68 @@ CChartsDrawer.prototype =
 				if(!yNumCache)
 					continue;
 				
-				for(var j = 0; j < yNumCache.pts.length; ++j)
+				for(var j = 0; j < yNumCache.ptCount; ++j)
 				{
-					yVal = parseFloat(yNumCache.pts[j].val);
-					
-					xNumCache = series[l].xVal && series[l].xVal.numRef ? series[l].xVal.numRef.numCache : series[l].xVal && series[l].xVal.numLit ? series[l].xVal.numLit : null;
-					if(xNumCache && xNumCache.pts[j])
+					if(yNumCache.pts[j])
 					{
-						if(!isNaN(parseFloat(xNumCache.pts[j].val)))
-							xVal = parseFloat(xNumCache.pts[j].val);
+						yVal = parseFloat(yNumCache.pts[j].val);
+					
+						xNumCache = series[l].xVal && series[l].xVal.numRef ? series[l].xVal.numRef.numCache : series[l].xVal && series[l].xVal.numLit ? series[l].xVal.numLit : null;
+						if(xNumCache && xNumCache.pts[j])
+						{
+							if(!isNaN(parseFloat(xNumCache.pts[j].val)))
+								xVal = parseFloat(xNumCache.pts[j].val);
+							else
+								xVal = j + 1;
+						}
 						else
 							xVal = j + 1;
+						
+						newArr[l][j] = [xVal, yVal];
+						
+						if(l == 0 && j == 0)
+						{
+							min = xVal;
+							max = xVal;
+							minY = yVal;
+							maxY = yVal;
+						}
+						
+						if(xVal < min)
+							min = xVal;
+						if(xVal > max)
+							max = xVal;
+						if(yVal < minY)
+							minY = yVal;
+						if(yVal > maxY)
+							maxY = yVal;
 					}
 					else
-						xVal = j + 1;
-					
-					newArr[l][j] = [xVal, yVal];
-					
-					if(l == 0 && j == 0)
 					{
-						min = xVal;
-						max = xVal;
-						minY = yVal;
-						maxY = yVal;
+						xNumCache = series[l].xVal && series[l].xVal.numRef ? series[l].xVal.numRef.numCache : series[l].xVal && series[l].xVal.numLit ? series[l].xVal.numLit : null;
+						if(xNumCache && xNumCache.pts[j])
+						{
+							if(!isNaN(parseFloat(xNumCache.pts[j].val)))
+								xVal = parseFloat(xNumCache.pts[j].val);
+							else
+								xVal = j + 1;
+						}
+						else
+							xVal = j + 1;
+						
+						if(l == 0 && j == 0)
+						{
+							min = xVal;
+							max = xVal;
+							
+						}
+						
+						if(xVal < min)
+							min = xVal;
+						if(xVal > max)
+							max = xVal;
 					}
 					
-					if(xVal < min)
-						min = xVal;
-					if(xVal > max)
-						max = xVal;
-					if(yVal < minY)
-						minY = yVal;
-					if(yVal > maxY)
-						maxY = yVal;
 				}
 			}
 			this.calcProp.ymin = minY;
@@ -5982,13 +6011,19 @@ drawHBarChart.prototype =
 		//соответствует подписям оси значений(OY)
 		var yPoints = this.cChartSpace.chart.plotArea.catAx.yPoints;
 		
-		var xaxispos      = this.chartProp.xaxispos;
+		var xaxispos       = this.chartProp.xaxispos;
 		var heightGraph    = this.chartProp.heightCanvas - this.chartProp.chartGutter._top - this.chartProp.chartGutter._bottom;
 		
 		var defaultOverlap = (this.chartProp.subType == "stacked" || this.chartProp.subType == "stackedPer") ? 100 : 0;
 		var overlap        = this.cChartSpace.chart.plotArea.chart.overlap ? this.cChartSpace.chart.plotArea.chart.overlap : defaultOverlap;
 		var ptCount        = this.cChartDrawer.getPtCount(this.chartProp.series);
         var height         = heightGraph / ptCount;
+		var crossBetween   = this.cChartSpace.getValAxisCrossType();
+		
+		if(crossBetween)
+		{
+			height = heightGraph / (ptCount - 1);
+		}
 		
 		var gapWidth = this.cChartSpace.chart.plotArea.chart.gapWidth ? this.cChartSpace.chart.plotArea.chart.gapWidth : 150;
 		

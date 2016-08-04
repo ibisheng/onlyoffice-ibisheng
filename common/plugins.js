@@ -431,7 +431,10 @@
 			{
 				var _sizes = JSON.parse(value);
 
-				window.g_asc_plugins.api.asc_fireCallback("asc_onPluginResize", _sizes["width"], _sizes["height"], function() {
+				window.g_asc_plugins.api.asc_fireCallback("asc_onPluginResize",
+					[_sizes["width"], _sizes["height"]],
+					[_sizes["minw"], _sizes["minh"]],
+					[_sizes["maxw"], _sizes["maxh"]], function() {
 					// TODO: send resize end event
 				});
 			}
