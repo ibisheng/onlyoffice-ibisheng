@@ -5428,40 +5428,7 @@
 
     WorksheetView.prototype.prepareDepCells = function ( se ) {
         //todo
-        return;
-        var activeCell = this.activeRange, mc = this.model.getMergedByCell( activeCell.startRow, activeCell.startCol ), c1 = mc ? mc.c1 : activeCell.startCol, r1 = mc ? mc.r1 : activeCell.startRow, c = this._getVisibleCell( c1, r1 ), nodes = (se == AscCommonExcel.c_oAscDrawDepOptions.Master) ? this.model.workbook.dependencyFormulas.getMasterNodes( this.model.getId(), c.getName() ) : this.model.workbook.dependencyFormulas.getSlaveNodes( this.model.getId(), c.getName() );
-
-        if ( !nodes ) {
-            return;
-        }
-
-        if ( !this.depDrawCells ) {
-            this.depDrawCells = {};
-        }
-
-        if ( se == AscCommonExcel.c_oAscDrawDepOptions.Master ) {
-            c = c.getCells()[0];
-            var id = AscCommonExcel.getVertexId( this.model.getId(), c.getName() );
-            this.depDrawCells[id] = {from: c, to: nodes};
-        }
-        else {
-            var to = {}, to1, id = AscCommonExcel.getVertexId( this.model.getId(), c.getName() );
-            to[AscCommonExcel.getVertexId( this.model.getId(), c.getName() )] = this.model.workbook.dependencyFormulas.getNode( this.model.getId(), c.getName() );
-            to1 = this.model.workbook.dependencyFormulas.getNode( this.model.getId(), c.getName() );
-            for ( var id2 in nodes ) {
-                if ( this.depDrawCells[id2] ) {
-                    $.extend( this.depDrawCells[id2].to, to )
-                }
-                else {
-                    this.depDrawCells[id2] = {}
-                    this.depDrawCells[id2].from = nodes[id2].returnCell()
-                    this.depDrawCells[id2].to = {}
-                    this.depDrawCells[id2].to[id] = to1;
-                }
-            }
-        }
         this.drawDepCells();
-
     };
 
     WorksheetView.prototype.cleanDepCells = function () {

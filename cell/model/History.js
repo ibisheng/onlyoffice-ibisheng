@@ -49,6 +49,7 @@ function (window, undefined) {
 	window['AscCH'].historyitem_Workbook_ChangeColorScheme = 5;
 	window['AscCH'].historyitem_Workbook_AddFont = 6;
 	window['AscCH'].historyitem_Workbook_DefinedNamesChange = 7;
+	window['AscCH'].historyitem_Workbook_DefinedNamesChangeUndo = 8;
 
 	window['AscCH'].historyitem_Worksheet_RemoveCell = 1;
 	window['AscCH'].historyitem_Worksheet_RemoveRows = 2;
@@ -75,7 +76,6 @@ function (window, undefined) {
 	window['AscCH'].historyitem_Worksheet_CreateCol = 21;
 	window['AscCH'].historyitem_Worksheet_CreateCell = 22;
 	window['AscCH'].historyitem_Worksheet_SetViewSettings = 23;
-	window['AscCH'].historyitem_Worksheet_RemoveCellFormula = 24;
 	window['AscCH'].historyitem_Worksheet_ChangeMerge = 25;
 	window['AscCH'].historyitem_Worksheet_ChangeHyperlink = 26;
 	window['AscCH'].historyitem_Worksheet_SetTabColor = 27;
@@ -125,6 +125,7 @@ function (window, undefined) {
 	window['AscCH'].historyitem_Cell_SetQuotePrefix = 20;
 	window['AscCH'].historyitem_Cell_Angle = 21;
 	window['AscCH'].historyitem_Cell_Style = 22;
+	window['AscCH'].historyitem_Cell_ChangeValueUndo = 23;
 
 	window['AscCH'].historyitem_Comment_Add = 1;
 	window['AscCH'].historyitem_Comment_Remove = 2;

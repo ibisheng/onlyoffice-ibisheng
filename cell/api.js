@@ -1690,17 +1690,7 @@ var editor;
       return;
     }
 
-    if (oldName.asc_getIsTable()) {
-      var dataRange = parserHelp.parse3DRef(oldName.asc_getRef());
-      if (dataRange) {
-        var ws = this.wb.getWorksheetByName(dataRange.sheet);
-        if (ws) {
-          return ws.af_changeDisplayNameTable(oldName.asc_getName(), newName.asc_getName());
-        }
-      }
-    } else {
-      return this.wb.editDefinedNames(oldName, newName);
-    }
+    return this.wb.editDefinedNames(oldName, newName);
   };
 
   spreadsheet_api.prototype.asc_delDefinedNames = function(oldName) {

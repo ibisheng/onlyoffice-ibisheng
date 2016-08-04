@@ -3596,17 +3596,14 @@ function parserFormula( formula, parent, _ws ) {
 				this.parent.onFormulaEvent(AscCommon.c_oNotifyParentType.Change);
 			}
 		} else {
-			var oldFormula = this.Formula;
+			this.removeDependencies();
 			if (AscCommon.c_oNotifyType.Shift === data.type || AscCommon.c_oNotifyType.Move === data.type ||
 				AscCommon.c_oNotifyType.Delete === data.type) {
-				this.shiftCells2(data.type, data.sheetId, data.bbox, data.offset);
-				if (this.parent && this.parent.onFormulaEvent) {
-					this.parent.onFormulaEvent(AscCommon.c_oNotifyParentType.Change);
-				}
+				this.shiftCells(data.type, data.sheetId, data.bbox, data.offset);
 			} else if (AscCommon.c_oNotifyType.ChangeDefName === data.type) {
 				this.changeDefName(data.from, data.to);
 			} else if (AscCommon.c_oNotifyType.Rebuild === data.type) {
-				this.Formula = this.assemble();
+				;
 			} else if (AscCommon.c_oNotifyType.ChangeSheet === data.type) {
 				if (this.is3D) {
 					var changeData = data.data;
@@ -3621,8 +3618,8 @@ function parserFormula( formula, parent, _ws ) {
 					}
 				}
 			}
-			if (this.parent && this.parent.onFormulaEvent && oldFormula !== this.Formula) {
-				this.parent.onFormulaEvent(AscCommon.c_oNotifyParentType.ChangeFormula, {from: oldFormula, to: this.Formula});
+			if (this.parent && this.parent.onFormulaEvent) {
+				this.parent.onFormulaEvent(AscCommon.c_oNotifyParentType.ChangeFormula);
 			}
 		}
 	};
@@ -4387,7 +4384,6 @@ parserFormula.prototype.getRef = function() {
 		return this;
 	};
 	parserFormula.prototype.changeDefName = function(from, to) {
-		this.removeDependencies();
 		var i, elem, LocalSheetId;
 		for (i = 0; i < this.outStack.length; i++) {
 			elem = this.outStack[i];
@@ -4403,11 +4399,8 @@ parserFormula.prototype.getRef = function() {
 				}
 			}
 		}
-		this.buildDependencies();
-		this.Formula = this.assemble();
 	};
-	parserFormula.prototype.shiftCells2 = function(notifyType, sheetId, bbox, offset) {
-		this.removeDependencies();
+	parserFormula.prototype.shiftCells = function(notifyType, sheetId, bbox, offset) {
 		var isHor = 0 != offset.offsetCol;
 		var oShiftGetBBox;
 		if (AscCommon.c_oNotifyType.Shift == notifyType) {
@@ -4463,8 +4456,6 @@ parserFormula.prototype.getRef = function() {
 				}
 			}
 		}
-		this.buildDependencies();
-		this.Formula = this.assemble();
 	};
 	parserFormula.prototype.renameSheet = function(lastName, newName) {
 		for (var i = 0; i < this.outStack.length; i++) {

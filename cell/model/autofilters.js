@@ -966,6 +966,7 @@
 						if(oldName === worksheet.TableParts[l].DisplayName)
 						{							
 							worksheet.TableParts[l] = cloneData.oldFilter.clone(null);
+							worksheet.workbook.dependencyFormulas.changeTableName(oldName, worksheet.TableParts[l].DisplayName);
 							break;
 						}
 					}
@@ -2542,8 +2543,7 @@
 				var oldFilter = tablePart.clone(null);
 				History.Create_NewPoint();
 				History.StartTransaction();
-				
-				//TODO добавлять в историю смену именного диапазона
+
 				worksheet.workbook.dependencyFormulas.changeTableName(tableName, newName);
 				
 				tablePart.changeDisplayName(newName);

@@ -2959,7 +2959,7 @@ UndoRedoWorkbook.prototype = {
 				this.wb.theme.themeElements.clrScheme = Data.newVal;
 			this.wb.oApi.asc_AfterChangeColorScheme();
 		}
-		else if (AscCH.historyitem_Workbook_DefinedNamesChange === Type) {
+		else if (AscCH.historyitem_Workbook_DefinedNamesChange === Type || AscCH.historyitem_Workbook_DefinedNamesChangeUndo === Type) {
 			var oldName, newName;
 			if (bUndo) {
 				oldName = Data.newName;
@@ -2971,12 +2971,14 @@ UndoRedoWorkbook.prototype = {
 				oldName = Data.oldName;
 				newName = Data.newName;
 			}
-			if (null == newName) {
-				this.wb.delDefinesNames(oldName);
-				this.wb.handlers.trigger("asc_onDelDefName")
-			} else {
-				this.wb.editDefinesNames(oldName, newName);
-				this.wb.handlers.trigger("asc_onEditDefName", oldName, newName);
+			if (bUndo || AscCH.historyitem_Workbook_DefinedNamesChangeUndo !== Type) {
+				if (null == newName) {
+					this.wb.delDefinesNames(oldName);
+					this.wb.handlers.trigger("asc_onDelDefName")
+				} else {
+					this.wb.editDefinesNames(oldName, newName);
+					this.wb.handlers.trigger("asc_onEditDefName", oldName, newName);
+				}
 			}
 		}
 	}
@@ -3067,12 +3069,13 @@ UndoRedoCell.prototype = {
 			for(var i = 0, length = Val.length; i < length; ++i)
 				cell.oValue.multiText.push(Val[i].clone());
 		}
-		else if(AscCH.historyitem_Cell_ChangeValue == Type)
+		else if(AscCH.historyitem_Cell_ChangeValue === Type || AscCH.historyitem_Cell_ChangeValueUndo === Type)
 		{
-			cell.setValueData(Val);
-			// ToDo Так делать неправильно, нужно поправить (перенести логику в model, а отрисовку отделить)
-			var worksheetView = this.wb.oApi.wb.getWorksheetById(nSheetId);
-			worksheetView.model.autoFilters.renameTableColumn(new Asc.Range(nCol, nRow, nCol, nRow), bUndo);
+			if (bUndo || AscCH.historyitem_Cell_ChangeValueUndo !== Type) {
+				cell.setValueData(Val);
+				// ToDo Так делать неправильно, нужно поправить (перенести логику в model, а отрисовку отделить)
+				ws.autoFilters.renameTableColumn(new Asc.Range(nCol, nRow, nCol, nRow), bUndo);
+			}
 		}
 		else if(AscCH.historyitem_Cell_SetStyle == Type)
 		{
@@ -3149,18 +3152,6 @@ UndoRedoWoorksheet.prototype = {
 			else
 				ws._removeCell(nRow, nCol);
 		}
-        else if(AscCH.historyitem_Worksheet_RemoveCellFormula == Type){
-            nRow = Data.nRow;
-            nCol = Data.nCol;
-            if(bUndo)
-            {
-				//todo
-                var oCellAddres = new CellAddress(nRow, nCol, 0);
-                var node = ws.workbook.dependencyFormulas.addNode(ws.getId(), oCellAddres.getID());
-                if (node)
-                    node.setFormula(Data.sFormula, false, true);
-            }
-        }
 		else if(AscCH.historyitem_Worksheet_ColProp == Type)
 		{
 			index = Data.index;

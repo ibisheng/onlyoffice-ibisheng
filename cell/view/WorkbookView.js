@@ -2255,7 +2255,11 @@
 
     var editDefinedNamesCallback = function(res) {
       if (res) {
-        t.model.editDefinesNames(oldName, newName);
+        if (oldName && oldName.asc_getIsTable()) {
+          ws.model.autoFilters.changeDisplayNameTable(oldName.asc_getName(), newName.asc_getName());
+        } else {
+          t.model.editDefinesNames(oldName, newName);
+        }
         t.handlers.trigger("asc_onEditDefName", oldName, newName);
         //условие исключает второй вызов asc_onRefreshDefNameList(первый в unlockDefName)
         if(!(t.collaborativeEditing.getCollaborativeEditing() && t.collaborativeEditing.getFast()))
