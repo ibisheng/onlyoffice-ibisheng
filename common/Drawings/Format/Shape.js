@@ -473,7 +473,7 @@ function ConvertTableToGraphicFrame(oTable, oPresentation){
         }
         var nIndex = oTable2.Content.length;
         oTable2.Content[nIndex] = oNewRow;
-        History.Add( oTable2, { Type : AscDFH.historyitem_Table_AddRow, Pos : Index, Item : { Row : oTable2.Content[nIndex], TableRowsBottom : {}, RowsInfo : {} } } );
+        History.Add( oTable2, { Type : AscDFH.historyitem_Table_AddRow, Pos : nIndex, Item : { Row : oTable2.Content[nIndex], TableRowsBottom : {}, RowsInfo : {} } } );
     }
 
     if(!oGraphicFrame.spPr){
@@ -491,6 +491,7 @@ function ConvertTableToGraphicFrame(oTable, oPresentation){
     }
     oGraphicFrame.setGraphicObject(oTable2);
     oGraphicFrame.setBDeleted(false);
+    return oGraphicFrame;
 }
 
 function RecalculateDocContentByMaxLine(oDocContent, dMaxWidth, bNeedRecalcAllDrawings)

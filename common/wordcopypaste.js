@@ -3783,32 +3783,35 @@ PasteProcessor.prototype =
 	_convertTableToPPTX: function(table)
 	{
 		//TODO пересмотреть обработку для вложенных таблиц(можно сделать так, как при копировании из документов в таблицы)
-		var allRows = [];
-		this.maxTableCell = 0;
-		table = this._replaceInnerTables(table, allRows, true);
-		
-		//ковертим внутренние параграфы
-		table.bPresentation = true;
-		for(var i = 0; i < table.Content.length; i++)
-		{
-			for(var j = 0; j < table.Content[i].Content.length; j++)
-			{
-				var cDocumentContent = table.Content[i].Content[j].Content;
-				cDocumentContent.bPresentation = true;
-				var nIndex = 0;
-				for(var n = 0; n < cDocumentContent.Content.length; n++)
-				{
-                    if(cDocumentContent.Content[n] instanceof Paragraph)
-                    {
-                        cDocumentContent.Content[nIndex] = AscFormat.ConvertParagraphToPPTX(cDocumentContent.Content[nIndex]);
-                        ++nIndex;
-                    }
+        var oTable = AscFormat.ExecuteNoHistory(function(){
+            var allRows = [];
+            this.maxTableCell = 0;
+            table = this._replaceInnerTables(table, allRows, true);
 
-				}
-			}
-		}
-		
-		return table;
+            //ковертим внутренние параграфы
+            table.bPresentation = true;
+            for(var i = 0; i < table.Content.length; i++)
+            {
+                for(var j = 0; j < table.Content[i].Content.length; j++)
+                {
+                    var cDocumentContent = table.Content[i].Content[j].Content;
+                    cDocumentContent.bPresentation = true;
+                    var nIndex = 0;
+                    for(var n = 0; n < cDocumentContent.Content.length; n++)
+                    {
+                        if(cDocumentContent.Content[n] instanceof Paragraph)
+                        {
+                            cDocumentContent.Content[nIndex] = AscFormat.ConvertParagraphToPPTX(cDocumentContent.Content[nIndex]);
+                            ++nIndex;
+                        }
+
+                    }
+                }
+            }
+            table.Set_TableLayout(tbllayout_Fixed);
+            return table;
+        }, this, []);
+        return oTable;
 	},
 	
 	_replaceInnerTables: function(table, allRows, isRoot)
