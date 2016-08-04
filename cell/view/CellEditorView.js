@@ -191,82 +191,83 @@
 		return this;
 	}
 
-	CellEditor.prototype._init = function ( settings ) {
+	CellEditor.prototype._init = function (settings) {
 		var t = this;
 		var z = t.defaults.canvasZIndex;
 		this.defaults.padding = settings.padding;
 
-		if ( null != this.element ) {
-			t.canvasOuter = document.createElement( 'div' );
+		if (null != this.element) {
+			t.canvasOuter = document.createElement('div');
 			t.canvasOuter.id = "ce-canvas-outer";
 			t.canvasOuter.style.display = "none";
 			t.canvasOuter.style.zIndex = z;
 			var innerHTML = '<canvas id="ce-canvas" style="z-index: ' + (z + 1) + '"></canvas>';
-			innerHTML += '<canvas id="ce-canvas-overlay" style="z-index: ' + (z + 2) + '; cursor: ' + t.defaults.cursorShape + '"></canvas>';
+			innerHTML += '<canvas id="ce-canvas-overlay" style="z-index: ' + (z + 2) + '; cursor: ' + t.defaults.cursorShape +
+				'"></canvas>';
 			innerHTML += '<div id="ce-cursor" style="display: none; z-index: ' + (z + 3) + '"></div>';
 			t.canvasOuter.innerHTML = innerHTML;
-			this.element.appendChild( t.canvasOuter );
+			this.element.appendChild(t.canvasOuter);
 
 			t.canvasOuterStyle = t.canvasOuter.style;
-			t.canvas = document.getElementById( "ce-canvas" );
-			t.canvasOverlay = document.getElementById( "ce-canvas-overlay" );
-			t.cursor = document.getElementById( "ce-cursor" );
+			t.canvas = document.getElementById("ce-canvas");
+			t.canvasOverlay = document.getElementById("ce-canvas-overlay");
+			t.cursor = document.getElementById("ce-cursor");
 			t.cursorStyle = t.cursor.style;
 		}
 
 		// create text render
-		t.drawingCtx = new asc.DrawingContext( {
+		t.drawingCtx = new asc.DrawingContext({
 			canvas: t.canvas, units: 1/*pt*/, fmgrGraphics: this.fmgrGraphics, font: this.m_oFont
-		} );
-		t.overlayCtx = new asc.DrawingContext( {
+		});
+		t.overlayCtx = new asc.DrawingContext({
 			canvas: t.canvasOverlay, units: 1/*pt*/, fmgrGraphics: this.fmgrGraphics, font: this.m_oFont
-		} );
-		t.textRender = new AscCommonExcel.CellTextRender( t.drawingCtx );
-		t.textRender.setDefaultFont( settings.font.clone() );
+		});
+		t.textRender = new AscCommonExcel.CellTextRender(t.drawingCtx);
+		t.textRender.setDefaultFont(settings.font.clone());
 
 		// bind event handlers
-		if ( t.canvasOuter && t.canvasOuter.addEventListener ) {
-			t.canvasOuter.addEventListener( "mousedown", function () {
-				return t._onMouseDown.apply( t, arguments );
-			}, false );
-			t.canvasOuter.addEventListener( "mouseup", function () {
-				return t._onMouseUp.apply( t, arguments );
-			}, false );
-			t.canvasOuter.addEventListener( "mousemove", function () {
-				return t._onMouseMove.apply( t, arguments );
-			}, false );
-			t.canvasOuter.addEventListener( "mouseleave", function () {
-				return t._onMouseLeave.apply( t, arguments );
-			}, false );
+		if (t.canvasOuter && t.canvasOuter.addEventListener) {
+			t.canvasOuter.addEventListener("mousedown", function () {
+				return t._onMouseDown.apply(t, arguments);
+			}, false);
+			t.canvasOuter.addEventListener("mouseup", function () {
+				return t._onMouseUp.apply(t, arguments);
+			}, false);
+			t.canvasOuter.addEventListener("mousemove", function () {
+				return t._onMouseMove.apply(t, arguments);
+			}, false);
+			t.canvasOuter.addEventListener("mouseleave", function () {
+				return t._onMouseLeave.apply(t, arguments);
+			}, false);
 		}
 
 		// check input, it may have zero len, for mobile version
-		if ( t.input && t.input.addEventListener ) {
-			t.input.addEventListener( "focus", function () {
-				return t.isOpened ? t._topLineGotFocus.apply( t, arguments ) : true;
-			}, false );
-			t.input.addEventListener( "mousedown", function () {
+		if (t.input && t.input.addEventListener) {
+			t.input.addEventListener("focus", function () {
+				return t.isOpened ? t._topLineGotFocus.apply(t, arguments) : true;
+			}, false);
+			t.input.addEventListener("mousedown", function () {
 				return t.isOpened ? (t.callTopLineMouseup = true) : true;
-			}, false );
-			t.input.addEventListener( "mouseup", function () {
-				return t.isOpened ? t._topLineMouseUp.apply( t, arguments ) : true;
-			}, false );
-			t.input.addEventListener( "input", function () {
-				return t._onInputTextArea.apply( t, arguments );
-			}, false );
+			}, false);
+			t.input.addEventListener("mouseup", function () {
+				return t.isOpened ? t._topLineMouseUp.apply(t, arguments) : true;
+			}, false);
+			t.input.addEventListener("input", function () {
+				return t._onInputTextArea.apply(t, arguments);
+			}, false);
 
 			// Не поддерживаем drop на верхнюю строку
-			t.input.addEventListener( "drop", function ( e ) {
+			t.input.addEventListener("drop", function (e) {
 				e.preventDefault();
 				return false;
-			}, false );
+			}, false);
 		}
 
 		this.fKeyMouseUp = function () {
-			return t._onWindowMouseUp.apply( t, arguments );
+			return t._onWindowMouseUp.apply(t, arguments);
 		};
 		this.fKeyMouseMove = function () {
-			return t._onWindowMouseMove.apply( t, arguments );
+			return t._onWindowMouseMove.apply(t, arguments);
 		};
 	};
 
@@ -555,13 +556,13 @@
 		}
 	};
 
-	CellEditor.prototype.setFocus = function ( hasFocus ) {
+	CellEditor.prototype.setFocus = function (hasFocus) {
 		this.hasFocus = !!hasFocus;
-		this.handlers.trigger( "gotFocus", this.hasFocus );
+		this.handlers.trigger("gotFocus", this.hasFocus);
 	};
 
 	CellEditor.prototype.restoreFocus = function () {
-		if ( this.isTopLineActive ) {
+		if (this.isTopLineActive) {
 			this.input.focus();
 		}
 	};
@@ -1597,52 +1598,51 @@
 		var t = this;
 		t.isTopLineActive = true;
 		t.input.isFocused = true;
-		t.setFocus( true );
+		t.setFocus(true);
 		t._hideCursor();
 		t._updateTopLineCurPos();
 		t._cleanSelection();
 	};
 
-    CellEditor.prototype._topLineMouseUp = function() {
-        var t = this;
-        this.callTopLineMouseup = false;
-        // при такой комбинации ctrl+a, click, ctrl+a, click не обновляется selectionStart
-        // поэтому выполняем обработку после обработчика системы
-        setTimeout(function() {
-            var b = t.input.selectionStart;
-            var e = t.input.selectionEnd;
-            if (typeof b !== "undefined") {
-                if (t.cursorPos !== b || t.selectionBegin !== t.selectionEnd) {
-                    t._moveCursor(kPosition, b);
-                }
-                if (b !== e) {
-                    t._selectChars(kPosition, e);
-                }
-            }
-        });
-    };
+	CellEditor.prototype._topLineMouseUp = function () {
+		var t = this;
+		this.callTopLineMouseup = false;
+		// при такой комбинации ctrl+a, click, ctrl+a, click не обновляется selectionStart
+		// поэтому выполняем обработку после обработчика системы
+		setTimeout(function () {
+			var b = t.input.selectionStart;
+			var e = t.input.selectionEnd;
+			if (typeof b !== "undefined") {
+				if (t.cursorPos !== b || t.selectionBegin !== t.selectionEnd) {
+					t._moveCursor(kPosition, b);
+				}
+				if (b !== e) {
+					t._selectChars(kPosition, e);
+				}
+			}
+		});
+	};
 
 	CellEditor.prototype._syncEditors = function () {
 		var t = this;
-		var s1 = t._getFragmentsText( t.options.fragments );
+		var s1 = t._getFragmentsText(t.options.fragments);
 		var s2 = t.input.value;
-		var l = Math.min( s1.length, s2.length );
+		var l = Math.min(s1.length, s2.length);
 		var i1 = 0, i2 = 0;
 
-		while ( i1 < l && s1.charAt( i1 ) === s2.charAt( i1 ) ) {
+		while (i1 < l && s1.charAt(i1) === s2.charAt(i1)) {
 			++i1;
 		}
 		i2 = i1 + 1;
-		if ( i2 >= l ) {
-			i2 = Math.max( s1.length, s2.length );
-		}
-		else {
-			while ( i2 < l && s1.charAt( i1 ) !== s2.charAt( i2 ) ) {
+		if (i2 >= l) {
+			i2 = Math.max(s1.length, s2.length);
+		} else {
+			while (i2 < l && s1.charAt(i1) !== s2.charAt(i2)) {
 				++i2;
 			}
 		}
 
-		t._addChars( s2.slice( i1, i2 ), i1 );
+		t._addChars(s2.slice(i1, i2), i1);
 	};
 
 	// Content
@@ -1820,44 +1820,43 @@
 		}
 	};
 
-	CellEditor.prototype._selectChars = function ( kind, pos ) {
+	CellEditor.prototype._selectChars = function (kind, pos) {
 		var t = this;
 		var begPos, endPos;
 
 		begPos = t.selectionBegin === t.selectionEnd ? t.cursorPos : t.selectionBegin;
-		t._moveCursor( kind, pos );
+		t._moveCursor(kind, pos);
 		endPos = t.cursorPos;
 
 		t.selectionBegin = begPos;
 		t.selectionEnd = endPos;
 		t._drawSelection();
-		if ( t.isTopLineActive && !t.skipTLUpdate ) {
+		if (t.isTopLineActive && !t.skipTLUpdate) {
 			t._updateTopLineCurPos();
 		}
 	};
 
-	CellEditor.prototype._changeSelection = function ( coord ) {
+	CellEditor.prototype._changeSelection = function (coord) {
 		var t = this;
 
-		function doChangeSelection( coordTmp ) {
+		function doChangeSelection(coordTmp) {
 			// ToDo реализовать для слова.
-			if ( c_oAscCellEditorSelectState.word === t.isSelectMode ) {
+			if (c_oAscCellEditorSelectState.word === t.isSelectMode) {
 				return;
 			}
-			var pos = t._findCursorPosition( coordTmp );
-			if ( pos !== undefined ) {
-				pos >= 0 ? t._selectChars( kPosition, pos ) : t._selectChars( pos );
+			var pos = t._findCursorPosition(coordTmp);
+			if (pos !== undefined) {
+				pos >= 0 ? t._selectChars(kPosition, pos) : t._selectChars(pos);
 			}
 		}
 
-		if ( window['IS_NATIVE_EDITOR'] ) {
-			doChangeSelection( coord );
-		}
-		else {
-			window.clearTimeout( t.selectionTimer );
-			t.selectionTimer = window.setTimeout( function () {
-				doChangeSelection( coord );
-			}, 0 );
+		if (window['IS_NATIVE_EDITOR']) {
+			doChangeSelection(coord);
+		} else {
+			window.clearTimeout(t.selectionTimer);
+			t.selectionTimer = window.setTimeout(function () {
+				doChangeSelection(coord);
+			}, 0);
 		}
 	};
 
@@ -2644,12 +2643,12 @@
 	};
 
 	/** @param event {MouseEvent} */
-	CellEditor.prototype._onMouseMove = function ( event ) {
-		var coord = this._getCoordinates( event );
-		this.clickCounter.mouseMoveEvent( coord.x, coord.y );
+	CellEditor.prototype._onMouseMove = function (event) {
+		var coord = this._getCoordinates(event);
+		this.clickCounter.mouseMoveEvent(coord.x, coord.y);
 		this.hasCursor = true;
-		if ( c_oAscCellEditorSelectState.no !== this.isSelectMode ) {
-			this._changeSelection( coord );
+		if (c_oAscCellEditorSelectState.no !== this.isSelectMode) {
+			this._changeSelection(coord);
 		}
 		return true;
 	};

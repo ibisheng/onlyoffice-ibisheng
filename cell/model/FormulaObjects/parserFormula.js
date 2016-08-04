@@ -5275,44 +5275,53 @@ function parseNum( str ) {
     return !isNaN( str );
 }
 
-function matching( x, y, oper ) {
-    var res = false, rS;
-    if ( y instanceof cString ) {
-        rS = searchRegExp2( x.value, y.toString() );
-        switch ( oper ) {
-            case "<>":
-                res = !rS;
-                break;
-            case "=":
-            default:
-                res = rS;
-                break;
-        }
-  } else if (typeof x === typeof y) {
-        switch ( oper ) {
-            case "<>":
-                res = (x.value != y.value);
-                break;
-            case ">":
-                res = (x.value > y.value);
-                break;
-            case "<":
-                res = (x.value < y.value);
-                break;
-            case ">=":
-                res = (x.value >= y.value);
-                break;
-            case "<=":
-                res = (x.value <= y.value);
-                break;
-            case "=":
-            default:
-                res = (x.value == y.value);
-                break;
-        }
-    }
-    return res;
-}
+	function matching(x, y, operator) {
+		var res = false, rS;
+		if (cElementType.string === y.type) {
+			y = y.toString();
+			if ('' === y) {
+				// Empty compare string
+				rS = (cElementType.empty === x.type);
+			} else {
+				// Equal only string values
+				rS = (cElementType.string === x.type) ? searchRegExp2(x.value, y) : false;
+			}
+
+			switch (operator) {
+				case "<>":
+					res = !rS;
+					break;
+				case "=":
+				default:
+					res = rS;
+					break;
+			}
+		} else {
+			rS = (x.type === y.type);
+			switch (operator) {
+				case "<>":
+					res = !rS || (x.value != y.value);
+					break;
+				case ">":
+					res = rS && (x.value > y.value);
+					break;
+				case "<":
+					res = rS && (x.value < y.value);
+					break;
+				case ">=":
+					res = rS && (x.value >= y.value);
+					break;
+				case "<=":
+					res = rS && (x.value <= y.value);
+					break;
+				case "=":
+				default:
+					res = (x.value == y.value);
+					break;
+			}
+		}
+		return res;
+	}
 
 function GetDiffDate360( nDay1, nMonth1, nYear1, nDay2, nMonth2, nYear2, bUSAMethod ) {
     var nDayDiff;
