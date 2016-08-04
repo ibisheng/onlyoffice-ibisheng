@@ -95,6 +95,10 @@
 	{
 		//console.log(_log);
 	}
+	function ti_console_log_ms(_log)
+	{
+		//console.log(_log);
+	}
 
 	function CTextInput(api)
 	{
@@ -151,7 +155,7 @@
 		this.FixedPosCheckElementY = 0;
 
 		// еще один режим для ie & edge
-		this.IsUseInputEventOnlyWithCtx = false;//(AscCommon.AscBrowser.isIE) ? true : false;
+		this.IsUseInputEventOnlyWithCtx = (AscCommon.AscBrowser.isIE) ? true : false;
 	}
 
 	CTextInput.prototype =
@@ -516,7 +520,7 @@
 			}
 
 			var _value = this.getAreaValue();
-			if (!this.KeyDownFlag && c_oCompositionState.end == this.compositionState && !this.TextInputAfterComposition && _value != "")
+			if (!this.KeyDownFlag && c_oCompositionState.end == this.compositionState && !this.TextInputAfterComposition && _value != "" && _value != this.ieNonCompositionPrefixConfirm)
 			{
 				ti_console_log("ti: external input");
 
@@ -560,10 +564,10 @@
 				if (this.compositionState == c_oCompositionState.end && bIsComposite)
 				{
 					this.Api.Begin_CompositeInput();
-					console.log("input_start");
+					ti_console_log_ms("input_start");
 				}
 
-				console.log("input: " + _value);
+				ti_console_log_ms("input: " + _value);
 
 				if (bIsComposite)
 					this.compositionState = c_oCompositionState.process;
@@ -575,7 +579,7 @@
 					{
 						var _newConfirm = this.ieNonCompositionPrefix.substr(this.ieNonCompositionPrefixConfirm.length);
 
-						console.log("input_confirm: " + _newConfirm);
+						ti_console_log_ms("input_confirm: " + _newConfirm);
 
 						this.ieNonCompositionPrefixConfirm = this.ieNonCompositionPrefix;
 
@@ -588,7 +592,7 @@
 
 					var _compositionData = _value.substr(_start);
 
-					console.log("input_update: " + _compositionData);
+					ti_console_log_ms("input_update: " + _compositionData);
 
 					this.checkCompositionData(_compositionData);
 					this.Api.Replace_CompositeText(this.compositionValue);
@@ -599,7 +603,7 @@
 					this.Api.End_CompositeInput();
 					this.compositionState = c_oCompositionState.end;
 
-					console.log("input_end");
+					ti_console_log_ms("input_end");
 				}
 			}
 
@@ -659,11 +663,8 @@
 					this.clear();
 			}
 
-			if (AscCommon.AscBrowser.isIeEdge && this.TextInputAfterComposition)
-			{
-				this.TextInputAfterComposition = false;
-				this.clear();
-			}
+			//if (this.IsUseInputEventOnlyWithCtx && this.TextInputAfterComposition)
+			//	this.clear();
 		},
 
 		emulateNativeKeyDown : function(e)
@@ -895,6 +896,7 @@
 			if (_code != 8 && _code != 46)
 				this.KeyDownFlag = true;
 
+			/*
 			if (AscCommon.AscBrowser.isIE && !AscCommon.AscBrowser.isIeEdge)
 			{
 				if (_code == 13 || this.isSpaceSymbol(e))
@@ -902,9 +904,17 @@
 					// не даем редактору превентить ничего
 					var _e = new CKeyboardEventWrapper(e);
 					this.Api.onKeyDown(_e);
+
+					if (_code == 13)
+						this.clear();
+
 					return;
 				}
 			}
+			*/
+
+			if (_code == 13)
+				this.clear();
 
 			var _ret = this.Api.onKeyDown(e);
 			if (!e.defaultPrevented && (AscCommon.AscBrowser.isIE || AscCommon.AscBrowser.isChrome))
@@ -962,7 +972,7 @@
 			}
 		},
 
-		checkTargetPosition : function(isCorrect)
+		getAreaPos : function()
 		{
 			var _offset = 0;
 			if (this.TextArea_Not_ContentEditableDiv)
@@ -978,6 +988,12 @@
 					_offset = range.endOffset;
 				}
 			}
+			return _offset;
+		},
+
+		checkTargetPosition : function(isCorrect)
+		{
+			var _offset = this.getAreaPos();
 
 			if (false !== isCorrect)
 			{
@@ -1034,6 +1050,7 @@
 					this.Api.Begin_CompositeInput();
 
 				this.compositionState = c_oCompositionState.start;
+				this.isChromeKeysNoKeyPressPresentStartValue = this.getAreaValue();
 				return;
 			}
 
@@ -1249,6 +1266,9 @@
 
 					if (ctx["compositionStartOffset"] == ctx["compositionEndOffset"])
 					{
+						//var _value = this.getAreaValue();
+						//console.log("natural composite end: " + _value);
+
 						if (e.data == "")
 							this.Api.Replace_CompositeText([]);
 
@@ -1256,6 +1276,14 @@
 
 						this.unlockTarget();
 						this.TextInputAfterComposition = true;
+
+						this.clear(true);
+						this.ieNonCompositionPrefixConfirm = this.getAreaValue();
+
+						// нужно выставить курсор в конец, а то ie позволяет уйти курсором за пределы композитной даты
+						var _pos = this.getAreaPos();
+						if (_pos < this.ieNonCompositionPrefixConfirm.length)
+							this.clear();
 					}
 				}
 
