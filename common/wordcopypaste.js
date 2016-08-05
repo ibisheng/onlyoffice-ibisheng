@@ -3690,7 +3690,16 @@ PasteProcessor.prototype =
 				//merge				
 				oCurCell.Set_GridSpan(gridSpan);
 				if(vMerge != 1)
-					oCurCell.Set_VMerge(vmerge_Continue);
+				{
+					if(isMergedCell.r1 === i + activeRange.r1)
+					{
+						oCurCell.Set_VMerge(vmerge_Restart);
+					}
+					else
+					{
+						oCurCell.Set_VMerge(vmerge_Continue);
+					}
+				}
 				
 				var oCurPar = oCurCell.Content.Content[0];
 				
