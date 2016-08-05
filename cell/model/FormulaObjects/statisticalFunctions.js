@@ -1107,43 +1107,37 @@ cCOUNTA.prototype.getInfo = function () {
     };
 };
 
-function cCOUNTBLANK() {
-//    cBaseFunction.call( this, "COUNTBLANK" );
-//    this.setArgumentsMin( 1 );
-//    this.setArgumentsMax( 1 );
-//    this.setFormat( this.formatType.noneFormat );
+    function cCOUNTBLANK() {
+        this.name = "COUNTBLANK";
+        this.type = cElementType.func;
+        this.value = null;
+        this.argumentsMin = 1;
+        this.argumentsCurrent = 0;
+        this.argumentsMax = 1;
+        this.formatType = {
+            def: -1, //подразумевается формат первой ячейки входящей в формулу.
+            noneFormat: -2
+        };
+        this.numFormat = this.formatType.noneFormat;
 
-    this.name = "COUNTBLANK";
-    this.type = cElementType.func;
-    this.value = null;
-    this.argumentsMin = 1;
-    this.argumentsCurrent = 0;
-    this.argumentsMax = 1;
-    this.formatType = {
-        def:-1, //подразумевается формат первой ячейки входящей в формулу.
-        noneFormat:-2
-    };
-    this.numFormat = this.formatType.noneFormat;
-
-}
-
-cCOUNTBLANK.prototype = Object.create( cBaseFunction.prototype );
-cCOUNTBLANK.prototype.Calculate = function ( arg ) {
-    var arg0 = arg[0];
-    if ( arg0 instanceof cArea || arg0 instanceof cArea3D )
-        return this.value = arg0.countCells();
-    else if ( arg0 instanceof cRef || arg0 instanceof cRef3D ) {
-        return this.value = new cNumber( 1 );
     }
-    else
-        return this.value = new cError( cErrorType.bad_reference );
-};
-cCOUNTBLANK.prototype.getInfo = function () {
-    return {
-        name:this.name,
-        args:"( argument-list )"
+
+    cCOUNTBLANK.prototype = Object.create(cBaseFunction.prototype);
+    cCOUNTBLANK.prototype.Calculate = function (arg) {
+        var arg0 = arg[0];
+        if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
+            return this.value = arg0.countCells();
+        } else if (arg0 instanceof cRef || arg0 instanceof cRef3D) {
+            return this.value = new cNumber(1);
+        } else {
+            return this.value = new cError(cErrorType.bad_reference);
+        }
     };
-};
+    cCOUNTBLANK.prototype.getInfo = function () {
+        return {
+            name: this.name, args: "( argument-list )"
+        };
+    };
 
     function cCOUNTIF() {
         this.name = "COUNTIF";
