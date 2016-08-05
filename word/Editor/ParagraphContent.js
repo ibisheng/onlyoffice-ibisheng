@@ -104,7 +104,7 @@ var para_FootnoteReference         = 0x0039; // Ссылка на сноску
 var para_FootnoteRef               = 0x0040; // Номер сноски (должен быть только внутри сноски)
 var para_Separator                 = 0x0041; // Разделить, который используется для сносок
 var para_ContinuationSeparator     = 0x0042; // Большой разделитель, который используется для сносок
-
+var para_PageCount                 = 0x0043; // Количество страниц
 
 var break_Line   = 0x01;
 var break_Page   = 0x02;
@@ -7809,6 +7809,104 @@ ParaContinuationSeparator.prototype.Update_Width = function(PRS)
 	this.Width        = nWidth;
 	this.WidthVisible = nWidth;
 };
+
+function ParaPageCount()
+{
+	this.FontKoef  = 1;
+	this.NumWidths = [];
+	this.Widths    = [];
+	this.String    = [];
+}
+AscCommon.extendClass(ParaPageCount, CRunElementBase);
+ParaPageCount.prototype.Type = para_PageCount;
+ParaPageCount.prototype.Copy = function()
+{
+	return new ParaPageCount();
+};
+ParaPageCount.prototype.Is_RealContent = function()
+{
+	return true;
+};
+ParaPageCount.prototype.Can_AddNumbering = function()
+{
+	return true;
+};
+ParaPageCount.prototype.Measure = function(Context, TextPr)
+{
+	this.FontKoef = TextPr.Get_FontKoef();
+	Context.SetFontSlot(fontslot_ASCII, this.FontKoef);
+
+	for (var Index = 0; Index < 10; Index++)
+	{
+		this.NumWidths[Index] = Context.Measure("" + Index).Width;
+	}
+
+	this.Width        = 0;
+	this.Height       = 0;
+	this.WidthVisible = 0;
+};
+ParaPageCount.prototype.Draw = function(X, Y, Context)
+{
+	var Len = this.String.length;
+
+	var _X = X;
+	var _Y = Y;
+
+	Context.SetFontSlot(fontslot_ASCII, this.FontKoef);
+	for (var Index = 0; Index < Len; Index++)
+	{
+		var Char = this.String.charAt(Index);
+		Context.FillText(_X, _Y, Char);
+		_X += this.Widths[Index];
+	}
+};
+ParaPageCount.prototype.Set_Page = function(PageNum)
+{
+	this.String = "" + PageNum;
+	var Len     = this.String.length;
+
+	var RealWidth = 0;
+	for (var Index = 0; Index < Len; Index++)
+	{
+		var Char = parseInt(this.String.charAt(Index));
+
+		this.Widths[Index] = this.NumWidths[Char];
+		RealWidth += this.NumWidths[Char];
+	}
+
+	this.Width        = RealWidth;
+	this.WidthVisible = RealWidth;
+};
+	// Save_RecalculateObject : function(Copy)
+	// {
+	// 	return new CPageNumRecalculateObject(this.Type, this.Widths, this.String, this.Width, Copy);
+	// },
+	//
+	// Load_RecalculateObject : function(RecalcObj)
+	// {
+	// 	this.Widths = RecalcObj.Widths;
+	// 	this.String = RecalcObj.String;
+	//
+	// 	this.Width  = RecalcObj.Width;
+	// 	this.WidthVisible = this.Width;
+	// },
+	//
+	// Prepare_RecalculateObject : function()
+	// {
+	// 	this.Widths = [];
+	// 	this.String = "";
+	// },
+
+	// Document_CreateFontCharMap : function(FontCharMap)
+	// {
+	// 	var sValue = "1234567890";
+	// 	for ( var Index = 0; Index < sValue.length; Index++ )
+	// 	{
+	// 		var Char = sValue.charAt(Index);
+	// 		FontCharMap.AddChar( Char );
+	// 	}
+	// },
+
 
 function ParagraphContent_Read_FromBinary(Reader)
 {
