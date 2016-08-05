@@ -3093,7 +3093,7 @@ PasteProcessor.prototype =
 							graphic_frame.spPr.xfrm.setExtY(7.478268771701388 * Rows);
 							graphic_frame.setNvSpPr(new AscFormat.UniNvPr());
 							
-							element = this._convertTableToPPTX(element);
+							element = this._convertTableToPPTX(element, true);
 							graphic_frame.setGraphicObject(element.Copy(graphic_frame));
 							graphic_frame.graphicObject.Set_TableStyle(defaultTableStyleId);
 
@@ -3790,14 +3790,18 @@ PasteProcessor.prototype =
 		return fonts;
 	},
 	
-	_convertTableToPPTX: function(table)
+	_convertTableToPPTX: function(table, isFromWord)
 	{
 		//TODO пересмотреть обработку для вложенных таблиц(можно сделать так, как при копировании из документов в таблицы)
         var oTable = AscFormat.ExecuteNoHistory(function(){
             var allRows = [];
             this.maxTableCell = 0;
-            table = this._replaceInnerTables(table, allRows, true);
-
+			
+			if(isFromWord)
+			{
+				table = this._replaceInnerTables(table, allRows, true);
+			}
+            
             //ковертим внутренние параграфы
             table.bPresentation = true;
             for(var i = 0; i < table.Content.length; i++)
