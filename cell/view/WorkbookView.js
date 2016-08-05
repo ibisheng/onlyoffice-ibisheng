@@ -517,7 +517,28 @@
         }
       };
       this.Api.End_CompositeInput = function () {
-        self.cellEditor.End_CompositeInput();
+        if (self.isCellEditMode) {
+          self.cellEditor.End_CompositeInput();
+        }
+      };
+      this.Api.Set_CursorPosInCompositeText = function (nPos) {
+        if (self.isCellEditMode) {
+          self.cellEditor.Set_CursorPosInCompositeText(nPos);
+        }
+      };
+      this.Api.Get_CursorPosInCompositeText = function () {
+        var res = 0;
+        if (self.isCellEditMode) {
+          res = self.cellEditor.Get_CursorPosInCompositeText();
+        }
+        return res;
+      };
+      this.Api.Get_MaxCursorPosInCompositeText = function () {
+        var res = 0;
+        if (self.isCellEditMode) {
+          res = self.cellEditor.Get_MaxCursorPosInCompositeText();
+        }
+        return res;
       };
       AscCommon.InitBrowserInputContext(this.Api, "id_target_cursor");
     }

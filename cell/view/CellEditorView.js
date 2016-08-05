@@ -1513,38 +1513,38 @@
 		this._updateSelectionInfo();
 	};
 
-	CellEditor.prototype._moveCursor = function ( kind, pos ) {
+	CellEditor.prototype._moveCursor = function (kind, pos) {
 		var t = this;
-		switch ( kind ) {
+		switch (kind) {
 			case kPrevChar:
-				t.cursorPos = t.textRender.getPrevChar( t.cursorPos );
+				t.cursorPos = t.textRender.getPrevChar(t.cursorPos);
 				break;
 			case kNextChar:
-				t.cursorPos = t.textRender.getNextChar( t.cursorPos );
+				t.cursorPos = t.textRender.getNextChar(t.cursorPos);
 				break;
 			case kPrevWord:
-				t.cursorPos = t.textRender.getPrevWord( t.cursorPos );
+				t.cursorPos = t.textRender.getPrevWord(t.cursorPos);
 				break;
 			case kNextWord:
-				t.cursorPos = t.textRender.getNextWord( t.cursorPos );
+				t.cursorPos = t.textRender.getNextWord(t.cursorPos);
 				break;
 			case kBeginOfLine:
-				t.cursorPos = t.textRender.getBeginOfLine( t.cursorPos );
+				t.cursorPos = t.textRender.getBeginOfLine(t.cursorPos);
 				break;
 			case kEndOfLine:
-				t.cursorPos = t.textRender.getEndOfLine( t.cursorPos );
+				t.cursorPos = t.textRender.getEndOfLine(t.cursorPos);
 				break;
 			case kBeginOfText:
-				t.cursorPos = t.textRender.getBeginOfText( t.cursorPos );
+				t.cursorPos = t.textRender.getBeginOfText(t.cursorPos);
 				break;
 			case kEndOfText:
-				t.cursorPos = t.textRender.getEndOfText( t.cursorPos );
+				t.cursorPos = t.textRender.getEndOfText(t.cursorPos);
 				break;
 			case kPrevLine:
-				t.cursorPos = t.textRender.getPrevLine( t.cursorPos );
+				t.cursorPos = t.textRender.getPrevLine(t.cursorPos);
 				break;
 			case kNextLine:
-				t.cursorPos = t.textRender.getNextLine( t.cursorPos );
+				t.cursorPos = t.textRender.getNextLine(t.cursorPos);
 				break;
 			case kPosition:
 				t.cursorPos = pos;
@@ -1555,7 +1555,7 @@
 			default:
 				return;
 		}
-		if ( t.selectionBegin !== t.selectionEnd ) {
+		if (t.selectionBegin !== t.selectionEnd) {
 			t.selectionBegin = t.selectionEnd = -1;
 			t._cleanSelection();
 		}
@@ -2689,7 +2689,6 @@
 	};
 
 	CellEditor.prototype.Begin_CompositeInput = function () {
-		console.log('Begin_CompositeInput');
 		if (this.selectionBegin === this.selectionEnd) {
 			this.beginCompositePos = this.cursorPos;
 			this.compositeLength = 0;
@@ -2700,7 +2699,6 @@
 		this.setTextStyle('u', Asc.EUnderline.underlineSingle);
 	};
 	CellEditor.prototype.Replace_CompositeText = function (arrCharCodes) {
-		console.log('Replace_CompositeText');
 		if (!this.isOpened) {
 			return;
 		}
@@ -2719,7 +2717,6 @@
 		this.compositeLength = newText.length;
 	};
 	CellEditor.prototype.End_CompositeInput = function () {
-		console.log('End_CompositeInput');
 		var tmpBegin = this.selectionBegin, tmpEnd = this.selectionEnd;
 
 		this.selectionBegin = this.beginCompositePos;
@@ -2734,6 +2731,17 @@
 		// Обновляем выделение
 		this._cleanSelection();
 		this._drawSelection();
+	};
+	CellEditor.prototype.Set_CursorPosInCompositeText = function (nPos) {
+		if (-1 !== this.beginCompositePos) {
+			this._moveCursor(kPosition, this.beginCompositePos + nPos);
+		}
+	};
+	CellEditor.prototype.Get_CursorPosInCompositeText = function () {
+		return this.cursorPos - this.beginCompositePos;
+	};
+	CellEditor.prototype.Get_MaxCursorPosInCompositeText = function () {
+		return this.compositeLength;
 	};
 
 
