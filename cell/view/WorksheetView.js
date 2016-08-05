@@ -11178,7 +11178,7 @@
 
     WorksheetView.prototype.findCell = function (reference, isViewerMode) {
         var range = AscCommonExcel.g_oRangeCache.getRange3D(reference) ||
-          AscCommonExcel.g_oRangeCache.getAscRange(reference);
+          AscCommonExcel.g_oRangeCache.getAscRange(reference), bNew = false;
         if (!range) {
             if (isViewerMode) {
                 return range;
@@ -11205,6 +11205,7 @@
                 ascRange = new asc_Range(c1, r1, c2, r2);
                 defName = this.model.workbook.editDefinesNames(null,
                   new Asc.asc_CDefName(reference, this.model.getName() + "!" + ascRange.getAbsName()));
+                bNew = true;
             }
 
             if (defName) {
@@ -11235,7 +11236,7 @@
                 if (range && sheetName) {
                     ar_norm = range.normalize();
                     mc = sheetName.getMergedByCell(ar_norm.r1, ar_norm.c1);
-                    range = {range: mc ? mc : range, sheet: sheetName.getName()};
+                    range = {range: mc ? mc : range, sheet: sheetName.getName(), new: bNew};
                 }
             }
         } else {

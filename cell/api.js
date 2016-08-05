@@ -2006,6 +2006,9 @@ var editor;
       }
       return;
     }
+    if (d.new) {
+      return;
+    }
 
     // Получаем sheet по имени
     var ws = this.wbModel.getWorksheetByName(d.sheet);
