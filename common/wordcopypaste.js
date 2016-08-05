@@ -2287,6 +2287,7 @@ PasteProcessor.prototype =
 					else
 					{
 						var aContent = oThis._convertExcelBinary(aContentExcel);
+						oThis.aContent = aContent.content;
 						oThis.api.pre_Paste(aContent.fonts, aContent.images, fPrepasteCallback);
 					}
 					if(bTurnOffTrackRevisions){
