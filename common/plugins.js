@@ -195,6 +195,8 @@
 				ifr.style.overflow = 'hidden';
 				ifr.style.zIndex   = -1000;
 				document.body.appendChild(ifr);
+
+				this.api.sendEvent("asc_onPluginShow", this.current, this.currentVariation);
 			}
 		},
 

@@ -156,6 +156,7 @@
 
 		// еще один режим для ie & edge
 		this.IsUseInputEventOnlyWithCtx = (AscCommon.AscBrowser.isIE) ? true : false;
+		this.IsInitialInputContext = false;
 	}
 
 	CTextInput.prototype =
@@ -359,10 +360,10 @@
 
 			if (isFromCompositionEnd !== true)
 			{
-				this.putAreaValue("");
-
 				this.ieNonCompositionPrefix = "";
 				this.ieNonCompositionPrefixConfirm = "";
+
+				this.putAreaValue("");
 			}
 		},
 
@@ -547,6 +548,7 @@
 				this.Api.End_CompositeInput();
 			}
 
+			/*
 			if (this.IsUseInputEventOnlyWithCtx)
 			{
 				var ctx = e.target["msGetInputContext"]();
@@ -606,6 +608,7 @@
 					ti_console_log_ms("input_end");
 				}
 			}
+			*/
 
 			if (c_oCompositionState.end == this.compositionState)
 			{
@@ -635,7 +638,7 @@
 					ti_console_log("ti: ea space");
 				}
 
-				if (!AscCommon.AscBrowser.isMozilla)
+				if (!AscCommon.AscBrowser.isMozilla && !this.IsUseInputEventOnlyWithCtx)
 				{
 					// у мозиллы есть проблемы, если делать тут clear
 					// например на корейском языке - слетает композиция в некоторых случаях
@@ -917,7 +920,7 @@
 				this.clear();
 
 			var _ret = this.Api.onKeyDown(e);
-			if (!e.defaultPrevented && (AscCommon.AscBrowser.isIE || AscCommon.AscBrowser.isChrome))
+			if (!e.defaultPrevented && AscCommon.AscBrowser.isChrome)
 				this.isChromeKeysNoKeyPressPresent = true;
 		},
 
@@ -1050,7 +1053,7 @@
 					this.Api.Begin_CompositeInput();
 
 				this.compositionState = c_oCompositionState.start;
-				this.isChromeKeysNoKeyPressPresentStartValue = this.getAreaValue();
+				this.msCheskComposition(e, c_oCompositionState.start);
 				return;
 			}
 
@@ -1096,6 +1099,7 @@
 		{
 			if (this.IsUseInputEventOnlyWithCtx)
 			{
+				this.msCheskComposition(e, c_oCompositionState.process);
 				return;
 			}
 
@@ -1256,37 +1260,104 @@
 			return false;
 		},
 
+		msCheskComposition : function(e, type)
+		{
+			var _locale = e.locale;
+			if (_locale == undefined || _locale == null)
+				_locale = "";
+
+			var isNoUseCtx = ((_locale.indexOf("zh-Hant") == 0) || (_locale.indexOf("zh-Hans") == 0)) ? true : false;
+			// этот код нарушает китайский ввод (написать много, и начать выбирать мышкой!!! по короткими частям)
+			// но пока так. иначе проблемы на корейском
+			if (this.IsInitialInputContext || !isNoUseCtx)
+			{
+				var ctx = e.target["msGetInputContext"] ? e.target["msGetInputContext"]() : null;
+				this.IsInitialInputContext = true;
+
+				if (type == c_oCompositionState.end)
+				{
+					if (ctx)
+					{
+						if (undefined != ctx["compositionStartOffset"] && undefined != ctx["compositionEndOffset"] &&
+							ctx["compositionEndOffset"] > ctx["compositionStartOffset"])
+						{
+							// не натуральный end!!!
+							type = c_oCompositionState.process;
+						}
+					}
+				}
+			}
+
+			var _value = this.getAreaValue();
+			var _data = e.data;
+
+			// определяем дату композиции
+			var _compositionData = _data;
+			var _compositionConfirm = _value;
+
+			if (this.ieNonCompositionPrefixConfirm != "")
+			{
+				if (_value.indexOf(this.ieNonCompositionPrefixConfirm) != 0)
+				{
+					// по идее нужно стереть, но мы пока просто заканчиваем ввод
+					this.externalEndCompositeInput();
+					return;
+				}
+			}
+
+			if ("" != _compositionData)
+			{
+				var _index = _value.lastIndexOf(_compositionData);
+				if (-1 != _index)
+					_compositionConfirm = _compositionConfirm.substr(0, _index);
+			}
+
+			var _offset = this.ieNonCompositionPrefixConfirm.length - _compositionConfirm.length;
+			if (_offset < 0)
+			{
+				this.ieNonCompositionPrefixConfirm = _compositionConfirm;
+
+				var _newConfirm = this.ieNonCompositionPrefixConfirm.substr(this.ieNonCompositionPrefixConfirm.length + _offset);
+
+				this.checkCompositionData(_newConfirm);
+				this.Api.Replace_CompositeText(this.compositionValue);
+				this.Api.End_CompositeInput();
+
+				this.Api.Begin_CompositeInput();
+			}
+			else if (_offset > 0)
+			{
+				if (_offset >= _compositionData.length)
+					_compositionData = "";
+				else
+					_compositionData = _data.substr(_offset);
+			}
+
+			this.checkCompositionData(_compositionData);
+			this.Api.Replace_CompositeText(this.compositionValue);
+
+			if (type == c_oCompositionState.end)
+			{
+				this.Api.End_CompositeInput();
+
+				this.unlockTarget();
+				this.TextInputAfterComposition = true;
+
+				this.clear(true);
+				this.ieNonCompositionPrefixConfirm = _value;
+
+				// нужно выставить курсор в конец, а то ie позволяет уйти курсором за пределы композитной даты
+				var _pos = this.getAreaPos();
+				if (_pos < this.ieNonCompositionPrefixConfirm.length)
+					this.clear();
+			}
+		},
+
 		onCompositionEnd : function(e, _data)
 		{
 			if (this.IsUseInputEventOnlyWithCtx)
 			{
-				if (AscCommon.AscBrowser.isIE && e.target["msGetInputContext"])
-				{
-					var ctx = e.target["msGetInputContext"]();
-
-					if (ctx["compositionStartOffset"] == ctx["compositionEndOffset"])
-					{
-						//var _value = this.getAreaValue();
-						//console.log("natural composite end: " + _value);
-
-						if (e.data == "")
-							this.Api.Replace_CompositeText([]);
-
-						this.Api.End_CompositeInput();
-
-						this.unlockTarget();
-						this.TextInputAfterComposition = true;
-
-						this.clear(true);
-						this.ieNonCompositionPrefixConfirm = this.getAreaValue();
-
-						// нужно выставить курсор в конец, а то ie позволяет уйти курсором за пределы композитной даты
-						var _pos = this.getAreaPos();
-						if (_pos < this.ieNonCompositionPrefixConfirm.length)
-							this.clear();
-					}
-				}
-
+				this.msCheskComposition(e, c_oCompositionState.end);
 				return;
 			}
 
@@ -1380,7 +1451,7 @@
 
 		externalEndCompositeInput : function()
 		{
-
+			this.clear();
 		}
 	};
 
@@ -1447,7 +1518,12 @@
 			var _oldNativeFE	 = t.nativeFocusElement;
 			t.nativeFocusElement = e.target;
 
-			//console.log(t.nativeFocusElement);
+			if (t.compositionState != c_oCompositionState.end)
+			{
+				t.Api.End_CompositeInput();
+
+				t.externalEndCompositeInput();
+			}
 
 			var _nativeFocusElementNoRemoveOnElementFocus = t.nativeFocusElementNoRemoveOnElementFocus;
 			t.nativeFocusElementNoRemoveOnElementFocus = false;
