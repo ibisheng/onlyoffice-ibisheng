@@ -1451,7 +1451,10 @@ var editor;
   spreadsheet_api.prototype._asc_setWorksheetRange = function(val) {
     // Получаем sheet по имени
     var ws = this.wbModel.getWorksheetByName(val.asc_getSheet());
-    if (!ws || ws.getHidden()) {
+    if (!ws) {
+      this.handlers.trigger("asc_onHyperlinkClick", null);
+      return;
+    } else if (ws.getHidden()) {
       return;
     }
     // Индекс листа
