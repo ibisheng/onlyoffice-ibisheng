@@ -386,7 +386,8 @@
 							if (pluginData.getAttribute("recalculate") == true)
 							{
 								var editorId = window.g_asc_plugins.api.getEditorId();
-								if (AscCommon.c_oEditorId.Word === editorId)
+								if (AscCommon.c_oEditorId.Word === editorId ||
+									AscCommon.c_oEditorId.Presentation === editorId)
 								{
 									var oLogicDocument = window.g_asc_plugins.api.WordControl ?
 										window.g_asc_plugins.api.WordControl.m_oLogicDocument : null;

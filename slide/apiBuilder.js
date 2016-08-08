@@ -728,6 +728,16 @@
         }
     };
 
+    /**
+     * Create new history point.
+     */
+    ApiPresentation.prototype.CreateNewHistoryPoint = function()
+    {
+        this.Presentation.Create_NewHistoryPoint(AscDFH.historydescription_Document_ApiBuilder);
+    };
+
+
+    /**
 
     //------------------------------------------------------------------------------------------------------------------
     //
@@ -782,6 +792,27 @@
             bg.bgPr.Fill = oApiFill.UniFill;
             this.Slide.changeBackground(bg);
         }
+    };
+
+
+    /**
+     * Getting slide width
+     * */
+    ApiSlide.prototype.GetWidth = function(){
+        if(this.Slide){
+            return this.Slide.Width*36000;
+        }
+        return 0;
+    };
+
+    /**
+     * Getting slide height
+     * */
+    ApiSlide.prototype.GetHeight = function(){
+        if(this.Slide){
+            return this.Slide.Height*36000;
+        }
+        return 0;
     };
     //------------------------------------------------------------------------------------------------------------------
     //
@@ -1605,11 +1636,14 @@
     ApiPresentation.prototype["GetSlideByIndex"]     = ApiPresentation.prototype.GetSlideByIndex;
     ApiPresentation.prototype["GetCurrentSlide"]     = ApiPresentation.prototype.GetCurrentSlide;
     ApiPresentation.prototype["AddSlide"]            = ApiPresentation.prototype.AddSlide;
+    ApiPresentation.prototype["CreateNewHistoryPoint"] = ApiPresentation.prototype.CreateNewHistoryPoint;
 
     ApiSlide.prototype["GetClassType"]               = ApiSlide.prototype.GetClassType;
     ApiSlide.prototype["RemoveAllObjects"]           = ApiSlide.prototype.RemoveAllObjects;
     ApiSlide.prototype["AddObject"]                  = ApiSlide.prototype.AddObject;
     ApiSlide.prototype["SetBackground"]              = ApiSlide.prototype.SetBackground;
+    ApiSlide.prototype["GetWidth"]                   = ApiSlide.prototype.GetWidth;
+    ApiSlide.prototype["GetHeight"]                  = ApiSlide.prototype.GetHeight;
 
     ApiDrawingContent.prototype["GetClassType"]      = ApiDrawingContent.prototype.GetClassType;
     ApiDrawingContent.prototype["GetElementsCount"]  = ApiDrawingContent.prototype.GetElementsCount;

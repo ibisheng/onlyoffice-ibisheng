@@ -3661,6 +3661,37 @@ background-repeat: no-repeat;\
 		}
 	};
 
+	asc_docs_api.prototype.asc_addOleObjectAction = function(sLocalUrl, sData, sApplicationId, fWidth, fHeight, nWidthPix, nHeightPix)
+	{
+		var _image = this.ImageLoader.LoadImage(AscCommon.getFullImageSrc2(sLocalUrl), 1);
+		if (null != _image)//картинка уже должна быть загружена
+		{
+			if (false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Drawing_Props))
+			{
+				this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_AddOleObject);
+				this.WordControl.m_oLogicDocument.Add_OleObject(fWidth, fHeight, nWidthPix, nHeightPix, sLocalUrl, sData, sApplicationId);
+			}
+		}
+	};
+
+	asc_docs_api.prototype.asc_editOleObjectAction = function(bResize, oOleObject, sImageUrl, sData, nPixWidth, nPixHeight)
+	{
+		if (oOleObject)
+		{
+			if (!bResize)
+			{
+				this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_EditOleObject);
+				this.WordControl.m_oLogicDocument.Edit_OleObject(oOleObject, sData, sImageUrl, nPixWidth, nPixHeight);
+				this.WordControl.m_oLogicDocument.Recalculate();
+			}
+			else
+			{
+				this.WordControl.m_oLogicDocument.Edit_OleObject(oOleObject, sData, sImageUrl, nPixWidth, nPixHeight);
+				this.WordControl.m_oLogicDocument.Recalculate();
+			}
+		}
+	};
+
 	asc_docs_api.prototype.AddTextArt = function(nStyle)
 	{
 		if (editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
@@ -6041,6 +6072,26 @@ background-repeat: no-repeat;\
 		}, fCallback, null, oAdditionalData, dataContainer);
 	};
 
+
+
+	asc_docs_api.prototype.asc_Recalculate = function(bIsUpdateInterface)
+	{
+		if (!this.WordControl.m_oLogicDocument)
+			return;
+		this.WordControl.m_oLogicDocument.Recalculate({Drawings : {All : true, Map : {}}});
+		this.WordControl.m_oLogicDocument.DrawingDocument.OnEndRecalculate();
+	};
+
+	asc_docs_api.prototype.asc_canPaste = function()
+	{
+		if (!this.WordControl ||
+			!this.WordControl.m_oLogicDocument ||
+			this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Drawing_Props))
+			return false;
+
+		this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_AddSectionBreak);
+		return true;
+	};
 
 	// input
 	asc_docs_api.prototype.Begin_CompositeInput = function()

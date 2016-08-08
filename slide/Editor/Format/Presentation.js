@@ -1507,6 +1507,28 @@ CPresentation.prototype =
         }
     },
 
+    Add_OleObject: function(fWidth, fHeight, nWidthPix, nHeightPix, sLocalUrl, sData, sApplicationId){
+        if(this.Slides[this.CurPage]){
+            var fPosX = (this.Width - fWidth)/2;
+            var fPosY = (this.Height - fHeight)/2;
+            var Image = this.Slides[this.CurPage].graphicObjects.createOleObject(sData, sApplicationId, sLocalUrl, fPosX, fPosY, fWidth, fHeight, nWidthPix, nHeightPix);
+            Image.setParent(this.Slides[this.CurPage]);
+            Image.addToDrawingObjects();
+            this.Slides[this.CurPage].graphicObjects.resetSelection();
+            this.Slides[this.CurPage].graphicObjects.selectObject(Image, 0);
+            this.Recalculate();
+            this.Document_UpdateInterfaceState();
+        }
+    },
+
+    Edit_OleObject: function(oOleObject, sData, sImageUrl, nPixWidth, nPixHeight){
+        oOleObject.setData(sData);
+        var _blipFill           = new AscFormat.CBlipFill();
+        _blipFill.RasterImageId = sImageUrl;
+        oOleObject.setBlipFill(_blipFill);
+        oOleObject.setPixSizes(nPixWidth, nPixHeight);
+    },
+
     addChart: function(binary)
     {
         var _this = this;
@@ -3329,6 +3351,23 @@ CPresentation.prototype =
             this.Slides[i].getAllFonts(AllFonts)
         }
         return AllFonts;
+    },
+
+
+    Get_AllImageUrls: function(aImages){
+        if(!Array.isArray(aImages)){
+            aImages = [];
+        }
+        for(var i = 0; i < this.Slides.length; ++i){
+            this.Slides[i].getAllRasterImages(aImages);
+        }
+        return aImages;
+    },
+
+    Reassign_ImageUrls : function (images_rename) {
+        for(var i = 0; i < this.Slides.length; ++i){
+            this.Slides[i].Reassign_ImageUrls(images_rename);
+        }
     },
 
 
