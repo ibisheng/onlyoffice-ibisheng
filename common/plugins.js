@@ -196,7 +196,8 @@
 				ifr.style.zIndex   = -1000;
 				document.body.appendChild(ifr);
 
-				this.api.sendEvent("asc_onPluginShow", this.current, this.currentVariation);
+				if (this.startData.getAttribute("resize") !== true)
+					this.api.sendEvent("asc_onPluginShow", this.current, this.currentVariation);
 			}
 		},
 
@@ -337,6 +338,15 @@
 				pluginData.setAttribute("guid", this.current.guid);
 				_iframe.contentWindow.postMessage(pluginData.serialize(), "*");
 			}
+		},
+
+		onChangedSelectionData : function()
+		{
+			if (this.current && this.current.variations[this.currentVariation].initOnSelectionChanged === true)
+			{
+				// re-init
+				this.init();
+			}
 		}
 	};
 
@@ -473,6 +483,10 @@
 		window["g_asc_plugins"]     = window.g_asc_plugins;
 		window.g_asc_plugins.api    = api;
 		window.g_asc_plugins["api"] = window.g_asc_plugins.api;
+
+		api.asc_registerCallback('asc_onSelectionEnd', function(){
+			window.g_asc_plugins.onChangedSelectionData();
+		});
 
 		window.g_asc_plugins.api.asc_registerCallback('asc_onDocumentContentReady', function()
 		{

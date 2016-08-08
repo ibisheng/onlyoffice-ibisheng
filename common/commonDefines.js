@@ -1531,6 +1531,7 @@
 		this.buttons = [{"text" : "Ok", "primary" : true}, {"text" : "Cancel", "primary" : false}];
 
 		this.size = undefined;
+		this.initOnSelectionChanged = undefined;
 	}
 
 	CPluginVariation.prototype["get_Description"] = function()
@@ -1643,6 +1644,14 @@
 	{
 		this.size = value;
 	};
+	CPluginVariation.prototype["get_InitOnSelectionChanged"]           = function()
+	{
+		return this.initOnSelectionChanged;
+	};
+	CPluginVariation.prototype["set_InitOnSelectionChanged"]           = function(value)
+	{
+		this.initOnSelectionChanged = value;
+	};
 
 	CPluginVariation.prototype["serialize"]   = function()
 	{
@@ -1667,6 +1676,7 @@
 		_object["buttons"] = this.buttons;
 
 		_object["size"] = this.size;
+		_object["initOnSelectionChanged"] = this.initOnSelectionChanged;
 
 		return _object;
 	};
@@ -1692,6 +1702,7 @@
 		this.buttons = (_object["buttons"] != null) ? _object["buttons"] : this.buttons;
 
 		this.size = (_object["size"] != null) ? _object["size"] : this.size;
+		this.initOnSelectionChanged = (_object["initOnSelectionChanged"] != null) ? _object["initOnSelectionChanged"] : this.initOnSelectionChanged;
 	};
 
 	function CPlugin()
