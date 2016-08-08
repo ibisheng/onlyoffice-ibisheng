@@ -237,7 +237,7 @@ ObjectToDraw.prototype =
         }
     },
 
-    Recalculate: function(oTheme, oColorMap, dWidth, dHeight, oShape)
+    Recalculate: function(oTheme, oColorMap, dWidth, dHeight, oShape, bResetPathsInfo)
     {
        // if(AscFormat.isRealNumber(this.x) && AscFormat.isRealNumber(this.y))
        // {
@@ -257,7 +257,7 @@ ObjectToDraw.prototype =
         }
         if(this.geometry)
         {
-            this.geometry.Recalculate(dWidth, dHeight);
+            this.geometry.Recalculate(dWidth, dHeight, bResetPathsInfo);
         }
         this.parentShape = oShape;
     },

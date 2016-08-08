@@ -464,7 +464,7 @@ Path.prototype = {
         }
     },
 
-    recalculate: function(gdLst)
+    recalculate: function(gdLst, bResetPathsInfo)
     {
         var ch, cw;
         if(this.pathW!=undefined)
@@ -686,6 +686,9 @@ Path.prototype = {
                     break;
                 }
             }
+        }
+        if(bResetPathsInfo){
+            delete this.ArrPathCommandInfo;
         }
     },
 
