@@ -103,8 +103,8 @@ DrawingObjectsController.prototype.handleOleObjectDoubleClick = function(drawing
         editor.asc_pluginRun(oleObject.m_sApplicationId, 0, pluginData);
     }
     this.changeCurrentState(new AscFormat.NullState(this));
-    this.oPresentation.OnMouseUp(e, x, y, pageIndex);
-},
+    oPresentation.OnMouseUp(e, x, y, pageIndex);
+};
 
 DrawingObjectsController.prototype.checkSelectedObjectsAndCallback = function(callback, args, bNoSendProps, nHistoryPointType)
 {
