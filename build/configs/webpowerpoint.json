@@ -163,6 +163,7 @@
         "../slide/apiCommon.js",
         "../word/apiCommon.js",
 		
+		"../slide/apiBuilder.js",
 		"../common/clipboard_base.js",
 		"../common/text_input.js",
 		"../common/Drawings/Format/OleObject.js",
