@@ -289,7 +289,7 @@
 
     /**
     * This type specifies the bullet type
-    * @typedef {("ArabicPeriod"  | "ArabicParenR"  | "RomanUcPeriod" | "RomanLcPeriod" | "AlphaLcParenR" | "AlphaLcPeriod" | "AlphaUcParenR" | "AlphaUcPeriod")} BulletType
+    * @typedef {("None" | "ArabicPeriod"  | "ArabicParenR"  | "RomanUcPeriod" | "RomanLcPeriod" | "AlphaLcParenR" | "AlphaLcPeriod" | "AlphaUcParenR" | "AlphaUcPeriod")} BulletType
     */
 
 
@@ -506,7 +506,7 @@
      * */
     Api.prototype.CreateBlipFill= function(sImageUrl, sBlipFillType)
     {
-        return new ApiFill(AscFormat.builder_CreateBlipFill());
+        return new ApiFill(AscFormat.builder_CreateBlipFill(sImageUrl, sBlipFillType));
     };
 
     /**
@@ -583,14 +583,15 @@
     /**
      * Create a new numbering
      * @memberof Api
+     * @param {BulletType} sType
+     * @param {number} nStartAt
      * @returns {ApiBullet}
      * */
 
     Api.CreateNumbering = function(sType, nStartAt){
         var oBullet = new AscFormat.CBullet();
         oBullet.bulletType = new AscFormat.CBulletType();
-
-
+        oBullet.bulletType.type = AscFormat.BULLET_TYPE_BULLET_AUTONUM;
         switch(sType){
             case "ArabicPeriod" :{
                 oBullet.bulletType.AutoNumType = 12;
@@ -605,64 +606,35 @@
                 break;
             }
             case "RomanLcPeriod":{
-                oBullet.bulletType.AutoNumType = 12;
+                oBullet.bulletType.AutoNumType = 31;
                 break;
             }
             case "AlphaLcParenR":{
-                oBullet.bulletType.AutoNumType = 12;
+                oBullet.bulletType.AutoNumType = 1;
                 break;
             }
             case "AlphaLcPeriod":{
-                oBullet.bulletType.AutoNumType = 12;
+                oBullet.bulletType.AutoNumType = 2;
                 break;
             }
             case "AlphaUcParenR":{
-                oBullet.bulletType.AutoNumType = 12;
+                oBullet.bulletType.AutoNumType = 4;
                 break;
             }
             case "AlphaUcPeriod":{
-                oBullet.bulletType.AutoNumType = 12;
+                oBullet.bulletType.AutoNumType = 5;
                 break;
             }
-        }
-
-        switch(sType){
-            case "bulletTypeArabicPeriod":{
-                var numberingType = 12;//numbering_numfmt_arabicPeriod;
-                break;
+            case "None":{
+                oBullet.bulletType.type = AscFormat.BULLET_TYPE_BULLET_NONE;
             }
-            case "bulletTypeArabicParenR":
-                {
-                    numberingType = 11;//numbering_numfmt_arabicParenR;
-                    break;
-                }
-            case "bulletTyperomanUcPeriod":
-                {
-                    numberingType = 34;//numbering_numfmt_romanUcPeriod;
-                    break;
-                }
-            case "bulletTypeArabicPeriod":
-                {
-                    numberingType = 5;//numbering_numfmt_alphaUcPeriod;
-                    break;
-                }
-            case "bulletTypeArabicPeriod":
-                {
-                    numberingType = 8;
-                    break;
-                }
-            case "bulletTypeArabicPeriod":
-                {
-                    numberingType = 40;
-                    break;
-                }
-            case "bulletTypeArabicPeriod":
-                {
-                    numberingType = 31;//numbering_numfmt_romanLcPeriod;
-                    break;
-                }
-
         }
+        if( oBullet.bulletType.type === AscFormat.BULLET_TYPE_BULLET_AUTONUM){
+            if(AscFormat.isRealNumber(nStartAt)){
+                oBullet.bulletType.startAt = nStartAt;
+            }
+        }
+        return new ApiBullet(oBullet);
     };
 
     //------------------------------------------------------------------------------------------------------------------
@@ -1326,6 +1298,17 @@
         this.private_OnChange();
     };
 
+    /*
+    * Set paragraph's bullet
+    * @param {ApiBullet} oBullet
+    * */
+    ApiParaPr.prototype.SetBullet = function(oBullet){
+        if(oBullet){
+            this.ParaPr.Bullet = oBullet.Bullet;
+            this.private_OnChange();
+        }
+    };
+
     //------------------------------------------------------------------------------------------------------------------
     //
     // ApiDrawing
@@ -1358,8 +1341,8 @@
 
     /**
      * Set the size of the bounding box.
-     * @param {EMU} nWidth
-     * @param {EMU} nHeight
+     * @param {EMU} nPosX
+     * @param {EMU} nPosY
      */
     ApiDrawing.prototype.SetPosition = function(nPosX, nPosY)
     {
@@ -1467,7 +1450,7 @@
      */
     ApiChart.prototype.SetTitle = function (sTitle, nFontSize)
     {
-        AscFormat.builder_SetChartTitle(this.Chart);
+        AscFormat.builder_SetChartTitle(this.Chart, sTitle, nFontSize);
     };
 
     /**
@@ -1690,6 +1673,7 @@
     ApiParaPr.prototype["SetSpacingLine"]            = ApiParaPr.prototype.SetSpacingLine;
     ApiParaPr.prototype["SetSpacingBefore"]          = ApiParaPr.prototype.SetSpacingBefore;
     ApiParaPr.prototype["SetSpacingAfter"]           = ApiParaPr.prototype.SetSpacingAfter;
+    ApiParaPr.prototype["SetBullet"]                 = ApiParaPr.prototype.SetBullet;
 
     ApiDrawing.prototype["GetClassType"]             =  ApiDrawing.prototype.GetClassType;
     ApiDrawing.prototype["SetSize"]                  =  ApiDrawing.prototype.SetSize;
