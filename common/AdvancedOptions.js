@@ -108,6 +108,13 @@
 		asc_CTXTAdvancedOptions.prototype.asc_setCodePage = function(v){this.codePage = v;};
 
 		/** @constructor */
+		function asc_CDRMAdvancedOptions(password){
+			this.password = password;
+		}
+		asc_CDRMAdvancedOptions.prototype.asc_getPassword = function(){return this.password;};
+		asc_CDRMAdvancedOptions.prototype.asc_setPassword = function(v){this.password = v;};
+
+		/** @constructor */
 		function asc_CCodePage(){
 			this.codePageName = null;
 			this.codePage = null;
@@ -184,6 +191,11 @@
 		prot = asc_CTXTAdvancedOptions.prototype;
 		prot["asc_getCodePage"] = prot.asc_getCodePage;
 		prot["asc_setCodePage"] = prot.asc_setCodePage;
+
+		window["Asc"].asc_CDRMAdvancedOptions = window["Asc"]["asc_CDRMAdvancedOptions"] = asc_CDRMAdvancedOptions;
+		prot = asc_CDRMAdvancedOptions.prototype;
+		prot["asc_getPassword"] = prot.asc_getPassword;
+		prot["asc_setPassword"] = prot.asc_setPassword;
 
 		prot = asc_CCodePage.prototype;
 		prot["asc_getCodePageName"]		= prot.asc_getCodePageName;

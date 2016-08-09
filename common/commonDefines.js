@@ -179,7 +179,8 @@
 
 	var c_oAscAdvancedOptionsID = {
 		CSV : 0,
-		TXT : 1
+		TXT : 1,
+		DRM : 2
 	};
 
 	var c_oAscAdvancedOptionsAction = {

@@ -2177,6 +2177,23 @@ background-repeat: no-repeat;\
 					this._downloadAs("save", c_oAscFileType.TXT, c_oAscAsyncAction.DownloadAs, options, null);
 				}
 				break;
+			case c_oAscAdvancedOptionsID.DRM:
+				if (this.advancedOptionsAction === c_oAscAdvancedOptionsAction.Open) {
+					var v = {
+						"id": this.documentId,
+						"userid": this.documentUserId,
+						"format": this.documentFormat,
+						"vkey": this.documentVKey,
+						"c": "reopen",
+						"url": this.documentUrl,
+						"title": this.documentTitle,
+						"embeddedfonts": this.isUseEmbeddedCutFonts,
+						"password": option.asc_getPassword()
+					};
+
+					sendCommand(this, null, v);
+				}
+				break;
 		}
 	};
 	asc_docs_api.prototype.SetFontRenderingMode         = function(mode)
@@ -7389,10 +7406,16 @@ background-repeat: no-repeat;\
 			editor.SpellCheckApi.onSpellCheck(response);
 	};
 
-	asc_docs_api.prototype._onNeedParams  = function(data)
+	asc_docs_api.prototype._onNeedParams  = function(data, opt_isPassword)
 	{
-		var cp = {'codepage' : AscCommon.c_oAscCodePageUtf8, 'encodings' : AscCommon.getEncodingParams()};
-		this.asc_fireCallback("asc_onAdvancedOptions", new AscCommon.asc_CAdvancedOptions(c_oAscAdvancedOptionsID.TXT, cp), this.advancedOptionsAction);
+		var options;
+		if (opt_isPassword) {
+			options = new AscCommon.asc_CAdvancedOptions(c_oAscAdvancedOptionsID.DRM);
+		} else {
+			var cp = {'codepage': AscCommon.c_oAscCodePageUtf8, 'encodings': AscCommon.getEncodingParams()};
+			options = new AscCommon.asc_CAdvancedOptions(c_oAscAdvancedOptionsID.TXT, cp);
+		}
+		this.asc_fireCallback("asc_onAdvancedOptions", options, this.advancedOptionsAction);
 	};
 	asc_docs_api.prototype._onOpenCommand = function(data)
 	{

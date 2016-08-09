@@ -431,7 +431,7 @@
 	baseEditorsApi.prototype._onOpenCommand                      = function(data)
 	{
 	};
-	baseEditorsApi.prototype._onNeedParams                       = function(data)
+	baseEditorsApi.prototype._onNeedParams                       = function(data, opt_isPassword)
 	{
 	};
 	baseEditorsApi.prototype.asyncServerIdEndLoaded              = function()
@@ -633,7 +633,7 @@
 								t._onNeedParams(input["data"]);
 								break;
 							case "needpassword":
-								t.sendEvent("asc_onError", Asc.c_oAscError.ID.ConvertationPassword, c_oAscError.Level.Critical);
+								t._onNeedParams(null, true);
 								break;
 							case "err":
 								t.sendEvent("asc_onError", AscCommon.mapAscServerErrorToAscError(parseInt(input["data"])), c_oAscError.Level.Critical);

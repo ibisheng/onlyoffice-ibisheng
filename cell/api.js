@@ -677,6 +677,24 @@ var editor;
           this._asc_downloadAs(c_oAscFileType.CSV, c_oAscAsyncAction.DownloadAs, options);
         }
         break;
+      case c_oAscAdvancedOptionsID.DRM:
+        // Проверяем тип состояния в данный момент
+        if (this.advancedOptionsAction === c_oAscAdvancedOptionsAction.Open) {
+          var v = {
+            "id": this.documentId,
+            "userid": this.documentUserId,
+            "format": this.documentFormat,
+            "vkey": this.documentVKey,
+            "c": "reopen",
+            "url": this.documentUrl,
+            "title": this.documentTitle,
+            "embeddedfonts": this.isUseEmbeddedCutFonts,
+            "password": option.asc_getPassword()
+          };
+
+          sendCommand(this, null, v);
+        }
+        break;
     }
   };
   // Опции страницы (для печати)
@@ -690,17 +708,19 @@ var editor;
     return this.wbModel.getWorksheet(sheetIndex).PagePrintOptions;
   };
 
-  spreadsheet_api.prototype._onNeedParams = function(data) {
+  spreadsheet_api.prototype._onNeedParams = function(data, opt_isPassword) {
     var t = this;
     // Проверяем, возможно нам пришли опции для CSV
-    if (this.documentOpenOptions) {
+    if (this.documentOpenOptions && !opt_isPassword) {
       var codePageCsv = AscCommon.c_oAscEncodingsMap[this.documentOpenOptions["codePage"]] || AscCommon.c_oAscCodePageUtf8, delimiterCsv = this.documentOpenOptions["delimiter"];
       if (null != codePageCsv && null != delimiterCsv) {
         this.asc_setAdvancedOptions(c_oAscAdvancedOptionsID.CSV, new asc.asc_CCSVAdvancedOptions(codePageCsv, delimiterCsv));
         return;
       }
     }
-    if (data) {
+    if (opt_isPassword) {
+      t.handlers.trigger("asc_onAdvancedOptions", new AscCommon.asc_CAdvancedOptions(c_oAscAdvancedOptionsID.DRM), this.advancedOptionsAction);
+    } else if (data) {
       AscCommon.loadFileContent(data, function(result) {
         if (null === result) {
           t.handlers.trigger("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.Critical);

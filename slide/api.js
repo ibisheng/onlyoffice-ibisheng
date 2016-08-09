@@ -2060,6 +2060,32 @@ background-repeat: no-repeat;\
 	{
 
 	};
+	/*
+	 idOption идентификатор дополнительного параметра, c_oAscAdvancedOptionsID.TXT.
+	 option - какие свойства применить, пока массив. для TXT объект asc_CTXTAdvancedOptions(codepage)
+	 exp:	asc_setAdvancedOptions(c_oAscAdvancedOptionsID.TXT, new Asc.asc_CCSVAdvancedOptions(1200) );
+	 */
+	asc_docs_api.prototype.asc_setAdvancedOptions       = function(idOption, option)
+	{
+		switch (idOption)
+		{
+			case c_oAscAdvancedOptionsID.DRM:
+				var v = {
+					"id": this.documentId,
+					"userid": this.documentUserId,
+					"format": this.documentFormat,
+					"vkey": this.documentVKey,
+					"c": "reopen",
+					"url": this.documentUrl,
+					"title": this.documentTitle,
+					"embeddedfonts": this.isUseEmbeddedCutFonts,
+					"password": option.asc_getPassword()
+				};
+
+				sendCommand(this, null, v);
+				break;
+		}
+	};
 	asc_docs_api.prototype.startGetDocInfo              = function()
 	{
 		/*
@@ -5928,6 +5954,13 @@ background-repeat: no-repeat;\
 		this.asc_fireCallback("asc_onContextMenu", Data);
 	};
 
+	asc_docs_api.prototype._onNeedParams  = function(data, opt_isPassword)
+	{
+		if (opt_isPassword) {
+			this.asc_fireCallback("asc_onAdvancedOptions", new AscCommon.asc_CAdvancedOptions(c_oAscAdvancedOptionsID.DRM), c_oAscAdvancedOptionsAction.Open);
+		}
+	};
+
 	asc_docs_api.prototype._onOpenCommand = function(data)
 	{
 		var t = this;
@@ -6487,6 +6520,7 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype['AddURL']                              = asc_docs_api.prototype.AddURL;
 	asc_docs_api.prototype['Help']                                = asc_docs_api.prototype.Help;
 	asc_docs_api.prototype['startGetDocInfo']                     = asc_docs_api.prototype.startGetDocInfo;
+	asc_docs_api.prototype['asc_setAdvancedOptions']              = asc_docs_api.prototype.asc_setAdvancedOptions;;
 	asc_docs_api.prototype['stopGetDocInfo']                      = asc_docs_api.prototype.stopGetDocInfo;
 	asc_docs_api.prototype['sync_DocInfoCallback']                = asc_docs_api.prototype.sync_DocInfoCallback;
 	asc_docs_api.prototype['sync_GetDocInfoStartCallback']        = asc_docs_api.prototype.sync_GetDocInfoStartCallback;
