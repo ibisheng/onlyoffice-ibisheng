@@ -1134,7 +1134,8 @@ CopyProcessor.prototype =
 					}
 					else
 					{
-						this.CopyPresentationTableFull(oDomTarget, elements[i].Drawing);
+						var isOnlyTable = elements.length === 1 ? true : false;
+						this.CopyPresentationTableFull(oDomTarget, elements[i].Drawing, isOnlyTable);
 						
 						this.oPresentationWriter.WriteDouble(elements[i].X);
 						this.oPresentationWriter.WriteDouble(elements[i].Y);
@@ -1593,7 +1594,7 @@ CopyProcessor.prototype =
         this.oBinaryFileWriter.copyParams.itemCount = 0;
     },
 
-    CopyPresentationTableFull: function(oDomTarget, graphicFrame)
+    CopyPresentationTableFull: function(oDomTarget, graphicFrame, isOnlyTable)
     {
         var aSelectedRows = [];
         var oRowElems = {};
@@ -1624,11 +1625,66 @@ CopyProcessor.prototype =
 			this.oPresentationWriter.WriteBool(true);
 			this.oPresentationWriter.WriteString2(Item.TableStyle);
         }
+		
+		History.TurnOff();
         this.oPresentationWriter.WriteTable(graphicFrame);
 		
+		//для случая, когда копируем 1 таблицу из презентаций, в бинарник заносим ещё одну такую же табличку, но со скомпиоированными стилями(для вставки в word / excel)
+		if(isOnlyTable)
+		{
+			this.convertToCompileStylesTable(Item);
+			this.oPresentationWriter.WriteTable(graphicFrame);
+		}
+		History.TurnOn();
+
 		this.CopyTable(oDomTarget, Item, null);   
     },
 
+	convertToCompileStylesTable: function(table)
+	{
+		var t = this;
+		
+		for(var i = 0; i < table.Content.length; i++)
+		{
+			var row = table.Content[i];
+			for(var j = 0; j < row.Content.length; j++)
+			{
+				var cell = row.Content[j];
+				var compilePr = cell.Get_CompiledPr();
+				
+				cell.Pr = compilePr;
+				
+				var shd = compilePr.Shd;
+				var color = shd.Get_Color2(this.oDocument.Get_Theme(), this.oDocument.Get_ColorMap());
+				cell.Pr.Shd.Unifill = AscFormat.CreteSolidFillRGB(color.r, color.g, color.b);
+				
+				if(compilePr.TableCellBorders.Bottom)
+				{
+					var color = compilePr.TableCellBorders.Bottom.Get_Color2(this.oDocument.Get_Theme(), this.oDocument.Get_ColorMap());
+					cell.Pr.TableCellBorders.Bottom.Unifill = AscFormat.CreteSolidFillRGB(color.r, color.g, color.b);
+				}
+				
+				if(compilePr.TableCellBorders.Top)
+				{
+					var color = compilePr.TableCellBorders.Top.Get_Color2(this.oDocument.Get_Theme(), this.oDocument.Get_ColorMap());
+					cell.Pr.TableCellBorders.Top.Unifill = AscFormat.CreteSolidFillRGB(color.r, color.g, color.b);
+				}
+				
+				if(compilePr.TableCellBorders.Left)
+				{
+					var color = compilePr.TableCellBorders.Left.Get_Color2(this.oDocument.Get_Theme(), this.oDocument.Get_ColorMap());
+					cell.Pr.TableCellBorders.Left.Unifill = AscFormat.CreteSolidFillRGB(color.r, color.g, color.b);
+				}
+				
+				if(compilePr.TableCellBorders.Right)
+				{
+					var color = compilePr.TableCellBorders.Right.Get_Color2(this.oDocument.Get_Theme(), this.oDocument.Get_ColorMap());
+					cell.Pr.TableCellBorders.Right.Unifill = AscFormat.CreteSolidFillRGB(color.r, color.g, color.b);
+				}
+			}
+		}
+	},
+	
     CopyGraphicObject: function(oDomTarget, oGraphicObj, drawingCopyObject)
     {
         var sSrc = oGraphicObj.getBase64Img();
@@ -4070,6 +4126,21 @@ PasteProcessor.prototype =
             }
             
 			var drawing = loader.ReadGraphicObject();
+			
+			//для случая, когда копируем 1 таблицу из презентаций, в бинарник заносим ещё одну такую же табличку, но со скомпилированными стилями(для вставки в word/excel)
+			if(count === 1 && typeof AscFormat.CGraphicFrame !== "undefined" && drawing instanceof AscFormat.CGraphicFrame)
+			{
+				//в презентациях пропускаю чтение ещё раз графического объекта
+				if(presentation.Slides)
+				{
+					loader.stream.Skip2(1);
+					loader.stream.SkipRecord();
+				}
+				else
+				{
+					drawing = loader.ReadGraphicObject();
+				}
+			}
 			
             var x = stream.GetULong()/100000;
             var y = stream.GetULong()/100000;
