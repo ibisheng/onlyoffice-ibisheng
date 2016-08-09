@@ -511,12 +511,14 @@ var editor;
     this.wb.restoreFocus();
   };
 
-  spreadsheet_api.prototype.asc_Resize = function() {
+  spreadsheet_api.prototype.asc_Resize = function () {
+    AscCommon.AscBrowser.checkZoom();
     if (this.wb) {
       this.wb.resize();
 
-      if (AscCommon.g_inputContext)
+      if (AscCommon.g_inputContext) {
         AscCommon.g_inputContext.onResize("ws-canvas-outer");
+      }
     }
   };
 
