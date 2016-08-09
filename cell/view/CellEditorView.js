@@ -32,11 +32,10 @@
 
 "use strict";
 (/**
- * @param {jQuery} $
  * @param {Window} window
  * @param {undefined} undefined
  */
-	function ( $, window, undefined ) {
+	function (window, undefined) {
 
 
 	/*
@@ -1447,54 +1446,56 @@
 		t.cursorStyle.display = "none";
 	};
 
-	CellEditor.prototype._updateCursorPosition = function ( redrawText ) {
+	CellEditor.prototype._updateCursorPosition = function (redrawText) {
 		// ToDo стоит переправить данную функцию
 		var h = this.canvas.height;
-		var y = -this.textRender.calcLineOffset( this.topLineIndex );
-		var cur = this.textRender.calcCharOffset( this.cursorPos );
+		var y = -this.textRender.calcLineOffset(this.topLineIndex);
+		var cur = this.textRender.calcCharOffset(this.cursorPos);
 		var charsCount = this.textRender.getCharsCount();
-		var curLeft = asc_round( ((kRightAlign !== this.textFlags.textAlign || this.cursorPos !== charsCount) && cur !== null && cur.left !== null ? cur.left : this._getContentPosition()) * this.kx );
-		var curTop = asc_round( ((cur !== null ? cur.top : 0) + y) * this.ky );
-		var curHeight = asc_round( (cur !== null ? cur.height : this._getContentHeight()) * this.ky );
+		var curLeft = asc_round(
+			((kRightAlign !== this.textFlags.textAlign || this.cursorPos !== charsCount) && cur !== null &&
+			cur.left !== null ? cur.left : this._getContentPosition()) * this.kx);
+		var curTop = asc_round(((cur !== null ? cur.top : 0) + y) * this.ky);
+		var curHeight = asc_round((cur !== null ? cur.height : this._getContentHeight()) * this.ky);
 		var i, dy, nCount = this.textRender.getLinesCount();
 
 		while (1 < nCount) {
-			if ( curTop + curHeight - 1 > h ) {
+			if (curTop + curHeight - 1 > h) {
 				i = i === undefined ? 0 : i + 1;
 				if (i === nCount) {
 					break;
 				}
-				dy = this.textRender.getLineInfo( i ).th;
+				dy = this.textRender.getLineInfo(i).th;
 				y -= dy;
-				curTop -= asc_round( dy * this.ky );
+				curTop -= asc_round(dy * this.ky);
 				++this.topLineIndex;
 				continue;
 			}
-			if ( curTop < 0 ) {
+			if (curTop < 0) {
 				--this.topLineIndex;
-				dy = this.textRender.getLineInfo( this.topLineIndex ).th;
+				dy = this.textRender.getLineInfo(this.topLineIndex).th;
 				y += dy;
-				curTop += asc_round( dy * this.ky );
+				curTop += asc_round(dy * this.ky);
 				continue;
 			}
 			break;
 		}
 
-		if ( dy !== undefined || redrawText ) {
-			this._renderText( y );
+		if (dy !== undefined || redrawText) {
+			this._renderText(y);
 		}
 
-		if ( AscBrowser.isRetina ) {
+		if (AscBrowser.isRetina) {
 			curLeft >>= 1;
 			curTop >>= 1;
 		}
 
-		if ( window['IS_NATIVE_EDITOR'] ) {
+
+		if (window['IS_NATIVE_EDITOR']) {
 			this.curLeft = curLeft;
 			this.curTop = curTop;
 			this.curHeight = curHeight;
-		}
-		else {
+		} else {
 			this.cursorStyle.left = curLeft + "px";
 			this.cursorStyle.top = curTop + "px";
 			this.cursorStyle.height = curHeight + "px";
@@ -1504,10 +1505,10 @@
 			AscCommon.g_inputContext.move(this.left * this.kx + curLeft, this.top * this.ky + curTop);
 		}
 
-		if ( cur ) {
+		if (cur) {
 			this.input.scrollTop = this.input.clientHeight * cur.lineIndex;
 		}
-		if ( this.isTopLineActive && !this.skipTLUpdate ) {
+		if (this.isTopLineActive && !this.skipTLUpdate) {
 			this._updateTopLineCurPos();
 		}
 		this._updateSelectionInfo();
@@ -2670,20 +2671,14 @@
 	};
 
 	/** @param event {MouseEvent} */
-	CellEditor.prototype._getCoordinates = function ( event ) {
-		if ( window['IS_NATIVE_EDITOR'] ) {
+	CellEditor.prototype._getCoordinates = function (event) {
+		if (window['IS_NATIVE_EDITOR']) {
 			return {x: event.pageX, y: event.pageY};
 		}
 
-		var t = this;
-		var offs = $( t.canvasOverlay ).offset();
-		var x = (event.pageX - offs.left) / t.kx;
-		var y = (event.pageY - offs.top) / t.ky;
-
-		if ( AscBrowser.isRetina ) {
-			x <<= 1;
-			y <<= 1;
-		}
+		var offs = this.canvasOverlay.getBoundingClientRect();
+		var x = (((event.pageX * AscBrowser.zoom) >> 0) - offs.left) / this.kx;
+		var y = (((event.pageY * AscBrowser.zoom) >> 0) - offs.top) / this.ky;
 
 		return {x: x, y: y};
 	};
@@ -2748,4 +2743,4 @@
 	//------------------------------------------------------------export---------------------------------------------------
 	window['AscCommonExcel'] = window['AscCommonExcel'] || {};
 	window["AscCommonExcel"].CellEditor = CellEditor;
-})( jQuery, window );
+})(window);
