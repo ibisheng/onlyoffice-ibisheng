@@ -5810,7 +5810,9 @@ PasteProcessor.prototype =
 			{
 				var sClass = child.getAttribute("class");
 				var sStyle = child.getAttribute("style");
-				if(sClass || sStyle)
+				var sHref = child.getAttribute("href");
+				
+				if(sClass || sStyle || sHref)
 				{
 					bIsPlainText = false;
 					break;
