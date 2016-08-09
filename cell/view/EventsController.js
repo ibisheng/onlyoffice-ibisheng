@@ -1509,31 +1509,26 @@
 		/** @param event */
 		asc_CEventsController.prototype._getCoordinates = function (event) {
 			// ToDo стоит переделать
-			if (event.coord)
+			if (event.coord) {
 				return event.coord;
-
-			var offs = $(this.element).offset();
-			var x = event.pageX - offs.left;
-			var y = event.pageY - offs.top;
-
-			// ToDo возможно стоит переделать
-			if (AscBrowser.isRetina) {
-				x <<= 1;
-				y <<= 1;
 			}
+
+			var offs = this.element.getBoundingClientRect();
+			var x = ((event.pageX * AscBrowser.zoom) >> 0) - offs.left;
+			var y = ((event.pageY * AscBrowser.zoom) >> 0) - offs.top;
 
 			return {x: x, y: y};
 		};
 
-        asc_CEventsController.prototype._onTouchStart = function (event){
-            this.view.MobileTouchManager.onTouchStart(event);
-        };
-        asc_CEventsController.prototype._onTouchMove = function (event){
-            this.view.MobileTouchManager.onTouchMove(event);
-        };
-        asc_CEventsController.prototype._onTouchEnd = function (event){
-            this.view.MobileTouchManager.onTouchEnd(event);
-        };
+		asc_CEventsController.prototype._onTouchStart = function (event) {
+			this.view.MobileTouchManager.onTouchStart(event);
+		};
+		asc_CEventsController.prototype._onTouchMove = function (event) {
+			this.view.MobileTouchManager.onTouchMove(event);
+		};
+		asc_CEventsController.prototype._onTouchEnd = function (event) {
+			this.view.MobileTouchManager.onTouchEnd(event);
+		};
 
 		//------------------------------------------------------------export---------------------------------------------------
 		window['AscCommonExcel'] = window['AscCommonExcel'] || {};
