@@ -33,11 +33,10 @@
 "use strict";
 (
 	/**
-	 * @param {jQuery} $
 	 * @param {Window} window
 	 * @param {undefined} undefined
 	 */
-	function ($, window, undefined) {
+	function (window, undefined) {
 
 		/*
 		 * Import
@@ -5112,4 +5111,4 @@
 		prot["asc_getType"]						= prot.asc_getType;
 		prot["asc_getImage"]					= prot.asc_getImage;
 	}
-)(jQuery, window);
+)(window);
