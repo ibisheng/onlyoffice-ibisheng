@@ -1961,12 +1961,12 @@ CGraphicObjects.prototype =
         }
     },
 
-    getSelectedText: function(bClearText)
+    getSelectedText: function(bClearText, oPr)
     {
         var content = this.getTargetDocContent();
         if(content)
         {
-            return content.Get_SelectedText(bClearText);
+            return content.Get_SelectedText(bClearText, oPr);
         }
         else
         {

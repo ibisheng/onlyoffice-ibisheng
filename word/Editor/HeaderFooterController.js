@@ -278,9 +278,9 @@ CHdrFtrController.prototype.GetCurPosXY = function()
 {
 	return this.HdrFtr.Get_CurPosXY();
 };
-CHdrFtrController.prototype.GetSelectedText = function(bClearText)
+CHdrFtrController.prototype.GetSelectedText = function(bClearText, oPr)
 {
-	return this.HdrFtr.Get_SelectedText(bClearText);
+	return this.HdrFtr.Get_SelectedText(bClearText, oPr);
 };
 CHdrFtrController.prototype.GetCurrentParagraph = function()
 {

@@ -7989,10 +7989,10 @@ CTable.prototype =
         return false;
     },
 
-    Get_SelectedText : function(bClearText)
+    Get_SelectedText : function(bClearText, oPr)
     {
         if ( true === bClearText && ( (true == this.Selection.Use && table_Selection_Text == this.Selection.Type) || false === this.Selection.Use ) )
-            return this.CurCell.Content.Get_SelectedText(true);
+            return this.CurCell.Content.Get_SelectedText(true, oPr);
         else if ( false === bClearText )
         {
             if ( true === this.Selection.Use && table_Selection_Cell === this.Selection.Type )
@@ -8005,14 +8005,14 @@ CTable.prototype =
                     var Cell = this.Content[Pos.Row].Get_Cell( Pos.Cell );
 
                     Cell.Content.Set_ApplyToAll( true );
-                    ResultText += Cell.Content.Get_SelectedText( false );
+                    ResultText += Cell.Content.Get_SelectedText( false, oPr );
                     Cell.Content.Set_ApplyToAll( false );
                 }
 
                 return ResultText;
             }
             else
-                return this.CurCell.Content.Get_SelectedText(false);
+                return this.CurCell.Content.Get_SelectedText(false, oPr);
         }
 
         return null;

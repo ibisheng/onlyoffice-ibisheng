@@ -6887,13 +6887,13 @@ Paragraph.prototype =
     },
 
     // Возвращаем выделенный текст
-    Get_SelectedText : function(bClearText)
+    Get_SelectedText : function(bClearText, oPr)
     {
         var Str = "";
         var Count = this.Content.length;        
         for ( var Pos = 0; Pos < Count; Pos++ )
         {
-            var _Str = this.Content[Pos].Get_SelectedText( true === this.ApplyToAll, bClearText );
+            var _Str = this.Content[Pos].Get_SelectedText( true === this.ApplyToAll, bClearText, oPr );
 
             if ( null === _Str )
                 return null;

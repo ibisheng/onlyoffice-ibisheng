@@ -236,15 +236,35 @@ CFootnotesController.prototype.Shift = function(nPageIndex, dX, dY)
 };
 /**
  * Добавляем заданную сноску на страницу для пересчета.
- * @param {number} nPageIndex
+ * @param {number} nPageAbs
  * @param {CFootEndnote} oFootnote
  */
-CFootnotesController.prototype.Add_FootnoteOnPage = function(nPageIndex, oFootnote)
+CFootnotesController.prototype.AddFootnoteToPage = function(nPageAbs, oFootnote)
 {
-	if (!this.Pages[nPageIndex])
-		this.Pages[nPageIndex] = new CFootEndnotePage();
+	if (!this.Pages[nPageAbs])
+		this.Pages[nPageAbs] = new CFootEndnotePage();
 
-	this.Pages[nPageIndex].Elements.push(oFootnote);
+	this.Pages[nPageAbs].Elements.push(oFootnote);
+};
+/**
+ * Убираем заданную сноску со страницы при пересчетею..
+ * @param {number} nPageAbs
+ * @param {CFootEndnote} oFootnote
+ */
+CFootnotesController.prototype.RemoveFootnoteFromPage = function(nPageAbs, oFootnote)
+{
+	if (!this.Pages[nPageAbs])
+		this.Pages[nPageAbs] = new CFootEndnotePage();
+
+	var oPage = this.Pages[nPageAbs];
+	for (var nIndex = 0, nCount = oPage.Elements.length; nIndex < nCount; ++nIndex)
+	{
+		if (oPage.Elements[nIndex] === oFootnote)
+		{
+			oPage.Elements.splice(nIndex, 1);
+			return;
+		}
+	}
 };
 CFootnotesController.prototype.GetFootnoteNumberOnPage = function(nPageAbs, oFootnote)
 {
@@ -2093,14 +2113,14 @@ CFootnotesController.prototype.GetCurPosXY = function()
 
 	return {X : 0, Y : 0};
 };
-CFootnotesController.prototype.GetSelectedText = function(bClearText)
+CFootnotesController.prototype.GetSelectedText = function(bClearText, oPr)
 {
 	if (true === bClearText)
 	{
 		if (true !== this.Selection.Use || 0 !== this.Selection.Direction)
 			return null;
 
-		return this.CurFootnote.Get_SelectedText(true);
+		return this.CurFootnote.Get_SelectedText(true, oPr);
 	}
 	else
 	{
@@ -2108,7 +2128,7 @@ CFootnotesController.prototype.GetSelectedText = function(bClearText)
 		var arrFootnotes = this.private_GetSelectionArray();
 		for (var nPos = 0, nCount = arrFootnotes.length; nPos < nCount; ++nPos)
 		{
-			var sTempResult = arrFootnotes[nPos].Get_SelectedText(false);
+			var sTempResult = arrFootnotes[nPos].Get_SelectedText(false, oPr);
 			if (null == sTempResult)
 				return null;
 

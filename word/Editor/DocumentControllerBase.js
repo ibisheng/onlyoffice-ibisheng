@@ -584,9 +584,10 @@ CDocumentControllerBase.prototype.GetCurPosXY = function(){return {X : 0, Y : 0}
 /**
  * Получаем выделенный текст.
  * @param {boolean} bClearText
+ * @param {object} oPr
  * @returns {String}
  */
-CDocumentControllerBase.prototype.GetSelectedText = function(bClearText){return "";};
+CDocumentControllerBase.prototype.GetSelectedText = function(bClearText, oPr){return "";};
 /**
  * Получаем текущий параграф.
  * @returns {?Paragraph}

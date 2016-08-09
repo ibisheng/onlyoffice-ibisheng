@@ -5983,10 +5983,10 @@ ParaDrawing.prototype =
         if (this.Parent instanceof Paragraph)
             return this.Parent;
     },
-    getSelectedText: function(bClearText)
+    getSelectedText: function(bClearText, oPr)
     {
         if(isRealObject(this.GraphicObj) && typeof this.GraphicObj.getSelectedText === "function")
-            return this.GraphicObj.getSelectedText(bClearText);
+            return this.GraphicObj.getSelectedText(bClearText, oPr);
         return "";
     },
 

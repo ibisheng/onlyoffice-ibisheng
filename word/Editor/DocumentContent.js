@@ -4119,14 +4119,14 @@ CDocumentContent.prototype.Is_TextSelectionUse                = function()
     return this.Is_SelectionUse();
 };
 // Возвращаем выделенный текст, если в выделении не более 1 параграфа, и там нет картинок, нумерации страниц и т.д.
-CDocumentContent.prototype.Get_SelectedText                   = function(bClearText)
+CDocumentContent.prototype.Get_SelectedText                   = function(bClearText, oPr)
 {
     if (true === this.ApplyToAll)
     {
         if (true === bClearText && this.Content.length <= 1)
         {
             this.Content[0].Set_ApplyToAll(true);
-            var ResultText = this.Content[0].Get_SelectedText(true);
+            var ResultText = this.Content[0].Get_SelectedText(true, oPr);
             this.Content[0].Set_ApplyToAll(false);
             return ResultText;
         }
@@ -4137,7 +4137,7 @@ CDocumentContent.prototype.Get_SelectedText                   = function(bClearT
             for (var Index = 0; Index < Count; Index++)
             {
                 this.Content[Index].Set_ApplyToAll(true);
-                ResultText += this.Content[Index].Get_SelectedText(false);
+                ResultText += this.Content[Index].Get_SelectedText(false, oPr);
                 this.Content[Index].Set_ApplyToAll(false);
             }
 
@@ -4147,7 +4147,7 @@ CDocumentContent.prototype.Get_SelectedText                   = function(bClearT
     else
     {
         if (docpostype_DrawingObjects === this.CurPos.Type)
-            return this.LogicDocument.DrawingObjects.getSelectedText(bClearText);
+            return this.LogicDocument.DrawingObjects.getSelectedText(bClearText, oPr);
 
         // Либо у нас нет выделения, либо выделение внутри одного элемента
         if (docpostype_Content == this.CurPos.Type && ( ( true === this.Selection.Use && selectionflag_Common === this.Selection.Flag ) || false === this.Selection.Use ))
@@ -4155,7 +4155,7 @@ CDocumentContent.prototype.Get_SelectedText                   = function(bClearT
             if (true === bClearText && (this.Selection.StartPos === this.Selection.EndPos || false === this.Selection.Use ))
             {
                 var Pos = ( true == this.Selection.Use ? this.Selection.StartPos : this.CurPos.ContentPos );
-                return this.Content[Pos].Get_SelectedText(true);
+                return this.Content[Pos].Get_SelectedText(true, oPr);
             }
             else if (false === bClearText)
             {
@@ -4166,7 +4166,7 @@ CDocumentContent.prototype.Get_SelectedText                   = function(bClearT
 
                 for (var Index = StartPos; Index <= EndPos; Index++)
                 {
-                    ResultText += this.Content[Index].Get_SelectedText(false);
+                    ResultText += this.Content[Index].Get_SelectedText(false, oPr);
                 }
 
                 return ResultText;

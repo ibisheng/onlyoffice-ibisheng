@@ -7839,14 +7839,18 @@ CDocument.prototype.Get_CurPosXY = function()
 /**
  * Возвращаем выделенный текст, если в выделении не более 1 параграфа, и там нет картинок, нумерации страниц и т.д.
  * @param bClearText
+ * @param oPr
  * @returns {*}
  */
-CDocument.prototype.Get_SelectedText = function(bClearText)
+CDocument.prototype.Get_SelectedText = function(bClearText, oPr)
 {
+	if (undefined === oPr)
+		oPr = {};
+
 	if (undefined === bClearText)
 		bClearText = false;
 
-	return this.Controller.GetSelectedText(bClearText);
+	return this.Controller.GetSelectedText(bClearText, oPr);
 };
 CDocument.prototype.Get_CurrentParagraph = function()
 {
@@ -15420,14 +15424,14 @@ CDocument.prototype.controller_GetCurPosXY = function()
 		return this.Content[this.CurPos.ContentPos].Get_CurPosXY();
 	}
 };
-CDocument.prototype.controller_GetSelectedText = function(bClearText)
+CDocument.prototype.controller_GetSelectedText = function(bClearText, oPr)
 {
 	if ((true === this.Selection.Use && selectionflag_Common === this.Selection.Flag) || false === this.Selection.Use)
 	{
 		if (true === bClearText && this.Selection.StartPos === this.Selection.EndPos)
 		{
 			var Pos = ( true == this.Selection.Use ? this.Selection.StartPos : this.CurPos.ContentPos );
-			return this.Content[Pos].Get_SelectedText(true);
+			return this.Content[Pos].Get_SelectedText(true, oPr);
 		}
 		else if (false === bClearText)
 		{
@@ -15438,7 +15442,7 @@ CDocument.prototype.controller_GetSelectedText = function(bClearText)
 
 			for (var Index = StartPos; Index <= EndPos; Index++)
 			{
-				ResultText += this.Content[Index].Get_SelectedText(false);
+				ResultText += this.Content[Index].Get_SelectedText(false, oPr);
 			}
 
 			return ResultText;

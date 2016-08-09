@@ -1946,7 +1946,7 @@ ParaRun.prototype.Get_AllFontNames = function(AllFonts)
     }
 };
 
-ParaRun.prototype.Get_SelectedText = function(bAll, bClearText)
+ParaRun.prototype.Get_SelectedText = function(bAll, bClearText, oPr)
 {
     var StartPos = 0;
     var EndPos   = 0;
@@ -1979,7 +1979,6 @@ ParaRun.prototype.Get_SelectedText = function(bAll, bClearText)
         switch ( ItemType )
         {
             case para_Drawing:
-            //case para_End:
             case para_Numbering:
             case para_PresentationNumbering:
             case para_PageNum:
@@ -1994,6 +1993,15 @@ ParaRun.prototype.Get_SelectedText = function(bAll, bClearText)
             case para_Text : Str += String.fromCharCode(Item.Value); break;
             case para_Space:
             case para_Tab  : Str += " "; break;
+			case para_End:
+			{
+				if (oPr && true === oPr.NewLineParagraph)
+				{
+					Str += '\n';
+				}
+
+				break;
+			}
         }
     }
 

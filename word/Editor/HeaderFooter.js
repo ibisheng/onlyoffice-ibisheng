@@ -513,9 +513,9 @@ CHeaderFooter.prototype =
         return this.Content.Get_CurPosXY();
     },
 
-    Get_SelectedText : function(bClearText)
+    Get_SelectedText : function(bClearText, oPr)
     {
-        return this.Content.Get_SelectedText(bClearText);
+        return this.Content.Get_SelectedText(bClearText, oPr);
     },
 
     Get_SelectedElementsInfo : function(Info)
@@ -1805,10 +1805,10 @@ CHeaderFooterController.prototype =
         return { X : 0, Y : 0 };
     },
 
-    Get_SelectedText : function(bClearText)
+    Get_SelectedText : function(bClearText, oPr)
     {
         if ( null != this.CurHdrFtr )
-            return this.CurHdrFtr.Get_SelectedText(bClearText);
+            return this.CurHdrFtr.Get_SelectedText(bClearText, oPr);
 
         return null;
     },

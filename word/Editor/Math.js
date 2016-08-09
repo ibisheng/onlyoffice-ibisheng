@@ -1652,7 +1652,7 @@ ParaMath.prototype.Get_SelectedElementsInfo = function(Info)
     Info.Set_Math(this);
 };
 
-ParaMath.prototype.Get_SelectedText = function(bAll, bClearText)
+ParaMath.prototype.Get_SelectedText = function(bAll, bClearText, oPr)
 {
     if ( true === bAll || true === this.Selection_IsUse() )
     {

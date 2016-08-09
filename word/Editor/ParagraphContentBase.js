@@ -372,12 +372,12 @@ CParagraphContentWithParagraphLikeContent.prototype.Get_SelectedElementsInfo = f
     else if (false === Selection.Use && this.Content[this.State.ContentPos].Get_SelectedElementsInfo)
         this.Content[this.State.ContentPos].Get_SelectedElementsInfo(Info);
 };
-CParagraphContentWithParagraphLikeContent.prototype.Get_SelectedText = function(bAll, bClearText)
+CParagraphContentWithParagraphLikeContent.prototype.Get_SelectedText = function(bAll, bClearText, oPr)
 {
     var Str = "";
     for (var Pos = 0, Count = this.Content.length; Pos < Count; Pos++)
     {
-        var _Str = this.Content[Pos].Get_SelectedText(bAll, bClearText);
+        var _Str = this.Content[Pos].Get_SelectedText(bAll, bClearText, oPr);
 
         if (null === _Str)
             return null;
