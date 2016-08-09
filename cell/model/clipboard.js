@@ -2211,7 +2211,9 @@
 						else
 						{
 							var format = cell.xfs && cell.xfs.font ? cell.xfs.font : null;
-							var elem = getSpan(cell.getValue(), format, true);
+							
+							var isAddSpace = row.c[parseInt(j) + 1] || (!row.c[parseInt(j) + 1] && worksheet.aGCells[parseInt(i) + 1]) ? true : false;
+							var elem = getSpan(cell.getValue(), format, isAddSpace);
 							if(null !== elem)
 							{	
 								res.appendChild(elem);
