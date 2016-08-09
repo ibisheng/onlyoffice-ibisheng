@@ -496,10 +496,23 @@ function CDocumentRecalculateState()
     this.MainStartPos      = -1;
 }
 
+function CDocumentRecalculateHdrFtrPageCountState()
+{
+	this.Id        = null;
+	this.PageIndex = 0;
+	this.PageCount = -1;
+}
+
 function Document_Recalculate_Page()
 {
     var LogicDocument = editor.WordControl.m_oLogicDocument;
     LogicDocument.Recalculate_Page();
+}
+
+function Document_Recalculate_HdrFtrPageCount()
+{
+	var LogicDocument = editor.WordControl.m_oLogicDocument;
+	LogicDocument.private_RecalculateHdrFtrPageCountUpdate();
 }
 
 function CDocumentPageSection()
@@ -1371,8 +1384,9 @@ function CDocument(DrawingDocument, isMainLogicDocument)
 
     this.RecalcInfo = new CDocumentRecalcInfo();
 
-    this.RecalcId   = 0; // Номер пересчета
-    this.FullRecalc = new CDocumentRecalculateState();
+    this.RecalcId     = 0; // Номер пересчета
+    this.FullRecalc   = new CDocumentRecalculateState(); // Объект полного пересчета
+    this.HdrFtrRecalc = new CDocumentRecalculateHdrFtrPageCountState(); // Объект дополнительного пересчета колонтитулов после полного пересчета
 
     this.TurnOffRecalc          = 0;
     this.TurnOffInterfaceEvents = false;
@@ -2077,21 +2091,17 @@ CDocument.prototype.Recalculate = function(bOneParagraph, bRecalcContentLast, _R
             StartPage  = this.FullRecalc.PageIndex;
         }
     }
+	else if (null !== this.HdrFtrRecalc.Id)
+	{
+		clearTimeout(this.HdrFtrRecalc.Id);
+		this.HdrFtrRecalc.Id = null;
+		this.DrawingDocument.OnEndRecalculate(false);
+	}
+
+	this.HdrFtrRecalc.PageCount = -1;
 
     // Очищаем данные пересчета
     this.RecalcInfo.Reset();
-
-    // Определим, является ли данная страница первой в новой секции
-    var bNewSection = ( 0 === StartPage ? true : false );
-    if (0 !== StartPage)
-    {
-        var PrevStartIndex = this.Pages[StartPage - 1].Pos;
-        var CurSectInfo    = this.SectionsInfo.Get_SectPr(StartIndex);
-        var PrevSectInfo   = this.SectionsInfo.Get_SectPr(PrevStartIndex);
-
-        if (PrevSectInfo !== CurSectInfo && (c_oAscSectionBreakType.Continuous !== CurSectInfo.SectPr.Get_Type() || true !== CurSectInfo.SectPr.Compare_PageSize(PrevSectInfo.SectPr) ))
-            bNewSection = true;
-    }
 
     this.FullRecalc.PageIndex         = StartPage;
     this.FullRecalc.SectionIndex      = 0;
@@ -2099,7 +2109,7 @@ CDocument.prototype.Recalculate = function(bOneParagraph, bRecalcContentLast, _R
     this.FullRecalc.StartIndex        = StartIndex;
     this.FullRecalc.Start             = true;
     this.FullRecalc.StartPage         = StartPage;
-    this.FullRecalc.ResetStartElement = bNewSection;
+    this.FullRecalc.ResetStartElement = this.private_RecalculateIsNewSection(StartPage, StartIndex);
 
     // Если у нас произошли какие-либо изменения с основной частью документа, тогда начинаем его пересчитывать сразу,
     // а если изменения касались только секций, тогда пересчитываем основную часть документа только с того места, где
@@ -2767,6 +2777,24 @@ CDocument.prototype.Recalculate_PageColumn                   = function()
 
         this.FullRecalc.Id           = null;
         this.FullRecalc.MainStartPos = -1;
+
+		// Основной пересчет окончен, если в колонтитулах есть элемент с количеством страниц, тогда нам надо
+		// запустить дополнительный пересчет колонтитулов.
+		// Если так случилось, что после повторного полного пересчета, вызванного изменением количества страниц и
+		// изменением метрик колонтитула, новое количество страниц стало меньше, чем раньше, тогда мы не пересчитываем
+		// дальше, чтобы избежать зацикливаний.
+
+		if (-1 === this.HdrFtrRecalc.PageCount || this.HdrFtrRecalc.PageCount < this.Pages.length)
+		{
+			this.HdrFtrRecalc.PageCount = this.Pages.length;
+			var nPageCountStartPage = this.HdrFtr.HavePageCountElement();
+			if (-1 !== nPageCountStartPage)
+			{
+				this.DrawingDocument.OnStartRecalculate(nPageCountStartPage);
+				this.HdrFtrRecalc.PageIndex = nPageCountStartPage;
+				this.private_RecalculateHdrFtrPageCountUpdate();
+			}
+		}
     }
 
     if (true === bContinue)
@@ -2806,6 +2834,22 @@ CDocument.prototype.Recalculate_PageColumn                   = function()
             this.Recalculate_Page();
         }
     }
+};
+CDocument.prototype.private_RecalculateIsNewSection = function(nPageAbs, nContentIndex)
+{
+	// Определим, является ли данная страница первой в новой секции
+	var bNewSection = ( 0 === nPageAbs ? true : false );
+	if (0 !== nPageAbs)
+	{
+		var PrevStartIndex = this.Pages[nPageAbs - 1].Pos;
+		var CurSectInfo    = this.SectionsInfo.Get_SectPr(nContentIndex);
+		var PrevSectInfo   = this.SectionsInfo.Get_SectPr(PrevStartIndex);
+
+		if (PrevSectInfo !== CurSectInfo && (c_oAscSectionBreakType.Continuous !== CurSectInfo.SectPr.Get_Type() || true !== CurSectInfo.SectPr.Compare_PageSize(PrevSectInfo.SectPr) ))
+			bNewSection = true;
+	}
+
+	return bNewSection;
 };
 CDocument.prototype.private_RecalculatePageFootnotes         = function(PageIndex)
 {
@@ -3296,6 +3340,58 @@ CDocument.prototype.private_RecalculateFlowParagraphCount    = function(Index)
     }
 
     return FlowCount;
+};
+CDocument.prototype.private_RecalculateHdrFtrPageCountUpdate = function()
+{
+	this.HdrFtrRecalc.Id = null;
+
+	var nPageAbs = this.HdrFtrRecalc.PageIndex;
+	var nPagesCount = this.Pages.length;
+
+	while (nPageAbs < nPagesCount)
+	{
+		var Result = this.HdrFtr.RecalculatePageCountUpdate(nPageAbs, nPagesCount);
+		if (null === Result)
+		{
+			nPageAbs++;
+		}
+		else if (false === Result)
+		{
+			this.DrawingDocument.OnRecalculatePage(nPageAbs, this.Pages[nPageAbs]);
+
+			if (nPageAbs < this.HdrFtrRecalc.PageIndex + 5)
+			{
+				nPageAbs++;
+			}
+			else
+			{
+				this.HdrFtrRecalc.PageIndex = nPageAbs + 1;
+				this.HdrFtrRecalc.Id = setTimeout(Document_Recalculate_HdrFtrPageCount, 20);
+				return;
+			}
+		}
+		else
+		{
+			this.RecalcInfo.Reset();
+			this.FullRecalc.PageIndex         = nPageAbs;
+			this.FullRecalc.SectionIndex      = 0;
+			this.FullRecalc.ColumnIndex       = 0;
+			this.FullRecalc.StartIndex        = this.Pages[nPageAbs].Pos;
+			this.FullRecalc.Start             = true;
+			this.FullRecalc.StartPage         = nPageAbs;
+			this.FullRecalc.ResetStartElement = this.private_RecalculateIsNewSection(nPageAbs, this.Pages[nPageAbs].Pos);
+			this.FullRecalc.MainStartPos      = this.Pages[nPageAbs].Pos;
+
+			this.DrawingDocument.OnStartRecalculate(nPageAbs);
+			this.Recalculate_Page();
+			return;
+		}
+	}
+	
+	if (nPageAbs >= nPagesCount)
+	{
+		this.DrawingDocument.OnEndRecalculate(true);
+	}
 };
 CDocument.prototype.OnColumnBreak_WhileRecalculate           = function()
 {
@@ -10992,6 +11088,14 @@ CDocument.prototype.GetColumnSize = function()
 CDocument.prototype.private_OnSelectionEnd = function()
 {
 	this.Api.asc_fireCallback("asc_onSelectionEnd");
+};
+CDocument.prototype.AddPageCount = function()
+{
+	if (false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content))
+	{
+		this.Create_NewHistoryPoint(AscDFH.historydescription_Document_AddPageCount);
+		this.Paragraph_Add(new ParaPageCount(this.Pages.length));
+	}
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Settings

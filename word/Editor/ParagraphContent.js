@@ -7810,12 +7810,13 @@ ParaContinuationSeparator.prototype.Update_Width = function(PRS)
 	this.WidthVisible = nWidth;
 };
 
-function ParaPageCount()
+function ParaPageCount(PageCount)
 {
 	this.FontKoef  = 1;
 	this.NumWidths = [];
 	this.Widths    = [];
-	this.String    = [];
+	this.String    = "";
+	this.PageCount = undefined !== PageCount ? PageCount : 1;
 }
 AscCommon.extendClass(ParaPageCount, CRunElementBase);
 ParaPageCount.prototype.Type = para_PageCount;
@@ -7841,9 +7842,7 @@ ParaPageCount.prototype.Measure = function(Context, TextPr)
 		this.NumWidths[Index] = Context.Measure("" + Index).Width;
 	}
 
-	this.Width        = 0;
-	this.Height       = 0;
-	this.WidthVisible = 0;
+	this.private_UpdateWidth();
 };
 ParaPageCount.prototype.Draw = function(X, Y, Context)
 {
@@ -7860,13 +7859,26 @@ ParaPageCount.prototype.Draw = function(X, Y, Context)
 		_X += this.Widths[Index];
 	}
 };
-ParaPageCount.prototype.Set_Page = function(PageNum)
+ParaPageCount.prototype.Document_CreateFontCharMap = function(FontCharMap)
 {
-	this.String = "" + PageNum;
-	var Len     = this.String.length;
+	var sValue = "1234567890";
+	for (var Index = 0; Index < sValue.length; Index++)
+	{
+		var Char = sValue.charAt(Index);
+		FontCharMap.AddChar(Char);
+	}
+};
+ParaPageCount.prototype.Update_PageCount = function(nPageCount)
+{
+	this.PageCount = nPageCount;
+	this.private_UpdateWidth();
+};
+ParaPageCount.prototype.private_UpdateWidth = function()
+{
+	this.String = "" + this.PageCount;
 
 	var RealWidth = 0;
-	for (var Index = 0; Index < Len; Index++)
+	for (var Index = 0, Len = this.String.length; Index < Len; Index++)
 	{
 		var Char = parseInt(this.String.charAt(Index));
 
@@ -7874,39 +7886,11 @@ ParaPageCount.prototype.Set_Page = function(PageNum)
 		RealWidth += this.NumWidths[Char];
 	}
 
+	RealWidth = (RealWidth * TEXTWIDTH_DIVIDER) | 0;
+
 	this.Width        = RealWidth;
 	this.WidthVisible = RealWidth;
 };
-	// Save_RecalculateObject : function(Copy)
-	// {
-	// 	return new CPageNumRecalculateObject(this.Type, this.Widths, this.String, this.Width, Copy);
-	// },
-	//
-	// Load_RecalculateObject : function(RecalcObj)
-	// {
-	// 	this.Widths = RecalcObj.Widths;
-	// 	this.String = RecalcObj.String;
-	//
-	// 	this.Width  = RecalcObj.Width;
-	// 	this.WidthVisible = this.Width;
-	// },
-	//
-	// Prepare_RecalculateObject : function()
-	// {
-	// 	this.Widths = [];
-	// 	this.String = "";
-	// },
-
-	// Document_CreateFontCharMap : function(FontCharMap)
-	// {
-	// 	var sValue = "1234567890";
-	// 	for ( var Index = 0; Index < sValue.length; Index++ )
-	// 	{
-	// 		var Char = sValue.charAt(Index);
-	// 		FontCharMap.AddChar( Char );
-	// 	}
-	// },
-
 
 function ParagraphContent_Read_FromBinary(Reader)
 {
@@ -7940,6 +7924,7 @@ function ParagraphContent_Read_FromBinary(Reader)
 		case para_FootnoteRef           : Element = new ParaFootnoteRef(); break;
 		case para_Separator             : Element = new ParaSeparator(); break;
 		case para_ContinuationSeparator : Element = new ParaContinuationSeparator(); break;
+		case para_PageCount             : Element = new ParaPageCount(); break;
 	}
 
 	if (null != Element)

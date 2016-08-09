@@ -992,6 +992,9 @@
 			case AscDFH.historydescription_Document_CompositeInputReplace:
 				sString = "Document_CompositeInputReplace             ";
 				break;
+			case AscDFH.historydescription_Document_AddPageCount:
+				sString = "Document_AddPageCount                      ";
+				break;
 		}
 		return sString;
 	}
@@ -2676,4 +2679,5 @@
 	window['AscDFH'].historydescription_Document_EditOleObject                      = 0x0138;
 	window['AscDFH'].historydescription_Document_CompositeInput                     = 0x0139;
 	window['AscDFH'].historydescription_Document_CompositeInputReplace              = 0x013a;
+	window['AscDFH'].historydescription_Document_AddPageCount                       = 0x013b;
 })(window);

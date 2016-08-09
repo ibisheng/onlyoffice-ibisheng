@@ -7663,7 +7663,10 @@ background-repeat: no-repeat;\
 			this.WordControl.m_oLogicDocument.Paragraph_Add(MathElement);
 		}
 	};
-
+	asc_docs_api.prototype.asc_AddPageCount = function()
+	{
+		this.WordControl.m_oLogicDocument.AddPageCount();
+	};
 	//----------------------------------------------------------------------------------------------------------------------
 	// Функции для работы с MailMerge
 	//----------------------------------------------------------------------------------------------------------------------

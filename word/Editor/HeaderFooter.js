@@ -72,8 +72,11 @@ function CHeaderFooter(Parent, LogicDocument, DrawingDocument, Type)
         CurPage       : -1, // Текущий выставленный номер страницы
         RecalcObj     : {}, // Постраничные объекты пересчета данного колонтитула
         NeedRecalc    : {}, // Объект с ключом - номером страницы, нужно ли пересчитывать данную страницу
+        PageNumInfo   : {}, // Объект с ключом - номером страницы, значением - информация о нумерации
         SectPr        : {}  // Объект с ключом - номером страницы и полем - ссылкой на секцию
     };
+
+	this.PageCountElements = [];
 
     // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
     g_oTableId.Add( this, this.Id );
@@ -109,7 +112,7 @@ CHeaderFooter.prototype =
         NewHdrFtr.Content.Copy2( this.Content );
         return NewHdrFtr;
     },
-    
+
     Set_Page : function(Page_abs)
     {
         if (Page_abs !== this.RecalcInfo.CurPage && undefined !== this.LogicDocument.Pages[Page_abs])
@@ -129,24 +132,24 @@ CHeaderFooter.prototype =
             }            
         }        
     },
-    
-    Is_NeedRecalculate : function(Page_abs)
-    {
-        var PageNumInfo = this.LogicDocument.Get_SectionPageNumInfo(Page_abs);
-        
-        if ( true === PageNumInfo.Compare( this.RecalcInfo.NeedRecalc[Page_abs] ) && undefined !== this.RecalcInfo.RecalcObj[Page_abs] )
-            return false;
-        
-        return true;
-    },
-    
+
+	Is_NeedRecalculate : function(PageAbs)
+	{
+		var PageNumInfo = this.LogicDocument.Get_SectionPageNumInfo(PageAbs);
+
+		if (true !== this.RecalcInfo.NeedRecalc[PageAbs] && true === PageNumInfo.Compare(this.RecalcInfo.PageNumInfo[PageAbs]) && undefined !== this.RecalcInfo.RecalcObj[PageAbs])
+			return false;
+
+		return true;
+	},
+
     Recalculate : function(Page_abs, SectPr)
     {
         // Логика пересчета колонтитулов следующая:
         // 1. При пересчете страницы каждый раз пересчитывается колонтитул (всмысле заходим в функцию Recalculate,т.е. сюда)
         // 2. Далее мы смотрим, нужно ли вообще пересчитывать данную страницу RecalcInfo.NeedRecalc[Page_abs] если это значение
         //    не false, тогда пересчитывать нужно, а если нет, тогда выходим
-        // 3. Если нужно персчитывать, пересчитываем заново и смотрим, изменились ли границы пересчета и позиции плавающих 
+        // 3. Если нужно пересчитывать, пересчитываем заново и смотрим, изменились ли границы пересчета и позиции плавающих
         //    картинок, и выставляем RecalcInfo.NeedRecalc[Page_abs] = false.
         
         var bChanges = false;                
@@ -169,14 +172,17 @@ CHeaderFooter.prototype =
         this.Content.Set_StartPage( Page_abs );
         this.Content.Prepare_RecalculateObject();
 
+		this.Clear_PageCountElements();
+
         var CurPage = 0;
         var RecalcResult = recalcresult2_NextPage;
         while ( recalcresult2_End != RecalcResult  )
             RecalcResult = this.Content.Recalculate_Page( CurPage++, true );
         
-        this.RecalcInfo.RecalcObj[Page_abs]  = this.Content.Save_RecalculateObject();
-        this.RecalcInfo.NeedRecalc[Page_abs] = this.LogicDocument.Get_SectionPageNumInfo(Page_abs);
-        this.RecalcInfo.SectPr[Page_abs]     = SectPr;
+        this.RecalcInfo.RecalcObj[Page_abs]   = this.Content.Save_RecalculateObject();
+        this.RecalcInfo.PageNumInfo[Page_abs] = this.LogicDocument.Get_SectionPageNumInfo(Page_abs);
+        this.RecalcInfo.SectPr[Page_abs]      = SectPr;
+		this.RecalcInfo.NeedRecalc[Page_abs]  = false;
         
         // Если у нас до этого был какой-то пересчет, тогда сравним его с текущим.
         // 1. Сравним границы: у верхнего колонтитула смотрим на изменение нижней границы, а нижнего - верхней
@@ -240,7 +246,7 @@ CHeaderFooter.prototype =
         
         // Ежели текущая страница не задана, тогда выставляем ту, которая оказалась пересчитанной первой. В противном
         // случае, выставляем рассчет страницы, которая была до этого.
-        if ( -1 === this.RecalcInfo.CurPage || false === this.LogicDocument.Get_SectionPageNumInfo(this.RecalcInfo.CurPage).Compare( this.RecalcInfo.NeedRecalc[this.RecalcInfo.CurPage] ) )
+        if ( -1 === this.RecalcInfo.CurPage || false === this.LogicDocument.Get_SectionPageNumInfo(this.RecalcInfo.CurPage).Compare( this.RecalcInfo.PageNumInfo[this.RecalcInfo.CurPage] ) )
         {
             this.RecalcInfo.CurPage = Page_abs;
             
@@ -1076,9 +1082,10 @@ CHeaderFooter.prototype =
     Refresh_RecalcData2 : function()
     {
         // Сохраняем пересчитаные страницы в старый пересчет, а текущий обнуляем
-        this.RecalcInfo.NeedRecalc = {};
-        this.RecalcInfo.SectPr     = {};
-        this.RecalcInfo.CurPage    = -1;
+        this.RecalcInfo.PageNumInfo = {};
+        this.RecalcInfo.SectPr      = {};
+        this.RecalcInfo.CurPage     = -1;
+		this.RecalcInfo.NeedRecalc  = {};
         
         History.RecalcData_Add( { Type : AscDFH.historyitem_recalctype_HdrFtr, Data : this } );
     },
@@ -1090,18 +1097,19 @@ CHeaderFooter.prototype =
         // как не пересчитанные.
         
         var MinPageIndex = -1;
-        for ( var PageIndex in this.RecalcInfo.NeedRecalc )
+        for ( var PageIndex in this.RecalcInfo.PageNumInfo )
         {
             if ( SectPr === this.RecalcInfo.SectPr[PageIndex] && ( -1 === MinPageIndex || PageIndex < MinPageIndex ) )
                 MinPageIndex = PageIndex;                
         }
         
-        for ( var PageIndex in this.RecalcInfo.NeedRecalc )
+        for ( var PageIndex in this.RecalcInfo.PageNumInfo )
         {
             if ( PageIndex >= MinPageIndex )
             {
-                delete this.RecalcInfo.NeedRecalc[PageIndex];
-                delete this.RecalcInfo.SectPr[PageIndex];                    
+                delete this.RecalcInfo.PageNumInfo[PageIndex];
+                delete this.RecalcInfo.SectPr[PageIndex];
+				delete this.RecalcInfo.NeedRecalc[PageIndex];
             }
         }
     },
@@ -1225,6 +1233,35 @@ CHeaderFooter.prototype.Get_SelectionBounds = function()
 CHeaderFooter.prototype.Get_DocumentContent = function()
 {
     return this.Content;
+};
+CHeaderFooter.prototype.Add_PageCountElement = function(oElement)
+{
+	for (var nIndex = 0, nCount = this.PageCountElements.length; nIndex < nCount; ++nIndex)
+	{
+		if (oElement == this.PageCountElements[nIndex])
+			return;
+	}
+
+	this.PageCountElements.push(oElement);
+};
+CHeaderFooter.prototype.Have_PageCountElement = function()
+{
+	return this.PageCountElements.length > 0 ? true : false;
+};
+CHeaderFooter.prototype.Clear_PageCountElements = function()
+{
+	this.PageCountElements = [];
+};
+CHeaderFooter.prototype.Update_PageCountElements = function(nPageCount)
+{
+	for (var nIndex = 0, nCount = this.PageCountElements.length; nIndex < nCount; ++nIndex)
+	{
+		this.PageCountElements[nIndex].Update_PageCount(nPageCount);
+	}
+};
+CHeaderFooter.prototype.ForceRecalculate = function(nPageAbs)
+{
+	this.RecalcInfo.NeedRecalc[nPageAbs] = true;
 };
 
 //-----------------------------------------------------------------------------------
@@ -1421,7 +1458,7 @@ CHeaderFooterController.prototype =
         return null;
     },
 
-    Recalculate : function(PageIndex)    
+    Recalculate : function(PageIndex)
     {
         // Определим четность страницы и является ли она первой в данной секции. Заметим, что четность страницы 
         // отсчитывается от начала текущей секции и не зависит от настроек нумерации страниц для данной секции.
@@ -2484,6 +2521,63 @@ CHeaderFooterController.prototype.Set_CurHdrFtr = function(HdrFtr)
         this.CurHdrFtr.Selection_Remove();
 
     this.CurHdrFtr = HdrFtr;
+};
+CHeaderFooterController.prototype.RecalculatePageCountUpdate = function(nPageAbs, nPageCount)
+{
+	var oPage = this.Pages[nPageAbs];
+	if (!oPage)
+		return false;
+	
+	var oHeader = oPage.Header;
+	var oFooter = oPage.Footer;
+
+	var bNeedRecalc = false;
+	if (oHeader && oHeader.Have_PageCountElement())
+	{
+		oHeader.Update_PageCountElements(nPageCount);
+		bNeedRecalc = true;
+	}
+
+	if (false === bNeedRecalc && oFooter && oFooter.Have_PageCountElement())
+	{
+		oFooter.Update_PageCountElements(nPageCount);
+		bNeedRecalc = true;
+	}
+
+	if (true === bNeedRecalc)
+		return this.Recalculate(nPageAbs);
+
+	return null;
+};
+CHeaderFooterController.prototype.HavePageCountElement = function()
+{
+	var nStartPage = -1;
+	var nPagesCount = this.LogicDocument.Pages.length;
+	for (var nPageAbs = 0; nPageAbs < nPagesCount; ++nPageAbs)
+	{
+		var oPage = this.Pages[nPageAbs];
+		if (!oPage)
+			continue;
+
+		var oHeader = oPage.Header;
+		var oFooter = oPage.Footer;
+
+		if (oHeader && oHeader.Have_PageCountElement())
+		{
+			oHeader.ForceRecalculate(nPageAbs);
+			if (-1 === nStartPage)
+				nStartPage = nPageAbs;
+		}
+
+		if (oFooter && oFooter.Have_PageCountElement())
+		{
+			oFooter.ForceRecalculate(nPageAbs);
+			if (-1 === nStartPage)
+				nStartPage = nPageAbs;
+		}
+	}
+
+	return nStartPage;
 };
 
 function CHdrFtrPage()
