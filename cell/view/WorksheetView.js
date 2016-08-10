@@ -11410,7 +11410,8 @@
         return mergedRange ? mergedRange : new asc_Range( col, row, col, row );
     };
 
-    WorksheetView.prototype._saveCellValueAfterEdit = function (oCellEdit, c, val, flags, skipNLCheck, isNotHistory, lockDraw) {
+    WorksheetView.prototype._saveCellValueAfterEdit =
+      function (oCellEdit, c, val, flags, skipNLCheck, isNotHistory, lockDraw) {
           var t = this;
           var oldMode = t.isFormulaEditMode;
           t.isFormulaEditMode = false;
@@ -11437,7 +11438,7 @@
                   return false;
               }
               isFormula = c.isFormula();
-			  t.model.autoFilters.renameTableColumn(oCellEdit);
+              t.model.autoFilters.renameTableColumn(oCellEdit);
           } else {
               c.setValue2(val);
               // Вызываем функцию пересчета для заголовков форматированной таблицы
@@ -11446,21 +11447,18 @@
 
           if (!isFormula) {
               // Нужно ли выставлять WrapText (ищем символ новой строки в тексте)
-              var bIsSetWrap = false;
               if (!skipNLCheck) {
                   for (var i = 0; i < val.length; ++i) {
-                      if (val[i].text.indexOf(kNewLine) >= 0) {
-                          bIsSetWrap = true;
+                      if (-1 !== val[i].text.indexOf(kNewLine)) {
+                          c.setWrap(true);
                           break;
                       }
                   }
               }
-              if (bIsSetWrap) {
-                  c.setWrap(true);
-              }
           }
 
-          t._updateCellsRange(oCellEdit, isNotHistory ? c_oAscCanChangeColWidth.none : c_oAscCanChangeColWidth.numbers, lockDraw);
+          t._updateCellsRange(oCellEdit, isNotHistory ? c_oAscCanChangeColWidth.none : c_oAscCanChangeColWidth.numbers,
+            lockDraw);
 
           if (!isNotHistory) {
               History.EndTransaction();
