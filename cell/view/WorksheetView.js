@@ -156,8 +156,8 @@
     if ( AscBrowser.isIE ) {
         // Пути указаны относительно html в меню, не надо их исправлять
         // и коммитить на пути относительно тестового меню
-        kCurCells = 'url(../../../sdk/Common/Images/plus.cur), pointer';
-        kCurFormatPainterExcel = 'url(../../../sdk/Common/Images/plus_copy.cur), pointer';
+        kCurCells = 'url(../../../../sdkjs/common/Images/plus.cur), pointer';
+        kCurFormatPainterExcel = 'url(../../../../sdkjs/common/Images/plus_copy.cur), pointer';
     }
     else if ( AscBrowser.isOpera ) {
         kCurCells = 'cell';
