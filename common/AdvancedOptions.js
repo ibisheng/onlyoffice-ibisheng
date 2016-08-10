@@ -53,6 +53,9 @@
 					this.optionId = id;
 					this.options = new asc_CTXTOptions(opt);
 					break;
+				case Asc.c_oAscAdvancedOptionsID.DRM:
+					this.optionId = id;
+					break;
 			}
 		}
 		asc_CAdvancedOptions.prototype.asc_getOptionId = function(){ return this.optionId; };
