@@ -2729,6 +2729,7 @@
 	};
 	CellEditor.prototype.Set_CursorPosInCompositeText = function (nPos) {
 		if (-1 !== this.beginCompositePos) {
+			nPos = Math.min(nPos, this.compositeLength);
 			this._moveCursor(kPosition, this.beginCompositePos + nPos);
 		}
 	};
