@@ -823,9 +823,16 @@ var c_oAscPrintDefaultSettings = {
 	};
 
 	var c_oNotifyParentType = {
-		Change: 0,
-		ChangeFormula: 1,
-		EndCalculate: 2
+		CanDo: 0,
+		Change: 1,
+		ChangeFormula: 2,
+		EndCalculate: 3
+	};
+
+	var c_oNotifyParentAssemble = {
+		Normal: 0,
+		Flag: 1,
+		Current: 2
 	};
 
     var c_oDashType = {
@@ -1480,6 +1487,8 @@ window['Asc']['c_oAscMaxCellOrCommentLength'] = window['Asc'].c_oAscMaxCellOrCom
   window["AscCommon"].c_oZoomType = c_oZoomType;
   window["AscCommon"].c_oNotifyType = c_oNotifyType;
   window["AscCommon"].c_oNotifyParentType = c_oNotifyParentType;
+  window["AscCommon"].c_oNotifyParentAssemble = c_oNotifyParentAssemble;
+
   window["AscCommon"].c_oAscEncodings = c_oAscEncodings;
   window["AscCommon"].c_oAscEncodingsMap = c_oAscEncodingsMap;
   window["AscCommon"].c_oAscCodePageUtf8 = c_oAscCodePageUtf8;

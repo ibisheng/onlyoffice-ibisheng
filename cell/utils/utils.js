@@ -305,11 +305,38 @@
 				return bRes;
 			},
 
-			isIntersectForShift: function(range, isHor) {
+			isIntersectForShift: function(range, offset) {
+				var isHor = offset && 0 != offset.offsetCol;
+				var toDelete = offset && (offset.offsetCol < 0 || offset.offsetRow < 0);
 				if (isHor) {
-					return this.r1 <= range.r1 && range.r2 <= this.r2 && this.c1 <= range.c2;
+					if (this.r1 <= range.r1 && range.r2 <= this.r2 && this.c1 <= range.c2) {
+						return true;
+					} else if (toDelete && this.c1 <= range.c1 && range.c2 <= this.c2) {
+						var topIn = this.r1 <= range.r1 && range.r1 <= this.r2;
+						var bottomIn = this.r1 <= range.r2 && range.r2 <= this.r2;
+						return topIn || bottomIn;
+					} else {
+						return false;
+					}
 				} else {
-					return this.c1 <= range.c1 && range.c2 <= this.c2 && this.r1 <= range.r2;
+					if (this.c1 <= range.c1 && range.c2 <= this.c2 && this.r1 <= range.r2) {
+						return true;
+					} else if (toDelete && this.r1 <= range.r1 && range.r2 <= this.r2) {
+						var leftIn = this.c1 <= range.c1 && range.c1 <= this.c2;
+						var rightIn = this.c1 <= range.c2 && range.c2 <= this.c2;
+						return leftIn || rightIn;
+					} else {
+						return false;
+					}
+				}
+			},
+
+			isIntersectForShiftCell: function(col, row, offset) {
+				var isHor = offset && 0 != offset.offsetCol;
+				if (isHor) {
+					return this.r1 <= row && row <= this.r2 && this.c1 <= col;
+				} else {
+					return this.c1 <= col && col <= this.c2 && this.r1 <= row;
 				}
 			},
 
@@ -328,9 +355,18 @@
 							}
 						} else if (this.c1 <= bbox.c2) {
 							if (this.c2 <= bbox.c2) {
-								isNoDelete = false;
+								var topIn = bbox.r1 <= this.r1 && this.r1 <= bbox.r2;
+								var bottomIn = bbox.r1 <= this.r2 && this.r2 <= bbox.r2;
+								if (topIn && bottomIn) {
+									isNoDelete = false;
+								} else if (topIn) {
+									this.setOffsetFirst({offsetCol: 0, offsetRow: bbox.r2 - this.r1 + 1});
+								} else if (bottomIn) {
+									this.setOffsetLast({offsetCol: 0, offsetRow: bbox.r1 - this.r2 - 1});
+								}
 							} else {
-								this.setOffsetFirst({offsetCol: bbox.c2 - this.c1 + 1, offsetRow: 0});
+								this.setOffsetFirst({offsetCol: bbox.c1 - this.c1, offsetRow: 0});
+								this.setOffsetLast(offset);
 							}
 						} else {
 							this.setOffset(offset);
@@ -352,9 +388,18 @@
 							}
 						} else if (this.r1 <= bbox.r2) {
 							if (this.r2 <= bbox.r2) {
-								isNoDelete = false;
+								var leftIn = bbox.c1 <= this.c1 && this.c1 <= bbox.c2;
+								var rightIn = bbox.c1 <= this.c2 && this.c2 <= bbox.c2;
+								if (leftIn && rightIn) {
+									isNoDelete = false;
+								} else if (leftIn) {
+									this.setOffsetFirst({offsetCol: bbox.c2 - this.c1 + 1, offsetRow: 0});
+								} else if (rightIn) {
+									this.setOffsetLast({offsetCol: bbox.c1 - this.c2 - 1, offsetRow: 0});
+								}
 							} else {
-								this.setOffsetFirst({offsetCol: 0, offsetRow: bbox.r2 - this.r1 + 1});
+								this.setOffsetFirst({offsetCol: 0, offsetRow: bbox.r1 - this.r1});
+								this.setOffsetLast(offset);
 							}
 						} else {
 							this.setOffset(offset);

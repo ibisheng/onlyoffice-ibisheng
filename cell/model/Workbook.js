@@ -188,9 +188,7 @@ function getRangeType(oBBox){
 		this.isLock = null;
 		this.parsedRef = null;
 		if (this.ref) {
-			//все ссылки должны быть 3d поэтому без разницы какой sheet предавать
-			this.parsedRef = new parserFormula(this.ref, this, this.wb.getWorksheet(0));
-			this.wb.dependencyFormulas.addToBuildDependencyDefName(this);
+			this.setRef(this.ref, true);
 		}
 	}
 
@@ -198,7 +196,17 @@ function getRangeType(oBBox){
 		removeDependencies: function() {
 			if (this.parsedRef) {
 				this.parsedRef.removeDependencies();
+				this.parsedRef = null;
 			}
+		},
+		setRef: function(ref, opt_noRemoveDependencies) {
+			if(!opt_noRemoveDependencies){
+				this.removeDependencies();
+			}
+			this.ref = ref;
+			//all ref should be 3d, so worksheet can be anyone
+			this.parsedRef = new parserFormula(ref, this, AscCommonExcel.g_DefNameWorksheet);
+			this.wb.dependencyFormulas.addToBuildDependencyDefName(this);
 		},
 		getNodeId: function() {
 			return getDefNameId(this.sheetId, this.name);
@@ -211,19 +219,49 @@ function getRangeType(oBBox){
 			}
 			return new Asc.asc_CDefName(this.name, this.ref, index, this.isTable, this.hidden, this.isLock);
 		},
-		onFormulaEvent: function(type, data) {
-			if (AscCommon.c_oNotifyParentType.Change === type) {
+		setAscCDefName: function(newAscName) {
+			this.name = newAscName.Name;
+			this.sheetId = this.wb.getSheetIdByIndex(newAscName.LocalSheetId);
+			this.hidden = newAscName.Hidden;
+			this.isTable = newAscName.isTable;
+			if(this.ref != newAscName.Ref){
+				this.setRef(newAscName.Ref);
+			}
+		},
+		onFormulaEvent: function(type, eventData) {
+			if (AscCommon.c_oNotifyParentType.CanDo === type) {
+				var type = eventData.notifyData.type;
+				return !(this.isTable &&
+				(AscCommon.c_oNotifyType.Shift === type || AscCommon.c_oNotifyType.Move === type ||
+				AscCommon.c_oNotifyType.Delete === type));
+			} else if (AscCommon.c_oNotifyParentType.Change === type) {
 				this.wb.dependencyFormulas.addToChangedDefName(this);
 			} else if (AscCommon.c_oNotifyParentType.ChangeFormula === type) {
 				var oldAscName = this.getAscCDefName();
-				this.parsedRef.buildDependencies();
-				this.parsedRef.Formula = this.parsedRef.assemble();
-				this.ref = this.parsedRef.Formula;
+				var assemb;
+				switch (eventData.assembleType) {
+					case AscCommon.c_oNotifyParentAssemble.Normal:
+						assemb = this.parsedRef.assemble();
+						break;
+					case AscCommon.c_oNotifyParentAssemble.Flag:
+						assemb = this.parsedRef.assemble(true);
+						break;
+					case AscCommon.c_oNotifyParentAssemble.Current:
+						assemb = this.parsedRef.Formula;
+						break;
+				}
+				if (eventData.isRebuild) {
+					this.setRef(assemb, true);
+				} else {
+					this.ref = this.parsedRef.Formula = assemb;
+					this.parsedRef.buildDependencies();
+					this.wb.dependencyFormulas.addToChangedDefName(this);
+				}
 				var newAscName = this.getAscCDefName();
 				History.Add(AscCommonExcel.g_oUndoRedoWorkbook, AscCH.historyitem_Workbook_DefinedNamesChangeUndo, null,
 							null, new UndoRedoData_DefinedNamesChange(oldAscName, newAscName), true);
-				this.wb.dependencyFormulas.addToChangedDefName(this);
 			}
+			return true;
 		}
 	};
 
@@ -373,16 +411,21 @@ function getRangeType(oBBox){
 			//обязательно, формула не в зависимостях не сдвинутся
 			this.buildDependency();
 			this._shiftMoveDelete(AscCommon.c_oNotifyType.Delete, sheetId, bbox, null);
+			this.addToChangedRange(sheetId, bbox);
 		},
 		shift: function(sheetId, bbox, offset) {
 			//обязательно, формула не в зависимостях не сдвинутся
 			this.buildDependency();
 			this._shiftMoveDelete(AscCommon.c_oNotifyType.Shift, sheetId, bbox, offset);
+			var bHor = 0 != offset.offsetCol;
+			var bboxShift = AscCommonExcel.shiftGetBBox(bbox, bHor);
+			this.addToChangedRange(sheetId, bboxShift);
 		},
 		move: function(sheetId, bboxFrom, offset) {
 			//обязательно, формула не в зависимостях не сдвинутся
 			this.buildDependency();
 			this._shiftMoveDelete(AscCommon.c_oNotifyType.Move, sheetId, bboxFrom, offset);
+			this.addToChangedRange(sheetId, bboxFrom);
 		},
 		changeSheet: function(sheetId, data) {
 			this.buildDependency();
@@ -396,7 +439,7 @@ function getRangeType(oBBox){
 					}
 				}
 				for (var vertexIndex in sheetContainer.areaMap) {
-					var areaSheetElem = sheetContainer.cellMap[vertexIndex];
+					var areaSheetElem = sheetContainer.areaMap[vertexIndex];
 					for (var listenerId in areaSheetElem.listeners) {
 						listeners[listenerId] = areaSheetElem.listeners[listenerId];
 					}
@@ -498,23 +541,9 @@ function getRangeType(oBBox){
 			return names.sort(sort);
 		},
 		addDefNameOpen: function(name, ref, sheetIndex, hidden, isTable) {
-			var nameIndex = getDefNameIndex(name);
-			var container;
 			var sheetId = this.wb.getSheetIdByIndex(sheetIndex);
-			if (sheetId) {
-				container = this.defNames.sheet[sheetId];
-				if (!container) {
-					container = {};
-					this.defNames.sheet[sheetId] = container;
-				}
-			} else {
-				container = this.defNames.wb;
-			}
-			var res = container[nameIndex];
-			if (!res) {
-				res = new DefName(this.wb, name, ref, sheetId, hidden, isTable);
-				container[nameIndex] = res;
-			}
+			var res = new DefName(this.wb, name, ref, sheetId, hidden, isTable);
+			this._addDefName(res);
 			return res;
 		},
 		removeDefName: function(sheetIndex, name) {
@@ -527,7 +556,6 @@ function getRangeType(oBBox){
 
 				defName.removeDependencies();
 				this.addToChangedDefName(defName);
-				this.calcTree();
 			}
 		},
 		editDefinesNames: function(oldAscName, newAscName) {
@@ -543,27 +571,27 @@ function getRangeType(oBBox){
 										  false);
 			}
 
-			if (res) {
+			if (res && oldAscName) {
 				History.Create_NewPoint();
 
-				this._delDefName(res.name, res.sheetId);
-				res = this.addDefNameOpen(newAscName.Name, newAscName.Ref, newAscName.LocalSheetId, newAscName.Hidden,
-										  newAscName.isTable);
-
-				if (oldAscName && oldAscName.Name != newAscName.Name) {
+				if (oldAscName.Name != newAscName.Name) {
 					this.buildDependency();
+
+					res = this._delDefName(res.name, res.sheetId);
+					res.setAscCDefName(newAscName);
+					this._addDefName(res);
 
 					var notifyData = {type: AscCommon.c_oNotifyType.ChangeDefName, from: oldAscName, to: newAscName};
 					this._broadcastDefName(oldAscName.Name, notifyData);
+
+					this.addToChangedDefName(res);
+				} else {
+					res.setAscCDefName(newAscName);
 				}
 
 				History.Add(AscCommonExcel.g_oUndoRedoWorkbook, AscCH.historyitem_Workbook_DefinedNamesChange, null,
 							null, new UndoRedoData_DefinedNamesChange(oldAscName, newAscName));
-
-				this.addToChangedDefName(res);
 			}
-
-			this.calcTree();
 			return res;
 		},
 		checkDefName: function (name, sheetIndex) {
@@ -617,20 +645,20 @@ function getRangeType(oBBox){
 		},
 		saveDefName: function() {
 			var list = [];
-			this._foreachDefName(function(defName, container) {
-				if (!defName.isTable && defName.Ref) {
+			this._foreachDefName(function(defName) {
+				if (!defName.isTable && defName.ref) {
 					list.push(defName.getAscCDefName());
 				}
 			});
 			return list;
 		},
 		unlockDefName: function() {
-			this._foreachDefName(function(defName, container) {
+			this._foreachDefName(function(defName) {
 				defName.isLock = null;
 			});
 		},
 		checkDefNameLock: function() {
-			return this._foreachDefName(function(defName, container) {
+			return this._foreachDefName(function(defName) {
 				return defName.isLock;
 			});
 		},
@@ -668,19 +696,21 @@ function getRangeType(oBBox){
 				var defNameRef = parserHelp.get3DRef(ws.getName(), refClone.getAbsName());
 				this.addDefNameOpen(sName, defNameRef, null, null, true);
 			} else {
-				defName.Ref = defNameRef;
+				defName.ref = defNameRef;
 			}
 		},
 		changeTableRef: function(tableName, newRef) {
+			History.TurnOff();
 			var defName = this.getDefNameByName(tableName, null);
 			if (defName) {
 				var oldAscName = defName.getAscCDefName();
 				var newAscName = defName.getAscCDefName();
-				newAscName.Ref = newRef;
-				History.TurnOff();
+				newAscName.Ref = defName.ref.split('!')[0] + '!' + newRef.getAbsName();
 				this.editDefinesNames(oldAscName, newAscName);
-				History.TurnOn();
+				var notifyData = {type: AscCommon.c_oNotifyType.ChangeDefName, from: oldAscName, to: newAscName};
+				this._broadcastDefName(defName.name, notifyData);
 			}
+			History.TurnOn();
 		},
 		changeTableName: function(tableName, newName) {
 			var defName = this.getDefNameByName(tableName, null);
@@ -695,6 +725,9 @@ function getRangeType(oBBox){
 		},
 		delTableName: function(tableName) {
 			this._delDefName(tableName, null);
+			//todo make ref
+			// var notifyData = {type: AscCommon.c_oNotifyType.ChangeDefName, from: defName.getAscCDefName(), to: null};
+			// this._broadcastDefName(tableName, notifyData);
 		},
 		rebuildTable: function(tableName) {
 			var defName = this.getDefNameByName(tableName, null);
@@ -857,6 +890,25 @@ function getRangeType(oBBox){
 			this.calcTree();
 		},
 		//internal
+		_addDefName: function(defName) {
+			var nameIndex = getDefNameIndex(defName.name);
+			var container;
+			var sheetId = defName.sheetId;
+			if (sheetId) {
+				container = this.defNames.sheet[sheetId];
+				if (!container) {
+					container = {};
+					this.defNames.sheet[sheetId] = container;
+				}
+			} else {
+				container = this.defNames.wb;
+			}
+			var cur = container[nameIndex];
+			if (cur) {
+				cur.removeDependencies();
+			}
+			container[nameIndex] = defName;
+		},
 		_delDefName: function(name, sheetId) {
 			var res = null;
 			var nameIndex = getDefNameIndex(name);
@@ -996,19 +1048,18 @@ function getRangeType(oBBox){
 			this.tempGetByCells = [];
 		},
 		_shiftMoveDelete: function(notifyType, sheetId, bbox, offset) {
-			var isHor = offset && 0 != offset.offsetCol;
-			var oShiftGetBBox;
-			if (AscCommon.c_oNotifyType.Shift == notifyType) {
-				oShiftGetBBox = AscCommonExcel.shiftGetBBox(bbox, isHor);
-			} else if (AscCommon.c_oNotifyType.Move == notifyType || AscCommon.c_oNotifyType.Delete == notifyType) {
-				oShiftGetBBox = bbox;
-			}
 			var sheetContainer = this.sheetListeners[sheetId];
 			if (sheetContainer) {
 				var listeners = {};
+				var isIntersect;
 				for (var cellIndex in sheetContainer.cellMap) {
 					getFromCellIndex(cellIndex);
-					if (oShiftGetBBox.contains(g_FCI.col, g_FCI.row)) {
+					if (AscCommon.c_oNotifyType.Shift == notifyType) {
+						isIntersect = bbox.isIntersectForShiftCell(g_FCI.col, g_FCI.row, offset);
+					} else {
+						isIntersect = bbox.contains(g_FCI.col, g_FCI.row);
+					}
+					if (isIntersect) {
 						var cellMapElem = sheetContainer.cellMap[cellIndex];
 						for (var listenerId in cellMapElem.listeners) {
 							listeners[listenerId] = cellMapElem.listeners[listenerId];
@@ -1017,11 +1068,13 @@ function getRangeType(oBBox){
 				}
 				for (var areaIndex in sheetContainer.areaMap) {
 					var areaMapElem = sheetContainer.areaMap[areaIndex];
-					var isIntersect;
 					if (AscCommon.c_oNotifyType.Shift == notifyType) {
-						isIntersect = oShiftGetBBox.isIntersectForShift(areaMapElem.bbox, isHor)
-					} else {
-						isIntersect = oShiftGetBBox.containsRange(areaMapElem.bbox);
+						isIntersect = bbox.isIntersectForShift(areaMapElem.bbox, offset);
+					} else if (AscCommon.c_oNotifyType.Move == notifyType) {
+						isIntersect = bbox.containsRange(areaMapElem.bbox);
+					} else if (AscCommon.c_oNotifyType.Delete == notifyType) {
+						//isIntersect = bbox.isIntersect(areaMapElem.bbox);
+						isIntersect = bbox.containsRange(areaMapElem.bbox);
 					}
 					if (isIntersect) {
 						for (var listenerId in areaMapElem.listeners) {
@@ -1044,14 +1097,18 @@ function getRangeType(oBBox){
 
 	RangeTree.prototype = {
 		add: function(bbox, data) {
-			var top = this.yTree.insertOrGet(new Asc.TreeRBNode(bbox.r1, {count: 0, vals: {}}));
-			var bottom = this.yTree.insertOrGet(new Asc.TreeRBNode(bbox.r2, {count: 0, vals: {}}));
 			data.id = this.id++;
+			var startFlag = bbox.r1 !== bbox.r2 ? 1 : 3;
 			var dataWrap = {bbox: bbox, data: data, isOutput: false};
-			top.storedValue.vals[data.id] = {isStart: true, dataWrap: dataWrap};
+			var top = this.yTree.insertOrGet(new Asc.TreeRBNode(bbox.r1, {count: 0, vals: {}}));
+			top.storedValue.vals[data.id] = {startFlag: startFlag, dataWrap: dataWrap};
 			top.storedValue.count++;
-			bottom.storedValue.vals[data.id] = {isStart: false, dataWrap: dataWrap};
-			bottom.storedValue.count++;
+			if (bbox.r1 != bbox.r2) {
+				startFlag = 2;
+				var bottom = this.yTree.insertOrGet(new Asc.TreeRBNode(bbox.r2, {count: 0, vals: {}}));
+				bottom.storedValue.vals[data.id] = {startFlag: startFlag, dataWrap: dataWrap};
+				bottom.storedValue.count++;
+			}
 		},
 		remove: function(bbox, data) {
 			var top = this.yTree.getElem(bbox.r1);
@@ -1082,7 +1139,7 @@ function getRangeType(oBBox){
 			console.time('forin');
 			var cellArr = [];
 			for (var cellIndex in cells) {
-				cellArr.push(cellIndex);
+				cellArr.push(cellIndex - 0);
 			}
 			console.timeEnd('forin');
 			console.time('sort');
@@ -1106,7 +1163,7 @@ function getRangeType(oBBox){
 						curY = curNodeY.key;
 						for (var id in curNodeY.storedValue.vals) {
 							var elem = curNodeY.storedValue.vals[id];
-							if (elem.isStart && !elem.dataWrap.isOutput) {
+							if (0 !== (1 & elem.startFlag) && !elem.dataWrap.isOutput) {
 								curNodes[id] = elem;
 							}
 						}
@@ -1132,7 +1189,7 @@ function getRangeType(oBBox){
 					} else {
 						for (var id in curNodeY.storedValue.vals) {
 							var elem = curNodeY.storedValue.vals[id];
-							if (!elem.isStart && !elem.dataWrap.isOutput) {
+							if (0 !== (2 & elem.startFlag) && !elem.dataWrap.isOutput) {
 								delete curNodes[id];
 							}
 						}
@@ -1199,7 +1256,6 @@ function getUniqueKeys(array) {
 function Workbook(eventsHandlers, oApi){
 	this.oApi = oApi;
 	this.handlers = eventsHandlers;
-	this.needRecalc = {nodes: {}, length:0};
 	this.dependencyFormulas = new DependencyGraph(this);
 	this.nActive = 0;
 	
@@ -1630,9 +1686,12 @@ Workbook.prototype.getDefinesNames = function ( name, sheetId ) {
 	};
 Workbook.prototype.delDefinesNames = function ( defName ) {
     this.dependencyFormulas.removeDefName( defName.LocalSheetId, defName.Name );
+	this.dependencyFormulas.calcTree();
 };
-Workbook.prototype.editDefinesNames = function ( oldName, newName, bUndo ) {
-	return this.dependencyFormulas.editDefinesNames( oldName, newName, bUndo );
+Workbook.prototype.editDefinesNames = function ( oldName, newName ) {
+	var res = this.dependencyFormulas.editDefinesNames( oldName, newName );
+	this.dependencyFormulas.calcTree();
+	return res;
 };
 Workbook.prototype.findDefinesNames = function ( ref, sheetId ) {
   return this.dependencyFormulas.getDefNameByRef( ref, sheetId );
@@ -2698,9 +2757,7 @@ Woorksheet.prototype._removeRows=function(start, stop){
 	History.Create_NewPoint();
 	//start, stop 0 based
 	var nDif = -(stop - start + 1);
-    var oActualRange = {r1: start, c1: 0, r2: stop, c2: gc_nMaxCol0};
 	var oActualRange = new Asc.Range(0, start, gc_nMaxCol0, stop);
-    this.renameDependencyNodes({offsetRow:nDif,offsetCol:0}, oActualRange);
 	var i, j, length, nIndex, aIndexes = [];
 	for(i in this.aGCells)
 	{
@@ -2740,7 +2797,8 @@ Woorksheet.prototype._removeRows=function(start, stop){
 		}
 		delete this.aGCells[nIndex];
 	}
-
+	//renameDependencyNodes after move cells because addToChanged has to add new locations
+	this.renameDependencyNodes({offsetRow:nDif,offsetCol:0}, oActualRange);
 
 	History.Add(AscCommonExcel.g_oUndoRedoWorksheet, AscCH.historyitem_Worksheet_RemoveRows, this.getId(), new Asc.Range(0, start, gc_nMaxCol0, gc_nMaxRow0), new UndoRedoData_FromToRowCol(true, start, stop));
     this.autoFilters.insertRows( "delCell", new Asc.Range(0, start, gc_nMaxCol0, stop), c_oAscDeleteOptions.DeleteRows );
@@ -2757,8 +2815,6 @@ Woorksheet.prototype._insertRowsBefore=function(index, count){
 	this.workbook.dependencyFormulas.lockRecal();
 	var oActualRange = {r1: index, c1: 0, r2: index + count - 1, c2: gc_nMaxCol0};
 	History.Create_NewPoint();
-    this.renameDependencyNodes({offsetRow:count,offsetCol:0},oActualRange);
-	History.Add(AscCommonExcel.g_oUndoRedoWorksheet, AscCH.historyitem_Worksheet_AddRows, this.getId(), new Asc.Range(0, index, gc_nMaxCol0, gc_nMaxRow0), new UndoRedoData_FromToRowCol(true, index, index + count - 1));
 	//index 0 based
 	var aIndexes = [];
 	for(var i in this.aGCells)
@@ -2796,6 +2852,10 @@ Woorksheet.prototype._insertRowsBefore=function(index, count){
         }
         History.LocalChange = false;
     }
+	//renameDependencyNodes after move cells because addToChanged has to add new locations
+	this.renameDependencyNodes({offsetRow:count,offsetCol:0},oActualRange);
+
+	History.Add(AscCommonExcel.g_oUndoRedoWorksheet, AscCH.historyitem_Worksheet_AddRows, this.getId(), new Asc.Range(0, index, gc_nMaxCol0, gc_nMaxRow0), new UndoRedoData_FromToRowCol(true, index, index + count - 1));
 
     this.autoFilters.insertRows( "insCell", new Asc.Range(0, index, gc_nMaxCol0, index + count - 1), c_oAscInsertOptions.InsertColumns );
 
@@ -2826,7 +2886,6 @@ Woorksheet.prototype._removeCols=function(start, stop){
 	//start, stop 0 based
 	var nDif = -(stop - start + 1), i, j, length, nIndex;
     var oActualRange = { r1: 0, c1: start, r2: gc_nMaxRow0, c2: stop };
-    this.renameDependencyNodes({ offsetRow: 0, offsetCol: nDif }, oActualRange);
 	for(i in this.aGCells)
 	{
 		var nRowIndex = i - 0;
@@ -2854,7 +2913,6 @@ Woorksheet.prototype._removeCols=function(start, stop){
 			}
 		}
 	}
-	
 	var oDefColPr = new AscCommonExcel.UndoRedoData_ColProp();
 	for(i = start; i <= stop; ++i)
 	{
@@ -2874,7 +2932,8 @@ Woorksheet.prototype._removeCols=function(start, stop){
 		if(null != elem)
 			elem.moveHor(nDif);
 	}
-
+	//renameDependencyNodes after move cells because addToChanged has to add new locations
+	this.renameDependencyNodes({ offsetRow: 0, offsetCol: nDif }, oActualRange);
 
 	History.Add(AscCommonExcel.g_oUndoRedoWorksheet, AscCH.historyitem_Worksheet_RemoveCols, this.getId(), new Asc.Range(start, 0, gc_nMaxCol0, gc_nMaxRow0), new UndoRedoData_FromToRowCol(false, start, stop));
 	
@@ -2891,8 +2950,6 @@ Woorksheet.prototype._insertColsBefore=function(index, count){
 	this.workbook.dependencyFormulas.lockRecal();
 	var oActualRange = {r1: 0, c1: index, r2: gc_nMaxRow0, c2: index + count - 1};
 	History.Create_NewPoint();
-    this.renameDependencyNodes({offsetRow:0,offsetCol:count},oActualRange);
-    History.Add(AscCommonExcel.g_oUndoRedoWorksheet, AscCH.historyitem_Worksheet_AddCols, this.getId(), new Asc.Range(index, 0, gc_nMaxCol0, gc_nMaxRow0), new UndoRedoData_FromToRowCol(false, index, index + count - 1));
 	//index 0 based
 	for(var i in this.aGCells)
 	{
@@ -2913,7 +2970,11 @@ Woorksheet.prototype._insertColsBefore=function(index, count){
 			this._moveCellHor(nRowIndex, nIndex, count, oActualRange);
 		}
 	}
+	//renameDependencyNodes after move cells because addToChanged has to add new locations
+	this.renameDependencyNodes({offsetRow:0,offsetCol:count},oActualRange);
 	
+	History.Add(AscCommonExcel.g_oUndoRedoWorksheet, AscCH.historyitem_Worksheet_AddCols, this.getId(), new Asc.Range(index, 0, gc_nMaxCol0, gc_nMaxRow0), new UndoRedoData_FromToRowCol(false, index, index + count - 1));
+
 	this.autoFilters.insertColumn( "insCells",  new Asc.Range(index, 0, index + count - 1, gc_nMaxRow0), c_oAscInsertOptions.InsertColumns );
 
 	this.workbook.dependencyFormulas.unlockRecal();
@@ -3756,12 +3817,8 @@ Woorksheet.prototype._moveRange=function(oBBoxFrom, oBBoxTo, copyRange){
 
 	if(!copyRange){
 		var sBBoxFromName = oBBoxFrom.getName();
-		this.workbook.needRecalc.nodes[getVertexId(this.getId(), sBBoxFromName)] = [this.getId(), sBBoxFromName];
-		this.workbook.needRecalc.length++;
 	}
 	var sBBoxToName = oBBoxTo.getName();
-	this.workbook.needRecalc.nodes[getVertexId(this.getId(), sBBoxToName)] = [this.getId(), sBBoxToName];
-	this.workbook.needRecalc.length++;
 	this.workbook.sortDependency();
 	
 	if(true == this.workbook.bUndoChanges || true == this.workbook.bRedoChanges)
@@ -3781,7 +3838,6 @@ Woorksheet.prototype._shiftCellsLeft=function(oBBox){
 	var nLeft = oBBox.c1;
 	var nRight = oBBox.c2;
 	var dif = nLeft - nRight - 1;
-    this.renameDependencyNodes( {offsetRow:0,offsetCol:dif}, oBBox );
 	for(var i = oBBox.r1; i <= oBBox.r2; i++){
 		var row = this.aGCells[i];
 		if(row){
@@ -3807,7 +3863,9 @@ Woorksheet.prototype._shiftCellsLeft=function(oBBox){
 			}
 		}
 	}
-
+	//renameDependencyNodes after move cells because addToChanged has to add new locations
+	this.renameDependencyNodes( {offsetRow:0,offsetCol:dif}, oBBox );
+	
 	History.Add(AscCommonExcel.g_oUndoRedoWorksheet, AscCH.historyitem_Worksheet_ShiftCellsLeft, this.getId(), new Asc.Range(nLeft, oBBox.r1, gc_nMaxCol0, oBBox.r2), new UndoRedoData_BBox(oBBox));
     this.autoFilters.insertColumn( "delCell",  oBBox, c_oAscDeleteOptions.DeleteCellsAndShiftLeft );
 	//todo проверить не уменьшились ли границы таблицы
@@ -3816,7 +3874,6 @@ Woorksheet.prototype._shiftCellsUp=function(oBBox){
 	var nTop = oBBox.r1;
 	var nBottom = oBBox.r2;
 	var dif = nTop - nBottom - 1;
-    this.renameDependencyNodes({offsetRow:dif,offsetCol:0}, oBBox );
 	var aIndexes = [];
 	for(var i in this.aGCells)
 	{
@@ -3846,7 +3903,9 @@ Woorksheet.prototype._shiftCellsUp=function(oBBox){
 			}
 		}
 	}
-
+	//renameDependencyNodes after move cells because addToChanged has to add new locations
+	this.renameDependencyNodes({offsetRow:dif,offsetCol:0}, oBBox );
+	
 	History.Add(AscCommonExcel.g_oUndoRedoWorksheet, AscCH.historyitem_Worksheet_ShiftCellsTop, this.getId(), new Asc.Range(oBBox.c1, oBBox.r1, oBBox.c2, gc_nMaxRow0), new UndoRedoData_BBox(oBBox));
     this.autoFilters.insertRows( "delCell", oBBox, c_oAscDeleteOptions.DeleteCellsAndShiftTop );
 	//todo проверить не уменьшились ли границы таблицы
@@ -3855,7 +3914,7 @@ Woorksheet.prototype._shiftCellsRight=function(oBBox, displayNameFormatTable){
 	var nLeft = oBBox.c1;
 	var nRight = oBBox.c2;
 	var dif = nRight - nLeft + 1;
-    this.renameDependencyNodes({offsetRow:0,offsetCol:dif}, oBBox);
+
 	for(var i = oBBox.r1; i <= oBBox.r2; i++){
 		var row = this.aGCells[i];
 		if(row){
@@ -3880,7 +3939,9 @@ Woorksheet.prototype._shiftCellsRight=function(oBBox, displayNameFormatTable){
 			}
 		}
 	}
-
+	//renameDependencyNodes after move cells because addToChanged has to add new locations
+	this.renameDependencyNodes({offsetRow:0,offsetCol:dif}, oBBox);
+	
 	History.Add(AscCommonExcel.g_oUndoRedoWorksheet, AscCH.historyitem_Worksheet_ShiftCellsRight, this.getId(), new Asc.Range(oBBox.c1, oBBox.r1, gc_nMaxCol0, oBBox.r2), new UndoRedoData_BBox(oBBox));
     this.autoFilters.insertColumn( "insCells",  oBBox, c_oAscInsertOptions.InsertCellsAndShiftRight, displayNameFormatTable );
 };
@@ -3889,7 +3950,6 @@ Woorksheet.prototype._shiftCellsBottom=function(oBBox, displayNameFormatTable){
 	var nBottom = oBBox.r2;
 	var dif = nBottom - nTop + 1;
 	var aIndexes = [];
-    this.renameDependencyNodes({offsetRow:dif,offsetCol:0}, oBBox);
 	for(var i in this.aGCells){
 		var rowInd = i - 0;
 		if(rowInd >= nTop)
@@ -3911,7 +3971,9 @@ Woorksheet.prototype._shiftCellsBottom=function(oBBox, displayNameFormatTable){
 			}
 		}
 	}
-
+	//renameDependencyNodes after move cells because addToChanged has to add new locations
+	this.renameDependencyNodes({offsetRow:dif,offsetCol:0}, oBBox);
+	
 	History.Add(AscCommonExcel.g_oUndoRedoWorksheet, AscCH.historyitem_Worksheet_ShiftCellsBottom, this.getId(), new Asc.Range(oBBox.c1, oBBox.r1, oBBox.c2, gc_nMaxRow0), new UndoRedoData_BBox(oBBox));
     this.autoFilters.insertRows( "insCell", oBBox, c_oAscInsertOptions.InsertCellsAndShiftDown, displayNameFormatTable );
 };
@@ -4697,24 +4759,43 @@ Cell.prototype.setValueData = function(Val){
 			}
 		}
 	};
-	Cell.prototype.onFormulaEvent = function(type, data) {
-		if (AscCommon.c_oNotifyParentType.Change === type) {
+	Cell.prototype.onFormulaEvent = function(type, eventData) {
+		if (AscCommon.c_oNotifyParentType.CanDo === type) {
+			;
+		} else if (AscCommon.c_oNotifyParentType.Change === type) {
 			this.ws.workbook.dependencyFormulas.addToChangedCell(this);
 		} else if (AscCommon.c_oNotifyParentType.ChangeFormula === type) {
 			var DataOld = this.getValueData();
-			this.formulaParsed.buildDependencies();
-			this.formulaParsed.Formula = this.formulaParsed.assemble();
-			var DataNew = this.getValueData();
-			if (false == DataOld.isEqual(DataNew)) {
-				History.Add(AscCommonExcel.g_oUndoRedoCell, AscCH.historyitem_Cell_ChangeValueUndo, this.ws.getId(),
-							new Asc.Range(this.nCol, this.nRow, this.nCol, this.nRow),
-							new UndoRedoData_CellSimpleData(this.nRow, this.nCol, DataOld, DataNew), true);
-				this.oValue.cleanCache();
+			var assemb;
+			switch (eventData.assembleType) {
+				case AscCommon.c_oNotifyParentAssemble.Normal:
+					assemb = this.formulaParsed.assemble();
+					break;
+				case AscCommon.c_oNotifyParentAssemble.Flag:
+					assemb = this.formulaParsed.assemble(true);
+					break;
+				case AscCommon.c_oNotifyParentAssemble.Current:
+					assemb = this.formulaParsed.Formula;
+					break;
+			}
+			if (eventData.isRebuild) {
+				this.setValue('=' + assemb);
+			} else {
+				this.formulaParsed.Formula = assemb;
+				this.formulaParsed.buildDependencies();
 				this.ws.workbook.dependencyFormulas.addToChangedCell(this);
+				var DataNew = this.getValueData();
+				if (false == DataOld.isEqual(DataNew)) {
+					History.Add(AscCommonExcel.g_oUndoRedoCell, AscCH.historyitem_Cell_ChangeValueUndo, this.ws.getId(),
+								new Asc.Range(this.nCol, this.nRow, this.nCol, this.nRow),
+								new UndoRedoData_CellSimpleData(this.nRow, this.nCol, DataOld, DataNew), true);
+					this.oValue.cleanCache();
+				}
 			}
 		} else if (AscCommon.c_oNotifyParentType.EndCalculate === type) {
 			this._updateCellValue();
 		}
+		return true;
 	};
 	Cell.prototype._calculateRefType = function(cell) {
 		var val = this.formulaParsed.value;
@@ -7568,9 +7649,11 @@ Range.prototype._sortByArray=function(oBBox, aSortData, bUndo){
 				oCurCell.moveVer(shift);
 				rowTo.c[i] = oCurCell;
 				if (oCurCell.formulaParsed) {
+					History.TurnOff();
 					var _p_ = oCurCell.formulaParsed.clone(null, oCurCell, this);
 					var assemb = _p_.changeOffset({offsetCol: 0, offsetRow: shift}).assemble();
 					oCurCell.setValue("=" + assemb);
+					History.TurnOn();
 				}
 			}
 			else
@@ -8615,6 +8698,7 @@ DrawingObjectsManager.prototype.rebuildCharts = function(data)
   window['AscCommonExcel'].oDefaultMetrics = oDefaultMetrics;
   window['AscCommonExcel'].g_nAllColIndex = g_nAllColIndex;
   window['AscCommonExcel'].g_nAllRowIndex = g_nAllRowIndex;
+  window['AscCommonExcel'].g_DefNameWorksheet;
   window['AscCommonExcel'].aStandartNumFormats = aStandartNumFormats;
   window['AscCommonExcel'].aStandartNumFormatsId = aStandartNumFormatsId;
   window['AscCommonExcel'].oFormulaLocaleInfo = oFormulaLocaleInfo;
