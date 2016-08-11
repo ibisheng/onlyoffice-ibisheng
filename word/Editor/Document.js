@@ -11289,11 +11289,19 @@ CDocument.prototype.End_CompositeInput = function()
 	if (null === this.CompositeInput)
 		return;
 
+	var nLen = this.CompositeInput.Length;
+	
 	var oRun = this.CompositeInput.Run;
 	oRun.Set_CompositeInput(null);
 	this.CompositeInput = null;
 
 	this.History.Check_UninonLastPoints();
+	
+	if (0 === nLen && true === this.History.CanRemoveLastPoint())
+	{
+		this.Document_Undo();
+		this.History.Clear_Redo();
+	}
 
 	this.Document_UpdateInterfaceState();
 
