@@ -1745,6 +1745,12 @@
               this.severalChartStyles = obj.severalChartStyles != undefined ? obj.severalChartStyles : undefined;
               this.verticalTextAlign = obj.verticalTextAlign != undefined ? obj.verticalTextAlign : undefined;
               this.vert = obj.vert != undefined ? obj.vert : undefined;
+
+              //oleObjects
+              this.pluginGuid = obj.pluginGuid !== undefined ? obj.pluginGuid : undefined;
+              this.pluginData = obj.pluginData !== undefined ? obj.pluginData : undefined;
+              this.oleWidth   = obj.oleWidth != undefined ? obj.oleWidth : undefined;
+              this.oleHeight  = obj.oleHeight != undefined ? obj.oleHeight : undefined;
           }
           else {
               this.CanBeFlow = true;
@@ -1775,6 +1781,13 @@
               this.severalChartStyles = undefined;
               this.verticalTextAlign = undefined;
               this.vert = undefined;
+
+              //oleObjects
+              this.pluginGuid = undefined;
+              this.pluginData = undefined;
+
+              this.oleWidth   = undefined;
+              this.oleHeight  = undefined;
           }
       }
 
@@ -1865,6 +1878,9 @@
 
           asc_getOriginSize: function(api)
           {
+              if(AscFormat.isRealNumber(this.oleWidth) && AscFormat.isRealNumber(this.oleHeight)){
+                  return new asc_CImageSize( this.oleWidth, this.oleHeight, true );
+              }
               var _section_select = api.WordControl.m_oLogicDocument.Get_PageSizesByDrawingObjects();
               var _page_width             = AscCommon.Page_Width;
               var _page_height            = AscCommon.Page_Height;
@@ -1912,6 +1928,23 @@
                   return new asc_CImageSize( parseInt(_w), parseInt(_h), bIsCorrect);
               }
               return new asc_CImageSize( 50, 50, false );
+          },
+
+          //oleObjects
+          asc_getPluginGuid: function(){
+              return this.pluginGuid;
+          },
+
+          asc_putPluginGuid: function(v){
+              this.pluginGuid = v;
+          },
+
+          asc_getPluginData: function(){
+              return this.pluginData;
+          },
+
+          asc_putPluginData: function(v){
+              this.pluginData = v;
           }
       };
 
@@ -2798,6 +2831,10 @@
       prot["get_ShapeProperties"] = prot["asc_getShapeProperties"] = prot.asc_getShapeProperties;
       prot["put_ShapeProperties"] = prot["asc_putShapeProperties"] = prot.asc_putShapeProperties;
       prot["get_OriginSize"] = prot["asc_getOriginSize"] = prot.asc_getOriginSize;
+      prot["get_PluginGuid"] = prot["asc_getPluginGuid"] = prot.asc_getPluginGuid;
+      prot["put_PluginGuid"] = prot["asc_putPluginGuid"] = prot.asc_putPluginGuid;
+      prot["get_PluginData"] = prot["asc_getPluginData"] = prot.asc_getPluginData;
+      prot["put_PluginData"] = prot["asc_putPluginData"] = prot.asc_putPluginData;
 
       window["AscCommon"].asc_CSelectedObject = asc_CSelectedObject;
       prot = asc_CSelectedObject.prototype;

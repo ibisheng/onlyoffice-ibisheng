@@ -379,7 +379,6 @@
 
 		this.isPaintFormat              = c_oAscFormatPainterState.kOff;
 		this.isMarkerFormat             = false;
-		this.isViewMode                 = false;
 		this.isStartAddShape            = false;
 		this.addShapePreset             = "";
 		this.isShowTableEmptyLine       = true;
@@ -639,15 +638,6 @@
 		this.InterfaceLocale = val;
 	};
 
-	asc_docs_api.prototype.SetTextBoxInputMode = function(bIsEA)
-	{
-		this.WordControl.SetTextBoxMode(bIsEA);
-	};
-	asc_docs_api.prototype.GetTextBoxInputMode = function()
-	{
-		return this.WordControl.TextBoxInputMode;
-	};
-
 	asc_docs_api.prototype.ChangeReaderMode  = function()
 	{
 		return this.WordControl.ChangeReaderMode();
@@ -754,14 +744,17 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype.ContentToHTML = function(bIsRet)
 	{
 		this.DocumentReaderMode            = new AscCommon.CDocumentReaderMode();
-		var _old                           = PasteElementsId.copyPasteUseBinary;
-		PasteElementsId.copyPasteUseBinary = false;
+
 		this.WordControl.m_oLogicDocument.Select_All();
-		AscCommon.Editor_Copy(this);
+		var text_data = {
+			data : "",
+			pushData : function(format, value) { this.data = value; }
+		};
+
+		this.asc_CheckCopy(text_data, 2);
 		this.WordControl.m_oLogicDocument.Selection_Remove();
-		PasteElementsId.copyPasteUseBinary = _old;
-		this.DocumentReaderMode            = null;
-		return document.getElementById("SelectId").innerHTML;
+
+		return text_data.data;
 	};
 
 	asc_docs_api.prototype.InitEditor = function()
@@ -1863,15 +1856,8 @@ background-repeat: no-repeat;\
 	{
 		if (window["AscDesktopEditor"])
 		{
-			var _e     = new AscCommon.CKeyboardEvent();
-			_e.CtrlKey = true;
-			_e.KeyCode = 67;
-
-			window["AscDesktopEditorButtonMode"] = true;
-			this.WordControl.m_oLogicDocument.OnKeyDown(_e);
-			window["AscDesktopEditorButtonMode"] = false;
-
-			return;
+			window["AscDesktopEditor"]["Copy"]();
+			return true;
 		}
 		return AscCommon.g_clipboardBase.Button_Copy();
 	};
@@ -1883,15 +1869,8 @@ background-repeat: no-repeat;\
 	{
 		if (window["AscDesktopEditor"])
 		{
-			var _e     = new AscCommon.CKeyboardEvent();
-			_e.CtrlKey = true;
-			_e.KeyCode = 88;
-
-			window["AscDesktopEditorButtonMode"] = true;
-			this.WordControl.m_oLogicDocument.OnKeyDown(_e);
-			window["AscDesktopEditorButtonMode"] = false;
-
-			return;
+			window["AscDesktopEditor"]["Cut"]();
+			return true;
 		}
 		return AscCommon.g_clipboardBase.Button_Cut();
 	};
@@ -1899,16 +1878,11 @@ background-repeat: no-repeat;\
 	{
 		if (window["AscDesktopEditor"])
 		{
-			var _e     = new AscCommon.CKeyboardEvent();
-			_e.CtrlKey = true;
-			_e.KeyCode = 86;
-
-			window["AscDesktopEditorButtonMode"] = true;
-			this.WordControl.m_oLogicDocument.OnKeyDown(_e);
-			window["AscDesktopEditorButtonMode"] = false;
-
-			return;
+			window["AscDesktopEditor"]["Paste"]();
+			return true;
 		}
+		if (!this.WordControl.m_oLogicDocument)
+			return false;
 
 		if (false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content))
 		{
@@ -1949,7 +1923,7 @@ background-repeat: no-repeat;\
 		//TEXT
 		if (AscCommon.c_oAscClipboardDataFormat.Text & _formats)
 		{
-			_data = this.WordControl.m_oLogicDocument.Get_SelectedText();
+			_data = this.WordControl.m_oLogicDocument.Get_SelectedText(false, {NewLineParagraph : true});
 			_clipboard.pushData(AscCommon.c_oAscClipboardDataFormat.Text, _data)
 		}
 		//HTML
@@ -2201,6 +2175,23 @@ background-repeat: no-repeat;\
 					var options       = {txtOptions : option, downloadType : this.downloadType};
 					this.downloadType = DownloadType.None;
 					this._downloadAs("save", c_oAscFileType.TXT, c_oAscAsyncAction.DownloadAs, options, null);
+				}
+				break;
+			case c_oAscAdvancedOptionsID.DRM:
+				if (this.advancedOptionsAction === c_oAscAdvancedOptionsAction.Open) {
+					var v = {
+						"id": this.documentId,
+						"userid": this.documentUserId,
+						"format": this.documentFormat,
+						"vkey": this.documentVKey,
+						"c": "reopen",
+						"url": this.documentUrl,
+						"title": this.documentTitle,
+						"embeddedfonts": this.isUseEmbeddedCutFonts,
+						"password": option.asc_getPassword()
+					};
+
+					sendCommand(this, null, v);
 				}
 				break;
 		}
@@ -4317,6 +4308,7 @@ background-repeat: no-repeat;\
 			this.CellsTextDirection = tblProp.CellsTextDirection;
 			this.CellsNoWrap        = tblProp.CellsNoWrap;
 			this.CellsWidth         = tblProp.CellsWidth;
+			this.CellsWidthNotEqual = tblProp.CellsWidthNotEqual;
 			this.Locked             = (undefined != tblProp.Locked) ? tblProp.Locked : false;
 			this.PercentFullWidth   = tblProp.PercentFullWidth;
 		}
@@ -4577,6 +4569,10 @@ background-repeat: no-repeat;\
 	CTableProp.prototype.get_PercentFullWidth   = function()
 	{
 		return this.PercentFullWidth;
+	};
+	CTableProp.prototype.get_CellsWidthNotEqual = function()
+	{
+		return this.CellsWidthNotEqual;
 	};
 
 
@@ -5043,8 +5039,10 @@ background-repeat: no-repeat;\
 		var _image = this.ImageLoader.LoadImage(url, 1);
 		if (null != _image)
 		{
-			var _w = Math.max(1, AscCommon.Page_Width - (AscCommon.X_Left_Margin + AscCommon.X_Right_Margin));
-			var _h = Math.max(1, AscCommon.Page_Height - (AscCommon.Y_Top_Margin + AscCommon.Y_Bottom_Margin));
+			var ColumnSize = this.WordControl.m_oLogicDocument.GetColumnSize();
+
+			var _w = Math.max(1, ColumnSize.W);
+			var _h = Math.max(1, ColumnSize.H);
 			if (_image.Image != null)
 			{
 				var __w = Math.max(parseInt(_image.Image.width * AscCommon.g_dKoef_pix_to_mm), 1);
@@ -5094,8 +5092,10 @@ background-repeat: no-repeat;\
 			this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
 			this.asyncImageEndLoaded2 = function(_image)
 			{
-				var _w = Math.max(1, AscCommon.Page_Width - (AscCommon.X_Left_Margin + AscCommon.X_Right_Margin));
-				var _h = Math.max(1, AscCommon.Page_Height - (AscCommon.Y_Top_Margin + AscCommon.Y_Bottom_Margin));
+				var ColumnSize = this.WordControl.m_oLogicDocument.GetColumnSize();
+
+				var _w = Math.max(1, ColumnSize.W);
+				var _h = Math.max(1, ColumnSize.H);
 				if (_image.Image != null)
 				{
 					var __w = Math.max(parseInt(_image.Image.width * AscCommon.g_dKoef_pix_to_mm), 1);
@@ -5596,12 +5596,14 @@ background-repeat: no-repeat;\
 					this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_EditOleObject);
 					this.WordControl.m_oLogicDocument.Edit_OleObject(oOleObject, sData, sImageUrl, nPixWidth, nPixHeight);
 					this.WordControl.m_oLogicDocument.Recalculate();
+                    this.WordControl.m_oLogicDocument.Document_UpdateInterfaceState();
 				}
 			}
 			else
 			{
 				this.WordControl.m_oLogicDocument.Edit_OleObject(oOleObject, sData, sImageUrl, nPixWidth, nPixHeight);
 				this.WordControl.m_oLogicDocument.Recalculate();
+                this.WordControl.m_oLogicDocument.Document_UpdateInterfaceState();
 			}
 		}
 	};
@@ -6256,7 +6258,7 @@ background-repeat: no-repeat;\
 	};
 
 	/*----------------------------------------------------------------*/
-	asc_docs_api.prototype.asc_enableKeyEvents = function(value)
+	asc_docs_api.prototype.asc_enableKeyEvents = function(value, isFromInput)
 	{
 		if (!this.isLoadFullApi)
 		{
@@ -6273,6 +6275,9 @@ background-repeat: no-repeat;\
 
 			this.asc_fireCallback("asc_onEnableKeyEventsChanged", value);
 		}
+
+		if (isFromInput !== true && AscCommon.g_inputContext)
+			AscCommon.g_inputContext.setInterfaceEnableKeyEvents(value);
 	};
 	asc_docs_api.prototype.asc_IsFocus         = function(bIsNaturalFocus)
 	{
@@ -6652,7 +6657,6 @@ background-repeat: no-repeat;\
 				if (this.bInit_word_control === false)
 				{
 					this.bInit_word_control = true;
-					this.pluginsManager     = Asc.createPluginsManager(this);
 					this.asc_fireCallback("asc_onDocumentContentReady");
 				}
 			}
@@ -6751,7 +6755,6 @@ background-repeat: no-repeat;\
 		if (false === this.isSaveFonts_Images)
 		{
 			this.bInit_word_control = true;
-			this.pluginsManager     = Asc.createPluginsManager(this);
 			this.asc_fireCallback("asc_onDocumentContentReady");
 		}
 
@@ -6791,6 +6794,13 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype.asyncFontEndLoaded = function(fontinfo)
 	{
 		this.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.LoadFont);
+
+		if (undefined !== this.asyncMethodCallback)
+		{
+			this.asyncMethodCallback();
+			this.asyncMethodCallback = undefined;
+			return;
+		}
 
 		var _fontSelections = g_fontApplication.g_fontSelections;
 		if (_fontSelections.CurrentLoadedObj != null)
@@ -7274,17 +7284,16 @@ background-repeat: no-repeat;\
 	};
 	asc_docs_api.prototype.asc_setViewMode = function(isViewMode)
 	{
+		this.isViewMode = !!isViewMode;
 		if (!this.isLoadFullApi)
 		{
-			this.isViewMode = isViewMode;
 			return;
 		}
 
 		if (isViewMode)
 		{
 			this.asc_SpellCheckDisconnect();
-
-			this.isViewMode                              = true;
+			
 			this.ShowParaMarks                           = false;
 			AscCommon.CollaborativeEditing.m_bGlobalLock = true;
 			//this.isShowTableEmptyLine = false;
@@ -7321,8 +7330,7 @@ background-repeat: no-repeat;\
 			 */
 
 			this.isUseEmbeddedCutFonts = false;
-
-			this.isViewMode = false;
+			
 			//this.WordControl.m_bIsRuler = true;
 			this.WordControl.checkNeedRules();
 			this.WordControl.m_oDrawingDocument.ClearCachePages();
@@ -7398,10 +7406,16 @@ background-repeat: no-repeat;\
 			editor.SpellCheckApi.onSpellCheck(response);
 	};
 
-	asc_docs_api.prototype._onNeedParams  = function(data)
+	asc_docs_api.prototype._onNeedParams  = function(data, opt_isPassword)
 	{
-		var cp = {'codepage' : AscCommon.c_oAscCodePageUtf8, 'encodings' : AscCommon.getEncodingParams()};
-		this.asc_fireCallback("asc_onAdvancedOptions", new AscCommon.asc_CAdvancedOptions(c_oAscAdvancedOptionsID.TXT, cp), this.advancedOptionsAction);
+		var options;
+		if (opt_isPassword) {
+			options = new AscCommon.asc_CAdvancedOptions(c_oAscAdvancedOptionsID.DRM);
+		} else {
+			var cp = {'codepage': AscCommon.c_oAscCodePageUtf8, 'encodings': AscCommon.getEncodingParams()};
+			options = new AscCommon.asc_CAdvancedOptions(c_oAscAdvancedOptionsID.TXT, cp);
+		}
+		this.asc_fireCallback("asc_onAdvancedOptions", options, this.advancedOptionsAction);
 	};
 	asc_docs_api.prototype._onOpenCommand = function(data)
 	{
@@ -7672,7 +7686,10 @@ background-repeat: no-repeat;\
 			this.WordControl.m_oLogicDocument.Paragraph_Add(MathElement);
 		}
 	};
-
+	asc_docs_api.prototype.asc_AddPageCount = function()
+	{
+		this.WordControl.m_oLogicDocument.AddPageCount();
+	};
 	//----------------------------------------------------------------------------------------------------------------------
 	// Функции для работы с MailMerge
 	//----------------------------------------------------------------------------------------------------------------------
@@ -8901,10 +8918,13 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype["asc_pluginRun"]                             = asc_docs_api.prototype.asc_pluginRun;
 	asc_docs_api.prototype["asc_pluginResize"]                          = asc_docs_api.prototype.asc_pluginResize;
 	asc_docs_api.prototype["asc_pluginButtonClick"]                     = asc_docs_api.prototype.asc_pluginButtonClick;
+	asc_docs_api.prototype["asc_pluginEnableMouseEvents"]         		= asc_docs_api.prototype.asc_pluginEnableMouseEvents;
+
 	asc_docs_api.prototype["asc_nativeInitBuilder"]                     = asc_docs_api.prototype.asc_nativeInitBuilder;
 	asc_docs_api.prototype["asc_SetSilentMode"]                         = asc_docs_api.prototype.asc_SetSilentMode;
 	asc_docs_api.prototype["asc_addOleObject"]                          = asc_docs_api.prototype.asc_addOleObject;
 	asc_docs_api.prototype["asc_editOleObject"]                         = asc_docs_api.prototype.asc_editOleObject;
+	asc_docs_api.prototype["asc_InputClearKeyboardElement"]             = asc_docs_api.prototype.asc_InputClearKeyboardElement;
 
 	CParagraphPropEx.prototype['get_ContextualSpacing'] = CParagraphPropEx.prototype.get_ContextualSpacing;
 	CParagraphPropEx.prototype['get_Ind']               = CParagraphPropEx.prototype.get_Ind;
@@ -9040,6 +9060,8 @@ background-repeat: no-repeat;\
 	CTableProp.prototype['get_CellsWidth']         = CTableProp.prototype.get_CellsWidth;
 	CTableProp.prototype['put_CellsWidth']         = CTableProp.prototype.put_CellsWidth;
 	CTableProp.prototype['get_PercentFullWidth']   = CTableProp.prototype.get_PercentFullWidth;
+	CTableProp.prototype['get_CellsWidthNotEqual'] = CTableProp.prototype.get_CellsWidthNotEqual;
+	
 	window['Asc']['CBorders']                      = window['Asc'].CBorders = CBorders;
 	CBorders.prototype['get_Left']    = CBorders.prototype.get_Left;
 	CBorders.prototype['put_Left']    = CBorders.prototype.put_Left;

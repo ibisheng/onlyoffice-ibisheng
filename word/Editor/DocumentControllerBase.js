@@ -584,9 +584,10 @@ CDocumentControllerBase.prototype.GetCurPosXY = function(){return {X : 0, Y : 0}
 /**
  * Получаем выделенный текст.
  * @param {boolean} bClearText
+ * @param {object} oPr
  * @returns {String}
  */
-CDocumentControllerBase.prototype.GetSelectedText = function(bClearText){return "";};
+CDocumentControllerBase.prototype.GetSelectedText = function(bClearText, oPr){return "";};
 /**
  * Получаем текущий параграф.
  * @returns {?Paragraph}
@@ -717,3 +718,8 @@ CDocumentControllerBase.prototype.SaveDocumentStateBeforeLoadChanges = function(
  * @param State
  */
 CDocumentControllerBase.prototype.RestoreDocumentStateAfterLoadChanges = function(State){};
+/**
+ * Получаем размеры текущей колонки.
+ * @returns {{W: number, H: number}}
+ */
+CDocumentControllerBase.prototype.GetColumnSize = function(){return {W : 0, H : 0};};

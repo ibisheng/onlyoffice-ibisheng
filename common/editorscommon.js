@@ -354,8 +354,7 @@ function mapAscServerErrorToAscError(nServerError) {
 		case c_oAscServerError.ConvertDownload : nRes = Asc.c_oAscError.ID.DownloadError; break;
 		case c_oAscServerError.ConvertTimeout : nRes = Asc.c_oAscError.ID.ConvertationTimeout; break;
 		case c_oAscServerError.ConvertDRM :
-		case c_oAscServerError.ConvertPASSWORD :
-		case c_oAscServerError.ConvertMS_OFFCRYPTO : nRes = Asc.c_oAscError.ID.ConvertationPassword; break;
+		case c_oAscServerError.ConvertPASSWORD : nRes = Asc.c_oAscError.ID.ConvertationPassword; break;
 		case c_oAscServerError.ConvertCONVERT_CORRUPTED :
 		case c_oAscServerError.ConvertLIBREOFFICE :
 		case c_oAscServerError.ConvertPARAMS :
@@ -763,7 +762,6 @@ var c_oAscServerError = {
     ConvertUnknownFormat:-82,
     ConvertTimeout:-83,
     ConvertReadFile:-84,
-    ConvertMS_OFFCRYPTO:-85,
     ConvertCONVERT_CORRUPTED:-86,
     ConvertLIBREOFFICE:-87,
     ConvertPARAMS:-88,
@@ -2130,6 +2128,7 @@ CTableId.prototype.Read_Class_FromBinary = function(Reader)
         case AscDFH.historyitem_type_SerAx                    : Element = new AscFormat.CSerAx(); break;
         case AscDFH.historyitem_type_Title                    : Element = new AscFormat.CTitle(); break;
         case AscDFH.historyitem_type_OleObject                : Element = new AscFormat.COleObject(); break;
+        case AscDFH.historyitem_type_DrawingContent           : Element = new AscFormat.CDrawingDocContent(); break;
 
         case AscDFH.historyitem_type_Math                     : Element = new AscCommonWord.ParaMath(false); break;
         case AscDFH.historyitem_type_MathContent              : Element = new AscCommonWord.CMathContent(); break;

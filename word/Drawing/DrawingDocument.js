@@ -2960,8 +2960,6 @@ function CDrawingDocument()
         }
 
         this.showTarget(false);
-
-        this.m_oWordControl.DisableTextEATextboxAttack();
     }
     this.UpdateTargetNoAttack = function()
     {
@@ -3110,8 +3108,6 @@ function CDrawingDocument()
                 oThis.TargetHtmlElement.style.top  = "0px";
                 oThis.TargetHtmlElement.style["webkitTransform"] = "matrix(1, 0, 0, 1, " + oThis.TargetHtmlElementLeft + "," + oThis.TargetHtmlElementTop + ")";
             }
-
-            this.m_oWordControl.CheckTextBoxInputPos();
         }
 
         this.MoveTargetInInputContext();
@@ -3471,8 +3467,6 @@ function CDrawingDocument()
         oThis.TargetHtmlElementTop = pos.Y >> 0;
         oThis.TargetHtmlElement.style.left = oThis.TargetHtmlElementLeft + "px";
         oThis.TargetHtmlElement.style.top  = oThis.TargetHtmlElementTop + "px";
-
-        this.m_oWordControl.CheckTextBoxInputPos();
     }
 
     this.SetTargetSize = function(size)

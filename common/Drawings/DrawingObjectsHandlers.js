@@ -326,11 +326,11 @@ function handleGroup(drawing, drawingObjectsController, e, x, y, group, pageInde
 function handleInternalChart(drawing, drawingObjectsController, e, x, y, group, pageIndex, bWord)
 {
     var ret = false, i, title;
-    if(drawing.hit(x, y) && !window["NATIVE_EDITOR_ENJINE"])
+    if(drawing.hit(x, y))
     {
         var selector = group ? group : drawingObjectsController;
         var legend = drawing.getLegend();
-        if(legend && legend.hit(x, y))
+        if(legend && !window["NATIVE_EDITOR_ENJINE"] && legend.hit(x, y))
         {
             if(drawing.selection.legend != legend)
             {
@@ -394,11 +394,11 @@ function handleInternalChart(drawing, drawingObjectsController, e, x, y, group, 
 
         var oLabels;
         var arrLabels = [];
-        if(drawing.chart.plotArea.catAx && drawing.chart.plotArea.catAx.labels)
+        if(drawing.chart.plotArea.catAx && drawing.chart.plotArea.catAx.labels && !window["NATIVE_EDITOR_ENJINE"])
         {
             arrLabels.push(drawing.chart.plotArea.catAx.labels);
         }
-        if(drawing.chart.plotArea.valAx && drawing.chart.plotArea.valAx.labels)
+        if(drawing.chart.plotArea.valAx && drawing.chart.plotArea.valAx.labels && !window["NATIVE_EDITOR_ENJINE"])
         {
             arrLabels.push(drawing.chart.plotArea.valAx.labels);
         }
@@ -425,7 +425,7 @@ function handleInternalChart(drawing, drawingObjectsController, e, x, y, group, 
             }
         }
 
-        if(drawing.chart.plotArea.chart && drawing.chart.plotArea.chart.series)
+        if(drawing.chart.plotArea.chart && drawing.chart.plotArea.chart.series && !window["NATIVE_EDITOR_ENJINE"])
         {
             var series = drawing.chart.plotArea.chart.series;
             var _len = drawing.chart.plotArea.chart.getObjectType() === AscDFH.historyitem_type_PieChart ? 1 : series.length;
@@ -473,7 +473,7 @@ function handleInternalChart(drawing, drawingObjectsController, e, x, y, group, 
             var hit_in_inner_area = title.hitInInnerArea(x, y);
             var hit_in_path = title.hitInPath(x, y);
             var hit_in_text_rect = title.hitInTextRect(x, y);
-            if(hit_in_inner_area && (!hit_in_text_rect || drawing.selection.title !== title) || hit_in_path)
+            if((hit_in_inner_area && (!hit_in_text_rect || drawing.selection.title !== title) || hit_in_path) && !window["NATIVE_EDITOR_ENJINE"])
             {
                 if(drawingObjectsController.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
                 {

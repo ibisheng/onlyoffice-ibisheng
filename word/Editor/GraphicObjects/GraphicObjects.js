@@ -292,7 +292,7 @@ CGraphicObjects.prototype =
     createTextArt: DrawingObjectsController.prototype.createTextArt,
     getChartObject: DrawingObjectsController.prototype.getChartObject,
     getChartSpace2: DrawingObjectsController.prototype.getChartSpace2,
-
+    CreateDocContent: DrawingObjectsController.prototype.CreateDocContent,
 
     getAllBoundsRectOnPageForMath: function(nPageIndex)
     {
@@ -506,6 +506,12 @@ CGraphicObjects.prototype =
                 image_props.Width = props_by_types.imageProps.w;
                 image_props.Height = props_by_types.imageProps.h;
                 image_props.lockAspect = props_by_types.imageProps.lockAspect;
+
+                image_props.pluginGuid = props_by_types.imageProps.pluginGuid;
+                image_props.pluginData = props_by_types.imageProps.pluginData;
+
+                image_props.oleWidth = props_by_types.imageProps.oleWidth;
+                image_props.oleHeight = props_by_types.imageProps.oleHeight;
             }
             if(props_by_types.chartProps && !(props_by_types.chartProps.severalCharts === true))
             {
@@ -1256,7 +1262,10 @@ CGraphicObjects.prototype =
 
     handleOleObjectDoubleClick: function(drawing, oleObject, e, x, y, pageIndex)
     {
-        if(false === this.document.Document_Is_SelectionLocked(changestype_Drawing_Props))
+		if(drawing && drawing.ParaMath){
+			drawing.Convert_ToMathObject();
+		}
+        else if(false === this.document.Document_Is_SelectionLocked(changestype_Drawing_Props))
         {
             var pluginData = new Asc.CPluginData();
             pluginData.setAttribute("data", oleObject.m_sData);
@@ -1952,12 +1961,12 @@ CGraphicObjects.prototype =
         }
     },
 
-    getSelectedText: function(bClearText)
+    getSelectedText: function(bClearText, oPr)
     {
         var content = this.getTargetDocContent();
         if(content)
         {
-            return content.Get_SelectedText(bClearText);
+            return content.Get_SelectedText(bClearText, oPr);
         }
         else
         {

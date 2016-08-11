@@ -754,6 +754,7 @@ CDrawingDocument.prototype =
     TargetStart : function()
     {
         this.Native["DD_TargetStart"]();
+        this.TextMatrix = null;
     },
     TargetEnd : function()
     {
@@ -777,14 +778,14 @@ CDrawingDocument.prototype =
             this.TextMatrix.sy = matrix.sy;
             this.TextMatrix.tx = matrix.tx;
             this.TextMatrix.ty = matrix.ty;
-
+            
             this.Native["DD_UpdateTargetTransform"](matrix.sx, matrix.shy, matrix.shx, matrix.sy, matrix.tx, matrix.ty);
         }
-        else
-        {
-            this.TextMatrix = null;
-            this.Native["DD_RemoveTargetTransform"]();
-        }
+        //else
+        //{
+        //    this.TextMatrix = null;
+        //    this.Native["DD_RemoveTargetTransform"]();
+        //}
     },
     UpdateTarget : function(x, y, pageIndex)
     {
@@ -2281,7 +2282,11 @@ CDrawingDocument.prototype =
 
         this.Native["DD_EndNativeDraw"](_stream);
     },
-
+    
+    CheckGuiControlColors : function ()
+    {
+        
+    },
     SendControlColors : function()
     {
     },

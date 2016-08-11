@@ -1897,44 +1897,49 @@ Asc['asc_docs_api'].prototype["Call_Menu_Event"] = function(type, _params)
                     case 21:
                     {
                         var bIsNeed = _params[_current.pos++];
-
+                        
                         if (bIsNeed)
                         {
-                            var _originSize = this.WordControl.m_oDrawingDocument.Native["DD_GetOriginalImageSize"](_imagePr.ImageUrl);
-                            var _w = _originSize[0];
-                            var _h = _originSize[1];
-
-                            // сбрасываем урл
-                            _imagePr.ImageUrl = undefined;
-
-                            var _section_select = this.WordControl.m_oLogicDocument.Get_PageSizesByDrawingObjects();
-                            var _page_width = AscCommon.Page_Width;
-                            var _page_height = AscCommon.Page_Height;
-                            var _page_x_left_margin = AscCommon.X_Left_Margin;
-                            var _page_y_top_margin = AscCommon.Y_Top_Margin;
-                            var _page_x_right_margin = AscCommon.X_Right_Margin;
-                            var _page_y_bottom_margin = AscCommon.Y_Bottom_Margin;
-
-                            if (_section_select)
-                            {
-                                if (_section_select.W)
-                                    _page_width = _section_select.W;
-
-                                if (_section_select.H)
-                                    _page_height = _section_select.H;
+                            var currImage = this.WordControl.m_oLogicDocument.DrawingObjects.Get_Props();
+                            if (currImage && currImage.length) {
+                               
+                                var _originSize = this.WordControl.m_oDrawingDocument.Native["DD_GetOriginalImageSize"](currImage[0].ImageUrl);
+                                
+                                var _w = _originSize[0];
+                                var _h = _originSize[1];
+                                
+                                // сбрасываем урл
+                                _imagePr.ImageUrl = undefined;
+                                
+                                var _section_select = this.WordControl.m_oLogicDocument.Get_PageSizesByDrawingObjects();
+                                var _page_width = AscCommon.Page_Width;
+                                var _page_height = AscCommon.Page_Height;
+                                var _page_x_left_margin = AscCommon.X_Left_Margin;
+                                var _page_y_top_margin = AscCommon.Y_Top_Margin;
+                                var _page_x_right_margin = AscCommon.X_Right_Margin;
+                                var _page_y_bottom_margin = AscCommon.Y_Bottom_Margin;
+                                
+                                if (_section_select)
+                                {
+                                    if (_section_select.W)
+                                        _page_width = _section_select.W;
+                                    
+                                    if (_section_select.H)
+                                        _page_height = _section_select.H;
+                                }
+                                
+                                var __w = Math.max(1, _page_width - (_page_x_left_margin + _page_x_right_margin));
+                                var __h = Math.max(1, _page_height - (_page_y_top_margin + _page_y_bottom_margin));
+                                
+                                var wI = (undefined !== _w) ? Math.max(_w * AscCommon.g_dKoef_pix_to_mm, 1) : 1;
+                                var hI = (undefined !== _h) ? Math.max(_h * AscCommon.g_dKoef_pix_to_mm, 1) : 1;
+                                
+                                wI = Math.max(5, Math.min(wI, __w));
+                                hI = Math.max(5, Math.min(hI, __h));
+                                
+                                _imagePr.Width = wI;
+                                _imagePr.Height = hI;
                             }
-
-                            var __w = Math.max(1, _page_width - (_page_x_left_margin + _page_x_right_margin));
-                            var __h = Math.max(1, _page_height - (_page_y_top_margin + _page_y_bottom_margin));
-
-                            var wI = (undefined !== _w) ? Math.max(_w * AscCommon.g_dKoef_pix_to_mm, 1) : 1;
-                            var hI = (undefined !== _h) ? Math.max(_h * AscCommon.g_dKoef_pix_to_mm, 1) : 1;
-
-                            wI = Math.max(5, Math.min(wI, __w));
-                            hI = Math.max(5, Math.min(hI, __h));
-
-                            _imagePr.Width = wI;
-                            _imagePr.Height = hI;
                         }
 
                         break;
@@ -2300,6 +2305,15 @@ Asc['asc_docs_api'].prototype["Call_Menu_Event"] = function(type, _params)
 
             break;
         }
+        case 2415: // ASC_MENU_EVENT_TYPE_CHANGE_COLOR_SCHEME
+        {
+            if (undefined !== _params) {
+                var indexScheme = parseInt(_params);
+                this.ChangeColorScheme(indexScheme);
+            }
+            break;
+        }
+
         default:
             break;
     }
@@ -4322,6 +4336,22 @@ function asc_menu_WriteHyperPr(_hyperPr, _stream)
     _stream["WriteByte"](255);
 };
 
+function asc_WriteColorSchemes(schemas, s) {
+
+    s["WriteLong"](schemas.length);
+
+    for (var i = 0; i < schemas.length; ++i) {
+        s["WriteString2"](schemas[i].get_name());
+
+        var colors = schemas[i].get_colors();
+        s["WriteLong"](colors.length);
+
+        for (var j = 0; j < colors.length; ++j) {
+            asc_menu_WriteColor(0, colors[j], s);
+        }
+    }
+}
+
 ///////////////////////////////////////////////////////////////////////
 
 
@@ -4675,23 +4705,6 @@ Asc['asc_docs_api'].prototype.ImgApply = function(obj)
 
             this.WordControl.m_oLogicDocument.Set_ImageProps( ImagePr );
         }
-    }
-};
-
-Asc['asc_docs_api'].prototype.IncreaseIndent = function()
-{
-    if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Paragraph_Properties) )
-    {
-        this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
-        this.WordControl.m_oLogicDocument.Paragraph_IncDecIndent( true );
-    }
-};
-Asc['asc_docs_api'].prototype.DecreaseIndent = function()
-{
-    if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Paragraph_Properties) )
-    {
-        this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
-        this.WordControl.m_oLogicDocument.Paragraph_IncDecIndent( false );
     }
 };
 
@@ -5272,11 +5285,7 @@ CStylesPainter.prototype =
         var dKoefToMM = AscCommon.g_dKoef_pix_to_mm;
 
         if (AscCommon.AscBrowser.isRetina)
-        {
-            _w_px *= 2;
-            _h_px *= 2;
             dKoefToMM /= 2;
-        }
 
         _api.WordControl.m_oDrawingDocument.Native["DD_StartNativeDraw"](_w_px, _h_px, _w_px * dKoefToMM, _h_px * dKoefToMM);
 
@@ -5693,3 +5702,127 @@ AscCommon.ChartPreviewManager.prototype.getChartPreviews = function(chartType)
         }
     }
 };
+
+// additional
+
+Asc['asc_docs_api'].prototype.__SendThemeColorScheme = function()
+{
+    var infos = [];
+    var _index = 0;
+
+    var _c = null;
+
+    // user scheme
+    var oColorScheme = AscCommon.g_oUserColorScheme;
+    var _count_defaults = oColorScheme.length;
+    for (var i = 0; i < _count_defaults; ++i)
+    {
+        var _obj = oColorScheme[i];
+        infos[_index] = new AscCommon.CAscColorScheme();
+        infos[_index].Name = _obj.name;
+
+        _c = _obj.dk1;
+        infos[_index].Colors[0] = new CColor(_c.R, _c.G, _c.B);
+
+        _c = _obj.lt1;
+        infos[_index].Colors[1] = new CColor(_c.R, _c.G, _c.B);
+
+        _c = _obj.dk2;
+        infos[_index].Colors[2] = new CColor(_c.R, _c.G, _c.B);
+
+        _c = _obj.lt2;
+        infos[_index].Colors[3] = new CColor(_c.R, _c.G, _c.B);
+
+        _c = _obj.accent1;
+        infos[_index].Colors[4] = new CColor(_c.R, _c.G, _c.B);
+
+        _c = _obj.accent2;
+        infos[_index].Colors[5] = new CColor(_c.R, _c.G, _c.B);
+
+        _c = _obj.accent3;
+        infos[_index].Colors[6] = new CColor(_c.R, _c.G, _c.B);
+
+        _c = _obj.accent4;
+        infos[_index].Colors[7] = new CColor(_c.R, _c.G, _c.B);
+
+        _c = _obj.accent5;
+        infos[_index].Colors[8] = new CColor(_c.R, _c.G, _c.B);
+
+        _c = _obj.accent6;
+        infos[_index].Colors[9] = new CColor(_c.R, _c.G, _c.B);
+
+        _c = _obj.hlink;
+        infos[_index].Colors[10] = new CColor(_c.R, _c.G, _c.B);
+
+        _c = _obj.folHlink;
+        infos[_index].Colors[11] = new CColor(_c.R, _c.G, _c.B);
+
+        ++_index;
+    }
+
+    // theme colors
+    var _theme = this.WordControl.m_oLogicDocument.theme;
+    var _extra = _theme.extraClrSchemeLst;
+    var _count = _extra.length;
+    var _rgba = {R:0, G: 0, B: 0, A: 255};
+    for (var i = 0; i < _count; ++i)
+    {
+        var _scheme = _extra[i].clrScheme;
+
+        infos[_index] = new AscCommon.CAscColorScheme();
+        infos[_index].Name = _scheme.name;
+
+        _scheme.colors[8].Calculate(_theme, null, null, null, _rgba);
+        _c = _scheme.colors[8].RGBA;
+        infos[_index].Colors[0] = new CColor(_c.R, _c.G, _c.B);
+
+        _scheme.colors[12].Calculate(_theme, null, null, null, _rgba);
+        _c = _scheme.colors[12].RGBA;
+        infos[_index].Colors[1] = new CColor(_c.R, _c.G, _c.B);
+
+        _scheme.colors[9].Calculate(_theme, null, null, null, _rgba);
+        _c = _scheme.colors[9].RGBA;
+        infos[_index].Colors[2] = new CColor(_c.R, _c.G, _c.B);
+
+        _scheme.colors[13].Calculate(_theme, null, null, null, _rgba);
+        _c = _scheme.colors[13].RGBA;
+        infos[_index].Colors[3] = new CColor(_c.R, _c.G, _c.B);
+
+        _scheme.colors[0].Calculate(_theme, null, null, null, _rgba);
+        _c = _scheme.colors[0].RGBA;
+        infos[_index].Colors[4] = new CColor(_c.R, _c.G, _c.B);
+
+        _scheme.colors[1].Calculate(_theme, null, null, null, _rgba);
+        _c = _scheme.colors[1].RGBA;
+        infos[_index].Colors[5] = new CColor(_c.R, _c.G, _c.B);
+
+        _scheme.colors[2].Calculate(_theme, null, null, null, _rgba);
+        _c = _scheme.colors[2].RGBA;
+        infos[_index].Colors[6] = new CColor(_c.R, _c.G, _c.B);
+
+        _scheme.colors[3].Calculate(_theme, null, null, null, _rgba);
+        _c = _scheme.colors[3].RGBA;
+        infos[_index].Colors[7] = new CColor(_c.R, _c.G, _c.B);
+
+        _scheme.colors[4].Calculate(_theme, null, null, null, _rgba);
+        _c = _scheme.colors[4].RGBA;
+        infos[_index].Colors[8] = new CColor(_c.R, _c.G, _c.B);
+
+        _scheme.colors[5].Calculate(_theme, null, null, null, _rgba);
+        _c = _scheme.colors[5].RGBA;
+        infos[_index].Colors[9] = new CColor(_c.R, _c.G, _c.B);
+
+        _scheme.colors[11].Calculate(_theme, null, null, null, _rgba);
+        _c = _scheme.colors[11].RGBA;
+        infos[_index].Colors[10] = new CColor(_c.R, _c.G, _c.B);
+
+        _scheme.colors[10].Calculate(_theme, null, null, null, _rgba);
+        _c = _scheme.colors[10].RGBA;
+        infos[_index].Colors[11] = new CColor(_c.R, _c.G, _c.B);
+
+        _index++;
+    }
+
+    this.WordControl.m_oApi.sync_SendThemeColorSchemes(infos);
+};
+

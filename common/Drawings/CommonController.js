@@ -134,6 +134,73 @@ var DISTANCE_TO_TEXT_LEFTRIGHT = 3.2;
             }
         }
     }
+
+    function fApproxEqual(a, b, fDelta){
+        if ( a === b ) {
+            return true;
+        }
+        if(AscFormat.isRealNumber(fDelta)){
+            return Math.abs( a - b ) < fDelta;
+        }
+        return Math.abs( a - b ) < 1e-15;
+    };
+
+
+	function fSolveQuadraticEquation(a, b, c){
+		var oResult = {x1: null, x2: null, bError: true}
+		var D = b*b - 4*a*c;
+        if(D < 0){
+            return oResult;
+        }
+		oResult.bError = false;
+        oResult.x1 = (-b + Math.sqrt(D))/(2*a), oResult.x2 = (-b - Math.sqrt(D))/(2*a);
+		return oResult;
+	}
+
+    function fCheckBoxIntersectionSegment(fX, fY, fWidth, fHeight, x1, y1, x2, y2){
+        return fCheckSegementIntersection(fX, fY, fX + fWidth, fY, x1, y1, x2, y2) ||
+            fCheckSegementIntersection(fX + fWidth, fY, fX + fWidth, fY + fHeight, x1, y1, x2, y2) ||
+            fCheckSegementIntersection(fX + fWidth, fY + fHeight, fX, fY + fHeight, x1, y1, x2, y2) ||
+            fCheckSegementIntersection(fX, fY + fHeight, fX, fY, x1, y1, x2, y2);
+
+    }
+
+    function fCheckSegementIntersection(x11, y11, x12, y12, x21, y21, x22, y22){
+        //check bounding boxes intersection
+        if(Math.max(x11, x12) < Math.min(x21, x22)){
+            return false;
+        }
+        if(Math.min(x11, x12) > Math.max(x21, x22)){
+            return false;
+        }
+        if(Math.max(y11, y12) < Math.min(y21, y22)){
+            return false;
+        }
+        if(Math.min(y11, y12) > Math.max(y21, y22)){
+            return false;
+        }
+
+        var oCoeffs = fResolve2LinearSystem(x12-x11, -(x22-x21), y12-y11, -(y22-y21), x21-x11, y21-y11);
+        if(oCoeffs.bError){
+            return false;
+        }
+        return (oCoeffs.x1 >= 0 && oCoeffs.x1 <= 1
+            && oCoeffs.x2 >= 0 && oCoeffs.x2 <= 1);
+    }
+
+
+    function fResolve2LinearSystem(a11, a12, a21, a22, t1, t2){
+        var oResult = {bError: true};
+        var D = a11*a22 - a12*a21;
+        if(fApproxEqual(D,  0)){
+            return oResult;
+        }
+        oResult.bError = false;
+        oResult.x1 = (t1*a22 - a12*t2)/D;
+        oResult.x2 = (a11*t2 - t1*a21)/D;
+        return oResult;
+    }
+
     function checkParagraphDefFonts(map, par)
     {
         par && par.Pr && par.Pr.DefaultRunPr && checkRFonts(map, par.Pr.DefaultRunPr.RFonts);
@@ -519,7 +586,7 @@ function CheckSpPrXfrm2(object)
 
 function getObjectsByTypesFromArr(arr, bGrouped)
 {
-    var ret = {shapes: [], images: [], groups: [], charts: [], tables: []};
+    var ret = {shapes: [], images: [], groups: [], charts: [], tables: [], oleObjects: []};
     var selected_objects = arr;
     for(var i = 0;  i < selected_objects.length; ++i)
     {
@@ -533,9 +600,13 @@ function getObjectsByTypesFromArr(arr, bGrouped)
                 break;
             }
             case AscDFH.historyitem_type_ImageShape:
-            case AscDFH.historyitem_type_OleObject:
             {
                 ret.images.push(drawing);
+                break;
+            }
+            case AscDFH.historyitem_type_OleObject:
+            {
+                ret.oleObjects.push(drawing);
                 break;
             }
             case AscDFH.historyitem_type_GroupShape:
@@ -547,7 +618,8 @@ function getObjectsByTypesFromArr(arr, bGrouped)
                     ret.shapes = ret.shapes.concat(by_types.shapes);
                     ret.images = ret.images.concat(by_types.images);
                     ret.charts = ret.charts.concat(by_types.charts);
-                    ret.tables = ret.tables.concat(by_types.charts);
+                    ret.tables = ret.tables.concat(by_types.tables);
+                    ret.oleObjects = ret.oleObjects.concat(by_types.oleObjects);
                 }
                 break;
             }
@@ -1141,6 +1213,32 @@ DrawingObjectsController.prototype =
         }
         return {X: 0, Y: 0, PageIndex: pageIndex};
     },
+
+
+    CreateDocContent: function(){
+        var oController = this;
+        if(this.selection.groupSelection){
+            oController = this.selection.groupSelection;
+        }
+        if(oController.selection.textSelection){
+            return;
+        }
+        if(oController.selectedObjects.length === 1 && oController.selectedObjects[0].getObjectType() === AscDFH.historyitem_type_Shape){
+            var oShape = oController.selectedObjects[0];
+            if(oShape.bWordShape){
+                if(!oShape.textBoxContent){
+                    oShape.createTextBoxContent();
+                }
+            }
+            else{
+                if(!oShape.txBody){
+                    oShape.createTextBody();
+                }
+            }
+            oController.selection.textSelection = oShape;
+        }
+    },
+
 
     getContextMenuPosition: function(pageIndex)
     {
@@ -2370,6 +2468,29 @@ DrawingObjectsController.prototype =
                     }
                     objects_by_type.charts[i].checkDrawingBaseCoords();
                 }
+                for(i = 0; i < objects_by_type.oleObjects.length; ++i)
+                {
+                    CheckSpPrXfrm(objects_by_type.oleObjects[i]);
+                    objects_by_type.oleObjects[i].spPr.xfrm.setExtX(props.Width);
+                    objects_by_type.oleObjects[i].spPr.xfrm.setExtY(props.Height);
+                    if(objects_by_type.oleObjects[i].group)
+                    {
+                        checkObjectInArray(aGroups, objects_by_type.oleObjects[i].group.getMainGroup());
+                    }
+
+                    var api = window.editor || window.Asc.editor;
+                    if(api)
+                    {
+                        var pluginData = new Asc.CPluginData();
+                        pluginData.setAttribute("data", objects_by_type.oleObjects[i].m_sData);
+                        pluginData.setAttribute("guid", objects_by_type.oleObjects[i].m_sApplicationId);
+                        pluginData.setAttribute("width", objects_by_type.oleObjects[i].spPr.xfrm.extX);
+                        pluginData.setAttribute("height", objects_by_type.oleObjects[i].spPr.xfrm.extY);
+                        pluginData.setAttribute("objectId", objects_by_type.oleObjects[i].Get_Id());
+                        api.asc_pluginResize(pluginData);
+                    }
+                    objects_by_type.oleObjects[i].checkDrawingBaseCoords();
+                }
             }
         }
 
@@ -3322,7 +3443,7 @@ DrawingObjectsController.prototype =
                             }
                             if(!hor_axis.title.txPr.content)
                             {
-                                hor_axis.title.txPr.setContent(new CDocumentContent(hor_axis.title.txPr, chart_space.getDrawingDocument(), 0, 0, 100, 500, false, false, true));
+                                hor_axis.title.txPr.setContent(new AscFormat.CDrawingDocContent(hor_axis.title.txPr, chart_space.getDrawingDocument(), 0, 0, 100, 500, false, false, true));
                             }
                             _text_body = hor_axis.title.txPr;
                         }
@@ -3395,7 +3516,7 @@ DrawingObjectsController.prototype =
                             var _body_pr = _text_body.bodyPr.createDuplicate();
                             if(!_text_body.content)
                             {
-                                _text_body.setContent(new CDocumentContent(_text_body, chart_space.getDrawingDocument(), 0, 0, 100, 500, false, false, true));
+                                _text_body.setContent(new AscFormat.CDrawingDocContent(_text_body, chart_space.getDrawingDocument(), 0, 0, 100, 500, false, false, true));
                             }
                             if(vert_axis_labels_settings === c_oAscChartVertAxisLabelShowSettings.rotated)
                             {
@@ -5023,6 +5144,11 @@ DrawingObjectsController.prototype =
                 }
             }
         }
+        else{
+            this.resetSelection();
+            this.document.Set_DocPosType(docpostype_Content);
+            this.document.Select_All();
+        }
         this.updateSelectionState();
     },
 
@@ -6542,6 +6668,55 @@ DrawingObjectsController.prototype =
                     }
                     break;
                 }
+                case AscDFH.historyitem_type_OleObject:
+                {
+                    var pluginData = new Asc.CPluginData();
+                    pluginData.setAttribute("data", drawing.m_sData);
+                    pluginData.setAttribute("guid", drawing.m_sApplicationId);
+                    pluginData.setAttribute("width", drawing.extX);
+                    pluginData.setAttribute("height", drawing.extY);
+                    pluginData.setAttribute("widthPix", drawing.m_nPixWidth);
+                    pluginData.setAttribute("heightPix", drawing.m_nPixHeight);
+                    pluginData.setAttribute("objectId", drawing.Id);
+                    new_image_props =
+                    {
+                        ImageUrl: drawing.getImageUrl(),
+                        w: drawing.extX,
+                        h: drawing.extY,
+                        locked: locked,
+                        x: drawing.x,
+                        y: drawing.y,
+                        lockAspect: lockAspect,
+                        pluginGuid: drawing.m_sApplicationId,
+                        pluginData: pluginData,
+                        oleWidth: drawing.m_fDefaultSizeX,
+                        oleHeight: drawing.m_fDefaultSizeY
+                    };
+                    if(!image_props)
+                        image_props = new_image_props;
+                    else
+                    {
+                        image_props.ImageUrl = null;
+                        if(image_props.w != null && image_props.w !== new_image_props.w)
+                            image_props.w = null;
+                        if(image_props.h != null && image_props.h !== new_image_props.h)
+                            image_props.h = null;
+                        if(image_props.x != null && image_props.x !== new_image_props.x)
+                            image_props.x = null;
+                        if(image_props.y != null && image_props.y !== new_image_props.y)
+                            image_props.y = null;
+
+                        if(image_props.locked || new_image_props.locked)
+                            image_props.locked = true;
+                        if(image_props.lockAspect || new_image_props.lockAspect)
+                            image_props.lockAspect = false;
+                        image_props.pluginGuid = null;
+                        image_props.pluginData = undefined;
+                        image_props.oleWidth = undefined;
+                        image_props.oleHeight = undefined;
+                    }
+                    break;
+                }
                 case AscDFH.historyitem_type_ChartSpace:
                 {
                     var type_subtype = drawing.getTypeSubType();
@@ -6962,6 +7137,14 @@ DrawingObjectsController.prototype =
             image_props.ImageUrl = props.imageProps.ImageUrl;
             image_props.Locked = props.imageProps.locked === true;
             image_props.lockAspect = props.imageProps.lockAspect;
+
+
+            image_props.pluginGuid = props.imageProps.pluginGuid;
+            image_props.pluginData = props.imageProps.pluginData;
+
+            image_props.oleWidth = props.imageProps.oleWidth;
+            image_props.oleHeight = props.imageProps.oleHeight;
+
             if(!bParaLocked)
             {
                 bParaLocked = image_props.Locked;
@@ -8776,6 +8959,9 @@ function CalcLiterByLength(aAlphaBet, nLength)
     return sResultLiter;
 }
 
+
+
+
     //--------------------------------------------------------export----------------------------------------------------
     window['AscFormat'] = window['AscFormat'] || {};
     window['AscFormat'].HANDLE_EVENT_MODE_HANDLE = HANDLE_EVENT_MODE_HANDLE;
@@ -8823,4 +9009,7 @@ function CalcLiterByLength(aAlphaBet, nLength)
     window['AscFormat'].GetMinSnapDistanceYObjectByArrays = GetMinSnapDistanceYObjectByArrays;
     window['AscFormat'].CalcLiterByLength = CalcLiterByLength;
     window['AscFormat'].fillImage = fillImage;
+	window['AscFormat'].fSolveQuadraticEquation = fSolveQuadraticEquation;
+	window['AscFormat'].fApproxEqual = fApproxEqual;
+	window['AscFormat'].fCheckBoxIntersectionSegment = fCheckBoxIntersectionSegment;
 })(window);

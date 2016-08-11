@@ -418,7 +418,7 @@ CHistory.prototype =
         var bPresentation = !(typeof CPresentation === "undefined");
         var bSlide = !(typeof Slide === "undefined");
         if ( ( Class instanceof CDocument        && ( AscDFH.historyitem_Document_AddItem        === Data.Type || AscDFH.historyitem_Document_RemoveItem        === Data.Type ) ) ||
-            ( Class instanceof CDocumentContent && ( AscDFH.historyitem_DocumentContent_AddItem === Data.Type || AscDFH.historyitem_DocumentContent_RemoveItem === Data.Type ) ) ||
+            (((Class instanceof CDocumentContent || Class instanceof AscFormat.CDrawingDocContent)) && ( AscDFH.historyitem_DocumentContent_AddItem === Data.Type || AscDFH.historyitem_DocumentContent_RemoveItem === Data.Type ) ) ||
             ( Class instanceof CTable           && ( AscDFH.historyitem_Table_AddRow            === Data.Type || AscDFH.historyitem_Table_RemoveRow            === Data.Type ) ) ||
             ( Class instanceof CTableRow        && ( AscDFH.historyitem_TableRow_AddCell        === Data.Type || AscDFH.historyitem_TableRow_RemoveCell        === Data.Type ) ) ||
             ( Class instanceof Paragraph        && ( AscDFH.historyitem_Paragraph_AddItem       === Data.Type || AscDFH.historyitem_Paragraph_RemoveItem       === Data.Type ) ) ||
@@ -429,7 +429,7 @@ CHistory.prototype =
             )
         {
             var bAdd = ( ( Class instanceof CDocument        && AscDFH.historyitem_Document_AddItem        === Data.Type ) ||
-                ( Class instanceof CDocumentContent && AscDFH.historyitem_DocumentContent_AddItem === Data.Type ) ||
+                ( ((Class instanceof CDocumentContent || Class instanceof AscFormat.CDrawingDocContent)) && AscDFH.historyitem_DocumentContent_AddItem === Data.Type ) ||
                 ( Class instanceof CTable           && AscDFH.historyitem_Table_AddRow            === Data.Type ) ||
                 ( Class instanceof CTableRow        && AscDFH.historyitem_TableRow_AddCell        === Data.Type ) ||
                 ( Class instanceof Paragraph        && AscDFH.historyitem_Paragraph_AddItem       === Data.Type ) ||
@@ -443,7 +443,7 @@ CHistory.prototype =
 
             if ( ( Class instanceof Paragraph ) ||  ( Class instanceof ParaHyperlink) || ( Class instanceof ParaRun ) ||
                 ( Class instanceof CDocument        && AscDFH.historyitem_Document_RemoveItem        === Data.Type ) ||
-                ( Class instanceof CDocumentContent && AscDFH.historyitem_DocumentContent_RemoveItem === Data.Type ) )
+                ( ((Class instanceof CDocumentContent || Class instanceof AscFormat.CDrawingDocContent)) && AscDFH.historyitem_DocumentContent_RemoveItem === Data.Type ) )
                 Count = Data.Items.length;
 
             var ContentChanges = new AscCommon.CContentChangesElement( ( bAdd == true ? AscCommon.contentchanges_Add : AscCommon.contentchanges_Remove ), Data.Pos, Count, Item );
@@ -670,28 +670,40 @@ CHistory.prototype =
         if (Point2.Items.length > 0 && Point2.Items[0].Data && AscDFH.historyitem_TableId_Description === Point2.Items[0].Data.Type)
             StartIndex2 = 1;
 
-        var PrevItem = null;
-        var Class = null;
-        for ( var Index = StartIndex1; Index < Point1.Items.length; Index++ )
+        var NewDescription;
+        if ((AscDFH.historydescription_Document_CompositeInput === Point1.Description || AscDFH.historydescription_Document_CompositeInputReplace === Point1.Description)
+            && AscDFH.historydescription_Document_CompositeInputReplace === Point2.Description)
         {
-            var Item = Point1.Items[Index];
-
-            if ( null === Class )
-                Class = Item.Class;
-            else if ( Class != Item.Class || "undefined" === typeof(Class.Check_HistoryUninon) || false === Class.Check_HistoryUninon(PrevItem.Data, Item.Data) )
-                return;
-
-            PrevItem = Item;
+            // Ничего не делаем. Эта ветка означает, что эти две точки можно объединить
+            NewDescription = AscDFH.historydescription_Document_CompositeInput;
         }
-
-        for ( var Index = StartIndex2; Index < Point2.Items.length; Index++ )
+        else
         {
-            var Item = Point2.Items[Index];
+            var PrevItem = null;
+            var Class    = null;
+            for (var Index = StartIndex1; Index < Point1.Items.length; Index++)
+            {
+                var Item = Point1.Items[Index];
 
-            if ( Class != Item.Class || "undefined" === typeof(Class.Check_HistoryUninon) || false === Class.Check_HistoryUninon(PrevItem.Data, Item.Data) )
-                return;
+                if (null === Class)
+                    Class = Item.Class;
+                else if (Class != Item.Class || "undefined" === typeof(Class.Check_HistoryUninon) || false === Class.Check_HistoryUninon(PrevItem.Data, Item.Data))
+                    return;
 
-            PrevItem = Item;
+                PrevItem = Item;
+            }
+
+            for (var Index = StartIndex2; Index < Point2.Items.length; Index++)
+            {
+                var Item = Point2.Items[Index];
+
+                if (Class != Item.Class || "undefined" === typeof(Class.Check_HistoryUninon) || false === Class.Check_HistoryUninon(PrevItem.Data, Item.Data))
+                    return;
+
+                PrevItem = Item;
+            }
+
+            NewDescription = AscDFH.historydescription_Document_AddLetterUnion;
         }
 
         if (0 !== StartIndex1)
@@ -706,7 +718,7 @@ CHistory.prototype =
             Items      : Point1.Items.concat(Point2.Items),
             Time       : Point1.Time,
             Additional : {},
-            Description: AscDFH.historydescription_Document_AddLetterUnion
+            Description: NewDescription
         };
 
 		if (null !== this.SavedIndex && this.SavedIndex >= this.Points.length - 2)

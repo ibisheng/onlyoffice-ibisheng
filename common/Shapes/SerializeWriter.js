@@ -2057,7 +2057,7 @@ function CBinaryFileWriter()
         oThis._WriteInt4(10, bodyPr.rIns, 36000);
         oThis._WriteInt2(11, bodyPr.rot);
         oThis._WriteBool2(12, bodyPr.rtlCol);
-        oThis._WriteInt2(13, bodyPr.spcCol);
+        oThis._WriteInt4(13, bodyPr.spcCol, 36000);
         oThis._WriteBool2(14, bodyPr.spcFirstLastPara);
         oThis._WriteInt4(15, bodyPr.tIns, 36000);
         oThis._WriteBool2(16, bodyPr.upright);
@@ -3161,8 +3161,27 @@ function CBinaryFileWriter()
     {
         oThis.WriteUChar(g_nodeAttributeStart);
 
-        if (row.Pr.Height !== undefined && row.Pr.Height != null)
-            oThis._WriteInt1(0, (row.Pr.Height.Value * 36000) >> 0);
+        if (row.Pr.Height !== undefined && row.Pr.Height != null){
+			var fMaxTopMargin = 0, fMaxBottomMargin = 0, fMaxTopBorder = 0, fMaxBottomBorder = 0;
+			for(i = 0;  i < row.Content.length; ++i){
+				var oCell = row.Content[i];
+				var oMargins = oCell.Get_Margins();
+				if(oMargins.Bottom.W > fMaxBottomMargin){
+					fMaxBottomMargin = oMargins.Bottom.W;
+				}
+				if(oMargins.Top.W > fMaxTopMargin){
+					fMaxTopMargin = oMargins.Top.W;
+				}
+				var oBorders = oCell.Get_Borders();
+				if(oBorders.Top.Size > fMaxTopBorder){
+					fMaxTopBorder = oBorders.Top.Size;
+				}
+				if(oBorders.Bottom.Size > fMaxBottomBorder){
+					fMaxBottomBorder = oBorders.Bottom.Size;
+				}
+			}
+            oThis._WriteInt1(0, ( (row.Pr.Height.Value + fMaxBottomMargin + fMaxTopMargin + fMaxTopBorder/2 + fMaxBottomBorder/2) * 36000) >> 0);
+		}
         
         oThis.WriteUChar(g_nodeAttributeEnd);
 

@@ -174,11 +174,6 @@
 
 			t.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
 		});
-		// init drag&drop
-		AscCommon.InitDragAndDrop(this.HtmlElement, function(error, files)
-		{
-			t._uploadCallback(error, files);
-		});
 
 		AscCommon.loadSdk(this._editorNameById(), function()
 		{
@@ -254,7 +249,7 @@
 			window["AscDesktopEditor"]["SetDocumentName"](this.documentTitle);
 		}
 	};
-	baseEditorsApi.prototype.asc_enableKeyEvents             = function(isEnabled)
+	baseEditorsApi.prototype.asc_enableKeyEvents             = function(isEnabled, isFromInput)
 	{
 	};
 	// Copy/Past/Cut
@@ -314,9 +309,6 @@
 	baseEditorsApi.prototype.sync_TryUndoInFastCollaborative = function()
 	{
 		this.sendEvent("asc_OnTryUndoInFastCollaborative");
-	};
-	baseEditorsApi.prototype.asc_enableKeyEvents             = function(val)
-	{
 	};
 	baseEditorsApi.prototype.asc_setViewMode                 = function()
 	{
@@ -439,7 +431,7 @@
 	baseEditorsApi.prototype._onOpenCommand                      = function(data)
 	{
 	};
-	baseEditorsApi.prototype._onNeedParams                       = function(data)
+	baseEditorsApi.prototype._onNeedParams                       = function(data, opt_isPassword)
 	{
 	};
 	baseEditorsApi.prototype.asyncServerIdEndLoaded              = function()
@@ -641,7 +633,7 @@
 								t._onNeedParams(input["data"]);
 								break;
 							case "needpassword":
-								t.sendEvent("asc_onError", Asc.c_oAscError.ID.ConvertationPassword, c_oAscError.Level.Critical);
+								t._onNeedParams(null, true);
 								break;
 							case "err":
 								t.sendEvent("asc_onError", AscCommon.mapAscServerErrorToAscError(parseInt(input["data"])), c_oAscError.Level.Critical);
@@ -891,6 +883,13 @@
 	};
 	baseEditorsApi.prototype._onEndLoadSdk = function()
 	{
+		// init drag&drop
+		var t = this;
+		AscCommon.InitDragAndDrop(this.HtmlElement, function(error, files)
+		{
+			t._uploadCallback(error, files);
+		});
+
 		AscFonts.g_fontApplication.Init();
 
 		this.FontLoader  = AscCommon.g_font_loader;
@@ -910,6 +909,8 @@
 		{
 			this.asc_enableKeyEvents(this.tmpFocus);
 		}
+
+		this.pluginsManager     = Asc.createPluginsManager(this);
 	};
 
 	baseEditorsApi.prototype.sendStandartTextures = function()
@@ -947,6 +948,18 @@
 	{
 		if (null != this.pluginsManager)
 			this.pluginsManager.buttonClick(id);
+	};
+
+	baseEditorsApi.prototype.asc_pluginEnableMouseEvents = function(isEnable)
+	{
+		if (!this.pluginsManager)
+			return;
+
+		var _pluginData = new Asc.CPluginData();
+		_pluginData.setAttribute("type", "enableMouseEvent");
+		_pluginData.setAttribute("isEnabled", isEnable);
+
+		this.pluginsManager.sendMessage(_pluginData);
 	};
 
 	// Builder
@@ -993,6 +1006,11 @@
 	baseEditorsApi.prototype.Input_UpdatePos = function()
 	{
 	};
+	baseEditorsApi.prototype.asc_InputClearKeyboardElement = function()
+	{
+		if (AscCommon.g_inputContext)
+			AscCommon.g_inputContext.nativeFocusElement = null;
+	};
 
 	baseEditorsApi.prototype.onKeyDown = function(e)
 	{
@@ -1002,6 +1020,18 @@
 	};
 	baseEditorsApi.prototype.onKeyUp = function(e)
 	{
+	};
+
+	// System input
+	baseEditorsApi.prototype.SetTextBoxInputMode = function(bIsEnable)
+	{
+		AscCommon.TextBoxInputMode = bIsEnable;
+		if (AscCommon.g_inputContext)
+			AscCommon.g_inputContext.systemInputEnable(AscCommon.TextBoxInputMode);
+	};
+	baseEditorsApi.prototype.GetTextBoxInputMode = function()
+	{
+		return AscCommon.TextBoxInputMode;
 	};
 
 	//----------------------------------------------------------export----------------------------------------------------

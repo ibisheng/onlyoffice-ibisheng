@@ -396,11 +396,11 @@ CDocumentContent.prototype.Set_CurrentElement              = function(Index, bUp
         this.Selection.EndPos   = ContentPos;
     }
 
-    this.Parent.Set_CurrentElement(bUpdateStates, this.Get_StartPage_Absolute());
+    this.Parent.Set_CurrentElement(bUpdateStates, this.Get_StartPage_Absolute(), this);
 };
 CDocumentContent.prototype.Is_ThisElementCurrent           = function()
 {
-    return this.Parent.Is_ThisElementCurrent();
+    return this.Parent.Is_ThisElementCurrent(this);
 };
 CDocumentContent.prototype.Content_GetPrev                 = function(Id)
 {
@@ -1101,6 +1101,16 @@ CDocumentContent.prototype.Recalculate_Page               = function(PageIndex, 
             this.Parent.OnEndRecalculate_Page(false);
     }
     return Result;
+};
+
+CDocumentContent.prototype.RecalculateContent = function(fWidth, fHeight, nStartPage)
+{
+    this.Set_StartPage(nStartPage);
+    this.Reset(0, 0, fWidth, 20000);
+    var nRecalcResult = recalcresult2_NextPage;
+    var nCurPage = 0;
+    while ( recalcresult2_End !== nRecalcResult  )
+        nRecalcResult = this.Recalculate_Page( nCurPage++, true );
 };
 CDocumentContent.prototype.Recalculate_MinMaxContentWidth = function(isRotated)
 {
@@ -2536,6 +2546,7 @@ CDocumentContent.prototype.Paragraph_Add                      = function(ParaIte
     {
         if (true === this.Selection.Use)
         {
+            var bAddSpace = this.LogicDocument ? this.LogicDocument.Is_WordSelection() : false;
             var Type = ParaItem.Get_Type();
             switch (Type)
             {
@@ -2545,10 +2556,22 @@ CDocumentContent.prototype.Paragraph_Add                      = function(ParaIte
                 case para_Space:
                 case para_Tab:
                 case para_PageNum:
+                case para_Field:
+                case para_FootnoteReference:
+                case para_FootnoteRef:
+                case para_Separator:
+                case para_ContinuationSeparator:
                 {
                     // Если у нас что-то заселекчено и мы вводим текст или пробел
                     // и т.д., тогда сначала удаляем весь селект.
                     this.Remove(1, true, false, true);
+
+                    if (true === bAddSpace)
+                    {
+                        this.Paragraph_Add(new ParaSpace());
+                        this.Cursor_MoveLeft(false, false);
+                    }
+
                     break;
                 }
                 case para_TextPr:
@@ -4096,14 +4119,14 @@ CDocumentContent.prototype.Is_TextSelectionUse                = function()
     return this.Is_SelectionUse();
 };
 // Возвращаем выделенный текст, если в выделении не более 1 параграфа, и там нет картинок, нумерации страниц и т.д.
-CDocumentContent.prototype.Get_SelectedText                   = function(bClearText)
+CDocumentContent.prototype.Get_SelectedText                   = function(bClearText, oPr)
 {
     if (true === this.ApplyToAll)
     {
         if (true === bClearText && this.Content.length <= 1)
         {
             this.Content[0].Set_ApplyToAll(true);
-            var ResultText = this.Content[0].Get_SelectedText(true);
+            var ResultText = this.Content[0].Get_SelectedText(true, oPr);
             this.Content[0].Set_ApplyToAll(false);
             return ResultText;
         }
@@ -4114,7 +4137,7 @@ CDocumentContent.prototype.Get_SelectedText                   = function(bClearT
             for (var Index = 0; Index < Count; Index++)
             {
                 this.Content[Index].Set_ApplyToAll(true);
-                ResultText += this.Content[Index].Get_SelectedText(false);
+                ResultText += this.Content[Index].Get_SelectedText(false, oPr);
                 this.Content[Index].Set_ApplyToAll(false);
             }
 
@@ -4124,7 +4147,7 @@ CDocumentContent.prototype.Get_SelectedText                   = function(bClearT
     else
     {
         if (docpostype_DrawingObjects === this.CurPos.Type)
-            return this.LogicDocument.DrawingObjects.getSelectedText(bClearText);
+            return this.LogicDocument.DrawingObjects.getSelectedText(bClearText, oPr);
 
         // Либо у нас нет выделения, либо выделение внутри одного элемента
         if (docpostype_Content == this.CurPos.Type && ( ( true === this.Selection.Use && selectionflag_Common === this.Selection.Flag ) || false === this.Selection.Use ))
@@ -4132,7 +4155,7 @@ CDocumentContent.prototype.Get_SelectedText                   = function(bClearT
             if (true === bClearText && (this.Selection.StartPos === this.Selection.EndPos || false === this.Selection.Use ))
             {
                 var Pos = ( true == this.Selection.Use ? this.Selection.StartPos : this.CurPos.ContentPos );
-                return this.Content[Pos].Get_SelectedText(true);
+                return this.Content[Pos].Get_SelectedText(true, oPr);
             }
             else if (false === bClearText)
             {
@@ -4143,7 +4166,7 @@ CDocumentContent.prototype.Get_SelectedText                   = function(bClearT
 
                 for (var Index = StartPos; Index <= EndPos; Index++)
                 {
-                    ResultText += this.Content[Index].Get_SelectedText(false);
+                    ResultText += this.Content[Index].Get_SelectedText(false, oPr);
                 }
 
                 return ResultText;
@@ -4439,10 +4462,10 @@ CDocumentContent.prototype.Insert_Content                     = function(Selecte
         }
 
         if (true === bNeedSelect)
-            this.Parent.Set_CurrentElement(false, this.Get_StartPage_Absolute());
+            this.Parent.Set_CurrentElement(false, this.Get_StartPage_Absolute(), this);
         else if (null !== this.LogicDocument && docpostype_HdrFtr === this.LogicDocument.CurPos.Type)
         {
-            this.Parent.Set_CurrentElement(false, this.Get_StartPage_Absolute());
+            this.Parent.Set_CurrentElement(false, this.Get_StartPage_Absolute(), this);
             var DocContent = this;
             var HdrFtr     = this.Is_HdrFtr(true);
             if (null !== HdrFtr)
@@ -7445,7 +7468,7 @@ CDocumentContent.prototype.Selection_SetStart = function(X, Y, CurPage, MouseEve
 
                 if (type_Paragraph === Item.GetType() && true === MouseEvent.CtrlKey)
                 {
-                    var Hyperlink = Item.Check_Hyperlink(X, Y, this.CurPage);
+                    var Hyperlink = Item.Check_Hyperlink(X, Y, ElementPageIndex);
                     if (null != Hyperlink)
                     {
                         this.Selection.Data =
@@ -7872,7 +7895,7 @@ CDocumentContent.prototype.Select_DrawingObject      = function(Id)
 {
     this.Selection_Remove();
 
-    this.Parent.Set_CurrentElement(true, this.Get_StartPage_Absolute() + this.CurPage);
+    this.Parent.Set_CurrentElement(true, this.Get_StartPage_Absolute() + this.CurPage, this);
 
     // Прячем курсор
     this.DrawingDocument.TargetEnd();
@@ -8405,6 +8428,10 @@ CDocumentContent.prototype.Set_StartPage          = function(StartPage)
 CDocumentContent.prototype.Get_Page_Relative      = function(AbsPage)
 {
     return Math.min(this.Pages.length - 1, Math.max(AbsPage - this.StartPage, 0));
+};
+CDocumentContent.prototype.Get_ColumnsCount      = function()
+{
+    return 1;
 };
 //-----------------------------------------------------------------------------------
 // Undo/Redo функции
@@ -9749,6 +9776,10 @@ CDocumentContent.prototype.Set_LogicDocument = function(oLogicDocument)
     this.Styles          = oLogicDocument.Get_Styles();
     this.Numbering       = oLogicDocument.Get_Numbering();
     this.DrawingObjects  = oLogicDocument.DrawingObjects;
+};
+CDocumentContent.prototype.Get_LogicDocument = function()
+{
+	return this.LogicDocument;
 };
 
 function CDocumentContentStartState(DocContent)

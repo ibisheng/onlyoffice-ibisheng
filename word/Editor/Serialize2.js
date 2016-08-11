@@ -5235,7 +5235,8 @@ function BinaryFileReader(doc, openParams)
 		aPostOpenStyleNumCallbacks: null,
 		headers: null,
 		footers: null,
-		trackRevisions: null
+		trackRevisions: null,
+		drawingToMath: null
 	};   
     
     this.getbase64DecodedData = function(szSrc)
@@ -5414,6 +5415,7 @@ function BinaryFileReader(doc, openParams)
 		this.oReadResult.aPostOpenStyleNumCallbacks = [];
 		this.oReadResult.headers = [];
 		this.oReadResult.footers = [];
+		this.oReadResult.drawingToMath = [];
 		
         var res = c_oSerConstants.ReadOk;
         //mtLen
@@ -5863,6 +5865,9 @@ function BinaryFileReader(doc, openParams)
 			// this.oReadResult.aPostOpenStyleNumCallbacks[i].call();
 		if (null != this.oReadResult.trackRevisions) {
 			this.Document.DrawingDocument.m_oWordControl.m_oApi.asc_SetTrackRevisions(this.oReadResult.trackRevisions);
+		}
+		for (var i = 0; i < this.oReadResult.drawingToMath.length; ++i) {
+			this.oReadResult.drawingToMath[i].Convert_ToMathObject(true);
 		}
         this.Document.On_EndLoad();
 		//чтобы удалялся stream с бинарником
@@ -8754,8 +8759,14 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 			res = this.bcr.Read1(length, function(t, l){
                 return oThis.ReadObject(t,l,oParStruct,oDrawing);
 			});
-			if(null != oDrawing.content.GraphicObj)
+			if (null != oDrawing.content.GraphicObj) {
 				oNewElem = oDrawing.content;
+				//todo do another check
+				if (oDrawing.ParaMath && oNewElem.GraphicObj.getImageUrl && 'image-1.jpg' === oNewElem.GraphicObj.getImageUrl()) {
+					//word 95 ole without image
+					this.oReadResult.drawingToMath.push(oNewElem);
+				}
+			}
 		}
         else if (c_oSerRunType.cr === type)
         {
@@ -9836,13 +9847,47 @@ function Binary_oMathReader(stream, oReadResult)
         }
 		else if (c_oSer_OMathContentType.Matrix === type)
         {
-			var oMatrix = {};
 			var arrContent = [];
 			props.mcs = [];
-			var oMatrCounter = {row:0, column:0};
             res = this.bcr.Read1(length, function(t, l){				
-                return oThis.ReadMathMatrix(t,l,props,oElem,oMatrix,arrContent,oMatrCounter);
-            });			
+				return oThis.ReadMathMatrix(t, l, props, arrContent);
+			});
+			if (oElem) {
+				//create props by content, important  before creation matrix
+				var rowMax = arrContent.length;
+				var colMax = 0;
+				for (var i = 0; i < arrContent.length; ++i) {
+					var row = arrContent[i];
+					if(colMax < row.length) {
+						colMax = row.length;
+					}
+				}
+				props.row = rowMax;
+				var colMaxMc = 0;
+				for (var i = 0; i < props.mcs.length; ++i) {
+					colMaxMc += props.mcs[i].count;
+				}
+				if (colMaxMc < colMax) {
+					props.mcs.push({count: colMax - colMaxMc, mcJc: MCJC_CENTER});
+				}
+				//create matrix
+				var oMatrix = new CMathMatrix(props);
+				initMathRevisions(oMatrix, props);
+				oElem.addElementToContent(oMatrix);
+				//read rows
+				var nOldPos = this.stream.GetCurPos();
+				for (var i = 0; i < arrContent.length; ++i) {
+					var row = arrContent[i];
+					for (var j = 0 ; j < row.length; ++j) {
+						var cell = row[j];
+						this.stream.Seek2(cell.pos);
+						res = this.bcr.Read1(cell.length, function(t, l){
+							return oThis.ReadMathArg(t, l, oMatrix.getElement(i, j));
+						});	
+					}
+				}
+				this.stream.Seek2(nOldPos);
+			}
         }			
 		else if (c_oSer_OMathContentType.Nary === type)
         {
@@ -10822,7 +10867,7 @@ function Binary_oMathReader(stream, oReadResult)
             res = c_oSerConstants.ReadUnknown;
         return res;
     };
-	this.ReadMathMatrix = function(type, length, props, oParent, oMatr, arrContent, oMatrCounter)
+	this.ReadMathMatrix = function(type, length, props, arrContent)
     {		
         var res = c_oSerConstants.ReadOk;
         var oThis = this;
@@ -10831,31 +10876,16 @@ function Binary_oMathReader(stream, oReadResult)
             res = this.bcr.Read1(length, function(t, l){
                 return oThis.ReadMathMPr(t,l,props);
             });			
-			var oMatrix = new CMathMatrix(props);
-            initMathRevisions(oMatrix, props);
-			if (oParent)
-				oParent.addElementToContent(oMatrix);
-			oMatr.content = oMatrix;
-			
-			var column = 0;
-			for (var i=0; i<props.mcs.length; i++)
-				column += props.mcs[i].count;
-			
-			
-			for(var i=0; i<props.row; i++)
-			{
-				arrContent[i] = [];
-				
-				for(var j=0; j<column; j++)
-					arrContent[i][j] = oMatrix.getElement(i,j);
-			}
         }
 		else if (c_oSer_OMathContentType.Mr === type)
         {
+			var row = [];
             res = this.bcr.Read1(length, function(t, l){
-                return oThis.ReadMathMr(t,l,oMatr.content, arrContent, oMatrCounter);
+				return oThis.ReadMathMr(t, l, row);
             });
-			oMatrCounter.row++;
+			if (row.length > 0) {
+				arrContent.push(row);
+			}
         }
         else
             res = c_oSerConstants.ReadUnknown;
@@ -11020,21 +11050,14 @@ function Binary_oMathReader(stream, oReadResult)
             res = c_oSerConstants.ReadUnknown;
         return res;
     };	
-	this.ReadMathMr = function(type, length, oMatrix, arrContent, oMatrCounter)
+	this.ReadMathMr = function(type, length, arrContent)
     {
         var res = c_oSerConstants.ReadOk;
         var oThis = this;
 		if (c_oSer_OMathContentType.Element === type)
         {
-			var lRow = oMatrCounter.row;
-			var lColumn = oMatrCounter.column;
-
-            res = this.bcr.Read1(length, function(t, l){
-                return oThis.ReadMathArg(t,l,arrContent[lRow][lColumn]);
-            });			
-			oMatrCounter.column++;
-			if ( oMatrix.nCol == oMatrCounter.column)
-				oMatrCounter.column = 0;
+			arrContent.push({pos: this.stream.GetCurPos(), length: length});
+			res = c_oSerConstants.ReadUnknown;
         }
         else
             res = c_oSerConstants.ReadUnknown;

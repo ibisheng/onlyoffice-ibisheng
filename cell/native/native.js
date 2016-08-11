@@ -4282,7 +4282,7 @@ function OfflineEditor () {
         var adjustPrint = asc_ReadAdjustPrint(s, p);
         var pagesData   = _api.wb.calcPagesPrint(adjustPrint);
         var pdfWriter   = new AscCommonExcel.CPdfPrinter();
-        var isEndPrint  = _api.wb.printSheet(pdfWriter, pagesData);
+        _api.wb.printSheets(pdfWriter, pagesData);
         return pdfWriter.DocumentRenderer.Memory.GetBase64Memory();
     };
 
@@ -5310,7 +5310,7 @@ function offline_mouse_down(x, y, pin, isViewerMode, isFormulaEditMode, isRangeR
     if (ct.target && ct.target === AscCommonExcel.c_oTargetType.FilterObject) {
         ws.af_setDialogProp(ct.idFilter);
         //var cell = offline_get_cell_in_coord(x, y);
-        return;
+        return {};
     }
 
     if (isRangeResize) {

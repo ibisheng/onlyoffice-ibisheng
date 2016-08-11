@@ -330,9 +330,9 @@ CDrawingsController.prototype.GetCurPosXY = function()
 {
 	return this.DrawingObjects.getCurPosXY();
 };
-CDrawingsController.prototype.GetSelectedText = function(bClearText)
+CDrawingsController.prototype.GetSelectedText = function(bClearText, oPr)
 {
-	return this.DrawingObjects.getSelectedText(bClearText);
+	return this.DrawingObjects.getSelectedText(bClearText, oPr);
 };
 CDrawingsController.prototype.GetCurrentParagraph = function()
 {
@@ -483,9 +483,9 @@ CDrawingsController.prototype.RestoreDocumentStateAfterLoadChanges = function(St
 {
 	if (true !== this.DrawingObjects.Load_DocumentStateAfterLoadChanges(State))
 	{
-		this.Set_DocPosType(docpostype_Content);
-
 		var LogicDocument = this.LogicDocument;
+		LogicDocument.Set_DocPosType(docpostype_Content);
+
 		var ContentPos = 0;
 		if (LogicDocument.Pages[LogicDocument.CurPage])
 			ContentPos = LogicDocument.Pages[LogicDocument.CurPage].Pos + 1;
@@ -496,6 +496,17 @@ CDrawingsController.prototype.RestoreDocumentStateAfterLoadChanges = function(St
 		LogicDocument.CurPos.ContentPos = ContentPos;
 		LogicDocument.Content[ContentPos].Cursor_MoveToStartPos(false);
 	}
+};
+CDrawingsController.prototype.GetColumnSize = function()
+{
+	// TODO: Переделать
+	var _w = Math.max(1, AscCommon.Page_Width - (AscCommon.X_Left_Margin + AscCommon.X_Right_Margin));
+	var _h = Math.max(1, AscCommon.Page_Height - (AscCommon.Y_Top_Margin + AscCommon.Y_Bottom_Margin));
+
+	return {
+		W : AscCommon.Page_Width - (AscCommon.X_Left_Margin + AscCommon.X_Right_Margin),
+		H : AscCommon.Page_Height - (AscCommon.Y_Top_Margin + AscCommon.Y_Bottom_Margin)
+	};
 };
 
 

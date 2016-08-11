@@ -1256,6 +1256,7 @@ function Workbook(eventsHandlers, oApi){
 	this.TableStyles = new Asc.CTableStyles();
 	this.oStyleManager = new AscCommonExcel.StyleManager();
 	this.aComments = [];	// Комментарии к документу
+	this.aCommentsCoords = [];
 	this.aWorksheets = [];
 	this.aWorksheetsById = {};
 	this.aCollaborativeActions = [];
@@ -1267,6 +1268,9 @@ function Workbook(eventsHandlers, oApi){
 	this.wsHandlers = null;
 
   this.openErrors = [];
+
+	this.maxDigitWidth = 0;
+	this.paddingPlusBorder = 0;
 }
 Workbook.prototype.init=function(bNoBuildDep){
 	if(this.nActive < 0)
@@ -1293,6 +1297,12 @@ Workbook.prototype.init=function(bNoBuildDep){
         var ws = this.aWorksheets[i];
         ws.initPostOpen(this.wsHandlers, bNoBuildDep);
     }
+	//show active if it hidden
+	var wsActive = this.getActiveWs();
+	if (wsActive && wsActive.getHidden()) {
+		wsActive.setHidden(false);
+	}
+
 	if(!bNoBuildDep){
 		this.dependencyFormulas.calcTree();
 	}
@@ -2018,6 +2028,17 @@ Workbook.prototype.getTableNameColumnByIndex = function(tableName, columnIndex){
 	};
 	Workbook.prototype.sortDependency = function (setCellFormat) {
 		this.dependencyFormulas.calcTree();
+	};
+	/**
+	 * Вычисляет ширину столбца для заданного количества символов
+	 * @param {Number} count  Количество символов
+	 * @returns {Number}      Ширина столбца в символах
+	 */
+	Workbook.prototype.charCountToModelColWidth = function (count) {
+		if (count <= 0) {
+			return 0;
+		}
+		return Asc.floor((count * this.maxDigitWidth + this.paddingPlusBorder) / this.maxDigitWidth * 256) / 256;
 	};
 //-------------------------------------------------------------------------------------------------
 /**
@@ -3010,6 +3031,9 @@ Woorksheet.prototype.getDefaultFontName=function(){
 Woorksheet.prototype.getDefaultFontSize=function(){
 	return this.workbook.getDefaultSize();
 };
+Woorksheet.prototype.charCountToModelColWidth = function (count) {
+	return this.workbook.charCountToModelColWidth(count);
+};
 Woorksheet.prototype.getColWidth=function(index){
 	//index 0 based
 	//Результат в пунктах
@@ -3023,8 +3047,10 @@ Woorksheet.prototype.getColWidth=function(index){
 	return dResult;
 };
 Woorksheet.prototype.setColWidth=function(width, start, stop){
+	width = this.charCountToModelColWidth(width);
 	if(0 == width)
 		return this.setColHidden(true, start, stop);
+
 	//start, stop 0 based
 	if(null == start)
 		return;
@@ -3964,7 +3990,12 @@ Woorksheet.prototype._shiftCellsBottom=function(oBBox, displayNameFormatTable){
 	this.renameDependencyNodes({offsetRow:dif,offsetCol:0}, oBBox);
 	
 	History.Add(AscCommonExcel.g_oUndoRedoWorksheet, AscCH.historyitem_Worksheet_ShiftCellsBottom, this.getId(), new Asc.Range(oBBox.c1, oBBox.r1, oBBox.c2, gc_nMaxRow0), new UndoRedoData_BBox(oBBox));
-    this.autoFilters.insertRows( "insCell", oBBox, c_oAscInsertOptions.InsertCellsAndShiftDown, displayNameFormatTable );
+	
+	if(!this.workbook.bUndoChanges)
+	{
+		this.autoFilters.insertRows( "insCell", oBBox, c_oAscInsertOptions.InsertCellsAndShiftDown, displayNameFormatTable );
+	}
+    
 };
 Woorksheet.prototype._setIndex=function(ind){
 	this.index = ind;

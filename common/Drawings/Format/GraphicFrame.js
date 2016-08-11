@@ -181,6 +181,7 @@ CGraphicFrame.prototype.setGraphicObject= function(graphicObject)
         if(this.graphicObject)
         {
             this.graphicObject.Index = 0;
+            this.graphicObject.Parent = this;
         }
 };
 
@@ -1093,6 +1094,7 @@ CGraphicFrame.prototype.Undo = function(data)
                 if(this.graphicObject)
                 {
                     this.graphicObject.Index = 0;
+                    this.graphicObject.Parent = this;
                 }
                 break;
             }
@@ -1139,6 +1141,7 @@ CGraphicFrame.prototype.Redo = function(data)
                 if(this.graphicObject)
                 {
                     this.graphicObject.Index = 0;
+                    this.graphicObject.Parent = this;
                 }
                 break;
             }
@@ -1213,6 +1216,7 @@ CGraphicFrame.prototype.Load_Changes = function(r)
                 if(this.graphicObject)
                 {
                     this.graphicObject.Index = 0;
+                    this.graphicObject.Parent = this;
                 }
                 break;
             }

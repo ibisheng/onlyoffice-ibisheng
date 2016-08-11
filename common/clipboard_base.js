@@ -85,6 +85,9 @@
 
 		this.CopyPasteFocus = false;
 		this.CopyPasteFocusTimer = -1;
+
+		this.inputContext = null;
+		this.LastCopyBinary = null; // для вставки по кнопке, еогда браузер не позволяет
 	}
 
 	CClipboardBase.prototype =
@@ -108,7 +111,13 @@
 			}
 			else
 			{
+				this.LastCopyBinary = null;
 				this.Api.asc_CheckCopy(this, AscCommon.c_oAscClipboardDataFormat.Text | AscCommon.c_oAscClipboardDataFormat.Html | AscCommon.c_oAscClipboardDataFormat.Internal);
+
+				setTimeout(function(){
+					g_clipboardBase.EndFocus();
+				}, 0);
+
 				e.preventDefault();
 				return false;
 			}
@@ -128,6 +137,7 @@
 			}
 			else
 			{
+				this.LastCopyBinary = null;
 				this.Api.asc_CheckCopy(this, AscCommon.c_oAscClipboardDataFormat.Text | AscCommon.c_oAscClipboardDataFormat.Html | AscCommon.c_oAscClipboardDataFormat.Internal);
 			}
 
@@ -135,6 +145,10 @@
 
 			if (!this.IsNeedDivOnCopy)
 			{
+				setTimeout(function(){
+					g_clipboardBase.EndFocus();
+				}, 0);
+
 				e.preventDefault();
 				return false;
 			}
@@ -494,7 +508,6 @@
 
 				setInterval(function()
 				{
-
 					if (g_clipboardBase.Api.asc_IsFocus(true))
 						g_clipboardBase.CommonDiv.focus();
 
@@ -510,7 +523,7 @@
 		StartFocus : function()
 		{
 			// не плодим таймеры
-			this.EndFocus();
+			this.EndFocus(false);
 
 			this.CopyPasteFocus = true;
 
@@ -523,13 +536,20 @@
 
 		},
 
-		EndFocus : function()
+		EndFocus : function(isFocusToEditor)
 		{
 			this.CopyPasteFocus = false;
 			if (-1 != this.CopyPasteFocusTimer)
 			{
 				clearTimeout(this.CopyPasteFocusTimer);
 				this.CopyPasteFocusTimer = -1;
+
+
+				if (false !== isFocusToEditor && null != this.inputContext)
+				{
+					if (this.inputContext.HtmlArea)
+						this.inputContext.HtmlArea.focus();
+				}
 			}
 		},
 
@@ -662,7 +682,8 @@
 			this.CommonDiv_Start();
 
 			this.ClosureParams.isDivCopy = true;
-			this.Api.asc_CheckCopy(this, AscCommon.c_oAscClipboardDataFormat.Html);
+			this.LastCopyBinary = null;
+			this.Api.asc_CheckCopy(this, AscCommon.c_oAscClipboardDataFormat.Text | AscCommon.c_oAscClipboardDataFormat.Html | AscCommon.c_oAscClipboardDataFormat.Internal);
 			this.ClosureParams.isDivCopy = false;
 
 			this.CommonDiv_Select();
@@ -744,6 +765,10 @@
 
 		pushData : function(_format, _data)
 		{
+			if (null == this.LastCopyBinary)
+				this.LastCopyBinary = [];
+			this.LastCopyBinary.push({ type: _format, data : _data });
+
 			if (this.ClosureParams.isDivCopy === true)
 			{
 				if (_format == AscCommon.c_oAscClipboardDataFormat.Html)
@@ -778,19 +803,59 @@
 
 		Button_Copy : function()
 		{
+			if (this.inputContext)
+				this.inputContext.HtmlArea.focus();
+			this.Api.asc_enableKeyEvents(true, true);
+
 			this.CommonDiv_Execute_CopyCut();
-			return document.execCommand("copy");
+			var _ret = document.execCommand("copy");
+			if (!_ret)
+			{
+				//　копирования не было
+				this.LastCopyBinary = null;
+				this.Api.asc_CheckCopy(this, AscCommon.c_oAscClipboardDataFormat.Text | AscCommon.c_oAscClipboardDataFormat.Html | AscCommon.c_oAscClipboardDataFormat.Internal);
+			}
+			return  _ret;
 		},
 
 		Button_Cut : function()
 		{
+			if (this.inputContext)
+				this.inputContext.HtmlArea.focus();
+			this.Api.asc_enableKeyEvents(true, true);
+
 			this.CommonDiv_Execute_CopyCut();
-			return document.execCommand("cut");
+			var _ret = document.execCommand("cut");
+			if (!_ret)
+			{
+				//　копирования не было
+				this.LastCopyBinary = null;
+				this.Api.asc_CheckCopy(this, AscCommon.c_oAscClipboardDataFormat.Text | AscCommon.c_oAscClipboardDataFormat.Html | AscCommon.c_oAscClipboardDataFormat.Internal);
+
+				this.Api.asc_SelectionCut();
+			}
+			return _ret;
 		},
 
 		Button_Paste : function()
 		{
-			return document.execCommand("paste");
+			if (this.inputContext)
+				this.inputContext.HtmlArea.focus();
+			this.Api.asc_enableKeyEvents(true, true);
+
+			var _ret = document.execCommand("paste");
+			if (!_ret && null != this.LastCopyBinary)
+			{
+				var _data = null;
+				for (var i = 0; i < this.LastCopyBinary.length; i++)
+				{
+					if (c_oAscClipboardDataFormat.Internal == this.LastCopyBinary[i].type)
+					{
+						this.Api.asc_PasteData(AscCommon.c_oAscClipboardDataFormat.Internal, this.LastCopyBinary[i].data);
+					}
+				}
+			}
+			return _ret;
 		}
 	};
 

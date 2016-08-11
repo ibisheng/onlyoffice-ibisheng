@@ -304,8 +304,9 @@ CTable.prototype =
             var Border_insideH = null;
             var Border_insideV = null;
 
-            var CellShd   = null;
-            var CellWidth = undefined;
+			var CellShd        = null;
+			var CellWidth      = undefined;
+			var CellWidthStart = undefined;
 
             var Prev_row = -1;
             var bFirstRow = true;
@@ -360,6 +361,8 @@ CTable.prototype =
 						CellWidth = Cell_w.W;
 					else// if (tblwidth_Pct === Cell_w.Type)
 						CellWidth = -Cell_w.W;
+
+					CellWidthStart = CellWidth;
 				}
 				else
 				{
@@ -487,7 +490,18 @@ CTable.prototype =
             Pr.CellsVAlign = VAlign;
             Pr.CellsTextDirection = TextDirection;
             Pr.CellsNoWrap        = NoWrap;
-            Pr.CellsWidth         = CellWidth;
+
+			if (undefined === CellWidth)
+			{
+				Pr.CellsWidth         = CellWidthStart;
+				Pr.CellsWidthNotEqual = true;
+			}
+			else
+			{
+				Pr.CellsWidth         = CellWidthStart;
+				Pr.CellsWidthNotEqual = false;
+			}
+
 
             Pr.CellBorders =
             {
@@ -568,6 +582,8 @@ CTable.prototype =
                 Pr.CellsWidth = CellW.W;
             else// if (tblwidth_Pct === CellW.Type)
                 Pr.CellsWidth = -CellW.W;
+
+			Pr.CellsWidthNotEqual = false;
 
             var Spacing = this.Content[0].Get_CellSpacing();
 
@@ -2198,7 +2214,7 @@ CTable.prototype =
             }
         }
 
-        Pos.X += this.Get_TableOffsetCorrection();
+		Pos.X = this.Pages[CurPage].X;
 
         Y += MaxTopBorder;
         
@@ -7973,10 +7989,10 @@ CTable.prototype =
         return false;
     },
 
-    Get_SelectedText : function(bClearText)
+    Get_SelectedText : function(bClearText, oPr)
     {
         if ( true === bClearText && ( (true == this.Selection.Use && table_Selection_Text == this.Selection.Type) || false === this.Selection.Use ) )
-            return this.CurCell.Content.Get_SelectedText(true);
+            return this.CurCell.Content.Get_SelectedText(true, oPr);
         else if ( false === bClearText )
         {
             if ( true === this.Selection.Use && table_Selection_Cell === this.Selection.Type )
@@ -7989,14 +8005,14 @@ CTable.prototype =
                     var Cell = this.Content[Pos.Row].Get_Cell( Pos.Cell );
 
                     Cell.Content.Set_ApplyToAll( true );
-                    ResultText += Cell.Content.Get_SelectedText( false );
+                    ResultText += Cell.Content.Get_SelectedText( false, oPr );
                     Cell.Content.Set_ApplyToAll( false );
                 }
 
                 return ResultText;
             }
             else
-                return this.CurCell.Content.Get_SelectedText(false);
+                return this.CurCell.Content.Get_SelectedText(false, oPr);
         }
 
         return null;
@@ -12626,7 +12642,7 @@ CTable.prototype =
             TableGrid_min[Index] = SumGrid_min[Index] - SumGrid_min[Index - 1];
 
         var CurrentW = SumGrid[SumGrid.length - 1];
-        while ( Grids_to_scale_count > 0 )
+        while ( Grids_to_scale_count > 0 && CurrentW > 0.001 )
         {
             // Пробуем ужать колонки таблицы
             var Koef = TableW / CurrentW;

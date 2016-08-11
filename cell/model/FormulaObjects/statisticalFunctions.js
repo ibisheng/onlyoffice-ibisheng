@@ -1107,119 +1107,103 @@ cCOUNTA.prototype.getInfo = function () {
     };
 };
 
-function cCOUNTBLANK() {
-//    cBaseFunction.call( this, "COUNTBLANK" );
-//    this.setArgumentsMin( 1 );
-//    this.setArgumentsMax( 1 );
-//    this.setFormat( this.formatType.noneFormat );
+    function cCOUNTBLANK() {
+        this.name = "COUNTBLANK";
+        this.type = cElementType.func;
+        this.value = null;
+        this.argumentsMin = 1;
+        this.argumentsCurrent = 0;
+        this.argumentsMax = 1;
+        this.formatType = {
+            def: -1, //подразумевается формат первой ячейки входящей в формулу.
+            noneFormat: -2
+        };
+        this.numFormat = this.formatType.noneFormat;
 
-    this.name = "COUNTBLANK";
-    this.type = cElementType.func;
-    this.value = null;
-    this.argumentsMin = 1;
-    this.argumentsCurrent = 0;
-    this.argumentsMax = 1;
-    this.formatType = {
-        def:-1, //подразумевается формат первой ячейки входящей в формулу.
-        noneFormat:-2
-    };
-    this.numFormat = this.formatType.noneFormat;
-
-}
-
-cCOUNTBLANK.prototype = Object.create( cBaseFunction.prototype );
-cCOUNTBLANK.prototype.Calculate = function ( arg ) {
-    var arg0 = arg[0];
-    if ( arg0 instanceof cArea || arg0 instanceof cArea3D )
-        return this.value = arg0.countCells();
-    else if ( arg0 instanceof cRef || arg0 instanceof cRef3D ) {
-        return this.value = new cNumber( 1 );
-    }
-    else
-        return this.value = new cError( cErrorType.bad_reference );
-};
-cCOUNTBLANK.prototype.getInfo = function () {
-    return {
-        name:this.name,
-        args:"( argument-list )"
-    };
-};
-
-function cCOUNTIF() {
-//    cBaseFunction.call( this, "COUNTIF" );
-//    this.setArgumentsMin( 2 );
-//    this.setArgumentsMax( 2 );
-
-    this.name = "COUNTIF";
-    this.type = cElementType.func;
-    this.value = null;
-    this.argumentsMin = 2;
-    this.argumentsCurrent = 0;
-    this.argumentsMax = 2;
-    this.formatType = {
-        def:-1, //подразумевается формат первой ячейки входящей в формулу.
-        noneFormat:-2
-    };
-    this.numFormat = this.formatType.def;
-
-}
-
-cCOUNTIF.prototype = Object.create( cBaseFunction.prototype );
-cCOUNTIF.prototype.Calculate = function ( arg ) {
-    var arg0 = arg[0], arg1 = arg[1], _count = 0, valueForSearching;
-    if ( !(arg0 instanceof cRef || arg0 instanceof cRef3D || arg0 instanceof cArea || arg0 instanceof cArea3D) ) {
-        return this.value = new cError( cErrorType.wrong_value_type );
     }
 
-    if ( arg1 instanceof cArea || arg1 instanceof cArea3D ) {
-        arg1 = arg1.cross( arguments[1].first );
-    }
-    else if ( arg1 instanceof cArray ) {
-        arg1 = arg1.getElementRowCol( 0, 0 );
-    }
-
-    arg1 = arg1.tocString();
-
-    if ( !(arg1 instanceof cString) ) {
-        return this.value = new cError( cErrorType.wrong_value_type );
-    }
-
-    arg1 = arg1.toString();
-    var operators = new RegExp( "^ *[<=> ]+ *" ), search, oper, val,
-        match = arg1.match( operators );
-
-    if ( match ) {
-        search = arg1.substr( match[0].length );
-        oper = match[0].replace( /\s/g, "" );
-    }
-    else {
-        search = arg1;
-    }
-    valueForSearching = parseNum( search ) ? new cNumber( search ) : new cString( search );
-    if ( arg0 instanceof cArea ) {
-        arg0.foreach2( function ( _val ) {
-            _count += matching( _val, valueForSearching, oper );
-        } )
-    }
-    else if ( arg0 instanceof cArea3D ) {
-        val = arg0.getValue();
-        for ( var i = 0; i < val.length; i++ ) {
-            _count += matching( val[i], valueForSearching, oper );
+    cCOUNTBLANK.prototype = Object.create(cBaseFunction.prototype);
+    cCOUNTBLANK.prototype.Calculate = function (arg) {
+        var arg0 = arg[0];
+        if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
+            return this.value = arg0.countCells();
+        } else if (arg0 instanceof cRef || arg0 instanceof cRef3D) {
+            return this.value = new cNumber(1);
+        } else {
+            return this.value = new cError(cErrorType.bad_reference);
         }
-    }
-    else {
-        val = arg0.getValue();
-        _count += matching( val, valueForSearching, oper );
+    };
+    cCOUNTBLANK.prototype.getInfo = function () {
+        return {
+            name: this.name, args: "( argument-list )"
+        };
+    };
+
+    function cCOUNTIF() {
+        this.name = "COUNTIF";
+        this.type = cElementType.func;
+        this.value = null;
+        this.argumentsMin = 2;
+        this.argumentsCurrent = 0;
+        this.argumentsMax = 2;
+        this.formatType = {
+            def: -1, //подразумевается формат первой ячейки входящей в формулу.
+            noneFormat: -2
+        };
+        this.numFormat = this.formatType.def;
+
     }
 
-    return this.value = new cNumber( _count );
-};
-cCOUNTIF.prototype.getInfo = function () {
-    return {
-        name:this.name,
-        args:"( cell-range, selection-criteria )"
+    cCOUNTIF.prototype = Object.create(cBaseFunction.prototype);
+    cCOUNTIF.prototype.Calculate = function (arg) {
+        var arg0 = arg[0], arg1 = arg[1], _count = 0, valueForSearching;
+        if (!(arg0 instanceof cRef || arg0 instanceof cRef3D || arg0 instanceof cArea || arg0 instanceof cArea3D)) {
+            return this.value = new cError(cErrorType.wrong_value_type);
+        }
+
+        if (arg1 instanceof cArea || arg1 instanceof cArea3D) {
+            arg1 = arg1.cross(arguments[1].first);
+        } else if (arg1 instanceof cArray) {
+            arg1 = arg1.getElementRowCol(0, 0);
+        }
+
+        arg1 = arg1.tocString();
+
+        if (!(arg1 instanceof cString)) {
+            return this.value = new cError(cErrorType.wrong_value_type);
+        }
+
+        arg1 = arg1.toString();
+        var operators = new RegExp("^ *[<=> ]+ *"), search, oper, val, match = arg1.match(operators);
+
+        if (match) {
+            search = arg1.substr(match[0].length);
+            oper = match[0].replace(/\s/g, "");
+        } else {
+            search = arg1;
+        }
+        valueForSearching = parseNum(search) ? new cNumber(search) : new cString(search);
+        if (arg0 instanceof cArea) {
+            arg0.foreach2(function (_val) {
+                _count += matching(_val, valueForSearching, oper);
+            })
+        } else if (arg0 instanceof cArea3D) {
+            val = arg0.getValue();
+            for (var i = 0; i < val.length; i++) {
+                _count += matching(val[i], valueForSearching, oper);
+            }
+        } else {
+            val = arg0.getValue();
+            _count += matching(val, valueForSearching, oper);
+        }
+
+        return this.value = new cNumber(_count);
     };
-};
+    cCOUNTIF.prototype.getInfo = function () {
+        return {
+            name: this.name, args: "( cell-range, selection-criteria )"
+        };
+    };
 
 function cCOUNTIFS() {
     cBaseFunction.call( this, "COUNTIFS" );

@@ -153,6 +153,8 @@ CWordCollaborativeEditing.prototype.Send_Changes = function(IsUserSave, Addition
         editor.WordControl.m_oLogicDocument.DrawingDocument.ClearCachePages();
         editor.WordControl.m_oLogicDocument.DrawingDocument.FirePaint();
     }
+
+    editor.WordControl.m_oLogicDocument.Check_CompositeInputRun();
 };
 CWordCollaborativeEditing.prototype.Release_Locks = function()
 {

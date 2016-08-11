@@ -897,12 +897,16 @@ CAbstractNum.prototype =
         var nPos     = 0;
         while (-1 !== (nPos = sFormatText.indexOf("%", nPos)) && nPos < sFormatText.length)
         {
-            if (nPos < sFormatText.length - 1 && sFormatText.charCodeAt(nPos + 1) >= 48 && sFormatText.charCodeAt(nPos + 1) <= 48 + iLvl)
+            if (nPos < sFormatText.length - 1 && sFormatText.charCodeAt(nPos + 1) >= 49 && sFormatText.charCodeAt(nPos + 1) <= 49 + iLvl)
             {
                 if (nPos > nLastPos)
-                    Lvl.LvlText.push(new CLvlText_Text(sFormatText.substring(nLastPos, nPos)));
+                {
+                    var sSubString = sFormatText.substring(nLastPos, nPos);
+                    for (var nSubIndex = 0, nSubLen = sSubString.length; nSubIndex < nSubLen; ++nSubIndex)
+                        Lvl.LvlText.push(new CLvlText_Text(sSubString.charAt(nSubIndex)));
+                }
 
-                Lvl.LvlText.push(new CLvlText_Num(sFormatText.charCodeAt(nPos + 1) - 48));
+                Lvl.LvlText.push(new CLvlText_Num(sFormatText.charCodeAt(nPos + 1) - 49));
                 nPos += 2;
                 nLastPos = nPos;
             }
@@ -913,7 +917,11 @@ CAbstractNum.prototype =
         }
         nPos = sFormatText.length;
         if (nPos > nLastPos)
-            Lvl.LvlText.push(new CLvlText_Text(sFormatText.substring(nLastPos, nPos)));
+        {
+            var sSubString = sFormatText.substring(nLastPos, nPos);
+            for (var nSubIndex = 0, nSubLen = sSubString.length; nSubIndex < nSubLen; ++nSubIndex)
+                Lvl.LvlText.push(new CLvlText_Text(sSubString.charAt(nSubIndex)));
+        }
 
         Lvl.TextPr = new CTextPr();
 

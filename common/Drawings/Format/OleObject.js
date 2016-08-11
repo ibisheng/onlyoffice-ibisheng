@@ -45,6 +45,8 @@ function (window, undefined) {
         this.m_sApplicationId = null;
         this.m_nPixWidth = null;
         this.m_nPixHeight = null;
+        this.m_fDefaultSizeX = null;
+        this.m_fDefaultSizeY = null;
         this.Id = AscCommon.g_oIdCounter.Get_NewId();
         AscCommon.g_oTableId.Add( this, this.Id );
     }
@@ -103,6 +105,19 @@ function (window, undefined) {
         copy.cachedPixH = this.cachedPixH;
         copy.cachedPixW = this.cachedPixW;
         return copy;
+    };
+
+
+    COleObject.prototype.handleUpdateExtents = function(){
+        if(!AscFormat.isRealNumber(this.m_fDefaultSizeX) || !AscFormat.isRealNumber(this.m_fDefaultSizeY)){
+            if(this.spPr && this.spPr.xfrm && AscFormat.isRealNumber(this.spPr.xfrm.extX) && AscFormat.isRealNumber(this.spPr.xfrm.extY)){
+                this.m_fDefaultSizeX = this.spPr.xfrm.extX;
+                this.m_fDefaultSizeY = this.spPr.xfrm.extY;
+            }
+        }
+        if(AscFormat.CImageShape.prototype.handleUpdateExtents){
+            AscFormat.CImageShape.prototype.handleUpdateExtents.call(this, []);
+        }
     };
         window['AscFormat'] = window['AscFormat'] || {};
         window['AscFormat'].COleObject = COleObject;

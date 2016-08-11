@@ -117,6 +117,12 @@ Slide.prototype =
         return editor.WordControl.m_oLogicDocument.DrawingDocument;
     },
 
+    Reassign_ImageUrls: function(images_rename){
+        for(var i = 0; i < this.cSld.spTree.length; ++i){
+            this.cSld.spTree[i].Reassign_ImageUrls(images_rename);
+        }
+    },
+
     createDuplicate: function()
     {
         var copy = new Slide(this.presentation, this.Layout, 0), i;
@@ -942,7 +948,7 @@ Slide.prototype =
         return oRet;
     },
 
-    getAllImages: function(images)
+    Get_AllImageUrls: function(images)
     {
         if(this.cSld.Bg && this.cSld.Bg.bgPr && this.cSld.Bg.bgPr.Fill && this.cSld.Bg.bgPr.Fill.fill instanceof  AscFormat.CBlipFill && typeof this.cSld.Bg.bgPr.Fill.fill.RasterImageId === "string" )
         {
@@ -953,6 +959,20 @@ Slide.prototype =
             if(typeof this.cSld.spTree[i].getAllImages === "function")
             {
                 this.cSld.spTree[i].getAllImages(images);
+            }
+        }
+    },
+
+    getAllRasterImages: function(images){
+        if(this.cSld.Bg && this.cSld.Bg.bgPr && this.cSld.Bg.bgPr.Fill && this.cSld.Bg.bgPr.Fill.fill instanceof  AscFormat.CBlipFill && typeof this.cSld.Bg.bgPr.Fill.fill.RasterImageId === "string" )
+        {
+            images.push(AscCommon.getFullImageSrc2(this.cSld.Bg.bgPr.Fill.fill.RasterImageId));
+        }
+        for(var i = 0; i < this.cSld.spTree.length; ++i)
+        {
+            if(typeof this.cSld.spTree[i].getAllRasterImages === "function")
+            {
+                this.cSld.spTree[i].getAllRasterImages(images);
             }
         }
     },

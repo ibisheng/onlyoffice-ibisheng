@@ -6221,6 +6221,9 @@ Paragraph.prototype =
 
                     this.Selection.Use = true;
                     this.Set_SelectionContentPos( StartPos, EndPos );
+
+                    if (this.LogicDocument)
+                        this.LogicDocument.Set_WordSelection();
                 }
                 else // ( 1 == ClickCounter % 2 )
                 {
@@ -6884,13 +6887,13 @@ Paragraph.prototype =
     },
 
     // Возвращаем выделенный текст
-    Get_SelectedText : function(bClearText)
+    Get_SelectedText : function(bClearText, oPr)
     {
         var Str = "";
         var Count = this.Content.length;        
         for ( var Pos = 0; Pos < Count; Pos++ )
         {
-            var _Str = this.Content[Pos].Get_SelectedText( true === this.ApplyToAll, bClearText );
+            var _Str = this.Content[Pos].Get_SelectedText( true === this.ApplyToAll, bClearText, oPr );
 
             if ( null === _Str )
                 return null;
@@ -7850,12 +7853,18 @@ Paragraph.prototype =
                     Pr.ParaPr.Spacing.After = 0;
                 }
             }
+			else if (true === this.Parent.Is_TableCellContent() && true === Pr.ParaPr.Spacing.AfterAutoSpacing)
+			{
+				Pr.ParaPr.Spacing.After = 0;
+			}
             else if(!(this.bFromDocument === true))
             {
                 Pr.ParaPr.Spacing.After = 0;
             }
             else
-                Pr.ParaPr.Spacing.After = this.Internal_CalculateAutoSpacing( Pr.ParaPr.Spacing.After, Pr.ParaPr.Spacing.AfterAutoSpacing, this );
+			{
+				Pr.ParaPr.Spacing.After = this.Internal_CalculateAutoSpacing(Pr.ParaPr.Spacing.After, Pr.ParaPr.Spacing.AfterAutoSpacing, this);
+			}
         }
 
         return Pr;

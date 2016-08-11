@@ -623,12 +623,12 @@ CTableStructure.prototype.Recalculate = function(oTheme, oColorMap, dWidth, dHei
     var i;
     for(i = 0; i < this.m_aContent.length; ++i)
     {
-        this.m_aContent[i].Recalculate(oTheme, oColorMap, dWidth, dHeight, oShape);
+        this.m_aContent[i].Recalculate(oTheme, oColorMap, dWidth, dHeight, oShape, true);
     }
 
     for(i = 0; i < this.m_aBorders.length; ++i)
     {
-        this.m_aBorders[i].Recalculate(oTheme, oColorMap, dWidth, dHeight, oShape);
+        this.m_aBorders[i].Recalculate(oTheme, oColorMap, dWidth, dHeight, oShape, true);
     }
 };
 CTableStructure.prototype.CheckContentStructs = function(aContentStructs)
@@ -680,23 +680,23 @@ CLineStructure.prototype.Recalculate = function(oTheme, oColorMap, dWidth, dHeig
     var i;
     for(i = 0; i < this.m_aContent.length; ++i)
     {
-        this.m_aContent[i].Recalculate(oTheme, oColorMap, dWidth, dHeight, oShape);
+        this.m_aContent[i].Recalculate(oTheme, oColorMap, dWidth, dHeight, oShape, true);
     }
     for(i = 0; i < this.m_aBorders.length; ++i)
     {
-        this.m_aBorders[i].Recalculate(oTheme, oColorMap, dWidth, dHeight, oShape);
+        this.m_aBorders[i].Recalculate(oTheme, oColorMap, dWidth, dHeight, oShape, true);
     }
     for(i = 0; i < this.m_aBackgrounds.length; ++i)
     {
-        this.m_aBackgrounds[i].Recalculate(oTheme, oColorMap, dWidth, dHeight, oShape);
+        this.m_aBackgrounds[i].Recalculate(oTheme, oColorMap, dWidth, dHeight, oShape, true);
     }
     for(i = 0; i < this.m_aUnderlinesStrikeouts.length; ++i)
     {
-        this.m_aUnderlinesStrikeouts[i].Recalculate(oTheme, oColorMap, dWidth, dHeight, oShape);
+        this.m_aUnderlinesStrikeouts[i].Recalculate(oTheme, oColorMap, dWidth, dHeight, oShape, true);
     }
     for(i = 0; i < this.m_aParagraphBackgrounds.length; ++i)
     {
-        this.m_aParagraphBackgrounds[i].Recalculate(oTheme, oColorMap, dWidth, dHeight, oShape);
+        this.m_aParagraphBackgrounds[i].Recalculate(oTheme, oColorMap, dWidth, dHeight, oShape, true);
     }
 };
 

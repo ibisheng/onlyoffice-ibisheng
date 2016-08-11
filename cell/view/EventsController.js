@@ -786,12 +786,8 @@
 					break;
 
 				case 27: // Esc
-					// (https://bugzilla.mozilla.org/show_bug.cgi?id=614304) - баг в Mozilla: Esc abort XMLHttpRequest and WebSocket
-					// http://bugzserver/show_bug.cgi?id=14631 - наш баг на редактор
-					// Перехватим Esc и отключим дефалтовую обработку
-					stop();
 					t.handlers.trigger("stopFormatPainter");
-                    t.handlers.trigger("stopAddShape");
+					t.handlers.trigger("stopAddShape");
 					return result;
 
 				case 144: //Num Lock
@@ -892,14 +888,11 @@
 				case 73: // make italic			Ctrl + i
 				//case 83: // save				Ctrl + s
 				case 85: // make underline		Ctrl + u
-				//case 86: // paste				Ctrl + v
-				//case 88: // cut					Ctrl + x
 				case 89: // redo				Ctrl + y
 				case 90: // undo				Ctrl + z
 					if (isViewerMode || t.isSelectionDialogMode) {stop(); return result;}
 
 				case 65: // select all      Ctrl + a
-				//case 67: // copy            Ctrl + c
 					//if (t.handlers.trigger("getCellEditMode")) { return true; }
 
 				case 80: // print           Ctrl + p
@@ -907,8 +900,7 @@
 
 					if (!ctrlKey) { t.skipKeyPress = false; return true; }
 
-					if (67 !== event.which && 86 !== event.which && 88 !== event.which)
-						stop();
+					stop();
 
 					// Вызовем обработчик
 					if (!t.__handlers) {
@@ -921,32 +913,6 @@
 							85: function () {t.handlers.trigger("setFontAttributes", "u");},
 							80: function () {t.handlers.trigger("print");},
 							//83: function () {t.handlers.trigger("save");},
-							//67: function () {t.handlers.trigger("copy");},
-							/*86: function () {
-								if (!window.GlobalPasteFlag)
-								{
-									if (!AscBrowser.isSafariMacOs)
-									{
-										window.GlobalPasteFlag = true;
-										t.handlers.trigger("paste");
-									}
-									else
-									{
-										if (0 === window.GlobalPasteFlagCounter)
-										{
-											AscCommonExcel.SafariIntervalFocus2();
-											window.GlobalPasteFlag = true;
-											t.handlers.trigger("paste");
-										}
-									}
-								}
-								else
-								{
-									if (!AscBrowser.isSafariMacOs)
-										stop();
-								}
-							},*/
-							//88: function () {t.handlers.trigger("cut");},
 							89: function () {t.handlers.trigger("redo");},
 							90: function () {t.handlers.trigger("undo");}
 						};
@@ -1546,31 +1512,26 @@
 		/** @param event */
 		asc_CEventsController.prototype._getCoordinates = function (event) {
 			// ToDo стоит переделать
-			if (event.coord)
+			if (event.coord) {
 				return event.coord;
-
-			var offs = $(this.element).offset();
-			var x = event.pageX - offs.left;
-			var y = event.pageY - offs.top;
-
-			// ToDo возможно стоит переделать
-			if (AscBrowser.isRetina) {
-				x <<= 1;
-				y <<= 1;
 			}
+
+			var offs = this.element.getBoundingClientRect();
+			var x = ((event.pageX * AscBrowser.zoom) >> 0) - offs.left;
+			var y = ((event.pageY * AscBrowser.zoom) >> 0) - offs.top;
 
 			return {x: x, y: y};
 		};
 
-        asc_CEventsController.prototype._onTouchStart = function (event){
-            this.view.MobileTouchManager.onTouchStart(event);
-        };
-        asc_CEventsController.prototype._onTouchMove = function (event){
-            this.view.MobileTouchManager.onTouchMove(event);
-        };
-        asc_CEventsController.prototype._onTouchEnd = function (event){
-            this.view.MobileTouchManager.onTouchEnd(event);
-        };
+		asc_CEventsController.prototype._onTouchStart = function (event) {
+			this.view.MobileTouchManager.onTouchStart(event);
+		};
+		asc_CEventsController.prototype._onTouchMove = function (event) {
+			this.view.MobileTouchManager.onTouchMove(event);
+		};
+		asc_CEventsController.prototype._onTouchEnd = function (event) {
+			this.view.MobileTouchManager.onTouchEnd(event);
+		};
 
 		//------------------------------------------------------------export---------------------------------------------------
 		window['AscCommonExcel'] = window['AscCommonExcel'] || {};

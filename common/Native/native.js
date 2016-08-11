@@ -339,6 +339,7 @@ function NativeOpenFile()
     if (window.NATIVE_DOCUMENT_TYPE == "presentation" || window.NATIVE_DOCUMENT_TYPE == "document")
     {
         _api = new window["Asc"]["asc_docs_api"]("");
+
         _api.asc_nativeOpenFile(doc_bin);
     }
     else
@@ -369,6 +370,16 @@ function NativeOpenFile2(_params)
         
         if (_api.NativeAfterLoad)
             _api.NativeAfterLoad();
+
+        _api.__SendThemeColorScheme();
+
+        var schemes = _api.get_PropertyThemeColorSchemes();
+        if (schemes) {
+            var st = global_memory_stream_menu;
+            st["ClearNoAttack"]();
+            asc_WriteColorSchemes(schemes, st);
+            window["native"]["OnCallMenuEvent"](2404, st); // ASC_MENU_EVENT_TYPE_COLOR_SCHEMES
+        }
     }
     else
     {
@@ -583,7 +594,9 @@ window.clearInterval    = clearInterval;
 window.setInterval      = setInterval;
 
 var console = {
-	log : function(param) { window.native.ConsoleLog(param); }
+	log : function(param) { window.native.ConsoleLog(param); },
+    time : function(param) {},
+    timeEnd : function(param) {}
 };
 
 window["NativeCorrectImageUrlOnPaste"] = function(url) {
@@ -598,7 +611,6 @@ window['AscFonts'].CFontManager = function CFontManager() {
     this.Initialize = function(){};
     this.ClearFontsRasterCache = function(){};
 };
-window["use_native_fonts_only"] = true;
 
 // FT_Common
 function _FT_Common() {
@@ -808,3 +820,4 @@ window.native.Call_Menu_Event = function(type, _params)
 {
     return _api.Call_Menu_Event(type, _params);
 };
+

@@ -2634,8 +2634,6 @@ function CDrawingDocument(drawingObjects)
         oThis.TargetHtmlElement.style.left = pos.X + "px";
         oThis.TargetHtmlElement.style.top  = pos.Y + "px";
 
-        this.m_oWordControl.CheckTextBoxInputPos();
-
         if (this.m_bIsSearching && null != this.CurrentSearchNavi)
         {
             this.CurrentSearchNavi = null;

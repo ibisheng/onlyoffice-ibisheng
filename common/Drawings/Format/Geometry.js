@@ -1033,7 +1033,7 @@ Geometry.prototype=
         }
     },
 
-    Recalculate: function(w, h)
+    Recalculate: function(w, h, bResetPathsInfo)
     {
         this.gdLst["_3cd4"]= 16200000;
         this.gdLst["_3cd8"]= 8100000;
@@ -1081,7 +1081,7 @@ Geometry.prototype=
         CalculateAhXYList(this.ahXYLstInfo, this.ahXYLst, this.gdLst);
         CalculateAhPolarList(this.ahPolarLstInfo, this.ahPolarLst, this.gdLst);
         for(var i=0, n=this.pathLst.length; i<n; i++)
-            this.pathLst[i].recalculate(this.gdLst);
+            this.pathLst[i].recalculate(this.gdLst, bResetPathsInfo);
         if(this.rectS!=undefined)
         {
             this.rect={};
@@ -1108,10 +1108,17 @@ Geometry.prototype=
             {
                 this.rect.b=parseInt(this.rectS.b);
             }
-
-
         }
-
+        if(bResetPathsInfo){
+            delete this.gdLst;
+            delete this.gdLstInfo;
+            delete this.rect;
+            delete this.rectS;
+            delete this.gdLstInfo;
+            delete this.cnxLstInfo;
+            delete this.ahXYLstInfo;
+            delete this.ahPolarLstInfo;
+        }
     },
 
     getMaxPathPolygonLength: function()

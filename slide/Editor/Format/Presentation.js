@@ -38,8 +38,6 @@ var align_Justify = AscCommon.align_Justify;
 var vertalign_Baseline = AscCommon.vertalign_Baseline;
 var changestype_Drawing_Props = AscCommon.changestype_Drawing_Props;
 var g_oTableId = AscCommon.g_oTableId;
-var Editor_Copy = AscCommon.Editor_Copy;
-var Editor_Paste = AscCommon.Editor_Paste;
 var isRealObject = AscCommon.isRealObject;
 var History = AscCommon.History;
 
@@ -476,6 +474,7 @@ function CPresentation(DrawingDocument)
     this.LastUpdateTargetTime             = 0;
     this.NeedUpdateTargetForCollaboration = false;
     this.oLastCheckContent = null;
+    this.CompositeInput    = null;
     // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
     g_oTableId.Add( this, this.Id );
    //
@@ -495,6 +494,170 @@ function CPresentation(DrawingDocument)
 
 CPresentation.prototype =
 {
+    //----------------------------------------------------------------------------------------------------------------------
+// Функции для работы с составным вводом
+//----------------------------------------------------------------------------------------------------------------------
+    /**
+     * Сообщаем о начале составного ввода текста.
+     * @returns {boolean} Начался или нет составной ввод.
+     */
+
+    Get_TargetDocContent: function(){
+        if(this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects){
+            return this.Slides[this.CurPage].graphicObjects.getTargetDocContent();
+        }
+        return null;
+    },
+
+    Begin_CompositeInput: function()
+    {
+        if (false === this.Document_Is_SelectionLocked(changestype_Drawing_Props, null, true))
+        {
+            this.Create_NewHistoryPoint(AscDFH.historydescription_Document_CompositeInput);
+            if(this.Slides[this.CurPage]){
+                this.Slides[this.CurPage].graphicObjects.CreateDocContent();
+            }
+            this.DrawingDocument.TargetStart();
+            this.DrawingDocument.TargetShow();
+
+
+            var oContent = this.Get_TargetDocContent();
+            if (!oContent)
+            {
+                this.History.Remove_LastPoint();
+                return false;
+            }
+            var oPara = oContent.Get_CurrentParagraph();
+            if (!oPara)
+            {
+                this.History.Remove_LastPoint();
+                return false;
+            }
+            if (true === oContent.Is_SelectionUse())
+                oContent.Remove(1, true, false, true);
+            var oRun = oPara.Get_ElementByPos(oPara.Get_ParaContentPos(false, false));
+            if (!oRun || !(oRun instanceof ParaRun))
+            {
+                this.History.Remove_LastPoint();
+                return false;
+            }
+
+            this.CompositeInput = {
+                Run    : oRun,
+                Pos    : oRun.State.ContentPos,
+                Length : 0
+            };
+
+            oRun.Set_CompositeInput(this.CompositeInput);
+
+            return true;
+        }
+
+        return false;
+    },
+
+
+    addCompositeText: function(nCharCode){
+        // TODO: При таком вводе не меняется язык в зависимости от раскладки, не учитывается режим рецензирования.
+
+        if (null === this.CompositeInput)
+            return;
+
+        var oRun = this.CompositeInput.Run;
+        var nPos = this.CompositeInput.Pos + this.CompositeInput.Length;
+        var oChar;
+        if (32 == nCharCode || 12288 == nCharCode)
+        {
+            oChar = new ParaSpace();
+        }
+        else
+        {
+            oChar = new ParaText();
+            oChar.Set_CharCode(nCharCode);
+        }
+        oRun.Add_ToContent(nPos, oChar, true);
+        this.CompositeInput.Length++;
+    },
+    Add_CompositeText: function(nCharCode)
+    {
+        this.addCompositeText(nCharCode);
+        this.Recalculate();
+        this.Document_UpdateSelectionState();
+    },
+
+    removeCompositeText: function(nCount){
+        if (null === this.CompositeInput)
+            return;
+
+        var oRun = this.CompositeInput.Run;
+        var nPos = this.CompositeInput.Pos + this.CompositeInput.Length;
+
+        var nDelCount = Math.max(0, Math.min(nCount, this.CompositeInput.Length, oRun.Content.length, nPos));
+        oRun.Remove_FromContent(nPos - nDelCount, nDelCount, true);
+        this.CompositeInput.Length -= nDelCount;
+    },
+
+    Remove_CompositeText: function(nCount){
+        this.removeCompositeText(nCount);
+        this.Recalculate();
+        this.Document_UpdateSelectionState();
+    },
+    Replace_CompositeText: function(arrCharCodes)
+    {
+        if (null === this.CompositeInput)
+            return;
+        this.removeCompositeText(this.CompositeInput.Length);
+        for (var nIndex = 0, nCount = arrCharCodes.length; nIndex < nCount; ++nIndex)
+        {
+            this.addCompositeText(arrCharCodes[nIndex]);
+        }
+        this.Recalculate();
+        this.Document_UpdateSelectionState();
+    },
+    Set_CursorPosInCompositeText: function(nPos)
+    {
+        if (null === this.CompositeInput)
+            return;
+
+        var oRun = this.CompositeInput.Run;
+
+        var nInRunPos = Math.max(Math.min(this.CompositeInput.Pos + nPos, this.CompositeInput.Pos + this.CompositeInput.Length, oRun.Content.length), this.CompositeInput.Pos);
+        oRun.State.ContentPos = nInRunPos;
+        this.Document_UpdateSelectionState();
+    },
+    Get_CursorPosInCompositeText: function()
+    {
+        if (null === this.CompositeInput)
+            return 0;
+
+        var oRun = this.CompositeInput.Run;
+        var nInRunPos = oRun.State.ContentPos;
+        var nPos = Math.min(this.CompositeInput.Length, Math.max(0, nInRunPos - this.CompositeInput.Pos));
+        return nPos;
+    },
+    End_CompositeInput: function()
+    {
+        if (null === this.CompositeInput)
+            return;
+
+        var oRun = this.CompositeInput.Run;
+        oRun.Set_CompositeInput(null);
+        this.CompositeInput = null;
+
+        this.Document_UpdateInterfaceState();
+
+        this.DrawingDocument.ClearCachePages();
+        this.DrawingDocument.FirePaint();
+    },
+    Get_MaxCursorPosInCompositeText: function()
+    {
+        if (null === this.CompositeInput)
+            return 0;
+
+        return this.CompositeInput.Length;
+    },
+
+
     setShowLoop: function(value){
         if(value === false){
             if(!this.showPr){
@@ -1344,6 +1507,28 @@ CPresentation.prototype =
         }
     },
 
+    Add_OleObject: function(fWidth, fHeight, nWidthPix, nHeightPix, sLocalUrl, sData, sApplicationId){
+        if(this.Slides[this.CurPage]){
+            var fPosX = (this.Width - fWidth)/2;
+            var fPosY = (this.Height - fHeight)/2;
+            var Image = this.Slides[this.CurPage].graphicObjects.createOleObject(sData, sApplicationId, sLocalUrl, fPosX, fPosY, fWidth, fHeight, nWidthPix, nHeightPix);
+            Image.setParent(this.Slides[this.CurPage]);
+            Image.addToDrawingObjects();
+            this.Slides[this.CurPage].graphicObjects.resetSelection();
+            this.Slides[this.CurPage].graphicObjects.selectObject(Image, 0);
+            this.Recalculate();
+            this.Document_UpdateInterfaceState();
+        }
+    },
+
+    Edit_OleObject: function(oOleObject, sData, sImageUrl, nPixWidth, nPixHeight){
+        oOleObject.setData(sData);
+        var _blipFill           = new AscFormat.CBlipFill();
+        _blipFill.RasterImageId = sImageUrl;
+        oOleObject.setBlipFill(_blipFill);
+        oOleObject.setPixSizes(nPixWidth, nPixHeight);
+    },
+
     addChart: function(binary)
     {
         var _this = this;
@@ -1382,21 +1567,29 @@ CPresentation.prototype =
     Check_GraphicFrameRowHeight: function(grFrame)
     {
         grFrame.recalculate();
-        var content = grFrame.graphicObject.Content, i;
+        var content = grFrame.graphicObject.Content, i, j;
         for(i = 0; i < content.length; ++i)
         {
-            var ResultHeight;
-            ResultHeight = content[i].Height;
-            var FirstCell = content[i].Content[0];
-            if(FirstCell)
-            {
-                var oMargins = FirstCell.Get_Margins();
-                if(oMargins)
-                {
-                    ResultHeight -= (oMargins.Top + oMargins.Bottom);
-        }
-            }
-            content[i].Set_Height(ResultHeight, Asc.linerule_AtLeast );
+			var row = content[i];
+			var fMaxTopMargin = 0, fMaxBottomMargin = 0, fMaxTopBorder = 0, fMaxBottomBorder = 0;
+			for(j = 0;  j < row.Content.length; ++j){
+				var oCell = row.Content[j];
+				var oMargins = oCell.Get_Margins();
+				if(oMargins.Bottom.W > fMaxBottomMargin){
+					fMaxBottomMargin = oMargins.Bottom.W;
+				}
+				if(oMargins.Top.W > fMaxTopMargin){
+					fMaxTopMargin = oMargins.Top.W;
+				}
+				var oBorders = oCell.Get_Borders();
+				if(oBorders.Top.Size > fMaxTopBorder){
+					fMaxTopBorder = oBorders.Top.Size;
+				}
+				if(oBorders.Bottom.Size > fMaxBottomBorder){
+					fMaxBottomBorder = oBorders.Bottom.Size;
+				}
+			}
+            row.Set_Height(row.Height - fMaxTopMargin - fMaxBottomMargin - fMaxTopBorder/2 - fMaxBottomBorder/2, Asc.linerule_AtLeast );
         }
     },
 
@@ -2407,14 +2600,6 @@ CPresentation.prototype =
                 }
                 bRetValue = keydownresult_PreventAll;
             }
-            else // Shift + Delete (аналогично Ctrl + X)
-            {
-                if ( false === this.Document_Is_SelectionLocked(changestype_Drawing_Props) )
-                {
-                    Editor_Copy(this.DrawingDocument.m_oWordControl.m_oApi, true);
-                }
-                bRetValue = keydownresult_PreventKeyPress;
-            }
         }
         else if ( e.KeyCode == 49 && false === editor.isViewMode && true === e.AltKey && !e.AltGr ) // Alt + Ctrl + Num1 - применяем стиль Heading1
         {
@@ -3166,6 +3351,23 @@ CPresentation.prototype =
             this.Slides[i].getAllFonts(AllFonts)
         }
         return AllFonts;
+    },
+
+
+    Get_AllImageUrls: function(aImages){
+        if(!Array.isArray(aImages)){
+            aImages = [];
+        }
+        for(var i = 0; i < this.Slides.length; ++i){
+            this.Slides[i].getAllRasterImages(aImages);
+        }
+        return aImages;
+    },
+
+    Reassign_ImageUrls : function (images_rename) {
+        for(var i = 0; i < this.Slides.length; ++i){
+            this.Slides[i].Reassign_ImageUrls(images_rename);
+        }
     },
 
 
@@ -4951,7 +5153,7 @@ CPresentation.prototype =
 //-----------------------------------------------------------------------------------
 // Функции для работы с textbox
 //-----------------------------------------------------------------------------------
-    TextBox_Put : function(sText)
+    TextBox_Put : function(sText, rFonts)
     {
         // Отключаем пересчет, включим перед последним добавлением. Поскольку,
         // у нас все добавляется в 1 параграф, так можно делать.
@@ -4959,19 +5161,55 @@ CPresentation.prototype =
 
         if(AscCommon.CollaborativeEditing.Is_Fast() || editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false) {
             History.Create_NewPoint(AscDFH.historydescription_Presentation_ParagraphAdd);
-            var Count = sText.length;
-            for (var Index = 0; Index < Count; Index++) {
-                if (Index === Count - 1)
+            if(!rFonts){
+                var Count = sText.length;
+                for (var Index = 0; Index < Count; Index++) {
+                    if (Index === Count - 1)
+                        this.TurnOffRecalc = false;
+
+                    var _char = sText.charAt(Index);
+                    if (" " == _char)
+                        this.Paragraph_Add(new ParaSpace(1));
+                    else
+                        this.Paragraph_Add(new ParaText(_char));
+
+                    // На случай, если Count = 0
                     this.TurnOffRecalc = false;
+                }
+            }
+            else{
+                if(this.Slides[this.CurPage]){
+                    this.Slides[this.CurPage].graphicObjects.CreateDocContent();
 
-                var _char = sText.charAt(Index);
-                if (" " == _char)
-                    this.Paragraph_Add(new ParaSpace(1));
-                else
-                    this.Paragraph_Add(new ParaText(_char));
+                    var oTargetContent = this.Slides[this.CurPage].graphicObjects.getTargetDocContent(true);
+                    if(oTargetContent){
+                        var Para = oTargetContent.Get_CurrentParagraph();
+                        if (null === Para)
+                            return;
 
-                // На случай, если Count = 0
-                this.TurnOffRecalc = false;
+                        var RunPr = Para.Get_TextPr();
+                        if (null === RunPr || undefined === RunPr)
+                            RunPr = new CTextPr();
+
+                        RunPr.RFonts = rFonts;
+
+                        var Run = new ParaRun(Para);
+                        Run.Set_Pr(RunPr);
+
+                        var Count = sText.length;
+                        for (var Index = 0; Index < Count; Index++)
+                        {
+                            var _char = sText.charAt(Index);
+                            if (" " == _char)
+                                Run.Add_ToContent(Index, new ParaSpace(), false);
+                            else
+                                Run.Add_ToContent(Index, new ParaText(_char), false);
+                        }
+
+                        Para.Add(Run);
+                    }
+                    this.Slides[this.CurPage].graphicObjects.startRecalculate();
+                }
             }
         }
         this.Document_UpdateUndoRedoState();

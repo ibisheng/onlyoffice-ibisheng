@@ -10053,6 +10053,7 @@ CBodyPr.prototype =
         duplicate.fromWordArt    = this.fromWordArt;
         duplicate.horzOverflow   = this.horzOverflow;
         duplicate.lIns           = this.lIns;
+        duplicate.numCol         = this.numCol;
         duplicate.rIns           = this.rIns;
         duplicate.rot            = this.rot;
         duplicate.rtlCol         = this.rtlCol;
@@ -10117,6 +10118,9 @@ CBodyPr.prototype =
             this.lIns = bodyPr.lIns;
         }
 
+        if(bodyPr.numCol != null){
+            this.numCol = bodyPr.numCol;
+        }
         if(bodyPr.rIns!=null)
         {
             this.rIns = bodyPr.rIns;
@@ -10169,6 +10173,9 @@ CBodyPr.prototype =
         if(bodyPr.textFit)
         {
             this.textFit = bodyPr.textFit.CreateDublicate();
+        }
+        if(bodyPr.numCol != null){
+            this.numCol = bodyPr.numCol;
         }
         return this;
     },
@@ -11979,6 +11986,457 @@ function CorrectUniColor(asc_color, unicolor, flag)
         return position;
     }
 
+
+    /* Common Functions For Builder*/
+    function builder_CreateShape(sType, nWidth, nHeight, oFill, oStroke, oParent, oTheme, oDrawingDocument, bWord){
+        var oShapeTrack = new AscFormat.NewShapeTrack(sType, 0, 0, oTheme, null, null, null, 0);
+        oShapeTrack.track({}, nWidth, nHeight);
+        var oShape = oShapeTrack.getShape(true, oDrawingDocument, null);
+        oShape.setParent(oParent);
+        if(bWord){
+            oShape.createTextBoxContent();
+        }
+        else{
+            oShape.createTextBody();
+        }
+        oShape.spPr.setFill(oFill);
+        oShape.spPr.setLn(oStroke);
+        return oShape;
+    }
+
+    function builder_CreateChart(nW, nH, sType, aCatNames, aSeriesNames, aSeries, nStyleIndex){
+        var settings = new AscCommon.asc_ChartSettings();
+        switch (sType)
+        {
+            case "bar" :
+            {
+                settings.type = Asc.c_oAscChartTypeSettings.barNormal;
+                break;
+            }
+            case "barStacked":
+            {
+                settings.type = Asc.c_oAscChartTypeSettings.barStacked;
+                break;
+            }
+            case "barStackedPercent":
+            {
+                settings.type = Asc.c_oAscChartTypeSettings.barStackedPer;
+                break;
+            }
+            case "bar3D":
+            {
+                settings.type = Asc.c_oAscChartTypeSettings.barNormal3d;
+                break;
+            }
+            case "barStacked3D":
+            {
+                settings.type = Asc.c_oAscChartTypeSettings.barStacked3d;
+                break;
+            }
+            case "barStackedPercent3D":
+            {
+                settings.type = Asc.c_oAscChartTypeSettings.barStackedPer3d;
+                break;
+            }
+            case "barStackedPercent3DPerspective":
+            {
+                settings.type = Asc.c_oAscChartTypeSettings.barNormal3dPerspective;
+                break;
+            }
+            case "horizontalBar":
+            {
+                settings.type = Asc.c_oAscChartTypeSettings.hBarNormal;
+                break;
+            }
+            case "horizontalBarStacked":
+            {
+                settings.type = Asc.c_oAscChartTypeSettings.hBarStacked;
+                break;
+            }
+            case "horizontalBarStackedPercent":
+            {
+                settings.type = Asc.c_oAscChartTypeSettings.hBarStackedPer;
+                break;
+            }
+            case "horizontalBar3D":
+            {
+                settings.type = Asc.c_oAscChartTypeSettings.hBarNormal3d;
+                break;
+            }
+            case "horizontalBarStacked3D":
+            {
+                settings.type = Asc.c_oAscChartTypeSettings.hBarStacked3d;
+                break;
+            }
+            case "horizontalBarStackedPercent3D":
+            {
+                settings.type = Asc.c_oAscChartTypeSettings.hBarStackedPer3d;
+                break;
+            }
+            case "lineNormal":
+            {
+                settings.type = Asc.c_oAscChartTypeSettings.lineNormal;
+                break;
+            }
+            case "lineStacked":
+            {
+                settings.type = Asc.c_oAscChartTypeSettings.lineStacked;
+                break;
+            }
+            case "lineStackedPercent":
+            {
+                settings.type = Asc.c_oAscChartTypeSettings.lineStackedPer;
+                break;
+            }
+            case "line3D":
+            {
+                settings.type = Asc.c_oAscChartTypeSettings.line3d;
+                break;
+            }
+            case "pie":
+            {
+                settings.type = Asc.c_oAscChartTypeSettings.pie;
+                break;
+            }
+            case "pie3D":
+            {
+                settings.type = Asc.c_oAscChartTypeSettings.pie3d;
+                break;
+            }
+            case "doughnut":
+            {
+                settings.type = Asc.c_oAscChartTypeSettings.doughnut;
+                break;
+            }
+            case "scatter":
+            {
+                settings.type = Asc.c_oAscChartTypeSettings.scatter;
+                break;
+            }
+            case "stock":
+            {
+                settings.type = Asc.c_oAscChartTypeSettings.stock;
+                break;
+            }
+            case "area":
+            {
+                settings.type = Asc.c_oAscChartTypeSettings.areaNormal;
+                break;
+            }
+            case "areaStacked":
+            {
+                settings.type = Asc.c_oAscChartTypeSettings.areaStacked;
+                break;
+            }
+            case "areaStackedPercent":
+            {
+                settings.type = Asc.c_oAscChartTypeSettings.areaStackedPer;
+                break;
+            }
+        }
+        var aAscSeries = [];
+        var aAlphaBet = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
+        var oCat, i;
+        if(aCatNames.length > 0)
+        {
+            var aNumCache = [];
+            for(i = 0; i < aCatNames.length; ++i)
+            {
+                aNumCache.push({val: aCatNames[i] + ""});
+            }
+            oCat = { Formula: "Sheet1!$B$1:$" + AscFormat.CalcLiterByLength(aAlphaBet, aCatNames.length) + "$1", NumCache: aNumCache };
+        }
+        for(i = 0; i < aSeries.length; ++i)
+        {
+            var oAscSeries = new AscFormat.asc_CChartSeria();
+            oAscSeries.Val.NumCache = [];
+            var aData = aSeries[i];
+            var sEndLiter = AscFormat.CalcLiterByLength(aAlphaBet, aData.length);
+            oAscSeries.Val.Formula = 'Sheet1!' + '$B$' + (i + 2) + ':$' + sEndLiter + '$' + (i + 2);
+            if(aSeriesNames[i])
+            {
+                oAscSeries.TxCache.Formula =  'Sheet1!' + '$A$' + (i + 2);
+                oAscSeries.TxCache.Tx = aSeriesNames[i];
+            }
+            if(oCat)
+            {
+                oAscSeries.Cat = oCat;
+            }
+            for(var j = 0; j < aData.length; ++j)
+            {
+
+                oAscSeries.Val.NumCache.push({ numFormatStr: "General", isDateTimeFormat: false, val: aData[j], isHidden: false });
+            }
+            aAscSeries.push(oAscSeries);
+        }
+        var chartSeries = {series: aAscSeries, parsedHeaders: {bLeft: true, bTop: true}};
+
+        var oChartSpace = AscFormat.DrawingObjectsController.prototype._getChartSpace(chartSeries, settings, true);
+        if(!oChartSpace)
+        {
+            return null;
+        }
+        oChartSpace.setBDeleted(false);
+        oChartSpace.extX = nW;
+        oChartSpace.extY = nH;
+        if(AscFormat.isRealNumber(nStyleIndex)){
+            oChartSpace.setStyle(nStyleIndex);
+        }
+        AscFormat.CheckSpPrXfrm(oChartSpace);
+        return oChartSpace;
+    }
+
+    function builder_CreateGroup(aDrawings, oController){
+        if(!oController){
+            return null;
+        }
+        var aForGroup = [];
+        for(var i = 0; i < aDrawings.length; ++i){
+            if(!aDrawings[i].Drawing || !aDrawings[i].Drawing.canGroup()){
+                return null;
+            }
+            aForGroup.push(aDrawings[i].Drawing);
+        }
+        return oController.getGroup(aForGroup);
+    }
+
+    function builder_CreateSchemeColor(sColorId){
+        var oUniColor = new AscFormat.CUniColor();
+        oUniColor.setColor(new AscFormat.CSchemeColor());
+        switch(sColorId)
+        {
+            case "accent1": {  oUniColor.color.id  = 0; break;}
+            case "accent2": {  oUniColor.color.id  = 1; break;}
+            case "accent3": {  oUniColor.color.id  = 2; break;}
+            case "accent4": {  oUniColor.color.id  = 3; break;}
+            case "accent5": {  oUniColor.color.id  = 4; break;}
+            case "accent6": {  oUniColor.color.id  = 5; break;}
+            case "bg1": {  oUniColor.color.id      = 6; break;}
+            case "bg2": {  oUniColor.color.id      = 7; break;}
+            case "dk1": {  oUniColor.color.id      = 8; break;}
+            case "dk2": {  oUniColor.color.id      = 9; break;}
+            case "lt1": {  oUniColor.color.id      = 12; break;}
+            case "lt2": {  oUniColor.color.id      = 13; break;}
+            case "tx1": {  oUniColor.color.id      = 15; break;}
+            case "tx2": {  oUniColor.color.id      = 16; break;}
+            default: {  oUniColor.color.id      = 16; break;}
+        }
+        return oUniColor;
+    }
+
+    function builder_CreatePresetColor(sPresetColor){
+        var oUniColor = new AscFormat.CUniColor();
+        oUniColor.setColor(new AscFormat.CPrstColor());
+        oUniColor.color.id = sPresetColor;
+        return oUniColor;
+    }
+
+    function builder_CreateGradientStop(oUniColor, nPos){
+        var Gs = new AscFormat.CGs();
+        Gs.pos = pos;
+        Gs.color = oUniColor;
+        return Gs;
+    }
+
+    function builder_CreateGradient(aGradientStop){
+        var oUniFill = new AscFormat.CUniFill();
+        oUniFill.fill = new AscFormat.CGradFill();
+        for(var i = 0; i < aGradientStop.length; ++i)
+        {
+            oUniFill.fill.colors.push(aGradientStop[i].Gs);
+        }
+        return oUniFill;
+    }
+
+    function builder_CreateLinearGradient(aGradientStop, Angle){
+        var oUniFill = builder_CreateGradient(aGradientStop);
+        oUniFill.fill.lin = new AscFormat.GradLin();
+        oUniFill.fill.lin.angle = Angle;
+        return oUniFill;
+    }
+
+    function builder_CreateRadialGradient(aGradientStop){
+        var oUniFill = builder_CreateGradient(aGradientStop);
+        oUniFill.fill.path = new AscFormat.GradPath();
+        return new ApiFill(oUniFill);
+    }
+
+    function builder_CreatePatternFill(sPatternType, BgColor, FgColor){
+        var oUniFill = new AscFormat.CUniFill();
+        oUniFill.fill = new AscFormat.CPattFill();
+        oUniFill.fill.ftype = AscCommon.global_hatch_offsets[sPatternType];
+        oUniFill.fill.fgClr = FgColor.Unicolor;
+        oUniFill.fill.bgClr = BgColor.Unicolor;
+        return oUniFill;
+    }
+
+    function builder_CreateBlipFill(sImageUrl, sBlipFillType){
+        var oUniFill = new AscFormat.CUniFill();
+        oUniFill.fill = new AscFormat.CBlipFill();
+        oUniFill.fill.RasterImageId = sImageUrl;
+        if(sBlipFillType === "tile")
+        {
+            oUniFill.fill.tile = new AscFormat.CBlipFillTile();
+        }
+        else if(sBlipFillType === "stretch")
+        {
+            oUniFill.fill.stretch = true;
+        }
+        return oUniFill;
+    }
+
+    function builder_CreateLine(nWidth, oFill) {
+        if(nWidth === 0)
+        {
+            return new AscFormat.CreateNoFillLine();
+        }
+        var oLn = new AscFormat.CLn();
+        oLn.w = nWidth;
+        oLn.Fill = oFill.UniFill;
+        return oLn;
+    }
+
+    function builder_CreateChartTitle(sTitle, nFontSize, oDrawingDocument){
+        if(typeof sTitle === "string" && sTitle.length > 0){
+            var oTitle = new AscFormat.CTitle();
+            oTitle.setOverlay(false);
+            oTitle.setTx(new AscFormat.CChartText());
+            var oTextBody = AscFormat.CreateTextBodyFromString(sTitle, oDrawingDocument, oTitle.tx);
+            if(AscFormat.isRealNumber(nFontSize)){
+                oTextBody.content.Set_ApplyToAll(true);
+                oTextBody.content.Paragraph_Add(new ParaTextPr({ FontSize : nFontSize}));
+                oTextBody.content.Set_ApplyToAll(false);
+            }
+            oTitle.tx.setRich(oTextBody);
+            return oTitle;
+        }
+        return null;
+    }
+
+
+    function builder_SetChartTitle(oChartSpace, sTitle, nFontSize){
+        if(oChartSpace){
+            oChartSpace.chart.setTitle(builder_CreateChartTitle(sTitle, nFontSize, oChartSpace.getDrawingDocument()));
+        }
+    }
+
+    function builder_SetChartHorAxisTitle(oChartSpace, sTitle, nFontSize){
+        if(oChartSpace){
+            var horAxis = oChartSpace.chart.plotArea.getHorizontalAxis();
+            if(horAxis){
+                horAxis.setTitle(this.CreateTitle(sTitle, nFontSize));
+            }
+        }
+    }
+
+    function builder_SetChartVertAxisTitle(oChartSpace, sTitle, nFontSize){
+        if(oChartSpace){
+            var verAxis = oChartSpace.chart.plotArea.getVerticalAxis();
+            if(verAxis)
+            {
+                if(typeof sTitle === "string" && sTitle.length > 0)
+                {
+                    verAxis.setTitle(this.CreateTitle(sTitle, nFontSize));
+                    if(verAxis.title){
+                        var _body_pr = new AscFormat.CBodyPr();
+                        _body_pr.reset();
+                        if(!verAxis.title.txPr)
+                        {
+                            verAxis.title.setTxPr(AscFormat.CreateTextBodyFromString("", oChartSpace.getDrawingDocument(), verAxis.title));
+                        }
+                        var _text_body =  verAxis.title.txPr;
+                        _text_body.setBodyPr(_body_pr);
+                        verAxis.title.setOverlay(false);
+                    }
+                }
+                else
+                {
+                    verAxis.setTitle(null);
+                }
+            }
+        }
+    }
+
+    function builder_SetChartLegendPos(oChartSpace, sLegendPos){
+
+        if(oChartSpace && oChartSpace.chart)
+        {
+            if(sLegendPos === "none")
+            {
+                if(oChartSpace.chart.legend)
+                {
+                    oChartSpace.chart.setLegend(null);
+                }
+            }
+            else
+            {
+                var nLegendPos = null;
+                switch(sLegendPos)
+                {
+                    case "left":
+                    {
+                        nLegendPos = Asc.c_oAscChartLegendShowSettings.left;
+                        break;
+                    }
+                    case "top":
+                    {
+                        nLegendPos = Asc.c_oAscChartLegendShowSettings.top;
+                        break;
+                    }
+                    case "right":
+                    {
+                        nLegendPos = Asc.c_oAscChartLegendShowSettings.right;
+                        break;
+                    }
+                    case "bottom":
+                    {
+                        nLegendPos = Asc.c_oAscChartLegendShowSettings.bottom;
+                        break;
+                    }
+                }
+                if(null !== nLegendPos)
+                {
+                    if(!oChartSpace.chart.legend)
+                    {
+                        oChartSpace.chart.setLegend(new AscFormat.CLegend());
+                    }
+                    if(oChartSpace.chart.legend.legendPos !== nLegendPos)
+                        oChartSpace.chart.legend.setLegendPos(nLegendPos);
+                    if(oChartSpace.chart.legend.overlay !== false)
+                    {
+                        oChartSpace.chart.legend.setOverlay(false);
+                    }
+                }
+            }
+        }
+    }
+
+    function builder_SetShowDataLabels(oChartSpace, bShowSerName, bShowCatName, bShowVal){
+        if(oChartSpace && oChartSpace.chart && oChartSpace.chart.plotArea && oChartSpace.chart.plotArea.charts[0]){
+            var oChart = oChartSpace.chart.plotArea.charts[0];
+            if(false == bShowSerName && false == bShowCatName && false == bShowVal)
+            {
+                if(oChart.dLbls)
+                {
+                    oChart.setDLbls(null);
+                }
+            }
+            if(!oChart.dLbls)
+            {
+                oChart.setDLbls(new AscFormat.CDLbls());
+            }
+            oChart.dLbls.setSeparator(",");
+            oChart.dLbls.setShowSerName(true == bShowSerName);
+            oChart.dLbls.setShowCatName(true == bShowCatName);
+            oChart.dLbls.setShowVal(true == bShowVal);
+            oChart.dLbls.setShowLegendKey(false);
+            //oChart.dLbls.setShowPercent(false);
+            oChart.dLbls.setShowBubbleSize(false);
+        }
+    }
+
+
+
     //----------------------------------------------------------export----------------------------------------------------
     window['AscFormat'] = window['AscFormat'] || {};
     window['AscFormat'].CreateFontRef = CreateFontRef;
@@ -12077,6 +12535,24 @@ function CorrectUniColor(asc_color, unicolor, flag)
     window['AscFormat'].CreateUnifillFromAscColor = CreateUnifillFromAscColor;
     window['AscFormat'].CorrectUniColor = CorrectUniColor;
     window['AscFormat'].deleteDrawingBase = deleteDrawingBase;
+
+
+    window['AscFormat'].builder_CreateShape = builder_CreateShape;
+    window['AscFormat'].builder_CreateChart = builder_CreateChart;
+    window['AscFormat'].builder_CreateGroup = builder_CreateGroup;
+    window['AscFormat'].builder_CreateSchemeColor = builder_CreateSchemeColor;
+    window['AscFormat'].builder_CreatePresetColor = builder_CreatePresetColor;
+    window['AscFormat'].builder_CreateGradientStop = builder_CreateGradientStop;
+    window['AscFormat'].builder_CreateLinearGradient = builder_CreateLinearGradient;
+    window['AscFormat'].builder_CreateRadialGradient = builder_CreateRadialGradient;
+    window['AscFormat'].builder_CreatePatternFill = builder_CreatePatternFill;
+    window['AscFormat'].builder_CreateBlipFill = builder_CreateBlipFill;
+    window['AscFormat'].builder_CreateLine    = builder_CreateLine;
+    window['AscFormat'].builder_SetChartTitle = builder_SetChartTitle;
+    window['AscFormat'].builder_SetChartHorAxisTitle = builder_SetChartHorAxisTitle;
+    window['AscFormat'].builder_SetChartVertAxisTitle = builder_SetChartVertAxisTitle;
+    window['AscFormat'].builder_SetChartLegendPos = builder_SetChartLegendPos;
+    window['AscFormat'].builder_SetShowDataLabels = builder_SetShowDataLabels;
 
     window['AscFormat'].Ax_Counter = Ax_Counter;
     window['AscFormat'].TYPE_TRACK = TYPE_TRACK;

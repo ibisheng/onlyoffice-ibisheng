@@ -181,7 +181,11 @@ if(typeof CDocument !== "undefined")
 	};
 	CFootnotesController.prototype.IsSelectionLocked = function(CheckType)
 	{
-		// TODO: Реализовать
+		for (var sId in this.Selection.Footnotes)
+		{
+			var oFootnote = this.Selection.Footnotes[sId];
+			oFootnote.Document_Is_SelectionLocked(CheckType);
+		}
 	};
 }
 

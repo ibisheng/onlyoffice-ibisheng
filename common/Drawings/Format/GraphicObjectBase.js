@@ -388,6 +388,9 @@
         }
     };
 
+    CGraphicObjectBase.prototype.getAllFonts = function(mapUrl){
+    };
+
     window['AscFormat'] = window['AscFormat'] || {};
     window['AscFormat'].CGraphicObjectBase = CGraphicObjectBase;
     window['AscFormat'].CGraphicBounds     = CGraphicBounds;

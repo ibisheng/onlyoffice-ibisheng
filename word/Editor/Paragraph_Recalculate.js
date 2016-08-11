@@ -1852,12 +1852,17 @@ Paragraph.prototype.private_RecalculateLineCheckFootnotes = function(CurLine, Cu
             {
                 var PageAbs = this.Get_AbsolutePage(CurPage);
                 RecalcInfo.Set_FootnoteReference(oFootnote, PageAbs);
-                this.Parent.Footnotes.Add_FootnoteOnPage(PageAbs, oFootnote);
+                this.Parent.Footnotes.AddFootnoteToPage(PageAbs, oFootnote);
                 PRS.RecalcResult = recalcresult_CurPage | recalcresultflags_Page | recalcresultflags_Footnotes;
                 return false;
             }
             else if (true === RecalcInfo.Check_FootnoteReference(oFootnote))
             {
+				if (true === RecalcInfo.Is_PageBreakBefore())
+				{
+					//PRS.RecalcResult
+				}
+
                 var PageAbs = this.Get_AbsolutePage(CurPage);
                 if (PageAbs === RecalcInfo.FlowObjectPage)
                 {
@@ -1867,7 +1872,10 @@ Paragraph.prototype.private_RecalculateLineCheckFootnotes = function(CurLine, Cu
                 else
                 {
                     // TODO: Реализовать
-                    RecalcInfo.FlowObjectPageBreakBefore = true;
+                    RecalcInfo.Set_PageBreaFlowObjectPageBreakBefore(true);
+					this.Parent.Footnotes.RemoveFootnoteFromPage(PageAbs, oFootnote);
+					PRS.RecalcResult = recalcresult_CurPage | recalcresultflags_Page | recalcresultflags_Footnotes;
+                    return false;
                 }
             }
             else

@@ -277,6 +277,7 @@ ParaRun.prototype.Get_Text = function(Text)
             case para_Drawing:
             case para_End:
             case para_PageNum:
+            case para_PageCount:
             {
                 Text.Text = null;
                 bBreak = true;
@@ -897,6 +898,42 @@ ParaRun.prototype.private_UpdatePositionsOnRemove = function(Pos, Count)
         }
     }
 };
+
+ParaRun.prototype.private_UpdateCompositeInputPositionsOnAdd = function(Pos)
+{
+	if (null !== this.CompositeInput)
+	{
+		if (Pos <= this.CompositeInput.Pos)
+			this.CompositeInput.Pos++;
+		else if (Pos < this.CompositeInput.Pos + this.CompositeInput.Length)
+			this.CompositeInput.Length++;
+	}
+};
+
+ParaRun.prototype.private_UpdateCompositeInputPositionsOnRemove = function(Pos, Count)
+{
+	if (null !== this.CompositeInput)
+	{
+		if (Pos + Count <= this.CompositeInput.Pos)
+		{
+			this.CompositeInput.Pos -= Count;
+		}
+		else if (Pos < this.CompositeInput.Pos)
+		{
+			this.CompositeInput.Pos    = Pos;
+			this.CompositeInput.Length = Math.max(0, this.CompositeInput.Length - (Count - (this.CompositeInput.Pos - Pos)));
+		}
+		else if (Pos + Count < this.CompositeInput.Pos + this.CompositeInput.Length)
+		{
+			this.CompositeInput.Length = Math.max(0, this.CompositeInput.Length - Count);
+		}
+		else if (Pos < this.CompositeInput.Pos + this.CompositeInput.Length)
+		{
+			this.CompositeInput.Length = Math.max(0, Pos - this.CompositeInput.Pos);
+		}
+	}
+};
+
 
 // Добавляем элемент в позицию с сохранием в историю
 ParaRun.prototype.Add_ToContent = function(Pos, Item, UpdatePosition)
@@ -1749,6 +1786,7 @@ ParaRun.prototype.Get_Layout = function(DrawingLayout, UseContentPos, ContentPos
             case para_Text:
             case para_Space:
             case para_PageNum:
+            case para_PageCount:
             {
                 DrawingLayout.LastW = WidthVisible;
 
@@ -1826,7 +1864,7 @@ ParaRun.prototype.Collect_DocumentStatistics = function(ParaStats)
         var bSpace   = false;
         var bNewWord = false;
 
-        if ((para_Text === ItemType && false === Item.Is_NBSP()) || (para_PageNum === ItemType))
+        if ((para_Text === ItemType && false === Item.Is_NBSP()) || (para_PageNum === ItemType || para_PageCount === ItemType))
         {
             if ( false === ParaStats.Word )
                 bNewWord = true;
@@ -1908,7 +1946,7 @@ ParaRun.prototype.Get_AllFontNames = function(AllFonts)
     }
 };
 
-ParaRun.prototype.Get_SelectedText = function(bAll, bClearText)
+ParaRun.prototype.Get_SelectedText = function(bAll, bClearText, oPr)
 {
     var StartPos = 0;
     var EndPos   = 0;
@@ -1941,10 +1979,10 @@ ParaRun.prototype.Get_SelectedText = function(bAll, bClearText)
         switch ( ItemType )
         {
             case para_Drawing:
-            //case para_End:
             case para_Numbering:
             case para_PresentationNumbering:
             case para_PageNum:
+            case para_PageCount:
             {
                 if ( true === bClearText )
                     return null;
@@ -1955,6 +1993,15 @@ ParaRun.prototype.Get_SelectedText = function(bAll, bClearText)
             case para_Text : Str += String.fromCharCode(Item.Value); break;
             case para_Space:
             case para_Tab  : Str += " "; break;
+			case para_End:
+			{
+				if (oPr && true === oPr.NewLineParagraph)
+				{
+					Str += '\n';
+				}
+
+				break;
+			}
         }
     }
 
@@ -1989,6 +2036,7 @@ ParaRun.prototype.Can_AddDropCap = function()
             case para_Space:
             case para_Tab:
             case para_PageNum:
+            case para_PageCount:
                 return false;
 
         }
@@ -2008,7 +2056,7 @@ ParaRun.prototype.Get_TextForDropCap = function(DropCapText, UseContentPos, Cont
 
         if ( true === DropCapText.Check )
         {
-            if ( para_Space === ItemType || para_Tab === ItemType || para_PageNum === ItemType || para_Drawing === ItemType )
+            if ( para_Space === ItemType || para_Tab === ItemType || para_PageNum === ItemType || para_PageCount === ItemType || para_Drawing === ItemType )
             {
                 DropCapText.Mixed = true;
                 return;
@@ -2046,7 +2094,7 @@ ParaRun.prototype.Get_StartTabsCount = function(TabsCounter)
             TabsCounter.Count++;
             TabsCounter.Pos.push( Pos );
         }
-        else if ( para_Text === ItemType || para_Space === ItemType || (para_Drawing === ItemType && true === Item.Is_Inline() ) || para_PageNum === ItemType || para_Math === ItemType )
+        else if ( para_Text === ItemType || para_Space === ItemType || (para_Drawing === ItemType && true === Item.Is_Inline() ) || para_PageNum === ItemType || para_PageCount === ItemType || para_Math === ItemType )
             return false;
     }
 
@@ -2069,7 +2117,7 @@ ParaRun.prototype.Remove_StartTabs = function(TabsCounter)
             Pos--;
             ContentLen--;
         }
-        else if ( para_Text === ItemType || para_Space === ItemType || (para_Drawing === ItemType && true === Item.Is_Inline() ) || para_PageNum === ItemType || para_Math === ItemType )
+        else if ( para_Text === ItemType || para_Space === ItemType || (para_Drawing === ItemType && true === Item.Is_Inline() ) || para_PageNum === ItemType || para_PageCount === ItemType || para_Math === ItemType )
             return false;
     }
 
@@ -2138,7 +2186,7 @@ ParaRun.prototype.Recalculate_MeasureContent = function()
             continue;
         }
 
-        Item.Measure( g_oTextMeasurer, Pr, InfoMathText );
+        Item.Measure( g_oTextMeasurer, Pr, InfoMathText, this);
 
 
         if (para_Drawing === Item.Type)
@@ -2289,11 +2337,18 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                     if (para_ContinuationSeparator === ItemType)
                         Item.Update_Width(PRS);
 
+					if (para_FootnoteReference === ItemType)
+					{
+						Item.UpdateNumber(Para.Get_AbsolutePage(PRS.Page));
+						PRS.Add_FootnoteReference(Item, Pos);
+					}
+					else if (para_FootnoteRef === ItemType)
+					{
+						Item.UpdateNumber(Para.Get_AbsolutePage(PRS.Page));
+					}
+
                     // При проверке, убирается ли слово, мы должны учитывать ширину предшествующих пробелов.
                     var LetterLen = Item.Width / TEXTWIDTH_DIVIDER;//var LetterLen = Item.Get_Width();
-                    
-                    if (para_FootnoteReference === ItemType)
-                        PRS.Add_FootnoteReference(Item, Pos);
 
                     if (true !== Word)
                     {
@@ -2805,14 +2860,22 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
                     break;
                 }
+                case para_PageCount:
                 case para_PageNum:
                 {
-                    // Выставляем номер страницы
+                    if (para_PageCount === ItemType)
+                    {
+                        var oHdrFtr = Para.Parent.Is_HdrFtr(true);
+                        if (oHdrFtr)
+                            oHdrFtr.Add_PageCountElement(Item);
+                    }
+                    else if (para_PageNum === ItemType)
+                    {
+                        var LogicDocument = Para.LogicDocument;
+                        var SectionPage   = LogicDocument.Get_SectionPageNumInfo2(Para.Get_AbsolutePage(PRS.Page)).CurPage;
 
-                    var LogicDocument = Para.LogicDocument;
-                    var SectionPage = LogicDocument.Get_SectionPageNumInfo2(Para.Get_AbsolutePage(PRS.Page)).CurPage;
-
-                    Item.Set_Page(SectionPage);
+                        Item.Set_Page(SectionPage);
+                    }
 
                     // Если до этого было слово, тогда не надо проверять убирается ли оно, но если стояли пробелы,
                     // тогда мы их учитываем при проверке убирается ли данный элемент, и добавляем только если
@@ -3130,6 +3193,7 @@ ParaRun.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine, _Cur
             case para_Sym:
             case para_Text:
             case para_PageNum:
+            case para_PageCount:
             case para_FootnoteReference:
             case para_FootnoteRef:
             case para_Separator:
@@ -3309,6 +3373,7 @@ ParaRun.prototype.Recalculate_Range_Width = function(PRSC, _CurLine, _CurRange)
                 break;
             }
             case para_PageNum:
+            case para_PageCount:
             {
                 PRSC.Words++;
                 PRSC.Range.W += PRSC.SpaceLen;
@@ -3634,6 +3699,7 @@ ParaRun.prototype.Recalculate_Range_Spaces = function(PRSA, _CurLine, _CurRange,
                 break;
             }
             case para_PageNum:
+            case para_PageCount:
             {
                 PRSA.X    += Item.WidthVisible;
                 PRSA.LastW = Item.WidthVisible;
@@ -4040,6 +4106,7 @@ ParaRun.prototype.Recalculate_MinMaxContentWidth = function(MinMax)
             }
 
             case para_PageNum:
+            case para_PageCount:
             {
                 if ( true === bWord )
                 {
@@ -4165,6 +4232,7 @@ ParaRun.prototype.Get_Range_VisibleWidth = function(RangeW, _CurLine, _CurRange)
                 break;
             }
             case para_PageNum:
+            case para_PageCount:
             case para_Tab:
             {
                 RangeW.W += Item.Width;
@@ -4278,6 +4346,7 @@ ParaRun.prototype.Draw_HighLights = function(PDSH)
         switch( ItemType )
         {
             case para_PageNum:
+            case para_PageCount:
             case para_Drawing:
             case para_Tab:
             case para_Text:
@@ -4475,6 +4544,7 @@ ParaRun.prototype.Draw_Elements = function(PDSE)
         switch( ItemType )
         {
             case para_PageNum:
+            case para_PageCount:
             case para_Drawing:
             case para_Tab:
             case para_Text:
@@ -4749,6 +4819,7 @@ ParaRun.prototype.Draw_Lines = function(PDSL)
             }
 
             case para_PageNum:
+            case para_PageCount:
             case para_Drawing:
             case para_Tab:
             case para_Text:
@@ -8669,6 +8740,7 @@ ParaRun.prototype.Load_Changes = function(Reader, Reader2, Color)
 
                     this.Content.splice(Pos, 0, Element);
                     this.private_UpdatePositionsOnAdd(Pos);
+					this.private_UpdateCompositeInputPositionsOnAdd(Pos);
                     AscCommon.CollaborativeEditing.Update_DocumentPositionsOnAdd(this, Pos);
                 }
             }
@@ -8696,6 +8768,7 @@ ParaRun.prototype.Load_Changes = function(Reader, Reader2, Color)
                 this.CollaborativeMarks.Update_OnRemove(ChangesPos, 1);
                 this.Content.splice(ChangesPos, 1);
                 this.private_UpdatePositionsOnRemove(ChangesPos, 1);
+				this.private_UpdateCompositeInputPositionsOnRemove(ChangesPos, 1);
                 AscCommon.CollaborativeEditing.Update_DocumentPositionsOnRemove(this, ChangesPos, 1);
             }
 
@@ -10577,7 +10650,7 @@ ParaRun.prototype.private_GetPosInParent = function(_Parent)
 };
 ParaRun.prototype.Make_ThisElementCurrent = function()
 {
-    if (this.Paragraph && true === this.Paragraph.Is_UseInDocument() && true === this.Is_UseInParagraph())
+    if (this.Is_UseInDocument())
     {
         var ContentPos = this.Paragraph.Get_PosByElement(this);
         ContentPos.Add(this.State.ContentPos);
@@ -11000,6 +11073,10 @@ ParaRun.prototype.Get_FootnotesList = function(oEngine)
 			oEngine.Add(oItem.Get_Footnote());
 		}
 	}
+};
+ParaRun.prototype.Is_UseInDocument = function()
+{
+	return (this.Paragraph && true === this.Paragraph.Is_UseInDocument() && true === this.Is_UseInParagraph() ? true : false);
 };
 
 function CParaRunStartState(Run)

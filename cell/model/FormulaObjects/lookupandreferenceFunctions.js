@@ -63,7 +63,6 @@
 	var cBaseFunction = AscCommonExcel.cBaseFunction;
 
 	var checkTypeCell = AscCommonExcel.checkTypeCell;
-	var checkTypeCell2 = AscCommonExcel.checkTypeCell2;
 	var cFormulaFunctionGroup = AscCommonExcel.cFormulaFunctionGroup;
 
 	var _func = AscCommonExcel._func;
@@ -170,30 +169,41 @@
 		rowNumber = rowNumber.getValue();
 		colNumber = colNumber.getValue();
 		refType = refType.getValue();
-		A1RefType = A1RefType.getValue();
+		A1RefType = A1RefType.toBool();
 
 		if (refType > 4 || refType < 1 || rowNumber < 1 || rowNumber > AscCommon.gc_nMaxRow || colNumber < 1 ||
 			colNumber > AscCommon.gc_nMaxCol) {
 			return this.value = new cError(cErrorType.wrong_value_type);
 		}
 		var strRef;
-		switch (refType) {
-			case 1:
-				strRef = "$" + g_oCellAddressUtils.colnumToColstrFromWsView(colNumber) + "$" + rowNumber;
+		var strColumn = A1RefType ? g_oCellAddressUtils.colnumToColstrFromWsView(colNumber) : colNumber;
+		var strRow;
+		switch (refType - 1) {
+			case AscCommonExcel.referenceType.A:
+				strRow = this._absolute(rowNumber, A1RefType);
+				strColumn = this._absolute(strColumn, A1RefType);
 				break;
-			case 2:
-				strRef = g_oCellAddressUtils.colnumToColstrFromWsView(colNumber) + "$" + rowNumber;
+			case AscCommonExcel.referenceType.ARRC:
+				strRow = this._absolute(rowNumber, A1RefType);
 				break;
-			case 3:
-				strRef = "$" + g_oCellAddressUtils.colnumToColstrFromWsView(colNumber) + rowNumber;
+			case AscCommonExcel.referenceType.RRAC:
+				strColumn = this._absolute(strColumn, A1RefType);
+				strRow = rowNumber;
 				break;
-			case 4:
-				strRef = g_oCellAddressUtils.colnumToColstrFromWsView(colNumber) + rowNumber;
+			case AscCommonExcel.referenceType.R:
+				strRow = rowNumber;
 				break;
 		}
+		strRef = this._getRef(strRow, strColumn, A1RefType);
 
 		return this.value =
 			new cString((cElementType.empty === sheetName.type) ? strRef : parserHelp.get3DRef(sheetName.toString(), strRef));
+	};
+	cADDRESS.prototype._getRef = function (row, col, A1RefType) {
+		return A1RefType ? col + row : 'R' + row + 'C' + col;
+	};
+	cADDRESS.prototype._absolute = function (val, A1RefType) {
+		return A1RefType ? '$' + val : '[' + val + ']';
 	};
 	cADDRESS.prototype.getInfo = function () {
 		return {
@@ -455,7 +465,7 @@
 		}
 
 		var v = arg1.getWS()._getCellNoEmpty(bb.r1 + numberRow, resC);
-		return this.value = checkTypeCell2(v);
+		return this.value = checkTypeCell(v);
 	};
 	cHLOOKUP.prototype.getInfo = function () {
 		return {
@@ -541,7 +551,7 @@
 			}
 		} else if (cElementType.cell === arg0.type || cElementType.cell3D === arg0.type) {
 			if ((arg1 == 0 || arg1 == 1) && (arg2 == 0 || arg2 == 1)) {
-				res = arg0.tryConvert();
+				res = arg0.getValue();
 			}
 		} else {
 			res = new cError(cErrorType.wrong_value_type);
@@ -671,7 +681,7 @@
 			return this.value = arg0;
 		}
 		if (cElementType.cell === arg0.type) {
-			arg0 = arg0.tryConvert();
+			arg0 = arg0.getValue();
 		}
 
 		function arrFinder(arr) {
@@ -729,8 +739,7 @@
 			}
 
 			var c = new CellAddress(BBox.r1 + resR, BBox.c1 + resC);
-			return this.value =
-				checkTypeCell(_arg2.getWS()._getCellNoEmpty(c.getRow0(), c.getCol0()).getValueWithoutFormat());
+			return this.value = checkTypeCell(_arg2.getWS()._getCellNoEmpty(c.getRow0(), c.getCol0()));
 		} else {
 			var arg1Range = arg1.getRange(), arg2Range = arg2.getRange();
 
@@ -1363,7 +1372,7 @@
 		}
 
 		var v = arg1.getWS()._getCellNoEmpty(resR, bb.c1 + numberCol);
-		return this.value = checkTypeCell2(v);
+		return this.value = checkTypeCell(v);
 	};
 	cVLOOKUP.prototype.getInfo = function () {
 		return {

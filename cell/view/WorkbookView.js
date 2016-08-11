@@ -375,12 +375,6 @@
           self.cellEditor.setFocus(false);
           self.getWorksheet().enterCellRange(self.cellEditor);
           self.lockDraw = false;
-        }, "copy": function () {
-          self.copyToClipboard.apply(self, arguments);
-        }, "paste": function () {
-          self.pasteFromClipboard.apply(self, arguments);
-        }, "cut": function () {
-          self.cutToClipboard.apply(self, arguments);
         }, "undo": function () {
           self.undo.apply(self, arguments);
         }, "redo": function () {
@@ -489,83 +483,21 @@
             self._onEditCell(/*isFocus*/true);
           }
         }, false);
+
+        this.input.addEventListener('keydown', function (event) {
+          if (self.isCellEditMode) {
+            self.handlers.trigger('asc_onInputKeyDown', event);
+            if (!event.defaultPrevented) {
+              self.cellEditor._onWindowKeyDown(event, true);
+            }
+          }
+        }, false);
       }
 
-      this.cellEditor =
-        new AscCommonExcel.CellEditor(this.element, this.input, this.fmgrGraphics, this.m_oFont, /*handlers*/{
-          "closed": function () {
-            self._onCloseCellEditor.apply(self, arguments);
-          }, "updated": function () {
-            self._onUpdateCellEditor.apply(self, arguments);
-          }, "gotFocus": function (hasFocus) {
-            self.controller.setFocus(!hasFocus);
-          }, "paste": function () {
-            self.pasteFromClipboard.apply(self, arguments);
-          }, "cut": function () {
-            self.cutToClipboard.apply(self, arguments);
-          }, "updateFormulaEditMod": function () {
-            self.controller.setFormulaEditMode.apply(self.controller, arguments);
-            var ws = self.getWorksheet();
-            if (ws) {
-              if (!self.lockDraw) {
-                ws.cleanSelection();
-              }
-              for (var i in self.wsViews) {
-                self.wsViews[i].cleanFormulaRanges();
-              }
-//            ws.cleanFormulaRanges();
-              ws.setFormulaEditMode.apply(ws, arguments);
-            }
-          }, "updateEditorState": function (state) {
-            self.handlers.trigger("asc_onEditCell", state);
-          }, "isGlobalLockEditCell": function () {
-            return self.collaborativeEditing.getGlobalLockEditCell();
-          }, "updateFormulaEditModEnd": function () {
-            if (!self.lockDraw) {
-              self.getWorksheet().updateSelection();
-            }
-          }, "newRange": function (range, ws) {
-            if (!ws) {
-              self.getWorksheet().addFormulaRange(range);
-            } else {
-              self.getWorksheet(self.model.getWorksheetIndexByName(ws)).addFormulaRange(range);
-            }
-          }, "existedRange": function (range, ws) {
-            var editRangeSheet = ws ? self.model.getWorksheetIndexByName(ws) : self.copyActiveSheet;
-            if (-1 === editRangeSheet || editRangeSheet === self.wsActive) {
-              self.getWorksheet().activeFormulaRange(range);
-            } else {
-              self.getWorksheet(editRangeSheet).removeFormulaRange(range);
-              self.getWorksheet().addFormulaRange(range);
-            }
-          }, "updateUndoRedoChanged": function (bCanUndo, bCanRedo) {
-            self.handlers.trigger("asc_onCanUndoChanged", bCanUndo);
-            self.handlers.trigger("asc_onCanRedoChanged", bCanRedo);
-          }, "applyCloseEvent": function () {
-            self.controller._onWindowKeyDown.apply(self.controller, arguments);
-          }, "isViewerMode": function () {
-            return self.controller.settings.isViewerMode;
-          }, "getFormulaRanges": function () {
-            return self.cellFormulaEnterWSOpen ? self.cellFormulaEnterWSOpen.getFormulaRanges() :
-              self.getWorksheet().getFormulaRanges();
-          }, "getCellFormulaEnterWSOpen": function () {
-            return self.cellFormulaEnterWSOpen;
-          }, "getActiveWS": function () {
-            return self.getWorksheet().model;
-          }, "setStrictClose": function (val) {
-            self.controller.setStrictClose(val);
-          }, "updateEditorSelectionInfo": function (info) {
-            self.handlers.trigger("asc_onEditorSelectionChanged", info);
-          }, "onContextMenu": function (event) {
-            self.handlers.trigger("asc_onContextMenu", event);
-          }
-        }, /*settings*/{
-          font: this.defaultFont, padding: this.defaults.worksheetView.cells.padding
-        });
       this.Api.onKeyDown = function (event) {
         self.controller._onWindowKeyDown(event);
         if (self.isCellEditMode) {
-          self.cellEditor._onWindowKeyDown(event);
+          self.cellEditor._onWindowKeyDown(event, false);
         }
       };
       this.Api.onKeyPress = function (event) {
@@ -581,11 +513,12 @@
         }
       };
       this.Api.Begin_CompositeInput = function () {
-        self.cellEditor.Begin_CompositeInput();
         if (!self.isCellEditMode) {
           self._onEditCell(false, true, undefined, true, function () {
             self.cellEditor.Begin_CompositeInput();
           });
+        } else {
+          self.cellEditor.Begin_CompositeInput();
         }
       };
       this.Api.Replace_CompositeText = function (arrCharCodes) {
@@ -594,10 +527,99 @@
         }
       };
       this.Api.End_CompositeInput = function () {
-        self.cellEditor.End_CompositeInput();
+        if (self.isCellEditMode) {
+          self.cellEditor.End_CompositeInput();
+        }
+      };
+      this.Api.Set_CursorPosInCompositeText = function (nPos) {
+        if (self.isCellEditMode) {
+          self.cellEditor.Set_CursorPosInCompositeText(nPos);
+        }
+      };
+      this.Api.Get_CursorPosInCompositeText = function () {
+        var res = 0;
+        if (self.isCellEditMode) {
+          res = self.cellEditor.Get_CursorPosInCompositeText();
+        }
+        return res;
+      };
+      this.Api.Get_MaxCursorPosInCompositeText = function () {
+        var res = 0;
+        if (self.isCellEditMode) {
+          res = self.cellEditor.Get_MaxCursorPosInCompositeText();
+        }
+        return res;
       };
       AscCommon.InitBrowserInputContext(this.Api, "id_target_cursor");
     }
+
+    this.cellEditor =
+      new AscCommonExcel.CellEditor(this.element, this.input, this.fmgrGraphics, this.m_oFont, /*handlers*/{
+        "closed": function () {
+          self._onCloseCellEditor.apply(self, arguments);
+        }, "updated": function () {
+          self._onUpdateCellEditor.apply(self, arguments);
+        }, "gotFocus": function (hasFocus) {
+          self.controller.setFocus(!hasFocus);
+        }, "updateFormulaEditMod": function () {
+          self.controller.setFormulaEditMode.apply(self.controller, arguments);
+          var ws = self.getWorksheet();
+          if (ws) {
+            if (!self.lockDraw) {
+              ws.cleanSelection();
+            }
+            for (var i in self.wsViews) {
+              self.wsViews[i].cleanFormulaRanges();
+            }
+//            ws.cleanFormulaRanges();
+            ws.setFormulaEditMode.apply(ws, arguments);
+          }
+        }, "updateEditorState": function (state) {
+          self.handlers.trigger("asc_onEditCell", state);
+        }, "isGlobalLockEditCell": function () {
+          return self.collaborativeEditing.getGlobalLockEditCell();
+        }, "updateFormulaEditModEnd": function () {
+          if (!self.lockDraw) {
+            self.getWorksheet().updateSelection();
+          }
+        }, "newRange": function (range, ws) {
+          if (!ws) {
+            self.getWorksheet().addFormulaRange(range);
+          } else {
+            self.getWorksheet(self.model.getWorksheetIndexByName(ws)).addFormulaRange(range);
+          }
+        }, "existedRange": function (range, ws) {
+          var editRangeSheet = ws ? self.model.getWorksheetIndexByName(ws) : self.copyActiveSheet;
+          if (-1 === editRangeSheet || editRangeSheet === self.wsActive) {
+            self.getWorksheet().activeFormulaRange(range);
+          } else {
+            self.getWorksheet(editRangeSheet).removeFormulaRange(range);
+            self.getWorksheet().addFormulaRange(range);
+          }
+        }, "updateUndoRedoChanged": function (bCanUndo, bCanRedo) {
+          self.handlers.trigger("asc_onCanUndoChanged", bCanUndo);
+          self.handlers.trigger("asc_onCanRedoChanged", bCanRedo);
+        }, "applyCloseEvent": function () {
+          self.controller._onWindowKeyDown.apply(self.controller, arguments);
+        }, "isViewerMode": function () {
+          return self.controller.settings.isViewerMode;
+        }, "getFormulaRanges": function () {
+          return self.cellFormulaEnterWSOpen ? self.cellFormulaEnterWSOpen.getFormulaRanges() :
+            self.getWorksheet().getFormulaRanges();
+        }, "getCellFormulaEnterWSOpen": function () {
+          return self.cellFormulaEnterWSOpen;
+        }, "getActiveWS": function () {
+          return self.getWorksheet().model;
+        }, "setStrictClose": function (val) {
+          self.controller.setStrictClose(val);
+        }, "updateEditorSelectionInfo": function (info) {
+          self.handlers.trigger("asc_onEditorSelectionChanged", info);
+        }, "onContextMenu": function (event) {
+          self.handlers.trigger("asc_onContextMenu", event);
+        }
+      }, /*settings*/{
+        font: this.defaultFont, padding: this.defaults.worksheetView.cells.padding
+      });
 
     this.wsViewHandlers = new AscCommonExcel.asc_CHandlersList(/*handlers*/{
       "getViewerMode": function() {
@@ -1243,7 +1265,7 @@
     var ct = ws.getCursorTypeFromXY(x, y, this.controller.settings.isViewerMode);
 
     if (ct.target === c_oTargetType.ColumnResize || ct.target === c_oTargetType.RowResize) {
-      ct.target === c_oTargetType.ColumnResize ? ws.optimizeColWidth(ct.col) : ws.optimizeRowHeight(ct.row);
+      ct.target === c_oTargetType.ColumnResize ? ws.autoFitColumnWidth(ct.col, ct.col) : ws.autoFitRowHeight(ct.row, ct.row);
       asc_applyFunction(callback);
     } else {
       if (ct.col >= 0 && ct.row >= 0) {
@@ -1972,13 +1994,13 @@
   };
   
    WorkbookView.prototype.checkCopyToClipboard = function(_clipboard, _formats) {
-    var t = this, ws, v;
+    var t = this, ws;
     ws = t.getWorksheet();
     t.clipboard.checkCopyToClipboard(ws, _clipboard, _formats);
   };
 
   WorkbookView.prototype.pasteData = function(_format, data1, data2) {
-    var t = this, ws, v;
+    var t = this, ws;
     ws = t.getWorksheet();
     t.clipboard.pasteData(ws, _format, data1, data2);
   };
@@ -2346,15 +2368,12 @@
   };
 
   // Печать
-  WorkbookView.prototype.printSheet = function(pdf_writer, printPagesData) {
+  WorkbookView.prototype.printSheets = function(pdf_writer, printPagesData) {
     var ws;
-    // Закончили печать или нет
-    var isEndPrint = false;
     if (null === printPagesData.arrPages || 0 === printPagesData.arrPages.length) {
       // Печать пустой страницы
       ws = this.getWorksheet();
       ws.drawForPrint(pdf_writer, null);
-      isEndPrint = true;
     } else {
       var indexWorksheet = -1;
       var indexWorksheetTmp = -1;
@@ -2366,13 +2385,10 @@
         }
         ws.drawForPrint(pdf_writer, printPagesData.arrPages[i]);
       }
-      isEndPrint = (i === printPagesData.arrPages.length);
     }
-
-    return isEndPrint;
   };
 
-  WorkbookView.prototype.calcPagesPrint = function(adjustPrint) {
+  WorkbookView.prototype.calcPagesPrint = function (adjustPrint) {
     var ws = null;
     var wb = this.model;
     var activeWs;
@@ -2380,7 +2396,7 @@
     var printType = adjustPrint.asc_getPrintType();
     if (printType === Asc.c_oAscPrintType.ActiveSheets) {
       activeWs = wb.getActive();
-      ws = this.getWorksheet();
+      ws = this.getWorksheet(activeWs);
       printPagesData.arrPages =
         ws.calcPagesPrint(wb.getWorksheet(activeWs).PagePrintOptions, /*printOnlySelection*/false, /*indexWorksheet*/
           activeWs);
@@ -2400,7 +2416,7 @@
       }
     } else if (printType === Asc.c_oAscPrintType.Selection) {
       activeWs = wb.getActive();
-      ws = this.getWorksheet();
+      ws = this.getWorksheet(activeWs);
       printPagesData.arrPages =
         ws.calcPagesPrint(wb.getWorksheet(activeWs).PagePrintOptions, /*printOnlySelection*/true, /*indexWorksheet*/
           activeWs);
@@ -2414,26 +2430,31 @@
     var item;
     for (var i in this.wsViews) {
       item = this.wsViews[i];
+      item._cleanCellsTextMetricsCache();
       item._prepareDrawingObjects();
     }
   };
 
   WorkbookView.prototype._initCommentsToSave = function() {
-    var isFirst = true;
-    for (var wsKey in this.wsViews) {
-      var wsView = this.wsViews[wsKey];
-      var wsModel = wsView.model;
-      wsView.cellCommentator.prepareCommentsToSave();
-      wsModel.aCommentsCoords = wsView.cellCommentator.aCommentCoords;
+    var isFirst = true, wsView, wsModel, tmpWs;
+    // Колличество листов
+    var countWorksheets = this.model.getWorksheetCount();
+    for (var i = 0; i < countWorksheets; ++i) {
+      tmpWs = this.model.getWorksheet(i);
+      if (tmpWs && 0 < tmpWs.aComments.length) {
+        wsView = this.getWorksheet(i);
+        wsModel = wsView.model;
+        wsModel.aCommentsCoords = wsView.cellCommentator.getCoordsToSave();
 
-      if (isFirst) {
-        isFirst = false;
-        this.cellCommentator.worksheet = wsView;
-        this.cellCommentator.overlayCtx = wsView.overlayCtx;
-        this.cellCommentator.drawingCtx = wsView.drawingCtx;
-        this.cellCommentator.prepareCommentsToSave();
-        wsModel.aComments = wsModel.aComments.concat(this.model.aComments);
-        wsModel.aCommentsCoords = wsModel.aCommentsCoords.concat(this.cellCommentator.aCommentCoords);
+        if (isFirst) {
+          isFirst = false;
+          tmpWs = this.cellCommentator.worksheet;
+          this.cellCommentator.worksheet = wsView;
+          this.cellCommentator.overlayCtx = wsView.overlayCtx;
+          this.cellCommentator.drawingCtx = wsView.drawingCtx;
+          this.model.aCommentsCoords = this.cellCommentator.getCoordsToSave();
+          this.cellCommentator.worksheet = tmpWs;
+        }
       }
     }
   };
@@ -2547,7 +2568,7 @@
     }
   };
 
-  WorkbookView.prototype._calcMaxDigitWidth = function() {
+  WorkbookView.prototype._calcMaxDigitWidth = function () {
     // set default worksheet header font for calculations
     this.buffers.main.setFont(this.defaultFont);
     // Измеряем в pt
@@ -2561,7 +2582,7 @@
     // Максимальная ширина в Pt
     var maxWidthInPt = this.stringRender.getWidestCharWidth();
     // Переводим в px и приводим к целому (int)
-    this.maxDigitWidth = asc_round(maxWidthInPt * ptConvToPx);
+    this.model.maxDigitWidth = this.maxDigitWidth = asc_round(maxWidthInPt * ptConvToPx);
     // Проверка для Calibri 11 должно быть this.maxDigitWidth = 7
 
     if (!this.maxDigitWidth) {
@@ -2570,442 +2591,400 @@
 
     // Padding рассчитывается исходя из maxDigitWidth (http://social.msdn.microsoft.com/Forums/en-US/9a6a9785-66ad-4b6b-bb9f-74429381bd72/margin-padding-in-cell-excel?forum=os_binaryfile)
     this.defaults.worksheetView.cells.padding = Math.max(asc.ceil(this.maxDigitWidth / 4), 2);
-    this.defaults.worksheetView.cells.paddingPlusBorder = 2 * this.defaults.worksheetView.cells.padding + 1;
+    this.model.paddingPlusBorder = this.defaults.worksheetView.cells.paddingPlusBorder = 2 * this.defaults.worksheetView.cells.padding + 1;
   };
 
-    WorkbookView.prototype.af_getTablePictures = function(wb, fmgrGraphics, oFont, props)
-    {
-        var styleThumbnailWidth = 61;
-        var styleThumbnailHeight = 46;
-        if (AscBrowser.isRetina) {
-            styleThumbnailWidth <<= 1;
-            styleThumbnailHeight <<= 1;
+  WorkbookView.prototype.af_getTablePictures = function (wb, fmgrGraphics, oFont, props) {
+    var styleThumbnailWidth = 61;
+    var styleThumbnailHeight = 46;
+    if (AscBrowser.isRetina) {
+      styleThumbnailWidth <<= 1;
+      styleThumbnailHeight <<= 1;
+    }
+
+    var canvas = document.createElement('canvas');
+    canvas.width = styleThumbnailWidth;
+    canvas.height = styleThumbnailHeight;
+    var customStyles = wb.TableStyles.CustomStyles;
+    var result = [];
+    var options;
+    var n = 0;
+    if (customStyles) {
+      for (var i in customStyles) {
+        if (customStyles[i].table) {
+          options = {
+            name: i,
+            displayName: customStyles[i].displayName,
+            type: 'custom',
+            image: this.af_getSmallIconTable(canvas, customStyles[i], fmgrGraphics, oFont, props)
+          };
+          result[n] = new AscCommonExcel.formatTablePictures(options);
+          n++;
+        }
+      }
+    }
+    var defaultStyles = wb.TableStyles.DefaultStyles;
+    if (defaultStyles) {
+      for (var i in defaultStyles) {
+        if (defaultStyles[i].table) {
+          options = {
+            name: i,
+            displayName: defaultStyles[i].displayName,
+            type: 'default',
+            image: this.af_getSmallIconTable(canvas, defaultStyles[i], fmgrGraphics, oFont, props)
+          };
+          result[n] = new AscCommonExcel.formatTablePictures(options);
+          n++;
+        }
+      }
+    }
+    return result;
+  };
+
+  WorkbookView.prototype.af_getSmallIconTable = function (canvas, style, fmgrGraphics, oFont, props) {
+    var ctx = new Asc.DrawingContext({canvas: canvas, units: 1/*pt*/, fmgrGraphics: fmgrGraphics, font: oFont});
+    var styleOptions = style;
+
+    //по умолчанию ставим строку заголовка и чередующиеся строки, позже нужно будет получать параметр
+    var styleInfo;
+    if (props) {
+      styleInfo = {
+        ShowColumnStripes: props.asc_getBandVer(),
+        ShowFirstColumn: props.asc_getFirstCol(),
+        ShowLastColumn: props.asc_getLastCol(),
+        ShowRowStripes: props.asc_getBandHor(),
+        HeaderRowCount: props.asc_getFirstRow(),
+        TotalsRowCount: props.asc_getLastRow()
+      };
+    } else {
+      styleInfo = {
+        ShowColumnStripes: false,
+        ShowFirstColumn: false,
+        ShowLastColumn: false,
+        ShowRowStripes: true,
+        HeaderRowCount: true,
+        TotalsRowCount: false
+      };
+    }
+
+
+    var pxToMM = 72 / 96;
+    var ySize = 45 * pxToMM;
+    var xSize = 61 * pxToMM;
+
+    var stepY = (ySize) / 5;
+    var stepX = (60 * pxToMM) / 5;
+    var whiteColor = new CColor(255, 255, 255);
+    var blackColor = new CColor(0, 0, 0);
+
+    //**draw background**
+    var defaultColorBackground;
+    if (styleOptions.wholeTable && styleOptions.wholeTable.dxf.fill) {
+      defaultColorBackground = styleOptions.wholeTable.dxf.fill.bg;
+    } else {
+      defaultColorBackground = whiteColor;
+    }
+
+    var color;
+    if (styleOptions != undefined) {
+      if (styleOptions.wholeTable && styleOptions.wholeTable.dxf.fill && null != styleOptions.wholeTable.dxf.fill.bg) {
+        ctx.setFillStyle(styleOptions.wholeTable.dxf.fill.bg);
+        ctx.fillRect(0, 0, xSize, ySize);
+      } else {
+        ctx.setFillStyle(whiteColor);
+        ctx.fillRect(0, 0, xSize, ySize);
+      }
+      if (styleInfo.ShowColumnStripes)//column stripes
+      {
+        for (k = 0; k < 6; k++) {
+          color = defaultColorBackground;
+          if (k % 2 == 0) {
+            if (styleOptions.firstColumnStripe && styleOptions.firstColumnStripe.dxf.fill &&
+              null != styleOptions.firstColumnStripe.dxf.fill.bg) {
+              color = styleOptions.firstColumnStripe.dxf.fill.bg;
+            } else if (styleOptions.wholeTable && styleOptions.wholeTable.dxf.fill &&
+              null != styleOptions.wholeTable.dxf.fill.bg) {
+              color = styleOptions.wholeTable.dxf.fill.bg;
+            }
+          } else {
+            if (styleOptions.secondColumnStripe && styleOptions.secondColumnStripe.dxf.fill &&
+              null != styleOptions.secondColumnStripe.dxf.fill.bg) {
+              color = styleOptions.secondColumnStripe.dxf.fill.bg;
+            } else if (styleOptions.wholeTable && styleOptions.wholeTable.dxf.fill &&
+              null != styleOptions.wholeTable.dxf.fill.bg) {
+              color = styleOptions.wholeTable.dxf.fill.bg;
+            }
+          }
+          ctx.setFillStyle(color);
+          ctx.fillRect(k * stepX, 0, stepX, ySize);
+        }
+      }
+
+      if (styleInfo.ShowRowStripes)//row stripes
+      {
+        for (var k = 0; k < 6; k++) {
+          color = null;
+
+          if (k == 0 && styleInfo.HeaderRowCount) {
+            continue;
+          }
+
+          if (styleInfo.HeaderRowCount) {
+            if (k % 2 != 0) {
+              if (styleOptions.firstRowStripe && styleOptions.firstRowStripe.dxf.fill &&
+                null != styleOptions.firstRowStripe.dxf.fill.bg) {
+                color = styleOptions.firstRowStripe.dxf.fill.bg;
+              }
+            } else {
+              if (styleOptions.secondRowStripe && styleOptions.secondRowStripe.dxf.fill &&
+                null != styleOptions.secondRowStripe.dxf.fill.bg) {
+                color = styleOptions.secondRowStripe.dxf.fill.bg;
+              }
+            }
+          } else {
+            if (k % 2 != 0) {
+              if (styleOptions.secondRowStripe && styleOptions.secondRowStripe.dxf.fill &&
+                null != styleOptions.secondRowStripe.dxf.fill.bg) {
+                color = styleOptions.secondRowStripe.dxf.fill.bg;
+              }
+            } else {
+              if (styleOptions.firstRowStripe && styleOptions.firstRowStripe.dxf.fill &&
+                null != styleOptions.firstRowStripe.dxf.fill.bg) {
+                color = styleOptions.firstRowStripe.dxf.fill.bg;
+              }
+            }
+          }
+
+          if (color != null) {
+            ctx.setFillStyle(color);
+            ctx.fillRect(0, k * stepY, xSize, stepY);
+          }
+        }
+      }
+
+      if (styleInfo.ShowFirstColumn && styleOptions.firstColumn)//first column
+      {
+        color = null;
+        if (styleOptions.firstColumn && styleOptions.firstColumn.dxf.fill &&
+          null != styleOptions.firstColumn.dxf.fill.bg) {
+          color = styleOptions.firstColumn.dxf.fill.bg;
         }
 
-        var canvas = document.createElement('canvas');
-        canvas.width = styleThumbnailWidth;
-        canvas.height = styleThumbnailHeight;
-        var customStyles = wb.TableStyles.CustomStyles;
-        var result  = [];
-        var options;
-        var n = 0;
-        if(customStyles)
-        {
-            for(var i in customStyles)
-            {
-                if(customStyles[i].table)
-                {
-                    options =
-                    {
-                        name: i,
-                        displayName: customStyles[i].displayName,
-                        type: 'custom',
-                        image: this.af_getSmallIconTable(canvas, customStyles[i], fmgrGraphics, oFont, props)
-                    };
-                    result[n] = new AscCommonExcel.formatTablePictures(options);
-                    n++;
-                }
-            }
+        if (color != null) {
+          ctx.setFillStyle(color);
+          ctx.fillRect(0, 0, stepX, ySize);
         }
-        var defaultStyles = wb.TableStyles.DefaultStyles;
-        if(defaultStyles)
-        {
-            for(var i in defaultStyles)
-            {
-                if(defaultStyles[i].table)
-                {
-                    options =
-                    {
-                        name: i,
-                        displayName: defaultStyles[i].displayName,
-                        type: 'default',
-                        image: this.af_getSmallIconTable(canvas, defaultStyles[i], fmgrGraphics, oFont, props)
-                    };
-                    result[n] = new AscCommonExcel.formatTablePictures(options);
-                    n++;
-                }
-            }
-        }
-        return result;
-    };
-
-    WorkbookView.prototype.af_getSmallIconTable = function(canvas, style, fmgrGraphics, oFont, props)
-    {
-        var ctx = new Asc.DrawingContext({canvas: canvas, units: 1/*pt*/, fmgrGraphics: fmgrGraphics, font: oFont});
-        var styleOptions = style;
-		
-        //по умолчанию ставим строку заголовка и чередующиеся строки, позже нужно будет получать параметр
-		var styleInfo;
-		if(props)
-		{
-			styleInfo = 
-			{
-				ShowColumnStripes: props.asc_getBandVer(),
-				ShowFirstColumn: props.asc_getFirstCol(),
-				ShowLastColumn: props.asc_getLastCol(),
-				ShowRowStripes: props.asc_getBandHor(),
-				HeaderRowCount: props.asc_getFirstRow(),
-				TotalsRowCount: props.asc_getLastRow()
-			};
-		}
-		else
-		{
-			styleInfo = 
-			{
-			ShowColumnStripes: false,
-			ShowFirstColumn: false,
-			ShowLastColumn: false,
-			ShowRowStripes: true,
-				HeaderRowCount: true,
-				TotalsRowCount: false
-		};
-		}
-
-
-        var pxToMM = 72 / 96;
-        var ySize = 45 * pxToMM;
-        var xSize = 61 * pxToMM;
-
-        var stepY = (ySize) / 5;
-        var stepX = (60 * pxToMM) / 5;
-        var whiteColor = new CColor(255, 255, 255);
-        var blackColor = new CColor(0, 0, 0);
-
-        //**draw background**
-        var defaultColorBackground;
-        if(styleOptions.wholeTable && styleOptions.wholeTable.dxf.fill)
-            defaultColorBackground = styleOptions.wholeTable.dxf.fill.bg;
-        else
-            defaultColorBackground = whiteColor;
-
-        var color;
-        if(styleOptions != undefined)
-        {
-            if(styleOptions.wholeTable && styleOptions.wholeTable.dxf.fill && null != styleOptions.wholeTable.dxf.fill.bg)
-            {
-                ctx.setFillStyle(styleOptions.wholeTable.dxf.fill.bg);
-                ctx.fillRect(0, 0, xSize, ySize);
-            }
-            else
-            {
-                ctx.setFillStyle(whiteColor);
-                ctx.fillRect(0, 0, xSize, ySize);
-            }
-            if(styleInfo.ShowColumnStripes)//column stripes
-            {
-                for(k = 0; k < 6; k++)
-                {
-                    color = defaultColorBackground;
-                    if(k % 2 == 0)
-                    {
-                        if(styleOptions.firstColumnStripe && styleOptions.firstColumnStripe.dxf.fill && null != styleOptions.firstColumnStripe.dxf.fill.bg)
-                            color =  styleOptions.firstColumnStripe.dxf.fill.bg;
-                        else if(styleOptions.wholeTable && styleOptions.wholeTable.dxf.fill && null != styleOptions.wholeTable.dxf.fill.bg)
-                            color =  styleOptions.wholeTable.dxf.fill.bg;
-                    }
-                    else
-                    {
-                        if(styleOptions.secondColumnStripe && styleOptions.secondColumnStripe.dxf.fill && null != styleOptions.secondColumnStripe.dxf.fill.bg)
-                            color = styleOptions.secondColumnStripe.dxf.fill.bg;
-                        else if(styleOptions.wholeTable && styleOptions.wholeTable.dxf.fill && null != styleOptions.wholeTable.dxf.fill.bg)
-                            color =  styleOptions.wholeTable.dxf.fill.bg;
-                    }
-                    ctx.setFillStyle(color);
-                    ctx.fillRect(k * stepX, 0, stepX, ySize);
-                }
-            }
-
-            if(styleInfo.ShowRowStripes)//row stripes
-            {
-                for(var k = 0; k < 6; k++)
-                {
-                    color = null;
-					
-					if(k == 0 && styleInfo.HeaderRowCount)
-						continue;
-					
-					if(styleInfo.HeaderRowCount)
-					{
-						if(k % 2 != 0)
-						{
-							if(styleOptions.firstRowStripe && styleOptions.firstRowStripe.dxf.fill && null != styleOptions.firstRowStripe.dxf.fill.bg)
-							{
-								color = styleOptions.firstRowStripe.dxf.fill.bg;
-							}
-						}
-						else
-						{
-							if(styleOptions.secondRowStripe && styleOptions.secondRowStripe.dxf.fill && null != styleOptions.secondRowStripe.dxf.fill.bg)
-							{
-								color = styleOptions.secondRowStripe.dxf.fill.bg;
-							}
-						}
-					}
-					else
-					{
-						if(k % 2 != 0)
-						{
-							if(styleOptions.secondRowStripe && styleOptions.secondRowStripe.dxf.fill && null != styleOptions.secondRowStripe.dxf.fill.bg)
-							{
-								color = styleOptions.secondRowStripe.dxf.fill.bg;
-							}
-						}
-						else
-						{
-							if(styleOptions.firstRowStripe && styleOptions.firstRowStripe.dxf.fill && null != styleOptions.firstRowStripe.dxf.fill.bg)
-							{
-								color = styleOptions.firstRowStripe.dxf.fill.bg;
-							}
-						}
-					}
-					
-					if(color != null)
-					{
-						ctx.setFillStyle(color);
-						ctx.fillRect(0, k * stepY, xSize, stepY);
-					}
-                }
-            }
-			
-            if(styleInfo.ShowFirstColumn && styleOptions.firstColumn)//first column
-            {
-                color = null;
-				if(styleOptions.firstColumn && styleOptions.firstColumn.dxf.fill && null != styleOptions.firstColumn.dxf.fill.bg)
-                    color = styleOptions.firstColumn.dxf.fill.bg;
-				
-				if(color != null)
-                {
-					ctx.setFillStyle(color);
-					ctx.fillRect(0, 0, stepX, ySize);
-				}
-            }
-            if(styleInfo.ShowLastColumn)//last column
-            {
-                color = null;
-                if(styleOptions.lastColumn && styleOptions.lastColumn.dxf.fill && null != styleOptions.lastColumn.dxf.fill.bg)
-                    color =styleOptions.lastColumn.dxf.fill.bg;
-
-                if(color != null)
-                {
-                    ctx.setFillStyle(color);
-                    ctx.fillRect(4*stepX + 1, 0, stepX, ySize);
-                }
-
-            }
-            if(styleInfo.HeaderRowCount)//header row
-            {
-                if(styleOptions.headerRow && styleOptions.headerRow.dxf.fill && null != styleOptions.headerRow.dxf.fill.bg)
-                {
-                    ctx.setFillStyle(styleOptions.headerRow.dxf.fill.bg);
-                }
-                else
-                {
-                    ctx.setFillStyle(defaultColorBackground);
-                }
-                ctx.fillRect(0, 0, xSize, stepY);
-
-            }
-            if(styleInfo.TotalsRowCount)//total row
-            {
-                color = null;
-                if(styleOptions.totalRow && styleOptions.totalRow.dxf.fill && null != styleOptions.totalRow.dxf.fill.bg)
-                    color = styleOptions.totalRow.dxf.fill.bg;
-                
-				if(color !== null)
-				{
-					ctx.setFillStyle(color);
-					ctx.fillRect(0, stepY * 4, xSize, stepY);
-				}
-            }
-
-
-            //первая ячейка
-            if(styleOptions.firstHeaderCell && styleInfo.ShowFirstColumn)
-            {
-                if(styleOptions.firstHeaderCell && styleOptions.firstHeaderCell.dxf.fill && null != styleOptions.firstHeaderCell.dxf.fill.bg)
-                    ctx.setFillStyle(styleOptions.firstHeaderCell.dxf.fill.bg);
-                else
-                    ctx.setFillStyle(defaultColorBackground);
-                ctx.fillRect(0,0,stepX,stepY);
-            }
-            //последняя в первой строке
-            if(styleOptions.lastHeaderCell && styleInfo.ShowLastColumn)
-            {
-                if(styleOptions.lastHeaderCell && styleOptions.lastHeaderCell.dxf.fill && null != styleOptions.lastHeaderCell.dxf.fill.bg)
-                    ctx.setFillStyle(styleOptions.lastHeaderCell.dxf.fill.bg);
-                else
-                    ctx.setFillStyle(defaultColorBackground);
-                ctx.fillRect(4*stepX,0,stepX,stepY);
-            }
-            //первая в последней строке
-            if(styleOptions.firstTotalCell  && styleInfo.TotalsRowCount && styleInfo.ShowFirstColumn)
-            {
-                if(styleOptions.firstTotalCell && styleOptions.firstTotalCell.dxf.fill && null != styleOptions.firstTotalCell.dxf.fill.bg)
-                    ctx.setFillStyle(styleOptions.firstTotalCell.dxf.fill.bg);
-                else
-                    ctx.setFillStyle(defaultColorBackground);
-                ctx.fillRect(0,4*stepY,stepX,stepY);
-            }
-            //последняя ячейка
-            if(styleOptions.lastTotalCell  && styleInfo.TotalsRowCount && styleInfo.ShowLastColumn)
-            {
-                if(styleOptions.lastTotalCell && styleOptions.lastTotalCell.dxf.fill && null != styleOptions.lastTotalCell.dxf.fill.bg)
-                    ctx.setFillStyle(styleOptions.lastTotalCell.dxf.fill.bg);
-                else
-                    ctx.setFillStyle(defaultColorBackground);
-                ctx.fillRect(4*stepX,4*stepY,stepX,ySize);
-            }
-
-        }
-        else
-        {
-            ctx.setFillStyle(whiteColor);
-            ctx.fillRect(0,0,xSize,ySize);
+      }
+      if (styleInfo.ShowLastColumn)//last column
+      {
+        color = null;
+        if (styleOptions.lastColumn && styleOptions.lastColumn.dxf.fill &&
+          null != styleOptions.lastColumn.dxf.fill.bg) {
+          color = styleOptions.lastColumn.dxf.fill.bg;
         }
 
-
-
-        //**draw vertical and horizontal lines**
-        if(styleOptions != undefined)
-        {
-            ctx.setLineWidth(1);
-            ctx.beginPath();
-            if(styleOptions.wholeTable && styleOptions.wholeTable.dxf.border)
-            {
-                var borders = styleOptions.wholeTable.dxf.border;
-                if(borders.t.s !== c_oAscBorderStyles.None)
-                {
-                    ctx.setStrokeStyle(borders.t.c);
-                    ctx.lineHor(0, 0, xSize);
-                }
-                if(borders.b.s !== c_oAscBorderStyles.None)
-                {
-                    ctx.setStrokeStyle(borders.b.c);
-                    ctx.lineHor(0, ySize, xSize);
-                }
-                if(borders.l.s !== c_oAscBorderStyles.None)
-                {
-                    ctx.setStrokeStyle(borders.l.c);
-                    ctx.lineVer(0, 0, ySize);
-                }
-                if(borders.r.s !== c_oAscBorderStyles.None)
-                {
-                    ctx.setStrokeStyle(borders.r.c);
-                    ctx.lineVer(xSize - 1, 0, ySize);
-                }
-                if(borders.ih.s !== c_oAscBorderStyles.None)
-                {
-                    ctx.setStrokeStyle(borders.ih.c);
-                    for(var n = 1; n < 5; n++)
-                    {
-                        ctx.lineHor(0, stepY*n, xSize);
-                    }
-                    ctx.stroke();
-                }
-                if(borders.iv.s !== c_oAscBorderStyles.None)
-                {
-                    ctx.setStrokeStyle(borders.iv.c);
-                    for(var n = 1; n < 5; n++)
-                    {
-                        ctx.lineVer(stepX*n, 0, ySize);
-                    }
-                    ctx.stroke();
-                }
-
-            }
-
-            var border;
-            if(styleInfo.ShowRowStripes)
-            {
-                if(styleOptions.firstRowStripe && styleOptions.firstRowStripe.dxf.border)
-                    border = styleOptions.firstRowStripe.dxf.border;
-                else if(styleOptions.secondRowStripe && styleOptions.secondRowStripe.dxf.border)
-                    border = styleOptions.secondRowStripe.dxf.border;
-
-                if(border)
-                {
-                    for(n = 1; n < 5; n++)
-                    {
-                        ctx.lineHor(0, stepY*n, xSize);
-                    }
-                    ctx.stroke();
-                }
-            }
-            if(styleOptions.totalRow && styleInfo.TotalsRowCount && styleOptions.totalRow.dxf.border)
-            {
-                border = styleOptions.totalRow.dxf.border;
-                if(border.t.s !== c_oAscBorderStyles.None)
-                {
-                    ctx.setStrokeStyle(border.t.c);
-                    ctx.lineVer(0, xSize, ySize);
-                }
-            }
-            if(styleOptions.headerRow && styleOptions.headerRow.dxf.border && styleInfo.HeaderRowCount)//header row
-            {
-                border = styleOptions.headerRow.dxf.border;
-                if(border.t.s !== c_oAscBorderStyles.None)
-                {
-                    ctx.setStrokeStyle(border.t.c);
-                    ctx.lineHor(0, 0, xSize);
-                }
-                if(border.b.s !== c_oAscBorderStyles.None)
-                {
-                    ctx.setStrokeStyle(border.b.c);
-                    ctx.lineHor(0, stepY, xSize);
-                }
-                ctx.stroke();
-            }
-            ctx.closePath();
+        if (color != null) {
+          ctx.setFillStyle(color);
+          ctx.fillRect(4 * stepX + 1, 0, stepX, ySize);
         }
 
-        //**draw marks line**
-        var defaultColor;
-        if(!styleOptions || !styleOptions.wholeTable || !styleOptions.wholeTable.dxf.font)
-            defaultColor = blackColor;
-        else
-            defaultColor = styleOptions.wholeTable.dxf.font.c;
-        for(var n = 1; n < 6; n++)
-        {
-            ctx.beginPath();
-            color = null;
-            if(n == 1 && styleOptions && styleOptions.headerRow && styleOptions.headerRow.dxf.font)
-                color = styleOptions.headerRow.dxf.font.c;
-            else if(n == 5 && styleOptions && styleOptions.totalRow && styleOptions.totalRow.dxf.font)
-                color = styleOptions.totalRow.dxf.font.c;
-            else if(styleOptions && styleOptions.headerRow && styleInfo.ShowRowStripes)
-            {
-                if((n == 2 || (n == 5 && !styleOptions.totalRow)) &&  styleOptions.firstRowStripe && styleOptions.firstRowStripe.dxf.font)
-                    color  = styleOptions.firstRowStripe.dxf.font.c;
-                else if(n == 3 && styleOptions.secondRowStripe && styleOptions.secondRowStripe.dxf.font)
-                    color  = styleOptions.secondRowStripe.dxf.font.c;
-                else
-                    color = defaultColor
-            }
-            else if(styleOptions && !styleOptions.headerRow && styleInfo.ShowRowStripes)
-            {
-                if((n == 1 || n == 3 || (n == 5 && !styleOptions.totalRow)) && styleOptions.firstRowStripe && styleOptions.firstRowStripe.dxf.font)
-                    color  = styleOptions.firstRowStripe.dxf.font.c;
-                else if((n == 2 || n == 4) && styleOptions.secondRowStripe && styleOptions.secondRowStripe.dxf.font)
-                    color  = styleOptions.secondRowStripe.dxf.font.c;
-                else
-                    color = defaultColor
-            }
-            else
-                color = defaultColor;
-            ctx.setStrokeStyle(color);
-            var k = 0;
-            var strY = n*stepY - stepY/2;
-            while(k < 6)
-            {
-                ctx.lineHor(k*stepX + 3 * pxToMM, strY, (k + 1)*stepX - 2 * pxToMM);
-                k++;
-            }
-            ctx.stroke();
-            ctx.closePath();
+      }
+      if (styleInfo.HeaderRowCount)//header row
+      {
+        if (styleOptions.headerRow && styleOptions.headerRow.dxf.fill && null != styleOptions.headerRow.dxf.fill.bg) {
+          ctx.setFillStyle(styleOptions.headerRow.dxf.fill.bg);
+        } else {
+          ctx.setFillStyle(defaultColorBackground);
+        }
+        ctx.fillRect(0, 0, xSize, stepY);
+
+      }
+      if (styleInfo.TotalsRowCount)//total row
+      {
+        color = null;
+        if (styleOptions.totalRow && styleOptions.totalRow.dxf.fill && null != styleOptions.totalRow.dxf.fill.bg) {
+          color = styleOptions.totalRow.dxf.fill.bg;
         }
 
-        return canvas.toDataURL("image/png");
-    };
+        if (color !== null) {
+          ctx.setFillStyle(color);
+          ctx.fillRect(0, stepY * 4, xSize, stepY);
+        }
+      }
+
+
+      //первая ячейка
+      if (styleOptions.firstHeaderCell && styleInfo.ShowFirstColumn) {
+        if (styleOptions.firstHeaderCell && styleOptions.firstHeaderCell.dxf.fill &&
+          null != styleOptions.firstHeaderCell.dxf.fill.bg) {
+          ctx.setFillStyle(styleOptions.firstHeaderCell.dxf.fill.bg);
+        } else {
+          ctx.setFillStyle(defaultColorBackground);
+        }
+        ctx.fillRect(0, 0, stepX, stepY);
+      }
+      //последняя в первой строке
+      if (styleOptions.lastHeaderCell && styleInfo.ShowLastColumn) {
+        if (styleOptions.lastHeaderCell && styleOptions.lastHeaderCell.dxf.fill &&
+          null != styleOptions.lastHeaderCell.dxf.fill.bg) {
+          ctx.setFillStyle(styleOptions.lastHeaderCell.dxf.fill.bg);
+        } else {
+          ctx.setFillStyle(defaultColorBackground);
+        }
+        ctx.fillRect(4 * stepX, 0, stepX, stepY);
+      }
+      //первая в последней строке
+      if (styleOptions.firstTotalCell && styleInfo.TotalsRowCount && styleInfo.ShowFirstColumn) {
+        if (styleOptions.firstTotalCell && styleOptions.firstTotalCell.dxf.fill &&
+          null != styleOptions.firstTotalCell.dxf.fill.bg) {
+          ctx.setFillStyle(styleOptions.firstTotalCell.dxf.fill.bg);
+        } else {
+          ctx.setFillStyle(defaultColorBackground);
+        }
+        ctx.fillRect(0, 4 * stepY, stepX, stepY);
+      }
+      //последняя ячейка
+      if (styleOptions.lastTotalCell && styleInfo.TotalsRowCount && styleInfo.ShowLastColumn) {
+        if (styleOptions.lastTotalCell && styleOptions.lastTotalCell.dxf.fill &&
+          null != styleOptions.lastTotalCell.dxf.fill.bg) {
+          ctx.setFillStyle(styleOptions.lastTotalCell.dxf.fill.bg);
+        } else {
+          ctx.setFillStyle(defaultColorBackground);
+        }
+        ctx.fillRect(4 * stepX, 4 * stepY, stepX, ySize);
+      }
+
+    } else {
+      ctx.setFillStyle(whiteColor);
+      ctx.fillRect(0, 0, xSize, ySize);
+    }
+
+
+    //**draw vertical and horizontal lines**
+    if (styleOptions != undefined) {
+      ctx.setLineWidth(1);
+      ctx.beginPath();
+      if (styleOptions.wholeTable && styleOptions.wholeTable.dxf.border) {
+        var borders = styleOptions.wholeTable.dxf.border;
+        if (borders.t.s !== c_oAscBorderStyles.None) {
+          ctx.setStrokeStyle(borders.t.c);
+          ctx.lineHor(0, 0, xSize);
+        }
+        if (borders.b.s !== c_oAscBorderStyles.None) {
+          ctx.setStrokeStyle(borders.b.c);
+          ctx.lineHor(0, ySize, xSize);
+        }
+        if (borders.l.s !== c_oAscBorderStyles.None) {
+          ctx.setStrokeStyle(borders.l.c);
+          ctx.lineVer(0, 0, ySize);
+        }
+        if (borders.r.s !== c_oAscBorderStyles.None) {
+          ctx.setStrokeStyle(borders.r.c);
+          ctx.lineVer(xSize - 1, 0, ySize);
+        }
+        if (borders.ih.s !== c_oAscBorderStyles.None) {
+          ctx.setStrokeStyle(borders.ih.c);
+          for (var n = 1; n < 5; n++) {
+            ctx.lineHor(0, stepY * n, xSize);
+          }
+          ctx.stroke();
+        }
+        if (borders.iv.s !== c_oAscBorderStyles.None) {
+          ctx.setStrokeStyle(borders.iv.c);
+          for (var n = 1; n < 5; n++) {
+            ctx.lineVer(stepX * n, 0, ySize);
+          }
+          ctx.stroke();
+        }
+
+      }
+
+      var border;
+      if (styleInfo.ShowRowStripes) {
+        if (styleOptions.firstRowStripe && styleOptions.firstRowStripe.dxf.border) {
+          border = styleOptions.firstRowStripe.dxf.border;
+        } else if (styleOptions.secondRowStripe && styleOptions.secondRowStripe.dxf.border) {
+          border = styleOptions.secondRowStripe.dxf.border;
+        }
+
+        if (border) {
+          for (n = 1; n < 5; n++) {
+            ctx.lineHor(0, stepY * n, xSize);
+          }
+          ctx.stroke();
+        }
+      }
+      if (styleOptions.totalRow && styleInfo.TotalsRowCount && styleOptions.totalRow.dxf.border) {
+        border = styleOptions.totalRow.dxf.border;
+        if (border.t.s !== c_oAscBorderStyles.None) {
+          ctx.setStrokeStyle(border.t.c);
+          ctx.lineVer(0, xSize, ySize);
+        }
+      }
+      if (styleOptions.headerRow && styleOptions.headerRow.dxf.border && styleInfo.HeaderRowCount)//header row
+      {
+        border = styleOptions.headerRow.dxf.border;
+        if (border.t.s !== c_oAscBorderStyles.None) {
+          ctx.setStrokeStyle(border.t.c);
+          ctx.lineHor(0, 0, xSize);
+        }
+        if (border.b.s !== c_oAscBorderStyles.None) {
+          ctx.setStrokeStyle(border.b.c);
+          ctx.lineHor(0, stepY, xSize);
+        }
+        ctx.stroke();
+      }
+      ctx.closePath();
+    }
+
+    //**draw marks line**
+    var defaultColor;
+    if (!styleOptions || !styleOptions.wholeTable || !styleOptions.wholeTable.dxf.font) {
+      defaultColor = blackColor;
+    } else {
+      defaultColor = styleOptions.wholeTable.dxf.font.c;
+    }
+    for (var n = 1; n < 6; n++) {
+      ctx.beginPath();
+      color = null;
+      if (n == 1 && styleOptions && styleOptions.headerRow && styleOptions.headerRow.dxf.font) {
+        color = styleOptions.headerRow.dxf.font.c;
+      } else if (n == 5 && styleOptions && styleOptions.totalRow && styleOptions.totalRow.dxf.font) {
+        color = styleOptions.totalRow.dxf.font.c;
+      } else if (styleOptions && styleOptions.headerRow && styleInfo.ShowRowStripes) {
+        if ((n == 2 || (n == 5 && !styleOptions.totalRow)) && styleOptions.firstRowStripe &&
+          styleOptions.firstRowStripe.dxf.font) {
+          color = styleOptions.firstRowStripe.dxf.font.c;
+        } else if (n == 3 && styleOptions.secondRowStripe && styleOptions.secondRowStripe.dxf.font) {
+          color = styleOptions.secondRowStripe.dxf.font.c;
+        } else {
+          color = defaultColor
+        }
+      } else if (styleOptions && !styleOptions.headerRow && styleInfo.ShowRowStripes) {
+        if ((n == 1 || n == 3 || (n == 5 && !styleOptions.totalRow)) && styleOptions.firstRowStripe &&
+          styleOptions.firstRowStripe.dxf.font) {
+          color = styleOptions.firstRowStripe.dxf.font.c;
+        } else if ((n == 2 || n == 4) && styleOptions.secondRowStripe && styleOptions.secondRowStripe.dxf.font) {
+          color = styleOptions.secondRowStripe.dxf.font.c;
+        } else {
+          color = defaultColor
+        }
+      } else {
+        color = defaultColor;
+      }
+      ctx.setStrokeStyle(color);
+      var k = 0;
+      var strY = n * stepY - stepY / 2;
+      while (k < 6) {
+        ctx.lineHor(k * stepX + 3 * pxToMM, strY, (k + 1) * stepX - 2 * pxToMM);
+        k++;
+      }
+      ctx.stroke();
+      ctx.closePath();
+    }
+
+    return canvas.toDataURL("image/png");
+  };
 
   //------------------------------------------------------------export---------------------------------------------------
   window['AscCommonExcel'] = window['AscCommonExcel'] || {};

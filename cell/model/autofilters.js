@@ -33,11 +33,10 @@
 "use strict";
 (
 	/**
-	 * @param {jQuery} $
 	 * @param {Window} window
 	 * @param {undefined} undefined
 	 */
-	function ($, window, undefined) {
+	function (window, undefined) {
 
 		/*
 		 * Import
@@ -824,7 +823,7 @@
 				var isTitle = this._isAddNameColumn(mainAdjacentCells);
 				objOptions.asc_setIsTitle(isTitle);
 				var tmpRange = mainAdjacentCells.clone();
-				tmpRange.r1Abs = tmpRange.c1Abs = tmpRange.r2Abs = tmpRange.c2Abs = true;
+				tmpRange.setAbs(true, true, true, true);
 				objOptions.asc_setRange(tmpRange.getName());
 				return objOptions;
 			},
@@ -2415,7 +2414,7 @@
 						{
 							//если сверху пустая строка, то просто увеличиваем диапазон и меняем флаг
 							var rangeUpTable = new Asc.Range(tablePart.Ref.c1, tablePart.Ref.r2 + 1, tablePart.Ref.c2, tablePart.Ref.r2 + 1); 
-							if(this._isEmptyCurrentRange(rangeUpTable) && this.searchRangeInTableParts(rangeUpTable) === -1)
+							if(this._isEmptyRange(rangeUpTable, 0) && this.searchRangeInTableParts(rangeUpTable) === -1)
 							{
 								isSetValue = true;
 								isSetType = true;
@@ -2462,7 +2461,7 @@
 						{
 							//если сверху пустая строка, то просто увеличиваем диапазон и меняем флаг
 							var rangeUpTable = new Asc.Range(tablePart.Ref.c1, tablePart.Ref.r1 - 1, tablePart.Ref.c2, tablePart.Ref.r1 - 1); 
-							if(this._isEmptyCurrentRange(rangeUpTable) && this.searchRangeInTableParts(rangeUpTable) === -1)
+							if(this._isEmptyRange(rangeUpTable, 0) && this.searchRangeInTableParts(rangeUpTable) === -1)
 							{
 								isSetValue = true;
 								
@@ -2563,21 +2562,6 @@
 					range.cleanText();
 					History.TurnOn();
 				}
-			},
-			
-			_isEmptyCurrentRange: function(range)
-			{
-				var worksheet = this.worksheet;
-				for(var n = range.r1; n <= range.r2; n++)
-				{
-					for(var k = range.c1; k <= range.c2; k++)
-					{
-						var cell = worksheet.getCell3(n, k, n, k);
-						if(cell.getValueWithoutFormat() != '')
-							return false;
-					}
-				}
-				return true;
 			},
 			
 			//TODO избавиться от split, передавать cellId и tableName
@@ -4921,26 +4905,17 @@
 				return result;
 			},
 			
-			_isEmptyRange: function(activeCells)
+			_isEmptyRange: function(ar, addDelta)
 			{
-				var worksheet = this.worksheet;
-				var cell;
-				for(var n = activeCells.r1 - 1; n <= activeCells.r2 + 1; n++)
-				{
-					if(n < 0)
-						n = 0;
-					
-					for(var k = activeCells.c1 - 1; k <= activeCells.c2 + 1; k++)
-					{
-						if(k < 0)
-							k = 0;
-						cell = worksheet.getCell3(n, k, n, k);
-						
-						if(cell.getValueWithoutFormat() != '')
-							return false;
+				var range = this.worksheet.getRange3(Math.max(0, ar.r1 - addDelta), Math.max(0, ar.c1 - addDelta), ar.r2 + addDelta, ar.c2 + addDelta);
+				var res = true;
+				range._foreachNoEmpty(function (cell) {
+					if (!cell.isEmptyText()) {
+						res = false;
+						return true;
 					}
-				}
-				return true;
+				});
+				return res;
 			},
 			
 			_setStyleTables: function(range)
@@ -5129,4 +5104,4 @@
 		prot["asc_getType"]						= prot.asc_getType;
 		prot["asc_getImage"]					= prot.asc_getImage;
 	}
-)(jQuery, window);
+)(window);

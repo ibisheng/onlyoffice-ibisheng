@@ -11124,4 +11124,11 @@ BinaryChartReader.prototype.ReadAlternateContentFallback = function (type, lengt
   window['AscCommon'] = window['AscCommon'] || {};
   window['AscCommon'].BinaryChartWriter = BinaryChartWriter;
   window['AscCommon'].BinaryChartReader = BinaryChartReader;
+
+  window['AscFormat'] = window['AscFormat'] || {};
+    window['AscFormat'].LAYOUT_MODE_EDGE = LAYOUT_MODE_EDGE;
+    window['AscFormat'].LAYOUT_MODE_FACTOR = LAYOUT_MODE_FACTOR;
+
+    window['AscFormat'].LAYOUT_TARGET_INNER = LAYOUT_TARGET_INNER;
+    window['AscFormat'].LAYOUT_TARGET_OUTER = LAYOUT_TARGET_OUTER;
 })(window);

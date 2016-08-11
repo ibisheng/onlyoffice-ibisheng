@@ -179,6 +179,7 @@
 		"../common/clipboard_base.js",
 		"../common/text_input.js",
 		"../common/Drawings/Format/OleObject.js",
+		"../common/Drawings/Format/DrawingContent.js",
 		"../common/plugins.js"
       ],
       "private": [
@@ -211,6 +212,7 @@
         "../common/Native/Wrappers/TextMeasurerWrapper.js",
         "../common/Native/Wrappers/DrawingStream.js",
 		"../common/Native/Wrappers/ShapeDrawer.js",
+        "../cell/native/TextDrawer.js",
         "../cell/native/Overlay.js",
 		"../cell/native/Graphics.js",
         "../cell/native/DrawingDocument.js",
@@ -227,6 +229,7 @@
         "../common/FontsFreeType/FontManager.js",
 		"../common/FontsFreeType/TextMeasurer.js",
 		"../cell/model/DrawingObjects/Graphics.js",
+        "../common/Drawings/TextDrawer.js",
 		"../cell/view/iscroll.js"
 	  ],
       "dst": "../cell",

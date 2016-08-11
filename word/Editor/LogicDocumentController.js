@@ -249,9 +249,9 @@ CLogicDocumentController.prototype.GetCurPosXY = function()
 {
 	return this.LogicDocument.controller_GetCurPosXY();
 };
-CLogicDocumentController.prototype.GetSelectedText = function(bClearText)
+CLogicDocumentController.prototype.GetSelectedText = function(bClearText, oPr)
 {
-	return this.LogicDocument.controller_GetSelectedText(bClearText);
+	return this.LogicDocument.controller_GetSelectedText(bClearText, oPr);
 };
 CLogicDocumentController.prototype.GetCurrentParagraph = function()
 {
@@ -364,4 +364,8 @@ CLogicDocumentController.prototype.SaveDocumentStateBeforeLoadChanges = function
 CLogicDocumentController.prototype.RestoreDocumentStateAfterLoadChanges = function(State)
 {
 	this.LogicDocument.controller_RestoreDocumentStateAfterLoadChanges(State);
+};
+CLogicDocumentController.prototype.GetColumnSize = function()
+{
+	return this.LogicDocument.controller_GetColumnSize();
 };
