@@ -3926,7 +3926,7 @@
                     return oThis.ReadTable(t,l, oNewTable);
                 });
                 if(null != oNewTable.Ref && null != oNewTable.DisplayName)
-                    this.ws.workbook.dependencyFormulas.addTableName(oNewTable.DisplayName, this.ws, oNewTable.Ref, oNewTable);
+                    this.ws.workbook.dependencyFormulas.addTableName(this.ws, oNewTable);
                 aTables.push(oNewTable);
             }
             else

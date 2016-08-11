@@ -663,54 +663,42 @@ function getRangeType(oBBox){
 			});
 		},
 		//defined name table
-		getNextTableName: function(ws, Ref, opt_tableName, opt_table) {
+		getNextTableName: function() {
 			var sNewName;
-			if (opt_tableName) {
-				sNewName = opt_tableName;
-			} else {
-				var collaborativeIndexUser = "";
-				if (this.wb.oApi.collaborativeEditing.getCollaborativeEditing()) {
-					collaborativeIndexUser = "_" + this.wb.oApi.CoAuthoringApi.get_indexUser();
-				}
-				do {
-					this.tableNameIndex++;
-					sNewName = this.tableNamePattern + this.tableNameIndex + collaborativeIndexUser;
-				} while (this.isListeningDefName(sNewName));
+			var collaborativeIndexUser = "";
+			if (this.wb.oApi.collaborativeEditing.getCollaborativeEditing()) {
+				collaborativeIndexUser = "_" + this.wb.oApi.CoAuthoringApi.get_indexUser();
 			}
-
-			this.addTableName(sNewName, ws, Ref, opt_table);
+			do {
+				this.tableNameIndex++;
+				sNewName = this.tableNamePattern + this.tableNameIndex + collaborativeIndexUser;
+			} while (this.isListeningDefName(sNewName));
 			return sNewName;
 		},
-		addTableName: function(sName, ws, Ref, table) {
-			var refClone;
-			if (table) {
-				refClone = table.getRangeWithoutHeaderFooter();
-			} else {
-				//todo
-				refClone = Ref.clone(true);
-				refClone.r1++;
-			}
+		addTableName: function(ws, table) {
+			var ref = table.getRangeWithoutHeaderFooter();
 
-			var defName = this.getDefNameByName(sName, null);
+			var defNameRef = parserHelp.get3DRef(ws.getName(), ref.getAbsName());
+			var defName = this.getDefNameByName(table.DisplayName, null);
 			if (!defName) {
-				var defNameRef = parserHelp.get3DRef(ws.getName(), refClone.getAbsName());
-				this.addDefNameOpen(sName, defNameRef, null, null, true);
+				this.addDefNameOpen(table.DisplayName, defNameRef, null, null, true);
 			} else {
-				defName.ref = defNameRef;
+				defName.setRef(defNameRef);
 			}
 		},
 		changeTableRef: function(tableName, newRef) {
-			History.TurnOff();
 			var defName = this.getDefNameByName(tableName, null);
 			if (defName) {
+				this.buildDependency();
 				var oldAscName = defName.getAscCDefName();
 				var newAscName = defName.getAscCDefName();
 				newAscName.Ref = defName.ref.split('!')[0] + '!' + newRef.getAbsName();
+				History.TurnOff();
 				this.editDefinesNames(oldAscName, newAscName);
 				var notifyData = {type: AscCommon.c_oNotifyType.ChangeDefName, from: oldAscName, to: newAscName};
 				this._broadcastDefName(defName.name, notifyData);
+				History.TurnOn();
 			}
-			History.TurnOn();
 		},
 		changeTableName: function(tableName, newName) {
 			var defName = this.getDefNameByName(tableName, null);
@@ -724,7 +712,8 @@ function getRangeType(oBBox){
 			}
 		},
 		delTableName: function(tableName) {
-			this._delDefName(tableName, null);
+			var defName = this._delDefName(tableName, null);
+			this.addToChangedDefName(defName);
 			//todo make ref
 			// var notifyData = {type: AscCommon.c_oNotifyType.ChangeDefName, from: defName.getAscCDefName(), to: null};
 			// this._broadcastDefName(tableName, notifyData);
@@ -736,6 +725,7 @@ function getRangeType(oBBox){
 				var notifyData = {type: AscCommon.c_oNotifyType.Rebuild};
 				this._broadcastDefName(defName.name, notifyData);
 			}
+			this.calcTree();
 		},
 		//set dirty
 		addToChangedCell: function(cell) {
@@ -1121,7 +1111,7 @@ function getRangeType(oBBox){
 					}
 				}
 				var bottom = this.yTree.getElem(bbox.r2);
-				if (bottom.storedValue.vals[data.id]) {
+				if (bottom && bottom.storedValue.vals[data.id]) {
 					delete bottom.storedValue.vals[data.id];
 					bottom.storedValue.count--;
 					if (bottom.storedValue.count <= 0) {
@@ -1456,8 +1446,7 @@ Workbook.prototype._insertTablePartsName = function (sheet) {
 	{
 		for(var i = 0; i < sheet.TableParts.length; i++)
 		{	
-			var oNewTable = sheet.TableParts[i];
-			this.dependencyFormulas.addTableName(oNewTable.DisplayName, sheet, oNewTable.Ref, oNewTable);
+			this.dependencyFormulas.addTableName(sheet, sheet.TableParts[i]);
 		}
 	}
 };
@@ -2813,7 +2802,7 @@ Woorksheet.prototype.insertRowsBefore=function(index, count){
 };
 Woorksheet.prototype._insertRowsBefore=function(index, count){
 	this.workbook.dependencyFormulas.lockRecal();
-	var oActualRange = {r1: index, c1: 0, r2: index + count - 1, c2: gc_nMaxCol0};
+	var oActualRange = new Asc.Range(0, index, gc_nMaxCol0, index + count - 1);
 	History.Create_NewPoint();
 	//index 0 based
 	var aIndexes = [];
@@ -2885,7 +2874,7 @@ Woorksheet.prototype._removeCols=function(start, stop){
 	History.Create_NewPoint();
 	//start, stop 0 based
 	var nDif = -(stop - start + 1), i, j, length, nIndex;
-    var oActualRange = { r1: 0, c1: start, r2: gc_nMaxRow0, c2: stop };
+	var oActualRange = new Asc.Range(start, 0, stop, gc_nMaxRow0);
 	for(i in this.aGCells)
 	{
 		var nRowIndex = i - 0;
@@ -2948,7 +2937,7 @@ Woorksheet.prototype.insertColsBefore=function(index, count){
 };
 Woorksheet.prototype._insertColsBefore=function(index, count){
 	this.workbook.dependencyFormulas.lockRecal();
-	var oActualRange = {r1: 0, c1: index, r2: gc_nMaxRow0, c2: index + count - 1};
+	var oActualRange = new Asc.Range(index, 0, index + count - 1, gc_nMaxRow0);
 	History.Create_NewPoint();
 	//index 0 based
 	for(var i in this.aGCells)
@@ -4350,6 +4339,23 @@ Cell.prototype.setValue2=function(array){
 		cell.removeHyperlink();
 	}
 };
+	Cell.prototype.setFormula = function(formula) {
+		var DataOld = null;
+		var DataNew = null;
+		if (History.Is_On())
+			DataOld = this.getValueData();
+
+		this.removeDependencies();
+		this.oValue.clean();
+		this.formulaParsed = new parserFormula(formula, this, this.ws);
+		this.ws.workbook.dependencyFormulas.addToBuildDependencyCell(this);
+
+		if (History.Is_On()) {
+			DataNew = this.getValueData();
+			if (false == DataOld.isEqual(DataNew))
+				History.Add(AscCommonExcel.g_oUndoRedoCell, AscCH.historyitem_Cell_ChangeValue, this.ws.getId(), new Asc.Range(this.nCol, this.nRow, this.nCol, this.nRow), new UndoRedoData_CellSimpleData(this.nRow, this.nCol, DataOld, DataNew));
+		}
+	};
 	Cell.prototype.removeDependencies = function() {
 		//удаляем сторое значение
 		if (this.formulaParsed) {
@@ -4701,7 +4707,7 @@ Cell.prototype.getValueData = function(){
 Cell.prototype.setValueData = function(Val){
 	//значения устанавляваются через setValue, чтобы пересчитались формулы
 	if(null != Val.formula)
-		this.setValue("=" + Val.formula);
+		this.setFormula(Val.formula);
 	else if(null != Val.value)
 	{
 	    var DataOld = null;
@@ -4779,7 +4785,7 @@ Cell.prototype.setValueData = function(Val){
 					break;
 			}
 			if (eventData.isRebuild) {
-				this.setValue('=' + assemb);
+				this.setFormula(assemb);
 			} else {
 				this.formulaParsed.Formula = assemb;
 				this.formulaParsed.buildDependencies();
@@ -7652,7 +7658,7 @@ Range.prototype._sortByArray=function(oBBox, aSortData, bUndo){
 					History.TurnOff();
 					var _p_ = oCurCell.formulaParsed.clone(null, oCurCell, this);
 					var assemb = _p_.changeOffset({offsetCol: 0, offsetRow: shift}).assemble();
-					oCurCell.setValue("=" + assemb);
+					oCurCell.setFormula(assemb);
 					History.TurnOn();
 				}
 			}
@@ -7923,11 +7929,7 @@ Range.prototype.promote=function(bCtrl, bVertical, nIndex){
 		}
 		History.SetSelectionRedo(oSelectionRedo);
 	}
-  oFormulaLocaleInfo.Parse = false;
-  oFormulaLocaleInfo.DigitSep = false;
 	_promoteFromTo(oBBox, this.worksheet, oPromoteAscRange, this.worksheet, true, oCanPromote, bCtrl, bVertical, nIndex);
-  oFormulaLocaleInfo.Parse = true;
-  oFormulaLocaleInfo.DigitSep = true;
 	return true;
 };
 function _promoteFromTo(from, wsFrom, to, wsTo, bIsPromote, oCanPromote, bCtrl, bVertical, nIndex) {
@@ -8196,7 +8198,7 @@ function _promoteFromTo(from, wsFrom, to, wsTo, bIsPromote, oCanPromote, bCtrl, 
 							} else {
 								var _p_ = oFromCell.formulaParsed.clone(null, oFromCell, this);
 								var assemb = _p_.changeOffset(oCopyCell.getOffset2(oFromCell.getName())).assemble();
-								oCopyCell.setValue("=" + assemb);
+								oCopyCell.setFormula(assemb);
 							}
 						}
 					}

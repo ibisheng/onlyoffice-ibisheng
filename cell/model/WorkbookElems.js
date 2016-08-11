@@ -4726,7 +4726,8 @@ TablePart.prototype.clone = function(ws, tableName) {
 	return res;
 };
 TablePart.prototype.recalc = function(ws, tableName) {
-	this.DisplayName = ws.workbook.dependencyFormulas.getNextTableName(ws, this.Ref, tableName, this);
+	this.DisplayName = ws.workbook.dependencyFormulas.getNextTableName();
+	ws.workbook.dependencyFormulas.addTableName(ws, this);
 };
 TablePart.prototype.moveRef = function(col, row) {
 	var ref = this.Ref.clone();
@@ -4791,7 +4792,7 @@ TablePart.prototype.changeRefOnRange = function(range, autoFilters, generateNewT
 			this.TableColumns = newTableColumns;
 		}
 	}
-	
+	this.Ref = Asc.Range(range.c1, range.r1, range.c2, range.r2);
 	//event
 	this.handlers.trigger("changeRefTablePart", this.DisplayName, this.getRangeWithoutHeaderFooter());
 	

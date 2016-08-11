@@ -921,7 +921,7 @@
 						if(!worksheet.TableParts)
 							worksheet.TableParts = [];
 						worksheet.TableParts[worksheet.TableParts.length] = cloneData;
-						worksheet.workbook.dependencyFormulas.addTableName(cloneData.DisplayName, worksheet, cloneData.Ref, cloneData);
+						worksheet.workbook.dependencyFormulas.addTableName(worksheet, cloneData);
 						this._setColorStyleTable(cloneData.Ref, cloneData, null, true);
 					}
 					else
@@ -1045,7 +1045,7 @@
 								if(!worksheet.TableParts)
 									worksheet.TableParts = [];
 								worksheet.TableParts[worksheet.TableParts.length] = cloneData;
-                                worksheet.workbook.dependencyFormulas.addTableName(cloneData.DisplayName, worksheet, cloneData.Ref, cloneData);
+                                worksheet.workbook.dependencyFormulas.addTableName(worksheet, cloneData);
 								this._setColorStyleTable(cloneData.Ref, cloneData, null, true);
 							}
 							else
@@ -3475,14 +3475,8 @@
 					
 					
 					newFilter.TableColumns = tableColumns;
-
-					if(tablePartDisplayName)
-					{
-						newFilter.DisplayName = tablePartDisplayName;
-						worksheet.workbook.dependencyFormulas.addTableName(tablePartDisplayName, worksheet, ref, newFilter);
-					}
-					else
-						newFilter.DisplayName = worksheet.workbook.dependencyFormulas.getNextTableName(worksheet, ref, null, newFilter);
+					newFilter.DisplayName = tablePartDisplayName ? tablePartDisplayName : worksheet.workbook.dependencyFormulas.getNextTableName();
+					worksheet.workbook.dependencyFormulas.addTableName(worksheet, newFilter);
 					
 					worksheet.TableParts[worksheet.TableParts.length] = newFilter;
 

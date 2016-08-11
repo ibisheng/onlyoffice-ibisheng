@@ -1418,7 +1418,8 @@ function cStrucTable( val, wb, ws ) {
     this.isDynamic = false;//#This row
     this.area = null;
     this.val = val;
-	this._createArea( val, null );
+	var ret = this._createArea( val, null );
+	return (ret && ret.type != cElementType.error) ? this : ret;
 }
 
 cStrucTable.prototype = Object.create( cBaseType.prototype );
@@ -3609,16 +3610,14 @@ function parserFormula( formula, parent, _ws ) {
 				this.shiftCells(data.type, data.sheetId, data.bbox, data.offset);
 				eventData.assembleType = AscCommon.c_oNotifyParentAssemble.Flag;
 			} else if (AscCommon.c_oNotifyType.ChangeDefName === data.type) {
-				if (!data.to) {
-					this.removeTableName(data.from);
-				} else if (data.from.Name != data.to.Name) {
+				if (data.from.Name != data.to.Name) {
 					this.changeDefName(data.from, data.to);
 				} else if (data.from.isTable) {
 					eventData.assembleType = AscCommon.c_oNotifyParentAssemble.Current;
 					eventData.isRebuild = true;
 				}
 			} else if (AscCommon.c_oNotifyType.Rebuild === data.type) {
-				eventData.assembleType = AscCommon.c_oNotifyParentAssemble.Assemble;
+				eventData.assembleType = AscCommon.c_oNotifyParentAssemble.Normal;
 				eventData.isRebuild = true;
 			} else if (AscCommon.c_oNotifyType.ChangeSheet === data.type) {
 				if (this.is3D) {
