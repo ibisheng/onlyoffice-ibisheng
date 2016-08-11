@@ -372,7 +372,7 @@
         if(this.spPr && this.spPr.Fill && this.spPr.Fill.fill && this.spPr.Fill.fill.RasterImageId){
             if(mapUrl[this.spPr.Fill.fill.RasterImageId]){
                 var blip_fill = new AscFormat.CBlipFill();
-                blip_fill.setRasterImageId(mapUrl[this.blipFill.RasterImageId]);
+                blip_fill.setRasterImageId(mapUrl[this.spPr.Fill.fill.RasterImageId]);
                 blip_fill.setStretch(true);
                 var oUniFill = new AscFormat.CUniFill();
                 oUniFill.setFill(blip_fill);
