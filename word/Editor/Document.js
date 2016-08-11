@@ -1481,7 +1481,8 @@ function CDocument(DrawingDocument, isMainLogicDocument)
     this.TrackRevisionsManager = new CTrackRevisionsManager(this);
 
     // Контролируем изменения интерфейса
-    this.ChangedStyles = []; // Объект с Id стилями, которые были изменены/удалены/добавлены
+    this.ChangedStyles      = []; // Объект с Id стилями, которые были изменены/удалены/добавлены
+	this.TurnOffPanelStyles = 0;  // == 0 - можно обновлять панельку со стилями, != 0 - нельзя обновлять
 
     // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
     this.TableId.Add(this, this.Id);
@@ -10108,6 +10109,9 @@ CDocument.prototype.Add_ChangedStyle = function(arrStylesId)
 };
 CDocument.prototype.Document_UpdateStylesPanel = function()
 {
+	if (0 !== this.TurnOffPanelStyles)
+		return;
+
 	var bNeedUpdate = false;
 	for (var StyleId in this.ChangedStyles)
 	{
@@ -10121,6 +10125,17 @@ CDocument.prototype.Document_UpdateStylesPanel = function()
 	{
 		editor.GenerateStyles();
 	}
+};
+CDocument.prototype.LockPanelStyles = function()
+{
+	this.TurnOffPanelStyles++;
+};
+CDocument.prototype.UnlockPanelStyles = function(isUpdate)
+{
+	this.TurnOffPanelStyles = Math.max(0, this.TurnOffPanelStyles - 1);
+
+	if (true === isUpdate)
+		this.Document_UpdateStylesPanel();
 };
 CDocument.prototype.Get_AllParagraphs = function(Props)
 {

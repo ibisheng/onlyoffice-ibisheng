@@ -390,6 +390,16 @@
 					{
 						if (window.g_asc_plugins.api.asc_canPaste())
 						{
+							var editorId = window.g_asc_plugins.api.getEditorId();
+							if (AscCommon.c_oEditorId.Word === editorId ||
+								AscCommon.c_oEditorId.Presentation === editorId)
+							{
+								var oLogicDocument = window.g_asc_plugins.api.WordControl ?
+									window.g_asc_plugins.api.WordControl.m_oLogicDocument : null;
+								
+								oLogicDocument.LockPanelStyles();
+							}
+							
 							var _script = "(function(){ var Api = window.g_asc_plugins.api;\n" + value + "})();";
 							eval(_script);
 
@@ -422,6 +432,7 @@
 											}
 											delete window.g_asc_plugins.images_rename;
 											window.g_asc_plugins.api.asc_Recalculate();
+											oLogicDocument.UnlockPanelStyles(true);
 										});
 								}
 								else if (AscCommon.c_oEditorId.Spreadsheet === editorId)
