@@ -3723,10 +3723,11 @@ function parserFormula( formula, parent, _ws ) {
     this.regSpace = /\$/g;
     this.countRef = 0;
 
-  this.listenerId = lastListenerId++;
-  this.isDirty = false;
-  this.isCalculate = false;
-  this.parent = parent;
+	this.listenerId = lastListenerId++;
+	this.ca = false;
+	this.isDirty = false;
+	this.isCalculate = false;
+	this.parent = parent;
 }
   parserFormula.prototype.getWs = function() {
     return this.ws;
@@ -4670,25 +4671,23 @@ parserFormula.prototype.calculate = function(opt_defName, opt_range) {
 	if (this.isCalculate) {
 		this.value = new cError(cErrorType.bad_reference);
 		this._endCalculate();
-    return this.value;
-  }
-  this.isCalculate = true;
-  if (this.outStack.length < 1) {
-	  this.value = new cError(cErrorType.wrong_name);
-	  this._endCalculate();
-    return this.value;
-  }
+		return this.value;
+	}
+	this.isCalculate = true;
+	if (this.outStack.length < 1) {
+		this.value = new cError(cErrorType.wrong_name);
+		this._endCalculate();
+		return this.value;
+	}
 	var rangeCell = null;
-  if(opt_range){
-	  rangeCell = opt_range;
-  } else{
-	  if(this.parent instanceof AscCommonExcel.Cell){
-		  rangeCell = this.ws.getCell3(this.parent.nRow,this.parent.nCol);
-	  } else {
-		  //we should not be here
-		  rangeCell = this.ws.getCell3(0,0);
-	  }
-  }
+	if (opt_range) {
+		rangeCell = opt_range;
+	} else if (this.parent && this.parent.onFormulaEvent) {
+		rangeCell = this.parent.onFormulaEvent(AscCommon.c_oNotifyParentType.GetRangeCell);
+	}
+	if (!rangeCell) {
+		rangeCell = this.ws.getCell3(0, 0);
+	}
 
   var elemArr = [], _tmp, numFormat = -1, currentElement = null;
   for (var i = 0; i < this.outStack.length; i++) {
@@ -4735,6 +4734,14 @@ parserFormula.prototype.calculate = function(opt_defName, opt_range) {
 		}
 		this.isCalculate = false;
 		this.isDirty = false;
+		if(this.ca != this.value.ca){
+			if (this.ca) {
+				this.wb.dependencyFormulas.endListeningVolatile(this);
+			} else {
+				this.wb.dependencyFormulas.startListeningVolatile(this);
+			}
+			this.ca = this.value.ca;
+		}
 	};
 
 /* Метод возвращает все ссылки на ячейки которые участвуют в формуле*/

@@ -806,7 +806,8 @@
 		CanDo: 0,
 		Change: 1,
 		ChangeFormula: 2,
-		EndCalculate: 3
+		EndCalculate: 3,
+		GetRangeCell: 4
 	};
 
 	var c_oNotifyParentAssemble = {
@@ -1469,9 +1470,9 @@
 	window["AscCommon"].c_oAscMouseMoveDataTypes    = c_oAscMouseMoveDataTypes;
 	window["AscCommon"].c_oAscPrintDefaultSettings  = c_oAscPrintDefaultSettings;
 	window["AscCommon"].c_oZoomType                 = c_oZoomType;
-	window["AscCommon"].c_oNotifyType = c_oNotifyType;
-	window["AscCommon"].c_oNotifyParentType = c_oNotifyParentType;
-	window["AscCommon"].c_oNotifyParentAssemble = c_oNotifyParentAssemble;
+	window["AscCommon"].c_oNotifyType               = c_oNotifyType;
+	window["AscCommon"].c_oNotifyParentType         = c_oNotifyParentType;
+	window["AscCommon"].c_oNotifyParentAssemble     = c_oNotifyParentAssemble;
 	window["AscCommon"].c_oAscEncodings             = c_oAscEncodings;
 	window["AscCommon"].c_oAscEncodingsMap          = c_oAscEncodingsMap;
 	window["AscCommon"].c_oAscCodePageUtf8          = c_oAscCodePageUtf8;

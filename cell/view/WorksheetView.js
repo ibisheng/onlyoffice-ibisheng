@@ -9562,7 +9562,6 @@
                                 var onlyChild = contentCurrentObj[0];
 								var valFormat = onlyChild.text;
                                 var nameFormat = false;
-                                    var offset = range.getCells()[0].getOffset2( currentObj[0].cellFrom ), assemb, _p_ = new AscCommonExcel.parserFormula( currentObj[0].text.substring( 1 ), null, range.worksheet );
 
                                 if ( onlyChild.cellFrom ) 
 								{
@@ -13648,8 +13647,6 @@
         if (!tablePart) {
             return false;
         }
-		var defNameId = t.model.workbook.dependencyFormulas.getDefNameByName(tableName, t.model.getId());
-		defNameId = defNameId ? defNameId.getNodeId() : null;
 
         var refTable = tablePart.Ref;
         var refTableContainsActiveRange = refTable.containsRange(acitveRange);
@@ -13732,8 +13729,8 @@
         };
 
         //лочим данный именованный диапазон при смене размера ф/т
-        var defNameId = t.model.workbook.dependencyFormulas.getDefNameNodeByName(tableName, t.model.getId());
-        defNameId = defNameId ? defNameId.nodeId : null;
+        var defNameId = t.model.workbook.dependencyFormulas.getDefNameByName(tableName, t.model.getId());
+        defNameId = defNameId ? defNameId.getNodeId() : null;
 
         t._isLockedDefNames(callBackLockedDefNames, defNameId);
     };

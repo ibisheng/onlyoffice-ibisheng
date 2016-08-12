@@ -261,7 +261,6 @@ function getRangeType(oBBox){
 				History.Add(AscCommonExcel.g_oUndoRedoWorkbook, AscCH.historyitem_Workbook_DefinedNamesChangeUndo, null,
 							null, new UndoRedoData_DefinedNamesChange(oldAscName, newAscName), true);
 			}
-			return true;
 		}
 	};
 
@@ -570,10 +569,8 @@ function getRangeType(oBBox){
 				res = this.addDefNameOpen(newAscName.Name, newAscName.Ref, newAscName.LocalSheetId, newAscName.Hidden,
 										  false);
 			}
-
+			History.Create_NewPoint();
 			if (res && oldAscName) {
-				History.Create_NewPoint();
-
 				if (oldAscName.Name != newAscName.Name) {
 					this.buildDependency();
 
@@ -588,10 +585,9 @@ function getRangeType(oBBox){
 				} else {
 					res.setAscCDefName(newAscName);
 				}
-
-				History.Add(AscCommonExcel.g_oUndoRedoWorkbook, AscCH.historyitem_Workbook_DefinedNamesChange, null,
-							null, new UndoRedoData_DefinedNamesChange(oldAscName, newAscName));
 			}
+			History.Add(AscCommonExcel.g_oUndoRedoWorkbook, AscCH.historyitem_Workbook_DefinedNamesChange, null, null,
+						new UndoRedoData_DefinedNamesChange(oldAscName, newAscName));
 			return res;
 		},
 		checkDefName: function (name, sheetIndex) {
@@ -4798,7 +4794,9 @@ Cell.prototype.setValueData = function(Val){
 	};
 	Cell.prototype.onFormulaEvent = function(type, eventData) {
 		if (AscCommon.c_oNotifyParentType.CanDo === type) {
-			;
+			return true;
+		} else if (AscCommon.c_oNotifyParentType.GetRangeCell === type) {
+			return this.ws.getCell3(this.nRow, this.nCol);
 		} else if (AscCommon.c_oNotifyParentType.Change === type) {
 			this.ws.workbook.dependencyFormulas.addToChangedCell(this);
 		} else if (AscCommon.c_oNotifyParentType.ChangeFormula === type) {
@@ -4832,7 +4830,6 @@ Cell.prototype.setValueData = function(Val){
 		} else if (AscCommon.c_oNotifyParentType.EndCalculate === type) {
 			this._updateCellValue();
 		}
-		return true;
 	};
 	Cell.prototype._calculateRefType = function(cell) {
 		var val = this.formulaParsed.value;
@@ -4883,8 +4880,6 @@ Cell.prototype.setValueData = function(Val){
 			this.ws.workbook.dependencyFormulas.addToCleanCellCache(this.ws.getId(), this.nRow, this.nCol);
 			AscCommonExcel.g_oVLOOKUPCache.remove(this);
 			AscCommonExcel.g_oHLOOKUPCache.remove(this);
-			//todo
-			this.formulaParsed.ca = res.ca;
 		}
 	};
 	Cell.prototype._BuildDependencies = function(parse, opt_dirty) {

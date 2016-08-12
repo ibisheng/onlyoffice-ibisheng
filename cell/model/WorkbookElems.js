@@ -4926,13 +4926,14 @@ TablePart.prototype.getTableRangeForFormula = function(objectParam)
 		}
 		case FormulaTablePartInfo.thisRow:
 		{
+			//like FormulaTablePartInfo.data
+			var startRow = this.HeaderRowCount === null ? this.Ref.r1 + 1 : this.Ref.r1;
+			var endRow = this.TotalsRowCount ? this.Ref.r2 - 1 : this.Ref.r2;
 			if (objectParam.cell) {
-				res = new Asc.Range(this.Ref.c1, objectParam.cell.r1, this.Ref.c2, objectParam.cell.r1);
+				if (startRow <= objectParam.cell.r1 && objectParam.cell.r1 <= endRow) {
+					res = new Asc.Range(this.Ref.c1, objectParam.cell.r1, this.Ref.c2, objectParam.cell.r1);
+				}
 			} else {
-				//like FormulaTablePartInfo.data
-				var startRow = this.HeaderRowCount === null ? this.Ref.r1 + 1 : this.Ref.r1;
-				var endRow = this.TotalsRowCount ? this.Ref.r2 - 1 : this.Ref.r2;
-
 				res = new Asc.Range(this.Ref.c1, startRow, this.Ref.c2, endRow);
 			}
 			break;
