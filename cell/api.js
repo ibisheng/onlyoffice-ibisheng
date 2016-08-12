@@ -952,6 +952,11 @@ var editor;
     this.handlers.remove(name, callback);
   };
 
+  spreadsheet_api.prototype.asc_fireCallback = function(name)
+  {
+    return this.handlers.trigger.apply(this.handlers, arguments);
+  };
+
   spreadsheet_api.prototype.asc_getController = function() {
     return this.controller;
 //				return null;
