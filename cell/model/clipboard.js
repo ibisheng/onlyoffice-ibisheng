@@ -73,7 +73,7 @@
 			
 			checkCopyToClipboard: function(ws, _clipboard, _formats)
 			{
-				var _data;
+				var _data = null;
 				var activeRange = ws.getSelectedRange();
 				var wb = window["Asc"]["editor"].wb;
 				
@@ -81,7 +81,11 @@
 				{
 					//only TEXT
 					var fragments = wb.cellEditor.copySelection();
-					_data = wb.cellEditor._getFragmentsText(fragments);
+					
+					if(null !== fragments)
+					{
+						_data = wb.cellEditor._getFragmentsText(fragments);
+					}
 					
 					_clipboard.pushData(AscCommon.c_oAscClipboardDataFormat.Text, _data)
 				}
