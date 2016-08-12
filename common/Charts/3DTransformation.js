@@ -333,7 +333,7 @@ Processor3D.prototype.calculateZPositionCatAxis = function()
 
 
 //***functions for complete transformation point***
-Processor3D.prototype.convertAndTurnPoint = function(x, y, z, isNotProject)
+Processor3D.prototype.convertAndTurnPoint = function(x, y, z, isNScale, isNRotate, isNProject)
 {
 	var res = null;
 	
@@ -343,7 +343,7 @@ Processor3D.prototype.convertAndTurnPoint = function(x, y, z, isNotProject)
 	}
 	else
 	{
-		res = this.convertAndTurnPointPerspective(x, y, z, isNotProject);
+		res = this.convertAndTurnPointPerspective(x, y, z, isNScale, isNRotate, isNProject);
 	}
 	
 	return res;
@@ -408,49 +408,68 @@ Processor3D.prototype.convertAndTurnPointRAngAx = function(x, y, z)
 	return {x: projectionPoint.x, y: projectionPoint.y, z: z};
 };
 
-Processor3D.prototype.convertAndTurnPointPerspective = function(x, y, z, isNotProject)
+Processor3D.prototype.convertAndTurnPointPerspective = function(x, y, z, isNScale, isNRotate, isNProject)
 {
-	//aspectRatio
-	x = x / this.aspectRatioX;
-	y = y / this.aspectRatioY;
-
-	x = x / this.scaleX;
-	y = y / this.scaleY;
-	z = z / this.scaleZ;
-	
 	var point3D = new Point3D(x, y, z, this);
 	
+	if(!isNScale)
+	{
+		this.scale(point3D);
+	}
+	
+	if(!isNRotate)
+	{
+		this.rotate1(point3D);
+	}
+	
+	if(!isNProject)
+	{
+		this.project1(point3D);
+	}
+	
+	return {x: point3D.x, y: point3D.y, z: point3D.z};
+};
+
+Processor3D.prototype.scale = function(point3D)
+{
+	//aspectRatio
+	point3D.x = point3D.x / this.aspectRatioX;
+	point3D.y = point3D.y / this.aspectRatioY;
+
+	point3D.x = point3D.x / this.scaleX;
+	point3D.y = point3D.y / this.scaleY;
+	point3D.z = point3D.z / this.scaleZ;
+},
+
+
+Processor3D.prototype.rotate1 = function(point3D)
+{
 	//diff
-	var centerZDiff = this.depthPerspective / 2;
-	
-	point3D.offset((-this.widthCanvas / 2) / this.aspectRatioX, (-this.heightCanvas / 2) / this.aspectRatioY /** aspectRatio*/, 0);
-	
+	point3D.offset((-this.widthCanvas / 2) / this.aspectRatioX, (-this.heightCanvas / 2) / this.aspectRatioY, 0);
 	//rotate
-	var matrixRotateAllAxis;
-	if(!this.view3D.rAngAx)
-		matrixRotateAllAxis = this._getMatrixRotateAllAxis();
-	else
-		matrixRotateAllAxis = this._shearXY();
-		
+	var matrixRotateAllAxis = this._getMatrixRotateAllAxis();	
 	point3D.multiplyPointOnMatrix1(matrixRotateAllAxis);
+	
+	point3D.offset((this.widthCanvas / 2) / this.aspectRatioX, (this.heightCanvas / 2) / this.aspectRatioY, 0);
+};
+
+
+Processor3D.prototype.project1 = function(point3D)
+{
+	//diff
+	point3D.offset((-this.widthCanvas / 2) / this.aspectRatioX, (-this.heightCanvas / 2) / this.aspectRatioY /** aspectRatio*/, 0);
 	
 	// diff camera for charts write into rect
 	point3D.offset(this.cameraDiffX, this.cameraDiffY, this.cameraDiffZ);
 	
 	//project
-	var projectionPoint = point3D;
-	if(!this.view3D.rAngAx && !isNotProject)
-	{
-		var projectiveMatrix = this._getPerspectiveProjectionMatrix(1 / (this.rPerspective));
-		projectionPoint = point3D.project(projectiveMatrix);
-	}
+	var projectiveMatrix = this._getPerspectiveProjectionMatrix(1 / (this.rPerspective));
+	point3D.project(projectiveMatrix);
 	
 	//undiff
 	var specialReverseDiffX = this.widthCanvas / 2 + (this.left - this.right) / 2;
 	var specialReverseDiffY = this.heightCanvas / 2 + (this.top - this.bottom) / 2; 
-	projectionPoint.offset(specialReverseDiffX, specialReverseDiffY, centerZDiff);
-	
-	return {x: projectionPoint.x, y: projectionPoint.y, z: projectionPoint.z};
+	point3D.offset(specialReverseDiffX, specialReverseDiffY, 0);
 };
 
 //functions for step transformation point
