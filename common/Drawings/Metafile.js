@@ -2578,7 +2578,7 @@
 		if (a < 0)
 			a += 360;
 
-		console.log(a);
+		//console.log(a);
 		return a * 60000;
 	};
 
