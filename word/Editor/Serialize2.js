@@ -4139,11 +4139,11 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
 							{
 								//заменяем на картинку, если бы был аналог CachedImage не надо было бы заменять
 								var sSrc = item.MathToImageConverter();
-								if (null != sSrc && "" != sSrc && null != sSrc.ImageUrl && item.Width > 0 && item.Height > 0){
+								if (null != sSrc && null != sSrc.ImageUrl && sSrc.w_mm > 0 && sSrc.h_mm > 0){
 									var doc = this.Document;
 									//todo paragraph
-									var drawing = new ParaDrawing(item.Width, item.Height, null, this.Document.DrawingDocument, this.Document, par);
-									var Image = editor.WordControl.m_oLogicDocument.DrawingObjects.createImage(sSrc.ImageUrl, 0, 0, item.Width, item.Height);
+									var drawing = new ParaDrawing(sSrc.w_mm, sSrc.h_mm, null, this.Document.DrawingDocument, this.Document, par);
+									var Image = editor.WordControl.m_oLogicDocument.DrawingObjects.createImage(sSrc.ImageUrl, 0, 0, sSrc.w_mm, sSrc.h_mm);
 									Image.cachedImage = sSrc.ImageUrl;
 									drawing.Set_GraphicObject(Image);
 									Image.setParent(drawing);

@@ -2636,7 +2636,7 @@ ParaMath.prototype.MathToImageConverter = function(bCopy, _canvasInput, _widthPx
 
     if (undefined === _canvasInput)
     {
-        var _ret = { ImageNative: _canvas, ImageUrl: "" };
+        var _ret = { ImageNative: _canvas, ImageUrl: "", w_px: _canvas.width, h_px: _canvas.height, w_mm: w_mm, h_mm: h_mm};
         try
         {
             _ret.ImageUrl = _canvas.toDataURL("image/png");

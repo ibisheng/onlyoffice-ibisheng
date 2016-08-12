@@ -524,10 +524,14 @@ CopyProcessor.prototype =
             }
 			else if(para_Math == item.Type){
                 var sSrc = item.MathToImageConverter();
-				if (null != sSrc && "" != sSrc && null != sSrc.ImageUrl){
+				if (null != sSrc && null != sSrc.ImageUrl){
 					var oImg = new CopyElement("img");
-					oImg.oAttributes["width"] = item.Width;
-					oImg.oAttributes["height"] = item.Height;
+					if (sSrc.w_px > 0) {
+						oImg.oAttributes["width"] = sSrc.w_px;
+					}
+					if (sSrc.h_px > 0) {
+						oImg.oAttributes["height"] = sSrc.h_px;
+					}
 					oImg.oAttributes["src"] = sSrc.ImageUrl;
 					oTarget.addChild(oImg);
 				}
