@@ -2110,7 +2110,8 @@ Paragraph.prototype.private_CheckColumnBreak = function(CurPage)
 
     if (Line.Info & paralineinfo_BreakPage && !(Line.Info & paralineinfo_BreakRealPage))
     {
-        this.Parent.OnColumnBreak_WhileRecalculate();
+        if (this.LogicDocument)
+            this.LogicDocument.OnColumnBreak_WhileRecalculate();
     }
 };
 
