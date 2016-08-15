@@ -361,6 +361,25 @@
         }
     };
 
+
+
+    /**
+     * Set presentation size
+     * @memberof ApiPresentation
+     /* {EMU} nWidth
+     /* {EMU} nHeight
+     */
+    ApiPresentation.prototype.SetSizes = function(nWidth, nHeight) {
+        if(this.Presentation){
+            var width = nWidth/36000.0;
+            var height = nHeight/36000.0;
+            History.Add(this, {Type: AscDFH.historyitem_Presentation_SlideSize, oldW: this.Presentation.Width, newW: width, oldH: this.Presentation.Height, newH:  height});
+            this.Presentation.Width = width;
+            this.Presentation.Height = height;
+            this.Presentation.changeSlideSizeFunction(this.Presentation.Width, this.Presentation.Height);
+
+        }
+    };
     /**
      * Create new history point.
      */
@@ -654,6 +673,7 @@
     ApiPresentation.prototype["GetCurrentSlide"]       = ApiPresentation.prototype.GetCurrentSlide;
     ApiPresentation.prototype["AddSlide"]              = ApiPresentation.prototype.AddSlide;
     ApiPresentation.prototype["CreateNewHistoryPoint"] = ApiPresentation.prototype.CreateNewHistoryPoint;
+    ApiPresentation.prototype["SetSizes"]              = ApiPresentation.prototype.SetSizes;
 
     ApiSlide.prototype["GetClassType"]               = ApiSlide.prototype.GetClassType;
     ApiSlide.prototype["RemoveAllObjects"]           = ApiSlide.prototype.RemoveAllObjects;

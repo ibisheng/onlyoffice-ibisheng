@@ -2487,6 +2487,17 @@
     };
 
 
+    /**
+     * Set fill of run
+     * @param {ApiFill} oApiFill
+     */
+    ApiTextPr.prototype.SetFill = function(oApiFill)
+    {
+        this.TextPr.Unifill = oApiFill.UniFill;
+        this.private_OnChange();
+    };
+
+
     //------------------------------------------------------------------------------------------------------------------
     //
     // ApiParaPr
@@ -4214,6 +4225,7 @@
     ApiTextPr.prototype["SetPosition"]               = ApiTextPr.prototype.SetPosition;
     ApiTextPr.prototype["SetLanguage"]               = ApiTextPr.prototype.SetLanguage;
     ApiTextPr.prototype["SetShd"]                    = ApiTextPr.prototype.SetShd;
+    ApiTextPr.prototype["SetFill"]                   = ApiTextPr.prototype.SetFill;
 
     ApiParaPr.prototype["GetClassType"]              = ApiParaPr.prototype.GetClassType;
     ApiParaPr.prototype["SetStyle"]                  = ApiParaPr.prototype.SetStyle;
