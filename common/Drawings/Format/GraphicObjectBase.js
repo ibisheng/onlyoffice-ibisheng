@@ -391,6 +391,31 @@
     CGraphicObjectBase.prototype.getAllFonts = function(mapUrl){
     };
 
+
+    CGraphicObjectBase.prototype.getAllRasterImages = function(mapUrl){
+    };
+
+    CGraphicObjectBase.prototype.setDrawingBaseType = function(nType){
+        if(this.drawingBase){
+            History.Add(this, {Type: AscDFH.historyitem_AutoShapes_SetDrawingBaseType, OldPr: this.drawingBase.Type, NewPr: nType});
+            this.drawingBase.Type = nType;
+        }
+    };
+    CGraphicObjectBase.prototype.setDrawingBasePos = function(fPosX, fPosY){
+        if(this.drawingBase && this.drawingBase.Pos){
+            History.Add(this, {Type: AscDFH.historyitem_AutoShapes_SetDrawingBasePos, OldPr: {X: this.drawingBase.Pos.X, Y: this.drawingBase.Pos.Y}, NewPr: {X: fPosX, Y: fPosY}});
+            this.drawingBase.Pos.X = fPosX;
+            this.drawingBase.Pos.Y = fPosY;
+        }
+    };
+    CGraphicObjectBase.prototype.setDrawingBaseExt = function(fExtX, fExtY){
+        if(this.drawingBase && this.drawingBase.ext){
+            History.Add(this, {Type: AscDFH.historyitem_AutoShapes_SetDrawingBaseExt, OldPr: {cx: this.drawingBase.ext.cx, cy: this.drawingBase.ext.cy}, NewPr: {cx: fExtX, cy: fExtY}});
+            this.drawingBase.ext.cx = fExtX;
+            this.drawingBase.ext.cy = fExtY;
+        }
+    };
+
     window['AscFormat'] = window['AscFormat'] || {};
     window['AscFormat'].CGraphicObjectBase = CGraphicObjectBase;
     window['AscFormat'].CGraphicBounds     = CGraphicBounds;

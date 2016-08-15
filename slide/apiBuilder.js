@@ -38,7 +38,7 @@
      * @class
      * @name Api
      */
-    var Api = window["Asc"]["asc_docs_api"];
+    var Api = window["Asc"]["asc_docs_api"] || window["Asc"]["spreadsheet_api"];
 
     /**
      * Class representing a presentation.
@@ -101,135 +101,6 @@
     }
     AscCommon.extendClass(ApiGroup, ApiDrawing);
 
-    /**
-     * Class representing a base class for color types
-     * @constructor
-     */
-    function ApiUniColor(Unicolor)
-    {
-        this.Unicolor = Unicolor;
-    }
-
-    /**
-     * Class representing RGB color
-     * @constructor
-     */
-    function ApiRGBColor(r, g, b)
-    {
-        ApiRGBColor.superclass.constructor.call(this, AscFormat.CreateUniColorRGB(r, g, b));
-    }
-    AscCommon.extendClass(ApiRGBColor, ApiUniColor);
-
-    /**
-     * Class representing a Scheme Color
-     * @constructor
-     */
-    function ApiSchemeColor(sColorId)
-    {
-        ApiSchemeColor.superclass.constructor.call(this, AscFormat.builder_CreateSchemeColor(sColorId));
-    }
-    AscCommon.extendClass(ApiSchemeColor, ApiUniColor);
-
-    /**
-     * Class representing a Preset Color
-     * @constructor
-     * */
-    function ApiPresetColor(sPresetColor)
-    {
-        ApiPresetColor.superclass.constructor.call(this, AscFormat.builder_CreatePresetColor(sPresetColor));
-    }
-    AscCommon.extendClass(ApiPresetColor, ApiUniColor);
-
-    /**
-     * Class represent a base class fill
-     * @constructor
-     * */
-    function ApiFill(UniFill)
-    {
-        this.UniFill = UniFill;
-    }
-
-    /**
-     * Class represent a stroke class
-     * @constructor
-     */
-    function ApiStroke(oLn)
-    {
-        this.Ln = oLn;
-    }
-
-    /**
-     * Class represent gradient stop
-     * @constructor
-     * */
-    function ApiGradientStop(oApiUniColor, pos)
-    {
-        this.Gs = AscFormat.builder_CreateGradientStop(oApiUniColor.Unicolor, pos);
-    }
-
-    /**
-     * Class representing a container for paragraphs
-     * @param Document
-     * @constructor
-     */
-    function ApiDrawingContent(Document)
-    {
-        this.Document = Document;
-    }
-
-    /**
-     * Class representing a paragraph properties.
-     * @constructor
-     */
-    function ApiParaPr(Parent, ParaPr)
-    {
-        this.Parent = Parent;
-        this.ParaPr = ParaPr;
-    }
-
-
-    /*
-    * Class representing paragraph bullet
-    * @constructor
-    * */
-    function ApiBullet(Bullet)
-    {
-        this.Bullet = Bullet;
-    }
-
-    /**
-     * Class representing a paragraph.
-     * @constructor
-     * @extends {ApiParaPr}
-     */
-    function ApiParagraph(Paragraph)
-    {
-        ApiParagraph.superclass.constructor.call(this, this, Paragraph.Pr.Copy());
-        this.Paragraph = Paragraph;
-    }
-    AscCommon.extendClass(ApiParagraph, ApiParaPr);
-
-    /**
-     * Class representing a text properties.
-     * @constructor
-     */
-    function ApiTextPr(Parent, TextPr)
-    {
-        this.Parent = Parent;
-        this.TextPr = TextPr;
-    }
-
-    /**
-     * Class representing a small text block calling 'run'.
-     * @constructor
-     * @extends {ApiTextPr}
-     */
-    function ApiRun(Run)
-    {
-        ApiRun.superclass.constructor.call(this, this, Run.Pr.Copy());
-        this.Run = Run;
-    }
-    AscCommon.extendClass(ApiRun, ApiTextPr);
 
     /**
      * Twentieths of a point (equivalent to 1/1440th of an inch).
@@ -415,133 +286,6 @@
         return null;
     };
 
-    /**
-     * Create a RGB color
-     * @memberof Api
-     * @param {byte} r
-     * @param {byte} g
-     * @param {byte} b
-     * @returns {ApiRGBColor}
-     */
-    Api.prototype.CreateRGBColor = function(r, g, b)
-    {
-        return new ApiRGBColor(r, g, b);
-    };
-
-    /**
-     * Create a scheme color
-     * @memberof Api
-     * @param {SchemeColorId} sSchemeColorId
-     * @returns {ApiSchemeColor}
-     */
-    Api.prototype.CreateSchemeColor = function(sSchemeColorId)
-    {
-        return new ApiSchemeColor(sSchemeColorId);
-    };
-
-    /**
-     * Create preset color
-     * @memberof Api
-     * @param {PresetColor} sPresetColor
-     * @returns {ApiPresetColor};
-     * */
-    Api.prototype.CreatePresetColor = function(sPresetColor)
-    {
-        return new ApiPresetColor(sPresetColor);
-    };
-
-    /**
-     * Create a solid fill
-     * @memberof Api
-     * @param {ApiUniColor} oUniColor
-     * @returns {ApiFill}
-     * */
-    Api.prototype.CreateSolidFill = function(oUniColor)
-    {
-        return new ApiFill(AscFormat.CreateUniFillByUniColor(oUniColor.Unicolor));
-    };
-
-    /**
-     * Create a linear gradient fill
-     * @memberof Api
-     * @param {Array} aGradientStop
-     * @param {PositiveFixedAngle} Angle
-     * @returns {ApiFill}
-     */
-    Api.prototype.CreateLinearGradientFill = function(aGradientStop, Angle)
-    {
-        return new ApiFill(AscFormat.builder_CreateLinearGradient(aGradientStop, Angle));
-    };
-
-    /**
-     * Create a radial gradient fill
-     * @memberof Api
-     * @param {Array} aGradientStop
-     * @returns {ApiFill}
-     */
-    Api.prototype.CreateRadialGradientFill = function(aGradientStop)
-    {
-        return new ApiFill(AscFormat.builder_CreateRadialGradient(aGradientStop));
-    };
-
-    /**
-     * Create a pattern fill
-     * @memberof Api
-     * @param {PatternType} sPatternType
-     * @param {ApiUniColor} BgColor
-     * @param {ApiUniColor} FgColor
-     * @returns {ApiFill}
-     */
-    Api.prototype.CreatePatternFill = function(sPatternType, BgColor, FgColor)
-    {
-        return new ApiFill(AscFormat.builder_CreatePatternFill(sPatternType, BgColor, FgColor));
-    };
-
-    /**
-     * Create a blip fill
-     * @memberof Api
-     * @param {string} sImageUrl
-     * @param {BlipFillType} sBlipFillType
-     * @returns {ApiFill}
-     * */
-    Api.prototype.CreateBlipFill= function(sImageUrl, sBlipFillType)
-    {
-        return new ApiFill(AscFormat.builder_CreateBlipFill(sImageUrl, sBlipFillType));
-    };
-
-    /**
-     * Create no fill
-     * @memberof Api
-     * @returns {ApiFill}
-     * */
-    Api.prototype.CreateNoFill = function()
-    {
-        return new ApiFill(AscFormat.CreateNoFillUniFill());
-    };
-
-    /**
-     * Create a stroke
-     * @memberof Api
-     * @param {EMU} nWidth
-     * @param {ApiFill} oFill
-     * @returns {ApiStroke}
-     * */
-    Api.prototype.CreateStroke = function(nWidth, oFill)
-    {
-        return new ApiStroke(AscFormat.builder_CreateLine(nWidth, oFill));
-    };
-
-    /**
-     * Create a stroke
-     * @memberof Api
-     * @param {ApiUniColor} oUniColor
-     * @param {PositivePercentage} nPos
-     * @returns {ApiGradientStop}
-     * */
-    Api.prototype.CreateGradientStop = function(oUniColor, nPos)
-    {
-        return new ApiGradientStop(oUniColor, nPos);
-    };
 
     /**
      * Create a new paragraph.
@@ -550,92 +294,9 @@
      */
     Api.prototype.CreateParagraph = function()
     {
-        return new ApiParagraph(new Paragraph(private_GetDrawingDocument(), null, 0, 0, 0, 0, 0, true));
+        return this.private_CreateApiParagraph(new Paragraph(private_GetDrawingDocument(), null));
     };
 
-    /**
-     * Create a new text block.
-     * @memberof Api
-     * @returns {ApiRun}
-     */
-    Api.prototype.CreateRun = function()
-    {
-        return new ApiRun(new ParaRun(null, false));
-    };
-
-    /**
-     * Create a new bullet
-     * @memberof Api
-     * @returns {ApiBullet}
-     * */
-    Api.CreateBullet = function(sSymbol){
-        var oBullet = new AscFormat.CBullet();
-        oBullet.bulletType = new AscFormat.CBulletType();
-        if(typeof sSymbol === "string" && sSymbol.length > 0){
-            oBullet.bulletType.type = AscFormat.BULLET_TYPE_BULLET_CHAR;
-            oBullet.bulletType.Char = sSymbol[0];
-        }
-        else{
-            oBullet.bulletType.type = AscFormat.BULLET_TYPE_BULLET_NONE;
-        }
-    };
-
-    /**
-     * Create a new numbering
-     * @memberof Api
-     * @param {BulletType} sType
-     * @param {number} nStartAt
-     * @returns {ApiBullet}
-     * */
-
-    Api.CreateNumbering = function(sType, nStartAt){
-        var oBullet = new AscFormat.CBullet();
-        oBullet.bulletType = new AscFormat.CBulletType();
-        oBullet.bulletType.type = AscFormat.BULLET_TYPE_BULLET_AUTONUM;
-        switch(sType){
-            case "ArabicPeriod" :{
-                oBullet.bulletType.AutoNumType = 12;
-                break;
-            }
-            case "ArabicParenR":{
-                oBullet.bulletType.AutoNumType = 11;
-                break;
-            }
-            case "RomanUcPeriod":{
-                oBullet.bulletType.AutoNumType = 34;
-                break;
-            }
-            case "RomanLcPeriod":{
-                oBullet.bulletType.AutoNumType = 31;
-                break;
-            }
-            case "AlphaLcParenR":{
-                oBullet.bulletType.AutoNumType = 1;
-                break;
-            }
-            case "AlphaLcPeriod":{
-                oBullet.bulletType.AutoNumType = 2;
-                break;
-            }
-            case "AlphaUcParenR":{
-                oBullet.bulletType.AutoNumType = 4;
-                break;
-            }
-            case "AlphaUcPeriod":{
-                oBullet.bulletType.AutoNumType = 5;
-                break;
-            }
-            case "None":{
-                oBullet.bulletType.type = AscFormat.BULLET_TYPE_BULLET_NONE;
-            }
-        }
-        if( oBullet.bulletType.type === AscFormat.BULLET_TYPE_BULLET_AUTONUM){
-            if(AscFormat.isRealNumber(nStartAt)){
-                oBullet.bulletType.startAt = nStartAt;
-            }
-        }
-        return new ApiBullet(oBullet);
-    };
 
     //------------------------------------------------------------------------------------------------------------------
     //
@@ -769,6 +430,7 @@
 
     /**
      * Getting slide width
+     * @returns {EMU}
      * */
     ApiSlide.prototype.GetWidth = function(){
         if(this.Slide){
@@ -779,6 +441,7 @@
 
     /**
      * Getting slide height
+     * @returns {EMU}
      * */
     ApiSlide.prototype.GetHeight = function(){
         if(this.Slide){
@@ -786,528 +449,7 @@
         }
         return 0;
     };
-    //------------------------------------------------------------------------------------------------------------------
-    //
-    // ApiDrawingContent
-    //
-    //------------------------------------------------------------------------------------------------------------------
 
-
-    /**
-     * Get the type of this class.
-     * @returns {"drawingContent"}
-     */
-    ApiDrawingContent.prototype.GetClassType = function()
-    {
-        return "drawingContent";
-    };
-    /**
-     * Get the number of elements.
-     * @returns {number}
-     */
-    ApiDrawingContent.prototype.GetElementsCount = function()
-    {
-        return this.Document.Content.length;
-    };
-    /**
-     * Get element by position
-     * @returns {ApiParagraph}
-     */
-    ApiDrawingContent.prototype.GetElement = function(nPos)
-    {
-        if (!this.Document.Content[nPos])
-            return null;
-
-        var Type = this.Document.Content[nPos].Get_Type();
-        if (type_Paragraph === Type)
-            return new ApiParagraph(this.Document.Content[nPos]);
-
-        return null;
-    };
-    /**
-     * Add paragraph or table by position
-     * @param {number} nPos
-     * @param {ApiParagraph} oElement
-     */
-    ApiDrawingContent.prototype.AddElement = function(nPos, oElement)
-    {
-        if (oElement instanceof ApiParagraph)
-        {
-            this.Document.Internal_Content_Add(nPos, oElement.private_GetImpl(), false);
-        }
-    };
-    /**
-     * Push paragraph or table
-     * @param {ApiParagraph} oElement
-     */
-    ApiDrawingContent.prototype.Push = function(oElement)
-    {
-        if (oElement instanceof ApiParagraph)
-        {
-            this.Document.Internal_Content_Add(this.Document.Content.length, oElement.private_GetImpl(), false);
-            return true;
-        }
-
-        return false;
-    };
-    /**
-     * Remove all elements from the current document.
-     */
-    ApiDrawingContent.prototype.RemoveAllElements = function()
-    {
-        this.Document.Content = [];
-    };
-    /**
-     * Remove element by specified position.
-     * @param {number} nPos
-     */
-    ApiDrawingContent.prototype.RemoveElement = function(nPos)
-    {
-        if (nPos < 0 || nPos >= this.GetElementsCount())
-            return;
-
-        this.Document.Internal_Content_Remove(nPos, 1);
-    };
-
-
-    //------------------------------------------------------------------------------------------------------------------
-    //
-    // ApiParagraph
-    //
-    //------------------------------------------------------------------------------------------------------------------
-
-    /**
-     * Get the type of this class.
-     * @returns {"document"}
-     */
-    ApiParagraph.prototype.GetClassType = function()
-    {
-        return "paragraph";
-    };
-    /**
-     * Add text
-     * @param {string} [sText=""]
-     * @returns {ApiRun}
-     */
-    ApiParagraph.prototype.AddText = function(sText)
-    {
-        var oRun = new ParaRun(this.Paragraph, false);
-
-        if (!sText || !sText.length)
-            return new ApiRun(oRun);
-
-        for (var nPos = 0, nCount = sText.length; nPos < nCount; ++nPos)
-        {
-            var nChar = sText.charAt(nPos);
-            if (" " == nChar)
-                oRun.Add_ToContent(nPos, new ParaSpace(), false);
-            else
-                oRun.Add_ToContent(nPos, new ParaText(nChar), false);
-        }
-
-        private_PushElementToParagraph(this.Paragraph, oRun);
-        return new ApiRun(oRun);
-    };
-    /**
-     * Get paragraph properties.
-     * @returns {ApiParaPr}
-     */
-    ApiParagraph.prototype.GetParaPr = function()
-    {
-        return new ApiParaPr(this, this.Paragraph.Pr.Copy());
-    };
-
-    /**
-     * Get the number of elements in the current paragraph.
-     * @returns {number}
-     */
-    ApiParagraph.prototype.GetElementsCount = function()
-    {
-        // TODO: ParaEnd
-        return this.Paragraph.Content.length - 1;
-    };
-    /**
-     * Get the element of the paragraph content by specified position.
-     * @param {number} nPos
-     * @returns {?ParagraphContent}
-     */
-    ApiParagraph.prototype.GetElement = function(nPos)
-    {
-        // TODO: ParaEnd
-        if (nPos < 0 || nPos >= this.Paragraph.Content.length - 1)
-            return null;
-
-        var oElement = this.Paragraph.Content[nPos];
-        if (oElement instanceof ParaRun)
-            return new ApiRun(oElement);
-        else
-            return null;
-    };
-    /**
-     * Remove element by specified position.
-     * @param {number} nPos
-     */
-    ApiParagraph.prototype.RemoveElement = function(nPos)
-    {
-        if (nPos < 0 || nPos >= this.Paragraph.Content.length - 1)
-            return;
-
-        this.Paragraph.Remove_FromContent(nPos, 1);
-    };
-    /**
-     * Remove all elements.
-     */
-    ApiParagraph.prototype.RemoveAllElements = function()
-    {
-        if (this.Paragraph.Content.length > 1)
-            this.Paragraph.Remove_FromContent(0, this.Paragraph.Content.length - 1);
-    };
-    /**
-     * Add an element to paragraph content.
-     * @param {ParagraphContent} oElement
-     * @param {number} [nPos] If this value is not specified then element will be added to the end of this paragraph.
-     * @returns {boolean} Returns <code>false</code> if the type of <code>oElement</code> is not supported by paragraph
-     * content.
-     */
-    ApiParagraph.prototype.AddElement = function(oElement, nPos)
-    {
-        // TODO: ParaEnd
-        if (!(oElement instanceof ApiRun) || nPos < 0 || nPos > this.Paragraph.Content.length - 1)
-            return false;
-
-        var oParaElement = oElement.private_GetImpl();
-        if (undefined !== nPos)
-        {
-            this.Paragraph.Add_ToContent(nPos, oParaElement);
-        }
-        else
-        {
-            private_PushElementToParagraph(this.Paragraph, oParaElement);
-        }
-
-        return true;
-    };
-
-    //------------------------------------------------------------------------------------------------------------------
-    //
-    // ApiRun
-    //
-    //------------------------------------------------------------------------------------------------------------------
-
-    /**
-     * Get the type of this class.
-     * @returns {"run"}
-     */
-    ApiRun.prototype.GetClassType = function()
-    {
-        return "run";
-    };
-    /**
-     * Get the text properties of the current run.
-     * @returns {ApiTextPr}
-     */
-    ApiRun.prototype.GetTextPr = function()
-    {
-        return new ApiTextPr(this, this.Run.Pr.Copy());
-    };
-    /**
-     * Remove all content from the current run.
-     */
-    ApiRun.prototype.ClearContent = function()
-    {
-        this.Run.Remove_FromContent(0, this.Run.Content.length);
-    };
-    /**
-     * Add text to this run.
-     * @param {string} sText
-     */
-    ApiRun.prototype.AddText = function(sText)
-    {
-        if (!sText || !sText.length)
-            return;
-
-        var nLastPos = this.Run.Content.length;
-
-        for (var nPos = 0, nCount = sText.length; nPos < nCount; ++nPos)
-        {
-            var nChar = sText.charAt(nPos);
-            if (" " == nChar)
-                this.Run.Add_ToContent(nLastPos + nPos, new ParaSpace(), false);
-            else
-                this.Run.Add_ToContent(nLastPos + nPos, new ParaText(nChar), false);
-        }
-    };
-    /**
-     * Add a tab stop.
-     */
-    ApiRun.prototype.AddTabStop = function()
-    {
-        this.Run.Add_ToContent(this.Run.Content.length, new ParaTab());
-    };
-
-    //------------------------------------------------------------------------------------------------------------------
-    //
-    // ApiTextPr
-    //
-    //------------------------------------------------------------------------------------------------------------------
-
-    /**
-     * Get the type of this class.
-     * @returns {"textPr"}
-     */
-    ApiTextPr.prototype.GetClassType = function()
-    {
-        return "textPr";
-    };
-    /**
-     * Set the bold property.
-     * @param {boolean} isBold
-     */
-    ApiTextPr.prototype.SetBold = function(isBold)
-    {
-        this.TextPr.Bold = isBold;
-        this.private_OnChange();
-    };
-    /**
-     * Set the italic property.
-     * @param {boolean} isItalic
-     */
-    ApiTextPr.prototype.SetItalic = function(isItalic)
-    {
-        this.TextPr.Italic = isItalic;
-        this.private_OnChange();
-    };
-    /**
-     * Specify that the contents of this run shall be displayed with a single horizontal line through the center of
-     * the line.
-     * @param {boolean} isStrikeout
-     */
-    ApiTextPr.prototype.SetStrikeout = function(isStrikeout)
-    {
-        this.TextPr.Strikeout = isStrikeout;
-        this.private_OnChange();
-    };
-    /**
-     * Specify that the contents of this run should be displayed along with an underline appearing directly below the
-     * character height (less all spacing above and below the characters on the line).
-     * @param {boolean} isUnderline
-     */
-    ApiTextPr.prototype.SetUnderline = function(isUnderline)
-    {
-        this.TextPr.Underline = isUnderline;
-        this.private_OnChange();
-    };
-    /**
-     * Set all 4 font slots with the specified font family.
-     * @param {string} sFontFamily
-     */
-    ApiTextPr.prototype.SetFontFamily = function(sFontFamily)
-    {
-        this.TextPr.RFonts.Set_All(sFontFamily, -1);
-        this.private_OnChange();
-    };
-    /**
-     * Set the font size.
-     * @param {hps} nSize
-     */
-    ApiTextPr.prototype.SetFontSize = function(nSize)
-    {
-        this.TextPr.FontSize = private_GetHps(nSize);
-        this.private_OnChange();
-    };
-    /**
-     * Set text color in the rgb format.
-     * @param {ApiFill} oFill
-     *
-     */
-    ApiTextPr.prototype.SetFill = function(oFill)
-    {
-        this.TextPr.Unifill = oFill.UniFill;
-        this.private_OnChange();
-    };
-    /**
-     * Specifies the alignment which shall be applied to the contents of this run in relation to the default
-     * appearance of the run's text.
-     * @param {("baseline" | "subscript" | "superscript")} sType
-     */
-    ApiTextPr.prototype.SetVertAlign = function(sType)
-    {
-        if ("baseline" === sType)
-            this.TextPr.VertAlign = AscCommon.vertalign_Baseline;
-        else if ("subscript" === sType)
-            this.TextPr.VertAlign = AscCommon.vertalign_SubScript;
-        else if ("superscript" === sType)
-            this.TextPr.VertAlign = AscCommon.vertalign_SuperScript;
-
-        this.private_OnChange();
-    };
-    /**
-     * Set text spacing.
-     * @param {twips} nSpacing
-     */
-    ApiTextPr.prototype.SetSpacing = function(nSpacing)
-    {
-        this.TextPr.Spacing = private_Twips2MM(nSpacing);
-        this.private_OnChange();
-    };
-    /**
-     * Specify that the contents of this run shall be displayed with two horizontal lines through each character
-     * displayed on the line.
-     * @param {boolean} isDoubleStrikeout
-     */
-    ApiTextPr.prototype.SetDoubleStrikeout = function(isDoubleStrikeout)
-    {
-        this.TextPr.DStrikeout = isDoubleStrikeout;
-        this.private_OnChange();
-    };
-    /**
-     * Specify that any lowercase characters in this text run shall be formatted for display only as their capital
-     * letter character equivalents.
-     * @param {boolean} isCaps
-     */
-    ApiTextPr.prototype.SetCaps = function(isCaps)
-    {
-        this.TextPr.Caps = isCaps;
-        this.private_OnChange();
-    };
-    /**
-     * Specify that all small letter characters in this text run shall be formatted for display only as their capital
-     * letter character equivalents in a font size two points smaller than the actual font size specified for this text.
-     * @param {boolean} isSmallCaps
-     */
-    ApiTextPr.prototype.SetSmallCaps = function(isSmallCaps)
-    {
-        this.TextPr.SmallCaps = isSmallCaps;
-        this.private_OnChange();
-    };
-
-    //------------------------------------------------------------------------------------------------------------------
-    //
-    // ApiParaPr
-    //
-    //------------------------------------------------------------------------------------------------------------------
-
-    /**
-     * Get the type of this class.
-     * @returns {"paraPr"}
-     */
-    ApiParaPr.prototype.GetClassType = function()
-    {
-        return "paraPr";
-    };
-    /**
-     * Set left indentation.
-     * @param {twips} nValue
-     */
-    ApiParaPr.prototype.SetIndLeft = function(nValue)
-    {
-        this.ParaPr.Ind.Left = private_Twips2MM(nValue);
-        this.private_OnChange();
-    };
-    /**
-     * Set right indentation.
-     * @param {twips} nValue
-     */
-    ApiParaPr.prototype.SetIndRight = function(nValue)
-    {
-        this.ParaPr.Ind.Right = private_Twips2MM(nValue);
-        this.private_OnChange();
-    };
-    /**
-     * Set first line indentation.
-     * @param {twips} nValue
-     */
-    ApiParaPr.prototype.SetIndFirstLine = function(nValue)
-    {
-        this.ParaPr.Ind.FirstLine = private_Twips2MM(nValue);
-        this.private_OnChange();
-    };
-    /**
-     * Set paragraph justification
-     * @param {("left" | "right" | "both" | "center")} sJc
-     */
-    ApiParaPr.prototype.SetJc = function(sJc)
-    {
-        this.ParaPr.Jc = private_GetParaAlign(sJc);
-        this.private_OnChange();
-    };
-    /**
-     * Set paragraph line spacing. If the value of the <code>sLineRule</code> parameter is either <code>"atLeast"</code>
-     * or <code>"exact"</code>, then the value of <code>nLine</code> shall be interpreted as twentieths of a point. If
-     * the value of the <code>sLineRule</code> parameter is <code>"auto"</code>, then the value of the <code>nLine</code>
-     * attribute shall be interpreted as 240ths of a line.
-     * @param {(twips | line240)} nLine
-     * @param {("auto" | "atLeast" | "exact")} sLineRule
-     */
-    ApiParaPr.prototype.SetSpacingLine = function(nLine, sLineRule)
-    {
-        if (undefined !== nLine && undefined !== sLineRule)
-        {
-            if ("auto" === sLineRule)
-            {
-                this.ParaPr.Spacing.LineRule = Asc.linerule_Auto;
-                this.ParaPr.Spacing.Line     = nLine / 240.0;
-            }
-            else if ("atLeast" === sLineRule)
-            {
-                this.ParaPr.Spacing.LineRule = Asc.linerule_AtLeast;
-                this.ParaPr.Spacing.Line     = private_Twips2MM(nLine);
-
-            }
-            else if ("exact" === sLineRule)
-            {
-                this.ParaPr.Spacing.LineRule = Asc.linerule_Exact;
-                this.ParaPr.Spacing.Line     = private_Twips2MM(nLine);
-            }
-        }
-
-        this.private_OnChange();
-    };
-    /**
-     * Set paragraph spacing before. If the value of the <code>isBeforeAuto</code> parameter is <code>true</code>, then
-     * any value of the <code>nBefore</code> is ignored. If <code>isBeforeAuto</code> parameter is not specified, then it
-     * will be interpreted as <code>false</code>.
-     * @param {twips} nBefore
-     * @param {boolean} [isBeforeAuto=false]
-     */
-    ApiParaPr.prototype.SetSpacingBefore = function(nBefore, isBeforeAuto)
-    {
-        if (undefined !== nBefore)
-            this.ParaPr.Spacing.Before = private_Twips2MM(nBefore);
-
-        if (undefined !== isBeforeAuto)
-            this.ParaPr.Spacing.BeforeAutoSpacing = isBeforeAuto;
-
-        this.private_OnChange();
-    };
-    /**
-     * Set paragraph spacing after. If the value of the <code>isAfterAuto</code> parameter is <code>true</code>, then
-     * any value of the <code>nAfter</code> is ignored. If <code>isAfterAuto</code> parameter is not specified, then it
-     * will be interpreted as <code>false</code>.
-     * @param {twips} nAfter
-     * @param {boolean} [isAfterAuto=false]
-     */
-    ApiParaPr.prototype.SetSpacingAfter = function(nAfter, isAfterAuto)
-    {
-        if (undefined !== nAfter)
-            this.ParaPr.Spacing.After = private_Twips2MM(nAfter);
-
-        if (undefined !== isAfterAuto)
-            this.ParaPr.Spacing.AfterAutoSpacing = isAfterAuto;
-
-        this.private_OnChange();
-    };
-
-    /*
-    * Set paragraph's bullet
-    * @param {ApiBullet} oBullet
-    * */
-    ApiParaPr.prototype.SetBullet = function(oBullet){
-        if(oBullet){
-            this.ParaPr.Bullet = oBullet.Bullet;
-            this.private_OnChange();
-        }
-    };
 
     //------------------------------------------------------------------------------------------------------------------
     //
@@ -1389,13 +531,14 @@
 
     /**
      * Get content of this shape.
-     * @returns {?ApiDrawingContent}
+     * @returns {?ApiDocumentContent}
      */
     ApiShape.prototype.GetDocContent = function()
     {
-        if(this.Drawing && this.Drawing.txBody && this.Drawing.txBody.content)
+        var oApi = private_GetApi();
+        if(oApi && this.Drawing && this.Drawing.txBody && this.Drawing.txBody.content)
         {
-            return new ApiDrawingContent(this.Drawing.txBody.content);
+            return oApi.private_CreateApiDocContent(this.Drawing.txBody.content);
         }
         return null;
     };
@@ -1493,103 +636,6 @@
         AscFormat.builder_SetShowDataLabels(this.Chart, bShowSerName, bShowCatName, bShowVal);
     };
 
-    //------------------------------------------------------------------------------------------------------------------
-    //
-    // ApiFill
-    //
-    //------------------------------------------------------------------------------------------------------------------
-    /**
-     * Get the type of this class.
-     * @returns {"fill"}
-     */
-    ApiFill.prototype.GetClassType = function()
-    {
-        return "fill";
-    };
-
-    //------------------------------------------------------------------------------------------------------------------
-    //
-    // ApiStroke
-    //
-    //------------------------------------------------------------------------------------------------------------------
-    /**
-     * Get the type of this class.
-     * @returns {"stroke"}
-     */
-    ApiStroke.prototype.GetClassType = function()
-    {
-        return "stroke";
-    };
-
-    //------------------------------------------------------------------------------------------------------------------
-    //
-    // ApiGradientStop
-    //
-    //------------------------------------------------------------------------------------------------------------------
-    /**
-     * Get the type of this class.
-     * @returns {"gradientStop"}
-     */
-    ApiGradientStop.prototype.GetClassType = function ()
-    {
-        return "gradientStop"
-    };
-    //------------------------------------------------------------------------------------------------------------------
-    //
-    // ApiUniColor
-    //
-    //------------------------------------------------------------------------------------------------------------------
-    /**
-     * Get the type of this class.
-     * @returns {"uniColor"}
-     */
-    ApiUniColor.prototype.GetClassType = function ()
-    {
-        return "uniColor"
-    };
-
-    //------------------------------------------------------------------------------------------------------------------
-    //
-    // ApiRGBColor
-    //
-    //------------------------------------------------------------------------------------------------------------------
-    /**
-     * Get the type of this class.
-     * @returns {"rgbColor"}
-     */
-    ApiRGBColor.prototype.GetClassType = function ()
-    {
-        return "rgbColor"
-    };
-
-    //------------------------------------------------------------------------------------------------------------------
-    //
-    // ApiSchemeColor
-    //
-    //------------------------------------------------------------------------------------------------------------------
-    /**
-     * Get the type of this class.
-     * @returns {"schemeColor"}
-     */
-    ApiSchemeColor.prototype.GetClassType = function ()
-    {
-        return "schemeColor"
-    };
-
-    //------------------------------------------------------------------------------------------------------------------
-    //
-    // ApiPresetColor
-    //
-    //------------------------------------------------------------------------------------------------------------------
-    /**
-     * Get the type of this class.
-     * @returns {"presetColor"}
-     */
-    ApiPresetColor.prototype.GetClassType = function ()
-    {
-        return "presetColor"
-    };
-
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Export
@@ -1600,25 +646,13 @@
     Api.prototype["CreateShape"]                     = Api.prototype.CreateShape;
     Api.prototype["CreateChart"]                     = Api.prototype.CreateChart;
     Api.prototype["CreateGroup"]                     = Api.prototype.CreateGroup;
-    Api.prototype["CreateRGBColor"]                  = Api.prototype.CreateRGBColor;
-    Api.prototype["CreateSchemeColor"]               = Api.prototype.CreateSchemeColor;
-    Api.prototype["CreatePresetColor"]               = Api.prototype.CreatePresetColor;
-    Api.prototype["CreateSolidFill"]                 = Api.prototype.CreateSolidFill;
-    Api.prototype["CreateLinearGradientFill"]        = Api.prototype.CreateLinearGradientFill;
-    Api.prototype["CreateRadialGradientFill"]        = Api.prototype.CreateRadialGradientFill;
-    Api.prototype["CreatePatternFill"]               = Api.prototype.CreatePatternFill;
-    Api.prototype["CreateBlipFill"]                  = Api.prototype.CreateBlipFill;
-    Api.prototype["CreateNoFill"]                    = Api.prototype.CreateNoFill;
-    Api.prototype["CreateStroke"]                    = Api.prototype.CreateStroke;
-    Api.prototype["CreateGradientStop"]              = Api.prototype.CreateGradientStop;
     Api.prototype["CreateParagraph"]                 = Api.prototype.CreateParagraph;
-    Api.prototype["CreateRun"]                       = Api.prototype.CreateRun;
 
-    ApiPresentation.prototype["GetClassType"]        = ApiPresentation.prototype.GetClassType;
-    ApiPresentation.prototype["GetCurSlideIndex"]    = ApiPresentation.prototype.GetCurSlideIndex;
-    ApiPresentation.prototype["GetSlideByIndex"]     = ApiPresentation.prototype.GetSlideByIndex;
-    ApiPresentation.prototype["GetCurrentSlide"]     = ApiPresentation.prototype.GetCurrentSlide;
-    ApiPresentation.prototype["AddSlide"]            = ApiPresentation.prototype.AddSlide;
+    ApiPresentation.prototype["GetClassType"]          = ApiPresentation.prototype.GetClassType;
+    ApiPresentation.prototype["GetCurSlideIndex"]      = ApiPresentation.prototype.GetCurSlideIndex;
+    ApiPresentation.prototype["GetSlideByIndex"]       = ApiPresentation.prototype.GetSlideByIndex;
+    ApiPresentation.prototype["GetCurrentSlide"]       = ApiPresentation.prototype.GetCurrentSlide;
+    ApiPresentation.prototype["AddSlide"]              = ApiPresentation.prototype.AddSlide;
     ApiPresentation.prototype["CreateNewHistoryPoint"] = ApiPresentation.prototype.CreateNewHistoryPoint;
 
     ApiSlide.prototype["GetClassType"]               = ApiSlide.prototype.GetClassType;
@@ -1627,53 +661,6 @@
     ApiSlide.prototype["SetBackground"]              = ApiSlide.prototype.SetBackground;
     ApiSlide.prototype["GetWidth"]                   = ApiSlide.prototype.GetWidth;
     ApiSlide.prototype["GetHeight"]                  = ApiSlide.prototype.GetHeight;
-
-    ApiDrawingContent.prototype["GetClassType"]      = ApiDrawingContent.prototype.GetClassType;
-    ApiDrawingContent.prototype["GetElementsCount"]  = ApiDrawingContent.prototype.GetElementsCount;
-    ApiDrawingContent.prototype["GetElement"]        = ApiDrawingContent.prototype.GetElement;
-    ApiDrawingContent.prototype["AddElement"]        = ApiDrawingContent.prototype.AddElement;
-    ApiDrawingContent.prototype["Push"]              = ApiDrawingContent.prototype.Push;
-    ApiDrawingContent.prototype["RemoveAllElements"] = ApiDrawingContent.prototype.RemoveAllElements;
-    ApiDrawingContent.prototype["RemoveElement"]     = ApiDrawingContent.prototype.RemoveElement;
-
-    ApiParagraph.prototype["GetClassType"]           = ApiParagraph.prototype.GetClassType;
-    ApiParagraph.prototype["AddText"]                = ApiParagraph.prototype.AddText;
-    ApiParagraph.prototype["GetParaPr"]              = ApiParagraph.prototype.GetParaPr;
-    ApiParagraph.prototype["GetElementsCount"]       = ApiParagraph.prototype.GetElementsCount;
-    ApiParagraph.prototype["GetElement"]             = ApiParagraph.prototype.GetElement;
-    ApiParagraph.prototype["RemoveElement"]          = ApiParagraph.prototype.RemoveElement;
-    ApiParagraph.prototype["RemoveAllElements"]      = ApiParagraph.prototype.RemoveAllElements;
-    ApiParagraph.prototype["AddElement"]             = ApiParagraph.prototype.AddElement;
-
-    ApiRun.prototype["GetClassType"]                 = ApiRun.prototype.GetClassType;
-    ApiRun.prototype["GetTextPr"]                    = ApiRun.prototype.GetTextPr;
-    ApiRun.prototype["ClearContent"]                 = ApiRun.prototype.ClearContent;
-    ApiRun.prototype["AddText"]                      = ApiRun.prototype.AddText;
-    ApiRun.prototype["AddTabStop"]                   = ApiRun.prototype.AddTabStop;
-
-    ApiTextPr.prototype["GetClassType"]              = ApiTextPr.prototype.GetClassType;
-    ApiTextPr.prototype["SetBold"]                   = ApiTextPr.prototype.SetBold;
-    ApiTextPr.prototype["SetItalic"]                 = ApiTextPr.prototype.SetItalic;
-    ApiTextPr.prototype["SetStrikeout"]              = ApiTextPr.prototype.SetStrikeout;
-    ApiTextPr.prototype["SetUnderline"]              = ApiTextPr.prototype.SetUnderline;
-    ApiTextPr.prototype["SetFontFamily"]             = ApiTextPr.prototype.SetFontFamily;
-    ApiTextPr.prototype["SetFontSize"]               = ApiTextPr.prototype.SetFontSize;
-    ApiTextPr.prototype["SetFill"]                   = ApiTextPr.prototype.SetFill;
-    ApiTextPr.prototype["SetVertAlign"]              = ApiTextPr.prototype.SetVertAlign;
-    ApiTextPr.prototype["SetSpacing"]                = ApiTextPr.prototype.SetSpacing;
-    ApiTextPr.prototype["SetDoubleStrikeout"]        = ApiTextPr.prototype.SetDoubleStrikeout;
-    ApiTextPr.prototype["SetCaps"]                   = ApiTextPr.prototype.SetCaps;
-    ApiTextPr.prototype["SetSmallCaps"]              = ApiTextPr.prototype.SetSmallCaps;
-
-    ApiParaPr.prototype["GetClassType"]              = ApiParaPr.prototype.GetClassType;
-    ApiParaPr.prototype["SetIndLeft"]                = ApiParaPr.prototype.SetIndLeft;
-    ApiParaPr.prototype["SetIndRight"]               = ApiParaPr.prototype.SetIndRight;
-    ApiParaPr.prototype["SetIndFirstLine"]           = ApiParaPr.prototype.SetIndFirstLine;
-    ApiParaPr.prototype["SetJc"]                     = ApiParaPr.prototype.SetJc;
-    ApiParaPr.prototype["SetSpacingLine"]            = ApiParaPr.prototype.SetSpacingLine;
-    ApiParaPr.prototype["SetSpacingBefore"]          = ApiParaPr.prototype.SetSpacingBefore;
-    ApiParaPr.prototype["SetSpacingAfter"]           = ApiParaPr.prototype.SetSpacingAfter;
-    ApiParaPr.prototype["SetBullet"]                 = ApiParaPr.prototype.SetBullet;
 
     ApiDrawing.prototype["GetClassType"]             =  ApiDrawing.prototype.GetClassType;
     ApiDrawing.prototype["SetSize"]                  =  ApiDrawing.prototype.SetSize;
@@ -1691,20 +678,6 @@
     ApiChart.prototype["SetVerAxisTitle"]            =  ApiChart.prototype.SetVerAxisTitle;
     ApiChart.prototype["SetLegendPos"]               =  ApiChart.prototype.SetLegendPos;
     ApiChart.prototype["SetShowDataLabels"]          =  ApiChart.prototype.SetShowDataLabels;
-
-    ApiFill.prototype["GetClassType"]                =  ApiFill.prototype.GetClassType;
-
-    ApiStroke.prototype["GetClassType"]              =  ApiStroke.prototype.GetClassType;
-
-    ApiGradientStop.prototype["GetClassType"]        =  ApiGradientStop.prototype.GetClassType;
-
-    ApiUniColor.prototype["GetClassType"]            =  ApiUniColor.prototype.GetClassType;
-
-    ApiRGBColor.prototype["GetClassType"]            =  ApiRGBColor.prototype.GetClassType;
-
-    ApiSchemeColor.prototype["GetClassType"]         =  ApiSchemeColor.prototype.GetClassType;
-
-    ApiPresetColor.prototype["GetClassType"]         =  ApiPresetColor.prototype.GetClassType;
 
     function private_GetCurrentSlide(){
         var oApiPresentation = editor.GetPresentation();
@@ -1724,19 +697,8 @@
         return null;
     }
 
-    function private_PushElementToParagraph(oPara, oElement)
-    {
-        // Добавляем не в конец из-за рана с символом конца параграфа TODO: ParaEnd
-        oPara.Add_ToContent(oPara.Content.length - 1, oElement);
-    }
-
     function private_GetPresentation(){
         return editor.WordControl.m_oLogicDocument;
-    }
-
-    function private_Twips2MM(twips)
-    {
-        return 25.4 / 72.0 / 20 * twips;
     }
 
     function private_EMU2MM(EMU)
@@ -1744,55 +706,9 @@
         return EMU / 36000.0;
     }
 
-    function private_GetHps(hps)
-    {
-        return Math.ceil(hps) / 2.0;
+    function private_GetApi(){
+        return editor;
     }
 
-    function private_GetParaAlign(sJc)
-    {
-        if ("left" === sJc)
-            return align_Left;
-        else if ("right" === sJc)
-            return align_Right;
-        else if ("both" === sJc)
-            return align_Justify;
-        else if ("center" === sJc)
-            return align_Center;
-
-        return undefined;
-    }
-
-    ApiParagraph.prototype.private_GetImpl = function()
-    {
-        return this.Paragraph;
-    };
-    ApiParagraph.prototype.OnChangeParaPr = function(oApiParaPr)
-    {
-        this.Paragraph.Set_Pr(oApiParaPr.ParaPr);
-        oApiParaPr.ParaPr = this.Paragraph.Pr.Copy();
-    };
-    ApiParagraph.prototype.OnChangeTextPr = function(oApiTextPr)
-    {
-        this.Paragraph.TextPr.Set_Value(oApiTextPr.TextPr);
-        oApiTextPr.TextPr = this.Paragraph.TextPr.Value.Copy();
-    };
-    ApiRun.prototype.private_GetImpl = function()
-    {
-        return this.Run;
-    };
-    ApiRun.prototype.OnChangeTextPr = function(oApiTextPr)
-    {
-        this.Run.Set_Pr(oApiTextPr.TextPr);
-        oApiTextPr.TextPr = this.Run.Pr.Copy();
-    };
-    ApiTextPr.prototype.private_OnChange = function()
-    {
-        this.Parent.OnChangeTextPr(this);
-    };
-    ApiParaPr.prototype.private_OnChange = function()
-    {
-        this.Parent.OnChangeParaPr(this);
-    };
 
 })(window, null);
