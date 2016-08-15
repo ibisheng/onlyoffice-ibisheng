@@ -465,7 +465,7 @@ function getRangeType(oBBox){
 			}
 		},
 		//defined name
-		getDefNameByName: function(name, sheetId) {
+		getDefNameByName: function(name, sheetId, opt_exact) {
 			var res = null;
 			var nameIndex = getDefNameIndex(name);
 			if (sheetId) {
@@ -474,14 +474,14 @@ function getRangeType(oBBox){
 					res = sheetContainer[nameIndex];
 				}
 			}
-			if (!res) {
+			if (!res && !(opt_exact && sheetId)) {
 				res = this.defNames.wb[nameIndex];
 			}
 			return res;
 		},
 		getDefNameByNodeId: function(nodeId) {
 			getFromDefNameId(nodeId);
-			return this.getDefNameByName(g_FDNI.name, g_FDNI.sheetId);
+			return this.getDefNameByName(g_FDNI.name, g_FDNI.sheetId, true);
 		},
 		getDefNameByRef: function(ref, sheetId) {
 			var getByRef = function(defName) {
@@ -601,7 +601,7 @@ function getRangeType(oBBox){
 			}
 
 			var sheetId = this.wb.getSheetIdByIndex(sheetIndex);
-			var defName = this.getDefNameByName(name, sheetId);
+			var defName = this.getDefNameByName(name, sheetId, true);
 			if (defName) {
 				defName = defName.getAscCDefName();
 				res.status = false;
@@ -624,18 +624,18 @@ function getRangeType(oBBox){
 		},
 		copyDefNameByWorksheet: function(wsFrom, wsTo) {
 			var sheetContainerFrom = this.defNames.sheet[wsFrom.getId()];
-			if(sheetContainerFrom){
-				var sheetContainerTo = this.defNames.sheet[wsTo.getId()];
+			if (sheetContainerFrom) {
 				var nameFrom = wsFrom.getName();
-				var nameTo = wsFrom.getName();
-				var notifyData = {type: AscCommon.c_oNotifyType.ChangeSheet, data: {rename: {from: nameFrom, to: nameTo}}};
-				for(var name in sheetContainerFrom){
+				var nameTo = wsTo.getName();
+				for (var name in sheetContainerFrom) {
 					var defNameOld = sheetContainerFrom[name];
-					var defNameNew = defNameOld.clone();
-					if(defNameNew.parsedRef){
-						defNameNew.parsedRef.notify(notifyData);
+					if (!defNameOld.isTable && defNameOld.parsedRef) {
+						var parsedRefNew = defNameOld.parsedRef.clone();
+						parsedRefNew.renameSheet(nameFrom, nameTo);
+						var refNew = parsedRefNew.assemble();
+						var defNameNew = new DefName(this.wb, defNameOld.name, refNew, wsTo.getId(), defNameOld.hidden, defNameOld.isTable);
+						this._addDefName(defNameNew);
 					}
-					sheetContainerTo[name] = defNameNew;
 				}
 			}
 		},
@@ -804,8 +804,7 @@ function getRangeType(oBBox){
 				}
 			}
 			for (var defNameId in this.buildDefName) {
-				getFromDefNameId(defNameId);
-				var defName = this.getDefNameByName(g_FDNI.name, g_FDNI.sheetId);
+				var defName = this.getDefNameByNodeId(defNameId);
 				if (defName && defName.parsedRef) {
 					defName.parsedRef.parse();
 					defName.parsedRef.buildDependencies();
@@ -975,12 +974,12 @@ function getRangeType(oBBox){
 				var changedDefName = this.changedDefName;
 				this.changedDefName = null;
 				for (var nodeId in changedDefName) {
-					getFromDefNameId(nodeId);
-					var defName = this.getDefNameByName(g_FDNI.name, g_FDNI.sheetId);
+					var defName = this.getDefNameByNodeId(nodeId);
 					if (defName && defName.parsedRef) {
 						defName.parsedRef.setIsDirty(true);
 						calcTrack.push(defName.parsedRef);
 					}
+					getFromDefNameId(nodeId);
 					this._broadcastDefName(g_FDNI.name, notifyData);
 				}
 			}
@@ -1457,35 +1456,26 @@ Workbook.prototype._insertTablePartsName = function (sheet) {
 	}
 };
 Workbook.prototype._insertWorksheetFormula=function(index){
-	if( index > 0 && index < this.aWorksheets.length ){
-		var oWsTo = this.aWorksheets[index - 1];
-		this.dependencyFormulas.changeSheet(oWsTo.getId(), {insert: index});
+	if( index > 0 && index < this.aWorksheets.length ) {
+		var oWsBefore = this.aWorksheets[index - 1];
+		this.dependencyFormulas.changeSheet(oWsBefore.getId(), {insert: index});
 	}
 };
 Workbook.prototype.replaceWorksheet=function(indexFrom, indexTo){
 	if(indexFrom >= 0 && indexFrom < this.aWorksheets.length &&
 		indexTo >= 0 && indexTo < this.aWorksheets.length){
-		History.Create_NewPoint();
 		History.TurnOff();
 		var wsActive = this.getActiveWs();
 		var oWsFrom = this.aWorksheets[indexFrom];
-		var oWsTo = this.aWorksheets[indexTo];
 		var tempW = {
 					wFN: oWsFrom.getName(),
 					wFI: indexFrom,
 					wFId: oWsFrom.getId(),
-					wTN: oWsTo.getName(),
-					wTI: indexTo,
-					wTId: oWsTo.getId()
+					wTI: indexTo
 				};
-		//переводим обратно в индекс sheet перед которым надо вставить
+		//wTI index insert before
 		if(tempW.wFI < tempW.wTI)
 			tempW.wTI++;
-		/*
-			Формулы:
-				перестройка графа для трехмерных формул вида Sheet1:Sheet3!A1:A3, Sheet1:Sheet3!A1.
-				пересчет трехмерных формул, перестройка формул при изменении положения листа: Sheet1, Sheet2, Sheet3, Sheet4 - Sheet1:Sheet4!A1 -> Sheet4, Sheet1, Sheet2, Sheet3 - Sheet1:Sheet3!A1;
-		*/
 		this.dependencyFormulas.lockRecal();
 		this.dependencyFormulas.changeSheet(tempW.wFId, {replace: tempW});
 		History.TurnOn();
@@ -1493,7 +1483,7 @@ Workbook.prototype.replaceWorksheet=function(indexFrom, indexTo){
 		this.aWorksheets.splice(indexTo, 0, movedSheet[0]);
 		this._updateWorksheetIndexes(wsActive);
 		
-		this._insertWorksheetFormula(tempW.wTI);
+		this._insertWorksheetFormula(indexTo);
 		
 		History.Add(AscCommonExcel.g_oUndoRedoWorkbook, AscCH.historyitem_Workbook_SheetMove, null, null, new UndoRedoData_FromTo(indexFrom, indexTo), true);
 		this.dependencyFormulas.unlockRecal();
@@ -1542,7 +1532,7 @@ Workbook.prototype.removeWorksheet=function(nIndex, outputParams){
 		History.Create_NewPoint();
 		var removedSheetId = removedSheet.getId();
 		this.dependencyFormulas.lockRecal();
-		this.dependencyFormulas.changeSheet(removedSheetId, {remove: removedSheet.getName()});
+		this.dependencyFormulas.changeSheet(removedSheetId, {remove: removedSheetId});
 
 		var wsActive = this.getActiveWs();
 		var oVisibleWs = null;
@@ -1696,46 +1686,6 @@ Workbook.prototype.unlockDefName = function(){
 };
 Workbook.prototype.checkDefNameLock = function(){
     return this.dependencyFormulas.checkDefNameLock();
-};
-Workbook.prototype.getUniqueDefinedNameFrom=function(name, bCopy){
-    var nIndex = 1,
-        dnNewName = "",
-        fGetPostfix = null,
-        name = name.Name,
-        sheetId = name.sheetId;
-    if(bCopy)
-    {
-
-        var result = /^(.*)(\d)$/.exec(name);
-        if(result)
-        {
-            fGetPostfix = function(nIndex){return "" + nIndex;};
-            name = result[1];
-        }
-        else
-        {
-            fGetPostfix = function(nIndex){return "_" + nIndex;};
-            name = name;
-        }
-    }
-    else
-    {
-        fGetPostfix = function(nIndex){return nIndex.toString();};
-    }
-    while(nIndex < 10000)
-    {
-        var sPosfix = fGetPostfix(nIndex);
-        dnNewName = name + sPosfix;
-        var bUniqueName = false;
-        if(!this.getDefNameByName( dnNewName, sheetId )){
-            bUniqueName = true;
-            break;
-        }
-        if(bUniqueName)
-            break;
-        nIndex++;
-    }
-    return dnNewName;
 };
 Workbook.prototype._SerializeHistoryBase64 = function (oMemory, item, aPointChangesBase64) {
     if (!item.LocalChange) {
@@ -2623,9 +2573,9 @@ Woorksheet.prototype.setName=function(name, bFromUndoRedo){
 		var lastName = this.sName;
 		this.sName = name;
 		History.Create_NewPoint();
-		History.Add(AscCommonExcel.g_oUndoRedoWorksheet, AscCH.historyitem_Worksheet_Rename, this.getId(), null, new UndoRedoData_FromTo(lastName, name));
-
 		this.workbook.dependencyFormulas.changeSheet(this.getId(), {rename: {from: lastName, to: name}});
+
+		History.Add(AscCommonExcel.g_oUndoRedoWorksheet, AscCH.historyitem_Worksheet_Rename, this.getId(), null, new UndoRedoData_FromTo(lastName, name));
         if(!bFromUndoRedo)
         {
             var _lastName = parserHelp.getEscapeSheetName(lastName);
@@ -8737,6 +8687,8 @@ DrawingObjectsManager.prototype.rebuildCharts = function(data)
   window['AscCommonExcel'].Woorksheet = Woorksheet;
   window['AscCommonExcel'].Cell = Cell;
   window['AscCommonExcel'].Range = Range;
+  window['AscCommonExcel'].RangeTree = RangeTree;
+  window['AscCommonExcel'].DependencyGraph = DependencyGraph;
   window['AscCommonExcel'].preparePromoteFromTo = preparePromoteFromTo;
   window['AscCommonExcel'].promoteFromTo = promoteFromTo;
 })(window);

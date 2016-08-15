@@ -1904,7 +1904,7 @@ var editor;
     if (1 === d) {
       where -= 1;
     }
-
+    History.Create_NewPoint();
     this.wb.replaceWorksheet(i, where);
     this.wbModel.replaceWorksheet(i, where);
 

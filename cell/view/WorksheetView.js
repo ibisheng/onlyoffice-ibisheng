@@ -11177,7 +11177,7 @@
 
             if (defName) {
                 range = true;
-                this._isLockedDefNames(null, defName.nodeId);
+                this._isLockedDefNames(null, defName.getNodeId());
 
                 if (defName.isTable) {
                     sheetName = defName.Ref.split("!");

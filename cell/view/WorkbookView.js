@@ -2296,7 +2296,7 @@
     var defNameId;
     if (oldName) {
       defNameId = t.model.getDefinedName(oldName);
-      defNameId = defNameId ? defNameId.nodeId : null;
+      defNameId = defNameId ? defNameId.getNodeId() : null;
     }
 
     var callback = function() {
@@ -2341,7 +2341,7 @@
         }
         t._onSelectionNameChanged(ws.getSelectionName(/*bRangeText*/false));
       };
-      var defNameId = t.model.getDefinedName(oldName).nodeId;
+      var defNameId = t.model.getDefinedName(oldName).getNodeId();
 
       ws._isLockedDefNames(delDefinedNamesCallback, defNameId);
 
