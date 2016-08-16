@@ -10632,6 +10632,7 @@
                             reinitRanges = true;
                             History.Create_NewPoint();
                             History.StartTransaction();
+							checkRange = t.model.autoFilters.checkDeleteAllRowsFormatTable(checkRange, true);
                             t.cellCommentator.updateCommentsDependencies(false, val, checkRange);
                             t.model.autoFilters.isEmptyAutoFilters(arn, c_oAscDeleteOptions.DeleteRows);
                             t.model.removeRows(checkRange.r1, checkRange.r2);
@@ -13435,7 +13436,6 @@
         }
 
         var deleteCellsAndShiftLeftTop = function (arn, type) {
-            var range = t.model.getRange3(arn.r1, arn.c1, arn.r2, arn.c2);
             var isCheckChangeAutoFilter = t.af_checkInsDelCells(arn, type, "delCell", true);
             if (isCheckChangeAutoFilter === false) {
                 return;
@@ -13458,9 +13458,13 @@
                 };
 
                 var res;
+				var range;
                 if (type === c_oAscInsertOptions.InsertCellsAndShiftRight) {
+					range = t.model.getRange3(arn.r1, arn.c1, arn.r2, arn.c2);
                     res = range.deleteCellsShiftLeft(preDeleteAction);
                 } else {
+					arn = t.model.autoFilters.checkDeleteAllRowsFormatTable(arn, true);
+					range = t.model.getRange3(arn.r1, arn.c1, arn.r2, arn.c2);
                     res = range.deleteCellsShiftUp(preDeleteAction);
                 }
 
