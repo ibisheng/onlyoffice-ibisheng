@@ -6240,11 +6240,7 @@ drawHBarChart.prototype =
 						var test3 = a * point3.x + b * point3.y + c * point3.z + d
 						var test4 = a * point4.x + b * point4.y + c * point4.z + d
 						
-						if(!(test1 === 0 && test2 === 0 && test3 === 0 && test4 === 0))
-						{
-							console.log("asd");
-						}
-						
+
 						return {a: a, b: b, c: c, d: d};
 					};	
 					
@@ -6373,9 +6369,7 @@ drawHBarChart.prototype =
 		
 		if(this.cChartDrawer.nDimensionCount === 3)
 		{
-			console.time("asd");
 			this._sort3DVerges();
-			console.timeEnd("asd");
 		}
     },
 	
@@ -6638,14 +6632,12 @@ drawHBarChart.prototype =
 					
 					if(x > minX && x < maxX && y > minY && y < maxY /*&& z > minZ && z < maxZ*/)
 					{
-						console.log("x: " + x + " ;y: " + y);
 						res = false;
 						break;
 						
 						
 						/*if(y < line2.a * x + line2.b && y > line4.a * x + line4.b && x > (y - line1.b) / line1.a && x < (y - line3.b) / line3.a)
 						{
-							console.log("x: " + x + " ;y: " + y);
 							res = false;
 							break;
 						}*/
@@ -8341,7 +8333,6 @@ drawPieChart.prototype =
 		
 		stAng = this.angleFor3D;
 		
-		console.log("swAng: " + swAng);
 		
 		//корректируем центр
 		yCenter = yCenter - depth / 2;

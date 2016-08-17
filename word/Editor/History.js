@@ -733,6 +733,16 @@ CHistory.prototype =
         }
 	},
 
+    CanRemoveLastPoint : function()
+    {
+        if (this.Points.length <= 0
+            || (true !== this.Is_UserSaveMode() && null !== this.SavedIndex && this.SavedIndex >= this.Points.length - 1)
+            || (true === this.Is_UserSaveMode() && null !== this.UserSavedIndex && this.UserSavedIndex >= this.Points.length - 1))
+            return false;
+
+        return true;
+    },
+
     TurnOff : function()
     {
 		this.TurnOffHistory++;

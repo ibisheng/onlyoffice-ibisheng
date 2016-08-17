@@ -1034,6 +1034,13 @@ CChartSpace.prototype.paragraphAdd = function(paraItem, bRecalculate)
         }*/
         this.applyLabelsFunction(CheckObjectTextPr, _paraItem.Value);
     }
+    else if(paraItem.Type === para_Text || paraItem.Type === para_Space){
+        if(this.selection.title){
+            this.selection.textSelection = this.selection.title;
+            this.selection.textSelection.checkDocContent();
+            this.selection.textSelection.paragraphAdd(paraItem, bRecalculate);
+        }
+    }
 };
 CChartSpace.prototype.applyTextFunction = function(docContentFunction, tableFunction, args)
 {
@@ -9690,6 +9697,26 @@ CChartSpace.prototype.Undo = function(data)
 {
     switch (data.Type)
     {
+        case AscDFH.historyitem_AutoShapes_SetDrawingBasePos:{
+            if(this.drawingBase && this.drawingBase.Pos){
+                this.drawingBase.Pos.X = data.OldPr.X;
+                this.drawingBase.Pos.Y = data.OldPr.Y;
+            }
+            break;
+        }
+        case AscDFH.historyitem_AutoShapes_SetDrawingBaseExt:{
+            if(this.drawingBase && this.drawingBase.ext){
+                this.drawingBase.ext.cx = data.OldPr.cx;
+                this.drawingBase.ext.cy = data.OldPr.cy;
+            }
+            break;
+        }
+        case AscDFH.historyitem_AutoShapes_SetDrawingBaseType:{
+            if(this.drawingBase){
+                this.drawingBase.Type = data.OldPr;
+            }
+            break;
+        }
         case AscDFH.historyitem_AutoShapes_SetLocks:
         {
             this.locks = data.oldPr;
@@ -9826,6 +9853,26 @@ CChartSpace.prototype.Redo = function(data)
 {
     switch (data.Type)
     {
+        case AscDFH.historyitem_AutoShapes_SetDrawingBasePos:{
+            if(this.drawingBase && this.drawingBase.Pos){
+                this.drawingBase.Pos.X = data.NewPr.X;
+                this.drawingBase.Pos.Y = data.NewPr.Y;
+            }
+            break;
+        }
+        case AscDFH.historyitem_AutoShapes_SetDrawingBaseExt:{
+            if(this.drawingBase && this.drawingBase.ext){
+                this.drawingBase.ext.cx = data.NewPr.cx;
+                this.drawingBase.ext.cy = data.NewPr.cy;
+            }
+            break;
+        }
+        case AscDFH.historyitem_AutoShapes_SetDrawingBaseType:{
+            if(this.drawingBase){
+                this.drawingBase.Type = data.NewPr;
+            }
+            break;
+        }
         case AscDFH.historyitem_AutoShapes_SetLocks:
         {
             this.locks = data.newPr;
@@ -9964,6 +10011,21 @@ CChartSpace.prototype.Save_Changes = function(data, w)
     w.WriteLong(data.Type);
     switch (data.Type)
     {
+        case AscDFH.historyitem_AutoShapes_SetDrawingBasePos:{
+
+            w.WriteDouble(data.NewPr.X);
+            w.WriteDouble(data.NewPr.Y);
+            break;
+        }
+        case AscDFH.historyitem_AutoShapes_SetDrawingBaseExt:{
+            w.WriteDouble(data.NewPr.cx);
+            w.WriteDouble(data.NewPr.cy);
+            break;
+        }
+        case AscDFH.historyitem_AutoShapes_SetDrawingBaseType:{
+            w.WriteLong(data.NewPr);
+            break;
+        }
         case AscDFH.historyitem_AutoShapes_SetLocks:
         {
             w.WriteLong(data.newPr);
@@ -10108,6 +10170,26 @@ CChartSpace.prototype.Load_Changes = function(r)
     var type = r.GetLong();
     switch (type)
     {
+        case AscDFH.historyitem_AutoShapes_SetDrawingBasePos:{
+            if(this.drawingBase && this.drawingBase.Pos){
+                this.drawingBase.Pos.X = r.GetDouble();
+                this.drawingBase.Pos.Y = r.GetDouble();
+            }
+            break;
+        }
+        case AscDFH.historyitem_AutoShapes_SetDrawingBaseExt:{
+            if(this.drawingBase && this.drawingBase.ext){
+                this.drawingBase.ext.cx = r.GetDouble();
+                this.drawingBase.ext.cy = r.GetDouble();
+            }
+            break;
+        }
+        case AscDFH.historyitem_AutoShapes_SetDrawingBaseType:{
+            if(this.drawingBase){
+                this.drawingBase.Type = r.GetLong();
+            }
+            break;
+        }
         case AscDFH.historyitem_AutoShapes_SetLocks:
         {
             this.locks = r.GetLong();

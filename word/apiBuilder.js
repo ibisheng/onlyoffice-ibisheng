@@ -38,7 +38,7 @@
      * @class
      * @name Api
      */
-    var Api = window["Asc"]["asc_docs_api"];
+    var Api = window["Asc"]["asc_docs_api"] || window["Asc"]["spreadsheet_api"];
 
     /**
      * Class representing a container for paragraphs and tables.
@@ -69,6 +69,16 @@
     {
         this.Parent = Parent;
         this.ParaPr = ParaPr;
+    }
+
+
+    /*
+     * Class representing paragraph bullet
+     * @constructor
+     * */
+    function ApiBullet(Bullet)
+    {
+        this.Bullet = Bullet;
     }
 
     /**
@@ -347,7 +357,7 @@
      */
     function ApiStroke(oLn)
     {
-        this.Ln= oLn;
+        this.Ln = oLn;
     }
 
 
@@ -861,16 +871,9 @@
      */
     Api.prototype.CreateLinearGradientFill = function(aGradientStop, Angle)
     {
-        var oUniFill = new AscFormat.CUniFill();
-        oUniFill.fill = new AscFormat.CGradFill();
-        for(var i = 0; i < aGradientStop.length; ++i)
-        {
-            oUniFill.fill.colors.push(aGradientStop[i].Gs);
-        }
-        oUniFill.fill.lin = new AscFormat.GradLin();
-        oUniFill.fill.lin.angle = Angle;
-        return new ApiFill(oUniFill);
+        return new ApiFill(AscFormat.builder_CreateLinearGradient(aGradientStop, Angle));
     };
+
 
     /**
      * Create a radial gradient fill
@@ -880,14 +883,7 @@
      */
     Api.prototype.CreateRadialGradientFill = function(aGradientStop)
     {
-        var oUniFill = new AscFormat.CUniFill();
-        oUniFill.fill = new AscFormat.CGradFill();
-        for(var i = 0; i < aGradientStop.length; ++i)
-        {
-            oUniFill.fill.colors.push(aGradientStop[i].Gs);
-        }
-        oUniFill.fill.path = new AscFormat.GradPath();
-        return new ApiFill(oUniFill);
+        return new ApiFill(AscFormat.builder_CreateRadialGradient(aGradientStop));
     };
 
     /**
@@ -898,14 +894,9 @@
      * @param {ApiUniColor} FgColor
      * @returns {ApiFill}
      */
-    Api.prototype.CreatePatternFill= function(sPatternType, BgColor, FgColor)
+    Api.prototype.CreatePatternFill = function(sPatternType, BgColor, FgColor)
     {
-        var oUniFill = new AscFormat.CUniFill();
-        oUniFill.fill = new AscFormat.CPattFill();
-        oUniFill.fill.ftype = AscCommon.global_hatch_offsets[sPatternType];
-        oUniFill.fill.fgClr = FgColor.Unicolor;
-        oUniFill.fill.bgClr = BgColor.Unicolor;
-        return new ApiFill(oUniFill);
+        return new ApiFill(AscFormat.builder_CreatePatternFill(sPatternType, BgColor, FgColor));
     };
 
     /**
@@ -915,20 +906,9 @@
      * @param {BlipFillType} sBlipFillType
      * @returns {ApiFill}
      * */
-    Api.prototype.CreateBlipFill= function(sImageUrl, sBlipFillType)
+    Api.prototype.CreateBlipFill = function(sImageUrl, sBlipFillType)
     {
-        var oUniFill = new AscFormat.CUniFill();
-        oUniFill.fill = new AscFormat.CBlipFill();
-        oUniFill.fill.RasterImageId = sImageUrl;
-        if(sBlipFillType === "tile")
-        {
-            oUniFill.fill.tile = new AscFormat.CBlipFillTile();
-        }
-        else if(sBlipFillType === "stretch")
-        {
-            oUniFill.fill.stretch = true;
-        }
-        return new ApiFill(oUniFill);
+        return new ApiFill(AscFormat.builder_CreateBlipFill(sImageUrl, sBlipFillType));
     };
 
     /**
@@ -950,14 +930,7 @@
      * */
     Api.prototype.CreateStroke = function(nWidth, oFill)
     {
-        if(nWidth === 0)
-        {
-            return new ApiStroke(AscFormat.CreateNoFillLine());
-        }
-        var oLn = new AscFormat.CLn();
-        oLn.w = nWidth;
-        oLn.Fill = oFill.UniFill;
-        return new ApiStroke(oLn);
+        return new ApiStroke(AscFormat.builder_CreateLine(nWidth, oFill));
     };
 
     /**
@@ -970,6 +943,81 @@
     Api.prototype.CreateGradientStop = function(oUniColor, nPos)
     {
         return new ApiGradientStop(oUniColor, nPos);
+    };
+
+    /**
+     * Create a new bullet
+     * @memberof Api
+     * @returns {ApiBullet}
+     * */
+    Api.CreateBullet = function(sSymbol){
+        var oBullet = new AscFormat.CBullet();
+        oBullet.bulletType = new AscFormat.CBulletType();
+        if(typeof sSymbol === "string" && sSymbol.length > 0){
+            oBullet.bulletType.type = AscFormat.BULLET_TYPE_BULLET_CHAR;
+            oBullet.bulletType.Char = sSymbol[0];
+        }
+        else{
+            oBullet.bulletType.type = AscFormat.BULLET_TYPE_BULLET_NONE;
+        }
+    };
+
+    /**
+     * Create a new numbering
+     * @memberof Api
+     * @param {BulletType} sType
+     * @param {number} nStartAt
+     * @returns {ApiBullet}
+     * */
+
+    Api.CreateNumbering = function(sType, nStartAt){
+        var oBullet = new AscFormat.CBullet();
+        oBullet.bulletType = new AscFormat.CBulletType();
+        oBullet.bulletType.type = AscFormat.BULLET_TYPE_BULLET_AUTONUM;
+        switch(sType){
+            case "ArabicPeriod" :{
+                oBullet.bulletType.AutoNumType = 12;
+                break;
+            }
+            case "ArabicParenR":{
+                oBullet.bulletType.AutoNumType = 11;
+                break;
+            }
+            case "RomanUcPeriod":{
+                oBullet.bulletType.AutoNumType = 34;
+                break;
+            }
+            case "RomanLcPeriod":{
+                oBullet.bulletType.AutoNumType = 31;
+                break;
+            }
+            case "AlphaLcParenR":{
+                oBullet.bulletType.AutoNumType = 1;
+                break;
+            }
+            case "AlphaLcPeriod":{
+                oBullet.bulletType.AutoNumType = 2;
+                break;
+            }
+            case "AlphaUcParenR":{
+                oBullet.bulletType.AutoNumType = 4;
+                break;
+            }
+            case "AlphaUcPeriod":{
+                oBullet.bulletType.AutoNumType = 5;
+                break;
+            }
+            case "None":{
+                oBullet.bulletType.type = AscFormat.BULLET_TYPE_BULLET_NONE;
+                break;
+            }
+        }
+        if( oBullet.bulletType.type === AscFormat.BULLET_TYPE_BULLET_AUTONUM){
+            if(AscFormat.isRealNumber(nStartAt)){
+                oBullet.bulletType.startAt = nStartAt;
+            }
+        }
+        return new ApiBullet(oBullet);
     };
 
 
@@ -2439,6 +2487,17 @@
     };
 
 
+    /**
+     * Set fill of run
+     * @param {ApiFill} oApiFill
+     */
+    ApiTextPr.prototype.SetFill = function(oApiFill)
+    {
+        this.TextPr.Unifill = oApiFill.UniFill;
+        this.private_OnChange();
+    };
+
+
     //------------------------------------------------------------------------------------------------------------------
     //
     // ApiParaPr
@@ -2745,6 +2804,10 @@
         }
         this.private_OnChange();
     };
+
+
+
+
 
     //------------------------------------------------------------------------------------------------------------------
     //
@@ -4162,6 +4225,7 @@
     ApiTextPr.prototype["SetPosition"]               = ApiTextPr.prototype.SetPosition;
     ApiTextPr.prototype["SetLanguage"]               = ApiTextPr.prototype.SetLanguage;
     ApiTextPr.prototype["SetShd"]                    = ApiTextPr.prototype.SetShd;
+    ApiTextPr.prototype["SetFill"]                   = ApiTextPr.prototype.SetFill;
 
     ApiParaPr.prototype["GetClassType"]              = ApiParaPr.prototype.GetClassType;
     ApiParaPr.prototype["SetStyle"]                  = ApiParaPr.prototype.SetStyle;
@@ -4726,4 +4790,11 @@
         this.private_OnChange();
     };
 
+    Api.prototype.private_CreateApiParagraph = function(oParagraph){
+        return new ApiParagraph(oParagraph);
+    };
+
+    Api.prototype.private_CreateApiDocContent = function(oDocContent){
+        return new ApiDocumentContent(oDocContent);
+    };
 }(window, null));

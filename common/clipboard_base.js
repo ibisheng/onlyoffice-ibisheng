@@ -847,13 +847,18 @@
 			if (!_ret && null != this.LastCopyBinary)
 			{
 				var _data = null;
+				var _isInternal = false;
 				for (var i = 0; i < this.LastCopyBinary.length; i++)
 				{
 					if (c_oAscClipboardDataFormat.Internal == this.LastCopyBinary[i].type)
 					{
 						this.Api.asc_PasteData(AscCommon.c_oAscClipboardDataFormat.Internal, this.LastCopyBinary[i].data);
+						_isInternal = true;
 					}
 				}
+
+				if (!_isInternal && this.LastCopyBinary.length > 0)
+					this.Api.asc_PasteData(this.LastCopyBinary[0].type, this.LastCopyBinary[0].data);
 			}
 			return _ret;
 		}

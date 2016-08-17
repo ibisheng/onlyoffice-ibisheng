@@ -2553,6 +2553,34 @@
 				History.EndTransaction();
 			},
 			
+			checkDeleteAllRowsFormatTable: function(range, emptyRange)
+			{
+				var worksheet = this.worksheet;
+		
+				if(worksheet.TableParts && worksheet.TableParts.length)
+				{
+					for(var i = 0; i < worksheet.TableParts.length; i++)
+					{
+						var table = worksheet.TableParts[i];
+						var intersection = range.intersection(table.Ref);
+						if(intersection.r1 === table.Ref.r1 + 1 && intersection.r2 >= table.Ref.r2)
+						{
+							range.r1++;
+							
+							if(emptyRange)
+							{
+								var deleteRange = this.worksheet.getRange3(table.Ref.r1 + 1, range.c1, table.Ref.r1 + 1, range.c2);
+								deleteRange.cleanText()
+							}
+							
+							break;
+						}
+					}
+				}
+				
+				return range;
+			},
+			
 			_clearRange: function(range, isClearText)
 			{
 				range.setTableStyle(null);

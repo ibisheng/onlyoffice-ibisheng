@@ -12258,7 +12258,7 @@ function CorrectUniColor(asc_color, unicolor, flag)
     function builder_CreateRadialGradient(aGradientStop){
         var oUniFill = builder_CreateGradient(aGradientStop);
         oUniFill.fill.path = new AscFormat.GradPath();
-        return new ApiFill(oUniFill);
+        return oUniFill;
     }
 
     function builder_CreatePatternFill(sPatternType, BgColor, FgColor){

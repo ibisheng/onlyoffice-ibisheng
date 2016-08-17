@@ -54,6 +54,14 @@
 		MouseUpLockedSend : false
 	};
 
+	AscCommon.stopEvent = function(e)
+	{
+		if (e.preventDefault)
+			e.preventDefault();
+		if (e.stopPropagation)
+			e.stopPropagation();
+	};
+
 	function CMouseEventHandler()
 	{
 		this.X = 0;                            // ������� ������� X
@@ -245,7 +253,8 @@
 			global_mouseEvent.Sender = (e.srcElement) ? e.srcElement : e.target;
 		}
 
-		if ((Math.abs(global_mouseEvent.X - global_mouseEvent.LastX) > 3) || (Math.abs(global_mouseEvent.Y - global_mouseEvent.LastY) > 3))
+		var _eps = 3 * global_mouseEvent.KoefPixToMM;
+		if ((Math.abs(global_mouseEvent.X - global_mouseEvent.LastX) > _eps) || (Math.abs(global_mouseEvent.Y - global_mouseEvent.LastY) > _eps))
 		{
 			global_mouseEvent.LastClickTime = -1;
 			global_mouseEvent.ClickCount    = 0;
@@ -332,6 +341,14 @@
 
 		global_mouseEvent.X = (global_mouseEvent.X * AscBrowser.zoom) >> 0;
 		global_mouseEvent.Y = (global_mouseEvent.Y * AscBrowser.zoom) >> 0;
+
+		var _eps = 3 * global_mouseEvent.KoefPixToMM;
+		if ((Math.abs(global_mouseEvent.X - global_mouseEvent.LastX) > _eps) || (Math.abs(global_mouseEvent.Y - global_mouseEvent.LastY) > _eps))
+		{
+			// not only move!!! (touch - fast click in different places)
+			global_mouseEvent.LastClickTime = -1;
+			global_mouseEvent.ClickCount    = 0;
+		}
 
 		global_mouseEvent.LastX = global_mouseEvent.X;
 		global_mouseEvent.LastY = global_mouseEvent.Y;

@@ -524,10 +524,14 @@ CopyProcessor.prototype =
             }
 			else if(para_Math == item.Type){
                 var sSrc = item.MathToImageConverter();
-				if (null != sSrc && "" != sSrc && null != sSrc.ImageUrl){
+				if (null != sSrc && null != sSrc.ImageUrl){
 					var oImg = new CopyElement("img");
-					oImg.oAttributes["width"] = item.Width;
-					oImg.oAttributes["height"] = item.Height;
+					if (sSrc.w_px > 0) {
+						oImg.oAttributes["width"] = sSrc.w_px;
+					}
+					if (sSrc.h_px > 0) {
+						oImg.oAttributes["height"] = sSrc.h_px;
+					}
 					oImg.oAttributes["src"] = sSrc.ImageUrl;
 					oTarget.addChild(oImg);
 				}
@@ -2184,10 +2188,11 @@ PasteProcessor.prototype =
 			content[i].RecalcInfo.Set_Type_0(pararecalc_0_All);
 		}
 	},
-    ReadFromBinary : function(sBase64)
+    ReadFromBinary : function(sBase64, oDocument)
 	{
         var openParams = { checkFileSize: false, charCount: 0, parCount: 0 };
-        var oBinaryFileReader = new AscCommonWord.BinaryFileReader(this.oLogicDocument, openParams);
+		var doc = oDocument ? oDocument : this.oLogicDocument;
+        var oBinaryFileReader = new AscCommonWord.BinaryFileReader(doc, openParams);
         var oRes = oBinaryFileReader.ReadFromString(sBase64, true);
         this.bInBlock = oRes.bInBlock;
         return oRes;
@@ -3111,7 +3116,7 @@ PasteProcessor.prototype =
 					this.oDocument = AscFormat.ExecuteNoHistory(tempCDocument , this, []);
 
 					AscCommon.g_oIdCounter.m_bRead = true;
-					var aContent = AscFormat.ExecuteNoHistory(this.ReadFromBinary, this, [base64FromWord]);
+					var aContent = AscFormat.ExecuteNoHistory(this.ReadFromBinary, this, [base64FromWord, this.oDocument]);
 					AscCommon.g_oIdCounter.m_bRead = false;
 					//возврщаем обратно переменные и историю, документ которой заменяется при создании CDocument
 					this.oDocument = trueDocument;

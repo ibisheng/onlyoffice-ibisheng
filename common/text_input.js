@@ -702,6 +702,30 @@
 					return this.keyCodeVal;
 				}
 			});
+			Object.defineProperty(oEvent, 'shiftKey', {
+				get : function()
+				{
+					return this.shiftKeyVal;
+				}
+			});
+			Object.defineProperty(oEvent, 'altKey', {
+				get : function()
+				{
+					return this.altKeyVal;
+				}
+			});
+			Object.defineProperty(oEvent, 'metaKey', {
+				get : function()
+				{
+					return this.metaKeyVal;
+				}
+			});
+			Object.defineProperty(oEvent, 'ctrlKey', {
+				get : function()
+				{
+					return this.ctrlKeyVal;
+				}
+			});
 
 			if (AscCommon.AscBrowser.isIE)
 			{
@@ -721,6 +745,10 @@
 			}
 
 			oEvent.keyCodeVal = k;
+			oEvent.shiftKeyVal = e.shiftKey;
+			oEvent.altKeyVal = e.altKey;
+			oEvent.metaKeyVal = e.metaKey;
+			oEvent.ctrlKeyVal = e.ctrlKey;
 
 			var _elem = _getElementKeyboardDown(this.nativeFocusElement, 3);
 			_elem.dispatchEvent(oEvent);

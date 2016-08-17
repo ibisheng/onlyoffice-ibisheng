@@ -73,7 +73,7 @@
 			
 			checkCopyToClipboard: function(ws, _clipboard, _formats)
 			{
-				var _data;
+				var _data = null;
 				var activeRange = ws.getSelectedRange();
 				var wb = window["Asc"]["editor"].wb;
 				
@@ -81,7 +81,11 @@
 				{
 					//only TEXT
 					var fragments = wb.cellEditor.copySelection();
-					_data = wb.cellEditor._getFragmentsText(fragments);
+					
+					if(null !== fragments)
+					{
+						_data = wb.cellEditor._getFragmentsText(fragments);
+					}
 					
 					_clipboard.pushData(AscCommon.c_oAscClipboardDataFormat.Text, _data)
 				}
@@ -2147,7 +2151,7 @@
 					return res.length > 0 ? res.join(",") : "";
 				}
 				
-				var getSpan = function(text, format, isAddSpace)
+				var getSpan = function(text, format, isAddSpace, isHyperLink)
 				{
 					var value = "";
 					
@@ -2166,7 +2170,18 @@
 						value += " ";
 					}
 					
-					var elem = document.createElement("span");
+					var elem;
+					if(isHyperLink)
+					{
+						elem = document.createElement("a");
+						elem.href = isHyperLink.Hyperlink;
+						elem.title = isHyperLink.ToolTip;
+					}
+					else
+					{
+						elem = document.createElement("span");
+					}
+					
 					elem.innerText = value;
 					
 					if(format)
@@ -2194,6 +2209,7 @@
 					for(var j in row.c)
 					{
 						var cell = row.c[j];
+						var isHyperlink = worksheet.getCell3( i, j ).getHyperlink();
 						
 						if(cell.oValue && cell.oValue.multiText)
 						{
@@ -2213,7 +2229,7 @@
 							var format = cell.xfs && cell.xfs.font ? cell.xfs.font : null;
 							
 							var isAddSpace = row.c[parseInt(j) + 1] || (!row.c[parseInt(j) + 1] && worksheet.aGCells[parseInt(i) + 1]) ? true : false;
-							var elem = getSpan(cell.getValue(), format, isAddSpace);
+							var elem = getSpan(cell.getValue(), format, isAddSpace, isHyperlink);
 							if(null !== elem)
 							{	
 								res.appendChild(elem);

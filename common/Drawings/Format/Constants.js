@@ -1010,6 +1010,9 @@
 	window['AscDFH'].historyitem_AutoShapes_RemoveFromDrawingObjects = 1004;
 	window['AscDFH'].historyitem_AutoShapes_SetBFromSerialize        = 1009;
 	window['AscDFH'].historyitem_AutoShapes_SetLocks                 = 1010;
+	window['AscDFH'].historyitem_AutoShapes_SetDrawingBaseType       = 1011;
+	window['AscDFH'].historyitem_AutoShapes_SetDrawingBaseExt        = 1012;
+	window['AscDFH'].historyitem_AutoShapes_SetDrawingBasePos        = 1013;
 	window['AscDFH'].historyitem_CommonChart_RemoveSeries            = 1005;
 	window['AscDFH'].historyitem_CommonSeries_RemoveDPt              = 1006;
 	window['AscDFH'].historyitem_CommonLit_RemoveDPt                 = 1007;

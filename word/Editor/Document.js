@@ -1481,7 +1481,8 @@ function CDocument(DrawingDocument, isMainLogicDocument)
     this.TrackRevisionsManager = new CTrackRevisionsManager(this);
 
     // Контролируем изменения интерфейса
-    this.ChangedStyles = []; // Объект с Id стилями, которые были изменены/удалены/добавлены
+    this.ChangedStyles      = []; // Объект с Id стилями, которые были изменены/удалены/добавлены
+	this.TurnOffPanelStyles = 0;  // == 0 - можно обновлять панельку со стилями, != 0 - нельзя обновлять
 
     // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
     this.TableId.Add(this, this.Id);
@@ -2278,8 +2279,8 @@ CDocument.prototype.Recalculate_PageColumn                   = function()
     var StartIndex         = this.FullRecalc.StartIndex;
     var bResetStartElement = this.FullRecalc.ResetStartElement;
 
-    // console.log("Page " + PageIndex + " Section " + SectionIndex + " Column " + ColumnIndex + " Element " + StartIndex);
-    // console.log(this.RecalcInfo);
+     // console.log("Page " + PageIndex + " Section " + SectionIndex + " Column " + ColumnIndex + " Element " + StartIndex);
+     // console.log(this.RecalcInfo);
 
     var StartPos = this.Get_PageContentStartPos2(PageIndex, ColumnIndex, 0, StartIndex);
 
@@ -2429,7 +2430,7 @@ CDocument.prototype.Recalculate_PageColumn                   = function()
 
         Element.TurnOn_RecalcEvent();
 
-        if (true != bFlow && RecalcResult & recalcresult_NextElement)
+        if (true != bFlow && (RecalcResult & recalcresult_NextElement || RecalcResult & recalcresult_NextPage))
         {
             var ElementPageIndex = this.private_GetElementPageIndex(Index, PageIndex, ColumnIndex, ColumnsCount);
             Y                    = Element.Get_PageBounds(ElementPageIndex).Bottom;
@@ -2521,8 +2522,7 @@ CDocument.prototype.Recalculate_PageColumn                   = function()
                             var NewPageSection           = new CDocumentPageSection();
                             NewPageSection.Pos           = Index;
                             NewPageSection.EndPos        = Index;
-                            NewPageSection.Y             = SectionY + 0.001; // bug fix 32748 проверить здесь
-                            //NewPageSection.Y             = true === PageSection.Is_CalculatingSectionBottomLine() ? PageSection.CurrentY : SectionY + 0.001;
+                            NewPageSection.Y             = SectionY + 0.001;
                             NewPageSection.YLimit        = true === PageSection.Is_CalculatingSectionBottomLine() ? PageSection.YLimit2 : RealYLimit;
                             Page.Sections[_SectionIndex] = NewPageSection;
 
@@ -10108,6 +10108,9 @@ CDocument.prototype.Add_ChangedStyle = function(arrStylesId)
 };
 CDocument.prototype.Document_UpdateStylesPanel = function()
 {
+	if (0 !== this.TurnOffPanelStyles)
+		return;
+
 	var bNeedUpdate = false;
 	for (var StyleId in this.ChangedStyles)
 	{
@@ -10121,6 +10124,17 @@ CDocument.prototype.Document_UpdateStylesPanel = function()
 	{
 		editor.GenerateStyles();
 	}
+};
+CDocument.prototype.LockPanelStyles = function()
+{
+	this.TurnOffPanelStyles++;
+};
+CDocument.prototype.UnlockPanelStyles = function(isUpdate)
+{
+	this.TurnOffPanelStyles = Math.max(0, this.TurnOffPanelStyles - 1);
+
+	if (true === isUpdate)
+		this.Document_UpdateStylesPanel();
 };
 CDocument.prototype.Get_AllParagraphs = function(Props)
 {
@@ -11274,11 +11288,19 @@ CDocument.prototype.End_CompositeInput = function()
 	if (null === this.CompositeInput)
 		return;
 
+	var nLen = this.CompositeInput.Length;
+	
 	var oRun = this.CompositeInput.Run;
 	oRun.Set_CompositeInput(null);
 	this.CompositeInput = null;
 
 	this.History.Check_UninonLastPoints();
+	
+	if (0 === nLen && true === this.History.CanRemoveLastPoint())
+	{
+		this.Document_Undo();
+		this.History.Clear_Redo();
+	}
 
 	this.Document_UpdateInterfaceState();
 

@@ -1209,7 +1209,7 @@ cArea3D.prototype.getRange = function () {
 		}
 		_r[0]._foreachNoEmpty(function (_cell) {
 			if (cell.getID() === _cell.getName()) {
-				_val.push(checkTypeCell(cell));
+				_val.push(checkTypeCell(_cell));
 			}
 		});
 
