@@ -8240,9 +8240,10 @@ background-repeat: no-repeat;\
 			if (null != frameWindow.document && null != frameWindow.document.body)
 			{
 				ifr.style.display = "block";
-				this.WordControl.m_oLogicDocument.TurnOffHistory();
+				this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
+				this.asc_SetSilentMode(true);
 				AscCommon.Editor_Paste_Exec(this, frameWindow.document.body, ifr);
-				this.WordControl.m_oLogicDocument.TurnOnHistory();
+				this.asc_SetSilentMode(false);
 			}
 		}
 
