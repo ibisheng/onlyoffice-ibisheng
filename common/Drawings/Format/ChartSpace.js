@@ -1034,6 +1034,13 @@ CChartSpace.prototype.paragraphAdd = function(paraItem, bRecalculate)
         }*/
         this.applyLabelsFunction(CheckObjectTextPr, _paraItem.Value);
     }
+    else if(paraItem.Type === para_Text || paraItem.Type === para_Space){
+        if(this.selection.title){
+            this.selection.textSelection = this.selection.title;
+            this.selection.textSelection.checkDocContent();
+            this.selection.textSelection.paragraphAdd(paraItem, bRecalculate);
+        }
+    }
 };
 CChartSpace.prototype.applyTextFunction = function(docContentFunction, tableFunction, args)
 {
