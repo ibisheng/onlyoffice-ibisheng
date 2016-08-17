@@ -449,6 +449,32 @@ function getRangeType(oBBox){
 				listeners[listenerId].notify(notifyData);
 			}
 		},
+		removeSheet: function(sheetId, tableNames) {
+			//cells
+			var sheet = this.wb.getWorksheetById(sheetId);
+			var range = sheet.getRange3(0, 0, gc_nMaxRow0, gc_nMaxCol0);
+			range._setPropertyNoEmpty(null, null, function(cell){
+				if (cell.formulaParsed) {
+					cell.formulaParsed.removeDependencies();
+				}
+			});
+			//defnames
+			var sheetContainerFrom = this.defNames.sheet[sheetId];
+			if (sheetContainerFrom) {
+				for (var name in sheetContainerFrom) {
+					var defNameOld = sheetContainerFrom[name];
+					if (!defNameOld.isTable) {
+						this._removeDefName(sheetId, name, AscCH.historyitem_Workbook_DefinedNamesChangeUndo);
+					}
+				}
+			}
+			//tables
+			for (var i = 0; i < tableNames.length; ++i) {
+				this._delDefName(tableNames[i], null);
+			}
+			//dependence
+			this.changeSheet(sheetId, {remove: sheetId});
+		},
 		//lock
 		lockRecal: function() {
 			++this.lockCounter;
@@ -547,15 +573,7 @@ function getRangeType(oBBox){
 		},
 		removeDefName: function(sheetIndex, name) {
 			var sheetId = this.wb.getSheetIdByIndex(sheetIndex);
-			var defName = this._delDefName(name, sheetId);
-			if (defName) {
-				History.Create_NewPoint();
-				History.Add(AscCommonExcel.g_oUndoRedoWorkbook, AscCH.historyitem_Workbook_DefinedNamesChange, null,
-							null, new UndoRedoData_DefinedNamesChange(defName.getAscCDefName(), null));
-
-				defName.removeDependencies();
-				this.addToChangedDefName(defName);
-			}
+			this._removeDefName(sheetId, name, AscCH.historyitem_Workbook_DefinedNamesChange);
 		},
 		editDefinesNames: function(oldAscName, newAscName) {
 			var res = null;
@@ -864,7 +882,7 @@ function getRangeType(oBBox){
 			for (var i = 0; i < worksheets.length; ++i) {
 				var ws = worksheets[i];
 				if (ws) {
-					var cwf = ws.getCWF();
+					var cwf = ws.getCwf();
 					for (var i in cwf) {
 						var ca = g_oCellAddressUtils.getCellAddress(i);
 						var c = ws._getCellNoEmpty(ca.getRow0(), ca.getCol0());
@@ -893,6 +911,17 @@ function getRangeType(oBBox){
 				cur.removeDependencies();
 			}
 			container[nameIndex] = defName;
+		},
+		_removeDefName: function(sheetId, name, historyType) {
+			var defName = this._delDefName(name, sheetId);
+			if (defName) {
+				History.Create_NewPoint();
+				History.Add(AscCommonExcel.g_oUndoRedoWorkbook, historyType, null, null,
+							new UndoRedoData_DefinedNamesChange(defName.getAscCDefName(), null));
+
+				defName.removeDependencies();
+				this.addToChangedDefName(defName);
+			}
 		},
 		_delDefName: function(name, sheetId) {
 			var res = null;
@@ -1402,20 +1431,16 @@ Workbook.prototype.copyWorksheet=function(index, insertBefore, sName, sId, bFrom
 		this.aWorksheetsById[newSheet.getId()] = newSheet;
 		this._updateWorksheetIndexes(wsActive);
 		History.TurnOn();
+		//now insertBefore is index of inserted sheet
 		this._insertWorksheetFormula(insertBefore);
 
 		this.dependencyFormulas.copyDefNameByWorksheet(wsFrom, newSheet);
 
 		//для формул. создаем копию this.cwf[this.Id] для нового листа.
-		newSheet._BuildDependencies(wsFrom.getCWF());
-		
-		if(!tableNames && newSheet.TableParts && newSheet.TableParts.length)
-		{
-			tableNames = [];
-			for(var i = 0; i < newSheet.TableParts.length; i++)
-			{
-				tableNames.push(newSheet.TableParts[i].DisplayName);
-			}
+		newSheet._BuildDependencies(wsFrom.getCwf());
+
+		if (!tableNames) {
+			tableNames = newSheet.getTableNames();
 		}
 		
 		History.Add(AscCommonExcel.g_oUndoRedoWorkbook, AscCH.historyitem_Workbook_SheetAdd, null, null, new UndoRedoData_SheetAdd(insertBefore, newSheet.getName(), wsFrom.getId(), newSheet.getId(), tableNames));
@@ -1443,7 +1468,7 @@ Workbook.prototype.insertWorksheet = function (index, sheet) {
 	this._insertWorksheetFormula(index);
 	this._insertTablePartsName(sheet);
 	//восстанавливаем список ячеек с формулами для sheet
-	sheet._BuildDependencies(sheet.getCWF());
+	sheet._BuildDependencies(sheet.getCwf());
   this.sortDependency();
 };
 Workbook.prototype._insertTablePartsName = function (sheet) {
@@ -1464,7 +1489,6 @@ Workbook.prototype._insertWorksheetFormula=function(index){
 Workbook.prototype.replaceWorksheet=function(indexFrom, indexTo){
 	if(indexFrom >= 0 && indexFrom < this.aWorksheets.length &&
 		indexTo >= 0 && indexTo < this.aWorksheets.length){
-		History.TurnOff();
 		var wsActive = this.getActiveWs();
 		var oWsFrom = this.aWorksheets[indexFrom];
 		var tempW = {
@@ -1478,7 +1502,6 @@ Workbook.prototype.replaceWorksheet=function(indexFrom, indexTo){
 			tempW.wTI++;
 		this.dependencyFormulas.lockRecal();
 		this.dependencyFormulas.changeSheet(tempW.wFId, {replace: tempW});
-		History.TurnOn();
 		var movedSheet = this.aWorksheets.splice(indexFrom, 1);
 		this.aWorksheets.splice(indexTo, 0, movedSheet[0]);
 		this._updateWorksheetIndexes(wsActive);
@@ -1529,10 +1552,9 @@ Workbook.prototype.removeWorksheet=function(nIndex, outputParams){
 	var removedSheet = this.getWorksheet(nIndex);
 	if(removedSheet)
 	{
-		History.Create_NewPoint();
 		var removedSheetId = removedSheet.getId();
 		this.dependencyFormulas.lockRecal();
-		this.dependencyFormulas.changeSheet(removedSheetId, {remove: removedSheetId});
+		this.dependencyFormulas.removeSheet(removedSheetId, removedSheet.getTableNames());
 
 		var wsActive = this.getActiveWs();
 		var oVisibleWs = null;
@@ -1543,7 +1565,6 @@ Workbook.prototype.removeWorksheet=function(nIndex, outputParams){
 		    if (null != oVisibleWs)
 		        wsActive = oVisibleWs;
 		}
-		var _cwf = null;
 		History.Add(AscCommonExcel.g_oUndoRedoWorkbook, AscCH.historyitem_Workbook_SheetRemove, null, null, new AscCommonExcel.UndoRedoData_SheetRemove(nIndex, removedSheetId, removedSheet));
 		if (null != oVisibleWs) {
 		    History.SetSheetUndo(removedSheetId);
@@ -4019,6 +4040,15 @@ Woorksheet.prototype.getTableNameColumnByIndex = function(tableName, columnIndex
 	}
 	return res;
 };
+	Woorksheet.prototype.getTableNames = function() {
+		var res = [];
+		if (this.TableParts) {
+			for (var i = 0; i < this.TableParts.length; i++) {
+				res.push(this.TableParts[i].DisplayName);
+			}
+		}
+		return res;
+	};
 Woorksheet.prototype.renameDependencyNodes = function(offset, oBBox, rec, noDelete){
 	this.workbook.dependencyFormulas.shift(this.Id, oBBox, offset);
 };
@@ -4099,7 +4129,7 @@ Woorksheet.prototype.updateSparklineCache = function(sheet, ranges) {
     this.aSparklineGroups[i].updateCache(sheet, ranges);
   }
 };
-	Woorksheet.prototype.getCWF = function() {
+	Woorksheet.prototype.getCwf = function() {
 		var cwf = {};
 		var range = this.getRange3(0,0, gc_nMaxRow0, gc_nMaxCol0);
 		range._setPropertyNoEmpty(null, null, function(cell){

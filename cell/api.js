@@ -1866,7 +1866,7 @@ var editor;
 
         History.Create_NewPoint();
         History.StartTransaction();
-
+        t.wbModel.dependencyFormulas.lockRecal();
         // Нужно проверить все диаграммы, ссылающиеся на удаляемый лист
         for (var key in t.wb.model.aWorksheets) {
           var wsModel = t.wb.model.aWorksheets[key];
@@ -1889,6 +1889,7 @@ var editor;
           // Посылаем callback об изменении списка листов
           t.sheetsChanged();
         }
+        t.wbModel.dependencyFormulas.unlockRecal();
         History.EndTransaction();
       }
     };
