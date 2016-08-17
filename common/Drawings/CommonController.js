@@ -4044,11 +4044,12 @@ DrawingObjectsController.prototype =
         var data_labels = plot_area.charts[0].dLbls;
         if(data_labels)
         {
+            var nDefaultDatalabelsPos = chart_type && chart_type.getDefaultDataLabelsPosition ? chart_type.getDefaultDataLabelsPosition() :  c_oAscChartDataLabelsPos.none;
             ret.putShowSerName(data_labels.showSerName === true);
             ret.putShowCatName(data_labels.showCatName === true);
             ret.putShowVal(data_labels.showVal === true);
             ret.putSeparator(data_labels.separator);
-            ret.putDataLabelsPos(AscFormat.isRealNumber(data_labels.dLblPos) ? data_labels.dLblPos :  c_oAscChartDataLabelsPos.none);
+            ret.putDataLabelsPos(AscFormat.isRealNumber(data_labels.dLblPos) ? data_labels.dLblPos :  nDefaultDatalabelsPos);
         }
         else
         {
