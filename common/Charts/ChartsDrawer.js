@@ -6046,8 +6046,185 @@ drawHBarChart.prototype =
 			DiffGapDepth = perspectiveDepth * (gapDepth / 2) / 100;
 		}		
 		
+		//TODO временная функция для теста результата значений
+		var getPlainEquation = function(point1, point2, point3)
+		{
+			var ppl = 2;
+			var set0 = 0.00000001;
+			var subMatrix = function(oldmat, row, col) 
+			{
+				var i;
+				var j;
+				var m = 0;
+				var k = 0;
+				var len = oldmat.length;
+				var retmat = new Array();
+
+				if ((len <= row) || (len <= col)) return 0;
+
+				for (j = 0; j < len; j++) {
+					if (j != row) {
+						retmat[k] = new Array();
+						for (i = 0; i < len; i++) {
+							if (i != col) {
+								retmat[k][m] = oldmat[j][i];
+								m++;
+							}
+						}
+						k++;
+					}
+					m = 0;
+				}
+				return retmat;
+			}
+			
+			 var isMatSquare = function(mat) 
+			 {
+				var len = mat.length - 1;
+				var i = 0;
+				
+				try{
+				for (i = 0; i < 9; i++) {
+					if (isNaN(mat[i][0]))
+						break;
+				}
+				}
+				catch(ex){
+
+				}
+
+				if (i - 1 == len)
+					return true;
+				else
+					return false;
+			}
+			
+			var determinant = function(mat) 
+			{
+				var sqrMat = isMatSquare(mat);
+
+				var i;
+				var tmpVal = 0;
+				var row = mat.length;
+				var newDet = new Array();
+				newDet[0] = new Array();
+
+				switch (row) {
+					case 1:
+						return mat[0][0];
+					case 2:
+						return (mat[0][0] * mat[1][1] - mat[0][1] * mat[1][0]);
+					default:
+						for (i = 0; i < row; i++) {
+							if (mat[0][i] == 0) i++;
+							if (i < row) {
+								newDet = subMatrix(mat, 0, i);
+								if (!isNaN(mat[0][i]))
+									tmpVal += parseFloat(mat[0][i]) * Math.pow(-1, i) * determinant(newDet);
+							}
+						}
+						return tmpVal;
+				}
+			};
+			
+			var round = function(inVal, plc) 
+			{
+				inVal = parseFloat(inVal);
+				if (isNaN(inVal)) return "";
+				if (inVal == 0) return "0";
+				if (inVal=="") return "";
+				var value = 0;
+
+				if (Math.abs(inVal) < set0) return 0;
+				
+				if (inVal == 0) {
+					return inVal;
+				}
+
+				var inE = inVal.toString().indexOf("e");
+
+				if (inE == -1) {
+					value = Math.round(inVal * Math.pow(10, plc)) / Math.pow(10, plc);
+				}
+				else {
+					var newVal = inVal.toString().substring(0, inE);
+					var Epart = inVal.toString().substring(inE, inVal.toString().length);
+					var calVal = parseFloat(newVal);
+					value = Math.round(calVal * Math.pow(10, plc)) / Math.pow(10, plc);
+					Epart = value + Epart;
+					return Epart;
+				}
+				
+				var i;
+				
+				if (value != 0)
+					return value;
+				else
+				{
+					i = plc + 1;
+					while (value==0){
+						value = Math.round(inVal * Math.pow(10, i))/Math.pow(10, i);
+						i++;
+						}
+						
+						i = i + plc - 1;
+					return Math.round(inVal * Math.pow(10, i))/Math.pow(10, i);
+				}
+			}
+			
+			var replaceCol = function(mat, col, vec) 
+			{
+				var i = 0;
+				var j = 0;
+				var tmp = new Array();
+
+				for (i = 0; i < mat.length; i++) {
+					tmp[i] = new Array();
+
+					for (j = 0; j < mat.length; j++) {
+						if (col == j)
+							tmp[i][col] = vec[i];
+						else
+							tmp[i][j] = mat[i][j]; 
+
+					}
+				}
+				return tmp;
+			}
+			
+			var a1 = point1.x;
+			var b1 = point1.y;
+			var c1 = point1.z;
+			var a2 = point2.x;
+			var b2 = point2.y;
+			var c2 = point2.z;
+			var a3 = point3.x;
+			var b3 = point3.y;
+			var c3 = point3.z;
+
+			var mat = new Array();
+			mat[0] = []; mat[1] = []; mat[2] = [];
+			mat[0][0] = a1; mat[0][1] = b1; mat[0][2] = c1;
+			mat[1][0] = a2; mat[1][1] = b2; mat[1][2] = c2;
+			mat[2][0] = a3; mat[2][1] = b3; mat[2][2] = c3;
+
+			var det = determinant(mat);
+			
+			var vec = [-1, -1, -1];
+			var factor;
+
+			var a = round(determinant(replaceCol(mat, 0, vec)), ppl);
+			if (a < 0) factor = -1; else factor = 1;
+			a *= factor;
+			var b = round(determinant(replaceCol(mat, 1, vec)) * factor, ppl);
+			var c = round(determinant(replaceCol(mat, 2, vec)) * factor, ppl);
+			var d = round(det, ppl) * factor;
+			
+			return {a: a, b: b, c: c, d: d};
+		};
+		
 		//уравнение плоскости
-		var getPlainEquation = function(point1, point2, point3, point4)
+		var getPlainEquation2 = function(point1, point2, point3, point4)
 		{
 			var x1 = point1.x, y1 = point1.y, z1 = point1.z;
 			var x2 = point2.x, y2 = point2.y, z2 = point2.z;
@@ -6078,7 +6255,7 @@ drawHBarChart.prototype =
 			var c = tempC;
 			var d =  y1 * tempB - x1 * tempA - z1 * tempC;
 				
-			return {a: a, b: b, c: -c, d: -d};
+			return {a: a, b: b, c: c, d: d};
 		};			
 		
 		for (var i = 0; i < this.chartProp.series.length; i++) 
@@ -6494,6 +6671,20 @@ drawHBarChart.prototype =
 			return res;
 		};
 		
+		var isBetweenPoint= function(point, start, end)
+		{
+			//TODO округление пересмотреть
+			var res = false;
+			point = Math.round(point * 100) / 100;
+			start = Math.round(start * 100) / 100;
+			end = Math.round(end * 100) / 100;
+			if(point > start && point < end)
+			{
+				res = true;
+			}
+			return res;
+		};
+		
 		var t = this;
 		var isNotIntersectionVergesAndLine = function(lineEqucation, pointFromVerge, i, j, sortZIndexPaths)
 		{
@@ -6505,23 +6696,26 @@ drawHBarChart.prototype =
 					continue;
 				
 				var plainEqucation = sortZIndexPaths[k].plainEquation;
+				
+				//get intersection
 				var nIntersectionPlainAndLine = isIntersectionPlainAndLine(plainEqucation ,lineEqucation);
 				
-				var intersectionPoint = t.cChartDrawer._convertAndTurnPoint(nIntersectionPlainAndLine.x, nIntersectionPlainAndLine.y, nIntersectionPlainAndLine.z, true, true);
-				//console.log("x: " + intersectionPoint.x + " ;y: " + intersectionPoint.y);
+				if(null === nIntersectionPlainAndLine)
+				{
+					continue;
+				}
+
+				var projectIntersection = t.cChartDrawer._convertAndTurnPoint(nIntersectionPlainAndLine.x, nIntersectionPlainAndLine.y, nIntersectionPlainAndLine.z, true, true);
 				
 				var minMaxpoints = getMinMaxPoints(sortZIndexPaths[k].points);
 				var minX = minMaxpoints.minX, maxX = minMaxpoints.maxX, minY = minMaxpoints.minY, maxY = minMaxpoints.maxY, minZ = minMaxpoints.minZ, maxZ = minMaxpoints.maxZ;
 				
-				var pointFromVergeProject = t.cChartDrawer._convertAndTurnPoint(pointFromVerge.x, pointFromVerge.y, pointFromVerge.z, true, true);
+				var iSX = nIntersectionPlainAndLine.x;
+				var iSY = nIntersectionPlainAndLine.y;
+				var iSZ = nIntersectionPlainAndLine.z;
 				
-				
-				
-				if(null !== nIntersectionPlainAndLine && nIntersectionPlainAndLine.z < pointFromVerge.z && nIntersectionPlainAndLine.z >= minZ && nIntersectionPlainAndLine.z <= maxZ && nIntersectionPlainAndLine.x >= minX && nIntersectionPlainAndLine.x <= maxX && nIntersectionPlainAndLine.y >= minY && nIntersectionPlainAndLine.y <= maxY)
+				if(iSZ < pointFromVerge.z && isBetweenPoint(iSZ, minZ, maxZ) && isBetweenPoint(iSX, minX, maxX) && isBetweenPoint(iSY, minY, maxY))
 				{
-					
-					
-					
 					var point0 = sortZIndexPaths[k].points2[0];
 					var point1 = sortZIndexPaths[k].points2[1];
 					var point2 = sortZIndexPaths[k].points2[2];
@@ -6529,14 +6723,16 @@ drawHBarChart.prototype =
 					
 					
 					var areaQuadrilateral = getAreaQuadrilateral(point0, point1, point2, point3);
-					var areaTriangle1 = getAreaTriangle(point0, intersectionPoint, point1);
-					var areaTriangle2 = getAreaTriangle(point1, intersectionPoint, point2);
-					var areaTriangle3 = getAreaTriangle(point2, intersectionPoint, point3);
-					var areaTriangle4 = getAreaTriangle(point3, intersectionPoint, point0);
+					var areaTriangle1 = getAreaTriangle(point0, projectIntersection, point1);
+					var areaTriangle2 = getAreaTriangle(point1, projectIntersection, point2);
+					var areaTriangle3 = getAreaTriangle(point2, projectIntersection, point3);
+					var areaTriangle4 = getAreaTriangle(point3, projectIntersection, point0);
 					
 					if(parseInt(areaQuadrilateral) === parseInt(areaTriangle1 + areaTriangle2 + areaTriangle3 + areaTriangle4))
 					{
-						//console.log("x: " + intersectionPoint.x + " ;y: " + intersectionPoint.y + " ;fromX:" + pointFromVergeProject.x + " ;fromY:" + pointFromVergeProject.y);
+						//var pointFromVergeProject = t.cChartDrawer._convertAndTurnPoint(pointFromVerge.x, pointFromVerge.y, pointFromVerge.z, true, true);
+						//console.log("x: " + projectIntersection.x + " ;y: " + projectIntersection.y + " ;fromX:" + pointFromVergeProject.x + " ;fromY:" + pointFromVergeProject.y);
+						
 						res = false;
 						break;
 					}
