@@ -2218,6 +2218,8 @@
 					return false;
 				}
 				t.close();
+				event.stopPropagation();
+				event.preventDefault();
 				return false;
 
 			case 13:  // "enter"
