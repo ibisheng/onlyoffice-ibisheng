@@ -3232,6 +3232,9 @@ function CThumbnailsManager()
 		else
 			e.returnValue = false;
 
+		if (AscCommon.g_inputContext)
+			AscCommon.g_inputContext.externalChangeFocus();
+
 		var control = oThis.m_oWordControl.m_oThumbnails.HtmlElement;
 		if (global_mouseEvent.IsLocked == true && global_mouseEvent.Sender != control)
 		{

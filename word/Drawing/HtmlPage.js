@@ -1703,7 +1703,7 @@ function CEditorPage(api)
 
 	this.onMouseDown = function(e, isTouch)
 	{
-		console.log("down: " + isTouch + ", " + AscCommon.isTouch);
+		//console.log("down: " + isTouch + ", " + AscCommon.isTouch);
 		if (false === oThis.m_oApi.bInit_word_control || (AscCommon.isTouch && undefined === isTouch))
 			return;
 
@@ -1714,6 +1714,9 @@ function CEditorPage(api)
 			else
 				e.returnValue = false;
 		}
+
+		if (AscCommon.g_inputContext)
+			AscCommon.g_inputContext.externalChangeFocus();
 
 		var oWordControl = oThis;
 
@@ -1889,7 +1892,7 @@ function CEditorPage(api)
 	};
 	this.onMouseUp    = function(e, bIsWindow, isTouch)
 	{
-		console.log("up: " + isTouch + ", " + AscCommon.isTouch);
+		//console.log("up: " + isTouch + ", " + AscCommon.isTouch);
 		if (false === oThis.m_oApi.bInit_word_control || (AscCommon.isTouch && undefined === isTouch))
 			return;
 		//if (true == global_mouseEvent.IsLocked)

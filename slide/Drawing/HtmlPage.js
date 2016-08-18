@@ -1352,6 +1352,9 @@ function CEditorPage(api)
 		if (false === oThis.m_oApi.bInit_word_control)
 			return;
 
+		if (AscCommon.g_inputContext)
+			AscCommon.g_inputContext.externalChangeFocus();
+
 		var _isCatch = false;
 
 		var downClick = global_mouseEvent.ClickCount;
@@ -1581,6 +1584,9 @@ function CEditorPage(api)
 			else
 				e.returnValue = false;
 		}
+
+		if (AscCommon.g_inputContext)
+			AscCommon.g_inputContext.externalChangeFocus();
 
 		oWordControl.Thumbnails.SetFocusElement(FOCUS_OBJECT_MAIN);
 		if (oWordControl.DemonstrationManager.Mode)

@@ -1481,6 +1481,15 @@
 		externalEndCompositeInput : function()
 		{
 			this.clear();
+		},
+
+		externalChangeFocus : function()
+		{
+			if (this.compositionState == c_oCompositionState.process)
+			{
+				this.Api.End_CompositeInput();
+				this.clear();
+			}
 		}
 	};
 
