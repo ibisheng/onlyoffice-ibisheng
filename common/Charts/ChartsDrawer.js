@@ -6078,7 +6078,7 @@ drawHBarChart.prototype =
 			var c = tempC;
 			var d =  y1 * tempB - x1 * tempA - z1 * tempC;
 				
-			return {a: a, b: b, c: c, d: d};
+			return {a: a, b: b, c: -c, d: -d};
 		};			
 		
 		for (var i = 0; i < this.chartProp.series.length; i++) 
@@ -6223,10 +6223,10 @@ drawHBarChart.prototype =
 					
 					for(var k = 0; k < paths.length; k++)
 					{
-						if(!(k == 0 || k == 4))
+						/*if(!(k == 0 || k == 4))
 						{
 							continue;
-						}
+						}*/
 						
 						if(null === paths[k])
 							continue;
@@ -6265,8 +6265,10 @@ drawHBarChart.prototype =
 	{
 		var heightGraph    = this.chartProp.heightCanvas - this.chartProp.chartGutter._top - this.chartProp.chartGutter._bottom;
 		var widthScreen = this.chartProp.widthCanvas - this.chartProp.chartGutter._right;
-		var centralViewPoint = {x: this.chartProp.widthCanvas / 2, y: this.chartProp.heightCanvas / 2, z: this.cChartDrawer.processor3D.cameraDiffZ - 500};
-		
+		var diffY = this.cChartDrawer.processor3D.cameraDiffY;
+		var diffX = 0/*-this.cChartDrawer.processor3D.cameraDiffX*/;
+		var centralViewPoint = {x: this.chartProp.widthCanvas / 2 - diffX, y: this.chartProp.heightCanvas / 2 - diffY, z: -500};
+		//centralViewPoint =  this.cChartDrawer._convertAndTurnPoint(centralViewPoint.x, centralViewPoint.y, centralViewPoint.z, true, null, true);
 
 		var firstVerges = [];
 		var lastVerges = [];
@@ -6493,31 +6495,37 @@ drawHBarChart.prototype =
 		};
 		
 		var t = this;
-		var isNotIntersectionVergesAndLine = function(lineEqucation, pointFromVerge, i, j)
+		var isNotIntersectionVergesAndLine = function(lineEqucation, pointFromVerge, i, j, sortZIndexPaths)
 		{
 			var res = true;
 			
-			for(var k = 0; k < t.sortZIndexPaths.length; k++)
+			for(var k = 0; k < sortZIndexPaths.length; k++)
 			{
-				/*if(k !== 0)
-					continue;*/
+				if(k === i)
+					continue;
 				
-				var plainEqucation = t.sortZIndexPaths[k].plainEquation;
+				var plainEqucation = sortZIndexPaths[k].plainEquation;
 				var nIntersectionPlainAndLine = isIntersectionPlainAndLine(plainEqucation ,lineEqucation);
 				
 				var intersectionPoint = t.cChartDrawer._convertAndTurnPoint(nIntersectionPlainAndLine.x, nIntersectionPlainAndLine.y, nIntersectionPlainAndLine.z, true, true);
 				//console.log("x: " + intersectionPoint.x + " ;y: " + intersectionPoint.y);
 				
-				if(null !== nIntersectionPlainAndLine && nIntersectionPlainAndLine.z < pointFromVerge.z)
+				var minMaxpoints = getMinMaxPoints(sortZIndexPaths[k].points);
+				var minX = minMaxpoints.minX, maxX = minMaxpoints.maxX, minY = minMaxpoints.minY, maxY = minMaxpoints.maxY, minZ = minMaxpoints.minZ, maxZ = minMaxpoints.maxZ;
+				
+				var pointFromVergeProject = t.cChartDrawer._convertAndTurnPoint(pointFromVerge.x, pointFromVerge.y, pointFromVerge.z, true, true);
+				
+				
+				
+				if(null !== nIntersectionPlainAndLine && nIntersectionPlainAndLine.z < pointFromVerge.z && nIntersectionPlainAndLine.z >= minZ && nIntersectionPlainAndLine.z <= maxZ && nIntersectionPlainAndLine.x >= minX && nIntersectionPlainAndLine.x <= maxX && nIntersectionPlainAndLine.y >= minY && nIntersectionPlainAndLine.y <= maxY)
 				{
-					var minMaxpoints = getMinMaxPoints(t.sortZIndexPaths[k].points2);
-					var minX = minMaxpoints.minX, maxX = minMaxpoints.maxX, minY = minMaxpoints.minY, maxY = minMaxpoints.maxY, minZ = minMaxpoints.minZ, maxZ = minMaxpoints.maxZ;
 					
 					
-					var point0 = t.sortZIndexPaths[k].points2[0];
-					var point1 = t.sortZIndexPaths[k].points2[1];
-					var point2 = t.sortZIndexPaths[k].points2[2];
-					var point3 = t.sortZIndexPaths[k].points2[3];
+					
+					var point0 = sortZIndexPaths[k].points2[0];
+					var point1 = sortZIndexPaths[k].points2[1];
+					var point2 = sortZIndexPaths[k].points2[2];
+					var point3 = sortZIndexPaths[k].points2[3];
 					
 					
 					var areaQuadrilateral = getAreaQuadrilateral(point0, point1, point2, point3);
@@ -6528,7 +6536,7 @@ drawHBarChart.prototype =
 					
 					if(parseInt(areaQuadrilateral) === parseInt(areaTriangle1 + areaTriangle2 + areaTriangle3 + areaTriangle4))
 					{
-						console.log("x: " + intersectionPoint.x + " ;y: " + intersectionPoint.y);
+						//console.log("x: " + intersectionPoint.x + " ;y: " + intersectionPoint.y + " ;fromX:" + pointFromVergeProject.x + " ;fromY:" + pointFromVergeProject.y);
 						res = false;
 						break;
 					}
@@ -6540,7 +6548,7 @@ drawHBarChart.prototype =
 		
 		
 		var lineArray = [];
-		var isIntersectionVergePointsLinesWithAnotherVerges = function(plainVerge, centralViewPoint, i)
+		var isIntersectionVergePointsLinesWithAnotherVerges = function(plainVerge, centralViewPoint, i, sortZIndexPaths)
 		{
 			var res = true;
 			
@@ -6566,10 +6574,10 @@ drawHBarChart.prototype =
 				var point2 = centralViewPoint/*t.cChartDrawer._convertAndTurnPoint(centralViewPoint.x, centralViewPoint.y, centralViewPoint.z)*/;
 			
 				var paths = t._calculateLine(point1.x, point1.y, point2.x, point2.y);
-				//lineArray.push({paths: paths});
+				lineArray.push({paths: paths});
 				
 				//пересечение грани и прямой
-				var isFirstVerge = isNotIntersectionVergesAndLine(lineEqucation, pointFromVerge, i, j);
+				var isFirstVerge = isNotIntersectionVergesAndLine(lineEqucation, pointFromVerge, i, j, sortZIndexPaths);
 				
 				if(false === isFirstVerge)
 				{
@@ -6582,37 +6590,53 @@ drawHBarChart.prototype =
 		};
 		
 		
-		
-		//перебираем все грани
-		for(var i = 0; i < this.sortZIndexPaths.length; i++)
+		var getFirstLastVerges = function(all, first, last)
 		{
-			
-			var plainVerge = this.sortZIndexPaths[i];
-			/*if(i === 3)
+			//перебираем все грани
+			for(var i = 0; i < all.length; i++)
 			{
-				var isFirstVerge = isIntersectionVergePointsLinesWithAnotherVerges(plainVerge, centralViewPoint, i);
-			}*/
-			
-			var isFirstVerge = isIntersectionVergePointsLinesWithAnotherVerges(plainVerge, centralViewPoint, i);
-			//push into array
-			if(isFirstVerge)
-			{
-				firstVerges.push(this.sortZIndexPaths[i]);
+				
+				var plainVerge = all[i];
+				/*if(i === 3)
+				{
+					var isFirstVerge = isIntersectionVergePointsLinesWithAnotherVerges(plainVerge, centralViewPoint, i);
+				}*/
+				
+				var isFirstVerge = isIntersectionVergePointsLinesWithAnotherVerges(plainVerge, centralViewPoint, i, all);
+				//push into array
+				if(isFirstVerge)
+				{
+					first.push(plainVerge);
+				}
+				else
+				{
+					last.push(plainVerge);
+				}
 			}
-			else
+		};
+		
+		var iterCount = 0;
+		var newArr = [];
+		var lastVerges = this.sortZIndexPaths;
+		while(lastVerges.length !== 0)
+		{
+			var firstVerges1 = [], lastVerges1 = [];
+			getFirstLastVerges(lastVerges, firstVerges1, lastVerges1);
+			newArr = firstVerges1.concat(newArr);
+			lastVerges = lastVerges1;
+			iterCount++;
+			
+			if(iterCount > 100)
 			{
-				lastVerges.push(this.sortZIndexPaths[i]);
+				break;
 			}
 		}
+		this.sortZIndexPaths = newArr;
 		
-		
-		
-
-		this.sortZIndexPaths = lastVerges.concat(firstVerges);
-		
-		this.sortZIndexPaths = this.sortZIndexPaths.concat(lineArray);
-
-		
+		/*var firstVerges1 = [], lastVerges1 = [];
+		getFirstLastVerges(lastVerges, firstVerges1, lastVerges1);
+		this.sortZIndexPaths = lastVerges1.concat(firstVerges1);
+		this.sortZIndexPaths = this.sortZIndexPaths.concat(firstVerges);*/
 	},
 	
 	_calculateLine : function(x, y, x1, y1)
