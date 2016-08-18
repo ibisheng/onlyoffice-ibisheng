@@ -1409,7 +1409,8 @@
 
 			ti_console_log("ti: onCompositionEnd -> onCompositionUpdate");
 			this.onCompositionUpdate(e, false, _data, true);
-			this.Api.Set_CursorPosInCompositeText(1000); // max
+			var _max = this.Api.Get_MaxCursorPosInCompositeText();
+			this.Api.Set_CursorPosInCompositeText(_max); // max
 
 			this.clear(true);
 			ti_console_log2("end");
