@@ -485,10 +485,10 @@ function CEditorPage(api)
 		this.checkNeedRules();
 		this.initEvents2();
 
-		this.UnShowOverlay();
 		this.m_oOverlayApi.m_oControl  = this.m_oOverlay;
 		this.m_oOverlayApi.m_oHtmlPage = this;
 		this.m_oOverlayApi.Clear();
+		this.ShowOverlay();
 
 		this.m_oDrawingDocument.AutoShapesTrack = new AscCommon.CAutoshapeTrack();
 		this.m_oDrawingDocument.AutoShapesTrack.init2(this.m_oOverlayApi);
@@ -693,31 +693,44 @@ function CEditorPage(api)
 				return e;
 			};
 
-			this.m_oEditor.HtmlElement["ontouchstart"] = this.m_oOverlay.HtmlElement["ontouchstart"] 	= function(e) {
+			var _cur = document.getElementById('id_target_cursor');
+
+			_cur["ontouchstart"] = this.m_oEditor.HtmlElement["ontouchstart"] = this.m_oOverlay.HtmlElement["ontouchstart"] 	= function(e) {
 				//console.log("start: " + AscCommon.isTouch);
 				if (AscCommon.isTouch)
 					return;
 
 				var _old = global_mouseEvent.KoefPixToMM;
 				global_mouseEvent.KoefPixToMM = 5;
-				AscCommon.isTouch = true;
+				AscCommon.isTouch 			= true;
+				AscCommon.isTouchMove 		= false;
+				AscCommon.TouchStartTime 	= new Date().getTime();
 				AscCommon.stopEvent(e);
 				var _ret = this.onmousedown(_check_e(e), true);
 				global_mouseEvent.KoefPixToMM = _old;
+
+				if ((document.activeElement !== undefined) &&
+					(AscCommon.g_inputContext != null) &&
+					(document.activeElement != AscCommon.g_inputContext.HtmlArea))
+				{
+					AscCommon.g_inputContext.HtmlArea.focus();
+				}
+
 				return _ret;
 			};
-			this.m_oEditor.HtmlElement["ontouchmove"] = this.m_oOverlay.HtmlElement["ontouchmove"] 		= function(e) {
+			_cur["ontouchmove"] = this.m_oEditor.HtmlElement["ontouchmove"] = this.m_oOverlay.HtmlElement["ontouchmove"] 		= function(e) {
 				//console.log("move: " + AscCommon.isTouch);
 
 				var _old = global_mouseEvent.KoefPixToMM;
 				global_mouseEvent.KoefPixToMM = 5;
-				AscCommon.isTouch = true;
+				AscCommon.isTouch 		= true;
+				AscCommon.isTouchMove 	= true;
 				AscCommon.stopEvent(e);
 				var _ret = this.onmousemove(_check_e(e), true);
 				global_mouseEvent.KoefPixToMM = _old;
 				return _ret;
 			};
-			this.m_oEditor.HtmlElement["ontouchend"] = this.m_oOverlay.HtmlElement["ontouchend"] 		= function(e) {
+			_cur["ontouchend"] = this.m_oEditor.HtmlElement["ontouchend"] = this.m_oOverlay.HtmlElement["ontouchend"] 		= function(e) {
 				//console.log("end: " + AscCommon.isTouch);
 
 				if (!AscCommon.isTouch)
@@ -727,11 +740,40 @@ function CEditorPage(api)
 				global_mouseEvent.KoefPixToMM = 5;
 				AscCommon.isTouch = false;
 				AscCommon.stopEvent(e);
-				var _ret = this.onmouseup(_check_e(e), undefined, true);
+				var _natE = _check_e(e);
+				var _ret = this.onmouseup(_natE, undefined, true);
 				global_mouseEvent.KoefPixToMM = _old;
+
+				if (!AscCommon.isTouchMove && (-1 != AscCommon.TouchStartTime) && (Math.abs(AscCommon.TouchStartTime - (new Date().getTime())) > 900))
+				{
+					var _eContextMenu = {
+						pageX   : _natE.pageX,
+						pageY   : _natE.pageY,
+						clientX : _natE.clientX,
+						clientY : _natE.clientY,
+
+						altKey   : _natE.altKey,
+						shiftKey : _natE.shiftKey,
+						ctrlKey  : _natE.ctrlKey,
+						metaKey  : _natE.metaKey,
+
+						button : AscCommon.g_mouse_button_right,
+
+						target     : e.target,
+						srcElement : e.srcElement
+					};
+
+					AscCommon.isTouch = true;
+					this.onmousedown(_eContextMenu, true);
+					this.onmouseup(_eContextMenu, undefined, true);
+					AscCommon.isTouch = false;
+				}
+				AscCommon.isTouchMove = false;
+				AscCommon.TouchStartTime = -1;
+
 				return _ret;
 			};
-			this.m_oEditor.HtmlElement["ontouchcancel"] = this.m_oOverlay.HtmlElement["ontouchcancel"] 	= function(e) {
+			_cur["ontouchcancel"] = this.m_oEditor.HtmlElement["ontouchcancel"] = this.m_oOverlay.HtmlElement["ontouchcancel"] 	= function(e) {
 				//console.log("cancel: " + AscCommon.isTouch);
 
 				if (!AscCommon.isTouch)
@@ -743,6 +785,34 @@ function CEditorPage(api)
 				AscCommon.stopEvent(e);
 				var _ret = this.onmouseup(_check_e(e), undefined, true);
 				global_mouseEvent.KoefPixToMM = _old;
+
+				if (!AscCommon.isTouchMove && (-1 != AscCommon.TouchStartTime) && (Math.abs(AscCommon.TouchStartTime - (new Date().getTime())) > 900))
+				{
+					var _eContextMenu = {
+						pageX   : _natE.pageX,
+						pageY   : _natE.pageY,
+						clientX : _natE.clientX,
+						clientY : _natE.clientY,
+
+						altKey   : _natE.altKey,
+						shiftKey : _natE.shiftKey,
+						ctrlKey  : _natE.ctrlKey,
+						metaKey  : _natE.metaKey,
+
+						button : AscCommon.g_mouse_button_right,
+
+						target     : e.target,
+						srcElement : e.srcElement
+					};
+
+					AscCommon.isTouch = true;
+					this.onmousedown(_eContextMenu, true);
+					this.onmouseup(_eContextMenu, undefined, true);
+					AscCommon.isTouch = false;
+				}
+				AscCommon.isTouchMove = false;
+				AscCommon.TouchStartTime = -1;
+
 				return _ret;
 			};
 		}
@@ -1633,7 +1703,7 @@ function CEditorPage(api)
 
 	this.onMouseDown = function(e, isTouch)
 	{
-		//console.log("down: " + isTouch + ", " + AscCommon.isTouch);
+		console.log("down: " + isTouch + ", " + AscCommon.isTouch);
 		if (false === oThis.m_oApi.bInit_word_control || (AscCommon.isTouch && undefined === isTouch))
 			return;
 
@@ -1819,7 +1889,7 @@ function CEditorPage(api)
 	};
 	this.onMouseUp    = function(e, bIsWindow, isTouch)
 	{
-		//console.log("up: " + isTouch + ", " + AscCommon.isTouch);
+		console.log("up: " + isTouch + ", " + AscCommon.isTouch);
 		if (false === oThis.m_oApi.bInit_word_control || (AscCommon.isTouch && undefined === isTouch))
 			return;
 		//if (true == global_mouseEvent.IsLocked)

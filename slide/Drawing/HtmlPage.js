@@ -537,10 +537,10 @@ function CEditorPage(api)
 
 		this.m_oDrawingDocument.TargetHtmlElement = document.getElementById('id_target_cursor');
 
-		this.UnShowOverlay();
 		this.m_oOverlayApi.m_oControl  = this.m_oOverlay;
 		this.m_oOverlayApi.m_oHtmlPage = this;
 		this.m_oOverlayApi.Clear();
+		this.ShowOverlay();
 
 		this.m_oDrawingDocument.AutoShapesTrack = new AscCommon.CAutoshapeTrack();
 		this.m_oDrawingDocument.AutoShapesTrack.init2(this.m_oOverlayApi);

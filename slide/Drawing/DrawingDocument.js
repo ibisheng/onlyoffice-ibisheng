@@ -1773,7 +1773,6 @@ function CDrawingDocument()
 		if (false === this.m_bIsSelection)
 		{
 			this.SelectClear();
-			this.m_oWordControl.CheckUnShowOverlay();
 			this.m_oWordControl.OnUpdateOverlay();
 			this.m_oWordControl.m_oOverlayApi.m_oContext.globalAlpha = 1.0;
 		}

@@ -37,6 +37,10 @@
 * @param {undefined} undefined
 */
 function (window, undefined) {
+
+    window['AscCommon'] = window['AscCommon'] || {};
+    var AscCommon = window['AscCommon'];
+
 var debug = false;
 
 var ScrollArrowType = {
@@ -1784,8 +1788,9 @@ ScrollObject.prototype = {
         }
 
         // return relative mouse position
-        var mouseX = evt.clientX - left + window.pageXOffset;
-        var mouseY = evt.clientY - top + window.pageYOffset;
+        var mouseX = ((evt.clientX * AscCommon.AscBrowser.zoom) >> 0) - left + window.pageXOffset;
+        var mouseY = ((evt.clientY * AscCommon.AscBrowser.zoom) >> 0) - top + window.pageYOffset;
+
         return {
             x:mouseX,
             y:mouseY
@@ -3352,6 +3357,5 @@ ScrollObject.prototype = {
 };
 
     //---------------------------------------------------------export---------------------------------------------------
-    window['AscCommon'] = window['AscCommon'] || {};
     window["AscCommon"].ScrollObject = ScrollObject;
 })(window);
