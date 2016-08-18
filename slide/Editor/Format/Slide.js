@@ -951,9 +951,12 @@ Slide.prototype =
     copySelectedObjects: function(){
         var aSelectedObjects, i, fShift = 5.0;
         var oSelector = this.graphicObjects.selection.groupSelection ? this.graphicObjects.selection.groupSelection : this.graphicObjects;
-        aSelectedObjects = [].concat(this.graphicObjects.selectedObjects);
+        aSelectedObjects = [].concat(oSelector.selectedObjects);
         oSelector.resetSelection(undefined, false);
         var bGroup = this.graphicObjects.selection.groupSelection ? true : false;
+        if(bGroup){
+            oSelector.normalize();
+        }
         for(i = 0; i < aSelectedObjects.length; ++i){
             var oCopy = aSelectedObjects[i].copy();
             oCopy.x = aSelectedObjects[i].x;
@@ -968,10 +971,13 @@ Slide.prototype =
                 this.addToSpTreeToPos(undefined, oCopy);
             }
             else{
-                oCopy.setGroup(oSelector);
-                oSelector.addToSpTree(undefined, oCopy);
+                oCopy.setGroup(aSelectedObjects[i].group);
+                aSelectedObjects[i].group.addToSpTree(undefined, oCopy);
             }
             oSelector.selectObject(oCopy, 0);
+        }
+        if(bGroup){
+            oSelector.updateCoordinatesAfterInternalResize();
         }
     },
 
