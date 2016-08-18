@@ -1153,6 +1153,9 @@
 
 		/** @param event {MouseEvent} */
 		asc_CEventsController.prototype._onMouseDown = function (event) {
+			if (AscCommon.g_inputContext)
+				AscCommon.g_inputContext.externalChangeFocus();
+			
 			var t = this;
 			var coord = t._getCoordinates(event);
 			event.isLocked = t.isMousePressed = true;
