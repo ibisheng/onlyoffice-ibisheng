@@ -3664,7 +3664,8 @@ DrawingObjectsController.prototype =
                         {
                             if(!(finish_dlbl_pos === c_oAscChartDataLabelsPos.ctr
                                 || finish_dlbl_pos === c_oAscChartDataLabelsPos.inEnd
-                                || finish_dlbl_pos === c_oAscChartDataLabelsPos.outEnd))
+                                || finish_dlbl_pos === c_oAscChartDataLabelsPos.outEnd
+                                || finish_dlbl_pos === c_oAscChartDataLabelsPos.bestFit))
                             {
                                 finish_dlbl_pos = c_oAscChartDataLabelsPos.ctr;
                             }
@@ -6959,7 +6960,12 @@ DrawingObjectsController.prototype =
                 {
                     oTextArtProperties.Fill = AscFormat.CreateUnfilFromRGB(oTextPr.Color.r, oTextPr.Color.g, oTextPr.Color.b);
                 }
-                oTextArtProperties.Line = oTextPr.TextOutline;
+                if(oTextPr.TextOutline){
+                    oTextArtProperties.Line = oTextPr.TextOutline;
+                }
+                else{
+                    oTextArtProperties.Line = AscFormat.CreateNoFillLine();
+                }
                 if(oTextArtProperties.Fill)
                 {
                     oTextArtProperties.Fill.check(this.getTheme(), this.getColorMap());
