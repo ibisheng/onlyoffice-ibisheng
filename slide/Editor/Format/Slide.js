@@ -948,6 +948,33 @@ Slide.prototype =
         return oRet;
     },
 
+    copySelectedObjects: function(){
+        var aSelectedObjects, i, fShift = 5.0;
+        var oSelector = this.graphicObjects.selection.groupSelection ? this.graphicObjects.selection.groupSelection : this.graphicObjects;
+        aSelectedObjects = [].concat(this.graphicObjects.selectedObjects);
+        oSelector.resetSelection(undefined, false);
+        var bGroup = this.graphicObjects.selection.groupSelection ? true : false;
+        for(i = 0; i < aSelectedObjects.length; ++i){
+            var oCopy = aSelectedObjects[i].copy();
+            oCopy.x = aSelectedObjects[i].x;
+            oCopy.y = aSelectedObjects[i].y;
+            oCopy.extX = aSelectedObjects[i].extX;
+            oCopy.extY = aSelectedObjects[i].extY;
+            AscFormat.CheckSpPrXfrm(oCopy, true);
+            oCopy.spPr.xfrm.setOffX(oCopy.x + fShift);
+            oCopy.spPr.xfrm.setOffY(oCopy.y + fShift);
+            oCopy.setParent(this);
+            if(!bGroup){
+                this.addToSpTreeToPos(undefined, oCopy);
+            }
+            else{
+                oCopy.setGroup(oSelector);
+                oSelector.addToSpTree(undefined, oCopy);
+            }
+            oSelector.selectObject(oCopy, 0);
+        }
+    },
+
     Get_AllImageUrls: function(images)
     {
         if(this.cSld.Bg && this.cSld.Bg.bgPr && this.cSld.Bg.bgPr.Fill && this.cSld.Bg.bgPr.Fill.fill instanceof  AscFormat.CBlipFill && typeof this.cSld.Bg.bgPr.Fill.fill.RasterImageId === "string" )

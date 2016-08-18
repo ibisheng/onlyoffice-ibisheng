@@ -2647,7 +2647,12 @@ CPresentation.prototype =
         }
         else if ( e.KeyCode == 68 && false === editor.isViewMode && true === e.CtrlKey )
         {
-            editor.DublicateSlide();
+           if(this.Slides[this.CurPage]){
+               this.Create_NewHistoryPoint(AscDFH.historydescription_Document_SetParagraphAlignHotKey);
+               this.Slides[this.CurPage].copySelectedObjects();
+               this.Recalculate();
+               this.Document_UpdateInterfaceState();
+           }
             bRetValue = keydownresult_PreventAll;
         }
         else if ( e.KeyCode == 69 && false === editor.isViewMode && true === e.CtrlKey )
