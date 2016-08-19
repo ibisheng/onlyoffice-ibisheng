@@ -1459,8 +1459,21 @@ TextAddState.prototype =
             this.onMouseUp(e, x, y, pageIndex);
             this.drawingObjects.OnMouseDown(e, x, y, pageIndex);
         }
-        if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_CURSOR)
-            return {cursorType: "default", objectId: this.majorObject.Get_Id()};
+        if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_CURSOR){
+            var oCheckObject = this.majorObject;
+            if(oCheckObject instanceof AscFormat.CTitle){
+                oCheckObject = oCheckObject.chart;
+            }
+
+            if(oCheckObject && oCheckObject.group){
+                while(!oCheckObject.group){
+                    oCheckObject = oCheckObject.group;
+                }
+            }
+            if(oCheckObject && oCheckObject.parent){
+                return {cursorType: "default", objectId: oCheckObject.Get_Id()};
+            }
+        }
     },
     onMouseMove: function(e, x, y, pageIndex)
     {
