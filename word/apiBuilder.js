@@ -1106,7 +1106,7 @@
      */
     ApiDocumentContent.prototype.RemoveAllElements = function()
     {
-        this.Document.Content = [];
+        this.Document.Internal_Content_Remove(0, this.Document.Content.length, false);
     };
     /**
      * Remove element by specified position.

@@ -68,6 +68,10 @@ function CDocumentContent(Parent, DrawingDocument, X, Y, XLimit, YLimit, Split, 
     this.XLimit = XLimit;
     this.YLimit = YLimit;
 
+	this.StartPage    = 0;
+	this.StartColumn  = 0;
+	this.ColumnsCount = 1;
+
     this.Parent = Parent;
     
     this.DrawingDocument = null;
@@ -8339,7 +8343,7 @@ CDocumentContent.prototype.Internal_Content_Add       = function(Position, NewOb
 
     this.private_ReindexContent(Position);
 };
-CDocumentContent.prototype.Internal_Content_Remove    = function(Position, Count)
+CDocumentContent.prototype.Internal_Content_Remove    = function(Position, Count, bCorrectionCheck)
 {
     if (Position < 0 || Position >= this.Content.length || Count <= 0)
         return;
@@ -8371,7 +8375,7 @@ CDocumentContent.prototype.Internal_Content_Remove    = function(Position, Count
         NextObj.Set_DocumentPrev(PrevObj);
 
     // Проверим, что последний элемент не таблица
-    if (type_Table == this.Content[this.Content.length - 1].GetType())
+    if (false !== bCorrectionCheck && (this.Content.length <= 0 || type_Table == this.Content[this.Content.length - 1].GetType()))
         this.Internal_Content_Add(this.Content.length, new Paragraph(this.DrawingDocument, this, 0, 50, 50, this.XLimit, this.YLimit, this.bPresentation === true));
 
     this.private_ReindexContent(Position);
@@ -8418,11 +8422,13 @@ CDocumentContent.prototype.Get_AbsolutePage       = function(CurPage)
 };
 CDocumentContent.prototype.Get_AbsoluteColumn     = function(CurPage)
 {
-    return this.Parent.Get_AbsoluteColumn(this.StartPage + CurPage);
+	return (this.StartColumn + CurPage) - (((this.StartColumn + CurPage) / this.ColumnsCount | 0) * this.ColumnsCount);
 };
-CDocumentContent.prototype.Set_StartPage          = function(StartPage)
+CDocumentContent.prototype.Set_StartPage = function(StartPage, StartColumn, ColumnsCount)
 {
-    this.StartPage = StartPage;
+    this.StartPage    = StartPage;
+    this.StartColumn  = undefined !== StartColumn ? StartColumn : 0;
+	this.ColumnsCount = undefined !== ColumnsCount ? ColumnsCount : 1;
 };
 // Приходит абсолютное значение страницы(по отношению к родительскому классу), на выходе - относительное
 CDocumentContent.prototype.Get_Page_Relative      = function(AbsPage)
@@ -8431,7 +8437,7 @@ CDocumentContent.prototype.Get_Page_Relative      = function(AbsPage)
 };
 CDocumentContent.prototype.Get_ColumnsCount      = function()
 {
-    return 1;
+    return this.ColumnsCount;
 };
 //-----------------------------------------------------------------------------------
 // Undo/Redo функции

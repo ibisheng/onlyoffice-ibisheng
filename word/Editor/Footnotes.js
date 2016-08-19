@@ -111,24 +111,54 @@ CFootnotesController.prototype.Create_Footnote = function()
 /**
  * Сбрасываем рассчетные данный для заданной страницы.
  * @param {number} nPageIndex
+ * @param {CSectionPr} oSectPr
  */
-CFootnotesController.prototype.Reset = function(nPageIndex)
+CFootnotesController.prototype.Reset = function(nPageIndex, oSectPr)
 {
 	if (!this.Pages[nPageIndex])
 		this.Pages[nPageIndex] = new CFootEndnotePage();
 
-	this.Pages[nPageIndex].Reset();
+	var oPage = this.Pages[nPageIndex];
+	oPage.Reset();
+
+	var X      = oSectPr.Get_PageMargin_Left();
+	var XLimit = oSectPr.Get_PageWidth() - oSectPr.Get_PageMargin_Right();
+
+	var nColumnsCount = oSectPr.Get_ColumnsCount();
+	for (var nColumnIndex = 0; nColumnIndex < nColumnsCount; ++nColumnIndex)
+	{
+		var _X = X;
+		for (var nTempColumnIndex = 0; nTempColumnIndex < nColumnIndex; ++nTempColumnIndex)
+		{
+			_X += oSectPr.Get_ColumnWidth(nTempColumnIndex);
+			_X += oSectPr.Get_ColumnSpace(nTempColumnIndex);
+		}
+
+		var _XLimit = (nColumnsCount - 1 !== nColumnIndex ? X + oSectPr.Get_ColumnWidth(nColumnIndex) : XLimit);
+
+		var oColumn    = new CFootEndnotePageColumn();
+		oColumn.X      = _X;
+		oColumn.XLimit = _XLimit;
+		oPage.AddColumn(oColumn);
+	}
+
+	oPage.X      = X;
+	oPage.XLimit = XLimit;
 };
 /**
  * Пересчитываем сноски на заданной странице.
  */
-CFootnotesController.prototype.Recalculate = function(nPageIndex, X, XLimit, Y, YLimit)
+CFootnotesController.prototype.Recalculate = function(nPageAbs, nColumnAbs, Y, YLimit)
 {
-	if (!this.Pages[nPageIndex])
-		this.Pages[nPageIndex] = new CFootEndnotePage();
-
-	if (true === this.Is_EmptyPage(nPageIndex))
+	if (true === this.IsEmptyPageColumn(nPageAbs, nColumnAbs))
 		return;
+
+	var oPage   = this.Pages[nPageAbs];
+	var oColumn = oPage.Columns[nColumnAbs];
+	var nColumnsCount = oPage.Columns.length;
+
+	var X      = oColumn.X;
+	var XLimit = oColumn.XLimit;
 
 	// Мы пересчет начинаем с 0, потом просто делаем сдвиг, через функцию Shift.
 
@@ -138,19 +168,19 @@ CFootnotesController.prototype.Recalculate = function(nPageIndex, X, XLimit, Y, 
 	{
 		this.SeparatorFootnote.Prepare_RecalculateObject();
 		this.SeparatorFootnote.Reset(X, CurY, XLimit, 10000);
-		this.SeparatorFootnote.Set_StartPage(nPageIndex);
+		this.SeparatorFootnote.Set_StartPage(nPageAbs, nColumnAbs, nColumnsCount);
 		this.SeparatorFootnote.Recalculate_Page(0, true);
-		this.Pages[nPageIndex].SeparatorRecalculateObject = this.SeparatorFootnote.Save_RecalculateObject();
+		oColumn.SeparatorRecalculateObject = this.SeparatorFootnote.Save_RecalculateObject();
 
 		var Bounds = this.SeparatorFootnote.Get_PageBounds(0);
 		CurY += Bounds.Bottom - Bounds.Top;
 	}
 
-	for (var nIndex = 0; nIndex < this.Pages[nPageIndex].Elements.length; ++nIndex)
+	for (var nIndex = 0; nIndex < oColumn.Elements.length; ++nIndex)
 	{
-		var Footnote = this.Pages[nPageIndex].Elements[nIndex];
+		var Footnote = oColumn.Elements[nIndex];
 		Footnote.Reset(X, CurY, XLimit, 10000);
-		Footnote.Set_StartPage(nPageIndex);
+		Footnote.Set_StartPage(nPageAbs, nColumnAbs, nColumnCount);
 
 		var CurPage      = 0;
 		var RecalcResult = recalcresult2_NextPage;
@@ -163,25 +193,28 @@ CFootnotesController.prototype.Recalculate = function(nPageIndex, X, XLimit, Y, 
 };
 /**
  * Получаем суммарную высоту, занимаемую сносками на заданной странице.
- * @param {number} nPageIndex
+ * @param {number} nPageAbs
+ * @param {number} nColumnAbs
  * @returns {number}
  */
-CFootnotesController.prototype.Get_Height = function(nPageIndex)
+CFootnotesController.prototype.GetHeight = function(nPageAbs, nColumnAbs)
 {
-	if (true === this.Is_EmptyPage(nPageIndex))
+	if (true === this.IsEmptyPageColumn(nPageAbs, nColumnAbs))
 		return 0;
 
-	var nHeight = 0;
+	var oColumn = this.Pages[nPageAbs].Columns[nColumnAbs];
 
-	if (null !== this.SeparatorFootnote)
+	var nHeight = 0;
+	if (null !== oColumn.SeparatorRecalculateObject)
 	{
+		this.SeparatorFootnote.Load_RecalculateObject(oColumn.SeparatorRecalculateObject);
 		var Bounds = this.SeparatorFootnote.Get_PageBounds(0);
 		nHeight += Bounds.Bottom - Bounds.Top;
 	}
 
-	for (var nIndex = 0; nIndex < this.Pages[nPageIndex].Elements.length; ++nIndex)
+	for (var nIndex = 0, nCount = oColumn.Element.length; nIndex < nCount; ++nIndex)
 	{
-		var Footnote = this.Pages[nPageIndex].Elements[nIndex];
+		var Footnote = oColumn.Elements[nIndex];
 		var Bounds   = Footnote.Get_PageBounds(0);
 		nHeight += Bounds.Bottom - Bounds.Top;
 	}
@@ -237,10 +270,12 @@ CFootnotesController.prototype.Shift = function(nPageIndex, dX, dY)
 /**
  * Добавляем заданную сноску на страницу для пересчета.
  * @param {number} nPageAbs
+ * @param {number} nColumnAbs
  * @param {CFootEndnote} oFootnote
  */
-CFootnotesController.prototype.AddFootnoteToPage = function(nPageAbs, oFootnote)
+CFootnotesController.prototype.AddFootnoteToPage = function(nPageAbs, nColumnAbs, oFootnote)
 {
+
 	if (!this.Pages[nPageAbs])
 		this.Pages[nPageAbs] = new CFootEndnotePage();
 
@@ -331,7 +366,22 @@ CFootnotesController.prototype.OnContentReDraw = function(StartPageAbs, EndPageA
  */
 CFootnotesController.prototype.Is_EmptyPage = function(nPageIndex)
 {
-	if (!this.Pages[nPageIndex] || this.Pages[nPageIndex].Elements.length <= 0)
+	var oPage = this.Pages[nPageIndex];
+	if (!oPage)
+		return true;
+
+	for (var nColumnIndex = 0, nColumnsCount = oPage.Columns.length; nColumnIndex < nColumnsCount; ++nColumnIndex)
+	{
+		if (true !== this.IsEmptyPageColumn(nPageIndex, nColumnIndex))
+			return false;
+	}
+
+	return true;
+};
+CFootnotesController.prototype.IsEmptyPageColumn = function(nPageIndex, nColumnIndex)
+{
+	var oColumn = this.private_GetPageColumn(nPageIndex, nColumnIndex);
+	if (!oColumn || oColumn.Elements.length <= 0)
 		return true;
 
 	return false;
@@ -658,6 +708,18 @@ CFootnotesController.prototype.AddFootnoteRef = function()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Private area
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+CFootnotesController.prototype.private_GetPageColumn = function(nPageAbs, nColumnAbs)
+{
+	var oPage = this.Pages[nPageAbs];
+	if (!oPage)
+		return null;
+
+	var oColumn = oPage.Columns[nColumnAbs]
+	if (!oColumn)
+		return null;
+
+	return oColumn;
+};
 CFootnotesController.prototype.private_GetFootnoteOnPageByXY = function(X, Y, PageAbs)
 {
 	if (true === this.Is_EmptyPage(PageAbs))
@@ -2663,6 +2725,33 @@ CFootnotesController.prototype.GetColumnSize = function()
 };
 
 
+function CFootEndnotePageColumn()
+{
+	this.X      = 0;
+	this.Y      = 0;
+	this.XLimit = 0;
+	this.YLimit = 0;
+
+	this.Elements = [];
+
+	this.SeparatorRecalculateObject             = null;
+	this.ContinuationSeparatorRecalculateObject = null;
+	this.ContinuationNoticeRecalculateObject    = null;
+}
+CFootEndnotePageColumn.prototype.Reset = function()
+{
+	this.X      = 0;
+	this.Y      = 0;
+	this.XLimit = 0;
+	this.YLimit = 0;
+
+	this.Elements = [];
+
+	this.SeparatorRecalculateObject             = null;
+	this.ContinuationSeparatorRecalculateObject = null;
+	this.ContinuationNoticeRecalculateObject    = null;
+};
+
 function CFootEndnotePage()
 {
 	this.X      = 0;
@@ -2675,6 +2764,8 @@ function CFootEndnotePage()
 	this.SeparatorRecalculateObject             = null;
 	this.ContinuationSeparatorRecalculateObject = null;
 	this.ContinuationNoticeRecalculateObject    = null;
+
+	this.Columns = [];
 }
 CFootEndnotePage.prototype.Reset = function()
 {
@@ -2688,4 +2779,10 @@ CFootEndnotePage.prototype.Reset = function()
 	this.SeparatorRecalculateObject             = null;
 	this.ContinuationSeparatorRecalculateObject = null;
 	this.ContinuationNoticeRecalculateObject    = null;
+
+	this.Columns = [];
+};
+CFootEndnotePage.prototype.AddColumn = function(oColumn)
+{
+	this.Columns.push(oColumn);
 };

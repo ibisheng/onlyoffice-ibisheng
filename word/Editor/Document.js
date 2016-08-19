@@ -1664,18 +1664,19 @@ CDocument.prototype.Get_PageContentStartPos2       = function(StartPageIndex, St
 
     var SectPr = this.SectionsInfo.Get_SectPr(ElementIndex).SectPr;
 
-    var FootnotesHeight = this.Footnotes.Get_Height(StartPageIndex);
-
-    var Y      = SectPr.Get_PageMargin_Top();
-    var YLimit = SectPr.Get_PageHeight() - SectPr.Get_PageMargin_Bottom() - FootnotesHeight;
-    var X      = SectPr.Get_PageMargin_Left();
-    var XLimit = SectPr.Get_PageWidth() - SectPr.Get_PageMargin_Right();
-
     var ColumnsCount = SectPr.Get_ColumnsCount();
     var ColumnAbs    = (StartColumnIndex + ElementPageIndex) - ((StartColumnIndex + ElementPageIndex) / ColumnsCount | 0) * ColumnsCount;
     var PageAbs      = StartPageIndex + ((StartColumnIndex + ElementPageIndex) / ColumnsCount | 0);
 
-    var SectionIndex = this.FullRecalc.SectionIndex;
+	var FootnotesHeight = this.Footnotes.GetHeight(StartPageIndex, ColumnAbs);
+
+	var Y      = SectPr.Get_PageMargin_Top();
+	var YLimit = SectPr.Get_PageHeight() - SectPr.Get_PageMargin_Bottom() - FootnotesHeight;
+	var X      = SectPr.Get_PageMargin_Left();
+	var XLimit = SectPr.Get_PageWidth() - SectPr.Get_PageMargin_Right();
+
+
+	var SectionIndex = this.FullRecalc.SectionIndex;
     if (this.Pages[PageAbs] && this.Pages[PageAbs].Sections[SectionIndex])
     {
         Y      = this.Pages[PageAbs].Sections[SectionIndex].Get_Y();
@@ -2251,8 +2252,10 @@ CDocument.prototype.Recalculate_Page = function()
         //console.log( "Regular Recalc " + PageIndex );
 
         var StartPos = this.Get_PageContentStartPos(PageIndex, StartIndex);
-        this.Footnotes.Reset(PageIndex);
-        this.private_RecalculatePageFootnotes(PageIndex);
+
+		this.Footnotes.Reset(PageIndex, this.SectionsInfo.Get_SectPr(StartIndex).SectPr);
+
+		//this.private_RecalculatePageFootnotes(PageIndex);
 
         this.Pages[PageIndex].ResetStartElement = this.FullRecalc.ResetStartElement;
         this.Pages[PageIndex].X                 = StartPos.X;
@@ -2459,7 +2462,7 @@ CDocument.prototype.Recalculate_PageColumn                   = function()
 
             if (RecalcResult & recalcresultflags_Footnotes)
             {
-                this.private_RecalculatePageFootnotes(PageIndex);
+                this.private_RecalculatePageFootnotes(PageIndex, ColumnIndex);
             }
 
             break;
@@ -2753,9 +2756,9 @@ CDocument.prototype.Recalculate_PageColumn                   = function()
         //console.log("LastRecalc: " + ((new Date().getTime() - this.StartTime) / 1000));
     }
 
-    if (Index >= Count || _PageIndex > PageIndex)
+    if (Index >= Count || _PageIndex > PageIndex || _ColumnIndex > ColumnIndex)
     {
-        this.private_RecalculateShiftFootnotes(PageIndex);
+        this.private_RecalculateShiftFootnotes(PageIndex, ColumnIndex);
     }
 
     if (true === bReDraw)
@@ -2851,16 +2854,15 @@ CDocument.prototype.private_RecalculateIsNewSection = function(nPageAbs, nConten
 
 	return bNewSection;
 };
-CDocument.prototype.private_RecalculatePageFootnotes         = function(PageIndex)
+CDocument.prototype.private_RecalculatePageFootnotes = function(nPageAbs, nColumnAbs)
 {
-    var PageMetrics = this.Get_PageContentStartPos(PageIndex);
-    this.Footnotes.Recalculate(PageIndex, PageMetrics.X, PageMetrics.XLimit, 0, 10000);
+	this.Footnotes.Recalculate(nPageAbs, nColumnAbs, 0, 10000);
 };
-CDocument.prototype.private_RecalculateShiftFootnotes        = function(PageIndex)
+CDocument.prototype.private_RecalculateShiftFootnotes = function(nPageAbs, nColumnAbs)
 {
-    var FootnotesHeight = this.Footnotes.Get_Height(PageIndex);
-    var PageMetrics = this.Get_PageContentStartPos(PageIndex);
-    this.Footnotes.Shift(PageIndex, 0, PageMetrics.YLimit - FootnotesHeight);
+	var dFootnotesHeight = this.Footnotes.GetHeight(nPageAbs, nColumnAbs);
+	var oPageMetrics     = this.Get_PageContentStartPos(nPageAbs);
+	this.Footnotes.Shift(nPageAbs, 0, oPageMetrics.YLimit - dFootnotesHeight);
 };
 CDocument.prototype.private_RecalculateFlowTable             = function(RecalcInfo)
 {
@@ -6764,6 +6766,10 @@ CDocument.prototype.OnKeyDown = function(e)
         bUpdateSelection = false;
         bRetValue        = keydownresult_PreventAll;
     }
+    // else if (e.KeyCode === 113)
+    // {
+    //     this.AddFootnote();
+    // }
     else if (e.KeyCode == 121 && true === e.ShiftKey) // Shift + F10 - контекстное меню
     {
         var X_abs, Y_abs, oPosition, ConvertedPos;
@@ -7400,7 +7406,7 @@ CDocument.prototype.Internal_Content_Add = function(Position, NewObject, bCheckT
 	// Запоминаем, что нам нужно произвести переиндексацию элементов
 	this.private_ReindexContent(Position);
 };
-CDocument.prototype.Internal_Content_Remove = function(Position, Count)
+CDocument.prototype.Internal_Content_Remove = function(Position, Count, bCorrectionCheck)
 {
 	var ChangePos = -1;
 
@@ -7436,7 +7442,7 @@ CDocument.prototype.Internal_Content_Remove = function(Position, Count)
 		NextObj.Set_DocumentPrev(PrevObj);
 
 	// Проверим, что последний элемент не таблица
-	if (type_Table == this.Content[this.Content.length - 1].GetType())
+	if (false !== bCorrectionCheck && (this.Content.length <= 0 || type_Table == this.Content[this.Content.length - 1].GetType()))
 		this.Internal_Content_Add(this.Content.length, new Paragraph(this.DrawingDocument, this, 0, 0, 0, 0, 0));
 
 	// Обновим информацию о секциях
