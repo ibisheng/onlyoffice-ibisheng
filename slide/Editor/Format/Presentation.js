@@ -3972,28 +3972,30 @@ CPresentation.prototype =
             }
             else if(Content.DocContent)
             {
-                var target_doc_content = this.Slides[this.CurPage].graphicObjects.getTargetDocContent(true), paragraph, NearPos;
-                if(target_doc_content)
-                {
-                    if(target_doc_content.Selection.Use)
+                if(Content.DocContent.Elements.length > 0){
+                    var target_doc_content = this.Slides[this.CurPage].graphicObjects.getTargetDocContent(true), paragraph, NearPos;
+                    if(target_doc_content)
                     {
-                        this.Slides[this.CurPage].graphicObjects.removeCallback(1);
+                        if(target_doc_content.Selection.Use)
+                        {
+                            this.Slides[this.CurPage].graphicObjects.removeCallback(1);
+                        }
+                        paragraph = target_doc_content.Content[target_doc_content.CurPos.ContentPos];
+                        if (null != paragraph && type_Paragraph == paragraph.GetType())
+                        {
+                            NearPos = { Paragraph: paragraph, ContentPos: paragraph.Get_ParaContentPos(false, false) };
+                            paragraph.Check_NearestPos(NearPos);
+                            target_doc_content.Insert_Content(Content.DocContent, NearPos);
+                        }
+                        var oTargetTextObject = AscFormat.getTargetTextObject(this.Slides[this.CurPage].graphicObjects);
+                        oTargetTextObject && oTargetTextObject.checkExtentsByDocContent && oTargetTextObject.checkExtentsByDocContent();
                     }
-                    paragraph = target_doc_content.Content[target_doc_content.CurPos.ContentPos];
-                    if (null != paragraph && type_Paragraph == paragraph.GetType())
+                    else
                     {
-                        NearPos = { Paragraph: paragraph, ContentPos: paragraph.Get_ParaContentPos(false, false) };
-                        paragraph.Check_NearestPos(NearPos);
-                        target_doc_content.Insert_Content(Content.DocContent, NearPos);
+                        var shape = this.CreateAndAddShapeFromSelectedContent(Content.DocContent);
+                        this.Slides[this.CurPage].graphicObjects.resetSelection();
+                        this.Slides[this.CurPage].graphicObjects.selectObject(shape, 0);
                     }
-                    var oTargetTextObject = AscFormat.getTargetTextObject(this.Slides[this.CurPage].graphicObjects);
-                    oTargetTextObject && oTargetTextObject.checkExtentsByDocContent && oTargetTextObject.checkExtentsByDocContent();
-                }
-                else
-                {
-                    var shape = this.CreateAndAddShapeFromSelectedContent(Content.DocContent);
-                    this.Slides[this.CurPage].graphicObjects.resetSelection();
-                    this.Slides[this.CurPage].graphicObjects.selectObject(shape, 0);
                 }
             }
         }

@@ -2747,7 +2747,9 @@ PasteProcessor.prototype =
                         case "Content":
                         {
                             var docContent = this.ReadPresentationText(stream);
-							
+							if(docContent.length === 0){
+							    return;
+							}
 							var presentationSelectedContent = new PresentationSelectedContent();
 							presentationSelectedContent.DocContent = new CSelectedContent();
 							presentationSelectedContent.DocContent.Elements = docContent;
