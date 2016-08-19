@@ -1127,6 +1127,7 @@
 		{
 			if (this.IsUseInputEventOnlyWithCtx)
 			{
+				this.compositionState = c_oCompositionState.process;
 				this.msCheskComposition(e, c_oCompositionState.process);
 				return;
 			}
