@@ -1084,7 +1084,7 @@
     {
         if (oElement instanceof ApiParagraph || oElement instanceof ApiTable)
         {
-            this.Document.Internal_Content_Add(nPos, oElement.private_GetImpl(), false);
+            this.Document.Internal_Content_Add(nPos, oElement.private_GetImpl());
         }
     };
     /**
@@ -1095,7 +1095,7 @@
     {
         if (oElement instanceof ApiParagraph || oElement instanceof ApiTable)
         {
-            this.Document.Internal_Content_Add(this.Document.Content.length, oElement.private_GetImpl(), false);
+            this.Document.Internal_Content_Add(this.Document.Content.length, oElement.private_GetImpl());
             return true;
         }
 
@@ -1106,7 +1106,7 @@
      */
     ApiDocumentContent.prototype.RemoveAllElements = function()
     {
-        this.Document.Internal_Content_Remove(0, this.Document.Content.length, false);
+        this.Document.Internal_Content_Remove(0, this.Document.Content.length);
     };
     /**
      * Remove element by specified position.
