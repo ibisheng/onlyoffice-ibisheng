@@ -1464,7 +1464,7 @@
 					}
 					else
 					{
-						this.compositionValue.push(((_code & 0x3FF) << 10) | (_code2 & 0x3FF));
+						this.compositionValue.push(0x10000 + (((_code & 0x3FF) << 10) | (_code2 & 0x3FF)));
 					}
 				}
 			}

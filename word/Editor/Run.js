@@ -1990,7 +1990,11 @@ ParaRun.prototype.Get_SelectedText = function(bAll, bClearText, oPr)
                 break;
             }
 
-            case para_Text : Str += String.fromCharCode(Item.Value); break;
+            case para_Text :
+            {
+                Str += AscCommon.encodeSurrogateChar(Item.Value);
+                break;
+            }
             case para_Space:
             case para_Tab  : Str += " "; break;
 			case para_End:
