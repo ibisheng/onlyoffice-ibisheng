@@ -2660,6 +2660,218 @@ CChartsDrawer.prototype =
 		return {minX: minX, maxX: maxX, minY : minY, maxY: maxY, minZ: minZ, maxZ: maxZ};
 	},
 	
+	//TODO временная функция для теста результата значений
+	getPlainEquation: function(point1, point2, point3)
+	{
+		var ppl = 2;
+		var set0 = 0.00000001;
+		var subMatrix = function(oldmat, row, col) 
+		{
+			var i;
+			var j;
+			var m = 0;
+			var k = 0;
+			var len = oldmat.length;
+			var retmat = new Array();
+
+			if ((len <= row) || (len <= col)) return 0;
+
+			for (j = 0; j < len; j++) {
+				if (j != row) {
+					retmat[k] = new Array();
+					for (i = 0; i < len; i++) {
+						if (i != col) {
+							retmat[k][m] = oldmat[j][i];
+							m++;
+						}
+					}
+					k++;
+				}
+				m = 0;
+			}
+			return retmat;
+		}
+		
+		 var isMatSquare = function(mat) 
+		 {
+			var len = mat.length - 1;
+			var i = 0;
+			
+			try{
+			for (i = 0; i < 9; i++) {
+				if (isNaN(mat[i][0]))
+					break;
+			}
+			}
+			catch(ex){
+
+			}
+
+			if (i - 1 == len)
+				return true;
+			else
+				return false;
+		}
+		
+		var determinant = function(mat) 
+		{
+			var sqrMat = isMatSquare(mat);
+
+			var i;
+			var tmpVal = 0;
+			var row = mat.length;
+			var newDet = new Array();
+			newDet[0] = new Array();
+
+			switch (row) {
+				case 1:
+					return mat[0][0];
+				case 2:
+					return (mat[0][0] * mat[1][1] - mat[0][1] * mat[1][0]);
+				default:
+					for (i = 0; i < row; i++) {
+						if (mat[0][i] == 0) i++;
+						if (i < row) {
+							newDet = subMatrix(mat, 0, i);
+							if (!isNaN(mat[0][i]))
+								tmpVal += parseFloat(mat[0][i]) * Math.pow(-1, i) * determinant(newDet);
+						}
+					}
+					return tmpVal;
+			}
+		};
+		
+		var round = function(inVal, plc) 
+		{
+			inVal = parseFloat(inVal);
+			if (isNaN(inVal)) return "";
+			if (inVal == 0) return "0";
+			if (inVal=="") return "";
+			var value = 0;
+
+			if (Math.abs(inVal) < set0) return 0;
+			
+			if (inVal == 0) {
+				return inVal;
+			}
+
+			var inE = inVal.toString().indexOf("e");
+
+			if (inE == -1) {
+				value = Math.round(inVal * Math.pow(10, plc)) / Math.pow(10, plc);
+			}
+			else {
+				var newVal = inVal.toString().substring(0, inE);
+				var Epart = inVal.toString().substring(inE, inVal.toString().length);
+				var calVal = parseFloat(newVal);
+				value = Math.round(calVal * Math.pow(10, plc)) / Math.pow(10, plc);
+				Epart = value + Epart;
+				return Epart;
+			}
+			
+			var i;
+			
+			if (value != 0)
+				return value;
+			else
+			{
+				i = plc + 1;
+				while (value==0){
+					value = Math.round(inVal * Math.pow(10, i))/Math.pow(10, i);
+					i++;
+					}
+					
+					i = i + plc - 1;
+				return Math.round(inVal * Math.pow(10, i))/Math.pow(10, i);
+			}
+		}
+		
+		var replaceCol = function(mat, col, vec) 
+		{
+			var i = 0;
+			var j = 0;
+			var tmp = new Array();
+
+			for (i = 0; i < mat.length; i++) {
+				tmp[i] = new Array();
+
+				for (j = 0; j < mat.length; j++) {
+					if (col == j)
+						tmp[i][col] = vec[i];
+					else
+						tmp[i][j] = mat[i][j]; 
+
+				}
+			}
+			return tmp;
+		}
+		
+		var a1 = point1.x;
+		var b1 = point1.y;
+		var c1 = point1.z;
+		var a2 = point2.x;
+		var b2 = point2.y;
+		var c2 = point2.z;
+		var a3 = point3.x;
+		var b3 = point3.y;
+		var c3 = point3.z;
+
+		var mat = new Array();
+		mat[0] = []; mat[1] = []; mat[2] = [];
+		mat[0][0] = a1; mat[0][1] = b1; mat[0][2] = c1;
+		mat[1][0] = a2; mat[1][1] = b2; mat[1][2] = c2;
+		mat[2][0] = a3; mat[2][1] = b3; mat[2][2] = c3;
+
+		var det = determinant(mat);
+		
+		var vec = [-1, -1, -1];
+		var factor;
+
+		var a = round(determinant(replaceCol(mat, 0, vec)), ppl);
+		if (a < 0) factor = -1; else factor = 1;
+		a *= factor;
+		var b = round(determinant(replaceCol(mat, 1, vec)) * factor, ppl);
+		var c = round(determinant(replaceCol(mat, 2, vec)) * factor, ppl);
+		var d = round(det, ppl) * factor;
+		
+		return {a: a, b: b, c: c, d: d};
+	},
+	
+	//уравнение плоскости
+	getPlainEquation2: function(point1, point2, point3, point4)
+	{
+		var x1 = point1.x, y1 = point1.y, z1 = point1.z;
+		var x2 = point2.x, y2 = point2.y, z2 = point2.z;
+		var x3 = point3.x, y3 = point3.y, z3 = point3.z;
+		
+		var x21 = x2 - x1;
+		var y21 = y2 - y1;
+		var z21 = z2 - z1;
+		
+		var x31 = x3 - x1;
+		var y31 = y3 - y1;
+		var z31 = z3 - z1;
+			
+		//(x - x1)*(y21 * z31 - x21 * y31) - (y - y1)*(x21 * z31 - z21 * x31) + (z - z1)(x21 * y31 - y21 * x31) 
+		
+		var tempA = y21 * z31 - z21 * y31;
+		
+		var tempB = x21 * z31 - z21 * x31;
+		
+		var tempC = x21 * y31 - y21 * x31;
+		
+		//(x - x1)*(tempA) - (y - y1)*(tempB) + (z - z1)(tempC)
+		
+		//x * tempA - x1 * tempA - y * tempB + y1 * tempB + z * tempC - z1 * tempC
+		
+		var a = tempA;
+		var b = tempB;
+		var c = tempC;
+		var d =  y1 * tempB - x1 * tempA - z1 * tempC;
+			
+		return {a: a, b: b, c: c, d: d};
+	},		
+	
 	
 	//******calculate graphic objects for 3d*******
 	calculateRect3D : function(point1, point2, point3, point4, point5, point6, point7, point8, val, isNotDrawDownVerge)
@@ -6208,218 +6420,6 @@ drawHBarChart.prototype =
 			DiffGapDepth = perspectiveDepth * (gapDepth / 2) / 100;
 		}		
 		
-		//TODO временная функция для теста результата значений
-		var getPlainEquation = function(point1, point2, point3)
-		{
-			var ppl = 2;
-			var set0 = 0.00000001;
-			var subMatrix = function(oldmat, row, col) 
-			{
-				var i;
-				var j;
-				var m = 0;
-				var k = 0;
-				var len = oldmat.length;
-				var retmat = new Array();
-
-				if ((len <= row) || (len <= col)) return 0;
-
-				for (j = 0; j < len; j++) {
-					if (j != row) {
-						retmat[k] = new Array();
-						for (i = 0; i < len; i++) {
-							if (i != col) {
-								retmat[k][m] = oldmat[j][i];
-								m++;
-							}
-						}
-						k++;
-					}
-					m = 0;
-				}
-				return retmat;
-			}
-			
-			 var isMatSquare = function(mat) 
-			 {
-				var len = mat.length - 1;
-				var i = 0;
-				
-				try{
-				for (i = 0; i < 9; i++) {
-					if (isNaN(mat[i][0]))
-						break;
-				}
-				}
-				catch(ex){
-
-				}
-
-				if (i - 1 == len)
-					return true;
-				else
-					return false;
-			}
-			
-			var determinant = function(mat) 
-			{
-				var sqrMat = isMatSquare(mat);
-
-				var i;
-				var tmpVal = 0;
-				var row = mat.length;
-				var newDet = new Array();
-				newDet[0] = new Array();
-
-				switch (row) {
-					case 1:
-						return mat[0][0];
-					case 2:
-						return (mat[0][0] * mat[1][1] - mat[0][1] * mat[1][0]);
-					default:
-						for (i = 0; i < row; i++) {
-							if (mat[0][i] == 0) i++;
-							if (i < row) {
-								newDet = subMatrix(mat, 0, i);
-								if (!isNaN(mat[0][i]))
-									tmpVal += parseFloat(mat[0][i]) * Math.pow(-1, i) * determinant(newDet);
-							}
-						}
-						return tmpVal;
-				}
-			};
-			
-			var round = function(inVal, plc) 
-			{
-				inVal = parseFloat(inVal);
-				if (isNaN(inVal)) return "";
-				if (inVal == 0) return "0";
-				if (inVal=="") return "";
-				var value = 0;
-
-				if (Math.abs(inVal) < set0) return 0;
-				
-				if (inVal == 0) {
-					return inVal;
-				}
-
-				var inE = inVal.toString().indexOf("e");
-
-				if (inE == -1) {
-					value = Math.round(inVal * Math.pow(10, plc)) / Math.pow(10, plc);
-				}
-				else {
-					var newVal = inVal.toString().substring(0, inE);
-					var Epart = inVal.toString().substring(inE, inVal.toString().length);
-					var calVal = parseFloat(newVal);
-					value = Math.round(calVal * Math.pow(10, plc)) / Math.pow(10, plc);
-					Epart = value + Epart;
-					return Epart;
-				}
-				
-				var i;
-				
-				if (value != 0)
-					return value;
-				else
-				{
-					i = plc + 1;
-					while (value==0){
-						value = Math.round(inVal * Math.pow(10, i))/Math.pow(10, i);
-						i++;
-						}
-						
-						i = i + plc - 1;
-					return Math.round(inVal * Math.pow(10, i))/Math.pow(10, i);
-				}
-			}
-			
-			var replaceCol = function(mat, col, vec) 
-			{
-				var i = 0;
-				var j = 0;
-				var tmp = new Array();
-
-				for (i = 0; i < mat.length; i++) {
-					tmp[i] = new Array();
-
-					for (j = 0; j < mat.length; j++) {
-						if (col == j)
-							tmp[i][col] = vec[i];
-						else
-							tmp[i][j] = mat[i][j]; 
-
-					}
-				}
-				return tmp;
-			}
-			
-			var a1 = point1.x;
-			var b1 = point1.y;
-			var c1 = point1.z;
-			var a2 = point2.x;
-			var b2 = point2.y;
-			var c2 = point2.z;
-			var a3 = point3.x;
-			var b3 = point3.y;
-			var c3 = point3.z;
-
-			var mat = new Array();
-			mat[0] = []; mat[1] = []; mat[2] = [];
-			mat[0][0] = a1; mat[0][1] = b1; mat[0][2] = c1;
-			mat[1][0] = a2; mat[1][1] = b2; mat[1][2] = c2;
-			mat[2][0] = a3; mat[2][1] = b3; mat[2][2] = c3;
-
-			var det = determinant(mat);
-			
-			var vec = [-1, -1, -1];
-			var factor;
-
-			var a = round(determinant(replaceCol(mat, 0, vec)), ppl);
-			if (a < 0) factor = -1; else factor = 1;
-			a *= factor;
-			var b = round(determinant(replaceCol(mat, 1, vec)) * factor, ppl);
-			var c = round(determinant(replaceCol(mat, 2, vec)) * factor, ppl);
-			var d = round(det, ppl) * factor;
-			
-			return {a: a, b: b, c: c, d: d};
-		};
-		
-		//уравнение плоскости
-		var getPlainEquation2 = function(point1, point2, point3, point4)
-		{
-			var x1 = point1.x, y1 = point1.y, z1 = point1.z;
-			var x2 = point2.x, y2 = point2.y, z2 = point2.z;
-			var x3 = point3.x, y3 = point3.y, z3 = point3.z;
-			
-			var x21 = x2 - x1;
-			var y21 = y2 - y1;
-			var z21 = z2 - z1;
-			
-			var x31 = x3 - x1;
-			var y31 = y3 - y1;
-			var z31 = z3 - z1;
-				
-			//(x - x1)*(y21 * z31 - x21 * y31) - (y - y1)*(x21 * z31 - z21 * x31) + (z - z1)(x21 * y31 - y21 * x31) 
-			
-			var tempA = y21 * z31 - z21 * y31;
-			
-			var tempB = x21 * z31 - z21 * x31;
-			
-			var tempC = x21 * y31 - y21 * x31;
-			
-			//(x - x1)*(tempA) - (y - y1)*(tempB) + (z - z1)(tempC)
-			
-			//x * tempA - x1 * tempA - y * tempB + y1 * tempB + z * tempC - z1 * tempC
-			
-			var a = tempA;
-			var b = tempB;
-			var c = tempC;
-			var d =  y1 * tempB - x1 * tempA - z1 * tempC;
-				
-			return {a: a, b: b, c: c, d: d};
-		};			
-		
 		for (var i = 0; i < this.chartProp.series.length; i++) 
 		{
 			numCache = this.chartProp.series[i].val.numRef ? this.chartProp.series[i].val.numRef.numCache : this.chartProp.series[i].val.numLit;
@@ -6545,12 +6545,12 @@ drawHBarChart.prototype =
 						
 						
 					
-					var plainEquation1 = getPlainEquation(point11, point44, point88, point55);
-					var plainEquation2 = getPlainEquation(point11, point22, point33, point44);
-					var plainEquation3 = getPlainEquation(point11, point22, point66, point55);
-					var plainEquation4 = getPlainEquation(point44, point88, point77, point33);
-					var plainEquation5 = getPlainEquation(point55, point66, point77, point88);
-					var plainEquation6 = getPlainEquation(point66, point22, point33, point77);
+					var plainEquation1 = this.cChartDrawer.getPlainEquation(point11, point44, point88, point55);
+					var plainEquation2 = this.cChartDrawer.getPlainEquation(point11, point22, point33, point44);
+					var plainEquation3 = this.cChartDrawer.getPlainEquation(point11, point22, point66, point55);
+					var plainEquation4 = this.cChartDrawer.getPlainEquation(point44, point88, point77, point33);
+					var plainEquation5 = this.cChartDrawer.getPlainEquation(point55, point66, point77, point88);
+					var plainEquation6 = this.cChartDrawer.getPlainEquation(point66, point22, point33, point77);
 					var plainEquations = [plainEquation1, plainEquation2, plainEquation3, plainEquation4, plainEquation5, plainEquation6];
 					
 					
@@ -11871,6 +11871,7 @@ CSortFaces.prototype =
 		var iterCount = 0;
 		var newArr = [];
 		var lastFaces = faces;
+		
 		while(lastFaces.length !== 0)
 		{
 			var firstFaces1 = [], lastFaces1 = [];
@@ -11881,6 +11882,7 @@ CSortFaces.prototype =
 			
 			if(iterCount > 100)
 			{
+				newArr = lastFaces.concat(newArr);
 				break;
 			}
 		}
@@ -11916,7 +11918,7 @@ CSortFaces.prototype =
 			
 			var isFirstVerge = this._isIntersectionFacesPointLines(plainVerge, i, all);
 			//push into array
-			if(isFirstVerge)
+			if(!isFirstVerge)
 			{
 				first.push(plainVerge);
 			}
@@ -11930,7 +11932,7 @@ CSortFaces.prototype =
 	//смотрим есть ли пересечения точек, выходящих из вершин данной грани, с другими гранями
 	_isIntersectionFacesPointLines: function(plainVerge, i, sortZIndexPaths)
 	{
-		var res = true;
+		var res = false;
 		
 		var t = this;
 		
@@ -11946,9 +11948,9 @@ CSortFaces.prototype =
 			lineArray.push({paths: paths});*/
 			
 			//пересечение грани и прямой
-			if(!t._isNotIntersectionVergesAndLine(lineEqucation, pointFromVerge, i, j, sortZIndexPaths))
+			if(t._isIntersectionFacesAndLine(lineEqucation, pointFromVerge, i, j, sortZIndexPaths))
 			{
-				res = false;
+				res = true;
 				break;
 			}
 		}
@@ -11956,9 +11958,10 @@ CSortFaces.prototype =
 		return res;
 	},
 	
-	_isNotIntersectionVergesAndLine: function(lineEqucation, pointFromVerge, i, j, sortZIndexPaths)
+	//пересечение прямой с другими гранями
+	_isIntersectionFacesAndLine: function(lineEqucation, pointFromVerge, i, j, sortZIndexPaths)
 	{
-		var res = true;
+		var res = false;
 		
 		for(var k = 0; k < sortZIndexPaths.length; k++)
 		{
@@ -11967,9 +11970,9 @@ CSortFaces.prototype =
 			
 			var plainEqucation = sortZIndexPaths[k].plainEquation;
 			
-			if(false === this._isNotIntersectionVergeAndLine(sortZIndexPaths[k], lineEqucation, pointFromVerge, i, j, k))
+			if(true === this._isIntersectionFaceAndLine(sortZIndexPaths[k], lineEqucation, pointFromVerge, i, j, k))
 			{
-				res = false;
+				res = true;
 				break;
 			}
 		}
@@ -11977,9 +11980,10 @@ CSortFaces.prototype =
 		return res;
 	},
 	
-	_isNotIntersectionVergeAndLine: function(plain, lineEquation, pointFromVerge, i, j, k)
+	//пересечение прямой гранью
+	_isIntersectionFaceAndLine: function(plain, lineEquation, pointFromVerge, i, j, k)
 	{
-		var res = true;
+		var res = false;
 		var t = this;
 		
 		//get intersection
@@ -11999,7 +12003,7 @@ CSortFaces.prototype =
 		var iSY = nIntersectionPlainAndLine.y;
 		var iSZ = nIntersectionPlainAndLine.z;
 		
-		if(iSZ < pointFromVerge.z && t._isBetweenPoint(iSZ, minZ, maxZ) && t._isBetweenPoint(iSX, minX, maxX) && t._isBetweenPoint(iSY, minY, maxY))
+		if(iSZ < pointFromVerge.z /*&& t._isBetweenPoint(iSZ, minZ, maxZ)*/ && t._isBetweenPoint(iSX, minX, maxX) && t._isBetweenPoint(iSY, minY, maxY))
 		{
 			var point0 = plain.points2[0];
 			var point1 = plain.points2[1];
@@ -12018,7 +12022,7 @@ CSortFaces.prototype =
 				//var pointFromVergeProject = t.cChartDrawer._convertAndTurnPoint(pointFromVerge.x, pointFromVerge.y, pointFromVerge.z, true, true);
 				//console.log("x: " + projectIntersection.x + " ;y: " + projectIntersection.y + " ;fromX:" + pointFromVergeProject.x + " ;fromY:" + pointFromVergeProject.y);
 				
-				res = false;
+				res = true;
 			}
 		}
 		
@@ -12029,10 +12033,10 @@ CSortFaces.prototype =
 	{
 		//TODO округление пересмотреть
 		var res = false;
-		point = Math.round(point * 100) / 100;
+		/*point = Math.round(point * 100) / 100;
 		start = Math.round(start * 100) / 100;
-		end = Math.round(end * 100) / 100;
-		if(point > start && point < end)
+		end = Math.round(end * 100) / 100;*/
+		if(point >= start && point <= end)
 		{
 			res = true;
 		}
