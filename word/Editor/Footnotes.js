@@ -275,11 +275,11 @@ CFootnotesController.prototype.Shift = function(nPageIndex, dX, dY)
  */
 CFootnotesController.prototype.AddFootnoteToPage = function(nPageAbs, nColumnAbs, oFootnote)
 {
+	var oColumn = this.private_GetPageColumn(nPageAbs, nColumnAbs);
+	if (!oColumn)
+		return;
 
-	if (!this.Pages[nPageAbs])
-		this.Pages[nPageAbs] = new CFootEndnotePage();
-
-	this.Pages[nPageAbs].Elements.push(oFootnote);
+	oColumn.Elements.push(oFootnote);
 };
 /**
  * Убираем заданную сноску со страницы при пересчетею..
@@ -320,6 +320,7 @@ CFootnotesController.prototype.GetFootnoteNumberOnPage = function(nPageAbs, oFoo
 /**
  * Проверяем, используется заданная сноска в документе.
  * @param {string} sFootnoteId
+ * @param {CFootEndnote.array} arrFootnotesList
  * @returns {boolean}
  */
 CFootnotesController.prototype.Is_UseInDocument = function(sFootnoteId, arrFootnotesList)
@@ -578,7 +579,7 @@ CFootnotesController.prototype.EndSelection = function(X, Y, PageAbs, MouseEvent
 		this.Selection.Direction = 0;
 	}
 };
-CFootnotesController.prototype.Undo = function()
+CFootnotesController.prototype.Undo = function(Data)
 {
 	var Type = Data.Type;
 
@@ -591,7 +592,7 @@ CFootnotesController.prototype.Undo = function()
 		}
 	}
 };
-CFootnotesController.prototype.Redo = function()
+CFootnotesController.prototype.Redo = function(Data)
 {
 	var Type = Data.Type;
 
