@@ -11991,7 +11991,7 @@ function CorrectUniColor(asc_color, unicolor, flag)
     function builder_CreateShape(sType, nWidth, nHeight, oFill, oStroke, oParent, oTheme, oDrawingDocument, bWord){
         var oShapeTrack = new AscFormat.NewShapeTrack(sType, 0, 0, oTheme, null, null, null, 0);
         oShapeTrack.track({}, nWidth, nHeight);
-        var oShape = oShapeTrack.getShape(true, oDrawingDocument, null);
+        var oShape = oShapeTrack.getShape(bWord === true, oDrawingDocument, null);
         oShape.setParent(oParent);
         if(bWord){
             oShape.createTextBoxContent();

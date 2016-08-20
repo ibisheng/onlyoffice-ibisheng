@@ -294,7 +294,17 @@
      */
     Api.prototype.CreateParagraph = function()
     {
-        return this.private_CreateApiParagraph(new Paragraph(private_GetDrawingDocument(), null));
+        var oDrawingDocument = null;
+        if(this.GetActiveSheet){
+            var oWorksheet = this.GetActiveSheet();
+            if(oWorksheet){
+                oDrawingDocument = oWorksheet.DrawingDocument;
+            }
+        }
+        else{
+            oDrawingDocument = private_GetDrawingDocument();
+        }
+        return this.private_CreateApiParagraph(new Paragraph(oDrawingDocument, null));
     };
 
 
