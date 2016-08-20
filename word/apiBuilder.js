@@ -950,7 +950,7 @@
      * @memberof Api
      * @returns {ApiBullet}
      * */
-    Api.CreateBullet = function(sSymbol){
+    Api.prototype.CreateBullet = function(sSymbol){
         var oBullet = new AscFormat.CBullet();
         oBullet.bulletType = new AscFormat.CBulletType();
         if(typeof sSymbol === "string" && sSymbol.length > 0){
@@ -960,6 +960,7 @@
         else{
             oBullet.bulletType.type = AscFormat.BULLET_TYPE_BULLET_NONE;
         }
+        return new ApiBullet(oBullet);
     };
 
     /**
@@ -970,7 +971,7 @@
      * @returns {ApiBullet}
      * */
 
-    Api.CreateNumbering = function(sType, nStartAt){
+    Api.prototype.CreateNumbering = function(sType, nStartAt){
         var oBullet = new AscFormat.CBullet();
         oBullet.bulletType = new AscFormat.CBulletType();
         oBullet.bulletType.type = AscFormat.BULLET_TYPE_BULLET_AUTONUM;
@@ -2806,7 +2807,19 @@
     };
 
 
-
+    /**
+    * Specifies paragraph bullet
+    * @param {?ApiBullet} oBullet
+    * */
+    ApiParaPr.prototype.SetBullet = function(oBullet){
+        if(oBullet){
+            this.ParaPr.Bullet = oBullet.Bullet;
+        }
+        else{
+            this.ParaPr.Bullet = null;
+        }
+        this.private_OnChange();
+    };
 
 
     //------------------------------------------------------------------------------------------------------------------
@@ -4097,6 +4110,8 @@
     Api.prototype["CreateNoFill"]                    = Api.prototype.CreateNoFill;
     Api.prototype["CreateStroke"]                    = Api.prototype.CreateStroke;
     Api.prototype["CreateGradientStop"]              = Api.prototype.CreateGradientStop;
+    Api.prototype["CreateBullet"]                    = Api.prototype.CreateBullet;
+    Api.prototype["CreateNumbering"]                 = Api.prototype.CreateNumbering;
 
     ApiUnsupported.prototype["GetClassType"]         = ApiUnsupported.prototype.GetClassType;
 
@@ -4249,6 +4264,7 @@
     ApiParaPr.prototype["SetWidowControl"]           = ApiParaPr.prototype.SetWidowControl;
     ApiParaPr.prototype["SetTabs"]                   = ApiParaPr.prototype.SetTabs;
     ApiParaPr.prototype["SetNumPr"]                  = ApiParaPr.prototype.SetNumPr;
+    ApiParaPr.prototype["SetBullet"]                 = ApiParaPr.prototype.SetBullet;
 
     ApiTablePr.prototype["GetClassType"]             = ApiTablePr.prototype.GetClassType;
     ApiTablePr.prototype["SetStyleColBandSize"]      = ApiTablePr.prototype.SetStyleColBandSize;

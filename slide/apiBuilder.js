@@ -304,7 +304,7 @@
         else{
             oDrawingDocument = private_GetDrawingDocument();
         }
-        return this.private_CreateApiParagraph(new Paragraph(oDrawingDocument, null));
+        return this.private_CreateApiParagraph(new Paragraph(oDrawingDocument, null, 0, 0, 0, 0, 0, true));
     };
 
 
@@ -722,7 +722,7 @@
 
     function private_GetDrawingDocument(){
         if(editor.WordControl){
-            return editor.m_oDrawingDocument;
+            return editor.WordControl.m_oDrawingDocument;
         }
         return null;
     }
