@@ -816,26 +816,28 @@
 				case 33: // PageUp
 					// Отключим стандартную обработку браузера нажатия PageUp
 					stop();
-					if (ctrlKey) {
+					if (ctrlKey || event.altKey) {
 						// Перемещение по листам справа налево
 						// В chrome не работает (т.к. там своя обработка на некоторые нажатия вместе с Ctrl
 						t.handlers.trigger("showNextPrevWorksheet", -1);
 						return true;
 					} else {
-						event.altKey ? dc = -0.5 : dr = -0.5;
+						// Solution design department to handle Alt + PgUp \ Alt + PgDown as a transition by sheets
+						/*event.altKey ? dc = -0.5 : */dr = -0.5;
 					}
 					break;
 
 				case 34: // PageDown
 					// Отключим стандартную обработку браузера нажатия PageDown
 					stop();
-					if (ctrlKey) {
+					if (ctrlKey || event.altKey) {
 						// Перемещение по листам слева направо
 						// В chrome не работает (т.к. там своя обработка на некоторые нажатия вместе с Ctrl
 						t.handlers.trigger("showNextPrevWorksheet", +1);
 						return true;
 					} else {
-						event.altKey ? dc = +0.5 : dr = +0.5;
+						// Solution design department to handle Alt + PgUp \ Alt + PgDown as a transition by sheets
+						/*event.altKey ? dc = +0.5 : */dr = +0.5;
 					}
 					break;
 
