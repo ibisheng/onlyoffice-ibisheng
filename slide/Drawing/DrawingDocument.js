@@ -813,7 +813,7 @@ function CDrawingDocument()
 
 	this.OnRecalculatePage = function(index, pageObject)
 	{
-		editor.asc_fireCallback("asc_onDocumentChanged");
+		editor.sendEvent("asc_onDocumentChanged");
 
 		if (true === this.m_bIsSearching)
 		{
@@ -962,7 +962,7 @@ function CDrawingDocument()
 			this.m_bIsSendApiDocChanged = true;
 			this.m_oWordControl.m_oApi.SetDocumentModified(true);
 
-			this.m_oWordControl.m_oApi.asc_fireCallback("asc_onDocumentChanged");
+			this.m_oWordControl.m_oApi.sendEvent("asc_onDocumentChanged");
 		}
 	}
 

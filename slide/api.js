@@ -765,7 +765,16 @@
 
 	asc_docs_api.prototype.sendEvent = function()
 	{
-		this.asc_fireCallback.apply(this, arguments);
+		var name = arguments[0];
+		if (_callbacks.hasOwnProperty(name))
+		{
+			for (var i = 0; i < _callbacks[name].length; ++i)
+			{
+				_callbacks[name][i].apply(this || window, Array.prototype.slice.call(arguments, 1));
+			}
+			return true;
+		}
+		return false;
 	};
 
 	/////////////////////////////////////////////////////////////////////////
@@ -803,7 +812,7 @@
 			{
 				editor.WordControl.m_oLogicDocument.Remove_ForeignCursor(e['id']);
 			}
-			t.asc_fireCallback("asc_onConnectionStateChanged", e);
+			t.sendEvent("asc_onConnectionStateChanged", e);
 		};
 		this.CoAuthoringApi.onLocksAcquired          = function(e)
 		{
@@ -875,15 +884,15 @@
 							{
 								if (Class === editor.WordControl.m_oLogicDocument.themeLock)
 								{
-									editor.asc_fireCallback("asc_onLockDocumentTheme");
+									editor.sendEvent("asc_onLockDocumentTheme");
 								}
 								else if (Class === editor.WordControl.m_oLogicDocument.schemeLock)
 								{
-									editor.asc_fireCallback("asc_onLockDocumentSchema");
+									editor.sendEvent("asc_onLockDocumentSchema");
 								}
 								else if (Class === editor.WordControl.m_oLogicDocument.slideSizeLock)
 								{
-									editor.asc_fireCallback("asc_onLockDocumentProps");
+									editor.sendEvent("asc_onLockDocumentProps");
 								}
 							}
 						}
@@ -1019,22 +1028,22 @@
 								{
 									if (NewType !== locktype_Mine && NewType !== locktype_None)
 									{
-										editor.asc_fireCallback("asc_onLockDocumentTheme");
+										editor.sendEvent("asc_onLockDocumentTheme");
 									}
 									else
 									{
-										editor.asc_fireCallback("asc_onUnLockDocumentTheme");
+										editor.sendEvent("asc_onUnLockDocumentTheme");
 									}
 								}
 								if (Class === object.slideSizeLock)
 								{
 									if (NewType !== locktype_Mine && NewType !== locktype_None)
 									{
-										editor.asc_fireCallback("asc_onLockDocumentProps");
+										editor.sendEvent("asc_onLockDocumentProps");
 									}
 									else
 									{
-										editor.asc_fireCallback("asc_onUnLockDocumentProps");
+										editor.sendEvent("asc_onUnLockDocumentProps");
 									}
 								}
 							}
@@ -1124,7 +1133,7 @@
 	asc_docs_api.prototype.sync_CollaborativeChanges = function()
 	{
 		if (true !== AscCommon.CollaborativeEditing.Is_Fast())
-			this.asc_fireCallback("asc_onCollaborativeChanges");
+			this.sendEvent("asc_onCollaborativeChanges");
 	};
 
 	asc_docs_api.prototype.asyncServerIdEndLoaded = function()
@@ -1137,7 +1146,7 @@
 	// Эвент о пришедщих изменениях
 	asc_docs_api.prototype.syncCollaborativeChanges = function()
 	{
-		this.asc_fireCallback("asc_onCollaborativeChanges");
+		this.sendEvent("asc_onCollaborativeChanges");
 	};
 
 
@@ -1169,7 +1178,7 @@
 		if (isCanSave !== this.isDocumentCanSave)
 		{
 			this.isDocumentCanSave = isCanSave;
-			this.asc_fireCallback('asc_onDocumentCanSaveChanged', this.isDocumentCanSave);
+			this.sendEvent('asc_onDocumentCanSaveChanged', this.isDocumentCanSave);
 		}
 	};
 
@@ -1198,7 +1207,7 @@
 	asc_docs_api.prototype.SetDocumentModified = function(bValue)
 	{
 		this.isDocumentModify = bValue;
-		this.asc_fireCallback("asc_onDocumentModifiedChanged");
+		this.sendEvent("asc_onDocumentModifiedChanged");
 
 		if (undefined !== window["AscDesktopEditor"])
 		{
@@ -1223,7 +1232,7 @@
 	};
 	asc_docs_api.prototype.sync_EndCatchSelectedElements   = function()
 	{
-		this.asc_fireCallback("asc_onFocusObject", this.SelectedObjectsStack);
+		this.sendEvent("asc_onFocusObject", this.SelectedObjectsStack);
 	};
 	asc_docs_api.prototype.getSelectedElements             = function()
 	{
@@ -1526,18 +1535,6 @@ background-repeat: no-repeat;\
 		}
 	};
 
-	asc_docs_api.prototype.asc_fireCallback      = function(name)
-	{
-		if (_callbacks.hasOwnProperty(name))
-		{
-			for (var i = 0; i < _callbacks[name].length; ++i)
-			{
-				_callbacks[name][i].apply(this || window, Array.prototype.slice.call(arguments, 1));
-			}
-			return true;
-		}
-		return false;
-	};
 	asc_docs_api.prototype.asc_checkNeedCallback = function(name)
 	{
 		if (_callbacks.hasOwnProperty(name))
@@ -1652,36 +1649,36 @@ background-repeat: no-repeat;\
 
 	asc_docs_api.prototype.sync_TextSpacing      = function(Spacing)
 	{
-		this.asc_fireCallback("asc_onTextSpacing", Spacing);
+		this.sendEvent("asc_onTextSpacing", Spacing);
 	};
 	asc_docs_api.prototype.sync_TextDStrikeout   = function(Value)
 	{
-		this.asc_fireCallback("asc_onTextDStrikeout", Value);
+		this.sendEvent("asc_onTextDStrikeout", Value);
 	};
 	asc_docs_api.prototype.sync_TextCaps         = function(Value)
 	{
-		this.asc_fireCallback("asc_onTextCaps", Value);
+		this.sendEvent("asc_onTextCaps", Value);
 	};
 	asc_docs_api.prototype.sync_TextSmallCaps    = function(Value)
 	{
-		this.asc_fireCallback("asc_onTextSmallCaps", Value);
+		this.sendEvent("asc_onTextSmallCaps", Value);
 	};
 	asc_docs_api.prototype.sync_TextPosition     = function(Value)
 	{
-		this.asc_fireCallback("asc_onTextPosition", Value);
+		this.sendEvent("asc_onTextPosition", Value);
 	};
 	asc_docs_api.prototype.sync_TextLangCallBack = function(Lang)
 	{
-		this.asc_fireCallback("asc_onTextLanguage", Lang.Val);
+		this.sendEvent("asc_onTextLanguage", Lang.Val);
 	};
 
 	asc_docs_api.prototype.sync_VerticalTextAlign = function(align)
 	{
-		this.asc_fireCallback("asc_onVerticalTextAlign", align);
+		this.sendEvent("asc_onVerticalTextAlign", align);
 	};
 	asc_docs_api.prototype.sync_Vert              = function(vert)
 	{
-		this.asc_fireCallback("asc_onVert", vert);
+		this.sendEvent("asc_onVert", vert);
 	};
 
 	asc_docs_api.prototype.UpdateParagraphProp = function(ParaPr, bParaPr)
@@ -2109,93 +2106,93 @@ background-repeat: no-repeat;\
 	};
 	asc_docs_api.prototype.sync_DocInfoCallback         = function(obj)
 	{
-		this.asc_fireCallback("asc_onDocInfo", new CDocInfoProp(obj));
+		this.sendEvent("asc_onDocInfo", new CDocInfoProp(obj));
 	};
 	asc_docs_api.prototype.sync_GetDocInfoStartCallback = function()
 	{
-		this.asc_fireCallback("asc_onGetDocInfoStart");
+		this.sendEvent("asc_onGetDocInfoStart");
 	};
 	asc_docs_api.prototype.sync_GetDocInfoStopCallback  = function()
 	{
-		this.asc_fireCallback("asc_onGetDocInfoStop");
+		this.sendEvent("asc_onGetDocInfoStop");
 	};
 	asc_docs_api.prototype.sync_GetDocInfoEndCallback   = function()
 	{
-		this.asc_fireCallback("asc_onGetDocInfoEnd");
+		this.sendEvent("asc_onGetDocInfoEnd");
 	};
 	asc_docs_api.prototype.sync_CanUndoCallback         = function(bCanUndo)
 	{
 		if (true === AscCommon.CollaborativeEditing.Is_Fast() && true !== AscCommon.CollaborativeEditing.Is_SingleUser())
 			bCanUndo = false;
 
-		this.asc_fireCallback("asc_onCanUndo", bCanUndo);
+		this.sendEvent("asc_onCanUndo", bCanUndo);
 	};
 	asc_docs_api.prototype.sync_CanRedoCallback         = function(bCanRedo)
 	{
 		if (true === AscCommon.CollaborativeEditing.Is_Fast() && true !== AscCommon.CollaborativeEditing.Is_SingleUser())
 			bCanRedo = false;
 
-		this.asc_fireCallback("asc_onCanRedo", bCanRedo);
+		this.sendEvent("asc_onCanRedo", bCanRedo);
 	};
 
 
 	/*callbacks*/
 	/*asc_docs_api.prototype.sync_CursorLockCallBack = function(isLock){
-	 this.asc_fireCallback("asc_onCursorLock",isLock);
+	 this.sendEvent("asc_onCursorLock",isLock);
 	 }*/
 	asc_docs_api.prototype.sync_UndoCallBack       = function()
 	{
-		this.asc_fireCallback("asc_onUndo");
+		this.sendEvent("asc_onUndo");
 	};
 	asc_docs_api.prototype.sync_RedoCallBack       = function()
 	{
-		this.asc_fireCallback("asc_onRedo");
+		this.sendEvent("asc_onRedo");
 	};
 	asc_docs_api.prototype.sync_CopyCallBack       = function()
 	{
-		this.asc_fireCallback("asc_onCopy");
+		this.sendEvent("asc_onCopy");
 	};
 	asc_docs_api.prototype.sync_CutCallBack        = function()
 	{
-		this.asc_fireCallback("asc_onCut");
+		this.sendEvent("asc_onCut");
 	};
 	asc_docs_api.prototype.sync_PasteCallBack      = function()
 	{
-		this.asc_fireCallback("asc_onPaste");
+		this.sendEvent("asc_onPaste");
 	};
 	asc_docs_api.prototype.sync_ShareCallBack      = function()
 	{
-		this.asc_fireCallback("asc_onShare");
+		this.sendEvent("asc_onShare");
 	};
 	asc_docs_api.prototype.sync_SaveCallBack       = function()
 	{
-		this.asc_fireCallback("asc_onSave");
+		this.sendEvent("asc_onSave");
 	};
 	asc_docs_api.prototype.sync_DownloadAsCallBack = function()
 	{
-		this.asc_fireCallback("asc_onDownload");
+		this.sendEvent("asc_onDownload");
 	};
 
 	asc_docs_api.prototype.sync_AddURLCallback  = function()
 	{
-		this.asc_fireCallback("asc_onAddURL");
+		this.sendEvent("asc_onAddURL");
 	};
 	asc_docs_api.prototype.sync_ErrorCallback   = function(errorID, errorLevel)
 	{
-		this.asc_fireCallback("asc_onError", errorID, errorLevel);
+		this.sendEvent("asc_onError", errorID, errorLevel);
 	};
 	asc_docs_api.prototype.sync_HelpCallback    = function(url)
 	{
-		this.asc_fireCallback("asc_onHelp", url);
+		this.sendEvent("asc_onHelp", url);
 	};
 	asc_docs_api.prototype.sync_UpdateZoom      = function(zoom)
 	{
-		this.asc_fireCallback("asc_onZoom", zoom);
+		this.sendEvent("asc_onZoom", zoom);
 	};
 	asc_docs_api.prototype.ClearPropObjCallback = function(prop)
 	{//колбэк предшествующий приходу свойств объекта, prop а всякий случай
 
-		this.asc_fireCallback("asc_onClearPropObj", prop);
+		this.sendEvent("asc_onClearPropObj", prop);
 	};
 
 
@@ -2213,7 +2210,7 @@ background-repeat: no-repeat;\
 	};
 	asc_docs_api.prototype.sync_ChangeActiveHeaderCallback = function(position, header)
 	{
-		this.asc_fireCallback("asc_onChangeActiveHeader", position, new CHeader(header));
+		this.sendEvent("asc_onChangeActiveHeader", position, new CHeader(header));
 	};
 	asc_docs_api.prototype.sync_ReturnHeadersCallback      = function(headers)
 	{
@@ -2223,7 +2220,7 @@ background-repeat: no-repeat;\
 			_headers[i] = new CHeader(headers[i]);
 		}
 
-		this.asc_fireCallback("asc_onReturnHeaders", _headers);
+		this.sendEvent("asc_onReturnHeaders", _headers);
 	};
 	/*----------------------------------------------------------------*/
 	/*functions for working with search*/
@@ -2292,19 +2289,19 @@ background-repeat: no-repeat;\
 	// returns: CSearchResult
 	asc_docs_api.prototype.sync_SearchFoundCallback = function(obj)
 	{
-		this.asc_fireCallback("asc_onSearchFound", new CSearchResult(obj));
+		this.sendEvent("asc_onSearchFound", new CSearchResult(obj));
 	};
 	asc_docs_api.prototype.sync_SearchStartCallback = function()
 	{
-		this.asc_fireCallback("asc_onSearchStart");
+		this.sendEvent("asc_onSearchStart");
 	};
 	asc_docs_api.prototype.sync_SearchStopCallback  = function()
 	{
-		this.asc_fireCallback("asc_onSearchStop");
+		this.sendEvent("asc_onSearchStop");
 	};
 	asc_docs_api.prototype.sync_SearchEndCallback   = function()
 	{
-		this.asc_fireCallback("asc_onSearchEnd");
+		this.sendEvent("asc_onSearchEnd");
 	};
 	/*----------------------------------------------------------------*/
 	/*functions for working with font*/
@@ -2406,31 +2403,31 @@ background-repeat: no-repeat;\
 	/*callbacks*/
 	asc_docs_api.prototype.sync_BoldCallBack             = function(isBold)
 	{
-		this.asc_fireCallback("asc_onBold", isBold);
+		this.sendEvent("asc_onBold", isBold);
 	};
 	asc_docs_api.prototype.sync_ItalicCallBack           = function(isItalic)
 	{
-		this.asc_fireCallback("asc_onItalic", isItalic);
+		this.sendEvent("asc_onItalic", isItalic);
 	};
 	asc_docs_api.prototype.sync_UnderlineCallBack        = function(isUnderline)
 	{
-		this.asc_fireCallback("asc_onUnderline", isUnderline);
+		this.sendEvent("asc_onUnderline", isUnderline);
 	};
 	asc_docs_api.prototype.sync_StrikeoutCallBack        = function(isStrikeout)
 	{
-		this.asc_fireCallback("asc_onStrikeout", isStrikeout);
+		this.sendEvent("asc_onStrikeout", isStrikeout);
 	};
 	asc_docs_api.prototype.sync_TextPrFontFamilyCallBack = function(FontFamily)
 	{
-		this.asc_fireCallback("asc_onFontFamily", new AscCommon.asc_CTextFontFamily(FontFamily));
+		this.sendEvent("asc_onFontFamily", new AscCommon.asc_CTextFontFamily(FontFamily));
 	};
 	asc_docs_api.prototype.sync_TextPrFontSizeCallBack   = function(FontSize)
 	{
-		this.asc_fireCallback("asc_onFontSize", FontSize);
+		this.sendEvent("asc_onFontSize", FontSize);
 	};
 	asc_docs_api.prototype.sync_PrLineSpacingCallBack    = function(LineSpacing)
 	{
-		this.asc_fireCallback("asc_onLineSpacing", new AscCommon.asc_CParagraphSpacing(LineSpacing));
+		this.sendEvent("asc_onLineSpacing", new AscCommon.asc_CParagraphSpacing(LineSpacing));
 	};
 
 	asc_docs_api.prototype.sync_InitEditorThemes      = function(gui_editor_themes, gui_document_themes)
@@ -2438,13 +2435,13 @@ background-repeat: no-repeat;\
 		this._gui_editor_themes   = gui_editor_themes;
 		this._gui_document_themes = gui_document_themes;
 		if (!this.isViewMode) {
-			this.asc_fireCallback("asc_onInitEditorStyles", [gui_editor_themes, gui_document_themes]);
+			this.sendEvent("asc_onInitEditorStyles", [gui_editor_themes, gui_document_themes]);
 		}
 	};
 	asc_docs_api.prototype.sync_InitEditorTableStyles = function(styles)
 	{
 		if (!this.isViewMode) {
-			this.asc_fireCallback("asc_onInitTableTemplates", styles);
+			this.sendEvent("asc_onInitTableTemplates", styles);
 		}
 	};
 
@@ -2766,17 +2763,17 @@ background-repeat: no-repeat;\
 							}
 							else
 							{
-								oApi.asc_fireCallback("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
+								oApi.sendEvent("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
 							}
 						}
 						else
 						{
-							oApi.asc_fireCallback("asc_onError", mapAscServerErrorToAscError(parseInt(input["data"])), c_oAscError.Level.NoCritical);
+							oApi.sendEvent("asc_onError", mapAscServerErrorToAscError(parseInt(input["data"])), c_oAscError.Level.NoCritical);
 						}
 					}
 					else
 					{
-						oApi.asc_fireCallback("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
+						oApi.sendEvent("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
 					}
 					oApi.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
 				};
@@ -3082,19 +3079,19 @@ background-repeat: no-repeat;\
 	/*callbacks*/
 	asc_docs_api.prototype.sync_VerticalAlign           = function(typeBaseline)
 	{
-		this.asc_fireCallback("asc_onVerticalAlign", typeBaseline);
+		this.sendEvent("asc_onVerticalAlign", typeBaseline);
 	};
 	asc_docs_api.prototype.sync_PrAlignCallBack         = function(value)
 	{
-		this.asc_fireCallback("asc_onPrAlign", value);
+		this.sendEvent("asc_onPrAlign", value);
 	};
 	asc_docs_api.prototype.sync_ListType                = function(NumPr)
 	{
-		this.asc_fireCallback("asc_onListType", new AscCommon.asc_CListType(NumPr));
+		this.sendEvent("asc_onListType", new AscCommon.asc_CListType(NumPr));
 	};
 	asc_docs_api.prototype.sync_TextColor               = function(Color)
 	{
-		this.asc_fireCallback("asc_onTextColor", new AscCommon.CColor(Color.r, Color.g, Color.b));
+		this.sendEvent("asc_onTextColor", new AscCommon.CColor(Color.r, Color.g, Color.b));
 	};
 	asc_docs_api.prototype.sync_TextColor2              = function(unifill)
 	{
@@ -3108,7 +3105,7 @@ background-repeat: no-repeat;\
 			color.asc_putR(_color.R);
 			color.asc_putG(_color.G);
 			color.asc_putB(_color.B);
-			this.asc_fireCallback("asc_onTextColor", color);
+			this.sendEvent("asc_onTextColor", color);
 		}
 		else if (unifill.fill.type == c_oAscFill.FILL_TYPE_GRAD)
 		{
@@ -3117,7 +3114,7 @@ background-repeat: no-repeat;\
 			color.asc_putR(_color.R);
 			color.asc_putG(_color.G);
 			color.asc_putB(_color.B);
-			this.asc_fireCallback("asc_onTextColor", color);
+			this.sendEvent("asc_onTextColor", color);
 		}
 		else
 		{
@@ -3126,36 +3123,36 @@ background-repeat: no-repeat;\
 			color.asc_putR(_color.R);
 			color.asc_putG(_color.G);
 			color.asc_putB(_color.B);
-			this.asc_fireCallback("asc_onTextColor", color);
+			this.sendEvent("asc_onTextColor", color);
 		}
 	};
 	asc_docs_api.prototype.sync_TextHighLight           = function(HighLight)
 	{
-		this.asc_fireCallback("asc_onTextHighLight", new AscCommon.CColor(HighLight.r, HighLight.g, HighLight.b));
+		this.sendEvent("asc_onTextHighLight", new AscCommon.CColor(HighLight.r, HighLight.g, HighLight.b));
 	};
 	asc_docs_api.prototype.sync_ParaStyleName           = function(Name)
 	{
-		this.asc_fireCallback("asc_onParaStyleName", Name);
+		this.sendEvent("asc_onParaStyleName", Name);
 	};
 	asc_docs_api.prototype.sync_ParaSpacingLine         = function(SpacingLine)
 	{
-		this.asc_fireCallback("asc_onParaSpacingLine", new AscCommon.asc_CParagraphSpacing(SpacingLine));
+		this.sendEvent("asc_onParaSpacingLine", new AscCommon.asc_CParagraphSpacing(SpacingLine));
 	};
 	asc_docs_api.prototype.sync_PageBreakCallback       = function(isBreak)
 	{
-		this.asc_fireCallback("asc_onPageBreak", isBreak);
+		this.sendEvent("asc_onPageBreak", isBreak);
 	};
 	asc_docs_api.prototype.sync_KeepLinesCallback       = function(isKeepLines)
 	{
-		this.asc_fireCallback("asc_onKeepLines", isKeepLines);
+		this.sendEvent("asc_onKeepLines", isKeepLines);
 	};
 	asc_docs_api.prototype.sync_ShowParaMarksCallback   = function()
 	{
-		this.asc_fireCallback("asc_onShowParaMarks");
+		this.sendEvent("asc_onShowParaMarks");
 	};
 	asc_docs_api.prototype.sync_SpaceBetweenPrgCallback = function()
 	{
-		this.asc_fireCallback("asc_onSpaceBetweenPrg");
+		this.sendEvent("asc_onSpaceBetweenPrg");
 	};
 	asc_docs_api.prototype.sync_PrPropCallback          = function(prProp)
 	{
@@ -3238,11 +3235,11 @@ background-repeat: no-repeat;\
 
 	asc_docs_api.prototype.sync_DocSizeCallback               = function(width, height)
 	{
-		this.asc_fireCallback("asc_onDocSize", width, height);
+		this.sendEvent("asc_onDocSize", width, height);
 	};
 	asc_docs_api.prototype.sync_PageOrientCallback            = function(isPortrait)
 	{
-		this.asc_fireCallback("asc_onPageOrient", isPortrait);
+		this.sendEvent("asc_onPageOrient", isPortrait);
 	};
 	asc_docs_api.prototype.sync_HeadersAndFootersPropCallback = function(hafProp)
 	{
@@ -3631,11 +3628,11 @@ background-repeat: no-repeat;\
 	/*callbacks*/
 	asc_docs_api.prototype.sync_AddTableCallback            = function()
 	{
-		this.asc_fireCallback("asc_onAddTable");
+		this.sendEvent("asc_onAddTable");
 	};
 	asc_docs_api.prototype.sync_AlignCellCallback           = function(align)
 	{
-		this.asc_fireCallback("asc_onAlignCell", align);
+		this.sendEvent("asc_onAlignCell", align);
 	};
 	asc_docs_api.prototype.sync_TblPropCallback             = function(tblProp)
 	{
@@ -3643,11 +3640,11 @@ background-repeat: no-repeat;\
 	};
 	asc_docs_api.prototype.sync_TblWrapStyleChangedCallback = function(style)
 	{
-		this.asc_fireCallback("asc_onTblWrapStyleChanged", style);
+		this.sendEvent("asc_onTblWrapStyleChanged", style);
 	};
 	asc_docs_api.prototype.sync_TblAlignChangedCallback     = function(style)
 	{
-		this.asc_fireCallback("asc_onTblAlignChanged", style);
+		this.sendEvent("asc_onTblAlignChanged", style);
 	};
 
 	/*----------------------------------------------------------------*/
@@ -3789,17 +3786,17 @@ background-repeat: no-repeat;\
 						}
 						else
 						{
-							t.asc_fireCallback("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
+							t.sendEvent("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
 						}
 					}
 					else
 					{
-						t.asc_fireCallback("asc_onError", mapAscServerErrorToAscError(parseInt(input["data"])), c_oAscError.Level.NoCritical);
+						t.sendEvent("asc_onError", mapAscServerErrorToAscError(parseInt(input["data"])), c_oAscError.Level.NoCritical);
 					}
 				}
 				else
 				{
-					t.asc_fireCallback("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
+					t.sendEvent("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
 				}
 				t.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
 			};
@@ -3991,17 +3988,17 @@ background-repeat: no-repeat;\
 							}
 							else
 							{
-								oApi.asc_fireCallback("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
+								oApi.sendEvent("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
 							}
 						}
 						else
 						{
-							oApi.asc_fireCallback("asc_onError", mapAscServerErrorToAscError(parseInt(input["data"])), c_oAscError.Level.NoCritical);
+							oApi.sendEvent("asc_onError", mapAscServerErrorToAscError(parseInt(input["data"])), c_oAscError.Level.NoCritical);
 						}
 					}
 					else
 					{
-						oApi.asc_fireCallback("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
+						oApi.sendEvent("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
 					}
 					oApi.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
 				};
@@ -4079,7 +4076,7 @@ background-repeat: no-repeat;\
 	/*callbacks*/
 	asc_docs_api.prototype.sync_AddImageCallback = function()
 	{
-		this.asc_fireCallback("asc_onAddImage");
+		this.sendEvent("asc_onAddImage");
 	};
 	asc_docs_api.prototype.sync_ImgPropCallback  = function(imgProp)
 	{
@@ -4192,25 +4189,25 @@ background-repeat: no-repeat;\
 	/*callbacks*/
 	asc_docs_api.prototype.sync_zoomChangeCallback  = function(percent, type)
 	{	//c_oAscZoomType.Current, c_oAscZoomType.FitWidth, c_oAscZoomType.FitPage
-		this.asc_fireCallback("asc_onZoomChange", percent, type);
+		this.sendEvent("asc_onZoomChange", percent, type);
 	};
 	asc_docs_api.prototype.sync_countPagesCallback  = function(count)
 	{
-		this.asc_fireCallback("asc_onCountPages", count);
+		this.sendEvent("asc_onCountPages", count);
 	};
 	asc_docs_api.prototype.sync_currentPageCallback = function(number)
 	{
-		this.asc_fireCallback("asc_onCurrentPage", number);
+		this.sendEvent("asc_onCurrentPage", number);
 	};
 
 	asc_docs_api.prototype.sync_SendThemeColors = function(colors, standart_colors)
 	{
-		this.asc_fireCallback("asc_onSendThemeColors", colors, standart_colors);
+		this.sendEvent("asc_onSendThemeColors", colors, standart_colors);
 	};
 
 	asc_docs_api.prototype.sync_SendThemeColorSchemes = function(param)
 	{
-		this.asc_fireCallback("asc_onSendThemeColorSchemes", param);
+		this.sendEvent("asc_onSendThemeColorSchemes", param);
 	};
 
 	asc_docs_api.prototype.ChangeColorScheme = function(index_scheme)
@@ -4293,7 +4290,7 @@ background-repeat: no-repeat;\
 		if (this.WordControl.IsFocus != value)
 		{
 			this.WordControl.IsFocus = value;
-			this.asc_fireCallback("asc_onEnableKeyEventsChanged", value);
+			this.sendEvent("asc_onEnableKeyEventsChanged", value);
 		}
 
 		if (isFromInput !== true && AscCommon.g_inputContext)
@@ -4481,7 +4478,7 @@ background-repeat: no-repeat;\
 
 	asc_docs_api.prototype.sync_RemoveComment = function(Id)
 	{
-		this.asc_fireCallback("asc_onRemoveComment", Id);
+		this.sendEvent("asc_onRemoveComment", Id);
 	};
 
 	asc_docs_api.prototype.sync_AddComment = function(Id, CommentData)
@@ -4490,7 +4487,7 @@ background-repeat: no-repeat;\
 		{
 			var AscCommentData = new asc_CCommentData(CommentData);
 			AscCommentData.asc_putQuoteText("");
-			this.asc_fireCallback("asc_onAddComment", Id, AscCommentData);
+			this.sendEvent("asc_onAddComment", Id, AscCommentData);
 		}
 	};
 
@@ -4503,34 +4500,34 @@ background-repeat: no-repeat;\
 		 }
 		 */
 		// TODO: Переделать на нормальный массив
-		this.asc_fireCallback("asc_onShowComment", [Id], X, Y);
+		this.sendEvent("asc_onShowComment", [Id], X, Y);
 	};
 
 	asc_docs_api.prototype.sync_HideComment = function()
 	{
-		this.asc_fireCallback("asc_onHideComment");
+		this.sendEvent("asc_onHideComment");
 	};
 
 	asc_docs_api.prototype.sync_UpdateCommentPosition = function(Id, X, Y)
 	{
 		// TODO: Переделать на нормальный массив
-		this.asc_fireCallback("asc_onUpdateCommentPosition", [Id], X, Y);
+		this.sendEvent("asc_onUpdateCommentPosition", [Id], X, Y);
 	};
 
 	asc_docs_api.prototype.sync_ChangeCommentData = function(Id, CommentData)
 	{
 		var AscCommentData = new asc_CCommentData(CommentData);
-		this.asc_fireCallback("asc_onChangeCommentData", Id, AscCommentData);
+		this.sendEvent("asc_onChangeCommentData", Id, AscCommentData);
 	};
 
 	asc_docs_api.prototype.sync_LockComment = function(Id, UserId)
 	{
-		this.asc_fireCallback("asc_onLockComment", Id, UserId);
+		this.sendEvent("asc_onLockComment", Id, UserId);
 	};
 
 	asc_docs_api.prototype.sync_UnLockComment = function(Id)
 	{
-		this.asc_fireCallback("asc_onUnLockComment", Id);
+		this.sendEvent("asc_onUnLockComment", Id);
 	};
 
 	// работа с шрифтами
@@ -4781,7 +4778,7 @@ background-repeat: no-repeat;\
 
 				this.sync_InitEditorThemes(this.ThemeLoader.Themes.EditorThemes, this.ThemeLoader.Themes.DocumentThemes);
 
-				this.asc_fireCallback("asc_onPresentationSize", presentation.Width, presentation.Height);
+				this.sendEvent("asc_onPresentationSize", presentation.Width, presentation.Height);
 
 				this.WordControl.GoToPage(0);
 				bIsScroll = true;
@@ -4812,7 +4809,7 @@ background-repeat: no-repeat;\
 				}
 			}
 		}
-		this.asc_fireCallback("asc_onDocumentContentReady");
+		this.sendEvent("asc_onDocumentContentReady");
 		this.isApplyChangesOnOpen = false;
 
 		this.WordControl.InitControl();
@@ -5111,12 +5108,12 @@ background-repeat: no-repeat;\
 
 	asc_docs_api.prototype.sync_MouseMoveStartCallback = function()
 	{
-		this.asc_fireCallback("asc_onMouseMoveStart");
+		this.sendEvent("asc_onMouseMoveStart");
 	};
 
 	asc_docs_api.prototype.sync_MouseMoveEndCallback = function()
 	{
-		this.asc_fireCallback("asc_onMouseMoveEnd");
+		this.sendEvent("asc_onMouseMoveEnd");
 	};
 
 	asc_docs_api.prototype.sync_MouseMoveCallback = function(Data)
@@ -5155,17 +5152,17 @@ background-repeat: no-repeat;\
 				}
 			}
 		}
-		this.asc_fireCallback("asc_onMouseMove", Data);
+		this.sendEvent("asc_onMouseMove", Data);
 	};
 
 	asc_docs_api.prototype.sync_ShowForeignCursorLabel = function(UserId, X, Y, Color)
 	{
 
-		this.asc_fireCallback("asc_onShowForeignCursorLabel", UserId, X, Y, new AscCommon.CColor(Color.r, Color.g, Color.b, 255));
+		this.sendEvent("asc_onShowForeignCursorLabel", UserId, X, Y, new AscCommon.CColor(Color.r, Color.g, Color.b, 255));
 	};
 	asc_docs_api.prototype.sync_HideForeignCursorLabel = function(UserId)
 	{
-		this.asc_fireCallback("asc_onHideForeignCursorLabel", UserId);
+		this.sendEvent("asc_onHideForeignCursorLabel", UserId);
 	};
 
 	asc_docs_api.prototype.ShowThumbnails           = function(bIsShow)
@@ -5196,7 +5193,7 @@ background-repeat: no-repeat;\
 		if (0 == this.WordControl.Splitter1Pos)
 			bIsShow = false;
 
-		this.asc_fireCallback("asc_onThumbnailsShow", bIsShow);
+		this.sendEvent("asc_onThumbnailsShow", bIsShow);
 	};
 
 
@@ -5280,20 +5277,20 @@ background-repeat: no-repeat;\
 
 	asc_docs_api.prototype.sync_HyperlinkClickCallback = function(Url)
 	{
-		this.asc_fireCallback("asc_onHyperlinkClick", Url);
+		this.sendEvent("asc_onHyperlinkClick", Url);
 	};
 
 	asc_docs_api.prototype.sync_CanAddHyperlinkCallback = function(bCanAdd)
 	{
 		//if ( true === CollaborativeEditing.Get_GlobalLock() )
-		//    this.asc_fireCallback("asc_onCanAddHyperlink", false);
+		//    this.sendEvent("asc_onCanAddHyperlink", false);
 		//else
-		this.asc_fireCallback("asc_onCanAddHyperlink", bCanAdd);
+		this.sendEvent("asc_onCanAddHyperlink", bCanAdd);
 	};
 
 	asc_docs_api.prototype.sync_DialogAddHyperlink = function()
 	{
-		this.asc_fireCallback("asc_onDialogAddHyperlink");
+		this.sendEvent("asc_onDialogAddHyperlink");
 	};
 
 
@@ -5441,7 +5438,7 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype.sync_PaintFormatCallback = function(value)
 	{
 		this.isPaintFormat = value;
-		return this.asc_fireCallback("asc_onPaintFormatChanged", value);
+		return this.sendEvent("asc_onPaintFormatChanged", value);
 	};
 	asc_docs_api.prototype.ClearFormating           = function()
 	{
@@ -5584,7 +5581,7 @@ background-repeat: no-repeat;\
 			return;
 		}
 
-		this.asc_fireCallback("asc_onHyperlinkClick", Url);
+		this.sendEvent("asc_onHyperlinkClick", Url);
 	};
 
 	asc_docs_api.prototype.UpdateInterfaceState = function()
@@ -5749,11 +5746,11 @@ background-repeat: no-repeat;\
 
 	asc_docs_api.prototype.sync_endDemonstration          = function()
 	{
-		this.asc_fireCallback("asc_onEndDemonstration");
+		this.sendEvent("asc_onEndDemonstration");
 	};
 	asc_docs_api.prototype.sync_DemonstrationSlideChanged = function(slideNum)
 	{
-		this.asc_fireCallback("asc_onDemonstrationSlideChanged", slideNum);
+		this.sendEvent("asc_onDemonstrationSlideChanged", slideNum);
 	};
 
 	asc_docs_api.prototype.StartDemonstration = function(div_id, slidestart_num)
@@ -5866,7 +5863,7 @@ background-repeat: no-repeat;\
 
 	asc_docs_api.prototype.sync_EndAddShape = function()
 	{
-		editor.asc_fireCallback("asc_onEndAddShape");
+		editor.sendEvent("asc_onEndAddShape");
 		if (this.WordControl.m_oDrawingDocument.m_sLockedCursorType == "crosshair")
 		{
 			this.WordControl.m_oDrawingDocument.UnlockCursorType();
@@ -5907,7 +5904,7 @@ background-repeat: no-repeat;\
 
 	asc_docs_api.prototype.sync_closeChartEditor = function()
 	{
-		this.asc_fireCallback("asc_onCloseChartEditor");
+		this.sendEvent("asc_onCloseChartEditor");
 	};
 
 	//-----------------------------------------------------------------
@@ -5951,13 +5948,13 @@ background-repeat: no-repeat;\
 
 	asc_docs_api.prototype.sync_ContextMenuCallback = function(Data)
 	{
-		this.asc_fireCallback("asc_onContextMenu", Data);
+		this.sendEvent("asc_onContextMenu", Data);
 	};
 
 	asc_docs_api.prototype._onNeedParams  = function(data, opt_isPassword)
 	{
 		if (opt_isPassword) {
-			this.asc_fireCallback("asc_onAdvancedOptions", new AscCommon.asc_CAdvancedOptions(c_oAscAdvancedOptionsID.DRM), c_oAscAdvancedOptionsAction.Open);
+			this.sendEvent("asc_onAdvancedOptions", new AscCommon.asc_CAdvancedOptions(c_oAscAdvancedOptionsID.DRM), c_oAscAdvancedOptionsAction.Open);
 		}
 	};
 
@@ -5968,7 +5965,7 @@ background-repeat: no-repeat;\
 		{
 			if (error || !result.bSerFormat)
 			{
-				t.asc_fireCallback("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.Critical);
+				t.sendEvent("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.Critical);
 				return;
 			}
 			t.onEndLoadFile(result);
@@ -6091,7 +6088,7 @@ background-repeat: no-repeat;\
 			}
 			if (c_oAscError.ID.No != error)
 			{
-				t.asc_fireCallback("asc_onError", error, c_oAscError.Level.NoCritical);
+				t.sendEvent("asc_onError", error, c_oAscError.Level.NoCritical);
 			}
 			if (actionType)
 			{
@@ -6488,7 +6485,6 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype['asc_getDocumentName']                 = asc_docs_api.prototype.asc_getDocumentName;
 	asc_docs_api.prototype['asc_registerCallback']                = asc_docs_api.prototype.asc_registerCallback;
 	asc_docs_api.prototype['asc_unregisterCallback']              = asc_docs_api.prototype.asc_unregisterCallback;
-	asc_docs_api.prototype['asc_fireCallback']                    = asc_docs_api.prototype.asc_fireCallback;
 	asc_docs_api.prototype['asc_checkNeedCallback']               = asc_docs_api.prototype.asc_checkNeedCallback;
 	asc_docs_api.prototype['get_TextProps']                       = asc_docs_api.prototype.get_TextProps;
 	asc_docs_api.prototype['asc_getPropertyEditorShapes']         = asc_docs_api.prototype.asc_getPropertyEditorShapes;

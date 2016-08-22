@@ -2099,7 +2099,7 @@ function CEditorPage(api)
 				if (this.VerticalScrollOnMouseUp.SlideNum >= this.m_oDrawingDocument.SlidesCount)
 					this.VerticalScrollOnMouseUp.SlideNum = this.m_oDrawingDocument.SlidesCount - 1;
 
-				this.m_oApi.asc_fireCallback("asc_onPaintSlideNum", this.VerticalScrollOnMouseUp.SlideNum);
+				this.m_oApi.sendEvent("asc_onPaintSlideNum", this.VerticalScrollOnMouseUp.SlideNum);
 				return;
 			}
 
@@ -2167,7 +2167,7 @@ function CEditorPage(api)
 		else
 		{
 			this.StartVerticalScroll = false;
-			this.m_oApi.asc_fireCallback("asc_onEndPaintSlideNum");
+			this.m_oApi.sendEvent("asc_onEndPaintSlideNum");
 
 			this.m_oScrollVerApi.scrollByY(0, true);
 		}
@@ -2337,7 +2337,7 @@ function CEditorPage(api)
 			}
 		}
 
-		this.m_oApi.asc_fireCallback("asc_onUpdateScrolls", this.m_dDocumentWidth, this.m_dDocumentHeight);
+		this.m_oApi.sendEvent("asc_onUpdateScrolls", this.m_dDocumentWidth, this.m_dDocumentHeight);
 
 		this.m_dScrollX_max = this.m_bIsHorScrollVisible ? this.m_oScrollHorApi.getMaxScrolledX() : 0;
 		this.m_dScrollY_max = this.m_oScrollVerApi.getMaxScrolledY();
@@ -2728,11 +2728,11 @@ function CEditorPage(api)
 		if (this.m_oApi.isMobileVersion || this.m_oApi.isViewMode)
 		{
 			var lPage = this.m_oApi.GetCurrentVisiblePage();
-			this.m_oApi.asc_fireCallback("asc_onCurrentVisiblePage", this.m_oApi.GetCurrentVisiblePage());
+			this.m_oApi.sendEvent("asc_onCurrentVisiblePage", this.m_oApi.GetCurrentVisiblePage());
 		}
 
 		if (this.m_bDocumentPlaceChangedEnabled)
-			this.m_oApi.asc_fireCallback("asc_onDocumentPlaceChanged");
+			this.m_oApi.sendEvent("asc_onDocumentPlaceChanged");
 	};
 
 	this.OnPaint = function()
@@ -3313,8 +3313,8 @@ function CEditorPage(api)
 				arr[i].Height = master.sldLayoutLst[i].Height64;
 			}
 
-			editor.asc_fireCallback("asc_onUpdateLayout", arr);
-			editor.asc_fireCallback("asc_onUpdateThemeIndex", this.MasterLayouts.ThemeIndex);
+			editor.sendEvent("asc_onUpdateLayout", arr);
+			editor.sendEvent("asc_onUpdateThemeIndex", this.MasterLayouts.ThemeIndex);
 
 			this.m_oDrawingDocument.SendThemeColorScheme();
 		}
@@ -3348,7 +3348,7 @@ function CEditorPage(api)
 
 		this.Thumbnails.LockMainObjType = true;
 		this.StartVerticalScroll        = false;
-		this.m_oApi.asc_fireCallback("asc_onEndPaintSlideNum");
+		this.m_oApi.sendEvent("asc_onEndPaintSlideNum");
 
 		var _bIsUpdate = (drDoc.SlideCurrent != lPageNum);
 

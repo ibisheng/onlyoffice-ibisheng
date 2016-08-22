@@ -2794,7 +2794,7 @@ function CEditorPage(api)
 			this.m_oScrollVerApi = this.m_oScrollVer_;
 		}
 
-		this.m_oApi.asc_fireCallback("asc_onUpdateScrolls", this.m_dDocumentWidth, this.m_dDocumentHeight);
+		this.m_oApi.sendEvent("asc_onUpdateScrolls", this.m_dDocumentWidth, this.m_dDocumentHeight);
 
 		this.m_dScrollX_max = this.m_oScrollHorApi.getMaxScrolledX();
 		this.m_dScrollY_max = this.m_oScrollVerApi.getMaxScrolledY();
@@ -3315,17 +3315,17 @@ function CEditorPage(api)
 		if ((this.m_oApi.isMobileVersion || this.m_oApi.isViewMode) && (!window["NATIVE_EDITOR_ENJINE"]))
 		{
 			var lPage = this.m_oApi.GetCurrentVisiblePage();
-			this.m_oApi.asc_fireCallback("asc_onCurrentVisiblePage", this.m_oApi.GetCurrentVisiblePage());
+			this.m_oApi.sendEvent("asc_onCurrentVisiblePage", this.m_oApi.GetCurrentVisiblePage());
 
 			if (null != this.m_oDrawingDocument.m_oDocumentRenderer)
 			{
 				this.m_oDrawingDocument.m_lCurrentPage = lPage;
-				this.m_oApi.asc_fireCallback("asc_onCurrentPage", lPage);
+				this.m_oApi.sendEvent("asc_onCurrentPage", lPage);
 			}
 		}
 
 		if (this.m_bDocumentPlaceChangedEnabled)
-			this.m_oApi.asc_fireCallback("asc_onDocumentPlaceChanged");
+			this.m_oApi.sendEvent("asc_onDocumentPlaceChanged");
 	};
 
 	this.OnPaint = function()
@@ -3799,7 +3799,7 @@ function CEditorPage(api)
 			}
 		}
 
-		oWordControl.m_oApi.asc_fireCallback("asc_onPaintTimer");
+		oWordControl.m_oApi.sendEvent("asc_onPaintTimer");
 		//window.requestAnimationFrame(oWordControl.onTimerScroll2);
 	};
 	this.onTimerScroll2          = function(is_no_timer)

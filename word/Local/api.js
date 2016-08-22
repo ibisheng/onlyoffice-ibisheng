@@ -160,7 +160,7 @@ window["DesktopOfflineAppDocumentApplyChanges"] = function(_changes)
 Asc['asc_docs_api'].prototype.SetDocumentModified = function(bValue)
 {
     this.isDocumentModify = bValue;
-    this.asc_fireCallback("asc_onDocumentModifiedChanged");
+    this.sendEvent("asc_onDocumentModifiedChanged");
 
     if (undefined !== window["AscDesktopEditor"])
     {

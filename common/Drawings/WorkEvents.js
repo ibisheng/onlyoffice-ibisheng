@@ -925,7 +925,7 @@
 
 			check_MouseDownEvent(e.touches ? e.touches[0] : e, true);
 			global_mouseEvent.LockMouse();
-			this.HtmlPage.m_oApi.asc_fireCallback("asc_onHidePopMenu");
+			this.HtmlPage.m_oApi.sendEvent("asc_onHidePopMenu");
 
 			this.ScrollH = this.HtmlPage.m_dScrollX;
 			this.ScrollV = this.HtmlPage.m_dScrollY;
@@ -1611,7 +1611,7 @@
 
 						this.LogicDocument.Update_CursorType(pos.X, pos.Y, pos.Page, global_mouseEvent);
 
-						this.HtmlPage.m_oApi.asc_fireCallback("asc_onTapEvent", e);
+						this.HtmlPage.m_oApi.sendEvent("asc_onTapEvent", e);
 					}
 					else
 					{
@@ -1898,7 +1898,7 @@
 
 					if (!this.MoveAfterDown)
 					{
-						this.HtmlPage.m_oApi.asc_fireCallback("asc_onTapEvent", e);
+						this.HtmlPage.m_oApi.sendEvent("asc_onTapEvent", e);
 					}
 					break;
 				}
@@ -2019,7 +2019,7 @@
 			var that             = this;
 			that.ShowMenuTimerId = setTimeout(function()
 			{
-				that.HtmlPage.m_oApi.asc_fireCallback("asc_onShowPopMenu", x, y);
+				that.HtmlPage.m_oApi.sendEvent("asc_onShowPopMenu", x, y);
 			}, 500);
 		}
 
@@ -2837,7 +2837,7 @@
 			this.DrawingDocument = ctrl.m_oDrawingDocument;
 
 			this.iScroll = new AscCommon.CTouchScroll(ctrl, {bounce : true}, this.HtmlPage.ReaderModeDiv);
-			this.HtmlPage.m_oApi.asc_fireCallback("asc_onHidePopMenu");
+			this.HtmlPage.m_oApi.sendEvent("asc_onHidePopMenu");
 		}
 
 		this.onTouchStart = function(e)
@@ -2860,7 +2860,7 @@
 
 			if (this.bIsMoveAfterDown === false)
 			{
-				this.HtmlPage.m_oApi.asc_fireCallback("asc_onTapEvent", e);
+				this.HtmlPage.m_oApi.sendEvent("asc_onTapEvent", e);
 			}
 		}
 

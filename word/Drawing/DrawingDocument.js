@@ -2166,7 +2166,7 @@ function CDrawingDocument()
     {
         if (!this.m_oWordControl.MobileTouchManager)
             this.TableOutlineDr.TableOutline = null;
-        editor.asc_fireCallback("asc_onDocumentChanged");
+        editor.sendEvent("asc_onDocumentChanged");
         if (true === this.m_bIsSearching)
         {
             this.SearchClear();
@@ -2267,7 +2267,7 @@ function CDrawingDocument()
         {
             //this.m_oWordControl.m_oLogicDocument.RecalculateCurPos();
             this.m_lCurrentPage = this.m_oWordControl.m_oLogicDocument.Get_CurPage();
-			this.m_oWordControl.m_oApi.asc_fireCallback("asc_onEndCalculate");
+			this.m_oWordControl.m_oApi.sendEvent("asc_onEndCalculate");
         }
 
         if (-1 != this.m_lCurrentPage)

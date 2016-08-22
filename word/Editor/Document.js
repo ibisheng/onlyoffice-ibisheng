@@ -11111,7 +11111,7 @@ CDocument.prototype.GetColumnSize = function()
 };
 CDocument.prototype.private_OnSelectionEnd = function()
 {
-	this.Api.asc_fireCallback("asc_onSelectionEnd");
+	this.Api.sendEvent("asc_onSelectionEnd");
 };
 CDocument.prototype.AddPageCount = function()
 {

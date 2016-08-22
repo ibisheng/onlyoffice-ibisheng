@@ -3449,7 +3449,7 @@ CPresentation.prototype =
                 if(this.bNeedUpdateChartPreview)
                 {
                     editor.chartPreviewManager.clearPreviews();
-                    editor.asc_fireCallback("asc_onUpdateChartStyles");
+                    editor.sendEvent("asc_onUpdateChartStyles");
                     this.bNeedUpdateChartPreview = false;
                 }
                 editor.sync_ImgPropCallback(drawing_props.chartProps);
@@ -3510,11 +3510,11 @@ CPresentation.prototype =
         this.Document_UpdateRulersState();
 
         this.Document_UpdateCanAddHyperlinkState();
-        editor.asc_fireCallback("asc_onPresentationSize", this.Width, this.Height);
-        editor.asc_fireCallback("asc_canIncreaseIndent", this.Can_IncreaseParagraphLevel(true));
-        editor.asc_fireCallback("asc_canDecreaseIndent", this.Can_IncreaseParagraphLevel(false));
-        editor.asc_fireCallback("asc_onCanGroup", this.canGroup());
-        editor.asc_fireCallback("asc_onCanUnGroup", this.canUnGroup());
+        editor.sendEvent("asc_onPresentationSize", this.Width, this.Height);
+        editor.sendEvent("asc_canIncreaseIndent", this.Can_IncreaseParagraphLevel(true));
+        editor.sendEvent("asc_canDecreaseIndent", this.Can_IncreaseParagraphLevel(false));
+        editor.sendEvent("asc_onCanGroup", this.canGroup());
+        editor.sendEvent("asc_onCanUnGroup", this.canUnGroup());
     },
 
     changeBackground: function(bg, arr_ind, bNoCreatePoint)
@@ -4070,7 +4070,7 @@ CPresentation.prototype =
                 this.Width = Data.oldW;
                 this.Height = Data.oldH;
                 this.changeSlideSizeFunction(this.Width, this.Height);
-                editor.asc_fireCallback("asc_onPresentationSize", this.Width, this.Height);
+                editor.sendEvent("asc_onPresentationSize", this.Width, this.Height);
 
                 break;
             }
@@ -4124,7 +4124,7 @@ CPresentation.prototype =
                 this.Width = Data.newW;
                 this.Height = Data.newH;
                 this.changeSlideSizeFunction(this.Width, this.Height);
-                editor.asc_fireCallback("asc_onPresentationSize", this.Width, this.Height);
+                editor.sendEvent("asc_onPresentationSize", this.Width, this.Height);
                 break;
             }
             case AscDFH.historyitem_Presentation_AddSlideMaster:
@@ -4930,7 +4930,7 @@ CPresentation.prototype =
                 AscCommon.CollaborativeEditing.ScaleX = kw;
                 AscCommon.CollaborativeEditing.ScaleY = kh;
                 this.changeSlideSizeFunction(this.Width, this.Height);
-                editor.asc_fireCallback("asc_onPresentationSize", this.Width, this.Height);
+                editor.sendEvent("asc_onPresentationSize", this.Width, this.Height);
                 break;
             }
             case AscDFH.historyitem_Presentation_AddSlideMaster:

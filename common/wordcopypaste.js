@@ -1811,7 +1811,7 @@ function sendImgUrls(api, images, callback, bExcel) {
     }
     if ( c_oAscError.ID.No !== nError ) {
       if(!bExcel)
-        api.asc_fireCallback("asc_onError", nError, c_oAscError.Level.NoCritical);
+        api.sendEvent("asc_onError", nError, c_oAscError.Level.NoCritical);
       else
         api.handlers.trigger("asc_onError", nError, c_oAscError.Level.NoCritical);
     }
