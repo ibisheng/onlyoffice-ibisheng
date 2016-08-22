@@ -909,6 +909,8 @@ function CDocumentRecalcInfo()
     this.ParaMath                  = null;
 
     this.FootnoteReference         = null;    // Ссылка на сноску, которую мы пересчитываем
+    this.FootnotePage              = 0;
+    this.FootnoteColumn            = 0;
 
     this.AdditionalInfo            = null;
 }
@@ -933,6 +935,8 @@ CDocumentRecalcInfo.prototype =
         this.ParaMath                  = null;
 
         this.FootnoteReference         = null;
+        this.FootnotePage              = 0;
+        this.FootnoteColumn            = 0;
     },
 
     Can_RecalcObject : function()
@@ -1046,22 +1050,23 @@ CDocumentRecalcInfo.prototype =
         this.FrameRecalc = Value;
     },
 
-    Set_FootnoteReference : function(FootnoteReference, PageIndex)
+    Set_FootnoteReference : function(oFootnoteReference, nPageAbs, nColumnAbs)
     {
-        this.FootnoteReference = FootnoteReference;
-        this.FlowObjectPage    = PageIndex;
+        this.FootnoteReference = oFootnoteReference;
+        this.FlowObjectPage    = nPageAbs;
     },
 
-    Check_FootnoteReference : function(FootnoteReference)
+    Check_FootnoteReference : function(oFootnoteReference)
     {
-        return (this.FootnoteReference === FootnoteReference ? true : false);
+        return (this.FootnoteReference === oFootnoteReference ? true : false);
     },
 
     Reset_FootnoteReference : function()
     {
         this.FootnoteReference         = null;
-        this.FlowObjectPage            = 0;
-        this.FlowObjectPageBreakBefore = false;
+		this.FootnotePage              = 0;
+		this.FootnoteColumn            = 0;
+		this.FlowObjectPageBreakBefore = false;
     }
 };
 
@@ -11237,12 +11242,14 @@ CDocument.prototype.Begin_CompositeInput = function()
 		}
 
 		this.CompositeInput = {
-			Run    : oRun,
-			Pos    : oRun.State.ContentPos,
-			Length : 0
+			Run     : oRun,
+			Pos     : oRun.State.ContentPos,
+			Length  : 0,
+			CanUndo : true
 		};
 
 		oRun.Set_CompositeInput(this.CompositeInput);
+
 		return true;
 	}
 
@@ -11266,7 +11273,8 @@ CDocument.prototype.Replace_CompositeText = function(arrCharCodes)
 	this.Document_UpdateSelectionState();
 	this.Document_UpdateUndoRedoState();
 
-	this.History.Check_UninonLastPoints();
+	if (!this.History.Check_UninonLastPoints())
+		this.CompositeInput.CanUndo = false;
 };
 CDocument.prototype.Set_CursorPosInCompositeText = function(nPos)
 {
@@ -11298,15 +11306,14 @@ CDocument.prototype.End_CompositeInput = function()
 	
 	var oRun = this.CompositeInput.Run;
 	oRun.Set_CompositeInput(null);
-	this.CompositeInput = null;
-
-	this.History.Check_UninonLastPoints();
 	
-	if (0 === nLen && true === this.History.CanRemoveLastPoint())
+	if (0 === nLen && true === this.History.CanRemoveLastPoint() && true === this.CompositeInput.CanUndo)
 	{
 		this.Document_Undo();
 		this.History.Clear_Redo();
 	}
+
+	this.CompositeInput = null;
 
 	this.Document_UpdateInterfaceState();
 
