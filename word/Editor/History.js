@@ -659,7 +659,7 @@ CHistory.prototype =
         var Point2 = this.Points[this.Points.length - 1];
 
         // Не объединяем слова больше 63 элементов
-        if ( Point1.Items.length > 63 )
+        if (Point1.Items.length > 63 && AscDFH.historydescription_Document_AddLetterUnion === Point1.Description)
             return;
 
         var StartIndex1 = 0;
