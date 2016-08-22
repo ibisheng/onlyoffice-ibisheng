@@ -780,6 +780,7 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype.InitViewer = function()
 	{
 		this.WordControl.m_oDrawingDocument.m_oDocumentRenderer = new AscCommonWord.CDocMeta();
+		this.WordControl.m_oDrawingDocument.showTarget(false);
 	};
 
 	asc_docs_api.prototype.OpenDocument = function(url, gObject)
