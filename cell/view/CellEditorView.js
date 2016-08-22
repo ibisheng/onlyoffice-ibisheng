@@ -2715,6 +2715,19 @@
 		}
 		this.replaceText(this.beginCompositePos, this.compositeLength, newText);
 		this.compositeLength = newText.length;
+
+		var tmpBegin = this.selectionBegin, tmpEnd = this.selectionEnd;
+
+		this.selectionBegin = this.beginCompositePos;
+		this.selectionEnd = this.beginCompositePos + this.compositeLength;
+		this.setTextStyle('u', Asc.EUnderline.underlineSingle);
+
+		this.selectionBegin = tmpBegin;
+		this.selectionEnd = tmpEnd;
+
+		// Обновляем выделение
+		this._cleanSelection();
+		this._drawSelection();
 	};
 	CellEditor.prototype.End_CompositeInput = function () {
 		var tmpBegin = this.selectionBegin, tmpEnd = this.selectionEnd;
