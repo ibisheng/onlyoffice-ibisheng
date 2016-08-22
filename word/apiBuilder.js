@@ -4088,6 +4088,14 @@
         return "presetColor"
     };
 
+    /**
+     * Get the type of this class.
+     * @returns {"bullet"}
+     */
+    ApiBullet.prototype.GetClassType = function()
+    {
+        return "bullet";
+    };
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Export
@@ -4348,6 +4356,8 @@
     ApiSchemeColor.prototype["GetClassType"]         = ApiSchemeColor.prototype.GetClassType;
 
     ApiPresetColor.prototype["GetClassType"]         = ApiPresetColor.prototype.GetClassType;
+
+    ApiBullet.prototype["GetClassType"]              = ApiBullet.prototype.GetClassType;
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Private area
