@@ -1785,6 +1785,17 @@ function trimString( str ){
     return str.replace(/^\s+|\s+$/g, '') ;
 }
 function sendImgUrls(api, images, callback, bExcel) {
+
+  if (window["AscDesktopEditor"])
+  {
+    // correct local images
+    for (var nIndex = images.length - 1; nIndex >= 0; nIndex--)
+    {
+      if (0 == images[nIndex].indexOf("file:/"))
+        images[nIndex] = window["AscDesktopEditor"]["GetImageBase64"](images[nIndex]);
+    }
+  }
+
   var rData = {"id": api.documentId, "c": "imgurls", "vkey": api.documentVKey, "userid":  api.documentUserId, "saveindex": g_oDocumentUrls.getMaxIndex(), "data": images};
   api.sync_StartAction(Asc.c_oAscAsyncActionType.BlockInteraction, Asc.c_oAscAsyncAction.LoadImage);
 
