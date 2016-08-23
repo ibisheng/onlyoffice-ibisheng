@@ -111,7 +111,7 @@ var c_oAscError = Asc.c_oAscError;
 
 window["Asc"]['spreadsheet_api'].prototype.asc_setAdvancedOptions = function(idOption, option) 
 {
-	if (c_oAscAdvancedOptionsID.CSV === idOption) {
+	if (window["Asc"].c_oAscAdvancedOptionsID.CSV === idOption) {
 		window["AscDesktopEditor"]["SetAdvancedOptions"]("" + option.asc_getCodePage(), "" + option.asc_getDelimiter());
 	}
 };
