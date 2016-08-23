@@ -13285,6 +13285,13 @@
             //add total row
             rangeUpTable =
               new Asc.Range(tablePart.Ref.c1, tablePart.Ref.r2 + 1, tablePart.Ref.c2, tablePart.Ref.r2 + 1);
+			
+			//add total table if down another format table
+			if(ws.autoFilters._isPartTablePartsUnderRange(tablePart.Ref)){
+				ws.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterChangeFormatTableError,
+				  c_oAscError.Level.NoCritical);
+				return false;
+			}
         }
 
         if (rangeUpTable && this.model.autoFilters._isEmptyRange(rangeUpTable, 0) &&
