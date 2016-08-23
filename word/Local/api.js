@@ -83,7 +83,7 @@ window["DesktopOfflineAppDocumentEndLoad"] = function(_url, _data)
 
 Asc['asc_docs_api'].prototype.asc_setAdvancedOptions = function(idOption, option) 
 {
-	if (window["Asc"].c_oAscAdvancedOptionsID.CSV === idOption) {
+	if (window["Asc"].c_oAscAdvancedOptionsID.TXT === idOption) {
 		window["AscDesktopEditor"]["SetAdvancedOptions"]("" + option.asc_getCodePage());
 	}
 };
