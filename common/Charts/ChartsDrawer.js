@@ -8057,7 +8057,17 @@ drawPieChart.prototype =
 		
 		var path;
 		if(this.cChartDrawer.nDimensionCount === 3)
-			path = this.paths.series[this.paths.series.length - 1][val].ArrPathCommand;
+		{
+			//TODO переделать на idx
+			if(!this.paths.series[this.paths.series.length - 1][val])
+			{
+				return;
+			}
+			else
+			{
+				path = this.paths.series[this.paths.series.length - 1][val].ArrPathCommand;
+			}
+		}
 		else
 			path = this.paths.series[val].ArrPathCommand;
 		
