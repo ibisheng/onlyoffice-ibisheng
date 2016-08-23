@@ -1499,7 +1499,7 @@
 					var oldFilter = null;
 					if(activeRange.c1 <= ref.c1 && activeRange.c2 >= ref.c2)
 					{
-						if(activeRange.r1 < ref.r1)//until
+						if(activeRange.r1 <= ref.r1)//until
 						{
 							oldFilter = filter.clone(null);
 							
