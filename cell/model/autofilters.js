@@ -2562,7 +2562,7 @@
 					{
 						var table = worksheet.TableParts[i];
 						var intersection = range.intersection(table.Ref);
-						if(intersection.r1 === table.Ref.r1 + 1 && intersection.r2 >= table.Ref.r2)
+						if(null !== intersection && intersection.r1 === table.Ref.r1 + 1 && intersection.r2 >= table.Ref.r2)
 						{
 							range.r1++;
 							
