@@ -33,11 +33,10 @@
 "use strict";
 
 (/**
- * @param {jQuery} $
  * @param {Window} window
  * @param {undefined} undefined
  */
-  function($, window, undefined) {
+  function(window, undefined) {
 
 
   /*
@@ -430,8 +429,6 @@
           return self._onGraphicObjectWindowKeyPress.apply(self, arguments);
         }, "getGraphicsInfo": function () {
           return self._onGetGraphicsInfo.apply(self, arguments);
-        }, "getSelectedGraphicObjects": function () {
-          return self._onGetSelectedGraphicObjects.apply(self, arguments);
         }, "updateSelectionShape": function () {
           return self._onUpdateSelectionShape.apply(self, arguments);
         }, "canReceiveKeyPress": function () {
@@ -1225,23 +1222,18 @@
   };
 
   WorkbookView.prototype._onGraphicObjectWindowKeyDown = function(e) {
-    var ws = this.getWorksheet();
-    return ws.objectRender.graphicObjectKeyDown(e);
+    var objectRender = this.getWorksheet().objectRender;
+    return (0 < objectRender.getSelectedGraphicObjects().length) ? objectRender.graphicObjectKeyDown(e) : false;
   };
 
   WorkbookView.prototype._onGraphicObjectWindowKeyPress = function(e) {
-    var ws = this.getWorksheet();
-    return ws.objectRender.graphicObjectKeyPress(e);
+    var objectRender = this.getWorksheet().objectRender;
+    return (0 < objectRender.getSelectedGraphicObjects().length) ? objectRender.graphicObjectKeyPress(e) : false;
   };
 
   WorkbookView.prototype._onGetGraphicsInfo = function(x, y) {
     var ws = this.getWorksheet();
     return ws.objectRender.checkCursorDrawingObject(x, y);
-  };
-
-  WorkbookView.prototype._onGetSelectedGraphicObjects = function() {
-    var ws = this.getWorksheet();
-    return ws.objectRender.getSelectedGraphicObjects();
   };
 
   WorkbookView.prototype._onUpdateSelectionShape = function(isSelectOnShape) {
@@ -2975,4 +2967,4 @@
   //------------------------------------------------------------export---------------------------------------------------
   window['AscCommonExcel'] = window['AscCommonExcel'] || {};
   window["AscCommonExcel"].WorkbookView = WorkbookView;
-})(jQuery, window);
+})(window);

@@ -5614,6 +5614,11 @@ DrawingObjectsController.prototype =
             drawingObjectsController.increaseFontSize();
             bRetValue = true;
         }
+        else if ( e.keyCode === 113 ) // F2
+        {
+            // ToDo обработать эту горячую клавишу. В автофигуры можно добавлять формулу
+            bRetValue = true;
+        }
         if(bRetValue)
             e.preventDefault();
         return bRetValue;
