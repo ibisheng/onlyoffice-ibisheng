@@ -580,6 +580,9 @@ CPresentation.prototype =
     },
     Add_CompositeText: function(nCharCode)
     {
+        if (null === this.CompositeInput)
+            return;
+        this.Create_NewHistoryPoint(AscDFH.historydescription_Document_CompositeInputReplace);
         this.addCompositeText(nCharCode);
         this.Recalculate();
         this.Document_UpdateSelectionState();
@@ -606,6 +609,7 @@ CPresentation.prototype =
     {
         if (null === this.CompositeInput)
             return;
+        this.Create_NewHistoryPoint(AscDFH.historydescription_Document_CompositeInputReplace);
         this.removeCompositeText(this.CompositeInput.Length);
         for (var nIndex = 0, nCount = arrCharCodes.length; nIndex < nCount; ++nIndex)
         {
