@@ -500,6 +500,14 @@
         }
       };
       this.Api.Begin_CompositeInput = function () {
+        var oWSView = self.getWorksheet();
+        if(oWSView && oWSView.isSelectOnShape){
+          if(oWSView.objectRender){
+            oWSView.objectRender.Begin_CompositeInput();
+          }
+          return;
+        }
+
         if (!self.isCellEditMode) {
           self._onEditCell(false, true, undefined, true, function () {
             self.cellEditor.Begin_CompositeInput();
@@ -509,30 +517,62 @@
         }
       };
       this.Api.Replace_CompositeText = function (arrCharCodes) {
+        var oWSView = self.getWorksheet();
+        if(oWSView && oWSView.isSelectOnShape){
+          if(oWSView.objectRender){
+            oWSView.objectRender.Replace_CompositeText(arrCharCodes);
+          }
+          return;
+        }
         if (self.isCellEditMode) {
           self.cellEditor.Replace_CompositeText(arrCharCodes);
         }
       };
       this.Api.End_CompositeInput = function () {
+        var oWSView = self.getWorksheet();
+        if(oWSView && oWSView.isSelectOnShape){
+          if(oWSView.objectRender){
+            oWSView.objectRender.End_CompositeInput();
+          }
+          return;
+        }
         if (self.isCellEditMode) {
           self.cellEditor.End_CompositeInput();
         }
       };
       this.Api.Set_CursorPosInCompositeText = function (nPos) {
+        var oWSView = self.getWorksheet();
+        if(oWSView && oWSView.isSelectOnShape){
+          if(oWSView.objectRender){
+            oWSView.objectRender.Set_CursorPosInCompositeText(nPos);
+          }
+          return;
+        }
         if (self.isCellEditMode) {
           self.cellEditor.Set_CursorPosInCompositeText(nPos);
         }
       };
       this.Api.Get_CursorPosInCompositeText = function () {
         var res = 0;
-        if (self.isCellEditMode) {
+        var oWSView = self.getWorksheet();
+        if(oWSView && oWSView.isSelectOnShape){
+          if(oWSView.objectRender){
+            res = oWSView.objectRender.Get_CursorPosInCompositeText();
+          }
+        }
+        else if (self.isCellEditMode) {
           res = self.cellEditor.Get_CursorPosInCompositeText();
         }
         return res;
       };
       this.Api.Get_MaxCursorPosInCompositeText = function () {
-        var res = 0;
-        if (self.isCellEditMode) {
+        var res = 0; var oWSView = self.getWorksheet();
+        if(oWSView && oWSView.isSelectOnShape){
+          if(oWSView.objectRender){
+            res = oWSView.objectRender.Get_CursorPosInCompositeText();
+          }
+        }
+        else if (self.isCellEditMode) {
           res = self.cellEditor.Get_MaxCursorPosInCompositeText();
         }
         return res;

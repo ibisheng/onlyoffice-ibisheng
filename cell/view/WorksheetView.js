@@ -1221,7 +1221,7 @@
             this.headersHeightByFont);
 
         // Инициализируем число колонок и строк (при открытии). Причем нужно поставить на 1 больше,
-        // чтобы могли показать последнюю строку/столбец (http://bugzserver/show_bug.cgi?id=23513)
+        // чтобы могли показать последнюю строку/столбец (http://bugzilla.onlyoffice.com/show_bug.cgi?id=23513)
         this.nColsCount = Math.min( this.model.getColsCount() + 1, gc_nMaxCol );
         this.nRowsCount = Math.min( this.model.getRowsCount() + 1, gc_nMaxRow );
     };
@@ -4562,7 +4562,7 @@
         firstUpdateRow = asc.getMinValueOrNull( firstUpdateRow, this._prepareCellTextMetricsCache2( range ) );
         if ( null !== firstUpdateRow || this.isChanged ) {
             // Убрал это из _calcCellsTextMetrics, т.к. вызов был для каждого сектора(добавляло тормоза: баг 20388)
-            // Код нужен для бага http://bugzserver/show_bug.cgi?id=13875
+            // Код нужен для бага http://bugzilla.onlyoffice.com/show_bug.cgi?id=13875
             this._updateRowPositions();
             this._calcVisibleRows();
 
@@ -5816,7 +5816,7 @@
         if ( moveHeight > 0 ) {
             ctx.drawImage( ctx.getCanvas(), x, y, oldW, moveHeight, x + dx, y - dy, oldW, moveHeight );
 
-            // Заглушка для safari (http://bugzserver/show_bug.cgi?id=25546). Режим 'copy' сначала затирает, а
+            // Заглушка для safari (http://bugzilla.onlyoffice.com/show_bug.cgi?id=25546). Режим 'copy' сначала затирает, а
             // потом рисует (а т.к. мы рисуем сами на себе, то уже картинка будет пустой)
             if ( AscBrowser.isSafari ) {
                 this.drawingGraphicCtx.moveImageDataSafari( x, y, oldW, moveHeight, x + dx, y - dy );
@@ -5997,7 +5997,7 @@
         if ( moveWidth > 0 ) {
             ctx.drawImage( ctx.getCanvas(), x, y, moveWidth, ctxH, x - dx, y, moveWidth, ctxH );
 
-            // Заглушка для safari (http://bugzserver/show_bug.cgi?id=25546). Режим 'copy' сначала затирает, а
+            // Заглушка для safari (http://bugzilla.onlyoffice.com/show_bug.cgi?id=25546). Режим 'copy' сначала затирает, а
             // потом рисует (а т.к. мы рисуем сами на себе, то уже картинка будет пустой)
             if ( AscBrowser.isSafari ) {
                 this.drawingGraphicCtx.moveImageDataSafari( x, y, moveWidth, ctxH, x - dx, y );
@@ -7209,12 +7209,12 @@
                 }
             }
         });
-        // Показываем только данные для 2-х или более ячеек (http://bugzserver/show_bug.cgi?id=24115)
+        // Показываем только данные для 2-х или более ячеек (http://bugzilla.onlyoffice.com/show_bug.cgi?id=24115)
         if (1 < oSelectionMathInfo.countNumbers) {
             // Мы должны отдавать в формате активной ячейки
             var numFormat = range.getNumFormat();
             if (Asc.c_oAscNumFormatType.Time === numFormat.getType()) {
-                // Для времени нужно отдавать в формате [h]:mm:ss (http://bugzserver/show_bug.cgi?id=26271)
+                // Для времени нужно отдавать в формате [h]:mm:ss (http://bugzilla.onlyoffice.com/show_bug.cgi?id=26271)
                 numFormat = AscCommon.oNumFormatCache.get('[h]:mm:ss');
             }
 
@@ -8848,7 +8848,7 @@
                 // Тут будет отрисовка select-а
                 t._recalculateAfterUpdate( [arnFrom, arnTo] );
 
-                // Вызовем на всякий случай, т.к. мы можем уже обновиться из-за формул ToDo возможно стоит убрать это в дальнейшем (но нужна переработка формул) - http://bugzserver/show_bug.cgi?id=24505
+                // Вызовем на всякий случай, т.к. мы можем уже обновиться из-за формул ToDo возможно стоит убрать это в дальнейшем (но нужна переработка формул) - http://bugzilla.onlyoffice.com/show_bug.cgi?id=24505
                 t._updateSelectionNameAndInfo();
 				
 				if(null !== t.model.getRange3( arnTo.r1, arnTo.c1, arnTo.r2, arnTo.c2 ).hasMerged() && false !== t.model.autoFilters._intersectionRangeWithTableParts(arnTo))
@@ -10780,7 +10780,7 @@
                         break;
                     }
                     if (lastHeight === tm.height) {
-                        // Ситуация, когда у нас текст не уберется по высоте (http://bugzserver/show_bug.cgi?id=19974)
+                        // Ситуация, когда у нас текст не уберется по высоте (http://bugzilla.onlyoffice.com/show_bug.cgi?id=19974)
                         tm.width = oldWidth;
                         break;
                     }
@@ -10974,7 +10974,7 @@
         var inc = options.scanForward ? +1 : -1;
         var isEqual;
 
-        // ToDo стоит переделать это место, т.к. для поиска не нужны измерения, а нужен только сам текст (http://bugzserver/show_bug.cgi?id=26136)
+        // ToDo стоит переделать это место, т.к. для поиска не нужны измерения, а нужен только сам текст (http://bugzilla.onlyoffice.com/show_bug.cgi?id=26136)
         this._prepareCellTextMetricsCache( new Asc.Range( 0, 0, this.model.getColsCount(), this.model.getRowsCount() ) );
 
         function findNextCell() {
@@ -12360,7 +12360,7 @@
      * @private
      */
     WorksheetView.prototype._onUpdateFormatTable = function (range, recalc, changeRowsOrMerge) {
-        //ToDo заглушка, чтобы не падало. Нужно полностью переделывать этот код!!!! (Перенес выше из-за бага http://bugzserver/show_bug.cgi?id=26705)
+        //ToDo заглушка, чтобы не падало. Нужно полностью переделывать этот код!!!! (Перенес выше из-за бага http://bugzilla.onlyoffice.com/show_bug.cgi?id=26705)
         this._checkUpdateRange(range);
 
         if (!recalc) {

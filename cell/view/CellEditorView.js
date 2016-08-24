@@ -329,7 +329,7 @@
 
 		if (saveValue && "function" === typeof opt.saveValueCallback) {
 			var isFormula = this.isFormula();
-			// Для формул делаем пересчет всегда. Для остального - только если мы изменили что-то. http://bugzserver/show_bug.cgi?id=31889
+			// Для формул делаем пересчет всегда. Для остального - только если мы изменили что-то. http://bugzilla.onlyoffice.com/show_bug.cgi?id=31889
 			if (0 < this.undoList.length || isFormula) {
 				// Делаем замену текста на автодополнение, если есть select и текст полностью совпал.
 				if (this.selectionBegin !== this.selectionEnd && !isFormula) {

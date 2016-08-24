@@ -504,7 +504,7 @@ CPresentation.prototype =
 
     Get_TargetDocContent: function(){
         if(this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects){
-            return this.Slides[this.CurPage].graphicObjects.getTargetDocContent();
+            return this.Slides[this.CurPage].graphicObjects.getTargetDocContent(true);
         }
         return null;
     },
