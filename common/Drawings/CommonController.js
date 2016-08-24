@@ -1223,22 +1223,35 @@ DrawingObjectsController.prototype =
         if(oController.selection.textSelection){
             return;
         }
-        if(oController.selectedObjects.length === 1 && oController.selectedObjects[0].getObjectType() === AscDFH.historyitem_type_Shape){
-            var oShape = oController.selectedObjects[0];
-            if(oShape.bWordShape){
-                if(!oShape.textBoxContent){
-                    oShape.createTextBoxContent();
+        if(oController.selection.chartSelection){
+           if(oController.selection.chartSelection.selection.textSelection){
+               oController.selection.chartSelection.selection.textSelection.checkDocContent && oController.selection.chartSelection.selection.textSelection.checkDocContent();
+               return;
+           }
+        }
+        if(oController.selectedObjects.length === 1 ){
+            if(oController.selectedObjects[0].getObjectType() === AscDFH.historyitem_type_Shape){
+                var oShape = oController.selectedObjects[0];
+                if(oShape.bWordShape){
+                    if(!oShape.textBoxContent){
+                        oShape.createTextBoxContent();
+                    }
                 }
+                else{
+                    if(!oShape.txBody){
+                        oShape.createTextBody();
+                    }
+                }
+                oController.selection.textSelection = oShape;
             }
             else{
-                if(!oShape.txBody){
-                    oShape.createTextBody();
+                if(oController.selection.chartSelection && oController.selection.chartSelection.selection.title){
+                    oController.selection.chartSelection.selection.textSelection = oController.selection.chartSelection.selection.title;
+                    oController.selection.chartSelection.selection.textSelection.checkDocContent && oController.selection.chartSelection.selection.textSelection.checkDocContent();
                 }
             }
-            oController.selection.textSelection = oShape;
         }
     },
-
 
     getContextMenuPosition: function(pageIndex)
     {
