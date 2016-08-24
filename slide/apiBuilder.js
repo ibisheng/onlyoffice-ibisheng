@@ -71,6 +71,7 @@
      */
     function ApiShape(oShape){
         ApiShape.superclass.constructor.call(this, oShape);
+        this.Shape = oShape;
     }
     AscCommon.extendClass(ApiShape, ApiDrawing);
 
@@ -89,6 +90,7 @@
      */
     function ApiChart(oChart){
         ApiChart.superclass.constructor.call(this, oChart);
+        this.Chart = oChart;
     }
     AscCommon.extendClass(ApiChart, ApiDrawing);
 
