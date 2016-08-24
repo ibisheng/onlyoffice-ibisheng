@@ -898,9 +898,12 @@
 				if(!undoData)
 					return;
 				
-				if(undoData.clone)
+				if (undoData.clone) {
 					cloneData = undoData.clone(null);
-				else
+					if (cloneData.buildDependencies) {
+						cloneData.buildDependencies();
+					}
+				} else
 					cloneData = undoData;
 					
 				if(!cloneData)
@@ -1066,7 +1069,10 @@
 							{
 								this._cleanStyleTable(cloneData.Ref);
                                 worksheet.workbook.dependencyFormulas.delTableName(worksheet.TableParts[l].DisplayName);
-                                worksheet.TableParts.splice(l,1);
+                                var deleted = worksheet.TableParts.splice(l,1);
+								for (var delIndex = 0; i < deleted.length; ++i) {
+									deleted[delIndex].removeDependencies();
+								}
 							}	
 						}
 					}
@@ -1153,7 +1159,7 @@
 						if(isTablePart)
 							worksheet.workbook.dependencyFormulas.delTableName(oldFilter.DisplayName)
 					} else
-						return oldFilter;
+						return filter;
 				};
 				
 				if(worksheet.AutoFilter)
@@ -1163,14 +1169,17 @@
 				if(worksheet.TableParts)
 				{
 					var newTableParts = [];
-					
 					for(var i = 0; i < worksheet.TableParts.length; i++)
 					{
-						var filter = changeFilter(worksheet.TableParts[i], true);
-						if(filter)
+						var tablePart = worksheet.TableParts[i];
+						var filter = changeFilter(tablePart, true);
+						if(filter){
 							newTableParts.push(filter);
+						} else {
+							tablePart.removeDependencies();
+						}
+
 					}
-					
 					worksheet.TableParts = newTableParts;
 				}
 				
@@ -2435,7 +2444,7 @@
 							
 							if(val === true)
 							{
-								tablePart.generateTotalsRowLabel();
+								tablePart.generateTotalsRowLabel(worksheet);
 							}
 						}
 						
@@ -2912,7 +2921,7 @@
 						if(cell.isFormula())
 						{
 							var val = cell.getFormula();
-							tableColumn.setTotalsRowFormula(val);
+							tableColumn.setTotalsRowFormula(val, worksheet);
 						}
 						else
 						{
