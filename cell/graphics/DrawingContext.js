@@ -439,7 +439,7 @@
 
 		/** @type FontProperties */
 		this.font = undefined !== settings.font ? settings.font : null;
-		// Font должен быть передан (он общий для всех DrawingContext, т.к. может возникнуть ситуация как в баге http://bugzserver/show_bug.cgi?id=19784)
+		// Font должен быть передан (он общий для всех DrawingContext, т.к. может возникнуть ситуация как в баге http://bugzilla.onlyoffice.com/show_bug.cgi?id=19784)
 		if (null === this.font) {
 			throw "Can not set font in DrawingContext";
 		}
