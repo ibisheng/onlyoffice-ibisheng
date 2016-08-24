@@ -145,7 +145,7 @@
 		this.isSelectMode = c_oAscCellEditorSelectState.no;
 		this.hasCursor = false;
 		this.hasFocus = false;
-		this.newTextFormat = undefined;
+		this.newTextFormat = null;
 		this.selectionTimer = undefined;
 		this.enableKeyEvents = true;
 		this.isTopLineActive = false;
@@ -769,7 +769,7 @@
 
 		this._cleanFragments( opt.fragments );
 		this.textRender.setString( opt.fragments, this.textFlags );
-		delete this.newTextFormat;
+		this.newTextFormat = null;
 
 		if ( opt.zoom > 0 ) {
 			this.overlayCtx.setFont( this.drawingCtx.getFont() );
@@ -1725,7 +1725,7 @@
 		if (this.newTextFormat) {
 			var oNewObj = new Fragment({format: this.newTextFormat, text: str});
 			this._addFragments([oNewObj], pos);
-			delete this.newTextFormat;
+			this.newTextFormat = null;
 		} else {
 			f = this._findFragmentToInsertInto(pos);
 			if (f) {
