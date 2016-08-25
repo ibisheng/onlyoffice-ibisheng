@@ -2343,12 +2343,12 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
 					if (para_FootnoteReference === ItemType)
 					{
-						Item.UpdateNumber(Para.Get_AbsolutePage(PRS.Page));
+						Item.UpdateNumber(Para.Get_AbsolutePage(PRS.Page), Para.Get_AbsoluteColumn(PRS.Page));
 						PRS.Add_FootnoteReference(Item, Pos);
 					}
 					else if (para_FootnoteRef === ItemType)
 					{
-						Item.UpdateNumber(Para.Get_AbsolutePage(PRS.Page));
+						Item.UpdateNumber(Para.Get_AbsolutePage(PRS.Page), Para.Get_AbsoluteColumn(PRS.Page));
 					}
 
                     // При проверке, убирается ли слово, мы должны учитывать ширину предшествующих пробелов.

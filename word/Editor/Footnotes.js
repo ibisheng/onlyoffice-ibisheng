@@ -313,21 +313,27 @@ CFootnotesController.prototype.RemoveFootnoteFromPage = function(nPageAbs, nColu
 		}
 	}
 };
-CFootnotesController.prototype.GetFootnoteNumberOnPage = function(nPageAbs, oFootnote)
+CFootnotesController.prototype.GetFootnoteNumberOnPage = function(nPageAbs, nColumnAbs, oFootnote)
 {
-	if (!this.Pages[nPageAbs])
+	var oPage = this.Pages[nPageAbs];
+	if (!oPage)
 		return 1;
 
-	if (oFootnote)
+	var nFootnoteIndex = 1;
+	for (var nColumnIndex = 0, nColumnsCount = oPage.Columns.length; nColumnIndex <= Math.min(nColumnAbs, nColumnsCount - 1); ++nColumnIndex)
 	{
-		for (var nIndex = 0, nCount = this.Pages[nPageAbs].Elements.length; nIndex < nCount; ++nIndex)
+		var oColumn = oPage.Columns[nColumnIndex];
+
+		for (var nIndex = 0, nCount = oColumn.Elements.length; nIndex < nCount; ++nIndex)
 		{
-			if (oFootnote === this.Pages[nPageAbs].Elements[nIndex])
-				return nIndex + 1;
+			if (oFootnote && oFootnote === oColumn.Elements[nIndex])
+				return nFootnoteIndex;
+
+			nFootnoteIndex++;
 		}
 	}
 
-	return  this.Pages[nPageAbs].Elements.length;
+	return nFootnoteIndex;
 };
 /**
  * Проверяем, используется заданная сноска в документе.
