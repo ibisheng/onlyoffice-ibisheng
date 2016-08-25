@@ -4724,6 +4724,7 @@ function CThumbnailsManager()
 					if (this.m_oWordControl.m_oLogicDocument.viewMode === false)
 					{
 						editor.DublicateSlide();
+						e.preventDefault();
 						return false;
 					}
 				}
