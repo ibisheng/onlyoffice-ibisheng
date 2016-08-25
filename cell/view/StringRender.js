@@ -156,8 +156,6 @@
 			/** @type RegExp */
 			this.reNL =  /[\r\n]/;
 			/** @type RegExp */
-			this.reTab = /[\t\v\f]/;
-			/** @type RegExp */
 			this.reSpace = /[\n\r\u2028\u2029\t\v\f\u0020\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2008\u2009\u200A\u200B\u205F\u3000]/;
 			/** @type RegExp */
 			this.reReplaceNL =  /\r?\n|\r/g;
@@ -520,8 +518,7 @@
 		 */
 		StringRender.prototype._filterText = function(fragment, wrap) {
 			var s = fragment;
-			if (s.search(this.reNL) >= 0) {s = s.replace(this.reReplaceNL, wrap ? "\n" : "\u00B6");}
-			if (s.search(this.reTab) >= 0) {s = s.replace(this.reReplaceTab, wrap ? "        " : "\u2192");}
+			if (s.search(this.reNL) >= 0) {s = s.replace(this.reReplaceNL, wrap ? "\n" : "");}
 			return s;
 		};
 
@@ -555,8 +552,7 @@
 		 * @return {Number}
 		 */
 		StringRender.prototype._calcLineWidth = function (startPos, endPos) {
-			var wrap = this.flags && this.flags.wrapText;
-			var wrapNL = this.flags && this.flags.wrapOnlyNL;
+			var wrap = this.flags && (this.flags.wrapText || this.flags.wrapOnlyNL);
 			var isAtEnd, j, chProp, tw;
 
 			if (endPos === undefined || endPos < 0) {
@@ -571,7 +567,7 @@
 			for (j = endPos, tw = 0, isAtEnd = true; j >= startPos; --j) {
 				if (isAtEnd) {
 					// skip space char at end of line
-					if ( (wrap || wrapNL) && this.reSpace.test(this.chars[j]) ) {continue;}
+					if ( (wrap) && this.reSpace.test(this.chars[j]) ) {continue;}
 					isAtEnd = false;
 				}
 				tw += this.charWidths[j];
