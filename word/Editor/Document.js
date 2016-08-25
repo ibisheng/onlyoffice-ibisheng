@@ -15302,6 +15302,9 @@ CDocument.prototype.controller_IsMovingTableBorder = function()
 };
 CDocument.prototype.controller_CheckPosInSelection = function(X, Y, PageAbs, NearPos)
 {
+	if (true === this.Footnotes.CheckHitInFootnote(X, Y, PageAbs))
+		return false;
+
 	if (true === this.Selection.Use)
 	{
 		switch (this.Selection.Flag)
