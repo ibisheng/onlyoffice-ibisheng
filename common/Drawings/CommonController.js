@@ -4635,6 +4635,9 @@ DrawingObjectsController.prototype =
                     {
                         this.selection.groupSelection.selectedObjects[i].group.removeFromSpTree(this.selection.groupSelection.selectedObjects[i].Get_Id());
                         group_map[this.selection.groupSelection.selectedObjects[i].group.Get_Id()+""] = this.selection.groupSelection.selectedObjects[i].group;
+                        if(this.selection.groupSelection.selectedObjects[i].setBDeleted){
+                            this.selection.groupSelection.selectedObjects[i].setBDeleted(true);
+                        }
                     }
                     group_map[this.selection.groupSelection.Get_Id()+""] = this.selection.groupSelection;
                     for(var key in group_map)
@@ -4722,6 +4725,10 @@ DrawingObjectsController.prototype =
                 for(var i = 0; i < this.selectedObjects.length; ++i)
                 {
                     this.selectedObjects[i].deleteDrawingBase(true);
+                    if(this.selectedObjects[i].setBDeleted){
+                        this.selectedObjects[i].setBDeleted(true);
+                    }
+
                 }
                 this.resetSelection();
                 this.recalculate();
