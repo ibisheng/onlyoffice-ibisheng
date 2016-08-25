@@ -1053,7 +1053,8 @@ CDocumentRecalcInfo.prototype =
     Set_FootnoteReference : function(oFootnoteReference, nPageAbs, nColumnAbs)
     {
         this.FootnoteReference = oFootnoteReference;
-        this.FlowObjectPage    = nPageAbs;
+        this.FootnotePage      = nPageAbs;
+		this.FootnoteColumn    = nColumnAbs;
     },
 
     Check_FootnoteReference : function(oFootnoteReference)
@@ -2867,7 +2868,7 @@ CDocument.prototype.private_RecalculateShiftFootnotes = function(nPageAbs, nColu
 {
 	var dFootnotesHeight = this.Footnotes.GetHeight(nPageAbs, nColumnAbs);
 	var oPageMetrics     = this.Get_PageContentStartPos(nPageAbs);
-	this.Footnotes.Shift(nPageAbs, 0, oPageMetrics.YLimit - dFootnotesHeight);
+	this.Footnotes.Shift(nPageAbs, nColumnAbs, 0, oPageMetrics.YLimit - dFootnotesHeight);
 };
 CDocument.prototype.private_RecalculateFlowTable             = function(RecalcInfo)
 {

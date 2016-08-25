@@ -1872,7 +1872,7 @@ Paragraph.prototype.private_RecalculateLineCheckFootnotes = function(CurLine, Cu
                 else
                 {
                     // TODO: Реализовать
-                    RecalcInfo.Set_PageBreaFlowObjectPageBreakBefore(true);
+                    RecalcInfo.Set_PageBreakBefore(true);
 					this.Parent.Footnotes.RemoveFootnoteFromPage(nPageAbs, nColumnAbs, oFootnote);
 					PRS.RecalcResult = recalcresult_CurPage | recalcresultflags_Column | recalcresultflags_Footnotes;
                     return false;

@@ -254,25 +254,27 @@ CFootnotesController.prototype.Draw = function(nPageAbs, pGraphics)
 };
 /**
  * Сдвигаем все рассчитанные позиции на заданной странице.
- * @param {number} nPageIndex
+ * @param {number} nPageAbs
+ * @param {number} nColumnAbs
  * @param {number} dX
  * @param {number} dY
  */
-CFootnotesController.prototype.Shift = function(nPageIndex, dX, dY)
+CFootnotesController.prototype.Shift = function(nPageAbs, nColumnAbs, dX, dY)
 {
-	if (true === this.Is_EmptyPage(nPageIndex))
+	var oColumn = this.private_GetPageColumn(nPageAbs, nColumnAbs);
+	if (!oColumn)
 		return;
 
-	if (null !== this.SeparatorFootnote && null !== this.Pages[nPageIndex].SeparatorRecalculateObject)
+	if (null !== this.SeparatorFootnote && null !== oColumn.SeparatorRecalculateObject)
 	{
-		this.SeparatorFootnote.Load_RecalculateObject(this.Pages[nPageIndex].SeparatorRecalculateObject);
+		this.SeparatorFootnote.Load_RecalculateObject(oColumn.SeparatorRecalculateObject);
 		this.SeparatorFootnote.Shift(0, dX, dY);
-		this.Pages[nPageIndex].SeparatorRecalculateObject = this.SeparatorFootnote.Save_RecalculateObject();
+		oColumn.SeparatorRecalculateObject = this.SeparatorFootnote.Save_RecalculateObject();
 	}
 
-	for (var nIndex = 0; nIndex < this.Pages[nPageIndex].Elements.length; ++nIndex)
+	for (var nIndex = 0, nCount = oColumn.Elements.length; nIndex < nCount; ++nIndex)
 	{
-		var Footnote = this.Pages[nPageIndex].Elements[nIndex];
+		var Footnote = oColumn.Elements[nIndex];
 		Footnote.Shift(0, dX, dY);
 	}
 };
@@ -293,6 +295,7 @@ CFootnotesController.prototype.AddFootnoteToPage = function(nPageAbs, nColumnAbs
 /**
  * Убираем заданную сноску со страницы при пересчетею..
  * @param {number} nPageAbs
+ * @param {number} nColumnAbs
  * @param {CFootEndnote} oFootnote
  */
 CFootnotesController.prototype.RemoveFootnoteFromPage = function(nPageAbs, nColumnAbs, oFootnote)
@@ -374,7 +377,7 @@ CFootnotesController.prototype.OnContentReDraw = function(StartPageAbs, EndPageA
  * @param {number} nPageIndex
  * @returns {boolean}
  */
-CFootnotesController.prototype.Is_EmptyPage = function(nPageIndex)
+CFootnotesController.prototype.IsEmptyPage = function(nPageIndex)
 {
 	var oPage = this.Pages[nPageIndex];
 	if (!oPage)
@@ -469,24 +472,43 @@ CFootnotesController.prototype.GetNearestPos = function(X, Y, PageAbs, bAnchor, 
  * Проверяем попадание в сноски на заданной странице.
  * @param X
  * @param Y
- * @param PageAbs
+ * @param nPageAbs
  * @returns {boolean}
  */
-CFootnotesController.prototype.CheckHitInFootnote = function(X, Y, PageAbs)
+CFootnotesController.prototype.CheckHitInFootnote = function(X, Y, nPageAbs)
 {
-	if (true === this.Is_EmptyPage(PageAbs))
+	if (true === this.IsEmptyPage(nPageAbs))
 		return false;
 
-	var Page = this.Pages[PageAbs];
-	for (var nIndex = 0; nIndex < Page.Elements.length; ++nIndex)
+	var oPage   = this.Pages[nPageAbs];
+	var oColumn = null;
+	for (var nColumnIndex = 0, nColumnsCount = oPage.Columns.length; nColumnIndex < nColumnsCount; ++nColumnIndex)
 	{
-		var Footnote = Page.Elements[nIndex];
-		var Bounds   = Footnote.Get_PageBounds(0);
-
-		if (Bounds.Top <= Y)
-			return true;
+		if (nColumnIndex < nColumnsCount - 1)
+		{
+			if (X < (oPage.Columns[nColumnIndex].XLimit + oPage.Columns[nColumnIndex + 1].X) / 2)
+			{
+				oColumn = oPage.Columns[nColumnIndex];
+				break;
+			}
+		}
+		else
+		{
+			oColumn = oPage.Columns[nColumnIndex];
+		}
 	}
 
+	if (!oColumn)
+		return false;
+
+	for (var nIndex = 0, nCount = oColumn.Elements.length; nIndex < nCount; ++nIndex)
+	{
+		var oFootnote = oColumn.Elements[nIndex];
+		var oBounds   = oFootnote.Get_PageBounds(0);
+
+		if (oBounds.Top <= Y)
+			return true;
+	}
 
 	return false;
 };
@@ -724,32 +746,53 @@ CFootnotesController.prototype.private_GetPageColumn = function(nPageAbs, nColum
 	if (!oPage)
 		return null;
 
-	var oColumn = oPage.Columns[nColumnAbs]
+	var oColumn = oPage.Columns[nColumnAbs];
 	if (!oColumn)
 		return null;
 
 	return oColumn;
 };
-CFootnotesController.prototype.private_GetFootnoteOnPageByXY = function(X, Y, PageAbs)
+CFootnotesController.prototype.private_GetFootnoteOnPageByXY = function(X, Y, nPageAbs)
 {
-	if (true === this.Is_EmptyPage(PageAbs))
+	if (true === this.IsEmptyPage(nPageAbs))
 		return null;
 
-	var Page = this.Pages[PageAbs];
-	for (var nIndex = Page.Elements.length - 1; nIndex >= 0; --nIndex)
+	var oPage   = this.Pages[nPageAbs];
+	var oColumn = null;
+	var nColumnIndex = 0;
+	for (var nColumnsCount = oPage.Columns.length; nColumnIndex < nColumnsCount; ++nColumnIndex)
 	{
-		var Footnote = Page.Elements[nIndex];
-		var Bounds   = Footnote.Get_PageBounds(0);
-
-		if (Bounds.Top <= Y || 0 === nIndex)
-			return {
-				Footnote : Footnote,
-				Index    : nIndex,
-				Page     : PageAbs
-			};
+		if (nColumnIndex < nColumnsCount - 1)
+		{
+			if (X < (oPage.Columns[nColumnIndex].XLimit + oPage.Columns[nColumnIndex + 1].X) / 2)
+			{
+				oColumn = oPage.Columns[nColumnIndex];
+				break;
+			}
+		}
+		else
+		{
+			oColumn = oPage.Columns[nColumnIndex];
+			break;
+		}
 	}
 
+	if (!oColumn)
+		return null;
 
+	for (var nIndex = oColumn.Elements.length - 1; nIndex >= 0; --nIndex)
+	{
+		var oFootnote = oColumn.Elements[nIndex];
+		var oBounds   = oFootnote.Get_PageBounds(0);
+
+		if (oBounds.Top <= Y || 0 === nIndex)
+			return {
+				Footnote : oFootnote,
+				Index    : nIndex,
+				Page     : nPageAbs,
+				Column   : nColumnIndex
+			};
+	}
 
 	return null;
 };
@@ -783,8 +826,8 @@ CFootnotesController.prototype.private_GetFootnoteByXY = function(X, Y, PageAbs)
 };
 CFootnotesController.prototype.private_GetFootnotesRange = function(Start, End)
 {
-	var oResult = [];
-	if (Start.Page > End.Page)
+	var oResult = {};
+	if (Start.Page > End.Page || (Start.Page === End.Page && Start.Column > End.Column) || (Start.Page === End.Page && Start.Column === End.Column && Start.Index > End.Index))
 	{
 		var Temp = Start;
 		Start    = End;
@@ -793,33 +836,52 @@ CFootnotesController.prototype.private_GetFootnotesRange = function(Start, End)
 
 	if (Start.Page === End.Page)
 	{
-		if (Start.Index <= End.Index)
-			this.private_GetFootnotesOnPage(Start.Page, Start.Index, End.Index, oResult);
-		else
-			this.private_GetFootnotesOnPage(Start.Page, End.Index, Start.Index, oResult);
+		this.private_GetFootnotesOnPage(Start.Page, Start.Column, End.Column, Start.Index, End.Index, oResult);
 	}
 	else
 	{
-		this.private_GetFootnotesOnPage(Start.Page, Start.Index, -1, oResult);
+		this.private_GetFootnotesOnPage(Start.Page, Start.Column, -1, Start.Index, -1, oResult);
 
 		for (var CurPage = Start.Page + 1; CurPage <= End.Page - 1; ++CurPage)
 		{
-			this.private_GetFootnotesOnPage(CurPage, -1, -1, oResult);
+			this.private_GetFootnotesOnPage(CurPage, -1, -1, -1, -1, oResult);
 		}
 
-		this.private_GetFootnotesOnPage(End.Page, -1, End.Index, oResult);
+		this.private_GetFootnotesOnPage(End.Page, -1, End.Column, -1, End.Index, oResult);
 	}
 
 	return oResult;
 };
-CFootnotesController.prototype.private_GetFootnotesOnPage = function(PageAbs, StartIndex, EndIndex, oFootnotes)
+CFootnotesController.prototype.private_GetFootnotesOnPage = function(nPageAbs, nColumnStart, nColumnEnd, nStartIndex, nEndIndex, oFootnotes)
 {
-	var Page = this.Pages[PageAbs];
+	var oPage = this.Pages[nPageAbs];
+	if (!oPage)
+		return;
+
+	var _nColumnStart = -1 === nColumnStart ? 0 : nColumnStart;
+	var _nColumnEnd   = -1 === nColumnEnd ? oPage.Columns.length - 1 : nColumnEnd;
+
+	var _nStartIndex  = -1 === nColumnStart || -1 === nStartIndex ? 0 : nStartIndex;
+	var _nEndIndex    = -1 === nColumnEnd || -1 === nEndIndex ? oPage.Columns[_nColumnEnd].Elements.length - 1 : nEndIndex;
+
+	for (var nColIndex = _nColumnStart; nColIndex <= _nColumnEnd; ++nColIndex)
+	{
+		var nSIndex = nColIndex === _nColumnStart ? _nStartIndex : 0;
+		var nEIndex = nColIndex === _nColumnEnd ? _nEndIndex : oPage.Columns[nColIndex].Elements.length - 1;
+
+		this.private_GetFootnotesOnPageColumn(nPageAbs, nColIndex, nSIndex, nEIndex, oFootnotes);
+	}
+};
+CFootnotesController.prototype.private_GetFootnotesOnPageColumn = function(nPageAbs, nColumnAbs, StartIndex, EndIndex, oFootnotes)
+{
+	var oColumn = this.private_GetPageColumn(nPageAbs, nColumnAbs);
+
 	var _StartIndex = -1 === StartIndex ? 0 : StartIndex;
-	var _EndIndex   = -1 === EndIndex ? Page.Elements.length - 1 : EndIndex;
+	var _EndIndex   = -1 === EndIndex ? oColumn.Elements.length - 1 : EndIndex;
+
 	for (var nIndex = _StartIndex; nIndex <= _EndIndex; ++nIndex)
 	{
-		var oFootnote = Page.Elements[nIndex];
+		var oFootnote = oColumn.Elements[nIndex];
 		oFootnotes[oFootnote.Get_Id()] = oFootnote;
 	}
 };
@@ -2016,19 +2078,23 @@ CFootnotesController.prototype.IsEmptySelection = function(bCheckHidden)
 
 	return oFootnote.Selection_IsEmpty(bCheckHidden);
 };
-CFootnotesController.prototype.DrawSelectionOnPage = function(PageAbs)
+CFootnotesController.prototype.DrawSelectionOnPage = function(nPageAbs)
 {
-	if (true !== this.Selection.Use || true === this.Is_EmptyPage(PageAbs))
+	if (true !== this.Selection.Use || true === this.IsEmptyPage(nPageAbs))
 		return;
 
-	var Page = this.Pages[PageAbs];
-	for (var nIndex = 0, nCount = Page.Elements.length; nIndex < nCount; ++nIndex)
+	var oPage = this.Pages[nPageAbs];
+	for (var nColumnIndex = 0, nColumnsCount = oPage.Columns.length; nColumnIndex < nColumnsCount; ++nColumnIndex)
 	{
-		var oFootnote = Page.Elements[nIndex];
-		if (oFootnote === this.Selection.Footnotes[oFootnote.Get_Id()])
+		var oColumn = oPage.Columns[nColumnIndex];
+		for (var nIndex = 0, nCount = oColumn.Elements.length; nIndex < nCount; ++nIndex)
 		{
-			var PageRel = oFootnote.GetRelaitivePageIndex(PageAbs);
-			oFootnote.Selection_Draw_Page(PageRel);
+			var oFootnote = oColumn.Elements[nIndex];
+			if (oFootnote === this.Selection.Footnotes[oFootnote.Get_Id()])
+			{
+				var nPageRel = oFootnote.GetRelaitivePageIndex(nPageAbs, nColumnIndex);
+				oFootnote.Selection_Draw_Page(nPageRel);
+			}
 		}
 	}
 };
