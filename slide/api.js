@@ -4735,6 +4735,9 @@ background-repeat: no-repeat;\
 							this.arrPreOpenLocksObjects[i]();
 						}
 						this.arrPreOpenLocksObjects = [];
+						if(OtherChanges && this.isSaveFonts_Images){
+							return;
+						}
 					}
 				}
 				this.WordControl.m_oLogicDocument.Recalculate({Drawings : {All : true, Map : {}}});
