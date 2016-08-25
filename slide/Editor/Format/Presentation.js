@@ -2652,10 +2652,15 @@ CPresentation.prototype =
         else if ( e.KeyCode == 68 && false === editor.isViewMode && true === e.CtrlKey )
         {
            if(this.Slides[this.CurPage]){
-               this.Create_NewHistoryPoint(AscDFH.historydescription_Document_SetParagraphAlignHotKey);
-               this.Slides[this.CurPage].copySelectedObjects();
-               this.Recalculate();
-               this.Document_UpdateInterfaceState();
+               if(this.Slides[this.CurPage].graphicObjects.selectedObjects.length > 0){
+                   this.Create_NewHistoryPoint(AscDFH.historydescription_Document_SetParagraphAlignHotKey);
+                   this.Slides[this.CurPage].copySelectedObjects();
+                   this.Recalculate();
+                   this.Document_UpdateInterfaceState();
+               }
+               else{
+                   this.DublicateSlide();
+               }
            }
             bRetValue = keydownresult_PreventAll;
         }
