@@ -338,7 +338,7 @@
 
 			constructor: AutoFilters,
 			
-			addAutoFilter: function(styleName, activeRange, addFormatTableOptionsObj, offLock, bWithoutFilter, tablePartDisplayName, pasteStyleObj)
+			addAutoFilter: function(styleName, activeRange, addFormatTableOptionsObj, offLock, props)
 			{
 				var worksheet = this.worksheet, t = this, cloneFilter;
 				var isTurnOffHistory = worksheet.workbook.bUndoChanges || worksheet.workbook.bRedoChanges;
@@ -350,6 +350,14 @@
 				var rangeWithoutDiff = filterInfo.rangeWithoutDiff;
 				var tablePartsContainsRange = filterInfo.tablePartsContainsRange;
 				
+				//props from paste
+				var bWithoutFilter, displayName, tablePart;
+				if(props)
+				{
+					bWithoutFilter = props.bWithoutFilter;
+					displayName = props.displayName;
+					tablePart = props.tablePart;
+				}
 				
 				//*****callBack on add filter
 				var addFilterCallBack = function()
@@ -389,7 +397,7 @@
 						}
 
 						//add to model
-						var newTablePart = t._addNewFilter(filterRange, styleName, bWithoutFilter, tablePartDisplayName, pasteStyleObj);
+						var newTablePart = t._addNewFilter(filterRange, styleName, bWithoutFilter, displayName, tablePart);
 						var newDisplayName = newTablePart && newTablePart.DisplayName ? newTablePart.DisplayName : null;
 
 						if(styleName)
@@ -397,7 +405,7 @@
 
 						//history
 						t._addHistoryObj({Ref: filterRange}, AscCH.historyitem_AutoFilter_Add,
-							{activeCells: filterRange, styleName: styleName, addFormatTableOptionsObj: addFormatTableOptionsObj, displayName: newDisplayName, pasteStyleObj: pasteStyleObj}, null, filterRange, bWithoutFilter);
+							{activeCells: filterRange, styleName: styleName, addFormatTableOptionsObj: addFormatTableOptionsObj, displayName: newDisplayName, tablePart: tablePart}, null, filterRange, bWithoutFilter);
 						History.SetSelectionRedo(filterRange);
 					}
 
@@ -834,7 +842,7 @@
 				History.TurnOff();
 				switch (type) {
 					case AscCH.historyitem_AutoFilter_Add:
-						this.addAutoFilter(data.styleName, data.activeCells, data.addFormatTableOptionsObj, null, data.bWithoutFilter, data.displayName, data);
+						this.addAutoFilter(data.styleName, data.activeCells, data.addFormatTableOptionsObj, null, data);
 						break;
 					case AscCH.historyitem_AutoFilter_Delete:
 						this.deleteAutoFilter(data.activeCells);
@@ -1070,7 +1078,7 @@
 								this._cleanStyleTable(cloneData.Ref);
                                 worksheet.workbook.dependencyFormulas.delTableName(worksheet.TableParts[l].DisplayName);
                                 var deleted = worksheet.TableParts.splice(l,1);
-								for (var delIndex = 0; i < deleted.length; ++i) {
+								for (var delIndex = 0; delIndex < deleted.length; ++delIndex) {
 									deleted[delIndex].removeDependencies();
 								}
 							}	
@@ -2780,17 +2788,7 @@
 					oHistoryObject.displayName          = redoObject.displayName;
 					oHistoryObject.val                  = redoObject.val;
 					oHistoryObject.color                = redoObject.color;
-					
-					if(redoObject.pasteStyleObj)
-					{
-						oHistoryObject.ShowColumnStripes  = redoObject.pasteStyleObj.ShowColumnStripes;
-						oHistoryObject.ShowFirstColumn    = redoObject.pasteStyleObj.ShowFirstColumn;
-						oHistoryObject.ShowLastColumn     = redoObject.pasteStyleObj.ShowLastColumn;
-						oHistoryObject.ShowRowStripes     = redoObject.pasteStyleObj.ShowRowStripes;
-
-						oHistoryObject.HeaderRowCount     = redoObject.pasteStyleObj.HeaderRowCount;
-						oHistoryObject.TotalsRowCount     = redoObject.pasteStyleObj.TotalsRowCount;
-					}
+					oHistoryObject.tablePart       	    = redoObject.tablePart;
 				}
 				else
 				{
@@ -3423,7 +3421,7 @@
 					return ar;
 			},
 			
-			_addNewFilter: function(ref, style, bWithoutFilter, tablePartDisplayName, pasteTablePartObj)
+			_addNewFilter: function(ref, style, bWithoutFilter, tablePartDisplayName, tablePart)
 			{
 				var worksheet = this.worksheet;
 				var newFilter;
@@ -3458,7 +3456,15 @@
 				}
 				else
 				{
-					var tableColumns = this._generateColumnNameWithoutTitle(ref);
+					var tableColumns;
+					if(tablePart && tablePart.TableColumns)
+					{
+						tableColumns = tablePart.TableColumns;
+					}
+					else
+					{
+						tableColumns = this._generateColumnNameWithoutTitle(ref);
+					}
 					
 					if(!worksheet.TableParts)
 						worksheet.TableParts = [];
@@ -3476,15 +3482,15 @@
 					newFilter.TableStyleInfo = new AscCommonExcel.TableStyleInfo();
 					newFilter.TableStyleInfo.Name = style;
 					
-					if(pasteTablePartObj && pasteTablePartObj.ShowColumnStripes !== null && pasteTablePartObj.ShowColumnStripes !== undefined)
+					if(tablePart && tablePart.TableStyleInfo && tablePart.TableStyleInfo.ShowColumnStripes !== null && tablePart.TableStyleInfo.ShowColumnStripes !== undefined)
 					{
-						newFilter.TableStyleInfo.ShowColumnStripes = pasteTablePartObj.ShowColumnStripes;
-						newFilter.TableStyleInfo.ShowFirstColumn = pasteTablePartObj.ShowFirstColumn;
-						newFilter.TableStyleInfo.ShowLastColumn = pasteTablePartObj.ShowLastColumn;
-						newFilter.TableStyleInfo.ShowRowStripes = pasteTablePartObj.ShowRowStripes;
+						newFilter.TableStyleInfo.ShowColumnStripes = tablePart.TableStyleInfo.ShowColumnStripes;
+						newFilter.TableStyleInfo.ShowFirstColumn = tablePart.TableStyleInfo.ShowFirstColumn;
+						newFilter.TableStyleInfo.ShowLastColumn = tablePart.TableStyleInfo.ShowLastColumn;
+						newFilter.TableStyleInfo.ShowRowStripes = tablePart.TableStyleInfo.ShowRowStripes;
 						
-						newFilter.HeaderRowCount = pasteTablePartObj.HeaderRowCount;
-						newFilter.TotalsRowCount = pasteTablePartObj.TotalsRowCount;
+						newFilter.HeaderRowCount = tablePart.HeaderRowCount;
+						newFilter.TotalsRowCount = tablePart.TotalsRowCount;
 					}
 					else
 					{
@@ -4666,7 +4672,7 @@
 									var cleanRange = new AscCommonExcel.Range(worksheet, newRange.r1, newRange.c1, newRange.r2, newRange.c2);
 									cleanRange.cleanFormat();
 								}
-								this.addAutoFilter(findFilters[i].TableStyleInfo.Name, newRange, null, offLock);
+								this.addAutoFilter(findFilters[i].TableStyleInfo.Name, newRange, null, offLock, {tablePart: findFilters[i]});
 							}	
 						}
 					}

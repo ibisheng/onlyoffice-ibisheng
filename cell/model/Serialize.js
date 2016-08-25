@@ -8155,5 +8155,8 @@
     window["AscCommonExcel"].BinaryFileReader = BinaryFileReader;
     window["AscCommonExcel"].BinaryFileWriter = BinaryFileWriter;
 
+    window["AscCommonExcel"].BinaryTableWriter = BinaryTableWriter;
+    window["AscCommonExcel"].Binary_TableReader = Binary_TableReader;
+
     window["Asc"].getBinaryOtherTableGVar = getBinaryOtherTableGVar;
 })(window);

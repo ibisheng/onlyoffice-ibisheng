@@ -9255,23 +9255,14 @@
                     range.cleanFormat();
                 }
 
+                //TODO использовать bWithoutFilter из tablePart
                 var bWithoutFilter = false;
                 if ( !aFilters[aF].AutoFilter ) {
                     bWithoutFilter = true;
                 }
-				
-				var stylePasteObj = 
-				{	
-					ShowColumnStripes  : aFilters[aF].TableStyleInfo.ShowColumnStripes,
-					ShowFirstColumn    : aFilters[aF].TableStyleInfo.ShowFirstColumn,
-					ShowLastColumn     : aFilters[aF].TableStyleInfo.ShowLastColumn,
-					ShowRowStripes     : aFilters[aF].TableStyleInfo.ShowRowStripes,
 
-					HeaderRowCount     : aFilters[aF].HeaderRowCount,
-					TotalsRowCount     : aFilters[aF].TotalsRowCount
-				};
-				
-                t.model.autoFilters.addAutoFilter( aFilters[aF].TableStyleInfo.Name, range.bbox, true, true, bWithoutFilter, null, stylePasteObj );
+                var props = {bWithoutFilter: bWithoutFilter, tablePart: aFilters[aF]};
+                t.model.autoFilters.addAutoFilter( aFilters[aF].TableStyleInfo.Name, range.bbox, true, true, props );
             }
         }
 

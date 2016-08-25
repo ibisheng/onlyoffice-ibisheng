@@ -1762,7 +1762,8 @@ var g_oUndoRedoData_AutoFilterProperties = {
 		ShowRowStripes      : 14,
 		HeaderRowCount      : 15,
 		TotalsRowCount      : 16,
-		color               : 17
+		color               : 17,
+		tablePart        : 18
 	};
 function UndoRedoData_AutoFilter() {
 	this.Properties = g_oUndoRedoData_AutoFilterProperties;
@@ -1789,6 +1790,7 @@ function UndoRedoData_AutoFilter() {
     this.HeaderRowCount     = null;
     this.TotalsRowCount     = null;
 	this.color              = null;
+	this.tablePart       = null;
 }
 UndoRedoData_AutoFilter.prototype = {
 	getType : function ()
@@ -1821,6 +1823,19 @@ UndoRedoData_AutoFilter.prototype = {
             case this.Properties.HeaderRowCount: return this.HeaderRowCount; break;
             case this.Properties.TotalsRowCount: return this.TotalsRowCount; break;
 			case this.Properties.color: return this.color; break;
+			case this.Properties.tablePart:
+			{
+				var tablePart = this.tablePart;
+				if(tablePart)
+				{
+					var memory = new AscCommon.CMemory();
+					var oBinaryTableWriter = new AscCommonExcel.BinaryTableWriter(memory);
+					oBinaryTableWriter.WriteTable(tablePart);
+					tablePart = memory.GetBase64Memory();
+				}
+
+				return tablePart; break;
+			}
 		}
 
 		return null;
@@ -1847,6 +1862,41 @@ UndoRedoData_AutoFilter.prototype = {
             case this.Properties.HeaderRowCount: this.HeaderRowCount = value;break;
             case this.Properties.TotalsRowCount: this.TotalsRowCount = value;break;
 			case this.Properties.color: this.color = value;break;
+			case this.Properties.tablePart:
+			{
+				var table;
+				if(value)
+				{
+					//TODO длину скорее всего нужно записывать
+					var dstLen = 0;
+					dstLen += value.length;
+
+					var pointer = g_memory.Alloc(dstLen);
+					var stream = new AscCommon.FT_Stream2(pointer.data, dstLen);
+					stream.obj = pointer.obj;
+
+					var nCurOffset = 0;
+					var oBinaryFileReader = new AscCommonExcel.BinaryFileReader();
+					nCurOffset = oBinaryFileReader.getbase64DecodedData2(value, 0, stream, nCurOffset);
+
+					var oBinaryTableReader = new AscCommonExcel.Binary_TableReader(stream);
+					oBinaryTableReader.stream = stream;
+					oBinaryTableReader.oReadResult = {
+						tableCustomFunc: []
+					};
+
+					var table = new AscCommonExcel.TablePart();
+					var res = oBinaryTableReader.bcr.Read1(dstLen, function(t,l){
+						return oBinaryTableReader.ReadTable(t, l, table);
+					});
+				}
+
+				if(table)
+				{
+					this.tablePart = table;
+				}
+				break;
+			}
 		}
 		return null;
 	},
