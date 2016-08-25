@@ -330,7 +330,9 @@
 		if (saveValue && "function" === typeof opt.saveValueCallback) {
 			var isFormula = this.isFormula();
 			// Для формул делаем пересчет всегда. Для остального - только если мы изменили что-то. http://bugzilla.onlyoffice.com/show_bug.cgi?id=31889
-			if (0 < this.undoList.length || isFormula) {
+			// Сюда же добавляется и ячейка с wrap-текстом, у которой выключен wrap.
+			// Иначе F2 по ячейке с '\n', у которой выключен wrap, не станет снова wrap. http://bugzilla.onlyoffice.com/show_bug.cgi?id=17590
+			if (0 < this.undoList.length || isFormula || this.textFlags.wrapOnlyNL) {
 				// Делаем замену текста на автодополнение, если есть select и текст полностью совпал.
 				if (this.selectionBegin !== this.selectionEnd && !isFormula) {
 					var s = this._getFragmentsText(this.options.fragments);
@@ -347,7 +349,6 @@
 					}
 				}
 
-				ret = this._wrapFragments(opt.fragments); // восстанавливаем символы \n
 				ret = opt.saveValueCallback(opt.fragments, this.textFlags, /*skip NL check*/ret);
 				if (!ret) {
 					// При ошибке нужно выставить флаг, чтобы по стрелкам не закрывался редактор
@@ -510,12 +511,6 @@
 		this.top = this.sides.cellY;
 		this.right = this.sides.r[0];
 		this.bottom = this.sides.b[0];
-		// Обновляем флаги, т.к. мы уже могли выставить wrap
-		this.textFlags.wrapText = this.options.flags.wrapText;
-		if ( this.textFlags.wrapText ) {
-			this.textFlags.wrapOnlyNL = true;
-			this.textFlags.wrapText = false;
-		}
 		// ToDo вынести в отдельную функцию
 		var canExpW = true, canExpH = true, tm, expW, expH, fragments = this._getRenderFragments();
 		if ( 0 < fragments.length ) {
@@ -599,89 +594,87 @@
 		return f;
 	};
 
-	CellEditor.prototype.pasteText = function ( text ) {
-		text = text.replace( /\t/g, " " );
-		text = text.replace( /\r/g, "" );
-		text = text.replace( /^\n+|\n+$/g, "" );
+	CellEditor.prototype.pasteText = function (text) {
+		text = text.replace(/\t/g, " ");
+		text = text.replace(/\r/g, "");
+		text = text.replace(/^\n+|\n+$/g, "");
 
 		var length = text.length;
-		if ( !(length > 0) ) {
+		if (!(length > 0)) {
 			return;
 		}
-		if ( !this._checkMaxCellLength( length ) ) {
+		if (!this._checkMaxCellLength(length)) {
 			return;
 		}
 
-		var wrap = text.indexOf( "\n" ) >= 0;
-		if ( this.selectionBegin !== this.selectionEnd ) {
+		var wrap = -1 !== text.indexOf(kNewLine);
+		if (this.selectionBegin !== this.selectionEnd) {
 			this._removeChars();
-		}
-		else {
-			this.undoList.push( {fn: "fake", args: []} );
+		} else {
+			this.undoList.push({fn: "fake", args: []});
 		}//фейковый undo(потому что у нас делает undo по 2 действия)
 
 		// save info to undo/redo
-		this.undoList.push( {fn: this._removeChars, args: [this.cursorPos, length]} );
+		this.undoList.push({fn: this._removeChars, args: [this.cursorPos, length]});
 		this.redoList = [];
 
 		var opt = this.options;
 		var nInsertPos = this.cursorPos;
 		var fr;
-		fr = this._findFragmentToInsertInto( nInsertPos - (nInsertPos > 0 ? 1 : 0) );
-		if ( fr ) {
+		fr = this._findFragmentToInsertInto(nInsertPos - (nInsertPos > 0 ? 1 : 0));
+		if (fr) {
 			var oCurFragment = opt.fragments[fr.index];
-			if ( fr.end <= nInsertPos ) {
+			if (fr.end <= nInsertPos) {
 				oCurFragment.text += text;
-			}
-			else {
-				var sNewText = oCurFragment.text.substring( 0, nInsertPos );
+			} else {
+				var sNewText = oCurFragment.text.substring(0, nInsertPos);
 				sNewText += text;
-				sNewText += oCurFragment.text.substring( nInsertPos );
+				sNewText += oCurFragment.text.substring(nInsertPos);
 				oCurFragment.text = sNewText;
 			}
 			this.cursorPos = nInsertPos + length;
 			this._update();
 		}
 
-		if ( wrap ) {
+		if (wrap) {
 			this._wrapText();
 			this._update();
 		}
 	};
 
-	CellEditor.prototype.paste = function ( fragments, cursorPos ) {
-		if ( !(fragments.length > 0) ) {
+	CellEditor.prototype.paste = function (fragments, cursorPos) {
+		if (!(fragments.length > 0)) {
 			return;
 		}
-		var length = this._getFragmentsLength( fragments );
-		if ( !this._checkMaxCellLength( length ) ) {
+		var length = this._getFragmentsLength(fragments);
+		if (!this._checkMaxCellLength(length)) {
 			return;
 		}
 
-		var wrap = fragments.some( function ( val ) {
-			return val.text.indexOf( "\n" ) >= 0;
-		} );
+		var wrap = fragments.some(function (val) {
+			return -1 !== val.text.indexOf(kNewLine);
+		});
 
-		this._cleanFragments( fragments );
+		this._cleanFragments(fragments);
 
-		if ( this.selectionBegin !== this.selectionEnd ) {
+		if (this.selectionBegin !== this.selectionEnd) {
 			this._removeChars();
 		}
 
 		// save info to undo/redo
-		this.undoList.push( {fn: this._removeChars, args: [this.cursorPos, length]} );
+		this.undoList.push({fn: this._removeChars, args: [this.cursorPos, length]});
 		this.redoList = [];
 
-		this._addFragments( fragments, this.cursorPos );
+		this._addFragments(fragments, this.cursorPos);
 
-		if ( wrap ) {
+		if (wrap) {
 			this._wrapText();
 			this._update();
 		}
 
 		// Сделано только для вставки формулы в ячейку (когда не открыт редактор)
-		if ( undefined !== cursorPos ) {
-			this._moveCursor( kPosition, cursorPos );
+		if (undefined !== cursorPos) {
+			this._moveCursor(kPosition, cursorPos);
 		}
 	};
 
@@ -761,10 +754,6 @@
 		this.textFlags = opt.flags.clone();
 		if ( this.textFlags.textAlign.toLowerCase() === "justify" || this.isFormula() ) {
 			this.textFlags.textAlign = "left";
-		}
-		if ( this.textFlags.wrapText ) {
-			this.textFlags.wrapOnlyNL = true;
-			this.textFlags.wrapText = false;
 		}
 
 		this._cleanFragments( opt.fragments );
@@ -1673,23 +1662,8 @@
 		return asc_calcnpt( 0, ppix, this.defaults.padding );
 	};
 
-	CellEditor.prototype._wrapFragments = function ( frag ) {
-		var i, s, ret = false;
-		for ( i = 0; i < frag.length; ++i ) {
-			s = frag[i].text;
-			if ( s.indexOf( "\u00B6" ) >= 0 ) {
-				s = s.replace( /\u00B6/g, "\n" );
-				ret = true;
-			}
-			frag[i].text = s;
-		}
-		return ret;
-	};
-
 	CellEditor.prototype._wrapText = function () {
-		var t = this;
-		t.textFlags.wrapOnlyNL = true;
-		t._wrapFragments( t.options.fragments );
+		this.textFlags.wrapOnlyNL = true;
 	};
 
 	CellEditor.prototype._addChars = function (str, pos, isRange) {
@@ -2001,23 +1975,20 @@
 		}
 	};
 
-	CellEditor.prototype._cleanFragments = function ( fr ) {
+	CellEditor.prototype._cleanFragments = function (fr) {
 		var t = this, i, s, f, wrap = t.textFlags.wrapText || t.textFlags.wrapOnlyNL;
 
-		for ( i = 0; i < fr.length; ++i ) {
+		for (i = 0; i < fr.length; ++i) {
 			s = fr[i].text;
-			if ( s.search( t.reNL ) >= 0 ) {
-				s = s.replace( t.reReplaceNL, wrap ? "\n" : "\u00B6" );
-			}
-			if ( s.search( t.reTab ) >= 0 ) {
-				s = s.replace( t.reReplaceTab, "        " );
+			if (!wrap && -1 !== s.indexOf(kNewLine)) {
+				this._wrapText();
 			}
 			fr[i].text = s;
 			f = fr[i].format;
-			if ( f.fn === "" ) {
+			if (f.fn === "") {
 				f.fn = t.options.font.FontFamily.Name;
 			}
-			if ( f.fs === 0 ) {
+			if (f.fs === 0) {
 				f.fs = t.options.font.FontSize;
 			}
 		}
