@@ -47,6 +47,8 @@ function CFootnotesController(LogicDocument)
 	this.Footnote = {}; // Список всех сносок с ключом - Id.
 	this.Pages    = [];
 
+	this.NeedShift = false; // Нужно ли делать перенос после пересчета.
+
 	// Специальные сноски
 	this.ContinuationNoticeFootnote    = null;
 	this.ContinuationSeparatorFootnote = null;
@@ -190,6 +192,8 @@ CFootnotesController.prototype.Recalculate = function(nPageAbs, nColumnAbs, Y, Y
 		var Bounds = Footnote.Get_PageBounds(0);
 		CurY += Bounds.Bottom - Bounds.Top;
 	}
+
+	this.NeedShift = true;
 };
 /**
  * Получаем суммарную высоту, занимаемую сносками на заданной странице.
@@ -261,6 +265,9 @@ CFootnotesController.prototype.Draw = function(nPageAbs, pGraphics)
  */
 CFootnotesController.prototype.Shift = function(nPageAbs, nColumnAbs, dX, dY)
 {
+	if (true !== this.NeedShift)
+		return;
+
 	var oColumn = this.private_GetPageColumn(nPageAbs, nColumnAbs);
 	if (!oColumn)
 		return;
@@ -277,6 +284,8 @@ CFootnotesController.prototype.Shift = function(nPageAbs, nColumnAbs, dX, dY)
 		var Footnote = oColumn.Elements[nIndex];
 		Footnote.Shift(0, dX, dY);
 	}
+
+	this.NeedShift = false;
 };
 /**
  * Добавляем заданную сноску на страницу для пересчета.
