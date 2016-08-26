@@ -820,7 +820,7 @@
 
     // Проверяет, есть ли числовые значения в диапазоне
     WorksheetView.prototype._hasNumberValueInActiveRange = function () {
-        var cell, cellType, isNumberFormat, arrCols = null, arrRows = null;
+        var cell, cellType, isNumberFormat, arrCols = [], arrRows = [];
         if (this.activeRange.isOneCell()) {
             // Для одной ячейки не стоит ничего делать
             return null;
@@ -839,17 +839,13 @@
                     cellType = cell.cellType;
                     isNumberFormat = (null == cellType || CellValueType.Number === cellType);
                     if (isNumberFormat) {
-                        if (!arrCols) {
-                            arrCols = [];
-                            arrRows = [];
-                        }
                         arrCols.push(c);
                         arrRows.push(r);
                     }
                 }
             }
         }
-        if (arrCols) {
+        if (0 !== arrCols.length) {
             // Делаем массивы уникальными и сортируем
             arrCols = arrCols.filter(AscCommon.fOnlyUnique);
             arrRows = arrRows.filter(AscCommon.fOnlyUnique);
