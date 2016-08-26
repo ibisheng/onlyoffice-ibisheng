@@ -863,7 +863,6 @@
     // Автодополняет формулу диапазоном, если это возможно
     WorksheetView.prototype.autoCompleteFormula = function ( functionName ) {
         var t = this;
-        this.activeRange.normalize();
         var ar = this.activeRange;
         var arCopy = null;
         var arHistorySelect = ar.clone( true );
