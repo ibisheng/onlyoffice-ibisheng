@@ -821,41 +821,40 @@
     // Проверяет, есть ли числовые значения в диапазоне
     WorksheetView.prototype._hasNumberValueInActiveRange = function () {
         var cell, cellType, isNumberFormat, arrCols = null, arrRows = null;
-        if ( this._rangeIsSingleCell( this.activeRange ) ) {
+        if (this.activeRange.isOneCell()) {
             // Для одной ячейки не стоит ничего делать
             return null;
         }
-        var mergedRange = this.model.getMergedByCell( this.activeRange.r1, this.activeRange.c1 );
-        if ( mergedRange && mergedRange.isEqual( this.activeRange ) ) {
+        var mergedRange = this.model.getMergedByCell(this.activeRange.r1, this.activeRange.c1);
+        if (mergedRange && mergedRange.isEqual(this.activeRange)) {
             // Для одной ячейки не стоит ничего делать
             return null;
         }
 
-        for ( var c = this.activeRange.c1; c <= this.activeRange.c2; ++c ) {
-            for ( var r = this.activeRange.r1; r <= this.activeRange.r2; ++r ) {
-                cell = this._getCellTextCache( c, r );
-                if ( cell ) {
+        for (var c = this.activeRange.c1; c <= this.activeRange.c2; ++c) {
+            for (var r = this.activeRange.r1; r <= this.activeRange.r2; ++r) {
+                cell = this._getCellTextCache(c, r);
+                if (cell) {
                     // Нашли не пустую ячейку, проверим формат
                     cellType = cell.cellType;
                     isNumberFormat = (null == cellType || CellValueType.Number === cellType);
-                    if ( isNumberFormat ) {
-                        if ( !arrCols ) {
+                    if (isNumberFormat) {
+                        if (!arrCols) {
                             arrCols = [];
                             arrRows = [];
                         }
-                        arrCols.push( c );
-                        arrRows.push( r );
+                        arrCols.push(c);
+                        arrRows.push(r);
                     }
                 }
             }
         }
-        if ( arrCols ) {
+        if (arrCols) {
             // Делаем массивы уникальными и сортируем
-            arrCols = arrCols.filter( AscCommon.fOnlyUnique );
-            arrRows = arrRows.filter( AscCommon.fOnlyUnique );
-            return {arrCols: arrCols.sort( fSortAscending ), arrRows: arrRows.sort( fSortAscending )};
-        }
-        else {
+            arrCols = arrCols.filter(AscCommon.fOnlyUnique);
+            arrRows = arrRows.filter(AscCommon.fOnlyUnique);
+            return {arrCols: arrCols.sort(fSortAscending), arrRows: arrRows.sort(fSortAscending)};
+        } else {
             return null;
         }
     };
@@ -5225,15 +5224,6 @@
     WorksheetView.prototype._isLargeRange = function ( range ) {
         var vr = this.visibleRange;
         return range.c2 - range.c1 + 1 > (vr.c2 - vr.c1 + 1) * 3 || range.r2 - range.r1 + 1 > (vr.r2 - vr.r1 + 1) * 3;
-    };
-
-    /**
-     * Возвращает true, если диапазон состоит из одной ячейки
-     * @param {Asc.Range} range  Диапазон
-     * @returns {Boolean}
-     */
-    WorksheetView.prototype._rangeIsSingleCell = function ( range ) {
-        return range.c1 === range.c2 && range.r1 === range.r2;
     };
 
     WorksheetView.prototype.drawDepCells = function () {
