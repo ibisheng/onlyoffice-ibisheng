@@ -3225,8 +3225,11 @@ var editor;
     return true;
   };
   spreadsheet_api.prototype.asc_Recalculate = function () {
-    History.EndTransaction();
-    this._onUpdateAfterApplyChanges();
+    var t = this;
+    this._loadFonts(this.wbModel.generateFontMap(), function() {
+      History.EndTransaction();
+      t._onUpdateAfterApplyChanges();
+    });
   };
 
   spreadsheet_api.prototype._onEndLoadSdk = function() {
