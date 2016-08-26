@@ -7262,20 +7262,21 @@
           parserHelp.get3DRef(this.model.getName(), sName);
     };
 
-    WorksheetView.prototype.getSelectionInfo = function ( bExt ) {
-        return this.objectRender.selectedGraphicObjectsExists() ? this._getSelectionInfoObject( bExt ) : this._getSelectionInfoCell( bExt );
+    WorksheetView.prototype.getSelectionInfo = function (bExt) {
+        return this.objectRender.selectedGraphicObjectsExists() ? this._getSelectionInfoObject(bExt) :
+          this._getSelectionInfoCell(bExt);
     };
 
-    WorksheetView.prototype._getSelectionInfoCell = function ( bExt ) {
+    WorksheetView.prototype._getSelectionInfoCell = function (bExt) {
         var c_opt = this.settings.cells;
         var activeCell = this.activeRange;
-        var mc = this.model.getMergedByCell( activeCell.startRow, activeCell.startCol );
+        var mc = this.model.getMergedByCell(activeCell.startRow, activeCell.startCol);
         var c1 = mc ? mc.c1 : activeCell.startCol;
         var r1 = mc ? mc.r1 : activeCell.startRow;
-        var c = this._getVisibleCell( c1, r1 );
+        var c = this._getVisibleCell(c1, r1);
 
-        if ( c === undefined ) {
-            asc_debug( "log", "Unknown cell's info: col = " + c1 + ", row = " + r1 );
+        if (c === undefined) {
+            asc_debug("log", "Unknown cell's info: col = " + c1 + ", row = " + r1);
             return {};
         }
 
@@ -7286,60 +7287,56 @@
         var isNumberFormat = (!cellType || CellValueType.Number === cellType);
 
         var cell_info = new asc_CCellInfo();
-        cell_info.name = this._getColumnTitle( c1 ) + this._getRowTitle( r1 );
+        cell_info.name = this._getColumnTitle(c1) + this._getRowTitle(r1);
         cell_info.formula = c.getFormula();
 
         cell_info.text = c.getValueForEdit();
 
-        cell_info.halign = c.getAlignHorizontalByValue().toLowerCase();
+        cell_info.halign = c.getAlignHorizontal().toLowerCase();
         cell_info.valign = c.getAlignVertical().toLowerCase();
 
-        var tablePartsOptions = this.model.autoFilters.searchRangeInTableParts( activeCell );
+        var tablePartsOptions = this.model.autoFilters.searchRangeInTableParts(activeCell);
         var curTablePart = tablePartsOptions >= 0 ? this.model.TableParts[tablePartsOptions] : null;
         var tableStyleInfo = curTablePart && curTablePart.TableStyleInfo ? curTablePart.TableStyleInfo : null;
 
         cell_info.autoFilterInfo = new asc_CAutoFilterInfo();
-        if ( -2 === tablePartsOptions ) {
+        if (-2 === tablePartsOptions) {
             cell_info.autoFilterInfo.isAutoFilter = null;
             cell_info.autoFilterInfo.isApplyAutoFilter = false;
-        }
-        else {
-            var checkApplyFilterOrSort = this.model.autoFilters.checkApplyFilterOrSort( tablePartsOptions );
+        } else {
+            var checkApplyFilterOrSort = this.model.autoFilters.checkApplyFilterOrSort(tablePartsOptions);
             cell_info.autoFilterInfo.isAutoFilter = checkApplyFilterOrSort.isAutoFilter;
             cell_info.autoFilterInfo.isApplyAutoFilter = checkApplyFilterOrSort.isFilterColumns;
         }
-		
-		if(curTablePart !== null)
-		{
-			cell_info.formatTableInfo = new AscCommonExcel.asc_CFormatTableInfo();
-			cell_info.formatTableInfo.tableName = curTablePart.DisplayName;
-			
-			if (tableStyleInfo) {
-				cell_info.formatTableInfo.tableStyleName = tableStyleInfo.Name;
-			
-				cell_info.formatTableInfo.bandVer = tableStyleInfo.ShowColumnStripes;
-				cell_info.formatTableInfo.firstCol = tableStyleInfo.ShowFirstColumn;
-				cell_info.formatTableInfo.lastCol = tableStyleInfo.ShowLastColumn;
-				
-				cell_info.formatTableInfo.bandHor = tableStyleInfo.ShowRowStripes;
-			}
-			cell_info.formatTableInfo.lastRow = curTablePart.TotalsRowCount !== null ? true : false;
-			cell_info.formatTableInfo.firstRow = curTablePart.HeaderRowCount === null ? true : false;
-			cell_info.formatTableInfo.tableRange = curTablePart.Ref.getAbsName();
-			cell_info.formatTableInfo.filterButton = curTablePart.isShowButton();
-			
-			var checkDisableProps = this.af_checkDisableProps(curTablePart)
-			
-			cell_info.formatTableInfo.isInsertRowAbove = checkDisableProps.insertRowAbove;
-			cell_info.formatTableInfo.isInsertRowBelow = checkDisableProps.insertRowBelow;
-			cell_info.formatTableInfo.isInsertColumnLeft = checkDisableProps.insertColumnLeft;
-			cell_info.formatTableInfo.isInsertColumnRight = checkDisableProps.insertColumnRight;
-			cell_info.formatTableInfo.isDeleteRow = checkDisableProps.deleteRow;
-			cell_info.formatTableInfo.isDeleteColumn = checkDisableProps.deleteColumn;
-			cell_info.formatTableInfo.isDeleteTable = checkDisableProps.deleteTable;
-		}
-       
-		
+
+        if (curTablePart !== null) {
+            cell_info.formatTableInfo = new AscCommonExcel.asc_CFormatTableInfo();
+            cell_info.formatTableInfo.tableName = curTablePart.DisplayName;
+
+            if (tableStyleInfo) {
+                cell_info.formatTableInfo.tableStyleName = tableStyleInfo.Name;
+
+                cell_info.formatTableInfo.bandVer = tableStyleInfo.ShowColumnStripes;
+                cell_info.formatTableInfo.firstCol = tableStyleInfo.ShowFirstColumn;
+                cell_info.formatTableInfo.lastCol = tableStyleInfo.ShowLastColumn;
+
+                cell_info.formatTableInfo.bandHor = tableStyleInfo.ShowRowStripes;
+            }
+            cell_info.formatTableInfo.lastRow = curTablePart.TotalsRowCount !== null;
+            cell_info.formatTableInfo.firstRow = curTablePart.HeaderRowCount === null;
+            cell_info.formatTableInfo.tableRange = curTablePart.Ref.getAbsName();
+            cell_info.formatTableInfo.filterButton = curTablePart.isShowButton();
+
+            var checkDisableProps = this.af_checkDisableProps(curTablePart);
+
+            cell_info.formatTableInfo.isInsertRowAbove = checkDisableProps.insertRowAbove;
+            cell_info.formatTableInfo.isInsertRowBelow = checkDisableProps.insertRowBelow;
+            cell_info.formatTableInfo.isInsertColumnLeft = checkDisableProps.insertColumnLeft;
+            cell_info.formatTableInfo.isInsertColumnRight = checkDisableProps.insertColumnRight;
+            cell_info.formatTableInfo.isDeleteRow = checkDisableProps.deleteRow;
+            cell_info.formatTableInfo.isDeleteColumn = checkDisableProps.deleteColumn;
+            cell_info.formatTableInfo.isDeleteTable = checkDisableProps.deleteTable;
+        }
 
         cell_info.styleName = c.getStyleName();
         cell_info.angle = c.getAngle();
@@ -7361,42 +7358,43 @@
         cell_info.font.strikeout = c.getStrikeout();
         cell_info.font.subscript = fa === "subscript";
         cell_info.font.superscript = fa === "superscript";
-        cell_info.font.color = (fc ? asc_obj2Color( fc ) : new Asc.asc_CColor( c_opt.defaultState.color ));
+        cell_info.font.color = (fc ? asc_obj2Color(fc) : new Asc.asc_CColor(c_opt.defaultState.color));
 
-        cell_info.fill = new asc_CFill( (null != bg) ? asc_obj2Color( bg ) : bg );
+        cell_info.fill = new asc_CFill((null != bg) ? asc_obj2Color(bg) : bg);
 
         cell_info.numFormatType = c.getNumFormatType();
 
         // Получаем гиперссылку
         var ar = this.activeRange.clone();
-        var range = this.model.getRange3( ar.r1, ar.c1, ar.r2, ar.c2 );
+        var range = this.model.getRange3(ar.r1, ar.c1, ar.r2, ar.c2);
         var hyperlink = range.getHyperlink();
         var oHyperlink;
-        if ( null !== hyperlink ) {
+        if (null !== hyperlink) {
             // Гиперлинк
-            oHyperlink = new asc_CHyperlink( hyperlink );
-            oHyperlink.asc_setText( cell_info.text );
+            oHyperlink = new asc_CHyperlink(hyperlink);
+            oHyperlink.asc_setText(cell_info.text);
             cell_info.hyperlink = oHyperlink;
-        }
-        else {
+        } else {
             cell_info.hyperlink = null;
         }
 
-        cell_info.comments = this.cellCommentator.getComments( ar.c1, ar.r1 );
+        cell_info.comments = this.cellCommentator.getComments(ar.c1, ar.r1);
         cell_info.flags.merge = null !== range.hasMerged();
 
-        if ( bExt ) {
+        if (bExt) {
             cell_info.innertext = c.getValue();
             cell_info.numFormat = c.getNumFormatStr();
         }
 
         var sheetId = this.model.getId();
         // Пересчет для входящих ячеек в добавленные строки/столбцы
-        var isIntersection = this._recalcRangeByInsertRowsAndColumns( sheetId, ar );
-        if ( false === isIntersection ) {
-            var lockInfo = this.collaborativeEditing.getLockInfo( c_oAscLockTypeElem.Range, /*subType*/null, sheetId, new AscCommonExcel.asc_CCollaborativeRange( ar.c1, ar.r1, ar.c2, ar.r2 ) );
+        var isIntersection = this._recalcRangeByInsertRowsAndColumns(sheetId, ar);
+        if (false === isIntersection) {
+            var lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Range, /*subType*/null, sheetId,
+              new AscCommonExcel.asc_CCollaborativeRange(ar.c1, ar.r1, ar.c2, ar.r2));
 
-            if ( false !== this.collaborativeEditing.getLockIntersection( lockInfo, c_oAscLockTypes.kLockTypeOther, /*bCheckOnlyLockAll*/false ) ) {
+            if (false !== this.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeOther,
+                /*bCheckOnlyLockAll*/false)) {
                 // Уже ячейку кто-то редактирует
                 cell_info.isLocked = true;
             }
